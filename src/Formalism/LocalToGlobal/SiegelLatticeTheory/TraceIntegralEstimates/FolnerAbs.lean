@@ -15,33 +15,37 @@ namespace Formalism.L2.S.Pv.FolnerAbs
 
 open Formalism.L2.SG.Pf.EnergyAbs
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-def subOf (S : Set G) (h1 : (1 : G) ∈ S) (hm : ∀ a ∈ S, ∀ b ∈ S, a * b ∈ S) (hi : ∀ a ∈ S, a⁻¹ ∈ S) :
-    Subgroup G where
+def subOf (S : Set G) (h1 : (1 : G) ∈ S) (hm : ∀ a ∈ S, ∀ b ∈ S, a * b ∈ S) (hi : ∀ a ∈ S, a⁻¹ ∈ S)
+    : Subgroup G where
   carrier := S
   mul_mem' := fun ha hb => hm _ ha _ hb
   one_mem' := h1
   inv_mem' := fun ha => hi _ ha
 
 def LeftHaarSub (S : Set G) (μS : Measure G) : Prop :=
-  IsClosed S ∧ (1 : G) ∈ S ∧ (∀ a ∈ S, ∀ b ∈ S, a * b ∈ S) ∧ (∀ a ∈ S, a⁻¹ ∈ S) ∧
-    SigmaFinite μS ∧ μS ≠ 0 ∧ μS Sᶜ = 0 ∧ (∀ s ∈ S, μS.map (fun x => s * x) = μS)
+  IsClosed S ∧ (1 : G) ∈ S ∧ (∀ a ∈ S, ∀ b ∈ S, a * b ∈ S) ∧ (∀ a ∈ S, a⁻¹ ∈ S) ∧ SigmaFinite μS
+    ∧ μS ≠ 0 ∧ μS Sᶜ = 0 ∧ (∀ s ∈ S, μS.map (fun x => s * x) = μS)
 
 theorem leftOf {S : Set G} {μS : Measure G} (h : IsHaarSub S μS) : LeftHaarSub S μS := by
   obtain ⟨a, b, c, d, e, f, g, h', -⟩ := h
   exact ⟨a, b, c, d, e, f, g, h'⟩
 
-theorem haarSub_prop {S : Set G} {μ ν : Measure G} (hμ : LeftHaarSub S μ) (hν : LeftHaarSub S ν) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
+theorem haarSub_prop {S : Set G} {μ ν : Measure G} (hμ : LeftHaarSub S μ) (hν : LeftHaarSub S ν)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
   obtain ⟨hC, h1, hm, hi, -, -, -, -⟩ := id hμ
   let H : Subgroup G := subOf S h1 hm hi
-  have hemb : MeasurableEmbedding (Subtype.val : H → G) := MeasurableEmbedding.subtype_coe hC.measurableSet
-  have key : ∀ ρ : Measure G, LeftHaarSub S ρ →
-      (ρ.comap (Subtype.val : H → G)).map Subtype.val = ρ ∧
-      IsMulLeftInvariant (ρ.comap (Subtype.val : H → G)) ∧
-      SigmaFinite (ρ.comap (Subtype.val : H → G)) ∧ ρ.comap (Subtype.val : H → G) ≠ 0 := by
+  have hemb : MeasurableEmbedding (Subtype.val : H → G) :=
+    MeasurableEmbedding.subtype_coe hC.measurableSet
+  have key
+      : ∀ ρ : Measure G,
+        LeftHaarSub S ρ
+          → (ρ.comap (Subtype.val : H → G)).map Subtype.val = ρ
+            ∧ IsMulLeftInvariant (ρ.comap (Subtype.val : H → G))
+            ∧ SigmaFinite (ρ.comap (Subtype.val : H → G)) ∧ ρ.comap (Subtype.val : H → G) ≠ 0 := by
     intro ρ hρ
     obtain ⟨-, -, -, -, hσ, h0, hc, hl⟩ := hρ
     have hmap : (ρ.comap (Subtype.val : H → G)).map Subtype.val = ρ := by
@@ -50,8 +54,9 @@ theorem haarSub_prop {S : Set G} {μ ν : Measure G} (hμ : LeftHaarSub S μ) (h
     refine ⟨hmap, ⟨fun s => ?_⟩, ?_, ?_⟩
     · ext A hA
       rw [Measure.map_apply (measurable_const_mul s) hA, hemb.comap_apply, hemb.comap_apply]
-      have e : Subtype.val '' ((fun x : H => s * x) ⁻¹' A) =
-          (fun y : G => (s : G) * y) ⁻¹' (Subtype.val '' A) := by
+      have e
+          : Subtype.val '' ((fun x : H => s * x) ⁻¹' A)
+            = (fun y : G => (s : G) * y) ⁻¹' (Subtype.val '' A) := by
         ext y
         constructor
         · rintro ⟨x, hx, rfl⟩
@@ -96,7 +101,8 @@ theorem haarSub_prop {S : Set G} {μ ν : Measure G} (hμ : LeftHaarSub S μ) (h
   · intro hc
     apply hμ0
     rw [heq, hc, zero_smul]
-  · calc μ = μ'.map Subtype.val := hμm.symm
+  · calc
+      μ = μ'.map Subtype.val := hμm.symm
       _ = ((μ' A / ν' A) • ν').map Subtype.val := by rw [← heq]
       _ = (μ' A / ν' A) • ν'.map Subtype.val := Measure.map_smul _ hemb.measurable.aemeasurable
       _ = (μ' A / ν' A) • ν := by rw [hνm]
@@ -109,8 +115,9 @@ theorem cjB_mul (b x y : G) : cjB b (x * y) = cjB b x * cjB b y := by
 theorem continuous_cjB (b : G) : Continuous (cjB b) := by
   exact (continuous_const.mul continuous_id).mul continuous_const
 
-theorem map_cjB {S : Set G} {μ : Measure G} (hμ : LeftHaarSub S μ) (b : G) (hb : ∀ s, s ∈ S ↔ cjB b s ∈ S) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ.map (cjB b) = c • μ := by
+theorem map_cjB
+    {S : Set G} {μ : Measure G} (hμ : LeftHaarSub S μ) (b : G) (hb : ∀ s, s ∈ S ↔ cjB b s ∈ S)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ.map (cjB b) = c • μ := by
   have hcont : Continuous (cjB b) := continuous_cjB b
   have hinv1 : ∀ y, cjB b⁻¹ (cjB b y) = y := by
     intro y
@@ -118,9 +125,14 @@ theorem map_cjB {S : Set G} {μ : Measure G} (hμ : LeftHaarSub S μ) (b : G) (h
   have hinv2 : ∀ y, cjB b (cjB b⁻¹ y) = y := by
     intro y
     simp [cjB, mul_assoc]
-  let E : G ≃ₜ G :=
-    { toFun := cjB b, invFun := cjB b⁻¹, left_inv := hinv1, right_inv := hinv2,
-      continuous_toFun := hcont, continuous_invFun := continuous_cjB _ }
+  let E : G ≃ₜ G := {
+    toFun := cjB b
+    invFun := cjB b⁻¹
+    left_inv := hinv1
+    right_inv := hinv2
+    continuous_toFun := hcont
+    continuous_invFun := continuous_cjB _
+  }
   let M : G ≃ᵐ G := E.toMeasurableEquiv
   have hmap : ∀ A : Set G, (μ.map (cjB b)) A = μ (cjB b ⁻¹' A) := fun A => by
     exact MeasurableEquiv.map_apply M A
@@ -130,11 +142,13 @@ theorem map_cjB {S : Set G} {μ : Measure G} (hμ : LeftHaarSub S μ) (b : G) (h
     · haveI := hσ
       show SigmaFinite (μ.map M)
       first
-        | exact M.sigmaFinite_map
-        | exact MeasurableEquiv.sigmaFinite_map M
-        | (refine SigmaFinite.of_map _ M.measurable.aemeasurable ?_
-           rw [Measure.map_map M.symm.measurable M.measurable, M.symm_comp_self, Measure.map_id]
-           exact hσ)
+      | exact M.sigmaFinite_map
+      | exact MeasurableEquiv.sigmaFinite_map M
+      | (
+          refine SigmaFinite.of_map _ M.measurable.aemeasurable ?_
+          rw [Measure.map_map M.symm.measurable M.measurable, M.symm_comp_self, Measure.map_id]
+          exact hσ
+        )
     · intro h
       exact h0 ((Measure.map_eq_zero_iff hcont.measurable.aemeasurable).1 h)
     · rw [hmap]
@@ -152,19 +166,18 @@ theorem map_cjB {S : Set G} {μ : Measure G} (hμ : LeftHaarSub S μ) (b : G) (h
       rw [e1, ← Measure.map_map hcont.measurable (continuous_const_mul _).measurable, hl _ hs']
   exact haarSub_prop hL ⟨hC, h1, hm, hi, hσ, h0, hc, hl⟩
 
-theorem cjB_pow_iff {S : Set G} {a : G} (ha : ∀ s, s ∈ S ↔ cjB a s ∈ S) (m : ℕ) (s : G) :
-    s ∈ S ↔ cjB (a ^ m) s ∈ S := by
+theorem cjB_pow_iff {S : Set G} {a : G} (ha : ∀ s, s ∈ S ↔ cjB a s ∈ S) (m : ℕ) (s : G)
+    : s ∈ S ↔ cjB (a ^ m) s ∈ S := by
   induction m with
   | zero => simp [cjB]
   | succ m ih =>
     rw [ih, ha (cjB (a ^ m) s)]
-    have e : cjB a (cjB (a ^ m) s) = cjB (a ^ (m + 1)) s := by
-      simp [cjB, pow_succ, mul_assoc]
+    have e : cjB a (cjB (a ^ m) s) = cjB (a ^ (m + 1)) s := by simp [cjB, pow_succ, mul_assoc]
     rw [e]
 
-private theorem preimage_cjB_lemma {S : Set G} {μ : Measure G} (hμ : LeftHaarSub S μ) (b : G)
-    (hb : ∀ s, s ∈ S ↔ cjB b s ∈ S) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ∀ A : Set G, μ (cjB b ⁻¹' A) = c * μ A := by
+private theorem preimage_cjB_lemma
+    {S : Set G} {μ : Measure G} (hμ : LeftHaarSub S μ) (b : G) (hb : ∀ s, s ∈ S ↔ cjB b s ∈ S)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ∀ A : Set G, μ (cjB b ⁻¹' A) = c * μ A := by
   obtain ⟨c, hc0, hctop, hceq⟩ := map_cjB hμ b hb
   have hinv1 : ∀ y, cjB b⁻¹ (cjB b y) = y := by
     intro y
@@ -172,21 +185,28 @@ private theorem preimage_cjB_lemma {S : Set G} {μ : Measure G} (hμ : LeftHaarS
   have hinv2 : ∀ y, cjB b (cjB b⁻¹ y) = y := by
     intro y
     simp [cjB, mul_assoc]
-  let E : G ≃ₜ G :=
-    { toFun := cjB b, invFun := cjB b⁻¹, left_inv := hinv1, right_inv := hinv2,
-      continuous_toFun := continuous_cjB b, continuous_invFun := continuous_cjB _ }
+  let E : G ≃ₜ G := {
+    toFun := cjB b
+    invFun := cjB b⁻¹
+    left_inv := hinv1
+    right_inv := hinv2
+    continuous_toFun := continuous_cjB b
+    continuous_invFun := continuous_cjB _
+  }
   let M : G ≃ᵐ G := E.toMeasurableEquiv
   refine ⟨c, hc0, hctop, fun A => ?_⟩
-  have h1 : (μ.map (cjB b)) A = μ (cjB b ⁻¹' A) := by
-    exact MeasurableEquiv.map_apply M A
+  have h1 : (μ.map (cjB b)) A = μ (cjB b ⁻¹' A) := by exact MeasurableEquiv.map_apply M A
   rw [← h1, hceq, Measure.smul_apply, smul_eq_mul]
 
-theorem isFolner_of_contract {S : Set G} {μS : Measure G} (hS : IsHaarSub S μS) (C : Set G) (f : G → ℝ)
-    (hf : Continuous f) (hfC : ∀ c ∈ C, ∀ x, f (c * x) = f x) (hfK : ∀ ρ : ℝ, IsCompact ({x | f x ≤ ρ} ∩ S))
+theorem isFolner_of_contract
+    {S : Set G} {μS : Measure G} (hS : IsHaarSub S μS)
+    (C : Set G) (f : G → ℝ) (hf : Continuous f) (hfC : ∀ c ∈ C, ∀ x, f (c * x) = f x)
+    (hfK : ∀ ρ : ℝ, IsCompact ({x | f x ≤ ρ} ∩ S))
     (a : G) (ha : ∀ s, s ∈ S ↔ cjB a s ∈ S)
-    (hcontr : ∀ K : Set G, IsCompact K → K ⊆ S → ∀ U : Set G, IsOpen U → C ⊆ U →
-      ∀ᶠ m : ℕ in atTop, ∀ k ∈ K, cjB (a ^ m) k ∈ U) :
-    IsFolner S μS := by
+    (hcontr : ∀ K : Set G,
+      IsCompact K → K ⊆ S
+        → ∀ U : Set G, IsOpen U → C ⊆ U → ∀ᶠ m : ℕ in atTop, ∀ k ∈ K, cjB (a ^ m) k ∈ U)
+    : IsFolner S μS := by
   obtain ⟨hSC, hS1, hSm, hSi, hSσ, hS0, hSc, hSl, hSK, -, -⟩ := id hS
   obtain ⟨L, hLdef⟩ : ∃ L : ℝ → Set G, L = fun ρ => {x | f x ≤ ρ} ∩ S := ⟨_, rfl⟩
   have hLmem : ∀ ρ x, x ∈ L ρ ↔ f x ≤ ρ ∧ x ∈ S := by
@@ -257,24 +277,24 @@ theorem isFolner_of_contract {S : Set G} {μS : Measure G} (hS : IsHaarSub S μS
     · apply measure_mono
       intro x hx
       exact (hLmem _ _).2 ⟨le_of_lt hx.1, hx.2⟩
-    · calc μS (L ρ) ≤ μS (({x | f x < ρ} ∩ S) ∪ {x | f x = ρ}) := by
-            apply measure_mono
-            intro x hx
-            rw [hLmem] at hx
-            rcases hx.1.lt_or_eq with h | h
-            · exact Or.inl ⟨h, hx.2⟩
-            · exact Or.inr h
+    · calc
+        μS (L ρ) ≤ μS (({x | f x < ρ} ∩ S) ∪ {x | f x = ρ}) := by
+          apply measure_mono
+          intro x hx
+          rw [hLmem] at hx
+          rcases hx.1.lt_or_eq with h | h
+          · exact Or.inl ⟨h, hx.2⟩
+          · exact Or.inr h
         _ ≤ μS ({x | f x < ρ} ∩ S) + μS {x | f x = ρ} := measure_union_le _ _
         _ = μS ({x | f x < ρ} ∩ S) := by rw [hlevel, add_zero]
   have hlim : Tendsto (fun n : ℕ => μS (L (ρ - 1 / ((n : ℝ) + 1)))) atTop (𝓝 (μS (L ρ))) := by
     rw [← hVeq, ← hunion]
-    first
-      | exact tendsto_measure_iUnion_atTop hmonoSeq
-      | exact tendsto_measure_iUnion hmonoSeq
+    first | exact tendsto_measure_iUnion_atTop hmonoSeq | exact tendsto_measure_iUnion hmonoSeq
   have hlt : μS (L ρ) < (1 + ε) * μS (L ρ) := by
     rw [add_mul, one_mul]
     exact ENNReal.lt_add_right (hLfin ρ) (mul_ne_zero hε.ne' hV0)
-  obtain ⟨n, hn⟩ := ((ENNReal.Tendsto.const_mul hlim (Or.inl hV0)).eventually (lt_mem_nhds hlt)).exists
+  obtain ⟨n, hn⟩ :=
+    ((ENNReal.Tendsto.const_mul hlim (Or.inl hV0)).eventually (lt_mem_nhds hlt)).exists
   have hn' : μS (L ρ) < (1 + ε) * μS (L (ρ - 1 / ((n : ℝ) + 1))) := hn
   have hpos : (0 : ℝ) < 1 / ((n : ℝ) + 1) := by positivity
   set ρ' := ρ - 1 / ((n : ℝ) + 1) with hρ'
@@ -312,8 +332,9 @@ theorem isFolner_of_contract {S : Set G} {μS : Measure G} (hS : IsHaarSub S μS
   · rw [hpre]
     exact ENNReal.mul_lt_top (lt_top_iff_ne_top.2 hctop) (lt_top_iff_ne_top.2 (hLfin ρ))
   · have hρρ : ρ' ≤ ρ := by linarith
-    have hsub : cjB (a ^ m) ⁻¹' L ρ' ⊆
-        {t | t ∈ cjB (a ^ m) ⁻¹' L ρ ∧ ∀ k ∈ K, k * t ∈ cjB (a ^ m) ⁻¹' L ρ} := by
+    have hsub
+        : cjB (a ^ m) ⁻¹' L ρ'
+          ⊆ {t | t ∈ cjB (a ^ m) ⁻¹' L ρ ∧ ∀ k ∈ K, k * t ∈ cjB (a ^ m) ⁻¹' L ρ} := by
       intro t ht
       have ht0 : cjB (a ^ m) t ∈ L ρ' := ht
       have ht' := (hLmem _ _).1 ht0
@@ -324,7 +345,9 @@ theorem isFolner_of_contract {S : Set G} {μS : Measure G} (hS : IsHaarSub S μS
       have hkU : ∀ t ∈ L ρ', f (cjB (a ^ m) k * t) < f t + 1 / ((n : ℝ) + 1) := hmU k hk
       have := hkU _ ht0
       linarith [ht'.1]
-    calc μS (cjB (a ^ m) ⁻¹' L ρ) = c * μS (L ρ) := hpre _
+    calc
+      μS (cjB (a ^ m) ⁻¹' L ρ)
+        = c * μS (L ρ) := hpre _
       _ ≤ c * ((1 + ε) * μS (L ρ')) := mul_le_mul_of_nonneg_left hn'.le zero_le
       _ = (1 + ε) * (c * μS (L ρ')) := by ring
       _ = (1 + ε) * μS (cjB (a ^ m) ⁻¹' L ρ') := by rw [hpre]

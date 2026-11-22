@@ -8,33 +8,40 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
-open Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.HenQ UpperTheory.V.Z.Bc UpperTheory.V.Published
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL UpperTheory.Zero.LLC UpperTheory.V.Z.Inf
+open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam
+  UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
+open Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.HenQ
+  UpperTheory.V.Z.Bc UpperTheory.V.Published
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  UpperTheory.Zero.LLC UpperTheory.V.Z.Inf
 open GroundTheory.Global.SemiLocal
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
 
-private theorem unr_mul {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {a b : kˣ →* ℂˣ} (ha : IsUnram a) (hb : IsUnram b) : IsUnram (a * b⁻¹) := by
+private theorem unr_mul
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {a b : kˣ →* ℂˣ} (ha : IsUnram a) (hb : IsUnram b)
+    : IsUnram (a * b⁻¹) := by
   intro x hx
   rw [MonoidHom.mul_apply, MonoidHom.inv_apply, ha x hx, hb x hx, inv_one, one_mul]
 
-private theorem unr_one {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    IsUnram (1 : kˣ →* ℂˣ) := by
+private theorem unr_one
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : IsUnram (1 : kˣ →* ℂˣ) := by
   unfold IsUnram
   simp
 
-private theorem loc_pow' {K : Type} [Field K] [NumberField K] (η : HChar K) (v : HeightOneSpectrum (𝓞 K)) (j : ℕ) :
-    (η ^ j).loc v = η.loc v ^ j := by
+private theorem loc_pow'
+    {K : Type} [Field K] [NumberField K] (η : HChar K) (v : HeightOneSpectrum (𝓞 K)) (j : ℕ)
+    : (η ^ j).loc v = η.loc v ^ j := by
   induction j with
   | zero => rw [pow_zero, pow_zero]; ext; rfl
   | succ j ih => rw [pow_succ, pow_succ, ← ih]; ext; rfl
 
-theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.upDownX :
-    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.UpDownX := by
+theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.upDownX
+    : UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.UpDownX := by
   intro K L _ _ _ _ _ _ _ _ hp n hn π P hBC v s s' hs hs'
   obtain ⟨η, hη, hloc⟩ := normCnt K L hp
   have hM := matchBCX K L hp n hn π P hBC η hη v s s' hs hs'
@@ -43,8 +50,9 @@ theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.upDownX :
   · obtain ⟨χ, hχ, hu⟩ := ((upDown K L hp n hn π P hBC v).1 hT w).2 (s' w) (hs' w) ζ hζ.1 hζ.2
     have hL := polFacts (w.1.adicCompletion L)
     have hf : 0 < fdeg w := (normVal K L v w 1).2.2.1
-    obtain ⟨x, hx⟩ := IsAlgClosed.exists_pow_nat_eq
-      ((((ζ * χ.comp (nm w)) (unif (w.1.adicCompletion L)) : ℂˣ) : ℂ)⁻¹) hf
+    obtain ⟨x, hx⟩ :=
+      IsAlgClosed.exists_pow_nat_eq
+        ((((ζ * χ.comp (nm w)) (unif (w.1.adicCompletion L)) : ℂˣ) : ℂ)⁻¹) hf
     have hbx : (((ζ * χ.comp (nm w)) (unif (w.1.adicCompletion L)) : ℂˣ) : ℂ) * x ^ fdeg w = 1 := by
       rw [hx]; exact mul_inv_cancel₀ (Units.ne_zero _)
     have h0 := congrArg (Polynomial.eval x) (hM χ hχ)
@@ -64,9 +72,12 @@ theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.upDownX :
     · have := unr_mul hu hN
       convert this using 1
       ext1 y
-      simp only [MonoidHom.mul_apply, MonoidHom.inv_apply, MonoidHom.comp_apply, hone, mul_one, mul_inv_rev]
+      simp only [MonoidHom.mul_apply, MonoidHom.inv_apply, MonoidHom.comp_apply, hone, mul_one,
+        mul_inv_rev]
       rw [mul_assoc, mul_inv_cancel_left]
-    · have h2 : (((ξ * (χ * (η ^ j).loc v)) (nm w (unif (w.1.adicCompletion L))) : ℂˣ) : ℂ) * x ^ fdeg w = 1 := by
+    · have h2
+          : (((ξ * (χ * (η ^ j).loc v)) (nm w (unif (w.1.adicCompletion L))) : ℂˣ) : ℂ) * x ^ fdeg w
+            = 1 := by
         rw [hval, Units.val_pow_eq_pow_val, ← mul_pow, hax, one_pow]
       have hx0 : x ^ fdeg w ≠ 0 := right_ne_zero_of_mul_eq_one h2
       have h3 := Units.ext (mul_right_cancel₀ hx0 (hbx.trans h2.symm))

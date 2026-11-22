@@ -5,11 +5,17 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomolo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC CochainComplex CochainComplex.HomComplex
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC CochainComplex
+  CochainComplex.HomComplex
 open LateralTheory.E.EtaleTopologySheaves LateralTheory.E.LeafGhostCut UpperTheory.Et.Loc
 
-theorem UpperTheory.totalHomComplex_isKInjective_of_bounded_injective :
-    ∀ (q : ℕ) {B : Scheme.{0}} (C : B.Etale ⥤ Cx (ZMod q)) (I : Cx (ZMod q)) (h : ∀ n, Presheaf.IsSheaf (EtTop B) (TP C I n)), (∀ n, Injective (⟨TP C I n, h n⟩ : SShv B q)) → (∀ (U : B.Etale) (n : ℤ), 0 < n → IsZero ((C.obj U).X n)) → (∀ n : ℤ, n < 0 → IsZero (I.X n)) → (TC C I h).IsKInjective := by
+theorem UpperTheory.totalHomComplex_isKInjective_of_bounded_injective
+    : ∀ (q : ℕ) {B : Scheme.{0}} (C : B.Etale ⥤ Cx (ZMod q)) (I : Cx (ZMod q))
+        (h : ∀ n, Presheaf.IsSheaf (EtTop B) (TP C I n)),
+      (∀ n, Injective (⟨TP C I n, h n⟩ : SShv B q))
+        → (∀ (U : B.Etale) (n : ℤ), 0 < n → IsZero ((C.obj U).X n))
+        → (∀ n : ℤ, n < 0 → IsZero (I.X n))
+        → (TC C I h).IsKInjective := by
   intro q B C I h hinj hC hI
   have hcoch : ∀ (U : B.Etale) (n : ℤ), n < 0 → ∀ α : Cochain (C.obj U) I n, α = 0 := by
     intro U n hn α

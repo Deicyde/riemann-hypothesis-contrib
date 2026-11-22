@@ -12,18 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.PowEqScaleAnd
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.TorsionReduced
 
-theorem isReduced_of_forall_dualNumber (F B : Type) [Field F] [IsAlgClosed F] [CommRing B]
-    [Algebra F B] [Module.Finite F B]
-    (h : ∀ (φ : B →ₐ[F] DualNumber F) (b : B), (φ b).snd = 0) : _root_.IsReduced B := by
+theorem isReduced_of_forall_dualNumber
+    (F B : Type) [Field F] [IsAlgClosed F] [CommRing B] [Algebra F B] [Module.Finite F B]
+    (h : ∀ (φ : B →ₐ[F] DualNumber F) (b : B), (φ b).snd = 0)
+    : _root_.IsReduced B := by
   have hs : Subsingleton (KaehlerDifferential F B) := by
     by_contra hne
     have : Nontrivial (KaehlerDifferential F B) := not_subsingleton_iff_nontrivial.mp hne
-    obtain ⟨P, hP, -⟩ := (eq_top_or_exists_le_coatom
-      (⊥ : Submodule B (KaehlerDifferential F B))).resolve_left bot_ne_top
+    obtain ⟨P, hP, -⟩ :=
+      (eq_top_or_exists_le_coatom (⊥ : Submodule B (KaehlerDifferential F B))).resolve_left
+        bot_ne_top
     have hsimple : IsSimpleModule B (KaehlerDifferential F B ⧸ P) :=
       isSimpleModule_iff_isCoatom.mpr hP
     obtain ⟨m, hm, ⟨e⟩⟩ := isSimpleModule_iff_quot_maximal.mp hsimple
@@ -33,19 +36,20 @@ theorem isReduced_of_forall_dualNumber (F B : Type) [Field F] [IsAlgClosed F] [C
     let u : (B ⧸ m) ≃ₐ[F] F := (AlgEquiv.ofBijective (Algebra.ofId F (B ⧸ m)) hb).symm
     let l : KaehlerDifferential F B →ₗ[B] (B ⧸ m) := e.toLinearMap ∘ₗ P.mkQ
     let D : Derivation F B (B ⧸ m) := l.compDer (KaehlerDifferential.D F B)
-    let φ : B →ₐ[F] DualNumber F :=
-      { toFun := fun b => TrivSqZeroExt.inl (u (Ideal.Quotient.mk m b)) + TrivSqZeroExt.inr (u (D b))
-        map_one' := by ext <;> simp
-        map_mul' := fun a b => by
-          ext
-          · simp
-          · simp [Algebra.smul_def, mul_comm, TrivSqZeroExt.algebraMap_eq_inl]
-        map_zero' := by ext <;> simp
-        map_add' := fun a b => by ext <;> simp
-        commutes' := fun r => by
-          ext
-          · simpa [TrivSqZeroExt.algebraMap_eq_inl] using u.commutes r
-          · simp [TrivSqZeroExt.algebraMap_eq_inl] }
+    let φ : B →ₐ[F] DualNumber F := {
+      toFun := fun b => TrivSqZeroExt.inl (u (Ideal.Quotient.mk m b)) + TrivSqZeroExt.inr (u (D b))
+      map_one' := by ext <;> simp
+      map_mul' := fun a b => by
+        ext
+        · simp
+        · simp [Algebra.smul_def, mul_comm, TrivSqZeroExt.algebraMap_eq_inl]
+      map_zero' := by ext <;> simp
+      map_add' := fun a b => by ext <;> simp
+      commutes' := fun r => by
+        ext
+        · simpa [TrivSqZeroExt.algebraMap_eq_inl] using u.commutes r
+        · simp [TrivSqZeroExt.algebraMap_eq_inl]
+    }
     have hD : ∀ b, l (KaehlerDifferential.D F B b) = 0 := fun b => by
       have := h φ b
       simpa [φ, D] using this
@@ -63,39 +67,42 @@ theorem isReduced_of_forall_dualNumber (F B : Type) [Field F] [IsAlgClosed F] [C
 
 variable {O : Type} [CommRing O] {R : Type} [CommRing R] [Algebra O R]
 
-theorem scale_comp_scale (a b : R) :
-    TangentPow.scale O a ≫ TangentPow.scale O b = TangentPow.scale O (a * b) := by
+theorem scale_comp_scale (a b : R)
+    : TangentPow.scale O a ≫ TangentPow.scale O b = TangentPow.scale O (a * b) := by
   rw [TangentPow.scale, TangentPow.scale, TangentPow.ptMap_comp_ptMap, TangentPow.scale]
   congr 1
   refine AlgHom.ext fun x => ?_
   ext <;> simp [_root_.mul_assoc]
 
-theorem eq_const_of_pow_eq_one {G : Over (Spec (CommRingCat.of O))} [GrpObj G] [IsCommMonObj G]
-    {N : ℕ} (hN : IsUnit (N : R)) (y : specO O (DualNumber R) ⟶ G) (hy : y ^ N = 1) :
-    y = ptMap (TrivSqZeroExt.inlAlgHom O R R) ≫ ptMap (TrivSqZeroExt.fstHom O R R) ≫ y := by
+theorem eq_const_of_pow_eq_one
+    {G : Over (Spec (CommRingCat.of O))} [GrpObj G] [IsCommMonObj G]
+    {N : ℕ} (hN : IsUnit (N : R))
+    (y : specO O (DualNumber R) ⟶ G) (hy : y ^ N = 1)
+    : y = ptMap (TrivSqZeroExt.inlAlgHom O R R) ≫ ptMap (TrivSqZeroExt.fstHom O R R) ≫ y := by
   set c := ptMap (TrivSqZeroExt.inlAlgHom O R R) ≫ ptMap (TrivSqZeroExt.fstHom O R R) ≫ y with hc
   have h0 : ptMap (TrivSqZeroExt.fstHom O R R) ≫ ptMap (TrivSqZeroExt.inlAlgHom O R R) = 𝟙 _ := by
     rw [TangentPow.ptMap_comp_ptMap, ← TangentPow.ptMap_id']
     congr 1
   have h1 : ptMap (TrivSqZeroExt.fstHom O R R) ≫ (y * c⁻¹) = 1 := by
     rw [comp_mul, GrpObj.comp_inv, hc, ← Category.assoc, h0, Category.id_comp, mul_inv_cancel]
-  have h2 : c ^ N = 1 := by
-    rw [hc, ← MonObj.comp_pow, ← MonObj.comp_pow, hy, comp_one, comp_one]
-  have h3 : (y * c⁻¹) ^ N = 1 := by
-    rw [mul_pow, inv_pow, hy, h2, inv_one, _root_.mul_one]
+  have h2 : c ^ N = 1 := by rw [hc, ← MonObj.comp_pow, ← MonObj.comp_pow, hy, comp_one, comp_one]
+  have h3 : (y * c⁻¹) ^ N = 1 := by rw [mul_pow, inv_pow, hy, h2, inv_one, _root_.mul_one]
   rw [TangentPow.pow_eq_scale_comp h1] at h3
   obtain ⟨a, ha⟩ := hN.exists_left_inv
   have h4 := congrArg (TangentPow.scale O a ≫ ·) h3
   simp only [← Category.assoc, scale_comp_scale, ha, TangentPow.scale_one, Category.id_comp,
-    comp_one] at h4
+      comp_one]
+    at h4
   exact mul_inv_eq_one.mp h4
 
 end GlobalTheory.TorsionReduced
 
 namespace GlobalTheory
 
-theorem isReduced_torsion_geometric_fibre :
-    ∀ (O F : Type) [CommRing O] [Field F] [IsAlgClosed F] [Algebra O F] (G : Over (Spec (CommRingCat.of O))) [GrpObj G] [IsCommMonObj G] (N : ℕ), (N : F) ≠ 0 → IsFinite (torsion G N).hom → IsReduced (specO O F ⊗ torsion G N).left := by
+theorem isReduced_torsion_geometric_fibre
+    : ∀ (O F : Type) [CommRing O] [Field F] [IsAlgClosed F] [Algebra O F]
+        (G : Over (Spec (CommRingCat.of O))) [GrpObj G] [IsCommMonObj G] (N : ℕ),
+      (N : F) ≠ 0 → IsFinite (torsion G N).hom → IsReduced (specO O F ⊗ torsion G N).left := by
   intro O F _ _ _ _ G _ _ N hN hfin
   have : IsAffine (torsion G N).left := isAffine_of_isAffineHom (torsion G N).hom
   obtain ⟨ψ, hψ⟩ := Spec.map_surjective ((torsion G N).left.isoSpec.inv ≫ (torsion G N).hom)

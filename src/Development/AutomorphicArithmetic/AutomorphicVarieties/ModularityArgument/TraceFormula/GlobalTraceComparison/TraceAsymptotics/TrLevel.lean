@@ -8,19 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevOpMemFixe
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open scoped Classical
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.trLevel :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.TrLevel := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.trLevel
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.TrLevel := by
   intro G _ _ _ K _ hK V _ _ ρ f K₁ K₂ h₂ hle h₁K hf hfd
   have h₁ : IsOpen (K₁ : Set G) := Subgroup.isOpen_mono hle h₂
   haveI : Finite (K₁ ⧸ K₂.subgroupOf K₁) := GlobalTheory.TwTrLevel.finite_quot K K₁ K₂ hK h₁ h₂ h₁K
   have hf₂ : IsHecke K₂ f := ⟨hf.1, fun k hk x => hf.2 k (hle hk) x⟩
-  have stable : ∀ (H : Subgroup G), IsOpen (H : Set G) → IsHecke H f →
-      ∀ v ∈ fixed ρ H, levOp ρ K H f LinearMap.id v ∈ fixed ρ H := fun H hH hfH v hv =>
-    GlobalTheory.TwTrLevel.levOp_mem_fixed ρ (MonoidHom.id G) (fun _ => rfl) LinearMap.id (fun _ => rfl) K H hH
-      (fun _ hk => hk) f hfH v hv
+  have stable
+      : ∀ (H : Subgroup G),
+        IsOpen (H : Set G) → IsHecke H f
+          → ∀ v ∈ fixed ρ H, levOp ρ K H f LinearMap.id v ∈ fixed ρ H := fun H hH hfH v hv =>
+    GlobalTheory.TwTrLevel.levOp_mem_fixed ρ (MonoidHom.id G)
+      (fun _ => rfl)
+      LinearMap.id
+      (fun _ => rfl)
+      K H hH
+      (fun _ hk => hk)
+      f hfH v hv
   have c₁ := stable K₁ h₁ hf
   have c₂ := stable K₂ h₂ hf₂
   have hW : fixed ρ K₁ ≤ fixed ρ K₂ := fun v hv => by
@@ -30,8 +38,8 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.trLevel :
   haveI : FiniteDimensional ℂ (fixed ρ K₁) := Submodule.finiteDimensional_of_le hW
   let incl : fixed ρ K₁ →ₗ[ℂ] fixed ρ K₂ := Submodule.inclusion hW
   let T : fixed ρ K₂ →ₗ[ℂ] fixed ρ K₁ :=
-    ((levOp ρ K K₁ f LinearMap.id).restrict c₁) ∘ₗ
-      ((GlobalTheory.TwTrLevel.avgOp ρ K₁ K₂).restrict fun u hu => GlobalTheory.TwTrLevel.avgOp_mem ρ K₁ K₂ u hu)
+    ((levOp ρ K K₁ f LinearMap.id).restrict c₁) ∘ₗ ((GlobalTheory.TwTrLevel.avgOp ρ K₁ K₂).restrict
+      fun u hu => GlobalTheory.TwTrLevel.avgOp_mem ρ K₁ K₂ u hu)
   have e₂ : (levOp ρ K K₂ f LinearMap.id).restrict c₂ = incl ∘ₗ T := by
     ext v
     simp only [LinearMap.restrict_coe_apply, LinearMap.coe_comp, Function.comp_apply, incl, T,

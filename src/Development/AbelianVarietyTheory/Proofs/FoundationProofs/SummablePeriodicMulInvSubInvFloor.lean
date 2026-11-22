@@ -7,14 +7,15 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory
 
-theorem norm_inv_add_int_sub_inv_add_int_le (z : ℂ) (L : ℝ) (d m : ℤ)
-    (hm : |(m : ℝ) - d| ≤ L) (hd : 2 * (‖z‖ + L) + 1 ≤ |(d : ℝ)|) :
-    ‖(z + d)⁻¹ - (z + m)⁻¹‖ ≤ 4 * L * (1 / (d : ℝ) ^ 2) := by
+theorem norm_inv_add_int_sub_inv_add_int_le
+    (z : ℂ) (L : ℝ) (d m : ℤ) (hm : |(m : ℝ) - d| ≤ L) (hd : 2 * (‖z‖ + L) + 1 ≤ |(d : ℝ)|)
+    : ‖(z + d)⁻¹ - (z + m)⁻¹‖ ≤ 4 * L * (1 / (d : ℝ) ^ 2) := by
   have hL : 0 ≤ L := (abs_nonneg _).trans hm
   have hz : 0 ≤ ‖z‖ := norm_nonneg z
   have key : ∀ x : ℤ, |(x : ℝ)| - ‖z‖ ≤ ‖z + x‖ := by
@@ -39,18 +40,18 @@ theorem norm_inv_add_int_sub_inv_add_int_le (z : ℂ) (L : ℝ) (d m : ℤ)
     ring
   rw [e, norm_div, norm_mul, Complex.norm_intCast]
   push_cast
-  calc |(m : ℝ) - d| / (‖z + d‖ * ‖z + m‖)
-      ≤ L / (|(d : ℝ)| / 2 * (|(d : ℝ)| / 2)) := by
-        gcongr
+  calc
+    |(m : ℝ) - d| / (‖z + d‖ * ‖z + m‖)
+      ≤ L / (|(d : ℝ)| / 2 * (|(d : ℝ)| / 2)) := by gcongr
     _ = 4 * L * (1 / (d : ℝ) ^ 2) := by
-        have : |(d : ℝ)| ≠ 0 := (by linarith : 0 < |(d : ℝ)|).ne'
-        rw [← sq_abs (d : ℝ)]
-        field_simp
-        ring
+      have : |(d : ℝ)| ≠ 0 := (by linarith : 0 < |(d : ℝ)|).ne'
+      rw [← sq_abs (d : ℝ)]
+      field_simp
+      ring
 
-theorem summable_periodic_mul_inv_sub_inv_floor :
-    ∀ (L : ℕ) (φ : ZMod L → ℂ) (z : ℂ), 0 < L → 0 < z.im →
-      Summable (fun d : ℤ => φ d * ((z + d)⁻¹ - (z + (L * (d / L) : ℤ))⁻¹)) := by
+theorem summable_periodic_mul_inv_sub_inv_floor
+    : ∀ (L : ℕ) (φ : ZMod L → ℂ) (z : ℂ),
+      0 < L → 0 < z.im → Summable (fun d : ℤ => φ d * ((z + d)⁻¹ - (z + (L * (d / L) : ℤ))⁻¹)) := by
   intro L φ z hL _
   haveI : NeZero L := ⟨hL.ne'⟩
   set M : ℝ := ∑ y, ‖φ y‖ with hM

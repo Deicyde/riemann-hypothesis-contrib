@@ -23,33 +23,35 @@ def ev : F[X] →ₗ[F] F := Polynomial.lsum fun i => c i • LinearMap.id
 theorem ev_monomial (n : ℕ) (a : F) : ev c (monomial n a) = c n * a := by
   simp [ev, Polynomial.lsum_apply]
 
-theorem ev_expand (q p : F[X]) (n : ℕ) (hp : p.natDegree < n) :
-    ev c (q * p) = ∑ j ∈ Finset.range n, p.coeff j * ev c (q * X ^ j) := by
+theorem ev_expand (q p : F[X]) (n : ℕ) (hp : p.natDegree < n)
+    : ev c (q * p) = ∑ j ∈ Finset.range n, p.coeff j * ev c (q * X ^ j) := by
   conv_lhs => rw [p.as_sum_range' n hp]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Finset.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
-  rw [← C_mul_X_pow_eq_monomial, show q * (C (p.coeff j) * X ^ j) = p.coeff j • (q * X ^ j) by
-    rw [smul_eq_C_mul]; ring, map_smul, smul_eq_mul]
+  rw [← C_mul_X_pow_eq_monomial,
+    show q * (C (p.coeff j) * X ^ j) = p.coeff j • (q * X ^ j) by rw [smul_eq_C_mul]; ring,
+    map_smul, smul_eq_mul]
 
-theorem ev_zero_of_lt (q p : F[X]) (s : ℕ) (h : ∀ j < s, ev c (q * X ^ j) = 0)
-    (hp : p.natDegree < s) : ev c (q * p) = 0 := by
+theorem ev_zero_of_lt
+    (q p : F[X]) (s : ℕ) (h : ∀ j < s, ev c (q * X ^ j) = 0) (hp : p.natDegree < s)
+    : ev c (q * p) = 0 := by
   rw [ev_expand c q p s hp]
   exact Finset.sum_eq_zero fun j hj => by rw [h j (Finset.mem_range.1 hj), mul_zero]
 
-theorem ev_top (q p : F[X]) (s : ℕ) (h : ∀ j < s, ev c (q * X ^ j) = 0)
-    (hp : p.natDegree ≤ s) : ev c (q * p) = p.coeff s * ev c (q * X ^ s) := by
+theorem ev_top (q p : F[X]) (s : ℕ) (h : ∀ j < s, ev c (q * X ^ j) = 0) (hp : p.natDegree ≤ s)
+    : ev c (q * p) = p.coeff s * ev c (q * X ^ s) := by
   rw [ev_expand c q p (s + 1) (Nat.lt_succ_of_le hp), Finset.sum_range_succ,
     Finset.sum_eq_zero fun j hj => by rw [h j (Finset.mem_range.1 hj), mul_zero], zero_add]
 
-theorem ev_X_pow_mul (m : ℕ) (q : F[X]) :
-    ev c (q * X ^ m) = ∑ j ∈ Finset.range (q.natDegree + 1), q.coeff j * c (m + j) := by
+theorem ev_X_pow_mul (m : ℕ) (q : F[X])
+    : ev c (q * X ^ m) = ∑ j ∈ Finset.range (q.natDegree + 1), q.coeff j * c (m + j) := by
   rw [mul_comm, ev_expand c _ q _ (Nat.lt_succ_self _)]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [← pow_add, ← monomial_one_right_eq_X_pow, ev_monomial, mul_one]
 
-theorem exists_kill (n : ℕ) (h : hankel c n = 0) :
-    ∃ r : F[X], r ≠ 0 ∧ r.natDegree ≤ n ∧ ∀ j ≤ n, ev c (r * X ^ j) = 0 := by
+theorem exists_kill (n : ℕ) (h : hankel c n = 0)
+    : ∃ r : F[X], r ≠ 0 ∧ r.natDegree ≤ n ∧ ∀ j ≤ n, ev c (r * X ^ j) = 0 := by
   classical
   unfold hankel at h
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h
@@ -58,7 +60,9 @@ theorem exists_kill (n : ℕ) (h : hankel c n = 0) :
     apply hv0
     funext k
     have := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p k) h0
-    simpa [Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply, Finsupp.single_apply, Fin.val_inj] using this
+    simpa [Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply, Finsupp.single_apply,
+        Fin.val_inj]
+      using this
   · exact natDegree_sum_le_of_forall_le _ _ fun k _ =>
       (natDegree_monomial_le _).trans (Nat.lt_succ_iff.1 k.2)
   · intro j hj
@@ -69,8 +73,8 @@ theorem exists_kill (n : ℕ) (h : hankel c n = 0) :
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [monomial_mul_X_pow, ev_monomial, add_comm]
 
-theorem exists_annihilator (N : ℕ) (hN : ∀ n, N ≤ n → hankel c n = 0) :
-    ∃ q : F[X], q ≠ 0 ∧ ∀ j, ev c (q * X ^ j) = 0 := by
+theorem exists_annihilator (N : ℕ) (hN : ∀ n, N ≤ n → hankel c n = 0)
+    : ∃ q : F[X], q ≠ 0 ∧ ∀ j, ev c (q * X ^ j) = 0 := by
   classical
   have hex : ∃ d, ∃ q : F[X], q ≠ 0 ∧ q.natDegree = d ∧ d ≤ N ∧ ∀ j ≤ N, ev c (q * X ^ j) = 0 := by
     obtain ⟨r, hr0, hrd, hr⟩ := exists_kill c N (hN N le_rfl)
@@ -79,12 +83,15 @@ theorem exists_annihilator (N : ℕ) (hN : ∀ n, N ≤ n → hankel c n = 0) :
   have hmin : ∀ r : F[X], r ≠ 0 → r.natDegree < Nat.find hex → ¬ ∀ j ≤ N, ev c (r * X ^ j) = 0 :=
     fun r hr0 hrd hr => Nat.find_min hex hrd ⟨r, hr0, rfl, by omega, hr⟩
   have hlc : (q0.leadingCoeff)⁻¹ ≠ 0 := inv_ne_zero (leadingCoeff_ne_zero.2 hq00)
-  obtain ⟨q, hqm, hqd, hqe⟩ : ∃ q : F[X], q.Monic ∧ q.natDegree = Nat.find hex ∧
-      ∀ j, ev c (q * X ^ j) = (q0.leadingCoeff)⁻¹ * ev c (q0 * X ^ j) := by
+  obtain ⟨q, hqm, hqd, hqe⟩
+      : ∃ q : F[X],
+        q.Monic ∧ q.natDegree = Nat.find hex
+          ∧ ∀ j, ev c (q * X ^ j) = (q0.leadingCoeff)⁻¹ * ev c (q0 * X ^ j) := by
     refine ⟨q0 * C (q0.leadingCoeff)⁻¹, monic_mul_leadingCoeff_inv hq00, ?_, fun j => ?_⟩
     · rw [natDegree_mul_C hlc, hq0d]
     · rw [show q0 * C (q0.leadingCoeff)⁻¹ * X ^ j = (q0.leadingCoeff)⁻¹ • (q0 * X ^ j) by
-        rw [smul_eq_C_mul]; ring, map_smul, smul_eq_mul]
+          rw [smul_eq_C_mul]; ring,
+        map_smul, smul_eq_mul]
   refine ⟨q, hqm.ne_zero, ?_⟩
   by_contra hne
   push_neg at hne
@@ -119,11 +126,12 @@ theorem exists_annihilator (N : ℕ) (hN : ∀ n, N ≤ n → hankel c n = 0) :
       have : q * r1 = r0 + q * r1 - r0 := by ring
       rw [this]
       exact (natDegree_sub_le _ _).trans (max_le hrd hr0s.le)
-    have key := hrk (q * X ^ (s - d - r1.natDegree))
-      (by rw [natDegree_mul_X_pow _ hqm.ne_zero, hqd]; omega)
+    have key :=
+      hrk (q * X ^ (s - d - r1.natDegree)) (by rw [natDegree_mul_X_pow _ hqm.ne_zero, hqd]; omega)
     rw [add_mul, map_add (f := _)] at key
     have h0 : ev c (r0 * (q * X ^ (s - d - r1.natDegree))) = 0 := by
-      rw [show r0 * (q * X ^ (s - d - r1.natDegree)) = q * (r0 * X ^ (s - d - r1.natDegree)) by ring]
+      rw [show r0 * (q * X ^ (s - d - r1.natDegree)) = q * (r0 * X ^ (s - d - r1.natDegree)) by
+        ring]
       apply ev_zero_of_lt c q _ s hlt
       by_cases hz : r0 = 0
       · rw [hz, zero_mul, natDegree_zero]; omega
@@ -137,14 +145,20 @@ theorem exists_annihilator (N : ℕ) (hN : ∀ n, N ≤ n → hankel c n = 0) :
       have := coeff_mul_X_pow (r1 * q) (s - d - r1.natDegree) (r1 * q).natDegree
       rw [← hs'] at this
       rw [this, coeff_natDegree, leadingCoeff_mul, hqm.leadingCoeff, mul_one]
-    have h2 : ev c (q * r1 * (q * X ^ (s - d - r1.natDegree))) = r1.leadingCoeff * ev c (q * X ^ s) := by
-      rw [show q * r1 * (q * X ^ (s - d - r1.natDegree)) = q * (r1 * q * X ^ (s - d - r1.natDegree)) by ring,
+    have h2
+        : ev c (q * r1 * (q * X ^ (s - d - r1.natDegree)))
+          = r1.leadingCoeff * ev c (q * X ^ s) := by
+      rw [show q * r1 * (q * X ^ (s - d - r1.natDegree))
+            = q * (r1 * q * X ^ (s - d - r1.natDegree)) by
+          ring,
         ev_top c q _ s hlt (by rw [natDegree_mul_X_pow _ hne1]; omega), hcoef]
     rw [h0, h2, zero_add] at key
     exact hs ((mul_eq_zero.1 key).resolve_left (leadingCoeff_ne_zero.2 h1))
 
-theorem isRat_of_ann (φ : PowerSeries F) (q : F[X]) (hq : q ≠ 0)
-    (h : ∀ j, ev (fun i => PowerSeries.coeff i φ) (q * X ^ j) = 0) : IsRat φ := by
+theorem isRat_of_ann
+    (φ : PowerSeries F) (q : F[X])
+    (hq : q ≠ 0) (h : ∀ j, ev (fun i => PowerSeries.coeff i φ) (q * X ^ j) = 0)
+    : IsRat φ := by
   classical
   let R : F[X] := ∑ k ∈ Finset.range (q.natDegree + 1), C (q.coeff k) * X ^ (q.natDegree - k)
   refine ⟨PowerSeries.trunc q.natDegree ((R : PowerSeries F) * φ), R, ?_, ?_⟩
@@ -163,8 +177,10 @@ theorem isRat_of_ann (φ : PowerSeries F) (q : F[X]) (hq : q ≠ 0)
     split_ifs with hn
     · rfl
     · obtain ⟨m, rfl⟩ : ∃ m, n = m + q.natDegree := ⟨n - q.natDegree, by omega⟩
-      have hR : (R : PowerSeries F) = ∑ k ∈ Finset.range (q.natDegree + 1),
-          PowerSeries.C (q.coeff k) * PowerSeries.X ^ (q.natDegree - k) := by
+      have hR
+          : (R : PowerSeries F)
+            = ∑ k ∈ Finset.range (q.natDegree + 1),
+              PowerSeries.C (q.coeff k) * PowerSeries.X ^ (q.natDegree - k) := by
         show Polynomial.coeToPowerSeries.ringHom R = _
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum]
@@ -180,8 +196,9 @@ end GlobalTheory.Nef.Kron
 
 namespace GlobalTheory.Nef
 
-theorem isRat_of_hankel_eventually_zero : ∀ (F : Type) [Field F] (φ : PowerSeries F) (N : ℕ),
-    (∀ n, N ≤ n → hankel (fun i => PowerSeries.coeff i φ) n = 0) → IsRat φ := by
+theorem isRat_of_hankel_eventually_zero
+    : ∀ (F : Type) [Field F] (φ : PowerSeries F) (N : ℕ),
+      (∀ n, N ≤ n → hankel (fun i => PowerSeries.coeff i φ) n = 0) → IsRat φ := by
   intro F _ φ N hN
   obtain ⟨q, hq, h⟩ := Kron.exists_annihilator _ N hN
   exact Kron.isRat_of_ann φ q hq h

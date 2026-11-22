@@ -19,14 +19,21 @@ section Walk
 
 variable {K : Type*} [Fintype K] [DecidableEq K]
 
-theorem walk_bound (g : (K → ℕ) → ℝ) (a₀ : ℕ) (B : ℝ) (hB : 0 ≤ B) (n : ℕ)
-    (hstep : ∀ a : K → ℕ, (∀ k, a₀ ≤ a k) → ∀ b, a₀ < a b →
-      |g a - g (Function.update a b (a b - 1))| ≤ B * ((∑ k, (a k : ℝ)) + 1) ^ n) :
-    ∀ a : K → ℕ, (∀ k, a₀ ≤ a k) →
-      |g a| ≤ |g (fun _ => a₀)| + B * ((∑ k, (a k : ℝ)) + 1) ^ (n + 1) := by
-  suffices H : ∀ N : ℕ, ∀ a : K → ℕ, (∀ k, a₀ ≤ a k) → ∑ k, (a k - a₀) = N →
-      |g a| ≤ |g (fun _ => a₀)| + B * ((∑ k, (a k : ℝ)) + 1) ^ (n + 1) from
-    fun a ha => H _ a ha rfl
+theorem walk_bound
+    (g : (K → ℕ) → ℝ) (a₀ : ℕ)
+    (B : ℝ) (hB : 0 ≤ B)
+    (n : ℕ)
+    (hstep : ∀ a : K → ℕ,
+      (∀ k, a₀ ≤ a k)
+        → ∀ b,
+          a₀ < a b → |g a - g (Function.update a b (a b - 1))| ≤ B * ((∑ k, (a k : ℝ)) + 1) ^ n)
+    : ∀ a : K → ℕ,
+      (∀ k, a₀ ≤ a k) → |g a| ≤ |g (fun _ => a₀)| + B * ((∑ k, (a k : ℝ)) + 1) ^ (n + 1) := by
+  suffices H
+      : ∀ N : ℕ, ∀ a : K → ℕ,
+        (∀ k, a₀ ≤ a k) → ∑ k, (a k - a₀) = N
+          → |g a| ≤ |g (fun _ => a₀)| + B * ((∑ k, (a k : ℝ)) + 1) ^ (n + 1) from fun a ha =>
+    H _ a ha rfl
   intro N
   induction N with
   | zero =>
@@ -49,7 +56,8 @@ theorem walk_bound (g : (K → ℕ) → ℝ) (a₀ : ℕ) (B : ℝ) (hB : 0 ≤ 
       by_cases hk : k = b
       · subst hk; simp [a']; omega
       · simp [a', hk, ha k]
-    have hsplit : ∀ c : K → ℕ, ∑ k, (c k - a₀) = (c b - a₀) + ∑ k ∈ Finset.univ.erase b, (c k - a₀) :=
+    have hsplit
+        : ∀ c : K → ℕ, ∑ k, (c k - a₀) = (c b - a₀) + ∑ k ∈ Finset.univ.erase b, (c k - a₀) :=
       fun c => (Finset.add_sum_erase _ _ (Finset.mem_univ b)).symm
     have hsplitR : ∀ c : K → ℕ, ∑ k, (c k : ℝ) = (c b : ℝ) + ∑ k ∈ Finset.univ.erase b, (c k : ℝ) :=
       fun c => (Finset.add_sum_erase _ _ (Finset.mem_univ b)).symm
@@ -79,11 +87,12 @@ theorem walk_bound (g : (K → ℕ) → ℝ) (a₀ : ℕ) (B : ℝ) (hB : 0 ≤ 
     have habs : |g a| ≤ |g a'| + |g a - g a'| := by
       have := abs_sub_abs_le_abs_sub (g a) (g a')
       linarith
-    calc |g a| ≤ |g a'| + |g a - g a'| := habs
+    calc
+      |g a|
+        ≤ |g a'| + |g a - g a'| := habs
       _ ≤ (|g (fun _ => a₀)| + B * s ^ (n + 1)) + B * (s + 1) ^ n := add_le_add h1 h2
       _ = |g (fun _ => a₀)| + B * (s ^ (n + 1) + (s + 1) ^ n) := by ring
-      _ ≤ |g (fun _ => a₀)| + B * (s + 1) ^ (n + 1) := by
-        gcongr
+      _ ≤ |g (fun _ => a₀)| + B * (s + 1) ^ (n + 1) := by gcongr
 
 end Walk
 
@@ -94,8 +103,8 @@ section Multilinear
 
 variable {K : Type*} [Fintype K] [DecidableEq K]
 
-theorem multilinear_abs_le {n : ℕ} (f : MultilinearMap ℤ (fun _ : Fin n => K → ℤ) ℤ) :
-    ∃ M : ℤ, 0 ≤ M ∧ ∀ m : Fin n → K → ℤ, |f m| ≤ M * ∏ i, ∑ k, |m i k| := by
+theorem multilinear_abs_le {n : ℕ} (f : MultilinearMap ℤ (fun _ : Fin n => K → ℤ) ℤ)
+    : ∃ M : ℤ, 0 ≤ M ∧ ∀ m : Fin n → K → ℤ, |f m| ≤ M * ∏ i, ∑ k, |m i k| := by
   set E : K → K → ℤ := fun k j => if k = j then 1 else 0
   refine ⟨∑ r : Fin n → K, |f (fun i => E (r i))|, Finset.sum_nonneg (fun _ _ => abs_nonneg _), ?_⟩
   intro m
@@ -121,10 +130,11 @@ section Expansion
 
 variable {K : Type*} [Fintype K] [DecidableEq K]
 
-def ofPositionAdditive {n : ℕ} (L : (Fin n → K → ℤ) → ℤ)
+def ofPositionAdditive
+    {n : ℕ} (L : (Fin n → K → ℤ) → ℤ)
     (hadd : ∀ (bs : Fin n → K → ℤ) (j : Fin n) (x y : K → ℤ),
-      L (Function.update bs j (x + y)) = L (Function.update bs j x) + L (Function.update bs j y)) :
-    MultilinearMap ℤ (fun _ : Fin n => K → ℤ) ℤ where
+      L (Function.update bs j (x + y)) = L (Function.update bs j x) + L (Function.update bs j y))
+    : MultilinearMap ℤ (fun _ : Fin n => K → ℤ) ℤ where
   toFun := L
   map_update_add' := by
     intro inst m i x y
@@ -137,30 +147,36 @@ def ofPositionAdditive {n : ℕ} (L : (Fin n → K → ℤ) → ℤ)
     exact φ.map_zsmul c x
 
 omit [Fintype K] [DecidableEq K] in
-theorem ofPositionAdditive_apply {n : ℕ} (L : (Fin n → K → ℤ) → ℤ) (hadd) (m : Fin n → K → ℤ) :
-    ofPositionAdditive L hadd m = L m := rfl
-
+theorem ofPositionAdditive_apply {n : ℕ} (L : (Fin n → K → ℤ) → ℤ) (hadd) (m : Fin n → K → ℤ)
+    : ofPositionAdditive L hadd m = L m :=
+  rfl
 
 omit [Fintype K] [DecidableEq K] in
-theorem vecCons_const_of_ne_zero {d : ℕ} (y x : K → ℤ) (k : Fin (d + 1)) (hk : k ≠ 0) :
-    Matrix.vecCons y (fun _ : Fin d => x) k = x := by
+theorem vecCons_const_of_ne_zero {d : ℕ} (y x : K → ℤ) (k : Fin (d + 1)) (hk : k ≠ 0)
+    : Matrix.vecCons y (fun _ : Fin d => x) k = x := by
   obtain ⟨k', rfl⟩ := Fin.exists_succ_eq.mpr hk
   simp
 
-
 omit [Fintype K] [DecidableEq K] in
-theorem multilinear_step {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) => K → ℤ) ℤ)
+theorem multilinear_step
+    {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) => K → ℤ) ℤ)
     (hsym : ∀ (σ : Equiv.Perm (Fin (d + 1))) (m : Fin (d + 1) → K → ℤ), f (m ∘ σ) = f m)
-    (x e : K → ℤ) :
-    f (fun _ => x) - f (fun _ => x - e) - ((d + 1 : ℕ) : ℤ) * f (Matrix.vecCons e fun _ : Fin d => x) =
-      -∑ s ∈ Finset.univ.filter (fun s : Finset (Fin (d + 1)) => s.card + 2 ≤ d + 1),
-        f (s.piecewise (fun _ => x) (fun _ => -e)) := by
-  have hadd : f (fun _ => x - e) = ∑ s : Finset (Fin (d + 1)), f (s.piecewise (fun _ => x) (fun _ => -e)) := by
+    (x e : K → ℤ)
+    : f (fun _ => x) - f (fun _ => x - e)
+        - ((d + 1 : ℕ) : ℤ) * f (Matrix.vecCons e fun _ : Fin d => x)
+      = - ∑ s ∈ Finset.univ.filter (fun s : Finset (Fin (d + 1)) => s.card + 2 ≤ d + 1),
+           f (s.piecewise (fun _ => x) (fun _ => -e)) := by
+  have hadd
+      : f (fun _ => x - e)
+        = ∑ s : Finset (Fin (d + 1)), f (s.piecewise (fun _ => x) (fun _ => -e)) := by
     rw [← MultilinearMap.map_add_univ]
     congr 1
 
-  have hone : ∀ s : Finset (Fin (d + 1)), s.card = d →
-      f (s.piecewise (fun _ => x) (fun _ => -e)) = -f (Matrix.vecCons e fun _ : Fin d => x) := by
+  have hone
+      : ∀ s : Finset (Fin (d + 1)),
+        s.card = d
+          → f (s.piecewise (fun _ => x) (fun _ => -e))
+            = - f (Matrix.vecCons e fun _ : Fin d => x) := by
     intro s hs
     obtain ⟨j, hj⟩ : ∃ j, j ∉ s := by
       by_contra hne
@@ -173,8 +189,9 @@ theorem multilinear_step {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) 
       · exact Finset.mem_erase.mpr ⟨fun h => hj (h ▸ hi), Finset.mem_univ _⟩
       · rw [Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, Fintype.card_fin, hs]
         omega
-    have hpw : s.piecewise (fun _ => x) (fun _ => -e) =
-        (Matrix.vecCons (-e) fun _ : Fin d => x) ∘ (Equiv.swap 0 j) := by
+    have hpw
+        : s.piecewise (fun _ => x) (fun _ => -e)
+          = (Matrix.vecCons (-e) fun _ : Fin d => x) ∘ (Equiv.swap 0 j) := by
       funext i
       simp only [Function.comp]
       by_cases hij : i = j
@@ -188,8 +205,9 @@ theorem multilinear_step {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) 
         rw [Equiv.swap_apply_eq_iff, Equiv.swap_apply_left] at h0
         exact hij h0
     rw [hpw, hsym]
-    have hupd : (Matrix.vecCons (-e) fun _ : Fin d => x) =
-        Function.update (Matrix.vecCons e fun _ : Fin d => x) 0 (-e) := by
+    have hupd
+        : (Matrix.vecCons (-e) fun _ : Fin d => x)
+          = Function.update (Matrix.vecCons e fun _ : Fin d => x) 0 (-e) := by
       funext i
       refine Fin.cases ?_ (fun i => ?_) i
       · simp
@@ -198,11 +216,16 @@ theorem multilinear_step {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) 
     congr 2
     funext i
     refine Fin.cases ?_ (fun i => ?_) i <;> simp
-  rw [hadd, ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun s : Finset (Fin (d + 1)) => s.card + 2 ≤ d + 1),
-    ← Finset.sum_filter_add_sum_filter_not (Finset.univ.filter fun s : Finset (Fin (d + 1)) => ¬ s.card + 2 ≤ d + 1)
+  rw [hadd,
+    ← Finset.sum_filter_add_sum_filter_not Finset.univ
+      (fun s : Finset (Fin (d + 1)) => s.card + 2 ≤ d + 1),
+    ← Finset.sum_filter_add_sum_filter_not
+      (Finset.univ.filter fun s : Finset (Fin (d + 1)) => ¬ s.card + 2 ≤ d + 1)
       (fun s => s.card = d + 1)]
-  have hA : ((Finset.univ.filter fun s : Finset (Fin (d + 1)) => ¬ s.card + 2 ≤ d + 1).filter
-      fun s => s.card = d + 1) = {Finset.univ} := by
+  have hA
+      : ((Finset.univ.filter fun s : Finset (Fin (d + 1)) => ¬ s.card + 2 ≤ d + 1).filter fun s =>
+          s.card = d + 1)
+        = {Finset.univ} := by
     ext s
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton]
     constructor
@@ -210,8 +233,10 @@ theorem multilinear_step {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) 
       exact Finset.eq_univ_of_card s (by rw [h, Fintype.card_fin])
     · rintro rfl
       simp
-  have hB : ((Finset.univ.filter fun s : Finset (Fin (d + 1)) => ¬ s.card + 2 ≤ d + 1).filter
-      fun s => ¬ s.card = d + 1) = Finset.powersetCard d Finset.univ := by
+  have hB
+      : ((Finset.univ.filter fun s : Finset (Fin (d + 1)) => ¬ s.card + 2 ≤ d + 1).filter fun s =>
+          ¬ s.card = d + 1)
+        = Finset.powersetCard d Finset.univ := by
     ext s
     have hle : s.card ≤ d + 1 := by simpa using Finset.card_le_univ s
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_powersetCard,
@@ -224,27 +249,33 @@ theorem multilinear_step {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) 
   push_cast
   ring
 
-theorem multilinear_step_le {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) => K → ℤ) ℤ)
-    (hsym : ∀ (σ : Equiv.Perm (Fin (d + 1))) (m : Fin (d + 1) → K → ℤ), f (m ∘ σ) = f m) :
-    ∃ M : ℤ, 0 ≤ M ∧ ∀ (a : K → ℕ) (b : K),
-      |f (fun _ => fun k => (a k : ℤ)) - f (fun _ => (fun k => (a k : ℤ)) - unitDeg b) -
-          ((d + 1 : ℕ) : ℤ) * f (Matrix.vecCons (unitDeg b) fun _ : Fin d => fun k => (a k : ℤ))| ≤
-        M * ((∑ k, (a k : ℤ)) + 1) ^ (d - 1) := by
+theorem multilinear_step_le
+    {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 1) => K → ℤ) ℤ)
+    (hsym : ∀ (σ : Equiv.Perm (Fin (d + 1))) (m : Fin (d + 1) → K → ℤ), f (m ∘ σ) = f m)
+    : ∃ M : ℤ,
+      0 ≤ M
+        ∧ ∀ (a : K → ℕ) (b : K),
+          |f (fun _ => fun k => (a k : ℤ)) - f (fun _ => (fun k => (a k : ℤ)) - unitDeg b) -
+              ((d + 1 : ℕ) : ℤ) * f (Matrix.vecCons (unitDeg b) fun _ : Fin d => fun k => (a k : ℤ))|
+            ≤ M * ((∑ k, (a k : ℤ)) + 1) ^ (d - 1) := by
   obtain ⟨M₀, hM₀, hbd⟩ := multilinear_abs_le f
   refine ⟨(Fintype.card (Finset (Fin (d + 1))) : ℤ) * M₀, by positivity, ?_⟩
   intro a b
   set S : ℤ := ∑ k, (a k : ℤ)
   have hS : 0 ≤ S := Finset.sum_nonneg (fun k _ => Nat.cast_nonneg _)
   rw [multilinear_step f hsym, abs_neg]
-  have hterm : ∀ s ∈ Finset.univ.filter (fun s : Finset (Fin (d + 1)) => s.card + 2 ≤ d + 1),
-      |f (s.piecewise (fun _ => fun k => (a k : ℤ)) (fun _ => -unitDeg b))| ≤ M₀ * (S + 1) ^ (d - 1) := by
+  have hterm
+      : ∀ s ∈ Finset.univ.filter (fun s : Finset (Fin (d + 1)) => s.card + 2 ≤ d + 1),
+        |f (s.piecewise (fun _ => fun k => (a k : ℤ)) (fun _ => -unitDeg b))|
+          ≤ M₀ * (S + 1) ^ (d - 1) := by
     intro s hs
     have hcard : s.card ≤ d - 1 := by
       have := (Finset.mem_filter.mp hs).2
       omega
     refine (hbd _).trans (mul_le_mul_of_nonneg_left ?_ hM₀)
-    have hprod : (∏ i, ∑ k, |(s.piecewise (fun _ => fun k => (a k : ℤ)) (fun _ => -unitDeg b)) i k|) =
-        ∏ i, (if i ∈ s then S else 1) := by
+    have hprod
+        : (∏ i, ∑ k, |(s.piecewise (fun _ => fun k => (a k : ℤ)) (fun _ => -unitDeg b)) i k|)
+          = ∏ i, (if i ∈ s then S else 1) := by
       refine Finset.prod_congr rfl (fun i _ => ?_)
       by_cases hi : i ∈ s
       · rw [Finset.piecewise_eq_of_mem _ _ _ hi, if_pos hi]
@@ -252,7 +283,9 @@ theorem multilinear_step_le {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 
       · rw [Finset.piecewise_eq_of_notMem _ _ _ hi, if_neg hi]
         simp [unitDeg, Pi.single_apply, apply_ite]
     rw [hprod, Finset.prod_ite_mem, Finset.univ_inter, Finset.prod_const]
-    calc S ^ s.card ≤ (S + 1) ^ s.card := pow_le_pow_left₀ hS (by linarith) _
+    calc
+      S ^ s.card
+        ≤ (S + 1) ^ s.card := pow_le_pow_left₀ hS (by linarith) _
       _ ≤ (S + 1) ^ (d - 1) := pow_le_pow_right₀ (by linarith) hcard
   refine (Finset.abs_sum_le_sum_abs _ _).trans ((Finset.sum_le_sum hterm).trans ?_)
   rw [Finset.sum_const, nsmul_eq_mul, mul_assoc]
@@ -261,8 +294,10 @@ theorem multilinear_step_le {d : ℕ} (f : MultilinearMap ℤ (fun _ : Fin (d + 
 
 end Expansion
 
-theorem int_eq_of_abs_sub_le {z₁ z₂ : ℤ} {c s : ℝ} (hs : 0 ≤ s) (hc : |c| < s + 1)
-    (h : |(z₁ : ℝ) - (z₂ : ℝ)| ≤ c * (s + 1) ^ (((0 : ℕ) : ℝ) - 1)) : z₁ = z₂ := by
+theorem int_eq_of_abs_sub_le
+    {z₁ z₂ : ℤ} {c s : ℝ}
+    (hs : 0 ≤ s) (hc : |c| < s + 1) (h : |(z₁ : ℝ) - (z₂ : ℝ)| ≤ c * (s + 1) ^ (((0 : ℕ) : ℝ) - 1))
+    : z₁ = z₂ := by
   rw [Nat.cast_zero, zero_sub, Real.rpow_neg_one] at h
   rw [← sub_eq_zero]
   set z := z₁ - z₂
@@ -277,9 +312,11 @@ theorem int_eq_of_abs_sub_le {z₁ z₂ : ℤ} {c s : ℝ} (hs : 0 ≤ s) (hc : 
   have h3 : |z| < 1 := by exact_mod_cast h2
   exact Int.abs_lt_one_iff.mp h3
 
-theorem hilbertPrime_succ (d : ℕ) (hM : MixedNumberPolynomial.Statement.{u})
-    (hI : HilbertIncrement.Statement.{u}) (hmod : HilbertModule.AtDim.{u, u} d) :
-    HilbertPrime.AtDim.{u} (d + 1) := by
+theorem hilbertPrime_succ
+    (d : ℕ)
+    (hM : MixedNumberPolynomial.Statement.{u}) (hI : HilbertIncrement.Statement.{u})
+    (hmod : HilbertModule.AtDim.{u, u} d)
+    : HilbertPrime.AtDim.{u} (d + 1) := by
   intro F _ K _ _ ι _ q hq hdim
   obtain ⟨hsym, hadd⟩ := hM F K ι q (d + 1) hq hdim
   obtain ⟨M, hM0, hE⟩ := multilinear_step_le (ofPositionAdditive (intNum F q) hadd) hsym
@@ -296,31 +333,48 @@ theorem hilbertPrime_succ (d : ℕ) (hM : MixedNumberPolynomial.Statement.{u})
       (Nat.le_add_right _ _)
   have hCb : ∀ b, |C b| ≤ (a₀ : ℝ) := by
     intro b
-    calc |C b| ≤ Cs := Finset.single_le_sum (f := fun b => |C b|) (fun j _ => abs_nonneg _)
-            (Finset.mem_univ b)
+    calc
+      |C b| ≤ Cs :=
+        Finset.single_le_sum (f := fun b => |C b|) (fun j _ => abs_nonneg _) (Finset.mem_univ b)
       _ ≤ (⌈Cs⌉₊ : ℝ) := Nat.le_ceil _
       _ ≤ (a₀ : ℝ) := by exact_mod_cast Nat.le_add_left _ _
-  have hs0 : ∀ a : K → ℕ, 0 ≤ ∑ k, (a k : ℝ) := fun a => Finset.sum_nonneg (fun k _ => Nat.cast_nonneg _)
-  have key : ∀ a : K → ℕ, (∀ k, a₀ ≤ a k) → ∀ b, a₀ < a b →
-      g a - g (Function.update a b (a b - 1)) =
-        ((((hilbFn q (fun k => (a k : ℤ)) - hilbFn q ((fun k => (a k : ℤ)) - unitDeg b) : ℤ) : ℝ) -
-          (intNum F q (Matrix.vecCons (unitDeg b) fun _ : Fin d => fun k => (a k : ℤ)) : ℝ) /
-            d.factorial) -
-        ((intNum F q (fun _ : Fin (d + 1) => fun k => (a k : ℤ)) -
-            intNum F q (fun _ : Fin (d + 1) => (fun k => (a k : ℤ)) - unitDeg b) -
-            ((d + 1 : ℕ) : ℤ) * intNum F q (Matrix.vecCons (unitDeg b) fun _ : Fin d => fun k => (a k : ℤ)) :
-              ℤ) : ℝ) / ((d + 1).factorial : ℝ)) := by
+  have hs0 : ∀ a : K → ℕ, 0 ≤ ∑ k, (a k : ℝ) := fun a =>
+    Finset.sum_nonneg (fun k _ => Nat.cast_nonneg _)
+  have key
+      : ∀ a : K → ℕ,
+        (∀ k, a₀ ≤ a k)
+          → ∀ b,
+            a₀ < a b
+              → g a - g (Function.update a b (a b - 1))
+                = ((((hilbFn q (fun k => (a k : ℤ)) - hilbFn q ((fun k => (a k : ℤ)) - unitDeg b)
+                        : ℤ)
+                      : ℝ)
+                    - (intNum F q (Matrix.vecCons (unitDeg b) fun _ : Fin d => fun k => (a k : ℤ))
+                        : ℝ)
+                      / d.factorial)
+                  - ((intNum F q (fun _ : Fin (d + 1) => fun k => (a k : ℤ))
+                          - intNum F q (fun _ : Fin (d + 1) => (fun k => (a k : ℤ)) - unitDeg b)
+                          - ((d + 1 : ℕ) : ℤ) * intNum F q
+                            (Matrix.vecCons (unitDeg b) fun _ : Fin d => fun k => (a k : ℤ))
+                        : ℤ)
+                      : ℝ)
+                    / ((d + 1).factorial : ℝ)) := by
     intro a ha b hb
-    have hcast : (fun k => ((Function.update a b (a b - 1) k : ℕ) : ℤ)) =
-        (fun k => (a k : ℤ)) - unitDeg b := by
+    have hcast
+        : (fun k => ((Function.update a b (a b - 1) k : ℕ) : ℤ))
+          = (fun k => (a k : ℤ)) - unitDeg b := by
       funext k
       by_cases hk : k = b
       · subst hk
         simp only [Function.update_self, Pi.sub_apply, unitDeg, Pi.single_eq_same]
         omega
       · simp [unitDeg, hk]
-    have gfun : ∀ (c : K → ℕ) (y : K → ℤ), (fun k => (c k : ℤ)) = y →
-        g c = (hilbFn q y : ℝ) - (intNum F q (fun _ : Fin (d + 1) => y) : ℝ) / ((d + 1).factorial : ℝ) := by
+    have gfun
+        : ∀ (c : K → ℕ) (y : K → ℤ),
+          (fun k => (c k : ℤ)) = y
+            → g c
+              = (hilbFn q y : ℝ)
+                - (intNum F q (fun _ : Fin (d + 1) => y) : ℝ) / ((d + 1).factorial : ℝ) := by
       intro c y h
       subst h
       rfl
@@ -334,20 +388,31 @@ theorem hilbertPrime_succ (d : ℕ) (hM : MixedNumberPolynomial.Statement.{u})
     have hempty : (Finset.univ.filter fun s : Finset (Fin (0 + 1)) => s.card + 2 ≤ 0 + 1) = ∅ := by
       ext s
       simp
-    have hstep : ∀ a : K → ℕ, (∀ k, a₀ ≤ a k) → ∀ b, a₀ < a b →
-        |g a - g (Function.update a b (a b - 1))| ≤ 0 * ((∑ k, (a k : ℝ)) + 1) ^ 0 := by
+    have hstep
+        : ∀ a : K → ℕ,
+          (∀ k, a₀ ≤ a k)
+            → ∀ b,
+              a₀ < a b
+                → |g a - g (Function.update a b (a b - 1))| ≤ 0 * ((∑ k, (a k : ℝ)) + 1) ^ 0 := by
       intro a ha b hb
-      have hR := multilinear_step (ofPositionAdditive (intNum F q) hadd) hsym (fun k => (a k : ℤ)) (unitDeg b)
+      have hR :=
+        multilinear_step (ofPositionAdditive (intNum F q) hadd) hsym
+          (fun k => (a k : ℤ))
+          (unitDeg b)
       rw [hempty, Finset.sum_empty, neg_zero] at hR
       simp only [ofPositionAdditive_apply] at hR
       have hIb := hAC b a (hAb a ha b)
       have hlt : |C b| < (∑ k, (a k : ℝ)) + 1 := by
         have h1 : (a₀ : ℝ) < a b := by exact_mod_cast hb
         have h2 : (a b : ℝ) ≤ ∑ k, (a k : ℝ) :=
-          Finset.single_le_sum (f := fun k => (a k : ℝ)) (fun k _ => Nat.cast_nonneg _) (Finset.mem_univ b)
+          Finset.single_le_sum
+            (f := fun k => (a k : ℝ))
+            (fun k _ => Nat.cast_nonneg _)
+            (Finset.mem_univ b)
         linarith [hCb b]
       rw [key a ha b hb, hR]
-      simp only [Nat.factorial_zero, Nat.cast_one, div_one, Int.cast_zero, zero_div, sub_zero] at hIb ⊢
+      simp only [Nat.factorial_zero, Nat.cast_one, div_one, Int.cast_zero, zero_div, sub_zero]
+        at hIb ⊢
       have hz := int_eq_of_abs_sub_le (hs0 a) hlt hIb
       rw [hz, sub_self]
       simp
@@ -358,18 +423,25 @@ theorem hilbertPrime_succ (d : ℕ) (hM : MixedNumberPolynomial.Statement.{u})
     show |g a| ≤ _
     simpa using hw
   | succ n =>
-    have hstep : ∀ a : K → ℕ, (∀ k, a₀ ≤ a k) → ∀ b, a₀ < a b →
-        |g a - g (Function.update a b (a b - 1))| ≤ (Cs + M) * ((∑ k, (a k : ℝ)) + 1) ^ n := by
+    have hstep
+        : ∀ a : K → ℕ,
+          (∀ k, a₀ ≤ a k)
+            → ∀ b,
+              a₀ < a b
+                → |g a - g (Function.update a b (a b - 1))|
+                  ≤ (Cs + M) * ((∑ k, (a k : ℝ)) + 1) ^ n := by
       intro a ha b hb
       have hIb := hAC b a (hAb a ha b)
       have hRb := hE a b
       set s := ∑ k, (a k : ℝ) with hs
       have hexp : (((n + 1 : ℕ) : ℝ) - 1) = (n : ℝ) := by push_cast; ring
       rw [hexp, Real.rpow_natCast] at hIb
-      have hRb' : |((intNum F q (fun _ : Fin (n + 1 + 1) => fun k => (a k : ℤ)) -
-            intNum F q (fun _ : Fin (n + 1 + 1) => (fun k => (a k : ℤ)) - unitDeg b) -
-            ((n + 1 + 1 : ℕ) : ℤ) * intNum F q (Matrix.vecCons (unitDeg b) fun _ : Fin (n + 1) => fun k => (a k : ℤ)) :
-              ℤ) : ℝ)| ≤ (M : ℝ) * (s + 1) ^ n := by
+      have hRb'
+          : |((intNum F q (fun _ : Fin (n + 1 + 1) => fun k => (a k : ℤ)) -
+              intNum F q (fun _ : Fin (n + 1 + 1) => (fun k => (a k : ℤ)) - unitDeg b) -
+              ((n + 1 + 1 : ℕ) : ℤ) * intNum F q (Matrix.vecCons (unitDeg b) fun _ : Fin (n + 1) => fun k => (a k : ℤ)) :
+                ℤ) : ℝ)|
+            ≤ (M : ℝ) * (s + 1) ^ n := by
         rw [← Int.cast_abs]
         have : ((M * ((∑ k, (a k : ℤ)) + 1) ^ (n + 1 - 1) : ℤ) : ℝ) = (M : ℝ) * (s + 1) ^ n := by
           rw [hs]
@@ -378,15 +450,20 @@ theorem hilbertPrime_succ (d : ℕ) (hM : MixedNumberPolynomial.Statement.{u})
         rw [← this]
         exact_mod_cast hRb
       rw [key a ha b hb]
-      have hpos : (1 : ℝ) ≤ ((n + 1 + 1).factorial : ℝ) := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (Nat.factorial_ne_zero _)
+      have hpos : (1 : ℝ) ≤ ((n + 1 + 1).factorial : ℝ) := by
+        exact_mod_cast Nat.one_le_iff_ne_zero.mpr (Nat.factorial_ne_zero _)
       have hdiv : ∀ x : ℝ, |x / ((n + 1 + 1).factorial : ℝ)| ≤ |x| := by
         intro x
         rw [abs_div, abs_of_pos (by linarith : (0 : ℝ) < ((n + 1 + 1).factorial : ℝ))]
         exact div_le_self (abs_nonneg _) hpos
       have hCb' : C b * (s + 1) ^ n ≤ Cs * (s + 1) ^ n := by
         have hp : 0 ≤ (s + 1) ^ n := by positivity
-        have : C b ≤ Cs := (le_abs_self _).trans
-          (Finset.single_le_sum (f := fun b => |C b|) (fun j _ => abs_nonneg _) (Finset.mem_univ b))
+        have : C b ≤ Cs :=
+          (le_abs_self _).trans
+            (Finset.single_le_sum
+              (f := fun b => |C b|)
+              (fun j _ => abs_nonneg _)
+              (Finset.mem_univ b))
         exact mul_le_mul_of_nonneg_right this hp
       refine (abs_sub _ _).trans ?_
       refine (add_le_add hIb ((hdiv _).trans hRb')).trans ?_
@@ -405,9 +482,10 @@ theorem hilbertPrime_succ (d : ℕ) (hM : MixedNumberPolynomial.Statement.{u})
     show |g a| ≤ _
     nlinarith
 
-theorem HilbertPrime.proof (hZ : HilbertDimZero.Statement.{u}) (hI : HilbertIncrement.Statement.{u})
-    (hM : MixedNumberPolynomial.Statement.{u}) (hMP : ModulesFromPrimes.Statement.{u, u}) :
-    HilbertPrime.Statement.{u} := by
+theorem HilbertPrime.proof
+    (hZ : HilbertDimZero.Statement.{u}) (hI : HilbertIncrement.Statement.{u})
+    (hM : MixedNumberPolynomial.Statement.{u}) (hMP : ModulesFromPrimes.Statement.{u, u})
+    : HilbertPrime.Statement.{u} := by
   intro d
   induction d using Nat.strong_induction_on with
   | _ d ih =>
@@ -420,8 +498,7 @@ theorem HilbertPrime.proof (hZ : HilbertDimZero.Statement.{u}) (hI : HilbertIncr
         Subsingleton.elim _ _
       rw [hfun, ha₀ a ha]
       simp
-    | succ d =>
-      exact hilbertPrime_succ d hM hI (hMP d (fun e he => ih e (by omega)))
+    | succ d => exact hilbertPrime_succ d hM hI (hMP d (fun e he => ih e (by omega)))
 
 end
 

@@ -9,12 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NormSatak
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel
+open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil ValuativeRel
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.CompanionTheory.ResCardAbsNorm
 
-theorem resCard_completion_eq_absNorm : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)), (resCard (w.adicCompletion E) : ℝ) = (Ideal.absNorm w.asIdeal : ℝ) := by
+theorem resCard_completion_eq_absNorm
+    : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)),
+      (resCard (w.adicCompletion E) : ℝ) = (Ideal.absNorm w.asIdeal : ℝ) := by
   intro E _ _ w
   exact_mod_cast GlobalTheory.LFun.SatBoundGL.resCard_completion w
 

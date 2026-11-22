@@ -8,7 +8,9 @@ public import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.IntegralFderivA
 
 set_option autoImplicit false
 
-open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.GoodTop
+open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+  GlobalTheory.GoodMetric GlobalTheory.GoodTop
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff Matrix
 
@@ -16,12 +18,12 @@ noncomputable section
 
 namespace GlobalTheory.GoodTop
 
-theorem integral_dbar_eq_zero_of_hasCompactSupport {n : ℕ} {G : V n → ℂ} (hG : ContDiff ℝ 1 G)
-    (hc : HasCompactSupport G) (u : V n) :
-    Integrable (fun v => dbar G v u) ∧ ∫ v, dbar G v u = 0 := by
+theorem integral_dbar_eq_zero_of_hasCompactSupport
+    {n : ℕ} {G : V n → ℂ} (hG : ContDiff ℝ 1 G) (hc : HasCompactSupport G) (u : V n)
+    : Integrable (fun v => dbar G v u) ∧ ∫ v, dbar G v u = 0 := by
   have hint : ∀ w : V n, Integrable (fun y => fderiv ℝ G y w) := fun w =>
-    ((hG.continuous_fderiv (by norm_num)).clm_apply continuous_const).integrable_of_hasCompactSupport
-      (hc.fderiv_apply (𝕜 := ℝ) w)
+    ((hG.continuous_fderiv (by norm_num)).clm_apply
+      continuous_const).integrable_of_hasCompactSupport (hc.fderiv_apply (𝕜 := ℝ) w)
   refine ⟨?_, ?_⟩
   · simp only [dbar_apply, smul_eq_mul]
     exact ((hint _).add ((hint _).const_mul _)).const_mul _
@@ -31,10 +33,10 @@ theorem integral_dbar_eq_zero_of_hasCompactSupport {n : ℕ} {G : V n → ℂ} (
       ReciprocityTheory.L2DbarEstimates.integral_fderiv_apply_eq_zero n G hG hc]
     simp
 
-theorem setIntegral_dbar_eq_zero {n : ℕ} (U K : Set (V n)) (g : V n → ℂ) (ξ : V n)
-    (hU : IsOpen U) (hK : IsCompact K) (hKU : K ⊆ U) (hg : ContDiffOn ℝ 1 g U)
-    (h0 : ∀ v ∈ U, v ∉ K → g v = 0) :
-    IntegrableOn (fun v => dbar g v ξ) U ∧ ∫ v in U, dbar g v ξ = 0 := by
+theorem setIntegral_dbar_eq_zero
+    {n : ℕ} (U K : Set (V n)) (g : V n → ℂ) (ξ : V n) (hU : IsOpen U) (hK : IsCompact K)
+    (hKU : K ⊆ U) (hg : ContDiffOn ℝ 1 g U) (h0 : ∀ v ∈ U, v ∉ K → g v = 0)
+    : IntegrableOn (fun v => dbar g v ξ) U ∧ ∫ v in U, dbar g v ξ = 0 := by
   classical
   set G : V n → ℂ := U.indicator g with hGdef
   have hin : ∀ v ∈ U, G =ᶠ[𝓝 v] g := fun v hv => by
@@ -58,8 +60,8 @@ theorem setIntegral_dbar_eq_zero {n : ℕ} (U K : Set (V n)) (g : V n → ℂ) (
   have heq : Set.EqOn (fun v => dbar G v ξ) (fun v => dbar g v ξ) U := fun v hv => by
     simp only [dbar_congr (hin v hv)]
   refine ⟨hI.integrableOn.congr_fun heq hU.measurableSet, ?_⟩
-  rw [← setIntegral_congr_fun hU.measurableSet heq,
-    setIntegral_eq_integral_of_forall_compl_eq_zero, hE]
+  rw [← setIntegral_congr_fun hU.measurableSet heq, setIntegral_eq_integral_of_forall_compl_eq_zero,
+    hE]
   intro v hv
   rw [dbar_congr (hout v fun h => hv (hKU h))]
   simp [dbar_apply]

@@ -18,12 +18,17 @@ noncomputable section
 
 namespace GlobalTheory.ProjHol
 
-theorem valuationRing_stalk {K : Type} [Field K] {X : Scheme.{0}} [IsIntegral X] (f : X ⟶ Sp K)
-    [hf : SmoothOfRelativeDimension 1 f] (x : X) : ValuationRing (X.presheaf.stalk x) := by
+theorem valuationRing_stalk
+    {K : Type} [Field K]
+    {X : Scheme.{0}} [IsIntegral X]
+    (f : X ⟶ Sp K) [hf : SmoothOfRelativeDimension 1 f]
+    (x : X)
+    : ValuationRing (X.presheaf.stalk x) := by
   have : Smooth f := SmoothOfRelativeDimension.smooth 1 f
   have : GlobalTheory.IsNormalScheme X := GlobalTheory.isNormalScheme_of_smooth f
   have := LocallyOfFiniteType.isLocallyNoetherian f
-  have h : Order.coheight x ≤ 1 := by simpa using GlobalTheory.AffineCover.coheight_le_of_smooth f hf x
+  have h : Order.coheight x ≤ 1 := by
+    simpa using GlobalTheory.AffineCover.coheight_le_of_smooth f hf x
   rcases h.eq_or_lt with h | h
   · have := GlobalTheory.IsNormalScheme.isDiscreteValuationRing_stalk h
     infer_instance

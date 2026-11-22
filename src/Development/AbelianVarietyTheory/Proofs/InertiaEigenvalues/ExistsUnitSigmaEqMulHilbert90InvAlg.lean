@@ -11,14 +11,15 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma.HilbertNinety
 
-theorem exists_unit_sigma (K : UQ) (B : InvAlg K) (u : B.A) (hu : u * B.σ u = 1) :
-    ∃ β : B.Aˣ, B.σ (β : B.A) = β * u := by
+theorem exists_unit_sigma (K : UQ) (B : InvAlg K) (u : B.A) (hu : u * B.σ u = 1)
+    : ∃ β : B.Aˣ, B.σ (β : B.A) = β * u := by
   classical
   letI : Module ℚ B.A := Module.compHom B.A (algebraMap ℚ K.E)
-  let b : B.A →+ B.A :=
-    { toFun := fun a => a + B.σ a * B.σ u
-      map_zero' := by simp
-      map_add' := by intro x y; simp only [map_add (f := _)]; ring }
+  let b : B.A →+ B.A := {
+    toFun := fun a => a + B.σ a * B.σ u
+    map_zero' := by simp
+    map_add' := by intro x y; simp only [map_add (f := _)]; ring
+  }
   have hb : ∀ a, b a = a + B.σ a * B.σ u := fun a => rfl
   have hbσ : ∀ a, B.σ (b a) = b a * u := by
     intro a
@@ -31,25 +32,29 @@ theorem exists_unit_sigma (K : UQ) (B : InvAlg K) (u : B.A) (hu : u * B.σ u = 1
     rw [sub_eq_zero, he, hxy] at h
     have := IsFractionRing.injective K.O K.E h
     exact hne (by rw [this, sub_self]; exact Ideal.zero_mem _)
-  have key : ∀ z : B.A, algebraMap K.E B.A (K.c e - e) * z =
-      algebraMap K.E B.A (K.c e) * b z - b (algebraMap K.E B.A e * z) := by
+  have key
+      : ∀ z : B.A,
+        algebraMap K.E B.A (K.c e - e) * z
+          = algebraMap K.E B.A (K.c e) * b z - b (algebraMap K.E B.A e * z) := by
     intro z
     rw [hb, hb, map_mul, B.σ_alg, map_sub]
     ring
   haveI : IsArtinianRing B.A := IsArtinianRing.of_finite K.E B.A
   haveI : Fintype (MaximalSpectrum B.A) := Fintype.ofFinite _
-  let S : MaximalSpectrum B.A → Submodule ℚ B.A := fun m =>
-    { carrier := {a | b a ∈ m.asIdeal}
-      add_mem' := fun {a c} ha hc => by
-        change b (a + c) ∈ m.asIdeal
-        rw [map_add (f := _)]; exact m.asIdeal.add_mem ha hc
-      zero_mem' := by change b 0 ∈ m.asIdeal; rw [map_zero]; exact m.asIdeal.zero_mem
-      smul_mem' := fun q a ha => by
-        change b (q • a) ∈ m.asIdeal
-        rw [map_rat_smul]
-        change (algebraMap ℚ K.E q) • b a ∈ m.asIdeal
-        rw [Algebra.smul_def]
-        exact m.asIdeal.mul_mem_left _ ha }
+  let S : MaximalSpectrum B.A → Submodule ℚ B.A := fun m => {
+    carrier := {a | b a ∈ m.asIdeal}
+    add_mem' := fun {a c} ha hc => by
+      change b (a + c) ∈ m.asIdeal
+      rw [map_add (f := _)]
+      exact m.asIdeal.add_mem ha hc
+    zero_mem' := by change b 0 ∈ m.asIdeal; rw [map_zero]; exact m.asIdeal.zero_mem
+    smul_mem' := fun q a ha => by
+      change b (q • a) ∈ m.asIdeal
+      rw [map_rat_smul]
+      change (algebraMap ℚ K.E q) • b a ∈ m.asIdeal
+      rw [Algebra.smul_def]
+      exact m.asIdeal.mul_mem_left _ ha
+  }
   have hS : ⊤ ∉ Finset.univ.image S := by
     intro h
     obtain ⟨m, -, hm⟩ := Finset.mem_image.1 h

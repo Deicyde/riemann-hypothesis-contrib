@@ -21,10 +21,9 @@ namespace CurveVerticalPointNagata
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem aeval_eq_eval₂ {S : Type*} [CommRing S] [Algebra ℤ S] (v : (Σ k, ι k) → S) (f : MRing ι) :
-    aeval v f = eval₂ (Int.castRingHom S) v f := by
+theorem aeval_eq_eval₂ {S : Type*} [CommRing S] [Algebra ℤ S] (v : (Σ k, ι k) → S) (f : MRing ι)
+    : aeval v f = eval₂ (Int.castRingHom S) v f := by
   rw [aeval_def, show algebraMap ℤ S = Int.castRingHom S from RingHom.ext_int _ _]
 
 abbrev comp (e : K → ℕ) (f : MRing ι) : MRing ι :=
@@ -33,9 +32,11 @@ abbrev comp (e : K → ℕ) (f : MRing ι) : MRing ι :=
 theorem isMultiHomog_comp (e : K → ℕ) (f : MRing ι) : IsMultiHomog (comp e f) e :=
   Inter.LocRingPow.isMultiHomog_iff.mpr (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
 
-theorem aeval_mul_of_isMultiHomog {S : Type*} [CommRing S] [Algebra ℤ S] (r : (Σ k, ι k) → S) (t : K → S) {g : MRing ι}
-    {e : K → ℕ} (hg : IsMultiHomog g e) :
-    aeval (fun p => r p * t p.1) g = aeval r g * ∏ k, t k ^ e k := by
+theorem aeval_mul_of_isMultiHomog
+    {S : Type*} [CommRing S] [Algebra ℤ S]
+    (r : (Σ k, ι k) → S) (t : K → S)
+    {g : MRing ι} {e : K → ℕ} (hg : IsMultiHomog g e)
+    : aeval (fun p => r p * t p.1) g = aeval r g * ∏ k, t k ^ e k := by
   classical
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
@@ -44,7 +45,8 @@ theorem aeval_mul_of_isMultiHomog {S : Type*} [CommRing S] [Algebra ℤ S] (r : 
   refine Finset.sum_congr rfl fun m hm => ?_
   have hdeg := hg m hm
   simp only [aeval_monomial]
-  rw [Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
+  rw [Finsupp.prod_fintype _ _ (fun _ => pow_zero _),
+    Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
   simp only [mul_pow, Finset.prod_mul_distrib]
   have hX : (∏ p : Σ k, ι k, t p.1 ^ m p) = ∏ k, t k ^ e k := by
     rw [Fintype.prod_sigma]
@@ -54,20 +56,26 @@ theorem aeval_mul_of_isMultiHomog {S : Type*} [CommRing S] [Algebra ℤ S] (r : 
   rw [hX]
   ring
 
-theorem aeval_C_mul_X_of_isMultiHomog {S : Type*} [CommRing S] [Algebra ℤ S] [Algebra ℤ (MvPolynomial K S)] (r : (Σ k, ι k) → S) {g : MRing ι}
-    {e : K → ℕ} (hg : IsMultiHomog g e) :
-    (aeval (fun p => MvPolynomial.C (r p) * MvPolynomial.X p.1) g : MvPolynomial K S) =
-      MvPolynomial.C (aeval r g) * ∏ k, (MvPolynomial.X k : MvPolynomial K S) ^ e k := by
-  refine (aeval_mul_of_isMultiHomog (fun p => (MvPolynomial.C (r p) : MvPolynomial K S)) MvPolynomial.X hg).trans ?_
+theorem aeval_C_mul_X_of_isMultiHomog
+    {S : Type*} [CommRing S] [Algebra ℤ S] [Algebra ℤ (MvPolynomial K S)]
+    (r : (Σ k, ι k) → S)
+    {g : MRing ι} {e : K → ℕ} (hg : IsMultiHomog g e)
+    : (aeval (fun p => MvPolynomial.C (r p) * MvPolynomial.X p.1) g : MvPolynomial K S)
+      = MvPolynomial.C (aeval r g) * ∏ k, (MvPolynomial.X k : MvPolynomial K S) ^ e k := by
+  refine (aeval_mul_of_isMultiHomog
+    (fun p => (MvPolynomial.C (r p) : MvPolynomial K S))
+    MvPolynomial.X hg).trans ?_
   congr 1
   rw [aeval_eq_eval₂, aeval_eq_eval₂, MvPolynomial.eval₂_comp_left,
     show (MvPolynomial.C : S →+* MvPolynomial K S).comp (Int.castRingHom S) = Int.castRingHom _ from
       RingHom.ext_int _ _]
   rfl
 
-theorem coeff_aeval_C_mul_X {S : Type*} [CommRing S] [Algebra ℤ S] [Algebra ℤ (MvPolynomial K S)] (r : (Σ k, ι k) → S) (f : MRing ι) (n : K →₀ ℕ) :
-    (aeval (fun p => MvPolynomial.C (r p) * MvPolynomial.X p.1) f : MvPolynomial K S).coeff n =
-      aeval r (comp (⇑n) f) := by
+theorem coeff_aeval_C_mul_X
+    {S : Type*} [CommRing S] [Algebra ℤ S] [Algebra ℤ (MvPolynomial K S)]
+    (r : (Σ k, ι k) → S) (f : MRing ι) (n : K →₀ ℕ)
+    : (aeval (fun p => MvPolynomial.C (r p) * MvPolynomial.X p.1) f : MvPolynomial K S).coeff n
+      = aeval r (comp (⇑n) f) := by
   classical
   induction f using MvPolynomial.induction_on' with
   | monomial u a0 =>
@@ -77,31 +85,38 @@ theorem coeff_aeval_C_mul_X {S : Type*} [CommRing S] [Algebra ℤ S] [Algebra �
       subst this
       rfl
     rw [aeval_C_mul_X_of_isMultiHomog r hu]
-    have hmono : ∀ (v : S) (D : K → ℕ), MvPolynomial.C v * ∏ k, (MvPolynomial.X k : MvPolynomial K S) ^ D k =
-        monomial (Finsupp.equivFunOnFinite.symm D) v := by
+    have hmono
+        : ∀ (v : S) (D : K → ℕ),
+          MvPolynomial.C v * ∏ k, (MvPolynomial.X k : MvPolynomial K S) ^ D k
+            = monomial (Finsupp.equivFunOnFinite.symm D) v := by
       intro v D
       rw [monomial_eq, Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
       rfl
     rw [hmono, coeff_monomial]
     have hw := Inter.LocRingPow.isMultiHomog_iff.mp hu
     by_cases h : Finsupp.equivFunOnFinite.symm (fun k => ∑ i, u ⟨k, i⟩) = n
-    · rw [if_pos h, comp, ← h, Finsupp.coe_equivFunOnFinite_symm, hw.weightedHomogeneousComponent_same]
-    · rw [if_neg h, comp, hw.weightedHomogeneousComponent_ne _ (fun e => h (by
-        rw [← e, Finsupp.equivFunOnFinite_symm_coe])), map_zero]
-  | add p q hp hq => rw [map_add (f := _), MvPolynomial.coeff_add, hp, hq, comp, comp, comp, map_add (f := _), map_add (f := _)]
+    · rw [if_pos h, comp, ← h, Finsupp.coe_equivFunOnFinite_symm,
+        hw.weightedHomogeneousComponent_same]
+    · rw [if_neg h, comp,
+        hw.weightedHomogeneousComponent_ne _
+          (fun e => h (by rw [← e, Finsupp.equivFunOnFinite_symm_coe])),
+        map_zero]
+  | add p q hp hq =>
+    rw [map_add (f := _), MvPolynomial.coeff_add, hp, hq, comp, comp, comp, map_add (f := _),
+      map_add (f := _)]
 
 end CurveVerticalPointNagata
 
-
 open CurveVerticalPointNagata in
-theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : CurveVertPointNagata.Statement := by
+theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement)
+    : CurveVertPointNagata.Statement := by
   intro K _ ι _ Ω _ y s d hP hs hsP W hW c hc _ _ a b hb hab
   classical
-
   have hPW : mCoordIdeal y ≤ W := le_sup_left.trans hW.1.1.2
   have hPh : IsMultiHomogIdeal (mCoordIdeal y) := hP.2.1.2.1
   have hWh : IsMultiHomogIdeal W := isMultiHomogIdeal_of_mem_minimalPrimes hPh hs hW.1
-  have hformP : ∀ (g : MRing ι) (e : K → ℕ), IsMultiHomog g e → g ∈ mCoordIdeal y → aeval y g = 0 := by
+  have hformP
+      : ∀ (g : MRing ι) (e : K → ℕ), IsMultiHomog g e → g ∈ mCoordIdeal y → aeval y g = 0 := by
     intro g e hg hgP
     have h0 : mConeMap y g = 0 := hgP
     rw [LowerBoundFree.mConeMap_of_isMultiHomog y hg] at h0
@@ -114,40 +129,51 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
 
   set m := curvePtIdeal y W with hm
   let Bm := Localization.AtPrime m
-  let r : (Σ k, ι k) → Bm := fun p =>
-    IsLocalization.mk' Bm (a p) (⟨b p, hb p⟩ : m.primeCompl)
-  obtain ⟨φ, hφ, hφalg, hφmk, hφaeval⟩ : ∃ φ : Bm →+* Ω, Function.Injective φ ∧
-      (∀ β : curveRing y, φ (algebraMap _ Bm β) = β) ∧
-      (∀ (α : curveRing y) (β : m.primeCompl), (α : Ω) = (β : Ω) * φ (IsLocalization.mk' Bm α β)) ∧
-      ∀ g : MRing ι, φ (aeval r g) = aeval (fun p => y p / y ⟨p.1, c p.1⟩) g := by
+  let r : (Σ k, ι k) → Bm := fun p => IsLocalization.mk' Bm (a p) (⟨b p, hb p⟩ : m.primeCompl)
+  obtain ⟨φ, hφ, hφalg, hφmk, hφaeval⟩
+      : ∃ φ : Bm →+* Ω,
+        Function.Injective φ ∧ (∀ β : curveRing y, φ (algebraMap _ Bm β) = β)
+          ∧ (∀ (α : curveRing y) (β : m.primeCompl),
+            (α : Ω) = (β : Ω) * φ (IsLocalization.mk' Bm α β))
+          ∧ ∀ g : MRing ι, φ (aeval r g) = aeval (fun p => y p / y ⟨p.1, c p.1⟩) g := by
     have hu : ∀ u : m.primeCompl, IsUnit ((curveRing y).subtype u) := by
       intro u
       refine isUnit_iff_ne_zero.mpr fun h => u.2 ?_
       have : (u : curveRing y) = 0 := Subtype.ext h
       rw [this]
       exact zero_mem _
-    refine ⟨IsLocalization.lift hu, (IsLocalization.lift_injective_iff (hg := hu)).mpr fun x z =>
-      ⟨fun h => by rw [IsLocalization.injective Bm (Ideal.primeCompl_le_nonZeroDivisors m) h],
-        fun h => by rw [Subtype.ext h]⟩, fun β => IsLocalization.lift_eq hu β,
+    refine ⟨
+      IsLocalization.lift hu,
+      (IsLocalization.lift_injective_iff (hg := hu)).mpr fun x z => ⟨
+        fun h => by rw [IsLocalization.injective Bm (Ideal.primeCompl_le_nonZeroDivisors m) h],
+        fun h => by rw [Subtype.ext h]
+      ⟩,
+      fun β => IsLocalization.lift_eq hu β,
       fun α β => by
-        have := (IsLocalization.lift_mk'_spec (S := Bm) hu α
-          (IsLocalization.lift hu (IsLocalization.mk' Bm α β)) β).mp rfl
-        exact this, fun g => ?_⟩
+        have :=
+          (IsLocalization.lift_mk'_spec (S := Bm) hu α
+            (IsLocalization.lift hu (IsLocalization.mk' Bm α β)) β).mp rfl
+        exact this,
+      fun g => ?_
+    ⟩
     rw [aeval_eq_eval₂, aeval_eq_eval₂, MvPolynomial.eval₂_comp_left,
-      show (IsLocalization.lift hu).comp (Int.castRingHom Bm) = Int.castRingHom Ω from RingHom.ext_int _ _]
+      show (IsLocalization.lift hu).comp (Int.castRingHom Bm) = Int.castRingHom Ω from
+        RingHom.ext_int _ _]
     congr 1
     funext p
     show IsLocalization.lift hu (IsLocalization.mk' Bm (a p) (⟨b p, hb p⟩ : m.primeCompl)) = _
     rw [IsLocalization.lift_mk'_spec]
     exact (hab p).symm
-  have hφev : ∀ (g : MRing ι) (e : K → ℕ), IsMultiHomog g e →
-      φ (aeval r g) = aeval y g / ∏ k, y ⟨k, c k⟩ ^ e k := fun g e hg => by
+  have hφev
+      : ∀ (g : MRing ι) (e : K → ℕ),
+        IsMultiHomog g e → φ (aeval r g) = aeval y g / ∏ k, y ⟨k, c k⟩ ^ e k := fun g e hg => by
     have h1 := aeval_mul_of_isMultiHomog y (fun k => (y ⟨k, c k⟩)⁻¹) hg
     simp only [inv_pow, Finset.prod_inv_distrib, ← div_eq_mul_inv] at h1
     rw [hφaeval, h1]
 
-  have hcrit : ∀ (g : MRing ι) (e : K → ℕ), IsMultiHomog g e →
-      (g ∈ W ↔ aeval r g ∈ IsLocalRing.maximalIdeal Bm) := by
+  have hcrit
+      : ∀ (g : MRing ι) (e : K → ℕ),
+        IsMultiHomog g e → (g ∈ W ↔ aeval r g ∈ IsLocalRing.maximalIdeal Bm) := by
     intro g e hg
     have h3 := (hCh K ι Ω y s d hP hs hsP W hW c hc).2.2 e g hg
     constructor
@@ -156,7 +182,8 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
       have : aeval r g = IsLocalization.mk' Bm α (⟨β, hβ⟩ : m.primeCompl) := by
         apply hφ
         have h1 := hφmk α ⟨β, hβ⟩
-        have hβ0 : (β : Ω) ≠ 0 := fun h => hβ (by rw [show β = 0 from Subtype.ext h]; exact zero_mem _)
+        have hβ0 : (β : Ω) ≠ 0 := fun h =>
+          hβ (by rw [show β = 0 from Subtype.ext h]; exact zero_mem _)
         rw [hφev g e hg]
         apply mul_left_cancel₀ hβ0
         rw [← h1, mul_div_assoc', he, mul_div_cancel_right₀ _ (hycp e)]
@@ -179,8 +206,10 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
   let N := mNagataRing K Bm
   have hψcoeff : ∀ f (n : K →₀ ℕ), (ψ f).coeff n = aeval r (comp (⇑n) f) := fun f n =>
     coeff_aeval_C_mul_X r f n
-  have hψform : ∀ (G : MRing ι) (e : K → ℕ), IsMultiHomog G e →
-      ψ G = MvPolynomial.C (aeval r G) * ∏ k, (MvPolynomial.X k : MvPolynomial K Bm) ^ e k :=
+  have hψform
+      : ∀ (G : MRing ι) (e : K → ℕ),
+        IsMultiHomog G e
+          → ψ G = MvPolynomial.C (aeval r G) * ∏ k, (MvPolynomial.X k : MvPolynomial K Bm) ^ e k :=
     fun G e hG => aeval_C_mul_X_of_isMultiHomog r hG
   have hrc : ∀ k, r ⟨k, c k⟩ = 1 := by
     intro k
@@ -191,8 +220,8 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
     exact div_self (hyc k)
   have hψX : ∀ k, ψ (X ⟨k, c k⟩) = MvPolynomial.X k := by
     intro k
-    rw [show ψ (X ⟨k, c k⟩) = MvPolynomial.C (r ⟨k, c k⟩) * MvPolynomial.X k from aeval_X _ _, hrc, map_one,
-      one_mul]
+    rw [show ψ (X ⟨k, c k⟩) = MvPolynomial.C (r ⟨k, c k⟩) * MvPolynomial.X k from aeval_X _ _, hrc,
+      map_one, one_mul]
   have hψW : ∀ h ∈ W, ψ h ∈ M := by
     intro h hh
     rw [MvPolynomial.mem_map_C_iff]
@@ -224,29 +253,31 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
       rw [hψcoeff, MvPolynomial.coeff_zero, Finsupp.zero_apply]
       apply hφ
       rw [hφev _ _ (isMultiHomog_comp _ f),
-        hformP _ _ (isMultiHomog_comp _ f) (Inter.LocRingPow.component_mem hPh hf _), zero_div, map_zero]
+        hformP _ _ (isMultiHomog_comp _ f) (Inter.LocRingPow.component_mem hPh hf _), zero_div,
+        map_zero]
 
-  have hunit : ∀ g : W.primeCompl,
-      IsUnit ((algebraMap (MvPolynomial K Bm) N).comp ψ.toRingHom g) := fun g =>
-    IsLocalization.map_units N (⟨ψ g, hψnot g g.2⟩ : M.primeCompl)
+  have hunit : ∀ g : W.primeCompl, IsUnit ((algebraMap (MvPolynomial K Bm) N).comp ψ.toRingHom g) :=
+    fun g => IsLocalization.map_units N (⟨ψ g, hψnot g g.2⟩ : M.primeCompl)
   let Φ : Localization.AtPrime W →+* N := IsLocalization.lift hunit
   have hΦ : ∀ f, Φ (algebraMap _ _ f) = algebraMap (MvPolynomial K Bm) N (ψ f) := fun f =>
     IsLocalization.lift_eq hunit f
-  have hΦmk : ∀ (f : MRing ι) (g : W.primeCompl) (v : N),
-      Φ (IsLocalization.mk' _ f g) = v ↔ algebraMap (MvPolynomial K Bm) N (ψ f) =
-        algebraMap (MvPolynomial K Bm) N (ψ g) * v := fun f g v =>
-    IsLocalization.lift_mk'_spec hunit f v g
+  have hΦmk
+      : ∀ (f : MRing ι) (g : W.primeCompl) (v : N),
+        Φ (IsLocalization.mk' _ f g) = v
+          ↔ algebraMap (MvPolynomial K Bm) N (ψ f) = algebraMap (MvPolynomial K Bm) N (ψ g) * v :=
+    fun f g v => IsLocalization.lift_mk'_spec hunit f v g
   have hinjN : Function.Injective (algebraMap (MvPolynomial K Bm) N) :=
     IsLocalization.injective (R := MvPolynomial K Bm) (M := M.primeCompl) N
       (Ideal.primeCompl_le_nonZeroDivisors M)
   refine ⟨Φ, ?_, ?_, hΦ⟩
-  ·
-    have hΦmax : ∀ x ∈ IsLocalRing.maximalIdeal (Localization.AtPrime W),
-        Φ x ∈ M.map (algebraMap (MvPolynomial K Bm) N) := by
+  · have hΦmax
+        : ∀ x ∈ IsLocalRing.maximalIdeal (Localization.AtPrime W),
+          Φ x ∈ M.map (algebraMap (MvPolynomial K Bm) N) := by
       intro x hx
       rw [← Localization.AtPrime.map_eq_maximalIdeal] at hx
-      have hle : (W.map (algebraMap _ (Localization.AtPrime W))).map Φ ≤
-          M.map (algebraMap (MvPolynomial K Bm) N) := by
+      have hle
+          : (W.map (algebraMap _ (Localization.AtPrime W))).map Φ
+            ≤ M.map (algebraMap (MvPolynomial K Bm) N) := by
         rw [Ideal.map_map, Ideal.map_le_iff_le_comap]
         intro h hh
         rw [Ideal.mem_comap, RingHom.comp_apply, hΦ]
@@ -259,7 +290,9 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
       rw [Localization.AtPrime.map_eq_maximalIdeal] at hmem
       exact (IsLocalRing.mem_maximalIdeal _).mp hmem hx
 
-    have hpoly : ∀ f : MRing ι, ∃ x, Φ x = algebraMap (MvPolynomial K Bm) N (MvPolynomial.C (aeval r f)) := by
+    have hpoly
+        : ∀ f : MRing ι, ∃ x,
+          Φ x = algebraMap (MvPolynomial K Bm) N (MvPolynomial.C (aeval r f)) := by
       intro f
       induction f using MvPolynomial.induction_on' with
       | monomial u a0 =>
@@ -269,12 +302,16 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
           subst this
           rfl
         have hXc : (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ (∑ i, u ⟨k, i⟩)) ∈ W.primeCompl :=
-          Submonoid.prod_mem _ fun k _ => Submonoid.pow_mem _ (show X ⟨k, c k⟩ ∈ W.primeCompl from hc k) _
-        have hψXc : ψ (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ (∑ i, u ⟨k, i⟩)) =
-            ∏ k, (MvPolynomial.X k : MvPolynomial K Bm) ^ (∑ i, u ⟨k, i⟩) := by
+          Submonoid.prod_mem _ fun k _ =>
+            Submonoid.pow_mem _ (show X ⟨k, c k⟩ ∈ W.primeCompl from hc k) _
+        have hψXc
+            : ψ (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ (∑ i, u ⟨k, i⟩))
+              = ∏ k, (MvPolynomial.X k : MvPolynomial K Bm) ^ (∑ i, u ⟨k, i⟩) := by
           simp only [map_prod, map_pow, hψX]
-        refine ⟨IsLocalization.mk' (Localization.AtPrime W) (monomial u a0) (⟨_, hXc⟩ : W.primeCompl),
-          (hΦmk _ _ _).mpr ?_⟩
+        refine ⟨
+          IsLocalization.mk' (Localization.AtPrime W) (monomial u a0) (⟨_, hXc⟩ : W.primeCompl),
+          (hΦmk _ _ _).mpr ?_
+        ⟩
         rw [← map_mul]
         congr 1
         show ψ (monomial u a0) = ψ (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ (∑ i, u ⟨k, i⟩)) * _
@@ -282,7 +319,10 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
       | add p q hp hq =>
         obtain ⟨x, hx⟩ := hp
         obtain ⟨x', hx'⟩ := hq
-        exact ⟨x + x', by rw [map_add (f := _), hx, hx', map_add (f := _), map_add (f := _), map_add (f := _)]⟩
+        exact ⟨
+          x + x',
+          by rw [map_add (f := _), hx, hx', map_add (f := _), map_add (f := _), map_add (f := _)]
+        ⟩
 
     have hC : ∀ q : Bm, ∃ x, Φ x = algebraMap (MvPolynomial K Bm) N (MvPolynomial.C q) := by
       intro q
@@ -299,18 +339,24 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
       obtain ⟨f2, e2⟩ := hB γ
       obtain ⟨x1, h1⟩ := hpoly f1
       obtain ⟨x2, h2⟩ := hpoly f2
-      obtain ⟨u, rfl⟩ := hloc x2 (by
-        rw [h2, e2]
-        exact ((IsLocalization.map_units Bm γ).map MvPolynomial.C).map (algebraMap _ N))
-      have hβγ : algebraMap (MvPolynomial K Bm) N (MvPolynomial.C (algebraMap _ Bm β)) =
-          algebraMap (MvPolynomial K Bm) N (MvPolynomial.C (IsLocalization.mk' Bm β γ)) * Φ ↑u := by
+      obtain ⟨u, rfl⟩ :=
+        hloc x2 (by
+          rw [h2, e2]
+          exact ((IsLocalization.map_units Bm γ).map MvPolynomial.C).map (algebraMap _ N))
+      have hβγ
+          : algebraMap (MvPolynomial K Bm) N (MvPolynomial.C (algebraMap _ Bm β))
+            = algebraMap (MvPolynomial K Bm) N (MvPolynomial.C (IsLocalization.mk' Bm β γ))
+              * Φ ↑u := by
         rw [h2, e2, ← map_mul, ← map_mul, IsLocalization.mk'_spec]
       refine ⟨x1 * ↑u⁻¹, ?_⟩
       rw [map_mul, h1, e1, hβγ, mul_assoc, ← map_mul, Units.mul_inv, map_one, mul_one]
     have hIm : ∀ q : MvPolynomial K Bm, ∃ x, Φ x = algebraMap (MvPolynomial K Bm) N q := by
       intro q
-      refine MvPolynomial.induction_on (motive := fun q => ∃ x, Φ x = algebraMap (MvPolynomial K Bm) N q) q hC
-        (fun p q hp hq => ?_) (fun p k hp => ?_)
+      refine MvPolynomial.induction_on
+        (motive := fun q => ∃ x, Φ x = algebraMap (MvPolynomial K Bm) N q)
+        q hC
+        (fun p q hp hq => ?_)
+        (fun p k hp => ?_)
       · obtain ⟨x, hx⟩ := hp
         obtain ⟨x', hx'⟩ := hq
         exact ⟨x + x', by rw [map_add (f := _), hx, hx', map_add (f := _)]⟩
@@ -326,8 +372,7 @@ theorem CurveVertPointNagata.proof (hCh : CurveVertPointChart.Statement) : Curve
     obtain ⟨u, rfl⟩ := hloc x2 (by rw [h2]; exact IsLocalization.map_units N q')
     refine ⟨x1 * ↑u⁻¹, ?_⟩
     rw [IsLocalization.eq_mk'_iff_mul_eq, ← h1, ← h2, ← map_mul, mul_assoc, Units.inv_mul, mul_one]
-  ·
-    ext x
+  · ext x
     rw [RingHom.mem_ker]
     constructor
     · intro hx

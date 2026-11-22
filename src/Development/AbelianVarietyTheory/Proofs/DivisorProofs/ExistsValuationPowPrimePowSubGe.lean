@@ -5,44 +5,54 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ResidueEqZer
 
 @[expose] public section
 
-open NumberField MvPowerSeries IsLocalRing ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes GlobalTheory.PrimePart
+open NumberField MvPowerSeries IsLocalRing ReciprocityTheory.PGsh
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FGDepth
+  GlobalTheory.CharDepth GlobalTheory.FactorDepth
+  GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes GlobalTheory.PrimePart
 
 namespace GlobalTheory.PowLim
 
-theorem pow_prime_step {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) {p : ℕ}
-    (hp : p.Prime) (hvp : v (p : C) = 1) {a b : C} (ha : 0 ≤ v a) (hb : 0 ≤ v b) {t ε : ℝ}
-    (hεt : ε ≤ t) (hε1 : ε ≤ 1) (ht : (t : WithTop ℝ) ≤ v (a - b)) :
-    ((t + ε : ℝ) : WithTop ℝ) ≤ v (a ^ p - b ^ p) := by
-  let R : Subring C :=
-    { carrier := {x | 0 ≤ v x}
-      mul_mem' := fun {a b} ha hb => by
-        have ha' : 0 ≤ v a := ha
-        have hb' : 0 ≤ v b := hb
-        show 0 ≤ v (a * b)
-        rw [v.map_mul]
-        exact add_nonneg ha' hb'
-      one_mem' := by
-        show 0 ≤ v 1
-        rw [v.map_one]
-      add_mem' := fun {a b} ha hb => le_trans (le_min ha hb) (v.map_add _ _)
-      zero_mem' := by
-        show 0 ≤ v 0
-        rw [v.map_zero]; exact le_top
-      neg_mem' := fun {a} ha => by
-        show 0 ≤ v (-a)
-        rw [v.map_neg]; exact ha }
+theorem pow_prime_step
+    {C : Type} [Field C]
+    (v : AddValuation C (WithTop ℝ))
+    {p : ℕ} (hp : p.Prime) (hvp : v (p : C) = 1)
+    {a b : C} (ha : 0 ≤ v a) (hb : 0 ≤ v b)
+    {t ε : ℝ} (hεt : ε ≤ t) (hε1 : ε ≤ 1) (ht : (t : WithTop ℝ) ≤ v (a - b))
+    : ((t + ε : ℝ) : WithTop ℝ) ≤ v (a ^ p - b ^ p) := by
+  let R : Subring C := {
+    carrier := {x | 0 ≤ v x}
+    mul_mem' := fun {a b} ha hb => by
+      have ha' : 0 ≤ v a := ha
+      have hb' : 0 ≤ v b := hb
+      show 0 ≤ v (a * b)
+      rw [v.map_mul]
+      exact add_nonneg ha' hb'
+    one_mem' := by
+      show 0 ≤ v 1
+      rw [v.map_one]
+    add_mem' := fun {a b} ha hb => le_trans (le_min ha hb) (v.map_add _ _)
+    zero_mem' := by
+      show 0 ≤ v 0
+      rw [v.map_zero]
+      exact le_top
+    neg_mem' := fun {a} ha => by
+      show 0 ≤ v (-a)
+      rw [v.map_neg]
+      exact ha
+  }
   have haR : a ∈ R := ha
   have hbR : b ∈ R := hb
   have hdR : a - b ∈ R := R.sub_mem haR hbR
   obtain ⟨r, hr⟩ := exists_add_pow_prime_eq hp (⟨a - b, hdR⟩ : R) ⟨b, hbR⟩
   have hr' := congrArg (fun z : R => (z : C)) hr
-  simp only [Subring.coe_pow, Subring.coe_add, Subring.coe_mul, Subring.coe_natCast,
-    sub_add_cancel] at hr'
+  simp only [Subring.coe_pow, Subring.coe_add, Subring.coe_mul, Subring.coe_natCast, sub_add_cancel]
+    at hr'
   obtain ⟨k, hk⟩ : ∃ k, p = k + 2 := ⟨p - 2, by have := hp.two_le; omega⟩
   have e : a ^ p - b ^ p = (a - b) * (a - b) * (a - b) ^ k + (p : C) * (a - b) * (b * r) := by
     rw [hr']
     have : (a - b) ^ p = (a - b) * (a - b) * (a - b) ^ k := by rw [hk]; ring
-    rw [this]; ring
+    rw [this]
+    ring
   have h1 : (0 : WithTop ℝ) ≤ v ((a - b) ^ k) := R.pow_mem hdR k
   have h2 : (0 : WithTop ℝ) ≤ v (b * (r : C)) := R.mul_mem hbR r.2
   have hε : (ε : WithTop ℝ) ≤ v (a - b) := le_trans (WithTop.coe_le_coe.2 hεt) ht
@@ -54,7 +64,12 @@ theorem pow_prime_step {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) {
   · rw [v.map_mul, v.map_mul, WithTop.coe_add, hvp, add_comm (t : WithTop ℝ)]
     exact le_trans (add_le_add hε1' ht) (le_add_of_nonneg_right h2)
 
-theorem pow_prime_pow_close : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (p : ℕ), p.Prime → v (p : C) = 1 → ∀ x y : C, IsIntV v x → IsIntV v y → 0 < v (x - y) → ∀ r : ℝ, ∃ N₀ : ℕ, ∀ N, N₀ ≤ N → (r : WithTop ℝ) ≤ v (x ^ p ^ N - y ^ p ^ N) := by
+theorem pow_prime_pow_close
+    : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (p : ℕ),
+      p.Prime → v (p : C) = 1
+        → ∀ x y : C,
+          IsIntV v x → IsIntV v y → 0 < v (x - y)
+            → ∀ r : ℝ, ∃ N₀ : ℕ, ∀ N, N₀ ≤ N → (r : WithTop ℝ) ≤ v (x ^ p ^ N - y ^ p ^ N) := by
   intro C _ v p hp hvp x y hx hy hxy r
   have hx' : 0 ≤ v x := hx
   have hy' : 0 ≤ v y := hy
@@ -75,11 +90,13 @@ theorem pow_prime_pow_close : ∀ (C : Type) [Field C] (v : AddValuation C (With
     | zero => simpa using hε
     | succ N ih =>
       have hN : (0 : ℝ) ≤ N := Nat.cast_nonneg N
-      have := pow_prime_step v hp hvp (hpow x (p ^ N) hx') (hpow y (p ^ N) hy')
-        (t := ((N : ℝ) + 1) * ε) (ε := ε) (by nlinarith) hε1 ih
+      have :=
+        pow_prime_step v hp hvp (hpow x (p ^ N) hx') (hpow y (p ^ N) hy') (t := ((N : ℝ) + 1) * ε)
+          (ε := ε) (by nlinarith) hε1 ih
       rw [← pow_mul, ← pow_mul, ← pow_succ] at this
       refine le_trans (WithTop.coe_le_coe.2 (le_of_eq ?_)) this
-      push_cast; ring
+      push_cast
+      ring
   obtain ⟨M, hM⟩ := exists_nat_gt (r / ε)
   refine ⟨M, fun N hN => le_trans (WithTop.coe_le_coe.2 ?_) (key N)⟩
   have h1 : (M : ℝ) ≤ N := by exact_mod_cast hN

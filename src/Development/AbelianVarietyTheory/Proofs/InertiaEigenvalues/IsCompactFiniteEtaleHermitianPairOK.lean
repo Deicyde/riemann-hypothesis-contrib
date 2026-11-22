@@ -11,61 +11,72 @@ noncomputable section
 
 namespace GlobalTheory.JR.OKCompact
 
-theorem continuous_coeff_charpoly {A : Type} [CommRing A] [TopologicalSpace A] [IsTopologicalRing A] {n : ℕ}
-    (k : ℕ) : Continuous fun M : Matrix (Fin n) (Fin n) A => M.charpoly.coeff k := by
-  have : (fun M : Matrix (Fin n) (Fin n) A => M.charpoly.coeff k) = fun M =>
-      MvPolynomial.eval (fun p : Fin n × Fin n => M p.1 p.2)
-        (MvPolynomial.map (Int.castRingHom A) ((Matrix.charpoly.univ ℤ (Fin n)).coeff k)) := by
+theorem continuous_coeff_charpoly
+    {A : Type} [CommRing A] [TopologicalSpace A] [IsTopologicalRing A] {n : ℕ} (k : ℕ)
+    : Continuous fun M : Matrix (Fin n) (Fin n) A => M.charpoly.coeff k := by
+  have : (fun M : Matrix (Fin n) (Fin n) A => M.charpoly.coeff k)
+      = fun M =>
+        MvPolynomial.eval
+          (fun p : Fin n × Fin n => M p.1 p.2)
+          (MvPolynomial.map (Int.castRingHom A) ((Matrix.charpoly.univ ℤ (Fin n)).coeff k)) := by
     funext M
     rw [MvPolynomial.eval_map]
-    exact (Matrix.charpoly.univ_coeff_eval₂Hom (Fin n) (Int.castRingHom A) (fun p => M p.1 p.2) k).symm
+    exact
+      (Matrix.charpoly.univ_coeff_eval₂Hom (Fin n) (Int.castRingHom A) (fun p => M p.1 p.2) k).symm
   rw [this]
   exact (MvPolynomial.continuous_eval _).comp (by fun_prop)
 
-theorem charpoly_smul_eq_scaleRoots {K : Type} [Field K] [Infinite K] {n : ℕ} (M : Matrix (Fin n) (Fin n) K)
-    {c : K} (hc : c ≠ 0) : (c • M).charpoly = M.charpoly.scaleRoots c := by
+theorem charpoly_smul_eq_scaleRoots
+    {K : Type} [Field K] [Infinite K] {n : ℕ} (M : Matrix (Fin n) (Fin n) K) {c : K} (hc : c ≠ 0)
+    : (c • M).charpoly = M.charpoly.scaleRoots c := by
   apply Polynomial.funext
   intro x
   obtain ⟨y, rfl⟩ : ∃ y, x = c * y := ⟨c⁻¹ * x, by rw [← mul_assoc, mul_inv_cancel₀ hc, one_mul]⟩
-  rw [Polynomial.scaleRoots_eval_mul, Matrix.charpoly_natDegree_eq_dim, Matrix.eval_charpoly, Matrix.eval_charpoly,
-    ← Matrix.det_smul, smul_sub]
+  rw [Polynomial.scaleRoots_eval_mul, Matrix.charpoly_natDegree_eq_dim, Matrix.eval_charpoly,
+    Matrix.eval_charpoly, ← Matrix.det_smul, smul_sub]
   congr 2
   ext a b
   simp only [Matrix.smul_apply, Matrix.scalar_apply, Matrix.diagonal_apply, smul_eq_mul]
   split_ifs <;> simp
 
-variable {F : Type} [NontriviallyNormedField F] {K : Type} [CommRing K] [Algebra F K] [Module.Finite F K]
+variable
+  {F : Type} [NontriviallyNormedField F] {K : Type} [CommRing K] [Algebra F K] [Module.Finite F K]
 
-theorem coeff_charpoly_lmul_smul [Infinite F] (z : K) {c : F} (hc : c ≠ 0) (k : ℕ) :
-    (LinearMap.charpoly (Algebra.lmul F K (c • z))).coeff k =
-      (LinearMap.charpoly (Algebra.lmul F K z)).coeff k * c ^ (Module.finrank F K - k) := by
+theorem coeff_charpoly_lmul_smul [Infinite F] (z : K) {c : F} (hc : c ≠ 0) (k : ℕ)
+    : (LinearMap.charpoly (Algebra.lmul F K (c • z))).coeff k
+      = (LinearMap.charpoly (Algebra.lmul F K z)).coeff k * c ^ (Module.finrank F K - k) := by
   let b := Module.finBasis F K
   rw [← LinearMap.charpoly_toMatrix (Algebra.lmul F K (c • z)) b,
     ← LinearMap.charpoly_toMatrix (Algebra.lmul F K z) b, map_smul, map_smul,
-    charpoly_smul_eq_scaleRoots _ hc, Polynomial.coeff_scaleRoots, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+    charpoly_smul_eq_scaleRoots _ hc, Polynomial.coeff_scaleRoots, Matrix.charpoly_natDegree_eq_dim,
+    Fintype.card_fin]
 
-theorem continuous_coeff_lmul [TopologicalSpace K] [IsModuleTopology F K] (k : ℕ) :
-    Continuous fun z : K => (LinearMap.charpoly (Algebra.lmul F K z)).coeff k := by
+theorem continuous_coeff_lmul [TopologicalSpace K] [IsModuleTopology F K] (k : ℕ)
+    : Continuous fun z : K => (LinearMap.charpoly (Algebra.lmul F K z)).coeff k := by
   let b := Module.finBasis F K
-  have h : (fun z : K => (LinearMap.charpoly (Algebra.lmul F K z)).coeff k) =
-      (fun M : Matrix _ _ F => M.charpoly.coeff k) ∘ (fun z => Algebra.leftMulMatrix b z) := by
+  have h
+      : (fun z : K => (LinearMap.charpoly (Algebra.lmul F K z)).coeff k)
+        = (fun M : Matrix _ _ F => M.charpoly.coeff k) ∘ (fun z => Algebra.leftMulMatrix b z) := by
     funext z
     simp only [Function.comp, Algebra.leftMulMatrix_apply, LinearMap.charpoly_toMatrix]
   rw [h]
   refine (continuous_coeff_charpoly k).comp ?_
   refine continuous_matrix fun i j => ?_
-  let l : K →ₗ[F] F :=
-    { toFun := fun z => Algebra.leftMulMatrix b z i j
-      map_add' := fun x y => by simp
-      map_smul' := fun c x => by simp }
+  let l : K →ₗ[F] F := {
+    toFun := fun z => Algebra.leftMulMatrix b z i j
+    map_add' := fun x y => by simp
+    map_smul' := fun c x => by simp
+  }
   exact IsModuleTopology.continuous_of_linearMap l
 
 end GlobalTheory.JR.OKCompact
 
 namespace GlobalTheory.JR.OKCompact
 
-theorem okCompact : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-    [StarRing E] [Unram F E] (A : Et F E), IsCompact A.OK := by
+theorem okCompact
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E),
+      IsCompact A.OK := by
   intro F E _ _ _ _ hU A
   haveI : CharZero F := hU.charZero
   haveI : LocallyCompactSpace F := hU.lcF
@@ -92,7 +103,8 @@ theorem okCompact : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNo
         rwa [LinearMap.charpoly_natDegree, hn, ← hk] at this
       · rw [if_neg hk.ne']
         apply Polynomial.coeff_eq_zero_of_natDegree_lt
-        rw [LinearMap.charpoly_natDegree, hn]; exact hk
+        rw [LinearMap.charpoly_natDegree, hn]
+        exact hk
     have hCH := LinearMap.aeval_self_charpoly (Algebra.lmul F A.K z)
     rw [hp, map_pow, Polynomial.aeval_X, ← map_pow] at hCH
     have h1 := LinearMap.congr_fun hCH 1
@@ -100,11 +112,14 @@ theorem okCompact : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNo
     exact IsReduced.eq_zero z ⟨n, h2⟩
   obtain ⟨a, ha⟩ := NormedField.exists_one_lt_norm F
   let T : Set (Fin n → F) := {v | 1 ≤ ‖v‖ ∧ ‖v‖ ≤ ‖a‖}
-  have hT : IsCompact T := (isCompact_closedBall (0 : Fin n → F) ‖a‖).of_isClosed_subset
-      ((isClosed_le continuous_const continuous_norm).inter (isClosed_le continuous_norm continuous_const))
+  have hT : IsCompact T :=
+    (isCompact_closedBall (0 : Fin n → F) ‖a‖).of_isClosed_subset
+      ((isClosed_le continuous_const continuous_norm).inter
+        (isClosed_le continuous_norm continuous_const))
       (fun v hv => mem_closedBall_zero_iff.2 hv.2)
   let h : (Fin n → F) → ℝ := fun v => ∑ k ∈ Finset.range n, ‖P k (e.symm v)‖
-  have hc : Continuous h := continuous_finsetSum _ fun k _ => continuous_norm.comp ((hPc k).comp hes)
+  have hc : Continuous h :=
+    continuous_finsetSum _ fun k _ => continuous_norm.comp ((hPc k).comp hes)
   have hpos : ∀ v ∈ T, 0 < h v := by
     intro v hv
     by_contra hle
@@ -112,8 +127,9 @@ theorem okCompact : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNo
     have hsum : h v = 0 := le_antisymm hle (Finset.sum_nonneg fun k _ => norm_nonneg _)
     have h0 : ∀ k < n, P k (e.symm v) = 0 := by
       intro k hk
-      exact norm_eq_zero.1 ((Finset.sum_eq_zero_iff_of_nonneg fun k _ => norm_nonneg (P k (e.symm v))).1 hsum k
-        (Finset.mem_range.2 hk))
+      exact norm_eq_zero.1
+        ((Finset.sum_eq_zero_iff_of_nonneg fun k _ => norm_nonneg (P k (e.symm v))).1 hsum k
+          (Finset.mem_range.2 hk))
     have hv0 : v = 0 := by simpa using congrArg e (hzero _ h0)
     have := hv.1
     rw [hv0, norm_zero] at this
@@ -141,28 +157,41 @@ theorem okCompact : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNo
       rw [hn] at this
       exact this
     have hhv : h (e z) ≤ n := by
-      calc h (e z) ≤ ∑ k ∈ Finset.range n, (1 : ℝ) := Finset.sum_le_sum fun k _ => by
-              show ‖P k (e.symm (e z))‖ ≤ 1
-              rw [e.symm_apply_apply]; exact hz k
+      calc
+        h (e z) ≤ ∑ k ∈ Finset.range n, (1 : ℝ) :=
+          Finset.sum_le_sum fun k _ => by
+            show ‖P k (e.symm (e z))‖ ≤ 1
+            rw [e.symm_apply_apply]
+            exact hz k
         _ = n := by simp
     by_cases hc1 : ‖d⁻¹‖ ≤ 1
-    · calc ‖e z‖ = ‖d⁻¹‖ * ‖d • e z‖ := hnv
+    · calc
+        ‖e z‖
+          = ‖d⁻¹‖ * ‖d • e z‖ := hnv
         _ ≤ 1 * ‖a‖ := mul_le_mul hc1 hwT.2 (norm_nonneg _) zero_le_one
         _ ≤ _ := by rw [one_mul]; exact hR
     · push_neg at hc1
       have hlow : ‖d⁻¹‖ * m ≤ h (e z) := by
-        calc ‖d⁻¹‖ * m ≤ ‖d⁻¹‖ * h (d • e z) := mul_le_mul_of_nonneg_left (hm _ hwT) (norm_nonneg _)
+        calc
+          ‖d⁻¹‖ * m
+            ≤ ‖d⁻¹‖ * h (d • e z) := mul_le_mul_of_nonneg_left (hm _ hwT) (norm_nonneg _)
           _ = ∑ k ∈ Finset.range n, ‖d⁻¹‖ * ‖P k (e.symm (d • e z))‖ := Finset.mul_sum _ _ _
-          _ ≤ ∑ k ∈ Finset.range n, ‖P k (e.symm (e z))‖ := Finset.sum_le_sum fun k hk => by
+          _ ≤ ∑ k ∈ Finset.range n, ‖P k (e.symm (e z))‖ :=
+            Finset.sum_le_sum fun k hk => by
               rw [hsc k, norm_mul, norm_pow, mul_comm]
               apply mul_le_mul_of_nonneg_left _ (norm_nonneg _)
               have hk' : 1 ≤ n - k := by have := Finset.mem_range.1 hk; omega
-              calc ‖d⁻¹‖ = ‖d⁻¹‖ ^ 1 := (pow_one _).symm
+              calc
+                ‖d⁻¹‖
+                  = ‖d⁻¹‖ ^ 1 := (pow_one _).symm
                 _ ≤ ‖d⁻¹‖ ^ (n - k) := pow_le_pow_right₀ hc1.le hk'
       have hcm : ‖d⁻¹‖ ≤ n / m := by rw [le_div_iff₀ hm0]; linarith
-      calc ‖e z‖ = ‖d⁻¹‖ * ‖d • e z‖ := hnv
+      calc
+        ‖e z‖
+          = ‖d⁻¹‖ * ‖d • e z‖ := hnv
         _ ≤ (n / m) * ‖a‖ := mul_le_mul hcm hwT.2 (norm_nonneg _) (by positivity)
-        _ ≤ _ := by rw [mul_comm]; exact mul_le_mul_of_nonneg_left (le_max_right _ _) (norm_nonneg _)
+        _ ≤ _ := by
+          rw [mul_comm]; exact mul_le_mul_of_nonneg_left (le_max_right _ _) (norm_nonneg _)
   exact ((isCompact_closedBall 0 _).image hes).of_isClosed_subset hcl hsub
 
 end GlobalTheory.JR.OKCompact

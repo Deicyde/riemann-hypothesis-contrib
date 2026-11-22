@@ -16,14 +16,15 @@ namespace GlobalTheory.LocDualInt
 
 section PerfL
 
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  {V : Type} [AddCommGroup V] [Module O V] [Module (FractionRing O) V]
-  [IsScalarTower O (FractionRing O) V]
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {V : Type}
+  [AddCommGroup V] [Module O V] [Module (FractionRing O) V] [IsScalarTower O (FractionRing O) V]
 
-theorem exists_form_of_not_mem {T : Submodule O V} (hT : IsLatticeIn T) {v : V} (hv : v ∉ T) :
-    ∃ ψ : V →ₗ[FractionRing O] FractionRing O,
-      (∀ t ∈ T, ψ t ∈ (1 : Submodule O (FractionRing O))) ∧
-        ψ v ∉ (1 : Submodule O (FractionRing O)) := by
+theorem exists_form_of_not_mem {T : Submodule O V} (hT : IsLatticeIn T) {v : V} (hv : v ∉ T)
+    : ∃ ψ : V →ₗ[FractionRing O] FractionRing O,
+      (∀ t ∈ T, ψ t ∈ (1 : Submodule O (FractionRing O)))
+        ∧ ψ v ∉ (1 : Submodule O (FractionRing O)) := by
   classical
   haveI : Module.Finite O T := Module.Finite.iff_fg.2 hT.1
   haveI : Module.IsTorsionFree O T := Module.IsTorsionFree.of_smul_eq_zero fun r m h => by
@@ -65,8 +66,10 @@ theorem exists_form_of_not_mem {T : Submodule O V} (hT : IsLatticeIn T) {v : V} 
       split_ifs
       · exact Submodule.mem_one.2 ⟨1, map_one _⟩
       · exact Submodule.zero_mem _
-    | zero => intro j; simp
-    | add x y _ _ hx hy => intro j; rw [map_add (f := _), Finsupp.add_apply]; exact Submodule.add_mem _ (hx j) (hy j)
+    | zero =>
+      intro j; simp
+    | add x y _ _ hx hy =>
+      intro j; rw [map_add (f := _), Finsupp.add_apply]; exact Submodule.add_mem _ (hx j) (hy j)
     | smul a x _ hx =>
       intro j
       rw [← algebraMap_smul (FractionRing O) a x, map_smul, Finsupp.smul_apply, algebraMap_smul]
@@ -83,9 +86,9 @@ theorem exists_form_of_not_mem {T : Submodule O V} (hT : IsLatticeIn T) {v : V} 
   obtain ⟨j, hj⟩ := hex
   exact ⟨bK.coord j, fun t ht => hint t ht j, hj⟩
 
-theorem exists_mul_eq_inv_unif {ϖ : O} (hϖ : Irreducible ϖ) {u : FractionRing O}
-    (hu : u ∉ (1 : Submodule O (FractionRing O))) :
-    ∃ o : O, algebraMap O (FractionRing O) o * u = (algebraMap O (FractionRing O) ϖ)⁻¹ := by
+theorem exists_mul_eq_inv_unif
+    {ϖ : O} (hϖ : Irreducible ϖ) {u : FractionRing O} (hu : u ∉ (1 : Submodule O (FractionRing O)))
+    : ∃ o : O, algebraMap O (FractionRing O) o * u = (algebraMap O (FractionRing O) ϖ)⁻¹ := by
   have hu0 : u ≠ 0 := fun h => hu (h ▸ Submodule.zero_mem _)
   rcases ValuationRing.isInteger_or_isInteger O u with h | ⟨w, hw⟩
   · exact absurd (Submodule.mem_one.2 h) hu
@@ -95,9 +98,10 @@ theorem exists_mul_eq_inv_unif {ϖ : O} (hϖ : Irreducible ϖ) {u : FractionRing
     refine Submodule.mem_one.2 ⟨((hw'.unit⁻¹ : Oˣ) : O), ?_⟩
     have h1 : algebraMap O (FractionRing O) ((hw'.unit⁻¹ : Oˣ) : O) * u⁻¹ = 1 := by
       rw [← hw, ← map_mul, IsUnit.val_inv_mul, map_one]
-    calc algebraMap O (FractionRing O) ((hw'.unit⁻¹ : Oˣ) : O)
-        = algebraMap O (FractionRing O) ((hw'.unit⁻¹ : Oˣ) : O) * (u⁻¹ * u) := by
-          rw [inv_mul_cancel₀ hu0, mul_one]
+    calc
+      algebraMap O (FractionRing O) ((hw'.unit⁻¹ : Oˣ) : O)
+          = algebraMap O (FractionRing O) ((hw'.unit⁻¹ : Oˣ) : O) * (u⁻¹ * u) := by
+        rw [inv_mul_cancel₀ hu0, mul_one]
       _ = u := by rw [← mul_assoc, h1, one_mul]
   have hwm : w ∈ IsLocalRing.maximalIdeal O := hwu
   rw [hϖ.maximalIdeal_eq, Ideal.mem_span_singleton] at hwm
@@ -106,7 +110,8 @@ theorem exists_mul_eq_inv_unif {ϖ : O} (hϖ : Irreducible ϖ) {u : FractionRing
   rw [map_mul] at hw
   symm
   apply inv_eq_of_mul_eq_one_right
-  calc algebraMap O (FractionRing O) ϖ * (algebraMap O (FractionRing O) o * u)
+  calc
+    algebraMap O (FractionRing O) ϖ * (algebraMap O (FractionRing O) o * u)
       = (algebraMap O (FractionRing O) ϖ * algebraMap O (FractionRing O) o) * u := by ring
     _ = 1 := by rw [hw, inv_mul_cancel₀ hu0]
 
@@ -114,17 +119,21 @@ end PerfL
 
 section Main
 
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
   [TopologicalSpace (FractionRing O)] [IsTopologicalAddGroup (FractionRing O)]
-  [ContinuousSMul O (FractionRing O)] {VT VT' : Type} [AddCommGroup VT] [Module O VT]
-  [TopologicalSpace VT] [IsTopologicalAddGroup VT] [ContinuousSMul O VT]
-  [Module (FractionRing O) VT] [IsScalarTower O (FractionRing O) VT] [AddCommGroup VT']
-  [Module O VT'] [TopologicalSpace VT'] [IsTopologicalAddGroup VT'] [ContinuousSMul O VT']
+  [ContinuousSMul O (FractionRing O)]
+  {VT VT' : Type} [AddCommGroup VT] [Module O VT] [TopologicalSpace VT] [IsTopologicalAddGroup VT]
+  [ContinuousSMul O VT] [Module (FractionRing O) VT] [IsScalarTower O (FractionRing O) VT]
+  [AddCommGroup VT'] [Module O VT'] [TopologicalSpace VT'] [IsTopologicalAddGroup VT']
+  [ContinuousSMul O VT']
   {G : Type} [Group G] [TopologicalSpace G]
 
-theorem exists_dual_pairKO_eq_inv_unif (D : LatData O G VT VT') (hT : IsLatticeIn D.T)
-    (hP : PerfectRight D.bT) (ϖ : O) (hϖ : Irreducible ϖ) (x : VT ⧸ D.T) (hx : x ≠ 0) :
-    ∃ f : ↥D.T', pairKO D.bT D.T x f = toKO O ((algebraMap O (FractionRing O) ϖ)⁻¹) := by
+theorem exists_dual_pairKO_eq_inv_unif
+    (D : LatData O G VT VT') (hT : IsLatticeIn D.T) (hP : PerfectRight D.bT)
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (x : VT ⧸ D.T) (hx : x ≠ 0)
+    : ∃ f : ↥D.T', pairKO D.bT D.T x f = toKO O ((algebraMap O (FractionRing O) ϖ)⁻¹) := by
   obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective D.T x
   have hv : v ∉ D.T := fun h => hx ((Submodule.Quotient.mk_eq_zero _).2 h)
   obtain ⟨ψ, hψT, hψv⟩ := exists_form_of_not_mem hT hv

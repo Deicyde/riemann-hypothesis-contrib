@@ -11,14 +11,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogFGLDepthS
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.DepthStages
+open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh
+  GlobalTheory.DepthStages
 
 namespace GlobalTheory
 
-theorem span_tangent_of_type : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (p d h : ℕ) (ty : Fin d → ZMod h)
-    (G : LogFGL v d) (γ : Fin d → Fin d → PowerSeries C), IsBasis G p ty γ →
-    ∀ (t : ZMod h) (w : Fin d → C), (∀ c, ty c ≠ t → w c = 0) →
-      w ∈ Submodule.span C (Set.range fun b : {b // ty b = t} => tangent (γ b.1)) := by
+theorem span_tangent_of_type
+    : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (p d h : ℕ) (ty : Fin d → ZMod h)
+        (G : LogFGL v d) (γ : Fin d → Fin d → PowerSeries C),
+      IsBasis G p ty γ
+        → ∀ (t : ZMod h) (w : Fin d → C),
+          (∀ c, ty c ≠ t → w c = 0)
+            → w ∈ Submodule.span C (Set.range fun b : {b // ty b = t} => tangent (γ b.1)) := by
   intro C _ v p d h ty G γ hB t w hw
   obtain ⟨hγ, hγty, hdet⟩ := hB
   have hdet' : v (PTb.tmat γ).det = 0 := hdet

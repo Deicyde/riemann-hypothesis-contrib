@@ -17,15 +17,19 @@ section Count
 theorem card_lt_pairs (n : ℕ) : Nat.card {p : Fin n × Fin n // p.1 < p.2} = n * (n - 1) / 2 := by
   classical
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
-  have hoff : ((Finset.univ : Finset (Fin n × Fin n)).filter (fun p => p.1 ≠ p.2)).card = n * (n - 1) := by
-    have h1 : (Finset.univ : Finset (Fin n × Fin n)).filter (fun p => p.1 ≠ p.2) =
-        (Finset.univ : Finset (Fin n)).offDiag := by
+  have hoff
+      : ((Finset.univ : Finset (Fin n × Fin n)).filter (fun p => p.1 ≠ p.2)).card
+        = n * (n - 1) := by
+    have h1
+        : (Finset.univ : Finset (Fin n × Fin n)).filter (fun p => p.1 ≠ p.2)
+          = (Finset.univ : Finset (Fin n)).offDiag := by
       ext p
       simp [Finset.mem_offDiag]
     rw [h1, Finset.offDiag_card, Finset.card_univ, Fintype.card_fin, Nat.mul_sub_one]
-  have hsplit : (Finset.univ : Finset (Fin n × Fin n)).filter (fun p => p.1 ≠ p.2) =
-      (Finset.univ.filter (fun p : Fin n × Fin n => p.1 < p.2)) ∪
-        (Finset.univ.filter (fun p : Fin n × Fin n => p.2 < p.1)) := by
+  have hsplit
+      : (Finset.univ : Finset (Fin n × Fin n)).filter (fun p => p.1 ≠ p.2)
+        = (Finset.univ.filter (fun p : Fin n × Fin n => p.1 < p.2))
+          ∪ (Finset.univ.filter (fun p : Fin n × Fin n => p.2 < p.1)) := by
     ext p
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union]
     constructor
@@ -40,8 +44,9 @@ theorem card_lt_pairs (n : ℕ) : Nat.card {p : Fin n × Fin n // p.1 < p.2} = n
     intro p hp hq
     simp only [Finset.mem_filter] at hp hq
     exact lt_asymm hp.2 hq.2
-  have hswap : (Finset.univ.filter (fun p : Fin n × Fin n => p.2 < p.1)).card =
-      (Finset.univ.filter (fun p : Fin n × Fin n => p.1 < p.2)).card := by
+  have hswap
+      : (Finset.univ.filter (fun p : Fin n × Fin n => p.2 < p.1)).card
+        = (Finset.univ.filter (fun p : Fin n × Fin n => p.1 < p.2)).card := by
     apply Finset.card_bij (fun p _ => p.swap)
     · intro p hp
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Prod.fst_swap, Prod.snd_swap] at hp ⊢
@@ -56,21 +61,31 @@ theorem card_lt_pairs (n : ℕ) : Nat.card {p : Fin n × Fin n // p.1 < p.2} = n
   generalize n * (n - 1) = X at hoff ⊢
   omega
 
-theorem card_matrix (m n K : Type) [Finite m] [Finite n] :
-    Nat.card (Matrix m n K) = Nat.card K ^ (Nat.card m * Nat.card n) := by
+theorem card_matrix (m n K : Type) [Finite m] [Finite n]
+    : Nat.card (Matrix m n K) = Nat.card K ^ (Nat.card m * Nat.card n) := by
   show Nat.card (m → n → K) = _
   rw [Nat.card_fun, Nat.card_fun, ← pow_mul, Nat.mul_comm (Nat.card n) (Nat.card m)]
 
 variable {A : Type} [CommRing A]
 
-def uniEquiv (n : ℕ) : {u : Matrix (Fin n) (Fin n) A // IsUpUni u} ≃ ({p : Fin n × Fin n // p.1 < p.2} → A) where
+def uniEquiv (n : ℕ)
+    : {u : Matrix (Fin n) (Fin n) A // IsUpUni u} ≃ ({p : Fin n × Fin n // p.1 < p.2} → A) where
   toFun u := fun p => u.1 p.1.1 p.1.2
-  invFun f := ⟨Matrix.of fun i j => if h : i < j then f ⟨(i, j), h⟩ else if i = j then 1 else 0, by
-    constructor
-    · intro i j hij
-      have hij' : j < i := hij
-      simp [not_lt.2 hij'.le, hij'.ne']
-    · intro a; simp⟩
+  invFun f := ⟨
+    Matrix.of fun i j =>
+      if h : i < j then
+        f ⟨(i, j), h⟩
+      else if i = j then
+        1
+      else
+        0,
+    by
+      constructor
+      · intro i j hij
+        have hij' : j < i := hij
+        simp [not_lt.2 hij'.le, hij'.ne']
+      · intro a; simp
+  ⟩
   left_inv u := by
     apply Subtype.ext
     ext i j
@@ -85,11 +100,13 @@ def uniEquiv (n : ℕ) : {u : Matrix (Fin n) (Fin n) A // IsUpUni u} ≃ ({p : F
     have h' : i < j := h
     simp [h']
 
-theorem card_uni (K : Type) [Field K] [Fintype K] (n : ℕ) :
-    Nat.card {u : Matrix (Fin n) (Fin n) K // IsUpUni u} = Fintype.card K ^ (n * (n - 1) / 2) := by
+theorem card_uni (K : Type) [Field K] [Fintype K] (n : ℕ)
+    : Nat.card {u : Matrix (Fin n) (Fin n) K // IsUpUni u}
+      = Fintype.card K ^ (n * (n - 1) / 2) := by
   rw [Nat.card_congr (uniEquiv (A := K) n), Nat.card_fun, card_lt_pairs, Nat.card_eq_fintype_card]
 
-noncomputable def upUniGEquiv (n : ℕ) : upUniG A n ≃ {u : Matrix (Fin n) (Fin n) A // IsUpUni u} where
+noncomputable def upUniGEquiv (n : ℕ)
+    : upUniG A n ≃ {u : Matrix (Fin n) (Fin n) A // IsUpUni u} where
   toFun g := ⟨g.1.1, g.2⟩
   invFun u := ⟨Matrix.GeneralLinearGroup.mk'' u.1 (uni_unit u.2), u.2⟩
   left_inv g := Subtype.ext (Units.ext rfl)
@@ -97,63 +114,48 @@ noncomputable def upUniGEquiv (n : ℕ) : upUniG A n ≃ {u : Matrix (Fin n) (Fi
 
 variable {r k : ℕ}
 
-def mk (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
-    (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A) :
-    Matrix (Idx r k) (Idx r k) A :=
+def mk
+    (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
+    (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A)
+    : Matrix (Idx r k) (Idx r k) A :=
   Matrix.fromBlocks a (Matrix.fromCols b c) 0 (Matrix.fromBlocks m e 0 f)
 
 section mk
-variable (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
-    (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A)
-theorem block11_of_blocks : b11 (mk a b c m e f) = a := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b11])
-theorem block12_of_blocks : b12 (mk a b c m e f) = b := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b12])
-theorem block13_of_blocks : b13 (mk a b c m e f) = c := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b13])
-theorem block21_of_blocks : b21 (mk a b c m e f) = 0 := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b21])
-theorem block22_of_blocks : b22 (mk a b c m e f) = m := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b22])
-theorem block23_of_blocks : b23 (mk a b c m e f) = e := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b23])
-theorem block31_of_blocks : b31 (mk a b c m e f) = 0 := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b31])
-theorem block32_of_blocks : b32 (mk a b c m e f) = 0 := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b32])
-theorem block33_of_blocks : b33 (mk a b c m e f) = f := by
-  first
-    | rfl
-    | (ext i j; simp [mk, b33])
+variable
+  (a : Matrix (Fin r) (Fin r) A) (b : Matrix (Fin r) (Mid k) A) (c : Matrix (Fin r) (Fin r) A)
+  (m : Matrix (Mid k) (Mid k) A) (e : Matrix (Mid k) (Fin r) A) (f : Matrix (Fin r) (Fin r) A)
+theorem block11_of_blocks : b11 (mk a b c m e f) = a := by first | rfl | (ext i j; simp [mk, b11])
+theorem block12_of_blocks : b12 (mk a b c m e f) = b := by first | rfl | (ext i j; simp [mk, b12])
+theorem block13_of_blocks : b13 (mk a b c m e f) = c := by first | rfl | (ext i j; simp [mk, b13])
+theorem block21_of_blocks : b21 (mk a b c m e f) = 0 := by first | rfl | (ext i j; simp [mk, b21])
+theorem block22_of_blocks : b22 (mk a b c m e f) = m := by first | rfl | (ext i j; simp [mk, b22])
+theorem block23_of_blocks : b23 (mk a b c m e f) = e := by first | rfl | (ext i j; simp [mk, b23])
+theorem block31_of_blocks : b31 (mk a b c m e f) = 0 := by first | rfl | (ext i j; simp [mk, b31])
+theorem block32_of_blocks : b32 (mk a b c m e f) = 0 := by first | rfl | (ext i j; simp [mk, b32])
+theorem block33_of_blocks : b33 (mk a b c m e f) = f := by first | rfl | (ext i j; simp [mk, b33])
 end mk
 
-def parMap (P : Matrix (Fin k) (Fin k) A → Prop) :
-    ({a : Matrix (Fin r) (Fin r) A // IsUpUni a} × {f : Matrix (Fin r) (Fin r) A // IsUpUni f} ×
-      {h : Matrix (Fin k) (Fin k) A // P h} × Matrix (Fin r) (Mid k) A × Matrix (Fin r) (Fin r) A ×
-      Matrix (Mid k) (Fin r) A) → {x : Matrix (Idx r k) (Idx r k) A // Par P x} :=
-  fun t => ⟨mk t.1.1 t.2.2.2.1 t.2.2.2.2.1 (midEmb t.2.2.1.1) t.2.2.2.2.2 t.2.1.1,
-    by rw [block11_of_blocks]; exact t.1.2, by rw [block33_of_blocks]; exact t.2.1.2, block21_of_blocks .., block31_of_blocks .., block32_of_blocks ..,
-    t.2.2.1.1, t.2.2.1.2, block22_of_blocks ..⟩
+def parMap (P : Matrix (Fin k) (Fin k) A → Prop)
+    : ({a : Matrix (Fin r) (Fin r) A // IsUpUni a} × {f : Matrix (Fin r) (Fin r) A // IsUpUni f}
+        × {h : Matrix (Fin k) (Fin k) A // P h} × Matrix (Fin r) (Mid k) A
+        × Matrix (Fin r) (Fin r) A × Matrix (Mid k) (Fin r) A)
+      → {x : Matrix (Idx r k) (Idx r k) A // Par P x} := fun t => ⟨
+  mk t.1.1 t.2.2.2.1 t.2.2.2.2.1 (midEmb t.2.2.1.1) t.2.2.2.2.2 t.2.1.1,
+  by rw [block11_of_blocks]; exact t.1.2,
+  by rw [block33_of_blocks]; exact t.2.1.2,
+  block21_of_blocks ..,
+  block31_of_blocks ..,
+  block32_of_blocks ..,
+  t.2.2.1.1,
+  t.2.2.1.2,
+  block22_of_blocks ..
+⟩
 
-theorem parMap_bij (P : Matrix (Fin k) (Fin k) A → Prop) : Function.Bijective (parMap (r := r) P) := by
+theorem parMap_bij (P : Matrix (Fin k) (Fin k) A → Prop)
+    : Function.Bijective (parMap (r := r) P) := by
   constructor
-  · rintro ⟨⟨a1, ha1⟩, ⟨f1, hf1⟩, ⟨h1, hh1⟩, b1, c1, e1⟩ ⟨⟨a2, ha2⟩, ⟨f2, hf2⟩, ⟨h2, hh2⟩, b2, c2, e2⟩ heq
+  · rintro ⟨⟨a1, ha1⟩, ⟨f1, hf1⟩, ⟨h1, hh1⟩, b1, c1, e1⟩
+      ⟨⟨a2, ha2⟩, ⟨f2, hf2⟩, ⟨h2, hh2⟩, b2, c2, e2⟩ heq
     have hx := congrArg Subtype.val heq
     change mk a1 b1 c1 (midEmb h1) e1 f1 = mk a2 b2 c2 (midEmb h2) e2 f2 at hx
     have ea := congrArg b11 hx
@@ -185,13 +187,13 @@ theorem parMap_bij (P : Matrix (Fin k) (Fin k) A → Prop) : Function.Bijective 
       simpa [b32] using congrFun (congrFun h32 i) j
     rw [← h22]
     ext i j
-    rcases i with i | i | i <;> rcases j with j | j | j <;>
-      simp [mk, b11, b12, b13, b22, b23, b33, z21, z31, z32]
+    rcases i with i | i | i <;> rcases j with j | j | j
+      <;> simp [mk, b11, b12, b13, b22, b23, b33, z21, z31, z32]
 
-theorem card_par (K : Type) [Field K] [Fintype K] (r k : ℕ) (P : Matrix (Fin k) (Fin k) K → Prop) :
-    Nat.card {x : Matrix (Idx r k) (Idx r k) K // Par P x} =
-      Nat.card {h : Matrix (Fin k) (Fin k) K // P h} *
-        Fintype.card K ^ (r * (r - 1) + 2 * r * (k + 1) + r ^ 2) := by
+theorem card_par (K : Type) [Field K] [Fintype K] (r k : ℕ) (P : Matrix (Fin k) (Fin k) K → Prop)
+    : Nat.card {x : Matrix (Idx r k) (Idx r k) K // Par P x}
+      = Nat.card {h : Matrix (Fin k) (Fin k) K // P h}
+        * Fintype.card K ^ (r * (r - 1) + 2 * r * (k + 1) + r ^ 2) := by
   have hM : Nat.card (Mid k) = k + 1 := by
     unfold Mid
     rw [Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin, Fintype.card_unit]
@@ -202,11 +204,12 @@ theorem card_par (K : Type) [Field K] [Fintype K] (r k : ℕ) (P : Matrix (Fin k
   rw [ht, show (t + t) / 2 = t by omega]
   ring
 
-theorem card_isN (K : Type) [Field K] [Fintype K] (r k : ℕ) :
-    Nat.card {x : Matrix (Idx r k) (Idx r k) K // IsN x} =
-      Fintype.card K ^ (r * (r - 1) + 2 * r * (k + 1) + r ^ 2) := by
-  have e : {x : Matrix (Idx r k) (Idx r k) K // IsN x} ≃
-      {x : Matrix (Idx r k) (Idx r k) K // Par (fun h : Matrix (Fin k) (Fin k) K => h = 1) x} :=
+theorem card_isN (K : Type) [Field K] [Fintype K] (r k : ℕ)
+    : Nat.card {x : Matrix (Idx r k) (Idx r k) K // IsN x}
+      = Fintype.card K ^ (r * (r - 1) + 2 * r * (k + 1) + r ^ 2) := by
+  have e
+      : {x : Matrix (Idx r k) (Idx r k) K // IsN x}
+        ≃ {x : Matrix (Idx r k) (Idx r k) K // Par (fun h : Matrix (Fin k) (Fin k) K => h = 1) x} :=
     Equiv.subtypeEquivRight (fun x => by
       unfold IsN Par
       constructor
@@ -215,9 +218,7 @@ theorem card_isN (K : Type) [Field K] [Fintype K] (r k : ℕ) :
       · rintro ⟨h1, h2, h4, h5, h6, h, rfl, h3⟩
         exact ⟨h1, h2, by rw [h3]; simp [midEmb], h4, h5, h6⟩)
   have hone : Nat.card {h : Matrix (Fin k) (Fin k) K // h = 1} = 1 := by
-    first
-      | exact Nat.card_unique
-      | simp
+    first | exact Nat.card_unique | simp
   rw [Nat.card_congr e, card_par, hone, one_mul]
 
 end Count

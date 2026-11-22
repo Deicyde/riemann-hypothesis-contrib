@@ -7,8 +7,10 @@ public import Development.WeilBound.ThetaLifts.LatticeBasics.UnfoldC
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 open GlobalTheory.Doubling (absE)
 
 noncomputable section
@@ -29,12 +31,12 @@ def supBar (v : Pl (F := F)) (τ : E →ₐ[F] FvBar F v) (u : J → E) : ℝ≥
 def locFin (σ : E →ₐ[F] E) (v : Pl (F := F)) (u : J → E) : ℝ≥0 :=
   supBar v (embBar F E v) u * supBar v ((embBar F E v).comp σ) u
 
-
 open Classical in
 def locInf (w : InfinitePlace F) (u : J → E) : ℝ≥0 :=
   (Finset.univ.sup fun p : EmbOver E w × J => ‖p.1.1 (u p.2)‖₊) ^ 2
 
-def vecHt (σ : E →ₐ[F] E) (u : J → E) : ℝ≥0 := (∏ w : InfinitePlace F, locInf w u) * ∏ᶠ v, locFin σ v u
+def vecHt (σ : E →ₐ[F] E) (u : J → E) : ℝ≥0 :=
+  (∏ w : InfinitePlace F, locInf w u) * ∏ᶠ v, locFin σ v u
 
 end Defs
 

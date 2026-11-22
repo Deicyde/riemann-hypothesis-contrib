@@ -26,7 +26,8 @@ public import GroundTheory.AutomorphicForms.MultiplicityOne.Injective
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG GlobalTheory.LFun Formalism.L2.Host
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG
+  GlobalTheory.LFun Formalism.L2.Host
 open scoped ENNReal ComplexConjugate ContDiff
 set_option maxHeartbeats 1000000 in
 set_option synthInstance.maxHeartbeats 400000 in

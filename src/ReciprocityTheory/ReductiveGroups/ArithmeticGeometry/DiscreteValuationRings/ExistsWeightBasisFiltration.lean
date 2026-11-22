@@ -42,7 +42,8 @@ def Ov : ValuationSubring F where
   carrier := {x | 0 ≤ v x}
   mul_mem' {a b} ha hb := by
     show 0 ≤ v (a * b)
-    rw [AddValuation.map_mul]; exact add_nonneg ha hb
+    rw [AddValuation.map_mul]
+    exact add_nonneg ha hb
   one_mem' := by show 0 ≤ v 1; rw [AddValuation.map_one]
   add_mem' {a b} ha hb := le_trans (le_min ha hb) (AddValuation.map_add v a b)
   zero_mem' := by show 0 ≤ v 0; rw [AddValuation.map_zero]; exact le_top
@@ -69,13 +70,14 @@ theorem v_unit (r : (Ov v)ˣ) : v ((r : Ov v) : F) = 0 := by
     rw [← AddValuation.map_mul, hm, AddValuation.map_one]
   exact le_antisymm (le_zero_of_add_eq_zero_nonneg hs h2) h1
 
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] {ϖ : V}
-  [Algebra (FractionRing V) F]
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+  {ϖ : V} [Algebra (FractionRing V) F]
 
 abbrev algVF : V →+* F := (algebraMap (FractionRing V) F).comp (algebraMap V (FractionRing V))
 
-theorem v_of_V (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) (x : V) : (0 : WithTop ℚ) ≤ v (algVF x) ∧
-    (¬ IsUnit x → x ≠ 0 → (1 : WithTop ℚ) ≤ v (algVF x)) := by
+theorem v_of_V (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) (x : V)
+    : (0 : WithTop ℚ) ≤ v (algVF x) ∧ (¬ IsUnit x → x ≠ 0 → (1 : WithTop ℚ) ≤ v (algVF x)) := by
   by_cases hx0 : x = 0
   · subst hx0
     refine ⟨?_, fun _ h => absurd rfl h⟩
@@ -97,8 +99,9 @@ theorem v_of_V (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) (x : V) : (0 : WithT
 def fO (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) : V →+* Ov v :=
   (algVF (F := F) (V := V)).codRestrict (Ov v).toSubring fun x => (v_of_V v hϖ hv x).1
 
-theorem fO_comp (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) :
-    (algebraMap (Ov v) F).comp (fO v hϖ hv) = algVF := rfl
+theorem fO_comp (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v)
+    : (algebraMap (Ov v) F).comp (fO v hϖ hv) = algVF :=
+  rfl
 
 instance isLocalHom_fO (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) : IsLocalHom (fO v hϖ hv) where
   map_nonunit x hx := by
@@ -111,30 +114,44 @@ instance isLocalHom_fO (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) : IsLocalHom
     rw [this] at h1
     exact absurd h1 (by decide)
 
-theorem exists_lift (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of V))
-    [IsProper p] (x : Spec (CommRingCat.of F) ⟶ X) (hx : x ≫ p = Spec.map (CommRingCat.ofHom algVF)) :
-    ∃ x' : Spec (CommRingCat.of (Ov v)) ⟶ X, x' ≫ p = Spec.map (CommRingCat.ofHom (fO v hϖ hv)) ∧
-      Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x' = x := by
+theorem exists_lift
+    (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v)
+    {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of V)) [IsProper p]
+    (x : Spec (CommRingCat.of F) ⟶ X) (hx : x ≫ p = Spec.map (CommRingCat.ofHom algVF))
+    : ∃ x' : Spec (CommRingCat.of (Ov v)) ⟶ X,
+      x' ≫ p = Spec.map (CommRingCat.ofHom (fO v hϖ hv))
+        ∧ Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x' = x := by
   have hE : ValuativeCriterion.Existence p := by
     have h : (ValuativeCriterion.Existence ⊓ @QuasiCompact) p := by
       rw [← UniversallyClosed.eq_valuativeCriterion]
       infer_instance
     exact h.1
-  let S : ValuativeCommSq p :=
-    { R := Ov v, K := F, i₁ := x, i₂ := Spec.map (CommRingCat.ofHom (fO v hϖ hv)),
-      commSq := ⟨by rw [hx, ← Spec.map_comp, ← CommRingCat.ofHom_comp, fO_comp]⟩ }
+  let S : ValuativeCommSq p := {
+    R := Ov v
+    K := F
+    i₁ := x
+    i₂ := Spec.map (CommRingCat.ofHom (fO v hϖ hv))
+    commSq := ⟨by rw [hx, ← Spec.map_comp, ← CommRingCat.ofHom_comp, fO_comp]⟩
+  }
   obtain ⟨l⟩ := (hE S).exists_lift
   exact ⟨l.l, l.fac_right, l.fac_left⟩
 
-theorem lift_unique (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v) {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of V))
-    [IsSeparated p] (x₁ x₂ : Spec (CommRingCat.of (Ov v)) ⟶ X)
-    (h₁ : x₁ ≫ p = Spec.map (CommRingCat.ofHom (fO v hϖ hv))) (h₂ : x₂ ≫ p = Spec.map (CommRingCat.ofHom (fO v hϖ hv)))
-    (h : Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x₁ = Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x₂) :
-    x₁ = x₂ := by
-  let S : ValuativeCommSq p :=
-    { R := Ov v, K := F, i₁ := Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x₁,
-      i₂ := Spec.map (CommRingCat.ofHom (fO v hϖ hv)),
-      commSq := ⟨by rw [Category.assoc, h₁]⟩ }
+theorem lift_unique
+    (hϖ : Irreducible ϖ) (hv : ValOver ϖ F v)
+    {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of V)) [IsSeparated p]
+    (x₁ x₂ : Spec (CommRingCat.of (Ov v)) ⟶ X)
+    (h₁ : x₁ ≫ p = Spec.map (CommRingCat.ofHom (fO v hϖ hv)))
+    (h₂ : x₂ ≫ p = Spec.map (CommRingCat.ofHom (fO v hϖ hv)))
+    (h : Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x₁
+      = Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x₂)
+    : x₁ = x₂ := by
+  let S : ValuativeCommSq p := {
+    R := Ov v
+    K := F
+    i₁ := Spec.map (CommRingCat.ofHom (algebraMap (Ov v) F)) ≫ x₁
+    i₂ := Spec.map (CommRingCat.ofHom (fO v hϖ hv))
+    commSq := ⟨by rw [Category.assoc, h₁]⟩
+  }
   have hU : Subsingleton S.commSq.LiftStruct := IsSeparated.valuativeCriterion p S
   have hl : (⟨x₁, rfl, h₁⟩ : S.commSq.LiftStruct) = ⟨x₂, h.symm, h₂⟩ := @Subsingleton.elim _ hU _ _
   exact congrArg CommSq.LiftStruct.l hl

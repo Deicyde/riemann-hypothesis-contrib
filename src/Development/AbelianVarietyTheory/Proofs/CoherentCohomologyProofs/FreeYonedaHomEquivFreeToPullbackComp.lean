@@ -18,12 +18,13 @@ namespace SheafPull
 
 section Abstract
 
-variable {A : Type u₁} [Category.{v₁} A] [Abelian A] [HasExt.{w} A]
+variable
+  {A : Type u₁} [Category.{v₁} A] [Abelian A] [HasExt.{w} A]
   {B : Type u₂} [Category.{v₂} B] [Abelian B] [HasExt.{w'} B]
   (Φ : A ⥤ B) [Φ.Additive] [PreservesFiniteLimits Φ] [PreservesFiniteColimits Φ]
 
-def extMap {Z F : A} {Z' G : B} (a : Z' ⟶ Φ.obj Z) (b : Φ.obj F ⟶ G) (n : ℕ) :
-    Ext.{w} Z F n →+ Ext.{w'} Z' G n :=
+def extMap {Z F : A} {Z' G : B} (a : Z' ⟶ Φ.obj Z) (b : Φ.obj F ⟶ G) (n : ℕ)
+    : Ext.{w} Z F n →+ Ext.{w'} Z' G n :=
   ((Ext.mk₀ a).precomp G (zero_add n)).comp
     (((Ext.mk₀ b).postcomp (Φ.obj Z) (add_zero n)).comp (Φ.mapExtAddHom Z F n))
 
@@ -78,35 +79,37 @@ end Abstract
 
 section Site
 
-variable {C D : Type u} [Category.{v} C] [Category.{v} D]
+variable
+  {C D : Type u} [Category.{v} C] [Category.{v} D]
   {J : GrothendieckTopology C} {K : GrothendieckTopology D}
   [HasSheafify J AddCommGrpCat.{v}] [HasSheafify K AddCommGrpCat.{v}]
-  (p : C ⥤ D) [p.IsContinuous J K]
-  [(p.sheafPushforwardContinuous AddCommGrpCat.{v} J K).IsRightAdjoint]
+  (p : C ⥤ D)
+  [p.IsContinuous J K] [(p.sheafPushforwardContinuous AddCommGrpCat.{v} J K).IsRightAdjoint]
 
 open GlobalTheory.SheafLES
 
 instance additive_sheafPullback : (p.sheafPullback AddCommGrpCat.{v} J K).Additive :=
   have := (p.sheafAdjunctionContinuous AddCommGrpCat.{v} J K).isLeftAdjoint
-  have := preservesBinaryBiproducts_of_preservesBinaryCoproducts
-    (p.sheafPullback AddCommGrpCat.{v} J K)
+  have :=
+    preservesBinaryBiproducts_of_preservesBinaryCoproducts (p.sheafPullback AddCommGrpCat.{v} J K)
   Functor.additive_of_preservesBinaryBiproducts _
 
-instance preservesFiniteColimits_sheafPullback :
-    PreservesFiniteColimits (p.sheafPullback AddCommGrpCat.{v} J K) :=
+instance preservesFiniteColimits_sheafPullback
+    : PreservesFiniteColimits (p.sheafPullback AddCommGrpCat.{v} J K) :=
   have := (p.sheafAdjunctionContinuous AddCommGrpCat.{v} J K).isLeftAdjoint
   inferInstance
 
-instance additive_sheafPushforwardContinuous :
-    (p.sheafPushforwardContinuous AddCommGrpCat.{v} J K).Additive where
+instance additive_sheafPushforwardContinuous
+    : (p.sheafPushforwardContinuous AddCommGrpCat.{v} J K).Additive where
   map_add := rfl
 
-
 variable (J K) in
-def freeToPullback {V : C} {W : D} (i : W ⟶ p.obj V) :
-    (GlobalTheory.SheafLES.freeYoneda K).obj W ⟶ (p.sheafPullback AddCommGrpCat.{v} J K).obj ((GlobalTheory.SheafLES.freeYoneda J).obj V) :=
+def freeToPullback {V : C} {W : D} (i : W ⟶ p.obj V)
+    : (GlobalTheory.SheafLES.freeYoneda K).obj W
+      ⟶ (p.sheafPullback AddCommGrpCat.{v} J K).obj ((GlobalTheory.SheafLES.freeYoneda J).obj V) :=
   (GlobalTheory.SheafLES.freeYonedaHomEquiv W _).symm
-    (((p.sheafPullback AddCommGrpCat.{v} J K).obj ((GlobalTheory.SheafLES.freeYoneda J).obj V)).obj.map i.op
+    (((p.sheafPullback AddCommGrpCat.{v} J K).obj
+        ((GlobalTheory.SheafLES.freeYoneda J).obj V)).obj.map i.op
       (((p.sheafAdjunctionContinuous AddCommGrpCat.{v} J K).unit.app _).hom.app (op V)
         (tautSection V)))
 
@@ -149,12 +152,15 @@ lemma freeToPullback_comp_map {V V' : C} {W : D} (i : W ⟶ p.obj V') (k : V' �
   rw [op_comp, Functor.map_comp]
   rfl
 
-variable [PreservesFiniteLimits (p.sheafPullback AddCommGrpCat.{v} J K)]
+variable
+  [PreservesFiniteLimits (p.sheafPullback AddCommGrpCat.{v} J K)]
   [HasExt.{w} (Sheaf J AddCommGrpCat.{v})] [HasExt.{w'} (Sheaf K AddCommGrpCat.{v})]
   {F F' : Sheaf J AddCommGrpCat.{v}} {G G' : Sheaf K AddCommGrpCat.{v}}
 
-def sitePull (φ : F ⟶ (p.sheafPushforwardContinuous AddCommGrpCat.{v} J K).obj G) (n : ℕ)
-    {V : C} {W : D} (i : W ⟶ p.obj V) : Sheaf.H'.{w} F n V →+ Sheaf.H'.{w'} G n W :=
+def sitePull
+    (φ : F ⟶ (p.sheafPushforwardContinuous AddCommGrpCat.{v} J K).obj G) (n : ℕ)
+    {V : C} {W : D} (i : W ⟶ p.obj V)
+    : Sheaf.H'.{w} F n V →+ Sheaf.H'.{w'} G n W :=
   extMap.{w, w'} (p.sheafPullback AddCommGrpCat.{v} J K) (freeToPullback (J := J) (K := K) p i)
     (((p.sheafAdjunctionContinuous AddCommGrpCat.{v} J K).homEquiv _ _).symm φ) n
 

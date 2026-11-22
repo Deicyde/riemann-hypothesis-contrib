@@ -8,20 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HaarLieIsHaar
 @[expose] public section
 
 open scoped Classical ENNReal
-open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf Formalism.L2.SG.LocWSOf Formalism.L2.SG.LoopTerm
+open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.TermTieOf Formalism.L2.SG.LocWSOf Formalism.L2.SG.LoopTerm
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.CovNFormulaPf
 
-theorem pi_const_smul' {ι : Type} [Fintype ι] {α : Type} [MeasurableSpace α] (μ : Measure α) [SigmaFinite μ]
-    (c : NNReal) :
-    Measure.pi (fun _ : ι => c • μ) = (c ^ Fintype.card ι) • Measure.pi (fun _ : ι => μ) := by
+theorem pi_const_smul'
+    {ι : Type} [Fintype ι]
+    {α : Type} [MeasurableSpace α]
+    (μ : Measure α) [SigmaFinite μ]
+    (c : NNReal)
+    : Measure.pi (fun _ : ι => c • μ) = (c ^ Fintype.card ι) • Measure.pi (fun _ : ι => μ) := by
   refine Measure.pi_eq fun s hs => ?_
   rw [Measure.coe_nnreal_smul_apply, Measure.pi_pi]
-  simp only [Measure.coe_nnreal_smul_apply, Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ,
-    ENNReal.coe_pow]
+  simp only [Measure.coe_nnreal_smul_apply, Finset.prod_mul_distrib, Finset.prod_const,
+    Finset.card_univ, ENNReal.coe_pow]
 
 theorem main : Formalism.L2.SG.Pf.LoopBCovN.CovNFormula := by
   intro D X Y θ C u hθ
@@ -33,8 +38,13 @@ theorem main : Formalism.L2.SG.Pf.LoopBCovN.CovNFormula := by
   set t : ℝ := v2 ^ (-((D.R.rS : ℝ) * D.R.k)) * θ with ht
   have ht0 : 0 ≤ t := by positivity
   have hk : kapN D θ = ((Real.toNNReal t : NNReal) : ℝ≥0∞) := rfl
-  have hmu : muNB D θ = (Real.toNNReal t) • haarLie (Formalism.QuantumDeterminants.Nset D.R.k D.R.rS) 1 := by
-    have e : ∀ κ : ℝ≥0∞, haarLie (Formalism.QuantumDeterminants.Nset D.R.k D.R.rS) κ = κ • haarLie (Formalism.QuantumDeterminants.Nset D.R.k D.R.rS) 1 := by
+  have hmu
+      : muNB D θ
+        = (Real.toNNReal t) • haarLie (Formalism.QuantumDeterminants.Nset D.R.k D.R.rS) 1 := by
+    have e
+        : ∀ κ : ℝ≥0∞,
+          haarLie (Formalism.QuantumDeterminants.Nset D.R.k D.R.rS) κ
+            = κ • haarLie (Formalism.QuantumDeterminants.Nset D.R.k D.R.rS) 1 := by
       intro κ; simp [haarLie]
     unfold muNB
     rw [hk, e]

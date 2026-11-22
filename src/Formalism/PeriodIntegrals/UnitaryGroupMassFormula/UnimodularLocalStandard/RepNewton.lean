@@ -10,16 +10,20 @@ open scoped ComplexConjugate
 namespace PI.UnitaryGroupMassFormula.UnimodLocStd
 open PI.ULS
 
-theorem rep_H_smul (L : PeriodPair) (m : Type) [Fintype m] [DecidableEq m] (ξ : ℂ) (z : m → ℂ) :
-    stdH L m (ξ • z) (ξ • z) = ξ * conj ξ * stdH L m z z := by
+theorem rep_H_smul (L : PeriodPair) (m : Type) [Fintype m] [DecidableEq m] (ξ : ℂ) (z : m → ℂ)
+    : stdH L m (ξ • z) (ξ • z) = ξ * conj ξ * stdH L m z z := by
   rw [LinearMap.map_smul₂, LinearMap.map_smulₛₗ]
   simp only [smul_eq_mul]
   ring
 
-theorem rep_tau {m : Type} (a : ℕ) (b c : ℤ) (d : ℕ) (hOK : CmOK a b c d) (Λ : AddSubgroup (m → ℂ))
-    (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ) {l : ℕ} (hl : l.Prime) :
-    ∃ τ : ℂ, ∃ r s : ℤ, τ + conj τ = 1 ∧ τ * conj τ = (r : ℂ) / s ∧ ¬ (l : ℤ) ∣ s ∧
-      ∀ v : m → ℂ, SatMem l Λ v → SatMem l Λ (τ • v) := by
+theorem rep_tau
+    {m : Type}
+    (a : ℕ) (b c : ℤ) (d : ℕ) (hOK : CmOK a b c d)
+    (Λ : AddSubgroup (m → ℂ)) (hθ : ∀ z ∈ Λ, cmTheta b d • z ∈ Λ)
+    {l : ℕ} (hl : l.Prime)
+    : ∃ τ : ℂ, ∃ r s : ℤ,
+      τ + conj τ = 1 ∧ τ * conj τ = (r : ℂ) / s ∧ ¬ (l : ℤ) ∣ s
+        ∧ ∀ v : m → ℂ, SatMem l Λ v → SatMem l Λ (τ • v) := by
   obtain ⟨hac, -, hd8, -⟩ := hOK
   obtain ⟨k, hk⟩ : ∃ k : ℤ, b = 2 * k + 1 := by
     rcases Int.even_or_odd b with ⟨j, hj⟩ | ⟨j, hj⟩

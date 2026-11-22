@@ -10,9 +10,9 @@ namespace PI.VolStabW.TopoPolish
 
 open Topology TopologicalSpace Set
 
-theorem polish_of_lcsc (Y : Type) [TopologicalSpace Y] [LocallyCompactSpace Y] [T2Space Y]
-    [SecondCountableTopology Y] : PolishSpace Y := by
-
+theorem polish_of_lcsc
+    (Y : Type) [TopologicalSpace Y] [LocallyCompactSpace Y] [T2Space Y] [SecondCountableTopology Y]
+    : PolishSpace Y := by
   haveI hS : SecondCountableTopology (OnePoint Y) := by
 
     let K := CompactExhaustion.choice Y

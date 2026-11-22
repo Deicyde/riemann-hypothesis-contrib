@@ -13,16 +13,17 @@ open Module Polynomial
 variable {k A : Type*} [Field k] [CommRing A] [Algebra k A]
 
 def Iq (A : Type*) [CommRing A] [Algebra k A] (χ : k[X]) (q : ℕ) : Ideal A[X] :=
-  Ideal.span {χ.map (algebraMap k A)} ⊔
-    Ideal.span {y | ∃ r ∈ (Ideal.span {χ.map (algebraMap k A)}).radical, y = r ^ q}
+  Ideal.span {χ.map (algebraMap k A)}
+    ⊔ Ideal.span {y | ∃ r ∈ (Ideal.span {χ.map (algebraMap k A)}).radical, y = r ^ q}
 
 abbrev Rq (A : Type*) [CommRing A] [Algebra k A] (χ : k[X]) (q : ℕ) : Type _ := A[X] ⧸ Iq A χ q
 
-theorem rq_fin [FiniteDimensional k A] (χ : k[X]) (hχ : χ.Monic) (q : ℕ) :
-    FiniteDimensional k (Rq A χ q) := by
+theorem rq_fin [FiniteDimensional k A] (χ : k[X]) (hχ : χ.Monic) (q : ℕ)
+    : FiniteDimensional k (Rq A χ q) := by
   classical
   have hmon : (χ.map (algebraMap k A)).Monic := hχ.map _
-  have : Module.Finite A (A[X] ⧸ Ideal.span {χ.map (algebraMap k A)}) := (AdjoinRoot.powerBasis' hmon).finite
+  have : Module.Finite A (A[X] ⧸ Ideal.span {χ.map (algebraMap k A)}) :=
+    (AdjoinRoot.powerBasis' hmon).finite
   have hle : Ideal.span {χ.map (algebraMap k A)} ≤ Iq A χ q := le_sup_left
   let φ := Ideal.Quotient.factorₐ A hle
   have hsurj : Function.Surjective φ := by
@@ -47,8 +48,11 @@ theorem rq_nil (χ : k[X]) (q : ℕ) (r : Rq A χ q) (hr : IsNilpotent r) : r ^ 
     have hP : P ∈ (Ideal.span {χ.map (algebraMap k A)}).radical :=
       (Ideal.radical_isRadical _) ⟨m, hle hm⟩
     exact Ideal.mem_sup_right (Ideal.subset_span ⟨P, hP, rfl⟩)
-private theorem isPrincipalIdealRing_pi {ι : Type*} [Finite ι] (R : ι → Type*) [∀ i, CommRing (R i)]
-    (hR : ∀ i, IsPrincipalIdealRing (R i)) : IsPrincipalIdealRing (∀ i, R i) := by
+private theorem isPrincipalIdealRing_pi
+    {ι : Type*} [Finite ι]
+    (R : ι → Type*) [∀ i, CommRing (R i)]
+    (hR : ∀ i, IsPrincipalIdealRing (R i))
+    : IsPrincipalIdealRing (∀ i, R i) := by
   classical
   have := Fintype.ofFinite ι
   refine ⟨fun J => ?_⟩
@@ -86,8 +90,8 @@ private theorem isPrincipalIdealRing_pi {ι : Type*} [Finite ι] (R : ι → Typ
     exact Ideal.mem_span_singleton'.mpr ⟨c, funext hc⟩
   · exact (Ideal.span_le).mpr (Set.singleton_subset_iff.mpr hgJ)
 
-theorem rq_pir [FiniteDimensional k A] [IsReduced A] (χ : k[X]) (q : ℕ) :
-    IsPrincipalIdealRing (Rq A χ q) := by
+theorem rq_pir [FiniteDimensional k A] [IsReduced A] (χ : k[X]) (q : ℕ)
+    : IsPrincipalIdealRing (Rq A χ q) := by
   classical
   have hA : IsArtinianRing A := IsArtinianRing.of_finite k A
   have hPI : IsPrincipalIdealRing ((I : MaximalSpectrum A) → (A ⧸ I.asIdeal)[X]) :=
@@ -96,35 +100,42 @@ theorem rq_pir [FiniteDimensional k A] [IsReduced A] (χ : k[X]) (q : ℕ) :
       letI : Field (A ⧸ I.asIdeal) := Ideal.Quotient.field _
       exact EuclideanDomain.instIsPrincipalIdealRing)
   have hPI' : IsPrincipalIdealRing ((∀ I : MaximalSpectrum A, A ⧸ I.asIdeal)[X]) :=
-    IsPrincipalIdealRing.of_surjective (Polynomial.piEquiv (fun I : MaximalSpectrum A => A ⧸ I.asIdeal)).symm
+    IsPrincipalIdealRing.of_surjective
+      (Polynomial.piEquiv (fun I : MaximalSpectrum A => A ⧸ I.asIdeal)).symm
       (Polynomial.piEquiv _).symm.surjective
   have hAX : IsPrincipalIdealRing A[X] :=
-    IsPrincipalIdealRing.of_surjective (Polynomial.mapEquiv (IsArtinianRing.equivPi A).symm.toRingEquiv)
+    IsPrincipalIdealRing.of_surjective
+      (Polynomial.mapEquiv (IsArtinianRing.equivPi A).symm.toRingEquiv)
       (Polynomial.mapEquiv _).surjective
-  exact IsPrincipalIdealRing.of_surjective (Ideal.Quotient.mk (Iq A χ q)) Ideal.Quotient.mk_surjective
+  exact IsPrincipalIdealRing.of_surjective (Ideal.Quotient.mk (Iq A χ q))
+    Ideal.Quotient.mk_surjective
 
-theorem rq_rep (χ : k[X]) (hχ : χ.Monic) (q d : ℕ) (hd : χ.natDegree ≤ d) (r : Rq A χ q) :
-    ∃ a : Fin d → A, r = Ideal.Quotient.mk _ (∑ l : Fin d, C (a l) * X ^ (l : ℕ)) := by
+theorem rq_rep (χ : k[X]) (hχ : χ.Monic) (q d : ℕ) (hd : χ.natDegree ≤ d) (r : Rq A χ q)
+    : ∃ a : Fin d → A, r = Ideal.Quotient.mk _ (∑ l : Fin d, C (a l) * X ^ (l : ℕ)) := by
   classical
   obtain ⟨P, rfl⟩ := Ideal.Quotient.mk_surjective r
   rcases subsingleton_or_nontrivial A with hA | hA
   · exact ⟨0, by congr 1; exact Subsingleton.elim _ _⟩
   have hmon : (χ.map (algebraMap k A)).Monic := hχ.map _
   have hmem : P - P %ₘ χ.map (algebraMap k A) ∈ Iq A χ q := by
-    have e : P - P %ₘ χ.map (algebraMap k A) = χ.map (algebraMap k A) * (P /ₘ χ.map (algebraMap k A)) := by
+    have e
+        : P - P %ₘ χ.map (algebraMap k A)
+          = χ.map (algebraMap k A) * (P /ₘ χ.map (algebraMap k A)) := by
       have h := modByMonic_add_div P (χ.map (algebraMap k A))
       linear_combination -h
     rw [e]
     exact Ideal.mem_sup_left (Ideal.mul_mem_right _ _ (Ideal.subset_span rfl))
   have hdeg : (P %ₘ χ.map (algebraMap k A)).degree < d :=
-    calc (P %ₘ χ.map (algebraMap k A)).degree < (χ.map (algebraMap k A)).degree := degree_modByMonic_lt _ hmon
+    calc
+      (P %ₘ χ.map (algebraMap k A)).degree
+        < (χ.map (algebraMap k A)).degree := degree_modByMonic_lt _ hmon
       _ ≤ (χ.map (algebraMap k A)).natDegree := degree_le_natDegree
       _ ≤ d := by exact_mod_cast natDegree_map_le.trans hd
   refine ⟨fun l => (P %ₘ χ.map (algebraMap k A)).coeff l, ?_⟩
   rw [Ideal.Quotient.eq.mpr hmem]
   congr 1
-  rw [show (∑ l : Fin d, C ((P %ₘ χ.map (algebraMap k A)).coeff (l : ℕ)) * X ^ (l : ℕ)) =
-      ∑ i ∈ Finset.range d, C ((P %ₘ χ.map (algebraMap k A)).coeff i) * X ^ i from
+  rw [show (∑ l : Fin d, C ((P %ₘ χ.map (algebraMap k A)).coeff (l : ℕ)) * X ^ (l : ℕ))
+      = ∑ i ∈ Finset.range d, C ((P %ₘ χ.map (algebraMap k A)).coeff i) * X ^ i from
     (Finset.sum_range (fun i => C ((P %ₘ χ.map (algebraMap k A)).coeff i) * X ^ i)).symm]
   by_cases h0 : P %ₘ χ.map (algebraMap k A) = 0
   · rw [h0]
@@ -133,10 +144,12 @@ theorem rq_rep (χ : k[X]) (hχ : χ.Monic) (q d : ℕ) (hd : χ.natDegree ≤ d
     simp only [← C_mul_X_pow_eq_monomial] at h
     exact h
 
-theorem rq_lift {B : Type*} [Ring B] [Algebra k B] (ι : A →ₐ[k] B) (x : B) (hc : ∀ a, Commute (ι a) x)
-    (χ : k[X]) (hχ : aeval x χ = 0) (q : ℕ)
-    (hq : ∀ P : A[X], IsNilpotent (P.eval₂ ι.toRingHom x) → (P.eval₂ ι.toRingHom x) ^ q = 0) :
-    ∃ ρ : Rq A χ q →ₐ[k] B, ∀ P : A[X], ρ (Ideal.Quotient.mk _ P) = P.eval₂ ι.toRingHom x := by
+theorem rq_lift
+    {B : Type*} [Ring B] [Algebra k B]
+    (ι : A →ₐ[k] B) (x : B) (hc : ∀ a, Commute (ι a) x)
+    (χ : k[X]) (hχ : aeval x χ = 0)
+    (q : ℕ) (hq : ∀ P : A[X], IsNilpotent (P.eval₂ ι.toRingHom x) → (P.eval₂ ι.toRingHom x) ^ q = 0)
+    : ∃ ρ : Rq A χ q →ₐ[k] B, ∀ P : A[X], ρ (Ideal.Quotient.mk _ P) = P.eval₂ ι.toRingHom x := by
   let f : A[X] →+* B := Polynomial.eval₂RingHom' ι.toRingHom x hc
   have hf : ∀ P : A[X], f P = P.eval₂ ι.toRingHom x := fun P => rfl
   have hχ0 : f (χ.map (algebraMap k A)) = 0 := by
@@ -160,12 +173,13 @@ theorem rq_lift {B : Type*} [Ring B] [Algebra k B] (ι : A →ₐ[k] B) (x : B) 
       have hnil : IsNilpotent (r.eval₂ ι.toRingHom x) := ⟨m, by rw [← hf, ← map_pow, hspan _ hm]⟩
       rw [SetLike.mem_coe, RingHom.mem_ker, map_pow, hf]
       exact hq r hnil
-  let F : A[X] →ₐ[k] B :=
-    { f with
-      commutes' := fun c => by
-        show Polynomial.eval₂ ι.toRingHom x (algebraMap k A[X] c) = algebraMap k B c
-        rw [Polynomial.algebraMap_apply, Polynomial.eval₂_C]
-        exact ι.commutes c }
+  let F : A[X] →ₐ[k] B := {
+    f with
+    commutes' := fun c => by
+      show Polynomial.eval₂ ι.toRingHom x (algebraMap k A[X] c) = algebraMap k B c
+      rw [Polynomial.algebraMap_apply, Polynomial.eval₂_C]
+      exact ι.commutes c
+  }
   exact ⟨Ideal.Quotient.liftₐ _ F (fun a ha => hle ha), fun P => rfl⟩
 
 end PositivityTheory.RgUd.TP.Desc.Piece.PSect

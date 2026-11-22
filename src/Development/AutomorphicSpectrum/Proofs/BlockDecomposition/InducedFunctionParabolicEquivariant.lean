@@ -20,11 +20,10 @@ open GlobalTheory.CompanionTheory.ModelS
 
 variable {n : ℕ}
 
-theorem ini_injective (j : Fin n) : Function.Injective (ini j) :=
-  Fin.castLE_injective j.isLt
+theorem ini_injective (j : Fin n) : Function.Injective (ini j) := Fin.castLE_injective j.isLt
 
-theorem rows_mul (j : Fin n) (p g : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0) :
-    (p * g).submatrix (ini j) id = p.submatrix (ini j) (ini j) * g.submatrix (ini j) id := by
+theorem rows_mul (j : Fin n) (p g : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0)
+    : (p * g).submatrix (ini j) id = p.submatrix (ini j) (ini j) * g.submatrix (ini j) id := by
   ext a c
   simp only [Matrix.submatrix_apply, Matrix.mul_apply, id]
   symm
@@ -43,23 +42,25 @@ theorem rows_mul (j : Fin n) (p g : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j 
     omega
   rw [hz _ _ haj hjk, zero_mul]
 
-theorem lm_mul (j : Fin n) (p g : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0) :
-    lm j (p * g) = lm j p * lm j g := by
-  have h : (p * g).submatrix (ini j) (ini j) =
-      p.submatrix (ini j) (ini j) * g.submatrix (ini j) (ini j) := by
+theorem lm_mul (j : Fin n) (p g : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0)
+    : lm j (p * g) = lm j p * lm j g := by
+  have h
+      : (p * g).submatrix (ini j) (ini j)
+        = p.submatrix (ini j) (ini j) * g.submatrix (ini j) (ini j) := by
     ext a c
     exact congrFun (congrFun (rows_mul j p g hz) a) (ini j c)
   delta lm
   rw [h, Matrix.det_mul]
 
-theorem gm_mul (j : Fin n) (p g : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0) :
-    gm j (p * g) = lm j p * star (lm j p) * gm j g := by
+theorem gm_mul (j : Fin n) (p g : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0)
+    : gm j (p * g) = lm j p * star (lm j p) * gm j g := by
   delta gm lm
   rw [rows_mul j p g hz, Matrix.conjTranspose_mul]
-  have h : p.submatrix (ini j) (ini j) * g.submatrix (ini j) id *
-      ((g.submatrix (ini j) id)ᴴ * (p.submatrix (ini j) (ini j))ᴴ) =
-      p.submatrix (ini j) (ini j) * (g.submatrix (ini j) id * (g.submatrix (ini j) id)ᴴ) *
-        (p.submatrix (ini j) (ini j))ᴴ := by
+  have h
+      : p.submatrix (ini j) (ini j) * g.submatrix (ini j) id
+          * ((g.submatrix (ini j) id)ᴴ * (p.submatrix (ini j) (ini j))ᴴ)
+        = p.submatrix (ini j) (ini j) * (g.submatrix (ini j) id * (g.submatrix (ini j) id)ᴴ)
+          * (p.submatrix (ini j) (ini j))ᴴ := by
     simp only [Matrix.mul_assoc]
   rw [h, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose]
   ring
@@ -72,13 +73,15 @@ theorem gm_one (j : Fin n) : gm j (1 : Mat n) = 1 := by
   delta gm
   rw [h, Matrix.det_one]
 
-theorem gm_left (j : Fin n) (p : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0) :
-    gm j p = lm j p * star (lm j p) := by
+theorem gm_left (j : Fin n) (p : Mat n) (hz : ∀ a b : Fin n, a ≤ j → j < b → p a b = 0)
+    : gm j p = lm j p * star (lm j p) := by
   have := gm_mul j p 1 hz
   rwa [Matrix.mul_one, gm_one, mul_one] at this
 
-theorem dif_eq_zero (lam : Fin n → ℤ) (lev : Fin n → ℕ) (hl : IsLev lam lev) (j : Fin n) (h : (j : ℕ) + 1 < n)
-    (he : lev j = lev ⟨j + 1, h⟩) : dif (muZ lam lev) j = 0 ∧ dif (yZ lam lev) j = 0 := by
+theorem dif_eq_zero
+    (lam : Fin n → ℤ) (lev : Fin n → ℕ) (hl : IsLev lam lev)
+    (j : Fin n) (h : (j : ℕ) + 1 < n) (he : lev j = lev ⟨j + 1, h⟩)
+    : dif (muZ lam lev) j = 0 ∧ dif (yZ lam lev) j = 0 := by
   obtain ⟨-, hl⟩ := hl
   have hlam := hl _ _ he
   have hmu : muZ lam lev j = muZ lam lev ⟨j + 1, h⟩ := by
@@ -92,9 +95,15 @@ theorem dif_eq_zero (lam : Fin n → ℤ) (lev : Fin n → ℕ) (hl : IsLev lam 
   · simp only [dite_eq_left h, hmu, sub_self]
   · simp only [dite_eq_left h, hy, sub_self]
 
-theorem fRaw_mul : ∀ (n : ℕ) (lam : Fin n → ℤ), Antitone lam → ∀ lev : Fin n → ℕ, IsLev lam lev →
-    ∀ p ∈ GlobalTheory.CompanionTheory.ModelS.Pb lev, ∀ g ∈ GLs n,
-      GlobalTheory.CompanionTheory.ModelS.fRaw lam lev (p * g) = GlobalTheory.CompanionTheory.ModelS.fRaw lam lev p * GlobalTheory.CompanionTheory.ModelS.fRaw lam lev g := by
+theorem fRaw_mul
+    : ∀ (n : ℕ) (lam : Fin n → ℤ),
+      Antitone lam
+        → ∀ lev : Fin n → ℕ,
+          IsLev lam lev
+            → ∀ p ∈ GlobalTheory.CompanionTheory.ModelS.Pb lev, ∀ g ∈ GLs n,
+              GlobalTheory.CompanionTheory.ModelS.fRaw lam lev (p * g)
+                = GlobalTheory.CompanionTheory.ModelS.fRaw lam lev p
+                  * GlobalTheory.CompanionTheory.ModelS.fRaw lam lev g := by
   intro n lam _ lev hl p hp g hg
   obtain ⟨hp1, hp2⟩ := hp
   have hpg : p * g ∈ GLs n := by

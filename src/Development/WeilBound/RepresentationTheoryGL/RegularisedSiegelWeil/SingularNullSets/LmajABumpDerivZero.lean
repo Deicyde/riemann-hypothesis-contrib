@@ -23,10 +23,10 @@ lemma lmajABump_deriv_zero (m : ℕ) (t : ℝ) (ht : 2 < |t|) : iteratedFDeriv �
   rw [lmajABump.tsupport_eq, mem_closedBall, dist_zero_right, Real.norm_eq_abs] at h1
   exact absurd h1 (by simp [lmajABump]; linarith)
 
-theorem lmajASeqSchwartz (b : ℕ → ℝ) (hb0 : ∀ n, 0 ≤ b n)
-    (hb : ∀ k : ℕ, Summable (fun n : ℕ => b n * ((n : ℝ) + 2) ^ k)) :
-    ∃ h : SchwartzMap ℝ ℂ, (∀ t, 0 ≤ (h t).re ∧ (h t).im = 0) ∧
-      ∀ (n : ℕ) (t : ℝ), |t - n| ≤ 1 → b n ≤ (h t).re := by
+theorem lmajASeqSchwartz
+    (b : ℕ → ℝ) (hb0 : ∀ n, 0 ≤ b n) (hb : ∀ k : ℕ, Summable (fun n : ℕ => b n * ((n : ℝ) + 2) ^ k))
+    : ∃ h : SchwartzMap ℝ ℂ,
+      (∀ t, 0 ≤ (h t).re ∧ (h t).im = 0) ∧ ∀ (n : ℕ) (t : ℝ), |t - n| ≤ 1 → b n ≤ (h t).re := by
   choose C hC using lmajABump_bound
   set φ : ℕ → ℝ → ℝ := fun n => b n • fun t => lmajABump (t - n) with hφ
   have hφc : ∀ n, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (φ n) := fun n =>
@@ -39,10 +39,11 @@ theorem lmajASeqSchwartz (b : ℕ → ℝ) (hb0 : ∀ n, 0 ≤ b n)
     simp only
     rw [iteratedFDeriv_const_smul_apply hc.contDiffAt, iteratedFDeriv_comp_sub]
   have hs0 : Summable b := by simpa using hb 0
-  have hv : ∀ m : ℕ, ((m : ℕ∞)) ≤ (⊤ : ℕ∞) → Summable (fun n => b n * C m) :=
-    fun m _ => hs0.mul_right _
-  have hbd : ∀ (m : ℕ) (n : ℕ) (t : ℝ), ((m : ℕ∞)) ≤ (⊤ : ℕ∞) →
-      ‖iteratedFDeriv ℝ m (φ n) t‖ ≤ b n * C m := by
+  have hv : ∀ m : ℕ, ((m : ℕ∞)) ≤ (⊤ : ℕ∞) → Summable (fun n => b n * C m) := fun m _ =>
+    hs0.mul_right _
+  have hbd
+      : ∀ (m : ℕ) (n : ℕ) (t : ℝ),
+        ((m : ℕ∞)) ≤ (⊤ : ℕ∞) → ‖iteratedFDeriv ℝ m (φ n) t‖ ≤ b n * C m := by
     intro m n t _
     rw [hD, norm_smul, Real.norm_of_nonneg (hb0 n)]
     exact mul_le_mul_of_nonneg_left (hC m _) (hb0 n)
@@ -54,37 +55,39 @@ theorem lmajASeqSchwartz (b : ℕ → ℝ) (hb0 : ∀ n, 0 ≤ b n)
     refine hs0.of_nonneg_of_le (fun n => ?_) (fun n => ?_)
     · rw [hφv]; exact mul_nonneg (hb0 n) (lmajABump.nonneg)
     · rw [hφv]; exact mul_le_of_le_one_right (hb0 n) (lmajABump.le_one)
-  have hg0 : ∀ t, 0 ≤ g t := fun t => tsum_nonneg fun n => by
-    rw [hφv]; exact mul_nonneg (hb0 n) (lmajABump.nonneg)
-  have hdecay : ∀ k m : ℕ, ∀ t : ℝ, ‖t‖ ^ k * ‖iteratedFDeriv ℝ m g t‖ ≤
-      ∑' n, b n * ((n : ℝ) + 2) ^ k * C m := by
+  have hg0 : ∀ t, 0 ≤ g t := fun t =>
+    tsum_nonneg fun n => by rw [hφv]; exact mul_nonneg (hb0 n) (lmajABump.nonneg)
+  have hdecay
+      : ∀ k m : ℕ, ∀ t : ℝ,
+        ‖t‖ ^ k * ‖iteratedFDeriv ℝ m g t‖ ≤ ∑' n, b n * ((n : ℝ) + 2) ^ k * C m := by
     intro k m t
     rw [hg, iteratedFDeriv_tsum_apply hφc hv hbd (mod_cast le_top) t]
     have hsn : Summable (fun n => ‖iteratedFDeriv ℝ m (φ n) t‖) :=
       (hv m le_top).of_nonneg_of_le (fun _ => norm_nonneg _) (fun n => hbd m n t le_top)
-    calc ‖t‖ ^ k * ‖∑' n, iteratedFDeriv ℝ m (φ n) t‖
-        ≤ ‖t‖ ^ k * ∑' n, ‖iteratedFDeriv ℝ m (φ n) t‖ :=
-          mul_le_mul_of_nonneg_left (norm_tsum_le_tsum_norm hsn) (by positivity)
+    calc
+      ‖t‖ ^ k * ‖∑' n, iteratedFDeriv ℝ m (φ n) t‖ ≤ ‖t‖ ^ k * ∑' n, ‖iteratedFDeriv ℝ m (φ n) t‖ :=
+        mul_le_mul_of_nonneg_left (norm_tsum_le_tsum_norm hsn) (by positivity)
       _ = ∑' n, ‖t‖ ^ k * ‖iteratedFDeriv ℝ m (φ n) t‖ := (tsum_mul_left).symm
       _ ≤ ∑' n, b n * ((n : ℝ) + 2) ^ k * C m := by
-          refine (hsn.mul_left _).tsum_le_tsum (fun n => ?_) ((hb k).mul_right _)
-          rw [hD, norm_smul, Real.norm_of_nonneg (hb0 n)]
-          by_cases htn : |t - n| ≤ 2
-          · have h1 : ‖t‖ ≤ (n : ℝ) + 2 := by
-              rw [Real.norm_eq_abs]
-              have := abs_sub_abs_le_abs_sub t n
-              rw [Nat.abs_cast] at this
-              linarith
-            have h2 : ‖t‖ ^ k ≤ ((n : ℝ) + 2) ^ k := pow_le_pow_left₀ (norm_nonneg _) h1 k
-            have hCm : 0 ≤ C m := (norm_nonneg _).trans (hC m 0)
-            calc ‖t‖ ^ k * (b n * ‖iteratedFDeriv ℝ m (lmajABump : ℝ → ℝ) (t - n)‖)
+        refine (hsn.mul_left _).tsum_le_tsum (fun n => ?_) ((hb k).mul_right _)
+        rw [hD, norm_smul, Real.norm_of_nonneg (hb0 n)]
+        by_cases htn : |t - n| ≤ 2
+        · have h1 : ‖t‖ ≤ (n : ℝ) + 2 := by
+            rw [Real.norm_eq_abs]
+            have := abs_sub_abs_le_abs_sub t n
+            rw [Nat.abs_cast] at this
+            linarith
+          have h2 : ‖t‖ ^ k ≤ ((n : ℝ) + 2) ^ k := pow_le_pow_left₀ (norm_nonneg _) h1 k
+          have hCm : 0 ≤ C m := (norm_nonneg _).trans (hC m 0)
+          calc
+            ‖t‖ ^ k * (b n * ‖iteratedFDeriv ℝ m (lmajABump : ℝ → ℝ) (t - n)‖)
                 ≤ ((n : ℝ) + 2) ^ k * (b n * C m) :=
-                  mul_le_mul h2 (mul_le_mul_of_nonneg_left (hC m _) (hb0 n)) (mul_nonneg (hb0 n) (norm_nonneg _))
-                    (by positivity)
-              _ = b n * ((n : ℝ) + 2) ^ k * C m := by ring
-          · rw [lmajABump_deriv_zero m _ (not_le.mp htn), norm_zero, mul_zero, mul_zero]
-            have hCm : 0 ≤ C m := (norm_nonneg _).trans (hC m 0)
-            exact mul_nonneg (mul_nonneg (hb0 n) (by positivity)) hCm
+              mul_le_mul h2 (mul_le_mul_of_nonneg_left (hC m _) (hb0 n))
+                (mul_nonneg (hb0 n) (norm_nonneg _)) (by positivity)
+            _ = b n * ((n : ℝ) + 2) ^ k * C m := by ring
+        · rw [lmajABump_deriv_zero m _ (not_le.mp htn), norm_zero, mul_zero, mul_zero]
+          have hCm : 0 ≤ C m := (norm_nonneg _).trans (hC m 0)
+          exact mul_nonneg (mul_nonneg (hb0 n) (by positivity)) hCm
   refine ⟨⟨Complex.ofRealLI ∘ g, ?_, ?_⟩, ?_, ?_⟩
   · exact Complex.ofRealLI.contDiff.comp hgc
   · intro k m

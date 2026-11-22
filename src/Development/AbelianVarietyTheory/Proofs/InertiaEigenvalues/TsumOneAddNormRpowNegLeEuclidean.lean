@@ -105,12 +105,14 @@ private lemma rpow_neg_mul_one_add_le_two_mul {D : ℝ} (hD : 1 ≤ D) {r : ℝ}
     have h2 : r ^ (-D) ≤ 1 := Real.rpow_le_one_of_one_le_of_nonpos h (by linarith)
     nlinarith
 
-theorem tsum_one_add_norm_rpow_neg_le (hD : 1 ≤ finrank ℝ V) {M : ℝ}
-    (hM : (finrank ℝ V : ℝ) < M) :
-    ∃ C : ℝ, 0 < C ∧ ∀ (Λ : AddSubgroup V) (r : ℝ), 0 < r → (∀ x ∈ Λ, x ≠ 0 → r ≤ ‖x‖) →
-      Summable (fun x : ((Λ : Set V) \ {0} : Set V) => (1 + ‖(x : V)‖) ^ (-M)) ∧
-      ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M) ≤
-        C * (r ^ (-(finrank ℝ V : ℝ)) + 1) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
+theorem tsum_one_add_norm_rpow_neg_le (hD : 1 ≤ finrank ℝ V) {M : ℝ} (hM : (finrank ℝ V : ℝ) < M)
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (Λ : AddSubgroup V) (r : ℝ),
+          0 < r → (∀ x ∈ Λ, x ≠ 0 → r ≤ ‖x‖)
+            → Summable (fun x : ((Λ : Set V) \ {0} : Set V) => (1 + ‖(x : V)‖) ^ (-M))
+              ∧ ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M)
+                ≤ C * (r ^ (-(finrank ℝ V : ℝ)) + 1) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
   let _ : MeasurableSpace V := borel V
   have _ : BorelSpace V := ⟨rfl⟩
   have _ : Nontrivial V := Module.nontrivial_of_finrank_pos (R := ℝ) (by omega)
@@ -123,80 +125,91 @@ theorem tsum_one_add_norm_rpow_neg_le (hD : 1 ≤ finrank ℝ V) {M : ℝ}
     2 ^ finrank ℝ V / ((Measure.addHaar : Measure V) (ball 0 1)).toReal with hK
   have hK0 : 0 ≤ K := by rw [hK]; positivity
   refine ⟨2 * K + 1, by positivity, fun Λ r hr hmin => ?_⟩
-  have hfs : ∀ u : Finset ((Λ : Set V) \ {0} : Set V),
-      ∑ x ∈ u, (1 + ‖(x : V)‖) ^ (-s) ≤ K * r ^ (-(finrank ℝ V : ℝ)) :=
-    fun u => sum_le_mul_rpow (Measure.addHaar : Measure V) hsD Λ hr hmin u
-  have hf0 : ∀ x : ((Λ : Set V) \ {0} : Set V), 0 ≤ (1 + ‖(x : V)‖) ^ (-s) :=
-    fun x => by positivity
+  have hfs
+      : ∀ u : Finset ((Λ : Set V) \ {0} : Set V),
+        ∑ x ∈ u, (1 + ‖(x : V)‖) ^ (-s) ≤ K * r ^ (-(finrank ℝ V : ℝ)) := fun u =>
+    sum_le_mul_rpow (Measure.addHaar : Measure V) hsD Λ hr hmin u
+  have hf0 : ∀ x : ((Λ : Set V) \ {0} : Set V), 0 ≤ (1 + ‖(x : V)‖) ^ (-s) := fun x => by positivity
   have hsum : Summable (fun x : ((Λ : Set V) \ {0} : Set V) => (1 + ‖(x : V)‖) ^ (-s)) :=
     summable_of_sum_le hf0 hfs
-  have hle : ∀ x : ((Λ : Set V) \ {0} : Set V),
-      (1 + ‖(x : V)‖) ^ (-M) ≤ (1 + ‖(x : V)‖) ^ (-s) * (1 + r) ^ (s - M) := by
+  have hle
+      : ∀ x : ((Λ : Set V) \ {0} : Set V),
+        (1 + ‖(x : V)‖) ^ (-M) ≤ (1 + ‖(x : V)‖) ^ (-s) * (1 + r) ^ (s - M) := by
     intro x
     have hx : r ≤ ‖(x : V)‖ := hmin _ (SetLike.mem_coe.mp x.2.1) (by simpa using x.2.2)
     have hpos : 0 < 1 + ‖(x : V)‖ := by positivity
-    calc (1 + ‖(x : V)‖) ^ (-M) = (1 + ‖(x : V)‖) ^ (-s) * (1 + ‖(x : V)‖) ^ (s - M) := by
-          rw [← Real.rpow_add hpos]; congr 1; ring
+    calc
+      (1 + ‖(x : V)‖) ^ (-M) = (1 + ‖(x : V)‖) ^ (-s) * (1 + ‖(x : V)‖) ^ (s - M) := by
+        rw [← Real.rpow_add hpos]; congr 1; ring
       _ ≤ (1 + ‖(x : V)‖) ^ (-s) * (1 + r) ^ (s - M) := by
-          apply mul_le_mul_of_nonneg_left _ (hf0 x)
-          exact Real.rpow_le_rpow_of_nonpos (by linarith) (by linarith) (by linarith)
+        apply mul_le_mul_of_nonneg_left _ (hf0 x)
+        exact Real.rpow_le_rpow_of_nonpos (by linarith) (by linarith) (by linarith)
   have hsumM : Summable (fun x : ((Λ : Set V) \ {0} : Set V) => (1 + ‖(x : V)‖) ^ (-M)) :=
     Summable.of_nonneg_of_le (fun x => by positivity) hle (hsum.mul_right _)
   refine ⟨hsumM, ?_⟩
   have hpow := rpow_neg_mul_one_add_le_two_mul hD1 hr
-  have hsplit : (1 + r) ^ (s - M) = (1 + r) ^ (s - finrank ℝ V) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
+  have hsplit
+      : (1 + r) ^ (s - M) = (1 + r) ^ (s - finrank ℝ V) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
     rw [← Real.rpow_add (by linarith)]; congr 1; ring
   have hsD' : (1 + r) ^ (s - finrank ℝ V) ≤ 1 + r := by
-    calc (1 + r) ^ (s - finrank ℝ V) ≤ (1 + r) ^ (1 : ℝ) :=
-          Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
+    calc
+      (1 + r) ^ (s - finrank ℝ V)
+        ≤ (1 + r) ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
       _ = 1 + r := Real.rpow_one _
   have hA : 0 ≤ r ^ (-(finrank ℝ V : ℝ)) := by positivity
   have hB : 0 ≤ (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by positivity
-  calc ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M)
-      ≤ ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-s) * (1 + r) ^ (s - M) :=
-        Summable.tsum_le_tsum hle hsumM (hsum.mul_right _)
+  calc
+    ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M)
+        ≤ ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-s) * (1 + r) ^ (s - M) :=
+      Summable.tsum_le_tsum hle hsumM (hsum.mul_right _)
     _ = (∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-s)) * (1 + r) ^ (s - M) :=
-        tsum_mul_right
+      tsum_mul_right
     _ ≤ (K * r ^ (-(finrank ℝ V : ℝ))) * (1 + r) ^ (s - M) :=
-        mul_le_mul_of_nonneg_right (hsum.tsum_le_of_sum_le hfs) (by positivity)
-    _ = K * (r ^ (-(finrank ℝ V : ℝ)) * (1 + r) ^ (s - finrank ℝ V)) *
-          (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by rw [hsplit]; ring
-    _ ≤ K * (r ^ (-(finrank ℝ V : ℝ)) * (1 + r)) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
-        gcongr
-    _ ≤ K * (2 * (r ^ (-(finrank ℝ V : ℝ)) + 1)) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
-        gcongr
+      mul_le_mul_of_nonneg_right (hsum.tsum_le_of_sum_le hfs) (by positivity)
+    _ = K * (r ^ (-(finrank ℝ V : ℝ)) * (1 + r) ^ (s - finrank ℝ V))
+        * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
+      rw [hsplit]; ring
+    _ ≤ K * (r ^ (-(finrank ℝ V : ℝ)) * (1 + r)) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by gcongr
+    _ ≤ K * (2 * (r ^ (-(finrank ℝ V : ℝ)) + 1)) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by gcongr
     _ ≤ (2 * K + 1) * (r ^ (-(finrank ℝ V : ℝ)) + 1) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := by
-        nlinarith [mul_nonneg (add_nonneg hA zero_le_one) hB]
+      nlinarith [mul_nonneg (add_nonneg hA zero_le_one) hB]
 
-theorem tsum_one_add_norm_rpow_neg_le_regimes (hD : 1 ≤ finrank ℝ V) {M : ℝ}
-    (hM : (finrank ℝ V : ℝ) < M) :
-    ∃ C : ℝ, 0 < C ∧ ∀ (Λ : AddSubgroup V) (r : ℝ), 0 < r → (∀ x ∈ Λ, x ≠ 0 → r ≤ ‖x‖) →
-      Summable (fun x : ((Λ : Set V) \ {0} : Set V) => (1 + ‖(x : V)‖) ^ (-M)) ∧
-      (r ≤ 1 → ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M) ≤
-        C * r ^ (-(finrank ℝ V : ℝ))) ∧
-      (1 ≤ r → ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M) ≤
-        C * r ^ ((finrank ℝ V : ℝ) - M)) := by
+theorem tsum_one_add_norm_rpow_neg_le_regimes
+    (hD : 1 ≤ finrank ℝ V) {M : ℝ} (hM : (finrank ℝ V : ℝ) < M)
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (Λ : AddSubgroup V) (r : ℝ),
+          0 < r → (∀ x ∈ Λ, x ≠ 0 → r ≤ ‖x‖)
+            → Summable (fun x : ((Λ : Set V) \ {0} : Set V) => (1 + ‖(x : V)‖) ^ (-M))
+              ∧ (r ≤ 1
+                → ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M)
+                  ≤ C * r ^ (-(finrank ℝ V : ℝ)))
+              ∧ (1 ≤ r
+                → ∑' x : ((Λ : Set V) \ {0} : Set V), (1 + ‖(x : V)‖) ^ (-M)
+                  ≤ C * r ^ ((finrank ℝ V : ℝ) - M)) := by
   obtain ⟨C, hC, h⟩ := tsum_one_add_norm_rpow_neg_le hD hM
   have hD0 : (0 : ℝ) ≤ finrank ℝ V := Nat.cast_nonneg _
-  refine ⟨2 * C, by positivity, fun Λ r hr hmin => ⟨(h Λ r hr hmin).1, fun hr1 => ?_, fun hr1 => ?_⟩⟩
+  refine
+    ⟨2 * C, by positivity, fun Λ r hr hmin => ⟨(h Λ r hr hmin).1, fun hr1 => ?_, fun hr1 => ?_⟩⟩
   · have hb := (h Λ r hr hmin).2
     have e1 : (1 + r) ^ ((finrank ℝ V : ℝ) - M) ≤ 1 :=
       Real.rpow_le_one_of_one_le_of_nonpos (by linarith) (by linarith)
     have e2 : 1 ≤ r ^ (-(finrank ℝ V : ℝ)) :=
       Real.one_le_rpow_of_pos_of_le_one_of_nonpos hr hr1 (by linarith)
     have e3 : 0 ≤ C * (r ^ (-(finrank ℝ V : ℝ)) + 1) := by positivity
-    calc _ ≤ C * (r ^ (-(finrank ℝ V : ℝ)) + 1) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := hb
+    calc
+      _ ≤ C * (r ^ (-(finrank ℝ V : ℝ)) + 1) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := hb
       _ ≤ C * (r ^ (-(finrank ℝ V : ℝ)) + 1) * 1 := mul_le_mul_of_nonneg_left e1 e3
       _ ≤ 2 * C * r ^ (-(finrank ℝ V : ℝ)) := by nlinarith
   · have hb := (h Λ r hr hmin).2
     have e1 : (1 + r) ^ ((finrank ℝ V : ℝ) - M) ≤ r ^ ((finrank ℝ V : ℝ) - M) :=
       Real.rpow_le_rpow_of_nonpos hr (by linarith) (by linarith)
-    have e2 : r ^ (-(finrank ℝ V : ℝ)) ≤ 1 :=
-      Real.rpow_le_one_of_one_le_of_nonpos hr1 (by linarith)
-    calc _ ≤ C * (r ^ (-(finrank ℝ V : ℝ)) + 1) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := hb
+    have e2 : r ^ (-(finrank ℝ V : ℝ)) ≤ 1 := Real.rpow_le_one_of_one_le_of_nonpos hr1 (by linarith)
+    calc
+      _ ≤ C * (r ^ (-(finrank ℝ V : ℝ)) + 1) * (1 + r) ^ ((finrank ℝ V : ℝ) - M) := hb
       _ ≤ (C * 2) * r ^ ((finrank ℝ V : ℝ) - M) :=
-          mul_le_mul (mul_le_mul_of_nonneg_left (by linarith) hC.le) e1 (by positivity)
-            (by positivity)
+        mul_le_mul (mul_le_mul_of_nonneg_left (by linarith) hC.le) e1 (by positivity)
+          (by positivity)
       _ = 2 * C * r ^ ((finrank ℝ V : ℝ) - M) := by ring
 
 end GlobalTheory.LatticeCount

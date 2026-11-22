@@ -25,7 +25,8 @@ open GroundTheory.Heights₂.Heights.NumbersDVR GroundTheory.Heights₂.Heights.
 theorem verticalPush : BlowUpVerticalPush.Statement.{0} :=
   BlowUpVerticalPush.proof (BlowUpVerticalFibre.proof BlowUpModel.full
     (BlowUpFibreDegree.proof NumbersDVR_HomLocRingLocal NumbersDVR_DivCycleHomLoc
-      FiniteBirationalLength.full GlobalTheory.T.blow_up_fibre_semilocal) GlobalTheory.T.projection_formula_degree)
+      FiniteBirationalLength.full GlobalTheory.T.blow_up_fibre_semilocal)
+    GlobalTheory.T.projection_formula_degree)
 
 theorem main : CutByEffectiveDivisor.Statement.{0} :=
   CutByEffectiveDivisor.of_steps NumbersDVR_C3NoCommon

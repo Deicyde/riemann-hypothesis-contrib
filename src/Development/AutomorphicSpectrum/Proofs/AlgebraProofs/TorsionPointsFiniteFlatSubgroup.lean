@@ -22,7 +22,17 @@ open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_subgroup : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G], ∀ (T : TorsRep G p) (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N] (pt : N → (sp (R₀ := R) R ⟶ G)), IsTorsPts G p pt → ∀ K : AddSubgroup N, IsFinFlatSub G (T.A ⧸ vanIdeal T pt K) (spMap (Ideal.Quotient.mkₐ R (vanIdeal T pt K)) ≫ T.y) := by
+theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_subgroup
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G],
+          ∀ (T : TorsRep G p) (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N]
+              (pt : N → (sp (R₀ := R) R ⟶ G)),
+            IsTorsPts G p pt
+              → ∀ K : AddSubgroup N,
+                IsFinFlatSub G (T.A ⧸ vanIdeal T pt K)
+                  (spMap (Ideal.Quotient.mkₐ R (vanIdeal T pt K)) ≫ T.y) := by
   classical
   intro p _ C _ _ _ v R _ _ hv hp G _ _ T N _ _ _ pt hpt K
   haveI : IsDomain R := Function.Injective.isDomain (algebraMap R C) hv.hom_inj
@@ -36,8 +46,8 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_sub
   set I : Ideal T.A := vanIdeal T pt (K : Set N) with hI
   have hpts : ∀ x : N, pt x ^ p = 1 := fun x => (hpt.range (pt x)).mpr ⟨x, rfl⟩
   choose ev hev using fun x : N => (T.univ R (pt x) (hpts x)).exists
-  have huniq : ∀ (x : N) (φ : T.A →ₐ[R] R), spMap φ ≫ T.y = pt x → φ = ev x :=
-    fun x φ h => (T.univ R (pt x) (hpts x)).unique h (hev x)
+  have huniq : ∀ (x : N) (φ : T.A →ₐ[R] R), spMap φ ≫ T.y = pt x → φ = ev x := fun x φ h =>
+    (T.univ R (pt x) (hpts x)).unique h (hev x)
   have memI : ∀ a : T.A, a ∈ I ↔ ∀ k ∈ K, ev k a = 0 := by
     intro a
     constructor
@@ -49,10 +59,11 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_sub
       intro k hk φ hφ
       rw [huniq k φ hφ]
       exact ha k hk
-  obtain ⟨evbar, hevbar⟩ : ∃ e : K → ((T.A ⧸ I) →ₐ[R] R),
-      ∀ k, (e k).comp (Ideal.Quotient.mkₐ R I) = ev k :=
-    ⟨fun k => Ideal.Quotient.liftₐ I (ev k) (fun a ha => (memI a).mp ha k k.2),
-      fun k => Ideal.Quotient.liftₐ_comp _ _ _⟩
+  obtain ⟨evbar, hevbar⟩
+      : ∃ e : K → ((T.A ⧸ I) →ₐ[R] R), ∀ k, (e k).comp (Ideal.Quotient.mkₐ R I) = ev k := ⟨
+    fun k => Ideal.Quotient.liftₐ I (ev k) (fun a ha => (memI a).mp ha k k.2),
+    fun k => Ideal.Quotient.liftₐ_comp _ _ _
+  ⟩
   have hsep1 : ∀ b : T.A ⧸ I, (∀ k : K, evbar k b = 0) → b = 0 := by
     intro b hb
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mkₐ_surjective R I b
@@ -80,29 +91,37 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_sub
   have hE : ∀ k : K, spMap (evbar k) ≫ spMap (Ideal.Quotient.mkₐ R I) ≫ T.y = pt k := by
     intro k
     rw [← Category.assoc, ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, hevbar, hev]
-  have hpowA : ∀ {X : Over (Spec (CommRingCat.of R))} (f : X ⟶ sp (R₀ := R) T.A), (f ≫ T.y) ^ p = 1 :=
-    fun f => by rw [← CategoryTheory.MonObj.comp_pow, T.y_p, CategoryTheory.MonObj.comp_one]
+  have hpowA
+      : ∀ {X : Over (Spec (CommRingCat.of R))} (f : X ⟶ sp (R₀ := R) T.A),
+        (f ≫ T.y) ^ p = 1 := fun f => by
+    rw [← CategoryTheory.MonObj.comp_pow, T.y_p, CategoryTheory.MonObj.comp_one]
   have hu : (spMap (Ideal.Quotient.mkₐ R I) ≫ T.y) ^ p = 1 := hpowA _
-  have hpowc : ∀ {X : Over (Spec (CommRingCat.of R))} (f : X ⟶ sp (R₀ := R) (T.A ⧸ I)),
-      (f ≫ spMap (Ideal.Quotient.mkₐ R I) ≫ T.y) ^ p = 1 :=
-    fun f => by rw [← CategoryTheory.MonObj.comp_pow, hu, CategoryTheory.MonObj.comp_one]
-  obtain ⟨Λ, hΛt⟩ : ∃ L : K → K → (TensorProduct R (T.A ⧸ I) (T.A ⧸ I) →ₐ[R] R),
-      ∀ k1 k2 x y, L k1 k2 (TensorProduct.tmul R x y) = evbar k1 x * evbar k2 y :=
-    ⟨fun k1 k2 => Algebra.TensorProduct.lift (evbar k1) (evbar k2) (fun _ _ => Commute.all _ _),
-      fun _ _ _ _ => Algebra.TensorProduct.lift_tmul _ _ _ _ _⟩
+  have hpowc
+      : ∀ {X : Over (Spec (CommRingCat.of R))} (f : X ⟶ sp (R₀ := R) (T.A ⧸ I)),
+        (f ≫ spMap (Ideal.Quotient.mkₐ R I) ≫ T.y) ^ p = 1 := fun f => by
+    rw [← CategoryTheory.MonObj.comp_pow, hu, CategoryTheory.MonObj.comp_one]
+  obtain ⟨Λ, hΛt⟩
+      : ∃ L : K → K → (TensorProduct R (T.A ⧸ I) (T.A ⧸ I) →ₐ[R] R), ∀ k1 k2 x y,
+        L k1 k2 (TensorProduct.tmul R x y) = evbar k1 x * evbar k2 y := ⟨
+    fun k1 k2 => Algebra.TensorProduct.lift (evbar k1) (evbar k2) (fun _ _ => Commute.all _ _),
+    fun _ _ _ _ => Algebra.TensorProduct.lift_tmul _ _ _ _ _
+  ⟩
   have hΛL : ∀ k1 k2, (Λ k1 k2).comp Algebra.TensorProduct.includeLeft = evbar k1 := fun k1 k2 =>
     AlgHom.ext fun b => by simp [hΛt]
   have hΛR : ∀ k1 k2, (Λ k1 k2).comp Algebra.TensorProduct.includeRight = evbar k2 := fun k1 k2 =>
     AlgHom.ext fun b => by simp [hΛt]
   have hι : Function.Injective (Pi.algHom R (fun _ : K => R) evbar).toLinearMap := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro b hb
     exact hsep1 b fun k => by simpa using congrFun hb k
-  have key : ∀ (w : TensorProduct R (T.A ⧸ I) (T.A ⧸ I)) (k1 k2 : K),
-      (Pi.algHom R (fun _ : K => R) evbar).toLinearMap
-        (TensorProduct.piScalarRight R R (T.A ⧸ I) K
-          (((Pi.algHom R (fun _ : K => R) evbar).toLinearMap.lTensor (T.A ⧸ I)) w) k2) k1 =
-        Λ k1 k2 w := by
+  have key
+      : ∀ (w : TensorProduct R (T.A ⧸ I) (T.A ⧸ I)) (k1 k2 : K),
+        (Pi.algHom R (fun _ : K => R) evbar).toLinearMap
+            (TensorProduct.piScalarRight R R (T.A ⧸ I) K
+              (((Pi.algHom R (fun _ : K => R) evbar).toLinearMap.lTensor (T.A ⧸ I)) w) k2)
+            k1
+          = Λ k1 k2 w := by
     intro w k1 k2
     induction w using TensorProduct.induction_on with
     | zero => simp
@@ -110,22 +129,25 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_sub
     | add x y hx hy => simp only [map_add (f := _), Pi.add_apply, hx, hy]
   have hsep2 : ∀ w : TensorProduct R (T.A ⧸ I) (T.A ⧸ I), (∀ k1 k2 : K, Λ k1 k2 w = 0) → w = 0 := by
     intro w hw
-    have h1 : TensorProduct.piScalarRight R R (T.A ⧸ I) K
-        (((Pi.algHom R (fun _ : K => R) evbar).toLinearMap.lTensor (T.A ⧸ I)) w) = 0 := by
+    have h1
+        : TensorProduct.piScalarRight R R (T.A ⧸ I) K
+            (((Pi.algHom R (fun _ : K => R) evbar).toLinearMap.lTensor (T.A ⧸ I)) w)
+          = 0 := by
       funext k2
       apply hι
       funext k1
       rw [key, hw]
       simp
     rw [LinearEquiv.map_eq_zero_iff] at h1
-    exact (injective_iff_map_eq_zero _).mp
-      (Module.Flat.lTensor_preserves_injective_linearMap _ hι) w h1
+    exact (injective_iff_map_eq_zero _).mp (Module.Flat.lTensor_preserves_injective_linearMap _ hι)
+      w h1
   refine ⟨inferInstance, inferInstance, ?_, ?_, ?_, ?_⟩
   · intro S _ _ φ φ' hφ
-    have e1 : spMap (φ.comp (Ideal.Quotient.mkₐ R I)) ≫ T.y =
-        spMap (φ'.comp (Ideal.Quotient.mkₐ R I)) ≫ T.y := by
-      rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, ← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc,
-        Category.assoc, hφ]
+    have e1
+        : spMap (φ.comp (Ideal.Quotient.mkₐ R I)) ≫ T.y
+          = spMap (φ'.comp (Ideal.Quotient.mkₐ R I)) ≫ T.y := by
+      rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp,
+        ← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, Category.assoc, hφ]
     have e2 := (T.univ S _ (hpowA (spMap (φ.comp (Ideal.Quotient.mkₐ R I))))).unique rfl e1.symm
     refine AlgHom.ext fun b => ?_
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mkₐ_surjective R I b
@@ -135,17 +157,25 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_sub
     rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, hE]
     show spMap (Algebra.ofId R S) ≫ pt 0 = 1
     rw [h0, CategoryTheory.MonObj.comp_one]
-  · have hm : ((spMap (Algebra.TensorProduct.includeLeft : (T.A ⧸ I) →ₐ[R] TensorProduct R (T.A ⧸ I) (T.A ⧸ I)) ≫
-          spMap (Ideal.Quotient.mkₐ R I) ≫ T.y) *
-        (spMap (Algebra.TensorProduct.includeRight : (T.A ⧸ I) →ₐ[R] TensorProduct R (T.A ⧸ I) (T.A ⧸ I)) ≫
-          spMap (Ideal.Quotient.mkₐ R I) ≫ T.y)) ^ p = 1 := by
+  · have hm
+        : ((spMap
+                  (Algebra.TensorProduct.includeLeft
+                    : (T.A ⧸ I) →ₐ[R] TensorProduct R (T.A ⧸ I) (T.A ⧸ I))
+                ≫ spMap (Ideal.Quotient.mkₐ R I) ≫ T.y)
+              * (spMap
+                  (Algebra.TensorProduct.includeRight
+                    : (T.A ⧸ I) →ₐ[R] TensorProduct R (T.A ⧸ I) (T.A ⧸ I))
+                ≫ spMap (Ideal.Quotient.mkₐ R I) ≫ T.y))
+            ^ p
+          = 1 := by
       rw [mul_pow, hpowc, hpowc, _root_.one_mul]
     obtain ⟨ψ0, hψ0⟩ := (T.univ _ _ hm).exists
     have hψI : ∀ a ∈ I, ψ0 a = 0 := by
       intro a ha
       refine hsep2 _ fun k1 k2 => ?_
       have e : spMap ((Λ k1 k2).comp ψ0) ≫ T.y = pt ((k1 : N) + k2) := by
-        rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, hψ0, CategoryTheory.MonObj.comp_mul,
+        rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, hψ0,
+          CategoryTheory.MonObj.comp_mul,
           ← Category.assoc (spMap (Λ k1 k2)) (spMap Algebra.TensorProduct.includeLeft),
           ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, hΛL, hE,
           ← Category.assoc (spMap (Λ k1 k2)) (spMap Algebra.TensorProduct.includeRight),
@@ -153,16 +183,24 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_sub
       rw [← AlgHom.comp_apply, huniq _ _ e]
       exact (memI a).mp ha _ (K.add_mem k1.2 k2.2)
     intro S _ _ φ φ'
-    have hLR : (Algebra.TensorProduct.lift φ φ' (fun _ _ => Commute.all _ _)).comp
-        Algebra.TensorProduct.includeRight = φ' := AlgHom.ext fun b => by simp
-    refine ⟨(Algebra.TensorProduct.lift φ φ' (fun _ _ => Commute.all _ _)).comp
-      (Ideal.Quotient.liftₐ I ψ0 hψI), ?_⟩
+    have hLR
+        : (Algebra.TensorProduct.lift φ φ' (fun _ _ => Commute.all _ _)).comp
+            Algebra.TensorProduct.includeRight
+          = φ' :=
+      AlgHom.ext fun b => by simp
+    refine ⟨
+      (Algebra.TensorProduct.lift φ φ' (fun _ _ => Commute.all _ _)).comp
+        (Ideal.Quotient.liftₐ I ψ0 hψI),
+      ?_
+    ⟩
     rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc,
-      ← Category.assoc (spMap (Ideal.Quotient.liftₐ I ψ0 hψI)), ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp,
-      Ideal.Quotient.liftₐ_comp, hψ0, CategoryTheory.MonObj.comp_mul]
+      ← Category.assoc (spMap (Ideal.Quotient.liftₐ I ψ0 hψI)),
+      ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Ideal.Quotient.liftₐ_comp, hψ0,
+      CategoryTheory.MonObj.comp_mul]
     rw [← Category.assoc (spMap (Algebra.TensorProduct.lift φ φ' (fun _ _ => Commute.all _ _)))
         (spMap Algebra.TensorProduct.includeLeft),
-      ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Algebra.TensorProduct.lift_comp_includeLeft,
+      ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp,
+      Algebra.TensorProduct.lift_comp_includeLeft,
       ← Category.assoc (spMap (Algebra.TensorProduct.lift φ φ' (fun _ _ => Commute.all _ _)))
         (spMap Algebra.TensorProduct.includeRight),
       ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, hLR]
@@ -172,12 +210,13 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_finite_flat_sub
       intro a ha
       refine hsep1 _ fun k => ?_
       have e : spMap ((evbar k).comp ψ0) ≫ T.y = pt (-(k : N)) := by
-        rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, hψ0, CategoryTheory.GrpObj.comp_inv,
-          hE, hneg]
+        rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, hψ0,
+          CategoryTheory.GrpObj.comp_inv, hE, hneg]
       rw [← AlgHom.comp_apply, huniq _ _ e]
       exact (memI a).mp ha _ (K.neg_mem k.2)
     intro S _ _ φ
     refine ⟨φ.comp (Ideal.Quotient.liftₐ I ψ0 hψI), ?_⟩
     rw [← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc,
-      ← Category.assoc (spMap (Ideal.Quotient.liftₐ I ψ0 hψI)), ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp,
-      Ideal.Quotient.liftₐ_comp, hψ0, CategoryTheory.GrpObj.comp_inv, inv_mul_cancel]
+      ← Category.assoc (spMap (Ideal.Quotient.liftₐ I ψ0 hψI)),
+      ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Ideal.Quotient.liftₐ_comp, hψ0,
+      CategoryTheory.GrpObj.comp_inv, inv_mul_cancel]

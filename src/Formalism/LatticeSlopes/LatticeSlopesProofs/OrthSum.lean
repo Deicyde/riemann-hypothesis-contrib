@@ -23,10 +23,10 @@ section
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
 
-theorem discreteTopology_span_range_and_covol {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → E)
-    (hu : LinearIndependent ℝ u) :
-    DiscreteTopology (span ℤ (Set.range u)) ∧
-      covol (span ℤ (Set.range u)) = Real.sqrt (Matrix.gram ℝ u).det := by
+theorem discreteTopology_span_range_and_covol
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → E) (hu : LinearIndependent ℝ u)
+    : DiscreteTopology (span ℤ (Set.range u))
+      ∧ covol (span ℤ (Set.range u)) = Real.sqrt (Matrix.gram ℝ u).det := by
   have hd := discreteTopology_span_range_of_linearIndependent u hu
   refine ⟨hd, ?_⟩
   haveI := hd
@@ -34,11 +34,11 @@ theorem discreteTopology_span_range_and_covol {ι : Type*} [Fintype ι] [Decidab
   rw [covol_eq_gram E (span ℤ (Set.range u)) ι (Basis.span hZ)]
   simp only [Basis.span_apply]
 
-theorem discreteTopology_sup_and_covol_sup (L₁ L₂ : Submodule ℤ E) [DiscreteTopology L₁] [DiscreteTopology L₂]
-    (h : ∀ x ∈ L₁, ∀ y ∈ L₂, inner ℝ x y = 0) :
-    DiscreteTopology (L₁ ⊔ L₂ : Submodule ℤ E) ∧ covol (L₁ ⊔ L₂) = covol L₁ * covol L₂ := by
+theorem discreteTopology_sup_and_covol_sup
+    (L₁ L₂ : Submodule ℤ E) [DiscreteTopology L₁] [DiscreteTopology L₂]
+    (h : ∀ x ∈ L₁, ∀ y ∈ L₂, inner ℝ x y = 0)
+    : DiscreteTopology (L₁ ⊔ L₂ : Submodule ℤ E) ∧ covol (L₁ ⊔ L₂) = covol L₁ * covol L₂ := by
   classical
-
   let b₁ := Module.finBasis ℤ L₁
   let b₂ := Module.finBasis ℤ L₂
   let v₁ : Fin (Module.finrank ℤ L₁) → E := fun i => (b₁ i : E)
@@ -64,13 +64,14 @@ theorem discreteTopology_sup_and_covol_sup (L₁ L₂ : Submodule ℤ E) [Discre
   have hc₁ : covol L₁ = Real.sqrt (Matrix.gram ℝ v₁).det := covol_eq_gram E L₁ _ b₁
   have hc₂ : covol L₂ = Real.sqrt (Matrix.gram ℝ v₂).det := covol_eq_gram E L₂ _ b₂
   have hp₁ : 0 ≤ (Matrix.gram ℝ v₁).det := (det_gram_basis_pos L₁ b₁).le
-  have hg : Matrix.gram ℝ (Sum.elim v₁ v₂) =
-      Matrix.fromBlocks (Matrix.gram ℝ v₁) 0 0 (Matrix.gram ℝ v₂) := by
+  have hg
+      : Matrix.gram ℝ (Sum.elim v₁ v₂)
+        = Matrix.fromBlocks (Matrix.gram ℝ v₁) 0 0 (Matrix.gram ℝ v₂) := by
     ext (i | i) (j | j) <;> simp [Matrix.gram_apply, horth, horth']
   rw [hc, hc₁, hc₂, hg, Matrix.det_fromBlocks_zero₂₁, Real.sqrt_mul hp₁]
 
-theorem degree_le_rank_mul_maxSlope (L N : Submodule ℤ E) (hL : DiscreteTopology L) (hNL : N ≤ L) :
-    deg N ≤ rk N * muMax L := by
+theorem degree_le_rank_mul_maxSlope (L N : Submodule ℤ E) (hL : DiscreteTopology L) (hNL : N ≤ L)
+    : deg N ≤ rk N * muMax L := by
   haveI := hL
   by_cases hN : N = ⊥
   · subst hN
@@ -85,17 +86,19 @@ theorem degree_le_rank_mul_maxSlope (L N : Submodule ℤ E) (hL : DiscreteTopolo
     rw [div_le_iff₀ hk'] at hs
     linarith
 
-theorem degree_le_rank_mul_maxSlope_of_injective (Q M : Submodule ℤ E) (hQ : DiscreteTopology Q)
-    (hM : DiscreteTopology M) (ψ : Q →ₗ[ℤ] M) (hinj : Function.Injective ψ)
-    (hψ : ∀ x : Q, ‖((ψ x : M) : E)‖ ≤ ‖(x : E)‖) : deg Q ≤ rk Q * muMax M := by
+theorem degree_le_rank_mul_maxSlope_of_injective
+    (Q M : Submodule ℤ E) (hQ : DiscreteTopology Q) (hM : DiscreteTopology M) (ψ : Q →ₗ[ℤ] M)
+    (hinj : Function.Injective ψ) (hψ : ∀ x : Q, ‖((ψ x : M) : E)‖ ≤ ‖(x : E)‖)
+    : deg Q ≤ rk Q * muMax M := by
   haveI := hQ
   by_cases hQ0 : Q = ⊥
   · subst hQ0
     have h0 : covol (⊥ : Submodule ℤ E) = 1 := (covol_basic_properties E).1
     have hr : rk (⊥ : Submodule ℤ E) = 0 := by simp [rk]
     simp [deg, h0, hr]
-  · have hs := slopeInequality_of (slopeLeMuMax_of (slopesBdd_of gram_det_le)) E E Q M hQ hM hQ0
-      ψ 1 hinj (fun x => by simpa using hψ x)
+  · have hs :=
+      slopeInequality_of (slopeLeMuMax_of (slopesBdd_of gram_det_le)) E E Q M hQ hM hQ0 ψ 1 hinj
+        (fun x => by simpa using hψ x)
     rw [Real.log_one, add_zero] at hs
     have hk : 0 < rk Q := Module.finrank_pos_iff.mpr (Submodule.nontrivial_iff_ne_bot.mpr hQ0)
     have hk' : (0 : ℝ) < (rk Q : ℝ) := by exact_mod_cast hk
@@ -103,13 +106,12 @@ theorem degree_le_rank_mul_maxSlope_of_injective (Q M : Submodule ℤ E) (hQ : D
     rw [div_le_iff₀ hk'] at hs
     linarith
 
-
 set_option maxHeartbeats 800000 in
-theorem slope_le_max_maxSlope (L₁ L₂ : Submodule ℤ E) (h1 : DiscreteTopology L₁)
-    (h2 : DiscreteTopology L₂) (h : ∀ x ∈ L₁, ∀ y ∈ L₂, inner ℝ x y = 0)
-    (hd : DiscreteTopology (L₁ ⊔ L₂ : Submodule ℤ E))
-    (N : Submodule ℤ E) (hN : N ≤ L₁ ⊔ L₂) (hN0 : N ≠ ⊥) :
-    slope N ≤ max (muMax L₁) (muMax L₂) := by
+theorem slope_le_max_maxSlope
+    (L₁ L₂ : Submodule ℤ E) (h1 : DiscreteTopology L₁) (h2 : DiscreteTopology L₂)
+    (h : ∀ x ∈ L₁, ∀ y ∈ L₂, inner ℝ x y = 0) (hd : DiscreteTopology (L₁ ⊔ L₂ : Submodule ℤ E))
+    (N : Submodule ℤ E) (hN : N ≤ L₁ ⊔ L₂) (hN0 : N ≠ ⊥)
+    : slope N ≤ max (muMax L₁) (muMax L₂) := by
   haveI := h1
   haveI := h2
   haveI := hd
@@ -136,8 +138,7 @@ theorem slope_le_max_maxSlope (L₁ L₂ : Submodule ℤ E) (h1 : DiscreteTopolo
     rw [hPdef]; exact Submodule.norm_starProjection_apply_le _ x
 
   set K : Submodule ℤ E := N ⊓ L₁ with hK
-  have hKspan : span ℝ (K : Set E) ≤ span ℝ (L₁ : Set E) :=
-    Submodule.span_mono (fun x hx => hx.2)
+  have hKspan : span ℝ (K : Set E) ≤ span ℝ (L₁ : Set E) := Submodule.span_mono (fun x hx => hx.2)
   have hsat : IsSaturated N K := by
     refine ⟨inf_le_left, fun x hx hxs => ⟨hx, ?_⟩⟩
     have h0 : P x = 0 := hP0 x (hKspan hxs)
@@ -160,14 +161,15 @@ theorem slope_le_max_maxSlope (L₁ L₂ : Submodule ℤ E) (h1 : DiscreteTopolo
     change P ((span ℝ (K : Set E))ᗮ.starProjection x) ∈ L₂
     rw [hPR x hx]
     exact (hP3 x (hN hx)).1
-  let ψ : Q →ₗ[ℤ] L₂ := LinearMap.codRestrict L₂
-    ((P.toLinearMap.restrictScalars ℤ).comp Q.subtype) (fun y => hQmem y.1 y.2)
+  let ψ : Q →ₗ[ℤ] L₂ :=
+    LinearMap.codRestrict L₂ ((P.toLinearMap.restrictScalars ℤ).comp Q.subtype)
+      (fun y => hQmem y.1 y.2)
   have hψ : ∀ y : Q, ((ψ y : L₂) : E) = P y := fun y => rfl
   have hinj : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro y hy0
-    have hPy : P y = 0 := by
-      rw [← hψ, hy0]; rfl
+    have hPy : P y = 0 := by rw [← hψ, hy0]; rfl
     obtain ⟨y, hyQ⟩ := y
     obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp hyQ
     change P ((span ℝ (K : Set E))ᗮ.starProjection x) = 0 at hPy
@@ -178,11 +180,12 @@ theorem slope_le_max_maxSlope (L₁ L₂ : Submodule ℤ E) (h1 : DiscreteTopolo
     have hxK : x ∈ span ℝ (K : Set E) := subset_span ⟨hx, hx1⟩
     apply Subtype.ext
     change (span ℝ (K : Set E))ᗮ.starProjection x = 0
-    rw [Submodule.starProjection_orthogonal_val, Submodule.starProjection_eq_self_iff.mpr hxK, sub_self]
-  have hnorm : ∀ y : Q, ‖((ψ y : L₂) : E)‖ ≤ ‖(y : E)‖ := fun y => by
-    rw [hψ]; exact hPnorm _
+    rw [Submodule.starProjection_orthogonal_val, Submodule.starProjection_eq_self_iff.mpr hxK,
+      sub_self]
+  have hnorm : ∀ y : Q, ‖((ψ y : L₂) : E)‖ ≤ ‖(y : E)‖ := fun y => by rw [hψ]; exact hPnorm _
   have hdK : deg K ≤ rk K * muMax L₁ := degree_le_rank_mul_maxSlope L₁ K h1 inf_le_right
-  have hdQ : deg Q ≤ rk Q * muMax L₂ := degree_le_rank_mul_maxSlope_of_injective Q L₂ hQd h2 ψ hinj hnorm
+  have hdQ : deg Q ≤ rk Q * muMax L₂ :=
+    degree_le_rank_mul_maxSlope_of_injective Q L₂ hQd h2 ψ hinj hnorm
   have hk : 0 < rk N := Module.finrank_pos_iff.mpr (Submodule.nontrivial_iff_ne_bot.mpr hN0)
   have hk' : (0 : ℝ) < (rk N : ℝ) := by exact_mod_cast hk
   have hK0 : (0 : ℝ) ≤ (rk K : ℝ) := Nat.cast_nonneg _

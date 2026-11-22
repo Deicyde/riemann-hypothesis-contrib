@@ -16,9 +16,9 @@ noncomputable section
 
 def ProjDegreeChow.Statement : Prop :=
   ∀ (n e δ : ℕ) (W : Ideal (MvPolynomial (Fin n) ℂ)) (f : MvPolynomial (Fin (e + 1) × Fin n) ℂ)
-    (A : Matrix (Fin (e + 1)) (Fin n) ℂ),
-    IsProjPrime W → IsChowForm W (e + 1) f → IsMultiHomog δ f →
-      ComplexSets.IsFiniteProjection W A → ComplexSets.projDegree W A = δ
+      (A : Matrix (Fin (e + 1)) (Fin n) ℂ),
+    IsProjPrime W → IsChowForm W (e + 1) f → IsMultiHomog δ f → ComplexSets.IsFiniteProjection W A
+      → ComplexSets.projDegree W A = δ
 
 end
 

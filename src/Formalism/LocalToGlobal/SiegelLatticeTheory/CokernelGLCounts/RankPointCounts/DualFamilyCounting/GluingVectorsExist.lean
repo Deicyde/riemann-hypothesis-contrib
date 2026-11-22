@@ -38,11 +38,15 @@ theorem gluing_vectors_exist : GlueVecsPre := by
   let t : Fin m → K := fun j =>
     if hj : ∃ i, vF 𝔭 (a i) ≠ 0 ∧ τ i = j then algebraMap F K (nF hj.choose) else 1
   have hts : ∀ j, star (t j) = t j := by
-    intro j; simp only [t]; split_ifs
+    intro j
+    simp only [t]
+    split_ifs
     · exact star_fix hF _
     · exact star_one K
   have htp : ∀ j, TotPos (t j) := by
-    intro j; simp only [t]; split_ifs
+    intro j
+    simp only [t]
+    split_ifs
     · exact hnpos _
     · intro φ; rw [map_one]; simp
   have htpart : ∀ i, vF 𝔭 (a i) ≠ 0 → t (τ i) = algebraMap F K (nF i) := by
@@ -61,8 +65,11 @@ theorem gluing_vectors_exist : GlueVecsPre := by
   have hpos' : ∀ x : W, x ≠ 0 → TotPos (h' x x) := by
     intro x hx φ; rw [h'a]; exact hpos x x.2 (fun e => hx (Subtype.ext e)) φ
   have hm1 : m - 1 + 1 = m := by omega
-  obtain ⟨v, ho, hv1, hvl⟩ := exists_presc_family hK h' hsym' hpos' (m - 1) (by omega)
-    (fun j => t (Fin.cast hm1 j)) (fun j => hts _) (fun j => htp _)
+  obtain ⟨v, ho, hv1, hvl⟩ :=
+    exists_presc_family hK h' hsym' hpos' (m - 1) (by omega)
+      (fun j => t (Fin.cast hm1 j))
+      (fun j => hts _)
+      (fun j => htp _)
   let w : Fin m → V := fun j => (v (Fin.cast hm1.symm j) : V)
   have hwo : ∀ j k, j ≠ k → h (w j) (w k) = 0 := by
     intro j k hjk
@@ -78,8 +85,7 @@ theorem gluing_vectors_exist : GlueVecsPre := by
     by_cases hj : (j : ℕ) + 1 < m
     · rw [hwn j hj]; exact TotPos.ne_zero' (htp j)
     · have hjl := j.isLt
-      have hl : Fin.cast hm1.symm j = Fin.last (m - 1) := by
-        ext; simp; omega
+      have hl : Fin.cast hm1.symm j = Fin.last (m - 1) := by ext; simp; omega
       have : v (Fin.cast hm1.symm j) ≠ 0 := by rw [hl]; exact hvl
       exact TotPos.ne_zero' (hpos' _ this)
   have hfix : ∀ j, ∃ x : F, h (w j) (w j) = algebraMap F K x := fun j => by
@@ -87,8 +93,20 @@ theorem gluing_vectors_exist : GlueVecsPre := by
     exact ⟨x, hx.symm⟩
   choose c hcw using hfix
   obtain ⟨π, s₀, hu⟩ := exists_isUnif0 h𝔭
-  refine ⟨π, w, c, τ, fun j => (v _).2, hwo,
-    fun j => ⟨hcw j, fun h0 => hwn0 j (by rw [hcw j, h0, map_zero])⟩, hτ, ⟨s₀, hu⟩, ?_, hτl, ?_⟩
+  refine ⟨
+    π,
+    w,
+    c,
+    τ,
+    fun j => (v _).2,
+    hwo,
+    fun j => ⟨hcw j, fun h0 => hwn0 j (by rw [hcw j, h0, map_zero])⟩,
+    hτ,
+    ⟨s₀, hu⟩,
+    ?_,
+    hτl,
+    ?_
+  ⟩
   · intro i hi
     have e : algebraMap F K (c (τ i)) = algebraMap F K (nF i) := by
       rw [← hcw, hwn _ (hτl i hi), htpart i hi]

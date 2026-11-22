@@ -22,7 +22,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Dirichlet
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
@@ -177,10 +178,32 @@ lemma coprime_of_dvd {d : ℤ} {m M : ℕ} (h : IsCoprime d ((M : ℕ) : ℤ)) (
 
 end GlobalTheory.ZMVal
 
-
 open GlobalTheory.ZMVal in
-theorem _root_.GlobalTheory.zm_val_ne_zero : ∀ (e N l : ℕ) (χ θ : DirichletCharacter ℂ N) (ψ : DirichletCharacter ℂ l) (g : ℕ → ℂ) (α β : ℂ) (a₀ b₀ c₀ d₀ : ℤ), N * a₀ * d₀ - l * b₀ * c₀ = 1 → 1 ≤ e → 0 < N → l.Prime → ¬ l ∣ N → Prim (2 * e + 1) N χ⁻¹ (fun n => conj (g n)) → α + β = χ l * conj (g l) → α * β = χ l * (l : ℂ) ^ (2 * e) → α ≠ 0 → θ (-1) = (-1) ^ e * ψ (-1) → θ * χ⁻¹ ≠ 1 → ∀ (B : ℕ) (c : ℕ → ℂ), EigF (2 * e + 1) N l χ (fun q => χ q * conj (g q)) α B c → val B c l α 1 (Zs (2 * e + 1) l (ch θ) (hat ⇑(θ * χ⁻¹)) (fun x y => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e)) ≠ 0 → ∀ (B' : ℕ) (c' : ℕ → ℂ), (∀ a a', MF (2 * e + 1) (N * l) (ch χ⁻¹) a → MF (2 * e + 1) (N * l) (ch χ) a' → qs a' = slz (2 * e + 1) !![(N : ℤ) * a₀, b₀; N * l * c₀, N * d₀] (qs a) → lam B' c' a = lam B c a') → (∀ a, MF (2 * e + 1) (N * l) (ch χ⁻¹) a → lam B' c' (Uo l a) = χ⁻¹ l * α * lam B' c' a) → val B' c' l (χ⁻¹ l * α) 1 (Zm (2 * e + 1) l (hat θ) (ch (θ * χ⁻¹)) (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e)) ≠ 0 := by
-  intro e N l χ θ ψ g α β a₀ b₀ c₀ d₀ hdet he hN hl hlN hprim hsum hprod hα0 hpar hθχ B c hEig hval B' c' hAL hU'
+theorem _root_.GlobalTheory.zm_val_ne_zero
+    : ∀ (e N l : ℕ) (χ θ : DirichletCharacter ℂ N) (ψ : DirichletCharacter ℂ l) (g : ℕ → ℂ)
+        (α β : ℂ) (a₀ b₀ c₀ d₀ : ℤ),
+      N * a₀ * d₀ - l * b₀ * c₀ = 1 → 1 ≤ e → 0 < N → l.Prime → ¬ l ∣ N
+        → Prim (2 * e + 1) N χ⁻¹ (fun n => conj (g n)) → α + β = χ l * conj (g l)
+        → α * β = χ l * (l : ℂ) ^ (2 * e) → α ≠ 0 → θ (-1) = (-1) ^ e * ψ (-1) → θ * χ⁻¹ ≠ 1
+        → ∀ (B : ℕ) (c : ℕ → ℂ),
+          EigF (2 * e + 1) N l χ (fun q => χ q * conj (g q)) α B c
+            → val B c l α 1
+                (Zs (2 * e + 1) l (ch θ) (hat ⇑(θ * χ⁻¹))
+                  (fun x y => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e))
+              ≠ 0
+            → ∀ (B' : ℕ) (c' : ℕ → ℂ),
+              (∀ a a',
+                  MF (2 * e + 1) (N * l) (ch χ⁻¹) a → MF (2 * e + 1) (N * l) (ch χ) a'
+                    → qs a' = slz (2 * e + 1) !![(N : ℤ) * a₀, b₀; N * l * c₀, N * d₀] (qs a)
+                    → lam B' c' a = lam B c a')
+                → (∀ a,
+                  MF (2 * e + 1) (N * l) (ch χ⁻¹) a → lam B' c' (Uo l a) = χ⁻¹ l * α * lam B' c' a)
+                → val B' c' l (χ⁻¹ l * α) 1
+                    (Zm (2 * e + 1) l (hat θ) (ch (θ * χ⁻¹))
+                      (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e))
+                  ≠ 0 := by
+  intro e N l χ θ ψ g α β a₀ b₀ c₀ d₀ hdet he hN hl hlN hprim hsum hprod hα0 hpar hθχ B c hEig hval
+    B' c' hAL hU'
   haveI : Fact l.Prime := ⟨hl⟩
   have hl0 : 0 < l := hl.pos
   have hNl : 0 < N * l := Nat.mul_pos hN hl0
@@ -190,10 +213,13 @@ theorem _root_.GlobalTheory.zm_val_ne_zero : ∀ (e N l : ℕ) (χ θ : Dirichle
   have hψsq := sq_neg_one ψ
   set θ' := θ * χ⁻¹ with hθ'
   have chm : ∀ {M : ℕ} (φ : DirichletCharacter ℂ M), ch φ (-1) = φ (-1) := fun φ => by simp [ch]
-  have hper : ∀ {M : ℕ} (φ : DirichletCharacter ℂ M), M ∣ N * l → ∀ d : ℤ, ch φ (d + ((N * l : ℕ) : ℤ)) = ch φ d :=
-    fun φ h d => ch_per φ _ h d
+  have hper
+      : ∀ {M : ℕ} (φ : DirichletCharacter ℂ M),
+        M ∣ N * l → ∀ d : ℤ, ch φ (d + ((N * l : ℕ) : ℤ)) = ch φ d := fun φ h d =>
+    ch_per φ _ h d
   have hatch := (GlobalTheory.EisM.hat_char_props).1
-  have hatper : ∀ (φ : DirichletCharacter ℂ N) (x : ℤ), hat φ (x + ((N * l : ℕ) : ℤ)) = hat φ x := by
+  have hatper
+      : ∀ (φ : DirichletCharacter ℂ N) (x : ℤ), hat φ (x + ((N * l : ℕ) : ℤ)) = hat φ x := by
     intro φ x
     have hp : Function.Periodic (hat φ) (N : ℤ) := fun x => (hatch N φ hN).1 x
     have := hp.nat_mul l x
@@ -205,42 +231,67 @@ theorem _root_.GlobalTheory.zm_val_ne_zero : ∀ (e N l : ℕ) (χ θ : Dirichle
   have hθ'm : θ' (-1) = -((-1 : ℂ) ^ e * ψ (-1)) := by
     rw [hθ', MulChar.mul_apply, dc_inv_neg_one, hχm, hpar]; ring
 
-  obtain ⟨c1, hE1⟩ := GlobalTheory.T.eisenstein_periodic_weights_isModularForm e l N (ch ψ) (ch θ) (ch ψ) (ch θ) he hl0 hN
-    (ch_zero_of_dvd ψ hl 0 (dvd_zero _))
-    (fun x => ch_per ψ l dvd_rfl x) (fun x => ch_per θ N dvd_rfl x)
-    (fun d _ => ⟨fun x => by rw [ch_mul', mul_comm], fun x => by rw [ch_mul', mul_comm]⟩)
-    (by rw [chm, chm, hpar]; linear_combination ((-1 : ℂ) ^ e) * hψsq)
+  obtain ⟨c1, hE1⟩ :=
+    GlobalTheory.T.eisenstein_periodic_weights_isModularForm e l N (ch ψ) (ch θ) (ch ψ) (ch θ) he
+      hl0 hN (ch_zero_of_dvd ψ hl 0 (dvd_zero _))
+      (fun x => ch_per ψ l dvd_rfl x)
+      (fun x => ch_per θ N dvd_rfl x)
+      (fun d _ => ⟨fun x => by rw [ch_mul', mul_comm], fun x => by rw [ch_mul', mul_comm]⟩)
+      (by rw [chm, chm, hpar]; linear_combination ((-1 : ℂ) ^ e) * hψsq)
   rw [mul_comm l N] at hE1
-  obtain ⟨c2, hE2⟩ := GlobalTheory.T.eisenstein_periodic_weights_isModularForm (e + 1) (N * l) 1 (fun y => ch ψ⁻¹ y * hat θ' y) (fun _ => 1)
-    (fun d => ch ψ⁻¹ d * ch θ'⁻¹ d) (fun _ => 1) (by omega) hNl one_pos
-    (by rw [ch_zero_of_dvd ψ⁻¹ hl 0 (dvd_zero _), zero_mul])
-    (fun x => by rw [hper ψ⁻¹ hlNl, hatper]) (fun x => rfl)
-    (fun d hd => ⟨fun x => by
-        rw [ch_mul', (hatch N θ' hN).2.1 d x (coprime_of_dvd hd (dvd_mul_of_dvd_left hNNl 1))]; ring,
-      fun x => by simp⟩)
-    (by simp only [chm, dc_inv_neg_one, hθ'm]; linear_combination (-(-1 : ℂ) ^ e) * hψsq)
+  obtain ⟨c2, hE2⟩ :=
+    GlobalTheory.T.eisenstein_periodic_weights_isModularForm (e + 1) (N * l) 1
+      (fun y => ch ψ⁻¹ y * hat θ' y)
+      (fun _ => 1)
+      (fun d => ch ψ⁻¹ d * ch θ'⁻¹ d)
+      (fun _ => 1)
+      (by omega) hNl one_pos (by rw [ch_zero_of_dvd ψ⁻¹ hl 0 (dvd_zero _), zero_mul])
+      (fun x => by rw [hper ψ⁻¹ hlNl, hatper])
+      (fun x => rfl)
+      (fun d hd => ⟨
+        fun x => by
+          rw [ch_mul', (hatch N θ' hN).2.1 d x (coprime_of_dvd hd (dvd_mul_of_dvd_left hNNl 1))]
+          ring,
+        fun x => by simp
+      ⟩)
+      (by simp only [chm, dc_inv_neg_one, hθ'm]; linear_combination (-(-1 : ℂ) ^ e) * hψsq)
   simp only [mul_one] at hE2
-  obtain ⟨c3, hF1⟩ := GlobalTheory.T.eisenstein_periodic_weights_isModularForm e (N * l) 1 (fun y => ch ψ y * hat θ y) (fun _ => 1)
-    (fun d => ch ψ d * ch θ⁻¹ d) (fun _ => 1) he hNl one_pos
-    (by rw [ch_zero_of_dvd ψ hl 0 (dvd_zero _), zero_mul])
-    (fun x => by rw [hper ψ hlNl, hatper]) (fun x => rfl)
-    (fun d hd => ⟨fun x => by
-        rw [ch_mul', (hatch N θ hN).2.1 d x (coprime_of_dvd hd (dvd_mul_of_dvd_left hNNl 1))]; ring,
-      fun x => by simp⟩)
-    (by simp only [chm, dc_inv_neg_one, hpar]; linear_combination ((-1 : ℂ) ^ e) * hψsq)
+  obtain ⟨c3, hF1⟩ :=
+    GlobalTheory.T.eisenstein_periodic_weights_isModularForm e (N * l) 1
+      (fun y => ch ψ y * hat θ y)
+      (fun _ => 1)
+      (fun d => ch ψ d * ch θ⁻¹ d)
+      (fun _ => 1)
+      he hNl one_pos (by rw [ch_zero_of_dvd ψ hl 0 (dvd_zero _), zero_mul])
+      (fun x => by rw [hper ψ hlNl, hatper])
+      (fun x => rfl)
+      (fun d hd => ⟨
+        fun x => by
+          rw [ch_mul', (hatch N θ hN).2.1 d x (coprime_of_dvd hd (dvd_mul_of_dvd_left hNNl 1))]
+          ring,
+        fun x => by simp
+      ⟩)
+      (by simp only [chm, dc_inv_neg_one, hpar]; linear_combination ((-1 : ℂ) ^ e) * hψsq)
   simp only [mul_one] at hF1
-  obtain ⟨c4, hF2⟩ := GlobalTheory.T.eisenstein_periodic_weights_isModularForm (e + 1) l N (ch ψ⁻¹) (ch θ') (ch ψ⁻¹) (ch θ') (by omega) hl0 hN
-    (ch_zero_of_dvd ψ⁻¹ hl 0 (dvd_zero _))
-    (fun x => ch_per ψ⁻¹ l dvd_rfl x) (fun x => ch_per θ' N dvd_rfl x)
-    (fun d _ => ⟨fun x => by rw [ch_mul', mul_comm], fun x => by rw [ch_mul', mul_comm]⟩)
-    (by rw [chm, chm, dc_inv_neg_one, hθ'm]; linear_combination (-(-1 : ℂ) ^ e) * hψsq)
+  obtain ⟨c4, hF2⟩ :=
+    GlobalTheory.T.eisenstein_periodic_weights_isModularForm (e + 1) l N (ch ψ⁻¹) (ch θ') (ch ψ⁻¹)
+      (ch θ') (by omega) hl0 hN (ch_zero_of_dvd ψ⁻¹ hl 0 (dvd_zero _))
+      (fun x => ch_per ψ⁻¹ l dvd_rfl x)
+      (fun x => ch_per θ' N dvd_rfl x)
+      (fun d _ => ⟨fun x => by rw [ch_mul', mul_comm], fun x => by rw [ch_mul', mul_comm]⟩)
+      (by rw [chm, chm, dc_inv_neg_one, hθ'm]; linear_combination (-(-1 : ℂ) ^ e) * hψsq)
   rw [mul_comm l N] at hF2
 
-  obtain ⟨κ1, hκ1, hW1⟩ := GlobalTheory.T.exists_ne_zero_slz_qs_eis_eq_smul e N l ψ θ c1 c3 a₀ b₀ c₀ d₀ hdet he hN hl hlN hE1 hF1
-  obtain ⟨κ2, hκ2, hW2⟩ := GlobalTheory.T.exists_ne_zero_slz_qs_eis_eq_smul (e + 1) N l ψ⁻¹ θ' c4 c2 a₀ b₀ c₀ d₀ hdet (by omega) hN hl hlN hF2 hE2
+  obtain ⟨κ1, hκ1, hW1⟩ :=
+    GlobalTheory.T.exists_ne_zero_slz_qs_eis_eq_smul e N l ψ θ c1 c3 a₀ b₀ c₀ d₀ hdet he hN hl hlN
+      hE1 hF1
+  obtain ⟨κ2, hκ2, hW2⟩ :=
+    GlobalTheory.T.exists_ne_zero_slz_qs_eis_eq_smul (e + 1) N l ψ⁻¹ θ' c4 c2 a₀ b₀ c₀ d₀ hdet
+      (by omega) hN hl hlN hF2 hE2
   set W : M2 := !![(N : ℤ) * a₀, b₀; N * l * c₀, N * d₀] with hW
   have hWd : W.det = N := by rw [hW, Matrix.det_fin_two_of]; linear_combination (N : ℤ) * hdet
-  obtain ⟨d, hd, hWW⟩ := slashIntMatrixPosDet_atkinLehner_twice e N l a₀ b₀ c₀ d₀ hdet he hN _ _ hE1.2
+  obtain ⟨d, hd, hWW⟩ :=
+    slashIntMatrixPosDet_atkinLehner_twice e N l a₀ b₀ c₀ d₀ hdet he hN _ _ hE1.2
   set E1 := eis e c1 (ch ψ) (ch θ) with hE1d
   set E2 := eis (e + 1) c2 (fun y => ch ψ⁻¹ y * hat θ' y) (fun _ => 1) with hE2d
   set F1 := eis e c3 (fun y => ch ψ y * hat θ y) (fun _ => 1) with hF1d
@@ -257,74 +308,126 @@ theorem _root_.GlobalTheory.zm_val_ne_zero : ∀ (e N l : ℕ) (χ θ : Dirichle
   have hk : 2 * e + 1 = e + (e + 1) := by ring
   have hX : MF (2 * e + 1) (N * l) (ch χ) X := by
     rw [hk]
-    refine (GlobalTheory.EisM.mf_linear _ _ _).2.2.2.1 _ _ (fun x hx => ?_) (hmf e (e + 1) (N * l) _ _ E1 E2 hE1 hE2)
+    refine (GlobalTheory.EisM.mf_linear _ _ _).2.2.2.1 _ _
+      (fun x hx => ?_)
+      (hmf e (e + 1) (N * l) _ _ E1 E2 hE1 hE2)
     have h1 := ch_mul_inv ψ x (coprime_right (a := N) x hx)
     have h2 := ch_mul_inv θ x (coprime_left (b := l) x hx)
-    rw [hθ'inv]; linear_combination (ch θ x * ch θ⁻¹ x * ch χ x) * h1 + ch χ x * h2
+    rw [hθ'inv]
+    linear_combination (ch θ x * ch θ⁻¹ x * ch χ x) * h1 + ch χ x * h2
   have hXm : MF (2 * e + 1) (N * l) (ch χ⁻¹) Xm := by
     rw [hk]
-    refine (GlobalTheory.EisM.mf_linear _ _ _).2.2.2.1 _ _ (fun x hx => ?_) (hmf e (e + 1) (N * l) _ _ F1 F2 hF1 hF2)
+    refine (GlobalTheory.EisM.mf_linear _ _ _).2.2.2.1 _ _
+      (fun x hx => ?_)
+      (hmf e (e + 1) (N * l) _ _ F1 F2 hF1 hF2)
     have h1 := ch_mul_inv ψ x (coprime_right (a := N) x hx)
     have h2 := ch_mul_inv θ x (coprime_left (b := l) x hx)
-    rw [hθ'v]; linear_combination (ch θ x * ch θ⁻¹ x * ch χ⁻¹ x) * h1 + ch χ⁻¹ x * h2
+    rw [hθ'v]
+    linear_combination (ch θ x * ch θ⁻¹ x * ch χ⁻¹ x) * h1 + ch χ⁻¹ x * h2
   set K : ℂ := ((N : ℤ) : ℂ) * (κ1⁻¹ * K0) * κ2 with hK
-  have ha' : MF (2 * e + 1) (N * l) (ch χ) (K • X) := ((GlobalTheory.EisM.mf_linear _ _ _).2.2.1 K X hX).1
+  have ha' : MF (2 * e + 1) (N * l) (ch χ) (K • X) :=
+    ((GlobalTheory.EisM.mf_linear _ _ _).2.2.1 K X hX).1
   have hqs : qs (K • X) = slz (2 * e + 1) W (qs Xm) := by
     rw [((GlobalTheory.EisM.mf_linear _ _ _).2.2.1 K X hX).2, hXd, hXmd, (hmul E1 E2 hE1.1 hE2.1).2,
-      (hmul F1 F2 hF1.1 hF2.1).2, hk, slz_mul' e (e + 1) he (by omega) W (qs F1) (qs F2), hF1W, hW2, hWd]
-    funext τ; simp only [Pi.smul_apply, smul_eq_mul]; ring
+      (hmul F1 F2 hF1.1 hF2.1).2, hk, slz_mul' e (e + 1) he (by omega) W (qs F1) (qs F2), hF1W, hW2,
+      hWd]
+    funext τ
+    simp only [Pi.smul_apply, smul_eq_mul]
+    ring
   have hAL' := hAL Xm (K • X) hXm ha' hqs
 
-  have hpE1 : ∀ x, (fun d => ch ψ d * ch θ d) (x + ((N * l : ℕ) : ℤ)) = (fun d => ch ψ d * ch θ d) x := fun x => by
+  have hpE1
+      : ∀ x,
+        (fun d => ch ψ d * ch θ d) (x + ((N * l : ℕ) : ℤ))
+          = (fun d => ch ψ d * ch θ d) x := fun x => by
     simp only; rw [hper ψ hlNl, hper θ hNNl]
 
-  have UE1 : Uo l E1 = (ch θ l) • E1 := U_eis_eq _ c1 (ch θ l) (ch ψ) (ch θ) he hNl hl hlNl hpE1 hE1
-      (fun x hx => ch_zero_of_dvd ψ hl x hx) (fun y => ch_mul' θ l y)
-  have UnitaryRankTwoFlags : Uo l E2 = (1 : ℂ) • E2 := U_eis_eq (fun d => ch ψ⁻¹ d * ch θ'⁻¹ d) c2 1 (fun y => ch ψ⁻¹ y * hat θ' y) (fun _ => 1) (by omega) hNl hl hlNl
-      (fun x => by simp only [hper ψ⁻¹ hlNl, hper θ'⁻¹ hNNl]) hE2
-      (fun x hx => by simp only [ch_zero_of_dvd ψ⁻¹ hl x hx, zero_mul]) (fun y => by simp)
-  have UF1 : Uo l F1 = (1 : ℂ) • F1 := U_eis_eq (fun d => ch ψ d * ch θ⁻¹ d) c3 1 (fun y => ch ψ y * hat θ y) (fun _ => 1) he hNl hl hlNl
-      (fun x => by simp only [hper ψ hlNl, hper θ⁻¹ hNNl]) hF1
-      (fun x hx => by simp only [ch_zero_of_dvd ψ hl x hx, zero_mul]) (fun y => by simp)
-  have UF2 : Uo l F2 = (ch θ' l) • F2 := U_eis_eq (fun d => ch ψ⁻¹ d * ch θ' d) c4 (ch θ' l) (ch ψ⁻¹) (ch θ') (by omega) hNl hl hlNl
-      (fun x => by simp only [hper ψ⁻¹ hlNl, hper θ' hNNl]) hF2
-      (fun x hx => ch_zero_of_dvd ψ⁻¹ hl x hx) (fun y => ch_mul' θ' l y)
+  have UE1 : Uo l E1 = (ch θ l) • E1 :=
+    U_eis_eq _ c1 (ch θ l) (ch ψ) (ch θ) he hNl hl hlNl hpE1 hE1
+      (fun x hx => ch_zero_of_dvd ψ hl x hx)
+      (fun y => ch_mul' θ l y)
+  have UnitaryRankTwoFlags : Uo l E2 = (1 : ℂ) • E2 :=
+    U_eis_eq
+      (fun d => ch ψ⁻¹ d * ch θ'⁻¹ d)
+      c2 1
+      (fun y => ch ψ⁻¹ y * hat θ' y)
+      (fun _ => 1)
+      (by omega) hNl hl hlNl
+      (fun x => by simp only [hper ψ⁻¹ hlNl, hper θ'⁻¹ hNNl])
+      hE2
+      (fun x hx => by simp only [ch_zero_of_dvd ψ⁻¹ hl x hx, zero_mul])
+      (fun y => by simp)
+  have UF1 : Uo l F1 = (1 : ℂ) • F1 :=
+    U_eis_eq
+      (fun d => ch ψ d * ch θ⁻¹ d)
+      c3 1
+      (fun y => ch ψ y * hat θ y)
+      (fun _ => 1)
+      he hNl hl hlNl
+      (fun x => by simp only [hper ψ hlNl, hper θ⁻¹ hNNl])
+      hF1
+      (fun x hx => by simp only [ch_zero_of_dvd ψ hl x hx, zero_mul])
+      (fun y => by simp)
+  have UF2 : Uo l F2 = (ch θ' l) • F2 :=
+    U_eis_eq
+      (fun d => ch ψ⁻¹ d * ch θ' d)
+      c4 (ch θ' l) (ch ψ⁻¹) (ch θ') (by omega) hNl hl hlNl
+      (fun x => by simp only [hper ψ⁻¹ hlNl, hper θ' hNNl])
+      hF2
+      (fun x hx => ch_zero_of_dvd ψ⁻¹ hl x hx)
+      (fun y => ch_mul' θ' l y)
   have hfor := GlobalTheory.EisM.formal_identities ℂ l hl0
-  have hFF : (fun x y : ℕ => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e) =
-      fun x y : ℕ => ch ψ x * ch ψ⁻¹ y * ((y : ℂ) / x) ^ e := by
+  have hFF
+      : (fun x y : ℕ => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e)
+        = fun x y : ℕ => ch ψ x * ch ψ⁻¹ y * ((y : ℂ) / x) ^ e := by
     funext x y; simp [ch]
 
-  have hZs : Zs (2 * e + 1) l (ch θ) (hat θ') (fun x y => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e) =
-      mul (dep l E1) (dep l E2) := by
-    have := GlobalTheory.zs_eq_mul_dep_eis (2 * e + 1) l e (ch θ) (hat θ') (ch ψ) (ch ψ⁻¹) c1 c2 (by omega)
+  have hZs
+      : Zs (2 * e + 1) l (ch θ) (hat θ') (fun x y => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e)
+        = mul (dep l E1) (dep l E2) := by
+    have :=
+      GlobalTheory.zs_eq_mul_dep_eis (2 * e + 1) l e (ch θ) (hat θ') (ch ψ) (ch ψ⁻¹) c1 c2
+        (by omega)
     rw [show 2 * e + 1 - 1 - e = e by omega] at this
     rw [hFF, this]
   simp only [val, pow_one, Function.iterate_one] at hval
-  rw [hZs, (hfor.2.1 E1 E2), UE1, UnitaryRankTwoFlags, mul_smul_smul, lam_sub_smul, hEig.U _ hX] at hval
+  rw [hZs, (hfor.2.1 E1 E2), UE1, UnitaryRankTwoFlags, mul_smul_smul, lam_sub_smul, hEig.U _ hX]
+    at hval
 
-  have hZm : Zm (2 * e + 1) l (hat θ) (ch θ') (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e) =
-      mul (dep l F1) (dep l F2) := by
-    have := GlobalTheory.T.eisensteinProductSeries_eq_depleted_eisenstein_product (2 * e + 1) l e (hat θ) (ch θ') (ch ψ) (ch ψ⁻¹) c3 c4 (by omega)
+  have hZm
+      : Zm (2 * e + 1) l (hat θ) (ch θ') (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e)
+        = mul (dep l F1) (dep l F2) := by
+    have :=
+      GlobalTheory.T.eisensteinProductSeries_eq_depleted_eisenstein_product (2 * e + 1) l e (hat θ)
+        (ch θ') (ch ψ) (ch ψ⁻¹) c3 c4 (by omega)
     rw [show 2 * e + 1 - 1 - e = e by omega,
-      show (fun x => hat θ x * ch ψ x) = fun x => ch ψ x * hat θ x from funext fun x => mul_comm _ _] at this
+        show (fun x => hat θ x * ch ψ x) = fun x => ch ψ x * hat θ x from
+          funext fun x => mul_comm _ _]
+      at this
     rw [hFF, this]
   simp only [val, pow_one, Function.iterate_one]
   rw [hZm, (hfor.2.1 F1 F2), UF1, UF2, mul_smul_smul, lam_sub_smul, hU' _ hXm, hAL', lam_smul]
 
   have hcl : χ⁻¹ (l : ZMod N) = ch χ⁻¹ l := by simp [ch]
-  have hlc : IsCoprime (l : ℤ) (N : ℤ) := Nat.isCoprime_iff_coprime.2 ((Nat.Prime.coprime_iff_not_dvd hl).2 hlN)
+  have hlc : IsCoprime (l : ℤ) (N : ℤ) :=
+    Nat.isCoprime_iff_coprime.2 ((Nat.Prime.coprime_iff_not_dvd hl).2 hlN)
   have hχl : ch χ⁻¹ l ≠ 0 := ch_ne_zero _ _ hlc
   have hKne : K ≠ 0 := by
     have hN0 : (N : ℂ) ≠ 0 := by exact_mod_cast hN.ne'
     have h1 := ch_ne_zero ψ d (coprime_right (a := N) d hd)
     have h2 := ch_ne_zero θ d (coprime_left (b := l) d hd)
-    rw [hK, hK0]; push_cast
-    exact mul_ne_zero (mul_ne_zero hN0 (mul_ne_zero (inv_ne_zero hκ1)
-      (mul_ne_zero (div_ne_zero (pow_ne_zero _ hN0) (pow_ne_zero _ hN0)) (mul_ne_zero h1 h2)))) hκ2
-  have hv : (α - ch θ l) * lam B c X ≠ 0 := by
-    intro h; apply hval; linear_combination α⁻¹ * h
+    rw [hK, hK0]
+    push_cast
+    exact mul_ne_zero
+      (mul_ne_zero hN0
+        (mul_ne_zero (inv_ne_zero hκ1)
+          (mul_ne_zero (div_ne_zero (pow_ne_zero _ hN0) (pow_ne_zero _ hN0)) (mul_ne_zero h1 h2))))
+      hκ2
+  have hv : (α - ch θ l) * lam B c X ≠ 0 := by intro h; apply hval; linear_combination α⁻¹ * h
   rw [hcl, hθ'v]
-  have : (ch χ⁻¹ l * α)⁻¹ * (ch χ⁻¹ l * α * (K * lam B c X) - 1 * (ch θ l * ch χ⁻¹ l) * (K * lam B c X)) =
-      (ch χ⁻¹ l * α)⁻¹ * (ch χ⁻¹ l * K * ((α - ch θ l) * lam B c X)) := by ring
+  have : (ch χ⁻¹ l * α)⁻¹
+        * (ch χ⁻¹ l * α * (K * lam B c X) - 1 * (ch θ l * ch χ⁻¹ l) * (K * lam B c X))
+      = (ch χ⁻¹ l * α)⁻¹ * (ch χ⁻¹ l * K * ((α - ch θ l) * lam B c X)) := by
+    ring
   rw [this]
   exact mul_ne_zero (inv_ne_zero (mul_ne_zero hχl hα0)) (mul_ne_zero (mul_ne_zero hχl hKne) hv)

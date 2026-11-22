@@ -5,13 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverC
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.Et GlobalTheory.GalV UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.Et GlobalTheory.GalV
+  UpperTheory.Gal.G3
 universe u v
 
-private theorem sq_bc {T Y S B : Scheme.{0}} (s : T ⟶ Y) (p : Y ⟶ S) (c : B ⟶ S) :
-    IsPullback (pullback.fst (s ≫ p) c)
+private theorem sq_bc {T Y S B : Scheme.{0}} (s : T ⟶ Y) (p : Y ⟶ S) (c : B ⟶ S)
+    : IsPullback (pullback.fst (s ≫ p) c)
       (pullback.lift (pullback.fst (s ≫ p) c ≫ s) (pullback.snd (s ≫ p) c)
-        (by rw [Category.assoc, pullback.condition]) : pullback (s ≫ p) c ⟶ pullback p c)
+          (by rw [Category.assoc, pullback.condition])
+        : pullback (s ≫ p) c ⟶ pullback p c)
       s (pullback.fst p c) := by
   refine IsPullback.of_bot (v₂₁ := pullback.snd p c) (v₂₂ := p) (h₃₁ := c) ?_ ?_
     (IsPullback.of_hasPullback p c)
@@ -19,8 +21,8 @@ private theorem sq_bc {T Y S B : Scheme.{0}} (s : T ⟶ Y) (p : Y ⟶ S) (c : B 
     exact IsPullback.of_hasPullback (s ≫ p) c
   · rw [pullback.lift_fst]
 
-theorem UpperTheory.Gal.G3.jLowNice :
-    FEtBasic → PositivityTheory.AutomorphicGaloisHodgeTate.G8.LowNice := by
+theorem UpperTheory.Gal.G3.jLowNice
+    : FEtBasic → PositivityTheory.AutomorphicGaloisHodgeTate.G8.LowNice := by
   intro hb k L _ _ H θ O _ _ C D
   haveI : Smooth C.p := C.smooth
   refine ⟨?_, ?_, ?_⟩

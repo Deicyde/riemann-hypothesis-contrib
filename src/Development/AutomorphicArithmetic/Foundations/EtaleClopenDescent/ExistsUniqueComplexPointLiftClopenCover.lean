@@ -6,10 +6,14 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OmegaP
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR KaehlerDifferential GlobalTheory.W1
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.HodgeCoh GlobalTheory.CechDR KaehlerDifferential GlobalTheory.W1
 
-theorem UpperTheory.Cb.existsUnique_complexPoint_lift_clopen_cover :
-    ∀ (Y : Scheme.{0}) (s' : Y ⟶ Sp ℂ) (M : Type) [Fintype M] (W : M → Y.Opens), (∀ i j, i ≠ j → W i ⊓ W j = ⊥) → iSup W = ⊤ → ∀ y : CxPts s' (RingHom.id ℂ), ∃! m : M, ∃! y' : CxPts ((W m).ι ≫ s') (RingHom.id ℂ), y'.1 ≫ (W m).ι = y.1 := by
+theorem UpperTheory.Cb.existsUnique_complexPoint_lift_clopen_cover
+    : ∀ (Y : Scheme.{0}) (s' : Y ⟶ Sp ℂ) (M : Type) [Fintype M] (W : M → Y.Opens),
+      (∀ i j, i ≠ j → W i ⊓ W j = ⊥) → iSup W = ⊤
+        → ∀ y : CxPts s' (RingHom.id ℂ),
+          ∃! m : M, ∃! y' : CxPts ((W m).ι ≫ s') (RingHom.id ℂ), y'.1 ≫ (W m).ι = y.1 := by
   intro Y s' M _ W hd hc y
   let x0 : (Sp ℂ : Scheme.{0}) := IsLocalRing.closedPoint ℂ
   have hone : ∀ a : (Sp ℂ : Scheme.{0}), a = x0 := fun a => Subsingleton.elim a x0

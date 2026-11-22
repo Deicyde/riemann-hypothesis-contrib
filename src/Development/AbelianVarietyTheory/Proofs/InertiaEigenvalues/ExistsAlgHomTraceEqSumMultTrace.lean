@@ -8,9 +8,9 @@ namespace GlobalTheory
 
 open Matrix
 
-noncomputable def blockDiagMultAlgHom (k : Type) [Field k] (N : ℕ) (n m : Fin N → ℕ) :
-    (Π i, Matrix (Fin (n i)) (Fin (n i)) k) →ₐ[k]
-      Matrix (Σ j : (Σ i, Fin (m i)), Fin (n j.1)) (Σ j : (Σ i, Fin (m i)), Fin (n j.1)) k where
+noncomputable def blockDiagMultAlgHom (k : Type) [Field k] (N : ℕ) (n m : Fin N → ℕ)
+    : (Π i, Matrix (Fin (n i)) (Fin (n i)) k) →ₐ[k]
+        Matrix (Σ j : (Σ i, Fin (m i)), Fin (n j.1)) (Σ j : (Σ i, Fin (m i)), Fin (n j.1)) k where
   toFun x := blockDiagonal' (fun j : (Σ i, Fin (m i)) => x j.1)
   map_one' := by
     show blockDiagonal' (fun j : (Σ i, Fin (m i)) => (1 : Matrix (Fin (n j.1)) (Fin (n j.1)) k)) = 1
@@ -28,22 +28,26 @@ noncomputable def blockDiagMultAlgHom (k : Type) [Field k] (N : ℕ) (n m : Fin 
     simp only [Algebra.algebraMap_eq_smul_one]
     simp only [Pi.smul_apply, Pi.one_apply]
     rw [show (fun j : (Σ i, Fin (m i)) => r • (1 : Matrix (Fin (n j.1)) (Fin (n j.1)) k))
-        = r • (fun j => 1) from rfl, blockDiagonal'_smul]
+          = r • (fun j => 1) from
+        rfl,
+      blockDiagonal'_smul]
     congr 1
     exact blockDiagonal'_one
 
-theorem blockDiagMultAlgHom_trace (k : Type) [Field k] (N : ℕ) (n m : Fin N → ℕ)
-    (x : Π i, Matrix (Fin (n i)) (Fin (n i)) k) :
-    (blockDiagMultAlgHom k N n m x).trace = ∑ i, (m i : k) * (x i).trace := by
+theorem blockDiagMultAlgHom_trace
+    (k : Type) [Field k] (N : ℕ) (n m : Fin N → ℕ) (x : Π i, Matrix (Fin (n i)) (Fin (n i)) k)
+    : (blockDiagMultAlgHom k N n m x).trace = ∑ i, (m i : k) * (x i).trace := by
   show (blockDiagonal' (fun j : (Σ i, Fin (m i)) => x j.1)).trace = _
   rw [trace_blockDiagonal', Fintype.sum_sigma]
   refine Finset.sum_congr rfl fun i _ => ?_
   show ∑ _y : Fin (m i), (x i).trace = _
   rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
 
-theorem exists_algHom_trace_eq_sum_mult_trace : ∀ (k : Type) [Field k] (N : ℕ) (n m : Fin N → ℕ) (d : ℕ),
-    ∑ i, m i * n i = d → ∃ ρ : (Π i, Matrix (Fin (n i)) (Fin (n i)) k) →ₐ[k] Matrix (Fin d) (Fin d) k,
-      ∀ x, (ρ x).trace = ∑ i, (m i : k) * (x i).trace := by
+theorem exists_algHom_trace_eq_sum_mult_trace
+    : ∀ (k : Type) [Field k] (N : ℕ) (n m : Fin N → ℕ) (d : ℕ),
+      ∑ i, m i * n i = d
+        → ∃ ρ : (Π i, Matrix (Fin (n i)) (Fin (n i)) k) →ₐ[k] Matrix (Fin d) (Fin d) k, ∀ x,
+          (ρ x).trace = ∑ i, (m i : k) * (x i).trace := by
   intro k _ N n m d hd
   have hcard : Fintype.card (Σ j : (Σ i, Fin (m i)), Fin (n j.1)) = d := by
     rw [Fintype.card_sigma, Fintype.sum_sigma, ← hd]

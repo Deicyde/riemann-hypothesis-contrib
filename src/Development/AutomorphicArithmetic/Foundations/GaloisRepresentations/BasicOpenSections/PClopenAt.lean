@@ -36,7 +36,8 @@ private lemma clopen_basicOpen {X : Scheme.{0}} {e : Γ(X, ⊤)} (he : IsIdempot
   rw [hc]
   exact (X.basicOpen (1 - e)).isOpen.isClosed_compl
 
-private noncomputable def rho {κ : Type} [Field κ] {W : Scheme.{0}} (z : gp κ ⟶ W) : Γ(W, ⊤) →+* κ :=
+private noncomputable def rho {κ : Type} [Field κ] {W : Scheme.{0}} (z : gp κ ⟶ W)
+    : Γ(W, ⊤) →+* κ :=
   (z.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of κ)).hom).hom
 
 private lemma mem_basicOpen_iff {κ : Type} [Field κ] {W : Scheme.{0}} (z : gp κ ⟶ W) (e : Γ(W, ⊤)) :
@@ -67,28 +68,31 @@ private lemma rho_comp (V : Type) [CommRing V] [IsLocalRing V] {W : Scheme.{0}}
   have h2 := congrArg CommRingCat.Hom.hom key
   exact h2
 
-theorem UpperTheory.Gal.Mod.clopenAt :
-    ResClosed → HensSplit → ClopenAt := by
+theorem UpperTheory.Gal.Mod.clopenAt : ResClosed → HensSplit → ClopenAt := by
   intro _ hHS V _ _ _ _ W g _ z₀ hz₀
   haveI : IsAffine W := isAffine_of_isAffineHom g
   set φ : V →+* Γ(W, ⊤) := ((Scheme.ΓSpecIso (CommRingCat.of V)).inv ≫ g.appTop).hom with hφ
   have hfin : φ.Finite := by
     have h1 := g.finite_appTop
     have h2 : (Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom.Finite :=
-      RingHom.Finite.of_surjective _ (fun a => ⟨(Scheme.ΓSpecIso (CommRingCat.of V)).hom a, by simp⟩)
+      RingHom.Finite.of_surjective _
+        (fun a => ⟨(Scheme.ΓSpecIso (CommRingCat.of V)).hom a, by simp⟩)
     exact h1.comp h2
   letI : Algebra V Γ(W, ⊤) := φ.toAlgebra
   haveI : Module.Finite V Γ(W, ⊤) := hfin
-  have hc : ∀ z : gp (IsLocalRing.ResidueField V) ⟶ W, z ≫ g = resPt V →
-      ∀ v : V, rho z (φ v) = IsLocalRing.residue V v := by
+  have hc
+      : ∀ z : gp (IsLocalRing.ResidueField V) ⟶ W,
+        z ≫ g = resPt V → ∀ v : V, rho z (φ v) = IsLocalRing.residue V v := by
     intro z hz v
     exact RingHom.congr_fun (rho_comp V g z hz) v
-  have hsurj : ∀ z : gp (IsLocalRing.ResidueField V) ⟶ W, z ≫ g = resPt V →
-      Function.Surjective (rho z) := by
+  have hsurj
+      : ∀ z : gp (IsLocalRing.ResidueField V) ⟶ W,
+        z ≫ g = resPt V → Function.Surjective (rho z) := by
     intro z hz r
     obtain ⟨v, hv⟩ := IsLocalRing.residue_surjective r
     exact ⟨φ v, by rw [hc z hz v, hv]⟩
-  have hmax : (RingHom.ker (rho z₀)).IsMaximal := RingHom.ker_isMaximal_of_surjective _ (hsurj z₀ hz₀)
+  have hmax : (RingHom.ker (rho z₀)).IsMaximal :=
+    RingHom.ker_isMaximal_of_surjective _ (hsurj z₀ hz₀)
   obtain ⟨e, he, hem, hoth⟩ := hHS V Γ(W, ⊤) (RingHom.ker (rho z₀)) hmax
   refine ⟨W.basicOpen e, clopen_basicOpen he, ?_⟩
   intro z hz
@@ -97,8 +101,8 @@ theorem UpperTheory.Gal.Mod.clopenAt :
   · intro hne
     have hk : RingHom.ker (rho z) = RingHom.ker (rho z₀) := by
       by_contra hk
-      exact hne (RingHom.mem_ker.mp
-        (hoth _ (RingHom.ker_isMaximal_of_surjective _ (hsurj z hz)) hk))
+      exact hne (RingHom.mem_ker.mp (hoth _ (RingHom.ker_isMaximal_of_surjective _ (hsurj z hz))
+        hk))
     apply rho_inj
     ext a
     obtain ⟨v, hv⟩ := IsLocalRing.residue_surjective (rho z₀ a)

@@ -14,7 +14,8 @@ section
 
 variable {K : Type} [Field K] {n : ℕ}
 
-def cmonoE (p q : Fin n) (y : K) : Matrix (Fin n) (Fin n) K := fun a b => if a = p ∧ b = q then y else 0
+def cmonoE (p q : Fin n) (y : K) : Matrix (Fin n) (Fin n) K := fun a b =>
+  if a = p ∧ b = q then y else 0
 
 theorem cmono_strict (p q : Fin n) (y : K) (h : p < q) : StrictUp (cmonoE p q y) := by
   intro a b hab
@@ -23,7 +24,8 @@ theorem cmono_strict (p q : Fin n) (y : K) (h : p < q) : StrictUp (cmonoE p q y)
   rintro ⟨rfl, rfl⟩
   exact absurd h (not_lt.2 hab)
 
-theorem cmono_supSum_succ (p q : Fin n) (y : K) (h : q.val = p.val + 1) : supSum (cmonoE p q y) = y := by
+theorem cmono_supSum_succ (p q : Fin n) (y : K) (h : q.val = p.val + 1)
+    : supSum (cmonoE p q y) = y := by
   unfold supSum
   rw [Finset.sum_eq_single p]
   · have hp : p.val + 1 < n := h ▸ q.isLt
@@ -38,7 +40,8 @@ theorem cmono_supSum_succ (p q : Fin n) (y : K) (h : q.val = p.val + 1) : supSum
   · intro hh
     exact absurd (Finset.mem_univ p) hh
 
-theorem cmono_supSum_ne (p q : Fin n) (y : K) (h : q.val ≠ p.val + 1) : supSum (cmonoE p q y) = 0 := by
+theorem cmono_supSum_ne (p q : Fin n) (y : K) (h : q.val ≠ p.val + 1)
+    : supSum (cmonoE p q y) = 0 := by
   unfold supSum
   refine Finset.sum_eq_zero (fun a _ => ?_)
   split_ifs with h1
@@ -48,9 +51,11 @@ theorem cmono_supSum_ne (p q : Fin n) (y : K) (h : q.val ≠ p.val + 1) : supSum
     exact h (by rw [← h2])
   · rfl
 
-theorem cmono_left [StarRing K] (σ : Fin n → Fin n) (t : Fin n → K) (hσ : Function.Injective σ) (b : Fin n) (q : Fin n)
-    (y : K) (i j : Fin n) :
-    ((cmonoE (σ b) q y)ᴴ * mono σ t) i j = if i = q ∧ j = b then star y * t b else 0 := by
+theorem cmono_left
+    [StarRing K]
+    (σ : Fin n → Fin n)
+    (t : Fin n → K) (hσ : Function.Injective σ) (b : Fin n) (q : Fin n) (y : K) (i j : Fin n)
+    : ((cmonoE (σ b) q y)ᴴ * mono σ t) i j = if i = q ∧ j = b then star y * t b else 0 := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (σ j)]
   · simp only [Matrix.conjTranspose_apply, cmonoE, mono, if_true]
     by_cases h1 : i = q ∧ j = b
@@ -65,8 +70,8 @@ theorem cmono_left [StarRing K] (σ : Fin n → Fin n) (t : Fin n → K) (hσ : 
   · intro hh
     exact absurd (Finset.mem_univ _) hh
 
-theorem cmono_right (σ : Fin n → Fin n) (t : Fin n → K) (c b : Fin n) (x : K) (i j : Fin n) :
-    (mono σ t * cmonoE c b x) i j = if i = σ c ∧ j = b then t c * x else 0 := by
+theorem cmono_right (σ : Fin n → Fin n) (t : Fin n → K) (c b : Fin n) (x : K) (i j : Fin n)
+    : (mono σ t * cmonoE c b x) i j = if i = σ c ∧ j = b then t c * x else 0 := by
   rw [Matrix.mul_apply, Finset.sum_eq_single c]
   · simp only [cmonoE, mono, true_and]
     by_cases h1 : i = σ c

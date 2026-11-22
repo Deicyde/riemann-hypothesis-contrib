@@ -11,14 +11,16 @@ noncomputable section
 
 namespace GlobalTheory.ChainTheta
 
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+  Formalism.L2.Ker
 
 section Fin
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem exists_pow_loc (P : HeightOneSpectrum (𝓞 E)) (k : ℕ) (hk : 0 < k) :
-    ∃ e : ℕ, ∀ j ∈ P.asIdeal ^ e, ∃ t : 𝓞 E, t ∉ P.asIdeal ∧ ∃ r : 𝓞 E, t * j = (k : 𝓞 E) * r := by
+theorem exists_pow_loc (P : HeightOneSpectrum (𝓞 E)) (k : ℕ) (hk : 0 < k)
+    : ∃ e : ℕ, ∀ j ∈ P.asIdeal ^ e, ∃ t : 𝓞 E,
+      t ∉ P.asIdeal ∧ ∃ r : 𝓞 E, t * j = (k : 𝓞 E) * r := by
   have hk0 : Ideal.span {(k : 𝓞 E)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact_mod_cast hk.ne'
@@ -33,14 +35,16 @@ theorem exists_pow_loc (P : HeightOneSpectrum (𝓞 E)) (k : ℕ) (hk : 0 < k) :
   obtain ⟨r, hr⟩ := Ideal.mem_span_singleton'.1 h1
   exact ⟨r, by rw [← hr, mul_comm]⟩
 
-theorem semilocal_reps {H : Type} [AddCommGroup H] [Module (𝓞 E) H] (S : Finset (HeightOneSpectrum (𝓞 E)))
-    (M₀ M : Submodule (𝓞 E) H) (hfg : M₀.FG) (h1 : M₀ ≤ M)
-    (h2 : ∀ x ∈ M, ∀ P ∈ S, ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ M₀) (k : ℕ) (hk : 0 < k)
-    (h3 : ∀ x ∈ M, ∀ j : 𝓞 E, (∀ P ∈ S, ∃ t : 𝓞 E, t ∉ P.asIdeal ∧ ∃ r : 𝓞 E, t * j = (k : 𝓞 E) * r) →
-      ∃ y ∈ M, (k : 𝓞 E) • y = j • x) :
-    ∃ F : Set H, F.Finite ∧ ∀ x ∈ M, ∃ f ∈ F, ∃ y ∈ M, x = f + (k : 𝓞 E) • y := by
+theorem semilocal_reps
+    {H : Type} [AddCommGroup H] [Module (𝓞 E) H]
+    (S : Finset (HeightOneSpectrum (𝓞 E))) (M₀ M : Submodule (𝓞 E) H)
+    (hfg : M₀.FG) (h1 : M₀ ≤ M) (h2 : ∀ x ∈ M, ∀ P ∈ S, ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ M₀)
+    (k : ℕ) (hk : 0 < k)
+    (h3 : ∀ x ∈ M, ∀ j : 𝓞 E,
+      (∀ P ∈ S, ∃ t : 𝓞 E, t ∉ P.asIdeal ∧ ∃ r : 𝓞 E, t * j = (k : 𝓞 E) * r)
+        → ∃ y ∈ M, (k : 𝓞 E) • y = j • x)
+    : ∃ F : Set H, F.Finite ∧ ∀ x ∈ M, ∃ f ∈ F, ∃ y ∈ M, x = f + (k : 𝓞 E) • y := by
   classical
-
   have ha : ∀ x ∈ M, ∃ m ∈ M₀, ∃ y ∈ M, x = m + (k : 𝓞 E) • y := by
     intro x hx
     choose e he using fun P : HeightOneSpectrum (𝓞 E) => exists_pow_loc P k hk
@@ -73,8 +77,10 @@ theorem semilocal_reps {H : Type} [AddCommGroup H] [Module (𝓞 E) H] (S : Fins
   refine ⟨Set.range rep, Set.finite_range rep, fun x hx => ?_⟩
   obtain ⟨m, hm, y, hy, rfl⟩ := ha x hx
   refine ⟨rep (Submodule.Quotient.mk ⟨m, hm⟩), ⟨_, rfl⟩, ?_⟩
-  obtain ⟨r0, hrep, h5⟩ : ∃ r0 : ↥M₀, rep (Submodule.Quotient.mk ⟨m, hm⟩) = (r0 : H) ∧
-      r0 - ⟨m, hm⟩ ∈ Ideal.span {(k : 𝓞 E)} • (⊤ : Submodule (𝓞 E) ↥M₀) :=
+  obtain ⟨r0, hrep, h5⟩
+      : ∃ r0 : ↥M₀,
+        rep (Submodule.Quotient.mk ⟨m, hm⟩) = (r0 : H)
+          ∧ r0 - ⟨m, hm⟩ ∈ Ideal.span {(k : 𝓞 E)} • (⊤ : Submodule (𝓞 E) ↥M₀) :=
     ⟨_, rfl, (Submodule.Quotient.eq _).1 (Function.surjInv_eq _ _)⟩
   rw [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists] at h5
   obtain ⟨w, -, hw⟩ := h5
@@ -87,18 +93,21 @@ theorem semilocal_reps {H : Type} [AddCommGroup H] [Module (𝓞 E) H] (S : Fins
   rw [smul_sub, ← h6]
   abel
 
-theorem mem_mulLat' {H : Type} [AddCommGroup H] [Module (𝓞 E) H] (c : ℕ) (M : Submodule (𝓞 E) H) (w : H) :
-    w ∈ mulLat c M ↔ ∃ y ∈ M, (c : 𝓞 E) • y = w := by
+theorem mem_mulLat'
+    {H : Type} [AddCommGroup H] [Module (𝓞 E) H] (c : ℕ) (M : Submodule (𝓞 E) H) (w : H)
+    : w ∈ mulLat c M ↔ ∃ y ∈ M, (c : 𝓞 E) • y = w := by
   unfold mulLat
   rw [Submodule.mem_map]
   rfl
 
-theorem finite_quot_of_reps {H : Type} [AddCommGroup H] [Module (𝓞 E) H] (M : Submodule (𝓞 E) H) (c k : ℕ) (F : Set H) (hF : F.Finite)
-    (hFM : ∀ x ∈ M, ∃ f ∈ F, ∃ y ∈ M, x = f + (k : 𝓞 E) • y) :
-    Finite (↥(mulLat c M) ⧸ (mulLat (c * k) M).comap (mulLat c M).subtype) := by
+theorem finite_quot_of_reps
+    {H : Type} [AddCommGroup H] [Module (𝓞 E) H]
+    (M : Submodule (𝓞 E) H) (c k : ℕ) (F : Set H)
+    (hF : F.Finite) (hFM : ∀ x ∈ M, ∃ f ∈ F, ∃ y ∈ M, x = f + (k : 𝓞 E) • y)
+    : Finite (↥(mulLat c M) ⧸ (mulLat (c * k) M).comap (mulLat c M).subtype) := by
   have : Finite ↥(F ∩ (M : Set H)) := (hF.inter_of_left _).to_subtype
-  let φ : ↥(F ∩ (M : Set H)) → (↥(mulLat c M) ⧸ (mulLat (c * k) M).comap (mulLat c M).subtype) := fun f =>
-    Submodule.Quotient.mk ⟨(c : 𝓞 E) • (f : H), (mem_mulLat' c M _).2 ⟨f, f.2.2, rfl⟩⟩
+  let φ : ↥(F ∩ (M : Set H)) → (↥(mulLat c M) ⧸ (mulLat (c * k) M).comap (mulLat c M).subtype) :=
+    fun f => Submodule.Quotient.mk ⟨(c : 𝓞 E) • (f : H), (mem_mulLat' c M _).2 ⟨f, f.2.2, rfl⟩⟩
   refine Finite.of_surjective φ fun z => ?_
   obtain ⟨⟨w, hw⟩, rfl⟩ := Submodule.Quotient.mk_surjective _ z
   obtain ⟨x, hx, rfl⟩ := (mem_mulLat' c M w).1 hw
@@ -116,20 +125,24 @@ theorem finite_quot_of_reps {H : Type} [AddCommGroup H] [Module (𝓞 E) H] (M :
 
 variable [StarRing E] {a b : ℕ}
 
-def homG (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b)) : Submodule (𝓞 E) (HomE E a b) where
+def homG (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b))
+    : Submodule (𝓞 E) (HomE E a b) where
   carrier := {x | ∀ y ∈ N, x y ∈ N'}
   add_mem' := fun hx hx' y hy => add_mem (hx y hy) (hx' y hy)
   zero_mem' := fun _ _ => zero_mem _
   smul_mem' := fun r _ hx y hy => Submodule.smul_mem _ r (hx y hy)
 
-theorem homG_fg (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b)) (hN : Submodule.IsFullLattice E N)
-    (hN' : Submodule.IsLattice E N') : (homG N N').FG := by
+theorem homG_fg
+    (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b))
+    (hN : Submodule.IsFullLattice E N) (hN' : Submodule.IsLattice E N')
+    : (homG N N').FG := by
   obtain ⟨G, hG⟩ := hN.fg
   have : Module.Finite (𝓞 E) ↥N' := Module.Finite.iff_fg.2 hN'.fg
-  let ev : ↥(homG N N') →ₗ[𝓞 E] (↥G → ↥N') :=
-    { toFun := fun x g => ⟨x.1 g.1, x.2 g.1 (hG ▸ Submodule.subset_span g.2)⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let ev : ↥(homG N N') →ₗ[𝓞 E] (↥G → ↥N') := {
+    toFun := fun x g => ⟨x.1 g.1, x.2 g.1 (hG ▸ Submodule.subset_span g.2)⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hinj : Function.Injective ev := by
     intro x x' h
     apply Subtype.ext
@@ -141,23 +154,31 @@ theorem homG_fg (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E
   have : Module.Finite (𝓞 E) ↥(homG N N') := Module.Finite.of_injective ev hinj
   exact Module.Finite.iff_fg.1 this
 
-theorem homG_le (S : Finset (HeightOneSpectrum (𝓞 E))) (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b)) :
-    homG N N' ≤ homAt S N N' := by
+theorem homG_le
+    (S : Finset (HeightOneSpectrum (𝓞 E))) (N : Submodule (𝓞 E) (Sp E a))
+    (N' : Submodule (𝓞 E) (Sp E b))
+    : homG N N' ≤ homAt S N N' := by
   intro x hx P _ y hy
   obtain ⟨s, hs, hsy⟩ := (mem_locP P N y).1 hy
   refine (mem_locP P N' _).2 ⟨s, hs, ?_⟩
   rw [← LinearMap.map_smul_of_tower]
   exact hx _ hsy
 
-theorem homAt_clear (S : Finset (HeightOneSpectrum (𝓞 E))) (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b)) (hN : N.FG)
-    (x : HomE E a b) (hx : x ∈ homAt S N N') (P : HeightOneSpectrum (𝓞 E)) (hP : P ∈ S) :
-    ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ homG N N' := by
+theorem homAt_clear
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    (N : Submodule (𝓞 E) (Sp E a))
+    (N' : Submodule (𝓞 E) (Sp E b))
+    (hN : N.FG)
+    (x : HomE E a b) (hx : x ∈ homAt S N N')
+    (P : HeightOneSpectrum (𝓞 E)) (hP : P ∈ S)
+    : ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ homG N N' := by
   classical
   obtain ⟨G, hG⟩ := hN
   have h1 : ∀ g : Sp E a, ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ (g ∈ G → s • x g ∈ N') := by
     intro g
     by_cases hg : g ∈ G
-    · obtain ⟨s, hs, h⟩ := (mem_locP P N' _).1 (hx P hP g (le_locP P N (hG ▸ Submodule.subset_span hg)))
+    · obtain ⟨s, hs, h⟩ :=
+        (mem_locP P N' _).1 (hx P hP g (le_locP P N (hG ▸ Submodule.subset_span hg)))
       exact ⟨s, hs, fun _ => h⟩
     · exact ⟨1, one_notMem P, fun h => absurd h hg⟩
   choose s hs hsx using h1
@@ -176,17 +197,21 @@ theorem homAt_clear (S : Finset (HeightOneSpectrum (𝓞 E))) (N : Submodule (�
     | add y y' _ _ h h' => rw [map_add (f := _)]; exact N'.add_mem h h'
     | smul r y _ h => rw [LinearMap.map_smul_of_tower]; exact N'.smul_mem _ h
 
-theorem homAt_div (S : Finset (HeightOneSpectrum (𝓞 E))) (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b)) (k : ℕ) (hk : 0 < k)
-    (x : HomE E a b) (hx : x ∈ homAt S N N') (j : 𝓞 E)
-    (hj : ∀ P ∈ S, ∃ t : 𝓞 E, t ∉ P.asIdeal ∧ ∃ r : 𝓞 E, t * j = (k : 𝓞 E) * r) :
-    ∃ y ∈ homAt S N N', (k : 𝓞 E) • y = j • x := by
+theorem homAt_div
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    (N : Submodule (𝓞 E) (Sp E a)) (N' : Submodule (𝓞 E) (Sp E b))
+    (k : ℕ) (hk : 0 < k)
+    (x : HomE E a b) (hx : x ∈ homAt S N N')
+    (j : 𝓞 E) (hj : ∀ P ∈ S, ∃ t : 𝓞 E, t ∉ P.asIdeal ∧ ∃ r : 𝓞 E, t * j = (k : 𝓞 E) * r)
+    : ∃ y ∈ homAt S N N', (k : 𝓞 E) • y = j • x := by
   have hk0 : (k : E) ≠ 0 := by exact_mod_cast hk.ne'
   refine ⟨(((j : 𝓞 E) : E) / (k : E)) • x, ?_, ?_⟩
   · intro P hP n hn
     obtain ⟨t, ht, r, hr⟩ := hj P hP
     refine indexBasic_smul_locP P.asIdeal N' ht ?_
     have h1 : t • ((((j : 𝓞 E) : E) / (k : E)) • x) n = r • x n := by
-      have h2 : ((t : 𝓞 E) : E) * ((j : 𝓞 E) : E) = (k : E) * ((r : 𝓞 E) : E) := by exact_mod_cast congrArg (fun z : 𝓞 E => (z : E)) hr
+      have h2 : ((t : 𝓞 E) : E) * ((j : 𝓞 E) : E) = (k : E) * ((r : 𝓞 E) : E) := by
+        exact_mod_cast congrArg (fun z : 𝓞 E => (z : E)) hr
       rw [LinearMap.smul_apply, ← algebraMap_smul E t, ← algebraMap_smul E r, smul_smul]
       congr 1
       show ((t : 𝓞 E) : E) * (((j : 𝓞 E) : E) / (k : E)) = ((r : 𝓞 E) : E)
@@ -200,9 +225,12 @@ theorem homAt_div (S : Finset (HeightOneSpectrum (𝓞 E))) (N : Submodule (𝓞
     push_cast
     field_simp
 
-theorem latFin (X : Fields) (a b : ℕ) (Sall : Finset (HeightOneSpectrum (𝓞 X.E))) : LatFin (X := X) a b Sall := by
+theorem latFin (X : Fields) (a b : ℕ) (Sall : Finset (HeightOneSpectrum (𝓞 X.E)))
+    : LatFin (X := X) a b Sall := by
   intro N N' c c' hN hN' _ hc'
-  have full_of_sd : ∀ {n : ℕ} {L : Submodule (𝓞 X.E) (Sp X.E n)}, IsSdLat L → Submodule.IsFullLattice X.E L := by
+  have full_of_sd
+      : ∀ {n : ℕ} {L : Submodule (𝓞 X.E) (Sp X.E n)},
+        IsSdLat L → Submodule.IsFullLattice X.E L := by
     intro n L hL
     let := hL.1
     refine { span_eq_top := ?_ }
@@ -222,17 +250,25 @@ theorem latFin (X : Fields) (a b : ℕ) (Sall : Finset (HeightOneSpectrum (𝓞 
       intro y hy
       apply hStd_mem_one_symm
       have hxy : hStd X.E n (e x) y = 0 :=
-        congrArg (fun f : Module.Dual X.E W => f ⟨y, Submodule.subset_span hy⟩) (LinearMap.mem_ker.mp hx)
+        congrArg
+          (fun f : Module.Dual X.E W => f ⟨y, Submodule.subset_span hy⟩)
+          (LinearMap.mem_ker.mp hx)
       simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hxy]
     let i : X.E →ₗ[𝓞 X.E] L :=
       ((LinearMap.toSpanSingleton X.E _ (e x)).restrictScalars (𝓞 X.E)).codRestrict L hsmul
     let : Module.Finite (𝓞 X.E) L := Module.Finite.iff_fg.mpr hL.1.fg
-    let : Module.Finite (𝓞 X.E) X.E := Module.Finite.of_injective i fun a b hab =>
-      smul_left_injective X.E (fun hz => hx₀ (e.map_eq_zero_iff.mp hz)) (congrArg Subtype.val hab)
+    let : Module.Finite (𝓞 X.E) X.E :=
+      Module.Finite.of_injective i fun a b hab =>
+        smul_left_injective X.E (fun hz => hx₀ (e.map_eq_zero_iff.mp hz)) (congrArg Subtype.val hab)
     exact RingOfIntegers.not_isField X.E
-      (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E) (Field.toIsField X.E))
-  obtain ⟨F, hF, hFM⟩ := semilocal_reps Sall (homG N N') (homAt Sall N N') (homG_fg N N' (full_of_sd hN) hN'.1) (homG_le Sall N N')
-    (fun x hx P hP => homAt_clear Sall N N' hN.1.fg x hx P hP) c' hc' (fun x hx j hj => homAt_div Sall N N' c' hc' x hx j hj)
+      (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E)
+        (Field.toIsField X.E))
+  obtain ⟨F, hF, hFM⟩ :=
+    semilocal_reps Sall (homG N N') (homAt Sall N N') (homG_fg N N' (full_of_sd hN) hN'.1)
+      (homG_le Sall N N')
+      (fun x hx P hP => homAt_clear Sall N N' hN.1.fg x hx P hP)
+      c' hc'
+      (fun x hx j hj => homAt_div Sall N N' c' hc' x hx j hj)
   exact finite_quot_of_reps _ c c' F hF hFM
 
 end Fin

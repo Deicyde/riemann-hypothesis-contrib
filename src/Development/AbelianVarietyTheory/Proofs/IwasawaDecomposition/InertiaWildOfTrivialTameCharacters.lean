@@ -7,13 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTam
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.FrobeniusOrbits Formalism.L2.Host Formalism.L2.NT Formalism.L2.TwC Formalism.L2.NC NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.FrobeniusOrbits Formalism.L2.Host
+  Formalism.L2.NT Formalism.L2.TwC Formalism.L2.NC NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting
 
 namespace GlobalTheory.TameWild
 
-theorem sub_one_lt_one_of_pow {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {g : ℕ} [hg : Fact g.Prime]
-    (hvg : A.valuation (g : Ω) < 1) {z : Ω} (a : ℕ) (hz : A.valuation (z ^ (g ^ a) - 1) < 1) :
-    A.valuation (z - 1) < 1 := by
+theorem sub_one_lt_one_of_pow
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {g : ℕ} [hg : Fact g.Prime]
+    (hvg : A.valuation (g : Ω) < 1)
+    {z : Ω} (a : ℕ) (hz : A.valuation (z ^ (g ^ a) - 1) < 1)
+    : A.valuation (z - 1) < 1 := by
   have hz1 : A.valuation z ≤ 1 := by
     have h : A.valuation (z ^ g ^ a) ≤ 1 := by
       have e : z ^ g ^ a = (z ^ g ^ a - 1) + 1 := by ring
@@ -34,13 +41,22 @@ theorem sub_one_lt_one_of_pow {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {
     simpa [zA] using hz
   have h2 : IsLocalRing.residue A (zA - 1) = 0 := by
     apply pow_eq_zero_iff (n := g ^ a) (pow_ne_zero _ hg.out.ne_zero) |>.1
-    rw [map_sub, map_one, sub_pow_char_pow, one_pow, ← map_pow, ← map_one (IsLocalRing.residue A), ← map_sub, h1]
+    rw [map_sub, map_one, sub_pow_char_pow, one_pow, ← map_pow, ← map_one (IsLocalRing.residue A),
+      ← map_sub, h1]
   rw [IsLocalRing.residue_eq_zero_iff, A.valuation_lt_one_iff] at h2
   simpa [zA] using h2
 
-
 open GlobalTheory.TameInertiaGen in
-theorem cob_lt_one_of_tame : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)), IsPlaceOver (F := E) A v → ∀ (g : ℕ) [Fact g.Prime], ((g : ℕ) : 𝓞 E) ∈ v.asIdeal → ∀ τ ∈ Ine (F := E) A, (∀ d, 0 < d → ∃ y : Ω, y ^ (g ^ d - 1) = ((g : ℕ) : Ω) ∧ A.valuation (τ y / y - 1) < 1) → ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1 := by
+theorem cob_lt_one_of_tame
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)),
+      IsPlaceOver (F := E) A v
+        → ∀ (g : ℕ) [Fact g.Prime],
+          ((g : ℕ) : 𝓞 E) ∈ v.asIdeal
+            → ∀ τ ∈ Ine (F := E) A,
+              (∀ d,
+                  0 < d → ∃ y : Ω, y ^ (g ^ d - 1) = ((g : ℕ) : Ω) ∧ A.valuation (τ y / y - 1) < 1)
+                → ∀ y : Ω, y ≠ 0 → A.valuation (τ y / y - 1) < 1 := by
   intro E Ω _ _ _ _ _ A v hA g hg hgv τ hτ hroot y hy
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   have hvg : A.valuation (g : Ω) < 1 := by
@@ -81,10 +97,11 @@ theorem cob_lt_one_of_tame : ∀ (E Ω : Type) [Field E] [NumberField E] [Field 
   have hR : cob τ (Units.mk0 r hr0) ∈ A.principalUnitGroup := by
     rw [ValuationSubring.mem_principalUnitGroup_iff, coe_cob, Units.val_mk0]
     exact hrτ
-  have hval : A.valuation ((Units.mk0 (y ^ g ^ a) (pow_ne_zero _ hy) : Ωˣ) : Ω) =
-      A.valuation ((Units.mk0 r hr0 : Ωˣ) : Ω) ^ ((c : ℤ) * k) := by
-    rw [Units.val_mk0, Units.val_mk0, ← pow_left_inj₀ zero_le zero_le hm'0, map_pow, ← pow_mul, ← hM', hM, ← hr,
-      map_pow, hc, ← zpow_natCast (A.valuation r) (m' * c),
+  have hval
+      : A.valuation ((Units.mk0 (y ^ g ^ a) (pow_ne_zero _ hy) : Ωˣ) : Ω)
+        = A.valuation ((Units.mk0 r hr0 : Ωˣ) : Ω) ^ ((c : ℤ) * k) := by
+    rw [Units.val_mk0, Units.val_mk0, ← pow_left_inj₀ zero_le zero_le hm'0, map_pow, ← pow_mul,
+      ← hM', hM, ← hr, map_pow, hc, ← zpow_natCast (A.valuation r) (m' * c),
       ← zpow_natCast (A.valuation r ^ ((c : ℤ) * k)) m', ← zpow_mul, ← zpow_mul]
     congr 1
     push_cast

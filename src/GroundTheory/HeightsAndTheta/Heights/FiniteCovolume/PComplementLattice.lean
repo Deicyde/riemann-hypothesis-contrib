@@ -12,13 +12,16 @@ open NumberField GroundTheory.Automorphic Module
 
 noncomputable section
 
-theorem isAddTorsionFree_of_module (K V : Type*) [Field K] [CharZero K] [AddCommGroup V]
-    [Module K V] : IsAddTorsionFree V := by
+theorem isAddTorsionFree_of_module
+    (K V : Type*) [Field K] [CharZero K] [AddCommGroup V] [Module K V]
+    : IsAddTorsionFree V := by
   letI : HasUniqueDiv V := HasUniqueDiv.of_isTorsionFree K V
   infer_instance
 
-theorem fg_of_fg_map_of_injective {A B : Type*} [AddCommGroup A] [AddCommGroup B]
-    {H : AddSubgroup A} (φ : A →+ B) (hφ : Function.Injective φ) (hH : (H.map φ).FG) : H.FG := by
+theorem fg_of_fg_map_of_injective
+    {A B : Type*} [AddCommGroup A] [AddCommGroup B]
+    {H : AddSubgroup A} (φ : A →+ B) (hφ : Function.Injective φ) (hH : (H.map φ).FG)
+    : H.FG := by
   have h2 : H.toIntSubmodule.FG := by
     refine Submodule.fg_of_fg_map_injective φ.toIntLinearMap hφ ?_
     have : H.toIntSubmodule.map φ.toIntLinearMap = (H.map φ).toIntSubmodule := by
@@ -30,14 +33,15 @@ theorem fg_of_fg_map_of_injective {A B : Type*} [AddCommGroup A] [AddCommGroup B
 
 section Complement
 
-variable {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E]
-  [Algebra.IsQuadraticExtension F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W]
 
-
 omit [NumberField E] in
-theorem factorial_nsmul_mem_of_mem_dual {h : HermitianForm F E W} {D : ℕ} {La : AddSubgroup W}
-    (hLa : IsDIntegral h D La) {y : W} (hy : y ∈ dualLattice h La) : D.factorial • y ∈ La := by
+theorem factorial_nsmul_mem_of_mem_dual
+    {h : HermitianForm F E W} {D : ℕ} {La : AddSubgroup W} (hLa : IsDIntegral h D La)
+    {y : W} (hy : y ∈ dualLattice h La)
+    : D.factorial • y ∈ La := by
   have hk : La.relIndex (dualLattice h La) • y ∈ La := by
     have := AddSubgroup.nsmul_index_mem (La.addSubgroupOf (dualLattice h La)) ⟨y, hy⟩
     exact AddSubgroup.mem_addSubgroupOf.1 this
@@ -45,21 +49,19 @@ theorem factorial_nsmul_mem_of_mem_dual {h : HermitianForm F E W} {D : ℕ} {La 
   rw [hc, mul_comm, ← smul_smul]
   exact La.nsmul_mem hk c
 
-theorem ComplementLattice.proof (h : HermitianForm F E W) [FiniteDimensional E W] :
-    ComplementLattice.Statement h := by
+theorem ComplementLattice.proof (h : HermitianForm F E W) [FiniteDimensional E W]
+    : ComplementLattice.Statement h := by
   intro v₀ w₀ hvw h' hh' D n hn
   refine ⟨(D.factorial * n) ^ (finrank ℚ E * finrank E W), ?_⟩
   intro La hLa hdec
   set P : AddSubgroup (hypComplement h v₀ w₀) := La.comap (hypComplement h v₀ w₀).subtype.toAddMonoidHom with hP
   obtain ⟨hvv, hww, hvw1⟩ := hvw
-  have hwv1 : h.toSesq w₀ v₀ = 1 := by
-    rw [← h.isSymm.eq v₀ w₀, hvw1, map_one]
+  have hwv1 : h.toSesq w₀ v₀ = 1 := by rw [← h.isSymm.eq v₀ w₀, hvw1, map_one]
   have hsymm0 : ∀ x y : W, h.toSesq x y = 0 → h.toSesq y x = 0 := fun x y hxy => by
     rw [← h.isSymm.eq x y, hxy, map_zero]
   have memP : ∀ x : (hypComplement h v₀ w₀), x ∈ P ↔ (x : W) ∈ La := fun x => Iff.rfl
 
-  let π₀ : W →ₗ[E] W :=
-    LinearMap.id - (h.toSesq w₀).smulRight v₀ - (h.toSesq v₀).smulRight w₀
+  let π₀ : W →ₗ[E] W := LinearMap.id - (h.toSesq w₀).smulRight v₀ - (h.toSesq v₀).smulRight w₀
   have hπ₀ : ∀ x, π₀ x = x - h.toSesq w₀ x • v₀ - h.toSesq v₀ x • w₀ := fun x => rfl
   have hπ₀mem : ∀ x, π₀ x ∈ (hypComplement h v₀ w₀) := by
     intro x
@@ -76,9 +78,10 @@ theorem ComplementLattice.proof (h : HermitianForm F E W) [FiniteDimensional E W
     rw [hπ₀, hww, hvw1]
     simp
 
-  have hz : ∀ x ∈ La, ∃ a b : E, a • v₀ ∈ La ∧ b • w₀ ∈ La ∧
-      n • x - a • v₀ - b • w₀ ∈ (hypComplement h v₀ w₀) ∧ n • x - a • v₀ - b • w₀ ∈ La ∧
-      n • π₀ x = n • x - a • v₀ - b • w₀ := by
+  have hz
+      : ∀ x ∈ La, ∃ a b : E,
+        a • v₀ ∈ La ∧ b • w₀ ∈ La ∧ n • x - a • v₀ - b • w₀ ∈ (hypComplement h v₀ w₀)
+          ∧ n • x - a • v₀ - b • w₀ ∈ La ∧ n • π₀ x = n • x - a • v₀ - b • w₀ := by
     intro x hx
     obtain ⟨a, ha, b, hb, hmem⟩ := hdec x hx
     change a • v₀ ∈ La at ha
@@ -91,7 +94,8 @@ theorem ComplementLattice.proof (h : HermitianForm F E W) [FiniteDimensional E W
     refine ⟨fun a x hx => ?_, ?_, ?_⟩
     · rw [memP] at hx ⊢
       exact hLa.isLattice.smul_mem a _ hx
-    · refine fg_of_fg_map_of_injective (hypComplement h v₀ w₀).subtype.toAddMonoidHom Subtype.val_injective ?_
+    · refine fg_of_fg_map_of_injective (hypComplement h v₀ w₀).subtype.toAddMonoidHom
+        Subtype.val_injective ?_
       exact fg_of_le_fg (AddSubgroup.map_comap_le _ _) hLa.isLattice.fg
     · let π : W →ₗ[E] (hypComplement h v₀ w₀) := π₀.codRestrict (hypComplement h v₀ w₀) hπ₀mem
       have hrange : LinearMap.range π = ⊤ :=
@@ -106,8 +110,7 @@ theorem ComplementLattice.proof (h : HermitianForm F E W) [FiniteDimensional E W
         change n • π₀ x ∈ La
         rw [hkey]
         exact hzLa
-      have : π x = (n : E)⁻¹ • ((n : E) • π x) := by
-        rw [smul_smul, inv_mul_cancel₀ hnE, one_smul]
+      have : π x = (n : E)⁻¹ • ((n : E) • π x) := by rw [smul_smul, inv_mul_cancel₀ hnE, one_smul]
       rw [this]
       exact Submodule.smul_mem _ _ (Submodule.subset_span hnx)
 
@@ -140,22 +143,26 @@ theorem ComplementLattice.proof (h : HermitianForm F E W) [FiniteDimensional E W
     rw [nsmulAddMonoidHom_apply, memP, Submodule.coe_smul_of_tower, hN, ← smul_smul]
     exact h2
 
-  have : IsAddTorsionFree (hypComplement h v₀ w₀) := isAddTorsionFree_of_module E (hypComplement h v₀ w₀)
+  have : IsAddTorsionFree (hypComplement h v₀ w₀) :=
+    isAddTorsionFree_of_module E (hypComplement h v₀ w₀)
   have : HasUniqueDiv (hypComplement h v₀ w₀) := HasUniqueDiv.of_isTorsionFree E _
-  have hGfg : G.FG := fg_of_fg_map_of_injective (nsmulAddMonoidHom N)
-    (AddSubgroup.nsmulAddMonoidHom_injective_of_isTorsionFree hNpos.ne')
-    (fg_of_le_fg hNG hPlat.fg)
+  have hGfg : G.FG :=
+    fg_of_fg_map_of_injective (nsmulAddMonoidHom N)
+      (AddSubgroup.nsmulAddMonoidHom_injective_of_isTorsionFree hNpos.ne')
+      (fg_of_le_fg hNG hPlat.fg)
   have : Module.Finite ℤ G.toIntSubmodule :=
     Module.Finite.iff_fg.2 ((Submodule.fg_iff_addSubgroup_fg _).2 hGfg)
   have : Module.Finite ℤ G := inferInstanceAs (Module.Finite ℤ G.toIntSubmodule)
   have hrank : finrank ℤ G ≤ finrank ℚ E * finrank E W := by
     letI : Module ℚ W := Module.compHom W (algebraMap ℚ E)
-    have : IsScalarTower ℚ E W := ⟨fun q e w => by
-      change (q • e) • w = algebraMap ℚ E q • e • w
-      rw [Algebra.smul_def, mul_smul]⟩
+    have : IsScalarTower ℚ E W :=
+      ⟨fun q e w => by
+        change (q • e) • w = algebraMap ℚ E q • e • w
+        rw [Algebra.smul_def, mul_smul]⟩
     have : Module.Finite ℚ W := Module.Finite.trans E W
     let b := Module.finBasis ℤ G
-    let f : G →ₗ[ℤ] W := ((hypComplement h v₀ w₀).subtype.toAddMonoidHom.comp G.subtype).toIntLinearMap
+    let f : G →ₗ[ℤ] W :=
+      ((hypComplement h v₀ w₀).subtype.toAddMonoidHom.comp G.subtype).toIntLinearMap
     have hf : Function.Injective f := Subtype.val_injective.comp Subtype.val_injective
     have hliZ : LinearIndependent ℤ (f ∘ b) :=
       b.linearIndependent.map' f (LinearMap.ker_eq_bot.mpr hf)

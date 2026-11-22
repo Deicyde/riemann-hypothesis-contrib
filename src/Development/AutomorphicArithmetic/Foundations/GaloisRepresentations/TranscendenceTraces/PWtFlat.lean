@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.wtFlat_of :
-    WtClopen → MultSum → MultBC → MultOpen → WtFlat := by
+theorem UpperTheory.Gal.TranscendenceTraces.wtFlat_of
+    : WtClopen → MultSum → MultBC → MultOpen → WtFlat := by
   intro hC hS hB hO Z S p _ _ _
   refine hC p (mult p) fun A W hW => ?_
   have : IsFinite A.r := A.finite
@@ -29,19 +30,23 @@ theorem UpperTheory.Gal.TranscendenceTraces.wtFlat_of :
     · intro z hz
       refine ⟨?_, ?_⟩
       · change (z ≫ O.ι) ≫ A.r = x
-        rw [Category.assoc]; exact hz
+        rw [Category.assoc]
+        exact hz
       · change pt (z ≫ O.ι) ∈ W
-        rw [pt_comp]; exact (pt z).2
+        rw [pt_comp]
+        exact (pt z).2
     · intro z _ z' _ e
       exact (cancel_mono O.ι).1 e
     · rintro z ⟨hz, hzW⟩
       have hr : Set.range z ⊆ Set.range O.ι := by
         rw [O.range_ι]
         rintro _ ⟨t, rfl⟩
-        rw [pt_eq]; exact hzW
+        rw [pt_eq]
+        exact hzW
       refine ⟨IsOpenImmersion.lift O.ι z hr, ?_, IsOpenImmersion.lift_fac _ _ _⟩
       change _ ≫ O.ι ≫ A.r = x
-      rw [← Category.assoc, IsOpenImmersion.lift_fac]; exact hz
+      rw [← Category.assoc, IsOpenImmersion.lift_fac]
+      exact hz
     · intro z _
       rw [hm, hm']
       simp [Wt.comap]

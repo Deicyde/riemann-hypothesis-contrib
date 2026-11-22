@@ -4,12 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
-private theorem canon_eig {R : Type} [CommRing R] [IsLocalRing R] (X : Matrix (Fin 3) (Fin 3) R)
-    (h : GL (Fin 3) R) (hc : Canon X h) :
-    ∃ d : Fin 3 → R, ((h⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) * X * h = diagonal d ∧
-      ∀ a, d a - X a a ∈ maximalIdeal R := by
+private theorem canon_eig
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (X : Matrix (Fin 3) (Fin 3) R) (h : GL (Fin 3) R) (hc : Canon X h)
+    : ∃ d : Fin 3 → R,
+      ((h⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) * X * h = diagonal d
+        ∧ ∀ a, d a - X a a ∈ maximalIdeal R := by
   let φ := residue R
   have h0 : φ.mapMatrix (h.val - 1) = 0 := by
     ext a b
@@ -28,8 +31,10 @@ private theorem canon_eig {R : Type} [CommRing R] [IsLocalRing R] (X : Matrix (F
     rw [map_mul, map_mul, hh, hhi, one_mul, mul_one]
   exact congrFun (congrFun e a) a
 
-theorem UpperTheory.V.UnitaryThreeInertia.canon_unique :
-    ∀ {R : Type} [CommRing R] [IsLocalRing R] (X : Matrix (Fin 3) (Fin 3) R) (h h' : GL (Fin 3) R), (∀ a b, a ≠ b → IsUnit (X a a - X b b)) → Canon X h → Canon X h' → h = h' := by
+theorem UpperTheory.V.UnitaryThreeInertia.canon_unique
+    : ∀ {R : Type} [CommRing R] [IsLocalRing R] (X : Matrix (Fin 3) (Fin 3) R)
+        (h h' : GL (Fin 3) R),
+      (∀ a b, a ≠ b → IsUnit (X a a - X b b)) → Canon X h → Canon X h' → h = h' := by
   intro R _ _ X h h' hX hc hc'
   obtain ⟨d, hd, hdX⟩ := canon_eig X h hc
   obtain ⟨d', hd', hd'X⟩ := canon_eig X h' hc'
@@ -52,16 +57,17 @@ theorem UpperTheory.V.UnitaryThreeInertia.canon_unique :
     have e3 : g.val a b * (d a - d' b) = 0 := by
       rw [mul_sub, mul_comm (g.val a b) (d a), e, sub_self]
     exact hu.mul_left_eq_zero.1 e3
-  have hh' : h'.val = h.val * g.val := by
-    simp only [g, Units.val_mul, Units.mul_inv_cancel_left]
+  have hh' : h'.val = h.val * g.val := by simp only [g, Units.val_mul, Units.mul_inv_cancel_left]
   have g1 : g.val = 1 := by
     ext a b
     by_cases hab : a = b
     · subst hab
       rw [Matrix.one_apply_eq]
       have e := congrFun (congrFun hh' a) a
-      rw [Matrix.mul_apply, Finset.sum_eq_single a (fun c _ hc => by rw [hg c a hc, mul_zero])
-        (by simp), hc'.one a, hc.one a, one_mul] at e
+      rw [Matrix.mul_apply,
+          Finset.sum_eq_single a (fun c _ hc => by rw [hg c a hc, mul_zero]) (by simp), hc'.one a,
+          hc.one a, one_mul]
+        at e
       exact e.symm
     · rw [Matrix.one_apply_ne hab, hg a b hab]
   have g1' : g = 1 := Units.ext g1

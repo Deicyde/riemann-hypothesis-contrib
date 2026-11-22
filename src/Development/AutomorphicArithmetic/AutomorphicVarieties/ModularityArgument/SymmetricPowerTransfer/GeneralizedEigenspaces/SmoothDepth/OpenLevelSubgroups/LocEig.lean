@@ -8,7 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL Formalism.BasicNotions
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  Formalism.BasicNotions
 open UpperTheory.V.W (Plc Lp)
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 
@@ -19,8 +21,9 @@ section LocEigAux
 
 open UpperTheory.V.Hi UpperTheory.V.AlgebraTools
 
-private theorem antitone_mem : ∀ {n : ℕ} (M : AddSubmonoid (Fin n → ℤ)), (∀ j ≤ n, fund n j ∈ M) → (-1 : Fin n → ℤ) ∈ M →
-    ∀ a : Fin n → ℤ, Antitone a → a ∈ M := by
+private theorem antitone_mem
+    : ∀ {n : ℕ} (M : AddSubmonoid (Fin n → ℤ)),
+      (∀ j ≤ n, fund n j ∈ M) → (-1 : Fin n → ℤ) ∈ M → ∀ a : Fin n → ℤ, Antitone a → a ∈ M := by
   intro n M h1 h2 a ha
   cases n with
   | zero =>
@@ -34,10 +37,13 @@ private theorem antitone_mem : ∀ {n : ℕ} (M : AddSubmonoid (Fin n → ℤ)),
       funext i
       simp [fund, i.2]
     let A : ℕ → ℤ := fun m => a ⟨min m N, by omega⟩
-    have hA : ∀ m, A (m + 1) ≤ A m := fun m => ha (by
-      simp only [Fin.mk_le_mk]
-      omega)
-    have tel : ∀ (m i : ℕ), i ≤ m → ∑ j ∈ Finset.range m, (if i < j + 1 then A j - A (j + 1) else 0) = A i - A m := by
+    have hA : ∀ m, A (m + 1) ≤ A m := fun m =>
+      ha (by
+        simp only [Fin.mk_le_mk]
+        omega)
+    have tel
+        : ∀ (m i : ℕ),
+          i ≤ m → ∑ j ∈ Finset.range m, (if i < j + 1 then A j - A (j + 1) else 0) = A i - A m := by
       intro m
       induction m with
       | zero =>
@@ -56,7 +62,10 @@ private theorem antitone_mem : ∀ {n : ℕ} (M : AddSubmonoid (Fin n → ℤ)),
           · intro j hj
             have := Finset.mem_range.1 hj
             rw [if_neg (by omega)]
-    have key : a = (A N) • (1 : Fin (N + 1) → ℤ) + ∑ j ∈ Finset.range N, (A j - A (j + 1)).toNat • fund (N + 1) (j + 1) := by
+    have key
+        : a
+          = (A N) • (1 : Fin (N + 1) → ℤ)
+            + ∑ j ∈ Finset.range N, (A j - A (j + 1)).toNat • fund (N + 1) (j + 1) := by
       funext i
       have hi : A i = a i := by
         show a _ = a i
@@ -65,10 +74,13 @@ private theorem antitone_mem : ∀ {n : ℕ} (M : AddSubmonoid (Fin n → ℤ)),
         have := i.2
         simp only
         omega
-      have h3 : ∀ j ∈ Finset.range N, (A j - A (j + 1)).toNat • fund (N + 1) (j + 1) i =
-          if (i : ℕ) < j + 1 then A j - A (j + 1) else 0 := by
+      have h3
+          : ∀ j ∈ Finset.range N,
+            (A j - A (j + 1)).toNat • fund (N + 1) (j + 1) i
+              = if (i : ℕ) < j + 1 then A j - A (j + 1) else 0 := by
         intro j _
-        have : (((A j - A (j + 1)).toNat : ℕ) : ℤ) = A j - A (j + 1) := Int.toNat_of_nonneg (sub_nonneg.2 (hA j))
+        have : (((A j - A (j + 1)).toNat : ℕ) : ℤ) = A j - A (j + 1) :=
+          Int.toNat_of_nonneg (sub_nonneg.2 (hA j))
         simp only [fund, nsmul_eq_mul, this]
         split_ifs <;> simp
       have h4 := tel N i (by have := i.2; omega)
@@ -76,16 +88,23 @@ private theorem antitone_mem : ∀ {n : ℕ} (M : AddSubmonoid (Fin n → ℤ)),
       rw [Finset.sum_congr rfl h3, h4, hi]
       ring
     rw [key]
-    refine add_mem ?_ (sum_mem fun j hj => nsmul_mem (h1 _ (by have := Finset.mem_range.1 hj; omega)) _)
+    refine add_mem ?_
+      (sum_mem fun j hj => nsmul_mem (h1 _ (by have := Finset.mem_range.1 hj; omega)) _)
     obtain ⟨m, e | e⟩ := (A N).eq_nat_or_neg
     · rw [e, natCast_zsmul]
       exact nsmul_mem hone m
     · rw [e, neg_smul, ← smul_neg, natCast_zsmul]
       exact nsmul_mem h2 m
 
-private theorem u_operator_torus_eigen {G : Type} [Group G] (I : Iwa G) {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    (π : Representation A G M) {t : G} (ht : t ∈ I.T) {v : M} (hv : v ∈ fixd π I.N) {c : A} (hc : π t v = c • v) :
-    I.uOp π t v = c • v := by
+private theorem u_operator_torus_eigen
+    {G : Type} [Group G]
+    (I : Iwa G)
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (π : Representation A G M)
+    {t : G} (ht : t ∈ I.T)
+    {v : M} (hv : v ∈ fixd π I.N)
+    {c : A} (hc : π t v = c • v)
+    : I.uOp π t v = c • v := by
   have h : (I.Nconj t).subgroupOf I.N = ⊤ := by
     rw [Subgroup.subgroupOf_eq_top]
     intro x hx
@@ -98,31 +117,39 @@ private theorem u_operator_torus_eigen {G : Type} [Group G] (I : Iwa G) {A M : T
   letI := Unique.mk' (I.N ⧸ (I.Nconj t).subgroupOf I.N)
   rw [Iwa.uOp, finsum_unique, map_mul, Module.End.mul_apply, hc, map_smul, hv _ (SetLike.coe_mem _)]
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
 private noncomputable def mu (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) : kˣ →* ℂˣ :=
   ψ i * (absPow k ((modExp (fun _ : Fin n => Unit) i : ℂ) / 2))⁻¹
 
-private theorem expo_eq (ψ : Fin n → kˣ →* ℂˣ) (d : Fin n → kˣ) : Dict.expo ψ d = ((torusChar (mu ψ) d : ℂˣ) : ℂ) := by
+private theorem expo_eq (ψ : Fin n → kˣ →* ℂˣ) (d : Fin n → kˣ)
+    : Dict.expo ψ d = ((torusChar (mu ψ) d : ℂˣ) : ℂ) := by
   have hd : ∀ i, Matrix.GeneralLinearGroup.det (leviTorus k (Fin n) d i) = d i :=
     congrFun ((leviTorus k (Fin n)).left_inv d)
   simp [Dict.expo, deltaHalf_apply, hd, mu, Finset.prod_mul_distrib]
 
-private noncomputable def omg (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) : kˣ →* ℂˣ := ψ i * absPow k (-(((n : ℂ) - 1) / 2))
+private noncomputable def omg (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) : kˣ →* ℂˣ :=
+  ψ i * absPow k (-(((n : ℂ) - 1) / 2))
 
-private theorem om_shift (ψ : Fin n → kˣ →* ℂˣ) : (fun i => omg ψ i * absPow k (((n : ℂ) - 1) / 2)) = ψ := by
+private theorem om_shift (ψ : Fin n → kˣ →* ℂˣ)
+    : (fun i => omg ψ i * absPow k (((n : ℂ) - 1) / 2)) = ψ := by
   funext i
   rw [omg, mul_assoc, ← absPow_add, neg_add_cancel, absPow_zero, mul_one]
 
-private theorem om_unit (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) {y : kˣ} (hy : valuation k (y : k) = 1) : omg ψ i y = ψ i y := by
+private theorem om_unit (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) {y : kˣ} (hy : valuation k (y : k) = 1)
+    : omg ψ i y = ψ i y := by
   simp [omg, isUnram_absPow k _ y hy]
 
-private theorem mu_unit (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) {y : kˣ} (hy : valuation k (y : k) = 1) : mu ψ i y = ψ i y := by
+private theorem mu_unit (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) {y : kˣ} (hy : valuation k (y : k) = 1)
+    : mu ψ i y = ψ i y := by
   simp [mu, isUnram_absPow k _ y hy]
 
-private theorem mu_unif (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) :
-    (mu ψ i (UpperTheory.V.Hi.unif k) : ℂ) = (omg ψ i (UpperTheory.V.Hi.unif k) : ℂ) * ((Nat.card 𝓀[k] : ℂ) ^ (i : ℕ))⁻¹ := by
-  have hq : nabs k (UpperTheory.V.Hi.unif k) = (Nat.card 𝓀[k] : ℝ)⁻¹ := GlobalTheory.GLDoubling.nabs_unif GlAx.unif_spec
+private theorem mu_unif (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n)
+    : (mu ψ i (UpperTheory.V.Hi.unif k) : ℂ)
+      = (omg ψ i (UpperTheory.V.Hi.unif k) : ℂ) * ((Nat.card 𝓀[k] : ℂ) ^ (i : ℕ))⁻¹ := by
+  have hq : nabs k (UpperTheory.V.Hi.unif k) = (Nat.card 𝓀[k] : ℝ)⁻¹ :=
+    GlobalTheory.GLDoubling.nabs_unif GlAx.unif_spec
   have e : mu ψ i = omg ψ i * absPow k ((i : ℕ) : ℂ) := by
     have hi := i.2
     rw [mu, omg, mul_assoc, ← absPow_add, ← absPow_neg, modExp_fin _ (fun _ => by simp)]
@@ -132,8 +159,9 @@ private theorem mu_unif (ψ : Fin n → kˣ →* ℂˣ) (i : Fin n) :
   rw [e, MonoidHom.mul_apply, Units.val_mul, val_absPow, hq, Complex.cpow_natCast]
   simp
 
-private theorem mu_fund (ψ : Fin n → kˣ →* ℂˣ) (j : ℕ) :
-    ((torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ fund n j i) : ℂˣ) : ℂ) = psEig (omg ψ) j := by
+private theorem mu_fund (ψ : Fin n → kˣ →* ℂˣ) (j : ℕ)
+    : ((torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ fund n j i) : ℂˣ) : ℂ)
+      = psEig (omg ψ) j := by
   rw [torusChar_apply, Units.coe_prod, psEig, Finset.prod_filter]
   refine Finset.prod_congr rfl fun i _ => ?_
   by_cases h : (i : ℕ) < j
@@ -149,12 +177,15 @@ private theorem diagT_inj : Function.Injective (diagT k (Fin n)) := by
   exact Units.ext this
 
 private noncomputable def phi (ω : Fin n → kˣ →* ℂˣ) : (glIwa k n).T →* ℂˣ :=
-  ((torusChar ω)⁻¹ : (Fin n → kˣ) →* ℂˣ).comp ((torusO k (Fin n)).subtype.comp
-    ((torusO k (Fin n)).equivMapOfInjective (diagT k (Fin n)) diagT_inj).symm.toMonoidHom)
+  ((torusChar ω)⁻¹ : (Fin n → kˣ) →* ℂˣ).comp
+    ((torusO k (Fin n)).subtype.comp
+      ((torusO k (Fin n)).equivMapOfInjective (diagT k (Fin n)) diagT_inj).symm.toMonoidHom)
 
-private theorem phi_diag (ω : Fin n → kˣ →* ℂˣ) (u : Fin n → kˣ) (hu : u ∈ torusO k (Fin n)) :
-    phi ω ⟨diagT k (Fin n) u, u, hu, rfl⟩ = (torusChar ω u)⁻¹ := by
-  have : ((torusO k (Fin n)).equivMapOfInjective (diagT k (Fin n)) diagT_inj).symm ⟨diagT k (Fin n) u, u, hu, rfl⟩ = ⟨u, hu⟩ := by
+private theorem phi_diag (ω : Fin n → kˣ →* ℂˣ) (u : Fin n → kˣ) (hu : u ∈ torusO k (Fin n))
+    : phi ω ⟨diagT k (Fin n) u, u, hu, rfl⟩ = (torusChar ω u)⁻¹ := by
+  have : ((torusO k (Fin n)).equivMapOfInjective (diagT k (Fin n)) diagT_inj).symm
+        ⟨diagT k (Fin n) u, u, hu, rfl⟩
+      = ⟨u, hu⟩ := by
     rw [MulEquiv.symm_apply_eq]
     rfl
   exact congrArg (fun x : torusO k (Fin n) => (torusChar ω (x : Fin n → kˣ))⁻¹) this
@@ -177,14 +208,22 @@ private theorem upow_add (a b : Fin n → ℤ) : upow k n (a + b) = upow k n a *
   funext i
   simp [_root_.zpow_add]
 
-private theorem upow_mem {a : Fin n → ℤ} (ha : Antitone a) : upow k n a ∈ (glIwa k n).P := ⟨a, ha, rfl⟩
+private theorem upow_mem {a : Fin n → ℤ} (ha : Antitone a) : upow k n a ∈ (glIwa k n).P :=
+  ⟨a, ha, rfl⟩
 
-private theorem uOp_upow {T : Type} [AddCommGroup T] [Module ℂ T] (τ : Representation ℂ (GL (Fin n) k) T)
-    (ψ : Fin n → kˣ →* ℂˣ) {v : T} (hv : v ∈ fixd τ (glIwa k n).N)
-    (hev : ∀ j ≤ n, (glIwa k n).uOp τ (al k n j) v = psEig (omg ψ) j • v) (a : Fin n → ℤ) (ha : Antitone a) :
-    (glIwa k n).uOp τ (upow k n a) v = ((torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ a i) : ℂˣ) : ℂ) • v := by
-  have E_add : ∀ a b : Fin n → ℤ, torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ (a + b) i) =
-      torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ a i) * torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ b i) := by
+private theorem uOp_upow
+    {T : Type} [AddCommGroup T] [Module ℂ T]
+    (τ : Representation ℂ (GL (Fin n) k) T) (ψ : Fin n → kˣ →* ℂˣ)
+    {v : T} (hv : v ∈ fixd τ (glIwa k n).N)
+    (hev : ∀ j ≤ n, (glIwa k n).uOp τ (al k n j) v = psEig (omg ψ) j • v)
+    (a : Fin n → ℤ) (ha : Antitone a)
+    : (glIwa k n).uOp τ (upow k n a) v
+      = ((torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ a i) : ℂˣ) : ℂ) • v := by
+  have E_add
+      : ∀ a b : Fin n → ℤ,
+        torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ (a + b) i)
+          = torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ a i)
+            * torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ b i) := by
     intro a b
     rw [← map_mul]
     congr 1
@@ -196,23 +235,25 @@ private theorem uOp_upow {T : Type} [AddCommGroup T] [Module ℂ T] (τ : Repres
       simp
     rw [this, map_one]
   have mulOp := fun x y hx hy => (uOpMul _ (glIwa k n) ℂ T τ x y hx hy v hv)
-  let M : AddSubmonoid (Fin n → ℤ) :=
-    { carrier := {a | Antitone a ∧ (glIwa k n).uOp τ (upow k n a) v =
+  let M : AddSubmonoid (Fin n → ℤ) := {
+    carrier :=
+      {a | Antitone a ∧ (glIwa k n).uOp τ (upow k n a) v =
         ((torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ a i) : ℂˣ) : ℂ) • v}
-      add_mem' := by
-        rintro a b ⟨ha, ea⟩ ⟨hb, eb⟩
-        refine ⟨ha.add hb, ?_⟩
-        rw [upow_add, ← (mulOp _ _ (upow_mem ha) (upow_mem hb)).2.1, eb, map_smul, ea, smul_smul, E_add, Units.val_mul,
-          mul_comm]
-      zero_mem' := by
-        refine ⟨fun _ _ _ => le_rfl, ?_⟩
-        have h1 : upow k n (0 : Fin n → ℤ) = 1 := by
-          rw [upow, ← (diagT k (Fin n)).map_one]
-          congr 1
-          funext i
-          simp
-        rw [h1, E_zero, (mulOp 1 1 (one_mem _) (one_mem _)).2.2.1]
-        simp }
+    add_mem' := by
+      rintro a b ⟨ha, ea⟩ ⟨hb, eb⟩
+      refine ⟨ha.add hb, ?_⟩
+      rw [upow_add, ← (mulOp _ _ (upow_mem ha) (upow_mem hb)).2.1, eb, map_smul, ea, smul_smul,
+        E_add, Units.val_mul, mul_comm]
+    zero_mem' := by
+      refine ⟨fun _ _ _ => le_rfl, ?_⟩
+      have h1 : upow k n (0 : Fin n → ℤ) = 1 := by
+        rw [upow, ← (diagT k (Fin n)).map_one]
+        congr 1
+        funext i
+        simp
+      rw [h1, E_zero, (mulOp 1 1 (one_mem _) (one_mem _)).2.2.1]
+      simp
+  }
   have hfund : ∀ j ≤ n, fund n j ∈ M := by
     intro j hj
     refine ⟨fun i i' h => ?_, ?_⟩
@@ -235,12 +276,16 @@ private theorem uOp_upow {T : Type} [AddCommGroup T] [Module ℂ T] (τ : Repres
       simp [fund]
     obtain ⟨-, e1⟩ := hfund n le_rfl
     rw [h1] at e1
-    have u1 := (mulOp _ _ (upow_mem anti) (upow_mem anti)).2.2.2.2 (by rw [hinv]; exact upow_mem anti')
-    have u2 := (mulOp _ _ (upow_mem anti') (upow_mem anti')).2.2.2.2 (by rw [← hinv, inv_inv]; exact upow_mem anti)
+    have u1 :=
+      (mulOp _ _ (upow_mem anti) (upow_mem anti)).2.2.2.2 (by rw [hinv]; exact upow_mem anti')
+    have u2 :=
+      (mulOp _ _ (upow_mem anti') (upow_mem anti')).2.2.2.2 (by
+        rw [← hinv, inv_inv]; exact upow_mem anti)
     refine ⟨anti', ?_⟩
     rw [u2]
-    have hE : torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ (-1 : Fin n → ℤ) i) =
-        (torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ (1 : Fin n → ℤ) i))⁻¹ := by
+    have hE
+        : torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ (-1 : Fin n → ℤ) i)
+          = (torusChar (mu ψ) (fun i => UpperTheory.V.Hi.unif k ^ (1 : Fin n → ℤ) i))⁻¹ := by
       rw [eq_inv_iff_mul_eq_one, ← E_add]
       rw [neg_add_cancel]
       exact E_zero

@@ -26,14 +26,17 @@ def nmPullA : NMor L.γ N.p (κA (OK l K) L.I) L.γ M.p (κA (OK l K) L.I) (Ring
   nmK L.γ L.γ N.p M.p (RingHom.id L.A) (DPMorphism.id L.γ).isDPMorphism (fun _ => rfl) u hu
 
 def nmPullB : NMor L.γB N.q (κA K L.IB) L.γB M.q (κA K L.IB) (RingHom.id L.B) :=
-  nmK L.γB L.γB N.q M.q (RingHom.id L.B) (DPMorphism.id L.γB).isDPMorphism (fun _ => rfl) (Model.genMap u hu)
-    (Model.genMap_q u hu)
+  nmK L.γB L.γB N.q M.q (RingHom.id L.B) (DPMorphism.id L.γB).isDPMorphism
+    (fun _ => rfl)
+    (Model.genMap u hu) (Model.genMap_q u hu)
 
 end
 
 section
-variable {m : ℕ} {L : Lev (per l K) m} (hL : L.Good) {M N : Model l K} (u : M.X ⟶ N.X) (hu : u ≫ N.p = M.p) (s : ℕ)
-  (hQN : ∀ T, QB L N s T → QA L N s (((nmB N hL).mor 0).obj T))
+variable
+  {m : ℕ} {L : Lev (per l K) m} (hL : L.Good)
+  {M N : Model l K} (u : M.X ⟶ N.X) (hu : u ≫ N.p = M.p)
+  (s : ℕ) (hQN : ∀ T, QB L N s T → QA L N s (((nmB N hL).mor 0).obj T))
   (hQM : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T))
   (rHN : ∀ n j, N.Hc false n j →ₛₗ[L.lam] HM (QA L N s) none ((l : L.A) ^ n) j)
   (rHM : ∀ n j, M.Hc false n j →ₛₗ[L.lam] HM (QA L M s) none ((l : L.A) ^ n) j)
@@ -55,20 +58,24 @@ end PullbackComparison
 end
 
 section
-variable {m : ℕ} {L : Lev (per l K) m}
+variable
+  {m : ℕ} {L : Lev (per l K) m}
   (d : ∀ n, RedIn (B.DD false (PAlg.base l) n) (B.κb (okToOC l K) false n) L.γ l n)
   (hc : ∀ n (c : Acris l), (d n).ρ ((PAlg.base l).cris n c) = Ideal.Quotient.mk _ (L.lam c))
-  {M N : Model l K} (u : M.X ⟶ N.X) (hu : u ≫ N.p = M.p) (s : ℕ)
+  {M N : Model l K} (u : M.X ⟶ N.X) (hu : u ≫ N.p = M.p)
+  (s : ℕ)
 
-theorem lnMap_id {B : Type} [CommRing B] (k n : ℕ) (y : B ⧸ Ideal.span {(k : B) ^ n}) :
-    lnMap (RingHom.id B) k (le_refl n) y = y := by
+theorem lnMap_id {B : Type} [CommRing B] (k n : ℕ) (y : B ⧸ Ideal.span {(k : B) ^ n})
+    : lnMap (RingHom.id B) k (le_refl n) y = y := by
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective y
   rfl
 
-theorem rHof_pull (n j : ℕ) (x : N.Hc false n j) :
-    nmHM (nmPullA L u hu) l s none n j (rHof d hc N s n j x) =
-      rHof d hc M s n j (B.pullHc (okToOC l K) (B.schMap u hu) false n j x) :=
-  (red_nm (d n) (d n) s (nmPullA L u hu) _ _ _ _ _ (hc n) (hc n) _ _ (fun _ _ => rfl) (fun _ => (lnMap_id l n _).symm)
+theorem rHof_pull (n j : ℕ) (x : N.Hc false n j)
+    : nmHM (nmPullA L u hu) l s none n j (rHof d hc N s n j x)
+      = rHof d hc M s n j (B.pullHc (okToOC l K) (B.schMap u hu) false n j x) :=
+  (red_nm (d n) (d n) s (nmPullA L u hu) _ _ _ _ _ (hc n) (hc n) _ _
+    (fun _ _ => rfl)
+    (fun _ => (lnMap_id l n _).symm)
     none j x).symm
 
 end

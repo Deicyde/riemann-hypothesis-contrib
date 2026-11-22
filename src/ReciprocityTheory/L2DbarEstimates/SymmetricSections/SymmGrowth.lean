@@ -24,26 +24,30 @@ theorem symmGrowth : symmGrowthStatement.{u} := by
     intro y hy
     rw [Set.Finite.mem_toFinset] at hy
     have hy' : z y = w := hy
-    calc ‖u y‖ ≤ R (z y) := hR y
+    calc
+      ‖u y‖
+        ≤ R (z y) := hR y
       _ = R w := by rw [hy']
       _ ≤ max (R w) 0 := le_max_left _ _
-  calc ‖∑ t ∈ hfin.toFinset.powersetCard k, t.prod u‖
+  calc
+    ‖∑ t ∈ hfin.toFinset.powersetCard k, t.prod u‖
       ≤ ∑ t ∈ hfin.toFinset.powersetCard k, ‖t.prod u‖ := norm_sum_le _ _
     _ ≤ ∑ t ∈ hfin.toFinset.powersetCard k, (max (R w) 0) ^ k := by
-        apply Finset.sum_le_sum
-        intro t ht
-        rw [Finset.mem_powersetCard] at ht
-        rw [norm_prod]
-        calc ∏ y ∈ t, ‖u y‖ ≤ ∏ _y ∈ t, max (R w) 0 :=
-              Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) (fun y hy => hu y (ht.1 hy))
-          _ = (max (R w) 0) ^ k := by rw [Finset.prod_const, ht.2]
+      apply Finset.sum_le_sum
+      intro t ht
+      rw [Finset.mem_powersetCard] at ht
+      rw [norm_prod]
+      calc
+        ∏ y ∈ t, ‖u y‖ ≤ ∏ _y ∈ t, max (R w) 0 :=
+          Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) (fun y hy => hu y (ht.1 hy))
+        _ = (max (R w) 0) ^ k := by rw [Finset.prod_const, ht.2]
     _ = ((hfin.toFinset.powersetCard k).card : ℝ) * (max (R w) 0) ^ k := by
-        rw [Finset.sum_const, nsmul_eq_mul]
+      rw [Finset.sum_const, nsmul_eq_mul]
     _ ≤ 2 ^ δ * (max (R w) 0) ^ k := by
-        apply mul_le_mul_of_nonneg_right _ (pow_nonneg hB k)
-        rw [Finset.card_powersetCard]
-        have h1 := Nat.choose_le_two_pow hfin.toFinset.card k
-        have h2 : 2 ^ hfin.toFinset.card ≤ 2 ^ δ := Nat.pow_le_pow_right (by norm_num) hcard
-        exact_mod_cast h1.trans h2
+      apply mul_le_mul_of_nonneg_right _ (pow_nonneg hB k)
+      rw [Finset.card_powersetCard]
+      have h1 := Nat.choose_le_two_pow hfin.toFinset.card k
+      have h2 : 2 ^ hfin.toFinset.card ≤ 2 ^ δ := Nat.pow_le_pow_right (by norm_num) hcard
+      exact_mod_cast h1.trans h2
 
 end ReciprocityTheory.L2DbarEstimates.Norm

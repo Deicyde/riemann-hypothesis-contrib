@@ -8,9 +8,11 @@ namespace ReciprocityTheory.ChartRestriction.G.T0.PrimeAvoidanceFibre
 
 open IsLocalRing
 
-theorem avoid {B : Type*} [CommRing B] [IsNoetherianRing B] (M q : Ideal B) [hM : M.IsMaximal] (w : B)
-    (hchain : ∀ P : Ideal B, P.IsPrime → q ≤ P → P ≤ M → w ∈ P → P = M) :
-    ∃ s ∉ M, ∀ P : Ideal B, P.IsPrime → q ≤ P → w ∈ P → s ∉ P → P = M := by
+theorem avoid
+    {B : Type*} [CommRing B] [IsNoetherianRing B]
+    (M q : Ideal B) [hM : M.IsMaximal]
+    (w : B) (hchain : ∀ P : Ideal B, P.IsPrime → q ≤ P → P ≤ M → w ∈ P → P = M)
+    : ∃ s ∉ M, ∀ P : Ideal B, P.IsPrime → q ≤ P → w ∈ P → s ∉ P → P = M := by
   classical
   haveI := hM.isPrime
   set I : Ideal B := q ⊔ Ideal.span {w} with hI
@@ -21,8 +23,8 @@ theorem avoid {B : Type*} [CommRing B] [IsNoetherianRing B] (M q : Ideal B) [hM 
     obtain ⟨hpp, hIp⟩ := hprop p hp
     exact hne (hchain p hpp (le_trans le_sup_left hIp) hle
       (hIp (Ideal.mem_sup_right (Ideal.mem_span_singleton_self w))))
-  have hex : ∀ p ∈ I.minimalPrimes, p ≠ M → ∃ x ∈ p, x ∉ M :=
-    fun p hp hne => SetLike.not_le_iff_exists.mp (hnot p hp hne)
+  have hex : ∀ p ∈ I.minimalPrimes, p ≠ M → ∃ x ∈ p, x ∉ M := fun p hp hne =>
+    SetLike.not_le_iff_exists.mp (hnot p hp hne)
   let f : Ideal B → B := fun p =>
     if h : p ∈ I.minimalPrimes ∧ p ≠ M then (hex p h.1 h.2).choose else 1
   let T := hfin.toFinset.filter (· ≠ M)
@@ -48,17 +50,20 @@ theorem avoid {B : Type*} [CommRing B] [IsNoetherianRing B] (M q : Ideal B) [hM 
       · simp only [f, dif_pos (And.intro hp hpM)]
         exact hpP (hex p hp hpM).choose_spec.1
 
-theorem finite_of_fibre {O T : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsAdicComplete (maximalIdeal O) O] [CommRing T] [IsDomain T] [IsNoetherianRing T] [Algebra O T]
-    [Algebra.FiniteType O T] (ϖ : O) (hϖ : Irreducible ϖ)
-    (hex : ∃ P : Ideal T, P.IsPrime ∧ algebraMap O T ϖ ∈ P)
-    (huniq : ∀ P P' : Ideal T, P.IsPrime → P'.IsPrime → algebraMap O T ϖ ∈ P → algebraMap O T ϖ ∈ P' →
-      P = P') : Module.Finite O T := by
+theorem finite_of_fibre
+    {O T : Type*}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O]
+    [CommRing T] [IsDomain T] [IsNoetherianRing T] [Algebra O T] [Algebra.FiniteType O T]
+    (ϖ : O) (hϖ : Irreducible ϖ) (hex : ∃ P : Ideal T, P.IsPrime ∧ algebraMap O T ϖ ∈ P)
+    (huniq : ∀ P P' : Ideal T,
+      P.IsPrime → P'.IsPrime → algebraMap O T ϖ ∈ P → algebraMap O T ϖ ∈ P' → P = P')
+    : Module.Finite O T := by
   classical
   set w := algebraMap O T ϖ with hw
   set J : Ideal T := Ideal.span {w} with hJ
   obtain ⟨P0, hP0, hwP0⟩ := hex
-  have hJtop : J ≠ ⊤ := fun h => hP0.ne_top (eq_top_iff.2 (h ▸ (Ideal.span_singleton_le_iff_mem P0).2 hwP0))
+  have hJtop : J ≠ ⊤ := fun h =>
+    hP0.ne_top (eq_top_iff.2 (h ▸ (Ideal.span_singleton_le_iff_mem P0).2 hwP0))
 
   have hdim : Ring.KrullDimLE 0 (T ⧸ J) := by
     rw [Ring.krullDimLE_zero_iff]
@@ -72,17 +77,23 @@ theorem finite_of_fibre {O T : Type*} [CommRing O] [IsDomain O] [IsDiscreteValua
     have : I = N := by
       have h1 := congrArg (Ideal.map (Ideal.Quotient.mk J)) e
       rwa [Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective,
-        Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective] at h1
-    rw [this]; exact hN
+          Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective]
+        at h1
+    rw [this]
+    exact hN
   have hart : IsArtinianRing (T ⧸ J) := IsNoetherianRing.isArtinianRing_of_krullDimLE_zero
 
   have hmJ : maximalIdeal O ≤ Ideal.comap (algebraMap O T) J := by
     rw [hϖ.maximalIdeal_eq, Ideal.span_le, Set.singleton_subset_iff]
     exact Ideal.mem_span_singleton_self w
   let _ : Algebra (O ⧸ maximalIdeal O) (T ⧸ J) := Ideal.Quotient.algebraQuotientOfLEComap hmJ
-  have hmk : ∀ c : O, algebraMap (O ⧸ maximalIdeal O) (T ⧸ J) (Ideal.Quotient.mk _ c) =
-      Ideal.Quotient.mk J (algebraMap O T c) := fun c => rfl
-  have : IsScalarTower O (O ⧸ maximalIdeal O) (T ⧸ J) := IsScalarTower.of_algebraMap_eq fun c => (hmk c).symm
+  have hmk
+      : ∀ c : O,
+        algebraMap (O ⧸ maximalIdeal O) (T ⧸ J) (Ideal.Quotient.mk _ c)
+          = Ideal.Quotient.mk J (algebraMap O T c) := fun c =>
+    rfl
+  have : IsScalarTower O (O ⧸ maximalIdeal O) (T ⧸ J) :=
+    IsScalarTower.of_algebraMap_eq fun c => (hmk c).symm
   have : Algebra.FiniteType O (T ⧸ J) :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ O J) Ideal.Quotient.mk_surjective
   have : Algebra.FiniteType (O ⧸ maximalIdeal O) (T ⧸ J) :=

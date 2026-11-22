@@ -10,8 +10,9 @@ open MvPolynomial Filter Topology
 
 theorem ptsLocal : PtsLocalStatement := by
   intro K _ ι _ P e Ψ₀ φ φ' g g' hφ hg
-  have hS : ∀ (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) y w,
-      sheetDensity P Ψ φ g y w = sheetDensity P Ψ φ' g' y w := by
+  have hS
+      : ∀ (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) y w,
+        sheetDensity P Ψ φ g y w = sheetDensity P Ψ φ' g' y w := by
     intro Ψ y w
     unfold sheetDensity
     split_ifs with hγ

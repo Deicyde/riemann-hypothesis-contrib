@@ -218,12 +218,13 @@ theorem factDuLe : FactDuLe := by
   intro R ι _ hc C A
   haveI := A.Mu0_fd
   show Module.finrank ℂ A.Mram ≤ Module.finrank ℂ A.Mu0
-  exact LinearMap.finrank_le_finrank_of_injective (Submodule.inclusion_injective (inf_le_left : A.Mram ≤ A.Mu0))
+  exact LinearMap.finrank_le_finrank_of_injective (Submodule.inclusion_injective
+    (inf_le_left : A.Mram ≤ A.Mu0))
 
 theorem factGaussRam : FactGaussRam := by
   intro R ι _ hc C A v x hx
-  refine (Formalism.ThetaLiftIndependence.final_gaussOp (A.Fv v) (C.cls 0 → C.Y 0 → ℂ) (A.psiT v) (A.rhoT v)
-    (A.psiT_ne v) x ?_).1
+  refine (Formalism.ThetaLiftIndependence.final_gaussOp (A.Fv v) (C.cls 0 → C.Y 0 → ℂ) (A.psiT v)
+    (A.rhoT v) (A.psiT_ne v) x ?_).1
   simpa [ColumnsAtT.Nm, LinearMap.sum_apply] using hx
 
 theorem bridge_autL_not_column_holds : bridge_autL_not_column := by
@@ -289,7 +290,8 @@ theorem factDleDall : FactDleDall := by
 
 theorem factZeMu0 : FactZeMu0 := by
   intro R D u
-  simp only [Formalism.BasicNotions.Rows.Data.zeC, D.rowsRest_wordColumnUnit_baseTuple, Units.val_one, map_one]
+  simp only [Formalism.BasicNotions.Rows.Data.zeC, D.rowsRest_wordColumnUnit_baseTuple,
+    Units.val_one, map_one]
 
 theorem factAjConj : FactAjConj := by
   intro R D j w
@@ -314,9 +316,7 @@ theorem factNc : FactNc := by
   rw [Real.rpow_neg hx.le, show (2 : ℝ) * ε = ε + ε by ring, Real.rpow_add hx]
   rcases eq_or_ne (R.n : ℝ) 0 with hn | hn
   · simp [hn]
-  · first
-    | (field_simp; done)
-    | (field_simp; ring)
+  · first | (field_simp; done) | (field_simp; ring)
 
 theorem bridge_ccb_unit_holds : bridge_ccb_unit := by
   intro R L _ _ _ _ _ w x hx
@@ -345,11 +345,13 @@ theorem bridge_ccb_dual_holds : bridge_ccb_dual := by
   · rintro ⟨β, hβ⟩ f ⟨φ, hφ, rfl⟩ x hx
     exact ⟨β ⟨φ, hφ⟩ ⟨x, hx⟩, hβ ⟨φ, hφ⟩ ⟨x, hx⟩⟩
   · intro h
-    have hmem : ∀ (φ : N) (F : A), ∃ c : 𝓞 K, algebraMap (𝓞 K) K c = B (φ : W) (F : V) :=
-      fun φ F => h (Submodule.mem_map_of_mem φ.2) F F.2
+    have hmem : ∀ (φ : N) (F : A), ∃ c : 𝓞 K, algebraMap (𝓞 K) K c = B (φ : W) (F : V) := fun φ F =>
+      h (Submodule.mem_map_of_mem φ.2) F F.2
     choose c hc using hmem
-    refine ⟨LinearMap.mk₂ (𝓞 K) c (fun φ ψ F => ?_) (fun r φ F => ?_) (fun φ F G => ?_)
-      (fun r φ F => ?_), fun φ F => ?_⟩
+    refine ⟨
+      LinearMap.mk₂ (𝓞 K) c (fun φ ψ F => ?_) (fun r φ F => ?_) (fun φ F G => ?_) (fun r φ F => ?_),
+      fun φ F => ?_
+    ⟩
     · apply inj; simp [hc]
     · apply inj
       simp only [hc, Submodule.coe_smul, smul_eq_mul, map_mul]
@@ -367,7 +369,8 @@ theorem factNatW : FactNatW := by
     have hi := i.2
     have hN : 0 < N := by omega
     simp only [DomWeight.detShift, dif_pos hN]
-    exact lam.anti (show i ≤ ⟨N - 1, by omega⟩ from Fin.le_iff_val_le_val.mpr (show i.val ≤ N - 1 by omega))
+    exact lam.anti (show i ≤ ⟨N - 1, by omega⟩ from
+      Fin.le_iff_val_le_val.mpr (show i.val ≤ N - 1 by omega))
   refine ⟨?_, ?_, ?_⟩
   · intro i j hij
     simp only [DomWeight.natW]
@@ -417,10 +420,13 @@ theorem bridge_sigRank_holds : Spaces.bridge_sigRank := by
 theorem factSigYD (R : Ranks) : FactSigYD R := by
   have h2 := R.two_le_m
   obtain ⟨a, ha⟩ := R.m_even
-  refine ⟨Prod.ext ?_ ?_, Prod.ext ?_ ?_⟩ <;> simp only [sigYD, Ranks.sigY0, Ranks.rankY, Ranks.rS, Ranks.r] <;> omega
+  refine ⟨Prod.ext ?_ ?_, Prod.ext ?_ ?_⟩
+    <;> simp only [sigYD, Ranks.sigY0, Ranks.rankY, Ranks.rS, Ranks.r] <;> omega
 
-theorem factWmPosDef (R : Ranks) (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [StarRing E] [Algebra F E] : FactWmPosDef R F E := by
+theorem factWmPosDef
+    (R : Ranks)
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+    : FactWmPosDef R F E := by
   intro S τ
   have h1 : 1 ≤ R.m := by
     have := R.two_le_m
@@ -428,8 +434,8 @@ theorem factWmPosDef (R : Ranks) (F E : Type) [Field F] [NumberField F] [Field E
   rw [S.W_sigval R.m h1 le_rfl τ, S.W_rank R.m h1 le_rfl]
   simp only [Ranks.sigW, Ranks.r, Nat.sub_self]
 
-theorem bridge_cols_conj_holds : bridge_cols_conj :=
-  fun D u => ⟨(D.mem u).A.Mu0, (D.mem u).A.Mu0_fd, rfl, rfl⟩
+theorem bridge_cols_conj_holds : bridge_cols_conj := fun D u =>
+  ⟨(D.mem u).A.Mu0, (D.mem u).A.Mu0_fd, rfl, rfl⟩
 
 theorem factSigYDceil : FactSigYDceil := by
   intro R j hj
@@ -449,8 +455,8 @@ theorem factPsiCardViaTau : FactPsiCardViaTau := by
   intro D
   rw [← Nat.card_congr D.eTau, Nat.card_eq_fintype_card, D.what₂.card_Tau]
 
-theorem anisotropicLine_indep_of_member : AnisotropicLineIndepOfMember :=
-  fun D u => ⟨D.cOf u, D.cOf_ne u, D.cOf_eq u⟩
+theorem anisotropicLine_indep_of_member : AnisotropicLineIndepOfMember := fun D u =>
+  ⟨D.cOf u, D.cOf_ne u, D.cOf_eq u⟩
 
 theorem factUnitRuleAgree : FactUnitRuleAgree := by
   intro D w x
@@ -475,8 +481,7 @@ theorem iotaH_add (e : ℕ) (i j : ZMod (2 ^ e)) : iotaH e (i + j) = iotaH e i *
   rw [orderOf_unit_class_eq_two_pow e] at h
   exact h
 
-theorem iotaH_zero (e : ℕ) : iotaH e 0 = 1 := by
-  simp only [iotaH, ZMod.val_zero, pow_zero]
+theorem iotaH_zero (e : ℕ) : iotaH e 0 = 1 := by simp only [iotaH, ZMod.val_zero, pow_zero]
 
 theorem iotaH_one (e : ℕ) : iotaH e 1 = hcl e (u5 (e + 2)) := by
   simp only [iotaH]
@@ -489,7 +494,9 @@ theorem iotaH_bijective (e : ℕ) : Function.Bijective (iotaH e) := by
   have inj : Function.Injective (iotaH e) := by
     intro i j hij
     simp only [iotaH] at hij
-    rw [pow_inj_mod, orderOf_unit_class_eq_two_pow e, Nat.mod_eq_of_lt (ZMod.val_lt i), Nat.mod_eq_of_lt (ZMod.val_lt j)] at hij
+    rw [pow_inj_mod, orderOf_unit_class_eq_two_pow e, Nat.mod_eq_of_lt (ZMod.val_lt i),
+        Nat.mod_eq_of_lt (ZMod.val_lt j)]
+      at hij
     exact ZMod.val_injective _ hij
   exact inj.bijective_of_nat_card_le (by rw [card_HGrp, Nat.card_zmod])
 
@@ -502,7 +509,8 @@ theorem bridge_iota_holds : bridge_iota := by
   rw [h2, map_pow, h1]
   rfl
 
-theorem iotaH_iotaHInv (e : ℕ) (h : HGrp e) : iotaH e (iotaHInv e h) = h := Function.rightInverse_invFun (iotaH_bijective e).surjective h
+theorem iotaH_iotaHInv (e : ℕ) (h : HGrp e) : iotaH e (iotaHInv e h) = h :=
+  Function.rightInverse_invFun (iotaH_bijective e).surjective h
 
 theorem bridge_star_holds : bridge_star := by
   intro R H x
@@ -585,9 +593,7 @@ theorem factFrobGeom : FactFrobGeom := by
   have h : H.galE σ⁻¹ = (H.galE σ)⁻¹ := map_inv _ σ
   refine ⟨h, ?_⟩
   rw [h, Prod.snd_inv]
-  first
-  | rfl
-  | simp [Formalism.HC.Frame.iotaInv]
+  first | rfl | simp [Formalism.HC.Frame.iotaInv]
 
 end host
 
@@ -597,50 +603,62 @@ open Matrix
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem hT_expand (S : HSpace E) (x y : S.V) :
-    S.hT x y = ∑ a, ∑ b, star (S.frame.repr x a) * S.gram a b * S.frame.repr y b := by
+theorem hT_expand (S : HSpace E) (x y : S.V)
+    : S.hT x y = ∑ a, ∑ b, star (S.frame.repr x a) * S.gram a b * S.frame.repr y b := by
   have key : ∀ u : S.V, S.hT u y = ∑ b, S.hT u (S.frame b) * S.frame.repr y b := by
     intro u
     conv_lhs => rw [← S.frame.sum_repr y]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     exact Finset.sum_congr rfl fun b _ => by rw [LinearMap.map_smul, smul_eq_mul, mul_comm]
-  have key2 : ∀ b, S.hT x (S.frame b) = ∑ a, star (S.frame.repr x a) * S.hT (S.frame a) (S.frame b) := by
+  have key2
+      : ∀ b, S.hT x (S.frame b) = ∑ a, star (S.frame.repr x a) * S.hT (S.frame a) (S.frame b) := by
     intro b
     conv_lhs => rw [← S.frame.sum_repr x]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, LinearMap.sum_apply]
-    exact Finset.sum_congr rfl fun a _ => by rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
+    exact Finset.sum_congr rfl fun a _ => by
+      rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
   rw [key x]
   simp only [key2, Finset.sum_mul, HSpace.gram]
   exact Finset.sum_comm
 
-theorem gram_family (S : HSpace E) {ι : Type} [Fintype ι] (w : ι → S.V) :
-    (Matrix.of fun i j => S.hT (w i) (w j)) =
-      (Matrix.of fun a i => S.frame.repr (w i) a)ᴴ * S.gram *
-        Matrix.of fun a i => S.frame.repr (w i) a := by
+theorem gram_family (S : HSpace E) {ι : Type} [Fintype ι] (w : ι → S.V)
+    : (Matrix.of fun i j => S.hT (w i) (w j))
+      = (Matrix.of fun a i => S.frame.repr (w i) a)ᴴ * S.gram
+        * Matrix.of fun a i => S.frame.repr (w i) a := by
   ext i j
   simp only [Matrix.of_apply]
   rw [hT_expand]
   simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply, Finset.sum_mul]
   exact Finset.sum_comm
 
-theorem map_family (S : HSpace E) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
-    {ι : Type} [Fintype ι] (w : ι → S.V) :
-    (Matrix.of fun i j => S.hT (w i) (w j)).map τ =
-      ((Matrix.of fun a i => S.frame.repr (w i) a).map τ)ᴴ * S.gram.map τ *
-        (Matrix.of fun a i => S.frame.repr (w i) a).map τ := by
+theorem map_family
+    (S : HSpace E)
+    (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
+    {ι : Type} [Fintype ι]
+    (w : ι → S.V)
+    : (Matrix.of fun i j => S.hT (w i) (w j)).map τ
+      = ((Matrix.of fun a i => S.frame.repr (w i) a).map τ)ᴴ * S.gram.map τ
+        * (Matrix.of fun a i => S.frame.repr (w i) a).map τ := by
   rw [gram_family, Matrix.map_mul, Matrix.map_mul, Matrix.conjTranspose_map τ (fun a => hτ a)]
 
-theorem sig_family (S : HSpace E) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
-    {ι : Type} [Fintype ι] [DecidableEq ι] (w : ι → S.V) {p q p' q' : ℕ}
+theorem sig_family
+    (S : HSpace E)
+    (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (w : ι → S.V)
+    {p q p' q' : ℕ}
     (h : Formalism.UG.HasSignature ((Matrix.of fun i j => S.hT (w i) (w j)).map τ) p q)
-    (hS : Formalism.UG.HasSignature (S.gram.map τ) p' q') : p + q' ≤ S.rank ∧ p' + q ≤ S.rank := by
+    (hS : Formalism.UG.HasSignature (S.gram.map τ) p' q')
+    : p + q' ≤ S.rank ∧ p' + q ≤ S.rank := by
   obtain ⟨-, Q, hQ⟩ := Formalism.UG.P.sig_data _ p q h
   obtain ⟨-, QS, hQS⟩ := Formalism.UG.P.sig_data _ p' q' hS
   rw [map_family S τ hτ w] at hQ
-  have hQ' : (((Matrix.of fun a i => S.frame.repr (w i) a).map τ) * Q)ᴴ * S.gram.map τ *
-      (((Matrix.of fun a i => S.frame.repr (w i) a).map τ) * Q) = Formalism.UG.Jpq p q := by
+  have hQ'
+      : (((Matrix.of fun a i => S.frame.repr (w i) a).map τ) * Q)ᴴ * S.gram.map τ
+          * (((Matrix.of fun a i => S.frame.repr (w i) a).map τ) * Q)
+        = Formalism.UG.Jpq p q := by
     rw [Matrix.conjTranspose_mul]
     simpa [Matrix.mul_assoc] using hQ
   have h1 := Formalism.UG.P.sig_dim (S.gram.map τ) _ hQ' QS hQS
@@ -648,7 +666,8 @@ theorem sig_family (S : HSpace E) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) =
   simp only [Fintype.card_fin] at h1 h2
   exact ⟨h1, h2⟩
 
-theorem sig_sum (S : HSpace E) (hS : S.SigOK) (τ : E →+* ℂ) : (S.sig τ).1 + (S.sig τ).2 = S.rank := bridge_sigRank_holds E S hS τ
+theorem sig_sum (S : HSpace E) (hS : S.SigOK) (τ : E →+* ℂ) : (S.sig τ).1 + (S.sig τ).2 = S.rank :=
+  bridge_sigRank_holds E S hS τ
 
 variable (R : Ranks) (F : Type) [Field F] [NumberField F] [Algebra F E]
 
@@ -659,8 +678,9 @@ theorem baseSpace_posDef : BaseSpacePosDef R F E := by
   rcases S.X_def 0 (Nat.zero_le _) τ with h | h
   · exact h
   · exfalso
-    have hw : (Matrix.of fun i j => (S.Y 0).hT (S.iXY 0 ((S.X 0).frame i))
-        (S.iXY 0 ((S.X 0).frame j))) = (S.X 0).gram := by
+    have hw
+        : (Matrix.of fun i j => (S.Y 0).hT (S.iXY 0 ((S.X 0).frame i)) (S.iXY 0 ((S.X 0).frame j)))
+          = (S.X 0).gram := by
       ext i j
       exact S.iXY_isom 0 (by have := R.two_le_m; omega) _ _
     have hsX := S.X_sig 0 τ
@@ -682,16 +702,20 @@ theorem factXmDef : FactXmDef R F E := by
   have hYr : (S.Y R.m).rank = R.rankX' := by rw [S.Y_rank R.m le_rfl]; rfl
   have hpos : 0 < R.rankX' := by unfold Ranks.rankX' Ranks.r; have := R.k_ge; omega
   have hNX : R.N R.m = R.rankX' + 1 := factXm R
-  have hw : (Matrix.of fun i j => (S.X R.m).hT (S.iX' (S.X'.frame i)) (S.iX' (S.X'.frame j))) =
-      S.X'.gram := by
+  have hw
+      : (Matrix.of fun i j => (S.X R.m).hT (S.iX' (S.X'.frame i)) (S.iX' (S.X'.frame j)))
+        = S.X'.gram := by
     ext i j; exact S.iX'_isom _ _
-  have hw2 : (Matrix.of fun i j => (S.Y R.m).hT (S.eYm (S.X'.frame i)) (S.eYm (S.X'.frame j))) =
-      S.X'.gram := by
+  have hw2
+      : (Matrix.of fun i j => (S.Y R.m).hT (S.eYm (S.X'.frame i)) (S.eYm (S.X'.frame j)))
+        = S.X'.gram := by
     ext i j; exact S.eYm_isom _ _
   have hs' : ∀ τ, (S.X'.sig τ).1 + (S.X'.sig τ).2 = R.rankX' := fun τ => by
     rw [sig_sum _ S.X'_sig τ, hX'r]
-  have key : ∀ τ : E →+* ℂ, ((S.X R.m).sig τ = (R.N R.m, 0) → S.X'.sig τ = (R.rankX', 0)) ∧
-      ((S.X R.m).sig τ = (0, R.N R.m) → S.X'.sig τ = (0, R.rankX')) := by
+  have key
+      : ∀ τ : E →+* ℂ,
+        ((S.X R.m).sig τ = (R.N R.m, 0) → S.X'.sig τ = (R.rankX', 0))
+          ∧ ((S.X R.m).sig τ = (0, R.N R.m) → S.X'.sig τ = (0, R.rankX')) := by
     intro τ
     have hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a) := S.cm.cmUnram.2.1 τ
     have hsX' := S.X'_sig τ
@@ -754,7 +778,8 @@ theorem factVSig : FactVSig R F E := by
       rw [if_pos hneg] at this
       simp only [LinearMap.neg_apply] at this
       rw [Matrix.of_apply, Matrix.neg_apply, Matrix.one_apply, ← this, neg_neg]
-    have hsig : Formalism.UG.HasSignature ((Matrix.of fun a b => (S.V j).hT (e a) (e b)).map τ) 0 R.nV := by
+    have hsig : Formalism.UG.HasSignature ((Matrix.of fun a b => (S.V j).hT (e a) (e b)).map τ) 0
+        R.nV := by
       rw [hw]
       have h0 : (-1 : Matrix (Fin R.nV) (Fin R.nV) E).map τ = -1 := by
         ext a b; by_cases hab : a = b <;> simp [hab]
@@ -769,7 +794,8 @@ theorem factVSig : FactVSig R F E := by
       have := horth a b
       rw [if_neg hneg] at this
       rw [Matrix.of_apply, Matrix.one_apply, this]
-    have hsig : Formalism.UG.HasSignature ((Matrix.of fun a b => (S.V j).hT (e a) (e b)).map τ) R.nV 0 := by
+    have hsig : Formalism.UG.HasSignature ((Matrix.of fun a b => (S.V j).hT (e a) (e b)).map τ) R.nV
+        0 := by
       rw [hw]
       have h0 : (1 : Matrix (Fin R.nV) (Fin R.nV) E).map τ = 1 := by
         ext a b; by_cases hab : a = b <;> simp [Matrix.one_apply, hab]
@@ -824,14 +850,16 @@ theorem factLpF : FactLpF := by
     rintro y ⟨xs, hx0, hodd, hcon, rfl⟩
     have hsum := Finset.sum_le_sum fun s (_ : s ∈ Finset.univ) => hcon s
     rw [Finset.sum_add_distrib] at hsum
-    have hshift : ∑ s, ∑ i ∈ Finset.range d, xs (s - (i : ZMod d)) i =
-        ∑ s, ∑ i ∈ Finset.range d, xs s i := by
+    have hshift
+        : ∑ s, ∑ i ∈ Finset.range d, xs (s - (i : ZMod d)) i
+          = ∑ s, ∑ i ∈ Finset.range d, xs s i := by
       rw [Finset.sum_comm]
       conv_rhs => rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => ?_
       exact Fintype.sum_equiv (Equiv.subRight (i : ZMod d)) _ _ (fun s => rfl)
-    have hfirst : (l : ℝ) * ∑ s, ∑ i ∈ Finset.range d, xs s i ≤
-        ∑ s, ∑ i ∈ Finset.range d, (l : ℝ) ^ i * xs s i := by
+    have hfirst
+        : (l : ℝ) * ∑ s, ∑ i ∈ Finset.range d, xs s i
+          ≤ ∑ s, ∑ i ∈ Finset.range d, (l : ℝ) ^ i * xs s i := by
       rw [Finset.mul_sum]
       refine Finset.sum_le_sum fun s _ => ?_
       rw [Finset.mul_sum]
@@ -839,7 +867,9 @@ theorem factLpF : FactLpF := by
       by_cases ho : Odd i
       · have hli : (l : ℝ) ≤ (l : ℝ) ^ i := by
           obtain ⟨k, rfl⟩ := ho
-          calc (l : ℝ) = (l : ℝ) ^ 1 := (pow_one _).symm
+          calc
+            (l : ℝ)
+              = (l : ℝ) ^ 1 := (pow_one _).symm
             _ ≤ (l : ℝ) ^ (2 * k + 1) := pow_le_pow_right₀ (by linarith) (by omega)
         exact mul_le_mul_of_nonneg_right hli (hx0 s i)
       · rw [hodd s i (Or.inl ho)]
@@ -860,17 +890,18 @@ theorem factLpF : FactLpF := by
   · have := le_csSup hbdd h0
     linarith
 
-theorem detPow_mul (R : Type) [CommRing R] (N : ℕ) (g h : GL (Fin N) R) (c : ℤ) :
-    detPow R N (g * h) c = detPow R N g c * detPow R N h c := by
+theorem detPow_mul (R : Type) [CommRing R] (N : ℕ) (g h : GL (Fin N) R) (c : ℤ)
+    : detPow R N (g * h) c = detPow R N g c * detPow R N h c := by
   simp only [detPow, map_mul, mul_zpow, Units.val_mul]
 
-theorem rowAct_tr_eq (R : Type) [CommRing R] (N : ℕ) (g : GL (Fin N) R)
-    (f : MvPolynomial (Fin N × Fin N) R) :
-    Formalism.GradedWeylDivisibility.rowAct R (n := N) (g : Matrix (Fin N) (Fin N) R).transpose f =
-      Formalism.UG.dwAct R N N (inside₂ R N g) f := rfl
+theorem rowAct_tr_eq
+    (R : Type) [CommRing R] (N : ℕ) (g : GL (Fin N) R) (f : MvPolynomial (Fin N × Fin N) R)
+    : Formalism.GradedWeylDivisibility.rowAct R (n := N) (g : Matrix (Fin N) (Fin N) R).transpose f
+      = Formalism.UG.dwAct R N N (inside₂ R N g) f :=
+  rfl
 
-theorem invTr_mul (R : Type) [CommRing R] (N : ℕ) (g h : GL (Fin N) R) :
-    inside₂ R N (g * h) = inside₂ R N g * inside₂ R N h := by
+theorem invTr_mul (R : Type) [CommRing R] (N : ℕ) (g h : GL (Fin N) R)
+    : inside₂ R N (g * h) = inside₂ R N g * inside₂ R N h := by
   apply Units.ext
   show ((g * h)⁻¹ : GL (Fin N) R).val.transpose = ((g⁻¹ : GL (Fin N) R).val.transpose) * ((h⁻¹ : GL (Fin N) R).val.transpose)
   rw [mul_inv_rev, Units.val_mul, Matrix.transpose_mul]
@@ -882,7 +913,8 @@ theorem bridge_round_square_holds : bridge_round_square := by
     apply Units.ext
     show (g : Matrix (Fin N) (Fin N) R).transpose.transpose = (g : Matrix (Fin N) (Fin N) R)
     exact Matrix.transpose_transpose _
-  have h3 : Matrix.GeneralLinearGroup.det (inside₂ R N g) = (Matrix.GeneralLinearGroup.det g)⁻¹ := by
+  have h3
+      : Matrix.GeneralLinearGroup.det (inside₂ R N g) = (Matrix.GeneralLinearGroup.det g)⁻¹ := by
     rw [← map_inv]
     apply Units.ext
     show ((g⁻¹ : GL (Fin N) R) : Matrix (Fin N) (Fin N) R).transpose.det = ((g⁻¹ : GL (Fin N) R) : Matrix (Fin N) (Fin N) R).det
@@ -919,8 +951,8 @@ theorem bridge_normFock_extremal_holds : bridge_normFock_extremal := by
     intro h; rw [h] at hpos; simp at hpos
   exact div_self h0
 
-theorem fockF_smul {σ : Type} (a b : ℂ) (ha : a ≠ 0) (f g : MvPolynomial σ ℂ) :
-    Formalism.REAL.fockF (a • f) (b • g) = a * star b * Formalism.REAL.fockF f g := by
+theorem fockF_smul {σ : Type} (a b : ℂ) (ha : a ≠ 0) (f g : MvPolynomial σ ℂ)
+    : Formalism.REAL.fockF (a • f) (b • g) = a * star b * Formalism.REAL.fockF f g := by
   unfold Formalism.REAL.fockF
   rw [MvPolynomial.support_smul_eq ha, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
@@ -932,14 +964,16 @@ theorem factNormFockUnitary : FactNormFockUnitary := by
   unfold normFock roundAct
   congr 1
   have ha : detPow ℂ N g (-lam.detShift) ≠ 0 := Units.ne_zero _
-  have hdd : (Matrix.GeneralLinearGroup.det g : ℂ) * star (Matrix.GeneralLinearGroup.det g : ℂ) = 1 := by
+  have hdd
+      : (Matrix.GeneralLinearGroup.det g : ℂ) * star (Matrix.GeneralLinearGroup.det g : ℂ) = 1 := by
     rw [Matrix.GeneralLinearGroup.val_det_apply, ← Matrix.det_conjTranspose, ← Matrix.det_mul,
       ← Matrix.star_eq_conjTranspose, Unitary.mul_star_self_of_mem hg, Matrix.det_one]
   have haa : detPow ℂ N g (-lam.detShift) * star (detPow ℂ N g (-lam.detShift)) = 1 := by
     rw [detPow, Units.val_zpow_eq_zpow_val, star_zpow₀, ← mul_zpow, hdd, one_zpow]
   rw [fockF_smul _ _ ha, haa, one_mul]
-  have hinv : Matrix.conjTranspose ((g⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ) =
-      (g : Matrix (Fin N) (Fin N) ℂ) := by
+  have hinv
+      : Matrix.conjTranspose ((g⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)
+        = (g : Matrix (Fin N) (Fin N) ℂ) := by
     rw [Matrix.coe_units_inv, Matrix.inv_eq_left_inv (Unitary.star_mul_self_of_mem hg),
       Matrix.star_eq_conjTranspose, Matrix.conjTranspose_conjTranspose]
   unfold Formalism.UG.dwAct
@@ -949,8 +983,8 @@ theorem factNormFockUnitary : FactNormFockUnitary := by
     rw [← AlgHom.comp_apply, ← h1.1, inv_mul_cancel, h1.2, AlgHom.id_apply]
   simpa [Formalism.UG.dwAct] using congrArg (Formalism.REAL.fockF f) key
 
-theorem nPl_two_mul (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] :
-    (Formalism.HN.nPl K : ℝ) * 2 = Module.finrank ℚ K := by
+theorem nPl_two_mul (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    : (Formalism.HN.nPl K : ℝ) * 2 = Module.finrank ℚ K := by
   simp only [Formalism.HN.nPl]
   have h1 := NumberField.InfinitePlace.card_add_two_mul_card_eq_rank K
   have h2 := NumberField.InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces (K := K)
@@ -960,12 +994,18 @@ theorem nPl_two_mul (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsT
     | exact NumberField.IsTotallyComplex.nrRealPlaces_eq_zero (K := K)
     | exact (NumberField.IsTotallyComplex.nrRealPlaces_eq_zero (K := K)).1
     | simp
-    | (simp only [NumberField.InfinitePlace.nrRealPlaces, Fintype.card_eq_zero_iff]
-       exact ⟨fun w => (NumberField.InfinitePlace.not_isReal_iff_isComplex.mpr (NumberField.IsTotallyComplex.isComplex w.1)) w.2⟩)
+    | (
+        simp only [NumberField.InfinitePlace.nrRealPlaces, Fintype.card_eq_zero_iff]
+        exact ⟨fun w =>
+          (NumberField.InfinitePlace.not_isReal_iff_isComplex.mpr
+              (NumberField.IsTotallyComplex.isComplex w.1))
+            w.2⟩
+      )
   exact_mod_cast (by omega : Fintype.card (NumberField.InfinitePlace K) * 2 = Module.finrank ℚ K)
 
-theorem HLat.L_ne_bot {K : Type} [Field K] [NumberField K] [StarRing K] (A : HLat K)
-    (hr : 0 < A.rank) : A.L ≠ ⊥ := by
+theorem HLat.L_ne_bot
+    {K : Type} [Field K] [NumberField K] [StarRing K] (A : HLat K) (hr : 0 < A.rank)
+    : A.L ≠ ⊥ := by
   intro h
   have h1 : Submodule.span K ((A.L : Set A.V)) = ⊥ := by
     rw [h, Submodule.bot_coe, Submodule.span_zero_singleton]
@@ -1010,15 +1050,19 @@ theorem bridge_dual_mu_holds : bridge_dual_mu := by
     simp only [HLat.rank] at hr
     omega
   have hs1 := Formalism.HN.sizeMu K A.V A.ι A.b A.X hG.1 A.L hG.2.1 hL
-  have hs2 := Formalism.HN.sizeMu K (Module.Dual K A.V) A.ι A.b.dualBasis (Formalism.HN.dualFrame A.X) hXd
-    (Formalism.HN.dualLat A.L) hd.1 hdne
+  have hs2 :=
+    Formalism.HN.sizeMu K (Module.Dual K A.V) A.ι A.b.dualBasis (Formalism.HN.dualFrame A.X) hXd
+      (Formalism.HN.dualLat A.L) hd.1 hdne
   simp only at hs1 hs2
   have e := hd.2.2.2.2.2.1
   rw [hs2.2.2.2.2.1, hs1.2.2.2.1, ← Real.exp_neg] at e
   have e2 := Real.exp_injective e
-  unfold HLat.muMinDual HLat.muMax HLat.dualB HLat.dualX HLat.dualL Formalism.HN.muMinDef Formalism.HN.muMaxDef
-  have hc : Formalism.HN.logDisc K / (2 * (Module.finrank ℚ K : ℝ)) =
-      Formalism.HN.logDisc K / (Module.finrank ℚ K : ℝ) / 2 := by rw [div_div, mul_comm]
+  unfold HLat.muMinDual HLat.muMax HLat.dualB HLat.dualX HLat.dualL Formalism.HN.muMinDef
+    Formalism.HN.muMaxDef
+  have hc
+      : Formalism.HN.logDisc K / (2 * (Module.finrank ℚ K : ℝ))
+        = Formalism.HN.logDisc K / (Module.finrank ℚ K : ℝ) / 2 := by
+    rw [div_div, mul_comm]
   rw [hc] at e2
   linarith
 
@@ -1037,8 +1081,9 @@ theorem span_prime_isMaximal (p : ℕ) (hp : p.Prime) : (Ideal.span {(p : ℤ)})
   haveI := Fact.mk hp
   exact Int.ideal_span_isMaximal_of_prime p
 
-theorem liesOver_of_mem (p : ℕ) (hp : p.Prime) (w : HeightOneSpectrum (𝓞 K))
-    (hmem : (p : 𝓞 K) ∈ w.asIdeal) : w.asIdeal.LiesOver (Ideal.span {(p : ℤ)}) := by
+theorem liesOver_of_mem
+    (p : ℕ) (hp : p.Prime) (w : HeightOneSpectrum (𝓞 K)) (hmem : (p : 𝓞 K) ∈ w.asIdeal)
+    : w.asIdeal.LiesOver (Ideal.span {(p : ℤ)}) := by
   have hmax := span_prime_isMaximal p hp
   have hP : (w.asIdeal.comap (algebraMap ℤ (𝓞 K))).IsPrime := w.isPrime.comap _
   have hle : Ideal.span {(p : ℤ)} ≤ w.asIdeal.comap (algebraMap ℤ (𝓞 K)) := by
@@ -1046,8 +1091,8 @@ theorem liesOver_of_mem (p : ℕ) (hp : p.Prime) (w : HeightOneSpectrum (𝓞 K)
     simpa using hmem
   exact ⟨hmax.eq_of_le hP.ne_top hle⟩
 
-theorem mem_of_liesOver (p : ℕ) (q : Ideal (𝓞 K)) [q.LiesOver (Ideal.span {(p : ℤ)})] :
-    (p : 𝓞 K) ∈ q := by
+theorem mem_of_liesOver (p : ℕ) (q : Ideal (𝓞 K)) [q.LiesOver (Ideal.span {(p : ℤ)})]
+    : (p : 𝓞 K) ∈ q := by
   have h : Ideal.span {(p : ℤ)} = q.under ℤ := Ideal.LiesOver.over
   have hm : (p : ℤ) ∈ q.under ℤ := by
     rw [← h]
@@ -1055,16 +1100,17 @@ theorem mem_of_liesOver (p : ℕ) (q : Ideal (𝓞 K)) [q.LiesOver (Ideal.span {
   have hm2 : algebraMap ℤ (𝓞 K) (p : ℤ) ∈ q := hm
   simpa using hm2
 
-theorem vAdd_prime (p : ℕ) (hp : p.Prime) (w : HeightOneSpectrum (𝓞 K))
-    (hmem : (p : 𝓞 K) ∈ w.asIdeal) : vAdd w ((p : ℕ) : K) = (eWL K w : ℤ) := by
+theorem vAdd_prime
+    (p : ℕ) (hp : p.Prime) (w : HeightOneSpectrum (𝓞 K)) (hmem : (p : 𝓞 K) ∈ w.asIdeal)
+    : vAdd w ((p : ℕ) : K) = (eWL K w : ℤ) := by
   have hl0 : (p : 𝓞 K) ≠ 0 := by exact_mod_cast hp.ne_zero
   have := liesOver_of_mem p hp w hmem
   have hmap : (Ideal.span {(p : ℤ)}).map (algebraMap ℤ (𝓞 K)) = Ideal.span {(p : 𝓞 K)} := by
     simp [Ideal.map_span]
-  have hne : (Ideal.span {(p : ℤ)}).map (algebraMap ℤ (𝓞 K)) ≠ ⊥ := by
-    rw [hmap]; simpa using hl0
+  have hne : (Ideal.span {(p : ℤ)}).map (algebraMap ℤ (𝓞 K)) ≠ ⊥ := by rw [hmap]; simpa using hl0
   unfold vAdd eWL
-  rw [Ideal.IsDedekindDomain.ramificationIdx_eq_multiplicity (Ideal.span {(p : ℤ)}) w.asIdeal hne, hmap]
+  rw [Ideal.IsDedekindDomain.ramificationIdx_eq_multiplicity (Ideal.span {(p : ℤ)}) w.asIdeal hne,
+    hmap]
   have : ((p : ℕ) : K) = algebraMap (𝓞 K) K (p : 𝓞 K) := by simp
   rw [this, w.valuation_of_algebraMap, w.intValuation_eq_exp_neg_multiplicity hl0, WithZero.log_exp]
   simp
@@ -1073,28 +1119,36 @@ theorem bridge_unit_rule_holds : bridge_unit_rule := by
   intro K _ _ l w hl hmem
   exact vAdd_prime l hl w hmem
 
-theorem sum_e_f (p : ℕ) (hp : p.Prime) (S : Finset (HeightOneSpectrum (𝓞 K)))
-    (hS : ∀ w, w ∈ S ↔ (p : 𝓞 K) ∈ w.asIdeal) :
-    ∑ w ∈ S, eWL K w * w.asIdeal.inertiaDeg ℤ = Module.finrank ℚ K := by
+theorem sum_e_f
+    (p : ℕ) (hp : p.Prime)
+    (S : Finset (HeightOneSpectrum (𝓞 K))) (hS : ∀ w, w ∈ S ↔ (p : 𝓞 K) ∈ w.asIdeal)
+    : ∑ w ∈ S, eWL K w * w.asIdeal.inertiaDeg ℤ = Module.finrank ℚ K := by
   have := span_prime_isMaximal p hp
   have hP0 : Ideal.span {(p : ℤ)} ≠ ⊥ := by simp [hp.ne_zero]
   have h := Ideal.sum_ramification_inertia_eq_finrank (Ideal.span {(p : ℤ)}) (𝓞 K)
   rw [NumberField.RingOfIntegers.rank] at h
   rw [← h]
-  refine Finset.sum_bij' (fun w hw => ⟨w.asIdeal, w.isPrime, liesOver_of_mem p hp w ((hS w).mp hw)⟩)
+  refine Finset.sum_bij'
+    (fun w hw => ⟨w.asIdeal, w.isPrime, liesOver_of_mem p hp w ((hS w).mp hw)⟩)
     (fun q _ => ⟨q.1, q.2.1, Ideal.ne_bot_of_liesOver_of_ne_bot hP0 q.1⟩)
-    (fun _ _ => Finset.mem_univ _) (fun q _ => ?_) (fun _ _ => rfl) (fun _ _ => rfl)
+    (fun _ _ => Finset.mem_univ _)
+    (fun q _ => ?_)
+    (fun _ _ => rfl)
+    (fun _ _ => rfl)
     (fun _ _ => rfl)
   rw [hS]
   have := q.2.2
   exact mem_of_liesOver p q.1
 
-theorem sum_lw_e (p : ℕ) (hp : p.Prime) (S : Finset (HeightOneSpectrum (𝓞 K)))
-    (hS : ∀ w, w ∈ S ↔ (p : 𝓞 K) ∈ w.asIdeal) :
-    ∑ w ∈ S, lw K w * (eWL K w : ℝ) = Real.log p := by
+theorem sum_lw_e
+    (p : ℕ) (hp : p.Prime)
+    (S : Finset (HeightOneSpectrum (𝓞 K))) (hS : ∀ w, w ∈ S ↔ (p : 𝓞 K) ∈ w.asIdeal)
+    : ∑ w ∈ S, lw K w * (eWL K w : ℝ) = Real.log p := by
   have hn : (0 : ℝ) < Module.finrank ℚ K := by exact_mod_cast Module.finrank_pos
-  have hterm : ∀ w ∈ S, lw K w * (eWL K w : ℝ) =
-      Real.log p / Module.finrank ℚ K * ((eWL K w * w.asIdeal.inertiaDeg ℤ : ℕ) : ℝ) := by
+  have hterm
+      : ∀ w ∈ S,
+        lw K w * (eWL K w : ℝ)
+          = Real.log p / Module.finrank ℚ K * ((eWL K w * w.asIdeal.inertiaDeg ℤ : ℕ) : ℝ) := by
     intro w hw
     have := liesOver_of_mem p hp w ((hS w).mp hw)
     have hN := Ideal.pow_inertiaDeg p w.asIdeal
@@ -1108,8 +1162,8 @@ theorem sum_lw_e (p : ℕ) (hp : p.Prime) (S : Finset (HeightOneSpectrum (𝓞 K
   rw [← Nat.cast_sum, this]
   field_simp
 
-theorem finite_places_over (p : ℕ) (hp : p.Prime) :
-    ∃ S : Finset (HeightOneSpectrum (𝓞 K)), ∀ w, w ∈ S ↔ (p : 𝓞 K) ∈ w.asIdeal := by
+theorem finite_places_over (p : ℕ) (hp : p.Prime)
+    : ∃ S : Finset (HeightOneSpectrum (𝓞 K)), ∀ w, w ∈ S ↔ (p : 𝓞 K) ∈ w.asIdeal := by
   have hI : Ideal.span {(p : 𝓞 K)} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast hp.ne_zero
@@ -1124,8 +1178,9 @@ theorem factUnitNormalisation : FactUnitNormalisation := by
   intro K _ _ p hp
   obtain ⟨S, hS⟩ := finite_places_over (K := K) p hp
   rw [finsum_eq_sum_of_support_subset _ (s := S) ?h]
-  · calc _ = ∑ w ∈ S, 2 * (lw K w * (eWL K w : ℝ)) :=
-          Finset.sum_congr rfl fun w hw => by rw [if_pos ((hS w).mp hw), mul_assoc]
+  · calc
+      _ = ∑ w ∈ S, 2 * (lw K w * (eWL K w : ℝ)) :=
+        Finset.sum_congr rfl fun w hw => by rw [if_pos ((hS w).mp hw), mul_assoc]
       _ = 2 * Real.log p := by rw [← Finset.mul_sum, sum_lw_e p hp S hS]
   · intro w hw
     rw [Function.mem_support] at hw
@@ -1133,25 +1188,35 @@ theorem factUnitNormalisation : FactUnitNormalisation := by
     by_contra h
     exact hw (if_neg h)
 
-theorem resChar_mem (D : D7) (w : D.what₂.places.Pl) :
-    ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
+theorem resChar_mem (D : D7) (w : D.what₂.places.Pl)
+    : ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
   have hv := D.what₂.places.val_resChar w
   have hne : ((D.what₂.places.resChar w : ℕ) : D.what₂.LL) ≠ 0 := by
     exact_mod_cast (D.what₂.places.resChar_prime w).ne_zero
   rw [D.val_eq w _ hne] at hv
-  have hv' : vAdd (D.plEq w) ((D.what₂.places.resChar w : ℕ) : D.what₂.LL) =
-      ((D.what₂.places.ramIdx w : ℕ) : ℤ) := by exact_mod_cast hv
+  have hv'
+      : vAdd (D.plEq w) ((D.what₂.places.resChar w : ℕ) : D.what₂.LL)
+        = ((D.what₂.places.ramIdx w : ℕ) : ℤ) := by
+    exact_mod_cast hv
   have hpos := D.what₂.places.ramIdx_pos w
-  have h1 : (D.plEq w).valuation D.what₂.LL (algebraMap (𝓞 D.what₂.LL) D.what₂.LL
-      ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL)) < 1 := by
-    have hx : ((D.what₂.places.resChar w : ℕ) : D.what₂.LL) = algebraMap (𝓞 D.what₂.LL) D.what₂.LL
-        ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) := by simp
+  have h1
+      : (D.plEq w).valuation D.what₂.LL
+          (algebraMap (𝓞 D.what₂.LL) D.what₂.LL ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL))
+        < 1 := by
+    have hx
+        : ((D.what₂.places.resChar w : ℕ) : D.what₂.LL)
+          = algebraMap (𝓞 D.what₂.LL) D.what₂.LL
+            ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) := by
+      simp
     rw [← hx]
     have hv0 : (D.plEq w).valuation D.what₂.LL ((D.what₂.places.resChar w : ℕ) : D.what₂.LL) ≠ 0 :=
       (Valuation.ne_zero_iff _).mpr hne
     unfold vAdd at hv'
-    rw [← WithZero.exp_log hv0, show WithZero.log ((D.plEq w).valuation D.what₂.LL
-      ((D.what₂.places.resChar w : ℕ) : D.what₂.LL)) = -((D.what₂.places.ramIdx w : ℕ) : ℤ) by omega]
+    rw [← WithZero.exp_log hv0,
+      show WithZero.log ((D.plEq w).valuation D.what₂.LL
+            ((D.what₂.places.resChar w : ℕ) : D.what₂.LL))
+          = -((D.what₂.places.ramIdx w : ℕ) : ℤ) by
+        omega]
     rw [← WithZero.exp_zero, WithZero.exp_lt_exp]
     omega
   exact ((D.plEq w).valuation_lt_one_iff_mem _).mp h1
@@ -1175,7 +1240,8 @@ theorem factEtaMean : FactEtaMean := by
         push_cast at this
         linarith
       have h1' : (1 : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
-        have : ((a * (D.what₂.places.resChar w : ℤ) + b * (l : ℤ) : ℤ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
+        have : ((a * (D.what₂.places.resChar w : ℤ) + b * (l : ℤ) : ℤ) : 𝓞 D.what₂.LL)
+            ∈ (D.plEq w).asIdeal := by
           push_cast
           exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ h1) (Ideal.mul_mem_left _ _ hmem)
         rwa [hab, Int.cast_one] at this
@@ -1191,26 +1257,32 @@ section hw
 
 open MvPolynomial
 
-theorem rowAct_lpMinor (R : Type) [CommRing R] (N s : ℕ) (hs hs' : s ≤ N)
-    (A : Matrix (Fin N) (Fin N) R) (hA : ∀ i j, i < j → A i j = 0) (hA1 : ∀ i, A i i = 1) :
-    Formalism.GradedWeylDivisibility.rowAct R (n := N) A (Formalism.GradedWeylDivisibility.lpMinor R s hs hs') = Formalism.GradedWeylDivisibility.lpMinor R s hs hs' := by
+theorem rowAct_lpMinor
+    (R : Type) [CommRing R]
+    (N s : ℕ) (hs hs' : s ≤ N) (A : Matrix (Fin N) (Fin N) R)
+    (hA : ∀ i j, i < j → A i j = 0) (hA1 : ∀ i, A i i = 1)
+    : Formalism.GradedWeylDivisibility.rowAct R (n := N) A
+        (Formalism.GradedWeylDivisibility.lpMinor R s hs hs')
+      = Formalism.GradedWeylDivisibility.lpMinor R s hs hs' := by
   unfold Formalism.GradedWeylDivisibility.lpMinor
   rw [AlgHom.map_det]
-  have hmat : (Formalism.GradedWeylDivisibility.rowAct R (n := N) A).mapMatrix
-      (Matrix.of fun p q : Fin s =>
-        (X (Fin.castLE hs p, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R)) =
-      (Matrix.of fun p c : Fin s =>
-        (C (A (Fin.castLE hs p) (Fin.castLE hs c)) : MvPolynomial (Fin N × Fin N) R)) *
-      (Matrix.of fun p q : Fin s =>
-        (X (Fin.castLE hs p, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R)) := by
+  have hmat
+      : (Formalism.GradedWeylDivisibility.rowAct R (n := N) A).mapMatrix
+          (Matrix.of fun p q : Fin s =>
+            (X (Fin.castLE hs p, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R))
+        = (Matrix.of fun p c : Fin s =>
+            (C (A (Fin.castLE hs p) (Fin.castLE hs c)) : MvPolynomial (Fin N × Fin N) R))
+          * (Matrix.of fun p q : Fin s =>
+            (X (Fin.castLE hs p, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R)) := by
     apply Matrix.ext
     intro p q
-    simp only [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Formalism.GradedWeylDivisibility.rowAct, aeval_X,
-      Matrix.mul_apply]
-    have e1 : ∑ c : Fin s, (C (A (Fin.castLE hs p) (Fin.castLE hs c)) *
-          X (Fin.castLE hs c, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R) =
-        ∑ b ∈ Finset.univ.map (Fin.castLEEmb hs), (C (A (Fin.castLE hs p) b) *
-          X (b, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R) := by
+    simp only [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
+      Formalism.GradedWeylDivisibility.rowAct, aeval_X, Matrix.mul_apply]
+    have e1
+        : ∑ c : Fin s, (C (A (Fin.castLE hs p) (Fin.castLE hs c)) *
+            X (Fin.castLE hs c, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R)
+          = ∑ b ∈ Finset.univ.map (Fin.castLEEmb hs), (C (A (Fin.castLE hs p) b) *
+              X (b, Fin.castLE hs' q) : MvPolynomial (Fin N × Fin N) R) := by
       rw [Finset.sum_map]; rfl
     rw [e1]
     symm
@@ -1220,13 +1292,14 @@ theorem rowAct_lpMinor (R : Type) [CommRing R] (N s : ℕ) (hs hs' : s ≤ N)
       by_contra hlt
       push Not at hlt
       exact hb (Finset.mem_map.mpr ⟨⟨b.val, hlt⟩, Finset.mem_univ _, Fin.ext rfl⟩)
-    have hlt : Fin.castLE hs p < b := by
-      rw [Fin.lt_def]; simp only [Fin.val_castLE]; omega
+    have hlt : Fin.castLE hs p < b := by rw [Fin.lt_def]; simp only [Fin.val_castLE]; omega
     rw [hA _ _ hlt]
     simp
   rw [hmat, Matrix.det_mul]
-  have hdetA : (Matrix.of fun p c : Fin s =>
-      (C (A (Fin.castLE hs p) (Fin.castLE hs c)) : MvPolynomial (Fin N × Fin N) R)).det = 1 := by
+  have hdetA
+      : (Matrix.of fun p c : Fin s =>
+          (C (A (Fin.castLE hs p) (Fin.castLE hs c)) : MvPolynomial (Fin N × Fin N) R)).det
+        = 1 := by
     rw [Matrix.det_of_lowerTriangular]
     · simp [hA1]
     · intro i j hij
@@ -1240,20 +1313,24 @@ theorem factSqHighestWeight : FactSqHighestWeight := by
   have hN := factNatW N lam
   refine ⟨fun t => ?_, fun g hg h1 => ?_⟩
   · unfold sqAct extremal
-    have hdiag : ((diagGL R N t : GL (Fin N) R) : Matrix (Fin N) (Fin N) R).transpose =
-        Matrix.diagonal fun a => (t a : R) := by
+    have hdiag
+        : ((diagGL R N t : GL (Fin N) R) : Matrix (Fin N) (Fin N) R).transpose
+          = Matrix.diagonal fun a => (t a : R) := by
       show (Matrix.diagonal fun a => (t a : R)).transpose = _
       exact Matrix.diagonal_transpose _
-    rw [hdiag, Formalism.GradedWeylDivisibility.rowActDiagWeight R N N (fun a => (t a : R)) _ _
-      (Formalism.GradedWeylDivisibility.hwRowWeight R N N le_rfl lam.natW hN.1), smul_smul]
+    rw [hdiag,
+      Formalism.GradedWeylDivisibility.rowActDiagWeight R N N
+        (fun a => (t a : R))
+        _ _ (Formalism.GradedWeylDivisibility.hwRowWeight R N N le_rfl lam.natW hN.1),
+      smul_smul]
     congr 1
     have hu : Matrix.GeneralLinearGroup.det (diagGL R N t) = ∏ a, t a := by
       apply Units.ext
       rw [Matrix.GeneralLinearGroup.val_det_apply]
       show (Matrix.diagonal fun a => (t a : R)).det = _
       rw [Matrix.det_diagonal, Units.coe_prod]
-    have hprod : (∏ a, t a ^ lam.w a : Rˣ) =
-        (∏ a, t a) ^ lam.detShift * ∏ a, t a ^ (lam.natW a) := by
+    have hprod
+        : (∏ a, t a ^ lam.w a : Rˣ) = (∏ a, t a) ^ lam.detShift * ∏ a, t a ^ (lam.natW a) := by
       rw [← Finset.prod_zpow, ← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun a _ => ?_
       rw [← hN.2.1 a, add_comm, zpow_add, zpow_natCast]
@@ -1276,15 +1353,18 @@ theorem factSqHighestWeight : FactSqHighestWeight := by
     · rw [Matrix.transpose_apply]; exact hg hij
     · rw [Matrix.transpose_apply]; exact h1 i
 
-theorem factDelDualNabla_of (h : Formalism.GradedWeylDivisibility.WeylEqDualNabla) : FactDelDualNabla := by
+theorem factDelDualNabla_of (h : Formalism.GradedWeylDivisibility.WeylEqDualNabla)
+    : FactDelDualNabla := by
   intro N lam f hf
   have hN := factNatW N lam
   have hE := h N N le_rfl lam.natW hN.1
   have hne : extremal ℚ N lam ≠ 0 := Formalism.GradedWeylDivisibility.hwNe ℚ N N le_rfl lam.natW
   have hpos : Formalism.GradedWeylDivisibility.fockQ (extremal ℚ N lam) (extremal ℚ N lam) ≠ 0 :=
     ((Formalism.GradedWeylDivisibility.fockQPos _ _ (extremal ℚ N lam)).2 hne).ne'
-  have hmem : (∃ f₀ ∈ delSq ℤ N lam, map (Int.castRingHom ℚ) f₀ = f) ↔
-      f ∈ (Formalism.GradedWeylDivisibility.weyl ℤ N N le_rfl lam.natW).map (Formalism.GradedWeylDivisibility.intQ N N) := by
+  have hmem
+      : (∃ f₀ ∈ delSq ℤ N lam, map (Int.castRingHom ℚ) f₀ = f)
+        ↔ f ∈ (Formalism.GradedWeylDivisibility.weyl ℤ N N le_rfl lam.natW).map
+          (Formalism.GradedWeylDivisibility.intQ N N) := by
     rw [Submodule.mem_map]; rfl
   rw [hmem, hE]
   constructor
@@ -1310,20 +1390,24 @@ section principal
 open Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition FractionalIdeal
 open scoped Pointwise
 
-def DiffKPrincipal : Prop := ∀ (R : Ranks) (H : Host R),
-  (((differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) : Ideal (𝓞 H.E)) :
-    FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) =
-    spanSingleton (nonZeroDivisors (𝓞 H.E)) H.sqrtMinusD
+def DiffKPrincipal : Prop :=
+  ∀ (R : Ranks) (H : Host R),
+    (((differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) : Ideal (𝓞 H.E))
+        : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E)
+      = spanSingleton (nonZeroDivisors (𝓞 H.E)) H.sqrtMinusD
 
-def CcNorm : Prop := ∀ (R : Ranks) (H : Host R),
-  ((H.ccE : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) *
-    ((H.conj • H.ccE : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) =
-    spanSingleton (nonZeroDivisors (𝓞 H.E)) ((Ideal.absNorm H.ccK : ℕ) : H.E)
+def CcNorm : Prop :=
+  ∀ (R : Ranks) (H : Host R),
+    ((H.ccE : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E)
+        * ((H.conj • H.ccE : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E)
+      = spanSingleton (nonZeroDivisors (𝓞 H.E)) ((Ideal.absNorm H.ccK : ℕ) : H.E)
 
 theorem factPrincipalDatum_of (h1 : DiffKPrincipal) (h2 : CcNorm) : FactPrincipalDatum := by
   intro R H
-  have ht : H.ddE = differentIdeal (𝓞 H.K) (𝓞 H.E) *
-      (differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) :=
+  have ht
+      : H.ddE
+        = differentIdeal (𝓞 H.K) (𝓞 H.E)
+          * (differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) :=
     differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 H.K) (𝓞 H.E)
   have hne : differentIdeal (𝓞 H.K) (𝓞 H.E) ≠ ⊥ := differentIdeal_ne_bot
   have hspec : differentIdeal (𝓞 H.K) (𝓞 H.E) = H.𝔟 * (H.conj • H.𝔟) := H.𝔟_spec.1
@@ -1332,7 +1416,8 @@ theorem factPrincipalDatum_of (h1 : DiffKPrincipal) (h2 : CcNorm) : FactPrincipa
     rw [Ne, coeIdeal_eq_zero]
     rintro h
     exact hne (by rw [h]; simp)
-  have hB' : ((H.conj • H.𝔟 : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) ≠ 0 := by
+  have hB'
+      : ((H.conj • H.𝔟 : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) ≠ 0 := by
     rw [Ne, coeIdeal_eq_zero]
     rintro h
     exact hne (by rw [h]; simp)
@@ -1342,8 +1427,10 @@ theorem factPrincipalDatum_of (h1 : DiffKPrincipal) (h2 : CcNorm) : FactPrincipa
   have hd : H.sqrtMinusD ≠ 0 := H.sqd_ne_zero
   rw [ht, coeIdeal_mul, coeIdeal_mul, h1 R H]
   unfold Host.AA Host.AAbar Host.AA0
-  have hcalc : ∀ (s C C' B B' D : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E),
-      s * (C * B⁻¹) * (C' * B'⁻¹) * (B * B' * D) = s * (C * C') * D * (B⁻¹ * B) * (B'⁻¹ * B') := by
+  have hcalc
+      : ∀ (s C C' B B' D : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E),
+        s * (C * B⁻¹) * (C' * B'⁻¹) * (B * B' * D)
+          = s * (C * C') * D * (B⁻¹ * B) * (B'⁻¹ * B') := by
     intro s C C' B B' D
     ring
   rw [hcalc, inv_mul_cancel₀ hB, inv_mul_cancel₀ hB', h2 R H, mul_one, mul_one,

@@ -4,22 +4,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
 section aux
 
 variable (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K]
 
-private theorem xMul_conjI_eq (P : Ideal (𝓞 K)) (t : (ZMod M)ˣ) :
-    conjI M K P t = P.map (sgO M K t).symm := (Ideal.map_symm (sgO M K t)).symm
+private theorem xMul_conjI_eq (P : Ideal (𝓞 K)) (t : (ZMod M)ˣ)
+    : conjI M K P t = P.map (sgO M K t).symm :=
+  (Ideal.map_symm (sgO M K t)).symm
 
-private theorem xMul_conjI_mul (P Q : Ideal (𝓞 K)) (t : (ZMod M)ˣ) :
-    conjI M K (P * Q) t = conjI M K P t * conjI M K Q t := by
+private theorem xMul_conjI_mul (P Q : Ideal (𝓞 K)) (t : (ZMod M)ˣ)
+    : conjI M K (P * Q) t = conjI M K P t * conjI M K Q t := by
   simp only [xMul_conjI_eq, Ideal.map_mul]
 
-private theorem xMul_conjI_pow (P : Ideal (𝓞 K)) (n : ℕ) (t : (ZMod M)ˣ) :
-    conjI M K (P ^ n) t = conjI M K P t ^ n := by
+private theorem xMul_conjI_pow (P : Ideal (𝓞 K)) (n : ℕ) (t : (ZMod M)ˣ)
+    : conjI M K (P ^ n) t = conjI M K P t ^ n := by
   simp only [xMul_conjI_eq, Ideal.map_pow]
 
 private theorem xMul_conj (φ : K →+* ℂ) (x : K) : φ (sg M K (-1) x) = (starRingEnd ℂ) (φ x) := by
@@ -29,7 +32,8 @@ private theorem xMul_conj (φ : K →+* ℂ) (x : K) : φ (sg M K (-1) x) = (sta
     apply (hζ.powerBasis ℚ).algHom_ext
     rw [IsPrimitiveRoot.powerBasis_gen]
     have h1 : sg M K (-1) ζ * ζ = 1 := by
-      rw [sg_apply M K _ hζ.pow_eq_one, ← pow_succ, hζ.pow_eq_one_iff_dvd, ← ZMod.natCast_eq_zero_iff]
+      rw [sg_apply M K _ hζ.pow_eq_one, ← pow_succ, hζ.pow_eq_one_iff_dvd,
+        ← ZMod.natCast_eq_zero_iff]
       simp
     have h2 : (φ ζ) ^ M = 1 := by rw [← map_pow, hζ.pow_eq_one, map_one]
     have h3 : ‖φ ζ‖ = 1 := Complex.norm_eq_one_of_pow_eq_one h2 (NeZero.ne M)
@@ -58,13 +62,19 @@ private theorem xMul_sp_eq (x : K) : FractionalIdeal.spanSingleton (𝓞 K)⁰ x
 
 end aux
 
-theorem UpperTheory.V.ML.xMul :
-    ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K] (b : ℕ),
-    (∀ (𝔞 𝔟 : Ideal (𝓞 K)) (X Y : K), 𝔞 ≠ ⊥ → 𝔟 ≠ ⊥ → IsX M K b 𝔞 X → IsX M K b 𝔟 Y → IsX M K b (𝔞 * 𝔟) (X * Y)) ∧
-    (∀ (𝔞 𝔟 : Ideal (𝓞 K)) (Z Y : K), 𝔞 ≠ ⊥ → 𝔟 ≠ ⊥ → IsX M K b (𝔞 * 𝔟) Z → IsX M K b 𝔟 Y → IsX M K b 𝔞 (Z / Y)) ∧
-    (∀ (𝔞 : Ideal (𝓞 K)) (X : K) (n : ℕ), 𝔞 ≠ ⊥ → IsX M K b 𝔞 X → IsX M K b (𝔞 ^ n) (X ^ n)) ∧
-    (∀ (𝔞 : Ideal (𝓞 K)) (X ζ : K) (k : ℕ), k ≠ 0 → ζ ^ k = 1 → IsX M K b 𝔞 X → IsX M K b 𝔞 (ζ * X)) ∧
-    ∀ y : 𝓞 K, y ≠ 0 → IsX M K b (Ideal.span {y}) (∏ t : (ZMod M)ˣ, (sg M K t)⁻¹ (y : K) ^ th M b t) := by
+theorem UpperTheory.V.ML.xMul
+    : ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K]
+        (b : ℕ),
+      (∀ (𝔞 𝔟 : Ideal (𝓞 K)) (X Y : K),
+          𝔞 ≠ ⊥ → 𝔟 ≠ ⊥ → IsX M K b 𝔞 X → IsX M K b 𝔟 Y → IsX M K b (𝔞 * 𝔟) (X * Y))
+        ∧ (∀ (𝔞 𝔟 : Ideal (𝓞 K)) (Z Y : K),
+          𝔞 ≠ ⊥ → 𝔟 ≠ ⊥ → IsX M K b (𝔞 * 𝔟) Z → IsX M K b 𝔟 Y → IsX M K b 𝔞 (Z / Y))
+        ∧ (∀ (𝔞 : Ideal (𝓞 K)) (X : K) (n : ℕ), 𝔞 ≠ ⊥ → IsX M K b 𝔞 X → IsX M K b (𝔞 ^ n) (X ^ n))
+        ∧ (∀ (𝔞 : Ideal (𝓞 K)) (X ζ : K) (k : ℕ),
+          k ≠ 0 → ζ ^ k = 1 → IsX M K b 𝔞 X → IsX M K b 𝔞 (ζ * X))
+        ∧ ∀ y : 𝓞 K,
+          y ≠ 0
+            → IsX M K b (Ideal.span {y}) (∏ t : (ZMod M)ˣ, (sg M K t)⁻¹ (y : K) ^ th M b t) := by
   intro M _ K _ _ _ b
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rintro 𝔞 𝔟 X Y - - ⟨hX, hX'⟩ ⟨hY, hY'⟩
@@ -88,7 +98,8 @@ theorem UpperTheory.V.ML.xMul :
     · rw [xMul_sp_eq] at hX' ⊢
       rw [map_pow, hX', ← Finset.prod_pow]
       refine Finset.prod_congr rfl fun t _ => ?_
-      rw [xMul_conjI_pow, FractionalIdeal.coeIdeal_pow, ← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, mul_comm]
+      rw [xMul_conjI_pow, FractionalIdeal.coeIdeal_pow, ← zpow_natCast, ← zpow_natCast, ← zpow_mul,
+        ← zpow_mul, mul_comm]
   · rintro 𝔞 X ζ k hk hζ ⟨hX, hX'⟩
     refine ⟨?_, ?_⟩
     · rw [map_mul, mul_mul_mul_comm, hX, xMul_root M K ζ k hk hζ, one_mul]
@@ -102,7 +113,9 @@ theorem UpperTheory.V.ML.xMul :
   · intro y hy
     have hy' : (y : K) ≠ 0 := by exact_mod_cast hy
     refine ⟨?_, ?_⟩
-    · rw [map_prod, ← Equiv.prod_comp (Equiv.neg (ZMod M)ˣ) (fun t => sg M K (-1) ((sg M K t)⁻¹ (y : K) ^ th M b t)),
+    · rw [map_prod,
+        ← Equiv.prod_comp (Equiv.neg (ZMod M)ˣ)
+          (fun t => sg M K (-1) ((sg M K t)⁻¹ (y : K) ^ th M b t)),
         ← Finset.prod_mul_distrib]
       refine Finset.prod_eq_one fun t _ => ?_
       have h1 : sg M K (-1) ((sg M K (-t))⁻¹ (y : K)) = (sg M K t)⁻¹ (y : K) := by
@@ -114,5 +127,6 @@ theorem UpperTheory.V.ML.xMul :
       exact mul_inv_cancel₀ (zpow_ne_zero _ h2)
     · rw [xMul_sp_eq, map_prod]
       refine Finset.prod_congr rfl fun t _ => ?_
-      rw [map_zpow₀, xMul_conjI_eq, Ideal.map_span, Set.image_singleton, FractionalIdeal.coeIdeal_span_singleton]
+      rw [map_zpow₀, xMul_conjI_eq, Ideal.map_span, Set.image_singleton,
+        FractionalIdeal.coeIdeal_span_singleton]
       rfl

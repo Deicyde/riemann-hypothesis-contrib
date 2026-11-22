@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsMulI
 @[expose] public section
 
 open scoped BigOperators
-open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds
+  Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace UpperTheory.G2.RowLab.Hyp
 
@@ -20,14 +22,13 @@ section Val
 
 variable {C : Type} [Field C] {V : VF C}
 
-theorem mm_add {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) :=
-  V.v.map_lt_add ha hb
+theorem mm_add {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) := V.v.map_lt_add ha hb
 
-theorem mm_neg {a : C} (ha : V.MM a) : V.MM (-a) := by
-  unfold VF.MM; rw [V.v.map_neg]; exact ha
+theorem mm_neg {a : C} (ha : V.MM a) : V.MM (-a) := by unfold VF.MM; rw [V.v.map_neg]; exact ha
 
 theorem mm_mul {a b : C} (ha : V.Ge 0 a) (hb : V.MM b) : V.MM (a * b) := by
-  unfold VF.MM at *; rw [V.v.map_mul]
+  unfold VF.MM at *
+  rw [V.v.map_mul]
   exact lt_of_lt_of_le hb (le_add_of_nonneg_left ha)
 
 theorem not_mm_one : ¬ V.MM (1 : C) := by simp [VF.MM]
@@ -41,8 +42,7 @@ theorem mm_or {a b : C} (ha : V.Ge 0 a) (hb : V.Ge 0 b) (h : V.MM (a * b)) : V.M
   rw [V.v.map_mul, h1, h2] at h
   simp at h
 
-theorem mm_l : V.MM (V.l : C) := by
-  unfold VF.MM; rw [V.v_l]; exact zero_lt_one
+theorem mm_l : V.MM (V.l : C) := by unfold VF.MM; rw [V.v_l]; exact zero_lt_one
 
 theorem mm_pow_iff {a : C} (ha : V.Ge 0 a) {n : ℕ} (hn : n ≠ 0) : V.MM (a ^ n) ↔ V.MM a := by
   induction n with
@@ -92,11 +92,13 @@ theorem not_mm_two (h2 : V.l ≠ 2) : ¬ V.MM (2 : C) := by
   exact not_mm_one (V := V) (e ▸ mm_add mm_l (mm_neg (mm_mul (VF.ge_natCast k) h)))
 
 theorem ge_half [CharZero C] (h2 : V.l ≠ 2) : V.Ge 0 (2 : C)⁻¹ := by
-  have h1 : V.v (2 : C) = 0 := le_antisymm (not_lt.mp (not_mm_two h2)) (by exact_mod_cast VF.ge_natCast (V := V) 2)
+  have h1 : V.v (2 : C) = 0 :=
+    le_antisymm (not_lt.mp (not_mm_two h2)) (by exact_mod_cast VF.ge_natCast (V := V) 2)
   have h3 := V.v.map_mul (2 : C) 2⁻¹
   rw [mul_inv_cancel₀ two_ne_zero, V.v.map_one, h1, zero_add] at h3
   unfold VF.Ge
-  rw [← h3]; rfl
+  rw [← h3]
+  rfl
 
 theorem exists_half [CharZero C] (h2 : V.l ≠ 2) (N : ℕ) : ∃ k : ℕ, V.Ge N ((2 : C)⁻¹ - k) := by
   obtain ⟨k, hk⟩ := (V.l_prime.odd_of_ne_two h2).pow (n := N)
@@ -136,8 +138,8 @@ theorem resIdeal_prime (em : O →+* C) (hi : ∀ x, V.Ge 0 (em x)) : (resIdeal 
     rw [map_mul] at h
     exact mm_or (hi x) (hi y) h
 
-theorem depthIdeal_pow (em : A → O →+* C) (hi : ∀ a x, V.Ge 0 (em a x)) (n : ℕ) :
-    depthIdeal V em hi 1 ^ n ≤ depthIdeal V em hi n := by
+theorem depthIdeal_pow (em : A → O →+* C) (hi : ∀ a x, V.Ge 0 (em a x)) (n : ℕ)
+    : depthIdeal V em hi 1 ^ n ≤ depthIdeal V em hi n := by
   induction n with
   | zero => intro x _ a; simpa using hi a x
   | succ n ih =>
@@ -146,8 +148,11 @@ theorem depthIdeal_pow (em : A → O →+* C) (hi : ∀ a x, V.Ge 0 (em a x)) (n
     rw [map_mul]
     exact ((ih hr a).mul (hs a)).mono (by push_cast; rfl)
 
-theorem exists_pow_le [IsNoetherianRing O] [Finite A] (em : A → O →+* C) (hi : ∀ a x, V.Ge 0 (em a x)) (P : Ideal O)
-    (hP : ∀ x ∈ P, ∀ a, V.MM (em a x)) : ∃ e : ℕ, ∀ n : ℕ, P ^ (e * n) ≤ depthIdeal V em hi n := by
+theorem exists_pow_le
+    [IsNoetherianRing O] [Finite A]
+    (em : A → O →+* C) (hi : ∀ a x, V.Ge 0 (em a x))
+    (P : Ideal O) (hP : ∀ x ∈ P, ∀ a, V.MM (em a x))
+    : ∃ e : ℕ, ∀ n : ℕ, P ^ (e * n) ≤ depthIdeal V em hi n := by
   have h : P ≤ (depthIdeal V em hi 1).radical := by
     intro x hx
     choose m hm using fun a => exists_pow_ge (hP x hx a)
@@ -161,9 +166,11 @@ theorem exists_pow_le [IsNoetherianRing O] [Finite A] (em : A → O →+* C) (hi
   rw [pow_mul]
   exact le_trans (Ideal.pow_right_mono he n) (depthIdeal_pow V em hi n)
 
-theorem exists_seq (s : O →+* O) (hs : ∀ x, s (s x) = x) (P : Ideal O) [P.IsMaximal] [Finite (O ⧸ P)]
-    (h1 : ∀ x ∈ P, s x ∈ P) (h2 : ∃ x, s x - x ∉ P) (h3 : (2 : O) ∉ P) :
-    ∃ z : ℕ → O, (∀ n, z n * s (z n) + 1 ∈ P ^ n) ∧ ∀ n m, z (n + m) - z n ∈ P ^ n := by
+theorem exists_seq
+    (s : O →+* O) (hs : ∀ x, s (s x) = x)
+    (P : Ideal O) [P.IsMaximal] [Finite (O ⧸ P)]
+    (h1 : ∀ x ∈ P, s x ∈ P) (h2 : ∃ x, s x - x ∉ P) (h3 : (2 : O) ∉ P)
+    : ∃ z : ℕ → O, (∀ n, z n * s (z n) + 1 ∈ P ^ n) ∧ ∀ n m, z (n + m) - z n ∈ P ^ n := by
   have H := GlobalTheory.NormResidue.exists_mul_involution_add_one_mem_pow O s hs P h1 h2 h3
   obtain ⟨z0, hz0, -⟩ := H 0 0 (Or.inl rfl)
   choose f hf1 hf2 using fun (N : ℕ) (x : O) (hx : x * s x + 1 ∈ P ^ (N + 1)) => H (N + 1) x (Or.inr hx)
@@ -173,19 +180,27 @@ theorem exists_seq (s : O →+* O) (hs : ∀ x, s (s x) = x) (P : Ideal O) [P.Is
   induction m with
   | zero => simp
   | succ m ih =>
-    have h4 : (y (n + m + 1)).1 - (y (n + m)).1 ∈ P ^ (n + m + 1) := hf2 _ _ (y (n + m)).2 (Nat.succ_ne_zero _)
+    have h4 : (y (n + m + 1)).1 - (y (n + m)).1 ∈ P ^ (n + m + 1) :=
+      hf2 _ _ (y (n + m)).2 (Nat.succ_ne_zero _)
     have h5 := (P ^ n).add_mem (Ideal.pow_le_pow_right (by omega : n ≤ n + m + 1) h4) ih
     rw [sub_add_sub_cancel] at h5
     exact h5
 
 end Ring
 
-theorem exists_root {E : Type} [Field E] [NumberField E] {C : Type} [Field C] [CharZero C] (V : VF C)
-    (hc : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n)) (h2 : V.l ≠ 2)
-    {d : ℕ} [NeZero d] (em : ZMod d → 𝓞 E →+* C) (hi : ∀ a x, V.Ge 0 (em a x)) (hd : ZMod d)
-    (s : 𝓞 E →+* 𝓞 E) (hs : ∀ x, s (s x) = x) (hconj : ∀ a x, em (a + hd) x = em a (s x))
-    (hfrob : ∀ a x, V.MM (em (a + 1) x - em a x ^ V.l)) (hsep : ∃ x, V.v (em 0 x - em hd x) = 0) :
-    ∃ ζ : ZMod d → C, (∀ a, ζ (a + hd) * ζ a = -1) ∧ ∀ N : ℕ, ∃ z : 𝓞 E, ∀ a, V.Ge N (ζ a - em a z) := by
+theorem exists_root
+    {E : Type} [Field E] [NumberField E]
+    {C : Type} [Field C] [CharZero C]
+    (V : VF C)
+    (hc : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+    (h2 : V.l ≠ 2)
+    {d : ℕ} [NeZero d]
+    (em : ZMod d → 𝓞 E →+* C) (hi : ∀ a x, V.Ge 0 (em a x))
+    (hd : ZMod d) (s : 𝓞 E →+* 𝓞 E)
+    (hs : ∀ x, s (s x) = x) (hconj : ∀ a x, em (a + hd) x = em a (s x))
+    (hfrob : ∀ a x, V.MM (em (a + 1) x - em a x ^ V.l)) (hsep : ∃ x, V.v (em 0 x - em hd x) = 0)
+    : ∃ ζ : ZMod d → C,
+      (∀ a, ζ (a + hd) * ζ a = -1) ∧ ∀ N : ℕ, ∃ z : 𝓞 E, ∀ a, V.Ge N (ζ a - em a z) := by
   have hstep : ∀ a x, V.MM (em (a + 1) x) ↔ V.MM (em a x) := by
     intro a x
     rw [← mm_pow_iff (hi a x) V.l_prime.ne_zero]
@@ -207,16 +222,17 @@ theorem exists_root {E : Type} [Field E] [NumberField E] {C : Type} [Field C] [C
     exact V.l_prime.ne_zero (by exact_mod_cast h1)
   have : P.IsMaximal := (resIdeal_prime V (em 0) (hi 0)).isMaximal hne
   have : Finite (𝓞 E ⧸ P) := Ideal.finiteQuotientOfFreeOfNeBot P hne
-  obtain ⟨z, hz1, hz2⟩ := exists_seq s hs P
-    (fun x hx => by rw [hmem, ← hconj, hall]; exact hx)
-    (by
-      obtain ⟨x, hx⟩ := hsep
-      refine ⟨x, fun h => ?_⟩
-      rw [hmem, map_sub, ← hconj, zero_add] at h
-      have h' := mm_neg h
-      rw [neg_sub] at h'
-      exact absurd hx (ne_of_gt h'))
-    (by rw [hmem, map_ofNat]; exact not_mm_two h2)
+  obtain ⟨z, hz1, hz2⟩ :=
+    exists_seq s hs P
+      (fun x hx => by rw [hmem, ← hconj, hall]; exact hx)
+      (by
+        obtain ⟨x, hx⟩ := hsep
+        refine ⟨x, fun h => ?_⟩
+        rw [hmem, map_sub, ← hconj, zero_add] at h
+        have h' := mm_neg h
+        rw [neg_sub] at h'
+        exact absurd hx (ne_of_gt h'))
+      (by rw [hmem, map_ofNat]; exact not_mm_two h2)
   obtain ⟨e, he⟩ := exists_pow_le V em hi P (fun x hx a => (hall a x).mpr hx)
   have hlim : ∀ a, ∃ x, ∀ n : ℕ, V.Ge n (x - em a (z (e * n))) := fun a =>
     hc _ fun n => by
@@ -231,17 +247,21 @@ theorem exists_root {E : Type} [Field E] [NumberField E] {C : Type} [Field C] [C
     simpa using this
   have h3 : V.Ge n (em a (z (e * n) * s (z (e * n)) + 1)) := he n (hz1 _) a
   rw [map_add (f := _), map_mul, map_one, ← hconj] at h3
-  have h4 := (h3.add (hint.mul_int (hζ (a + hd) n))).add ((hi (a + hd) (z (e * n))).mul_int (hζ a n))
+  have h4 :=
+    (h3.add (hint.mul_int (hζ (a + hd) n))).add ((hi (a + hd) (z (e * n))).mul_int (hζ a n))
   convert h4 using 1
   ring
 
-theorem gmEx : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H)
-    (c : Coeff l), GmExSt c := by
+theorem gmEx
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (c : Coeff l),
+      GmExSt c := by
   intro E _ _ _ H l c T io C _ _ V ι _ hc h2 Orb d _ tau hd hd0 _ hconj hfrob hsep
   have hint : ∀ τ x, V.Ge 0 (emA3 io ι τ x) := fun τ x =>
     ge_of_isIntegral V (map_isIntegral_int (emA3 io ι τ) (Algebra.IsIntegral.isIntegral x))
-  have hbar : ∀ (τ : E →+* ℂ) (x : 𝓞 E),
-      emA3 io ι (ComplexEmbedding.conjugate τ) x = emA3 io ι τ (H.bar x) := by
+  have hbar
+      : ∀ (τ : E →+* ℂ) (x : 𝓞 E),
+        emA3 io ι (ComplexEmbedding.conjugate τ) x = emA3 io ι τ (H.bar x) := by
     intro τ x
     have : embK c (ComplexEmbedding.conjugate τ) x = embK c τ (H.bar x) := by
       apply Subtype.ext
@@ -254,9 +274,13 @@ theorem gmEx : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Recip
     intro x
     apply RingOfIntegers.ext
     simp [H.bar_eq]
-  have key := fun o => exists_root V hc h2 (fun a => emA3 io ι (tau o a)) (fun a x => hint _ x) hd
-    (H.bar : 𝓞 E →+* 𝓞 E) hbb (fun a x => by rw [← hconj]; exact hbar _ x) (hfrob o)
-    (hsep (o, 0) (o, hd) (fun h => hd0 (Prod.mk.inj h).2.symm))
+  have key := fun o =>
+    exists_root V hc h2
+      (fun a => emA3 io ι (tau o a))
+      (fun a x => hint _ x)
+      hd (H.bar : 𝓞 E →+* 𝓞 E) hbb
+      (fun a x => by rw [← hconj]; exact hbar _ x)
+      (hfrob o) (hsep (o, 0) (o, hd) (fun h => hd0 (Prod.mk.inj h).2.symm))
   choose ζ hζ1 hζ2 using key
   refine ⟨fun o a => !![1, 2⁻¹; ζ o a, -(ζ o a * 2⁻¹)], fun o N => ?_, fun o a s s' => ?_⟩
   · obtain ⟨z, hz⟩ := hζ2 o N
@@ -281,14 +305,16 @@ end UpperTheory.G2.RowLab.Hyp
 
 namespace UpperTheory.G2.RowLab.Sep
 
-theorem v_intCast_eq_zero {C : Type} [Field C] (V : VF C) {n : ℤ} (hn : ¬ (V.l : ℤ) ∣ n) : V.v (n : C) = 0 := by
+theorem v_intCast_eq_zero {C : Type} [Field C] (V : VF C) {n : ℤ} (hn : ¬ (V.l : ℤ) ∣ n)
+    : V.v (n : C) = 0 := by
   have hint : ∀ m : ℤ, V.Ge 0 (m : C) := fun m => by
     rcases Int.eq_nat_or_neg m with ⟨k, rfl | rfl⟩
     · simpa using VF.ge_natCast (V := V) k
     · simpa using (VF.ge_natCast (V := V) k).neg
   have hp : Prime (V.l : ℤ) := Nat.prime_iff_prime_int.1 V.l_prime
   obtain ⟨a, b, hab⟩ := (Irreducible.coprime_iff_not_dvd hp.irreducible).2 hn
-  have h1 : (a : C) * (V.l : C) + (b : C) * (n : C) = 1 := by exact_mod_cast congrArg (Int.cast : ℤ → C) hab
+  have h1 : (a : C) * (V.l : C) + (b : C) * (n : C) = 1 := by
+    exact_mod_cast congrArg (Int.cast : ℤ → C) hab
   refine le_antisymm ?_ (hint n)
   by_contra hc
   have hc' : 0 < V.v (n : C) := lt_of_not_ge hc
@@ -302,9 +328,13 @@ theorem v_intCast_eq_zero {C : Type} [Field C] (V : VF C) {n : ℤ} (hn : ¬ (V.
   rw [h1, V.v.map_one] at h4
   exact lt_irrefl _ h4
 
-theorem exists_v_sub_eq_zero {C : Type} [Field C] (V : VF C) {I : Type} [Fintype I] (M : Matrix I I C)
-    (h : ∀ i j, V.Ge 0 (M i j)) (hd : V.v M.det = 0) {j j' : I} (hj : j ≠ j') :
-    ∃ i, V.v (M i j - M i j') = 0 := by
+theorem exists_v_sub_eq_zero
+    {C : Type} [Field C]
+    (V : VF C)
+    {I : Type} [Fintype I]
+    (M : Matrix I I C) (h : ∀ i j, V.Ge 0 (M i j)) (hd : V.v M.det = 0)
+    {j j' : I} (hj : j ≠ j')
+    : ∃ i, V.v (M i j - M i j') = 0 := by
   by_contra hc
   push Not at hc
   have hpos : ∀ i, 0 < V.v (M i j - M i j') := fun i =>
@@ -327,7 +357,14 @@ theorem exists_v_sub_eq_zero {C : Type} [Field C] (V : VF C) {I : Type} [Fintype
   rw [h3, V.v.map_one] at h4
   exact lt_irrefl _ h4
 
-theorem cmEmbeddings_integral_and_distinct_mod_maximal' : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι → ¬ (V.l : ℤ) ∣ NumberField.discr E → (∀ τ x, V.Ge 0 (emA3 io ι τ x)) ∧ ∀ τ τ' : E →+* ℂ, τ ≠ τ' → ∃ a : 𝓞 E, V.v (emA3 io ι τ a - emA3 io ι τ' a) = 0 := by
+theorem cmEmbeddings_integral_and_distinct_mod_maximal'
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv)
+        (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C)
+        (ι : T.Fr →+* C),
+      EmbOK T V ι → ¬ (V.l : ℤ) ∣ NumberField.discr E
+        → (∀ τ x, V.Ge 0 (emA3 io ι τ x))
+          ∧ ∀ τ τ' : E →+* ℂ, τ ≠ τ' → ∃ a : 𝓞 E, V.v (emA3 io ι τ a - emA3 io ι τ' a) = 0 := by
   intro E _ _ _ H lv c T io C _ _ V ι _ hd
   have hint : ∀ τ x, V.Ge 0 (emA3 io ι τ x) := fun τ x =>
     ge_of_isIntegral V (map_isIntegral_int (emA3 io ι τ) (Algebra.IsIntegral.isIntegral x))
@@ -336,14 +373,14 @@ theorem cmEmbeddings_integral_and_distinct_mod_maximal' : ∀ (E : Type) [Field 
   let M : Matrix (E →+* ℂ) (E →+* ℂ) c.F := Matrix.of fun i σ => embK c σ (b i)
   have hM : (algebraMap c.F ℂ).mapMatrix M = basisMatrix E := by
     ext i σ
-    simp only [basisMatrix, Matrix.of_apply, canonicalEmbedding.latticeBasis_apply, integralBasis_apply]
+    simp only [basisMatrix, Matrix.of_apply, canonicalEmbedding.latticeBasis_apply,
+      integralBasis_apply]
     rfl
   have hdet : M.det ^ 2 = (discr E : c.F) := by
     apply (algebraMap c.F ℂ).injective
     rw [map_pow, RingHom.map_det, hM, map_intCast, discr_eq_basisMatrix_det_sq]
   let N : Matrix (E →+* ℂ) (E →+* ℂ) C := (ι.comp io).mapMatrix M
-  have hN : N.det ^ 2 = (discr E : C) := by
-    rw [← RingHom.map_det, ← map_pow, hdet, map_intCast]
+  have hN : N.det ^ 2 = (discr E : C) := by rw [← RingHom.map_det, ← map_pow, hdet, map_intCast]
   have hNi : ∀ i j, V.Ge 0 (N i j) := fun i j => hint j (b i)
   have hv : V.v N.det = 0 := by
     have h1 := v_intCast_eq_zero V hd
@@ -359,9 +396,13 @@ end UpperTheory.G2.RowLab.Sep
 
 namespace UpperTheory.G2.RowLab.Idem
 
-theorem exists_idem (E : Type) [Field E] [NumberField E] (l : ℕ) (hl : l.Prime)
-    (hd : ¬ (l : ℤ) ∣ NumberField.discr E) (P : Ideal (𝓞 E)) [hP : P.IsPrime] (hlP : (l : 𝓞 E) ∈ P) :
-    ∃ ε : 𝓞 E, (∃ y, ε * ε - ε = (l : 𝓞 E) * y) ∧ ε - 1 ∈ P ∧ ∀ x ∈ P, ∃ y, ε * x = (l : 𝓞 E) * y := by
+theorem exists_idem
+    (E : Type) [Field E] [NumberField E]
+    (l : ℕ) (hl : l.Prime) (hd : ¬ (l : ℤ) ∣ NumberField.discr E)
+    (P : Ideal (𝓞 E)) [hP : P.IsPrime]
+    (hlP : (l : 𝓞 E) ∈ P)
+    : ∃ ε : 𝓞 E,
+      (∃ y, ε * ε - ε = (l : 𝓞 E) * y) ∧ ε - 1 ∈ P ∧ ∀ x ∈ P, ∃ y, ε * x = (l : 𝓞 E) * y := by
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl
   have hun : Algebra.IsUnramifiedAt ℤ P :=
     (NumberField.not_dvd_discr_iff_forall_mem E (𝓞 E) hp).mp hd P hP (by simpa using hlP)
@@ -378,7 +419,8 @@ theorem exists_idem (E : Type) [Field E] [NumberField E] (l : ℕ) (hl : l.Prime
   have := hP.isMaximal hP0
   obtain ⟨Q, h₁, h₂⟩ := Ideal.eq_prime_pow_mul_coprime hne P
   rw [← Ideal.IsDedekindDomain.ramificationIdx_eq_normalizedFactors_count _ _ hne,
-    Ideal.ramificationIdx_eq_one P ℤ, pow_one, hmap] at h₂
+      Ideal.ramificationIdx_eq_one P ℤ, pow_one, hmap]
+    at h₂
   obtain ⟨p, hpP, q, hqQ, hpq⟩ := Submodule.mem_sup.mp ((Ideal.eq_top_iff_one _).mp h₁)
   have key : ∀ x ∈ P, ∃ y, q * x = (l : 𝓞 E) * y := by
     intro x hx
@@ -387,7 +429,8 @@ theorem exists_idem (E : Type) [Field E] [NumberField E] (l : ℕ) (hl : l.Prime
     exact ⟨y, by rw [mul_comm, hy]⟩
   have hq1 : q - 1 ∈ P := by
     have : q - 1 = -p := by rw [← hpq]; ring
-    rw [this]; exact P.neg_mem hpP
+    rw [this]
+    exact P.neg_mem hpP
   refine ⟨q, ?_, hq1, key⟩
   obtain ⟨y, hy⟩ := key _ hq1
   exact ⟨y, by rw [← hy]; ring⟩
@@ -395,8 +438,11 @@ theorem exists_idem (E : Type) [Field E] [NumberField E] (l : ℕ) (hl : l.Prime
 variable {C : Type} [Field C] {V : VF C}
 
 theorem ge_int {x : C} (hx : IsIntegral ℤ x) : V.Ge 0 x := by
-  have h1 : IsIntegral (Valuation.integer (V.v : Valuation C (Multiplicative (WithTop ℝ)ᵒᵈ))) x := hx.tower_top
-  exact (Valuation.integer.integers (V.v : Valuation C (Multiplicative (WithTop ℝ)ᵒᵈ))).mem_of_integral h1
+  have h1 : IsIntegral (Valuation.integer (V.v : Valuation C (Multiplicative (WithTop ℝ)ᵒᵈ))) x :=
+    hx.tower_top
+  exact
+    (Valuation.integer.integers (V.v : Valuation C (Multiplicative (WithTop ℝ)ᵒᵈ))).mem_of_integral
+      h1
 
 theorem mm_add {a b : C} (ha : V.MM a) (hb : V.MM b) : V.MM (a + b) := V.v.map_lt_add ha hb
 
@@ -410,15 +456,18 @@ def ker (V : VF C) {R : Type} [CommRing R] (f : R →+* C) (hf : ∀ x, V.Ge 0 (
   carrier := {x | V.MM (f x)}
   add_mem' := fun {a b} ha hb => by
     show V.MM (f (a + b))
-    rw [map_add (f := _)]; exact mm_add ha hb
+    rw [map_add (f := _)]
+    exact mm_add ha hb
   zero_mem' := by
     show V.MM (f 0)
     simp [VF.MM]
   smul_mem' := fun c x hx => by
     show V.MM (f (c * x))
-    rw [map_mul]; exact mm_mul (hf c) hx
+    rw [map_mul]
+    exact mm_mul (hf c) hx
 
-theorem ker_isPrime {R : Type} [CommRing R] (f : R →+* C) (hf : ∀ x, V.Ge 0 (f x)) : (ker V f hf).IsPrime := by
+theorem ker_isPrime {R : Type} [CommRing R] (f : R →+* C) (hf : ∀ x, V.Ge 0 (f x))
+    : (ker V f hf).IsPrime := by
   refine ⟨(Ideal.ne_top_iff_one _).mpr ?_, fun {a b} hab => ?_⟩
   · show ¬ V.MM (f 1)
     simp [VF.MM]
@@ -435,7 +484,17 @@ theorem ker_isPrime {R : Type} [CommRing R] (f : R →+* C) (hf : ∀ x, V.Ge 0 
 end UpperTheory.G2.RowLab.Idem
 
 open UpperTheory.G2.RowLab.Idem in
-theorem UpperTheory.G2.RowLab.exists_idempotent : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι → ¬ (V.l : ℤ) ∣ NumberField.discr E → ∀ (d : ℕ) [NeZero d] (tau : ZMod d → (E →+* ℂ)), (∀ s x, V.MM (emA3 io ι (tau (s + 1)) x - emA3 io ι (tau s) x ^ V.l)) → ∃ ε : 𝓞 E, (∃ y, ε * ε - ε = (V.l : 𝓞 E) * y) ∧ (∀ a, V.MM (emA3 io ι (tau a) ε - 1)) ∧ ∀ x : 𝓞 E, (∀ a, V.MM (emA3 io ι (tau a) x)) → ∃ y, ε * x = (V.l : 𝓞 E) * y := by
+theorem UpperTheory.G2.RowLab.exists_idempotent
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv)
+        (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C)
+        (ι : T.Fr →+* C),
+      EmbOK T V ι → ¬ (V.l : ℤ) ∣ NumberField.discr E
+        → ∀ (d : ℕ) [NeZero d] (tau : ZMod d → (E →+* ℂ)),
+          (∀ s x, V.MM (emA3 io ι (tau (s + 1)) x - emA3 io ι (tau s) x ^ V.l))
+            → ∃ ε : 𝓞 E,
+              (∃ y, ε * ε - ε = (V.l : 𝓞 E) * y) ∧ (∀ a, V.MM (emA3 io ι (tau a) ε - 1))
+                ∧ ∀ x : 𝓞 E, (∀ a, V.MM (emA3 io ι (tau a) x)) → ∃ y, ε * x = (V.l : 𝓞 E) * y := by
   intro E _ _ _ H lv c T io C _ _ V ι _ hd d _ tau hF
   have hint : ∀ τ x, V.Ge 0 (emA3 io ι τ x) := fun τ x =>
     ge_int ((RingOfIntegers.isIntegral x).map (emA3 io ι τ).toIntAlgHom)
@@ -456,12 +515,13 @@ theorem UpperTheory.G2.RowLab.exists_idempotent : ∀ (E : Type) [Field E] [Numb
       | succ n ih => push_cast; exact hstep x _ ih
     simpa using this a.val
   have hP := ker_isPrime (V := V) (emA3 io ι (tau 0)) (hint _)
-  obtain ⟨ε, h1, h2, h3⟩ := exists_idem E V.l V.l_prime hd (ker V (emA3 io ι (tau 0)) (hint _)) (by
-    show V.MM (emA3 io ι (tau 0) (V.l : 𝓞 E))
-    rw [map_natCast]
-    unfold VF.MM
-    rw [V.v_l]
-    exact zero_lt_one)
+  obtain ⟨ε, h1, h2, h3⟩ :=
+    exists_idem E V.l V.l_prime hd (ker V (emA3 io ι (tau 0)) (hint _)) (by
+      show V.MM (emA3 io ι (tau 0) (V.l : 𝓞 E))
+      rw [map_natCast]
+      unfold VF.MM
+      rw [V.v_l]
+      exact zero_lt_one)
   refine ⟨ε, h1, fun a => ?_, fun x hx => h3 x (hx 0)⟩
   have := hall _ h2 a
   rwa [map_sub, map_one] at this
@@ -501,7 +561,9 @@ lemma pos_mod (N : NumDatum) (l : ℕ) (z : RPl N.R) (e : ℕ) :
     N.pos l z (e % N.ordP l) = N.pos l z e := by
   conv_rhs => rw [← Nat.div_add_mod e (N.ordP l), ← pos_add, pos_mul_period]
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
 lemma inPsi_conj_iff (τ : E →+* ℂ) : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
   have hd : (H.d : ℂ) ≠ 0 := Nat.cast_ne_zero.2 H.d_prime.ne_zero
@@ -546,7 +608,8 @@ lemma embK_conj_bar {lv : Level H} (c : Coeff lv) (τ : E →+* ℂ) (x : 𝓞 E
 lemma conj_conj (τ : E →+* ℂ) : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ :=
   ComplexEmbedding.involutive_conjugate E τ
 
-noncomputable def tauN (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)) (l : ℕ) (z : RPl N.R) (n : ℕ) : E →+* ℂ :=
+noncomputable def tauN (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)) (l : ℕ) (z : RPl N.R) (n : ℕ)
+    : E →+* ℂ :=
   if Even n then pl (N.pos l z n) else ComplexEmbedding.conjugate (pl (N.pos l z n))
 
 omit [NumberField E] [IsCMField E] in
@@ -577,20 +640,33 @@ lemma tauN_ord (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)) (l : ℕ) (ho : O
   · rw [if_pos h, if_neg (Nat.not_even_iff_odd.2 (h.add_odd ho))]
   · rw [if_neg h, if_pos ((Nat.not_even_iff_odd.1 h).add_odd ho), conj_conj]
 
-theorem exists_lab {lv : Level H} (c : Coeff lv) (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)) (hinj : Function.Injective pl)
-    (hpsi : ∀ τ, InPsi H τ ↔ ∃ z, pl z = τ) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C)
-    (ι : T.Fr →+* C) (hι : EmbOK T V ι)
-    (hc : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n)) (h2 : V.l ≠ 2)
-    (hunr : ¬ (V.l : ℤ) ∣ NumberField.discr E)
-    (hf : ∀ (w : RPl N.R) (x : 𝓞 E), V.MM (emA3 io ι (ComplexEmbedding.conjugate (pl (N.pos V.l w 1))) x -
-        emA3 io ι (pl w) x ^ V.l))
-    (ho : Odd (N.ordP V.l)) (Z : Finset (RPl N.R))
-    (hZ : ∀ z' : RPl N.R, ∃! p : RPl N.R × ZMod (N.ordP V.l), p.1 ∈ Z ∧ N.pos V.l p.1 p.2.val = z') (n j₁ j₂ : ℕ) :
-    ∃ lab : Formalism.L2.FormalSeriesBounds.LabS E C {z // z ∈ Z} (2 * N.ordP V.l), LabSArith V io ι lab ∧
-      lab.hd = (N.ordP V.l : ZMod (2 * N.ordP V.l)) ∧ lab.n = n ∧ lab.j = j₁ ∧ lab.j' = j₂ ∧
-      (∀ o g s, lab.big o g s ↔ (Even s.val ↔ g = 0)) ∧
-      (∀ o s, lab.tau o s = if Even s.val then pl (N.pos V.l o.1 s.val) else ComplexEmbedding.conjugate (pl (N.pos V.l o.1 s.val))) ∧
-      Function.Surjective (fun x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l) => lab.tau x.1 x.2) := by
+theorem exists_lab
+    {lv : Level H} (c : Coeff lv)
+    (N : NumDatum) (pl : RPl N.R → (E →+* ℂ))
+    (hinj : Function.Injective pl) (hpsi : ∀ τ, InPsi H τ ↔ ∃ z, pl z = τ)
+    (T : CDVR) (io : c.F →+* T.Fr)
+    (C : Type) [Field C] [CharZero C]
+    (V : VF C) (ι : T.Fr →+* C) (hι : EmbOK T V ι)
+    (hc : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+    (h2 : V.l ≠ 2) (hunr : ¬ (V.l : ℤ) ∣ NumberField.discr E)
+    (hf : ∀ (w : RPl N.R) (x : 𝓞 E),
+      V.MM
+        (emA3 io ι (ComplexEmbedding.conjugate (pl (N.pos V.l w 1))) x - emA3 io ι (pl w) x ^ V.l))
+    (ho : Odd (N.ordP V.l))
+    (Z : Finset (RPl N.R))
+    (hZ : ∀ z' : RPl N.R, ∃! p : RPl N.R × ZMod (N.ordP V.l), p.1 ∈ Z ∧ N.pos V.l p.1 p.2.val = z')
+    (n j₁ j₂ : ℕ)
+    : ∃ lab : Formalism.L2.FormalSeriesBounds.LabS E C {z // z ∈ Z} (2 * N.ordP V.l),
+      LabSArith V io ι lab ∧ lab.hd = (N.ordP V.l : ZMod (2 * N.ordP V.l)) ∧ lab.n = n ∧ lab.j = j₁
+        ∧ lab.j' = j₂ ∧ (∀ o g s, lab.big o g s ↔ (Even s.val ↔ g = 0))
+        ∧ (∀ o s,
+          lab.tau o s
+            = if Even s.val then
+                pl (N.pos V.l o.1 s.val)
+              else
+                ComplexEmbedding.conjugate (pl (N.pos V.l o.1 s.val)))
+        ∧ Function.Surjective (fun x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l) =>
+          lab.tau x.1 x.2) := by
   have hpos : 0 < N.ordP V.l := Nat.pos_of_ne_zero (NeZero.ne _)
   have hin : ∀ z, InPsi H (pl z) := fun z => (hpsi _).2 ⟨z, rfl⟩
   have hne : ∀ z z', pl z ≠ ComplexEmbedding.conjugate (pl z') := fun z z' h =>
@@ -600,11 +676,15 @@ theorem exists_lab {lv : Level H} (c : Coeff lv) (N : NumDatum) (pl : RPl N.R �
   let tau : {z // z ∈ Z} → ZMod (2 * N.ordP V.l) → (E →+* ℂ) := fun o s => tauN N pl V.l o.1 s.val
   have htinj : Function.Injective fun x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l) => tau x.1 x.2 := by
     rintro ⟨z, s⟩ ⟨z', s'⟩ h
-    have main : N.pos V.l z.1 s.val = N.pos V.l z'.1 s'.val → (Even s.val ↔ Even s'.val) → (z, s) = (z', s') := by
+    have main
+        : N.pos V.l z.1 s.val = N.pos V.l z'.1 s'.val → (Even s.val ↔ Even s'.val)
+          → (z, s) = (z', s') := by
       intro h1 h2
-      have := (hZ (N.pos V.l z'.1 s'.val)).unique (y₁ := (z.1, (s.val : ZMod (N.ordP V.l))))
-        (y₂ := (z'.1, (s'.val : ZMod (N.ordP V.l))))
-        ⟨z.2, by dsimp only; rw [ZMod.val_natCast, pos_mod, h1]⟩ ⟨z'.2, by dsimp only; rw [ZMod.val_natCast, pos_mod]⟩
+      have :=
+        (hZ (N.pos V.l z'.1 s'.val)).unique (y₁ := (z.1, (s.val : ZMod (N.ordP V.l))))
+          (y₂ := (z'.1, (s'.val : ZMod (N.ordP V.l))))
+          ⟨z.2, by dsimp only; rw [ZMod.val_natCast, pos_mod, h1]⟩
+          ⟨z'.2, by dsimp only; rw [ZMod.val_natCast, pos_mod]⟩
       obtain ⟨a, b⟩ := Prod.mk.inj this
       obtain rfl := Subtype.ext a
       have b1 : s.val ≡ s'.val [MOD N.ordP V.l] := (ZMod.natCast_eq_natCast_iff _ _ _).1 b
@@ -634,7 +714,10 @@ theorem exists_lab {lv : Level H} (c : Coeff lv) (N : NumDatum) (pl : RPl N.R �
     omega
   have hd2 : (N.ordP V.l : ZMod (2 * N.ordP V.l)) + (N.ordP V.l : ZMod (2 * N.ordP V.l)) = 0 := by
     rw [← Nat.cast_add, ← two_mul, ZMod.natCast_self]
-  have hconj : ∀ o a, ComplexEmbedding.conjugate (tau o a) = tau o (a + (N.ordP V.l : ZMod (2 * N.ordP V.l))) := by
+  have hconj
+      : ∀ o a,
+        ComplexEmbedding.conjugate (tau o a)
+          = tau o (a + (N.ordP V.l : ZMod (2 * N.ordP V.l))) := by
     intro o a
     dsimp only [tau]
     rw [tauN_add, tauN_ord N pl V.l ho]
@@ -653,16 +736,37 @@ theorem exists_lab {lv : Level H} (c : Coeff lv) (N : NumDatum) (pl : RPl N.R �
       have := hf (N.pos V.l o.1 a.val) (H.bar x)
       simp only [emA3, RingHom.comp_apply, embK_conj_bar, conj_conj] at this ⊢
       exact this
-  have hsep : ∀ x x' : {z // z ∈ Z} × ZMod (2 * N.ordP V.l), x ≠ x' →
-      ∃ a : 𝓞 E, V.v (emA3 io ι (tau x.1 x.2) a - emA3 io ι (tau x'.1 x'.2) a) = 0 := fun x x' hx =>
-    (Sep.cmEmbeddings_integral_and_distinct_mod_maximal' E H lv c T io C V ι hι hunr).2 _ _ fun h => hx (htinj h)
+  have hsep
+      : ∀ x x' : {z // z ∈ Z} × ZMod (2 * N.ordP V.l),
+        x ≠ x' → ∃ a : 𝓞 E, V.v (emA3 io ι (tau x.1 x.2) a - emA3 io ι (tau x'.1 x'.2) a) = 0 :=
+    fun x x' hx =>
+      (Sep.cmEmbeddings_integral_and_distinct_mod_maximal' E H lv c T io C V ι hι hunr).2 _ _
+        fun h => hx (htinj h)
   obtain ⟨gm, g1, g2⟩ := Hyp.gmEx E H lv c T io C V ι hι hc h2 _ _ tau _ hd0 hd2 hconj hfrob hsep
-  refine ⟨⟨tau, (N.ordP V.l : ZMod (2 * N.ordP V.l)), gm, n, j₁, j₂, fun _ g s => (Even s.val ↔ g = 0)⟩,
-    ⟨htinj, hd0, hd2, hconj, hfrob, hsep,
-      fun o => exists_idempotent E H lv c T io C V ι hι hunr _ (tau o) (hfrob o), g1, g2⟩,
-    rfl, rfl, rfl, rfl, fun _ _ _ => Iff.rfl, fun _ _ => rfl, fun τ => ?_⟩
-  have key : ∀ z', ∃ x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l), tau x.1 x.2 = pl z' ∨
-      ComplexEmbedding.conjugate (tau x.1 x.2) = pl z' := by
+  refine ⟨
+    ⟨tau, (N.ordP V.l : ZMod (2 * N.ordP V.l)), gm, n, j₁, j₂, fun _ g s => (Even s.val ↔ g = 0)⟩,
+    ⟨
+      htinj,
+      hd0,
+      hd2,
+      hconj,
+      hfrob,
+      hsep,
+      fun o => exists_idempotent E H lv c T io C V ι hι hunr _ (tau o) (hfrob o),
+      g1,
+      g2
+    ⟩,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    fun _ _ _ => Iff.rfl,
+    fun _ _ => rfl,
+    fun τ => ?_
+  ⟩
+  have key
+      : ∀ z', ∃ x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l),
+        tau x.1 x.2 = pl z' ∨ ComplexEmbedding.conjugate (tau x.1 x.2) = pl z' := by
     intro z'
     obtain ⟨p, hp, -⟩ := hZ z'
     refine ⟨(⟨p.1, hp.1⟩, (p.2.val : ZMod (2 * N.ordP V.l))), ?_⟩
@@ -673,8 +777,11 @@ theorem exists_lab {lv : Level H} (c : Coeff lv) (N : NumDatum) (pl : RPl N.R �
     by_cases h : Even p.2.val
     · rw [if_pos h]; exact Or.inl rfl
     · rw [if_neg h]; exact Or.inr (conj_conj _)
-  have key2 : ∀ σ : E →+* ℂ, (∃ x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l), tau x.1 x.2 = σ) →
-      ∃ x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l), tau x.1 x.2 = ComplexEmbedding.conjugate σ := by
+  have key2
+      : ∀ σ : E →+* ℂ,
+        (∃ x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l), tau x.1 x.2 = σ)
+          → ∃ x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l),
+            tau x.1 x.2 = ComplexEmbedding.conjugate σ := by
     rintro σ ⟨x, rfl⟩
     exact ⟨(x.1, _), (hconj x.1 x.2).symm⟩
   have key3 : ∀ z', ∃ x : {z // z ∈ Z} × ZMod (2 * N.ordP V.l), tau x.1 x.2 = pl z' := by

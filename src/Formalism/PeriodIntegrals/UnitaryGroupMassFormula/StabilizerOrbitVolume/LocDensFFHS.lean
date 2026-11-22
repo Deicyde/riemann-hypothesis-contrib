@@ -13,8 +13,7 @@ open Module
 
 variable {K : Type} [Field K] {σ : K →+* K}
 
-structure IsSq {V : Type} [AddCommGroup V] [Module K V] (σ : K →+* K) (h : V → V → K) :
-    Prop where
+structure IsSq {V : Type} [AddCommGroup V] [Module K V] (σ : K →+* K) (h : V → V → K) : Prop where
   add_right : ∀ x y z, h x (y + z) = h x y + h x z
   smul_right : ∀ (c : K) x y, h x (c • y) = c * h x y
   herm : ∀ x y, h y x = σ (h x y)
@@ -46,13 +45,14 @@ theorem IsSq.sub_right (hs : IsSq σ h) (x y z : V) : h x (y - z) = h x y - h x 
 
 def perp (hs : IsSq σ h) (e : V) : Submodule K V := LinearMap.ker (hs.lin e)
 
-theorem mem_perp (hs : IsSq σ h) (e w : V) : w ∈ perp hs e ↔ h e w = 0 := by
-  exact LinearMap.mem_ker
+theorem mem_perp (hs : IsSq σ h) (e w : V) : w ∈ perp hs e ↔ h e w = 0 := by exact LinearMap.mem_ker
 
-theorem perp_isHS (hs : IsHS σ h) (e : V) (he : h e e ≠ 0) :
-    IsHS σ (fun w w' : perp hs.toIsSq e => h w w') := by
-  refine ⟨⟨fun x y z => hs.add_right x y z, fun c x y => hs.smul_right c x y,
-    fun x y => hs.herm x y⟩, ?_⟩
+theorem perp_isHS (hs : IsHS σ h) (e : V) (he : h e e ≠ 0)
+    : IsHS σ (fun w w' : perp hs.toIsSq e => h w w') := by
+  refine ⟨
+    ⟨fun x y z => hs.add_right x y z, fun c x y => hs.smul_right c x y, fun x y => hs.herm x y⟩,
+    ?_
+  ⟩
   · intro w hw
     have hq := hs.toIsSq
     apply Subtype.ext
@@ -64,14 +64,15 @@ theorem perp_isHS (hs : IsHS σ h) (e : V) (he : h e e ≠ 0) :
       rw [mem_perp, hq.sub_right, hq.smul_right, this, sub_self]
     have h1 := hw ⟨_, hm⟩
     have hwe : h w e = 0 := by rw [hq.herm e w, (mem_perp hq e w).1 w.2, map_zero]
-    calc h w y = h w (((h e e)⁻¹ * h e y) • e + (y - ((h e e)⁻¹ * h e y) • e)) := by
-          rw [add_sub_cancel]
+    calc
+      h w y
+        = h w (((h e e)⁻¹ * h e y) • e + (y - ((h e e)⁻¹ * h e y) • e)) := by rw [add_sub_cancel]
       _ = ((h e e)⁻¹ * h e y) * h w e + h w (y - ((h e e)⁻¹ * h e y) • e) := by
-          rw [hq.add_right, hq.smul_right]
+        rw [hq.add_right, hq.smul_right]
       _ = 0 := by rw [hwe, h1]; ring
 
-theorem finrank_perp [FiniteDimensional K V] (hs : IsSq σ h) (e : V) (he : h e e ≠ 0) :
-    finrank K (perp hs e) + 1 = finrank K V := by
+theorem finrank_perp [FiniteDimensional K V] (hs : IsSq σ h) (e : V) (he : h e e ≠ 0)
+    : finrank K (perp hs e) + 1 = finrank K V := by
   have hsurj : LinearMap.range (hs.lin e) = ⊤ := by
     rw [LinearMap.range_eq_top]
     intro c
@@ -82,9 +83,10 @@ theorem finrank_perp [FiniteDimensional K V] (hs : IsSq σ h) (e : V) (he : h e 
   unfold perp
   omega
 
-theorem linIndep_orth (hs : IsSq σ h) {n : ℕ} (f : Fin n → V)
-    (h1 : ∀ i j, i ≠ j → h (f i) (f j) = 0) (h2 : ∀ i, h (f i) (f i) ≠ 0) :
-    LinearIndependent K f := by
+theorem linIndep_orth
+    (hs : IsSq σ h)
+    {n : ℕ} (f : Fin n → V) (h1 : ∀ i j, i ≠ j → h (f i) (f j) = 0) (h2 : ∀ i, h (f i) (f i) ≠ 0)
+    : LinearIndependent K f := by
   rw [Fintype.linearIndependent_iff]
   intro g hg i
   have e1 := congrArg (hs.lin (f i)) hg
@@ -97,11 +99,11 @@ theorem linIndep_orth (hs : IsSq σ h) {n : ℕ} (f : Fin n → V)
     rw [h1 i j (Ne.symm hji), mul_zero]
   · simp
 
-theorem decomp_val (hs : IsSq σ h) (e w : V) (hw : h e w = 0) (s : K) :
-    h (s • e + w) (s • e + w) = σ s * s * h e e + h w w := by
+theorem decomp_val (hs : IsSq σ h) (e w : V) (hw : h e w = 0) (s : K)
+    : h (s • e + w) (s • e + w) = σ s * s * h e e + h w w := by
   have hwe : h w e = 0 := by rw [hs.herm e w, hw, map_zero]
-  rw [hs.add_right, IsSq.add_left hs, IsSq.add_left hs, IsSq.smul_left hs, IsSq.smul_left hs, hs.smul_right,
-    hs.smul_right, hw, hwe]
+  rw [hs.add_right, IsSq.add_left hs, IsSq.add_left hs, IsSq.smul_left hs, IsSq.smul_left hs,
+    hs.smul_right, hs.smul_right, hw, hwe]
   ring
 
 end basic

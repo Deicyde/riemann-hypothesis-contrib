@@ -9,7 +9,12 @@ open Filter Topology
 
 namespace GlobalTheory.CompanionTheory.CompactScaling
 
-theorem exists_pow_smul_mem : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (K : Set (Fin n → k)), IsCompact K → ∀ U ∈ nhds (0 : Fin n → k), ∀ ϖ : k, valuation k ϖ < 1 → ∃ l : ℕ, ∀ x ∈ K, ϖ ^ l • x ∈ U := by
+theorem exists_pow_smul_mem
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (K : Set (Fin n → k)),
+      IsCompact K
+        → ∀ U ∈ nhds (0 : Fin n → k), ∀ ϖ : k,
+          valuation k ϖ < 1 → ∃ l : ℕ, ∀ x ∈ K, ϖ ^ l • x ∈ U := by
   intro k _ _ _ _ n K hK U hU ϖ hϖ
   have hpow : Tendsto (fun l : ℕ => ϖ ^ l) atTop (𝓝 (0 : k)) := by
     rw [(IsValuativeTopology.hasBasis_nhds_zero k).tendsto_right_iff]

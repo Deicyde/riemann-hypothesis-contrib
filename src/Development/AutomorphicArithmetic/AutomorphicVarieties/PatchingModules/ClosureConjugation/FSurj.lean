@@ -7,11 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.f_surj :
-    ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ} {x : NP G0.frame n} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] [Algebra O x.K] {r : Resid G.frame O n} {B : Type} [CommRing B] [Algebra O B] [IsCO O B] {u : Pair r B} (P : OoPt h x u), Function.Surjective P.f ∧ IsLocalHom P.f.toRingHom := by
+theorem UpperTheory.V.Pa.f_surj
+    : ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ}
+        {x : NP G0.frame n} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] [Algebra ℤ_[l] O] [Algebra O x.K] {r : Resid G.frame O n} {B : Type}
+        [CommRing B] [Algebra O B] [IsCO O B] {u : Pair r B} (P : OoPt h x u),
+      Function.Surjective P.f ∧ IsLocalHom P.f.toRingHom := by
   intro l _ L G G0 h n x O _ _ _ _ _ _ r B _ _ _ u P
   have hK : IsCO O x.K := by
     refine IsCO.mk ?_ ?_ ?_

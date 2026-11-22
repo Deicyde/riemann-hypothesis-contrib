@@ -5,9 +5,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CMFieldExpo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-private theorem deg_jac {a p n : ℕ} (h : a.Coprime p) : jacobiSym ((a ^ (2 * n) : ℕ) : ℤ) p = 1 := by
+private theorem deg_jac {a p n : ℕ} (h : a.Coprime p)
+    : jacobiSym ((a ^ (2 * n) : ℕ) : ℤ) p = 1 := by
   have hc : Int.gcd ((a ^ n : ℕ) : ℤ) (p : ℤ) = 1 := by
     rw [Int.gcd_natCast_natCast]
     exact Nat.Coprime.pow_left n h
@@ -17,7 +20,8 @@ private theorem deg_jac {a p n : ℕ} (h : a.Coprime p) : jacobiSym ((a ^ (2 * n
   rw [he]
   exact jacobiSym.sq_one' hc
 
-private theorem deg_ker (A : AbF) {a : ℕ} (n : ℕ) (h : a.Coprime A.m) : A.ker (a ^ (A.deg * n)) := by
+private theorem deg_ker (A : AbF) {a : ℕ} (n : ℕ) (h : a.Coprime A.m)
+    : A.ker (a ^ (A.deg * n)) := by
   haveI : NeZero A.m := ⟨A.pos.ne'⟩
   let u : (ZMod A.m)ˣ := ZMod.unitOfCoprime a h
   refine ⟨u ^ (A.deg * n), ?_, ?_⟩
@@ -26,32 +30,37 @@ private theorem deg_ker (A : AbF) {a : ℕ} (n : ℕ) (h : a.Coprime A.m) : A.ke
   · push_cast
     simp [u, ZMod.coe_unitOfCoprime]
 
-private theorem deg_two {a e : ℕ} (n : ℕ) (h : a.Coprime (2 ^ (e + 2))) :
-    a ^ (2 ^ (e + 1) * n) ≡ 1 [MOD 2 ^ (e + 2)] := by
+private theorem deg_two {a e : ℕ} (n : ℕ) (h : a.Coprime (2 ^ (e + 2)))
+    : a ^ (2 ^ (e + 1) * n) ≡ 1 [MOD 2 ^ (e + 2)] := by
   have ht := Nat.ModEq.pow_totient h
   rw [Nat.totient_prime_pow Nat.prime_two (by omega)] at ht
   simp only [Nat.add_sub_cancel, show (2 : ℕ) - 1 = 1 from rfl, mul_one] at ht
   rw [pow_mul]
   simpa using ht.pow n
 
-theorem UpperTheory.V.Odd.deg :
-    ∀ (M : AbF) (e q d : ℕ), PrimePair M.m q d → ∀ (E : Type) [Field E] [NumberField E], IsCompField M e q d E → ∀ l : ℕ, l.Prime → l ≠ 2 → l ∣ Module.finrank ℚ E → l ∣ M.deg := by
+theorem UpperTheory.V.Odd.deg
+    : ∀ (M : AbF) (e q d : ℕ),
+      PrimePair M.m q d
+        → ∀ (E : Type) [Field E] [NumberField E],
+          IsCompField M e q d E
+            → ∀ l : ℕ, l.Prime → l ≠ 2 → l ∣ Module.finrank ℚ E → l ∣ M.deg := by
   intro M e q d _ E _ _ hE l hl hl2 hldvd
   obtain ⟨N, hN, j, ζ, h1, h2, h3, h4, hζ, hfix⟩ := hE
   haveI : NeZero (N : ℚ) := ⟨by exact_mod_cast hN.ne⟩
   haveI : IsCyclotomicExtension {N} ℚ (CyclotomicField N ℚ) := CyclotomicField.isCyclotomicExtension N ℚ
   haveI : IsGalois ℚ (CyclotomicField N ℚ) := IsCyclotomicExtension.isGalois {N} ℚ _
-  have hpowζ : ∀ (τ : Gal(CyclotomicField N ℚ/ℚ)) (a n : ℕ), τ ζ = ζ ^ a → (τ ^ n) ζ = ζ ^ (a ^ n) := by
+  have hpowζ
+      : ∀ (τ : Gal(CyclotomicField N ℚ/ℚ)) (a n : ℕ), τ ζ = ζ ^ a → (τ ^ n) ζ = ζ ^ (a ^ n) := by
     intro τ a n hτ
     induction n with
     | zero => simp
-    | succ n ih =>
-      rw [pow_succ τ n, AlgEquiv.mul_apply, hτ, map_pow, ih, ← pow_mul, pow_succ a n]
-  have hmem : ∀ (τ : Gal(CyclotomicField N ℚ/ℚ)) (x : E),
-      (τ ^ (2 ^ (e + 1) * M.deg)) (j x) = j x := by
+    | succ n ih => rw [pow_succ τ n, AlgEquiv.mul_apply, hτ, map_pow, ih, ← pow_mul, pow_succ a n]
+  have hmem
+      : ∀ (τ : Gal(CyclotomicField N ℚ/ℚ)) (x : E), (τ ^ (2 ^ (e + 1) * M.deg)) (j x) = j x := by
     intro τ
     have hτ : τ ζ = ζ ^ ((hζ.autToPow ℚ τ : (ZMod N)ˣ) : ZMod N).val := (hζ.autToPow_spec ℚ τ).symm
-    have hcop : (((hζ.autToPow ℚ τ : (ZMod N)ˣ) : ZMod N).val).Coprime N := ZMod.val_coe_unit_coprime _
+    have hcop : (((hζ.autToPow ℚ τ : (ZMod N)ˣ) : ZMod N).val).Coprime N :=
+      ZMod.val_coe_unit_coprime _
     refine (hfix _ _ (hpowζ τ _ (2 ^ (e + 1) * M.deg) hτ)).mpr ⟨Or.inl ?_, ?_, ?_, ?_⟩
     · exact deg_two M.deg (hcop.coprime_dvd_right h1)
     · have hk := deg_ker M (2 ^ (e + 1)) (hcop.coprime_dvd_right h2)

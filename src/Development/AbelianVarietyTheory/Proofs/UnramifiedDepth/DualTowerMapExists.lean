@@ -18,13 +18,14 @@ section Helpers
 
 open ReciprocityTheory.PGsh
 
-private def dualTowerRing {R₀ : Type} [CommRing R₀] {Λ S : LAlg R₀} (Dq : DualPair S) (ψ : LHom Λ S) :
-    DualNum.DN Λ →+* (Dq.D : Type) :=
+private def dualTowerRing {R₀ : Type} [CommRing R₀] {Λ S : LAlg R₀} (Dq : DualPair S) (ψ : LHom Λ S)
+    : DualNum.DN Λ →+* (Dq.D : Type) :=
   Ideal.Quotient.lift _
-    (Polynomial.eval₂RingHom ((Dq.σ.1.comp ψ.1 : (Λ : Type) →ₐ[R₀] (Dq.D : Type)) :
-      (Λ : Type) →+* (Dq.D : Type)) Dq.η) (fun a ha => by
-    obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
-    rw [map_mul, map_pow, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_X, sq, Dq.η_sq, mul_zero])
+    (Polynomial.eval₂RingHom
+      ((Dq.σ.1.comp ψ.1 : (Λ : Type) →ₐ[R₀] (Dq.D : Type)) : (Λ : Type) →+* (Dq.D : Type)) Dq.η)
+    (fun a ha => by
+      obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
+      rw [map_mul, map_pow, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_X, sq, Dq.η_sq, mul_zero])
 
 private lemma dualTowerRing_C {R₀ : Type} [CommRing R₀] {Λ S : LAlg R₀} (Dq : DualPair S)
     (ψ : LHom Λ S) (r : (Λ : Type)) :
@@ -78,12 +79,14 @@ private lemma dualTower_nonempty {R₀ : Type} [CommRing R₀] {p : ℕ} (Tw : A
 
 end Helpers
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
-theorem exists_dualTower :
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} (Tw : ATowerL R₀ p), Nonempty (DualTower Tw)) :=
+theorem exists_dualTower
+    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} (Tw : ATowerL R₀ p), Nonempty (DualTower Tw)) :=
   fun Tw => dualTower_nonempty Tw
 
 end GlobalTheory

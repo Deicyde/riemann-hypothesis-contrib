@@ -9,11 +9,11 @@ open scoped Pointwise ENNReal
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp
 
-theorem exists_isFundamentalDomain_of_relIndex_ne_zero :
-    ∀ (G X : Type) [Group G] [MeasurableSpace X] [MulAction G X] [MeasurableConstSMul G X]
-      (μ : Measure X) [SMulInvariantMeasure G X μ] (Γ₀ Γ : Subgroup G) [Countable Γ] (s : Set X),
-      Γ₀ ≤ Γ → Γ₀.relIndex Γ ≠ 0 → IsFundamentalDomain Γ s μ →
-      ∃ t : Set X, IsFundamentalDomain Γ₀ t μ ∧ μ t = (Γ₀.relIndex Γ : ℝ≥0∞) * μ s := by
+theorem exists_isFundamentalDomain_of_relIndex_ne_zero
+    : ∀ (G X : Type) [Group G] [MeasurableSpace X] [MulAction G X] [MeasurableConstSMul G X]
+        (μ : Measure X) [SMulInvariantMeasure G X μ] (Γ₀ Γ : Subgroup G) [Countable Γ] (s : Set X),
+      Γ₀ ≤ Γ → Γ₀.relIndex Γ ≠ 0 → IsFundamentalDomain Γ s μ
+        → ∃ t : Set X, IsFundamentalDomain Γ₀ t μ ∧ μ t = (Γ₀.relIndex Γ : ℝ≥0∞) * μ s := by
   intro G X _ _ _ _ μ _ Γ₀ Γ _ s hle hidx hs
   classical
   set H : Subgroup Γ := Γ₀.subgroupOf Γ with hH
@@ -55,7 +55,9 @@ theorem exists_isFundamentalDomain_of_relIndex_ne_zero :
     intro heq
     apply hgg'
     have h1 : (ρ q')⁻¹ * ρ q = (ι g')⁻¹ * ι g := by
-      calc (ρ q')⁻¹ * ρ q = (ι g')⁻¹ * (ι g' * (ρ q')⁻¹) * ρ q := by group
+      calc
+        (ρ q')⁻¹ * ρ q
+          = (ι g')⁻¹ * (ι g' * (ρ q')⁻¹) * ρ q := by group
         _ = (ι g')⁻¹ * (ι g * (ρ q)⁻¹) * ρ q := by rw [heq]
         _ = (ι g')⁻¹ * ι g := by group
     have h2 : (ι g')⁻¹ * ι g ∈ H := by

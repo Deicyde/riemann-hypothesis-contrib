@@ -25,7 +25,7 @@ def KCountable : Prop :=
 
 def IndexEq : Prop :=
   ∀ (I : AutInst) (x : I.Gf),
-    ((Ksub I).map (MulAut.conj x).toMonoidHom).relIndex (Ksub I) =
-      ((Ksub I).map (MulAut.conj x⁻¹).toMonoidHom).relIndex (Ksub I)
+    ((Ksub I).map (MulAut.conj x).toMonoidHom).relIndex (Ksub I)
+      = ((Ksub I).map (MulAut.conj x⁻¹).toMonoidHom).relIndex (Ksub I)
 
 end PI.WAU

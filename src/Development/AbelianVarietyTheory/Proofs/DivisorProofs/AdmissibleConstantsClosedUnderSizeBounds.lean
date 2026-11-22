@@ -12,8 +12,11 @@ open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Numb
 
 namespace GlobalTheory
 
-theorem admissibleConstants_closed_under_sizeBounds : ∀ (𝒞 : FamClass), (∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → TuSize Fm ∧ DGamSize Fm) →
-    Closed 𝒞 (fun Fm _ => Formalism.MainNotions.WeightDegreeSizes.FamilySecondComplementInputs Fm) := by
+theorem admissibleConstants_closed_under_sizeBounds
+    : ∀ (𝒞 : FamClass),
+      (∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → TuSize Fm ∧ DGamSize Fm)
+        → Closed 𝒞 (fun Fm _ =>
+          Formalism.MainNotions.WeightDegreeSizes.FamilySecondComplementInputs Fm) := by
   intro 𝒞 h𝒞
   refine ⟨1 / 100, by norm_num, fun eps he hle => ?_⟩
   have hK : Nonempty TransportedAlt := ⟨by constructor <;> exact 0⟩

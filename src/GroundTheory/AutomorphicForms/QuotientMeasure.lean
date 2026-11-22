@@ -12,9 +12,10 @@ namespace GroundTheory.Automorphic
 
 noncomputable section
 
-theorem polishSpace_of_locallyCompact {G : Type*} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] :
-    PolishSpace G := by
+theorem polishSpace_of_locallyCompact
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [T2Space G] [SecondCountableTopology G]
+    : PolishSpace G := by
   let _ := IsTopologicalGroup.rightUniformSpace G
   have : IsRightUniformGroup G := ⟨rfl⟩
   have : CompleteSpace G := IsRightUniformGroup.completeSpace_of_weaklyLocallyCompactSpace G
@@ -39,16 +40,13 @@ theorem mk_eq_mk_iff {g h : G} : mk Γ g = mk Γ h ↔ ∃ γ : Γ, γ • h = g
   Quotient.eq.trans MulAction.orbitRel_apply
 
 @[simp]
-theorem mk_smul (γ : Γ) (g : G) : mk Γ (γ • g) = mk Γ g :=
-  mk_eq_mk_iff.2 ⟨γ, rfl⟩
+theorem mk_smul (γ : Γ) (g : G) : mk Γ (γ • g) = mk Γ g := mk_eq_mk_iff.2 ⟨γ, rfl⟩
 
-theorem mk_mul_of_mem {γ : G} (hγ : γ ∈ Γ) (g : G) : mk Γ (γ * g) = mk Γ g :=
-  mk_smul ⟨γ, hγ⟩ g
+theorem mk_mul_of_mem {γ : G} (hγ : γ ∈ Γ) (g : G) : mk Γ (γ * g) = mk Γ g := mk_smul ⟨γ, hγ⟩ g
 
 variable (Γ)
 
-theorem mk_surjective : Function.Surjective (mk Γ) :=
-  Quotient.mk_surjective
+theorem mk_surjective : Function.Surjective (mk Γ) := Quotient.mk_surjective
 
 def rightMul (g : G) : RightCosetSpace Γ → RightCosetSpace Γ :=
   Quotient.map' (· * g) fun a b h ↦ by
@@ -61,8 +59,7 @@ def rightMul (g : G) : RightCosetSpace Γ → RightCosetSpace Γ :=
 variable {Γ}
 
 @[simp]
-theorem rightMul_mk (g x : G) : rightMul Γ g (mk Γ x) = mk Γ (x * g) :=
-  rfl
+theorem rightMul_mk (g x : G) : rightMul Γ g (mk Γ x) = mk Γ (x * g) := rfl
 
 variable (Γ)
 
@@ -77,8 +74,8 @@ theorem rightMul_mul (g h : G) : rightMul Γ (g * h) = rightMul Γ h ∘ rightMu
   obtain ⟨x, rfl⟩ := mk_surjective Γ x
   simp [mul_assoc]
 
-theorem rightMul_rightMul (g h : G) (x : RightCosetSpace Γ) :
-    rightMul Γ h (rightMul Γ g x) = rightMul Γ (g * h) x := by
+theorem rightMul_rightMul (g h : G) (x : RightCosetSpace Γ)
+    : rightMul Γ h (rightMul Γ g x) = rightMul Γ (g * h) x := by
   rw [rightMul_mul]
   rfl
 
@@ -87,17 +84,14 @@ section Topology
 variable [TopologicalSpace G] [IsTopologicalGroup G]
 
 omit [IsTopologicalGroup G] in
-theorem continuous_mk : Continuous (mk Γ) :=
-  continuous_quotient_mk'
+theorem continuous_mk : Continuous (mk Γ) := continuous_quotient_mk'
 
-theorem isOpenQuotientMap_mk : IsOpenQuotientMap (mk Γ) :=
-  MulAction.isOpenQuotientMap_quotientMk
+theorem isOpenQuotientMap_mk : IsOpenQuotientMap (mk Γ) := MulAction.isOpenQuotientMap_quotientMk
 
-theorem isOpenMap_mk : IsOpenMap (mk Γ) :=
-  (isOpenQuotientMap_mk Γ).isOpenMap
+theorem isOpenMap_mk : IsOpenMap (mk Γ) := (isOpenQuotientMap_mk Γ).isOpenMap
 
-theorem continuous_rightMul_prod :
-    Continuous fun p : RightCosetSpace Γ × G ↦ rightMul Γ p.2 p.1 := by
+theorem continuous_rightMul_prod
+    : Continuous fun p : RightCosetSpace Γ × G ↦ rightMul Γ p.2 p.1 := by
   have hq : IsQuotientMap (Prod.map (mk Γ) (id : G → G)) :=
     ((isOpenQuotientMap_mk Γ).prodMap IsOpenQuotientMap.id).isQuotientMap
   rw [hq.continuous_iff]
@@ -120,9 +114,11 @@ instance [LocallyCompactSpace G] : LocallyCompactSpace (RightCosetSpace Γ) :=
 instance [SecondCountableTopology G] : SecondCountableTopology (RightCosetSpace Γ) :=
   ContinuousConstSMul.secondCountableTopology
 
-theorem exists_isCompact_subset_mk_image [LocallyCompactSpace G] {K : Set (RightCosetSpace Γ)}
-    (hK : IsCompact K) : ∃ D : Set G, IsCompact D ∧ K ⊆ mk Γ '' D :=
-  by apply _root_.UpperTheory.Reformulated.B.RightCosetSpaceCompact.exists_isCompact_subset_mk_image <;> assumption
+theorem exists_isCompact_subset_mk_image
+    [LocallyCompactSpace G] {K : Set (RightCosetSpace Γ)} (hK : IsCompact K)
+    : ∃ D : Set G, IsCompact D ∧ K ⊆ mk Γ '' D := by
+  apply _root_.UpperTheory.Reformulated.B.RightCosetSpaceCompact.exists_isCompact_subset_mk_image
+    <;> assumption
 
 section Discrete
 
@@ -133,8 +129,8 @@ section T2
 variable [T2Space G]
 
 instance properlyDiscontinuousSMul : ProperlyDiscontinuousSMul Γ G :=
-  Γ.properlyDiscontinuousSMul_of_tendsto_cofinite
-    (Γ.tendsto_coe_cofinite_of_discrete (isDiscrete_iff_discreteTopology.2 ‹_›))
+  Γ.properlyDiscontinuousSMul_of_tendsto_cofinite (Γ.tendsto_coe_cofinite_of_discrete
+    (isDiscrete_iff_discreteTopology.2 ‹_›))
 
 theorem t2Space [LocallyCompactSpace G] : T2Space (RightCosetSpace Γ) := inferInstance
 
@@ -143,9 +139,8 @@ instance countable_of_discrete [SecondCountableTopology G] : Countable Γ :=
 
 end T2
 
-theorem exists_isOpen_one_mem_injOn {C : Set G} (hC : C ∈ 𝓝 (1 : G)) :
-    ∃ V : Set G, IsOpen V ∧ (1 : G) ∈ V ∧ V ⊆ C ∧
-      ∀ a ∈ V, ∀ b ∈ V, a * b⁻¹ ∈ Γ → a = b := by
+theorem exists_isOpen_one_mem_injOn {C : Set G} (hC : C ∈ 𝓝 (1 : G))
+    : ∃ V : Set G, IsOpen V ∧ (1 : G) ∈ V ∧ V ⊆ C ∧ ∀ a ∈ V, ∀ b ∈ V, a * b⁻¹ ∈ Γ → a = b := by
   obtain ⟨U, hUo, hU⟩ : ∃ U : Set G, IsOpen U ∧ Subtype.val ⁻¹' U = ({1} : Set Γ) :=
     isOpen_induced_iff.1 (isOpen_discrete ({1} : Set Γ))
   have h1U : (1 : G) ∈ U := by
@@ -158,8 +153,13 @@ theorem exists_isOpen_one_mem_injOn {C : Set G} (hC : C ∈ 𝓝 (1 : G)) :
   have hW : IsOpen {q : G × G | q.1 * q.2⁻¹ ∈ U} :=
     hUo.preimage (continuous_fst.mul continuous_snd.inv)
   obtain ⟨u, v, hu, hv, hu1, hv1, huv⟩ := isOpen_prod_iff.1 hW 1 1 (by simpa using h1U)
-  refine ⟨u ∩ v ∩ interior C, (hu.inter hv).inter isOpen_interior,
-    ⟨⟨hu1, hv1⟩, mem_interior_iff_mem_nhds.2 hC⟩, fun a ha ↦ interior_subset ha.2, ?_⟩
+  refine ⟨
+    u ∩ v ∩ interior C,
+    (hu.inter hv).inter isOpen_interior,
+    ⟨⟨hu1, hv1⟩, mem_interior_iff_mem_nhds.2 hC⟩,
+    fun a ha ↦ interior_subset ha.2,
+    ?_
+  ⟩
   intro a ha b hb hab
   have := hUΓ _ hab (huv (Set.mk_mem_prod ha.1.1 hb.1.2))
   exact mul_inv_eq_one.1 this
@@ -170,11 +170,10 @@ section FundamentalDomain
 
 variable {Γ} [MeasurableSpace G] [BorelSpace G]
 
-theorem exists_fundamentalDomain_of_cover {V : Set G} (hVo : IsOpen V)
-    (hV : ∀ a ∈ V, ∀ b ∈ V, a * b⁻¹ ∈ Γ → a = b) (p : ℕ → G)
-    (hcov : ∀ x : G, ∃ γ : Γ, ∃ i, γ • x ∈ (· * p i) '' V) :
-    ∃ E : Set G, MeasurableSet E ∧ E ⊆ ⋃ i, (· * p i) '' V ∧
-      ∀ x : G, ∃! γ : Γ, γ • x ∈ E := by
+theorem exists_fundamentalDomain_of_cover
+    {V : Set G} (hVo : IsOpen V) (hV : ∀ a ∈ V, ∀ b ∈ V, a * b⁻¹ ∈ Γ → a = b)
+    (p : ℕ → G) (hcov : ∀ x : G, ∃ γ : Γ, ∃ i, γ • x ∈ (· * p i) '' V)
+    : ∃ E : Set G, MeasurableSet E ∧ E ⊆ ⋃ i, (· * p i) '' V ∧ ∀ x : G, ∃! γ : Γ, γ • x ∈ E := by
   classical
   set B : ℕ → Set G := fun i ↦ (· * p i) '' V with hBdef
   set O : ℕ → Set G := fun j ↦ ⋃ γ : Γ, (fun y : G ↦ γ • y) ⁻¹' B j with hOdef
@@ -189,8 +188,9 @@ theorem exists_fundamentalDomain_of_cover {V : Set G} (hVo : IsOpen V)
     intro y
     simp only [hEdef, Set.mem_iUnion, Set.mem_sdiff, not_exists]
   refine ⟨E, ?_, ?_, ?_⟩
-  · exact MeasurableSet.iUnion fun i ↦ (hBo i).measurableSet.diff
-      (MeasurableSet.iUnion fun j ↦ MeasurableSet.iUnion fun _ ↦ (hOo j).measurableSet)
+  · exact MeasurableSet.iUnion fun i ↦
+      (hBo i).measurableSet.diff
+        (MeasurableSet.iUnion fun j ↦ MeasurableSet.iUnion fun _ ↦ (hOo j).measurableSet)
   · intro y hy
     obtain ⟨i, hi, -⟩ := (hmemE y).1 hy
     exact Set.mem_iUnion.2 ⟨i, hi⟩
@@ -213,10 +213,8 @@ theorem exists_fundamentalDomain_of_cover {V : Set G} (hVo : IsOpen V)
       obtain ⟨v₂, hv₂, h₂⟩ := hk
       have hmem : v₂ * v₁⁻¹ ∈ Γ := by
         have : v₂ * v₁⁻¹ = ((δ * γ⁻¹ : Γ) : G) := by
-          have h₁' : v₁ = (γ : G) * x * (p i)⁻¹ := by
-            rw [eq_mul_inv_iff_mul_eq]; exact h₁
-          have h₂' : v₂ = (δ : G) * x * (p i)⁻¹ := by
-            rw [eq_mul_inv_iff_mul_eq]; exact h₂
+          have h₁' : v₁ = (γ : G) * x * (p i)⁻¹ := by rw [eq_mul_inv_iff_mul_eq]; exact h₁
+          have h₂' : v₂ = (δ : G) * x * (p i)⁻¹ := by rw [eq_mul_inv_iff_mul_eq]; exact h₂
           rw [h₁', h₂']
           simp [mul_assoc]
         rw [this]
@@ -230,20 +228,23 @@ theorem exists_fundamentalDomain_of_cover {V : Set G} (hVo : IsOpen V)
 
 variable (Γ) [DiscreteTopology Γ]
 
-theorem exists_fundamentalDomain [SecondCountableTopology G] :
-    ∃ E : Set G, MeasurableSet E ∧ ∀ x : G, ∃! γ : Γ, γ • x ∈ E := by
+theorem exists_fundamentalDomain [SecondCountableTopology G]
+    : ∃ E : Set G, MeasurableSet E ∧ ∀ x : G, ∃! γ : Γ, γ • x ∈ E := by
   obtain ⟨V, hVo, hV1, -, hV⟩ := exists_isOpen_one_mem_injOn Γ (univ_mem (f := 𝓝 (1 : G)))
-  obtain ⟨r, hr, hcov⟩ := isLindelof_univ.elim_countable_subcover (fun x : G ↦ (· * x) '' V)
-    (fun x ↦ isOpenMap_mul_right x _ hVo)
-    (fun x _ ↦ Set.mem_iUnion.2 ⟨x, 1, hV1, one_mul x⟩)
+  obtain ⟨r, hr, hcov⟩ :=
+    isLindelof_univ.elim_countable_subcover
+      (fun x : G ↦ (· * x) '' V)
+      (fun x ↦ isOpenMap_mul_right x _ hVo)
+      (fun x _ ↦ Set.mem_iUnion.2 ⟨x, 1, hV1, one_mul x⟩)
   have hrne : r.Nonempty := by
     obtain ⟨x, hx, -⟩ := Set.mem_iUnion₂.1 (hcov (Set.mem_univ (1 : G)))
     exact ⟨x, hx⟩
   obtain ⟨p, rfl⟩ := hr.exists_eq_range hrne
-  obtain ⟨E, hE, -, hEu⟩ := exists_fundamentalDomain_of_cover hVo hV p fun x ↦ by
-    obtain ⟨y, hy, hxy⟩ := Set.mem_iUnion₂.1 (hcov (Set.mem_univ x))
-    obtain ⟨i, rfl⟩ := hy
-    exact ⟨1, i, by simpa using hxy⟩
+  obtain ⟨E, hE, -, hEu⟩ :=
+    exists_fundamentalDomain_of_cover hVo hV p fun x ↦ by
+      obtain ⟨y, hy, hxy⟩ := Set.mem_iUnion₂.1 (hcov (Set.mem_univ x))
+      obtain ⟨i, rfl⟩ := hy
+      exact ⟨1, i, by simpa using hxy⟩
   exact ⟨E, hE, hEu⟩
 
 end FundamentalDomain
@@ -252,18 +253,16 @@ section Measure
 
 variable [MeasurableSpace G] [BorelSpace G] [SecondCountableTopology G] [DiscreteTopology Γ]
 
-def fundamentalDomain : Set G :=
-  (exists_fundamentalDomain Γ).choose
+def fundamentalDomain : Set G := (exists_fundamentalDomain Γ).choose
 
 theorem measurableSet_fundamentalDomain : MeasurableSet (fundamentalDomain Γ) :=
   (exists_fundamentalDomain Γ).choose_spec.1
 
-theorem existsUnique_smul_mem_fundamentalDomain (x : G) :
-    ∃! γ : Γ, γ • x ∈ fundamentalDomain Γ :=
+theorem existsUnique_smul_mem_fundamentalDomain (x : G) : ∃! γ : Γ, γ • x ∈ fundamentalDomain Γ :=
   (exists_fundamentalDomain Γ).choose_spec.2 x
 
-theorem isFundamentalDomain_fundamentalDomain (μ : Measure G) :
-    IsFundamentalDomain Γ (fundamentalDomain Γ) μ :=
+theorem isFundamentalDomain_fundamentalDomain (μ : Measure G)
+    : IsFundamentalDomain Γ (fundamentalDomain Γ) μ :=
   IsFundamentalDomain.mk' (measurableSet_fundamentalDomain Γ).nullMeasurableSet
     (existsUnique_smul_mem_fundamentalDomain Γ)
 
@@ -290,14 +289,16 @@ instance borelSpace : BorelSpace (RightCosetSpace Γ) := by
   have := polishSpace_of_locallyCompact (G := G)
   exact Quotient.borelSpace
 
-theorem measurable_mk : Measurable (mk Γ) :=
-  (continuous_mk Γ).measurable
+theorem measurable_mk : Measurable (mk Γ) := (continuous_mk Γ).measurable
 
 def fundamentalDomainEquiv : fundamentalDomain Γ ≃ᵐ RightCosetSpace Γ where
-  toEquiv := Equiv.ofBijective (fun x ↦ mk Γ x)
-    ⟨fun x y h ↦ Subtype.ext (injOn_mk_fundamentalDomain Γ x.2 y.2 h), fun x ↦ by
-      obtain ⟨y, hy, rfl⟩ := (mk_image_fundamentalDomain Γ).symm ▸ Set.mem_univ x
-      exact ⟨⟨y, hy⟩, rfl⟩⟩
+  toEquiv :=
+    Equiv.ofBijective (fun x ↦ mk Γ x) ⟨
+      fun x y h ↦ Subtype.ext (injOn_mk_fundamentalDomain Γ x.2 y.2 h),
+      fun x ↦ by
+        obtain ⟨y, hy, rfl⟩ := (mk_image_fundamentalDomain Γ).symm ▸ Set.mem_univ x
+        exact ⟨⟨y, hy⟩, rfl⟩
+    ⟩
   measurable_toFun := (measurable_mk Γ).comp measurable_subtype_coe
   measurable_invFun := by
     intro A hA
@@ -322,45 +323,45 @@ def fundamentalDomainEquiv : fundamentalDomain Γ ≃ᵐ RightCosetSpace Γ wher
 
 variable (μ : Measure G)
 
-theorem quotientMeasure_eq_map_fundamentalDomainEquiv :
-    quotientMeasure Γ μ = Measure.map (fundamentalDomainEquiv Γ) (μ.comap Subtype.val) := by
+theorem quotientMeasure_eq_map_fundamentalDomainEquiv
+    : quotientMeasure Γ μ = Measure.map (fundamentalDomainEquiv Γ) (μ.comap Subtype.val) := by
   rw [quotientMeasure, ← map_comap_subtype_coe (measurableSet_fundamentalDomain Γ),
     Measure.map_map (measurable_mk Γ) measurable_subtype_coe]
   rfl
 
-theorem integral_quotientMeasure {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    (h : RightCosetSpace Γ → E) :
-    ∫ x, h x ∂quotientMeasure Γ μ = ∫ g in fundamentalDomain Γ, h (mk Γ g) ∂μ := by
+theorem integral_quotientMeasure
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (h : RightCosetSpace Γ → E)
+    : ∫ x, h x ∂quotientMeasure Γ μ = ∫ g in fundamentalDomain Γ, h (mk Γ g) ∂μ := by
   rw [quotientMeasure_eq_map_fundamentalDomainEquiv, integral_map_equiv,
     ← integral_subtype_comap (measurableSet_fundamentalDomain Γ)]
   rfl
 
-theorem lintegral_quotientMeasure (h : RightCosetSpace Γ → ℝ≥0∞) :
-    ∫⁻ x, h x ∂quotientMeasure Γ μ = ∫⁻ g in fundamentalDomain Γ, h (mk Γ g) ∂μ := by
+theorem lintegral_quotientMeasure (h : RightCosetSpace Γ → ℝ≥0∞)
+    : ∫⁻ x, h x ∂quotientMeasure Γ μ = ∫⁻ g in fundamentalDomain Γ, h (mk Γ g) ∂μ := by
   rw [quotientMeasure_eq_map_fundamentalDomainEquiv, lintegral_map_equiv,
     ← lintegral_subtype_comap (measurableSet_fundamentalDomain Γ)]
   rfl
 
 variable {Γ} [μ.IsMulLeftInvariant]
 
-
 omit [LocallyCompactSpace G] [T2Space G] in
-theorem map_restrict_eq_quotientMeasure {F : Set G} (hF : IsFundamentalDomain Γ F μ) :
-    Measure.map (mk Γ) (μ.restrict F) = quotientMeasure Γ μ :=
+theorem map_restrict_eq_quotientMeasure {F : Set G} (hF : IsFundamentalDomain Γ F μ)
+    : Measure.map (mk Γ) (μ.restrict F) = quotientMeasure Γ μ :=
   hF.quotientMeasure_eq μ (isFundamentalDomain_fundamentalDomain Γ μ)
 
-theorem quotientMeasure_apply {F : Set G} (hF : IsFundamentalDomain Γ F μ)
-    {A : Set (RightCosetSpace Γ)} (hA : MeasurableSet A) :
-    quotientMeasure Γ μ A = μ (mk Γ ⁻¹' A ∩ F) := by
+theorem quotientMeasure_apply
+    {F : Set G} (hF : IsFundamentalDomain Γ F μ)
+    {A : Set (RightCosetSpace Γ)} (hA : MeasurableSet A)
+    : quotientMeasure Γ μ A = μ (mk Γ ⁻¹' A ∩ F) := by
   rw [← map_restrict_eq_quotientMeasure μ hF, Measure.map_apply (measurable_mk Γ) hA,
     Measure.restrict_apply (measurable_mk Γ hA)]
 
-theorem quotientMeasure_univ {F : Set G} (hF : IsFundamentalDomain Γ F μ) :
-    quotientMeasure Γ μ univ = μ F := by
+theorem quotientMeasure_univ {F : Set G} (hF : IsFundamentalDomain Γ F μ)
+    : quotientMeasure Γ μ univ = μ F := by
   rw [quotientMeasure_apply μ hF MeasurableSet.univ, Set.preimage_univ, Set.univ_inter]
 
-theorem quotientMeasure_mk_image_le {D : Set G} (hD : MeasurableSet (mk Γ '' D)) :
-    quotientMeasure Γ μ (mk Γ '' D) ≤ μ D := by
+theorem quotientMeasure_mk_image_le {D : Set G} (hD : MeasurableSet (mk Γ '' D))
+    : quotientMeasure Γ μ (mk Γ '' D) ≤ μ D := by
   have hF := isFundamentalDomain_fundamentalDomain Γ μ
   rw [quotientMeasure_apply μ hF hD]
   have : mk Γ ⁻¹' (mk Γ '' D) = ⋃ γ : Γ, (γ • ·) '' D :=
@@ -369,16 +370,15 @@ theorem quotientMeasure_mk_image_le {D : Set G} (hD : MeasurableSet (mk Γ '' D)
   refine (measure_iUnion_le _).trans (le_of_eq ?_)
   simp only [Set.image_smul]
 
-instance isFiniteMeasureOnCompacts [IsFiniteMeasureOnCompacts μ] :
-    IsFiniteMeasureOnCompacts (quotientMeasure Γ μ) := by
+instance isFiniteMeasureOnCompacts [IsFiniteMeasureOnCompacts μ]
+    : IsFiniteMeasureOnCompacts (quotientMeasure Γ μ) := by
   refine ⟨fun K hK ↦ ?_⟩
   obtain ⟨D, hD, hKD⟩ := exists_isCompact_subset_mk_image Γ hK
   have hm : MeasurableSet (mk Γ '' D) := (hD.image (continuous_mk Γ)).isClosed.measurableSet
-  exact (measure_mono hKD).trans_lt
-    ((quotientMeasure_mk_image_le μ hm).trans_lt hD.measure_lt_top)
+  exact (measure_mono hKD).trans_lt ((quotientMeasure_mk_image_le μ hm).trans_lt hD.measure_lt_top)
 
-instance isFiniteMeasure [IsFiniteMeasureOnCompacts μ] [CompactSpace (RightCosetSpace Γ)] :
-    IsFiniteMeasure (quotientMeasure Γ μ) :=
+instance isFiniteMeasure [IsFiniteMeasureOnCompacts μ] [CompactSpace (RightCosetSpace Γ)]
+    : IsFiniteMeasure (quotientMeasure Γ μ) :=
   ⟨isCompact_univ.measure_lt_top⟩
 
 instance regular [IsFiniteMeasureOnCompacts μ] : (quotientMeasure Γ μ).Regular :=
@@ -401,8 +401,8 @@ instance isOpenPosMeasure [μ.IsOpenPosMeasure] : (quotientMeasure Γ μ).IsOpen
   rw [quotientMeasure_apply μ hF hUo.measurableSet] at hU0
   simp [hU0]
 
-theorem map_rightMul_quotientMeasure [μ.IsMulRightInvariant] (g : G) :
-    Measure.map (rightMul Γ g) (quotientMeasure Γ μ) = quotientMeasure Γ μ := by
+theorem map_rightMul_quotientMeasure [μ.IsMulRightInvariant] (g : G)
+    : Measure.map (rightMul Γ g) (quotientMeasure Γ μ) = quotientMeasure Γ μ := by
   set F := fundamentalDomain Γ
   have hF' : IsFundamentalDomain Γ ((· * g⁻¹) ⁻¹' F) μ :=
     (isFundamentalDomain_fundamentalDomain Γ μ).preimage_of_equiv
@@ -418,42 +418,46 @@ theorem map_rightMul_quotientMeasure [μ.IsMulRightInvariant] (g : G) :
   conv_rhs => rw [← key]
   have h2 : Measure.map (· * g) (μ.restrict F) = μ.restrict ((· * g⁻¹) ⁻¹' F) := by
     conv_lhs => rw [← h1]
-    rw [← Measure.restrict_map hmg ((measurableSet_fundamentalDomain Γ).preimage
-      (measurable_mul_const g⁻¹)), map_mul_right_eq_self]
+    rw [← Measure.restrict_map hmg
+        ((measurableSet_fundamentalDomain Γ).preimage (measurable_mul_const g⁻¹)),
+      map_mul_right_eq_self]
   rw [show quotientMeasure Γ μ = Measure.map (mk Γ) (μ.restrict F) from rfl,
     Measure.map_map (continuous_rightMul Γ g).measurable (measurable_mk Γ), hcomm,
     ← Measure.map_map (measurable_mk Γ) hmg, h2]
 
-theorem measurePreserving_rightMul [μ.IsMulRightInvariant] (g : G) :
-    MeasurePreserving (rightMul Γ g) (quotientMeasure Γ μ) (quotientMeasure Γ μ) :=
+theorem measurePreserving_rightMul [μ.IsMulRightInvariant] (g : G)
+    : MeasurePreserving (rightMul Γ g) (quotientMeasure Γ μ) (quotientMeasure Γ μ) :=
   ⟨(continuous_rightMul Γ g).measurable, map_rightMul_quotientMeasure μ g⟩
 
-theorem lintegral_eq_lintegral_automorphize {f : G → ℝ≥0∞} (hf : AEMeasurable f μ) :
-    ∫⁻ g, f g ∂μ = ∫⁻ x, MulAction.automorphize f x ∂quotientMeasure Γ μ := by
+theorem lintegral_eq_lintegral_automorphize {f : G → ℝ≥0∞} (hf : AEMeasurable f μ)
+    : ∫⁻ g, f g ∂μ = ∫⁻ x, MulAction.automorphize f x ∂quotientMeasure Γ μ := by
   have hF := isFundamentalDomain_fundamentalDomain Γ μ
   rw [lintegral_quotientMeasure, hF.lintegral_eq_tsum'' f, ← lintegral_tsum]
   · rfl
-  · exact fun γ ↦ (hf.comp_quasiMeasurePreserving
-      (measurePreserving_smul γ μ).quasiMeasurePreserving).restrict
+  · exact fun γ ↦
+      (hf.comp_quasiMeasurePreserving (measurePreserving_smul γ μ).quasiMeasurePreserving).restrict
 
-theorem integral_eq_integral_automorphize {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    {f : G → E} (hf : Integrable f μ) :
-    ∫ g, f g ∂μ = ∫ x, MulAction.automorphize f x ∂quotientMeasure Γ μ := by
+theorem integral_eq_integral_automorphize
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {f : G → E} (hf : Integrable f μ)
+    : ∫ g, f g ∂μ = ∫ x, MulAction.automorphize f x ∂quotientMeasure Γ μ := by
   have hF := isFundamentalDomain_fundamentalDomain Γ μ
   rw [integral_quotientMeasure]
-  calc ∫ g, f g ∂μ = ∑' γ : Γ, ∫ g in fundamentalDomain Γ, f (γ • g) ∂μ :=
-        hF.integral_eq_tsum'' f hf
+  calc
+    ∫ g, f g ∂μ
+      = ∑' γ : Γ, ∫ g in fundamentalDomain Γ, f (γ • g) ∂μ := hF.integral_eq_tsum'' f hf
     _ = ∫ g in fundamentalDomain Γ, ∑' γ : Γ, f (γ • g) ∂μ := by
-        rw [integral_tsum]
-        · exact fun γ ↦ (hf.1.comp_quasiMeasurePreserving
-            (measurePreserving_smul γ μ).quasiMeasurePreserving).restrict
-        · rw [← hF.lintegral_eq_tsum'' (‖f ·‖ₑ)]
-          exact hf.2.ne
+      rw [integral_tsum]
+      · exact fun γ ↦
+          (hf.1.comp_quasiMeasurePreserving (measurePreserving_smul γ
+            μ).quasiMeasurePreserving).restrict
+      · rw [← hF.lintegral_eq_tsum'' (‖f ·‖ₑ)]
+        exact hf.2.ne
     _ = ∫ g in fundamentalDomain Γ, MulAction.automorphize f (mk Γ g) ∂μ := rfl
 
-theorem integral_mul_eq_integral_mul_automorphize {𝕜 : Type*} [RCLike 𝕜] {f : G → 𝕜}
-    {φ : RightCosetSpace Γ → 𝕜} (h : Integrable (fun g ↦ φ (mk Γ g) * f g) μ) :
-    ∫ g, φ (mk Γ g) * f g ∂μ = ∫ x, φ x * MulAction.automorphize f x ∂quotientMeasure Γ μ := by
+theorem integral_mul_eq_integral_mul_automorphize
+    {𝕜 : Type*} [RCLike 𝕜]
+    {f : G → 𝕜} {φ : RightCosetSpace Γ → 𝕜} (h : Integrable (fun g ↦ φ (mk Γ g) * f g) μ)
+    : ∫ g, φ (mk Γ g) * f g ∂μ = ∫ x, φ x * MulAction.automorphize f x ∂quotientMeasure Γ μ := by
   rw [integral_eq_integral_automorphize (Γ := Γ) μ h]
   have H := MulAction.automorphize_smul_left (α := Γ) f φ
   refine integral_congr_ae (Eventually.of_forall fun x ↦ ?_)

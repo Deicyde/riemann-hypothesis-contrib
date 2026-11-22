@@ -13,8 +13,9 @@ namespace UpperTheory.N.Num
 
 variable {D : D7}
 
-theorem ranks (D : D7) : (1 : ℝ) ≤ D.R.m ∧ (D.R.m : ℝ) ≤ D.R.f ∧ (D.R.f : ℝ) ≤ D.R.k ∧ (D.R.k : ℝ) ≤ D.R.r ∧
-    (D.R.r : ℝ) ≤ D.R.t ∧ (D.R.t : ℝ) ≤ D.R.nV ∧ (D.R.nV : ℝ) ≤ 2 * D.R.t := by
+theorem ranks (D : D7)
+    : (1 : ℝ) ≤ D.R.m ∧ (D.R.m : ℝ) ≤ D.R.f ∧ (D.R.f : ℝ) ≤ D.R.k ∧ (D.R.k : ℝ) ≤ D.R.r
+      ∧ (D.R.r : ℝ) ≤ D.R.t ∧ (D.R.t : ℝ) ≤ D.R.nV ∧ (D.R.nV : ℝ) ≤ 2 * D.R.t := by
   have h1 := D.R.two_le_m
   have h2 := D.R.m_le_f
   have h3 := D.R.f_le_k
@@ -39,13 +40,14 @@ theorem condN_le (L : SizeData₂ D) (P : ParameterChoice' D L) : (D.host.condN 
     exact Real.rpow_le_rpow_of_exponent_le hb (by norm_num)
   have e : (LevelStarExponents.condE D : ℝ) = D.host.condN := rfl
   rw [e] at hc
-  have h2 : (D.host.condN : ℝ) ≤ (D.host.condN : ℝ) ^ 36 := by exact_mod_cast Nat.le_self_pow (by norm_num) _
+  have h2 : (D.host.condN : ℝ) ≤ (D.host.condN : ℝ) ^ 36 := by
+    exact_mod_cast Nat.le_self_pow (by norm_num) _
   have h3 : (D.host.condN : ℝ) ^ 36 ≤ (D.host.condN : ℝ) ^ 36 * (D.R.t : ℝ) ^ 150 :=
     le_mul_of_one_le_right (by positivity) ht
   linarith
 
-theorem sizes_le_b (L : SizeData₂ D) (P : ParameterChoice' D L) :
-    L.Sc ≤ L.sc.b ∧ L.etaSz ≤ L.sc.b ∧ (D.R.t : ℝ) ≤ L.sc.b := by
+theorem sizes_le_b (L : SizeData₂ D) (P : ParameterChoice' D L)
+    : L.Sc ≤ L.sc.b ∧ L.etaSz ≤ L.sc.b ∧ (D.R.t : ℝ) ≤ L.sc.b := by
   have hb := one_le_b L
   have hL := one_le_L L
   obtain ⟨r1, r2, r3, r4, r5, -, -⟩ := ranks D
@@ -57,9 +59,13 @@ theorem sizes_le_b (L : SizeData₂ D) (P : ParameterChoice' D L) :
   refine ⟨?_, hη, P.t_le_eta.trans hη⟩
   have hS := L.Sc_pos
   have hn : (1 : ℝ) ≤ D.R.n := by exact_mod_cast D.R.ord_pos
-  have hden : (D.R.m : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 +
-      (D.R.k : ℝ) * (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L) := by
-    have h1 : (0 : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 := by positivity
+  have hden
+      : (D.R.m : ℝ)
+        ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2
+          + (D.R.k : ℝ) * (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L) := by
+    have h1
+        : (0 : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 := by
+      positivity
     have h2 : (1 : ℝ) ≤ (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L) :=
       one_le_mul_of_one_le_of_one_le (one_le_pow₀ hn) (by linarith)
     have h3 : (D.R.k : ℝ) ≤ (D.R.k : ℝ) * ((D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L)) :=
@@ -82,14 +88,14 @@ theorem sizes_le_b (L : SizeData₂ D) (P : ParameterChoice' D L) :
   have h3 := L.etaSz_pos
   linarith
 
-theorem factorization_condN (H : D7) {l : ℕ} (hs : l ∈ H.host.small) :
-    H.host.condN.factorization l = H.host.QS.factorization l := by
+theorem factorization_condN (H : D7) {l : ℕ} (hs : l ∈ H.host.small)
+    : H.host.condN.factorization l = H.host.QS.factorization l := by
   have h := Nat.mem_primeFactors.1 hs
   have e : H.host.condN = H.host.QS * (H.host.q * H.host.d) := mul_assoc _ _ _
   rw [e, Nat.factorization_eq_of_coprime_left H.host.QS_coprime (Nat.mem_primeFactorsList'.2 h)]
 
-theorem s0_eq (i : D.nd.Loc) (hs : D.nd.l i ∈ D.host.small) (h2 : D.nd.l i ≠ 2) :
-    D.nd.s0 i = max 1 (D.host.condN.factorization (D.nd.l i)) := by
+theorem s0_eq (i : D.nd.Loc) (hs : D.nd.l i ∈ D.host.small) (h2 : D.nd.l i ≠ 2)
+    : D.nd.s0 i = max 1 (D.host.condN.factorization (D.nd.l i)) := by
   rw [D.nd.restNLevelExponent_of_odd i h2, factorization_condN D hs]
 
 end UpperTheory.N.Num

@@ -9,13 +9,14 @@ abbrev M4 (R : Type) : Type := Matrix (Fin 4) (Fin 4) R
 
 variable {K : Type} [Field K]
 
-theorem ordFlag_diag (c : Fin 4 → K) (hc : Function.Injective c) (X : M4 K)
-    (hX : X.charpoly = ∏ j, (Polynomial.X - Polynomial.C (c j))) :
-    ∃ P : (M4 K)ˣ, X * (P : M4 K) = (P : M4 K) * Matrix.diagonal c := by
+theorem ordFlag_diag
+    (c : Fin 4 → K) (hc : Function.Injective c)
+    (X : M4 K) (hX : X.charpoly = ∏ j, (Polynomial.X - Polynomial.C (c j)))
+    : ∃ P : (M4 K)ˣ, X * (P : M4 K) = (P : M4 K) * Matrix.diagonal c := by
   have hev : ∀ j, Module.End.HasEigenvalue (Matrix.toLin' X) (c j) := by
     intro j
-    rw [Module.End.hasEigenvalue_iff_isRoot_charpoly, Matrix.charpoly_toLin', hX,
-      Polynomial.IsRoot, Polynomial.eval_prod]
+    rw [Module.End.hasEigenvalue_iff_isRoot_charpoly, Matrix.charpoly_toLin', hX, Polynomial.IsRoot,
+      Polynomial.eval_prod]
     exact Finset.prod_eq_zero (Finset.mem_univ j) (by simp)
   choose v hv using fun j => (hev j).exists_hasEigenvector
   have hli : LinearIndependent K v :=

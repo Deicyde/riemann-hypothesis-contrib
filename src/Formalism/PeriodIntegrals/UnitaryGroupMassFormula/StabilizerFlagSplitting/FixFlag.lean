@@ -59,8 +59,9 @@ theorem stabilizer_subgroup_flag : SubFlag := by
   refine ⟨?_, fun a => ?_⟩
   · show (h * m)ᴴ * Hpk k r * (h * m) = Hpk k r
     rw [Matrix.conjTranspose_mul]
-    calc mᴴ * hᴴ * Hpk k r * (h * m) = mᴴ * (hᴴ * Hpk k r * h) * m := by
-          simp only [Matrix.mul_assoc]
+    calc
+      mᴴ * hᴴ * Hpk k r * (h * m)
+        = mᴴ * (hᴴ * Hpk k r * h) * m := by simp only [Matrix.mul_assoc]
       _ = Hpk k r := by rw [hhU']; exact hmU'
   · have hm1 : m *ᵥ fvec k r z a - fvec k r z a ∈ flagSpan k r z a := by
       apply mem_flagSpan_of_eq_zero_of_le
@@ -92,8 +93,8 @@ theorem stabilizer_subgroup_flag : SubFlag := by
             rw [hmd i j h1 h2 hri, if_neg (Ne.symm hji), zero_mul]
         · intro hi'
           exact absurd (Finset.mem_univ i) hi'
-    have heq : (h * m) *ᵥ fvec k r z a - fvec k r z a =
-        h *ᵥ (m *ᵥ fvec k r z a - fvec k r z a) := by
+    have heq
+        : (h * m) *ᵥ fvec k r z a - fvec k r z a = h *ᵥ (m *ᵥ fvec k r z a - fvec k r z a) := by
       rw [← Matrix.mulVec_mulVec, Matrix.mulVec_sub, hfix]
     rw [heq]
     exact mulVec_mem_flagSpan_of_fixes_fvec z a h hfix _ hm1

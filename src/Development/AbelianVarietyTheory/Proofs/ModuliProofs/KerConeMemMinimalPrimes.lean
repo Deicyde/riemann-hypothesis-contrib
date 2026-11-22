@@ -8,8 +8,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
@@ -18,9 +20,11 @@ namespace HomogMinPrime
 
 open MvPolynomial
 
-theorem eval_scale {o σ A : Type} [CommRing o] [CommRing A] (f : o →+* A) (g : σ → A) (c : A)
-    {F : MvPolynomial σ o} {e : ℕ} (hF : F.IsHomogeneous e) :
-    eval₂Hom f (fun a => g a * c) F = c ^ e * eval₂Hom f g F := by
+theorem eval_scale
+    {o σ A : Type} [CommRing o] [CommRing A]
+    (f : o →+* A) (g : σ → A) (c : A)
+    {F : MvPolynomial σ o} {e : ℕ} (hF : F.IsHomogeneous e)
+    : eval₂Hom f (fun a => g a * c) F = c ^ e * eval₂Hom f g F := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [F.as_sum, map_sum, map_sum, Finset.mul_sum]
@@ -33,26 +37,31 @@ theorem eval_scale {o σ A : Type} [CommRing o] [CommRing A] (f : o →+* A) (g 
     Finsupp.degree_apply]
   ring
 
-theorem eval_cone {o σ K : Type} [CommRing o] [Field K] (β : o →+* K) (u : σ → K)
-    {F : MvPolynomial σ o} {e : ℕ} (hF : F.IsHomogeneous e) :
-    eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β)
-      (fun a => Polynomial.C (u a) * Polynomial.X) F
+theorem eval_cone
+    {o σ K : Type} [CommRing o] [Field K]
+    (β : o →+* K) (u : σ → K)
+    {F : MvPolynomial σ o} {e : ℕ} (hF : F.IsHomogeneous e)
+    : eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β)
+        (fun a => Polynomial.C (u a) * Polynomial.X)
+        F
       = Polynomial.monomial e (eval₂Hom β u F) := by
   rw [eval_scale _ (fun a => Polynomial.C (u a)) Polynomial.X hF,
     ← Polynomial.C_mul_X_pow_eq_monomial, mul_comm]
   congr 1
   exact (map_eval₂Hom β u (Polynomial.C : K →+* Polynomial K) F).symm
 
-theorem mem_ker_cone {o σ K : Type} [CommRing o] [Field K] (β : o →+* K) (u : σ → K)
-    (F : MvPolynomial σ o) :
-    F ∈ RingHom.ker (eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β)
-      (fun a => Polynomial.C (u a) * Polynomial.X)) ↔
-      ∀ e, eval₂Hom β u (homogeneousComponent e F) = 0 := by
+theorem mem_ker_cone
+    {o σ K : Type} [CommRing o] [Field K] (β : o →+* K) (u : σ → K) (F : MvPolynomial σ o)
+    : F ∈ RingHom.ker (eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β)
+        (fun a => Polynomial.C (u a) * Polynomial.X))
+      ↔ ∀ e, eval₂Hom β u (homogeneousComponent e F) = 0 := by
   rw [RingHom.mem_ker]
-  have h : eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β)
-      (fun a => Polynomial.C (u a) * Polynomial.X) F =
-      ∑ e ∈ Finset.range (F.totalDegree + 1),
-        Polynomial.monomial e (eval₂Hom β u (homogeneousComponent e F)) := by
+  have h
+      : eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β)
+          (fun a => Polynomial.C (u a) * Polynomial.X)
+          F
+        = ∑ e ∈ Finset.range (F.totalDegree + 1),
+            Polynomial.monomial e (eval₂Hom β u (homogeneousComponent e F)) := by
     set_option synthInstance.maxHeartbeats 100000 in
       conv_lhs => rw [← sum_homogeneousComponent F, map_sum]
     exact Finset.sum_congr rfl fun e _ => eval_cone β u (homogeneousComponent_isHomogeneous e F)
@@ -62,7 +71,8 @@ theorem mem_ker_cone {o σ K : Type} [CommRing o] [Field K] (β : o →+* K) (u 
     by_cases he : e ∈ Finset.range (F.totalDegree + 1)
     · have := congrArg (fun p : Polynomial K => p.coeff e) h0
       simp only [Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply, Polynomial.coeff_zero,
-        Finset.sum_ite_eq', he, ite_true] at this
+          Finset.sum_ite_eq', he, ite_true]
+        at this
       exact this
     · rw [homogeneousComponent_eq_zero, map_zero]
       rw [Finset.mem_range] at he
@@ -72,9 +82,16 @@ theorem mem_ker_cone {o σ K : Type} [CommRing o] [Field K] (β : o →+* K) (u 
 
 end HomogMinPrime
 
-
 open HomogMinPrime in
-theorem ker_cone_mem_minimalPrimes : ∀ (o σ K : Type) [CommRing o] [Field K] (I : Ideal (MvPolynomial σ o)) (β : o →+* K) (u : σ → K) (i : σ), (∀ F ∈ I, ∀ e, MvPolynomial.homogeneousComponent e F ∈ I) → u i = 1 → RingHom.ker (MvPolynomial.eval₂Hom β u) ∈ (I ⊔ Ideal.span {MvPolynomial.X i - 1}).minimalPrimes → RingHom.ker (MvPolynomial.eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β) (fun a => Polynomial.C (u a) * Polynomial.X)) ∈ I.minimalPrimes := by
+theorem ker_cone_mem_minimalPrimes
+    : ∀ (o σ K : Type) [CommRing o] [Field K] (I : Ideal (MvPolynomial σ o)) (β : o →+* K)
+        (u : σ → K) (i : σ),
+      (∀ F ∈ I, ∀ e, MvPolynomial.homogeneousComponent e F ∈ I) → u i = 1
+        → RingHom.ker (MvPolynomial.eval₂Hom β u)
+          ∈ (I ⊔ Ideal.span {MvPolynomial.X i - 1}).minimalPrimes
+        → RingHom.ker (MvPolynomial.eval₂Hom ((Polynomial.C : K →+* Polynomial K).comp β)
+            (fun a => Polynomial.C (u a) * Polynomial.X))
+          ∈ I.minimalPrimes := by
   intro o σ K _ _ I β u i hI hu hmin
   have hIφ : I ≤ RingHom.ker (MvPolynomial.eval₂Hom β u) := le_sup_left.trans hmin.1.2
   refine ⟨⟨RingHom.ker_isPrime _, fun F hF => (mem_ker_cone β u F).2 fun e => hIφ (hI F hF e)⟩, ?_⟩
@@ -96,15 +113,20 @@ theorem ker_cone_mem_minimalPrimes : ∀ (o σ K : Type) [CommRing o] [Field K] 
     have := hQφ _ ((hπ _).1 h)
     rw [MvPolynomial.eval₂Hom_X', hu] at this
     exact one_ne_zero this
-  let χ : MvPolynomial σ o →+* L := MvPolynomial.eval₂Hom (π.comp MvPolynomial.C)
-    (fun a => π (MvPolynomial.X a) * (π (MvPolynomial.X i))⁻¹)
+  let χ : MvPolynomial σ o →+* L :=
+    MvPolynomial.eval₂Hom (π.comp MvPolynomial.C)
+      (fun a => π (MvPolynomial.X a) * (π (MvPolynomial.X i))⁻¹)
   have hπe : MvPolynomial.eval₂Hom (π.comp MvPolynomial.C) (fun a => π (MvPolynomial.X a)) = π := by
     apply MvPolynomial.ringHom_ext <;> simp
-  have hχ : ∀ (F : MvPolynomial σ o) e, χ (MvPolynomial.homogeneousComponent e F) =
-      (π (MvPolynomial.X i))⁻¹ ^ e * π (MvPolynomial.homogeneousComponent e F) := by
+  have hχ
+      : ∀ (F : MvPolynomial σ o) e,
+        χ (MvPolynomial.homogeneousComponent e F)
+          = (π (MvPolynomial.X i))⁻¹ ^ e * π (MvPolynomial.homogeneousComponent e F) := by
     intro F e
-    have := eval_scale (π.comp MvPolynomial.C) (fun a => π (MvPolynomial.X a))
-      (π (MvPolynomial.X i))⁻¹ (MvPolynomial.homogeneousComponent_isHomogeneous e F)
+    have :=
+      eval_scale (π.comp MvPolynomial.C)
+        (fun a => π (MvPolynomial.X a))
+        (π (MvPolynomial.X i))⁻¹ (MvPolynomial.homogeneousComponent_isHomogeneous e F)
     rw [hπe] at this
     exact this
   have h1 : I ⊔ Ideal.span {MvPolynomial.X i - 1} ≤ RingHom.ker χ := by
@@ -119,8 +141,10 @@ theorem ker_cone_mem_minimalPrimes : ∀ (o σ K : Type) [CommRing o] [Field K] 
   have h2 : RingHom.ker χ ≤ RingHom.ker (MvPolynomial.eval₂Hom β u) := by
     intro F hF
     rw [RingHom.mem_ker] at hF ⊢
-    have hG : (∑ e ∈ Finset.range (F.totalDegree + 1),
-        MvPolynomial.X i ^ (F.totalDegree - e) * MvPolynomial.homogeneousComponent e F) ∈ Q := by
+    have hG
+        : (∑ e ∈ Finset.range (F.totalDegree + 1),
+            MvPolynomial.X i ^ (F.totalDegree - e) * MvPolynomial.homogeneousComponent e F)
+          ∈ Q := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← hπ, map_sum]
       set_option synthInstance.maxHeartbeats 100000 in

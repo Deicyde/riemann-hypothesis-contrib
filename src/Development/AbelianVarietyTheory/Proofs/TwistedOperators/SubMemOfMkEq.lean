@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.JointSm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum NumberField
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -27,23 +29,25 @@ theorem mem_mLat {m : ℕ} {Λ : AddSubgroup V} {x : V} : x ∈ mLat m Λ ↔ �
 
 theorem repm_mem {m : ℕ} {Λ : AddSubgroup V} (q : Qm m Λ) : repm q ∈ Λ := (Quotient.out q : Λ).2
 
-theorem mk_repm {m : ℕ} {Λ : AddSubgroup V} (q : Qm m Λ) :
-    (QuotientAddGroup.mk (⟨repm q, repm_mem q⟩ : Λ) : Qm m Λ) = q := by
+theorem mk_repm {m : ℕ} {Λ : AddSubgroup V} (q : Qm m Λ)
+    : (QuotientAddGroup.mk (⟨repm q, repm_mem q⟩ : Λ) : Qm m Λ) = q := by
   have : (⟨repm q, repm_mem q⟩ : Λ) = Quotient.out q := rfl
   rw [this]
   exact QuotientAddGroup.out_eq' q
 
-theorem sub_mem_of_mk_eq {m : ℕ} {Λ : AddSubgroup V} {a b : V} (ha : a ∈ Λ) (hb : b ∈ Λ)
-    (h : (QuotientAddGroup.mk (⟨a, ha⟩ : Λ) : Qm m Λ) = QuotientAddGroup.mk (⟨b, hb⟩ : Λ)) : b - a ∈ mLat m Λ := by
+theorem sub_mem_of_mk_eq
+    {m : ℕ} {Λ : AddSubgroup V} {a b : V} (ha : a ∈ Λ) (hb : b ∈ Λ)
+    (h : (QuotientAddGroup.mk (⟨a, ha⟩ : Λ) : Qm m Λ) = QuotientAddGroup.mk (⟨b, hb⟩ : Λ))
+    : b - a ∈ mLat m Λ := by
   rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf] at h
   simpa [sub_eq_neg_add] using h
 
-theorem repm_mk_sub {m : ℕ} {Λ : AddSubgroup V} {a : V} (ha : a ∈ Λ) :
-    repm (QuotientAddGroup.mk (⟨a, ha⟩ : Λ) : Qm m Λ) - a ∈ mLat m Λ :=
+theorem repm_mk_sub {m : ℕ} {Λ : AddSubgroup V} {a : V} (ha : a ∈ Λ)
+    : repm (QuotientAddGroup.mk (⟨a, ha⟩ : Λ) : Qm m Λ) - a ∈ mLat m Λ :=
   sub_mem_of_mk_eq (m := m) ha (repm_mem _) (mk_repm _).symm
 
-theorem repm_add_sub {m : ℕ} {Λ : AddSubgroup V} (q q' : Qm m Λ) :
-    repm (q + q') - (repm q + repm q') ∈ mLat m Λ := by
+theorem repm_add_sub {m : ℕ} {Λ : AddSubgroup V} (q q' : Qm m Λ)
+    : repm (q + q') - (repm q + repm q') ∈ mLat m Λ := by
   refine sub_mem_of_mk_eq (m := m) (Λ.add_mem (repm_mem q) (repm_mem q')) (repm_mem (q + q')) ?_
   rw [mk_repm]
   conv_rhs => rw [← mk_repm q, ← mk_repm q']

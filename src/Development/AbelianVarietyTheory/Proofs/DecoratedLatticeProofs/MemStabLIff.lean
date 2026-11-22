@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PhiTopA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.SymBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions
+  Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil
+  GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.SymBridge
 
 noncomputable section
 
@@ -17,7 +19,8 @@ theorem intAt_zero : IntAt P (0 : E) := by
   have := IntAt.coe P 0
   rwa [map_zero] at this
 
-theorem intAt_sum {ι : Type} (s : Finset ι) (f : ι → E) (h : ∀ i ∈ s, IntAt P (f i)) : IntAt P (∑ i ∈ s, f i) := by
+theorem intAt_sum {ι : Type} (s : Finset ι) (f : ι → E) (h : ∀ i ∈ s, IntAt P (f i))
+    : IntAt P (∑ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using (intAt_zero (P := P))
@@ -25,13 +28,16 @@ theorem intAt_sum {ι : Type} (s : Finset ι) (f : ι → E) (h : ∀ i ∈ s, I
     rw [Finset.sum_insert ha]
     exact (h a (Finset.mem_insert_self a s)).add (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem mem_locP' {n : ℕ} (L : Submodule (𝓞 E) (Sp E n)) (x : Sp E n) :
-    x ∈ localization₂ P.asIdeal L ↔ ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ L := Iff.rfl
+theorem mem_locP' {n : ℕ} (L : Submodule (𝓞 E) (Sp E n)) (x : Sp E n)
+    : x ∈ localization₂ P.asIdeal L ↔ ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ L :=
+  Iff.rfl
 
-theorem mem_stdLat' {n : ℕ} (x : Sp E n) : x ∈ stdLat E n ↔ ∀ i, ∃ r : 𝓞 E, algebraMap (𝓞 E) E r = x i := by
+theorem mem_stdLat' {n : ℕ} (x : Sp E n)
+    : x ∈ stdLat E n ↔ ∀ i, ∃ r : 𝓞 E, algebraMap (𝓞 E) E r = x i := by
   simp only [stdLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff, Submodule.mem_one]
 
-theorem mem_locStd {n : ℕ} (x : Sp E n) : x ∈ localization₂ P.asIdeal (stdLat E n) ↔ ∀ i, IntAt P (x i) := by
+theorem mem_locStd {n : ℕ} (x : Sp E n)
+    : x ∈ localization₂ P.asIdeal (stdLat E n) ↔ ∀ i, IntAt P (x i) := by
   constructor
   · intro hx i
     obtain ⟨s, hs, h⟩ := (mem_locP' _ x).1 hx
@@ -53,8 +59,8 @@ theorem mem_locStd {n : ℕ} (x : Sp E n) : x ∈ localization₂ P.asIdeal (std
       exact ⟨r, by simp⟩
     · exact ⟨0, by simp [hj]⟩
 
-theorem mem_sclLat {N : ℕ} (e : ℕ → ℤ) (v : Sp E N) :
-    v ∈ LocE.sclLat P q N e ↔ ∀ l : Fin N, IntAt P (((q : E) ^ e l.1)⁻¹ * v l) := by
+theorem mem_sclLat {N : ℕ} (e : ℕ → ℤ) (v : Sp E N)
+    : v ∈ LocE.sclLat P q N e ↔ ∀ l : Fin N, IntAt P (((q : E) ^ e l.1)⁻¹ * v l) := by
   unfold LocE.sclLat stdAt
   rw [Submodule.mem_comap, mem_locStd]
   simp [LinearMap.pi_apply, smul_eq_mul]

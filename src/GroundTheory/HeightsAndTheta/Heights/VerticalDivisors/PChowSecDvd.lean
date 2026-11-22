@@ -39,11 +39,23 @@ theorem ChowSecDvd.proof (h₁ : IncidenceNull.Statement) : ChowSecDvd.Statement
   set c : k →+* MvPolynomial (Fin n) (SecAlg QE y) := (C : SecAlg QE y →+* _).comp (ι.comp (algebraMap k E))
     with hc
   let vφ : Fin n ⊕ (Fin (e + 1) × Fin n) → MvPolynomial (Fin n) (SecAlg QE y) :=
-    Sum.elim (fun j => C (x j)) fun ij => Fin.cases (motive := fun _ => MvPolynomial (Fin n) (SecAlg QE y))
-      (X ij.2 - θ * C (ι (y (.inr ij.2)))) (fun i => C (ι (y (.inl (i, ij.2))))) ij.1
+    Sum.elim
+      (fun j => C (x j))
+      fun ij =>
+        Fin.cases
+          (motive := fun _ => MvPolynomial (Fin n) (SecAlg QE y))
+          (X ij.2 - θ * C (ι (y (.inr ij.2))))
+          (fun i => C (ι (y (.inl (i, ij.2)))))
+          ij.1
   let vψ : Fin n ⊕ (Fin (e + 1) × Fin n) → MvPolynomial (Fin n) (SecAlg QE y) :=
-    Sum.elim (fun j => C (x j)) fun ij => Fin.cases (motive := fun _ => MvPolynomial (Fin n) (SecAlg QE y))
-      (X ij.2) (fun i => C (ι (y (.inl (i, ij.2))))) ij.1
+    Sum.elim
+      (fun j => C (x j))
+      fun ij =>
+        Fin.cases
+          (motive := fun _ => MvPolynomial (Fin n) (SecAlg QE y))
+          (X ij.2)
+          (fun i => C (ι (y (.inl (i, ij.2)))))
+          ij.1
   set φ := eval₂Hom c vφ with hφ
   set ψ := eval₂Hom c vψ with hψ
 
@@ -64,8 +76,9 @@ theorem ChowSecDvd.proof (h₁ : IncidenceNull.Statement) : ChowSecDvd.Statement
       simp only [map_mul, hφ, eval₂Hom_X', vφ, Sum.elim_inl, Sum.elim_inr]
       refine Fin.cases ?_ (fun i => ?_) i
       · show ∑ j, (X j - θ * C (ι (y (.inr j)))) * C (x j) = 0
-        have h : ∑ j, (X j - θ * C (ι (y (.inr j)))) * C (x j) =
-            θ - θ * C (∑ j, ι (y (.inr j)) * x j) := by
+        have h
+            : ∑ j, (X j - θ * C (ι (y (.inr j)))) * C (x j)
+              = θ - θ * C (∑ j, ι (y (.inr j)) * x j) := by
           set_option synthInstance.maxHeartbeats 100000 in
             simp only [map_sum, map_mul, Finset.mul_sum]
           rw [eq_sub_iff_add_eq, ← Finset.sum_add_distrib]
@@ -73,7 +86,7 @@ theorem ChowSecDvd.proof (h₁ : IncidenceNull.Statement) : ChowSecDvd.Statement
           exact Finset.sum_congr rfl fun j _ => by ring
         rw [h, hchart, map_one, mul_one, sub_self]
       set_option synthInstance.maxHeartbeats 100000 in
-        · simp only [Fin.cases_succ, ← map_mul, ← map_sum, hform, map_zero]
+      · simp only [Fin.cases_succ, ← map_mul, ← map_sum, hform, map_zero]
   obtain ⟨M, hM⟩ := h₁ k n (e + 1) Q g hg
   set G := φ (rename Sum.inr g) with hG
   have hGx : ∀ j, G ^ M * C (x j) ^ M = 0 := by
@@ -83,17 +96,23 @@ theorem ChowSecDvd.proof (h₁ : IncidenceNull.Statement) : ChowSecDvd.Statement
     rw [← mul_pow]
     exact this
   have hG0 : G ^ M = 0 := by
-    have h1 : Ideal.span (Set.range fun j => (C (x j) : MvPolynomial (Fin n) (SecAlg QE y))) = ⊤ := by
+    have h1
+        : Ideal.span (Set.range fun j => (C (x j) : MvPolynomial (Fin n) (SecAlg QE y))) = ⊤ := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [Ideal.eq_top_iff_one, ← map_one C, ← hchart, map_sum]
       exact sum_mem fun j _ => by
         rw [map_mul]; exact Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)
     have h2 := Ideal.span_pow_eq_top _ h1 M
-    have h3 : (1 : MvPolynomial (Fin n) (SecAlg QE y)) ∈
-        Ideal.span ((fun z => z ^ M) '' Set.range fun j => C (x j)) := by
+    have h3
+        : (1 : MvPolynomial (Fin n) (SecAlg QE y))
+          ∈ Ideal.span ((fun z => z ^ M) '' Set.range fun j => C (x j)) := by
       rw [h2]; exact Submodule.mem_top
-    have key : ∀ z ∈ Ideal.span ((fun z => z ^ M) '' Set.range fun j =>
-        (C (x j) : MvPolynomial (Fin n) (SecAlg QE y))), G ^ M * z = 0 := by
+    have key
+        : ∀ z
+            ∈ Ideal.span
+              ((fun z => z ^ M)
+                '' Set.range fun j => (C (x j) : MvPolynomial (Fin n) (SecAlg QE y))),
+          G ^ M * z = 0 := by
       intro z hz
       induction hz using Submodule.span_induction with
       | mem z hz =>
@@ -114,10 +133,11 @@ theorem ChowSecDvd.proof (h₁ : IncidenceNull.Statement) : ChowSecDvd.Statement
       · simp [hφ, hψ, vφ, vψ]
       · refine Fin.cases ?_ (fun i => ?_) i
         · set_option synthInstance.maxHeartbeats 100000 in
-            simp [hφ, hψ, vφ, vψ, hπθ]
+          simp [hφ, hψ, vφ, vψ, hπθ]
         · simp [hφ, hψ, vφ, vψ]
-  have hspec : ψ (rename Sum.inr g) =
-      (specRest (algebraMap k E) g y).map (algebraMap E (SecAlg QE y)) := by
+  have hspec
+      : ψ (rename Sum.inr g)
+        = (specRest (algebraMap k E) g y).map (algebraMap E (SecAlg QE y)) := by
     rw [hψ, coe_eval₂Hom, eval₂_rename]
     unfold specRest
     rw [eval₂_comp_left]

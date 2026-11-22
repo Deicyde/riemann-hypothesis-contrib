@@ -21,11 +21,11 @@ theorem continuous_mirProj (n : ℕ) : Continuous (mirabolicProjection k n) := b
       ((mirabolicProjection k n g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
     refine continuous_pi fun i => continuous_pi fun j => ?_
     exact (continuous_apply (Fin.castSucc j)).comp ((continuous_apply (Fin.castSucc i)).comp hval)
-  have hinv : Continuous fun g : Mir k n => g⁻¹ := by
-    exact continuous_inv
+  have hinv : Continuous fun g : Mir k n => g⁻¹ := by exact continuous_inv
   refine Units.continuous_iff.2 ⟨hblock, ?_⟩
-  have : (fun g : Mir k n => (((mirabolicProjection k n g)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) =
-      fun g => ((mirabolicProjection k n g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
+  have : (fun g : Mir k n =>
+        (((mirabolicProjection k n g)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))
+      = fun g => ((mirabolicProjection k n g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
     funext g
     rw [map_inv]
   show Continuous (fun g : Mir k n => (((mirabolicProjection k n g)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))

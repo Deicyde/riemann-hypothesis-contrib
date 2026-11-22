@@ -8,11 +8,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-theorem UpperTheory.V.Two.genOfRk :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (N r : ℕ) (U : Subgroup (G F Ω)), IsClosed (U : Set (G F Ω)) → XRk l N (cycU l U) r → Tower.GenLE ℤ_[l] (Xinf l N U) r := by
+theorem UpperTheory.V.Two.genOfRk
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (N r : ℕ) (U : Subgroup (G F Ω)),
+      IsClosed (U : Set (G F Ω)) → XRk l N (cycU l U) r → Tower.GenLE ℤ_[l] (Xinf l N U) r := by
   intro F Ω _ _ _ _ _ l _ N rk U hU hrk
   classical
   have hQ : ∀ q : QZ l, ∃ r : ℕ, (l : ℤ_[l]) ^ r • q = 0 := by
@@ -55,14 +59,18 @@ theorem UpperTheory.V.Two.genOfRk :
     apply Function.invFun_eq
     obtain ⟨a, ha⟩ := (hιr q).2 (by rw [pow_one]; exact hq)
     exact ⟨(ZMod.ringEquivCongr (pow_one l).symm).symm a, by simp [κ, ha]⟩
-  have hval : ∀ φ : Submodule.torsionBy ℤ_[l] (Dinf l N U) (l : ℤ_[l]), ∀ u : cycU l U,
-      (l : ℤ_[l]) • ((φ : Dinf l N U) : cycU l U → QZ l) u = 0 := by
+  have hval
+      : ∀ φ : Submodule.torsionBy ℤ_[l] (Dinf l N U) (l : ℤ_[l]), ∀ u : cycU l U,
+        (l : ℤ_[l]) • ((φ : Dinf l N U) : cycU l U → QZ l) u = 0 := by
     intro φ u
     have h := (Submodule.mem_torsionBy_iff _ _).1 φ.2
     have h2 := congrArg (fun ψ : Dinf l N U => (ψ : cycU l U → QZ l) u) h
     exact h2
-  let f : Submodule.torsionBy ℤ_[l] (Dinf l N U) (l : ℤ_[l]) → XDual N (cycU l U) (ZMod l) (ZMod l) :=
-    fun φ => ⟨fun u => Function.invFun κ (((φ : Dinf l N U) : cycU l U → QZ l) u), by
+  let f
+      : Submodule.torsionBy ℤ_[l] (Dinf l N U) (l : ℤ_[l])
+        → XDual N (cycU l U) (ZMod l) (ZMod l) := fun φ => ⟨
+    fun u => Function.invFun κ (((φ : Dinf l N U) : cycU l U → QZ l) u),
+    by
       have hφ := (φ : Dinf l N U).2
       refine ⟨by exact hφ.1.comp (Function.invFun κ), ?_, ?_, ?_⟩
       · intro a b
@@ -73,13 +81,15 @@ theorem UpperTheory.V.Two.genOfRk :
         rw [hκr _ (hval φ _), hφ.2.2.1 A u hu, map_zero]
       · intro A hA u hu
         apply hκ
-        rw [hκr _ (hval φ _), hφ.2.2.2 A hA u hu, map_zero]⟩
+        rw [hκr _ (hval φ _), hφ.2.2.2 A hA u hu, map_zero]
+  ⟩
   have hf : Function.Injective f := by
     intro φ ψ h
     apply Subtype.ext
     apply Subtype.ext
     funext u
-    have h1 := congrArg (fun χ : XDual N (cycU l U) (ZMod l) (ZMod l) => κ ((χ : cycU l U → ZMod l) u)) h
+    have h1 :=
+      congrArg (fun χ : XDual N (cycU l U) (ZMod l) (ZMod l) => κ ((χ : cycU l U → ZMod l) u)) h
     simp only [f] at h1
     rwa [hκr _ (hval φ u), hκr _ (hval ψ u)] at h1
   exact dualGen l (Dinf l N U) rk htors (hrk.of_injective f hf)

@@ -9,19 +9,25 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
-open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.SpectralAccumulation
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
+  PositivityTheory.Rg.BcB.G8
+open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail
+  PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig
+  PositivityTheory.Rg.BcB.SpectralAccumulation
 open scoped Classical
 
 set_option synthInstance.maxHeartbeats 400000
 
 namespace PositivityTheory.Rg.BcB.F.BC
 
-attribute [local instance] borelG borelF borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+attribute [local instance]
+  borelG borelF borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem pw_fin {E : Type} [Field E] [NumberField E] [IsCMField E] {B : Block E} (t : PT B) (h : IsFinM t.ψ) :
-    ∀ j, IsFinM (t.pw j).ψ := by
+theorem pw_fin
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {B : Block E} (t : PT B) (h : IsFinM t.ψ)
+    : ∀ j, IsFinM (t.pw j).ψ := by
   haveI : BorelSpace (Hf E B.a B.b) := ⟨rfl⟩
   haveI := B.hν
   intro j
@@ -29,10 +35,13 @@ theorem pw_fin {E : Type} [Field E] [NumberField E] [IsCMField E] {B : Block E} 
   | zero => exact h
   | succ j ih => exact CG.PMul.mulF_fin B.ν h ih
 
-theorem adj_fin {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ} {κ : Type} {ψ : Matrix κ κ (Hf E a b → ℂ)}
-    (h : IsFinM ψ) : IsFinM (adjF ψ) := fun x y =>
-  ⟨Complex.continuous_conj.comp ((h y x).1.comp continuous_inv),
-    ((h y x).2.comp_homeomorph (Homeomorph.inv _)).comp_left (g := starRingEnd ℂ) (map_zero _)⟩
+theorem adj_fin
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {a b : ℕ} {κ : Type} {ψ : Matrix κ κ (Hf E a b → ℂ)} (h : IsFinM ψ)
+    : IsFinM (adjF ψ) := fun x y => ⟨
+  Complex.continuous_conj.comp ((h y x).1.comp continuous_inv),
+  ((h y x).2.comp_homeomorph (Homeomorph.inv _)).comp_left (g := starRingEnd ℂ) (map_zero _)
+⟩
 
 theorem powNeOf_holds : PowNeOf := by
   intro hCM E _ _ _ B t m A _ G ht hG hne h0

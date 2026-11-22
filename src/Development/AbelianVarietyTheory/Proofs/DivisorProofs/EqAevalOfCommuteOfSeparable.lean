@@ -9,13 +9,15 @@ open scoped TensorProduct
 
 namespace GlobalTheory.SepCentralizer
 
-theorem exists_ne_zero_aeval_eq_zero {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (g : Module.End K V) (p : K[X]) (hp : Irreducible p)
-    (hdvd : p ∣ g.charpoly) : ∃ w : V, w ≠ 0 ∧ aeval g p w = 0 := by
+theorem exists_ne_zero_aeval_eq_zero
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (g : Module.End K V) (p : K[X]) (hp : Irreducible p) (hdvd : p ∣ g.charpoly)
+    : ∃ w : V, w ≠ 0 ∧ aeval g p w = 0 := by
   by_contra hcon
   push_neg at hcon
   have hinj : Function.Injective (aeval g p) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro w hw
     by_contra hw0
     exact hcon w hw0 hw
@@ -41,9 +43,11 @@ theorem exists_ne_zero_aeval_eq_zero {K V : Type} [Field K] [AddCommGroup V] [Mo
   have h4 := ((Module.End.isUnit_iff _).1 h3).1
   exact hv.2 (h4 (by rw [h1, map_zero]))
 
-theorem exists_annihilator_eq {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (g : Module.End K V) (hs : g.charpoly.Separable) (d : K[X]) :
-    d ∣ g.charpoly → ∃ e : V, aeval g d e = 0 ∧ ∀ q : K[X], aeval g q e = 0 → d ∣ q := by
+theorem exists_annihilator_eq
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (g : Module.End K V) (hs : g.charpoly.Separable)
+    (d : K[X])
+    : d ∣ g.charpoly → ∃ e : V, aeval g d e = 0 ∧ ∀ q : K[X], aeval g q e = 0 → d ∣ q := by
   induction d using UniqueFactorizationMonoid.induction_on_coprime with
   | h0 =>
     intro h
@@ -63,8 +67,9 @@ theorem exists_annihilator_eq {K V : Type} [Field K] [AddCommGroup V] [Module K 
       obtain ⟨a, b, hab⟩ := (hp.irreducible.coprime_iff_not_dvd).2 hnd
       apply hw0
       have := congrArg (fun r => aeval g r w) hab
-      simp only [map_add (f := _), map_mul, map_one, LinearMap.add_apply, Module.End.mul_apply, hw, hq,
-        map_zero, add_zero, Module.End.one_apply] at this
+      simp only [map_add (f := _), map_mul, map_one, LinearMap.add_apply, Module.End.mul_apply, hw,
+          hq, map_zero, add_zero, Module.End.one_apply]
+        at this
       exact this.symm
     · exfalso
       have h2 : p * p ∣ g.charpoly := by
@@ -81,40 +86,41 @@ theorem exists_annihilator_eq {K V : Type} [Field K] [AddCommGroup V] [Module K 
     · rw [map_add (f := _)]
       have a1 : aeval g (x * y) e₁ = 0 := by
         rw [mul_comm, map_mul, Module.End.mul_apply, h1, map_zero]
-      have a2 : aeval g (x * y) e₂ = 0 := by
-        rw [map_mul, Module.End.mul_apply, h2, map_zero]
+      have a2 : aeval g (x * y) e₂ = 0 := by rw [map_mul, Module.End.mul_apply, h2, map_zero]
       rw [a1, a2, add_zero]
     · rw [map_add (f := _)] at hq
       have b1 : x ∣ q := by
         have : aeval g (q * y) e₁ = 0 := by
           have c := congrArg (aeval g y) hq
           rw [map_add (f := _), map_zero, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul,
-            mul_comm y q] at c
-          have c2 : aeval g (q * y) e₂ = 0 := by
-            rw [map_mul, Module.End.mul_apply, h2, map_zero]
+              mul_comm y q]
+            at c
+          have c2 : aeval g (q * y) e₂ = 0 := by rw [map_mul, Module.End.mul_apply, h2, map_zero]
           rwa [c2, add_zero] at c
         exact hco.dvd_of_dvd_mul_right (h1' _ this)
       have b2 : y ∣ q := by
         have : aeval g (q * x) e₂ = 0 := by
           have c := congrArg (aeval g x) hq
           rw [map_add (f := _), map_zero, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul,
-            mul_comm x q] at c
-          have c2 : aeval g (q * x) e₁ = 0 := by
-            rw [map_mul, Module.End.mul_apply, h1, map_zero]
+              mul_comm x q]
+            at c
+          have c2 : aeval g (q * x) e₁ = 0 := by rw [map_mul, Module.End.mul_apply, h1, map_zero]
           rwa [c2, zero_add] at c
         exact hco.symm.dvd_of_dvd_mul_right (h2' _ this)
       exact hco.mul_dvd b1 b2
 
-theorem exists_cyclic {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (g : Module.End K V) (hs : g.charpoly.Separable) :
-    ∃ e : V, ∀ v : V, ∃ q : K[X], aeval g q e = v := by
+theorem exists_cyclic
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (g : Module.End K V) (hs : g.charpoly.Separable)
+    : ∃ e : V, ∀ v : V, ∃ q : K[X], aeval g q e = v := by
   obtain ⟨e, -, he⟩ := exists_annihilator_eq g hs g.charpoly dvd_rfl
   refine ⟨e, ?_⟩
   let φ : K[X] →ₗ[K] V := (LinearMap.applyₗ e) ∘ₗ (aeval g).toLinearMap
   have hφ : ∀ p, φ p = aeval g p e := fun p => rfl
   let ψ : degreeLT K (Module.finrank K V) →ₗ[K] V := φ ∘ₗ (degreeLT K (Module.finrank K V)).subtype
   have hinj : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro q hq
     have h1 : g.charpoly ∣ (q : K[X]) := he _ hq
     have h2 : (q : K[X]).degree < g.charpoly.degree := by
@@ -130,9 +136,10 @@ theorem exists_cyclic {K V : Type} [Field K] [AddCommGroup V] [Module K V]
   obtain ⟨q, hq⟩ := hsurj v
   exact ⟨q, hq⟩
 
-theorem exists_eq_aeval_of_commute {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (g c : Module.End K V) (hs : g.charpoly.Separable)
-    (hc : c * g = g * c) : ∃ p : K[X], c = aeval g p := by
+theorem exists_eq_aeval_of_commute
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (g c : Module.End K V) (hs : g.charpoly.Separable) (hc : c * g = g * c)
+    : ∃ p : K[X], c = aeval g p := by
   obtain ⟨e, he⟩ := exists_cyclic g hs
   obtain ⟨p, hp⟩ := he (c e)
   refine ⟨p, LinearMap.ext fun v => ?_⟩
@@ -142,17 +149,16 @@ theorem exists_eq_aeval_of_commute {K V : Type} [Field K] [AddCommGroup V] [Modu
   rw [← Module.End.mul_apply, ← hcq.eq, Module.End.mul_apply, ← hp, ← Module.End.mul_apply,
     ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_comm]
 
-theorem eq_aeval_of_commute_of_separable : ∀ (k : Type) [Field k] (n : ℕ)
-    (Γ C : Matrix (Fin n) (Fin n) k) (u r : k[X]),
-    u * Γ.charpoly + r * derivative Γ.charpoly = 1 → C * Γ = Γ * C →
-    ∃ g : k[X], C = aeval Γ g := by
+theorem eq_aeval_of_commute_of_separable
+    : ∀ (k : Type) [Field k] (n : ℕ) (Γ C : Matrix (Fin n) (Fin n) k) (u r : k[X]),
+      u * Γ.charpoly + r * derivative Γ.charpoly = 1 → C * Γ = Γ * C
+        → ∃ g : k[X], C = aeval Γ g := by
   intro k _ n Γ C u r h hC
   let e := (Matrix.toLinAlgEquiv' (R := k) (n := Fin n))
   have hs : (e Γ).charpoly.Separable := by
     rw [show e Γ = Matrix.toLin' Γ from rfl, Matrix.charpoly_toLin']
     exact ⟨u, r, h⟩
-  have hc : e C * e Γ = e Γ * e C := by
-    rw [← map_mul, ← map_mul, hC]
+  have hc : e C * e Γ = e Γ * e C := by rw [← map_mul, ← map_mul, hC]
   obtain ⟨p, hp⟩ := exists_eq_aeval_of_commute _ _ hs hc
   refine ⟨p, e.injective ?_⟩
   rw [hp]

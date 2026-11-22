@@ -68,9 +68,12 @@ theorem homKill_of : HomKill := by
   rw [op_comp, Functor.map_comp, ModuleCat.hom_comp, LinearMap.comp_apply]
   convert map_zero ((C.homology j).obj.map h.op).hom
   rw [map_nsmul, ← nat_sec, ← map_nsmul]
-  have key : N • ((C.cycles j).obj.map (g u).op).hom z = ((C.toCycles (j - 1) j).hom.app (op (V u))).hom (y u) := by
+  have key
+      : N • ((C.cycles j).obj.map (g u).op).hom z
+        = ((C.toCycles (j - 1) j).hom.app (op (V u))).hom (y u) := by
     apply inj_app (C.iCycles j)
     rw [← comp_sec, C.toCycles_i, hy u, map_nsmul, nat_sec]
-  rw [key, ← comp_sec, C.toCycles_comp_homologyπ]; rfl
+  rw [key, ← comp_sec, C.toCycles_comp_homologyπ]
+  rfl
 
 end LateralTheory.KummerTheory.HomKillPf

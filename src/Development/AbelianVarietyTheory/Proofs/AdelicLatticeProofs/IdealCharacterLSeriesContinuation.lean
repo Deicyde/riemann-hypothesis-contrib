@@ -16,9 +16,10 @@ namespace GlobalTheory
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
 open Filter Topology Set Asymptotics in
-private theorem eq_of_norm_sub_div_le {f : ℝ → ℂ} {R R' : ℂ} {C C' : ℝ}
-    (h : ∀ t : ℝ, 0 < t → t ≤ 1 → ‖f t - R / t‖ ≤ C)
-    (h' : ∀ t : ℝ, 0 < t → t ≤ 1 → ‖f t - R' / t‖ ≤ C') : R = R' := by
+private theorem eq_of_norm_sub_div_le
+    {f : ℝ → ℂ} {R R' : ℂ} {C C' : ℝ} (h : ∀ t : ℝ, 0 < t → t ≤ 1 → ‖f t - R / t‖ ≤ C)
+    (h' : ∀ t : ℝ, 0 < t → t ≤ 1 → ‖f t - R' / t‖ ≤ C')
+    : R = R' := by
   by_contra hne
   have hd : 0 < ‖R - R'‖ := norm_pos_iff.2 (sub_ne_zero.2 hne)
   set D := |C| + |C'| + 1 with hD_def
@@ -27,7 +28,9 @@ private theorem eq_of_norm_sub_div_le {f : ℝ → ℂ} {R R' : ℂ} {C C' : ℝ
   have ht0 : 0 < t := lt_min one_pos (by positivity)
   have ht1 : t ≤ 1 := min_le_left _ _
   have htD : t * D ≤ ‖R - R'‖ / 2 := by
-    calc t * D ≤ ‖R - R'‖ / (2 * D) * D := by gcongr; exact min_le_right _ _
+    calc
+      t * D
+        ≤ ‖R - R'‖ / (2 * D) * D := by gcongr; exact min_le_right _ _
       _ = ‖R - R'‖ / 2 := by field_simp
   have htc : (t : ℂ) ≠ 0 := ofReal_ne_zero.2 ht0.ne'
   have key : R - R' = (t : ℂ) * ((f t - R' / t) - (f t - R / t)) := by
@@ -44,11 +47,14 @@ private theorem eq_of_norm_sub_div_le {f : ℝ → ℂ} {R R' : ℂ} {C C' : ℝ
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
 open Filter Topology Set Asymptotics in
-private theorem exists_differentiable_eq_div_of_family {ι : Type} (M G : ι → ℂ → ℂ)
-    (F : ℂ → ℂ) (hM : ∀ i, Differentiable ℂ (M i)) (hG : ∀ i, Differentiable ℂ (G i))
-    (hGF : ∀ i s, 1 < s.re → G i s = M i s * F s) (hne : ∀ s, ∃ i, M i s ≠ 0) :
-    ∃ Z : ℂ → ℂ, Differentiable ℂ Z ∧ (∀ s, 1 < s.re → Z s = F s) ∧
-      ∀ i s, M i s ≠ 0 → Z s = G i s / M i s := by
+private theorem exists_differentiable_eq_div_of_family
+    {ι : Type} (M G : ι → ℂ → ℂ)
+    (F : ℂ → ℂ)
+    (hM : ∀ i, Differentiable ℂ (M i)) (hG : ∀ i, Differentiable ℂ (G i))
+    (hGF : ∀ i s, 1 < s.re → G i s = M i s * F s) (hne : ∀ s, ∃ i, M i s ≠ 0)
+    : ∃ Z : ℂ → ℂ,
+      Differentiable ℂ Z ∧ (∀ s, 1 < s.re → Z s = F s)
+        ∧ ∀ i s, M i s ≠ 0 → Z s = G i s / M i s := by
   have hcross : ∀ i j s, G i s * M j s = G j s * M i s := by
     intro i j s
     have hU : IsOpen {s : ℂ | 1 < s.re} := isOpen_lt continuous_const Complex.continuous_re
@@ -56,10 +62,10 @@ private theorem exists_differentiable_eq_div_of_family {ι : Type} (M G : ι →
       filter_upwards [hU.mem_nhds (by norm_num : (1 : ℝ) < (2 : ℂ).re)] with s hs
       rw [hGF i s hs, hGF j s hs]
       ring
-    have hf : AnalyticOnNhd ℂ (fun s => G i s * M j s) univ :=
-      fun z _ => ((hG i).mul (hM j)).analyticAt z
-    have hg : AnalyticOnNhd ℂ (fun s => G j s * M i s) univ :=
-      fun z _ => ((hG j).mul (hM i)).analyticAt z
+    have hf : AnalyticOnNhd ℂ (fun s => G i s * M j s) univ := fun z _ =>
+      ((hG i).mul (hM j)).analyticAt z
+    have hg : AnalyticOnNhd ℂ (fun s => G j s * M i s) univ := fun z _ =>
+      ((hG j).mul (hM i)).analyticAt z
     exact hf.eqOn_of_preconnected_of_eventuallyEq hg isPreconnected_univ (mem_univ _) h2
       (mem_univ s)
   choose w hw using hne
@@ -80,8 +86,9 @@ private theorem exists_differentiable_eq_div_of_family {ι : Type} (M G : ι →
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
 open Filter Topology Set Asymptotics in
-private theorem differentiable_mellin_of_support_in_Icc_pos {w : ℝ → ℂ} (hw : Continuous w) {a b : ℝ}
-    (ha : 0 < a) (hab : ∀ y, w y ≠ 0 → a ≤ y ∧ y ≤ b) : Differentiable ℂ (mellin w) := by
+private theorem differentiable_mellin_of_support_in_Icc_pos
+    {w : ℝ → ℂ} (hw : Continuous w) {a b : ℝ} (ha : 0 < a) (hab : ∀ y, w y ≠ 0 → a ≤ y ∧ y ≤ b)
+    : Differentiable ℂ (mellin w) := by
   intro s
   have htop : w =ᶠ[atTop] 0 := by
     filter_upwards [eventually_gt_atTop b] with y hy
@@ -99,16 +106,17 @@ private theorem differentiable_mellin_of_support_in_Icc_pos {w : ℝ → ℂ} (h
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
 open Filter Topology Set Asymptotics in
-private theorem exists_weight_mellin_ne_zero (s₀ : ℂ) :
-    ∃ w : ℝ → ℂ, ContDiff ℝ ∞ w ∧ (∃ a b : ℝ, 0 < a ∧ ∀ y, w y ≠ 0 → a ≤ y ∧ y ≤ b) ∧
-      mellin w s₀ ≠ 0 := by
+private theorem exists_weight_mellin_ne_zero (s₀ : ℂ)
+    : ∃ w : ℝ → ℂ,
+      ContDiff ℝ ∞ w ∧ (∃ a b : ℝ, 0 < a ∧ ∀ y, w y ≠ 0 → a ≤ y ∧ y ≤ b) ∧ mellin w s₀ ≠ 0 := by
   let ψ : ContDiffBump (2 : ℝ) := ⟨1 / 2, 1, by norm_num, by norm_num⟩
-  have hψ0 : ∀ y : ℝ, y ≤ 0 → ψ y = 0 := fun y hy => ψ.zero_of_le_dist (by
-    rw [Real.dist_eq, abs_of_neg (by linarith)]
-    show (1 : ℝ) ≤ _
-    linarith)
-  refine ⟨fun y => Complex.exp (-(s₀ - 1) * (Real.log y : ℂ)) * (ψ y : ℂ), ?_,
-    ⟨1, 3, one_pos, ?_⟩, ?_⟩
+  have hψ0 : ∀ y : ℝ, y ≤ 0 → ψ y = 0 := fun y hy =>
+    ψ.zero_of_le_dist (by
+      rw [Real.dist_eq, abs_of_neg (by linarith)]
+      show (1 : ℝ) ≤ _
+      linarith)
+  refine
+    ⟨fun y => Complex.exp (-(s₀ - 1) * (Real.log y : ℂ)) * (ψ y : ℂ), ?_, ⟨1, 3, one_pos, ?_⟩, ?_⟩
   · rw [contDiff_iff_contDiffAt]
     intro x
     by_cases hx : x ∈ tsupport ψ
@@ -117,11 +125,12 @@ private theorem exists_weight_mellin_ne_zero (s₀ : ℂ) :
         rw [ψ.tsupport_eq, Metric.mem_closedBall, Real.dist_eq] at hx
         norm_num at hx
       have h1 : ContDiffAt ℝ ∞ (fun y : ℝ => Complex.exp (-(s₀ - 1) * (Real.log y : ℂ))) x :=
-        Complex.contDiff_exp.contDiffAt.comp x (contDiffAt_const.mul
-          (ofRealCLM.contDiff.contDiffAt.comp x (Real.contDiffAt_log.2 hx0)))
+        Complex.contDiff_exp.contDiffAt.comp x
+          (contDiffAt_const.mul (ofRealCLM.contDiff.contDiffAt.comp x (Real.contDiffAt_log.2 hx0)))
       exact h1.mul (ofRealCLM.contDiff.comp ψ.contDiff).contDiffAt
-    · have hev : (fun y => Complex.exp (-(s₀ - 1) * (Real.log y : ℂ)) * (ψ y : ℂ)) =ᶠ[𝓝 x]
-          fun _ => 0 :=
+    · have hev
+          : (fun y => Complex.exp (-(s₀ - 1) * (Real.log y : ℂ)) * (ψ y : ℂ)) =ᶠ[𝓝 x]
+            fun _ => 0 :=
         (notMem_tsupport_iff_eventuallyEq.1 hx).mono fun y hy => by simp [hy]
       exact contDiffAt_const.congr_of_eventuallyEq hev
   · intro y hy
@@ -131,9 +140,10 @@ private theorem exists_weight_mellin_ne_zero (s₀ : ℂ) :
       exact hψy
     rw [Real.ball_eq_Ioo] at hmem
     constructor <;> linarith [hmem.1, hmem.2]
-  · have hint : ∫ y in Ioi (0 : ℝ), (y : ℂ) ^ (s₀ - 1) •
-        (Complex.exp (-(s₀ - 1) * (Real.log y : ℂ)) * (ψ y : ℂ)) =
-        ∫ y in Ioi (0 : ℝ), ((ψ y : ℝ) : ℂ) := by
+  · have hint
+        : ∫ y in Ioi (0 : ℝ), (y : ℂ) ^ (s₀ - 1) •
+            (Complex.exp (-(s₀ - 1) * (Real.log y : ℂ)) * (ψ y : ℂ))
+          = ∫ y in Ioi (0 : ℝ), ((ψ y : ℝ) : ℂ) := by
       refine setIntegral_congr_fun measurableSet_Ioi fun y hy => ?_
       simp only [smul_eq_mul]
       rw [Complex.cpow_def_of_ne_zero (ofReal_ne_zero.2 (ne_of_gt hy)),
@@ -141,18 +151,30 @@ private theorem exists_weight_mellin_ne_zero (s₀ : ℂ) :
         show (Real.log y : ℂ) * (s₀ - 1) + -(s₀ - 1) * (Real.log y : ℂ) = 0 by ring,
         Complex.exp_zero, one_mul]
     unfold mellin
-    rw [hint, integral_complex_ofReal, setIntegral_eq_integral_of_forall_compl_eq_zero
-      (fun y (hy : y ∉ Ioi (0 : ℝ)) => hψ0 y (not_lt.1 hy))]
+    rw [hint, integral_complex_ofReal,
+      setIntegral_eq_integral_of_forall_compl_eq_zero (fun y (hy : y ∉ Ioi (0 : ℝ)) =>
+        hψ0 y (not_lt.1 hy))]
     exact ofReal_ne_zero.2 ψ.integral_pos.ne'
-
 
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
 open Filter Topology Set Asymptotics in
-theorem _root_.GlobalTheory.idealCharacter_LSeries_continuation : ∀ (K : Type) [Field K] [NumberField K] (m : Ideal (𝓞 K)) (X : Ideal (𝓞 K) → ℂ) (φ : mixedSpace K → ℂ), m ≠ ⊥ → X ⊥ = 0 → (∀ I J, X (I * J) = X I * X J) → (∀ I, I ≠ ⊥ → I ⊔ m = ⊤ → ‖X I‖ = 1) → (∀ I, I ⊔ m ≠ ⊤ → X I = 0) → (∀ x y, φ (x * y) = φ x * φ y) → (∀ (t : ℝ) x, 0 < t → φ (t • x) = φ x) → ContDiffOn ℝ ∞ φ {x | mixedEmbedding.norm x ≠ 0} → (∀ x, mixedEmbedding.norm x ≠ 0 → ‖φ x‖ = 1) → (∀ β : 𝓞 K, β ≠ 0 → β - 1 ∈ m → X (Ideal.span {β}) = φ (mixedEmbedding K β)) → ∃ Z : ℂ → ℂ, Differentiable ℂ Z ∧ (∀ s : ℂ, 1 < s.re → Z s = (s - 1) * ∑' I, X I * ((Ideal.absNorm I : ℕ) : ℂ) ^ (-s)) ∧ ((∃ J, J ≠ ⊥ ∧ J ⊔ m = ⊤ ∧ X J ≠ 1) → Z 1 = 0) := by
+theorem _root_.GlobalTheory.idealCharacter_LSeries_continuation
+    : ∀ (K : Type) [Field K] [NumberField K] (m : Ideal (𝓞 K)) (X : Ideal (𝓞 K) → ℂ)
+        (φ : mixedSpace K → ℂ),
+      m ≠ ⊥ → X ⊥ = 0 → (∀ I J, X (I * J) = X I * X J) → (∀ I, I ≠ ⊥ → I ⊔ m = ⊤ → ‖X I‖ = 1)
+        → (∀ I, I ⊔ m ≠ ⊤ → X I = 0) → (∀ x y, φ (x * y) = φ x * φ y)
+        → (∀ (t : ℝ) x, 0 < t → φ (t • x) = φ x) → ContDiffOn ℝ ∞ φ {x | mixedEmbedding.norm x ≠ 0}
+        → (∀ x, mixedEmbedding.norm x ≠ 0 → ‖φ x‖ = 1)
+        → (∀ β : 𝓞 K, β ≠ 0 → β - 1 ∈ m → X (Ideal.span {β}) = φ (mixedEmbedding K β))
+        → ∃ Z : ℂ → ℂ,
+          Differentiable ℂ Z
+            ∧ (∀ s : ℂ, 1 < s.re → Z s = (s - 1) * ∑' I, X I * ((Ideal.absNorm I : ℕ) : ℂ) ^ (-s))
+            ∧ ((∃ J, J ≠ ⊥ ∧ J ⊔ m = ⊤ ∧ X J ≠ 1) → Z 1 = 0) := by
   intro K _ _ m X φ hm hX0 hXmul hXn hXz hφmul hφh hφs hφn hβ
-  have hmain := _root_.GlobalTheory.smoothedSum_main_term_representatives K m X φ hm hX0 hXmul
-    hXn hXz hφmul hφh hφs hφn hβ
+  have hmain :=
+    _root_.GlobalTheory.smoothedSum_main_term_representatives K m X φ hm hX0 hXmul hXn hXz hφmul hφh
+      hφs hφn hβ
   obtain ⟨hcount, hsum⟩ := _root_.GlobalTheory.countable_ideal_and_summable_absNorm_rpow K
   haveI := hcount
   choose b hb using _root_.GlobalTheory.exists_integral_ideal_in_class_coprime K m hm
@@ -178,26 +200,29 @@ theorem _root_.GlobalTheory.idealCharacter_LSeries_continuation : ∀ (K : Type)
   have hsumm : ∀ σ : ℝ, 1 < σ → Summable fun I => ‖X I‖ * (Ideal.absNorm I : ℝ) ^ (-σ) := by
     intro σ hσ
     refine ((hsum σ hσ).1).of_nonneg_of_le
-      (fun I => mul_nonneg (norm_nonneg _) (Real.rpow_nonneg (Nat.cast_nonneg _) _)) fun I => ?_
+      (fun I => mul_nonneg (norm_nonneg _) (Real.rpow_nonneg (Nat.cast_nonneg _) _))
+      fun I => ?_
     exact mul_le_of_le_one_left (Real.rpow_nonneg (Nat.cast_nonneg _) _) (hXle I)
   set S := ∑ c, (X (b c : Ideal (𝓞 K)))⁻¹ with hS
   set F : ℂ → ℂ := fun s => (s - 1) * ∑' I, X I * ((Ideal.absNorm I : ℕ) : ℂ) ^ (-s) with hF
-  have hweight : ∀ w : {w : ℝ → ℂ // ContDiff ℝ ∞ w ∧
-      ∃ a b : ℝ, 0 < a ∧ ∀ y, w y ≠ 0 → a ≤ y ∧ y ≤ b},
-      ∃ G : ℂ → ℂ, Differentiable ℂ G ∧ (∀ s, 1 < s.re → G s = mellin w.1 s * F s) ∧
-        ((∃ J, J ≠ ⊥ ∧ J ⊔ m = ⊤ ∧ X J ≠ 1) → G 1 = 0) := by
+  have hweight
+      : ∀ w : {w : ℝ → ℂ // ContDiff ℝ ∞ w ∧ ∃ a b : ℝ, 0 < a ∧ ∀ y, w y ≠ 0 → a ≤ y ∧ y ≤ b},
+        ∃ G : ℂ → ℂ,
+          Differentiable ℂ G ∧ (∀ s, 1 < s.re → G s = mellin w.1 s * F s)
+            ∧ ((∃ J, J ≠ ⊥ ∧ J ⊔ m = ⊤ ∧ X J ≠ 1) → G 1 = 0) := by
     rintro ⟨w, hw, hwsupp⟩
     obtain ⟨κ, hκ⟩ := hmain w hw hwsupp
-    obtain ⟨G, hGd, hG1, hGs⟩ := _root_.GlobalTheory.SmoothedSumMellin.exists_entire_mellin (Ideal (𝓞 K)) X
-      (fun I => (Ideal.absNorm I : ℝ)) (κ * S) w hw hwsupp hN hsumm (hκ b hbij hbm)
+    obtain ⟨G, hGd, hG1, hGs⟩ :=
+      _root_.GlobalTheory.SmoothedSumMellin.exists_entire_mellin (Ideal (𝓞 K)) X
+        (fun I => (Ideal.absNorm I : ℝ))
+        (κ * S) w hw hwsupp hN hsumm (hκ b hbij hbm)
     refine ⟨G, hGd, fun s hs => ?_, fun hJ => ?_⟩
     · rw [hGs s hs]
       simp only [F, Complex.ofReal_natCast]
     · rw [hG1]
       obtain ⟨J, hJ0, hJm, hXJ⟩ := hJ
       let J' : (Ideal (𝓞 K))⁰ := ⟨J, mem_nonZeroDivisors_of_ne_zero hJ0⟩
-      let b' : ClassGroup (𝓞 K) → (Ideal (𝓞 K))⁰ :=
-        fun c => b (c * (ClassGroup.mk0 J')⁻¹) * J'
+      let b' : ClassGroup (𝓞 K) → (Ideal (𝓞 K))⁰ := fun c => b (c * (ClassGroup.mk0 J')⁻¹) * J'
       have hb'mk : ∀ c, ClassGroup.mk0 (b' c) = c := by
         intro c
         simp only [b', map_mul, (hb _).1, inv_mul_cancel_right]
@@ -219,7 +244,11 @@ theorem _root_.GlobalTheory.idealCharacter_LSeries_continuation : ∀ (K : Type)
         obtain ⟨C, hC⟩ := hκ b hbij hbm 0
         obtain ⟨C', hC'⟩ := hκ b' hbij' hbm' 0
         rw [← hS']
-        refine eq_of_norm_sub_div_le (f := fun t => ∑' I, X I * w (t * (Ideal.absNorm I : ℝ))) (C := C) (C' := C') (fun t h0 h1 => ?_) (fun t h0 h1 => ?_)
+        refine eq_of_norm_sub_div_le
+          (f := fun t => ∑' I, X I * w (t * (Ideal.absNorm I : ℝ)))
+          (C := C) (C' := C')
+          (fun t h0 h1 => ?_)
+          (fun t h0 h1 => ?_)
         · have := hC t h0 h1
           rwa [pow_zero, mul_one] at this
         · have := hC' t h0 h1
@@ -230,13 +259,17 @@ theorem _root_.GlobalTheory.idealCharacter_LSeries_continuation : ∀ (K : Type)
       · exact h
       · exact absurd (sub_eq_zero.1 h).symm hinv
   choose G hGd hGF hG1 using hweight
-  obtain ⟨Z, hZd, hZF, hZdiv⟩ := exists_differentiable_eq_div_of_family (fun w => mellin w.1) G F
-    (fun w => by
-      obtain ⟨a, c, ha, hac⟩ := w.2.2
-      exact differentiable_mellin_of_support_in_Icc_pos w.2.1.continuous ha hac)
-    hGd hGF (fun s => by
-      obtain ⟨w, hw, hws, hne⟩ := exists_weight_mellin_ne_zero s
-      exact ⟨⟨w, hw, hws⟩, hne⟩)
+  obtain ⟨Z, hZd, hZF, hZdiv⟩ :=
+    exists_differentiable_eq_div_of_family
+      (fun w => mellin w.1)
+      G F
+      (fun w => by
+        obtain ⟨a, c, ha, hac⟩ := w.2.2
+        exact differentiable_mellin_of_support_in_Icc_pos w.2.1.continuous ha hac)
+      hGd hGF
+      (fun s => by
+        obtain ⟨w, hw, hws, hne⟩ := exists_weight_mellin_ne_zero s
+        exact ⟨⟨w, hw, hws⟩, hne⟩)
   refine ⟨Z, hZd, hZF, fun hJ => ?_⟩
   obtain ⟨w, hw, hws, hne⟩ := exists_weight_mellin_ne_zero 1
   rw [hZdiv ⟨w, hw, hws⟩ 1 hne, hG1 _ hJ, zero_div]

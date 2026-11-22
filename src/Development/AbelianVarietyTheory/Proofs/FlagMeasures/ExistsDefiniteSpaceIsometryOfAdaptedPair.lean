@@ -10,15 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FlagFramesSam
 
 @[expose] public section
 
-open NumberField Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt GlobalTheory.DegAsm
+open NumberField Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt
+  GlobalTheory.DegAsm
 open scoped Pointwise ENNReal Classical
 open Formalism.HermitianLatticeCounting.P
 namespace GlobalTheory.DegAsm.IndIsom
-variable {K V W : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+variable
+  {K V W : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
   {H : HermSpace K V} {r : ℕ}
 
-theorem perpX (F : FlagD H r) {v : V} (hv : ∀ a : Fin (r + 1), H.B (F.e a) v = 0) :
-    ∀ x ∈ F.X, H.B x v = 0 := by
+theorem perpX (F : FlagD H r) {v : V} (hv : ∀ a : Fin (r + 1), H.B (F.e a) v = 0)
+    : ∀ x ∈ F.X, H.B x v = 0 := by
   have h : F.X ≤ LinearMap.ker (H.B.flip v) := by
     rw [FlagD.X, FlagD.Xa, Submodule.span_le]
     rintro _ ⟨b, -, rfl⟩
@@ -26,21 +28,25 @@ theorem perpX (F : FlagD H r) {v : V} (hv : ∀ a : Fin (r + 1), H.B (F.e a) v =
   intro x hx
   simpa using h hx
 
-theorem map_mem {F G : FlagD H r} {γ : V ≃ₗ[K] V} (hG : ∀ a, G.e a = γ (F.e a)) {x : V} (hx : x ∈ F.X) :
-    γ x ∈ G.X := by
+theorem map_mem
+    {F G : FlagD H r} {γ : V ≃ₗ[K] V} (hG : ∀ a, G.e a = γ (F.e a)) {x : V} (hx : x ∈ F.X)
+    : γ x ∈ G.X := by
   have h : F.X.map (γ : V →ₗ[K] V) = G.X := by
     simp only [FlagD.X, FlagD.Xa, Submodule.map_span, Set.image_image, hG, LinearEquiv.coe_coe]
   rw [← h]
   exact Submodule.mem_map_of_mem hx
 
-theorem mem_of_map {F G : FlagD H r} {γ : V ≃ₗ[K] V} (hG : ∀ a, G.e a = γ (F.e a)) {x : V} (hx : γ x ∈ G.X) :
-    x ∈ F.X := by
-  have h := map_mem (F := G) (G := F) (γ := γ.symm)
-    (fun a => by rw [hG a, LinearEquiv.symm_apply_apply]) hx
+theorem mem_of_map
+    {F G : FlagD H r} {γ : V ≃ₗ[K] V} (hG : ∀ a, G.e a = γ (F.e a)) {x : V} (hx : γ x ∈ G.X)
+    : x ∈ F.X := by
+  have h :=
+    map_mem (F := G) (G := F) (γ := γ.symm) (fun a => by rw [hG a, LinearEquiv.symm_apply_apply]) hx
   rwa [LinearEquiv.symm_apply_apply] at h
 
-theorem B_mod {S : Submodule K V} {u u' y y' : V} (hu : ∀ x ∈ S, H.B x u = 0) (hy' : ∀ x ∈ S, H.B x y' = 0)
-    (h : y - u ∈ S) (h' : y' - u' ∈ S) : H.B y y' = H.B u u' := by
+theorem B_mod
+    {S : Submodule K V} {u u' y y' : V}
+    (hu : ∀ x ∈ S, H.B x u = 0) (hy' : ∀ x ∈ S, H.B x y' = 0) (h : y - u ∈ S) (h' : y' - u' ∈ S)
+    : H.B y y' = H.B u u' := by
   have h1 : H.B (y - u) y' = 0 := hy' _ h
   have h2 : H.B (y' - u') u = 0 := hu _ h'
   have h3 : H.B u (y' - u') = 0 := by rw [← H.herm, h2, star_zero]
@@ -62,7 +68,18 @@ private lemma sup_iff_lemma {K V : Type} [Field K] [AddCommGroup V] [Module K V]
   · intro hb
     simpa using add_mem hb h'
 
-theorem exists_isH : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module K W] [FiniteDimensional K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W] (H : HermSpace K V) (HW : HermSpace K W) (e : W →ₗ[K] V), Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ (r : ℕ), ∀ (F G : FlagD H r) (𝔡 : Ideal (𝓞 K)) (N : NF H r) (γ : V ≃ₗ[K] V), IsEmb F HW e → Adapt F G 𝔡 N → γ ∈ isomGrp H → (∀ a, G.e a = γ (F.e a)) → ∃ h : W ≃ₗ[K] W, h ∈ isomGrp HW ∧ IsH F G e γ h ∧ (∀ h' : W ≃ₗ[K] W, IsH F G e γ h' → h' = h) ∧ ∀ (g : ℕ) (Λ' : Submodule (𝓞 K) V), (datOf F G e g (γ • Λ')).1 = imLat h (lat0 F e Λ') := by
+theorem exists_isH
+    : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [AddCommGroup W]
+        [Module K W] [FiniteDimensional K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
+        (H : HermSpace K V) (HW : HermSpace K W) (e : W →ₗ[K] V),
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ (r : ℕ), ∀ (F G : FlagD H r) (𝔡 : Ideal (𝓞 K)) (N : NF H r) (γ : V ≃ₗ[K] V),
+          IsEmb F HW e → Adapt F G 𝔡 N → γ ∈ isomGrp H → (∀ a, G.e a = γ (F.e a))
+            → ∃ h : W ≃ₗ[K] W,
+              h ∈ isomGrp HW ∧ IsH F G e γ h ∧ (∀ h' : W ≃ₗ[K] W, IsH F G e γ h' → h' = h)
+                ∧ ∀ (g : ℕ) (Λ' : Submodule (𝓞 K) V),
+                  (datOf F G e g (γ • Λ')).1 = imLat h (lat0 F e Λ') := by
   intro K V W _ _ _ _ _ _ _ _ _ _ _ _ _ H HW e hCM r F G 𝔡 N γ hE hAd hγ hG
   classical
   obtain ⟨-, hXF, hXG, hV0, -⟩ := adapt_invariants K V H hCM r F G 𝔡 N hAd
@@ -115,19 +132,22 @@ theorem exists_isH : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [
     refine ⟨u, γ (e w) - x, hy, ?_, ?_⟩
     · rw [← hyz]; simpa using hz
     · simpa using neg_mem hxG
-  have huniq : ∀ w u₁ u₂, (∃ y ∈ wSp F G, y - e u₁ ∈ F.X ∧ y - γ (e w) ∈ G.X) →
-      (∃ y ∈ wSp F G, y - e u₂ ∈ F.X ∧ y - γ (e w) ∈ G.X) → u₁ = u₂ := by
+  have huniq
+      : ∀ w u₁ u₂,
+        (∃ y ∈ wSp F G, y - e u₁ ∈ F.X ∧ y - γ (e w) ∈ G.X)
+          → (∃ y ∈ wSp F G, y - e u₂ ∈ F.X ∧ y - γ (e w) ∈ G.X)
+          → u₁ = u₂ := by
     rintro w u₁ u₂ ⟨y₁, hy₁, hF₁, hG₁⟩ ⟨y₂, hy₂, hF₂, hG₂⟩
-    have hdG : y₁ - y₂ ∈ G.X := by
-      convert sub_mem hG₁ hG₂ using 1; abel
+    have hdG : y₁ - y₂ ∈ G.X := by convert sub_mem hG₁ hG₂ using 1; abel
     have hdF : y₁ - y₂ ∈ F.X := hB _ hdG ((hW _).1 (sub_mem hy₁ hy₂))
     have he : e (u₁ - u₂) ∈ F.X := by
       convert add_mem (sub_mem hdF hF₁) hF₂ using 1
-      rw [map_sub]; abel
+      rw [map_sub]
+      abel
     exact sub_eq_zero.mp (heX _ he)
   choose f hf using hex
-  have hchar : ∀ w u, (∃ y ∈ wSp F G, y - e u ∈ F.X ∧ y - γ (e w) ∈ G.X) → f w = u :=
-    fun w u hu => huniq w _ _ (hf w) hu
+  have hchar : ∀ w u, (∃ y ∈ wSp F G, y - e u ∈ F.X ∧ y - γ (e w) ∈ G.X) → f w = u := fun w u hu =>
+    huniq w _ _ (hf w) hu
   have hadd : ∀ w₁ w₂, f (w₁ + w₂) = f w₁ + f w₂ := by
     intro w₁ w₂
     apply hchar
@@ -143,10 +163,11 @@ theorem exists_isH : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [
     refine ⟨c • y, Submodule.smul_mem _ c hy, ?_, ?_⟩
     · convert Submodule.smul_mem _ c hF using 1; rw [map_smul, smul_sub]
     · convert Submodule.smul_mem _ c hGG using 1; rw [map_smul, map_smul, smul_sub]
-  let fl : W →ₗ[K] W :=
-    { toFun := f
-      map_add' := hadd
-      map_smul' := fun c w => by rw [RingHom.id_apply]; exact hsmul c w }
+  let fl : W →ₗ[K] W := {
+    toFun := f
+    map_add' := hadd
+    map_smul' := fun c w => by rw [RingHom.id_apply]; exact hsmul c w
+  }
   have hiso : ∀ w₁ w₂, HW.B (f w₁) (f w₂) = HW.B w₁ w₂ := by
     intro w₁ w₂
     obtain ⟨y₁, hy₁, hF₁, hG₁⟩ := hf w₁
@@ -165,8 +186,7 @@ theorem exists_isH : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [
     have hw0 : f w = 0 := hw
     rw [← hiso w w', hw0, map_zero, LinearMap.zero_apply]
   set h := LinearEquiv.ofInjectiveEndo fl hinj with hh
-  have hcoe : ∀ w, h w = f w := fun w => by
-    rw [hh, LinearEquiv.coe_ofInjectiveEndo]; rfl
+  have hcoe : ∀ w, h w = f w := fun w => by rw [hh, LinearEquiv.coe_ofInjectiveEndo]; rfl
   refine ⟨h, ?_, ?_, ?_, ?_⟩
   · rw [mem_isomGrp]
     intro x y
@@ -184,22 +204,25 @@ theorem exists_isH : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [
     obtain ⟨y, hy, hF, hGG⟩ := hf w
     rw [← hcoe] at hF
     have hR : h w ∈ imLat h (lat0 F e Λ') ↔ e w ∈ Λ' ⊔ rs (𝓞 K) F.X := by
-      simp only [imLat, Formalism.HermitianLatticesTheory.gmap, lat0, Submodule.mem_map, Submodule.mem_comap,
-        LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
+      simp only [imLat, Formalism.HermitianLatticesTheory.gmap, lat0, Submodule.mem_map,
+        Submodule.mem_comap, LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
       constructor
       · rintro ⟨w', hw', hww⟩
         rwa [h.injective hww] at hw'
       · intro hw
         exact ⟨w, hw, rfl⟩
-    have hL : h w ∈ (datOf F G e g (γ • Λ')).1 ↔
-        e (h w) ∈ flagPairDefinitePartLattice G F (γ • Λ') ⊔ rs (𝓞 K) F.X := Iff.rfl
+    have hL
+        : h w ∈ (datOf F G e g (γ • Λ')).1
+          ↔ e (h w) ∈ flagPairDefinitePartLattice G F (γ • Λ') ⊔ rs (𝓞 K) F.X :=
+      Iff.rfl
     rw [hL, hR, ← sup_iff_lemma _ _ hF]
     have hV0c : V0 G F = V0 F G := by
       simp only [V0]
       rw [sup_comm G.X F.X, Set.pair_comm]
-    have hWc : ∀ v, v ∈ wSp G F ↔ v ∈ wSp F G := fun v => by
-      simp only [wSp, hV0c]
-    have hS2 : y ∈ flagPairDefinitePartLattice G F (γ • Λ') ⊔ rs (𝓞 K) F.X ↔ y ∈ γ • Λ' ⊔ rs (𝓞 K) G.X := by
+    have hWc : ∀ v, v ∈ wSp G F ↔ v ∈ wSp F G := fun v => by simp only [wSp, hV0c]
+    have hS2
+        : y ∈ flagPairDefinitePartLattice G F (γ • Λ') ⊔ rs (𝓞 K) F.X
+          ↔ y ∈ γ • Λ' ⊔ rs (𝓞 K) G.X := by
       constructor
       · intro hy'
         obtain ⟨l, hl, x, hx, hlx⟩ := Submodule.mem_sup.mp hy'
@@ -226,8 +249,7 @@ theorem exists_isH : ∀ (K V W : Type) [Field K] [NumberField K] [StarRing K] [
       obtain ⟨m, hm, x, hx, hmx⟩ := Submodule.mem_sup.mp h1
       obtain ⟨l, hl, rfl⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).mp hm
       rw [LinearEquiv.smul_def] at hmx
-      have hx' : γ (e w - l) ∈ G.X := by
-        rw [map_sub, ← hmx]; simpa using hx
+      have hx' : γ (e w - l) ∈ G.X := by rw [map_sub, ← hmx]; simpa using hx
       have : e w - l ∈ F.X := IndIsom.mem_of_map hG hx'
       have hsum : e w = l + (e w - l) := by abel
       rw [hsum]

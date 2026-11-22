@@ -10,8 +10,10 @@ open CategoryTheory AlgebraicGeometry GlobalTheory.EtC Polynomial IsLocalRing
 namespace LateralTheory.E.LeafClosedSH0PfPrim
 open LateralTheory.E.E4 LateralTheory.E.LeafClosedSH0Pf
 
-theorem derivUnit {C : Type} [CommRing C] [Nontrivial C] (q : ℕ) (z : C) (hq : IsUnit (q : C))
-    (hz : (cyclotomic q C).eval z = 0) : IsUnit ((derivative (cyclotomic q C)).eval z) := by
+theorem derivUnit
+    {C : Type} [CommRing C] [Nontrivial C]
+    (q : ℕ) (z : C) (hq : IsUnit (q : C)) (hz : (cyclotomic q C).eval z = 0)
+    : IsUnit ((derivative (cyclotomic q C)).eval z) := by
   have hq0 : q ≠ 0 := by rintro rfl; simp at hq
   obtain ⟨g, hg⟩ := cyclotomic.dvd_X_pow_sub_one q C
   have hzq : z ^ q = 1 := by
@@ -20,15 +22,16 @@ theorem derivUnit {C : Type} [CommRing C] [Nontrivial C] (q : ℕ) (z : C) (hq :
     exact sub_eq_zero.mp this
   have hzu : IsUnit z := IsUnit.of_pow_eq_one hzq hq0
   have hd := congrArg (fun p => (derivative p).eval z) hg
-  simp only [derivative_mul, derivative_sub, derivative_X_pow, derivative_one, sub_zero, eval_add, eval_mul,
-    eval_C, eval_pow, eval_X, hz, zero_mul, add_zero] at hd
+  simp only [derivative_mul, derivative_sub, derivative_X_pow, derivative_one, sub_zero, eval_add,
+      eval_mul, eval_C, eval_pow, eval_X, hz, zero_mul, add_zero]
+    at hd
   have hu : IsUnit ((q : C) * z ^ (q - 1)) := hq.mul (hzu.pow _)
   have hu' : IsUnit ((derivative (cyclotomic q C)).eval z * g.eval z) := by
     rw [← hd]; simpa using hu
   exact isUnit_of_mul_isUnit_left hu'
 
-theorem evalHom {B C : Type} [CommRing B] [CommRing C] (f : B →+* C) (p : B[X]) (x : B) :
-    f (p.eval x) = (p.map f).eval (f x) := by
+theorem evalHom {B C : Type} [CommRing B] [CommRing C] (f : B →+* C) (p : B[X]) (x : B)
+    : f (p.eval x) = (p.map f).eval (f x) := by
   rw [Polynomial.eval_map, eval₂_at_apply]
 
 theorem primLift : LeafPrimLift := by
@@ -42,7 +45,8 @@ theorem primLift : LeafPrimLift := by
     exact (isUnit_map_iff f _).mp this
   obtain ⟨a0, rfl⟩ := hf z
   have hker : (cyclotomic q B).eval a0 ∈ maximalIdeal B := by
-    rw [mem_maximalIdeal, mem_nonunits_iff]; intro hu
+    rw [mem_maximalIdeal, mem_nonunits_iff]
+    intro hu
     have := hu.map f
     rw [evalHom, map_cyclotomic, hz'] at this
     exact not_isUnit_zero this
@@ -51,7 +55,8 @@ theorem primLift : LeafPrimLift := by
     rw [evalHom, ← derivative_map, map_cyclotomic]
     exact derivUnit q (f a0) hqC hz'
   have : IsLocalRing C := IsLocalRing.of_surjective' f hf
-  obtain ⟨a, ha, ham⟩ := HenselianLocalRing.is_henselian (cyclotomic q B) (cyclotomic.monic q B) a0 hker hder
+  obtain ⟨a, ha, ham⟩ :=
+    HenselianLocalRing.is_henselian (cyclotomic q B) (cyclotomic.monic q B) a0 hker hder
   have hfa : (cyclotomic q C).eval (f a) = 0 := by
     rw [← map_cyclotomic q f, ← evalHom, ha.eq_zero, map_zero]
   refine ⟨⟨a, hqB, ?_⟩, ?_⟩

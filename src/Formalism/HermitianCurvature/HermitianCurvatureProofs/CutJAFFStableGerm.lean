@@ -15,8 +15,8 @@ section germ
 
 variable {k r : ℕ} {E' : Type*} [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
-theorem deriv_const_smul_any (c : ℂ) (h : ℝ → E') (t : ℝ) :
-    deriv (fun s => c • h s) t = c • deriv h t := by
+theorem deriv_const_smul_any (c : ℂ) (h : ℝ → E') (t : ℝ)
+    : deriv (fun s => c • h s) t = c • deriv h t := by
   by_cases hc : c = 0
   · simp [hc]
   by_cases hd : DifferentiableAt ℝ h t
@@ -31,22 +31,24 @@ theorem deriv_const_smul_any (c : ℂ) (h : ℝ → E') (t : ℝ) :
       exact h'.const_smul c⁻¹
     rw [deriv_zero_of_not_differentiableAt hd, deriv_zero_of_not_differentiableAt hd', smul_zero]
 
-theorem rdV_smul (X : B.Mat k r) (c : ℂ) (f : B.Mat k r → E') :
-    RdV X (c • f) = c • RdV X f := by
+theorem rdV_smul (X : B.Mat k r) (c : ℂ) (f : B.Mat k r → E') : RdV X (c • f) = c • RdV X f := by
   funext g
   exact deriv_const_smul_any c (fun t => f (g * NormedSpace.exp ((t : ℂ) • X))) 0
 
-theorem rw_smul (w : List (B.Mat k r)) (c : ℂ) (f : B.Mat k r → E') :
-    B.Rw w (c • f) = c • B.Rw w f := by
+theorem rw_smul (w : List (B.Mat k r)) (c : ℂ) (f : B.Mat k r → E')
+    : B.Rw w (c • f) = c • B.Rw w f := by
   induction w with
   | nil => rfl
   | cons X w ih =>
     show RdV X (B.Rw w (c • f)) = c • RdV X (B.Rw w f)
     rw [ih, rdV_smul]
 
-theorem rdV_local {X : B.Mat k r} (hX : B.inLie k r X) {U : Set (B.Mat k r)} (hU : IsOpen U)
-    {f f' : B.Mat k r → E'} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x) {g : B.Mat k r} (hg : g ∈ U)
-    (hgG : g ∈ B.GV k r) : RdV X f g = RdV X f' g := by
+theorem rdV_local
+    {X : B.Mat k r} (hX : B.inLie k r X)
+    {U : Set (B.Mat k r)} (hU : IsOpen U)
+    {f f' : B.Mat k r → E'} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x)
+    {g : B.Mat k r} (hg : g ∈ U) (hgG : g ∈ B.GV k r)
+    : RdV X f g = RdV X f' g := by
   show deriv (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) 0 =
     deriv (fun t : ℝ => f' (g * NormedSpace.exp ((t : ℂ) • X))) 0
   apply Filter.EventuallyEq.deriv_eq
@@ -60,17 +62,19 @@ theorem rdV_local {X : B.Mat k r} (hX : B.inLie k r X) {U : Set (B.Mat k r)} (hU
   filter_upwards [hev] with t ht
   exact he _ ht (Formalism.FourierDecayAlt.P.B5.curve_mem hgG hX t)
 
-theorem rw_local (w : List (B.Mat k r)) (hw : ∀ X ∈ w, B.inLie k r X) {U : Set (B.Mat k r)} (hU : IsOpen U)
-    {f f' : B.Mat k r → E'} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x) :
-    ∀ x ∈ U, x ∈ B.GV k r → B.Rw w f x = B.Rw w f' x := by
+theorem rw_local
+    (w : List (B.Mat k r)) (hw : ∀ X ∈ w, B.inLie k r X)
+    {U : Set (B.Mat k r)} (hU : IsOpen U)
+    {f f' : B.Mat k r → E'} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x)
+    : ∀ x ∈ U, x ∈ B.GV k r → B.Rw w f x = B.Rw w f' x := by
   induction w with
   | nil => exact he
   | cons X w ih =>
     intro x hx hxG
     exact rdV_local (hw X (by simp)) hU (ih (fun Y hY => hw Y (by simp [hY]))) hx hxG
 
-theorem sum_map_smul' {ι M : Type*} [AddCommMonoid M] [Module ℂ M] (c : ℂ) (l : List ι) (φ : ι → M) :
-    (l.map fun i => c • φ i).sum = c • (l.map φ).sum := by
+theorem sum_map_smul' {ι M : Type*} [AddCommMonoid M] [Module ℂ M] (c : ℂ) (l : List ι) (φ : ι → M)
+    : (l.map fun i => c • φ i).sum = c • (l.map φ).sum := by
   induction l with
   | nil => simp
   | cons a l ih => simp [ih, smul_add]
@@ -89,9 +93,13 @@ theorem germ_operators_holds : GermOps := by
     congr 1
     apply List.map_congr_left
     intro T _
-    rw [rw_local T.word.reverse (fun X hX => T.word_lie X (List.mem_reverse.1 hX)) hU
-      (f := fun x => T.coefAdj x (f x)) (f' := fun x => T.coefAdj x (f' x))
-      (fun x hx hxG => by simp only [he x hx hxG]) g hg hgG]
+    rw [rw_local T.word.reverse
+      (fun X hX => T.word_lie X (List.mem_reverse.1 hX))
+      hU
+      (f := fun x => T.coefAdj x (f x))
+      (f' := fun x => T.coefAdj x (f' x))
+      (fun x hx hxG => by simp only [he x hx hxG])
+      g hg hgG]
   · unfold B.opApply
     rw [← sum_map_smul']
     congr 1

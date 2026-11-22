@@ -6,16 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsInvari
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem siegelToroidalIntegral_of_polCharts :
-    GlobalTheory.Published.SiegelToroidalPolCharts → GlobalTheory.Published.SiegelToroidalIntegral :=
-  GlobalTheory.T.siegelIntegralToroidal_of_polarisedCharts GlobalTheory.T.exists_invariant_smoothProjFan_noSelfIntersections
+theorem siegelToroidalIntegral_of_polCharts
+    : GlobalTheory.Published.SiegelToroidalPolCharts
+      → GlobalTheory.Published.SiegelToroidalIntegral :=
+  GlobalTheory.T.siegelIntegralToroidal_of_polarisedCharts
+    GlobalTheory.T.exists_invariant_smoothProjFan_noSelfIntersections
 
 end GlobalTheory

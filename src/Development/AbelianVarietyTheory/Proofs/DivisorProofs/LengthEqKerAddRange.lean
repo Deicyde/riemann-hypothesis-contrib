@@ -35,18 +35,19 @@ lemma length_of_surjective {N₁ N₂ : Type} [AddCommGroup N₁] [Module A N₁
     Module.length A (LinearMap.range g) = Module.length A N₂ := by
   rw [LinearMap.range_eq_top.mpr hg, Module.length_top]
 
-variable {M₁ M₂ M₃ : Type} [AddCommGroup M₁] [AddCommGroup M₂] [AddCommGroup M₃]
-  [Module A M₁] [Module A M₂] [Module A M₃]
+variable
+  {M₁ M₂ M₃ : Type}
+  [AddCommGroup M₁] [AddCommGroup M₂] [AddCommGroup M₃] [Module A M₁] [Module A M₂] [Module A M₃]
 
-def kerMap (f : M₁ →ₗ[A] M₂) (b : A) :
-    LinearMap.ker (LinearMap.lsmul A M₁ b) →ₗ[A] LinearMap.ker (LinearMap.lsmul A M₂ b) :=
+def kerMap (f : M₁ →ₗ[A] M₂) (b : A)
+    : LinearMap.ker (LinearMap.lsmul A M₁ b) →ₗ[A] LinearMap.ker (LinearMap.lsmul A M₂ b) :=
   f.restrict (fun x hx => by
     simp only [LinearMap.mem_ker, LinearMap.lsmul_apply] at hx ⊢
     rw [← map_smul, hx, map_zero])
 
-def quotMap (f : M₁ →ₗ[A] M₂) (b : A) :
-    (M₁ ⧸ LinearMap.range (LinearMap.lsmul A M₁ b)) →ₗ[A]
-      (M₂ ⧸ LinearMap.range (LinearMap.lsmul A M₂ b)) :=
+def quotMap (f : M₁ →ₗ[A] M₂) (b : A)
+    : (M₁ ⧸ LinearMap.range (LinearMap.lsmul A M₁ b)) →ₗ[A]
+        (M₂ ⧸ LinearMap.range (LinearMap.lsmul A M₂ b)) :=
   Submodule.mapQ _ _ f (by
     rintro _ ⟨x, rfl⟩
     exact ⟨f x, by simp⟩)
@@ -60,8 +61,9 @@ namespace GlobalTheory
 namespace ScalarSnakeLength
 
 variable {A : Type} [CommRing A]
-variable {M₁ M₂ M₃ : Type} [AddCommGroup M₁] [AddCommGroup M₂] [AddCommGroup M₃]
-  [Module A M₁] [Module A M₂] [Module A M₃]
+variable
+  {M₁ M₂ M₃ : Type}
+  [AddCommGroup M₁] [AddCommGroup M₂] [AddCommGroup M₃] [Module A M₁] [Module A M₂] [Module A M₃]
 
 lemma kerMap_injective (f : M₁ →ₗ[A] M₂) (hf : Function.Injective f) (b : A) :
     Function.Injective (kerMap f b) := fun x y hxy =>
@@ -112,14 +114,14 @@ lemma quotMap_surjective (g : M₂ →ₗ[A] M₃) (hg : Function.Surjective g) 
   obtain ⟨y, rfl⟩ := hg x
   exact ⟨(LinearMap.range (LinearMap.lsmul A M₂ b)).mkQ y, rfl⟩
 
-noncomputable def delta (f : M₁ →ₗ[A] M₂) (g : M₂ →ₗ[A] M₃) (hf : Function.Injective f)
-    (hg : Function.Surjective g) (hfg : Function.Exact f g) (b : A) :
-    LinearMap.ker (LinearMap.lsmul A M₃ b) →ₗ[A] (M₁ ⧸ LinearMap.range (LinearMap.lsmul A M₁ b)) :=
-  SnakeLemma.δ' (LinearMap.lsmul A M₁ b) (LinearMap.lsmul A M₂ b) (LinearMap.lsmul A M₃ b)
-    f g hfg f g hfg (by ext x; simp) (by ext x; simp)
-    (LinearMap.ker (LinearMap.lsmul A M₃ b)).subtype (LinearMap.exact_subtype_ker_map _)
-    (LinearMap.range (LinearMap.lsmul A M₁ b)).mkQ (LinearMap.exact_map_mkQ_range _)
-    hg hf
+noncomputable def delta
+    (f : M₁ →ₗ[A] M₂) (g : M₂ →ₗ[A] M₃)
+    (hf : Function.Injective f) (hg : Function.Surjective g) (hfg : Function.Exact f g) (b : A)
+    : LinearMap.ker (LinearMap.lsmul A M₃ b) →ₗ[A] (M₁ ⧸ LinearMap.range (LinearMap.lsmul A M₁ b)) :=
+  SnakeLemma.δ' (LinearMap.lsmul A M₁ b) (LinearMap.lsmul A M₂ b) (LinearMap.lsmul A M₃ b) f g hfg f
+    g hfg (by ext x; simp) (by ext x; simp) (LinearMap.ker (LinearMap.lsmul A M₃ b)).subtype
+    (LinearMap.exact_subtype_ker_map _) (LinearMap.range (LinearMap.lsmul A M₁ b)).mkQ
+    (LinearMap.exact_map_mkQ_range _) hg hf
 
 lemma exact_kerMap_delta (f : M₁ →ₗ[A] M₂) (g : M₂ →ₗ[A] M₃) (hf : Function.Injective f)
     (hg : Function.Surjective g) (hfg : Function.Exact f g) (b : A) :
@@ -137,27 +139,27 @@ lemma exact_delta_quotMap (f : M₁ →ₗ[A] M₂) (g : M₂ →ₗ[A] M₃) (h
 
 end ScalarSnakeLength
 
-theorem scalar_snake_length :
-    ∀ (A : Type) [CommRing A] (M₁ M₂ M₃ : Type) [AddCommGroup M₁] [AddCommGroup M₂]
-      [AddCommGroup M₃] [Module A M₁] [Module A M₂] [Module A M₃] (f : M₁ →ₗ[A] M₂)
-      (g : M₂ →ₗ[A] M₃), Function.Injective f → Function.Surjective g → Function.Exact f g →
-      ∀ b : A,
-        Module.length A (M₂ ⧸ LinearMap.range (LinearMap.lsmul A M₂ b)) +
-            Module.length A (LinearMap.ker (LinearMap.lsmul A M₁ b)) +
-            Module.length A (LinearMap.ker (LinearMap.lsmul A M₃ b)) =
-          Module.length A (LinearMap.ker (LinearMap.lsmul A M₂ b)) +
-            Module.length A (M₁ ⧸ LinearMap.range (LinearMap.lsmul A M₁ b)) +
-            Module.length A (M₃ ⧸ LinearMap.range (LinearMap.lsmul A M₃ b)) ∧
-        Module.length A (LinearMap.ker (LinearMap.lsmul A M₂ b)) ≤
-          Module.length A (LinearMap.ker (LinearMap.lsmul A M₁ b)) +
-            Module.length A (LinearMap.ker (LinearMap.lsmul A M₃ b)) := by
+theorem scalar_snake_length
+    : ∀ (A : Type) [CommRing A] (M₁ M₂ M₃ : Type) [AddCommGroup M₁] [AddCommGroup M₂]
+        [AddCommGroup M₃] [Module A M₁] [Module A M₂] [Module A M₃] (f : M₁ →ₗ[A] M₂)
+        (g : M₂ →ₗ[A] M₃),
+      Function.Injective f → Function.Surjective g → Function.Exact f g
+        → ∀ b : A,
+          Module.length A (M₂ ⧸ LinearMap.range (LinearMap.lsmul A M₂ b))
+                + Module.length A (LinearMap.ker (LinearMap.lsmul A M₁ b))
+                + Module.length A (LinearMap.ker (LinearMap.lsmul A M₃ b))
+              = Module.length A (LinearMap.ker (LinearMap.lsmul A M₂ b))
+                + Module.length A (M₁ ⧸ LinearMap.range (LinearMap.lsmul A M₁ b))
+                + Module.length A (M₃ ⧸ LinearMap.range (LinearMap.lsmul A M₃ b))
+            ∧ Module.length A (LinearMap.ker (LinearMap.lsmul A M₂ b))
+              ≤ Module.length A (LinearMap.ker (LinearMap.lsmul A M₁ b))
+                + Module.length A (LinearMap.ker (LinearMap.lsmul A M₃ b)) := by
   intro A _ M₁ M₂ M₃ _ _ _ _ _ _ f g hf hg hfg b
   open ScalarSnakeLength in
   have e1 := length_of_injective (kerMap f b) (kerMap_injective f hf b)
   have e2 := length_mid (kerMap f b) (kerMap g b) (exact_kerMap f g hf hfg b)
   have e3 := length_mid (kerMap g b) (delta f g hf hg hfg b) (exact_kerMap_delta f g hf hg hfg b)
-  have e4 := length_mid (delta f g hf hg hfg b) (quotMap f b)
-    (exact_delta_quotMap f g hf hg hfg b)
+  have e4 := length_mid (delta f g hf hg hfg b) (quotMap f b) (exact_delta_quotMap f g hf hg hfg b)
   have e5 := length_mid (quotMap f b) (quotMap g b) (exact_quotMap f g hg hfg b)
   have e6 := length_of_surjective (quotMap g b) (quotMap_surjective g hg b)
   rw [e1, e2, e3, e4, e5, ← e6]

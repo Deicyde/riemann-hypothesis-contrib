@@ -10,10 +10,11 @@ open scoped nonZeroDivisors
 
 namespace GroundTheory.Heights₂.Heights.Model
 
-theorem module_finite_of_forall_isMaximal {A M : Type*} [CommRing A] [AddCommGroup M] [Module A M]
-    (h : ∀ 𝔪 : Ideal A, 𝔪.IsMaximal →
-      ∃ r ∉ 𝔪, ∃ N : Submodule A M, N.FG ∧ ∀ x : M, ∃ n : ℕ, r ^ n • x ∈ N) :
-    Module.Finite A M := by
+theorem module_finite_of_forall_isMaximal
+    {A M : Type*} [CommRing A] [AddCommGroup M] [Module A M]
+    (h : ∀ 𝔪 : Ideal A,
+      𝔪.IsMaximal → ∃ r ∉ 𝔪, ∃ N : Submodule A M, N.FG ∧ ∀ x : M, ∃ n : ℕ, r ^ n • x ∈ N)
+    : Module.Finite A M := by
   classical
   choose! r hr N hN hx using h
   set s : Set A := r '' {𝔪 | 𝔪.IsMaximal}
@@ -44,9 +45,9 @@ theorem exists_pow_smul_mem_of_weaklyQuasiFiniteAt
     (d : ℕ) [Algebra (MvPolynomial (Fin d) ℤ) A]
     (hinj : Function.Injective (algebraMap (MvPolynomial (Fin d) ℤ) A))
     [Algebra.FiniteType (MvPolynomial (Fin d) ℤ) A]
-    (𝔪 : Ideal A) [𝔪.IsPrime] [Algebra.WeaklyQuasiFiniteAt (MvPolynomial (Fin d) ℤ) 𝔪] :
-    ∃ r ∉ 𝔪, ∃ N : Submodule A (integralClosure A K), N.FG ∧
-      ∀ x : integralClosure A K, ∃ n : ℕ, r ^ n • x ∈ N := by
+    (𝔪 : Ideal A) [𝔪.IsPrime] [Algebra.WeaklyQuasiFiniteAt (MvPolynomial (Fin d) ℤ) 𝔪]
+    : ∃ r ∉ 𝔪, ∃ N : Submodule A (integralClosure A K),
+      N.FG ∧ ∀ x : integralClosure A K, ∃ n : ℕ, r ^ n • x ∈ N := by
   classical
   set C := MvPolynomial (Fin d) ℤ
   have hZ := Algebra.ZariskisMainProperty.of_finiteType_of_weaklyQuasiFiniteAt (R := C) 𝔪
@@ -88,14 +89,16 @@ theorem exists_pow_smul_mem_of_weaklyQuasiFiniteAt
           rw [this]
           exact div_mem hx' (pow_mem hr' _)
         | algebraMap c =>
-          rw [← IsScalarTower.algebraMap_apply C A K, IsScalarTower.algebraMap_apply C (FractionRing C) K]
+          rw [← IsScalarTower.algebraMap_apply C A K,
+            IsScalarTower.algebraMap_apply C (FractionRing C) K]
           exact IntermediateField.algebraMap_mem _ _
         | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
         | mul x y _ _ hx hy => rw [map_mul]; exact mul_mem hx hy
       obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := A) z
       exact div_mem (hA a) (hA b)
     rw [htop] at hfd
-    exact (IntermediateField.topEquiv (F := FractionRing C) (E := K)).toLinearEquiv.finiteDimensional
+    exact (IntermediateField.topEquiv (F := FractionRing C)
+      (E := K)).toLinearEquiv.finiteDimensional
   have : CharZero (FractionRing C) :=
     charZero_of_injective_algebraMap (IsFractionRing.injective C (FractionRing C))
   have : Algebra.IsSeparable (FractionRing C) K := Algebra.IsSeparable.of_integral _ _
@@ -112,13 +115,15 @@ theorem exists_pow_smul_mem_of_weaklyQuasiFiniteAt
     | zero => exact N.zero_mem
     | add y z _ _ hy hz =>
       have : ι (y + z) = ι y + ι z := rfl
-      rw [this]; exact N.add_mem hy hz
+      rw [this]
+      exact N.add_mem hy hz
     | smul c y _ hy =>
       have : ι (c • y) = algebraMap C A c • ι y := by
         apply Subtype.ext
         change c • (y : K) = algebraMap C A c • (y : K)
         rw [Algebra.smul_def, Algebra.smul_def, ← IsScalarTower.algebraMap_apply]
-      rw [this]; exact N.smul_mem _ hy
+      rw [this]
+      exact N.smul_mem _ hy
   refine ⟨r, hr𝔪, N, Submodule.fg_span (g.finite_toSet.image ι), fun x => ?_⟩
   obtain ⟨P, hPm, hPx⟩ := x.2
   set D := P.natDegree
@@ -131,8 +136,8 @@ theorem exists_pow_smul_mem_of_weaklyQuasiFiniteAt
     · have hmi : m (P.coeff i) ≤ M :=
         Finset.le_sup (f := fun i => m (P.coeff i)) (Finset.mem_range.mpr (by omega))
       obtain ⟨k, hk⟩ : ∃ k, D - i = k + 1 := ⟨D - i - 1, by omega⟩
-      have : P.coeff i * (r ^ M) ^ (D - i) =
-          (r ^ m (P.coeff i) * P.coeff i) * (r ^ (M - m (P.coeff i)) * (r ^ M) ^ k) := by
+      have : P.coeff i * (r ^ M) ^ (D - i)
+          = (r ^ m (P.coeff i) * P.coeff i) * (r ^ (M - m (P.coeff i)) * (r ^ M) ^ k) := by
         rw [hk, pow_succ]
         rw [show (r ^ M) = r ^ m (P.coeff i) * r ^ (M - m (P.coeff i)) by
           rw [← pow_add, Nat.add_sub_cancel' hmi]]

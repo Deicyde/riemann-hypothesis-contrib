@@ -11,7 +11,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.LocJacTyp
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain PI.LocJacTyp
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain
+  PI.LocJacTyp
 open scoped Classical
 
 section Count
@@ -41,8 +42,8 @@ def absVHom : Fv F v →* ℝ where
   map_one' := absV_one v
   map_mul' := absV_mul v
 
-theorem absV_prod {ι : Type} (s : Finset ι) (f : ι → Fv F v) :
-    absV v (∏ i ∈ s, f i) = ∏ i ∈ s, absV v (f i) :=
+theorem absV_prod {ι : Type} (s : Finset ι) (f : ι → Fv F v)
+    : absV v (∏ i ∈ s, f i) = ∏ i ∈ s, absV v (f i) :=
   map_prod (absVHom v) f s
 
 end AbsProd

@@ -5,8 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Integrab
 
 @[expose] public section
 
-private theorem UpperTheory.ConvolutionTheory.L1.simple_of_prime (R : Type) [Ring R] [Nontrivial R] [IsArtinianRing R]
-    (h : ∀ I : Ideal R, I.IsTwoSided → ∀ r : R, (∀ x ∈ I, x * r = 0) → I = ⊥ ∨ r = 0) : IsSimpleRing R := by
+private theorem UpperTheory.ConvolutionTheory.L1.simple_of_prime
+    (R : Type) [Ring R] [Nontrivial R] [IsArtinianRing R]
+    (h : ∀ I : Ideal R, I.IsTwoSided → ∀ r : R, (∀ x ∈ I, x * r = 0) → I = ⊥ ∨ r = 0)
+    : IsSimpleRing R := by
   have hJ : Ring.jacobson R = ⊥ := by
     by_contra hne
     obtain ⟨n, hn⟩ : IsNilpotent (Ring.jacobson R) := IsSemiprimaryRing.isNilpotent
@@ -20,11 +22,12 @@ private theorem UpperTheory.ConvolutionTheory.L1.simple_of_prime (R : Type) [Rin
         rw [eq_bot_iff]
         intro r hr
         rcases h (Ring.jacobson R) inferInstance r (fun x hx => by
-          have : x * r ∈ Ring.jacobson R ^ (k + 1) := by
-            rw [Ideal.IsTwoSided.pow_succ]
-            exact Ideal.mul_mem_mul hx hr
-          rw [hk] at this
-          exact this) with h1 | h1
+            have : x * r ∈ Ring.jacobson R ^ (k + 1) := by
+              rw [Ideal.IsTwoSided.pow_succ]
+              exact Ideal.mul_mem_mul hx hr
+            rw [hk] at this
+            exact this)
+          with h1 | h1
         · exact absurd h1 hne
         · exact h1
     exact key n hn
@@ -32,9 +35,10 @@ private theorem UpperTheory.ConvolutionTheory.L1.simple_of_prime (R : Type) [Rin
   refine IsSimpleRing.of_eq_bot_or_eq_top fun I => ?_
   obtain ⟨e, he, hI⟩ := IsSemisimpleRing.ideal_eq_span_idempotent I.asIdeal
   rcases h I.asIdeal inferInstance (1 - e) (fun x hx => by
-    rw [hI, Ideal.mem_span_singleton'] at hx
-    obtain ⟨a, rfl⟩ := hx
-    rw [mul_assoc, mul_sub, mul_one, he.eq, sub_self, mul_zero]) with h1 | h1
+      rw [hI, Ideal.mem_span_singleton'] at hx
+      obtain ⟨a, rfl⟩ := hx
+      rw [mul_assoc, mul_sub, mul_one, he.eq, sub_self, mul_zero])
+    with h1 | h1
   · left
     rw [eq_bot_iff]
     intro x hx
@@ -46,8 +50,7 @@ private theorem UpperTheory.ConvolutionTheory.L1.simple_of_prime (R : Type) [Rin
     rw [← sub_eq_zero.mp h1] at h2
     exact I.one_mem_iff.mp h2
 
-theorem UpperTheory.ConvolutionTheory.L1.matImage :
-    UpperTheory.ConvolutionTheory.L1.MatImage := by
+theorem UpperTheory.ConvolutionTheory.L1.matImage : UpperTheory.ConvolutionTheory.L1.MatImage := by
   intro A W _ _ _ _ _ _ ρ B hB hirr
   haveI : FiniteDimensional ℂ ρ.range :=
     FiniteDimensional.of_injective ρ.range.val.toLinearMap Subtype.val_injective

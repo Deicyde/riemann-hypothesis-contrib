@@ -9,12 +9,13 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open NumberField GroundTheory.Automorphic Module Matrix
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem GramAtData.proof (h : HermitianForm F E W) (v : Basis ι E W) :
-    GramAtData.Statement h v := by
+theorem GramAtData.proof (h : HermitianForm F E W) (v : Basis ι E W)
+    : GramAtData.Statement h v := by
   intro w
   refine ⟨?_, ?_⟩
   · ext i j

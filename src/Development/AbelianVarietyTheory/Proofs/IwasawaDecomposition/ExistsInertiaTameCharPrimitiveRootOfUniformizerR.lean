@@ -14,10 +14,12 @@ namespace GlobalTheory.TameRootSurj
 
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
 
-theorem irreducible_X_pow_sub_C {E : Type} [Field E] [NumberField E]
-    (P : HeightOneSpectrum (𝓞 E)) {L : ℕ} (hL : 0 < L) {ϖ : 𝓞 E}
-    (hmem : ϖ ∈ P.asIdeal) (hnot : ϖ ∉ P.asIdeal ^ 2) :
-    Irreducible (X ^ L - C (ϖ : E)) := by
+theorem irreducible_X_pow_sub_C
+    {E : Type} [Field E] [NumberField E]
+    (P : HeightOneSpectrum (𝓞 E))
+    {L : ℕ} (hL : 0 < L)
+    {ϖ : 𝓞 E} (hmem : ϖ ∈ P.asIdeal) (hnot : ϖ ∉ P.asIdeal ^ 2)
+    : Irreducible (X ^ L - C (ϖ : E)) := by
   have hmon : (X ^ L - C ϖ : (𝓞 E)[X]).Monic := monic_X_pow_sub_C ϖ hL.ne'
   have hdeg : (X ^ L - C ϖ : (𝓞 E)[X]).natDegree = L := natDegree_X_pow_sub_C _
   have hEis : (X ^ L - C ϖ : (𝓞 E)[X]).IsEisensteinAt P.asIdeal := by
@@ -35,12 +37,15 @@ theorem irreducible_X_pow_sub_C {E : Type} [Field E] [NumberField E]
     hEis.irreducible P.isPrime hmon.isPrimitive (by rw [hdeg]; exact hL)
   have hmap : (X ^ L - C ϖ : (𝓞 E)[X]).map (algebraMap (𝓞 E) E) = X ^ L - C (ϖ : E) := by
     simp [Polynomial.map_sub]
-  rw [← hmap]; exact (hmon.irreducible_iff_irreducible_map_fraction_map (K := E)).1 hirr
+  rw [← hmap]
+  exact (hmon.irreducible_iff_irreducible_map_fraction_map (K := E)).1 hirr
 
-theorem main : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (P : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (L : ℕ) (ϖ : 𝓞 E) (π : Ω),
-    Formalism.ConjugateSelfDual.IsPlaceOver A P → ((L : ℕ) : 𝓞 E) ∉ P.asIdeal → ϖ ∈ P.asIdeal → ϖ ∉ P.asIdeal ^ 2 →
-    π ^ L = algebraMap E Ω (ϖ : E) → ∃ σ ∈ ReciprocityTheory.Gal.Ine (F := E) A, IsPrimitiveRoot (σ π / π) L := by
+theorem main
+    : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (P : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (L : ℕ) (ϖ : 𝓞 E) (π : Ω),
+      Formalism.ConjugateSelfDual.IsPlaceOver A P → ((L : ℕ) : 𝓞 E) ∉ P.asIdeal → ϖ ∈ P.asIdeal
+        → ϖ ∉ P.asIdeal ^ 2 → π ^ L = algebraMap E Ω (ϖ : E)
+        → ∃ σ ∈ ReciprocityTheory.Gal.Ine (F := E) A, IsPrimitiveRoot (σ π / π) L := by
   intro E Ω _ _ _ _ _ P A L ϖ π hA hL h1 h2 hπ
   have hϖ0 : ϖ ≠ 0 := by rintro rfl; exact h2 (zero_mem _)
   have hL0 : L ≠ 0 := by rintro rfl; exact hL (by simp)
@@ -76,13 +81,15 @@ theorem main : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E
   have hH : IsClosed (H : Set (Ω ≃ₐ[E] Ω)) :=
     H.isClosed_of_isOpen (stabilizer_isOpen_of_isIntegral (K := E) π)
   haveI : CompactSpace H := isCompact_iff_compactSpace.mp hH.isCompact
-  obtain ⟨k, hk, k', hk', hc⟩ := GlobalTheory.InertiaMovesRoot.exists_cong_of_cong_on_fixed (R := 𝓞 E) H
-    (primeBelow (F := E) A) g (fun b hb => by
-      refine hx2 g b ?_ (valuation_le_one_intCl A b)
-      rw [← InfiniteGalois.fixedField_fixingSubgroup (IntermediateField.adjoin E {π}),
-        IntermediateField.mem_fixedField_iff]
-      intro f hf
-      exact congrArg Subtype.val (hb f (hf ⟨π, IntermediateField.mem_adjoin_simple_self E π⟩)))
+  obtain ⟨k, hk, k', hk', hc⟩ :=
+    GlobalTheory.InertiaMovesRoot.exists_cong_of_cong_on_fixed (R := 𝓞 E) H (primeBelow (F := E) A)
+      g
+      (fun b hb => by
+        refine hx2 g b ?_ (valuation_le_one_intCl A b)
+        rw [← InfiniteGalois.fixedField_fixingSubgroup (IntermediateField.adjoin E {π}),
+          IntermediateField.mem_fixedField_iff]
+        intro f hf
+        exact congrArg Subtype.val (hb f (hf ⟨π, IntermediateField.mem_adjoin_simple_self E π⟩)))
   refine ⟨k' * g * k, GlobalTheory.InertiaMovesRoot.mem_Ine_of_cong hc, ?_⟩
   have e1 : k π = π := hk
   have e2 : k' π = π := hk'

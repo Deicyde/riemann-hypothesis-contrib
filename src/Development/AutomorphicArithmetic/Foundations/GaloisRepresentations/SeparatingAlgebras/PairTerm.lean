@@ -6,9 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical UpperTheory.Gal.Gen
 
-private theorem mono_term {n : ℕ} (l : Fin n → ℤ) (w : Fin n → ℂˣ) (hw : ∀ i, ‖(w i : ℂ)‖ = 1) :
-    monomialChar (fun i => -l (Fin.rev i)) (w ∘ Fin.revPerm) =
-      (starRingEnd ℂ) (monomialChar l w) := by
+private theorem mono_term {n : ℕ} (l : Fin n → ℤ) (w : Fin n → ℂˣ) (hw : ∀ i, ‖(w i : ℂ)‖ = 1)
+    : monomialChar (fun i => - l (Fin.rev i)) (w ∘ Fin.revPerm)
+      = (starRingEnd ℂ) (monomialChar l w) := by
   show ∏ i, (((w (Fin.revPerm i)) ^ (-l (Fin.rev i)) : ℂˣ) : ℂ) =
     (starRingEnd ℂ) (∏ i, ((w i ^ l i : ℂˣ) : ℂ))
   rw [map_prod, ← Equiv.prod_comp Fin.revPerm (fun k => (starRingEnd ℂ) ((w k ^ l k : ℂˣ) : ℂ))]
@@ -16,15 +16,18 @@ private theorem mono_term {n : ℕ} (l : Fin n → ℤ) (w : Fin n → ℂˣ) (h
   simp only [Fin.revPerm_apply, Units.val_zpow_eq_zpow_val, map_zpow₀]
   rw [← Complex.inv_eq_conj (hw _), zpow_neg, inv_zpow]
 
-private theorem pair_term {n : ℕ} (t : ℝ) (w : Fin n → ℂˣ) (hinj : Function.Injective w)
-    (hw : ∀ i, ‖(w i : ℂ)‖ = 1) :
-    ∏ p ∈ prs n, ((w (Fin.rev p.1) : ℂ) - (t : ℂ) * (w (Fin.rev p.2) : ℂ)) /
-        ((w (Fin.rev p.1) : ℂ) - (w (Fin.rev p.2) : ℂ)) =
-      (starRingEnd ℂ) (∏ p ∈ prs n, ((w p.1 : ℂ) - (t : ℂ) * (w p.2 : ℂ)) /
-        ((w p.1 : ℂ) - (w p.2 : ℂ))) := by
+private theorem pair_term
+    {n : ℕ} (t : ℝ) (w : Fin n → ℂˣ) (hinj : Function.Injective w) (hw : ∀ i, ‖(w i : ℂ)‖ = 1)
+    : ∏ p ∈ prs n, ((w (Fin.rev p.1) : ℂ) - (t : ℂ) * (w (Fin.rev p.2) : ℂ)) /
+          ((w (Fin.rev p.1) : ℂ) - (w (Fin.rev p.2) : ℂ))
+      = (starRingEnd ℂ)
+        (∏ p ∈ prs n, ((w p.1 : ℂ) - (t : ℂ) * (w p.2 : ℂ)) /
+          ((w p.1 : ℂ) - (w p.2 : ℂ))) := by
   rw [map_prod]
-  refine Finset.prod_nbij' (fun p => (Fin.rev p.2, Fin.rev p.1))
-    (fun p => (Fin.rev p.2, Fin.rev p.1)) ?_ ?_ ?_ ?_ ?_
+  refine Finset.prod_nbij'
+    (fun p => (Fin.rev p.2, Fin.rev p.1))
+    (fun p => (Fin.rev p.2, Fin.rev p.1))
+    ?_ ?_ ?_ ?_ ?_
   · intro p hp
     simp only [prs, Finset.mem_filter, Finset.mem_univ, true_and] at hp ⊢
     exact Fin.rev_lt_rev.mpr hp
@@ -38,8 +41,8 @@ private theorem pair_term {n : ℕ} (t : ℝ) (w : Fin n → ℂˣ) (hinj : Func
   · intro p hp
     simp only [prs, Finset.mem_filter, Finset.mem_univ, true_and] at hp
     have hne : Fin.rev p.2 ≠ Fin.rev p.1 := fun h => (ne_of_lt hp) (Fin.rev_injective h).symm
-    have hab : (w (Fin.rev p.2) : ℂ) ≠ (w (Fin.rev p.1) : ℂ) :=
-      fun h => hne (hinj (Units.val_injective h))
+    have hab : (w (Fin.rev p.2) : ℂ) ≠ (w (Fin.rev p.1) : ℂ) := fun h =>
+      hne (hinj (Units.val_injective h))
     have ha : (w (Fin.rev p.2) : ℂ) ≠ 0 := Units.ne_zero _
     have hb : (w (Fin.rev p.1) : ℂ) ≠ 0 := Units.ne_zero _
     simp only [map_div₀, map_sub, map_mul, Complex.conj_ofReal]
@@ -53,8 +56,8 @@ private theorem pair_term {n : ℕ} (t : ℝ) (w : Fin n → ℂˣ) (hinj : Func
     rw [div_eq_div_iff h1 h2]
     field_simp
 
-theorem UpperTheory.Gal.Gen.rConj_pf :
-    UpperTheory.Gal.Gen.RFormula → UpperTheory.Gal.Gen.RConj := by
+theorem UpperTheory.Gal.Gen.rConj_pf
+    : UpperTheory.Gal.Gen.RFormula → UpperTheory.Gal.Gen.RConj := by
   intro hR n t l z hinj hz
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hR n t _ z hinj, hR n t l z hinj, map_sum]

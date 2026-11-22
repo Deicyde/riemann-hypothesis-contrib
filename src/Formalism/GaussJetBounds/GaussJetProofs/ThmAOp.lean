@@ -15,8 +15,8 @@ namespace Formalism.DworkPowerSeriesWeights
 
 open Formalism.IncomingBounds MvPolynomial
 
-def opInt (K : Type u) [NormedField K] [IsUltrametricDist K] (σ : Type) :
-    Subring (MvPolynomial σ K) where
+def opInt (K : Type u) [NormedField K] [IsUltrametricDist K] (σ : Type)
+    : Subring (MvPolynomial σ K) where
   carrier := {P | ∀ κ, ‖AddMonoidAlgebra.coeff P κ‖ ≤ 1}
   mul_mem' := by
     intro P Q hP hQ κ
@@ -42,10 +42,16 @@ def opInt (K : Type u) [NormedField K] [IsUltrametricDist K] (σ : Type) :
     rw [coeff_neg, norm_neg]
     exact hP κ
 
-def opA {K : Type u} [Field K] {d N0 : ℕ} (TT : Finset (ZMod d))
-    (T : ZMod d → Fin N0 → Fin N0 → K) (s : ZMod d) (i k : Fin N0) : K :=
-  if s ∈ TT ∧ i.val = 0 then (if k = i then 1 else 0)
-  else if s ∈ TT ∧ k.val = 0 then 0 else T s i k
+def opA
+    {K : Type u} [Field K]
+    {d N0 : ℕ} (TT : Finset (ZMod d)) (T : ZMod d → Fin N0 → Fin N0 → K) (s : ZMod d) (i k : Fin N0)
+    : K :=
+  if s ∈ TT ∧ i.val = 0 then
+    (if k = i then 1 else 0)
+  else if s ∈ TT ∧ k.val = 0 then
+    0
+  else
+    T s i k
 
 lemma rowOp_eq {K : Type u} [Field K] {d N0 N1 : ℕ} (TT : Finset (ZMod d))
     (T : ZMod d → Fin N0 → Fin N0 → K) (s : ZMod d) (i : Fin N0) (b : Fin N1) :
@@ -314,8 +320,8 @@ lemma sum_filter_rows {d N0 N1 : ℕ} [NeZero d] (Pr : ZMod d × Fin N0 → Prop
   · simp [h]
 
 theorem thmAOp : ThmAOp.{u} := by
-  intro K _ _ _ l d N0 N1 _ hl hl3 hd hde hnl h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε
-    TT colN p hp hp1 I T hT nu1 nu2 size hnu1 hnu2 hsize a ha hsa spec hspec hinj hframe
+  intro K _ _ _ l d N0 N1 _ hl hl3 hd hde hnl h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε TT colN
+    p hp hp1 I T hT nu1 nu2 size hnu1 hnu2 hsize a ha hsa spec hspec hinj hframe
   classical
   have hpos : 0 < ‖(l : K)‖ := by
     rw [norm_pos_iff]
@@ -327,18 +333,22 @@ theorem thmAOp : ThmAOp.{u} := by
   have h1s : ∀ s, nu1 s ≤ size s := by
     intro s
     rw [hnu1, hsize]
-    calc colN s = ∑ _c : Fin (colN s), 1 := by simp
+    calc
+      colN s
+        = ∑ _c : Fin (colN s), 1 := by simp
       _ ≤ ∑ c, p s c := Finset.sum_le_sum fun c _ => hp1 s c
-  have hPint : (∏ s : ZMod d, minorProd (rowOp (N1 := N1) TT T s) (p s) (hp s) (I s)) ∈
-      opInt K (ZV d N0 N1) :=
+  have hPint
+      : (∏ s : ZMod d, minorProd (rowOp (N1 := N1) TT T s) (p s) (hp s) (I s))
+        ∈ opInt K (ZV d N0 N1) :=
     Subring.prod_mem _ fun s _ =>
       minorProd_mem_opInt _ (fun i b => rowOp_mem_opInt TT T hT s i b) _ _ _
   unfold jetPair
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (Real.rpow_nonneg hpos.le _)
     fun κ hκ => ?_
   have hsh := op_prod_shape TT T colN p hp hp1 I κ hκ
-  have hcap : ∀ (s : ZMod d) (k : Fin N0), ¬ (s ∈ TT ∧ k.val = 0) →
-      rowDeg s k κ ≤ capL d TT nu1 nu2 s := by
+  have hcap
+      : ∀ (s : ZMod d) (k : Fin N0),
+        ¬(s ∈ TT ∧ k.val = 0) → rowDeg s k κ ≤ capL d TT nu1 nu2 s := by
     intro s k hsk
     unfold capL
     split_ifs with hs
@@ -346,18 +356,20 @@ theorem thmAOp : ThmAOp.{u} := by
       exact ((hsh s).2.2 hs ⟨0, h0⟩ rfl).2 k (fun hk => hsk ⟨hs, hk⟩)
     · rw [hnu1]
       exact (hsh s).2.1 k
-  have hjet := thmAJetA K l d N0 N1 hl hl3 hd hde hnl h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε
-    TT nu1 nu2 size h21 h1s a ha hsa spec κ ?_ ?_ hspec ?_ hframe
+  have hjet :=
+    thmAJetA K l d N0 N1 hl hl3 hd hde hnl h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε TT nu1 nu2
+      size h21 h1s a ha hsa spec κ ?_ ?_ hspec ?_ hframe
   · rw [mul_assoc, norm_mul]
-    calc ‖AddMonoidAlgebra.coeff (∏ s : ZMod d, minorProd (rowOp (N1 := N1) TT T s) (p s) (hp s) (I s)) κ‖ * _
+    calc
+      ‖AddMonoidAlgebra.coeff (∏ s : ZMod d, minorProd (rowOp (N1 := N1) TT T s) (p s) (hp s) (I s)) κ‖
+          * _
         ≤ 1 * _ := mul_le_mul_of_nonneg_right (hPint κ) (norm_nonneg _)
       _ ≤ _ := by rw [one_mul]; exact hjet
   · intro s hs
     rw [hnu1]
     exact ((hsh s).2.2 hs ⟨0, h0⟩ rfl).1
   · intro s
-    have hrows := sum_filter_rows
-      (fun r : ZMod d × Fin N0 => r.1 = s ∧ ¬ (r.1 ∈ TT ∧ r.2.val = 0)) κ
+    have hrows := sum_filter_rows (fun r : ZMod d × Fin N0 => r.1 = s ∧ ¬(r.1 ∈ TT ∧ r.2.val = 0)) κ
     refine Eq.trans (Finset.sum_congr ?_ fun _ _ => rfl) (hrows.trans ?_)
     · ext y
       simp [frameTop]
@@ -370,9 +382,10 @@ theorem thmAOp : ThmAOp.{u} := by
         rw [← hnu1] at htop
         rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (⟨0, h0⟩ : Fin N0)), htop] at htot
         rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (⟨0, h0⟩ : Fin N0))]
-        have hrest : (∑ k ∈ Finset.univ.erase (⟨0, h0⟩ : Fin N0),
-            if (s = s ∧ ¬ (s ∈ TT ∧ k.val = 0)) then rowDeg s k κ else 0) =
-            ∑ k ∈ Finset.univ.erase (⟨0, h0⟩ : Fin N0), rowDeg s k κ := by
+        have hrest
+            : (∑ k ∈ Finset.univ.erase (⟨0, h0⟩ : Fin N0),
+                if (s = s ∧ ¬ (s ∈ TT ∧ k.val = 0)) then rowDeg s k κ else 0)
+              = ∑ k ∈ Finset.univ.erase (⟨0, h0⟩ : Fin N0), rowDeg s k κ := by
           refine Finset.sum_congr rfl fun k hk => ?_
           rw [if_pos]
           refine ⟨rfl, fun hh => ?_⟩

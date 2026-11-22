@@ -12,50 +12,64 @@ open scoped ENNReal
 
 namespace Formalism.L2.SG.Pf.NcReal.JX
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.L2.SG.Pf.WFL Formalism.L2.SG.Pf
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.RealObj Formalism.L2.SG.Pf.WFL Formalism.L2.SG.Pf
   Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates Formalism.L2.SG.RealObj.InfCut
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-def mOf : {n r k : ℕ} → n = 2 * r + k + 1 → (ε : Fin n → Bool) → (Fin r → Fin n → ℂ) → (Fin r → Fin n → ℂ) →
-    (Fin k → Fin n → ℂ) → (Fin n → ℂ) → Formalism.REAL.UJ ε → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ
+def mOf
+    : {n r k : ℕ} → n = 2 * r + k + 1 → (ε : Fin n → Bool) → (Fin r → Fin n → ℂ)
+      → (Fin r → Fin n → ℂ) → (Fin k → Fin n → ℂ) → (Fin n → ℂ) → Formalism.REAL.UJ ε
+      → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ
   | _, _, _, rfl, ε, e, f, w, z0, g => Qi ε e f w z0 * uMat g * Qm e f w z0
 
 section Loc
 
-theorem mOf_facts {n r k : ℕ} (hn : n = 2 * r + k + 1) (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ)
-    (w : Fin k → Fin n → ℂ) (z : Fin n → ℂ) {T : ℝ} (hT : 0 < T)
+theorem mOf_facts
+    {n r k : ℕ} (hn : n = 2 * r + k + 1) (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ)
+    (w : Fin k → Fin n → ℂ) (z : Fin n → ℂ)
+    {T : ℝ} (hT : 0 < T)
     (hee : ∀ a b, hJ ε (e a) (e b) = 0) (hff : ∀ a b, hJ ε (f a) (f b) = 0)
     (hef : ∀ a b, hJ ε (e a) (f b) = if a = b then 1 else 0)
-    (hww : ∀ a b, hJ ε (w a) (w b) = if a = b then 1 else 0)
-    (hew : ∀ c a, hJ ε (e c) (w a) = 0) (hfw : ∀ c a, hJ ε (f c) (w a) = 0)
-    (hez : ∀ a, hJ ε (e a) z = 0) (hfz : ∀ a, hJ ε (f a) z = 0) (hzz : hJ ε z z = -(T : ℂ))
-    (hzw : ∀ a, hJ ε z (w a) = 0) :
-    (∀ g g' : Formalism.REAL.UJ ε, mOf hn ε e f w (z0v T z) (g * g') =
-      mOf hn ε e f w (z0v T z) g * mOf hn ε e f w (z0v T z) g') ∧
-    (∀ g : Formalism.REAL.UJ ε, g ∈ NLoc ε e z → mOf hn ε e f w (z0v T z) g ∈ Nset k r) ∧
-    (∀ (g : Formalism.REAL.UJ ε) (b a : Fin r), hJ ε (f b) (uMat g *ᵥ e a) = mOf hn ε e f w (z0v T z) g (eI k r b) (eI k r a)) ∧
-    (∀ (g : Formalism.REAL.UJ ε) (b : Fin r) (j : Fin k),
-      hJ ε (f b) (uMat g *ᵥ w j) = mOf hn ε e f w (z0v T z) g (eI k r b) (wI k r (Fin.castSucc j))) ∧
-    (∀ (g : Formalism.REAL.UJ ε) (b : Fin r),
-      hJ ε (f b) (uMat g *ᵥ z) = ((Real.sqrt T : ℝ) : ℂ) * mOf hn ε e f w (z0v T z) g (eI k r b) (wI k r (Fin.last k))) ∧
-    (∀ g : Formalism.REAL.UJ ε, g ∈ NLoc ε e z → mL ε e f g = WlocSk.NB.mof (mOf hn ε e f w (z0v T z) g)) := by
+    (hww : ∀ a b, hJ ε (w a) (w b) = if a = b then 1 else 0) (hew : ∀ c a, hJ ε (e c) (w a) = 0)
+    (hfw : ∀ c a, hJ ε (f c) (w a) = 0) (hez : ∀ a, hJ ε (e a) z = 0) (hfz : ∀ a, hJ ε (f a) z = 0)
+    (hzz : hJ ε z z = -(T : ℂ)) (hzw : ∀ a, hJ ε z (w a) = 0)
+    : (∀ g g' : Formalism.REAL.UJ ε,
+        mOf hn ε e f w (z0v T z) (g * g')
+          = mOf hn ε e f w (z0v T z) g * mOf hn ε e f w (z0v T z) g')
+      ∧ (∀ g : Formalism.REAL.UJ ε, g ∈ NLoc ε e z → mOf hn ε e f w (z0v T z) g ∈ Nset k r)
+      ∧ (∀ (g : Formalism.REAL.UJ ε) (b a : Fin r),
+        hJ ε (f b) (uMat g *ᵥ e a) = mOf hn ε e f w (z0v T z) g (eI k r b) (eI k r a))
+      ∧ (∀ (g : Formalism.REAL.UJ ε) (b : Fin r) (j : Fin k),
+        hJ ε (f b) (uMat g *ᵥ w j)
+          = mOf hn ε e f w (z0v T z) g (eI k r b) (wI k r (Fin.castSucc j)))
+      ∧ (∀ (g : Formalism.REAL.UJ ε) (b : Fin r),
+        hJ ε (f b) (uMat g *ᵥ z)
+          = ((Real.sqrt T : ℝ) : ℂ) * mOf hn ε e f w (z0v T z) g (eI k r b) (wI k r (Fin.last k)))
+      ∧ (∀ g : Formalism.REAL.UJ ε,
+        g ∈ NLoc ε e z → mL ε e f g = WlocSk.NB.mof (mOf hn ε e f w (z0v T z) g)) := by
   subst hn
   have hFJ := isFrameJ_of hT hee hff hef hww hew hfw hez hfz hzz hzw
   have hQz : Qm e f w (z0v T z) *ᵥ zBv k r T = z := Qm_zB hT z
   have hz0 : ∃ t : ℂ, z0v T z = t • (Qm e f w (z0v T z) *ᵥ zBv k r T) :=
     ⟨(((Real.sqrt T)⁻¹ : ℝ) : ℂ), by rw [hQz]; rfl⟩
-  have hmem : ∀ g : Formalism.REAL.UJ ε, g ∈ NLoc ε e z → mOf rfl ε e f w (z0v T z) g ∈ Nset k r := fun g hg => by
+  have hmem
+      : ∀ g : Formalism.REAL.UJ ε,
+        g ∈ NLoc ε e z → mOf rfl ε e f w (z0v T z) g ∈ Nset k r := fun g hg => by
     have hg' : InN ε e (Qm e f w (z0v T z) *ᵥ zBv k r T) (uMat g) := by rw [hQz]; exact hg
     exact conj_mem_Nset hFJ hz0 (uMat_mem g) hg'
-  have hcol : ∀ (g : Formalism.REAL.UJ ε) b j, hJ ε (f b) (uMat g *ᵥ colQ e f w (z0v T z) j) =
-      mOf rfl ε e f w (z0v T z) g (eI k r b) j := fun g b j => hJ_f_col g b j
+  have hcol
+      : ∀ (g : Formalism.REAL.UJ ε) b j,
+        hJ ε (f b) (uMat g *ᵥ colQ e f w (z0v T z) j) = mOf rfl ε e f w (z0v T z) g (eI k r b) j :=
+    fun g b j => hJ_f_col g b j
   refine ⟨fun g g' => ?_, hmem, fun g b a => ?_, fun g b j => ?_, fun g b => ?_, fun g hg => ?_⟩
   · show Qi ε e f w (z0v T z) * uMat (g * g') * Qm e f w (z0v T z) =
       (Qi ε e f w (z0v T z) * uMat g * Qm e f w (z0v T z)) * (Qi ε e f w (z0v T z) * uMat g' * Qm e f w (z0v T z))
     rw [uMat_mul]
     simp only [← Matrix.mul_assoc]
-    rw [Matrix.mul_assoc (Qi ε e f w (z0v T z) * uMat g) (Qm e f w (z0v T z)) (Qi ε e f w (z0v T z)),
+    rw [Matrix.mul_assoc (Qi ε e f w (z0v T z) * uMat g) (Qm e f w (z0v T z))
+        (Qi ε e f w (z0v T z)),
       Qm_mul_Qi hFJ, Matrix.mul_one]
   · rw [← colQ_eI e f w (z0v T z) a, hcol]
   · have hw : colQ e f w (z0v T z) (wI k r (Fin.castSucc j)) = w j := by
@@ -97,35 +111,42 @@ theorem sclT_ne {T : ℝ} (hT : 0 < T) (j : Fin (k + 1)) : sclT T j ≠ 0 := by
   · exact one_ne_zero
   · exact Complex.ofReal_ne_zero.2 (Real.sqrt_pos.2 hT).ne'
 
-def chAt (T : ℝ) (x : ∀ q : CBlk r, CSpc ι k q) (v : ι) : (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ) :=
-  (fun c => match c with
+def chAt (T : ℝ) (x : ∀ q : CBlk r, CSpc ι k q) (v : ι) : (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ) := (
+  fun c =>
+    match c with
     | Sum.inl p => (x (Sum.inl (Sum.inl p)) : ι → ℂ) v
     | Sum.inr (Sum.inl (b, j)) => (x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v j / sclT T j
     | Sum.inr (Sum.inr p) => (x (Sum.inr (Sum.inl p)) : ι → ℂ) v,
-   fun a => (x (Sum.inr (Sum.inr a)) : ι → ℝ) v)
+  fun a => (x (Sum.inr (Sum.inr a)) : ι → ℝ) v
+)
 
-def ph0 (c : (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
+def ph0 (c : (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ))
+    : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
   WlocSk.NB.phi0 c.1 c.2
 
 def Bk (T : ℝ) : ∀ p : CBlk r, (∀ q : CBlk r, CSpc ι k q) → (∀ q : CBlk r, CSpc ι k q) → CSpc ι k p
   | Sum.inl (Sum.inl p) => fun x y v =>
-      WlocSk.NB.shG (ph0 (chAt T x v)) (chAt T y v).1 (Sum.inl p) - (x (Sum.inl (Sum.inl p)) : ι → ℂ) v
+    WlocSk.NB.shG (ph0 (chAt T x v)) (chAt T y v).1 (Sum.inl p)
+      - (x (Sum.inl (Sum.inl p)) : ι → ℂ) v
   | Sum.inl (Sum.inr b) => fun x y v j =>
-      sclT T j * WlocSk.NB.shG (ph0 (chAt T x v)) (chAt T y v).1 (Sum.inr (Sum.inl (b, j))) -
-        (x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v j
+    sclT T j * WlocSk.NB.shG (ph0 (chAt T x v)) (chAt T y v).1 (Sum.inr (Sum.inl (b, j)))
+      - (x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v j
   | Sum.inr (Sum.inl p) => fun x y v =>
-      WlocSk.NB.shG (ph0 (chAt T x v)) (chAt T y v).1 (Sum.inr (Sum.inr p)) - (x (Sum.inr (Sum.inl p)) : ι → ℂ) v
+    WlocSk.NB.shG (ph0 (chAt T x v)) (chAt T y v).1 (Sum.inr (Sum.inr p))
+      - (x (Sum.inr (Sum.inl p)) : ι → ℂ) v
   | Sum.inr (Sum.inr a) => fun x y v =>
-      WlocSk.NB.shH (ph0 (chAt T x v)) (chAt T y v).1 a - (x (Sum.inr (Sum.inr a)) : ι → ℝ) v
+    WlocSk.NB.shH (ph0 (chAt T x v)) (chAt T y v).1 a - (x (Sum.inr (Sum.inr a)) : ι → ℝ) v
 
-def blkOf (T : ℝ) (M : ι → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : ∀ p : CBlk r, CSpc ι k p
+def blkOf (T : ℝ) (M : ι → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : ∀ p : CBlk r, CSpc ι k p
   | Sum.inl (Sum.inl p) => fun v => WlocSk.NB.psiC (M v) (Sum.inl p)
   | Sum.inl (Sum.inr b) => fun v j => sclT T j * WlocSk.NB.psiC (M v) (Sum.inr (Sum.inl (b, j)))
   | Sum.inr (Sum.inl p) => fun v => WlocSk.NB.psiC (M v) (Sum.inr (Sum.inr p))
   | Sum.inr (Sum.inr a) => fun v => WlocSk.NB.psiR (M v) a
 
-theorem chAt_blkOf {T : ℝ} (hT : 0 < T) (M : ι → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (v : ι) :
-    chAt T (blkOf T M) v = (WlocSk.NB.psiC (M v), WlocSk.NB.psiR (M v)) := by
+theorem chAt_blkOf
+    {T : ℝ} (hT : 0 < T) (M : ι → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (v : ι)
+    : chAt T (blkOf T M) v = (WlocSk.NB.psiC (M v), WlocSk.NB.psiR (M v)) := by
   refine Prod.ext (funext fun c => ?_) rfl
   rcases c with p | ⟨b, j⟩ | p
   · rfl
@@ -133,11 +154,18 @@ theorem chAt_blkOf {T : ℝ} (hT : 0 < T) (M : ι → Matrix (Fin (2 * r + k + 1
     rw [mul_div_cancel_left₀ _ (sclT_ne hT j)]
   · rfl
 
-theorem law_blkOf {T : ℝ} (hT : 0 < T) (M M' : ι → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (hM : ∀ v, M v ∈ Nset k r) (hM' : ∀ v, M' v ∈ Nset k r) :
-    blkOf T (fun v => M v * M' v) = Formalism.L2.SG.NGCut.SplitEmbedding.mlaw (Bk T) (blkOf T M) (blkOf T M') := by
-  have key : ∀ v, WlocSk.NB.psiC (M v * M' v) = WlocSk.NB.psiC (M' v) + WlocSk.NB.shG (M v) (WlocSk.NB.psiC (M' v)) ∧
-      WlocSk.NB.psiR (M v * M' v) = WlocSk.NB.psiR (M' v) + WlocSk.NB.shH (M v) (WlocSk.NB.psiC (M' v)) := fun v => by
+theorem law_blkOf
+    {T : ℝ} (hT : 0 < T)
+    (M M' : ι → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (hM : ∀ v, M v ∈ Nset k r) (hM' : ∀ v, M' v ∈ Nset k r)
+    : blkOf T (fun v => M v * M' v)
+      = Formalism.L2.SG.NGCut.SplitEmbedding.mlaw (Bk T) (blkOf T M) (blkOf T M') := by
+  have key
+      : ∀ v,
+        WlocSk.NB.psiC (M v * M' v)
+            = WlocSk.NB.psiC (M' v) + WlocSk.NB.shG (M v) (WlocSk.NB.psiC (M' v))
+          ∧ WlocSk.NB.psiR (M v * M' v)
+            = WlocSk.NB.psiR (M' v) + WlocSk.NB.shH (M v) (WlocSk.NB.psiC (M' v)) := fun v => by
     have h := WlocSk.NB.lmul_coord (hM v) (WlocSk.NB.psiC (M' v)) (WlocSk.NB.psiR (M' v))
     rwa [WlocSk.NB.nilpotent_chart_left_inverse (hM' v)] at h
   have hph : ∀ v, ph0 (chAt T (blkOf T M) v) = M v := fun v => by
@@ -148,26 +176,30 @@ theorem law_blkOf {T : ℝ} (hT : 0 < T) (M M' : ι → Matrix (Fin (2 * r + k +
     show WlocSk.NB.psiC (M v * M' v) (Sum.inl p) = WlocSk.NB.psiC (M v) (Sum.inl p) + WlocSk.NB.psiC (M' v) (Sum.inl p) +
       (WlocSk.NB.shG (ph0 (chAt T (blkOf T M) v)) (chAt T (blkOf T M') v).1 (Sum.inl p) - WlocSk.NB.psiC (M v) (Sum.inl p))
     rw [hph, chAt_blkOf hT, (key v).1]
-    simp only [Pi.add_apply]; ring
+    simp only [Pi.add_apply]
+    ring
   · funext v j
     show sclT T j * WlocSk.NB.psiC (M v * M' v) (Sum.inr (Sum.inl (b, j))) =
       sclT T j * WlocSk.NB.psiC (M v) (Sum.inr (Sum.inl (b, j))) + sclT T j * WlocSk.NB.psiC (M' v) (Sum.inr (Sum.inl (b, j))) +
       (sclT T j * WlocSk.NB.shG (ph0 (chAt T (blkOf T M) v)) (chAt T (blkOf T M') v).1 (Sum.inr (Sum.inl (b, j))) -
         sclT T j * WlocSk.NB.psiC (M v) (Sum.inr (Sum.inl (b, j))))
     rw [hph, chAt_blkOf hT, (key v).1]
-    simp only [Pi.add_apply]; ring
+    simp only [Pi.add_apply]
+    ring
   · funext v
     show WlocSk.NB.psiC (M v * M' v) (Sum.inr (Sum.inr p)) = WlocSk.NB.psiC (M v) (Sum.inr (Sum.inr p)) +
       WlocSk.NB.psiC (M' v) (Sum.inr (Sum.inr p)) +
       (WlocSk.NB.shG (ph0 (chAt T (blkOf T M) v)) (chAt T (blkOf T M') v).1 (Sum.inr (Sum.inr p)) -
         WlocSk.NB.psiC (M v) (Sum.inr (Sum.inr p)))
     rw [hph, chAt_blkOf hT, (key v).1]
-    simp only [Pi.add_apply]; ring
+    simp only [Pi.add_apply]
+    ring
   · funext v
     show WlocSk.NB.psiR (M v * M' v) a = WlocSk.NB.psiR (M v) a + WlocSk.NB.psiR (M' v) a +
       (WlocSk.NB.shH (ph0 (chAt T (blkOf T M) v)) (chAt T (blkOf T M') v).1 a - WlocSk.NB.psiR (M v) a)
     rw [hph, chAt_blkOf hT, (key v).2]
-    simp only [Pi.add_apply]; ring
+    simp only [Pi.add_apply]
+    ring
 
 end BessLaw
 
@@ -175,16 +207,15 @@ section Tri
 
 variable {r k : ℕ}
 
-theorem adj_lowId {A : Matrix (Fin r) (Fin r) ℂ} (hA : WlocSk.NB.LowId A) :
-    (∀ a d : Fin r, d < a → A.adjugate a d = 0) ∧ ∀ a, A.adjugate a a = 1 := by
+theorem adj_lowId {A : Matrix (Fin r) (Fin r) ℂ} (hA : WlocSk.NB.LowId A)
+    : (∀ a d : Fin r, d < a → A.adjugate a d = 0) ∧ ∀ a, A.adjugate a a = 1 := by
   have hT : A.BlockTriangular id := fun i j hji => by
     have hji' : j < i := hji
     rw [hA i j hji'.le, if_neg (ne_of_gt hji')]
   have hdet : A.det = 1 := by
     rw [Matrix.det_of_upperTriangular hT]
     exact Finset.prod_eq_one fun i _ => by rw [hA i i le_rfl, if_pos rfl]
-  have hadj : A.adjugate = A⁻¹ := by
-    rw [Matrix.inv_def, hdet, Ring.inverse_one, one_smul]
+  have hadj : A.adjugate = A⁻¹ := by rw [Matrix.inv_def, hdet, Ring.inverse_one, one_smul]
   have hU : IsUnit A.det := by rw [hdet]; exact isUnit_one
   haveI : Invertible A := Matrix.invertibleOfIsUnitDet A hU
   have hinvT : (A⁻¹).BlockTriangular id := Matrix.blockTriangular_inv_of_blockTriangular hT
@@ -203,16 +234,17 @@ theorem adj_lowId {A : Matrix (Fin r) (Fin r) ℂ} (hA : WlocSk.NB.LowId A) :
     · intro h
       exact absurd (Finset.mem_univ a) h
 
-theorem cF_low (c : WlocSk.NB.CI k r → ℂ) :
-    (∀ d a : Fin r, d < a → WlocSk.NB.cF c d a = 0) ∧ ∀ a, WlocSk.NB.cF c a a = 1 := by
+theorem cF_low (c : WlocSk.NB.CI k r → ℂ)
+    : (∀ d a : Fin r, d < a → WlocSk.NB.cF c d a = 0) ∧ ∀ a, WlocSk.NB.cF c a a = 1 := by
   obtain ⟨h1, h2⟩ := adj_lowId (WlocSk.NB.lowId_cA c)
   refine ⟨fun d a hda => ?_, fun a => ?_⟩
   · rw [WlocSk.NB.cF, conjTranspose_apply, h1 a d hda, star_zero]
   · rw [WlocSk.NB.cF, conjTranspose_apply, h2 a, star_one]
 
-theorem tri_conj (F Δ : Matrix (Fin r) (Fin r) ℂ) (hF : ∀ d a, d < a → F d a = 0) (hF1 : ∀ a, F a a = 1)
-    (b a : Fin r) (hΔ : ∀ c d : Fin r, b ≤ c → a ≤ d → (c, d) ≠ (b, a) → Δ c d = 0) :
-    (Fᴴ * Δ * F) b a = Δ b a := by
+theorem tri_conj
+    (F Δ : Matrix (Fin r) (Fin r) ℂ) (hF : ∀ d a, d < a → F d a = 0) (hF1 : ∀ a, F a a = 1)
+    (b a : Fin r) (hΔ : ∀ c d : Fin r, b ≤ c → a ≤ d → (c, d) ≠ (b, a) → Δ c d = 0)
+    : (Fᴴ * Δ * F) b a = Δ b a := by
   have hFz : ∀ c, c < b → star (F c b) = 0 := fun c hc => by rw [hF c b hc, star_zero]
   have hrow : ∀ d, a ≤ d → (Fᴴ * Δ) b d = if d = a then Δ b a else 0 := by
     intro d hd
@@ -237,16 +269,17 @@ theorem tri_conj (F Δ : Matrix (Fin r) (Fin r) ℂ) (hF : ∀ d a, d < a → F 
   · intro h
     exact absurd (Finset.mem_univ a) h
 
-theorem cK_skew (c : WlocSk.NB.CI k r → ℂ) (s : Fin r → ℝ) (i j : Fin r) :
-    star (WlocSk.NB.cK c s j i) = -WlocSk.NB.cK c s i j := by
+theorem cK_skew (c : WlocSk.NB.CI k r → ℂ) (s : Fin r → ℝ) (i j : Fin r)
+    : star (WlocSk.NB.cK c s j i) = - WlocSk.NB.cK c s i j := by
   unfold WlocSk.NB.cK
   rcases lt_trichotomy i j with h | rfl | h
   · simp [h, not_lt.2 h.le]
   · simp
   · simp [h, not_lt.2 h.le]
 
-theorem skew_conj (F Δ : Matrix (Fin r) (Fin r) ℂ) (hΔ : ∀ i j, star (Δ j i) = -Δ i j) (b a : Fin r) :
-    star ((Fᴴ * Δ * F) a b) = -(Fᴴ * Δ * F) b a := by
+theorem skew_conj
+    (F Δ : Matrix (Fin r) (Fin r) ℂ) (hΔ : ∀ i j, star (Δ j i) = - Δ i j) (b a : Fin r)
+    : star ((Fᴴ * Δ * F) a b) = - (Fᴴ * Δ * F) b a := by
   have hD : Δᴴ = -Δ := by
     ext i j
     rw [conjTranspose_apply, hΔ]
@@ -264,52 +297,80 @@ section TriBk
 
 variable {ι : Type} {r k : ℕ}
 
-theorem chart_difference_formula (cx cy : WlocSk.NB.CI k r → ℂ) (sx : Fin r → ℝ) :
-    WlocSk.NB.dlt (WlocSk.NB.phi0 cx sx) cy =
-      (WlocSk.NB.cF cy)ᴴ * ((WlocSk.NB.cF cx)ᴴ * (WlocSk.NB.cB cx * WlocSk.NB.cE cy)) +
-        (WlocSk.NB.cF cy)ᴴ * WlocSk.NB.cM cx sx * WlocSk.NB.cF cy := by
+theorem chart_difference_formula (cx cy : WlocSk.NB.CI k r → ℂ) (sx : Fin r → ℝ)
+    : WlocSk.NB.dlt (WlocSk.NB.phi0 cx sx) cy
+      = (WlocSk.NB.cF cy)ᴴ * ((WlocSk.NB.cF cx)ᴴ * (WlocSk.NB.cB cx * WlocSk.NB.cE cy))
+        + (WlocSk.NB.cF cy)ᴴ * WlocSk.NB.cM cx sx * WlocSk.NB.cF cy := by
   unfold WlocSk.NB.dlt WlocSk.NB.phi0
   rw [WlocSk.NB.bF_mk, WlocSk.NB.bB_mk, WlocSk.NB.bC_mk]
-  have e : (WlocSk.NB.cF cx)ᴴ * (WlocSk.NB.cC cx sx * WlocSk.NB.cF cy) = WlocSk.NB.cM cx sx * WlocSk.NB.cF cy := by
+  have e
+      : (WlocSk.NB.cF cx)ᴴ * (WlocSk.NB.cC cx sx * WlocSk.NB.cF cy)
+        = WlocSk.NB.cM cx sx * WlocSk.NB.cF cy := by
     unfold WlocSk.NB.cC
     rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, WlocSk.NB.cF_cA, Matrix.one_mul]
   rw [Matrix.mul_add (WlocSk.NB.cF cx)ᴴ, e, Matrix.mul_add, Matrix.mul_assoc (WlocSk.NB.cF cy)ᴴ]
 
-theorem kcore0 (cx cx' cy cy' : WlocSk.NB.CI k r → ℂ) (sx sx' : Fin r → ℝ) (b a : Fin r)
+theorem kcore0
+    (cx cx' cy cy' : WlocSk.NB.CI k r → ℂ) (sx sx' : Fin r → ℝ) (b a : Fin r)
     (hAx : WlocSk.NB.cA cx = WlocSk.NB.cA cx') (hBx : WlocSk.NB.cB cx = WlocSk.NB.cB cx')
     (hAy : WlocSk.NB.cA cy = WlocSk.NB.cA cy') (hBy : WlocSk.NB.cB cy = WlocSk.NB.cB cy')
-    (hΔ : ∀ c d : Fin r, b ≤ c → a ≤ d → (c, d) ≠ (b, a) → WlocSk.NB.cK cx sx c d = WlocSk.NB.cK cx' sx' c d) :
-    WlocSk.NB.dlt (WlocSk.NB.phi0 cx sx) cy = WlocSk.NB.dlt (WlocSk.NB.phi0 cx' sx') cy' +
-        (WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy ∧
-      ((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) b a =
-        WlocSk.NB.cK cx sx b a - WlocSk.NB.cK cx' sx' b a ∧
-      ∀ i j, star (((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) j i) =
-        -((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) i j := by
+    (hΔ : ∀ c d : Fin r,
+      b ≤ c → a ≤ d → (c, d) ≠ (b, a) → WlocSk.NB.cK cx sx c d = WlocSk.NB.cK cx' sx' c d)
+    : WlocSk.NB.dlt (WlocSk.NB.phi0 cx sx) cy
+        = WlocSk.NB.dlt (WlocSk.NB.phi0 cx' sx') cy'
+          + (WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy
+      ∧ ((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) b a
+        = WlocSk.NB.cK cx sx b a - WlocSk.NB.cK cx' sx' b a
+      ∧ ∀ i j,
+        star
+            (((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) j
+              i)
+          = - ((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) i
+            j := by
   have hFx : WlocSk.NB.cF cx = WlocSk.NB.cF cx' := by unfold WlocSk.NB.cF; rw [hAx]
   have hFy : WlocSk.NB.cF cy = WlocSk.NB.cF cy' := by unfold WlocSk.NB.cF; rw [hAy]
   have hEx : WlocSk.NB.cE cx = WlocSk.NB.cE cx' := by unfold WlocSk.NB.cE; rw [hBx, hFx]
   have hEy : WlocSk.NB.cE cy = WlocSk.NB.cE cy' := by unfold WlocSk.NB.cE; rw [hBy, hFy]
-  have hM : WlocSk.NB.cM cx sx = WlocSk.NB.cM cx' sx' + (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') := by
+  have hM
+      : WlocSk.NB.cM cx sx
+        = WlocSk.NB.cM cx' sx' + (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') := by
     unfold WlocSk.NB.cM; rw [hEx]; abel
-  have hskew : ∀ i j, star ((WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') j i) =
-      -(WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') i j := fun i j => by
+  have hskew
+      : ∀ i j,
+        star ((WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') j i)
+          = - (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') i j := fun i j => by
     rw [Matrix.sub_apply, Matrix.sub_apply, star_sub, cK_skew, cK_skew, neg_sub_neg, neg_sub]
-  have hmain : WlocSk.NB.dlt (WlocSk.NB.phi0 cx sx) cy = WlocSk.NB.dlt (WlocSk.NB.phi0 cx' sx') cy' +
-      (WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy := by
-    rw [chart_difference_formula, chart_difference_formula, hM, ← hFx, ← hBx, ← hFy, ← hEy, Matrix.mul_add, Matrix.add_mul, add_assoc]
-  have htri : ((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) b a =
-      WlocSk.NB.cK cx sx b a - WlocSk.NB.cK cx' sx' b a := by
+  have hmain
+      : WlocSk.NB.dlt (WlocSk.NB.phi0 cx sx) cy
+        = WlocSk.NB.dlt (WlocSk.NB.phi0 cx' sx') cy'
+          + (WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy := by
+    rw [chart_difference_formula, chart_difference_formula, hM, ← hFx, ← hBx, ← hFy, ← hEy,
+      Matrix.mul_add, Matrix.add_mul, add_assoc]
+  have htri
+      : ((WlocSk.NB.cF cy)ᴴ * (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') * WlocSk.NB.cF cy) b a
+        = WlocSk.NB.cK cx sx b a - WlocSk.NB.cK cx' sx' b a := by
     obtain ⟨hF0, hF1⟩ := cF_low (k := k) cy
     refine tri_conj _ _ hF0 hF1 b a fun c d hbc had hne => ?_
     rw [Matrix.sub_apply, sub_eq_zero]
     exact hΔ c d hbc had hne
-  exact ⟨hmain, htri, fun i j => skew_conj (WlocSk.NB.cF cy) (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') hskew i j⟩
+  exact ⟨
+    hmain,
+    htri,
+    fun i j => skew_conj (WlocSk.NB.cF cy) (WlocSk.NB.cK cx sx - WlocSk.NB.cK cx' sx') hskew i j
+  ⟩
 
-theorem cK_agree (T : ℝ) (x x' : ∀ q : CBlk r, CSpc ι k q) (v : ι) (b a : Fin r)
-    (hK : ∀ q : LsNc5.LtPair r, b.val + a.val < q.1.1.val + q.1.2.val → x (Sum.inr (Sum.inl q)) = x' (Sum.inr (Sum.inl q)))
-    (hD : ∀ c : Fin r, b.val + a.val < 2 * c.val → x (Sum.inr (Sum.inr c)) = x' (Sum.inr (Sum.inr c)))
-    (c d : Fin r) (hbc : b ≤ c) (had : a ≤ d) (hne : (c, d) ≠ (b, a)) :
-    WlocSk.NB.cK (chAt T x v).1 (chAt T x v).2 c d = WlocSk.NB.cK (chAt T x' v).1 (chAt T x' v).2 c d := by
+theorem cK_agree
+    (T : ℝ)
+    (x x' : ∀ q : CBlk r, CSpc ι k q)
+    (v : ι)
+    (b a : Fin r)
+    (hK : ∀ q : LsNc5.LtPair r,
+      b.val + a.val < q.1.1.val + q.1.2.val → x (Sum.inr (Sum.inl q)) = x' (Sum.inr (Sum.inl q)))
+    (hD
+      : ∀ c : Fin r, b.val + a.val < 2 * c.val → x (Sum.inr (Sum.inr c)) = x' (Sum.inr (Sum.inr c)))
+    (c d : Fin r) (hbc : b ≤ c) (had : a ≤ d) (hne : (c, d) ≠ (b, a))
+    : WlocSk.NB.cK (chAt T x v).1 (chAt T x v).2 c d
+      = WlocSk.NB.cK (chAt T x' v).1 (chAt T x' v).2 c d := by
   have hlt : b.val + a.val < c.val + d.val := by
     have h1 : b.val ≤ c.val := hbc
     have h2 : a.val ≤ d.val := had
@@ -328,10 +389,13 @@ theorem cK_agree (T : ℝ) (x x' : ∀ q : CBlk r, CSpc ι k q) (v : ι) (b a : 
     show (((x (Sum.inr (Sum.inr c)) : ι → ℝ) v : ℝ) : ℂ) * Complex.I = (((x' (Sum.inr (Sum.inr c)) : ι → ℝ) v : ℝ) : ℂ) * Complex.I
     rw [hD c (by omega)]
 
-theorem cAB_agree (T : ℝ) (x x' : ∀ q : CBlk r, CSpc ι k q) (v : ι)
-    (hX : ∀ q : LsNc5.LtPair r, x (Sum.inl (Sum.inl q)) = x' (Sum.inl (Sum.inl q)))
-    (hR : ∀ c : Fin r, x (Sum.inl (Sum.inr c)) = x' (Sum.inl (Sum.inr c))) :
-    WlocSk.NB.cA (chAt T x v).1 = WlocSk.NB.cA (chAt T x' v).1 ∧ WlocSk.NB.cB (chAt T x v).1 = WlocSk.NB.cB (chAt T x' v).1 := by
+theorem cAB_agree
+    (T : ℝ)
+    (x x' : ∀ q : CBlk r, CSpc ι k q)
+    (v : ι) (hX : ∀ q : LsNc5.LtPair r, x (Sum.inl (Sum.inl q)) = x' (Sum.inl (Sum.inl q)))
+    (hR : ∀ c : Fin r, x (Sum.inl (Sum.inr c)) = x' (Sum.inl (Sum.inr c)))
+    : WlocSk.NB.cA (chAt T x v).1 = WlocSk.NB.cA (chAt T x' v).1
+      ∧ WlocSk.NB.cB (chAt T x v).1 = WlocSk.NB.cB (chAt T x' v).1 := by
   refine ⟨?_, ?_⟩
   · funext i l
     simp only [WlocSk.NB.cA]
@@ -343,19 +407,22 @@ theorem cAB_agree (T : ℝ) (x x' : ∀ q : CBlk r, CSpc ι k q) (v : ι)
     show (x (Sum.inl (Sum.inr i)) : ι → Fin (k + 1) → ℂ) v l / sclT T l = (x' (Sum.inl (Sum.inr i)) : ι → Fin (k + 1) → ℂ) v l / sclT T l
     rw [hR i]
 
-theorem bk_tri {T : ℝ} (hT : 0 < T) (p : CBlk r) (x x' y y' : ∀ q : CBlk r, CSpc ι k q)
-    (hxy : ∀ q, cHgt q < cHgt p → x q = x' q ∧ y q = y' q) : Bk T p x y = Bk T p x' y' := by
+theorem bk_tri
+    {T : ℝ} (hT : 0 < T)
+    (p : CBlk r) (x x' y y' : ∀ q : CBlk r, CSpc ι k q)
+    (hxy : ∀ q, cHgt q < cHgt p → x q = x' q ∧ y q = y' q)
+    : Bk T p x y = Bk T p x' y' := by
   have ag : ∀ q, cHgt q < cHgt p → x q = x' q := fun q h => (hxy q h).1
   have ag' : ∀ q, cHgt q < cHgt p → y q = y' q := fun q h => (hxy q h).2
   rcases p with ((p | b) | (p | a))
-  ·
-    obtain ⟨⟨b, a⟩, hba⟩ := p
+  · obtain ⟨⟨b, a⟩, hba⟩ := p
     funext v
     show WlocSk.NB.shG (ph0 (chAt T x v)) (chAt T y v).1 (Sum.inl ⟨(b, a), hba⟩) - x (Sum.inl (Sum.inl ⟨(b, a), hba⟩)) v =
       WlocSk.NB.shG (ph0 (chAt T x' v)) (chAt T y' v).1 (Sum.inl ⟨(b, a), hba⟩) - x' (Sum.inl (Sum.inl ⟨(b, a), hba⟩)) v
     simp only [WlocSk.NB.shG, ph0, WlocSk.NB.phi0, WlocSk.NB.bA_mk]
     rw [sub_eq_sub_iff_sub_eq_sub, ← Finset.sum_sub_distrib, Finset.sum_eq_single a]
-    · simp only [if_pos hba, WlocSk.NB.cA, dif_pos hba, dif_neg (lt_irrefl a), if_pos rfl, ite_true, mul_one]
+    · simp only [if_pos hba, WlocSk.NB.cA, dif_pos hba, dif_neg (lt_irrefl a), if_pos rfl, ite_true,
+        mul_one]
       rfl
     · intro c _ hca
       by_cases hbc : b < c
@@ -372,19 +439,22 @@ theorem bk_tri {T : ℝ} (hT : 0 < T) (p : CBlk r) (x x' y y' : ∀ q : CBlk r, 
         · simp only [WlocSk.NB.cA, dif_neg (not_lt.2 h.le), if_neg (ne_of_gt h), mul_zero, sub_self]
       · simp only [if_neg hbc, sub_self]
     · intro h; exact absurd (Finset.mem_univ a) h
-  ·
-    funext v j
+  · funext v j
     have hsc := sclT_ne hT (k := k) j
-    have hS : ∀ xx yy : ∀ q : CBlk r, CSpc ι k q, Bk T (Sum.inl (Sum.inr b)) xx yy v j =
-        sclT T j * ∑ c, (if b < c then WlocSk.NB.cA (chAt T xx v).1 b c * WlocSk.NB.cB (chAt T yy v).1 c j else 0) := by
-      intro xx yy
-      show sclT T j * WlocSk.NB.shG (ph0 (chAt T xx v)) (chAt T yy v).1 (Sum.inr (Sum.inl (b, j))) -
-        xx (Sum.inl (Sum.inr b)) v j = _
-      simp only [WlocSk.NB.shG, ph0, WlocSk.NB.phi0, WlocSk.NB.bA_mk, WlocSk.NB.bB_mk]
-      have e : sclT T j * WlocSk.NB.cB (chAt T xx v).1 b j = xx (Sum.inl (Sum.inr b)) v j := by
-        show sclT T j * (xx (Sum.inl (Sum.inr b)) v j / sclT T j) = _
-        field_simp
-      rw [mul_add, e, add_sub_cancel_right]
+    have hS
+        : ∀ xx yy : ∀ q : CBlk r, CSpc ι k q,
+          Bk T (Sum.inl (Sum.inr b)) xx yy v j
+            = sclT T j
+              * ∑ c, (if b < c then WlocSk.NB.cA (chAt T xx v).1 b c * WlocSk.NB.cB (chAt T yy v).1 c j else 0) :=
+      by
+        intro xx yy
+        show sclT T j * WlocSk.NB.shG (ph0 (chAt T xx v)) (chAt T yy v).1 (Sum.inr (Sum.inl (b, j))) -
+          xx (Sum.inl (Sum.inr b)) v j = _
+        simp only [WlocSk.NB.shG, ph0, WlocSk.NB.phi0, WlocSk.NB.bA_mk, WlocSk.NB.bB_mk]
+        have e : sclT T j * WlocSk.NB.cB (chAt T xx v).1 b j = xx (Sum.inl (Sum.inr b)) v j := by
+          show sclT T j * (xx (Sum.inl (Sum.inr b)) v j / sclT T j) = _
+          field_simp
+        rw [mul_add, e, add_sub_cancel_right]
     rw [hS, hS]
     congr 1
     refine Finset.sum_congr rfl fun c _ => ?_
@@ -398,22 +468,38 @@ theorem bk_tri {T : ℝ} (hT : 0 < T) (p : CBlk r) (x x' y y' : ∀ q : CBlk r, 
         x' (Sum.inl (Sum.inl ⟨(b, c), hbc⟩)) v * (y' (Sum.inl (Sum.inr c)) v j / sclT T j)
       rw [e1, e2]
     · simp only [if_neg hbc]
-  ·
-    obtain ⟨⟨b, a⟩, hba⟩ := p
+  · obtain ⟨⟨b, a⟩, hba⟩ := p
     funext v
-    have hX : ∀ q : LsNc5.LtPair r, x (Sum.inl (Sum.inl q)) = x' (Sum.inl (Sum.inl q)) ∧
-        y (Sum.inl (Sum.inl q)) = y' (Sum.inl (Sum.inl q)) := fun q =>
-      hxy _ (by show q.1.2.val - q.1.1.val < 2 * r + 1 + (2 * r - (b.val + a.val)); have := q.1.2.isLt; omega)
-    have hR : ∀ c : Fin r, x (Sum.inl (Sum.inr c)) = x' (Sum.inl (Sum.inr c)) ∧
-        y (Sum.inl (Sum.inr c)) = y' (Sum.inl (Sum.inr c)) := fun c =>
+    have hX
+        : ∀ q : LsNc5.LtPair r,
+          x (Sum.inl (Sum.inl q)) = x' (Sum.inl (Sum.inl q))
+            ∧ y (Sum.inl (Sum.inl q)) = y' (Sum.inl (Sum.inl q)) := fun q =>
+      hxy _ (by
+        show q.1.2.val - q.1.1.val < 2 * r + 1 + (2 * r - (b.val + a.val))
+        have := q.1.2.isLt
+        omega)
+    have hR
+        : ∀ c : Fin r,
+          x (Sum.inl (Sum.inr c)) = x' (Sum.inl (Sum.inr c))
+            ∧ y (Sum.inl (Sum.inr c)) = y' (Sum.inl (Sum.inr c)) := fun c =>
       hxy _ (by show r + (r - c.val) < 2 * r + 1 + (2 * r - (b.val + a.val)); omega)
-    have hK : ∀ q : LsNc5.LtPair r, b.val + a.val < q.1.1.val + q.1.2.val →
-        x (Sum.inr (Sum.inl q)) = x' (Sum.inr (Sum.inl q)) := fun q hq =>
-      ag _ (by show 2 * r + 1 + (2 * r - (q.1.1.val + q.1.2.val)) < 2 * r + 1 + (2 * r - (b.val + a.val))
-               have := q.1.1.isLt; have := q.1.2.isLt; omega)
-    have hD : ∀ c : Fin r, b.val + a.val < 2 * c.val → x (Sum.inr (Sum.inr c)) = x' (Sum.inr (Sum.inr c)) :=
-      fun c hc => ag _ (by show 2 * r + 1 + (2 * r - 2 * c.val) < 2 * r + 1 + (2 * r - (b.val + a.val))
-                           have := c.isLt; omega)
+    have hK
+        : ∀ q : LsNc5.LtPair r,
+          b.val + a.val < q.1.1.val + q.1.2.val
+            → x (Sum.inr (Sum.inl q)) = x' (Sum.inr (Sum.inl q)) := fun q hq =>
+      ag _ (by
+        show 2 * r + 1 + (2 * r - (q.1.1.val + q.1.2.val)) < 2 * r + 1 + (2 * r - (b.val + a.val))
+        have := q.1.1.isLt
+        have := q.1.2.isLt
+        omega)
+    have hD
+        : ∀ c : Fin r,
+          b.val + a.val < 2 * c.val
+            → x (Sum.inr (Sum.inr c)) = x' (Sum.inr (Sum.inr c)) := fun c hc =>
+      ag _ (by
+        show 2 * r + 1 + (2 * r - 2 * c.val) < 2 * r + 1 + (2 * r - (b.val + a.val))
+        have := c.isLt
+        omega)
     obtain ⟨hAx, hBx⟩ := cAB_agree T x x' v (fun q => (hX q).1) (fun c => (hR c).1)
     obtain ⟨hAy, hBy⟩ := cAB_agree T y y' v (fun q => (hX q).2) (fun c => (hR c).2)
     obtain ⟨h1, h2, h3⟩ := kcore0 _ _ _ _ _ _ b a hAx hBx hAy hBy (cK_agree T x x' v b a hK hD)
@@ -423,27 +509,45 @@ theorem bk_tri {T : ℝ} (hT : 0 < T) (p : CBlk r) (x x' y y' : ∀ q : CBlk r, 
         x' (Sum.inr (Sum.inl ⟨(b, a), hba⟩)) v
     simp only [ph0] at *
     rw [h1, Matrix.add_apply, Matrix.add_apply, star_add, h3 b a, h2]
-    have e1 : WlocSk.NB.cK (chAt T x v).1 (chAt T x v).2 b a = x (Sum.inr (Sum.inl ⟨(b, a), hba⟩)) v := by
+    have e1
+        : WlocSk.NB.cK (chAt T x v).1 (chAt T x v).2 b a
+          = x (Sum.inr (Sum.inl ⟨(b, a), hba⟩)) v := by
       simp only [WlocSk.NB.cK, dif_pos hba]; rfl
-    have e2 : WlocSk.NB.cK (chAt T x' v).1 (chAt T x' v).2 b a = x' (Sum.inr (Sum.inl ⟨(b, a), hba⟩)) v := by
+    have e2
+        : WlocSk.NB.cK (chAt T x' v).1 (chAt T x' v).2 b a
+          = x' (Sum.inr (Sum.inl ⟨(b, a), hba⟩)) v := by
       simp only [WlocSk.NB.cK, dif_pos hba]; rfl
     rw [e1, e2]
     ring
-  ·
-    funext v
-    have hX : ∀ q : LsNc5.LtPair r, x (Sum.inl (Sum.inl q)) = x' (Sum.inl (Sum.inl q)) ∧
-        y (Sum.inl (Sum.inl q)) = y' (Sum.inl (Sum.inl q)) := fun q =>
-      hxy _ (by show q.1.2.val - q.1.1.val < 2 * r + 1 + (2 * r - 2 * a.val); have := q.1.2.isLt; omega)
-    have hR : ∀ c : Fin r, x (Sum.inl (Sum.inr c)) = x' (Sum.inl (Sum.inr c)) ∧
-        y (Sum.inl (Sum.inr c)) = y' (Sum.inl (Sum.inr c)) := fun c =>
+  · funext v
+    have hX
+        : ∀ q : LsNc5.LtPair r,
+          x (Sum.inl (Sum.inl q)) = x' (Sum.inl (Sum.inl q))
+            ∧ y (Sum.inl (Sum.inl q)) = y' (Sum.inl (Sum.inl q)) := fun q =>
+      hxy _
+        (by show q.1.2.val - q.1.1.val < 2 * r + 1 + (2 * r - 2 * a.val); have := q.1.2.isLt; omega)
+    have hR
+        : ∀ c : Fin r,
+          x (Sum.inl (Sum.inr c)) = x' (Sum.inl (Sum.inr c))
+            ∧ y (Sum.inl (Sum.inr c)) = y' (Sum.inl (Sum.inr c)) := fun c =>
       hxy _ (by show r + (r - c.val) < 2 * r + 1 + (2 * r - 2 * a.val); omega)
-    have hK : ∀ q : LsNc5.LtPair r, a.val + a.val < q.1.1.val + q.1.2.val →
-        x (Sum.inr (Sum.inl q)) = x' (Sum.inr (Sum.inl q)) := fun q hq =>
-      ag _ (by show 2 * r + 1 + (2 * r - (q.1.1.val + q.1.2.val)) < 2 * r + 1 + (2 * r - 2 * a.val)
-               have := q.1.1.isLt; have := q.1.2.isLt; omega)
-    have hD : ∀ c : Fin r, a.val + a.val < 2 * c.val → x (Sum.inr (Sum.inr c)) = x' (Sum.inr (Sum.inr c)) :=
-      fun c hc => ag _ (by show 2 * r + 1 + (2 * r - 2 * c.val) < 2 * r + 1 + (2 * r - 2 * a.val)
-                           have := c.isLt; omega)
+    have hK
+        : ∀ q : LsNc5.LtPair r,
+          a.val + a.val < q.1.1.val + q.1.2.val
+            → x (Sum.inr (Sum.inl q)) = x' (Sum.inr (Sum.inl q)) := fun q hq =>
+      ag _ (by
+        show 2 * r + 1 + (2 * r - (q.1.1.val + q.1.2.val)) < 2 * r + 1 + (2 * r - 2 * a.val)
+        have := q.1.1.isLt
+        have := q.1.2.isLt
+        omega)
+    have hD
+        : ∀ c : Fin r,
+          a.val + a.val < 2 * c.val
+            → x (Sum.inr (Sum.inr c)) = x' (Sum.inr (Sum.inr c)) := fun c hc =>
+      ag _ (by
+        show 2 * r + 1 + (2 * r - 2 * c.val) < 2 * r + 1 + (2 * r - 2 * a.val)
+        have := c.isLt
+        omega)
     obtain ⟨hAx, hBx⟩ := cAB_agree T x x' v (fun q => (hX q).1) (fun c => (hR c).1)
     obtain ⟨hAy, hBy⟩ := cAB_agree T y y' v (fun q => (hX q).2) (fun c => (hR c).2)
     obtain ⟨h1, h2, -⟩ := kcore0 _ _ _ _ _ _ a a hAx hBx hAy hBy (cK_agree T x x' v a a hK hD)
@@ -460,37 +564,43 @@ end TriBk
 
 section Assemble
 
-theorem mOf_one {n r k : ℕ} (hn : n = 2 * r + k + 1) (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ)
-    (w : Fin k → Fin n → ℂ) (z : Fin n → ℂ) {T : ℝ} (hT : 0 < T)
+theorem mOf_one
+    {n r k : ℕ} (hn : n = 2 * r + k + 1) (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ)
+    (w : Fin k → Fin n → ℂ) (z : Fin n → ℂ)
+    {T : ℝ} (hT : 0 < T)
     (hee : ∀ a b, hJ ε (e a) (e b) = 0) (hff : ∀ a b, hJ ε (f a) (f b) = 0)
     (hef : ∀ a b, hJ ε (e a) (f b) = if a = b then 1 else 0)
-    (hww : ∀ a b, hJ ε (w a) (w b) = if a = b then 1 else 0)
-    (hew : ∀ c a, hJ ε (e c) (w a) = 0) (hfw : ∀ c a, hJ ε (f c) (w a) = 0)
-    (hez : ∀ a, hJ ε (e a) z = 0) (hfz : ∀ a, hJ ε (f a) z = 0) (hzz : hJ ε z z = -(T : ℂ))
-    (hzw : ∀ a, hJ ε z (w a) = 0) : mOf hn ε e f w (z0v T z) 1 = 1 := by
+    (hww : ∀ a b, hJ ε (w a) (w b) = if a = b then 1 else 0) (hew : ∀ c a, hJ ε (e c) (w a) = 0)
+    (hfw : ∀ c a, hJ ε (f c) (w a) = 0) (hez : ∀ a, hJ ε (e a) z = 0) (hfz : ∀ a, hJ ε (f a) z = 0)
+    (hzz : hJ ε z z = -(T : ℂ)) (hzw : ∀ a, hJ ε z (w a) = 0)
+    : mOf hn ε e f w (z0v T z) 1 = 1 := by
   subst hn
   have hFJ := isFrameJ_of hT hee hff hef hww hew hfw hez hfz hzz hzw
   show Qi ε e f w (z0v T z) * uMat 1 * Qm e f w (z0v T z) = 1
   rw [uMat_one, Matrix.mul_one, Qi_mul_Qm hFJ]
 
-theorem blkOf_one {ι : Type} {r k : ℕ} (T : ℝ) :
-    blkOf (ι := ι) (r := r) (k := k) T (fun _ => 1) = 0 := by
+theorem blkOf_one {ι : Type} {r k : ℕ} (T : ℝ)
+    : blkOf (ι := ι) (r := r) (k := k) T (fun _ => 1) = 0 := by
   funext p
   rcases p with ((⟨⟨b, a⟩, hba⟩ | b) | (⟨⟨b, a⟩, hba⟩ | a))
   · funext v
     show (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (eI k r b) (eI k r a) = 0
     rw [Matrix.one_apply, if_neg]
-    intro h; exact (ne_of_lt hba) (by have := congrArg Fin.val h; simp [eI] at this; exact Fin.ext this)
+    intro h
+    exact (ne_of_lt hba) (by have := congrArg Fin.val h; simp [eI] at this; exact Fin.ext this)
   · funext v j
     show sclT T j * (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (eI k r b) (wI k r j) = 0
     rw [Matrix.one_apply, if_neg, mul_zero]
-    intro h; have := congrArg Fin.val h; simp [eI, wI] at this; omega
+    intro h
+    have := congrArg Fin.val h
+    simp [eI, wI] at this
+    omega
   · funext v
     show WlocSk.NB.kof 1 b a = 0
     have hm : WlocSk.NB.mof (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) = 0 := by
       funext i l
-      simp only [WlocSk.NB.mof, WlocSk.NB.bF, WlocSk.NB.bC, Matrix.mul_apply, Matrix.conjTranspose_apply,
-        Matrix.one_apply, Matrix.zero_apply]
+      simp only [WlocSk.NB.mof, WlocSk.NB.bF, WlocSk.NB.bC, Matrix.mul_apply,
+        Matrix.conjTranspose_apply, Matrix.one_apply, Matrix.zero_apply]
       refine Finset.sum_eq_zero fun c _ => ?_
       have hne : eI k r c ≠ esI k r l := by
         intro h; have := congrArg Fin.val h; simp [eI, esI] at this; omega
@@ -499,8 +609,8 @@ theorem blkOf_one {ι : Type} {r k : ℕ} (T : ℝ) :
   · funext v
     show (WlocSk.NB.mof (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) a a).im = 0
     have hm : WlocSk.NB.mof (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) a a = 0 := by
-      simp only [WlocSk.NB.mof, WlocSk.NB.bF, WlocSk.NB.bC, Matrix.mul_apply, Matrix.conjTranspose_apply,
-        Matrix.one_apply]
+      simp only [WlocSk.NB.mof, WlocSk.NB.bF, WlocSk.NB.bC, Matrix.mul_apply,
+        Matrix.conjTranspose_apply, Matrix.one_apply]
       refine Finset.sum_eq_zero fun c _ => ?_
       have hne : eI k r c ≠ esI k r a := by
         intro h; have := congrArg Fin.val h; simp [eI, esI] at this; omega
@@ -509,15 +619,18 @@ theorem blkOf_one {ι : Type} {r k : ℕ} (T : ℝ) :
 
 variable {D : D7} (X : HidaSetting D)
 
-def mX (u : D.what₂.Word) (s : X.B.I.Ginf) (v : InfinitePlace X.B.I.F) :
-    Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ :=
-  mOf (nX X) (X.B.I.ε v) (eV X v) (ProductExactness.pV X v) (X.wfr u v) (z0v (Tw u) (ProductExactness.zV X u v)) (s v)
+def mX (u : D.what₂.Word) (s : X.B.I.Ginf) (v : InfinitePlace X.B.I.F)
+    : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ :=
+  mOf (nX X) (X.B.I.ε v) (eV X v) (ProductExactness.pV X v) (X.wfr u v)
+    (z0v (Tw u) (ProductExactness.zV X u v)) (s v)
 
-theorem blk_eq (u : D.what₂.Word) (s : X.B.I.Ginf) (hs : s ∈ X.NinfU u) :
-    blk X u s = blkOf (Tw u) (mX X u s) := by
-  have mX_facts : ∀ (u : D.what₂.Word) (v : InfinitePlace X.B.I.F), _ := fun u v => mOf_facts (nX X) (X.B.I.ε v) (eV X v)
-    (ProductExactness.pV X v) (X.wfr u v) (ProductExactness.zV X u v) (ProductExactness.Tw_pos u) (fX_ee X v) (fX_ff X v) (fX_ef X v) (fX_ww X u v)
-    (fX_ew X u v) (fX_fw X u v) (fX_ez X u v) (fX_fz X u v) (frame_real_z_z_eq_neg X u v) (fX_zw X u v)
+theorem blk_eq (u : D.what₂.Word) (s : X.B.I.Ginf) (hs : s ∈ X.NinfU u)
+    : blk X u s = blkOf (Tw u) (mX X u s) := by
+  have mX_facts : ∀ (u : D.what₂.Word) (v : InfinitePlace X.B.I.F), _ := fun u v =>
+    mOf_facts (nX X) (X.B.I.ε v) (eV X v) (ProductExactness.pV X v) (X.wfr u v)
+      (ProductExactness.zV X u v) (ProductExactness.Tw_pos u) (fX_ee X v) (fX_ff X v) (fX_ef X v)
+      (fX_ww X u v) (fX_ew X u v) (fX_fw X u v) (fX_ez X u v) (fX_fz X u v)
+      (frame_real_z_z_eq_neg X u v) (fX_zw X u v)
   funext p
   rcases p with ((⟨⟨b, a⟩, hba⟩ | b) | (⟨⟨b, a⟩, hba⟩ | a))
   · funext v
@@ -540,12 +653,14 @@ theorem blk_eq (u : D.what₂.Word) (s : X.B.I.Ginf) (hs : s ∈ X.NinfU u) :
     obtain ⟨-, -, -, -, -, hM⟩ := mX_facts u v
     show (LsNc5.mMat X v s b a - star (LsNc5.mMat X v s a b)) / 2 = WlocSk.NB.kof (mX X u s v) b a
     have e : LsNc5.mMat X v s = WlocSk.NB.mof (mX X u s v) := hM (s v) (hs v)
-    rw [e]; rfl
+    rw [e]
+    rfl
   · funext v
     obtain ⟨-, -, -, -, -, hM⟩ := mX_facts u v
     show (LsNc5.mMat X v s a a).im = WlocSk.NB.psiR (mX X u s v) a
     have e : LsNc5.mMat X v s = WlocSk.NB.mof (mX X u s v) := hM (s v) (hs v)
-    rw [e]; rfl
+    rw [e]
+    rfl
 
 end Assemble
 
@@ -553,36 +668,61 @@ section Meas
 
 variable {r k : ℕ}
 
-theorem cont_dlt : Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
-    WlocSk.NB.dlt mc.1 mc.2 := by
-  have hent : ∀ i j : Fin (2 * r + k + 1), Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ ×
-      (WlocSk.NB.CI k r → ℂ) => mc.1 i j := fun i j =>
+theorem cont_dlt
+    : Continuous
+      fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+        WlocSk.NB.dlt mc.1 mc.2 := by
+  have hent
+      : ∀ i j : Fin (2 * r + k + 1),
+        Continuous
+          fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+            mc.1 i j := fun i j =>
     (continuous_apply j).comp ((continuous_apply i).comp continuous_fst)
-  have hbB : Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
-      WlocSk.NB.bB mc.1 := continuous_pi fun a => continuous_pi fun j => hent _ _
-  have hbC : Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
-      WlocSk.NB.bC mc.1 := continuous_pi fun a => continuous_pi fun j => hent _ _
-  have hbF : Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
-      WlocSk.NB.bF mc.1 := continuous_pi fun a => continuous_pi fun j => hent _ _
-  have hcE := WlocSk.NB.continuous_cE.comp (continuous_snd (X := Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (Y := WlocSk.NB.CI k r → ℂ))
-  have hcF := WlocSk.NB.continuous_cF.comp (continuous_snd (X := Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (Y := WlocSk.NB.CI k r → ℂ))
+  have hbB : Continuous
+      fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+        WlocSk.NB.bB mc.1 :=
+    continuous_pi fun a => continuous_pi fun j => hent _ _
+  have hbC : Continuous
+      fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+        WlocSk.NB.bC mc.1 :=
+    continuous_pi fun a => continuous_pi fun j => hent _ _
+  have hbF : Continuous
+      fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+        WlocSk.NB.bF mc.1 :=
+    continuous_pi fun a => continuous_pi fun j => hent _ _
+  have hcE :=
+    WlocSk.NB.continuous_cE.comp (continuous_snd
+      (X := Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (Y := WlocSk.NB.CI k r → ℂ))
+  have hcF :=
+    WlocSk.NB.continuous_cF.comp (continuous_snd
+      (X := Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (Y := WlocSk.NB.CI k r → ℂ))
   unfold WlocSk.NB.dlt
   exact hcF.matrix_conjTranspose.matrix_mul (hbF.matrix_conjTranspose.matrix_mul
     ((hbB.matrix_mul hcE).add (hbC.matrix_mul hcF)))
 
-theorem cont_shG (i : WlocSk.NB.CI k r) :
-    Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
-      WlocSk.NB.shG mc.1 mc.2 i := by
-  have hent : ∀ i j : Fin (2 * r + k + 1), Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ ×
-      (WlocSk.NB.CI k r → ℂ) => mc.1 i j := fun i j =>
+theorem cont_shG (i : WlocSk.NB.CI k r)
+    : Continuous
+      fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+        WlocSk.NB.shG mc.1 mc.2 i := by
+  have hent
+      : ∀ i j : Fin (2 * r + k + 1),
+        Continuous
+          fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+            mc.1 i j := fun i j =>
     (continuous_apply j).comp ((continuous_apply i).comp continuous_fst)
-  have hcA : ∀ a b, Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
-      WlocSk.NB.cA mc.2 a b := fun a b =>
-    (continuous_apply b).comp ((continuous_apply a).comp (WlocSk.NB.continuous_cA.comp continuous_snd))
-  have hcB : ∀ a j, Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
-      WlocSk.NB.cB mc.2 a j := fun a j => (continuous_apply _).comp continuous_snd
+  have hcA
+      : ∀ a b,
+        Continuous
+          fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+            WlocSk.NB.cA mc.2 a b := fun a b =>
+    (continuous_apply b).comp
+      ((continuous_apply a).comp (WlocSk.NB.continuous_cA.comp continuous_snd))
+  have hcB
+      : ∀ a j,
+        Continuous
+          fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+            WlocSk.NB.cB mc.2 a j := fun a j =>
+    (continuous_apply _).comp continuous_snd
   rcases i with p | q | p
   · show Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
       ∑ c, if p.1.1 < c then WlocSk.NB.bA mc.1 p.1.1 c * WlocSk.NB.cA mc.2 c p.1.2 else 0
@@ -598,94 +738,140 @@ theorem cont_shG (i : WlocSk.NB.CI k r) :
     · simp only [if_neg h]; exact continuous_const
   · show Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
       (WlocSk.NB.dlt mc.1 mc.2 p.1.1 p.1.2 - star (WlocSk.NB.dlt mc.1 mc.2 p.1.2 p.1.1)) / 2
-    have h1 : ∀ a b : Fin r, Continuous fun mc : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ ×
-        (WlocSk.NB.CI k r → ℂ) => WlocSk.NB.dlt mc.1 mc.2 a b := fun a b =>
+    have h1
+        : ∀ a b : Fin r,
+          Continuous
+            fun mc
+                : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ × (WlocSk.NB.CI k r → ℂ) =>
+              WlocSk.NB.dlt mc.1 mc.2 a b := fun a b =>
       (continuous_apply b).comp ((continuous_apply a).comp cont_dlt)
     exact ((h1 _ _).sub (h1 _ _).star).div_const 2
 
 variable {ι : Type}
 
-theorem meas_chAt (T : ℝ) (v : ι) : Measurable (fun x : (∀ q : CBlk r, CSpc ι k q) => chAt T x v) := by
+theorem meas_chAt (T : ℝ) (v : ι)
+    : Measurable (fun x : (∀ q : CBlk r, CSpc ι k q) => chAt T x v) := by
   refine Measurable.prodMk (Measurable.of_eval fun c => ?_) (Measurable.of_eval fun a => ?_)
   · rcases c with p | ⟨b, j⟩ | p
     · exact (measurable_pi_apply v).comp (measurable_pi_apply (Sum.inl (Sum.inl p) : CBlk r))
-    · exact ((measurable_pi_apply j).comp ((measurable_pi_apply v).comp
-        (measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r)))).div_const _
+    · exact ((measurable_pi_apply j).comp
+        ((measurable_pi_apply v).comp
+          (measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r)))).div_const _
     · exact (measurable_pi_apply v).comp (measurable_pi_apply (Sum.inr (Sum.inl p) : CBlk r))
   · exact (measurable_pi_apply v).comp (measurable_pi_apply (Sum.inr (Sum.inr a) : CBlk r))
 
 set_option maxHeartbeats 800000 in
-theorem meas_Bk (T : ℝ) (p : CBlk r) :
-    Measurable (fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) => Bk T p z.1 z.2) := by
+theorem meas_Bk (T : ℝ) (p : CBlk r)
+    : Measurable (fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
+      Bk T p z.1 z.2) := by
   haveI : SecondCountableTopology ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) := inferInstance
   haveI : OpensMeasurableSpace (((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ))) :=
     inferInstance
-  have hφ : Continuous fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-      ((WlocSk.NB.phi0 cc.1.1 cc.1.2 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ), cc.2.1) :=
-    (WlocSk.NB.continuous_nilpotent_chart.comp continuous_fst).prodMk (continuous_fst.comp continuous_snd)
-  have hmc : ∀ v : ι, Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
-      (chAt T z.1 v, chAt T z.2 v) := fun v =>
+  have hφ : Continuous
+      fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) => (
+        (WlocSk.NB.phi0 cc.1.1 cc.1.2 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ),
+        cc.2.1
+      ) :=
+    (WlocSk.NB.continuous_nilpotent_chart.comp continuous_fst).prodMk
+      (continuous_fst.comp continuous_snd)
+  have hmc
+      : ∀ v : ι,
+        Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
+          (chAt T z.1 v, chAt T z.2 v) := fun v =>
     ((meas_chAt T v).comp measurable_fst).prodMk ((meas_chAt T v).comp measurable_snd)
-  have hG : ∀ (i : WlocSk.NB.CI k r) (v : ι), Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
-      WlocSk.NB.shG (ph0 (chAt T z.1 v)) (chAt T z.2 v).1 i := fun i v => by
-    have hc : Continuous fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-        WlocSk.NB.shG (ph0 cc.1) cc.2.1 i := (cont_shG i).comp hφ
-    exact Measurable.comp (g := fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-        WlocSk.NB.shG (ph0 cc.1) cc.2.1 i) (f := fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
-        (chAt T z.1 v, chAt T z.2 v)) hc.measurable (hmc v)
-  have hH : ∀ (a : Fin r) (v : ι), Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
-      WlocSk.NB.shH (ph0 (chAt T z.1 v)) (chAt T z.2 v).1 a := fun a v => by
+  have hG
+      : ∀ (i : WlocSk.NB.CI k r) (v : ι),
+        Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
+          WlocSk.NB.shG (ph0 (chAt T z.1 v)) (chAt T z.2 v).1 i := fun i v => by
+    have hc : Continuous
+        fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+          WlocSk.NB.shG (ph0 cc.1) cc.2.1 i :=
+      (cont_shG i).comp hφ
+    exact Measurable.comp
+      (g :=
+        fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+          WlocSk.NB.shG (ph0 cc.1) cc.2.1 i)
+      (f := fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
+        (chAt T z.1 v, chAt T z.2 v))
+      hc.measurable (hmc v)
+  have hH
+      : ∀ (a : Fin r) (v : ι),
+        Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
+          WlocSk.NB.shH (ph0 (chAt T z.1 v)) (chAt T z.2 v).1 a := fun a v => by
     have hcM : Continuous fun t : (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ) => WlocSk.NB.cM t.1 t.2 := by
-      have hE := WlocSk.NB.continuous_cE.comp (continuous_fst (X := WlocSk.NB.CI k r → ℂ) (Y := Fin r → ℝ))
+      have hE :=
+        WlocSk.NB.continuous_cE.comp (continuous_fst (X := WlocSk.NB.CI k r → ℂ) (Y := Fin r → ℝ))
       exact WlocSk.NB.continuous_cK.sub
-        (((hE.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul hE).const_smul (1 / 2 : ℂ))
-    have hd : Continuous fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-        WlocSk.NB.dlt (ph0 cc.1) cc.2.1 := by
-      have e : (fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-          WlocSk.NB.dlt (ph0 cc.1) cc.2.1) = fun cc =>
-          (WlocSk.NB.cF cc.2.1)ᴴ * ((WlocSk.NB.cF cc.1.1)ᴴ * (WlocSk.NB.cB cc.1.1 * WlocSk.NB.cE cc.2.1)) +
-            (WlocSk.NB.cF cc.2.1)ᴴ * WlocSk.NB.cM cc.1.1 cc.1.2 * WlocSk.NB.cF cc.2.1 :=
+        (((hE.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul hE).const_smul
+          (1 / 2 : ℂ))
+    have hd : Continuous
+        fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+          WlocSk.NB.dlt (ph0 cc.1) cc.2.1 := by
+      have e
+          : (fun cc
+                : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+              WlocSk.NB.dlt (ph0 cc.1) cc.2.1)
+            = fun cc =>
+              (WlocSk.NB.cF cc.2.1)ᴴ
+                  * ((WlocSk.NB.cF cc.1.1)ᴴ * (WlocSk.NB.cB cc.1.1 * WlocSk.NB.cE cc.2.1))
+                + (WlocSk.NB.cF cc.2.1)ᴴ * WlocSk.NB.cM cc.1.1 cc.1.2 * WlocSk.NB.cF cc.2.1 :=
         funext fun cc => chart_difference_formula cc.1.1 cc.2.1 cc.1.2
       rw [e]
-      have hy : Continuous fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-          cc.2.1 := continuous_fst.comp continuous_snd
-      have hx : Continuous fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-          cc.1.1 := continuous_fst.comp continuous_fst
+      have hy : Continuous
+          fun cc
+              : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+            cc.2.1 :=
+        continuous_fst.comp continuous_snd
+      have hx : Continuous
+          fun cc
+              : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+            cc.1.1 :=
+        continuous_fst.comp continuous_fst
       have hFy := WlocSk.NB.continuous_cF.comp' hy
       have hFx := WlocSk.NB.continuous_cF.comp' hx
       have hBx := WlocSk.NB.continuous_cB.comp' hx
       have hEy := WlocSk.NB.continuous_cE.comp' hy
-      have hMx := hcM.comp' (continuous_fst (X := (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ))
-        (Y := (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)))
-      exact (hFy.matrix_conjTranspose.matrix_mul (hFx.matrix_conjTranspose.matrix_mul (hBx.matrix_mul hEy))).add
-        ((hFy.matrix_conjTranspose.matrix_mul hMx).matrix_mul hFy)
-    have hc : Continuous fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-        WlocSk.NB.shH (ph0 cc.1) cc.2.1 a :=
+      have hMx :=
+        hcM.comp' (continuous_fst (X := (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ))
+          (Y := (WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)))
+      exact (hFy.matrix_conjTranspose.matrix_mul (hFx.matrix_conjTranspose.matrix_mul
+        (hBx.matrix_mul hEy))).add ((hFy.matrix_conjTranspose.matrix_mul hMx).matrix_mul hFy)
+    have hc : Continuous
+        fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+          WlocSk.NB.shH (ph0 cc.1) cc.2.1 a :=
       Complex.continuous_im.comp' (hd.matrix_elem a a)
-    exact Measurable.comp (g := fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
-        WlocSk.NB.shH (ph0 cc.1) cc.2.1 a) (f := fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
-        (chAt T z.1 v, chAt T z.2 v)) hc.measurable (hmc v)
+    exact Measurable.comp
+      (g :=
+        fun cc : ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) × ((WlocSk.NB.CI k r → ℂ) × (Fin r → ℝ)) =>
+          WlocSk.NB.shH (ph0 cc.1) cc.2.1 a)
+      (f := fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
+        (chAt T z.1 v, chAt T z.2 v))
+      hc.measurable (hmc v)
   rcases p with ((p | b) | (p | a))
   · refine Measurable.of_eval fun v => ?_
     have h2 : Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
         (z.1 (Sum.inl (Sum.inl p)) : ι → ℂ) v :=
-      (measurable_pi_apply v).comp ((measurable_pi_apply (Sum.inl (Sum.inl p) : CBlk r)).comp measurable_fst)
+      (measurable_pi_apply v).comp
+        ((measurable_pi_apply (Sum.inl (Sum.inl p) : CBlk r)).comp measurable_fst)
     exact (hG _ v).sub h2
   · refine Measurable.of_eval fun v => Measurable.of_eval fun j => ?_
     have h2 : Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
         (z.1 (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v j :=
-      (measurable_pi_apply j).comp ((measurable_pi_apply v).comp
-        ((measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r)).comp measurable_fst))
+      (measurable_pi_apply j).comp
+        ((measurable_pi_apply v).comp
+          ((measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r)).comp measurable_fst))
     exact (measurable_const.mul (hG _ v)).sub h2
   · refine Measurable.of_eval fun v => ?_
     have h2 : Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
         (z.1 (Sum.inr (Sum.inl p)) : ι → ℂ) v :=
-      (measurable_pi_apply v).comp ((measurable_pi_apply (Sum.inr (Sum.inl p) : CBlk r)).comp measurable_fst)
+      (measurable_pi_apply v).comp
+        ((measurable_pi_apply (Sum.inr (Sum.inl p) : CBlk r)).comp measurable_fst)
     exact (hG _ v).sub h2
   · refine Measurable.of_eval fun v => ?_
     have h2 : Measurable fun z : (∀ q : CBlk r, CSpc ι k q) × (∀ q : CBlk r, CSpc ι k q) =>
         (z.1 (Sum.inr (Sum.inr a)) : ι → ℝ) v :=
-      (measurable_pi_apply v).comp ((measurable_pi_apply (Sum.inr (Sum.inr a) : CBlk r)).comp measurable_fst)
+      (measurable_pi_apply v).comp
+        ((measurable_pi_apply (Sum.inr (Sum.inr a) : CBlk r)).comp measurable_fst)
     exact (hH a v).sub h2
 
 end Meas
@@ -693,37 +879,51 @@ end Meas
 theorem kapLaw_holds : KapLaw := by
   intro D X u
   have hT := ProductExactness.Tw_pos (D := D) u
-  have hco : X.NinfU u = (ProductExactness.NinfG X u : Set X.B.I.Ginf) := (ProductExactness.NinfG_coe X u).symm
+  have hco : X.NinfU u = (ProductExactness.NinfG X u : Set X.B.I.Ginf) :=
+    (ProductExactness.NinfG_coe X u).symm
   have hmulN : ∀ s ∈ X.NinfU u, ∀ s' ∈ X.NinfU u, s * s' ∈ X.NinfU u := by
     intro s hs s' hs'; rw [hco] at hs hs' ⊢; exact (ProductExactness.NinfG X u).mul_mem hs hs'
-  have hone : (1 : X.B.I.Ginf) ∈ X.NinfU u := by rw [hco]; exact (ProductExactness.NinfG X u).one_mem
-  have mX_facts : ∀ v : InfinitePlace X.B.I.F, _ := fun v => mOf_facts (nX X) (X.B.I.ε v) (eV X v)
-    (ProductExactness.pV X v) (X.wfr u v) (ProductExactness.zV X u v) (ProductExactness.Tw_pos u) (fX_ee X v) (fX_ff X v) (fX_ef X v) (fX_ww X u v)
-    (fX_ew X u v) (fX_fw X u v) (fX_ez X u v) (fX_fz X u v) (frame_real_z_z_eq_neg X u v) (fX_zw X u v)
-  have hlaw : ∀ s ∈ X.NinfU u, ∀ s' ∈ X.NinfU u,
-      blk X u (s * s') = Formalism.L2.SG.NGCut.SplitEmbedding.mlaw (Bk (Tw u)) (blk X u s) (blk X u s') := by
+  have hone : (1 : X.B.I.Ginf) ∈ X.NinfU u := by
+    rw [hco]; exact (ProductExactness.NinfG X u).one_mem
+  have mX_facts : ∀ v : InfinitePlace X.B.I.F, _ := fun v =>
+    mOf_facts (nX X) (X.B.I.ε v) (eV X v) (ProductExactness.pV X v) (X.wfr u v)
+      (ProductExactness.zV X u v) (ProductExactness.Tw_pos u) (fX_ee X v) (fX_ff X v) (fX_ef X v)
+      (fX_ww X u v) (fX_ew X u v) (fX_fw X u v) (fX_ez X u v) (fX_fz X u v)
+      (frame_real_z_z_eq_neg X u v) (fX_zw X u v)
+  have hlaw
+      : ∀ s ∈ X.NinfU u, ∀ s' ∈ X.NinfU u,
+        blk X u (s * s')
+          = Formalism.L2.SG.NGCut.SplitEmbedding.mlaw (Bk (Tw u)) (blk X u s) (blk X u s') := by
     intro s hs s' hs'
     rw [blk_eq X u _ (hmulN s hs s' hs'), blk_eq X u s hs, blk_eq X u s' hs']
     have e : mX X u (s * s') = fun v => mX X u s v * mX X u s' v :=
       funext fun v => (mX_facts v).1 (s v) (s' v)
     rw [e]
-    exact law_blkOf hT _ _ (fun v => (mX_facts v).2.1 (s v) (hs v)) (fun v => (mX_facts v).2.1 (s' v) (hs' v))
-  refine ⟨Bk (Tw u), meas_Bk (Tw u), fun p x x' y y' h => bk_tri hT p x x' y y' h, fun p x => ?_, hlaw⟩
+    exact law_blkOf hT _ _
+      (fun v => (mX_facts v).2.1 (s v) (hs v))
+      (fun v => (mX_facts v).2.1 (s' v) (hs' v))
+  refine
+    ⟨Bk (Tw u), meas_Bk (Tw u), fun p x x' y y' h => bk_tri hT p x x' y y' h, fun p x => ?_, hlaw⟩
   obtain ⟨σ, -, hσ⟩ := kapSurj_holds X u
   obtain ⟨hσN, hσb⟩ := hσ x
   have h1 := hlaw (σ x) hσN 1 hone
   rw [mul_one, hσb] at h1
   have h0 : blk X u 1 = 0 := by
     rw [blk_eq X u 1 hone]
-    have e : mX X u 1 = fun _ => 1 := funext fun v => mOf_one (nX X) (X.B.I.ε v) (eV X v)
-      (ProductExactness.pV X v) (X.wfr u v) (ProductExactness.zV X u v) (ProductExactness.Tw_pos u) (fX_ee X v) (fX_ff X v) (fX_ef X v) (fX_ww X u v)
-      (fX_ew X u v) (fX_fw X u v) (fX_ez X u v) (fX_fz X u v) (frame_real_z_z_eq_neg X u v) (fX_zw X u v)
+    have e : mX X u 1 = fun _ => 1 :=
+      funext fun v =>
+        mOf_one (nX X) (X.B.I.ε v) (eV X v) (ProductExactness.pV X v) (X.wfr u v)
+          (ProductExactness.zV X u v) (ProductExactness.Tw_pos u) (fX_ee X v) (fX_ff X v)
+          (fX_ef X v) (fX_ww X u v) (fX_ew X u v) (fX_fw X u v) (fX_ez X u v) (fX_fz X u v)
+          (frame_real_z_z_eq_neg X u v) (fX_zw X u v)
     rw [e]
     exact blkOf_one _
   rw [h0] at h1
   have h2 := congrFun h1 p
   simp only [Formalism.L2.SG.NGCut.SplitEmbedding.mlaw, Pi.zero_apply, add_zero] at h2
-  calc Bk (Tw u) p x 0 = (x p + Bk (Tw u) p x 0) - x p := by abel
+  calc
+    Bk (Tw u) p x 0
+      = (x p + Bk (Tw u) p x 0) - x p := by abel
     _ = x p - x p := by rw [← h2]
     _ = 0 := sub_self _
 

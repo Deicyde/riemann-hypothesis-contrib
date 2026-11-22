@@ -11,8 +11,8 @@ namespace Formalism.FourierDecayAlt.P.SignAntidiagonal
 
 open Formalism.FourierDecayAlt.C3 Formalism.REAL Formalism.QuantumDeterminants
 
-theorem herm_bvec_bvec {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (p q : Fin n) :
-    herm H (bvec p) (bvec q) = H q p := by
+theorem herm_bvec_bvec {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (p q : Fin n)
+    : herm H (bvec p) (bvec q) = H q p := by
   have hs : star (bvec q) = bvec q := by
     ext i
     by_cases h : i = q <;> simp [bvec, Pi.single_apply, h]
@@ -23,22 +23,24 @@ theorem herm_bvec_bvec {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (p q : Fin n) 
 section dp
 variable {k r : ℕ} (z' : Fin (2 * r + k + 1) → ℂ) (p q : Fin (2 * r + k + 1))
 
-theorem dp1 (hp : p.val < r) (hq : q.val < r) : dpsiP k r z' p q = if q.val = p.val + 1 then 1 else 0 := by
+theorem dp1 (hp : p.val < r) (hq : q.val < r)
+    : dpsiP k r z' p q = if q.val = p.val + 1 then 1 else 0 := by
   rw [dpsiP, if_pos ⟨hp, hq⟩]
-theorem dp2 (hp : p.val < r) (hq1 : r ≤ q.val) (hq2 : q.val ≤ r + k) :
-    dpsiP k r z' p q = if p.val + 1 = r then z' q else 0 := by
+theorem dp2 (hp : p.val < r) (hq1 : r ≤ q.val) (hq2 : q.val ≤ r + k)
+    : dpsiP k r z' p q = if p.val + 1 = r then z' q else 0 := by
   rw [dpsiP, if_neg (by omega), if_pos ⟨hp, hq1, hq2⟩]
 theorem dp0 (hp : p.val < r) (hq : r + k < q.val) : dpsiP k r z' p q = 0 := by
   rw [dpsiP, if_neg (by omega), if_neg (by omega), if_neg (by omega), if_neg (by omega)]
-theorem dp3 (hp1 : r ≤ p.val) (hp2 : p.val ≤ r + k) (hq : r + k < q.val) :
-    dpsiP k r z' p q = if q.val = r + k + 1 then herm (Hpk k r) (bvec p) z' else 0 := by
+theorem dp3 (hp1 : r ≤ p.val) (hp2 : p.val ≤ r + k) (hq : r + k < q.val)
+    : dpsiP k r z' p q = if q.val = r + k + 1 then herm (Hpk k r) (bvec p) z' else 0 := by
   rw [dpsiP, if_neg (by omega), if_neg (by omega), if_pos ⟨hp1, hp2, hq⟩]
-theorem dp4 (hp : r + k < p.val) (hq : r + k < q.val) : dpsiP k r z' p q = if q.val = p.val + 1 then 1 else 0 := by
+theorem dp4 (hp : r + k < p.val) (hq : r + k < q.val)
+    : dpsiP k r z' p q = if q.val = p.val + 1 then 1 else 0 := by
   rw [dpsiP, if_neg (by omega), if_neg (by omega), if_neg (by omega), if_pos ⟨hp, hq⟩]
 end dp
 
-theorem hpk_row_eI {k r : ℕ} (b : Fin r) (p : Fin (2 * r + k + 1)) :
-    Hpk k r (eI k r b) p = if p.val = 2 * r + k - b.val then 1 else 0 := by
+theorem hpk_row_eI {k r : ℕ} (b : Fin r) (p : Fin (2 * r + k + 1))
+    : Hpk k r (eI k r b) p = if p.val = 2 * r + k - b.val then 1 else 0 := by
   have hb := b.isLt
   have heI : (eI k r b).val = b.val := rfl
   simp only [Hpk]
@@ -48,15 +50,17 @@ theorem hpk_row_eI {k r : ℕ} (b : Fin r) (p : Fin (2 * r + k + 1)) :
       if_neg (fun hc => by rw [heI] at hc; omega),
       if_neg (fun hc => by rw [heI] at hc; exact absurd hc.1 (by omega))]
 
-theorem herm_unitary {k r : ℕ} (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hg : g ∈ UH (Hpk k r))
-    (x y : Fin (2 * r + k + 1) → ℂ) : herm (Hpk k r) (g *ᵥ x) (g *ᵥ y) = herm (Hpk k r) x y := by
+theorem herm_unitary
+    {k r : ℕ} (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hg : g ∈ UH (Hpk k r))
+    (x y : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (g *ᵥ x) (g *ᵥ y) = herm (Hpk k r) x y := by
   have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   unfold herm
   rw [Matrix.star_mulVec, Matrix.mulVec_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
     ← Matrix.mul_assoc, hg']
 
-theorem herm_bvec_eI {k r : ℕ} (v : Fin (2 * r + k + 1) → ℂ) (b : Fin r) :
-    herm (Hpk k r) v (bvec (eI k r b)) = v (esI k r b) := by
+theorem herm_bvec_eI {k r : ℕ} (v : Fin (2 * r + k + 1) → ℂ) (b : Fin r)
+    : herm (Hpk k r) v (bvec (eI k r b)) = v (esI k r b) := by
   have h1 : herm (Hpk k r) v (bvec (eI k r b)) = ∑ p, Hpk k r (eI k r b) p * v p := by
     have hs : star (bvec (eI k r b)) = bvec (eI k r b) := by
       ext i
@@ -76,18 +80,19 @@ theorem herm_bvec_eI {k r : ℕ} (v : Fin (2 * r + k + 1) → ℂ) (b : Fin r) :
 
 theorem xi_Y_zhat_identity : XiYZhat := by
   intro k r z z' g a b hg
-  have hf : ∀ (w : Fin (2 * r + k + 1) → ℂ) (c : Fin r), fvec k r w c.castSucc = bvec (eI k r c) := by
+  have hf
+      : ∀ (w : Fin (2 * r + k + 1) → ℂ) (c : Fin r), fvec k r w c.castSucc = bvec (eI k r c) := by
     intro w c
     simp [fvec, c.isLt]
-  have hZ : Zhat k r z z' g a.castSucc b.castSucc =
-      herm (Hpk k r) (g *ᵥ bvec (eI k r b)) (bvec (eI k r a)) := by
+  have hZ
+      : Zhat k r z z' g a.castSucc b.castSucc
+        = herm (Hpk k r) (g *ᵥ bvec (eI k r b)) (bvec (eI k r a)) := by
     simp only [Zhat, hf]
   refine ⟨hZ.symm, ?_⟩
   obtain ⟨hH, hHH, -⟩ := Formalism.QuantumDeterminants.hermitian_pos_facts_hold k r
   have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   have hdet : IsUnit g.det := by
-    have h1 : (Hpk k r).det * (Hpk k r).det = 1 := by
-      rw [← Matrix.det_mul, hHH, Matrix.det_one]
+    have h1 : (Hpk k r).det * (Hpk k r).det = 1 := by rw [← Matrix.det_mul, hHH, Matrix.det_one]
     have h2 := congrArg Matrix.det hg'
     rw [Matrix.det_mul, Matrix.det_mul] at h2
     rw [isUnit_iff_ne_zero]
@@ -100,20 +105,31 @@ theorem xi_Y_zhat_identity : XiYZhat := by
     intro v w
     unfold herm
     first
-    | (rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_mulVec]; done)
-    | (rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_mulVec];
-        exact Matrix.dotProduct_comm _ _)
-    | (rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_mulVec];
-        exact (Matrix.dotProduct_comm _ _).symm)
-    | (rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_comm,
-        Matrix.dotProduct_mulVec]; done)
+    | (
+        rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_mulVec]
+        done
+      )
+    | (
+        rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_mulVec]
+        exact Matrix.dotProduct_comm _ _
+      )
+    | (
+        rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_mulVec]
+        exact (Matrix.dotProduct_comm _ _).symm
+      )
+    | (
+        rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hH, Matrix.dotProduct_comm,
+          Matrix.dotProduct_mulVec]
+        done
+      )
     | (simp [Matrix.star_dotProduct, Matrix.star_mulVec, hH, Matrix.dotProduct_mulVec]; done)
-  calc (g⁻¹ *ᵥ bvec (eI k r a)) (esI k r b)
+  calc
+    (g⁻¹ *ᵥ bvec (eI k r a)) (esI k r b)
       = herm (Hpk k r) (g⁻¹ *ᵥ bvec (eI k r a)) (bvec (eI k r b)) := (herm_bvec_eI _ b).symm
     _ = herm (Hpk k r) (g *ᵥ (g⁻¹ *ᵥ bvec (eI k r a))) (g *ᵥ bvec (eI k r b)) :=
-        (herm_unitary g hg _ _).symm
+      (herm_unitary g hg _ _).symm
     _ = herm (Hpk k r) (bvec (eI k r a)) (g *ᵥ bvec (eI k r b)) := by
-        rw [Matrix.mulVec_mulVec, hgi, Matrix.one_mulVec]
+      rw [Matrix.mulVec_mulVec, hgi, Matrix.one_mulVec]
     _ = star (herm (Hpk k r) (g *ᵥ bvec (eI k r b)) (bvec (eI k r a))) := (hsym _ _).symm
     _ = star (Zhat k r z z' g a.castSucc b.castSucc) := by rw [hZ]
 

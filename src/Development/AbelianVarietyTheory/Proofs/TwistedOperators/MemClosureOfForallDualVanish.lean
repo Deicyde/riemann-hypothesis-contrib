@@ -8,28 +8,29 @@ namespace GlobalTheory
 
 open Complex
 
-theorem mem_closure_of_forall_dual_vanish :
-    ∀ {E : Type} [AddCommGroup E] [Module ℂ E] [UniformSpace E] [IsUniformAddGroup E]
-    {p : ℕ → Seminorm ℂ E}, WithSeminorms p → ∀ (Z : Submodule ℂ E) (x : E),
-    (∀ f : E →L[ℂ] ℂ, (∀ z ∈ Z, f z = 0) → f x = 0) → x ∈ closure (Z : Set E) := by
+theorem mem_closure_of_forall_dual_vanish
+    : ∀ {E : Type} [AddCommGroup E] [Module ℂ E] [UniformSpace E] [IsUniformAddGroup E]
+        {p : ℕ → Seminorm ℂ E},
+      WithSeminorms p
+        → ∀ (Z : Submodule ℂ E) (x : E),
+          (∀ f : E →L[ℂ] ℂ, (∀ z ∈ Z, f z = 0) → f x = 0) → x ∈ closure (Z : Set E) := by
   intro E _ _ _ _ p hp Z x h
   haveI := hp.continuousSMul
   haveI : LocallyConvexSpace ℝ E := hp.toLocallyConvexSpace
   by_contra hx
   rw [← Z.topologicalClosure_coe] at hx
-  obtain ⟨f, u, hfx, hf⟩ := RCLike.geometric_hahn_banach_point_closed (𝕜 := ℂ)
-    ((Z.topologicalClosure.restrictScalars ℝ).convex) Z.isClosed_topologicalClosure hx
+  obtain ⟨f, u, hfx, hf⟩ :=
+    RCLike.geometric_hahn_banach_point_closed (𝕜 := ℂ)
+      ((Z.topologicalClosure.restrictScalars ℝ).convex) Z.isClosed_topologicalClosure hx
   simp only [RCLike.re_to_complex] at hfx hf
   have hre : ∀ w ∈ Z, (f w).re = 0 := by
     intro w hw
     by_contra hne
     set t : ℝ := (u - 1) / (f w).re
-    have hmem : ((t : ℂ) • w) ∈ Z.topologicalClosure :=
-      Z.le_topologicalClosure (Z.smul_mem _ hw)
+    have hmem : ((t : ℂ) • w) ∈ Z.topologicalClosure := Z.le_topologicalClosure (Z.smul_mem _ hw)
     have h1 := hf _ hmem
     rw [map_smul, smul_eq_mul, Complex.re_ofReal_mul] at h1
-    have : t * (f w).re = u - 1 := by
-      simp only [t]; field_simp
+    have : t * (f w).re = u - 1 := by simp only [t]; field_simp
     linarith
   have hvan : ∀ z ∈ Z, f z = 0 := by
     intro z hz

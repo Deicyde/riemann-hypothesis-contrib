@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Bound
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 
 namespace GlobalTheory.PerFix
 
@@ -40,9 +42,13 @@ def inertiaC (c : Coef l) : Subgroup (Qbar l ≃ₐ[ℚ_[l]] Qbar l) where
       rw [e, norm_aut, norm_sub_rev]
       exact hσ2 y hy
 
-theorem exists_fixed_near : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l), ∃ c₁ : ℕ, ∀ (k : ℕ) (x : Qbar l), ‖x‖ ≤ 1 →
-  (∀ σ : Qbar l ≃ₐ[ℚ_[l]] Qbar l, (∀ b ∈ c.O, σ b = b) → (∀ y : Qbar l, ‖y‖ ≤ 1 → ‖σ y - y‖ < 1) → Cg k (σ x) x) →
-  ∃ x' : Qbar l, ‖x'‖ ≤ 1 ∧ GlobalTheory.LambdaValuationPowers.FixIc c x' ∧ Cg (k - c₁) x x' := by
+theorem exists_fixed_near
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l), ∃ c₁ : ℕ, ∀ (k : ℕ) (x : Qbar l),
+      ‖x‖ ≤ 1
+        → (∀ σ : Qbar l ≃ₐ[ℚ_[l]] Qbar l,
+          (∀ b ∈ c.O, σ b = b) → (∀ y : Qbar l, ‖y‖ ≤ 1 → ‖σ y - y‖ < 1) → Cg k (σ x) x)
+        → ∃ x' : Qbar l,
+          ‖x'‖ ≤ 1 ∧ GlobalTheory.LambdaValuationPowers.FixIc c x' ∧ Cg (k - c₁) x x' := by
   intro l _ c
   obtain ⟨C, -, hC⟩ := GlobalTheory.AxLemma.ax_lemma l
   have hl : ‖((l : ℕ) : Qbar l)‖ = (l : ℝ)⁻¹ := by
@@ -55,7 +61,8 @@ theorem exists_fixed_near : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l), ∃ c₁ 
   · refine ⟨0, by simp, fun σ _ _ => map_zero σ, ?_⟩
     have h0 : k - c₁ = 0 := by omega
     simpa [Cg, h0] using hx
-  · obtain ⟨y, hyH, hxy⟩ := hC (inertiaC c) x ‖((l : ℕ) : Qbar l) ^ k‖ (fun g hg => hfix g hg.1 hg.2)
+  · obtain ⟨y, hyH, hxy⟩ :=
+      hC (inertiaC c) x ‖((l : ℕ) : Qbar l) ^ k‖ (fun g hg => hfix g hg.1 hg.2)
     have hlpos : (0 : ℝ) < l := by linarith
     have key : C * ‖((l : ℕ) : Qbar l) ^ k‖ ≤ ‖((l : ℕ) : Qbar l) ^ (k - c₁)‖ := by
       rw [norm_pow, norm_pow, hl]
@@ -72,6 +79,7 @@ theorem exists_fixed_near : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l), ∃ c₁ 
     refine ⟨y, ?_, fun σ h1 h2 => hyH σ ⟨h1, h2⟩, hxy'⟩
     have e : y = x + (y - x) := by ring
     rw [e]
-    exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hx ((norm_sub_rev y x).le.trans (hxy'.trans hle1)))
+    exact (IsUltrametricDist.norm_add_le_max _ _).trans
+      (max_le hx ((norm_sub_rev y x).le.trans (hxy'.trans hle1)))
 
 end GlobalTheory.PerFix

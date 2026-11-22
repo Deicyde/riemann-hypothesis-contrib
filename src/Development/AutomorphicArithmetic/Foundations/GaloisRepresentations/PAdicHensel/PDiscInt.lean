@@ -15,7 +15,6 @@ namespace UpperTheory.Gal.G1
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem pDiscInt : DiscInt :=
-  _root_.UpperTheory.Reformulated.B.Qk39.pDiscInt
+theorem pDiscInt : DiscInt := _root_.UpperTheory.Reformulated.B.Qk39.pDiscInt
 
 end UpperTheory.Gal.G1

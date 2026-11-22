@@ -32,8 +32,8 @@ def IsInv (k : ℕ) (H : AddSubgroup W) (g : W → ℂ) : Prop := ∀ t ∈ H, �
 def avg (k : ℕ) (H : AddSubgroup W) (g : W → ℂ) : ℂ :=
   (Nat.card (Qt k H) : ℂ)⁻¹ * ∑ᶠ q : Qt k H, g ((q.out : H) : W)
 
-theorem out_mk (k : ℕ) (H : AddSubgroup W) (x : H) :
-    ∃ u ∈ H, ((((QuotientAddGroup.mk x : Qt k H)).out : H) : W) + k • u = (x : W) := by
+theorem out_mk (k : ℕ) (H : AddSubgroup W) (x : H)
+    : ∃ u ∈ H, ((((QuotientAddGroup.mk x : Qt k H)).out : H) : W) + k • u = (x : W) := by
   have h := QuotientAddGroup.eq.1 (QuotientAddGroup.out_eq' (QuotientAddGroup.mk x : Qt k H))
   rw [AddSubgroup.mem_addSubgroupOf] at h
   obtain ⟨u, hu, hux⟩ := mem_smulSub.1 h
@@ -42,36 +42,49 @@ theorem out_mk (k : ℕ) (H : AddSubgroup W) (x : H) :
   push_cast
   abel
 
-theorem IsInv.mk_eq {k : ℕ} {H : AddSubgroup W} {g : W → ℂ} (hg : IsInv k H g) {x y : H}
-    (hxy : (QuotientAddGroup.mk x : Qt k H) = QuotientAddGroup.mk y) : g x = g y := by
+theorem IsInv.mk_eq
+    {k : ℕ} {H : AddSubgroup W} {g : W → ℂ} (hg : IsInv k H g)
+    {x y : H} (hxy : (QuotientAddGroup.mk x : Qt k H) = QuotientAddGroup.mk y)
+    : g x = g y := by
   have h := QuotientAddGroup.eq.1 hxy
   rw [AddSubgroup.mem_addSubgroupOf] at h
   obtain ⟨u, hu, hux⟩ := mem_smulSub.1 h
   have : (y : W) = x + k • u := by rw [hux]; push_cast; abel
   rw [this, hg _ x.2 u hu]
 
-theorem IsInv.out_mk {k : ℕ} {H : AddSubgroup W} {g : W → ℂ} (hg : IsInv k H g) (x : H) :
-    g (((QuotientAddGroup.mk x : Qt k H).out : H) : W) = g x :=
+theorem IsInv.out_mk {k : ℕ} {H : AddSubgroup W} {g : W → ℂ} (hg : IsInv k H g) (x : H)
+    : g (((QuotientAddGroup.mk x : Qt k H).out : H) : W) = g x :=
   hg.mk_eq (QuotientAddGroup.out_eq' _)
 
-theorem avg_eq_sum (k : ℕ) (H : AddSubgroup W) [Fintype (Qt k H)] (g : W → ℂ) :
-    avg k H g = (Fintype.card (Qt k H) : ℂ)⁻¹ * ∑ q : Qt k H, g ((q.out : H) : W) := by
+theorem avg_eq_sum (k : ℕ) (H : AddSubgroup W) [Fintype (Qt k H)] (g : W → ℂ)
+    : avg k H g = (Fintype.card (Qt k H) : ℂ)⁻¹ * ∑ q : Qt k H, g ((q.out : H) : W) := by
   rw [avg, finsum_eq_sum_of_fintype, Nat.card_eq_fintype_card]
 
-theorem avg_comp_surj {A B : Type*} [AddCommGroup A] [AddCommGroup B] [Fintype A] [Fintype B] [DecidableEq B]
-    (π : A →+ B) (hπ : Function.Surjective π) (G : B → ℂ) :
-    (Fintype.card A : ℂ)⁻¹ * ∑ a, G (π a) = (Fintype.card B : ℂ)⁻¹ * ∑ b, G b := by
-  first | exact Bl.SecondBlockLemmaD.goal1 .. | (apply Bl.SecondBlockLemmaD.goal1 <;> assumption) | (intros; apply Bl.SecondBlockLemmaD.goal1 <;> assumption) | (apply @Bl.SecondBlockLemmaD.goal1 <;> assumption) | (intros; apply @Bl.SecondBlockLemmaD.goal1 <;> assumption) | (apply @Bl.SecondBlockLemmaD.goal1 <;> first | assumption | infer_instance)
+theorem avg_comp_surj
+    {A B : Type*} [AddCommGroup A] [AddCommGroup B] [Fintype A] [Fintype B] [DecidableEq B]
+    (π : A →+ B) (hπ : Function.Surjective π)
+    (G : B → ℂ)
+    : (Fintype.card A : ℂ)⁻¹ * ∑ a, G (π a) = (Fintype.card B : ℂ)⁻¹ * ∑ b, G b := by
+  first
+  | exact Bl.SecondBlockLemmaD.goal1 ..
+  | (apply Bl.SecondBlockLemmaD.goal1 <;> assumption)
+  | (intros; apply Bl.SecondBlockLemmaD.goal1 <;> assumption)
+  | (apply @Bl.SecondBlockLemmaD.goal1 <;> assumption)
+  | (intros; apply @Bl.SecondBlockLemmaD.goal1 <;> assumption)
+  | (apply @Bl.SecondBlockLemmaD.goal1 <;> first | assumption | infer_instance)
 
-theorem avg_mul (k j : ℕ) (H : AddSubgroup W) [Finite (Qt k H)] [Finite (Qt (k * j) H)] (g : W → ℂ)
-    (hg : IsInv k H g) : avg (k * j) H g = avg k H g := by
+theorem avg_mul
+    (k j : ℕ) (H : AddSubgroup W) [Finite (Qt k H)] [Finite (Qt (k * j) H)]
+    (g : W → ℂ) (hg : IsInv k H g)
+    : avg (k * j) H g = avg k H g := by
   classical
   let _ := Fintype.ofFinite (Qt k H)
   let _ := Fintype.ofFinite (Qt (k * j) H)
   let π : Qt (k * j) H →+ Qt k H :=
     QuotientAddGroup.map _ _ (AddMonoidHom.id H) (by
       intro x hx
-      simp only [AddSubgroup.mem_comap, AddMonoidHom.id_apply, AddSubgroup.mem_addSubgroupOf] at hx ⊢
+      simp only [AddSubgroup.mem_comap, AddMonoidHom.id_apply, AddSubgroup.mem_addSubgroupOf]
+        at hx ⊢
       exact smulSub_mul_le k j H hx)
   have hπ : Function.Surjective π := by
     intro q
@@ -87,11 +100,10 @@ theorem avg_mul (k j : ℕ) (H : AddSubgroup W) [Finite (Qt k H)] [Finite (Qt (k
   simp_rw [key]
   exact avg_comp_surj π hπ (fun b => g ((b.out : H) : W))
 
-
 open Classical in
-def integ (H : AddSubgroup W) (g : W → ℂ) : ℂ :=
-  by classical
-     exact if h : ∃ k, 0 < k ∧ IsInv k H g then avg h.choose H g else 0
+def integ (H : AddSubgroup W) (g : W → ℂ) : ℂ := by
+  classical
+  exact if h : ∃ k, 0 < k ∧ IsInv k H g then avg h.choose H g else 0
 
 section Integ
 
@@ -109,7 +121,8 @@ theorem integ_eq {k : ℕ} (hk : 0 < k) {g : W → ℂ} (hg : IsInv k H g) : int
   rw [← avg_mul h.choose k H g hg0, ← avg_mul k h.choose H g hg, Nat.mul_comm]
 
 omit hfin in
-theorem IsInv.congr {k : ℕ} {g g' : W → ℂ} (hg : IsInv k H g) (h : ∀ t ∈ H, g t = g' t) : IsInv k H g' := by
+theorem IsInv.congr {k : ℕ} {g g' : W → ℂ} (hg : IsInv k H g) (h : ∀ t ∈ H, g t = g' t)
+    : IsInv k H g' := by
   intro t ht u hu
   rw [← h _ ht, ← h _ (H.add_mem ht (H.nsmul_mem hu k)), hg t ht u hu]
 
@@ -128,14 +141,14 @@ theorem integ_congr {g g' : W → ℂ} (h : ∀ t ∈ H, g t = g' t) : integ H g
       exact hg ⟨k, hk, hgk.congr fun t ht => (h t ht).symm⟩
     rw [integ, dite_eq_right hg, integ, dite_eq_right hg']
 
-
 omit hfin in
-theorem IsInv.cmul {k : ℕ} {g : W → ℂ} (hg : IsInv k H g) (c : ℂ) : IsInv k H (fun t => c * g t) := by
+theorem IsInv.cmul {k : ℕ} {g : W → ℂ} (hg : IsInv k H g) (c : ℂ)
+    : IsInv k H (fun t => c * g t) := by
   intro t ht u hu
   simp only [hg t ht u hu]
 
-theorem integ_cmul {k : ℕ} (hk : 0 < k) {g : W → ℂ} (hg : IsInv k H g) (c : ℂ) :
-    integ H (fun t => c * g t) = c * integ H g := by
+theorem integ_cmul {k : ℕ} (hk : 0 < k) {g : W → ℂ} (hg : IsInv k H g) (c : ℂ)
+    : integ H (fun t => c * g t) = c * integ H g := by
   classical
   rw [integ_eq hfin hk (hg.cmul c), integ_eq hfin hk hg]
   haveI := hfin _ hk
@@ -144,14 +157,14 @@ theorem integ_cmul {k : ℕ} (hk : 0 < k) {g : W → ℂ} (hg : IsInv k H g) (c 
   ring
 
 omit hfin in
-theorem IsInv.shift {k : ℕ} {g : W → ℂ} (hg : IsInv k H g) {v : W} (hv : v ∈ H) :
-    IsInv k H (fun t => g (t + v)) := by
+theorem IsInv.shift {k : ℕ} {g : W → ℂ} (hg : IsInv k H g) {v : W} (hv : v ∈ H)
+    : IsInv k H (fun t => g (t + v)) := by
   intro t ht u hu
   simp only
   rw [add_right_comm, hg _ (H.add_mem ht hv) u hu]
 
-theorem integ_shift {k : ℕ} (hk : 0 < k) {g : W → ℂ} (hg : IsInv k H g) {v : W} (hv : v ∈ H) :
-    integ H (fun t => g (t + v)) = integ H g := by
+theorem integ_shift {k : ℕ} (hk : 0 < k) {g : W → ℂ} (hg : IsInv k H g) {v : W} (hv : v ∈ H)
+    : integ H (fun t => g (t + v)) = integ H g := by
   classical
   rw [integ_eq hfin hk (hg.shift hv), integ_eq hfin hk hg]
   haveI := hfin _ hk
@@ -179,8 +192,12 @@ theorem integ_one : integ H (fun _ => (1 : ℂ)) = 1 := by
   have : (Fintype.card (Qt 1 H) : ℂ) ≠ 0 := by exact_mod_cast Fintype.card_ne_zero
   exact inv_mul_cancel₀ this
 
-theorem integ_twist {k : ℕ} (hk : 0 < k) {g : W → ℂ} (hg : IsInv k H g) {v : W} (hv : v ∈ H) {ζ : ℂ}
-    (hζ : ζ ≠ 1) (htw : ∀ t ∈ H, g (t + v) = ζ * g t) : integ H g = 0 := by
+theorem integ_twist
+    {k : ℕ} (hk : 0 < k)
+    {g : W → ℂ} (hg : IsInv k H g)
+    {v : W} (hv : v ∈ H)
+    {ζ : ℂ} (hζ : ζ ≠ 1) (htw : ∀ t ∈ H, g (t + v) = ζ * g t)
+    : integ H g = 0 := by
   have h1 := integ_shift hfin hk hg hv
   rw [integ_congr hfin htw, integ_cmul hfin hk hg] at h1
   have : (ζ - 1) * integ H g = 0 := by rw [sub_mul, h1, one_mul, sub_self]

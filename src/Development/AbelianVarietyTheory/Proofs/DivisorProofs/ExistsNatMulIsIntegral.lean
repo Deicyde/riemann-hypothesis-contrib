@@ -8,8 +8,8 @@ namespace GlobalTheory.NatMultipleIntegral
 
 open NumberField
 
-theorem exists_nat_mul_isIntegral (E : Type) [Field E] [NumberField E] (c : E) :
-    ∃ n : ℕ, 0 < n ∧ IsIntegral ℤ ((n : E) * c) := by
+theorem exists_nat_mul_isIntegral (E : Type) [Field E] [NumberField E] (c : E)
+    : ∃ n : ℕ, 0 < n ∧ IsIntegral ℤ ((n : E) * c) := by
   have h1 : IsAlgebraic ℚ c := Algebra.IsAlgebraic.isAlgebraic c
   have h2 : IsAlgebraic ℤ c := (IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr h1
   obtain ⟨y, hy, hint⟩ := h2.exists_integral_multiple
@@ -19,16 +19,19 @@ theorem exists_nat_mul_isIntegral (E : Type) [Field E] [NumberField E] (c : E) :
   · have : ((y.natAbs : ℕ) : E) = (y : E) := by
       conv_rhs => rw [h]
       exact (Int.cast_natCast _).symm
-    rw [this]; exact hint
+    rw [this]
+    exact hint
   · have : ((y.natAbs : ℕ) : E) = -(y : E) := by
       conv_rhs => rw [h]
       rw [Int.cast_neg, neg_neg, Int.cast_natCast]
-    rw [this, neg_mul]; exact hint.neg
+    rw [this, neg_mul]
+    exact hint.neg
 
-theorem exists_nat_smul_mem (E : Type) [inst : Field E] [NumberField E] (r : ℕ)
-    (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E))
-    (hΛ : Submodule.span E (↑Λ : Set (Fin r → E)) = ⊤) (v : Fin r → E) :
-    ∃ (q : ℕ), (0 : ℕ) < q ∧ (↑q : E) • v ∈ Λ := by
+theorem exists_nat_smul_mem
+    (E : Type) [inst : Field E] [NumberField E]
+    (r : ℕ) (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E))
+    (hΛ : Submodule.span E (↑Λ : Set (Fin r → E)) = ⊤) (v : Fin r → E)
+    : ∃ (q : ℕ), (0 : ℕ) < q ∧ (↑q : E) • v ∈ Λ := by
   have hv : v ∈ Submodule.span E (↑Λ : Set (Fin r → E)) := hΛ ▸ Submodule.mem_top
   have key : ∀ (a : E), IsIntegral ℤ a → ∀ x ∈ Λ, a • x ∈ Λ := by
     intro a ha x hx

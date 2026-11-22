@@ -11,7 +11,10 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.PairMembershipBlocks
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.TraceSpectra
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.TraceSpectra
 open Formalism.MainNotions.G.WittFrameLocaliserOrders
 
 namespace LkD
@@ -20,17 +23,18 @@ section MD
 
 variable {ι : Type*} {n : ℕ}
 
-theorem multideg_add (a b : ι × Fin n →₀ ℕ) (x : ι) : multideg (a + b) x = multideg a x + multideg b x := by
+theorem multideg_add (a b : ι × Fin n →₀ ℕ) (x : ι)
+    : multideg (a + b) x = multideg a x + multideg b x := by
   simp [multideg, Finset.sum_add_distrib]
 
-theorem multideg_zero (x : ι) : multideg (0 : ι × Fin n →₀ ℕ) x = 0 := by
-  simp [multideg]
+theorem multideg_zero (x : ι) : multideg (0 : ι × Fin n →₀ ℕ) x = 0 := by simp [multideg]
 
-theorem multideg_smul (k : ℕ) (a : ι × Fin n →₀ ℕ) (x : ι) : multideg (k • a) x = k * multideg a x := by
+theorem multideg_smul (k : ℕ) (a : ι × Fin n →₀ ℕ) (x : ι)
+    : multideg (k • a) x = k * multideg a x := by
   simp [multideg, Finset.mul_sum]
 
-theorem multideg_single (v : ι × Fin n) (k : ℕ) (x : ι) :
-    multideg (Finsupp.single v k) x = if v.1 = x then k else 0 := by
+theorem multideg_single (v : ι × Fin n) (k : ℕ) (x : ι)
+    : multideg (Finsupp.single v k) x = if v.1 = x then k else 0 := by
   unfold multideg
   by_cases h : v.1 = x
   · rw [if_pos h, Finset.sum_eq_single v.2]
@@ -62,39 +66,49 @@ theorem ne_pred {J : ℕ} (hJ : 2 ≤ J) (j : ZMod J) : j ≠ j - 1 := by
 
 section Phi
 
-variable {p : ℕ} {n' r : ℕ} [NeZero n'] [NeZero r] {O : Type} [CommRing O] [IsDomain O]
-  [IsDiscreteValuationRing O] {Fr : Frames n' r} {L₁ N₁ : ℕ} {J : ℕ} [NeZero J] (Dt : SignedChainData p O r J)
+variable
+  {p : ℕ} {n' r : ℕ} [NeZero n'] [NeZero r]
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {Fr : Frames n' r} {L₁ N₁ : ℕ} {J : ℕ} [NeZero J]
+  (Dt : SignedChainData p O r J)
 
-theorem ph_ll (j : ZMod J) (l : Fin (Dt.nL j)) (a : Fin r) :
-    Dt.ph (X (ML.ll j l, a)) = monomial (Finsupp.single ((⟨j, Sum.inl l⟩ : TL J Dt.nL r), a) 1) 1 := by
+theorem ph_ll (j : ZMod J) (l : Fin (Dt.nL j)) (a : Fin r)
+    : Dt.ph (X (ML.ll j l, a))
+      = monomial (Finsupp.single ((⟨j, Sum.inl l⟩ : TL J Dt.nL r), a) 1) 1 := by
   rw [SignedChainData.ph, aeval_X]
   rfl
 
-theorem ph_lab (j : ZMod J) (m : Fin r) (a : Fin r) :
-    Dt.ph (X (ML.lab j m, a)) = monomial (Finsupp.single ((⟨j, Sum.inr m⟩ : TL J Dt.nL r), a) 1) 1 := by
+theorem ph_lab (j : ZMod J) (m : Fin r) (a : Fin r)
+    : Dt.ph (X (ML.lab j m, a))
+      = monomial (Finsupp.single ((⟨j, Sum.inr m⟩ : TL J Dt.nL r), a) 1) 1 := by
   rw [SignedChainData.ph, aeval_X]
   rfl
 
-theorem ph_wc (j : ZMod J) (m : Fin r) (a : Fin r) :
-    Dt.ph (X (ML.wc j m, a)) = monomial (Finsupp.single ((⟨j, Sum.inr m⟩ : TL J Dt.nL r), a) (Dt.P j m)) 1 := by
+theorem ph_wc (j : ZMod J) (m : Fin r) (a : Fin r)
+    : Dt.ph (X (ML.wc j m, a))
+      = monomial (Finsupp.single ((⟨j, Sum.inr m⟩ : TL J Dt.nL r), a) (Dt.P j m)) 1 := by
   rw [SignedChainData.ph, aeval_X]
   exact X_pow_eq_monomial
 
-theorem PhiJ_X (j : ZMod J) (v : ℤ × Fin r) (hv : v.1 ∈ Fr.letters (segZ j)) :
-    PhiJ Fr Dt j (X v) = Dt.ph (X (mlOf Fr Dt.nL j v.1, v.2)) := by
+theorem PhiJ_X (j : ZMod J) (v : ℤ × Fin r) (hv : v.1 ∈ Fr.letters (segZ j))
+    : PhiJ Fr Dt j (X v) = Dt.ph (X (mlOf Fr Dt.nL j v.1, v.2)) := by
   rw [PhiJ, AlgHom.comp_apply, chi, aeval_X, if_pos hv]
 
-theorem PhiJ_X_mon (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card) (hJ : 2 ≤ J) (j : ZMod J)
-    (v : ℤ × Fin r) (hv : v.1 ∈ Fr.letters (segZ j)) :
-    ∃ e : TL J Dt.nL r × Fin r →₀ ℕ, PhiJ Fr Dt j (X v) = monomial e 1 ∧
-      ∀ m' : Fin r, multideg e ⟨j - 1, Sum.inr m'⟩ =
-        Dt.P (j - 1) m' * (if v.1 = Fr.fr (segZ j - 1) (r - 1 - m'.val) then 1 else 0) := by
+theorem PhiJ_X_mon
+    (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card) (hJ : 2 ≤ J)
+    (j : ZMod J) (v : ℤ × Fin r) (hv : v.1 ∈ Fr.letters (segZ j))
+    : ∃ e : TL J Dt.nL r × Fin r →₀ ℕ,
+      PhiJ Fr Dt j (X v) = monomial e 1
+        ∧ ∀ m' : Fin r,
+          multideg e ⟨j - 1, Sum.inr m'⟩
+            = Dt.P (j - 1) m' * (if v.1 = Fr.fr (segZ j - 1) (r - 1 - m'.val) then 1 else 0) := by
   have hne := ne_pred hJ j
   have hr : 1 ≤ r := NeZero.one_le
   rw [PhiJ_X Dt j v hv]
   have hord := hV.2.2.2.1 (segZ j - 1)
   rw [sub_add_cancel] at hord
-  rcases Formalism.MainNotions.NormalSetCounting.restSpec n' r Fr L₁ N₁ hV J Dt.nL hnL j v.1 hv with ⟨l, hy, hml⟩ | ⟨m, hy, hml⟩ | ⟨m, hy, hml⟩
+  rcases Formalism.MainNotions.NormalSetCounting.restSpec n' r Fr L₁ N₁ hV J Dt.nL hnL j v.1 hv with
+    ⟨l, hy, hml⟩ | ⟨m, hy, hml⟩ | ⟨m, hy, hml⟩
   · rw [hml]
     refine ⟨_, ph_ll Dt j l v.2, fun m' => ?_⟩
     rw [multideg_single, if_neg (fun h => hne (congrArg Sigma.fst h)), if_neg, mul_zero]
@@ -123,11 +137,15 @@ theorem PhiJ_X_mon (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (
         have h3 := eq_of_heq (Sigma.mk.inj_iff.1 h).2
         exact hmm (Sum.inr.inj h3)
 
-theorem PhiJ_monomial (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card) (hJ : 2 ≤ J) (j : ZMod J)
-    (μ : ℤ × Fin r →₀ ℕ) : (∀ v ∈ μ.support, v.1 ∈ Fr.letters (segZ j)) →
-    ∃ ν : TL J Dt.nL r × Fin r →₀ ℕ, (∀ c : KK O, PhiJ Fr Dt j (monomial μ c) = monomial ν c) ∧
-      ∀ m' : Fin r, multideg ν ⟨j - 1, Sum.inr m'⟩ =
-        Dt.P (j - 1) m' * multideg μ (Fr.fr (segZ j - 1) (r - 1 - m'.val)) := by
+theorem PhiJ_monomial
+    (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card) (hJ : 2 ≤ J) (j : ZMod J)
+    (μ : ℤ × Fin r →₀ ℕ)
+    : (∀ v ∈ μ.support, v.1 ∈ Fr.letters (segZ j))
+      → ∃ ν : TL J Dt.nL r × Fin r →₀ ℕ,
+        (∀ c : KK O, PhiJ Fr Dt j (monomial μ c) = monomial ν c)
+          ∧ ∀ m' : Fin r,
+            multideg ν ⟨j - 1, Sum.inr m'⟩
+              = Dt.P (j - 1) m' * multideg μ (Fr.fr (segZ j - 1) (r - 1 - m'.val)) := by
   induction μ using Finsupp.induction_linear with
   | zero =>
     intro _
@@ -135,16 +153,22 @@ theorem PhiJ_monomial (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLse
     exact MvPolynomial.algHom_C _ c
   | add f g hf hg =>
     intro h
-    obtain ⟨ν1, a1, b1⟩ := hf (fun v hv => h v (by
-      rw [Finsupp.mem_support_iff] at hv ⊢
-      rw [Finsupp.add_apply]
-      omega))
-    obtain ⟨ν2, a2, b2⟩ := hg (fun v hv => h v (by
-      rw [Finsupp.mem_support_iff] at hv ⊢
-      rw [Finsupp.add_apply]
-      omega))
+    obtain ⟨ν1, a1, b1⟩ :=
+      hf (fun v hv =>
+        h v (by
+          rw [Finsupp.mem_support_iff] at hv ⊢
+          rw [Finsupp.add_apply]
+          omega))
+    obtain ⟨ν2, a2, b2⟩ :=
+      hg (fun v hv =>
+        h v (by
+          rw [Finsupp.mem_support_iff] at hv ⊢
+          rw [Finsupp.add_apply]
+          omega))
     refine ⟨ν1 + ν2, fun c => ?_, fun m' => ?_⟩
-    · have e : (monomial (f + g) c : MvPolynomial (ℤ × Fin r) (KK O)) = monomial f c * monomial g 1 := by
+    · have e
+          : (monomial (f + g) c : MvPolynomial (ℤ × Fin r) (KK O))
+            = monomial f c * monomial g 1 := by
         rw [monomial_mul, mul_one]
       rw [e, map_mul, a1, a2, monomial_mul, mul_one]
     · rw [multideg_add, multideg_add, b1, b2, mul_add]
@@ -152,16 +176,23 @@ theorem PhiJ_monomial (hV : Fr.Valid L₁ N₁) (hnL : ∀ j, Dt.nL j = (Fr.LLse
     intro h
     by_cases hk0 : k = 0
     · subst hk0
-      refine ⟨0, fun c => ?_, fun m' => by rw [Finsupp.single_zero, multideg_zero, multideg_zero, mul_zero]⟩
+      refine ⟨
+        0,
+        fun c => ?_,
+        fun m' => by rw [Finsupp.single_zero, multideg_zero, multideg_zero, mul_zero]
+      ⟩
       rw [Finsupp.single_zero]
       exact MvPolynomial.algHom_C _ c
-    · have hv : v.1 ∈ Fr.letters (segZ j) := h v (by rw [Finsupp.mem_support_iff, Finsupp.single_eq_same]; exact hk0)
+    · have hv : v.1 ∈ Fr.letters (segZ j) :=
+        h v (by rw [Finsupp.mem_support_iff, Finsupp.single_eq_same]; exact hk0)
       obtain ⟨e, he, hm⟩ := PhiJ_X_mon Dt hV hnL hJ j v hv
       refine ⟨k • e, fun c => ?_, fun m' => ?_⟩
-      · have e1 : (monomial (Finsupp.single v k) c : MvPolynomial (ℤ × Fin r) (KK O)) = C c * X v ^ k := by
+      · have e1
+            : (monomial (Finsupp.single v k) c : MvPolynomial (ℤ × Fin r) (KK O))
+              = C c * X v ^ k := by
           rw [X_pow_eq_monomial, C_mul_monomial, mul_one]
-        rw [e1, map_mul, map_pow, he, MvPolynomial.algHom_C, MvPolynomial.algebraMap_eq, monomial_pow, one_pow,
-          C_mul_monomial, mul_one]
+        rw [e1, map_mul, map_pow, he, MvPolynomial.algHom_C, MvPolynomial.algebraMap_eq,
+          monomial_pow, one_pow, C_mul_monomial, mul_one]
       · rw [multideg_smul, hm, multideg_single]
         split_ifs <;> ring
 
@@ -176,8 +207,9 @@ theorem lkDeg : LkDeg := by
     rw [map_sum] at hFs
   rw [hFs] at hν
   obtain ⟨μ, hμ, hν'⟩ := Finset.mem_biUnion.1 (MvPolynomial.support_sum hν)
-  obtain ⟨ν0, a0, b0⟩ := LkD.PhiJ_monomial Dt hV hS.2.1 hJ j μ (fun v hv =>
-    (mem_supported.1 hF) (Finset.mem_coe.2 ((mem_vars_iff_mem_support v).2 ⟨μ, hμ, hv⟩)))
+  obtain ⟨ν0, a0, b0⟩ :=
+    LkD.PhiJ_monomial Dt hV hS.2.1 hJ j μ (fun v hv =>
+      (mem_supported.1 hF) (Finset.mem_coe.2 ((mem_vars_iff_mem_support v).2 ⟨μ, hμ, hv⟩)))
   rw [a0] at hν'
   have := support_monomial_subset hν'
   rw [Finset.mem_singleton] at this
@@ -187,8 +219,9 @@ theorem lkVars : LkVars := by
   intro p n' r _ _ O _ _ _ Fr J _ Dt j
   let s : Set (TL J Dt.nL r × Fin r) :=
     {v | (∃ l, v.1 = ⟨j, Sum.inl l⟩) ∨ ∃ (j' : ZMod J) (m' : Fin r), v.1 = ⟨j', Sum.inr m'⟩}
-  have hmon : ∀ (x : TL J Dt.nL r × Fin r) (k : ℕ), x ∈ s →
-      (monomial (Finsupp.single x k) (1 : KK O)) ∈ supported (KK O) s := by
+  have hmon
+      : ∀ (x : TL J Dt.nL r × Fin r) (k : ℕ),
+        x ∈ s → (monomial (Finsupp.single x k) (1 : KK O)) ∈ supported (KK O) s := by
     intro x k hx
     rw [← X_pow_eq_monomial]
     refine Subalgebra.pow_mem _ ?_ _

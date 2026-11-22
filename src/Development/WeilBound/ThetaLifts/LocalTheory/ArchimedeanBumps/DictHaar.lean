@@ -13,9 +13,10 @@ open scoped ENNReal NNReal
 
 variable {ι : Type} [Fintype ι]
 
-theorem map_mul_vol (s : ι → ℂ) (hs : ∀ w, s w ≠ 0) :
-    Measure.map (fun c : ι → ℂ => s * c) volume = ENNReal.ofReal (∏ w, ‖s w‖ ^ 2)⁻¹ • volume := by
-  let f : (ι → ℂ) →ₗ[ℝ] (ι → ℂ) := LinearMap.pi fun i => (LinearMap.mul ℝ ℂ (s i)).comp (LinearMap.proj i)
+theorem map_mul_vol (s : ι → ℂ) (hs : ∀ w, s w ≠ 0)
+    : Measure.map (fun c : ι → ℂ => s * c) volume = ENNReal.ofReal (∏ w, ‖s w‖ ^ 2)⁻¹ • volume := by
+  let f : (ι → ℂ) →ₗ[ℝ] (ι → ℂ) :=
+    LinearMap.pi fun i => (LinearMap.mul ℝ ℂ (s i)).comp (LinearMap.proj i)
   have hd : LinearMap.det f = ∏ w, ‖s w‖ ^ 2 := by
     rw [LinearMap.det_pi]
     refine Finset.prod_congr rfl fun i _ => ?_
@@ -23,7 +24,9 @@ theorem map_mul_vol (s : ι → ℂ) (hs : ∀ w, s w ≠ 0) :
     rw [Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq] at this
     exact this.symm
   have hp : 0 < ∏ w, ‖s w‖ ^ 2 := Finset.prod_pos fun w _ => pow_pos (norm_pos_iff.2 (hs w)) 2
-  have := Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (ι → ℂ)) (f := f) (by rw [hd]; exact hp.ne')
+  have :=
+    Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (ι → ℂ)) (f := f)
+      (by rw [hd]; exact hp.ne')
   rw [hd, abs_of_pos (inv_pos.2 hp)] at this
   exact this
 
@@ -36,35 +39,45 @@ theorem measurable_dens : Measurable (dens : (ι → ℂ) → ℝ≥0) := by
 theorem ae_ne : ∀ᵐ c : ι → ℂ, ∀ w, c w ≠ 0 := by
   rw [ae_all_iff]
   intro w
-  exact (Measure.quasiMeasurePreserving_eval (fun _ : ι => (volume : Measure ℂ)) w).ae (p := fun z => z ≠ 0)
+  exact (Measure.quasiMeasurePreserving_eval (fun _ : ι => (volume : Measure ℂ)) w).ae
+    (p := fun z => z ≠ 0)
     (by rw [ae_iff]; simp)
 
-theorem dens_inv (s : ι → ℂ) (hs : ∀ w, s w ≠ 0) (A : Set (ι → ℂ)) (hA : MeasurableSet A) :
-    volume.withDensity (fun c => (dens c : ℝ≥0∞)) ((fun c => s * c) ⁻¹' A) = volume.withDensity (fun c => (dens c : ℝ≥0∞)) A := by
+theorem dens_inv (s : ι → ℂ) (hs : ∀ w, s w ≠ 0) (A : Set (ι → ℂ)) (hA : MeasurableSet A)
+    : volume.withDensity (fun c => (dens c : ℝ≥0∞)) ((fun c => s * c) ⁻¹' A)
+      = volume.withDensity (fun c => (dens c : ℝ≥0∞)) A := by
   have hm : Measurable fun c : ι → ℂ => s * c := by fun_prop
   have hp : 0 < ∏ w, ‖s w‖ ^ 2 := Finset.prod_pos fun w _ => pow_pos (norm_pos_iff.2 (hs w)) 2
   have hd : Measurable fun c : ι → ℂ => (dens c : ℝ≥0∞) := measurable_dens.coe_nnreal_ennreal
-  rw [withDensity_apply _ (hm hA), withDensity_apply _ hA, ← lintegral_indicator (hm hA), ← lintegral_indicator hA]
-  have e : ∀ c, ((fun c => s * c) ⁻¹' A).indicator (fun c => (dens c : ℝ≥0∞)) c =
-      ENNReal.ofReal (∏ w, ‖s w‖ ^ 2) * A.indicator (fun c => (dens c : ℝ≥0∞)) (s * c) := by
+  rw [withDensity_apply _ (hm hA), withDensity_apply _ hA, ← lintegral_indicator (hm hA),
+    ← lintegral_indicator hA]
+  have e
+      : ∀ c,
+        ((fun c => s * c) ⁻¹' A).indicator (fun c => (dens c : ℝ≥0∞)) c
+          = ENNReal.ofReal (∏ w, ‖s w‖ ^ 2) * A.indicator (fun c => (dens c : ℝ≥0∞)) (s * c) := by
     intro c
     by_cases h : s * c ∈ A
-    · rw [indicator_of_mem (show c ∈ (fun c => s * c) ⁻¹' A from h), indicator_of_mem h, ← ENNReal.ofReal_coe_nnreal,
-        ← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul hp.le]
+    · rw [indicator_of_mem (show c ∈ (fun c => s * c) ⁻¹' A from h), indicator_of_mem h,
+        ← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul hp.le]
       congr 1
       change (∏ w, ‖c w‖ ^ 2)⁻¹ = (∏ w, ‖s w‖ ^ 2) * (∏ w, ‖(s * c) w‖ ^ 2)⁻¹
       simp only [Pi.mul_apply, norm_mul, mul_pow, Finset.prod_mul_distrib, mul_inv]
       rw [← mul_assoc, mul_inv_cancel₀ hp.ne', one_mul]
-    · rw [indicator_of_notMem (show c ∉ (fun c => s * c) ⁻¹' A from h), indicator_of_notMem h, mul_zero]
+    · rw [indicator_of_notMem (show c ∉ (fun c => s * c) ⁻¹' A from h), indicator_of_notMem h,
+        mul_zero]
   simp only [e]
-  rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, ← lintegral_map (hd.indicator hA) hm, map_mul_vol s hs,
-    lintegral_smul_measure, smul_eq_mul, ← mul_assoc, ← ENNReal.ofReal_mul hp.le, mul_inv_cancel₀ hp.ne', ENNReal.ofReal_one,
-    one_mul]
+  rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, ← lintegral_map (hd.indicator hA) hm,
+    map_mul_vol s hs, lintegral_smul_measure, smul_eq_mul, ← mul_assoc, ← ENNReal.ofReal_mul hp.le,
+    mul_inv_cancel₀ hp.ne', ENNReal.ofReal_one, one_mul]
 
-theorem haar_units {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
-    (j : G → ι → ℂ) (hj : IsOpenEmbedding j) (hr : range j = {c | ∀ w, c w ≠ 0}) (hm : ∀ a b, j (a * b) = j a * j b)
-    (x : Measure G) [x.IsHaarMeasure] : ∃ κ : ℝ, 0 < κ ∧ ∀ g : (ι → ℂ) → ℂ,
-      ∫ l, g (j l) ∂x = κ * ∫ c, g c * ((∏ w, ‖c w‖ ^ 2 : ℝ) : ℂ)⁻¹ := by
+theorem haar_units
+    {G : Type}
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+    (j : G → ι → ℂ)
+    (hj : IsOpenEmbedding j) (hr : range j = {c | ∀ w, c w ≠ 0}) (hm : ∀ a b, j (a * b) = j a * j b)
+    (x : Measure G) [x.IsHaarMeasure]
+    : ∃ κ : ℝ,
+      0 < κ ∧ ∀ g : (ι → ℂ) → ℂ, ∫ l, g (j l) ∂x = κ * ∫ c, g c * ((∏ w, ‖c w‖ ^ 2 : ℝ) : ℂ)⁻¹ := by
   haveI := hj.locallyCompactSpace
   haveI := hj.isEmbedding.secondCountableTopology
   have he := hj.measurableEmbedding
@@ -103,7 +116,11 @@ theorem haar_units {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup
     rw [this] at h
     exact (hj.isOpenMap O hO).measure_ne_zero volume (hn.image j) h⟩
   haveI : y.IsHaarMeasure := {}
-  refine ⟨Measure.haarScalarFactor x y, by exact_mod_cast Measure.haarScalarFactor_pos_of_isHaarMeasure x y, fun g => ?_⟩
+  refine ⟨
+    Measure.haarScalarFactor x y,
+    by exact_mod_cast Measure.haarScalarFactor_pos_of_isHaarMeasure x y,
+    fun g => ?_
+  ⟩
   conv_lhs => rw [Measure.isMulLeftInvariant_eq_smul x y]
   have hν : ν.restrict {c | ∀ w, c w ≠ 0} = volume.withDensity fun c => (dens c : ℝ≥0∞) :=
     Measure.restrict_eq_self_of_ae_mem ((withDensity_absolutelyContinuous _ _).ae_le ae_ne)

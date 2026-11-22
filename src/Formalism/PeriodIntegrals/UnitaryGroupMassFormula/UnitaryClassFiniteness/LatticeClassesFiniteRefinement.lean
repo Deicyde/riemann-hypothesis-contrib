@@ -21,21 +21,22 @@ theorem int_nat (m : ℕ) : IsIntegral ℤ (m : E) := by
   have h := isIntegral_algebraMap (R := ℤ) (A := E) (x := (m : ℤ))
   simpa using h
 
-theorem int_sigma (σ : E →+* E) {a : E} (ha : IsIntegral ℤ a) : IsIntegral ℤ (σ a) := ha.map σ.toIntAlgHom
+theorem int_sigma (σ : E →+* E) {a : E} (ha : IsIntegral ℤ a) : IsIntegral ℤ (σ a) :=
+  ha.map σ.toIntAlgHom
 
-theorem mat_den {M : ℕ} (A : Matrix (Fin M) (Fin M) E) : ∃ d : ℕ, 0 < d ∧ ∀ i j, IsIntegral ℤ ((d : E) * A i j) := by
+theorem mat_den {M : ℕ} (A : Matrix (Fin M) (Fin M) E)
+    : ∃ d : ℕ, 0 < d ∧ ∀ i j, IsIntegral ℤ ((d : E) * A i j) := by
   have hex : ∀ a : E, ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * a) := by
     intro a
     have halg : IsAlgebraic ℤ a := by
       first
       | exact (IsFractionRing.isAlgebraic_iff ℤ ℚ).mpr (Algebra.IsAlgebraic.isAlgebraic a)
       | exact (IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr (Algebra.IsAlgebraic.isAlgebraic a)
-      | exact (IsFractionRing.isAlgebraic_iff (R := ℤ) (K := ℚ)).mpr (Algebra.IsAlgebraic.isAlgebraic a)
+      | exact (IsFractionRing.isAlgebraic_iff (R := ℤ) (K := ℚ)).mpr
+          (Algebra.IsAlgebraic.isAlgebraic a)
       | exact Algebra.IsAlgebraic.isAlgebraic a
     obtain ⟨y, hy0, hy⟩ : ∃ y ≠ (0 : ℤ), IsIntegral ℤ (y • a) := by
-      first
-      | exact halg.exists_integral_multiple
-      | exact exists_integral_multiple halg
+      first | exact halg.exists_integral_multiple | exact exists_integral_multiple halg
     refine ⟨y.natAbs, Int.natAbs_pos.mpr hy0, ?_⟩
     have hcast : ((y.natAbs : ℕ) : E) = (((y.natAbs : ℕ) : ℤ) : E) := (Int.cast_natCast _).symm
     rcases (show ((y.natAbs : ℕ) : ℤ) = y ∨ ((y.natAbs : ℕ) : ℤ) = -y by omega) with h | h
@@ -64,8 +65,12 @@ theorem lattice_classes_finite_refinement : LatFin := by
   obtain ⟨SE, hSEf, hSE⟩ := hermitian_lattice_finite E M σ J' T hσ hpos' hT
   let Sub : Submodule (𝓞 E) (Fin M → E) → Set (Set (Fin M → E)) := fun N₀ =>
     {s | (∃ G : AddSubgroup (Fin M → E), (G : Set (Fin M → E)) = s) ∧ (∀ x ∈ N₀, (c0 : E) • x ∈ s) ∧ s ⊆ N₀}
-  refine ⟨⋃ N₀ ∈ {N₀ | N₀ ∈ SE ∧ N₀.FG}, Sub N₀,
-    Set.Finite.biUnion (hSEf.subset (by exact fun N₀ h => h.1)) fun N₀ h => sub_finite N₀ h.2 c0 hc0, ?_⟩
+  refine ⟨
+    ⋃ N₀ ∈ {N₀ | N₀ ∈ SE ∧ N₀.FG}, Sub N₀,
+    Set.Finite.biUnion (hSEf.subset (by exact fun N₀ h => h.1)) fun N₀ h =>
+      sub_finite N₀ h.2 c0 hc0,
+    ?_
+  ⟩
   intro Λ h1 h2 h3 h4
   have hDE : (D : E) ≠ 0 := by exact_mod_cast hD.ne'
 
@@ -139,8 +144,8 @@ theorem lattice_classes_finite_refinement : LatFin := by
       congr 1
       rw [smul_eq_mul, div_mul_cancel₀ _ hkE]
     rw [hv]
-    exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _
-      (Submodule.subset_span (Submodule.subset_span (hsing j)))
+    exact Submodule.sum_mem _ fun j _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span (Submodule.subset_span (hsing j)))
   have hAdm : admitted σ J' T N := ⟨⟨hNfg, hNspan⟩, hI, hDual⟩
   obtain ⟨N₀, hN₀, g, hg, hgN⟩ := hSE N hAdm
 
@@ -164,7 +169,8 @@ theorem lattice_classes_finite_refinement : LatFin := by
   have hGg : ((G : GL (Fin M) E) : Matrix (Fin M) (Fin M) E) = g := rfl
   have hGU : G ∈ PI.UJClassFin.UJ σ J := by
     show PI.UJClassFin.cT σ (G : Matrix (Fin M) (Fin M) E) * J * (G : Matrix (Fin M) (Fin M) E) = J
-    rw [hGg]; exact hgU
+    rw [hGg]
+    exact hgU
   have hgi : g⁻¹ * g = 1 := Matrix.nonsing_inv_mul _ (Ne.isUnit hgdet)
   have hig : g * g⁻¹ = 1 := Matrix.mul_nonsing_inv _ (Ne.isUnit hgdet)
 
@@ -180,17 +186,18 @@ theorem lattice_classes_finite_refinement : LatFin := by
     exact hNfg.map _
 
   have hc0N : ∀ y ∈ N, (c0 : E) • y ∈ Λ := by
-    let Nc : Submodule (𝓞 E) (Fin M → E) :=
-      { carrier := {y | ∀ a : 𝓞 E, (c0 : E) • ((a : E) • y) ∈ Λ}
-        add_mem' := fun {y z} hy hz a => by rw [smul_add, smul_add]; exact Λ.add_mem (hy a) (hz a)
-        zero_mem' := fun a => by rw [smul_zero, smul_zero]; exact Λ.zero_mem
-        smul_mem' := fun b y hy a => by
-          show (c0 : E) • ((a : E) • (b • y)) ∈ Λ
-          have e : (a : E) • (b • y) = ((a * b : 𝓞 E) : E) • y := by
-            rw [smul_coe b y, smul_smul]
-            rfl
-          rw [e]
-          exact hy (a * b) }
+    let Nc : Submodule (𝓞 E) (Fin M → E) := {
+      carrier := {y | ∀ a : 𝓞 E, (c0 : E) • ((a : E) • y) ∈ Λ}
+      add_mem' := fun {y z} hy hz a => by rw [smul_add, smul_add]; exact Λ.add_mem (hy a) (hz a)
+      zero_mem' := fun a => by rw [smul_zero, smul_zero]; exact Λ.zero_mem
+      smul_mem' := fun b y hy a => by
+        show (c0 : E) • ((a : E) • (b • y)) ∈ Λ
+        have e : (a : E) • (b • y) = ((a * b : 𝓞 E) : E) • y := by
+          rw [smul_coe b y, smul_smul]
+          rfl
+        rw [e]
+        exact hy (a * b)
+    }
     have hle : N ≤ Nc := by
       rw [hNdef, Submodule.span_le]
       intro x hx a

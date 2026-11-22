@@ -5,29 +5,47 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.AbelianDeR
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.AbLaw
+  GlobalTheory.CechPic GlobalTheory.AbDual
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.StalkIdeal
 
-theorem exists_stalk_ideal : ∀ (X Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i] (x : X), x ∈ Set.range i → (∀ z : Z, IsClosed ({z} : Set Z)) → ∃ I : Ideal (X.presheaf.stalk x), I ≠ ⊤ ∧ (∀ q : Ideal (X.presheaf.stalk x), q.IsPrime → I ≤ q → q = IsLocalRing.maximalIdeal (X.presheaf.stalk x)) ∧ ∀ J : Ideal (X.presheaf.stalk x), (∃ z : Sp (X.presheaf.stalk x ⧸ J) ⟶ Z, z ≫ i = spMap (Ideal.Quotient.mk J) ≫ X.fromSpecStalk x) ↔ I ≤ J := by
+theorem exists_stalk_ideal
+    : ∀ (X Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i] (x : X),
+      x ∈ Set.range i → (∀ z : Z, IsClosed ({z} : Set Z))
+        → ∃ I : Ideal (X.presheaf.stalk x),
+          I ≠ ⊤
+            ∧ (∀ q : Ideal (X.presheaf.stalk x),
+              q.IsPrime → I ≤ q → q = IsLocalRing.maximalIdeal (X.presheaf.stalk x))
+            ∧ ∀ J : Ideal (X.presheaf.stalk x),
+              (∃ z : Sp (X.presheaf.stalk x ⧸ J) ⟶ Z,
+                  z ≫ i = spMap (Ideal.Quotient.mk J) ≫ X.fromSpecStalk x)
+                ↔ I ≤ J := by
   intro X Z i _ x hx hcl
   have hq : IsClosedImmersion (pullback.snd i (X.fromSpecStalk x)) := inferInstance
   obtain ⟨I, e, he⟩ := IsClosedImmersion.Spec_iff.1 hq
-  have hpt : ∀ p : ↥(pullback i (X.fromSpecStalk x)),
-      X.fromSpecStalk x (pullback.snd i (X.fromSpecStalk x) p) =
-        i (pullback.fst i (X.fromSpecStalk x) p) := by
+  have hpt
+      : ∀ p : ↥(pullback i (X.fromSpecStalk x)),
+        X.fromSpecStalk x (pullback.snd i (X.fromSpecStalk x) p)
+          = i (pullback.fst i (X.fromSpecStalk x) p) := by
     intro p
     rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, pullback.condition]
-  have hsnd : ∀ s : ↥(Spec (CommRingCat.of (X.presheaf.stalk x ⧸ I))),
-      pullback.snd i (X.fromSpecStalk x) (e.inv s) = PrimeSpectrum.comap (Ideal.Quotient.mk I) s := by
+  have hsnd
+      : ∀ s : ↥(Spec (CommRingCat.of (X.presheaf.stalk x ⧸ I))),
+        pullback.snd i (X.fromSpecStalk x) (e.inv s)
+          = PrimeSpectrum.comap (Ideal.Quotient.mk I) s := by
     intro s
     rw [he, Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply e.inv e.hom, Iso.inv_hom_id]
     rfl
   refine ⟨I, ?_, ?_, ?_⟩
   · obtain ⟨z, hz⟩ := hx
-    obtain ⟨p, -, -⟩ := Scheme.Pullback.exists_preimage_pullback (f := i) (g := X.fromSpecStalk x)
-      z (IsLocalRing.closedPoint _) (by rw [Scheme.fromSpecStalk_closedPoint, hz])
+    obtain ⟨p, -, -⟩ :=
+      Scheme.Pullback.exists_preimage_pullback (f := i) (g := X.fromSpecStalk x) z
+        (IsLocalRing.closedPoint _) (by rw [Scheme.fromSpecStalk_closedPoint, hz])
     have hs : (show PrimeSpectrum (X.presheaf.stalk x ⧸ I) from e.hom p).asIdeal.IsPrime :=
       PrimeSpectrum.isPrime _
     rw [← Ideal.Quotient.nontrivial_iff]
@@ -61,29 +79,37 @@ theorem exists_stalk_ideal : ∀ (X Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmer
       rw [Set.mem_singleton_iff] at this
       exact this.trans h1.symm
     have h4 : P = IsLocalRing.closedPoint (X.presheaf.stalk x) :=
-      (X.fromSpecStalk x).isEmbedding.injective (by rw [Scheme.fromSpecStalk_closedPoint]; exact h3.symm)
+      (X.fromSpecStalk x).isEmbedding.injective
+        (by rw [Scheme.fromSpecStalk_closedPoint]; exact h3.symm)
     exact congrArg PrimeSpectrum.asIdeal h4
   · intro J
     constructor
     · rintro ⟨z, hz⟩
       have hw := pullback.lift_snd z (spMap (Ideal.Quotient.mk J)) hz
       rw [he, ← Category.assoc] at hw
-      have h2 : Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I) ≫
-          Spec.preimage (S := CommRingCat.of (X.presheaf.stalk x ⧸ J))
-            (pullback.lift z (spMap (Ideal.Quotient.mk J)) hz ≫ e.hom)) =
-          Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)) := by
+      have h2
+          : Spec.map
+              (CommRingCat.ofHom (Ideal.Quotient.mk I)
+                ≫ Spec.preimage (S := CommRingCat.of (X.presheaf.stalk x ⧸ J))
+                  (pullback.lift z (spMap (Ideal.Quotient.mk J)) hz ≫ e.hom))
+            = Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)) := by
         rw [Spec.map_comp, Spec.map_preimage]
         exact hw
       rw [Spec.map_inj] at h2
       intro a ha
       have h3 := congrArg (fun g => g.hom a) h2
       have h4 : Ideal.Quotient.mk I a = 0 := Ideal.Quotient.eq_zero_iff_mem.2 ha
-      simp only [CommRingCat.hom_comp, CommRingCat.hom_ofHom, RingHom.comp_apply, h4, map_zero] at h3
+      simp only [CommRingCat.hom_comp, CommRingCat.hom_ofHom, RingHom.comp_apply, h4, map_zero]
+        at h3
       exact Ideal.Quotient.eq_zero_iff_mem.1 h3.symm
     · intro hIJ
-      refine ⟨Spec.map (CommRingCat.ofHom (Ideal.Quotient.factor hIJ)) ≫ e.inv ≫
-        pullback.fst i (X.fromSpecStalk x), ?_⟩
-      rw [Category.assoc, Category.assoc, pullback.condition, he, Category.assoc, Iso.inv_hom_id_assoc,
-        ← Category.assoc, ← Spec.map_comp, ← CommRingCat.ofHom_comp, Ideal.Quotient.factor_comp_mk]
+      refine ⟨
+        Spec.map (CommRingCat.ofHom (Ideal.Quotient.factor hIJ)) ≫ e.inv
+          ≫ pullback.fst i (X.fromSpecStalk x),
+        ?_
+      ⟩
+      rw [Category.assoc, Category.assoc, pullback.condition, he, Category.assoc,
+        Iso.inv_hom_id_assoc, ← Category.assoc, ← Spec.map_comp, ← CommRingCat.ofHom_comp,
+        Ideal.Quotient.factor_comp_mk]
 
 end GlobalTheory.CompanionTheory.StalkIdeal

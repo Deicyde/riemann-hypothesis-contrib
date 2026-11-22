@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.MemNonzeroL
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
 open GlobalTheory.KeyUnitModels
 
 namespace GlobalTheory.BoxNonzeroClosed
@@ -27,13 +29,26 @@ theorem flat_pow {S : Scheme.{0}} (G : Over S) [Flat G.hom] (N : ℕ) : Flat (po
   rw [← Over.w e.hom]
   infer_instance
 
-theorem main : ∀ (V : Type) [CommRing V] [IsLocalRing V] (G : Over (Sp V)) [Flat G.hom] (L : LB G.left) (θ : L.Sec),
-    NonzeroClosed (X := G) θ → ∀ N : ℕ, Flat (pow G N).hom ∧ NonzeroClosed (X := pow G N) (boxSec G θ N) := by
+theorem main
+    : ∀ (V : Type) [CommRing V] [IsLocalRing V] (G : Over (Sp V)) [Flat G.hom] (L : LB G.left)
+        (θ : L.Sec),
+      NonzeroClosed (X := G) θ
+        → ∀ N : ℕ, Flat (pow G N).hom ∧ NonzeroClosed (X := pow G N) (boxSec G θ N) := by
   rintro V _ _ G _ L θ ⟨g, hg, hθ⟩ N
   refine ⟨flat_pow G N, ?_⟩
-  obtain ⟨y, hy, hy'⟩ := GlobalTheory.BoxSection.exists_point (fun k => Pi.π (fun _ : Fin N => G) k)
-    (productIsProduct (fun _ : Fin N => G)) _ (fun _ => g) (fun _ => hg)
-  exact ⟨y, hy, GlobalTheory.BoxSection.mem_nonzeroLocus_prodSec L (pr G N) (fun _ => θ) y
-    fun i => (hy' i).symm ▸ hθ⟩
+  obtain ⟨y, hy, hy'⟩ :=
+    GlobalTheory.BoxSection.exists_point
+      (fun k => Pi.π (fun _ : Fin N => G) k)
+      (productIsProduct (fun _ : Fin N => G)) _
+      (fun _ => g)
+      (fun _ => hg)
+  exact ⟨
+    y,
+    hy,
+    GlobalTheory.BoxSection.mem_nonzeroLocus_prodSec L (pr G N)
+      (fun _ => θ)
+      y
+      fun i => (hy' i).symm ▸ hθ
+  ⟩
 
 end GlobalTheory.BoxNonzeroClosed

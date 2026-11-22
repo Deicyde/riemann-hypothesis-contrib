@@ -5,15 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NonemptyI
 
 @[expose] public section
 
-open MvPolynomial GlobalTheory.IndefiniteRowSideFullHecke.MinorOrderedEntries GlobalTheory.OneFunctional Formalism.BasicNotions GlobalTheory.Branching
+open MvPolynomial GlobalTheory.IndefiniteRowSideFullHecke.MinorOrderedEntries
+  GlobalTheory.OneFunctional Formalism.BasicNotions GlobalTheory.Branching
 open scoped TensorProduct DirectSum
 
 noncomputable section
 
 namespace GlobalTheory.PolyTensor
 
-theorem curry_sum_mapDomain {ι β : Type} [Fintype ι] (v : ι → (β →₀ ℕ)) (τ : ι) :
-    (∑ σ, Finsupp.mapDomain (fun x => (σ, x)) (v σ)).curry τ = v τ := by
+theorem curry_sum_mapDomain {ι β : Type} [Fintype ι] (v : ι → (β →₀ ℕ)) (τ : ι)
+    : (∑ σ, Finsupp.mapDomain (fun x => (σ, x)) (v σ)).curry τ = v τ := by
   classical
   ext x
   rw [Finsupp.curry_apply, Finsupp.finsetSum_apply, Finset.sum_eq_single τ]
@@ -35,8 +36,8 @@ def expEquiv (ι σ : Type) [Fintype ι] : (ι → (σ →₀ ℕ)) ≃ (ι × �
       have := DFunLike.congr_fun (curry_sum_mapDomain (fun τ => m.curry τ) τ) x
       simpa only [Finsupp.curry_apply] using this
 
-theorem exists_piTensor_equiv : ∀ (ι σ : Type) [Fintype ι],
-    ∃ e : (⨂[ℂ] _ : ι, MvPolynomial σ ℂ) ≃ₗ[ℂ] MvPolynomial (ι × σ) ℂ,
+theorem exists_piTensor_equiv
+    : ∀ (ι σ : Type) [Fintype ι], ∃ e : (⨂[ℂ] _ : ι, MvPolynomial σ ℂ) ≃ₗ[ℂ] MvPolynomial (ι × σ) ℂ,
       ∀ f : ι → MvPolynomial σ ℂ,
         e (PiTensorProduct.tprod ℂ f) = ∏ τ, rename (Prod.mk τ) (f τ) := by
   intro ι σ _
@@ -45,9 +46,10 @@ theorem exists_piTensor_equiv : ∀ (ι σ : Type) [Fintype ι],
   let e : (⨂[ℂ] _ : ι, MvPolynomial σ ℂ) ≃ₗ[ℂ] MvPolynomial (ι × σ) ℂ :=
     bT.equiv (MvPolynomial.basisMonomials (ι × σ) ℂ) (expEquiv ι σ)
 
-  have key : e.toLinearMap.compMultilinearMap (PiTensorProduct.tprod ℂ) =
-      (MultilinearMap.mkPiAlgebra ℂ ι (MvPolynomial (ι × σ) ℂ)).compLinearMap
-        (fun τ => (rename (Prod.mk τ) : MvPolynomial σ ℂ →ₐ[ℂ] MvPolynomial (ι × σ) ℂ).toLinearMap) := by
+  have key
+      : e.toLinearMap.compMultilinearMap (PiTensorProduct.tprod ℂ)
+        = (MultilinearMap.mkPiAlgebra ℂ ι (MvPolynomial (ι × σ) ℂ)).compLinearMap (fun τ =>
+          (rename (Prod.mk τ) : MvPolynomial σ ℂ →ₐ[ℂ] MvPolynomial (ι × σ) ℂ).toLinearMap) := by
     refine Module.Basis.ext_multilinear (fun _ => MvPolynomial.basisMonomials σ ℂ) fun v => ?_
     rw [LinearMap.compMultilinearMap_apply, MultilinearMap.compLinearMap_apply,
       MultilinearMap.mkPiAlgebra_apply, ← Basis.piTensorProduct_apply]

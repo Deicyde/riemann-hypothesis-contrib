@@ -7,14 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSplit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
 open scoped TensorProduct
 
 namespace GlobalTheory.Member.DeltaTame
 
-theorem delta_tame_and_15 : ∀ (D : D7) (T : TwR D.LL0 D.nd) (i : T.Tw) (P : PlE D.host), P ∈ T.pD i →
-    ((15 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal ∧ ∀ A : ValuationSubring D.nd.Om, IsPlaceOver A P → ∀ σ ∈ Ine (F := D.host.E) A,
-      ∃ N : ℕ, T.delta i σ ^ (15 ^ N) = 1 := by
+theorem delta_tame_and_15
+    : ∀ (D : D7) (T : TwR D.LL0 D.nd) (i : T.Tw) (P : PlE D.host),
+      P ∈ T.pD i
+        → ((15 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal
+          ∧ ∀ A : ValuationSubring D.nd.Om,
+            IsPlaceOver A P → ∀ σ ∈ Ine (F := D.host.E) A, ∃ N : ℕ, T.delta i σ ^ (15 ^ N) = 1 := by
   intro D T i P hP
   refine ⟨?_, ?_⟩
   · intro h15
@@ -26,7 +32,8 @@ theorem delta_tame_and_15 : ∀ (D : D7) (T : TwR D.LL0 D.nd) (i : T.Tw) (P : Pl
     rw [hdecomp] at hmem
     push_cast at hmem h15
     have h1 : (1 : 𝓞 D.host.E) ∈ P.asIdeal := by
-      have hm2 : (15 : 𝓞 D.host.E) * ((Ideal.absNorm P.asIdeal / 15 : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal :=
+      have hm2
+          : (15 : 𝓞 D.host.E) * ((Ideal.absNorm P.asIdeal / 15 : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal :=
         P.asIdeal.mul_mem_right _ h15
       have := P.asIdeal.sub_mem hmem hm2
       simpa using this
@@ -35,8 +42,9 @@ theorem delta_tame_and_15 : ∀ (D : D7) (T : TwR D.LL0 D.nd) (i : T.Tw) (P : Pl
     have h15 := T.delta_15 i P hP A hA
     have hfin : Finite ((Ine (F := D.host.E) A).map (T.delta i)) :=
       Nat.finite_of_card_ne_zero (by rw [h15]; norm_num)
-    have hpow := pow_card_eq_one' (G := (Ine (F := D.host.E) A).map (T.delta i))
-      (x := ⟨T.delta i σ, Subgroup.mem_map_of_mem _ hσ⟩)
+    have hpow :=
+      pow_card_eq_one' (G := (Ine (F := D.host.E) A).map (T.delta i))
+        (x := ⟨T.delta i σ, Subgroup.mem_map_of_mem _ hσ⟩)
     rw [h15] at hpow
     refine ⟨1, ?_⟩
     have := congrArg Subtype.val hpow

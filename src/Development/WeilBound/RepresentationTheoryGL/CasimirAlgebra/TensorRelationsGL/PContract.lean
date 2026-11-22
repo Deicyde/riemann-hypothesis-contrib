@@ -17,8 +17,8 @@ theorem contract_of : TensorGl → QdetFacts → WallAlg → TensorGK → LieInv
   intro n hn M _ _ ι _ _ Γ _ _ bar κ E ρ hK hG s φ hφ m hm hS
   classical
   obtain ⟨lab, c, ξ, hlab, hξ, I, w, hw, hφw⟩ := hS
-  obtain ⟨N, F, hFgl, hFc, hFch, hFE, hN⟩ := hWQ n M ι E hG.gl hG.comm (fun _ _ => s) φ (by
-    intro τ u; rw [hφ τ u]; simp [Finset.prod_const])
+  obtain ⟨N, F, hFgl, hFc, hFch, hFE, hN⟩ :=
+    hWQ n M ι E hG.gl hG.comm (fun _ _ => s) φ (by intro τ u; rw [hφ τ u]; simp [Finset.prod_const])
   obtain ⟨τ0, hτ0⟩ : ∃ τ0, lab ⟨0, hm⟩ = τ0 := ⟨_, rfl⟩
   let O := {p : Fin m // ¬ lab p = τ0}
   let e1 := Fintype.equivFin {p : Fin m // lab p = τ0}
@@ -33,8 +33,10 @@ theorem contract_of : TensorGl → QdetFacts → WallAlg → TensorGK → LieInv
     · exact (e1.symm j).2
   have hm1 : 0 < Fintype.card {p : Fin m // lab p = τ0} := Fintype.card_pos_iff.2 ⟨⟨⟨0, hm⟩, hτ0⟩⟩
   set ζ := cur (reIx e ξ) with hζdef
-  have hζS : ∀ γ, actT (fun _ : Fin (Fintype.card {p : Fin m // lab p = τ0}) => τ0) κ (actT labO κ ρ) γ ζ =
-      (∏ τ, (κ τ γ).det ^ c τ) • ζ := by
+  have hζS
+      : ∀ γ,
+        actT (fun _ : Fin (Fintype.card {p : Fin m // lab p = τ0}) => τ0) κ (actT labO κ ρ) γ ζ
+          = (∏ τ, (κ τ γ).det ^ c τ) • ζ := by
     intro γ
     apply unc_inj
     rw [← actT_unc, unc_smul, hζdef, unc_cur, ← hle, actT_reIx, hξ γ, reIx_smul]
@@ -70,15 +72,24 @@ theorem contract_of : TensorGl → QdetFacts → WallAlg → TensorGK → LieInv
     show N.mkQ (ζ (I ∘ e.symm ∘ Sum.inr) I0) ≠ 0
     rw [h4, Submodule.mkQ_apply, Ne, Submodule.Quotient.mk_eq_zero]
     exact hξN
-  obtain ⟨m2, hm2, ζ2, hζ2, I2, hI2⟩ := core hQ hW hT hL hK hGO τ0 q (F τ0) (F (bar τ0)) s (hFgl _) (hFgl _)
-    (hFc _ _ (Ne.symm (hK.ne τ0))) (hFch τ0) (hFch (bar τ0)) (hq τ0 hf0) (hq _ hf1) hn _ hm1 c ζ hζS
-    ⟨_, hz⟩
+  obtain ⟨m2, hm2, ζ2, hζ2, I2, hI2⟩ :=
+    core hQ hW hT hL hK hGO τ0 q (F τ0) (F (bar τ0)) s (hFgl _) (hFgl _)
+      (hFc _ _ (Ne.symm (hK.ne τ0))) (hFch τ0) (hFch (bar τ0)) (hq τ0 hf0) (hq _ hf1) hn _ hm1 c ζ
+      hζS ⟨_, hz⟩
   let e3 := Fintype.equivFin (O ⊕ Fin m2)
   have hcard : m = Fintype.card O + Fintype.card {p : Fin m // lab p = τ0} := by
     have := Fintype.card_congr e
     simpa [Fintype.card_sum] using this
-  refine ⟨Fintype.card (O ⊕ Fin m2), ?_, (Sum.elim labO (fun _ => τ0)) ∘ e3.symm,
-    Function.update c τ0 (c τ0 - 1), reIx e3 (unc ζ2), ?_, ?_, ?_⟩
+  refine ⟨
+    Fintype.card (O ⊕ Fin m2),
+    ?_,
+    (Sum.elim labO (fun _ => τ0)) ∘ e3.symm,
+    Function.update c τ0 (c τ0 - 1),
+    reIx e3 (unc ζ2),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Fintype.card_sum, Fintype.card_fin]
     omega
   · have hex : ∀ x : O ⊕ Fin m2, ∃ p, Sum.elim labO (fun _ => τ0) x = lab p := by

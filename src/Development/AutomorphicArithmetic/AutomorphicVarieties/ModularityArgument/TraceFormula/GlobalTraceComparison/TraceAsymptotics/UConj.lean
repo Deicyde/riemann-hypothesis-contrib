@@ -6,11 +6,12 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Continuo
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open GlobalTheory.CompanionTheory.ConjSat
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.uConj :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.UConj := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.uConj
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.UConj := by
   intro E _ _ _ n σ w hw τ B ⟨_, f, f0, hf, hfx⟩ hB
   have hu : locU n (UpperTheory.V.Af.Bc.cPl w) = locU n w :=
     locU_eq_of_under (GlobalTheory.SplitPts.over_split hw).2.1

@@ -5,5 +5,6 @@ public import Development.AutomorphicArithmetic.Foundations.BaseChangeIdentities
 
 @[expose] public section
 
-theorem UpperTheory.BaseChangeIdentities.baseChangeN : PositivityTheory.Rg.BcN.BaseChangeIsobaricN :=
+theorem UpperTheory.BaseChangeIdentities.baseChangeN
+    : PositivityTheory.Rg.BcN.BaseChangeIsobaricN :=
   UpperTheory.BaseChangeIdentities.baseChangeN_of UpperTheory.HeckeLevelFrameExistence.candFin

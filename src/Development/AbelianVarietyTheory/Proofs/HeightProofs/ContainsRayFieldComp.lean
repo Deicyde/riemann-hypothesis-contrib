@@ -9,8 +9,10 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.RayDescent
 
-theorem dvd_intNorm_sub_one (K E : Type) [Field K] [NumberField K] [Field E] [NumberField E] [Algebra K E] (n : ℕ)
-    (a : 𝓞 E) (h : (n : 𝓞 E) ∣ a - 1) : (n : 𝓞 K) ∣ Algebra.intNorm (𝓞 K) (𝓞 E) a - 1 := by
+theorem dvd_intNorm_sub_one
+    (K E : Type) [Field K] [NumberField K] [Field E] [NumberField E] [Algebra K E]
+    (n : ℕ) (a : 𝓞 E) (h : (n : 𝓞 E) ∣ a - 1)
+    : (n : 𝓞 K) ∣ Algebra.intNorm (𝓞 K) (𝓞 E) a - 1 := by
   classical
   obtain ⟨c, hc⟩ := h
   have ha : a = 1 + n * c := by rw [← hc]; ring
@@ -29,7 +31,8 @@ theorem dvd_intNorm_sub_one (K E : Type) [Field K] [NumberField K] [Field E] [Nu
         refine ⟨r σ a * d + r σ c, ?_⟩
         have h1 : r σ a = 1 + n * r σ c := by rw [ha]; simp
         have h2 : ∏ σ ∈ s, r σ a = 1 + n * d := by rw [← hd]; ring
-        rw [h2, h1]; ring
+        rw [h2, h1]
+        ring
     exact this _
   obtain ⟨d, hd⟩ := hd
   set N := Algebra.intNorm (𝓞 K) (𝓞 E) a with hN
@@ -56,15 +59,20 @@ theorem dvd_intNorm_sub_one (K E : Type) [Field K] [NumberField K] [Field E] [Nu
   change (N : K) - 1 = n * (y : K)
   rw [hy', mul_div_cancel₀ _ hnK]
 
-theorem containsRayField_comp (K E L : Type) [Field K] [NumberField K] [Field E] [NumberField E] [Field L] [NumberField L]
-    (φ : K →+* E) (ψ : E →+* L) (n : ℕ) (h : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField ψ n) :
-    GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (ψ.comp φ) n := by
+theorem containsRayField_comp
+    (K E L : Type) [Field K] [NumberField K] [Field E] [NumberField E] [Field L] [NumberField L]
+    (φ : K →+* E)
+    (ψ : E →+* L) (n : ℕ)
+    (h : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField ψ n)
+    : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (ψ.comp φ) n := by
   intro P hP
   obtain ⟨f, α, h1, h2, h3⟩ := h P hP
   letI : Algebra K E := φ.toAlgebra
   letI : Algebra E L := ψ.toAlgebra
   have hq : P.asIdeal.comap (RingOfIntegers.mapRingHom ψ) = P.asIdeal.under (𝓞 E) := rfl
-  have hp : P.asIdeal.comap (RingOfIntegers.mapRingHom (ψ.comp φ)) = (P.asIdeal.under (𝓞 E)).under (𝓞 K) := by
+  have hp
+      : P.asIdeal.comap (RingOfIntegers.mapRingHom (ψ.comp φ))
+        = (P.asIdeal.under (𝓞 E)).under (𝓞 K) := by
     ext x
     rfl
   rw [hq] at h1 h2
@@ -74,8 +82,10 @@ theorem containsRayField_comp (K E L : Type) [Field K] [NumberField K] [Field E]
   set p := q.under (𝓞 K)
   haveI : q.IsMaximal := inferInstance
   haveI : p.IsMaximal := inferInstance
-  have hrel : Ideal.relNorm (𝓞 K) q = p ^ q.inertiaDeg (𝓞 K) := Ideal.relNorm_eq_pow_of_isMaximal q p
-  refine ⟨q.inertiaDeg (𝓞 K) * f, Algebra.intNorm (𝓞 K) (𝓞 E) α, ?_, ?_, dvd_intNorm_sub_one K E n α h3⟩
+  have hrel : Ideal.relNorm (𝓞 K) q = p ^ q.inertiaDeg (𝓞 K) :=
+    Ideal.relNorm_eq_pow_of_isMaximal q p
+  refine
+    ⟨q.inertiaDeg (𝓞 K) * f, Algebra.intNorm (𝓞 K) (𝓞 E) α, ?_, ?_, dvd_intNorm_sub_one K E n α h3⟩
   · rw [h1, pow_mul, ← map_pow Ideal.absNorm p, ← hrel, Ideal.absNorm_relNorm]
   · rw [pow_mul, ← hrel, ← map_pow, h2, Ideal.relNorm_singleton]
 

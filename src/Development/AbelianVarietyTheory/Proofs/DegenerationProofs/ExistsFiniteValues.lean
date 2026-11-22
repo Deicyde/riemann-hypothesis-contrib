@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsU
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 
@@ -17,10 +18,13 @@ noncomputable section
 namespace GlobalTheory.ZH.IntegralSum
 open GlobalTheory.FormalValue Filter Topology
 
-theorem exists_lift_valR {O T : Type} [CommRing O] [IsLocalRing O] [CommRing T] [IsLocalRing T] (π : O →+* T)
-    [IsLocalHom π] {X Y : Scheme.{0}} (i : Y ⟶ X) [IsClosedImmersion i] (c : Sp O ⟶ X) (ce : Sp T ⟶ Y)
-    (h : ce ≫ i = spMap π ≫ c) (U : Y.Opens) (hU : ⊤ ≤ ce ⁻¹ᵁ U) (f : Γ(Y, U)) :
-    ∃ (U' : X.Opens) (f' : Γ(X, U')), ⊤ ≤ c ⁻¹ᵁ U' ∧ π (valR c U' f') = valR ce U f := by
+theorem exists_lift_valR
+    {O T : Type} [CommRing O] [IsLocalRing O] [CommRing T] [IsLocalRing T]
+    (π : O →+* T) [IsLocalHom π]
+    {X Y : Scheme.{0}} (i : Y ⟶ X) [IsClosedImmersion i]
+    (c : Sp O ⟶ X) (ce : Sp T ⟶ Y) (h : ce ≫ i = spMap π ≫ c)
+    (U : Y.Opens) (hU : ⊤ ≤ ce ⁻¹ᵁ U) (f : Γ(Y, U))
+    : ∃ (U' : X.Opens) (f' : Γ(X, U')), ⊤ ≤ c ⁻¹ᵁ U' ∧ π (valR c U' f') = valR ce U f := by
   have hy : ce (cpt T) ∈ U := hU trivial
   obtain ⟨a, ha⟩ := i.stalkMap_surjective (ce (cpt T)) ((Y.presheaf.germ U _ hy).hom f)
   obtain ⟨U', hU', f', rfl⟩ := X.presheaf.germ_exist a
@@ -35,15 +39,21 @@ theorem exists_lift_valR {O T : Type} [CommRing O] [IsLocalRing O] [CommRing T] 
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem exists_finite_values {V : Type} [CommRing V] (j : V →+* OO p) (K₀ : IntermediateField ℚ_[p] (PadicAlgCl p))
-    [FiniteDimensional ℚ_[p] K₀] (hj : ∀ x, (j x : PadicAlgCl p) ∈ K₀) {X : Scheme.{0}} (s : X ⟶ Sp V)
-    [LocallyOfFiniteType s] (c : Sp (OO p) ⟶ X) (hc : c ≫ s = spMap j) :
-    ∃ K : IntermediateField ℚ_[p] (PadicAlgCl p), FiniteDimensional ℚ_[p] K ∧
-      ∀ (U : X.Opens), ⊤ ≤ c ⁻¹ᵁ U → ∀ f, ((valR c U f : OO p) : PadicAlgCl p) ∈ K := by
+theorem exists_finite_values
+    {V : Type} [CommRing V]
+    (j : V →+* OO p)
+    (K₀ : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K₀]
+    (hj : ∀ x, (j x : PadicAlgCl p) ∈ K₀)
+    {X : Scheme.{0}} (s : X ⟶ Sp V) [LocallyOfFiniteType s]
+    (c : Sp (OO p) ⟶ X) (hc : c ≫ s = spMap j)
+    : ∃ K : IntermediateField ℚ_[p] (PadicAlgCl p),
+      FiniteDimensional ℚ_[p] K
+        ∧ ∀ (U : X.Opens), ⊤ ≤ c ⁻¹ᵁ U → ∀ f, ((valR c U f : OO p) : PadicAlgCl p) ∈ K := by
   obtain ⟨W, hW, hyW, -⟩ := exists_isAffineOpen_mem_and_subset (x := c (cpt _)) (U := ⊤) trivial
   have hWt : ⊤ ≤ c ⁻¹ᵁ W := (top_le_iff_cpt c W).2 hyW
   have hft : (s.appLE ⊤ W le_top).hom.FiniteType :=
-    HasRingHomProperty.appLE @LocallyOfFiniteType s inferInstance ⟨⊤, isAffineOpen_top _⟩ ⟨W, hW⟩ le_top
+    HasRingHomProperty.appLE @LocallyOfFiniteType s inferInstance ⟨⊤, isAffineOpen_top _⟩ ⟨W, hW⟩
+      le_top
   letI := (s.appLE ⊤ W le_top).hom.toAlgebra
   obtain ⟨t, ht⟩ := hft.1
   let φ : Γ(X, W) →+* PadicAlgCl p := (OO p).subtype.comp (CrdCalc.valHom c W hWt)
@@ -60,14 +70,17 @@ theorem exists_finite_values {V : Type} [CommRing V] (j : V →+* OO p) (K₀ : 
     | mem x hx => exact (le_sup_right : _ ≤ K) (IntermediateField.subset_adjoin _ _ ⟨x, hx, rfl⟩)
     | algebraMap r =>
       refine (le_sup_left : _ ≤ K) ?_
-      have e : (s.appLE ⊤ W le_top ≫ c.appLE W ⊤ hWt ≫ (Scheme.ΓSpecIso (CommRingCat.of (OO p))).hom) =
-          (Scheme.ΓSpecIso (CommRingCat.of V)).hom ≫ CommRingCat.ofHom j := by
+      have e
+          : (s.appLE ⊤ W le_top ≫ c.appLE W ⊤ hWt ≫ (Scheme.ΓSpecIso (CommRingCat.of (OO p))).hom)
+            = (Scheme.ΓSpecIso (CommRingCat.of V)).hom ≫ CommRingCat.ofHom j := by
         rw [← Category.assoc, ← Scheme.ΓSpecIso_naturality]
         refine congrArg (· ≫ _) ((Scheme.Hom.appLE_comp_appLE c s ⊤ W ⊤ le_top hWt).trans ?_)
         simp only [hc]
         rfl
-      have e' : CrdCalc.valHom c W hWt (algebraMap Γ(Sp V, ⊤) Γ(X, W) r) =
-        j ((Scheme.ΓSpecIso (CommRingCat.of V)).hom.hom r) := congrArg (fun q => q.hom r) e
+      have e'
+          : CrdCalc.valHom c W hWt (algebraMap Γ(Sp V, ⊤) Γ(X, W) r)
+            = j ((Scheme.ΓSpecIso (CommRingCat.of V)).hom.hom r) :=
+        congrArg (fun q => q.hom r) e
       have := hj ((Scheme.ΓSpecIso (CommRingCat.of V)).hom.hom r)
       rw [← e'] at this
       exact this
@@ -80,8 +93,10 @@ theorem exists_finite_values {V : Type} [CommRing V] (j : V →+* OO p) (K₀ : 
   obtain ⟨⟨a, ⟨_, n, rfl⟩⟩, e⟩ := IsLocalization.surj (Submonoid.powers g) (resG X hgU f)
   have e2 := congrArg (valR c (X.basicOpen g)) e
   rw [CrdCalc.valR_mul c _ hgt, CrdCalc.valR_res c hgU hgt] at e2
-  have r1 : ∀ b : Γ(X, W), valR c (X.basicOpen g) (algebraMap Γ(X, W) Γ(X, X.basicOpen g) b) = valR c W b :=
-    fun b => CrdCalc.valR_res c (X.basicOpen_le g) hgt b
+  have r1
+      : ∀ b : Γ(X, W),
+        valR c (X.basicOpen g) (algebraMap Γ(X, W) Γ(X, X.basicOpen g) b) = valR c W b := fun b =>
+    CrdCalc.valR_res c (X.basicOpen_le g) hgt b
   rw [r1, r1] at e2
   have hu : IsUnit (valR c W g) := (CrdCalc.isUnit_valR_iff c W hWt g).2 hgt
   have hg0 : φ (g ^ n) ≠ 0 := by
@@ -93,18 +108,24 @@ theorem exists_finite_values {V : Type} [CommRing V] (j : V →+* OO p) (K₀ : 
   rw [e3]
   exact div_mem (hall _) (hall _)
 
-theorem exists_tendsto (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K] {r : ℝ}
-    (hr : r < 1) (ω : ℕ → PadicAlgCl p) (hK : ∀ e, ω e ∈ K) (h : ∀ e, ‖ω (e + 1) - ω e‖ ≤ r ^ (e + 1)) :
-    ∃ a, Tendsto ω atTop (𝓝 a) := by
-  have hc : CauchySeq ω := cauchySeq_of_le_geometric r r hr fun e => by
-    rw [dist_comm, dist_eq_norm, ← pow_succ']; exact h e
+theorem exists_tendsto
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K]
+    {r : ℝ} (hr : r < 1)
+    (ω : ℕ → PadicAlgCl p) (hK : ∀ e, ω e ∈ K) (h : ∀ e, ‖ω (e + 1) - ω e‖ ≤ r ^ (e + 1))
+    : ∃ a, Tendsto ω atTop (𝓝 a) := by
+  have hc : CauchySeq ω :=
+    cauchySeq_of_le_geometric r r hr fun e => by
+      rw [dist_comm, dist_eq_norm, ← pow_succ']; exact h e
   haveI : FiniteDimensional ℚ_[p] K.toSubmodule := inferInstanceAs (FiniteDimensional ℚ_[p] K)
-  obtain ⟨a, -, ha⟩ := cauchySeq_tendsto_of_isComplete K.toSubmodule.complete_of_finiteDimensional hK hc
+  obtain ⟨a, -, ha⟩ :=
+    cauchySeq_tendsto_of_isComplete K.toSubmodule.complete_of_finiteDimensional hK hc
   exact ⟨a, ha⟩
 
-theorem hasSum_of_levels {Ix : Type} {r : ℝ} (hr₀ : 0 ≤ r) (hr : r < 1) (x : Ix → PadicAlgCl p)
+theorem hasSum_of_levels
+    {Ix : Type} {r : ℝ} (hr₀ : 0 ≤ r) (hr : r < 1) (x : Ix → PadicAlgCl p)
     (s : ℕ → PadicAlgCl p) (a : PadicAlgCl p) (hs : Tendsto s atTop (𝓝 a))
-    (h : ∀ e, ∃ S : Finset Ix, ∀ T, S ⊆ T → ‖s e - ∑ i ∈ T, x i‖ ≤ r ^ (e + 1)) : HasSum x a := by
+    (h : ∀ e, ∃ S : Finset Ix, ∀ T, S ⊆ T → ‖s e - ∑ i ∈ T, x i‖ ≤ r ^ (e + 1))
+    : HasSum x a := by
   refine Metric.tendsto_atTop.2 fun ε hε => ?_
   have h1 := (Metric.tendsto_nhds.1 hs) (ε / 2) (half_pos hε)
   have h2 := (tendsto_pow_atTop_nhds_zero_of_lt_one hr₀ hr).comp (tendsto_add_atTop_nat 1)

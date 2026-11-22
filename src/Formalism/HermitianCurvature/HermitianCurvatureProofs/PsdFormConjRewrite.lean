@@ -9,8 +9,8 @@ open scoped ComplexOrder ComplexConjugate nonZeroDivisors
 
 namespace Formalism.FourierDecayAlt.P.Jx1
 
-theorem conv {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TB.PSDOn F k) :
-    TA.PSDOn F (fun x y => k y x) := by
+theorem conv {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TB.PSDOn F k)
+    : TA.PSDOn F (fun x y => k y x) := by
   unfold TB.PSDOn at h
   rw [Matrix.posSemidef_iff_dotProduct_mulVec] at h
   obtain ⟨hH, hN⟩ := h
@@ -32,11 +32,13 @@ theorem conv {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TB.PSDOn F
     simp only [Complex.star_def, Complex.conj_conj]
     ring
 
-private theorem im_quadratic_form_eq_zero_of_hermitian {α : Type} (F : Finset α) (k : α → α → ℂ)
-    (hh : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y)) (a : α → ℂ) :
-    (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y).im = 0 := by
-  have h : conj (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y) =
-      ∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y := by
+private theorem im_quadratic_form_eq_zero_of_hermitian
+    {α : Type}
+    (F : Finset α) (k : α → α → ℂ) (hh : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y)) (a : α → ℂ)
+    : (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y).im = 0 := by
+  have h
+      : conj (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y)
+        = ∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_mul, Complex.conj_conj]
     rw [Finset.sum_comm]
@@ -45,8 +47,8 @@ private theorem im_quadratic_form_eq_zero_of_hermitian {α : Type} (F : Finset �
     ring
   exact Complex.conj_eq_iff_im.mp h
 
-private theorem tb_psdOn_of_ta_psdOn {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TA.PSDOn F k) :
-    TB.PSDOn F k := by
+private theorem tb_psdOn_of_ta_psdOn {α : Type} (F : Finset α) (k : α → α → ℂ) (h : TA.PSDOn F k)
+    : TB.PSDOn F k := by
   classical
   unfold TB.PSDOn
   rw [Matrix.posSemidef_iff_dotProduct_mulVec]
@@ -56,8 +58,9 @@ private theorem tb_psdOn_of_ta_psdOn {α : Type} (F : Finset α) (k : α → α 
     rw [h.1 i i.2 j j.2]
     simp
   · set a : α → ℂ := fun u => if hu : u ∈ F then x ⟨u, hu⟩ else 0 with ha
-    have hQ : star x ⬝ᵥ (Matrix.of fun u v : F => k u v).mulVec x =
-        ∑ u ∈ F, ∑ v ∈ F, conj (a u) * k u v * a v := by
+    have hQ
+        : star x ⬝ᵥ (Matrix.of fun u v : F => k u v).mulVec x
+          = ∑ u ∈ F, ∑ v ∈ F, conj (a u) * k u v * a v := by
       rw [← Finset.sum_coe_sort F]
       simp only [dotProduct, Matrix.mulVec, Matrix.of_apply, Pi.star_apply, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
@@ -81,10 +84,12 @@ end Tower
 section Agree
 variable {α : Type}
 
-theorem q_im (F : Finset α) (k : α → α → ℂ) (hh : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y)) (a : α → ℂ) :
-    (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y).im = 0 := by
-  have h : conj (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y) =
-      ∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y := by
+theorem q_im
+    (F : Finset α) (k : α → α → ℂ) (hh : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y)) (a : α → ℂ)
+    : (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y).im = 0 := by
+  have h
+      : conj (∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y)
+        = ∑ x ∈ F, ∑ y ∈ F, conj (a x) * k x y * a y := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_mul, Complex.conj_conj]
     rw [Finset.sum_comm]
@@ -96,15 +101,15 @@ theorem q_im (F : Finset α) (k : α → α → ℂ) (hh : ∀ x ∈ F, ∀ y �
 theorem ta_to_tb (F : Finset α) (k : α → α → ℂ) (h : TA.PSDOn F k) : TB.PSDOn F k := by
   exact tb_psdOn_of_ta_psdOn F k h
 
-theorem psd_form_conj_rewrite (F : Finset α) (k : α → α → ℂ) (a : α → ℂ) :
-    (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k x y) =
-      ∑ x ∈ F, ∑ y ∈ F, conj ((fun z => conj (a z)) x) * k x y * (fun z => conj (a z)) y := by
+theorem psd_form_conj_rewrite (F : Finset α) (k : α → α → ℂ) (a : α → ℂ)
+    : (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k x y)
+      = ∑ x ∈ F, ∑ y ∈ F, conj ((fun z => conj (a z)) x) * k x y * (fun z => conj (a z)) y := by
   refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
   simp only [Complex.conj_conj]
   ring
 
-theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsPSD F k) :
-    ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y) := by
+theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsPSD F k)
+    : ∀ x ∈ F, ∀ y ∈ F, k y x = conj (k x y) := by
   classical
   intro x hx y hy
   set B : (α → ℂ) → (α → ℂ) → ℂ := fun a b => ∑ u ∈ F, ∑ v ∈ F, a u * conj (b v) * k u v with hB
@@ -129,8 +134,10 @@ theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsP
     simp only [hB, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun u _ => Finset.sum_congr rfl fun v _ => ?_
     ring
-  have hBe : ∀ p q, p ∈ F → q ∈ F →
-      B (fun u => if u = p then 1 else 0) (fun u => if u = q then 1 else 0) = k p q := by
+  have hBe
+      : ∀ p q,
+        p ∈ F → q ∈ F
+          → B (fun u => if u = p then 1 else 0) (fun u => if u = q then 1 else 0) = k p q := by
     intro p q hp hq
     simp [hB, apply_ite (starRingEnd ℂ), ite_mul, hp, hq]
   have h1 := hpol (fun u => if u = x then 1 else 0) (fun u => if u = y then 1 else 0)
@@ -142,7 +149,10 @@ theorem psd_kernel_hermitian (F : Finset α) (k : α → α → ℂ) (h : A5.IsP
 theorem t_PSDAgree : PSDAgree := by
   unfold PSDAgree
   intro α F k
-  refine ⟨⟨fun h => conv F _ (t_PSDTranspose α F k h), ta_to_tb F k⟩, ⟨fun h => ⟨psd_kernel_hermitian F k h, fun a => ?_⟩, fun h => ?_⟩⟩
+  refine ⟨
+    ⟨fun h => conv F _ (t_PSDTranspose α F k h), ta_to_tb F k⟩,
+    ⟨fun h => ⟨psd_kernel_hermitian F k h, fun a => ?_⟩, fun h => ?_⟩
+  ⟩
   · have h2 := (h (fun z => conj (a z))).2
     refine le_of_le_of_eq h2 ?_
     congr 1
@@ -168,22 +178,21 @@ theorem t_BoxSumLattice : BoxSumLattice := by
   have hd0 : 0 < Fintype.card (InfinitePlace E) := Fintype.card_pos
   have wnn : ∀ (w : InfinitePlace E) (l : E), 0 ≤ w l := by
     intro w l
-    first
-    | positivity
-    | exact w.nonneg l
-    | exact apply_nonneg w l
+    first | positivity | exact w.nonneg l | exact apply_nonneg w l
   have hNq : (0 : ℝ) < (FractionalIdeal.absNorm aa : ℝ) := by
     first
-    | (have h1 : FractionalIdeal.absNorm aa ≠ 0 := by
-         simpa [FractionalIdeal.absNorm_eq_zero_iff] using haa
-       have h2 : (0 : ℚ) ≤ FractionalIdeal.absNorm aa := FractionalIdeal.absNorm_nonneg aa
-       exact_mod_cast lt_of_le_of_ne h2 (Ne.symm h1))
+    | (
+        have h1 : FractionalIdeal.absNorm aa ≠ 0 := by
+          simpa [FractionalIdeal.absNorm_eq_zero_iff] using haa
+        have h2 : (0 : ℚ) ≤ FractionalIdeal.absNorm aa := FractionalIdeal.absNorm_nonneg aa
+        exact_mod_cast lt_of_le_of_ne h2 (Ne.symm h1)
+      )
     | exact_mod_cast FractionalIdeal.absNorm_pos_iff.mpr haa
   have hNpos : 0 < √(FractionalIdeal.absNorm aa : ℝ) := Real.sqrt_pos.mpr hNq
   set T : ℝ := (a / Θ) ^ Fintype.card (InfinitePlace E) * √(FractionalIdeal.absNorm aa : ℝ) with hT
   have hTpos : 0 < T := mul_pos (pow_pos (div_pos hapos hΘpos) _) hNpos
-  obtain ⟨y, hxy, hy0, hyT⟩ : ∃ y : InfinitePlace E → ℝ, (∀ w, x w ≤ y w) ∧ (∀ w, 0 < y w) ∧
-      ∏ w, y w ≤ T := by
+  obtain ⟨y, hxy, hy0, hyT⟩
+      : ∃ y : InfinitePlace E → ℝ, (∀ w, x w ≤ y w) ∧ (∀ w, 0 < y w) ∧ ∏ w, y w ≤ T := by
     by_cases hpos : ∀ w, 0 < x w
     · exact ⟨x, fun _ => le_rfl, hpos, hprod⟩
     · push_neg at hpos
@@ -195,47 +204,58 @@ theorem t_BoxSumLattice : BoxSumLattice := by
       have hMpos : 0 < M := by linarith
       set ε : ℝ := min 1 (T / M ^ Fintype.card (InfinitePlace E)) with hε
       have hεpos : 0 < ε := lt_min one_pos (div_pos hTpos (pow_pos hMpos _))
-      refine ⟨fun w => max (x w) ε, fun w => le_max_left _ _,
-        fun w => lt_of_lt_of_le hεpos (le_max_right _ _), ?_⟩
-      have hcomp : ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), max (x w) ε ≤
-          M ^ Fintype.card (InfinitePlace E) := by
-        calc ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), max (x w) ε
-            ≤ ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), M := by
-              apply Finset.prod_le_prod₀ (fun w _ => le_trans hεpos.le (le_max_right _ _))
-              intro w _
-              apply max_le
-              · have h3 : x w ≤ ∑ v, x v := Finset.single_le_sum (fun v _ => hx v) (Finset.mem_univ w)
-                linarith
-              · exact le_trans (min_le_left _ _) hM1
+      refine ⟨
+        fun w => max (x w) ε,
+        fun w => le_max_left _ _,
+        fun w => lt_of_lt_of_le hεpos (le_max_right _ _),
+        ?_
+      ⟩
+      have hcomp
+          : ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), max (x w) ε
+            ≤ M ^ Fintype.card (InfinitePlace E) := by
+        calc
+          ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), max (x w) ε
+              ≤ ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), M := by
+            apply Finset.prod_le_prod₀ (fun w _ => le_trans hεpos.le (le_max_right _ _))
+            intro w _
+            apply max_le
+            · have h3 : x w ≤ ∑ v, x v := Finset.single_le_sum (fun v _ => hx v) (Finset.mem_univ w)
+              linarith
+            · exact le_trans (min_le_left _ _) hM1
           _ = M ^ ({w₀}ᶜ : Finset (InfinitePlace E)).card := Finset.prod_const M
           _ ≤ M ^ Fintype.card (InfinitePlace E) := pow_le_pow_right₀ hM1 (Finset.card_le_univ _)
       show ∏ w, max (x w) ε ≤ T
       rw [Fintype.prod_eq_mul_prod_compl w₀, hxw0, max_eq_right hεpos.le]
-      calc ε * ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), max (x w) ε
+      calc
+        ε * ∏ w ∈ ({w₀}ᶜ : Finset (InfinitePlace E)), max (x w) ε
           ≤ ε * M ^ Fintype.card (InfinitePlace E) := mul_le_mul_of_nonneg_left hcomp hεpos.le
         _ ≤ (T / M ^ Fintype.card (InfinitePlace E)) * M ^ Fintype.card (InfinitePlace E) :=
-            mul_le_mul_of_nonneg_right (min_le_right _ _) (pow_pos hMpos _).le
+          mul_le_mul_of_nonneg_right (min_le_right _ _) (pow_pos hMpos _).le
         _ = T := div_mul_cancel₀ T (pow_pos hMpos _).ne'
   have hPpos : 0 < ∏ w, y w := Finset.prod_pos fun w _ => hy0 w
   have hQpos : 0 < √(FractionalIdeal.absNorm aa : ℝ) / ∏ w, y w := div_pos hNpos hPpos
   set Θ' : ℝ := (√(FractionalIdeal.absNorm aa : ℝ) / ∏ w, y w) ^ ((1 : ℝ) / Fintype.card (InfinitePlace E))
     with hΘ'
   have hΘ'nn : 0 ≤ Θ' := Real.rpow_nonneg hQpos.le _
-  have hΘ'd : Θ' ^ Fintype.card (InfinitePlace E) = √(FractionalIdeal.absNorm aa : ℝ) / ∏ w, y w := by
+  have hΘ'd
+      : Θ' ^ Fintype.card (InfinitePlace E) = √(FractionalIdeal.absNorm aa : ℝ) / ∏ w, y w := by
     rw [hΘ', ← Real.rpow_natCast, ← Real.rpow_mul hQpos.le]
-    have hdr : ((1 : ℝ) / Fintype.card (InfinitePlace E)) * (Fintype.card (InfinitePlace E) : ℝ) = 1 := by
+    have hdr
+        : ((1 : ℝ) / Fintype.card (InfinitePlace E)) * (Fintype.card (InfinitePlace E) : ℝ)
+          = 1 := by
       field_simp
     rw [hdr, Real.rpow_one]
   have hΘ'ge : Θ / a ≤ Θ' := by
     have h1 : (Θ / a) ^ Fintype.card (InfinitePlace E) ≤ Θ' ^ Fintype.card (InfinitePlace E) := by
       rw [hΘ'd, le_div_iff₀ hPpos]
-      calc (Θ / a) ^ Fintype.card (InfinitePlace E) * ∏ w, y w
-          ≤ (Θ / a) ^ Fintype.card (InfinitePlace E) * T :=
-            mul_le_mul_of_nonneg_left hyT (pow_pos (div_pos hΘpos hapos) _).le
+      calc
+        (Θ / a) ^ Fintype.card (InfinitePlace E) * ∏ w, y w
+            ≤ (Θ / a) ^ Fintype.card (InfinitePlace E) * T :=
+          mul_le_mul_of_nonneg_left hyT (pow_pos (div_pos hΘpos hapos) _).le
         _ = √(FractionalIdeal.absNorm aa : ℝ) := by
-            rw [hT, ← mul_assoc, ← mul_pow]
-            have hone : Θ / a * (a / Θ) = 1 := by field_simp
-            rw [hone, one_pow, one_mul]
+          rw [hT, ← mul_assoc, ← mul_pow]
+          have hone : Θ / a * (a / Θ) = 1 := by field_simp
+          rw [hone, one_pow, one_mul]
     first
     | exact le_of_pow_le_pow_left₀ hd0.ne' hΘ'nn h1
     | exact (pow_le_pow_iff_left₀ (div_pos hΘpos hapos).le hΘ'nn hd0.ne').mp h1
@@ -246,7 +266,8 @@ theorem t_BoxSumLattice : BoxSumLattice := by
   constructor
   · intro l
     unfold prof
-    exact Finset.prod_nonneg fun w _ => le_min zero_le_one (pow_nonneg (div_nonneg (hx w) (wnn w l)) _)
+    exact Finset.prod_nonneg fun w _ =>
+      le_min zero_le_one (pow_nonneg (div_nonneg (hx w) (wnn w l)) _)
   · intro S hS
     have hS' : ∀ l ∈ S, l ∈ aa ∧ l ≠ 0 := fun l hl => ⟨hL l (hS l hl).1, (hS l hl).2⟩
     have h1 := hbox S hS'
@@ -261,28 +282,32 @@ theorem t_BoxSumLattice : BoxSumLattice := by
         inv_anti₀ (Real.rpow_pos_of_pos hta _) h2
       refine le_trans h3 (le_of_eq ?_)
       rw [Real.div_rpow hΘpos.le hapos.le, inv_div, div_eq_mul_inv]
-    calc ∑ l ∈ S, prof x K l ≤ ∑ l ∈ S, ∏ w, min 1 ((y w / w l) ^ (K : ℝ)) := by
-          apply Finset.sum_le_sum
-          intro l _
-          unfold prof
-          apply Finset.prod_le_prod₀
-          · intro w _
-            exact le_min zero_le_one (pow_nonneg (div_nonneg (hx w) (wnn w l)) _)
-          · intro w _
-            rw [Real.rpow_natCast]
-            apply min_le_min_left
-            exact pow_le_pow_left₀ (div_nonneg (hx w) (wnn w l)) (div_le_div_of_nonneg_right (hxy w) (wnn w l)) _
+    calc
+      ∑ l ∈ S, prof x K l ≤ ∑ l ∈ S, ∏ w, min 1 ((y w / w l) ^ (K : ℝ)) := by
+        apply Finset.sum_le_sum
+        intro l _
+        unfold prof
+        apply Finset.prod_le_prod₀
+        · intro w _
+          exact le_min zero_le_one (pow_nonneg (div_nonneg (hx w) (wnn w l)) _)
+        · intro w _
+          rw [Real.rpow_natCast]
+          apply min_le_min_left
+          exact pow_le_pow_left₀ (div_nonneg (hx w) (wnn w l))
+            (div_le_div_of_nonneg_right (hxy w) (wnn w l)) _
       _ ≤ (C₀ * Θ' ^ (-((K : ℝ) - 5 / 2))) ^ Fintype.card (InfinitePlace E) := h1
       _ ≤ (|C₀| * Θ' ^ (-((K : ℝ) - 5 / 2))) ^ Fintype.card (InfinitePlace E) := by
-          have e : (|C₀| * Θ' ^ (-((K : ℝ) - 5 / 2))) ^ Fintype.card (InfinitePlace E) =
-              |(C₀ * Θ' ^ (-((K : ℝ) - 5 / 2))) ^ Fintype.card (InfinitePlace E)| := by
-            rw [abs_pow, abs_mul, abs_of_nonneg ht0]
-          rw [e]
-          exact le_abs_self _
-      _ ≤ (max 1 |C₀| * a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) ^ Fintype.card (InfinitePlace E) := by
-          apply pow_le_pow_left₀ (mul_nonneg (abs_nonneg _) ht0)
-          rw [mul_assoc]
-          exact mul_le_mul (le_max_right _ _) htle ht0 (le_trans zero_le_one (le_max_left _ _))
+        have e
+            : (|C₀| * Θ' ^ (-((K : ℝ) - 5 / 2))) ^ Fintype.card (InfinitePlace E)
+              = |(C₀ * Θ' ^ (-((K : ℝ) - 5 / 2))) ^ Fintype.card (InfinitePlace E)| := by
+          rw [abs_pow, abs_mul, abs_of_nonneg ht0]
+        rw [e]
+        exact le_abs_self _
+      _ ≤ (max 1 |C₀| * a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))
+          ^ Fintype.card (InfinitePlace E) := by
+        apply pow_le_pow_left₀ (mul_nonneg (abs_nonneg _) ht0)
+        rw [mul_assoc]
+        exact mul_le_mul (le_max_right _ _) htle ht0 (le_trans zero_le_one (le_max_left _ _))
 
 end Formalism.FourierDecayAlt.P.Jx1
 

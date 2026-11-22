@@ -45,8 +45,18 @@ public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSheetLift
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartDivisorLength : GroundTheory.Heights₂.Heights.Targets.ChartDivisorLength.Statement :=
-  @GroundTheory.Heights₂.Heights.Targets.ChartDivisorLength.proof GroundTheory.Heights₂.Heights.Targets.ChartSectionNotMem.proof GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartDivisorComponents GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartSectionLength
+theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartDivisorLength
+    : GroundTheory.Heights₂.Heights.Targets.ChartDivisorLength.Statement :=
+  @GroundTheory.Heights₂.Heights.Targets.ChartDivisorLength.proof
+    GroundTheory.Heights₂.Heights.Targets.ChartSectionNotMem.proof
+    GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartDivisorComponents
+    GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartSectionLength
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.ConeAverage : GroundTheory.Heights₂.Heights.ConeAverage.Statement :=
-  @GroundTheory.Heights₂.Heights.ConeAverage.proof GroundTheory.Heights₂.Heights.ConeIntegralMass.full GroundTheory.Heights₂.Heights.ChowDegreePos.proof GroundTheory.Heights₂.Heights.AutoClose.ConeFubini GroundTheory.Heights₂.Heights.AutoClose.FsLogAverage GroundTheory.Heights₂.Heights.FsLogMeasurable.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.ConeAverage
+    : GroundTheory.Heights₂.Heights.ConeAverage.Statement :=
+  @GroundTheory.Heights₂.Heights.ConeAverage.proof
+    GroundTheory.Heights₂.Heights.ConeIntegralMass.full
+    GroundTheory.Heights₂.Heights.ChowDegreePos.proof
+    GroundTheory.Heights₂.Heights.AutoClose.ConeFubini
+    GroundTheory.Heights₂.Heights.AutoClose.FsLogAverage
+    GroundTheory.Heights₂.Heights.FsLogMeasurable.proof

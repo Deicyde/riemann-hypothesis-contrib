@@ -8,11 +8,11 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem coords_in_rational_symplectic_basis :
-    ∀ (g r : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (ε φ : Fin g → Fin r → ℚ), r = 2 * g → Mqᵀ = -Mq →
-      Mq.det ≠ 0 → (∀ i j, ε i ⬝ᵥ Mq *ᵥ ε j = 0) → (∀ i j, φ i ⬝ᵥ Mq *ᵥ φ j = 0) →
-      (∀ i j, φ j ⬝ᵥ Mq *ᵥ ε i = if i = j then 1 else 0) →
-      ∀ x : Fin r → ℚ, x = ∑ i, (-(x ⬝ᵥ Mq *ᵥ φ i)) • ε i + ∑ j, (x ⬝ᵥ Mq *ᵥ ε j) • φ j := by
+theorem coords_in_rational_symplectic_basis
+    : ∀ (g r : ℕ) (Mq : Matrix (Fin r) (Fin r) ℚ) (ε φ : Fin g → Fin r → ℚ),
+      r = 2 * g → Mqᵀ = -Mq → Mq.det ≠ 0 → (∀ i j, ε i ⬝ᵥ Mq *ᵥ ε j = 0)
+        → (∀ i j, φ i ⬝ᵥ Mq *ᵥ φ j = 0) → (∀ i j, φ j ⬝ᵥ Mq *ᵥ ε i = if i = j then 1 else 0)
+        → ∀ x : Fin r → ℚ, x = ∑ i, (-(x ⬝ᵥ Mq *ᵥ φ i)) • ε i + ∑ j, (x ⬝ᵥ Mq *ᵥ ε j) • φ j := by
   intro g r Mq ε φ hr hskew hdet hεε hφφ hφε x
   rcases Nat.eq_zero_or_pos g with hg | hg
   · funext i
@@ -24,12 +24,10 @@ theorem coords_in_rational_symplectic_basis :
     intro i k
     rw [hsk, hφε]
 
-  have pε : ∀ (a b : Fin g → ℚ) k,
-      (∑ i, a i • ε i + ∑ j, b j • φ j) ⬝ᵥ Mq *ᵥ ε k = b k := by
+  have pε : ∀ (a b : Fin g → ℚ) k, (∑ i, a i • ε i + ∑ j, b j • φ j) ⬝ᵥ Mq *ᵥ ε k = b k := by
     intro a b k
     simp [add_dotProduct, sum_dotProduct, smul_dotProduct, hεε, hφε]
-  have pφ : ∀ (a b : Fin g → ℚ) k,
-      (∑ i, a i • ε i + ∑ j, b j • φ j) ⬝ᵥ Mq *ᵥ φ k = -a k := by
+  have pφ : ∀ (a b : Fin g → ℚ) k, (∑ i, a i • ε i + ∑ j, b j • φ j) ⬝ᵥ Mq *ᵥ φ k = - a k := by
     intro a b k
     simp [add_dotProduct, sum_dotProduct, smul_dotProduct, hφφ, hεφ]
 
@@ -53,10 +51,11 @@ theorem coords_in_rational_symplectic_basis :
     omega
 
   set z := x - (∑ i, (-(x ⬝ᵥ Mq *ᵥ φ i)) • ε i + ∑ j, (x ⬝ᵥ Mq *ᵥ ε j) • φ j) with hz
-  let f : (Fin r → ℚ) →ₗ[ℚ] ℚ :=
-    { toFun := fun y => z ⬝ᵥ Mq *ᵥ y
-      map_add' := by intro a b; simp [mulVec_add, dotProduct_add]
-      map_smul' := by intro c a; simp [mulVec_smul, dotProduct_smul] }
+  let f : (Fin r → ℚ) →ₗ[ℚ] ℚ := {
+    toFun := fun y => z ⬝ᵥ Mq *ᵥ y
+    map_add' := by intro a b; simp [mulVec_add, dotProduct_add]
+    map_smul' := by intro c a; simp [mulVec_smul, dotProduct_smul]
+  }
   have hf : f = 0 := by
     apply LinearMap.ext_on_range hspan
     intro s

@@ -11,10 +11,12 @@ noncomputable section
 
 namespace MassDataVolumesW
 
-open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.TypedSets Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.TypedSets
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
 
-def StepFrameStd : Prop := ∀ {D : D7} (X : HidaSetting D) (u : D.what₂.Word),
-  ∃ T : X.B.I.F, (frameOf X u).IsStd X.B.I.cm.sig X.B.I.J T
+def StepFrameStd : Prop :=
+  ∀ {D : D7} (X : HidaSetting D) (u : D.what₂.Word), ∃ T : X.B.I.F,
+    (frameOf X u).IsStd X.B.I.cm.sig X.B.I.J T
 
 theorem stepGramH_of (h : StepFrameStd) : StepGramH := by
   unfold StepGramH

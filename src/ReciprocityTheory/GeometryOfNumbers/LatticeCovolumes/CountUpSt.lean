@@ -12,11 +12,12 @@ namespace ReciprocityTheory.GeometryOfNumbersTheory
 open NumberField Module MeasureTheory
 open scoped ComplexOrder
 
-variable {K : Type*} [Field K] [NumberField K] {V : Type*} [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K : Type*} [Field K] [NumberField K]
+  {V : Type*} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem HermFam.nrm_smul_up (h : HermFam K V) (σ : K →+* ℂ) (c : K) (x : V) :
-    h.nrm σ (c • x) = ‖σ c‖ * h.nrm σ x := by
+theorem HermFam.nrm_smul_up (h : HermFam K V) (σ : K →+* ℂ) (c : K) (x : V)
+    : h.nrm σ (c • x) = ‖σ c‖ * h.nrm σ x := by
   unfold HermFam.nrm
   have h2 : h.form σ (c • x) x = starRingEnd ℂ (σ c) * h.form σ x x := by
     rw [← h.conj_symm σ x (c • x), h.smul_right, map_mul, h.conj_symm σ x x]

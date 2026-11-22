@@ -12,9 +12,14 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem coeff_weightComponent {R : Type*} [CommRing R] {ι : Type*} [Fintype ι] {n : ℕ} (LL : Letters ι) (S : Set ι)
-    (nu : Fin n → ℤ) (F : MvPolynomial (ι × Fin n) R) (m : ι × Fin n →₀ ℕ) :
-    AddMonoidAlgebra.coeff (weightComponent LL S nu F) m = if wtS LL S m = nu then AddMonoidAlgebra.coeff F m else 0 := by
+theorem coeff_weightComponent
+    {R : Type*} [CommRing R]
+    {ι : Type*} [Fintype ι]
+    {n : ℕ}
+    (LL : Letters ι) (S : Set ι) (nu : Fin n → ℤ) (F : MvPolynomial (ι × Fin n) R)
+    (m : ι × Fin n →₀ ℕ)
+    : AddMonoidAlgebra.coeff (weightComponent LL S nu F) m
+      = if wtS LL S m = nu then AddMonoidAlgebra.coeff F m else 0 := by
   classical
   unfold weightComponent
   rw [MvPolynomial.coeff_sum]
@@ -25,8 +30,14 @@ theorem coeff_weightComponent {R : Type*} [CommRing R] {ι : Type*} [Fintype ι]
 
 section bwd
 
-variable {R : Type} [Field R] {ι : Type} [Fintype ι] (LL : Letters ι) {n : ℕ} (S : Set ι)
-  {L : Type} [Field L] (φ : R →+* L) (W : Submodule R (MvPolynomial (ι × Fin n) R))
+variable
+  {R : Type} [Field R]
+  {ι : Type} [Fintype ι]
+  (LL : Letters ι)
+  {n : ℕ}
+  (S : Set ι)
+  {L : Type} [Field L]
+  (φ : R →+* L) (W : Submodule R (MvPolynomial (ι × Fin n) R))
 
 def scalarExtension : Submodule L (MvPolynomial (ι × Fin n) L) :=
   Submodule.span L ((MvPolynomial.map φ) '' (W : Set (MvPolynomial (ι × Fin n) R)))
@@ -34,8 +45,9 @@ def scalarExtension : Submodule L (MvPolynomial (ι × Fin n) L) :=
 def SubstitutionPreservesExtension (h h' : Matrix (Fin n) (Fin n) L) : Prop :=
   ∀ x ∈ scalarExtension φ W, matrixSubst LL S (RingHom.id L) h h' x ∈ scalarExtension φ W
 
-theorem scalarExtension_monomial_weights (hGr : BinomialStableContainsComponents) (hW2 : ∀ a k, ∀ x ∈ W, binomPol R LL S a k x ∈ W) :
-    ∀ z ∈ scalarExtension φ W, ∀ m ∈ z.support, wtS LL S m ∈ polWts LL S W := by
+theorem scalarExtension_monomial_weights
+    (hGr : BinomialStableContainsComponents) (hW2 : ∀ a k, ∀ x ∈ W, binomPol R LL S a k x ∈ W)
+    : ∀ z ∈ scalarExtension φ W, ∀ m ∈ z.support, wtS LL S m ∈ polWts LL S W := by
   intro z hz
   induction hz using Submodule.span_induction with
   | mem y hy =>
@@ -52,7 +64,8 @@ theorem scalarExtension_monomial_weights (hGr : BinomialStableContainsComponents
       rw [MvPolynomial.mem_support_iff, coeff_weightComponent] at hm''
       by_contra hne
       exact hm'' (if_neg hne)
-  | zero => intro m hm; simp at hm
+  | zero =>
+    intro m hm; simp at hm
   | add x y _ _ hx hy =>
     classical
     intro m hm

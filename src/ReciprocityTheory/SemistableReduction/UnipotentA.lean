@@ -8,17 +8,21 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Polynomial Matrix
 
-theorem unip_trace_aeval_zero {K : Type*} [Field K] {r : ℕ} (N : Matrix (Fin r) (Fin r) K)
-    (hN : ∀ k, 1 ≤ k → k ≤ r → (N ^ k).trace = 0) (P : K[X]) (hP : P.natDegree ≤ r) :
-    (aeval N P).trace = P.coeff 0 * r := by
+theorem unip_trace_aeval_zero
+    {K : Type*} [Field K]
+    {r : ℕ} (N : Matrix (Fin r) (Fin r) K) (hN : ∀ k, 1 ≤ k → k ≤ r → (N ^ k).trace = 0)
+    (P : K[X]) (hP : P.natDegree ≤ r)
+    : (aeval N P).trace = P.coeff 0 * r := by
   rw [Polynomial.aeval_eq_sum_range, Matrix.trace_sum, Finset.sum_range_succ', Finset.sum_eq_zero]
   · simp [Matrix.trace_one]
   · intro i hi
     have hi' := Finset.mem_range.mp hi
     rw [Matrix.trace_smul, hN (i + 1) (by omega) (by omega), smul_zero]
 
-theorem unip_idem_eq_zero {K : Type*} [Field K] [CharZero K] {r : ℕ} (E : Matrix (Fin r) (Fin r) K)
-    (hE : E * E = E) (ht : E.trace = 0) : E = 0 := by
+theorem unip_idem_eq_zero
+    {K : Type*} [Field K] [CharZero K]
+    {r : ℕ} (E : Matrix (Fin r) (Fin r) K) (hE : E * E = E) (ht : E.trace = 0)
+    : E = 0 := by
   set f := Matrix.toLin' E with hfdef
   have hf : LinearMap.IsProj (LinearMap.range f) f := by
     constructor
@@ -28,17 +32,18 @@ theorem unip_idem_eq_zero {K : Type*} [Field K] [CharZero K] {r : ℕ} (E : Matr
       obtain ⟨y, rfl⟩ := hx
       simp only [hfdef, Matrix.toLin'_apply, Matrix.mulVec_mulVec, hE]
   have htr : LinearMap.trace K _ f = E.trace := by
-    rw [LinearMap.trace_eq_matrix_trace K (Pi.basisFun K (Fin r)),
-      LinearMap.toMatrix_eq_toMatrix', hfdef, LinearMap.toMatrix'_toLin']
-  have h0 : ((Module.finrank K (LinearMap.range f) : ℕ) : K) = 0 := by
-    rw [← hf.trace, htr, ht]
+    rw [LinearMap.trace_eq_matrix_trace K (Pi.basisFun K (Fin r)), LinearMap.toMatrix_eq_toMatrix',
+      hfdef, LinearMap.toMatrix'_toLin']
+  have h0 : ((Module.finrank K (LinearMap.range f) : ℕ) : K) = 0 := by rw [← hf.trace, htr, ht]
   have h1 : Module.finrank K (LinearMap.range f) = 0 := by exact_mod_cast h0
   have h2 : LinearMap.range f = ⊥ := Submodule.finrank_eq_zero.mp h1
   have h3 : f = 0 := LinearMap.range_eq_bot.mp h2
   exact Matrix.toLin'.injective (h3.trans (map_zero _).symm)
 
-theorem unip_pow_card_eq_zero {K : Type*} [Field K] [CharZero K] {r : ℕ} (N : Matrix (Fin r) (Fin r) K)
-    (hN : ∀ k, 1 ≤ k → k ≤ r → (N ^ k).trace = 0) : N ^ r = 0 := by
+theorem unip_pow_card_eq_zero
+    {K : Type*} [Field K] [CharZero K]
+    {r : ℕ} (N : Matrix (Fin r) (Fin r) K) (hN : ∀ k, 1 ≤ k → k ≤ r → (N ^ k).trace = 0)
+    : N ^ r = 0 := by
   rcases Nat.eq_zero_or_pos r with hr | hr
   · subst hr
     exact Subsingleton.elim _ _
@@ -47,8 +52,9 @@ theorem unip_pow_card_eq_zero {K : Type*} [Field K] [CharZero K] {r : ℕ} (N : 
   have hmon : m.Monic := minpoly.monic hint
   have hm0 : aeval N m = 0 := minpoly.aeval K N
   have hmdeg : m.natDegree ≤ r := by
-    have h2 := Polynomial.natDegree_le_of_dvd (Matrix.minpoly_dvd_charpoly N)
-      (Matrix.charpoly_monic N).ne_zero
+    have h2 :=
+      Polynomial.natDegree_le_of_dvd (Matrix.minpoly_dvd_charpoly N)
+        (Matrix.charpoly_monic N).ne_zero
     rwa [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin] at h2
   have hrK : (r : K) ≠ 0 := Nat.cast_ne_zero.mpr hr.ne'
   have hmc : m.coeff 0 = 0 := by
@@ -71,7 +77,9 @@ theorem unip_pow_card_eq_zero {K : Type*} [Field K] [CharZero K] {r : ℕ} (N : 
   have hPP : aeval N P * aeval N P = aeval N P := by
     have hsub : P - 1 = -(v * q) := by rw [hP, ← huv]; ring
     have hfac : P * P - P = -(u * v) * m := by
-      calc P * P - P = P * (P - 1) := by ring
+      calc
+        P * P - P
+          = P * (P - 1) := by ring
         _ = -(u * v) * (X ^ k * q) := by rw [hsub, hP]; ring
         _ = -(u * v) * m := by rw [← hq]
     have h := congrArg (aeval N) hfac
@@ -80,9 +88,7 @@ theorem unip_pow_card_eq_zero {K : Type*} [Field K] [CharZero K] {r : ℕ} (N : 
   obtain ⟨P', hP'⟩ : ∃ P' : K[X], P' = P %ₘ m := ⟨_, rfl⟩
   have hdiv : P' + m * (P /ₘ m) = P := by
     rw [hP']
-    first
-      | exact Polynomial.modByMonic_add_div P hmon
-      | exact Polynomial.modByMonic_add_div P m
+    first | exact Polynomial.modByMonic_add_div P hmon | exact Polynomial.modByMonic_add_div P m
   have hPeq : aeval N P' = aeval N P := by
     have h := congrArg (aeval N) hdiv
     rw [map_add (f := _), map_mul, hm0, zero_mul, add_zero] at h
@@ -91,8 +97,8 @@ theorem unip_pow_card_eq_zero {K : Type*} [Field K] [CharZero K] {r : ℕ} (N : 
     rw [hP']
     refine le_trans ?_ hmdeg
     first
-      | exact Polynomial.natDegree_modByMonic_le P hmon
-      | exact Polynomial.natDegree_modByMonic_le P m
+    | exact Polynomial.natDegree_modByMonic_le P hmon
+    | exact Polynomial.natDegree_modByMonic_le P m
   have hP'0 : P'.coeff 0 = 0 := by
     have h := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p 0) hdiv
     simp only [Polynomial.coeff_add, Polynomial.mul_coeff_zero, hmc, zero_mul, add_zero] at h

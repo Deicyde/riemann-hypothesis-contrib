@@ -5,16 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG UpperTheory.Gal.W2.Seed
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo
+  GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG
+  UpperTheory.Gal.W2.Seed
 open UpperTheory.Gal.CertificateRingHomMap (GUf Gam0 AfQ Plc sim mat comp rat lev ZU)
 open scoped TensorProduct Classical
 
-theorem UpperTheory.Gal.W2.Seed.pPPart :
-    JEq → PPart := by
+theorem UpperTheory.Gal.W2.Seed.pPPart : JEq → PPart := by
   intro hJ E _ _ _ A n p _ S T g
   have hext := (hJ E A n p S T.toAdT T.μ T.mu T.a T.j T.j_mx).1
-  have hoff : ∀ w : Plc E, (p : 𝓞 E) ∉ w.asIdeal → comp w (T.sec (T.j g)) = comp w g :=
-    fun w hw => (T.j_eq (T.sec (T.j g)) g).1 (T.j_sec _) w hw
+  have hoff : ∀ w : Plc E, (p : 𝓞 E) ∉ w.asIdeal → comp w (T.sec (T.j g)) = comp w g := fun w hw =>
+    (T.j_eq (T.sec (T.j g)) g).1 (T.j_sec _) w hw
   have hk1 : ∀ w : Plc E, (p : 𝓞 E) ∉ w.asIdeal → comp w ((T.sec (T.j g))⁻¹ * g) = 1 := by
     intro w hw
     rw [map_mul, map_inv, hoff w hw, inv_mul_cancel]

@@ -11,7 +11,8 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E
+  PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
 open DiscreteGroups.T1.G
 open scoped Classical ENNReal
 
@@ -19,20 +20,33 @@ namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
 
 attribute [local instance] borelH
 
-private theorem pow_mul_exp_neg_le (N : ℕ) {r : ℝ} (hr : 0 ≤ r) :
-    (1 + r) ^ N * Real.exp (-r) ≤ N.factorial * Real.exp 1 := by
+private theorem pow_mul_exp_neg_le (N : ℕ) {r : ℝ} (hr : 0 ≤ r)
+    : (1 + r) ^ N * Real.exp (-r) ≤ N.factorial * Real.exp 1 := by
   have h := Real.pow_div_factorial_le_exp (1 + r) (by linarith) N
   rw [div_le_iff₀ (by exact_mod_cast N.factorial_pos)] at h
   have e : Real.exp r * Real.exp (-r) = 1 := by rw [← Real.exp_add]; simp
-  calc (1 + r) ^ N * Real.exp (-r) ≤ (Real.exp (1 + r) * N.factorial) * Real.exp (-r) :=
-        mul_le_mul_of_nonneg_right h (Real.exp_pos _).le
+  calc
+    (1 + r) ^ N * Real.exp (-r) ≤ (Real.exp (1 + r) * N.factorial) * Real.exp (-r) :=
+      mul_le_mul_of_nonneg_right h (Real.exp_pos _).le
     _ = N.factorial * Real.exp 1 * (Real.exp r * Real.exp (-r)) := by rw [Real.exp_add]; ring
     _ = N.factorial * Real.exp 1 := by rw [e, mul_one]
 
-private theorem point_bound {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (hB : Basic) (hS : Sizes)
-    (hn : 1 ≤ n) {π : CuspSub E n} (hθ : ThetaFix π) {ψ : Sm E n} (hψ : ψ ∈ π.V) (M : ℕ) (L : ℝ) (hL : 0 ≤ L) :
-    ∃ A : ℝ, 0 ≤ A ∧ ∀ R ρ : ℝ, 0 ≤ R → ∀ x : H E n 0, |ldet x| ≤ R → ρ ≤ r0 x →
-      ‖ψ.1 x.1‖ ≤ A * (1 + R) ^ (2 * M) * Real.exp (-(L * ρ)) * wt x ^ (-(2 * M : ℤ)) := by
+private theorem point_bound
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n : ℕ}
+    (hB : Basic) (hS : Sizes) (hn : 1 ≤ n)
+    {π : CuspSub E n} (hθ : ThetaFix π)
+    {ψ : Sm E n} (hψ : ψ ∈ π.V)
+    (M : ℕ)
+    (L : ℝ) (hL : 0 ≤ L)
+    : ∃ A : ℝ,
+      0 ≤ A
+        ∧ ∀ R ρ : ℝ,
+          0 ≤ R
+            → ∀ x : H E n 0,
+              |ldet x| ≤ R → ρ ≤ r0 x
+                → ‖ψ.1 x.1‖
+                  ≤ A * (1 + R) ^ (2 * M) * Real.exp (-(L * ρ)) * wt x ^ (-(2 * M : ℤ)) := by
   obtain ⟨h1, h2, -⟩ := hB E n hn
   obtain ⟨c, hc0, hc⟩ := hS E n hn
   have hA := hθ.1 ψ hψ
@@ -52,9 +66,10 @@ private theorem point_bound {E : Type} [Field E] [NumberField E] [IsCMField E] {
   have hy0 : ldet y = 0 := by rw [hy, h2, h1]; ring
   have hψy : ψ.1 y.1 = ψ.1 x.1 := hA _ _
   have hdec : ‖ψ.1 x.1‖ ≤ C * Real.exp (-((L + 1) * r)) := by
-    have h := hC₀ y.1 (by
-      have : |ldet y| ≤ 0 := by rw [hy0]; simp
-      exact this)
+    have h :=
+      hC₀ y.1 (by
+        have : |ldet y| ≤ 0 := by rw [hy0]; simp
+        exact this)
     rw [hψy] at h
     exact h.trans (mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.exp_pos _).le)
   have hx2 : x.2 = 1 := Units.ext (Subsingleton.elim _ _)
@@ -67,7 +82,8 @@ private theorem point_bound {E : Type} [Field E] [NumberField E] [IsCMField E] {
     have h4 : 1 + R ≤ (1 + r) * (1 + R) := by nlinarith [mul_nonneg hr hR]
     have h5 : 1 + r ≤ (1 + r) * (1 + R) := by nlinarith [mul_nonneg hr hR]
     have h6 : c * (1 + R) ≤ c * ((1 + r) * (1 + R)) := mul_le_mul_of_nonneg_left h4 hc0
-    have h7 : (1 + a) * 1 ≤ (1 + a) * ((1 + r) * (1 + R)) := mul_le_mul_of_nonneg_left hP (by linarith)
+    have h7 : (1 + a) * 1 ≤ (1 + a) * ((1 + r) * (1 + R)) :=
+      mul_le_mul_of_nonneg_left hP (by linarith)
     rw [hw, hc₁]
     nlinarith
   have hexp : Real.exp (-((L + 1) * r)) ≤ Real.exp (-(L * ρ)) * Real.exp (-r) := by
@@ -83,15 +99,19 @@ private theorem point_bound {E : Type} [Field E] [NumberField E] [IsCMField E] {
     congr 1
   have hr1 : 0 ≤ 1 + r := by linarith
   have hR1 : 0 ≤ 1 + R := by linarith
-  have hmain : ‖ψ.1 x.1‖ * wt x ^ (2 * M) ≤ C * c₁ ^ (2 * M) * K * (1 + R) ^ (2 * M) * Real.exp (-(L * ρ)) := by
+  have hmain
+      : ‖ψ.1 x.1‖ * wt x ^ (2 * M)
+        ≤ C * c₁ ^ (2 * M) * K * (1 + R) ^ (2 * M) * Real.exp (-(L * ρ)) := by
     have hq := pow_mul_exp_neg_le (2 * M) hr
-    calc ‖ψ.1 x.1‖ * wt x ^ (2 * M)
-        ≤ (C * (Real.exp (-(L * ρ)) * Real.exp (-r))) *
-            (c₁ ^ (2 * M) * ((1 + r) ^ (2 * M) * (1 + R) ^ (2 * M))) :=
-          mul_le_mul (hdec.trans (mul_le_mul_of_nonneg_left hexp hC0)) hpow hwpos.le (by positivity)
-      _ = C * c₁ ^ (2 * M) * ((1 + r) ^ (2 * M) * Real.exp (-r)) * (1 + R) ^ (2 * M) * Real.exp (-(L * ρ)) := by ring
-      _ ≤ C * c₁ ^ (2 * M) * K * (1 + R) ^ (2 * M) * Real.exp (-(L * ρ)) := by
-          gcongr
+    calc
+      ‖ψ.1 x.1‖ * wt x ^ (2 * M)
+          ≤ (C * (Real.exp (-(L * ρ)) * Real.exp (-r)))
+            * (c₁ ^ (2 * M) * ((1 + r) ^ (2 * M) * (1 + R) ^ (2 * M))) :=
+        mul_le_mul (hdec.trans (mul_le_mul_of_nonneg_left hexp hC0)) hpow hwpos.le (by positivity)
+      _ = C * c₁ ^ (2 * M) * ((1 + r) ^ (2 * M) * Real.exp (-r)) * (1 + R) ^ (2 * M)
+          * Real.exp (-(L * ρ)) := by
+        ring
+      _ ≤ C * c₁ ^ (2 * M) * K * (1 + R) ^ (2 * M) * Real.exp (-(L * ρ)) := by gcongr
   rw [hz, ← div_eq_mul_inv, le_div_iff₀ hwpos]
   exact hmain
 
@@ -105,8 +125,10 @@ theorem domInt_pf : Basic → Sizes → DomInt := by
   set B : ℝ := A * (1 + R) ^ (2 * (2 * n)) * Real.exp (-(L * ρ)) with hBdef
   have hR1 : 0 ≤ 1 + R := by linarith
   have hB0 : 0 ≤ B := by positivity
-  calc ∫⁻ x, {x | |ldet x| ≤ R ∧ ρ ≤ r0 x}.indicator (fun x => ‖ψ.1 x.1‖ₑ * cnt (ratH E n 0) Ω x) x ∂D.ν
-      ≤ ∫⁻ x, ENNReal.ofReal B * (ENNReal.ofReal (wt x ^ (-(2 * ((2 * n : ℕ) : ℤ)))) * cnt (ratH E n 0) Ω x) ∂D.ν := by
+  calc
+    ∫⁻ x, {x | |ldet x| ≤ R ∧ ρ ≤ r0 x}.indicator (fun x => ‖ψ.1 x.1‖ₑ * cnt (ratH E n 0) Ω x) x ∂D.ν
+        ≤ ∫⁻ x, ENNReal.ofReal B * (ENNReal.ofReal (wt x ^ (-(2 * ((2 * n : ℕ) : ℤ)))) * cnt (ratH E n 0) Ω x) ∂D.ν :=
+      by
         refine lintegral_mono fun x => ?_
         by_cases hx : x ∈ {x : H E n 0 | |ldet x| ≤ R ∧ ρ ≤ r0 x}
         · rw [Set.indicator_of_mem hx, ← mul_assoc, ← ENNReal.ofReal_mul hB0, ← ofReal_norm]
@@ -115,8 +137,9 @@ theorem domInt_pf : Basic → Sizes → DomInt := by
           exact zero_le
     _ = ENNReal.ofReal B * I := lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
     _ = ENNReal.ofReal (A * I.toReal * (1 + R) ^ (2 * (2 * n)) * Real.exp (-(L * ρ))) := by
-        rw [show A * I.toReal * (1 + R) ^ (2 * (2 * n)) * Real.exp (-(L * ρ)) = B * I.toReal by rw [hBdef]; ring,
-          ENNReal.ofReal_mul hB0, ENNReal.ofReal_toReal hI]
+      rw [show A * I.toReal * (1 + R) ^ (2 * (2 * n)) * Real.exp (-(L * ρ)) = B * I.toReal by
+          rw [hBdef]; ring,
+        ENNReal.ofReal_mul hB0, ENNReal.ofReal_toReal hI]
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
 

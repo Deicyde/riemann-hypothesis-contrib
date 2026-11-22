@@ -15,24 +15,21 @@ namespace BesselUnitaryEquiv
 
 variable {k r : ℕ}
 
-theorem continuous_lmulM (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    Continuous (lmulM (k := k) (r := r) a) := by
+theorem continuous_lmulM (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : Continuous (lmulM (k := k) (r := r) a) := by
   unfold lmulM
-  first
-  | fun_prop
-  | exact continuous_const.matrix_mul continuous_id
-  | continuity
+  first | fun_prop | exact continuous_const.matrix_mul continuous_id | continuity
 
-theorem continuous_conjM (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    Continuous (conjM (k := k) (r := r) a) := by
+theorem continuous_conjM (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : Continuous (conjM (k := k) (r := r) a) := by
   unfold conjM
   first
   | fun_prop
   | exact (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
   | continuity
 
-def lmulE (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : IsUnit a.det) :
-    Mt k r ≃ᵐ Mt k r where
+def lmulE (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : IsUnit a.det)
+    : Mt k r ≃ᵐ Mt k r where
   toFun := lmulM a
   invFun := lmulM a⁻¹
   left_inv x := by
@@ -44,8 +41,8 @@ def lmulE (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : IsU
   measurable_toFun := (continuous_lmulM a).measurable
   measurable_invFun := (continuous_lmulM a⁻¹).measurable
 
-def conjE (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : IsUnit a.det) :
-    Mt k r ≃ᵐ Mt k r where
+def conjE (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : IsUnit a.det)
+    : Mt k r ≃ᵐ Mt k r where
   toFun := conjM a
   invFun := conjM a⁻¹
   left_inv x := by
@@ -61,19 +58,23 @@ def conjE (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (ha : IsU
   measurable_toFun := (continuous_conjM a).measurable
   measurable_invFun := (continuous_conjM a⁻¹).measurable
 
-theorem integral_transfer {α E F : Type*} [MeasurableSpace α] {μ : Measure α}
-    [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedSpace ℝ E]
+theorem integral_transfer
+    {α E F : Type*} [MeasurableSpace α]
+    {μ : Measure α} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedSpace ℝ E]
     [NormedAddCommGroup F] [NormedSpace ℂ F] [NormedSpace ℝ F]
     (f : α → α) (hf : MeasurePreserving f μ μ) (hfe : MeasurableEmbedding f)
-    (L : E ≃L[ℂ] F) (I₀ : α → E) (I₁ : α → F)
-    (h : ∀ᵐ p ∂μ, I₁ (f p) = L (I₀ p)) : ∫ p, I₁ p ∂μ = L (∫ p, I₀ p ∂μ) := by
+    (L : E ≃L[ℂ] F) (I₀ : α → E) (I₁ : α → F) (h : ∀ᵐ p ∂μ, I₁ (f p) = L (I₀ p))
+    : ∫ p, I₁ p ∂μ = L (∫ p, I₀ p ∂μ) := by
   rw [← hf.integral_comp hfe I₁, integral_congr_ae h]
   exact L.integral_comp_comm I₀
 
-theorem rep_inv {W : Type*} [NormedAddCommGroup W] [NormedSpace ℂ W] {m : ℕ}
-    {U : Set (Matrix (Fin m) (Fin m) ℂ)} {π : Matrix (Fin m) (Fin m) ℂ → (W →L[ℂ] W)}
-    (hπ : IsCRepOn U π) {a b : Matrix (Fin m) (Fin m) ℂ} (ha : a ∈ U) (hb : b ∈ U)
-    (hab : a * b = 1) (x : W) : π a (π b x) = x := by
+theorem rep_inv
+    {W : Type*} [NormedAddCommGroup W] [NormedSpace ℂ W]
+    {m : ℕ} {U : Set (Matrix (Fin m) (Fin m) ℂ)} {π : Matrix (Fin m) (Fin m) ℂ → (W →L[ℂ] W)}
+    (hπ : IsCRepOn U π)
+    {a b : Matrix (Fin m) (Fin m) ℂ} (ha : a ∈ U) (hb : b ∈ U) (hab : a * b = 1)
+    (x : W)
+    : π a (π b x) = x := by
   unfold IsCRepOn at hπ
   rw [← ContinuousLinearMap.comp_apply, ← hπ.2 a ha b hb, hab, hπ.1]
   try rfl
@@ -82,8 +83,8 @@ end BesselUnitaryEquiv
 
 open BesselUnitaryEquiv in
 theorem bessel_unitary_equiv_holds : BesselUEquiv := by
-  intro Wp Wq _ _ _ _ _ _ k r z z' c π π' μW μN μW' _ _ _ F hz hz' hN hW hW' hWl hW'l hNc hπ hπ'
-    g h₀ hh₀ h₀' hh₀'
+  intro Wp Wq _ _ _ _ _ _ k r z z' c π π' μW μN μW' _ _ _ F hz hz' hN hW hW' hWl hW'l hNc hπ hπ' g
+    h₀ hh₀ h₀' hh₀'
   have hu₀ := WeylGroupFacts.isUnit_of_uh hh₀.1
   have hu₀' := WeylGroupFacts.isUnit_of_uh hh₀'.1
   have hi₀ : h₀⁻¹ ∈ UWset k r z := WeylGroupFacts.uw_inv hh₀
@@ -93,13 +94,13 @@ theorem bessel_unitary_equiv_holds : BesselUEquiv := by
   let Φ : (Mt k r × Mt k r) × (Mt k r × Mt k r) ≃ᵐ (Mt k r × Mt k r) × (Mt k r × Mt k r) :=
     ((lmulE h₀ hu₀).prodCongr (conjE h₀ hu₀)).prodCongr
       ((lmulE h₀'⁻¹ hui₀').prodCongr (conjE h₀'⁻¹ hui₀'))
-  have hΦe : MeasurableEmbedding (Prod.map (Prod.map (lmulM h₀) (conjM h₀))
-      (Prod.map (lmulM h₀'⁻¹) (conjM h₀'⁻¹)) :
-        (Mt k r × Mt k r) × (Mt k r × Mt k r) → (Mt k r × Mt k r) × (Mt k r × Mt k r)) :=
+  have hΦe : MeasurableEmbedding
+      (Prod.map (Prod.map (lmulM h₀) (conjM h₀)) (Prod.map (lmulM h₀'⁻¹) (conjM h₀'⁻¹))
+        : (Mt k r × Mt k r) × (Mt k r × Mt k r) → (Mt k r × Mt k r) × (Mt k r × Mt k r)) :=
     Φ.measurableEmbedding
-  have hΦ : MeasurePreserving (Prod.map (Prod.map (lmulM h₀) (conjM h₀))
-      (Prod.map (lmulM h₀'⁻¹) (conjM h₀'⁻¹)) :
-        (Mt k r × Mt k r) × (Mt k r × Mt k r) → (Mt k r × Mt k r) × (Mt k r × Mt k r))
+  have hΦ : MeasurePreserving
+      (Prod.map (Prod.map (lmulM h₀) (conjM h₀)) (Prod.map (lmulM h₀'⁻¹) (conjM h₀'⁻¹))
+        : (Mt k r × Mt k r) × (Mt k r × Mt k r) → (Mt k r × Mt k r) × (Mt k r × Mt k r))
       ((μW.prod μN).prod (μW'.prod μN)) ((μW.prod μN).prod (μW'.prod μN)) := by
     refine MeasurePreserving.prod (MeasurePreserving.prod ?_ ?_) (MeasurePreserving.prod ?_ ?_)
     · exact ⟨(lmulE h₀ hu₀).measurable, hWl h₀ hh₀⟩
@@ -119,15 +120,16 @@ theorem bessel_unitary_equiv_holds : BesselUEquiv := by
   have q22 : ∀ᵐ p ∂((μW.prod μN).prod (μW'.prod μN)), Matrix.of p.2.2 ∈ Nset k r :=
     (Measure.quasiMeasurePreserving_snd.comp Measure.quasiMeasurePreserving_snd).ae aN
 
-  let e₂ : Wp ≃L[ℂ] Wp := ContinuousLinearEquiv.equivOfInverse (π h₀) (π h₀⁻¹)
-    (fun x => rep_inv hπ hi₀ hh₀ (Matrix.nonsing_inv_mul _ hu₀) x)
-    (fun x => rep_inv hπ hh₀ hi₀ (Matrix.mul_nonsing_inv _ hu₀) x)
-  let e₁ : Wq ≃L[ℂ] Wq := ContinuousLinearEquiv.equivOfInverse (π' h₀'⁻¹) (π' h₀')
-    (fun x => rep_inv hπ' hh₀' hi₀' (Matrix.mul_nonsing_inv _ hu₀') x)
-    (fun x => rep_inv hπ' hi₀' hh₀' (Matrix.nonsing_inv_mul _ hu₀') x)
+  let e₂ : Wp ≃L[ℂ] Wp :=
+    ContinuousLinearEquiv.equivOfInverse (π h₀) (π h₀⁻¹)
+      (fun x => rep_inv hπ hi₀ hh₀ (Matrix.nonsing_inv_mul _ hu₀) x)
+      (fun x => rep_inv hπ hh₀ hi₀ (Matrix.mul_nonsing_inv _ hu₀) x)
+  let e₁ : Wq ≃L[ℂ] Wq :=
+    ContinuousLinearEquiv.equivOfInverse (π' h₀'⁻¹) (π' h₀')
+      (fun x => rep_inv hπ' hh₀' hi₀' (Matrix.mul_nonsing_inv _ hu₀') x)
+      (fun x => rep_inv hπ' hi₀' hh₀' (Matrix.nonsing_inv_mul _ hu₀') x)
   let L : (Wq →L[ℂ] Wp) ≃L[ℂ] (Wq →L[ℂ] Wp) := e₁.arrowCongr e₂
-  have hL : ∀ X : Wq →L[ℂ] Wp, L X = (π h₀).comp (X.comp (π' h₀')) := by
-    intro X; ext y; rfl
+  have hL : ∀ X : Wq →L[ℂ] Wp, L X = (π h₀).comp (X.comp (π' h₀')) := by intro X; ext y; rfl
   rw [← hL]
   unfold besselJ
   refine integral_transfer _ hΦ hΦe L _ _ ?_
@@ -142,8 +144,9 @@ theorem bessel_unitary_equiv_holds : BesselUEquiv := by
     unfold psi; rw [(unitary_weyl_normal_holds k r z hz h₀ hh₀ M hM).2]
   have ep' : psi k r z' c (h₀'⁻¹ * M' * h₀'⁻¹⁻¹) = psi k r z' c M' := by
     unfold psi; rw [(unitary_weyl_normal_holds k r z' hz' h₀'⁻¹ hi₀' M' hM').2]
-  have earg : (h₀ * K)⁻¹ * (h₀ * M * h₀⁻¹)⁻¹ * (h₀ * g * h₀') * (h₀'⁻¹ * M' * h₀'⁻¹⁻¹) *
-      (h₀'⁻¹ * K') = K⁻¹ * M⁻¹ * g * M' * K' := by
+  have earg
+      : (h₀ * K)⁻¹ * (h₀ * M * h₀⁻¹)⁻¹ * (h₀ * g * h₀') * (h₀'⁻¹ * M' * h₀'⁻¹⁻¹) * (h₀'⁻¹ * K')
+        = K⁻¹ * M⁻¹ * g * M' * K' := by
     simp only [Matrix.mul_inv_rev, Matrix.nonsing_inv_nonsing_inv _ hu₀,
       Matrix.nonsing_inv_nonsing_inv _ hu₀', Matrix.mul_assoc,
       Matrix.nonsing_inv_mul_cancel_left _ _ hu₀, Matrix.mul_nonsing_inv_cancel_left _ _ hu₀']

@@ -5,10 +5,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem fib_spec_finite (Ω B : Type) [Field Ω] [CommRing B] [Algebra Ω B] [Module.Finite Ω B] :
-    (fib (Ω := Ω) (Spec.map (CommRingCat.ofHom (algebraMap Ω B))) (𝟙 (gp Ω))).Finite := by
+private theorem fib_spec_finite
+    (Ω B : Type) [Field Ω] [CommRing B] [Algebra Ω B] [Module.Finite Ω B]
+    : (fib (Ω := Ω) (Spec.map (CommRingCat.ofHom (algebraMap Ω B))) (𝟙 (gp Ω))).Finite := by
   apply (Set.finite_range (fun g : B →ₐ[Ω] Ω => Spec.map (CommRingCat.ofHom (g : B →+* Ω)))).subset
   intro z hz
   have hz' : z ≫ Spec.map (CommRingCat.ofHom (algebraMap Ω B)) = 𝟙 _ := hz
@@ -20,8 +22,7 @@ private theorem fib_spec_finite (Ω B : Type) [Field Ω] [CommRing B] [Algebra �
     simpa using this
   · rfl
 
-theorem UpperTheory.Gal.TranscendenceTraces.fibFin_of :
-    Chart → FibFin := by
+theorem UpperTheory.Gal.TranscendenceTraces.fibFin_of : Chart → FibFin := by
   intro hC
   unfold Chart at hC
   unfold FibFin

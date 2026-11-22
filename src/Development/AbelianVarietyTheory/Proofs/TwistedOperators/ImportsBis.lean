@@ -6,7 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory.OneAddPowBoundTwistedOperators
 
-theorem one_add_pow_le : ∀ {L : ℝ}, (0 : ℝ) ≤ L → ∀ (N : ℕ), ((1 : ℝ) + L) ^ N ≤ (2 : ℝ) ^ N * ((1 : ℝ) + L ^ N) := by
+theorem one_add_pow_le
+    : ∀ {L : ℝ}, (0 : ℝ) ≤ L → ∀ (N : ℕ), ((1 : ℝ) + L) ^ N ≤ (2 : ℝ) ^ N * ((1 : ℝ) + L ^ N) := by
   intro L hL N
   have h2 : (0 : ℝ) ≤ (2 : ℝ) ^ N := by positivity
   have hLN : (0 : ℝ) ≤ L ^ N := pow_nonneg hL N

@@ -10,9 +10,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.RepSecondIso
 
-theorem subQuot_equiv_of_sup : ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (A B E : Subrepresentation ρ), E ≤ A → E ⊔ B = A →
-    Nonempty ((subQuot E B).Equiv (subQuot A B)) := by
+theorem subQuot_equiv_of_sup
+    : ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
+        (A B E : Subrepresentation ρ),
+      E ≤ A → E ⊔ B = A → Nonempty ((subQuot E B).Equiv (subQuot A B)) := by
   intro G V _ _ _ ρ A B E hEA hsup
   have hEA' : E.toSubmodule ≤ A.toSubmodule := fun x hx => hEA hx
   let PE := Submodule.comap E.toSubmodule.subtype B.toSubmodule
@@ -50,7 +51,8 @@ theorem subQuot_equiv_of_sup : ∀ {G V : Type} [Group G] [AddCommGroup V] [Modu
     rw [hdiff]
     exact B.toSubmodule.neg_mem hb
   let ψ := LinearEquiv.ofBijective φ ⟨hinj, hsurj⟩
-  refine ⟨Representation.Equiv.mk' ⟨φ, fun g => ?_⟩ ψ.symm (fun x => ψ.symm_apply_apply x)
+  refine ⟨Representation.Equiv.mk' ⟨φ, fun g => ?_⟩ ψ.symm
+    (fun x => ψ.symm_apply_apply x)
     (fun y => ψ.apply_symm_apply y)⟩
   exact Submodule.linearMap_qext _ (LinearMap.ext fun x => rfl)
 

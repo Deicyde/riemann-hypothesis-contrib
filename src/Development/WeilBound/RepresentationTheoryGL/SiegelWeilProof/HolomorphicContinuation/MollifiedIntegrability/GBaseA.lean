@@ -10,12 +10,14 @@ open MeasureTheory Complex
 
 namespace PositivityTheory.Rg.Sw.WR.G.GB
 
-theorem gauss_one (w : ℂ) (hw : 0 < w.re) :
-    ∫ z : ℂ, cexp (-(w * ((‖z‖ ^ 2 : ℝ) : ℂ))) = (Real.pi : ℂ) / w := by
+theorem gauss_one (w : ℂ) (hw : 0 < w.re)
+    : ∫ z : ℂ, cexp (-(w * ((‖z‖ ^ 2 : ℝ) : ℂ))) = (Real.pi : ℂ) / w := by
   have h := Complex.volume_preserving_equiv_real_prod.symm
   rw [← h.integral_comp' (g := fun z : ℂ => cexp (-(w * ((‖z‖ ^ 2 : ℝ) : ℂ))))]
-  have e : ∀ p : ℝ × ℝ, cexp (-(w * ((‖measurableEquivRealProd.symm p‖ ^ 2 : ℝ) : ℂ))) =
-      cexp (-w * (p.1 : ℂ) ^ 2) * cexp (-w * (p.2 : ℂ) ^ 2) := by
+  have e
+      : ∀ p : ℝ × ℝ,
+        cexp (-(w * ((‖measurableEquivRealProd.symm p‖ ^ 2 : ℝ) : ℂ)))
+          = cexp (-w * (p.1 : ℂ) ^ 2) * cexp (-w * (p.2 : ℂ) ^ 2) := by
     intro p
     rw [← Complex.exp_add]
     congr 1
@@ -32,10 +34,11 @@ theorem gauss_one (w : ℂ) (hw : 0 < w.re) :
   rw [← Complex.cpow_add _ _ hne]
   norm_num
 
-theorem gauss_diag {n : ℕ} (d : Fin n → ℂ) (hd : ∀ k, 0 < (d k).re) :
-    ∫ r : Fin n → ℂ, cexp (-∑ k, d k * ((‖r k‖ ^ 2 : ℝ) : ℂ)) = ∏ k, (Real.pi : ℂ) / d k := by
-  have e : ∀ r : Fin n → ℂ, cexp (-∑ k, d k * ((‖r k‖ ^ 2 : ℝ) : ℂ)) =
-      ∏ k, cexp (-(d k * ((‖r k‖ ^ 2 : ℝ) : ℂ))) := by
+theorem gauss_diag {n : ℕ} (d : Fin n → ℂ) (hd : ∀ k, 0 < (d k).re)
+    : ∫ r : Fin n → ℂ, cexp (-∑ k, d k * ((‖r k‖ ^ 2 : ℝ) : ℂ)) = ∏ k, (Real.pi : ℂ) / d k := by
+  have e
+      : ∀ r : Fin n → ℂ,
+        cexp (- ∑ k, d k * ((‖r k‖ ^ 2 : ℝ) : ℂ)) = ∏ k, cexp (-(d k * ((‖r k‖ ^ 2 : ℝ) : ℂ))) := by
     intro r
     rw [← Complex.exp_sum, Finset.sum_neg_distrib]
   simp_rw [e]

@@ -9,17 +9,26 @@ open Formalism.BasicNotions NumberField IsDedekindDomain GlobalTheory.Mem
 
 namespace GlobalTheory.Mem
 
-theorem prod_norm_embeddings_eq_abs_norm (E : Type) [Field E] [NumberField E] (γ : E) :
-    ∏ φ : E →+* ℂ, ‖φ γ‖ = |((Algebra.norm ℚ γ : ℚ) : ℝ)| := by
+theorem prod_norm_embeddings_eq_abs_norm (E : Type) [Field E] [NumberField E] (γ : E)
+    : ∏ φ : E →+* ℂ, ‖φ γ‖ = |((Algebra.norm ℚ γ : ℚ) : ℝ)| := by
   have h := Algebra.norm_eq_prod_embeddings ℚ ℂ γ
   have h2 := congrArg (fun z : ℂ => ‖z‖) h
   simp only [norm_prod, eq_ratCast] at h2
-  rw [Fintype.prod_equiv (RingHom.equivRatAlgHom E ℂ) (fun φ : E →+* ℂ => ‖φ γ‖)
-    (fun φ : E →ₐ[ℚ] ℂ => ‖φ γ‖) (fun _ => rfl), ← h2]
+  rw [Fintype.prod_equiv (RingHom.equivRatAlgHom E ℂ)
+      (fun φ : E →+* ℂ => ‖φ γ‖)
+      (fun φ : E →ₐ[ℚ] ℂ => ‖φ γ‖)
+      (fun _ => rfl),
+    ← h2]
   rw [← Real.norm_eq_abs, ← Complex.norm_real]
   simp
 
-theorem norm_typeNorm_sq_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [IsGalois ℚ E] (r : (E →+* ℂ) → ℕ) (n : ℕ), (∀ τ, r τ + r (ComplexEmbedding.conjugate τ) = n) → ∀ (K : IntermediateField ℚ ℂ) [FiniteDimensional ℚ K] (hK : ∀ (τ : E →+* ℂ) x, τ x ∈ K) (γ : E) (σ : K →+* ℂ), ‖σ (∏ τ : E →+* ℂ, (⟨τ γ, hK τ γ⟩ : K) ^ r τ)‖ ^ 2 = |(Algebra.norm ℚ γ : ℝ)| ^ n := by
+theorem norm_typeNorm_sq_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [IsGalois ℚ E] (r : (E →+* ℂ) → ℕ)
+        (n : ℕ),
+      (∀ τ, r τ + r (ComplexEmbedding.conjugate τ) = n)
+        → ∀ (K : IntermediateField ℚ ℂ) [FiniteDimensional ℚ K] (hK : ∀ (τ : E →+* ℂ) x, τ x ∈ K)
+            (γ : E) (σ : K →+* ℂ),
+          ‖σ (∏ τ : E →+* ℂ, (⟨τ γ, hK τ γ⟩ : K) ^ r τ)‖ ^ 2 = |(Algebra.norm ℚ γ : ℝ)| ^ n := by
   intro E _ _ _ _ r n hr K _ hK γ σ
   let s : (E →+* ℂ) → (E →+* ℂ) := fun τ => σ.comp (τ.codRestrict K (hK τ))
   have hs : ∀ τ x, s τ x = σ ⟨τ x, hK τ x⟩ := fun _ _ => rfl
@@ -37,14 +46,15 @@ theorem norm_typeNorm_sq_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
       congr 2
       rw [IsCMField.complexEmbedding_complexConj, ComplexEmbedding.conjugate_coe_eq]
     rw [h1, IsCMField.complexEmbedding_complexConj, Complex.norm_conj]
-  have hinv : Function.Involutive
-      (fun τ : E →+* ℂ => ComplexEmbedding.conjugate τ) := fun τ => star_star τ
+  have hinv : Function.Involutive (fun τ : E →+* ℂ => ComplexEmbedding.conjugate τ) := fun τ =>
+    star_star τ
   have hP : ‖σ (∏ τ : E →+* ℂ, (⟨τ γ, hK τ γ⟩ : K) ^ r τ)‖ = ∏ τ : E →+* ℂ, ‖s τ γ‖ ^ r τ := by
     rw [map_prod, norm_prod]
     refine Finset.prod_congr rfl fun τ _ => ?_
     rw [map_pow, norm_pow, hs]
-  have hQ : ∏ τ : E →+* ℂ, ‖s τ γ‖ ^ r τ
-      = ∏ τ : E →+* ℂ, ‖s τ γ‖ ^ r (ComplexEmbedding.conjugate τ) := by
+  have hQ
+      : ∏ τ : E →+* ℂ, ‖s τ γ‖ ^ r τ
+        = ∏ τ : E →+* ℂ, ‖s τ γ‖ ^ r (ComplexEmbedding.conjugate τ) := by
     rw [← hinv.bijective.prod_comp (fun τ => ‖s τ γ‖ ^ r τ)]
     refine Finset.prod_congr rfl fun τ _ => ?_
     rw [hconj]

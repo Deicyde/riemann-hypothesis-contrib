@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open MeasureTheory Topology PositivityTheory.Rg.Tf.Loc
 open scoped ENNReal
 
-theorem UpperTheory.V.Z.Tf.Orb.haarComm :
-    UpperTheory.V.Z.Tf.Orb.HaarComm := by
+theorem UpperTheory.V.Z.Tf.Orb.haarComm : UpperTheory.V.Z.Tf.Orb.HaarComm := by
   intro G _ _ _ _ _ _ _ _ H hH hc μ hμ
   haveI : LocallyCompactSpace H := hH.isClosedEmbedding_subtypeVal.locallyCompactSpace
   haveI : SecondCountableTopology H := TopologicalSpace.Subtype.secondCountableTopology _

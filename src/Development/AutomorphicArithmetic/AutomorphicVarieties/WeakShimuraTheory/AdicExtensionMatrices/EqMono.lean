@@ -5,27 +5,45 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem eqMono_unit {Λ S : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing S] [Algebra Λ S] [IsCO Λ S] {x : S}
-    (h : IsUnit (res Λ S x)) : IsUnit x := by
+private theorem eqMono_unit
+    {Λ S : Type} [CommRing Λ] [IsLocalRing Λ] [CommRing S] [Algebra Λ S] [IsCO Λ S]
+    {x : S} (h : IsUnit (res Λ S x))
+    : IsUnit x := by
   by_contra hn
   exact h.ne_zero ((res_eq_zero_iff Λ S x).2 hn)
 
-private theorem eqMono_root {S : Type} [CommRing S] (x : S) (c : Fin 4 → S) (i : Fin 4)
-    (h : ∏ j, (x - c j) = 0) (hu : ∀ j, j ≠ i → IsUnit (x - c j)) : x = c i := by
+private theorem eqMono_root
+    {S : Type} [CommRing S]
+    (x : S) (c : Fin 4 → S) (i : Fin 4)
+    (h : ∏ j, (x - c j) = 0) (hu : ∀ j, j ≠ i → IsUnit (x - c j))
+    : x = c i := by
   rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i)] at h
   have h2 : IsUnit (∏ j ∈ Finset.univ.erase i, (x - c j)) :=
     IsUnit.prod_iff.2 fun j hj => hu j (Finset.ne_of_mem_erase hj)
   exact sub_eq_zero.1 (h2.mul_left_eq_zero.1 h)
 
-theorem UpperTheory.V.Ws.sxEqMono :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type} [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ] {a : O →+* Λ} {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] {D : RD Φ R} {W : WPres Λ (ℤ × ℤ) R} [IsCO Λ (W.gr 0)], Φ.Ok ((residue Λ).comp a) → Φ.Near a 0 D → D.Graded W → ∀ (D' : RD Φ W.A), D'.map (W.A.val : W.A →+* R) = D → ∀ cp : Γ → (W.gr 0)[X], (∀ g, (cp g).map (algebraMap (W.gr 0) W.A) = (D'.r g).charpoly) → ∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (f f' : W.gr 0 →ₐ[Λ] R'), (∀ g n, f ((cp g).coeff n) = f' ((cp g).coeff n)) → ∀ x ∈ mono D.r 0, ∃ b : W.gr 0, ((b : W.A) : R) = x ∧ f b = f' b := by
+theorem UpperTheory.V.Ws.sxEqMono
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type}
+        [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ]
+        {a : O →+* Λ} {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] {D : RD Φ R}
+        {W : WPres Λ (ℤ × ℤ) R} [IsCO Λ (W.gr 0)],
+      Φ.Ok ((residue Λ).comp a) → Φ.Near a 0 D → D.Graded W
+        → ∀ (D' : RD Φ W.A),
+          D'.map (W.A.val : W.A →+* R) = D
+            → ∀ cp : Γ → (W.gr 0)[X],
+              (∀ g, (cp g).map (algebraMap (W.gr 0) W.A) = (D'.r g).charpoly)
+                → ∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (f f' : W.gr 0 →ₐ[Λ] R'),
+                  (∀ g n, f ((cp g).coeff n) = f' ((cp g).coeff n))
+                    → ∀ x ∈ mono D.r 0, ∃ b : W.gr 0, ((b : W.A) : R) = x ∧ f b = f' b := by
   intro O Γ _ _ _ Φ Λ _ _ _ _ a R _ _ _ D W _ hOk hNear hGr D' hD' cp hcp R' _ _ _ f f' hff' x hx
   classical
-  let φA : W.gr 0 →ₐ[Λ] R :=
-    { toRingHom := (W.A.val : W.A →+* R).comp (algebraMap (W.gr 0) W.A)
-      commutes' := fun c => rfl }
+  let φA : W.gr 0 →ₐ[Λ] R := {
+    toRingHom := (W.A.val : W.A →+* R).comp (algebraMap (W.gr 0) W.A)
+    commutes' := fun c => rfl
+  }
   have hAinj : Function.Injective (algebraMap (W.gr 0) W.A) := fun b c h => Subtype.ext h
   let E : Subring R := (AlgHom.equalizer f f').toSubring.map (φA : W.gr 0 →+* R)
   have hmem : ∀ b : W.gr 0, f b = f' b → φA b ∈ E := fun b hb => Subring.mem_map.mpr ⟨b, hb, rfl⟩
@@ -88,13 +106,14 @@ theorem UpperTheory.V.Ws.sxEqMono :
     ⟨_, hmem (algebraMap Λ (W.gr 0) (a ↑(Φ.ν g))) (by rw [f.commutes, f'.commutes]), hrep.mult g⟩
   have htr : ∀ g, Matrix.trace (D.r g) ∈ E := by
     intro g
-    have h2 : Matrix.trace (D'.r g) = algebraMap (W.gr 0) W.A (-(cp g).coeff 3) := by
-      rw [Matrix.trace_eq_neg_charpoly_coeff, Fintype.card_fin, ← hcp, Polynomial.coeff_map, map_neg]
+    have h2 : Matrix.trace (D'.r g) = algebraMap (W.gr 0) W.A (- (cp g).coeff 3) := by
+      rw [Matrix.trace_eq_neg_charpoly_coeff, Fintype.card_fin, ← hcp, Polynomial.coeff_map,
+        map_neg]
     have h3 : Matrix.trace (D.r g) = (W.A.val : W.A →+* R) (Matrix.trace (D'.r g)) := by
       rw [hD'r g]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [Matrix.trace, map_sum]
-    have h1 : Matrix.trace (D.r g) = φA (-(cp g).coeff 3) := by
+      simp [Matrix.trace, map_sum]
+    have h1 : Matrix.trace (D.r g) = φA (- (cp g).coeff 3) := by
       rw [h3, h2]
       rfl
     rw [h1]
@@ -109,7 +128,9 @@ theorem UpperTheory.V.Ws.sxEqMono :
     have e1 : f ↑U⁻¹ * f (d i - d j) = 1 := by rw [← hU, ← map_mul, Units.inv_mul, map_one]
     have e2 : f' ↑U⁻¹ * f' (d i - d j) = 1 := by rw [← hU, ← map_mul, Units.inv_mul, map_one]
     have hinv : f (↑U⁻¹ : W.gr 0) = f' ↑U⁻¹ := by
-      calc f ↑U⁻¹ = f ↑U⁻¹ * (f' (d i - d j) * f' ↑U⁻¹) := by rw [mul_comm (f' _), e2, mul_one]
+      calc
+        f ↑U⁻¹
+          = f ↑U⁻¹ * (f' (d i - d j) * f' ↑U⁻¹) := by rw [mul_comm (f' _), e2, mul_one]
         _ = (f ↑U⁻¹ * f (d i - d j)) * f' ↑U⁻¹ := by rw [hfe]; ring
         _ = f' ↑U⁻¹ := by rw [e1, one_mul]
     refine ⟨φA ↑U⁻¹, hmem _ hinv, ?_⟩

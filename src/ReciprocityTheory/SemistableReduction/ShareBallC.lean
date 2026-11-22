@@ -26,15 +26,17 @@ theorem sb_normSq_split (p : ℕ) {r : ℕ} (v : Fin r → ℂ) : normSq v = pos
 theorem sb_normSq_nonneg {r : ℕ} (v : Fin r → ℂ) : 0 ≤ normSq v :=
   Finset.sum_nonneg fun _ _ => by positivity
 
-theorem sb_setup {r p : ℕ} {H : Matrix (Fin r) (Fin r) ℂ} {s : ℝ} (hH : H.PosDef)
-    (hJ : H * signMat p r * H = signMat p r)
-    (hP : ∀ u : Fin r → ℂ, signMat p r *ᵥ (H *ᵥ u) = u → negSq p u ≤ s ^ 2 * posSq p u) :
-    ∀ w : Fin r → ℂ, ∃ x, signMat p r *ᵥ (H *ᵥ x) = x ∧ sbDp p r *ᵥ x = sbDp p r *ᵥ w := by
+theorem sb_setup
+    {r p : ℕ} {H : Matrix (Fin r) (Fin r) ℂ} {s : ℝ}
+    (hH : H.PosDef) (hJ : H * signMat p r * H = signMat p r)
+    (hP : ∀ u : Fin r → ℂ, signMat p r *ᵥ (H *ᵥ u) = u → negSq p u ≤ s ^ 2 * posSq p u)
+    : ∀ w : Fin r → ℂ, ∃ x, signMat p r *ᵥ (H *ᵥ x) = x ∧ sbDp p r *ᵥ x = sbDp p r *ᵥ w := by
   intro w
   have hJJ : signMat p r * signMat p r = 1 := sb_J_mul_J p r
   have hA2 : signMat p r * H * (signMat p r * H) = 1 := by
-    calc signMat p r * H * (signMat p r * H) = signMat p r * (H * signMat p r * H) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      signMat p r * H * (signMat p r * H)
+        = signMat p r * (H * signMat p r * H) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hJ, hJJ]
   have hHx : ∀ x : Fin r → ℂ, H *ᵥ x = signMat p r *ᵥ (signMat p r *ᵥ (H *ᵥ x)) := by
     intro x; rw [mulVec_mulVec, hJJ, one_mulVec]
@@ -55,7 +57,8 @@ theorem sb_setup {r p : ℕ} {H : Matrix (Fin r) (Fin r) ℂ} {s : ℝ} (hH : H.
     by_contra hx
     have h1 := hre x hx
     rw [hHx x, hAx, mulVec_neg, dotProduct_neg, Complex.neg_re, sb_re_dot_J, sb_posSq_eq,
-      sb_negSq_eq, hDx] at h1
+        sb_negSq_eq, hDx]
+      at h1
     have h2 := sb_normSq_nonneg (sbDp p r *ᵥ x)
     have h3 : normSq (0 : Fin r → ℂ) = 0 := by simp [normSq]
     linarith
@@ -90,8 +93,7 @@ theorem sb_setup {r p : ℕ} {H : Matrix (Fin r) (Fin r) ℂ} {s : ℝ} (hH : H.
     have h0 : F *ᵥ (x - y) = 0 := by rw [mulVec_sub]; exact sub_eq_zero.mpr hxy
     have hp : P *ᵥ (x - y) = 0 := hplus _ (hPv _) (by rw [← hFp, h0, mulVec_zero])
     have hn : N *ᵥ (x - y) = 0 := hminus _ (hNv _) (by rw [← hFn, h0, mulVec_zero])
-    have : x - y = 0 := by
-      rw [← one_mulVec (x - y), ← hPN, add_mulVec, hp, hn, add_zero]
+    have : x - y = 0 := by rw [← one_mulVec (x - y), ← hPN, add_mulVec, hp, hn, add_zero]
     exact sub_eq_zero.mp this
   have hsurj : Function.Surjective F.mulVec :=
     mulVec_surjective_iff_isUnit.mpr (mulVec_injective_iff_isUnit.mp hinj)

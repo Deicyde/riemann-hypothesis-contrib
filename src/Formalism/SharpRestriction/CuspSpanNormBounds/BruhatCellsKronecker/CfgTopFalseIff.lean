@@ -9,22 +9,23 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.FourierDecayAlt Finset
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.FourierDecayAlt
+  Finset
 
-theorem vOne_succ (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h : j < D.R.k - 1) :
-    vOne D τ (j + 1) = (((D.hc τ).v ⟨j, h⟩ : ℚ) : ℝ) := by
+theorem vOne_succ (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h : j < D.R.k - 1)
+    : vOne D τ (j + 1) = (((D.hc τ).v ⟨j, h⟩ : ℚ) : ℝ) := by
   have hh : 1 ≤ j + 1 ∧ j + 1 ≤ D.R.k - 1 := ⟨by omega, by omega⟩
   rw [vOne, dite_eq_left hh]
   simp only [Nat.add_sub_cancel]
 
-theorem bOne_succ (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h : j < D.R.m) :
-    bOne D τ (j + 1) = (((D.hc τ).b ⟨j, h⟩ : ℚ) : ℝ) := by
+theorem bOne_succ (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h : j < D.R.m)
+    : bOne D τ (j + 1) = (((D.hc τ).b ⟨j, h⟩ : ℚ) : ℝ) := by
   have hh : 1 ≤ j + 1 ∧ j + 1 ≤ D.R.m := ⟨by omega, by omega⟩
   rw [bOne, dite_eq_left hh]
   simp only [Nat.add_sub_cancel]
 
-theorem uOne_succ (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) (j : ℕ) (h : j < D.R.k) :
-    uOne D u τ (j + 1) = (((D.hcW u τ).u ⟨j, h⟩ : ℚ) : ℝ) := by
+theorem uOne_succ (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) (j : ℕ) (h : j < D.R.k)
+    : uOne D u τ (j + 1) = (((D.hcW u τ).u ⟨j, h⟩ : ℚ) : ℝ) := by
   have hh : 1 ≤ j + 1 ∧ j + 1 ≤ D.R.k := ⟨by omega, by omega⟩
   rw [uOne, dite_eq_left hh]
   simp only [uS, Nat.add_sub_cancel]
@@ -40,32 +41,36 @@ theorem m_eq (D : D7) : D.R.m = 2 * D.R.rS + 2 := by
   unfold Ranks.rS
   omega
 
-theorem uOne_one (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) : uOne D u τ 1 = uOne D D.u₀ τ 1 := by
+theorem uOne_one (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    : uOne D u τ 1 = uOne D D.u₀ τ 1 := by
   have hk := five_le_k D
   have e1 := uOne_succ D u τ 0 (by omega)
   have e2 := uOne_succ D D.u₀ τ 0 (by omega)
   simp only [Nat.zero_add] at e1 e2
   rw [e1, e2, D.hcW_first u τ (by omega), D.hcW_first D.u₀ τ (by omega)]
 
-theorem uOne_last (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) : uOne D u τ D.R.k = uOne D D.u₀ τ D.R.k := by
+theorem uOne_last (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    : uOne D u τ D.R.k = uOne D D.u₀ τ D.R.k := by
   have hk := five_le_k D
   have e1 := uOne_succ D u τ (D.R.k - 1) (by omega)
   have e2 := uOne_succ D D.u₀ τ (D.R.k - 1) (by omega)
   rw [Nat.sub_add_cancel (by omega : 1 ≤ D.R.k)] at e1 e2
   rw [e1, e2, D.hcW_last u τ (by omega), D.hcW_last D.u₀ τ (by omega)]
 
-theorem vOne_gap (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h : j + 1 < D.R.k - 1) :
-    vOne D τ (j + 1) = vOne D τ (j + 2) + 4 * (D.s.Del : ℝ) := by
+theorem vOne_gap (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h : j + 1 < D.R.k - 1)
+    : vOne D τ (j + 1) = vOne D τ (j + 2) + 4 * (D.s.Del : ℝ) := by
   have hj : j < D.R.k - 1 := by omega
   rw [vOne_succ D τ j hj, show j + 2 = j + 1 + 1 from rfl, vOne_succ D τ (j + 1) h]
   have g := D.s.cloud_gap D.u₀ τ j h
   rw [D.hcW_base] at g
-  have g2 : (((D.hc τ).v ⟨j, hj⟩ : ℚ) : ℝ) - (((D.hc τ).v ⟨j + 1, h⟩ : ℚ) : ℝ) = 4 * (D.s.Del : ℝ) := by
+  have g2
+      : (((D.hc τ).v ⟨j, hj⟩ : ℚ) : ℝ) - (((D.hc τ).v ⟨j + 1, h⟩ : ℚ) : ℝ) = 4 * (D.s.Del : ℝ) := by
     exact_mod_cast g
   linarith
 
-theorem vOne_arith (D : D7) (τ : D.what₂.Tau) : ∀ d j : ℕ, j + d + 2 = D.R.k →
-    vOne D τ (j + 1) = vOne D τ (D.R.k - 1) + 4 * (D.s.Del : ℝ) * d := by
+theorem vOne_arith (D : D7) (τ : D.what₂.Tau)
+    : ∀ d j : ℕ,
+      j + d + 2 = D.R.k → vOne D τ (j + 1) = vOne D τ (D.R.k - 1) + 4 * (D.s.Del : ℝ) * d := by
   intro d
   induction d with
   | zero =>
@@ -81,7 +86,6 @@ theorem vOne_arith (D : D7) (τ : D.what₂.Tau) : ∀ d j : ℕ, j + d + 2 = D.
     push_cast
     ring
 
-
 open Classical in
 def cfgOf (D : D7) (τ : D.what₂.Tau) : Sz.Cfg where
   k := D.R.k
@@ -96,8 +100,8 @@ def cfgOf (D : D7) (τ : D.what₂.Tau) : Sz.Cfg where
 def deOf (D : D7) (u : D.what₂.Word) (l : ℕ) : ℝ :=
   if h : 1 ≤ l ∧ l ≤ D.R.k - 2 then (if D.s.letter u ⟨l - 1, by omega⟩ then 1 else 0) else 0
 
-theorem deOf_succ (D : D7) (u : D.what₂.Word) (l : ℕ) (h : l < D.R.k - 2) :
-    deOf D u (l + 1) = if D.s.letter u ⟨l, h⟩ then 1 else 0 := by
+theorem deOf_succ (D : D7) (u : D.what₂.Word) (l : ℕ) (h : l < D.R.k - 2)
+    : deOf D u (l + 1) = if D.s.letter u ⟨l, h⟩ then 1 else 0 := by
   have hh : 1 ≤ l + 1 ∧ l + 1 ≤ D.R.k - 2 := ⟨by omega, by omega⟩
   rw [deOf, dite_eq_left hh]
   simp only [Nat.add_sub_cancel]
@@ -108,7 +112,7 @@ theorem isWord_deOf (D : D7) (u : D.what₂.Word) : Sz.IsWord D.R.k (deOf D u) :
   refine ⟨fun i => ?_, ?_⟩
   · unfold deOf
     split_ifs <;> simp
-  · have hn : ¬ (1 ≤ D.R.k - 1 ∧ D.R.k - 1 ≤ D.R.k - 2) := by omega
+  · have hn : ¬(1 ≤ D.R.k - 1 ∧ D.R.k - 1 ≤ D.R.k - 2) := by omega
     rw [deOf, dite_eq_right hn]
 
 theorem cfg_top_iff (D : D7) (τ : D.what₂.Tau) : (cfgOf D τ).top = true ↔ IsTop D τ := by
@@ -117,8 +121,8 @@ theorem cfg_top_iff (D : D7) (τ : D.what₂.Tau) : (cfgOf D τ).top = true ↔ 
 theorem cfg_top_false_iff (D : D7) (τ : D.what₂.Tau) : (cfgOf D τ).top = false ↔ ¬ IsTop D τ := by
   simp [cfgOf]
 
-theorem cfg_v (D : D7) (τ : D.what₂.Tau) (i : ℕ) (h1 : 1 ≤ i) (h2 : i ≤ D.R.k - 1) :
-    (cfgOf D τ).v i = vOne D τ i := by
+theorem cfg_v (D : D7) (τ : D.what₂.Tau) (i : ℕ) (h1 : 1 ≤ i) (h2 : i ≤ D.R.k - 1)
+    : (cfgOf D τ).v i = vOne D τ i := by
   show vOne D τ (D.R.k - 1) + 4 * (D.s.Del : ℝ) * ((D.R.k : ℝ) - 1 - (i : ℝ)) = vOne D τ i
   obtain ⟨j, rfl⟩ : ∃ j, i = j + 1 := ⟨i - 1, by omega⟩
   have hk := five_le_k D
@@ -129,10 +133,11 @@ theorem cfg_v (D : D7) (τ : D.what₂.Tau) (i : ℕ) (h1 : 1 ≤ i) (h2 : i ≤
   rw [hc]
   push_cast <;> ring
 
-theorem cfg_u (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau)
+theorem cfg_u
+    (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau)
     (h5 : ¬ IsTop D τ → uOne D u τ D.R.k = vOne D τ (D.R.k - 1) - 1 / 2)
-    (i : ℕ) (h1 : 1 ≤ i) (h2 : i ≤ D.R.k) :
-    (cfgOf D τ).u (deOf D u) i = uOne D u τ i := by
+    (i : ℕ) (h1 : 1 ≤ i) (h2 : i ≤ D.R.k)
+    : (cfgOf D τ).u (deOf D u) i = uOne D u τ i := by
   have hk := five_le_k D
   simp only [Sz.Cfg.u]
   split_ifs with hi1 hik
@@ -161,8 +166,8 @@ theorem cfg_u (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau)
     show _ - _ - _ * ((D.s.Del : ℚ) : ℝ) = _
     split_ifs <;> push_cast <;> ring
 
-theorem cfg_lam (D : D7) (τ : D.what₂.Tau) (a : Fin D.R.r) :
-    (cfgOf D τ).lam (a.1 + 1) = lamS D.R (D.hc τ) a := by
+theorem cfg_lam (D : D7) (τ : D.what₂.Tau) (a : Fin D.R.r)
+    : (cfgOf D τ).lam (a.1 + 1) = lamS D.R (D.hc τ) a := by
   have hk := five_le_k D
   have ha := a.isLt
   simp only [Sz.Cfg.lam, lamS]
@@ -171,7 +176,7 @@ theorem cfg_lam (D : D7) (τ : D.what₂.Tau) (a : Fin D.R.r) :
       show a.1 + 1 < D.R.k
       omega
     rw [if_pos h1, dite_eq_left h, cfg_v D τ (a.1 + 1) (by omega) (by omega), vOne_succ D τ a.1 h]
-  · have h1 : ¬ (a.1 + 1 < (cfgOf D τ).k) := by
+  · have h1 : ¬(a.1 + 1 < (cfgOf D τ).k) := by
       show ¬ (a.1 + 1 < D.R.k)
       omega
     have h2 : a.1 - (D.R.k - 1) < D.R.m := by
@@ -181,27 +186,29 @@ theorem cfg_lam (D : D7) (τ : D.what₂.Tau) (a : Fin D.R.r) :
     show -bOne D τ (a.1 + 1 + 1 - D.R.k) = _
     rw [show a.1 + 1 + 1 - D.R.k = (a.1 - (D.R.k - 1)) + 1 by omega, bOne_succ D τ _ h2]
 
-theorem cfg_lamH (D : D7) (τ : D.what₂.Tau) (a : Fin (2 * D.R.rS + D.R.k + 1)) :
-    (cfgOf D τ).lam (a.1 + 1) = lamSH D.R (D.hc τ) a := by
+theorem cfg_lamH (D : D7) (τ : D.what₂.Tau) (a : Fin (2 * D.R.rS + D.R.k + 1))
+    : (cfgOf D τ).lam (a.1 + 1) = lamSH D.R (D.hc τ) a := by
   show (cfgOf D τ).lam (a.1 + 1) = lamS D.R (D.hc τ) (Fin.cast (dimS_eq D.R) a)
   exact cfg_lam D τ (Fin.cast (dimS_eq D.R) a)
 
 theorem prod_Icc_eq_fin (p : ℕ) (F : ℕ → ℝ) : ∏ i ∈ Icc 1 p, F i = ∏ a : Fin p, F (a.1 + 1) := by
   induction p with
   | zero =>
-    rw [Finset.Icc_eq_empty (show ¬ (1 ≤ 0) by omega)]
+    rw [Finset.Icc_eq_empty (show ¬(1 ≤ 0) by omega)]
     simp
   | succ n ih =>
     rw [Finset.prod_Icc_succ_top (show 1 ≤ n + 1 by omega), ih, Fin.prod_univ_castSucc]
     simp
 
-theorem Vand_eq_vand {p : ℕ} (x : ℕ → ℝ) (y : Fin p → ℝ) (h : ∀ a : Fin p, x (a.1 + 1) = y a) :
-    Sz.Vand p x = vand y := by
+theorem Vand_eq_vand {p : ℕ} (x : ℕ → ℝ) (y : Fin p → ℝ) (h : ∀ a : Fin p, x (a.1 + 1) = y a)
+    : Sz.Vand p x = vand y := by
   unfold Sz.Vand vand
   rw [prod_Icc_eq_fin]
   refine Finset.prod_congr rfl (fun a _ => ?_)
   symm
-  refine Finset.prod_nbij' (fun b => b.1 + 1) (fun j => if hj : j - 1 < p then ⟨j - 1, hj⟩ else a)
+  refine Finset.prod_nbij'
+    (fun b => b.1 + 1)
+    (fun j => if hj : j - 1 < p then ⟨j - 1, hj⟩ else a)
     ?_ ?_ ?_ ?_ ?_
   · intro b hb
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hb
@@ -212,35 +219,36 @@ theorem Vand_eq_vand {p : ℕ} (x : ℕ → ℝ) (y : Fin p → ℝ) (h : ∀ a 
   · intro j hj
     simp only [Finset.mem_Ioc] at hj
     have hjp : j - 1 < p := by omega
-    simp only [hjp, ↓reduceDIte, Finset.mem_filter, Finset.mem_univ, true_and]
+    simp only [hjp, ↓ reduceDIte, Finset.mem_filter, Finset.mem_univ, true_and]
     show a.1 < j - 1
     omega
   · intro b _
     have hbp : b.1 + 1 - 1 < p := by
       have := b.isLt
       omega
-    simp only [hbp, ↓reduceDIte]
+    simp only [hbp, ↓ reduceDIte]
     ext
     simp
   · intro j hj
     simp only [Finset.mem_Ioc] at hj
     have hjp : j - 1 < p := by omega
-    simp only [hjp, ↓reduceDIte]
+    simp only [hjp, ↓ reduceDIte]
     omega
   · intro b _
     show y a - y b = x (a.1 + 1) - x (b.1 + 1)
     rw [h a, h b]
 
-theorem Vand_u (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau)
-    (h5 : ¬ IsTop D τ → uOne D u τ D.R.k = vOne D τ (D.R.k - 1) - 1 / 2) :
-    Sz.Vand D.R.k ((cfgOf D τ).u (deOf D u)) = vand (uS D u τ) := by
+theorem Vand_u
+    (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    (h5 : ¬ IsTop D τ → uOne D u τ D.R.k = vOne D τ (D.R.k - 1) - 1 / 2)
+    : Sz.Vand D.R.k ((cfgOf D τ).u (deOf D u)) = vand (uS D u τ) := by
   apply Vand_eq_vand
   intro a
   rw [cfg_u D u τ h5 (a.1 + 1) (by omega) (by have := a.isLt; omega), uOne_succ D u τ a.1 a.isLt]
   rfl
 
-theorem Vand_lam (D : D7) (τ : D.what₂.Tau) :
-    Sz.Vand ((cfgOf D τ).k + (cfgOf D τ).m - 1) (cfgOf D τ).lam = vand (lamSH D.R (D.hc τ)) := by
+theorem Vand_lam (D : D7) (τ : D.what₂.Tau)
+    : Sz.Vand ((cfgOf D τ).k + (cfgOf D τ).m - 1) (cfgOf D τ).lam = vand (lamSH D.R (D.hc τ)) := by
   have hp : (cfgOf D τ).k + (cfgOf D τ).m - 1 = 2 * D.R.rS + D.R.k + 1 := by
     show D.R.k + D.R.m - 1 = 2 * D.R.rS + D.R.k + 1
     have := m_eq D
@@ -254,25 +262,30 @@ theorem rdE_eq (D : D7) : D.host.rdE = 2 * D.host.v := by
   rw [Host.v]
   ring
 
-theorem cast_tri (m : ℕ) (hm : 1 ≤ m) : ((m * (m - 1) / 2 : ℕ) : ℝ) = (m : ℝ) * ((m : ℝ) - 1) / 2 := by
+theorem cast_tri (m : ℕ) (hm : 1 ≤ m)
+    : ((m * (m - 1) / 2 : ℕ) : ℝ) = (m : ℝ) * ((m : ℝ) - 1) / 2 := by
   have h2 : 2 ∣ m * (m - 1) := (Nat.even_mul_pred_self m).two_dvd
   have h3 : ((m * (m - 1) / 2 : ℕ) : ℝ) = ((m * (m - 1) : ℕ) : ℝ) / ((2 : ℕ) : ℝ) :=
     Nat.cast_div h2 (by norm_num)
   rw [h3, Nat.cast_mul, Nat.cast_sub hm]
   norm_num
 
-theorem Tcrit_eq (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) (hka : 0 ≤ D.host.ka) :
-    Sz.Tcrit D.R.k D.R.m D.host.ka D.host.rdE (gg D) (VV D τ) (vand (uS D u τ)) = Tcrit D u τ := by
+theorem Tcrit_eq (D : D7) (u : D.what₂.Word) (τ : D.what₂.Tau) (hka : 0 ≤ D.host.ka)
+    : Sz.Tcrit D.R.k D.R.m D.host.ka D.host.rdE (gg D) (VV D τ) (vand (uS D u τ))
+      = Tcrit D u τ := by
   have hm : 1 ≤ D.R.m := by
     have := D.R.two_le_m
     omega
-  have e1 : (((D.R.m - 1) * D.R.k + D.R.m * (D.R.m - 1) / 2 : ℕ) : ℝ) =
-      ((D.R.m : ℝ) - 1) * D.R.k + (D.R.m : ℝ) * ((D.R.m : ℝ) - 1) / 2 := by
+  have e1
+      : (((D.R.m - 1) * D.R.k + D.R.m * (D.R.m - 1) / 2 : ℕ) : ℝ)
+        = ((D.R.m : ℝ) - 1) * D.R.k + (D.R.m : ℝ) * ((D.R.m : ℝ) - 1) / 2 := by
     rw [Nat.cast_add, cast_tri _ hm, Nat.cast_mul, Nat.cast_sub hm, Nat.cast_one]
-  have e2 : ((D.R.k * D.R.m + D.R.m * (D.R.m - 1) / 2 : ℕ) : ℝ) =
-      (D.R.k : ℝ) * D.R.m + (D.R.m : ℝ) * ((D.R.m : ℝ) - 1) / 2 := by
+  have e2
+      : ((D.R.k * D.R.m + D.R.m * (D.R.m - 1) / 2 : ℕ) : ℝ)
+        = (D.R.k : ℝ) * D.R.m + (D.R.m : ℝ) * ((D.R.m : ℝ) - 1) / 2 := by
     rw [Nat.cast_add, cast_tri _ hm, Nat.cast_mul]
-  unfold Formalism.FourierDecayAlt.Sz.Tcrit Formalism.FourierDecayAlt.Sz.TcritPow Formalism.MainNotions.S.Tcrit
+  unfold Formalism.FourierDecayAlt.Sz.Tcrit Formalism.FourierDecayAlt.Sz.TcritPow
+    Formalism.MainNotions.S.Tcrit
   rw [← Real.rpow_natCast D.host.ka, e1, ← Real.rpow_natCast (gg D), e2, ← Real.rpow_neg hka]
 
 theorem one_le_L {D : D7} (large₂ : SizeData₂ D) : 1 ≤ large₂.sc.L := by
@@ -297,8 +310,8 @@ theorem one_le_f (D : D7) : (1 : ℝ) ≤ D.R.f := by
     omega
   exact_mod_cast h3
 
-theorem bOne_gap (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h1 : 1 ≤ j) (h2 : j < D.R.m) :
-    bOne D τ j + 1 ≤ bOne D τ (j + 1) := by
+theorem bOne_gap (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h1 : 1 ≤ j) (h2 : j < D.R.m)
+    : bOne D τ j + 1 ≤ bOne D τ (j + 1) := by
   obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
   have hi : i < D.R.m := by omega
   have hi' : i + 1 < D.R.m := h2
@@ -309,8 +322,10 @@ theorem bOne_gap (D : D7) (τ : D.what₂.Tau) (j : ℕ) (h1 : 1 ≤ j) (h2 : j 
   have h3 : ((D.hc τ).b ⟨i, hi⟩ : ℚ) + 1 ≤ (D.hc τ).b ⟨i + 1, hi'⟩ := by linarith
   exact_mod_cast h3
 
-theorem cfg_ok {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl Cg cb Cu cT CT : ℝ} (hD : StandingNumericalData D C0)
-    (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT) (τ : D.what₂.Tau) : (cfgOf D τ).Ok := by
+theorem cfg_ok
+    {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl Cg cb Cu cT CT : ℝ} (hD : StandingNumericalData D C0)
+    (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT) (τ : D.what₂.Tau)
+    : (cfgOf D τ).Ok := by
   have hk5 := five_le_k D
   have hm2 := D.R.two_le_m
   have hf := one_le_f D
@@ -349,8 +364,10 @@ theorem cfg_ok {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl Cg cb Cu cT CT : �
     show bOne D τ 1 / 2 ≤ bTop D τ ∧ bTop D τ ≤ bOne D τ 1 - 3
     exact ⟨h2, by linarith⟩
 
-theorem cfg_small {D : D7} {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT CT : ℝ}
-    (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT) (h40 : 40 ≤ Cl) (τ : D.what₂.Tau) : (cfgOf D τ).Small large₂.sc.b := by
+theorem cfg_small
+    {D : D7} {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT CT : ℝ}
+    (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT) (h40 : 40 ≤ Cl) (τ : D.what₂.Tau)
+    : (cfgOf D τ).Small large₂.sc.b := by
   have hk5 := five_le_k D
   have hm2 := D.R.two_le_m
   have hL := one_le_L large₂

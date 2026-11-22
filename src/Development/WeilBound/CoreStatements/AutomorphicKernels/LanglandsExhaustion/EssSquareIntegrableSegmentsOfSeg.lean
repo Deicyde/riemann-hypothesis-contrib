@@ -47,8 +47,10 @@ public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.
 
 namespace PositivityTheory.Exh
 
-theorem essSquareIntegrableSegments_of_seg (hZ : GlobalTheory.Published.SegmentRepresentation) : GlobalTheory.Published.EssSquareIntegrableSegments := by
-  have hI : GlobalTheory.Published.IrreducibleAdmissibleGL := PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top
+theorem essSquareIntegrableSegments_of_seg (hZ : GlobalTheory.Published.SegmentRepresentation)
+    : GlobalTheory.Published.EssSquareIntegrableSegments := by
+  have hI : GlobalTheory.Published.IrreducibleAdmissibleGL :=
+    PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top
   have hU := PositivityTheory.Exh.lUnlinkedIrr_of_seg hZ
   exact PositivityTheory.PfEss.essSquareIntegrableSegments_main2
     (PositivityTheory.Exh.langlandsExhaustionGL_of_seg hZ)

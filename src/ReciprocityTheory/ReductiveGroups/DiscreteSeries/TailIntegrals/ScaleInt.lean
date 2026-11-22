@@ -11,12 +11,17 @@ open scoped ENNReal
 
 namespace ReciprocityTheory.ChartRestriction.DS.Xi.RankOneLeviIdentities
 
-theorem scale_int {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] {r : ℝ}
-    (hr : (Module.finrank ℝ E : ℝ) < r) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ a b : ℝ, 0 < a → 0 < b →
-      ∫⁻ x, ENNReal.ofReal ((a + b * ‖x‖) ^ (-r)) ∂μ ≤
-        ENNReal.ofReal (K * a ^ (-r) * (a / b) ^ (Module.finrank ℝ E : ℝ)) := by
+theorem scale_int
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    {r : ℝ} (hr : (Module.finrank ℝ E : ℝ) < r)
+    : ∃ K : ℝ,
+      0 ≤ K
+        ∧ ∀ a b : ℝ,
+          0 < a → 0 < b
+            → ∫⁻ x, ENNReal.ofReal ((a + b * ‖x‖) ^ (-r)) ∂μ
+              ≤ ENNReal.ofReal (K * a ^ (-r) * (a / b) ^ (Module.finrank ℝ E : ℝ)) := by
   have hg := integrable_one_add_norm (μ := μ) hr
   refine ⟨∫ x, (1 + ‖x‖) ^ (-r) ∂μ, integral_nonneg fun x => by positivity, fun a b ha hb => ?_⟩
   have ht : 0 < a / b := div_pos ha hb
@@ -31,10 +36,12 @@ theorem scale_int {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [Finite
   have hF : Integrable (fun x => a ^ (-r) * (1 + ‖(a / b)⁻¹ • x‖) ^ (-r)) μ :=
     (hg.comp_smul (inv_ne_zero ht.ne')).const_mul (a ^ (-r))
   simp_rw [hpt]
-  rw [← ofReal_integral_eq_lintegral_ofReal hF (Filter.Eventually.of_forall fun x =>
-    mul_nonneg (Real.rpow_nonneg ha.le _) (Real.rpow_nonneg (by positivity) _))]
+  rw [← ofReal_integral_eq_lintegral_ofReal hF
+    (Filter.Eventually.of_forall fun x =>
+      mul_nonneg (Real.rpow_nonneg ha.le _) (Real.rpow_nonneg (by positivity) _))]
   apply ENNReal.ofReal_le_ofReal
-  rw [integral_const_mul, Measure.integral_comp_smul (μ := μ) (f := fun y => (1 + ‖y‖) ^ (-r)) (R := (a / b)⁻¹),
+  rw [integral_const_mul,
+    Measure.integral_comp_smul (μ := μ) (f := fun y => (1 + ‖y‖) ^ (-r)) (R := (a / b)⁻¹),
     smul_eq_mul, inv_pow, inv_inv, abs_of_pos (pow_pos ht _), Real.rpow_natCast]
   exact le_of_eq (by ring)
 

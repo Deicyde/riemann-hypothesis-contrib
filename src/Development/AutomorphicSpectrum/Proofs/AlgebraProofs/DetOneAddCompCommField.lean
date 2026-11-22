@@ -8,18 +8,23 @@ open NumberField TensorProduct
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem det_one_add_comp_comm_field {K V W : Type*} [Field K] [AddCommGroup V] [Module K V]
-    [AddCommGroup W] [Module K W] [Module.Finite K V] [Module.Finite K W]
-    (A : V →ₗ[K] W) (B : W →ₗ[K] V) :
-    LinearMap.det (1 + A ∘ₗ B) = LinearMap.det (1 + B ∘ₗ A) := by
+theorem det_one_add_comp_comm_field
+    {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    [Module.Finite K V] [Module.Finite K W]
+    (A : V →ₗ[K] W) (B : W →ₗ[K] V)
+    : LinearMap.det (1 + A ∘ₗ B) = LinearMap.det (1 + B ∘ₗ A) := by
   classical
   let bV := Module.finBasis K V
   let bW := Module.finBasis K W
   rw [← LinearMap.det_toMatrix bW, ← LinearMap.det_toMatrix bV, map_add (f := _), map_add (f := _),
-    LinearMap.toMatrix_comp bW bV bW, LinearMap.toMatrix_comp bV bW bV,
-    LinearMap.toMatrix_one, LinearMap.toMatrix_one, Matrix.det_one_add_mul_comm]
+    LinearMap.toMatrix_comp bW bV bW, LinearMap.toMatrix_comp bV bW bV, LinearMap.toMatrix_one,
+    LinearMap.toMatrix_one, Matrix.det_one_add_mul_comm]
 
-theorem exists_det_congr_one : ∀ (E : Type) [Field E] [NumberField E] (La : Type) [AddCommGroup La] [Module (𝓞 E) La] [Module.Finite (𝓞 E) La] [Module.Projective (𝓞 E) La] (I : Ideal (𝓞 E)) (g : La →ₗ[𝓞 E] La), (∀ a, g a - a ∈ I • (⊤ : Submodule (𝓞 E) La)) → ∃ u : 𝓞 E, u - 1 ∈ I ∧ (u : E) = LinearMap.det (g.baseChange E) := by
+theorem exists_det_congr_one
+    : ∀ (E : Type) [Field E] [NumberField E] (La : Type) [AddCommGroup La] [Module (𝓞 E) La]
+        [Module.Finite (𝓞 E) La] [Module.Projective (𝓞 E) La] (I : Ideal (𝓞 E)) (g : La →ₗ[𝓞 E] La),
+      (∀ a, g a - a ∈ I • (⊤ : Submodule (𝓞 E) La))
+        → ∃ u : 𝓞 E, u - 1 ∈ I ∧ (u : E) = LinearMap.det (g.baseChange E) := by
   intro E _ _ La _ _ _ _ I g hg
   classical
   obtain ⟨n, p, i, -, -, hpi⟩ := Module.Finite.exists_comp_eq_id_of_projective (𝓞 E) La

@@ -14,17 +14,19 @@ open scoped Topology
 
 namespace GlobalTheory.CosetSumShift
 
-theorem sum_shift : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] (r R : kˣ) (S : Finset (n → k)),
-    (∀ b ∈ S, b ∈ box n R) → (∀ a ∈ box n R, ∃! b, b ∈ S ∧ a - b ∈ box n r) →
-    ∀ F : (n → k) → ℂ, (∀ t ∈ box n r, ∀ y, F (y + t) = F y) →
-    ∀ a ∈ box n R, ∑ b ∈ S, F (a + b) = ∑ b ∈ S, F b := by
+theorem sum_shift
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : Type) [Fintype n] (r R : kˣ) (S : Finset (n → k)),
+      (∀ b ∈ S, b ∈ box n R) → (∀ a ∈ box n R, ∃! b, b ∈ S ∧ a - b ∈ box n r)
+        → ∀ F : (n → k) → ℂ,
+          (∀ t ∈ box n r, ∀ y, F (y + t) = F y)
+            → ∀ a ∈ box n R, ∑ b ∈ S, F (a + b) = ∑ b ∈ S, F b := by
   intro k _ _ _ _ n _ r R S hS huniq F hF a ha
   classical
   have hadd : ∀ {s : kˣ} {x y : n → k}, x ∈ box n s → y ∈ box n s → x + y ∈ box n s :=
     fun hx hy i _ => add_mem_cball (hx i trivial) (hy i trivial)
-  have hneg : ∀ {s : kˣ} {x : n → k}, x ∈ box n s → -x ∈ box n s :=
-    fun hx i _ => neg_mem_cball (hx i trivial)
+  have hneg : ∀ {s : kˣ} {x : n → k}, x ∈ box n s → -x ∈ box n s := fun hx i _ =>
+    neg_mem_cball (hx i trivial)
   have hzero : (0 : n → k) ∈ box n r := fun i _ => by simp [cball]
   have hmem : ∀ b ∈ S, a + b ∈ box n R := fun b hb => hadd ha (hS b hb)
   choose! c hc using fun b (hb : b ∈ S) => (huniq (a + b) (hmem b hb)).exists

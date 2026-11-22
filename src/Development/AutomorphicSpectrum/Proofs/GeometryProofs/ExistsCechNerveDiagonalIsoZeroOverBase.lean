@@ -7,14 +7,16 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.WedgeEqSpanO
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagDet
 
-theorem alt_triangular {Ω E W : Type} [Field Ω] [AddCommGroup E] [Module Ω E] [AddCommGroup W] [Module Ω W] {s : ℕ}
-    (f : E [⋀^Fin s]→ₗ[Ω] W) (v w : Fin s → E) (c : Fin s → Ω)
-    (h : ∀ i, v i - c i • w i ∈ Submodule.span Ω (w '' {k | k < i})) :
-    f v = (∏ i, c i) • f w := by
+theorem alt_triangular
+    {Ω E W : Type} [Field Ω] [AddCommGroup E] [Module Ω E] [AddCommGroup W] [Module Ω W]
+    {s : ℕ} (f : E [⋀^Fin s]→ₗ[Ω] W) (v w : Fin s → E) (c : Fin s → Ω)
+    (h : ∀ i, v i - c i • w i ∈ Submodule.span Ω (w '' {k | k < i}))
+    : f v = (∏ i, c i) • f w := by
   classical
   have key : ∀ j : ℕ, f v = f (fun i => if (i : ℕ) < j then c i • w i else v i) := by
     intro j
@@ -24,8 +26,11 @@ theorem alt_triangular {Ω E W : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
       rw [ih]
       by_cases hj : j < s
       · obtain ⟨i, rfl⟩ : ∃ i : Fin s, (i : ℕ) = j := ⟨⟨j, hj⟩, rfl⟩
-        have hnew : (fun k : Fin s => if (k : ℕ) < i + 1 then c k • w k else v k) =
-            Function.update (fun k : Fin s => if (k : ℕ) < i then c k • w k else v k) i (c i • w i) := by
+        have hnew
+            : (fun k : Fin s => if (k : ℕ) < i + 1 then c k • w k else v k)
+              = Function.update
+                (fun k : Fin s => if (k : ℕ) < i then c k • w k else v k)
+                i (c i • w i) := by
           funext k
           by_cases hk : k = i
           · rw [hk, Function.update_self, if_pos (Nat.lt_succ_self _)]
@@ -33,7 +38,7 @@ theorem alt_triangular {Ω E W : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
             have hk' : (k : ℕ) ≠ i := fun h => hk (Fin.ext h)
             by_cases hki : (k : ℕ) < i
             · rw [if_pos hki, if_pos (show (k : ℕ) < i + 1 by omega)]
-            · rw [if_neg hki, if_neg (show ¬ ((k : ℕ) < i + 1) by omega)]
+            · rw [if_neg hki, if_neg (show ¬((k : ℕ) < i + 1) by omega)]
         rw [hnew]
         generalize hm : (fun k : Fin s => if (k : ℕ) < i then c k • w k else v k) = m
         have hmi : m i = v i := by
@@ -54,7 +59,8 @@ theorem alt_triangular {Ω E W : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
               exact hmk k hk
             rw [← Function.update_eq_self k (Function.update m i (w k)), hmk', f.map_update_smul]
             rw [f.map_eq_zero_of_eq _ (i := k) (j := i)
-              (by rw [Function.update_self, Function.update_of_ne hki.symm, Function.update_self]) hki,
+                (by rw [Function.update_self, Function.update_of_ne hki.symm, Function.update_self])
+                hki,
               smul_zero]
           | zero => exact f.map_coord_zero i (by simp)
           | add x y _ _ hx hy => rw [f.map_update_add, hx, hy, add_zero]
@@ -73,9 +79,10 @@ theorem alt_triangular {Ω E W : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
   rw [hfun]
   exact f.toMultilinearMap.map_smul_univ c w
 
-theorem exists_diag {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] {r : ℕ} {b b₀ : Fin r → E}
-    (hF : ∀ i, flagStep Ω b i = flagStep Ω b₀ i) (i : Fin r) :
-    ∃ c : Ω, b i - c • b₀ i ∈ flagStep Ω b₀ i := by
+theorem exists_diag
+    {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
+    {r : ℕ} {b b₀ : Fin r → E} (hF : ∀ i, flagStep Ω b i = flagStep Ω b₀ i) (i : Fin r)
+    : ∃ c : Ω, b i - c • b₀ i ∈ flagStep Ω b₀ i := by
   have hb : b i ∈ flagStep Ω b₀ ((i : ℕ) + 1) := by
     rw [← hF]
     exact Submodule.subset_span ⟨i, show (i : ℕ) < (i : ℕ) + 1 by omega, rfl⟩

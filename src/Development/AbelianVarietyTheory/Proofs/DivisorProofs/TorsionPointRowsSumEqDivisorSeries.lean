@@ -18,8 +18,8 @@ theorem norm_ch (N : ℕ) (j : ZMod N) : ‖ch N j‖ = 1 := by
   rw [Complex.norm_exp]
   simp [Complex.div_re]
 
-theorem norm_q_lt (N : ℕ) [NeZero N] (τ : ℍ) :
-    ‖Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * τ / N)‖ < 1 := by
+theorem norm_q_lt (N : ℕ) [NeZero N] (τ : ℍ)
+    : ‖Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * τ / N)‖ < 1 := by
   rw [Complex.norm_exp, show (1 : ℝ) = Real.exp 0 from Real.exp_zero.symm, Real.exp_lt_exp]
   have hN : (0 : ℝ) < N := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne N)
   have hτ := τ.im_pos
@@ -31,14 +31,26 @@ theorem norm_q_lt (N : ℕ) [NeZero N] (τ : ℍ) :
   have := Real.pi_pos
   nlinarith
 
-theorem main : ∀ (N : ℕ) [NeZero N] (e : ℕ) (τ : ℍ) (x : Fin 2 → ZMod N) (S : ℂ), 1 ≤ e → HasSum (fun n : ℤ => ∑' m : ℤ, 1 / (tors N τ x + n * (τ : ℂ) + m) ^ (e + 1)) S → ∃ T : ℂ, HasSum (fun k : ℕ => cSum N e ((-1) ^ (e + 1)) x k * Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * τ / N) ^ k) T ∧ S = (if x 0 = 0 then ∑' m : ℤ, 1 / ((((x 1).val : ℂ)) / N + m) ^ (e + 1) else 0) + (-(2 * (Real.pi : ℂ) * Complex.I)) ^ (e + 1) / (e.factorial : ℂ) * T := by
+theorem main
+    : ∀ (N : ℕ) [NeZero N] (e : ℕ) (τ : ℍ) (x : Fin 2 → ZMod N) (S : ℂ),
+      1 ≤ e → HasSum (fun n : ℤ => ∑' m : ℤ, 1 / (tors N τ x + n * (τ : ℂ) + m) ^ (e + 1)) S
+        → ∃ T : ℂ,
+          HasSum
+              (fun k : ℕ =>
+                cSum N e ((-1) ^ (e + 1)) x k
+                  * Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * τ / N) ^ k)
+              T
+            ∧ S
+              = (if x 0 = 0 then ∑' m : ℤ, 1 / ((((x 1).val : ℂ)) / N + m) ^ (e + 1) else 0)
+                + (-(2 * (Real.pi : ℂ) * Complex.I)) ^ (e + 1) / (e.factorial : ℂ) * T := by
   intro N _ e τ x S he hS
   set q : ℂ := Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * τ / N) with hq
   set K : ℂ := (-(2 * (Real.pi : ℂ) * Complex.I)) ^ (e + 1) / (e.factorial : ℂ)
   set R : ℤ → ℂ := fun k => ∑' m : ℤ, 1 / (((k : ℂ) * τ + ((x 1).val : ℂ)) / N + m) ^ (e + 1) with hR
   have hN : (N : ℂ) ≠ 0 := by exact_mod_cast NeZero.ne N
-  have hfR : (fun n : ℤ => ∑' m : ℤ, 1 / (tors N τ x + n * (τ : ℂ) + m) ^ (e + 1)) =
-      fun n : ℤ => R (((x 0).val : ℤ) + n * N) := by
+  have hfR
+      : (fun n : ℤ => ∑' m : ℤ, 1 / (tors N τ x + n * (τ : ℂ) + m) ^ (e + 1))
+        = fun n : ℤ => R (((x 0).val : ℤ) + n * N) := by
     funext n
     simp only [hR]
     congr 1
@@ -51,7 +63,8 @@ theorem main : ∀ (N : ℕ) [NeZero N] (e : ℕ) (τ : ℍ) (x : Fin 2 → ZMod
   rw [hfR] at hS
   have hsplit := GlobalTheory.T.tsum_residueClass_split_by_sign N (x 0) R hS.summable
   let c₁ : ℕ → ℕ → ℂ := fun d m => if ((d : ℕ) : ZMod N) = x 0 then ch N ((m : ZMod N) * x 1) else 0
-  let c₂ : ℕ → ℕ → ℂ := fun d m => if ((d : ℕ) : ZMod N) = -x 0 then ch N (-((m : ZMod N) * x 1)) else 0
+  let c₂ : ℕ → ℕ → ℂ := fun d m =>
+    if ((d : ℕ) : ZMod N) = - x 0 then ch N (-((m : ZMod N) * x 1)) else 0
   have hq1 : ‖q‖ < 1 := norm_q_lt N τ
   have hc₁ : ∀ d m, ‖c₁ d m‖ ≤ 1 := by
     intro d m
@@ -79,8 +92,10 @@ theorem main : ∀ (N : ℕ) [NeZero N] (e : ℕ) (τ : ℍ) (x : Fin 2 → ZMod
     refine Finset.sum_congr rfl fun m _ => ?_
     ring
   · rw [← hS.tsum_eq, hsplit]
-    have hpos : ∀ d : ℕ+, (if ((d : ℕ) : ZMod N) = x 0 then R ((d : ℕ) : ℤ) else 0) =
-        K * ∑' m : ℕ+, ((m : ℕ) : ℂ) ^ e * c₁ d m * q ^ ((d : ℕ) * (m : ℕ)) := by
+    have hpos
+        : ∀ d : ℕ+,
+          (if ((d : ℕ) : ZMod N) = x 0 then R ((d : ℕ) : ℤ) else 0)
+            = K * ∑' m : ℕ+, ((m : ℕ) : ℂ) ^ e * c₁ d m * q ^ ((d : ℕ) * (m : ℕ)) := by
       intro d
       simp only [c₁]
       split_ifs with hd
@@ -89,8 +104,12 @@ theorem main : ∀ (N : ℕ) [NeZero N] (e : ℕ) (τ : ℍ) (x : Fin 2 → ZMod
         push_cast
         rw [this]
       · simp
-    have hneg : ∀ d : ℕ+, (if ((d : ℕ) : ZMod N) = -x 0 then R (-((d : ℕ) : ℤ)) else 0) =
-        K * ((-1) ^ (e + 1) * ∑' m : ℕ+, ((m : ℕ) : ℂ) ^ e * c₂ d m * q ^ ((d : ℕ) * (m : ℕ))) := by
+    have hneg
+        : ∀ d : ℕ+,
+          (if ((d : ℕ) : ZMod N) = - x 0 then R (-((d : ℕ) : ℤ)) else 0)
+            = K
+              * ((-1) ^ (e + 1)
+                * ∑' m : ℕ+, ((m : ℕ) : ℂ) ^ e * c₂ d m * q ^ ((d : ℕ) * (m : ℕ))) := by
       intro d
       simp only [c₂]
       split_ifs with hd
@@ -100,8 +119,7 @@ theorem main : ∀ (N : ℕ) [NeZero N] (e : ℕ) (τ : ℍ) (x : Fin 2 → ZMod
         rw [this]
       · simp
     rw [tsum_congr hpos, tsum_congr hneg, tsum_mul_left, tsum_mul_left, tsum_mul_left]
-    have h0 : R 0 = ∑' m : ℤ, 1 / ((((x 1).val : ℂ)) / N + m) ^ (e + 1) := by
-      simp [hR]
+    have h0 : R 0 = ∑' m : ℤ, 1 / ((((x 1).val : ℂ)) / N + m) ^ (e + 1) := by simp [hR]
     rw [h0]
     ring
 

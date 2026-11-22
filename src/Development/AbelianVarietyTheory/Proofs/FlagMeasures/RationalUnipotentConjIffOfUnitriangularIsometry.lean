@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.Unitriangular
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData
+  Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
 open scoped Pointwise ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -40,13 +43,16 @@ private lemma finrank_Xflag {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (j : 
   rw [h, finrank_span_eq_card]
   exact F.fl.e_indep.comp _ Subtype.val_injective
 
-theorem finrank_Xflag_eq {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LFlag (D.sp.Y 0) D.R.rS T0) (j : ℕ) :
-    Module.finrank D.host.E (Xflag F j) = Module.finrank D.host.E (Xflag F0 j) := by
+theorem finrank_Xflag_eq
+    {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LFlag (D.sp.Y 0) D.R.rS T0) (j : ℕ)
+    : Module.finrank D.host.E (Xflag F j) = Module.finrank D.host.E (Xflag F0 j) := by
   rw [finrank_Xflag, finrank_Xflag]
 
-theorem orth_iff {β : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hi : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
-    {U U' : Submodule D.host.E (VS D).V} (hU : ∀ x, β x ∈ U' ↔ x ∈ U) (y : (VS D).V) :
-    β y ∈ orth (VS D) U' ↔ y ∈ orth (VS D) U := by
+theorem orth_iff
+    {β : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hi : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+    {U U' : Submodule D.host.E (VS D).V} (hU : ∀ x, β x ∈ U' ↔ x ∈ U)
+    (y : (VS D).V)
+    : β y ∈ orth (VS D) U' ↔ y ∈ orth (VS D) U := by
   have hiso : ∀ x y, (VS D).hT (β x) (β y) = (VS D).hT x y := hi
   unfold orth
   simp only [Submodule.mem_iInf, LinearMap.mem_ker]
@@ -68,13 +74,16 @@ private lemma frame_mem_Xflag {T0 : D.host.E} (F0 : LFlag (D.sp.Y 0) D.R.rS T0) 
   simp only [Formalism.MainNotions.S.FlagG.fvec, Fin.snoc_castSucc, Formalism.MainNotions.S.FlagG.Xa]
   exact Submodule.subset_span ⟨⟨a.1, hr⟩, ha, rfl⟩
 
-theorem map_Xflag_le {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LFlag (D.sp.Y 0) D.R.rS T0)
+theorem map_Xflag_le
+    {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LFlag (D.sp.Y 0) D.R.rS T0)
     (σ : (VS D).V ≃ₗ[D.host.E] (VS D).V) (U : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)
-    (hU : IsUpUni U) (hf : ∀ b, σ (frame F b) = ∑ a, U a b • frame F0 a) (j : ℕ) :
-    ∀ x ∈ Xflag F j, σ x ∈ Xflag F0 j := by
+    (hU : IsUpUni U) (hf : ∀ b, σ (frame F b) = ∑ a, U a b • frame F0 a)
+    (j : ℕ)
+    : ∀ x ∈ Xflag F j, σ x ∈ Xflag F0 j := by
   intro x hx
-  have key : Submodule.span D.host.E (F.fl.e '' {i | i.1 < j}) ≤
-      (Xflag F0 j).comap (σ : (VS D).V →ₗ[D.host.E] (VS D).V) := by
+  have key
+      : Submodule.span D.host.E (F.fl.e '' {i | i.1 < j})
+        ≤ (Xflag F0 j).comap (σ : (VS D).V →ₗ[D.host.E] (VS D).V) := by
     rw [Submodule.span_le]
     rintro _ ⟨i, hi, rfl⟩
     have hi' : i.1 < j := hi
@@ -87,16 +96,17 @@ theorem map_Xflag_le {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LFl
     by_cases hab : Fin.castSucc i < a
     · rw [(hU a (Fin.castSucc i)).1 hab, zero_smul]
       exact Submodule.zero_mem _
-    · have h1 : a.1 ≤ i.1 := by
-        simpa [Fin.lt_def] using hab
+    · have h1 : a.1 ≤ i.1 := by simpa [Fin.lt_def] using hab
       have h2 := i.2
       exact Submodule.smul_mem _ _ (frame_mem_Xflag F0 j a (by omega) (by omega))
   exact key hx
 
-theorem mem_Xflag_iff {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LFlag (D.sp.Y 0) D.R.rS T0)
+theorem mem_Xflag_iff
+    {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LFlag (D.sp.Y 0) D.R.rS T0)
     (σ : (VS D).V ≃ₗ[D.host.E] (VS D).V) (U : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)
-    (hU : IsUpUni U) (hf : ∀ b, σ (frame F b) = ∑ a, U a b • frame F0 a) (j : ℕ) (x : (VS D).V) :
-    σ x ∈ Xflag F0 j ↔ x ∈ Xflag F j := by
+    (hU : IsUpUni U) (hf : ∀ b, σ (frame F b) = ∑ a, U a b • frame F0 a)
+    (j : ℕ) (x : (VS D).V)
+    : σ x ∈ Xflag F0 j ↔ x ∈ Xflag F j := by
   have hle : (Xflag F j).map (σ : (VS D).V →ₗ[D.host.E] (VS D).V) ≤ Xflag F0 j := by
     rw [Submodule.map_le_iff_le_comap]
     intro y hy
@@ -116,10 +126,13 @@ theorem mem_Xflag_iff {T T0 : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F0 : LF
     exact hy
   · exact map_Xflag_le F F0 σ U hU hf j x
 
-theorem nrat_conj_iff : ∀ (D : D7) {T : D.host.E} (F F0 : LFlag (D.sp.Y 0) D.R.rS T)
-    (σ : (VS D).V ≃ₗ[D.host.E] (VS D).V) (U : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E),
-    σ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT → IsUpUni U → (∀ b, σ (frame F b) = ∑ a, U a b • frame F0 a) →
-    ∀ n, n ∈ NRat F ↔ σ * n * σ⁻¹ ∈ NRat F0 := by
+theorem nrat_conj_iff
+    : ∀ (D : D7) {T : D.host.E} (F F0 : LFlag (D.sp.Y 0) D.R.rS T)
+        (σ : (VS D).V ≃ₗ[D.host.E] (VS D).V)
+        (U : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E),
+      σ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT → IsUpUni U
+        → (∀ b, σ (frame F b) = ∑ a, U a b • frame F0 a)
+        → ∀ n, n ∈ NRat F ↔ σ * n * σ⁻¹ ∈ NRat F0 := by
   intro D T F F0 σ U hσ hU hf n
   have hX : ∀ j x, σ x ∈ Xflag F0 j ↔ x ∈ Xflag F j := fun j x => mem_Xflag_iff F F0 σ U hU hf j x
   have hS : ∀ x, σ x ∈ Xsp F0 ↔ x ∈ Xsp F := by

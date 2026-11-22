@@ -6,12 +6,14 @@ public import Development.AbelianVarietyTheory.BlockTheory.PoincareCuspForms.Sma
 
 @[expose] public section
 
-open NumberField Module ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
+open NumberField Module ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
 
 namespace GlobalTheory.SplitLevelsBall
 
-theorem setOf_prime_mem_eq_primesOver (E : Type) [Field E] [NumberField E] (g : ℕ) (hg : g.Prime) :
-    {P : Ideal (𝓞 E) | P.IsPrime ∧ (g : 𝓞 E) ∈ P} = (Ideal.span {(g : ℤ)}).primesOver (𝓞 E) := by
+theorem setOf_prime_mem_eq_primesOver (E : Type) [Field E] [NumberField E] (g : ℕ) (hg : g.Prime)
+    : {P : Ideal (𝓞 E) | P.IsPrime ∧ (g : 𝓞 E) ∈ P} = (Ideal.span {(g : ℤ)}).primesOver (𝓞 E) := by
   ext P
   simp only [Set.mem_setOf_eq, Ideal.primesOver, Set.mem_setOf_eq]
   constructor
@@ -28,12 +30,14 @@ theorem setOf_prime_mem_eq_primesOver (E : Type) [Field E] [NumberField E] (g : 
     exact hmax.eq_of_le hne hle
   · rintro ⟨hP, hlo⟩
     refine ⟨hP, ?_⟩
-    have : (g : ℤ) ∈ P.under ℤ := by
-      rw [← hlo.over]; exact Ideal.mem_span_singleton_self _
+    have : (g : ℤ) ∈ P.under ℤ := by rw [← hlo.over]; exact Ideal.mem_span_singleton_self _
     simpa [Ideal.under, Ideal.mem_comap] using this
 
-theorem isTotallySplitPrime_of_splitsCompletely :
-    ∀ (E : Type) [Field E] [NumberField E] (g : ℕ), SplitsCompletely E g → GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsTotallySplitPrime E g := by
+theorem isTotallySplitPrime_of_splitsCompletely
+    : ∀ (E : Type) [Field E] [NumberField E] (g : ℕ),
+      SplitsCompletely E g
+        → GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsTotallySplitPrime E
+          g := by
   intro E _ _ g ⟨hg, hc⟩
   exact ⟨hg, by rw [← setOf_prime_mem_eq_primesOver E g hg]; exact hc⟩
 

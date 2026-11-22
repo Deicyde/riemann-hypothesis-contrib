@@ -10,9 +10,10 @@ open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.Compan
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.FibreComp
 
-theorem mem_minimalPrimes_span_of_mem {T : Type} [CommRing T] [IsDomain T] [IsNoetherianRing T]
-    {q : Ideal T} {a b : T} (hq : q ∈ (Ideal.span {a}).minimalPrimes) (hb : b ∈ q) (hb0 : b ≠ 0) :
-    q ∈ (Ideal.span {b}).minimalPrimes := by
+theorem mem_minimalPrimes_span_of_mem
+    {T : Type} [CommRing T] [IsDomain T] [IsNoetherianRing T]
+    {q : Ideal T} {a b : T} (hq : q ∈ (Ideal.span {a}).minimalPrimes) (hb : b ∈ q) (hb0 : b ≠ 0)
+    : q ∈ (Ideal.span {b}).minimalPrimes := by
   have hqp : q.IsPrime := hq.1.1
   refine ⟨⟨hqp, (Ideal.span_singleton_le_iff_mem q).2 hb⟩, ?_⟩
   rintro p ⟨hp, hbp⟩ hpq
@@ -37,14 +38,20 @@ theorem mem_minimalPrimes_span_of_mem {T : Type} [CommRing T] [IsDomain T] [IsNo
   have h2 := (Ideal.height_le_iff.mp hp0) ⊥ Ideal.isPrime_bot hbot
   simp at h2
 
-theorem mem_minimalPrimes_sup_of_mem {S : Type} [CommRing S] [IsNoetherianRing S] {P W : Ideal S}
-    [P.IsPrime] {f b : S} (hW : W ∈ (P ⊔ Ideal.span {f}).minimalPrimes) (hb : b ∈ W) (hbP : b ∉ P) :
-    W ∈ (P ⊔ Ideal.span {b}).minimalPrimes := by
+theorem mem_minimalPrimes_sup_of_mem
+    {S : Type} [CommRing S] [IsNoetherianRing S]
+    {P W : Ideal S} [P.IsPrime]
+    {f b : S} (hW : W ∈ (P ⊔ Ideal.span {f}).minimalPrimes) (hb : b ∈ W) (hbP : b ∉ P)
+    : W ∈ (P ⊔ Ideal.span {b}).minimalPrimes := by
   have hπ : Function.Surjective (Ideal.Quotient.mk P) := Ideal.Quotient.mk_surjective
-  have hcomap : ∀ x : S, Ideal.comap (Ideal.Quotient.mk P) (Ideal.span {Ideal.Quotient.mk P x}) =
-      P ⊔ Ideal.span {x} := by
+  have hcomap
+      : ∀ x : S,
+        Ideal.comap (Ideal.Quotient.mk P) (Ideal.span {Ideal.Quotient.mk P x})
+          = P ⊔ Ideal.span {x} := by
     intro x
-    have hx : Ideal.span {Ideal.Quotient.mk P x} = Ideal.map (Ideal.Quotient.mk P) (Ideal.span {x}) := by
+    have hx
+        : Ideal.span {Ideal.Quotient.mk P x}
+          = Ideal.map (Ideal.Quotient.mk P) (Ideal.span {x}) := by
       rw [Ideal.map_span, Set.image_singleton]
     rw [hx, Ideal.comap_map_of_surjective' _ hπ, Ideal.mk_ker, sup_comm]
   rw [← hcomap f, Ideal.comap_minimalPrimes_eq_of_surjective hπ] at hW
@@ -55,9 +62,12 @@ theorem mem_minimalPrimes_sup_of_mem {S : Type} [CommRing S] [IsNoetherianRing S
   have hb0 : Ideal.Quotient.mk P b ≠ 0 := fun h => hbP (Ideal.Quotient.eq_zero_iff_mem.mp h)
   exact mem_minimalPrimes_span_of_mem hW' hbW' hb0
 
-theorem length_toNat_ne_zero {S : Type} [CommRing S] [IsNoetherianRing S] {J W : Ideal S}
-    [hWp : W.IsPrime] (hW : W ∈ J.minimalPrimes) :
-    (Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (S ⧸ J))).toNat ≠ 0 := by
+theorem length_toNat_ne_zero
+    {S : Type} [CommRing S] [IsNoetherianRing S]
+    {J W : Ideal S} [hWp : W.IsPrime]
+    (hW : W ∈ J.minimalPrimes)
+    : (Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (S ⧸ J))).toNat
+      ≠ 0 := by
   classical
   haveI : IsNoetherianRing (Localization.AtPrime W) :=
     IsLocalization.isNoetherianRing W.primeCompl _ inferInstance
@@ -65,8 +75,10 @@ theorem length_toNat_ne_zero {S : Type} [CommRing S] [IsNoetherianRing S] {J W :
   refine ⟨?_, ?_⟩
   · rw [Module.length_eq_zero_iff]
     intro hsub
-    have h10 : (LocalizedModule.mk (1 : S ⧸ J) (1 : W.primeCompl) :
-        LocalizedModule W.primeCompl (S ⧸ J)) = LocalizedModule.mk 0 1 := Subsingleton.elim _ _
+    have h10
+        : (LocalizedModule.mk (1 : S ⧸ J) (1 : W.primeCompl) : LocalizedModule W.primeCompl (S ⧸ J))
+          = LocalizedModule.mk 0 1 :=
+      Subsingleton.elim _ _
     rw [LocalizedModule.mk_eq] at h10
     obtain ⟨u, hu⟩ := h10
     simp only [one_smul, smul_zero] at hu
@@ -106,15 +118,17 @@ theorem length_toNat_ne_zero {S : Type} [CommRing S] [IsNoetherianRing S] {J W :
         (by rw [Ideal.Quotient.algebraMap_eq]; exact Ideal.Quotient.mk_surjective)]
       exact Module.length_ne_top
     let x : LocalizedModule W.primeCompl (S ⧸ J) := LocalizedModule.mk 1 1
-    let g : Localization.AtPrime W →ₗ[Localization.AtPrime W] LocalizedModule W.primeCompl (S ⧸ J) :=
+    let g
+        : Localization.AtPrime W →ₗ[Localization.AtPrime W] LocalizedModule W.primeCompl (S ⧸ J) :=
       LinearMap.toSpanSingleton _ _ x
     have hker : JA ≤ LinearMap.ker g := by
       rw [hJA, Ideal.map_le_iff_le_comap]
       intro j hj
       rw [Ideal.mem_comap, LinearMap.mem_ker]
       show (algebraMap S (Localization.AtPrime W) j) • x = 0
-      rw [← Localization.mk_one_eq_algebraMap, LocalizedModule.mk_smul_mk, Algebra.smul_def, mul_one,
-        Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem.mpr hj, LocalizedModule.zero_mk]
+      rw [← Localization.mk_one_eq_algebraMap, LocalizedModule.mk_smul_mk, Algebra.smul_def,
+        mul_one, Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem.mpr hj,
+        LocalizedModule.zero_mk]
     have hsurj : Function.Surjective (JA.liftQ g hker) := by
       intro y
       refine LocalizedModule.induction_on (fun m s => ?_) y
@@ -122,26 +136,40 @@ theorem length_toNat_ne_zero {S : Type} [CommRing S] [IsNoetherianRing S] {J W :
       refine ⟨Submodule.Quotient.mk (Localization.mk t s), ?_⟩
       rw [Submodule.liftQ_apply]
       show Localization.mk t s • x = _
-      rw [LocalizedModule.mk_smul_mk, Algebra.smul_def, mul_one, mul_one, Ideal.Quotient.algebraMap_eq]
+      rw [LocalizedModule.mk_smul_mk, Algebra.smul_def, mul_one, mul_one,
+        Ideal.Quotient.algebraMap_eq]
     exact ne_top_of_le_ne_top hlenQ (Module.length_le_of_surjective _ hsurj)
 
-theorem facts_of_divCycle_ne_zero {K : Type} {ι : K → Type} {R : Type} [CommRing R]
-    {P W : Ideal (MRing ι R)} {f : MRing ι R} (h : divCycle P f W ≠ 0) :
-    W ∈ (P ⊔ Ideal.span {f}).minimalPrimes ∧ IsRelevant W := by
+theorem facts_of_divCycle_ne_zero
+    {K : Type} {ι : K → Type} {R : Type} [CommRing R]
+    {P W : Ideal (MRing ι R)} {f : MRing ι R} (h : divCycle P f W ≠ 0)
+    : W ∈ (P ⊔ Ideal.span {f}).minimalPrimes ∧ IsRelevant W := by
   by_contra hc
   apply h
   unfold divCycle
   rw [dite_eq_right hc]
 
-theorem fibre_comp : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O), Irreducible ϖ → ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι O)) (d : ℕ), IsModelOver P d → (∀ W, IsFibreComp P W ↔ divCycle P (C ϖ) W ≠ 0) ∧ (∀ (a : K → ℕ) (f : MRing ι O), IsMultiHomog f a → f ∉ P → ∀ W, divCycle P f W ≠ 0 → (C ϖ : MRing ι O) ∈ W → IsFibreComp P W) ∧ ∀ (b : K → ℤ) (f g : MRing ι O), IsVerticalDivisor P ϖ b f g → ∀ W, ratDiv P f g W ≠ 0 → IsFibreComp P W := by
+theorem fibre_comp
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O),
+      Irreducible ϖ
+        → ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+            (P : Ideal (MRing ι O)) (d : ℕ),
+          IsModelOver P d
+            → (∀ W, IsFibreComp P W ↔ divCycle P (C ϖ) W ≠ 0)
+              ∧ (∀ (a : K → ℕ) (f : MRing ι O),
+                IsMultiHomog f a → f ∉ P
+                  → ∀ W, divCycle P f W ≠ 0 → (C ϖ : MRing ι O) ∈ W → IsFibreComp P W)
+              ∧ ∀ (b : K → ℤ) (f g : MRing ι O),
+                IsVerticalDivisor P ϖ b f g → ∀ W, ratDiv P f g W ≠ 0 → IsFibreComp P W := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP
   classical
   haveI : IsNoetherianRing (MRing ι O) :=
     (inferInstance : IsNoetherianRing (MvPolynomial ((k : K) × ι k) O))
   obtain ⟨⟨hPprime, -, -⟩, hnt, -⟩ := hP
   haveI := hPprime
-  have hmax : Ideal.map (C : O →+* MRing ι O) (IsLocalRing.maximalIdeal O) =
-      Ideal.span {(C ϖ : MRing ι O)} := by
+  have hmax
+      : Ideal.map (C : O →+* MRing ι O) (IsLocalRing.maximalIdeal O)
+        = Ideal.span {(C ϖ : MRing ι O)} := by
     rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ, Ideal.map_span,
       Set.image_singleton]
   have hϖP : (C ϖ : MRing ι O) ∉ P := by
@@ -149,8 +177,9 @@ theorem fibre_comp : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuati
     have h2 : ϖ ∈ Ideal.comap (C : O →+* MRing ι O) P := Ideal.mem_comap.mpr h
     rw [hnt] at h2
     exact hϖ.ne_zero ((Submodule.mem_bot O).1 h2)
-  have key : ∀ f : MRing ι O, f ∉ P → ∀ W, divCycle P f W ≠ 0 → (C ϖ : MRing ι O) ∈ W →
-      IsFibreComp P W := by
+  have key
+      : ∀ f : MRing ι O,
+        f ∉ P → ∀ W, divCycle P f W ≠ 0 → (C ϖ : MRing ι O) ∈ W → IsFibreComp P W := by
     intro f _ W hW hϖW
     obtain ⟨hWmin, hWrel⟩ := facts_of_divCycle_ne_zero hW
     unfold IsFibreComp

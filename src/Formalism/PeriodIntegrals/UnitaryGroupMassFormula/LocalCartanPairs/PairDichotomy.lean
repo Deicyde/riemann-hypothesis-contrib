@@ -15,8 +15,8 @@ theorem pair_dichotomy : Dichotomy := by
   intro R _ _ R₀ hfix _ _ _ _ hunr ϖ hϖ
   obtain ⟨θ, hθ⟩ := hunr
   have hst : ∀ r : R₀, star (r : R) = r := fun r => (hfix _).mp r.2
-  have unit_of : ∀ {M : Type} [CommMonoid M] (a b : M), a * b = 1 → IsUnit a :=
-    fun a b h => ⟨⟨a, b, h, (mul_comm b a).trans h⟩, rfl⟩
+  have unit_of : ∀ {M : Type} [CommMonoid M] (a b : M), a * b = 1 → IsUnit a := fun a b h =>
+    ⟨⟨a, b, h, (mul_comm b a).trans h⟩, rfl⟩
   obtain ⟨Di, hDi⟩ : ∃ Di : R, (θ - star θ) * Di = 1 := hθ.exists_right_inv
   have hDis : star Di = -Di := by
     have h2 := congrArg star hDi
@@ -41,9 +41,10 @@ theorem pair_dichotomy : Dichotomy := by
     ⟨⟨Di ^ 2, by rw [hfix, star_pow, hDis, neg_sq]⟩, rfl⟩
   have h4 : ((4 : R₀) : R) = 4 := map_ofNat R₀.subtype 4
   have hd : IsUnit (T ^ 2 - 4 * Nn) :=
-    unit_of _ E (Subtype.ext (by
-      push_cast [hTc, hNc, hEc, h4]
-      linear_combination (θ * Di - star θ * Di + 1) * hDi))
+    unit_of _ E
+      (Subtype.ext (by
+        push_cast [hTc, hNc, hEc, h4]
+        linear_combination (θ * Di - star θ * Di + 1) * hDi))
   by_cases hs : ∃ c : R₀, ¬ IsUnit (c ^ 2 + T * c + Nn)
   · left
     obtain ⟨c, hc⟩ := hs
@@ -56,11 +57,15 @@ theorem pair_dichotomy : Dichotomy := by
       have h3 := Ideal.sub_mem _ h1 h2
       rw [show (2 * c + T) ^ 2 - 4 * (c ^ 2 + T * c + Nn) = T ^ 2 - 4 * Nn by ring] at h3
       exact (mem_maximalIdeal _).mp h3 hd
-    obtain ⟨r, hr, -⟩ := HenselianLocalRing.is_henselian (X ^ 2 + C T * X + C Nn) (by monicity!) c
-      (by simpa [mem_maximalIdeal, mem_nonunits_iff] using hc)
-      (by rw [show (derivative (X ^ 2 + C T * X + C Nn)).eval c = 2 * c + T by
-        simp only [derivative_add, derivative_X_pow, derivative_C_mul_X, derivative_C, eval_add,
-          eval_mul, eval_C, eval_pow, eval_X, add_zero] <;> norm_num]; exact hu)
+    obtain ⟨r, hr, -⟩ :=
+      HenselianLocalRing.is_henselian (X ^ 2 + C T * X + C Nn) (by monicity!) c
+        (by simpa [mem_maximalIdeal, mem_nonunits_iff] using hc)
+        (by
+          rw [show (derivative (X ^ 2 + C T * X + C Nn)).eval c = 2 * c + T by
+            simp only [derivative_add, derivative_X_pow, derivative_C_mul_X, derivative_C, eval_add,
+                eval_mul, eval_C, eval_pow, eval_X, add_zero]
+              <;> norm_num]
+          exact hu)
     have hr' : r ^ 2 + T * r + Nn = 0 := by simpa using hr
     have hrR : (r : R) ^ 2 + (θ + star θ) * r + θ * star θ = 0 := by
       have h4 := congrArg (fun z : R₀ => (z : R)) hr'
@@ -79,8 +84,9 @@ theorem pair_dichotomy : Dichotomy := by
         rcases em (IsUnit b) with hb | hb
         · obtain ⟨bu, rfl⟩ := hb
           have hbb : (bu : R₀) * ↑bu⁻¹ = 1 := bu.mul_inv
-          have e : a ^ 2 + T * a * bu + Nn * (bu : R₀) ^ 2 =
-              (bu : R₀) ^ 2 * ((a * ↑bu⁻¹) ^ 2 + T * (a * ↑bu⁻¹) + Nn) := by
+          have e
+              : a ^ 2 + T * a * bu + Nn * (bu : R₀) ^ 2
+                = (bu : R₀) ^ 2 * ((a * ↑bu⁻¹) ^ 2 + T * (a * ↑bu⁻¹) + Nn) := by
             linear_combination (-(a ^ 2) * ((bu : R₀) * ↑bu⁻¹ + 1) - T * a * bu) * hbb
           rw [e]
           exact (bu.isUnit.pow 2).mul (hs _)
@@ -92,7 +98,8 @@ theorem pair_dichotomy : Dichotomy := by
           have h3 := Ideal.sub_mem _ h1 h2
           rw [show a ^ 2 + T * a * b + Nn * b ^ 2 - b * (T * a + Nn * b) = a ^ 2 by ring] at h3
           exact (mem_maximalIdeal _).mp h3 (ha.pow 2)
-      have e : ((a : R) + b * θ) * (a + b * star θ) = ((a ^ 2 + T * a * b + Nn * b ^ 2 : R₀) : R) := by
+      have e
+          : ((a : R) + b * θ) * (a + b * star θ) = ((a ^ 2 + T * a * b + Nn * b ^ 2 : R₀) : R) := by
         push_cast
         rw [hTc, hNc]
         ring

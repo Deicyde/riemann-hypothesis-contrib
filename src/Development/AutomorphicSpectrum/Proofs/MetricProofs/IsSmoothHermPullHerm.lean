@@ -11,7 +11,12 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.FA GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GlobalTheory.CompanionTheory.Ar.PB.FA GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.FA.StepLine
@@ -24,9 +29,12 @@ theorem pullDeg_zero {K K' : Type} (κ : K → K') : pullDeg κ (0 : K → ℤ) 
   · simp [pullDeg, Function.extend_def, h]
   · simp [pullDeg, Function.extend_def, h]
 
-theorem isSmoothHerm_pullHerm {K K' : Type} [Fintype K] [Fintype K'] {ι : K → Type} {ι' : K' → Type}
-    [∀ k, Fintype (ι k)] [∀ k, Fintype (ι' k)] {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')}
-    (hv : IsBlockMap κ v) {B : HermLine ι} (hB : IsSmoothHerm B) : IsSmoothHerm (pullHerm hv B) := by
+theorem isSmoothHerm_pullHerm
+    {K K' : Type} [Fintype K] [Fintype K']
+    {ι : K → Type} {ι' : K' → Type} [∀ k, Fintype (ι k)] [∀ k, Fintype (ι' k)]
+    {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v)
+    {B : HermLine ι} (hB : IsSmoothHerm B)
+    : IsSmoothHerm (pullHerm hv B) := by
   have hlin : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z : (Σ k', ι' k') → ℂ => fun q => z (v q)) :=
     contDiff_pi.2 fun q => contDiff_apply ℝ (fun _ => ℂ) (v q)
   show ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (B.h ∘ fun z : (Σ k', ι' k') → ℂ => fun q => z (v q))
@@ -41,11 +49,17 @@ theorem isSmoothHerm_pullHerm {K K' : Type} [Fintype K] [Fintype K'] {ι : K →
   subst h2
   exact ⟨m, by simpa [hq] using hi'⟩
 
-theorem exists_stepLine : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
-    (y : (Σ k, ι k) → Φ) (Ψ : Type) (N j : ℕ) (M : FlagModel y Ψ N j) (p : Ψ × Fin N)
-    (B : HermLine (stepIdx M p)), B.a = 0 → ∃ A : HermLine ι, A.a = M.dy p ∧ M.OnStep p A ∧
-      (IsSmoothHerm B → IsSmoothHerm A) ∧ ∀ z : (Σ k, ι k) → ℂ, (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) →
-        Real.log (A.h z) = Real.log ((fsHerm ι (M.dy p)).h z) + Real.log (B.h (z ∘ stepV M p)) := by
+theorem exists_stepLine
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
+        (y : (Σ k, ι k) → Φ) (Ψ : Type) (N j : ℕ) (M : FlagModel y Ψ N j) (p : Ψ × Fin N)
+        (B : HermLine (stepIdx M p)),
+      B.a = 0
+        → ∃ A : HermLine ι,
+          A.a = M.dy p ∧ M.OnStep p A ∧ (IsSmoothHerm B → IsSmoothHerm A)
+            ∧ ∀ z : (Σ k, ι k) → ℂ,
+              (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+                → Real.log (A.h z)
+                  = Real.log ((fsHerm ι (M.dy p)).h z) + Real.log (B.h (z ∘ stepV M p)) := by
   intro K _ ι _ Φ _ y Ψ N j M p B hB
   have hdy : ∀ k, M.dy p k ≠ 0 → k ∈ Set.range (Subtype.val : PartialFlagBlocks M p → K) := by
     intro k hk
@@ -64,10 +78,11 @@ theorem exists_stepLine : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, F
       · exact congrFun hb ⟨⟨k, h⟩, m⟩
       · exact hs k h m
     show (fsHerm ι (M.dy p)).h z * B.h (z ∘ stepV M p) = (fsHerm ι (M.dy p)).h z' * B.h (z' ∘ stepV M p)
-    rw [StepW.fsHerm_h_blockMap K ι (PartialFlagBlocks M p) (stepIdx M p) Subtype.val (stepV M p) (M.dy p) z
-        (isBlockMap_stepV M p) hdy,
-      StepW.fsHerm_h_blockMap K ι (PartialFlagBlocks M p) (stepIdx M p) Subtype.val (stepV M p) (M.dy p) z'
-        (isBlockMap_stepV M p) hdy, hc]
+    rw [StepW.fsHerm_h_blockMap K ι (PartialFlagBlocks M p) (stepIdx M p) Subtype.val (stepV M p)
+        (M.dy p) z (isBlockMap_stepV M p) hdy,
+      StepW.fsHerm_h_blockMap K ι (PartialFlagBlocks M p) (stepIdx M p) Subtype.val (stepV M p)
+        (M.dy p) z' (isBlockMap_stepV M p) hdy,
+      hc]
   · intro hS
     exact isSmoothHerm_tensor (FlagHeightMultilinear.isSmoothHerm_fsHerm _)
       (isSmoothHerm_pullHerm (isBlockMap_stepV M p) hS)

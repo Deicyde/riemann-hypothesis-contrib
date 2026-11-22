@@ -5,20 +5,27 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsAu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host
+  GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
 
 namespace GlobalTheory.LamTie
 
-theorem levelLe_of_le {E : Type} [Field E] [NumberField E] {χ : Formalism.L2.Host.HChar E} {w : HeightOneSpectrum (𝓞 E)} {m m' : ℕ}
-    (h : χ.LevelLe w m) (hm : m ≤ m') : χ.LevelLe w m' := by
+theorem levelLe_of_le
+    {E : Type} [Field E] [NumberField E]
+    {χ : Formalism.L2.Host.HChar E} {w : HeightOneSpectrum (𝓞 E)} {m m' : ℕ}
+    (h : χ.LevelLe w m) (hm : m ≤ m')
+    : χ.LevelLe w m' := by
   intro x hx hv
 
   refine h x hx (le_trans hv ?_)
   rw [WithZero.exp_le_exp]
   omega
 
-theorem expAt_mul_inv : ∀ (E : Type) [Field E] [NumberField E] (χ χ' : Formalism.L2.Host.HChar E) (w : HeightOneSpectrum (𝓞 E)) (n : ℕ),
-    1 ≤ n → ExpAt χ w n → χ'.LevelLe w (n - 1) → ExpAt (χ' * χ⁻¹) w n := by
+theorem expAt_mul_inv
+    : ∀ (E : Type) [Field E] [NumberField E] (χ χ' : Formalism.L2.Host.HChar E)
+        (w : HeightOneSpectrum (𝓞 E)) (n : ℕ),
+      1 ≤ n → ExpAt χ w n → χ'.LevelLe w (n - 1) → ExpAt (χ' * χ⁻¹) w n := by
   intro E _ _ χ χ' w n hn hχ hχ' m
   constructor
   · intro hm

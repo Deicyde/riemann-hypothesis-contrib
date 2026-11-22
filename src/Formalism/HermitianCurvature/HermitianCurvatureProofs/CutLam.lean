@@ -51,23 +51,26 @@ theorem cfg_b_ge_one (hok : c.Ok) {j : ℕ} (hj : 1 ≤ j) (hjm : j ≤ c.m) : 1
     subst e
     exact hok.hb1
 
-theorem cfg_interlaces (r : ℕ) (hm : c.m = 2 * r + 2) (hk : 2 ≤ c.k) (hok : c.Ok) (de : ℕ → ℝ)
-    (hde : ∀ i, de i = 0 ∨ de i = 1) :
-    C7.LamInterlaces c.k r (c.u de) (fun s : Fin (c.k + 2 * r + 1) => c.lam ((s : ℕ) + 1)) := by
+theorem cfg_interlaces
+    (r : ℕ) (hm : c.m = 2 * r + 2)
+    (hk : 2 ≤ c.k) (hok : c.Ok)
+    (de : ℕ → ℝ) (hde : ∀ i, de i = 0 ∨ de i = 1)
+    : C7.LamInterlaces c.k r (c.u de) (fun s : Fin (c.k + 2 * r + 1) => c.lam ((s : ℕ) + 1)) := by
   have hk4 := hok.hk
   have hD := hok.hDel
   have hv0 := hok.hv0
   have hb1 := hok.hb1
   have ha := hok.ha
   have hkR : (4 : ℝ) ≤ c.k := by exact_mod_cast hk4
-  have hlamv : ∀ s : ℕ, s < c.k → c.lam s = c.v s := fun s hs => by
-    rw [Sz.Cfg.lam, if_pos hs]
-  have hlamb : ∀ s : ℕ, ¬ s < c.k → c.lam s = -c.b (s + 1 - c.k) := fun s hs => by
+  have hlamv : ∀ s : ℕ, s < c.k → c.lam s = c.v s := fun s hs => by rw [Sz.Cfg.lam, if_pos hs]
+  have hlamb : ∀ s : ℕ, ¬ s < c.k → c.lam s = - c.b (s + 1 - c.k) := fun s hs => by
     rw [Sz.Cfg.lam, if_neg hs]
   have hu1 : c.u de 1 = c.a := by rw [Sz.Cfg.u, if_pos rfl]
   have huk : c.u de c.k = c.ulast := by rw [Sz.Cfg.u, if_neg (by omega), if_pos rfl]
-  have hum : ∀ j : ℕ, j ≠ 1 → j ≠ c.k → c.u de j = c.v (j - 1) - 1 / 2 - de (j - 1) * c.Del :=
-    fun j h1 h2 => by rw [Sz.Cfg.u, if_neg h1, if_neg h2]
+  have hum
+      : ∀ j : ℕ,
+        j ≠ 1 → j ≠ c.k → c.u de j = c.v (j - 1) - 1 / 2 - de (j - 1) * c.Del := fun j h1 h2 => by
+    rw [Sz.Cfg.u, if_neg h1, if_neg h2]
   have hde0 : ∀ j, 0 ≤ de j * c.Del ∧ de j * c.Del ≤ c.Del := fun j => by
     rcases hde j with h | h <;> simp [h] <;> linarith
   have hul : c.ulast = if c.top then -c.bp else c.vlast - 1 / 2 := rfl
@@ -91,8 +94,9 @@ theorem cfg_interlaces (r : ℕ) (hm : c.m = 2 * r + 2) (hk : 2 ≤ c.k) (hok : 
         have := cfg_v_ge_vlast c hok ((s : ℕ) + 1) (by omega)
         linarith
       · rw [hlamb _ h2]
-        have := cfg_b_lt c hok (j := (s : ℕ) + 1 + 1 - c.k) (j' := (t : ℕ) + 1 + 1 - c.k)
-          (by omega) (by omega) (by omega)
+        have :=
+          cfg_b_lt c hok (j := (s : ℕ) + 1 + 1 - c.k) (j' := (t : ℕ) + 1 + 1 - c.k) (by omega)
+            (by omega) (by omega)
         linarith
   · show c.lam ((i : ℕ) + 1) < c.u de ((i : ℕ) + 1)
     rcases Nat.eq_zero_or_pos (i : ℕ) with h0 | h0
@@ -130,7 +134,9 @@ end cfg
 
 theorem eigenvalue_configuration_interlaces : LamCfgInterlaces := by
   intro E _ _ _ Wp Wq _ _ _ _ S hk hok hw hw' v
-  exact ⟨cfg_interlaces (S.G.place (S.pl v)) S.G.r rfl hk (hok v) S.de hw.1,
-    cfg_interlaces (S.G.place (S.pl v)) S.G.r rfl hk (hok v) S.de' hw'.1⟩
+  exact ⟨
+    cfg_interlaces (S.G.place (S.pl v)) S.G.r rfl hk (hok v) S.de hw.1,
+    cfg_interlaces (S.G.place (S.pl v)) S.G.r rfl hk (hok v) S.de' hw'.1
+  ⟩
 
 end Formalism.FourierDecayAlt.P.CutMP

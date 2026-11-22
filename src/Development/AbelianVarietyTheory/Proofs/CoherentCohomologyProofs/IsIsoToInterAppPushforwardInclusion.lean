@@ -23,13 +23,14 @@ def interFunctor (W : Opens X) : Opens X ⥤ Opens X where
   obj B := B ⊓ W
   map i := homOfLE (inf_le_inf_right W i.le)
 
-def interFunctorIso (W : Opens X) :
-    Opens.map W.inclusion' ⋙ W.isOpenEmbedding.functor ≅ interFunctor W :=
-  NatIso.ofComponents (fun B ↦ eqToIso (Opens.functor_map_eq_inf W B))
+def interFunctorIso (W : Opens X)
+    : Opens.map W.inclusion' ⋙ W.isOpenEmbedding.functor ≅ interFunctor W :=
+  NatIso.ofComponents
+    (fun B ↦ eqToIso (Opens.functor_map_eq_inf W B))
     (fun _ ↦ Subsingleton.elim _ _)
 
-instance isContinuous_interFunctor (W : Opens X) :
-    (interFunctor W).IsContinuous (Opens.grothendieckTopology X) (Opens.grothendieckTopology X) :=
+instance isContinuous_interFunctor (W : Opens X)
+    : (interFunctor W).IsContinuous (Opens.grothendieckTopology X) (Opens.grothendieckTopology X) :=
   haveI := W.isOpenEmbedding.functor_isContinuous
   Functor.isContinuous_of_iso (interFunctorIso W) _ _
 
@@ -39,11 +40,14 @@ def interSheaf (W : Opens X) : X.Sheaf A ⥤ X.Sheaf A :=
   (interFunctor W).sheafPushforwardContinuous A _ _
 
 def toInter (W : Opens X) : 𝟭 (X.Sheaf A) ⟶ interSheaf A W where
-  app F := ObjectProperty.homMk
-    { app B := F.obj.map (homOfLE (inf_le_left : B.unop ⊓ W ≤ B.unop)).op
+  app F :=
+    ObjectProperty.homMk {
+      app B := F.obj.map (homOfLE (inf_le_left : B.unop ⊓ W ≤ B.unop)).op
       naturality B B' i :=
-        (F.obj.map_comp _ _).symm.trans (F.obj.map_comp
-          (homOfLE (inf_le_left : B.unop ⊓ W ≤ B.unop)).op ((interFunctor W).op.map i)) }
+        (F.obj.map_comp _ _).symm.trans
+          (F.obj.map_comp (homOfLE (inf_le_left : B.unop ⊓ W ≤ B.unop)).op
+            ((interFunctor W).op.map i))
+    }
   naturality F G f := by
     apply Sheaf.hom_ext
     ext B : 2
@@ -159,35 +163,40 @@ lemma map_toInter_δ_eq_zero (hS : S.ShortExact) {V W : Opens X} (s : S.X₃.obj
   refine (map_equivZero_symm S'.g V t).trans (Eq.trans ?_ (map_equivZero_symm η₃ V s).symm)
   exact congrArg _ ht
 
-theorem exists_mem_map_toInter_eq_zero {𝔅 : Set (Opens X)} (h𝔅 : Opens.IsBasis 𝔅)
-    (hinf : ∀ B ∈ 𝔅, ∀ B' ∈ 𝔅, B ⊓ B' ∈ 𝔅) (V : Opens X) (n : ℕ)
-    (F : X.Sheaf AddCommGrpCat.{u})
+theorem exists_mem_map_toInter_eq_zero
+    {𝔅 : Set (Opens X)} (h𝔅 : Opens.IsBasis 𝔅) (hinf : ∀ B ∈ 𝔅, ∀ B' ∈ 𝔅, B ⊓ B' ∈ 𝔅)
+    (V : Opens X) (n : ℕ) (F : X.Sheaf AddCommGrpCat.{u})
     (hF : ∀ q, 0 < q → q < n + 1 → ∀ B ∈ 𝔅, Subsingleton (Sheaf.H'.{w} F q B))
-    (α : Sheaf.H'.{w} F (n + 1) V) {x : X} (hx : x ∈ V) :
-    ∃ W ∈ 𝔅, x ∈ W ∧ W ≤ V ∧
-      map.{w} ((toInter AddCommGrpCat.{u} W).app F) (n + 1) V α = 0 := by
+    (α : Sheaf.H'.{w} F (n + 1) V)
+    {x : X} (hx : x ∈ V)
+    : ∃ W ∈ 𝔅, x ∈ W ∧ W ≤ V ∧ map.{w} ((toInter AddCommGrpCat.{u} W).app F) (n + 1) V α = 0 := by
   induction n generalizing F with
   | zero =>
     have hS := Flasque.injectiveShortComplex_shortExact F
-    obtain ⟨β, rfl⟩ := δ_surjective_of_subsingleton.{w} hS 0 V
-      (Flasque.subsingleton_H'_of_isFlasque _ 0 V) α
+    obtain ⟨β, rfl⟩ :=
+      δ_surjective_of_subsingleton.{w} hS 0 V (Flasque.subsingleton_H'_of_isFlasque _ 0 V) α
     obtain ⟨s, rfl⟩ := (equivZero _ V).symm.surjective β
     obtain ⟨W, hW, hxW, hWV, t, ht⟩ := exists_isBasis_lift hS h𝔅 s hx
     exact ⟨W, hW, hxW, hWV, map_toInter_δ_eq_zero hS s t ht⟩
   | succ n ih =>
     have hS := Flasque.injectiveShortComplex_shortExact F
-    obtain ⟨β, rfl⟩ := δ_surjective_of_subsingleton.{w} hS (n + 1) V
-      (Flasque.subsingleton_H'_of_isFlasque _ (n + 1) V) α
-    obtain ⟨W, hW, hxW, hWV, hβ⟩ := ih (Flasque.injectiveShortComplex F).X₃
-      (fun q hq hqn B hB ↦ subsingleton₃.{w} hS q B
-        (Flasque.subsingleton_H'_of_isFlasque_of_pos _ hq B)
-        (hF (q + 1) q.succ_pos (by omega) B hB)) β
-    have hT := shortExact_map_interSheaf hS h𝔅 hinf
-      (fun B hB ↦ sections_surjective_of_subsingleton.{w} hS B (hF 1 one_pos (by omega) B hB)) hW
+    obtain ⟨β, rfl⟩ :=
+      δ_surjective_of_subsingleton.{w} hS (n + 1) V
+        (Flasque.subsingleton_H'_of_isFlasque _ (n + 1) V) α
+    obtain ⟨W, hW, hxW, hWV, hβ⟩ :=
+      ih (Flasque.injectiveShortComplex F).X₃
+        (fun q hq hqn B hB ↦
+          subsingleton₃.{w} hS q B (Flasque.subsingleton_H'_of_isFlasque_of_pos _ hq B)
+            (hF (q + 1) q.succ_pos (by omega) B hB))
+        β
+    have hT :=
+      shortExact_map_interSheaf hS h𝔅 hinf
+        (fun B hB ↦ sections_surjective_of_subsingleton.{w} hS B (hF 1 one_pos (by omega) B hB))
+        hW
     refine ⟨W, hW, hxW, hWV, ?_⟩
     refine (δ_naturality hS hT
-      ((Flasque.injectiveShortComplex F).mapNatTrans (toInter AddCommGrpCat.{u} W))
-      (n + 1) V β).trans ?_
+      ((Flasque.injectiveShortComplex F).mapNatTrans (toInter AddCommGrpCat.{u} W)) (n + 1) V
+      β).trans ?_
     exact (congrArg (δ hT (n + 1) V) hβ).trans (map_zero _)
 
 lemma map_eq_zero_of_map_toInter_eq_zero {W : Opens X} {F G : X.Sheaf AddCommGrpCat.{u}}
@@ -198,33 +207,45 @@ lemma map_eq_zero_of_map_toInter_eq_zero {W : Opens X} {F G : X.Sheaf AddCommGrp
   refine (map_comp _ _ n V α).trans ?_
   exact (congrArg _ h).trans (map_zero _)
 
-theorem exists_cover_map_toInter_eq_zero {𝔅 : Set (Opens X)} (h𝔅 : Opens.IsBasis 𝔅)
-    (hinf : ∀ B ∈ 𝔅, ∀ B' ∈ 𝔅, B ⊓ B' ∈ 𝔅) (F : X.Sheaf AddCommGrpCat.{u}) (V : Opens X)
-    {n : ℕ} (hn : 1 ≤ n)
-    (hF : ∀ q, 0 < q → q < n → ∀ B ∈ 𝔅, Subsingleton (Sheaf.H'.{w} F q B))
-    (α : Sheaf.H'.{w} F n V) :
-    ∃ 𝔘 ⊆ 𝔅, sSup 𝔘 = V ∧
-      ∀ W ∈ 𝔘, map.{w} ((toInter AddCommGrpCat.{u} W).app F) n V α = 0 := by
+theorem exists_cover_map_toInter_eq_zero
+    {𝔅 : Set (Opens X)} (h𝔅 : Opens.IsBasis 𝔅) (hinf : ∀ B ∈ 𝔅, ∀ B' ∈ 𝔅, B ⊓ B' ∈ 𝔅)
+    (F : X.Sheaf AddCommGrpCat.{u}) (V : Opens X)
+    {n : ℕ} (hn : 1 ≤ n) (hF : ∀ q, 0 < q → q < n → ∀ B ∈ 𝔅, Subsingleton (Sheaf.H'.{w} F q B))
+    (α : Sheaf.H'.{w} F n V)
+    : ∃ 𝔘 ⊆ 𝔅, sSup 𝔘 = V ∧ ∀ W ∈ 𝔘, map.{w} ((toInter AddCommGrpCat.{u} W).app F) n V α = 0 := by
   obtain ⟨n, rfl⟩ := Nat.exists_eq_add_of_le' hn
-  refine ⟨{W | W ∈ 𝔅 ∧ W ≤ V ∧ map.{w} ((toInter AddCommGrpCat.{u} W).app F) (n + 1) V α = 0},
-    fun _ h ↦ h.1, le_antisymm (sSup_le fun _ h ↦ h.2.1) fun x hx ↦ ?_, fun _ h ↦ h.2.2⟩
+  refine ⟨
+    {W | W ∈ 𝔅 ∧ W ≤ V ∧ map.{w} ((toInter AddCommGrpCat.{u} W).app F) (n + 1) V α = 0},
+    fun _ h ↦ h.1,
+    le_antisymm (sSup_le fun _ h ↦ h.2.1) fun x hx ↦ ?_,
+    fun _ h ↦ h.2.2
+  ⟩
   obtain ⟨W, hW, hxW, hWV, h⟩ := exists_mem_map_toInter_eq_zero h𝔅 hinf V n F hF α hx
   exact Opens.mem_sSup.2 ⟨W, ⟨hW, hWV, h⟩, hxW⟩
 
-theorem exists_finite_cover_map_toInter_eq_zero {𝔅 : Set (Opens X)} (h𝔅 : Opens.IsBasis 𝔅)
-    (hinf : ∀ B ∈ 𝔅, ∀ B' ∈ 𝔅, B ⊓ B' ∈ 𝔅) (F : X.Sheaf AddCommGrpCat.{u}) (V : Opens X)
-    (hV : IsCompact (V : Set X)) {n : ℕ} (hn : 1 ≤ n)
-    (hF : ∀ q, 0 < q → q < n → ∀ B ∈ 𝔅, Subsingleton (Sheaf.H'.{w} F q B))
-    (α : Sheaf.H'.{w} F n V) :
-    ∃ 𝔘 ⊆ 𝔅, 𝔘.Finite ∧ sSup 𝔘 = V ∧
-      ∀ W ∈ 𝔘, map.{w} ((toInter AddCommGrpCat.{u} W).app F) n V α = 0 := by
+theorem exists_finite_cover_map_toInter_eq_zero
+    {𝔅 : Set (Opens X)} (h𝔅 : Opens.IsBasis 𝔅) (hinf : ∀ B ∈ 𝔅, ∀ B' ∈ 𝔅, B ⊓ B' ∈ 𝔅)
+    (F : X.Sheaf AddCommGrpCat.{u})
+    (V : Opens X) (hV : IsCompact (V : Set X))
+    {n : ℕ} (hn : 1 ≤ n) (hF : ∀ q, 0 < q → q < n → ∀ B ∈ 𝔅, Subsingleton (Sheaf.H'.{w} F q B))
+    (α : Sheaf.H'.{w} F n V)
+    : ∃ 𝔘 ⊆ 𝔅,
+      𝔘.Finite ∧ sSup 𝔘 = V ∧ ∀ W ∈ 𝔘, map.{w} ((toInter AddCommGrpCat.{u} W).app F) n V α = 0 := by
   obtain ⟨𝔘, h𝔘, hsup, h0⟩ := exists_cover_map_toInter_eq_zero h𝔅 hinf F V hn hF α
-  obtain ⟨𝔙, h𝔙, hfin, hcov⟩ := hV.elim_finite_subcover_image (b := 𝔘)
-    (c := fun W : Opens X ↦ (W : Set X)) (fun W _ ↦ W.isOpen) fun x hx ↦ by
-      obtain ⟨W, hW, hxW⟩ := Opens.mem_sSup.1 (hsup.ge hx)
-      exact Set.mem_biUnion hW hxW
-  refine ⟨𝔙, h𝔙.trans h𝔘, hfin, le_antisymm ((sSup_le_sSup h𝔙).trans hsup.le) fun x hx ↦ ?_,
-    fun W hW ↦ h0 W (h𝔙 hW)⟩
+  obtain ⟨𝔙, h𝔙, hfin, hcov⟩ :=
+    hV.elim_finite_subcover_image (b := 𝔘)
+      (c := fun W : Opens X ↦ (W : Set X))
+      (fun W _ ↦ W.isOpen)
+      fun x hx ↦ by
+        obtain ⟨W, hW, hxW⟩ := Opens.mem_sSup.1 (hsup.ge hx)
+        exact Set.mem_biUnion hW hxW
+  refine ⟨
+    𝔙,
+    h𝔙.trans h𝔘,
+    hfin,
+    le_antisymm ((sSup_le_sSup h𝔙).trans hsup.le) fun x hx ↦ ?_,
+    fun W hW ↦ h0 W (h𝔙 hW)
+  ⟩
   obtain ⟨W, hW, hxW⟩ := Set.mem_iUnion₂.1 (hcov hx)
   exact Opens.mem_sSup.2 ⟨W, hW, hxW⟩
 

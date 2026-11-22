@@ -12,33 +12,40 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Conjuga
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 open GlobalTheory.SplitRowProbe GlobalTheory.SplitType GlobalTheory.SplitDecl
 
 namespace UpperTheory.N
 
-theorem place_type_conj (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym (-(D.host.d : ℤ)) (D.nd.l i) = 1)
+theorem place_type_conj
+    (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym (-(D.host.d : ℤ)) (D.nd.l i) = 1)
     (w w' : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
-    (hw' : w' ∈ placesOver D.host.E (D.nd.l i)) (hc : IsConjPl D.host w w') :
-    (PlIn (N := D.nd) D.nbr i true w hw ∧ PlIn (N := D.nd) D.nbr i false w' hw') ∨
-      (PlIn (N := D.nd) D.nbr i false w hw ∧ PlIn (N := D.nd) D.nbr i true w' hw') := by
+    (hw' : w' ∈ placesOver D.host.E (D.nd.l i)) (hc : IsConjPl D.host w w')
+    : (PlIn (N := D.nd) D.nbr i true w hw ∧ PlIn (N := D.nd) D.nbr i false w' hw')
+      ∨ (PlIn (N := D.nd) D.nbr i false w hw ∧ PlIn (N := D.nd) D.nbr i true w' hw') := by
   obtain ⟨s, hs, hn⟩ := exists_sqrt (D.nd.l i) D.host.d h2 hj
-  obtain ⟨s₀, hs₀, h₀⟩ := exists_root
-    ((algebraMap (D.nd.O i) (FractionRing (D.nd.O i))).comp (algebraMap ℤ_[D.nd.l i] (D.nd.O i))) hs
-    (map_sqrt_sq D.host ((D.nd.embK i).comp D.embE))
+  obtain ⟨s₀, hs₀, h₀⟩ :=
+    exists_root
+      ((algebraMap (D.nd.O i) (FractionRing (D.nd.O i))).comp (algebraMap ℤ_[D.nd.l i] (D.nd.O i)))
+      hs (map_sqrt_sq D.host ((D.nd.embK i).comp D.embE))
   have hs0 : s₀ ^ 2 = -(D.host.d : ℤ_[D.nd.l i]) := by rcases hs₀ with rfl | rfl <;> simp [hs]
   have hn0 : ‖2 * s₀‖ = 1 := by rcases hs₀ with rfl | rfl <;> simpa using hn
   have hne : s₀ ≠ -s₀ := fun e => by
     rw [show 2 * s₀ = 0 by linear_combination e] at hn0
     simp at hn0
-  have key : ∀ (v : HeightOneSpectrum (𝓞 D.host.E)) (hv : v ∈ placesOver D.host.E (D.nd.l i)),
-      ∃ t : ℤ_[D.nd.l i], algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i]) =
-        (D.nbr i v hv).j (algebraMap D.host.E D.nd.Om (D.host.sqd)) ∧
-        ((t = s₀ ∧ PlIn (N := D.nd) D.nbr i true v hv) ∨ (t = -s₀ ∧ PlIn (N := D.nd) D.nbr i false v hv)) := by
+  have key
+      : ∀ (v : HeightOneSpectrum (𝓞 D.host.E)) (hv : v ∈ placesOver D.host.E (D.nd.l i)),
+        ∃ t : ℤ_[D.nd.l i],
+          algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i)) (t : ℚ_[D.nd.l i])
+              = (D.nbr i v hv).j (algebraMap D.host.E D.nd.Om (D.host.sqd))
+            ∧ ((t = s₀ ∧ PlIn (N := D.nd) D.nbr i true v hv)
+              ∨ (t = -s₀ ∧ PlIn (N := D.nd) D.nbr i false v hv)) := by
     intro v hv
-    obtain ⟨t, ht, h⟩ := exists_root
-      ((algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i))).comp PadicInt.Coe.ringHom) hs0
-      (map_sqrt_sq D.host ((D.nbr i v hv).j.comp (algebraMap D.host.E D.nd.Om)))
+    obtain ⟨t, ht, h⟩ :=
+      exists_root ((algebraMap ℚ_[D.nd.l i] (Loc.Om (D.nd.l i))).comp PadicInt.Coe.ringHom) hs0
+        (map_sqrt_sq D.host ((D.nbr i v hv).j.comp (algebraMap D.host.E D.nd.Om)))
     refine ⟨t, h, ?_⟩
     rcases ht with ht | ht
     · refine Or.inl ⟨ht, nonempty_emb D i v hv, fun τ => ?_⟩
@@ -57,9 +64,12 @@ theorem place_type_conj (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jaco
   · exact Or.inr ⟨h, h'⟩
   · exact (root_ne D i w w' hw hw' hc (by simpa using hn0) ht (e ▸ ht')).elim
 
-theorem columns_xor (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym (-(D.host.d : ℤ)) (D.nd.l i) = 1) (s : Bool) :
-    ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w', IsConjPl D.host w w' →
-      Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s) := by
+theorem columns_xor
+    (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym (-(D.host.d : ℤ)) (D.nd.l i) = 1)
+    (s : Bool)
+    : ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w',
+      IsConjPl D.host w w'
+        → Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s) := by
   intro w hw w' h
   have hw' := GlobalTheory.SplitCount.mem_placesOver_of_conj D.host hw h
   have n1 := GlobalTheory.SplitRowProbe.not_both_columns D i w hw
@@ -70,8 +80,11 @@ theorem columns_xor (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSy
   · exact Or.inl ⟨⟨hw, h1⟩, fun ⟨_, h3⟩ => n2 ⟨h2, h3⟩⟩
   · exact Or.inr ⟨⟨hw', h2⟩, fun ⟨_, h3⟩ => n1 ⟨h3, h1⟩⟩
 
-theorem decl_split (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym (-(D.host.d : ℤ)) (D.nd.l i) = 1) (ep : Bool) :
-    (∃ dc : TruncatedSeriesCountingIdentities.Decl D i, EmbeddingTypes.hypDecl i dc ep) ∧ EmbeddingTypes.ambTypeD (D := D) i ep := by
+theorem decl_split
+    (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym (-(D.host.d : ℤ)) (D.nd.l i) = 1)
+    (ep : Bool)
+    : (∃ dc : TruncatedSeriesCountingIdentities.Decl D i, EmbeddingTypes.hypDecl i dc ep)
+      ∧ EmbeddingTypes.ambTypeD (D := D) i ep := by
   have hl : D.nd.l i ≠ 0 := (D.nd.lPrime i).out.ne_zero
   have hx := columns_xor D i h2 hj ep
   refine ⟨⟨decl D i hl ep, ?_, ?_⟩, ?_⟩
@@ -87,7 +100,11 @@ theorem decl_split (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym
         rcases hx v hv v' hc with h | h
         · exact absurd h.1 hnc
         · exact h.1
-      exact ⟨v', (mem_col D i hl ep v').2 ⟨hv', hv'c⟩, GlobalTheory.Proof.ConjugatePlaces.isConjPl_symm hc⟩
+      exact ⟨
+        v',
+        (mem_col D i hl ep v').2 ⟨hv', hv'c⟩,
+        GlobalTheory.Proof.ConjugatePlaces.isConjPl_symm hc
+      ⟩
     · rintro ⟨u, hu, hc⟩
       obtain ⟨hu, huc⟩ := (mem_col D i hl ep u).1 hu
       refine ⟨GlobalTheory.SplitCount.mem_placesOver_of_conj D.host hu hc, fun hvc => ?_⟩
@@ -95,7 +112,9 @@ theorem decl_split (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i ≠ 2) (hj : jacobiSym
       · exact h.2 hvc
       · exact h.2 huc
   · intro u hu hU w hw hc τ₀ hτ
-    have hnb : ∀ v hv τ, ¬ (EmbIn (N := D.nd) D.nbr i true v hv τ ∧ EmbIn (N := D.nd) D.nbr i false v hv τ) := by
+    have hnb
+        : ∀ v hv τ,
+          ¬(EmbIn (N := D.nd) D.nbr i true v hv τ ∧ EmbIn (N := D.nd) D.nbr i false v hv τ) := by
       rintro v hv τ ⟨a, b⟩
       rcases embIn_xor D i v hv τ with h | h
       · exact h.2 b

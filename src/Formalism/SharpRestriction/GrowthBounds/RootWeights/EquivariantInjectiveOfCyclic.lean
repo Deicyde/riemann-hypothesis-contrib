@@ -13,23 +13,33 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
 section
-variable {n : ℕ} {K V V' : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup V'] [Module K V']
+variable
+  {n : ℕ} {K V V' : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup V'] [Module K V']
 
-def prodRepresentation (E : GLOps n K V) (E' : GLOps n K V') : GLOps n K (V × V') := fun a b => (E a b).prodMap (E' a b)
+def prodRepresentation (E : GLOps n K V) (E' : GLOps n K V') : GLOps n K (V × V') := fun a b =>
+  (E a b).prodMap (E' a b)
 
-@[simp] theorem prodRepresentation_apply (E : GLOps n K V) (E' : GLOps n K V') (a b : Fin n) (z : V × V') :
-    prodRepresentation E E' a b z = (E a b z.1, E' a b z.2) := rfl
+@[simp]
+theorem prodRepresentation_apply (E : GLOps n K V) (E' : GLOps n K V') (a b : Fin n) (z : V × V')
+    : prodRepresentation E E' a b z = (E a b z.1, E' a b z.2) :=
+  rfl
 
-theorem prod_mem_weightSpace_iff (E : GLOps n K V) (E' : GLOps n K V') (mu : Fin n → ℤ) (z : V × V') :
-    z ∈ weightSp (prodRepresentation E E') mu ↔ z.1 ∈ weightSp E mu ∧ z.2 ∈ weightSp E' mu := by
+theorem prod_mem_weightSpace_iff (E : GLOps n K V) (E' : GLOps n K V') (mu : Fin n → ℤ) (z : V × V')
+    : z ∈ weightSp (prodRepresentation E E') mu ↔ z.1 ∈ weightSp E mu ∧ z.2 ∈ weightSp E' mu := by
   obtain ⟨x, y⟩ := z
   simp [weightSp, forall_and]
 
-theorem prodRepresentation_isRep [FiniteDimensional K V] [FiniteDimensional K V'] (E : GLOps n K V) (E' : GLOps n K V')
-    (hE : IsGLRep E) (hE' : IsGLRep E') : IsGLRep (prodRepresentation E E') := by
+theorem prodRepresentation_isRep
+    [FiniteDimensional K V] [FiniteDimensional K V']
+    (E : GLOps n K V) (E' : GLOps n K V') (hE : IsGLRep E) (hE' : IsGLRep E')
+    : IsGLRep (prodRepresentation E E') := by
   obtain ⟨hE1, -, hE3⟩ := hE
   obtain ⟨hE1', -, hE3'⟩ := hE'
-  refine ⟨fun a b c d => ?_, fun z => ⟨⊤, inferInstance, Submodule.mem_top, fun _ _ _ _ => Submodule.mem_top⟩, ?_⟩
+  refine ⟨
+    fun a b c d => ?_,
+    fun z => ⟨⊤, inferInstance, Submodule.mem_top, fun _ _ _ _ => Submodule.mem_top⟩,
+    ?_
+  ⟩
   · refine LinearMap.ext fun z => Prod.ext ?_ ?_
     · have h := LinearMap.congr_fun (hE1 a b c d) z.1
       split_ifs at h ⊢ <;> simpa using h
@@ -39,13 +49,17 @@ theorem prodRepresentation_isRep [FiniteDimensional K V] [FiniteDimensional K V'
     rintro ⟨x, y⟩ -
     have hx : x ∈ ⨆ mu, weightSp E mu := by rw [hE3]; exact Submodule.mem_top
     have hy : y ∈ ⨆ mu, weightSp E' mu := by rw [hE3']; exact Submodule.mem_top
-    have h1 : (⨆ mu, weightSp E mu).map (LinearMap.inl K V V') ≤ ⨆ mu, weightSp (prodRepresentation E E') mu := by
+    have h1
+        : (⨆ mu, weightSp E mu).map (LinearMap.inl K V V')
+          ≤ ⨆ mu, weightSp (prodRepresentation E E') mu := by
       rw [Submodule.map_iSup]
       refine iSup_mono fun mu => ?_
       rintro _ ⟨v, hv, rfl⟩
       rw [prod_mem_weightSpace_iff]
       exact ⟨by simpa using hv, by simp⟩
-    have h2 : (⨆ mu, weightSp E' mu).map (LinearMap.inr K V V') ≤ ⨆ mu, weightSp (prodRepresentation E E') mu := by
+    have h2
+        : (⨆ mu, weightSp E' mu).map (LinearMap.inr K V V')
+          ≤ ⨆ mu, weightSp (prodRepresentation E E') mu := by
       rw [Submodule.map_iSup]
       refine iSup_mono fun mu => ?_
       rintro _ ⟨v, hv, rfl⟩
@@ -55,37 +69,43 @@ theorem prodRepresentation_isRep [FiniteDimensional K V] [FiniteDimensional K V'
     rw [hxy]
     exact Submodule.add_mem _ (h1 ⟨x, hx, rfl⟩) (h2 ⟨y, hy, rfl⟩)
 
-theorem equivariant_lifts_monoid (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V') (hT : IsEquivariantMap E E' T)
-    {u' : Module.End K V'} (hu : u' ∈ Umon E') : ∃ u ∈ Umon E, ∀ y, T (u y) = u' (T y) := by
+theorem equivariant_lifts_monoid
+    (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V') (hT : IsEquivariantMap E E' T)
+    {u' : Module.End K V'} (hu : u' ∈ Umon E')
+    : ∃ u ∈ Umon E, ∀ y, T (u y) = u' (T y) := by
   have hu' : u' ∈ Submonoid.closure (Set.range fun ab : Fin n × Fin n => E' ab.1 ab.2) := hu
   clear hu
   induction hu' using Submonoid.closure_induction with
   | mem x hx =>
     obtain ⟨⟨a, b⟩, rfl⟩ := hx
     exact ⟨E a b, Submonoid.subset_closure ⟨(a, b), rfl⟩, fun y => hT a b y⟩
-  | one => exact ⟨1, one_mem _, fun y => rfl⟩
+  | one =>
+    exact ⟨1, one_mem _, fun y => rfl⟩
   | mul x y _ _ ihx ihy =>
     obtain ⟨u1, hu1, h1⟩ := ihx
     obtain ⟨u2, hu2, h2⟩ := ihy
     exact ⟨u1 * u2, mul_mem hu1 hu2, fun z => (h1 (u2 z)).trans (congrArg x (h2 z))⟩
 
-private theorem exists_Umon_intertwined_of_isEquivariantMap (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V')
-    (hT : IsEquivariantMap E E' T) {u : Module.End K V} (hu : u ∈ Umon E) :
-    ∃ u' ∈ Umon E', ∀ y, T (u y) = u' (T y) := by
+private theorem exists_Umon_intertwined_of_isEquivariantMap
+    (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V') (hT : IsEquivariantMap E E' T)
+    {u : Module.End K V} (hu : u ∈ Umon E)
+    : ∃ u' ∈ Umon E', ∀ y, T (u y) = u' (T y) := by
   have hu' : u ∈ Submonoid.closure (Set.range fun ab : Fin n × Fin n => E ab.1 ab.2) := hu
   clear hu
   induction hu' using Submonoid.closure_induction with
   | mem x hx =>
     obtain ⟨⟨a, b⟩, rfl⟩ := hx
     exact ⟨E' a b, Submonoid.subset_closure ⟨(a, b), rfl⟩, fun y => hT a b y⟩
-  | one => exact ⟨1, one_mem _, fun y => rfl⟩
+  | one =>
+    exact ⟨1, one_mem _, fun y => rfl⟩
   | mul x y _ _ ihx ihy =>
     obtain ⟨u1, hu1, h1⟩ := ihx
     obtain ⟨u2, hu2, h2⟩ := ihy
     exact ⟨u1 * u2, mul_mem hu1 hu2, fun z => (h1 (y z)).trans (congrArg u1 (h2 z))⟩
 
-theorem equivariant_map_cyclicSubmodule (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V') (hT : IsEquivariantMap E E' T) (v : V) :
-    (cyclicSubmodule E v).map T = cyclicSubmodule E' (T v) := by
+theorem equivariant_map_cyclicSubmodule
+    (E : GLOps n K V) (E' : GLOps n K V') (T : V →ₗ[K] V') (hT : IsEquivariantMap E E' T) (v : V)
+    : (cyclicSubmodule E v).map T = cyclicSubmodule E' (T v) := by
   unfold cyclicSubmodule
   rw [Submodule.map_span]
   congr 1
@@ -100,11 +120,15 @@ theorem equivariant_map_cyclicSubmodule (E : GLOps n K V) (E' : GLOps n K V') (T
 
 end
 
-theorem equivariant_injective_of_cyclic (D : Formalism.BasicNotions.D7) (h2 : adm2 D) {n : ℕ} {K G V : Type} [Field K] [CharZero K]
-    [AddCommGroup G] [Module K G] [FiniteDimensional K G] [AddCommGroup V] [Module K V]
-    (EG : GLOps n K G) (hEG : IsGLRep EG) (E : GLOps n K V) (lam : Fin n → ℤ) (g0 : G) (hg0 : IsHWV EG lam g0)
-    (hcyc : cyclicSubmodule EG g0 = ⊤) (F : G →ₗ[K] V) (hF : IsEquivariantMap EG E F) (hne : F g0 ≠ 0) :
-    LinearMap.ker F = ⊥ := by
+theorem equivariant_injective_of_cyclic
+    (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    {n : ℕ} {K G V : Type} [Field K] [CharZero K] [AddCommGroup G] [Module K G]
+    [FiniteDimensional K G] [AddCommGroup V] [Module K V]
+    (EG : GLOps n K G) (hEG : IsGLRep EG)
+    (E : GLOps n K V)
+    (lam : Fin n → ℤ) (g0 : G) (hg0 : IsHWV EG lam g0) (hcyc : cyclicSubmodule EG g0 = ⊤)
+    (F : G →ₗ[K] V) (hF : IsEquivariantMap EG E F) (hne : F g0 ≠ 0)
+    : LinearMap.ker F = ⊥ := by
   classical
   have hEG0 := hEG
   obtain ⟨hcomm, -, -⟩ := hEG0
@@ -113,16 +137,22 @@ theorem equivariant_injective_of_cyclic (D : Formalism.BasicNotions.D7) (h2 : ad
     intro μ x
     simp [weightSp, sub_eq_zero]
   have hlam := (wt lam g0).mp hg0w
-  have comm : ∀ a b c d (y : G), EG c d (EG a b y) =
-      EG a b (EG c d y) + ((if d = a then EG c b y else 0) - (if b = c then EG a d y else 0)) := by
+  have comm
+      : ∀ a b c d (y : G),
+        EG c d (EG a b y)
+          = EG a b (EG c d y)
+            + ((if d = a then EG c b y else 0) - (if b = c then EG a d y else 0)) := by
     intro a b c d y
-    have h' : EG c d (EG a b y) - EG a b (EG c d y) =
-        (if d = a then EG c b y else 0) - (if b = c then EG a d y else 0) := by
+    have h'
+        : EG c d (EG a b y) - EG a b (EG c d y)
+          = (if d = a then EG c b y else 0) - (if b = c then EG a d y else 0) := by
       have h := LinearMap.congr_fun (hcomm c d a b) y
       split_ifs at h ⊢ <;> simpa using h
     exact sub_eq_iff_eq_add'.mp h'
-  obtain ⟨L, hL⟩ : ∃ L : Submonoid (Module.End K G),
-      L = Submonoid.closure {x | ∃ a b : Fin n, b < a ∧ x = EG a b} := ⟨_, rfl⟩
+  obtain ⟨L, hL⟩
+      : ∃ L : Submonoid (Module.End K G),
+        L = Submonoid.closure {x | ∃ a b : Fin n, b < a ∧ x = EG a b} :=
+    ⟨_, rfl⟩
   obtain ⟨N, hN⟩ : ∃ N : Submodule K G, N = Submodule.span K {x | ∃ l ∈ L, x = l g0} := ⟨_, rfl⟩
   have lowL : ∀ a b : Fin n, b < a → EG a b ∈ L := fun a b h => by
     rw [hL]; exact Submonoid.subset_closure ⟨a, b, h, rfl⟩
@@ -150,8 +180,8 @@ theorem equivariant_injective_of_cyclic (D : Formalism.BasicNotions.D7) (h2 : ad
       intro c d
       show EG c d (EG a b (l g0)) ∈ N
       rw [comm a b c d (l g0)]
-      refine N.add_mem (low_mem a b hab (ih c d)) (N.sub_mem ?_ ?_) <;>
-        split_ifs <;> first | exact ih _ _ | exact N.zero_mem
+      refine N.add_mem (low_mem a b hab (ih c d)) (N.sub_mem ?_ ?_) <;> split_ifs
+        <;> first | exact ih _ _ | exact N.zero_mem
   have all_mem : ∀ c d, ∀ x ∈ N, EG c d x ∈ N := by
     intro c d
     have hle : N ≤ N.comap (EG c d) := by
@@ -159,8 +189,8 @@ theorem equivariant_injective_of_cyclic (D : Formalism.BasicNotions.D7) (h2 : ad
       rintro _ ⟨l, hl, rfl⟩
       exact all_gen l hl c d
     exact fun x hx => hle hx
-  have umonS : ∀ S : Submodule K G, (∀ a b, ∀ x ∈ S, EG a b x ∈ S) →
-      ∀ u ∈ Umon EG, ∀ x ∈ S, u x ∈ S := by
+  have umonS
+      : ∀ S : Submodule K G, (∀ a b, ∀ x ∈ S, EG a b x ∈ S) → ∀ u ∈ Umon EG, ∀ x ∈ S, u x ∈ S := by
     intro S hS u hu
     have hu' : u ∈ Submonoid.closure (Set.range fun ab : Fin n × Fin n => EG ab.1 ab.2) := hu
     clear hu
@@ -188,25 +218,28 @@ theorem equivariant_injective_of_cyclic (D : Formalism.BasicNotions.D7) (h2 : ad
     rw [hHapp, hh0, Finset.sum_smul]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [hlam c, smul_smul]
-  have Hstep : ∀ (a b : Fin n) (y : G) (t : K), H y = t • y →
-      H (EG a b y) = (t + (((a : ℕ) : K) - ((b : ℕ) : K))) • EG a b y := by
+  have Hstep
+      : ∀ (a b : Fin n) (y : G) (t : K),
+        H y = t • y → H (EG a b y) = (t + (((a : ℕ) : K) - ((b : ℕ) : K))) • EG a b y := by
     intro a b y t hy
     have e1 : ∑ c : Fin n, ((c : ℕ) : K) • EG a b (EG c c y) = EG a b (H y) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [hHapp, map_sum]
       simp only [map_smul]
-    have e2 : ∑ c : Fin n, ((c : ℕ) : K) • (if c = a then EG c b y else 0) =
-        ((a : ℕ) : K) • EG a b y := by
+    have e2
+        : ∑ c : Fin n, ((c : ℕ) : K) • (if c = a then EG c b y else 0)
+          = ((a : ℕ) : K) • EG a b y := by
       simp [smul_ite]
-    have e3 : ∑ c : Fin n, ((c : ℕ) : K) • (if b = c then EG a c y else 0) =
-        ((b : ℕ) : K) • EG a b y := by
+    have e3
+        : ∑ c : Fin n, ((c : ℕ) : K) • (if b = c then EG a c y else 0)
+          = ((b : ℕ) : K) • EG a b y := by
       simp [smul_ite]
     rw [hHapp]
-    simp only [comm a b, smul_add, smul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib, e1, e2, e3,
-      hy, map_smul]
+    simp only [comm a b, smul_add, smul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib, e1, e2,
+      e3, hy, map_smul]
     rw [add_smul, sub_smul]
-  have alt : ∀ l ∈ L, (∃ r : K, l g0 = r • g0) ∨
-      ∃ k : ℕ, 0 < k ∧ H (l g0) = (h0 + (k : K)) • l g0 := by
+  have alt
+      : ∀ l ∈ L, (∃ r : K, l g0 = r • g0) ∨ ∃ k : ℕ, 0 < k ∧ H (l g0) = (h0 + (k : K)) • l g0 := by
     intro l hl
     rw [hL] at hl
     induction hl using Submonoid.closure_induction_left with
@@ -246,8 +279,9 @@ theorem equivariant_injective_of_cyclic (D : Formalism.BasicNotions.D7) (h2 : ad
       rw [Module.End.mem_eigenspace_iff]
       rw [map_add (f := _), map_smul, Hg0, smul_add, smul_comm h0 r g0] at hw
       exact add_left_cancel hw
-    have hz' : z = 0 := (Submodule.mem_bot K).mp
-      ((Module.End.eigenspaces_iSupIndep H h0).le_bot (Submodule.mem_inf.mpr ⟨hz0, hz⟩))
+    have hz' : z = 0 :=
+      (Submodule.mem_bot K).mp
+        ((Module.End.eigenspaces_iSupIndep H h0).le_bot (Submodule.mem_inf.mpr ⟨hz0, hz⟩))
     exact ⟨r, by rw [hz', add_zero]⟩
   have hWs : ∀ a b, ∀ x ∈ LinearMap.ker F, EG a b x ∈ LinearMap.ker F := by
     intro a b x hx
@@ -265,11 +299,13 @@ theorem equivariant_injective_of_cyclic (D : Formalism.BasicNotions.D7) (h2 : ad
       have h := congrArg H hsum
       rw [map_add (f := _), Hg0, ← hsum, smul_add] at h
       rw [sub_eq_sub_iff_add_eq_add, h, add_comm]
-    have h1 : H w - h0 • w ∈ LinearMap.ker F := sub_mem (Hmem _ hWs w hw) (Submodule.smul_mem _ _ hw)
+    have h1 : H w - h0 • w ∈ LinearMap.ker F :=
+      sub_mem (Hmem _ hWs w hw) (Submodule.smul_mem _ _ hw)
     have h2' : H w - h0 • w ∈ W' := by
       rw [e]
       exact sub_mem (Submodule.smul_mem _ _ hw') (Hmem _ hW's w' hw')
-    exact sub_eq_zero.mp ((Submodule.mem_bot K).mp (hC.disjoint.le_bot (Submodule.mem_inf.mpr ⟨h1, h2'⟩)))
+    exact sub_eq_zero.mp ((Submodule.mem_bot K).mp
+      (hC.disjoint.le_bot (Submodule.mem_inf.mpr ⟨h1, h2'⟩)))
   obtain ⟨r, hr⟩ := key w hHw
   have hr0 : r = 0 := by
     have hFw : F w = 0 := LinearMap.mem_ker.mp hw

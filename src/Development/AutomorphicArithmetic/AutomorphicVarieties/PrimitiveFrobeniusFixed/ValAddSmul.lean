@@ -6,17 +6,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-private theorem val_add_smul {W : Type} [AddCommGroup W] {M : ℕ} [NeZero M] (x : W) (hx : M • x = 0) (a b : ZMod M) :
-    (a + b).val • x = a.val • x + b.val • x := by
+private theorem val_add_smul
+    {W : Type} [AddCommGroup W] {M : ℕ} [NeZero M] (x : W) (hx : M • x = 0) (a b : ZMod M)
+    : (a + b).val • x = a.val • x + b.val • x := by
   rw [ZMod.val_add, ← add_smul]
   conv_rhs => rw [← Nat.mod_add_div' (a.val + b.val) M]
   rw [add_smul, mul_smul, hx, smul_zero, add_zero]
 
-private theorem lc_sum {X ι W : Type} [TopologicalSpace X] [AddCommGroup W] (s : Finset ι) (f : ι → X → W)
-    (h : ∀ i, IsLocallyConstant (f i)) : IsLocallyConstant fun x => ∑ i ∈ s, f i x := by
+private theorem lc_sum
+    {X ι W : Type} [TopologicalSpace X] [AddCommGroup W]
+    (s : Finset ι)
+    (f : ι → X → W) (h : ∀ i, IsLocallyConstant (f i))
+    : IsLocallyConstant fun x => ∑ i ∈ s, f i x := by
   classical
   induction s using Finset.induction_on with
   | empty => simp only [Finset.sum_empty]; exact IsLocallyConstant.const (0 : W)
@@ -24,10 +30,21 @@ private theorem lc_sum {X ι W : Type} [TopologicalSpace X] [AddCommGroup W] (s 
     simp only [Finset.sum_insert ha]
     exact (h a).add ih
 
-theorem UpperTheory.V.ML.nuIs :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (O W : Type) [CommRing O] [AddCommGroup W] [Module O W] (M F n : ℕ) [NeZero M] [NeZero F], F ∣ n → ∀ (β : G ℚ Ω →* Oˣ), (∀ g ∈ fixMu ℚ Ω F, (M : O) ∣ (β g : O) - 1) → ∀ σ : (ZMod F)ˣ → G ℚ Ω, (∀ t, Lifts F t (σ t)) →
-    ∀ w : W, M • w = 0 → ∀ κ : G ℚ Ω → ZMod M, (∀ u ∈ fixMu ℚ Ω F, ∀ v ∈ fixMu ℚ Ω F, κ (u * v) = κ u + κ v) → IsLocallyConstant (fun u : fixMu ℚ Ω F => κ u) →
-    (∀ A : ValuationSubring Ω, ¬ Over A n → ∀ g ∈ Ine (F := ℚ) A, κ g = 0) → IsNu M F n β (nu β σ w κ) := by
+theorem UpperTheory.V.ML.nuIs
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (O W : Type) [CommRing O]
+        [AddCommGroup W] [Module O W] (M F n : ℕ) [NeZero M] [NeZero F],
+      F ∣ n
+        → ∀ (β : G ℚ Ω →* Oˣ),
+          (∀ g ∈ fixMu ℚ Ω F, (M : O) ∣ (β g : O) - 1)
+            → ∀ σ : (ZMod F)ˣ → G ℚ Ω,
+              (∀ t, Lifts F t (σ t))
+                → ∀ w : W,
+                  M • w = 0
+                    → ∀ κ : G ℚ Ω → ZMod M,
+                      (∀ u ∈ fixMu ℚ Ω F, ∀ v ∈ fixMu ℚ Ω F, κ (u * v) = κ u + κ v)
+                        → IsLocallyConstant (fun u : fixMu ℚ Ω F => κ u)
+                        → (∀ A : ValuationSubring Ω, ¬ Over A n → ∀ g ∈ Ine (F := ℚ) A, κ g = 0)
+                        → IsNu M F n β (nu β σ w κ) := by
   intro Ω _ _ _ O W _ _ _ M F n _ _ hFn β hβ σ hσ w hw κ hκ hlc hunr
   have hF0 : F ≠ 0 := NeZero.ne F
   obtain ⟨hN, -, -, -, hlift, -, -, -, -, hmul⟩ := galBasic Ω F hF0
@@ -75,17 +92,20 @@ theorem UpperTheory.V.ML.nuIs :
   · intro g u hu
     obtain ⟨b, hb⟩ := hlift g
     simp only [nu]
-    rw [Finset.smul_sum, ← Equiv.sum_comp (Equiv.mulLeft b)
-      (fun t => (κ ((σ t)⁻¹ * (g * u * g⁻¹) * σ t)).val • (β (σ t) : O) • w)]
+    rw [Finset.smul_sum,
+      ← Equiv.sum_comp (Equiv.mulLeft b)
+        (fun t => (κ ((σ t)⁻¹ * (g * u * g⁻¹) * σ t)).val • (β (σ t) : O) • w)]
     refine Finset.sum_congr rfl (fun s _ => ?_)
     show (κ ((σ (b * s))⁻¹ * (g * u * g⁻¹) * σ (b * s))).val • (β (σ (b * s)) : O) • w = _
     have hk0 : (g * σ s)⁻¹ * σ (b * s) ∈ fixMu ℚ Ω F :=
-      (hmul (b * s) (b * s) (g * σ s) (σ (b * s)) (hmul b s g (σ s) hb (hσ s)).1 (hσ (b * s))).2.2.mp rfl
+      (hmul (b * s) (b * s) (g * σ s) (σ (b * s)) (hmul b s g (σ s) hb (hσ s)).1
+        (hσ (b * s))).2.2.mp rfl
     obtain ⟨k, hk, hτ⟩ : ∃ k ∈ fixMu ℚ Ω F, σ (b * s) = g * σ s * k := ⟨_, hk0, by group⟩
     rw [hτ]
-    have e : (g * σ s * k)⁻¹ * (g * u * g⁻¹) * (g * σ s * k) = k⁻¹ * ((σ s)⁻¹ * u * σ s) * k := by group
-    rw [e, hconj k hk _ (hcm _ u hu), map_mul, map_mul, Units.val_mul, Units.val_mul, mul_smul, mul_smul,
-      hfix k hk w hw]
+    have e : (g * σ s * k)⁻¹ * (g * u * g⁻¹) * (g * σ s * k) = k⁻¹ * ((σ s)⁻¹ * u * σ s) * k := by
+      group
+    rw [e, hconj k hk _ (hcm _ u hu), map_mul, map_mul, Units.val_mul, Units.val_mul, mul_smul,
+      mul_smul, hfix k hk w hw]
     exact smul_comm _ _ _
   · intro u hu
     simp only [nu]

@@ -6,7 +6,8 @@ public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.JacobiCharacterSums.
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
@@ -72,8 +73,8 @@ private lemma sum_min_le_div {x : ℝ} (hx0 : 0 ≤ x) (N : ℕ) {p : ℕ} (hp :
     calc x * ∑ i ∈ Icc 1 N, r ^ i ≤ x * (2 * r) := mul_le_mul_of_nonneg_left hle hx0
       _ = 2 * (x / p) := by rw [hr]; ring
 
-theorem exists_primePowerSum_le_mul_log :
-    ∃ C : ℝ, 0 < C ∧ ∀ y : ℝ, 3 ≤ y → ∀ N p : ℕ, sP (cN y) N p ≤ C * Real.log y := by
+theorem exists_primePowerSum_le_mul_log
+    : ∃ C : ℝ, 0 < C ∧ ∀ y : ℝ, 3 ≤ y → ∀ N p : ℕ, sP (cN y) N p ≤ C * Real.log y := by
   refine ⟨3, by norm_num, fun y hy N p => ?_⟩
   have hy0 : 0 < y := by linarith
   have hly : 0 ≤ Real.log y := Real.log_nonneg (by linarith)
@@ -92,7 +93,9 @@ theorem exists_primePowerSum_le_mul_log :
       have h5 : Real.log p * (2 * (y / p)) ≤ 2 * Real.log y := by
         have e : Real.log p * (2 * (y / p)) = 2 * y * (Real.log p / p) := by ring
         rw [e]
-        calc 2 * y * (Real.log p / p) ≤ 2 * y * (Real.log y / y) := by gcongr
+        calc
+          2 * y * (Real.log p / p)
+            ≤ 2 * y * (Real.log y / y) := by gcongr
           _ = 2 * Real.log y := by field_simp
       linarith
   · have h0 : sP (cN y) N p = 0 := by

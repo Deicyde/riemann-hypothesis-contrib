@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FormallyUnram
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.UnrEuler Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.UnrEuler
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped nonZeroDivisors
 open Formalism.L2.Host (aboveF)
 
@@ -21,19 +23,27 @@ open GlobalTheory.StdDual (codiff codiff_ne_zero one_le_codiff)
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem not_le_differentIdeal_of_psiUnr {F : Type} [Field F] [NumberField F] {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ)
-    (v : Pl (F := F)) (hu : PsiUnr ψ v) : ¬ differentIdeal ℤ (𝓞 F) ≤ v.asIdeal := by
+theorem not_le_differentIdeal_of_psiUnr
+    {F : Type} [Field F] [NumberField F]
+    {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ)
+    (v : Pl (F := F)) (hu : PsiUnr ψ v)
+    : ¬ differentIdeal ℤ (𝓞 F) ≤ v.asIdeal := by
   classical
-  have h := GlobalTheory.SplitUnram.mem_adelicIdeal_codiff_iff hψ.1 (GlobalTheory.LatVacArith.psi_fin_rat hψ)
+  have h :=
+    GlobalTheory.SplitUnram.mem_adelicIdeal_codiff_iff hψ.1
+      (GlobalTheory.LatVacArith.psi_fin_rat hψ)
 
-  have key : ∀ x : Fv F v, (∀ y ∈ v.adicCompletionIntegers F, psiLoc ψ v (x * y) = 1) ↔
-      Valued.v x ≤ exp (-FractionalIdeal.count F v (codiff F)) := by
+  have key
+      : ∀ x : Fv F v,
+        (∀ y ∈ v.adicCompletionIntegers F, psiLoc ψ v (x * y) = 1)
+          ↔ Valued.v x ≤ exp (- FractionalIdeal.count F v (codiff F)) := by
     intro x
     set α : Af F := GlobalTheory.AdelicU.singleFin v x with hα
     have hαv : α v = x := GlobalTheory.AdelicU.evalV_singleFin_self v x
     have hαw : ∀ w, w ≠ v → α w = 0 := fun w hw => GlobalTheory.AdelicU.evalV_singleFin_ne hw x
-    have k1 : (∀ y ∈ v.adicCompletionIntegers F, psiLoc ψ v (x * y) = 1) ↔
-        ∀ β : Af F, (∀ w, β w ∈ w.adicCompletionIntegers F) → ψ (pairA F 0 (β * α)) = 1 := by
+    have k1
+        : (∀ y ∈ v.adicCompletionIntegers F, psiLoc ψ v (x * y) = 1)
+          ↔ ∀ β : Af F, (∀ w, β w ∈ w.adicCompletionIntegers F) → ψ (pairA F 0 (β * α)) = 1 := by
       constructor
       · intro H β hβ
         have e : β * α = GlobalTheory.AdelicU.singleFin v (x * β v) := by
@@ -41,24 +51,33 @@ theorem not_le_differentIdeal_of_psiUnr {F : Type} [Field F] [NumberField F] {ψ
           intro u
           by_cases hu : u = v
           · subst hu
-            rw [map_mul, hα, GlobalTheory.AdelicU.evalV_singleFin_self, GlobalTheory.AdelicU.evalV_singleFin_self]
+            rw [map_mul, hα, GlobalTheory.AdelicU.evalV_singleFin_self,
+              GlobalTheory.AdelicU.evalV_singleFin_self]
             change β u * x = x * β u
             ring
-          · rw [map_mul, hα, GlobalTheory.AdelicU.evalV_singleFin_ne hu, GlobalTheory.AdelicU.evalV_singleFin_ne hu, mul_zero]
+          · rw [map_mul, hα, GlobalTheory.AdelicU.evalV_singleFin_ne hu,
+              GlobalTheory.AdelicU.evalV_singleFin_ne hu, mul_zero]
         rw [e]
         exact H _ (hβ v)
       · intro H y hy
-        have e : GlobalTheory.AdelicU.singleFin v y * α = GlobalTheory.AdelicU.singleFin v (x * y) := by
+        have e
+            : GlobalTheory.AdelicU.singleFin v y * α
+              = GlobalTheory.AdelicU.singleFin v (x * y) := by
           rw [hα, ← GlobalTheory.AdelicU.singleFin_mul, mul_comm]
-        have := H (GlobalTheory.AdelicU.singleFin v y) (fun w => by
-          by_cases hw : w = v
-          · subst hw
-            change Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV _ w (GlobalTheory.AdelicU.singleFin w y) ∈ _
-            rw [GlobalTheory.AdelicU.evalV_singleFin_self]
-            exact hy
-          · change Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV _ w (GlobalTheory.AdelicU.singleFin v y) ∈ _
-            rw [GlobalTheory.AdelicU.evalV_singleFin_ne hw]
-            exact zero_mem _)
+        have :=
+          H (GlobalTheory.AdelicU.singleFin v y) (fun w => by
+            by_cases hw : w = v
+            · subst hw
+              change Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV _ w
+                  (GlobalTheory.AdelicU.singleFin w y)
+                ∈ _
+              rw [GlobalTheory.AdelicU.evalV_singleFin_self]
+              exact hy
+            · change Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV _ w
+                  (GlobalTheory.AdelicU.singleFin v y)
+                ∈ _
+              rw [GlobalTheory.AdelicU.evalV_singleFin_ne hw]
+              exact zero_mem _)
         rw [e] at this
         exact this
     rw [k1, ← h, mem_adelicIdeal_iff codiff_ne_zero]
@@ -76,8 +95,9 @@ theorem not_le_differentIdeal_of_psiUnr {F : Type} [Field F] [NumberField F] {ψ
   set c := FractionalIdeal.count F v (codiff F) with hc
 
   have hc0 : c ≤ 0 := by
-    have := FractionalIdeal.count_mono F v (one_ne_zero (α := FractionalIdeal (𝓞 F)⁰ F))
-      (one_le_codiff (F := F))
+    have :=
+      FractionalIdeal.count_mono F v (one_ne_zero (α := FractionalIdeal (𝓞 F)⁰ F))
+        (one_le_codiff (F := F))
     rw [FractionalIdeal.count_one] at this
     omega
 
@@ -91,7 +111,8 @@ theorem not_le_differentIdeal_of_psiUnr {F : Type} [Field F] [NumberField F] {ψ
       exact exp_ne_zero hπ.symm
     set x : Fv F v := ((π⁻¹ : F) : v.adicCompletion F) with hx
     have hvx : Valued.v x = exp 1 := by
-      rw [hx, HeightOneSpectrum.valuedAdicCompletion_eq_valuation', map_inv₀, hπ, ← exp_neg, neg_neg]
+      rw [hx, HeightOneSpectrum.valuedAdicCompletion_eq_valuation', map_inv₀, hπ, ← exp_neg,
+        neg_neg]
     have h1 : Valued.v x ≤ exp (-c) := by
       rw [hvx, exp_le_exp]
       omega

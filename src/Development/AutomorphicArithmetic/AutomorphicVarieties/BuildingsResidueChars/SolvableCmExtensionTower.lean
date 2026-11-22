@@ -6,9 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 open NumberField UpperTheory.V.Af.Sol
 
-private theorem exists_proper_nontrivial_normal_of_solvable_not_prime_card (G : Type) [Group G] [Finite G] (hs : IsSolvable G)
-    (h1 : Nat.card G ≠ 1) (hp : ¬ (Nat.card G).Prime) :
-    ∃ N : Subgroup G, N.Normal ∧ N ≠ ⊥ ∧ N ≠ ⊤ := by
+private theorem exists_proper_nontrivial_normal_of_solvable_not_prime_card
+    (G : Type) [Group G] [Finite G]
+    (hs : IsSolvable G) (h1 : Nat.card G ≠ 1) (hp : ¬(Nat.card G).Prime)
+    : ∃ N : Subgroup G, N.Normal ∧ N ≠ ⊥ ∧ N ≠ ⊤ := by
   by_contra hne
   push_neg at hne
   have hlt : 1 < Nat.card G := by
@@ -24,21 +25,23 @@ private theorem exists_proper_nontrivial_normal_of_solvable_not_prime_card (G : 
   letI : CommGroup G := { ‹Group G› with mul_comm := hc }
   exact hp (CommGroup.is_simple_iff_prime_card.1 ‹IsSimpleGroup G›)
 
-private theorem rc_of_intermediateField_stable_under_complexConj {F M : Type} [Field F] [NumberField F] [Field M] [NumberField M] [Algebra F M]
-    [IsCMField M] (K : IntermediateField F M)
-    (hK : ∀ x ∈ K, IsCMField.complexConj M x ∈ K) : RC K := by
+private theorem rc_of_intermediateField_stable_under_complexConj
+    {F M : Type} [Field F] [NumberField F] [Field M] [NumberField M] [Algebra F M] [IsCMField M]
+    (K : IntermediateField F M) (hK : ∀ x ∈ K, IsCMField.complexConj M x ∈ K)
+    : RC K := by
   have hext : ∀ φ : K →+* ℂ, ∃ Φ : M →+* ℂ, ∀ x : K, Φ x = φ x := by
     intro φ
     letI : Algebra K ℂ := φ.toAlgebra
     refine ⟨(IsAlgClosed.lift : M →ₐ[K] ℂ).toRingHom, fun x => ?_⟩
     exact (IsAlgClosed.lift : M →ₐ[K] ℂ).commutes x
-  let τ : K ≃+* K :=
-    { toFun := fun x => ⟨IsCMField.complexConj M x, hK x x.2⟩
-      invFun := fun x => ⟨IsCMField.complexConj M x, hK x x.2⟩
-      left_inv := fun x => Subtype.ext (IsCMField.complexConj_apply_apply M x)
-      right_inv := fun x => Subtype.ext (IsCMField.complexConj_apply_apply M x)
-      map_mul' := fun x y => Subtype.ext (by simp [map_mul])
-      map_add' := fun x y => Subtype.ext (by simp [map_add (f := _)]) }
+  let τ : K ≃+* K := {
+    toFun := fun x => ⟨IsCMField.complexConj M x, hK x x.2⟩
+    invFun := fun x => ⟨IsCMField.complexConj M x, hK x x.2⟩
+    left_inv := fun x => Subtype.ext (IsCMField.complexConj_apply_apply M x)
+    right_inv := fun x => Subtype.ext (IsCMField.complexConj_apply_apply M x)
+    map_mul' := fun x y => Subtype.ext (by simp [map_mul])
+    map_add' := fun x y => Subtype.ext (by simp [map_add (f := _)])
+  }
   let σ : Gal(K/ℚ) := τ.toRatAlgEquiv
   have hσ : ∀ x : K, ((σ x : K) : M) = IsCMField.complexConj M x := fun x => rfl
   have hconj : ∀ φ : K →+* ℂ, ComplexEmbedding.IsConj φ σ := by
@@ -87,11 +90,11 @@ private theorem rc_of_intermediateField_stable_under_complexConj {F M : Type} [F
         exact FixedPoints.finrank_eq_card (Subgroup.zpowers σ) K⟩
     exact IsCMField.ofCMExtension L K
 
-theorem UpperTheory.solvable_cm_extension_tower :
-    UpperTheory.V.Af.Sol.Tower := by
+theorem UpperTheory.solvable_cm_extension_tower : UpperTheory.V.Af.Sol.Tower := by
   intro F M _ _ _ _ _ _ hs hF hM h1 hp
-  obtain ⟨N, hN, hbot, htop⟩ := exists_proper_nontrivial_normal_of_solvable_not_prime_card Gal(M/F) hs
-    (by rwa [IsGalois.card_aut_eq_finrank]) (by rwa [IsGalois.card_aut_eq_finrank])
+  obtain ⟨N, hN, hbot, htop⟩ :=
+    exists_proper_nontrivial_normal_of_solvable_not_prime_card Gal(M/F) hs
+      (by rwa [IsGalois.card_aut_eq_finrank]) (by rwa [IsGalois.card_aut_eq_finrank])
   refine ⟨IntermediateField.fixedField N, ?_, ?_, IsGalois.of_fixedField_normal_subgroup N, ?_⟩
   · intro h
     apply htop

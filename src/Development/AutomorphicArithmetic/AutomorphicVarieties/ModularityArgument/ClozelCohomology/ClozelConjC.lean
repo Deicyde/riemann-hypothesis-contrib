@@ -28,8 +28,10 @@ namespace UpperTheory.V.Z.Coh
 open UpperTheory.V.Cj
 
 theorem clozelConjC : Published.ClozelConjC :=
-  clozelConjC_of_steps PositivityTheory.AdelicQuotientData.jacquetShalikaRigidity clozelCohC finExC R.exAlgRepCusp R.conjAlgRep S.cuspSupport conjEx
-    (embed_of partH relFacts partA relOnto harmSub harmNe harmInj irrCo graph Lit.Bor.frameEx Lit.Bor.oneReal Lit.Geo.cuspRapid)
+  clozelConjC_of_steps PositivityTheory.AdelicQuotientData.jacquetShalikaRigidity clozelCohC finExC
+    R.exAlgRepCusp R.conjAlgRep S.cuspSupport conjEx
+    (embed_of partH relFacts partA relOnto harmSub harmNe harmInj irrCo graph Lit.Bor.frameEx
+      Lit.Bor.oneReal Lit.Geo.cuspRapid)
     noEis
 
 theorem borelInjC : Published.BorelInjC := Lit.Geo.borelInjC

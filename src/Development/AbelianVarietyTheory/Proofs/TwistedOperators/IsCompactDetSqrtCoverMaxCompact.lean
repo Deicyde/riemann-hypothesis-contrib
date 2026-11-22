@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsGrp
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix MeasureTheory
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix
+  MeasureTheory
 
 namespace GlobalTheory.PolarU
 
@@ -28,10 +29,11 @@ theorem isCompact_Kset : ∀ (p q : ℕ) (T : GrpData p q), IsCompact T.Kset := 
     intro z hz
     have : z ≠ 0 := by rintro rfl; simp at hz
     exact ⟨Units.mk0 z this, rfl⟩
-  have hc := Formalism.UG.P.isCompact_units_of_unitary (n := Ix p q) (T := {M | star M * M = 1})
-    (isClosed_eq (continuous_star.matrix_mul continuous_id) continuous_const) (fun M hM => hM)
-  refine ((GlobalTheory.RealPar.SqInt.isClosedEmbedding_emb T).isCompact_preimage (hc.prod hS)).of_isClosed_subset
-    (isClosed_Kset T) fun x hx => ⟨matG_star_mul T hx, ?_⟩
+  have hc :=
+    Formalism.UG.P.isCompact_units_of_unitary (n := Ix p q) (T := {M | star M * M = 1})
+      (isClosed_eq (continuous_star.matrix_mul continuous_id) continuous_const) (fun M hM => hM)
+  refine ((GlobalTheory.RealPar.SqInt.isClosedEmbedding_emb T).isCompact_preimage
+    (hc.prod hS)).of_isClosed_subset (isClosed_Kset T) fun x hx => ⟨matG_star_mul T hx, ?_⟩
   simpa using GlobalTheory.RealPar.Cover.norm_sq x
 
 end GlobalTheory.PolarU

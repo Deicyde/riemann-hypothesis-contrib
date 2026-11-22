@@ -10,10 +10,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal GlobalTheory.StringRepresentationDecomposition
+open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions
+  Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal
+  GlobalTheory.StringRepresentationDecomposition
 noncomputable section
 namespace UpperTheory.GalS
-theorem lgc_of_cut'_alt (D : D7) (hA : _root_.Formalism.MainNotions.SumRepresentations.AdmAAlt D) (hC : UpperTheory.GalC.CutRec D) : LGCN D := by
+theorem lgc_of_cut'_alt
+    (D : D7) (hA : _root_.Formalism.MainNotions.SumRepresentations.AdmAAlt D)
+    (hC : UpperTheory.GalC.CutRec D)
+    : LGCN D := by
   intro i r hr w hw x
   have ht := hA.1
   have h1 := hA.2.2.1
@@ -37,7 +42,8 @@ theorem lgc_of_cut'_alt (D : D7) (hA : _root_.Formalism.MainNotions.SumRepresent
   · rcases ((D.nd.S_def i w).1 hS).1 with h | h | h
     · exact hC i P hne 0 w h
     · exact hC i P hne 1 w h
-    · refine nonCritical_localParam_of_full_dim D hA.2.2.2.2.2.1 i P w (Or.inl hS) (Or.inr ⟨hS, ?_⟩) hd
+    · refine nonCritical_localParam_of_full_dim D hA.2.2.2.2.2.1 i P w (Or.inl hS) (Or.inr ⟨hS, ?_⟩)
+        hd
       split_ifs at h with he
       · exact Or.inr ⟨he, h⟩
       · exact Or.inl h

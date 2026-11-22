@@ -4,19 +4,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-private theorem bcMap_isPullback {B B' X Y : Scheme.{0}} (g : B ⟶ B') {p : X ⟶ B'} {q : Y ⟶ B'} (f : Y ⟶ X)
-    (h : f ≫ p = q) : IsPullback (pullback.fst q g) (bcMap g f h) f (pullback.fst p g) := by
+private theorem bcMap_isPullback
+    {B B' X Y : Scheme.{0}} (g : B ⟶ B') {p : X ⟶ B'} {q : Y ⟶ B'} (f : Y ⟶ X) (h : f ≫ p = q)
+    : IsPullback (pullback.fst q g) (bcMap g f h) f (pullback.fst p g) := by
   subst h
   refine IsPullback.of_bot ?_ (bcMap_fst g f rfl).symm (IsPullback.of_hasPullback p g)
   rw [bcMap_snd]
   exact IsPullback.of_hasPullback (f ≫ p) g
 
-theorem UpperTheory.Gal.G3.pBcGal :
-    BcSplits → BcGal := by
+theorem UpperTheory.Gal.G3.pBcGal : BcSplits → BcGal := by
   intro hB B B' Z W g p r c hc G _ _ a ha hG
   obtain ⟨hfin, het, hsur, h1, hmul, hsp⟩ := hG
   obtain ⟨f1, f2, f3⟩ := @hB B B' Z W W g p r r c hc c hc G _ a ha hfin het

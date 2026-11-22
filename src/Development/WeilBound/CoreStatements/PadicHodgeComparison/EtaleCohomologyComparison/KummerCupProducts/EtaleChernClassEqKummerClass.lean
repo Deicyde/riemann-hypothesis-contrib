@@ -96,7 +96,8 @@ theorem stCupA : StCupA := GlobalTheory.CompanionTheory.StairCupFirst.stCupA cup
 
 theorem stCupB : StCupB := GlobalTheory.CompanionTheory.Staircase.stCupB cupLeib stCol
 
-theorem edgeCup : EdgeCup := GlobalTheory.CompanionTheory.EdgeMap.edgeCup_of_steps cupCls stTop stCupA stCupB
+theorem edgeCup : EdgeCup :=
+  GlobalTheory.CompanionTheory.EdgeMap.edgeCup_of_steps cupCls stTop stCupA stCupB
 
 theorem lcCover : LcCover := GlobalTheory.CompanionTheory.LcCoverProof.lcCover
 
@@ -124,7 +125,8 @@ theorem logEps : LogEps := GlobalTheory.CompanionTheory.LogEpsP.logEps
 
 theorem epsRoot : EpsRoot := GlobalTheory.CompanionTheory.EpsRootProof.epsRoot
 
-theorem lcLog : LcLog := GlobalTheory.CompanionTheory.LcLogProof.lcLog lcIdem lcSpec lcCover logEx logMul logEps epsRoot
+theorem lcLog : LcLog :=
+  GlobalTheory.CompanionTheory.LcLogProof.lcLog lcIdem lcSpec lcCover logEx logMul logEps epsRoot
 
 theorem lineBC : LineBC := GlobalTheory.CompanionTheory.LineBase.lineBC
 
@@ -136,13 +138,16 @@ theorem fKum : FKum := GlobalTheory.CompanionTheory.FKum.fKum rootPow lcLog
 
 theorem liftEx : LiftEx := GlobalTheory.CompanionTheory.LineLift.liftEx
 
-theorem firstChern_unique : FirstChernUniqueEtale := GlobalTheory.CompanionTheory.EtChern.chern_class_unique_of_lift_and_log liftEx logEx
+theorem firstChern_unique : FirstChernUniqueEtale :=
+  GlobalTheory.CompanionTheory.EtChern.chern_class_unique_of_lift_and_log liftEx logEx
 
 theorem repBasic : RepBasic := GlobalTheory.CompanionTheory.EtEdge.repBasic evExt evNat inSch
 
-theorem repConc : RepConc := GlobalTheory.CompanionTheory.EdgeMap.repConc_of_inputs evExt inSch repBasic
+theorem repConc : RepConc :=
+  GlobalTheory.CompanionTheory.EdgeMap.repConc_of_inputs evExt inSch repBasic
 
-theorem repCup : RepCup := GlobalTheory.CompanionTheory.EdgeRep.repCup evExt evNat repBasic repConc inSch
+theorem repCup : RepCup :=
+  GlobalTheory.CompanionTheory.EdgeRep.repCup evExt evNat repBasic repConc inSch
 
 theorem repOp : RepOp := GlobalTheory.CompanionTheory.EdgeRep.repOp evNat repConc repBasic
 
@@ -154,15 +159,19 @@ theorem cechPt : CechPt := GlobalTheory.CompanionTheory.CechPts.cechPt_spec
 
 theorem lineMap : LineMap := GlobalTheory.CompanionTheory.CechLine.lineMap_exists cechPt
 
-theorem chern_class_compatible_system : FirstChernCompatibleSystem := GlobalTheory.CompanionTheory.ChernSys.chern_class_compatible_system cechPt
+theorem chern_class_compatible_system : FirstChernCompatibleSystem :=
+  GlobalTheory.CompanionTheory.ChernSys.chern_class_compatible_system cechPt
 
-theorem firstChern_primitive_kummer : FirstChernCoboundary := GlobalTheory.CompanionTheory.KummerPrimitive.main evExt evNat evDel repConc repBasic cechPt
+theorem firstChern_primitive_kummer : FirstChernCoboundary :=
+  GlobalTheory.CompanionTheory.KummerPrimitive.main evExt evNat evDel repConc repBasic cechPt
 
-theorem resSplit : ResSplit := GlobalTheory.CompanionTheory.ResSplitProof.resSplit resLoc locSplit lcCover
+theorem resSplit : ResSplit :=
+  GlobalTheory.CompanionTheory.ResSplitProof.resSplit resLoc locSplit lcCover
 
 theorem repRoot : RepRoot := GlobalTheory.CompanionTheory.EtRoot.repRoot repConc resZero
 
-theorem redRoot : RedRoot := GlobalTheory.CompanionTheory.EdgeMap.redRoot_of_rep repRoot repOp repConc
+theorem redRoot : RedRoot :=
+  GlobalTheory.CompanionTheory.EdgeMap.redRoot_of_rep repRoot repOp repConc
 
 theorem twZero : TwZero := GlobalTheory.CompanionTheory.TwZeroGen.twZero rootPow lcCover repRoot
 
@@ -174,21 +183,30 @@ theorem kapMul : KapMul := GlobalTheory.CompanionTheory.KapMulE.kapMul_of lcCove
 
 theorem kapRed : KapRed := GlobalTheory.CompanionTheory.CstE.KapRedP.kapRed lcCover repRoot kapSpec
 
-theorem kumPow : KumPow := GlobalTheory.CompanionTheory.KumPowProof.kumPow lcCover repRoot kapSpec primAlg
+theorem kumPow : KumPow :=
+  GlobalTheory.CompanionTheory.KumPowProof.kumPow lcCover repRoot kapSpec primAlg
 
-theorem resGood : ResGood := GlobalTheory.CompanionTheory.EdgeRes.resGood kapSpec kapBij resZero resSplit
+theorem resGood : ResGood :=
+  GlobalTheory.CompanionTheory.EdgeRes.resGood kapSpec kapBij resZero resSplit
 
-theorem etSpec : EtSpec := GlobalTheory.CompanionTheory.EtSpecProof.etSpec resGood stEx edgeUniq repBasic resZero
+theorem etSpec : EtSpec :=
+  GlobalTheory.CompanionTheory.EtSpecProof.etSpec resGood stEx edgeUniq repBasic resZero
 
-theorem etNat : EtNat := GlobalTheory.CompanionTheory.EtNatProof.etNat etSpec edgeMap repBasic kapSpec twZero
+theorem etNat : EtNat :=
+  GlobalTheory.CompanionTheory.EtNatProof.etNat etSpec edgeMap repBasic kapSpec twZero
 
-theorem etRed : EtRed := GlobalTheory.CompanionTheory.EdgeRed.etRed etSpec edgeMap repBasic repOp kapSpec kapRed
+theorem etRed : EtRed :=
+  GlobalTheory.CompanionTheory.EdgeRed.etRed etSpec edgeMap repBasic repOp kapSpec kapRed
 
-theorem etCup : EtCup := GlobalTheory.CompanionTheory.EdgeProduct.etCup etSpec resGood edgeCup repBasic repCup kapMul
+theorem etCup : EtCup :=
+  GlobalTheory.CompanionTheory.EdgeProduct.etCup etSpec resGood edgeCup repBasic repCup kapMul
 
-theorem etRoot : EtRoot := GlobalTheory.CompanionTheory.EdgeRoot.etRoot_of_spec etSpec repRoot kapSpec
+theorem etRoot : EtRoot :=
+  GlobalTheory.CompanionTheory.EdgeRoot.etRoot_of_spec etSpec repRoot kapSpec
 
-theorem etale_chern_class_eq_kummer_class : EtaleFirstChernKummer := GlobalTheory.CompanionTheory.EtaleChernClass.etale_chern_class_eq_kummer_class etSpec resGood stCol firstChern_primitive_kummer kumPow
+theorem etale_chern_class_eq_kummer_class : EtaleFirstChernKummer :=
+  GlobalTheory.CompanionTheory.EtaleChernClass.etale_chern_class_eq_kummer_class etSpec resGood
+    stCol firstChern_primitive_kummer kumPow
 
 theorem fRed : FRed := GlobalTheory.CompanionTheory.EtReduction.fred_of_etRed etRed
 
@@ -204,8 +222,11 @@ theorem fRoot : FRoot := GlobalTheory.CompanionTheory.FRootCls.froot etRoot redR
 
 theorem fUntw : FUntw := GlobalTheory.CompanionTheory.FUntwPf.main fCup fRoot cupOne
 
-theorem firstChern_family : FirstChernClassFamily := firstChern_family_of_lifts lineBC lineMap chern_class_compatible_system etale_chern_class_eq_kummer_class fKum fRes fUntw
+theorem firstChern_family : FirstChernClassFamily :=
+  firstChern_family_of_lifts lineBC lineMap chern_class_compatible_system
+    etale_chern_class_eq_kummer_class fKum fRes fUntw
 
-theorem etale_comparison_map : EtaleComparisonMapExists := etale_comparison_map_of_facts rootsEx lcNat fRed fEqui fPhi fNat fCup fRoot firstChern_family
+theorem etale_comparison_map : EtaleComparisonMapExists :=
+  etale_comparison_map_of_facts rootsEx lcNat fRed fEqui fPhi fNat fCup fRoot firstChern_family
 
 end CrystallineSemistableComparison.E.Main

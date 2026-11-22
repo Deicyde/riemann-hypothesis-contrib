@@ -5,7 +5,8 @@ public import Formalism.LocalToGlobal.Divisibility.RecBridge
 @[expose] public section
 
 open Module NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.L2.DIV Formalism.L2.Indef Formalism.HermitianLatticesTheory
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.L2.DIV Formalism.L2.Indef
+  Formalism.HermitianLatticesTheory
 
 noncomputable section
 
@@ -13,44 +14,57 @@ namespace Formalism.L2.DIV.Cons
 
 variable {D : D7}
 
-def nuOf (L : SizeData₂ D) (u : D.what₂.Word) {d : ℕ} (e : (Fin d → D.what₂.LL) ≃ₗ[D.what₂.LL] (D.div.Nu u).V) :
-    Submodule (𝓞 D.what₂.LL) (Fin d → D.what₂.LL) :=
-  (L.NuLat u).comap ((e : (Fin d → D.what₂.LL) →ₗ[D.what₂.LL] (D.div.Nu u).V).restrictScalars (𝓞 D.what₂.LL))
+def nuOf
+    (L : SizeData₂ D)
+    (u : D.what₂.Word)
+    {d : ℕ} (e : (Fin d → D.what₂.LL) ≃ₗ[D.what₂.LL] (D.div.Nu u).V)
+    : Submodule (𝓞 D.what₂.LL) (Fin d → D.what₂.LL) :=
+  (L.NuLat u).comap
+    ((e : (Fin d → D.what₂.LL) →ₗ[D.what₂.LL] (D.div.Nu u).V).restrictScalars (𝓞 D.what₂.LL))
 
-private theorem sg_eq_zero_of_not_mem_supp (L : SizeData₂ D) (u : D.what₂.Word) (w : D.what₂.places.Pl) (hw : w ∉ L.supp) :
-    L.sg u w = 0 := by
+private theorem sg_eq_zero_of_not_mem_supp
+    (L : SizeData₂ D) (u : D.what₂.Word) (w : D.what₂.places.Pl) (hw : w ∉ L.supp)
+    : L.sg u w = 0 := by
   unfold Formalism.BasicNotions.SizeData₂.sg
   refine Finset.sum_eq_zero fun j _ => ?_
-  simp [Formalism.BasicNotions.SizeData₂.gainD, L.gain_supp j w hw, L.F_supp j w hw, L.E_supp u j w hw]
+  simp [Formalism.BasicNotions.SizeData₂.gainD, L.gain_supp j w hw, L.F_supp j w hw,
+    L.E_supp u j w hw]
 
-private theorem shiftIdeal_shiftZ_sgRec_eq_Iu (L : SizeData₂ D) (u : D.what₂.Word) :
-    Formalism.DivisionValues.shiftIdeal (shiftZ (sgRec L u)) = Formalism.BasicNotions.DV.Iu D L u := by
-  have hfun : ∀ i, shiftZ (sgRec L u) (D.plEq i) = ⌊Formalism.BasicNotions.DV.ur D i (L.sg u i)⌋ := by
+private theorem shiftIdeal_shiftZ_sgRec_eq_Iu (L : SizeData₂ D) (u : D.what₂.Word)
+    : Formalism.DivisionValues.shiftIdeal (shiftZ (sgRec L u))
+      = Formalism.BasicNotions.DV.Iu D L u := by
+  have hfun
+      : ∀ i, shiftZ (sgRec L u) (D.plEq i) = ⌊Formalism.BasicNotions.DV.ur D i (L.sg u i)⌋ := by
     intro i
     simp [shiftZ, sgRec]
-  calc Formalism.DivisionValues.shiftIdeal (shiftZ (sgRec L u))
-      = ∏ᶠ i, ((D.plEq i).asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 D.what₂.LL)) D.what₂.LL) ^
-          (-(shiftZ (sgRec L u) (D.plEq i))) := by
-        rw [Formalism.DivisionValues.shiftIdeal]
-        exact (finprod_comp_equiv D.plEq).symm
+  calc
+    Formalism.DivisionValues.shiftIdeal (shiftZ (sgRec L u))
+        = ∏ᶠ i, ((D.plEq i).asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 D.what₂.LL)) D.what₂.LL) ^
+            (-(shiftZ (sgRec L u) (D.plEq i))) := by
+      rw [Formalism.DivisionValues.shiftIdeal]
+      exact (finprod_comp_equiv D.plEq).symm
     _ = ∏ᶠ i, ((D.plEq i).asIdeal : FractionalIdeal (nonZeroDivisors (𝓞 D.what₂.LL)) D.what₂.LL) ^
           (-⌊Formalism.BasicNotions.DV.ur D i (L.sg u i)⌋) := by
-        simp only [hfun]
+      simp only [hfun]
     _ = Formalism.BasicNotions.DV.Iu D L u := by
-        unfold Formalism.BasicNotions.DV.Iu
-        refine finprod_eq_prod_of_mulSupport_subset _ ?_
-        intro i hi
-        rw [Function.mem_mulSupport] at hi
-        by_contra hs
-        have hs' : i ∉ L.supp := fun h => hs (Finset.mem_coe.2 h)
-        apply hi
-        simp [sg_eq_zero_of_not_mem_supp L u i hs', Formalism.BasicNotions.DV.ur]
+      unfold Formalism.BasicNotions.DV.Iu
+      refine finprod_eq_prod_of_mulSupport_subset _ ?_
+      intro i hi
+      rw [Function.mem_mulSupport] at hi
+      by_contra hs
+      have hs' : i ∉ L.supp := fun h => hs (Finset.mem_coe.2 h)
+      apply hi
+      simp [sg_eq_zero_of_not_mem_supp L u i hs', Formalism.BasicNotions.DV.ur]
 
-theorem shift_nuOf (L : SizeData₂ D) (hN : NprimeDef D L) (u : D.what₂.Word) {d : ℕ}
-    (e : (Fin d → D.what₂.LL) ≃ₗ[D.what₂.LL] (D.div.Nu u).V) (NuC : Submodule (𝓞 D.what₂.LL) (Fin d → D.what₂.LL))
-    (hlat : (D.div.Nu u).L =
-      NuC.map ((e : (Fin d → D.what₂.LL) →ₗ[D.what₂.LL] (D.div.Nu u).V).restrictScalars (𝓞 D.what₂.LL))) :
-    NuC = shiftLat (nuOf L u e) (sgRec L u) := by
+theorem shift_nuOf
+    (L : SizeData₂ D) (hN : NprimeDef D L)
+    (u : D.what₂.Word)
+    {d : ℕ} (e : (Fin d → D.what₂.LL) ≃ₗ[D.what₂.LL] (D.div.Nu u).V)
+    (NuC : Submodule (𝓞 D.what₂.LL) (Fin d → D.what₂.LL))
+    (hlat : (D.div.Nu u).L
+      = NuC.map
+        ((e : (Fin d → D.what₂.LL) →ₗ[D.what₂.LL] (D.div.Nu u).V).restrictScalars (𝓞 D.what₂.LL)))
+    : NuC = shiftLat (nuOf L u e) (sgRec L u) := by
   have finj : Function.Injective
       ((e : (Fin d → D.what₂.LL) →ₗ[D.what₂.LL] (D.div.Nu u).V).restrictScalars (𝓞 D.what₂.LL)) :=
     fun x y h => e.injective h
@@ -74,7 +88,8 @@ theorem shift_nuOf (L : SizeData₂ D) (hN : NprimeDef D L) (u : D.what₂.Word)
     · show e (a • x) = a • e x
       exact map_smul e a x
 
-theorem sgRec_fin (L : SizeData₂ D) (u : D.what₂.Word) : (Function.support (shiftZ (sgRec L u))).Finite := by
+theorem sgRec_fin (L : SizeData₂ D) (u : D.what₂.Word)
+    : (Function.support (shiftZ (sgRec L u))).Finite := by
   refine (L.supp.finite_toSet.image D.plEq).subset ?_
   intro w hw
   rw [Function.mem_support] at hw

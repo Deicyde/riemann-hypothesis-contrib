@@ -32,21 +32,21 @@ private lemma quad_err {ι : Type} [Fintype ι] (E : ι → ι → ℝ) (η : �
     _ = (Fintype.card ι : ℝ) ^ 2 * (‖c‖ ^ 2 * η) := by
         simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]; ring
 
-theorem posDef_quad_margin {ι : Type} [Fintype ι] (M : ι → ι → ℝ)
-    (hM : ∀ c : ι → ℝ, c ≠ 0 → 0 < ∑ i, ∑ j, c i * c j * M i j) :
-    ∃ η : ℝ, 0 < η ∧ ∀ E : ι → ι → ℝ, (∀ i j, |E i j| ≤ η) →
-      ∀ c : ι → ℝ, c ≠ 0 → 0 < ∑ i, ∑ j, c i * c j * (M i j + E i j) := by
+theorem posDef_quad_margin
+    {ι : Type} [Fintype ι]
+    (M : ι → ι → ℝ) (hM : ∀ c : ι → ℝ, c ≠ 0 → 0 < ∑ i, ∑ j, c i * c j * M i j)
+    : ∃ η : ℝ,
+      0 < η
+        ∧ ∀ E : ι → ι → ℝ,
+          (∀ i j, |E i j| ≤ η)
+            → ∀ c : ι → ℝ, c ≠ 0 → 0 < ∑ i, ∑ j, c i * c j * (M i j + E i j) := by
   rcases isEmpty_or_nonempty ι with hι | hι
   · exact ⟨1, one_pos, fun E _ c hc => absurd (Subsingleton.elim c 0) hc⟩
   set q : (ι → ℝ) → ℝ := fun c => ∑ i, ∑ j, c i * c j * M i j with hq
-  have hcont : Continuous q := by
-    simp only [hq]; fun_prop
-  have hne : (Metric.sphere (0 : ι → ℝ) 1).Nonempty :=
-    (NormedSpace.sphere_nonempty).mpr zero_le_one
-  obtain ⟨c₀, hc₀, hmin⟩ :=
-    (isCompact_sphere (0 : ι → ℝ) 1).exists_isMinOn hne hcont.continuousOn
-  have hc₀ne : c₀ ≠ 0 := by
-    rintro rfl; simp at hc₀
+  have hcont : Continuous q := by simp only [hq]; fun_prop
+  have hne : (Metric.sphere (0 : ι → ℝ) 1).Nonempty := (NormedSpace.sphere_nonempty).mpr zero_le_one
+  obtain ⟨c₀, hc₀, hmin⟩ := (isCompact_sphere (0 : ι → ℝ) 1).exists_isMinOn hne hcont.continuousOn
+  have hc₀ne : c₀ ≠ 0 := by rintro rfl; simp at hc₀
   set μ := q c₀ with hμ
   have hμpos : 0 < μ := hM c₀ hc₀ne
   have hlow : ∀ c : ι → ℝ, c ≠ 0 → μ * ‖c‖ ^ 2 ≤ q c := by
@@ -57,9 +57,10 @@ theorem posDef_quad_margin {ι : Type} [Fintype ι] (M : ι → ι → ℝ)
     have h1 : μ ≤ q (‖c‖⁻¹ • c) := hmin hmem
     have h2 : q (‖c‖⁻¹ • c) = (‖c‖⁻¹) ^ 2 * q c := quad_smul M _ c
     rw [h2] at h1
-    have h3 : (‖c‖⁻¹) ^ 2 * ‖c‖ ^ 2 = 1 := by
-      rw [← mul_pow, inv_mul_cancel₀ hs.ne', one_pow]
-    calc μ * ‖c‖ ^ 2 ≤ ((‖c‖⁻¹) ^ 2 * q c) * ‖c‖ ^ 2 := by gcongr
+    have h3 : (‖c‖⁻¹) ^ 2 * ‖c‖ ^ 2 = 1 := by rw [← mul_pow, inv_mul_cancel₀ hs.ne', one_pow]
+    calc
+      μ * ‖c‖ ^ 2
+        ≤ ((‖c‖⁻¹) ^ 2 * q c) * ‖c‖ ^ 2 := by gcongr
       _ = q c := by rw [mul_comm ((‖c‖⁻¹) ^ 2), mul_assoc, h3, mul_one]
   set K : ℝ := (Fintype.card ι : ℝ) ^ 2 with hK
   have hK0 : 0 ≤ K := sq_nonneg _
@@ -68,8 +69,7 @@ theorem posDef_quad_margin {ι : Type} [Fintype ι] (M : ι → ι → ℝ)
   have hη0 : 0 ≤ μ / (2 * K + 1) := (div_pos hμpos (by linarith)).le
   have herr := quad_err E _ hη0 hE c
   have hs : 0 < ‖c‖ := norm_pos_iff.mpr hc
-  have hsplit : ∑ i, ∑ j, c i * c j * (M i j + E i j)
-      = q c + ∑ i, ∑ j, c i * c j * E i j := by
+  have hsplit : ∑ i, ∑ j, c i * c j * (M i j + E i j) = q c + ∑ i, ∑ j, c i * c j * E i j := by
     simp only [hq, mul_add, Finset.sum_add_distrib]
   rw [hsplit]
   have hKη : K * (μ / (2 * K + 1)) < μ := by

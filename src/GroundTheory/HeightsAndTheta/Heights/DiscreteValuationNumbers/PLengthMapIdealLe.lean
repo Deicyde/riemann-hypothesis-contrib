@@ -15,8 +15,8 @@ open IsLocalRing
 
 theorem LengthMapIdealLe.proof : LengthMapIdealLe.Statement.{u} := by
   intro C D _ _ _ φ hφ
-  suffices key : ∀ n : ℕ, ∀ I : Ideal C, Module.length C (C ⧸ I) = n →
-      Module.length D (D ⧸ I.map φ) ≤ n by
+  suffices key
+      : ∀ n : ℕ, ∀ I : Ideal C, Module.length C (C ⧸ I) = n → Module.length D (D ⧸ I.map φ) ≤ n by
     intro I
     cases h : Module.length C (C ⧸ I) with
     | top => exact le_top
@@ -39,7 +39,8 @@ theorem LengthMapIdealLe.proof : LengthMapIdealLe.Statement.{u} := by
     have : Nontrivial (C ⧸ I) :=
       Module.length_pos_iff.mp (by rw [hI]; exact_mod_cast Nat.succ_pos n)
     have : IsAtomic (Submodule C (C ⧸ I)) := isAtomic_of_orderBot_wellFounded_lt wellFounded_lt
-    obtain ⟨N, hN, -⟩ := (eq_bot_or_exists_atom_le (⊤ : Submodule C (C ⧸ I))).resolve_left top_ne_bot
+    obtain ⟨N, hN, -⟩ :=
+      (eq_bot_or_exists_atom_le (⊤ : Submodule C (C ⧸ I))).resolve_left top_ne_bot
     have hNs : IsSimpleModule C N := isSimpleModule_iff_isAtom.mpr hN
 
     have hlen : Module.length C (C ⧸ I) = Module.length C N + Module.length C ((C ⧸ I) ⧸ N) :=
@@ -98,7 +99,9 @@ theorem LengthMapIdealLe.proof : LengthMapIdealLe.Statement.{u} := by
     set J' : Ideal D := I'.map φ
     have hJJ' : J ≤ J' := Ideal.map_mono hII'
     have hJ'le : J' ≤ J ⊔ Ideal.span {φ c} := by
-      calc J' ≤ (I ⊔ Ideal.span {c}).map φ := Ideal.map_mono hI'le
+      calc
+        J'
+          ≤ (I ⊔ Ideal.span {c}).map φ := Ideal.map_mono hI'le
         _ = J ⊔ Ideal.span {φ c} := by rw [Ideal.map_sup, Ideal.map_span, Set.image_singleton]
     set w : D ⧸ J := Submodule.Quotient.mk (p := J) (φ c)
     set K : Submodule D (D ⧸ J) := Submodule.map (Submodule.mkQ J) J'
@@ -111,13 +114,14 @@ theorem LengthMapIdealLe.proof : LengthMapIdealLe.Statement.{u} := by
       exact Submodule.smul_mem _ b (Submodule.mem_span_singleton_self w)
     have hlenD : Module.length D (D ⧸ J) = Module.length D K + Module.length D (D ⧸ J') := by
       rw [Module.length_eq_add_of_exact K.subtype K.mkQ K.injective_subtype K.mkQ_surjective
-        (LinearMap.exact_subtype_mkQ K), (Submodule.quotientQuotientEquivQuotient J J' hJJ').length_eq]
+          (LinearMap.exact_subtype_mkQ K),
+        (Submodule.quotientQuotientEquivQuotient J J' hJJ').length_eq]
 
     have hmX : m.map φ ≤ LinearMap.ker (LinearMap.toSpanSingleton D (D ⧸ J) w) := by
       rw [Ideal.map_le_iff_le_comap]
       intro x hx
-      rw [Ideal.mem_comap, LinearMap.mem_ker, LinearMap.toSpanSingleton_apply, ← Submodule.Quotient.mk_smul,
-        smul_eq_mul, ← map_mul, Submodule.Quotient.mk_eq_zero]
+      rw [Ideal.mem_comap, LinearMap.mem_ker, LinearMap.toSpanSingleton_apply,
+        ← Submodule.Quotient.mk_smul, smul_eq_mul, ← map_mul, Submodule.Quotient.mk_eq_zero]
       exact Ideal.mem_map_of_mem φ (hmc x hx)
     have hKle1 : Module.length D K ≤ 1 := by
       rcases hφ m hm with htop | hle
@@ -135,13 +139,17 @@ theorem LengthMapIdealLe.proof : LengthMapIdealLe.Statement.{u} := by
           rw [Submodule.range_liftQ, LinearMap.range_toSpanSingleton]
         have : IsSimpleModule D (D ⧸ maximalIdeal D) :=
           isSimpleModule_iff_quot_maximal.mpr ⟨_, inferInstance, ⟨LinearEquiv.refl _ _⟩⟩
-        calc Module.length D K ≤ Module.length D (Submodule.span D {w}) :=
-              Module.length_le_of_injective (Submodule.inclusion hK) (Submodule.inclusion_injective hK)
+        calc
+          Module.length D K ≤ Module.length D (Submodule.span D {w}) :=
+            Module.length_le_of_injective (Submodule.inclusion hK)
+              (Submodule.inclusion_injective hK)
           _ = Module.length D (LinearMap.range f) := by rw [hrange]
           _ ≤ Module.length D (D ⧸ maximalIdeal D) :=
-              Module.length_le_of_surjective f.rangeRestrict f.surjective_rangeRestrict
+            Module.length_le_of_surjective f.rangeRestrict f.surjective_rangeRestrict
           _ = 1 := Module.length_eq_one _ _
-    calc Module.length D (D ⧸ I.map φ) = Module.length D K + Module.length D (D ⧸ J') := hlenD
+    calc
+      Module.length D (D ⧸ I.map φ)
+        = Module.length D K + Module.length D (D ⧸ J') := hlenD
       _ ≤ 1 + n := add_le_add hKle1 ih'
       _ = ((n + 1 : ℕ) : ℕ∞) := by push_cast; ring
 

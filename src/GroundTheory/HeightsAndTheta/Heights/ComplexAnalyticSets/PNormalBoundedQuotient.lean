@@ -13,9 +13,9 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology
 
-theorem monic_eval_div_mul_pow {d : ℕ} (a : Fin d → ℂ) {F G : ℂ} (hG : G ≠ 0) :
-    F ^ d + ∑ j : Fin d, a j * F ^ (j : ℕ) * G ^ (d - (j : ℕ)) =
-      G ^ d * ((F / G) ^ d + ∑ j : Fin d, a j * (F / G) ^ (j : ℕ)) := by
+theorem monic_eval_div_mul_pow {d : ℕ} (a : Fin d → ℂ) {F G : ℂ} (hG : G ≠ 0)
+    : F ^ d + ∑ j : Fin d, a j * F ^ (j : ℕ) * G ^ (d - (j : ℕ))
+      = G ^ d * ((F / G) ^ d + ∑ j : Fin d, a j * (F / G) ^ (j : ℕ)) := by
   rw [mul_add, Finset.mul_sum, div_pow, mul_div_cancel₀ _ (pow_ne_zero _ hG)]
   congr 1
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -24,14 +24,21 @@ theorem monic_eval_div_mul_pow {d : ℕ} (a : Fin d → ℂ) {F G : ℂ} (hG : G
   rw [hGd, div_pow]
   field_simp
 
-theorem NormalBoundedQuotient.proof (hwi : WeaklyHolomorphicIntegral.Statement)
-    (hic : NormalGermIntegrallyClosed.Statement) : NormalBoundedQuotient.Statement := by
+theorem NormalBoundedQuotient.proof
+    (hwi : WeaklyHolomorphicIntegral.Statement) (hic : NormalGermIntegrallyClosed.Statement)
+    : NormalBoundedQuotient.Statement := by
   intro σ _ I w N F G hI hIc hw hN hwN hF hG hnv hb
 
   have hhol : HolomorphicOnSubset (fun z => F z / G z) ((zeroSetIn I ∩ N) \ {z | G z = 0}) := by
     intro z hz
-    refine ⟨N ∩ G ⁻¹' {0}ᶜ, hG.continuousOn.isOpen_inter_preimage hN isOpen_compl_singleton,
-      ⟨hz.1.2, hz.2⟩, fun z => F z / G z, ?_, fun _ _ => rfl⟩
+    refine ⟨
+      N ∩ G ⁻¹' {0}ᶜ,
+      hG.continuousOn.isOpen_inter_preimage hN isOpen_compl_singleton,
+      ⟨hz.1.2, hz.2⟩,
+      fun z => F z / G z,
+      ?_,
+      fun _ _ => rfl
+    ⟩
     have hsub : N ∩ G ⁻¹' {0}ᶜ ⊆ N := Set.inter_subset_left
     simp only [div_eq_mul_inv]
     exact (hF.mono hsub).mul ((hG.mono hsub).inv fun y (hy : y ∈ N ∩ G ⁻¹' {0}ᶜ) => hy.2)

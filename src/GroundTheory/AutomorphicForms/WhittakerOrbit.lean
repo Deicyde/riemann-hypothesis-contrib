@@ -41,11 +41,13 @@ end Translation
 
 section Relations
 
-variable {X : Type*} [TopologicalSpace X] {H : Type*} [Group H] [TopologicalSpace H]
-  [MulAction H X] [ContinuousSMul H X]
+variable
+  {X : Type*} [TopologicalSpace X]
+  {H : Type*} [Group H] [TopologicalSpace H] [MulAction H X] [ContinuousSMul H X]
 
-theorem transl_mem_supportedIn {U : Set X} (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) (h : H)
-    {f : X → ℂ} (hf : f ∈ supportedIn U) : transl h f ∈ supportedIn U := by
+theorem transl_mem_supportedIn
+    {U : Set X} (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) (h : H) {f : X → ℂ} (hf : f ∈ supportedIn U)
+    : transl h f ∈ supportedIn U := by
   refine ⟨⟨hf.1.1.comp_continuous (continuous_const_smul h⁻¹), ?_⟩, ?_⟩
   · exact hf.1.2.comp_homeomorph (Homeomorph.smul h⁻¹)
   · intro x hx
@@ -56,29 +58,27 @@ def relSpan (χ : H →* ℂ) (U : Set X) : Submodule ℂ (X → ℂ) :=
   Submodule.span ℂ {g | ∃ h : H, ∃ f ∈ supportedIn U, g = transl h f - χ h • f}
 
 omit [TopologicalSpace H] [ContinuousSMul H X] in
-theorem sub_mem_relSpan (χ : H →* ℂ) {U : Set X} (h : H) {f : X → ℂ} (hf : f ∈ supportedIn U) :
-    transl h f - χ h • f ∈ relSpan χ U :=
+theorem sub_mem_relSpan (χ : H →* ℂ) {U : Set X} (h : H) {f : X → ℂ} (hf : f ∈ supportedIn U)
+    : transl h f - χ h • f ∈ relSpan χ U :=
   Submodule.subset_span ⟨h, f, hf, rfl⟩
 
-theorem relSpan_le_supportedIn (χ : H →* ℂ) {U : Set X}
-    (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) : relSpan χ U ≤ supportedIn U := by
+theorem relSpan_le_supportedIn (χ : H →* ℂ) {U : Set X} (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U)
+    : relSpan χ U ≤ supportedIn U := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨h, f, hf, rfl⟩
-  exact (supportedIn U).sub_mem (transl_mem_supportedIn hUinv h hf)
-    ((supportedIn U).smul_mem _ hf)
+  exact (supportedIn U).sub_mem (transl_mem_supportedIn hUinv h hf) ((supportedIn U).smul_mem _ hf)
 
 end Relations
 
 section Orbit
 
-variable {X : Type*} [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X]
-  [TotallyDisconnectedSpace X]
-  {H : Type*} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
-  [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H]
-  [MulAction H X] [ContinuousSMul H X]
+variable
+  {X : Type*} [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
+  {H : Type*}
+  [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
+  [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [MulAction H X] [ContinuousSMul H X]
 
 def orbitPiece (L : Subgroup H) (y : X) : Set X := (fun l : H => l • y) '' (L : Set H)
-
 
 omit [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
   [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
@@ -89,17 +89,16 @@ theorem self_mem_orbitPiece (L : Subgroup H) (y : X) : y ∈ orbitPiece L y :=
 omit [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
   [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
   [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [ContinuousSMul H X] in
-theorem orbitPiece_subset_orbit {L : Subgroup H} {x₀ y : X} (hy : y ∈ orbit H x₀) :
-    orbitPiece L y ⊆ orbit H x₀ := by
+theorem orbitPiece_subset_orbit {L : Subgroup H} {x₀ y : X} (hy : y ∈ orbit H x₀)
+    : orbitPiece L y ⊆ orbit H x₀ := by
   rintro _ ⟨l, -, rfl⟩
   exact mem_orbit_of_mem_orbit l hy
-
 
 omit [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
   [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
   [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [ContinuousSMul H X] in
-theorem orbitPiece_eq_of_mem {L : Subgroup H} {y z : X} (hz : z ∈ orbitPiece L y) :
-    orbitPiece L z = orbitPiece L y := by
+theorem orbitPiece_eq_of_mem {L : Subgroup H} {y z : X} (hz : z ∈ orbitPiece L y)
+    : orbitPiece L z = orbitPiece L y := by
   obtain ⟨l, hl, rfl⟩ := hz
   ext x
   constructor
@@ -109,23 +108,23 @@ theorem orbitPiece_eq_of_mem {L : Subgroup H} {y z : X} (hz : z ∈ orbitPiece L
     refine ⟨m * l⁻¹, L.mul_mem hm (L.inv_mem hl), ?_⟩
     simp [mul_smul]
 
-
 omit [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
   [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
   [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [ContinuousSMul H X] in
-theorem orbitPiece_eq_or_disjoint (L : Subgroup H) (y z : X) :
-    orbitPiece L y = orbitPiece L z ∨ Disjoint (orbitPiece L y) (orbitPiece L z) := by
+theorem orbitPiece_eq_or_disjoint (L : Subgroup H) (y z : X)
+    : orbitPiece L y = orbitPiece L z ∨ Disjoint (orbitPiece L y) (orbitPiece L z) := by
   by_cases h : Disjoint (orbitPiece L y) (orbitPiece L z)
   · exact Or.inr h
   · obtain ⟨x, hxy, hxz⟩ := Set.not_disjoint_iff.1 h
     exact Or.inl ((orbitPiece_eq_of_mem hxy).symm.trans (orbitPiece_eq_of_mem hxz))
 
-
 omit [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
   [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
   [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [ContinuousSMul H X] in
-theorem smul_orbitPiece {A : Subgroup H} {j : H} (hj : ∀ a ∈ A, j * a * j⁻¹ ∈ A)
-    (hj' : ∀ a ∈ A, j⁻¹ * a * j ∈ A) (y : X) : j • orbitPiece A y = orbitPiece A (j • y) := by
+theorem smul_orbitPiece
+    {A : Subgroup H} {j : H} (hj : ∀ a ∈ A, j * a * j⁻¹ ∈ A) (hj' : ∀ a ∈ A, j⁻¹ * a * j ∈ A)
+    (y : X)
+    : j • orbitPiece A y = orbitPiece A (j • y) := by
   ext x
   constructor
   · rintro ⟨_, ⟨a, ha, rfl⟩, rfl⟩
@@ -135,12 +134,11 @@ theorem smul_orbitPiece {A : Subgroup H} {j : H} (hj : ∀ a ∈ A, j * a * j⁻
     refine ⟨(j⁻¹ * a * j) • y, ⟨j⁻¹ * a * j, hj' a ha, rfl⟩, ?_⟩
     simp [mul_smul]
 
-
 omit [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
   [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
   [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [ContinuousSMul H X] in
-theorem orbitPiece_smul (L : Subgroup H) (h : H) (y : X) :
-    orbitPiece L (h • y) = h • orbitPiece (L.map (MulAut.conj h⁻¹).toMonoidHom) y := by
+theorem orbitPiece_smul (L : Subgroup H) (h : H) (y : X)
+    : orbitPiece L (h • y) = h • orbitPiece (L.map (MulAut.conj h⁻¹).toMonoidHom) y := by
   ext x
   constructor
   · rintro ⟨l, hl, rfl⟩
@@ -152,19 +150,19 @@ theorem orbitPiece_smul (L : Subgroup H) (h : H) (y : X) :
 
 omit [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [IsTopologicalGroup H]
   [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H] in
-theorem isCompact_orbitPiece {L : Subgroup H} (hL : IsCompact (L : Set H)) (y : X) :
-    IsCompact (orbitPiece L y) :=
+theorem isCompact_orbitPiece {L : Subgroup H} (hL : IsCompact (L : Set H)) (y : X)
+    : IsCompact (orbitPiece L y) :=
   hL.image (continuous_id.smul continuous_const)
 
-
-omit [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [T2Space X]
-  [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [ContinuousSMul H X] in
-theorem isCompact_isOpen_map_conj {L : Subgroup H} (hLc : IsCompact (L : Set H))
-    (hLo : IsOpen (L : Set H)) (h : H) :
-    IsCompact ((L.map (MulAut.conj h).toMonoidHom : Subgroup H) : Set H) ∧
-      IsOpen ((L.map (MulAut.conj h).toMonoidHom : Subgroup H) : Set H) := by
-  have e : ((L.map (MulAut.conj h).toMonoidHom : Subgroup H) : Set H) =
-      ((Homeomorph.mulLeft h).trans (Homeomorph.mulRight h⁻¹)) '' (L : Set H) := by
+omit [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H]
+  [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [ContinuousSMul H X] in
+theorem isCompact_isOpen_map_conj
+    {L : Subgroup H} (hLc : IsCompact (L : Set H)) (hLo : IsOpen (L : Set H)) (h : H)
+    : IsCompact ((L.map (MulAut.conj h).toMonoidHom : Subgroup H) : Set H)
+      ∧ IsOpen ((L.map (MulAut.conj h).toMonoidHom : Subgroup H) : Set H) := by
+  have e
+      : ((L.map (MulAut.conj h).toMonoidHom : Subgroup H) : Set H)
+        = ((Homeomorph.mulLeft h).trans (Homeomorph.mulRight h⁻¹)) '' (L : Set H) := by
     ext x
     simp [Subgroup.coe_map, MulAut.conj_apply]
   rw [e]
@@ -174,18 +172,20 @@ omit [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [IsTopolog
   [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H] in
 theorem continuousSMul_orbit (x₀ : X) : ContinuousSMul H (orbit H x₀) := by
   refine ⟨continuous_induced_rng.2 ?_⟩
-  have : ((Subtype.val : orbit H x₀ → X) ∘ fun p : H × orbit H x₀ => p.1 • p.2) =
-      fun p : H × orbit H x₀ => p.1 • (p.2 : X) := by
+  have : ((Subtype.val : orbit H x₀ → X) ∘ fun p : H × orbit H x₀ => p.1 • p.2)
+      = fun p : H × orbit H x₀ => p.1 • (p.2 : X) := by
     funext p
     rfl
   rw [this]
   exact continuous_fst.smul (continuous_subtype_val.comp continuous_snd)
 
-
-omit [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [TotallyDisconnectedSpace X] in
-theorem isOpen_orbitPiece {x₀ : X} (hO : IsLocallyClosed (orbit H x₀)) {L : Subgroup H}
-    (hLo : IsOpen (L : Set H)) {y : X} (hy : y ∈ orbit H x₀) :
-    IsOpen ((Subtype.val : orbit H x₀ → X) ⁻¹' orbitPiece L y) := by
+omit [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H]
+  [TotallyDisconnectedSpace X] in
+theorem isOpen_orbitPiece
+    {x₀ : X} (hO : IsLocallyClosed (orbit H x₀))
+    {L : Subgroup H} (hLo : IsOpen (L : Set H))
+    {y : X} (hy : y ∈ orbit H x₀)
+    : IsOpen ((Subtype.val : orbit H x₀ → X) ⁻¹' orbitPiece L y) := by
   have : LocallyCompactSpace (orbit H x₀) := hO.locallyCompactSpace
   have := continuousSMul_orbit (H := H) x₀
   have hmap := isOpenMap_smul_of_sigmaCompact (G := H) (X := orbit H x₀) ⟨y, hy⟩ _ hLo
@@ -198,12 +198,13 @@ theorem isOpen_orbitPiece {x₀ : X} (hO : IsLocallyClosed (orbit H x₀)) {L : 
   · rintro ⟨l, hl, e⟩
     exact ⟨l, hl, congrArg Subtype.val e⟩
 
-
 omit [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] in
-theorem exists_lift_orbit_piece {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X}
-    (hO : U ∩ C = orbit H x₀) {L : Subgroup H} (hLc : IsCompact (L : Set H))
-    (hLo : IsOpen (L : Set H)) {y : X} (hy : y ∈ orbit H x₀) :
-    ∃ f ∈ supportedIn U, ∀ x ∈ orbit H x₀, f x = (orbitPiece L y).indicator 1 x := by
+theorem exists_lift_orbit_piece
+    {U C : Set X} (hU : IsOpen U) (hC : IsClosed C)
+    {x₀ : X} (hO : U ∩ C = orbit H x₀)
+    {L : Subgroup H} (hLc : IsCompact (L : Set H)) (hLo : IsOpen (L : Set H))
+    {y : X} (hy : y ∈ orbit H x₀)
+    : ∃ f ∈ supportedIn U, ∀ x ∈ orbit H x₀, f x = (orbitPiece L y).indicator 1 x := by
   have hOl : IsLocallyClosed (orbit H x₀) := ⟨U, C, hU, hC, hO.symm⟩
   exact exists_lift_indicator hU (hO ▸ inter_subset_left) (orbitPiece_subset_orbit hy)
     (isCompact_orbitPiece hLc y) (isOpen_orbitPiece hOl hLo hy)
@@ -212,13 +213,14 @@ section Base
 
 variable {U C : Set X} {x₀ : X}
 
-
 omit [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [IsTopologicalGroup H]
   [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H]
   [ContinuousSMul H X] [T2Space X] [TopologicalSpace H] in
-theorem sub_mem_of_eqOn_orbit (hO : U ∩ C = orbit H x₀) {f g : X → ℂ} (hf : f ∈ supportedIn U)
-    (hg : g ∈ supportedIn U) (heq : ∀ x ∈ orbit H x₀, f x = g x) :
-    f - g ∈ supportedIn U ⊓ vanishingOn C := by
+theorem sub_mem_of_eqOn_orbit
+    (hO : U ∩ C = orbit H x₀)
+    {f g : X → ℂ}
+    (hf : f ∈ supportedIn U) (hg : g ∈ supportedIn U) (heq : ∀ x ∈ orbit H x₀, f x = g x)
+    : f - g ∈ supportedIn U ⊓ vanishingOn C := by
   refine ⟨(supportedIn U).sub_mem hf hg, fun x hxC => ?_⟩
   by_cases hxU : x ∈ U
   · have hx : x ∈ orbit H x₀ := hO ▸ ⟨hxU, hxC⟩
@@ -227,42 +229,50 @@ theorem sub_mem_of_eqOn_orbit (hO : U ∩ C = orbit H x₀) {f g : X → ℂ} (h
     have h2 : g x = 0 := Function.notMem_support.1 fun h => hxU (hg.2 h)
     simp [h1, h2]
 
-
 omit [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [IsTopologicalGroup H]
   [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H]
   [ContinuousSMul H X] [T2Space X] [TopologicalSpace H] in
-theorem mem_of_eqOn_orbit (hO : U ∩ C = orbit H x₀) {W : Submodule ℂ (X → ℂ)}
-    (hWU : W ≤ supportedIn U) {f g : X → ℂ} (hg : g ∈ supportedIn U)
-    (hf : f ∈ W ⊔ (supportedIn U ⊓ vanishingOn C)) (heq : ∀ x ∈ orbit H x₀, g x = f x) :
-    g ∈ W ⊔ (supportedIn U ⊓ vanishingOn C) := by
+theorem mem_of_eqOn_orbit
+    (hO : U ∩ C = orbit H x₀)
+    {W : Submodule ℂ (X → ℂ)} (hWU : W ≤ supportedIn U)
+    {f g : X → ℂ} (hg : g ∈ supportedIn U) (hf : f ∈ W ⊔ (supportedIn U ⊓ vanishingOn C))
+    (heq : ∀ x ∈ orbit H x₀, g x = f x)
+    : g ∈ W ⊔ (supportedIn U ⊓ vanishingOn C) := by
   have hfU : f ∈ supportedIn U := (sup_le hWU inf_le_left) hf
-  have := (W ⊔ (supportedIn U ⊓ vanishingOn C)).add_mem hf
-    (le_sup_right (a := W) (sub_mem_of_eqOn_orbit hO hg hfU heq))
+  have :=
+    (W ⊔ (supportedIn U ⊓ vanishingOn C)).add_mem hf
+      (le_sup_right (a := W) (sub_mem_of_eqOn_orbit hO hg hfU heq))
   simpa using this
-
 
 omit [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [IsTopologicalGroup H]
   [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [T2Space X]
   [TopologicalSpace H] [ContinuousSMul H X] in
-theorem transl_mem_of_mem (χ : H →* ℂ)
-    {W : Submodule ℂ (X → ℂ)} (hWU : W ≤ supportedIn U) (hW : relSpan χ U ≤ W) (h : H)
-    {f : X → ℂ} (hf : f ∈ W ⊔ (supportedIn U ⊓ vanishingOn C)) :
-    transl h f ∈ W ⊔ (supportedIn U ⊓ vanishingOn C) := by
+theorem transl_mem_of_mem
+    (χ : H →* ℂ)
+    {W : Submodule ℂ (X → ℂ)} (hWU : W ≤ supportedIn U) (hW : relSpan χ U ≤ W)
+    (h : H)
+    {f : X → ℂ} (hf : f ∈ W ⊔ (supportedIn U ⊓ vanishingOn C))
+    : transl h f ∈ W ⊔ (supportedIn U ⊓ vanishingOn C) := by
   have hfU : f ∈ supportedIn U := (sup_le hWU inf_le_left) hf
   have e : transl h f = (transl h f - χ h • f) + χ h • f := by abel
   rw [e]
-  exact add_mem (le_sup_left (b := supportedIn U ⊓ vanishingOn C)
-    (hW (sub_mem_relSpan χ h hfU))) (Submodule.smul_mem _ _ hf)
+  exact add_mem (le_sup_left (b := supportedIn U ⊓ vanishingOn C) (hW (sub_mem_relSpan χ h hfU)))
+    (Submodule.smul_mem _ _ hf)
 
 def GoodPiece (U C : Set X) (x₀ : X) (W : Submodule ℂ (X → ℂ)) (A : Set X) : Prop :=
-  ∀ g ∈ supportedIn U, (∀ x ∈ orbit H x₀, g x = A.indicator 1 x) →
-    g ∈ W ⊔ (supportedIn U ⊓ vanishingOn C)
+  ∀ g ∈ supportedIn U,
+    (∀ x ∈ orbit H x₀, g x = A.indicator 1 x) → g ∈ W ⊔ (supportedIn U ⊓ vanishingOn C)
 
 omit [LocallyCompactSpace X] [TotallyDisconnectedSpace X] [IsTopologicalGroup H]
-  [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H] [T2Space X] in
-theorem GoodPiece.smul (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) (χ : H →* ℂ)
-    {W : Submodule ℂ (X → ℂ)} (hWU : W ≤ supportedIn U) (hW : relSpan χ U ≤ W) {A : Set X}
-    (hA : GoodPiece (H := H) U C x₀ W A) (h : H) : GoodPiece (H := H) U C x₀ W (h • A) := by
+  [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] [SigmaCompactSpace H]
+  [T2Space X] in
+theorem GoodPiece.smul
+    (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U)
+    (χ : H →* ℂ)
+    {W : Submodule ℂ (X → ℂ)} (hWU : W ≤ supportedIn U) (hW : relSpan χ U ≤ W)
+    {A : Set X} (hA : GoodPiece (H := H) U C x₀ W A)
+    (h : H)
+    : GoodPiece (H := H) U C x₀ W (h • A) := by
   intro g hg hgA
   have h1 : transl h⁻¹ g ∈ W ⊔ (supportedIn U ⊓ vanishingOn C) := by
     refine hA _ (transl_mem_supportedIn hUinv _ hg) fun x hx => ?_
@@ -275,13 +285,16 @@ theorem GoodPiece.smul (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) (χ : H �
   have := transl_mem_of_mem χ hWU hW h h1
   rwa [← transl_mul, mul_inv_cancel, transl_one] at this
 
-
-omit [TotallyDisconnectedSpace X] [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] in
-theorem exists_finset_orbitPiece (hOl : IsLocallyClosed (orbit H x₀)) {J A : Subgroup H}
-    (hJc : IsCompact (J : Set H)) (hAo : IsOpen (A : Set H)) (hAJ : A ≤ J)
-    (hAn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A) {y : X} (hy : y ∈ orbit H x₀) :
-    ∃ 𝒮 : Finset (Set X), 𝒮.Nonempty ∧ (∀ S ∈ 𝒮, ∃ j ∈ J, S = j • orbitPiece A y) ∧
-      ∀ x, (orbitPiece J y).indicator (1 : X → ℂ) x = ∑ S ∈ 𝒮, S.indicator 1 x := by
+omit [TotallyDisconnectedSpace X] [LocallyCompactSpace H] [T2Space H]
+  [TotallyDisconnectedSpace H] in
+theorem exists_finset_orbitPiece
+    (hOl : IsLocallyClosed (orbit H x₀))
+    {J A : Subgroup H} (hJc : IsCompact (J : Set H)) (hAo : IsOpen (A : Set H)) (hAJ : A ≤ J)
+    (hAn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A)
+    {y : X} (hy : y ∈ orbit H x₀)
+    : ∃ 𝒮 : Finset (Set X),
+      𝒮.Nonempty ∧ (∀ S ∈ 𝒮, ∃ j ∈ J, S = j • orbitPiece A y)
+        ∧ ∀ x, (orbitPiece J y).indicator (1 : X → ℂ) x = ∑ S ∈ 𝒮, S.indicator 1 x := by
   classical
   have hsm : ∀ j ∈ J, j • orbitPiece A y = orbitPiece A (j • y) := fun j hj =>
     smul_orbitPiece (hAn j hj) (fun a ha => by simpa using hAn j⁻¹ (J.inv_mem hj) a ha) y
@@ -292,12 +305,13 @@ theorem exists_finset_orbitPiece (hOl : IsLocallyClosed (orbit H x₀)) {J A : S
   let K' : Set (orbit H x₀) := (fun j : H => j • (⟨y, hy⟩ : orbit H x₀)) '' (J : Set H)
   have := continuousSMul_orbit (H := H) x₀
   have hK' : IsCompact K' := hJc.image (continuous_id.smul continuous_const)
-  obtain ⟨t, htJ, htfin, hcov⟩ := hK'.elim_finite_subcover_image (b := (J : Set H))
-    (c := fun j => (Subtype.val : orbit H x₀ → X) ⁻¹' orbitPiece A (j • y))
-    (fun j _ => isOpen_orbitPiece hOl hAo (mem_orbit_of_mem_orbit j hy))
-    (by
-      rintro _ ⟨j, hj, rfl⟩
-      exact mem_iUnion₂.2 ⟨j, hj, self_mem_orbitPiece A _⟩)
+  obtain ⟨t, htJ, htfin, hcov⟩ :=
+    hK'.elim_finite_subcover_image (b := (J : Set H))
+      (c := fun j => (Subtype.val : orbit H x₀ → X) ⁻¹' orbitPiece A (j • y))
+      (fun j _ => isOpen_orbitPiece hOl hAo (mem_orbit_of_mem_orbit j hy))
+      (by
+        rintro _ ⟨j, hj, rfl⟩
+        exact mem_iUnion₂.2 ⟨j, hj, self_mem_orbitPiece A _⟩)
   have hcov' : ∀ x ∈ orbitPiece J y, ∃ j ∈ t, x ∈ orbitPiece A (j • y) := by
     rintro _ ⟨j, hj, rfl⟩
     have hx : (j • (⟨y, hy⟩ : orbit H x₀)) ∈ K' := ⟨j, hj, rfl⟩
@@ -328,15 +342,16 @@ theorem exists_finset_orbitPiece (hOl : IsLocallyClosed (orbit H x₀)) {J A : S
       obtain ⟨i, hi, rfl⟩ := Finset.mem_image.1 hS
       exact Set.indicator_of_notMem (fun hxi => hx (hsub i (htJ (htfin.mem_toFinset.1 hi)) hxi)) _
 
-
 omit [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] in
-theorem GoodPiece.up {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X}
-    (hO : U ∩ C = orbit H x₀) (χ : H →* ℂ)
+theorem GoodPiece.up
+    {U C : Set X} (hU : IsOpen U) (hC : IsClosed C)
+    {x₀ : X} (hO : U ∩ C = orbit H x₀)
+    (χ : H →* ℂ)
     {W : Submodule ℂ (X → ℂ)} (hWU : W ≤ supportedIn U) (hW : relSpan χ U ≤ W)
     {J A : Subgroup H} (hJc : IsCompact (J : Set H)) (hAo : IsOpen (A : Set H)) (hAJ : A ≤ J)
-    (hAn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A) {y : X} (hy : y ∈ orbit H x₀)
-    (hA : GoodPiece (H := H) U C x₀ W (orbitPiece A y)) :
-    GoodPiece (H := H) U C x₀ W (orbitPiece J y) := by
+    (hAn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A)
+    {y : X} (hy : y ∈ orbit H x₀) (hA : GoodPiece (H := H) U C x₀ W (orbitPiece A y))
+    : GoodPiece (H := H) U C x₀ W (orbitPiece J y) := by
   classical
   have hOl : IsLocallyClosed (orbit H x₀) := ⟨U, C, hU, hC, hO.symm⟩
   obtain ⟨𝒮, -, h𝒮, hsum⟩ := exists_finset_orbitPiece hOl hJc hAo hAJ hAn hy
@@ -357,16 +372,18 @@ theorem GoodPiece.up {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X}
   · rw [Set.indicator_of_notMem hxS,
       Set.indicator_of_notMem (fun h' => hxS (Set.mem_smul_set_iff_inv_smul_mem.1 h'))]
 
-
-omit [TotallyDisconnectedSpace X] [LocallyCompactSpace H] [T2Space H] [TotallyDisconnectedSpace H] in
-theorem GoodPiece.down {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X}
-    (hO : U ∩ C = orbit H x₀) (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) (χ : H →* ℂ)
+omit [TotallyDisconnectedSpace X] [LocallyCompactSpace H] [T2Space H]
+  [TotallyDisconnectedSpace H] in
+theorem GoodPiece.down
+    {U C : Set X} (hU : IsOpen U) (hC : IsClosed C)
+    {x₀ : X} (hO : U ∩ C = orbit H x₀)
+    (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U)
+    (χ : H →* ℂ)
     {W : Submodule ℂ (X → ℂ)} (hW : relSpan χ U ≤ W)
     {J A : Subgroup H} (hJc : IsCompact (J : Set H)) (hχJ : ∀ j ∈ J, χ j = 1)
-    (hAo : IsOpen (A : Set H)) (hAJ : A ≤ J)
-    (hAn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A) {y : X} (hy : y ∈ orbit H x₀)
-    (hJ : GoodPiece (H := H) U C x₀ W (orbitPiece J y)) :
-    GoodPiece (H := H) U C x₀ W (orbitPiece A y) := by
+    (hAo : IsOpen (A : Set H)) (hAJ : A ≤ J) (hAn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A)
+    {y : X} (hy : y ∈ orbit H x₀) (hJ : GoodPiece (H := H) U C x₀ W (orbitPiece J y))
+    : GoodPiece (H := H) U C x₀ W (orbitPiece A y) := by
   classical
   have hOl : IsLocallyClosed (orbit H x₀) := ⟨U, C, hU, hC, hO.symm⟩
   obtain ⟨𝒮, hne, h𝒮, hsum⟩ := exists_finset_orbitPiece hOl hJc hAo hAJ hAn hy
@@ -374,8 +391,7 @@ theorem GoodPiece.down {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X
   intro gA hgA hgAO
   set T := W ⊔ (supportedIn U ⊓ vanishingOn C)
   have hG : ∑ S ∈ 𝒮, transl (j S) gA ∈ T := by
-    refine hJ _ (Submodule.sum_mem _ fun S _ => transl_mem_supportedIn hUinv _ hgA)
-      fun x hx => ?_
+    refine hJ _ (Submodule.sum_mem _ fun S _ => transl_mem_supportedIn hUinv _ hgA) fun x hx => ?_
     rw [hsum x, Finset.sum_apply]
     refine Finset.sum_congr rfl fun S hS => ?_
     rw [transl_apply, hgAO _ (mem_orbit_of_mem_orbit _ hx)]
@@ -389,22 +405,25 @@ theorem GoodPiece.down {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X
     le_sup_left (b := supportedIn U ⊓ vanishingOn C)
       (hW (Submodule.sum_mem _ fun S _ => sub_mem_relSpan χ _ hgA))
   have hcard : (𝒮.card : ℂ) • gA ∈ T := by
-    have e : (𝒮.card : ℂ) • gA =
-        ∑ S ∈ 𝒮, transl (j S) gA - ∑ S ∈ 𝒮, (transl (j S) gA - χ (j S) • gA) := by
-      rw [Finset.sum_sub_distrib, sub_sub_cancel, Finset.sum_congr rfl fun S hS => by
-        rw [hχJ _ (hjJ S hS), one_smul], Finset.sum_const, Nat.cast_smul_eq_nsmul]
+    have e
+        : (𝒮.card : ℂ) • gA
+          = ∑ S ∈ 𝒮, transl (j S) gA - ∑ S ∈ 𝒮, (transl (j S) gA - χ (j S) • gA) := by
+      rw [Finset.sum_sub_distrib, sub_sub_cancel,
+        Finset.sum_congr rfl fun S hS => by rw [hχJ _ (hjJ S hS), one_smul], Finset.sum_const,
+        Nat.cast_smul_eq_nsmul]
     rw [e]
     exact T.sub_mem hG hR
   have hc : (𝒮.card : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (Finset.card_ne_zero.2 hne)
   have := T.smul_mem (𝒮.card : ℂ)⁻¹ hcard
   rwa [smul_smul, inv_mul_cancel₀ hc, one_smul] at this
 
-
 omit [TotallyDisconnectedSpace X] [T2Space X] [LocallyCompactSpace X] [SigmaCompactSpace H] in
-theorem exists_forall_smul_eq {U C : Set X} (hC : IsClosed C) {x₀ : X}
-    (hO : U ∩ C = orbit H x₀) {f : X → ℂ} (hf : f ∈ supportedIn U) :
-    ∃ L : Subgroup H, IsCompact (L : Set H) ∧ IsOpen (L : Set H) ∧
-      ∀ l ∈ L, ∀ x ∈ orbit H x₀, f (l • x) = f x := by
+theorem exists_forall_smul_eq
+    {U C : Set X} (hC : IsClosed C)
+    {x₀ : X} (hO : U ∩ C = orbit H x₀)
+    {f : X → ℂ} (hf : f ∈ supportedIn U)
+    : ∃ L : Subgroup H,
+      IsCompact (L : Set H) ∧ IsOpen (L : Set H) ∧ ∀ l ∈ L, ∀ x ∈ orbit H x₀, f (l • x) = f x := by
   have hOC : orbit H x₀ ⊆ C := hO ▸ inter_subset_right
   let K := C ∩ Function.support f
   have hK : IsCompact K := (isCompact_support hf.1).inter_left hC
@@ -432,14 +451,17 @@ theorem exists_forall_smul_eq {U C : Set X} (hC : IsClosed C) {x₀ : X}
     simp only [Wset, Set.mem_ofPred_eq, inv_smul_smul] at this
     exact h (by rw [← this, hfx])
 
-theorem supportedIn_le_of_base {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X}
-    (hO : U ∩ C = orbit H x₀) (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) (χ : H →* ℂ)
+theorem supportedIn_le_of_base
+    {U C : Set X} (hU : IsOpen U) (hC : IsClosed C)
+    {x₀ : X} (hO : U ∩ C = orbit H x₀)
+    (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U)
+    (χ : H →* ℂ)
     {W : Submodule ℂ (X → ℂ)} (hWU : W ≤ supportedIn U) (hW : relSpan χ U ≤ W)
-    (L₀ : Subgroup H) (hL₀c : IsCompact (L₀ : Set H)) (hL₀o : IsOpen (L₀ : Set H))
-    (hχL₀ : ∀ l ∈ L₀, χ l = 1) (f₀ : X → ℂ)
-    (hf₀O : ∀ x ∈ orbit H x₀, f₀ x = (orbitPiece L₀ x₀).indicator 1 x)
-    (hbase : f₀ ∈ W ⊔ (supportedIn U ⊓ vanishingOn C)) :
-    supportedIn U ≤ W ⊔ (supportedIn U ⊓ vanishingOn C) := by
+    (L₀ : Subgroup H)
+    (hL₀c : IsCompact (L₀ : Set H)) (hL₀o : IsOpen (L₀ : Set H)) (hχL₀ : ∀ l ∈ L₀, χ l = 1)
+    (f₀ : X → ℂ) (hf₀O : ∀ x ∈ orbit H x₀, f₀ x = (orbitPiece L₀ x₀).indicator 1 x)
+    (hbase : f₀ ∈ W ⊔ (supportedIn U ⊓ vanishingOn C))
+    : supportedIn U ≤ W ⊔ (supportedIn U ⊓ vanishingOn C) := by
   classical
   have hx₀ : x₀ ∈ orbit H x₀ := mem_orbit_self x₀
   set T := W ⊔ (supportedIn U ⊓ vanishingOn C)
@@ -449,30 +471,38 @@ theorem supportedIn_le_of_base {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {
   have hgood0 : GoodPiece (H := H) U C x₀ W (orbitPiece L₀ x₀) := fun g hg hgO =>
     mem_of_eqOn_orbit hO hWU hg hbase fun x hx => by rw [hgO x hx, hf₀O x hx]
 
-  have hA : ∀ M : Subgroup H, IsOpen (M : Set H) → M ≤ L₀ →
-      (∀ k ∈ L₀, ∀ m ∈ M, k * m * k⁻¹ ∈ M) → GoodPiece (H := H) U C x₀ W (orbitPiece M x₀) :=
-    fun M hMo hML hMn => GoodPiece.down hU hC hO hUinv χ hW hL₀c hχL₀ hMo hML hMn hx₀ hgood0
+  have hA
+      : ∀ M : Subgroup H,
+        IsOpen (M : Set H) → M ≤ L₀ → (∀ k ∈ L₀, ∀ m ∈ M, k * m * k⁻¹ ∈ M)
+          → GoodPiece (H := H) U C x₀ W (orbitPiece M x₀) := fun M hMo hML hMn =>
+    GoodPiece.down hU hC hO hUinv χ hW hL₀c hχL₀ hMo hML hMn hx₀ hgood0
 
-  have hB : ∀ M : Subgroup H, IsOpen (M : Set H) → M ≤ L₀ →
-      GoodPiece (H := H) U C x₀ W (orbitPiece M x₀) := by
+  have hB
+      : ∀ M : Subgroup H,
+        IsOpen (M : Set H) → M ≤ L₀ → GoodPiece (H := H) U C x₀ W (orbitPiece M x₀) := by
     intro M hMo hML
     obtain ⟨N₀, hN₀o, hN₀L, hN₀M, hN₀n, -⟩ :=
       exists_normal_subgroup hL₀c hL₀o (hMo.mem_nhds M.one_mem)
     have hMc : IsCompact (M : Set H) := hL₀c.of_isClosed_subset (M.isClosed_of_isOpen hMo) hML
-    exact GoodPiece.up hU hC hO χ hWU hW hMc hN₀o (fun x hx => hN₀M hx)
-      (fun j hj a ha => hN₀n j (hML hj) a ha) hx₀ (hA N₀ hN₀o hN₀L hN₀n)
+    exact GoodPiece.up hU hC hO χ hWU hW hMc hN₀o
+      (fun x hx => hN₀M hx)
+      (fun j hj a ha => hN₀n j (hML hj) a ha)
+      hx₀ (hA N₀ hN₀o hN₀L hN₀n)
 
-  have hC' : ∀ J : Subgroup H, IsCompact (J : Set H) → IsOpen (J : Set H) →
-      GoodPiece (H := H) U C x₀ W (orbitPiece J x₀) := by
+  have hC'
+      : ∀ J : Subgroup H,
+        IsCompact (J : Set H) → IsOpen (J : Set H)
+          → GoodPiece (H := H) U C x₀ W (orbitPiece J x₀) := by
     intro J hJc hJo
     obtain ⟨A, hAo, hAJ, hAJL, hAn, -⟩ :=
       exists_normal_subgroup hJc hJo (U := (J : Set H) ∩ L₀)
         (Filter.inter_mem (hJo.mem_nhds J.one_mem) (hL₀o.mem_nhds L₀.one_mem))
-    exact GoodPiece.up hU hC hO χ hWU hW hJc hAo hAJ hAn hx₀
-      (hB A hAo fun x hx => (hAJL hx).2)
+    exact GoodPiece.up hU hC hO χ hWU hW hJc hAo hAJ hAn hx₀ (hB A hAo fun x hx => (hAJL hx).2)
 
-  have hall : ∀ J : Subgroup H, IsCompact (J : Set H) → IsOpen (J : Set H) →
-      ∀ y ∈ orbit H x₀, GoodPiece (H := H) U C x₀ W (orbitPiece J y) := by
+  have hall
+      : ∀ J : Subgroup H,
+        IsCompact (J : Set H) → IsOpen (J : Set H)
+          → ∀ y ∈ orbit H x₀, GoodPiece (H := H) U C x₀ W (orbitPiece J y) := by
     intro J hJc hJo y hy
     obtain ⟨h, rfl⟩ := mem_orbit_iff.1 hy
     rw [orbitPiece_smul]
@@ -481,9 +511,13 @@ theorem supportedIn_le_of_base {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {
 
   intro f hf
   obtain ⟨L, hLc, hLo, hLf⟩ := exists_forall_smul_eq hC hO hf
-  have key : ∀ t : Finset X, (↑t : Set X) ⊆ orbit H x₀ → ∀ g ∈ supportedIn U,
-      (∀ l ∈ L, ∀ x ∈ orbit H x₀, g (l • x) = g x) →
-      (∀ x ∈ orbit H x₀, g x ≠ 0 → x ∈ ⋃ y ∈ t, orbitPiece L y) → g ∈ T := by
+  have key
+      : ∀ t : Finset X,
+        (↑t : Set X) ⊆ orbit H x₀
+          → ∀ g ∈ supportedIn U,
+            (∀ l ∈ L, ∀ x ∈ orbit H x₀, g (l • x) = g x)
+              → (∀ x ∈ orbit H x₀, g x ≠ 0 → x ∈ ⋃ y ∈ t, orbitPiece L y)
+              → g ∈ T := by
     intro t
     induction t using Finset.induction_on with
     | empty =>
@@ -501,8 +535,11 @@ theorem supportedIn_le_of_base {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {
       have hgyT : gy ∈ T := hall L hLc hLo y hy gy hgy hgyO
       have e : g = (g - g y • gy) + g y • gy := by abel
       rw [e]
-      refine T.add_mem (ih (fun x hx => htO (by simp [hx])) _
-        ((supportedIn U).sub_mem hg ((supportedIn U).smul_mem _ hgy)) ?_ ?_) (T.smul_mem _ hgyT)
+      refine T.add_mem
+        (ih
+          (fun x hx => htO (by simp [hx]))
+          _ ((supportedIn U).sub_mem hg ((supportedIn U).smul_mem _ hgy)) ?_ ?_)
+        (T.smul_mem _ hgyT)
       · intro l hl x hx
         have hlx := mem_orbit_of_mem_orbit l hx
         simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
@@ -538,8 +575,8 @@ theorem supportedIn_le_of_base {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {
         exact this.resolve_left hxy
 
   have hK : IsCompact (C ∩ Function.support f) := (isCompact_support hf.1).inter_left hC
-  have hopen : ∀ y ∈ C ∩ Function.support f, ∃ V : Set X, IsOpen V ∧
-      V ∩ orbit H x₀ = orbitPiece L y := by
+  have hopen
+      : ∀ y ∈ C ∩ Function.support f, ∃ V : Set X, IsOpen V ∧ V ∩ orbit H x₀ = orbitPiece L y := by
     intro y hy
     have hyO : y ∈ orbit H x₀ := hO ▸ ⟨hf.2 hy.2, hy.1⟩
     obtain ⟨V, hVo, hV⟩ := isOpen_induced_iff.1 (isOpen_orbitPiece hOl hLo hyO)
@@ -556,12 +593,17 @@ theorem supportedIn_le_of_base {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {
       rw [← hV] at this
       exact ⟨this, hxO⟩
   choose! V hVo hVO using hopen
-  obtain ⟨t, htK, htfin, hcov⟩ := hK.elim_finite_subcover_image hVo
-    (fun y hy => mem_iUnion₂.2 ⟨y, hy, by
-      have : y ∈ V y ∩ orbit H x₀ := by
-        rw [hVO y hy]
-        exact self_mem_orbitPiece L y
-      exact this.1⟩)
+  obtain ⟨t, htK, htfin, hcov⟩ :=
+    hK.elim_finite_subcover_image hVo (fun y hy =>
+      mem_iUnion₂.2 ⟨
+        y,
+        hy,
+        by
+          have : y ∈ V y ∩ orbit H x₀ := by
+            rw [hVO y hy]
+            exact self_mem_orbitPiece L y
+          exact this.1
+      ⟩)
   refine key htfin.toFinset (fun x hx => ?_) f hf hLf fun x hx hfx => ?_
   · have := htK (htfin.mem_toFinset.1 hx)
     exact hO ▸ ⟨hf.2 this.2, this.1⟩
@@ -570,25 +612,30 @@ theorem supportedIn_le_of_base {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {
     rw [← hVO y (htK hy)]
     exact ⟨hxy, hx⟩
 
-theorem supportedIn_le_of_stabilizer {U C : Set X} (hU : IsOpen U) (hC : IsClosed C) {x₀ : X}
-    (hO : U ∩ C = orbit H x₀) (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U) (χ : H →* ℂ)
-    (hχ : ∃ L : Subgroup H, IsOpen (L : Set H) ∧ ∀ l ∈ L, χ l = 1)
-    {S₀ : Subgroup H} (hS₀ : IsCompact (S₀ : Set H)) {s : H} (hs : s ∈ S₀) (hsx : s • x₀ = x₀)
-    (hχs : χ s ≠ 1) :
-    supportedIn U ≤ relSpan χ U ⊔ (supportedIn U ⊓ vanishingOn C) := by
+theorem supportedIn_le_of_stabilizer
+    {U C : Set X} (hU : IsOpen U) (hC : IsClosed C)
+    {x₀ : X} (hO : U ∩ C = orbit H x₀)
+    (hUinv : ∀ h : H, ∀ x ∈ U, h • x ∈ U)
+    (χ : H →* ℂ) (hχ : ∃ L : Subgroup H, IsOpen (L : Set H) ∧ ∀ l ∈ L, χ l = 1)
+    {S₀ : Subgroup H} (hS₀ : IsCompact (S₀ : Set H))
+    {s : H} (hs : s ∈ S₀) (hsx : s • x₀ = x₀) (hχs : χ s ≠ 1)
+    : supportedIn U ≤ relSpan χ U ⊔ (supportedIn U ⊓ vanishingOn C) := by
   obtain ⟨L, hLo, hχL⟩ := hχ
-  obtain ⟨L₀, hL₀c, hL₀L, hL₀n⟩ := exists_compactOpenSubgroup_normalized hS₀ (hLo.mem_nhds L.one_mem)
+  obtain ⟨L₀, hL₀c, hL₀L, hL₀n⟩ :=
+    exists_compactOpenSubgroup_normalized hS₀ (hLo.mem_nhds L.one_mem)
   have hx₀ : x₀ ∈ orbit H x₀ := mem_orbit_self x₀
   have hWU := relSpan_le_supportedIn χ hUinv
   obtain ⟨f₀, hf₀, hf₀O⟩ := exists_lift_orbit_piece hU hC hO hL₀c L₀.isOpen hx₀
   set T := relSpan χ U ⊔ (supportedIn U ⊓ vanishingOn C)
 
   have hspiece : s • orbitPiece (L₀ : Subgroup H) x₀ = orbitPiece (L₀ : Subgroup H) x₀ := by
-    rw [smul_orbitPiece (fun a ha => hL₀n s hs a ha)
-      (fun a ha => by simpa using hL₀n s⁻¹ (S₀.inv_mem hs) a ha), hsx]
+    rw [smul_orbitPiece
+        (fun a ha => hL₀n s hs a ha)
+        (fun a ha => by simpa using hL₀n s⁻¹ (S₀.inv_mem hs) a ha),
+      hsx]
   have h1 : transl s f₀ - f₀ ∈ T := by
-    refine le_sup_right (a := relSpan χ U) (sub_mem_of_eqOn_orbit hO
-      (transl_mem_supportedIn hUinv s hf₀) hf₀ fun x hx => ?_)
+    refine le_sup_right (a := relSpan χ U)
+      (sub_mem_of_eqOn_orbit hO (transl_mem_supportedIn hUinv s hf₀) hf₀ fun x hx => ?_)
     rw [transl_apply, hf₀O _ (mem_orbit_of_mem_orbit _ hx), hf₀O x hx]
     conv_rhs => rw [← hspiece]
     by_cases hxS : s⁻¹ • x ∈ orbitPiece (L₀ : Subgroup H) x₀
@@ -608,7 +655,8 @@ theorem supportedIn_le_of_stabilizer {U C : Set X} (hU : IsOpen U) (hC : IsClose
     have := T.smul_mem (χ s - 1)⁻¹ h3
     rwa [smul_smul, inv_mul_cancel₀ (sub_ne_zero.2 hχs), one_smul] at this
   exact supportedIn_le_of_base hU hC hO hUinv χ hWU le_rfl (L₀ : Subgroup H) hL₀c L₀.isOpen
-    (fun l hl => hχL l (hL₀L hl)) f₀ hf₀O hbase
+    (fun l hl => hχL l (hL₀L hl))
+    f₀ hf₀O hbase
 
 end Base
 

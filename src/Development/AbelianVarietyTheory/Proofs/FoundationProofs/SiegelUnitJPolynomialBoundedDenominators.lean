@@ -13,21 +13,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasQExpansio
 noncomputable section
 
 open scoped MatrixGroups UpperHalfPlane
-open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois GlobalTheory.Sieg
+open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois
+  GlobalTheory.Sieg
 
 namespace GlobalTheory.FracBd
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
 def Good (F : HahnSeries ℚ Ω) : Prop :=
-  ∃ (S : Finset Ω) (D : ℕ), 0 < D ∧ ∀ r, F.coeff r ∈ IntermediateField.adjoin ℚ (S : Set Ω) ∧
-    IsIntegral ℤ ((D : Ω) * F.coeff r)
+  ∃ (S : Finset Ω) (D : ℕ),
+    0 < D
+      ∧ ∀ r, F.coeff r ∈ IntermediateField.adjoin ℚ (S : Set Ω) ∧ IsIntegral ℤ ((D : Ω) * F.coeff r)
 
 theorem isIntegral_natCast' (n : ℕ) : IsIntegral ℤ (n : Ω) := by
   simpa using (isIntegral_algebraMap (R := ℤ) (A := Ω) (x := (n : ℤ)))
 
-theorem adj_mono {S S' : Finset Ω} (h : S ⊆ S') :
-    IntermediateField.adjoin ℚ (S : Set Ω) ≤ IntermediateField.adjoin ℚ (S' : Set Ω) :=
+theorem adj_mono {S S' : Finset Ω} (h : S ⊆ S')
+    : IntermediateField.adjoin ℚ (S : Set Ω) ≤ IntermediateField.adjoin ℚ (S' : Set Ω) :=
   IntermediateField.adjoin.mono ℚ _ _ (Finset.coe_subset.2 h)
 
 theorem good_add {F G : HahnSeries ℚ Ω} (hF : Good F) (hG : Good G) : Good (F + G) := by
@@ -36,10 +38,13 @@ theorem good_add {F G : HahnSeries ℚ Ω} (hF : Good F) (hG : Good G) : Good (F
   obtain ⟨S', D', hD', h'⟩ := hG
   refine ⟨S ∪ S', D * D', Nat.mul_pos hD hD', fun r => ⟨?_, ?_⟩⟩
   · rw [HahnSeries.coeff_add]
-    exact add_mem (adj_mono Finset.subset_union_left (h r).1) (adj_mono Finset.subset_union_right (h' r).1)
+    exact add_mem (adj_mono Finset.subset_union_left (h r).1)
+      (adj_mono Finset.subset_union_right (h' r).1)
   · rw [HahnSeries.coeff_add]
-    have e : ((D * D' : ℕ) : Ω) * (F.coeff r + G.coeff r) =
-        (D' : Ω) * ((D : Ω) * F.coeff r) + (D : Ω) * ((D' : Ω) * G.coeff r) := by push_cast; ring
+    have e
+        : ((D * D' : ℕ) : Ω) * (F.coeff r + G.coeff r)
+          = (D' : Ω) * ((D : Ω) * F.coeff r) + (D : Ω) * ((D' : Ω) * G.coeff r) := by
+      push_cast; ring
     rw [e]
     exact ((isIntegral_natCast' D').mul (h r).2).add ((isIntegral_natCast' D).mul (h' r).2)
 
@@ -49,18 +54,22 @@ theorem good_mul {F G : HahnSeries ℚ Ω} (hF : Good F) (hG : Good G) : Good (F
   obtain ⟨S', D', hD', h'⟩ := hG
   refine ⟨S ∪ S', D * D', Nat.mul_pos hD hD', fun r => ⟨?_, ?_⟩⟩
   · rw [HahnSeries.coeff_mul]
-    exact sum_mem fun ij _ => mul_mem (adj_mono Finset.subset_union_left (h ij.1).1)
-      (adj_mono Finset.subset_union_right (h' ij.2).1)
+    exact sum_mem fun ij _ =>
+      mul_mem (adj_mono Finset.subset_union_left (h ij.1).1)
+        (adj_mono Finset.subset_union_right (h' ij.2).1)
   · rw [HahnSeries.coeff_mul, Finset.mul_sum]
     refine IsIntegral.sum _ fun ij _ => ?_
-    have e : ((D * D' : ℕ) : Ω) * (F.coeff ij.1 * G.coeff ij.2) =
-        ((D : Ω) * F.coeff ij.1) * ((D' : Ω) * G.coeff ij.2) := by push_cast; ring
+    have e
+        : ((D * D' : ℕ) : Ω) * (F.coeff ij.1 * G.coeff ij.2)
+          = ((D : Ω) * F.coeff ij.1) * ((D' : Ω) * G.coeff ij.2) := by
+      push_cast; ring
     rw [e]
     exact (h ij.1).2.mul (h' ij.2).2
 
 theorem good_C [Algebra.IsAlgebraic ℚ Ω] (c : Ω) : Good (algebraMap Ω (HahnSeries ℚ Ω) c) := by
   classical
-  have hc : IsAlgebraic ℤ c := (IsFractionRing.isAlgebraic_iff ℤ ℚ Ω).2 (Algebra.IsAlgebraic.isAlgebraic c)
+  have hc : IsAlgebraic ℤ c :=
+    (IsFractionRing.isAlgebraic_iff ℤ ℚ Ω).2 (Algebra.IsAlgebraic.isAlgebraic c)
   obtain ⟨y, hy0, hy⟩ := hc.exists_integral_multiple
   have hyc : IsIntegral ℤ ((y.natAbs : Ω) * c) := by
     rw [zsmul_eq_mul] at hy
@@ -94,13 +103,17 @@ namespace GlobalTheory.FracBd
 
 open GlobalTheory.QFam
 
-theorem shift_hasQ {N : ℕ} {f : ℍ → ℂ} {a : ℕ → ℂ} (h : HasQ N f a) (d : ℕ) :
-    HasQ N (fun τ => f τ * ee ((d : ℂ) / N * (τ : ℂ))) (fun n => if d ≤ n then a (n - d) else 0) := by
+theorem shift_hasQ {N : ℕ} {f : ℍ → ℂ} {a : ℕ → ℂ} (h : HasQ N f a) (d : ℕ)
+    : HasQ N
+      (fun τ => f τ * ee ((d : ℂ) / N * (τ : ℂ)))
+      (fun n => if d ≤ n then a (n - d) else 0) := by
   intro τ
   have h1 := (h τ).mul_right (ee ((d : ℂ) / N * (τ : ℂ)))
   rw [← hasSum_nat_add_iff' d]
-  have hz : ∑ i ∈ Finset.range d, (if d ≤ i then a (i - d) else 0) *
-      Complex.exp (2 * Real.pi * Complex.I * (i : ℂ) * τ / N) = 0 :=
+  have hz
+      : ∑ i ∈ Finset.range d, (if d ≤ i then a (i - d) else 0) *
+          Complex.exp (2 * Real.pi * Complex.I * (i : ℂ) * τ / N)
+        = 0 :=
     Finset.sum_eq_zero fun i hi => by simp [not_le.2 (Finset.mem_range.1 hi)]
   rw [hz, sub_zero]
   convert h1 using 2 with n
@@ -112,15 +125,19 @@ theorem shift_hasQ {N : ℕ} {f : ℍ → ℂ} {a : ℕ → ℂ} (h : HasQ N f a
     ring
   all_goals rfl
 
-theorem coeff_cmp {N : ℕ} (hN : 0 < N) {g : ℍ → ℂ} {k k' : ℤ} {A B : ℕ → ℂ}
+theorem coeff_cmp
+    {N : ℕ} (hN : 0 < N)
+    {g : ℍ → ℂ} {k k' : ℤ} {A B : ℕ → ℂ}
     (hA : HasQ N (fun τ => g τ * ee (-((k : ℂ) / N) * (τ : ℂ))) A)
-    (hB : HasQ N (fun τ => g τ * ee (-((k' : ℂ) / N) * (τ : ℂ))) B) (n : ℕ) :
-    B n = 0 ∨ ∃ m, B n = A m := by
+    (hB : HasQ N (fun τ => g τ * ee (-((k' : ℂ) / N) * (τ : ℂ))) B)
+    (n : ℕ)
+    : B n = 0 ∨ ∃ m, B n = A m := by
   rcases le_total k k' with hk | hk
   · obtain ⟨d, rfl⟩ : ∃ d : ℕ, k' = k + d := ⟨(k' - k).toNat, by omega⟩
     have hS := shift_hasQ hB d
-    have e : (fun τ : ℍ => g τ * ee (-(((k + d : ℤ) : ℂ) / N) * (τ : ℂ)) * ee ((d : ℂ) / N * (τ : ℂ))) =
-        fun τ => g τ * ee (-((k : ℂ) / N) * (τ : ℂ)) := by
+    have e
+        : (fun τ : ℍ => g τ * ee (-(((k + d : ℤ) : ℂ) / N) * (τ : ℂ)) * ee ((d : ℂ) / N * (τ : ℂ)))
+          = fun τ => g τ * ee (-((k : ℂ) / N) * (τ : ℂ)) := by
       funext τ
       simp only [ee]
       rw [mul_assoc, ← Complex.exp_add]
@@ -135,8 +152,9 @@ theorem coeff_cmp {N : ℕ} (hN : 0 < N) {g : ℍ → ℂ} {k k' : ℤ} {A B : �
     simp
   · obtain ⟨d, rfl⟩ : ∃ d : ℕ, k = k' + d := ⟨(k - k').toNat, by omega⟩
     have hS := shift_hasQ hA d
-    have e : (fun τ : ℍ => g τ * ee (-(((k' + d : ℤ) : ℂ) / N) * (τ : ℂ)) * ee ((d : ℂ) / N * (τ : ℂ))) =
-        fun τ => g τ * ee (-((k' : ℂ) / N) * (τ : ℂ)) := by
+    have e
+        : (fun τ : ℍ => g τ * ee (-(((k' + d : ℤ) : ℂ) / N) * (τ : ℂ)) * ee ((d : ℂ) / N * (τ : ℂ)))
+          = fun τ => g τ * ee (-((k' : ℂ) / N) * (τ : ℂ)) := by
       funext τ
       simp only [ee]
       rw [mul_assoc, ← Complex.exp_add]
@@ -152,21 +170,26 @@ theorem coeff_cmp {N : ℕ} (hN : 0 < N) {g : ℍ → ℂ} {k k' : ℤ} {A B : �
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
-theorem eps_zeta [IsAlgClosed Ω] (ε : Ω →+* ℂ) {M : ℕ} (hM : 0 < M) :
-    ε (eOm ε (1 / (M : ℚ))) = ee (1 / (M : ℂ)) := by
-  have e : Complex.exp (2 * Real.pi * Complex.I * (((1 / (M : ℚ)) : ℚ) : ℂ)) = ee (1 / (M : ℂ)) := by
+theorem eps_zeta [IsAlgClosed Ω] (ε : Ω →+* ℂ) {M : ℕ} (hM : 0 < M)
+    : ε (eOm ε (1 / (M : ℚ))) = ee (1 / (M : ℂ)) := by
+  have e
+      : Complex.exp (2 * Real.pi * Complex.I * (((1 / (M : ℚ)) : ℚ) : ℂ)) = ee (1 / (M : ℂ)) := by
     unfold ee; push_cast; rfl
   unfold eOm
   rw [e]
-  exact Function.invFun_eq (GlobalTheory.KZ.SiegelMem.mem_range_of_isIntegral ε (GlobalTheory.KZ.SiegelMem.isIntegral_ee hM))
+  exact Function.invFun_eq (GlobalTheory.KZ.SiegelMem.mem_range_of_isIntegral ε
+    (GlobalTheory.KZ.SiegelMem.isIntegral_ee hM))
 
-theorem mem_closure_of_eps (ε : Ω →+* ℂ) {ζ x : Ω} (h : ε x ∈ Subring.closure {ε ζ}) : x ∈ Subring.closure {ζ} := by
+theorem mem_closure_of_eps (ε : Ω →+* ℂ) {ζ x : Ω} (h : ε x ∈ Subring.closure {ε ζ})
+    : x ∈ Subring.closure {ζ} := by
   rw [← Set.image_singleton, ← RingHom.map_closure] at h
   obtain ⟨y, hy, hyx⟩ := Subring.mem_map.1 h
   rwa [← ε.injective hyx]
 
-theorem admissible_of_integral_conj_le {M c : ℕ} (hM : 0 < M) (hc1 : 1 < c) (hc6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M]) {a b : ℤ}
-    (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) : admitted c ![(a : ℚ) / M, (b : ℚ) / M] := by
+theorem admissible_of_integral_conj_le
+    {M c : ℕ} (hM : 0 < M) (hc1 : 1 < c) (hc6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M])
+    {a b : ℤ} (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
+    : admitted c ![(a : ℚ) / M, (b : ℚ) / M] := by
   have hMq : (M : ℚ) ≠ 0 := by exact_mod_cast hM.ne'
   have hcop : IsCoprime (M : ℤ) (c : ℤ) := by
     rw [Nat.isCoprime_iff_coprime]
@@ -189,9 +212,14 @@ open GlobalTheory.QFam
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
-theorem siegel_coeff [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) {M c : ℕ} (hM : 0 < M) (hc1 : 1 < c)
-    (hc6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M]) (a b : ℤ) (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b)) (r : ℚ) :
-    (X.exp (siegel X c ![(a : ℚ) / M, (b : ℚ) / M])).coeff r ∈ Subring.closure {eOm ε (1 / (M : ℚ))} := by
+theorem siegel_coeff
+    [IsAlgClosure ℚ Ω]
+    (ε : Ω →+* ℂ) (X : Tower Ω ε)
+    {M c : ℕ} (hM : 0 < M) (hc1 : 1 < c) (hc6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M])
+    (a b : ℤ) (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
+    (r : ℚ)
+    : (X.exp (siegel X c ![(a : ℚ) / M, (b : ℚ) / M])).coeff r
+      ∈ Subring.closure {eOm ε (1 / (M : ℚ))} := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hMz : (M : ℤ) ≠ 0 := by exact_mod_cast hM.ne'
   have hMq : (M : ℚ) ≠ 0 := by exact_mod_cast hM.ne'
@@ -211,34 +239,44 @@ theorem siegel_coeff [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε)
   have hqb : (b : ℚ) = (M : ℚ) * ((b / (M : ℤ) : ℤ) : ℚ) + (b0 : ℚ) := by
     have h : b = (M : ℤ) * (b / (M : ℤ)) + (b0 : ℤ) := by linarith [Int.emod_def b (M : ℤ), hb0']
     exact_mod_cast h
-  have hab0 : ¬ ((M : ℤ) ∣ (a0 : ℤ) ∧ (M : ℤ) ∣ (b0 : ℤ)) := by
+  have hab0 : ¬((M : ℤ) ∣ (a0 : ℤ) ∧ (M : ℤ) ∣ (b0 : ℤ)) := by
     rintro ⟨h1, h2⟩
     apply hab
     rw [ha0'] at h1
     rw [hb0'] at h2
-    exact ⟨(Int.dvd_iff_emod_eq_zero).2 (by have := Int.emod_emod_of_dvd a (dvd_refl (M : ℤ)); omega),
-      (Int.dvd_iff_emod_eq_zero).2 (by have := Int.emod_emod_of_dvd b (dvd_refl (M : ℤ)); omega)⟩
+    exact ⟨
+      (Int.dvd_iff_emod_eq_zero).2 (by have := Int.emod_emod_of_dvd a (dvd_refl (M : ℤ)); omega),
+      (Int.dvd_iff_emod_eq_zero).2 (by have := Int.emod_emod_of_dvd b (dvd_refl (M : ℤ)); omega)
+    ⟩
   have hadm : admitted c ![(a0 : ℚ) / M, (b0 : ℚ) / M] := by
     have := admissible_of_integral_conj_le hM hc1 hc6 hcM hab0
     simpa using this
   set n : Fin 2 → ℤ := ![a / (M : ℤ), b / (M : ℤ)] with hn
-  have hx : (![(a : ℚ) / M, (b : ℚ) / M] : Fin 2 → ℚ) = fun i => (![(a0 : ℚ) / M, (b0 : ℚ) / M] : Fin 2 → ℚ) i + n i := by
+  have hx
+      : (![(a : ℚ) / M, (b : ℚ) / M] : Fin 2 → ℚ)
+        = fun i => (![(a0 : ℚ) / M, (b0 : ℚ) / M] : Fin 2 → ℚ) i + n i := by
     funext i
     fin_cases i
     · simp only [n, Fin.zero_eta, Fin.isValue, Matrix.cons_val_zero]
-      rw [hqa]; field_simp; ring
+      rw [hqa]
+      field_simp
+      ring
     · simp only [n, Fin.mk_one, Fin.isValue, Matrix.cons_val_one, Matrix.cons_val_fin_one]
-      rw [hqb]; field_simp; ring
+      rw [hqb]
+      field_simp
+      ring
   have hsg : sgC c ![(a : ℚ) / M, (b : ℚ) / M] = sgC c ![(a0 : ℚ) / M, (b0 : ℚ) / M] := by
     funext z
     unfold sgC
     rw [hx]
     exact GlobalTheory.T.smoothedSiegelUnit_index_add_intVector c _ n _ hadm
-  have hsie : siegel X c ![(a : ℚ) / M, (b : ℚ) / M] = siegel X c ![(a0 : ℚ) / M, (b0 : ℚ) / M] := by
+  have hsie
+      : siegel X c ![(a : ℚ) / M, (b : ℚ) / M] = siegel X c ![(a0 : ℚ) / M, (b0 : ℚ) / M] := by
     unfold siegel
     rw [hsg]
   rw [hsie]
-  obtain ⟨k, A, hQ, hc, hz⟩ := GlobalTheory.T.siegel_unit_q_expansion_coefficients Ω ε X c M a0 b0 hM hlt hadm
+  obtain ⟨k, A, hQ, hc, hz⟩ :=
+    GlobalTheory.T.siegel_unit_q_expansion_coefficients Ω ε X c M a0 b0 hM hlt hadm
   obtain ⟨k', hk'⟩ := GlobalTheory.T.smoothedSiegelUnit_qExpansion_coeffs_integral c M a0 hM hlt
   obtain ⟨A', hQ', -, -, hA', -⟩ := hk' b0 hadm
   have hAn : ∀ m, A m ∈ Subring.closure {eOm ε (1 / (M : ℚ))} := by
@@ -262,23 +300,31 @@ namespace GlobalTheory.FracBd
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
-theorem good_closure {F : HahnSeries ℚ Ω} {ζ : Ω} {M : ℕ} (hM : 0 < M) (hζ : ζ ^ M = 1)
-    (h : ∀ r, F.coeff r ∈ Subring.closure {ζ}) : Good F := by
+theorem good_closure
+    {F : HahnSeries ℚ Ω} {ζ : Ω} {M : ℕ}
+    (hM : 0 < M) (hζ : ζ ^ M = 1) (h : ∀ r, F.coeff r ∈ Subring.closure {ζ})
+    : Good F := by
   classical
   have hi : IsIntegral ℤ ζ := IsIntegral.of_pow hM (by rw [hζ]; exact isIntegral_one)
-  have h1 : Subring.closure {ζ} ≤ (IntermediateField.adjoin ℚ (({ζ} : Finset Ω) : Set Ω)).toSubring :=
+  have h1
+      : Subring.closure {ζ} ≤ (IntermediateField.adjoin ℚ (({ζ} : Finset Ω) : Set Ω)).toSubring :=
     Subring.closure_le.2 (by simpa using IntermediateField.subset_adjoin ℚ ({ζ} : Set Ω))
   have h2 : Subring.closure {ζ} ≤ (integralClosure ℤ Ω).toSubring :=
     Subring.closure_le.2 (by simpa [mem_integralClosure_iff] using hi)
   refine ⟨{ζ}, 1, one_pos, fun r => ⟨h1 (h r), ?_⟩⟩
   simpa [mem_integralClosure_iff] using h2 (h r)
 
-theorem good_siegel [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) {M c : ℕ} (hM : 0 < M) (hc1 : 1 < c)
-    (hc6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M]) (a b : ℤ) (hab : ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
-    (γ : SL(2, ℤ)) : Good (X.exp (X.sl (ofSL γ) (siegel X c ![(a : ℚ) / M, (b : ℚ) / M]))) := by
+theorem good_siegel
+    [IsAlgClosure ℚ Ω]
+    (ε : Ω →+* ℂ) (X : Tower Ω ε)
+    {M c : ℕ} (hM : 0 < M) (hc1 : 1 < c) (hc6 : Nat.Coprime c 6) (hcM : c ≡ 1 [MOD M])
+    (a b : ℤ) (hab : ¬((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b))
+    (γ : SL(2, ℤ))
+    : Good (X.exp (X.sl (ofSL γ) (siegel X c ![(a : ℚ) / M, (b : ℚ) / M]))) := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hMq : (M : ℚ) ≠ 0 := by exact_mod_cast hM.ne'
-  rw [GlobalTheory.T.siegelUnitInTower_sl_action_rowVector Ω ε X c _ γ (admissible_of_integral_conj_le hM hc1 hc6 hcM hab)]
+  rw [GlobalTheory.T.siegelUnitInTower_sl_action_rowVector Ω ε X c _ γ
+    (admissible_of_integral_conj_le hM hc1 hc6 hcM hab)]
   have hdet : (γ 0 0 : ℤ) * γ 1 1 - γ 0 1 * γ 1 0 = 1 := by
     have := Matrix.SpecialLinearGroup.det_coe γ
     rw [Matrix.det_fin_two] at this
@@ -292,13 +338,15 @@ theorem good_siegel [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) 
       field_simp
     · simp [act, Fin.sum_univ_two, b']
       field_simp
-  have hab' : ¬ ((M : ℤ) ∣ a' ∧ (M : ℤ) ∣ b') := by
+  have hab' : ¬((M : ℤ) ∣ a' ∧ (M : ℤ) ∣ b') := by
     rintro ⟨h1, h2⟩
     apply hab
     have ea : a = a' * γ 1 1 - b' * γ 1 0 := by simp only [a', b']; linear_combination (-a) * hdet
     have eb : b = b' * γ 0 0 - a' * γ 0 1 := by simp only [a', b']; linear_combination (-b) * hdet
-    exact ⟨ea ▸ dvd_sub (dvd_mul_of_dvd_left h1 _) (dvd_mul_of_dvd_left h2 _),
-      eb ▸ dvd_sub (dvd_mul_of_dvd_left h2 _) (dvd_mul_of_dvd_left h1 _)⟩
+    exact ⟨
+      ea ▸ dvd_sub (dvd_mul_of_dvd_left h1 _) (dvd_mul_of_dvd_left h2 _),
+      eb ▸ dvd_sub (dvd_mul_of_dvd_left h2 _) (dvd_mul_of_dvd_left h1 _)
+    ⟩
   rw [hact]
   have hζ : eOm ε (1 / (M : ℚ)) ^ M = 1 := by
     apply ε.injective
@@ -311,12 +359,22 @@ theorem good_siegel [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) 
     rw [this, Complex.exp_two_pi_mul_I]
   exact good_closure hM hζ (siegel_coeff ε X hM hc1 hc6 hcM a' b' hab')
 
-theorem frac_bd : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : GlobalTheory.KZ.Tower Ω ε),
-    ∀ (M c : ℕ), 0 < M → 1 < c → Nat.Coprime c 6 → c ≡ 1 [MOD M] →
-    ∀ f ∈ Algebra.adjoin Ω ({X.jK} ∪ {g | ∃ a b : ℤ, ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b) ∧
-      g = siegel X c ![(a : ℚ) / M, (b : ℚ) / M]}), ∀ γ : SL(2, ℤ),
-    (∃ (S : Finset Ω) (D : ℕ), 0 < D ∧ ∀ r, (X.exp (X.sl (ofSL γ) f)).coeff r ∈ IntermediateField.adjoin ℚ (S : Set Ω) ∧
-      IsIntegral ℤ ((D : Ω) * (X.exp (X.sl (ofSL γ) f)).coeff r)) := by
+theorem frac_bd
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ)
+        (X : GlobalTheory.KZ.Tower Ω ε),
+      ∀ (M c : ℕ),
+        0 < M → 1 < c → Nat.Coprime c 6 → c ≡ 1 [MOD M]
+          → ∀ f
+              ∈ Algebra.adjoin Ω
+                ({X.jK}
+                  ∪ {g | ∃ a b : ℤ, ¬ ((M : ℤ) ∣ a ∧ (M : ℤ) ∣ b) ∧
+                    g = siegel X c ![(a : ℚ) / M, (b : ℚ) / M]}),
+            ∀ γ : SL(2, ℤ),
+              (∃ (S : Finset Ω) (D : ℕ),
+                0 < D
+                  ∧ ∀ r,
+                    (X.exp (X.sl (ofSL γ) f)).coeff r ∈ IntermediateField.adjoin ℚ (S : Set Ω)
+                      ∧ IsIntegral ℤ ((D : Ω) * (X.exp (X.sl (ofSL γ) f)).coeff r)) := by
   intro Ω _ _ _ ε X M c hM hc1 hc6 hcM f hf γ
   haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
   show Good (X.exp (X.sl (ofSL γ) f))

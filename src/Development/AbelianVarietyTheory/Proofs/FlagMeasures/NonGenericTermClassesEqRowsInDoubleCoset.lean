@@ -11,8 +11,10 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full
-  Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,8 +24,8 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem orth_apply {U : Submodule E S.V} {x : S.V} (hx : x ∈ orth S U) {y : S.V} (hy : y ∈ U) :
-    S.hT y x = 0 := by
+theorem orth_apply {U : Submodule E S.V} {x : S.V} (hx : x ∈ orth S U) {y : S.V} (hy : y ∈ U)
+    : S.hT y x = 0 := by
   simp only [orth, Submodule.mem_iInf, LinearMap.mem_ker] at hx
   exact hx y hy
 
@@ -31,8 +33,8 @@ theorem mem_orth_of {U : Submodule E S.V} {x : S.V} (h : ∀ y ∈ U, S.hT y x =
   simp only [orth, Submodule.mem_iInf, LinearMap.mem_ker]
   exact h
 
-theorem mem_orth_Xsp {T : E} (F : LFlag S r T) (x : S.V) (hx : ∀ a, S.hT (F.fl.e a) x = 0) :
-    x ∈ orth S (Xsp F) := by
+theorem mem_orth_Xsp {T : E} (F : LFlag S r T) (x : S.V) (hx : ∀ a, S.hT (F.fl.e a) x = 0)
+    : x ∈ orth S (Xsp F) := by
   refine mem_orth_of fun y hy => ?_
   induction hy using Submodule.span_induction with
   | mem y hy => obtain ⟨a, rfl⟩ := hy; exact hx a
@@ -40,8 +42,8 @@ theorem mem_orth_Xsp {T : E} (F : LFlag S r T) (x : S.V) (hx : ∀ a, S.hT (F.fl
   | add y y' _ _ h h' => simp [h, h']
   | smul c y _ h => simp [h]
 
-theorem frame_orth_Xsp {T : E} (F : LFlag S r T) (i : Fin (r + 1)) (y : S.V) (hy : y ∈ Xsp F) :
-    S.hT (F.fl.fvec i) y = 0 := by
+theorem frame_orth_Xsp {T : E} (F : LFlag S r T) (i : Fin (r + 1)) (y : S.V) (hy : y ∈ Xsp F)
+    : S.hT (F.fl.fvec i) y = 0 := by
   induction hy using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨b, rfl⟩ := hy
@@ -52,8 +54,11 @@ theorem frame_orth_Xsp {T : E} (F : LFlag S r T) (i : Fin (r + 1)) (y : S.V) (hy
   | add y y' _ _ h h' => simp [h, h']
   | smul c y _ h => simp [h]
 
-theorem mapLF_fvec {T : E} (γ : S.V ≃ₗ[E] S.V) (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : LFlag S r T)
-    (i : Fin (r + 1)) : (mapLF γ F).fl.fvec i = γ (F.fl.fvec i) := by
+theorem mapLF_fvec
+    {T : E}
+    (γ : S.V ≃ₗ[E] S.V) (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (F : LFlag S r T) (i : Fin (r + 1))
+    : (mapLF γ F).fl.fvec i = γ (F.fl.fvec i) := by
   unfold mapLF
   rw [dite_eq_left hγ]
   induction i using Fin.lastCases with
@@ -66,8 +71,11 @@ section NR
 
 variable {D : D7}
 
-theorem nrat_fvec_sub {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
-    (hn : n ∈ NRat F) (i : Fin (D.R.rS + 1)) : n (F.fl.fvec i) - F.fl.fvec i ∈ Xsp F := by
+theorem nrat_fvec_sub
+    {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
+    {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F)
+    (i : Fin (D.R.rS + 1))
+    : n (F.fl.fvec i) - F.fl.fvec i ∈ Xsp F := by
   induction i using Fin.lastCases with
   | last =>
     rw [FlagG.fvec, Fin.snoc_last]
@@ -78,8 +86,11 @@ theorem nrat_fvec_sub {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) {n : (VS D)
       Submodule.subset_span ⟨a, by show a.1 < a.1 + 1; omega, rfl⟩
     exact Submodule.span_mono (Set.image_subset_range _ _) (hn.2.1 a.1 _ h1)
 
-theorem nrat_map_Xsp {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
-    (hn : n ∈ NRat F) (y : (VS D).V) (hy : y ∈ Xsp F) : n y ∈ Xsp F := by
+theorem nrat_map_Xsp
+    {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
+    {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ NRat F)
+    (y : (VS D).V) (hy : y ∈ Xsp F)
+    : n y ∈ Xsp F := by
   induction hy using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨a, rfl⟩ := hy
@@ -91,7 +102,8 @@ theorem nrat_map_Xsp {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) {n : (VS D).
   | add y y' _ _ h h' => rw [map_add]; exact add_mem h h'
   | smul c y _ h => rw [map_smul]; exact Submodule.smul_mem _ c h
 
-theorem one_mem_NRat {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) : (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ NRat F :=
+theorem one_mem_NRat {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
+    : (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ NRat F :=
   ⟨one_mem _, fun j x _ => by simp, fun x _ => by simp⟩
 
 end NR
@@ -104,10 +116,13 @@ section Terms
 
 variable {D : D7} {X : HidaSetting D} {Y : Full X} {u u' : D.what₂.Word}
 
-theorem nonGeneric_terms_same_coset_corank_one (t t' : TauC Y u u') (ht : t ∈ (Y.tO u u').ngSet) (hlam : t.lam = t'.lam)
-    (hlam' : t.lam' = t'.lam') (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ NRat (lf D (X.Fu u)))
-    (n' : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn' : n' ∈ NRat (lf D (X.Fu u'))) (he : t'.lin = n * t.lin * n') :
-    (Y.tO u u').s0 t t' = 1 := by
+theorem nonGeneric_terms_same_coset_corank_one
+    (t t' : TauC Y u u')
+    (ht : t ∈ (Y.tO u u').ngSet) (hlam : t.lam = t'.lam) (hlam' : t.lam' = t'.lam')
+    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ NRat (lf D (X.Fu u)))
+    (n' : (VS D).V ≃ₗ[D.host.E] (VS D).V)
+    (hn' : n' ∈ NRat (lf D (X.Fu u'))) (he : t'.lin = n * t.lin * n')
+    : (Y.tO u u').s0 t t' = 1 := by
   have hdim := Formalism.L2.SG.Corank.finrank_VS D
   have hGv : Gval (lf D (X.Fu u)) t.frame ≠ 0 := by
     intro h
@@ -124,7 +139,8 @@ theorem nonGeneric_terms_same_coset_corank_one (t t' : TauC Y u u') (ht : t ∈ 
   show Formalism.L2.SG.TermOp.s0T t t' = 1
   unfold Formalism.L2.SG.TermOp.s0T
   rw [if_pos ⟨hlam, hlam'⟩]
-  refine (Formalism.L2.SG.NGCut.CorankRelation.s0_eq_one_iff_Th_eq_Hp D.R.k hdim t.lam hlat _ t.frame t'.frame _ hLF hLt hGv).2 ?_
+  refine (Formalism.L2.SG.NGCut.CorankRelation.s0_eq_one_iff_Th_eq_Hp D.R.k hdim t.lam hlat _
+    t.frame t'.frame _ hLF hLt hGv).2 ?_
   refine le_antisymm (PI.PairCorankPos.W.Th_le_Hp _ _ _ _ _) fun x hx => ?_
   have hxo : ∀ i, (VS D).hT (Sum.elim (lf D (X.Fu u)).fl.fvec t.frame.fl.fvec i) x = 0 := fun i =>
     Formalism.L2.SG.NGCut.CorankRelation.hT_eq_zero_of_mem_Hp t.lam _ t.frame hx
@@ -135,8 +151,13 @@ theorem nonGeneric_terms_same_coset_corank_one (t t' : TauC Y u u') (ht : t ∈ 
     mem_orth_Xsp _ x fun a => by simpa [FlagG.fvec] using hxo (Sum.inr a.castSucc)
 
   have hXt : ∀ d ∈ Xsp (lf D (X.Fu u')), t.lin d ∈ Xsp t.frame := fun d hd =>
-    (Formalism.L2.SG.NGCut.CorankRelation.mem_Xsp_mapLF t.lin hiso (lf D (X.Fu u')) _).2 (by simpa using hd)
-  refine Submodule.mem_map.2 ⟨(x, n x), (Formalism.L2.SG.NGCut.CorankRelation.mem_ThPairs _ _ _ _ _ _).2 ⟨hx, ?_, ?_, ?_⟩, rfl⟩
+    (Formalism.L2.SG.NGCut.CorankRelation.mem_Xsp_mapLF t.lin hiso (lf D (X.Fu u')) _).2
+      (by simpa using hd)
+  refine Submodule.mem_map.2 ⟨
+    (x, n x),
+    (Formalism.L2.SG.NGCut.CorankRelation.mem_ThPairs _ _ _ _ _ _).2 ⟨hx, ?_, ?_, ?_⟩,
+    rfl
+  ⟩
   · refine Formalism.L2.SG.NGCut.CorankRelation.mem_Hp_of_orth t.lam _ t'.frame hLF hL' (n x) ?_
     rintro (a | b)
     · show (VS D).hT ((lf D (X.Fu u)).fl.fvec a) (n x) = 0
@@ -151,13 +172,19 @@ theorem nonGeneric_terms_same_coset_corank_one (t t' : TauC Y u u') (ht : t ∈ 
         rfl
       rw [hf, hn.1]
       have hd := nrat_fvec_sub (lf D (X.Fu u')) hn' b
-      have h4 : n' ((lf D (X.Fu u')).fl.fvec b) =
-          (lf D (X.Fu u')).fl.fvec b + (n' ((lf D (X.Fu u')).fl.fvec b) - (lf D (X.Fu u')).fl.fvec b) := by abel
+      have h4
+          : n' ((lf D (X.Fu u')).fl.fvec b)
+            = (lf D (X.Fu u')).fl.fvec b
+              + (n' ((lf D (X.Fu u')).fl.fvec b) - (lf D (X.Fu u')).fl.fvec b) := by
+        abel
       have h5 : (VS D).hT (t.lin ((lf D (X.Fu u')).fl.fvec b)) x = 0 := by
         have := hxo (Sum.inr b)
         simp only [Sum.elim_inr] at this
-        rwa [show t.frame.fl.fvec b = t.lin ((lf D (X.Fu u')).fl.fvec b) from mapLF_fvec t.lin hiso _ b] at this
-      rw [h4, map_add (f := _), map_add (f := _), LinearMap.add_apply, h5, orth_apply hxt (hXt _ hd), add_zero]
+        rwa [show t.frame.fl.fvec b = t.lin ((lf D (X.Fu u')).fl.fvec b) from
+            mapLF_fvec t.lin hiso _ b]
+          at this
+      rw [h4, map_add (f := _), map_add (f := _), LinearMap.add_apply, h5,
+        orth_apply hxt (hXt _ hd), add_zero]
   · show x - n x ∈ Xsp (lf D (X.Fu u))
     have := (Xsp (lf D (X.Fu u))).neg_mem (hn.2.2 x hxF)
     simpa using this
@@ -182,12 +209,15 @@ theorem nonGeneric_terms_same_coset_corank_one (t t' : TauC Y u u') (ht : t ∈ 
     rw [LinearEquiv.apply_symm_apply] at h6
     exact h6
 
-theorem clsRow_ngSet : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word), ConcTie X Y →
-    ClsRow (Y.tO u u').ngSet (clsOf Y u u') := by
+theorem clsRow_ngSet
+    : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
+      ConcTie X Y → ClsRow (Y.tO u u').ngSet (clsOf Y u u') := by
   intro D X Y u u' hT t ht t' ht' hn
-  obtain ⟨hR, hS, hTr⟩ := Formalism.L2.SG.NGCut.CorankRelation.corankOne_equivalence_holds D X Y u u' hT
-  have hiff : clsOf Y u u' t = clsOf Y u u' t' ↔
-      ((Y.tO u u').rowOf t = (Y.tO u u').rowOf t' ∧ (Y.tO u u').s0 t t' = 1) := by
+  obtain ⟨hR, hS, hTr⟩ :=
+    Formalism.L2.SG.NGCut.CorankRelation.corankOne_equivalence_holds D X Y u u' hT
+  have hiff
+      : clsOf Y u u' t = clsOf Y u u' t'
+        ↔ ((Y.tO u u').rowOf t = (Y.tO u u').rowOf t' ∧ (Y.tO u u').s0 t t' = 1) := by
     constructor
     · intro heq
       have hm : t' ∈ clsOf Y u u' t' := ⟨ht', rfl, hR t' ht'⟩

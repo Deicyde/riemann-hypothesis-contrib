@@ -9,10 +9,8 @@ namespace PositivityTheory.RgUd.T2
 open Complex Real
 
 theorem eq_one_of_pow_near {z : ℂ} (h : ∀ n : ℕ, ‖z ^ n - 1‖ ≤ 1 / 2) : z = 1 := by
-
   have hup : ∀ n : ℕ, ‖z‖ ^ n ≤ 3 / 2 := fun n => by
-    have h1 : ‖z ^ n‖ ≤ ‖z ^ n - 1‖ + ‖(1 : ℂ)‖ := by
-      simpa using norm_le_norm_sub_add (z ^ n) 1
+    have h1 : ‖z ^ n‖ ≤ ‖z ^ n - 1‖ + ‖(1 : ℂ)‖ := by simpa using norm_le_norm_sub_add (z ^ n) 1
     rw [norm_pow] at h1
     have := h n
     simp at h1
@@ -31,8 +29,7 @@ theorem eq_one_of_pow_near {z : ℂ} (h : ∀ n : ℕ, ‖z ^ n - 1‖ ≤ 1 / 2
     · exact heq
     · obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (3 / 2 : ℝ) hgt
       linarith [hup n]
-  have hmem : z ∈ Submonoid.unitSphere ℂ := by
-    simpa [Submonoid.unitSphere] using hz1
+  have hmem : z ∈ Submonoid.unitSphere ℂ := by simpa [Submonoid.unitSphere] using hz1
   let w : Circle := (⟨z, hmem⟩ : Submonoid.unitSphere ℂ)
   have hw : (w : ℂ) = z := rfl
   have hw1 : w = 1 := by

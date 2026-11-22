@@ -210,8 +210,14 @@ open AdmissibleUnits in
 theorem unitsTwoPow : UnitsTwoPow := by
   unfold UnitsTwoPow
   intro n
-  refine ⟨card_units (n + 2), orderOf_five_units_two_pow (n + 1), orderOf_three_units_two_pow n, neg_not_mem_five (n + 1),
-    neg_not_mem_three n, ?_⟩
+  refine ⟨
+    card_units (n + 2),
+    orderOf_five_units_two_pow (n + 1),
+    orderOf_three_units_two_pow n,
+    neg_not_mem_five (n + 1),
+    neg_not_mem_three n,
+    ?_
+  ⟩
   intro u
   have hc : Nat.card (ZMod (2 ^ (n + 3)))ˣ = 2 ^ (n + 2) := card_units (n + 2)
   have hcard : Fintype.card (Bool × Fin (2 ^ (n + 1))) = Fintype.card (ZMod (2 ^ (n + 3)))ˣ := by
@@ -226,8 +232,9 @@ theorem quotCyclic : QuotCyclic := by
   unfold QuotCyclic
   intro n
   have hsq : (-1 : (ZMod (2 ^ (n + 2)))ˣ) ^ 2 = 1 := neg_one_sq
-  have h5 : orderOf (QuotientGroup.mk (s := Subgroup.zpowers (-1 : (ZMod (2 ^ (n + 2)))ˣ))
-      (u5 (n + 2))) = 2 ^ n := by
+  have h5
+      : orderOf (QuotientGroup.mk (s := Subgroup.zpowers (-1 : (ZMod (2 ^ (n + 2)))ˣ)) (u5 (n + 2)))
+        = 2 ^ n := by
     rw [orderOf_mk_eq hsq (neg_not_mem_five n), orderOf_five_units_two_pow n]
   refine ⟨isCyclic_of_orderOf_eq_card _ (h5.trans (card_quot n).symm), card_quot n, h5, ?_⟩
   cases n with

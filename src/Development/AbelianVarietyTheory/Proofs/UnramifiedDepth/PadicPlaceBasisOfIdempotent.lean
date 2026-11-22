@@ -16,23 +16,32 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.Squarefree
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ChF
 
-private theorem exists_eps {C B OE : Type} [Field C] [CommRing B] [Algebra C B] [CommRing OE]
-    (σ : B →ₐ[C] C) (j : OE →+* B) (hj : Submodule.span C (Set.range j) = ⊤)
-    (hsup : (⨆ τ : OE →+* C, ⨅ a : OE,
-      Module.End.eigenspace (((Algebra.lmul C B).toRingHom.comp j) a) (τ a)) = ⊤) :
-    ∃ ε : B, σ ε = 1 ∧ ∀ z, z * ε = σ z • ε := by
+private theorem exists_eps
+    {C B OE : Type} [Field C] [CommRing B] [Algebra C B] [CommRing OE]
+    (σ : B →ₐ[C] C)
+    (j : OE →+* B) (hj : Submodule.span C (Set.range j) = ⊤)
+    (hsup
+      : (⨆ τ : OE →+* C, ⨅ a : OE,
+          Module.End.eigenspace (((Algebra.lmul C B).toRingHom.comp j) a) (τ a))
+        = ⊤)
+    : ∃ ε : B, σ ε = 1 ∧ ∀ z, z * ε = σ z • ε := by
   have key : ∀ z : B, ∃ ε : B, σ ε = σ z ∧ ∀ a, j a * ε = σ (j a) • ε := by
     intro z
-    have hz : z ∈ (⨆ τ : OE →+* C, ⨅ a : OE,
-      Module.End.eigenspace (((Algebra.lmul C B).toRingHom.comp j) a) (τ a)) := by
+    have hz
+        : z
+          ∈ (⨆ τ : OE →+* C, ⨅ a : OE,
+              Module.End.eigenspace (((Algebra.lmul C B).toRingHom.comp j) a) (τ a)) := by
       rw [hsup]; trivial
     induction hz using Submodule.iSup_induction' with
     | mem τ x hx =>
@@ -46,7 +55,8 @@ private theorem exists_eps {C B OE : Type} [Field C] [CommRing B] [Algebra C B] 
         have h1 := congrArg σ (hx' a)
         rw [map_mul, map_smul, smul_eq_mul] at h1
         rw [hx' a, mul_right_cancel₀ h0 h1]
-    | zero => exact ⟨0, rfl, by simp⟩
+    | zero =>
+      exact ⟨0, rfl, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, ha, ha'⟩ := hx
       obtain ⟨b, hb, hb'⟩ := hy
@@ -60,17 +70,22 @@ private theorem exists_eps {C B OE : Type} [Field C] [CommRing B] [Algebra C B] 
   | add x y _ _ hx hy => rw [add_mul, hx, hy, map_add (f := _), add_smul]
   | smul c x _ hx => rw [smul_mul_assoc, hx, map_smul, smul_eq_mul, mul_smul]
 
-private theorem core {C B OE κ I H : Type} [Field C] [CommRing B] [Algebra C B] [CommRing OE]
-    [Fintype κ] [DecidableEq κ] [Fintype I] [Fintype H]
-    (σ : B →ₐ[C] C) (j : OE →+* B) (hj : Submodule.span C (Set.range j) = ⊤)
-    (hsup : (⨆ τ : OE →+* C, ⨅ a : OE,
-      Module.End.eigenspace (((Algebra.lmul C B).toRingHom.comp j) a) (τ a)) = ⊤)
-    (ρ : B →ₐ[C] Matrix κ κ C) (e : B) (he : σ e = 1) (b : I → B)
-    (hb : ∀ z, z * e ∈ Submodule.span C (Set.range b)) (y : H → κ → C)
-    (hli : LinearIndependent C (fun q : I × H => ρ (b q.1) *ᵥ y q.2))
-    (hsp : ∀ x, ρ e *ᵥ x ∈ Submodule.span C (Set.range fun q : I × H => ρ (b q.1) *ᵥ y q.2)) :
-    Module.finrank C ↥(⨅ a : OE, Module.End.eigenspace (Matrix.toLin' (ρ (j a))) (σ (j a))) =
-      Fintype.card H := by
+private theorem core
+    {C B OE κ I H : Type} [Field C] [CommRing B] [Algebra C B] [CommRing OE] [Fintype κ]
+    [DecidableEq κ] [Fintype I] [Fintype H]
+    (σ : B →ₐ[C] C)
+    (j : OE →+* B) (hj : Submodule.span C (Set.range j) = ⊤)
+    (hsup
+      : (⨆ τ : OE →+* C, ⨅ a : OE,
+          Module.End.eigenspace (((Algebra.lmul C B).toRingHom.comp j) a) (τ a))
+        = ⊤)
+    (ρ : B →ₐ[C] Matrix κ κ C)
+    (e : B) (he : σ e = 1)
+    (b : I → B) (hb : ∀ z, z * e ∈ Submodule.span C (Set.range b))
+    (y : H → κ → C) (hli : LinearIndependent C (fun q : I × H => ρ (b q.1) *ᵥ y q.2))
+    (hsp : ∀ x, ρ e *ᵥ x ∈ Submodule.span C (Set.range fun q : I × H => ρ (b q.1) *ᵥ y q.2))
+    : Module.finrank C ↥(⨅ a : OE, Module.End.eigenspace (Matrix.toLin' (ρ (j a))) (σ (j a)))
+      = Fintype.card H := by
   obtain ⟨ε, h1, h2⟩ := exists_eps σ j hj hsup
   have hεe : ε * e = ε := by rw [mul_comm, h2, he, one_smul]
   obtain ⟨t, ht⟩ := (Submodule.mem_span_range_iff_exists_fun C).1 (hb ε)
@@ -82,20 +97,22 @@ private theorem core {C B OE κ I H : Type} [Field C] [CommRing B] [Algebra C B]
   have hli' : LinearIndependent C (fun l : H => ρ ε *ᵥ y l) := by
     rw [Fintype.linearIndependent_iff] at hli ⊢
     intro c hc l
-    have h3 := hli (fun q => c q.2 * t q.1) (by
-      rw [← hc, Fintype.sum_prod_type_right]
-      refine Finset.sum_congr rfl fun l _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← ht, map_sum, Matrix.sum_mulVec, Finset.smul_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [map_smul, Matrix.smul_mulVec, mul_smul])
+    have h3 :=
+      hli (fun q => c q.2 * t q.1) (by
+        rw [← hc, Fintype.sum_prod_type_right]
+        refine Finset.sum_congr rfl fun l _ => ?_
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [← ht, map_sum, Matrix.sum_mulVec, Finset.smul_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [map_smul, Matrix.smul_mulVec, mul_smul])
     by_contra hl
     have h4 : ∀ i, t i = 0 := fun i => (mul_eq_zero.1 (h3 (i, l))).resolve_left hl
     have h5 : ε = 0 := by rw [← ht]; simp [h4]
     rw [h5, map_zero] at h1
     exact zero_ne_one h1
-  have hE : (⨅ a : OE, Module.End.eigenspace (Matrix.toLin' (ρ (j a))) (σ (j a))) =
-      Submodule.span C (Set.range fun l : H => ρ ε *ᵥ y l) := by
+  have hE
+      : (⨅ a : OE, Module.End.eigenspace (Matrix.toLin' (ρ (j a))) (σ (j a)))
+        = Submodule.span C (Set.range fun l : H => ρ ε *ᵥ y l) := by
     apply le_antisymm
     · intro x hx
       have hx' : ∀ a, ρ (j a) *ᵥ x = σ (j a) • x := fun a => by
@@ -107,7 +124,8 @@ private theorem core {C B OE κ I H : Type} [Field C] [CommRing B] [Algebra C B]
         induction hz using Submodule.span_induction with
         | mem x hx => obtain ⟨a, rfl⟩ := hx; exact hx' a
         | zero => simp
-        | add x y _ _ hx hy => rw [map_add (f := _), Matrix.add_mulVec, hx, hy, map_add (f := _), add_smul]
+        | add x y _ _ hx hy =>
+          rw [map_add (f := _), Matrix.add_mulVec, hx, hy, map_add (f := _), add_smul]
         | smul c x _ hx => rw [map_smul, Matrix.smul_mulVec, hx, map_smul, smul_eq_mul, mul_smul]
       obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun C).1 (hsp x)
       have : x = ρ ε *ᵥ (ρ e *ᵥ x) := by rw [hx2 e, he, one_smul, hx2, h1, one_smul]
@@ -122,12 +140,31 @@ private theorem core {C B OE κ I H : Type} [Field C] [CommRing B] [Algebra C B]
       exact hmul _ _
   rw [hE, finrank_span_eq_card hli']
 
-theorem eigDim_eq_of_basis : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [Algebra ℤ_[p] O] (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE] (w : PlaceU p OE) (b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e))) (κ : Type) [Fintype κ] [DecidableEq κ] (ρ : (ℤ_[p] ⊗[ℤ] OE) →ₐ[ℤ_[p]] Matrix κ κ ℤ_[p]) (h : ℕ) (y : Fin h → κ → ℤ_[p]), LinearIndependent ℤ_[p] (fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2) → Submodule.span ℤ_[p] (Set.range fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2) = LinearMap.range (Matrix.mulVecLin (ρ w.e)) → ∀ τ ∈ Emb (O := O) w.e, eigDim C (fun a : OE => (ρ (1 ⊗ₜ[ℤ] a)).map (algebraMap ℤ_[p] O)) ((algebraMap O C).comp τ) = h := by
+theorem eigDim_eq_of_basis
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
+      v.Integers O
+        → ∀ [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [Algebra ℤ_[p] O]
+            (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE]
+            [Module.Finite ℤ OE] (w : PlaceU p OE)
+            (b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)))
+            (κ : Type) [Fintype κ] [DecidableEq κ] (ρ : (ℤ_[p] ⊗[ℤ] OE) →ₐ[ℤ_[p]] Matrix κ κ ℤ_[p])
+            (h : ℕ) (y : Fin h → κ → ℤ_[p]),
+          LinearIndependent ℤ_[p] (fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2)
+            → Submodule.span ℤ_[p]
+                (Set.range fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2)
+              = LinearMap.range (Matrix.mulVecLin (ρ w.e))
+            → ∀ τ ∈ Emb (O := O) w.e,
+              eigDim C
+                  (fun a : OE => (ρ (1 ⊗ₜ[ℤ] a)).map (algebraMap ℤ_[p] O))
+                  ((algebraMap O C).comp τ)
+                = h := by
   intro p _ C _ _ _ v O _ _ _ _ _ _ OE _ _ _ _ _ w b κ _ _ ρ h y hli hsp τ hτ
   letI : Algebra ℤ_[p] C := ((algebraMap O C).comp (algebraMap ℤ_[p] O)).toAlgebra
   haveI : IsScalarTower ℤ_[p] O C := IsScalarTower.of_algebraMap_eq fun _ => rfl
   have hinj : Function.Injective (algebraMap ℤ_[p] C) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra h0
     rw [PadicInt.unitCoeff_spec h0, map_mul, map_pow, map_natCast] at hx
@@ -135,11 +172,12 @@ theorem eigDim_eq_of_basis : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [
     · exact ((PadicInt.unitCoeff h0).isUnit.map (algebraMap ℤ_[p] C)).ne_zero h1
     · exact (Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero) (pow_eq_zero_iff'.1 h1).1
   haveI : FaithfulSMul ℤ_[p] C := (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
-  let σ : (C ⊗[ℤ_[p]] (ℤ_[p] ⊗[ℤ] OE)) →ₐ[C] C := Algebra.TensorProduct.lift (AlgHom.id C C)
-    ((IsScalarTower.toAlgHom ℤ_[p] O C).comp (tauExt τ)) (fun _ _ => Commute.all _ _)
+  let σ : (C ⊗[ℤ_[p]] (ℤ_[p] ⊗[ℤ] OE)) →ₐ[C] C :=
+    Algebra.TensorProduct.lift (AlgHom.id C C) ((IsScalarTower.toAlgHom ℤ_[p] O C).comp (tauExt τ))
+      (fun _ _ => Commute.all _ _)
   let ρB : (C ⊗[ℤ_[p]] (ℤ_[p] ⊗[ℤ] OE)) →ₐ[C] Matrix κ κ C :=
     Algebra.TensorProduct.lift (Algebra.ofId C (Matrix κ κ C))
-    ((Algebra.ofId ℤ_[p] C).mapMatrix.comp ρ) (fun _ _ => Algebra.commutes _ _)
+      ((Algebra.ofId ℤ_[p] C).mapMatrix.comp ρ) (fun _ _ => Algebra.commutes _ _)
   let j : OE →+* (C ⊗[ℤ_[p]] (ℤ_[p] ⊗[ℤ] OE)) :=
     (Algebra.TensorProduct.includeRight (R := ℤ_[p]) (A := C) (B := ℤ_[p] ⊗[ℤ] OE)).toRingHom.comp
       (Algebra.TensorProduct.includeRight (R := ℤ) (A := ℤ_[p]) (B := OE)).toRingHom
@@ -154,12 +192,17 @@ theorem eigDim_eq_of_basis : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [
     funext i
     rw [hρ]
     exact (RingHom.map_mulVec _ _ _ _).symm
-  have hs : ∀ (c : C) (r : ℤ_[p]) (a : ℤ_[p] ⊗[ℤ] OE),
-      (c ⊗ₜ[ℤ_[p]] (r • a)) = (r • c) • ((1 : C) ⊗ₜ[ℤ_[p]] a) := fun c r a => by
+  have hs
+      : ∀ (c : C) (r : ℤ_[p]) (a : ℤ_[p] ⊗[ℤ] OE),
+        (c ⊗ₜ[ℤ_[p]] (r • a)) = (r • c) • ((1 : C) ⊗ₜ[ℤ_[p]] a) := fun c r a => by
     rw [← TensorProduct.smul_tmul, TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
-  have H := core (I := Fin w.n) (H := Fin h) σ j ?_ ((GlobalTheory.order_rep_diagonalisable C OE).2 _ _).2 ρB (1 ⊗ₜ w.e)
-    (by rw [hσ, show tauExt τ w.e = 1 from hτ, map_one])
-    (fun i => 1 ⊗ₜ (b i : ℤ_[p] ⊗[ℤ] OE)) ?_ (fun l => algebraMap ℤ_[p] C ∘ y l) ?_ ?_
+  have H :=
+    core (I := Fin w.n) (H := Fin h) σ j ?_ ((GlobalTheory.order_rep_diagonalisable C OE).2 _ _).2
+      ρB (1 ⊗ₜ w.e) (by rw [hσ, show tauExt τ w.e = 1 from hτ, map_one])
+      (fun i => 1 ⊗ₜ (b i : ℤ_[p] ⊗[ℤ] OE))
+      ?_
+      (fun l => algebraMap ℤ_[p] C ∘ y l)
+      ?_ ?_
   · rw [Fintype.card_fin] at H
     have h1 : ∀ a, ρB (j a) = ((ρ (1 ⊗ₜ[ℤ] a)).map (algebraMap ℤ_[p] O)).map (algebraMap O C) := by
       intro a
@@ -169,9 +212,12 @@ theorem eigDim_eq_of_basis : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [
       intro a
       rw [hj, hσ]
       simp [tauExt]
-    have h3 : (⨅ a : OE, Module.End.eigenspace (Matrix.toLin' (ρB (j a))) (σ (j a))) = ⨅ a : OE,
-        Module.End.eigenspace (Matrix.toLin' (((ρ (1 ⊗ₜ[ℤ] a)).map (algebraMap ℤ_[p] O)).map (algebraMap O C)))
-          (((algebraMap O C).comp τ) a) := iInf_congr fun a => by rw [h1, h2]
+    have h3
+        : (⨅ a : OE, Module.End.eigenspace (Matrix.toLin' (ρB (j a))) (σ (j a)))
+          = ⨅ a : OE,
+            Module.End.eigenspace (Matrix.toLin' (((ρ (1 ⊗ₜ[ℤ] a)).map (algebraMap ℤ_[p] O)).map (algebraMap O C)))
+              (((algebraMap O C).comp τ) a) :=
+      iInf_congr fun a => by rw [h1, h2]
     rw [h3] at H
     exact H
   · rw [eq_top_iff]
@@ -195,7 +241,8 @@ theorem eigDim_eq_of_basis : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [
     | tmul c a =>
       have h1 := congrArg Subtype.val (b.sum_repr ⟨w.e * a, a, rfl⟩)
       simp only [AddSubmonoidClass.coe_finsetSum, SetLike.val_smul] at h1
-      rw [Algebra.TensorProduct.tmul_mul_tmul, _root_.mul_one, mul_comm a, ← h1, TensorProduct.tmul_sum]
+      rw [Algebra.TensorProduct.tmul_mul_tmul, _root_.mul_one, mul_comm a, ← h1,
+        TensorProduct.tmul_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [hs]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -205,20 +252,23 @@ theorem eigDim_eq_of_basis : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [
     simp only [hmv]
     rw [← Finset.univ_sum_single x, Matrix.mulVec_sum]
     refine Submodule.sum_mem _ fun k _ => ?_
-    have h1 : (Pi.single k (x k) : κ → C) = x k • (algebraMap ℤ_[p] C ∘ (Pi.single k 1 : κ → ℤ_[p])) := by
+    have h1
+        : (Pi.single k (x k) : κ → C)
+          = x k • (algebraMap ℤ_[p] C ∘ (Pi.single k 1 : κ → ℤ_[p])) := by
       funext i
       by_cases hi : i = k
       · subst hi; simp
       · simp [hi]
     rw [h1, Matrix.mulVec_smul, hmv]
     refine Submodule.smul_mem _ _ ?_
-    have h2 : ρ w.e *ᵥ (Pi.single k 1 : κ → ℤ_[p]) ∈ LinearMap.range (Matrix.mulVecLin (ρ w.e)) := ⟨_, rfl⟩
+    have h2 : ρ w.e *ᵥ (Pi.single k 1 : κ → ℤ_[p]) ∈ LinearMap.range (Matrix.mulVecLin (ρ w.e)) :=
+      ⟨_, rfl⟩
     rw [← hsp] at h2
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 h2
     refine (Submodule.mem_span_range_iff_exists_fun _).2 ⟨fun q => algebraMap ℤ_[p] C (c q), ?_⟩
     rw [← hc]
     funext i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, map_sum, map_mul]
+    simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, map_sum, map_mul]
 
 end GlobalTheory.ChF

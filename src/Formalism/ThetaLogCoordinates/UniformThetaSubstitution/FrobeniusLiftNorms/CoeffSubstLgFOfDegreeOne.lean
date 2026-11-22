@@ -33,62 +33,75 @@ theorem coeff_one_lgF (p : ℕ) (hp : 2 ≤ p) : PowerSeries.coeff 1 (lgF K p) =
   rw [lgF, PowerSeries.coeff_mk]
   simp [Finset.sum_range_succ, h1]
 
-theorem map_lgF {L : Type} [Field L] (φ : K →+* L) (p : ℕ) :
-    PowerSeries.map φ (lgF K p) = lgF L p := by
+theorem map_lgF {L : Type} [Field L] (φ : K →+* L) (p : ℕ)
+    : PowerSeries.map φ (lgF K p) = lgF L p := by
   ext n
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [lgF, PowerSeries.coeff_map, PowerSeries.coeff_mk, map_sum]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   split_ifs <;> simp
 
-theorem cob_eq_zero_iff (F : MvPowerSeries (Fin 2) K) (f : PowerSeries K) :
-    cob F f = 0 ↔ PowerSeries.subst F f = at1 0 f + at1 1 f := by
+theorem cob_eq_zero_iff (F : MvPowerSeries (Fin 2) K) (f : PowerSeries K)
+    : cob F f = 0 ↔ PowerSeries.subst F f = at1 0 f + at1 1 f := by
   rw [cob, sub_sub, sub_eq_zero]
 
-theorem constantCoeff_inVar {ι : Type} (x : ι) (f : PowerSeries K)
-    (hf : PowerSeries.constantCoeff f = 0) : MvPowerSeries.constantCoeff (at1 x f) = 0 :=
+theorem constantCoeff_inVar
+    {ι : Type} (x : ι) (f : PowerSeries K) (hf : PowerSeries.constantCoeff f = 0)
+    : MvPowerSeries.constantCoeff (at1 x f) = 0 :=
   PowerSeries.constantCoeff_subst_eq_zero (by simp) f hf
 
-theorem lgF_subst_inj {ι : Type} (p : ℕ) (hp : 2 ≤ p) (a b : MvPowerSeries ι K)
+theorem lgF_subst_inj
+    {ι : Type}
+    (p : ℕ) (hp : 2 ≤ p)
+    (a b : MvPowerSeries ι K)
     (ha : MvPowerSeries.constantCoeff a = 0) (hb : MvPowerSeries.constantCoeff b = 0)
-    (h : PowerSeries.subst a (lgF K p) = PowerSeries.subst b (lgF K p)) : a = b :=
+    (h : PowerSeries.subst a (lgF K p) = PowerSeries.subst b (lgF K p))
+    : a = b :=
   Formalism.G.substInjective K ι (lgF K p) a b (constantCoeff_lgF p hp) (coeff_one_lgF p hp) ha hb h
 
-theorem law_exists (p : ℕ) (hp : 2 ≤ p) :
-    ∃ F : MvPowerSeries (Fin 2) K, MvPowerSeries.constantCoeff F = 0 ∧ cob F (lgF K p) = 0 := by
+theorem law_exists (p : ℕ) (hp : 2 ≤ p)
+    : ∃ F : MvPowerSeries (Fin 2) K, MvPowerSeries.constantCoeff F = 0 ∧ cob F (lgF K p) = 0 := by
   have h0 : MvPowerSeries.constantCoeff (at1 (0 : Fin 2) (lgF K p) + at1 1 (lgF K p)) = 0 := by
     rw [map_add (f := _), constantCoeff_inVar _ _ (constantCoeff_lgF p hp),
       constantCoeff_inVar _ _ (constantCoeff_lgF p hp), add_zero]
-  obtain ⟨F, hF0, hF⟩ := Formalism.LT.SolveExists_proof K (Fin 2) (lgF K p) _
-    (constantCoeff_lgF p hp) (coeff_one_lgF p hp) h0
+  obtain ⟨F, hF0, hF⟩ :=
+    Formalism.LT.SolveExists_proof K (Fin 2) (lgF K p) _ (constantCoeff_lgF p hp)
+      (coeff_one_lgF p hp) h0
   exact ⟨F, hF0, (cob_eq_zero_iff F _).mpr hF⟩
 
-theorem law_unique (p : ℕ) (hp : 2 ≤ p) (F F' : MvPowerSeries (Fin 2) K)
-    (h0 : MvPowerSeries.constantCoeff F = 0) (h0' : MvPowerSeries.constantCoeff F' = 0)
-    (h : cob F (lgF K p) = 0) (h' : cob F' (lgF K p) = 0) : F = F' :=
-  lgF_subst_inj p hp F F' h0 h0'
-    (by rw [(cob_eq_zero_iff F _).mp h, (cob_eq_zero_iff F' _).mp h'])
+theorem law_unique
+    (p : ℕ) (hp : 2 ≤ p)
+    (F F' : MvPowerSeries (Fin 2) K) (h0 : MvPowerSeries.constantCoeff F = 0)
+    (h0' : MvPowerSeries.constantCoeff F' = 0) (h : cob F (lgF K p) = 0) (h' : cob F' (lgF K p) = 0)
+    : F = F' :=
+  lgF_subst_inj p hp F F' h0 h0' (by rw [(cob_eq_zero_iff F _).mp h, (cob_eq_zero_iff F' _).mp h'])
 
-theorem map_inVar {L ι : Type} [Field L] (φ : K →+* L) (x : ι) (f : PowerSeries K) :
-    MvPowerSeries.map φ (at1 x f) = at1 x (PowerSeries.map φ f) := by
+theorem map_inVar {L ι : Type} [Field L] (φ : K →+* L) (x : ι) (f : PowerSeries K)
+    : MvPowerSeries.map φ (at1 x f) = at1 x (PowerSeries.map φ f) := by
   rw [at1, at1, PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)),
     MvPowerSeries.map_X]
 
-theorem map_cob {L : Type} [Field L] (φ : K →+* L) (F : MvPowerSeries (Fin 2) K)
-    (hF : MvPowerSeries.constantCoeff F = 0) (f : PowerSeries K) :
-    MvPowerSeries.map φ (cob F f) = cob (MvPowerSeries.map φ F) (PowerSeries.map φ f) := by
+theorem map_cob
+    {L : Type} [Field L]
+    (φ : K →+* L)
+    (F : MvPowerSeries (Fin 2) K) (hF : MvPowerSeries.constantCoeff F = 0)
+    (f : PowerSeries K)
+    : MvPowerSeries.map φ (cob F f) = cob (MvPowerSeries.map φ F) (PowerSeries.map φ f) := by
   rw [cob, cob, map_sub, map_sub, map_inVar, map_inVar,
     PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero hF)]
 
-theorem map_law {L : Type} [Field L] (φ : K →+* L) (p : ℕ) (F : MvPowerSeries (Fin 2) K)
-    (hF : MvPowerSeries.constantCoeff F = 0) (h : cob F (lgF K p) = 0) :
-    MvPowerSeries.constantCoeff (MvPowerSeries.map φ F) = 0 ∧
-      cob (MvPowerSeries.map φ F) (lgF L p) = 0 := by
+theorem map_law
+    {L : Type} [Field L]
+    (φ : K →+* L)
+    (p : ℕ) (F : MvPowerSeries (Fin 2) K)
+    (hF : MvPowerSeries.constantCoeff F = 0) (h : cob F (lgF K p) = 0)
+    : MvPowerSeries.constantCoeff (MvPowerSeries.map φ F) = 0
+      ∧ cob (MvPowerSeries.map φ F) (lgF L p) = 0 := by
   refine ⟨by rw [MvPowerSeries.constantCoeff_map, hF, map_zero], ?_⟩
   rw [← map_lgF φ p, ← map_cob φ F hF, h, map_zero]
 
-private theorem coeff_lgF_pow_sq_pow_eq_inv_pow (p : ℕ) (hp : 2 ≤ p) (j : ℕ) :
-    PowerSeries.coeff ((p ^ 2) ^ j) (lgF K p) = ((p : K) ^ j)⁻¹ := by
+private theorem coeff_lgF_pow_sq_pow_eq_inv_pow (p : ℕ) (hp : 2 ≤ p) (j : ℕ)
+    : PowerSeries.coeff ((p ^ 2) ^ j) (lgF K p) = ((p : K) ^ j)⁻¹ := by
   have hq : 2 ≤ p ^ 2 := by nlinarith
   rw [lgF, PowerSeries.coeff_mk, Finset.sum_eq_single j]
   · simp
@@ -103,14 +116,14 @@ private theorem coeff_lgF_pow_sq_pow_eq_inv_pow (p : ℕ) (hp : 2 ≤ p) (j : �
     have : j < (p ^ 2) ^ j := Nat.lt_pow_self (by omega)
     omega
 
-private theorem coeff_lgF_eq_zero_of_ne_pow_sq_pow (p n : ℕ) (h : ∀ j, n ≠ (p ^ 2) ^ j) :
-    PowerSeries.coeff n (lgF K p) = 0 := by
+private theorem coeff_lgF_eq_zero_of_ne_pow_sq_pow (p n : ℕ) (h : ∀ j, n ≠ (p ^ 2) ^ j)
+    : PowerSeries.coeff n (lgF K p) = 0 := by
   rw [lgF, PowerSeries.coeff_mk]
   exact Finset.sum_eq_zero (fun i _ => if_neg (h i))
 
-theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0) :
-    lgF K p - (p : K)⁻¹ • PowerSeries.subst ((PowerSeries.X : PowerSeries K) ^ (p ^ 2)) (lgF K p) =
-      PowerSeries.X := by
+theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0)
+    : lgF K p - (p : K)⁻¹ • PowerSeries.subst ((PowerSeries.X : PowerSeries K) ^ (p ^ 2)) (lgF K p)
+      = PowerSeries.X := by
   have hq0 : p ^ 2 ≠ 0 := by positivity
   have hq : 2 ≤ p ^ 2 := by nlinarith
   ext n
@@ -128,7 +141,8 @@ theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0) :
       have hdiv : (p ^ 2) ^ (j + 1) / p ^ 2 = (p ^ 2) ^ j := by
         rw [pow_succ, Nat.mul_div_cancel _ (by positivity)]
       have hne1 : (p ^ 2) ^ (j + 1) ≠ 1 := ne_of_gt (Nat.one_lt_pow (Nat.succ_ne_zero j) (by omega))
-      rw [if_pos hd, hdiv, coeff_lgF_pow_sq_pow_eq_inv_pow p hp, coeff_lgF_pow_sq_pow_eq_inv_pow p hp, if_neg hne1]
+      rw [if_pos hd, hdiv, coeff_lgF_pow_sq_pow_eq_inv_pow p hp,
+        coeff_lgF_pow_sq_pow_eq_inv_pow p hp, if_neg hne1]
       simp [pow_succ, mul_inv, mul_comm]
   · push_neg at hn
     rw [coeff_lgF_eq_zero_of_ne_pow_sq_pow p n hn]
@@ -142,29 +156,32 @@ theorem lgF_funEq (p : ℕ) (hp : 2 ≤ p) (hpK : (p : K) ≠ 0) :
       simp [coeff_lgF_eq_zero_of_ne_pow_sq_pow p _ hn']
     · simp
 
-theorem subst_subst {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b)
-    {a : MvPowerSeries ι K} (ha : PowerSeries.HasSubst a) (f : PowerSeries K) :
-    MvPowerSeries.subst b (PowerSeries.subst a f) =
-      PowerSeries.subst (MvPowerSeries.subst b a) f := by
+theorem subst_subst
+    {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b)
+    {a : MvPowerSeries ι K} (ha : PowerSeries.HasSubst a)
+    (f : PowerSeries K)
+    : MvPowerSeries.subst b (PowerSeries.subst a f)
+      = PowerSeries.subst (MvPowerSeries.subst b a) f := by
   unfold PowerSeries.subst
   rw [MvPowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.const ha) hb]
 
-theorem subst_single_var {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b)
-    (x : ι) (f : PowerSeries K) :
-    MvPowerSeries.subst b (at1 x f) = PowerSeries.subst (b x) f := by
+theorem subst_single_var
+    {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : MvPowerSeries.HasSubst b) (x : ι)
+    (f : PowerSeries K)
+    : MvPowerSeries.subst b (at1 x f) = PowerSeries.subst (b x) f := by
   rw [at1, subst_subst hb (PowerSeries.HasSubst.of_constantCoeff_zero (by simp)),
     MvPowerSeries.subst_X hb]
 
-theorem zeta_pow {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) (j : ℕ) :
-    ζ ^ ((p ^ 2) ^ j) = ζ := by
+theorem zeta_pow {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) (j : ℕ)
+    : ζ ^ ((p ^ 2) ^ j) = ζ := by
   induction j with
   | zero => simp
   | succ j ih =>
     have hq : p ^ 2 - 1 + 1 = p ^ 2 := Nat.sub_add_cancel (by nlinarith)
     rw [pow_succ, pow_mul, ih, ← hq, pow_succ, hζ, one_mul]
 
-theorem rescale_lgF {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) :
-    PowerSeries.rescale ζ (lgF K p) = PowerSeries.C ζ * lgF K p := by
+theorem rescale_lgF {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p)
+    : PowerSeries.rescale ζ (lgF K p) = PowerSeries.C ζ * lgF K p := by
   ext n
   rw [PowerSeries.coeff_rescale, PowerSeries.coeff_C_mul]
   by_cases hn : ∃ j, n = (p ^ 2) ^ j
@@ -174,10 +191,11 @@ theorem rescale_lgF {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ 
     rw [coeff_lgF_eq_zero_of_ne_pow_sq_pow p n hn]
     simp
 
-theorem lgF_subst_C_mul {ι : Type} {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p)
-    (G : MvPowerSeries ι K) (hG : MvPowerSeries.constantCoeff G = 0) :
-    PowerSeries.subst (MvPowerSeries.C ζ * G) (lgF K p) =
-      MvPowerSeries.C ζ * PowerSeries.subst G (lgF K p) := by
+theorem lgF_subst_C_mul
+    {ι : Type} {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) = 1) (hp : 2 ≤ p) (G : MvPowerSeries ι K)
+    (hG : MvPowerSeries.constantCoeff G = 0)
+    : PowerSeries.subst (MvPowerSeries.C ζ * G) (lgF K p)
+      = MvPowerSeries.C ζ * PowerSeries.subst G (lgF K p) := by
   have hG' : PowerSeries.HasSubst G := PowerSeries.HasSubst.of_constantCoeff_zero hG
   have hX : PowerSeries.HasSubst (ζ • PowerSeries.X : PowerSeries K) :=
     PowerSeries.HasSubst.of_constantCoeff_zero (by simp; exact Or.inr PowerSeries.constantCoeff_X)
@@ -187,9 +205,12 @@ theorem lgF_subst_C_mul {ι : Type} {ζ : K} {p : ℕ} (hζ : ζ ^ (p ^ 2 - 1) =
     rescale_lgF hζ hp, ← PowerSeries.smul_eq_C_mul, PowerSeries.subst_smul hG',
     MvPowerSeries.smul_eq_C_mul]
 
-theorem coeff_subst_lgF_of_degree_one {ι : Type} (p : ℕ) (hp : 2 ≤ p) (F : MvPowerSeries ι K)
-    (hF : MvPowerSeries.constantCoeff F = 0) (n : ι →₀ ℕ) (hn : n.degree = 1) :
-    MvPowerSeries.coeff n (PowerSeries.subst F (lgF K p)) = MvPowerSeries.coeff n F := by
+theorem coeff_subst_lgF_of_degree_one
+    {ι : Type}
+    (p : ℕ) (hp : 2 ≤ p)
+    (F : MvPowerSeries ι K) (hF : MvPowerSeries.constantCoeff F = 0)
+    (n : ι →₀ ℕ) (hn : n.degree = 1)
+    : MvPowerSeries.coeff n (PowerSeries.subst F (lgF K p)) = MvPowerSeries.coeff n F := by
   classical
   have hdvd : (PowerSeries.X : PowerSeries K) ^ 2 ∣ lgF K p - PowerSeries.X := by
     rw [PowerSeries.X_pow_dvd_iff]
@@ -231,8 +252,9 @@ theorem not_dvd_den {p : ℕ} [Fact p.Prime] (r : ℚ) (h : ‖(r : ℚ_[p])‖ 
       push_cast
       exact (Rat.mul_den_eq_num r).symm
     rw [hc, padicNorm.mul]
-    calc padicNorm p r * padicNorm p ((r.den : ℤ) : ℚ) ≤ 1 * padicNorm p ((r.den : ℤ) : ℚ) :=
-          mul_le_mul_of_nonneg_right (by exact_mod_cast h) (padicNorm.nonneg _)
+    calc
+      padicNorm p r * padicNorm p ((r.den : ℤ) : ℚ) ≤ 1 * padicNorm p ((r.den : ℤ) : ℚ) :=
+        mul_le_mul_of_nonneg_right (by exact_mod_cast h) (padicNorm.nonneg _)
       _ < 1 := by rw [one_mul]; exact hden
   have h1 : (p : ℤ) ∣ r.num := (padicNorm.int_lt_one_iff _).mp hnum
   have h2 : p ∣ r.num.natAbs := Int.natCast_dvd.mp h1
@@ -240,20 +262,27 @@ theorem not_dvd_den {p : ℕ} [Fact p.Prime] (r : ℚ) (h : ‖(r : ℚ_[p])‖ 
   rw [Nat.Coprime.gcd_eq_one r.reduced] at h3
   exact hp.one_lt.ne' (Nat.dvd_one.mp h3)
 
-theorem norm_ratCast_le_one {K : Type} [NormedField K] [IsUltrametricDist K] {p : ℕ}
-    (hp : p.Prime) (hnp : ‖(p : K)‖ < 1) (r : ℚ) (hr : ¬ p ∣ r.den) : ‖(r : K)‖ ≤ 1 := by
+theorem norm_ratCast_le_one
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    {p : ℕ} (hp : p.Prime) (hnp : ‖(p : K)‖ < 1)
+    (r : ℚ) (hr : ¬ p ∣ r.den)
+    : ‖(r : K)‖ ≤ 1 := by
   have hden : 1 ≤ ‖(r.den : K)‖ := by
     have hcop : Nat.Coprime r.den p := ((Nat.Prime.coprime_iff_not_dvd hp).mpr hr).symm
     have hab : (r.den : ℤ) * Nat.gcdA r.den p + (p : ℤ) * Nat.gcdB r.den p = 1 := by
       rw [← Nat.gcd_eq_gcd_ab, Nat.Coprime.gcd_eq_one hcop, Nat.cast_one]
-    have h1 : (1 : K) = (r.den : K) * ((Nat.gcdA r.den p : ℤ) : K) + (p : K) * ((Nat.gcdB r.den p : ℤ) : K) := by
+    have h1
+        : (1 : K)
+          = (r.den : K) * ((Nat.gcdA r.den p : ℤ) : K)
+            + (p : K) * ((Nat.gcdB r.den p : ℤ) : K) := by
       have h1' := congrArg (Int.cast : ℤ → K) hab
       push_cast at h1'
       exact h1'.symm
     by_contra hlt
     push_neg at hlt
-    have hm := IsUltrametricDist.norm_add_le_max ((r.den : K) * ((Nat.gcdA r.den p : ℤ) : K))
-      ((p : K) * ((Nat.gcdB r.den p : ℤ) : K))
+    have hm :=
+      IsUltrametricDist.norm_add_le_max ((r.den : K) * ((Nat.gcdA r.den p : ℤ) : K))
+        ((p : K) * ((Nat.gcdB r.den p : ℤ) : K))
     rw [← h1, norm_one, norm_mul, norm_mul] at hm
     have ha := IsUltrametricDist.norm_intCast_le_one K (Nat.gcdA r.den p)
     have hb := IsUltrametricDist.norm_intCast_le_one K (Nat.gcdB r.den p)
@@ -266,8 +295,8 @@ theorem norm_ratCast_le_one {K : Type} [NormedField K] [IsUltrametricDist K] {p 
   rw [Rat.cast_def, norm_div]
   exact div_le_one_of_le₀ (hnum.trans hden) (norm_nonneg _)
 
-theorem funEqType_lgF (p : ℕ) [hp : Fact p.Prime] :
-    Formalism.G.IsFunEqType p (p ^ 2) (RingHom.id ℚ_[p]) (lgF ℚ_[p] p) := by
+theorem funEqType_lgF (p : ℕ) [hp : Fact p.Prime]
+    : Formalism.G.IsFunEqType p (p ^ 2) (RingHom.id ℚ_[p]) (lgF ℚ_[p] p) := by
   have hp2 : 2 ≤ p := hp.out.two_le
   have hpK : (p : ℚ_[p]) ≠ 0 := by exact_mod_cast hp.out.ne_zero
   unfold Formalism.G.IsFunEqType
@@ -277,15 +306,19 @@ theorem funEqType_lgF (p : ℕ) [hp : Fact p.Prime] :
   rw [PowerSeries.coeff_X]
   split_ifs <;> simp
 
-theorem law_integral {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K] (p : ℕ)
-    (hp : p.Prime) (hnp : ‖(p : K)‖ = (p : ℝ)⁻¹) (F : MvPowerSeries (Fin 2) K)
-    (hF0 : MvPowerSeries.constantCoeff F = 0) (hF : cob F (lgF K p) = 0) : Integral F := by
+theorem law_integral
+    {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K]
+    (p : ℕ) (hp : p.Prime) (hnp : ‖(p : K)‖ = (p : ℝ)⁻¹)
+    (F : MvPowerSeries (Fin 2) K)
+    (hF0 : MvPowerSeries.constantCoeff F = 0) (hF : cob F (lgF K p) = 0)
+    : Integral F := by
   haveI : Fact p.Prime := ⟨hp⟩
   have hp2 := hp.two_le
   obtain ⟨FQ, hFQ0, hFQ⟩ := law_exists (K := ℚ) p hp2
-  obtain ⟨G, hG0, hGint, hGlog⟩ := Formalism.LT.funEqGroup ℚ_[p] p (p ^ 2) (RingHom.id ℚ_[p])
-    (Formalism.FG.frobenius_lift_padic_square p) (lgF ℚ_[p] p) (constantCoeff_lgF p hp2)
-    (coeff_one_lgF p hp2) (funEqType_lgF p)
+  obtain ⟨G, hG0, hGint, hGlog⟩ :=
+    Formalism.LT.funEqGroup ℚ_[p] p (p ^ 2) (RingHom.id ℚ_[p])
+      (Formalism.FG.frobenius_lift_padic_square p) (lgF ℚ_[p] p) (constantCoeff_lgF p hp2)
+      (coeff_one_lgF p hp2) (funEqType_lgF p)
   have hGcob : cob G (lgF ℚ_[p] p) = 0 := (cob_eq_zero_iff G _).mpr hGlog
   obtain ⟨h0p, hcp⟩ := map_law (Rat.castHom ℚ_[p]) p FQ hFQ0 hFQ
   have hEq := law_unique p hp2 _ G h0p hG0 hcp hGcob
@@ -318,9 +351,10 @@ theorem formal_law_symmetric : LawSymm := by
   intro K _ _ _ p hp hnp F hF
   obtain ⟨hF0, _, hFc⟩ := hF
   have hp2 := hp.two_le
-  have hFl : PowerSeries.subst F (lgF K p) =
-      PowerSeries.subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) K) (lgF K p) +
-        PowerSeries.subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K) (lgF K p) :=
+  have hFl
+      : PowerSeries.subst F (lgF K p)
+        = PowerSeries.subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) K) (lgF K p)
+          + PowerSeries.subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K) (lgF K p) :=
     (cob_eq_zero_iff F _).mp hFc
   have hFlA : PowerSeries.subst F (lgF K p) = at1 0 (lgF K p) + at1 1 (lgF K p) :=
     (cob_eq_zero_iff F _).mp hFc
@@ -330,8 +364,8 @@ theorem formal_law_symmetric : LawSymm := by
     obtain ⟨h0, hc⟩ := map_law σ p F hF0 hFc
     exact law_unique p hp2 _ F h0 hF0 hc hFc
   · intro ζ hζ
-    have hb : MvPowerSeries.HasSubst
-        (fun a : Fin 2 => MvPowerSeries.C ζ * (MvPowerSeries.X a : MvPowerSeries (Fin 2) K)) :=
+    have hb : MvPowerSeries.HasSubst (fun a : Fin 2 =>
+        MvPowerSeries.C ζ * (MvPowerSeries.X a : MvPowerSeries (Fin 2) K)) :=
       MvPowerSeries.hasSubst_of_constantCoeff_zero (fun a => by simp)
     apply lgF_subst_inj p hp2
     · exact MvPowerSeries.constantCoeff_subst_eq_zero hb (fun a => by simp) hF0

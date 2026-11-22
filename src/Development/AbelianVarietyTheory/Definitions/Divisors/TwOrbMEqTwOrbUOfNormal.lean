@@ -25,9 +25,10 @@ abbrev Q0 : IntermediateField ℚ_[p] (PadicAlgCl p) := ⊥
 
 abbrev Qr (r : ℕ) : IntermediateField ℚ_[p] (PadicAlgCl p) := Kn p (Q0 p) r
 
-def frobQ (r : ℕ) : Qr p r →ₐ[ℚ_[p]] Qr p r :=
-  { GlobalTheory.LKLoc.frobR p (Q0 p) r with
-    commutes' := fun c => Subtype.ext (((frobK p (Q0 p)).restrictScalars ℚ_[p]).commutes c) }
+def frobQ (r : ℕ) : Qr p r →ₐ[ℚ_[p]] Qr p r := {
+  GlobalTheory.LKLoc.frobR p (Q0 p) r with
+  commutes' := fun c => Subtype.ext (((frobK p (Q0 p)).restrictScalars ℚ_[p]).commutes c)
+}
 
 variable (K : IntermediateField ℚ_[p] (PadicAlgCl p))
 
@@ -47,8 +48,9 @@ def sigKQ (r : ℕ) : KQ p K r →ₐ[ℚ_[p]] KQ p K r :=
   Algebra.TensorProduct.map (AlgHom.id ℚ_[p] K) (frobQ p r)
 
 def intKQ (r : ℕ) : Subring (KQ p K r) :=
-  Subring.closure (Set.range (fun a : GlobalTheory.LKLoc.intK p K => inclK p K r a) ∪
-    Set.range (fun b : GlobalTheory.LKLoc.intR p (Q0 p) r => inclQ p K r b))
+  Subring.closure
+    (Set.range (fun a : GlobalTheory.LKLoc.intK p K => inclK p K r a)
+      ∪ Set.range (fun b : GlobalTheory.LKLoc.intR p (Q0 p) r => inclQ p K r b))
 
 def sigRes (n r : ℕ) : GL (Fin n) (KQ p K r) →* GL (Fin n) (KQ p K r) :=
   GeneralLinearGroup.map (sigKQ p K r).toRingHom
@@ -62,10 +64,13 @@ def nrmRes (n r : ℕ) (δ : GL (Fin n) (KQ p K r)) : GL (Fin n) (KQ p K r) :=
 abbrev GHT (m n r : ℕ) (Kw : Fin m → IntermediateField ℚ_[p] (PadicAlgCl p)) : Type :=
   GL (Fin 1) (Qr p r) × ((i : Fin m) → GL (Fin n) (KQ p (Kw i) r))
 
-def sigHT (m n r : ℕ) (Kw : Fin m → IntermediateField ℚ_[p] (PadicAlgCl p)) : GHT p m n r Kw →* GHT p m n r Kw :=
-  (GlobalTheory.LKLoc.sig p (Q0 p) 1 r).prodMap (Pi.monoidHom fun i => (sigRes p (Kw i) n r).comp (Pi.evalMonoidHom _ i))
+def sigHT (m n r : ℕ) (Kw : Fin m → IntermediateField ℚ_[p] (PadicAlgCl p))
+    : GHT p m n r Kw →* GHT p m n r Kw :=
+  (GlobalTheory.LKLoc.sig p (Q0 p) 1 r).prodMap
+    (Pi.monoidHom fun i => (sigRes p (Kw i) n r).comp (Pi.evalMonoidHom _ i))
 
-def KHT (m n r : ℕ) (Kw : Fin m → IntermediateField ℚ_[p] (PadicAlgCl p)) : Subgroup (GHT p m n r Kw) :=
+def KHT (m n r : ℕ) (Kw : Fin m → IntermediateField ℚ_[p] (PadicAlgCl p))
+    : Subgroup (GHT p m n r Kw) :=
   (GlobalTheory.LKLoc.Kint p (Q0 p) 1 r).prod (Subgroup.pi Set.univ fun i => Kres p (Kw i) n r)
 
 theorem sigKQ_apply_inclK (r : ℕ) (a : K) : sigKQ p K r (inclK p K r a) = inclK p K r a := by
@@ -73,22 +78,21 @@ theorem sigKQ_apply_inclK (r : ℕ) (a : K) : sigKQ p K r (inclK p K r a) = incl
     a ⊗ₜ[ℚ_[p]] (1 : Qr p r)
   rw [Algebra.TensorProduct.map_tmul, map_one, AlgHom.id_apply]
 
-theorem sigKQ_apply_inclQ (r : ℕ) (b : Qr p r) : sigKQ p K r (inclQ p K r b) = inclQ p K r (frobQ p r b) := by
+theorem sigKQ_apply_inclQ (r : ℕ) (b : Qr p r)
+    : sigKQ p K r (inclQ p K r b) = inclQ p K r (frobQ p r b) := by
   show Algebra.TensorProduct.map (AlgHom.id ℚ_[p] K) (frobQ p r) ((1 : K) ⊗ₜ[ℚ_[p]] b) =
     (1 : K) ⊗ₜ[ℚ_[p]] (frobQ p r b)
   rw [Algebra.TensorProduct.map_tmul, map_one]
 
 theorem frobQ_degree_one : frobQ p 1 = AlgHom.id ℚ_[p] (Qr p 1) := by
-  have hK : FiniteDimensional ℚ_[p] (Q0 p) := by
-    infer_instance
+  have hK : FiniteDimensional ℚ_[p] (Q0 p) := by infer_instance
   have hle : Q0 p ≤ Qr p 1 := bot_le
   have hdeg : degLK p (Q0 p) (Kn p (Q0 p) 1) = 1 := degLK_Kn hK one_pos
   rw [degLK_eq_finrank (h := hle)] at hdeg
   have hbot := IntermediateField.finrank_eq_one_iff.1 hdeg
   refine AlgHom.ext fun x => Subtype.ext ?_
   have hx : (x : PadicAlgCl p) ∈ Q0 p := by
-    have h1 : (x : PadicAlgCl p) ∈ IntermediateField.extendScalars hle := by
-      exact x.2
+    have h1 : (x : PadicAlgCl p) ∈ IntermediateField.extendScalars hle := by exact x.2
     rw [hbot] at h1
     obtain ⟨y, hy⟩ := IntermediateField.mem_bot.1 h1
     rw [← hy]

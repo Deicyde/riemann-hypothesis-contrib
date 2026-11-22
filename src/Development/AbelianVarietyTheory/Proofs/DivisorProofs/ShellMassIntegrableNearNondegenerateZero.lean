@@ -10,14 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ShellMass
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY.ShellZero
 
 section
-variable {n : ℕ} {Y : Type} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
-  [MeasurableSpace Y] [BorelSpace Y] {ι La : Type} [AddCommGroup La]
+variable
+  {n : ℕ} {Y : Type}
+  [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+  {ι La : Type} [AddCommGroup La]
 
 end
 
@@ -59,7 +62,6 @@ private lemma lintegral_nsq_transition_eq_chart_lintegral {n : ℕ} {Y : Type} [
     filter_upwards [ae_restrict_mem hW] with v hv
     have hs : (A.chart i).symm v ∈ (A.chart i).source := (A.chart i).map_target (hWt hv)
     simp only [Function.comp, hD, A.g_self _ i hs, one_mul]
-
 
 open MeasureTheory Filter Topology Metric in
 open scoped ENNReal ContDiff in

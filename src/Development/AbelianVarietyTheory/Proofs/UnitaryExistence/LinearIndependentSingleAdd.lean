@@ -14,23 +14,24 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LandherrS
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
 open scoped Matrix ComplexConjugate
 
 namespace GlobalTheory.CuspExist
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem exists_congr_diagonal (H : GlobalTheory.Published.Landherr) (X : Data E r) (k : Fin r) :
-    ∃ (d : E) (P : Matrix (Fin r) (Fin r) E), P.det ≠ 0 ∧
-      Matrix.diagonal (fun a : Fin r => (if (a : ℕ) < X.p0 then (1 : E) else -1) *
-        (if a = k then d else 1)) = Pᵀ * X.Gm * P.map cc := by
+theorem exists_congr_diagonal (H : GlobalTheory.Published.Landherr) (X : Data E r) (k : Fin r)
+    : ∃ (d : E) (P : Matrix (Fin r) (Fin r) E),
+      P.det ≠ 0
+        ∧ Matrix.diagonal (fun a : Fin r =>
+            (if (a : ℕ) < X.p0 then (1 : E) else -1) * (if a = k then d else 1))
+          = Pᵀ * X.Gm * P.map cc := by
   classical
   set s : Fin r → E := fun a => if (a : ℕ) < X.p0 then (1 : E) else -1 with hs
-  have hs0 : ∀ a, s a ≠ 0 := fun a => by
-    simp only [hs]; split_ifs <;> simp
-  have hscc : ∀ a, cc (s a) = s a := fun a => by
-    simp only [hs]; split_ifs <;> simp [cc]
+  have hs0 : ∀ a, s a ≠ 0 := fun a => by simp only [hs]; split_ifs <;> simp
+  have hscc : ∀ a, cc (s a) = s a := fun a => by simp only [hs]; split_ifs <;> simp [cc]
   have hsτ : ∀ (τ : E →+* ℂ) a, τ (s a) = ((sgn X.p0 (a : ℕ) : ℝ) : ℂ) := fun τ a => by
     simp only [hs, sgn]; split_ifs <;> simp
   have hS0 : (Matrix.diagonal s).det ≠ 0 := by
@@ -49,11 +50,17 @@ theorem exists_congr_diagonal (H : GlobalTheory.Published.Landherr) (X : Data E 
     unfold cc at h1 h2 ⊢
     rw [hd, map_div₀, h1, h2]
   have hdet : (Matrix.diagonal fun a : Fin r => s a * (if a = k then d else 1)).det = X.Gm.det := by
-    rw [Matrix.det_diagonal, Finset.prod_mul_distrib, Finset.prod_ite_eq', if_pos (Finset.mem_univ _),
-      ← Matrix.det_diagonal, hd]
+    rw [Matrix.det_diagonal, Finset.prod_mul_distrib, Finset.prod_ite_eq',
+      if_pos (Finset.mem_univ _), ← Matrix.det_diagonal, hd]
     field_simp
-  refine ⟨d, GlobalTheory.Published.Landherr.of_signature H X.Gm_herm ?_ X.Gm_det (hdet ▸ X.Gm_det)
-    (X.Ψ : Set (E →+* ℂ)) (fun τ => ?_) (fun τ hτ => ⟨X.p0, X.signature ⟨τ, hτ⟩, ?_⟩) ⟨1, ?_⟩⟩
+  refine ⟨
+    d,
+    GlobalTheory.Published.Landherr.of_signature H X.Gm_herm ?_ X.Gm_det (hdet ▸ X.Gm_det)
+      (X.Ψ : Set (E →+* ℂ))
+      (fun τ => ?_)
+      (fun τ hτ => ⟨X.p0, X.signature ⟨τ, hτ⟩, ?_⟩)
+      ⟨1, ?_⟩
+  ⟩
   · intro a b
     by_cases h : a = b
     · subst h
@@ -83,8 +90,9 @@ theorem exists_congr_diagonal (H : GlobalTheory.Published.Landherr) (X : Data E 
     refine ⟨Matrix.diagonal fun a => if a = k then (t : ℂ) else 1, ?_, ?_⟩
     · rw [Matrix.det_diagonal, Finset.prod_ite_eq', if_pos (Finset.mem_univ _)]
       exact_mod_cast ht0
-    · rw [GlobalTheory.Published.gram_eq, Matrix.diagonal_transpose, Matrix.diagonal_map (map_zero τ),
-        Matrix.diagonal_map (map_zero _), Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
+    · rw [GlobalTheory.Published.gram_eq, Matrix.diagonal_transpose,
+        Matrix.diagonal_map (map_zero τ), Matrix.diagonal_map (map_zero _),
+        Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
       congr 1
       funext a
       rw [map_mul, hsτ]
@@ -94,35 +102,42 @@ theorem exists_congr_diagonal (H : GlobalTheory.Published.Landherr) (X : Data E 
       · simp
   · rw [hdet, div_self X.Gm_det]; simp [cc]
 
-
 omit [NumberField E] [IsCMField E] in
-theorem linearIndependent_single_add {ρ : ℕ} {i j : Fin ρ → Fin r} (hi : Function.Injective i)
-    (hij : ∀ a b, i a ≠ j b) :
-    LinearIndependent E fun a => (Pi.single (i a) 1 + Pi.single (j a) 1 : Fin r → E) := by
+theorem linearIndependent_single_add
+    {ρ : ℕ} {i j : Fin ρ → Fin r} (hi : Function.Injective i) (hij : ∀ a b, i a ≠ j b)
+    : LinearIndependent E fun a => (Pi.single (i a) 1 + Pi.single (j a) 1 : Fin r → E) := by
   classical
   rw [Fintype.linearIndependent_iff]
   intro g hg a
   have := congrFun hg (i a)
   simpa [Finset.sum_apply, Pi.single_apply, hij, hi.eq_iff] using this
 
-theorem herm_diagonal_single_add {ρ : ℕ} {i j : Fin ρ → Fin r} (hi : Function.Injective i)
-    (hj : Function.Injective j) (hij : ∀ a b, i a ≠ j b) (g : Fin r → E)
-    (hg : ∀ a, g (i a) + g (j a) = 0) (a b : Fin ρ) :
-    herm (Matrix.diagonal g) (Pi.single (i a) 1 + Pi.single (j a) 1)
-      (Pi.single (i b) 1 + Pi.single (j b) 1) = 0 := by
+theorem herm_diagonal_single_add
+    {ρ : ℕ} {i j : Fin ρ → Fin r}
+    (hi : Function.Injective i) (hj : Function.Injective j) (hij : ∀ a b, i a ≠ j b)
+    (g : Fin r → E) (hg : ∀ a, g (i a) + g (j a) = 0)
+    (a b : Fin ρ)
+    : herm (Matrix.diagonal g) (Pi.single (i a) 1 + Pi.single (j a) 1)
+        (Pi.single (i b) 1 + Pi.single (j b) 1)
+      = 0 := by
   classical
   have hji : ∀ a b, j a ≠ i b := fun a b => (hij b a).symm
-  rw [GlobalTheory.Published.LandherrSt.herm_eq, add_dotProduct, single_dotProduct, single_dotProduct,
-    Matrix.mulVec_diagonal, Matrix.mulVec_diagonal]
+  rw [GlobalTheory.Published.LandherrSt.herm_eq, add_dotProduct, single_dotProduct,
+    single_dotProduct, Matrix.mulVec_diagonal, Matrix.mulVec_diagonal]
   by_cases h : a = b
   · subst h
     simpa [cc, Pi.single_apply, hij, hji] using hg a
   · simp [cc, hij, hji, hi.eq_iff, hj.eq_iff, h]
 
-theorem nonempty_cuspFD : GlobalTheory.Published.HasseNormSt → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r), ρ ≤ X.p0 → ρ + X.p0 ≤ r → 2 * ρ < r → Nonempty (FJ.CuspFD X ρ) := by
+theorem nonempty_cuspFD
+    : GlobalTheory.Published.HasseNormSt
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r),
+        ρ ≤ X.p0 → ρ + X.p0 ≤ r → 2 * ρ < r → Nonempty (FJ.CuspFD X ρ) := by
   intro HN E _ _ _ r ρ X h1 h2 h3
   classical
-  have H := GlobalTheory.Published.landherr_of_landherrSt (GlobalTheory.LocalQuad.landherrSt_of_hasseNormSt HN)
+  have H :=
+    GlobalTheory.Published.landherr_of_landherrSt (GlobalTheory.LocalQuad.landherrSt_of_hasseNormSt
+      HN)
   obtain ⟨k, hk⟩ : ∃ k : Fin r, (k : ℕ) + ρ < X.p0 ∨ X.p0 + ρ ≤ k := by
     by_cases h : ρ < X.p0
     · exact ⟨⟨0, by omega⟩, Or.inl (by simpa using h)⟩
@@ -131,7 +146,8 @@ theorem nonempty_cuspFD : GlobalTheory.Published.HasseNormSt → ∀ (E : Type) 
   let i : Fin ρ → Fin r := fun a => ⟨X.p0 - 1 - a, by have := a.2; omega⟩
   let j : Fin ρ → Fin r := fun a => ⟨X.p0 + a, by have := a.2; omega⟩
   have hi : Function.Injective i := fun a b h => by
-    have := a.2; have := b.2
+    have := a.2
+    have := b.2
     simp only [i, Fin.mk.injEq] at h
     exact Fin.ext (by omega)
   have hj : Function.Injective j := fun a b h => by
@@ -144,8 +160,8 @@ theorem nonempty_cuspFD : GlobalTheory.Published.HasseNormSt → ∀ (E : Type) 
   refine ⟨⟨fun a => P *ᵥ (Pi.single (i a) 1 + Pi.single (j a) 1), ?_, fun a b => ?_⟩⟩
   · refine (linearIndependent_single_add (E := E) hi hij).map' (Matrix.toLin' P) ?_
     rw [LinearMap.ker_eq_bot]
-    exact Matrix.mulVec_injective_iff_isUnit.mpr
-      ((Matrix.isUnit_iff_isUnit_det P).mpr (isUnit_iff_ne_zero.mpr hP))
+    exact Matrix.mulVec_injective_iff_isUnit.mpr ((Matrix.isUnit_iff_isUnit_det P).mpr
+      (isUnit_iff_ne_zero.mpr hP))
   · rw [GlobalTheory.Published.LandherrSt.herm_mulVec, ← hG]
     refine herm_diagonal_single_add hi hj hij _ (fun c => ?_) a b
     have := c.2

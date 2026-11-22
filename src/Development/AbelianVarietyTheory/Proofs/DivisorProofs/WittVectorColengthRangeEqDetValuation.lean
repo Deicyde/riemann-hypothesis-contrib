@@ -8,28 +8,44 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.L
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 namespace GlobalTheory.Dieu.ColenDet
 
-theorem map_eq_unit_mul_pow {p : ℕ} [Fact p.Prime] {k : Type} [Field k] [CharP k p]
-    (ψ : ℤ_[p] →+* WittVector p k) {x : ℤ_[p]} (hx : x ≠ 0) :
-    ψ x = ψ (PadicInt.unitCoeff hx : ℤ_[p]) * (p : WittVector p k) ^ x.valuation := by
+theorem map_eq_unit_mul_pow
+    {p : ℕ} [Fact p.Prime]
+    {k : Type} [Field k] [CharP k p]
+    (ψ : ℤ_[p] →+* WittVector p k)
+    {x : ℤ_[p]} (hx : x ≠ 0)
+    : ψ x = ψ (PadicInt.unitCoeff hx : ℤ_[p]) * (p : WittVector p k) ^ x.valuation := by
   conv_lhs => rw [PadicInt.unitCoeff_spec hx]
   rw [map_mul, map_pow, map_natCast]
 
-theorem addVal_map {p : ℕ} [Fact p.Prime] {k : Type} [Field k] [CharP k p] [PerfectRing k p]
-    (ψ : ℤ_[p] →+* WittVector p k) {x : ℤ_[p]} (hx : x ≠ 0) :
-    IsDiscreteValuationRing.addVal (WittVector p k) (ψ x) = (x.valuation : ℕ∞) := by
+theorem addVal_map
+    {p : ℕ} [Fact p.Prime]
+    {k : Type} [Field k] [CharP k p] [PerfectRing k p]
+    (ψ : ℤ_[p] →+* WittVector p k)
+    {x : ℤ_[p]} (hx : x ≠ 0)
+    : IsDiscreteValuationRing.addVal (WittVector p k) (ψ x) = (x.valuation : ℕ∞) := by
   rw [map_eq_unit_mul_pow ψ hx, AddValuation.map_mul, AddValuation.map_pow,
     IsDiscreteValuationRing.addVal_uniformizer (WittVector.irreducible p),
     (IsDiscreteValuationRing.addVal_eq_zero_iff).mpr ((PadicInt.unitCoeff hx).isUnit.map ψ)]
   simp
 
-theorem colength_det : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (N : Type) [AddCommGroup N] [Module (WittVector p k) N] [Module.Free (WittVector p k) N] [Module.Finite (WittVector p k) N] (ψ : ℤ_[p] →+* (WittVector p k)) (u : N →ₗ[(WittVector p k)] N) (d : ℤ_[p]), LinearMap.det u = ψ d → (∀ e : ℕ, Module.length (WittVector p k) (N ⧸ LinearMap.range u) = e → ‖d‖ = (p : ℝ) ^ (-(e : ℤ))) ∧ (¬ Function.Injective u → d = 0) ∧ Function.Injective ψ := by
+theorem colength_det
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (N : Type)
+        [AddCommGroup N] [Module (WittVector p k) N] [Module.Free (WittVector p k) N]
+        [Module.Finite (WittVector p k) N] (ψ : ℤ_[p] →+* (WittVector p k))
+        (u : N →ₗ[(WittVector p k)] N) (d : ℤ_[p]),
+      LinearMap.det u = ψ d
+        → (∀ e : ℕ,
+            Module.length (WittVector p k) (N ⧸ LinearMap.range u) = e → ‖d‖ = (p : ℝ) ^ (-(e : ℤ)))
+          ∧ (¬ Function.Injective u → d = 0) ∧ Function.Injective ψ := by
   intro p _ k _ _ _ N _ _ _ _ ψ u d hdet
   have hψ : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra h0
     have h1 := addVal_map ψ h0

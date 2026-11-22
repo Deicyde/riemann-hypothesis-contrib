@@ -6,11 +6,16 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.Thick
 
-theorem inU_iInf_finset : ∀ {O : Type} [CommRing O] {R : Type} [CommRing R] {I : Ideal R} {γ : DividedPowers I} {p : ℕ} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I} {ι : Type} (U : ι → X.Opens) (S : Finset ι) (T : Thick (nlFun γ p X q κ)), InU (⨅ α ∈ S, U α) T ↔ ∀ α ∈ S, InU (U α) T := by
+theorem inU_iInf_finset
+    : ∀ {O : Type} [CommRing O] {R : Type} [CommRing R] {I : Ideal R} {γ : DividedPowers I} {p : ℕ}
+        {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I} {ι : Type}
+        (U : ι → X.Opens) (S : Finset ι) (T : Thick (nlFun γ p X q κ)),
+      InU (⨅ α ∈ S, U α) T ↔ ∀ α ∈ S, InU (U α) T := by
   intro O _ R _ I γ p X q κ ι U S T
   classical
   have htop : InU (⊤ : X.Opens) T := fun x _ => trivial

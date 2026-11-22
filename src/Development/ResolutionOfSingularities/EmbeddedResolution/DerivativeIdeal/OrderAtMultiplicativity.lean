@@ -24,11 +24,13 @@ namespace FunctorialResolution.EmbeddedResolution
 
 namespace EtaleCoordinates
 
-theorem partialDeriv_comm (k : Type*) [CommRing k] (ι : Type*) [Fintype ι] [DecidableEq ι]
+theorem partialDeriv_comm
+    (k : Type*) [CommRing k]
+    (ι : Type*) [Fintype ι] [DecidableEq ι]
     (T : Type*) [CommRing T] [Algebra k T] [Algebra (MvPolynomial ι k) T]
     [IsScalarTower k (MvPolynomial ι k) T] [Algebra.FormallyEtale (MvPolynomial ι k) T]
-    (i j : ι) (a : T) :
-    partialDeriv k ι T i (partialDeriv k ι T j a)
+    (i j : ι) (a : T)
+    : partialDeriv k ι T i (partialDeriv k ι T j a)
       = partialDeriv k ι T j (partialDeriv k ι T i a) := by
   have hzero : ⁅partialDeriv k ι T i, partialDeriv k ι T j⁆ = (0 : Derivation k T T) := by
     refine derivation_ext_of_coord k ι T T _ _ ?_
@@ -36,20 +38,21 @@ theorem partialDeriv_comm (k : Type*) [CommRing k] (ι : Type*) [Fintype ι] [De
     rw [Derivation.commutator_apply]
     simp only [partialDeriv_coord]
     split_ifs <;> simp
-  have h2 : ⁅partialDeriv k ι T i, partialDeriv k ι T j⁆ a = 0 := by
-    rw [hzero]; simp
+  have h2 : ⁅partialDeriv k ι T i, partialDeriv k ι T j⁆ a = 0 := by rw [hzero]; simp
   rw [Derivation.commutator_apply] at h2
   linear_combination h2
 
 end EtaleCoordinates
 
-private theorem exists_commuting_dual_derivations (k : Type*) [CommRing k] (ι : Type*) [Fintype ι]
-    [DecidableEq ι] (A : Type*) [CommRing A] [Algebra k A] [Algebra.FormallySmooth k A]
+private theorem exists_commuting_dual_derivations
+    (k : Type*) [CommRing k]
+    (ι : Type*) [Fintype ι] [DecidableEq ι]
+    (A : Type*) [CommRing A] [Algebra k A] [Algebra.FormallySmooth k A]
     (e : Module.Basis ι A (KaehlerDifferential k A)) (w : ι → A)
-    (hdet : IsUnit (e.det fun i : ι => KaehlerDifferential.D k A (w i))) :
-    ∃ D : ι → Derivation k A A,
-      (∀ i j : ι, D i (w j) = if i = j then 1 else 0) ∧
-      (∀ i j : ι, ∀ a : A, D i (D j a) = D j (D i a)) := by
+    (hdet : IsUnit (e.det fun i : ι => KaehlerDifferential.D k A (w i)))
+    : ∃ D : ι → Derivation k A A,
+      (∀ i j : ι, D i (w j) = if i = j then 1 else 0)
+        ∧ (∀ i j : ι, ∀ a : A, D i (D j a) = D j (D i a)) := by
   let _ : Algebra (MvPolynomial ι k) A :=
     (MvPolynomial.aeval w : MvPolynomial ι k →ₐ[k] A).toRingHom.toAlgebra
   have : IsScalarTower k (MvPolynomial ι k) A :=
@@ -69,23 +72,28 @@ private theorem exists_commuting_dual_derivations (k : Type*) [CommRing k] (ι :
   · intro i j a
     exact EtaleCoordinates.partialDeriv_comm k ι A i j a
 
-theorem exists_regularParameters_of_formallyEtale (k : Type*) [CommRing k] (ι : Type*) [Fintype ι]
-    [DecidableEq ι] (S : Type*) [CommRing S] [Algebra k S] [Algebra (MvPolynomial ι k) S]
+theorem exists_regularParameters_of_formallyEtale
+    (k : Type*) [CommRing k]
+    (ι : Type*) [Fintype ι] [DecidableEq ι]
+    (S : Type*) [CommRing S] [Algebra k S] [Algebra (MvPolynomial ι k) S]
     [IsScalarTower k (MvPolynomial ι k) S] [Algebra.FormallyEtale (MvPolynomial ι k) S]
-    (q : Ideal S) [q.IsPrime] (A : Type*) [CommRing A] [Algebra S A] [Algebra k A]
-    [IsScalarTower k S A] [IsLocalization q.primeCompl A] [IsLocalRing A] [IsNoetherianRing A]
+    (q : Ideal S) [q.IsPrime]
+    (A : Type*) [CommRing A] [Algebra S A] [Algebra k A] [IsScalarTower k S A]
+    [IsLocalization q.primeCompl A] [IsLocalRing A] [IsNoetherianRing A]
     [Algebra k (IsLocalRing.ResidueField A)] [IsScalarTower k A (IsLocalRing.ResidueField A)]
-    [Algebra.FormallySmooth k (IsLocalRing.ResidueField A)] :
-    ∃ (h : ℕ) (x : Fin h → A) (D : Fin h → Derivation k A A),
-      Ideal.span (Set.range x) = IsLocalRing.maximalIdeal A ∧
-      (∀ i j : Fin h, D i (x j) = if i = j then 1 else 0) ∧
-      (∀ i j : Fin h, ∀ a : A, D i (D j a) = D j (D i a)) := by
+    [Algebra.FormallySmooth k (IsLocalRing.ResidueField A)]
+    : ∃ (h : ℕ) (x : Fin h → A) (D : Fin h → Derivation k A A),
+      Ideal.span (Set.range x) = IsLocalRing.maximalIdeal A
+        ∧ (∀ i j : Fin h, D i (x j) = if i = j then 1 else 0)
+        ∧ (∀ i j : Fin h, ∀ a : A, D i (D j a) = D j (D i a)) := by
   obtain ⟨g, w, J, hgq, -, hspan, -, hgdet, -⟩ :=
     EtaleCoordinates.exists_adapted_parameters k ι S q A
   let _ : Algebra (MvPolynomial ι k) A :=
     ((algebraMap S A).comp (algebraMap (MvPolynomial ι k) S)).toAlgebra
-  have halg : (algebraMap (MvPolynomial ι k) A)
-      = (algebraMap S A).comp (algebraMap (MvPolynomial ι k) S) := rfl
+  have halg
+      : (algebraMap (MvPolynomial ι k) A)
+        = (algebraMap S A).comp (algebraMap (MvPolynomial ι k) S) :=
+    rfl
   have : IsScalarTower (MvPolynomial ι k) S A :=
     IsScalarTower.of_algebraMap_eq fun z => by rw [halg]; rfl
   have : IsScalarTower k (MvPolynomial ι k) A :=
@@ -96,15 +104,16 @@ theorem exists_regularParameters_of_formallyEtale (k : Type*) [CommRing k] (ι :
   have : Algebra.FormallyEtale (MvPolynomial ι k) A :=
     Algebra.FormallyEtale.comp (MvPolynomial ι k) S A
   have : Algebra.FormallySmooth k A := Algebra.FormallySmooth.comp k (MvPolynomial ι k) A
-  obtain ⟨e, he⟩ : ∃ e : Module.Basis ι A (KaehlerDifferential k A),
-      IsUnit (e.det fun i : ι => KaehlerDifferential.D k A (algebraMap S A (w i))) := by
+  obtain ⟨e, he⟩
+      : ∃ e : Module.Basis ι A (KaehlerDifferential k A),
+        IsUnit (e.det fun i : ι => KaehlerDifferential.D k A (algebraMap S A (w i))) := by
     refine ⟨EtaleCoordinates.basisKaehler k ι A, ?_⟩
     rw [← EtaleCoordinates.algebraMap_det_basisKaehler k ι S A w, ← hgdet]
     exact IsLocalization.map_units (M := q.primeCompl) A ⟨g, hgq⟩
   obtain ⟨D, hD, hDD⟩ :=
     exists_commuting_dual_derivations k ι A e (fun i => algebraMap S A (w i)) he
-  obtain ⟨h, ix, hix, hrange⟩ :
-      ∃ (h : ℕ) (ix : Fin h → ι), Function.Injective ix ∧ Set.range ix = (↑J : Set ι) := by
+  obtain ⟨h, ix, hix, hrange⟩
+      : ∃ (h : ℕ) (ix : Fin h → ι), Function.Injective ix ∧ Set.range ix = (↑J : Set ι) := by
     refine ⟨J.card, fun i => ((J.equivFin.symm i : {a : ι // a ∈ J}) : ι), ?_, ?_⟩
     · intro a b hab
       exact J.equivFin.symm.injective (Subtype.ext hab)
@@ -115,8 +124,8 @@ theorem exists_regularParameters_of_formallyEtale (k : Type*) [CommRing k] (ι :
         exact (J.equivFin.symm i).2
       · intro hl
         exact ⟨J.equivFin ⟨l, hl⟩, by simp⟩
-  have hset : (algebraMap S A) '' (w '' (↑J : Set ι))
-      = Set.range fun i => algebraMap S A (w (ix i)) := by
+  have hset
+      : (algebraMap S A) '' (w '' (↑J : Set ι)) = Set.range fun i => algebraMap S A (w (ix i)) := by
     rw [← hrange]
     ext a
     constructor
@@ -132,14 +141,16 @@ theorem exists_regularParameters_of_formallyEtale (k : Type*) [CommRing k] (ι :
   · intro i j a
     exact hDD (ix i) (ix j) a
 
-theorem exists_regularParameters_stalk_of_smooth (k : Type u) [Field k] [CharZero k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p] (x : X) :
-    letI := stalkAlgebra k p x;
-    ∃ (h : ℕ) (y : Fin h → X.presheaf.stalk x)
-      (D : Fin h → Derivation k (X.presheaf.stalk x) (X.presheaf.stalk x)),
-      Ideal.span (Set.range y) = IsLocalRing.maximalIdeal (X.presheaf.stalk x) ∧
-      (∀ i j : Fin h, D i (y j) = if i = j then 1 else 0) ∧
-      (∀ i j : Fin h, ∀ a : X.presheaf.stalk x, D i (D j a) = D j (D i a)) := by
+theorem exists_regularParameters_stalk_of_smooth
+    (k : Type u) [Field k] [CharZero k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (x : X)
+    : letI := stalkAlgebra k p x
+      ∃ (h : ℕ) (y : Fin h → X.presheaf.stalk x)
+          (D : Fin h → Derivation k (X.presheaf.stalk x) (X.presheaf.stalk x)),
+        Ideal.span (Set.range y) = IsLocalRing.maximalIdeal (X.presheaf.stalk x)
+          ∧ (∀ i j : Fin h, D i (y j) = if i = j then 1 else 0)
+          ∧ (∀ i j : Fin h, ∀ a : X.presheaf.stalk x, D i (D j a) = D j (D i a)) := by
   let _ := stalkAlgebra k p x
   obtain ⟨U, m, hxU, hU, ⟨c⟩⟩ := exists_etaleChart p x
   let _ := sectionsAlgebra k p U
@@ -151,13 +162,12 @@ theorem exists_regularParameters_stalk_of_smooth (k : Type u) [Field k] [CharZer
   have : IsScalarTower k Γ(X, U) (X.presheaf.stalk x) :=
     isScalarTower_stalk k p U x hxU (algebraMap_sectionsAlgebra k p U)
       (algebraMap_stalkAlgebra k p x) rfl
-  have : IsLocalization ((hU.primeIdealOf ⟨x, hxU⟩).asIdeal).primeCompl
-      (X.presheaf.stalk x) := hU.isLocalization_stalk ⟨x, hxU⟩
+  have : IsLocalization ((hU.primeIdealOf ⟨x, hxU⟩).asIdeal).primeCompl (X.presheaf.stalk x) :=
+    hU.isLocalization_stalk ⟨x, hxU⟩
   have := isNoetherianRing_stalk k p x
   let _ : Algebra k (IsLocalRing.ResidueField (X.presheaf.stalk x)) :=
     ((IsLocalRing.residue (X.presheaf.stalk x)).comp (stalkAlgebraMap k p x)).toAlgebra
-  have : IsScalarTower k (X.presheaf.stalk x)
-      (IsLocalRing.ResidueField (X.presheaf.stalk x)) :=
+  have : IsScalarTower k (X.presheaf.stalk x) (IsLocalRing.ResidueField (X.presheaf.stalk x)) :=
     IsScalarTower.of_algebraMap_eq fun a => by
       rw [IsLocalRing.ResidueField.algebraMap_eq]
       rfl
@@ -165,30 +175,33 @@ theorem exists_regularParameters_stalk_of_smooth (k : Type u) [Field k] [CharZer
   exact exists_regularParameters_of_formallyEtale k (ULift.{u} (Fin m)) Γ(X, U)
     ((hU.primeIdealOf ⟨x, hxU⟩).asIdeal) (X.presheaf.stalk x)
 
-theorem orderAt_mul (k : Type u) [Field k] [CharZero k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    (I J : X.IdealSheafData) (x : X) :
-    orderAt (I * J) x = orderAt I x + orderAt J x := by
+theorem orderAt_mul
+    (k : Type u) [Field k] [CharZero k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (I J : X.IdealSheafData) (x : X)
+    : orderAt (I * J) x = orderAt I x + orderAt J x := by
   let _ := stalkAlgebra k p x
   have := isNoetherianRing_stalk k p x
   obtain ⟨h, y, D, hspan, hD, hDD⟩ := exists_regularParameters_stalk_of_smooth k p x
   simp only [orderAt_eq_idealOrder, stalkIdeal_mul]
-  exact idealOrder_mul y D hspan hD hDD (fun n hn => isUnit_natCast_stalk k p x hn)
+  exact idealOrder_mul y D hspan hD hDD
+    (fun n hn => isUnit_natCast_stalk k p x hn)
     (stalkIdeal I x) (stalkIdeal J x)
 
-theorem orderAt_pow (k : Type u) [Field k] [CharZero k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    (I : X.IdealSheafData) (c : ℕ) (x : X) :
-    orderAt (I ^ c) x = (c : ℕ∞) * orderAt I x := by
+theorem orderAt_pow
+    (k : Type u) [Field k] [CharZero k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (I : X.IdealSheafData) (c : ℕ) (x : X)
+    : orderAt (I ^ c) x = (c : ℕ∞) * orderAt I x := by
   let _ := stalkAlgebra k p x
   have := isNoetherianRing_stalk k p x
   obtain ⟨h, y, D, hspan, hD, hDD⟩ := exists_regularParameters_stalk_of_smooth k p x
   simp only [orderAt_eq_idealOrder, stalkIdeal_pow]
-  exact idealOrder_pow y D hspan hD hDD (fun n hn => isUnit_natCast_stalk k p x hn)
-    (stalkIdeal I x) c
+  exact
+    idealOrder_pow y D hspan hD hDD (fun n hn => isUnit_natCast_stalk k p x hn) (stalkIdeal I x) c
 
-theorem natCast_mul_le_mul_iff {c : ℕ} (hc : 1 ≤ c) (m : ℕ) (a : ℕ∞) :
-    (c : ℕ∞) * (m : ℕ∞) ≤ (c : ℕ∞) * a ↔ (m : ℕ∞) ≤ a := by
+theorem natCast_mul_le_mul_iff {c : ℕ} (hc : 1 ≤ c) (m : ℕ) (a : ℕ∞)
+    : (c : ℕ∞) * (m : ℕ∞) ≤ (c : ℕ∞) * a ↔ (m : ℕ∞) ≤ a := by
   induction a using ENat.recTopCoe with
   | top =>
     have hc0 : (c : ℕ∞) ≠ 0 := by
@@ -207,10 +220,13 @@ theorem natCast_mul_le_mul_iff {c : ℕ} (hc : 1 ≤ c) (m : ℕ) (a : ℕ∞) :
       have h'' : c * m ≤ c * n := Nat.mul_le_mul (le_refl c) h'
       exact_mod_cast h''
 
-theorem orderAtLeastLocus_pow_mul (k : Type u) [Field k] [CharZero k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    (I : X.IdealSheafData) {c : ℕ} (hc : 1 ≤ c) (m : ℕ) :
-    orderAtLeastLocus (I ^ c) (c * m) = orderAtLeastLocus I m := by
+theorem orderAtLeastLocus_pow_mul
+    (k : Type u) [Field k] [CharZero k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (I : X.IdealSheafData)
+    {c : ℕ} (hc : 1 ≤ c)
+    (m : ℕ)
+    : orderAtLeastLocus (I ^ c) (c * m) = orderAtLeastLocus I m := by
   ext x
   rw [mem_orderAtLeastLocus_iff, mem_orderAtLeastLocus_iff, orderAt_pow k p I c x, Nat.cast_mul]
   exact natCast_mul_le_mul_iff hc m (orderAt I x)

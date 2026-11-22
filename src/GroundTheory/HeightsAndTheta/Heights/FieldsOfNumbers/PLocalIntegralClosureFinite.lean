@@ -21,10 +21,11 @@ noncomputable section
 
 universe u
 
-theorem LocalIntegralClosureFinite.proof (hN : NoetherIntegralClosureFinite.Statement.{u})
-    (hF : FunctionFieldFinite.Statement.{u}) (hQ : DegZeroLocQuot.Statement.{u})
-    (hD : MChartDehomog.Statement.{u}) (hFr : DegZeroLocFrac.Statement.{u}) :
-    LocalIntegralClosureFinite.Statement.{u} := by
+theorem LocalIntegralClosureFinite.proof
+    (hN : NoetherIntegralClosureFinite.Statement.{u}) (hF : FunctionFieldFinite.Statement.{u})
+    (hQ : DegZeroLocQuot.Statement.{u}) (hD : MChartDehomog.Statement.{u})
+    (hFr : DegZeroLocFrac.Statement.{u})
+    : LocalIntegralClosureFinite.Statement.{u} := by
   intro F _ K K' _ _ _ _ j ι' _ P' hP' hdim W hW hle
   have := hP'.isPrime
   have := hW.isPrime
@@ -46,15 +47,19 @@ theorem LocalIntegralClosureFinite.proof (hN : NoetherIntegralClosureFinite.Stat
       (inv_mem (IntermediateField.algebra_adjoin_le_adjoin F S hd))
   have hκE : (homFracDegZero P).map φ ≤ IntermediateField.adjoin F S := by
     rintro _ ⟨z, hz, rfl⟩
-    obtain ⟨y, hy, w, hw, -, rfl⟩ := hFr F K (fun k => ι' (j k)) P
-      (isMultiProjPrime_contractPrime j ι' hP') {W} (Set.finite_singleton W)
-      (fun W' h => by rw [Set.mem_singleton_iff.mp h]; exact hW) z hz
+    obtain ⟨y, hy, w, hw, -, rfl⟩ :=
+      hFr F K
+        (fun k => ι' (j k))
+        P (isMultiProjPrime_contractPrime j ι' hP') {W} (Set.finite_singleton W)
+        (fun W' h => by rw [Set.mem_singleton_iff.mp h]; exact hW)
+        z hz
     rw [map_div₀]
     exact div_mem (hAE _ ⟨y, hy, rfl⟩) (hAE _ ⟨w, hw, rfl⟩)
   have hdeg : IntermediateField.relfinrank ((homFracDegZero P).map φ) L ≠ 0 :=
     hF F K K' j ι' P' hP' hdim
   rw [← IntermediateField.relfinrank_mul_relfinrank hκE hEL,
-    IntermediateField.relfinrank_eq_finrank_of_le hEL] at hdeg
+      IntermediateField.relfinrank_eq_finrank_of_le hEL]
+    at hdeg
   exact exists_finset_integral_span hN (Set.finite_range _) A' L hRA hloc hEL
     (FiniteDimensional.of_finrank_pos (Nat.pos_of_ne_zero (right_ne_zero_of_mul hdeg)))
 

@@ -12,14 +12,16 @@ section Act
 
 variable {K : Type} [Field K] {ι : Type}
 variable (pts : ∀ (S : Type) [CommRing S] [Algebra K S], Type)
-variable (mapR : ∀ {S T : Type} [CommRing S] [Algebra K S] [CommRing T] [Algebra K T],
-  (S →ₐ[K] T) → pts S → pts T → Prop)
+variable
+  (mapR : ∀ {S T : Type} [CommRing S] [Algebra K S] [CommRing T] [Algebra K T],
+    (S →ₐ[K] T) → pts S → pts T → Prop)
 variable (borR : ∀ {S : Type} [CommRing S] [Algebra K S], (ι → Sˣ) → pts S → pts S → Prop)
 variable {G : Type} [Group G]
 variable (actR : ∀ {S : Type} [CommRing S] [Algebra K S], G → pts S → pts S → Prop)
 
 def mvPt (g : G) {S : Type} [CommRing S] [Algebra K S] (y : pts S) : pts S :=
-  open Classical in if h : ∃ y', actR g y y' then h.choose else y
+  open Classical in
+  if h : ∃ y', actR g y y' then h.choose else y
 
 def actRule (g : G) (f : Rules pts) : Rules pts := fun p y => f p (mvPt pts actR g y)
 
@@ -28,8 +30,9 @@ def actL (g : G) : Rules pts →ₗ[K] Rules pts where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem actL_apply (g : G) (f : Rules pts) (p : TRing K) (y : pts p.R) :
-    actL pts actR g f p y = f p (mvPt pts actR g y) := rfl
+theorem actL_apply (g : G) (f : Rules pts) (p : TRing K) (y : pts p.R)
+    : actL pts actR g f p y = f p (mvPt pts actR g y) :=
+  rfl
 
 def ActTotal : Prop :=
   ∀ (g : G) (S : Type) [CommRing S] [Algebra K S] (y : pts S), ∃ y', actR g y y'
@@ -38,8 +41,7 @@ def ActFun : Prop :=
   ∀ (g : G) (S : Type) [CommRing S] [Algebra K S] (y y' y'' : pts S),
     actR g y y' → actR g y y'' → mapR (AlgHom.id K S) y' y''
 
-def ActOne : Prop :=
-  ∀ (S : Type) [CommRing S] [Algebra K S] (y : pts S), actR 1 y y
+def ActOne : Prop := ∀ (S : Type) [CommRing S] [Algebra K S] (y : pts S), actR 1 y y
 
 def ActMul : Prop :=
   ∀ (g h : G) (S : Type) [CommRing S] [Algebra K S] (y y' y'' : pts S),
@@ -47,7 +49,8 @@ def ActMul : Prop :=
 
 def ActNat : Prop :=
   ∀ (g : G) (S T : Type) [CommRing S] [Algebra K S] [CommRing T] [Algebra K T] (φ : S →ₐ[K] T)
-    (y y' : pts S) (z z' : pts T), mapR φ y z → actR g y y' → actR g z z' → mapR φ y' z'
+      (y y' : pts S) (z z' : pts T),
+    mapR φ y z → actR g y y' → actR g z z' → mapR φ y' z'
 
 def ActBor : Prop :=
   ∀ (g : G) (S : Type) [CommRing S] [Algebra K S] (t : ι → Sˣ) (y y' z z' : pts S),
@@ -55,8 +58,8 @@ def ActBor : Prop :=
 
 variable {pts actR}
 
-theorem mvPt_spec (hT : ActTotal pts actR) (g : G) {S : Type} [CommRing S] [Algebra K S] (y : pts S) :
-    actR g y (mvPt pts actR g y) := by
+theorem mvPt_spec (hT : ActTotal pts actR) (g : G) {S : Type} [CommRing S] [Algebra K S] (y : pts S)
+    : actR g y (mvPt pts actR g y) := by
   have h := hT g S y
   unfold mvPt
   rw [dite_eq_left h]
@@ -64,27 +67,36 @@ theorem mvPt_spec (hT : ActTotal pts actR) (g : G) {S : Type} [CommRing S] [Alge
 
 variable (pts actR)
 
-theorem actL_mem [Fintype ι] (hT : ActTotal pts actR) (hN : ActNat pts mapR actR) (hB : ActBor pts borR actR)
-    (e : ι → ℕ) (g : G) {f : Rules pts} (hf : f ∈ secW pts mapR borR e) :
-    actL pts actR g f ∈ secW pts mapR borR e := by
+theorem actL_mem
+    [Fintype ι]
+    (hT : ActTotal pts actR) (hN : ActNat pts mapR actR) (hB : ActBor pts borR actR)
+    (e : ι → ℕ)
+    (g : G)
+    {f : Rules pts} (hf : f ∈ secW pts mapR borR e)
+    : actL pts actR g f ∈ secW pts mapR borR e := by
   obtain ⟨h1, h2⟩ := hf
   refine ⟨?_, ?_⟩
   · intro p q φ y z hyz
-    exact h1 p q φ _ _ (hN g p.R q.R φ y (mvPt pts actR g y) z (mvPt pts actR g z) hyz
-      (mvPt_spec hT g y) (mvPt_spec hT g z))
+    exact h1 p q φ _ _
+      (hN g p.R q.R φ y (mvPt pts actR g y) z (mvPt pts actR g z) hyz (mvPt_spec hT g y)
+        (mvPt_spec hT g z))
   · intro p t y y' hyy
-    exact h2 p t _ _ (hB g p.R t y (mvPt pts actR g y) y' (mvPt pts actR g y') hyy
-      (mvPt_spec hT g y) (mvPt_spec hT g y'))
+    exact h2 p t _ _
+      (hB g p.R t y (mvPt pts actR g y) y' (mvPt pts actR g y') hyy (mvPt_spec hT g y)
+        (mvPt_spec hT g y'))
 
-theorem actL_one (hT : ActTotal pts actR) (hF : ActFun pts mapR actR) (hO : ActOne pts actR)
-    {f : Rules pts} (hf : IsNatural pts mapR f) : actL pts actR 1 f = f := by
+theorem actL_one
+    (hT : ActTotal pts actR) (hF : ActFun pts mapR actR) (hO : ActOne pts actR)
+    {f : Rules pts} (hf : IsNatural pts mapR f)
+    : actL pts actR 1 f = f := by
   funext p y
   show f p (mvPt pts actR 1 y) = f p y
   exact hf p p (AlgHom.id K p.R) y _ (hF 1 p.R y y _ (hO p.R y) (mvPt_spec hT 1 y))
 
-theorem actL_mul (hT : ActTotal pts actR) (hF : ActFun pts mapR actR) (hM : ActMul pts actR)
-    (g h : G) {f : Rules pts} (hf : IsNatural pts mapR f) :
-    actL pts actR (g * h) f = actL pts actR g (actL pts actR h f) := by
+theorem actL_mul
+    (hT : ActTotal pts actR) (hF : ActFun pts mapR actR) (hM : ActMul pts actR) (g h : G)
+    {f : Rules pts} (hf : IsNatural pts mapR f)
+    : actL pts actR (g * h) f = actL pts actR g (actL pts actR h f) := by
   funext p y
   show f p (mvPt pts actR (g * h) y) = f p (mvPt pts actR h (mvPt pts actR g y))
   have h1 : actR (g * h) y (mvPt pts actR h (mvPt pts actR g y)) :=

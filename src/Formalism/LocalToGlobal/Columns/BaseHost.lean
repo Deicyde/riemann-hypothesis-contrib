@@ -21,19 +21,13 @@ section Host
 
 variable {R : Ranks} {H : Formalism.BasicNotions.Host R} (T : Frame H)
 
-
 end Host
 
 section Host2
 
 variable {R : Ranks} {H : Formalism.BasicNotions.Host R} (T : Frame H)
 
-
-
 variable (ι : Qb →+* ℂ) (LL : Fld) [Normal ℚ LL] (hE : H.EQ ≤ LL)
-
-
-
 
 end Host2
 
@@ -42,15 +36,17 @@ section Host3
 variable {R : Ranks} {H : Formalism.BasicNotions.Host R} (T : Frame H)
 variable (ι : Qb →+* ℂ) (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL] (hE : H.EQ ≤ LL)
 
-
 end Host3
 
-theorem ram_conj_mem {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (hrank : Module.finrank F E = 2) (c : 𝓞 E →+* 𝓞 E) (hcc : ∀ x, c (c x) = x)
+theorem ram_conj_mem
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (hrank : Module.finrank F E = 2)
+    (c : 𝓞 E →+* 𝓞 E) (hcc : ∀ x, c (c x) = x)
     (hcF : ∀ a : 𝓞 F, c (algebraMap (𝓞 F) (𝓞 E) a) = algebraMap (𝓞 F) (𝓞 E) a)
     (P : HeightOneSpectrum (𝓞 E))
-    (hP : (P.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E))).map (algebraMap (𝓞 F) (𝓞 E)) ≤ P.asIdeal ^ 2) (x : 𝓞 E) :
-    c x - x ∈ P.asIdeal := by
+    (hP : (P.asIdeal.comap (algebraMap (𝓞 F) (𝓞 E))).map (algebraMap (𝓞 F) (𝓞 E)) ≤ P.asIdeal ^ 2)
+    (x : 𝓞 E)
+    : c x - x ∈ P.asIdeal := by
   classical
   set p : Ideal (𝓞 F) := P.asIdeal.under (𝓞 F) with hp
   have hPmax : P.asIdeal.IsMaximal := P.isMaximal
@@ -88,8 +84,9 @@ theorem ram_conj_mem {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   have hQP : Q = P.asIdeal := by
     by_contra hne
     have hne' : Q' ≠ P' := fun h => hne (congrArg Subtype.val h)
-    have h2 : ∑ q ∈ ({P', Q'} : Finset (p.primesOver (𝓞 E))), q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F) ≤
-        ∑ q : p.primesOver (𝓞 E), q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F) :=
+    have h2
+        : ∑ q ∈ ({P', Q'} : Finset (p.primesOver (𝓞 E))), q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F)
+          ≤ ∑ q : p.primesOver (𝓞 E), q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F) :=
       Finset.sum_le_sum_of_subset (Finset.subset_univ _)
     rw [Finset.sum_pair hne'.symm, hsum] at h2
     have h3 : 2 ≤ P.asIdeal.ramificationIdx (𝓞 F) * P.asIdeal.inertiaDeg (𝓞 F) := by nlinarith
@@ -100,10 +97,13 @@ theorem ram_conj_mem {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
     omega
 
   have hf1 : P.asIdeal.inertiaDeg (𝓞 F) = 1 := by
-    have h2 : P'.1.ramificationIdx (𝓞 F) * P'.1.inertiaDeg (𝓞 F) ≤
-        ∑ q : p.primesOver (𝓞 E), q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F) :=
-      Finset.single_le_sum (f := fun q : p.primesOver (𝓞 E) => q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F))
-        (fun _ _ => Nat.zero_le _) (Finset.mem_univ P')
+    have h2
+        : P'.1.ramificationIdx (𝓞 F) * P'.1.inertiaDeg (𝓞 F)
+          ≤ ∑ q : p.primesOver (𝓞 E), q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F) :=
+      Finset.single_le_sum
+        (f := fun q : p.primesOver (𝓞 E) => q.1.ramificationIdx (𝓞 F) * q.1.inertiaDeg (𝓞 F))
+        (fun _ _ => Nat.zero_le _)
+        (Finset.mem_univ P')
     rw [hsum] at h2
     have h5 : P'.1 = P.asIdeal := rfl
     rw [h5] at h2
@@ -111,7 +111,9 @@ theorem ram_conj_mem {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   rw [Ideal.inertiaDeg_eq_of_isMaximal p P.asIdeal] at hf1
   let : Field (𝓞 F ⧸ p) := Ideal.Quotient.field p
   let : Field (𝓞 E ⧸ P.asIdeal) := Ideal.Quotient.field P.asIdeal
-  obtain ⟨a', ha'⟩ := (finrank_eq_one_iff_of_nonzero' (1 : 𝓞 E ⧸ P.asIdeal) one_ne_zero).1 hf1 (Ideal.Quotient.mk P.asIdeal x)
+  obtain ⟨a', ha'⟩ :=
+    (finrank_eq_one_iff_of_nonzero' (1 : 𝓞 E ⧸ P.asIdeal) one_ne_zero).1 hf1
+      (Ideal.Quotient.mk P.asIdeal x)
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a'
   have hxa : x - algebraMap (𝓞 F) (𝓞 E) a ∈ P.asIdeal := by
     rw [← Ideal.Quotient.eq, ← ha', Algebra.smul_def, mul_one]
@@ -126,9 +128,12 @@ theorem ram_conj_mem {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
   have e : c x - algebraMap (𝓞 F) (𝓞 E) a - (x - algebraMap (𝓞 F) (𝓞 E) a) = c x - x := by ring
   rwa [e] at this
 
-theorem Fields.Ok.ram_conj {X : Fields} (h : X.Ok) (P : HeightOneSpectrum (𝓞 X.E))
-    (hP : (P.asIdeal.comap (algebraMap (𝓞 X.F) (𝓞 X.E))).map (algebraMap (𝓞 X.F) (𝓞 X.E)) ≤ P.asIdeal ^ 2) (x : 𝓞 X.E) :
-    X.conjO x - x ∈ P.asIdeal := by
+theorem Fields.Ok.ram_conj
+    {X : Fields} (h : X.Ok) (P : HeightOneSpectrum (𝓞 X.E))
+    (hP : (P.asIdeal.comap (algebraMap (𝓞 X.F) (𝓞 X.E))).map (algebraMap (𝓞 X.F) (𝓞 X.E))
+      ≤ P.asIdeal ^ 2)
+    (x : 𝓞 X.E)
+    : X.conjO x - x ∈ P.asIdeal := by
   refine ram_conj_mem h.rankE X.conjO ?_ ?_ P hP x
   · intro y
     apply RingOfIntegers.ext
@@ -138,9 +143,12 @@ theorem Fields.Ok.ram_conj {X : Fields} (h : X.Ok) (P : HeightOneSpectrum (𝓞 
     apply RingOfIntegers.ext
     exact h.star_F (a : X.F)
 
-theorem Fields.Ok.unram_of_inertia {X : Fields} (h : X.Ok)
-    (hin : ∀ P : HeightOneSpectrum (𝓞 X.E), ¬ ∀ x : 𝓞 X.E, X.conjO x - x ∈ P.asIdeal) (P : HeightOneSpectrum (𝓞 X.E)) :
-    ¬ (P.asIdeal.comap (algebraMap (𝓞 X.F) (𝓞 X.E))).map (algebraMap (𝓞 X.F) (𝓞 X.E)) ≤ P.asIdeal ^ 2 :=
-  fun hP => hin P (h.ram_conj P hP)
+theorem Fields.Ok.unram_of_inertia
+    {X : Fields}
+    (h : X.Ok) (hin : ∀ P : HeightOneSpectrum (𝓞 X.E), ¬ ∀ x : 𝓞 X.E, X.conjO x - x ∈ P.asIdeal)
+    (P : HeightOneSpectrum (𝓞 X.E))
+    : ¬ (P.asIdeal.comap (algebraMap (𝓞 X.F) (𝓞 X.E))).map (algebraMap (𝓞 X.F) (𝓞 X.E))
+      ≤ P.asIdeal ^ 2 := fun hP =>
+  hin P (h.ram_conj P hP)
 
 end Formalism.L2.Col

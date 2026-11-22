@@ -117,14 +117,18 @@ theorem stepOne : StepOne := by
   have hself : IsExt P p.l0 Y N K w w := isExt_self hw (by omega)
   obtain ⟨wm, hwm, hmax⟩ := exists_max_ext K w (fun w' => Ew p nn F j w' h) hself
   set M := Ew p nn F j wm h with hMdef
-  have hint : ∀ s : ℂ, ∫ c, Complex.exp (2 * Complex.I * ((s * c).im : ℂ)) * φ c
-      = ∫ c, P5.fsv s c * NP p nn F (j + 1) w (h ++ [(1, c)]) (h ++ [(1, c)]) := by
+  have hint
+      : ∀ s : ℂ,
+        ∫ c, Complex.exp (2 * Complex.I * ((s * c).im : ℂ)) * φ c
+          = ∫ c, P5.fsv s c * NP p nn F (j + 1) w (h ++ [(1, c)]) (h ++ [(1, c)]) := by
     intro s
     refine integral_congr_ae ?_
     filter_upwards [ae_ne_zero] with c hc
     rw [fsv_eq, hφe c hc]
-  have hbd : ∀ s : ℂ, ‖∫ c, P5.fsv s c * NP p nn F (j + 1) w (h ++ [(1, c)]) (h ++ [(1, c)])‖ ≤
-      mn Λ K ‖s‖ * M := by
+  have hbd
+      : ∀ s : ℂ,
+        ‖∫ c, P5.fsv s c * NP p nn F (j + 1) w (h ++ [(1, c)]) (h ++ [(1, c)])‖
+          ≤ mn Λ K ‖s‖ * M := by
     intro s
     obtain ⟨w', hw', hb⟩ := hI3 j hj h hh w hw hlen s
     exact hb.trans (mul_le_mul_of_nonneg_left (hmax w' hw') (mn_nonneg hΛ K (norm_nonneg _)))
@@ -134,9 +138,12 @@ theorem stepOne : StepOne := by
     exact (norm_nonneg _).trans h0
   have key : ∀ x : ℝ, 0 < x → Λ ≤ x → ‖φ c‖ ≤ 3 / π * x ^ 2 * M := by
     intro x hx hΛx
-    refine Formalism.HermitianLatticeCounting.P.sup_bound_of_truncated_integral φ x M hφc hφi hx (fun s => ?_) c
+    refine Formalism.HermitianLatticeCounting.P.sup_bound_of_truncated_integral φ x M hφc hφi hx
+      (fun s => ?_)
+      c
     rw [hint s, mul_comm M]
-    exact (hbd s).trans (mul_le_mul_of_nonneg_right (min_le_truncated_exponential hΛ hΛx hK (norm_nonneg _)) hM)
+    exact (hbd s).trans
+      (mul_le_mul_of_nonneg_right (min_le_truncated_exponential hΛ hΛx hK (norm_nonneg _)) hM)
   have hre : Ew p nn F (j + 1) w (h ++ [(1, c)]) ≤ ‖φ c‖ := by
     show (NP p nn F (j + 1) w (h ++ [(1, c)]) (h ++ [(1, c)])).re ≤ _
     rw [← hφe c hc]
@@ -146,7 +153,8 @@ theorem stepOne : StepOne := by
   · exact key Λ hpos le_rfl
   · rw [← h0]
     have ht : Tendsto (fun x : ℝ => 3 / π * x ^ 2 * M) (𝓝[>] 0) (𝓝 (3 / π * 0 ^ 2 * M)) :=
-      ((by fun_prop : Continuous fun x : ℝ => 3 / π * x ^ 2 * M).tendsto 0).mono_left nhdsWithin_le_nhds
+      ((by fun_prop : Continuous fun x : ℝ => 3 / π * x ^ 2 * M).tendsto 0).mono_left
+        nhdsWithin_le_nhds
     refine ge_of_tendsto ht ?_
     filter_upwards [self_mem_nhdsWithin] with x hx
     exact key x hx (h0 ▸ le_of_lt hx)
@@ -156,7 +164,8 @@ lemma gauss_const : (4 * (3 / 2 : ℝ) ^ (3 : ℝ) * (3 / (3 - 2))) = 40.5 := by
 
 theorem stepUp : StepUp := by
   refine ⟨40.5 / π, by positivity, ?_⟩
-  intro Wp Wq _ _ _ _ _ _ P p nn F Y Λ K N hK hΛ hPos hI4 hI5 b s hb hs hbs h hh w hw hlen Mb hMb z hz
+  intro Wp Wq _ _ _ _ _ _ P p nn F Y Λ K N hK hΛ hPos hI4 hI5 b s hb hs hbs h hh w hw hlen Mb hMb z
+    hz
   have hΛ0 : 0 < Λ := by linarith
   have hMb0 : 0 ≤ Mb :=
     (hPos _ w _ hw (by omega)).trans (hMb w (isExt_self hw (by omega)) 1 one_ne_zero)
@@ -166,9 +175,12 @@ theorem stepUp : StepUp := by
     simp [hω₁, hω₂, Complex.conj_ofReal]
     ring
   have hne : (conj ω₁ * ω₂).im ≠ 0 := by rw [him]; positivity
-  have hbdd : ∀ w', IsExt P p.l0 Y N K w w' →
-      BddAbove (Set.range fun t : {t : ℂ // t ≠ 0} => Ew p nn F (b + s - 2) w' (h ++ [(s - 1, t.1)])) :=
-    fun w' hw' => ⟨Mb, by rintro _ ⟨t, rfl⟩; exact hMb w' hw' t.1 t.2⟩
+  have hbdd
+      : ∀ w',
+        IsExt P p.l0 Y N K w w'
+          → BddAbove (Set.range fun t : {t : ℂ // t ≠ 0} =>
+            Ew p nn F (b + s - 2) w' (h ++ [(s - 1, t.1)])) := fun w' hw' =>
+    ⟨Mb, by rintro _ ⟨t, rfl⟩; exact hMb w' hw' t.1 t.2⟩
   obtain ⟨k, hk1, hk2⟩ := hI5 b s hb hs hbs h hh w hw hlen hbdd ω₁ ω₂ z hne
   have hkσ : ∀ σ, InDual ω₁ ω₂ σ → (‖k σ‖₊ : ℝ≥0∞) ≤ ENNReal.ofReal (mn Λ K ‖σ‖ * Mb) := by
     intro σ hσ
@@ -178,27 +190,31 @@ theorem stepUp : StepUp := by
       by_cases hσ0 : σ = 0
       · filter_upwards [ev1] with t ht
         simpa [hσ0] using ht
-      · have hn : ∀ᶠ t in 𝓝 (0 : ℂ), t ≠ (-σ)⁻¹ :=
-          eventually_ne_nhds (by simpa using hσ0)
+      · have hn : ∀ᶠ t in 𝓝 (0 : ℂ), t ≠ (-σ)⁻¹ := eventually_ne_nhds (by simpa using hσ0)
         filter_upwards [nhdsWithin_le_nhds hn] with t ht
         intro h0
         apply ht
         rw [← eq_neg_iff_add_eq_zero.2 h0, inv_inv]
     filter_upwards [ev1, ev2] with t ht ht'
     have ht'' : (t⁻¹ + σ)⁻¹ ≠ 0 := inv_ne_zero ht'
-    obtain ⟨w₁, w₂, hw₁, hw₂, hN⟩ := hI4 b (s - 1) hb (by omega) (by omega) h hh w hw hlen t _ ht ht''
+    obtain ⟨w₁, w₂, hw₁, hw₂, hN⟩ :=
+      hI4 b (s - 1) hb (by omega) (by omega) h hh w hw hlen t _ ht ht''
     rw [show b + (s - 1) - 1 = b + s - 2 by omega] at hN
-    have hdiff : ‖t⁻¹ - ((t⁻¹ + σ)⁻¹)⁻¹‖ = ‖σ‖ := by
-      rw [inv_inv, sub_add_cancel_left, norm_neg]
+    have hdiff : ‖t⁻¹ - ((t⁻¹ + σ)⁻¹)⁻¹‖ = ‖σ‖ := by rw [inv_inv, sub_add_cancel_left, norm_neg]
     rw [hdiff] at hN
     have hE1 := hMb w₁ hw₁ t ht
     have hE2 := hMb w₂ hw₂ _ ht''
     have hmn := mn_nonneg hΛ0.le K (norm_nonneg σ)
-    have hle : ‖NP p nn F (b + s - 2) w (h ++ [(s - 1, t)]) (h ++ [(s - 1, (t⁻¹ + σ)⁻¹)])‖ ≤
-        mn Λ K ‖σ‖ * Mb := hN.trans (mul_le_mul_of_nonneg_left (by linarith) hmn)
+    have hle
+        : ‖NP p nn F (b + s - 2) w (h ++ [(s - 1, t)]) (h ++ [(s - 1, (t⁻¹ + σ)⁻¹)])‖
+          ≤ mn Λ K ‖σ‖ * Mb :=
+      hN.trans (mul_le_mul_of_nonneg_left (by linarith) hmn)
     rw [← ENNReal.ofReal_coe_nnreal, coe_nnnorm]
     exact ENNReal.ofReal_le_ofReal hle
-  have hdual : ∀ σ, InDual ω₁ ω₂ σ → σ ∈ Set.range (fun a : GaussianInt => (Λ : ℂ) * GaussianInt.toComplex a) := by
+  have hdual
+      : ∀ σ,
+        InDual ω₁ ω₂ σ
+          → σ ∈ Set.range (fun a : GaussianInt => (Λ : ℂ) * GaussianInt.toComplex a) := by
     intro σ hσ
     have h1 := hσ 1 0
     have h2 := hσ 0 1
@@ -225,46 +241,56 @@ theorem stepUp : StepUp := by
     have : GaussianInt.toComplex a = GaussianInt.toComplex a' :=
       mul_left_cancel₀ (by exact_mod_cast hΛ0.ne') haa
     exact GaussianInt.toComplex_injective this
-  let g : ℂ → ℝ≥0∞ := fun σ => ENNReal.ofReal (Formalism.HermitianLatticeCounting.ExpansionTerms.TruncationCutoff 3 Λ ‖σ‖)
+  let g : ℂ → ℝ≥0∞ := fun σ =>
+    ENNReal.ofReal (Formalism.HermitianLatticeCounting.ExpansionTerms.TruncationCutoff 3 Λ ‖σ‖)
   have hG : ∑' a : GaussianInt, g ((Λ : ℂ) * GaussianInt.toComplex a) ≤ ENNReal.ofReal 40.5 := by
     rw [ENNReal.tsum_eq_iSup_sum]
     refine iSup_le fun S => ?_
-    rw [← ENNReal.ofReal_sum_of_nonneg (fun a _ => truncated_exponential_nonneg _ _ hΛ0.le (norm_nonneg _))]
+    rw [← ENNReal.ofReal_sum_of_nonneg (fun a _ =>
+      truncated_exponential_nonneg _ _ hΛ0.le (norm_nonneg _))]
     refine ENNReal.ofReal_le_ofReal ?_
     have := Formalism.HermitianLatticeCounting.P.gaussian_lattice_cutoff_sum 3 Λ (by norm_num) hΛ0 S
     rwa [gauss_const] at this
-  have hsum : ∑' σ : {σ : ℂ // InDual ω₁ ω₂ σ}, (‖k σ.1‖₊ : ℝ≥0∞) ≤
-      ENNReal.ofReal Mb * ENNReal.ofReal 40.5 := by
-    calc ∑' σ : {σ : ℂ // InDual ω₁ ω₂ σ}, (‖k σ.1‖₊ : ℝ≥0∞)
-        ≤ ∑' σ : {σ : ℂ // InDual ω₁ ω₂ σ}, ENNReal.ofReal Mb * g σ.1 := by
-          refine ENNReal.tsum_le_tsum fun σ => (hkσ σ.1 σ.2).trans ?_
-          rw [← ENNReal.ofReal_mul hMb0, mul_comm Mb]
-          refine ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_right ?_ hMb0)
-          exact min_le_truncated_exponential hΛ0.le le_rfl hK (norm_nonneg _)
+  have hsum
+      : ∑' σ : {σ : ℂ // InDual ω₁ ω₂ σ}, (‖k σ.1‖₊ : ℝ≥0∞)
+        ≤ ENNReal.ofReal Mb * ENNReal.ofReal 40.5 := by
+    calc
+      ∑' σ : {σ : ℂ // InDual ω₁ ω₂ σ}, (‖k σ.1‖₊ : ℝ≥0∞)
+          ≤ ∑' σ : {σ : ℂ // InDual ω₁ ω₂ σ}, ENNReal.ofReal Mb * g σ.1 := by
+        refine ENNReal.tsum_le_tsum fun σ => (hkσ σ.1 σ.2).trans ?_
+        rw [← ENNReal.ofReal_mul hMb0, mul_comm Mb]
+        refine ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_right ?_ hMb0)
+        exact min_le_truncated_exponential hΛ0.le le_rfl hK (norm_nonneg _)
       _ = ENNReal.ofReal Mb * ∑' σ : {σ : ℂ // InDual ω₁ ω₂ σ}, g σ.1 := ENNReal.tsum_mul_left
-      _ ≤ ENNReal.ofReal Mb *
-            ∑' σ : Set.range (fun a : GaussianInt => (Λ : ℂ) * GaussianInt.toComplex a), g σ.1 := by
-          gcongr
-          exact tsum_mono_subtype (s := {σ : ℂ | InDual ω₁ ω₂ σ}) g (by
-            intro σ hσ
-            exact hdual σ hσ)
+      _ ≤ ENNReal.ofReal Mb
+          * ∑' σ : Set.range (fun a : GaussianInt => (Λ : ℂ) * GaussianInt.toComplex a), g σ.1 := by
+        gcongr
+        exact tsum_mono_subtype (s := {σ : ℂ | InDual ω₁ ω₂ σ}) g (by
+          intro σ hσ
+          exact hdual σ hσ)
       _ = ENNReal.ofReal Mb * ∑' a : GaussianInt, g ((Λ : ℂ) * GaussianInt.toComplex a) := by
-          rw [tsum_range g hinj]
+        rw [tsum_range g hinj]
       _ ≤ ENNReal.ofReal Mb * ENNReal.ofReal 40.5 := by gcongr
-  have hterm : ENNReal.ofReal (Ew p nn F (b + s - 1) w (h ++ [(s, z)])) ≤
-      ∑' ab : ℤ × ℤ, ENNReal.ofReal
-        (Ew p nn F (b + s - 1) w (h ++ [(s, z + (ab.1 : ℂ) * ω₁ + (ab.2 : ℂ) * ω₂)])) := by
+  have hterm
+      : ENNReal.ofReal (Ew p nn F (b + s - 1) w (h ++ [(s, z)]))
+        ≤ ∑' ab : ℤ × ℤ, ENNReal.ofReal
+            (Ew p nn F (b + s - 1) w (h ++ [(s, z + (ab.1 : ℂ) * ω₁ + (ab.2 : ℂ) * ω₂)])) := by
     refine le_of_eq_of_le ?_ (ENNReal.le_tsum ((0 : ℤ), (0 : ℤ)))
     simp
   have hv : |(conj ω₁ * ω₂).im| / π = π / Λ ^ 2 := by
     rw [him, abs_of_nonneg (by positivity)]
     field_simp
-  have hmain : ENNReal.ofReal (π / Λ ^ 2 * Ew p nn F (b + s - 1) w (h ++ [(s, z)])) ≤
-      ENNReal.ofReal (Mb * 40.5) := by
+  have hmain
+      : ENNReal.ofReal (π / Λ ^ 2 * Ew p nn F (b + s - 1) w (h ++ [(s, z)]))
+        ≤ ENNReal.ofReal (Mb * 40.5) := by
     rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_mul hMb0, ← hv]
-    have hm : ENNReal.ofReal (|(conj ω₁ * ω₂).im| / π) * ENNReal.ofReal (Ew p nn F (b + s - 1) w (h ++ [(s, z)])) ≤
-        ENNReal.ofReal (|(conj ω₁ * ω₂).im| / π) * ∑' ab : ℤ × ℤ, ENNReal.ofReal
-          (Ew p nn F (b + s - 1) w (h ++ [(s, z + (ab.1 : ℂ) * ω₁ + (ab.2 : ℂ) * ω₂)])) := by gcongr
+    have hm
+        : ENNReal.ofReal (|(conj ω₁ * ω₂).im| / π)
+            * ENNReal.ofReal (Ew p nn F (b + s - 1) w (h ++ [(s, z)]))
+          ≤ ENNReal.ofReal (|(conj ω₁ * ω₂).im| / π)
+            * ∑' ab : ℤ × ℤ, ENNReal.ofReal
+              (Ew p nn F (b + s - 1) w (h ++ [(s, z + (ab.1 : ℂ) * ω₁ + (ab.2 : ℂ) * ω₂)])) := by
+      gcongr
     exact hm.trans (hk1.trans hsum)
   have hfin := (ENNReal.ofReal_le_ofReal_iff (by positivity)).1 hmain
   have hπ := Real.pi_pos
@@ -285,47 +311,65 @@ theorem lemmaSOfSteps : LemmaSOfSteps := by
   | base =>
     intro hbs h hh w hw hlen t ht
     rw [one_mul] at hlen
-    obtain ⟨w', hw', hE⟩ := h1 Wp Wq P p nn F Y Λ K N hK (by linarith) hI2 hI3 (b - 1) (by omega) h hh w hw
-      hlen t ht
+    obtain ⟨w', hw', hE⟩ :=
+      h1 Wp Wq P p nn F Y Λ K N hK (by linarith) hI2 hI3 (b - 1) (by omega) h hh w hw hlen t ht
     rw [show b - 1 + 1 = b + 1 - 1 by omega] at hE
     refine ⟨w', by rwa [one_mul], hE.trans ?_⟩
-    have hE0 : 0 ≤ Ew p nn F (b - 1) w' h := hPos _ _ _ (admissible_word_of_extension hw hw') (isExt_lenN hw')
+    have hE0 : 0 ≤ Ew p nn F (b - 1) w' h :=
+      hPos _ _ _ (admissible_word_of_extension hw hw') (isExt_lenN hw')
     rw [pow_one]
-    exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_max_left _ _) (sq_nonneg _)) hE0
+    exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_max_left _ _) (sq_nonneg _))
+      hE0
   | succ s hs ih =>
     intro hbs h hh w hw hlen t ht
     have hlen' : w.length + K + s * K ≤ N := by rw [Nat.succ_mul] at hlen; omega
     have hself : IsExt P p.l0 Y N ((s + 1) * K) w w := isExt_self hw (by omega)
-    obtain ⟨wm, hwm, hmax⟩ := exists_max_ext ((s + 1) * K) w (fun w' => Ew p nn F (b - 1) w' h) hself
-    have hE0 : 0 ≤ Ew p nn F (b - 1) wm h := hPos _ _ _ (admissible_word_of_extension hw hwm) (isExt_lenN hwm)
+    obtain ⟨wm, hwm, hmax⟩ :=
+      exists_max_ext ((s + 1) * K) w (fun w' => Ew p nn F (b - 1) w' h) hself
+    have hE0 : 0 ≤ Ew p nn F (b - 1) wm h :=
+      hPos _ _ _ (admissible_word_of_extension hw hwm) (isExt_lenN hwm)
     set Mb := (max (3 / π) Cu * Λ ^ 2) ^ s * Ew p nn F (b - 1) wm h with hMbdef
-    have hMb : ∀ w', IsExt P p.l0 Y N K w w' → ∀ t : ℂ, t ≠ 0 →
-        Ew p nn F (b + (s + 1) - 2) w' (h ++ [(s + 1 - 1, t)]) ≤ Mb := by
+    have hMb
+        : ∀ w',
+          IsExt P p.l0 Y N K w w'
+            → ∀ t : ℂ, t ≠ 0 → Ew p nn F (b + (s + 1) - 2) w' (h ++ [(s + 1 - 1, t)]) ≤ Mb := by
       intro w' hw' t ht
       rw [show b + (s + 1) - 2 = b + s - 1 by omega, show s + 1 - 1 = s by omega]
       have hl' : w'.length + s * K ≤ N := by have := isExt_len hw'; omega
       obtain ⟨w'', hw'', hE⟩ := ih (by omega) h hh w' (admissible_word_of_extension hw hw') hl' t ht
       refine hE.trans (mul_le_mul_of_nonneg_left (hmax w'' ?_) (pow_nonneg hCL _))
       refine isExt_mono (isExt_trans hw' hw'') ?_
-      rw [Nat.succ_mul]; omega
-    have hup' := hup Wp Wq P p nn F Y Λ K N hK hΛ hPos hI4 hI5 b (s + 1) hb (by omega) hbs h hh w hw
-      (by omega) Mb hMb t ht
+      rw [Nat.succ_mul]
+      omega
+    have hup' :=
+      hup Wp Wq P p nn F Y Λ K N hK hΛ hPos hI4 hI5 b (s + 1) hb (by omega) hbs h hh w hw (by omega)
+        Mb hMb t ht
     refine ⟨wm, hwm, hup'.trans ?_⟩
     rw [hMbdef, pow_succ]
-    have hX : 0 ≤ (max (3 / π) Cu * Λ ^ 2) ^ s * Ew p nn F (b - 1) wm h := mul_nonneg (pow_nonneg hCL _) hE0
+    have hX : 0 ≤ (max (3 / π) Cu * Λ ^ 2) ^ s * Ew p nn F (b - 1) wm h :=
+      mul_nonneg (pow_nonneg hCL _) hE0
     have hc : Cu * Λ ^ 2 ≤ max (3 / π) Cu * Λ ^ 2 :=
       mul_le_mul_of_nonneg_right (le_max_right _ _) (sq_nonneg _)
-    calc Cu * Λ ^ 2 * ((max (3 / π) Cu * Λ ^ 2) ^ s * Ew p nn F (b - 1) wm h)
-        ≤ max (3 / π) Cu * Λ ^ 2 * ((max (3 / π) Cu * Λ ^ 2) ^ s * Ew p nn F (b - 1) wm h) :=
-          mul_le_mul_of_nonneg_right hc hX
-      _ = (max (3 / π) Cu * Λ ^ 2) ^ s * (max (3 / π) Cu * Λ ^ 2) * Ew p nn F (b - 1) wm h := by ring
+    calc
+      Cu * Λ ^ 2 * ((max (3 / π) Cu * Λ ^ 2) ^ s * Ew p nn F (b - 1) wm h)
+          ≤ max (3 / π) Cu * Λ ^ 2 * ((max (3 / π) Cu * Λ ^ 2) ^ s * Ew p nn F (b - 1) wm h) :=
+        mul_le_mul_of_nonneg_right hc hX
+      _ = (max (3 / π) Cu * Λ ^ 2) ^ s * (max (3 / π) Cu * Λ ^ 2) * Ew p nn F (b - 1) wm h := by
+        ring
 
-theorem corollary_s_induction {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] {P : M.Par} (p : KB.Pl P Wp Wq)
-    (nn : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ) (Λ : ℝ) (K N : ℕ) (C₂ : ℝ) (hC : 0 ≤ C₂)
-    (hL : LemmaS p nn F Y Λ K N C₂) :
-    ∀ γ : C.LPt, ∀ j, D.IsLocPt γ j → j ≤ P.r + 1 → ∀ w, AdmW P p.l0 Y w → w.length + j * K ≤ N →
-      ∃ w', IsExt P p.l0 Y N (j * K) w w' ∧ Ew p nn F j w γ ≤ (C₂ * Λ ^ 2) ^ j * Ew p nn F 0 w' [] := by
+theorem corollary_s_induction
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+    {P : M.Par} (p : KB.Pl P Wp Wq)
+    (nn : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (Y : Finset ℝ) (Λ : ℝ) (K N : ℕ) (C₂ : ℝ)
+    (hC : 0 ≤ C₂) (hL : LemmaS p nn F Y Λ K N C₂)
+    : ∀ γ : C.LPt, ∀ j,
+      D.IsLocPt γ j → j ≤ P.r + 1
+        → ∀ w,
+          AdmW P p.l0 Y w → w.length + j * K ≤ N
+            → ∃ w',
+              IsExt P p.l0 Y N (j * K) w w'
+                ∧ Ew p nn F j w γ ≤ (C₂ * Λ ^ 2) ^ j * Ew p nn F 0 w' [] := by
   have hCL : 0 ≤ C₂ * Λ ^ 2 := by positivity
   intro γ
   induction γ using List.reverseRecOn with
@@ -345,7 +389,8 @@ theorem corollary_s_induction {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProdu
     have hlS : w.length + s * K ≤ N := by
       have : s * K ≤ j * K := Nat.mul_le_mul_right K (by omega)
       omega
-    obtain ⟨w₁, hw₁, hE₁⟩ := hL (i + 1) s (by omega) hst.1 (by omega) h (by simpa using hh) w hw hlS t hst.2
+    obtain ⟨w₁, hw₁, hE₁⟩ :=
+      hL (i + 1) s (by omega) hst.1 (by omega) h (by simpa using hh) w hw hlS t hst.2
     rw [show i + 1 + s - 1 = j by omega, show i + 1 - 1 = i by omega] at hE₁
     have hl₁ : w₁.length + i * K ≤ N := by
       have h1 := isExt_len hw₁
@@ -355,20 +400,29 @@ theorem corollary_s_induction {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProdu
     refine ⟨w₂, ?_, hE₁.trans ?_⟩
     · refine isExt_mono (isExt_trans hw₁ hw₂) (le_of_eq ?_)
       rw [← hsz', Nat.add_mul, add_comm]
-    · calc (C₂ * Λ ^ 2) ^ s * Ew p nn F i w₁ h
-          ≤ (C₂ * Λ ^ 2) ^ s * ((C₂ * Λ ^ 2) ^ i * Ew p nn F 0 w₂ []) :=
-            mul_le_mul_of_nonneg_left hE₂ (pow_nonneg hCL _)
+    · calc
+        (C₂ * Λ ^ 2) ^ s * Ew p nn F i w₁ h
+            ≤ (C₂ * Λ ^ 2) ^ s * ((C₂ * Λ ^ 2) ^ i * Ew p nn F 0 w₂ []) :=
+          mul_le_mul_of_nonneg_left hE₂ (pow_nonneg hCL _)
         _ = (C₂ * Λ ^ 2) ^ j * Ew p nn F 0 w₂ [] := by rw [← hsz', pow_add]; ring
 
 theorem corSOfLemmaS : CorSOfLemmaS := by
   intro Wp Wq _ _ _ _ _ _ P p nn F Y Λ K N C₂ hN hC _ hL γ hγ
-  exact corollary_s_induction p nn F Y Λ K N C₂ hC hL γ (P.r + 1) hγ le_rfl [] admissible_word_nil (by simpa using hN)
+  exact corollary_s_induction p nn F Y Λ K N C₂ hC hL γ (P.r + 1) hγ le_rfl [] admissible_word_nil
+    (by simpa using hN)
 
 end
 
 end Formalism.FourierDecayAlt.P.TBBx1
 
-theorem Formalism.FourierDecayAlt.P.lemma_s_induction_base : Formalism.FourierDecayAlt.TBB.StepOne := Formalism.FourierDecayAlt.P.TBBx1.stepOne
-theorem Formalism.FourierDecayAlt.P.lemma_s_induction_up : Formalism.FourierDecayAlt.TBB.StepUp := Formalism.FourierDecayAlt.P.TBBx1.stepUp
-theorem Formalism.FourierDecayAlt.P.lemma_s_of_parts : Formalism.FourierDecayAlt.TBB.LemmaSOfSteps := Formalism.FourierDecayAlt.P.TBBx1.lemmaSOfSteps
-theorem Formalism.FourierDecayAlt.P.corSOfLemmaS_statement : Formalism.FourierDecayAlt.TBB.CorSOfLemmaS := Formalism.FourierDecayAlt.P.TBBx1.corSOfLemmaS
+theorem Formalism.FourierDecayAlt.P.lemma_s_induction_base
+    : Formalism.FourierDecayAlt.TBB.StepOne :=
+  Formalism.FourierDecayAlt.P.TBBx1.stepOne
+theorem Formalism.FourierDecayAlt.P.lemma_s_induction_up : Formalism.FourierDecayAlt.TBB.StepUp :=
+  Formalism.FourierDecayAlt.P.TBBx1.stepUp
+theorem Formalism.FourierDecayAlt.P.lemma_s_of_parts
+    : Formalism.FourierDecayAlt.TBB.LemmaSOfSteps :=
+  Formalism.FourierDecayAlt.P.TBBx1.lemmaSOfSteps
+theorem Formalism.FourierDecayAlt.P.corSOfLemmaS_statement
+    : Formalism.FourierDecayAlt.TBB.CorSOfLemmaS :=
+  Formalism.FourierDecayAlt.P.TBBx1.corSOfLemmaS

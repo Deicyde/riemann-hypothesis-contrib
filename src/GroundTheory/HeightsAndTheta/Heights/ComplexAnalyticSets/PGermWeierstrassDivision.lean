@@ -15,8 +15,9 @@ open Topology Filter
 
 noncomputable section
 
-theorem WeierstrassDivision.proof (hP : WeierstrassPreparation.Statement)
-    (hD : WeierstrassPolynomialDivision.Statement) : WeierstrassDivision.Statement := by
+theorem WeierstrassDivision.proof
+    (hP : WeierstrassPreparation.Statement) (hD : WeierstrassPolynomialDivision.Statement)
+    : WeierstrassDivision.Statement := by
   intro σ _ d f g hf hg hord
   obtain ⟨e, c, he, he0, hc, hc0, hfe⟩ := hP σ d f hf hord
   obtain ⟨q, a, hq, ha, hgq⟩ := hD σ d c g hc hc0 hg

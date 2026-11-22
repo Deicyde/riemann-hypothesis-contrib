@@ -12,9 +12,8 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem exists_not_mem_sq_add_sub (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ ρ : 𝓞 F, ∀ a : 𝓞 F, a ^ 2 + a - ρ ∉ v.asIdeal := by
+theorem exists_not_mem_sq_add_sub (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : ∃ ρ : 𝓞 F, ∀ a : 𝓞 F, a ^ 2 + a - ρ ∉ v.asIdeal := by
   have : v.asIdeal.IsMaximal := v.isMaximal
   let f : 𝓞 F ⧸ v.asIdeal → 𝓞 F ⧸ v.asIdeal := fun x => x ^ 2 + x
   have hni : ¬ Function.Injective f := by
@@ -30,7 +29,11 @@ theorem exists_not_mem_sq_add_sub (F : Type) [Field F] [NumberField F]
   simp only [map_sub, map_add (f := _), map_pow] at h
   exact sub_eq_zero.mp h
 
-theorem exists_evenNorms_unit : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)), ∃ Δ : v.adicCompletion F, EvenNorms Valued.v Δ ∧ Valued.v Δ = 1 ∧ Valued.v (Δ - 1) ≤ Valued.v (4 : v.adicCompletion F) := by
+theorem exists_evenNorms_unit
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)),
+      ∃ Δ : v.adicCompletion F,
+        EvenNorms Valued.v Δ ∧ Valued.v Δ = 1
+          ∧ Valued.v (Δ - 1) ≤ Valued.v (4 : v.adicCompletion F) := by
   intro F _ _ v
   obtain ⟨_, hval, hrep, -⟩ := GlobalTheory.T.exists_global_uniformizer_residue_representatives F v
   obtain ⟨ρ, hρ⟩ := exists_not_mem_sq_add_sub F v
@@ -40,8 +43,9 @@ theorem exists_evenNorms_unit : ∀ (F : Type) [Field F] [NumberField F] (v : He
     rwa [map_ofNat] at h
   have hint : ∀ a : 𝓞 F, Valued.v (algebraMap F (v.adicCompletion F) (a : F)) ≤ 1 := fun a => by
     rw [hval]; exact v.valuation_le_one a
-  have hone : ∀ a : 𝓞 F, a ∉ v.asIdeal →
-      Valued.v (algebraMap F (v.adicCompletion F) (a : F)) = 1 := fun a ha => by
+  have hone
+      : ∀ a : 𝓞 F,
+        a ∉ v.asIdeal → Valued.v (algebraMap F (v.adicCompletion F) (a : F)) = 1 := fun a ha => by
     rw [hval]; exact v.valuation_eq_one_iff_notMem.mpr ha
   have key : ∀ x : v.adicCompletion F, Valued.v x ≤ 1 → Valued.v (x ^ 2 + x - r) = 1 := by
     intro x hx
@@ -59,7 +63,12 @@ theorem exists_evenNorms_unit : ∀ (F : Type) [Field F] [NumberField F] (v : He
       exact lt_of_le_of_lt (mul_le_of_le_one_right' h3) ha
     have e : x ^ 2 + x - r = (x - b) * (x + b + 1) + (b ^ 2 + b - r) := by ring
     rw [e, Valuation.map_add_eq_of_lt_right _ hsmall, hab]
-  refine ⟨1 + 4 * r, GlobalTheory.T.evenOrderNorms_one_add_four_mul_of_no_root _ Valued.v r h2 (hint ρ) key, ?_, ?_⟩
+  refine ⟨
+    1 + 4 * r,
+    GlobalTheory.T.evenOrderNorms_one_add_four_mul_of_no_root _ Valued.v r h2 (hint ρ) key,
+    ?_,
+    ?_
+  ⟩
   · have h2le : Valued.v (2 : v.adicCompletion F) ≤ 1 := by
       rw [← one_add_one_eq_two]
       exact Valuation.map_add_le _ (by simp) (by simp)
@@ -69,8 +78,10 @@ theorem exists_evenNorms_unit : ∀ (F : Type) [Field F] [NumberField F] (v : He
         rw [Valuation.map_neg, map_inv₀, h2v, inv_one]
       have hk := key (-(2 : v.adicCompletion F)⁻¹) hx.le
       have h22 : (2 : v.adicCompletion F) * 2⁻¹ = 1 := mul_inv_cancel₀ h2
-      have e : 1 + 4 * r = -(2 * 2) *
-          ((-(2 : v.adicCompletion F)⁻¹) ^ 2 + (-(2 : v.adicCompletion F)⁻¹) - r) := by
+      have e
+          : 1 + 4 * r
+            = -(2 * 2)
+              * ((-(2 : v.adicCompletion F)⁻¹) ^ 2 + (-(2 : v.adicCompletion F)⁻¹) - r) := by
         linear_combination (2 * (2 : v.adicCompletion F)⁻¹ - 1) * h22
       rw [e, map_mul, hk, mul_one, Valuation.map_neg, map_mul, h2v, mul_one]
     · have h2lt : Valued.v (2 : v.adicCompletion F) < 1 := lt_of_le_of_ne h2le h2v

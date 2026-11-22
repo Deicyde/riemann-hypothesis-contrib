@@ -19,8 +19,8 @@ theorem c_pos (τ : X.Ψ) : 0 < X.c τ := by
   unfold Data.c
   positivity
 
-theorem tt_pos {x : Frame X.Ψ r} (hx : x ∈ X.dom) {ξ : Fin r → E} (hξ : ξ ≠ 0) (τ : X.Ψ) :
-    0 < X.tt ξ x τ := by
+theorem tt_pos {x : Frame X.Ψ r} (hx : x ∈ X.dom) {ξ : Fin r → E} (hξ : ξ ≠ 0) (τ : X.Ψ)
+    : 0 < X.tt ξ x τ := by
   have hv : Data.emb τ.1 ξ ≠ 0 := by
     intro h
     apply hξ

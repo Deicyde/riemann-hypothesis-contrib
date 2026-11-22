@@ -11,7 +11,6 @@ noncomputable section
 
 namespace Formalism.FX
 
-
 open LFunctionPartialSum in
 lemma LFunctionPartialSum.norm_tail_le {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {B : ℝ}
     (hB : ∀ M, ‖Ap χ M‖ ≤ B) {s : ℂ} (hs : 0 < s.re) (N : ℕ) :
@@ -143,12 +142,16 @@ theorem l_function_partial_sum : LPartialSum := by
   have hB0 : 0 ≤ B := (norm_nonneg _).trans (hB' 0)
   rw [LFunction_eq_G χ hχ hB' hs, ← partial_identity χ s N]
   have hsum := summable_dterm χ hB' hs
-  have hG : LFunctionPartialSum.G χ s = ∑ n ∈ Finset.range (N + 1), dterm χ s n + ∑' i, dterm χ s (i + (N + 1)) :=
+  have hG
+      : LFunctionPartialSum.G χ s
+        = ∑ n ∈ Finset.range (N + 1), dterm χ s n + ∑' i, dterm χ s (i + (N + 1)) :=
     (hsum.sum_add_tsum_nat_add (N + 1)).symm
   rw [hG]
-  have e : ∑ n ∈ Finset.range (N + 1), dterm χ s n + ∑' i, dterm χ s (i + (N + 1)) -
-      (∑ n ∈ Finset.range (N + 1), dterm χ s n + Ap χ N * ((N : ℂ) + 1) ^ (-s)) =
-      ∑' i, dterm χ s (i + (N + 1)) - Ap χ N * ((N : ℂ) + 1) ^ (-s) := by ring
+  have e
+      : ∑ n ∈ Finset.range (N + 1), dterm χ s n + ∑' i, dterm χ s (i + (N + 1))
+          - (∑ n ∈ Finset.range (N + 1), dterm χ s n + Ap χ N * ((N : ℂ) + 1) ^ (-s))
+        = ∑' i, dterm χ s (i + (N + 1)) - Ap χ N * ((N : ℂ) + 1) ^ (-s) := by
+    ring
   rw [e]
   have h1 := norm_tail_le χ hB' hs N
   have h2 : ‖Ap χ N * ((N : ℂ) + 1) ^ (-s)‖ ≤ B * ((N : ℝ) + 1) ^ (-s.re) := by
@@ -161,15 +164,16 @@ theorem l_function_partial_sum : LPartialSum := by
   have hq : 0 ≤ ‖s‖ / s.re := div_nonneg (norm_nonneg _) hs.le
   have h4 : 0 ≤ (N : ℝ) ^ (-s.re) := Real.rpow_nonneg hNpos.le _
   have h5 : 0 ≤ ((N : ℝ) + 1) ^ (-s.re) := Real.rpow_nonneg (by positivity) _
-  calc ‖∑' i, dterm χ s (i + (N + 1)) - Ap χ N * ((N : ℂ) + 1) ^ (-s)‖
+  calc
+    ‖∑' i, dterm χ s (i + (N + 1)) - Ap χ N * ((N : ℂ) + 1) ^ (-s)‖
       ≤ ‖∑' i, dterm χ s (i + (N + 1))‖ + ‖Ap χ N * ((N : ℂ) + 1) ^ (-s)‖ := norm_sub_le _ _
     _ ≤ B * (‖s‖ / s.re) * ((N : ℝ) + 1) ^ (-s.re) + B * ((N : ℝ) + 1) ^ (-s.re) := add_le_add h1 h2
     _ = B * (1 + ‖s‖ / s.re) * ((N : ℝ) + 1) ^ (-s.re) := by ring
     _ ≤ B * (1 + ‖s‖ / s.re) * (N : ℝ) ^ (-s.re) :=
-        mul_le_mul_of_nonneg_left h3 (mul_nonneg hB0 (by linarith))
+      mul_le_mul_of_nonneg_left h3 (mul_nonneg hB0 (by linarith))
     _ ≤ 2 * B * (1 + ‖s‖ / s.re) * (N : ℝ) ^ (-s.re) := by
-        have : 0 ≤ B * (1 + ‖s‖ / s.re) * (N : ℝ) ^ (-s.re) :=
-          mul_nonneg (mul_nonneg hB0 (by linarith)) h4
-        linarith
+      have : 0 ≤ B * (1 + ‖s‖ / s.re) * (N : ℝ) ^ (-s.re) :=
+        mul_nonneg (mul_nonneg hB0 (by linarith)) h4
+      linarith
 
 end Formalism.FX

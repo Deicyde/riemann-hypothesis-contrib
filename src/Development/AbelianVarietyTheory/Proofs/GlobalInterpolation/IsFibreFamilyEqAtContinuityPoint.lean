@@ -70,15 +70,15 @@ private lemma measure_isOpen_le_of_lintegral_le {V : Type} [MetricSpace V] [Prop
           simp [this]
     _ = m' G := lintegral_indicator_one hG.measurableSet
 
-
 open MeasureTheory Set Topology in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.measure_eq_of_lintegral_eq_on_compactSupport {V : Type} [MetricSpace V] [ProperSpace V]
-    [MeasurableSpace V] [BorelSpace V] (m m' : Measure V) (O : Set V) (hO : IsOpen O)
-    (hm : m Oᶜ = 0) (hm' : m' Oᶜ = 0)
-    (h : ∀ φ : V → ℝ, Continuous φ → HasCompactSupport φ → tsupport φ ⊆ O → (∀ v, 0 ≤ φ v) →
-      Integrable φ m ∧ ∫⁻ v, ENNReal.ofReal (φ v) ∂m = ∫⁻ v, ENNReal.ofReal (φ v) ∂m') :
-    m = m' := by
+theorem _root_.GlobalTheory.measure_eq_of_lintegral_eq_on_compactSupport
+    {V : Type} [MetricSpace V] [ProperSpace V] [MeasurableSpace V] [BorelSpace V]
+    (m m' : Measure V) (O : Set V) (hO : IsOpen O) (hm : m Oᶜ = 0) (hm' : m' Oᶜ = 0)
+    (h : ∀ φ : V → ℝ,
+      Continuous φ → HasCompactSupport φ → tsupport φ ⊆ O → (∀ v, 0 ≤ φ v)
+        → Integrable φ m ∧ ∫⁻ v, ENNReal.ofReal (φ v) ∂m = ∫⁻ v, ENNReal.ofReal (φ v) ∂m')
+    : m = m' := by
   have hopen : ∀ G : Set V, IsOpen G → G ⊆ O → m G = m' G := fun G hG hGO =>
     le_antisymm
       (measure_isOpen_le_of_lintegral_le m m' hG fun φ hc hs ht hn =>
@@ -111,22 +111,23 @@ theorem _root_.GlobalTheory.measure_eq_of_lintegral_eq_on_compactSupport {V : Ty
     haveI : IsFiniteMeasure (m.restrict {v | 0 < f n v}) := isFiniteMeasure_restrict.2 hfin.ne
     show m.restrict {v | 0 < f n v} = m'.restrict {v | 0 < f n v}
     refine ext_of_generate_finite {s | IsOpen s} BorelSpace.measurable_eq isPiSystem_isOpen
-      (fun s hs => ?_) ?_
+      (fun s hs => ?_)
+      ?_
     · rw [Measure.restrict_apply hs.measurableSet, Measure.restrict_apply hs.measurableSet]
       exact hopen _ (hs.inter hWo) (inter_subset_right.trans hWO)
     · simpa using hopen _ hWo hWO
 
-
 open MeasureTheory Set Topology in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.IsFibreFamily_lintegral_preimage {V : Type} [TopologicalSpace V]
-    [MeasurableSpace V] [BorelSpace V] {μ : Measure V} {f : V → ℝ} {O U : Set V} {B : Set ℝ}
-    {fib : ℝ → Measure V}
+theorem _root_.GlobalTheory.IsFibreFamily_lintegral_preimage
+    {V : Type} [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
+    {μ : Measure V} {f : V → ℝ} {O U : Set V} {B : Set ℝ} {fib : ℝ → Measure V}
     (hf : Measurable f) (hO : IsOpen O) (hU : O ⊆ U)
-    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f id U (volume : Measure ℝ) B fib)
+    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f id U
+      (volume : Measure ℝ) B fib)
     (φ : V → ℝ≥0∞) (hφ : Measurable φ) (hs : ∀ v, v ∉ O → φ v = 0)
-    (S : Set ℝ) (hS : MeasurableSet S) :
-    ∫⁻ v in O, (f ⁻¹' S).indicator φ v ∂μ = ∫⁻ b in S, ∫⁻ v, φ v ∂(fib b) := by
+    (S : Set ℝ) (hS : MeasurableSet S)
+    : ∫⁻ v in O, (f ⁻¹' S).indicator φ v ∂μ = ∫⁻ b in S, ∫⁻ v, φ v ∂(fib b) := by
   unfold _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily at h
   obtain ⟨hfib, hint, -⟩ := h
   have hψ : Measurable ((f ⁻¹' S).indicator φ) := hφ.indicator (hf hS)
@@ -134,8 +135,8 @@ theorem _root_.GlobalTheory.IsFibreFamily_lintegral_preimage {V : Type} [Topolog
     intro v hv
     by_contra hvO
     exact hv (by simp [indicator, hs v hvO])
-  rw [setLIntegral_eq_of_support_subset hsupp,
-    ← setLIntegral_eq_of_support_subset (hsupp.trans hU), hint _ hψ, ← lintegral_indicator hS]
+  rw [setLIntegral_eq_of_support_subset hsupp, ← setLIntegral_eq_of_support_subset (hsupp.trans hU),
+    hint _ hψ, ← lintegral_indicator hS]
   refine lintegral_congr fun b => ?_
   have hae : ∀ᵐ v ∂(fib b), f v = b := by
     refine ae_iff.2 (measure_mono_null ?_ (hfib b))
@@ -180,28 +181,32 @@ private lemma le_of_setLIntegral_eq_near {g g' : ℝ → ℝ} {β : ℝ} {W : Se
   rw [ENNReal.ofReal_le_ofReal_iff (hg0.trans h₁.le)] at key'
   exact absurd key' (not_le.2 h₃)
 
-
 open MeasureTheory Set Topology in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.IsFibreFamily_eq_at {V : Type} [NormedAddCommGroup V]
-    [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
-    (μ : Measure V) (f : V → ℝ)
-    (O U U' : Set V) (B B' : Set ℝ) (fib fib' : ℝ → Measure V) (β : ℝ)
+theorem _root_.GlobalTheory.IsFibreFamily_eq_at
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V]
+    [BorelSpace V]
+    (μ : Measure V) (f : V → ℝ) (O U U' : Set V) (B B' : Set ℝ) (fib fib' : ℝ → Measure V) (β : ℝ)
     (hf : Measurable f) (hO : IsOpen O) (hU : O ⊆ U) (hU' : O ⊆ U') (hβ : f ⁻¹' {β} ⊆ O)
     (hB : IsOpen B) (hB' : IsOpen B') (hβB : β ∈ B) (hβB' : β ∈ B')
-    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f id U (volume : Measure ℝ) B fib)
-    (h' : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f id U' (volume : Measure ℝ) B' fib') : fib β = fib' β := by
-  have hdens := fun (S : Set ℝ) (hS : MeasurableSet S) (φ : V → ℝ≥0∞) (hφ : Measurable φ)
-      (hs : ∀ v, v ∉ O → φ v = 0) =>
-    (_root_.GlobalTheory.IsFibreFamily_lintegral_preimage hf hO hU h φ hφ hs S hS).symm.trans
-      (_root_.GlobalTheory.IsFibreFamily_lintegral_preimage hf hO hU' h' φ hφ hs S hS)
+    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f id U
+      (volume : Measure ℝ) B fib)
+    (h' : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f id U'
+      (volume : Measure ℝ) B' fib')
+    : fib β = fib' β := by
+  have hdens :=
+    fun (S : Set ℝ) (hS : MeasurableSet S) (φ : V → ℝ≥0∞) (hφ : Measurable φ)
+        (hs : ∀ v, v ∉ O → φ v = 0) =>
+      (_root_.GlobalTheory.IsFibreFamily_lintegral_preimage hf hO hU h φ hφ hs S hS).symm.trans
+        (_root_.GlobalTheory.IsFibreFamily_lintegral_preimage hf hO hU' h' φ hφ hs S hS)
   unfold _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily at h h'
   obtain ⟨hfib, -, hcts⟩ := h
   obtain ⟨hfib', -, hcts'⟩ := h'
   have hnull : Oᶜ ⊆ (f ⁻¹' {id β} ∩ U)ᶜ := compl_subset_compl.2 (inter_subset_left.trans hβ)
   have hnull' : Oᶜ ⊆ (f ⁻¹' {id β} ∩ U')ᶜ := compl_subset_compl.2 (inter_subset_left.trans hβ)
-  refine _root_.GlobalTheory.measure_eq_of_lintegral_eq_on_compactSupport _ _ O hO (measure_mono_null hnull (hfib β))
-    (measure_mono_null hnull' (hfib' β)) fun φ hφc hφs hφO hφ0 => ?_
+  refine _root_.GlobalTheory.measure_eq_of_lintegral_eq_on_compactSupport _ _ O hO
+    (measure_mono_null hnull (hfib β)) (measure_mono_null hnull' (hfib' β))
+    fun φ hφc hφs hφO hφ0 => ?_
   obtain ⟨hi, hc⟩ := hcts φ hφc hφs (hφO.trans hU)
   obtain ⟨hi', hc'⟩ := hcts' φ hφc hφs (hφO.trans hU')
   refine ⟨hi β hβB, ?_⟩
@@ -212,9 +217,11 @@ theorem _root_.GlobalTheory.IsFibreFamily_eq_at {V : Type} [NormedAddCommGroup V
   have hφz : ∀ v, v ∉ O → ENNReal.ofReal (φ v) = 0 := fun v hv => by
     rw [image_eq_zero_of_notMem_tsupport fun h'' => hv (hφO h'')]
     simp
-  have hset : ∀ S ⊆ B ∩ B', MeasurableSet S →
-      ∫⁻ b in S, ENNReal.ofReal (∫ v, φ v ∂fib b) =
-        ∫⁻ b in S, ENNReal.ofReal (∫ v, φ v ∂fib' b) := by
+  have hset
+      : ∀ S ⊆ B ∩ B',
+        MeasurableSet S
+          → ∫⁻ b in S, ENNReal.ofReal (∫ v, φ v ∂fib b)
+            = ∫⁻ b in S, ENNReal.ofReal (∫ v, φ v ∂fib' b) := by
     intro S hSW hS
     rw [setLIntegral_congr_fun hS fun b hb =>
         ofReal_integral_eq_lintegral_ofReal (hi b (hSW hb).1) (Filter.Eventually.of_forall hφ0),
@@ -224,8 +231,7 @@ theorem _root_.GlobalTheory.IsFibreFamily_eq_at {V : Type} [NormedAddCommGroup V
   have hca := hc.continuousAt (hB.mem_nhds hβB)
   have hca' := hc'.continuousAt (hB'.mem_nhds hβB')
   congr 1
-  exact le_antisymm
-    (le_of_setLIntegral_eq_near hW hca hca' (integral_nonneg hφ0) hset)
+  exact le_antisymm (le_of_setLIntegral_eq_near hW hca hca' (integral_nonneg hφ0) hset)
     (le_of_setLIntegral_eq_near hW hca' hca (integral_nonneg hφ0) fun S hSW hS =>
       (hset S hSW hS).symm)
 

@@ -12,29 +12,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 set_option linter.overlappingInstances false
 
-open IsLocalRing Matrix UpperTheory.V UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr UpperTheory.V.Pr
+open IsLocalRing Matrix UpperTheory.V UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
+  UpperTheory.V.Pr
 
 section
 
-variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+variable
+  {l : ℕ} [Fact l.Prime]
+  {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
   {F : Frame l (ResidueField O)} {n : ℕ} {G : W.GFrame l} {r : W.Resid G O n} (K : TwLink F r)
   {A A' : Type} [CommRing A] [Algebra O A] [CommRing A'] [Algebra O A']
 
-private theorem tw_map (f : A →ₐ[O] A') (ρ : NRep F n A) :
-    (W.GDet.ofRep (K.tw ρ)).map (f : A →+* A') = W.GDet.ofRep (K.tw (ρ.map (f : A →+* A'))) := by
+private theorem tw_map (f : A →ₐ[O] A') (ρ : NRep F n A)
+    : (W.GDet.ofRep (K.tw ρ)).map (f : A →+* A') = W.GDet.ofRep (K.tw (ρ.map (f : A →+* A'))) := by
   rw [(CA.d_gmap (W.GDet.ofRep (K.tw ρ))).2.2.2]
   congr 1
   ext g i j
   simp [TwLink.tw, TwLink.κA]
 
-private theorem twψ_map (f : A →ₐ[O] A') (ρ : NRep F n A) (v : G.Vl) (i : Fin n) :
-    W.pushCh (f : A →+* A') (K.twψ ρ v i) = K.twψ (ρ.map (f : A →+* A')) v i := by
+private theorem twψ_map (f : A →ₐ[O] A') (ρ : NRep F n A) (v : G.Vl) (i : Fin n)
+    : W.pushCh (f : A →+* A') (K.twψ ρ v i) = K.twψ (ρ.map (f : A →+* A')) v i := by
   ext g
   simp [TwLink.twψ, TwLink.κA]
 
-private theorem maps_comp (B : W.UniversalOrdinaryDeterminantRing r) (φ : B.B →ₐ[O] A) (f : A →ₐ[O] A') (ρ : NRep F n A)
-    (h : B.u.Maps (φ : B.B →+* A) (W.GDet.ofRep (K.tw ρ)) (K.twψ ρ)) :
-    B.u.Maps ((f.comp φ : B.B →ₐ[O] A') : B.B →+* A') (W.GDet.ofRep (K.tw (ρ.map (f : A →+* A'))))
+private theorem maps_comp
+    (B : W.UniversalOrdinaryDeterminantRing r) (φ : B.B →ₐ[O] A)
+    (f : A →ₐ[O] A')
+    (ρ : NRep F n A) (h : B.u.Maps (φ : B.B →+* A) (W.GDet.ofRep (K.tw ρ)) (K.twψ ρ))
+    : B.u.Maps ((f.comp φ : B.B →ₐ[O] A') : B.B →+* A') (W.GDet.ofRep (K.tw (ρ.map (f : A →+* A'))))
       (K.twψ (ρ.map (f : A →+* A'))) := by
   refine ⟨?_, fun v i => ?_⟩
   · rw [← tw_map, ← h.1, (CA.d_gmap B.u.D).2.1]
@@ -42,16 +47,20 @@ private theorem maps_comp (B : W.UniversalOrdinaryDeterminantRing r) (φ : B.B �
   · rw [← twψ_map, ← h.2]
     rfl
 
-private theorem maps_of_inj (B : W.UniversalOrdinaryDeterminantRing r) (φ : B.B →ₐ[O] A) (f : A →ₐ[O] A') (hf : Function.Injective f)
+private theorem maps_of_inj
+    (B : W.UniversalOrdinaryDeterminantRing r) (φ : B.B →ₐ[O] A)
+    (f : A →ₐ[O] A') (hf : Function.Injective f)
     (ρ : NRep F n A)
-    (h : B.u.Maps ((f.comp φ : B.B →ₐ[O] A') : B.B →+* A') (W.GDet.ofRep (K.tw (ρ.map (f : A →+* A'))))
-      (K.twψ (ρ.map (f : A →+* A')))) :
-    B.u.Maps (φ : B.B →+* A) (W.GDet.ofRep (K.tw ρ)) (K.twψ ρ) := by
+    (h : B.u.Maps ((f.comp φ : B.B →ₐ[O] A') : B.B →+* A')
+      (W.GDet.ofRep (K.tw (ρ.map (f : A →+* A')))) (K.twψ (ρ.map (f : A →+* A'))))
+    : B.u.Maps (φ : B.B →+* A) (W.GDet.ofRep (K.tw ρ)) (K.twψ ρ) := by
   have hc : ((f.comp φ : B.B →ₐ[O] A') : B.B →+* A') = (f : A →+* A').comp (φ : B.B →+* A) := rfl
   have hinj : Function.Injective (f : A →+* A') := hf
   obtain ⟨h1, h2⟩ := h
   refine ⟨?_, fun v i => ?_⟩
-  · refine (UpperTheory.V.AlgebraTools.Det.injTest (X := Unit) (fun _ => A') (fun _ => (f : A →+* A'))
+  · refine (UpperTheory.V.AlgebraTools.Det.injTest (X := Unit)
+      (fun _ => A')
+      (fun _ => (f : A →+* A'))
       (fun a ha => hinj (by rw [ha (), map_zero]))).1 _ _ (fun _ => ?_)
     rw [(UpperTheory.V.CA.d_gmap B.u.D).2.1, ← hc, h1, tw_map]
   · ext g
@@ -61,16 +70,23 @@ private theorem maps_of_inj (B : W.UniversalOrdinaryDeterminantRing r) (φ : B.B
 
 end
 
-theorem UpperTheory.V.Pr.goodPtOf :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [UpperTheory.V.Fr.IsCoef l O] [Algebra ℤ_[l] O] (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (n : ℕ) (T : UpperTheory.V.Pr.Setup F n), T.GoodPtOf := by
+theorem UpperTheory.V.Pr.goodPtOf
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [UpperTheory.V.Fr.IsCoef l O] [Algebra ℤ_[l] O]
+        (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (n : ℕ)
+        (T : UpperTheory.V.Pr.Setup F n),
+      T.GoodPtOf := by
   intro l _ O _ _ _ _ _ F n T Φ hΦ J hJ A _ _ _ ρ hρ K' _ j hj hirr
-  have hcl : CA.IsCL O A :=
-    { noeth := PrincipalIdealRing.isNoetherianRing
-      complete := inferInstance
-      isLocalHom := inferInstance
-      res_fin := Module.Finite.of_finite }
-  obtain ⟨ξ, hξ, -⟩ := point_loc T.ok T.n23 T.S A hcl (ResidueField.map (algebraMap O A)) (fun _ => rfl) ρ
-    hρ.cont hρ.bar
+  have hcl : CA.IsCL O A := {
+    noeth := PrincipalIdealRing.isNoetherianRing
+    complete := inferInstance
+    isLocalHom := inferInstance
+    res_fin := Module.Finite.of_finite
+  }
+  obtain ⟨ξ, hξ, -⟩ :=
+    point_loc T.ok T.n23 T.S A hcl (ResidueField.map (algebraMap O A))
+      (fun _ => rfl)
+      ρ hρ.cont hρ.bar
   have hTI : T.S.u.TI (RingHom.ker (j.comp (ξ : T.S.A →+* A))) := by
     refine (types T.ok T.n23 T.S K' (j.comp (ξ : T.S.A →+* A))).1.1 ?_
     rw [← NRep.map_map, hξ]
@@ -87,6 +103,8 @@ theorem UpperTheory.V.Pr.goodPtOf :
         ext g
         rfl
     have hc : T.S.A.val.comp (T.S.inc.comp Φ) = T.S.B.val.comp Φ := AlgHom.ext fun _ => rfl
-    have h2 := maps_comp T.K T.B (T.S.inc.comp Φ) ξ T.S.u
-      (maps_of_inj T.K T.B (T.S.inc.comp Φ) T.S.A.val Subtype.val_injective T.S.u (by rw [hu, hc]; exact hΦ))
+    have h2 :=
+      maps_comp T.K T.B (T.S.inc.comp Φ) ξ T.S.u
+        (maps_of_inj T.K T.B (T.S.inc.comp Φ) T.S.A.val Subtype.val_injective T.S.u
+          (by rw [hu, hc]; exact hΦ))
     rwa [hξ] at h2

@@ -8,22 +8,35 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open MvPolynomial Equiv UpperTheory.V.AlgebraTools.Hk
 
-private theorem pair_lt {R : Type} [CommRing R] {n : ℕ} {q : R} {H : Type} [Ring H] [Algebra R H] (b : Bern n q H)
-    {a c : Fin n} (h : a.val + 1 = c.val) (u : Perm (Fin n)) (hu : u⁻¹ a < u⁻¹ c) :
-    (b.T (swap a c) * b.T u - q • b.T u) + (b.T (swap a c) * b.T (swap a c * u) - q • b.T (swap a c * u)) = 0 := by
+private theorem pair_lt
+    {R : Type} [CommRing R]
+    {n : ℕ} {q : R} {H : Type} [Ring H] [Algebra R H]
+    (b : Bern n q H)
+    {a c : Fin n} (h : a.val + 1 = c.val)
+    (u : Perm (Fin n)) (hu : u⁻¹ a < u⁻¹ c)
+    : (b.T (swap a c) * b.T u - q • b.T u)
+        + (b.T (swap a c) * b.T (swap a c * u) - q • b.T (swap a c * u))
+      = 0 := by
   have hu : b.T (swap a c * u) = b.T (swap a c) * b.T u := b.T_mul a c h u hu
   have hsq := b.T_sq a c h
   rw [hu, ← mul_assoc, hsq, add_mul, smul_mul_assoc, smul_mul_assoc, one_mul]
   module
 
-private theorem swap_one {R : Type} [CommRing R] {n : ℕ} {q : R} {H : Type} [Ring H] [Algebra R H] (b : Bern n q H)
-    {a c : Fin n} (h : a.val + 1 = c.val) : b.T (swap a c) * b.one = q • b.one := by
+private theorem swap_one
+    {R : Type} [CommRing R]
+    {n : ℕ} {q : R} {H : Type} [Ring H] [Algebra R H]
+    (b : Bern n q H)
+    {a c : Fin n} (h : a.val + 1 = c.val)
+    : b.T (swap a c) * b.one = q • b.one := by
   have hac : a ≠ c := by
     intro e
     rw [e] at h
     omega
-  have key : ∀ w : Perm (Fin n), (b.T (swap a c) * b.T w - q • b.T w)
-      + (b.T (swap a c) * b.T (swap a c * w) - q • b.T (swap a c * w)) = 0 := by
+  have key
+      : ∀ w : Perm (Fin n),
+        (b.T (swap a c) * b.T w - q • b.T w)
+            + (b.T (swap a c) * b.T (swap a c * w) - q • b.T (swap a c * w))
+          = 0 := by
     intro w
     rcases lt_or_gt_of_ne (show w⁻¹ a ≠ w⁻¹ c from fun e => hac (w⁻¹.injective e)) with hw | hw
     · exact pair_lt b h w hw
@@ -46,8 +59,8 @@ private theorem swap_one {R : Type} [CommRing R] {n : ℕ} {q : R} {H : Type} [R
   rw [Finset.mul_sum, Finset.smul_sum, ← sub_eq_zero, ← Finset.sum_sub_distrib]
   exact hsum
 
-theorem UpperTheory.V.AlgebraTools.hkOne :
-    ∀ (R : Type) [CommRing R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H] (b : Bern n q H),
+theorem UpperTheory.V.AlgebraTools.hkOne
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H] (b : Bern n q H),
       (∀ w, b.T w * b.one = q ^ invN w • b.one) ∧ b.one * b.one = poin (n := n) q • b.one := by
   intro R _ n q H _ _ b
   have hinv := UpperTheory.V.AlgebraTools.hkInv n

@@ -11,8 +11,7 @@ open MvPowerSeries
 
 variable {R : Type*} [CommRing R] (F : FormalGroup R)
 
-noncomputable def higher : MvPowerSeries (Fin 2) R :=
-  F.toPowerSeries - X 0 - X 1
+noncomputable def higher : MvPowerSeries (Fin 2) R := F.toPowerSeries - X 0 - X 1
 
 theorem toPowerSeries_eq_X_add_X_add_higher : F.toPowerSeries = X 0 + X 1 + higher F := by
   simp [higher]
@@ -28,15 +27,14 @@ theorem two_le_order_higher : (2 : ℕ∞) ≤ order (higher F) := by
     simp at this
   have ha : a < 2 := by omega
   have hb : b < 2 := by omega
-  interval_cases a <;> interval_cases b <;> simp_all [higher, coeff_X, F.lin_coeff_X,
-    F.lin_coeff_Y, F.zero_constantCoeff, Ne.symm h01]
+  interval_cases a <;> interval_cases b
+    <;> simp_all [higher, coeff_X, F.lin_coeff_X, F.lin_coeff_Y, F.zero_constantCoeff, Ne.symm h01]
 
 theorem constantCoeff_higher : constantCoeff (higher F) = 0 :=
   one_le_order_iff_constCoeff_eq_zero.1 (le_trans (by norm_num) (two_le_order_higher F))
 
-theorem subst_eq_add_add_subst_higher {τ : Type*} {a b : MvPowerSeries τ R}
-    (hab : HasSubst ![a, b]) :
-    subst ![a, b] F.toPowerSeries = a + b + subst ![a, b] (higher F) := by
+theorem subst_eq_add_add_subst_higher {τ : Type*} {a b : MvPowerSeries τ R} (hab : HasSubst ![a, b])
+    : subst ![a, b] F.toPowerSeries = a + b + subst ![a, b] (higher F) := by
   conv_lhs => rw [toPowerSeries_eq_X_add_X_add_higher F]
   rw [subst_add hab, subst_add hab, subst_X hab, subst_X hab]
   simp
@@ -46,7 +44,7 @@ lemma hasSubst_pair {τ : Type*} {a b : MvPowerSeries τ R} (ha : constantCoeff 
   hasSubst_of_constantCoeff_zero fun i => by fin_cases i <;> simpa
 
 private noncomputable def invStep (g : MvPowerSeries Unit R) : MvPowerSeries Unit R :=
-  -X () - subst ![X (), g - C (constantCoeff g)] (higher F)
+  - X () - subst ![X (), g - C (constantCoeff g)] (higher F)
 
 private lemma constantCoeff_sub_C (g : MvPowerSeries Unit R) :
     constantCoeff (g - C (constantCoeff g)) = 0 := by simp
@@ -82,8 +80,7 @@ private lemma existsUnique_invStep : ∃! g, invStep F g = g :=
   existsUnique_fixedPoint _ (invStep_contract F)
 
 @[no_expose]
-noncomputable def inv : PowerSeries R :=
-  (existsUnique_invStep F).exists.choose
+noncomputable def inv : PowerSeries R := (existsUnique_invStep F).exists.choose
 
 private lemma invStep_inv : invStep F (inv F) = inv F :=
   (existsUnique_invStep F).exists.choose_spec
@@ -107,8 +104,7 @@ private lemma invStep_of_constantCoeff_eq_zero {g : MvPowerSeries Unit R}
     (hg : constantCoeff g = 0) : invStep F g = -X () - subst ![X (), g] (higher F) := by
   simp [invStep, hg]
 
-theorem subst_X_inv :
-    subst ![PowerSeries.X, inv F] F.toPowerSeries = (0 : PowerSeries R) := by
+theorem subst_X_inv : subst ![PowerSeries.X, inv F] F.toPowerSeries = (0 : PowerSeries R) := by
   have hX : constantCoeff (X () : MvPowerSeries Unit R) = 0 := by simp
   have hi : constantCoeff (inv F : MvPowerSeries Unit R) = 0 := constantCoeff_inv F
   have := invStep_inv F
@@ -117,8 +113,10 @@ theorem subst_X_inv :
   rw [subst_eq_add_add_subst_higher F (hasSubst_pair hX hi)]
   linear_combination (-1 : MvPowerSeries Unit R) * this
 
-theorem eq_inv_of_subst_eq_zero {g : PowerSeries R} (hg : PowerSeries.constantCoeff g = 0)
-    (h : subst ![PowerSeries.X, g] F.toPowerSeries = (0 : PowerSeries R)) : g = inv F := by
+theorem eq_inv_of_subst_eq_zero
+    {g : PowerSeries R} (hg : PowerSeries.constantCoeff g = 0)
+    (h : subst ![PowerSeries.X, g] F.toPowerSeries = (0 : PowerSeries R))
+    : g = inv F := by
   have hX : constantCoeff (X () : MvPowerSeries Unit R) = 0 := by simp
   have hg' : constantCoeff (g : MvPowerSeries Unit R) = 0 := hg
   change subst ![X (), (g : MvPowerSeries Unit R)] F.toPowerSeries = 0 at h
@@ -128,10 +126,12 @@ theorem eq_inv_of_subst_eq_zero {g : PowerSeries R} (hg : PowerSeries.constantCo
     linear_combination (-1 : MvPowerSeries Unit R) * h
   exact (existsUnique_invStep F).unique hfix (invStep_inv F)
 
-theorem subst_subst_pair {σ : Type*} {g h : PowerSeries R} (hgh : HasSubst ![g, h])
-    {x : MvPowerSeries σ R} (hx : PowerSeries.HasSubst x) (G : MvPowerSeries (Fin 2) R) :
-    PowerSeries.subst x (subst ![g, h] G : PowerSeries R) =
-      subst ![PowerSeries.subst x g, PowerSeries.subst x h] G := by
+theorem subst_subst_pair
+    {σ : Type*} {g h : PowerSeries R} (hgh : HasSubst ![g, h])
+    {x : MvPowerSeries σ R} (hx : PowerSeries.HasSubst x)
+    (G : MvPowerSeries (Fin 2) R)
+    : PowerSeries.subst x (subst ![g, h] G : PowerSeries R)
+      = subst ![PowerSeries.subst x g, PowerSeries.subst x h] G := by
   have hx' : HasSubst (fun _ : Unit => x) := PowerSeries.hasSubst_iff.mp hx
   rw [PowerSeries.subst_def, subst_comp_subst_apply hgh hx']
   congr 1
@@ -141,8 +141,10 @@ theorem subst_subst_pair {σ : Type*} {g h : PowerSeries R} (hgh : HasSubst ![g,
 variable {σ : Type*}
 
 noncomputable instance : Neg (F.Point σ) where
-  neg x := ⟨PowerSeries.subst x.val (inv F), by
-    simpa [PowerSeries.coe_substAlgHom] using (hasSubst_inv F).comp x.prop⟩
+  neg x := ⟨
+    PowerSeries.subst x.val (inv F),
+    by simpa [PowerSeries.coe_substAlgHom] using (hasSubst_inv F).comp x.prop
+  ⟩
 
 theorem neg_point_val (x : F.Point σ) : (-x).val = PowerSeries.subst x.val (inv F) := rfl
 
@@ -156,23 +158,28 @@ private lemma add_neg_point (x : F.Point σ) : x + -x = 0 := by
   rw [← PowerSeries.coe_substAlgHom x.prop, map_zero]
   rfl
 
-noncomputable instance instAddGroupPoint : AddGroup (F.Point σ) :=
-  { (inferInstance : AddMonoid (F.Point σ)) with
-    neg := Neg.neg
-    zsmul := zsmulRec
-    neg_add_cancel := fun x => by
-      have h1 := add_neg_point F x
-      have h2 := add_neg_point F (-x)
-      have hx : x = -(-x) :=
-        calc x = x + 0 := (add_zero x).symm
-          _ = x + (-x + -(-x)) := by rw [h2]
-          _ = (x + -x) + -(-x) := (add_assoc _ _ _).symm
-          _ = -(-x) := by rw [h1, zero_add]
-      calc -x + x = -x + -(-x) := congrArg (-x + ·) hx
-        _ = 0 := h2 }
+noncomputable instance instAddGroupPoint : AddGroup (F.Point σ) := {
+  (inferInstance : AddMonoid (F.Point σ)) with
+  neg := Neg.neg
+  zsmul := zsmulRec
+  neg_add_cancel := fun x => by
+    have h1 := add_neg_point F x
+    have h2 := add_neg_point F (-x)
+    have hx : x = -(-x) :=
+      calc
+        x = x + 0 := (add_zero x).symm
+        _ = x + (-x + -(-x)) := by rw [h2]
+        _ = (x + -x) + -(-x) := (add_assoc _ _ _).symm
+        _ = -(-x) := by rw [h1, zero_add]
+    calc
+      -x + x
+        = -x + -(-x) := congrArg (-x + ·) hx
+      _ = 0 := h2
+}
 
-noncomputable instance instAddCommGroupPoint [F.IsComm] : AddCommGroup (F.Point σ) :=
-  { instAddGroupPoint F with
-    add_comm := fun x y => Subtype.ext (F.comm' x.prop y.prop) }
+noncomputable instance instAddCommGroupPoint [F.IsComm] : AddCommGroup (F.Point σ) := {
+  instAddGroupPoint F with
+  add_comm := fun x y => Subtype.ext (F.comm' x.prop y.prop)
+}
 
 end GroundTheory.LocalField.FormalGroup

@@ -20,14 +20,12 @@ theorem nontrivial_Ow (w : Place p R) : Nontrivial w.Ow := by
   apply Ideal.Quotient.nontrivial_iff.mpr
   intro h
   rw [Ideal.span_singleton_eq_top] at h
-  have h1 : (1 - w.e) * (1 - w.e) = (1 - w.e) * 1 := by
-    rw [mul_one]; exact w.idem.one_sub
+  have h1 : (1 - w.e) * (1 - w.e) = (1 - w.e) * 1 := by rw [mul_one]; exact w.idem.one_sub
   exact w.ne_zero (sub_eq_self.mp (h.mul_left_cancel h1))
 
 theorem idem_Ow (w : Place p R) {d : w.Ow} (hd : IsIdempotentElem d) : d = 0 ∨ d = 1 := by
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective d
-  have hx : x * x - x ∈ Ideal.span {1 - w.e} :=
-    Ideal.Quotient.eq.mp (by rw [map_mul]; exact hd)
+  have hx : x * x - x ∈ Ideal.span {1 - w.e} := Ideal.Quotient.eq.mp (by rw [map_mul]; exact hd)
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp hx
   have hee : w.e * w.e = w.e := w.idem
   have he1 : Ideal.Quotient.mk (Ideal.span {1 - w.e}) w.e = 1 := by
@@ -37,8 +35,9 @@ theorem idem_Ow (w : Place p R) {d : w.Ow} (hd : IsIdempotentElem d) : d = 0 ∨
     show w.e * x * (w.e * x) = w.e * x
     linear_combination (x * x - c) * hee - w.e * hc
   have hfe : w.e * x * w.e = w.e * x := by linear_combination x * hee
-  have hmk : Ideal.Quotient.mk (Ideal.span {1 - w.e}) (w.e * x) =
-      Ideal.Quotient.mk (Ideal.span {1 - w.e}) x := by
+  have hmk
+      : Ideal.Quotient.mk (Ideal.span {1 - w.e}) (w.e * x)
+        = Ideal.Quotient.mk (Ideal.span {1 - w.e}) x := by
     rw [map_mul, he1, one_mul]
   rcases w.primitive _ hf hfe with h0 | h1
   · left
@@ -46,8 +45,9 @@ theorem idem_Ow (w : Place p R) {d : w.Ow} (hd : IsIdempotentElem d) : d = 0 ∨
   · right
     rw [← hmk, h1, he1]
 
-theorem maximal_unique [Module.Finite ℤ R] (w : Place p R) (M N : Ideal w.Ow) (hM : M.IsMaximal)
-    (hN : N.IsMaximal) : N = M := by
+theorem maximal_unique
+    [Module.Finite ℤ R] (w : Place p R) (M N : Ideal w.Ow) (hM : M.IsMaximal) (hN : N.IsMaximal)
+    : N = M := by
   have : HenselianLocalRing ℤ_[p] := GlobalTheory.henselianLocalRing_of_henselianRing ℤ_[p]
   have := hM
   obtain ⟨d, hd, hmem⟩ := GlobalTheory.exists_idempotent_notMem_iff_of_henselian ℤ_[p] (S := w.Ow) M
@@ -55,8 +55,8 @@ theorem maximal_unique [Module.Finite ℤ R] (w : Place p R) (M N : Ideal w.Ow) 
   · exact absurd M.zero_mem ((hmem M hM).mpr rfl)
   · exact (hmem N hN).mp (fun h => hN.ne_top ((Ideal.eq_top_iff_one _).mpr h))
 
-private theorem exists_eq_one_tmul_add_mul (x : Op p R) :
-    ∃ (r : R) (t : Op p R), x = (1 : ℤ_[p]) ⊗ₜ r + (p : Op p R) * t := by
+private theorem exists_eq_one_tmul_add_mul (x : Op p R)
+    : ∃ (r : R) (t : Op p R), x = (1 : ℤ_[p]) ⊗ₜ r + (p : Op p R) * t := by
   induction x using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul z r =>
@@ -66,11 +66,12 @@ private theorem exists_eq_one_tmul_add_mul (x : Op p R) :
     refine ⟨(n : R) * r, t ⊗ₜ r, ?_⟩
     have hz : z = (n : ℤ_[p]) + t * p := by rw [ht]; ring
     have h1 : (n : ℤ_[p]) ⊗ₜ[ℤ] r = (1 : ℤ_[p]) ⊗ₜ ((n : R) * r) := by
-      calc (n : ℤ_[p]) ⊗ₜ[ℤ] r = ((n : ℤ_[p]) ⊗ₜ[ℤ] (1 : R)) * ((1 : ℤ_[p]) ⊗ₜ r) := by
-            rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
+      calc
+        (n : ℤ_[p]) ⊗ₜ[ℤ] r = ((n : ℤ_[p]) ⊗ₜ[ℤ] (1 : R)) * ((1 : ℤ_[p]) ⊗ₜ r) := by
+          rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
         _ = (n : Op p R) * ((1 : ℤ_[p]) ⊗ₜ r) := by rw [Algebra.TensorProduct.natCast_def]
         _ = ((1 : ℤ_[p]) ⊗ₜ[ℤ] (n : R)) * ((1 : ℤ_[p]) ⊗ₜ r) := by
-            rw [Algebra.TensorProduct.natCast_def']
+          rw [Algebra.TensorProduct.natCast_def']
         _ = (1 : ℤ_[p]) ⊗ₜ ((n : R) * r) := by rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul]
     have h2 : (t * p) ⊗ₜ[ℤ] r = (p : Op p R) * (t ⊗ₜ r) := by
       rw [Algebra.TensorProduct.natCast_def, Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_comm]
@@ -80,18 +81,21 @@ private theorem exists_eq_one_tmul_add_mul (x : Op p R) :
     obtain ⟨r₂, t₂, h₂⟩ := hy
     exact ⟨r₁ + r₂, t₁ + t₂, by rw [h₁, h₂, TensorProduct.tmul_add]; ring⟩
 
-theorem exists_eq_add (w : Place p R) (s : w.Ow) :
-    ∃ (r : R) (t : w.Ow), s = w.toOw r + (p : w.Ow) * t := by
+theorem exists_eq_add (w : Place p R) (s : w.Ow)
+    : ∃ (r : R) (t : w.Ow), s = w.toOw r + (p : w.Ow) * t := by
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective s
   obtain ⟨r, t, h⟩ := exists_eq_one_tmul_add_mul x
   refine ⟨r, Ideal.Quotient.mk _ t, ?_⟩
   rw [h, map_add (f := _), map_mul, map_natCast]
   rfl
 
-theorem exists_prime_under (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] [IsDedekindDomain R]
-    [CharZero R] [Module.Finite ℤ R] (w : GlobalTheory.IndefiniteRowSideFullHecke.SplitUnramifiedPlaces.Place p R) :
-    ∃ P : Ideal R, P.IsMaximal ∧ (p : R) ∈ P ∧ (P.map w.toOw).IsMaximal ∧
-      ∀ Q : Ideal R, Q.IsMaximal → Q ≠ P → Q.map w.toOw = ⊤ := by
+theorem exists_prime_under
+    (p : ℕ) [Fact p.Prime]
+    (R : Type) [CommRing R] [IsDedekindDomain R] [CharZero R] [Module.Finite ℤ R]
+    (w : GlobalTheory.IndefiniteRowSideFullHecke.SplitUnramifiedPlaces.Place p R)
+    : ∃ P : Ideal R,
+      P.IsMaximal ∧ (p : R) ∈ P ∧ (P.map w.toOw).IsMaximal
+        ∧ ∀ Q : Ideal R, Q.IsMaximal → Q ≠ P → Q.map w.toOw = ⊤ := by
   have : HenselianLocalRing ℤ_[p] := GlobalTheory.henselianLocalRing_of_henselianRing ℤ_[p]
   have : Nontrivial w.Ow := nontrivial_Ow w
   have : IsLocalRing w.Ow := by

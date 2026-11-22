@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.IsolatedTheoremFive
 
-theorem main {K K' : Type} [Field K] [Field K'] (φ : K →+* K') {n d : ℕ}
-    (E : Matrix (Fin n) (Fin d) K) (h : Function.Injective (Matrix.mulVec E)) :
-    Function.Injective (Matrix.mulVec (Matrix.map E (⇑φ : K → K'))) := by
+theorem main
+    {K K' : Type} [Field K] [Field K']
+    (φ : K →+* K')
+    {n d : ℕ} (E : Matrix (Fin n) (Fin d) K) (h : Function.Injective (Matrix.mulVec E))
+    : Function.Injective (Matrix.mulVec (Matrix.map E (⇑φ : K → K'))) := by
   have hl : LinearMap.ker (Matrix.mulVecLin E) = ⊥ := LinearMap.ker_eq_bot.mpr h
   obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Matrix.mulVecLin E) hl
   have hB : LinearMap.toMatrix' g * E = 1 := by
@@ -22,7 +24,11 @@ theorem main {K K' : Type} [Field K] [Field K'] (φ : K →+* K') {n d : ℕ}
   have := congrArg (Matrix.mulVec ((LinearMap.toMatrix' g).map φ)) hxy
   simpa [Matrix.mulVec_mulVec, hB'] using this
 
-theorem target : ∀ {K K' : Type} [inst : Field K] [inst_1 : Field K'] (φ : K →+* K') {n d : ℕ} (E : Matrix (Fin n) (Fin d) K), Function.Injective (Matrix.mulVec E) → Function.Injective (Matrix.mulVec (Matrix.map E (⇑φ : K → K'))) := by
+theorem target
+    : ∀ {K K' : Type} [inst : Field K] [inst_1 : Field K'] (φ : K →+* K') {n d : ℕ}
+        (E : Matrix (Fin n) (Fin d) K),
+      Function.Injective (Matrix.mulVec E)
+        → Function.Injective (Matrix.mulVec (Matrix.map E (⇑φ : K → K'))) := by
   intro K K' _ _ φ n d E h
   exact main φ E h
 

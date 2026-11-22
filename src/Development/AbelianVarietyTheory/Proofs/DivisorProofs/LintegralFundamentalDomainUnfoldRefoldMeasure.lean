@@ -10,14 +10,16 @@ open scoped ENNReal Pointwise
 
 namespace GlobalTheory.CovolIndep
 
-theorem lintegral_unfold_refold (S X : Type) [Group S] [MeasurableSpace S] [MeasurableSpace X]
-    [MulAction S X] [MeasurableSMul₂ S X] [MeasurableMul₂ S] [MeasurableInv S] (ν : Measure S)
-    [SFinite ν] [ν.IsMulLeftInvariant] (μ : Measure X) [SFinite μ] [SMulInvariantMeasure S X μ]
-    (Γ : Subgroup S) [Countable Γ] (D₁ D₂ : Set X) (hD₁ : MeasurableSet D₁)
-    (hD₂ : IsFundamentalDomain Γ D₂ μ) (E : Set S) (hE : MeasurableSet E)
-    (hEf : IsFundamentalDomain Γ E ν) (ψ : X → ℝ≥0∞) (hψ : Measurable ψ)
-    (hinv : ∀ (s : S) (x : X), ψ (s • x) = ψ x) :
-    ∫⁻ y, ψ y * ν (E ∩ {s | s⁻¹ • y ∈ D₁}) ∂μ = ∫⁻ y in D₂, ψ y * ν {s | s⁻¹ • y ∈ D₁} ∂μ := by
+theorem lintegral_unfold_refold
+    (S X : Type) [Group S] [MeasurableSpace S] [MeasurableSpace X] [MulAction S X]
+    [MeasurableSMul₂ S X] [MeasurableMul₂ S] [MeasurableInv S]
+    (ν : Measure S) [SFinite ν] [ν.IsMulLeftInvariant]
+    (μ : Measure X) [SFinite μ] [SMulInvariantMeasure S X μ]
+    (Γ : Subgroup S) [Countable Γ]
+    (D₁ D₂ : Set X) (hD₁ : MeasurableSet D₁) (hD₂ : IsFundamentalDomain Γ D₂ μ)
+    (E : Set S) (hE : MeasurableSet E) (hEf : IsFundamentalDomain Γ E ν)
+    (ψ : X → ℝ≥0∞) (hψ : Measurable ψ) (hinv : ∀ (s : S) (x : X), ψ (s • x) = ψ x)
+    : ∫⁻ y, ψ y * ν (E ∩ {s | s⁻¹ • y ∈ D₁}) ∂μ = ∫⁻ y in D₂, ψ y * ν {s | s⁻¹ • y ∈ D₁} ∂μ := by
   haveI : MeasurableConstSMul Γ X :=
     ⟨fun c => (measurable_const_smul (c : S) : Measurable fun x : X => (c : S) • x)⟩
   haveI : SMulInvariantMeasure Γ X μ :=
@@ -48,12 +50,13 @@ theorem lintegral_unfold_refold (S X : Type) [Group S] [MeasurableSpace S] [Meas
     simp only [Set.mem_inter_iff, Set.mem_smul_set_iff_inv_smul_mem, Set.mem_setOf_eq,
       Subgroup.smul_def, smul_eq_mul, mul_inv_rev, inv_inv, mul_smul]
     exact and_comm
-  calc ∫⁻ y, F y ∂μ = ∑' γ : Γ, ∫⁻ y in D₂, F (γ • y) ∂μ := hD₂.lintegral_eq_tsum'' F
+  calc
+    ∫⁻ y, F y ∂μ
+      = ∑' γ : Γ, ∫⁻ y in D₂, F (γ • y) ∂μ := hD₂.lintegral_eq_tsum'' F
     _ = ∫⁻ y in D₂, ∑' γ : Γ, F (γ • y) ∂μ := by
       rw [lintegral_tsum]
       intro γ
       exact (hFm.comp (measurable_const_smul γ)).aemeasurable
-    _ = ∫⁻ y in D₂, ψ y * ν {s | s⁻¹ • y ∈ D₁} ∂μ := by
-      simp_rw [hstep]
+    _ = ∫⁻ y in D₂, ψ y * ν {s | s⁻¹ • y ∈ D₁} ∂μ := by simp_rw [hstep]
 
 end GlobalTheory.CovolIndep

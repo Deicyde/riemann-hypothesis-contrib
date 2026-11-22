@@ -14,10 +14,12 @@ open scoped Matrix
 namespace GlobalTheory.HaarLin
 
 def TD (R : Type) [CommRing R] (κ : Type) [Fintype κ] [DecidableEq κ] : Submonoid (Matrix κ κ R) :=
-  Submonoid.closure ({M | ∃ i j : κ, ∃ c : R, i ≠ j ∧ M = Matrix.transvection i j c} ∪
-    {M | ∃ d : κ → Rˣ, M = Matrix.diagonal fun i => (d i : R)})
+  Submonoid.closure
+    ({M | ∃ i j : κ, ∃ c : R, i ≠ j ∧ M = Matrix.transvection i j c}
+      ∪ {M | ∃ d : κ → Rˣ, M = Matrix.diagonal fun i => (d i : R)})
 
-def HasStableRangeOne (R : Type) [CommRing R] : Prop := ∀ a b : R, IsCoprime a b → ∃ t : R, IsUnit (a + t * b)
+def HasStableRangeOne (R : Type) [CommRing R] : Prop :=
+  ∀ a b : R, IsCoprime a b → ∃ t : R, IsUnit (a + t * b)
 
 end GlobalTheory.HaarLin
 
@@ -191,11 +193,17 @@ private lemma exists_unit_det_map_mulVec_haar_eq_inv_smul {R : Type} [CommRing R
     rw [map_mul_lemma_2, hwμ μ hμ, Measure.map_smul, hvμ μ hμ, smul_smul, map_mul, mul_inv, mul_comm]
     exact (Continuous.matrix_mulVec continuous_const continuous_id).measurable.aemeasurable
 
-theorem map_mulVec_of_mem_TD : ∀ (R : Type) [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
-    [LocallyCompactSpace R] [SecondCountableTopology R] [T2Space R] (κ : Type) [Fintype κ] [DecidableEq κ]
-    (M : Matrix κ κ R), M ∈ TD R κ → ∀ u : Rˣ, u.1 = M.det → ∀ μ : @Measure (κ → R) (borel _),
-    @Measure.IsAddHaarMeasure _ _ _ (borel _) μ →
-    @Measure.map _ _ (borel _) (borel _) (fun x : κ → R => M *ᵥ x) μ = ((distribHaarChar R u)⁻¹ : ℝ≥0) • μ := by
+theorem map_mulVec_of_mem_TD
+    : ∀ (R : Type) [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [LocallyCompactSpace R]
+        [SecondCountableTopology R] [T2Space R] (κ : Type) [Fintype κ] [DecidableEq κ]
+        (M : Matrix κ κ R),
+      M ∈ TD R κ
+        → ∀ u : Rˣ,
+          u.1 = M.det
+            → ∀ μ : @Measure (κ → R) (borel _),
+              @Measure.IsAddHaarMeasure _ _ _ (borel _) μ
+                → @Measure.map _ _ (borel _) (borel _) (fun x : κ → R => M *ᵥ x) μ
+                  = ((distribHaarChar R u)⁻¹ : ℝ≥0) • μ := by
   intro R _ _ _ _ _ _ κ _ _ M hM u hu μ hμ
   letI : MeasurableSpace (κ → R) := borel (κ → R)
   haveI : BorelSpace (κ → R) := ⟨rfl⟩

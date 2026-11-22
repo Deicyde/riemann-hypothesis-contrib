@@ -20,11 +20,12 @@ def SemiStd {n C : ℕ} (T : Fin C → Finset (Fin n)) : Prop :=
 
 def initSeg (n h : ℕ) : Finset (Fin n) := univ.filter fun m => m.val < h
 
-def genX (k : Type*) [CommRing k] (n : ℕ) : Matrix (Fin n) (Fin n) (MvPolynomial (Fin n × Fin n) k) :=
+def genX (k : Type*) [CommRing k] (n : ℕ)
+    : Matrix (Fin n) (Fin n) (MvPolynomial (Fin n × Fin n) k) :=
   Matrix.of fun a b => X (a, b)
 
-def tabMinors (k : Type*) [CommRing k] {n C : ℕ} (T : Fin C → Finset (Fin n)) :
-    MvPolynomial (Fin n × Fin n) k :=
+def tabMinors (k : Type*) [CommRing k] {n C : ℕ} (T : Fin C → Finset (Fin n))
+    : MvPolynomial (Fin n × Fin n) k :=
   ∏ c, minorF (genX k n) (initSeg n (T c).card) (T c)
 
 def tabDiag {n C : ℕ} (T : Fin C → Finset (Fin n)) : Fin n × Fin n →₀ ℕ :=
@@ -35,19 +36,29 @@ def LemmaA : Prop :=
   ∀ (k : Type) [Field k] (n C : ℕ),
     LinearIndependent k (fun T : {T : Fin C → Finset (Fin n) // SemiStd T} => tabMinors k T.1)
 
-def pathWord {R : Type*} [CommRing R] {n : ℕ} (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ) (c : ℤ)
-    (Xr : ℕ → Fin n → R) : ℕ → Form R n
+def pathWord
+    {R : Type*} [CommRing R]
+    {n : ℕ}
+    (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ) (c : ℤ) (Xr : ℕ → Fin n → R)
+    : ℕ → Form R n
   | 0 => oneF
   | i + 1 =>
-    if colHeight (μ (i + 1)) c = colHeight (μ i) c then pathWord isVec μ c Xr i
-    else stepF (isVec i == decide (1 ≤ c)) (pathWord isVec μ c Xr i) (Xr i)
+    if colHeight (μ (i + 1)) c = colHeight (μ i) c then
+      pathWord isVec μ c Xr i
+    else
+      stepF (isVec i == decide (1 ≤ c)) (pathWord isVec μ c Xr i) (Xr i)
 
 def canIdx {n : ℕ} (μN : Fin n → ℤ) (c : ℤ) : Finset (Fin n) :=
-  if 1 ≤ c then univ.filter fun m => m.val < colHeight μN c
-  else univ.filter fun m => colHeight μN c ≤ m.val
+  if 1 ≤ c then
+    univ.filter fun m => m.val < colHeight μN c
+  else
+    univ.filter fun m => colHeight μN c ≤ m.val
 
-def psiPath (R : Type*) [CommRing R] {n : ℕ} (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ) (N : ℕ)
-    (I : ℤ → Finset (Fin n)) : MvPolynomial (ℕ × Fin n) R :=
+def psiPath
+    (R : Type*) [CommRing R]
+    {n : ℕ}
+    (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ) (N : ℕ) (I : ℤ → Finset (Fin n))
+    : MvPolynomial (ℕ × Fin n) R :=
   ∏ᶠ c : ℤ, pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c)
 
 def IsIndex {n : ℕ} (μN : Fin n → ℤ) (I : ℤ → Finset (Fin n)) : Prop :=
@@ -55,11 +66,14 @@ def IsIndex {n : ℕ} (μN : Fin n → ℤ) (I : ℤ → Finset (Fin n)) : Prop 
 
 def PsiDegrees : Prop :=
   ∀ (R : Type) [CommRing R] (n N : ℕ) (isVec : ℕ → Bool) (B : ℕ → ℕ) (μ : ℕ → Fin n → ℤ)
-    (I : ℤ → Finset (Fin n)), IsPath n isVec B μ N → IsIndex (μ N) I →
-    (Function.mulSupport fun c : ℤ =>
-      pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c)).Finite ∧
-    ∀ i : ℕ, IsWeightedHomogeneous (fun x : ℕ × Fin n => if x.1 = i then 1 else 0)
-      (psiPath R isVec μ N I) (if i < N then B i else 0)
+      (I : ℤ → Finset (Fin n)),
+    IsPath n isVec B μ N → IsIndex (μ N) I
+      → (Function.mulSupport fun c : ℤ =>
+          pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c)).Finite
+        ∧ ∀ i : ℕ,
+          IsWeightedHomogeneous
+            (fun x : ℕ × Fin n => if x.1 = i then 1 else 0)
+            (psiPath R isVec μ N I) (if i < N then B i else 0)
 
 def PathProductLinearIndependent : Prop :=
   ∀ (k : Type) [Field k] (n N : ℕ) (isVec : ℕ → Bool) (B : ℕ → ℕ) (ν : Fin n → ℤ),

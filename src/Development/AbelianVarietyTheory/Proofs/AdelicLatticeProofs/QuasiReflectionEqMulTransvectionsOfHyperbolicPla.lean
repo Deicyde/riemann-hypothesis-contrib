@@ -151,28 +151,32 @@ private lemma transvection_mul_isotropic {E : Type} [Field E] {n : ℕ} (σ : E 
   congr 2
   ring
 
-
 open NumberField IsDedekindDomain Matrix in
 open scoped TensorProduct in
 variable {R : Type} [CommRing R] {n : ℕ} (σ : R →+* R) (G : Matrix (Fin n) (Fin n) R) in
-theorem _root_.GlobalTheory.UTrans.PlaneRefl.quasiRefl_eq_mul_of_plane : ∀ (E : Type) [Field E] [CharZero E]
-    (n : ℕ) (σ : E →+* E) (G : Matrix (Fin n) (Fin n) E), _root_.GlobalTheory.UTrans.IsHerm σ G →
-    ∀ (x z : Fin n → E) (a u : E), _root_.GlobalTheory.UTrans.hf σ G z z = 0 →
-    _root_.GlobalTheory.UTrans.hf σ G x z ≠ 0 → _root_.GlobalTheory.UTrans.hf σ G x x ≠ 0 →
-    _root_.GlobalTheory.UTrans.hf σ G (x + a • z) (x + a • z) ≠ 0 → u * σ u = 1 →
-    ∃ m ∈ _root_.GlobalTheory.UTrans.TvGen σ G,
-      _root_.GlobalTheory.UTrans.tv σ G x ((u - 1) / _root_.GlobalTheory.UTrans.hf σ G x x) =
-        m * _root_.GlobalTheory.UTrans.tv σ G (x + a • z)
-          ((u - 1) / _root_.GlobalTheory.UTrans.hf σ G (x + a • z) (x + a • z)) := by
+theorem _root_.GlobalTheory.UTrans.PlaneRefl.quasiRefl_eq_mul_of_plane
+    : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E →+* E) (G : Matrix (Fin n) (Fin n) E),
+      _root_.GlobalTheory.UTrans.IsHerm σ G
+        → ∀ (x z : Fin n → E) (a u : E),
+          _root_.GlobalTheory.UTrans.hf σ G z z = 0 → _root_.GlobalTheory.UTrans.hf σ G x z ≠ 0
+            → _root_.GlobalTheory.UTrans.hf σ G x x ≠ 0
+            → _root_.GlobalTheory.UTrans.hf σ G (x + a • z) (x + a • z) ≠ 0 → u * σ u = 1
+            → ∃ m ∈ _root_.GlobalTheory.UTrans.TvGen σ G,
+              _root_.GlobalTheory.UTrans.tv σ G x ((u - 1) / _root_.GlobalTheory.UTrans.hf σ G x x)
+                = m * _root_.GlobalTheory.UTrans.tv σ G (x + a • z)
+                  ((u - 1) / _root_.GlobalTheory.UTrans.hf σ G (x + a • z) (x + a • z)) := by
   intro E _ _ n σ G hH x z a u hzz hxz hxx hyy hu
   obtain ⟨hinv, hne, hG, -⟩ := hH
   by_cases hu1 : u = 1
   · subst hu1
     refine ⟨1, one_mem _, ?_⟩
     simp only [sub_self, zero_div, transvection_zero', one_mul]
-  by_cases hD : u * σ a * _root_.GlobalTheory.UTrans.hf σ G x z +
-      a * σ (_root_.GlobalTheory.UTrans.hf σ G x z) ≠ 0
-  · exact quasiReflection_eq_transvectionGen_mul_shifted σ G hinv hG x z a u hzz hxz hxx hyy hu hu1 hD
+  by_cases hD
+    : u * σ a * _root_.GlobalTheory.UTrans.hf σ G x z
+        + a * σ (_root_.GlobalTheory.UTrans.hf σ G x z)
+      ≠ 0
+  · exact quasiReflection_eq_transvectionGen_mul_shifted σ G hinv hG x z a u hzz hxz hxx hyy hu hu1
+      hD
   push_neg at hD
   obtain ⟨e, he⟩ := hne
   obtain ⟨ω, hωdef⟩ : ∃ ω, ω = e - σ e := ⟨_, rfl⟩
@@ -182,52 +186,69 @@ theorem _root_.GlobalTheory.UTrans.PlaneRefl.quasiRefl_eq_mul_of_plane : ∀ (E 
   set y := x + a • z with hy
   set E₁ := _root_.GlobalTheory.UTrans.tv σ G z ω with hE₁
   set E₂ := _root_.GlobalTheory.UTrans.tv σ G z (-ω) with hE₂
-  have hEiso : ∀ v w, _root_.GlobalTheory.UTrans.hf σ G (E₁.mulVec v) (E₁.mulVec w) =
-      _root_.GlobalTheory.UTrans.hf σ G v w :=
+  have hEiso
+      : ∀ v w,
+        _root_.GlobalTheory.UTrans.hf σ G (E₁.mulVec v) (E₁.mulVec w)
+          = _root_.GlobalTheory.UTrans.hf σ G v w :=
     transvection_isometry σ G hinv hG z ω (by rw [hσω, hzz]; ring)
   have hy1 : E₁.mulVec y = x + (a + ω * β) • z := by
-    rw [hE₁, _root_.GlobalTheory.UTrans.Model.tv_mulVec, hy, _root_.GlobalTheory.UTrans.Model.hf_add_smul_left, hzz,
-      ← hβ, add_smul, add_assoc]
+    rw [hE₁, _root_.GlobalTheory.UTrans.Model.tv_mulVec, hy,
+      _root_.GlobalTheory.UTrans.Model.hf_add_smul_left, hzz, ← hβ, add_smul, add_assoc]
     congr 2
     ring_nf
-  have hnorm : _root_.GlobalTheory.UTrans.hf σ G (x + (a + ω * β) • z) (x + (a + ω * β) • z) =
-      _root_.GlobalTheory.UTrans.hf σ G y y := by rw [← hy1, hEiso]
+  have hnorm
+      : _root_.GlobalTheory.UTrans.hf σ G (x + (a + ω * β) • z) (x + (a + ω * β) • z)
+        = _root_.GlobalTheory.UTrans.hf σ G y y := by
+    rw [← hy1, hEiso]
   have hD1 : u * σ (a + ω * β) * β + (a + ω * β) * σ β ≠ 0 := by
     have e1 : u * σ (a + ω * β) * β + (a + ω * β) * σ β = ω * β * σ β * (1 - u) := by
       rw [map_add (f := _), map_mul, hσω]
       linear_combination hD
     rw [e1]
     refine mul_ne_zero (mul_ne_zero (mul_ne_zero hω0 hxz) ?_) (sub_ne_zero.2 (Ne.symm hu1))
-    intro h; exact hxz (by rw [← hinv β, h, map_zero])
-  obtain ⟨m₁, hm₁, h₁⟩ := quasiReflection_eq_transvectionGen_mul_shifted σ G hinv hG x z (a + ω * β) u hzz hxz hxx
-    (by rw [hnorm]; exact hyy) hu hu1 hD1
+    intro h
+    exact hxz (by rw [← hinv β, h, map_zero])
+  obtain ⟨m₁, hm₁, h₁⟩ :=
+    quasiReflection_eq_transvectionGen_mul_shifted σ G hinv hG x z (a + ω * β) u hzz hxz hxx
+      (by rw [hnorm]; exact hyy) hu hu1 hD1
   rw [hnorm] at h₁
   set c' := (u - 1) / _root_.GlobalTheory.UTrans.hf σ G y y with hc'
   have hyr : σ (_root_.GlobalTheory.UTrans.hf σ G y y) = _root_.GlobalTheory.UTrans.hf σ G y y :=
     _root_.GlobalTheory.UTrans.Model.hf_conj σ G hinv hG y y
-  have hτiso : ∀ v w, _root_.GlobalTheory.UTrans.hf σ G
-      ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec v) ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec w) =
-      _root_.GlobalTheory.UTrans.hf σ G v w := by
+  have hτiso
+      : ∀ v w,
+        _root_.GlobalTheory.UTrans.hf σ G ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec v)
+            ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec w)
+          = _root_.GlobalTheory.UTrans.hf σ G v w := by
     refine transvection_isometry σ G hinv hG y c' ?_
     rw [hc', map_div₀, map_sub, map_one, hyr]
     field_simp
     linear_combination hu
-  have hc1 : E₁ * _root_.GlobalTheory.UTrans.tv σ G y c' = _root_.GlobalTheory.UTrans.tv σ G (x + (a + ω * β) • z) c' * E₁ := by
+  have hc1
+      : E₁ * _root_.GlobalTheory.UTrans.tv σ G y c'
+        = _root_.GlobalTheory.UTrans.tv σ G (x + (a + ω * β) • z) c' * E₁ := by
     rw [isometry_mul_transvection σ G E₁ hEiso, hy1]
   have hEE : E₁ * E₂ = 1 := by
     rw [hE₁, hE₂, transvection_mul_isotropic σ G z hzz, add_neg_cancel, transvection_zero']
-  have hc2 : _root_.GlobalTheory.UTrans.tv σ G y c' * E₂ =
-      _root_.GlobalTheory.UTrans.tv σ G ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec z) (-ω) *
-        _root_.GlobalTheory.UTrans.tv σ G y c' := by
+  have hc2
+      : _root_.GlobalTheory.UTrans.tv σ G y c' * E₂
+        = _root_.GlobalTheory.UTrans.tv σ G ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec z) (-ω)
+          * _root_.GlobalTheory.UTrans.tv σ G y c' := by
     rw [hE₂, isometry_mul_transvection σ G _ hτiso]
-  refine ⟨m₁ * E₁ * _root_.GlobalTheory.UTrans.tv σ G ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec z) (-ω), ?_, ?_⟩
+  refine ⟨
+    m₁ * E₁
+      * _root_.GlobalTheory.UTrans.tv σ G ((_root_.GlobalTheory.UTrans.tv σ G y c').mulVec z) (-ω),
+    ?_,
+    ?_
+  ⟩
   · refine mul_mem (mul_mem hm₁ ?_) ?_
     · unfold _root_.GlobalTheory.UTrans.TvGen
       exact Submonoid.subset_closure ⟨z, ω, hzz, by rw [hσω]; ring, rfl⟩
     · unfold _root_.GlobalTheory.UTrans.TvGen
       exact Submonoid.subset_closure ⟨_, -ω, by rw [hτiso, hzz], by rw [map_neg, hσω]; ring, rfl⟩
-  · have key : _root_.GlobalTheory.UTrans.tv σ G (x + (a + ω * β) • z) c' =
-        E₁ * _root_.GlobalTheory.UTrans.tv σ G y c' * E₂ := by
+  · have key
+        : _root_.GlobalTheory.UTrans.tv σ G (x + (a + ω * β) • z) c'
+          = E₁ * _root_.GlobalTheory.UTrans.tv σ G y c' * E₂ := by
       rw [hc1, mul_assoc, hEE, mul_one]
     rw [h₁, key, mul_assoc E₁, hc2]
     simp only [mul_assoc]

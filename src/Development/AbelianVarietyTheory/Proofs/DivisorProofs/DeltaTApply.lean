@@ -20,11 +20,12 @@ def topR (x : WOF F E nS (nT + nT)) : WOF F E nS nT := x.submatrix (finSumFinEqu
 
 def botR (x : WOF F E nS (nT + nT)) : WOF F E nS nT := x.submatrix (finSumFinEquiv ∘ Sum.inr) id
 
-def deltaT (f₁ f₂ : WOF F E nS nT → ℂ) : WOF F E nS (nT + nT) → ℂ :=
-  fun x => f₁ (topR x) * conj (f₂ (-botR x))
+def deltaT (f₁ f₂ : WOF F E nS nT → ℂ) : WOF F E nS (nT + nT) → ℂ := fun x =>
+  f₁ (topR x) * conj (f₂ (- botR x))
 
-theorem deltaT_apply (f₁ f₂ : WOF F E nS nT → ℂ) (x : WOF F E nS (nT + nT)) :
-    deltaT f₁ f₂ x = f₁ (topR x) * conj (f₂ (-botR x)) := rfl
+theorem deltaT_apply (f₁ f₂ : WOF F E nS nT → ℂ) (x : WOF F E nS (nT + nT))
+    : deltaT f₁ f₂ x = f₁ (topR x) * conj (f₂ (- botR x)) :=
+  rfl
 
 end GlobalTheory.DblTargetDelta
 

@@ -9,6 +9,7 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 namespace Formalism.L2.SG.Pf.Cnt
 
 theorem gluing_mass_holds : GlueMass :=
-  glueMass_of' jordan_splitting_exists jordan_invariants_holds alpha_discriminant_holds local_gluing_holds gluing_product_holds
+  glueMass_of' jordan_splitting_exists jordan_invariants_holds alpha_discriminant_holds
+    local_gluing_holds gluing_product_holds
 
 end Formalism.L2.SG.Pf.Cnt

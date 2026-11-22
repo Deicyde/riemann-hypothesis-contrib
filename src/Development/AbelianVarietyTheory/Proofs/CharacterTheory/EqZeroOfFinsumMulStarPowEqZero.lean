@@ -10,10 +10,12 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-theorem eq_zero_of_finsum_mul_star_pow_eq_zero {K : Type} [Field K] (θ : K →* ℂ)
-    (hθ : ∀ x y : K, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) (N : ℕ) (hN : 0 < N) (c : K → ℂ)
-    (h : ∀ l : ℕ, ∑ᶠ α ∈ {α : K | α ^ N = 1}, c α * star (θ α ^ l) = 0) :
-    ∀ α ∈ {α : K | α ^ N = 1}, c α = 0 := by
+theorem eq_zero_of_finsum_mul_star_pow_eq_zero
+    {K : Type} [Field K]
+    (θ : K →* ℂ) (hθ : ∀ x y : K, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+    (N : ℕ) (hN : 0 < N)
+    (c : K → ℂ) (h : ∀ l : ℕ, ∑ᶠ α ∈ {α : K | α ^ N = 1}, c α * star (θ α ^ l) = 0)
+    : ∀ α ∈ {α : K | α ^ N = 1}, c α = 0 := by
   classical
   have hS : {α : K | α ^ N = 1} = ((Polynomial.nthRootsFinset N (1 : K) : Finset K) : Set K) := by
     ext x
@@ -37,8 +39,8 @@ theorem eq_zero_of_finsum_mul_star_pow_eq_zero {K : Type} [Field K] (θ : K →*
     rintro x hx rfl
     rw [zero_pow hN.ne'] at hx
     exact zero_ne_one hx
-  have key : ∀ α ∈ S, ∑ l ∈ Finset.range N, (θ β * star (θ α)) ^ l
-      = if α = β then (N : ℂ) else 0 := by
+  have key
+      : ∀ α ∈ S, ∑ l ∈ Finset.range N, (θ β * star (θ α)) ^ l = if α = β then (N : ℂ) else 0 := by
     intro α hα
     have hα' := (hmem α).1 hα
     split_ifs with hab
@@ -49,14 +51,17 @@ theorem eq_zero_of_finsum_mul_star_pow_eq_zero {K : Type} [Field K] (θ : K →*
         intro hz
         apply hab
         apply hθ α β (hne α hα') (hne β hβ')
-        calc θ α = (θ β * star (θ α)) * θ α := by rw [hz, one_mul]
+        calc
+          θ α
+            = (θ β * star (θ α)) * θ α := by rw [hz, one_mul]
           _ = θ β := by rw [mul_assoc, hunit α hα', mul_one]
       rw [geom_sum_eq hz, mul_pow, ← star_pow, hpow β hβ', hpow α hα']
       simp
   have hsum : ∑ l ∈ Finset.range N, θ β ^ l * ∑ α ∈ S, c α * star (θ α ^ l) = 0 := by
     simp only [h', mul_zero, Finset.sum_const_zero]
-  have h2 : ∑ l ∈ Finset.range N, θ β ^ l * ∑ α ∈ S, c α * star (θ α ^ l)
-      = ∑ α ∈ S, c α * ∑ l ∈ Finset.range N, (θ β * star (θ α)) ^ l := by
+  have h2
+      : ∑ l ∈ Finset.range N, θ β ^ l * ∑ α ∈ S, c α * star (θ α ^ l)
+        = ∑ α ∈ S, c α * ∑ l ∈ Finset.range N, (θ β * star (θ α)) ^ l := by
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun α _ => Finset.sum_congr rfl fun l _ => ?_
@@ -66,7 +71,16 @@ theorem eq_zero_of_finsum_mul_star_pow_eq_zero {K : Type} [Field K] (θ : K →*
   simp only [mul_ite, mul_zero, Finset.sum_ite_eq', (hmem β).2 hβ', if_true] at hsum
   exact (mul_eq_zero.1 hsum).resolve_right (Nat.cast_ne_zero.2 hN.ne')
 
-theorem torus_fourier_injective : ∀ (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ), (∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) → ∀ n : ℕ, 0 < n → ∀ c : AlgebraicClosure F → ℂ, (∀ l : ℕ, ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}, c α * star (θ α ^ l) = 0) → ∀ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}, c α = 0 := by
+theorem torus_fourier_injective
+    : ∀ (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ),
+      (∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+        → ∀ n : ℕ,
+          0 < n
+            → ∀ c : AlgebraicClosure F → ℂ,
+              (∀ l : ℕ,
+                  ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}, c α * star (θ α ^ l)
+                    = 0)
+                → ∀ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}, c α = 0 := by
   intro F _ _ θ hθ n hn c h
   have hq : 1 < Nat.card F := Finite.one_lt_card
   have hN : 0 < Nat.card F ^ n - 1 := Nat.sub_pos_of_lt (Nat.one_lt_pow hn.ne' hq)

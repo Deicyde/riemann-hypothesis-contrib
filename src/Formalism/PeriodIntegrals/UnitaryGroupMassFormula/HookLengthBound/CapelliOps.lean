@@ -10,8 +10,9 @@ namespace PI.HookSteps.Cap
 
 open MvPolynomial Finset
 
-theorem mulLeft_eq_lmul (N : ℕ) (p : MvPolynomial (Fin N × Fin N) ℚ) :
-    LinearMap.mulLeft ℚ p = Algebra.lmul ℚ (MvPolynomial (Fin N × Fin N) ℚ) p := rfl
+theorem mulLeft_eq_lmul (N : ℕ) (p : MvPolynomial (Fin N × Fin N) ℚ)
+    : LinearMap.mulLeft ℚ p = Algebra.lmul ℚ (MvPolynomial (Fin N × Fin N) ℚ) p :=
+  rfl
 
 theorem capelli_relation : CapRel := by
   intro N
@@ -24,7 +25,8 @@ theorem capelli_relation : CapRel := by
   · refine LinearMap.ext fun p => ?_
     have e1 : (dop N b t * xo N a s) p = pderiv (b, t) (X (a, s) * p) := rfl
     have e2 : (xo N a s * dop N b t) p = X (a, s) * pderiv (b, t) p := rfl
-    rw [LinearMap.add_apply, e1, e2, Derivation.leibniz, MvPolynomial.pderiv_X, smul_eq_mul, smul_eq_mul]
+    rw [LinearMap.add_apply, e1, e2, Derivation.leibniz, MvPolynomial.pderiv_X, smul_eq_mul,
+      smul_eq_mul]
     split_ifs with h
     · obtain ⟨rfl, rfl⟩ := h
       simp
@@ -44,21 +46,28 @@ theorem capelli_left_holds : CapLeft := by
   simp [map_sub, map_natCast]
 
 theorem dop_comm (N : ℕ) (b t b' t' : Fin N) : Commute (dop N b t) (dop N b' t') := by
-  have h : ⁅(pderiv (b, t) : Derivation ℚ (MvPolynomial (Fin N × Fin N) ℚ) (MvPolynomial (Fin N × Fin N) ℚ)),
-      (pderiv (b', t') : Derivation ℚ (MvPolynomial (Fin N × Fin N) ℚ) (MvPolynomial (Fin N × Fin N) ℚ))⁆ = 0 := by
+  have h
+      : ⁅(pderiv (b, t) : Derivation ℚ (MvPolynomial (Fin N × Fin N) ℚ) (MvPolynomial (Fin N × Fin N) ℚ)),
+          (pderiv (b', t') : Derivation ℚ (MvPolynomial (Fin N × Fin N) ℚ) (MvPolynomial (Fin N × Fin N) ℚ))⁆
+        = 0 := by
     apply MvPolynomial.derivation_ext
     intro k
     rw [Derivation.commutator_apply, pderiv_X, pderiv_X]
     simp only [Pi.single_apply]
     split_ifs <;> simp
-  apply LinearMap.ext; intro f
-  have := congrArg (fun D : Derivation ℚ (MvPolynomial (Fin N × Fin N) ℚ)
-    (MvPolynomial (Fin N × Fin N) ℚ) => D f) h
+  apply LinearMap.ext
+  intro f
+  have :=
+    congrArg
+      (fun D : Derivation ℚ (MvPolynomial (Fin N × Fin N) ℚ) (MvPolynomial (Fin N × Fin N) ℚ) =>
+        D f)
+      h
   simp only [Derivation.commutator_apply, Derivation.zero_apply] at this
   simpa [dop, Module.End.mul_apply, sub_eq_zero] using this
 
-theorem xw_xo (N : ℕ) : ∀ (k : ℕ) (r s : Fin k → Fin N),
-    xw (xo N) r s = Algebra.lmul ℚ (MvPolynomial (Fin N × Fin N) ℚ) (∏ j, X (r j, s j)) := by
+theorem xw_xo (N : ℕ)
+    : ∀ (k : ℕ) (r s : Fin k → Fin N),
+      xw (xo N) r s = Algebra.lmul ℚ (MvPolynomial (Fin N × Fin N) ℚ) (∏ j, X (r j, s j)) := by
   intro k
   induction k with
   | zero =>
@@ -71,12 +80,14 @@ theorem xw_xo (N : ℕ) : ∀ (k : ℕ) (r s : Fin k → Fin N),
     rw [xw_succ, ih, Fin.prod_univ_succ, map_mul]
     rfl
 
-theorem sum_perm_of_noninj {M : Type} [AddCommMonoid M] (N : ℕ) (F : (Fin N → Fin N) → M)
-    (hF : ∀ s, ¬ Function.Injective s → F s = 0) :
-    ∑ s, F s = ∑ π : Equiv.Perm (Fin N), F π := by
+theorem sum_perm_of_noninj
+    {M : Type} [AddCommMonoid M]
+    (N : ℕ) (F : (Fin N → Fin N) → M) (hF : ∀ s, ¬ Function.Injective s → F s = 0)
+    : ∑ s, F s = ∑ π : Equiv.Perm (Fin N), F π := by
   classical
-  have himg : ∑ π : Equiv.Perm (Fin N), F π =
-      ∑ s ∈ Finset.univ.image (fun π : Equiv.Perm (Fin N) => (π : Fin N → Fin N)), F s :=
+  have himg
+      : ∑ π : Equiv.Perm (Fin N), F π
+        = ∑ s ∈ Finset.univ.image (fun π : Equiv.Perm (Fin N) => (π : Fin N → Fin N)), F s :=
     (Finset.sum_image fun π _ σ _ h => Equiv.ext (congrFun h)).symm
   rw [himg]
   symm
@@ -84,8 +95,10 @@ theorem sum_perm_of_noninj {M : Type} [AddCommMonoid M] (N : ℕ) (F : (Fin N �
   exact Finset.mem_image.2
     ⟨Equiv.ofBijective s (Finite.injective_iff_bijective.1 hinj), Finset.mem_univ _, rfl⟩
 
-theorem detD_eq (N : ℕ) : detD N = ∑ π : Equiv.Perm (Fin N), ((Equiv.Perm.sign π : ℤˣ) : ℤ) •
-    dw (dop N) (id : Fin N → Fin N) (fun j => π j) := by
+theorem detD_eq (N : ℕ)
+    : detD N
+      = ∑ π : Equiv.Perm (Fin N), ((Equiv.Perm.sign π : ℤˣ) : ℤ) •
+        dw (dop N) (id : Fin N → Fin N) (fun j => π j) := by
   unfold detD
   rw [← Equiv.sum_comp (Equiv.inv (Equiv.Perm (Fin N)))]
   refine Finset.sum_congr rfl fun σ _ => ?_
@@ -105,8 +118,11 @@ theorem capelli_square : CapSquare := by
   intro N
   set P := MvPolynomial (Fin N × Fin N) ℚ
   set M : Matrix (Fin N) (Fin N) P := Matrix.of fun a b => (X (a, b) : P) with hM
-  have hdet : ∀ s : Fin N → Fin N, ∑ σ : Equiv.Perm (Fin N), ((Equiv.Perm.sign σ : ℤˣ) : ℤ) •
-      xw (xo N) (fun j => σ j) s = Algebra.lmul ℚ P (M.submatrix id s).det := by
+  have hdet
+      : ∀ s : Fin N → Fin N,
+        ∑ σ : Equiv.Perm (Fin N), ((Equiv.Perm.sign σ : ℤˣ) : ℤ) •
+            xw (xo N) (fun j => σ j) s
+          = Algebra.lmul ℚ P (M.submatrix id s).det := by
     intro s
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Matrix.det_apply, map_sum]

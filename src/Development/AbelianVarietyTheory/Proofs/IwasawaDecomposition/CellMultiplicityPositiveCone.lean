@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSmo
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 noncomputable section
 namespace GlobalTheory.PolFan
@@ -24,14 +25,17 @@ theorem mem_sat {P : Submodule ℤ M} {x : M} : x ∈ sat P ↔ ∃ n : ℤ, n �
   · rintro ⟨⟨n, hn⟩, h⟩
     refine ⟨n, nonZeroDivisors.ne_zero hn, ?_⟩
     rw [Submonoid.smul_def] at h
-    rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_smul]; exact h
+    rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_smul]
+    exact h
   · rintro ⟨n, hn, h⟩
     refine ⟨⟨n, mem_nonZeroDivisors_of_ne_zero hn⟩, ?_⟩
     rw [Submonoid.smul_def]
     show n • Submodule.Quotient.mk x = (0 : M ⧸ P)
-    rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]; exact h
+    rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
+    exact h
 
-theorem le_sat (P : Submodule ℤ M) : P ≤ sat P := fun x hx => mem_sat.2 ⟨1, one_ne_zero, by simpa using hx⟩
+theorem le_sat (P : Submodule ℤ M) : P ≤ sat P := fun x hx =>
+  mem_sat.2 ⟨1, one_ne_zero, by simpa using hx⟩
 
 theorem sat_eq {E P : Submodule ℤ M} (hEP : E ≤ P) (hP : P ≤ sat E) : sat P = sat E := by
   ext x
@@ -43,10 +47,13 @@ theorem sat_eq {E P : Submodule ℤ M} (hEP : E ≤ P) (hP : P ≤ sat E) : sat 
   · rintro ⟨n, hn, h⟩
     exact ⟨n, hn, hEP h⟩
 
-theorem card_torsion_eq_relIndex (P : Submodule ℤ M) :
-    Nat.card (Submodule.torsion ℤ (M ⧸ P)) = P.toAddSubgroup.relIndex (sat P).toAddSubgroup := by
-  let f : (sat P).toAddSubgroup →+ Submodule.torsion ℤ (M ⧸ P) :=
-    { toFun := fun x => ⟨P.mkQ x.1, x.2⟩, map_zero' := rfl, map_add' := fun _ _ => rfl }
+theorem card_torsion_eq_relIndex (P : Submodule ℤ M)
+    : Nat.card (Submodule.torsion ℤ (M ⧸ P)) = P.toAddSubgroup.relIndex (sat P).toAddSubgroup := by
+  let f : (sat P).toAddSubgroup →+ Submodule.torsion ℤ (M ⧸ P) := {
+    toFun := fun x => ⟨P.mkQ x.1, x.2⟩
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   have hf : Function.Surjective f := by
     rintro ⟨y, hy⟩
     obtain ⟨x, rfl⟩ := P.mkQ_surjective y
@@ -60,10 +67,13 @@ theorem card_torsion_eq_relIndex (P : Submodule ℤ M) :
   rw [AddSubgroup.relIndex, ← hker, AddSubgroup.index]
   exact (Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective f hf).toEquiv).symm
 
-theorem relIndex_cons_smul {p : ℕ} (v : M) (w : Fin p → M) (n : ℤ)
-    (hli : LinearIndependent ℤ (Fin.cons v w : Fin (p + 1) → M)) :
-    (Submodule.span ℤ (Set.range (Fin.cons (n • v) w : Fin (p + 1) → M))).toAddSubgroup.relIndex
-      (Submodule.span ℤ (Set.range (Fin.cons v w : Fin (p + 1) → M))).toAddSubgroup = n.natAbs := by
+theorem relIndex_cons_smul
+    {p : ℕ}
+    (v : M) (w : Fin p → M)
+    (n : ℤ) (hli : LinearIndependent ℤ (Fin.cons v w : Fin (p + 1) → M))
+    : (Submodule.span ℤ (Set.range (Fin.cons (n • v) w : Fin (p + 1) → M))).toAddSubgroup.relIndex
+        (Submodule.span ℤ (Set.range (Fin.cons v w : Fin (p + 1) → M))).toAddSubgroup
+      = n.natAbs := by
   set u : Fin (p + 1) → M := Fin.cons v w with hu
   set K := Submodule.span ℤ (Set.range u)
   set K' := Submodule.span ℤ (Set.range (Fin.cons (n • v) w : Fin (p + 1) → M))
@@ -105,17 +115,24 @@ theorem relIndex_cons_smul {p : ℕ} (v : M) (w : Fin p → M) (n : ℤ)
         exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, by simp [u]⟩)
       · exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i.succ, by simp [u]⟩)
   have hsurj : Function.Surjective f.toAddMonoidHom := fun t => ⟨t • b 0, by simp [hf0]⟩
-  have heq : K'.toAddSubgroup.addSubgroupOf K.toAddSubgroup =
-      (AddSubgroup.zmultiples n).comap f.toAddMonoidHom := by
+  have heq
+      : K'.toAddSubgroup.addSubgroupOf K.toAddSubgroup
+        = (AddSubgroup.zmultiples n).comap f.toAddMonoidHom := by
     ext x
     rw [AddSubgroup.mem_addSubgroupOf, AddSubgroup.mem_comap, Int.mem_zmultiples_iff]
     exact hmem x
-  rw [AddSubgroup.relIndex, heq, AddSubgroup.index_comap_of_surjective _ hsurj, Int.index_zmultiples]
+  rw [AddSubgroup.relIndex, heq, AddSubgroup.index_comap_of_surjective _ hsurj,
+    Int.index_zmultiples]
 
-theorem card_torsion_cons_mul {p : ℕ} (v β : M) (w : Fin p → M) (k a : ℤ) (b : Fin p → ℤ) (hk : k ≠ 0) (ha : a ≠ 0)
-    (hli : LinearIndependent ℤ (Fin.cons v w : Fin (p + 1) → M)) (hrel : k • β = a • v + ∑ i, b i • w i) :
-    k.natAbs * Nat.card (Submodule.torsion ℤ (M ⧸ Submodule.span ℤ (Set.range (Fin.cons β w : Fin (p + 1) → M)))) =
-      a.natAbs * Nat.card (Submodule.torsion ℤ (M ⧸ Submodule.span ℤ (Set.range (Fin.cons v w : Fin (p + 1) → M)))) := by
+theorem card_torsion_cons_mul
+    {p : ℕ}
+    (v β : M) (w : Fin p → M) (k a : ℤ) (b : Fin p → ℤ)
+    (hk : k ≠ 0) (ha : a ≠ 0) (hli : LinearIndependent ℤ (Fin.cons v w : Fin (p + 1) → M))
+    (hrel : k • β = a • v + ∑ i, b i • w i)
+    : k.natAbs * Nat.card (Submodule.torsion ℤ
+        (M ⧸ Submodule.span ℤ (Set.range (Fin.cons β w : Fin (p + 1) → M))))
+      = a.natAbs * Nat.card (Submodule.torsion ℤ
+        (M ⧸ Submodule.span ℤ (Set.range (Fin.cons v w : Fin (p + 1) → M)))) := by
   have hli' : LinearIndependent ℤ (Fin.cons β w : Fin (p + 1) → M) := by
     rw [Fintype.linearIndependent_iff] at hli ⊢
     intro g hg
@@ -128,8 +145,9 @@ theorem card_torsion_cons_mul {p : ℕ} (v β : M) (w : Fin p → M) (k a : ℤ)
       rw [← e1]
       simp only [smul_add, Finset.smul_sum, smul_smul, add_smul, Finset.sum_add_distrib]
       abel
-    have h3 := hli (Fin.cons (g 0 * a) fun i => g 0 * b i + k * g i.succ) (by
-      rw [Fin.sum_univ_succ]; simpa using h2)
+    have h3 :=
+      hli (Fin.cons (g 0 * a) fun i => g 0 * b i + k * g i.succ)
+        (by rw [Fin.sum_univ_succ]; simpa using h2)
     have hg0 : g 0 = 0 := by
       have := h3 0
       simp only [Fin.cons_zero, mul_eq_zero] at this
@@ -148,7 +166,8 @@ theorem card_torsion_cons_mul {p : ℕ} (v β : M) (w : Fin p → M) (k a : ℤ)
   have hkE : k • β ∈ E := Submodule.subset_span ⟨0, by simp⟩
   have haE : a • v ∈ E := by
     have : a • v = k • β - ∑ i, b i • w i := by rw [hrel]; abel
-    rw [this]; exact sub_mem hkE (hw _ hwE)
+    rw [this]
+    exact sub_mem hkE (hw _ hwE)
   have hE' : E = Submodule.span ℤ (Set.range (Fin.cons (a • v) w : Fin (p + 1) → M)) := by
     apply le_antisymm
     · rw [Submodule.span_le]
@@ -156,7 +175,8 @@ theorem card_torsion_cons_mul {p : ℕ} (v β : M) (w : Fin p → M) (k a : ℤ)
       refine Fin.cases ?_ (fun i => ?_) i
       · simp only [Fin.cons_zero, SetLike.mem_coe]
         rw [hrel]
-        exact add_mem (Submodule.subset_span ⟨0, by simp⟩) (hw _ fun i => Submodule.subset_span ⟨i.succ, by simp⟩)
+        exact add_mem (Submodule.subset_span ⟨0, by simp⟩)
+          (hw _ fun i => Submodule.subset_span ⟨i.succ, by simp⟩)
       · exact Submodule.subset_span ⟨i.succ, by simp⟩
     · rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
@@ -193,29 +213,39 @@ theorem card_torsion_cons_mul {p : ℕ} (v β : M) (w : Fin p → M) (k a : ℤ)
   rw [sat_eq hEN hNs] at h2
   rw [h1, h2, ← relIndex_cons_smul β w k hli', ← relIndex_cons_smul v w a hli, ← hE']
   change E.toAddSubgroup.relIndex N.toAddSubgroup * _ = E.toAddSubgroup.relIndex D.toAddSubgroup * _
-  rw [AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).2 hEN) ((Submodule.toAddSubgroup_le _ _).2 hNs),
-    AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).2 hED) ((Submodule.toAddSubgroup_le _ _).2 hDs)]
+  rw [AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).2 hEN)
+      ((Submodule.toAddSubgroup_le _ _).2 hNs),
+    AddSubgroup.relIndex_mul_relIndex _ _ _ ((Submodule.toAddSubgroup_le _ _).2 hED)
+      ((Submodule.toAddSubgroup_le _ _).2 hDs)]
 
-theorem exists_int_rel {O : Type} [CommRing O] {bar : O → O} {X : Type} [AddCommGroup X] [Module O X] {m : ℕ}
-    (δ : Fin m → balForms bar X) (β : balForms bar X) (c : Fin m → ℝ) (hli : LinearIndependent ℤ δ)
-    (hc : toReal (β : LinearMap.BilinForm ℤ X) = ∑ i, c i • toReal (δ i : LinearMap.BilinForm ℤ X)) :
-    ∃ (k : ℤ) (a : Fin m → ℤ), k ≠ 0 ∧ k • β = ∑ i, a i • δ i ∧ ∀ i, (k : ℝ) * c i = a i := by
-  have hind : ∀ (d : Fin 0 → ℤ) (g : Fin m → ℤ),
-      ∑ i, g i • (δ i : LinearMap.BilinForm ℤ X) = ∑ k, d k • (Fin.elim0 k : LinearMap.BilinForm ℤ X) → g = 0 :=
-    fun d g hg => by
-      refine funext (Fintype.linearIndependent_iff.1 hli g (Subtype.ext ?_))
-      simpa using hg
+theorem exists_int_rel
+    {O : Type} [CommRing O]
+    {bar : O → O} {X : Type} [AddCommGroup X] [Module O X]
+    {m : ℕ} (δ : Fin m → balForms bar X)
+    (β : balForms bar X) (c : Fin m → ℝ)
+    (hli : LinearIndependent ℤ δ)
+    (hc : toReal (β : LinearMap.BilinForm ℤ X) = ∑ i, c i • toReal (δ i : LinearMap.BilinForm ℤ X))
+    : ∃ (k : ℤ) (a : Fin m → ℤ), k ≠ 0 ∧ k • β = ∑ i, a i • δ i ∧ ∀ i, (k : ℝ) * c i = a i := by
+  have hind
+      : ∀ (d : Fin 0 → ℤ) (g : Fin m → ℤ),
+        ∑ i, g i • (δ i : LinearMap.BilinForm ℤ X)
+            = ∑ k, d k • (Fin.elim0 k : LinearMap.BilinForm ℤ X)
+          → g = 0 := fun d g hg => by
+    refine funext (Fintype.linearIndependent_iff.1 hli g (Subtype.ext ?_))
+    simpa using hg
   have hdep : ¬ LinearIndependent ℤ (Fin.cons β δ : Fin (m + 1) → balForms bar X) := by
     intro h
-    have hind' : ∀ (d : Fin 0 → ℤ) (g : Fin (m + 1) → ℤ),
-        ∑ i, g i • (((Fin.cons β δ : Fin (m + 1) → balForms bar X) i : balForms bar X) : LinearMap.BilinForm ℤ X) =
-          ∑ k, d k • (Fin.elim0 k : LinearMap.BilinForm ℤ X) → g = 0 :=
-      fun d g hg => by
-        refine funext (Fintype.linearIndependent_iff.1 h g (Subtype.ext ?_))
-        simpa using hg
-    have := eq_zero_of_toReal_rel hind' (r := Fin.cons 1 (-c)) (s := 0) (by
-      rw [Fin.sum_univ_succ]
-      simp [hc])
+    have hind'
+        : ∀ (d : Fin 0 → ℤ) (g : Fin (m + 1) → ℤ),
+          ∑ i, g i • (((Fin.cons β δ : Fin (m + 1) → balForms bar X) i : balForms bar X) : LinearMap.BilinForm ℤ X)
+              = ∑ k, d k • (Fin.elim0 k : LinearMap.BilinForm ℤ X)
+            → g = 0 := fun d g hg => by
+      refine funext (Fintype.linearIndependent_iff.1 h g (Subtype.ext ?_))
+      simpa using hg
+    have :=
+      eq_zero_of_toReal_rel hind' (r := Fin.cons 1 (-c)) (s := 0) (by
+        rw [Fin.sum_univ_succ]
+        simp [hc])
     simpa using congrFun this 0
   obtain ⟨g, hg, i0, hi0⟩ := Fintype.not_linearIndependent_iff.1 hdep
   rw [Fin.sum_univ_succ] at hg
@@ -225,37 +255,49 @@ theorem exists_int_rel {O : Type} [CommRing O] {bar : O → O} {X : Type} [AddCo
     rw [h0, zero_smul, zero_add] at hg
     have := Fintype.linearIndependent_iff.1 hli _ hg
     exact hi0 (Fin.cases h0 (fun i => this i) i0)
-  have hb : g 0 • β = -∑ i, g i.succ • δ i := eq_neg_of_add_eq_zero_left hg
+  have hb : g 0 • β = - ∑ i, g i.succ • δ i := eq_neg_of_add_eq_zero_left hg
   refine ⟨g 0 * g 0, fun i => -(g 0 * g i.succ), mul_ne_zero hg0 hg0, ?_, ?_⟩
   · rw [mul_smul, hb, smul_neg, Finset.smul_sum, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [smul_smul, neg_smul]
-  · have hr := eq_zero_of_toReal_rel hind (r := fun i => (g 0 : ℝ) * c i + g i.succ) (s := 0) (by
-      ext x y
-      have h1 := LinearMap.congr_fun₂ hc x y
-      have h2 := LinearMap.congr_fun₂ (congrArg Subtype.val hg) x y
-      simp only [toReal_apply, LinearMap.sum_apply, LinearMap.smul_apply, Submodule.coe_add, Submodule.coe_smul,
-        Submodule.coe_sum, LinearMap.add_apply, smul_eq_mul, ZeroMemClass.coe_zero, LinearMap.zero_apply] at h1 h2 ⊢
-      simp only [Fin.sum_univ_zero]
-      have h3 : ((g 0 * (β : LinearMap.BilinForm ℤ X) x y + ∑ i, g i.succ * (δ i : LinearMap.BilinForm ℤ X) x y : ℤ) : ℝ) = 0 := by
-        exact_mod_cast h2
-      push_cast at h3
-      rw [h1] at h3
-      rw [Finset.mul_sum, ← Finset.sum_add_distrib] at h3
-      rw [← h3]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      ring)
+  · have hr :=
+      eq_zero_of_toReal_rel hind (r := fun i => (g 0 : ℝ) * c i + g i.succ) (s := 0) (by
+        ext x y
+        have h1 := LinearMap.congr_fun₂ hc x y
+        have h2 := LinearMap.congr_fun₂ (congrArg Subtype.val hg) x y
+        simp only [toReal_apply, LinearMap.sum_apply, LinearMap.smul_apply, Submodule.coe_add,
+            Submodule.coe_smul, Submodule.coe_sum, LinearMap.add_apply, smul_eq_mul,
+            ZeroMemClass.coe_zero, LinearMap.zero_apply]
+          at h1 h2 ⊢
+        simp only [Fin.sum_univ_zero]
+        have h3
+            : ((g 0 * (β : LinearMap.BilinForm ℤ X) x y
+                    + ∑ i, g i.succ * (δ i : LinearMap.BilinForm ℤ X) x y
+                  : ℤ)
+                : ℝ)
+              = 0 := by
+          exact_mod_cast h2
+        push_cast at h3
+        rw [h1] at h3
+        rw [Finset.mul_sum, ← Finset.sum_add_distrib] at h3
+        rw [← h3]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        ring)
     intro i
     have := congrFun hr i
     simp only [Pi.zero_apply] at this
     push_cast
     linear_combination (g 0 : ℝ) * this
 
-theorem cellMult_cons_eq : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [AddCommGroup X] [Module O X] {m p : ℕ}
-    (δ : Fin m → balForms bar X) (β : balForms bar X) (c : Fin m → ℝ) (j : Fin m) (e : Fin p ↪ Fin m),
-    LinearIndependent ℤ δ → toReal (β : LinearMap.BilinForm ℤ X) = ∑ i, c i • toReal (δ i : LinearMap.BilinForm ℤ X) →
-    0 < c j → (∀ i, i ∈ Set.range e ↔ i ≠ j) → 0 < cellMult bar δ →
-    (cellMult bar (Fin.cons β (fun k => δ (e k)) : Fin (p + 1) → balForms bar X) : ℝ) = c j * cellMult bar δ := by
+theorem cellMult_cons_eq
+    : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [AddCommGroup X] [Module O X] {m p : ℕ}
+        (δ : Fin m → balForms bar X) (β : balForms bar X) (c : Fin m → ℝ) (j : Fin m)
+        (e : Fin p ↪ Fin m),
+      LinearIndependent ℤ δ
+        → toReal (β : LinearMap.BilinForm ℤ X) = ∑ i, c i • toReal (δ i : LinearMap.BilinForm ℤ X)
+        → 0 < c j → (∀ i, i ∈ Set.range e ↔ i ≠ j) → 0 < cellMult bar δ
+        → (cellMult bar (Fin.cons β (fun k => δ (e k)) : Fin (p + 1) → balForms bar X) : ℝ)
+          = c j * cellMult bar δ := by
   intro O _ bar X _ _ m p δ β c j e hli hc hcj he _
   obtain ⟨k, a, hk, hrel, hca⟩ := exists_int_rel δ β c hli hc
 
@@ -280,9 +322,12 @@ theorem cellMult_cons_eq : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type
     refine Fin.cases ?_ (fun l => ?_) r
     · simp [hσ0]
     · simp [hσs]
-  have hli' : LinearIndependent ℤ (Fin.cons (δ j) (fun k => δ (e k)) : Fin (p + 1) → balForms bar X) := by
+  have hli'
+      : LinearIndependent ℤ (Fin.cons (δ j) (fun k => δ (e k)) : Fin (p + 1) → balForms bar X) := by
     rw [hσ]; exact hli.comp σ σ.injective
-  have hrange : Set.range (Fin.cons (δ j) (fun k => δ (e k)) : Fin (p + 1) → balForms bar X) = Set.range δ := by
+  have hrange
+      : Set.range (Fin.cons (δ j) (fun k => δ (e k)) : Fin (p + 1) → balForms bar X)
+        = Set.range δ := by
     rw [hσ]; exact EquivLike.range_comp δ σ
   have hsum : ∀ f : Fin m → balForms bar X, ∑ i, f i = f j + ∑ l, f (e l) := fun f => by
     rw [← σ.sum_comp, Fin.sum_univ_succ, hσ0]
@@ -293,10 +338,13 @@ theorem cellMult_cons_eq : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type
     intro h0
     rw [h0, Int.cast_zero] at haj
     exact (mul_ne_zero (by exact_mod_cast hk) hcj.ne') haj.symm
-  have key := card_torsion_cons_mul (δ j) β (fun l => δ (e l)) k (a j) (fun l => a (e l)) hk haj0 hli' hrel'
+  have key :=
+    card_torsion_cons_mul (δ j) β (fun l => δ (e l)) k (a j) (fun l => a (e l)) hk haj0 hli' hrel'
   rw [hrange] at key
-  have key' : (k.natAbs : ℝ) * (cellMult bar (Fin.cons β (fun k => δ (e k)) : Fin (p + 1) → balForms bar X) : ℝ) =
-      ((a j).natAbs : ℝ) * (cellMult bar δ : ℝ) := by
+  have key'
+      : (k.natAbs : ℝ)
+          * (cellMult bar (Fin.cons β (fun k => δ (e k)) : Fin (p + 1) → balForms bar X) : ℝ)
+        = ((a j).natAbs : ℝ) * (cellMult bar δ : ℝ) := by
     unfold cellMult; exact_mod_cast key
   have hkabs : ((k.natAbs : ℕ) : ℝ) = |(k : ℝ)| := by rw [Nat.cast_natAbs, Int.cast_abs]
   have haabs : (((a j).natAbs : ℕ) : ℝ) = |(k : ℝ)| * c j := by

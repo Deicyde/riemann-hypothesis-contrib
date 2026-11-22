@@ -13,7 +13,8 @@ namespace Formalism.FourierDecayAlt.P.B3
 
 open Formalism.FourierDecayAlt.B
 
-def pl (a b k x : ℝ) : ℝ := Real.smoothTransition (k * (x - a)) * Real.smoothTransition (k * (b - x))
+def pl (a b k x : ℝ) : ℝ :=
+  Real.smoothTransition (k * (x - a)) * Real.smoothTransition (k * (b - x))
 
 lemma pl_nonneg (a b k x : ℝ) : 0 ≤ pl a b k x := by
   unfold pl
@@ -100,8 +101,9 @@ lemma test_prod_measurable {w₁ w₂ : ℝ → ℝ} (h₁ : IsTest w₁) (h₂ 
     (h₂.1.continuous.measurable.comp measurable_snd))
 
 def FinT (f : ℝ × ℝ → ℝ≥0∞) : Prop :=
-  ∀ w₁ w₂ : ℝ → ℝ, IsTest w₁ → IsTest w₂ → (∀ x, 0 ≤ w₁ x) → (∀ x, 0 ≤ w₂ x) →
-    (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * f τ ∂(volume.restrict Quad)) ≠ ∞
+  ∀ w₁ w₂ : ℝ → ℝ,
+    IsTest w₁ → IsTest w₂ → (∀ x, 0 ≤ w₁ x) → (∀ x, 0 ≤ w₂ x)
+      → (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * f τ ∂(volume.restrict Quad)) ≠ ∞
 
 lemma box_bound (f : ℝ × ℝ → ℝ≥0∞) {a₁ b₁ a₂ b₂ : ℝ} (h₁ : 0 < a₁) (h₂ : 0 < a₂) (τ : ℝ × ℝ) :
     (Ioo a₁ b₁ ×ˢ Ioo a₂ b₂).indicator f τ ≤
@@ -283,22 +285,28 @@ theorem ae_equality_from_test_functions : Formalism.FourierDecayAlt.B.AeFromTest
   intro b c hb hc H
   have hre : ContinuousOn (fun τ => (c τ).re) Quad := Complex.continuous_re.comp_continuousOn hc
   have him : ContinuousOn (fun τ => (c τ).im) Quad := Complex.continuous_im.comp_continuousOn hc
-  have mO : ∀ h : ℝ × ℝ → ℝ, ContinuousOn h Quad →
-      AEMeasurable (fun τ => ENNReal.ofReal (h τ)) (volume.restrict Quad) := fun h hh =>
-    (hh.aemeasurable measurableSet_Quad).ennreal_ofReal
+  have mO
+      : ∀ h : ℝ × ℝ → ℝ,
+        ContinuousOn h Quad → AEMeasurable (fun τ => ENNReal.ofReal (h τ)) (volume.restrict Quad) :=
+    fun h hh => (hh.aemeasurable measurableSet_Quad).ennreal_ofReal
 
-  have R : ∀ w₁ w₂ : ℝ → ℝ, IsTest w₁ → IsTest w₂ → (∀ x, 0 ≤ w₁ x) → (∀ x, 0 ≤ w₂ x) →
-      (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * b τ ∂(volume.restrict Quad)) ≠ ∞ ∧
-      (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * b τ ∂(volume.restrict Quad)).toReal =
-        (∫ τ, w₁ τ.1 * w₂ τ.2 * (c τ).re ∂(volume.restrict Quad)) ∧
-      (0 : ℝ) = ∫ τ, w₁ τ.1 * w₂ τ.2 * (c τ).im ∂(volume.restrict Quad) := by
+  have R
+      : ∀ w₁ w₂ : ℝ → ℝ,
+        IsTest w₁ → IsTest w₂ → (∀ x, 0 ≤ w₁ x) → (∀ x, 0 ≤ w₂ x)
+          → (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * b τ ∂(volume.restrict Quad)) ≠ ∞
+            ∧ (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * b τ ∂(volume.restrict Quad)).toReal
+              = (∫ τ, w₁ τ.1 * w₂ τ.2 * (c τ).re ∂(volume.restrict Quad))
+            ∧ (0 : ℝ) = ∫ τ, w₁ τ.1 * w₂ τ.2 * (c τ).im ∂(volume.restrict Quad) := by
     intro w₁ w₂ h₁ h₂ p₁ p₂
     obtain ⟨hfin, heq⟩ := H w₁ w₂ h₁ h₂ p₁ p₂
     rw [lintegral_test_restrict h₁ h₂ b] at hfin heq
-    have hint : Integrable (fun τ : ℝ × ℝ => ((w₁ τ.1 * w₂ τ.2 : ℝ) : ℂ) * c τ) (volume.restrict Quad) := by
+    have hint : Integrable
+        (fun τ : ℝ × ℝ => ((w₁ τ.1 * w₂ τ.2 : ℝ) : ℂ) * c τ)
+        (volume.restrict Quad) := by
       simpa only [Complex.real_smul] using integrable_test h₁ h₂ hc
-    have hres : (∫ τ : ℝ × ℝ, ((w₁ τ.1 * w₂ τ.2 : ℝ) : ℂ) * c τ) =
-        ∫ τ, ((w₁ τ.1 * w₂ τ.2 : ℝ) : ℂ) * c τ ∂(volume.restrict Quad) := by
+    have hres
+        : (∫ τ : ℝ × ℝ, ((w₁ τ.1 * w₂ τ.2 : ℝ) : ℂ) * c τ)
+          = ∫ τ, ((w₁ τ.1 * w₂ τ.2 : ℝ) : ℂ) * c τ ∂(volume.restrict Quad) := by
       refine (setIntegral_eq_integral_of_forall_compl_eq_zero fun τ hτ => ?_).symm
       rw [test_prod_zero h₁ h₂ hτ]
       simp
@@ -315,33 +323,41 @@ theorem ae_equality_from_test_functions : Formalism.FourierDecayAlt.B.AeFromTest
       refine integral_congr_ae (Eventually.of_forall fun τ => ?_)
       simp only [Complex.imCLM_apply, Complex.im_ofReal_mul]
 
-  have split : ∀ w₁ w₂ : ℝ → ℝ, IsTest w₁ → IsTest w₂ → (∀ x, 0 ≤ w₁ x) → (∀ x, 0 ≤ w₂ x) →
-      (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * (b τ + ENNReal.ofReal (max (-(c τ).re) 0))
-        ∂(volume.restrict Quad)) =
-        ENNReal.ofReal (∫ τ, w₁ τ.1 * w₂ τ.2 * max (c τ).re 0 ∂(volume.restrict Quad)) := by
+  have split
+      : ∀ w₁ w₂ : ℝ → ℝ,
+        IsTest w₁ → IsTest w₂ → (∀ x, 0 ≤ w₁ x) → (∀ x, 0 ≤ w₂ x)
+          → (∫⁻ τ, ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * (b τ + ENNReal.ofReal (max (-(c τ).re) 0))
+              ∂(volume.restrict Quad))
+            = ENNReal.ofReal (∫ τ, w₁ τ.1 * w₂ τ.2 * max (c τ).re 0 ∂(volume.restrict Quad)) := by
     intro w₁ w₂ h₁ h₂ p₁ p₂
     obtain ⟨hfin, h1, -⟩ := R w₁ w₂ h₁ h₂ p₁ p₂
-    have hm : AEMeasurable (fun τ : ℝ × ℝ => ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * b τ) (volume.restrict Quad) :=
+    have hm : AEMeasurable
+        (fun τ : ℝ × ℝ => ENNReal.ofReal (w₁ τ.1 * w₂ τ.2) * b τ)
+        (volume.restrict Quad) :=
       (test_prod_measurable h₁ h₂).aemeasurable.mul hb
     simp only [mul_add]
     rw [lintegral_add_left' hm,
       lintegral_test_cont h₁ h₂ p₁ p₂ (contOn_neg hre) (fun τ => le_max_right _ _),
-      ← ENNReal.ofReal_toReal hfin, ← ENNReal.ofReal_add ENNReal.toReal_nonneg
+      ← ENNReal.ofReal_toReal hfin,
+      ← ENNReal.ofReal_add ENNReal.toReal_nonneg
         (integral_nonneg fun τ => mul_nonneg (mul_nonneg (p₁ _) (p₂ _)) (le_max_right _ _)),
       h1, integral_test_parts h₁ h₂ hre]
     congr 1
     ring
-  have A : (fun τ => b τ + ENNReal.ofReal (max (-(c τ).re) 0)) =ᵐ[volume.restrict Quad]
-      fun τ => ENNReal.ofReal (max (c τ).re 0) := by
+  have A
+      : (fun τ => b τ + ENNReal.ofReal (max (-(c τ).re) 0)) =ᵐ[volume.restrict Quad]
+        fun τ => ENNReal.ofReal (max (c τ).re 0) := by
     refine ae_eq_of_tests (hb.add (mO _ (contOn_neg hre))) (mO _ (contOn_pos hre)) ?_ ?_
     · intro w₁ w₂ h₁ h₂ p₁ p₂
       rw [split w₁ w₂ h₁ h₂ p₁ p₂]
       exact ENNReal.ofReal_ne_top
     · intro w₁ w₂ h₁ h₂ p₁ p₂
-      rw [split w₁ w₂ h₁ h₂ p₁ p₂, lintegral_test_cont h₁ h₂ p₁ p₂ (contOn_pos hre) (fun τ => le_max_right _ _)]
+      rw [split w₁ w₂ h₁ h₂ p₁ p₂,
+        lintegral_test_cont h₁ h₂ p₁ p₂ (contOn_pos hre) (fun τ => le_max_right _ _)]
 
-  have B : (fun τ => ENNReal.ofReal (max (c τ).im 0)) =ᵐ[volume.restrict Quad]
-      fun τ => ENNReal.ofReal (max (-(c τ).im) 0) := by
+  have B
+      : (fun τ => ENNReal.ofReal (max (c τ).im 0)) =ᵐ[volume.restrict Quad]
+        fun τ => ENNReal.ofReal (max (-(c τ).im) 0) := by
     refine ae_eq_of_tests (mO _ (contOn_pos him)) (mO _ (contOn_neg him)) ?_ ?_
     · intro w₁ w₂ h₁ h₂ p₁ p₂
       rw [lintegral_test_cont h₁ h₂ p₁ p₂ (contOn_pos him) (fun τ => le_max_right _ _)]
@@ -361,7 +377,8 @@ theorem ae_equality_from_test_functions : Formalism.FourierDecayAlt.B.AeFromTest
   have h1 : (b τ).toReal + max (-(c τ).re) 0 = max (c τ).re 0 := by
     have := congrArg ENNReal.toReal hA
     rwa [ENNReal.toReal_add hbt ENNReal.ofReal_ne_top, ENNReal.toReal_ofReal (le_max_right _ _),
-      ENNReal.toReal_ofReal (le_max_right _ _)] at this
+        ENNReal.toReal_ofReal (le_max_right _ _)]
+      at this
   have h2 : max (c τ).im 0 = max (-(c τ).im) 0 :=
     (ENNReal.ofReal_eq_ofReal_iff (le_max_right _ _) (le_max_right _ _)).mp hB
   have e1 := max_zero_sub_max_neg_zero_eq_self (c τ).re

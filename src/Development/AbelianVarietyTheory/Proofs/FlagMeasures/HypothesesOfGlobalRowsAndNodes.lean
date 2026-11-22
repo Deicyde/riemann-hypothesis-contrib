@@ -15,26 +15,44 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Global
 
 namespace GlobalTheory.Diag.PG
 
-theorem standingHypotheses_of_glob0_nodes_Tr_bounds : ∀ eps CD : ℝ, 0 < eps → eps < 1 / 52 → 3 ≤ CD → ∀ C' Cl Cg : ℝ, 0 < Cl → Cl ≤ CD →
-    ∃ x0 : ℝ, ∀ x, x0 ≤ x → ∀ (D : D7) (large₂ : SizeData₂ D) (cT CT : ℝ), large₂.sc.L = x ^ eps → 8 * large₂.CGam ≤ C' →
-      Glob0 D x eps CD Cg → Nodes D x eps →
-      (∀ u, large₂.sc.b ^ (cT * (D.R.m : ℝ)) ≤ Tr D u ∧ Tr D u ≤ large₂.sc.b ^ (CT * (D.R.m : ℝ))) →
-      StandingHypotheses D large₂ C' Cl Cg (1 / 4) 3 cT CT := by
+theorem standingHypotheses_of_glob0_nodes_Tr_bounds
+    : ∀ eps CD : ℝ,
+      0 < eps → eps < 1 / 52 → 3 ≤ CD
+        → ∀ C' Cl Cg : ℝ,
+          0 < Cl → Cl ≤ CD
+            → ∃ x0 : ℝ, ∀ x,
+              x0 ≤ x
+                → ∀ (D : D7) (large₂ : SizeData₂ D) (cT CT : ℝ),
+                  large₂.sc.L = x ^ eps → 8 * large₂.CGam ≤ C' → Glob0 D x eps CD Cg → Nodes D x eps
+                    → (∀ u,
+                      large₂.sc.b ^ (cT * (D.R.m : ℝ)) ≤ Tr D u
+                        ∧ Tr D u ≤ large₂.sc.b ^ (CT * (D.R.m : ℝ)))
+                    → StandingHypotheses D large₂ C' Cl Cg (1 / 4) 3 cT CT := by
   intro eps CD he he52 hCD C' Cl Cg hCl hClD
-  obtain ⟨x1, h1⟩ := GlobalTheory.T.eventually_rankNums_imp_parameter_lower_bounds eps CD he he52 hCD C'
-  obtain ⟨x2, h2⟩ := GlobalTheory.T.eventually_rankNums_imp_parameter_lower_bounds eps CD he he52 hCD Cl
-  obtain ⟨x3, h3⟩ := GlobalTheory.T.globalRankNumberBounds_rootDiscriminant_clauses eps CD he he52 hCD Cl hCl
-  obtain ⟨x4, h4⟩ := GlobalTheory.T.globalRankNumberBounds_size_comparisons eps CD he he52 hCD Cl hCl
+  obtain ⟨x1, h1⟩ :=
+    GlobalTheory.T.eventually_rankNums_imp_parameter_lower_bounds eps CD he he52 hCD C'
+  obtain ⟨x2, h2⟩ :=
+    GlobalTheory.T.eventually_rankNums_imp_parameter_lower_bounds eps CD he he52 hCD Cl
+  obtain ⟨x3, h3⟩ :=
+    GlobalTheory.T.globalRankNumberBounds_rootDiscriminant_clauses eps CD he he52 hCD Cl hCl
+  obtain ⟨x4, h4⟩ :=
+    GlobalTheory.T.globalRankNumberBounds_size_comparisons eps CD he he52 hCD Cl hCl
   obtain ⟨x5, h5⟩ := GlobalTheory.T.globalRankNumberBounds_gaps_exceed eps CD he he52 hCD Cl hCl
   refine ⟨max x1 (max x2 (max x3 (max x4 x5))), fun x hx D large₂ cT CT hL h8 G N hT => ?_⟩
   have hx1 : x1 ≤ x := le_trans (le_max_left _ _) hx
   have hx2 : x2 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hx
   have hx3 : x3 ≤ x :=
     le_trans (le_trans (le_max_left _ _) (le_trans (le_max_right _ _) (le_max_right _ _))) hx
-  have hx4 : x4 ≤ x := le_trans (le_trans (le_max_left _ _)
-    (le_trans (le_max_right _ _) (le_trans (le_max_right _ _) (le_max_right _ _)))) hx
-  have hx5 : x5 ≤ x := le_trans (le_trans (le_max_right _ _)
-    (le_trans (le_max_right _ _) (le_trans (le_max_right _ _) (le_max_right _ _)))) hx
+  have hx4 : x4 ≤ x :=
+    le_trans
+      (le_trans (le_max_left _ _)
+        (le_trans (le_max_right _ _) (le_trans (le_max_right _ _) (le_max_right _ _))))
+      hx
+  have hx5 : x5 ≤ x :=
+    le_trans
+      (le_trans (le_max_right _ _)
+        (le_trans (le_max_right _ _) (le_trans (le_max_right _ _) (le_max_right _ _))))
+      hx
   have R := G.nums
   obtain ⟨a1, -, -, -, -, -, -, -⟩ := h1 x hx1 _ _ _ _ _ R
   obtain ⟨-, a2, a3, a4, a5, -, -, -⟩ := h2 x hx2 _ _ _ _ _ R
@@ -49,7 +67,9 @@ theorem standingHypotheses_of_glob0_nodes_Tr_bounds : ∀ eps CD : ℝ, 0 < eps 
     rw [hL]
   have hrd := G.rd_lo
   have hv : D.host.v = D.host.rdE / 2 := rfl
-  have hbj : ∀ τ j, 1 ≤ j → j ≤ D.R.m → Real.sqrt (bx x eps) ≤ bOne D τ j ∧ bOne D τ j ≤ bx x eps ^ 2 := by
+  have hbj
+      : ∀ τ j,
+        1 ≤ j → j ≤ D.R.m → Real.sqrt (bx x eps) ≤ bOne D τ j ∧ bOne D τ j ≤ bx x eps ^ 2 := by
     intro τ j h1 h2
     obtain ⟨j, rfl⟩ : ∃ j', j = j' + 1 := ⟨j - 1, by omega⟩
     rw [bOne_succ τ j (by omega)]
@@ -64,8 +84,33 @@ theorem standingHypotheses_of_glob0_nodes_Tr_bounds : ∀ eps CD : ℝ, 0 < eps 
   unfold StandingHypotheses
   dsimp only
   rw [hb, hL]
-  refine ⟨h8, a1, by exact_mod_cast R.mf, by exact_mod_cast R.fk, by rw [hrS]; exact a2, a3, a4, ?_, ?_, c2, c3,
-    (G.g_win 0).1, (G.g_win 0).2, (G.g_win 1).1, (G.g_win 1).2, ?_, ?_, ?_, ?_, d7 hClD, ?_, ?_, hT, a5, hCl⟩
+  refine ⟨
+    h8,
+    a1,
+    by exact_mod_cast R.mf,
+    by exact_mod_cast R.fk,
+    by rw [hrS]; exact a2,
+    a3,
+    a4,
+    ?_,
+    ?_,
+    c2,
+    c3,
+    (G.g_win 0).1,
+    (G.g_win 0).2,
+    (G.g_win 1).1,
+    (G.g_win 1).2,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    d7 hClD,
+    ?_,
+    ?_,
+    hT,
+    a5,
+    hCl
+  ⟩
   · intro τ j h1 h2
     exact le_trans d2 (hbj τ j h1 h2).1
   · rw [hv, Real.log_div (by linarith) (by norm_num)]
@@ -120,7 +165,8 @@ theorem standingHypotheses_of_glob0_nodes_Tr_bounds : ∀ eps CD : ℝ, 0 < eps 
         rw [lamS_hi τ i c2, lamS_hi τ ⟨i.1 + 1, h⟩ c1]
         have e2 : i.1 + 1 - (D.R.k - 1) + 1 = (i.1 - (D.R.k - 1) + 1) + 1 := by omega
         simp only [e2]
-        rw [bOne_succ τ (i.1 - (D.R.k - 1)) (by omega), bOne_succ τ (i.1 - (D.R.k - 1) + 1) (by omega)]
+        rw [bOne_succ τ (i.1 - (D.R.k - 1)) (by omega),
+          bOne_succ τ (i.1 - (D.R.k - 1) + 1) (by omega)]
         have g := G.gap τ (i.1 - (D.R.k - 1)) (by omega)
         push_cast at g
         linarith [e.2.2.1]

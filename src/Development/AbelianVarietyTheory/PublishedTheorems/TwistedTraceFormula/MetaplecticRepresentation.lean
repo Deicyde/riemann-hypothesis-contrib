@@ -30,14 +30,18 @@ theorem hasTemperateGrowth_eChar : Function.HasTemperateGrowth (eChar : ℝ → 
     intro x
     have h := (((hasDerivAt_id x).ofReal_comp).const_mul (2 * π : ℂ)).mul_const I
     simpa using h
-  have hd : ∀ c : ℂ, deriv (fun x : ℝ => c * cexp (2 * π * x * I)) =
-      fun x : ℝ => c * (2 * π * I) * cexp (2 * π * x * I) := by
+  have hd
+      : ∀ c : ℂ,
+        deriv (fun x : ℝ => c * cexp (2 * π * x * I))
+          = fun x : ℝ => c * (2 * π * I) * cexp (2 * π * x * I) := by
     intro c
     funext x
     rw [((hlin x).cexp.const_mul c).deriv]
     ring
-  have hit : ∀ n : ℕ, iteratedDeriv n (fun x : ℝ => cexp (2 * π * x * I)) =
-      fun x : ℝ => (2 * π * I) ^ n * cexp (2 * π * x * I) := by
+  have hit
+      : ∀ n : ℕ,
+        iteratedDeriv n (fun x : ℝ => cexp (2 * π * x * I))
+          = fun x : ℝ => (2 * π * I) ^ n * cexp (2 * π * x * I) := by
     intro n
     induction n with
     | zero => funext x; simp
@@ -54,8 +58,8 @@ theorem hasTemperateGrowth_eChar : Function.HasTemperateGrowth (eChar : ℝ → 
     simp [abs_of_pos Real.pi_pos]
 
 def rho (w : (ι → ℝ) × (ι → ℝ)) : 𝓢(ι → ℝ, ℂ) →L[ℂ] 𝓢(ι → ℝ, ℂ) :=
-  SchwartzMap.smulLeftCLM ℂ (fun x => eChar (x ⬝ᵥ w.2 + ⅟(2 : ℝ) * (w.1 ⬝ᵥ w.2))) ∘L
-    SchwartzMap.compSubConstCLM ℂ (-w.1)
+  SchwartzMap.smulLeftCLM ℂ (fun x => eChar (x ⬝ᵥ w.2 + ⅟(2 : ℝ) * (w.1 ⬝ᵥ w.2)))
+    ∘L SchwartzMap.compSubConstCLM ℂ (-w.1)
 
 private lemma hasTemperateGrowth_eChar_dotProduct_phase (w : (ι → ℝ) × (ι → ℝ)) :
     (fun x : ι → ℝ => eChar (x ⬝ᵥ w.2 + ⅟(2 : ℝ) * (w.1 ⬝ᵥ w.2))).HasTemperateGrowth := by
@@ -67,14 +71,16 @@ private lemma hasTemperateGrowth_eChar_dotProduct_phase (w : (ι → ℝ) × (ι
         (Function.HasTemperateGrowth.const _)
   exact hasTemperateGrowth_eChar.comp (hl.add (Function.HasTemperateGrowth.const _))
 
-theorem coe_rho (w : (ι → ℝ) × (ι → ℝ)) (φ : 𝓢(ι → ℝ, ℂ)) : ⇑(rho w φ) = GlobalTheory.WeilM.schr eChar w φ := by
+theorem coe_rho (w : (ι → ℝ) × (ι → ℝ)) (φ : 𝓢(ι → ℝ, ℂ))
+    : ⇑(rho w φ) = GlobalTheory.WeilM.schr eChar w φ := by
   funext x
   simp only [rho, ContinuousLinearMap.comp_apply]
-  rw [SchwartzMap.smulLeftCLM_apply_apply (hasTemperateGrowth_eChar_dotProduct_phase w), SchwartzMap.compSubConstCLM_apply]
+  rw [SchwartzMap.smulLeftCLM_apply_apply (hasTemperateGrowth_eChar_dotProduct_phase w),
+    SchwartzMap.compSubConstCLM_apply]
   simp [GlobalTheory.WeilM.schr]
 
-theorem rho_apply (p q : ι → ℝ) (φ : 𝓢(ι → ℝ, ℂ)) (x : ι → ℝ) :
-    rho (p, q) φ x = cexp (2 * π * ((x ⬝ᵥ q + p ⬝ᵥ q / 2 : ℝ) : ℂ) * I) * φ (x + p) := by
+theorem rho_apply (p q : ι → ℝ) (φ : 𝓢(ι → ℝ, ℂ)) (x : ι → ℝ)
+    : rho (p, q) φ x = cexp (2 * π * ((x ⬝ᵥ q + p ⬝ᵥ q / 2 : ℝ) : ℂ) * I) * φ (x + p) := by
   rw [coe_rho]
   simp only [GlobalTheory.WeilM.schr, eChar_apply, invOf_eq_inv]
   congr 2
@@ -85,7 +91,9 @@ def act (g : Matrix (ι ⊕ ι) (ι ⊕ ι) ℝ) (w : (ι → ℝ) × (ι → �
   ((g *ᵥ Sum.elim w.1 w.2) ∘ Sum.inl, (g *ᵥ Sum.elim w.1 w.2) ∘ Sum.inr)
 
 def holPart (g : Matrix (ι ⊕ ι) (ι ⊕ ι) ℝ) : Matrix ι ι ℂ := fun i j =>
-  ((g (.inl i) (.inl j) + g (.inr i) (.inr j) : ℝ) + I * (g (.inr i) (.inl j) - g (.inl i) (.inr j) : ℝ)) / 2
+  ((g (.inl i) (.inl j) + g (.inr i) (.inr j) : ℝ)
+      + I * (g (.inr i) (.inl j) - g (.inl i) (.inr j) : ℝ))
+    / 2
 
 end Metaplectic
 
@@ -94,18 +102,20 @@ open Metaplectic
 def MetaplecticRepresentation : Prop :=
   ∀ (ι : Type) [Fintype ι] [DecidableEq ι],
     ∃ (G : Type) (_ : Group G) (_ : TopologicalSpace G) (_ : IsTopologicalGroup G)
-      (pr : G →* symplecticGroup ι ℝ)
-      (Ω : G →* (Lp ℂ 2 (volume : Measure (ι → ℝ)) →L[ℂ] Lp ℂ 2 (volume : Measure (ι → ℝ))))
-      (ω : G →* (𝓢(ι → ℝ, ℂ) →L[ℂ] 𝓢(ι → ℝ, ℂ))) (φ₀ : 𝓢(ι → ℝ, ℂ)),
-      Function.Surjective pr ∧ IsCoveringMap pr ∧ Nat.card pr.ker = 2 ∧
-      (∀ g f, ‖Ω g f‖ = ‖f‖) ∧ (∀ f, Continuous fun g => Ω g f) ∧
-      (∀ g (φ : 𝓢(ι → ℝ, ℂ)), Ω g (φ.toLp 2) = (ω g φ).toLp 2) ∧
-      (Continuous fun x : G × 𝓢(ι → ℝ, ℂ) => ω x.1 x.2) ∧
-      (∀ g w φ, ω g (rho w φ) = rho (act (pr g).1 w) (ω g φ)) ∧
-      (∀ g, pr g = 1 → g ≠ 1 → ∀ φ, ω g φ = -φ) ∧
-      (∀ x, φ₀ x = cexp (-π * ((x ⬝ᵥ x : ℝ) : ℂ))) ∧
-      (∀ g, (∫ x, ω g φ₀ x * conj (φ₀ x)) ^ 2 * (holPart (pr g).1).det = (∫ x, φ₀ x * conj (φ₀ x)) ^ 2) ∧
-      (∀ g, (pr g).1ᵀ * (pr g).1 = 1 → ∃ c : ℂ, c ^ 2 * (holPart (pr g).1).det = 1 ∧ ω g φ₀ = c • φ₀)
+        (pr : G →* symplecticGroup ι ℝ)
+        (Ω : G →* (Lp ℂ 2 (volume : Measure (ι → ℝ)) →L[ℂ] Lp ℂ 2 (volume : Measure (ι → ℝ))))
+        (ω : G →* (𝓢(ι → ℝ, ℂ) →L[ℂ] 𝓢(ι → ℝ, ℂ))) (φ₀ : 𝓢(ι → ℝ, ℂ)),
+      Function.Surjective pr ∧ IsCoveringMap pr ∧ Nat.card pr.ker = 2 ∧ (∀ g f, ‖Ω g f‖ = ‖f‖)
+        ∧ (∀ f, Continuous fun g => Ω g f)
+        ∧ (∀ g (φ : 𝓢(ι → ℝ, ℂ)), Ω g (φ.toLp 2) = (ω g φ).toLp 2)
+        ∧ (Continuous fun x : G × 𝓢(ι → ℝ, ℂ) => ω x.1 x.2)
+        ∧ (∀ g w φ, ω g (rho w φ) = rho (act (pr g).1 w) (ω g φ))
+        ∧ (∀ g, pr g = 1 → g ≠ 1 → ∀ φ, ω g φ = -φ) ∧ (∀ x, φ₀ x = cexp (-π * ((x ⬝ᵥ x : ℝ) : ℂ)))
+        ∧ (∀ g,
+          (∫ x, ω g φ₀ x * conj (φ₀ x)) ^ 2 * (holPart (pr g).1).det
+            = (∫ x, φ₀ x * conj (φ₀ x)) ^ 2)
+        ∧ (∀ g,
+          (pr g).1ᵀ * (pr g).1 = 1 → ∃ c : ℂ, c ^ 2 * (holPart (pr g).1).det = 1 ∧ ω g φ₀ = c • φ₀)
 
 end GlobalTheory.Published
 

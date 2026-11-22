@@ -13,8 +13,9 @@ namespace PrimeCountingLemmas
 noncomputable def S (N : ℕ) : ℝ :=
   ∑ p ∈ (Finset.range (N + 1)).filter (fun p => p.Prime ∧ N < 2 * p ∧ p + 3 ≤ N), (1 : ℝ) / p
 
-theorem prime_of_gcd {r p : ℕ} (h1 : r < p) (h2 : p < (r + 1) * (r + 1))
-    (h3 : Nat.gcd p (r.factorial) = 1) : p.Prime := by
+theorem prime_of_gcd
+    {r p : ℕ} (h1 : r < p) (h2 : p < (r + 1) * (r + 1)) (h3 : Nat.gcd p (r.factorial) = 1)
+    : p.Prime := by
   have hp2 : 2 ≤ p := by
     rcases Nat.lt_or_ge r 1 with hr | hr
     · nlinarith
@@ -33,11 +34,11 @@ theorem prime_of_gcd {r p : ℕ} (h1 : r < p) (h2 : p < (r + 1) * (r + 1))
   nlinarith
 
 def test (F r a b p : ℕ) : Bool :=
-  Nat.ble (p + 3) a && Nat.blt b (2 * p) && Nat.blt r p && Nat.blt p ((r + 1) * (r + 1)) &&
-    Nat.beq (Nat.gcd p F) 1
+  Nat.ble (p + 3) a && Nat.blt b (2 * p) && Nat.blt r p && Nat.blt p ((r + 1) * (r + 1))
+    && Nat.beq (Nat.gcd p F) 1
 
-theorem test_spec {F r a b p : ℕ} (hF : F = r.factorial) (h : test F r a b p = true) :
-    p.Prime ∧ b < 2 * p ∧ p + 3 ≤ a := by
+theorem test_spec {F r a b p : ℕ} (hF : F = r.factorial) (h : test F r a b p = true)
+    : p.Prime ∧ b < 2 * p ∧ p + 3 ≤ a := by
   simp only [test, Bool.and_eq_true, Nat.ble_eq, Nat.blt_eq, Nat.beq_eq] at h
   obtain ⟨⟨⟨⟨h1, h2⟩, h3⟩, h4⟩, h5⟩ := h
   exact ⟨prime_of_gcd h3 h4 (hF ▸ h5), h2, h1⟩
@@ -56,33 +57,32 @@ theorem bsum_eq (t : ℕ → ℕ) : ∀ k lo, bsum t k lo = ∑ p ∈ Finset.Ico
     simp [bsum]
   | succ k ih =>
     intro lo
-    rw [bsum, ih, ih, Finset.sum_Ico_consecutive _ (Nat.le_add_right _ _) (Nat.le_add_right _ _), pow_succ,
-      show lo + 2 ^ k + 2 ^ k = lo + 2 ^ k * 2 by ring]
+    rw [bsum, ih, ih, Finset.sum_Ico_consecutive _ (Nat.le_add_right _ _) (Nat.le_add_right _ _),
+      pow_succ, show lo + 2 ^ k + 2 ^ k = lo + 2 ^ k * 2 by ring]
 
-def chk (M F r a b : ℕ) : Bool :=
-  Nat.ble M (20 * bsum (term M F r a b) (Nat.log2 a) (b / 2))
+def chk (M F r a b : ℕ) : Bool := Nat.ble M (20 * bsum (term M F r a b) (Nat.log2 a) (b / 2))
 
-theorem chk_sound {M F r a b : ℕ} (hM : 0 < M) (hF : F = r.factorial)
-    (h : chk M F r a b = true) (N : ℕ)
-    (haN : a ≤ N) (hNb : N ≤ b) : (1 : ℝ) / 20 ≤ S N := by
+theorem chk_sound
+    {M F r a b : ℕ} (hM : 0 < M) (hF : F = r.factorial) (h : chk M F r a b = true)
+    (N : ℕ) (haN : a ≤ N) (hNb : N ≤ b)
+    : (1 : ℝ) / 20 ≤ S N := by
   simp only [chk, Nat.ble_eq] at h
   rw [bsum_eq] at h
   generalize Finset.Ico (b / 2) (b / 2 + 2 ^ Nat.log2 a) = I at h
   have hMr : (0 : ℝ) < M := by exact_mod_cast hM
-  have h1 : (M : ℝ) ≤ 20 * ∑ p ∈ I, (term M F r a b p : ℝ) := by
-    exact_mod_cast h
+  have h1 : (M : ℝ) ≤ 20 * ∑ p ∈ I, (term M F r a b p : ℝ) := by exact_mod_cast h
   have h2 : ∑ p ∈ I, (term M F r a b p : ℝ) ≤ M * S N := by
     unfold S
     rw [Finset.mul_sum]
-    have e : ∀ p, (term M F r a b p : ℝ) =
-        if test F r a b p = true then ((M / p : ℕ) : ℝ) else 0 := by
+    have e
+        : ∀ p, (term M F r a b p : ℝ) = if test F r a b p = true then ((M / p : ℕ) : ℝ) else 0 := by
       intro p; unfold term; cases test F r a b p <;> simp
     simp only [e]
     rw [← Finset.sum_filter]
     refine (Finset.sum_le_sum (fun p _ => (Nat.cast_div_le : ((M / p : ℕ) : ℝ) ≤ M / p))).trans ?_
     refine (Finset.sum_le_sum_of_subset_of_nonneg
-      (t := (Finset.range (N + 1)).filter (fun p => p.Prime ∧ N < 2 * p ∧ p + 3 ≤ N))
-      ?_ ?_).trans (le_of_eq ?_)
+        (t := (Finset.range (N + 1)).filter (fun p => p.Prime ∧ N < 2 * p ∧ p + 3 ≤ N)) ?_ ?_).trans
+      (le_of_eq ?_)
     · intro p hp
       obtain ⟨h3, h4, h5⟩ := test_spec hF (Finset.mem_filter.mp hp).2
       simp only [Finset.mem_filter, Finset.mem_range]
@@ -100,9 +100,8 @@ def ladder (M F r T : ℕ) : ℕ → ℕ → Bool
   | 0, a => Nat.ble T a
   | f + 1, a => Nat.ble T a || (chk M F r a (a + a / 10) && ladder M F r T f (a + a / 10 + 1))
 
-theorem ladder_sound {M F r T : ℕ} (hM : 0 < M) (hF : F = r.factorial) :
-    ∀ (f a : ℕ), ladder M F r T f a = true →
-    ∀ N, a ≤ N → N < T → (1 : ℝ) / 20 ≤ S N := by
+theorem ladder_sound {M F r T : ℕ} (hM : 0 < M) (hF : F = r.factorial)
+    : ∀ (f a : ℕ), ladder M F r T f a = true → ∀ N, a ≤ N → N < T → (1 : ℝ) / 20 ≤ S N := by
   intro f
   induction f with
   | zero =>
@@ -118,9 +117,13 @@ theorem ladder_sound {M F r T : ℕ} (hM : 0 < M) (hF : F = r.factorial) :
       · exact chk_sound hM hF h3 N h1 hN
       · exact ih _ h4 N (by omega) h2
 
-theorem factorial_ladder_thirteen : ladder 1000000000 (Nat.factorial 13) 13 196 60 100 = true := by decide +kernel
-theorem factorial_ladder_thirty_one : ladder 1000000000 (Nat.factorial 31) 31 1024 60 196 = true := by decide +kernel
-theorem factorial_ladder_one_forty_one : ladder 1000000000 (Nat.factorial 141) 141 20000 60 1024 = true := by
+theorem factorial_ladder_thirteen : ladder 1000000000 (Nat.factorial 13) 13 196 60 100 = true := by
+  decide +kernel
+theorem factorial_ladder_thirty_one
+    : ladder 1000000000 (Nat.factorial 31) 31 1024 60 196 = true := by
+  decide +kernel
+theorem factorial_ladder_one_forty_one
+    : ladder 1000000000 (Nat.factorial 141) 141 20000 60 1024 = true := by
   decide +kernel
 
 theorem S_small (N : ℕ) (h1 : 100 ≤ N) (h2 : N < 20000) : (1 : ℝ) / 20 ≤ S N := by
@@ -132,9 +135,10 @@ theorem S_small (N : ℕ) (h1 : 100 ≤ N) (h2 : N < 20000) : (1 : ℝ) / 20 ≤
 
 def upper (n : ℕ) : Finset ℕ := (Finset.range (2 * n + 1)).filter (fun p => p.Prime ∧ n < p)
 
-theorem centralBinom_le (n : ℕ) (n_large : 2 < n) :
-    centralBinom n ≤
-      ((2 * n) ^ (primeCounting (sqrt (2 * n))) * 4 ^ (2 * n / 3)) * (2 * n) ^ (upper n).card := by
+theorem centralBinom_le (n : ℕ) (n_large : 2 < n)
+    : centralBinom n
+      ≤ ((2 * n) ^ (primeCounting (sqrt (2 * n))) * 4 ^ (2 * n / 3))
+        * (2 * n) ^ (upper n).card := by
   have n_pos : 0 < n := (Nat.zero_le _).trans_lt n_large
   have n2_pos : 1 ≤ 2 * n := mul_pos (zero_lt_two' ℕ) n_pos
   let S0 := {p ∈ Finset.range (2 * n + 1) | Nat.Prime p}
@@ -143,7 +147,8 @@ theorem centralBinom_le (n : ℕ) (n_large : 2 < n) :
   have h0 : ∏ x ∈ S0, f x = centralBinom n := by
     rw [← n.prod_pow_factorization_centralBinom]
     refine Finset.prod_filter_of_ne fun p _ h => ?_
-    contrapose h; dsimp only [f]
+    contrapose h
+    dsimp only [f]
     rw [factorization_eq_zero_of_not_prime n.centralBinom h, _root_.pow_zero]
   rw [← h0, ← Finset.prod_filter_mul_prod_filter_not S0 (· ≤ 2 * n / 3)]
   apply mul_le_mul'
@@ -195,15 +200,15 @@ theorem primeCounting_le (s : ℕ) (hs : 6 ≤ s) : (primeCounting s : ℝ) ≤ 
   have t6 : totient 6 = 2 := by decide
   rw [h6, t6] at h
   have h2 : (((s - 6) / 6 : ℕ) : ℝ) ≤ ((s - 6 : ℕ) : ℝ) / 6 := Nat.cast_div_le
-  have h3 : ((s - 6 : ℕ) : ℝ) = (s : ℝ) - 6 := by
-    rw [Nat.cast_sub hs]; norm_num
+  have h3 : ((s - 6 : ℕ) : ℝ) = (s : ℝ) - 6 := by rw [Nat.cast_sub hs]; norm_num
   have h4 : (primeCounting s : ℝ) ≤ 3 + 2 * ((((s - 6) / 6 : ℕ) : ℝ) + 1) := by exact_mod_cast h
   rw [h3] at h2
   linarith
 
-theorem real_ineq {y l L k : ℝ} (hy : 141 ≤ y) (hl1 : 0.6931471803 < l) (hl2 : l < 0.6931471808)
-    (hL : L ≤ 2 * (7 * l + y / 128 - 1))
-    (h : y ^ 2 * l / 3 < (y / 3 + 4 + k) * L) : y ^ 2 + 1 ≤ 5 * (k - 3) * L := by
+theorem real_ineq
+    {y l L k : ℝ} (hy : 141 ≤ y) (hl1 : 0.6931471803 < l) (hl2 : l < 0.6931471808)
+    (hL : L ≤ 2 * (7 * l + y / 128 - 1)) (h : y ^ 2 * l / 3 < (y / 3 + 4 + k) * L)
+    : y ^ 2 + 1 ≤ 5 * (k - 3) * L := by
   have hy0 : (0 : ℝ) ≤ y := by linarith
   rcases le_or_gt L 0 with hL0 | hL0
   · nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ y / 3 + 7) (neg_nonneg.2 hL0),
@@ -212,8 +217,8 @@ theorem real_ineq {y l L k : ℝ} (hy : 141 ≤ y) (hl1 : 0.6931471803 < l) (hl2
       mul_le_mul_of_nonneg_left hl1.le (sq_nonneg y), mul_nonneg (by linarith : (0 : ℝ) ≤ y - 141) hy0,
       mul_le_mul_of_nonneg_left hl2.le hy0]
 
-theorem upper_card (n : ℕ) (hn : 10000 ≤ n) :
-    (2 * (n : ℝ) + 1) ≤ 5 * (((upper n).card : ℝ) - 3) * Real.log (2 * n) := by
+theorem upper_card (n : ℕ) (hn : 10000 ≤ n)
+    : (2 * (n : ℝ) + 1) ≤ 5 * (((upper n).card : ℝ) - 3) * Real.log (2 * n) := by
   have h1 : 4 ^ n < n * centralBinom n := Nat.four_pow_lt_mul_centralBinom n (by omega)
   have h2 := centralBinom_le n (by omega)
   set k := (upper n).card with hk
@@ -228,8 +233,9 @@ theorem upper_card (n : ℕ) (hn : 10000 ≤ n) :
   have h2n : (0 : ℝ) < 2 * n := by linarith
   have h5 := Real.log_lt_log (by positivity) h4
   rw [Real.log_mul hnpos.ne' (by positivity), Real.log_mul (by positivity) (by positivity),
-    Real.log_mul (by positivity) (by positivity), Real.log_pow, Real.log_pow, Real.log_pow,
-    Real.log_pow] at h5
+      Real.log_mul (by positivity) (by positivity), Real.log_pow, Real.log_pow, Real.log_pow,
+      Real.log_pow]
+    at h5
   set L := Real.log (2 * n) with hLdef
   have hl4 : Real.log 4 = 2 * Real.log 2 := by
     rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]; norm_num
@@ -246,15 +252,12 @@ theorem upper_card (n : ℕ) (hn : 10000 ≤ n) :
   have hsy : (s : ℝ) ≤ y := by
     have := Real.nat_sqrt_le_real_sqrt (a := 2 * n)
     simpa [hs, hy] using this
-  have hs6 : 6 ≤ s := by
-    rw [hs, Nat.le_sqrt]; omega
+  have hs6 : 6 ≤ s := by rw [hs, Nat.le_sqrt]; omega
   have hcs : (c : ℝ) ≤ s / 3 + 3 := primeCounting_le s hs6
-  have hLy : L = 2 * Real.log y := by
-    rw [hLdef, ← hy2, Real.log_pow]; norm_num
+  have hLy : L = 2 * Real.log y := by rw [hLdef, ← hy2, Real.log_pow]; norm_num
   have hlogy : Real.log y ≤ 7 * l + y / 128 - 1 := by
     have h := Real.log_le_sub_one_of_pos (show 0 < y / 128 by positivity)
-    rw [Real.log_div hypos.ne' (by norm_num), show (128 : ℝ) = 2 ^ 7 by norm_num,
-      Real.log_pow] at h
+    rw [Real.log_div hypos.ne' (by norm_num), show (128 : ℝ) = 2 ^ 7 by norm_num, Real.log_pow] at h
     push_cast at h
     linarith
   have hL0 : 0 ≤ L := Real.log_nonneg (by linarith)
@@ -312,7 +315,8 @@ theorem S_large (N : ℕ) (hN : 20000 ≤ N) : 1 / (5 * Real.log N) ≤ S N := b
   have hL0 : 0 < Real.log (2 * n) := Real.log_pos (by linarith)
   have hLN : Real.log (2 * n) ≤ Real.log N := Real.log_le_log (by linarith) h2nN
   have hc0 : (0 : ℝ) ≤ F.card := Nat.cast_nonneg _
-  have h1 : 5 * (((upper n).card : ℝ) - 3) * Real.log (2 * n) ≤ 5 * (F.card : ℝ) * Real.log (2 * n) :=
+  have h1
+      : 5 * (((upper n).card : ℝ) - 3) * Real.log (2 * n) ≤ 5 * (F.card : ℝ) * Real.log (2 * n) :=
     mul_le_mul_of_nonneg_right (by linarith) hL0.le
   have h2 : 5 * (F.card : ℝ) * Real.log (2 * n) ≤ 5 * (F.card : ℝ) * Real.log N :=
     mul_le_mul_of_nonneg_left hLN (by linarith)
@@ -326,7 +330,9 @@ theorem four_le_log (N : ℕ) (hN : 100 ≤ N) : 4 ≤ Real.log N := by
     have h2 : Real.exp 4 = Real.exp 1 ^ 4 := by
       rw [show (4 : ℝ) = ((4 : ℕ) : ℝ) * 1 by norm_num, Real.exp_nat_mul]
     rw [h2]
-    calc Real.exp 1 ^ 4 ≤ 2.7182818286 ^ 4 := pow_le_pow_left₀ (Real.exp_pos 1).le he.le 4
+    calc
+      Real.exp 1 ^ 4
+        ≤ 2.7182818286 ^ 4 := pow_le_pow_left₀ (Real.exp_pos 1).le he.le 4
       _ ≤ 100 := by norm_num
   have h2 : (100 : ℝ) ≤ N := by exact_mod_cast hN
   rw [Real.le_log_iff_exp_le (by linarith)]
@@ -339,7 +345,8 @@ theorem prime_reciprocal_sum_bound : PrimeRecipSum := by
   change 1 / (5 * Real.log N) ≤ PrimeCountingLemmas.S N
   by_cases h : N < 20000
   · have h4 := PrimeCountingLemmas.four_le_log N hN
-    exact (one_div_le_one_div_of_le (by norm_num) (by linarith)).trans (PrimeCountingLemmas.S_small N hN h)
+    exact (one_div_le_one_div_of_le (by norm_num) (by linarith)).trans
+      (PrimeCountingLemmas.S_small N hN h)
   · exact PrimeCountingLemmas.S_large N (by omega)
 
 end Formalism.IrreducibleCountingLemmas.GaloisIrreducibility

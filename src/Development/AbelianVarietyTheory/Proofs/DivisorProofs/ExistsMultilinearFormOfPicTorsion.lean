@@ -15,15 +15,20 @@ open CommRing Module
 
 variable {B : Type} [CommRing B]
 
-theorem exists_local_generator (M : Type) [AddCommGroup M] [Module B M] [Module.Invertible B M]
-    (p : Ideal B) [p.IsPrime] : ∃ e : M, ∀ x : M, ∃ w a : B, w ∉ p ∧ w • x = a • e := by
-  have ⟨f⟩ := Invertible.free_iff_linearEquiv.mp
-    (inferInstance : Free (Localization.AtPrime p) (LocalizedModule p.primeCompl M))
+theorem exists_local_generator
+    (M : Type) [AddCommGroup M] [Module B M] [Module.Invertible B M] (p : Ideal B) [p.IsPrime]
+    : ∃ e : M, ∀ x : M, ∃ w a : B, w ∉ p ∧ w • x = a • e := by
+  have ⟨f⟩ :=
+    Invertible.free_iff_linearEquiv.mp
+      (inferInstance : Free (Localization.AtPrime p) (LocalizedModule p.primeCompl M))
   obtain ⟨e, s, he⟩ : ∃ (e : M) (s : p.primeCompl), LocalizedModule.mk e s = f.symm 1 :=
-    LocalizedModule.induction_on (β := fun y => ∃ (e : M) (s : p.primeCompl), LocalizedModule.mk e s = y)
-      (fun e s => ⟨e, s, rfl⟩) (f.symm 1)
+    LocalizedModule.induction_on
+      (β := fun y => ∃ (e : M) (s : p.primeCompl), LocalizedModule.mk e s = y)
+      (fun e s => ⟨e, s, rfl⟩)
+      (f.symm 1)
   refine ⟨e, fun x => ?_⟩
-  obtain ⟨a, t, ht⟩ : ∃ (a : B) (t : p.primeCompl), Localization.mk a t = f (LocalizedModule.mk x 1) :=
+  obtain ⟨a, t, ht⟩
+      : ∃ (a : B) (t : p.primeCompl), Localization.mk a t = f (LocalizedModule.mk x 1) :=
     Localization.induction_on (f (LocalizedModule.mk x 1)) fun z => ⟨z.1, z.2, rfl⟩
   have key : LocalizedModule.mk x (1 : p.primeCompl) = LocalizedModule.mk (a • e) (t * s) := by
     rw [← f.symm_apply_apply (LocalizedModule.mk x 1), ← ht, ← mul_one (Localization.mk a t),
@@ -31,10 +36,11 @@ theorem exists_local_generator (M : Type) [AddCommGroup M] [Module B M] [Module.
   obtain ⟨u, hu⟩ := (LocalizedModule.mk_eq).mp key
   refine ⟨(u : B) * ((t : B) * s), u * a, ?_, ?_⟩
   · exact p.primeCompl.mul_mem u.2 (p.primeCompl.mul_mem t.2 s.2)
-  · simpa only [Submonoid.smul_def, Submonoid.coe_mul, OneMemClass.coe_one, one_smul, smul_smul] using hu
+  · simpa only [Submonoid.smul_def, Submonoid.coe_mul, OneMemClass.coe_one, one_smul, smul_smul]
+      using hu
 
-theorem tensorPow_equiv (c : Pic B) (n : ℕ) :
-    Nonempty (Pic.AsModule (c ^ n) ≃ₗ[B] ⨂[B] _ : Fin n, Pic.AsModule c) := by
+theorem tensorPow_equiv (c : Pic B) (n : ℕ)
+    : Nonempty (Pic.AsModule (c ^ n) ≃ₗ[B] ⨂[B] _ : Fin n, Pic.AsModule c) := by
   induction n with
   | zero =>
     have ⟨e⟩ := Pic.ext_iff.mp (pow_zero c)
@@ -44,13 +50,17 @@ theorem tensorPow_equiv (c : Pic B) (n : ℕ) :
     obtain ⟨ih⟩ := ih
     have ⟨e1⟩ := Pic.ext_iff.mp (pow_succ c n)
     have ⟨e2⟩ := Pic.ext_iff.mp (Pic.mul_eq_tensor (c ^ n) c)
-    exact ⟨e1 ≪≫ₗ e2 ≪≫ₗ Pic.mk.linearEquiv B _ ≪≫ₗ TensorProduct.congr ih
-      (PiTensorProduct.subsingletonEquiv (R := B) (s := fun _ : Fin 1 => Pic.AsModule c) 0).symm ≪≫ₗ
-      PiTensorProduct.tmulEquiv B (Pic.AsModule c) ≪≫ₗ PiTensorProduct.reindex B _ finSumFinEquiv⟩
+    exact ⟨e1 ≪≫ₗ e2 ≪≫ₗ Pic.mk.linearEquiv B _
+      ≪≫ₗ TensorProduct.congr ih
+        (PiTensorProduct.subsingletonEquiv (R := B) (s := fun _ : Fin 1 => Pic.AsModule c) 0).symm
+      ≪≫ₗ PiTensorProduct.tmulEquiv B (Pic.AsModule c)
+      ≪≫ₗ PiTensorProduct.reindex B _ finSumFinEquiv⟩
 
-theorem exists_form : ∀ (B : Type) [CommRing B] (q : ℕ) (c : CommRing.Pic B), c ^ q = 1 →
-    ∃ φ : (Π _ : Fin q, CommRing.Pic.AsModule c) →ₘₗ[B] B,
-      ∀ p : Ideal B, p.IsPrime → ∃ e : CommRing.Pic.AsModule c, φ (fun _ => e) ∉ p := by
+theorem exists_form
+    : ∀ (B : Type) [CommRing B] (q : ℕ) (c : CommRing.Pic B),
+      c ^ q = 1
+        → ∃ φ : (Π _ : Fin q, CommRing.Pic.AsModule c) →ₘₗ[B] B, ∀ p : Ideal B,
+          p.IsPrime → ∃ e : CommRing.Pic.AsModule c, φ (fun _ => e) ∉ p := by
   intro B _ q c hc
   obtain ⟨T⟩ := tensorPow_equiv c q
   have ⟨e1⟩ := Pic.ext_iff.mp hc
@@ -68,11 +78,13 @@ theorem exists_form : ∀ (B : Type) [CommRing B] (q : ℕ) (c : CommRing.Pic B)
   choose w a hw hwa using fun i => he (x i)
   refine ⟨e, fun hmem => ?_⟩
   have hmem' : ψ (PiTensorProduct.tprod B fun _ => e) ∈ p := hmem
-  have h1 : ψ (PiTensorProduct.tprod B (fun i => w i • x i)) =
-      (∏ i, w i) * ψ (PiTensorProduct.tprod B x) := by
+  have h1
+      : ψ (PiTensorProduct.tprod B (fun i => w i • x i))
+        = (∏ i, w i) * ψ (PiTensorProduct.tprod B x) := by
     simp only [MultilinearMap.map_smul_univ, RingHom.id_apply, map_smul, smul_eq_mul]
-  have h2 : ψ (PiTensorProduct.tprod B (fun i => w i • x i)) =
-      (∏ i, a i) * ψ (PiTensorProduct.tprod B (fun _ => e)) := by
+  have h2
+      : ψ (PiTensorProduct.tprod B (fun i => w i • x i))
+        = (∏ i, a i) * ψ (PiTensorProduct.tprod B (fun _ => e)) := by
     simp_rw [hwa]
     simp only [MultilinearMap.map_smul_univ, RingHom.id_apply, map_smul, smul_eq_mul]
   have hin : (∏ i, w i) * ψ (PiTensorProduct.tprod B x) ∈ p := by

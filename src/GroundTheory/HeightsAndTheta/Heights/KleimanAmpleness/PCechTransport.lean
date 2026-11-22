@@ -19,11 +19,12 @@ namespace Cech
 theorem Transport.proof : Transport.Statement.{u, v, w} := by
   intro n U R _ G _ _ G' _ _ ρ ρ' deg deg' φ hφ hdeg hinj hmap i
 
-  have minj : ∀ i, Function.Injective (mapC (G := G) (G' := G') φ i) :=
-    fun i s t h => funext fun I => hinj I.1 (congrFun h I)
+  have minj : ∀ i, Function.Injective (mapC (G := G) (G' := G') φ i) := fun i s t h =>
+    funext fun I => hinj I.1 (congrFun h I)
 
-  have lift : ∀ (i : ℕ) (w' : Cochain G' i), w' ∈ Cdeg G' deg' i →
-      ∃ w ∈ Cdeg G deg i, mapC φ i w = w' := by
+  have lift
+      : ∀ (i : ℕ) (w' : Cochain G' i),
+        w' ∈ Cdeg G' deg' i → ∃ w ∈ Cdeg G deg i, mapC φ i w = w' := by
     intro i w' hw'
     have h : ∀ I : Idx U i, ∃ x ∈ deg I.1, φ I.1 x = w' I := fun I => by
       have hI : w' I ∈ deg' I.1 := hw' I (Set.mem_univ _)
@@ -32,7 +33,8 @@ theorem Transport.proof : Transport.Statement.{u, v, w} := by
     choose w hw hφw using h
     exact ⟨w, fun I _ => hw I, funext fun I => hφw I⟩
 
-  have bdry : ∀ (i : ℕ) (z : Cochain G i), mapC φ i z ∈ bdryDeg G' deg' ρ' i → z ∈ bdryDeg G deg ρ i := by
+  have bdry
+      : ∀ (i : ℕ) (z : Cochain G i), mapC φ i z ∈ bdryDeg G' deg' ρ' i → z ∈ bdryDeg G deg ρ i := by
     intro i z h
     cases i with
     | zero =>

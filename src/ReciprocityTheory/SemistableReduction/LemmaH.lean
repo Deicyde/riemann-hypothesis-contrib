@@ -8,12 +8,14 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Matrix InnerProductSpace
 
-theorem exists_unitary_mul_upper {n : ℕ} (x : Matrix (Fin n) (Fin n) ℂ) :
-    ∃ k b : Matrix (Fin n) (Fin n) ℂ, k ∈ Matrix.unitaryGroup (Fin n) ℂ ∧ b.BlockTriangular id ∧
-      x = k * b ∧ ∀ j, ‖b j j‖ ^ 2 ≤ colNormSq x j := by
+theorem exists_unitary_mul_upper {n : ℕ} (x : Matrix (Fin n) (Fin n) ℂ)
+    : ∃ k b : Matrix (Fin n) (Fin n) ℂ,
+      k ∈ Matrix.unitaryGroup (Fin n) ℂ ∧ b.BlockTriangular id ∧ x = k * b
+        ∧ ∀ j, ‖b j j‖ ^ 2 ≤ colNormSq x j := by
   classical
   let std := EuclideanSpace.basisFun (Fin n) ℂ
-  let f : Fin n → EuclideanSpace ℂ (Fin n) := fun j => (EuclideanSpace.equiv (Fin n) ℂ).symm (fun i => x i j)
+  let f : Fin n → EuclideanSpace ℂ (Fin n) := fun j =>
+    (EuclideanSpace.equiv (Fin n) ℂ).symm (fun i => x i j)
   have hdim : Module.finrank ℂ (EuclideanSpace ℂ (Fin n)) = Fintype.card (Fin n) := by simp
   let e := gramSchmidtOrthonormalBasis hdim f
   have hstd : std.toBasis.toMatrix f = x := by
@@ -25,26 +27,31 @@ theorem exists_unitary_mul_upper {n : ℕ} (x : Matrix (Fin n) (Fin n) ℂ) :
     rw [EuclideanSpace.norm_eq, Real.sq_sqrt (Finset.sum_nonneg fun _ _ => sq_nonneg _)]
     simp [colNormSq, f]
   refine ⟨std.toBasis.toMatrix e.toBasis, e.toBasis.toMatrix f, ?_, ?_, ?_, ?_⟩
-  · simpa [OrthonormalBasis.coe_toBasis] using OrthonormalBasis.toMatrix_orthonormalBasis_mem_unitary std e
+  · simpa [OrthonormalBasis.coe_toBasis] using
+      OrthonormalBasis.toMatrix_orthonormalBasis_mem_unitary std e
   · exact gramSchmidtOrthonormalBasis_inv_blockTriangular hdim f
   · rw [Module.Basis.toMatrix_mul_toMatrix, hstd]
   · intro j
     rw [← hnorm j, Module.Basis.toMatrix_apply, OrthonormalBasis.coe_toBasis_repr_apply,
       OrthonormalBasis.repr_apply_apply]
     have h1 : ‖inner ℂ (e j) (f j)‖ ≤ ‖f j‖ := by
-      calc ‖inner ℂ (e j) (f j)‖ ≤ ‖e j‖ * ‖f j‖ := norm_inner_le_norm _ _
+      calc
+        ‖inner ℂ (e j) (f j)‖
+          ≤ ‖e j‖ * ‖f j‖ := norm_inner_le_norm _ _
         _ = ‖f j‖ := by rw [e.orthonormal.1 j, one_mul]
     exact pow_le_pow_left₀ (norm_nonneg _) h1 2
 
-private theorem P_ite_mul_eq_prod_triChar_mul {ι : Type} [Fintype ι] [DecidableEq ι] (p : ι → ℕ)
-    (a : ∀ s, Fin (p s) → ℕ) (P : (∀ s, Matrix (Fin (p s)) (Fin (p s)) ℂ) → ℂ)
-    (hP : ∀ (x : ∀ s, Matrix (Fin (p s)) (Fin (p s)) ℂ) (s : ι) (b : Matrix (Fin (p s)) (Fin (p s)) ℂ),
-      (∀ t, (x t).det ≠ 0) → b.det ≠ 0 → b.BlockTriangular id →
-      P (Function.update x s (x s * b)) = triChar (a s) b * P x)
-    (k b : ∀ s, Matrix (Fin (p s)) (Fin (p s)) ℂ) (hk : ∀ s, (k s).det ≠ 0)
-    (hb : ∀ s, (b s).det ≠ 0) (hbt : ∀ s, (b s).BlockTriangular id) (S : Finset ι) :
-    P (fun t => if t ∈ S then k t * b t else k t) =
-      (∏ s ∈ S, triChar (a s) (b s)) * P k := by
+private theorem P_ite_mul_eq_prod_triChar_mul
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (p : ι → ℕ) (a : ∀ s, Fin (p s) → ℕ) (P : (∀ s, Matrix (Fin (p s)) (Fin (p s)) ℂ) → ℂ)
+    (hP : ∀ (x : ∀ s, Matrix (Fin (p s)) (Fin (p s)) ℂ) (s : ι)
+        (b : Matrix (Fin (p s)) (Fin (p s)) ℂ),
+      (∀ t, (x t).det ≠ 0) → b.det ≠ 0 → b.BlockTriangular id
+        → P (Function.update x s (x s * b)) = triChar (a s) b * P x)
+    (k b : ∀ s, Matrix (Fin (p s)) (Fin (p s)) ℂ)
+    (hk : ∀ s, (k s).det ≠ 0) (hb : ∀ s, (b s).det ≠ 0) (hbt : ∀ s, (b s).BlockTriangular id)
+    (S : Finset ι)
+    : P (fun t => if t ∈ S then k t * b t else k t) = (∏ s ∈ S, triChar (a s) (b s)) * P k := by
   induction S using Finset.induction_on with
   | empty => simp
   | insert s S hs ih =>
@@ -55,9 +62,11 @@ private theorem P_ite_mul_eq_prod_triChar_mul {ι : Type} [Fintype ι] [Decidabl
         exact mul_ne_zero (hk t) (hb t)
       · simp only [ht, if_false]
         exact hk t
-    have heq : (fun t => if t ∈ insert s S then k t * b t else k t) =
-        Function.update (fun t => if t ∈ S then k t * b t else k t) s
-          ((fun t => if t ∈ S then k t * b t else k t) s * b s) := by
+    have heq
+        : (fun t => if t ∈ insert s S then k t * b t else k t)
+          = Function.update
+            (fun t => if t ∈ S then k t * b t else k t)
+            s ((fun t => if t ∈ S then k t * b t else k t) s * b s) := by
       funext t
       by_cases hts : t = s
       · subst hts

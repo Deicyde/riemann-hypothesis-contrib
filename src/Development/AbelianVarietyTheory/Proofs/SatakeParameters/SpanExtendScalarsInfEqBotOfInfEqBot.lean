@@ -6,16 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem span_map_inf_eq_bot_of_inf_eq_bot : ∀ {k : Type} [Field k] {L : Type} [Field L] (f : k →+* L)
-    {a : ℕ} (W₁ W₂ : Submodule k (Fin a → k)), W₁ ⊓ W₂ = ⊥ →
-    Submodule.span L ((fun v => f ∘ v) '' (W₁ : Set (Fin a → k))) ⊓
-      Submodule.span L ((fun v => f ∘ v) '' (W₂ : Set (Fin a → k))) = ⊥ := by
+theorem span_map_inf_eq_bot_of_inf_eq_bot
+    : ∀ {k : Type} [Field k] {L : Type} [Field L] (f : k →+* L) {a : ℕ}
+        (W₁ W₂ : Submodule k (Fin a → k)),
+      W₁ ⊓ W₂ = ⊥
+        → Submodule.span L ((fun v => f ∘ v) '' (W₁ : Set (Fin a → k)))
+            ⊓ Submodule.span L ((fun v => f ∘ v) '' (W₂ : Set (Fin a → k)))
+          = ⊥ := by
   intro k _ L _ f a W₁ W₂ h
   have hker : LinearMap.ker (W₂.mkQ ∘ₗ W₁.subtype) = ⊥ := by
     refine LinearMap.ker_eq_bot'.mpr ?_
     intro w hw
-    have hw2 : (w : Fin a → k) ∈ W₂ := by
-      simpa [Submodule.Quotient.mk_eq_zero] using hw
+    have hw2 : (w : Fin a → k) ∈ W₂ := by simpa [Submodule.Quotient.mk_eq_zero] using hw
     have hw12 : (w : Fin a → k) ∈ W₁ ⊓ W₂ := ⟨w.2, hw2⟩
     rw [h] at hw12
     exact Subtype.ext (by simpa using hw12)

@@ -73,7 +73,9 @@ theorem secondJetIntegralGeneral_holds : TwoG := by
   intro p _ l ex ph a b hlog hsim
   obtain ⟨hl0, hle, he1⟩ := logOk_low hlog
   have hex0 : PowerSeries.constantCoeff ex = 0 := hlog.1
-  have cX : ∀ i : Fin 2, MvPowerSeries.constantCoeff (Xv i : MvPowerSeries (Fin 2) ℂ_[p]) = 0 := fun i => by
+  have cX
+      : ∀ i : Fin 2,
+        MvPowerSeries.constantCoeff (Xv i : MvPowerSeries (Fin 2) ℂ_[p]) = 0 := fun i => by
     simp [Xv]
   have x00 : MvPowerSeries.coeff E0 (Xv 0 : MvPowerSeries (Fin 2) ℂ_[p]) = 1 := by
     simp [Xv, MvPowerSeries.coeff_X, E0, E1, Finsupp.single_eq_single_iff]
@@ -94,20 +96,29 @@ theorem secondJetIntegralGeneral_holds : TwoG := by
   have d1 : MvPowerSeries.coeff E1 D = 0 := by rw [hD, map_sub, u1, v1, sub_zero]
 
   have hs : (bivariateExponentMonomial.sum fun _ k => k) = 2 := degree_expXY
-  have hexp : MvPowerSeries.coeff bivariateExponentMonomial (expMv D) = MvPowerSeries.coeff bivariateExponentMonomial D := by
-    change (∑ n ∈ Finset.range ((bivariateExponentMonomial.sum fun _ k => k) + 1),
-      MvPowerSeries.coeff bivariateExponentMonomial (D ^ n) / (n.factorial : ℂ_[p])) = _
+  have hexp
+      : MvPowerSeries.coeff bivariateExponentMonomial (expMv D)
+        = MvPowerSeries.coeff bivariateExponentMonomial D := by
+    change
+      (∑ n ∈ Finset.range ((bivariateExponentMonomial.sum fun _ k => k) + 1),
+        MvPowerSeries.coeff bivariateExponentMonomial (D ^ n) / (n.factorial : ℂ_[p]))
+        = _
     rw [hs, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one, pow_two,
       coeff_expXY_mul hD0 hD0, d0, d1]
     simp [MvPowerSeries.coeff_one, expXY_ne_zero]
   have hint : ‖MvPowerSeries.coeff bivariateExponentMonomial D‖ ≤ 1 := by
     rw [← hexp]; exact hsim.2 bivariateExponentMonomial
-  have hjet : jet ex ph 2 = 2 * (PowerSeries.coeff 1 ph * PowerSeries.coeff 2 ex +
-      PowerSeries.coeff 2 ph * PowerSeries.coeff 1 ex ^ 2) := by
+  have hjet
+      : jet ex ph 2
+        = 2
+          * (PowerSeries.coeff 1 ph * PowerSeries.coeff 2 ex
+            + PowerSeries.coeff 2 ph * PowerSeries.coeff 1 ex ^ 2) := by
     unfold jet
     rw [pcoeff2_subst hex0 ph]
     norm_num
-  have hval : MvPowerSeries.coeff bivariateExponentMonomial D = (a - b) * jet ex ph 2 * PowerSeries.coeff 1 l ^ 2 := by
+  have hval
+      : MvPowerSeries.coeff bivariateExponentMonomial D
+        = (a - b) * jet ex ph 2 * PowerSeries.coeff 1 l ^ 2 := by
     rw [hD, map_sub, u2, v2, ma1, mb2, x00, x11, hjet]
     linear_combination (-2 * (a - b) * PowerSeries.coeff 2 ph *
       (PowerSeries.coeff 1 ex * PowerSeries.coeff 1 l + 1)) * hle

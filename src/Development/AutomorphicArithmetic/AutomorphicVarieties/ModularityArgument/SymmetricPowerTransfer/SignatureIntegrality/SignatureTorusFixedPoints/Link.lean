@@ -9,7 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
 theorem UpperTheory.V.Z.Sym.Sig.link : UpperTheory.V.Z.Sym.Sig.Link := by
   intro k _ _ _ _ n
@@ -29,10 +31,11 @@ theorem UpperTheory.V.Z.Sym.Sig.link : UpperTheory.V.Z.Sym.Sig.Link := by
       simp only [MonoidHom.mem_ker, Matrix.GeneralLinearGroup.ext_iff, GeneralLinearGroup.map_apply,
         Units.val_one, Matrix.one_apply]
       refine forall_congr' fun i => forall_congr' fun j => ?_
-      have h1 : ∀ (I : Ideal 𝒪[k]) (x : 𝒪[k]), Ideal.Quotient.mk I x = 1 ↔ x - 1 ∈ I := fun I x => by
+      have h1
+          : ∀ (I : Ideal 𝒪[k]) (x : 𝒪[k]), Ideal.Quotient.mk I x = 1 ↔ x - 1 ∈ I := fun I x => by
         rw [← map_one (Ideal.Quotient.mk I), Ideal.Quotient.eq]
-      have h0 : ∀ (I : Ideal 𝒪[k]) (x : 𝒪[k]), Ideal.Quotient.mk I x = 0 ↔ x ∈ I :=
-        fun I x => Ideal.Quotient.eq_zero_iff_mem
+      have h0 : ∀ (I : Ideal 𝒪[k]) (x : 𝒪[k]), Ideal.Quotient.mk I x = 0 ↔ x ∈ I := fun I x =>
+        Ideal.Quotient.eq_zero_iff_mem
       split_ifs
       · rw [h1]
         erw [h1]
@@ -55,8 +58,10 @@ theorem UpperTheory.V.Z.Sym.Sig.link : UpperTheory.V.Z.Sym.Sig.Link := by
       · intro x hx
         have h1 : x ∈ Kc k n 1 := hx.2
         rw [hK] at h1
-        exact (le_sup_left.trans le_sup_left :
-          KOne k (Fin n) ≤ KOne k (Fin n) ⊔ unipO k n ⊔ Subgroup.map (diagT k (Fin n)) (torC k n ⊤)) h1
+        exact (le_sup_left.trans le_sup_left
+            : KOne k (Fin n)
+              ≤ KOne k (Fin n) ⊔ unipO k n ⊔ Subgroup.map (diagT k (Fin n)) (torC k n ⊤))
+          h1
     · show KOne k (Fin n) ⊔ unipO k n ⊔ Subgroup.map (diagT k (Fin n)) (torC k n ⊤) ≤
         (glIwa k n).N ⊔ (Lev.iw k).TH n ⊔ (glIwa k n).Nm 0
       refine sup_le (sup_le ?_ ?_) ?_

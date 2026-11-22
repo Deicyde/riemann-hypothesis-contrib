@@ -22,5 +22,9 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.Pullback
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.MahlerSectionOfConst : GroundTheory.Heights₂.Heights.MahlerSectionOfConst.Statement :=
-  @GroundTheory.Heights₂.Heights.MahlerSectionOfConst.proof GroundTheory.Heights₂.Heights.AutoClose.DefectAverage GroundTheory.Heights₂.Heights.AutoClose.AdmissibleAENrm GroundTheory.Heights₂.Heights.BallVolume.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.MahlerSectionOfConst
+    : GroundTheory.Heights₂.Heights.MahlerSectionOfConst.Statement :=
+  @GroundTheory.Heights₂.Heights.MahlerSectionOfConst.proof
+    GroundTheory.Heights₂.Heights.AutoClose.DefectAverage
+    GroundTheory.Heights₂.Heights.AutoClose.AdmissibleAENrm
+    GroundTheory.Heights₂.Heights.BallVolume.proof

@@ -10,23 +10,30 @@ open MvPolynomial
 
 namespace PositivityTheory.Rg.Sw.SP.Mi
 
-theorem deriv_prod {R A : Type*} [CommRing R] [CommRing A] [Algebra R A] (D : Derivation R A A) {ι : Type*} [DecidableEq ι]
-    (s : Finset ι) (f : ι → A) : D (∏ i ∈ s, f i) = ∑ c ∈ s, (∏ i ∈ s.erase c, f i) * D (f c) := by
+theorem deriv_prod
+    {R A : Type*} [CommRing R] [CommRing A] [Algebra R A]
+    (D : Derivation R A A)
+    {ι : Type*} [DecidableEq ι]
+    (s : Finset ι) (f : ι → A)
+    : D (∏ i ∈ s, f i) = ∑ c ∈ s, (∏ i ∈ s.erase c, f i) * D (f c) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih =>
-    rw [Finset.prod_insert ha, Derivation.leibniz, ih, Finset.sum_insert ha, Finset.erase_insert ha, smul_eq_mul,
-      smul_eq_mul, Finset.mul_sum, add_comm]
+    rw [Finset.prod_insert ha, Derivation.leibniz, ih, Finset.sum_insert ha, Finset.erase_insert ha,
+      smul_eq_mul, smul_eq_mul, Finset.mul_sum, add_comm]
     congr 1
     · refine Finset.sum_congr rfl fun c hc => ?_
       have hca : c ≠ a := fun h => ha (h ▸ hc)
-      rw [Finset.erase_insert_of_ne hca.symm, Finset.prod_insert (fun h => ha (Finset.mem_of_mem_erase h))]
+      rw [Finset.erase_insert_of_ne hca.symm,
+        Finset.prod_insert (fun h => ha (Finset.mem_of_mem_erase h))]
       ring
 
-theorem deriv_det {R A : Type*} [CommRing R] [CommRing A] [Algebra R A] (D : Derivation R A A) {ρ : ℕ}
-    (M : Matrix (Fin ρ) (Fin ρ) A) :
-    D M.det = ∑ c, (Matrix.updateCol M c (fun a => D (M a c))).det := by
+theorem deriv_det
+    {R A : Type*} [CommRing R] [CommRing A] [Algebra R A]
+    (D : Derivation R A A)
+    {ρ : ℕ} (M : Matrix (Fin ρ) (Fin ρ) A)
+    : D M.det = ∑ c, (Matrix.updateCol M c (fun a => D (M a c))).det := by
   simp only [Matrix.det_apply]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finset.sum_comm]
@@ -44,17 +51,22 @@ theorem deriv_det {R A : Type*} [CommRing R] [CommRing A] [Algebra R A] (D : Der
 theorem delDet : DelDet := by
   intro R _ ρ p q
   rw [deriv_det]
-  have h1 : ∀ c, Matrix.updateCol (Xm R ρ) c (fun a => del p q (Xm R ρ a c)) =
-      Matrix.updateCol (Xm R ρ) c (fun a => X (q, c) * X (a, p)) := by
+  have h1
+      : ∀ c,
+        Matrix.updateCol (Xm R ρ) c (fun a => del p q (Xm R ρ a c))
+          = Matrix.updateCol (Xm R ρ) c (fun a => X (q, c) * X (a, p)) := by
     intro c
     congr 1
     funext a
     simp [Xm, del, mkDerivation_X, mul_comm]
   simp only [h1]
-  have h2 : ∀ c, (Matrix.updateCol (Xm R ρ) c (fun a => X (q, c) * X (a, p))).det =
-      X (q, c) * (Matrix.updateCol (Xm R ρ) c (fun a => Xm R ρ a p)).det := by
+  have h2
+      : ∀ c,
+        (Matrix.updateCol (Xm R ρ) c (fun a => X (q, c) * X (a, p))).det
+          = X (q, c) * (Matrix.updateCol (Xm R ρ) c (fun a => Xm R ρ a p)).det := by
     intro c
-    have : (fun a => (X (q, c) * X (a, p) : Pm R ρ)) = (X (q, c) : Pm R ρ) • fun a => Xm R ρ a p := by
+    have : (fun a => (X (q, c) * X (a, p) : Pm R ρ))
+        = (X (q, c) : Pm R ρ) • fun a => Xm R ρ a p := by
       funext a; simp [Xm]
     rw [this, Matrix.det_updateCol_smul]
   simp only [h2]
@@ -72,7 +84,8 @@ theorem delDet : DelDet := by
 
 theorem renInt : RenInt := by
   intro R _ r s I J α p q f
-  simp only [opE, LinearMap.add_apply, LinearMap.mulLeft_apply, Derivation.coeFn_coe, map_add (f := _), map_mul]
+  simp only [opE, LinearMap.add_apply, LinearMap.mulLeft_apply, Derivation.coeFn_coe,
+    map_add (f := _), map_mul]
   congr 1
   · simp [ren, rename_X]
   · induction f using MvPolynomial.induction_on with
@@ -80,18 +93,19 @@ theorem renInt : RenInt := by
     | add f g hf hg => simp only [map_add (f := _), hf, hg]
     | mul_X f ad hf =>
       have e1 : ren I J (f * X ad) = ren I J f * X (J ad.1, I ad.2) := by simp [ren, rename_X]
-      rw [e1, Derivation.leibniz, Derivation.leibniz, map_add (f := _), hf, smul_eq_mul, smul_eq_mul, smul_eq_mul, smul_eq_mul,
-        map_mul, map_mul]
+      rw [e1, Derivation.leibniz, Derivation.leibniz, map_add (f := _), hf, smul_eq_mul,
+        smul_eq_mul, smul_eq_mul, smul_eq_mul, map_mul, map_mul]
       simp only [del, mkDerivation_X, ren, map_mul, rename_X]
 
-theorem del_CX_mul {R : Type} [CommRing R] {ρ : ℕ} (p q : Fin ρ) (α : R) (a b : Fin ρ) (g : Pm R ρ) :
-    del p q (C α * X (a, b) * g) = C α * (X (a, p) * X (q, b)) * g + C α * X (a, b) * del p q g := by
+theorem del_CX_mul {R : Type} [CommRing R] {ρ : ℕ} (p q : Fin ρ) (α : R) (a b : Fin ρ) (g : Pm R ρ)
+    : del p q (C α * X (a, b) * g)
+      = C α * (X (a, p) * X (q, b)) * g + C α * X (a, b) * del p q g := by
   rw [Derivation.leibniz, Derivation.leibniz, smul_eq_mul, smul_eq_mul, smul_eq_mul, smul_eq_mul,
     MvPolynomial.derivation_C, del, mkDerivation_X]
   ring
 
-theorem del_comm {R : Type} [CommRing R] {ρ : ℕ} (p q p' q' : Fin ρ) (g : Pm R ρ) :
-    del p q (del p' q' g) = del p' q' (del p q g) := by
+theorem del_comm {R : Type} [CommRing R] {ρ : ℕ} (p q p' q' : Fin ρ) (g : Pm R ρ)
+    : del p q (del p' q' g) = del p' q' (del p q g) := by
   induction g using MvPolynomial.induction_on with
   | C a => simp [del]
   | add f g hf hg => simp only [map_add (f := _), hf, hg]
@@ -104,7 +118,8 @@ theorem mComm : MComm := by
   intro R _ ρ α p q p' q'
   apply LinearMap.ext
   intro f
-  simp only [LinearMap.comp_apply, opE, LinearMap.add_apply, LinearMap.mulLeft_apply, Derivation.coeFn_coe, map_add (f := _)]
+  simp only [LinearMap.comp_apply, opE, LinearMap.add_apply, LinearMap.mulLeft_apply,
+    Derivation.coeFn_coe, map_add (f := _)]
   rw [del_CX_mul, del_CX_mul, del_comm p q p' q']
   ring
 

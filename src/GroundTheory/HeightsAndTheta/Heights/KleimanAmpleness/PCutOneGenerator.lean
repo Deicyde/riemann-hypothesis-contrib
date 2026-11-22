@@ -21,16 +21,22 @@ universe u w
 
 namespace CutOneGenerator
 
-variable {k : Type u} [Field k] {Ω : Type w} [Field Ω] [Algebra k Ω] {K' : Type w} [Field K']
-  [Algebra k K'] {N : ℕ} {x : Fin (N + 1) → Ω} {y : Fin (N + 1) → K'}
+variable
+  {k : Type u} [Field k]
+  {Ω : Type w} [Field Ω] [Algebra k Ω]
+  {K' : Type w} [Field K'] [Algebra k K']
+  {N : ℕ} {x : Fin (N + 1) → Ω} {y : Fin (N + 1) → K'}
 
-theorem mem_sub_of_mem_secs {S : Type u} [CommRing S] {E : Type w} [Field E] [Algebra S E] {M : ℕ}
-    {z : Fin (M + 1) → E} {H : SubSystem S z E} {t : E} (ht : t ∈ H.secs) (I : Chart z) :
-    t ∈ H.sub I :=
+theorem mem_sub_of_mem_secs
+    {S : Type u} [CommRing S]
+    {E : Type w} [Field E] [Algebra S E]
+    {M : ℕ} {z : Fin (M + 1) → E} {H : SubSystem S z E} {t : E} (ht : t ∈ H.secs) (I : Chart z)
+    : t ∈ H.sub I :=
   (Submodule.restrictScalars_mem S _ _).mp ((Submodule.mem_iInf _).mp ht I)
 
-theorem mem_chartRing_of_mem_idealMod {pp : Ideal (Poly k N)} {I : Chart x} {a : Ω}
-    (ha : a ∈ idealMod (x := x) pp I) : a ∈ chartRing k x I := by
+theorem mem_chartRing_of_mem_idealMod
+    {pp : Ideal (Poly k N)} {I : Chart x} {a : Ω} (ha : a ∈ idealMod (x := x) pp I)
+    : a ∈ chartRing k x I := by
   induction ha using Submodule.span_induction with
   | mem a ha => obtain ⟨f, s, e, -, hs, hf, hse, rfl⟩ := ha; exact ⟨f, s, e, hs, hf, hse, rfl⟩
   | zero => exact zero_mem _
@@ -44,29 +50,36 @@ theorem restrict_zero (hR : RestrictData Q hxy Q' ρ) (J : Chart y) : ρ 0 = 0 :
   rw [add_zero] at this
   simpa using this
 
-theorem exists_restrict_mul (hR : RestrictData Q hxy Q' ρ) (J : Chart y) {c q : Ω}
-    (hc : c ∈ chartRing k x (liftChart hxy J)) (hq : q ∈ Q.sub (liftChart hxy J)) :
-    ∃ b ∈ chartRing k y J, ρ (c * q) = b * ρ q := by
+theorem exists_restrict_mul
+    (hR : RestrictData Q hxy Q' ρ)
+    (J : Chart y)
+    {c q : Ω} (hc : c ∈ chartRing k x (liftChart hxy J)) (hq : q ∈ Q.sub (liftChart hxy J))
+    : ∃ b ∈ chartRing k y J, ρ (c * q) = b * ρ q := by
   obtain ⟨f, t, e, ht, hf, hte, rfl⟩ := hc
   exact ⟨_, ⟨f, t, e, ht, hf, hte, rfl⟩, hR.smul J q hq f t e ht hf hte⟩
 
-theorem restrict_twist_eq_zero (hR : RestrictData Q hxy Q' ρ) {pp : Ideal (Poly k N)}
-    (hpp : primeOf (S := k) y = pp) (J : Chart y) {z : Ω}
-    (hz : z ∈ (Q.twist (idealSys x pp)).sub (liftChart hxy J)) :
-    z ∈ Q.sub (liftChart hxy J) ∧ ρ z = 0 := by
-  have hgen : ∀ w ∈ Q.sub (liftChart hxy J), ∀ q ∈ idealMod (x := x) pp (liftChart hxy J),
-      q * w ∈ Q.sub (liftChart hxy J) ∧ ρ (q * w) = 0 := by
+theorem restrict_twist_eq_zero
+    (hR : RestrictData Q hxy Q' ρ)
+    {pp : Ideal (Poly k N)} (hpp : primeOf (S := k) y = pp)
+    (J : Chart y)
+    {z : Ω} (hz : z ∈ (Q.twist (idealSys x pp)).sub (liftChart hxy J))
+    : z ∈ Q.sub (liftChart hxy J) ∧ ρ z = 0 := by
+  have hgen
+      : ∀ w ∈ Q.sub (liftChart hxy J), ∀ q ∈ idealMod (x := x) pp (liftChart hxy J),
+        q * w ∈ Q.sub (liftChart hxy J) ∧ ρ (q * w) = 0 := by
     intro w hw q hq
     have hmw : ∀ a ∈ idealMod (x := x) pp (liftChart hxy J), a * w ∈ Q.sub (liftChart hxy J) :=
-      fun a ha => (Q.sub _).smul_mem
-        ⟨a, mem_chartRing_of_mem_idealMod (pp := pp) (I := liftChart hxy J) ha⟩ hw
+      fun a ha =>
+        (Q.sub _).smul_mem ⟨a, mem_chartRing_of_mem_idealMod (pp := pp) (I := liftChart hxy J) ha⟩
+          hw
     refine ⟨hmw q hq, ?_⟩
     induction hq using Submodule.span_induction with
     | mem a ha =>
       obtain ⟨f, t, e, hfp, ht, hf, hte, rfl⟩ := ha
-      rw [hR.smul J w hw f t e ht hf hte,
-        (mem_primeOf_of_isHomogeneous y hf).mp (hpp ▸ hfp), zero_div, zero_mul]
-    | zero => rw [zero_mul]; exact restrict_zero hR J
+      rw [hR.smul J w hw f t e ht hf hte, (mem_primeOf_of_isHomogeneous y hf).mp (hpp ▸ hfp),
+        zero_div, zero_mul]
+    | zero =>
+      rw [zero_mul]; exact restrict_zero hR J
     | add a b ha hb iha ihb =>
       rw [add_mul, hR.add J _ (hmw a ha) _ (hmw b hb), iha, ihb, add_zero]
     | smul c a ha iha =>
@@ -75,7 +88,8 @@ theorem restrict_twist_eq_zero (hR : RestrictData Q hxy Q' ρ) {pp : Ideal (Poly
   induction hz using Submodule.span_induction with
   | mem z hz => obtain ⟨q, hq, w, hw, rfl⟩ := hz; exact hgen w hw q hq
   | zero => exact ⟨zero_mem _, restrict_zero hR J⟩
-  | add a b _ _ ha hb => exact ⟨add_mem ha.1 hb.1, by rw [hR.add J a ha.1 b hb.1, ha.2, hb.2, add_zero]⟩
+  | add a b _ _ ha hb =>
+    exact ⟨add_mem ha.1 hb.1, by rw [hR.add J a ha.1 b hb.1, ha.2, hb.2, add_zero]⟩
   | smul c a _ ha =>
     refine ⟨(Q.sub _).smul_mem c ha.1, ?_⟩
     obtain ⟨b, -, hb⟩ := exists_restrict_mul hR J c.2 ha.1
@@ -83,11 +97,16 @@ theorem restrict_twist_eq_zero (hR : RestrictData Q hxy Q' ρ) {pp : Ideal (Poly
     erw [hb]
     rw [ha.2, mul_zero]
 
-theorem exists_eq_mul_of_le (hR : RestrictData Q hxy Q' ρ) {pp : Ideal (Poly k N)}
-    (hpp : primeOf (S := k) y = pp) (J : Chart y) {s : Ω} (hs : s ∈ Q.sub (liftChart hxy J))
-    (hle : Q.sub (liftChart hxy J) ≤ (Q.twist (idealSys x pp)).sub (liftChart hxy J) ⊔
-      Submodule.span (chartRing k x (liftChart hxy J)) {s}) {t : K'} (ht : t ∈ Q'.sub J) :
-    ∃ b ∈ chartRing k y J, t = b * ρ s := by
+theorem exists_eq_mul_of_le
+    (hR : RestrictData Q hxy Q' ρ)
+    {pp : Ideal (Poly k N)} (hpp : primeOf (S := k) y = pp)
+    (J : Chart y)
+    {s : Ω} (hs : s ∈ Q.sub (liftChart hxy J))
+    (hle : Q.sub (liftChart hxy J)
+      ≤ (Q.twist (idealSys x pp)).sub (liftChart hxy J)
+        ⊔ Submodule.span (chartRing k x (liftChart hxy J)) {s})
+    {t : K'} (ht : t ∈ Q'.sub J)
+    : ∃ b ∈ chartRing k y J, t = b * ρ s := by
   rw [← hR.span J] at ht
   induction ht using Submodule.span_induction with
   | mem t ht =>
@@ -98,7 +117,8 @@ theorem exists_eq_mul_of_le (hR : RestrictData Q hxy Q' ρ) {pp : Ideal (Poly k 
     obtain ⟨b, hb, he⟩ := exists_restrict_mul hR J a.2 hs
     refine ⟨b, hb, ?_⟩
     rw [hR.add J u hu' _ ((Q.sub _).smul_mem a hs), hu0, zero_add, chartRing_smul_def, he]
-  | zero => exact ⟨0, zero_mem _, (zero_mul _).symm⟩
+  | zero =>
+    exact ⟨0, zero_mem _, (zero_mul _).symm⟩
   | add t t' _ _ ht ht' =>
     obtain ⟨b, hb, rfl⟩ := ht
     obtain ⟨b', hb', rfl⟩ := ht'
@@ -107,10 +127,15 @@ theorem exists_eq_mul_of_le (hR : RestrictData Q hxy Q' ρ) {pp : Ideal (Poly k 
     obtain ⟨b, hb, rfl⟩ := ht
     exact ⟨c * b, mul_mem c.2 hb, by rw [chartRing_smul_def, mul_assoc]⟩
 
-theorem exists_algHom_ker_eq {R : Type w} [CommRing R] [Algebra k R] (P : Ideal R) [P.IsPrime] :
-    ∃ (F : Type w) (_ : Field F) (_ : Algebra k F) (ψ : R →ₐ[k] F), RingHom.ker ψ = P := by
-  refine ⟨FractionRing (R ⧸ P), inferInstance, inferInstance,
-    (IsScalarTower.toAlgHom k (R ⧸ P) (FractionRing (R ⧸ P))).comp (Ideal.Quotient.mkₐ k P), ?_⟩
+theorem exists_algHom_ker_eq {R : Type w} [CommRing R] [Algebra k R] (P : Ideal R) [P.IsPrime]
+    : ∃ (F : Type w) (_ : Field F) (_ : Algebra k F) (ψ : R →ₐ[k] F), RingHom.ker ψ = P := by
+  refine ⟨
+    FractionRing (R ⧸ P),
+    inferInstance,
+    inferInstance,
+    (IsScalarTower.toAlgHom k (R ⧸ P) (FractionRing (R ⧸ P))).comp (Ideal.Quotient.mkₐ k P),
+    ?_
+  ⟩
   ext a
   rw [RingHom.mem_ker]
   change algebraMap (R ⧸ P) (FractionRing (R ⧸ P)) (Ideal.Quotient.mk P a) = 0 ↔ _
@@ -118,10 +143,9 @@ theorem exists_algHom_ker_eq {R : Type w} [CommRing R] [Algebra k R] (P : Ideal 
 
 end CutOneGenerator
 
-
 open CutOneGenerator in
-theorem CutOneGenerator.proof (hG : GlobalFunctionsIntegral.Statement.{u, w}) :
-    CutOneGenerator.Statement.{u, w} := by
+theorem CutOneGenerator.proof (hG : GlobalFunctionsIntegral.Statement.{u, w})
+    : CutOneGenerator.Statement.{u, w} := by
   intro k _ Ω _ _ N x n pp L s hW hL hs hgen
   obtain ⟨r, h, hV⟩ := hL
   obtain ⟨j, hXj⟩ := hW.relevant
@@ -130,8 +154,7 @@ theorem CutOneGenerator.proof (hG : GlobalFunctionsIntegral.Statement.{u, w}) :
     apply hXj
     apply hW.le
     rw [mem_primeOf_of_isHomogeneous x (isHomogeneous_X k j), aeval_X, h0]
-  obtain ⟨hprime, hpt⟩ :=
-    PrimeFiltration.Point.proof k Ω N x pp hW.isPrime hW.homog hW.le j hxj hXj
+  obtain ⟨hprime, hpt⟩ := PrimeFiltration.Point.proof k Ω N x pp hW.isPrime hW.homog hW.le j hxj hXj
   obtain ⟨K', _, _, ψ, hker⟩ := @exists_algHom_ker_eq k _ _ _ _ (chartPrime pp hxj) hprime
   set y : Fin (N + 1) → K' := fun i => ψ (ratio hxj i) with hy
   have hpy : primeOf (S := k) y = pp := hpt K' ψ hker
@@ -152,24 +175,29 @@ theorem CutOneGenerator.proof (hG : GlobalFunctionsIntegral.Statement.{u, w}) :
   have hWy : IsSubvar y (primeOf (S := k) y) (n + 1) := by
     rw [hpy]; exact ⟨hW.isPrime, hW.homog, hpy.le, hW.relevant, hW.dim⟩
   have hdy : dimCl k y = ((n + 1 : ℕ) : Cardinal) := (DimTie.proof k K' N y hne (n + 1)).mp hWy
-  have hmul : ∀ t ∈ Q'.secs, ∀ i (hi : y i ≠ 0), ∃ b ∈ chartRing k y (singleChart hi), t = b * ρ s :=
-    fun t ht i hi => exists_eq_mul_of_le hR hpy (singleChart hi) (mem_sub_of_mem_secs hs _)
-      (hgen i (hxy i hi)) (mem_sub_of_mem_secs ht _)
+  have hmul
+      : ∀ t ∈ Q'.secs, ∀ i (hi : y i ≠ 0), ∃ b ∈ chartRing k y (singleChart hi),
+        t = b * ρ s := fun t ht i hi =>
+    exists_eq_mul_of_le hR hpy (singleChart hi) (mem_sub_of_mem_secs hs _) (hgen i (hxy i hi))
+      (mem_sub_of_mem_secs ht _)
   have hρs : ρ s ≠ 0 := by
     intro h0
     obtain ⟨Q'', hQ''⟩ := Q'.invertible (singleChart hy0)
-    have hbot : Q'.sub (singleChart hy0) = ⊥ := (Submodule.eq_bot_iff _).mpr fun t ht => by
-      obtain ⟨b, -, rfl⟩ := exists_eq_mul_of_le hR hpy (singleChart hy0) (mem_sub_of_mem_secs hs _)
-        (hgen j (hxy j hy0)) ht
-      rw [h0, mul_zero]
+    have hbot : Q'.sub (singleChart hy0) = ⊥ :=
+      (Submodule.eq_bot_iff _).mpr fun t ht => by
+        obtain ⟨b, -, rfl⟩ :=
+          exists_eq_mul_of_le hR hpy (singleChart hy0) (mem_sub_of_mem_secs hs _)
+            (hgen j (hxy j hy0)) ht
+        rw [h0, mul_zero]
     rw [hbot, Submodule.bot_mul] at hQ''
     have h1 : (1 : K') ∈ (⊥ : Submodule (chartRing k y (singleChart hy0)) K') := by
       rw [hQ'']; exact Submodule.one_le.mp le_rfl
     exact one_ne_zero ((Submodule.mem_bot _).mp h1)
-  have hint : ∀ l, IsIntegral k (ρ (h l) / ρ s) := fun l => hG k K' N y _ hne fun i hi => by
-    obtain ⟨b, hb, he⟩ := hmul (ρ (h l)) (hV'.mem_secs l) i hi
-    rw [he, mul_div_cancel_right₀ _ hρs]
-    exact hb
+  have hint : ∀ l, IsIntegral k (ρ (h l) / ρ s) := fun l =>
+    hG k K' N y _ hne fun i hi => by
+      obtain ⟨b, hb, he⟩ := hmul (ρ (h l)) (hV'.mem_secs l) i hi
+      rw [he, mul_div_cancel_right₀ _ hρs]
+      exact hb
   have halg : Algebra.IsAlgebraic k (funField (k := k) (ρ ∘ h)) := by
     apply IntermediateField.isAlgebraic_adjoin
     rintro _ ⟨i, l, -, rfl⟩

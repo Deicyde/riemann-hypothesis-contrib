@@ -15,8 +15,8 @@ namespace GlobalTheory.BSP.PoUniv
 
 variable {l : ℕ} {R : Type} [CommRing R]
 
-def deltaLocus {A B : Type} [CommRing A] [CommRing B] (D : Delta l A) (D' : Delta l B) (c : A →+* B) :
-    Subring A where
+def deltaLocus {A B : Type} [CommRing A] [CommRing B] (D : Delta l A) (D' : Delta l B) (c : A →+* B)
+    : Subring A where
   carrier := {x | c (D.δ x) = D'.δ (c x)}
   mul_mem' {a b} ha hb := by
     simp only [Set.mem_setOf_eq] at *
@@ -29,11 +29,13 @@ def deltaLocus {A B : Type} [CommRing A] [CommRing B] (D : Delta l A) (D' : Delt
   neg_mem' {a} ha := by
     simp only [Set.mem_setOf_eq] at *
     have e1 := congrArg c (D.δ_add a (-a))
-    have e2 := D'.δ_add (c a) (-c a)
+    have e2 := D'.δ_add (c a) (- c a)
     rw [add_neg_cancel, D.δ_zero] at e1
     rw [add_neg_cancel, D'.δ_zero] at e2
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_zero, map_sub, map_add (f := _), map_sum, map_mul, map_pow, map_natCast, map_neg, ha] at e1 ⊢
+      simp only [map_zero, map_sub, map_add (f := _), map_sum, map_mul, map_pow, map_natCast,
+          map_neg, ha]
+        at e1 ⊢
     linear_combination e2 - e1
 
 open CategoryTheory in
@@ -107,41 +109,45 @@ private lemma mem_subring_of_isPushout_of_maps_mem {A X Y P : Type} [CommRing A]
   rw [← hp]
   exact (r p).2
 
-
 open CategoryTheory in
-theorem _root_.GlobalTheory.BSP.PoUniv.isPO_univ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R]
+theorem _root_.GlobalTheory.BSP.PoUniv.isPO_univ
+    (l : ℕ) [Fact l.Prime]
+    (R : Type) [CommRing R]
     (B C B' C' : _root_.GlobalTheory.Prism.Obj l R) (h : _root_.GlobalTheory.Prism.Hom B C)
-    (k : _root_.GlobalTheory.Prism.Hom B B') (k' : _root_.GlobalTheory.Prism.Hom C C') (h' : _root_.GlobalTheory.Prism.Hom B' C')
-    (H : _root_.GlobalTheory.BSP.IsPO h k k' h') (Q : _root_.GlobalTheory.Prism.Obj l R)
-    (a : _root_.GlobalTheory.Prism.Hom C Q) (b : _root_.GlobalTheory.Prism.Hom B' Q)
-    (hab : a.comp h = b.comp k) :
-    ∃! c : _root_.GlobalTheory.Prism.Hom C' Q,
-      c.comp k' = a ∧ c.comp h' = b := by
+    (k : _root_.GlobalTheory.Prism.Hom B B') (k' : _root_.GlobalTheory.Prism.Hom C C')
+    (h' : _root_.GlobalTheory.Prism.Hom B' C') (H : _root_.GlobalTheory.BSP.IsPO h k k' h')
+    (Q : _root_.GlobalTheory.Prism.Obj l R) (a : _root_.GlobalTheory.Prism.Hom C Q)
+    (b : _root_.GlobalTheory.Prism.Hom B' Q) (hab : a.comp h = b.comp k)
+    : ∃! c : _root_.GlobalTheory.Prism.Hom C' Q,
+        c.comp k' = a ∧ c.comp h' = b := by
   haveI : IsAdicComplete (_root_.GlobalTheory.BSP.adI Q) Q.A :=
     Q.complete
-  have hex : ∀ m, ∃ ψ : C'.A ⧸ _root_.GlobalTheory.BSP.adI C' ^ m →+*
-      Q.A ⧸ _root_.GlobalTheory.BSP.adI Q ^ m,
-      ψ.comp (_root_.GlobalTheory.BSP.qmap k' m) = _root_.GlobalTheory.BSP.qmap a m ∧
-      ψ.comp (_root_.GlobalTheory.BSP.qmap h' m) = _root_.GlobalTheory.BSP.qmap b m := fun m =>
-    exists_ringHom_of_isPushout (H.po m) _ _ (by
-      rw [← _root_.GlobalTheory.BSP.qmap_comp, ← _root_.GlobalTheory.BSP.qmap_comp, hab])
+  have hex
+      : ∀ m,
+        ∃ ψ : C'.A ⧸ _root_.GlobalTheory.BSP.adI C' ^ m →+* Q.A ⧸ _root_.GlobalTheory.BSP.adI Q ^ m,
+          ψ.comp (_root_.GlobalTheory.BSP.qmap k' m) = _root_.GlobalTheory.BSP.qmap a m
+            ∧ ψ.comp (_root_.GlobalTheory.BSP.qmap h' m)
+              = _root_.GlobalTheory.BSP.qmap b m := fun m =>
+    exists_ringHom_of_isPushout (H.po m) _ _
+      (by rw [← _root_.GlobalTheory.BSP.qmap_comp, ← _root_.GlobalTheory.BSP.qmap_comp, hab])
   choose ψ hψa hψb using hex
-  have hψa' : ∀ m x, ψ m (Ideal.Quotient.mk _ (k'.f x)) =
-      Ideal.Quotient.mk _ (a.f x) := by
+  have hψa' : ∀ m x, ψ m (Ideal.Quotient.mk _ (k'.f x)) = Ideal.Quotient.mk _ (a.f x) := by
     intro m x
     have hx := RingHom.congr_fun (hψa m) (Ideal.Quotient.mk _ x)
     simpa [_root_.GlobalTheory.BSP.qmap_mk] using hx
-  have hψb' : ∀ m y, ψ m (Ideal.Quotient.mk _ (h'.f y)) =
-      Ideal.Quotient.mk _ (b.f y) := by
+  have hψb' : ∀ m y, ψ m (Ideal.Quotient.mk _ (h'.f y)) = Ideal.Quotient.mk _ (b.f y) := by
     intro m y
     have hy := RingHom.congr_fun (hψb m) (Ideal.Quotient.mk _ y)
     simpa [_root_.GlobalTheory.BSP.qmap_mk] using hy
-  have hcompat : ∀ {m n : ℕ} (hle : m ≤ n),
-      (Ideal.Quotient.factorPow (_root_.GlobalTheory.BSP.adI Q) hle).comp
-        ((ψ n).comp (Ideal.Quotient.mk _)) = (ψ m).comp (Ideal.Quotient.mk _) := by
+  have hcompat
+      : ∀ {m n : ℕ} (hle : m ≤ n),
+        (Ideal.Quotient.factorPow (_root_.GlobalTheory.BSP.adI Q) hle).comp
+            ((ψ n).comp (Ideal.Quotient.mk _))
+          = (ψ m).comp (Ideal.Quotient.mk _) := by
     intro m n hle
-    have key : (Ideal.Quotient.factorPow (_root_.GlobalTheory.BSP.adI Q) hle).comp (ψ n) =
-        (ψ m).comp (Ideal.Quotient.factorPow (_root_.GlobalTheory.BSP.adI C') hle) := by
+    have key
+        : (Ideal.Quotient.factorPow (_root_.GlobalTheory.BSP.adI Q) hle).comp (ψ n)
+          = (ψ m).comp (Ideal.Quotient.factorPow (_root_.GlobalTheory.BSP.adI C') hle) := by
       refine ringHom_eq_of_isPushout_of_comp_eq (H.po n) ?_ ?_
       · rw [RingHom.comp_assoc, hψa, RingHom.comp_assoc, factorPow_comp_qmap_eq_qmap_comp_factorPow,
           factorPow_comp_qmap_eq_qmap_comp_factorPow, ← RingHom.comp_assoc, hψa]
@@ -149,56 +155,60 @@ theorem _root_.GlobalTheory.BSP.PoUniv.isPO_univ (l : ℕ) [Fact l.Prime] (R : T
           factorPow_comp_qmap_eq_qmap_comp_factorPow, ← RingHom.comp_assoc, hψb]
     rw [← RingHom.comp_assoc, key, RingHom.comp_assoc]
     congr 1
-  obtain ⟨c0, hc0⟩ : ∃ c0 : C'.A →+* Q.A, ∀ n x,
-      Ideal.Quotient.mk (_root_.GlobalTheory.BSP.adI Q ^ n) (c0 x) = ψ n (Ideal.Quotient.mk _ x) :=
+  obtain ⟨c0, hc0⟩
+      : ∃ c0 : C'.A →+* Q.A, ∀ n x,
+        Ideal.Quotient.mk (_root_.GlobalTheory.BSP.adI Q ^ n) (c0 x)
+          = ψ n (Ideal.Quotient.mk _ x) :=
     ⟨_, fun n x => IsAdicComplete.mk_liftRingHom _ _ hcompat n x⟩
-  have hmap : ∀ n z, z ∈ _root_.GlobalTheory.BSP.adI C' ^ n →
-      c0 z ∈ _root_.GlobalTheory.BSP.adI Q ^ n := by
+  have hmap
+      : ∀ n z,
+        z ∈ _root_.GlobalTheory.BSP.adI C' ^ n → c0 z ∈ _root_.GlobalTheory.BSP.adI Q ^ n := by
     intro n z hz
     rw [← Ideal.Quotient.eq_zero_iff_mem, hc0, Ideal.Quotient.eq_zero_iff_mem.mpr hz, map_zero]
   have hk : ∀ x, c0 (k'.f x) = a.f x := fun x =>
     eq_of_forall_mk_pow_eq_of_isHausdorff (_root_.GlobalTheory.BSP.adI Q) fun n => by rw [hc0, hψa']
   have hh : ∀ y, c0 (h'.f y) = b.f y := fun y =>
     eq_of_forall_mk_pow_eq_of_isHausdorff (_root_.GlobalTheory.BSP.adI Q) fun n => by rw [hc0, hψb']
-  have hδ : ∀ x, c0 (C'.D.δ x) =
-      Q.D.δ (c0 x) := by
+  have hδ : ∀ x, c0 (C'.D.δ x) = Q.D.δ (c0 x) := by
     intro x
-    have hS : ∀ n, ∃ s ∈ _root_.GlobalTheory.BSP.PoUniv.deltaLocus C'.D Q.D c0,
-        x - s ∈ _root_.GlobalTheory.BSP.adI C' ^ n := by
+    have hS
+        : ∀ n, ∃ s ∈ _root_.GlobalTheory.BSP.PoUniv.deltaLocus C'.D Q.D c0,
+          x - s ∈ _root_.GlobalTheory.BSP.adI C' ^ n := by
       intro n
-      have hT := mem_subring_of_isPushout_of_maps_mem (H.po n)
-        ((_root_.GlobalTheory.BSP.PoUniv.deltaLocus C'.D Q.D c0).map
-          (Ideal.Quotient.mk (_root_.GlobalTheory.BSP.adI C' ^ n)))
-        (fun y => by
-          obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
-          rw [_root_.GlobalTheory.BSP.qmap_mk]
-          refine Subring.mem_map.mpr ⟨_, ?_, rfl⟩
-          show c0 (C'.D.δ (k'.f y)) =
-            Q.D.δ (c0 (k'.f y))
-          rw [← k'.f_δ, hk, hk, a.f_δ])
-        (fun y => by
-          obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
-          rw [_root_.GlobalTheory.BSP.qmap_mk]
-          refine Subring.mem_map.mpr ⟨_, ?_, rfl⟩
-          show c0 (C'.D.δ (h'.f y)) =
-            Q.D.δ (c0 (h'.f y))
-          rw [← h'.f_δ, hh, hh, b.f_δ])
-        (Ideal.Quotient.mk _ x)
+      have hT :=
+        mem_subring_of_isPushout_of_maps_mem (H.po n)
+          ((_root_.GlobalTheory.BSP.PoUniv.deltaLocus C'.D Q.D c0).map
+            (Ideal.Quotient.mk (_root_.GlobalTheory.BSP.adI C' ^ n)))
+          (fun y => by
+            obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
+            rw [_root_.GlobalTheory.BSP.qmap_mk]
+            refine Subring.mem_map.mpr ⟨_, ?_, rfl⟩
+            show c0 (C'.D.δ (k'.f y)) =
+              Q.D.δ (c0 (k'.f y))
+            rw [← k'.f_δ, hk, hk, a.f_δ])
+          (fun y => by
+            obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
+            rw [_root_.GlobalTheory.BSP.qmap_mk]
+            refine Subring.mem_map.mpr ⟨_, ?_, rfl⟩
+            show c0 (C'.D.δ (h'.f y)) =
+              Q.D.δ (c0 (h'.f y))
+            rw [← h'.f_δ, hh, hh, b.f_δ])
+          (Ideal.Quotient.mk _ x)
       obtain ⟨s, hs, hsx⟩ := Subring.mem_map.mp hT
       exact ⟨s, hs, Ideal.Quotient.eq.mp hsx.symm⟩
-    refine sub_eq_zero.mp (eq_of_forall_mk_pow_eq_of_isHausdorff (_root_.GlobalTheory.BSP.adI Q) fun n => ?_)
+    refine sub_eq_zero.mp (eq_of_forall_mk_pow_eq_of_isHausdorff (_root_.GlobalTheory.BSP.adI Q)
+      fun n => ?_)
     rw [map_zero, Ideal.Quotient.eq_zero_iff_mem]
     obtain ⟨s, hs, hxs⟩ := hS (n + 1)
-    have hs' : c0 (C'.D.δ s) =
-        Q.D.δ (c0 s) := hs
+    have hs' : c0 (C'.D.δ s) = Q.D.δ (c0 s) := hs
     have hlC : (l : C'.A) ∈ _root_.GlobalTheory.BSP.adI C' :=
       Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)
     have hlQ : (l : Q.A) ∈ _root_.GlobalTheory.BSP.adI Q :=
       Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)
-    have h1 := _root_.GlobalTheory.BSP.delta_add_sub_mem_pow l C'.A C'.D _ hlC n s
-      (x - s) hxs
-    have h2 := _root_.GlobalTheory.BSP.delta_add_sub_mem_pow l Q.A Q.D _ hlQ n (c0 s)
-      (c0 (x - s)) (hmap _ _ hxs)
+    have h1 := _root_.GlobalTheory.BSP.delta_add_sub_mem_pow l C'.A C'.D _ hlC n s (x - s) hxs
+    have h2 :=
+      _root_.GlobalTheory.BSP.delta_add_sub_mem_pow l Q.A Q.D _ hlQ n (c0 s) (c0 (x - s))
+        (hmap _ _ hxs)
     rw [add_sub_cancel] at h1
     rw [← map_add (f := _), add_sub_cancel] at h2
     have h3 := hmap n _ h1
@@ -214,9 +224,9 @@ theorem _root_.GlobalTheory.BSP.PoUniv.isPO_univ (l : ℕ) [Fact l.Prime] (R : T
       exact hz
     have hmem := Ideal.mem_map_of_mem c0 hz'
     rwa [Ideal.map_map, hcb, _root_.GlobalTheory.Prism.Rigid.map_I_eq l R B' Q b] at hmem
-  have hstr : ∀ (r : R) (z : C'.A),
-      Ideal.Quotient.mk C'.I z = C'.str r →
-      Ideal.Quotient.mk Q.I (c0 z) = Q.str r := by
+  have hstr
+      : ∀ (r : R) (z : C'.A),
+        Ideal.Quotient.mk C'.I z = C'.str r → Ideal.Quotient.mk Q.I (c0 z) = Q.str r := by
     intro r z hz
     obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (B'.str r)
     have h1 := h'.f_str r y hy
@@ -225,9 +235,10 @@ theorem _root_.GlobalTheory.BSP.PoUniv.isPO_univ (l : ℕ) [Fact l.Prime] (R : T
     refine hI _ ?_
     rw [← Ideal.Quotient.eq, hz, h1]
   let c : _root_.GlobalTheory.Prism.Hom C' Q := ⟨c0, hδ, hI, hstr⟩
-  have hcomm : c.comp k' = a ∧ c.comp h' = b :=
-    ⟨_root_.GlobalTheory.Prism.Hom.ext' (RingHom.ext hk),
-      _root_.GlobalTheory.Prism.Hom.ext' (RingHom.ext hh)⟩
+  have hcomm : c.comp k' = a ∧ c.comp h' = b := ⟨
+    _root_.GlobalTheory.Prism.Hom.ext' (RingHom.ext hk),
+    _root_.GlobalTheory.Prism.Hom.ext' (RingHom.ext hh)
+  ⟩
   refine ⟨c, hcomm, fun c' hc' => ?_⟩
   refine _root_.GlobalTheory.Prism.Hom.ext' (RingHom.ext fun x =>
     eq_of_forall_mk_pow_eq_of_isHausdorff (_root_.GlobalTheory.BSP.adI Q) fun n => ?_)

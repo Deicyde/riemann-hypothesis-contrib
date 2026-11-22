@@ -14,17 +14,20 @@ open GlobalTheory.OrbitAvg
 
 variable {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
 
-theorem stab_finiteIndex_of_smooth [TopologicalSpace G] [IsTopologicalGroup G] (K : Subgroup G)
-    (hc : IsCompact (K : Set G)) (ρ : Representation ℂ G V) (hs : IsSmooth ρ) (x : V) :
-    (stab ρ K x).FiniteIndex := by
+theorem stab_finiteIndex_of_smooth
+    [TopologicalSpace G] [IsTopologicalGroup G]
+    (K : Subgroup G) (hc : IsCompact (K : Set G))
+    (ρ : Representation ℂ G V) (hs : IsSmooth ρ)
+    (x : V)
+    : (stab ρ K x).FiniteIndex := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.mp hc
-  have ho : IsOpen (stab ρ K x : Set K) :=
-    (hs x).preimage continuous_subtype_val
+  have ho : IsOpen (stab ρ K x : Set K) := (hs x).preimage continuous_subtype_val
   haveI : Finite (K ⧸ stab ρ K x) := Subgroup.quotient_finite_of_isOpen _ ho
   exact Subgroup.finiteIndex_of_finite_quotient
 
-private theorem normalCore_stab_le_stab_apply (ρ : Representation ℂ G V) (K : Subgroup G) (x : V) (k : K) :
-    (stab ρ K x).normalCore ≤ stab ρ K (ρ (k : G) x) := by
+private theorem normalCore_stab_le_stab_apply
+    (ρ : Representation ℂ G V) (K : Subgroup G) (x : V) (k : K)
+    : (stab ρ K x).normalCore ≤ stab ρ K (ρ (k : G) x) := by
   intro n hn
   have hc : k⁻¹ * n * k ∈ stab ρ K x := by
     have h1 := (Subgroup.normalCore_normal (stab ρ K x)).conj_mem n hn k⁻¹
@@ -34,25 +37,30 @@ private theorem normalCore_stab_le_stab_apply (ρ : Representation ℂ G V) (K :
   have he : (n : G) * (k : G) = (k : G) * ((k⁻¹ * n * k : K) : G) := by
     simp only [Subgroup.coe_mul, Subgroup.coe_inv]
     group
-  calc ρ (n : G) (ρ (k : G) x) = ρ ((n : G) * (k : G)) x := by
-        rw [map_mul, Module.End.mul_apply]
-    _ = ρ (k : G) (ρ ((k⁻¹ * n * k : K) : G) x) := by
-        rw [he, map_mul, Module.End.mul_apply]
+  calc
+    ρ (n : G) (ρ (k : G) x)
+      = ρ ((n : G) * (k : G)) x := by rw [map_mul, Module.End.mul_apply]
+    _ = ρ (k : G) (ρ ((k⁻¹ * n * k : K) : G) x) := by rw [he, map_mul, Module.End.mul_apply]
     _ = ρ (k : G) x := by rw [hc]
 
-theorem avg_translate (ρ : Representation ℂ G V) (K : Subgroup G) {x : V}
-    (hx : (stab ρ K x).FiniteIndex) (k : K) : avg ρ K (ρ (k : G) x) = avg ρ K x := by
+theorem avg_translate
+    (ρ : Representation ℂ G V) (K : Subgroup G) {x : V} (hx : (stab ρ K x).FiniteIndex) (k : K)
+    : avg ρ K (ρ (k : G) x) = avg ρ K x := by
   haveI := hx
   have hN1 : (stab ρ K x).normalCore ≤ stab ρ K x := Subgroup.normalCore_le _
-  have hN2 : (stab ρ K x).normalCore ≤ stab ρ K (ρ (k : G) x) := normalCore_stab_le_stab_apply ρ K x k
+  have hN2 : (stab ρ K x).normalCore ≤ stab ρ K (ρ (k : G) x) :=
+    normalCore_stab_le_stab_apply ρ K x k
   rw [avg_eq ρ K hN2, avg_eq ρ K hN1]
   unfold avgH
   congr 1
-  have key : ∀ q : K ⧸ (stab ρ K x).normalCore,
-      cv ρ K (stab ρ K x).normalCore (ρ (k : G) x) q =
-        cv ρ K (stab ρ K x).normalCore x (q * (QuotientGroup.mk k)) := by
+  have key
+      : ∀ q : K ⧸ (stab ρ K x).normalCore,
+        cv ρ K (stab ρ K x).normalCore (ρ (k : G) x) q
+          = cv ρ K (stab ρ K x).normalCore x (q * (QuotientGroup.mk k)) := by
     intro q
-    have hq : q * (QuotientGroup.mk k : K ⧸ (stab ρ K x).normalCore) = QuotientGroup.mk (q.out * k) := by
+    have hq
+        : q * (QuotientGroup.mk k : K ⧸ (stab ρ K x).normalCore)
+          = QuotientGroup.mk (q.out * k) := by
       rw [QuotientGroup.mk_mul, QuotientGroup.out_eq']
     rw [hq, cv_mk ρ K hN1]
     simp only [cv, Subgroup.coe_mul, map_mul, Module.End.mul_apply]
@@ -61,16 +69,17 @@ theorem avg_translate (ρ : Representation ℂ G V) (K : Subgroup G) {x : V}
 
 end GlobalTheory.CompanionTheory.KAvg
 
-
 open GlobalTheory.OrbitAvg GlobalTheory.CompanionTheory.KAvg in
-theorem GlobalTheory.CompanionTheory.KAvg.kInvForm : PositivityTheory.SphericalProduct.KInvForm := by
+theorem GlobalTheory.CompanionTheory.KAvg.kInvForm
+    : PositivityTheory.SphericalProduct.KInvForm := by
   unfold PositivityTheory.SphericalProduct.KInvForm
   intro G _ _ _ K _ hc V _ _ ρ hs v₀ hv₀ hne
   have hfi : ∀ x : V, (stab ρ K x).FiniteIndex := fun x => stab_finiteIndex_of_smooth K hc ρ hs x
-  let A : V →ₗ[ℂ] V :=
-    { toFun := fun x => avg ρ K x
-      map_add' := fun x y => avg_add ρ K (hfi x) (hfi y)
-      map_smul' := fun c x => avg_smul ρ K (hfi x) c }
+  let A : V →ₗ[ℂ] V := {
+    toFun := fun x => avg ρ K x
+    map_add' := fun x y => avg_add ρ K (hfi x) (hfi y)
+    map_smul' := fun c x => avg_smul ρ K (hfi x) c
+  }
   obtain ⟨f, hf⟩ : ∃ f : Module.Dual ℂ V, f v₀ ≠ 0 := by
     by_contra h
     push_neg at h

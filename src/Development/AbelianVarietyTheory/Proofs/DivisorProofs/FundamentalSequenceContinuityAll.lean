@@ -8,27 +8,33 @@ open TensorProduct Polynomial
 
 namespace GlobalTheory
 
-theorem torsion_of_one_tmul_eq_zero (D K M : Type) [CommRing D] [IsDomain D] [Field K]
-    [Algebra D K] [FaithfulSMul D K] [AddCommGroup M] [Module D M] (m : M)
-    (h : (1 : K) ⊗ₜ[D] m = 0) : ∃ d : D, d ≠ 0 ∧ d • m = 0 := by
+theorem torsion_of_one_tmul_eq_zero
+    (D K M : Type) [CommRing D] [IsDomain D] [Field K] [Algebra D K] [FaithfulSMul D K]
+    [AddCommGroup M] [Module D M]
+    (m : M) (h : (1 : K) ⊗ₜ[D] m = 0)
+    : ∃ d : D, d ≠ 0 ∧ d • m = 0 := by
   letI : Algebra (FractionRing D) K := FractionRing.liftAlgebra D K
   haveI : IsScalarTower D (FractionRing D) K := FractionRing.isScalarTower_liftAlgebra D K
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap (FractionRing D) K)
-    (by rw [LinearMap.ker_eq_bot]; exact (algebraMap (FractionRing D) K).injective)
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap (FractionRing D) K)
+      (by rw [LinearMap.ker_eq_bot]; exact (algebraMap (FractionRing D) K).injective)
   have hg1 : g 1 = 1 := by
     have := LinearMap.congr_fun hg 1
     simpa using this
   have h2 : (1 : FractionRing D) ⊗ₜ[D] m = 0 := by
     have := congrArg ((g.restrictScalars D).rTensor M) h
     simpa [hg1] using this
-  obtain ⟨⟨d, hd⟩, hdm⟩ := (IsLocalizedModule.eq_zero_iff (nonZeroDivisors D)
-    (TensorProduct.mk D (FractionRing D) M 1)).1 h2
+  obtain ⟨⟨d, hd⟩, hdm⟩ :=
+    (IsLocalizedModule.eq_zero_iff (nonZeroDivisors D) (TensorProduct.mk D (FractionRing D) M 1)).1
+      h2
   exact ⟨d, nonZeroDivisors.ne_zero hd, hdm⟩
 
-theorem exists_not_mem_ker_smul_mem_map_of_one_tmul_eq_zero (A B K : Type) [CommRing A] [CommRing B]
-    [Algebra A B] [Field K] [Algebra A K] (b : B) (h : (1 : K) ⊗ₜ[A] b = 0) :
-    ∃ f : A, f ∉ RingHom.ker (algebraMap A K) ∧
-      f • b ∈ (RingHom.ker (algebraMap A K)).map (algebraMap A B) := by
+theorem exists_not_mem_ker_smul_mem_map_of_one_tmul_eq_zero
+    (A B K : Type) [CommRing A] [CommRing B] [Algebra A B] [Field K] [Algebra A K]
+    (b : B) (h : (1 : K) ⊗ₜ[A] b = 0)
+    : ∃ f : A,
+      f ∉ RingHom.ker (algebraMap A K)
+        ∧ f • b ∈ (RingHom.ker (algebraMap A K)).map (algebraMap A B) := by
   set P := RingHom.ker (algebraMap A K) with hP
   haveI : P.IsPrime := RingHom.ker_isPrime _
   letI : Algebra (A ⧸ P) K := (RingHom.kerLift (algebraMap A K)).toAlgebra

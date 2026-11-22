@@ -8,11 +8,12 @@ namespace GlobalTheory.UpperUnitriangularMul
 
 open Matrix
 
-theorem upperUnitriangular_mul {E : Type} [Field E] [NumberField E] [StarRing E] {N : ℕ}
-    {U W : Matrix (Fin N) (Fin N) E}
+theorem upperUnitriangular_mul
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {N : ℕ} {U W : Matrix (Fin N) (Fin N) E}
     (hU : ∀ a b : Fin N, b < a → U a b = (0 : E)) (hU1 : ∀ a : Fin N, U a a = (1 : E))
-    (hW : ∀ a b : Fin N, b < a → W a b = (0 : E)) (hW1 : ∀ a : Fin N, W a a = (1 : E)) :
-    (∀ a b : Fin N, b < a → (U * W) a b = (0 : E)) ∧ ∀ a : Fin N, (U * W) a a = (1 : E) := by
+    (hW : ∀ a b : Fin N, b < a → W a b = (0 : E)) (hW1 : ∀ a : Fin N, W a a = (1 : E))
+    : (∀ a b : Fin N, b < a → (U * W) a b = (0 : E)) ∧ ∀ a : Fin N, (U * W) a a = (1 : E) := by
   constructor
   · intro a b hba
     rw [Matrix.mul_apply]

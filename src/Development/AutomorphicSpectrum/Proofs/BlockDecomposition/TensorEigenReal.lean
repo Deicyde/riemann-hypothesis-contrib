@@ -16,44 +16,52 @@ noncomputable def contr (v : V ⊗[ℂ] W) : Module.Dual ℂ V →ₗ[ℂ] W whe
   map_add' l m := by simp [LinearMap.rTensor_add]
   map_smul' c l := by simp [LinearMap.rTensor_smul]
 
-theorem contr_apply (v : V ⊗[ℂ] W) (l : Module.Dual ℂ V) :
-    contr v l = TensorProduct.lid ℂ W (LinearMap.rTensor W l v) := rfl
+theorem contr_apply (v : V ⊗[ℂ] W) (l : Module.Dual ℂ V)
+    : contr v l = TensorProduct.lid ℂ W (LinearMap.rTensor W l v) :=
+  rfl
 
 theorem contr_tmul (a : V) (b : W) (l : Module.Dual ℂ V) : contr (a ⊗ₜ[ℂ] b) l = l a • b := by
   simp [contr_apply]
 
-theorem contr_add (v w : V ⊗[ℂ] W) (l : Module.Dual ℂ V) : contr (v + w) l = contr v l + contr w l := by
+theorem contr_add (v w : V ⊗[ℂ] W) (l : Module.Dual ℂ V)
+    : contr (v + w) l = contr v l + contr w l := by
   simp [contr_apply]
 
-theorem contr_smul (c : ℂ) (v : V ⊗[ℂ] W) (l : Module.Dual ℂ V) : contr (c • v) l = c • contr v l := by
+theorem contr_smul (c : ℂ) (v : V ⊗[ℂ] W) (l : Module.Dual ℂ V)
+    : contr (c • v) l = c • contr v l := by
   simp [contr_apply]
 
-theorem contr_map (A : Module.End ℂ V) (B : Module.End ℂ W) (v : V ⊗[ℂ] W) (l : Module.Dual ℂ V) :
-    B (contr v (l ∘ₗ A)) = contr (TensorProduct.map A B v) l := by
+theorem contr_map (A : Module.End ℂ V) (B : Module.End ℂ W) (v : V ⊗[ℂ] W) (l : Module.Dual ℂ V)
+    : B (contr v (l ∘ₗ A)) = contr (TensorProduct.map A B v) l := by
   induction v using TensorProduct.induction_on with
   | zero => simp [contr_apply]
   | tmul a b => simp [contr_tmul]
   | add x y hx hy => simp only [map_add (f := _), contr_add, hx, hy]
 
-theorem exists_finiteDimensional (v : V ⊗[ℂ] W) :
-    ∃ T : Submodule ℂ W, FiniteDimensional ℂ T ∧ ∀ l, contr v l ∈ T := by
+theorem exists_finiteDimensional (v : V ⊗[ℂ] W)
+    : ∃ T : Submodule ℂ W, FiniteDimensional ℂ T ∧ ∀ l, contr v l ∈ T := by
   induction v using TensorProduct.induction_on with
   | zero => exact ⟨⊥, inferInstance, fun l => by simp [contr_apply]⟩
   | tmul a b =>
-    exact ⟨ℂ ∙ b, inferInstance, fun l => by
-      rw [contr_tmul]; exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self b)⟩
+    exact ⟨
+      ℂ ∙ b,
+      inferInstance,
+      fun l => by
+        rw [contr_tmul]; exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self b)
+    ⟩
   | add x y hx hy =>
     obtain ⟨T, hT, h⟩ := hx
     obtain ⟨T', hT', h'⟩ := hy
-    exact ⟨T ⊔ T', inferInstance, fun l => by
-      rw [contr_add]; exact Submodule.add_mem_sup (h l) (h' l)⟩
+    exact
+      ⟨T ⊔ T', inferInstance, fun l => by rw [contr_add]; exact Submodule.add_mem_sup (h l) (h' l)⟩
 
 theorem exists_contr_ne_zero {v : V ⊗[ℂ] W} (hv : v ≠ 0) : ∃ l, contr v l ≠ 0 := by
   by_contra hcon
   push_neg at hcon
   apply hv
   let b := Module.Free.chooseBasis ℂ V
-  have key : ∀ (w : V ⊗[ℂ] W) i, TensorProduct.equivFinsuppOfBasisLeft b w i = contr w (b.coord i) := by
+  have key
+      : ∀ (w : V ⊗[ℂ] W) i, TensorProduct.equivFinsuppOfBasisLeft b w i = contr w (b.coord i) := by
     intro w i
     induction w using TensorProduct.induction_on with
     | zero => simp [contr_apply]
@@ -64,11 +72,14 @@ theorem exists_contr_ne_zero {v : V ⊗[ℂ] W} (hv : v ≠ 0) : ∃ l, contr v 
   rw [key, hcon]
   simp
 
-theorem core {Y : Type} (A : Module.End ℂ V) (B : Y → Module.End ℂ W) (a : ℂ) (ha : a ≠ 0) (mu : Y → ℂ)
-    (hmu : ∀ y, mu y ≠ 0) (v : V ⊗[ℂ] W) (hv : v ≠ 0)
-    (h : ∀ y, TensorProduct.map A (B y) v = (a * mu y) • v) :
-    ∃ (l : Module.Dual ℂ V) (c : ℂ), c ≠ 0 ∧ contr v l ≠ 0 ∧
-      ∀ y, B y (contr v l) = (c * mu y) • contr v l := by
+theorem core
+    {Y : Type}
+    (A : Module.End ℂ V) (B : Y → Module.End ℂ W)
+    (a : ℂ) (ha : a ≠ 0)
+    (mu : Y → ℂ) (hmu : ∀ y, mu y ≠ 0)
+    (v : V ⊗[ℂ] W) (hv : v ≠ 0) (h : ∀ y, TensorProduct.map A (B y) v = (a * mu y) • v)
+    : ∃ (l : Module.Dual ℂ V) (c : ℂ),
+      c ≠ 0 ∧ contr v l ≠ 0 ∧ ∀ y, B y (contr v l) = (c * mu y) • contr v l := by
   obtain ⟨l₀, hl₀⟩ := exists_contr_ne_zero hv
   rcases isEmpty_or_nonempty Y with hY | ⟨⟨y0⟩⟩
   · exact ⟨l₀, 1, one_ne_zero, hl₀, fun y => isEmptyElim y⟩
@@ -114,8 +125,7 @@ theorem core {Y : Type} (A : Module.End ℂ V) (B : Y → Module.End ℂ W) (a :
     obtain ⟨t, ht, rfl⟩ := hmap hs
     exact ⟨⟨t, hle ht⟩, rfl⟩
   have hinj : Function.Injective R := LinearMap.injective_iff_surjective.mpr hsurj
-  have hnt : Nontrivial S :=
-    ⟨⟨⟨contr v l₀, ⟨l₀, rfl⟩⟩, 0, fun e => hl₀ (congrArg Subtype.val e)⟩⟩
+  have hnt : Nontrivial S := ⟨⟨⟨contr v l₀, ⟨l₀, rfl⟩⟩, 0, fun e => hl₀ (congrArg Subtype.val e)⟩⟩
   obtain ⟨γ, hγ⟩ := Module.End.exists_eigenvalue R
   obtain ⟨u, hu⟩ := hγ.exists_hasEigenvector
   have hRu : R u = γ • u := hu.apply_eq_smul

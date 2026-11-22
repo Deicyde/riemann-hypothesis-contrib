@@ -7,7 +7,9 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum
 open GlobalTheory.AdelicU GlobalTheory.StdUnn
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -16,10 +18,14 @@ namespace PositivityTheory.Rg.Sw.Glob.GenTopH
 
 variable {D : D7} {n : ℕ}
 
-theorem mat_projFin (g : G D n) : (mat g).map (finPart D) = (HA.mat _ D.sp.cm.sig (Jst D n) (projFin D.sp.cm.sig (Jst D n) g)).1 :=
+theorem mat_projFin (g : G D n)
+    : (mat g).map (finPart D)
+      = (HA.mat _ D.sp.cm.sig (Jst D n) (projFin D.sp.cm.sig (Jst D n) g)).1 :=
   rfl
 
-theorem mat_projInf (g : G D n) : (mat g).map (infPart D) = (HA.mat _ D.sp.cm.sig (Jst D n) (projInf D.sp.cm.sig (Jst D n) g)).1 :=
+theorem mat_projInf (g : G D n)
+    : (mat g).map (infPart D)
+      = (HA.mat _ D.sp.cm.sig (Jst D n) (projInf D.sp.cm.sig (Jst D n) g)).1 :=
   rfl
 
 end PositivityTheory.Rg.Sw.Glob.GenTopH
@@ -44,7 +50,8 @@ theorem genA_of : UnitD → PIn → KInInf → KInFin → GenA := by
     · rw [proj_ofFin, projFinLoc_projFin]; exact hk'.1 v
     · rw [projArch_ofFin]; exact one_mem _
   · intro τ
-    have e : Formalism.IndefR.Eqv.psiT D τ = (Formalism.IndefR.Eqv.thetaC D τ).comp (infPart D) := rfl
+    have e : Formalism.IndefR.Eqv.psiT D τ = (Formalism.IndefR.Eqv.thetaC D τ).comp (infPart D) :=
+      rfl
     rw [e, RingHom.coe_comp, ← Matrix.map_map, GenTopH.mat_projInf, projInf_ofFin]
     exact Matrix.map_one _ (map_zero _) (map_one _)
 

@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.W2.Seed.QuadraticExtensions
@@ -112,8 +113,7 @@ private lemma root_odd (q : ℕ) (hq : q.Prime) (h2 : q ≠ 2) (d0 m : ℕ) (hm 
 end UpperTheory.Gal.W2.Seed.QuadraticExtensions
 
 open UpperTheory.Gal.W2.Seed.QuadraticExtensions in
-theorem UpperTheory.Gal.W2.Seed.pQuadEx :
-    QuadEx := by
+theorem UpperTheory.Gal.W2.Seed.pQuadEx : QuadEx := by
   intro d hd
   obtain ⟨d0, g, hgd, hsq⟩ := Nat.sq_mul_squarefree d
   have hg : 0 < g := by

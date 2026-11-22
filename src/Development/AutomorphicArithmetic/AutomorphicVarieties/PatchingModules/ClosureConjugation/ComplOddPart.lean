@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
 section aux
@@ -29,11 +30,10 @@ private theorem mem_one_iff (z : Φ.Ext) : z ∈ (1 : Submodule B Φ.Ext) ↔ z.
 
 private def oddPart : Submodule B Φ.Ext where
   carrier := {z | z.ev = 0}
-  add_mem' := fun {x y} (hx : x.ev = 0) (hy : y.ev = 0) => show (x + y).ev = 0 by
-    rw [OddForm.ev_add, hx, hy, add_zero]
+  add_mem' := fun {x y} (hx : x.ev = 0) (hy : y.ev = 0) =>
+    show (x + y).ev = 0 by rw [OddForm.ev_add, hx, hy, add_zero]
   zero_mem' := rfl
-  smul_mem' := fun c x (hx : x.ev = 0) => show (c • x).ev = 0 by
-    rw [OddForm.ev_smul, hx, mul_zero]
+  smul_mem' := fun c x (hx : x.ev = 0) => show (c • x).ev = 0 by rw [OddForm.ev_smul, hx, mul_zero]
 
 private theorem mem_oddPart (z : Φ.Ext) : z ∈ oddPart Φ ↔ z.ev = 0 := Iff.rfl
 
@@ -49,13 +49,18 @@ private theorem compl_oddPart : _root_.IsCompl (1 : Submodule B Φ.Ext) (oddPart
 
 end aux
 
-private theorem oB_eq_iff {n a : ℕ} (h1 : 1 ≤ a) (h2 : a < n) (i j : Fin n) :
-    oB n a i = oB n a j ↔ (((i : ℕ) < a) ↔ ((j : ℕ) < a)) := by
+private theorem oB_eq_iff {n a : ℕ} (h1 : 1 ≤ a) (h2 : a < n) (i j : Fin n)
+    : oB n a i = oB n a j ↔ (((i : ℕ) < a) ↔ ((j : ℕ) < a)) := by
   unfold oB
   by_cases hi : (i : ℕ) < a <;> by_cases hj : (j : ℕ) < a <;> simp [hi, hj] <;> omega
 
-theorem UpperTheory.V.Pa.gr_E :
-    ∀ {B E F : Type} [CommRing B] [IsLocalRing B] [Ring E] [Algebra B E] [Field F] [Algebra B F] {n : ℕ} [Module.Finite B E] (a : ℕ) (T : TrInv B E) (r : E →ₐ[B] Matrix (Fin n) (Fin n) F) (U : T.Units (Fin n) (oB n a)), 1 ≤ a → a < n → RingHom.ker (algebraMap B F) = maximalIdeal B → (∀ y, r (T.st y) = (r y)ᵀ) → (∀ i, r (U.x i) = single (oB n a i) i 1) → (∀ y, r y ∈ Ev F F n a) → Nonempty (GrAlg T n a r U.ep) := by
+theorem UpperTheory.V.Pa.gr_E
+    : ∀ {B E F : Type} [CommRing B] [IsLocalRing B] [Ring E] [Algebra B E] [Field F] [Algebra B F]
+        {n : ℕ} [Module.Finite B E] (a : ℕ) (T : TrInv B E) (r : E →ₐ[B] Matrix (Fin n) (Fin n) F)
+        (U : T.Units (Fin n) (oB n a)),
+      1 ≤ a → a < n → RingHom.ker (algebraMap B F) = maximalIdeal B → (∀ y, r (T.st y) = (r y)ᵀ)
+        → (∀ i, r (U.x i) = single (oB n a i) i 1) → (∀ y, r y ∈ Ev F F n a)
+        → Nonempty (GrAlg T n a r U.ep) := by
   intro B E F _ _ _ _ _ _ n _ a T r U h1 h2 hker hst hx hev
   let p : Fin n := ⟨0, by omega⟩
   let q : Fin n := ⟨n - 1, by omega⟩
@@ -73,7 +78,7 @@ theorem UpperTheory.V.Pa.gr_E :
     rw [if_pos (show 0 < a by omega)]
   have hq : oB n a q = q := by
     unfold oB
-    rw [if_neg (show ¬ (n - 1 < a) by omega)]
+    rw [if_neg (show ¬(n - 1 < a) by omega)]
   have h0 : ∀ y i j, oB n a i ≠ oB n a j → r y i j = 0 := fun y i j h =>
     (Submodule.mem_bot F).1 ((hev y i j).2 fun h' => h ((oB_eq_iff h1 h2 i j).2 h'))
   obtain ⟨φ, hφ, hφst, -⟩ := vr_hom T (oB n a) U p q hpq ho
@@ -83,28 +88,32 @@ theorem UpperTheory.V.Pa.gr_E :
   rw [hker] at hle'
   have hφe : (φ : E → _) = U.vr p q := funext hφ
   haveI : Module.Finite B (corner B (U.ep p) (U.ep q)) := Module.Finite.range _
-  have hv : ∀ y y' k l, U.x k * y * T.st (U.x l) = U.x k * y' * T.st (U.x l) → φ y k l = φ y' k l :=
-    fun y y' k l h => by
-      rw [hφ, hφ]
-      simp only [TrInv.Units.vr, Matrix.of_apply, h]
+  have hv
+      : ∀ y y' k l,
+        U.x k * y * T.st (U.x l) = U.x k * y' * T.st (U.x l)
+          → φ y k l = φ y' k l := fun y y' k l h => by
+    rw [hφ, hφ]
+    simp only [TrInv.Units.vr, Matrix.of_apply, h]
   have ha : ∀ i, U.x i * U.ep i = U.x i := fun i => by
     conv_lhs => rw [← U.x_mem i, mul_assoc, (U.coi.idem i).eq]
     exact U.x_mem i
   have hd : ∀ i, U.ep i * T.st (U.x i) = T.st (U.x i) := fun i => by
     rw [← U.st_ep i, ← T.st_mul, ha]
-  refine ⟨{ AA := (U.oddForm p q).Ext
-            fin := inferInstance
-            inj := fun b b' h => ?_
-            N := oddPart _
-            compl := compl_oddPart _
-            mul_mem := fun y hy z hz => ?_
-            typeI := fun h => absurd h h2.ne
-            φ := φ
-            φ_inj := hφe ▸ hinj
-            range := fun Y => ?_
-            st := hφst
-            φ_ep := fun i => ?_
-            red := fun y i j b h => ?_ }⟩
+  refine ⟨{
+    AA := (U.oddForm p q).Ext
+    fin := inferInstance
+    inj := fun b b' h => ?_
+    N := oddPart _
+    compl := compl_oddPart _
+    mul_mem := fun y hy z hz => ?_
+    typeI := fun h => absurd h h2.ne
+    φ := φ
+    φ_inj := hφe ▸ hinj
+    range := fun Y => ?_
+    st := hφst
+    φ_ep := fun i => ?_
+    red := fun y i j b h => ?_
+  }⟩
   · rw [← ev_alg (U.oddForm p q) b, h, ev_alg]
   · rw [mem_oddPart] at hy hz
     refine ⟨(U.oddForm p q).be y.od z.od, hle' (Ideal.subset_span ⟨_, _, rfl⟩), OddForm.ext ?_ ?_⟩

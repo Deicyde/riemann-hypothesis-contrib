@@ -8,38 +8,43 @@ public import Development.AutomorphicSpectrum.Proofs.MembershipProofs.GoodCharIs
 
 noncomputable section
 
-open MeasureTheory GlobalTheory.WeilM GlobalTheory.CompanionTheory.VacLoc GlobalTheory.CompanionTheory.SchrLaw
+open MeasureTheory GlobalTheory.WeilM GlobalTheory.CompanionTheory.VacLoc
+  GlobalTheory.CompanionTheory.SchrLaw
 
 namespace GlobalTheory.CompanionTheory.SchrModel
 
 variable {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
 
-theorem locallyCompact_of_goodChar [T2Space R] {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u) :
-    LocallyCompactSpace R := by
+theorem locallyCompact_of_goodChar
+    [T2Space R] {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u)
+    : LocallyCompactSpace R := by
   exact h.compact.locallyCompactSpace_of_mem_nhds_of_addGroup (h.isOpen.mem_nhds O.zero_mem)
 
-
 omit [CommRing R] [IsTopologicalRing R] in
-theorem integrable_pair {κ : Type} (μ : @Measure (κ → R) (borel _))
-    (hμ : @IsFiniteMeasureOnCompacts _ (borel _) _ μ) (φ φ' : SB (κ → R)) :
-    @Integrable _ _ _ _ (borel _) (fun x => (starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ' : (κ → R) → ℂ) x) μ := by
+theorem integrable_pair
+    {κ : Type} (μ : @Measure (κ → R) (borel _)) (hμ : @IsFiniteMeasureOnCompacts _ (borel _) _ μ)
+    (φ φ' : SB (κ → R))
+    : @Integrable _ _ _ _ (borel _)
+      (fun x => (starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ' : (κ → R) → ℂ) x)
+      μ := by
   haveI := hμ
   have hφ : IsLocallyConstant (φ : (κ → R) → ℂ) ∧ HasCompactSupport (φ : (κ → R) → ℂ) := φ.2
   have hφ' : IsLocallyConstant (φ' : (κ → R) → ℂ) ∧ HasCompactSupport (φ' : (κ → R) → ℂ) := φ'.2
   have hcont : Continuous (fun x => (starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ' : (κ → R) → ℂ) x) :=
     (Complex.continuous_conj.comp hφ.1.continuous).mul hφ'.1.continuous
-  have hsupp : HasCompactSupport
-      (fun x => (starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ' : (κ → R) → ℂ) x) :=
+  have hsupp
+      : HasCompactSupport (fun x => (starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ' : (κ → R) → ℂ) x) :=
     HasCompactSupport.mul_left (f := fun x => (starRingEnd ℂ) ((φ : (κ → R) → ℂ) x)) hφ'.2
   letI : MeasurableSpace (κ → R) := borel _
   haveI : BorelSpace (κ → R) := ⟨rfl⟩
   exact Continuous.integrable_of_hasCompactSupport hcont hsupp
 
-
 omit [CommRing R] [IsTopologicalRing R] in
-def form {κ : Type} (μ : @Measure (κ → R) (borel _)) (hμ : @IsFiniteMeasureOnCompacts _ (borel _) _ μ) :
-    SB (κ → R) →ₗ⋆[ℂ] SB (κ → R) →ₗ[ℂ] ℂ :=
-  LinearMap.mk₂'ₛₗ (starRingEnd ℂ) (RingHom.id ℂ) (fun φ φ' => pair μ φ φ')
+def form
+    {κ : Type} (μ : @Measure (κ → R) (borel _)) (hμ : @IsFiniteMeasureOnCompacts _ (borel _) _ μ)
+    : SB (κ → R) →ₗ⋆[ℂ] SB (κ → R) →ₗ[ℂ] ℂ :=
+  LinearMap.mk₂'ₛₗ (starRingEnd ℂ) (RingHom.id ℂ)
+    (fun φ φ' => pair μ φ φ')
     (fun φ₁ φ₂ φ' => by
       unfold pair
       rw [← integral_add (integrable_pair μ hμ φ₁ φ') (integrable_pair μ hμ φ₂ φ')]
@@ -65,32 +70,33 @@ def form {κ : Type} (μ : @Measure (κ → R) (borel _)) (hμ : @IsFiniteMeasur
       funext x
       simp [mul_left_comm])
 
-
 omit [CommRing R] [IsTopologicalRing R] in
-theorem pair_conj {κ : Type} (μ : @Measure (κ → R) (borel _)) (φ φ' : (κ → R) → ℂ) :
-    (starRingEnd ℂ) (pair μ φ φ') = pair μ φ' φ := by
+theorem pair_conj {κ : Type} (μ : @Measure (κ → R) (borel _)) (φ φ' : (κ → R) → ℂ)
+    : (starRingEnd ℂ) (pair μ φ φ') = pair μ φ' φ := by
   show (starRingEnd ℂ) (∫ x, (starRingEnd ℂ) (φ x) * φ' x ∂μ) = ∫ x, (starRingEnd ℂ) (φ' x) * φ x ∂μ
   rw [← @integral_conj (κ → R) (borel _) μ ℂ _ _]
   congr 1
   funext x
   rw [map_mul, Complex.conj_conj, mul_comm]
 
-
 omit [IsTopologicalRing R] in
-theorem pair_pos {κ : Type} (μ : @Measure (κ → R) (borel _))
-    (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ) (φ : SB (κ → R)) (hφ : φ ≠ 0) :
-    0 < (pair μ (φ : (κ → R) → ℂ) φ).re := by
+theorem pair_pos
+    {κ : Type} (μ : @Measure (κ → R) (borel _)) (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ)
+    (φ : SB (κ → R)) (hφ : φ ≠ 0)
+    : 0 < (pair μ (φ : (κ → R) → ℂ) φ).re := by
   haveI := hμ
   have hφl : IsLocallyConstant (φ : (κ → R) → ℂ) ∧ HasCompactSupport (φ : (κ → R) → ℂ) := φ.2
   have hcont : Continuous (φ : (κ → R) → ℂ) := hφl.1.continuous
-  have hint := integrable_pair μ
-    (@Measure.IsAddHaarMeasure.toIsFiniteMeasureOnCompacts _ _ _ (borel _) μ hμ) φ φ
+  have hint :=
+    integrable_pair μ (@Measure.IsAddHaarMeasure.toIsFiniteMeasureOnCompacts _ _ _ (borel _) μ hμ) φ
+      φ
   have hg : ∀ z : ℂ, ((starRingEnd ℂ) z * z).re = Complex.normSq z := by
     intro z
     rw [Complex.normSq_apply, Complex.mul_re, Complex.conj_re, Complex.conj_im]
     ring
-  have hre : (pair μ (φ : (κ → R) → ℂ) φ).re =
-      ∫ x, ((starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ : (κ → R) → ℂ) x).re ∂μ :=
+  have hre
+      : (pair μ (φ : (κ → R) → ℂ) φ).re
+        = ∫ x, ((starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ : (κ → R) → ℂ) x).re ∂μ :=
     (@integral_re (κ → R) (borel _) μ ℂ _ _ hint).symm
   rw [hre]
   obtain ⟨x0, hx0⟩ : ∃ x, (φ : (κ → R) → ℂ) x ≠ 0 := by
@@ -107,34 +113,46 @@ theorem pair_pos {κ : Type} (μ : @Measure (κ → R) (borel _))
     exact Complex.normSq_nonneg _
   · exact hint.re
   · have hU : IsOpen ((φ : (κ → R) → ℂ) ⁻¹' {0}ᶜ) := hcont.isOpen_preimage _ isOpen_compl_singleton
-    have hsub : (φ : (κ → R) → ℂ) ⁻¹' {0}ᶜ ⊆
-        Function.support fun x => ((starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ : (κ → R) → ℂ) x).re := by
+    have hsub
+        : (φ : (κ → R) → ℂ) ⁻¹' {0}ᶜ
+          ⊆ Function.support fun x =>
+            ((starRingEnd ℂ) ((φ : (κ → R) → ℂ) x) * (φ : (κ → R) → ℂ) x).re := by
       intro x hx
       rw [Function.mem_support, hg]
       exact (Complex.normSq_pos.mpr hx).ne'
     exact lt_of_lt_of_le (hU.measure_pos μ ⟨x0, hx0⟩) (measure_mono hsub)
 
-variable [T2Space R] [Invertible (2 : R)] {W : Type} [AddCommGroup W] [Module R W] {B : W → W → R} {κ : Type} [Fintype κ]
+variable
+  [T2Space R] [Invertible (2 : R)]
+  {W : Type} [AddCommGroup W] [Module R W]
+  {B : W → W → R} {κ : Type} [Fintype κ]
 
-def sys {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u) (d : Darboux B κ)
-    (μ : @Measure (κ → R) (borel _)) (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ) :
-    GlobalTheory.CompanionTheory.FinHeis.Sys W (SB (κ → R)) :=
+def sys
+    {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u)
+    (d : Darboux B κ)
+    (μ : @Measure (κ → R) (borel _)) (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ)
+    : GlobalTheory.CompanionTheory.FinHeis.Sys W (SB (κ → R)) :=
   haveI := locallyCompact_of_goodChar h
-  { c := fun w w' => ψ (⅟(2 : R) * B w w')
-    rho := fun w =>
-      { toFun := fun φ => ⟨d.rho ψ w φ, (schr_law ψ O u d μ w w φ φ h hμ).2.2.1 φ.2⟩
-        map_add' := fun φ φ' => Subtype.ext (funext fun x => by simp [Darboux.rho, schr, mul_add])
-        map_smul' := fun a φ => Subtype.ext (funext fun x => by simp [Darboux.rho, schr, mul_left_comm]) }
+  {
+    c := fun w w' => ψ (⅟(2 : R) * B w w')
+    rho := fun w => {
+      toFun := fun φ => ⟨d.rho ψ w φ, (schr_law ψ O u d μ w w φ φ h hμ).2.2.1 φ.2⟩
+      map_add' := fun φ φ' => Subtype.ext (funext fun x => by simp [Darboux.rho, schr, mul_add])
+      map_smul' := fun a φ =>
+        Subtype.ext (funext fun x => by simp [Darboux.rho, schr, mul_left_comm])
+    }
     B := form μ (@Measure.IsAddHaarMeasure.toIsFiniteMeasureOnCompacts _ _ _ (borel _) μ hμ)
     c_add_left := fun x x' y => by
       rw [← AddChar.map_add_eq_mul]
       congr 1
-      simp only [d.form, map_add (f := _), Prod.fst_add, Prod.snd_add, add_dotProduct, dotProduct_add]
+      simp only [d.form, map_add (f := _), Prod.fst_add, Prod.snd_add, add_dotProduct,
+        dotProduct_add]
       ring
     c_add_right := fun x y y' => by
       rw [← AddChar.map_add_eq_mul]
       congr 1
-      simp only [d.form, map_add (f := _), Prod.fst_add, Prod.snd_add, add_dotProduct, dotProduct_add]
+      simp only [d.form, map_add (f := _), Prod.fst_add, Prod.snd_add, add_dotProduct,
+        dotProduct_add]
       ring
     c_self := fun x => by simp [d.form]
     c_norm := fun x y => h.norm_one _
@@ -142,17 +160,22 @@ def sys {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u) (d 
     rho_rho := fun w w' φ => Subtype.ext (schr_law ψ O u d μ w w' φ φ h hμ).1
     B_conj := fun φ φ' => pair_conj μ φ φ'
     B_pos := fun φ hφ => pair_pos μ hμ φ hφ
-    B_rho := fun w φ φ' => (schr_law ψ O u d μ w w φ φ' h hμ).2.2.2 }
+    B_rho := fun w φ φ' => (schr_law ψ O u d μ w w φ φ' h hμ).2.2.2
+  }
 
-theorem isModel_sys {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u) (d : Darboux B κ)
-    (μ : @Measure (κ → R) (borel _)) (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ) :
-    IsModel ψ d μ (sys h d μ hμ) := by
+theorem isModel_sys
+    {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u)
+    (d : Darboux B κ)
+    (μ : @Measure (κ → R) (borel _)) (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ)
+    : IsModel ψ d μ (sys h d μ hμ) := by
   show (∀ w φ, _) ∧ (∀ φ φ', _) ∧ ∀ w w', _
   exact ⟨fun w φ => rfl, fun φ φ' => rfl, fun w w' => rfl⟩
 
-theorem exists_isModel {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u) (d : Darboux B κ)
-    (μ : @Measure (κ → R) (borel _)) (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ) :
-    ∃ S : GlobalTheory.CompanionTheory.FinHeis.Sys W (SB (κ → R)), IsModel ψ d μ S := by
+theorem exists_isModel
+    {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u)
+    (d : Darboux B κ)
+    (μ : @Measure (κ → R) (borel _)) (hμ : @Measure.IsAddHaarMeasure _ _ _ (borel _) μ)
+    : ∃ S : GlobalTheory.CompanionTheory.FinHeis.Sys W (SB (κ → R)), IsModel ψ d μ S := by
   exact ⟨sys h d μ hμ, isModel_sys h d μ hμ⟩
 
 end GlobalTheory.CompanionTheory.SchrModel

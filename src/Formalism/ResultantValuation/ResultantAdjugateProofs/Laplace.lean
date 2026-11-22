@@ -18,8 +18,8 @@ theorem perm_sign_eq_inversion_sign {n : ℕ} (f : Perm (Fin n)) : Perm.sign f =
   · intro g x y hxy ih
     rw [Perm.sign_mul, Perm.signAux_mul, ih, Perm.sign_swap hxy, Perm.signAux_swap hxy]
 
-theorem prod_finPairsLT {n : ℕ} (f : (Σ _ : Fin n, Fin n) → ℤˣ) :
-    ∏ p ∈ Perm.finPairsLT n, f p = ∏ x : Fin n, ∏ y : Fin n, if y < x then f ⟨x, y⟩ else 1 := by
+theorem prod_finPairsLT {n : ℕ} (f : (Σ _ : Fin n, Fin n) → ℤˣ)
+    : ∏ p ∈ Perm.finPairsLT n, f p = ∏ x : Fin n, ∏ y : Fin n, if y < x then f ⟨x, y⟩ else 1 := by
   have hs : Perm.finPairsLT n = univ.sigma (fun x : Fin n => univ.filter (· < x)) := by
     ext ⟨x, y⟩
     simp [Perm.mem_finPairsLT]
@@ -29,8 +29,8 @@ theorem prod_finPairsLT {n : ℕ} (f : (Σ _ : Fin n, Fin n) → ℤˣ) :
 
 variable {a b : ℕ}
 
-theorem shuffle_bijective (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b) :
-    Function.Bijective (Sum.elim (J.orderEmbOfFin h) (Jᶜ.orderEmbOfFin hc)) := by
+theorem shuffle_bijective (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b)
+    : Function.Bijective (Sum.elim (J.orderEmbOfFin h) (Jᶜ.orderEmbOfFin hc)) := by
   rw [Fintype.bijective_iff_injective_and_card]
   refine ⟨?_, by simp⟩
   rintro (i | i) (j | j) hij
@@ -50,12 +50,14 @@ theorem shuffle_bijective (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ
 def shuffle (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b) : Perm (Fin (a + b)) :=
   finSumFinEquiv.symm.trans (Equiv.ofBijective _ (shuffle_bijective J h hc))
 
-@[simp] theorem shuffle_castAdd (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b)
-    (i : Fin a) : shuffle J h hc (Fin.castAdd b i) = J.orderEmbOfFin h i := by
+@[simp]
+theorem shuffle_castAdd (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b) (i : Fin a)
+    : shuffle J h hc (Fin.castAdd b i) = J.orderEmbOfFin h i := by
   simp [shuffle]
 
-@[simp] theorem shuffle_natAdd (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b)
-    (j : Fin b) : shuffle J h hc (Fin.natAdd a j) = Jᶜ.orderEmbOfFin hc j := by
+@[simp]
+theorem shuffle_natAdd (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b) (j : Fin b)
+    : shuffle J h hc (Fin.natAdd a j) = Jᶜ.orderEmbOfFin hc j := by
   simp [shuffle]
 
 private lemma card_filter_le_orderEmbOfFin (J : Finset (Fin (a + b))) (h : J.card = a) (i : Fin a) :
@@ -74,11 +76,12 @@ private lemma card_filter_le_orderEmbOfFin (J : Finset (Fin (a + b))) (h : J.car
       exact ⟨Finset.orderEmbOfFin_mem _ _ _, (J.orderEmbOfFin h).le_iff_le.mpr hk⟩
   rw [hm, Finset.card_map, Fin.card_Iic]
 
-theorem card_compl_le (J : Finset (Fin (a + b))) (h : J.card = a) (i : Fin a) :
-    (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card + (i : ℕ) = (J.orderEmbOfFin h i : ℕ) := by
+theorem card_compl_le (J : Finset (Fin (a + b))) (h : J.card = a) (i : Fin a)
+    : (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card + (i : ℕ) = (J.orderEmbOfFin h i : ℕ) := by
   have h1 := card_filter_le_orderEmbOfFin J h i
-  have h2 : (J.filter (· ≤ J.orderEmbOfFin h i)).card + (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card
-      = (Finset.Iic (J.orderEmbOfFin h i)).card := by
+  have h2
+      : (J.filter (· ≤ J.orderEmbOfFin h i)).card + (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card
+        = (Finset.Iic (J.orderEmbOfFin h i)).card := by
     rw [← Finset.card_union_of_disjoint (Finset.disjoint_filter_filter disjoint_compl_right),
       ← Finset.filter_union, Finset.union_compl]
     congr 1
@@ -87,9 +90,10 @@ theorem card_compl_le (J : Finset (Fin (a + b))) (h : J.card = a) (i : Fin a) :
   rw [Fin.card_Iic] at h2
   omega
 
-private theorem perm_inversion_sign_eq_prod {n : ℕ} (g : Perm (Fin n)) :
-    Perm.signAux g = ∏ x : Fin n, ∏ y : Fin n,
-      if y < x then (if g x ≤ g y then (-1 : ℤˣ) else 1) else 1 := by
+private theorem perm_inversion_sign_eq_prod {n : ℕ} (g : Perm (Fin n))
+    : Perm.signAux g
+      = ∏ x : Fin n, ∏ y : Fin n,
+        if y < x then (if g x ≤ g y then (-1 : ℤˣ) else 1) else 1 := by
   rw [Perm.signAux.eq_1, prod_finPairsLT]
   all_goals rfl
 
@@ -141,19 +145,23 @@ private lemma sum_val_eq_sum_orderEmbOfFin (J : Finset (Fin (a + b))) (h : J.car
   conv_lhs => rw [hJ]
   exact Finset.sum_map _ _ _
 
-theorem sign_shuffle (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b) :
-    Perm.sign (shuffle J h hc) = (-1) ^ (a * (a - 1) / 2 + ∑ j ∈ J, (j : ℕ)) := by
+theorem sign_shuffle (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card = b)
+    : Perm.sign (shuffle J h hc) = (-1) ^ (a * (a - 1) / 2 + ∑ j ∈ J, (j : ℕ)) := by
   rw [perm_sign_eq_inversion_sign, perm_inversion_sign_eq_prod, prod_fin_add_lt_split]
-  have hA : (∏ i : Fin a, ∏ i' : Fin a, if i' < i then (if shuffle J h hc (Fin.castAdd b i) ≤
-      shuffle J h hc (Fin.castAdd b i') then (-1 : ℤˣ) else 1) else 1) = 1 := by
+  have hA
+      : (∏ i : Fin a, ∏ i' : Fin a, if i' < i then (if shuffle J h hc (Fin.castAdd b i) ≤
+          shuffle J h hc (Fin.castAdd b i') then (-1 : ℤˣ) else 1) else 1)
+        = 1 := by
     refine Finset.prod_eq_one fun i _ => Finset.prod_eq_one fun i' _ => ?_
     split_ifs with h1 h2
     · rw [shuffle_castAdd, shuffle_castAdd, OrderEmbedding.le_iff_le] at h2
       exact absurd h2 (not_le.mpr h1)
     · rfl
     · rfl
-  have hD : (∏ j : Fin b, ∏ j' : Fin b, if j' < j then (if shuffle J h hc (Fin.natAdd a j) ≤
-      shuffle J h hc (Fin.natAdd a j') then (-1 : ℤˣ) else 1) else 1) = 1 := by
+  have hD
+      : (∏ j : Fin b, ∏ j' : Fin b, if j' < j then (if shuffle J h hc (Fin.natAdd a j) ≤
+          shuffle J h hc (Fin.natAdd a j') then (-1 : ℤˣ) else 1) else 1)
+        = 1 := by
     refine Finset.prod_eq_one fun j _ => Finset.prod_eq_one fun j' _ => ?_
     split_ifs with h1 h2
     · rw [shuffle_natAdd, shuffle_natAdd, OrderEmbedding.le_iff_le] at h2
@@ -163,14 +171,19 @@ theorem sign_shuffle (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card
   rw [hA, hD, one_mul, mul_one]
   simp only [shuffle_castAdd, shuffle_natAdd]
   rw [Finset.prod_comm]
-  have hrow : ∀ i : Fin a, (∏ j : Fin b, if Jᶜ.orderEmbOfFin hc j ≤ J.orderEmbOfFin h i then
-      (-1 : ℤˣ) else 1) = (-1) ^ (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card := by
+  have hrow
+      : ∀ i : Fin a,
+        (∏ j : Fin b, if Jᶜ.orderEmbOfFin hc j ≤ J.orderEmbOfFin h i then
+          (-1 : ℤˣ) else 1)
+          = (-1) ^ (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card := by
     intro i
-    rw [Finset.prod_ite, Finset.prod_const, Finset.prod_const_one, mul_one, card_filter_compl_orderEmbOfFin_le]
+    rw [Finset.prod_ite, Finset.prod_const, Finset.prod_const_one, mul_one,
+      card_filter_compl_orderEmbOfFin_le]
   refine (Finset.prod_congr rfl fun i _ => hrow i).trans ?_
   rw [Finset.prod_pow_eq_pow_sum, sum_val_eq_sum_orderEmbOfFin J h]
-  have hsum : ∑ i : Fin a, (J.orderEmbOfFin h i : ℕ) =
-      ∑ i : Fin a, (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card + a * (a - 1) / 2 := by
+  have hsum
+      : ∑ i : Fin a, (J.orderEmbOfFin h i : ℕ)
+        = ∑ i : Fin a, (Jᶜ.filter (· ≤ J.orderEmbOfFin h i)).card + a * (a - 1) / 2 := by
     rw [← Finset.sum_range_id, ← Fin.sum_univ_eq_sum_range (fun i => i) a, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun i _ => (card_compl_le J h i).symm
   rw [hsum]
@@ -178,8 +191,8 @@ theorem sign_shuffle (J : Finset (Fin (a + b))) (h : J.card = a) (hc : Jᶜ.card
   generalize a * (a - 1) / 2 = T
   rw [show T + (C + T) = C + 2 * T by ring, pow_add, pow_mul, neg_one_sq, one_pow, mul_one]
 
-theorem det_rows {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R]
-    (M : Matrix n n R) : M.det = ∑ σ : Perm n, ((Perm.sign σ : ℤ) : R) * ∏ i, M i (σ i) := by
+theorem det_rows {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R] (M : Matrix n n R)
+    : M.det = ∑ σ : Perm n, ((Perm.sign σ : ℤ) : R) * ∏ i, M i (σ i) := by
   rw [← M.det_transpose, Matrix.det_apply']
   simp only [Matrix.transpose_apply]
 
@@ -187,29 +200,29 @@ theorem compl_card (J : {J : Finset (Fin (a + b)) // J.card = a}) : (J.1ᶜ).car
   rw [Finset.card_compl, Fintype.card_fin, J.2]
   omega
 
-def glue (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b)) :
-    Perm (Fin (a + b)) :=
+def glue (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b))
+    : Perm (Fin (a + b)) :=
   shuffle x.1.1 x.1.2 (compl_card x.1) * finSumFinEquiv.permCongr (Perm.sumCongr x.2.1 x.2.2)
 
-@[simp] theorem glue_castAdd (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a},
-    Perm (Fin a) × Perm (Fin b)) (i : Fin a) :
-    glue x (Fin.castAdd b i) = x.1.1.orderEmbOfFin x.1.2 (x.2.1 i) := by
+@[simp]
+theorem glue_castAdd
+    (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b)) (i : Fin a)
+    : glue x (Fin.castAdd b i) = x.1.1.orderEmbOfFin x.1.2 (x.2.1 i) := by
   simp [glue, Equiv.permCongr_apply]
 
-@[simp] theorem glue_natAdd (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a},
-    Perm (Fin a) × Perm (Fin b)) (j : Fin b) :
-    glue x (Fin.natAdd a j) = (x.1.1ᶜ).orderEmbOfFin (compl_card x.1) (x.2.2 j) := by
+@[simp]
+theorem glue_natAdd
+    (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b)) (j : Fin b)
+    : glue x (Fin.natAdd a j) = (x.1.1ᶜ).orderEmbOfFin (compl_card x.1) (x.2.2 j) := by
   simp [glue, Equiv.permCongr_apply]
 
-theorem sign_glue (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a},
-    Perm (Fin a) × Perm (Fin b)) :
-    Perm.sign (glue x) = (-1) ^ (a * (a - 1) / 2 + ∑ j ∈ x.1.1, (j : ℕ)) *
-      Perm.sign x.2.1 * Perm.sign x.2.2 := by
+theorem sign_glue (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b))
+    : Perm.sign (glue x)
+      = (-1) ^ (a * (a - 1) / 2 + ∑ j ∈ x.1.1, (j : ℕ)) * Perm.sign x.2.1 * Perm.sign x.2.2 := by
   simp only [glue, Perm.sign_mul, sign_shuffle, Perm.sign_permCongr, Perm.sign_sumCongr, mul_assoc]
 
-theorem image_glue (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a},
-    Perm (Fin a) × Perm (Fin b)) :
-    univ.image (fun i => glue x (Fin.castAdd b i)) = x.1.1 := by
+theorem image_glue (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b))
+    : univ.image (fun i => glue x (Fin.castAdd b i)) = x.1.1 := by
   simp only [glue_castAdd]
   ext y
   simp only [Finset.mem_image, Finset.mem_univ, true_and]
@@ -226,10 +239,14 @@ theorem image_glue (x : Σ _ : {J : Finset (Fin (a + b)) // J.card = a},
 theorem glue_injective : Function.Injective (glue (a := a) (b := b)) := by
   rintro ⟨⟨J, hJ⟩, σ, τ⟩ ⟨⟨J', hJ'⟩, σ', τ'⟩ heq
   have hJJ : J = J' := by
-    have h1 := image_glue (⟨⟨J, hJ⟩, σ, τ⟩ : Σ _ : {J : Finset (Fin (a + b)) // J.card = a},
-      Perm (Fin a) × Perm (Fin b))
-    have h2 := image_glue (⟨⟨J', hJ'⟩, σ', τ'⟩ : Σ _ : {J : Finset (Fin (a + b)) // J.card = a},
-      Perm (Fin a) × Perm (Fin b))
+    have h1 :=
+      image_glue
+        (⟨⟨J, hJ⟩, σ, τ⟩
+          : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b))
+    have h2 :=
+      image_glue
+        (⟨⟨J', hJ'⟩, σ', τ'⟩
+          : Σ _ : {J : Finset (Fin (a + b)) // J.card = a}, Perm (Fin a) × Perm (Fin b))
     rw [heq] at h1
     exact h1.symm.trans h2
   subst hJJ

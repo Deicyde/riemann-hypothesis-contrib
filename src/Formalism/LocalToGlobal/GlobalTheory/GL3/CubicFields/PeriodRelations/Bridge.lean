@@ -16,10 +16,14 @@ namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5
 open NumberField Classical
 open scoped Pointwise
 open Formalism.BasicNotions (D7)
-open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity (IsLat jL Uniformization CMTransitive LinkPer KroneckerLimit DedekindFactor)
-open Formalism.MainNotions.TaylorLogMetric (lamConj lamOf embT meanLogOm DataIn tor0 IsCurveIdeal IsDiscriminantTwelfthRootOfIdealLattice per22 logOmVal)
+open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
+  (IsLat jL Uniformization CMTransitive LinkPer KroneckerLimit DedekindFactor)
+open Formalism.MainNotions.TaylorLogMetric
+  (lamConj lamOf embT meanLogOm DataIn tor0 IsCurveIdeal IsDiscriminantTwelfthRootOfIdealLattice
+    per22 logOmVal)
 
-theorem br_area_eq (Λ : AddSubgroup ℂ) : Formalism.MainNotions.TaylorLogMetric.area Λ = area Λ := rfl
+theorem br_area_eq (Λ : AddSubgroup ℂ) : Formalism.MainNotions.TaylorLogMetric.area Λ = area Λ :=
+  rfl
 
 def brPhi (D : D7) : D.host.K →+* ℂ := D.host.φ₀.comp (algebraMap D.host.K D.host.E)
 

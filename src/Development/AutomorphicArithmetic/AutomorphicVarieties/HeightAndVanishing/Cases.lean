@@ -7,13 +7,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-theorem UpperTheory.V.HV.cases :
-    ∀ (h : Host) (t : ℕ), h.Big t → ∀ (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N), h.IsChar ψ → ∀ l e : ℕ, l.Prime → l ≠ 2 → 0 < e → e < t →
-      (l ∉ Bchi h.chi → ¬ l ∣ orderOf ψ ∧ comp l ψ ^ 2 = 1 ∧ th0 l ψ = ψ ∧ kap l ψ = 1 ∧ (l - 1 ∣ 2 * e → chiP l ψ = ψ) ∧
-        (h.CaseI l e ∨ h.CaseZ l e ψ ∨ h.CaseII l e ψ ∨ h.CaseIII l e ψ)) ∧
-      (l ∈ Bchi h.chi → h.CaseII l e ψ ∨ h.CaseIV l e ψ ∨ h.CaseV l e) := by
+theorem UpperTheory.V.HV.cases
+    : ∀ (h : Host) (t : ℕ),
+      h.Big t
+        → ∀ (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N),
+          h.IsChar ψ
+            → ∀ l e : ℕ,
+              l.Prime → l ≠ 2 → 0 < e → e < t
+                → (l ∉ Bchi h.chi
+                    → ¬ l ∣ orderOf ψ ∧ comp l ψ ^ 2 = 1 ∧ th0 l ψ = ψ ∧ kap l ψ = 1
+                      ∧ (l - 1 ∣ 2 * e → chiP l ψ = ψ)
+                      ∧ (h.CaseI l e ∨ h.CaseZ l e ψ ∨ h.CaseII l e ψ ∨ h.CaseIII l e ψ))
+                  ∧ (l ∈ Bchi h.chi → h.CaseII l e ψ ∨ h.CaseIV l e ψ ∨ h.CaseV l e) := by
   intro h t hbig O _ _ ψ hψ l e hl hl2 he het
   have hB := bchiFacts h t hbig
   have hC := hostComp h O ψ hψ

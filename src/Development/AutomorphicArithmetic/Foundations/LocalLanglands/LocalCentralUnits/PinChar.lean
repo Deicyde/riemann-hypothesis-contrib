@@ -23,8 +23,9 @@ theorem conj_char (χ : G →* ℂˣ) (z : G) : conj ((χ z : ℂˣ) : ℂ) = ((
   rw [MonoidHom.inv_apply, Units.val_inv_eq_inv_val, Complex.inv_eq_conj (norm_char χ z)]
 
 open Classical in
-theorem sum_mul_conj (χ ψ : G →* ℂˣ) :
-    ∑ z, ((χ z : ℂˣ) : ℂ) * conj ((ψ z : ℂˣ) : ℂ) = if χ = ψ then (Fintype.card G : ℂ) else 0 := by
+theorem sum_mul_conj (χ ψ : G →* ℂˣ)
+    : ∑ z, ((χ z : ℂˣ) : ℂ) * conj ((ψ z : ℂˣ) : ℂ)
+      = if χ = ψ then (Fintype.card G : ℂ) else 0 := by
   have : ∀ z, ((χ z : ℂˣ) : ℂ) * conj ((ψ z : ℂˣ) : ℂ) = (((χ * ψ⁻¹) z : ℂˣ) : ℂ) := by
     intro z
     rw [conj_char, MonoidHom.mul_apply, Units.val_mul]
@@ -38,12 +39,13 @@ noncomputable def dif (A B : Finset (G →* ℂˣ)) (z : G) : ℂ :=
   ∑ χ ∈ A, ((χ z : ℂˣ) : ℂ) - ∑ χ ∈ B, ((χ z : ℂˣ) : ℂ)
 
 open Classical in
-theorem inner_dif (A B : Finset (G →* ℂˣ)) (ψ : G →* ℂˣ) :
-    ∑ z, dif A B z * conj ((ψ z : ℂˣ) : ℂ) =
-      (Fintype.card G : ℂ) * ((if ψ ∈ A then 1 else 0) - (if ψ ∈ B then 1 else 0)) := by
-  have key : ∀ C : Finset (G →* ℂˣ),
-      ∑ z, (∑ χ ∈ C, ((χ z : ℂˣ) : ℂ)) * conj ((ψ z : ℂˣ) : ℂ) =
-        (Fintype.card G : ℂ) * (if ψ ∈ C then 1 else 0) := by
+theorem inner_dif (A B : Finset (G →* ℂˣ)) (ψ : G →* ℂˣ)
+    : ∑ z, dif A B z * conj ((ψ z : ℂˣ) : ℂ)
+      = (Fintype.card G : ℂ) * ((if ψ ∈ A then 1 else 0) - (if ψ ∈ B then 1 else 0)) := by
+  have key
+      : ∀ C : Finset (G →* ℂˣ),
+        ∑ z, (∑ χ ∈ C, ((χ z : ℂˣ) : ℂ)) * conj ((ψ z : ℂˣ) : ℂ)
+          = (Fintype.card G : ℂ) * (if ψ ∈ C then 1 else 0) := by
     intro C
     simp_rw [Finset.sum_mul]
     rw [Finset.sum_comm]
@@ -53,28 +55,31 @@ theorem inner_dif (A B : Finset (G →* ℂˣ)) (ψ : G →* ℂˣ) :
   simp only [dif, sub_mul, Finset.sum_sub_distrib, key]
   ring
 
-theorem parseval (A B : Finset (G →* ℂˣ)) (hd : Disjoint A B) :
-    ∑ z, dif A B z * conj (dif A B z) = (Fintype.card G : ℂ) * ((#A : ℂ) + #B) := by
+theorem parseval (A B : Finset (G →* ℂˣ)) (hd : Disjoint A B)
+    : ∑ z, dif A B z * conj (dif A B z) = (Fintype.card G : ℂ) * ((#A : ℂ) + #B) := by
   classical
-  have hc : ∀ z, conj (dif A B z) =
-      ∑ χ ∈ A, conj ((χ z : ℂˣ) : ℂ) - ∑ χ ∈ B, conj ((χ z : ℂˣ) : ℂ) := by
+  have hc
+      : ∀ z,
+        conj (dif A B z) = ∑ χ ∈ A, conj ((χ z : ℂˣ) : ℂ) - ∑ χ ∈ B, conj ((χ z : ℂˣ) : ℂ) := by
     intro z
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [dif, map_sub, map_sum]
+    simp [dif, map_sub, map_sum]
   simp_rw [hc, mul_sub, Finset.mul_sum]
   rw [Finset.sum_sub_distrib, Finset.sum_comm]
   rw [Finset.sum_comm (s := Finset.univ) (t := B)]
   simp_rw [inner_dif]
-  have hA : ∑ ψ ∈ A, (Fintype.card G : ℂ) * ((if ψ ∈ A then 1 else 0) - (if ψ ∈ B then 1 else 0))
-      = (Fintype.card G : ℂ) * #A := by
+  have hA
+      : ∑ ψ ∈ A, (Fintype.card G : ℂ) * ((if ψ ∈ A then 1 else 0) - (if ψ ∈ B then 1 else 0))
+        = (Fintype.card G : ℂ) * #A := by
     rw [Finset.sum_congr rfl (g := fun _ => (Fintype.card G : ℂ))]
     · simp [mul_comm]
     · intro ψ hψ
       have : ψ ∉ B := Finset.disjoint_left.mp hd hψ
       simp [hψ, this]
-  have hB : ∑ ψ ∈ B, (Fintype.card G : ℂ) * ((if ψ ∈ A then 1 else 0) - (if ψ ∈ B then 1 else 0))
-      = - ((Fintype.card G : ℂ) * #B) := by
-    rw [Finset.sum_congr rfl (g := fun _ => - (Fintype.card G : ℂ))]
+  have hB
+      : ∑ ψ ∈ B, (Fintype.card G : ℂ) * ((if ψ ∈ A then 1 else 0) - (if ψ ∈ B then 1 else 0))
+        = -((Fintype.card G : ℂ) * #B) := by
+    rw [Finset.sum_congr rfl (g := fun _ => -(Fintype.card G : ℂ))]
     · simp [mul_comm]
     · intro ψ hψ
       have : ψ ∉ A := Finset.disjoint_right.mp hd hψ
@@ -89,9 +94,11 @@ theorem norm_dif_le (A B : Finset (G →* ℂˣ)) (z : G) : ‖dif A B z‖ ≤ 
     simp [norm_char]
   exact (norm_sub_le _ _).trans (add_le_add (h A) (h B))
 
-theorem card_le (A B : Finset (G →* ℂˣ)) (hd : Disjoint A B) (D : Finset G)
-    (hD : ∀ z, z ∉ D → dif A B z = 0) (hne : 0 < #A + #B) :
-    Fintype.card G ≤ #D * (#A + #B) := by
+theorem card_le
+    (A B : Finset (G →* ℂˣ)) (hd : Disjoint A B)
+    (D : Finset G) (hD : ∀ z, z ∉ D → dif A B z = 0)
+    (hne : 0 < #A + #B)
+    : Fintype.card G ≤ #D * (#A + #B) := by
   have h1 : ∑ z, ‖dif A B z‖ ^ 2 = (Fintype.card G : ℝ) * ((#A : ℝ) + #B) := by
     have := parseval A B hd
     simp_rw [Complex.mul_conj, Complex.normSq_eq_norm_sq] at this
@@ -106,17 +113,22 @@ theorem card_le (A B : Finset (G →* ℂˣ)) (hd : Disjoint A B) (D : Finset G)
     simpa using Finset.sum_le_sum this
   have hpos : (0 : ℝ) < (#A : ℝ) + #B := by exact_mod_cast hne
   have h4 : (Fintype.card G : ℝ) ≤ (#D : ℝ) * ((#A : ℝ) + #B) := by
-    have : (Fintype.card G : ℝ) * ((#A : ℝ) + #B) ≤ ((#D : ℝ) * ((#A : ℝ) + #B)) * ((#A : ℝ) + #B) := by
+    have : (Fintype.card G : ℝ) * ((#A : ℝ) + #B)
+        ≤ ((#D : ℝ) * ((#A : ℝ) + #B)) * ((#A : ℝ) + #B) := by
       rw [← h1, h2]
       nlinarith [h3]
     exact le_of_mul_le_mul_right this hpos
   exact_mod_cast h4
 
-theorem mul_mem (A B : Finset (G →* ℂˣ)) (hd : Disjoint A B) (D : Finset G)
-    (hD : ∀ z, z ∉ D → dif A B z = 0) (η : G →* ℂˣ) (hη : ∀ z ∈ D, η z = 1) (ψ : G →* ℂˣ) :
-    (ψ ∈ A → ψ * η ∈ A) ∧ (ψ ∈ B → ψ * η ∈ B) := by
+theorem mul_mem
+    (A B : Finset (G →* ℂˣ)) (hd : Disjoint A B)
+    (D : Finset G) (hD : ∀ z, z ∉ D → dif A B z = 0)
+    (η : G →* ℂˣ) (hη : ∀ z ∈ D, η z = 1)
+    (ψ : G →* ℂˣ)
+    : (ψ ∈ A → ψ * η ∈ A) ∧ (ψ ∈ B → ψ * η ∈ B) := by
   classical
-  have h1 : ∑ z, dif A B z * conj (((ψ * η) z : ℂˣ) : ℂ) = ∑ z, dif A B z * conj ((ψ z : ℂˣ) : ℂ) := by
+  have h1
+      : ∑ z, dif A B z * conj (((ψ * η) z : ℂˣ) : ℂ) = ∑ z, dif A B z * conj ((ψ z : ℂˣ) : ℂ) := by
     refine Finset.sum_congr rfl (fun z _ => ?_)
     by_cases hz : z ∈ D
     · simp [hη z hz]

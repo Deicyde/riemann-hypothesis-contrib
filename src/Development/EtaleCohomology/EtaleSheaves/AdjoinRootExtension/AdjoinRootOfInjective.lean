@@ -67,7 +67,8 @@ lemma finite_roots (F : Finset (MonP R)) : ∃ (T : Type u) (_ : CommRing T) (φ
 
 theorem stepHom_injective : Function.Injective (stepHom R) := by
   classical
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro r hr
   have hmem : MvPolynomial.C r ∈ stepIdeal R := Ideal.Quotient.eq_zero_iff_mem.1 hr
   obtain ⟨S, hS, hx⟩ := Submodule.mem_span_finite_of_mem_span hmem
@@ -76,14 +77,16 @@ theorem stepHom_injective : Function.Injective (stepHom R) := by
   obtain ⟨T, _, φ, hφ, hF⟩ := finite_roots R F
   let v : MonP R → T := fun p => if h : p ∈ F then (hF p h).choose else 0
   let ev := MvPolynomial.eval₂Hom φ v
-  have hk : Ideal.span (↑(F.image fun p : MonP R => p.1.eval₂ MvPolynomial.C (MvPolynomial.X p)) :
-      Set (MvPolynomial (MonP R) R)) ≤ RingHom.ker ev := by
+  have hk
+      : Ideal.span
+          (↑(F.image fun p : MonP R => p.1.eval₂ MvPolynomial.C (MvPolynomial.X p))
+            : Set (MvPolynomial (MonP R) R))
+        ≤ RingHom.ker ev := by
     rw [Ideal.span_le]
     intro t ht
     obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 (Finset.mem_coe.1 ht)
     rw [SetLike.mem_coe, RingHom.mem_ker, hom_eval₂, MvPolynomial.eval₂Hom_comp_C]
-    have : ev (MvPolynomial.X p) = (hF p hp).choose := by
-      simp [ev, v, hp]
+    have : ev (MvPolynomial.X p) = (hF p hp).choose := by simp [ev, v, hp]
     rw [this, ← eval_map]
     exact (hF p hp).choose_spec
   have h0 : ev (MvPolynomial.C r) = 0 := RingHom.mem_ker.1 (hk hx)
@@ -103,8 +106,8 @@ theorem stepHom_isIntegral : (stepHom R).IsIntegral := by
     rw [← eval_map]
     exact step_root R p
 
-theorem step_has_root (p : R[X]) (hp : p.Monic) (hd : 0 < p.natDegree) :
-    ∃ a : StepRing R, (p.map (stepHom R)).eval a = 0 :=
+theorem step_has_root (p : R[X]) (hp : p.Monic) (hd : 0 < p.natDegree)
+    : ∃ a : StepRing R, (p.map (stepHom R)).eval a = 0 :=
   ⟨_, step_root R ⟨p, hp, hd⟩⟩
 
 end LateralTheory.E.AICExtPf

@@ -9,14 +9,15 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.Core.Rk
 
-theorem ramBig_of_ramShare : ∀ (D : D7) (u : D.what₂.Word), RamShare D u → 0 < d0 D u → 2 < (D.mem u).A.T →
-    RamBig D u ((D.R.f : ℝ) / (((D.mem u).A.T : ℝ) - 1)) := by
+theorem ramBig_of_ramShare
+    : ∀ (D : D7) (u : D.what₂.Word),
+      RamShare D u → 0 < d0 D u → 2 < (D.mem u).A.T
+        → RamBig D u ((D.R.f : ℝ) / (((D.mem u).A.T : ℝ) - 1)) := by
   intro D u hS hd hT
   have hT' : (2 : ℝ) < ((D.mem u).A.T : ℝ) := by exact_mod_cast hT
   have hpos : (0 : ℝ) < ((D.mem u).A.T : ℝ) - 1 := by linarith
   set a : ℝ := -(1 / (((D.mem u).A.T : ℝ) - 1)) with ha
-  have ha1 : 1 / (((D.mem u).A.T : ℝ) - 1) < 1 := by
-    rw [div_lt_one hpos]; linarith
+  have ha1 : 1 / (((D.mem u).A.T : ℝ) - 1) < 1 := by rw [div_lt_one hpos]; linarith
   have ha0 : 0 < 1 / (((D.mem u).A.T : ℝ) - 1) := by positivity
   have hb : -2 ≤ a := by rw [ha]; linarith
   have hB := one_add_mul_le_pow hb D.R.f

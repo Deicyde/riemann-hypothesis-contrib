@@ -17,13 +17,13 @@ theorem lowU_neg_mul (C : Matrix (Fin c) n k) : lowU (-C) * lowU C = 1 := by
   ext1
   simp [lowU, fromBlocks_multiply]
 
-theorem conj_val (C : Matrix (Fin c) n k) (B : Matrix n (Fin c) k) (h : B * C = 0) :
-    (lowU C * upU B * lowU (-C)).val = fromBlocks 1 B 0 (C * B + 1) := by
+theorem conj_val (C : Matrix (Fin c) n k) (B : Matrix n (Fin c) k) (h : B * C = 0)
+    : (lowU C * upU B * lowU (-C)).val = fromBlocks 1 B 0 (C * B + 1) := by
   simp [lowU, upU, fromBlocks_multiply, h, Matrix.add_mul, Matrix.mul_assoc]
 
-theorem exists_conj (h1 : 1 ≤ p) (hc : p < c) (u β : n → k) :
-    ∃ g ∈ N k n c p, simpleSum g = ∑ r, u r * β r ∧
-      rowE c p u * colE c (p + 1) β = g * rowE c p u := by
+theorem exists_conj (h1 : 1 ≤ p) (hc : p < c) (u β : n → k)
+    : ∃ g ∈ N k n c p,
+      simpleSum g = ∑ r, u r * β r ∧ rowE c p u * colE c (p + 1) β = g * rowE c p u := by
   set C : Matrix (Fin c) n k := Matrix.of fun l s => if l.val + 1 = p then u s else 0 with hC
   set B : Matrix n (Fin c) k := Matrix.of fun r i => if i.val + 1 = p + 1 then β r else 0 with hB
   have hBC : B * C = 0 := by
@@ -45,11 +45,13 @@ theorem exists_conj (h1 : 1 ≤ p) (hc : p < c) (u β : n → k) :
     · simp [Matrix.one_apply]
     · simp only [lev, Sum.elim_inl, Sum.elim_inr] at hrs
       simp only [fromBlocks_apply₁₂, hB, Matrix.of_apply]
-      rw [if_neg (by omega)]; simp
+      rw [if_neg (by omega)]
+      simp
     · simp
     · simp only [lev, Sum.elim_inr] at hrs
       simp only [fromBlocks_apply₂₂, Matrix.add_apply, hCB]
-      rw [if_neg (by omega)]; simp [Matrix.one_apply]
+      rw [if_neg (by omega)]
+      simp [Matrix.one_apply]
   · unfold simpleSum
     rw [hv]
     simp only [fromBlocks_apply₂₂, Matrix.add_apply, hCB]
@@ -57,13 +59,15 @@ theorem exists_conj (h1 : 1 ≤ p) (hc : p < c) (u β : n → k) :
     · rw [if_pos (by simp; omega), if_pos (by simp; omega), Matrix.one_apply_ne, add_zero]
       intro h
       have := congrArg Fin.val h
-      simp at this; omega
+      simp at this
+      omega
     · intro j _ hj
       rw [if_neg]
       intro h
       apply hj
       ext
-      simp at h ⊢; omega
+      simp at h ⊢
+      omega
     · simp
     · intro i _ hi
       refine Finset.sum_eq_zero fun j _ => ?_
@@ -71,7 +75,8 @@ theorem exists_conj (h1 : 1 ≤ p) (hc : p < c) (u β : n → k) :
       · exfalso
         apply hi
         ext
-        simp; omega
+        simp
+        omega
       · rw [Matrix.one_apply_ne, add_zero]
         intro h
         have := congrArg Fin.val h
@@ -85,44 +90,68 @@ end alg
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem lowU_mem_KO {n : Type} [Fintype n] [DecidableEq n] {c : ℕ} (C : Matrix (Fin c) n k)
-    (h : ∀ l s, valuation k (C l s) ≤ 1) : lowU C ∈ KO k (n ⊕ Fin c) := by
+theorem lowU_mem_KO
+    {n : Type} [Fintype n] [DecidableEq n]
+    {c : ℕ} (C : Matrix (Fin c) n k) (h : ∀ l s, valuation k (C l s) ≤ 1)
+    : lowU C ∈ KO k (n ⊕ Fin c) := by
   let C' : Matrix (Fin c) n 𝒪[k] := Matrix.of fun l s => ⟨C l s, h l s⟩
-  refine ⟨⟨fromBlocks 1 0 C' 1, fromBlocks 1 0 (-C') 1, by simp [fromBlocks_multiply],
-    by simp [fromBlocks_multiply]⟩, ?_⟩
+  refine ⟨
+    ⟨
+      fromBlocks 1 0 C' 1,
+      fromBlocks 1 0 (-C') 1,
+      by simp [fromBlocks_multiply],
+      by simp [fromBlocks_multiply]
+    ⟩,
+    ?_
+  ⟩
   ext r s
-  rcases r with r | r <;> rcases s with s | s <;>
-    simp [lowU, C', Matrix.one_apply, apply_ite (algebraMap 𝒪[k] k)]
+  rcases r with r | r <;> rcases s with s | s
+    <;> simp [lowU, C', Matrix.one_apply, apply_ite (algebraMap 𝒪[k] k)]
   all_goals first | rfl | (split_ifs <;> simp)
 
-theorem upU_mem_KO {n : Type} [Fintype n] [DecidableEq n] {c : ℕ} (C : Matrix n (Fin c) k)
-    (h : ∀ l s, valuation k (C l s) ≤ 1) : upU C ∈ KO k (n ⊕ Fin c) := by
+theorem upU_mem_KO
+    {n : Type} [Fintype n] [DecidableEq n]
+    {c : ℕ} (C : Matrix n (Fin c) k) (h : ∀ l s, valuation k (C l s) ≤ 1)
+    : upU C ∈ KO k (n ⊕ Fin c) := by
   let C' : Matrix n (Fin c) 𝒪[k] := Matrix.of fun l s => ⟨C l s, h l s⟩
-  refine ⟨⟨fromBlocks 1 C' 0 1, fromBlocks 1 (-C') 0 1, by simp [fromBlocks_multiply],
-    by simp [fromBlocks_multiply]⟩, ?_⟩
+  refine ⟨
+    ⟨
+      fromBlocks 1 C' 0 1,
+      fromBlocks 1 (-C') 0 1,
+      by simp [fromBlocks_multiply],
+      by simp [fromBlocks_multiply]
+    ⟩,
+    ?_
+  ⟩
   ext r s
-  rcases r with r | r <;> rcases s with s | s <;>
-    simp [upU, C', Matrix.one_apply, apply_ite (algebraMap 𝒪[k] k)]
+  rcases r with r | r <;> rcases s with s | s
+    <;> simp [upU, C', Matrix.one_apply, apply_ite (algebraMap 𝒪[k] k)]
   all_goals first | rfl | (split_ifs <;> simp)
 
-theorem nonarchimedeanLocalField_secondCountable_t2Space : SecondCountableTopology k ∧ T2Space k := by
+theorem nonarchimedeanLocalField_secondCountable_t2Space
+    : SecondCountableTopology k ∧ T2Space k := by
   let _ := IsTopologicalAddGroup.rightUniformSpace k
   have := isUniformAddGroup_of_addCommGroup (G := k)
-  let _ : (Valued.v (R := k)).RankOne :=
-  { hom' := IsRankLeOne.nonempty.some.emb (R := k).comp MonoidWithZeroHom.ValueGroup₀.embedding
-    strictMono' := IsRankLeOne.nonempty.some.strictMono.comp
-        MonoidWithZeroHom.ValueGroup₀.embedding_strictMono }
+  let _ : (Valued.v (R := k)).RankOne := {
+    hom' := IsRankLeOne.nonempty.some.emb (R := k).comp MonoidWithZeroHom.ValueGroup₀.embedding
+    strictMono' :=
+      IsRankLeOne.nonempty.some.strictMono.comp MonoidWithZeroHom.ValueGroup₀.embedding_strictMono
+  }
   open scoped Valued in
   have : ProperSpace k := .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace k
   open scoped Valued in
   exact ⟨secondCountable_of_proper, inferInstance⟩
 
-theorem vanish {n : Type} [Fintype n] [DecidableEq n] {c p : ℕ} (h1 : 1 ≤ p) (hc : p < c)
-    {ψ : AddChar k Circle} (hψ : HasConductor ψ 1) {A : Type} [AddCommGroup A] [Module ℂ A]
-    (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (l : A →ₗ[ℂ] ℂ) (hl : IsNEquiv ψ p σ l) (v : A)
-    (s : kˣ) (hβ : ∀ β : n → k, (∀ r, valuation k (β r * s) ≤ 1) → σ (colE c (p + 1) β) v = v)
-    (u : n → k) (r : n) (hr : ¬ valuation k (u r) ≤ valuation k (s : k)) :
-    l (σ (rowE c p u) v) = 0 := by
+theorem vanish
+    {n : Type} [Fintype n] [DecidableEq n]
+    {c p : ℕ} (h1 : 1 ≤ p) (hc : p < c)
+    {ψ : AddChar k Circle} (hψ : HasConductor ψ 1)
+    {A : Type} [AddCommGroup A] [Module ℂ A]
+    (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (l : A →ₗ[ℂ] ℂ) (hl : IsNEquiv ψ p σ l)
+    (v : A) (s : kˣ)
+    (hβ : ∀ β : n → k, (∀ r, valuation k (β r * s) ≤ 1) → σ (colE c (p + 1) β) v = v)
+    (u : n → k) (r : n) (hr : ¬ valuation k (u r) ≤ valuation k (s : k))
+    : l (σ (rowE c p u) v) = 0 := by
   have hs : 0 < valuation k (s : k) := by simp [pos_iff_ne_zero]
   have hu : 0 < valuation k (u r) := hs.trans (not_le.1 hr)
   have hu0 : u r ≠ 0 := by rintro h; simp [h] at hu
@@ -132,14 +161,15 @@ theorem vanish {n : Type} [Fintype n] [DecidableEq n] {c p : ℕ} (h1 : 1 ≤ p)
   push Not at hx
   obtain ⟨y, hy, hy1⟩ := hx
   obtain ⟨g, hg, hsum, hmul⟩ := exists_conj h1 hc u (Pi.single r (y / u r))
-  have hfix := hβ (Pi.single r (y / u r)) (by
-    intro t
-    by_cases ht : t = r
-    · subst ht
-      rw [map_div₀, le_div_iff₀ hs] at hy
-      rw [Pi.single_eq_same, map_mul, map_div₀, div_mul_eq_mul_div, div_le_iff₀ hu, one_mul]
-      exact hy
-    · simp [Pi.single_eq_of_ne ht])
+  have hfix :=
+    hβ (Pi.single r (y / u r)) (by
+      intro t
+      by_cases ht : t = r
+      · subst ht
+        rw [map_div₀, le_div_iff₀ hs] at hy
+        rw [Pi.single_eq_same, map_mul, map_div₀, div_mul_eq_mul_div, div_le_iff₀ hu, one_mul]
+        exact hy
+      · simp [Pi.single_eq_of_ne ht])
   have hy' : simpleSum g = y := by
     rw [hsum, Finset.sum_eq_single r]
     · simp only [Pi.single_eq_same]; field_simp
@@ -171,20 +201,24 @@ theorem meas_ball (s : kˣ) : MeasurableSet {x : k | valuation k x ≤ valuation
   refine (IsOpen.smul ?_ s).measurableSet
   exact Valuation.isOpen_integer
 
-theorem vol_ball (ν : Measure k) (hν : IsUnitVol ν) (s : kˣ) :
-    ν {x : k | valuation k x ≤ valuation k (s : k)} = ENNReal.ofReal (nabs k s) := by
+theorem vol_ball (ν : Measure k) (hν : IsUnitVol ν) (s : kˣ)
+    : ν {x : k | valuation k x ≤ valuation k (s : k)} = ENNReal.ofReal (nabs k s) := by
   haveI := hν.1
   obtain ⟨_, _⟩ := nonarchimedeanLocalField_secondCountable_t2Space (k := k)
   rw [ball_eq, ← distribHaarChar_mul ν s, hν.2, nabs]
   simp
 
-theorem exUp_of_fixed {n : Type} [Fintype n] [DecidableEq n] {c p : ℕ} (h1 : 1 ≤ p) (hc : p < c)
-    {ψ : AddChar k Circle} (hψ : HasConductor ψ 1) (ν : Measure k) (hν : IsUnitVol ν)
+theorem exUp_of_fixed
+    {n : Type} [Fintype n] [DecidableEq n]
+    {c p : ℕ} (h1 : 1 ≤ p) (hc : p < c)
+    {ψ : AddChar k Circle} (hψ : HasConductor ψ 1)
+    (ν : Measure k) (hν : IsUnitVol ν)
     {A : Type} [AddCommGroup A] [Module ℂ A]
-    (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (l : A →ₗ[ℂ] ℂ) (hl : IsNEquiv ψ p σ l) (v : A)
-    (s : kˣ) (hβ : ∀ β : n → k, (∀ r, valuation k (β r * s) ≤ 1) → σ (colE c (p + 1) β) v = v)
-    (hu : ∀ u : n → k, (∀ r, valuation k (u r) ≤ valuation k (s : k)) → σ (rowE c p u) v = v) :
-    exUp ν p σ l v = ((nabs k s ^ Fintype.card n : ℝ) : ℂ) * l v := by
+    (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (l : A →ₗ[ℂ] ℂ) (hl : IsNEquiv ψ p σ l)
+    (v : A) (s : kˣ)
+    (hβ : ∀ β : n → k, (∀ r, valuation k (β r * s) ≤ 1) → σ (colE c (p + 1) β) v = v)
+    (hu : ∀ u : n → k, (∀ r, valuation k (u r) ≤ valuation k (s : k)) → σ (rowE c p u) v = v)
+    : exUp ν p σ l v = ((nabs k s ^ Fintype.card n : ℝ) : ℂ) * l v := by
   haveI := hν.1
   obtain ⟨_, _⟩ := nonarchimedeanLocalField_secondCountable_t2Space (k := k)
   let S : Set (n → k) := Set.univ.pi fun _ => {x : k | valuation k x ≤ valuation k (s : k)}
@@ -202,7 +236,17 @@ theorem exUp_of_fixed {n : Type} [Fintype n] [DecidableEq n] {c p : ℕ} (h1 : 1
   rw [hf, integral_indicator_const _ hS, Measure.real, Measure.pi_pi]
   simp [vol_ball ν hν s, hn]
 
-theorem exUp_fixed_vector : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] [DecidableEq n] (c p : ℕ) (_ : 1 ≤ p) (_ : p < c) (ψ : AddChar k Circle) (_ : HasConductor ψ 1) (ν : Measure k) (_ : IsUnitVol ν) (A : Type) [AddCommGroup A] [Module ℂ A] (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (l : A →ₗ[ℂ] ℂ) (_ : IsNEquiv ψ p σ l) (v : A), (∀ s : kˣ, (∀ β : n → k, (∀ r, valuation k (β r * s) ≤ 1) → σ (colE c (p + 1) β) v = v) → (∀ u : n → k, (∀ r, valuation k (u r) ≤ valuation k (s : k)) → σ (rowE c p u) v = v) → exUp ν p σ l v = ((nabs k s ^ Fintype.card n : ℝ) : ℂ) * l v) ∧ ((∀ g ∈ KO k (n ⊕ Fin c), σ g v = v) → exUp ν p σ l v = l v) := by
+theorem exUp_fixed_vector
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] [DecidableEq n] (c p : ℕ)
+        (_ : 1 ≤ p) (_ : p < c) (ψ : AddChar k Circle) (_ : HasConductor ψ 1) (ν : Measure k)
+        (_ : IsUnitVol ν) (A : Type) [AddCommGroup A] [Module ℂ A]
+        (σ : Representation ℂ (GL (n ⊕ Fin c) k) A) (l : A →ₗ[ℂ] ℂ) (_ : IsNEquiv ψ p σ l) (v : A),
+      (∀ s : kˣ,
+          (∀ β : n → k, (∀ r, valuation k (β r * s) ≤ 1) → σ (colE c (p + 1) β) v = v)
+            → (∀ u : n → k, (∀ r, valuation k (u r) ≤ valuation k (s : k)) → σ (rowE c p u) v = v)
+            → exUp ν p σ l v = ((nabs k s ^ Fintype.card n : ℝ) : ℂ) * l v)
+        ∧ ((∀ g ∈ KO k (n ⊕ Fin c), σ g v = v) → exUp ν p σ l v = l v) := by
   intro k _ _ _ _ _ _ n _ _ c p h1 hc ψ hψ ν hν A _ _ σ l hl v
   refine ⟨fun s hβ hu => exUp_of_fixed h1 hc hψ ν hν σ l hl v s hβ hu, fun hK => ?_⟩
   rw [exUp_of_fixed h1 hc hψ ν hν σ l hl v 1]

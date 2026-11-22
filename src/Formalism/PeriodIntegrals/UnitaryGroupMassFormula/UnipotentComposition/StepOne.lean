@@ -12,7 +12,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.UsCompose
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.U Formalism.REAL
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.U
+  Formalism.REAL
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -56,15 +57,18 @@ def shape (k j ρ : ℕ) (F : Mat k (j + ρ) → E) (L : FS k (j + ρ)) (g : Mat
 
 end shape
 
-def stepOne (k j ρ : ℕ) (X : Mat k (j + ρ)) (e : SC (2 * (j + ρ) + k + 1) × List (Mat k (j + ρ))) :
-    FS k (j + ρ) :=
-  [((dP X e.1.1, e.1.2.1, e.1.2.2), e.2),
-   ((C (-(e.1.2.1 : ℂ)) * e.1.1 * dP X (qD k j ρ), e.1.2.1 + 1, e.1.2.2), e.2),
-   ((C (-(e.1.2.2 : ℂ)) * e.1.1 * dP X (qDb k j ρ), e.1.2.1, e.1.2.2 + 1), e.2),
-   (e.1, X :: e.2)]
+def stepOne (k j ρ : ℕ) (X : Mat k (j + ρ)) (e : SC (2 * (j + ρ) + k + 1) × List (Mat k (j + ρ)))
+    : FS k (j + ρ) := [
+  ((dP X e.1.1, e.1.2.1, e.1.2.2), e.2),
+  ((C (-(e.1.2.1 : ℂ)) * e.1.1 * dP X (qD k j ρ), e.1.2.1 + 1, e.1.2.2), e.2),
+  ((C (-(e.1.2.2 : ℂ)) * e.1.1 * dP X (qDb k j ρ), e.1.2.1, e.1.2.2 + 1), e.2),
+  (e.1, X :: e.2)
+]
 
-def step (k j ρ : ℕ) (X : Mat k (j + ρ)) (L : FS k (j + ρ)) : FS k (j + ρ) := L.flatMap (stepOne k j ρ X)
+def step (k j ρ : ℕ) (X : Mat k (j + ρ)) (L : FS k (j + ρ)) : FS k (j + ρ) :=
+  L.flatMap (stepOne k j ρ X)
 
-def steps (k j ρ : ℕ) (w : List (Mat k (j + ρ))) (L : FS k (j + ρ)) : FS k (j + ρ) := w.foldr (step k j ρ) L
+def steps (k j ρ : ℕ) (w : List (Mat k (j + ρ))) (L : FS k (j + ρ)) : FS k (j + ρ) :=
+  w.foldr (step k j ρ) L
 
 end PI.UnitaryGroupMassFormula.UsCompose

@@ -11,31 +11,44 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicUni
 
 open NumberField MeasureTheory
 open scoped Classical
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 Hf lamOf area Th U)
 open Formalism.MainNotions.StandardLatticesGL3 (WeilO HeckeU TT stdL pt oddE0)
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
 open GlobalTheory.NormDict GlobalTheory.NormExact
 open GlobalTheory.BotFormula (IsFinPt)
-open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral (IsDefiniteSpace IsOpenCompactLevel)
+open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral
+  (IsDefiniteSpace IsOpenCompactLevel)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.LevelIndexMeasure
 
-theorem measure_eq_relIndex_smul : ∀ {D : D7} (V : HSp D) (n : ℕ) (ι : Formalism.MainNotions.StandardLatticesGL3.GA D n →* GA D V) (J J₀ : Subgroup (Formalism.MainNotions.StandardLatticesGL3.GA D n))
-  (K K₀ : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (μ μ₀ : Measure (GA D V)), ι.range = GfC V → J ≤ J₀ → J.relIndex J₀ ≠ 0 →
-  IsOpenCompactLevel V K → IsOpenCompactLevel V K₀ → (∀ x, Lev.finE V (ι x) ∈ K ↔ x ∈ J) → (∀ x, Lev.finE V (ι x) ∈ K₀ ↔ x ∈ J₀) →
-  Lev.IsMeasLevDef V K μ → Lev.IsMeasLevDef V K₀ μ₀ → μ = (J.relIndex J₀ : ENNReal) • μ₀ := by
+theorem measure_eq_relIndex_smul
+    : ∀ {D : D7} (V : HSp D) (n : ℕ)
+        (ι : Formalism.MainNotions.StandardLatticesGL3.GA D n →* GA D V)
+        (J J₀ : Subgroup (Formalism.MainNotions.StandardLatticesGL3.GA D n))
+        (K K₀ : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (μ μ₀ : Measure (GA D V)),
+      ι.range = GfC V → J ≤ J₀ → J.relIndex J₀ ≠ 0 → IsOpenCompactLevel V K
+        → IsOpenCompactLevel V K₀ → (∀ x, Lev.finE V (ι x) ∈ K ↔ x ∈ J)
+        → (∀ x, Lev.finE V (ι x) ∈ K₀ ↔ x ∈ J₀) → Lev.IsMeasLevDef V K μ → Lev.IsMeasLevDef V K₀ μ₀
+        → μ = (J.relIndex J₀ : ENNReal) • μ₀ := by
   intro D V n ι J J₀ K K₀ μ μ₀ hι hJ hJi hK hK₀ hJK hJK₀ hμ hμ₀
   obtain ⟨hLC, hSC, hT2, hB, hTG, -⟩ := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
-  haveI := hLC; haveI := hSC; haveI := hT2; haveI := hB; haveI := hTG
+  haveI := hLC
+  haveI := hSC
+  haveI := hT2
+  haveI := hB
+  haveI := hTG
   haveI : μ.IsHaarMeasure := hμ.1
   haveI : μ₀.IsHaarMeasure := hμ₀.1
 
   have hfin : ∀ g : GA D V, ∃ x, Lev.finE V (ι x) = Lev.finE V g := by
     intro g
-    obtain ⟨k, k1, k2⟩ := GlobalTheory.UnitarySplit.ga_glue V 1 _ (one_mem _) (GlobalTheory.UnitarySplit.finHom_mem V g)
+    obtain ⟨k, k1, k2⟩ :=
+      GlobalTheory.UnitarySplit.ga_glue V 1 _ (one_mem _) (GlobalTheory.UnitarySplit.finHom_mem V g)
     have hk : k ∈ ι.range := by
       rw [hι]
       exact MonoidHom.mem_ker.2 k1
@@ -71,7 +84,10 @@ theorem measure_eq_relIndex_smul : ∀ {D : D7} (V : HSp D) (n : ℕ) (ι : Form
   have h0 : μ₀ (K₀.comap (Lev.finE V)) = 1 := GlobalTheory.Mass.Levels.measure_comap_finE hμ₀
   have heq := Measure.isMulLeftInvariant_eq_smul μ μ₀
   have hc : ((Measure.haarScalarFactor μ μ₀ : NNReal) : ENNReal) = (J.relIndex J₀ : ENNReal) := by
-    have := congrArg (fun m : Measure (GA D V) => m ((K₀.comap (Lev.finE V) : Subgroup (GA D V)) : Set (GA D V))) heq
+    have :=
+      congrArg
+        (fun m : Measure (GA D V) => m ((K₀.comap (Lev.finE V) : Subgroup (GA D V)) : Set (GA D V)))
+        heq
     simp only [Measure.smul_apply, h0, ← hm] at this
     rw [this, ENNReal.smul_def, smul_eq_mul, mul_one]
   ext s hs

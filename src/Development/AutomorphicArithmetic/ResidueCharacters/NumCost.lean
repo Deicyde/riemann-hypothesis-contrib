@@ -14,8 +14,9 @@ namespace UpperTheory.N.Num
 
 variable {D : D7}
 
-theorem hB_bounds (L : SizeData₂ D) (P : ParameterChoice' D L) :
-    L.sc.b ≤ L.sc.b + L.Sc + L.etaSz + D.R.t + 2 ∧ L.sc.b + L.Sc + L.etaSz + D.R.t + 2 ≤ 6 * L.sc.b := by
+theorem hB_bounds (L : SizeData₂ D) (P : ParameterChoice' D L)
+    : L.sc.b ≤ L.sc.b + L.Sc + L.etaSz + D.R.t + 2
+      ∧ L.sc.b + L.Sc + L.etaSz + D.R.t + 2 ≤ 6 * L.sc.b := by
   obtain ⟨h1, h2, h3⟩ := sizes_le_b L P
   have hb := one_le_b L
   have := L.Sc_pos
@@ -23,9 +24,11 @@ theorem hB_bounds (L : SizeData₂ D) (P : ParameterChoice' D L) :
   have : (0 : ℝ) ≤ D.R.t := Nat.cast_nonneg _
   constructor <;> linarith
 
-theorem level_le' (D : D7) {l : ℕ} (hl : l.Prime)
-    (hfac : D.host.condN.factorization l = D.host.QS.factorization l) {x C : ℝ} (hx : 1 ≤ Real.log x) (hx0 : 0 < x) (hC : 1 ≤ C)
-    (hn : (D.R.n : ℝ) ≤ x ^ C) : ((max 1 (D.host.condN.factorization l) : ℕ) : ℝ) ≤ 3 * C * Real.log x := by
+theorem level_le'
+    (D : D7)
+    {l : ℕ} (hl : l.Prime) (hfac : D.host.condN.factorization l = D.host.QS.factorization l)
+    {x C : ℝ} (hx : 1 ≤ Real.log x) (hx0 : 0 < x) (hC : 1 ≤ C) (hn : (D.R.n : ℝ) ≤ x ^ C)
+    : ((max 1 (D.host.condN.factorization l) : ℕ) : ℝ) ≤ 3 * C * Real.log x := by
   rw [hfac]
   have hCx : 1 ≤ C * Real.log x := one_le_mul_of_one_le_of_one_le hC hx
   have h1 : 2 ^ D.host.QS.factorization l ≤ D.R.n ^ 2 :=
@@ -46,8 +49,8 @@ theorem level_le' (D : D7) {l : ℕ} (hl : l.Prime)
   push_cast
   linarith
 
-theorem factorization_condN' (D : D7) {l : ℕ} (hq : l ≠ D.host.q) (hd : l ≠ D.host.d) :
-    D.host.condN.factorization l = D.host.QS.factorization l := by
+theorem factorization_condN' (D : D7) {l : ℕ} (hq : l ≠ D.host.q) (hd : l ≠ D.host.d)
+    : D.host.condN.factorization l = D.host.QS.factorization l := by
   have pq := D.host.hyp.1
   have pd := D.host.hyp.2.1
   show (D.host.QS * D.host.q * D.host.d).factorization l = _
@@ -56,14 +59,17 @@ theorem factorization_condN' (D : D7) {l : ℕ} (hq : l ≠ D.host.q) (hd : l �
   simp [Finsupp.single_apply, hq.symm, hd.symm]
 
 set_option maxHeartbeats 800000 in
-theorem cost_le' (L : SizeData₂ D) (P : ParameterChoice' D L) {A B C0 : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (hC : 1 ≤ C0)
-    (hx : 1 ≤ Real.log L.sc.x) (hn : (D.R.n : ℝ) ≤ L.sc.x ^ C0) (ht : (D.R.t : ℝ) ≤ L.sc.x ^ C0) {l : ℕ}
-    (hl : l.Prime) (hfac : D.host.condN.factorization l = D.host.QS.factorization l) {C : ℝ}
-    (hC' : 18 * A * C0 + 2 * B * (3 * C0 + 9) + 5 * C0 + 1 ≤ C) :
-    A * D.R.f * D.R.m * (L.sc.b + L.Sc + L.etaSz + D.R.t + 2) * ((max 1 (D.host.condN.factorization l) : ℕ) : ℝ) +
-      B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV *
-        lam l (max 1 (D.host.condN.factorization l)) (L.sc.b + L.Sc + L.etaSz + D.R.t + 2) ≤
-      C * D.R.f * D.R.m * L.sc.b * Real.log L.sc.x + C * L.sc.x ^ C * L.sc.L ^ 2 := by
+theorem cost_le'
+    (L : SizeData₂ D) (P : ParameterChoice' D L)
+    {A B C0 : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (hC : 1 ≤ C0)
+    (hx : 1 ≤ Real.log L.sc.x) (hn : (D.R.n : ℝ) ≤ L.sc.x ^ C0) (ht : (D.R.t : ℝ) ≤ L.sc.x ^ C0)
+    {l : ℕ} (hl : l.Prime) (hfac : D.host.condN.factorization l = D.host.QS.factorization l)
+    {C : ℝ} (hC' : 18 * A * C0 + 2 * B * (3 * C0 + 9) + 5 * C0 + 1 ≤ C)
+    : A * D.R.f * D.R.m * (L.sc.b + L.Sc + L.etaSz + D.R.t + 2)
+          * ((max 1 (D.host.condN.factorization l) : ℕ) : ℝ)
+        + B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV
+          * lam l (max 1 (D.host.condN.factorization l)) (L.sc.b + L.Sc + L.etaSz + D.R.t + 2)
+      ≤ C * D.R.f * D.R.m * L.sc.b * Real.log L.sc.x + C * L.sc.x ^ C * L.sc.L ^ 2 := by
   have hx1 : 1 < L.sc.x := L.sc.one_lt_alt
   have hx0 : 0 < L.sc.x := by linarith
   have hS := level_le' D hl hfac hx hx0 hC hn
@@ -77,13 +83,16 @@ theorem cost_le' (L : SizeData₂ D) (P : ParameterChoice' D L) {A B C0 : ℝ} (
   have hAC : 0 ≤ A * C0 := by positivity
   have hBC : 0 ≤ B * (3 * C0 + 9) := by positivity
   have t1 : A * D.R.f * D.R.m * h * (s : ℝ) ≤ C * D.R.f * D.R.m * L.sc.b * Real.log x := by
-    calc A * D.R.f * D.R.m * h * (s : ℝ) ≤ A * D.R.f * D.R.m * (6 * L.sc.b) * (3 * C0 * Real.log x) := by gcongr
+    calc
+      A * D.R.f * D.R.m * h * (s : ℝ)
+        ≤ A * D.R.f * D.R.m * (6 * L.sc.b) * (3 * C0 * Real.log x) := by gcongr
       _ = (18 * A * C0) * (D.R.f * D.R.m * L.sc.b * Real.log x) := by ring
       _ ≤ C * (D.R.f * D.R.m * L.sc.b * Real.log x) := by gcongr; linarith
       _ = _ := by ring
   have hlog : Real.logb l (2 * h) ≤ 2 * L.sc.L + 6 := by
     have a : Real.log (2 * h) ≤ L.sc.L + 3 := by
-      have a1 : Real.log (2 * h) ≤ Real.log (12 * L.sc.b) := Real.log_le_log (by linarith) (by linarith)
+      have a1 : Real.log (2 * h) ≤ Real.log (12 * L.sc.b) :=
+        Real.log_le_log (by linarith) (by linarith)
       have a2 : Real.log L.sc.b = L.sc.L := Real.log_exp _
       have a3 : Real.log 12 ≤ 3 := by
         rw [Real.log_le_iff_le_exp (by norm_num)]
@@ -91,7 +100,9 @@ theorem cost_le' (L : SizeData₂ D) (P : ParameterChoice' D L) {A B C0 : ℝ} (
         have e : Real.exp 3 = Real.exp 1 ^ 3 := by rw [← Real.exp_nat_mul]; norm_num
         have := Real.exp_one_gt_d9
         rw [e]
-        calc (12 : ℝ) ≤ 2.7 ^ 3 := by norm_num
+        calc
+          (12 : ℝ)
+            ≤ 2.7 ^ 3 := by norm_num
           _ ≤ Real.exp 1 ^ 3 := by gcongr; linarith
       rw [Real.log_mul (x := 12) (by norm_num) (by linarith), a2] at a1
       linarith
@@ -120,24 +131,31 @@ theorem cost_le' (L : SizeData₂ D) (P : ParameterChoice' D L) {A B C0 : ℝ} (
     exact Real.rpow_le_rpow_of_exponent_le hx1.le (by linarith)
   have hf : (D.R.f : ℝ) ≤ x ^ C0 := by linarith
   have hV : (D.R.nV : ℝ) ≤ 2 * x ^ C0 := by linarith
-  have t2 : B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV * lam l s h ≤ C * x ^ C * L.sc.L ^ 2 := by
-    calc B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV * lam l s h
-        ≤ B * (x ^ C0) ^ 2 * (x ^ C0) ^ 2 * (2 * x ^ C0) * ((3 * C0 + 9) * (x * L.sc.L)) := by gcongr
+  have t2
+      : B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV * lam l s h ≤ C * x ^ C * L.sc.L ^ 2 := by
+    calc
+      B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV * lam l s h
+          ≤ B * (x ^ C0) ^ 2 * (x ^ C0) ^ 2 * (2 * x ^ C0) * ((3 * C0 + 9) * (x * L.sc.L)) := by
+        gcongr
       _ = (2 * B * (3 * C0 + 9)) * ((x ^ C0) ^ 5 * x) * (L.sc.L * 1) := by ring
       _ ≤ C * x ^ C * (L.sc.L * L.sc.L) := by
-          have : 0 ≤ C := by linarith
-          have h9 : 2 * B * (3 * C0 + 9) ≤ C := by linarith
-          gcongr
+        have : 0 ≤ C := by linarith
+        have h9 : 2 * B * (3 * C0 + 9) ≤ C := by linarith
+        gcongr
       _ = _ := by ring
   linarith
 
-theorem cost_le (L : SizeData₂ D) (P : ParameterChoice' D L) {A B C0 : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (hC : 1 ≤ C0)
-    (hx : 1 ≤ Real.log L.sc.x) (hn : (D.R.n : ℝ) ≤ L.sc.x ^ C0) (ht : (D.R.t : ℝ) ≤ L.sc.x ^ C0) {l : ℕ}
-    (hs : l ∈ D.host.small) {C : ℝ} (hC' : 18 * A * C0 + 2 * B * (3 * C0 + 9) + 5 * C0 + 1 ≤ C) :
-    A * D.R.f * D.R.m * (L.sc.b + L.Sc + L.etaSz + D.R.t + 2) * ((max 1 (D.host.condN.factorization l) : ℕ) : ℝ) +
-      B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV *
-        lam l (max 1 (D.host.condN.factorization l)) (L.sc.b + L.Sc + L.etaSz + D.R.t + 2) ≤
-      C * D.R.f * D.R.m * L.sc.b * Real.log L.sc.x + C * L.sc.x ^ C * L.sc.L ^ 2 :=
+theorem cost_le
+    (L : SizeData₂ D) (P : ParameterChoice' D L)
+    {A B C0 : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (hC : 1 ≤ C0)
+    (hx : 1 ≤ Real.log L.sc.x) (hn : (D.R.n : ℝ) ≤ L.sc.x ^ C0) (ht : (D.R.t : ℝ) ≤ L.sc.x ^ C0)
+    {l : ℕ} (hs : l ∈ D.host.small)
+    {C : ℝ} (hC' : 18 * A * C0 + 2 * B * (3 * C0 + 9) + 5 * C0 + 1 ≤ C)
+    : A * D.R.f * D.R.m * (L.sc.b + L.Sc + L.etaSz + D.R.t + 2)
+          * ((max 1 (D.host.condN.factorization l) : ℕ) : ℝ)
+        + B * (D.R.f : ℝ) ^ 2 * (D.R.t : ℝ) ^ 2 * D.R.nV
+          * lam l (max 1 (D.host.condN.factorization l)) (L.sc.b + L.Sc + L.etaSz + D.R.t + 2)
+      ≤ C * D.R.f * D.R.m * L.sc.b * Real.log L.sc.x + C * L.sc.x ^ C * L.sc.L ^ 2 :=
   cost_le' L P hA hB hC hx hn ht (Nat.mem_primeFactors.1 hs).1 (factorization_condN D hs) hC'
 
 end UpperTheory.N.Num

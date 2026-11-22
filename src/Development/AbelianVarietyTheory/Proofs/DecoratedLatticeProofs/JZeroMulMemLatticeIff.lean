@@ -14,8 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sel
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.LatPair GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain
+  NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil
+  GlobalTheory.LatPair GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -25,8 +29,10 @@ namespace GlobalTheory.SeeSaw.AdaptFBIdeals
 
 variable {D : D7}
 
-theorem supp_of_colMul {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (L : Lat S) (v : Pl D) (i : Fin ρ) (a : AE D)
-    (h : colMul d.jX i a ∈ latV S L (· = v)) : a ∈ idAt D (· = v) := by
+theorem supp_of_colMul
+    {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (L : Lat S)
+    (v : Pl D) (i : Fin ρ) (a : AE D) (h : colMul d.jX i a ∈ latV S L (· = v))
+    : a ∈ idAt D (· = v) := by
   have hp : d.pX * d.jX = 1 := by
     have h := congrArg rat d.e'e
     rw [rat_one] at h
@@ -34,10 +40,13 @@ theorem supp_of_colMul {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (L : L
   have h1 : (d.pX * d.jX) i i = 1 := by rw [hp]; exact Matrix.one_apply_eq i
   rw [Matrix.mul_apply] at h1
   have h2 : a = ∑ k, d.pX i k * colMul d.jX i a k := by
-    calc a = a * ∑ k, d.pX i k * d.jX k i := by rw [h1, mul_one]
-      _ = _ := by rw [Finset.mul_sum]; refine Finset.sum_congr rfl fun k _ => ?_; simp only [colMul]; ring
+    calc
+      a = a * ∑ k, d.pX i k * d.jX k i := by rw [h1, mul_one]
+      _ = _ := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl fun k _ => ?_; simp only [colMul]; ring
   rw [h2]
-  exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_left _ _ (GlobalTheory.FinPl.FrameLat.latV_supp h k)
+  exact Ideal.sum_mem _ fun k _ =>
+    Ideal.mul_mem_left _ _ (GlobalTheory.FinPl.FrameLat.latV_supp h k)
 
 theorem idV_supp (𝔞 : FI D) (v : Pl D) {a : AE D} (h : a ∈ idV 𝔞 v) : a ∈ idAt D (· = v) := by
   induction h using AddSubgroup.closure_induction with

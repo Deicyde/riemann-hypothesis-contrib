@@ -8,17 +8,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalPr
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem res_zsmul {R : Type} [CommRing R] {F : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (c : ℤ) (x : Sec F U) :
-    Sec.res g (c • x) = c • Sec.res g x := by
+private theorem res_zsmul
+    {R : Type} [CommRing R] {F : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (c : ℤ) (x : Sec F U)
+    : Sec.res g (c • x) = c • Sec.res g x := by
   simp
 
-private theorem sec_eq_of_isEmpty {R : Type} [CommRing R] {F : Shv R} (W : Scheme.{0}) [IsEmpty W] (a b : Sec F W) : a = b :=
-  (GlobalTheory.T.etaleSheafSections_ext_and_glue R F W).1 a b (GlobalTheory.T.etaleLocal_property_calculus_rules.2.2.2.2.2.2 W _)
+private theorem sec_eq_of_isEmpty
+    {R : Type} [CommRing R] {F : Shv R} (W : Scheme.{0}) [IsEmpty W] (a b : Sec F W)
+    : a = b :=
+  (GlobalTheory.T.etaleSheafSections_ext_and_glue R F W).1 a b
+    (GlobalTheory.T.etaleLocal_property_calculus_rules.2.2.2.2.2.2 W _)
 
-theorem UpperTheory.Gal.TranscendenceTraces.funSec_of :
-    FunSec := by
+theorem UpperTheory.Gal.TranscendenceTraces.funSec_of : FunSec := by
   intro q _ i U ζ φ hφ
   let V : ℤ → U.Opens := fun n => ⟨{x | φ x = n}, hφ.isOpen_fiber n⟩
   have hmem : ∀ (n : ℤ) (v : (V n : Scheme)), φ ((V n).ι v) = n := by
@@ -33,8 +37,12 @@ theorem UpperTheory.Gal.TranscendenceTraces.funSec_of :
       rw [Scheme.Opens.range_ι]
       exact rfl
     exact h1
-  obtain ⟨y, hy⟩ := (GlobalTheory.T.etaleSheafSections_sep_glue_of_surjective_family (ZMod q) (tw q i) U ℤ (fun n => (V n : Scheme)) (fun n => (V n).ι)
-    (fun n => inferInstance) hcov).2 (fun n => n • Sec.res (V n).ι (twGen i ζ)) (by
+  obtain ⟨y, hy⟩ :=
+    (GlobalTheory.T.etaleSheafSections_sep_glue_of_surjective_family (ZMod q) (tw q i) U ℤ
+        (fun n => (V n : Scheme))
+        (fun n => (V n).ι)
+        (fun n => inferInstance)
+        hcov).2 (fun n => n • Sec.res (V n).ι (twGen i ζ)) (by
       intro n m
       by_cases h : n = m
       · subst h
@@ -57,7 +65,8 @@ theorem UpperTheory.Gal.TranscendenceTraces.funSec_of :
     show φ (x s) = φ (pt x)
     rw [pt_eq]
   obtain ⟨k, hk⟩ : ∃ k, k ≫ (V (φ (pt x))).ι = x := ⟨_, IsOpenImmersion.lift_fac _ _ hr⟩
-  calc Sec.res x y = Sec.res (k ≫ (V (φ (pt x))).ι) y := by rw [hk]
-    _ = Sec.res k ((φ (pt x)) • Sec.res (V (φ (pt x))).ι (twGen i ζ)) := by
-        rw [← res_res, hy]
+  calc
+    Sec.res x y
+      = Sec.res (k ≫ (V (φ (pt x))).ι) y := by rw [hk]
+    _ = Sec.res k ((φ (pt x)) • Sec.res (V (φ (pt x))).ι (twGen i ζ)) := by rw [← res_res, hy]
     _ = φ (pt x) • Sec.res x (twGen i ζ) := by rw [res_zsmul, res_res, hk]

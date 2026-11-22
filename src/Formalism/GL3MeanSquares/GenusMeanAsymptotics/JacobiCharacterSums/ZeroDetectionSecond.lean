@@ -51,11 +51,11 @@ theorem zero_detection_second : Detect1 := by
     have hrho : 1 + ‖ρ‖ / ρ.re ≤ 3 * T := by
       have h1 : ‖ρ‖ ≤ ρ.re + T := by
         refine (Complex.norm_le_abs_re_add_abs_im ρ).trans ?_
-        rw [abs_of_pos hre0]; linarith
+        rw [abs_of_pos hre0]
+        linarith
       have h2 : ‖ρ‖ / ρ.re ≤ 1 + T / ρ.re := by
         rw [div_le_iff₀ hre0, add_mul, one_mul, div_mul_cancel₀ _ hre0.ne']; linarith
-      have h3 : T / ρ.re ≤ 4 / 3 * T := by
-        rw [div_le_iff₀ hre0]; nlinarith
+      have h3 : T / ρ.re ≤ 4 / 3 * T := by rw [div_le_iff₀ hre0]; nlinarith
       linarith
     have hpow : ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) ≤ ((pNd M T : ℕ) : ℝ) ^ (-(3 / 4 : ℝ)) :=
       Real.rpow_le_rpow_of_exponent_le (by exact_mod_cast hN1) (by linarith)
@@ -72,34 +72,40 @@ theorem zero_detection_second : Detect1 := by
     have hYr : (pYd M T : ℝ) = (X : ℝ) ^ (3 : ℕ) := by rw [hY, Nat.cast_pow]
     have hc : 2 * ((M : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re) ≤ 8 * X := by
       have hpos : (0 : ℝ) ≤ 1 + ‖ρ‖ / ρ.re := by positivity
-      calc 2 * ((M : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re) ≤ 2 * ((M : ℝ) + 1) * (3 * T) :=
-            mul_le_mul_of_nonneg_left hrho (by positivity)
+      calc
+        2 * ((M : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re)
+          ≤ 2 * ((M : ℝ) + 1) * (3 * T) := mul_le_mul_of_nonneg_left hrho (by positivity)
         _ ≤ 8 * X := by nlinarith
     have hPle : ‖P‖ ≤ 8 * X * (1 / (X : ℝ) ^ (6 : ℕ)) := by
       refine hP.trans ?_
       have a3 : ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) ≤ 1 / (X : ℝ) ^ (6 : ℕ) := hpow.trans hinv
-      calc 2 * ((M : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re) * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re)
-          ≤ 8 * X * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) :=
-            mul_le_mul_of_nonneg_right hc (Real.rpow_nonneg (Nat.cast_nonneg _) _)
+      calc
+        2 * ((M : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re) * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re)
+            ≤ 8 * X * ((pNd M T : ℕ) : ℝ) ^ (-ρ.re) :=
+          mul_le_mul_of_nonneg_right hc (Real.rpow_nonneg (Nat.cast_nonneg _) _)
         _ ≤ 8 * X * (1 / (X : ℝ) ^ (6 : ℕ)) := mul_le_mul_of_nonneg_left a3 (by positivity)
     rw [hYr]
-    calc ‖P‖ * (X : ℝ) ^ (3 : ℕ) ≤ 8 * X * (1 / (X : ℝ) ^ (6 : ℕ)) * (X : ℝ) ^ (3 : ℕ) :=
-          mul_le_mul_of_nonneg_right hPle (by positivity)
+    calc
+      ‖P‖ * (X : ℝ) ^ (3 : ℕ) ≤ 8 * X * (1 / (X : ℝ) ^ (6 : ℕ)) * (X : ℝ) ^ (3 : ℕ) :=
+        mul_le_mul_of_nonneg_right hPle (by positivity)
       _ = 8 / X ^ 2 := by
-          have hX0 : (X : ℝ) ≠ 0 := hXpos.ne'
-          field_simp
-      _ ≤ 1 / 2 := by
-          rw [div_le_iff₀ (by positivity)]; nlinarith
+        have hX0 : (X : ℝ) ≠ 0 := hXpos.ne'
+        field_simp
+      _ ≤ 1 / 2 := by rw [div_le_iff₀ (by positivity)]; nlinarith
   have h1D : ‖1 + D‖ ≤ 1 / 2 := by
     rw [← hMI, norm_mul]
-    calc ‖P‖ * ‖Mo‖ ≤ ‖P‖ * (pYd M T : ℝ) := mul_le_mul_of_nonneg_left hMo (norm_nonneg _)
+    calc
+      ‖P‖ * ‖Mo‖
+        ≤ ‖P‖ * (pYd M T : ℝ) := mul_le_mul_of_nonneg_left hMo (norm_nonneg _)
       _ ≤ 1 / 2 := hnum
   have hDge : 1 / 2 ≤ ‖D‖ := by
     have := norm_sub_le (1 + D) D
     simp only [add_sub_cancel_right, norm_one] at this
     linarith
-  have hsplit : D = ∑ j ∈ range (pJd M T),
-      blkD (pYd M T) (pNd M T) (pYd M T * 2 ^ j) (fun n => χ (n : ZMod M)) ρ := by
+  have hsplit
+      : D
+        = ∑ j ∈ range (pJd M T),
+          blkD (pYd M T) (pNd M T) (pYd M T * 2 ^ j) (fun n => χ (n : ZMod M)) ρ := by
     rw [hD, show pNd M T = 2 ^ pJd M T by unfold pNd; rfl, sum_blocks]
     rfl
   by_contra hcon
@@ -110,7 +116,8 @@ theorem zero_detection_second : Detect1 := by
     rw [hsplit]
     refine (norm_sum_le _ _).trans_lt ?_
     have hne : (range (pJd M T)).Nonempty := nonempty_range_iff.mpr (by omega)
-    calc ∑ j ∈ range (pJd M T), ‖blkD (pYd M T) (pNd M T) (pYd M T * 2 ^ j) (fun n => χ (n : ZMod M)) ρ‖
+    calc
+      ∑ j ∈ range (pJd M T), ‖blkD (pYd M T) (pNd M T) (pYd M T * 2 ^ j) (fun n => χ (n : ZMod M)) ρ‖
         < ∑ j ∈ range (pJd M T), 1 / (2 * (pJd M T : ℝ)) := sum_lt_sum_of_nonempty hne hcon
       _ = 1 / 2 := by rw [sum_const, card_range, nsmul_eq_mul]; field_simp
   linarith

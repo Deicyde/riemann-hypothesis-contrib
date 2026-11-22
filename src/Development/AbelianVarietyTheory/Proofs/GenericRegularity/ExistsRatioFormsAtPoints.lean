@@ -8,22 +8,25 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ValuationLift
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
 
 namespace GlobalTheory.ConstRatio
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j)
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j)
   {N : ℕ} {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL)
 
 abbrev Deg (wL : WeightFamilies.Wt D j) (m : ℕ) : Submodule B.KO X.Forms :=
   LinearMap.range (X.inc (addL (wt0 D j) wL m))
 
-theorem deg_mul {m n : ℕ} {x y : X.Forms} (hx : x ∈ Deg X wL m) (hy : y ∈ Deg X wL n) :
-    x * y ∈ Deg X wL (m + n) := by
+theorem deg_mul {m n : ℕ} {x y : X.Forms} (hx : x ∈ Deg X wL m) (hy : y ∈ Deg X wL n)
+    : x * y ∈ Deg X wL (m + n) := by
   obtain ⟨F, rfl⟩ := hx
   obtain ⟨G, rfl⟩ := hy
-  have h : X.inc _ F * X.inc _ G ∈
-      LinearMap.range (X.inc (wadd (addL (wt0 D j) wL m) (addL (wt0 D j) wL n))) := by
+  have h
+      : X.inc _ F * X.inc _ G
+        ∈ LinearMap.range (X.inc (wadd (addL (wt0 D j) wL m) (addL (wt0 D j) wL n))) := by
     obtain ⟨H, hH⟩ := X.inc_mul _ _ F G
     exact ⟨H, hH.symm⟩
   rwa [wadd_addL_addL, zero_weight_add] at h
@@ -38,29 +41,33 @@ theorem deg_wsmul (k : ℕ) (g : B.Cusp j (wsmul k wL)) : X.inc (wsmul k wL) g �
   unfold Deg
   rwa [addL, zero_weight_add]
 
-theorem deg_mul_pow {m : ℕ} {y x : X.Forms} (hy : y ∈ Deg X wL m) (hx : x ∈ Deg X wL 1) (e : ℕ) :
-    y * x ^ e ∈ Deg X wL (m + e) := by
+theorem deg_mul_pow {m : ℕ} {y x : X.Forms} (hy : y ∈ Deg X wL m) (hx : x ∈ Deg X wL 1) (e : ℕ)
+    : y * x ^ e ∈ Deg X wL (m + e) := by
   induction e with
   | zero => simpa using hy
   | succ e ih =>
     rw [pow_succ, ← mul_assoc, ← add_assoc]
     exact deg_mul X ih hx
 
-theorem deg_mul_prod (d : Fin N →₀ ℕ) {m : ℕ} {y : X.Forms} (hy : y ∈ Deg X wL m) (s : Finset (Fin N)) :
-    y * ∏ i ∈ s, X.inc wL (w i) ^ d i ∈ Deg X wL (m + ∑ i ∈ s, d i) := by
+theorem deg_mul_prod
+    (d : Fin N →₀ ℕ) {m : ℕ} {y : X.Forms} (hy : y ∈ Deg X wL m) (s : Finset (Fin N))
+    : y * ∏ i ∈ s, X.inc wL (w i) ^ d i ∈ Deg X wL (m + ∑ i ∈ s, d i) := by
   classical
   refine Finset.induction_on s (by simpa using hy) ?_
   intro a s ha ih
   rw [Finset.prod_insert ha, Finset.sum_insert ha]
-  have e1 : y * (X.inc wL (w a) ^ d a * ∏ i ∈ s, X.inc wL (w i) ^ d i) =
-      (y * ∏ i ∈ s, X.inc wL (w i) ^ d i) * X.inc wL (w a) ^ d a := by ring
+  have e1
+      : y * (X.inc wL (w a) ^ d a * ∏ i ∈ s, X.inc wL (w i) ^ d i)
+        = (y * ∏ i ∈ s, X.inc wL (w i) ^ d i) * X.inc wL (w a) ^ d a := by
+    ring
   have e2 : m + (d a + ∑ i ∈ s, d i) = m + ∑ i ∈ s, d i + d a := by ring
   rw [e1, e2]
   exact deg_mul_pow X ih (deg_one X (w a)) (d a)
 
-theorem deg_mul_aeval {k : ℕ} (Pw : MvPolynomial (Fin N) B.KO) (hPw : Pw.IsHomogeneous k) {m : ℕ} {y : X.Forms}
-    (hy : y ∈ Deg X wL m) :
-    y * MvPolynomial.aeval (fun i => X.inc wL (w i)) Pw ∈ Deg X wL (m + k) := by
+theorem deg_mul_aeval
+    {k : ℕ} (Pw : MvPolynomial (Fin N) B.KO) (hPw : Pw.IsHomogeneous k)
+    {m : ℕ} {y : X.Forms} (hy : y ∈ Deg X wL m)
+    : y * MvPolynomial.aeval (fun i => X.inc wL (w i)) Pw ∈ Deg X wL (m + k) := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Pw.as_sum, map_sum, Finset.mul_sum]
@@ -74,10 +81,15 @@ theorem deg_mul_aeval {k : ℕ} (Pw : MvPolynomial (Fin N) B.KO) (hPw : Pw.IsHom
   rw [hdeg] at h
   exact h
 
-theorem ratio_large {Ω : Type} [Field Ω] [Algebra B.KO Ω] (gF : X.Forms →ₐ[B.KO] Ω)
-    (hB : CurveLoc.BirAt X N w gF) (k0 : Fin N) (hk0 : gF (X.inc wL (w k0)) ≠ 0) (a : Ω) :
-    ∃ k : ℕ, ∀ m, k < m → ∃ n d : B.Cusp j (addL (wt0 D j) wL m),
-      gF (X.inc _ d) ≠ 0 ∧ gF (X.inc _ n) = a * gF (X.inc _ d) := by
+theorem ratio_large
+    {Ω : Type} [Field Ω] [Algebra B.KO Ω]
+    (gF : X.Forms →ₐ[B.KO] Ω) (hB : CurveLoc.BirAt X N w gF)
+    (k0 : Fin N) (hk0 : gF (X.inc wL (w k0)) ≠ 0)
+    (a : Ω)
+    : ∃ k : ℕ, ∀ m,
+      k < m
+        → ∃ n d : B.Cusp j (addL (wt0 D j) wL m),
+          gF (X.inc _ d) ≠ 0 ∧ gF (X.inc _ n) = a * gF (X.inc _ d) := by
   obtain ⟨k, g, Pw, hPw, hne, he⟩ := hB a
   refine ⟨k, fun m hm => ?_⟩
   obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_lt hm
@@ -89,8 +101,9 @@ theorem ratio_large {Ω : Type} [Field Ω] [Algebra B.KO Ω] (gF : X.Forms →�
   rw [e1] at hd hn
   obtain ⟨d, hd⟩ := hd
   obtain ⟨n, hn⟩ := hn
-  have hPv : gF (MvPolynomial.aeval (fun i => X.inc wL (w i)) Pw) =
-      MvPolynomial.aeval (fun i => gF (X.inc wL (w i))) Pw :=
+  have hPv
+      : gF (MvPolynomial.aeval (fun i => X.inc wL (w i)) Pw)
+        = MvPolynomial.aeval (fun i => gF (X.inc wL (w i))) Pw :=
     MvPolynomial.comp_aeval_apply (fun i => X.inc wL (w i)) gF Pw
   refine ⟨n, d, ?_, ?_⟩
   · rw [hd, map_mul, map_mul, map_pow, hPv]
@@ -102,9 +115,31 @@ end GlobalTheory.ConstRatio
 
 namespace GlobalTheory
 
-
 open ConstRatio in
-theorem exists_ratio_forms_at_points : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ) (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (N : ℕ) (wL : WeightFamilies.Wt D j) (w : Fin N → B.Cusp j wL) (Pt : Type) [Finite Pt] (U : Pt → Type) [∀ ζ, Field (U ζ)] (ev : ∀ ζ, Rp X la N →+* U ζ) (ι : Type) (Ω : ι → Type) [∀ Z, Field (Ω Z)] [∀ Z, Algebra B.KO (Ω Z)] (gF : ∀ Z, X.Forms →ₐ[B.KO] Ω Z) (Zc : Pt → ι) (jz : ∀ ζ, Ω (Zc ζ) →+* U ζ), (∀ ζ, ∃ k, ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc wL (w k))) ≠ 0) → (∀ ζ (u : WeightFamilies.Wt D j) (F : B.Cusp j u), gF (Zc ζ) (X.inc u F) = 0 → ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc u F)) = 0) → (∀ ζ (u : WeightFamilies.Wt D j) (F F' : B.Cusp j u), jz ζ (gF (Zc ζ) (X.inc u F)) * ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc u F')) = jz ζ (gF (Zc ζ) (X.inc u F')) * ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc u F))) → (∀ Z, CurveLoc.BirAt X N w (gF Z)) → (∀ Z (u : WeightFamilies.Wt D j) (F : B.Cusp j u), ∃ F' : B.Cusp j u, gF Z (X.inc u F') = gF Z (X.inc u F) ∧ ∀ Z', Z' ≠ Z → gF Z' (X.inc u F') = 0) → ∀ a : ∀ Z, Ω Z, ∃ (k : ℕ) (F F' : B.Cusp j (addL (wt0 D j) wL k)), ∀ ζ, ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc _ F')) ≠ 0 ∧ ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc _ F)) = jz ζ (a (Zc ζ)) * ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc _ F')) := by
+theorem exists_ratio_forms_at_points
+    : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ)
+        (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (N : ℕ) (wL : WeightFamilies.Wt D j)
+        (w : Fin N → B.Cusp j wL) (Pt : Type) [Finite Pt] (U : Pt → Type) [∀ ζ, Field (U ζ)]
+        (ev : ∀ ζ, Rp X la N →+* U ζ) (ι : Type) (Ω : ι → Type) [∀ Z, Field (Ω Z)]
+        [∀ Z, Algebra B.KO (Ω Z)] (gF : ∀ Z, X.Forms →ₐ[B.KO] Ω Z) (Zc : Pt → ι)
+        (jz : ∀ ζ, Ω (Zc ζ) →+* U ζ),
+      (∀ ζ, ∃ k, ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc wL (w k))) ≠ 0)
+        → (∀ ζ (u : WeightFamilies.Wt D j) (F : B.Cusp j u),
+          gF (Zc ζ) (X.inc u F) = 0
+            → ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc u F)) = 0)
+        → (∀ ζ (u : WeightFamilies.Wt D j) (F F' : B.Cusp j u),
+          jz ζ (gF (Zc ζ) (X.inc u F))
+              * ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc u F'))
+            = jz ζ (gF (Zc ζ) (X.inc u F'))
+              * ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc u F)))
+        → (∀ Z, CurveLoc.BirAt X N w (gF Z))
+        → (∀ Z (u : WeightFamilies.Wt D j) (F : B.Cusp j u), ∃ F' : B.Cusp j u,
+          gF Z (X.inc u F') = gF Z (X.inc u F) ∧ ∀ Z', Z' ≠ Z → gF Z' (X.inc u F') = 0)
+        → ∀ a : ∀ Z, Ω Z, ∃ (k : ℕ) (F F' : B.Cusp j (addL (wt0 D j) wL k)), ∀ ζ,
+          ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc _ F')) ≠ 0
+            ∧ ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc _ F))
+              = jz ζ (a (Zc ζ))
+                * ev ζ (Formalism.MainNotions.Gaps.EtaleWeightGaps.emb X la N (X.inc _ F')) := by
   intro D B P j X la N wL w Pt _ U _ ev ι Ω _ _ gF Zc jz h1 h2 h3 hB hs a
   classical
   haveI := Fintype.ofFinite Pt
@@ -115,9 +150,11 @@ theorem exists_ratio_forms_at_points : ∀ (D : D7) (B : WeightFamilies.Prov D) 
   have hlt : ∀ ζ, K ζ < 1 + M := fun ζ => by
     have : K ζ ≤ M := Finset.le_sup (f := K) (Finset.mem_univ ζ)
     omega
-  have key : ∀ Z, ∃ n d : B.Cusp j (addL (wt0 D j) wL (1 + M)),
-      (∀ Z', Z' ≠ Z → gF Z' (X.inc _ n) = 0 ∧ gF Z' (X.inc _ d) = 0) ∧
-      (Z ∈ Set.range Zc → gF Z (X.inc _ d) ≠ 0 ∧ gF Z (X.inc _ n) = a Z * gF Z (X.inc _ d)) := by
+  have key
+      : ∀ Z, ∃ n d : B.Cusp j (addL (wt0 D j) wL (1 + M)),
+        (∀ Z', Z' ≠ Z → gF Z' (X.inc _ n) = 0 ∧ gF Z' (X.inc _ d) = 0)
+          ∧ (Z ∈ Set.range Zc
+            → gF Z (X.inc _ d) ≠ 0 ∧ gF Z (X.inc _ n) = a Z * gF Z (X.inc _ d)) := by
     intro Z
     by_cases hZ : Z ∈ Set.range Zc
     · obtain ⟨ζ, rfl⟩ := hZ
@@ -129,14 +166,17 @@ theorem exists_ratio_forms_at_points : ∀ (D : D7) (B : WeightFamilies.Prov D) 
       exact ⟨hd, hn⟩
     · exact ⟨0, 0, fun Z' _ => by simp, fun h => absurd h hZ⟩
   choose n d hoff hon using key
-  have hsum : ∀ (f : ι → B.Cusp j (addL (wt0 D j) wL (1 + M))),
-      (∀ Z Z', Z' ≠ Z → gF Z' (X.inc _ (f Z)) = 0) → ∀ ζ,
-      gF (Zc ζ) (X.inc _ (∑ Z ∈ Finset.univ.image Zc, f Z)) = gF (Zc ζ) (X.inc _ (f (Zc ζ))) := by
+  have hsum
+      : ∀ (f : ι → B.Cusp j (addL (wt0 D j) wL (1 + M))),
+        (∀ Z Z', Z' ≠ Z → gF Z' (X.inc _ (f Z)) = 0)
+          → ∀ ζ,
+            gF (Zc ζ) (X.inc _ (∑ Z ∈ Finset.univ.image Zc, f Z))
+              = gF (Zc ζ) (X.inc _ (f (Zc ζ))) := by
     intro f hf ζ
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, map_sum]
-    exact Finset.sum_eq_single_of_mem _ (Finset.mem_image_of_mem _ (Finset.mem_univ ζ))
-      fun Z _ h => hf Z _ h.symm
+    exact Finset.sum_eq_single_of_mem _ (Finset.mem_image_of_mem _ (Finset.mem_univ ζ)) fun Z _ h =>
+      hf Z _ h.symm
   refine ⟨1 + M, ∑ Z ∈ Finset.univ.image Zc, n Z, ∑ Z ∈ Finset.univ.image Zc, d Z, fun ζ => ?_⟩
   have hn := hsum n (fun Z Z' h => (hoff Z Z' h).1) ζ
   have hd := hsum d (fun Z Z' h => (hoff Z Z' h).2) ζ

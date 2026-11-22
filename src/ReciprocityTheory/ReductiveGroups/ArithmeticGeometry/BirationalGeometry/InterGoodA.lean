@@ -8,11 +8,13 @@ namespace ReciprocityTheory.ChartRestriction.G.Geo
 
 open Ideal
 
-theorem exists_ltSeries_lift {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
-    [Algebra.IsIntegral R S] (hinj : Function.Injective (algebraMap R S)) :
-    ∀ (n : ℕ) (p : LTSeries (PrimeSpectrum R)), p.length = n →
-      ∃ q : LTSeries (PrimeSpectrum S), q.length = n ∧
-        q.last.asIdeal.comap (algebraMap R S) = p.last.asIdeal := by
+theorem exists_ltSeries_lift
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] [Algebra.IsIntegral R S]
+    (hinj : Function.Injective (algebraMap R S))
+    : ∀ (n : ℕ) (p : LTSeries (PrimeSpectrum R)),
+      p.length = n
+        → ∃ q : LTSeries (PrimeSpectrum S),
+          q.length = n ∧ q.last.asIdeal.comap (algebraMap R S) = p.last.asIdeal := by
   intro n
   induction n with
   | zero =>
@@ -20,26 +22,27 @@ theorem exists_ltSeries_lift {R S : Type*} [CommRing R] [CommRing S] [Algebra R 
     have hker : RingHom.ker (algebraMap R S) ≤ p.last.asIdeal := by
       rw [(RingHom.injective_iff_ker_eq_bot _).mp hinj]
       exact bot_le
-    obtain ⟨Q, -, hQ, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral p.last.asIdeal (⊥ : Ideal S)
-      (by rw [Ideal.under_def, ← RingHom.ker_eq_comap_bot]; exact hker)
+    obtain ⟨Q, -, hQ, hQc⟩ :=
+      Ideal.exists_ideal_over_prime_of_isIntegral p.last.asIdeal (⊥ : Ideal S)
+        (by rw [Ideal.under_def, ← RingHom.ker_eq_comap_bot]; exact hker)
     exact ⟨RelSeries.singleton _ ⟨Q, hQ⟩, rfl, hQc⟩
   | succ n ih =>
     intro p hp
-    obtain ⟨q', hq'len, hq'c⟩ := ih p.eraseLast (by
-      first
-      | (show p.length - 1 = n; omega)
-      | simp [hp])
+    obtain ⟨q', hq'len, hq'c⟩ :=
+      ih p.eraseLast (by first | (show p.length - 1 = n; omega) | simp [hp])
     have hlt : p.eraseLast.last < p.last := p.eraseLast_last_rel_last (by omega)
-    obtain ⟨Q, hQle, hQ, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral_of_isPrime
-      p.last.asIdeal q'.last.asIdeal (by
+    obtain ⟨Q, hQle, hQ, hQc⟩ :=
+      Ideal.exists_ideal_over_prime_of_isIntegral_of_isPrime p.last.asIdeal q'.last.asIdeal (by
         calc
-          under R q'.last.asIdeal = p.eraseLast.last.asIdeal := hq'c
+          under R q'.last.asIdeal
+            = p.eraseLast.last.asIdeal := hq'c
           _ ≤ p.last.asIdeal := hlt.le)
     have hlt' : q'.last.asIdeal < Q := by
       refine lt_of_le_of_ne hQle fun h => hlt.ne ?_
       ext1
       calc
-        p.eraseLast.last.asIdeal = under R q'.last.asIdeal := hq'c.symm
+        p.eraseLast.last.asIdeal
+          = under R q'.last.asIdeal := hq'c.symm
         _ = under R Q := congrArg (under R) h
         _ = p.last.asIdeal := hQc
     refine ⟨q'.snoc ⟨Q, hQ⟩ hlt', ?_, ?_⟩
@@ -48,9 +51,11 @@ theorem exists_ltSeries_lift {R S : Type*} [CommRing R] [CommRing S] [Algebra R 
     · rw [RelSeries.last_snoc]
       exact hQc
 
-theorem le_ringKrullDim_of_isIntegral {R S : Type*} [CommRing R] [CommRing S] (f : R →+* S)
-    (hf : f.IsIntegral) (hinj : Function.Injective f) (n : ℕ)
-    (h : (n : WithBot ℕ∞) ≤ ringKrullDim R) : (n : WithBot ℕ∞) ≤ ringKrullDim S := by
+theorem le_ringKrullDim_of_isIntegral
+    {R S : Type*} [CommRing R] [CommRing S]
+    (f : R →+* S) (hf : f.IsIntegral) (hinj : Function.Injective f)
+    (n : ℕ) (h : (n : WithBot ℕ∞) ≤ ringKrullDim R)
+    : (n : WithBot ℕ∞) ≤ ringKrullDim S := by
   letI := f.toAlgebra
   haveI : Algebra.IsIntegral R S := ⟨hf⟩
   obtain ⟨p, hp⟩ := Order.le_krullDim_iff.mp h
@@ -71,11 +76,13 @@ theorem int_isJacobsonRing : IsJacobsonRing ℤ := by
   · haveI : P.IsMaximal := hP.isMaximal hb
     exact Ideal.jacobson_eq_self_of_isMaximal
 
-theorem exists_gt_of_comap_int_eq_bot {σ A : Type*} [Finite σ] [CommRing A]
-    (g : MvPolynomial σ ℤ →+* A) (hg : Function.Surjective g) (p : Ideal A) (hp : p.IsPrime)
-    (hb : p.comap (g.comp MvPolynomial.C) = ⊥) : ∃ q : Ideal A, q.IsPrime ∧ p < q := by
+theorem exists_gt_of_comap_int_eq_bot
+    {σ A : Type*} [Finite σ] [CommRing A]
+    (g : MvPolynomial σ ℤ →+* A) (hg : Function.Surjective g)
+    (p : Ideal A) (hp : p.IsPrime) (hb : p.comap (g.comp MvPolynomial.C) = ⊥)
+    : ∃ q : Ideal A, q.IsPrime ∧ p < q := by
   haveI := int_isJacobsonRing
-  have hnm : ¬ p.IsMaximal := by
+  have hnm : ¬p.IsMaximal := by
     intro hm
     haveI := hm
     letI : Field (A ⧸ p) := Ideal.Quotient.field p
@@ -105,12 +112,14 @@ theorem exists_gt_of_comap_int_eq_bot {σ A : Type*} [Finite σ] [CommRing A]
   rintro rfl
   exact hnm hm
 
-theorem succ_le_ringKrullDim_of_isLocalization {A B : Type*} [CommRing A] [CommRing B] [Algebra A B]
+theorem succ_le_ringKrullDim_of_isLocalization
+    {A B : Type*} [CommRing A] [CommRing B] [Algebra A B]
     (M : Submonoid A) [IsLocalization M B]
     (hext : ∀ p : Ideal A, p.IsPrime → Disjoint (M : Set A) p → ∃ q : Ideal A, q.IsPrime ∧ p < q)
-    (n : ℕ) (h : (n : WithBot ℕ∞) ≤ ringKrullDim B) :
-    ((n + 1 : ℕ) : WithBot ℕ∞) ≤ ringKrullDim A := by
-  let φ : PrimeSpectrum B → PrimeSpectrum A := fun q => ⟨q.asIdeal.comap (algebraMap A B), inferInstance⟩
+    (n : ℕ) (h : (n : WithBot ℕ∞) ≤ ringKrullDim B)
+    : ((n + 1 : ℕ) : WithBot ℕ∞) ≤ ringKrullDim A := by
+  let φ : PrimeSpectrum B → PrimeSpectrum A := fun q =>
+    ⟨q.asIdeal.comap (algebraMap A B), inferInstance⟩
   have hsm : StrictMono φ := fun a b hab => by
     refine lt_of_le_of_ne (Ideal.comap_mono hab.le) fun e => hab.ne ?_
     have e' : (φ a).asIdeal = (φ b).asIdeal := congrArg PrimeSpectrum.asIdeal e

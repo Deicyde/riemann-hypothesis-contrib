@@ -17,21 +17,24 @@ noncomputable section
 
 section Loc
 
-variable {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k Ω] {K' : Type} [Field K'] [Algebra k K']
+variable
+  {k : Type} [Field k]
+  {Ω : Type} [Field Ω] [Algebra k Ω]
+  {K' : Type} [Field K'] [Algebra k K']
   {N : ℕ} {x : Fin (N + 1) → Ω} {x' : Fin (N + 1) → K'}
   (hsp : Kleiman.primeOf (S := k) x ≤ Kleiman.primeOf (S := k) x')
 include hsp
 
-theorem locAt_ratio {c : Fin (N + 1)} (hc : x' c ≠ 0) (a : Fin (N + 1)) :
-    x a / x c ∈ Kleiman.locAt k x x' ∧ Kleiman.redAt k x x' (x a / x c) = x' a / x' c := by
+theorem locAt_ratio {c : Fin (N + 1)} (hc : x' c ≠ 0) (a : Fin (N + 1))
+    : x a / x c ∈ Kleiman.locAt k x x' ∧ Kleiman.redAt k x x' (x a / x c) = x' a / x' c := by
   have hsy : aeval x' (X c : Kleiman.Poly k N) ≠ 0 := by rw [aeval_X]; exact hc
   have h1 := Kleiman.mem_locAt (x := x) (isHomogeneous_X k a) (isHomogeneous_X k c) hsy
   have h2 := Kleiman.redAt_eq hsp (isHomogeneous_X k a) (isHomogeneous_X k c) hsy
   simp only [aeval_X] at h1 h2
   exact ⟨h1, h2⟩
 
-theorem locAt_zpow {a : Ω} (ha : a ∈ Kleiman.locAt k x x') (hr : Kleiman.redAt k x x' a ≠ 0) (n : ℤ) :
-    a ^ n ∈ Kleiman.locAt k x x' ∧ Kleiman.redAt k x x' (a ^ n) = Kleiman.redAt k x x' a ^ n := by
+theorem locAt_zpow {a : Ω} (ha : a ∈ Kleiman.locAt k x x') (hr : Kleiman.redAt k x x' a ≠ 0) (n : ℤ)
+    : a ^ n ∈ Kleiman.locAt k x x' ∧ Kleiman.redAt k x x' (a ^ n) = Kleiman.redAt k x x' a ^ n := by
   obtain ⟨n, rfl | rfl⟩ := Int.eq_nat_or_neg n
   · simpa only [zpow_natCast] using Kleiman.locAt_pow hsp ha n
   · have hp := Kleiman.locAt_pow hsp ha n
@@ -51,8 +54,9 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
     exact Ideal.comap_mono hle
   obtain ⟨γ, hγ0, hg, hb⟩ := Kleiman.exists_restrict_gen hsp hxy Q
 
-  have hmemQ : ∀ (I : Kleiman.Chart x') {i : Fin (N + 1)}, i ∈ I.1 → ∀ b,
-      x i ^ (-n) * s b ∈ Q.sub (Kleiman.liftChart hxy I) := by
+  have hmemQ
+      : ∀ (I : Kleiman.Chart x') {i : Fin (N + 1)},
+        i ∈ I.1 → ∀ b, x i ^ (-n) * s b ∈ Q.sub (Kleiman.liftChart hxy I) := by
     intro I i hi b
     have hxi : x i ≠ 0 := (Kleiman.mem_support x).mp ((Kleiman.liftChart hxy I).2.2 hi)
     have hsb : s b ∈ (Q.twist (Kleiman.twistSys k x n)).sub (Kleiman.liftChart hxy I) := by
@@ -71,8 +75,9 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
     by_contra hcon
     push Not at hcon
     obtain ⟨b₀, -, hb₀L, hb₀r, hb₀Q⟩ := hb (Kleiman.singleChart hi₀)
-    have hmem : x i₀ ^ n • (b₀ * γ) ∈
-        (Q.twist (Kleiman.twistSys k x n)).sub (Kleiman.liftChart hxy (Kleiman.singleChart hi₀)) :=
+    have hmem
+        : x i₀ ^ n • (b₀ * γ) ∈ (Q.twist (Kleiman.twistSys k x n)).sub
+          (Kleiman.liftChart hxy (Kleiman.singleChart hi₀)) :=
       (TranslateEq.mem_twist_twistSys_iff Q.toSubSystem n _ hi₀I _).mpr ⟨_, hb₀Q, rfl⟩
     rw [← hgen, Submodule.mem_span_range_iff_exists_fun] at hmem
     obtain ⟨a, ha⟩ := hmem
@@ -86,8 +91,10 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
         exact Finset.sum_congr rfl fun b _ => by rw [ht]; ring
       rw [this, ha, zpow_neg]
       field_simp
-    have hL := Kleiman.locAt_sum hsp Finset.univ (fun b => (a b : Ω) * t b) fun b _ =>
-      (Kleiman.locAt_mul hsp (haL b) (htL b)).1
+    have hL :=
+      Kleiman.locAt_sum hsp Finset.univ
+        (fun b => (a b : Ω) * t b)
+        fun b _ => (Kleiman.locAt_mul hsp (haL b) (htL b)).1
     apply hb₀r
     rw [hsum, hL.2]
     exact Finset.sum_eq_zero fun b _ => by
@@ -100,10 +107,10 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
     obtain ⟨hdL, hdr⟩ := Kleiman.locAt_div hsp (htL b) (htL l₀) hl₀
     obtain ⟨f, h, e, hf, hh, hhy, hfh⟩ := hdL
     have hhx := Kleiman.aeval_ne_zero_of_primeOf_le hsp hh hhy
-    have hr2 : Kleiman.redAt k x x' (t b) / Kleiman.redAt k x x' (t l₀) = aeval x' f / aeval x' h := by
+    have hr2
+        : Kleiman.redAt k x x' (t b) / Kleiman.redAt k x x' (t l₀) = aeval x' f / aeval x' h := by
       rw [← hdr, hfh, Kleiman.redAt_eq hsp hf hh hhy]
-    have hst : t b / t l₀ = s b / s l₀ := by
-      rw [div_eq_div_iff htl0 hsl0, ht]; dsimp only; ring
+    have hst : t b / t l₀ = s b / s l₀ := by rw [div_eq_div_iff htl0 hsl0, ht]; dsimp only; ring
     rw [hst, div_eq_div_iff hsl0 hhx] at hfh
     have hgr := graphEq_of_le hle hf hh b l₀ (by rw [hfh]; ring)
     rw [div_eq_div_iff hl₀ hhy] at hr2
@@ -116,12 +123,12 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
     rw [h0, zero_mul] at this
     exact (mul_eq_zero.mp this).resolve_right hl₀
   obtain ⟨μ, hμdef⟩ : ∃ μ : K', μ = s' l₀ / (Kleiman.redAt k x x' (t l₀) * x' i₀ ^ n) := ⟨_, rfl⟩
-  have hμ : μ ≠ 0 := by
-    rw [hμdef]; exact div_ne_zero hlam (mul_ne_zero hl₀ (zpow_ne_zero n hi₀))
+  have hμ : μ ≠ 0 := by rw [hμdef]; exact div_ne_zero hlam (mul_ne_zero hl₀ (zpow_ne_zero n hi₀))
 
   let Q'' : Kleiman.LineBundle k x' :=
     Kleiman.LineBundle.mk
-      (Kleiman.SubFamily.mk (Kleiman.redSys hxy Q.toSubSystem γ) (Kleiman.redSys_mem_iff hsp hxy hg))
+      (Kleiman.SubFamily.mk (Kleiman.redSys hxy Q.toSubSystem γ)
+        (Kleiman.redSys_mem_iff hsp hxy hg))
       (fun I => by
         obtain ⟨S0, hS0⟩ := Q.fg (Kleiman.liftChart hxy I)
         change (Kleiman.redSys hxy Q.toSubSystem γ).sub I |>.FG
@@ -129,7 +136,8 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
         exact Submodule.fg_span (S0.finite_toSet.image _))
       (fun I => Kleiman.redSys_invertible hsp hxy hγ0 hg I (hb I))
   have hR'' : Kleiman.RestrictData Q.toSubSystem hxy Q''.toSubSystem
-      (fun q => Kleiman.redAt k x x' (q / γ)) := Kleiman.restrictData_redSys hsp hxy hg Q'' rfl
+      (fun q => Kleiman.redAt k x x' (q / γ)) :=
+    Kleiman.restrictData_redSys hsp hxy hg Q'' rfl
   have hR' := restrictData_scale hR'' μ hμ
   refine ⟨scaleBundle Q'' μ hμ, fun q => μ * Kleiman.redAt k x x' (q / γ), hR', ?_⟩
   intro I
@@ -137,8 +145,11 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
   have hxi' : x' i ≠ 0 := (Kleiman.mem_support x').mp (I.2.2 hi)
   have hxi : x i ≠ 0 := hxy i hxi'
 
-  have hc : ∀ b, x i ^ (-n) * s b / γ ∈ Kleiman.locAt k x x' ∧
-      Kleiman.redAt k x x' (x i ^ (-n) * s b / γ) = (x' i₀ / x' i) ^ n * Kleiman.redAt k x x' (t b) := by
+  have hc
+      : ∀ b,
+        x i ^ (-n) * s b / γ ∈ Kleiman.locAt k x x'
+          ∧ Kleiman.redAt k x x' (x i ^ (-n) * s b / γ)
+            = (x' i₀ / x' i) ^ n * Kleiman.redAt k x x' (t b) := by
     intro b
     obtain ⟨hr1, hr2⟩ := locAt_ratio hsp hxi' i₀
     have hr0 : Kleiman.redAt k x x' (x i₀ / x i) ≠ 0 := by rw [hr2]; exact div_ne_zero hi₀ hxi'
@@ -173,8 +184,11 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
     rw [← hgen, Submodule.mem_span_range_iff_exists_fun] at hxq
     obtain ⟨a, ha⟩ := hxq
     simp only [Subalgebra.smul_def, smul_eq_mul] at ha
-    have haL : ∀ b, (a b : Ω) ∈ Kleiman.locAt k x x' ∧ Kleiman.redAt k x x' (a b) ∈ Kleiman.chartRing k x' I :=
-      fun b => Kleiman.chartRing_sub_locAt hsp hxy I (a b).2
+    have haL
+        : ∀ b,
+          (a b : Ω) ∈ Kleiman.locAt k x x'
+            ∧ Kleiman.redAt k x x' (a b) ∈ Kleiman.chartRing k x' I := fun b =>
+      Kleiman.chartRing_sub_locAt hsp hxy I (a b).2
     have hqs : q / γ = ∑ b, (a b : Ω) * (x i ^ (-n) * s b / γ) := by
       have hxn : x i ^ n ≠ 0 := zpow_ne_zero n hxi
       have : ∑ b, (a b : Ω) * (x i ^ (-n) * s b / γ) = x i ^ (-n) / γ * ∑ b, (a b : Ω) * s b := by
@@ -182,8 +196,10 @@ theorem GraphRestrict.full : GraphRestrict.Statement := by
         exact Finset.sum_congr rfl fun b _ => by ring
       rw [this, ha, zpow_neg]
       field_simp
-    have hsumL := Kleiman.locAt_sum hsp Finset.univ (fun b => (a b : Ω) * (x i ^ (-n) * s b / γ))
-      fun b _ => (Kleiman.locAt_mul hsp (haL b).1 (hc b).1).1
+    have hsumL :=
+      Kleiman.locAt_sum hsp Finset.univ
+        (fun b => (a b : Ω) * (x i ^ (-n) * s b / γ))
+        fun b _ => (Kleiman.locAt_mul hsp (haL b).1 (hc b).1).1
     rw [Submodule.mem_span_range_iff_exists_fun]
     refine ⟨fun b => ⟨Kleiman.redAt k x x' (a b), (haL b).2⟩, ?_⟩
     simp only [Subalgebra.smul_def, smul_eq_mul]

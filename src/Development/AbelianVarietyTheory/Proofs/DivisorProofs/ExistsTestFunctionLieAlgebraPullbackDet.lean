@@ -19,21 +19,22 @@ namespace GlobalTheory.GLExt
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-
 variable (E a) in
 def toLCLM : Matrix (Fin a) (Fin a) (Cinf E) →L[ℝ] Lie E a :=
   LinearMap.toContinuousLinearMap (Matrix.ofLinearEquiv ℝ).symm.toLinearMap
-
 
 variable (E a) in
 def ofCLM : Lie E a →L[ℝ] Matrix (Fin a) (Fin a) (Cinf E) :=
   LinearMap.toContinuousLinearMap (Matrix.ofLinearEquiv ℝ).toLinearMap
 
-def detL (x : Lie E a) : ℝ := LinearMap.det ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a)
+def detL (x : Lie E a) : ℝ :=
+  LinearMap.det ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a)
 
 theorem contDiff_detL : ContDiff ℝ ∞ (detL (E := E) (a := a)) := by
   let b := Module.finBasis ℝ (Lie E a)
-  have e : (detL (E := E) (a := a)) = fun x => (Matrix.of fun i j => b.coord i (rmul (b j) x)).det := by
+  have e
+      : (detL (E := E) (a := a))
+        = fun x => (Matrix.of fun i j => b.coord i (rmul (b j) x)).det := by
     funext x
     rw [detL, ← LinearMap.det_toMatrix b]
     congr 1
@@ -43,16 +44,21 @@ theorem contDiff_detL : ContDiff ℝ ∞ (detL (E := E) (a := a)) := by
   rw [e]
   simp only [Matrix.det_apply', Matrix.of_apply]
   refine ContDiff.sum fun σ _ => contDiff_const.mul (contDiff_prod fun i _ => ?_)
-  exact (LinearMap.toContinuousLinearMap (b.coord (σ i))).contDiff.comp (ContinuousLinearMap.contDiff (rmul (b i)))
+  exact (LinearMap.toContinuousLinearMap (b.coord (σ i))).contDiff.comp
+    (ContinuousLinearMap.contDiff (rmul (b i)))
 
 theorem detL_ne_zero {x : Lie E a} (hx : x ∈ invSet E a) : detL x ≠ 0 := by
   obtain ⟨u, hu⟩ := hx
-  have h : ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a) ∘ₗ
-      ((lmul (toL (u⁻¹ : (Matrix (Fin a) (Fin a) (Cinf E))ˣ).val) : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a) =
-        LinearMap.id := by
+  have h
+      : ((lmul x : Lie E a →L[ℝ] Lie E a) : Lie E a →ₗ[ℝ] Lie E a)
+          ∘ₗ ((lmul (toL (u⁻¹ : (Matrix (Fin a) (Fin a) (Cinf E))ˣ).val) : Lie E a →L[ℝ] Lie E a)
+            : Lie E a →ₗ[ℝ] Lie E a)
+        = LinearMap.id := by
     refine LinearMap.ext fun v => ?_
-    change Matrix.of x * (((u⁻¹ : (Matrix (Fin a) (Fin a) (Cinf E))ˣ) : Matrix (Fin a) (Fin a) (Cinf E)) * Matrix.of v) =
-      Matrix.of v
+    change Matrix.of x
+        * (((u⁻¹ : (Matrix (Fin a) (Fin a) (Cinf E))ˣ) : Matrix (Fin a) (Fin a) (Cinf E))
+          * Matrix.of v)
+      = Matrix.of v
     rw [← hu, Units.mul_inv_cancel_left]
   intro h0
   have h1 := congrArg LinearMap.det h
@@ -61,13 +67,12 @@ theorem detL_ne_zero {x : Lie E a} (hx : x ∈ invSet E a) : detL x ≠ 0 := by
   rw [h0, zero_mul] at h1
   exact zero_ne_one h1
 
-
 open Classical in
 def extZ (α : glG E a → ℂ) (x : Lie E a) : ℂ :=
   if h : IsUnit (Matrix.of x) then ((|detL x|⁻¹ : ℝ) : ℂ) * α ⟨h.unit, Subgroup.mem_top _⟩ else 0
 
-theorem extZ_val (α : glG E a → ℂ) (y : glG E a) :
-    extZ α (toL y.1.val) = ((|detL (toL y.1.val)|⁻¹ : ℝ) : ℂ) * α y := by
+theorem extZ_val (α : glG E a → ℂ) (y : glG E a)
+    : extZ α (toL y.1.val) = ((|detL (toL y.1.val)|⁻¹ : ℝ) : ℂ) * α y := by
   have h : IsUnit (Matrix.of (toL y.1.val)) := y.1.isUnit
   have e : (⟨h.unit, Subgroup.mem_top _⟩ : glG E a) = y := Subtype.ext (Units.ext h.unit_spec)
   rw [extZ, dite_eq_left h, e]
@@ -75,22 +80,24 @@ theorem extZ_val (α : glG E a → ℂ) (y : glG E a) :
 theorem continuous_toL_val : Continuous fun y : glG E a => toL y.1.val :=
   (toLCLM E a).continuous.comp (Units.continuous_val.comp continuous_subtype_val)
 
-theorem support_extZ_subset (α : glG E a → ℂ) :
-    Function.support (extZ α) ⊆ (fun y : glG E a => toL y.1.val) '' tsupport α := by
+theorem support_extZ_subset (α : glG E a → ℂ)
+    : Function.support (extZ α) ⊆ (fun y : glG E a => toL y.1.val) '' tsupport α := by
   intro x hx
   by_cases h : IsUnit (Matrix.of x)
   · refine ⟨⟨h.unit, Subgroup.mem_top _⟩, subset_tsupport _ fun h0 => hx ?_, ?_⟩
     · simp [extZ, h, h0]
     · show Matrix.of.symm (h.unit : Matrix (Fin a) (Fin a) (Cinf E)) = x
-      rw [h.unit_spec]; rfl
+      rw [h.unit_spec]
+      rfl
   · exact absurd (by simp [extZ, h]) hx
 
-theorem contDiffAt_extZ {α : glG E a → ℂ} (hα : (glH E a).IsSmoothFun α) {x₀ : Lie E a} (hx₀ : x₀ ∈ invSet E a) :
-    ContDiffAt ℝ ∞ (extZ α) x₀ := by
+theorem contDiffAt_extZ
+    {α : glG E a → ℂ} (hα : (glH E a).IsSmoothFun α) {x₀ : Lie E a} (hx₀ : x₀ ∈ invSet E a)
+    : ContDiffAt ℝ ∞ (extZ α) x₀ := by
   obtain ⟨u, hu⟩ := id hx₀
   let g : glG E a := ⟨u, Subgroup.mem_top _⟩
-  let L : Lie E a → Matrix (Fin a) (Fin a) (Cinf E) :=
-    fun x => ((u⁻¹ : (Matrix (Fin a) (Fin a) (Cinf E))ˣ) : Matrix (Fin a) (Fin a) (Cinf E)) * ofCLM E a x
+  let L : Lie E a → Matrix (Fin a) (Fin a) (Cinf E) := fun x =>
+    ((u⁻¹ : (Matrix (Fin a) (Fin a) (Cinf E))ˣ) : Matrix (Fin a) (Fin a) (Cinf E)) * ofCLM E a x
   have hL1 : L x₀ = 1 := by
     change _ * Matrix.of x₀ = 1
     rw [← hu, Units.inv_mul]
@@ -113,10 +120,13 @@ theorem contDiffAt_extZ {α : glG E a → ℂ} (hα : (glH E a).IsSmoothFun α) 
       ((contDiff_detL.contDiffAt.abs (detL_ne_zero hx₀)).inv (abs_ne_zero.2 (detL_ne_zero hx₀)))
   refine (hD.mul hF).congr_of_eventuallyEq ?_
   filter_upwards [hU, hI] with x hx hxi
-  have h2 : NormedSpace.exp ((expPartialHomeomorph ℝ (Matrix (Fin a) (Fin a) (Cinf E))).symm (L x)) = L x :=
+  have h2
+      : NormedSpace.exp ((expPartialHomeomorph ℝ (Matrix (Fin a) (Fin a) (Cinf E))).symm (L x))
+        = L x :=
     (expPartialHomeomorph ℝ _).right_inv hx
   have e : (⟨hxi.unit, Subgroup.mem_top _⟩ : glG E a) = g * (glH E a).expG (Y x) := by
-    apply Subtype.ext; apply Units.ext
+    apply Subtype.ext
+    apply Units.ext
     simp only [Subgroup.coe_mul, Units.val_mul, IsExpLieAlgebra.coe_expG]
     rw [subspaceProj_of_mem Submodule.mem_top]
     refine (?_ : _ = (u : Matrix (Fin a) (Fin a) (Cinf E)) * L x).trans (congrArg _ h2.symm)
@@ -124,20 +134,35 @@ theorem contDiffAt_extZ {α : glG E a → ℂ} (hα : (glH E a).IsSmoothFun α) 
     rw [Units.mul_inv_cancel_left]
   rw [extZ, dite_eq_left (show IsUnit (Matrix.of x) from hxi), e]
 
-theorem exists_isTest_ext : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ), ∀ α : glG E a → ℂ,
-    (glH E a).IsSmoothFun α → HasCompactSupport α → ∃ β : Lie E a → ℂ, GlobalTheory.CuspQuot.IsTest (invSet E a) β ∧
-      ∀ y : glG E a, β (toL y.1.val) = ((|LinearMap.det ((lmul (toL y.1.val) : Lie E a →L[ℝ] Lie E a) :
-        Lie E a →ₗ[ℝ] Lie E a)|⁻¹ : ℝ) : ℂ) * α y := by
+theorem exists_isTest_ext
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
+      ∀ α : glG E a → ℂ,
+        (glH E a).IsSmoothFun α → HasCompactSupport α
+          → ∃ β : Lie E a → ℂ,
+            GlobalTheory.CuspQuot.IsTest (invSet E a) β
+              ∧ ∀ y : glG E a,
+                β (toL y.1.val)
+                  = ((|LinearMap.det ((lmul (toL y.1.val) : Lie E a →L[ℝ] Lie E a) :
+                          Lie E a →ₗ[ℝ] Lie E a)|⁻¹
+                        : ℝ)
+                      : ℂ)
+                    * α y := by
   intro E _ _ _ a α hα hc
-  have hK : IsCompact ((fun y : glG E a => toL y.1.val) '' tsupport α) := hc.image continuous_toL_val
+  have hK : IsCompact ((fun y : glG E a => toL y.1.val) '' tsupport α) :=
+    hc.image continuous_toL_val
   have hs : tsupport (extZ α) ⊆ (fun y : glG E a => toL y.1.val) '' tsupport α :=
     closure_minimal (support_extZ_subset α) hK.isClosed
-  have hi : tsupport (extZ α) ⊆ invSet E a := hs.trans (by rintro _ ⟨y, _, rfl⟩; exact val_mem_invSet y.1)
-  refine ⟨extZ α, ⟨contDiff_iff_contDiffAt.2 fun x => ?_, hK.of_isClosed_subset (isClosed_tsupport _) hs, hi⟩,
-    fun y => extZ_val α y⟩
+  have hi : tsupport (extZ α) ⊆ invSet E a :=
+    hs.trans (by rintro _ ⟨y, _, rfl⟩; exact val_mem_invSet y.1)
+  refine ⟨
+    extZ α,
+    ⟨contDiff_iff_contDiffAt.2 fun x => ?_, hK.of_isClosed_subset (isClosed_tsupport _) hs, hi⟩,
+    fun y => extZ_val α y
+  ⟩
   by_cases hx : x ∈ tsupport (extZ α)
   · exact contDiffAt_extZ hα (hi hx)
-  · exact (contDiffAt_const (c := (0 : ℂ))).congr_of_eventuallyEq (notMem_tsupport_iff_eventuallyEq.1 hx)
+  · exact (contDiffAt_const (c := (0 : ℂ))).congr_of_eventuallyEq
+      (notMem_tsupport_iff_eventuallyEq.1 hx)
 
 end GlobalTheory.GLExt
 

@@ -8,18 +8,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthC
 
 noncomputable section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology Pointwise
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology Pointwise
 
 namespace GlobalTheory.SelInfl
 
-variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-  {S : Set (HeightOneSpectrum (𝓞 F))} {R : Type} [CommRing R] {M : Type}
-  [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
-  [ContinuousConstSMul R M] [T2Space M] (rhoS : Representation R (GS Ω S) M) (A : Places F Ω)
+variable
+  {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+  {S : Set (HeightOneSpectrum (𝓞 F))} {R : Type} [CommRing R]
+  {M : Type} [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+  [ContinuousConstSMul R M] [T2Space M]
+  (rhoS : Representation R (GS Ω S) M) (A : Places F Ω)
 
-theorem vanish {f : G F Ω → M} (hf : f ∈ Z1 (rhoS.comp (toGS Ω S) : Representation R (G F Ω) M))
-    (hv0 : ∀ v ∉ S, ∃ m, ∀ g ∈ Ine (F := F) (A.1 v), f g = rhoS (toGS Ω S g) m - m) (n : G F Ω)
-    (hn : n ∈ NS Ω S) : f n = 0 := by
+theorem vanish
+    {f : G F Ω → M} (hf : f ∈ Z1 (rhoS.comp (toGS Ω S) : Representation R (G F Ω) M))
+    (hv0 : ∀ v ∉ S, ∃ m, ∀ g ∈ Ine (F := F) (A.1 v), f g = rhoS (toGS Ω S g) m - m)
+    (n : G F Ω) (hn : n ∈ NS Ω S)
+    : f n = 0 := by
   obtain ⟨hfc, hfco⟩ := (ReciprocityTheory.Gal.mem_Z1_iff_cocycle _ f).1 hf
   have ht : ∀ g ∈ NS Ω S, toGS Ω S g = 1 := fun g hg => (QuotientGroup.eq_one_iff g).2 hg
   have hρ : ∀ g ∈ NS Ω S, ∀ x : M, (rhoS.comp (toGS Ω S)) g x = x := by
@@ -34,12 +39,13 @@ theorem vanish {f : G F Ω → M} (hf : f ∈ Z1 (rhoS.comp (toGS Ω S) : Repres
     have := hfco a a⁻¹
     rw [mul_inv_cancel, h1, h0, zero_add, hρ a ha] at this
     exact this.symm
-  let H : Subgroup (G F Ω) :=
-    { carrier := {g | g ∈ NS Ω S ∧ f g = 0}
-      one_mem' := ⟨(NS Ω S).one_mem, h1⟩
-      mul_mem' := fun {a b} ha hb =>
-        ⟨(NS Ω S).mul_mem ha.1 hb.1, by rw [hfco, ha.2, hb.2, map_zero, add_zero]⟩
-      inv_mem' := fun {a} ha => ⟨(NS Ω S).inv_mem ha.1, hinv a ha.1 ha.2⟩ }
+  let H : Subgroup (G F Ω) := {
+    carrier := {g | g ∈ NS Ω S ∧ f g = 0}
+    one_mem' := ⟨(NS Ω S).one_mem, h1⟩
+    mul_mem' := fun {a b} ha hb =>
+      ⟨(NS Ω S).mul_mem ha.1 hb.1, by rw [hfco, ha.2, hb.2, map_zero, add_zero]⟩
+    inv_mem' := fun {a} ha => ⟨(NS Ω S).inv_mem ha.1, hinv a ha.1 ha.2⟩
+  }
   have hconj : ∀ n ∈ H, ∀ g : G F Ω, g * n * g⁻¹ ∈ H := by
     intro n hn g
     refine ⟨(normal_NS S).conj_mem n hn.1 g, ?_⟩
@@ -52,10 +58,11 @@ theorem vanish {f : G F Ω → M} (hf : f ∈ Z1 (rhoS.comp (toGS Ω S) : Repres
   have hHn : H.Normal := ⟨hconj⟩
   have hclosed : IsClosed (H : Set (G F Ω)) :=
     (isClosed_NS Ω S).inter (isClosed_singleton.preimage hfc)
-  have hsub : (⋃ v ∈ Sᶜ, ⋃ A' ∈ {A' : ValuationSubring Ω | IsPlaceOver A' v}, Inertia (F := F) A') ⊆ H := by
+  have hsub
+      : (⋃ v ∈ Sᶜ, ⋃ A' ∈ {A' : ValuationSubring Ω | IsPlaceOver A' v}, Inertia (F := F) A')
+        ⊆ H := by
     intro σ hσ
-    have hσN : σ ∈ NS Ω S :=
-      Subgroup.le_topologicalClosure _ (Subgroup.subset_normalClosure hσ)
+    have hσN : σ ∈ NS Ω S := Subgroup.le_topologicalClosure _ (Subgroup.subset_normalClosure hσ)
     simp only [Set.mem_iUnion, Set.mem_ofPred_eq] at hσ
     obtain ⟨v, hv, A', hA', hσA'⟩ := hσ
     obtain ⟨γ, hγ⟩ := exists_smul_eq_of_isPlaceOver (A.2 v) hA'
@@ -84,15 +91,22 @@ theorem selAllLeInf : Formalism.GaloisCohomology.SelAllLeInf := by
   have hv0 : ∀ v ∉ S, ∃ m, ∀ g ∈ Ine (F := F) (A.1 v), z.1 g = rhoS (toGS Ω S g) m - m := by
     intro v hv
     have h1 := hL v hv (hloc v)
-    have h2 : (Submodule.Quotient.mk (restrictCocycles1 _ ((Ine (F := F) (A.1 v)).subgroupOf (Dec (F := F) (A.1 v))).subtype
-        continuous_subtype_val (restrictCocycles1 _ (Dec (F := F) (A.1 v)).subtype continuous_subtype_val z)) :
-        H1 _) = 0 := h1
+    have h2
+        : (Submodule.Quotient.mk (restrictCocycles1 _
+              ((Ine (F := F) (A.1 v)).subgroupOf (Dec (F := F) (A.1 v))).subtype
+              continuous_subtype_val
+              (restrictCocycles1 _ (Dec (F := F) (A.1 v)).subtype continuous_subtype_val z))
+            : H1 _)
+          = 0 :=
+      h1
     have h3 := (Submodule.Quotient.mk_eq_zero _).1 h2
     rw [Submodule.mem_comap] at h3
     obtain ⟨m, hm⟩ := (ReciprocityTheory.Gal.mem_coboundaries1 _ _).1 h3
     refine ⟨m, fun g hg => ?_⟩
     have gD : g ∈ Dec (F := F) (A.1 v) := Ine_le_Dec _ hg
-    have gJ : (⟨g, gD⟩ : Dec (F := F) (A.1 v)) ∈ (Ine (F := F) (A.1 v)).subgroupOf (Dec (F := F) (A.1 v)) := by
+    have gJ
+        : (⟨g, gD⟩ : Dec (F := F) (A.1 v))
+          ∈ (Ine (F := F) (A.1 v)).subgroupOf (Dec (F := F) (A.1 v)) := by
       rw [Subgroup.mem_subgroupOf]
       exact hg
     exact hm ⟨⟨g, gD⟩, gJ⟩

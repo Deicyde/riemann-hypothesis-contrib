@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowEqPowOfMo
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 
@@ -17,8 +20,8 @@ noncomputable section
 open IsDedekindDomain
 namespace GlobalTheory.CompatLim
 
-theorem norm_sub_le_of_dvd (ℓ : ℕ) [Fact ℓ.Prime] (k : ℕ) (x y : ℤ) (h : ((ℓ ^ k : ℕ) : ℤ) ∣ x - y) :
-    ‖((x : ℤ_[ℓ]) - (y : ℤ_[ℓ]))‖ ≤ (ℓ : ℝ) ^ (-(k : ℤ)) := by
+theorem norm_sub_le_of_dvd (ℓ : ℕ) [Fact ℓ.Prime] (k : ℕ) (x y : ℤ) (h : ((ℓ ^ k : ℕ) : ℤ) ∣ x - y)
+    : ‖((x : ℤ_[ℓ]) - (y : ℤ_[ℓ]))‖ ≤ (ℓ : ℝ) ^ (-(k : ℤ)) := by
   rw [PadicInt.norm_le_pow_iff_mem_span_pow, Ideal.mem_span_singleton]
   obtain ⟨c, hc⟩ := h
   refine ⟨(c : ℤ_[ℓ]), ?_⟩
@@ -26,16 +29,22 @@ theorem norm_sub_le_of_dvd (ℓ : ℕ) [Fact ℓ.Prime] (k : ℕ) (x y : ℤ) (h
   push_cast at this
   rw [← this]
 
-theorem exists_padicInt_lim (p ℓ : ℕ) [Fact ℓ.Prime] (hp : p.Prime) (hne : ℓ ≠ p) (a : ℕ → ℤ)
-    (ha : ∀ n m : ℕ, 0 < n → 0 < m → (n * m).Coprime p → (n : ℤ) ∣ a (n * m) - a n) :
-    ∃ L : ℤ_[ℓ], ∀ n : ℕ, 0 < n → n.Coprime p → ∃ b : ℤ_[ℓ], L = (a n : ℤ_[ℓ]) + (n : ℤ_[ℓ]) * b := by
+theorem exists_padicInt_lim
+    (p ℓ : ℕ) [Fact ℓ.Prime]
+    (hp : p.Prime) (hne : ℓ ≠ p)
+    (a : ℕ → ℤ) (ha : ∀ n m : ℕ, 0 < n → 0 < m → (n * m).Coprime p → (n : ℤ) ∣ a (n * m) - a n)
+    : ∃ L : ℤ_[ℓ], ∀ n : ℕ,
+      0 < n → n.Coprime p → ∃ b : ℤ_[ℓ], L = (a n : ℤ_[ℓ]) + (n : ℤ_[ℓ]) * b := by
   have hℓ : ℓ.Prime := Fact.out
-  have hcop : ∀ k, (ℓ ^ k).Coprime p := fun k => Nat.Coprime.pow_left k ((Nat.coprime_primes hℓ hp).2 hne)
+  have hcop : ∀ k, (ℓ ^ k).Coprime p := fun k =>
+    Nat.Coprime.pow_left k ((Nat.coprime_primes hℓ hp).2 hne)
   have hpos : ∀ k, 0 < ℓ ^ k := fun k => pow_pos hℓ.pos k
 
   have key : ∀ k m, k ≤ m → ((ℓ ^ k : ℕ) : ℤ) ∣ a (ℓ ^ m) - a (ℓ ^ k) := by
     intro k m hkm
-    have h := ha (ℓ ^ k) (ℓ ^ (m - k)) (hpos k) (hpos _) (by rw [← pow_add, Nat.add_sub_cancel' hkm]; exact hcop m)
+    have h :=
+      ha (ℓ ^ k) (ℓ ^ (m - k)) (hpos k) (hpos _)
+        (by rw [← pow_add, Nat.add_sub_cancel' hkm]; exact hcop m)
     rwa [← pow_add, Nat.add_sub_cancel' hkm] at h
   set s : ℕ → ℤ_[ℓ] := fun k => (a (ℓ ^ k) : ℤ_[ℓ]) with hs
   have hdist : ∀ k m, k ≤ m → dist (s m) (s k) ≤ (ℓ : ℝ) ^ (-(k : ℤ)) := by
@@ -61,7 +70,8 @@ theorem exists_padicInt_lim (p ℓ : ℕ) [Fact ℓ.Prime] (hp : p.Prime) (hne :
   have hm : ℓ.Coprime m := Nat.coprime_ordCompl hℓ hn.ne'
   have hmpos : 0 < m := Nat.pos_of_ne_zero fun h => by rw [h, mul_zero] at hnm; omega
 
-  have h1 : L - s e ∈ Ideal.span {(ℓ : ℤ_[ℓ]) ^ e} := (PadicInt.norm_le_pow_iff_mem_span_pow _ _).1 (hLk e)
+  have h1 : L - s e ∈ Ideal.span {(ℓ : ℤ_[ℓ]) ^ e} :=
+    (PadicInt.norm_le_pow_iff_mem_span_pow _ _).1 (hLk e)
 
   have h2 := ha (ℓ ^ e) m (hpos e) hmpos (by rw [hnm]; exact hnp)
   rw [hnm] at h2
@@ -74,10 +84,10 @@ theorem exists_padicInt_lim (p ℓ : ℕ) [Fact ℓ.Prime] (hp : p.Prime) (hne :
     have := congrArg (fun z : ℤ => (z : ℤ_[ℓ])) hd
     push_cast at this
     simpa [hs] using this
-  have hn' : (n : ℤ_[ℓ]) = (ℓ : ℤ_[ℓ]) ^ e * u := by
-    rw [hu, ← hnm]; push_cast; ring
+  have hn' : (n : ℤ_[ℓ]) = (ℓ : ℤ_[ℓ]) ^ e * u := by rw [hu, ← hnm]; push_cast; ring
   rw [hn']
-  have : (ℓ : ℤ_[ℓ]) ^ e * (u : ℤ_[ℓ]) * ((u⁻¹ : ℤ_[ℓ]ˣ) * (c - d)) = (ℓ : ℤ_[ℓ]) ^ e * (c - d) := by
+  have : (ℓ : ℤ_[ℓ]) ^ e * (u : ℤ_[ℓ]) * ((u⁻¹ : ℤ_[ℓ]ˣ) * (c - d))
+      = (ℓ : ℤ_[ℓ]) ^ e * (c - d) := by
     rw [_root_.mul_assoc, ← _root_.mul_assoc (u : ℤ_[ℓ]), Units.mul_inv, _root_.one_mul]
   rw [this]
   linear_combination hc - hd'
@@ -95,12 +105,15 @@ theorem natGenerator_ne (p : ℕ) (v : AwayP p) : (primesEquiv v.1 : ℕ) ≠ p 
   rw [Ideal.mem_map_of_equiv]
   simp [eq_intCast]
 
-
 open Rat.HeightOneSpectrum in
-theorem exists_integer_lim (p : ℕ) [hp : Fact p.Prime] (a : ℕ → ℤ)
-    (ha : ∀ n m : ℕ, 0 < n → 0 < m → (n * m).Coprime p → (n : ℤ) ∣ a (n * m) - a n) (v : AwayP p) :
-    ∃ x : v.1.adicCompletionIntegers ℚ, ∀ n : ℕ, 0 < n → n.Coprime p →
-      ∃ b : v.1.adicCompletionIntegers ℚ, x = (a n : v.1.adicCompletionIntegers ℚ) + (n : v.1.adicCompletionIntegers ℚ) * b := by
+theorem exists_integer_lim
+    (p : ℕ) [hp : Fact p.Prime]
+    (a : ℕ → ℤ) (ha : ∀ n m : ℕ, 0 < n → 0 < m → (n * m).Coprime p → (n : ℤ) ∣ a (n * m) - a n)
+    (v : AwayP p)
+    : ∃ x : v.1.adicCompletionIntegers ℚ, ∀ n : ℕ,
+      0 < n → n.Coprime p
+        → ∃ b : v.1.adicCompletionIntegers ℚ,
+          x = (a n : v.1.adicCompletionIntegers ℚ) + (n : v.1.adicCompletionIntegers ℚ) * b := by
   haveI : Fact (primesEquiv v.1 : ℕ).Prime := ⟨(primesEquiv v.1).2⟩
   obtain ⟨L, hL⟩ := exists_padicInt_lim p (primesEquiv v.1 : ℕ) hp.out (natGenerator_ne p v) a ha
   let e := (RingEquivClass.toRingEquiv (adicCompletionIntegers.padicIntEquiv (R := ℤ) v.1)).symm
@@ -109,19 +122,33 @@ theorem exists_integer_lim (p : ℕ) [hp : Fact p.Prime] (a : ℕ → ℤ)
   refine ⟨e b, ?_⟩
   rw [hb, map_add (f := _), map_mul, map_intCast, map_natCast]
 
-theorem exists_lim : ∀ (p : ℕ) [Fact p.Prime] (a : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → (n * m).Coprime p → (n : ℤ) ∣ a (n * m) - a n) → ∃ α : AfP p, IsIntAf α ∧ ∀ n : ℕ, 0 < n → n.Coprime p → ∃ β : AfP p, IsIntAf β ∧ α = (a n : AfP p) + n • β := by
+theorem exists_lim
+    : ∀ (p : ℕ) [Fact p.Prime] (a : ℕ → ℤ),
+      (∀ n m : ℕ, 0 < n → 0 < m → (n * m).Coprime p → (n : ℤ) ∣ a (n * m) - a n)
+        → ∃ α : AfP p,
+          IsIntAf α
+            ∧ ∀ n : ℕ,
+              0 < n → n.Coprime p → ∃ β : AfP p, IsIntAf β ∧ α = (a n : AfP p) + n • β := by
   intro p _ a ha
   choose x hx using exists_integer_lim p a ha
-  let α : AfP p := RestrictedProduct.mk (fun v => (x v : v.1.adicCompletion ℚ)) (Filter.Eventually.of_forall fun v => (x v).2)
+  let α : AfP p :=
+    RestrictedProduct.mk
+      (fun v => (x v : v.1.adicCompletion ℚ))
+      (Filter.Eventually.of_forall fun v => (x v).2)
   refine ⟨α, fun v => (x v).2, fun n hn hnp => ?_⟩
   choose b hb using fun v => hx v n hn hnp
-  let β : AfP p := RestrictedProduct.mk (fun v => (b v : v.1.adicCompletion ℚ)) (Filter.Eventually.of_forall fun v => (b v).2)
+  let β : AfP p :=
+    RestrictedProduct.mk
+      (fun v => (b v : v.1.adicCompletion ℚ))
+      (Filter.Eventually.of_forall fun v => (b v).2)
   refine ⟨β, fun v => (b v).2, ?_⟩
   apply RestrictedProduct.ext
   intro v
   have h1 : AfP.eval v α = x v := rfl
   have h2 : AfP.eval v β = b v := rfl
-  have h3 : AfP.eval v ((a n : AfP p) + n • β) = (a n : v.1.adicCompletion ℚ) + (n : v.1.adicCompletion ℚ) * b v := by
+  have h3
+      : AfP.eval v ((a n : AfP p) + n • β)
+        = (a n : v.1.adicCompletion ℚ) + (n : v.1.adicCompletion ℚ) * b v := by
     rw [map_add (f := _), map_intCast, map_nsmul, h2, nsmul_eq_mul]
   change AfP.eval v α = AfP.eval v ((a n : AfP p) + n • β)
   rw [h3, h1, hb v]

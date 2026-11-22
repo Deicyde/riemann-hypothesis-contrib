@@ -26,8 +26,8 @@ theorem det_ne_zero_of_star_mul_self {U : Matrix n n ℂ} (hU : star U * U = 1) 
   rw [det_mul, h, mul_zero, det_one] at this
   exact zero_ne_one this
 
-theorem exists_congr_eq_one {N : Matrix n n ℂ} (hN : N.PosDef) :
-    ∃ C : Matrix n n ℂ, C.det ≠ 0 ∧ Cᴴ * N * C = 1 := by
+theorem exists_congr_eq_one {N : Matrix n n ℂ} (hN : N.PosDef)
+    : ∃ C : Matrix n n ℂ, C.det ≠ 0 ∧ Cᴴ * N * C = 1 := by
   set U : Matrix n n ℂ := (hN.1.eigenvectorUnitary : Matrix n n ℂ) with hUdef
   set μ := hN.1.eigenvalues
   set d : n → ℂ := fun j => (((Real.sqrt (μ j))⁻¹ : ℝ) : ℂ) with hd
@@ -42,32 +42,34 @@ theorem exists_congr_eq_one {N : Matrix n n ℂ} (hN : N.PosDef) :
     exact this.ne'
   · have hstar : Uᴴ = star U := rfl
     rw [hN', conjTranspose_mul, diagonal_conjTranspose, hstar]
-    calc diagonal (star d) * star U * (U * diagonal (fun j => (μ j : ℂ)) * star U) * (U * diagonal d)
-        = diagonal (star d) * (star U * U) * diagonal (fun j => (μ j : ℂ)) * (star U * U) * diagonal d := by
-          simp only [Matrix.mul_assoc]
+    calc
+      diagonal (star d) * star U * (U * diagonal (fun j => (μ j : ℂ)) * star U) * (U * diagonal d)
+          = diagonal (star d) * (star U * U) * diagonal (fun j => (μ j : ℂ)) * (star U * U)
+            * diagonal d := by
+        simp only [Matrix.mul_assoc]
       _ = 1 := by
-          rw [hU, Matrix.mul_one, Matrix.mul_one, diagonal_mul_diagonal, diagonal_mul_diagonal, ← diagonal_one]
-          congr 1
-          funext j
-          have hs := Real.sqrt_pos.mpr (hμ j)
-          have hsq := Real.sq_sqrt (hμ j).le
-          simp only [hd, Pi.star_apply, Complex.star_def, Complex.conj_ofReal]
-          rw [← Complex.ofReal_mul, ← Complex.ofReal_mul, ← Complex.ofReal_one]
-          congr 1
-          field_simp
-          linarith
+        rw [hU, Matrix.mul_one, Matrix.mul_one, diagonal_mul_diagonal, diagonal_mul_diagonal,
+          ← diagonal_one]
+        congr 1
+        funext j
+        have hs := Real.sqrt_pos.mpr (hμ j)
+        have hsq := Real.sq_sqrt (hμ j).le
+        simp only [hd, Pi.star_apply, Complex.star_def, Complex.conj_ofReal]
+        rw [← Complex.ofReal_mul, ← Complex.ofReal_mul, ← Complex.ofReal_one]
+        congr 1
+        field_simp
+        linarith
 
-theorem det_congr (C X : Matrix n n ℂ) :
-    (Cᴴ * X * C).det = (Complex.normSq C.det : ℂ) * X.det := by
+theorem det_congr (C X : Matrix n n ℂ) : (Cᴴ * X * C).det = (Complex.normSq C.det : ℂ) * X.det := by
   rw [det_mul, det_mul, det_conjTranspose, Complex.normSq_eq_conj_mul_self, Complex.star_def]
   ring
 
 end ChartEnergyCongruence
 
-
 open ChartEnergyCongruence in
-theorem ChartEnergy.proof (hI : ChartEnergyLinearInvariant.Statement) (hD : ChartEnergyDiagonal.Statement) :
-    ChartEnergy.Statement := by
+theorem ChartEnergy.proof
+    (hI : ChartEnergyLinearInvariant.Statement) (hD : ChartEnergyDiagonal.Statement)
+    : ChartEnergy.Statement := by
   intro e M N hM hN
   obtain ⟨C, hC, hCN⟩ := exists_congr_eq_one hN
   have hCu : IsUnit C := (Matrix.isUnit_iff_isUnit_det C).mpr (isUnit_iff_ne_zero.mpr hC)
@@ -82,7 +84,8 @@ theorem ChartEnergy.proof (hI : ChartEnergyLinearInvariant.Statement) (hD : Char
     rw [Unitary.conjStarAlgAut_star_apply] at this
     exact this
   have hone : Vᴴ * 1 * V = 1 := by rw [Matrix.mul_one]; exact hVV
-  have hterm : ∀ k, chartMixedEnergy M N k = chartMixedEnergy (diagonal fun j => (Λ j : ℂ)) 1 k := by
+  have hterm
+      : ∀ k, chartMixedEnergy M N k = chartMixedEnergy (diagonal fun j => (Λ j : ℂ)) 1 k := by
     intro k
     rw [← hI e M N C hM hN hC k, hCN, ← hI e M' 1 V hM' PosDef.one hVd k, hdiag, hone]
   rw [Finset.sum_congr rfl fun k _ => hterm k, hD e Λ hM'.eigenvalues_pos]

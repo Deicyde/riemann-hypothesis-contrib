@@ -9,23 +9,29 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames Formalism.GradedWeylDivisibility MvPolynomial
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames
+  Formalism.GradedWeylDivisibility MvPolynomial
 
 def TiePsi : Prop :=
-  ∀ (p n' : ℕ) (R : RS p n') (m : ℕ), 2 ≤ m →
-    Function.Injective (PsiXY R.Kf m) ∧
-    (∀ (P Q : ℕ) x, x ∈ twoSp R.Kf m P Q ↔ ∃ f ∈ PolAB R.Kf (m + 1) P Q, PsiXY R.Kf m f = x) ∧
-    (∀ (a b : ℕ) y, y ∈ dualWeyl R.Kf (m + 1) (m + 1) (nuOf (wtPQ m a b)) ↔
-      ∃ f ∈ PolAB R.Kf (m + 1) a b, deltaB R.Kf m (PsiXY R.Kf m f) = y) ∧
-    (∀ (a b : ℕ), ∀ f ∈ PolAB R.Kf (m + 1) a b, deltaB R.Kf m (PsiXY R.Kf m f) = 0 →
-      ∃ G ∈ PolAB R.Kf (m + 1) (a - 1) (b - 1), f = hXY R.Kf (m + 1) * G) ∧
-    ∀ Λ : Submodule R.O (Fin (m + 1) → R.Kf), IsLattice R.O Λ →
-      ∃ g' : GL (Fin (m + 1)) R.Kf,
-        (∀ (P Q : ℕ), ∀ f ∈ PolAB R.Kf (m + 1) P Q,
-          PsiXY R.Kf m f ∈ twoLat R.O m P Q Λ ↔ f ∈ latOf g' (GaussLat R.Ov.toSubring)) ∧
-        (∀ (a b : ℕ) y, y ∈ H0 R.O m (wtPQ m a b) Λ ↔
-          ∃ f ∈ PolAB R.Kf (m + 1) a b, f ∈ latOf g' (GaussLat R.Ov.toSubring) ∧
-            deltaB R.Kf m (PsiXY R.Kf m f) = y)
+  ∀ (p n' : ℕ) (R : RS p n') (m : ℕ),
+    2 ≤ m
+      → Function.Injective (PsiXY R.Kf m)
+        ∧ (∀ (P Q : ℕ) x, x ∈ twoSp R.Kf m P Q ↔ ∃ f ∈ PolAB R.Kf (m + 1) P Q, PsiXY R.Kf m f = x)
+        ∧ (∀ (a b : ℕ) y,
+          y ∈ dualWeyl R.Kf (m + 1) (m + 1) (nuOf (wtPQ m a b))
+            ↔ ∃ f ∈ PolAB R.Kf (m + 1) a b, deltaB R.Kf m (PsiXY R.Kf m f) = y)
+        ∧ (∀ (a b : ℕ), ∀ f ∈ PolAB R.Kf (m + 1) a b,
+          deltaB R.Kf m (PsiXY R.Kf m f) = 0
+            → ∃ G ∈ PolAB R.Kf (m + 1) (a - 1) (b - 1), f = hXY R.Kf (m + 1) * G)
+        ∧ ∀ Λ : Submodule R.O (Fin (m + 1) → R.Kf),
+          IsLattice R.O Λ
+            → ∃ g' : GL (Fin (m + 1)) R.Kf,
+              (∀ (P Q : ℕ), ∀ f ∈ PolAB R.Kf (m + 1) P Q,
+                  PsiXY R.Kf m f ∈ twoLat R.O m P Q Λ ↔ f ∈ latOf g' (GaussLat R.Ov.toSubring))
+                ∧ (∀ (a b : ℕ) y,
+                  y ∈ H0 R.O m (wtPQ m a b) Λ
+                    ↔ ∃ f ∈ PolAB R.Kf (m + 1) a b,
+                      f ∈ latOf g' (GaussLat R.Ov.toSubring) ∧ deltaB R.Kf m (PsiXY R.Kf m f) = y)
 
 theorem model_identification_of_explicit_map (h : TiePsi) : TwoLetterModelIdentification := by
   intro p n' R m hm
@@ -39,23 +45,31 @@ theorem model_identification_of_explicit_map (h : TiePsi) : TwoLetterModelIdenti
     exact ⟨⟨f, hf⟩, Subtype.ext hfx⟩
   let α : ∀ P Q : ℕ, twoSp R.Kf m P Q ≃ₗ[R.Kf] PolAB R.Kf (m + 1) P Q := fun P Q =>
     (LinearEquiv.ofBijective (e P Q) (he P Q)).symm
-  have hαe : ∀ P Q (x : twoSp R.Kf m P Q),
-      PsiXY R.Kf m (α P Q x : PolXY R.Kf (m + 1)) = x := fun P Q x => by
+  have hαe
+      : ∀ P Q (x : twoSp R.Kf m P Q),
+        PsiXY R.Kf m (α P Q x : PolXY R.Kf (m + 1)) = x := fun P Q x => by
     have h1 := (LinearEquiv.ofBijective (e P Q) (he P Q)).apply_symm_apply x
     exact congrArg Subtype.val h1
-  let β : ∀ a b : ℕ, PolAB R.Kf (m + 1) a b →ₗ[R.Kf] dualWeyl R.Kf (m + 1) (m + 1) (nuOf (wtPQ m a b)) :=
-    fun a b => (((deltaB R.Kf m).comp (PsiXY R.Kf m)).toLinearMap.domRestrict
-      (PolAB R.Kf (m + 1) a b)).codRestrict _ (fun f => (hdw a b _).2 ⟨f.1, f.2, rfl⟩)
-  have hβ : ∀ a b (f : PolAB R.Kf (m + 1) a b),
-      (β a b f : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf) = deltaB R.Kf m (PsiXY R.Kf m f) :=
-    fun a b f => rfl
+  let β
+      : ∀ a b : ℕ,
+        PolAB R.Kf (m + 1) a b →ₗ[R.Kf] dualWeyl R.Kf (m + 1) (m + 1) (nuOf (wtPQ m a b)) :=
+    fun a b =>
+      (((deltaB R.Kf m).comp (PsiXY R.Kf m)).toLinearMap.domRestrict
+        (PolAB R.Kf (m + 1) a b)).codRestrict _ (fun f => (hdw a b _).2 ⟨f.1, f.2, rfl⟩)
+  have hβ
+      : ∀ a b (f : PolAB R.Kf (m + 1) a b),
+        (β a b f : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R.Kf)
+          = deltaB R.Kf m (PsiXY R.Kf m f) := fun a b f =>
+    rfl
   have ha : ∀ i, deltaB R.Kf m (PsiXY R.Kf m (X (Sum.inl i))) = X (i, (0 : Fin (m + 1))) := by
     intro i
     simp only [PsiXY, aeval_X, Sum.elim_inl, deltaB, rename_X]
   have hc : ∀ i, deltaB R.Kf m (PsiXY R.Kf m (X (Sum.inr i))) = covY R.Kf m i := by
     intro i
     simp only [PsiXY, aeval_X, Sum.elim_inr, deltaB, rename_rename]
-    rw [show (Prod.snd ∘ Prod.mk false : Fin (m + 1) × Fin (m + 1) → Fin (m + 1) × Fin (m + 1)) = id from rfl,
+    rw [show (Prod.snd ∘ Prod.mk false : Fin (m + 1) × Fin (m + 1) → Fin (m + 1) × Fin (m + 1))
+          = id from
+        rfl,
       rename_id, AlgHom.id_apply]
   have hh0 : deltaB R.Kf m (PsiXY R.Kf m (hXY R.Kf (m + 1))) = 0 := by
     set_option synthInstance.maxHeartbeats 100000 in

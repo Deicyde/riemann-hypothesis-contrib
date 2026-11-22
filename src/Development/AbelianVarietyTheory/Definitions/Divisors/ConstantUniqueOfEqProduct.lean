@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 open NumberField Matrix IsDedekindDomain
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
   Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT GlobalTheory.WeilParts
 open scoped TensorProduct Classical
 
@@ -23,8 +25,10 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem finite_levQc {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (Dw : Datum H)
-    (l : Level H) : Finite (LevQc Dw l) := by
+theorem finite_levQc
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (Dw : Datum H) (l : Level H)
+    : Finite (LevQc Dw l) := by
   have hM : Mfr l ≠ ⊥ := by
     intro h
     have h₁ : l.Mb * Mfr l = Ideal.span {(l.M : 𝓞 E)} := l.prod
@@ -34,11 +38,14 @@ theorem finite_levQc {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Rec
     omega
   have := (Mfr l).finiteQuotientOfFreeOfNeBot hM
   have := Dw.fin
-  exact Submodule.finite_quotient_smul (Mfr l) (N := (⊤ : Submodule (𝓞 E) Dw.La)) Module.Finite.fg_top
+  exact Submodule.finite_quotient_smul (Mfr l) (N := (⊤ : Submodule (𝓞 E) Dw.La))
+    Module.Finite.fg_top
 
-theorem hatC_phiHat {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} (c : Coeff l) {n : ℕ}
-    (φ : (Fin n → LevQc Dw l) → c.F) (q : Fin n → LevQ Dw l) :
-    inC c (phiHat c φ q) = hatC l (fun x => inC c (φ x)) q := by
+theorem hatC_phiHat
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H}
+    (c : Coeff l)
+    {n : ℕ} (φ : (Fin n → LevQc Dw l) → c.F) (q : Fin n → LevQ Dw l)
+    : inC c (phiHat c φ q) = hatC l (fun x => inC c (φ x)) q := by
   haveI := finite_levQc Dw l
   haveI := Fintype.ofFinite (Fin n → LevQc Dw l)
   have hz : inC c (zetaM c) = Complex.exp (2 * Real.pi * Complex.I / (l.M : ℂ)) := by
@@ -58,8 +65,10 @@ theorem hatC_phiHat {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.hos
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [map_mul, map_zpow₀, hz]
 
-variable {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
-  {C : Core D} [Algebra C.Q.c.F D.what₂.LL] {R : RealDat D A C.Q.c.F} {i : Fin D.R.m} {Tp : Type} {tup : Tp → T0}
+variable
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {C : Core D} [Algebra C.Q.c.F D.what₂.LL]
+  {R : RealDat D A C.Q.c.F} {i : Fin D.R.m} {Tp : Type} {tup : Tp → T0}
 
 end
 

@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.HasT
 @[expose] public section
 
 open scoped BigOperators
-open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj
+  GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.JetProd
 
@@ -196,15 +198,18 @@ open scoped BigOperators in
 open NumberField in
 open Finsupp in
 variable {C : Type} [Field C] {ι τ : Type} [Fintype ι] {σ : ι → Type} (e : ∀ i, σ i ↪ τ) in
-theorem _root_.GlobalTheory.JetProd.jetAt0_prod_rename (hd : ∀ i j x y, e i x = e j y → i = j)
-    (P : ∀ i, MvPolynomial (σ i) C) (G : ∀ i, MvPowerSeries (σ i) C) :
-    _root_.Formalism.IncomingBounds.jetAt0 (∏ j, MvPolynomial.rename (e j) (P j)) (∏ j, MvPowerSeries.rename (e j) (G j)) =
-      ∏ j, _root_.Formalism.IncomingBounds.jetAt0 (P j) (G j) := by
+theorem _root_.GlobalTheory.JetProd.jetAt0_prod_rename
+    (hd : ∀ i j x y, e i x = e j y → i = j) (P : ∀ i, MvPolynomial (σ i) C)
+    (G : ∀ i, MvPowerSeries (σ i) C)
+    : _root_.Formalism.IncomingBounds.jetAt0 (∏ j, MvPolynomial.rename (e j) (P j))
+        (∏ j, MvPowerSeries.rename (e j) (G j))
+      = ∏ j, _root_.Formalism.IncomingBounds.jetAt0 (P j) (G j) := by
   classical
-  have hP : ∏ j, MvPolynomial.rename (e j) (P j) =
-      ∑ f ∈ Fintype.piFinset fun j => (P j).support,
-        MvPolynomial.monomial (∑ k, Finsupp.embDomain (e k) (f k))
-          (∏ k, AddMonoidAlgebra.coeff (P k) (f k)) := by
+  have hP
+      : ∏ j, MvPolynomial.rename (e j) (P j)
+        = ∑ f ∈ Fintype.piFinset fun j => (P j).support,
+            MvPolynomial.monomial (∑ k, Finsupp.embDomain (e k) (f k))
+              (∏ k, AddMonoidAlgebra.coeff (P k) (f k)) := by
     conv_lhs => rw [show P = fun j => ∑ v ∈ (P j).support,
       MvPolynomial.monomial v (AddMonoidAlgebra.coeff (P j) v) from
         funext fun j => MvPolynomial.as_sum (P j)]
@@ -218,8 +223,9 @@ theorem _root_.GlobalTheory.JetProd.jetAt0_prod_rename (hd : ∀ i j x y, e i x 
   simp only [jetAt0_eq_sum_coeff_mul_mfact_of_support_subset _ _ (subset_refl _)]
   rw [Finset.prod_univ_sum]
   refine Finset.sum_congr rfl fun f _ => ?_
-  rw [coeff_sum_embDomain_prod_rename_eq_prod_coeff e hd, _root_.Formalism.IncomingBounds.mfact, prod_factorial_sum_embDomain_eq_prod_prod_factorial e hd,
-    Nat.cast_prod, ← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
+  rw [coeff_sum_embDomain_prod_rename_eq_prod_coeff e hd, _root_.Formalism.IncomingBounds.mfact,
+    prod_factorial_sum_embDomain_eq_prod_prod_factorial e hd, Nat.cast_prod,
+    ← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
   rfl
 
 end General
@@ -231,11 +237,12 @@ variable {C : Type} [Field C] {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I 
 def rowEmb {N : ℕ} (ρ : Fin N) : WV I ↪ Fin N × WV I :=
   ⟨fun w => (ρ, w), fun _ _ h => congrArg Prod.snd h⟩
 
-noncomputable def rowSer (hL : Fin 2 → ZMod d → ZMod d → MvPowerSeries (WV I) C) (k : Knd d)
-    (g : MvPowerSeries (WV I) C) : MvPowerSeries (WV I) C :=
+noncomputable def rowSer
+    (hL : Fin 2 → ZMod d → ZMod d → MvPowerSeries (WV I) C) (k : Knd d) (g : MvPowerSeries (WV I) C)
+    : MvPowerSeries (WV I) C :=
   g * mvExp (match k with
-      | Option.some (g, a, a') => hL g a a'
-      | none => 0)
+    | Option.some (g, a, a') => hL g a a'
+    | none => 0)
 
 open scoped BigOperators in
 open NumberField in
@@ -317,26 +324,35 @@ variable {C : Type} [Field C] {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I 
 theorem _root_.GlobalTheory.JetProd.jetProd : _root_.Formalism.L2.FormalSeriesBounds.JetProdSt := by
   intro C _ d I _ hL N K what₂ pl hpl P kind gr
   classical
-  let emb : ∀ i, Fin (what₂ i) × _root_.Formalism.L2.FormalSeriesBounds.WV I ↪ Fin N × _root_.Formalism.L2.FormalSeriesBounds.WV I := fun i =>
-    ⟨fun x => (pl ⟨i, x.1⟩, x.2), fun x y h => by
+  let emb
+      : ∀ i,
+        Fin (what₂ i) × _root_.Formalism.L2.FormalSeriesBounds.WV I
+          ↪ Fin N × _root_.Formalism.L2.FormalSeriesBounds.WV I := fun i => ⟨
+    fun x => (pl ⟨i, x.1⟩, x.2),
+    fun x y h => by
       simp only [Prod.mk.injEq] at h
       have h1 := hpl h.1
       simp only [Sigma.mk.inj_iff, heq_eq_eq, true_and] at h1
-      exact Prod.ext h1 h.2⟩
-  have hdisj : ∀ i j (x : Fin (what₂ i) × _root_.Formalism.L2.FormalSeriesBounds.WV I) (y : Fin (what₂ j) × _root_.Formalism.L2.FormalSeriesBounds.WV I),
-      emb i x = emb j y → i = j := fun i j x y h =>
+      exact Prod.ext h1 h.2
+  ⟩
+  have hdisj
+      : ∀ i j (x : Fin (what₂ i) × _root_.Formalism.L2.FormalSeriesBounds.WV I)
+          (y : Fin (what₂ j) × _root_.Formalism.L2.FormalSeriesBounds.WV I),
+        emb i x = emb j y → i = j := fun i j x y h =>
     congrArg Sigma.fst (hpl (congrArg Prod.fst h))
-  have hZ : ∀ s, _root_.Formalism.L2.FormalSeriesBounds.grAll pl gr (pl s) = gr s.1 s.2 := fun s => by
+  have hZ
+      : ∀ s, _root_.Formalism.L2.FormalSeriesBounds.grAll pl gr (pl s) = gr s.1 s.2 := fun s => by
     unfold _root_.Formalism.L2.FormalSeriesBounds.grAll
     split_ifs with h
     · rw [hpl h.choose_spec]
     · exact absurd ⟨s, rfl⟩ h
-  have hT : ∏ ρ, MvPowerSeries.rename (_root_.GlobalTheory.JetProd.rowEmb ρ)
-        (_root_.GlobalTheory.JetProd.rowSer hL (_root_.Formalism.L2.FormalSeriesBounds.kindAll pl kind ρ) (_root_.Formalism.L2.FormalSeriesBounds.grAll pl gr ρ)) =
-      ∏ i, MvPowerSeries.rename (emb i) (∏ r, MvPowerSeries.rename (_root_.GlobalTheory.JetProd.rowEmb r)
-        (_root_.GlobalTheory.JetProd.rowSer hL (kind i r) (gr i r))) := by
-    rw [← Fintype.prod_of_injective pl hpl
-      (fun s => MvPowerSeries.rename (_root_.GlobalTheory.JetProd.rowEmb (pl s))
+  have hT
+      : ∏ ρ, MvPowerSeries.rename (_root_.GlobalTheory.JetProd.rowEmb ρ)
+          (_root_.GlobalTheory.JetProd.rowSer hL (_root_.Formalism.L2.FormalSeriesBounds.kindAll pl kind ρ) (_root_.Formalism.L2.FormalSeriesBounds.grAll pl gr ρ))
+        = ∏ i, MvPowerSeries.rename (emb i) (∏ r, MvPowerSeries.rename (_root_.GlobalTheory.JetProd.rowEmb r)
+            (_root_.GlobalTheory.JetProd.rowSer hL (kind i r) (gr i r))) := by
+    rw [← Fintype.prod_of_injective pl hpl (fun s =>
+      MvPowerSeries.rename (_root_.GlobalTheory.JetProd.rowEmb (pl s))
         (_root_.GlobalTheory.JetProd.rowSer hL (kind s.1 s.2) (gr s.1 s.2)))]
     · rw [Fintype.prod_sigma]
       refine Finset.prod_congr rfl fun i _ => ?_
@@ -346,8 +362,10 @@ theorem _root_.GlobalTheory.JetProd.jetProd : _root_.Formalism.L2.FormalSeriesBo
       rfl
     · intro ρ hρ
       have hn : ¬ ∃ s, pl s = ρ := fun ⟨s, hs⟩ => hρ ⟨s, hs⟩
-      have hZ1 : _root_.Formalism.L2.FormalSeriesBounds.grAll pl gr ρ = 1 := by unfold _root_.Formalism.L2.FormalSeriesBounds.grAll; rw [dite_eq_right hn]
-      have hK : _root_.Formalism.L2.FormalSeriesBounds.kindAll pl kind ρ = none := by unfold _root_.Formalism.L2.FormalSeriesBounds.kindAll; rw [dite_eq_right hn]
+      have hZ1 : _root_.Formalism.L2.FormalSeriesBounds.grAll pl gr ρ = 1 := by
+        unfold _root_.Formalism.L2.FormalSeriesBounds.grAll; rw [dite_eq_right hn]
+      have hK : _root_.Formalism.L2.FormalSeriesBounds.kindAll pl kind ρ = none := by
+        unfold _root_.Formalism.L2.FormalSeriesBounds.kindAll; rw [dite_eq_right hn]
       rw [hZ1, hK]
       show MvPowerSeries.rename _ (1 * _root_.Formalism.IncomingBounds.mvExp 0) = 1
       rw [mvExp_zero_eq_one', mul_one, map_one]

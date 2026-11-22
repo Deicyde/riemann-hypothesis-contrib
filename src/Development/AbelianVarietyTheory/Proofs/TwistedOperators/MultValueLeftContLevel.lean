@@ -8,18 +8,23 @@ public import Formalism.LocalToGlobal.IndefiniteReal.DatumVec
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR
+open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Mult
+  Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory
 
-theorem mult_value_left_cont_level :
-    ∀ {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (θ : InfFam D) (M : DSModel V S), ∀ J χ, ∀ T ∈ Mult θ M J χ, ∀ v, (∀ γ ∈ GQ V, ∀ g, T v (γ * g) = T v g) ∧ Continuous (T v) ∧ ∀ k ∈ J, ∀ g, T v (g * k) = χ k * T v g := by
+theorem mult_value_left_cont_level
+    : ∀ {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} (θ : InfFam D) (M : DSModel V S), ∀ J χ,
+      ∀ T ∈ Mult θ M J χ, ∀ v,
+        (∀ γ ∈ GQ V, ∀ g, T v (γ * g) = T v g) ∧ Continuous (T v)
+          ∧ ∀ k ∈ J, ∀ g, T v (g * k) = χ k * T v g := by
   intro D V S θ M J χ T hT v
   induction hT using Submodule.span_induction with
-  | mem x hx =>
-    exact ⟨(hx.aut v).left, (hx.aut v).cont, hx.lev v⟩
+  | mem x hx => exact ⟨(hx.aut v).left, (hx.aut v).cont, hx.lev v⟩
   | zero =>
     refine ⟨fun γ _ g => ?_, ?_, fun k _ g => ?_⟩
     · simp

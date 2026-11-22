@@ -15,26 +15,29 @@ open Formalism.UG
 
 section Lattice
 
-variable {F E : Type} [Field F] [Field E] [NumberField E] [Algebra F E] {n : Type} [Fintype n]
-  [DecidableEq n] (R : Type) [CommRing R] [Algebra F R] (S₂ : Subring R)
+variable
+  {F E : Type} [Field F] [Field E] [NumberField E] [Algebra F E]
+  {n : Type} [Fintype n] [DecidableEq n]
+  (R : Type) [CommRing R] [Algebra F R]
+  (S₂ : Subring R)
 
-theorem easyc_inclE_mem (e : E) (he : e ∈ intOE E) :
-    inclE (F := F) R e ∈ tensInt (F := F) R (intOE E) S₂ := by
+theorem easyc_inclE_mem (e : E) (he : e ∈ intOE E)
+    : inclE (F := F) R e ∈ tensInt (F := F) R (intOE E) S₂ := by
   apply Subring.subset_closure
   left
   exact ⟨⟨e, he⟩, rfl⟩
 
-theorem easyc_single_mem (i : n) :
-    (Pi.single i (1 : E) : n → E) ∈ stdLat (n := n) (A := E) (𝓞 E) := by
+theorem easyc_single_mem (i : n)
+    : (Pi.single i (1 : E) : n → E) ∈ stdLat (n := n) (A := E) (𝓞 E) := by
   rw [mem_stdLat_iff']
   intro k
   by_cases hk : k = i
   · subst hk; exact ⟨1, by simp⟩
   · exact ⟨0, by simp [hk]⟩
 
-theorem easyc_latS_std :
-    latS (F := F) R (tensInt (F := F) R (intOE E) S₂) (stdLat (n := n) (A := E) (𝓞 E)) =
-      stdLat (n := n) (A := E ⊗[F] R) ↥(tensInt (F := F) R (intOE E) S₂) := by
+theorem easyc_latS_std
+    : latS (F := F) R (tensInt (F := F) R (intOE E) S₂) (stdLat (n := n) (A := E) (𝓞 E))
+      = stdLat (n := n) (A := E ⊗[F] R) ↥(tensInt (F := F) R (intOE E) S₂) := by
   apply le_antisymm
   · rw [latS, Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩

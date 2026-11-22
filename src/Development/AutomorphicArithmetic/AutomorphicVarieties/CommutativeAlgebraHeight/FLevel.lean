@@ -17,16 +17,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-private theorem level_field {n h : ℕ} {k G : Type} [Field k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [CompactSpace G] [TotallyDisconnectedSpace G] (χ : Fin n → G →* kˣ) (hχ : MultFree χ h)
-    (U : OpenNormalSubgroup G) : ∃ s : Finset G, s.card ≤ finBound n h ∧ ∀ y : MonoidAlgebra k G,
-      ∃ z ∈ Submodule.span k ((fun g => MonoidAlgebra.single g (1 : k)) '' (s : Set G)),
-        y - z ∈ TwoSidedIdeal.span ((GDet.ofChars χ).CH ∪ {z | ∃ u ∈ U, z = MonoidAlgebra.single u 1 - 1}) := by
+private theorem level_field
+    {n h : ℕ} {k G : Type} [Field k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    [CompactSpace G] [TotallyDisconnectedSpace G]
+    (χ : Fin n → G →* kˣ) (hχ : MultFree χ h)
+    (U : OpenNormalSubgroup G)
+    : ∃ s : Finset G,
+      s.card ≤ finBound n h
+        ∧ ∀ y : MonoidAlgebra k G,
+          ∃ z ∈ Submodule.span k ((fun g => MonoidAlgebra.single g (1 : k)) '' (s : Set G)),
+            y - z ∈ TwoSidedIdeal.span
+              ((GDet.ofChars χ).CH ∪ {z | ∃ u ∈ U, z = MonoidAlgebra.single u 1 - 1}) := by
   classical
   have ho : IsOpen ((U : Set G) ∩ ⋂ i, ((χ i).ker : Set G)) :=
     U.toOpenSubgroup.isOpen.inter (isOpen_iInter_of_finite hχ.isOpen)
-  obtain ⟨H, hH⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one ho
-    ⟨one_mem U, Set.mem_iInter.2 fun i => one_mem (χ i).ker⟩
+  obtain ⟨H, hH⟩ :=
+    ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one ho
+      ⟨one_mem U, Set.mem_iInter.2 fun i => one_mem (χ i).ker⟩
   obtain ⟨π, hπs, hπg, hπk, hπc⟩ := f_chars χ hχ.inj
   set D := GDet.ofChars χ with hD
   let J : TwoSidedIdeal (MonoidAlgebra k G) :=
@@ -84,35 +91,53 @@ private theorem level_field {n h : ℕ} {k G : Type} [Field k] [Group G] [Topolo
   haveI : Module.Finite k J.ringCon.Quotient := ⟨hspan ▸ Submodule.fg_span hfr⟩
   haveI : IsAdicComplete (maximalIdeal k) k := by
     rw [IsLocalRing.maximalIdeal_eq_bot]; infer_instance
-  obtain ⟨-, e, he, hπe⟩ := f_gma DE π' hCH (fun v => by
-      obtain ⟨x, rfl⟩ := hπs v; exact ⟨f x, hπ' x⟩) (fun q => by
-      obtain ⟨x, rfl⟩ := hsurj q
-      rw [← (d_pull DE f).1, hDE, (d_toDet D x).1, hπc, hπ']
-      simp)
-  have hfin := f_cot χ ρ e π' hχ hopen hspan (fun g i => by rw [hρ, hπ', hπg]) he.idem hπe
-    (fun i x => ⟨_, (d_corner DE (e i) hCH (he.idem.idem i) (he.rank i) (Nat.one_le_of_lt i.2 )).1 x⟩)
+  obtain ⟨-, e, he, hπe⟩ :=
+    f_gma DE π' hCH
+      (fun v => by obtain ⟨x, rfl⟩ := hπs v; exact ⟨f x, hπ' x⟩)
+      (fun q => by
+        obtain ⟨x, rfl⟩ := hsurj q
+        rw [← (d_pull DE f).1, hDE, (d_toDet D x).1, hπc, hπ']
+        simp)
+  have hfin :=
+    f_cot χ ρ e π' hχ hopen hspan
+      (fun g i => by rw [hρ, hπ', hπg])
+      he.idem hπe
+      (fun i x =>
+        ⟨_, (d_corner DE (e i) hCH (he.idem.idem i) (he.rank i) (Nat.one_le_of_lt i.2)).1 x⟩)
   obtain ⟨c, hc, hcs, -⟩ := Submodule.exists_fun_fin_finrank_span_eq k (Set.range ρ)
   choose g hg using hc
   refine ⟨Finset.univ.image g, Finset.card_image_le.trans ?_, fun y => ?_⟩
   · rw [Finset.card_univ, Fintype.card_fin, hspan, finrank_top]
     exact hfin
-  · have h1 : f y ∈ (Submodule.span k ((fun g => MonoidAlgebra.single g (1 : k)) ''
-        ((Finset.univ.image g : Finset G) : Set G))).map f.toLinearMap := by
+  · have h1
+        : f y ∈ (Submodule.span k
+          ((fun g => MonoidAlgebra.single g (1 : k))
+            '' ((Finset.univ.image g : Finset G) : Set G))).map f.toLinearMap := by
       have : f y ∈ Submodule.span k (Set.range c) := by rw [hcs, hspan]; trivial
       refine Submodule.span_le.2 ?_ this
       rintro _ ⟨i, rfl⟩
       exact ⟨_, Submodule.subset_span ⟨g i, by simp, rfl⟩, hg i⟩
     obtain ⟨z, hz, hzy⟩ := h1
     refine ⟨z, hz, ?_⟩
-    have h2 : y - z ∈ J := by
-      rw [← hmem, map_sub, sub_eq_zero]; exact hzy.symm
+    have h2 : y - z ∈ J := by rw [← hmem, map_sub, sub_eq_zero]; exact hzy.symm
     refine TwoSidedIdeal.span_mono ?_ h2
     rintro w (hw | ⟨u, hu, rfl⟩)
     · exact Or.inl hw
     · exact Or.inr ⟨u, (hH hu).1, rfl⟩
 
-theorem UpperTheory.V.CA.f_level :
-    ∀ {n h : ℕ} {B G : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B] [IsAdicComplete (maximalIdeal B) B] [Finite (ResidueField B)] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] (D : GDet n B G) (χ : Fin n → G →* (ResidueField B)ˣ), D.IsCont (maximalIdeal B) → D.map (residue B) = GDet.ofChars χ → MultFree χ h → ∀ (N : ℕ) (U : OpenNormalSubgroup G), ∃ s : Finset G, s.card ≤ finBound n h ∧ ∀ y : MonoidAlgebra B G, ∃ z ∈ Submodule.span B ((fun g => MonoidAlgebra.single g (1 : B)) '' (s : Set G)), y - z ∈ TwoSidedIdeal.span (D.CH ∪ {z | ∃ a ∈ maximalIdeal B ^ N, z = MonoidAlgebra.single 1 a} ∪ {z | ∃ u ∈ U, z = MonoidAlgebra.single u 1 - 1}) := by
+theorem UpperTheory.V.CA.f_level
+    : ∀ {n h : ℕ} {B G : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
+        [IsAdicComplete (maximalIdeal B) B] [Finite (ResidueField B)] [Group G] [TopologicalSpace G]
+        [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] (D : GDet n B G)
+        (χ : Fin n → G →* (ResidueField B)ˣ),
+      D.IsCont (maximalIdeal B) → D.map (residue B) = GDet.ofChars χ → MultFree χ h
+        → ∀ (N : ℕ) (U : OpenNormalSubgroup G), ∃ s : Finset G,
+          s.card ≤ finBound n h
+            ∧ ∀ y : MonoidAlgebra B G,
+              ∃ z ∈ Submodule.span B ((fun g => MonoidAlgebra.single g (1 : B)) '' (s : Set G)),
+                y - z ∈ TwoSidedIdeal.span
+                  (D.CH ∪ {z | ∃ a ∈ maximalIdeal B ^ N, z = MonoidAlgebra.single 1 a}
+                    ∪ {z | ∃ u ∈ U, z = MonoidAlgebra.single u 1 - 1}) := by
   intro n h B G _ _ _ _ _ _ _ _ _ _ D χ _ hD hχ N U
   obtain ⟨s, hs, hy⟩ := level_field χ hχ U
   refine ⟨s, hs, ?_⟩
@@ -133,8 +158,9 @@ theorem UpperTheory.V.CA.f_level :
     | single g a =>
       obtain ⟨a, rfl⟩ := residue_surjective a
       exact ⟨MonoidAlgebra.single g a, MonoidAlgebra.mapRingHom_single _ _ _⟩
-  have lift : ∀ T : Set (MonoidAlgebra (ResidueField B) G), (∀ w ∈ T, ∃ x ∈ Q, φ x = w) →
-      ∀ w ∈ TwoSidedIdeal.span T, ∃ x ∈ Q, φ x = w := by
+  have lift
+      : ∀ T : Set (MonoidAlgebra (ResidueField B) G),
+        (∀ w ∈ T, ∃ x ∈ Q, φ x = w) → ∀ w ∈ TwoSidedIdeal.span T, ∃ x ∈ Q, φ x = w := by
     intro T hT w hw
     induction hw using TwoSidedIdeal.span_induction with
     | mem x hx => exact hT x hx
@@ -154,29 +180,34 @@ theorem UpperTheory.V.CA.f_level :
       obtain ⟨a, ha, rfl⟩ := hx
       obtain ⟨c, rfl⟩ := hφ c
       exact ⟨a * c, Q.mul_mem_right _ _ ha, map_mul _ _ _⟩
-  let Q' : Submodule B (MonoidAlgebra B G) :=
-    { carrier := Q
-      add_mem' := Q.add_mem
-      zero_mem' := Q.zero_mem
-      smul_mem' := fun c x hx => by rw [Algebra.smul_def]; exact Q.mul_mem_left _ _ hx }
+  let Q' : Submodule B (MonoidAlgebra B G) := {
+    carrier := Q
+    add_mem' := Q.add_mem
+    zero_mem' := Q.zero_mem
+    smul_mem' := fun c x hx => by rw [Algebra.smul_def]; exact Q.mul_mem_left _ _ hx
+  }
   have step : (⊤ : Submodule B (MonoidAlgebra B G)) ≤ (S ⊔ Q') ⊔ maximalIdeal B • ⊤ := by
     intro y _
     obtain ⟨z, hz, hyz⟩ := hy (φ y)
-    obtain ⟨x, hx, hxe⟩ := lift _ (by
-      rintro w (hw | ⟨u, hu, rfl⟩)
-      · refine lift (φ '' D.CH) ?_ w ?_
-        · rintro _ ⟨x, hx, rfl⟩
-          exact ⟨x, TwoSidedIdeal.subset_span (Or.inl (Or.inl hx)), rfl⟩
-        · rw [← g_chmap, hD]
-          exact TwoSidedIdeal.subset_span hw
-      · exact ⟨_, TwoSidedIdeal.subset_span (Or.inr ⟨u, hu, rfl⟩), by simp [φ]⟩) _ hyz
+    obtain ⟨x, hx, hxe⟩ :=
+      lift _
+        (by
+          rintro w (hw | ⟨u, hu, rfl⟩)
+          · refine lift (φ '' D.CH) ?_ w ?_
+            · rintro _ ⟨x, hx, rfl⟩
+              exact ⟨x, TwoSidedIdeal.subset_span (Or.inl (Or.inl hx)), rfl⟩
+            · rw [← g_chmap, hD]
+              exact TwoSidedIdeal.subset_span hw
+          · exact ⟨_, TwoSidedIdeal.subset_span (Or.inr ⟨u, hu, rfl⟩), by simp [φ]⟩)
+        _ hyz
     obtain ⟨z', hz', rfl⟩ : ∃ z' ∈ S, φ z' = z := by
       clear hyz hxe
       induction hz using Submodule.span_induction with
       | mem w hw =>
         obtain ⟨g, hg, rfl⟩ := hw
         exact ⟨_, Submodule.subset_span ⟨g, hg, rfl⟩, by simp [φ]⟩
-      | zero => exact ⟨0, S.zero_mem, map_zero _⟩
+      | zero =>
+        exact ⟨0, S.zero_mem, map_zero _⟩
       | add x y _ _ hx hy =>
         obtain ⟨a, ha, rfl⟩ := hx
         obtain ⟨b, hb, rfl⟩ := hy
@@ -190,7 +221,9 @@ theorem UpperTheory.V.CA.f_level :
       generalize y - z' - x = w at h0
       rw [← MonoidAlgebra.sum_coeff_single w]
       refine Submodule.sum_mem _ fun g _ => ?_
-      have h2 : MonoidAlgebra.single g (w.coeff g) = w.coeff g • MonoidAlgebra.single g (1 : B) := by simp
+      have h2
+          : MonoidAlgebra.single g (w.coeff g) = w.coeff g • MonoidAlgebra.single g (1 : B) := by
+        simp
       have h3 := congrArg (fun v => v.coeff g) h0
       simp only [h2]
       refine Submodule.smul_mem_smul ((residue_eq_zero_iff _).1 ?_) trivial
@@ -198,7 +231,8 @@ theorem UpperTheory.V.CA.f_level :
     have : y = z' + x + (y - z' - x) := by abel
     rw [this]
     exact Submodule.add_mem_sup (Submodule.add_mem_sup hz' hx) h1
-  have iter : ∀ j : ℕ, (⊤ : Submodule B (MonoidAlgebra B G)) ≤ (S ⊔ Q') ⊔ maximalIdeal B ^ j • ⊤ := by
+  have iter
+      : ∀ j : ℕ, (⊤ : Submodule B (MonoidAlgebra B G)) ≤ (S ⊔ Q') ⊔ maximalIdeal B ^ j • ⊤ := by
     intro j
     induction j with
     | zero => simp

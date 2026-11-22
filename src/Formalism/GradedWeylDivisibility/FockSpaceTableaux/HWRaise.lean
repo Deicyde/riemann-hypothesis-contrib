@@ -11,14 +11,14 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-theorem rowGen_X (R : Type*) [CommRing R] {r n : ℕ} (a b : Fin r) (v : Fin r × Fin n) :
-    rowGen R a b (X v) = Polynomial.C (X v) +
-      (if v.1 = b then Polynomial.X * Polynomial.C (X (a, v.2)) else 0) := by
+theorem rowGen_X (R : Type*) [CommRing R] {r n : ℕ} (a b : Fin r) (v : Fin r × Fin n)
+    : rowGen R a b (X v)
+      = Polynomial.C (X v) + (if v.1 = b then Polynomial.X * Polynomial.C (X (a, v.2)) else 0) := by
   rw [rowGen, aeval_X]
 
-theorem rowGen_lpMinor (R : Type*) [CommRing R] {r n : ℕ} (a b : Fin r) (hab : a < b)
-    (m : ℕ) (hr : m ≤ r) (hn : m ≤ n) :
-    rowGen R a b (lpMinor R m hr hn) = Polynomial.C (lpMinor R m hr hn) := by
+theorem rowGen_lpMinor
+    (R : Type*) [CommRing R] {r n : ℕ} (a b : Fin r) (hab : a < b) (m : ℕ) (hr : m ≤ r) (hn : m ≤ n)
+    : rowGen R a b (lpMinor R m hr hn) = Polynomial.C (lpMinor R m hr hn) := by
   classical
   unfold lpMinor
   rw [AlgHom.map_det, RingHom.map_det]
@@ -34,10 +34,12 @@ theorem rowGen_lpMinor (R : Type*) [CommRing R] {r n : ℕ} (a b : Fin r) (hab :
       have := congrArg Fin.val h
       simp [hi, hj] at this
       exact absurd this (Fin.val_ne_of_ne (ne_of_lt hab)).symm
-    have hM : (rowGen R a b).toRingHom.mapMatrix N =
-        Matrix.updateRow ((Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N) i
-          (((Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N) i +
-            (Polynomial.X : Polynomial (MvPolynomial (Fin r × Fin n) R)) • ((Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N) j) := by
+    have hM
+        : (rowGen R a b).toRingHom.mapMatrix N
+          = Matrix.updateRow ((Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N) i
+            (((Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N) i
+              + (Polynomial.X : Polynomial (MvPolynomial (Fin r × Fin n) R))
+                • ((Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N) j) := by
       ext p q
       by_cases hp : p = i
       · subst hp
@@ -51,8 +53,9 @@ theorem rowGen_lpMinor (R : Type*) [CommRing R] {r n : ℕ} (a b : Fin r) (hab :
         simp [hN, Matrix.updateRow_apply, rowGen_X, h1, hp]
     change ((rowGen R a b).toRingHom.mapMatrix N).det = _
     rw [hM, Matrix.det_updateRow_add_smul_self _ hij]
-  · have hM : (rowGen R a b).toRingHom.mapMatrix N =
-        (Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N := by
+  · have hM
+        : (rowGen R a b).toRingHom.mapMatrix N
+          = (Polynomial.C : MvPolynomial (Fin r × Fin n) R →+* _).mapMatrix N := by
       ext p q
       have h1 : Fin.castLE hr p ≠ b := by
         intro h
@@ -63,9 +66,9 @@ theorem rowGen_lpMinor (R : Type*) [CommRing R] {r n : ℕ} (a b : Fin r) (hab :
     change ((rowGen R a b).toRingHom.mapMatrix N).det = _
     rw [hM]
 
-theorem rowGen_hw (R : Type*) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
-    (a b : Fin r) (hab : a < b) :
-    rowGen R a b (hw R hn ν) = Polynomial.C (hw R hn ν) := by
+theorem rowGen_hw
+    (R : Type*) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (a b : Fin r) (hab : a < b)
+    : rowGen R a b (hw R hn ν) = Polynomial.C (hw R hn ν) := by
   simp only [hw, map_prod, map_pow, rowGen_lpMinor R a b hab]
 
 theorem highestWeightVectorRaising : HWRaise := by

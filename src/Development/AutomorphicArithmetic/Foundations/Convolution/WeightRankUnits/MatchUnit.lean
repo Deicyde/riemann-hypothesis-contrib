@@ -5,4 +5,6 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 @[expose] public section
 
-theorem UpperTheory.ConvolutionTheory.G2.matchUnit : UpperTheory.V.Z.Tf.GlobalTraceComparison.MatchUnit := PositivityTheory.Rg.Bc.ArchbcB.B.m1
+theorem UpperTheory.ConvolutionTheory.G2.matchUnit
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.MatchUnit :=
+  PositivityTheory.Rg.Bc.ArchbcB.B.m1

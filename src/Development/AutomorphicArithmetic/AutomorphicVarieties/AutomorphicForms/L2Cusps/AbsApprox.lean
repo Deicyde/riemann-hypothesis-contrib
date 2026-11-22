@@ -4,11 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-private theorem starProjection_apply_comm_of_invariant_adjoint {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (Y : Submodule ℂ H) [Y.HasOrthogonalProjection] (B C : H →L[ℂ] H)
-    (hB : ∀ y ∈ Y, B y ∈ Y) (hC : ∀ y ∈ Y, C y ∈ Y)
-    (hBC : ContinuousLinearMap.adjoint B = C) (x : H) :
-    Y.starProjection (B x) = B (Y.starProjection x) := by
+private theorem starProjection_apply_comm_of_invariant_adjoint
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (Y : Submodule ℂ H) [Y.HasOrthogonalProjection]
+    (B C : H →L[ℂ] H)
+    (hB : ∀ y ∈ Y, B y ∈ Y) (hC : ∀ y ∈ Y, C y ∈ Y) (hBC : ContinuousLinearMap.adjoint B = C)
+    (x : H)
+    : Y.starProjection (B x) = B (Y.starProjection x) := by
   apply Submodule.eq_starProjection_of_mem_orthogonal' (z := B (x - Y.starProjection x))
     (hB _ (Y.starProjection_apply_mem x))
   · rw [Submodule.mem_orthogonal]
@@ -18,14 +20,17 @@ private theorem starProjection_apply_comm_of_invariant_adjoint {H : Type} [Norme
       (Submodule.sub_starProjection_mem_orthogonal (K := Y) x)
   · rw [← map_add (f := _), add_sub_cancel]
 
-private theorem exists_finiteDimensional_invariant_le_of_fg {ι H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+private theorem exists_finiteDimensional_invariant_le_of_fg
+    {ι H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     (A : ι → H →L[ℂ] H) (W M : Submodule ℂ H) (hM : M.FG) (hMW : M ≤ W)
-    (hW : ∀ w ∈ W, ∃ Y ≤ W, FiniteDimensional ℂ Y ∧ w ∈ Y ∧ ∀ i, ∀ y ∈ Y, A i y ∈ Y) :
-    ∃ Y ≤ W, FiniteDimensional ℂ Y ∧ M ≤ Y ∧ ∀ i, ∀ y ∈ Y, A i y ∈ Y := by
+    (hW : ∀ w ∈ W, ∃ Y ≤ W, FiniteDimensional ℂ Y ∧ w ∈ Y ∧ ∀ i, ∀ y ∈ Y, A i y ∈ Y)
+    : ∃ Y ≤ W, FiniteDimensional ℂ Y ∧ M ≤ Y ∧ ∀ i, ∀ y ∈ Y, A i y ∈ Y := by
   classical
   obtain ⟨s, rfl⟩ := hM
-  have key : ∀ t : Finset H, (↑t : Set H) ⊆ W → ∃ Y ≤ W, FiniteDimensional ℂ Y ∧
-      (↑t : Set H) ⊆ Y ∧ ∀ i, ∀ y ∈ Y, A i y ∈ Y := by
+  have key
+      : ∀ t : Finset H,
+        (↑t : Set H) ⊆ W
+          → ∃ Y ≤ W, FiniteDimensional ℂ Y ∧ (↑t : Set H) ⊆ Y ∧ ∀ i, ∀ y ∈ Y, A i y ∈ Y := by
     intro t
     induction t using Finset.induction_on with
     | empty =>
@@ -50,18 +55,20 @@ private theorem exists_finiteDimensional_invariant_le_of_fg {ι H : Type} [Norme
   obtain ⟨Y, hYW, hYf, hsY, hYA⟩ := key s (Submodule.span_le.1 hMW)
   exact ⟨Y, hYW, hYf, Submodule.span_le.2 hsY, hYA⟩
 
-theorem UpperTheory.V.KernelIndexFullLattice.absApprox_holds :
-    UpperTheory.V.KernelIndexFullLattice.AbsApprox := by
+theorem UpperTheory.V.KernelIndexFullLattice.absApprox_holds
+    : UpperTheory.V.KernelIndexFullLattice.AbsApprox := by
   intro ι H _ _ _ A hA W N hN hW v hv hP
   classical
   haveI := hN
   have hfg : (N ⊓ W).FG := by
     haveI : FiniteDimensional ℂ ↥(N ⊓ W) := Submodule.finiteDimensional_of_le inf_le_left
     exact (Submodule.fg_iff_finiteDimensional _).2 inferInstance
-  obtain ⟨Y0, hY0W, hY0f, hNY0, hY0A⟩ := exists_finiteDimensional_invariant_le_of_fg A W (N ⊓ W) hfg inf_le_right hW
+  obtain ⟨Y0, hY0W, hY0f, hNY0, hY0A⟩ :=
+    exists_finiteDimensional_invariant_le_of_fg A W (N ⊓ W) hfg inf_le_right hW
   haveI := hY0f
-  have hproj : ∀ (Y : Submodule ℂ H) [FiniteDimensional ℂ Y], Y ≤ W →
-      (∀ i, ∀ y ∈ Y, A i y ∈ Y) → Y0 ≤ Y → Y0.starProjection v = Y.starProjection v := by
+  have hproj
+      : ∀ (Y : Submodule ℂ H) [FiniteDimensional ℂ Y],
+        Y ≤ W → (∀ i, ∀ y ∈ Y, A i y ∈ Y) → Y0 ≤ Y → Y0.starProjection v = Y.starProjection v := by
     intro Y _ hYW hYA hY0Y
     have h1 : Y.starProjection v ∈ N := by
       apply hP
@@ -78,15 +85,17 @@ theorem UpperTheory.V.KernelIndexFullLattice.absApprox_holds :
     intro w hw
     obtain ⟨Y1, h1W, h1f, hw1, h1A⟩ := hW w hw
     haveI := h1f
-    have hY := hproj (Y0 ⊔ Y1) (sup_le hY0W h1W) (fun i y hy => by
-      obtain ⟨y1, hy1, y2, hy2, rfl⟩ := Submodule.mem_sup.1 hy
-      rw [map_add (f := _)]
-      exact Submodule.add_mem_sup (hY0A i y1 hy1) (h1A i y2 hy2)) le_sup_left
+    have hY :=
+      hproj (Y0 ⊔ Y1) (sup_le hY0W h1W)
+        (fun i y hy => by
+          obtain ⟨y1, hy1, y2, hy2, rfl⟩ := Submodule.mem_sup.1 hy
+          rw [map_add (f := _)]
+          exact Submodule.add_mem_sup (hY0A i y1 hy1) (h1A i y2 hy2))
+        le_sup_left
     rw [hY, inner_eq_zero_symm]
     exact Submodule.starProjection_inner_eq_zero v w (Submodule.mem_sup_right hw1)
   have hcl : v - Y0.starProjection v ∈ W.topologicalClosure :=
-    W.topologicalClosure.sub_mem hv
-      (W.le_topologicalClosure (hY0W (Y0.starProjection_apply_mem v)))
+    W.topologicalClosure.sub_mem hv (W.le_topologicalClosure (hY0W (Y0.starProjection_apply_mem v)))
   have hsub : closure (W : Set H) ⊆ {x | inner ℂ x (v - Y0.starProjection v) = 0} :=
     closure_minimal horth (isClosed_eq (continuous_id.inner continuous_const) continuous_const)
   have hzero : inner ℂ (v - Y0.starProjection v) (v - Y0.starProjection v) = 0 := by

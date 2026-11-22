@@ -50,8 +50,8 @@ lemma smul_mem' {r : ℕ} {M : Submodule (𝓞 E) (Fin r → E)} {a : E} (ha : I
   rw [← algebraMap_smul E]
   rfl
 
-noncomputable def pairL {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (ξ : Fin r → E) :
-    (Fin r → E) →ₗ[𝓞 E] E where
+noncomputable def pairL {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (ξ : Fin r → E)
+    : (Fin r → E) →ₗ[𝓞 E] E where
   toFun y := herm G y ξ
   map_add' x y := herm_add_left G x y ξ
   map_smul' a y := by
@@ -71,9 +71,9 @@ theorem hermitian_lattice_pairing_duality : PerpQuotientSelfDual (E := E) := by
     ha.map (IsCMField.complexConj E).toAlgHom.toRingHom.toIntAlgHom
   suffices hP : ∃ c : E, ∀ y ∈ X.L', IsIntegral ℤ (herm X.Gm y x - c * herm X.Gm y ξ) by
     obtain ⟨c, hc⟩ := hP
-    refine ⟨-cc c, X.L'_dual _ fun y hy => ?_⟩
+    refine ⟨- cc c, X.L'_dual _ fun y hy => ?_⟩
     have h := hintcc _ (hc y hy)
-    have e : cc (herm X.Gm y x - c * herm X.Gm y ξ) = herm X.Gm (x + (-cc c) • ξ) y := by
+    have e : cc (herm X.Gm y x - c * herm X.Gm y ξ) = herm X.Gm (x + (- cc c) • ξ) y := by
       rw [herm_add_left, herm_smul_left, ← hsym y x, ← hsym y ξ]
       simp only [cc, map_sub, map_mul, map_neg]
       ring
@@ -93,43 +93,52 @@ theorem hermitian_lattice_pairing_duality : PerpQuotientSelfDual (E := E) := by
       intro h
       apply hI
       rw [← hJc, h, FractionalIdeal.coe_zero]
-    have h1 : (1 : E) ∈ (J : Submodule (𝓞 E) E) * ((J⁻¹ : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) := by
+    have h1
+        : (1 : E)
+          ∈ (J : Submodule (𝓞 E) E) * ((J⁻¹ : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) := by
       rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ hJ0]
       exact FractionalIdeal.one_mem_one _
-    have key := Submodule.mul_induction_on
-      (C := fun w => ∃ c : E, ∀ y ∈ X.L', IsIntegral ℤ (w * herm X.Gm y x - c * herm X.Gm y ξ)) h1
-      (fun t ht u hu => by
-        rw [hJc] at ht
-        obtain ⟨yt, hyt, rfl⟩ := Submodule.mem_map.mp ht
-        have hu' := (FractionalIdeal.mem_inv_iff hJ0).mp hu
-        have hint : ∀ y ∈ X.L', IsIntegral ℤ (u * herm X.Gm y ξ) := fun y hy => by
-          have hs : herm X.Gm y ξ ∈ J := by
-            rw [← FractionalIdeal.mem_coe, hJc, ← pairL_apply]
-            exact Submodule.mem_map_of_mem hy
-          obtain ⟨a, ha⟩ := (FractionalIdeal.mem_one_iff _).mp (hu' _ hs)
-          rw [← ha]
-          exact a.isIntegral_coe
-        refine ⟨u * herm X.Gm yt x, fun y hy => ?_⟩
-        have hb := hint yt hyt
-        have ha := hint y hy
-        have hmem : (u * herm X.Gm yt ξ) • y - (u * herm X.Gm y ξ) • yt ∈ X.L' :=
-          X.L'.sub_mem (smul_mem' hb hy) (smul_mem' ha hyt)
-        have hz : herm X.Gm ((u * herm X.Gm yt ξ) • y - (u * herm X.Gm y ξ) • yt) ξ = 0 := by
-          rw [herm_sub_left, herm_smul_left, herm_smul_left]
-          ring
-        have h2 := hintcc _ (hx _ hmem hz)
-        rw [hsym, herm_sub_left, herm_smul_left, herm_smul_left] at h2
-        rw [pairL_apply]
-        convert h2 using 1
-        ring)
-      (fun w1 w2 ⟨c1, h1⟩ ⟨c2, h2⟩ => ⟨c1 + c2, fun y hy => by
-        have h3 := (h1 y hy).add (h2 y hy)
-        have e : (w1 + w2) * herm X.Gm y x - (c1 + c2) * herm X.Gm y ξ =
-            (w1 * herm X.Gm y x - c1 * herm X.Gm y ξ) + (w2 * herm X.Gm y x - c2 * herm X.Gm y ξ) := by
-          ring
-        show IsIntegral ℤ ((w1 + w2) * herm X.Gm y x - (c1 + c2) * herm X.Gm y ξ)
-        rw [e]
-        exact h3⟩)
+    have key :=
+      Submodule.mul_induction_on
+        (C := fun w => ∃ c : E, ∀ y ∈ X.L', IsIntegral ℤ (w * herm X.Gm y x - c * herm X.Gm y ξ))
+        h1
+        (fun t ht u hu => by
+          rw [hJc] at ht
+          obtain ⟨yt, hyt, rfl⟩ := Submodule.mem_map.mp ht
+          have hu' := (FractionalIdeal.mem_inv_iff hJ0).mp hu
+          have hint : ∀ y ∈ X.L', IsIntegral ℤ (u * herm X.Gm y ξ) := fun y hy => by
+            have hs : herm X.Gm y ξ ∈ J := by
+              rw [← FractionalIdeal.mem_coe, hJc, ← pairL_apply]
+              exact Submodule.mem_map_of_mem hy
+            obtain ⟨a, ha⟩ := (FractionalIdeal.mem_one_iff _).mp (hu' _ hs)
+            rw [← ha]
+            exact a.isIntegral_coe
+          refine ⟨u * herm X.Gm yt x, fun y hy => ?_⟩
+          have hb := hint yt hyt
+          have ha := hint y hy
+          have hmem : (u * herm X.Gm yt ξ) • y - (u * herm X.Gm y ξ) • yt ∈ X.L' :=
+            X.L'.sub_mem (smul_mem' hb hy) (smul_mem' ha hyt)
+          have hz : herm X.Gm ((u * herm X.Gm yt ξ) • y - (u * herm X.Gm y ξ) • yt) ξ = 0 := by
+            rw [herm_sub_left, herm_smul_left, herm_smul_left]
+            ring
+          have h2 := hintcc _ (hx _ hmem hz)
+          rw [hsym, herm_sub_left, herm_smul_left, herm_smul_left] at h2
+          rw [pairL_apply]
+          convert h2 using 1
+          ring)
+        (fun w1 w2 ⟨c1, h1⟩ ⟨c2, h2⟩ => ⟨
+          c1 + c2,
+          fun y hy => by
+            have h3 := (h1 y hy).add (h2 y hy)
+            have e
+                : (w1 + w2) * herm X.Gm y x - (c1 + c2) * herm X.Gm y ξ
+                  = (w1 * herm X.Gm y x - c1 * herm X.Gm y ξ)
+                    + (w2 * herm X.Gm y x - c2 * herm X.Gm y ξ) := by
+              ring
+            show IsIntegral ℤ ((w1 + w2) * herm X.Gm y x - (c1 + c2) * herm X.Gm y ξ)
+            rw [e]
+            exact h3
+        ⟩)
     obtain ⟨c, hc⟩ := key
     exact ⟨c, fun y hy => by simpa using hc y hy⟩
 

@@ -8,9 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV
+  UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
 
-private theorem hom_ext {l : ℕ} [Fact l.Prime] {k : Type} [CommRing k] [CharP k l] (f g : ℤ_[l] →+* k) : f = g := by
+private theorem hom_ext
+    {l : ℕ} [Fact l.Prime] {k : Type} [CommRing k] [CharP k l] (f g : ℤ_[l] →+* k)
+    : f = g := by
   ext x
   obtain ⟨y, hy⟩ : (l : ℤ_[l]) ∣ x - (x.zmodRepr : ℤ_[l]) := by
     have hm := PadicInt.sub_zmodRepr_mem x
@@ -19,8 +22,8 @@ private theorem hom_ext {l : ℕ} [Fact l.Prime] {k : Type} [CommRing k] [CharP 
   rw [hx]
   simp only [map_add (f := _), map_mul, map_natCast, CharP.cast_eq_zero k l, zero_mul]
 
-private theorem sqrt_discr {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) :
-    ∃ δ : K, δ ^ 2 = (discr K : K) := by
+private theorem sqrt_discr {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
+    : ∃ δ : K, δ ^ 2 = (discr K : K) := by
   classical
   haveI : Algebra.IsQuadraticExtension ℚ K := ⟨hK⟩
   set b := NumberField.integralBasis K with hb
@@ -36,15 +39,18 @@ private theorem sqrt_discr {K : Type} [Field K] [NumberField K] (hK : Module.fin
     exact (map_intCast _ _).symm
   have h2 : (algebraMap ℚ K).mapMatrix (Algebra.traceMatrix ℚ b) = M * M.transpose := by
     ext i j
-    rw [RingHom.mapMatrix_apply, Matrix.map_apply, Algebra.traceMatrix_apply, Algebra.traceForm_apply,
-      trace_eq_sum_automorphisms, Matrix.mul_apply]
-    rw [← Fintype.sum_equiv e (fun j' => (e j') (b i) * (e j') (b j)) (fun σ => σ (b i * b j))
+    rw [RingHom.mapMatrix_apply, Matrix.map_apply, Algebra.traceMatrix_apply,
+      Algebra.traceForm_apply, trace_eq_sum_automorphisms, Matrix.mul_apply]
+    rw [← Fintype.sum_equiv e
+      (fun j' => (e j') (b i) * (e j') (b j))
+      (fun σ => σ (b i * b j))
       (fun j' => by simp only [map_mul])]
     rfl
   rw [h1, Algebra.discr_def, RingHom.map_det, h2, Matrix.det_mul, Matrix.det_transpose, sq]
 
-private theorem discr_neg {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) (h : IsTotallyComplex K) :
-    discr K < 0 := by
+private theorem discr_neg
+    {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) (h : IsTotallyComplex K)
+    : discr K < 0 := by
   haveI := h
   have h1 := NumberField.InfinitePlace.card_add_two_mul_card_eq_rank K
   rw [IsTotallyComplex.nrRealPlaces_eq_zero, hK] at h1
@@ -53,13 +59,17 @@ private theorem discr_neg {K : Type} [Field K] [NumberField K] (hK : Module.finr
   rw [hc, pow_one] at hs
   exact Int.sign_eq_neg_one_iff_neg.mp hs
 
-private theorem quad_ex {Ω : Type} [Field Ω] [CharZero Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
-    (hK : Module.finrank ℚ K = 2) (h : IsTotallyComplex K) (η : G ℚ Ω →* ℤˣ) (hη : η.ker = galOf ℚ K Ω) (σ : G ℚ Ω)
-    (φ : Ω →+* ℂ) (hφ : ∀ x, φ (σ x) = starRingEnd ℂ (φ x)) (hσ : η σ = -1) :
-    ∃ δ : Ω, δ ^ 2 = -((discr K).natAbs : Ω) ∧ ∀ s : G ℚ Ω, s δ = (η s : ℤ) • δ := by
+private theorem quad_ex
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+    (hK : Module.finrank ℚ K = 2) (h : IsTotallyComplex K)
+    (η : G ℚ Ω →* ℤˣ) (hη : η.ker = galOf ℚ K Ω)
+    (σ : G ℚ Ω) (φ : Ω →+* ℂ) (hφ : ∀ x, φ (σ x) = starRingEnd ℂ (φ x))
+    (hσ : η σ = -1)
+    : ∃ δ : Ω, δ ^ 2 = -((discr K).natAbs : Ω) ∧ ∀ s : G ℚ Ω, s δ = (η s : ℤ) • δ := by
   obtain ⟨δ0, hδ0⟩ := sqrt_discr hK
   have hneg := discr_neg hK h
-  have hnd : ((discr K).natAbs : ℤ) = -discr K := Int.ofNat_natAbs_of_nonpos hneg.le
+  have hnd : ((discr K).natAbs : ℤ) = - discr K := Int.ofNat_natAbs_of_nonpos hneg.le
   have hirr : ∀ r : ℚ, r • (1 : K) ≠ δ0 := by
     intro r hr
     rw [Rat.smul_def, mul_one] at hr
@@ -83,7 +93,8 @@ private theorem quad_ex {Ω : Type} [Field Ω] [CharZero Ω] {K : Type} [Field K
   have hfix : ∀ s : G ℚ Ω, s (algebraMap K Ω δ0) = algebraMap K Ω δ0 → s ∈ galOf ℚ K Ω := by
     intro s hs x
     obtain ⟨a, b, rfl⟩ := hspan x
-    rw [map_add (f := _), map_mul, map_ratCast, map_ratCast, map_add (f := _), map_mul, hs, map_ratCast, map_ratCast]
+    rw [map_add (f := _), map_mul, map_ratCast, map_ratCast, map_add (f := _), map_mul, hs,
+      map_ratCast, map_ratCast]
   have hsq : (algebraMap K Ω δ0) ^ 2 = -((discr K).natAbs : Ω) := by
     rw [← map_pow, hδ0, map_intCast]
     rw [← Int.cast_natCast, hnd, Int.cast_neg, neg_neg]
@@ -97,7 +108,9 @@ private theorem quad_ex {Ω : Type} [Field Ω] [CharZero Ω] {K : Type} [Field K
     rw [he, Units.val_one, one_smul]
     exact hk δ0
   · rw [he, Units.val_neg, Units.val_one, neg_smul, one_smul]
-    have hm : (s (algebraMap K Ω δ0) - algebraMap K Ω δ0) * (s (algebraMap K Ω δ0) + algebraMap K Ω δ0) = 0 := by
+    have hm
+        : (s (algebraMap K Ω δ0) - algebraMap K Ω δ0) * (s (algebraMap K Ω δ0) + algebraMap K Ω δ0)
+          = 0 := by
       linear_combination hs2
     rcases mul_eq_zero.mp hm with h1 | h1
     · exfalso
@@ -109,14 +122,22 @@ private theorem quad_ex {Ω : Type} [Field Ω] [CharZero Ω] {K : Type} [Field K
       exact absurd h1' (by decide)
     · exact eq_neg_of_add_eq_zero_left h1
 
-private theorem kills_mono {Ω C : Type} [Field Ω] [CharZero Ω] [Monoid C] {M M' : ℕ} (h : M ∣ M') {χ : G ℚ Ω →* C}
-    (hχ : Af.KillsMu M χ) : Af.KillsMu M' χ := fun s hs => hχ s fun ζ hζ => hs ζ (by
-  obtain ⟨k, rfl⟩ := h
-  rw [pow_mul, hζ, one_pow])
+private theorem kills_mono
+    {Ω C : Type} [Field Ω] [CharZero Ω] [Monoid C]
+    {M M' : ℕ} (h : M ∣ M')
+    {χ : G ℚ Ω →* C} (hχ : Af.KillsMu M χ)
+    : Af.KillsMu M' χ := fun s hs =>
+  hχ s fun ζ hζ =>
+    hs ζ (by
+      obtain ⟨k, rfl⟩ := h
+      rw [pow_mul, hζ, one_pow])
 
-private theorem cyc_ine (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
-    (A : ValuationSubring Ω) (hA : ¬ A.valuation (l : Ω) < 1) {σ : G ℚ Ω} (hσ : σ ∈ Ine (F := ℚ) A) :
-    cycZ ℚ Ω l σ = 1 := by
+private theorem cyc_ine
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (A : ValuationSubring Ω) (hA : ¬ A.valuation (l : Ω) < 1)
+    {σ : G ℚ Ω} (hσ : σ ∈ Ine (F := ℚ) A)
+    : cycZ ℚ Ω l σ = 1 := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hl1 : 1 ≤ A.valuation (l : Ω) := not_lt.mp hA
   have fix : ∀ (n : ℕ) (t : Ω), t ^ (l ^ n) = 1 → σ t = t := by
@@ -132,7 +153,8 @@ private theorem cyc_ine (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ �
     rcases n with _ | n
     · simp only [pow_zero, pow_one] at ht
       simp [ht]
-    · have h1 : l ^ (n + 1) ≠ 1 := (Nat.one_lt_pow (Nat.succ_ne_zero n) (Fact.out : l.Prime).one_lt).ne'
+    · have h1 : l ^ (n + 1) ≠ 1 :=
+        (Nat.one_lt_pow (Nat.succ_ne_zero n) (Fact.out : l.Prime).one_lt).ne'
       rw [Units.val_one, ZMod.val_one'' h1, pow_one]
   show cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) = 1
   apply Units.ext
@@ -150,11 +172,16 @@ private theorem cyc_ine (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ �
   rcases n with _ | n
   · simp only [pow_zero, pow_one] at htn
     simp [htn]
-  · have h1 : l ^ (n + 1) ≠ 1 := (Nat.one_lt_pow (Nat.succ_ne_zero n) (Fact.out : l.Prime).one_lt).ne'
+  · have h1 : l ^ (n + 1) ≠ 1 :=
+      (Nat.one_lt_pow (Nat.succ_ne_zero n) (Fact.out : l.Prime).one_lt).ne'
     rw [ZMod.val_one'' h1, pow_one]
 
-theorem UpperTheory.V.Fr.gen_gd :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [IsCMField K] [Algebra K Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) [CharP (ResidueField c.O) l] (N : ℕ) [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (D : Dat Ω K c e ψ) (B : ValuationSubring Ω), B.valuation (l : Ω) < 1 → Gen l D.η D.Ψ D.cc B (l * N * (discr K).natAbs) ⊤ := by
+theorem UpperTheory.V.Fr.gen_gd
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
+        [IsCMField K] [Algebra K Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) [CharP (ResidueField c.O) l]
+        (N : ℕ) [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (D : Dat Ω K c e ψ)
+        (B : ValuationSubring Ω),
+      B.valuation (l : Ω) < 1 → Gen l D.η D.Ψ D.cc B (l * N * (discr K).natAbs) ⊤ := by
   intro Ω _ _ _ K _ _ _ _ l _ c _ N _ e ψ D B hB
   have gd := D.gd
   obtain ⟨hηd, hd1, hψN, -⟩ := eta_killsMu D
@@ -170,8 +197,10 @@ theorem UpperTheory.V.Fr.gen_gd :
     ext x
     rw [ComplexEmbedding.conjugate_coe_eq, RingHom.comp_apply, ← hφ, h1 x]
   have hΨcc : D.Ψ D.cc = 1 := hlit.par D.cc D.conj
-  have hIneL : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 →
-      Ine (F := ℚ) A ≤ D.η.ker ∧ ∃ s ∈ Ine (F := ℚ) A, IsUnit ((D.Ψ s : c.O) ^ 2 - 1) := by
+  have hIneL
+      : ∀ A : ValuationSubring Ω,
+        A.valuation (l : Ω) < 1
+          → Ine (F := ℚ) A ≤ D.η.ker ∧ ∃ s ∈ Ine (F := ℚ) A, IsUnit ((D.Ψ s : c.O) ^ 2 - 1) := by
     intro A hA
     obtain ⟨h1, s, hs, h2⟩ := (gdLoc Ω K l c e N ψ w' η' a hlit).1 A hA
     refine ⟨D.η_ker ▸ h1, s, hs, ?_⟩
@@ -180,13 +209,22 @@ theorem UpperTheory.V.Fr.gen_gd :
   have hrel := (gdIff Ω K l c e N ψ).2 w' η' a hlit
   have hww : w' = w := huniq w' hlit.om
   subst hww
-  have hbar : ∀ s, Units.map (residue c.O : c.O →* ResidueField c.O) (chiO ℚ Ω l c.O s) = omO Ω l c.O s := by
+  have hbar
+      : ∀ s,
+        Units.map (residue c.O : c.O →* ResidueField c.O) (chiO ℚ Ω l c.O s) = omO Ω l c.O s := by
     intro s
     apply Units.ext
-    exact RingHom.congr_fun (hom_ext ((residue c.O).comp (algebraMap ℤ_[l] c.O))
-      ((ZMod.castHom (dvd_pow_self l one_ne_zero) (ResidueField c.O)).comp (PadicInt.toZModPow 1))) _
+    exact RingHom.congr_fun
+      (hom_ext ((residue c.O).comp (algebraMap ℤ_[l] c.O))
+        ((ZMod.castHom (dvd_pow_self l one_ne_zero) (ResidueField c.O)).comp
+          (PadicInt.toZModPow 1)))
+      _
   have hPsi : ∀ s, D.Ψ s = chiO ℚ Ω l c.O s ^ e * Chr.dirG ℚ Ω ψ s := fun s => rfl
-  have hbarPsi : ∀ s, barChar c.O D.Ψ s = omO Ω l c.O s ^ e * Units.map (residue c.O : c.O →* ResidueField c.O) (Chr.dirG ℚ Ω ψ s) := by
+  have hbarPsi
+      : ∀ s,
+        barChar c.O D.Ψ s
+          = omO Ω l c.O s ^ e
+            * Units.map (residue c.O : c.O →* ResidueField c.O) (Chr.dirG ℚ Ω ψ s) := by
     intro s
     show Units.map _ (D.Ψ s) = _
     rw [hPsi, map_mul, map_pow]
@@ -202,26 +240,27 @@ theorem UpperTheory.V.Fr.gen_gd :
     intro s hs
     show Units.map _ (cycMod ℚ Ω l 1 s) = 1
     rw [hs, map_one]
-  refine
-    { odd := gd.l_odd
-      fin := ?_
-      M_ne := ?_
-      l_dvd := ⟨N * (discr K).natAbs, by ring⟩
-      two_dvd := ?_
-      cc := D.conj
-      over_l := hB
-      quad := ?_
-      cyc := ?_
-      η_l := fun B' hB' => (hIneL B' hB').1
-      even := ?_
-      Ψ_l := ?_
-      g4 := ?_
-      g5 := ?_
-      Hb_open := ?_
-      Hb_ab := le_top
-      Hb_idx := ⟨0, by simp⟩
-      Hb_l := fun _ _ => le_top
-      teich := ?_ }
+  refine {
+    odd := gd.l_odd
+    fin := ?_
+    M_ne := ?_
+    l_dvd := ⟨N * (discr K).natAbs, by ring⟩
+    two_dvd := ?_
+    cc := D.conj
+    over_l := hB
+    quad := ?_
+    cyc := ?_
+    η_l := fun B' hB' => (hIneL B' hB').1
+    even := ?_
+    Ψ_l := ?_
+    g4 := ?_
+    g5 := ?_
+    Hb_open := ?_
+    Hb_ab := le_top
+    Hb_idx := ⟨0, by simp⟩
+    Hb_l := fun _ _ => le_top
+    teich := ?_
+  }
   · haveI := c.dvr
     haveI := c.fin
     exact (abelian₂.dvr_finite l c.O).2.1
@@ -243,8 +282,7 @@ theorem UpperTheory.V.Fr.gen_gd :
         apply hs
         obtain ⟨m, hm⟩ := hk
         rw [hm, pow_mul, hζ, one_pow]
-      have h1 : Chr.dirG ℚ Ω ψ s = 1 :=
-        hψN s (hdiv N (Dvd.dvd.mul_right (Dvd.intro_left l rfl) _))
+      have h1 : Chr.dirG ℚ Ω ψ s = 1 := hψN s (hdiv N (Dvd.dvd.mul_right (Dvd.intro_left l rfl) _))
       haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
       haveI : Fact (1 < l) := ⟨(Fact.out : l.Prime).one_lt⟩
       have h2 : s ∈ (Chr.cls ℚ Ω l).ker := by

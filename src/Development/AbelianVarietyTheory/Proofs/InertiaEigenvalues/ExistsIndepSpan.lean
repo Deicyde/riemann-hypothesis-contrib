@@ -11,10 +11,11 @@ open GlobalTheory.PhiGam
 
 variable {k : Type} [Field k]
 
-theorem exists_indep_span {Q : Type} [AddCommGroup Q] [Module k⸨X⸩ Q] [Module k⟦X⟧ Q]
-    [IsScalarTower k⟦X⟧ k⸨X⸩ Q] {P : Submodule k⟦X⟧ Q} (hP : P.FG) :
-    ∃ (ι : Type) (_ : Fintype ι) (e : ι → Q), LinearIndependent k⸨X⸩ e ∧
-      Submodule.span k⟦X⟧ (Set.range e) = P := by
+theorem exists_indep_span
+    {Q : Type} [AddCommGroup Q] [Module k⸨X⸩ Q] [Module k⟦X⟧ Q] [IsScalarTower k⟦X⟧ k⸨X⸩ Q]
+    {P : Submodule k⟦X⟧ Q} (hP : P.FG)
+    : ∃ (ι : Type) (_ : Fintype ι) (e : ι → Q),
+      LinearIndependent k⸨X⸩ e ∧ Submodule.span k⟦X⟧ (Set.range e) = P := by
   classical
   haveI : Module.Finite k⟦X⟧ P := Module.Finite.iff_fg.mpr hP
   haveI : NoZeroSMulDivisors k⟦X⟧ Q := by
@@ -39,9 +40,11 @@ theorem exists_indep_span {Q : Type} [AddCommGroup Q] [Module k⸨X⸩ Q] [Modul
       rfl
     rw [hr, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
 
-theorem exists_form {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k V] {l n : ℕ} {R : RingPG k l}
-    (D : ModPG R n V) (i : ZMod n) (t : V →ₗ[k⸨X⸩] k⸨X⸩) :
-    ∃ u : V →ₗ[k⸨X⸩] k⸨X⸩, ∀ x, u (D.φ i x) = R.φ (t x) := by
+theorem exists_form
+    {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k V]
+    {l n : ℕ} {R : RingPG k l} (D : ModPG R n V) (i : ZMod n)
+    (t : V →ₗ[k⸨X⸩] k⸨X⸩)
+    : ∃ u : V →ₗ[k⸨X⸩] k⸨X⸩, ∀ x, u (D.φ i x) = R.φ (t x) := by
   let b := Module.Basis.ofVectorSpace k⸨X⸩ V
   let c := Module.Basis.mk (D.linearIndependent_φ i b) (D.span_φ i b).ge
   refine ⟨c.constr k⸨X⸩ fun j => R.φ (t (b j)), fun x => ?_⟩
@@ -56,9 +59,11 @@ theorem exists_form {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k V]
   | add y z _ _ hy hz => simp only [map_add (f := _), hy, hz]
   | smul a y _ hy => rw [D.φ_semi i a y, map_smul, map_smul, hy, smul_eq_mul, smul_eq_mul, map_mul]
 
-theorem exists_dual {K Q ι : Type} [Field K] [AddCommGroup Q] [Module K Q] [DecidableEq ι] {e : ι → Q}
-    (he : LinearIndependent K e) (j : ι) :
-    ∃ t : Q →ₗ[K] K, ∀ m, t (e m) = if m = j then 1 else 0 := by
+theorem exists_dual
+    {K Q ι : Type} [Field K] [AddCommGroup Q] [Module K Q] [DecidableEq ι]
+    {e : ι → Q} (he : LinearIndependent K e)
+    (j : ι)
+    : ∃ t : Q →ₗ[K] K, ∀ m, t (e m) = if m = j then 1 else 0 := by
   classical
   obtain ⟨g, hg⟩ := LinearMap.exists_extend ((Module.Basis.span he).coord j)
   refine ⟨g, fun m => ?_⟩
@@ -68,13 +73,16 @@ theorem exists_dual {K Q ι : Type} [Field K] [AddCommGroup Q] [Module K Q] [Dec
   rw [hm, ← LinearMap.comp_apply, hg, Module.Basis.coord_apply, Module.Basis.repr_self,
     Finsupp.single_apply]
 
-theorem comap_pull {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V]
-    [IsScalarTower k⟦X⟧ k⸨X⸩ V] {W : Type} [AddCommGroup W] [Module k⸨X⸩ W] [Module k⟦X⟧ W]
-    [IsScalarTower k⟦X⟧ k⸨X⸩ W] [Module k V] [Module k W] {l n : ℕ} {R : RingPG k l}
-    (D : ModPG R n V) (D' : ModPG R n W) (i : ZMod n) (f g : W →ₗ[k⸨X⸩] V)
-    (_hf : Function.Injective f) (hg : Function.Injective g)
-    (h : ∀ x, g (D'.φ i x) = D.φ i (f x)) {N : Submodule k⟦X⟧ V} (hN : N.FG) :
-    (pull (D.φ i) N).comap (g.restrictScalars k⟦X⟧) = pull (D'.φ i) (N.comap (f.restrictScalars k⟦X⟧)) := by
+theorem comap_pull
+    {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [IsScalarTower k⟦X⟧ k⸨X⸩ V]
+    {W : Type} [AddCommGroup W] [Module k⸨X⸩ W] [Module k⟦X⟧ W] [IsScalarTower k⟦X⟧ k⸨X⸩ W]
+    [Module k V] [Module k W]
+    {l n : ℕ} {R : RingPG k l} (D : ModPG R n V) (D' : ModPG R n W) (i : ZMod n)
+    (f g : W →ₗ[k⸨X⸩] V)
+    (_hf : Function.Injective f) (hg : Function.Injective g) (h : ∀ x, g (D'.φ i x) = D.φ i (f x))
+    {N : Submodule k⟦X⟧ V} (hN : N.FG)
+    : (pull (D.φ i) N).comap (g.restrictScalars k⟦X⟧)
+      = pull (D'.φ i) (N.comap (f.restrictScalars k⟦X⟧)) := by
   classical
   apply le_antisymm
   swap
@@ -90,8 +98,10 @@ theorem comap_pull {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X
     exact this
   choose s hsN hs using hlift
 
-  have hle : pull (D.φ i) N ≤ (pull (D'.φ i) (N.comap (f.restrictScalars k⟦X⟧))).map (g.restrictScalars k⟦X⟧) ⊔
-      Submodule.span k⟦X⟧ (Set.range fun j => D.φ i (s j)) := by
+  have hle
+      : pull (D.φ i) N
+        ≤ (pull (D'.φ i) (N.comap (f.restrictScalars k⟦X⟧))).map (g.restrictScalars k⟦X⟧)
+          ⊔ Submodule.span k⟦X⟧ (Set.range fun j => D.φ i (s j)) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨x, hx, rfl⟩
     have hx' : π x ∈ Submodule.span k⟦X⟧ (Set.range e) := hsp ▸ ⟨x, hx, rfl⟩
@@ -127,10 +137,12 @@ theorem comap_pull {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X
     have hug : u.comp g = 0 := by
       refine LinearMap.ext_on_range (D'.etale i) fun x => ?_
       have : π (f x) = 0 := (Submodule.Quotient.mk_eq_zero _).2 ⟨x, rfl⟩
-      rw [LinearMap.comp_apply, h, hu, LinearMap.comp_apply, this, map_zero, map_zero, LinearMap.zero_apply]
-    have h1 : u (∑ m, a m • D.φ i (s m)) = 0 := by
-      rw [hq']; exact LinearMap.congr_fun hug _
-    have h2 : ∀ m, u (a m • D.φ i (s m)) = if m = j then algebraMap k⟦X⟧ k⸨X⸩ (a m) else 0 := fun m => by
+      rw [LinearMap.comp_apply, h, hu, LinearMap.comp_apply, this, map_zero, map_zero,
+        LinearMap.zero_apply]
+    have h1 : u (∑ m, a m • D.φ i (s m)) = 0 := by rw [hq']; exact LinearMap.congr_fun hug _
+    have h2
+        : ∀ m,
+          u (a m • D.φ i (s m)) = if m = j then algebraMap k⟦X⟧ k⸨X⸩ (a m) else 0 := fun m => by
       rw [← algebraMap_smul k⸨X⸩ (a m), map_smul, hu, LinearMap.comp_apply, hs, ht]
       split_ifs <;> simp
     set_option synthInstance.maxHeartbeats 100000 in

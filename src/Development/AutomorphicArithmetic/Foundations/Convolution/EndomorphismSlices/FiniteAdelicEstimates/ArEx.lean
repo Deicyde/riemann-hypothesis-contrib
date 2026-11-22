@@ -8,8 +8,11 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf TypeB TypeH)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison
@@ -20,8 +23,8 @@ set_option synthInstance.maxHeartbeats 200000
 
 attribute [local instance] borelG borelF borelA borelH
 
-theorem UpperTheory.Zero.ConvolutionTheory.EB.arEx :
-    UpperTheory.Zero.ConvolutionTheory.EB.ArEx := by
+theorem UpperTheory.Zero.ConvolutionTheory.EB.arEx
+    : UpperTheory.Zero.ConvolutionTheory.EB.ArEx := by
   intro E _ _ _ a b l₁ l₂ D
   haveI : BorelSpace (G a) := ⟨rfl⟩
   haveI : BorelSpace (G b) := ⟨rfl⟩
@@ -35,9 +38,12 @@ theorem UpperTheory.Zero.ConvolutionTheory.EB.arEx :
   obtain ⟨ν, hν, hν', hcomp⟩ := compatEx E a b D μa μb
   obtain ⟨-, -, ca, hca0, hca⟩ := GlobalTheory.CompanionTheory.Growth.size_facts E a
   obtain ⟨-, -, cb, hcb0, hcb⟩ := GlobalTheory.CompanionTheory.Growth.size_facts E b
-  obtain ⟨bump, T, hT, hbump, hone⟩ := PositivityTheory.Rg.BcB.F.F0.bump_one (InfinitePlace E ⊕ InfinitePlace E)
-    (Sum.elim (fun v => cas (UpperTheory.Zero.ConvolutionTheory.EB.chi l₁ v)) fun v => cas (UpperTheory.Zero.ConvolutionTheory.EB.chi l₂ v))
-    (fun i => by cases i <;> exact PositivityTheory.Rg.BcB.F.F0.cas_infOf_im _)
+  obtain ⟨bump, T, hT, hbump, hone⟩ :=
+    PositivityTheory.Rg.BcB.F.F0.bump_one (InfinitePlace E ⊕ InfinitePlace E)
+      (Sum.elim
+        (fun v => cas (UpperTheory.Zero.ConvolutionTheory.EB.chi l₁ v))
+        fun v => cas (UpperTheory.Zero.ConvolutionTheory.EB.chi l₂ v))
+      (fun i => by cases i <;> exact PositivityTheory.Rg.BcB.F.F0.cas_infOf_im _)
   obtain ⟨_, hKa⟩ := PositivityTheory.RgBcC.wave_existence_speed_multiplicity.2.2.1 a
   obtain ⟨_, hKb⟩ := PositivityTheory.RgBcC.wave_existence_speed_multiplicity.2.2.1 b
   let Ma := UpperTheory.Zero.ConvolutionTheory.EB.Ml l₁
@@ -63,4 +69,5 @@ theorem UpperTheory.Zero.ConvolutionTheory.EB.arEx :
     kb := fun w v => ((hKb μb (Mb v)).1 w bump T hbump).choose
     kera := fun w v => ((hKa μa (Ma v)).1 w bump T hbump).choose_spec
     kerb := fun w v => ((hKb μb (Mb v)).1 w bump T hbump).choose_spec
-    one := by simpa [Fintype.prod_sum_type] using hone }⟩
+    one := by simpa [Fintype.prod_sum_type] using hone
+  }⟩

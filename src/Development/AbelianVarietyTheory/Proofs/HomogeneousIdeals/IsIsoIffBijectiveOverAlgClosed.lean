@@ -12,19 +12,25 @@ noncomputable section
 
 namespace GlobalTheory.FinEt
 
-attribute [local simp] pullback.lift_fst pullback.lift_snd pullback.lift_fst_assoc
-  pullback.lift_snd_assoc
+attribute [local simp]
+  pullback.lift_fst pullback.lift_snd pullback.lift_fst_assoc pullback.lift_snd_assoc
 
-theorem range_of_isPullback {P X Y Z : Scheme.{u}} {a : P ⟶ X} {b : P ⟶ Y} {f : X ⟶ Z}
-    {g : Y ⟶ Z} (h : IsPullback a b f g) : Set.range a = f ⁻¹' Set.range g := by
+theorem range_of_isPullback
+    {P X Y Z : Scheme.{u}} {a : P ⟶ X} {b : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z} (h : IsPullback a b f g)
+    : Set.range a = f ⁻¹' Set.range g := by
   rw [← Scheme.Pullback.range_fst, ← h.isoPullback_hom_fst, Scheme.Hom.comp_base, TopCat.coe_comp,
     Set.range_comp, h.isoPullback.hom.surjective.range_eq, Set.image_univ]
 
-theorem exists_algClosed_point (X : Scheme.{u}) (x : X) :
-    ∃ (k : Type u) (_ : Field k) (_ : IsAlgClosed k) (a : Spec (.of k) ⟶ X),
+theorem exists_algClosed_point (X : Scheme.{u}) (x : X)
+    : ∃ (k : Type u) (_ : Field k) (_ : IsAlgClosed k) (a : Spec (.of k) ⟶ X),
       Set.range a = {x} := by
-  refine ⟨AlgebraicClosure (X.residueField x), inferInstance, inferInstance,
-    Spec.map (CommRingCat.ofHom (algebraMap (X.residueField x) _)) ≫ X.fromSpecResidueField x, ?_⟩
+  refine ⟨
+    AlgebraicClosure (X.residueField x),
+    inferInstance,
+    inferInstance,
+    Spec.map (CommRingCat.ofHom (algebraMap (X.residueField x) _)) ≫ X.fromSpecResidueField x,
+    ?_
+  ⟩
   ext y
   constructor
   · rintro ⟨z, rfl⟩
@@ -45,14 +51,15 @@ theorem isFinite_left (f : X ⟶ Y) [IsFinite X.hom] [IsSeparated Y.hom] : IsFin
   have : IsFinite (f.left ≫ Y.hom) := by rw [Over.w]; infer_instance
   exact IsFinite.of_comp f.left Y.hom
 
-theorem etale_left (f : X ⟶ Y) [Etale X.hom] [LocallyOfFiniteType Y.hom]
-    [FormallyUnramified Y.hom] : Etale f.left := by
+theorem etale_left (f : X ⟶ Y) [Etale X.hom] [LocallyOfFiniteType Y.hom] [FormallyUnramified Y.hom]
+    : Etale f.left := by
   have : Etale (f.left ≫ Y.hom) := by rw [Over.w]; infer_instance
   exact Etale.of_comp f.left Y.hom
 
-theorem isIso_iff_bijective_algClosed {X Y : Scheme.{u}} (f : X ⟶ Y) [IsFinite f] [Etale f] :
-    IsIso f ↔ ∀ (k : Type u) [Field k] [IsAlgClosed k],
-      Function.Bijective fun x : Spec (.of k) ⟶ X ↦ x ≫ f := by
+theorem isIso_iff_bijective_algClosed {X Y : Scheme.{u}} (f : X ⟶ Y) [IsFinite f] [Etale f]
+    : IsIso f
+      ↔ ∀ (k : Type u) [Field k] [IsAlgClosed k],
+        Function.Bijective fun x : Spec (.of k) ⟶ X ↦ x ≫ f := by
   constructor
   · intro _ k _ _
     exact ⟨fun a b h ↦ (cancel_mono f).mp h, fun y ↦ ⟨y ≫ inv f, by simp⟩⟩
@@ -70,26 +77,25 @@ theorem isIso_iff_bijective_algClosed {X Y : Scheme.{u}} (f : X ⟶ Y) [IsFinite
     rw [eq_top_iff]
     intro z _
     obtain ⟨k, _, _, a, ha⟩ := exists_algClosed_point _ z
-    have e : a ≫ pullback.fst f f = a ≫ pullback.snd f f :=
-      (h k).1 (by simp [pullback.condition])
+    have e : a ≫ pullback.fst f f = a ≫ pullback.snd f f := (h k).1 (by simp [pullback.condition])
     have e' : a = (a ≫ pullback.fst f f) ≫ pullback.diagonal f := by
       apply pullback.hom_ext <;> simp [e]
     have : z ∈ Set.range a := by simp [ha]
     obtain ⟨w, rfl⟩ := this
     refine ⟨(a ≫ pullback.fst f f) w, ?_⟩
     rw [← Scheme.Hom.comp_apply, ← e']
-  have hsnd : IsIso (pullback.snd f f) :=
-    IsIso.of_isIso_fac_left (pullback.diagonal_snd f)
+  have hsnd : IsIso (pullback.snd f f) := IsIso.of_isIso_fac_left (pullback.diagonal_snd f)
   rw [Scheme.Hom.isIso_iff_finrank_eq]
   funext y
   obtain ⟨x, rfl⟩ := hsurj y
   rw [← Scheme.Hom.finrank_pullback_snd, Scheme.Hom.finrank_eq_one_of_isIso]
   rfl
 
-theorem isIso_iff_bijective_over_algClosed (f : X ⟶ Y)
-    [IsFinite X.hom] [Etale X.hom] [IsFinite Y.hom] [Etale Y.hom] :
-    IsIso f ↔ ∀ (k : Type u) [Field k] [IsAlgClosed k] (s : Spec (.of k) ⟶ S),
-      Function.Bijective fun x : Over.mk s ⟶ X ↦ x ≫ f := by
+theorem isIso_iff_bijective_over_algClosed
+    (f : X ⟶ Y) [IsFinite X.hom] [Etale X.hom] [IsFinite Y.hom] [Etale Y.hom]
+    : IsIso f
+      ↔ ∀ (k : Type u) [Field k] [IsAlgClosed k] (s : Spec (.of k) ⟶ S),
+        Function.Bijective fun x : Over.mk s ⟶ X ↦ x ≫ f := by
   have := isFinite_left f
   have := etale_left f
   constructor
@@ -100,52 +106,56 @@ theorem isIso_iff_bijective_over_algClosed (f : X ⟶ Y)
   intro k _ _
   constructor
   · intro a b (hab : a ≫ f.left = b ≫ f.left)
-    have hb : b ≫ X.hom = a ≫ X.hom := by
-      rw [← Over.w f, ← Category.assoc, ← hab, Category.assoc]
-    have := (h k (a ≫ X.hom)).1 (a₁ := Over.homMk a rfl) (a₂ := Over.homMk b hb)
-      (Over.OverMorphism.ext hab)
+    have hb : b ≫ X.hom = a ≫ X.hom := by rw [← Over.w f, ← Category.assoc, ← hab, Category.assoc]
+    have :=
+      (h k (a ≫ X.hom)).1 (a₁ := Over.homMk a rfl) (a₂ := Over.homMk b hb)
+        (Over.OverMorphism.ext hab)
     exact congr(($this).left)
   · intro y
     obtain ⟨x, hx⟩ := (h k (y ≫ Y.hom)).2 (Over.homMk y rfl)
     exact ⟨x.left, congr(($hx).left)⟩
 
-def agreeι (f g : X ⟶ Y) :
-    pullback (pullback.lift f.left g.left ((Over.w f).trans (Over.w g).symm))
-      (pullback.diagonal Y.hom) ⟶ X.left :=
+def agreeι (f g : X ⟶ Y)
+    : pullback (pullback.lift f.left g.left ((Over.w f).trans (Over.w g).symm))
+        (pullback.diagonal Y.hom)
+      ⟶ X.left :=
   pullback.fst _ _
 
-instance (f g : X ⟶ Y) [LocallyOfFiniteType Y.hom] [FormallyUnramified Y.hom] :
-    IsOpenImmersion (agreeι f g) := by
+instance (f g : X ⟶ Y) [LocallyOfFiniteType Y.hom] [FormallyUnramified Y.hom]
+    : IsOpenImmersion (agreeι f g) := by
   unfold agreeι; infer_instance
 
 instance (f g : X ⟶ Y) [IsSeparated Y.hom] : IsClosedImmersion (agreeι f g) := by
   unfold agreeι; infer_instance
 
 theorem agreeι_condition (f g : X ⟶ Y) : agreeι f g ≫ f.left = agreeι f g ≫ g.left := by
-  have h := pullback.condition
-    (f := pullback.lift f.left g.left ((Over.w f).trans (Over.w g).symm))
-    (g := pullback.diagonal Y.hom)
+  have h :=
+    pullback.condition (f := pullback.lift f.left g.left ((Over.w f).trans (Over.w g).symm))
+      (g := pullback.diagonal Y.hom)
   have h1 := h =≫ pullback.fst _ _
   have h2 := h =≫ pullback.snd _ _
   simp only [Category.assoc, pullback.lift_fst, pullback.lift_snd, pullback.diagonal_fst,
-    pullback.diagonal_snd, Category.comp_id] at h1 h2
+      pullback.diagonal_snd, Category.comp_id]
+    at h1 h2
   exact h1.trans h2.symm
 
-theorem comp_eq_comp_iff_range (f g : X ⟶ Y) [LocallyOfFiniteType Y.hom]
-    [FormallyUnramified Y.hom] {Z : Scheme.{u}} (a : Z ⟶ X.left) :
-    a ≫ f.left = a ≫ g.left ↔ Set.range a ⊆ Set.range (agreeι f g) := by
+theorem comp_eq_comp_iff_range
+    (f g : X ⟶ Y)
+    [LocallyOfFiniteType Y.hom] [FormallyUnramified Y.hom]
+    {Z : Scheme.{u}} (a : Z ⟶ X.left)
+    : a ≫ f.left = a ≫ g.left ↔ Set.range a ⊆ Set.range (agreeι f g) := by
   constructor
   · intro h
-    have : pullback.lift a (a ≫ f.left) (by apply pullback.hom_ext <;> simp [h]) ≫ agreeι f g
-        = a := pullback.lift_fst _ _ _
+    have : pullback.lift a (a ≫ f.left) (by apply pullback.hom_ext <;> simp [h]) ≫ agreeι f g = a :=
+      pullback.lift_fst _ _ _
     rintro _ ⟨z, rfl⟩
     exact ⟨_, by rw [← Scheme.Hom.comp_apply, this]⟩
   · intro h
     rw [← IsOpenImmersion.lift_fac (agreeι f g) a h, Category.assoc, Category.assoc,
       agreeι_condition]
 
-theorem range_subset_iff_factors {T : Scheme.{u}} (t : T ⟶ S) (U : S.Opens) :
-    Set.range t ⊆ U ↔ ∃ t' : T ⟶ U, t' ≫ U.ι = t := by
+theorem range_subset_iff_factors {T : Scheme.{u}} (t : T ⟶ S) (U : S.Opens)
+    : Set.range t ⊆ U ↔ ∃ t' : T ⟶ U, t' ≫ U.ι = t := by
   constructor
   · intro h
     exact ⟨IsOpenImmersion.lift U.ι t (by simpa using h), IsOpenImmersion.lift_fac _ _ _⟩
@@ -153,11 +163,14 @@ theorem range_subset_iff_factors {T : Scheme.{u}} (t : T ⟶ S) (U : S.Opens) :
     rw [Scheme.Hom.comp_apply, ← Scheme.Opens.range_ι]
     exact ⟨_, rfl⟩
 
-theorem isIso_coprodDesc {U V X : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpenImmersion i]
-    [IsOpenImmersion j] (h : Set.range j = (Set.range i)ᶜ) : IsIso (coprod.desc i j) := by
-  obtain ⟨hc⟩ := nonempty_isColimit_binaryCofanMk_of_isCompl i j (by
-    rw [isCompl_iff, disjoint_iff, codisjoint_iff]
-    constructor <;> ext1 <;> simp [h])
+theorem isIso_coprodDesc
+    {U V X : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpenImmersion i] [IsOpenImmersion j]
+    (h : Set.range j = (Set.range i)ᶜ)
+    : IsIso (coprod.desc i j) := by
+  obtain ⟨hc⟩ :=
+    nonempty_isColimit_binaryCofanMk_of_isCompl i j (by
+      rw [isCompl_iff, disjoint_iff, codisjoint_iff]
+      constructor <;> ext1 <;> simp [h])
   have : coprod.desc i j = ((coprodIsCoprod _ _).coconePointUniqueUpToIso hc).hom := by
     apply coprod.hom_ext
     · rw [coprod.inl_desc]
@@ -167,13 +180,16 @@ theorem isIso_coprodDesc {U V X : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpe
   rw [this]
   exact Iso.isIso_hom _
 
-theorem finrank_eq_add {U V X S : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpenImmersion i]
-    [IsOpenImmersion j] (h : Set.range j = (Set.range i)ᶜ) (p : X ⟶ S) [IsFinite p] [Flat p]
-    (s : S) : p.finrank s = (i ≫ p).finrank s + (j ≫ p).finrank s := by
-  have hi : IsClosedImmersion i := .of_isPreimmersion _ (by
-    rw [← isOpen_compl_iff, ← h]; exact j.isOpenEmbedding.isOpen_range)
-  have hj : IsClosedImmersion j := .of_isPreimmersion _ (by
-    rw [h, isClosed_compl_iff]; exact i.isOpenEmbedding.isOpen_range)
+theorem finrank_eq_add
+    {U V X S : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpenImmersion i] [IsOpenImmersion j]
+    (h : Set.range j = (Set.range i)ᶜ)
+    (p : X ⟶ S) [IsFinite p] [Flat p]
+    (s : S)
+    : p.finrank s = (i ≫ p).finrank s + (j ≫ p).finrank s := by
+  have hi : IsClosedImmersion i :=
+    .of_isPreimmersion _ (by rw [← isOpen_compl_iff, ← h]; exact j.isOpenEmbedding.isOpen_range)
+  have hj : IsClosedImmersion j :=
+    .of_isPreimmersion _ (by rw [h, isClosed_compl_iff]; exact i.isOpenEmbedding.isOpen_range)
   wlog hS : ∃ R, S = Spec R generalizing U V X S
   · obtain ⟨R, g, _, s, rfl⟩ := S.exists_Spec_apply_eq s
     have H := IsPullback.of_hasPullback p g
@@ -189,8 +205,8 @@ theorem finrank_eq_add {U V X S : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpe
   · have _ : IsAffine U := isAffine_of_isAffineHom (i ≫ p)
     rw [← Scheme.Hom.finrank_comp_left_of_isIso U.isoSpec.inv (i ≫ p), ← Category.assoc]
     refine this _ ?_ inferInstance ⟨_, rfl⟩
-    rw [h, Scheme.Hom.comp_base, TopCat.coe_comp, Set.range_comp,
-      U.isoSpec.inv.surjective.range_eq, Set.image_univ]
+    rw [h, Scheme.Hom.comp_base, TopCat.coe_comp, Set.range_comp, U.isoSpec.inv.surjective.range_eq,
+      Set.image_univ]
   obtain ⟨A, rfl⟩ := hU
   wlog hV : ∃ B, V = Spec B generalizing V
   · have _ : IsAffine V := isAffine_of_isAffineHom (j ≫ p)
@@ -207,8 +223,9 @@ theorem finrank_eq_add {U V X S : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpe
   have hψ2 : ψ.hom.Flat := by rw [← Flat.SpecMap_iff, hψ]; infer_instance
   have hiso := isIso_coprodDesc i j h
   algebraize [φ.hom, ψ.hom]
-  have e : coprod.desc i j ≫ p =
-      coprodSpec A B ≫ Spec.map (CommRingCat.ofHom (algebraMap R (A × B))) := by
+  have e
+      : coprod.desc i j ≫ p
+        = coprodSpec A B ≫ Spec.map (CommRingCat.ofHom (algebraMap R (A × B))) := by
     apply coprod.hom_ext
     · rw [coprod.inl_desc_assoc, ← hφ, coprodSpec_inl_assoc, ← Spec.map_comp]; rfl
     · rw [coprod.inr_desc_assoc, ← hψ, coprodSpec_inr_assoc, ← Spec.map_comp]; rfl
@@ -230,13 +247,13 @@ theorem finrank_eq_add {U V X S : Scheme.{u}} (i : U ⟶ X) (j : V ⟶ X) [IsOpe
 def IsSplitOfRank {X S : Scheme.{u}} (p : X ⟶ S) (n : ℕ) : Prop :=
   ∃ s : Fin n → (S ⟶ X), (∀ i, s i ≫ p = 𝟙 S) ∧ Nonempty (IsColimit (Cofan.mk X s))
 
-theorem isSplitOfRank_sigmaDesc (S : Scheme.{u}) (n : ℕ) :
-    IsSplitOfRank (Sigma.desc fun _ : Fin n ↦ 𝟙 S) n :=
+theorem isSplitOfRank_sigmaDesc (S : Scheme.{u}) (n : ℕ)
+    : IsSplitOfRank (Sigma.desc fun _ : Fin n ↦ 𝟙 S) n :=
   ⟨fun i ↦ Sigma.ι (fun _ : Fin n ↦ S) i, fun i ↦ by simp, ⟨coproductIsCoproduct _⟩⟩
 
-theorem isSplitOfRank_iff_exists_iso {X S : Scheme.{u}} (p : X ⟶ S) (n : ℕ) :
-    IsSplitOfRank p n ↔
-      ∃ e : (∐ fun _ : Fin n ↦ S) ≅ X, e.hom ≫ p = Sigma.desc fun _ : Fin n ↦ 𝟙 S := by
+theorem isSplitOfRank_iff_exists_iso {X S : Scheme.{u}} (p : X ⟶ S) (n : ℕ)
+    : IsSplitOfRank p n
+      ↔ ∃ e : (∐ fun _ : Fin n ↦ S) ≅ X, e.hom ≫ p = Sigma.desc fun _ : Fin n ↦ 𝟙 S := by
   constructor
   · rintro ⟨s, hs, hc⟩
     have : IsIso (Sigma.desc s) := (Cofan.nonempty_isColimit_iff_isIso_sigmaDesc _).mp hc
@@ -250,14 +267,20 @@ theorem isSplitOfRank_iff_exists_iso {X S : Scheme.{u}} (p : X ⟶ S) (n : ℕ) 
     rw [this]
     infer_instance
 
-theorem isSplitOfRank_iff {X S : Scheme.{u}} (p : X ⟶ S) (n : ℕ) :
-    IsSplitOfRank p n ↔ ∃ s : Fin n → (S ⟶ X), (∀ i, s i ≫ p = 𝟙 S) ∧
-      (∀ i, IsOpenImmersion (s i)) ∧ ∀ x : X, ∃! i, x ∈ Set.range (s i) := by
+theorem isSplitOfRank_iff {X S : Scheme.{u}} (p : X ⟶ S) (n : ℕ)
+    : IsSplitOfRank p n
+      ↔ ∃ s : Fin n → (S ⟶ X),
+        (∀ i, s i ≫ p = 𝟙 S) ∧ (∀ i, IsOpenImmersion (s i))
+          ∧ ∀ x : X, ∃! i, x ∈ Set.range (s i) := by
   constructor
   · rw [isSplitOfRank_iff_exists_iso]
     rintro ⟨e, he⟩
-    refine ⟨fun i ↦ Sigma.ι (fun _ : Fin n ↦ S) i ≫ e.hom, fun i ↦ by simp [he],
-      fun i ↦ inferInstance, fun x ↦ ?_⟩
+    refine ⟨
+      fun i ↦ Sigma.ι (fun _ : Fin n ↦ S) i ≫ e.hom,
+      fun i ↦ by simp [he],
+      fun i ↦ inferInstance,
+      fun x ↦ ?_
+    ⟩
     obtain ⟨x, rfl⟩ := e.hom.surjective x
     obtain ⟨i, y, hy⟩ := (sigmaOpenCover fun _ : Fin n ↦ S).exists_eq x
     obtain rfl : Sigma.ι (fun _ : Fin n ↦ S) i y = x := hy
@@ -277,37 +300,46 @@ theorem isSplitOfRank_iff {X S : Scheme.{u}} (p : X ⟶ S) (n : ℕ) :
       rintro x ⟨hi, hj⟩
       exact (hij ((hx x).unique hi hj)).elim
 
-theorem isPullback_section {X S X' S' : Scheme.{u}} {a : X' ⟶ X} {q : X' ⟶ S'} {p : X ⟶ S}
-    {t : S' ⟶ S} (H : IsPullback a q p t) (σ : S ⟶ X) (hσ : σ ≫ p = 𝟙 S) :
-    IsPullback (H.lift (t ≫ σ) (𝟙 S') (by simp [hσ])) t a σ := by
+theorem isPullback_section
+    {X S X' S' : Scheme.{u}} {a : X' ⟶ X} {q : X' ⟶ S'} {p : X ⟶ S} {t : S' ⟶ S}
+    (H : IsPullback a q p t) (σ : S ⟶ X) (hσ : σ ≫ p = 𝟙 S)
+    : IsPullback (H.lift (t ≫ σ) (𝟙 S') (by simp [hσ])) t a σ := by
   refine IsPullback.of_right (h₁₂ := q) (v₁₃ := t) (h₂₂ := p) ?_ (by simp) H.flip
   rw [H.lift_snd, hσ]
   exact IsPullback.of_horiz_isIso ⟨by simp⟩
 
-theorem IsSplitOfRank.of_isPullback {X S X' S' : Scheme.{u}} {a : X' ⟶ X} {q : X' ⟶ S'}
-    {p : X ⟶ S} {t : S' ⟶ S} (H : IsPullback a q p t) {n : ℕ} (h : IsSplitOfRank p n) :
-    IsSplitOfRank q n := by
+theorem IsSplitOfRank.of_isPullback
+    {X S X' S' : Scheme.{u}} {a : X' ⟶ X} {q : X' ⟶ S'} {p : X ⟶ S} {t : S' ⟶ S}
+    (H : IsPullback a q p t)
+    {n : ℕ} (h : IsSplitOfRank p n)
+    : IsSplitOfRank q n := by
   rw [isSplitOfRank_iff] at h ⊢
   obtain ⟨s, hs, ho, hx⟩ := h
-  refine ⟨fun i ↦ H.lift (t ≫ s i) (𝟙 S') (by simp [hs]), fun i ↦ H.lift_snd _ _ _,
-    fun i ↦ MorphismProperty.of_isPullback (P := @IsOpenImmersion)
-      (isPullback_section H (s i) (hs i)).flip (ho i), fun x ↦ ?_⟩
+  refine ⟨
+    fun i ↦ H.lift (t ≫ s i) (𝟙 S') (by simp [hs]),
+    fun i ↦ H.lift_snd _ _ _,
+    fun i ↦
+      MorphismProperty.of_isPullback (P := @IsOpenImmersion)
+        (isPullback_section H (s i) (hs i)).flip (ho i),
+    fun x ↦ ?_
+  ⟩
   simp only [range_of_isPullback (isPullback_section H _ (hs _)), Set.mem_preimage]
   exact hx (a x)
 
-theorem IsSplitOfRank.pullback_snd {X S S' : Scheme.{u}} {p : X ⟶ S} {n : ℕ}
-    (h : IsSplitOfRank p n) (t : S' ⟶ S) : IsSplitOfRank (pullback.snd p t) n :=
+theorem IsSplitOfRank.pullback_snd
+    {X S S' : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p n) (t : S' ⟶ S)
+    : IsSplitOfRank (pullback.snd p t) n :=
   h.of_isPullback (IsPullback.of_hasPullback p t)
 
-theorem IsSplitOfRank.of_isPullback_of_isPullback {X S X' X'' S' : Scheme.{u}} {a : X' ⟶ X}
-    {q : X' ⟶ S'} {a' : X'' ⟶ X} {q' : X'' ⟶ S'} {p : X ⟶ S} {t : S' ⟶ S}
-    (H : IsPullback a q p t) (H' : IsPullback a' q' p t) {n : ℕ} (h : IsSplitOfRank q n) :
-    IsSplitOfRank q' n :=
+theorem IsSplitOfRank.of_isPullback_of_isPullback
+    {X S X' X'' S' : Scheme.{u}} {a : X' ⟶ X} {q : X' ⟶ S'} {a' : X'' ⟶ X} {q' : X'' ⟶ S'}
+    {p : X ⟶ S} {t : S' ⟶ S} (H : IsPullback a q p t) (H' : IsPullback a' q' p t)
+    {n : ℕ} (h : IsSplitOfRank q n)
+    : IsSplitOfRank q' n :=
   h.of_isPullback (a := (H'.isoIsPullback _ _ H).hom) (t := 𝟙 _)
     (IsPullback.of_horiz_isIso ⟨by simp⟩)
 
-theorem isSplitOfRank_zero_iff {X S : Scheme.{u}} (p : X ⟶ S) :
-    IsSplitOfRank p 0 ↔ IsEmpty X := by
+theorem isSplitOfRank_zero_iff {X S : Scheme.{u}} (p : X ⟶ S) : IsSplitOfRank p 0 ↔ IsEmpty X := by
   rw [isSplitOfRank_iff]
   constructor
   · rintro ⟨s, -, -, hx⟩
@@ -315,9 +347,12 @@ theorem isSplitOfRank_zero_iff {X S : Scheme.{u}} (p : X ⟶ S) :
   · intro h
     exact ⟨Fin.elim0, fun i ↦ i.elim0, fun i ↦ i.elim0, fun x ↦ h.elim x⟩
 
-theorem IsSplitOfRank.succ {X V S : Scheme.{u}} {p : X ⟶ S} (σ : S ⟶ X) (hσ : σ ≫ p = 𝟙 S)
-    [IsOpenImmersion σ] (j : V ⟶ X) [IsOpenImmersion j] (hj : Set.range j = (Set.range σ)ᶜ)
-    {n : ℕ} (h : IsSplitOfRank (j ≫ p) n) : IsSplitOfRank p (n + 1) := by
+theorem IsSplitOfRank.succ
+    {X V S : Scheme.{u}} {p : X ⟶ S} (σ : S ⟶ X) (hσ : σ ≫ p = 𝟙 S) [IsOpenImmersion σ]
+    (j : V ⟶ X) [IsOpenImmersion j]
+    (hj : Set.range j = (Set.range σ)ᶜ)
+    {n : ℕ} (h : IsSplitOfRank (j ≫ p) n)
+    : IsSplitOfRank p (n + 1) := by
   rw [isSplitOfRank_iff] at h ⊢
   obtain ⟨s, hs, ho, hx⟩ := h
   refine ⟨Fin.cons σ fun i ↦ s i ≫ j, fun i ↦ ?_, fun i ↦ ?_, fun x ↦ ?_⟩
@@ -348,17 +383,19 @@ theorem IsSplitOfRank.succ {X V S : Scheme.{u}} {p : X ⟶ S} (σ : S ⟶ X) (h�
 def complOpen {X S : Scheme.{u}} (σ : S ⟶ X) [IsClosedImmersion σ] : X.Opens :=
   ⟨(Set.range σ)ᶜ, σ.isClosedEmbedding.isClosed_range.isOpen_compl⟩
 
-theorem range_complOpen_ι {X S : Scheme.{u}} (σ : S ⟶ X) [IsClosedImmersion σ] :
-    Set.range (complOpen σ).ι = (Set.range σ)ᶜ := Scheme.Opens.range_ι _
+theorem range_complOpen_ι {X S : Scheme.{u}} (σ : S ⟶ X) [IsClosedImmersion σ]
+    : Set.range (complOpen σ).ι = (Set.range σ)ᶜ :=
+  Scheme.Opens.range_ι _
 
-instance {X S : Scheme.{u}} (σ : S ⟶ X) [IsClosedImmersion σ] [IsOpenImmersion σ] :
-    IsClosedImmersion (complOpen σ).ι := .of_isPreimmersion _ (by
-  rw [range_complOpen_ι, isClosed_compl_iff]; exact σ.isOpenEmbedding.isOpen_range)
+instance {X S : Scheme.{u}} (σ : S ⟶ X) [IsClosedImmersion σ] [IsOpenImmersion σ]
+    : IsClosedImmersion (complOpen σ).ι :=
+  .of_isPreimmersion _
+    (by rw [range_complOpen_ι, isClosed_compl_iff]; exact σ.isOpenEmbedding.isOpen_range)
 
-theorem IsSplitOfRank.exists_of_succ {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ}
-    (h : IsSplitOfRank p (n + 1)) :
-    ∃ (σ : S ⟶ X) (_ : IsOpenImmersion σ) (V : X.Opens), σ ≫ p = 𝟙 S ∧
-      Set.range V.ι = (Set.range σ)ᶜ ∧ IsSplitOfRank (V.ι ≫ p) n := by
+theorem IsSplitOfRank.exists_of_succ
+    {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p (n + 1))
+    : ∃ (σ : S ⟶ X) (_ : IsOpenImmersion σ) (V : X.Opens),
+      σ ≫ p = 𝟙 S ∧ Set.range V.ι = (Set.range σ)ᶜ ∧ IsSplitOfRank (V.ι ≫ p) n := by
   rw [isSplitOfRank_iff] at h
   obtain ⟨s, hs, ho, hx⟩ := h
   let V : X.Opens := ⨆ i : Fin n, (s i.succ).opensRange
@@ -379,14 +416,14 @@ theorem IsSplitOfRank.exists_of_succ {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ}
       · exact (h0 hi).elim
       · exact ⟨_, hi⟩
   rw [isSplitOfRank_iff]
-  refine ⟨fun i ↦ IsOpenImmersion.lift V.ι (s i.succ) (hle i), fun i ↦ ?_, fun i ↦ ?_,
-    fun v ↦ ?_⟩
+  refine ⟨fun i ↦ IsOpenImmersion.lift V.ι (s i.succ) (hle i), fun i ↦ ?_, fun i ↦ ?_, fun v ↦ ?_⟩
   · rw [← Category.assoc, hfac, hs]
   · have : IsOpenImmersion (IsOpenImmersion.lift V.ι (s i.succ) (hle i) ≫ V.ι) := by
       rw [hfac]; exact ho _
     exact IsOpenImmersion.of_comp _ V.ι
-  have key (i : Fin n) : v ∈ Set.range (IsOpenImmersion.lift V.ι (s i.succ) (hle i)) ↔
-      V.ι v ∈ Set.range (s i.succ) := by
+  have key (i : Fin n)
+      : v ∈ Set.range (IsOpenImmersion.lift V.ι (s i.succ) (hle i))
+        ↔ V.ι v ∈ Set.range (s i.succ) := by
     constructor
     · rintro ⟨y, rfl⟩
       exact ⟨y, by rw [← Scheme.Hom.comp_apply, hfac]⟩
@@ -397,8 +434,8 @@ theorem IsSplitOfRank.exists_of_succ {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ}
   obtain ⟨i, hi⟩ := (hV _).mp ⟨v, rfl⟩
   exact ⟨i, hi, fun j hj ↦ Fin.succ_injective _ ((hx _).unique hj hi)⟩
 
-theorem IsSplitOfRank.etale {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p n) :
-    Etale p := by
+theorem IsSplitOfRank.etale {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p n)
+    : Etale p := by
   obtain ⟨e, he⟩ := (isSplitOfRank_iff_exists_iso p n).mp h
   have : IsZariskiLocalAtSource @Etale := HasRingHomProperty.instIsZariskiLocalAtSource
   have : Etale (Sigma.desc fun _ : Fin n ↦ 𝟙 S) :=
@@ -406,8 +443,8 @@ theorem IsSplitOfRank.etale {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSp
   rw [← e.inv_hom_id_assoc p, he]
   infer_instance
 
-theorem IsSplitOfRank.isFinite {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p n) :
-    IsFinite p := by
+theorem IsSplitOfRank.isFinite {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p n)
+    : IsFinite p := by
   induction n generalizing X with
   | zero =>
     have := (isSplitOfRank_zero_iff p).mp h
@@ -416,13 +453,13 @@ theorem IsSplitOfRank.isFinite {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : I
     obtain ⟨σ, _, V, hσ, hV, h'⟩ := h.exists_of_succ
     have := ih h'
     have := isIso_coprodDesc σ V.ι hV
-    have e : coprod.desc σ V.ι ≫ p = coprod.desc (𝟙 S) (V.ι ≫ p) := by
-      rw [coprod.desc_comp, hσ]
+    have e : coprod.desc σ V.ι ≫ p = coprod.desc (𝟙 S) (V.ι ≫ p) := by rw [coprod.desc_comp, hσ]
     rw [← IsIso.inv_hom_id_assoc (coprod.desc σ V.ι) p, e]
     infer_instance
 
-theorem IsSplitOfRank.finrank_eq {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p n)
-    (s : S) : p.finrank s = n := by
+theorem IsSplitOfRank.finrank_eq
+    {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h : IsSplitOfRank p n) (s : S)
+    : p.finrank s = n := by
   have := h.isFinite
   have := h.etale
   induction n generalizing X with
@@ -436,14 +473,24 @@ theorem IsSplitOfRank.finrank_eq {X S : Scheme.{u}} {p : X ⟶ S} {n : ℕ} (h :
     rw [finrank_eq_add σ V.ι hV p s, hσ, Scheme.Hom.finrank_eq_one_of_isIso (𝟙 S),
       ih h' h'.isFinite h'.etale, Pi.one_apply, add_comm]
 
-theorem exists_isPullback_isSplitOfRank (n : ℕ) {X S : Scheme.{u}} (p : X ⟶ S) [IsFinite p]
-    [Etale p] (hn : ∀ s, p.finrank s = n) :
-    ∃ (S' X' : Scheme.{u}) (t : S' ⟶ S) (a : X' ⟶ X) (q : X' ⟶ S'),
+theorem exists_isPullback_isSplitOfRank
+    (n : ℕ) {X S : Scheme.{u}} (p : X ⟶ S) [IsFinite p] [Etale p] (hn : ∀ s, p.finrank s = n)
+    : ∃ (S' X' : Scheme.{u}) (t : S' ⟶ S) (a : X' ⟶ X) (q : X' ⟶ S'),
       IsFinite t ∧ Etale t ∧ Surjective t ∧ IsPullback a q p t ∧ IsSplitOfRank q n := by
   induction n generalizing X S with
   | zero =>
-    refine ⟨S, X, 𝟙 S, 𝟙 X, p, inferInstance, inferInstance, inferInstance,
-      IsPullback.of_horiz_isIso ⟨by simp⟩, (isSplitOfRank_zero_iff p).mpr ⟨fun x ↦ ?_⟩⟩
+    refine ⟨
+      S,
+      X,
+      𝟙 S,
+      𝟙 X,
+      p,
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      IsPullback.of_horiz_isIso ⟨by simp⟩,
+      (isSplitOfRank_zero_iff p).mpr ⟨fun x ↦ ?_⟩
+    ⟩
     have := p.one_le_finrank_map x
     rw [hn] at this
     omega
@@ -451,33 +498,44 @@ theorem exists_isPullback_isSplitOfRank (n : ℕ) {X S : Scheme.{u}} (p : X ⟶ 
     have hp : Surjective p := p.one_le_finrank_iff_surjective.mp fun s ↦ by simp [hn]
     let σ := pullback.diagonal p
     have hσ : σ ≫ pullback.snd p p = 𝟙 X := pullback.diagonal_snd p
-    obtain ⟨S', X', t, a, q, h1, h2, h3, H, hq⟩ := ih ((complOpen σ).ι ≫ pullback.snd p p)
-      fun x ↦ by
+    obtain ⟨S', X', t, a, q, h1, h2, h3, H, hq⟩ :=
+      ih ((complOpen σ).ι ≫ pullback.snd p p) fun x ↦ by
         have := finrank_eq_add σ (complOpen σ).ι (range_complOpen_ι σ) (pullback.snd p p) x
         rw [hσ, Scheme.Hom.finrank_eq_one_of_isIso (𝟙 X), Scheme.Hom.finrank_pullback_snd, hn,
-          Pi.one_apply] at this
+            Pi.one_apply]
+          at this
         omega
     have G := IsPullback.of_hasPullback (pullback.snd p p) t
     have Gσ := isPullback_section G σ hσ
     have Gj := IsPullback.of_hasPullback (complOpen σ).ι (pullback.fst (pullback.snd p p) t)
-    refine ⟨S', _, t ≫ p, _, _, inferInstance, inferInstance, inferInstance,
-      G.paste_horiz (IsPullback.of_hasPullback p p), ?_⟩
+    refine ⟨
+      S',
+      _,
+      t ≫ p,
+      _,
+      _,
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      G.paste_horiz (IsPullback.of_hasPullback p p),
+      ?_
+    ⟩
     have := MorphismProperty.of_isPullback (P := @IsOpenImmersion) Gσ.flip inferInstance
     refine IsSplitOfRank.succ (G.lift (t ≫ σ) (𝟙 _) _) (G.lift_snd _ _ _)
-      (pullback.snd (complOpen σ).ι _) ?_
-      (hq.of_isPullback_of_isPullback H (Gj.paste_vert G))
+      (pullback.snd (complOpen σ).ι _) ?_ (hq.of_isPullback_of_isPullback H (Gj.paste_vert G))
     rw [Scheme.Pullback.range_snd, range_of_isPullback Gσ, range_complOpen_ι, Set.preimage_compl]
 
-theorem exists_isSplitOfRank_pullback {X S : Scheme.{u}} (p : X ⟶ S) [IsFinite p] [Etale p]
-    {n : ℕ} (hn : ∀ s, p.finrank s = n) :
-    ∃ (S' : Scheme.{u}) (t : S' ⟶ S), IsFinite t ∧ Etale t ∧ Surjective t ∧
-      IsSplitOfRank (pullback.snd p t) n := by
+theorem exists_isSplitOfRank_pullback
+    {X S : Scheme.{u}} (p : X ⟶ S) [IsFinite p] [Etale p] {n : ℕ} (hn : ∀ s, p.finrank s = n)
+    : ∃ (S' : Scheme.{u}) (t : S' ⟶ S),
+      IsFinite t ∧ Etale t ∧ Surjective t ∧ IsSplitOfRank (pullback.snd p t) n := by
   obtain ⟨S', X', t, a, q, h1, h2, h3, H, hq⟩ := exists_isPullback_isSplitOfRank n p hn
   exact ⟨S', t, h1, h2, h3, hq.of_isPullback_of_isPullback H (IsPullback.of_hasPullback p t)⟩
 
-theorem exists_section_of_isSepClosed {k : Type u} [Field k] [IsSepClosed k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (.of k)) [IsFinite p] [Etale p] [Nonempty X] :
-    ∃ σ : Spec (.of k) ⟶ X, σ ≫ p = 𝟙 _ := by
+theorem exists_section_of_isSepClosed
+    {k : Type u} [Field k] [IsSepClosed k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (.of k)) [IsFinite p] [Etale p] [Nonempty X]
+    : ∃ σ : Spec (.of k) ⟶ X, σ ≫ p = 𝟙 _ := by
   wlog hX : ∃ A, X = Spec A generalizing X
   · have _ : IsAffine X := isAffine_of_isAffineHom p
     have _ : Nonempty (Spec Γ(X, ⊤)) := ⟨X.isoSpec.hom (Classical.arbitrary X)⟩
@@ -496,34 +554,40 @@ theorem exists_section_of_isSepClosed {k : Type u} [Field k] [IsSepClosed k] {X 
   ext a
   exact ψ.commutes a
 
-theorem isSplitOfRank_of_isSepClosed {k : Type u} [Field k] [IsSepClosed k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (.of k)) [IsFinite p] [Etale p] (s : Spec (.of k)) :
-    IsSplitOfRank p (p.finrank s) := by
-  obtain ⟨S', X', t, a, q, h1, h2, h3, H, hq⟩ := exists_isPullback_isSplitOfRank (p.finrank s) p
-    fun s' ↦ by rw [Subsingleton.elim s' s]
+theorem isSplitOfRank_of_isSepClosed
+    {k : Type u} [Field k] [IsSepClosed k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (.of k)) [IsFinite p] [Etale p]
+    (s : Spec (.of k))
+    : IsSplitOfRank p (p.finrank s) := by
+  obtain ⟨S', X', t, a, q, h1, h2, h3, H, hq⟩ :=
+    exists_isPullback_isSplitOfRank (p.finrank s) p fun s' ↦ by rw [Subsingleton.elim s' s]
   have : Nonempty S' := ⟨(t.surjective s).choose⟩
   obtain ⟨σ, hσ⟩ := exists_section_of_isSepClosed t
   have G := (IsPullback.of_hasPullback q σ).paste_horiz H
   rw [hσ] at G
   exact (hq.pullback_snd σ).of_isPullback_of_isPullback G IsPullback.of_id_fst
 
-theorem exists_iso_sigma_of_isSepClosed {k : Type u} [Field k] [IsSepClosed k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (.of k)) [IsFinite p] [Etale p] :
-    ∃ (n : ℕ) (e : (∐ fun _ : Fin n ↦ Spec (.of k)) ≅ X),
+theorem exists_iso_sigma_of_isSepClosed
+    {k : Type u} [Field k] [IsSepClosed k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (.of k)) [IsFinite p] [Etale p]
+    : ∃ (n : ℕ) (e : (∐ fun _ : Fin n ↦ Spec (.of k)) ≅ X),
       e.hom ≫ p = Sigma.desc fun _ : Fin n ↦ 𝟙 (Spec (.of k)) := by
   obtain ⟨s⟩ : Nonempty (Spec (.of k)) := inferInstance
   exact ⟨_, (isSplitOfRank_iff_exists_iso p _).mp (isSplitOfRank_of_isSepClosed p s)⟩
 
-theorem card_points_eq_finrank {X S : Scheme.{u}} (p : X ⟶ S) [IsFinite p] [Etale p]
-    {k : Type u} [Field k] [IsSepClosed k] (t : Spec (.of k) ⟶ S) (z : Spec (.of k)) :
-    Finite {x : Spec (.of k) ⟶ X // x ≫ p = t} ∧
-      Nat.card {x : Spec (.of k) ⟶ X // x ≫ p = t} = p.finrank (t z) := by
+theorem card_points_eq_finrank
+    {X S : Scheme.{u}} (p : X ⟶ S) [IsFinite p] [Etale p]
+    {k : Type u} [Field k] [IsSepClosed k]
+    (t : Spec (.of k) ⟶ S) (z : Spec (.of k))
+    : Finite {x : Spec (.of k) ⟶ X // x ≫ p = t}
+      ∧ Nat.card {x : Spec (.of k) ⟶ X // x ≫ p = t} = p.finrank (t z) := by
   obtain ⟨s, hs, ho, hx⟩ :=
     (isSplitOfRank_iff _ _).mp (isSplitOfRank_of_isSepClosed (pullback.snd p t) z)
   rw [← Scheme.Hom.finrank_pullback_snd]
-  let F : Fin ((pullback.snd p t).finrank z) → {x : Spec (.of k) ⟶ X // x ≫ p = t} :=
-    fun i ↦ ⟨s i ≫ pullback.fst p t, by
-      rw [Category.assoc, pullback.condition, ← Category.assoc, hs, Category.id_comp]⟩
+  let F : Fin ((pullback.snd p t).finrank z) → {x : Spec (.of k) ⟶ X // x ≫ p = t} := fun i ↦ ⟨
+    s i ≫ pullback.fst p t,
+    by rw [Category.assoc, pullback.condition, ← Category.assoc, hs, Category.id_comp]
+  ⟩
   have hF : Function.Bijective F := by
     constructor
     · intro i j hij

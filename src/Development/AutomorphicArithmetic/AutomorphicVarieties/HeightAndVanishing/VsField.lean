@@ -9,26 +9,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CMFieldExpo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem idx_le (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N] (ψ : DirichletCharacter O N) :
-    ψ.toUnitHom.ker.index ≤ orderOf ψ := by
+private theorem idx_le
+    (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N] (ψ : DirichletCharacter O N)
+    : ψ.toUnitHom.ker.index ≤ orderOf ψ := by
   have hpos := MulChar.orderOf_pos ψ
   haveI : NeZero (orderOf ψ) := ⟨hpos.ne'⟩
   rw [Subgroup.index_ker]
-  calc Nat.card ψ.toUnitHom.range ≤ Nat.card (rootsOfUnity (orderOf ψ) O) := by
-        apply Subgroup.card_le_of_le
-        rintro _ ⟨u, rfl⟩
-        rw [mem_rootsOfUnity]
-        ext
-        rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, ← MulChar.pow_apply' ψ hpos.ne',
-          pow_orderOf_eq_one, MulChar.one_apply_coe, Units.val_one]
+  calc
+    Nat.card ψ.toUnitHom.range ≤ Nat.card (rootsOfUnity (orderOf ψ) O) := by
+      apply Subgroup.card_le_of_le
+      rintro _ ⟨u, rfl⟩
+      rw [mem_rootsOfUnity]
+      ext
+      rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, ← MulChar.pow_apply' ψ hpos.ne',
+        pow_orderOf_eq_one, MulChar.one_apply_coe, Units.val_one]
     _ ≤ orderOf ψ := card_rootsOfUnity O _
 
-theorem UpperTheory.V.HV.vsField :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N] (ψ : DirichletCharacter O N),
-      ∃ (L : Type) (_ : Field L) (_ : NumberField L) (_ : Algebra L Ω) (_ : IsAlgClosure L Ω) (_ : IsAbelianGalois ℚ L), HasMuQ l L ∧
-        Module.finrank ℚ L ≤ orderOf ψ * l ∧ Nonempty (L →ₐ[ℚ] CyclotomicField (l * N) ℚ) ∧ galOf ℚ L Ω ≤ (Chr.dirG ℚ Ω ψ).ker := by
+theorem UpperTheory.V.HV.vsField
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime],
+      l ≠ 2
+        → ∀ (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N] (ψ : DirichletCharacter O N),
+          ∃ (L : Type) (_ : Field L) (_ : NumberField L) (_ : Algebra L Ω) (_ : IsAlgClosure L Ω)
+              (_ : IsAbelianGalois ℚ L),
+            HasMuQ l L ∧ Module.finrank ℚ L ≤ orderOf ψ * l
+              ∧ Nonempty (L →ₐ[ℚ] CyclotomicField (l * N) ℚ)
+              ∧ galOf ℚ L Ω ≤ (Chr.dirG ℚ Ω ψ).ker := by
   intro Ω _ _ _ l hl hl2 O _ _ N _ ψ
   have hlp : l.Prime := hl.out
   haveI : NeZero l := ⟨hlp.ne_zero⟩
@@ -44,8 +52,7 @@ theorem UpperTheory.V.HV.vsField :
   haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
   let f : L →ₐ[ℚ] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   letI : Algebra L Ω := f.toRingHom.toAlgebra
   haveI : IsScalarTower ℚ L Ω := inferInstance
@@ -94,7 +101,8 @@ theorem UpperTheory.V.HV.vsField :
     have hη : IsPrimitiveRoot (ζ ^ (N' / (l * N))) (l * N) := by
       have := hζ.pow_of_dvd hdpos (Nat.div_dvd_of_dvd hmN')
       rwa [Nat.div_div_self hmN' (NeZero.ne N')] at this
-    let F : IntermediateField ℚ (CyclotomicField N' ℚ) := IntermediateField.adjoin ℚ {ζ ^ (N' / (l * N))}
+    let F : IntermediateField ℚ (CyclotomicField N' ℚ) :=
+      IntermediateField.adjoin ℚ {ζ ^ (N' / (l * N))}
     haveI : IsCyclotomicExtension {l * N} ℚ F := hη.intermediateField_adjoin_isCyclotomicExtension ℚ
     have hmem : ∀ x, j x ∈ F := by
       intro x
@@ -104,10 +112,12 @@ theorem UpperTheory.V.HV.vsField :
         (IntermediateField.mem_fixingSubgroup_iff F τ).mp hτ _
           (IntermediateField.mem_adjoin_simple_self ℚ _)
       have hτζ : τ ζ = ζ ^ ((hζ.autToPow ℚ τ : ZMod N')).val := (hζ.autToPow_spec ℚ τ).symm
-      have hpow : (ζ ^ (N' / (l * N))) ^ ((hζ.autToPow ℚ τ : ZMod N')).val = ζ ^ (N' / (l * N)) := by
-        calc (ζ ^ (N' / (l * N))) ^ ((hζ.autToPow ℚ τ : ZMod N')).val
-            = (ζ ^ ((hζ.autToPow ℚ τ : ZMod N')).val) ^ (N' / (l * N)) := by
-              rw [← pow_mul, ← pow_mul, mul_comm]
+      have hpow
+          : (ζ ^ (N' / (l * N))) ^ ((hζ.autToPow ℚ τ : ZMod N')).val = ζ ^ (N' / (l * N)) := by
+        calc
+          (ζ ^ (N' / (l * N))) ^ ((hζ.autToPow ℚ τ : ZMod N')).val
+              = (ζ ^ ((hζ.autToPow ℚ τ : ZMod N')).val) ^ (N' / (l * N)) := by
+            rw [← pow_mul, ← pow_mul, mul_comm]
           _ = (τ ζ) ^ (N' / (l * N)) := by rw [hτζ]
           _ = τ (ζ ^ (N' / (l * N))) := (map_pow τ ζ _).symm
           _ = ζ ^ (N' / (l * N)) := hτη

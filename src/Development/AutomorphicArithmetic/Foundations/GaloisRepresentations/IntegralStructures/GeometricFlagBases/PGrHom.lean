@@ -5,17 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-theorem UpperTheory.Gal.Int.Geo.grHom_of :
-    GrHom := by
+theorem UpperTheory.Gal.Int.Geo.grHom_of : GrHom := by
   intro Γ k _ _ d ρ₀ c hinv
-  have mem : ∀ (i : ℕ) (v : Fin d → k), v ∈ low k c i ↔ ∀ j, i ≤ c j → v j = 0 :=
-    fun _ _ => Iff.rfl
+  have mem : ∀ (i : ℕ) (v : Fin d → k), v ∈ low k c i ↔ ∀ j, i ≤ c j → v j = 0 := fun _ _ => Iff.rfl
   have hbt : ∀ g, (ρ₀ g : Matrix (Fin d) (Fin d) k).BlockTriangular c := by
     intro g i j hij
     have hv : (Pi.single j (1 : k) : Fin d → k) ∈ low k c (c j + 1) := by
@@ -27,11 +27,12 @@ theorem UpperTheory.Gal.Int.Geo.grHom_of :
       · simp [Pi.single_apply, h]
     have hw := (mem _ _).1 (hinv (c j + 1) g _ hv) i (by omega)
     simpa [Matrix.mulVec, dotProduct, Pi.single_apply] using hw
-  let D : Matrix (Fin d) (Fin d) k → Matrix (Fin d) (Fin d) k :=
-    fun M => Matrix.of fun i j => if c i = c j then M i j else 0
+  let D : Matrix (Fin d) (Fin d) k → Matrix (Fin d) (Fin d) k := fun M =>
+    Matrix.of fun i j => if c i = c j then M i j else 0
   have hD : ∀ M i j, D M i j = if c i = c j then M i j else 0 := fun _ _ _ => rfl
-  have hmul : ∀ M N : Matrix (Fin d) (Fin d) k, M.BlockTriangular c → N.BlockTriangular c →
-      D (M * N) = D M * D N := by
+  have hmul
+      : ∀ M N : Matrix (Fin d) (Fin d) k,
+        M.BlockTriangular c → N.BlockTriangular c → D (M * N) = D M * D N := by
     intro M N hM hN
     ext i j
     simp only [hD, Matrix.mul_apply]
@@ -55,7 +56,10 @@ theorem UpperTheory.Gal.Int.Geo.grHom_of :
   have hunit : ∀ g h : Γ, D (ρ₀ g) * D (ρ₀ h) = D (ρ₀ (g * h)) := by
     intro g h
     rw [← hmul _ _ (hbt g) (hbt h), map_mul, Units.val_mul]
-  refine ⟨hbt, ⟨{ toFun := fun g => ⟨D (ρ₀ g), D (ρ₀ g⁻¹), ?_, ?_⟩, map_one' := ?_, map_mul' := ?_ }, ?_⟩⟩
+  refine ⟨
+    hbt,
+    ⟨{ toFun := fun g => ⟨D (ρ₀ g), D (ρ₀ g⁻¹), ?_, ?_⟩, map_one' := ?_, map_mul' := ?_ }, ?_⟩
+  ⟩
   · rw [hunit, mul_inv_cancel, map_one, Units.val_one, hone]
   · rw [hunit, inv_mul_cancel, map_one, Units.val_one, hone]
   · apply Units.ext

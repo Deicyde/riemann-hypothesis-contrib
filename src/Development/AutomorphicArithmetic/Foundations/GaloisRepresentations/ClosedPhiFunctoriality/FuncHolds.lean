@@ -9,7 +9,9 @@ noncomputable section
 
 namespace UpperTheory.Gal.ClosedPhiFromClosedTrace
 
-open Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N GlobalTheory.Per
+open Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N
+  GlobalTheory.Per
 
 theorem func_holds : IntBasis → Func := by
   intro hB l _ F I _ x z hx hz
@@ -34,14 +36,15 @@ theorem func_holds : IntBasis → Func := by
     rw [Finset.not_nonempty_iff_eq_empty] at hne
     apply hz0
     rw [← hyz, hc2, hne, Finset.sum_empty]
-  obtain ⟨j₀, -, hj₀⟩ := Finset.exists_max_image Finset.univ
-    (fun j => ‖((c (eqv none) j : ↥F) : Om l)‖) hm
+  obtain ⟨j₀, -, hj₀⟩ :=
+    Finset.exists_max_image Finset.univ (fun j => ‖((c (eqv none) j : ↥F) : Om l)‖) hm
   let f : (Fin m → ↥F) →ₗ[↥F] Om l := Fintype.linearCombination ↥F e
   have hker : LinearMap.ker f = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro a ha
     funext j
-    exact Fintype.linearIndependent_iff.1 hli a (by simpa [f, Fintype.linearCombination_apply] using ha) j
+    exact Fintype.linearIndependent_iff.1 hli a
+      (by simpa [f, Fintype.linearCombination_apply] using ha) j
   obtain ⟨G, hG⟩ := LinearMap.exists_leftInverse_of_injective f hker
   let lam : Om l →ₗ[↥F] ↥F := LinearMap.proj j₀ ∘ₗ G
   have key : ∀ a : Fin m → ↥F, lam (∑ j, (a j : Om l) * e j) = a j₀ := by
@@ -54,8 +57,7 @@ theorem func_holds : IntBasis → Func := by
       simpa using this
     rw [h1]
     simp only [lam, LinearMap.comp_apply, h2, LinearMap.proj_apply]
-  have hlz : lam z = c (eqv none) j₀ := by
-    rw [← hyz, hc2, key]
+  have hlz : lam z = c (eqv none) j₀ := by rw [← hyz, hc2, key]
   refine ⟨lam, ?_, ?_, ?_⟩
   · intro i
     rw [← hyx i, hc2, key]
@@ -65,9 +67,9 @@ theorem func_holds : IntBasis → Func := by
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) ?_
     intro j _
     rw [norm_mul]
-    calc ‖((c (eqv none) j : ↥F) : Om l)‖ * ‖e j‖
-        ≤ ‖((c (eqv none) j : ↥F) : Om l)‖ * 1 :=
-          mul_le_mul_of_nonneg_left (he j) (norm_nonneg _)
+    calc
+      ‖((c (eqv none) j : ↥F) : Om l)‖ * ‖e j‖
+        ≤ ‖((c (eqv none) j : ↥F) : Om l)‖ * 1 := mul_le_mul_of_nonneg_left (he j) (norm_nonneg _)
       _ = ‖((c (eqv none) j : ↥F) : Om l)‖ := mul_one _
       _ ≤ _ := hj₀ j (Finset.mem_univ j)
   · rw [hlz]

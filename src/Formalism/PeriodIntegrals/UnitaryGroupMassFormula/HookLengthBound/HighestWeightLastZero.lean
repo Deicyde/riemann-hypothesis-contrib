@@ -17,24 +17,28 @@ theorem highest_weight_det_mul : HwDetMul := by
   | succ n =>
     simp only [hw]
     rw [Fin.prod_univ_castSucc, Fin.prod_univ_castSucc]
-    have hlast : ∀ μ : Fin (n + 1) → ℕ, nuNext μ (Fin.last n) = 0 := by
-      intro μ; simp [nuNext]
-    have hcs : ∀ s : Fin n, (ν s.castSucc + 1) - nuNext (fun i => ν i + 1) s.castSucc =
-        ν s.castSucc - nuNext ν s.castSucc := by
+    have hlast : ∀ μ : Fin (n + 1) → ℕ, nuNext μ (Fin.last n) = 0 := by intro μ; simp [nuNext]
+    have hcs
+        : ∀ s : Fin n,
+          (ν s.castSucc + 1) - nuNext (fun i => ν i + 1) s.castSucc
+            = ν s.castSucc - nuNext ν s.castSucc := by
       intro s
       have hs := s.isLt
       simp only [nuNext, Fin.val_castSucc]
-      rw [dite_eq_left (show (s : ℕ) + 1 < n + 1 by omega), dite_eq_left (show (s : ℕ) + 1 < n + 1 by omega)]
+      rw [dite_eq_left (show (s : ℕ) + 1 < n + 1 by omega),
+        dite_eq_left (show (s : ℕ) + 1 < n + 1 by omega)]
       omega
     simp only [hlast, hcs, Nat.sub_zero]
-    have hL : lpMinor ℚ ((Fin.last n : ℕ) + 1) (r := n + 1) (n := n + 1) (by simp) (by simp) =
-        detX (n + 1) := rfl
+    have hL
+        : lpMinor ℚ ((Fin.last n : ℕ) + 1) (r := n + 1) (n := n + 1) (by simp) (by simp)
+          = detX (n + 1) :=
+      rfl
     rw [hL, pow_succ]
     ring
 
-theorem lpMinor_rename (n s : ℕ) (h1 h2 : s ≤ n) (h3 h4 : s ≤ n + 1) :
-    rename (fun v : Fin n × Fin n => (Fin.castSucc v.1, Fin.castSucc v.2)) (lpMinor ℚ s h1 h2) =
-      lpMinor ℚ s h3 h4 := by
+theorem lpMinor_rename (n s : ℕ) (h1 h2 : s ≤ n) (h3 h4 : s ≤ n + 1)
+    : rename (fun v : Fin n × Fin n => (Fin.castSucc v.1, Fin.castSucc v.2)) (lpMinor ℚ s h1 h2)
+      = lpMinor ℚ s h3 h4 := by
   unfold lpMinor
   rw [AlgHom.map_det]
   congr 1
@@ -64,7 +68,8 @@ theorem rename_isomorphism : RenameIso := by
   intro σ τ φ hφ f g
   classical
   unfold fockQ
-  rw [support_rename_of_injective hφ, Finset.sum_image (fun a _ b _ h => Finsupp.mapDomain_injective hφ h)]
+  rw [support_rename_of_injective hφ,
+    Finset.sum_image (fun a _ b _ h => Finsupp.mapDomain_injective hφ h)]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [coeff_rename_mapDomain φ hφ, coeff_rename_mapDomain φ hφ]
   congr 2

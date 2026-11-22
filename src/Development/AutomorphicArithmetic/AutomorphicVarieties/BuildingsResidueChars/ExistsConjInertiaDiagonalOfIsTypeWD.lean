@@ -5,15 +5,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi
+  UpperTheory.V.Hi.CaseU
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterminantRing Pair)
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 set_option synthInstance.maxHeartbeats 200000
 
-theorem UpperTheory.exists_conj_inertia_diagonal_of_isTypeWD :
-    ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (ι : Qbar l ≃+* ℂ) (n : ℕ) (A : ValuationSubring Ω) (w : Plc L) (h : IsPlaceOver A w), ((l : ℕ) : 𝓞 L) ∉ w.asIdeal → ∀ (r : G L Ω →* GL (Fin n) (Qbar l)) (χ : Fin n → Ine (F := L) A →* (Qbar l)ˣ) (x : WD h), IsWDOf ι r x → IsTypeWD h (fun i => W.pushCh ι.toRingHom (χ i)) x → ∃ g : GL (Fin n) (Qbar l), ∀ t : Ine (F := L) A, ((g * r t * g⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) = Matrix.diagonal fun i => (χ i t : Qbar l) := by
+theorem UpperTheory.exists_conj_inertia_diagonal_of_isTypeWD
+    : ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω]
+        [IsAlgClosure L Ω] (ι : Qbar l ≃+* ℂ) (n : ℕ) (A : ValuationSubring Ω) (w : Plc L)
+        (h : IsPlaceOver A w),
+      ((l : ℕ) : 𝓞 L) ∉ w.asIdeal
+        → ∀ (r : G L Ω →* GL (Fin n) (Qbar l)) (χ : Fin n → Ine (F := L) A →* (Qbar l)ˣ) (x : WD h),
+          IsWDOf ι r x → IsTypeWD h (fun i => W.pushCh ι.toRingHom (χ i)) x
+            → ∃ g : GL (Fin n) (Qbar l), ∀ t : Ine (F := L) A,
+              ((g * r t * g⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l))
+                = Matrix.diagonal fun i => (χ i t : Qbar l) := by
   intro l _ L Ω _ _ _ _ _ ι n A w h _hl r χ x hWD hType
   classical
   obtain ⟨t, _ht, φ, hφ, N, a, hMon, hFS, hax⟩ := hWD
@@ -22,8 +34,8 @@ theorem UpperTheory.exists_conj_inertia_diagonal_of_isTypeWD :
   obtain ⟨e, he1, he2⟩ := hiso
   obtain ⟨_hNnil, U, hUo, hU⟩ := hMon
   obtain ⟨haN, hFS⟩ := hFS
-  have htoEnd : ∀ X : Matrix (Fin n) (Fin n) (Qbar l),
-      toEndC ι X = Matrix.toLin' (X.map ι) := fun X => rfl
+  have htoEnd : ∀ X : Matrix (Fin n) (Fin n) (Qbar l), toEndC ι X = Matrix.toLin' (X.map ι) :=
+    fun X => rfl
   have haN0 : a.N = 0 := by
     apply LinearMap.ext
     intro v
@@ -63,8 +75,10 @@ theorem UpperTheory.exists_conj_inertia_diagonal_of_isTypeWD :
     rcases lt_or_gt_of_ne hij with hlt | hlt
     · exact ⟨j - i, Nat.sub_pos_of_lt hlt, key i j hlt hfij⟩
     · exact ⟨i - j, Nat.sub_pos_of_lt hlt, key j i hlt hfij.symm⟩
-  have hrs : ∀ s : Ine (F := L) A,
-      Matrix.toLin' ((r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)).map ι) = a.ρ (ineIncl h s) := by
+  have hrs
+      : ∀ s : Ine (F := L) A,
+        Matrix.toLin' ((r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)).map ι)
+          = a.ρ (ineIncl h s) := by
     intro s
     obtain ⟨m, hm, hsm⟩ := hpow s
     have hrm : (r (s : G L Ω)) ^ m = 1 := by
@@ -93,38 +107,45 @@ theorem UpperTheory.exists_conj_inertia_diagonal_of_isTypeWD :
   let Pi : Matrix (Fin n) (Fin n) ℂ := LinearMap.toMatrix' (e.symm : Module.End ℂ (Fin n → ℂ))
   have hPPi : P * Pi = 1 := by
     rw [← LinearMap.toMatrix'_comp]
-    rw [show (e : Module.End ℂ (Fin n → ℂ)).comp (e.symm : Module.End ℂ (Fin n → ℂ)) = LinearMap.id from
+    rw [show (e : Module.End ℂ (Fin n → ℂ)).comp (e.symm : Module.End ℂ (Fin n → ℂ))
+        = LinearMap.id from
       LinearMap.ext fun v => by simp]
     exact LinearMap.toMatrix'_id
   have hPiP : Pi * P = 1 := by
     rw [← LinearMap.toMatrix'_comp]
-    rw [show (e.symm : Module.End ℂ (Fin n → ℂ)).comp (e : Module.End ℂ (Fin n → ℂ)) = LinearMap.id from
+    rw [show (e.symm : Module.End ℂ (Fin n → ℂ)).comp (e : Module.End ℂ (Fin n → ℂ))
+        = LinearMap.id from
       LinearMap.ext fun v => by simp]
     exact LinearMap.toMatrix'_id
   let Φ := ι.symm.toRingHom.mapMatrix (m := Fin n)
   let g : GL (Fin n) (Qbar l) :=
     ⟨Φ P, Φ Pi, by rw [← map_mul, hPPi, map_one], by rw [← map_mul, hPiP, map_one]⟩
   refine ⟨g, fun s => ?_⟩
-  have hA : a.ρ (ineIncl h s) = (e.symm : Module.End ℂ (Fin n → ℂ)).comp
-      ((b.ρ (ineIncl h s)).comp (e : Module.End ℂ (Fin n → ℂ))) := by
+  have hA
+      : a.ρ (ineIncl h s)
+        = (e.symm : Module.End ℂ (Fin n → ℂ)).comp
+          ((b.ρ (ineIncl h s)).comp (e : Module.End ℂ (Fin n → ℂ))) := by
     apply LinearMap.ext
     intro v
     simp [← he1]
-  have hR : (r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)).map ι =
-      Pi * Matrix.diagonal (fun i => ι (χ i s : Qbar l)) * P := by
+  have hR
+      : (r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)).map ι
+        = Pi * Matrix.diagonal (fun i => ι (χ i s : Qbar l)) * P := by
     have h1 := congrArg LinearMap.toMatrix' (hrs s)
     rw [LinearMap.toMatrix'_toLin', hA, LinearMap.toMatrix'_comp, LinearMap.toMatrix'_comp, hbρ s,
-      LinearMap.toMatrix'_toLin', ← mul_assoc] at h1
+        LinearMap.toMatrix'_toLin', ← mul_assoc]
+      at h1
     rw [h1]
     rfl
-  have hback : (r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)) =
-      Φ ((r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)).map ι) := by
+  have hback
+      : (r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l))
+        = Φ ((r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)).map ι) := by
     ext i j
     simp [Φ]
   show Φ P * (r (s : G L Ω) : Matrix (Fin n) (Fin n) (Qbar l)) * Φ Pi = _
   rw [hback, hR, ← map_mul, ← map_mul]
-  rw [show P * (Pi * Matrix.diagonal (fun i => ι (χ i s : Qbar l)) * P) * Pi =
-      Matrix.diagonal (fun i => ι (χ i s : Qbar l)) by
+  rw [show P * (Pi * Matrix.diagonal (fun i => ι (χ i s : Qbar l)) * P) * Pi
+      = Matrix.diagonal (fun i => ι (χ i s : Qbar l)) by
     rw [← mul_assoc, ← mul_assoc, hPPi, one_mul, mul_assoc, hPPi, mul_one]]
   ext i j
   by_cases hij : i = j

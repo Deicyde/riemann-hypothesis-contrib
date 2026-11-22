@@ -8,21 +8,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinrankHopfA
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 namespace GlobalTheory.Dieu
 
-theorem surjective_iff_finrank_quot_kerIdeal_eq_one :
-    ∀ (k : Type) [Field k] (A : Type) [CommRing A] [HopfAlgebra k A] [IsCocomm k A]
-      [Module.Finite k A] (C : Type) [CommRing C] [HopfAlgebra k C] [IsCocomm k C]
-      [Module.Finite k C] (f : C →ₐc[k] A),
+theorem surjective_iff_finrank_quot_kerIdeal_eq_one
+    : ∀ (k : Type) [Field k] (A : Type) [CommRing A] [HopfAlgebra k A] [IsCocomm k A]
+        [Module.Finite k A] (C : Type) [CommRing C] [HopfAlgebra k C] [IsCocomm k C]
+        [Module.Finite k C] (f : C →ₐc[k] A),
       Function.Surjective f ↔ Module.finrank k (A ⧸ kerIdeal f) = 1 := by
   intro k _ A _ _ _ _ C _ _ _ _ f
   constructor
   · intro hf
     rw [kerIdeal_of_surjective hf]
-    have hs : Function.Surjective (counitAlgHom k A) := fun c =>
-      ⟨algebraMap k A c, by simp⟩
+    have hs : Function.Surjective (counitAlgHom k A) := fun c => ⟨algebraMap k A c, by simp⟩
     let e : (A ⧸ augIdeal (R := k) (A := A)) ≃ₐ[k] k := Ideal.quotientKerAlgEquivOfSurjective hs
     rw [e.toLinearEquiv.finrank_eq, Module.finrank_self]
   · intro h

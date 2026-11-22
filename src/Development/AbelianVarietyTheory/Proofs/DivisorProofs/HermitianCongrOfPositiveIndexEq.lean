@@ -5,25 +5,28 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsRootSe
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 noncomputable section
 
 namespace GlobalTheory.HermCongruence
 
-def signVec {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) : Fin n → ℂ :=
-  fun i => if 0 < hA.eigenvalues i then 1 else -1
+def signVec {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) : Fin n → ℂ := fun i =>
+  if 0 < hA.eigenvalues i then 1 else -1
 
-theorem eigenvalues_ne_zero {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (hd : A.det ≠ 0)
-    (i : Fin n) : hA.eigenvalues i ≠ 0 := by
+theorem eigenvalues_ne_zero
+    {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (hd : A.det ≠ 0) (i : Fin n)
+    : hA.eigenvalues i ≠ 0 := by
   intro h
   apply hd
   rw [hA.det_eq_prod_eigenvalues]
   exact Finset.prod_eq_zero (Finset.mem_univ i) (by simp [h])
 
-theorem exists_congr_signVec {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (hd : A.det ≠ 0) :
-    ∃ V : GL (Fin n) ℂ, (V : Matrix (Fin n) (Fin n) ℂ)ᴴ * A * V = diagonal (signVec hA) := by
+theorem exists_congr_signVec
+    {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (hd : A.det ≠ 0)
+    : ∃ V : GL (Fin n) ℂ, (V : Matrix (Fin n) (Fin n) ℂ)ᴴ * A * V = diagonal (signVec hA) := by
   set U : Matrix (Fin n) (Fin n) ℂ := (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   have hUU : Uᴴ * U = 1 := by
     have := hA.eigenvectorUnitary.2.1
@@ -48,11 +51,15 @@ theorem exists_congr_signVec {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.
   show Vᴴ * A * V = _
   have hcs : (diagonal c)ᴴ = diagonal c := by
     rw [diagonal_conjTranspose]
-    congr 1; funext i; simp [hc]
+    congr 1
+    funext i
+    simp [hc]
   rw [hV, conjTranspose_mul, hcs]
   conv_lhs => rw [hspec]
-  have : diagonal c * Uᴴ * (U * diagonal (fun i => ((hA.eigenvalues i : ℝ) : ℂ)) * Uᴴ) * (U * diagonal c) =
-      diagonal c * (Uᴴ * U) * diagonal (fun i => ((hA.eigenvalues i : ℝ) : ℂ)) * (Uᴴ * U) * diagonal c := by
+  have : diagonal c * Uᴴ * (U * diagonal (fun i => ((hA.eigenvalues i : ℝ) : ℂ)) * Uᴴ)
+        * (U * diagonal c)
+      = diagonal c * (Uᴴ * U) * diagonal (fun i => ((hA.eigenvalues i : ℝ) : ℂ)) * (Uᴴ * U)
+        * diagonal c := by
     simp only [Matrix.mul_assoc]
   rw [this, hUU, Matrix.mul_one, Matrix.mul_one, diagonal_mul_diagonal, diagonal_mul_diagonal]
   congr 1
@@ -62,8 +69,9 @@ theorem exists_congr_signVec {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.
   have hsq : Real.sqrt |hA.eigenvalues i| * Real.sqrt |hA.eigenvalues i| = |hA.eigenvalues i| :=
     Real.mul_self_sqrt hpos.le
   have hs0 : Real.sqrt |hA.eigenvalues i| ≠ 0 := (Real.sqrt_pos.2 hpos).ne'
-  have key : (Real.sqrt |hA.eigenvalues i|)⁻¹ * hA.eigenvalues i * (Real.sqrt |hA.eigenvalues i|)⁻¹ =
-      if 0 < hA.eigenvalues i then 1 else -1 := by
+  have key
+      : (Real.sqrt |hA.eigenvalues i|)⁻¹ * hA.eigenvalues i * (Real.sqrt |hA.eigenvalues i|)⁻¹
+        = if 0 < hA.eigenvalues i then 1 else -1 := by
     rw [mul_comm, ← mul_assoc, ← mul_inv, hsq]
     split_ifs with h
     · rw [abs_of_pos h]; field_simp
@@ -76,35 +84,44 @@ end GlobalTheory.HermCongruence
 
 namespace GlobalTheory.HermCongruence
 
-theorem exists_equiv_pos {n : ℕ} {A B : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (hB : B.IsHermitian)
-    (h : sigPosH hA = sigPosH hB) :
-    ∃ e : Fin n ≃ Fin n, ∀ i, (0 < hA.eigenvalues (e i) ↔ 0 < hB.eigenvalues i) := by
-  have h1 : Fintype.card {i // 0 < hB.eigenvalues i} = Fintype.card {i // 0 < hA.eigenvalues i} := h.symm
-  have h2 : Fintype.card {i // ¬ 0 < hB.eigenvalues i} = Fintype.card {i // ¬ 0 < hA.eigenvalues i} := by
+theorem exists_equiv_pos
+    {n : ℕ} {A B : Matrix (Fin n) (Fin n) ℂ}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) (h : sigPosH hA = sigPosH hB)
+    : ∃ e : Fin n ≃ Fin n, ∀ i, (0 < hA.eigenvalues (e i) ↔ 0 < hB.eigenvalues i) := by
+  have h1 : Fintype.card {i // 0 < hB.eigenvalues i} = Fintype.card {i // 0 < hA.eigenvalues i} :=
+    h.symm
+  have h2
+      : Fintype.card {i // ¬ 0 < hB.eigenvalues i}
+        = Fintype.card {i // ¬ 0 < hA.eigenvalues i} := by
     rw [Fintype.card_subtype_compl, Fintype.card_subtype_compl, h1]
   refine ⟨Equiv.subtypeCongr (Fintype.equivOfCardEq h1) (Fintype.equivOfCardEq h2), fun i => ?_⟩
   by_cases hi : 0 < hB.eigenvalues i
-  · have hx : Equiv.subtypeCongr (Fintype.equivOfCardEq h1) (Fintype.equivOfCardEq h2) i =
-        ((Fintype.equivOfCardEq h1) ⟨i, hi⟩ : Fin n) := by
+  · have hx
+        : Equiv.subtypeCongr (Fintype.equivOfCardEq h1) (Fintype.equivOfCardEq h2) i
+          = ((Fintype.equivOfCardEq h1) ⟨i, hi⟩ : Fin n) := by
       simp [Equiv.subtypeCongr, hi]
     rw [hx]
     exact iff_of_true ((Fintype.equivOfCardEq h1) ⟨i, hi⟩).2 hi
-  · have hx : Equiv.subtypeCongr (Fintype.equivOfCardEq h1) (Fintype.equivOfCardEq h2) i =
-        ((Fintype.equivOfCardEq h2) ⟨i, hi⟩ : Fin n) := by
+  · have hx
+        : Equiv.subtypeCongr (Fintype.equivOfCardEq h1) (Fintype.equivOfCardEq h2) i
+          = ((Fintype.equivOfCardEq h2) ⟨i, hi⟩ : Fin n) := by
       simp [Equiv.subtypeCongr, hi]
     rw [hx]
     exact iff_of_false ((Fintype.equivOfCardEq h2) ⟨i, hi⟩).2 hi
 
-theorem perm_congr {n : ℕ} (d : Fin n → ℂ) (e : Fin n ≃ Fin n) :
-    ((1 : Matrix (Fin n) (Fin n) ℂ).submatrix id e)ᴴ * diagonal d * (1 : Matrix (Fin n) (Fin n) ℂ).submatrix id e =
-      diagonal (d ∘ e) := by
+theorem perm_congr {n : ℕ} (d : Fin n → ℂ) (e : Fin n ≃ Fin n)
+    : ((1 : Matrix (Fin n) (Fin n) ℂ).submatrix id e)ᴴ * diagonal d
+        * (1 : Matrix (Fin n) (Fin n) ℂ).submatrix id e
+      = diagonal (d ∘ e) := by
   ext i j
   simp [Matrix.mul_apply, Matrix.one_apply, Matrix.diagonal_apply, Matrix.conjTranspose_apply]
   split_ifs with h <;> simp [h]
 
-theorem congr_of_sigPosH_eq : ∀ {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian) (hB : B.IsHermitian),
-    A.det ≠ 0 → B.det ≠ 0 → sigPosH hA = sigPosH hB →
-      ∃ Z : GL (Fin n) ℂ, B = (Z : Matrix (Fin n) (Fin n) ℂ)ᴴ * A * (Z : Matrix (Fin n) (Fin n) ℂ) := by
+theorem congr_of_sigPosH_eq
+    : ∀ {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian) (hB : B.IsHermitian),
+      A.det ≠ 0 → B.det ≠ 0 → sigPosH hA = sigPosH hB
+        → ∃ Z : GL (Fin n) ℂ,
+          B = (Z : Matrix (Fin n) (Fin n) ℂ)ᴴ * A * (Z : Matrix (Fin n) (Fin n) ℂ) := by
   intro n A B hA hB hdA hdB hs
   obtain ⟨VA, hVA⟩ := exists_congr_signVec hA hdA
   obtain ⟨VB, hVB⟩ := exists_congr_signVec hB hdB
@@ -129,14 +146,17 @@ theorem congr_of_sigPosH_eq : ∀ {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℂ) (
     rw [hW, ← Units.val_mul, mul_inv_cancel, Units.val_one]
   have hWV : Wᴴ * (VB : Matrix (Fin n) (Fin n) ℂ)ᴴ = 1 := by
     rw [← conjTranspose_mul, hVW, conjTranspose_one]
-  have hP' : ((GeneralLinearGroup.mkOfDetNeZero P hPdet : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) = P := rfl
+  have hP'
+      : ((GeneralLinearGroup.mkOfDetNeZero P hPdet : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ)
+        = P :=
+    rfl
   rw [Units.val_mul, Units.val_mul, hP', ← hW, conjTranspose_mul, conjTranspose_mul]
-  have : Wᴴ * (Pᴴ * (VA : Matrix (Fin n) (Fin n) ℂ)ᴴ) * A * (VA * P * W) =
-      Wᴴ * (Pᴴ * ((VA : Matrix (Fin n) (Fin n) ℂ)ᴴ * A * VA) * P) * W := by
+  have : Wᴴ * (Pᴴ * (VA : Matrix (Fin n) (Fin n) ℂ)ᴴ) * A * (VA * P * W)
+      = Wᴴ * (Pᴴ * ((VA : Matrix (Fin n) (Fin n) ℂ)ᴴ * A * VA) * P) * W := by
     simp only [Matrix.mul_assoc]
   rw [this, hVA, hP, perm_congr, hsig, ← hVB]
-  have : Wᴴ * ((VB : Matrix (Fin n) (Fin n) ℂ)ᴴ * B * VB) * W =
-      (Wᴴ * (VB : Matrix (Fin n) (Fin n) ℂ)ᴴ) * B * ((VB : Matrix (Fin n) (Fin n) ℂ) * W) := by
+  have : Wᴴ * ((VB : Matrix (Fin n) (Fin n) ℂ)ᴴ * B * VB) * W
+      = (Wᴴ * (VB : Matrix (Fin n) (Fin n) ℂ)ᴴ) * B * ((VB : Matrix (Fin n) (Fin n) ℂ) * W) := by
     simp only [Matrix.mul_assoc]
   rw [this, hWV, hVW, Matrix.one_mul, Matrix.mul_one]
 

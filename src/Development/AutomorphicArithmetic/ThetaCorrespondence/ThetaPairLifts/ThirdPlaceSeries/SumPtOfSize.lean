@@ -19,6 +19,9 @@ set_option synthInstance.maxHeartbeats 200000
 section
 open GlobalTheory.RefSum GlobalTheory.CovTop GlobalTheory.BigTop
 namespace GlobalTheory.RefSum
-theorem sumPt_of_size_alt : _root_.GlobalTheory.CovTop.SizeCondition → _root_.GlobalTheory.RefSum.SumPtAlt := fun h => _root_.GlobalTheory.T.sum_pt_of_wt_pt_num_pt (_root_.GlobalTheory.T.weight_pt_of_size h) (_root_.GlobalTheory.T.numerical_point_statement_of_size h)
+theorem sumPt_of_size_alt
+    : _root_.GlobalTheory.CovTop.SizeCondition → _root_.GlobalTheory.RefSum.SumPtAlt := fun h =>
+  _root_.GlobalTheory.T.sum_pt_of_wt_pt_num_pt (_root_.GlobalTheory.T.weight_pt_of_size h)
+    (_root_.GlobalTheory.T.numerical_point_statement_of_size h)
 end GlobalTheory.RefSum
 end

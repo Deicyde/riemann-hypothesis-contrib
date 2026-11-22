@@ -19,20 +19,25 @@ def DecLe (p : ℕ) (θ s : ℝ) (K : ℕ) (f : ℕ → ℚ) : Prop := ∀ j ≤
 
 def Dec (p : ℕ) (θ s : ℝ) (f : ℕ → ℚ) : Prop := ∀ j, PadicGe p (mah f j) (θ * j + s)
 
-def HdU (p : ℕ) : Prop := ∀ t rho : ℕ, rho < p ^ (t + 1) → ∃ a : ℕ → ℤ,
-  (∀ n : ℕ, dUnit (p ^ (t + 1)) n rho = ∑ l ∈ range (rho + 1), (a l : ℚ) * (n.choose l : ℚ)) ∧
-  ∀ l, (p : ℤ) ^ l ∣ a l
+def HdU (p : ℕ) : Prop :=
+  ∀ t rho : ℕ,
+    rho < p ^ (t + 1)
+      → ∃ a : ℕ → ℤ,
+        (∀ n : ℕ, dUnit (p ^ (t + 1)) n rho = ∑ l ∈ range (rho + 1), (a l : ℚ) * (n.choose l : ℚ))
+          ∧ ∀ l, (p : ℤ) ^ l ∣ a l
 
 def HDec (p : ℕ) : Prop := ∀ u : UnitFn, u.rho < p ^ (u.t + 1) → Dec p (1 / 4) 0 (unitFn p u)
 
-def HUnit (p : ℕ) : Prop := ∀ u : UnitFn, u.rho < p ^ (u.t + 1) → ∀ m : ℕ,
-  unitFn p u m ≠ 0 ∧ padicValRat p (unitFn p u m) = 0
+def HUnit (p : ℕ) : Prop :=
+  ∀ u : UnitFn, u.rho < p ^ (u.t + 1) → ∀ m : ℕ, unitFn p u m ≠ 0 ∧ padicValRat p (unitFn p u m) = 0
 
-def HMul (p : ℕ) : Prop := ∀ (θ s s' : ℝ) (f g : ℕ → ℚ), 0 ≤ θ → Dec p θ s f → Dec p θ s' g →
-  Dec p θ (s + s') (fun n => f n * g n)
+def HMul (p : ℕ) : Prop :=
+  ∀ (θ s s' : ℝ) (f g : ℕ → ℚ),
+    0 ≤ θ → Dec p θ s f → Dec p θ s' g → Dec p θ (s + s') (fun n => f n * g n)
 
-theorem padicGe_add {p : ℕ} [Fact p.Prime] {x y : ℚ} {r : ℝ} (hx : PadicGe p x r) (hy : PadicGe p y r) :
-    PadicGe p (x + y) r := by
+theorem padicGe_add
+    {p : ℕ} [Fact p.Prime] {x y : ℚ} {r : ℝ} (hx : PadicGe p x r) (hy : PadicGe p y r)
+    : PadicGe p (x + y) r := by
   rcases hx with hx | hx
   · subst hx; simpa using hy
   rcases hy with hy | hy
@@ -46,8 +51,9 @@ theorem padicGe_add {p : ℕ} [Fact p.Prime] {x y : ℚ} {r : ℝ} (hx : PadicGe
   rw [Int.cast_min] at hm'
   exact le_trans (le_min hx hy) hm'
 
-theorem padicGe_mul {p : ℕ} [Fact p.Prime] {x y : ℚ} {r s : ℝ} (hx : PadicGe p x r) (hy : PadicGe p y s) :
-    PadicGe p (x * y) (r + s) := by
+theorem padicGe_mul
+    {p : ℕ} [Fact p.Prime] {x y : ℚ} {r s : ℝ} (hx : PadicGe p x r) (hy : PadicGe p y s)
+    : PadicGe p (x * y) (r + s) := by
   rcases hx with hx | hx
   · left; simp [hx]
   rcases hy with hy | hy
@@ -61,7 +67,8 @@ theorem padicGe_mul {p : ℕ} [Fact p.Prime] {x y : ℚ} {r s : ℝ} (hx : Padic
   push_cast
   linarith
 
-theorem padicGe_mono {p : ℕ} {x : ℚ} {r s : ℝ} (hx : PadicGe p x r) (h : s ≤ r) : PadicGe p x s := by
+theorem padicGe_mono {p : ℕ} {x : ℚ} {r s : ℝ} (hx : PadicGe p x r) (h : s ≤ r)
+    : PadicGe p x s := by
   rcases hx with hx | hx
   · exact Or.inl hx
   · exact Or.inr (le_trans h hx)
@@ -78,13 +85,16 @@ theorem padicGe_int {p : ℕ} [Fact p.Prime] (k : ℤ) : PadicGe p (k : ℚ) 0 :
   rw [padicValRat.of_int]
   exact_mod_cast (Nat.cast_nonneg _ : (0 : ℤ) ≤ (padicValInt p k : ℤ))
 
-theorem padicGe_mul_nat {p : ℕ} [Fact p.Prime] {x : ℚ} {r : ℝ} (hx : PadicGe p x r) (k : ℕ) :
-    PadicGe p (x * (k : ℚ)) r := by
+theorem padicGe_mul_nat {p : ℕ} [Fact p.Prime] {x : ℚ} {r : ℝ} (hx : PadicGe p x r) (k : ℕ)
+    : PadicGe p (x * (k : ℚ)) r := by
   have h := padicGe_mul hx (padicGe_int (p := p) (k : ℤ))
   simpa using h
 
-theorem padicGe_sum {p : ℕ} [Fact p.Prime] {ι : Type*} (s : Finset ι) (f : ι → ℚ) {r : ℝ}
-    (h : ∀ i ∈ s, PadicGe p (f i) r) : PadicGe p (∑ i ∈ s, f i) r := by
+theorem padicGe_sum
+    {p : ℕ} [Fact p.Prime]
+    {ι : Type*} (s : Finset ι) (f : ι → ℚ)
+    {r : ℝ} (h : ∀ i ∈ s, PadicGe p (f i) r)
+    : PadicGe p (∑ i ∈ s, f i) r := by
   classical
   induction s using Finset.induction_on with
   | empty => exact Or.inl (by simp)

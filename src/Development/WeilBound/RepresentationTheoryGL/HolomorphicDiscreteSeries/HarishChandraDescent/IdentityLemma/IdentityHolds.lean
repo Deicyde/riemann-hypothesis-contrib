@@ -24,7 +24,9 @@ theorem npq_le (n : ℕ) (ε : Fin n → Bool) : (n : ℝ) * (pOf ε : ℝ) * (q
   have h0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   have h1 : (0 : ℝ) ≤ pOf ε := Nat.cast_nonneg _
   have h2 : (0 : ℝ) ≤ qOf ε := Nat.cast_nonneg _
-  calc (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) ≤ (n : ℝ) * n * n := by gcongr
+  calc
+    (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ)
+      ≤ (n : ℝ) * n * n := by gcongr
     _ = (n : ℝ) ^ 3 := by ring
 
 end IdentityBound
@@ -35,9 +37,14 @@ theorem identity_holds : Ident := by
   have hE : IsGlRep (smE ε ρ) := hD.glRep
   have hU : IsInfUnitary ε (smE ε ρ) := isInfUnitary_of_isDerivedOn hρ hD
   have h0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
-  have hstd : StdGap ε mu := ⟨hmu.1, h, hgap, by
-    have := IdentityBound.npq_le n ε
-    nlinarith⟩
+  have hstd : StdGap ε mu := ⟨
+    hmu.1,
+    h,
+    hgap,
+    by
+      have := IdentityBound.npq_le n ε
+      nlinarith
+  ⟩
   have hc₁ : ∀ v ∈ V, casimir (smE ε ρ) v = (casVal mu : ℂ) • v :=
     casimir_eq_casVal_of_no hmu.1 hE hU hV hNo
   have hVK₁ : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = ρ k v :=
@@ -55,9 +62,12 @@ theorem identity_holds : Ident := by
   have htop : closGen (smE ε σ) V₂ = ⊤ :=
     data_closGen_eq_top hstd hσU hD₂ hV₂ hc₂ hVK₂ hσ.2.2.2.1 hV₂0
 
-  let e₂ : H' ≃ₗᵢ[ℂ] closGen (smE ε σ) V₂ := (LinearIsometryEquiv.ofTop (p := closGen (smE ε σ) V₂) (hp := htop)).symm
-  let j : H' →L[ℂ] H := (closGen (smE ε ρ) V).subtypeL.comp (Uq.symm.toContinuousLinearEquiv.toContinuousLinearMap.comp
-    e₂.toContinuousLinearEquiv.toContinuousLinearMap)
+  let e₂ : H' ≃ₗᵢ[ℂ] closGen (smE ε σ) V₂ :=
+    (LinearIsometryEquiv.ofTop (p := closGen (smE ε σ) V₂) (hp := htop)).symm
+  let j : H' →L[ℂ] H :=
+    (closGen (smE ε ρ) V).subtypeL.comp
+      (Uq.symm.toContinuousLinearEquiv.toContinuousLinearMap.comp
+        e₂.toContinuousLinearEquiv.toContinuousLinearMap)
   have hj : ∀ x, j x = ((Uq.symm (e₂ x) : closGen (smE ε ρ) V) : H) := fun x => rfl
   have he₂ : ∀ x, ((e₂ x : closGen (smE ε σ) V₂) : H') = x := fun x => by
     show (((LinearIsometryEquiv.ofTop (p := closGen (smE ε σ) V₂) (hp := htop)).symm x : closGen (smE ε σ) V₂) : H') = x

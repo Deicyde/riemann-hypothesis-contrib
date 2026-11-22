@@ -36,7 +36,9 @@ section Norms
 
 open Formalism.HermitianLatticesTheory
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {n : ℕ} (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {n : ℕ} (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
 
 end Norms
 
@@ -44,8 +46,10 @@ section Adj
 
 open Formalism.HermitianLatticesTheory
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {Γ : Type} [Group Γ] [Finite Γ] {n : ℕ}
-  (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {Γ : Type} [Group Γ] [Finite Γ]
+  {n : ℕ} (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
 
 end Adj
 
@@ -63,9 +67,13 @@ open Formalism.HermitianLatticesTheory
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] {D0 D1 : ℕ} (A : LevelAmb K D0 D1)
 
-theorem rows_gen (hL : A.LatG) {D : ℕ} (ι : Matrix (Fin A.Dg) (Fin D) K) (P : Matrix (Fin A.Dg) (Fin A.Dg) K)
-    (hD : 0 < D) (hinj : Function.Injective ι.mulVec) (hr : LinearMap.range ι.mulVecLin = LinearMap.range P.mulVecLin) :
-    A.partLat P ≠ ⊥ := by
+theorem rows_gen
+    (hL : A.LatG)
+    {D : ℕ} (ι : Matrix (Fin A.Dg) (Fin D) K)
+    (P : Matrix (Fin A.Dg) (Fin A.Dg) K)
+    (hD : 0 < D) (hinj : Function.Injective ι.mulVec)
+    (hr : LinearMap.range ι.mulVecLin = LinearMap.range P.mulVecLin)
+    : A.partLat P ≠ ⊥ := by
   intro hb
   have hspan := A.span_partLat hL P
   rw [hb, Submodule.bot_coe, Submodule.span_zero_singleton] at hspan

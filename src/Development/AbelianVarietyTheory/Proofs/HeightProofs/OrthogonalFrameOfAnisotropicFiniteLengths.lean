@@ -13,10 +13,13 @@ namespace GlobalTheory.SmoothForms
 
 open Module Submodule
 
-theorem Sized.proj_le {E : Type} [Field E] [NumberField E] [IsCMField E] {V : Type} [AddCommGroup V] [Module E V]
+theorem Sized.proj_le
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {V : Type} [AddCommGroup V] [Module E V]
     {h : V →ₗ[E] V →ₗ⋆[E] E} {Λ : Submodule ℤ V} {N : ℤ} {ν : V → ℝ} {B : ℝ} (H : Sized h Λ N ν B)
-    {T : ℝ} (hT : 2 ≤ T) {v x : V} (hv : ν v ≤ T) (hx : ν x ≤ T) :
-    ν (h v v • x - h x v • v) ≤ T ^ 4 := by
+    {T : ℝ} (hT : 2 ≤ T)
+    {v x : V} (hv : ν v ≤ T) (hx : ν x ≤ T)
+    : ν (h v v • x - h x v • v) ≤ T ^ 4 := by
   have hneg : house (-(h x v)) = house (h x v) := by simp [house]
   have h0 : 0 ≤ T := by linarith
   have h1 : house (h v v) ≤ T * T := (H.form_le v v).trans (mul_le_mul hv hv (H.nonneg _) h0)
@@ -28,22 +31,30 @@ theorem Sized.proj_le {E : Type} [Field E] [NumberField E] [IsCMField E] {V : Ty
   rw [sub_eq_add_neg, ← neg_smul]
   have h5 : 2 * (T * T * T) ≤ T * (T * T * T) := mul_le_mul_of_nonneg_right hT (by positivity)
   refine (H.add_le _ _).trans ?_
-  calc _ ≤ 2 * (T * T * T) := by linarith
+  calc
+    _ ≤ 2 * (T * T * T) := by linarith
     _ ≤ _ := h5
     _ = _ := by ring
 
-theorem orthoSmall_of_anisoSmall (E : Type) [Field E] [NumberField E] [IsCMField E] (HA : AnisoSmall E) :
-    OrthoSmall E := by
+theorem orthoSmall_of_anisoSmall
+    (E : Type) [Field E] [NumberField E] [IsCMField E] (HA : AnisoSmall E)
+    : OrthoSmall E := by
   intro n
   induction n with
   | zero =>
     intro N _
-    exact ⟨∅, 0, Set.finite_empty, by simp, fun V _ _ _ _ _ _ _ _ _ =>
-      ⟨Fin.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩⟩
+    exact ⟨
+      ∅,
+      0,
+      Set.finite_empty,
+      by simp,
+      fun V _ _ _ _ _ _ _ _ _ => ⟨Fin.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩
+    ⟩
   | succ n ih =>
     intro N hN
     obtain ⟨S₁, k₁, hS₁, h0₁, H₁⟩ := HA (n + 1) n.succ_ne_zero N hN
-    obtain ⟨M, hM, hMS⟩ := GlobalTheory.HermClass.exists_int_mul_isIntegral E (hS₁.image fun a => a⁻¹)
+    obtain ⟨M, hM, hMS⟩ :=
+      GlobalTheory.HermClass.exists_int_mul_isIntegral E (hS₁.image fun a => a⁻¹)
     obtain ⟨S₂, k₂, hS₂, h0₂, H₂⟩ := ih _ (mul_ne_zero hM hN)
     refine ⟨S₁ ∪ S₂, k₁ + (k₁ + 1) * 4 * k₂, hS₁.union hS₂, by simp [h0₁, h0₂], ?_⟩
     intro V _ _ _ h Λ ν B hV H
@@ -72,8 +83,8 @@ theorem orthoSmall_of_anisoSmall (E : Type) [Field E] [NumberField E] [IsCMField
       rw [h2, finrank_top, finrank_self, hV] at h1
       change 1 + finrank E W = _ at h1
       omega
-    let p : V →ₗ[E] W := LinearMap.codRestrict W
-      (a • LinearMap.id - (h.flip v).smulRight v) fun x => by
+    let p : V →ₗ[E] W :=
+      LinearMap.codRestrict W (a • LinearMap.id - (h.flip v).smulRight v) fun x => by
         rw [hW]; simp [← ha, mul_comm]
     have hp : ∀ x, (p x : V) = a • x - h x v • v := fun x => rfl
     let Λ' : Submodule ℤ W := Λ.comap (W.subtype.restrictScalars ℤ)
@@ -83,42 +94,49 @@ theorem orthoSmall_of_anisoSmall (E : Type) [Field E] [NumberField E] [IsCMField
     have hyp : ∀ (y : W) (x : V), h y (p x) = a * h y x := fun y x => by
       have : h y v = 0 := y.2
       simp [hp, starRingEnd_apply, has, this]
-    have H' : Sized (h.domRestrict₁₂ W W) Λ' (M * N) (fun w : W => ν w) ((B ^ (k₁ + 1)) ^ 4) :=
-      { symm := fun x y => hs x y
-        nondeg := fun y hy => Subtype.ext (H.nondeg y fun x => by
+    have H' : Sized (h.domRestrict₁₂ W W) Λ' (M * N) (fun w : W => ν w) ((B ^ (k₁ + 1)) ^ 4) := {
+      symm := fun x y => hs x y
+      nondeg := fun y hy =>
+        Subtype.ext (H.nondeg y fun x => by
           have h1 : h y (p x) = 0 := hy (p x)
           rw [hyp] at h1
           exact (mul_eq_zero.1 h1).resolve_left ha0)
-        fg := by
-          apply Submodule.fg_of_fg_map_injective (W.subtype.restrictScalars ℤ) W.subtype_injective
-          exact H.fg.of_le (map_comap_le _ _)
-        stable := fun c hc x hx => hO c hc x hx
-        int := fun x hx y hy => hint x hx y hy
-        dual := fun y hy => by
-          have h1 : (N : E) • a • (y : V) ∈ Λ := H.dual _ fun x hx => by
+      fg := by
+        apply Submodule.fg_of_fg_map_injective (W.subtype.restrictScalars ℤ) W.subtype_injective
+        exact H.fg.of_le (map_comap_le _ _)
+      stable := fun c hc x hx => hO c hc x hx
+      int := fun x hx y hy => hint x hx y hy
+      dual := fun y hy => by
+        have h1 : (N : E) • a • (y : V) ∈ Λ :=
+          H.dual _ fun x hx => by
             rw [map_smul, LinearMap.smul_apply, smul_eq_mul, ← hyp]
             exact hy _ (hpΛ x hx)
-          have h2 := hO _ (hMS _ ⟨a, hvS, rfl⟩) _ h1
-          rw [smul_smul, smul_smul] at h2
-          rw [hΛ', Submodule.coe_smul]
-          convert h2 using 2
-          push_cast; field_simp
-        two_le := hT2.trans (le_self_pow₀ (by linarith) (by norm_num))
-        nonneg := fun x => H.nonneg x
-        add_le := fun x y => H.add_le x y
-        smul_le := fun c x => H.smul_le c x
-        form_le := fun x y => H.form_le x y
-        span := by
-          rw [eq_top_iff]
-          intro w _
-          have h1 : span E {x | x ∈ Λ ∧ ν x ≤ B} ≤
-              (span E {x : W | x ∈ Λ' ∧ ν x ≤ (B ^ (k₁ + 1)) ^ 4}).comap p :=
-            span_le.2 fun x hx => subset_span ⟨hpΛ x hx.1, hproj x hx.2⟩
-          have h2 : p w ∈ span E {x : W | x ∈ Λ' ∧ ν x ≤ (B ^ (k₁ + 1)) ^ 4} := h1 (H.span ▸ mem_top)
-          have h3 : w = a⁻¹ • p w := Subtype.ext (by
+        have h2 := hO _ (hMS _ ⟨a, hvS, rfl⟩) _ h1
+        rw [smul_smul, smul_smul] at h2
+        rw [hΛ', Submodule.coe_smul]
+        convert h2 using 2
+        push_cast
+        field_simp
+      two_le := hT2.trans (le_self_pow₀ (by linarith) (by norm_num))
+      nonneg := fun x => H.nonneg x
+      add_le := fun x y => H.add_le x y
+      smul_le := fun c x => H.smul_le c x
+      form_le := fun x y => H.form_le x y
+      span := by
+        rw [eq_top_iff]
+        intro w _
+        have h1
+            : span E {x | x ∈ Λ ∧ ν x ≤ B}
+              ≤ (span E {x : W | x ∈ Λ' ∧ ν x ≤ (B ^ (k₁ + 1)) ^ 4}).comap p :=
+          span_le.2 fun x hx => subset_span ⟨hpΛ x hx.1, hproj x hx.2⟩
+        have h2 : p w ∈ span E {x : W | x ∈ Λ' ∧ ν x ≤ (B ^ (k₁ + 1)) ^ 4} := h1 (H.span ▸ mem_top)
+        have h3 : w = a⁻¹ • p w :=
+          Subtype.ext (by
             have : h w v = 0 := w.2
             simp [hp, this, ha0])
-          rw [h3]; exact smul_mem _ _ h2 }
+        rw [h3]
+        exact smul_mem _ _ h2
+    }
     obtain ⟨u, huΛ, huo, huS⟩ := H₂ W (h.domRestrict₁₂ W W) Λ' _ _ hWr H'
     refine ⟨Fin.cons v fun i => u i, fun i => ?_, fun i j hij => ?_, fun i => ?_⟩
     · cases i using Fin.cases with

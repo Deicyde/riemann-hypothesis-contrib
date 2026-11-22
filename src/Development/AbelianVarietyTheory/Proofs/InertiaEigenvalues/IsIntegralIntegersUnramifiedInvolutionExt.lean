@@ -13,7 +13,8 @@ namespace GlobalTheory.UnitLemma.Unr
 
 open GlobalTheory.UnitLemma Polynomial IsLocalRing
 
-theorem intO_lift_of_val_nonneg (K : UQ) (x : K.E) (h : 0 ≤ val K.O x) : ∃ a : K.O, algebraMap K.O K.E a = x := by
+theorem intO_lift_of_val_nonneg (K : UQ) (x : K.E) (h : 0 ≤ val K.O x)
+    : ∃ a : K.O, algebraMap K.O K.E a = x := by
   by_cases hx : x = 0
   · exact ⟨0, by simp [hx]⟩
   apply IsDiscreteValuationRing.exists_lift_of_le_one
@@ -26,24 +27,30 @@ theorem intO_val_algebraMap_nonneg (K : UQ) (a : K.O) : 0 ≤ val K.O (algebraMa
   by_cases ha : a = 0
   · simp [ha, val]
   have h1 := (IsDiscreteValuationRing.maximalIdeal K.O).valuation_le_one (K := K.E) a
-  have h0 : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (algebraMap K.O K.E a) ≠ 0 := by
+  have h0
+      : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (algebraMap K.O K.E a) ≠ 0 := by
     simpa using (map_ne_zero_iff _ (IsFractionRing.injective K.O K.E)).2 ha
   unfold val
   rw [← WithZero.exp_log h0, ← WithZero.exp_zero, WithZero.exp_le_exp] at h1
   omega
 
-theorem intO_val_ne_zero_of_mem (K : UQ) (a : K.O) (ha0 : a ≠ 0) (ha : a ∈ maximalIdeal K.O) :
-    val K.O (algebraMap K.O K.E a) ≠ 0 := by
+theorem intO_val_ne_zero_of_mem (K : UQ) (a : K.O) (ha0 : a ≠ 0) (ha : a ∈ maximalIdeal K.O)
+    : val K.O (algebraMap K.O K.E a) ≠ 0 := by
   have h1 : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (algebraMap K.O K.E a) < 1 :=
     (IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem _ _).2 ha
-  have h0 : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (algebraMap K.O K.E a) ≠ 0 := by
+  have h0
+      : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (algebraMap K.O K.E a) ≠ 0 := by
     simpa using (map_ne_zero_iff _ (IsFractionRing.injective K.O K.E)).2 ha0
   unfold val
   rw [← WithZero.exp_log h0, ← WithZero.exp_zero, WithZero.exp_lt_exp] at h1
   omega
 
-theorem intO : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ → d ≠ 0 → ∀ y : K'.O,
-    @IsIntegral K.O K'.E _ _ (φ.comp (algebraMap K.O K.E)).toAlgebra (algebraMap K'.O K'.E y) := by
+theorem intO
+    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
+      IsUnrExt K K' d φ → d ≠ 0
+        → ∀ y : K'.O,
+          @IsIntegral K.O K'.E _ _ (φ.comp (algebraMap K.O K.E)).toAlgebra
+            (algebraMap K'.O K'.E y) := by
   intro K K' d φ hU hd y
   letI : Algebra K.E K'.E := φ.toAlgebra
   letI : Algebra K.O K'.E := (φ.comp (algebraMap K.O K.E)).toAlgebra
@@ -67,18 +74,20 @@ theorem intO : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d 
     rw [hU.2.2.1]; exact intO_val_algebraMap_nonneg K a
   choose ψf hψf using fun a : K.O => intO_lift_of_val_nonneg K' _ (hv a)
   have hinj' : Function.Injective (algebraMap K'.O K'.E) := IsFractionRing.injective _ _
-  let ψ : K.O →+* K'.O :=
-    { toFun := ψf
-      map_one' := hinj' (by rw [hψf]; simp)
-      map_mul' := fun a b => hinj' (by simp [hψf])
-      map_zero' := hinj' (by rw [hψf]; simp)
-      map_add' := fun a b => hinj' (by simp [hψf]) }
+  let ψ : K.O →+* K'.O := {
+    toFun := ψf
+    map_one' := hinj' (by rw [hψf]; simp)
+    map_mul' := fun a b => hinj' (by simp [hψf])
+    map_zero' := hinj' (by rw [hψf]; simp)
+    map_add' := fun a b => hinj' (by simp [hψf])
+  }
   have hψ : ∀ a, algebraMap K'.O K'.E (ψ a) = algebraMap K.O K'.E a := fun a => hψf a
 
   have hS : ∀ t : K'.E, IsIntegral K.O t → ∃ z : K'.O, algebraMap K'.O K'.E z = t := by
     intro t ht
     have : IsIntegral K'.O t :=
-      IsIntegral.map_of_comp_eq (T := K'.O) (U := K'.E) ψ (RingHom.id K'.E) (by ext a; exact hψ a) ht
+      IsIntegral.map_of_comp_eq (T := K'.O) (U := K'.E) ψ (RingHom.id K'.E) (by ext a; exact hψ a)
+        ht
     exact IsIntegrallyClosed.isIntegral_iff.1 this
   set x := algebraMap K'.O K'.E y with hx
   rcases ValuationRing.isInteger_or_isInteger S x with ⟨s, hs⟩ | ⟨s, hs⟩
@@ -92,11 +101,14 @@ theorem intO : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d 
       rw [← map_mul, hu1, map_one]
     have : x = algebraMap S K'.E ((hsu.unit⁻¹ : Sˣ) : S) := by
       rw [eq_inv_of_mul_eq_one_left e, hs, inv_inv]
-    rw [this]; exact ((hsu.unit⁻¹ : Sˣ) : S).2
+    rw [this]
+    exact ((hsu.unit⁻¹ : Sˣ) : S).2
   exfalso
   have hall : ∀ n : Ideal S, n.IsMaximal → s ∈ n := fun n hn => by
     rw [IsLocalRing.eq_maximalIdeal hn]; exact (mem_maximalIdeal s).2 hsu
-  obtain ⟨N, -, hN⟩ := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.exists_pow_mem_map_maximalIdeal (R := K.O) S s hall
+  obtain ⟨N, -, hN⟩ :=
+    ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.exists_pow_mem_map_maximalIdeal
+      (R := K.O) S s hall
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible K.O
   rw [hπ.maximalIdeal_eq, Ideal.map_span, Set.image_singleton, Ideal.mem_span_singleton'] at hN
   obtain ⟨t, ht⟩ := hN

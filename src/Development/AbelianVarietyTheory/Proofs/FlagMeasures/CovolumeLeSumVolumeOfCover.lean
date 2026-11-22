@@ -9,13 +9,13 @@ open MeasureTheory NumberField Finset
 
 namespace GlobalTheory
 
-
 open Pointwise in
-theorem covolume_le_sum_volume_of_cover (ι : Type) [Fintype ι] (L : Submodule ℤ (ι → ℝ))
-    [DiscreteTopology L] [IsZLattice ℝ L] (κ : Type) (T : Finset κ) (A : κ → Set (ι → ℝ))
-    (_hA : ∀ k, MeasurableSet (A k))
-    (hcov : ∀ t : ι → ℝ, ∃ k ∈ T, ∃ l ∈ L, t + l ∈ A k) :
-    ENNReal.ofReal (ZLattice.covolume L volume) ≤ ∑ k ∈ T, volume (A k) := by
+theorem covolume_le_sum_volume_of_cover
+    (ι : Type) [Fintype ι]
+    (L : Submodule ℤ (ι → ℝ)) [DiscreteTopology L] [IsZLattice ℝ L]
+    (κ : Type) (T : Finset κ) (A : κ → Set (ι → ℝ))
+    (_hA : ∀ k, MeasurableSet (A k)) (hcov : ∀ t : ι → ℝ, ∃ k ∈ T, ∃ l ∈ L, t + l ∈ A k)
+    : ENNReal.ofReal (ZLattice.covolume L volume) ≤ ∑ k ∈ T, volume (A k) := by
   classical
   let b := Module.Free.chooseBasis ℤ L
   have hF := ZLattice.isAddFundamentalDomain b (volume : Measure (ι → ℝ))

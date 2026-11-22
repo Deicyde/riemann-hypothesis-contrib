@@ -8,27 +8,44 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleLocallyH
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex UpperTheory.Et
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  UpperTheory.Et
 
-private theorem UpperTheory.continuousSection_nsmul (R : Type) [CommRing R] (T : Type) [AddCommGroup T] [Module R T]
-    [TopologicalSpace T] [IsTopologicalAddGroup T] [ContinuousConstSMul R T] (U : Scheme.{0})
-    (a : C(U, T)) (c : ℕ) : cSec R T (c • a) = c • cSec R T a := by
-  exact map_nsmul (AddMonoidHom.mk' (cSec R T (U := U)) (UpperTheory.continuousSections_bijective_additive_natural R T U).2.1) c a
+private theorem UpperTheory.continuousSection_nsmul
+    (R : Type) [CommRing R]
+    (T : Type) [AddCommGroup T] [Module R T] [TopologicalSpace T] [IsTopologicalAddGroup T]
+    [ContinuousConstSMul R T]
+    (U : Scheme.{0}) (a : C(U, T))
+    (c : ℕ)
+    : cSec R T (c • a) = c • cSec R T a := by
+  exact map_nsmul
+    (AddMonoidHom.mk' (cSec R T (U := U))
+      (UpperTheory.continuousSections_bijective_additive_natural R T U).2.1)
+    c a
 
-private theorem UpperTheory.restriction_comp {R : Type} [CommRing R] (M : PMod R) {W' W V : Scheme.{0}}
-    (l : W' ⟶ W) (h : W ⟶ V) (z : sec M V) : rs M (l ≫ h) z = rs M l (rs M h z) := by
+private theorem UpperTheory.restriction_comp
+    {R : Type} [CommRing R]
+    (M : PMod R)
+    {W' W V : Scheme.{0}} (l : W' ⟶ W) (h : W ⟶ V) (z : sec M V)
+    : rs M (l ≫ h) z = rs M l (rs M h z) := by
   simp only [rs, op_comp, Functor.map_comp, ModuleCat.hom_comp, LinearMap.comp_apply]
 
-theorem UpperTheory.constantSheaf_cyclic_generator_of_order :
-    ∀ (R : Type) [CommRing R] (T : Type) [AddCommGroup T] [Module R T] [TopologicalSpace T] [DiscreteTopology T] [IsTopologicalAddGroup T] [ContinuousConstSMul R T] (q : ℕ) (t : T), q • t = 0 → (∀ c : ℕ, c • t = 0 → q ∣ c) → (∀ x : T, ∃ c : ℕ, x = c • t) → ∀ U : Scheme.{0}, Gen Scheme.etaleTopology q (cSh R T).obj (cSec R T (ContinuousMap.const U t)) := by
+theorem UpperTheory.constantSheaf_cyclic_generator_of_order
+    : ∀ (R : Type) [CommRing R] (T : Type) [AddCommGroup T] [Module R T] [TopologicalSpace T]
+        [DiscreteTopology T] [IsTopologicalAddGroup T] [ContinuousConstSMul R T] (q : ℕ) (t : T),
+      q • t = 0 → (∀ c : ℕ, c • t = 0 → q ∣ c) → (∀ x : T, ∃ c : ℕ, x = c • t)
+        → ∀ U : Scheme.{0},
+          Gen Scheme.etaleTopology q (cSh R T).obj (cSec R T (ContinuousMap.const U t)) := by
   intro R _ T _ _ _ _ _ _ q t hq hmin hgen U
   have hsm : ∀ (W : Scheme.{0}) (a : C(W, T)) (c : ℕ), cSec R T (c • a) = c • cSec R T a :=
     fun W a c => UpperTheory.continuousSection_nsmul R T W a c
   have h0 : ∀ W : Scheme.{0}, cSec R T (0 : C(W, T)) = 0 := fun W =>
-    map_zero (AddMonoidHom.mk' (cSec R T (U := W)) (UpperTheory.continuousSections_bijective_additive_natural R T W).2.1)
-  have hrs : ∀ (V : Scheme.{0}) (k : V ⟶ U),
-      rs (cSh R T).obj k (cSec R T (ContinuousMap.const U t)) =
-        cSec R T (ContinuousMap.const V t) := by
+    map_zero (AddMonoidHom.mk' (cSec R T (U := W))
+      (UpperTheory.continuousSections_bijective_additive_natural R T W).2.1)
+  have hrs
+      : ∀ (V : Scheme.{0}) (k : V ⟶ U),
+        rs (cSh R T).obj k (cSec R T (ContinuousMap.const U t))
+          = cSec R T (ContinuousMap.const V t) := by
     intro V k
     rw [(UpperTheory.continuousSections_bijective_additive_natural R T U).2.2.1]
     rfl
@@ -45,7 +62,8 @@ theorem UpperTheory.constantSheaf_cyclic_generator_of_order :
     refine (UpperTheory.etaleLocallyHolds_of_pointwise_cover_or_affine_local V _ ?_).1 ?_
     · rintro W W' g' k' ⟨c, hc⟩
       refine ⟨c, ?_⟩
-      rw [UpperTheory.restriction_comp _ k' g', hc, Category.assoc, UpperTheory.restriction_comp _ k' (g' ≫ k)]
+      rw [UpperTheory.restriction_comp _ k' g', hc, Category.assoc,
+        UpperTheory.restriction_comp _ k' (g' ≫ k)]
       exact map_nsmul ((cSh R T).obj.map k'.op).hom c _
     · intro x
       obtain ⟨c, hc⟩ := hgen (b x)

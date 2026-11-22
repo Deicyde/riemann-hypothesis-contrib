@@ -10,28 +10,40 @@ universe u
 
 namespace GlobalTheory.HTRho
 
-theorem mSub_top_eq_ker_smul :
-    ∀ (k : Type) [Field k] (C : Type) [CommRing C] (H : Type u) [AddCommGroup H]
-      [Module k H] (σ : C →+* Module.End k H) (χ : C →+* k),
-      letI : Module (k ⊗[ℤ] C) H := Module.compHom H
-        (Algebra.TensorProduct.lift (Algebra.ofId k (Module.End k H)) σ.toIntAlgHom
-          (fun _ _ => Algebra.commutes _ _)).toRingHom
-      ∀ x : H, x ∈ GlobalTheory.HTRho.mSub σ χ ⊤ ↔
-        x ∈ (RingHom.ker (Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom
-          (fun _ _ => Commute.all _ _) : k ⊗[ℤ] C →ₐ[k] k) • ⊤ : Submodule (k ⊗[ℤ] C) H) := by
+theorem mSub_top_eq_ker_smul
+    : ∀ (k : Type) [Field k] (C : Type) [CommRing C] (H : Type u) [AddCommGroup H] [Module k H]
+        (σ : C →+* Module.End k H) (χ : C →+* k),
+      letI : Module (k ⊗[ℤ] C) H :=
+        Module.compHom H
+          (Algebra.TensorProduct.lift (Algebra.ofId k (Module.End k H)) σ.toIntAlgHom
+            (fun _ _ => Algebra.commutes _ _)).toRingHom
+      ∀ x : H,
+        x ∈ GlobalTheory.HTRho.mSub σ χ ⊤
+          ↔ x
+            ∈ (RingHom.ker
+                  (Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom
+                      (fun _ _ => Commute.all _ _)
+                    : k ⊗[ℤ] C →ₐ[k] k)
+                • ⊤
+              : Submodule (k ⊗[ℤ] C) H) := by
   intro k _ C _ H _ _ σ χ x
-  let : Module (k ⊗[ℤ] C) H := Module.compHom H (Algebra.TensorProduct.lift (Algebra.ofId k (Module.End k H))
-      σ.toIntAlgHom (fun _ _ => Algebra.commutes _ _)).toRingHom
-  let L := Algebra.TensorProduct.lift (Algebra.ofId k (Module.End k H)) σ.toIntAlgHom
-    (fun _ _ => Algebra.commutes _ _)
+  let : Module (k ⊗[ℤ] C) H :=
+    Module.compHom H
+      (Algebra.TensorProduct.lift (Algebra.ofId k (Module.End k H)) σ.toIntAlgHom
+        (fun _ _ => Algebra.commutes _ _)).toRingHom
+  let L :=
+    Algebra.TensorProduct.lift (Algebra.ofId k (Module.End k H)) σ.toIntAlgHom
+      (fun _ _ => Algebra.commutes _ _)
   set φ : k ⊗[ℤ] C →ₐ[k] k := Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom
     (fun _ _ => Commute.all _ _) with hφdef
   have hsmul : ∀ (a : k ⊗[ℤ] C) (y : H), a • y = L a y := fun _ _ => rfl
   have hLt : ∀ (l : k) (c : C) (y : H), L (l ⊗ₜ c) y = l • σ c y := by
     intro l c y
-    exact congrArg (fun f : Module.End k H => f y)
-      (Algebra.TensorProduct.lift_tmul (Algebra.ofId k (Module.End k H))
-        σ.toIntAlgHom (fun _ _ => Algebra.commutes _ _) l c)
+    exact congrArg
+      (fun f : Module.End k H => f y)
+      (Algebra.TensorProduct.lift_tmul (Algebra.ofId k (Module.End k H)) σ.toIntAlgHom
+        (fun _ _ => Algebra.commutes _ _)
+        l c)
   have hφt : ∀ (l : k) (c : C), φ (l ⊗ₜ c) = l * χ c := by
     intro l c
     simp [hφdef, Algebra.TensorProduct.lift_tmul]
@@ -57,11 +69,12 @@ theorem mSub_top_eq_ker_smul :
       convert this using 1
       rw [hsmul, map_sub, LinearMap.sub_apply, hLt, hLt]
       simp
-    | zero => exact Submodule.zero_mem _
-    | add a b _ _ ha hb => exact add_mem ha hb
+    | zero =>
+      exact Submodule.zero_mem _
+    | add a b _ _ ha hb =>
+      exact add_mem ha hb
     | smul l z _ hz =>
-      have : l • z = ((l ⊗ₜ (1 : C) : k ⊗[ℤ] C)) • z := by
-        rw [hsmul, hLt]; simp
+      have : l • z = ((l ⊗ₜ (1 : C) : k ⊗[ℤ] C)) • z := by rw [hsmul, hLt]; simp
       rw [this]
       exact Submodule.smul_mem _ _ hz
   · intro hx

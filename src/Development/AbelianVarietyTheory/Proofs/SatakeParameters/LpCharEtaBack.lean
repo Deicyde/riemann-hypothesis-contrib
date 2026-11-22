@@ -16,11 +16,15 @@ noncomputable section
 
 namespace GlobalTheory.GoodDepthZero
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie GlobalTheory.SplitRead
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie
+  GlobalTheory.SplitRead
 
-theorem charSum_of_tie (D : D7) (hT : Formalism.MainNotions.SumRepresentations.At.TieLP D.nd D.naut)
-    (hc : ∀ w (a b c : D.naut.LP w), D.naut.lpSum a c = D.naut.lpSum b c → a = b) :
-    GlobalTheory.LiftLeaf.CharSum D.nd D.naut := by
+theorem charSum_of_tie
+    (D : D7) (hT : Formalism.MainNotions.SumRepresentations.At.TieLP D.nd D.naut)
+    (hc : ∀ w (a b c : D.naut.LP w), D.naut.lpSum a c = D.naut.lpSum b c → a = b)
+    : GlobalTheory.LiftLeaf.CharSum D.nd D.naut := by
   intro w a b χ s hχ
   obtain ⟨h1, h2, -⟩ := hT w a b χ χ s hχ hχ
   refine ⟨h1, h2, ?_⟩
@@ -29,8 +33,11 @@ theorem charSum_of_tie (D : D7) (hT : Formalism.MainNotions.SumRepresentations.A
   refine hc w _ _ (D.naut.lpChar (D.naut.lpZero w) χ) ?_
   rw [← h, D.naut.lpSum_comm, D.naut.lpSum_zero]
 
-theorem lpChar_eta_back (D : D7) (hT : Formalism.MainNotions.SumRepresentations.At.TieLP D.nd D.naut) (w : PlE D.host) (a : D.naut.LP w) :
-    D.naut.lpChar (D.naut.lpChar a (D.naut.locG D.naut.etaTinv w)) (D.naut.locG D.naut.etaT w) = a := by
+theorem lpChar_eta_back
+    (D : D7) (hT : Formalism.MainNotions.SumRepresentations.At.TieLP D.nd D.naut) (w : PlE D.host)
+    (a : D.naut.LP w)
+    : D.naut.lpChar (D.naut.lpChar a (D.naut.locG D.naut.etaTinv w)) (D.naut.locG D.naut.etaT w)
+      = a := by
   have hu := D.naut.etaT_unr w
   obtain ⟨hu', he⟩ := D.naut.etaTinv_def w
   have hcard := D.naut.frobEig_card _ hu
@@ -42,10 +49,12 @@ theorem lpChar_eta_back (D : D7) (hT : Formalism.MainNotions.SumRepresentations.
     rw [hc, h0]
     exact Multiset.mem_singleton_self _
   rw [hc, Multiset.map_singleton] at he
-  have key := GlobalTheory.TypeLeaf.lpChar_eq_triv_of_mul_eq_one D w _ _ c⁻¹ c hu' hu (D.naut.locG_dim _ w) he hc
-    (inv_mul_cancel₀ hc0)
-  obtain ⟨-, -, -, h4, h5, -⟩ := hT w a a (D.naut.locG D.naut.etaTinv w) (D.naut.locG D.naut.etaT w) 0
-    (D.naut.locG_dim _ w) (D.naut.locG_dim _ w)
+  have key :=
+    GlobalTheory.TypeLeaf.lpChar_eq_triv_of_mul_eq_one D w _ _ c⁻¹ c hu' hu (D.naut.locG_dim _ w) he
+      hc (inv_mul_cancel₀ hc0)
+  obtain ⟨-, -, -, h4, h5, -⟩ :=
+    hT w a a (D.naut.locG D.naut.etaTinv w) (D.naut.locG D.naut.etaT w) 0 (D.naut.locG_dim _ w)
+      (D.naut.locG_dim _ w)
   rw [h4, key, h5]
 
 end GlobalTheory.GoodDepthZero

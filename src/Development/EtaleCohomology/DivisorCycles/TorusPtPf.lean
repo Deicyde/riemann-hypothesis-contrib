@@ -63,7 +63,8 @@ lemma entry_exp {N n : ℕ} {p : Fin n → Mat C N} (hp : Sys p) (e : Fin n → 
   refine Finset.sum_congr rfl fun j _ => by ring
 
 noncomputable def bin {n : ℕ} (q : Finset (Fin n) × Finset (Fin n) × C) : MvPolynomial (Fin n) C :=
-  (∏ i ∈ q.1, MvPolynomial.X i) ^ q.2.1.card - MvPolynomial.C q.2.2 * (∏ i ∈ q.2.1, MvPolynomial.X i) ^ q.1.card
+  (∏ i ∈ q.1, MvPolynomial.X i) ^ q.2.1.card
+    - MvPolynomial.C q.2.2 * (∏ i ∈ q.2.1, MvPolynomial.X i) ^ q.1.card
 
 theorem TorusPt_of (hE : ExpVan) (hS : SpecPt) : TorusPt := by
   intro C _ _ _ N n S p e hp hlac hX B hB
@@ -72,8 +73,9 @@ theorem TorusPt_of (hE : ExpVan) (hS : SpecPt) : TorusPt := by
   let Q : Set (Finset (Fin n) × Finset (Fin n) × C) :=
     {q | q.1.Nonempty ∧ q.2.1.Nonempty ∧ Disjoint q.1 q.2.1 ∧ q.2.2 ∈ B}
   let G : Set (MvPolynomial (Fin n) C) := Set.range (fun j => MvPolynomial.X j) ∪ bin '' Q
-  have hQ : Q.Finite := (Set.finite_univ.prod (Set.finite_univ.prod hB)).subset fun q hq => by
-    simp only [Set.mem_prod, Set.mem_univ, true_and]; exact hq.2.2.2
+  have hQ : Q.Finite :=
+    (Set.finite_univ.prod (Set.finite_univ.prod hB)).subset fun q hq => by
+      simp only [Set.mem_prod, Set.mem_univ, true_and]; exact hq.2.2.2
   have hG : G.Finite := (Set.finite_range _).union (hQ.image _)
   have hxg : ∀ g ∈ G, MvPolynomial.aeval x g ≠ 0 := by
     rintro g (⟨j, rfl⟩ | ⟨q, ⟨h1, h2, h3, h4⟩, rfl⟩)
@@ -81,32 +83,44 @@ theorem TorusPt_of (hE : ExpVan) (hS : SpecPt) : TorusPt := by
       have := congrArg (PowerSeries.coeff 0) h0
       simp [x, coeff_E] at this
     · intro h0
-      simp only [bin, map_sub, map_mul, map_pow, map_prod, MvPolynomial.aeval_X, MvPolynomial.aeval_C, x, E_prod,
-        E_pow] at h0
-      have h0' : E ((q.2.1.card : C) * ∑ i ∈ q.1, e i) - PowerSeries.C q.2.2 * E ((q.1.card : C) * ∑ i ∈ q.2.1, e i) = 0 := by
+      simp only [bin, map_sub, map_mul, map_pow, map_prod, MvPolynomial.aeval_X,
+          MvPolynomial.aeval_C, x, E_prod, E_pow]
+        at h0
+      have h0'
+          : E ((q.2.1.card : C) * ∑ i ∈ q.1, e i)
+              - PowerSeries.C q.2.2 * E ((q.1.card : C) * ∑ i ∈ q.2.1, e i)
+            = 0 := by
         simpa using h0
       exact hlac _ _ h1 h2 h3 (E_ne _ _ _ h0').2
   obtain ⟨y, hy1, hy2⟩ := hS C (PowerSeries C) (Fin n) x G hG hxg
   refine ⟨y, fun j => ?_, fun f hf => ?_, fun O O' hO hO' hd b hb => ?_⟩
   · have := hy2 _ (Or.inl ⟨j, rfl⟩); simpa using this
   · have h := hE C N S _ hX f hf
-    have hent : (fun ab : Fin N × Fin N => PowerSeries.mk fun k =>
-          ((k.factorial : C)⁻¹ • (∑ i, e i • p i) ^ k) ab.1 ab.2)
-        = fun ab => MvPolynomial.aeval x (∑ j, MvPolynomial.C (p j ab.1 ab.2) * MvPolynomial.X j) := by
+    have hent
+        : (fun ab : Fin N × Fin N =>
+            PowerSeries.mk fun k => ((k.factorial : C)⁻¹ • (∑ i, e i • p i) ^ k) ab.1 ab.2)
+          = fun ab =>
+            MvPolynomial.aeval x (∑ j, MvPolynomial.C (p j ab.1 ab.2) * MvPolynomial.X j) := by
       funext ab; rw [entry_exp hp]; simp [x]
     rw [hent, ← MvPolynomial.aeval_bind₁] at h
     have h2 := hy1 _ h
-    have h3 : MvPolynomial.aeval y
-        ((MvPolynomial.bind₁ fun ab : Fin N × Fin N => ∑ j, MvPolynomial.C (p j ab.1 ab.2) * MvPolynomial.X j) f) = 0 := by
+    have h3
+        : MvPolynomial.aeval y
+            ((MvPolynomial.bind₁ fun ab : Fin N × Fin N =>
+                ∑ j, MvPolynomial.C (p j ab.1 ab.2) * MvPolynomial.X j)
+              f)
+          = 0 := by
       exact h2
     rw [MvPolynomial.aeval_bind₁] at h3
     unfold ev
-    rw [show (fun q : Fin N × Fin N => (∑ j, y j • p j) q.1 q.2) = fun ab =>
-        MvPolynomial.aeval y (∑ j, MvPolynomial.C (p j ab.1 ab.2) * MvPolynomial.X j) from
+    rw [show (fun q : Fin N × Fin N => (∑ j, y j • p j) q.1 q.2)
+        = fun ab =>
+          MvPolynomial.aeval y (∑ j, MvPolynomial.C (p j ab.1 ab.2) * MvPolynomial.X j) from
       funext fun ab => by simp [Matrix.sum_apply, mul_comm]]
     exact h3
   · intro h
     apply hy2 _ (Or.inr ⟨(O, O', b), ⟨hO, hO', hd, hb⟩, rfl⟩)
     simp only [bin, map_sub, map_mul, map_pow, map_prod, MvPolynomial.eval_X, MvPolynomial.eval_C]
-    rw [h]; ring
+    rw [h]
+    ring
 end LateralTheory.DivDb.TorusPtPf

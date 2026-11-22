@@ -7,19 +7,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open scoped Classical
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
-private theorem isHecke_add {G : Type} [Group G] [TopologicalSpace G] {K : Subgroup G} {f g : G → ℂ}
-    (hf : IsHecke K f) (hg : IsHecke K g) : IsHecke K fun y => f y + g y := by
+private theorem isHecke_add
+    {G : Type} [Group G] [TopologicalSpace G]
+    {K : Subgroup G} {f g : G → ℂ} (hf : IsHecke K f) (hg : IsHecke K g)
+    : IsHecke K fun y => f y + g y := by
   refine ⟨hf.1.add hg.1, fun k hk x => ?_⟩
   simp only [(hf.2 k hk x).1, (hf.2 k hk x).2, (hg.2 k hk x).1, (hg.2 k hk x).2, and_self]
 
-private theorem isHecke_const_mul {G : Type} [Group G] [TopologicalSpace G] {K : Subgroup G} {f : G → ℂ}
-    (c : ℂ) (hf : IsHecke K f) : IsHecke K fun y => c * f y := by
+private theorem isHecke_const_mul
+    {G : Type} [Group G] [TopologicalSpace G]
+    {K : Subgroup G} {f : G → ℂ}
+    (c : ℂ) (hf : IsHecke K f)
+    : IsHecke K fun y => c * f y := by
   refine ⟨hf.1.mul_left (f := fun _ => c), fun k hk x => ?_⟩
   simp only [(hf.2 k hk x).1, (hf.2 k hk x).2, and_self]
 

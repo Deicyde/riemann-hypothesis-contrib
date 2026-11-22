@@ -18,25 +18,47 @@ namespace GlobalTheory
 
 open GlobalTheory.OpTrace
 
-theorem tensorTrace_summable_sq {ι : Type} [Fintype ι] {Hs : ι → Type} [∀ i, NormedAddCommGroup (Hs i)]
-    [∀ i, InnerProductSpace ℂ (Hs i)] [∀ i, CompleteSpace (Hs i)] {H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (Ψ : ContinuousMultilinearMap ℂ Hs H) (c : ℂ)
-    (hΨ : ∀ y y', ⟪Ψ y', Ψ y⟫_ℂ = c * ∏ i, ⟪y' i, y i⟫_ℂ) (A : ∀ i, Hs i →L[ℂ] Hs i)
-    (hA : ∀ i, IsHilbertSchmidt (A i)) :
-    Summable fun j : ∀ i, stdIndex (Hs i) => ‖Ψ (fun i => A i (stdBasis (H := Hs i) (j i)))‖ ^ 2 := by
-  have hs := (splitHeight_summable_pi_prod (α := fun i => stdIndex (Hs i))
-    (f := fun i k => ‖A i (stdBasis (H := Hs i) k)‖ ^ 2) (fun _ _ => sq_nonneg _) hA).mul_left c.re
+theorem tensorTrace_summable_sq
+    {ι : Type} [Fintype ι]
+    {Hs : ι → Type}
+    [∀ i, NormedAddCommGroup (Hs i)] [∀ i, InnerProductSpace ℂ (Hs i)] [∀ i, CompleteSpace (Hs i)]
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (Ψ : ContinuousMultilinearMap ℂ Hs H) (c : ℂ)
+    (hΨ : ∀ y y', ⟪Ψ y', Ψ y⟫_ℂ = c * ∏ i, ⟪y' i, y i⟫_ℂ)
+    (A : ∀ i, Hs i →L[ℂ] Hs i) (hA : ∀ i, IsHilbertSchmidt (A i))
+    : Summable fun j : ∀ i, stdIndex (Hs i) =>
+      ‖Ψ (fun i => A i (stdBasis (H := Hs i) (j i)))‖ ^ 2 := by
+  have hs :=
+    (splitHeight_summable_pi_prod
+      (α := fun i => stdIndex (Hs i))
+      (f := fun i k => ‖A i (stdBasis (H := Hs i) k)‖ ^ 2)
+      (fun _ _ => sq_nonneg _)
+      hA).mul_left c.re
   refine hs.congr fun j => ?_
-  have h1 := hΨ (fun i => A i (stdBasis (H := Hs i) (j i))) (fun i => A i (stdBasis (H := Hs i) (j i)))
+  have h1 :=
+    hΨ (fun i => A i (stdBasis (H := Hs i) (j i))) (fun i => A i (stdBasis (H := Hs i) (j i)))
   simp only [inner_self_eq_norm_sq_to_K] at h1
-  have h2 : ((‖Ψ (fun i => A i (stdBasis (H := Hs i) (j i)))‖ ^ 2 : ℝ) : ℂ)
-      = c * ((∏ i, ‖A i (stdBasis (H := Hs i) (j i))‖ ^ 2 : ℝ) : ℂ) := by
+  have h2
+      : ((‖Ψ (fun i => A i (stdBasis (H := Hs i) (j i)))‖ ^ 2 : ℝ) : ℂ)
+        = c * ((∏ i, ‖A i (stdBasis (H := Hs i) (j i))‖ ^ 2 : ℝ) : ℂ) := by
     push_cast; exact h1
   have h3 := congrArg Complex.re h2
   rw [Complex.ofReal_re, Complex.re_mul_ofReal] at h3
   exact h3.symm
 
-theorem tensorTrace_hasTrace : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Hs : ι → Type) [∀ i, NormedAddCommGroup (Hs i)] [∀ i, InnerProductSpace ℂ (Hs i)] [∀ i, CompleteSpace (Hs i)] (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (Φ Φ' : ContinuousMultilinearMap ℂ Hs H) (κ κ' : ℂ), (∀ y y', inner ℂ (Φ y') (Φ y) = ∏ i, inner ℂ (y' i) (y i)) → (∀ y y', inner ℂ (Φ y') (Φ' y) = κ * ∏ i, inner ℂ (y' i) (y i)) → (∀ y y', inner ℂ (Φ' y') (Φ' y) = κ' * ∏ i, inner ℂ (y' i) (y i)) → ∀ (B : ∀ i, Hs i →L[ℂ] Hs i) (b : ι → ℂ), (∀ i, HasTrace (B i) (b i)) → ∀ X : H →L[ℂ] H, (∀ y, X (Φ y) = Φ' fun i => B i (y i)) → (∀ v, (∀ y, inner ℂ (Φ y) v = 0) → X v = 0) → HasTrace X (κ * ∏ i, b i) := by
+theorem tensorTrace_hasTrace
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Hs : ι → Type) [∀ i, NormedAddCommGroup (Hs i)]
+        [∀ i, InnerProductSpace ℂ (Hs i)] [∀ i, CompleteSpace (Hs i)] (H : Type)
+        [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        (Φ Φ' : ContinuousMultilinearMap ℂ Hs H) (κ κ' : ℂ),
+      (∀ y y', inner ℂ (Φ y') (Φ y) = ∏ i, inner ℂ (y' i) (y i))
+        → (∀ y y', inner ℂ (Φ y') (Φ' y) = κ * ∏ i, inner ℂ (y' i) (y i))
+        → (∀ y y', inner ℂ (Φ' y') (Φ' y) = κ' * ∏ i, inner ℂ (y' i) (y i))
+        → ∀ (B : ∀ i, Hs i →L[ℂ] Hs i) (b : ι → ℂ),
+          (∀ i, HasTrace (B i) (b i))
+            → ∀ X : H →L[ℂ] H,
+              (∀ y, X (Φ y) = Φ' fun i => B i (y i)) → (∀ v, (∀ y, inner ℂ (Φ y) v = 0) → X v = 0)
+                → HasTrace X (κ * ∏ i, b i) := by
   intro ι _ _ Hs _ _ _ H _ _ _ Φ Φ' κ κ' hΦ hΦΦ' hΦ' B b hB X hX hX0
   classical
   let J : ι → Type := fun i => stdIndex (Hs i)
@@ -61,14 +83,19 @@ theorem tensorTrace_hasTrace : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Hs
 
   have hperp : ∀ x : H, (∀ j, ⟪u j, x⟫_ℂ = 0) → ∀ y, ⟪Φ y, x⟫_ℂ = 0 := by
     intro x hx y
-    have hL := GlobalTheory.T.continuousMultilinearMap_ext_hilbertBasis' ι Hs J e ℂ
-      ((innerSL ℂ x).compContinuousMultilinearMap Φ) 0 fun j => by
-        simp only [compContinuousMultilinearMap_coe, Function.comp_apply, innerSL_apply_apply,
-          ContinuousMultilinearMap.zero_apply]
-        rw [← inner_conj_symm]; simp [u] at hx; simp [hx]
+    have hL :=
+      GlobalTheory.T.continuousMultilinearMap_ext_hilbertBasis' ι Hs J e ℂ
+        ((innerSL ℂ x).compContinuousMultilinearMap Φ) 0
+        fun j => by
+          simp only [compContinuousMultilinearMap_coe, Function.comp_apply, innerSL_apply_apply,
+            ContinuousMultilinearMap.zero_apply]
+          rw [← inner_conj_symm]
+          simp [u] at hx
+          simp [hx]
     have := congrArg (fun L : ContinuousMultilinearMap ℂ Hs ℂ => L y) hL
     simp only [compContinuousMultilinearMap_coe, Function.comp_apply, innerSL_apply_apply,
-      ContinuousMultilinearMap.zero_apply] at this
+        ContinuousMultilinearMap.zero_apply]
+      at this
     rw [← inner_conj_symm, this, map_zero]
 
   have hinj : Function.Injective u := hu.linearIndependent.injective
@@ -83,16 +110,24 @@ theorem tensorTrace_hasTrace : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Hs
 
   choose n C D hC hD hBeq using fun i => (hB i).1
 
-  have hG : ∀ (Ψ : ContinuousMultilinearMap ℂ Hs H) (c : ℂ),
-      (∀ y y', ⟪Ψ y', Ψ y⟫_ℂ = c * ∏ i, ⟪y' i, y i⟫_ℂ) → ∀ A : ∀ i, Hs i →L[ℂ] Hs i,
-      (∀ i, IsHilbertSchmidt (A i)) → ∃ G : H →L[ℂ] H, (∀ y, G (Φ y) = Ψ (fun i => A i (y i))) ∧
-        (∀ v, (∀ y, ⟪Φ y, v⟫_ℂ = 0) → G v = 0) ∧ IsHilbertSchmidt G := by
+  have hG
+      : ∀ (Ψ : ContinuousMultilinearMap ℂ Hs H) (c : ℂ),
+        (∀ y y', ⟪Ψ y', Ψ y⟫_ℂ = c * ∏ i, ⟪y' i, y i⟫_ℂ)
+          → ∀ A : ∀ i, Hs i →L[ℂ] Hs i,
+            (∀ i, IsHilbertSchmidt (A i))
+              → ∃ G : H →L[ℂ] H,
+                (∀ y, G (Φ y) = Ψ (fun i => A i (y i))) ∧ (∀ v, (∀ y, ⟪Φ y, v⟫_ℂ = 0) → G v = 0)
+                  ∧ IsHilbertSchmidt G := by
     intro Ψ c hΨ A hA
-    obtain ⟨G, hG1, hG2, hG3⟩ := GlobalTheory.T.exists_isHilbertSchmidt_orthonormal_apply_alt H H (∀ i, J i) u
-      (fun j => Ψ (fun i => A i (e i (j i)))) hu (tensorTrace_summable_sq Ψ c hΨ A hA)
+    obtain ⟨G, hG1, hG2, hG3⟩ :=
+      GlobalTheory.T.exists_isHilbertSchmidt_orthonormal_apply_alt H H (∀ i, J i) u
+        (fun j => Ψ (fun i => A i (e i (j i))))
+        hu (tensorTrace_summable_sq Ψ c hΨ A hA)
     refine ⟨G, fun y => ?_, fun v hv => hG2 v fun j => hv _, hG3⟩
-    have := GlobalTheory.T.continuousMultilinearMap_ext_hilbertBasis' ι Hs J e H (G.compContinuousMultilinearMap Φ)
-      (Ψ.compContinuousLinearMap A) fun j => by simpa using hG1 j
+    have :=
+      GlobalTheory.T.continuousMultilinearMap_ext_hilbertBasis' ι Hs J e H
+        (G.compContinuousMultilinearMap Φ) (Ψ.compContinuousLinearMap A)
+        fun j => by simpa using hG1 j
     simpa using congrArg (fun L : ContinuousMultilinearMap ℂ Hs H => L y) this
   have hΦ1 : ∀ y y', ⟪Φ y', Φ y⟫_ℂ = 1 * ∏ i, ⟪y' i, y i⟫_ℂ := fun y y' => by rw [one_mul, hΦ]
   choose GD hGD1 hGD2 hGD3 using fun k : ∀ i, Fin (n i) => hG Φ 1 hΦ1 (fun i => D i (k i)) fun i => hD i _
@@ -136,8 +171,10 @@ theorem tensorTrace_hasTrace : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Hs
     simp only [hb, g]
     change ⟪Φ _, X (Φ _)⟫_ℂ = _
     rw [hX, hΦΦ']
-  have hprod := (GlobalTheory.T.hasSum_tuple_prod_of_summable_norm_complex ι J (fun i k => ⟪e i k, B i (e i k)⟫_ℂ)
-    fun i => (hB i).1.summable_norm (e i)).mul_left κ
+  have hprod :=
+    (GlobalTheory.T.hasSum_tuple_prod_of_summable_norm_complex ι J
+      (fun i k => ⟪e i k, B i (e i k)⟫_ℂ)
+      fun i => (hB i).1.summable_norm (e i)).mul_left κ
   have hb' : ∀ i, ∑' k, ⟪e i k, B i (e i k)⟫_ℂ = b i := fun i =>
     ((hB i).1.hasSum_trace (e i)).tsum_eq.trans (hB i).2
   simp only [hb'] at hprod

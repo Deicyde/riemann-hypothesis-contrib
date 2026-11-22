@@ -6,11 +6,13 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.DPFil
 
-theorem dividedPowerFiltration_one_le {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) : pdP δ 1 ≤ J := by
+theorem dividedPowerFiltration_one_le {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J)
+    : pdP δ 1 ≤ J := by
   refine Ideal.span_le.2 ?_
   rintro _ ⟨l, hl, hr, rfl⟩
   induction l with
@@ -23,8 +25,9 @@ theorem dividedPowerFiltration_one_le {B : Type} [CommRing B] {J : Ideal B} (δ 
       simpa [h0] using hr
     · exact J.mul_mem_right _ (δ.dpow_mem h0 hq)
 
-theorem dividedPowerFiltration_mul_le {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (r r' : ℕ) :
-    pdP δ r * pdP δ r' ≤ pdP δ (r + r') := by
+theorem dividedPowerFiltration_mul_le
+    {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (r r' : ℕ)
+    : pdP δ r * pdP δ r' ≤ pdP δ (r + r') := by
   unfold pdP
   rw [Ideal.span_mul_span']
   refine Ideal.span_le.2 ?_
@@ -37,11 +40,13 @@ theorem dividedPowerFiltration_mul_le {B : Type} [CommRing B] {J : Ideal B} (δ 
   · simpa using Nat.add_le_add hr hr'
   · simp
 
-theorem dpow_mem_pdP {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (k : ℕ) {x : B} (hx : x ∈ J) :
-    δ.dpow k x ∈ pdP δ k :=
+theorem dpow_mem_pdP
+    {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (k : ℕ) {x : B} (hx : x ∈ J)
+    : δ.dpow k x ∈ pdP δ k :=
   Ideal.subset_span ⟨[(k, x)], by simpa using hx, by simp, by simp⟩
 
-theorem isFil_sFil : ∀ {b : Base} {L : b.Fun} (Q : ObjectProperty (Thick L)), IsFil (sP Q) (sFil Q) := by
+theorem isFil_sFil
+    : ∀ {b : Base} {L : b.Fun} (Q : ObjectProperty (Thick L)), IsFil (sP Q) (sFil Q) := by
   intro b L Q
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro r hr T

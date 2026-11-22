@@ -5,8 +5,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-theorem UpperTheory.V.Pr.coefIs :
-    UpperTheory.V.Pr.CoefIs := by
+theorem UpperTheory.V.Pr.coefIs : UpperTheory.V.Pr.CoefIs := by
   intro l hl c
   obtain ⟨hc, hf, hlm, -, -, -⟩ := UpperTheory.V.abelian₂.dvr_finite l c.O
   refine ⟨hc, hf, ?_⟩

@@ -23,19 +23,21 @@ namespace OrdUnimod
 
 variable {e q d : ℕ} {L : Type} [Field L] [NumberField L] {ζ a b : L}
 
-theorem mem_one_iff' (t : hostE ζ a b) :
-    t ∈ (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) ↔ IsIntegral ℤ t := by
+theorem mem_one_iff' (t : hostE ζ a b)
+    : t ∈ (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) ↔ IsIntegral ℤ t := by
   rw [FractionalIdeal.mem_one_iff, IsIntegralClosure.isIntegral_iff (A := 𝓞 (hostE ζ a b))]
 
-theorem integ_iff (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (t : hostE ζ a b) :
-    IsIntegral ℤ (σ t) ↔ IsIntegral ℤ t := by
+theorem integ_iff (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (t : hostE ζ a b)
+    : IsIntegral ℤ (σ t) ↔ IsIntegral ℤ t := by
   first
   | exact isIntegral_algEquiv (σ.restrictScalars ℤ)
-  | exact ⟨fun h => by simpa using h.map (σ.symm.toAlgHom.restrictScalars ℤ),
-      fun h => h.map (σ.toAlgHom.restrictScalars ℤ)⟩
+  | exact ⟨
+      fun h => by simpa using h.map (σ.symm.toAlgHom.restrictScalars ℤ),
+      fun h => h.map (σ.toAlgHom.restrictScalars ℤ)
+    ⟩
 
-theorem smul_ne_bot (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (B : Ideal (𝓞 (hostE ζ a b)))
-    (hB : B ≠ ⊥) : σ • B ≠ ⊥ := by
+theorem smul_ne_bot (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (B : Ideal (𝓞 (hostE ζ a b))) (hB : B ≠ ⊥)
+    : σ • B ≠ ⊥ := by
   intro h
   apply hB
   have h' : σ⁻¹ • σ • B = σ⁻¹ • (⊥ : Ideal (𝓞 (hostE ζ a b))) := by rw [h]
@@ -47,24 +49,22 @@ theorem smul_ne_bot (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (B : Ideal (�
   | (rw [Ideal.pointwise_smul_def]; exact Ideal.map_bot)
   | simp
 
-theorem mem_inv_smul (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (B : Ideal (𝓞 (hostE ζ a b)))
-    (hB : B ≠ ⊥) (y : hostE ζ a b) :
-    σ y ∈ ((σ • B : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))⁻¹ ↔
-      y ∈ ((B : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
-  have hc : ∀ z : 𝓞 (hostE ζ a b),
-      algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) (σ • z) =
-        σ (algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) z) := by
+theorem mem_inv_smul
+    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (B : Ideal (𝓞 (hostE ζ a b))) (hB : B ≠ ⊥) (y : hostE ζ a b)
+    : σ y ∈ ((σ • B : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))⁻¹
+      ↔ y ∈ ((B : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
+  have hc
+      : ∀ z : 𝓞 (hostE ζ a b),
+        algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) (σ • z)
+          = σ (algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) z) := by
     intro z
-    first
-    | rfl
-    | simp
-    | exact NumberField.RingOfIntegers.coe_smul _ _
-  have h1 : ((σ • B : Ideal (𝓞 (hostE ζ a b))) :
-      FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) ≠ 0 :=
+    first | rfl | simp | exact NumberField.RingOfIntegers.coe_smul _ _
+  have h1
+      : ((σ • B : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+        ≠ 0 :=
     FractionalIdeal.coeIdeal_ne_zero.mpr (smul_ne_bot σ B hB)
-  have h2 : ((B : Ideal (𝓞 (hostE ζ a b))) :
-      FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) ≠ 0 :=
+  have h2
+      : ((B : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) ≠ 0 :=
     FractionalIdeal.coeIdeal_ne_zero.mpr hB
   rw [FractionalIdeal.mem_inv_iff h1, FractionalIdeal.mem_inv_iff h2]
   constructor
@@ -76,9 +76,10 @@ theorem mem_inv_smul (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (B : Ideal (�
       | exact Ideal.smul_mem_pointwise_smul σ z' B hz'
       | exact Submodule.smul_mem_pointwise_smul z' σ B hz'
       | exact Set.smul_mem_smul_set hz'
-    have := h (algebraMap _ _ (σ • z')) (by
-      rw [FractionalIdeal.mem_coeIdeal]
-      exact ⟨σ • z', hm, rfl⟩)
+    have :=
+      h (algebraMap _ _ (σ • z')) (by
+        rw [FractionalIdeal.mem_coeIdeal]
+        exact ⟨σ • z', hm, rfl⟩)
     rw [mem_one_iff'] at this ⊢
     rwa [hc, ← map_mul, integ_iff] at this
   · intro h w hw
@@ -89,9 +90,10 @@ theorem mem_inv_smul (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (B : Ideal (�
       | exact (Ideal.mem_pointwise_smul_iff_inv_smul_mem).mp hw'
       | exact Ideal.mem_pointwise_smul_iff_inv_smul_mem.mp hw'
       | (obtain ⟨v, hv, rfl⟩ := hw'; simpa using hv)
-    have := h (algebraMap _ _ (σ⁻¹ • w')) (by
-      rw [FractionalIdeal.mem_coeIdeal]
-      exact ⟨σ⁻¹ • w', hv, rfl⟩)
+    have :=
+      h (algebraMap _ _ (σ⁻¹ • w')) (by
+        rw [FractionalIdeal.mem_coeIdeal]
+        exact ⟨σ⁻¹ • w', hv, rfl⟩)
     rw [mem_one_iff'] at this ⊢
     have hw2 : w' = σ • (σ⁻¹ • w') := (smul_inv_smul σ w').symm
     rw [hw2, hc, ← map_mul, integ_iff]
@@ -101,20 +103,18 @@ end OrdUnimod
 
 open OrdUnimod
 
-private theorem mem_stabilizer_of_isArithFrobAt {L : Type} [Field L] [NumberField L] {ζ a b : L}
-    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime]
-    (h : IsArithFrobAt ℤ σ P) :
-    σ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P := by
+private theorem mem_stabilizer_of_isArithFrobAt
+    {L : Type} [Field L] [NumberField L]
+    {ζ a b : L} (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime]
+    (h : IsArithFrobAt ℤ σ P)
+    : σ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P := by
   have hc := h.comap_eq
   have key : ∀ y : 𝓞 (hostE ζ a b), y ∈ P ↔ σ • y ∈ P := by
     intro y
     have := congrArg (fun I : Ideal (𝓞 (hostE ζ a b)) => y ∈ I) hc
     simp only [Ideal.mem_comap] at this
     rw [← this]
-    first
-    | rfl
-    | exact Iff.rfl
-    | simp
+    first | rfl | exact Iff.rfl | simp
   rw [MulAction.mem_stabilizer_iff]
   ext x
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem]
@@ -125,17 +125,22 @@ private theorem mem_stabilizer_of_isArithFrobAt {L : Type} [Field L] [NumberFiel
   · intro hx
     exact (key _).mpr (by rw [smul_inv_smul]; exact hx)
 
-private theorem galE_fst_snd_eq_one_of_mem_stabilizer_of_jacobiSym_eq_one {e q d : ℕ} {L : Type} [Field L] [NumberField L] {ζ a b : L}
+private theorem galE_fst_snd_eq_one_of_mem_stabilizer_of_jacobiSym_eq_one
+    {e q d : ℕ} {L : Type} [Field L] [NumberField L]
+    {ζ a b : L}
     (hodd : HypOdd q d) (hL : IsLayer (e + 2) q d ζ a b)
-    (p : ℕ) [hpF : Fact p.Prime] (hp2 : p ≠ 2) (hpd : p ≠ d)
+    (p : ℕ) [hpF : Fact p.Prime]
+    (hp2 : p ≠ 2) (hpd : p ≠ d)
     (P : Ideal (𝓞 (hostE ζ a b))) [hPp : P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
     (hj : jacobiSym (-(d : ℤ)) p = 1)
     (τ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
-    (hτ : τ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P) :
-    (galE e ζ a b τ).1.2 = 1 := by
+    (hτ : τ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P)
+    : (galE e ζ a b τ).1.2 = 1 := by
   have hodd' : q.Prime ∧ d.Prime ∧ q ≠ d ∧ q ≠ 2 ∧ d ≠ 2 := hodd
-  have hL' : IsPrimitiveRoot ζ (2 ^ (e + 2)) ∧ a ^ 2 = -(q : L) ∧ b ^ 2 = -(d : L) ∧
-      IntermediateField.adjoin ℚ {ζ, a, b} = ⊤ := hL
+  have hL'
+      : IsPrimitiveRoot ζ (2 ^ (e + 2)) ∧ a ^ 2 = -(q : L) ∧ b ^ 2 = -(d : L)
+        ∧ IntermediateField.adjoin ℚ {ζ, a, b} = ⊤ :=
+    hL
   have hp : p.Prime := hpF.out
   have hspec := (hostGalSpec e q d hodd L ζ a b hL τ).2.1
   by_contra hs
@@ -143,14 +148,10 @@ private theorem galE_fst_snd_eq_one_of_mem_stabilizer_of_jacobiSym_eq_one {e q d
   have hτb : τ (bE ζ a b) = -(bE ζ a b) := by
     apply Subtype.ext
     rw [hspec, hs']
-    first
-    | simp [bE]
-    | (simp; rfl)
+    first | simp [bE] | (simp; rfl)
   have hb2 : (bE ζ a b) ^ 2 = algebraMap ℤ (hostE ζ a b) (-(d : ℤ)) := by
     apply Subtype.ext
-    first
-    | simp [bE, hL'.2.2.1]
-    | (simp [bE]; exact hL'.2.2.1)
+    first | simp [bE, hL'.2.2.1] | (simp [bE]; exact hL'.2.2.1)
   have hbI : IsIntegral ℤ (bE ζ a b) := by
     have h := isIntegral_algebraMap (R := ℤ) (A := hostE ζ a b) (x := -(d : ℤ))
     rw [← hb2] at h
@@ -162,14 +163,12 @@ private theorem galE_fst_snd_eq_one_of_mem_stabilizer_of_jacobiSym_eq_one {e q d
     | exact FaithfulSMul.algebraMap_injective _ _
     | exact NoZeroSMulDivisors.algebraMap_injective _ _
     | exact IsFractionRing.injective _ _
-  have hcomm : ∀ z : 𝓞 (hostE ζ a b),
-      algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) (τ • z) =
-        τ (algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) z) := by
+  have hcomm
+      : ∀ z : 𝓞 (hostE ζ a b),
+        algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) (τ • z)
+          = τ (algebraMap (𝓞 (hostE ζ a b)) (hostE ζ a b) z) := by
     intro z
-    first
-    | rfl
-    | simp
-    | exact NumberField.RingOfIntegers.coe_smul _ _
+    first | rfl | simp | exact NumberField.RingOfIntegers.coe_smul _ _
   have hβ2 : β ^ 2 = -(d : 𝓞 (hostE ζ a b)) := by
     apply hinj
     rw [map_pow, hβ, hb2]
@@ -195,10 +194,8 @@ private theorem galE_fst_snd_eq_one_of_mem_stabilizer_of_jacobiSym_eq_one {e q d
       exact one_ne_zero this
     exact (legendreSym.eq_one_iff p h0).mp hl
   obtain ⟨c, hc⟩ := hsq
-  obtain ⟨r, hr⟩ : ∃ r : ℤ, (r : ZMod p) = c := ⟨c.val, by
-    first
-    | simp
-    | exact_mod_cast ZMod.natCast_zmod_val c⟩
+  obtain ⟨r, hr⟩ : ∃ r : ℤ, (r : ZMod p) = c :=
+    ⟨c.val, by first | simp | exact_mod_cast ZMod.natCast_zmod_val c⟩
   have hdiv : (p : ℤ) ∣ r * r + d := by
     rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
     push_cast
@@ -220,8 +217,9 @@ private theorem galE_fst_snd_eq_one_of_mem_stabilizer_of_jacobiSym_eq_one {e q d
       rw [hcomm]
       simp [hβ, hτb]
     rw [h2] at h1
-    have e3 : ((4 * (d : ℤ) : ℤ) : 𝓞 (hostE ζ a b)) =
-        -(((β - s) - (-β - s)) * ((β - s) - (-β - s))) := by
+    have e3
+        : ((4 * (d : ℤ) : ℤ) : 𝓞 (hostE ζ a b))
+          = -(((β - s) - (-β - s)) * ((β - s) - (-β - s))) := by
       push_cast
       linear_combination 4 * hβ2
     have h3 : ((4 * (d : ℤ) : ℤ) : 𝓞 (hostE ζ a b)) ∈ P := by
@@ -235,8 +233,9 @@ private theorem galE_fst_snd_eq_one_of_mem_stabilizer_of_jacobiSym_eq_one {e q d
         (hp.dvd_of_dvd_pow (show p ∣ 2 ^ 2 by simpa using h5)))
     · exact hpd ((Nat.prime_dvd_prime_iff_eq hp hodd'.2.1).mp h5)
   have hm : (β - (r : 𝓞 (hostE ζ a b))) * (β - ((-r : ℤ) : 𝓞 (hostE ζ a b))) ∈ P := by
-    have e4 : (β - (r : 𝓞 (hostE ζ a b))) * (β - ((-r : ℤ) : 𝓞 (hostE ζ a b))) =
-        (((-(r * r + d)) : ℤ) : 𝓞 (hostE ζ a b)) := by
+    have e4
+        : (β - (r : 𝓞 (hostE ζ a b))) * (β - ((-r : ℤ) : 𝓞 (hostE ζ a b)))
+          = (((-(r * r + d)) : ℤ) : 𝓞 (hostE ζ a b)) := by
       push_cast
       linear_combination hβ2
     rw [e4, hZ]
@@ -251,8 +250,8 @@ theorem hostOrdinary : HostOrdinary := by
   obtain ⟨hq, hd, hq8, hd16, -⟩ := hH'
   have hq2 : q ≠ 2 := by omega
   have hd2 : d ≠ 2 := by omega
-  have hodd : HypOdd q d := show q.Prime ∧ d.Prime ∧ q ≠ d ∧ q ≠ 2 ∧ d ≠ 2 from
-    ⟨hq, hd, by omega, hq2, hd2⟩
+  have hodd : HypOdd q d :=
+    show q.Prime ∧ d.Prime ∧ q ≠ d ∧ q ≠ 2 ∧ d ≠ 2 from ⟨hq, hd, by omega, hq2, hd2⟩
   have hG := hostGalois e q d hodd L ζ a b hL
   have hmul := hG.2.2.1
   have hbij := hG.2.2.2
@@ -262,21 +261,20 @@ theorem hostOrdinary : HostOrdinary := by
     | (have h11 := hmul 1 1; rw [one_mul] at h11; exact (mul_eq_left.mp h11.symm))
   have hPsi : ∀ g : GG e, g ∈ Psi e ↔ g.1.2 = 1 := by
     intro g
-    first
-    | exact Iff.rfl
-    | (rw [Psi, MonoidHom.mem_ker]; rfl)
-    | simp [Psi, chD]
+    first | exact Iff.rfl | (rw [Psi, MonoidHom.mem_ker]; rfl) | simp [Psi, chD]
   have hS := hostSplitK_of (hostFrob_of hostGalois hostGalSpec) e q d hH L ζ a b hL
   have hF := hostFrob_of hostGalois hostGalSpec e q d hodd L ζ a b hL
   have hcq : Nat.Coprime q (2 ^ (e + 2)) :=
     Nat.Coprime.pow_right _ ((Nat.coprime_primes hq Nat.prime_two).mpr hq2)
   have hcd : Nat.Coprime d (2 ^ (e + 2)) :=
     Nat.Coprime.pow_right _ ((Nat.coprime_primes hd Nat.prime_two).mpr hd2)
-  have hD := hostDecomp e q d hH L ζ a b hL (ZMod.unitOfCoprime q hcq) (ZMod.unitOfCoprime d hcd)
-    (ZMod.coe_unitOfCoprime _ _) (ZMod.coe_unitOfCoprime _ _)
-  have key : (∀ σ τ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b, τ ∈ MulAction.stabilizer _ P →
-      (galE e ζ a b (σ * τ) ∈ Psi e ↔ galE e ζ a b σ ∈ Psi e)) ↔
-      ∀ τ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P, galE e ζ a b τ ∈ Psi e := by
+  have hD :=
+    hostDecomp e q d hH L ζ a b hL (ZMod.unitOfCoprime q hcq) (ZMod.unitOfCoprime d hcd)
+      (ZMod.coe_unitOfCoprime _ _) (ZMod.coe_unitOfCoprime _ _)
+  have key
+      : (∀ σ τ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b,
+          τ ∈ MulAction.stabilizer _ P → (galE e ζ a b (σ * τ) ∈ Psi e ↔ galE e ζ a b σ ∈ Psi e))
+        ↔ ∀ τ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P, galE e ζ a b τ ∈ Psi e := by
     constructor
     · intro h τ hτ
       have h1 := h 1 τ hτ
@@ -323,52 +321,54 @@ attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_l
 
 theorem hostUnimodular : HostUnimodular := by
   intro e q d _ L _ _ ζ a b _ σ _ 𝔟 h x
-  have hd1 : FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
-      (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) ≠ 0 := by
+  have hd1
+      : FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
+          (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+        ≠ 0 := by
     first
     | exact FractionalIdeal.dual_ne_zero _ _ one_ne_zero
     | exact FractionalIdeal.dual_ne_zero one_ne_zero
     | exact FractionalIdeal.dual_ne_zero (𝓞 (KinE ζ a b)) (KinE ζ a b) one_ne_zero
-  have hprod : ((𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-      FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) *
-      ((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) =
-      (FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
-        (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
+  have hprod
+      : ((𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+          * ((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+        = (FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
+          (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
     rw [← FractionalIdeal.coeIdeal_mul, ← h]
     first
     | exact coeIdeal_differentIdeal _ _ _ _
     | exact coeIdeal_differentIdeal (𝓞 (KinE ζ a b)) (KinE ζ a b) (hostE ζ a b) (𝓞 (hostE ζ a b))
     | exact coeIdeal_differentIdeal (A := 𝓞 (KinE ζ a b)) (K := KinE ζ a b) (L := hostE ζ a b)
         (B := 𝓞 (hostE ζ a b))
-  have hne : ((𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-      FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) *
-      ((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) ≠ 0 := by
+  have hne
+      : ((𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+          * ((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+        ≠ 0 := by
     rw [hprod]; exact inv_ne_zero hd1
   have hb := left_ne_zero_of_mul hne
   have hsb := right_ne_zero_of_mul hne
   have hb0 : 𝔟 ≠ ⊥ := FractionalIdeal.coeIdeal_ne_zero.mp hb
-  have hd : FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
-      (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) =
-      (((𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)) *
-      ((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
+  have hd
+      : FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
+          (1 : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+        = (((𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))
+          * ((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b)))
+            : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
     rw [hprod, inv_inv]
-  have hJ : FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
-      (((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ =
-      ((𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))⁻¹ := by
+  have hJ
+      : FractionalIdeal.dual (𝓞 (KinE ζ a b)) (KinE ζ a b)
+          (((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹
+        = ((𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))⁻¹ := by
     rw [FractionalIdeal.dual_eq_mul_inv, hd, inv_inv, mul_inv, mul_assoc, inv_mul_cancel₀ hsb,
       mul_one]
-  have hx : ∀ z : hostE ζ a b, z ∈ ((𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))⁻¹ ↔
-      ∀ w ∈ (((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹,
-        Algebra.trace (KinE ζ a b) (hostE ζ a b) (z * w) ∈
-          (algebraMap (𝓞 (KinE ζ a b)) (KinE ζ a b)).range := by
+  have hx
+      : ∀ z : hostE ζ a b,
+        z ∈ ((𝔟 : Ideal (𝓞 (hostE ζ a b))) : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b))⁻¹
+          ↔ ∀ w
+              ∈ (((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b)))
+                : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹,
+            Algebra.trace (KinE ζ a b) (hostE ζ a b) (z * w)
+              ∈ (algebraMap (𝓞 (KinE ζ a b)) (KinE ζ a b)).range := by
     intro z
     rw [← hJ, FractionalIdeal.mem_dual (inv_ne_zero hsb)]
     simp only [Algebra.traceForm_apply]
@@ -377,8 +377,9 @@ theorem hostUnimodular : HostUnimodular := by
   · intro hw y hy
     exact hw _ ((mem_inv_smul σ 𝔟 hb0 y).mpr hy)
   · intro hy w hw
-    have hw' : σ (σ.symm w) ∈ (((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b))) :
-        FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
+    have hw'
+        : σ (σ.symm w) ∈ (((σ • 𝔟 : Ideal (𝓞 (hostE ζ a b)))
+          : FractionalIdeal (𝓞 (hostE ζ a b))⁰ (hostE ζ a b)))⁻¹ := by
       rw [AlgEquiv.apply_symm_apply]; exact hw
     have := hy (σ.symm w) ((mem_inv_smul σ 𝔟 hb0 _).mp hw')
     rwa [AlgEquiv.apply_symm_apply] at this

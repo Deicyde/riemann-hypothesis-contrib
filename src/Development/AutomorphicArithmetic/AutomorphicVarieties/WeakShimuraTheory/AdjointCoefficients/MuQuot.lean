@@ -6,12 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem lifts_map {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type} [CommRing Λ]
-    [IsLocalRing Λ] {a : O →+* Λ} {c : PD Φ.ι Γ (ResidueField Λ)} {R R' : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
-    [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] {P : PD Φ.ι Γ R} (h : Φ.Lifts a c P) (f : R →ₐ[Λ] R') :
-    Φ.Lifts a c (P.map (f : R →+* R')) := by
+private theorem lifts_map
+    {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ]
+    {Φ : Fr O Γ} {Λ : Type} [CommRing Λ] [IsLocalRing Λ]
+    {a : O →+* Λ} {c : PD Φ.ι Γ (ResidueField Λ)} {R R' : Type}
+    [CommRing R] [Algebra Λ R] [IsCO Λ R] [CommRing R'] [Algebra Λ R'] [IsCO Λ R']
+    {P : PD Φ.ι Γ R} (h : Φ.Lifts a c P)
+    (f : R →ₐ[Λ] R')
+    : Φ.Lifts a c (P.map (f : R →+* R')) := by
   refine ⟨?_, ?_, ?_⟩
   · have hp := h.pair.map (f : R →+* R')
     rwa [← RingHom.comp_assoc, AlgHom.comp_algebraMap] at hp
@@ -21,13 +26,33 @@ private theorem lifts_map {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpac
     convert h.red using 2
     exact RingHom.ext fun x => res_map f x
 
-private theorem lifts_noMu {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type} [CommRing Λ]
-    [IsLocalRing Λ] {a : O →+* Λ} {c : PD Φ.ι Γ (ResidueField Λ)} {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
-    {P : PD Φ.ι Γ R} (h : Φ.Lifts a c P) : Φ.noMu.Lifts a c P :=
-  ⟨⟨h.pair.mult, h.pair.kill, h.pair.nrm, h.pair.low, h.pair.flag, fun _ _ hs => hs.elim⟩, h.cont, h.red⟩
+private theorem lifts_noMu
+    {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ]
+    {Φ : Fr O Γ} {Λ : Type} [CommRing Λ] [IsLocalRing Λ]
+    {a : O →+* Λ} {c : PD Φ.ι Γ (ResidueField Λ)} {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
+    {P : PD Φ.ι Γ R} (h : Φ.Lifts a c P)
+    : Φ.noMu.Lifts a c P := ⟨
+  ⟨h.pair.mult, h.pair.kill, h.pair.nrm, h.pair.low, h.pair.flag, fun _ _ hs => hs.elim⟩,
+  h.cont,
+  h.red
+⟩
 
-theorem UpperTheory.V.Ws.X1.muQuot :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (Φ : Fr O Γ) (l : ℕ) [Fact l.Prime] {Λ : Type} [CommRing Λ] [IsDomain Λ] [IsDiscreteValuationRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ] [Finite (ResidueField Λ)] (a : O →+* Λ), Φ.Std l a → ∀ c : PD Φ.ι Γ (ResidueField Λ), Φ.IsRes ((residue Λ).comp a) c → ∀ ζ : Φ.ι → Γ, (∀ v, MuGen (Φ.Gv v) (Φ.Mu v) (ζ v)) → (∀ v, a (Φ.ν (ζ v)) = 1) → ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (P : PD Φ.ι Γ R), Φ.IsDef a c P → ∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (P' : PD Φ.ι Γ R'), Φ.noMu.IsDef a c P' → ∃ (g : R' →ₐ[Λ] R) (e : Φ.ι × Fin 2 → R'), Function.Surjective g ∧ RingHom.ker g = Ideal.span (Set.range e) := by
+theorem UpperTheory.V.Ws.X1.muQuot
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (Φ : Fr O Γ) (l : ℕ) [Fact l.Prime] {Λ : Type}
+        [CommRing Λ] [IsDomain Λ] [IsDiscreteValuationRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ]
+        [Finite (ResidueField Λ)] (a : O →+* Λ),
+      Φ.Std l a
+        → ∀ c : PD Φ.ι Γ (ResidueField Λ),
+          Φ.IsRes ((residue Λ).comp a) c
+            → ∀ ζ : Φ.ι → Γ,
+              (∀ v, MuGen (Φ.Gv v) (Φ.Mu v) (ζ v)) → (∀ v, a (Φ.ν (ζ v)) = 1)
+                → ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (P : PD Φ.ι Γ R),
+                  Φ.IsDef a c P
+                    → ∀ (R' : Type) [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] (P' : PD Φ.ι Γ R'),
+                      Φ.noMu.IsDef a c P'
+                        → ∃ (g : R' →ₐ[Λ] R) (e : Φ.ι × Fin 2 → R'),
+                          Function.Surjective g ∧ RingHom.ker g = Ideal.span (Set.range e) := by
   intro O Γ _ _ _ _ _ _ Φ l _ Λ _ _ _ _ _ a hstd c hres ζ hζ hν R _ _ _ P hP R' _ _ _ P' hP'
   obtain ⟨g, hg, -⟩ := hP'.2 R P (lifts_noMu hP.1)
   have hPψ := (X1.muIff Φ l a hstd c hres ζ hζ hν R P (lifts_noMu hP.1)).mp hP.1
@@ -81,8 +106,9 @@ theorem UpperTheory.V.Ws.X1.muQuot :
     ext x
     rfl
   have hid : gb.comp h = AlgHom.id Λ R := by
-    rw [huniqP (gb.comp h) (by beta_reduce; rw [AlgHom.comp_toRingHom, ← PD.map_map, hh, PD.map_map,
-        ← AlgHom.comp_toRingHom, hgb, hg]),
+    rw [huniqP (gb.comp h) (by
+        beta_reduce
+        rw [AlgHom.comp_toRingHom, ← PD.map_map, hh, PD.map_map, ← AlgHom.comp_toRingHom, hgb, hg]),
       huniqP (AlgHom.id Λ R) (by beta_reduce; rw [← hg, PD.map_map]; rfl)]
   refine ⟨g, e, ?_, ?_⟩
   · intro y
@@ -94,8 +120,7 @@ theorem UpperTheory.V.Ws.X1.muQuot :
     exact hy
   · apply le_antisymm
     · intro x hx
-      have hx' : π x = 0 := by
-        rw [← hhg, AlgHom.comp_apply, RingHom.mem_ker.mp hx, map_zero]
+      have hx' : π x = 0 := by rw [← hhg, AlgHom.comp_apply, RingHom.mem_ker.mp hx, map_zero]
       exact (Ideal.Quotient.eq_zero_iff_mem).mp hx'
     · intro x hx
       exact RingHom.mem_ker.mpr (hIg x hx)

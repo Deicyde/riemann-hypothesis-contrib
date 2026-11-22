@@ -15,8 +15,8 @@ open Formalism.BasicNotions Formalism.MainNotions
 
 namespace GlobalTheory.BigOn
 
-theorem three_r_lt_g_of_params (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (k : Fin 2) :
-    3 * D.R.r < D.host.g k := by
+theorem three_r_lt_g_of_params (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (k : Fin 2)
+    : 3 * D.R.r < D.host.g k := by
   obtain ⟨Y, hY1, -, -, hY4⟩ := P.g_Y
   have hx1 : 1 < L.sc.x := L.sc.one_lt_alt
   have hL1 : 1 ≤ L.sc.L := by unfold Scale.L; exact Real.one_le_rpow hx1.le L.sc.eps_pos.le
@@ -28,7 +28,8 @@ theorem three_r_lt_g_of_params (D : D7) (L : SizeData₂ D) (P : ParameterChoice
   have hr : D.R.r ≤ 2 * D.R.k := by unfold Ranks.r; omega
   have hk1 : (1 : ℝ) ≤ D.R.k := by exact_mod_cast (show 1 ≤ D.R.k by omega)
   have hkb : (2 : ℝ) * D.R.k ≤ (D.R.k : ℝ) * L.sc.b := by nlinarith
-  have hpow : (D.R.k : ℝ) * L.sc.b * ((D.R.k : ℝ) * L.sc.b) ^ 7 = ((D.R.k : ℝ) * L.sc.b) ^ 8 := by ring
+  have hpow : (D.R.k : ℝ) * L.sc.b * ((D.R.k : ℝ) * L.sc.b) ^ 7 = ((D.R.k : ℝ) * L.sc.b) ^ 8 := by
+    ring
   have h7 : (2 : ℝ) ^ 7 ≤ ((D.R.k : ℝ) * L.sc.b) ^ 7 :=
     pow_le_pow_left₀ (by norm_num) (by nlinarith) 7
   have hbig : (6 : ℝ) * D.R.k < ((D.R.k : ℝ) * L.sc.b) ^ 8 := by
@@ -39,8 +40,7 @@ theorem three_r_lt_g_of_params (D : D7) (L : SizeData₂ D) (P : ParameterChoice
   have hr' : ((3 * D.R.r : ℕ) : ℝ) ≤ 6 * D.R.k := by
     have : 3 * D.R.r ≤ 6 * D.R.k := by omega
     exact_mod_cast this
-  have hg : ((3 * D.R.r : ℕ) : ℝ) < (D.host.g k : ℝ) := by
-    linarith [(hY4 k).1]
+  have hg : ((3 * D.R.r : ℕ) : ℝ) < (D.host.g k : ℝ) := by linarith [(hY4 k).1]
   exact_mod_cast hg
 
 end GlobalTheory.BigOn

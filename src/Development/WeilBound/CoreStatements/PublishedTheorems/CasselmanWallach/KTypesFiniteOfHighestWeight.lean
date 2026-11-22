@@ -7,21 +7,23 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirAlgebra.Mu
 
 noncomputable section
 
-open ReciprocityTheory.ChartRestriction.DS (casimirK IsGlRep IsInfUnitary IsKHWVec IsKStableSub adjSign)
+open ReciprocityTheory.ChartRestriction.DS
+  (casimirK IsGlRep IsInfUnitary IsKHWVec IsKStableSub adjSign)
 open scoped InnerProductSpace
 
 namespace PositivityTheory.CW.HighestWeightKernel
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V}
 
-theorem inner_compact (hU : IsInfUnitary ε E) {a b : Fin n} (h : ε a = ε b) (x y : V) :
-    ⟪E b a x, y⟫_ℂ = ⟪x, E a b y⟫_ℂ := by
+theorem inner_compact (hU : IsInfUnitary ε E) {a b : Fin n} (h : ε a = ε b) (x y : V)
+    : ⟪E b a x, y⟫_ℂ = ⟪x, E a b y⟫_ℂ := by
   have := hU b a x y
   simpa [adjSign, h.symm] using this
 
-theorem exists_hull (hL : LocFin ε E) (W : Submodule ℂ V) [FiniteDimensional ℂ W] :
-    ∃ Y : Submodule ℂ V, FiniteDimensional ℂ Y ∧ IsKStableSub ε E Y ∧ W ≤ Y := by
+theorem exists_hull (hL : LocFin ε E) (W : Submodule ℂ V) [FiniteDimensional ℂ W]
+    : ∃ Y : Submodule ℂ V, FiniteDimensional ℂ Y ∧ IsKStableSub ε E Y ∧ W ≤ Y := by
   classical
   choose S hSfin hSmem hSk using hL
   let bW := Module.finBasis ℂ W
@@ -29,7 +31,8 @@ theorem exists_hull (hL : LocFin ε E) (W : Submodule ℂ V) [FiniteDimensional 
   haveI : ∀ i, FiniteDimensional ℂ (S (bW i : V)) := fun i => hSfin _
   refine ⟨Y, Submodule.finite_iSup _, ?_, ?_⟩
   · intro a b hab v hv
-    refine Submodule.iSup_induction (fun i => S (bW i : V)) (motive := fun x => E a b x ∈ Y) hv ?_ ?_ ?_
+    refine
+      Submodule.iSup_induction (fun i => S (bW i : V)) (motive := fun x => E a b x ∈ Y) hv ?_ ?_ ?_
     · intro i x hx
       exact (le_iSup (fun i => S (bW i : V)) i) (hSk _ a b hab x hx)
     · simp
@@ -46,32 +49,37 @@ theorem exists_hull (hL : LocFin ε E) (W : Submodule ℂ V) [FiniteDimensional 
     refine Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ ?_)
     exact (le_iSup (fun i => S (bW i : V)) i) (hSmem _)
 
-theorem inner_casimirK (hU : IsInfUnitary ε E) (w : V) :
-    ⟪w, casimirK ε E w⟫_ℂ =
-      ((∑ a, ∑ b ∈ Finset.univ.filter (fun b => ε b = ε a), ‖E b a w‖ ^ 2 : ℝ) : ℂ) := by
-  simp only [ReciprocityTheory.ChartRestriction.DS.casimirK, LinearMap.sum_apply, Module.End.mul_apply, inner_sum]
+theorem inner_casimirK (hU : IsInfUnitary ε E) (w : V)
+    : ⟪w, casimirK ε E w⟫_ℂ
+      = ((∑ a, ∑ b ∈ Finset.univ.filter (fun b => ε b = ε a), ‖E b a w‖ ^ 2 : ℝ) : ℂ) := by
+  simp only [ReciprocityTheory.ChartRestriction.DS.casimirK, LinearMap.sum_apply,
+    Module.End.mul_apply, inner_sum]
   push_cast
   refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b hb => ?_))
   have hba : ε b = ε a := (Finset.mem_filter.1 hb).2
   rw [← inner_compact hU hba.symm, inner_self_eq_norm_sq_to_K]
-  first
-    | rfl
-    | simp
-    | norm_cast
+  first | rfl | simp | norm_cast
 
-theorem mem_ker_iff (μ : ℝ) (x : V) :
-    x ∈ LinearMap.ker (casimirK ε E - (μ : ℂ) • (1 : Module.End ℂ V)) ↔ casimirK ε E x = (μ : ℂ) • x := by
+theorem mem_ker_iff (μ : ℝ) (x : V)
+    : x ∈ LinearMap.ker (casimirK ε E - (μ : ℂ) • (1 : Module.End ℂ V))
+      ↔ casimirK ε E x = (μ : ℂ) • x := by
   simp [LinearMap.mem_ker, sub_eq_zero]
 
-theorem sq_le_of_khw (hU : IsInfUnitary ε E) {w : V} (hw0 : w ≠ 0) {μ : ℝ} (hwμ : casimirK ε E w = (μ : ℂ) • w)
-    {Λ : Fin n → ℝ} (hkw : IsKHWVec ε E Λ w) : (∑ a, Λ a ^ 2) ≤ μ := by
+theorem sq_le_of_khw
+    (hU : IsInfUnitary ε E)
+    {w : V} (hw0 : w ≠ 0)
+    {μ : ℝ} (hwμ : casimirK ε E w = (μ : ℂ) • w)
+    {Λ : Fin n → ℝ} (hkw : IsKHWVec ε E Λ w)
+    : (∑ a, Λ a ^ 2) ≤ μ := by
   have h1 := inner_casimirK hU w
   rw [hwμ, inner_smul_right, inner_self_eq_norm_sq_to_K] at h1
   have h2 : μ * ‖w‖ ^ 2 = ∑ a, ∑ b ∈ Finset.univ.filter (fun b => ε b = ε a), ‖E b a w‖ ^ 2 := by
     apply Complex.ofReal_injective
     rw [Complex.ofReal_mul, Complex.ofReal_pow]
     exact h1
-  have h3 : ∑ a, Λ a ^ 2 * ‖w‖ ^ 2 ≤ ∑ a, ∑ b ∈ Finset.univ.filter (fun b => ε b = ε a), ‖E b a w‖ ^ 2 := by
+  have h3
+      : ∑ a, Λ a ^ 2 * ‖w‖ ^ 2
+        ≤ ∑ a, ∑ b ∈ Finset.univ.filter (fun b => ε b = ε a), ‖E b a w‖ ^ 2 := by
     refine Finset.sum_le_sum (fun a _ => ?_)
     have hmem : a ∈ Finset.univ.filter (fun b => ε b = ε a) := by simp
     have hle := Finset.single_le_sum (f := fun b => ‖E b a w‖ ^ 2) (fun b _ => by positivity) hmem
@@ -82,17 +90,24 @@ theorem sq_le_of_khw (hU : IsInfUnitary ε E) {w : V} (hw0 : w ≠ 0) {μ : ℝ}
   rw [← Finset.sum_mul] at h3
   nlinarith
 
-theorem mem_of_eig (hgl : IsGlRep E) (hU : IsInfUnitary ε E) (hL : LocFin ε E)
-    (h3 : ∀ S : Submodule ℂ V, FiniteDimensional ℂ S → IsKStableSub ε E S → S ≠ ⊥ →
-      ∃ (w : V) (μ : Fin n → ℝ), w ∈ S ∧ w ≠ 0 ∧ IsKHWVec ε E μ w)
+theorem mem_of_eig
+    (hgl : IsGlRep E) (hU : IsInfUnitary ε E) (hL : LocFin ε E)
+    (h3 : ∀ S : Submodule ℂ V,
+      FiniteDimensional ℂ S → IsKStableSub ε E S → S ≠ ⊥
+        → ∃ (w : V) (μ : Fin n → ℝ), w ∈ S ∧ w ≠ 0 ∧ IsKHWVec ε E μ w)
     (hint : ∀ (v : V) (a : Fin n) (x : ℝ), v ≠ 0 → E a a v = (x : ℂ) • v → ∃ z : ℤ, x = z)
-    {Y : Submodule ℂ V} (hYk : IsKStableSub ε E Y) {μ : ℝ}
-    (hY : ∀ (w : V) (Λ : Fin n → ℤ), IsKHWVec ε E (fun a => ((Λ a : ℤ) : ℝ)) w →
-      (∑ a, ((Λ a : ℤ) : ℝ) ^ 2) ≤ μ → w ∈ Y)
-    {v : V} (hv : Eig ε E μ v) : v ∈ Y := by
+    {Y : Submodule ℂ V} (hYk : IsKStableSub ε E Y)
+    {μ : ℝ}
+    (hY : ∀ (w : V) (Λ : Fin n → ℤ),
+      IsKHWVec ε E (fun a => ((Λ a : ℤ) : ℝ)) w → (∑ a, ((Λ a : ℤ) : ℝ) ^ 2) ≤ μ → w ∈ Y)
+    {v : V} (hv : Eig ε E μ v)
+    : v ∈ Y := by
   classical
-  have key : ∀ k : ℕ, ∀ Z : Submodule ℂ V, FiniteDimensional ℂ Z → Module.finrank ℂ Z = k →
-      IsKStableSub ε E Z → (∀ z ∈ Z, casimirK ε E z = (μ : ℂ) • z) → Z ≤ Y := by
+  have key
+      : ∀ k : ℕ, ∀ Z : Submodule ℂ V,
+        FiniteDimensional ℂ Z → Module.finrank ℂ Z = k → IsKStableSub ε E Z
+          → (∀ z ∈ Z, casimirK ε E z = (μ : ℂ) • z)
+          → Z ≤ Y := by
     intro k
     induction k using Nat.strong_induction_on with
     | _ k ih =>
@@ -138,10 +153,8 @@ theorem mem_of_eig (hgl : IsGlRep E) (hU : IsInfUnitary ε E) (hL : LocFin ε E)
         exact Submodule.inner_right_of_mem_orthogonal (hKwS b a hab.symm u hu) hx.1
       have hlt : Module.finrank ℂ (Kwᗮ ⊓ Z : Submodule ℂ V) < k :=
         hZk ▸ Submodule.finrank_lt_finrank_of_lt hZ'lt
-      have hZ'le : Kwᗮ ⊓ Z ≤ Y :=
-        ih _ hlt _ inferInstance rfl hZ'k (fun z hz => hZc z hz.2)
-      have hsplit : Kw ⊔ Kwᗮ ⊓ Z = Z :=
-        Submodule.sup_orthogonal_inf_of_hasOrthogonalProjection hKwZ
+      have hZ'le : Kwᗮ ⊓ Z ≤ Y := ih _ hlt _ inferInstance rfl hZ'k (fun z hz => hZc z hz.2)
+      have hsplit : Kw ⊔ Kwᗮ ⊓ Z = Z := Submodule.sup_orthogonal_inf_of_hasOrthogonalProjection hKwZ
       rw [← hsplit]
       exact sup_le hKwY hZ'le
   obtain ⟨S, hSf, hvS, hSk⟩ := hL v
@@ -157,7 +170,8 @@ theorem mem_of_eig (hgl : IsGlRep E) (hU : IsInfUnitary ε E) (hL : LocFin ε E)
     simp only [Module.End.mul_apply] at this
     rw [this, hx2, map_smul]
   exact key _ Z (Submodule.finiteDimensional_of_le inf_le_left) rfl hZk
-    (fun z hz => (mem_ker_iff μ z).1 hz.2) ⟨hvS, (mem_ker_iff μ v).2 hv⟩
+    (fun z hz => (mem_ker_iff μ z).1 hz.2)
+    ⟨hvS, (mem_ker_iff μ v).2 hv⟩
 
 end PositivityTheory.CW.HighestWeightKernel
 
@@ -165,16 +179,20 @@ namespace PositivityTheory.CW
 
 open PositivityTheory.CW.HighestWeightKernel
 
-theorem k_types_finite_of_highest_weight (h : KStableHighestWeightVector) : KTypesBoundedFinite := by
+theorem k_types_finite_of_highest_weight (h : KStableHighestWeightVector)
+    : KTypesBoundedFinite := by
   classical
   intro n ε V _ _ E hgl hU hL hfinHW hint R
   let F : Set (Fin n → ℤ) := {Λ | (∑ a, ((Λ a : ℤ) : ℝ) ^ 2) ≤ R}
   have hFfin : F.Finite := by
-    refine (Set.Finite.pi (t := fun _ => Set.Icc (-⌈R⌉) ⌈R⌉) (fun _ => Set.finite_Icc _ _)).subset ?_
+    refine (Set.Finite.pi (t := fun _ => Set.Icc (- ⌈R⌉) ⌈R⌉) (fun _ => Set.finite_Icc _ _)).subset
+      ?_
     intro Λ hΛ a _
     have hsq : ((Λ a : ℤ) : ℝ) ^ 2 ≤ R := by
       refine le_trans ?_ hΛ
-      exact Finset.single_le_sum (f := fun b => ((Λ b : ℤ) : ℝ) ^ 2) (fun b _ => by positivity)
+      exact Finset.single_le_sum
+        (f := fun b => ((Λ b : ℤ) : ℝ) ^ 2)
+        (fun b _ => by positivity)
         (Finset.mem_univ a)
     have h1 : ((Λ a : ℤ) : ℝ) ≤ ((Λ a : ℤ) : ℝ) ^ 2 := by exact_mod_cast Int.le_self_sq (Λ a)
     have h2 : (-(Λ a : ℤ) : ℝ) ≤ ((Λ a : ℤ) : ℝ) ^ 2 := by
@@ -201,8 +219,10 @@ theorem k_types_finite_of_highest_weight (h : KStableHighestWeightVector) : KTyp
   refine mem_of_eig hgl hU hL (h n ε V E hgl hU) hint hYk (μ := μ) ?_ hv
   intro w Λ hkw hsq
   have hΛF : Λ ∈ F := le_trans hsq hμR
-  exact hWY ((le_iSup (fun Λ : F => Submodule.span ℂ
-    {w | IsKHWVec ε E (fun a => ((Λ.1 a : ℤ) : ℝ)) w}) ⟨Λ, hΛF⟩) (Submodule.subset_span hkw))
+  exact hWY ((le_iSup
+      (fun Λ : F => Submodule.span ℂ {w | IsKHWVec ε E (fun a => ((Λ.1 a : ℤ) : ℝ)) w})
+      ⟨Λ, hΛF⟩)
+    (Submodule.subset_span hkw))
 
 end PositivityTheory.CW
 

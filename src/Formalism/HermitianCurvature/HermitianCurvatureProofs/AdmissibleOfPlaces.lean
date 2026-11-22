@@ -16,18 +16,25 @@ noncomputable section
 
 section pull
 
-theorem psd_comp {Z X : Type} (P : Finset Z) (H : Z → Z → ℂ) (hH : TB.PSDOn P H) (Y : Finset X) (g : X → Z)
-    (hg : ∀ h ∈ Y, g h ∈ P) : TB.PSDOn Y (fun x y => H (g x) (g y)) := by
+theorem psd_comp
+    {Z X : Type} (P : Finset Z) (H : Z → Z → ℂ) (hH : TB.PSDOn P H) (Y : Finset X) (g : X → Z)
+    (hg : ∀ h ∈ Y, g h ∈ P)
+    : TB.PSDOn Y (fun x y => H (g x) (g y)) := by
   unfold TB.PSDOn at hH ⊢
   exact hH.submatrix (fun x : Y => (⟨g x, hg x x.2⟩ : P))
 
-theorem blockPSD_pull {Z X : Type} (P : Finset Z) (H : Z → Z → ℂ) (hH : TB.PSDOn P H) (Y : Finset X)
-    (f g : X → Z) (hf : ∀ h ∈ Y, f h ∈ P) (hg : ∀ h ∈ Y, g h ∈ P) :
-    KB.BlockPSD Y Y (fun h h' => H (f h) (f h')) (fun h h' => H (f h) (g h')) (fun h h' => H (g h) (g h')) := by
-  have h1 := psd_comp P H hH (Y.disjSum Y) (Sum.elim f g) (by
-    rintro (x|x) hx
-    · simpa using hf x (by simpa using hx)
-    · simpa using hg x (by simpa using hx))
+theorem blockPSD_pull
+    {Z X : Type} (P : Finset Z) (H : Z → Z → ℂ) (hH : TB.PSDOn P H) (Y : Finset X) (f g : X → Z)
+    (hf : ∀ h ∈ Y, f h ∈ P) (hg : ∀ h ∈ Y, g h ∈ P)
+    : KB.BlockPSD Y Y
+      (fun h h' => H (f h) (f h'))
+      (fun h h' => H (f h) (g h'))
+      (fun h h' => H (g h) (g h')) := by
+  have h1 :=
+    psd_comp P H hH (Y.disjSum Y) (Sum.elim f g) (by
+      rintro (x | x) hx
+      · simpa using hf x (by simpa using hx)
+      · simpa using hg x (by simpa using hx))
   have hherm := ((PBA.psd_iff_qf P H).1 hH).1
   unfold KB.BlockPSD
   unfold TB.PSDOn at h1 ⊢
@@ -39,14 +46,19 @@ theorem blockPSD_pull {Z X : Type} (P : Finset Z) (H : Z → Z → ℂ) (hH : TB
   · exact (hherm (f y) (hf y (by simpa using hj)) (g x) (hg x (by simpa using hi))).symm
   · rfl
 
-theorem blockPSD_comp {α X : Type} (Y₀ : Finset α) (a w b : α → α → ℂ) (h : KB.BlockPSD Y₀ Y₀ a w b)
-    (Y : Finset X) (l : X → α) (hl : ∀ x ∈ Y, l x ∈ Y₀) :
-    KB.BlockPSD Y Y (fun x y => a (l x) (l y)) (fun x y => w (l x) (l y)) (fun x y => b (l x) (l y)) := by
+theorem blockPSD_comp
+    {α X : Type} (Y₀ : Finset α) (a w b : α → α → ℂ) (h : KB.BlockPSD Y₀ Y₀ a w b) (Y : Finset X)
+    (l : X → α) (hl : ∀ x ∈ Y, l x ∈ Y₀)
+    : KB.BlockPSD Y Y
+      (fun x y => a (l x) (l y))
+      (fun x y => w (l x) (l y))
+      (fun x y => b (l x) (l y)) := by
   unfold KB.BlockPSD at h
-  have h1 := psd_comp _ _ h (Y.disjSum Y) (Sum.map l l) (by
-    rintro (x|x) hx
-    · simpa using hl x (by simpa using hx)
-    · simpa using hl x (by simpa using hx))
+  have h1 :=
+    psd_comp _ _ h (Y.disjSum Y) (Sum.map l l) (by
+      rintro (x | x) hx
+      · simpa using hl x (by simpa using hx)
+      · simpa using hl x (by simpa using hx))
   unfold KB.BlockPSD
   unfold TB.PSDOn at h1 ⊢
   convert h1 using 1
@@ -55,9 +67,12 @@ theorem blockPSD_comp {α X : Type} (Y₀ : Finset α) (a w b : α → α → �
 
 end pull
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
-  [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)] [∀ x, NormedAddCommGroup (Wq x)]
-  [∀ x, InnerProductSpace ℂ (Wq x)] (S : C.HidaSetting E Wp Wq)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Wp Wq : InfinitePlace E → Type}
+  [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+  [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
+  (S : C.HidaSetting E Wp Wq)
 
 section words
 
@@ -69,7 +84,8 @@ theorem cnt_le {w : C.Word S.f} {n : ℕ} (h : ∀ v, (w v).length ≤ n) : w.cn
   unfold C.Word.cnt
   exact Finset.sup_le fun v _ => h v
 
-theorem admissible_of_places {g : C.Word S.f} (h : ∀ v, ∃ w0 : S.W, w0.1 v = g v) : S.admitted g := by
+theorem admissible_of_places {g : C.Word S.f} (h : ∀ v, ∃ w0 : S.W, w0.1 v = g v)
+    : S.admitted g := by
   unfold C.HidaSetting.admitted
   refine ⟨fun v => ?_, fun v => ?_⟩
   · obtain ⟨w0, hw⟩ := h v
@@ -83,8 +99,9 @@ theorem admissible_of_places {g : C.Word S.f} (h : ∀ v, ∃ w0 : S.W, w0.1 v =
     rw [hw] at hA2
     exact hA2
 
-theorem mem_listsUpTo {T : Finset ℝ} {n : ℕ} (L : List C.Letter) (hl : L.length ≤ n)
-    (hT : ∀ x ∈ L, x.2 ∈ T) : L ∈ C.listsUpTo T n := by
+theorem mem_listsUpTo
+    {T : Finset ℝ} {n : ℕ} (L : List C.Letter) (hl : L.length ≤ n) (hT : ∀ x ∈ L, x.2 ∈ T)
+    : L ∈ C.listsUpTo T n := by
   unfold C.listsUpTo
   rw [Finset.mem_biUnion]
   refine ⟨L.length, Finset.mem_range.mpr (Nat.lt_succ_of_le hl), ?_⟩
@@ -139,25 +156,35 @@ theorem mem_Wb {w0 : S.W} {n : ℕ} (h : w0.1.cnt ≤ n) : w0 ∈ S.base.Wb n :=
   rw [Finset.mem_filter]
   exact ⟨W_mem_Wall S w0, h⟩
 
-def pw (A : Finset (Fin S.f)) (w : S.W) (θ : Fin S.f → List C.Letter → ℝ) (v : Fin S.f) (a : List C.Letter) : ℝ :=
-  if v ∈ A then θ v a else if a = w.1 v then 1 else 0
+def pw
+    (A : Finset (Fin S.f)) (w : S.W) (θ : Fin S.f → List C.Letter → ℝ) (v : Fin S.f)
+    (a : List C.Letter)
+    : ℝ :=
+  if v ∈ A then
+    θ v a
+  else if a = w.1 v then
+    1
+  else
+    0
 
 def pθ (A : Finset (Fin S.f)) (w : S.W) (θ : Fin S.f → List C.Letter → ℝ) (w' : S.W) : ℝ :=
   ∏ v, pw S A w θ v (w'.1 v)
 
-def supp (A : Finset (Fin S.f)) (w : S.W) (U : Fin S.f → Finset (List C.Letter)) (v : Fin S.f) :
-    Finset (List C.Letter) :=
+def supp (A : Finset (Fin S.f)) (w : S.W) (U : Fin S.f → Finset (List C.Letter)) (v : Fin S.f)
+    : Finset (List C.Letter) :=
   if v ∈ A then U v else {w.1 v}
 
 variable {S}
 
 section hyps
 
-variable {A : Finset (Fin S.f)} {w : S.W} {n : ℕ} {U : Fin S.f → Finset (List C.Letter)}
+variable
+  {A : Finset (Fin S.f)} {w : S.W} {n : ℕ} {U : Fin S.f → Finset (List C.Letter)}
   {θ : Fin S.f → List C.Letter → ℝ}
 
-theorem pw_ne_zero (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v)) {v : Fin S.f} {a : List C.Letter}
-    (h : pw S A w θ v a ≠ 0) : a ∈ supp S A w U v := by
+theorem pw_ne_zero
+    (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v)) {v : Fin S.f} {a : List C.Letter} (h : pw S A w θ v a ≠ 0)
+    : a ∈ supp S A w U v := by
   unfold pw at h
   unfold supp
   split_ifs at h ⊢ with h1 h2
@@ -166,16 +193,18 @@ theorem pw_ne_zero (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v)) {v : Fin S.f} {a :
   · simp [h2]
   · exact absurd rfl h
 
-theorem pw_nonneg (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v)) (v : Fin S.f) (a : List C.Letter) :
-    0 ≤ pw S A w θ v a := by
+theorem pw_nonneg (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v)) (v : Fin S.f) (a : List C.Letter)
+    : 0 ≤ pw S A w θ v a := by
   unfold pw
   split_ifs with h1 h2
   · exact (hP v h1).1 a
   · exact zero_le_one
   · exact le_refl 0
 
-theorem supp_word (hU : ∀ v ∈ A, ∀ a ∈ U v, D.AdmAt S v a ∧ a.length ≤ n) (hw : w.1.cnt ≤ n) (hn : n ≤ S.Ntop)
-    {g : C.Word S.f} (hg : g ∈ Fintype.piFinset (supp S A w U)) : S.AdmN g ∧ g.cnt ≤ n := by
+theorem supp_word
+    (hU : ∀ v ∈ A, ∀ a ∈ U v, D.AdmAt S v a ∧ a.length ≤ n) (hw : w.1.cnt ≤ n) (hn : n ≤ S.Ntop)
+    {g : C.Word S.f} (hg : g ∈ Fintype.piFinset (supp S A w U))
+    : S.AdmN g ∧ g.cnt ≤ n := by
   rw [Fintype.mem_piFinset] at hg
   have hv : ∀ v, D.AdmAt S v (g v) ∧ (g v).length ≤ n := by
     intro v
@@ -189,14 +218,16 @@ theorem supp_word (hU : ∀ v ∈ A, ∀ a ∈ U v, D.AdmAt S v a ∧ a.length �
   have hc : g.cnt ≤ n := cnt_le S (fun v => (hv v).2)
   exact ⟨And.intro (admissible_of_places S (fun v => (hv v).1)) (hc.trans hn), hc⟩
 
-theorem expand (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v))
-    (hU : ∀ v ∈ A, ∀ a ∈ U v, D.AdmAt S v a ∧ a.length ≤ n) (hw : w.1.cnt ≤ n) (hn : n ≤ S.Ntop)
-    (F : Fin S.f → List C.Letter → ℂ) :
-    ∑ w' ∈ S.base.Wb n, (pθ S A w θ w' : ℂ) * ∏ v, F v (w'.1 v) =
-      ∏ v, (if v ∈ A then ∑ a ∈ U v, (θ v a : ℂ) * F v a else F v (w.1 v)) := by
+theorem expand
+    (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v)) (hU : ∀ v ∈ A, ∀ a ∈ U v, D.AdmAt S v a ∧ a.length ≤ n)
+    (hw : w.1.cnt ≤ n) (hn : n ≤ S.Ntop) (F : Fin S.f → List C.Letter → ℂ)
+    : ∑ w' ∈ S.base.Wb n, (pθ S A w θ w' : ℂ) * ∏ v, F v (w'.1 v)
+      = ∏ v, (if v ∈ A then ∑ a ∈ U v, (θ v a : ℂ) * F v a else F v (w.1 v)) := by
   classical
-  have e1 : ∀ v, (if v ∈ A then ∑ a ∈ U v, (θ v a : ℂ) * F v a else F v (w.1 v)) =
-      ∑ a ∈ supp S A w U v, (pw S A w θ v a : ℂ) * F v a := by
+  have e1
+      : ∀ v,
+        (if v ∈ A then ∑ a ∈ U v, (θ v a : ℂ) * F v a else F v (w.1 v))
+          = ∑ a ∈ supp S A w U v, (pw S A w θ v a : ℂ) * F v a := by
     intro v
     unfold supp pw
     by_cases hv : v ∈ A
@@ -204,8 +235,10 @@ theorem expand (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v))
     · simp [hv]
   simp only [e1]
   rw [Finset.prod_univ_sum]
-  have e2 : ∀ w' : S.W, (pθ S A w θ w' : ℂ) * ∏ v, F v (w'.1 v) =
-      ∏ v, (pw S A w θ v (w'.1 v) : ℂ) * F v (w'.1 v) := by
+  have e2
+      : ∀ w' : S.W,
+        (pθ S A w θ w' : ℂ) * ∏ v, F v (w'.1 v)
+          = ∏ v, (pw S A w θ v (w'.1 v) : ℂ) * F v (w'.1 v) := by
     intro w'
     unfold pθ
     push_cast
@@ -224,9 +257,10 @@ theorem expand (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v))
   · intro w' _ _
     rfl
 
-theorem pθ_prob (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v))
-    (hU : ∀ v ∈ A, ∀ a ∈ U v, D.AdmAt S v a ∧ a.length ≤ n) (hw : w.1.cnt ≤ n) (hn : n ≤ S.Ntop) :
-    TB.IsProb (S.base.Wb n) (pθ S A w θ) := by
+theorem pθ_prob
+    (hP : ∀ v ∈ A, TB.IsProb (U v) (θ v)) (hU : ∀ v ∈ A, ∀ a ∈ U v, D.AdmAt S v a ∧ a.length ≤ n)
+    (hw : w.1.cnt ≤ n) (hn : n ≤ S.Ntop)
+    : TB.IsProb (S.base.Wb n) (pθ S A w θ) := by
   classical
   refine ⟨fun w' => Finset.prod_nonneg fun v _ => pw_nonneg hP v _, fun w' hw' => ?_, ?_⟩
   · by_contra h0

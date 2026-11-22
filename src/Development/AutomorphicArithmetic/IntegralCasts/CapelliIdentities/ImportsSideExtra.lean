@@ -7,15 +7,17 @@ public import Mathlib
 namespace MeasureEqCardCosetsMul
 end MeasureEqCardCosetsMul
 
-theorem UpperTheory.Reformulated.B.Yla7.main :
-    ∀ {G : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [inst_3 : MeasurableSpace G]
-      [BorelSpace G] (μ : MeasureTheory.Measure G) [μ.IsMulLeftInvariant] {I : Subgroup G},
-      IsOpen (↑I : Set G) →
-        ∀ {D : Set G},
-          (∀ g ∈ D, ∀ i ∈ I, g * i ∈ D) →
-            ∀ (S : Finset (G ⧸ I)),
-              (∀ (q : G ⧸ I), q ∈ S ↔ Quotient.out q ∈ D) →
-                (μ : Set G → ENNReal) D = (↑S.card : ENNReal) * (μ : Set G → ENNReal) (↑I : Set G) := by
+theorem UpperTheory.Reformulated.B.Yla7.main
+    : ∀ {G : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [inst_3 : MeasurableSpace G] [BorelSpace G] (μ : MeasureTheory.Measure G)
+        [μ.IsMulLeftInvariant] {I : Subgroup G},
+      IsOpen (↑I : Set G)
+        → ∀ {D : Set G},
+          (∀ g ∈ D, ∀ i ∈ I, g * i ∈ D)
+            → ∀ (S : Finset (G ⧸ I)),
+              (∀ (q : G ⧸ I), q ∈ S ↔ Quotient.out q ∈ D)
+                → (μ : Set G → ENNReal) D
+                  = (↑S.card : ENNReal) * (μ : Set G → ENNReal) (↑I : Set G) := by
   intro G _ _ _ _ _ μ _ I hI D hD S hS
   classical
   set f : G ⧸ I → Set G := fun q => (fun h => (Quotient.out q)⁻¹ * h) ⁻¹' (I : Set G) with hf
@@ -38,7 +40,8 @@ theorem UpperTheory.Reformulated.B.Yla7.main :
         rw [hh]
         exact hD x hx h h.2
       · rw [hmem]
-        have : (QuotientGroup.mk (Quotient.out (QuotientGroup.mk x : G ⧸ I)) : G ⧸ I) = QuotientGroup.mk x :=
+        have : (QuotientGroup.mk (Quotient.out (QuotientGroup.mk x : G ⧸ I)) : G ⧸ I)
+            = QuotientGroup.mk x :=
           Quotient.out_eq' _
         exact QuotientGroup.eq.mp this
     · rintro ⟨q, hq, hx⟩

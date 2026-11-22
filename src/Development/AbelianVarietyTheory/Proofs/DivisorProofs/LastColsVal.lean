@@ -30,16 +30,23 @@ attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
 
 variable {k}
 
-theorem smallF_lact [MeasurableSpace k] [BorelSpace k] (n d : ℕ) (ν : kˣ →* ℂˣ) (h : GL (Fin n) k)
-    (Φ : Matrix (Fin n) (Fin d) k → ℂ) (Y : Matrix (Fin n) (Fin d) k) :
-    smallF (haarVol (GlobalTheory.SplitWeil.KO k (Fin n))) ν (GlobalTheory.FullRankCoinv.lact ν h Φ) Y =
-      smallF (haarVol (GlobalTheory.SplitWeil.KO k (Fin n))) ν Φ Y := by
+theorem smallF_lact
+    [MeasurableSpace k] [BorelSpace k]
+    (n d : ℕ)
+    (ν : kˣ →* ℂˣ) (h : GL (Fin n) k) (Φ : Matrix (Fin n) (Fin d) k → ℂ)
+    (Y : Matrix (Fin n) (Fin d) k)
+    : smallF (haarVol (GlobalTheory.SplitWeil.KO k (Fin n))) ν
+        (GlobalTheory.FullRankCoinv.lact ν h Φ) Y
+      = smallF (haarVol (GlobalTheory.SplitWeil.KO k (Fin n))) ν Φ Y := by
   unfold smallF GlobalTheory.FullRankCoinv.lact
-  have hI := integral_mul_left_eq_self (μ := haarVol (GlobalTheory.SplitWeil.KO k (Fin n)))
-    (fun g : GL (Fin n) k => Φ (g.val * Y) * (ν (gdet g) : ℂ) * apow (gdet g) ((Fintype.card (Fin d) : ℂ) / 2))
-    (invT h)⁻¹
+  have hI :=
+    integral_mul_left_eq_self (μ := haarVol (GlobalTheory.SplitWeil.KO k (Fin n)))
+      (fun g : GL (Fin n) k =>
+        Φ (g.val * Y) * (ν (gdet g) : ℂ) * apow (gdet g) ((Fintype.card (Fin d) : ℂ) / 2))
+      (invT h)⁻¹
   rw [← hI]
-  congr 1; funext g
+  congr 1
+  funext g
   have e1 : gdet ((invT h)⁻¹ * g) = gdet h * gdet g := by
     rw [gdet_mul, show gdet (invT h)⁻¹ = (gdet (invT h))⁻¹ from map_inv _ _, gdet_invT, inv_inv]
   simp only [e1, Units.val_mul, invT_inv_val, map_mul, apow_mul, Matrix.mul_assoc, Fintype.card_fin]

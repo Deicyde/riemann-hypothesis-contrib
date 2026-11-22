@@ -7,7 +7,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.ExhaustionFrames
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
 open scoped Matrix ComplexOrder
 
 noncomputable section
@@ -15,18 +16,24 @@ noncomputable section
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
 def IsOrthonormalFrame (X : Data E r) (x0 : Frame X.Ψ r) : Prop :=
-  ∀ τ : X.Ψ, gram τ.1 X.Gm (mat x0 τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)
+  ∀ τ : X.Ψ,
+    gram τ.1 X.Gm (mat x0 τ) = Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)
 
 def Base (X : Data E r) : Type := {x0 : Frame X.Ψ r // IsOrthonormalFrame X x0}
 
 variable (X : Data E r)
 
-def zBlock (z : V (nd X)) (τ : X.Ψ) :
-    Matrix {a : Fin r // X.p0 ≤ (a : ℕ)} {b : Fin r // (b : ℕ) < X.p0} ℂ :=
+def zBlock (z : V (nd X)) (τ : X.Ψ)
+    : Matrix {a : Fin r // X.p0 ≤ (a : ℕ)} {b : Fin r // (b : ℕ) < X.p0} ℂ :=
   Matrix.of fun a b => nmat X z τ a.1 b.1
 
 def zFrame (z : V (nd X)) : Frame X.Ψ r := fun τ a b =>
-  if X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0 then nmat X z τ a b else if a = b then 1 else 0
+  if X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0 then
+    nmat X z τ a b
+  else if a = b then
+    1
+  else
+    0
 
 def leviFrame (z : V (nd X)) : Frame X.Ψ r := fun τ a b =>
   if X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0 then 0 else nmat X z τ a b
@@ -57,7 +64,8 @@ theorem zDet_pos {z : V (nd X)} (hz : z ∈ Om X) (τ : X.Ψ) : 0 < zDet X z τ 
     intro x
     rw [Matrix.sub_mulVec, Matrix.one_mulVec, dotProduct_sub, ← Matrix.mulVec_mulVec,
       Matrix.star_mulVec, ← Matrix.dotProduct_mulVec]
-  have hsq : ∀ {ι : Type} [Fintype ι] (v : ι → ℂ), star v ⬝ᵥ v = ((‖WithLp.toLp 2 v‖ ^ 2 : ℝ) : ℂ) := by
+  have hsq
+      : ∀ {ι : Type} [Fintype ι] (v : ι → ℂ), star v ⬝ᵥ v = ((‖WithLp.toLp 2 v‖ ^ 2 : ℝ) : ℂ) := by
     intro ι _ v
     have h := inner_self_eq_norm_sq_to_K (𝕜 := ℂ) (WithLp.toLp 2 v)
     rw [EuclideanSpace.inner_toLp_toLp, dotProduct_comm] at h

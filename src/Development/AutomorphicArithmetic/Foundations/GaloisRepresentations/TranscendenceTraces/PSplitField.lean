@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.splitField_of :
-    SplitField :=
+theorem UpperTheory.Gal.TranscendenceTraces.splitField_of : SplitField :=
   _root_.UpperTheory.Reformulated.B.SplittingFieldConstruction.splitField_of

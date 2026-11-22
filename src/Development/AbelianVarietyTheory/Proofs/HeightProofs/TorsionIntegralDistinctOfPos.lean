@@ -13,21 +13,23 @@ open scoped IntermediateField
 namespace GlobalTheory.TorsionIntegralPos
 open GlobalTheory.TorsionIntegral
 
-
 open IsLocalRing in
-theorem torsion_integral_distinct_of_pos : ∀ (L : PeriodPair) (W : ValuationSubring ℂ) (m : ℕ),
-    (2 : ℂ)⁻¹ ∈ W → (3 : ℂ)⁻¹ ∈ W → L.g₂ ∈ W → L.g₃ ∈ W → (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)⁻¹ ∈ W →
-    0 < m → (m : ℂ)⁻¹ ∈ W →
-    (∀ t, (m : ℂ) * t ∈ L.lattice → t ∉ L.lattice → L.weierstrassP t ∈ W) ∧
-    ∀ t t', (m : ℂ) * t ∈ L.lattice → t ∉ L.lattice → (m : ℂ) * t' ∈ L.lattice →
-      t' ∉ L.lattice → L.weierstrassP t - L.weierstrassP t' ∈ W.nonunits →
-      t - t' ∈ L.lattice ∨ t + t' ∈ L.lattice := by
+theorem torsion_integral_distinct_of_pos
+    : ∀ (L : PeriodPair) (W : ValuationSubring ℂ) (m : ℕ),
+      (2 : ℂ)⁻¹ ∈ W → (3 : ℂ)⁻¹ ∈ W → L.g₂ ∈ W → L.g₃ ∈ W → (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)⁻¹ ∈ W → 0 < m
+        → (m : ℂ)⁻¹ ∈ W
+        → (∀ t, (m : ℂ) * t ∈ L.lattice → t ∉ L.lattice → L.weierstrassP t ∈ W)
+          ∧ ∀ t t',
+            (m : ℂ) * t ∈ L.lattice → t ∉ L.lattice → (m : ℂ) * t' ∈ L.lattice → t' ∉ L.lattice
+              → L.weierstrassP t - L.weierstrassP t' ∈ W.nonunits
+              → t - t' ∈ L.lattice ∨ t + t' ∈ L.lattice := by
   intro L W m h2 _ hg2 hg3 hΔ hpos hm
-  have hI : ∀ t, (m : ℂ) * t ∈ L.lattice → t ∉ L.lattice → L.weierstrassP t ∈ W :=
-    fun t a b => integral L W m h2 hg2 hg3 hpos.ne' hm a b
+  have hI : ∀ t, (m : ℂ) * t ∈ L.lattice → t ∉ L.lattice → L.weierstrassP t ∈ W := fun t a b =>
+    integral L W m h2 hg2 hg3 hpos.ne' hm a b
   refine ⟨hI, fun t t' a b a' b' hn => ?_⟩
   by_contra hc
-  have hne : L.weierstrassP t ≠ L.weierstrassP t' := mt (GlobalTheory.weierstrassP_eq_iff L b b').1 hc
+  have hne : L.weierstrassP t ≠ L.weierstrassP t' :=
+    mt (GlobalTheory.weierstrassP_eq_iff L b b').1 hc
   rw [not_or] at hc
   obtain ⟨hs, hp⟩ := sum_prod L b b' hne
   let x1 : W := ⟨_, hI t a b⟩
@@ -69,9 +71,9 @@ theorem torsion_integral_distinct_of_pos : ∀ (L : PeriodPair) (W : ValuationSu
   generalize residue W h = u at *
   have k1 : 4 * x ^ 3 - A * x - B = 0 := by linear_combination (A * x) * f3 - f1
   have k2 : (4 * x ^ 2 + A) ^ 2 + 32 * B * x = 0 := by
-    have hA : 4 * (x * x + A * u ^ 2) = 4 * x ^ 2 + A := by
-      linear_combination A * (2 * u + 1) * f3
-    rw [← hA]; linear_combination -16 * f2
+    have hA : 4 * (x * x + A * u ^ 2) = 4 * x ^ 2 + A := by linear_combination A * (2 * u + 1) * f3
+    rw [← hA]
+    linear_combination -16 * f2
   have k3 : A ^ 3 - 27 * B ^ 2 = 0 := by
     linear_combination (A - 3 * x ^ 2) * k2 + (12 * x ^ 3 + 5 * A * x + 27 * B) * k1
   rw [k3, zero_mul] at f4

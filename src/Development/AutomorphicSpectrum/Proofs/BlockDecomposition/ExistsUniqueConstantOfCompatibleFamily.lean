@@ -8,8 +8,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.USt
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.Axis
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+  GlobalTheory.CompanionTheory.Axis
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -18,46 +21,56 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Axis
 
-theorem existsUnique_const_of_trivSqZeroExt (R : Type) [CommRing R] (C : Type) [Category.{0} C]
-    (F : C ⥤ CommAlgCat.{0} R) (M : Type) [AddCommGroup M]
-    [Module R M] [Module Rᵐᵒᵖ M] [IsCentralScalar R M] (F' : C ⥤ CommAlgCat.{0} (TrivSqZeroExt R M)) (bc : BC F F') :
-    Stein F' → ∀ z : ∀ T : C, M ⊗[R] F.obj T,
-      (∀ (T T' : C) (φ : T ⟶ T'), z T' = (mp F φ).toLinearMap.lTensor M (z T)) →
-      ∃! m : M, ∀ T, z T = m ⊗ₜ[R] (1 : F.obj T) := by
+theorem existsUnique_const_of_trivSqZeroExt
+    (R : Type) [CommRing R]
+    (C : Type) [Category.{0} C]
+    (F : C ⥤ CommAlgCat.{0} R)
+    (M : Type) [AddCommGroup M] [Module R M] [Module Rᵐᵒᵖ M] [IsCentralScalar R M]
+    (F' : C ⥤ CommAlgCat.{0} (TrivSqZeroExt R M)) (bc : BC F F')
+    : Stein F'
+      → ∀ z : ∀ T : C, M ⊗[R] F.obj T,
+        (∀ (T T' : C) (φ : T ⟶ T'), z T' = (mp F φ).toLinearMap.lTensor M (z T))
+          → ∃! m : M, ∀ T, z T = m ⊗ₜ[R] (1 : F.obj T) := by
   intro hS z hz
   choose e he using bc.bij
   have hpure : ∀ (T : C) (r : TrivSqZeroExt R M) (b : F.obj T), e T (r ⊗ₜ[R] b) = r • bc.α T b := by
     intro T r b
-    have h : (r ⊗ₜ[R] b : TrivSqZeroExt R M ⊗[R] F.obj T) = r • ((1 : TrivSqZeroExt R M) ⊗ₜ[R] b) := by
+    have h
+        : (r ⊗ₜ[R] b : TrivSqZeroExt R M ⊗[R] F.obj T) = r • ((1 : TrivSqZeroExt R M) ⊗ₜ[R] b) := by
       rw [TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
     rw [h, map_smul, he]
-  have hnat : ∀ {T T' : C} (φ : T ⟶ T') (x : TrivSqZeroExt R M ⊗[R] F.obj T),
-      e T' ((mp F φ).toLinearMap.lTensor _ x) = mp F' φ (e T x) := by
+  have hnat
+      : ∀ {T T' : C} (φ : T ⟶ T') (x : TrivSqZeroExt R M ⊗[R] F.obj T),
+        e T' ((mp F φ).toLinearMap.lTensor _ x) = mp F' φ (e T x) := by
     intro T T' φ x
     induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul r b =>
       rw [LinearMap.lTensor_tmul, hpure, hpure, map_smul]
       exact congrArg (r • ·) (bc.naturality φ b)
-    | add x y hx hy => rw [map_add (f := _), map_add (f := _), map_add (f := _), hx, hy, map_add (f := _)]
-  let jj : ∀ T : C, M ⊗[R] F.obj T →ₗ[R] TrivSqZeroExt R M ⊗[R] F.obj T :=
-    fun T ↦ (TrivSqZeroExt.inrHom R M).rTensor _
-  have hsnd : ∀ (T : C) (x : M ⊗[R] F.obj T),
-      (TrivSqZeroExt.sndHom R M).rTensor _ (jj T x) = x := by
+    | add x y hx hy =>
+      rw [map_add (f := _), map_add (f := _), map_add (f := _), hx, hy, map_add (f := _)]
+  let jj : ∀ T : C, M ⊗[R] F.obj T →ₗ[R] TrivSqZeroExt R M ⊗[R] F.obj T := fun T ↦
+    (TrivSqZeroExt.inrHom R M).rTensor _
+  have hsnd
+      : ∀ (T : C) (x : M ⊗[R] F.obj T), (TrivSqZeroExt.sndHom R M).rTensor _ (jj T x) = x := by
     intro T x
     induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul a b => simp [jj]
     | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
-  have hcomm : ∀ {T T' : C} (φ : T ⟶ T') (x : M ⊗[R] F.obj T),
-      jj T' ((mp F φ).toLinearMap.lTensor M x) = (mp F φ).toLinearMap.lTensor _ (jj T x) := by
+  have hcomm
+      : ∀ {T T' : C} (φ : T ⟶ T') (x : M ⊗[R] F.obj T),
+        jj T' ((mp F φ).toLinearMap.lTensor M x) = (mp F φ).toLinearMap.lTensor _ (jj T x) := by
     intro T T' φ x
     induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul a b => simp [jj]
-    | add x y hx hy => rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]
-  have hconst : ∀ (T : C) (r : TrivSqZeroExt R M),
-      algebraMap (TrivSqZeroExt R M) (F'.obj T) r = e T (r ⊗ₜ[R] (1 : F.obj T)) := by
+    | add x y hx hy =>
+      rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]
+  have hconst
+      : ∀ (T : C) (r : TrivSqZeroExt R M),
+        algebraMap (TrivSqZeroExt R M) (F'.obj T) r = e T (r ⊗ₜ[R] (1 : F.obj T)) := by
     intro T r
     rw [hpure, map_one, Algebra.algebraMap_eq_smul_one]
   let w : C0 F' := fun T ↦ e T (jj T (z T))
@@ -83,8 +96,8 @@ theorem existsUnique_const_of_trivSqZeroExt (R : Type) [CommRing R] (C : Type) [
           simp
         rw [TensorProduct.sub_tmul, ← hm₂ T, ← h1, sub_self]
       have h2 : (TrivSqZeroExt.inr (m₂ - r.snd) : TrivSqZeroExt R M) ⊗ₜ[R] (1 : F.obj T) = 0 := by
-        have : jj T ((m₂ - r.snd) ⊗ₜ[R] (1 : F.obj T)) =
-            (TrivSqZeroExt.inr (m₂ - r.snd) : TrivSqZeroExt R M) ⊗ₜ[R] (1 : F.obj T) := by
+        have : jj T ((m₂ - r.snd) ⊗ₜ[R] (1 : F.obj T))
+            = (TrivSqZeroExt.inr (m₂ - r.snd) : TrivSqZeroExt R M) ⊗ₜ[R] (1 : F.obj T) := by
           simp [jj]
         rw [← this, hd, map_zero]
       change algebraMap (TrivSqZeroExt R M) (F'.obj T) _ = 0

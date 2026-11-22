@@ -8,29 +8,46 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContD
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm
 open scoped ComplexConjugate
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
 
 namespace GlobalTheory.ArchCancel
 
-theorem eq_of_tens_eq : ∀ (F : Type) [Field F] [NumberField F] {κ : Type} [Fintype κ] (r : (κ → AF F) → ℂ),
-    (∀ x z, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) z → r (x + z) = r x) → (∃ x, r x ≠ 0) →
-    ∀ f₁ f₂ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ,
-      GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f₁ r = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f₂ r → f₁ = f₂ := by
+theorem eq_of_tens_eq
+    : ∀ (F : Type) [Field F] [NumberField F] {κ : Type} [Fintype κ] (r : (κ → AF F) → ℂ),
+      (∀ x z,
+          GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At
+              (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) z
+            → r (x + z) = r x)
+        → (∃ x, r x ≠ 0)
+        → ∀ f₁ f₂ : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ,
+          GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens
+                (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f₁ r
+              = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.tens
+                (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) f₂ r
+            → f₁ = f₂ := by
   intro F _ _ κ _ r hr hne f₁ f₂ h
   obtain ⟨x₀, hx₀⟩ := hne
   refine DFunLike.ext f₁ f₂ fun y => ?_
-  let z : κ → AF F := fun i =>
-    ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i - GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F (x₀ i)), 0)
-  have hz : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) z := by
+  let z : κ → AF F := fun i => (
+    (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm
+      (y i - GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F (x₀ i)),
+    0
+  )
+  have hz : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At
+      (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) z := by
     intro u hu
     funext i
     have hu1 : u.1 = 0 := by
@@ -43,7 +60,9 @@ theorem eq_of_tens_eq : ∀ (F : Type) [Field F] [NumberField F] {κ : Type} [Fi
     · show u.2 * (z i).2 = 0
       show u.2 * 0 = 0
       rw [mul_zero]
-  have hev : (fun i => GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F ((x₀ + z) i)) = y := by
+  have hev
+      : (fun i => GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F ((x₀ + z) i))
+        = y := by
     funext i
     show InfiniteAdeleRing.ringEquiv_mixedSpace F ((x₀ i).1 +
       (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i - GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F (x₀ i))) = y i

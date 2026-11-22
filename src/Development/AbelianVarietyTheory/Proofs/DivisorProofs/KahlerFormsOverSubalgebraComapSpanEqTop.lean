@@ -13,9 +13,13 @@ open GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential
 
 namespace GlobalTheory.PD.KSpan
 
-theorem alt_mem_of_span {K M N : Type} [Field K] [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N]
-    {n : ℕ} (f : M [⋀^Fin n]→ₗ[K] N) (s : Set M) (hs : Submodule.span K s = ⊤) (T : Submodule K N)
-    (hT : ∀ v : Fin n → M, (∀ i, v i ∈ s) → f v ∈ T) (v : Fin n → M) : f v ∈ T := by
+theorem alt_mem_of_span
+    {K M N : Type} [Field K] [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N]
+    {n : ℕ} (f : M [⋀^Fin n]→ₗ[K] N)
+    (s : Set M) (hs : Submodule.span K s = ⊤)
+    (T : Submodule K N) (hT : ∀ v : Fin n → M, (∀ i, v i ∈ s) → f v ∈ T)
+    (v : Fin n → M)
+    : f v ∈ T := by
   have key : ∀ j : ℕ, ∀ v : Fin n → M, (∀ i : Fin n, j ≤ i.val → v i ∈ s) → f v ∈ T := by
     intro j
     induction j with
@@ -47,9 +51,13 @@ end GlobalTheory.PD.KSpan
 
 namespace GlobalTheory.PD
 
-
 open KSpan in
-theorem omB_comap_span_eq_top : ∀ (k K : Type) [Field k] [Field K] [Algebra k K] (B : Subalgebra k K) [IsFractionRing B K] (p : ℕ) (W : Type) [AddCommGroup W] [Module K W] [Module k W] [IsScalarTower k K W] (e : W →ₗ[K] DR k K), Function.Injective e → LinearMap.range e = ⋀[K]^p Ω[K⁄k] → Submodule.span K ((omB k K B p).comap (e.restrictScalars k) : Set W) = ⊤ := by
+theorem omB_comap_span_eq_top
+    : ∀ (k K : Type) [Field k] [Field K] [Algebra k K] (B : Subalgebra k K) [IsFractionRing B K]
+        (p : ℕ) (W : Type) [AddCommGroup W] [Module K W] [Module k W] [IsScalarTower k K W]
+        (e : W →ₗ[K] DR k K),
+      Function.Injective e → LinearMap.range e = ⋀[K]^p Ω[K⁄k]
+        → Submodule.span K ((omB k K B p).comap (e.restrictScalars k) : Set W) = ⊤ := by
   intro k K _ _ _ B _ p W _ _ _ _ e he hr
   have hD : Submodule.span K (D k K '' (B : Set K)) = ⊤ := by
     rw [eq_top_iff, ← span_range_derivation k K, Submodule.span_le]
@@ -58,7 +66,10 @@ theorem omB_comap_span_eq_top : ∀ (k K : Type) [Field k] [Field K] [Algebra k 
     have h2 : algebraMap B K b2 ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb2
     set q := algebraMap B K b1 / algebraMap B K b2 with hqdef
     have e1 : algebraMap B K b1 = q * algebraMap B K b2 := by rw [hqdef, div_mul_cancel₀ _ h2]
-    have hq : D k K q = (algebraMap B K b2)⁻¹ • (D k K (algebraMap B K b1) - q • D k K (algebraMap B K b2)) := by
+    have hq
+        : D k K q
+          = (algebraMap B K b2)⁻¹
+            • (D k K (algebraMap B K b1) - q • D k K (algebraMap B K b2)) := by
       rw [e1, Derivation.leibniz, add_sub_cancel_left, smul_smul, inv_mul_cancel₀ h2, one_smul]
     have m1 : D k K (algebraMap B K b1) ∈ Submodule.span K (D k K '' (B : Set K)) :=
       Submodule.subset_span ⟨(b1 : K), b1.2, rfl⟩
@@ -87,11 +98,14 @@ theorem omB_comap_span_eq_top : ∀ (k K : Type) [Field k] [Field K] [Algebra k 
     refine ⟨1, B.one_mem, b, hb, ?_⟩
     rw [one_smul]
     simp only [hbv]
-  have hSC : (omB k K B p : Set (DR k K)) ⊆ e '' ((omB k K B p).comap (e.restrictScalars k) : Set W) := by
+  have hSC
+      : (omB k K B p : Set (DR k K))
+        ⊆ e '' ((omB k K B p).comap (e.restrictScalars k) : Set W) := by
     intro y hy
     obtain ⟨w, rfl⟩ : y ∈ LinearMap.range e := hr ▸ hS hy
     exact ⟨w, hy, rfl⟩
-  rw [eq_top_iff, ← Submodule.map_le_map_iff_of_injective he, ← LinearMap.range_eq_map, hr, Submodule.map_span]
+  rw [eq_top_iff, ← Submodule.map_le_map_iff_of_injective he, ← LinearMap.range_eq_map, hr,
+    Submodule.map_span]
   exact hP.trans (Submodule.span_mono hSC)
 
 end GlobalTheory.PD

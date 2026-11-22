@@ -12,8 +12,8 @@ noncomputable section
 
 namespace GlobalTheory.LKMid
 
-theorem t2Space_kq {p : ℕ} [Fact p.Prime] (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (r : ℕ) :
-    T2Space (KQ p K r) := by
+theorem t2Space_kq {p : ℕ} [Fact p.Prime] (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (r : ℕ)
+    : T2Space (KQ p K r) := by
   haveI : IsModuleTopology ℚ_[p] (KQ p K r) := ⟨rfl⟩
   let b := Module.Free.chooseBasis ℚ_[p] (KQ p K r)
   let φ : KQ p K r →ₗ[ℚ_[p]] (Module.Free.ChooseBasisIndex ℚ_[p] (KQ p K r) → ℚ_[p]) :=

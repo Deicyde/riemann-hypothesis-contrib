@@ -72,7 +72,6 @@ namespace LocalizationIntegrallyClosedDomain
 
 variable {B : Type} [CommRing B] {Q : Ideal B} [Q.IsPrime]
 
-
 set_option maxHeartbeats 1600000 in
 lemma isIntegrallyClosed
     (H : ∀ s : Finset B, ∃ C : Subring B, (↑s : Set B) ⊆ (C : Set B) ∧
@@ -193,8 +192,13 @@ lemma isIntegrallyClosed
 
 end LocalizationIntegrallyClosedDomain
 
-theorem localization_isDomain_isIntegrallyClosed_of_finset_subring :
-    ∀ (B : Type) [CommRing B] (Q : Ideal B) [Q.IsPrime], (∀ s : Finset B, ∃ C : Subring B, (↑s : Set B) ⊆ (C : Set B) ∧ ∀ (q : Ideal C) [q.IsPrime], IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q)) → IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q) := by
+theorem localization_isDomain_isIntegrallyClosed_of_finset_subring
+    : ∀ (B : Type) [CommRing B] (Q : Ideal B) [Q.IsPrime],
+      (∀ s : Finset B, ∃ C : Subring B,
+          (↑s : Set B) ⊆ (C : Set B)
+            ∧ ∀ (q : Ideal C) [q.IsPrime],
+              IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q))
+        → IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q) := by
   intro B _ Q _ H
   haveI : NoZeroDivisors (Localization.AtPrime Q) := LocalizationIntegrallyClosedDomain.noZeroDivisors H
   haveI : IsDomain (Localization.AtPrime Q) := NoZeroDivisors.to_isDomain _

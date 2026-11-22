@@ -14,8 +14,10 @@ noncomputable section
 
 universe u w
 
-theorem TwistVanishAll.proof (hE : Extension.Statement.{u, w, w}) (hV : SerreVanish.Statement.{u, w})
-    (hT : TwistSplit.Statement.{u, w}) : TwistVanishAll.Statement.{u, w} := by
+theorem TwistVanishAll.proof
+    (hE : Extension.Statement.{u, w, w}) (hV : SerreVanish.Statement.{u, w})
+    (hT : TwistSplit.Statement.{u, w})
+    : TwistVanishAll.Statement.{u, w} := by
   intro S _ _ Ω _ _ N x G B r η hη hspan
   obtain ⟨M₀, -, hM₀⟩ := hE S Ω N x Ω G.toSubFamily G.fg
   obtain ⟨M, _, _, _, _, 𝓜, hfin, hsplit⟩ :=

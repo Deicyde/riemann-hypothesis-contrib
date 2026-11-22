@@ -10,14 +10,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegersLatt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology
 
 namespace GlobalTheory.CMModel
 
-theorem exists_ker_point_sqrtNegNat {p : ℕ} (hp : 1 < p) (L : PeriodPair)
-    (hL : MulStable L (sqrtNegNat p)) :
-    ∃ t : ℂ, t ∉ L.lattice ∧ sqrtNegNat p * t ∈ L.lattice := by
+theorem exists_ker_point_sqrtNegNat
+    {p : ℕ} (hp : 1 < p) (L : PeriodPair) (hL : MulStable L (sqrtNegNat p))
+    : ∃ t : ℂ, t ∉ L.lattice ∧ sqrtNegNat p * t ∈ L.lattice := by
   have hn : Complex.normSq (sqrtNegNat p) = p := by
     rw [sqrtNegNat, map_mul, Complex.normSq_I, Complex.normSq_ofReal,
       Real.mul_self_sqrt (Nat.cast_nonneg p), mul_one]
@@ -38,8 +39,8 @@ theorem exists_ker_point_sqrtNegNat {p : ℕ} (hp : 1 < p) (L : PeriodPair)
   have := hS.1 t ht
   exact ⟨t, by tauto, by tauto⟩
 
-theorem g₂_mem_adjoin_j_of_eq (L : PeriodPair) (h0 : L.g₂ ≠ 0) (h : L.g₃ = L.g₂) :
-    L.g₂ ∈ ℚ⟮(latticeCurve L).j⟯ := by
+theorem g₂_mem_adjoin_j_of_eq (L : PeriodPair) (h0 : L.g₂ ≠ 0) (h : L.g₃ = L.g₂)
+    : L.g₂ ∈ ℚ⟮(latticeCurve L).j⟯ := by
   have hΔ := latticeCurve_Δ_ne_zero L
   rw [latticeCurve_Δ, h] at hΔ
   have h27 : L.g₂ - 27 ≠ 0 := fun e => hΔ (by linear_combination L.g₂ ^ 2 * e)
@@ -57,11 +58,14 @@ theorem g₂_mem_adjoin_j_of_eq (L : PeriodPair) (h0 : L.g₂ ≠ 0) (h : L.g₃
   rw [e]
   exact div_mem (mul_mem (ofNat_mem _ 27) hm) (sub_mem hm (ofNat_mem _ 1728))
 
-theorem exists_datum_of_isIntegersLattice : ∀ (p : ℕ) (L₀ : PeriodPair), p.Prime → p % 4 = 3 →
-    3 < p → IsIntegersLattice p L₀ → ∃ (L : PeriodPair) (t : ℂ),
-      Datum p ℚ⟮(latticeCurve L₀).j⟯ L t ∧ (latticeCurve L).j = (latticeCurve L₀).j := by
+theorem exists_datum_of_isIntegersLattice
+    : ∀ (p : ℕ) (L₀ : PeriodPair),
+      p.Prime → p % 4 = 3 → 3 < p → IsIntegersLattice p L₀
+        → ∃ (L : PeriodPair) (t : ℂ),
+          Datum p ℚ⟮(latticeCurve L₀).j⟯ L t ∧ (latticeCurve L).j = (latticeCurve L₀).j := by
   intro p L₀ hp _ h3 hL₀
-  obtain ⟨h2, h3', hmul⟩ := GlobalTheory.T.integersLattice_g2_g3_ne_zero_and_mulStable p L₀ hp h3 hL₀
+  obtain ⟨h2, h3', hmul⟩ :=
+    GlobalTheory.T.integersLattice_g2_g3_ne_zero_and_mulStable p L₀ hp h3 hL₀
   obtain ⟨c, hc⟩ := IsAlgClosed.exists_pow_nat_eq (L₀.g₃ / L₀.g₂) two_pos
   have hc0 : c ≠ 0 := by
     rintro rfl

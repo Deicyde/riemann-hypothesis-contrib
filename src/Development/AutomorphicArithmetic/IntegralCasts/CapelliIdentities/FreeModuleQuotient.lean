@@ -6,15 +6,18 @@ public import Mathlib
 
 theorem UpperTheory.Reformulated.B.FreeModuleQuotient.freeN_quot
     {R S M : Type} [CommRing R] [CommRing S] [AddCommGroup M] [Module R M]
-    (s : S →+* R) (I K : Ideal S) (hIK : I ≤ K) (c : ℕ)
-    (e : M ≃+ (Fin c → S ⧸ I)) (he : ∀ (z : S) (x : M), e (s z • x) = z • e x) :
-    ∃ e' : (M ⧸ (Ideal.map s K • ⊤ : Submodule R M)) ≃+ (Fin c → S ⧸ K),
-      ∀ (a : S) (x : M ⧸ (Ideal.map s K • ⊤ : Submodule R M)), e' (s a • x) = a • e' x := by
+    (s : S →+* R)
+    (I K : Ideal S) (hIK : I ≤ K)
+    (c : ℕ) (e : M ≃+ (Fin c → S ⧸ I)) (he : ∀ (z : S) (x : M), e (s z • x) = z • e x)
+    : ∃ e' : (M ⧸ (Ideal.map s K • ⊤ : Submodule R M)) ≃+ (Fin c → S ⧸ K),
+      ∀ (a : S) (x : M ⧸ (Ideal.map s K • ⊤ : Submodule R M)),
+        e' (s a • x) = a • e' x := by
   classical
-  let φ : M →+ (Fin c → S ⧸ K) :=
-    { toFun := fun x i => Ideal.Quotient.factor hIK (e x i)
-      map_zero' := by funext i; simp
-      map_add' := by intro x y; funext i; simp }
+  let φ : M →+ (Fin c → S ⧸ K) := {
+    toFun := fun x i => Ideal.Quotient.factor hIK (e x i)
+    map_zero' := by funext i; simp
+    map_add' := by intro x y; funext i; simp
+  }
   have hφ : ∀ x i, φ x i = Ideal.Quotient.factor hIK (e x i) := fun _ _ => rfl
   have hsm : ∀ (a : S) (x : M), φ (s a • x) = a • φ x := by
     intro a x

@@ -13,7 +13,8 @@ set_option linter.unusedSectionVars false
 
 namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1
 
 section FrameBundle
 
@@ -55,8 +56,7 @@ theorem isMultiHomog_C (c : O) : IsMultiHomog (C c : MRingOver O ι) 0 := by
     simp
   · exact absurd rfl hm
 
-def unif : O :=
-  Classical.choose (IsDiscreteValuationRing.exists_irreducible O)
+def unif : O := Classical.choose (IsDiscreteValuationRing.exists_irreducible O)
 
 end ModelInhabitants
 

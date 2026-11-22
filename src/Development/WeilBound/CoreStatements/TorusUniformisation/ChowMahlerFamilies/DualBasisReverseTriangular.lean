@@ -11,25 +11,30 @@ open GlobalTheory.CompanionTheory.Ar.Num (dotDual)
 
 namespace PositivityTheory.Xgn.DualReverseTriangular
 
-theorem repr_eq_dot {Ω : Type} [Field Ω] {r : ℕ} (w v : Module.Basis (Fin r) Ω (Fin r → Ω))
-    (h : ∀ i j, w i ⬝ᵥ v j = if i = j.rev then 1 else 0) (z : Fin r → Ω) (j : Fin r) :
-    v.repr z j = w j.rev ⬝ᵥ z := by
+theorem repr_eq_dot
+    {Ω : Type} [Field Ω]
+    {r : ℕ} (w v : Module.Basis (Fin r) Ω (Fin r → Ω))
+    (h : ∀ i j, w i ⬝ᵥ v j = if i = j.rev then 1 else 0) (z : Fin r → Ω) (j : Fin r)
+    : v.repr z j = w j.rev ⬝ᵥ z := by
   conv_rhs => rw [← v.sum_repr z]
   rw [dotProduct_sum]
   simp only [dotProduct_smul, h, Fin.rev_inj, smul_eq_mul, mul_ite, mul_one, mul_zero]
   simp
 
-theorem repr_eq_dot' {Ω : Type} [Field Ω] {r : ℕ} (w v : Module.Basis (Fin r) Ω (Fin r → Ω))
-    (h : ∀ i j, w i ⬝ᵥ v j = if i = j.rev then 1 else 0) (z : Fin r → Ω) (j : Fin r) :
-    w.repr z j.rev = z ⬝ᵥ v j := by
+theorem repr_eq_dot'
+    {Ω : Type} [Field Ω]
+    {r : ℕ} (w v : Module.Basis (Fin r) Ω (Fin r → Ω))
+    (h : ∀ i j, w i ⬝ᵥ v j = if i = j.rev then 1 else 0) (z : Fin r → Ω) (j : Fin r)
+    : w.repr z j.rev = z ⬝ᵥ v j := by
   conv_rhs => rw [← w.sum_repr z]
   rw [sum_dotProduct]
   simp only [smul_dotProduct, h, smul_eq_mul, mul_ite, mul_one, mul_zero]
   simp
 
-theorem tri_inv {Ω : Type} [Field Ω] {r : ℕ} (w w' : Module.Basis (Fin r) Ω (Fin r → Ω))
-    (h : ∀ i j, i < j → w.repr (w' i) j = 0) :
-    (∀ i j, i < j → w'.repr (w i) j = 0) ∧ ∀ i, w'.repr (w i) i * w.repr (w' i) i = 1 := by
+theorem tri_inv
+    {Ω : Type} [Field Ω]
+    {r : ℕ} (w w' : Module.Basis (Fin r) Ω (Fin r → Ω)) (h : ∀ i j, i < j → w.repr (w' i) j = 0)
+    : (∀ i j, i < j → w'.repr (w i) j = 0) ∧ ∀ i, w'.repr (w i) i * w.repr (w' i) i = 1 := by
   have hAB := w.toMatrix_mul_toMatrix_flip w'
   have hBA := w'.toMatrix_mul_toMatrix_flip w
   letI : Invertible (w.toMatrix w') := ⟨w'.toMatrix w, hBA, hAB⟩
@@ -53,10 +58,12 @@ theorem tri_inv {Ω : Type} [Field Ω] {r : ℕ} (w w' : Module.Basis (Fin r) Ω
 
 end PositivityTheory.Xgn.DualReverseTriangular
 
-theorem PositivityTheory.Xgn.dual_basis_reverse_triangular : ∀ (Ω : Type) [Field Ω] (r : ℕ) (w w' v v' : Module.Basis (Fin r) Ω (Fin r → Ω)),
-    (∀ i j, w i ⬝ᵥ v j = if i = j.rev then 1 else 0) → (∀ i j, w' i ⬝ᵥ v' j = if i = j.rev then 1 else 0) →
-    (∀ i j, i < j → w.repr (w' i) j = 0) →
-    (∀ i j, i < j → v.repr (v' i) j = 0) ∧ ∀ i, v.repr (v' i) i * w.repr (w' i.rev) i.rev = 1 := by
+theorem PositivityTheory.Xgn.dual_basis_reverse_triangular
+    : ∀ (Ω : Type) [Field Ω] (r : ℕ) (w w' v v' : Module.Basis (Fin r) Ω (Fin r → Ω)),
+      (∀ i j, w i ⬝ᵥ v j = if i = j.rev then 1 else 0)
+        → (∀ i j, w' i ⬝ᵥ v' j = if i = j.rev then 1 else 0) → (∀ i j, i < j → w.repr (w' i) j = 0)
+        → (∀ i j, i < j → v.repr (v' i) j = 0)
+          ∧ ∀ i, v.repr (v' i) i * w.repr (w' i.rev) i.rev = 1 := by
   intro Ω _ r w w' v v' h h' ht
   obtain ⟨h1, h2⟩ := PositivityTheory.Xgn.DualReverseTriangular.tri_inv w w' ht
   have key : ∀ i j, v.repr (v' i) j = w'.repr (w j.rev) i.rev := fun i j => by

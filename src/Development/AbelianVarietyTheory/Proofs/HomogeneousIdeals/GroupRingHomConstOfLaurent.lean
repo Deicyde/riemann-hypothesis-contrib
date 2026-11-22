@@ -10,15 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Bijectiv
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
 open ReciprocityTheory.ChartRestriction.G.Semi
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.GroupRingConst
 
-noncomputable def pt {R F X : Type} [CommRing R] [CommRing F] [AddCommGroup X] (r : R →+* F)
-    (c : Multiplicative X →* Fˣ) : AddMonoidAlgebra R X →+* F :=
+noncomputable def pt
+    {R F X : Type} [CommRing R] [CommRing F] [AddCommGroup X]
+    (r : R →+* F) (c : Multiplicative X →* Fˣ)
+    : AddMonoidAlgebra R X →+* F :=
   AddMonoidAlgebra.liftNCRingHom r ((Units.coeHom F).comp c) (fun _ _ ↦ Commute.all _ _)
 
 @[simp] lemma pt_single {R F X : Type} [CommRing R] [CommRing F] [AddCommGroup X] (r : R →+* F)
@@ -32,8 +35,8 @@ lemma pt_comp_algebraMap {R F X : Type} [CommRing R] [CommRing F] [AddCommGroup 
   ext x
   simp [AddMonoidAlgebra.coe_algebraMap, pt_single]
 
-def powChar {G X : Type} [CommGroup G] [AddCommGroup X] (l : X →+ ℤ) (u : G) :
-    Multiplicative X →* G :=
+def powChar {G X : Type} [CommGroup G] [AddCommGroup X] (l : X →+ ℤ) (u : G)
+    : Multiplicative X →* G :=
   (zpowersHom G u).comp (AddMonoidHom.toMultiplicative l)
 
 @[simp] lemma powChar_apply {G X : Type} [CommGroup G] [AddCommGroup X] (l : X →+ ℤ) (u : G)
@@ -53,11 +56,13 @@ lemma eq_prod_powChar {G X I : Type} [CommGroup G] [AddCommGroup X] [Fintype I]
   rw [ofAdd_zsmul, map_zpow]
   simp [Module.Basis.coord_apply]
 
-noncomputable def family {R F X : Type} [CommRing R] [CommRing F] [AddCommGroup X] (r : R →+* F)
-    (c : Multiplicative X →* Fˣ) (l : X →+ ℤ) : AddMonoidAlgebra R X →+* AddMonoidAlgebra F ℤ :=
+noncomputable def family
+    {R F X : Type} [CommRing R] [CommRing F] [AddCommGroup X]
+    (r : R →+* F) (c : Multiplicative X →* Fˣ) (l : X →+ ℤ)
+    : AddMonoidAlgebra R X →+* AddMonoidAlgebra F ℤ :=
   AddMonoidAlgebra.liftNCRingHom ((algebraMap F (AddMonoidAlgebra F ℤ)).comp r)
-    (((algebraMap F (AddMonoidAlgebra F ℤ)).toMonoidHom.comp ((Units.coeHom F).comp c)) *
-      ((AddMonoidAlgebra.of F ℤ).comp (AddMonoidHom.toMultiplicative l)))
+    (((algebraMap F (AddMonoidAlgebra F ℤ)).toMonoidHom.comp ((Units.coeHom F).comp c))
+      * ((AddMonoidAlgebra.of F ℤ).comp (AddMonoidHom.toMultiplicative l)))
     (fun _ _ ↦ Commute.all _ _)
 
 lemma family_single {R F X : Type} [CommRing R] [CommRing F] [AddCommGroup X] (r : R →+* F)
@@ -168,29 +173,40 @@ private lemma pts_lemma_5 {S Y : Scheme.{0}} (p : Y ⟶ S)
 end GlobalTheory.GroupRingConst
 
 open GlobalTheory.GroupRingConst in
-theorem GlobalTheory.groupRing_hom_const_of_laurent {S Y : Scheme.{0}} (p : Y ⟶ S) [IsSeparated p]
-    (h : ∀ (L : Type) [Field L] (s : Spec (CommRingCat.of L) ⟶ S) (f : Spec (CommRingCat.of (AddMonoidAlgebra L ℤ)) ⟶ Y),
-      f ≫ p = Spec.map (CommRingCat.ofHom (algebraMap L (AddMonoidAlgebra L ℤ))) ≫ s →
-      ∃ k : Spec (CommRingCat.of L) ⟶ Y, f = Spec.map (CommRingCat.ofHom (algebraMap L (AddMonoidAlgebra L ℤ))) ≫ k)
-    (R : Type) [CommRing R] [IsDomain R] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+theorem GlobalTheory.groupRing_hom_const_of_laurent
+    {S Y : Scheme.{0}} (p : Y ⟶ S) [IsSeparated p]
+    (h : ∀ (L : Type) [Field L] (s : Spec (CommRingCat.of L) ⟶ S)
+        (f : Spec (CommRingCat.of (AddMonoidAlgebra L ℤ)) ⟶ Y),
+      f ≫ p = Spec.map (CommRingCat.ofHom (algebraMap L (AddMonoidAlgebra L ℤ))) ≫ s
+        → ∃ k : Spec (CommRingCat.of L) ⟶ Y,
+          f = Spec.map (CommRingCat.ofHom (algebraMap L (AddMonoidAlgebra L ℤ))) ≫ k)
+    (R : Type) [CommRing R] [IsDomain R]
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
     (s : Spec (CommRingCat.of R) ⟶ S) (f : Spec (CommRingCat.of (AddMonoidAlgebra R X)) ⟶ Y)
-    (hf : f ≫ p = Spec.map (CommRingCat.ofHom (algebraMap R (AddMonoidAlgebra R X))) ≫ s) :
-    ∃ k : Spec (CommRingCat.of R) ⟶ Y, f = Spec.map (CommRingCat.ofHom (algebraMap R (AddMonoidAlgebra R X))) ≫ k := by
+    (hf : f ≫ p = Spec.map (CommRingCat.ofHom (algebraMap R (AddMonoidAlgebra R X))) ≫ s)
+    : ∃ k : Spec (CommRingCat.of R) ⟶ Y,
+      f = Spec.map (CommRingCat.ofHom (algebraMap R (AddMonoidAlgebra R X))) ≫ k := by
   classical
-  have : UniqueSums X := UniqueSums.of_injective_addHom
-    (Module.Free.chooseBasis ℤ X).repr.toLinearMap.toAddMonoidHom.toAddHom
-    (Module.Free.chooseBasis ℤ X).repr.injective inferInstance
-  have hcomp : (pt (RingHom.id R) (1 : Multiplicative X →* Rˣ)).comp
-      (algebraMap R (AddMonoidAlgebra R X)) = RingHom.id R := pt_comp_algebraMap _ _
+  have : UniqueSums X :=
+    UniqueSums.of_injective_addHom
+      (Module.Free.chooseBasis ℤ X).repr.toLinearMap.toAddMonoidHom.toAddHom
+      (Module.Free.chooseBasis ℤ X).repr.injective inferInstance
+  have hcomp
+      : (pt (RingHom.id R) (1 : Multiplicative X →* Rˣ)).comp (algebraMap R (AddMonoidAlgebra R X))
+        = RingHom.id R :=
+    pt_comp_algebraMap _ _
   refine ⟨Spec.map (CommRingCat.ofHom (pt (RingHom.id R) 1)) ≫ f, ?_⟩
   refine ext_of_fromSpecResidueField_eq _ _ p Set.univ dense_univ (fun x _ => ?_) ?_
-  · obtain ⟨φ, hφ⟩ : ∃ φ : AddMonoidAlgebra R X →+*
-        ((Spec (CommRingCat.of (AddMonoidAlgebra R X))).residueField x),
-        Spec.map (CommRingCat.ofHom φ) = (Spec (CommRingCat.of (AddMonoidAlgebra R X))).fromSpecResidueField x :=
-      ⟨(Spec.preimage ((Spec (CommRingCat.of (AddMonoidAlgebra R X))).fromSpecResidueField x)).hom,
-        by rw [CommRingCat.ofHom_hom, Spec.map_preimage]⟩
+  · obtain ⟨φ, hφ⟩
+        : ∃ φ : AddMonoidAlgebra R X
+            →+* ((Spec (CommRingCat.of (AddMonoidAlgebra R X))).residueField x),
+          Spec.map (CommRingCat.ofHom φ)
+            = (Spec (CommRingCat.of (AddMonoidAlgebra R X))).fromSpecResidueField x := ⟨
+      (Spec.preimage ((Spec (CommRingCat.of (AddMonoidAlgebra R X))).fromSpecResidueField x)).hom,
+      by rw [CommRingCat.ofHom_hom, Spec.map_preimage]
+    ⟩
     rw [← hφ]
     exact pts_lemma_5 p h s f hf _ φ
   · rw [hf, Category.assoc, Category.assoc, hf,
-      ← Category.assoc _ (Spec.map (CommRingCat.ofHom (algebraMap R (AddMonoidAlgebra R X)))), spec_comp, hcomp,
-      CommRingCat.ofHom_id, Spec.map_id, Category.id_comp]
+      ← Category.assoc _ (Spec.map (CommRingCat.ofHom (algebraMap R (AddMonoidAlgebra R X)))),
+      spec_comp, hcomp, CommRingCat.ofHom_id, Spec.map_id, Category.id_comp]

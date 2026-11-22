@@ -12,10 +12,10 @@ namespace Formalism.L2.Col
 
 open Formalism.BasicNotions
 
-theorem mem_divs {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} (ha : a ≠ 0) (P : HeightOneSpectrum A) :
-    P ∈ divs a ↔ a ∈ P.asIdeal := by
-  have hI : Ideal.span {a} ≠ ⊥ := by
-    rwa [Ne, Ideal.span_singleton_eq_bot]
+theorem mem_divs
+    {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} (ha : a ≠ 0) (P : HeightOneSpectrum A)
+    : P ∈ divs a ↔ a ∈ P.asIdeal := by
+  have hI : Ideal.span {a} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
   have hfin : {P : HeightOneSpectrum A | a ∈ P.asIdeal}.Finite := by
     have h := Ideal.finite_factors hI
     simpa only [Ideal.dvd_span_singleton] using h
@@ -23,15 +23,15 @@ theorem mem_divs {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} (ha : a �
   rw [dite_eq_left hfin, Set.Finite.mem_toFinset]
   rfl
 
-theorem ofQ_w {N : ℕ} {x : Fin N → ℚ} (h : Antitone x) (hz : ∀ i, ∃ z : ℤ, x i = z) (i : Fin N) :
-    ((ofQ x).w i : ℚ) = x i := by
+theorem ofQ_w {N : ℕ} {x : Fin N → ℚ} (h : Antitone x) (hz : ∀ i, ∃ z : ℤ, x i = z) (i : Fin N)
+    : ((ofQ x).w i : ℚ) = x i := by
   obtain ⟨z, hz'⟩ := hz i
   unfold ofQ
   rw [dite_eq_left h]
   simp [hz']
 
-theorem anti_sub_rho {N : ℕ} (x : ℕ → ℚ) (h : ∀ n, n + 1 < N → x (n + 1) + 1 ≤ x n) :
-    Antitone (fun i : Fin N => x i.1 - rhoVec N i) := by
+theorem anti_sub_rho {N : ℕ} (x : ℕ → ℚ) (h : ∀ n, n + 1 < N → x (n + 1) + 1 ≤ x n)
+    : Antitone (fun i : Fin N => x i.1 - rhoVec N i) := by
   have key : ∀ d n : ℕ, n + d < N → x (n + d) + ((n + d : ℕ) : ℚ) ≤ x n + (n : ℚ) := by
     intro d
     induction d with
@@ -96,7 +96,7 @@ theorem vb_lo {n : ℕ} (h : n < R.k - 1) : (of P).vb n = P.v ⟨n, h⟩ := by
   rw [dite_eq_left h]
   rfl
 
-theorem vb_hi {n : ℕ} (h : ¬ n < R.k - 1) : (of P).vb n = -(of P).bAt (n - (R.k - 1)) := by
+theorem vb_hi {n : ℕ} (h : ¬ n < R.k - 1) : (of P).vb n = - (of P).bAt (n - (R.k - 1)) := by
   unfold RowPar.vb
   rw [dite_eq_right h]
 
@@ -111,7 +111,8 @@ theorem gap_be {c : ℕ} (h : c < R.m) : ((R.t : ℚ) + 3) / 2 ≤ (of P).eAt c 
   rw [eAt_of P h, bAt_of P h]
   exact P.gap_be ⟨c, h⟩
 
-theorem gap_eb {c : ℕ} (h : c + 1 < R.m) : ((R.t : ℚ) + 3) / 2 ≤ (of P).bAt (c + 1) - (of P).eAt c := by
+theorem gap_eb {c : ℕ} (h : c + 1 < R.m)
+    : ((R.t : ℚ) + 3) / 2 ≤ (of P).bAt (c + 1) - (of P).eAt c := by
   rw [bAt_of P h, eAt_of P (by omega : c < R.m)]
   exact P.gap_eb ⟨c, by omega⟩ h
 
@@ -133,7 +134,8 @@ theorem vb_step {n : ℕ} (h : n + 1 < R.k - 1 + R.m) : (of P).vb (n + 1) + 1 �
       have hn : n + 1 - (R.k - 1) = 0 := by omega
       rw [vb_hi P (n := n + 1) (by omega), vb_lo P h2, hn, bAt_of P hm]
       have a1 := P.u_last_gt hk hm
-      have hu : (⟨R.k - 1, by omega⟩ : Fin R.k) = ⟨n + 1, by omega⟩ := Fin.ext (by show R.k - 1 = n + 1; omega)
+      have hu : (⟨R.k - 1, by omega⟩ : Fin R.k) = ⟨n + 1, by omega⟩ :=
+        Fin.ext (by show R.k - 1 = n + 1; omega)
       rw [hu] at a1
       have a2 := P.v_gt_u ⟨n, h2⟩
       obtain ⟨z, hz⟩ := P.b_int ⟨0, hm⟩
@@ -156,7 +158,7 @@ theorem sgHC_lo (S : RowPar R) {n : ℕ} (h : n < R.k - 1) : S.sgHC n = sh R + S
   rw [dite_eq_left h, dite_eq_left h]
 
 theorem sgHC_b (S : RowPar R) (B : ℕ) : S.sgHC (R.k - 1 + B * (R.t + 1)) = sh R - S.bAt B := by
-  have h1 : ¬ (R.k - 1 + B * (R.t + 1) < R.k - 1) := by omega
+  have h1 : ¬(R.k - 1 + B * (R.t + 1) < R.k - 1) := by omega
   have e : R.k - 1 + B * (R.t + 1) - (R.k - 1) = B * (R.t + 1) := by omega
   have e2 : B * (R.t + 1) % (R.t + 1) = 0 := by simp
   have e3 : B * (R.t + 1) / (R.t + 1) = B := Nat.mul_div_cancel B (Nat.succ_pos _)
@@ -164,12 +166,13 @@ theorem sgHC_b (S : RowPar R) (B : ℕ) : S.sgHC (R.k - 1 + B * (R.t + 1)) = sh 
   rw [dite_eq_right h1, e, if_pos e2, e3]
   ring
 
-theorem sgHC_e (S : RowPar R) (B ρ : ℕ) (h1 : 1 ≤ ρ) (h2 : ρ ≤ R.t) :
-    S.sgHC (R.k - 1 + B * (R.t + 1) + ρ) = sh R - S.eAt B + ((R.t : ℚ) - 1) / 2 - ((ρ : ℚ) - 1) := by
+theorem sgHC_e (S : RowPar R) (B ρ : ℕ) (h1 : 1 ≤ ρ) (h2 : ρ ≤ R.t)
+    : S.sgHC (R.k - 1 + B * (R.t + 1) + ρ)
+      = sh R - S.eAt B + ((R.t : ℚ) - 1) / 2 - ((ρ : ℚ) - 1) := by
   have hd := divmod (R.t + 1) B ρ (by omega)
-  have h1' : ¬ (R.k - 1 + B * (R.t + 1) + ρ < R.k - 1) := by omega
+  have h1' : ¬(R.k - 1 + B * (R.t + 1) + ρ < R.k - 1) := by omega
   have e : R.k - 1 + B * (R.t + 1) + ρ - (R.k - 1) = B * (R.t + 1) + ρ := by omega
-  have hne : ¬ ((B * (R.t + 1) + ρ) % (R.t + 1) = 0) := by rw [hd.2]; omega
+  have hne : ¬((B * (R.t + 1) + ρ) % (R.t + 1) = 0) := by rw [hd.2]; omega
   unfold RowPar.sgHC RowPar.sh
   rw [dite_eq_right h1', e, if_neg hne, hd.1, hd.2]
   ring
@@ -192,11 +195,15 @@ theorem sgHC_step {n : ℕ} (hn : n + 1 < R.N R.m - 1) : (of P).sgHC (n + 1) + 1
         ring
     rw [e0, e1]
     linarith
-  · obtain ⟨B, ρ, hρ, hnB⟩ : ∃ B ρ : ℕ, ρ < R.t + 1 ∧ n = R.k - 1 + B * (R.t + 1) + ρ :=
-      ⟨(n - (R.k - 1)) / (R.t + 1), (n - (R.k - 1)) % (R.t + 1), Nat.mod_lt _ (Nat.succ_pos _), by
+  · obtain ⟨B, ρ, hρ, hnB⟩ : ∃ B ρ : ℕ, ρ < R.t + 1 ∧ n = R.k - 1 + B * (R.t + 1) + ρ := ⟨
+      (n - (R.k - 1)) / (R.t + 1),
+      (n - (R.k - 1)) % (R.t + 1),
+      Nat.mod_lt _ (Nat.succ_pos _),
+      by
         have hdm := Nat.div_add_mod (n - (R.k - 1)) (R.t + 1)
         rw [Nat.mul_comm] at hdm
-        omega⟩
+        omega
+    ⟩
     subst hnB
     rcases Nat.eq_zero_or_pos ρ with h0 | hpos
     · subst h0
@@ -207,8 +214,9 @@ theorem sgHC_step {n : ℕ} (hn : n + 1 < R.N R.m - 1) : (of P).sgHC (n + 1) + 1
         omega
       have e0 : (of P).sgHC (R.k - 1 + B * (R.t + 1) + 0) = sh R - (of P).bAt B := by
         rw [Nat.add_zero]; exact sgHC_b (of P) B
-      have e1 : (of P).sgHC (R.k - 1 + B * (R.t + 1) + 0 + 1) =
-          sh R - (of P).eAt B + ((R.t : ℚ) - 1) / 2 - (((1 : ℕ) : ℚ) - 1) := by
+      have e1
+          : (of P).sgHC (R.k - 1 + B * (R.t + 1) + 0 + 1)
+            = sh R - (of P).eAt B + ((R.t : ℚ) - 1) / 2 - (((1 : ℕ) : ℚ) - 1) := by
         rw [Nat.add_zero]; exact sgHC_e (of P) B 1 le_rfl (by omega)
       rw [e0, e1]
       have hg := gap_be P hBm
@@ -217,7 +225,8 @@ theorem sgHC_step {n : ℕ} (hn : n + 1 < R.N R.m - 1) : (of P).sgHC (n + 1) + 1
     · rcases lt_or_ge ρ R.t with hlt | hge
       · have e0 := sgHC_e (of P) B ρ hpos hlt.le
         have e1 := sgHC_e (of P) B (ρ + 1) (by omega) hlt
-        rw [show R.k - 1 + B * (R.t + 1) + ρ + 1 = R.k - 1 + B * (R.t + 1) + (ρ + 1) by omega, e1, e0]
+        rw [show R.k - 1 + B * (R.t + 1) + ρ + 1 = R.k - 1 + B * (R.t + 1) + (ρ + 1) by omega, e1,
+          e0]
         push_cast
         linarith
       · have hρt : ρ = R.t := by omega
@@ -245,8 +254,7 @@ theorem sgHC_int (n : ℕ) : ∃ z : ℤ, (of P).sgHC n = z := by
   obtain ⟨s, hs⟩ := R.t_odd
   have hsh : ((R.m : ℚ) * ((R.t : ℚ) + 1)) / 2 = ((a * (R.t + 1) : ℕ) : ℚ) := by
     rw [ha]; push_cast; ring
-  have hth : ((R.t : ℚ) - 1) / 2 = (s : ℚ) := by
-    rw [hs]; push_cast; ring
+  have hth : ((R.t : ℚ) - 1) / 2 = (s : ℚ) := by rw [hs]; push_cast; ring
   unfold RowPar.sgHC
   rw [hsh]
   split_ifs with h1 h2
@@ -267,8 +275,11 @@ theorem sgQ_int (i : Fin (R.N R.m - 1)) : ∃ z : ℤ, (of P).sgQ i = z := by
     omega
   have hNq : ((R.N R.m : ℕ) : ℚ) = (R.k : ℚ) + (R.m : ℚ) * ((R.t : ℚ) + 1) := by
     show ((R.k + R.m * (R.t + 1) : ℕ) : ℚ) = _
-    push_cast; ring
-  have hrho : rhoVec (R.N R.m - 1) i = ((R.k : ℚ) + (R.m : ℚ) * ((R.t : ℚ) + 1) - 2) / 2 - ((i.1 : ℕ) : ℚ) := by
+    push_cast
+    ring
+  have hrho
+      : rhoVec (R.N R.m - 1) i
+        = ((R.k : ℚ) + (R.m : ℚ) * ((R.t : ℚ) + 1) - 2) / 2 - ((i.1 : ℕ) : ℚ) := by
     unfold rhoVec
     rw [Nat.cast_sub hN1, hNq]
     ring
@@ -282,8 +293,8 @@ theorem sgQ_int (i : Fin (R.N R.m - 1)) : ∃ z : ℤ, (of P).sgQ i = z := by
   push_cast
   ring
 
-theorem sg_eq (i : Fin (R.N R.m - 1)) :
-    (((of P).sg).w i : ℚ) = (of P).sgHC i.1 - rhoVec (R.N R.m - 1) i := by
+theorem sg_eq (i : Fin (R.N R.m - 1))
+    : (((of P).sg).w i : ℚ) = (of P).sgHC i.1 - rhoVec (R.N R.m - 1) i := by
   exact ofQ_w (sgQ_anti P) (sgQ_int P) i
 
 end RowPar
@@ -293,9 +304,12 @@ namespace RowPar
 variable {R : Ranks} (P : HCParam R)
 
 def hcV (S : RowPar R) (j n : ℕ) : ℚ :=
-  if n < pOf R j then S.vb n
-  else if n < pOf R j + R.t then -S.eAt (j - 1) + ((R.t : ℚ) - 1) / 2 - ((n - pOf R j : ℕ) : ℚ)
-  else -S.bAt (j + (n - (pOf R j + R.t)))
+  if n < pOf R j then
+    S.vb n
+  else if n < pOf R j + R.t then
+    - S.eAt (j - 1) + ((R.t : ℚ) - 1) / 2 - ((n - pOf R j : ℕ) : ℚ)
+  else
+    - S.bAt (j + (n - (pOf R j + R.t)))
 
 theorem cast_pOf {j : ℕ} (h1 : 1 ≤ j) : (pOf R j : ℚ) = (R.k : ℚ) + j - 1 := by
   unfold RowPar.pOf
@@ -314,8 +328,8 @@ theorem cast_nV : (R.nV : ℚ) = (R.k : ℚ) + R.m - 1 + R.t := by
   push_cast
   ring
 
-theorem lamVQ_eq_hc (S : RowPar R) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i : Fin R.nV) :
-    S.lamVQ j i = (S.hcV j i.1 - 1 / 2) - rhoVec R.nV i := by
+theorem lamVQ_eq_hc (S : RowPar R) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i : Fin R.nV)
+    : S.lamVQ j i = (S.hcV j i.1 - 1 / 2) - rhoVec R.nV i := by
   have hp := cast_pOf (R := R) h1
   have hq := cast_qOf (R := R) h2
   have hn := cast_nV (R := R)
@@ -333,8 +347,8 @@ theorem lamVQ_eq_hc (S : RowPar R) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i 
     simp only [hp, hq, hn]
     ring
 
-theorem hcV_step {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) {n : ℕ} (hn : n + 1 < R.nV) :
-    (of P).hcV j (n + 1) + 1 ≤ (of P).hcV j n := by
+theorem hcV_step {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) {n : ℕ} (hn : n + 1 < R.nV)
+    : (of P).hcV j (n + 1) + 1 ≤ (of P).hcV j n := by
   have hk3 := R.m_add_three_le_k
   have ht1 : 1 ≤ R.t := by have := R.rank_add_five_le; omega
   have hp : pOf R j = R.k + j - 1 := rfl
@@ -345,8 +359,8 @@ theorem hcV_step {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) {n : ℕ} (hn : n + 1
   · rw [if_pos a1, if_pos (by omega : n < pOf R j)]
     exact vb_step P (n := n) (by omega)
   · rcases lt_or_ge n (pOf R j) with a2 | a2
-    · rw [if_neg (by omega : ¬ n + 1 < pOf R j), if_pos (by omega : n + 1 < pOf R j + R.t), if_pos a2,
-        vb_hi P (n := n) (by omega), show n - (R.k - 1) = j - 1 by omega,
+    · rw [if_neg (by omega : ¬ n + 1 < pOf R j), if_pos (by omega : n + 1 < pOf R j + R.t),
+        if_pos a2, vb_hi P (n := n) (by omega), show n - (R.k - 1) = j - 1 by omega,
         show n + 1 - pOf R j = 0 by omega]
       have hg := gap_be P (c := j - 1) (by omega)
       push_cast
@@ -372,10 +386,13 @@ theorem hcV_step {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) {n : ℕ} (hn : n + 1
 
 theorem lamVQ_anti {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) : Antitone ((of P).lamVQ j) := by
   intro a b hab
-  have H := anti_sub_rho (N := R.nV) (fun n => (of P).hcV j n - 1 / 2)
-    (fun n hn => by
-      show (of P).hcV j (n + 1) - 1 / 2 + 1 ≤ (of P).hcV j n - 1 / 2
-      linarith [hcV_step P h1 h2 hn]) hab
+  have H :=
+    anti_sub_rho (N := R.nV)
+      (fun n => (of P).hcV j n - 1 / 2)
+      (fun n hn => by
+        show (of P).hcV j (n + 1) - 1 / 2 + 1 ≤ (of P).hcV j n - 1 / 2
+        linarith [hcV_step P h1 h2 hn])
+      hab
   simp only at H
   rw [lamVQ_eq_hc (of P) h1 h2, lamVQ_eq_hc (of P) h1 h2]
   exact H
@@ -393,7 +410,8 @@ theorem hcV_int (j n : ℕ) : ∃ z : ℤ, (of P).hcV j n = z := by
   · obtain ⟨z, hz⟩ := bAt_int P (j + (n - (pOf R j + R.t)))
     exact ⟨-z, by rw [hz]; push_cast; ring⟩
 
-theorem lamVQ_int {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i : Fin R.nV) : ∃ z : ℤ, (of P).lamVQ j i = z := by
+theorem lamVQ_int {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i : Fin R.nV)
+    : ∃ z : ℤ, (of P).lamVQ j i = z := by
   obtain ⟨z, hz⟩ := hcV_int P j i.1
   rw [lamVQ_eq_hc (of P) h1 h2, hz]
   obtain ⟨a, ha⟩ := R.k_even
@@ -407,8 +425,8 @@ theorem lamVQ_int {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i : Fin R.nV) : ∃
   rw [hn, hk, hm, ht]
   exact ⟨z - (a + b + s) + ((i.1 : ℕ) : ℤ), by push_cast; ring⟩
 
-theorem lamV_eq {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i : Fin R.nV) :
-    ((((of P).lamV j).w i : ℤ) : ℚ) = (of P).lamVQ j i := by
+theorem lamV_eq {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (i : Fin R.nV)
+    : ((((of P).lamV j).w i : ℤ) : ℚ) = (of P).lamVQ j i := by
   exact ofQ_w (lamVQ_anti P h1 h2) (lamVQ_int P h1 h2) i
 
 end RowPar
@@ -430,8 +448,8 @@ theorem cast_t_add_one_div_two (R : Ranks) : (((R.t + 1) / 2 : ℕ) : ℚ) = ((R
   push_cast
   ring
 
-theorem lamOf_wtN {R : Ranks} (P : HCParam R) {j : ℕ} (hj : j ≤ R.m) (i : Fin (R.N j)) :
-    ((Examples₂.lamOf P j).w i : ℚ) = Examples₂.wtN P i.1 := by
+theorem lamOf_wtN {R : Ranks} (P : HCParam R) {j : ℕ} (hj : j ≤ R.m) (i : Fin (R.N j))
+    : ((Examples₂.lamOf P j).w i : ℚ) = Examples₂.wtN P i.1 := by
   have hint : ∃ z : ℤ, Examples₂.wtQ P j hj i = z := by
     unfold Examples₂.wtQ
     split_ifs with h
@@ -461,10 +479,13 @@ namespace Wts
 
 variable {X : Fields} {Word : Type} {R : Ranks} (W : Wts X Word R)
 
-theorem lamN_eq (u : Word) {j : ℕ} (hj : j ≤ R.m) (τ : X.Tau) (i : Fin (R.N j)) :
-    ((W.lamN u j τ).w i : ℚ) =
-      if h : i.1 < R.k then hcToWeightQ (W.hc u τ).u ⟨i.1, h⟩
-      else -wG R ((W.hc u τ).e ⟨(i.1 - R.k) / (R.t + 1), R.blk_lt hj i h⟩) ((i.1 - R.k) / (R.t + 1) + 1) := by
+theorem lamN_eq (u : Word) {j : ℕ} (hj : j ≤ R.m) (τ : X.Tau) (i : Fin (R.N j))
+    : ((W.lamN u j τ).w i : ℚ)
+      = if h : i.1 < R.k then
+          hcToWeightQ (W.hc u τ).u ⟨i.1, h⟩
+        else
+          - wG R ((W.hc u τ).e ⟨(i.1 - R.k) / (R.t + 1), R.blk_lt hj i h⟩)
+            ((i.1 - R.k) / (R.t + 1) + 1) := by
   unfold Wts.lamN
   rw [lamOf_wtN (W.hc u τ) hj i]
   unfold Examples₂.wtN
@@ -473,17 +494,19 @@ theorem lamN_eq (u : Word) {j : ℕ} (hj : j ≤ R.m) (τ : X.Tau) (i : Fin (R.N
   · rfl
   · exact absurd (R.blk_lt hj i h1) h2
 
-theorem lamTrue_eq (u : Word) (j : ℕ) (τ : X.Tau) (i : Fin (R.N j)) :
-    ((W.lamTrue u j τ).w i : ℚ) = (W.lamN u j τ).w i - (j : ℚ) * (((R.t : ℚ) + 1) / 2) := by
+theorem lamTrue_eq (u : Word) (j : ℕ) (τ : X.Tau) (i : Fin (R.N j))
+    : ((W.lamTrue u j τ).w i : ℚ) = (W.lamN u j τ).w i - (j : ℚ) * (((R.t : ℚ) + 1) / 2) := by
   unfold Wts.lamTrue
   show (((W.lamN u j τ).w i + (-((j : ℤ) * (((R.t + 1) / 2 : ℕ) : ℤ))) : ℤ) : ℚ) = _
   simp only [Int.cast_add, Int.cast_neg, Int.cast_mul, Int.cast_natCast]
   rw [cast_t_add_one_div_two R]
   ring
 
-theorem lamTrue_old (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N (j + 1))) (h : i.1 < R.N j) :
-    ((W.lamTrue u (j + 1) τ).w i : ℚ) =
-      (W.lamTrue u j τ).w ⟨i.1, h⟩ + sExp' R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) - sExp R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
+theorem lamTrue_old
+    (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N (j + 1))) (h : i.1 < R.N j)
+    : ((W.lamTrue u (j + 1) τ).w i : ℚ)
+      = (W.lamTrue u j τ).w ⟨i.1, h⟩ + sExp' R ((W.hc u τ).e ⟨j, hj⟩) (j + 1)
+        - sExp R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
   have e1 := lamN_eq W u (by omega : j + 1 ≤ R.m) τ i
   have e2 := lamN_eq W u hj.le τ ⟨i.1, h⟩
   have hl : ((W.lamN u (j + 1) τ).w i : ℚ) = (W.lamN u j τ).w ⟨i.1, h⟩ := e1.trans e2.symm
@@ -497,8 +520,9 @@ theorem lamTrue_old (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R
   push_cast
   ring
 
-theorem lamTrue_new (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N (j + 1))) (h : ¬ i.1 < R.N j) :
-    ((W.lamTrue u (j + 1) τ).w i : ℚ) = -sExp R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
+theorem lamTrue_new
+    (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N (j + 1))) (h : ¬ i.1 < R.N j)
+    : ((W.lamTrue u (j + 1) τ).w i : ℚ) = - sExp R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
   have hk : ¬ i.1 < R.k := by
     have h1 : R.k + j * (R.t + 1) ≤ i.1 := Nat.le_of_not_lt h
     omega
@@ -517,8 +541,8 @@ theorem lamTrue_new (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R
   push_cast
   ring
 
-theorem nuW_eq (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N j)) :
-    ((W.nuW u (j + 1) τ).w i : ℚ) = (W.lamN u j τ).w i + wG R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
+theorem nuW_eq (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N j))
+    : ((W.nuW u (j + 1) τ).w i : ℚ) = (W.lamN u j τ).w i + wG R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
   obtain ⟨e, he⟩ := (W.hc u τ).e_int ⟨j, hj⟩
   obtain ⟨y, hy⟩ := wG_int R e (j + 1)
   have hwe : wG R ((RowPar.of (W.hc u τ)).eAt j) (j + 1) = y := by
@@ -528,8 +552,9 @@ theorem nuW_eq (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N j)
   push_cast
   rw [← hwe, RowPar.eAt_of (W.hc u τ) hj]
 
-theorem nuW_eq_true (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N j)) :
-    ((W.nuW u (j + 1) τ).w i : ℚ) = (W.lamTrue u j τ).w i + sExp' R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
+theorem nuW_eq_true (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R.N j))
+    : ((W.nuW u (j + 1) τ).w i : ℚ)
+      = (W.lamTrue u j τ).w i + sExp' R ((W.hc u τ).e ⟨j, hj⟩) (j + 1) := by
   rw [nuW_eq W u hj τ i, lamTrue_eq W u j τ i]
   have hN1 : ((R.N (j + 1) : ℕ) : ℚ) = R.k + (j + 1) * (R.t + 1) := by
     unfold Ranks.N; push_cast; ring
@@ -540,8 +565,8 @@ theorem nuW_eq_true (u : Word) {j : ℕ} (hj : j < R.m) (τ : X.Tau) (i : Fin (R
 
 variable {W}
 
-theorem lamV_eq (hW : W.Ok) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (τ : X.Tau) (i : Fin R.nV) :
-    ((W.lamV j τ).w i : ℚ) = (W.row τ).lamVQ j i := by
+theorem lamV_eq (hW : W.Ok) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ R.m) (τ : X.Tau) (i : Fin R.nV)
+    : ((W.lamV j τ).w i : ℚ) = (W.row τ).lamVQ j i := by
   obtain ⟨P, hP⟩ := hW.row_ok τ
   unfold Wts.lamV
   rw [← hP]
@@ -553,8 +578,8 @@ namespace RowPar
 
 variable {R : Ranks} (P : HCParam R)
 
-theorem sgTrue_eq (i : Fin (R.N R.m - 1)) :
-    (((of P).sgTrue).w i : ℚ) = ((of P).sgHC i.1 - sh R) - rhoVec (R.N R.m - 1) i := by
+theorem sgTrue_eq (i : Fin (R.N R.m - 1))
+    : (((of P).sgTrue).w i : ℚ) = ((of P).sgHC i.1 - sh R) - rhoVec (R.N R.m - 1) i := by
   show ((((of P).sg.w i + -((R.m : ℤ) * (((R.t + 1) / 2 : ℕ) : ℤ))) : ℤ) : ℚ) = _
   simp only [Int.cast_add, Int.cast_neg, Int.cast_mul, Int.cast_natCast]
   rw [sg_eq P i, cast_t_add_one_div_two R]
@@ -580,15 +605,17 @@ theorem conjO_invol (x : 𝓞 X.E) : X.conjO (X.conjO x) = x := by
 def conjOEquiv : 𝓞 X.E ≃+* 𝓞 X.E :=
   RingEquiv.ofRingHom X.conjO X.conjO (RingHom.ext X.conjO_invol) (RingHom.ext X.conjO_invol)
 
-theorem absNorm_conjO (a : 𝓞 X.E) :
-    Ideal.absNorm (Ideal.span {X.conjO a}) = Ideal.absNorm (Ideal.span {a}) := by
+theorem absNorm_conjO (a : 𝓞 X.E)
+    : Ideal.absNorm (Ideal.span {X.conjO a}) = Ideal.absNorm (Ideal.span {a}) := by
   have e : Ideal.span {X.conjO a} = Ideal.map X.conjOEquiv (Ideal.span {a}) := by
     rw [Ideal.map_span, Set.image_singleton]
     rfl
-  rw [e, Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply, Submodule.cardQuot_apply]
+  rw [e, Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply,
+    Submodule.cardQuot_apply]
   exact Nat.card_congr (Ideal.quotientEquiv _ _ X.conjOEquiv rfl).toEquiv.symm
 
-theorem absNorm_nat (n : ℕ) : Ideal.absNorm (Ideal.span {(n : 𝓞 X.E)}) = n ^ Module.finrank ℚ X.E := by
+theorem absNorm_nat (n : ℕ)
+    : Ideal.absNorm (Ideal.span {(n : 𝓞 X.E)}) = n ^ Module.finrank ℚ X.E := by
   rw [Ideal.absNorm_span_singleton]
   have h : ((n : 𝓞 X.E)) = algebraMap ℤ (𝓞 X.E) (n : ℤ) := by simp
   rw [h, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank]
@@ -617,20 +644,23 @@ theorem Ok.piT_ne_zero (hPr : Pr.Ok) (u : Pr.Word) : Pr.piT u ≠ 0 := by
   have hne : ((Pr.T u : ℕ) : 𝓞 X.E) ≠ 0 := by exact_mod_cast hT.ne'
   exact hne h.symm
 
-theorem Ok.absNorm_piT (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) :
-    Ideal.absNorm (Ideal.span {Pr.piT u}) = Pr.T u ^ X.f := by
-  have hmul : Ideal.span {Pr.piT u} * Ideal.span {X.conjO (Pr.piT u)} =
-      Ideal.span {((Pr.T u : ℕ) : 𝓞 X.E)} := by
+theorem Ok.absNorm_piT (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word)
+    : Ideal.absNorm (Ideal.span {Pr.piT u}) = Pr.T u ^ X.f := by
+  have hmul
+      : Ideal.span {Pr.piT u} * Ideal.span {X.conjO (Pr.piT u)}
+        = Ideal.span {((Pr.T u : ℕ) : 𝓞 X.E)} := by
     rw [Ideal.span_singleton_mul_span_singleton, hPr.piT_norm u]
-  have h : Ideal.absNorm (Ideal.span {Pr.piT u} * Ideal.span {X.conjO (Pr.piT u)}) =
-      Ideal.absNorm (Ideal.span {((Pr.T u : ℕ) : 𝓞 X.E)}) := by rw [hmul]
+  have h
+      : Ideal.absNorm (Ideal.span {Pr.piT u} * Ideal.span {X.conjO (Pr.piT u)})
+        = Ideal.absNorm (Ideal.span {((Pr.T u : ℕ) : 𝓞 X.E)}) := by
+    rw [hmul]
   rw [map_mul, Fields.absNorm_conjO X, Fields.absNorm_nat X, hX.rankQ] at h
-  have h2 : Ideal.absNorm (Ideal.span {Pr.piT u}) ^ 2 = (Pr.T u ^ X.f) ^ 2 := by
-    rw [sq, h]; ring
+  have h2 : Ideal.absNorm (Ideal.span {Pr.piT u}) ^ 2 = (Pr.T u ^ X.f) ^ 2 := by rw [sq, h]; ring
   exact Nat.pow_left_injective (by norm_num) h2
 
-theorem Ok.piT_notMem_sq (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ Pr.vT u) :
-    Pr.piT u ∉ P.asIdeal ^ 2 := by
+theorem Ok.piT_notMem_sq
+    (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ Pr.vT u)
+    : Pr.piT u ∉ P.asIdeal ^ 2 := by
   classical
   intro hmem
   have hne := hPr.piT_ne_zero u
@@ -641,8 +671,10 @@ theorem Ok.piT_notMem_sq (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) {P : HeightOneS
   have hmax : ∀ A B : HeightOneSpectrum (𝓞 X.E), A ≠ B → IsCoprime A.asIdeal B.asIdeal := by
     intro A B hAB
     rw [Ideal.isCoprime_iff_sup_eq]
-    exact Ideal.IsMaximal.coprime_of_ne A.isMaximal B.isMaximal (fun h => hAB (HeightOneSpectrum.ext h))
-  let g : HeightOneSpectrum (𝓞 X.E) → Ideal (𝓞 X.E) := fun Q => if Q = P then P.asIdeal ^ 2 else Q.asIdeal
+    exact Ideal.IsMaximal.coprime_of_ne A.isMaximal B.isMaximal
+      (fun h => hAB (HeightOneSpectrum.ext h))
+  let g : HeightOneSpectrum (𝓞 X.E) → Ideal (𝓞 X.E) := fun Q =>
+    if Q = P then P.asIdeal ^ 2 else Q.asIdeal
   have hg : ∀ Q ∈ Pr.vT u, g Q ∣ Ideal.span {Pr.piT u} := by
     intro Q hQ'
     show (if Q = P then P.asIdeal ^ 2 else Q.asIdeal) ∣ _
@@ -651,8 +683,9 @@ theorem Ok.piT_notMem_sq (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) {P : HeightOneS
       exact hmem
     · rw [if_neg h]
       exact hQ Q hQ'
-  have hcop : ((Pr.vT u : Finset (HeightOneSpectrum (𝓞 X.E))) : Set (HeightOneSpectrum (𝓞 X.E))).Pairwise
-      (Function.onFun IsCoprime g) := by
+  have hcop
+      : ((Pr.vT u : Finset (HeightOneSpectrum (𝓞 X.E))) : Set (HeightOneSpectrum (𝓞 X.E))).Pairwise
+        (Function.onFun IsCoprime g) := by
     intro Q _ Q' _ hQQ'
     show IsCoprime (if Q = P then P.asIdeal ^ 2 else Q.asIdeal) (if Q' = P then P.asIdeal ^ 2 else Q'.asIdeal)
     by_cases h1 : Q = P
@@ -674,7 +707,9 @@ theorem Ok.piT_notMem_sq (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) {P : HeightOneS
       ring
     · rw [if_neg h, if_neg h, hPr.vT_norm u Q hQ', mul_one]
   rw [map_prod, hPr.absNorm_piT hX u, Finset.prod_congr rfl hprod] at hN
-  simp only [Finset.prod_mul_distrib, Finset.prod_const, Finset.prod_ite_eq', if_pos hP, hPr.vT_card u] at hN
+  simp only [Finset.prod_mul_distrib, Finset.prod_const, Finset.prod_ite_eq', if_pos hP,
+      hPr.vT_card u]
+    at hN
   rw [← pow_succ] at hN
   have hle := (Nat.pow_dvd_pow_iff_le_right (by omega : 1 < Pr.T u)).1 hN
   omega

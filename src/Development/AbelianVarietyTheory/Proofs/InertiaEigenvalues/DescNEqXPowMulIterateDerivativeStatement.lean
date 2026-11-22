@@ -6,10 +6,11 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Exis
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.descN_eq_X_pow_mul_iterate_derivative' :
-    ∀ (K : Type) [NormedField K] (p : ℕ) (f : K⟦X⟧),
+theorem _root_.GlobalTheory.T.descN_eq_X_pow_mul_iterate_derivative'
+    : ∀ (K : Type) [NormedField K] (p : ℕ) (f : K⟦X⟧),
       descN (K := K) p f = X ^ p * (⇑(derivative (R := K)))^[p] f := by
   intro K _ p f
   ext n

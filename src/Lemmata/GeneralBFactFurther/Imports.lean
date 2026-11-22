@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace Bl.general_b_fact_further
 
-theorem goal1 :
-  ∀ {V : Type} [inst : CommRing.{0} V] [inst_1 : IsDomain.{0} V] [IsDiscreteValuationRing.{0} V] {ϖ : V},
-  Irreducible.{0} ϖ → IsLocalization.Away.{0, 0} ϖ (FractionRing.{0} V) := by
+theorem goal1
+    : ∀ {V : Type} [inst : CommRing.{0} V] [inst_1 : IsDomain.{0} V] [IsDiscreteValuationRing.{0} V]
+        {ϖ : V},
+      Irreducible.{0} ϖ → IsLocalization.Away.{0, 0} ϖ (FractionRing.{0} V) := by
   intro V _ _ _ ϖ hϖ
   have hinj : Function.Injective (algebraMap V (FractionRing V)) := IsFractionRing.injective V _
   refine ⟨?_, ?_, ?_⟩
@@ -22,11 +23,15 @@ theorem goal1 :
     simp only at h ⊢
     rw [map_mul] at h
     rw [map_mul, ← h]
-    have hu : algebraMap V (FractionRing V) (↑u : V) * algebraMap V (FractionRing V) (↑u⁻¹ : V) = 1 := by
+    have hu
+        : algebraMap V (FractionRing V) (↑u : V) * algebraMap V (FractionRing V) (↑u⁻¹ : V)
+          = 1 := by
       rw [← map_mul, Units.mul_inv, map_one]
-    calc z * algebraMap V (FractionRing V) (ϖ ^ n)
-        = z * (algebraMap V (FractionRing V) (↑u : V) * algebraMap V (FractionRing V) (↑u⁻¹ : V))
-            * algebraMap V (FractionRing V) (ϖ ^ n) := by rw [hu, mul_one]
+    calc
+      z * algebraMap V (FractionRing V) (ϖ ^ n)
+          = z * (algebraMap V (FractionRing V) (↑u : V) * algebraMap V (FractionRing V) (↑u⁻¹ : V))
+            * algebraMap V (FractionRing V) (ϖ ^ n) := by
+        rw [hu, mul_one]
       _ = _ := by ring
   · intro x y h
     exact ⟨1, by rw [hinj h]⟩

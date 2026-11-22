@@ -10,12 +10,16 @@ open Matrix
 
 namespace ReciprocityTheory.PGsh.Up.UnitVectorPowers
 
-open ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up.FrobeniusValuationMatrix
+open ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2
+  ReciprocityTheory.PGsh.Up.FrobeniusValuationMatrix
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
-  {σ : O ≃ₐ[ℤ_[p]] O} {cp : R} {H : HodgeTateDatum p g v R O σ cp} {U : UnramData p g v R O σ cp H}
-  {X : Fin U.m → NNReal}
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+  {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
+  {H : HodgeTateDatum p g v R O σ cp} {U : UnramData p g v R O σ cp H} {X : Fin U.m → NNReal}
 
 section Res
 
@@ -32,15 +36,17 @@ theorem Lk_det (D : Lifts H U X) : IsUnit (Lk D).det := by
   rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
   exact D.Λ_det.map _
 
-theorem lam_p (D : Lifts H U X) (j : Ix g) (y : Nb p g) :
-    lam (Lk D) j y ^ p = ∑ l, Mk D j l * lam (Lk D) l y := by
+theorem lam_p (D : Lifts H U X) (j : Ix g) (y : Nb p g)
+    : lam (Lk D) j y ^ p = ∑ l, Mk D j l * lam (Lk D) l y := by
   have hinv : (Lk D)⁻¹ * Lk D = 1 := Matrix.nonsing_inv_mul _ (Lk_det D)
-  have hxc : ∀ i, (xc (IsLocalRing.ResidueField R) i y) ^ p = xc (IsLocalRing.ResidueField R) i y := by
+  have hxc
+      : ∀ i, (xc (IsLocalRing.ResidueField R) i y) ^ p = xc (IsLocalRing.ResidueField R) i y := by
     intro i
     simp only [xc]
     rw [← map_pow, ZMod.pow_card]
-  have hR : ∑ l, Mk D j l * lam (Lk D) l y =
-      ((Mk D * Lk D) *ᵥ fun i => xc (IsLocalRing.ResidueField R) i y) j := by
+  have hR
+      : ∑ l, Mk D j l * lam (Lk D) l y
+        = ((Mk D * Lk D) *ᵥ fun i => xc (IsLocalRing.ResidueField R) i y) j := by
     rw [← Matrix.mulVec_mulVec]
     simp [Matrix.mulVec, dotProduct, lam]
   rw [hR]
@@ -50,8 +56,8 @@ theorem lam_p (D : Lifts H U X) (j : Ix g) (y : Nb p g) :
   rw [sum_pow_char]
   simp only [mul_pow, hxc]
 
-theorem formMonomial_unitVector (D : Lifts H U X) (l : Ix g) (y : Nb p g) :
-    monF (Lk D) (e1 l) y = lam (Lk D) l y := by
+theorem formMonomial_unitVector (D : Lifts H U X) (l : Ix g) (y : Nb p g)
+    : monF (Lk D) (e1 l) y = lam (Lk D) l y := by
   simp only [monF, e1]
   rw [Finset.prod_eq_single l]
   · simp [ZMod.val_one]
@@ -60,24 +66,27 @@ theorem formMonomial_unitVector (D : Lifts H U X) (l : Ix g) (y : Nb p g) :
   · intro h
     exact absurd (Finset.mem_univ l) h
 
-theorem MuR_map (hv : v.Integers R) (D : Lifts H U X) :
-    (MuR hv D).map (IsLocalRing.residue R) = Matrix.of fun (y α : Nb p g) => monF (Lk D) α y := by
+theorem MuR_map (hv : v.Integers R) (D : Lifts H U X)
+    : (MuR hv D).map (IsLocalRing.residue R) = Matrix.of fun (y α : Nb p g) => monF (Lk D) α y := by
   ext y α
   simp [MuR, monF, Lk, residue_uR hv]
 
-theorem res_bR (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1) (D : Lifts H U X)
-    (j l : Ix g) : IsLocalRing.residue R (bR hv D j (e1 l)) = Mk D j l := by
+theorem res_bR
+    (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1) (D : Lifts H U X) (j l : Ix g)
+    : IsLocalRing.residue R (bR hv D j (e1 l)) = Mk D j l := by
   classical
   have hMu := MuR_mulVec_bR hv hp1 D j
   have hdet : IsUnit ((MuR hv D).map (IsLocalRing.residue R)).det := by
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact (isUnit_det_MuR hv hp1 D).map _
   let c : Nb p g → IsLocalRing.ResidueField R := fun α => ∑ l', if α = e1 l' then Mk D j l' else 0
-  have hvecres : ((MuR hv D).map (IsLocalRing.residue R)) *ᵥ
-      (fun α => IsLocalRing.residue R (bR hv D j α)) = ((MuR hv D).map (IsLocalRing.residue R)) *ᵥ c := by
+  have hvecres
+      : ((MuR hv D).map (IsLocalRing.residue R)) *ᵥ (fun α => IsLocalRing.residue R (bR hv D j α))
+        = ((MuR hv D).map (IsLocalRing.residue R)) *ᵥ c := by
     funext y
-    have h1 : ((MuR hv D).map (IsLocalRing.residue R) *ᵥ fun α => IsLocalRing.residue R (bR hv D j α)) y =
-        IsLocalRing.residue R (hvec hv D j y) := by
+    have h1
+        : ((MuR hv D).map (IsLocalRing.residue R) *ᵥ fun α => IsLocalRing.residue R (bR hv D j α)) y
+          = IsLocalRing.residue R (hvec hv D j y) := by
       rw [← hMu, RingHom.map_mulVec]
       rfl
     rw [h1, hvec, map_pow, residue_uR hv]
@@ -89,10 +98,13 @@ theorem res_bR (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1) (D : L
     exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
   have hinv := Matrix.nonsing_inv_mul _ hdet
   have hinj : (fun α => IsLocalRing.residue R (bR hv D j α)) = c := by
-    calc (fun α => IsLocalRing.residue R (bR hv D j α))
-        = (((MuR hv D).map (IsLocalRing.residue R))⁻¹ * (MuR hv D).map (IsLocalRing.residue R)) *ᵥ
-            (fun α => IsLocalRing.residue R (bR hv D j α)) := by rw [hinv, Matrix.one_mulVec]
-      _ = c := by rw [← Matrix.mulVec_mulVec, hvecres, Matrix.mulVec_mulVec, hinv, Matrix.one_mulVec]
+    calc
+      (fun α => IsLocalRing.residue R (bR hv D j α))
+          = (((MuR hv D).map (IsLocalRing.residue R))⁻¹ * (MuR hv D).map (IsLocalRing.residue R))
+            *ᵥ (fun α => IsLocalRing.residue R (bR hv D j α)) := by
+        rw [hinv, Matrix.one_mulVec]
+      _ = c := by
+        rw [← Matrix.mulVec_mulVec, hvecres, Matrix.mulVec_mulVec, hinv, Matrix.one_mulVec]
   have hc : IsLocalRing.residue R (bR hv D j (e1 l)) = c (e1 l) := congrFun hinj (e1 l)
   rw [hc]
   simp only [c]
@@ -107,8 +119,9 @@ theorem res_bR (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1) (D : L
 
 theorem Mk_det (D : Lifts H U X) : (Mk D).det ≠ 0 := by
   have h0 := (Lk_det D).ne_zero
-  have hfrob : (Lk D).map (fun a => a ^ p) =
-      (frobenius (IsLocalRing.ResidueField R) p).mapMatrix (Lk D) := by
+  have hfrob
+      : (Lk D).map (fun a => a ^ p)
+        = (frobenius (IsLocalRing.ResidueField R) p).mapMatrix (Lk D) := by
     ext a b
     simp [frobenius_def]
   have hdet : ((Lk D).map (fun a => a ^ p)).det = (Lk D).det ^ p := by
@@ -117,13 +130,16 @@ theorem Mk_det (D : Lifts H U X) : (Mk D).det ≠ 0 := by
   rw [Matrix.det_mul, hdet, Matrix.det_nonsing_inv]
   exact mul_ne_zero (pow_ne_zero _ h0) (by simpa [Ring.inverse_eq_inv] using h0)
 
-theorem Mk_off (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1) (D : Lifts H U X)
-    (j l : Ix g) (hl : D.κ l ≠ U.φ (D.κ j)) : Mk D j l = 0 := by
+theorem Mk_off
+    (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1)
+    (D : Lifts H U X) (j l : Ix g) (hl : D.κ l ≠ U.φ (D.κ j))
+    : Mk D j l = 0 := by
   rw [← res_bR hv hp1 D j l, bR_off hv hp1 D j l hl, map_zero]
 
-theorem block_det_ne (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1) (D : Lifts H U X)
-    (i : Fin U.m) (e : {j // D.κ j = i} ≃ {l // D.κ l = U.φ i}) :
-    (Matrix.of fun j l : {j // D.κ j = i} => Mk D j.1 (e l).1).det ≠ 0 := by
+theorem block_det_ne
+    (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1)
+    (D : Lifts H U X) (i : Fin U.m) (e : {j // D.κ j = i} ≃ {l // D.κ l = U.φ i})
+    : (Matrix.of fun j l : {j // D.κ j = i} => Mk D j.1 (e l).1).det ≠ 0 := by
   classical
   intro h0
   obtain ⟨w, hw0, hw⟩ := Matrix.exists_vecMul_eq_zero_iff.mpr h0
@@ -140,8 +156,8 @@ theorem block_det_ne (hv : v.Integers R) (hp1 : v (algebraMap R C (p : R)) < 1) 
     simp only [Matrix.vecMul, dotProduct, Pi.zero_apply]
     by_cases hl : D.κ l = U.φ i
     · have h1 := congrFun hw (e.symm ⟨l, hl⟩)
-      simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, Equiv.apply_symm_apply,
-        Pi.zero_apply] at h1
+      simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, Equiv.apply_symm_apply, Pi.zero_apply]
+        at h1
       rw [← Fintype.sum_subtype_add_sum_subtype (fun j => D.κ j = i)]
       have h2 : ∑ j : {j // ¬ D.κ j = i}, W j.1 * Mk D j.1 l = 0 :=
         Finset.sum_eq_zero fun j _ => by simp [W, j.2]

@@ -23,7 +23,8 @@ instance t2Space_nonarchimedeanLocalField : T2Space K := by
   have := isUniformAddGroup_of_addCommGroup (G := K)
   infer_instance
 
-theorem mem_valBall_iff_le_ord {n : ℤ} {x : K} (hx : x ≠ 0) : x ∈ valBall (K := K) n ↔ n ≤ ord x := by
+theorem mem_valBall_iff_le_ord {n : ℤ} {x : K} (hx : x ≠ 0)
+    : x ∈ valBall (K := K) n ↔ n ≤ ord x := by
   change normalizedValuation K x ≤ WithZero.exp (-n) ↔ n ≤ ord x
   rw [normalizedValuation_eq_exp_ord hx, WithZero.exp_le_exp]
   omega
@@ -33,7 +34,7 @@ theorem mem_valBall_ord {x : K} : x ∈ valBall (K := K) (ord x) := by
   · rw [hx]; exact zero_mem _
   · exact (mem_valBall_iff_le_ord hx).mpr le_rfl
 
-theorem ord_inv {x : K} (hx : x ≠ 0) : ord x⁻¹ = -ord x := by
+theorem ord_inv {x : K} (hx : x ≠ 0) : ord x⁻¹ = - ord x := by
   have h := ord_mul hx (inv_ne_zero hx)
   rw [mul_inv_cancel₀ hx, ord_one] at h
   omega
@@ -53,18 +54,20 @@ theorem mem_valBall_one_iff {x : K} : x ∈ valBall (K := K) 1 ↔ valuation K x
     normalizedValuation_eq_exp_ord hx, map_one, ← WithZero.exp_zero, WithZero.exp_lt_exp]
   omega
 
-theorem mem_maximalIdeal_iff_mem_valBall_one {z : 𝒪[K]} : z ∈ 𝓂[K] ↔ (z : K) ∈ valBall (K := K) 1 := by
+theorem mem_maximalIdeal_iff_mem_valBall_one {z : 𝒪[K]}
+    : z ∈ 𝓂[K] ↔ (z : K) ∈ valBall (K := K) 1 := by
   rw [mem_valBall_one_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
     Valuation.Integer.not_isUnit_iff_valuation_lt_one]
 
-theorem residue_eq_residue_iff {a b : 𝒪[K]} :
-    IsLocalRing.residue 𝒪[K] a = IsLocalRing.residue 𝒪[K] b ↔ (a : K) - b ∈ valBall (K := K) 1 := by
+theorem residue_eq_residue_iff {a b : 𝒪[K]}
+    : IsLocalRing.residue 𝒪[K] a = IsLocalRing.residue 𝒪[K] b
+      ↔ (a : K) - b ∈ valBall (K := K) 1 := by
   rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff,
     mem_maximalIdeal_iff_mem_valBall_one]
   rfl
 
-theorem smul_valBall {c : K} (hc : c ≠ 0) (n : ℤ) :
-    c • (valBall (K := K) n : Set K) = valBall (K := K) (n + ord c) := by
+theorem smul_valBall {c : K} (hc : c ≠ 0) (n : ℤ)
+    : c • (valBall (K := K) n : Set K) = valBall (K := K) (n + ord c) := by
   ext x
   constructor
   · rintro ⟨y, hy, rfl⟩
@@ -73,8 +76,7 @@ theorem smul_valBall {c : K} (hc : c ≠ 0) (n : ℤ) :
     exact this
   · intro hx
     refine ⟨c⁻¹ * x, ?_, by simp [smul_eq_mul, hc]⟩
-    have h1 : c⁻¹ ∈ valBall (K := K) (-ord c) := by
-      rw [← ord_inv hc]; exact mem_valBall_ord
+    have h1 : c⁻¹ ∈ valBall (K := K) (- ord c) := by rw [← ord_inv hc]; exact mem_valBall_ord
     have := mul_mem_valBall h1 hx
     simpa using this
 
@@ -90,16 +92,19 @@ theorem isCompact_valBall (n : ℤ) : IsCompact (valBall (K := K) n : Set K) := 
   rwa [smul_valBall hc, zero_add, hcn] at this
 
 theorem exists_mem_valBall_neg_nat (x : K) : ∃ m : ℕ, x ∈ valBall (K := K) (-(m : ℤ)) := by
-  refine ⟨(-ord x).toNat, ?_⟩
+  refine ⟨(- ord x).toNat, ?_⟩
   by_cases hx : x = 0
   · rw [hx]; exact zero_mem _
   · exact (mem_valBall_iff_le_ord hx).mpr (by omega)
 
-instance sigmaCompactSpace_localField : SigmaCompactSpace K :=
-  ⟨⟨fun m : ℕ => (valBall (K := K) (-(m : ℤ)) : Set K), fun _ => isCompact_valBall _, by
+instance sigmaCompactSpace_localField : SigmaCompactSpace K := ⟨⟨
+  fun m : ℕ => (valBall (K := K) (-(m : ℤ)) : Set K),
+  fun _ => isCompact_valBall _,
+  by
     ext x
     simp only [Set.mem_iUnion, Set.mem_univ, iff_true, SetLike.mem_coe]
-    exact exists_mem_valBall_neg_nat x⟩⟩
+    exact exists_mem_valBall_neg_nat x
+⟩⟩
 
 instance secondCountableTopology_localField : SecondCountableTopology K := by
   let := nontriviallyNormedField K
@@ -108,7 +113,6 @@ instance secondCountableTopology_localField : SecondCountableTopology K := by
 end Topology
 
 section Residue
-
 
 variable (K) in
 def residueCard : ℕ := Nat.card 𝓀[K]
@@ -130,15 +134,15 @@ end Residue
 section Modulus
 
 def modulus (x : K) : ℝ≥0 := by
-  classical exact if x = 0 then 0 else (residueCard K : ℝ≥0) ^ (-ord x)
+  classical
+  exact if x = 0 then 0 else (residueCard K : ℝ≥0) ^ (- ord x)
 
-theorem modulus_of_ne_zero {x : K} (hx : x ≠ 0) :
-    modulus x = (residueCard K : ℝ≥0) ^ (-ord x) := by
+theorem modulus_of_ne_zero {x : K} (hx : x ≠ 0)
+    : modulus x = (residueCard K : ℝ≥0) ^ (- ord x) := by
   simp [modulus, hx]
 
 @[simp]
-theorem modulus_zero : modulus (0 : K) = 0 := by
-  simp [modulus]
+theorem modulus_zero : modulus (0 : K) = 0 := by simp [modulus]
 
 theorem modulus_pos {x : K} (hx : x ≠ 0) : 0 < modulus x := by
   rw [modulus_of_ne_zero hx]
@@ -170,8 +174,8 @@ theorem modulus_eq_one_iff {x : K} : modulus x = 1 ↔ x ≠ 0 ∧ ord x = 0 := 
     (zpow_right_strictMono₀ one_lt_residueCard_nnreal).injective.eq_iff]
   simp [hx]
 
-theorem ord_add_eq {x d : K} (hx : x ≠ 0) (hd : d ∈ valBall (K := K) (ord x + 1)) :
-    x + d ≠ 0 ∧ ord (x + d) = ord x := by
+theorem ord_add_eq {x d : K} (hx : x ≠ 0) (hd : d ∈ valBall (K := K) (ord x + 1))
+    : x + d ≠ 0 ∧ ord (x + d) = ord x := by
   have hlt : normalizedValuation K d < normalizedValuation K x := by
     change normalizedValuation K d ≤ WithZero.exp (-(ord x + 1)) at hd
     rw [normalizedValuation_eq_exp_ord hx]
@@ -184,13 +188,13 @@ theorem ord_add_eq {x d : K} (hx : x ≠ 0) (hd : d ∈ valBall (K := K) (ord x 
     exact WithZero.exp_ne_zero heq.symm
   exact ⟨hne, by simp only [ord, heq]⟩
 
-theorem modulus_add_eq {x d : K} (hx : x ≠ 0) (hd : d ∈ valBall (K := K) (ord x + 1)) :
-    modulus (x + d) = modulus x := by
+theorem modulus_add_eq {x d : K} (hx : x ≠ 0) (hd : d ∈ valBall (K := K) (ord x + 1))
+    : modulus (x + d) = modulus x := by
   obtain ⟨h1, h2⟩ := ord_add_eq hx hd
   rw [modulus_of_ne_zero h1, modulus_of_ne_zero hx, h2]
 
-theorem modulus_le_of_mem_valBall {n : ℤ} {x : K} (hx : x ∈ valBall (K := K) n) :
-    modulus x ≤ (residueCard K : ℝ≥0) ^ (-n) := by
+theorem modulus_le_of_mem_valBall {n : ℤ} {x : K} (hx : x ∈ valBall (K := K) n)
+    : modulus x ≤ (residueCard K : ℝ≥0) ^ (-n) := by
   by_cases h0 : x = 0
   · simp [h0]
   rw [modulus_of_ne_zero h0]
@@ -204,15 +208,17 @@ theorem continuous_modulus : Continuous (modulus : K → ℝ≥0) := by
   · subst hx
     rw [ContinuousAt, modulus_zero, tendsto_order]
     refine ⟨fun a ha => (not_lt_zero ha).elim, fun ε hε => ?_⟩
-    obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one hε
-      (inv_lt_one_of_one_lt₀ (one_lt_residueCard_nnreal (K := K)))
+    obtain ⟨k, hk⟩ :=
+      exists_pow_lt_of_lt_one hε (inv_lt_one_of_one_lt₀ (one_lt_residueCard_nnreal (K := K)))
     filter_upwards [valBall_mem_nhds (K := K) (k : ℤ)] with y hy
-    calc modulus y ≤ (residueCard K : ℝ≥0) ^ (-(k : ℤ)) := modulus_le_of_mem_valBall hy
+    calc
+      modulus y
+        ≤ (residueCard K : ℝ≥0) ^ (-(k : ℤ)) := modulus_le_of_mem_valBall hy
       _ = ((residueCard K : ℝ≥0))⁻¹ ^ k := by rw [zpow_neg, zpow_natCast, inv_pow]
       _ < ε := hk
   · have hmem : {y : K | y - x ∈ valBall (K := K) (ord x + 1)} ∈ 𝓝 x :=
-      ((isOpen_valBall (K := K) (ord x + 1)).preimage
-        (continuous_id.sub continuous_const)).mem_nhds (by simp)
+      ((isOpen_valBall (K := K) (ord x + 1)).preimage (continuous_id.sub continuous_const)).mem_nhds
+        (by simp)
     have hev : ∀ᶠ y in 𝓝 x, modulus x = modulus y := by
       filter_upwards [hmem] with y hy
       have := modulus_add_eq hx hy
@@ -235,16 +241,16 @@ theorem measurableSet_valBall (n : ℤ) : MeasurableSet (valBall (K := K) n : Se
   rw [hset]
   exact (isOpen_setOf_valuation_sub_le (by simpa using hy0)).measurableSet
 
-theorem measurable_modulus : Measurable (modulus : K → ℝ≥0) :=
-  continuous_modulus.measurable
+theorem measurable_modulus : Measurable (modulus : K → ℝ≥0) := continuous_modulus.measurable
 
-theorem measure_valBall_zero_eq_mul (μ : Measure K) [μ.IsAddLeftInvariant] :
-    μ (valBall (K := K) 0) = residueCard K * μ (valBall (K := K) 1) := by
+theorem measure_valBall_zero_eq_mul (μ : Measure K) [μ.IsAddLeftInvariant]
+    : μ (valBall (K := K) 0) = residueCard K * μ (valBall (K := K) 1) := by
   classical
   have : Fintype 𝓀[K] := Fintype.ofFinite _
   choose s hs using
     (IsLocalRing.residue_surjective : Function.Surjective (IsLocalRing.residue 𝒪[K]))
-  let T : 𝓀[K] → Set K := fun r => (fun x => -((s r : 𝒪[K]) : K) + x) ⁻¹' (valBall (K := K) 1 : Set K)
+  let T : 𝓀[K] → Set K := fun r =>
+    (fun x => -((s r : 𝒪[K]) : K) + x) ⁻¹' (valBall (K := K) 1 : Set K)
   have hmem : ∀ r x, x ∈ T r ↔ ∃ h : x ∈ 𝒪[K], IsLocalRing.residue 𝒪[K] ⟨x, h⟩ = r := by
     intro r x
     constructor
@@ -255,7 +261,8 @@ theorem measure_valBall_zero_eq_mul (μ : Measure K) [μ.IsAddLeftInvariant] :
       have hx0 : x - (s r : K) ∈ valBall (K := K) 0 := by
         by_cases h : x - (s r : K) = 0
         · rw [h]; exact zero_mem _
-        · exact (mem_valBall_iff_le_ord h).mpr (zero_le_one.trans ((mem_valBall_iff_le_ord h).mp hx'))
+        · exact (mem_valBall_iff_le_ord h).mpr
+            (zero_le_one.trans ((mem_valBall_iff_le_ord h).mp hx'))
       have h1 := add_mem hx0 (mem_valBall_zero_iff.mpr (s r).2)
       rw [sub_add_cancel] at h1
       refine ⟨mem_valBall_zero_iff.mp h1, ?_⟩
@@ -289,12 +296,12 @@ theorem measure_valBall_zero_eq_mul (μ : Measure K) [μ.IsAddLeftInvariant] :
 
 variable (μ : Measure K) [μ.IsAddHaarMeasure]
 
-theorem measure_smul_eq_distribHaarChar {c : K} (hc : c ≠ 0) (s : Set K) :
-    μ (c • s) = distribHaarChar K (Units.mk0 c hc) * μ s :=
+theorem measure_smul_eq_distribHaarChar {c : K} (hc : c ≠ 0) (s : Set K)
+    : μ (c • s) = distribHaarChar K (Units.mk0 c hc) * μ s :=
   (distribHaarChar_mul μ (Units.mk0 c hc) s).symm
 
-theorem measure_valBall_eq_mul_succ (n : ℤ) :
-    μ (valBall (K := K) n) = residueCard K * μ (valBall (K := K) (n + 1)) := by
+theorem measure_valBall_eq_mul_succ (n : ℤ)
+    : μ (valBall (K := K) n) = residueCard K * μ (valBall (K := K) (n + 1)) := by
   obtain ⟨c, hc, hcn⟩ := exists_ord_eq (K := K) n
   have h0 := measure_smul_eq_distribHaarChar μ hc (valBall (K := K) 0)
   have h1 := measure_smul_eq_distribHaarChar μ hc (valBall (K := K) 1)
@@ -303,8 +310,8 @@ theorem measure_valBall_eq_mul_succ (n : ℤ) :
   rw [h0, h1, measure_valBall_zero_eq_mul μ]
   ring
 
-theorem measure_valBall (n : ℤ) :
-    μ (valBall (K := K) n) = ((residueCard K : ℝ≥0) ^ (-n) : ℝ≥0) * μ (valBall (K := K) 0) := by
+theorem measure_valBall (n : ℤ)
+    : μ (valBall (K := K) n) = ((residueCard K : ℝ≥0) ^ (-n) : ℝ≥0) * μ (valBall (K := K) 0) := by
   have hq0 := residueCard_nnreal_ne_zero (K := K)
   have hq : ((residueCard K : ℝ≥0) : ℝ≥0∞) ≠ 0 := by exact_mod_cast hq0
   have hqt : ((residueCard K : ℝ≥0) : ℝ≥0∞) ≠ ∞ := ENNReal.coe_ne_top
@@ -314,21 +321,23 @@ theorem measure_valBall (n : ℤ) :
   | succ k ih =>
     have h := measure_valBall_eq_mul_succ μ (k : ℤ)
     rw [ih, hcast] at h
-    have : μ (valBall (K := K) (k + 1)) = ((residueCard K : ℝ≥0) : ℝ≥0∞)⁻¹ *
-        (((residueCard K : ℝ≥0) ^ (-(k : ℤ)) : ℝ≥0) * μ (valBall (K := K) 0)) := by
+    have : μ (valBall (K := K) (k + 1))
+        = ((residueCard K : ℝ≥0) : ℝ≥0∞)⁻¹
+          * (((residueCard K : ℝ≥0) ^ (-(k : ℤ)) : ℝ≥0) * μ (valBall (K := K) 0)) := by
       rw [h, ← mul_assoc, ENNReal.inv_mul_cancel hq hqt, one_mul]
-    have e : ((residueCard K : ℝ≥0))⁻¹ * (residueCard K : ℝ≥0) ^ (-(k : ℤ)) =
-        (residueCard K : ℝ≥0) ^ (-((k : ℤ) + 1)) := by
+    have e
+        : ((residueCard K : ℝ≥0))⁻¹ * (residueCard K : ℝ≥0) ^ (-(k : ℤ))
+          = (residueCard K : ℝ≥0) ^ (-((k : ℤ) + 1)) := by
       rw [show -((k : ℤ) + 1) = -1 + -(k : ℤ) by ring, zpow_add₀ hq0, zpow_neg_one]
     rw [this, ← mul_assoc, ← ENNReal.coe_inv hq0, ← ENNReal.coe_mul, e]
   | pred k ih =>
     have h := measure_valBall_eq_mul_succ μ (-(k : ℤ) - 1)
     rw [sub_add_cancel, ih, hcast] at h
-    have e : (residueCard K : ℝ≥0) * (residueCard K : ℝ≥0) ^ (-(-(k : ℤ))) =
-        (residueCard K : ℝ≥0) ^ (-(-(k : ℤ) - 1)) := by
+    have e
+        : (residueCard K : ℝ≥0) * (residueCard K : ℝ≥0) ^ (-(-(k : ℤ)))
+          = (residueCard K : ℝ≥0) ^ (-(-(k : ℤ) - 1)) := by
       rw [show -(-(k : ℤ) - 1) = 1 + -(-(k : ℤ)) by ring, zpow_add₀ hq0, zpow_one]
     rw [h, ← mul_assoc, ← ENNReal.coe_mul, e]
-
 
 variable (K) in
 def integersPositiveCompacts : PositiveCompacts K where
@@ -343,7 +352,6 @@ def integersPositiveCompacts : PositiveCompacts K where
     rw [hopen.interior_eq]
     exact ⟨0, zero_mem _⟩
 
-
 variable (K) in
 def haarIntegers : Measure K := addHaarMeasure (integersPositiveCompacts K)
 
@@ -351,10 +359,10 @@ instance : (haarIntegers K).IsAddHaarMeasure := by
   unfold haarIntegers
   infer_instance
 
-theorem measureReal_valBall (n : ℤ) :
-    μ.real (valBall (K := K) n) = (residueCard K : ℝ) ^ (-n) * μ.real (valBall (K := K) 0) := by
-  rw [measureReal_def, measureReal_def, measure_valBall μ n, ENNReal.toReal_mul,
-    ENNReal.coe_toReal, NNReal.coe_zpow, NNReal.coe_natCast]
+theorem measureReal_valBall (n : ℤ)
+    : μ.real (valBall (K := K) n) = (residueCard K : ℝ) ^ (-n) * μ.real (valBall (K := K) 0) := by
+  rw [measureReal_def, measureReal_def, measure_valBall μ n, ENNReal.toReal_mul, ENNReal.coe_toReal,
+    NNReal.coe_zpow, NNReal.coe_natCast]
 
 theorem distribHaarChar_eq_modulus (u : Kˣ) : distribHaarChar K u = modulus (u : K) := by
   have h0 : haarIntegers K (valBall (K := K) 0) ≠ 0 := by
@@ -370,41 +378,40 @@ theorem distribHaarChar_eq_modulus (u : Kˣ) : distribHaarChar K u = modulus (u 
 theorem addHaar_smul {a : K} (ha : a ≠ 0) (s : Set K) : μ (a • s) = modulus a * μ s := by
   rw [measure_smul_eq_distribHaarChar μ ha, distribHaarChar_eq_modulus, Units.val_mk0]
 
-theorem map_mul_left_eq_smul {a : K} (ha : a ≠ 0) :
-    Measure.map (fun x => a * x) μ = (modulus a)⁻¹ • μ := by
+theorem map_mul_left_eq_smul {a : K} (ha : a ≠ 0)
+    : Measure.map (fun x => a * x) μ = (modulus a)⁻¹ • μ := by
   ext s hs
   rw [Measure.map_apply (measurable_const_mul a) hs]
   have : (fun x => a * x) ⁻¹' s = a⁻¹ • s := by
     ext x
     simp [Set.mem_smul_set_iff_inv_smul_mem₀ (inv_ne_zero ha), smul_eq_mul]
-  rw [this, addHaar_smul μ (inv_ne_zero ha), modulus_inv, smul_apply, ENNReal.smul_def,
-    smul_eq_mul]
+  rw [this, addHaar_smul μ (inv_ne_zero ha), modulus_inv, smul_apply, ENNReal.smul_def, smul_eq_mul]
 
-theorem integral_comp_mul_left {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    {a : K} (ha : a ≠ 0) (f : K → E) :
-    ∫ x, f (a * x) ∂μ = ((modulus a : ℝ))⁻¹ • ∫ x, f x ∂μ := by
+theorem integral_comp_mul_left
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {a : K} (ha : a ≠ 0) (f : K → E)
+    : ∫ x, f (a * x) ∂μ = ((modulus a : ℝ))⁻¹ • ∫ x, f x ∂μ := by
   have he : MeasurableEmbedding (fun x : K => a * x) :=
     (Homeomorph.mulLeft₀ a ha).measurableEmbedding
   rw [← he.integral_map, map_mul_left_eq_smul μ ha, integral_smul_nnreal_measure]
   simp [NNReal.smul_def]
 
-theorem lintegral_comp_mul_left {a : K} (ha : a ≠ 0) (f : K → ℝ≥0∞) :
-    ∫⁻ x, f (a * x) ∂μ = ((modulus a : ℝ≥0∞))⁻¹ * ∫⁻ x, f x ∂μ := by
+theorem lintegral_comp_mul_left {a : K} (ha : a ≠ 0) (f : K → ℝ≥0∞)
+    : ∫⁻ x, f (a * x) ∂μ = ((modulus a : ℝ≥0∞))⁻¹ * ∫⁻ x, f x ∂μ := by
   have he : MeasurableEmbedding (fun x : K => a * x) :=
     (Homeomorph.mulLeft₀ a ha).measurableEmbedding
-  rw [← he.lintegral_map, map_mul_left_eq_smul μ ha, lintegral_smul_measure,
-    ENNReal.smul_def, smul_eq_mul, ENNReal.coe_inv (modulus_ne_zero ha)]
+  rw [← he.lintegral_map, map_mul_left_eq_smul μ ha, lintegral_smul_measure, ENNReal.smul_def,
+    smul_eq_mul, ENNReal.coe_inv (modulus_ne_zero ha)]
 
 theorem haarIntegers_integers : haarIntegers K (𝒪[K] : Set K) = 1 := by
   rw [← coe_valBall_zero]
   exact addHaarMeasure_self
 
-theorem haarIntegers_valBall (n : ℤ) :
-    haarIntegers K (valBall (K := K) n) = ((residueCard K : ℝ≥0) ^ (-n) : ℝ≥0) := by
+theorem haarIntegers_valBall (n : ℤ)
+    : haarIntegers K (valBall (K := K) n) = ((residueCard K : ℝ≥0) ^ (-n) : ℝ≥0) := by
   rw [measure_valBall (haarIntegers K), coe_valBall_zero, haarIntegers_integers, mul_one]
 
-theorem eq_smul_haarIntegers (ν : Measure K) [ν.IsAddHaarMeasure] :
-    ν = ν (𝒪[K] : Set K) • haarIntegers K := by
+theorem eq_smul_haarIntegers (ν : Measure K) [ν.IsAddHaarMeasure]
+    : ν = ν (𝒪[K] : Set K) • haarIntegers K := by
   have := addHaarMeasure_unique ν (integersPositiveCompacts K)
   rw [← coe_valBall_zero]
   exact this

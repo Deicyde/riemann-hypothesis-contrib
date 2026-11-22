@@ -16,21 +16,28 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace GenericPointsInAffineChart
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
 
 open Classical in
-theorem exists_normalise {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v)
-    {P' : Ideal (MRing ι')} (hP' : IsMultiHomogIdeal P') {j : ∀ k : FibreBlock κ, ι' k.1}
-    {z : (Σ k, ι k) → ℂ} {c : K → ℂ} (hc : ∀ k, c k ≠ 0) {z' : (Σ k', ι' k') → ℂ} (hz' : z' ∈ mcPts P')
-    (hzz : SameOrbit (fun p => z' (v p)) z) (hj : ∀ k : FibreBlock κ, z' ⟨k.1, j k⟩ ≠ 0) :
-    ∃ d : K' → ℂ, (∀ k, d k ≠ 0) ∧ (fun q => d q.1 * z' q) ∈ mcPts P' ∧
-      (∀ p, d (v p).1 * z' (v p) = c p.1 * z p) ∧ ∀ k : FibreBlock κ, d k.1 * z' ⟨k.1, j k⟩ = 1 := by
+theorem exists_normalise
+    {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v)
+    {P' : Ideal (MRing ι')} (hP' : IsMultiHomogIdeal P')
+    {j : ∀ k : FibreBlock κ, ι' k.1} {z : (Σ k, ι k) → ℂ} {c : K → ℂ} (hc : ∀ k, c k ≠ 0)
+    {z' : (Σ k', ι' k') → ℂ} (hz' : z' ∈ mcPts P') (hzz : SameOrbit (fun p => z' (v p)) z)
+    (hj : ∀ k : FibreBlock κ, z' ⟨k.1, j k⟩ ≠ 0)
+    : ∃ d : K' → ℂ,
+      (∀ k, d k ≠ 0) ∧ (fun q => d q.1 * z' q) ∈ mcPts P'
+        ∧ (∀ p, d (v p).1 * z' (v p) = c p.1 * z p)
+        ∧ ∀ k : FibreBlock κ, d k.1 * z' ⟨k.1, j k⟩ = 1 := by
   obtain ⟨s, hs, hzs⟩ := hzz
   let d : K' → ℂ := fun k' =>
     if h : k' ∈ Set.range κ then c h.choose / s h.choose else (z' ⟨k', j ⟨k', h⟩⟩)⁻¹
@@ -55,13 +62,14 @@ theorem exists_normalise {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} 
     simp only [d, dif_neg h]
     exact inv_mul_cancel₀ (hj k)
 
-
 omit [∀ k, Fintype (ι k)] [Fintype K'] [∀ k, Fintype (ι' k)] in
-theorem eq_of_normalised {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v)
+theorem eq_of_normalised
+    {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v)
     {j : ∀ k : FibreBlock κ, ι' k.1} {w : (Σ k, ι k) → ℂ} (hw : ∀ k, ∃ i, w ⟨k, i⟩ ≠ 0)
-    {z₁ z₂ : (Σ k', ι' k') → ℂ} (h₁v : ∀ p, z₁ (v p) = w p) (h₁j : ∀ k : FibreBlock κ, z₁ ⟨k.1, j k⟩ = 1)
-    (h₂v : ∀ p, z₂ (v p) = w p) (h₂j : ∀ k : FibreBlock κ, z₂ ⟨k.1, j k⟩ = 1) (h : SameOrbit z₁ z₂) :
-    z₁ = z₂ := by
+    {z₁ z₂ : (Σ k', ι' k') → ℂ}
+    (h₁v : ∀ p, z₁ (v p) = w p) (h₁j : ∀ k : FibreBlock κ, z₁ ⟨k.1, j k⟩ = 1)
+    (h₂v : ∀ p, z₂ (v p) = w p) (h₂j : ∀ k : FibreBlock κ, z₂ ⟨k.1, j k⟩ = 1) (h : SameOrbit z₁ z₂)
+    : z₁ = z₂ := by
   obtain ⟨t, -, ht⟩ := h
   have ht1 : ∀ k', t k' = 1 := by
     intro k'
@@ -83,12 +91,14 @@ theorem eq_of_normalised {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} 
 
 end GenericPointsInAffineChart
 
-
 open GenericPointsInAffineChart PullbackDegreeCount in
-theorem GenericPointsInAffineChart.proof (hFin : ArithmeticIntersectionChartFinite.Statement) (hNorm : ChartNormCount.Statement)
-    (hOrb : OrbitCompNonvanish.Statement) : GenericPointsInAffineChart.Statement := by
+theorem GenericPointsInAffineChart.proof
+    (hFin : ArithmeticIntersectionChartFinite.Statement) (hNorm : ChartNormCount.Statement)
+    (hOrb : OrbitCompNonvanish.Statement)
+    : GenericPointsInAffineChart.Statement := by
   intro K _ ι _ K' _ ι' _ κ v P' n G j hv hP' hP hj
-  obtain ⟨E, hE, hEw⟩ := hNorm K ι K' ι' κ v P' n G j hv hP' hP hj (hFin K ι K' ι' κ v P' n G j hv hP' hP hj)
+  obtain ⟨E, hE, hEw⟩ :=
+    hNorm K ι K' ι' κ v P' n G j hv hP' hP hj (hFin K ι K' ι' κ v P' n G j hv hP' hP hj)
   have hPh : IsMultiHomogIdeal (imageZ v P') := hP.2.1.2.1
   have hP'h : IsMultiHomogIdeal P' := hP'.2.1.2.1
   obtain ⟨D, a, hD, hDP, hDz⟩ := hOrb K ι (imageZ v P') E hPh hE

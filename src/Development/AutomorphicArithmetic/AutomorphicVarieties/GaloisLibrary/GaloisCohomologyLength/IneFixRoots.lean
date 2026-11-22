@@ -5,11 +5,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
-theorem UpperTheory.V.LDataCardLeFinrank.ineFixRoots :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 → ∀ (m : ℕ), m.Coprime l → ∀ ζ : Ω, ζ ^ m = 1 →
-      (∀ ξ : Ω, ξ ^ m = 1 → A.valuation (ξ - ζ) < 1 → ξ = ζ) ∧ ∀ g ∈ Ine (F := F) A, g ζ = ζ := by
+theorem UpperTheory.V.LDataCardLeFinrank.ineFixRoots
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (A : ValuationSubring Ω),
+      A.valuation (l : Ω) < 1
+        → ∀ (m : ℕ),
+          m.Coprime l
+            → ∀ ζ : Ω,
+              ζ ^ m = 1
+                → (∀ ξ : Ω, ξ ^ m = 1 → A.valuation (ξ - ζ) < 1 → ξ = ζ)
+                  ∧ ∀ g ∈ Ine (F := F) A, g ζ = ζ := by
   intro F Ω _ _ _ _ _ l _ A hl m hm ζ hζ
   have hm0 : m ≠ 0 := by
     rintro rfl
@@ -22,8 +30,7 @@ theorem UpperTheory.V.LDataCardLeFinrank.ineFixRoots :
     · exact absurd h (pow_lt_one₀ zero_le' h1 hm0).ne
     · exact h1
     · exact absurd h (one_lt_pow₀ h1 hm0).ne'
-  have hint : ∀ a : ℤ, A.valuation (a : Ω) ≤ 1 := fun a => by
-    simpa using A.valuation_le_one (a : A)
+  have hint : ∀ a : ℤ, A.valuation (a : Ω) ≤ 1 := fun a => by simpa using A.valuation_le_one (a : A)
   have hmv : ¬ A.valuation (m : Ω) < 1 := by
     intro hlt
     have hg : ((Nat.gcd m l : ℕ) : ℤ) = m * Nat.gcdA m l + l * Nat.gcdB m l := Nat.gcd_eq_gcd_ab m l
@@ -61,8 +68,7 @@ theorem UpperTheory.V.LDataCardLeFinrank.ineFixRoots :
       have hs : A.valuation (∑ j ∈ Finset.range i, η ^ j) ≤ 1 :=
         A.valuation.map_sum_le (fun j _ => (hpow1 j).le)
       exact lt_of_le_of_lt (mul_le_of_le_one_left' hs) hvη
-    have hsum0 : ∑ i ∈ Finset.range m, η ^ i = 0 := by
-      rw [geom_sum_eq hη1, hη, sub_self, zero_div]
+    have hsum0 : ∑ i ∈ Finset.range m, η ^ i = 0 := by rw [geom_sum_eq hη1, hη, sub_self, zero_div]
     have hmΩ : (m : Ω) = ∑ i ∈ Finset.range m, (1 - η ^ i) := by
       rw [Finset.sum_sub_distrib, hsum0, sub_zero]
       simp

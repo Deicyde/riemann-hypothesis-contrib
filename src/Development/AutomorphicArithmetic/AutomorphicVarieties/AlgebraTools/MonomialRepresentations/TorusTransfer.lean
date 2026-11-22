@@ -152,15 +152,18 @@ private lemma torusTransfer_spec {K : Type*} [Field K] {ι : Type*} [Fintype ι]
   rw [← resultant_map_map, ← derivative_map, ← charpoly_map, hM]
   exact torusTransfer_sep_iff _ (charpoly_monic _) _ (charpoly_natDegree_eq_dim _)
 
-theorem UpperTheory.V.AlgebraTools.torusTransfer :
-    ∀ (K : Type) [Field K] (ι : Type) [Fintype ι] [DecidableEq ι] (x : Matrix ι ι K) (a : ι → Kˣ) (w : ι → ℤ),
-      (∀ m : ι → ℤ, ∏ i, a i ^ m i = 1 → ∑ i, m i * w i = 0) →
-      (x.map (algebraMap K (RatFunc K)) * diagonal (fun i => (RatFunc.X : RatFunc K) ^ w i)).charpoly.Separable →
-      ∃ m : ℕ, (x * diagonal (fun i => (a i : K) ^ m)).charpoly.Separable := by
+theorem UpperTheory.V.AlgebraTools.torusTransfer
+    : ∀ (K : Type) [Field K] (ι : Type) [Fintype ι] [DecidableEq ι] (x : Matrix ι ι K) (a : ι → Kˣ)
+        (w : ι → ℤ),
+      (∀ m : ι → ℤ, ∏ i, a i ^ m i = 1 → ∑ i, m i * w i = 0)
+        → (x.map (algebraMap K (RatFunc K))
+          * diagonal (fun i => (RatFunc.X : RatFunc K) ^ w i)).charpoly.Separable
+        → ∃ m : ℕ, (x * diagonal (fun i => (a i : K) ^ m)).charpoly.Separable := by
   classical
   intro K _ ι _ _ x a w hw hsep
-  have hne := (torusTransfer_spec x (algebraMap K (RatFunc K))
-    (fun i => (RatFunc.X : RatFunc K) ^ w i)).1 hsep
+  have hne :=
+    (torusTransfer_spec x (algebraMap K (RatFunc K)) (fun i => (RatFunc.X : RatFunc K) ^ w i)).1
+      hsep
   by_contra hall
   push_neg at hall
   apply hne

@@ -13,12 +13,16 @@ namespace LateralTheory.KummerTheory
 section Alg
 variable (l : ℕ) [Fact l.Prime] {M : Type*} [AddCommGroup M] [Module ℤ_[l] M]
 
-theorem adic_decomp [Module.Finite ℤ_[l] M] : ∃ (r : ℕ) (c : Fin r → M) (e : ℕ), 0 < e ∧
-    LinearIndependent ℤ_[l] c ∧ ∀ x : M, ∃ (a : Fin r → ℤ_[l]) (τ : M), x = ∑ s, a s • c s + τ ∧ e • τ = 0 := by
+theorem adic_decomp [Module.Finite ℤ_[l] M]
+    : ∃ (r : ℕ) (c : Fin r → M) (e : ℕ),
+      0 < e ∧ LinearIndependent ℤ_[l] c
+        ∧ ∀ x : M, ∃ (a : Fin r → ℤ_[l]) (τ : M), x = ∑ s, a s • c s + τ ∧ e • τ = 0 := by
   classical
   set T := Submodule.torsion ℤ_[l] M
   have hTfin : Module.Finite ℤ_[l] T := inferInstance
-  obtain ⟨a, ha, ha0⟩ := Submodule.annihilator_top_inter_nonZeroDivisors (Submodule.torsion_isTorsion (R := ℤ_[l]) (M := M))
+  obtain ⟨a, ha, ha0⟩ :=
+    Submodule.annihilator_top_inter_nonZeroDivisors (Submodule.torsion_isTorsion (R := ℤ_[l])
+      (M := M))
   have hane : a ≠ 0 := nonZeroDivisors.ne_zero ha0
   have hkill : ∀ τ ∈ T, (l ^ a.valuation : ℕ) • τ = 0 := by
     intro τ hτ
@@ -32,8 +36,10 @@ theorem adic_decomp [Module.Finite ℤ_[l] M] : ∃ (r : ℕ) (c : Fin r → M) 
     exact h3
   set Q := M ⧸ T
   let b := Module.finBasis ℤ_[l] Q
-  let c : Fin (Module.finrank ℤ_[l] Q) → M := fun s => (Submodule.Quotient.mk_surjective T (b s)).choose
-  have hc : ∀ s, T.mkQ (c s) = b s := fun s => (Submodule.Quotient.mk_surjective T (b s)).choose_spec
+  let c : Fin (Module.finrank ℤ_[l] Q) → M := fun s =>
+    (Submodule.Quotient.mk_surjective T (b s)).choose
+  have hc : ∀ s, T.mkQ (c s) = b s := fun s =>
+    (Submodule.Quotient.mk_surjective T (b s)).choose_spec
   have hcomp : T.mkQ ∘ c = b := funext hc
   refine ⟨_, c, l ^ a.valuation, pow_pos (Fact.out : l.Prime).pos _, ?_, ?_⟩
   · exact LinearIndependent.of_comp T.mkQ (hcomp ▸ b.linearIndependent)
@@ -44,13 +50,19 @@ theorem adic_decomp [Module.Finite ℤ_[l] M] : ∃ (r : ℕ) (c : Fin r → M) 
     simp only [map_smul, hc]
     rw [b.sum_repr, sub_self]
 
-theorem adic_qbasis {r : ℕ} (c : Fin r → M) (e : ℕ) (he : 0 < e) (hli : LinearIndependent ℤ_[l] c)
-    (hdec : ∀ x : M, ∃ (a : Fin r → ℤ_[l]) (τ : M), x = ∑ s, a s • c s + τ ∧ e • τ = 0) :
-    LinearIndependent ℚ_[l] (fun s => ((1 : ℚ_[l]) ⊗ₜ[ℤ_[l]] c s : ℚ_[l] ⊗[ℤ_[l]] M)) ∧
-    Submodule.span ℚ_[l] (Set.range fun s => ((1 : ℚ_[l]) ⊗ₜ[ℤ_[l]] c s : ℚ_[l] ⊗[ℤ_[l]] M)) = ⊤ := by
+theorem adic_qbasis
+    {r : ℕ} (c : Fin r → M)
+    (e : ℕ) (he : 0 < e)
+    (hli : LinearIndependent ℤ_[l] c)
+    (hdec : ∀ x : M, ∃ (a : Fin r → ℤ_[l]) (τ : M), x = ∑ s, a s • c s + τ ∧ e • τ = 0)
+    : LinearIndependent ℚ_[l] (fun s => ((1 : ℚ_[l]) ⊗ₜ[ℤ_[l]] c s : ℚ_[l] ⊗[ℤ_[l]] M))
+      ∧ Submodule.span ℚ_[l] (Set.range fun s => ((1 : ℚ_[l]) ⊗ₜ[ℤ_[l]] c s : ℚ_[l] ⊗[ℤ_[l]] M))
+        = ⊤ := by
   let f := TensorProduct.mk ℤ_[l] ℚ_[l] M 1
   refine ⟨hli.of_isLocalizedModule ℚ_[l] (nonZeroDivisors ℤ_[l]) f, ?_⟩
-  have htop := span_eq_top_of_isLocalizedModule ℚ_[l] (nonZeroDivisors ℤ_[l]) f (v := Set.univ) Submodule.span_univ
+  have htop :=
+    span_eq_top_of_isLocalizedModule ℚ_[l] (nonZeroDivisors ℤ_[l]) f (v := Set.univ)
+      Submodule.span_univ
   refine top_unique (htop ▸ Submodule.span_le.mpr ?_)
   rintro _ ⟨x, -, rfl⟩
   obtain ⟨a, τ, rfl, hτ⟩ := hdec x
@@ -70,8 +82,12 @@ def levH (l : ℕ) [Fact l.Prime] (E : Spc) (n i : ℤ) (k : ℕ) : Hl l E n i �
   map_zero' := rfl
   map_add' _ _ := rfl
 
-theorem lev_comb (l : ℕ) [Fact l.Prime] {E : Spc} {n i : ℤ} {r : ℕ} (c : Fin r → Hl l E n i) (a : Fin r → ℤ_[l]) (k : ℕ) :
-    lev l (∑ s, a s • c s) k = comb (l ^ k) (fun s => lev l (c s) k) (fun s => PadicInt.toZModPow k (a s)) := by
+theorem lev_comb
+    (l : ℕ) [Fact l.Prime]
+    {E : Spc} {n i : ℤ} {r : ℕ} (c : Fin r → Hl l E n i) (a : Fin r → ℤ_[l])
+    (k : ℕ)
+    : lev l (∑ s, a s • c s) k
+      = comb (l ^ k) (fun s => lev l (c s) k) (fun s => PadicInt.toZModPow k (a s)) := by
   change levH l E n i k _ = _
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -105,7 +121,8 @@ theorem AdicAlg_of : AdicAlg := by
         exact mul_left_cancel₀ (Nat.cast_ne_zero.mpr he.ne') h4
       rw [← congrFun hat s]
       simp only [h3, map_mul, map_pow, map_natCast, Pi.zero_apply]
-      rw [show ((l : ZMod (l ^ k)) ^ k) = ((l ^ k : ℕ) : ZMod (l ^ k)) by push_cast; rfl, ZMod.natCast_self, zero_mul]
+      rw [show ((l : ZMod (l ^ k)) ^ k) = ((l ^ k : ℕ) : ZMod (l ^ k)) by push_cast; rfl,
+        ZMod.natCast_self, zero_mul]
     rw [ht0, smul_zero]
   · intro z
     obtain ⟨x, hx⟩ := hcok k z

@@ -11,14 +11,19 @@ open Matrix
 
 namespace GlobalTheory.RegSS
 
-private theorem aeval_mul_mulVec {K : Type} [Field K] {n : Type} [Fintype n]
-    [DecidableEq n] (M : Matrix n n K) (f g : Polynomial K) (v : n → K) :
-    Polynomial.aeval M (f * g) *ᵥ v = Polynomial.aeval M f *ᵥ (Polynomial.aeval M g *ᵥ v) := by
+private theorem aeval_mul_mulVec
+    {K : Type} [Field K]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (M : Matrix n n K) (f g : Polynomial K) (v : n → K)
+    : Polynomial.aeval M (f * g) *ᵥ v = Polynomial.aeval M f *ᵥ (Polynomial.aeval M g *ᵥ v) := by
   rw [map_mul, Matrix.mulVec_mulVec]
 
-private theorem det_aeval_eq_zero_of_irreducible_dvd_charpoly {K : Type} [Field K] {n : Type} [Fintype n]
-    [DecidableEq n] (M : Matrix n n K) {q : Polynomial K} (hq : Irreducible q)
-    (hd : q ∣ M.charpoly) : (Polynomial.aeval M q).det = 0 := by
+private theorem det_aeval_eq_zero_of_irreducible_dvd_charpoly
+    {K : Type} [Field K]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (M : Matrix n n K)
+    {q : Polynomial K} (hq : Irreducible q) (hd : q ∣ M.charpoly)
+    : (Polynomial.aeval M q).det = 0 := by
   have : Fact (Irreducible q) := ⟨hq⟩
   obtain ⟨s, hs⟩ := hd
   have hα : Polynomial.aeval (AdjoinRoot.root q) q = 0 := by
@@ -26,15 +31,18 @@ private theorem det_aeval_eq_zero_of_irreducible_dvd_charpoly {K : Type} [Field 
   have hroot : (q.map (algebraMap K (AdjoinRoot q))).IsRoot (AdjoinRoot.root q) := by
     rw [Polynomial.IsRoot, Polynomial.eval_map_algebraMap, hα]
   obtain ⟨g, hg⟩ := Polynomial.dvd_iff_isRoot.mpr hroot
-  have hN : (Matrix.scalar n (AdjoinRoot.root q) - M.map (algebraMap K (AdjoinRoot q))).det = 0 := by
+  have hN
+      : (Matrix.scalar n (AdjoinRoot.root q) - M.map (algebraMap K (AdjoinRoot q))).det = 0 := by
     rw [← Matrix.eval_charpoly, Matrix.charpoly_map, hs, Polynomial.map_mul, Polynomial.eval_mul,
       Polynomial.eval_map_algebraMap, hα, zero_mul]
-  have hmap : Polynomial.aeval (M.map (algebraMap K (AdjoinRoot q))) q =
-      (Polynomial.aeval M q).map (algebraMap K (AdjoinRoot q)) := by
+  have hmap
+      : Polynomial.aeval (M.map (algebraMap K (AdjoinRoot q))) q
+        = (Polynomial.aeval M q).map (algebraMap K (AdjoinRoot q)) := by
     exact Polynomial.aeval_algHom_apply ((Algebra.ofId K (AdjoinRoot q)).mapMatrix (m := n)) M q
-  have hfac : Polynomial.aeval (M.map (algebraMap K (AdjoinRoot q))) q =
-      (M.map (algebraMap K (AdjoinRoot q)) - Matrix.scalar n (AdjoinRoot.root q)) *
-        Polynomial.aeval (M.map (algebraMap K (AdjoinRoot q))) g := by
+  have hfac
+      : Polynomial.aeval (M.map (algebraMap K (AdjoinRoot q))) q
+        = (M.map (algebraMap K (AdjoinRoot q)) - Matrix.scalar n (AdjoinRoot.root q))
+          * Polynomial.aeval (M.map (algebraMap K (AdjoinRoot q))) g := by
     rw [← Polynomial.aeval_map_algebraMap (AdjoinRoot q), hg, map_mul, map_sub, Polynomial.aeval_X,
       Polynomial.aeval_C]
     congr 2
@@ -44,10 +52,15 @@ private theorem det_aeval_eq_zero_of_irreducible_dvd_charpoly {K : Type} [Field 
     rw [RingHom.map_det, RingHom.mapMatrix_apply, ← hmap, h2]
   exact (map_eq_zero_iff _ (algebraMap K (AdjoinRoot q)).injective).mp h3
 
-private theorem exists_vec_annihilator_eq_of_dvd_charpoly {K : Type} [Field K] {n : Type} [Fintype n] [DecidableEq n]
-    (M : Matrix n n K) (hsq : Squarefree M.charpoly) (q : Polynomial K) :
-    q ∣ M.charpoly → ∃ w : n → K, Polynomial.aeval M q *ᵥ w = 0 ∧
-      ∀ f : Polynomial K, Polynomial.aeval M f *ᵥ w = 0 → q ∣ f := by
+private theorem exists_vec_annihilator_eq_of_dvd_charpoly
+    {K : Type} [Field K]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (M : Matrix n n K) (hsq : Squarefree M.charpoly)
+    (q : Polynomial K)
+    : q ∣ M.charpoly
+      → ∃ w : n → K,
+        Polynomial.aeval M q *ᵥ w = 0
+          ∧ ∀ f : Polynomial K, Polynomial.aeval M f *ᵥ w = 0 → q ∣ f := by
   refine UniqueFactorizationMonoid.induction_on_prime q ?_ ?_ ?_
   · intro h
     exact absurd (zero_dvd_iff.mp h) M.charpoly_monic.ne_zero
@@ -55,8 +68,9 @@ private theorem exists_vec_annihilator_eq_of_dvd_charpoly {K : Type} [Field K] {
     exact ⟨0, Matrix.mulVec_zero _, fun _ _ => hx.dvd⟩
   · intro r π _ hπ ih hd
     obtain ⟨wr, hwr0, hwr⟩ := ih (dvd_trans (dvd_mul_left r π) hd)
-    obtain ⟨wp, hwpne, hwp0⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr
-      (det_aeval_eq_zero_of_irreducible_dvd_charpoly M hπ.irreducible (dvd_trans (dvd_mul_right π r) hd))
+    obtain ⟨wp, hwpne, hwp0⟩ :=
+      Matrix.exists_mulVec_eq_zero_iff.mpr (det_aeval_eq_zero_of_irreducible_dvd_charpoly M
+        hπ.irreducible (dvd_trans (dvd_mul_right π r) hd))
     have hcop : IsCoprime π r := by
       rw [hπ.coprime_iff_not_dvd]
       rintro ⟨t, rfl⟩
@@ -92,7 +106,8 @@ private theorem exists_vec_annihilator_eq_of_dvd_charpoly {K : Type} [Field K] {
 
 theorem cyclicField : GlobalTheory.RegSS.CyclicField := by
   intro K _ n _ _ M hsep
-  obtain ⟨v, -, hv⟩ := exists_vec_annihilator_eq_of_dvd_charpoly M hsep.squarefree M.charpoly dvd_rfl
+  obtain ⟨v, -, hv⟩ :=
+    exists_vec_annihilator_eq_of_dvd_charpoly M hsep.squarefree M.charpoly dvd_rfl
   refine ⟨v, ?_⟩
   rw [isUnit_iff_ne_zero]
   intro h0

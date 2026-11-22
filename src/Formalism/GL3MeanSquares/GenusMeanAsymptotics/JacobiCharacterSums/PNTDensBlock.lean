@@ -132,18 +132,19 @@ theorem off_diagonal_bound : Offdiag := by
     linarith
   have hpF : p ∈ Fib := mem_filter.2 ⟨hp, rfl⟩
   have htP : p.2.im ∈ P := mem_image_of_mem _ hpF
-  have hsp' := (zero_spacing P T (by linarith)
-    (by
-      intro x hx
-      obtain ⟨a, ha, rfl⟩ := mem_image.1 hx
-      exact (hS a (mem_filter.1 ha).1).2.2)
-    (by
-      intro x hx y hy hxy
-      obtain ⟨a, ha, rfl⟩ := mem_image.1 hx
-      obtain ⟨b, hb, rfl⟩ := mem_image.1 hy
-      have ha' := mem_filter.1 ha
-      have hb' := mem_filter.1 hb
-      exact hsp a ha'.1 b hb'.1 (fun h => hxy (by rw [h])) (ha'.2.trans hb'.2.symm))).2 _ htP
+  have hsp' :=
+    (zero_spacing P T (by linarith)
+      (by
+        intro x hx
+        obtain ⟨a, ha, rfl⟩ := mem_image.1 hx
+        exact (hS a (mem_filter.1 ha).1).2.2)
+      (by
+        intro x hx y hy hxy
+        obtain ⟨a, ha, rfl⟩ := mem_image.1 hx
+        obtain ⟨b, hb, rfl⟩ := mem_image.1 hy
+        have ha' := mem_filter.1 ha
+        have hb' := mem_filter.1 hb
+        exact hsp a ha'.1 b hb'.1 (fun h => hxy (by rw [h])) (ha'.2.trans hb'.2.symm))).2 _ htP
   have hsumeq : ∑ p' ∈ Fib, 1 / |p.2.im - p'.2.im| = ∑ x ∈ P.erase p.2.im, 1 / |p.2.im - x| := by
     rw [← add_zero (∑ x ∈ P.erase p.2.im, 1 / |p.2.im - x|)]
     have h0 : (0 : ℝ) = 1 / |p.2.im - p.2.im| := by simp
@@ -151,10 +152,13 @@ theorem off_diagonal_bound : Offdiag := by
   rw [hsumeq]
   have hc0 : (0 : ℝ) ≤ S.card := by positivity
   have hB0 : 0 ≤ ((M : ℝ) + 1) * (2 + 2 * T) := by positivity
-  have h1 : 4 * (U : ℝ) * ∑ x ∈ P.erase p.2.im, 1 / |p.2.im - x| ≤
-      4 * (U : ℝ) * (2 * (1 + Real.log (2 * T + 1))) := by gcongr
-  have h2 : (S.card : ℝ) * (4 * ((M : ℝ) + 1) * (2 + 2 * T)) ≤
-      (S.card : ℝ) * (8 * ((M : ℝ) + 1) * (2 + 2 * T)) := by
+  have h1
+      : 4 * (U : ℝ) * ∑ x ∈ P.erase p.2.im, 1 / |p.2.im - x|
+        ≤ 4 * (U : ℝ) * (2 * (1 + Real.log (2 * T + 1))) := by
+    gcongr
+  have h2
+      : (S.card : ℝ) * (4 * ((M : ℝ) + 1) * (2 + 2 * T))
+        ≤ (S.card : ℝ) * (8 * ((M : ℝ) + 1) * (2 + 2 * T)) := by
     apply mul_le_mul_of_nonneg_left _ hc0
     nlinarith
   linarith
@@ -170,31 +174,35 @@ theorem dyadic_block_count : BlockCnt := by
   set b : ℕ → ℂ := fun n => mco Y N n * (n : ℂ) ^ (-(σ : ℂ)) with hb
   set v : α → ℕ → ℂ := fun p n => f p n * (n : ℂ) ^ (-(ρ p - (σ : ℂ))) with hv
   have hU0 : (0 : ℝ) < U := by exact_mod_cast hU
-  have hbv : ∀ p, ∀ n ∈ Ioc U (2 * U), b n * v p n = mco Y N n * f p n * (n : ℂ) ^ (-ρ p) := by
+  have hbv : ∀ p, ∀ n ∈ Ioc U (2 * U), b n * v p n = mco Y N n * f p n * (n : ℂ) ^ (- ρ p) := by
     intro p n hn
-    have hn0 : (n : ℂ) ≠ 0 := by
-      have := (mem_Ioc.1 hn).1; exact_mod_cast (by omega : n ≠ 0)
-    have : (n : ℂ) ^ (-(σ : ℂ)) * (n : ℂ) ^ (-(ρ p - (σ : ℂ))) = (n : ℂ) ^ (-ρ p) := by
+    have hn0 : (n : ℂ) ≠ 0 := by have := (mem_Ioc.1 hn).1; exact_mod_cast (by omega : n ≠ 0)
+    have : (n : ℂ) ^ (-(σ : ℂ)) * (n : ℂ) ^ (-(ρ p - (σ : ℂ))) = (n : ℂ) ^ (- ρ p) := by
       rw [← Complex.cpow_add _ _ hn0]; congr 1; ring
     simp only [hb, hv]
-    rw [← this]; ring
+    rw [← this]
+    ring
   have hsum : ∀ p, ∑ n ∈ Ioc U (2 * U), b n * v p n = blkD Y N U (f p) (ρ p) := by
     intro p; unfold blkD; exact sum_congr rfl (hbv p)
-  have heq : ∀ p p', ∑ n ∈ Ioc U (2 * U), v p n * (starRingEnd ℂ) (v p' n) =
-      ∑ n ∈ Ioc U (2 * U), f p n * (starRingEnd ℂ) (f p' n) *
-        (n : ℂ) ^ (-((ρ p - (σ : ℂ)) + (starRingEnd ℂ) (ρ p' - (σ : ℂ)))) := by
+  have heq
+      : ∀ p p',
+        ∑ n ∈ Ioc U (2 * U), v p n * (starRingEnd ℂ) (v p' n)
+          = ∑ n ∈ Ioc U (2 * U), f p n * (starRingEnd ℂ) (f p' n) *
+              (n : ℂ) ^ (-((ρ p - (σ : ℂ)) + (starRingEnd ℂ) (ρ p' - (σ : ℂ)))) := by
     intro p p'
     refine sum_congr rfl (fun n hn => ?_)
-    have hn0 : (n : ℂ) ≠ 0 := by
-      have := (mem_Ioc.1 hn).1; exact_mod_cast (by omega : n ≠ 0)
+    have hn0 : (n : ℂ) ≠ 0 := by have := (mem_Ioc.1 hn).1; exact_mod_cast (by omega : n ≠ 0)
     simp only [hv]
     rw [map_mul, conj_natCast_cpow_neg']
-    have : (n : ℂ) ^ (-(ρ p - (σ : ℂ))) * (n : ℂ) ^ (-(starRingEnd ℂ) (ρ p' - (σ : ℂ))) =
-        (n : ℂ) ^ (-((ρ p - (σ : ℂ)) + (starRingEnd ℂ) (ρ p' - (σ : ℂ)))) := by
+    have : (n : ℂ) ^ (-(ρ p - (σ : ℂ))) * (n : ℂ) ^ (- (starRingEnd ℂ) (ρ p' - (σ : ℂ)))
+        = (n : ℂ) ^ (-((ρ p - (σ : ℂ)) + (starRingEnd ℂ) (ρ p' - (σ : ℂ)))) := by
       rw [← Complex.cpow_add _ _ hn0]; congr 1; ring
-    rw [← this]; ring
-  have hΔ : ∀ p ∈ S, ∑ p' ∈ S, ‖∑ n ∈ Ioc U (2 * U), v p n * (starRingEnd ℂ) (v p' n)‖ ≤
-      (U : ℝ) * G + (S.card : ℝ) * K := by
+    rw [← this]
+    ring
+  have hΔ
+      : ∀ p ∈ S,
+        ∑ p' ∈ S, ‖∑ n ∈ Ioc U (2 * U), v p n * (starRingEnd ℂ) (v p' n)‖
+          ≤ (U : ℝ) * G + (S.card : ℝ) * K := by
     intro p hp
     simp only [heq]
     exact hoff p hp
@@ -217,7 +225,8 @@ theorem dyadic_block_count : BlockCnt := by
   have haU : a * U = 2 * (U : ℝ) ^ (2 - 2 * σ) * (1 + Real.log (2 * U)) ^ 3 := by
     have : (U : ℝ) ^ (2 - 2 * σ) = (U : ℝ) ^ (1 - 2 * σ) * (U : ℝ) ^ (1 : ℝ) := by
       rw [← Real.rpow_add hU0]; congr 1; ring
-    rw [this, Real.rpow_one, ha]; ring
+    rw [this, Real.rpow_one, ha]
+    ring
   have h1 : (S.card : ℝ) * θ ^ 2 ≤ a * ((U : ℝ) * G + (S.card : ℝ) * K) :=
     hlow.trans (hmain.trans (mul_le_mul_of_nonneg_right hbn hΔ0))
   have hS0 : (0 : ℝ) ≤ S.card := by positivity

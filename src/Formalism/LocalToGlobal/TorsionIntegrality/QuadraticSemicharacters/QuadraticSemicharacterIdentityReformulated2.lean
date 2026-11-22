@@ -57,8 +57,12 @@ theorem taylorMvProd : TaylorMvProd := TaylorMvProd_of lineUnique taylorLine
 theorem taylorMvTens4 : TaylorMvTens4 := TaylorMvTens4_of lineUnique taylorLine
 theorem taylorMvInj : TaylorMvInj := TaylorMvInj_of lineUnique taylorLine
 
-theorem quadraticSemicharacter_identity_reformulated₂ : quadraticSemicharacterIdentityReformulated₂ := quadraticSemicharacters_of_productThetaMem product_theta_mem'
+theorem quadraticSemicharacter_identity_reformulated₂
+    : quadraticSemicharacterIdentityReformulated₂ :=
+  quadraticSemicharacters_of_productThetaMem product_theta_mem'
 theorem quadraticSemicharacters_fact : quadraticSemicharacterIdentity :=
-  quadraticSemicharacterIdentity_of_reformulated_of_taylorMv_of_repsExist_of_opUAnalytic quadraticSemicharacter_identity_reformulated₂ taylorMvLinear taylorMvComp taylorMvProd taylorMvTens4 repsExist opUAnalytic
+  quadraticSemicharacterIdentity_of_reformulated_of_taylorMv_of_repsExist_of_opUAnalytic
+    quadraticSemicharacter_identity_reformulated₂ taylorMvLinear taylorMvComp taylorMvProd
+    taylorMvTens4 repsExist opUAnalytic
 
 end Formalism.L2.Th1.H

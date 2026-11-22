@@ -14,13 +14,23 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sca
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.DIV GlobalTheory.FlagBasis GlobalTheory.LevNorm
+open NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.DIV
+  GlobalTheory.FlagBasis GlobalTheory.LevNorm
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.ScalW
 
-theorem hMat_mem_hfin_comm : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (c : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) (h : X.B.I.Gf), (∀ a, GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.eV X a) = GlobalTheory.ScalW.eV X a ∧ GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.fV X a) = GlobalTheory.ScalW.fV X a) → GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.zV X u) = GlobalTheory.ScalW.zV X u → X.B.I.fmat h = GlobalTheory.ScalW.hMat X u c → h ∈ Hfin X u ∧ ∀ h' ∈ Hfin X u, h * h' = h' * h := by
+theorem hMat_mem_hfin_comm
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (c : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)
+        (h : X.B.I.Gf),
+      (∀ a,
+          GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.eV X a) = GlobalTheory.ScalW.eV X a
+            ∧ GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.fV X a) = GlobalTheory.ScalW.fV X a)
+        → GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.zV X u) = GlobalTheory.ScalW.zV X u
+        → X.B.I.fmat h = GlobalTheory.ScalW.hMat X u c
+        → h ∈ Hfin X u ∧ ∀ h' ∈ Hfin X u, h * h' = h' * h := by
   intro D X u c h hef hz hh
   have hfixV : ∀ v ∈ fixSet X u, GlobalTheory.ScalW.prj X u (incl X.B.I v) = incl X.B.I v := by
     rintro v ((⟨a, rfl⟩ | ⟨a, rfl⟩) | hv)
@@ -39,7 +49,10 @@ theorem hMat_mem_hfin_comm : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Wor
   have hE := Formalism.L2.SG.PoincareInHH.Cut.eR_mem_fix X u
   have hF := Formalism.L2.SG.PoincareInHH.Cut.fR_mem_fix X u
   have hZ := Formalism.L2.SG.PoincareInHH.Cut.zR_mem_fix X u
-  have hmv : ∀ v, v ∈ fixSet X u → ∀ y, hA X.B.I (incl X.B.I v) (X.B.I.fmat h' *ᵥ y) = hA X.B.I (incl X.B.I v) y := by
+  have hmv
+      : ∀ v,
+        v ∈ fixSet X u
+          → ∀ y, hA X.B.I (incl X.B.I v) (X.B.I.fmat h' *ᵥ y) = hA X.B.I (incl X.B.I v) y := by
     intro v hv y
     rw [GlobalTheory.St.G.FrameClose.hA_move, hgi v hv]
   have hprj : ∀ y, prj X u (X.B.I.fmat h' *ᵥ y) = prj X u y := by
@@ -47,14 +60,15 @@ theorem hMat_mem_hfin_comm : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Wor
     simp only [prj, eV, fV, zV, hmv _ (hE _), hmv _ (hF _), hmv _ hZ]
   have hprj2 : ∀ y, X.B.I.fmat h' *ᵥ prj X u y = prj X u y := by
     intro y
-    simp only [prj, Matrix.mulVec_sub, Matrix.mulVec_add, Matrix.mulVec_sum, Matrix.mulVec_smul, eV, fV, zV,
-      hg _ (hE _), hg _ (hF _), hg _ hZ]
+    simp only [prj, Matrix.mulVec_sub, Matrix.mulVec_add, Matrix.mulVec_sum, Matrix.mulVec_smul, eV,
+      fV, zV, hg _ (hE _), hg _ (hF _), hg _ hZ]
   have hM : X.B.I.fmat (h * h') = X.B.I.fmat (h' * h) := by
     rw [Formalism.L2.SG.PoincareInHH.Cut.fmat_mul, Formalism.L2.SG.PoincareInHH.Cut.fmat_mul, hh]
     apply Matrix.toLin'.injective
     refine LinearMap.ext fun y => ?_
     rw [Matrix.toLin'_apply, Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
-      hMat_mulVec, hMat_mulVec, hprj, Matrix.mulVec_add, Matrix.mulVec_smul, Matrix.mulVec_smul, hprj2]
+      hMat_mulVec, hMat_mulVec, hprj, Matrix.mulVec_add, Matrix.mulVec_smul, Matrix.mulVec_smul,
+      hprj2]
   exact Subtype.ext (Units.ext hM)
 
 end GlobalTheory.ScalW

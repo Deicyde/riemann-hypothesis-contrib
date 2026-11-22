@@ -9,9 +9,9 @@ open NumberField IsDedekindDomain ReciprocityTheory.Aut Formalism.AUTREP Formali
 
 namespace GlobalTheory
 
-theorem valued_natCast_adicCompletion_le_one :
-    ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (N : ℕ),
-    Valued.v ((N : v.adicCompletion F)) ≤ 1 := by
+theorem valued_natCast_adicCompletion_le_one
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (N : ℕ),
+      Valued.v ((N : v.adicCompletion F)) ≤ 1 := by
   intro F _ _ v N
   induction N with
   | zero => simp

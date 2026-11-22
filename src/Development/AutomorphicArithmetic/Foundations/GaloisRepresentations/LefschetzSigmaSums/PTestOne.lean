@@ -9,8 +9,7 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.T
 
 open UpperTheory.Gal.LocalSmoothExtension
 
-theorem UpperTheory.Gal.LocalSmoothExtension.testOne_of :
-    TestOne := by
+theorem UpperTheory.Gal.LocalSmoothExtension.testOne_of : TestOne := by
   intro p _ G
   refine ⟨?_, ?_⟩
   · exact GlobalTheory.LKMid.isTest_indicator _ _ (by

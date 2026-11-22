@@ -7,35 +7,41 @@ public import Formalism.GaloisCohomology.Statement
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate
 
 namespace GlobalTheory
 
-theorem exists_addHom_zmod_pow_extend (O : Type) [CommRing O] (l n : ℕ) [Fact l.Prime]
-    (hinj : Function.Injective (fun o : O => (l : O) ^ n * o)) (β : O →+ ZMod (l ^ 1)) :
-    ∃ A : O →+ ZMod (l ^ (n + 1)), ∀ o : O,
+theorem exists_addHom_zmod_pow_extend
+    (O : Type) [CommRing O]
+    (l n : ℕ) [Fact l.Prime]
+    (hinj : Function.Injective (fun o : O => (l : O) ^ n * o)) (β : O →+ ZMod (l ^ 1))
+    : ∃ A : O →+ ZMod (l ^ (n + 1)), ∀ o : O,
       A ((l : O) ^ n * o) = ((l ^ n * (β o).val : ℕ) : ZMod (l ^ (n + 1))) := by
   classical
   have hl0 : l ≠ 0 := (Fact.out : l.Prime).ne_zero
   have : NeZero (l ^ (n + 1)) := ⟨pow_ne_zero _ hl0⟩
   have : NeZero (l ^ 1) := ⟨pow_ne_zero _ hl0⟩
 
-  have hcong : ∀ x : ℕ, ((l ^ n * (x % l ^ 1) : ℕ) : ZMod (l ^ (n + 1)))
-      = ((l ^ n * x : ℕ) : ZMod (l ^ (n + 1))) := by
+  have hcong
+      : ∀ x : ℕ,
+        ((l ^ n * (x % l ^ 1) : ℕ) : ZMod (l ^ (n + 1)))
+          = ((l ^ n * x : ℕ) : ZMod (l ^ (n + 1))) := by
     intro x
     rw [ZMod.natCast_eq_natCast_iff, pow_one, pow_succ]
     exact Nat.ModEq.mul_left' _ (Nat.mod_modEq x l)
-  let g : O →+ ZMod (l ^ (n + 1)) :=
-    { toFun := fun o => ((l ^ n * (β o).val : ℕ) : ZMod (l ^ (n + 1)))
-      map_zero' := by simp
-      map_add' := by
-        intro a b
-        rw [map_add (f := _), ZMod.val_add, hcong, mul_add, Nat.cast_add] }
+  let g : O →+ ZMod (l ^ (n + 1)) := {
+    toFun := fun o => ((l ^ n * (β o).val : ℕ) : ZMod (l ^ (n + 1)))
+    map_zero' := by simp
+    map_add' := by
+      intro a b
+      rw [map_add (f := _), ZMod.val_add, hcong, mul_add, Nat.cast_add]
+  }
 
-  obtain ⟨h, hh⟩ := (Module.Baer.of_divisible UnitAddCircle).extension_property_addMonoidHom
-    (AddMonoidHom.mulLeft ((l : O) ^ n)) hinj ((ZMod.toAddCircle).comp g)
-  have hh' : ∀ o, h ((l : O) ^ n * o) = ZMod.toAddCircle (g o) := fun o =>
-    DFunLike.congr_fun hh o
+  obtain ⟨h, hh⟩ :=
+    (Module.Baer.of_divisible UnitAddCircle).extension_property_addMonoidHom
+      (AddMonoidHom.mulLeft ((l : O) ^ n)) hinj ((ZMod.toAddCircle).comp g)
+  have hh' : ∀ o, h ((l : O) ^ n * o) = ZMod.toAddCircle (g o) := fun o => DFunLike.congr_fun hh o
 
   have htors : ∀ o, (l ^ (n + 1)) • h o = 0 := by
     intro o
@@ -72,9 +78,11 @@ theorem exists_addHom_zmod_pow_extend (O : Type) [CommRing O] (l n : ℕ) [Fact 
     rw [hA, hh']
     rfl
 
-theorem addHom_zmod_pow_algebraMap_mul (O : Type) [CommRing O] (l m : ℕ) [Fact l.Prime]
-    [Algebra ℤ_[l] O] (A : O →+ ZMod (l ^ m)) (u : ℤ_[l]) (o : O) :
-    A (algebraMap ℤ_[l] O u * o) = PadicInt.toZModPow m u * A o := by
+theorem addHom_zmod_pow_algebraMap_mul
+    (O : Type) [CommRing O]
+    (l m : ℕ) [Fact l.Prime] [Algebra ℤ_[l] O]
+    (A : O →+ ZMod (l ^ m)) (u : ℤ_[l]) (o : O)
+    : A (algebraMap ℤ_[l] O u * o) = PadicInt.toZModPow m u * A o := by
   set v : ℕ := (PadicInt.toZModPow m u).val with hv
 
   have hk : u - (v : ℤ_[l]) ∈ RingHom.ker (PadicInt.toZModPow m : ℤ_[l] →+* ZMod (l ^ m)) := by
@@ -85,14 +93,24 @@ theorem addHom_zmod_pow_algebraMap_mul (O : Type) [CommRing O] (l m : ℕ) [Fact
   have hkill : ∀ x : O, A ((l : O) ^ m * x) = 0 := by
     intro x
     rw [← Nat.cast_pow, ← nsmul_eq_mul, map_nsmul, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
-  have hsplit : algebraMap ℤ_[l] O u * o
-      = v • o + (l : O) ^ m * (algebraMap ℤ_[l] O w * o) := by
+  have hsplit : algebraMap ℤ_[l] O u * o = v • o + (l : O) ^ m * (algebraMap ℤ_[l] O w * o) := by
     rw [hu, map_add (f := _), map_mul, map_pow, map_natCast, map_natCast, nsmul_eq_mul]
     ring
   rw [hsplit, map_add (f := _), hkill, add_zero, map_nsmul, nsmul_eq_mul, hv, ZMod.natCast_zmod_val]
 
-theorem exists_zmod_pow_coboundary_of_rational_coboundary :
-    ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] (l : ℕ) [Fact l.Prime] (ε : Γ → ℤ_[l]) (O L : Type) [CommRing O] [Algebra ℤ_[l] O] [Field L] [TopologicalSpace L] [IsTopologicalRing L] (ι : O →+* L), Function.Injective ι → IsOpen (Set.range ι) → (l : L) ≠ 0 → (∀ x : L, ∃ n : ℕ, (l : L) ^ n * x ∈ Set.range ι) → ∀ (β : O →+ ZMod (l ^ 1)) (z : Γ → Γ → O) (f : Γ → L), Continuous f → (∀ g h, ι (z g h) = ι (algebraMap ℤ_[l] O (ε g)) * f h - f (g * h) + f g) → ∃ (n : ℕ) (a : Γ → ZMod (l ^ (n + 1))), Continuous a ∧ ∀ g h, PadicInt.toZModPow (n + 1) (ε g) * a h - a (g * h) + a g = ((l ^ n * (β (z g h)).val : ℕ) : ZMod (l ^ (n + 1))) := by
+theorem exists_zmod_pow_coboundary_of_rational_coboundary
+    : ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] (l : ℕ) [Fact l.Prime]
+        (ε : Γ → ℤ_[l]) (O L : Type) [CommRing O] [Algebra ℤ_[l] O] [Field L] [TopologicalSpace L]
+        [IsTopologicalRing L] (ι : O →+* L),
+      Function.Injective ι → IsOpen (Set.range ι) → (l : L) ≠ 0
+        → (∀ x : L, ∃ n : ℕ, (l : L) ^ n * x ∈ Set.range ι)
+        → ∀ (β : O →+ ZMod (l ^ 1)) (z : Γ → Γ → O) (f : Γ → L),
+          Continuous f → (∀ g h, ι (z g h) = ι (algebraMap ℤ_[l] O (ε g)) * f h - f (g * h) + f g)
+            → ∃ (n : ℕ) (a : Γ → ZMod (l ^ (n + 1))),
+              Continuous a
+                ∧ ∀ g h,
+                  PadicInt.toZModPow (n + 1) (ε g) * a h - a (g * h) + a g
+                    = ((l ^ n * (β (z g h)).val : ℕ) : ZMod (l ^ (n + 1))) := by
   intro Γ _ _ _ l _ ε O L _ _ _ _ _ ι hι hopen hl hcov β z f hf hz
 
   have hstep : ∀ k x, (l : L) ^ k * x ∈ Set.range ι → (l : L) ^ (k + 1) * x ∈ Set.range ι := by
@@ -100,10 +118,12 @@ theorem exists_zmod_pow_coboundary_of_rational_coboundary :
     exact ⟨(l : O) * o, by rw [map_mul, map_natCast, ho, pow_succ]; ring⟩
   have hmono : Monotone (fun k : ℕ => {x : L | (l : L) ^ k * x ∈ Set.range ι}) :=
     monotone_nat_of_le_succ (fun k x hx => hstep k x hx)
-  obtain ⟨N, hN⟩ := (isCompact_range hf).elim_directed_cover
-    (fun k : ℕ => {x : L | (l : L) ^ k * x ∈ Set.range ι})
-    (fun k => hopen.preimage (continuous_const.mul continuous_id))
-    (fun x _ => Set.mem_iUnion.mpr (hcov x)) hmono.directed_le
+  obtain ⟨N, hN⟩ :=
+    (isCompact_range hf).elim_directed_cover
+      (fun k : ℕ => {x : L | (l : L) ^ k * x ∈ Set.range ι})
+      (fun k => hopen.preimage (continuous_const.mul continuous_id))
+      (fun x _ => Set.mem_iUnion.mpr (hcov x))
+      hmono.directed_le
   have hN' : ∀ g, ∃ o : O, ι o = (l : L) ^ N * f g := fun g => hN ⟨g, rfl⟩
   choose F hF using hN'
   have hlN : ∀ k, (l : L) ^ k ≠ 0 := fun k => pow_ne_zero _ hl
@@ -115,8 +135,7 @@ theorem exists_zmod_pow_coboundary_of_rational_coboundary :
     exact mul_left_cancel₀ (hlN N) this
   obtain ⟨A, hA⟩ := exists_addHom_zmod_pow_extend O l N hinjO β
 
-  have hrel : ∀ g h, (l : O) ^ N * z g h
-      = algebraMap ℤ_[l] O (ε g) * F h - F (g * h) + F g := by
+  have hrel : ∀ g h, (l : O) ^ N * z g h = algebraMap ℤ_[l] O (ε g) * F h - F (g * h) + F g := by
     intro g h
     apply hι
     rw [map_mul, map_pow, map_natCast, hz, map_add (f := _), map_sub, map_mul, hF, hF, hF]
@@ -125,13 +144,16 @@ theorem exists_zmod_pow_coboundary_of_rational_coboundary :
     intro x
     rw [← Nat.cast_pow, ← nsmul_eq_mul, map_nsmul, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
   refine ⟨N, fun g => A (F g), ?_, ?_⟩
-  ·
-    refine ((IsLocallyConstant.iff_eventually_eq _).mpr fun g₁ => ?_).continuous
-    have hPo : IsOpen {g : Γ | ((l : L) ^ (N + 1))⁻¹ * ((l : L) ^ N * f g - (l : L) ^ N * f g₁)
-        ∈ Set.range ι} :=
+  · refine ((IsLocallyConstant.iff_eventually_eq _).mpr fun g₁ => ?_).continuous
+    have hPo : IsOpen
+        {g : Γ | ((l : L) ^ (N + 1))⁻¹ * ((l : L) ^ N * f g - (l : L) ^ N * f g₁)
+          ∈ Set.range ι} :=
       hopen.preimage (continuous_const.mul ((continuous_const.mul hf).sub continuous_const))
-    have hmem : g₁ ∈ {g : Γ | ((l : L) ^ (N + 1))⁻¹ * ((l : L) ^ N * f g - (l : L) ^ N * f g₁)
-        ∈ Set.range ι} := ⟨0, by simp⟩
+    have hmem
+        : g₁
+          ∈ {g : Γ | ((l : L) ^ (N + 1))⁻¹ * ((l : L) ^ N * f g - (l : L) ^ N * f g₁)
+            ∈ Set.range ι} :=
+      ⟨0, by simp⟩
     filter_upwards [hPo.mem_nhds hmem] with g hg
     obtain ⟨o, ho⟩ := hg
     have hFg : F g = F g₁ + (l : O) ^ (N + 1) * o := by

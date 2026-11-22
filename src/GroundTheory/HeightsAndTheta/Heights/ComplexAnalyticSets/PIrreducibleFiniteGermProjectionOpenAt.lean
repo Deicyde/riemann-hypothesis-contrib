@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 open Topology Metric Filter Set
 
 theorem IrreducibleFiniteGermProjectionOpenAt.proof
-    (hpts : IrreducibleGermPointsOffDiscriminant.Statement) :
-    IrreducibleFiniteGermProjectionOpenAt.Statement := by
+    (hpts : IrreducibleGermPointsOffDiscriminant.Statement)
+    : IrreducibleFiniteGermProjectionOpenAt.Statement := by
   intro σ _ X x d A hX hirr hiso hinj V hV
   obtain ⟨δ, hδa, hδne, hδpts⟩ := hpts σ X x d A hX hirr hiso hinj
   obtain ⟨N, k, f, hNo, hxN, hf, hXN⟩ := hX
@@ -55,13 +55,16 @@ theorem IrreducibleFiniteGermProjectionOpenAt.proof
     exact ⟨x', hball x' hx', rfl⟩
   have hD : ball (A x) ε ⊆ A '' K := by
     intro y hy
-    refine (hKc.image A.continuous).isClosed.closure_subset_iff.mpr hsub (mem_closure_iff_frequently.mpr ?_)
+    refine (hKc.image A.continuous).isClosed.closure_subset_iff.mpr hsub
+      (mem_closure_iff_frequently.mpr ?_)
     intro hev
     have hev' : δ =ᶠ[𝓝 y] 0 := by
       filter_upwards [hev, isOpen_ball.mem_nhds hy] with z hz hzD
       by_contra hz0
       exact hz ⟨hzD, hz0⟩
-    have hzero := hDa.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball (A x) ε).isPreconnected hy hev'
+    have hzero :=
+      hDa.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball (A x) ε).isPreconnected hy
+        hev'
     apply hδne
     filter_upwards [isOpen_ball.mem_nhds (mem_ball_self hε)] with z hz using hzero hz
   exact Filter.mem_of_superset (ball_mem_nhds (A x) hε) (hD.trans hKV)

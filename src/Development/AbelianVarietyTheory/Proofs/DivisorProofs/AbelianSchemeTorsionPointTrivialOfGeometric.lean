@@ -7,18 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsIsoIff
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped NumberField CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TorsionRigid
 
-theorem eq_one_of_geometric (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A]
-    (hA : IsAbelianScheme A) (T : Over S) (x : T ⟶ A) (c : ℕ) (hc : IsUnit (c : Γ(T.left, ⊤)))
-    (hx : x ^ c = 1)
-    (H : ∀ (k : Type) [Field k] [IsAlgClosed k], (c : k) ≠ 0 → ∀ (z : Sp k ⟶ S)
-      (g : Over.mk z ⟶ T), g ≫ x = 1) : x = 1 := by
+theorem eq_one_of_geometric
+    (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A]
+    (hA : IsAbelianScheme A)
+    (T : Over S) (x : T ⟶ A)
+    (c : ℕ) (hc : IsUnit (c : Γ(T.left, ⊤))) (hx : x ^ c = 1)
+    (H : ∀ (k : Type) [Field k] [IsAlgClosed k],
+      (c : k) ≠ 0 → ∀ (z : Sp k ⟶ S) (g : Over.mk z ⟶ T), g ≫ x = 1)
+    : x = 1 := by
   have := hA.smooth
   let AT := (Over.pullback T.hom).obj A
   have hft : LocallyOfFiniteType AT.hom := by
@@ -41,8 +46,7 @@ theorem eq_one_of_geometric (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonO
     pullback.lift_snd _ _ _
   have f_fst : f ≫ pullback.fst A.hom T.hom = pullback.fst A.hom T.hom ≫ (mulN A c).left :=
     pullback.lift_fst _ _ _
-  have f_snd : f ≫ pullback.snd A.hom T.hom = pullback.snd A.hom T.hom :=
-    pullback.lift_snd _ _ _
+  have f_snd : f ≫ pullback.snd A.hom T.hom = pullback.snd A.hom T.hom := pullback.lift_snd _ _ _
   have sec_f : ∀ y : T ⟶ A, sec y ≫ f = sec (y ^ c) := by
     intro y
     apply pullback.hom_ext
@@ -63,8 +67,9 @@ theorem eq_one_of_geometric (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonO
     have hk : (c : k) ≠ 0 := (GlobalTheory.GrpTangent.isUnit_natCast_of_point hc a).ne_zero
     have h1 := H k hk (a ≫ T.hom) (Over.homMk a rfl)
     have h2 : a ≫ x.left = a ≫ (1 : T ⟶ A).left := by
-      have := congrArg CommaMorphism.left
-        (h1.trans (comp_one (Over.homMk a rfl : Over.mk (a ≫ T.hom) ⟶ T)).symm)
+      have :=
+        congrArg CommaMorphism.left
+          (h1.trans (comp_one (Over.homMk a rfl : Over.mk (a ≫ T.hom) ⟶ T)).symm)
       exact this
     have h3 : a ≫ fx.left = a ≫ f1.left := by
       change a ≫ sec x = a ≫ sec 1
@@ -73,10 +78,12 @@ theorem eq_one_of_geometric (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonO
       · rw [Category.assoc, Category.assoc, sec_snd, sec_snd]
     have h4 := (GlobalTheory.FinEt.comp_eq_comp_iff_range fx f1 a).mp h3
     apply h4
-    rw [ha]; rfl
+    rw [ha]
+    rfl
   have hsec : sec x = sec 1 := by
-    have := (GlobalTheory.FinEt.comp_eq_comp_iff_range fx f1 (𝟙 _)).mpr (by
-      rintro _ ⟨t, rfl⟩; exact hpt _)
+    have :=
+      (GlobalTheory.FinEt.comp_eq_comp_iff_range fx f1 (𝟙 _)).mpr
+        (by rintro _ ⟨t, rfl⟩; exact hpt _)
     simpa [fx, f1] using this
   ext1
   rw [← sec_fst x, hsec, sec_fst]

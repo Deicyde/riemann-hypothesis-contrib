@@ -8,6 +8,7 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 
 namespace PositivityTheory.Rg.Sw.AbsSt
 
-theorem derivative_vacuum_section : DerivativeVacuumDilations := DF.derivative_vacuum_of_parts DF.gaussPart DF.groupPart
+theorem derivative_vacuum_section : DerivativeVacuumDilations :=
+  DF.derivative_vacuum_of_parts DF.gaussPart DF.groupPart
 
 end PositivityTheory.Rg.Sw.AbsSt

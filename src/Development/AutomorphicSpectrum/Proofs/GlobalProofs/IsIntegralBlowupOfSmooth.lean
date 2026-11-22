@@ -12,8 +12,9 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 
 namespace GlobalTheory.CompanionTheory.BlowupIntegral
 
-theorem dense_compl_support_of_effCartier {Y : Scheme.{0}} [IsReduced Y] (I : Y.IdealSheafData)
-    (hI : FinalTheorems.EffCartier I) : Dense ((I.support.compl : Y.Opens) : Set Y) := by
+theorem dense_compl_support_of_effCartier
+    {Y : Scheme.{0}} [IsReduced Y] (I : Y.IdealSheafData) (hI : FinalTheorems.EffCartier I)
+    : Dense ((I.support.compl : Y.Opens) : Set Y) := by
   rw [dense_iff_inter_open]
   rintro W hW ⟨x, hx⟩
   by_contra hc
@@ -31,10 +32,14 @@ theorem dense_compl_support_of_effCartier {Y : Scheme.{0}} [IsReduced Y] (I : Y.
   subst ht0
   simp at hxt
 
-theorem isIntegral_of_blowup {X₁ X₂ : Scheme.{0}} (Z : X₁.IdealSheafData) (π : X₂ ⟶ X₁) [IsIntegral X₁]
-    [IsReduced X₂] [Nonempty X₂] (hb : FinalTheorems.Blowup π Z) : IsIntegral X₂ := by
+theorem isIntegral_of_blowup
+    {X₁ X₂ : Scheme.{0}} (Z : X₁.IdealSheafData) (π : X₂ ⟶ X₁)
+    [IsIntegral X₁] [IsReduced X₂] [Nonempty X₂]
+    (hb : FinalTheorems.Blowup π Z)
+    : IsIntegral X₂ := by
   let V : X₁.Opens := Z.support.compl
-  have hbV : IsIso (π ∣_ V) := GlobalTheory.Principalise.isIso_restrict_of_blowup hb V fun _ hx => hx
+  have hbV : IsIso (π ∣_ V) :=
+    GlobalTheory.Principalise.isIso_restrict_of_blowup hb V fun _ hx => hx
   have hU : (Z.comap π).support.compl = π ⁻¹ᵁ V := by
     ext y
     exact not_congr (GlobalTheory.ProjBlowup.mem_support_comap Z π y)
@@ -43,15 +48,17 @@ theorem isIntegral_of_blowup {X₁ X₂ : Scheme.{0}} (Z : X₁.IdealSheafData) 
   have : Nonempty V.toScheme := ⟨(π ∣_ V) (Classical.arbitrary _)⟩
   have : IsIntegral V.toScheme := isIntegral_of_isOpenImmersion V.ι
   have : IsIntegral (π ⁻¹ᵁ V).toScheme := isIntegral_of_isOpenImmersion (π ∣_ V)
-  have h := ((IrreducibleSpace.isIrreducible_univ (π ⁻¹ᵁ V).toScheme).image _
-    (π ⁻¹ᵁ V).ι.continuous.continuousOn).closure
+  have h :=
+    ((IrreducibleSpace.isIrreducible_univ (π ⁻¹ᵁ V).toScheme).image _
+      (π ⁻¹ᵁ V).ι.continuous.continuousOn).closure
   rw [Set.image_univ, Scheme.Opens.range_ι, hd.closure_eq] at h
   have : IrreducibleSpace X₂ := (irreducibleSpace_def _).2 h
   exact isIntegral_of_irreducibleSpace_of_isReduced X₂
 
-theorem isIntegral_of_smooth_blowup : ∀ {k : Type} [Field k] {X₁ X₂ : Scheme.{0}} (g : X₁ ⟶ Sp k)
-    (Z : X₁.IdealSheafData) (π : X₂ ⟶ X₁), IsIntegral X₁ → FinalTheorems.Blowup π Z → Smooth (π ≫ g) → Nonempty X₂ →
-      IsIntegral X₂ := by
+theorem isIntegral_of_smooth_blowup
+    : ∀ {k : Type} [Field k] {X₁ X₂ : Scheme.{0}} (g : X₁ ⟶ Sp k) (Z : X₁.IdealSheafData)
+        (π : X₂ ⟶ X₁),
+      IsIntegral X₁ → FinalTheorems.Blowup π Z → Smooth (π ≫ g) → Nonempty X₂ → IsIntegral X₂ := by
   intro k _ X₁ X₂ g Z π h₁ hb hs h₂
   have : IsReduced X₂ := GlobalTheory.isReduced_of_smooth_of_isReduced (π ≫ g)
   exact isIntegral_of_blowup Z π hb

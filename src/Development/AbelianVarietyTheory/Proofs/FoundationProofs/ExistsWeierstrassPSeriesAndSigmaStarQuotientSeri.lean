@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Different
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 
 open Filter Topology
@@ -134,24 +136,38 @@ lemma isWpSer_sqWp (L : PeriodPair) : IsWpSer L.g₂ L.g₃ (tay (sqWp L)) := by
     tay_deriv, tay_const, tay_const, tay_const, tay_const, map_ofNat, map_ofNat] at key
   exact key
 
-theorem exists_wpSer : ∀ Λ : AddSubgroup ℂ, IsLat Λ → ∃ P : PowerSeries ℂ, IsWpSer (g2 Λ) (g3 Λ) P ∧ ∀ v, v ∉ Λ → PowerSeries.X ^ 2 * PowerSeries.mk (coef1 (sqTh Λ v)) = PowerSeries.mk (coef1 (sgStar Λ)) ^ 2 * lineSer P (wpF Λ v) := by
+theorem exists_wpSer
+    : ∀ Λ : AddSubgroup ℂ,
+      IsLat Λ
+        → ∃ P : PowerSeries ℂ,
+          IsWpSer (g2 Λ) (g3 Λ) P
+            ∧ ∀ v,
+              v ∉ Λ
+                → PowerSeries.X ^ 2 * PowerSeries.mk (coef1 (sqTh Λ v))
+                  = PowerSeries.mk (coef1 (sgStar Λ)) ^ 2 * lineSer P (wpF Λ v) := by
   intro Λ h
   obtain ⟨L, hL⟩ := GlobalTheory.OddTheta.exists_periodPair Λ h
   refine ⟨tay (sqWp L), ?_, fun v hv => ?_⟩
-  · rw [GlobalTheory.LatticeInvariants.g2_eq hL, GlobalTheory.LatticeInvariants.lattice_invariant_g3_eq hL]
+  · rw [GlobalTheory.LatticeInvariants.g2_eq hL,
+      GlobalTheory.LatticeInvariants.lattice_invariant_g3_eq hL]
     exact isWpSer_sqWp L
   have hp := analyticAt_sqWp L
   have hi : AnalyticAt ℂ (fun z : ℂ => z) 0 := analyticAt_id
   have hs : AnalyticAt ℂ (sgStar Λ) 0 := h.differentiable.analyticAt 0
   have ht : AnalyticAt ℂ (sqTh Λ v) 0 := (h.differentiable_sqTh v).analyticAt 0
-  have key := tay_congr' (f := fun z => z ^ 2 * sqTh Λ v z)
-    (g := fun z => sgStar Λ z ^ 2 * (sqWp L z - wpF Λ v * z ^ 2))
-    (by fun_prop) (by fun_prop) (by
-      filter_upwards [eventually_notMem L, self_mem_nhdsWithin] with z h1 h2
-      rw [h.sqTh_eq hv ((hL z).not.2 h1), sqWp_eq L h2, GlobalTheory.LatticeInvariants.wpF_eq hL z]
-      ring)
+  have key :=
+    tay_congr'
+      (f := fun z => z ^ 2 * sqTh Λ v z)
+      (g := fun z => sgStar Λ z ^ 2 * (sqWp L z - wpF Λ v * z ^ 2))
+      (by fun_prop) (by fun_prop)
+      (by
+        filter_upwards [eventually_notMem L, self_mem_nhdsWithin] with z h1 h2
+        rw [h.sqTh_eq hv ((hL z).not.2 h1), sqWp_eq L h2,
+          GlobalTheory.LatticeInvariants.wpF_eq hL z]
+        ring)
   rw [tay_mul (hi.fun_pow 2) ht, tay_mul (hs.fun_pow 2) (by fun_prop), tay_sub hp (by fun_prop),
-    tay_mul analyticAt_const (hi.fun_pow 2), tay_pow hi, tay_pow hs, tay_id, tay_const] at key
+      tay_mul analyticAt_const (hi.fun_pow 2), tay_pow hi, tay_pow hs, tay_id, tay_const]
+    at key
   exact key
 
 end GlobalTheory.WpSeries

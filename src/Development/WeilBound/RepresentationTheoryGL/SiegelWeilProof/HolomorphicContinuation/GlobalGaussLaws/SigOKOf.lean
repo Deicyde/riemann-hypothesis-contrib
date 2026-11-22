@@ -15,7 +15,9 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 theorem cnt_add {m : ℕ} (ε : Fin m → Bool) : cnt ε true + cnt ε false = m := by
   unfold cnt
-  have h := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin m))) (p := fun a => ε a = true)
+  have h :=
+    Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin m)))
+      (p := fun a => ε a = true)
   simp only [Finset.card_univ, Fintype.card_fin, Bool.not_eq_true] at h
   exact h
 

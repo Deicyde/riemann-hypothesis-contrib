@@ -9,11 +9,13 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.E.t_
 
 namespace LateralTheory.E.SHExistsPf
 
-def SHLoc : Prop := ∀ (A : CommRingCat.{0}) [IsLocalRing A],
-  ∃ (O : CommRingCat.{0}) (f : A ⟶ O), IE f ∧ SH O ∧ IsLocalHom f.hom
+def SHLoc : Prop :=
+  ∀ (A : CommRingCat.{0}) [IsLocalRing A], ∃ (O : CommRingCat.{0}) (f : A ⟶ O),
+    IE f ∧ SH O ∧ IsLocalHom f.hom
 
-def LocAt : Prop := ∀ (A : CommRingCat.{0}) (r : Ideal A) [r.IsPrime],
-  IE (CommRingCat.ofHom (algebraMap A (Localization.AtPrime r)))
+def LocAt : Prop :=
+  ∀ (A : CommRingCat.{0}) (r : Ideal A) [r.IsPrime],
+    IE (CommRingCat.ofHom (algebraMap A (Localization.AtPrime r)))
 
 def Comp : Prop := ∀ {A B C : CommRingCat.{0}} (f : A ⟶ B) (g : B ⟶ C), IE f → IE g → IE (f ≫ g)
 

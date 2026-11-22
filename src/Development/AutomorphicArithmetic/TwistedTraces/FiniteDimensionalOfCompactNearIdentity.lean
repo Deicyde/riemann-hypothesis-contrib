@@ -4,14 +4,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C Polynomial Topology
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C Polynomial Topology
 
-theorem UpperTheory.finiteDimensional_of_compact_near_identity :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (T : H →L[ℂ] H) (S : Submodule ℂ H), IsCompactOperator T → (∀ v ∈ S, ‖T v - v‖ ≤ 1 / 2 * ‖v‖) → FiniteDimensional ℂ S := by
+theorem UpperTheory.finiteDimensional_of_compact_near_identity
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (T : H →L[ℂ] H)
+        (S : Submodule ℂ H),
+      IsCompactOperator T → (∀ v ∈ S, ‖T v - v‖ ≤ 1 / 2 * ‖v‖) → FiniteDimensional ℂ S := by
   intro H _ _ _ T S hT hS
-  have hcl : IsClosed {v : H | ‖T v - v‖ ≤ 1 / 2 * ‖v‖} :=
-    isClosed_le (by fun_prop) (by fun_prop)
+  have hcl : IsClosed {v : H | ‖T v - v‖ ≤ 1 / 2 * ‖v‖} := isClosed_le (by fun_prop) (by fun_prop)
   have hS' : ∀ v ∈ S.topologicalClosure, ‖T v - v‖ ≤ 1 / 2 * ‖v‖ := by
     intro v hv
     have : closure (S : Set H) ⊆ {v : H | ‖T v - v‖ ≤ 1 / 2 * ‖v‖} :=
@@ -25,7 +28,9 @@ theorem UpperTheory.finiteDimensional_of_compact_near_identity :
     have h1 := hS' x.1 x.2
     have h2 : ‖(x : H)‖ ≤ ‖T x‖ + ‖T x - x‖ := by
       have : (x : H) = T x - (T x - x) := by abel
-      calc ‖(x : H)‖ = ‖T x - (T x - x)‖ := congrArg norm this
+      calc
+        ‖(x : H)‖
+          = ‖T x - (T x - x)‖ := congrArg norm this
         _ ≤ _ := norm_sub_le _ _
     have h3 : ‖x‖ = ‖(x : H)‖ := rfl
     have h4 : f x = T x := rfl
@@ -34,7 +39,8 @@ theorem UpperTheory.finiteDimensional_of_compact_near_identity :
     linarith
   have hanti : AntilipschitzWith 2 f := f.antilipschitz_of_bound hf
   have hemb : IsClosedEmbedding f := hanti.isClosedEmbedding f.uniformContinuous
-  obtain ⟨K, hK, hKsub⟩ := IsCompactOperator.image_closedBall_subset_compact (f := (T : H →ₗ[ℂ] H)) hT 1
+  obtain ⟨K, hK, hKsub⟩ :=
+    IsCompactOperator.image_closedBall_subset_compact (f := (T : H →ₗ[ℂ] H)) hT 1
   have hc : IsCompact (Metric.closedBall (0 : S.topologicalClosure) 1) := by
     refine (hemb.isCompact_preimage hK).of_isClosed_subset Metric.isClosed_closedBall ?_
     intro x hx

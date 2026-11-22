@@ -8,18 +8,20 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsB
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 namespace GlobalTheory.ZH.FreeNear
 
 section Abstract
 
-variable {o A G B : Type} [CommRing o] [IsDomain o] [Ring A] [Algebra o A] [AddCommGroup G] [Fintype G]
-  [AddCommGroup B]
+variable
+  {o A G B : Type}
+  [CommRing o] [IsDomain o] [Ring A] [Algebra o A] [AddCommGroup G] [Fintype G] [AddCommGroup B]
 
-theorem sum_char_comp (ψ : AddChar B o) (hψ : ∀ a, ψ a = 1 → a = 0) (c : G →+ B) :
-    ∑ t, ψ (c t) = if c = 0 then (Fintype.card G : o) else 0 := by
+theorem sum_char_comp (ψ : AddChar B o) (hψ : ∀ a, ψ a = 1 → a = 0) (c : G →+ B)
+    : ∑ t, ψ (c t) = if c = 0 then (Fintype.card G : o) else 0 := by
   have h := AddChar.sum_eq_ite (ψ.compAddMonoidHom c)
   simp only [AddChar.compAddMonoidHom_apply] at h
   rw [h]
@@ -29,12 +31,17 @@ theorem sum_char_comp (ψ : AddChar B o) (hψ : ∀ a, ψ a = 1 → a = 0) (c : 
   · ext t
     simp [h0]
 
-theorem avg_mul_avg [DecidableEq (G →+ B)] (ψ : AddChar B o) (hψ : ∀ a, ψ a = 1 → a = 0) (ρ : G → A)
-    (hρ : ∀ a b, ρ a * ρ b = ρ (a + b)) (u : o) (hu : u * (Fintype.card G : o) = 1) (c c' : G →+ B) :
-    (u • ∑ t, ψ (-(c t)) • ρ t) * (u • ∑ t, ψ (-(c' t)) • ρ t) =
-      if c = c' then u • ∑ t, ψ (-(c t)) • ρ t else 0 := by
-  have h1 : (∑ t, ψ (-(c t)) • ρ t) * (∑ t, ψ (-(c' t)) • ρ t) =
-      (∑ s, ψ ((c' - c) s)) • ∑ t, ψ (-(c' t)) • ρ t := by
+theorem avg_mul_avg
+    [DecidableEq (G →+ B)]
+    (ψ : AddChar B o) (hψ : ∀ a, ψ a = 1 → a = 0)
+    (ρ : G → A) (hρ : ∀ a b, ρ a * ρ b = ρ (a + b))
+    (u : o) (hu : u * (Fintype.card G : o) = 1)
+    (c c' : G →+ B)
+    : (u • ∑ t, ψ (-(c t)) • ρ t) * (u • ∑ t, ψ (-(c' t)) • ρ t)
+      = if c = c' then u • ∑ t, ψ (-(c t)) • ρ t else 0 := by
+  have h1
+      : (∑ t, ψ (-(c t)) • ρ t) * (∑ t, ψ (-(c' t)) • ρ t)
+        = (∑ s, ψ ((c' - c) s)) • ∑ t, ψ (-(c' t)) • ρ t := by
     rw [Finset.sum_mul, Finset.sum_smul]
     refine Finset.sum_congr rfl fun s _ => ?_
     rw [Finset.mul_sum, Finset.smul_sum]
@@ -49,9 +56,12 @@ theorem avg_mul_avg [DecidableEq (G →+ B)] (ψ : AddChar B o) (hψ : ∀ a, ψ
     rw [if_pos (sub_self c), if_pos rfl, _root_.mul_assoc, hu, _root_.mul_one]
   · rw [if_neg (fun h0 => h (sub_eq_zero.1 h0).symm), if_neg h, mul_zero, zero_smul]
 
-theorem sum_avg [Fintype (G →+ B)] (ψ : AddChar B o) (hψ : ∀ a, ψ a = 1 → a = 0) (ρ : G → A)
-    (hρ : ∀ t, (∀ c : G →+ B, c t = 0) → ρ t = 1) (u : o) (hu : u * (Fintype.card G : o) = 1) :
-    ∑ c : G →+ B, u • ∑ t, ψ (-(c t)) • ρ t = 1 := by
+theorem sum_avg
+    [Fintype (G →+ B)]
+    (ψ : AddChar B o) (hψ : ∀ a, ψ a = 1 → a = 0)
+    (ρ : G → A) (hρ : ∀ t, (∀ c : G →+ B, c t = 0) → ρ t = 1)
+    (u : o) (hu : u * (Fintype.card G : o) = 1)
+    : ∑ c : G →+ B, u • ∑ t, ψ (-(c t)) • ρ t = 1 := by
   have h1 : ∀ t, (∑ c : G →+ B, ψ (-(c t))) • ρ t = (∑ c : G →+ B, ψ (-(c t))) • (1 : A) := by
     intro t
     by_cases h : ∀ c : G →+ B, c t = 0
@@ -86,9 +96,12 @@ theorem isPrimitiveRoot_ζN : IsPrimitiveRoot S.ζN S.N :=
 theorem finite_char (T : AddSubgroup S.Gam) : Finite (T →+ ZMod S.N) :=
   Finite.of_injective _ DFunLike.coe_injective
 
-theorem proj_orthogonal [IsDomain o] (T : AddSubgroup S.Gam) (hT : S.IsoFree T) [Fintype (T →+ ZMod S.N)]
-    [DecidableEq (T →+ ZMod S.N)] :
-    (∀ c c', S.proj T c * S.proj T c' = if c = c' then S.proj T c else 0) ∧ ∑ c, S.proj T c = 1 := by
+theorem proj_orthogonal
+    [IsDomain o]
+    (T : AddSubgroup S.Gam) (hT : S.IsoFree T)
+    [Fintype (T →+ ZMod S.N)] [DecidableEq (T →+ ZMod S.N)]
+    : (∀ c c', S.proj T c * S.proj T c' = if c = c' then S.proj T c else 0)
+      ∧ ∑ c, S.proj T c = 1 := by
   obtain ⟨hiso, d, ⟨φ⟩⟩ := hT
   haveI := Fintype.ofFinite T
   have hprim := isPrimitiveRoot_ζN S
@@ -102,19 +115,23 @@ theorem proj_orthogonal [IsDomain o] (T : AddSubgroup S.Gam) (hT : S.IsoFree T) 
   have hu : Ring.inverse (Nat.card T : o) * (Fintype.card T : o) = 1 := by
     rw [← Nat.card_eq_fintype_card]
     exact Ring.inverse_mul_cancel _ hunit
-  have hp : ∀ c, S.proj T c = Ring.inverse (Nat.card T : o) • ∑ t : T, ψ (-(c t)) • S.ρ t := fun c => by
+  have hp
+      : ∀ c, S.proj T c = Ring.inverse (Nat.card T : o) • ∑ t : T, ψ (-(c t)) • S.ρ t := fun c => by
     rw [ThetaSys.proj, finsum_eq_sum_of_fintype]
     rfl
   simp only [hp]
-  refine ⟨avg_mul_avg ψ hψ (fun t : T => S.ρ t) (fun a b => S.ρ_add _ _ ?_) _ hu,
-    sum_avg ψ hψ (fun t : T => S.ρ t) (fun t ht => S.ρ_one _ ?_) _ hu⟩
+  refine ⟨
+    avg_mul_avg ψ hψ (fun t : T => S.ρ t) (fun a b => S.ρ_add _ _ ?_) _ hu,
+    sum_avg ψ hψ (fun t : T => S.ρ t) (fun t ht => S.ρ_one _ ?_) _ hu
+  ⟩
   · rw [hiso a.2 b b.2, smul_zero]
   · have h : S.r • t = 0 := by
       apply φ.injective
       rw [map_nsmul, map_zero]
       funext i
-      have h1 := ht (((ZMod.castHom (dvd_mul_left S.N S.r) (ZMod S.N)).toAddMonoidHom.comp
-        (Pi.evalAddMonoidHom (fun _ => ZMod (S.r * S.N)) i)).comp φ.toAddMonoidHom)
+      have h1 :=
+        ht (((ZMod.castHom (dvd_mul_left S.N S.r) (ZMod S.N)).toAddMonoidHom.comp
+          (Pi.evalAddMonoidHom (fun _ => ZMod (S.r * S.N)) i)).comp φ.toAddMonoidHom)
       change ZMod.castHom (dvd_mul_left S.N S.r) (ZMod S.N) (φ t i) = 0 at h1
       change S.r • φ t i = 0
       obtain ⟨n, hn⟩ := ZMod.natCast_zmod_surjective (φ t i)
@@ -129,27 +146,40 @@ section Model
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω)
 
-theorem isOpen_setOf_mem_span {J I : Type} [Fintype I] (b : I → J → Ω) (v : J → Ω) :
-    IsOpen {x : M.Z | v ∈ Submodule.span (M.O x) (Set.range b)} := by
+theorem isOpen_setOf_mem_span {J I : Type} [Fintype I] (b : I → J → Ω) (v : J → Ω)
+    : IsOpen {x : M.Z | v ∈ Submodule.span (M.O x) (Set.range b)} := by
   refine isOpen_iff_forall_mem_open.2 fun x hx => ?_
   obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hx
-  refine ⟨⋂ i, {w | (a i : Ω) ∈ M.O w}, fun w hw => ?_,
-    isOpen_iInter_of_finite fun i => M.isOpen_setOf_mem_O _, Set.mem_iInter.2 fun i => (a i).2⟩
+  refine ⟨
+    ⋂ i, {w | (a i : Ω) ∈ M.O w},
+    fun w hw => ?_,
+    isOpen_iInter_of_finite fun i => M.isOpen_setOf_mem_O _,
+    Set.mem_iInter.2 fun i => (a i).2
+  ⟩
   exact (Submodule.mem_span_range_iff_exists_fun _).2 ⟨fun i => ⟨a i, Set.mem_iInter.1 hw i⟩, rfl⟩
 
-theorem exists_opens_span_eq {J I : Type} [Fintype I] (b : I → J → Ω) (V : Set (J → Ω)) (hV : V.Finite)
-    (hb : Set.range b ⊆ V) (z : M.Z) (hz : ∀ v ∈ V, v ∈ Submodule.span (M.O z) (Set.range b)) :
-    ∃ W : M.Z.Opens, z ∈ W ∧ ∀ x ∈ W, Submodule.span (M.O x) V = Submodule.span (M.O x) (Set.range b) := by
-  refine ⟨⟨⋂ v ∈ V, {x : M.Z | v ∈ Submodule.span (M.O x) (Set.range b)},
-    hV.isOpen_biInter fun v _ => isOpen_setOf_mem_span M b v⟩, Set.mem_iInter₂.2 hz, fun x hx => ?_⟩
-  exact le_antisymm (Submodule.span_le.2 fun v hv => Set.mem_iInter₂.1 hx v hv) (Submodule.span_mono hb)
+theorem exists_opens_span_eq
+    {J I : Type} [Fintype I]
+    (b : I → J → Ω) (V : Set (J → Ω)) (hV : V.Finite) (hb : Set.range b ⊆ V)
+    (z : M.Z) (hz : ∀ v ∈ V, v ∈ Submodule.span (M.O z) (Set.range b))
+    : ∃ W : M.Z.Opens,
+      z ∈ W ∧ ∀ x ∈ W, Submodule.span (M.O x) V = Submodule.span (M.O x) (Set.range b) := by
+  refine ⟨
+    ⟨
+      ⋂ v ∈ V, {x : M.Z | v ∈ Submodule.span (M.O x) (Set.range b)},
+      hV.isOpen_biInter fun v _ => isOpen_setOf_mem_span M b v
+    ⟩,
+    Set.mem_iInter₂.2 hz,
+    fun x hx => ?_
+  ⟩
+  exact le_antisymm (Submodule.span_le.2 fun v hv => Set.mem_iInter₂.1 hx v hv)
+    (Submodule.span_mono hb)
 
 end Model
 
 end GlobalTheory.ZH.FreeNear
 
 namespace GlobalTheory.ZH
-
 
 open FreeNear in
 theorem exists_basis_lattice_near :

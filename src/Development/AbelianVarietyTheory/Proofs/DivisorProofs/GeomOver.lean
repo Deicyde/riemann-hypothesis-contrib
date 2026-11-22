@@ -37,9 +37,10 @@ abbrev geomOver (A : AbVar K) : Over (Sp K) :=
 def transl (A : AbVar K) (a : A.Pt) : geomX A ⟶ geomX A :=
   pullback.lift
     ((lift (Over.homMk (pullback.fst _ _) : geomOver A ⟶ A.X)
-      (Over.homMk (pullback.snd _ _ ≫ a.left) (by
-        rw [Category.assoc, Over.w a]; exact pullback.condition.symm) : geomOver A ⟶ A.X) ≫ μ[A.X]).left)
-    (pullback.snd _ _) (by
-      rw [Over.w]; exact pullback.condition)
+        (Over.homMk (pullback.snd _ _ ≫ a.left)
+            (by rw [Category.assoc, Over.w a]; exact pullback.condition.symm)
+          : geomOver A ⟶ A.X)
+      ≫ μ[A.X]).left)
+    (pullback.snd _ _) (by rw [Over.w]; exact pullback.condition)
 
 end GlobalTheory.AV.AbVar

@@ -11,8 +11,8 @@ open NumberField
 
 namespace GlobalTheory.NatSmulMemOfSpan
 
-theorem exists_nat_mul_eq_coe {K : Type*} [Field K] [NumberField K] (c : K) :
-    ∃ m : ℕ, 0 < m ∧ ∃ a : 𝓞 K, algebraMap (𝓞 K) K a = (m : K) * c := by
+theorem exists_nat_mul_eq_coe {K : Type*} [Field K] [NumberField K] (c : K)
+    : ∃ m : ℕ, 0 < m ∧ ∃ a : 𝓞 K, algebraMap (𝓞 K) K a = (m : K) * c := by
   have halg : IsAlgebraic ℤ c :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ K).2 (Algebra.IsAlgebraic.isAlgebraic c)
   obtain ⟨y, hy, hint⟩ := halg.exists_integral_multiple
@@ -24,12 +24,16 @@ theorem exists_nat_mul_eq_coe {K : Type*} [Field K] [NumberField K] (c : K) :
     · have h2 : ((y.natAbs : ℤ) : K) = -(y : K) := by
         have : (y.natAbs : ℤ) = -y := by omega
         rw [this, Int.cast_neg]
-      rw [hc, h2, neg_mul]; exact hint.neg
+      rw [hc, h2, neg_mul]
+      exact hint.neg
   exact ⟨y.natAbs, Int.natAbs_pos.2 hy, ⟨_, hint'⟩, rfl⟩
 
-theorem exists_nat_smul_mem_of_mem_span {K V : Type*} [Field K] [NumberField K] [AddCommGroup V]
-    [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (Λ : Submodule (𝓞 K) V) {v : V}
-    (hv : v ∈ Submodule.span K (Λ : Set V)) : ∃ n : ℕ, 0 < n ∧ (n : K) • v ∈ Λ := by
+theorem exists_nat_smul_mem_of_mem_span
+    {K V : Type*} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+    [IsScalarTower (𝓞 K) K V]
+    (Λ : Submodule (𝓞 K) V)
+    {v : V} (hv : v ∈ Submodule.span K (Λ : Set V))
+    : ∃ n : ℕ, 0 < n ∧ (n : K) • v ∈ Λ := by
   have key : ∀ (a : 𝓞 K) (w : V), w ∈ Λ → algebraMap (𝓞 K) K a • w ∈ Λ := fun a w hw => by
     rw [algebraMap_smul]; exact Λ.smul_mem a hw
   have keyN : ∀ (m : ℕ) (w : V), w ∈ Λ → (m : K) • w ∈ Λ := fun m w hw => by
@@ -56,10 +60,11 @@ theorem exists_nat_smul_mem_of_mem_span {K V : Type*} [Field K] [NumberField K] 
     rw [this]
     exact key a _ hx
 
-theorem exists_nat_smul_mem {D : Formalism.BasicNotions.D7} (Λ : GlobalTheory.Unfold.LV D)
+theorem exists_nat_smul_mem
+    {D : Formalism.BasicNotions.D7} (Λ : GlobalTheory.Unfold.LV D)
     (hΛ : Submodule.IsFullLattice ((Formalism.BasicNotions.D7.host D).E) Λ)
-    (v : Formalism.BasicNotions.HSpace.V (Formalism.MainNotions.S.VS D)) :
-    ∃ n : ℕ, 0 < n ∧ (n : (Formalism.BasicNotions.D7.host D).E) • v ∈ Λ :=
+    (v : Formalism.BasicNotions.HSpace.V (Formalism.MainNotions.S.VS D))
+    : ∃ n : ℕ, 0 < n ∧ (n : (Formalism.BasicNotions.D7.host D).E) • v ∈ Λ :=
   exists_nat_smul_mem_of_mem_span Λ (by rw [hΛ.span_eq_top]; exact Submodule.mem_top)
 
 end GlobalTheory.NatSmulMemOfSpan

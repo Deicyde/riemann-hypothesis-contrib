@@ -18,8 +18,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.FinRepExis
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -29,11 +32,16 @@ noncomputable section
 
 namespace PositivityTheory.HtPt.Rg
 
-theorem torsrep_ex : ∀ (R : Type) [CommRing R] [IsLocalRing R] (p : ℕ), 1 ≤ p → ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (L : LB A.left), IsAbelianScheme A → L.IsLB → Out.RelAmple A L → Nonempty (TorsRep A p) := by
+theorem torsrep_ex
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (p : ℕ),
+      1 ≤ p
+        → ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (L : LB A.left),
+          IsAbelianScheme A → L.IsLB → Out.RelAmple A L → Nonempty (TorsRep A p) := by
   intro R _ _ p hp A _ L hA hL ha
   have := hA.comm
-  obtain ⟨hf, hfl, -⟩ := (GlobalTheory.ChF.exists_gen_theta_tensor_and_finite_flat_surjective_pow R A L
-    (L.pull (fst A A).left) hA hL ha (LB.isLB_pull hL _)).2 p hp
+  obtain ⟨hf, hfl, -⟩ :=
+    (GlobalTheory.ChF.exists_gen_theta_tensor_and_finite_flat_surjective_pow R A L
+      (L.pull (fst A A).left) hA hL ha (LB.isLB_pull hL _)).2 p hp
   obtain ⟨B, cr, al, al', tw, hfree, hfin, y, hy, hu⟩ :=
     GlobalTheory.finRep_kernel_mul_finite_free A (LAlg.mk R : LAlg R) p hf hfl hA.smooth
   have e : al = al' := by
@@ -41,7 +49,8 @@ theorem torsrep_ex : ∀ (R : Type) [CommRing R] [IsLocalRing R] (p : ℕ), 1 �
     have := @IsScalarTower.algebraMap_apply R R B _ _ _ _ al al' tw r
     exact this.symm
   subst e
-  refine ⟨{ A := B, cr := cr, alg := al, free := hfree, fin := hfin, y := y, y_p := hy, univ := ?_ }⟩
+  refine
+    ⟨{ A := B, cr := cr, alg := al, free := hfree, fin := hfin, y := y, y_p := hy, univ := ?_ }⟩
   intro S _ _ z hz
   exact hu S z hz
 

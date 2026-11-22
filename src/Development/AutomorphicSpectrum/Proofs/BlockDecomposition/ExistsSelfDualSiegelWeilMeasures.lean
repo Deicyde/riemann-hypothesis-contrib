@@ -9,8 +9,12 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Continuo
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,17 +24,24 @@ namespace GlobalTheory.CompanionTheory.SiegelND
 
 section Transport
 
-variable {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-    [MeasurableSpace V] [BorelSpace V] [AddCommGroup V'] [TopologicalSpace V'] [IsTopologicalAddGroup V']
-    [MeasurableSpace V'] [BorelSpace V']
+variable
+  {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V]
+  [BorelSpace V] [AddCommGroup V'] [TopologicalSpace V'] [IsTopologicalAddGroup V']
+  [MeasurableSpace V'] [BorelSpace V']
 
-theorem integral_map_addEquiv (e : V ≃+ V') (hc : Continuous e) (hc' : Continuous e.symm) (μ : Measure V)
-    (f : V' → ℂ) : ∫ y, f y ∂(μ.map e) = ∫ x, f (e x) ∂μ :=
-  integral_map_equiv ({ toEquiv := e.toEquiv, continuous_toFun := hc, continuous_invFun := hc' } : V ≃ₜ V').toMeasurableEquiv f
+theorem integral_map_addEquiv
+    (e : V ≃+ V') (hc : Continuous e) (hc' : Continuous e.symm) (μ : Measure V) (f : V' → ℂ)
+    : ∫ y, f y ∂(μ.map e) = ∫ x, f (e x) ∂μ :=
+  integral_map_equiv
+    ({ toEquiv := e.toEquiv, continuous_toFun := hc, continuous_invFun := hc' }
+      : V ≃ₜ V').toMeasurableEquiv
+    f
 
-theorem selfDual_map_addEquiv (e : V ≃+ V') (hc : Continuous e) (hc' : Continuous e.symm)
-    {μ : Measure V} {χ : V → V → ℂ} {χ' : V' → V' → ℂ} (h : SelfDual μ χ)
-    (hχ : ∀ x y, χ' (e x) (e y) = χ x y) : SelfDual (μ.map e) χ' := by
+theorem selfDual_map_addEquiv
+    (e : V ≃+ V') (hc : Continuous e) (hc' : Continuous e.symm)
+    {μ : Measure V} {χ : V → V → ℂ} {χ' : V' → V' → ℂ}
+    (h : SelfDual μ χ) (hχ : ∀ x y, χ' (e x) (e y) = χ x y)
+    : SelfDual (μ.map e) χ' := by
   haveI := h.1
   let H : V ≃ₜ V' := { toEquiv := e.toEquiv, continuous_toFun := hc, continuous_invFun := hc' }
   let M : V ≃ᵐ V' := H.toMeasurableEquiv
@@ -51,27 +62,37 @@ theorem selfDual_map_addEquiv (e : V ≃+ V') (hc : Continuous e) (hc' : Continu
     exact inner y
   have key := h.2 (Φ ∘ H) (hΦ.comp H.continuous) (hs.comp_homeomorph H) hI0 (e.symm z)
   have hz : e (e.symm z) = z := e.apply_symm_apply z
-  calc ∫ y, (∫ x, Φ x * χ' x y ∂(μ.map e)) * χ' y z ∂(μ.map e)
-      = ∫ y, (∫ x, (Φ ∘ H) x * χ x y ∂μ) * χ y (e.symm z) ∂μ := by
-        rw [integral_map_addEquiv e hc hc']
-        refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
-        change (∫ x, Φ x * χ' x (e y) ∂(μ.map e)) * χ' (e y) z = (∫ x, (Φ ∘ H) x * χ x y ∂μ) * χ y (e.symm z)
-        rw [inner y, ← hχ y (e.symm z), hz]
+  calc
+    ∫ y, (∫ x, Φ x * χ' x y ∂(μ.map e)) * χ' y z ∂(μ.map e)
+        = ∫ y, (∫ x, (Φ ∘ H) x * χ x y ∂μ) * χ y (e.symm z) ∂μ := by
+      rw [integral_map_addEquiv e hc hc']
+      refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
+      change (∫ x, Φ x * χ' x (e y) ∂(μ.map e)) * χ' (e y) z
+        = (∫ x, (Φ ∘ H) x * χ x y ∂μ) * χ y (e.symm z)
+      rw [inner y, ← hχ y (e.symm z), hz]
     _ = (Φ ∘ H) (-(e.symm z)) := key
     _ = Φ (-z) := by
-        change Φ (e (-(e.symm z))) = _
-        rw [map_neg, hz]
+      change Φ (e (-(e.symm z))) = _
+      rw [map_neg, hz]
 
-theorem integral_map_of (f : V → V') (g : V' → V) (h1 : Function.LeftInverse g f) (h2 : Function.RightInverse g f)
-    (hadd : ∀ x y, f (x + y) = f x + f y) (hc : Continuous f) (hc' : Continuous g) (μ : Measure V) (u : V' → ℂ) :
-    ∫ y, u y ∂(μ.map f) = ∫ x, u (f x) ∂μ :=
-  integral_map_addEquiv ({ toFun := f, invFun := g, left_inv := h1, right_inv := h2, map_add' := hadd } : V ≃+ V') hc hc' μ u
+theorem integral_map_of
+    (f : V → V') (g : V' → V) (h1 : Function.LeftInverse g f) (h2 : Function.RightInverse g f)
+    (hadd : ∀ x y, f (x + y) = f x + f y) (hc : Continuous f) (hc' : Continuous g) (μ : Measure V)
+    (u : V' → ℂ)
+    : ∫ y, u y ∂(μ.map f) = ∫ x, u (f x) ∂μ :=
+  integral_map_addEquiv
+    ({ toFun := f, invFun := g, left_inv := h1, right_inv := h2, map_add' := hadd } : V ≃+ V') hc
+    hc' μ u
 
-theorem selfDual_map_of (f : V → V') (g : V' → V) (h1 : Function.LeftInverse g f) (h2 : Function.RightInverse g f)
+theorem selfDual_map_of
+    (f : V → V') (g : V' → V) (h1 : Function.LeftInverse g f) (h2 : Function.RightInverse g f)
     (hadd : ∀ x y, f (x + y) = f x + f y) (hc : Continuous f) (hc' : Continuous g)
-    {μ : Measure V} {χ : V → V → ℂ} {χ' : V' → V' → ℂ} (h : SelfDual μ χ)
-    (hχ : ∀ x y, χ' (f x) (f y) = χ x y) : SelfDual (μ.map f) χ' :=
-  selfDual_map_addEquiv ({ toFun := f, invFun := g, left_inv := h1, right_inv := h2, map_add' := hadd } : V ≃+ V') hc hc' h hχ
+    {μ : Measure V} {χ : V → V → ℂ} {χ' : V' → V' → ℂ}
+    (h : SelfDual μ χ) (hχ : ∀ x y, χ' (f x) (f y) = χ x y)
+    : SelfDual (μ.map f) χ' :=
+  selfDual_map_addEquiv
+    ({ toFun := f, invFun := g, left_inv := h1, right_inv := h2, map_add' := hadd } : V ≃+ V') hc
+    hc' h hχ
 
 end Transport
 
@@ -98,17 +119,21 @@ theorem borel_tup : BorelSpace (Fin r → Fin m → AE D) := by
   haveI : BorelSpace (Fin m → AE D) := Pi.borelSpace
   exact Pi.borelSpace
 
-theorem hR_tup (V : HSp D) (x y : Mx D V.rank r) (a b : Fin r) :
-    hR (AF D.host.F) D.sp.cm.sig V.gram (fun i => x i a) (fun i => y i b) = GlobalTheory.StdUnn.inner V x y a b := by
-  simp only [hR, Formalism.UG.hform, JR, GlobalTheory.StdUnn.inner, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
+theorem hR_tup (V : HSp D) (x y : Mx D V.rank r) (a b : Fin r)
+    : hR (AF D.host.F) D.sp.cm.sig V.gram (fun i => x i a) (fun i => y i b)
+      = GlobalTheory.StdUnn.inner V x y a b := by
+  simp only [hR, Formalism.UG.hform, JR, GlobalTheory.StdUnn.inner, Matrix.mul_apply,
+    Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   change _ = (cA D (x i a)) * (incA D (V.gram i j) * y j b)
   rw [mul_assoc]
   rfl
 
-theorem pairing_tup (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ) (x y : Mx D V.rank r) :
-    ψ (BR (AF D.host.F) D.sp.cm.sig V.gram (tupInv x) (tupInv y)) = GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing V.gram ψ x y := by
-  unfold GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.trA
+theorem pairing_tup (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ) (x y : Mx D V.rank r)
+    : ψ (BR (AF D.host.F) D.sp.cm.sig V.gram (tupInv x) (tupInv y))
+      = GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing V.gram ψ x y := by
+  unfold GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing
+    GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.trA
   rw [GlobalTheory.SiegelWeilLitCompare.gramQ_eq]
   congr 1
   set_option synthInstance.maxHeartbeats 100000 in
@@ -117,16 +142,20 @@ theorem pairing_tup (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ) (x y : Mx D V.r
   rw [← hR_tup]
   rfl
 
-theorem sdW_map (V : HSp D) {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) {μ : Measure (Mx D V.rank r)}
-    {𝓕 : Set (Mx D V.rank r)} (hμ : IsCovolOne (ratMx D V.rank r) μ 𝓕) :
-    SdW D.host.F D.host.E D.sp.cm.sig V.rank V.gram (AF D.host.F) ψ r (μ.map tupInv) := by
+theorem sdW_map
+    (V : HSp D)
+    {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    {μ : Measure (Mx D V.rank r)} {𝓕 : Set (Mx D V.rank r)} (hμ : IsCovolOne (ratMx D V.rank r) μ 𝓕)
+    : SdW D.host.F D.host.E D.sp.cm.sig V.rank V.gram (AF D.host.F) ψ r (μ.map tupInv) := by
   obtain ⟨i1, -, -, -, -, -⟩ := lattice_Mx D V.rank r
   haveI : BorelSpace (Mx D V.rank r) := ⟨rfl⟩
   haveI : BorelSpace (Fin r → Fin V.rank → AE D) := borel_tup
   obtain ⟨j1, -⟩ := Formalism.IndefR.Eqv.ae_facts D
-  exact selfDual_map_of (χ' := fun X Y => ψ (BR (AF D.host.F) D.sp.cm.sig V.gram X Y)) tupInv tupOf tupOf_tupInv
-    tupInv_tupOf tupInv_add continuous_tupInv continuous_tupOf
-    (GlobalTheory.SiegelWeilLitCompare.selfDual_of_covolOne (isHermND_gram V) hψ hμ) (fun x y => pairing_tup V ψ x y)
+  exact selfDual_map_of
+    (χ' := fun X Y => ψ (BR (AF D.host.F) D.sp.cm.sig V.gram X Y))
+    tupInv tupOf tupOf_tupInv tupInv_tupOf tupInv_add continuous_tupInv continuous_tupOf
+    (GlobalTheory.SiegelWeilLitCompare.selfDual_of_covolOne (isHermND_gram V) hψ hμ)
+    (fun x y => pairing_tup V ψ x y)
 
 end Tuples
 
@@ -134,9 +163,11 @@ section Herm
 
 variable {D : D7} {r : ℕ}
 
-def hermTo (b : hermA D r) : HermR (AF D.host.F) D.sp.cm.sig r := ⟨b.1, fun a c => congrFun (congrFun b.2 a) c⟩
+def hermTo (b : hermA D r) : HermR (AF D.host.F) D.sp.cm.sig r :=
+  ⟨b.1, fun a c => congrFun (congrFun b.2 a) c⟩
 
-def hermFrom (S : HermR (AF D.host.F) D.sp.cm.sig r) : hermA D r := ⟨S.1, Matrix.ext fun a c => S.2 a c⟩
+def hermFrom (S : HermR (AF D.host.F) D.sp.cm.sig r) : hermA D r :=
+  ⟨S.1, Matrix.ext fun a c => S.2 a c⟩
 
 theorem hermFrom_hermTo (b : hermA D r) : hermFrom (hermTo b) = b := rfl
 
@@ -174,16 +205,20 @@ theorem trF_adj (a b : Mx D r r) : trF (adj a) (adj b) = trF a b := by
   unfold trF
   rw [h, GlobalTheory.DualPairCheck.trace_cA, Matrix.trace_mul_comm]
 
-theorem half_add_self (p : AF D.host.F) : algebraMap D.host.F (AF D.host.F) (1 / 2) * (p + p) = p := by
+theorem half_add_self (p : AF D.host.F)
+    : algebraMap D.host.F (AF D.host.F) (1 / 2) * (p + p) = p := by
   rw [← two_mul, ← mul_assoc, ← map_ofNat (algebraMap D.host.F (AF D.host.F)) 2, ← map_mul]
   norm_num
 
 def pairH (ψ : AddChar (AF D.host.F) ℂ) (S T : hermA D r) : ℂ :=
   ψ (algebraMap D.host.F (AF D.host.F) (1 / 2) * trF S.1 T.1)
 
-theorem pairing_one (ψ : AddChar (AF D.host.F) ℂ) (γ x : Mx D r r) :
-    GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing (1 : Matrix (Fin r) (Fin r) D.host.E) ψ γ x = ψ (trF (adj γ) x) := by
-  unfold GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.trA trF
+theorem pairing_one (ψ : AddChar (AF D.host.F) ℂ) (γ x : Mx D r r)
+    : GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing
+        (1 : Matrix (Fin r) (Fin r) D.host.E) ψ γ x
+      = ψ (trF (adj γ) x) := by
+  unfold GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.pairing
+    GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.trA trF
   congr 3
   change (adj γ * (1 : Matrix (Fin r) (Fin r) D.host.E).map (incA D)) * x = _
   rw [Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one]
@@ -198,9 +233,9 @@ theorem adj_mem_rat {γ : Mx D r r} (h : γ ∈ ratMx D r r) : adj γ ∈ ratMx 
   obtain ⟨η, rfl⟩ := mem_ratMx.1 h
   exact mem_ratMx.2 ⟨ηᴴ, rat_conjTranspose η⟩
 
-theorem pairH_annih {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) :
-    (∀ x : hermA D r, (∀ γ ∈ ratHerm D r, pairH ψ γ x = 1) ↔ x ∈ ratHerm D r) ∧
-      ∀ γ ∈ ratHerm D r, (∀ x, pairH ψ γ x = 1) → γ = 0 := by
+theorem pairH_annih {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    : (∀ x : hermA D r, (∀ γ ∈ ratHerm D r, pairH ψ γ x = 1) ↔ x ∈ ratHerm D r)
+      ∧ ∀ γ ∈ ratHerm D r, (∀ x, pairH ψ γ x = 1) → γ = 0 := by
   haveI : Module.Finite D.host.F D.host.E := Module.finite_of_finrank_pos (by rw [D.sp.cm.deg2]; norm_num)
   obtain ⟨h1, h2⟩ := GlobalTheory.GramAnnih.ratMx_annihilator D r r 1 isHermND_one ψ hψ
   refine ⟨fun x => ⟨fun h => ?_, fun hx γ hγ => ?_⟩, fun γ hγ h => ?_⟩
@@ -241,12 +276,12 @@ theorem pairH_annih {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ
       exact trF_adj _ _
     rw [e, half_add_self]
 
-
 set_option maxHeartbeats 1000000 in
 set_option synthInstance.maxHeartbeats 400000 in
-theorem sdHerm_map {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) {lam : Measure (hermA D r)}
-    {𝓖 : Set (hermA D r)} (hl : IsCovolOneH lam 𝓖) :
-    SdHerm D.host.F D.host.E D.sp.cm.sig (AF D.host.F) ψ r (lam.map hermTo) := by
+theorem sdHerm_map
+    {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    {lam : Measure (hermA D r)} {𝓖 : Set (hermA D r)} (hl : IsCovolOneH lam 𝓖)
+    : SdHerm D.host.F D.host.E D.sp.cm.sig (AF D.host.F) ψ r (lam.map hermTo) := by
   obtain ⟨i1, i2, i3, i4, -, -⟩ := lattice_Mx D r r
   haveI : IsTopologicalAddGroup (Mx D r r) := i1
   haveI : LocallyCompactSpace (Mx D r r) := i2
@@ -266,35 +301,43 @@ theorem sdHerm_map {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
   have ht : Continuous (Algebra.trace (AF D.host.F) (AE D)) :=
     IsModuleTopology.continuous_of_linearMap (Algebra.trace (AF D.host.F) (AE D))
   have hsd : SelfDual lam (pairH ψ) := by
-    refine GlobalTheory.T.selfDual_of_fundamentalDomain_volume_eq_one _ (ratHerm D r) K hK hKc _ (fun y => ?_) (fun x y => ?_) (fun x x' y => ?_) (fun x y => hψ.2.1 _)
+    refine GlobalTheory.T.selfDual_of_fundamentalDomain_volume_eq_one _ (ratHerm D r) K hK hKc _
+      (fun y => ?_)
+      (fun x y => ?_)
+      (fun x x' y => ?_)
+      (fun x y => hψ.2.1 _)
       h1 h2 lam 𝓖 hl.1 hl.2.1 hl.2.2
     · unfold trF
-      exact hψ.1.comp (continuous_const.mul (ht.comp
-        ((continuous_subtype_val.matrix_mul continuous_const).matrix_trace)))
+      exact hψ.1.comp (continuous_const.mul (ht.comp ((continuous_subtype_val.matrix_mul
+        continuous_const).matrix_trace)))
     · rw [trF_comm]
     · change ψ (_ * trF (x.1 + x'.1) y.1) = _
       rw [trF_add_left, mul_add, AddChar.map_add_eq_mul]
-  refine selfDual_map_of (hermTo (D := D) (r := r)) hermFrom hermFrom_hermTo hermTo_hermFrom hermTo_add continuous_hermTo
-    continuous_hermFrom hsd fun S T => ?_
+  refine selfDual_map_of (hermTo (D := D) (r := r)) hermFrom hermFrom_hermTo hermTo_hermFrom
+    hermTo_add continuous_hermTo continuous_hermFrom hsd fun S T => ?_
   unfold pairH trF pairHerm
   congr 3
 
 end Herm
 
-
 set_option maxHeartbeats 1000000 in
 set_option synthInstance.maxHeartbeats 400000 in
-theorem whit_eq_coefN : ∀ (D : D7) (r : ℕ) (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ), IsCharAF D.host.F ψ →
-  ∀ μ : Measure (Mx D V.rank r), (∃ 𝓕, IsCovolOne (ratMx D V.rank r) μ 𝓕) →
-  ∀ lam : Measure (hermA D r), (∃ 𝓖, IsCovolOneH lam 𝓖) →
-  ∃ (dx : Measure (Fin r → Fin V.rank → AE D)) (db : Measure (HermR (AF D.host.F) D.sp.cm.sig r)),
-    SdW D.host.F D.host.E D.sp.cm.sig V.rank V.gram (AF D.host.F) ψ r dx ∧
-    SdHerm D.host.F D.host.E D.sp.cm.sig (AF D.host.F) ψ r db ∧
-    ∀ (φ : Mx D V.rank r → ℂ) (β : HermE D r),
-      W ψ V μ lam φ β = coefN D.sp.cm.sig V.gram ψ dx db (fun X => φ (tupOf X)) β.1 := by
+theorem whit_eq_coefN
+    : ∀ (D : D7) (r : ℕ) (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ),
+      IsCharAF D.host.F ψ
+        → ∀ μ : Measure (Mx D V.rank r),
+          (∃ 𝓕, IsCovolOne (ratMx D V.rank r) μ 𝓕)
+            → ∀ lam : Measure (hermA D r),
+              (∃ 𝓖, IsCovolOneH lam 𝓖)
+                → ∃ (dx : Measure (Fin r → Fin V.rank → AE D))
+                    (db : Measure (HermR (AF D.host.F) D.sp.cm.sig r)),
+                  SdW D.host.F D.host.E D.sp.cm.sig V.rank V.gram (AF D.host.F) ψ r dx
+                    ∧ SdHerm D.host.F D.host.E D.sp.cm.sig (AF D.host.F) ψ r db
+                    ∧ ∀ (φ : Mx D V.rank r → ℂ) (β : HermE D r),
+                      W ψ V μ lam φ β
+                        = coefN D.sp.cm.sig V.gram ψ dx db (fun X => φ (tupOf X)) β.1 := by
   rintro D r V ψ hψ μ ⟨𝓕, hμ⟩ lam ⟨𝓖, hl⟩
-  refine ⟨μ.map tupInv, lam.map hermTo, sdW_map V hψ hμ, sdHerm_map hψ hl,
-    fun φ β => ?_⟩
+  refine ⟨μ.map tupInv, lam.map hermTo, sdW_map V hψ hμ, sdHerm_map hψ hl, fun φ β => ?_⟩
   obtain ⟨i1, -, i3, -, -, -⟩ := lattice_Mx D r r
   obtain ⟨k1, -, -, -, -, -⟩ := lattice_Mx D V.rank r
   haveI : IsTopologicalAddGroup (Mx D r r) := i1
@@ -309,17 +352,24 @@ theorem whit_eq_coefN : ∀ (D : D7) (r : ℕ) (V : HSp D) (ψ : AddChar (AF D.h
   haveI : BorelSpace (Fin r → Fin V.rank → AE D) := borel_tup
   obtain ⟨j1, -⟩ := Formalism.IndefR.Eqv.ae_facts D
   unfold W coefN
-  rw [integral_map_of (hermTo (D := D) (r := r)) hermFrom hermFrom_hermTo hermTo_hermFrom hermTo_add continuous_hermTo continuous_hermFrom]
+  rw [integral_map_of (hermTo (D := D) (r := r)) hermFrom hermFrom_hermTo hermTo_hermFrom hermTo_add
+    continuous_hermTo continuous_hermFrom]
   refine integral_congr_ae (Filter.Eventually.of_forall fun b => ?_)
-  have hstar : starN D.sp.cm.sig V.gram ψ (μ.map tupInv) (fun X => φ (tupOf X)) (hermTo b) = Jt ψ V μ φ b := by
+  have hstar
+      : starN D.sp.cm.sig V.gram ψ (μ.map tupInv) (fun X => φ (tupOf X)) (hermTo b)
+        = Jt ψ V μ φ b := by
     unfold starN Jt
-    rw [integral_map_of tupInv tupOf tupOf_tupInv tupInv_tupOf tupInv_add continuous_tupInv continuous_tupOf]
+    rw [integral_map_of tupInv tupOf tupOf_tupInv tupInv_tupOf tupInv_add continuous_tupInv
+      continuous_tupOf]
     refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
-    have hg : gramR (AF D.host.F) D.sp.cm.sig V.gram (tupInv y) =
-        GlobalTheory.StdUnn.inner V y y := by
+    have hg
+        : gramR (AF D.host.F) D.sp.cm.sig V.gram (tupInv y) = GlobalTheory.StdUnn.inner V y y := by
       ext a c
       exact hR_tup V y y a c
-    change φ y * ψ (_ * Algebra.trace _ _ (Matrix.trace (b.1 * gramR (AF D.host.F) D.sp.cm.sig V.gram (tupInv y)))) = _
+    change φ y * ψ
+        (_ * Algebra.trace _ _
+          (Matrix.trace (b.1 * gramR (AF D.host.F) D.sp.cm.sig V.gram (tupInv y))))
+      = _
     rw [hg]
     rfl
   change _ = starN D.sp.cm.sig V.gram ψ _ _ (hermTo b) * _

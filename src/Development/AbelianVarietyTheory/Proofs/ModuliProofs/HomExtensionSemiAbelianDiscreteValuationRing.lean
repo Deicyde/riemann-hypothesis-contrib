@@ -24,6 +24,7 @@ namespace GlobalTheory
 
 theorem homExtension_semiAbelian_dvr : GlobalTheory.LN.HomExtSt :=
   GlobalTheory.existsUnique_hom_extension_semiAbelian_dvr
-    (GlobalTheory.AbelianSubgroupFinite.finite_of_no_torsion GlobalTheory.card_torsion_abelianVariety)
+    (GlobalTheory.AbelianSubgroupFinite.finite_of_no_torsion
+      GlobalTheory.card_torsion_abelianVariety)
 
 end GlobalTheory

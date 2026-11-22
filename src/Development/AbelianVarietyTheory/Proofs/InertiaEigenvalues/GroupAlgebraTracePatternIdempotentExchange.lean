@@ -15,12 +15,19 @@ open scoped Classical
 
 namespace GlobalTheory.GLq
 
-theorem tr_eJ_eq_tr_eJ' : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 →
-    ∀ (N k s : ℕ), N = k + 2 * s + 1 → ∀ χ : Gn g N → ℂ, IsClass χ →
-      tr (eJ g N k s ψ) χ = tr (eJ' g N k ψ) χ := by
+theorem tr_eJ_eq_tr_eJ'
+    : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ),
+      ψ ≠ 1
+        → ∀ (N k s : ℕ),
+          N = k + 2 * s + 1
+            → ∀ χ : Gn g N → ℂ, IsClass χ → tr (eJ g N k s ψ) χ = tr (eJ' g N k ψ) χ := by
   intro g _ ψ hψ N k s hN χ hχ
-  have key : ∀ i, i ≤ s →
-      tr (GlobalTheory.GLm.ePat g N (GlobalTheory.GLm.phI k s i) (GlobalTheory.GLm.eeI k s) ψ) χ = tr (eJ' g N k ψ) χ := by
+  have key
+      : ∀ i,
+        i ≤ s
+          → tr (GlobalTheory.GLm.ePat g N (GlobalTheory.GLm.phI k s i) (GlobalTheory.GLm.eeI k s) ψ)
+              χ
+            = tr (eJ' g N k ψ) χ := by
     intro i
     induction i with
     | zero => intro _; exact GlobalTheory.GLm.FirstPattern.tr_first_pattern g ψ N k s hN χ hχ

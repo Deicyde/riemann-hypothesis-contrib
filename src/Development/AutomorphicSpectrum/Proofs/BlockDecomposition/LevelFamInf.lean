@@ -17,8 +17,7 @@ variable {H : Type} [Group H]
 
 theorem mem_rStab' {u : H → ℂ} {r : H} : r ∈ rStab u ↔ ∀ x, u (x * r) = u x := Iff.rfl
 
-theorem hint_zero (K : Subgroup H) : hint K (fun _ => (0 : ℂ)) = 0 := by
-  simp [hint]
+theorem hint_zero (K : Subgroup H) : hint K (fun _ => (0 : ℂ)) = 0 := by simp [hint]
 
 theorem rStab_left (u : H → ℂ) (k : H) : rStab (fun z => u (k * z)) = rStab u := by
   ext r
@@ -29,15 +28,17 @@ theorem rStab_left (u : H → ℂ) (k : H) : rStab (fun z => u (k * z)) = rStab 
   · intro h x
     simpa [mul_assoc] using h (k * x)
 
-theorem hint_left (K : Subgroup H) (u : H → ℂ) (k : H) :
-    hint K (fun z => u (k * z)) = hint K u := by
+theorem hint_left (K : Subgroup H) (u : H → ℂ) (k : H)
+    : hint K (fun z => u (k * z)) = hint K u := by
   unfold hint
   rw [rStab_left]
   congr 1
-  refine Eq.trans ?_ (finsum_comp_equiv (MulAction.toPerm k : H ⧸ (rStab u ⊓ K) ≃ H ⧸ (rStab u ⊓ K)))
+  refine Eq.trans ?_
+    (finsum_comp_equiv (MulAction.toPerm k : H ⧸ (rStab u ⊓ K) ≃ H ⧸ (rStab u ⊓ K)))
   refine finsum_congr fun q => ?_
-  have hq : (MulAction.toPerm k : H ⧸ (rStab u ⊓ K) ≃ H ⧸ (rStab u ⊓ K)) q =
-      ((k * q.out : H) : H ⧸ (rStab u ⊓ K)) := by
+  have hq
+      : (MulAction.toPerm k : H ⧸ (rStab u ⊓ K) ≃ H ⧸ (rStab u ⊓ K)) q
+        = ((k * q.out : H) : H ⧸ (rStab u ⊓ K)) := by
     conv_lhs => rw [← QuotientGroup.out_eq' q]
     rfl
   rw [hq]

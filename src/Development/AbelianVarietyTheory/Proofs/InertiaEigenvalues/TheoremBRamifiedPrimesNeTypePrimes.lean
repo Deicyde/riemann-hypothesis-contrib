@@ -12,13 +12,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocDegP
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal NumberField IsDedekindDomain
 
 namespace GlobalTheory.Proof.TypePrimesQD
 
-theorem not_split_of_ram_two (E : Type) [Field E] [NumberField E] (l : ℕ) (hl : l.Prime)
-    (hram : ∀ v ∈ placesOver E l, v.asIdeal.ramificationIdx ℤ = 2)
-    (hsplit : (placesOver E l).ncard = Module.finrank ℚ E) : False := by
+theorem not_split_of_ram_two
+    (E : Type) [Field E] [NumberField E]
+    (l : ℕ) (hl : l.Prime) (hram : ∀ v ∈ placesOver E l, v.asIdeal.ramificationIdx ℤ = 2)
+    (hsplit : (placesOver E l).ncard = Module.finrank ℚ E)
+    : False := by
   classical
   have hpos : 0 < Module.finrank ℚ E := Module.finrank_pos
   have hfin : (placesOver E l).Finite := Set.finite_of_ncard_pos (by omega)
@@ -34,17 +38,21 @@ theorem not_split_of_ram_two (E : Type) [Field E] [NumberField E] (l : ℕ) (hl 
   rw [Finset.sum_const, smul_eq_mul, ← Set.ncard_eq_toFinset_card _ hfin, hsplit] at hge
   omega
 
-theorem qd_ne_typePrimes : ∀ (D : D7), Formalism.MainNotions.EmbeddingTypeJumps.Conclusion1 D → ∀ i : D.nd.Loc,
-    (D.nd.l i = D.host.q ∨ D.nd.l i = D.host.d) → D.nd.l i ≠ D.host.g 0 ∧ D.nd.l i ≠ D.host.g 1 := by
+theorem qd_ne_typePrimes
+    : ∀ (D : D7),
+      Formalism.MainNotions.EmbeddingTypeJumps.Conclusion1 D
+        → ∀ i : D.nd.Loc,
+          (D.nd.l i = D.host.q ∨ D.nd.l i = D.host.d)
+            → D.nd.l i ≠ D.host.g 0 ∧ D.nd.l i ≠ D.host.g 1 := by
   intro D h1 i hl
   have key : ∀ k : Fin 2, D.nd.l i ≠ D.host.g k := by
     intro k hk
-    have hmem : D.nd.l i ∈ ({D.host.q, D.host.d} : Finset ℕ) := by
-      rcases hl with h | h <;> simp [h]
+    have hmem : D.nd.l i ∈ ({D.host.q, D.host.d} : Finset ℕ) := by rcases hl with h | h <;> simp [h]
     have hram := (h1 _ hmem).2
     rw [hk] at hram
     exact not_split_of_ram_two D.host.E (D.host.g k) (D.host.g_prime k)
-      (fun v hv => (hram v hv).1) (D.nd.g_split k)
+      (fun v hv => (hram v hv).1)
+      (D.nd.g_split k)
   exact ⟨key 0, key 1⟩
 
 end GlobalTheory.Proof.TypePrimesQD

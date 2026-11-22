@@ -9,7 +9,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -20,7 +21,8 @@ section Module
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
 def modPieceCard (J₁ J₂ : Ideal (MRing ι)) (a : K → ℕ) : ℕ :=
-  (J₂.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup.relIndex (J₁.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup
+  (J₂.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup.relIndex
+    (J₁.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup
 
 def topComps (J : Ideal (MRing ι)) (d : ℕ) : Set (Ideal (MRing ι)) :=
   {W | W ∈ J.minimalPrimes ∧ IsRelevant W ∧

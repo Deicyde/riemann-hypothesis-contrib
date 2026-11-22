@@ -11,9 +11,12 @@ open MeasureTheory Set Filter Topology Metric Complex Real
 
 namespace PositivityTheory.Rg.Sw.AbsSt
 
-theorem clm_circleIntegral {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
-    [NormedAddCommGroup F] [NormedSpace ℂ F] [CompleteSpace F] (L : E →L[ℂ] F) {f : ℂ → E} {c : ℂ} {R : ℝ}
-    (hf : CircleIntegrable f c R) : L (∮ z in C(c, R), f z) = ∮ z in C(c, R), L (f z) := by
+theorem clm_circleIntegral
+    {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] [NormedAddCommGroup F]
+    [NormedSpace ℂ F] [CompleteSpace F]
+    (L : E →L[ℂ] F)
+    {f : ℂ → E} {c : ℂ} {R : ℝ} (hf : CircleIntegrable f c R)
+    : L (∮ z in C(c, R), f z) = ∮ z in C(c, R), L (f z) := by
   unfold circleIntegral
   rw [← ContinuousLinearMap.intervalIntegral_comp_comm L hf.out]
   congr 1

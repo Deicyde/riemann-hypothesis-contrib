@@ -14,10 +14,11 @@ theorem rpow_three_halves_sq_eq_cube {x : ℝ} (hx : 0 ≤ x) : (x ^ ((3 : ℝ) 
   rw [← Real.rpow_natCast, ← Real.rpow_mul hx]
   norm_num
 
-theorem rhoN_norm_le_and_casimir_arith :
-    (∀ (n : ℕ) (ε : Fin n → Bool), Real.sqrt (nsq (rhoN ε)) ≤ 0.58 * (n : ℝ) ^ ((3 : ℝ) / 2)) ∧
-    ∀ (L a n : ℝ), 0 ≤ L → 0 ≤ a → 0 ≤ n →
-      2 * (L + a) ^ 2 - L ^ 2 + n ^ 3 / 12 ≤ (L + 2 * a + 0.3 * n ^ ((3 : ℝ) / 2)) ^ 2 := by
+theorem rhoN_norm_le_and_casimir_arith
+    : (∀ (n : ℕ) (ε : Fin n → Bool), Real.sqrt (nsq (rhoN ε)) ≤ 0.58 * (n : ℝ) ^ ((3 : ℝ) / 2))
+      ∧ ∀ (L a n : ℝ),
+        0 ≤ L → 0 ≤ a → 0 ≤ n
+          → 2 * (L + a) ^ 2 - L ^ 2 + n ^ 3 / 12 ≤ (L + 2 * a + 0.3 * n ^ ((3 : ℝ) / 2)) ^ 2 := by
   refine ⟨fun n ε => ?_, fun L a n hL ha hn => ?_⟩
   · have hn : (0 : ℝ) ≤ n := Nat.cast_nonneg n
     have hs := rpow_three_halves_sq_eq_cube hn

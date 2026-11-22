@@ -8,8 +8,10 @@ namespace PositivityTheory.RgBcC.Fc
 
 open PositivityTheory.RgBcC
 
-theorem asmKerOne_of_steps (hC : AsmCpt) (hS : CalcSteps) (hO : SmoothOp) (hP : PWdecay) (hK : KerCore)
-    (hL : KerLoc) (hW : KerW) : AsmKerOne := by
+theorem asmKerOne_of_steps
+    (hC : AsmCpt) (hS : CalcSteps) (hO : SmoothOp) (hP : PWdecay) (hK : KerCore) (hL : KerLoc)
+    (hW : KerW)
+    : AsmKerOne := by
   intro h1 h2 h3 h4 h5 h6 n _ _ μ _ E w g T hg
   have hWC : WaveCpt := hC h1 h2 h3 h4
   apply hW n μ E w g h1 h2 h3

@@ -8,18 +8,21 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodge
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar
 
 open scoped nonZeroDivisors
 
-theorem differentIdeal_principal_in_localSubring :
-    ∀ (F : Type) [Field F] [NumberField F] (Ω : Type) [Field Ω] [CharZero Ω] (R : Subring Ω)
-      [IsLocalRing R] (σ : 𝓞 F →+* Ω), (∀ a, σ a ∈ R) →
-      ∃ d₀ ∈ differentIdeal ℤ (𝓞 F), σ d₀ ≠ 0 ∧
-        ∀ d ∈ differentIdeal ℤ (𝓞 F), σ d / σ d₀ ∈ R := by
+theorem differentIdeal_principal_in_localSubring
+    : ∀ (F : Type) [Field F] [NumberField F] (Ω : Type) [Field Ω] [CharZero Ω] (R : Subring Ω)
+        [IsLocalRing R] (σ : 𝓞 F →+* Ω),
+      (∀ a, σ a ∈ R)
+        → ∃ d₀ ∈ differentIdeal ℤ (𝓞 F),
+          σ d₀ ≠ 0 ∧ ∀ d ∈ differentIdeal ℤ (𝓞 F), σ d / σ d₀ ∈ R := by
   intro F _ _ Ω _ _ R _ σ hσ
   have hinj : Function.Injective σ := by
     rw [RingHom.injective_iff_ker_eq_bot]
@@ -29,8 +32,7 @@ theorem differentIdeal_principal_in_localSubring :
   set I : Ideal (𝓞 F) := differentIdeal ℤ (𝓞 F) with hIdef
   have hI0 : I ≠ ⊥ := differentIdeal_ne_bot
   let J : FractionalIdeal (𝓞 F)⁰ F := (I : FractionalIdeal (𝓞 F)⁰ F)
-  have hJ0 : J ≠ 0 := by
-    simpa [J] using hI0
+  have hJ0 : J ≠ 0 := by simpa [J] using hI0
   have hJ : J * J⁻¹ = 1 := mul_inv_cancel₀ hJ0
   let σ' : 𝓞 F →+* R := σ.codRestrict R hσ
   let P : Ideal (𝓞 F) := (IsLocalRing.maximalIdeal R).comap σ'
@@ -39,8 +41,8 @@ theorem differentIdeal_principal_in_localSubring :
     have : (1 : R) ∈ IsLocalRing.maximalIdeal R := by simpa [P] using h
     exact (Ideal.ne_top_iff_one _).1 (IsLocalRing.maximalIdeal.isMaximal R).ne_top this
 
-  have hex : ∃ x ∈ I, ∃ y ∈ J⁻¹, ∃ u : 𝓞 F, algebraMap (𝓞 F) F u = algebraMap (𝓞 F) F x * y ∧
-      u ∉ P := by
+  have hex
+      : ∃ x ∈ I, ∃ y ∈ J⁻¹, ∃ u : 𝓞 F, algebraMap (𝓞 F) F u = algebraMap (𝓞 F) F x * y ∧ u ∉ P := by
     by_contra hcon
     push_neg at hcon
     have hle : J * J⁻¹ ≤ (P : FractionalIdeal (𝓞 F)⁰ F) := by
@@ -91,7 +93,9 @@ theorem differentIdeal_principal_in_localSubring :
   have hw' : σ u * (w : Ω) = 1 := congrArg Subtype.val hw
   have key : σ d / σ x = σ v * (w : Ω) := by
     rw [div_eq_iff hσx]
-    calc σ d = σ d * (σ u * (w : Ω)) := by rw [hw', _root_.mul_one]
+    calc
+      σ d
+        = σ d * (σ u * (w : Ω)) := by rw [hw', _root_.mul_one]
       _ = (σ d * σ u) * (w : Ω) := by ring
       _ = σ v * (w : Ω) * σ x := by rw [hrel']; ring
   rw [key]

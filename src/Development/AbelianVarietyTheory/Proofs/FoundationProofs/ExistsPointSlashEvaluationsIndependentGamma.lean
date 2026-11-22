@@ -24,10 +24,12 @@ def evHom (Γ : Subgroup SL(2, ℤ)) (x : SL(2, ℤ)) (τ : ℍ) : mfMonoid Γ �
   toFun p := (p.1.2 ∣[Multiplicative.toAdd p.1.1] x) τ
   map_one' := by
     show ((1 : ℍ → ℂ) ∣[Multiplicative.toAdd (1 : Multiplicative ℤ)] x) τ = 1
-    rw [toAdd_one, ModularForm.is_invariant_one]; rfl
+    rw [toAdd_one, ModularForm.is_invariant_one]
+    rfl
   map_mul' p q := by
     show ((p.1.2 * q.1.2) ∣[Multiplicative.toAdd (p.1.1 * q.1.1)] x) τ = _
-    rw [toAdd_mul, ModularForm.mul_slash_SL2]; rfl
+    rw [toAdd_mul, ModularForm.mul_slash_SL2]
+    rfl
 
 open UpperHalfPlane Filter in
 open ModularForm (E₄ E₆) in
@@ -52,16 +54,28 @@ private lemma dense_setOf_ne_zero_of_mdifferentiable_of_ne_zero {D : ℍ → ℂ
   funext σ
   simpa using hall σ.im_pos
 
-
 open UpperHalfPlane Filter in
 open ModularForm (E₄ E₆) in
 open scoped MatrixGroups ModularForm Manifold Topology in
-theorem _root_.GlobalTheory.CosetEval.evals_independent : ∀ M : ℕ, 0 < M → (∀ x : SL(2, ℤ), x ∉ CongruenceSubgroup.Gamma M → ∃ (k : ℤ) (f : ℍ → ℂ), _root_.GlobalTheory.OddFrame.IsMF (CongruenceSubgroup.Gamma M) k f ∧ f ∣[k] x ≠ f) → ∃ τ₀ : ℍ, ∀ (ι : Type) [Fintype ι] (x : ι → SL(2, ℤ)) (c : ι → ℂ), (∀ i j, x i * (x j)⁻¹ ∈ CongruenceSubgroup.Gamma M → i = j) → (∀ (k : ℤ) (f : ℍ → ℂ), _root_.GlobalTheory.OddFrame.IsMF (CongruenceSubgroup.Gamma M) k f → ∑ i, c i * (f ∣[k] x i) τ₀ = 0) → c = 0 := by
+theorem _root_.GlobalTheory.CosetEval.evals_independent
+    : ∀ M : ℕ,
+      0 < M
+        → (∀ x : SL(2, ℤ),
+          x ∉ CongruenceSubgroup.Gamma M
+            → ∃ (k : ℤ) (f : ℍ → ℂ),
+              _root_.GlobalTheory.OddFrame.IsMF (CongruenceSubgroup.Gamma M) k f ∧ f ∣[k] x ≠ f)
+        → ∃ τ₀ : ℍ, ∀ (ι : Type) [Fintype ι] (x : ι → SL(2, ℤ)) (c : ι → ℂ),
+          (∀ i j, x i * (x j)⁻¹ ∈ CongruenceSubgroup.Gamma M → i = j)
+            → (∀ (k : ℤ) (f : ℍ → ℂ),
+              _root_.GlobalTheory.OddFrame.IsMF (CongruenceSubgroup.Gamma M) k f
+                → ∑ i, c i * (f ∣[k] x i) τ₀ = 0)
+            → c = 0 := by
   intro M _ hsep
   classical
-  have hsep' : ∀ p : SL(2, ℤ) × SL(2, ℤ), ∃ (k : ℤ) (f : ℍ → ℂ),
-      _root_.GlobalTheory.OddFrame.IsMF (CongruenceSubgroup.Gamma M) k f ∧
-      (p.1 * p.2⁻¹ ∉ CongruenceSubgroup.Gamma M → f ∣[k] p.1 ≠ f ∣[k] p.2) := by
+  have hsep'
+      : ∀ p : SL(2, ℤ) × SL(2, ℤ), ∃ (k : ℤ) (f : ℍ → ℂ),
+        _root_.GlobalTheory.OddFrame.IsMF (CongruenceSubgroup.Gamma M) k f
+          ∧ (p.1 * p.2⁻¹ ∉ CongruenceSubgroup.Gamma M → f ∣[k] p.1 ≠ f ∣[k] p.2) := by
     intro p
     by_cases hp : p.1 * p.2⁻¹ ∈ CongruenceSubgroup.Gamma M
     · exact ⟨0, 0, _root_.GlobalTheory.OddFrame.IsMF.zero _ _, fun h => absurd hp h⟩
@@ -69,8 +83,8 @@ theorem _root_.GlobalTheory.CosetEval.evals_independent : ∀ M : ℕ, 0 < M →
       refine ⟨k, f, hf, fun _ heq => hne ?_⟩
       have := congrArg (fun g => g ∣[k] p.2⁻¹) heq
 
-      rwa [← SlashAction.slash_mul, ← SlashAction.slash_mul, mul_inv_cancel,
-        SlashAction.slash_one] at this
+      rwa [← SlashAction.slash_mul, ← SlashAction.slash_mul, mul_inv_cancel, SlashAction.slash_one]
+        at this
   choose k f hf hne using hsep'
   set O : SL(2, ℤ) × SL(2, ℤ) → Set ℍ := fun p =>
     {_τ | p.1 * p.2⁻¹ ∈ CongruenceSubgroup.Gamma M} ∪
@@ -84,7 +98,8 @@ theorem _root_.GlobalTheory.CosetEval.evals_independent : ∀ M : ℕ, 0 < M →
     by_cases hp : p.1 * p.2⁻¹ ∈ CongruenceSubgroup.Gamma M
     · exact dense_univ.mono fun τ _ => Or.inl hp
     · have hD : MDiff (f p ∣[k p] p.1 - f p ∣[k p] p.2) :=
-        (_root_.GlobalTheory.OddFrame.mdiff_slash (hf p).2.1 _ _).sub (_root_.GlobalTheory.OddFrame.mdiff_slash (hf p).2.1 _ _)
+        (_root_.GlobalTheory.OddFrame.mdiff_slash (hf p).2.1 _ _).sub
+          (_root_.GlobalTheory.OddFrame.mdiff_slash (hf p).2.1 _ _)
       refine (dense_setOf_ne_zero_of_mdifferentiable_of_ne_zero hD
         (fun h0 => hne p hp (sub_eq_zero.1 h0))).mono fun τ hτ => Or.inr ?_
       exact sub_ne_zero.1 hτ
@@ -92,8 +107,8 @@ theorem _root_.GlobalTheory.CosetEval.evals_independent : ∀ M : ℕ, 0 < M →
   haveI : Countable SL(2, ℤ) := Subtype.countable
   obtain ⟨τ₀, hτ₀⟩ := (dense_iInter_of_isOpen hOopen hOdense).nonempty
   refine ⟨τ₀, fun ι _ x c hx hc => ?_⟩
-  let χ : ι → (_root_.GlobalTheory.CosetEval.mfMonoid (CongruenceSubgroup.Gamma M) →* ℂ) :=
-    fun i => _root_.GlobalTheory.CosetEval.evHom (CongruenceSubgroup.Gamma M) (x i) τ₀
+  let χ : ι → (_root_.GlobalTheory.CosetEval.mfMonoid (CongruenceSubgroup.Gamma M) →* ℂ) := fun i =>
+    _root_.GlobalTheory.CosetEval.evHom (CongruenceSubgroup.Gamma M) (x i) τ₀
   have hinj : Function.Injective χ := by
     intro i j hij
     by_contra hij'
@@ -102,7 +117,9 @@ theorem _root_.GlobalTheory.CosetEval.evals_independent : ∀ M : ℕ, 0 < M →
     · exact hnot h
     · exact h (DFunLike.congr_fun hij
         ⟨(Multiplicative.ofAdd (k (x i, x j)), f (x i, x j)), hf (x i, x j)⟩)
-  have hli := (linearIndependent_monoidHom (_root_.GlobalTheory.CosetEval.mfMonoid (CongruenceSubgroup.Gamma M)) ℂ).comp χ hinj
+  have hli :=
+    (linearIndependent_monoidHom
+      (_root_.GlobalTheory.CosetEval.mfMonoid (CongruenceSubgroup.Gamma M)) ℂ).comp χ hinj
   funext i
   refine Fintype.linearIndependent_iff.1 hli c ?_ i
   funext p

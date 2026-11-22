@@ -10,8 +10,11 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.WeightedGaugeFactors.F
 
 namespace GlobalTheory.GapIn
 
-theorem hyp_of_uniqGap : GlobalTheory.GapIn.UniqGap → GlobalTheory.GapIn.Hyp :=
-  fun h => ⟨CompanionTheory.PieriExpansion.hypsG_of_zuck CompanionTheory.Zuck.zuckerman_gap, h, Formalism.L2.SG.OwnFacts.factMultOne.out,
-    Formalism.L2.SG.OwnFacts.FD.factDsigHC.out⟩
+theorem hyp_of_uniqGap : GlobalTheory.GapIn.UniqGap → GlobalTheory.GapIn.Hyp := fun h => ⟨
+  CompanionTheory.PieriExpansion.hypsG_of_zuck CompanionTheory.Zuck.zuckerman_gap,
+  h,
+  Formalism.L2.SG.OwnFacts.factMultOne.out,
+  Formalism.L2.SG.OwnFacts.FD.factDsigHC.out
+⟩
 
 end GlobalTheory.GapIn

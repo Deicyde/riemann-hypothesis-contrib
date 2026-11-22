@@ -20,12 +20,16 @@ theorem interlaces_of_OK (P : M.Par) (hOK : P.OK) : I.Interlaces P.k P.u P.u' P.
   · have := le_max_left (P.u (i + 1)) (P.u' (i + 1)); linarith
   · have := le_max_right (P.u (i + 1)) (P.u' (i + 1)); linarith
 
-theorem den_core (k : ℕ) (u u' ρ : ℕ → ℝ) (l : ℕ) (Y : ℝ) (hl1 : 1 ≤ l) (hlk : l ≤ k)
-    (h : I.Interlaces k u u' ρ) (hA : u l + 2 ≤ -Y ∧ -Y ≤ u' l - 2) :
-    ∀ i, 1 ≤ i → i ≤ k → 1 ≤ |Y + 1 / 2 + u i| ∧ 1 ≤ |Y + 1 / 2 + u' i| := by
-  have hu := Formalism.FourierDecayAlt.P.Interlace.antitone_on (Formalism.FourierDecayAlt.P.Interlace.u_step h)
-  have hu' := Formalism.FourierDecayAlt.P.Interlace.antitone_on
-    (Formalism.FourierDecayAlt.P.Interlace.u_step (Formalism.FourierDecayAlt.P.Interlace.interlaces_swap h))
+theorem den_core
+    (k : ℕ) (u u' ρ : ℕ → ℝ) (l : ℕ) (Y : ℝ)
+    (hl1 : 1 ≤ l) (hlk : l ≤ k) (h : I.Interlaces k u u' ρ) (hA : u l + 2 ≤ -Y ∧ -Y ≤ u' l - 2)
+    : ∀ i, 1 ≤ i → i ≤ k → 1 ≤ |Y + 1 / 2 + u i| ∧ 1 ≤ |Y + 1 / 2 + u' i| := by
+  have hu :=
+    Formalism.FourierDecayAlt.P.Interlace.antitone_on (Formalism.FourierDecayAlt.P.Interlace.u_step
+      h)
+  have hu' :=
+    Formalism.FourierDecayAlt.P.Interlace.antitone_on (Formalism.FourierDecayAlt.P.Interlace.u_step
+      (Formalism.FourierDecayAlt.P.Interlace.interlaces_swap h))
   intro i hi1 hik
   rcases lt_trichotomy i l with hil | rfl | hil
   · obtain ⟨a, b, c, d⟩ := h i (mem_Icc.2 ⟨hi1, by omega⟩)
@@ -37,22 +41,26 @@ theorem den_core (k : ℕ) (u u' ρ : ℕ → ℝ) (l : ℕ) (Y : ℝ) (hl1 : 1 
     have h1 := hu l j hl1 (by omega) (by omega)
     exact ⟨le_abs.2 (Or.inr (by linarith)), le_abs.2 (Or.inr (by linarith))⟩
 
-theorem den_onCut (k : ℕ) (u u' ρ : ℕ → ℝ) (l : ℕ) (Y : ℝ) (hl1 : 1 ≤ l) (hlk : l ≤ k)
-    (h : I.Interlaces k u u' ρ) (hc : I.OnCut u u' l Y) :
-    ∀ i, 1 ≤ i → i ≤ k → 1 ≤ |Y + 1 / 2 + u i| ∧ 1 ≤ |Y + 1 / 2 + u' i| := by
+theorem den_onCut
+    (k : ℕ) (u u' ρ : ℕ → ℝ) (l : ℕ) (Y : ℝ)
+    (hl1 : 1 ≤ l) (hlk : l ≤ k) (h : I.Interlaces k u u' ρ) (hc : I.OnCut u u' l Y)
+    : ∀ i, 1 ≤ i → i ≤ k → 1 ≤ |Y + 1 / 2 + u i| ∧ 1 ≤ |Y + 1 / 2 + u' i| := by
   rcases hc with hA | hB
   · exact den_core k u u' ρ l Y hl1 hlk h hA
   · intro i hi1 hik
-    exact (den_core k u' u ρ l Y hl1 hlk (Formalism.FourierDecayAlt.P.Interlace.interlaces_swap h) hB i hi1 hik).symm
+    exact (den_core k u' u ρ l Y hl1 hlk (Formalism.FourierDecayAlt.P.Interlace.interlaces_swap h)
+      hB i hi1 hik).symm
 
-theorem abs_le_of_onCut (u u' : ℕ → ℝ) (l : ℕ) (Y b : ℝ) (hc : I.OnCut u u' l Y) (hu : |u l| ≤ b)
-    (hu' : |u' l| ≤ b) : |Y| ≤ b := by
+theorem abs_le_of_onCut
+    (u u' : ℕ → ℝ) (l : ℕ) (Y b : ℝ) (hc : I.OnCut u u' l Y) (hu : |u l| ≤ b) (hu' : |u' l| ≤ b)
+    : |Y| ≤ b := by
   rw [abs_le] at hu hu' ⊢
   rcases hc with ⟨h1, h2⟩ | ⟨h1, h2⟩ <;> constructor <;> linarith
 
-theorem qpoly_eq_of_pos (k : ℕ) (T T' : ℝ) (u u' : ℕ → ℝ) (Y : ℝ) (hT : 0 < T) (hT' : 0 < T')
-    (hq : 0 < I.qpoly k T T' u u' Y) :
-    I.qpoly k T T' u u' Y = T * T' * ∏ i ∈ Icc 1 k, (|Y + 1 / 2 + u i| * |Y + 1 / 2 + u' i|) := by
+theorem qpoly_eq_of_pos
+    (k : ℕ) (T T' : ℝ) (u u' : ℕ → ℝ) (Y : ℝ)
+    (hT : 0 < T) (hT' : 0 < T') (hq : 0 < I.qpoly k T T' u u' Y)
+    : I.qpoly k T T' u u' Y = T * T' * ∏ i ∈ Icc 1 k, (|Y + 1 / 2 + u i| * |Y + 1 / 2 + u' i|) := by
   rw [← abs_of_pos hq]
   unfold I.qpoly
   rw [abs_mul, abs_neg, abs_of_pos (mul_pos hT hT'), Finset.abs_prod]
@@ -66,8 +74,11 @@ structure LamData (P : M.Par) (lam : ℕ → ℝ) (c g b : ℝ) : Prop where
   b_ge_c : c + 2 ≤ b
   lam_le : ∀ s, 1 ≤ s → s ≤ P.k + 2 * P.r + 1 → |lam s| ≤ b
   gap : ∀ s, 1 ≤ s → s + 1 ≤ P.k - 1 → lam (s + 1) + g ≤ lam s
-  inter : ∀ s, 1 ≤ s → s ≤ P.k - 1 →
-    (lam s + 1 / 2 ≤ P.u s ∧ P.u (s + 1) ≤ lam s - 1 / 2) ∧ (lam s + 1 / 2 ≤ P.u' s ∧ P.u' (s + 1) ≤ lam s - 1 / 2)
+  inter
+    : ∀ s,
+      1 ≤ s → s ≤ P.k - 1
+        → (lam s + 1 / 2 ≤ P.u s ∧ P.u (s + 1) ≤ lam s - 1 / 2)
+          ∧ (lam s + 1 / 2 ≤ P.u' s ∧ P.u' (s + 1) ≤ lam s - 1 / 2)
   u_le : ∀ i, 1 ≤ i → i ≤ P.k → |P.u i| ≤ b ∧ |P.u' i| ≤ b
 
 end CompanionTheory.WaveGrid

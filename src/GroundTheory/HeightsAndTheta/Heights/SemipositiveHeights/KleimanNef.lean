@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.ForSecondHalf
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 open GroundTheory.Heights₂.Heights.HilbertSamuel.NefAmpleFibreAlt
 
 noncomputable section
@@ -21,30 +22,31 @@ namespace KleimanNef
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem isMultiProjPrime_map_red (p : ℕ) {V : Ideal (MRing ι)} (hV : IsMultiProjPrime V)
-    (hp : ((p : ℕ) : MRing ι) ∈ V) : IsMultiProjPrime (V.map (red p)) := by
+theorem isMultiProjPrime_map_red
+    (p : ℕ) {V : Ideal (MRing ι)} (hV : IsMultiProjPrime V) (hp : ((p : ℕ) : MRing ι) ∈ V)
+    : IsMultiProjPrime (V.map (red p)) := by
   have : V.IsPrime := hV.1
-  refine ⟨Ideal.map_isPrime_of_surjective (red_surjective p) (ker_red_le p hp),
-    isMultiHomogIdeal_map _ hV.2.1, fun k => ?_⟩
+  refine ⟨
+    Ideal.map_isPrime_of_surjective (red_surjective p) (ker_red_le p hp),
+    isMultiHomogIdeal_map _ hV.2.1,
+    fun k => ?_
+  ⟩
   obtain ⟨i, hi⟩ := hV.2.2 k
   refine ⟨i, fun h => hi ?_⟩
-  have h' : red p (X ⟨k, i⟩ : MRing ι) ∈ V.map (red p) := by
-    simpa only [red, map_X] using h
+  have h' : red p (X ⟨k, i⟩ : MRing ι) ∈ V.map (red p) := by simpa only [red, map_X] using h
   exact (mem_map_red_iff p hp _).1 h'
-
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
 theorem charOf_mem (W : Ideal (MRing ι)) : ((charOf W : ℕ) : MRing ι) ∈ W := by
   have hg := Submodule.IsPrincipal.generator_mem (W.comap (C : ℤ →+* MRing ι))
-  have hdvd : Submodule.IsPrincipal.generator (W.comap (C : ℤ →+* MRing ι)) ∣
-      ((charOf W : ℕ) : ℤ) := Int.dvd_natAbs.mpr dvd_rfl
-  have hmem : ((charOf W : ℕ) : ℤ) ∈ W.comap (C : ℤ →+* MRing ι) :=
-    Ideal.mem_of_dvd _ hdvd hg
+  have hdvd
+      : Submodule.IsPrincipal.generator (W.comap (C : ℤ →+* MRing ι)) ∣ ((charOf W : ℕ) : ℤ) :=
+    Int.dvd_natAbs.mpr dvd_rfl
+  have hmem : ((charOf W : ℕ) : ℤ) ∈ W.comap (C : ℤ →+* MRing ι) := Ideal.mem_of_dvd _ hdvd hg
   rw [Ideal.mem_comap, map_natCast] at hmem
   exact hmem
 
 end KleimanNef
-
 
 open KleimanNef in
 theorem KleimanNef.proof (hF : KH.KleimanNefFStatement) : KH.KleimanNefIntersectionNonneg := by

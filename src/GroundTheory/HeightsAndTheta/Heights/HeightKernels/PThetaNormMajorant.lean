@@ -28,8 +28,9 @@ theorem ThetaNormMajorant.proof (h : ThetaSummandNorm.Statement) : ThetaNormMajo
   set z : Fin g → ℂ := periodMatrix X Y *ᵥ (fun i => (u₁ i : ℂ)) + fun i => (u₂ i : ℂ) with hz
   set E : ℝ := exp (-π * qf Y u₁) with hE
   have hEpos : 0 < E := exp_pos _
-  have hterm : ∀ k : Fin g → ℤ,
-      ‖thetaSummand X Y a b z k‖ = exp (-π * qf Y (intVec k + a + u₁)) * E⁻¹ := by
+  have hterm
+      : ∀ k : Fin g → ℤ,
+        ‖thetaSummand X Y a b z k‖ = exp (-π * qf Y (intVec k + a + u₁)) * E⁻¹ := by
     intro k
     rw [← h g X Y a b u₁ u₂ k hS, mul_inv_cancel_right₀ hEpos.ne']
   have hG : Summable fun k : Fin g → ℤ => exp (-π * qf Y (intVec k + a + u₁)) := by
@@ -40,12 +41,13 @@ theorem ThetaNormMajorant.proof (h : ThetaSummandNorm.Statement) : ThetaNormMajo
     exact hG.mul_right _
   have hN : thetaNorm X Y a b u₁ u₂ = ‖∑' k, thetaSummand X Y a b z k‖ * E := rfl
   rw [hN]
-  calc ‖∑' k, thetaSummand X Y a b z k‖ * E
-      ≤ (∑' k, ‖thetaSummand X Y a b z k‖) * E :=
-        mul_le_mul_of_nonneg_right (norm_tsum_le_tsum_norm hsum) hEpos.le
+  calc
+    ‖∑' k, thetaSummand X Y a b z k‖ * E ≤ (∑' k, ‖thetaSummand X Y a b z k‖) * E :=
+      mul_le_mul_of_nonneg_right (norm_tsum_le_tsum_norm hsum) hEpos.le
     _ = ∑' k, ‖thetaSummand X Y a b z k‖ * E := (tsum_mul_right).symm
     _ = ∑' k : Fin g → ℤ, exp (-π * qf Y (intVec k + a + u₁)) := by
-        congr 1; funext k
-        rw [hterm, inv_mul_cancel_right₀ hEpos.ne']
+      congr 1
+      funext k
+      rw [hterm, inv_mul_cancel_right₀ hEpos.ne']
 
 end GroundTheory.Heights₂.Heights

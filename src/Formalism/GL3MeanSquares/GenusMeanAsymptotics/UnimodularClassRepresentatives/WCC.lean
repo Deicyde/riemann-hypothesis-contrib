@@ -13,21 +13,26 @@ namespace Formalism.HermitianLattices.Ext.L3.WCC
 open WCA WCB
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 local notation "ι" => algebraMap (𝓞 F) (𝓞 K)
 local notation "κ" => algebraMap (𝓞 K) K
 
-theorem core (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
-    (han : ∀ x, h x x = 0 → x = 0) {A : Submodule (𝓞 K) V} (hA : Formalism.HermitianLatticesTheory.IsIntegralLat h A)
-    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) {v : ℕ} (hv : n ∉ 𝔭 ^ (v + 1))
-    {x y : V} (hx : InL 𝔭 A 0 x)
-    (hxx : h x x = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) n))
+theorem core
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (han : ∀ x, h x x = 0 → x = 0)
+    {A : Submodule (𝓞 K) V} (hA : Formalism.HermitianLatticesTheory.IsIntegralLat h A)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {n : 𝓞 F} (hn : n ≠ 0)
+    {v : ℕ} (hv : n ∉ 𝔭 ^ (v + 1))
+    {x y : V} (hx : InL 𝔭 A 0 x) (hxx : h x x = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) n))
     (hyy : h y y = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) n))
-    {J : ℕ} (hJ : 1 ≤ J) (hw : InL 𝔭 A (v + (v + J)) (y - x)) :
-    ∃ g ∈ Formalism.HermitianLatticesTheory.isom h, (∀ z, InL 𝔭 A 0 z → InL 𝔭 A J (g z - z)) ∧
-      (∀ z, InL 𝔭 A 0 z → InL 𝔭 A 0 (g.symm z)) ∧ g x = y := by
+    {J : ℕ} (hJ : 1 ≤ J) (hw : InL 𝔭 A (v + (v + J)) (y - x))
+    : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h,
+      (∀ z, InL 𝔭 A 0 z → InL 𝔭 A J (g z - z)) ∧ (∀ z, InL 𝔭 A 0 z → InL 𝔭 A 0 (g.symm z))
+        ∧ g x = y := by
   classical
   have hp : 𝔭.IsPrime := h𝔭.isPrime
   obtain ⟨θ₀, hθ₀⟩ := idealPowerSpanBounds.exists_theta hK hF h𝔭
@@ -35,8 +40,8 @@ theorem core (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K
   have hconj : κ (conjO K θ₀) = star (κ θ₀) := rfl
   set δ : K := κ θ₀ - star (κ θ₀) with hδ
   have hδe : InI 𝔭 1 (δ * κ e - 1) := by
-    refine ⟨1, fun h1 => h𝔭.ne_top ((Ideal.eq_top_iff_one _).2 h1),
-      (θ₀ - conjO K θ₀) * e - 1, he, ?_⟩
+    refine
+      ⟨1, fun h1 => h𝔭.ne_top ((Ideal.eq_top_iff_one _).2 h1), (θ₀ - conjO K θ₀) * e - 1, he, ?_⟩
     simp only [map_sub, map_mul, map_one, hδ, hconj, one_mul]
   obtain ⟨hne, hinv⟩ := InI.unit h𝔭 hF hδe
   have hδe' : 1 + (δ * κ e - 1) = δ * κ e := by ring
@@ -96,8 +101,7 @@ theorem core (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K
   have hc0 : c ≠ 0 := by
     rw [hc]
     exact mul_ne_zero hn0 hne'
-  have hcinv : c⁻¹ = (1 + ε)⁻¹ * (κ (ι n))⁻¹ := by
-    rw [hc, mul_inv, mul_comm]
+  have hcinv : c⁻¹ = (1 + ε)⁻¹ * (κ (ι n))⁻¹ := by rw [hc, mul_inv, mul_comm]
   set w : V := c⁻¹ • d with hw_def
   have hwv : InL 𝔭 A (v + J) w := by
     rw [hw_def, hcinv, mul_smul]
@@ -109,8 +113,7 @@ theorem core (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K
     have h1 : InI 𝔭 (v + (v + J)) (h d z₀) := (InL.form hp hF hA hw hz₀L).mono (by omega)
     have h2 := InI.div h𝔭 hn hv (InI.div h𝔭 hn hv h1)
     have h3 := InI.mul hp hinv' (InI.mul hp hinv' h2)
-    have h4 : θ = (1 + ε)⁻¹ * ((1 + ε)⁻¹ *
-        ((κ (ι n))⁻¹ * ((κ (ι n))⁻¹ * h d z₀))) := by
+    have h4 : θ = (1 + ε)⁻¹ * ((1 + ε)⁻¹ * ((κ (ι n))⁻¹ * ((κ (ι n))⁻¹ * h d z₀))) := by
       rw [hθ_def, hcinv]
       ring
     rw [h4]
@@ -130,8 +133,7 @@ theorem core (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K
     rw [hY_def, WCB.skewY_apply]
     have hcc : c * c⁻¹ = 1 := mul_inv_cancel₀ hc0
     have hcoef : θ * c - h w z₀ = 0 := by
-      rw [hw_def, LinearMap.map_smulₛₗ₂, starRingEnd_apply, star_inv₀,
-        hcstar, smul_eq_mul, hθ_def]
+      rw [hw_def, LinearMap.map_smulₛₗ₂, starRingEnd_apply, star_inv₀, hcstar, smul_eq_mul, hθ_def]
       linear_combination c⁻¹ * h d z₀ * hcc
     rw [hcoef, zero_smul, zero_add, hw_def, smul_smul, hcc, one_smul]
   obtain ⟨g, hg, hgz, hs1, hs2⟩ := WCB.exists_cayley han hY hl
@@ -151,11 +153,10 @@ theorem core (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K
       rw [neg_smul, sub_neg_eq_add]
       exact hz'
     have hz'L := WCB.mem_of_resolvent h𝔭 hF hA hz₀L hw1 hθ1 (InI.neg hl0) hz hz''
-    have hgs : g.symm z = z' - star l • Y z' := by
-      rw [LinearEquiv.symm_apply_eq, hgz, hz']
+    have hgs : g.symm z = z' - star l • Y z' := by rw [LinearEquiv.symm_apply_eq, hgz, hz']
     rw [hgs]
-    exact InL.sub hp hz'L ((InL.smul hp hls0 (WCB.skewY_mem hp hF hA hz₀L hwJ hθJ hz'L)).mono
-      (by omega))
+    exact InL.sub hp hz'L
+      ((InL.smul hp hls0 (WCB.skewY_mem hp hF hA hz₀L hwJ hθJ hz'L)).mono (by omega))
   · have hx' : z₀ - star l • Y z₀ = x := by
       rw [hYz, hz₀]
       abel

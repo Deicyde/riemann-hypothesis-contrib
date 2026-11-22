@@ -10,12 +10,15 @@ open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 
 namespace GlobalTheory.AnalyticVec
 
-theorem map_flow_eq_zero {V E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [NormedAddCommGroup F] [NormedSpace ℝ F] [CompleteSpace F]
+theorem map_flow_eq_zero
+    {V E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [NormedAddCommGroup F]
+    [NormedSpace ℝ F] [CompleteSpace F]
     (ι : V → E) (a : V → V) (U : ℝ → E →L[ℝ] E) (h0 : U 0 = 1) (hadd : ∀ s t, U (s + t) = U s * U t)
     (hder : ∀ v, HasDerivAt (fun t : ℝ => U t (ι v)) (ι (a v)) 0)
     (han : ∀ v, AnalyticOnNhd ℝ (fun t : ℝ => U t (ι v)) Set.univ)
-    (L : E →L[ℝ] F) (hL : ∀ v, L (ι v) = 0) (v : V) (t : ℝ) : L (U t (ι v)) = 0 := by
+    (L : E →L[ℝ] F) (hL : ∀ v, L (ι v) = 0)
+    (v : V) (t : ℝ)
+    : L (U t (ι v)) = 0 := by
   have hd : ∀ w s, HasDerivAt (fun r : ℝ => U r (ι w)) (U s (ι (a w))) s := by
     intro w s
     have e : (fun r : ℝ => U r (ι w)) = fun r => U s (U (r - s) (ι w)) := by
@@ -42,8 +45,8 @@ theorem map_flow_eq_zero {V E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ
         funext r
         exact (L.hasFDerivAt.comp_hasDerivAt r (hd w r)).deriv
       rw [hD, ih (a w), Function.iterate_succ_apply]
-  have hf : AnalyticOnNhd ℝ (fun r : ℝ => L (U r (ι v))) Set.univ :=
-    fun r _ => (L.analyticAt _).comp (han v r (Set.mem_univ r))
+  have hf : AnalyticOnNhd ℝ (fun r : ℝ => L (U r (ι v))) Set.univ := fun r _ =>
+    (L.analyticAt _).comp (han v r (Set.mem_univ r))
   obtain ⟨p, hp⟩ := hf 0 (Set.mem_univ 0)
   have hc : ∀ n, p.coeff n = 0 := by
     intro n
@@ -62,28 +65,34 @@ theorem map_flow_eq_zero {V E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ
     rfl
   rw [hp0] at hp
   have hev : (fun r : ℝ => L (U r (ι v))) =ᶠ[nhds 0] 0 := HasFPowerSeriesAt.eventually_eq_zero hp
-  have := hf.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ 0) hev
-    (Set.mem_univ t)
+  have :=
+    hf.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ 0) hev
+      (Set.mem_univ t)
   simpa using this
 
-private theorem eventually_abs_le_half_add_of_doubling_bounds {p q : ℕ} (T : GrpData p q) (π₁ π₂ : URep T) (M : GKMod p q)
-    (j₁ : M.V →ₗ[ℂ] π₁.H) (j₂ : M.V →ₗ[ℂ] π₂.H) (Y : Mat p q) (hY : Y ∈ upq p q)
+private theorem eventually_abs_le_half_add_of_doubling_bounds
+    {p q : ℕ} (T : GrpData p q) (π₁ π₂ : URep T) (M : GKMod p q) (j₁ : M.V →ₗ[ℂ] π₁.H)
+    (j₂ : M.V →ₗ[ℂ] π₂.H) (Y : Mat p q) (hY : Y ∈ upq p q)
     (hd1 : ∀ x, HasDerivAt (fun t : ℝ => π₁.π (T.expt (t • Y)) (j₁ x)) (j₁ (M.act Y x)) 0)
     (hd2 : ∀ x, HasDerivAt (fun t : ℝ => π₂.π (T.expt (t • Y)) (j₂ x)) (j₂ (M.act Y x)) 0)
     (ha1 : ∀ x, AnalyticOnNhd ℝ (fun t : ℝ => π₁.π (T.expt (t • Y)) (j₁ x)) Set.univ)
-    (ha2 : ∀ x, AnalyticOnNhd ℝ (fun t : ℝ => π₂.π (T.expt (t • Y)) (j₂ x)) Set.univ)
-    (h : T.G) (hh : ∀ x y, inner ℂ (j₁ x) (π₁.π h (j₁ y)) = inner ℂ (j₂ x) (π₂.π h (j₂ y)))
-    (t : ℝ) : ∀ x y, inner ℂ (j₁ x) (π₁.π (h * T.expt (t • Y)) (j₁ y)) =
-      inner ℂ (j₂ x) (π₂.π (h * T.expt (t • Y)) (j₂ y)) := by
+    (ha2 : ∀ x, AnalyticOnNhd ℝ (fun t : ℝ => π₂.π (T.expt (t • Y)) (j₂ x)) Set.univ) (h : T.G)
+    (hh : ∀ x y, inner ℂ (j₁ x) (π₁.π h (j₁ y)) = inner ℂ (j₂ x) (π₂.π h (j₂ y)))
+    (t : ℝ)
+    : ∀ x y,
+      inner ℂ (j₁ x) (π₁.π (h * T.expt (t • Y)) (j₁ y))
+        = inner ℂ (j₂ x) (π₂.π (h * T.expt (t • Y)) (j₂ y)) := by
   intro x y
   let U : ℝ → (π₁.H × π₂.H) →L[ℝ] (π₁.H × π₂.H) := fun s =>
     ((π₁.π (T.expt (s • Y))).restrictScalars ℝ).prodMap ((π₂.π (T.expt (s • Y))).restrictScalars ℝ)
   let L : (π₁.H × π₂.H) →L[ℝ] ℂ :=
-    (((innerSL ℂ (j₁ x)).comp (π₁.π h)).restrictScalars ℝ).comp (ContinuousLinearMap.fst ℝ _ _) -
-    (((innerSL ℂ (j₂ x)).comp (π₂.π h)).restrictScalars ℝ).comp (ContinuousLinearMap.snd ℝ _ _)
+    (((innerSL ℂ (j₁ x)).comp (π₁.π h)).restrictScalars ℝ).comp (ContinuousLinearMap.fst ℝ _ _)
+      - (((innerSL ℂ (j₂ x)).comp (π₂.π h)).restrictScalars ℝ).comp (ContinuousLinearMap.snd ℝ _ _)
   have key := map_flow_eq_zero (fun v => (j₁ v, j₂ v)) (M.act Y) U ?_ ?_ ?_ ?_ L ?_ y t
-  · have e : L (U t (j₁ y, j₂ y)) = inner ℂ (j₁ x) (π₁.π (h * T.expt (t • Y)) (j₁ y)) -
-        inner ℂ (j₂ x) (π₂.π (h * T.expt (t • Y)) (j₂ y)) := by
+  · have e
+        : L (U t (j₁ y, j₂ y))
+          = inner ℂ (j₁ x) (π₁.π (h * T.expt (t • Y)) (j₁ y))
+            - inner ℂ (j₂ x) (π₂.π (h * T.expt (t • Y)) (j₂ y)) := by
       simp [L, U, map_mul]
     rw [e, sub_eq_zero] at key
     exact key
@@ -100,17 +109,32 @@ private theorem eventually_abs_le_half_add_of_doubling_bounds {p q : ℕ} (T : G
   · intro v
     simp [L, hh]
 
-theorem inner_apply_eq_of_analytic : ∀ (p q : ℕ) (T : GrpData p q), Subgroup.closure (T.expt '' upq p q) = ⊤ → ∀ (π₁ π₂ : URep T) (M : GKMod p q) (j₁ : M.V →ₗ[ℂ] π₁.H) (j₂ : M.V →ₗ[ℂ] π₂.H), (∀ Y ∈ upq p q, ∀ x, HasDerivAt (fun t : ℝ => π₁.π (T.expt (t • Y)) (j₁ x)) (j₁ (M.act Y x)) 0) → (∀ Y ∈ upq p q, ∀ x, HasDerivAt (fun t : ℝ => π₂.π (T.expt (t • Y)) (j₂ x)) (j₂ (M.act Y x)) 0) → (∀ Y ∈ upq p q, ∀ x, AnalyticOnNhd ℝ (fun t : ℝ => π₁.π (T.expt (t • Y)) (j₁ x)) Set.univ) → (∀ Y ∈ upq p q, ∀ x, AnalyticOnNhd ℝ (fun t : ℝ => π₂.π (T.expt (t • Y)) (j₂ x)) Set.univ) → (∀ x y, inner ℂ (j₁ x) (j₁ y) = inner ℂ (j₂ x) (j₂ y)) → ∀ g x y, inner ℂ (j₁ x) (π₁.π g (j₁ y)) = inner ℂ (j₂ x) (π₂.π g (j₂ y)) := by
+theorem inner_apply_eq_of_analytic
+    : ∀ (p q : ℕ) (T : GrpData p q),
+      Subgroup.closure (T.expt '' upq p q) = ⊤
+        → ∀ (π₁ π₂ : URep T) (M : GKMod p q) (j₁ : M.V →ₗ[ℂ] π₁.H) (j₂ : M.V →ₗ[ℂ] π₂.H),
+          (∀ Y ∈ upq p q, ∀ x,
+              HasDerivAt (fun t : ℝ => π₁.π (T.expt (t • Y)) (j₁ x)) (j₁ (M.act Y x)) 0)
+            → (∀ Y ∈ upq p q, ∀ x,
+              HasDerivAt (fun t : ℝ => π₂.π (T.expt (t • Y)) (j₂ x)) (j₂ (M.act Y x)) 0)
+            → (∀ Y ∈ upq p q, ∀ x,
+              AnalyticOnNhd ℝ (fun t : ℝ => π₁.π (T.expt (t • Y)) (j₁ x)) Set.univ)
+            → (∀ Y ∈ upq p q, ∀ x,
+              AnalyticOnNhd ℝ (fun t : ℝ => π₂.π (T.expt (t • Y)) (j₂ x)) Set.univ)
+            → (∀ x y, inner ℂ (j₁ x) (j₁ y) = inner ℂ (j₂ x) (j₂ y))
+            → ∀ g x y, inner ℂ (j₁ x) (π₁.π g (j₁ y)) = inner ℂ (j₂ x) (π₂.π g (j₂ y)) := by
   intro p q T hT π₁ π₂ M j₁ j₂ hd1 hd2 ha1 ha2 hiso
-  let Q : T.G → Prop := fun h => ∀ x y, inner ℂ (j₁ x) (π₁.π h (j₁ y)) = inner ℂ (j₂ x) (π₂.π h (j₂ y))
-  let S : Subgroup T.G :=
-    { carrier := {g | ∀ h, Q h ↔ Q (h * g)}
-      mul_mem' := fun {a b} ha hb h => (ha h).trans (by rw [hb (h * a), mul_assoc])
-      one_mem' := fun h => by rw [mul_one]
-      inv_mem' := fun {g} hg h => by
-        have e := hg (h * g⁻¹)
-        rw [inv_mul_cancel_right] at e
-        exact e.symm }
+  let Q : T.G → Prop := fun h =>
+    ∀ x y, inner ℂ (j₁ x) (π₁.π h (j₁ y)) = inner ℂ (j₂ x) (π₂.π h (j₂ y))
+  let S : Subgroup T.G := {
+    carrier := {g | ∀ h, Q h ↔ Q (h * g)}
+    mul_mem' := fun {a b} ha hb h => (ha h).trans (by rw [hb (h * a), mul_assoc])
+    one_mem' := fun h => by rw [mul_one]
+    inv_mem' := fun {g} hg h => by
+      have e := hg (h * g⁻¹)
+      rw [inv_mul_cancel_right] at e
+      exact e.symm
+  }
   have hle : Subgroup.closure (T.expt '' upq p q) ≤ S := by
     rw [Subgroup.closure_le]
     rintro _ ⟨Y, hY, rfl⟩ h
@@ -120,12 +144,15 @@ theorem inner_apply_eq_of_analytic : ∀ (p q : ℕ) (T : GrpData p q), Subgroup
       exact e1.symm
     constructor
     · intro hh
-      have h2 := eventually_abs_le_half_add_of_doubling_bounds T π₁ π₂ M j₁ j₂ Y hY (hd1 Y hY) (hd2 Y hY) (ha1 Y hY) (ha2 Y hY) h hh 1
+      have h2 :=
+        eventually_abs_le_half_add_of_doubling_bounds T π₁ π₂ M j₁ j₂ Y hY (hd1 Y hY) (hd2 Y hY)
+          (ha1 Y hY) (ha2 Y hY) h hh 1
       rw [one_smul] at h2
       exact h2
     · intro hh
-      have h2 := eventually_abs_le_half_add_of_doubling_bounds T π₁ π₂ M j₁ j₂ Y hY (hd1 Y hY) (hd2 Y hY) (ha1 Y hY) (ha2 Y hY)
-        (h * T.expt Y) hh (-1)
+      have h2 :=
+        eventually_abs_le_half_add_of_doubling_bounds T π₁ π₂ M j₁ j₂ Y hY (hd1 Y hY) (hd2 Y hY)
+          (ha1 Y hY) (ha2 Y hY) (h * T.expt Y) hh (-1)
       rw [mul_assoc, e, mul_one] at h2
       exact h2
   have q1 : Q 1 := by

@@ -5,7 +5,11 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsSmoothVect
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -99,7 +103,9 @@ lemma conjH_cd {H x : Mt n} {q : ℕ} (h : OrthFr H q x) (v : Fin n → ℂ) :
   unfold conjH
   rw [Matrix.mul_assoc, cd_adj h, ← Matrix.mul_assoc, nonsing_inv_mul H hH, Matrix.one_mul]
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {Hm : ι → Mt n} {q : ι → ℕ} {x₀ : ι → Mt n} {w : ι → Fin n → ℤ}
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {Hm : ι → Mt n} {q : ι → ℕ} {x₀ : ι → Mt n} {w : ι → Fin n → ℤ}
 
 omit [Fintype ι] [DecidableEq ι] in
 lemma torEl_add (h : ∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ)) (s s' : ι → Fin n → ℝ) :
@@ -332,31 +338,41 @@ end GlobalTheory.HolDict.TorusLaw
 
 namespace GlobalTheory.HolDict
 
-
 open TorusLaw in
-theorem torus_law_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n) (w : ι → Fin n → ℤ), (∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ)) → ∀ f, SmFn Hm f → KilledFn Hm x₀ w f → ∀ u ∈ UG Hm, ∀ s, f (u * torEl x₀ s) = torCh w s * f u := by
+theorem torus_law_of_killed
+    : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n)
+        (w : ι → Fin n → ℤ),
+      (∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ))
+        → ∀ f,
+          SmFn Hm f → KilledFn Hm x₀ w f
+            → ∀ u ∈ UG Hm, ∀ s, f (u * torEl x₀ s) = torCh w s * f u := by
   intro n ι _ _ Hm q x₀ w h f hs hk u hu s
-  have key : ∀ S : Finset (ι × Fin n), ∀ v ∈ UG Hm,
-      f (v * torEl x₀ (fun τ a => if (τ, a) ∈ S then s τ a else 0)) =
-        torCh w (fun τ a => if (τ, a) ∈ S then s τ a else 0) * f v := by
+  have key
+      : ∀ S : Finset (ι × Fin n), ∀ v ∈ UG Hm,
+        f (v * torEl x₀ (fun τ a => if (τ, a) ∈ S then s τ a else 0))
+          = torCh w (fun τ a => if (τ, a) ∈ S then s τ a else 0) * f v := by
     intro S
     refine Finset.induction_on S ?_ ?_
     · intro v _
-      have h0 : (fun τ a => if ((τ, a) : ι × Fin n) ∈ (∅ : Finset (ι × Fin n)) then s τ a else 0) =
-          (0 : ι → Fin n → ℝ) := by
+      have h0
+          : (fun τ a => if ((τ, a) : ι × Fin n) ∈ (∅ : Finset (ι × Fin n)) then s τ a else 0)
+            = (0 : ι → Fin n → ℝ) := by
         funext τ a
         simp
-      have hc0 : torCh w (0 : ι → Fin n → ℝ) = 1 := by
-        simp [torCh]
+      have hc0 : torCh w (0 : ι → Fin n → ℝ) = 1 := by simp [torCh]
       rw [h0, torEl_zero h, mul_one, hc0, one_mul]
     · intro p S hp ih v hv
-      have hps : ∀ (τ : ι) (a : Fin n), (Pi.single p.1 (Pi.single p.2 (s p.1 p.2)) : ι → Fin n → ℝ) τ a =
-          if (τ, a) = p then s τ a else 0 := by
+      have hps
+          : ∀ (τ : ι) (a : Fin n),
+            (Pi.single p.1 (Pi.single p.2 (s p.1 p.2)) : ι → Fin n → ℝ) τ a
+              = if (τ, a) = p then s τ a else 0 := by
         intro τ a
         rcases p with ⟨τ0, a0⟩
         by_cases e1 : τ = τ0 <;> by_cases e2 : a = a0 <;> simp [e1, e2]
-      have hsplit : (fun τ a => if (τ, a) ∈ insert p S then s τ a else 0) =
-          Pi.single p.1 (Pi.single p.2 (s p.1 p.2)) + (fun τ a => if (τ, a) ∈ S then s τ a else 0) := by
+      have hsplit
+          : (fun τ a => if (τ, a) ∈ insert p S then s τ a else 0)
+            = Pi.single p.1 (Pi.single p.2 (s p.1 p.2))
+              + (fun τ a => if (τ, a) ∈ S then s τ a else 0) := by
         funext τ a
         rw [Pi.add_apply, Pi.add_apply, hps]
         by_cases e : (τ, a) = p
@@ -366,7 +382,9 @@ theorem torus_law_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableE
       rw [hsplit, torEl_add h, ← mul_assoc, ih _ (mul_torEl_mem h _ hv),
         law_single h hs hk p.1 p.2 (s p.1 p.2) hv, torCh_add]
       ring
-  have hfull : (fun τ a => if ((τ, a) : ι × Fin n) ∈ (Finset.univ : Finset (ι × Fin n)) then s τ a else 0) = s := by
+  have hfull
+      : (fun τ a => if ((τ, a) : ι × Fin n) ∈ (Finset.univ : Finset (ι × Fin n)) then s τ a else 0)
+        = s := by
     funext τ a
     simp
   have := key Finset.univ u hu

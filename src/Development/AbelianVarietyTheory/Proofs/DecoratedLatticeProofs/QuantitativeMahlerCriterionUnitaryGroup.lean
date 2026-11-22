@@ -122,29 +122,37 @@ lemma entry_bound (z : I.Ginf) {N : ℕ} (e₀ : Fin N → Fin I.n → I.E) (c :
 
 end GlobalTheory.HtMinPf
 
-
 open GlobalTheory.HtMinPf in
 theorem GlobalTheory.htMin_of_reduced : ∀ I : AutInst, HtMin I := by
   intro I
   classical
   obtain ⟨N, R, C, hred⟩ := GlobalTheory.T.existsReducedBasisBoundedType_of_instance I
-  obtain ⟨S, hSfin, hS0, hS⟩ := GlobalTheory.T.integralVectorBases_bounded_finite_unitaryClasses I N R
+  obtain ⟨S, hSfin, hS0, hS⟩ :=
+    GlobalTheory.T.integralVectorBases_bounded_finite_unitaryClasses I N R
   obtain ⟨K, hK, hK'⟩ := GlobalTheory.T.exists_compact_integral_unitary_finitePart I
-  have hbd : ∀ e₀ : Fin N → Fin I.n → I.E, ∃ M : ℝ, e₀ ∈ S → ∀ v i, ∃ c : Fin N → ℝ,
-      (Pi.single v (Pi.single i (1 : ℂ)) : InfinitePlace I.F → Fin I.n → ℂ) = ∑ l, c l • vec I 1 (e₀ l) ∧
-        ∑ l, |c l| ≤ M := by
+  have hbd
+      : ∀ e₀ : Fin N → Fin I.n → I.E, ∃ M : ℝ,
+        e₀ ∈ S
+          → ∀ v i, ∃ c : Fin N → ℝ,
+            (Pi.single v (Pi.single i (1 : ℂ)) : InfinitePlace I.F → Fin I.n → ℂ)
+                = ∑ l, c l • vec I 1 (e₀ l)
+              ∧ ∑ l, |c l| ≤ M := by
     intro e₀
     by_cases h : e₀ ∈ S
     · have := fun v i => span_of_zbasis I e₀ (hS0 e₀ h) (Pi.single v (Pi.single i (1 : ℂ)))
       choose c hc using this
       refine ⟨∑ v, ∑ i, ∑ l, |c v i l|, fun _ v i => ⟨c v i, hc v i, ?_⟩⟩
-      calc ∑ l, |c v i l| ≤ ∑ i', ∑ l, |c v i' l| :=
-            Finset.single_le_sum (f := fun i' => ∑ l, |c v i' l|)
-              (fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _) (Finset.mem_univ i)
+      calc
+        ∑ l, |c v i l| ≤ ∑ i', ∑ l, |c v i' l| :=
+          Finset.single_le_sum
+            (f := fun i' => ∑ l, |c v i' l|)
+            (fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _)
+            (Finset.mem_univ i)
         _ ≤ ∑ v', ∑ i', ∑ l, |c v' i' l| :=
-            Finset.single_le_sum (f := fun v' => ∑ i', ∑ l, |c v' i' l|)
-              (fun _ _ => Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _)
-              (Finset.mem_univ v)
+          Finset.single_le_sum
+            (f := fun v' => ∑ i', ∑ l, |c v' i' l|)
+            (fun _ _ => Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _)
+            (Finset.mem_univ v)
     · exact ⟨0, fun h' => absurd h' h⟩
   choose M hM using hbd
   obtain ⟨Mt, hMt⟩ := (hSfin.image M).bddAbove
@@ -163,12 +171,14 @@ theorem GlobalTheory.htMin_of_reduced : ∀ I : AutInst, HtMin I := by
   simp_rw [hvec] at hb
   have ht : 0 ≤ t ^ N := pow_nonneg ht0.le _
   rw [uj_entry]
-  calc ‖uMat ((x.1 * y) v)⁻¹ j i‖ * t ^ N ≤ (∑ l, |c l| * ‖vec I y (e l)‖) * t ^ N :=
-        mul_le_mul_of_nonneg_right hb ht
+  calc
+    ‖uMat ((x.1 * y) v)⁻¹ j i‖ * t ^ N
+      ≤ (∑ l, |c l| * ‖vec I y (e l)‖) * t ^ N := mul_le_mul_of_nonneg_right hb ht
     _ = ∑ l, |c l| * (‖vec I y (e l)‖ * t ^ N) := by
-        rw [Finset.sum_mul]
-        simp_rw [mul_assoc]
-    _ ≤ ∑ l, |c l| * max C 0 := Finset.sum_le_sum fun l _ =>
+      rw [Finset.sum_mul]
+      simp_rw [mul_assoc]
+    _ ≤ ∑ l, |c l| * max C 0 :=
+      Finset.sum_le_sum fun l _ =>
         mul_le_mul_of_nonneg_left ((hesz t ht0 ht1 hns l).trans (le_max_left _ _)) (abs_nonneg _)
     _ = (∑ l, |c l|) * max C 0 := by rw [Finset.sum_mul]
     _ ≤ Mt * max C 0 := mul_le_mul_of_nonneg_right (hcM.trans hMle) (le_max_right _ _)

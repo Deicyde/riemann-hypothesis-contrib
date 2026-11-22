@@ -11,14 +11,20 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Wit
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel IsLocalRing
 open GlobalTheory.LatPair GlobalTheory.SplitWeil
 open GlobalTheory.StepData (XIx Ix latOf box LatFrame)
 open GlobalTheory.LocMod (GAt PinGBy ofSplit MovedTo)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter (CharUnramAt)
 open GlobalTheory.IndefiniteRowSideFullHecke.AppendedVectorData (lastPair lastKer)
-open GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedLocalFrameSequences (IsFockOver StepsAll vec atW IsMoved InAt InvOnUnits IsBesFrame IsJacFrame FrameMapsPrefix jacLat ptBF ptFB)
+open GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedLocalFrameSequences
+  (IsFockOver StepsAll vec atW IsMoved InAt InvOnUnits IsBesFrame IsJacFrame FrameMapsPrefix jacLat
+    ptBF ptFB)
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Mem.Isom
@@ -32,14 +38,19 @@ def colRow (S T : HSp D) (r : Fin S.rank → AE D) : (Fin T.rank → AE D) →+ 
   map_zero' := by ext i j; simp
   map_add' y y' := by ext i j; simp [add_mul]
 
-theorem mul_colRow {S T T' : HSp D} (M : Mx D T'.rank T.rank) (r : Fin S.rank → AE D) (y : Fin T.rank → AE D) :
-    HMul.hMul M (colRow S T r y) = colRow S T' r (M *ᵥ y) := by
+theorem mul_colRow
+    {S T T' : HSp D} (M : Mx D T'.rank T.rank) (r : Fin S.rank → AE D) (y : Fin T.rank → AE D)
+    : HMul.hMul M (colRow S T r y) = colRow S T' r (M *ᵥ y) := by
   ext i j
   simp [colRow, Matrix.mul_apply, Matrix.mulVec, dotProduct, Finset.sum_mul, mul_assoc]
 
-theorem gen_eq_colRow {S T : HSp D} (α : AF D.host.F) (a : D.host.E) (s : Fin S.rank → D.host.E) (t : Fin T.rank → D.host.E) :
-    (Matrix.of fun i j => α ⊗ₜ[D.host.F] (a * t i * ∑ k, star (s k) * S.gram k j) : WO S T) =
-      colRow S T (fun j => incA D (a * ∑ k, star (s k) * S.gram k j)) (fun i => α ⊗ₜ[D.host.F] (1 * t i)) := by
+theorem gen_eq_colRow
+    {S T : HSp D}
+    (α : AF D.host.F) (a : D.host.E) (s : Fin S.rank → D.host.E) (t : Fin T.rank → D.host.E)
+    : (Matrix.of fun i j => α ⊗ₜ[D.host.F] (a * t i * ∑ k, star (s k) * S.gram k j) : WO S T)
+      = colRow S T
+        (fun j => incA D (a * ∑ k, star (s k) * S.gram k j))
+        (fun i => α ⊗ₜ[D.host.F] (1 * t i)) := by
   ext i j
   simp only [colRow, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Matrix.of_apply]
   change _ = (α ⊗ₜ[D.host.F] (1 * t i)) * ((1 : AF D.host.F) ⊗ₜ[D.host.F] _)
@@ -47,10 +58,13 @@ theorem gen_eq_colRow {S T : HSp D} (α : AF D.host.F) (a : D.host.E) (s : Fin S
   congr 1
   ring
 
-theorem colRow_mem_latO {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Lat T} {P : GlobalTheory.FinPl.Pl D → Prop}
-    {a : D.host.E} (ha : a ∈ D.host.AA) {s : Fin S.rank → D.host.E} (hs : s ∈ LS) {y : Fin T.rank → AE D}
-    (hy : y ∈ latV T LT P) :
-    colRow S T (fun j => incA D (a * ∑ k, star (s k) * S.gram k j)) y ∈ latO S T LS (LT : Set _) P := by
+theorem colRow_mem_latO
+    {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Lat T}
+    {P : GlobalTheory.FinPl.Pl D → Prop} {a : D.host.E} (ha : a ∈ D.host.AA)
+    {s : Fin S.rank → D.host.E} (hs : s ∈ LS)
+    {y : Fin T.rank → AE D} (hy : y ∈ latV T LT P)
+    : colRow S T (fun j => incA D (a * ∑ k, star (s k) * S.gram k j)) y
+      ∈ latO S T LS (LT : Set _) P := by
   induction hy using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨β, hβi, hβ, c, hc, x, hx, rfl⟩ := hz
@@ -62,9 +76,12 @@ theorem colRow_mem_latO {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT :
   | add z z' _ _ hz hz' => rw [map_add]; exact add_mem hz hz'
   | neg z _ hz => rw [map_neg]; exact neg_mem hz
 
-theorem mul_mem_latO {S T T' : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Lat T} {LT' : Lat T'}
-    {P : GlobalTheory.FinPl.Pl D → Prop} (M : Mx D T'.rank T.rank) (hM : ∀ y ∈ latV T LT P, M *ᵥ y ∈ latV T' LT' P) {w : WO S T}
-    (hw : w ∈ latO S T LS (LT : Set _) P) : HMul.hMul M w ∈ latO S T' LS (LT' : Set _) P := by
+theorem mul_mem_latO
+    {S T T' : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Lat T} {LT' : Lat T'}
+    {P : GlobalTheory.FinPl.Pl D → Prop}
+    (M : Mx D T'.rank T.rank) (hM : ∀ y ∈ latV T LT P, M *ᵥ y ∈ latV T' LT' P)
+    {w : WO S T} (hw : w ∈ latO S T LS (LT : Set _) P)
+    : HMul.hMul M w ∈ latO S T' LS (LT' : Set _) P := by
   induction hw using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨α, hαi, hα, a, ha, s, hs, t, ht, rfl⟩ := hz
@@ -85,9 +102,12 @@ end Isometry
 
 section Frames
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {p : SplitPt D k}
-  {S T T₀ : HSp D} (d : HypDec T T₀ 0) {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
-  (α : GlobalTheory.FinPl.Frame p S n') (β : GlobalTheory.FinPl.Frame p T n) (β₀ : GlobalTheory.FinPl.Frame p T₀ n)
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {p : SplitPt D k} {S T T₀ : HSp D} (d : HypDec T T₀ 0)
+  {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
+  (α : GlobalTheory.FinPl.Frame p S n') (β : GlobalTheory.FinPl.Frame p T n)
+  (β₀ : GlobalTheory.FinPl.Frame p T₀ n)
 
 end Frames
 

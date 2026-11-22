@@ -15,13 +15,13 @@ noncomputable section
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι] {n : ι → ℕ}
 
-
 omit [Fintype ι] in
-theorem eval₂_scale_of_isWeightedHomogeneous {S : Type*} [CommRing S] [Fintype ι] (w : ι → S)
-    (x : Coord n → S) {f : MvPolynomial (Coord n) ℤ} {δ : ι → ℕ}
-    (hf : IsWeightedHomogeneous (coordDeg n) f δ) :
-    eval₂ (Int.castRingHom S) (fun v ↦ w v.1 * x v) f =
-      (∏ k, w k ^ δ k) * eval₂ (Int.castRingHom S) x f := by
+theorem eval₂_scale_of_isWeightedHomogeneous
+    {S : Type*} [CommRing S] [Fintype ι]
+    (w : ι → S) (x : Coord n → S)
+    {f : MvPolynomial (Coord n) ℤ} {δ : ι → ℕ} (hf : IsWeightedHomogeneous (coordDeg n) f δ)
+    : eval₂ (Int.castRingHom S) (fun v ↦ w v.1 * x v) f
+      = (∏ k, w k ^ δ k) * eval₂ (Int.castRingHom S) x f := by
   conv_lhs => rw [f.as_sum]
   conv_rhs => rw [f.as_sum]
   simp only [eval₂_sum, eval₂_monomial, Finset.mul_sum]
@@ -40,11 +40,12 @@ theorem eval₂_scale_of_isWeightedHomogeneous {S : Type*} [CommRing S] [Fintype
   have hprod : (μ.prod fun v e ↦ w v.1 ^ e) = ∏ k, w k ^ δ k := by
     rw [Finsupp.prod]
     symm
-    calc ∏ k, w k ^ δ k = ∏ k, ∏ v ∈ μ.support with v.1 = k, w v.1 ^ μ v := by
-          refine Finset.prod_congr rfl fun k _ ↦ ?_
-          rw [hδ k, ← Finset.prod_pow_eq_pow_sum]
-          refine Finset.prod_congr rfl fun v hv ↦ ?_
-          rw [(Finset.mem_filter.mp hv).2]
+    calc
+      ∏ k, w k ^ δ k = ∏ k, ∏ v ∈ μ.support with v.1 = k, w v.1 ^ μ v := by
+        refine Finset.prod_congr rfl fun k _ ↦ ?_
+        rw [hδ k, ← Finset.prod_pow_eq_pow_sum]
+        refine Finset.prod_congr rfl fun v hv ↦ ?_
+        rw [(Finset.mem_filter.mp hv).2]
       _ = ∏ v ∈ μ.support, w v.1 ^ μ v := Finset.prod_fiberwise _ _ _
   rw [← hprod]
   simp only [Finsupp.prod, mul_pow, Finset.prod_mul_distrib]
@@ -54,10 +55,9 @@ namespace ArithVariety
 
 variable (P : ArithVariety n)
 
-
 omit [Fintype ι] in
-theorem exists_chart :
-    ∃ c : (k : ι) → Fin (n k + 1), ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal :=
+theorem exists_chart
+    : ∃ c : (k : ι) → Fin (n k + 1), ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal :=
   ⟨fun k ↦ (P.relevant k).choose, fun k ↦ (P.relevant k).choose_spec⟩
 
 abbrev CoordRing : Type := MvPolynomial (Coord n) ℤ ⧸ P.ideal
@@ -94,17 +94,17 @@ abbrev ChartAlg : Subalgebra ℚ P.FunField := (P.chartMap c).range
 instance : Algebra.FiniteType ℚ (P.ChartAlg c) :=
   Algebra.FiniteType.of_surjective (P.chartMap c).rangeRestrict (AlgHom.rangeRestrict_surjective _)
 
-
 omit [Fintype ι] in
-theorem chartMap_map (f : MvPolynomial (Coord n) ℤ) :
-    P.chartMap c (map (Int.castRingHom ℚ) f) = eval₂ (Int.castRingHom _) (P.chartCoord c) f := by
+theorem chartMap_map (f : MvPolynomial (Coord n) ℤ)
+    : P.chartMap c (map (Int.castRingHom ℚ) f) = eval₂ (Int.castRingHom _) (P.chartCoord c) f := by
   rw [chartMap, aeval_def, eval₂_map]
   congr 1
   exact RingHom.ext_int _ _
 
-theorem chart_homogeneous (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
-    {f : MvPolynomial (Coord n) ℤ} {δ : ι → ℕ} (hf : IsWeightedHomogeneous (coordDeg n) f δ) :
-    (∏ k, P.mkF (X ⟨k, c k⟩) ^ δ k) * eval₂ (Int.castRingHom _) (P.chartCoord c) f = P.mkF f := by
+theorem chart_homogeneous
+    (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
+    {f : MvPolynomial (Coord n) ℤ} {δ : ι → ℕ} (hf : IsWeightedHomogeneous (coordDeg n) f δ)
+    : (∏ k, P.mkF (X ⟨k, c k⟩) ^ δ k) * eval₂ (Int.castRingHom _) (P.chartCoord c) f = P.mkF f := by
   rw [← eval₂_scale_of_isWeightedHomogeneous _ _ hf]
   have hne : ∀ k, P.mkF (X ⟨k, c k⟩) ≠ 0 := fun k h ↦ hc k ((P.mkF_eq_zero_iff _).mp h)
   have : (fun v : Coord n ↦ P.mkF (X ⟨v.1, c v.1⟩) * P.chartCoord c v) = fun v ↦ P.mkF (X v) := by
@@ -119,24 +119,26 @@ theorem chart_homogeneous (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) 
 def chartPoint (ψ : P.ChartAlg c →ₐ[ℚ] AlgebraicClosure ℚ) : Cone n (AlgebraicClosure ℚ) :=
   fun k i ↦ ψ ((P.chartMap c).rangeRestrict (X ⟨k, i⟩))
 
-
 omit [Fintype ι] in
-theorem evalCone_chartPoint (ψ : P.ChartAlg c →ₐ[ℚ] AlgebraicClosure ℚ)
-    (f : MvPolynomial (Coord n) ℤ) :
-    evalCone (P.chartPoint c ψ) f =
-      ψ ((P.chartMap c).rangeRestrict (map (Int.castRingHom ℚ) f)) := by
+theorem evalCone_chartPoint
+    (ψ : P.ChartAlg c →ₐ[ℚ] AlgebraicClosure ℚ) (f : MvPolynomial (Coord n) ℤ)
+    : evalCone (P.chartPoint c ψ) f
+      = ψ ((P.chartMap c).rangeRestrict (map (Int.castRingHom ℚ) f)) := by
   set χ : MvPolynomial (Coord n) ℚ →ₐ[ℚ] AlgebraicClosure ℚ := ψ.comp (P.chartMap c).rangeRestrict
   change _ = χ (map (Int.castRingHom ℚ) f)
   rw [aeval_unique χ, aeval_def, eval₂_map, evalCone]
   congr 1
 
-theorem chartMap_eq_zero (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
-    {f : MvPolynomial (Coord n) ℤ} (hf : f ∈ P.ideal) :
-    P.chartMap c (map (Int.castRingHom ℚ) f) = 0 := by
+theorem chartMap_eq_zero
+    (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
+    {f : MvPolynomial (Coord n) ℤ} (hf : f ∈ P.ideal)
+    : P.chartMap c (map (Int.castRingHom ℚ) f) = 0 := by
   classical
   rw [chartMap_map]
-  have hcomp : ∀ m : ι → ℕ,
-      eval₂ (Int.castRingHom _) (P.chartCoord c) (weightedHomogeneousComponent (coordDeg n) m f) = 0 := by
+  have hcomp
+      : ∀ m : ι → ℕ,
+        eval₂ (Int.castRingHom _) (P.chartCoord c) (weightedHomogeneousComponent (coordDeg n) m f)
+          = 0 := by
     intro m
     have h := P.chart_homogeneous c hc (weightedHomogeneousComponent_isWeightedHomogeneous m f)
     rw [(P.mkF_eq_zero_iff _).mpr (P.homogeneous f hf m)] at h
@@ -147,17 +149,17 @@ theorem chartMap_eq_zero (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) �
   rw [finsum_eq_sum _ (weightedHomogeneousComponent_finsupp f), eval₂_sum]
   exact Finset.sum_eq_zero fun m _ ↦ hcomp m
 
-theorem chartPoint_mem (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
-    (ψ : P.ChartAlg c →ₐ[ℚ] AlgebraicClosure ℚ) :
-    P.chartPoint c ψ ∈ P.points (AlgebraicClosure ℚ) := by
+theorem chartPoint_mem
+    (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
+    (ψ : P.ChartAlg c →ₐ[ℚ] AlgebraicClosure ℚ)
+    : P.chartPoint c ψ ∈ P.points (AlgebraicClosure ℚ) := by
   refine ⟨fun k h ↦ ?_, fun f hf ↦ ?_⟩
   · have h1 : (P.chartMap c).rangeRestrict (X ⟨k, c k⟩) = 1 := by
       apply Subtype.ext
       change P.chartMap c (X ⟨k, c k⟩) = 1
       rw [chartMap, aeval_X, chartCoord]
       exact div_self fun h ↦ hc k ((P.mkF_eq_zero_iff _).mp h)
-    have h2 : P.chartPoint c ψ k (c k) = 1 := by
-      rw [chartPoint, h1, map_one]
+    have h2 : P.chartPoint c ψ k (c k) = 1 := by rw [chartPoint, h1, map_one]
     rw [h] at h2
     exact zero_ne_one h2
   · rw [evalCone_chartPoint]
@@ -165,9 +167,11 @@ theorem chartPoint_mem (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ
       Subtype.ext (P.chartMap_eq_zero c hc hf)
     rw [this, map_zero]
 
-theorem chartMap_ne_zero (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
-    {f : MvPolynomial (Coord n) ℤ} {δ : ι → ℕ} (hf : IsWeightedHomogeneous (coordDeg n) f δ)
-    (hfP : f ∉ P.ideal) : (P.chartMap c).rangeRestrict (map (Int.castRingHom ℚ) f) ≠ 0 := by
+theorem chartMap_ne_zero
+    (hc : ∀ k, (X ⟨k, c k⟩ : MvPolynomial (Coord n) ℤ) ∉ P.ideal)
+    {f : MvPolynomial (Coord n) ℤ} {δ : ι → ℕ}
+    (hf : IsWeightedHomogeneous (coordDeg n) f δ) (hfP : f ∉ P.ideal)
+    : (P.chartMap c).rangeRestrict (map (Int.castRingHom ℚ) f) ≠ 0 := by
   intro h
   have h0 : P.chartMap c (map (Int.castRingHom ℚ) f) = 0 := congrArg Subtype.val h
   rw [chartMap_map] at h0

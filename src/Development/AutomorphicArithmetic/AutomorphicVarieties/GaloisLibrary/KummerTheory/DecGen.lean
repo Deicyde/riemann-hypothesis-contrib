@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem frob_pow_fin (k L : Type) [Field k] [Finite k] [Field L] [Algebra k L] [Algebra.IsAlgebraic k L]
-    (τ : L →ₐ[k] L) (S : Finset L) : ∃ i : ℕ, ∀ x ∈ S, τ x = x ^ Nat.card k ^ i := by
+private theorem frob_pow_fin
+    (k L : Type) [Field k] [Finite k] [Field L] [Algebra k L] [Algebra.IsAlgebraic k L]
+    (τ : L →ₐ[k] L) (S : Finset L)
+    : ∃ i : ℕ, ∀ x ∈ S, τ x = x ^ Nat.card k ^ i := by
   classical
   haveI := Fintype.ofFinite k
   let E := IntermediateField.adjoin k (S : Set L)
@@ -26,24 +30,28 @@ private theorem frob_pow_fin (k L : Type) [Field k] [Finite k] [Field L] [Algebr
   have h3 : e ⟨x, hxE⟩ = ⟨x, hxE⟩ ^ Fintype.card k ^ (n : ℕ) := by
     rw [← hn', AlgEquiv.coe_pow, FiniteField.coe_frobeniusAlgEquivOfAlgebraic_iterate]
   rw [Nat.card_eq_fintype_card]
-  calc τ x = τ (algebraMap E L ⟨x, hxE⟩) := rfl
+  calc
+    τ x
+      = τ (algebraMap E L ⟨x, hxE⟩) := rfl
     _ = algebraMap E L (τE ⟨x, hxE⟩) := h1.symm
     _ = algebraMap E L (e ⟨x, hxE⟩) := rfl
     _ = x ^ Fintype.card k ^ (n : ℕ) := by
       rw [h3, map_pow]
       rfl
 
-private theorem alg_residue {Ω : Type} [Field Ω] [CharZero Ω] (A : ValuationSubring Ω) (k : Type) [Field k]
-    [Algebra k (IsLocalRing.ResidueField A)] (x : A) (hx : IsAlgebraic ℤ (x : Ω)) :
-    IsAlgebraic k (IsLocalRing.residue A x) := by
+private theorem alg_residue
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (A : ValuationSubring Ω) (k : Type) [Field k] [Algebra k (IsLocalRing.ResidueField A)]
+    (x : A) (hx : IsAlgebraic ℤ (x : Ω))
+    : IsAlgebraic k (IsLocalRing.residue A x) := by
   obtain ⟨p, hp0, hpx⟩ := hx
   have hq : p.primPart.IsPrimitive := p.isPrimitive_primPart
   have hqx : Polynomial.aeval x p.primPart = 0 := by
-    have h1 : Polynomial.aeval (x : Ω) p = (p.content : Ω) * Polynomial.aeval (x : Ω) p.primPart := by
+    have h1
+        : Polynomial.aeval (x : Ω) p = (p.content : Ω) * Polynomial.aeval (x : Ω) p.primPart := by
       conv_lhs => rw [p.eq_C_content_mul_primPart]
       simp
-    have hc : (p.content : Ω) ≠ 0 := by
-      exact_mod_cast (Polynomial.content_eq_zero_iff.not.2 hp0)
+    have hc : (p.content : Ω) ≠ 0 := by exact_mod_cast (Polynomial.content_eq_zero_iff.not.2 hp0)
     rw [hpx] at h1
     have h2 : Polynomial.aeval (x : Ω) p.primPart = 0 := (mul_eq_zero.1 h1.symm).resolve_left hc
     have h3 : ((Polynomial.aeval x p.primPart : A) : Ω) = Polynomial.aeval (x : Ω) p.primPart :=
@@ -70,16 +78,20 @@ private theorem alg_residue {Ω : Type} [Field Ω] [CharZero Ω] (A : ValuationS
         rw [h, Polynomial.map_zero]
       exact hq.ne_zero this
   · rw [Polynomial.aeval_def, Polynomial.eval₂_map]
-    have e : (algebraMap k (IsLocalRing.ResidueField A)).comp (algebraMap ℤ k) =
-        algebraMap ℤ (IsLocalRing.ResidueField A) := RingHom.ext_int _ _
+    have e
+        : (algebraMap k (IsLocalRing.ResidueField A)).comp (algebraMap ℤ k)
+          = algebraMap ℤ (IsLocalRing.ResidueField A) :=
+      RingHom.ext_int _ _
     rw [e, ← Polynomial.aeval_def]
     have := Polynomial.aeval_algebraMap_apply (IsLocalRing.ResidueField A) x p.primPart
     rw [IsLocalRing.ResidueField.algebraMap_eq] at this
     rw [this, hqx, map_zero]
 
-private theorem frob_pow {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    {A : ValuationSubring Ω} {q : ℕ} {φ : G F Ω} (hφ : IsFrob A q φ) (n : ℕ) :
-    IsFrob A (q ^ n) (φ ^ n) := by
+private theorem frob_pow
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {q : ℕ} {φ : G F Ω} (hφ : IsFrob A q φ)
+    (n : ℕ)
+    : IsFrob A (q ^ n) (φ ^ n) := by
   have hD : φ ∈ ValuationSubring.decompositionSubgroup F A := hφ.1
   induction n with
   | zero =>
@@ -101,21 +113,25 @@ private theorem frob_pow {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alg
         exact this
       rw [h4, map_mul]
       have hc1 : A.valuation (c : Ω) ≤ 1 := A.valuation_le_one c
-      calc _ ≤ A.valuation ((φ ^ n) x - x ^ q ^ n) * 1 := by gcongr
+      calc
+        _ ≤ A.valuation ((φ ^ n) x - x ^ q ^ n) * 1 := by gcongr
         _ < 1 := by
           rw [mul_one]
           exact e2
-    have h5 : (φ ^ (n + 1)) x - x ^ q ^ (n + 1) =
-        (φ ((φ ^ n) x) - ((φ ^ n) x) ^ q) + (((φ ^ n) x) ^ q - (x ^ q ^ n) ^ q) := by
+    have h5
+        : (φ ^ (n + 1)) x - x ^ q ^ (n + 1)
+          = (φ ((φ ^ n) x) - ((φ ^ n) x) ^ q) + (((φ ^ n) x) ^ q - (x ^ q ^ n) ^ q) := by
       rw [pow_succ' φ n, AlgEquiv.mul_apply, pow_succ q n, pow_mul]
       ring
     rw [h5]
     exact lt_of_le_of_lt (A.valuation.map_add _ _) (max_lt e1 e3)
 
-private theorem dec_pow_fin {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω]
-    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 K)} (hA : IsPlaceOver A v) {g : G K Ω}
-    (hg : g ∈ Dec (F := K) A) (S : Finset A) :
-    ∃ i : ℕ, ∀ x ∈ S, A.valuation (g x - (x : Ω) ^ normV v ^ i) < 1 := by
+private theorem dec_pow_fin
+    {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω]
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 K)} (hA : IsPlaceOver A v)
+    {g : G K Ω} (hg : g ∈ Dec (F := K) A)
+    (S : Finset A)
+    : ∃ i : ℕ, ∀ x ∈ S, A.valuation (g x - (x : Ω) ^ normV v ^ i) < 1 := by
   classical
   haveI : Algebra.IsAlgebraic K Ω := IsAlgClosure.isAlgebraic
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap K Ω).injective
@@ -142,17 +158,20 @@ private theorem dec_pow_fin {K Ω : Type} [Field K] [NumberField K] [Field Ω] [
     apply Subtype.ext
     show g (algebraMap K Ω (a : K)) = algebraMap K Ω (a : K)
     exact g.commutes _
-  let τ : IsLocalRing.ResidueField A →ₐ[𝓞 K ⧸ v.asIdeal] IsLocalRing.ResidueField A :=
-    { MulSemiringAction.toRingHom _ (IsLocalRing.ResidueField A) gD with
-      commutes' := by
-        intro c
-        obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective c
-        show gD • (Ideal.Quotient.lift v.asIdeal f1 hker (Ideal.Quotient.mk _ a)) = _
-        rw [Ideal.Quotient.lift_mk]
-        show gD • IsLocalRing.residue A (f0 a) = IsLocalRing.residue A (f0 a)
-        rw [← IsLocalRing.ResidueField.residue_smul (ValuationSubring.decompositionSubgroup K A) gD (f0 a), hfix] }
-  obtain ⟨i, hi⟩ := frob_pow_fin (𝓞 K ⧸ v.asIdeal) (IsLocalRing.ResidueField A) τ
-    (S.image (IsLocalRing.residue A))
+  let τ : IsLocalRing.ResidueField A →ₐ[𝓞 K ⧸ v.asIdeal] IsLocalRing.ResidueField A := {
+    MulSemiringAction.toRingHom _ (IsLocalRing.ResidueField A) gD with
+    commutes' := by
+      intro c
+      obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective c
+      show gD • (Ideal.Quotient.lift v.asIdeal f1 hker (Ideal.Quotient.mk _ a)) = _
+      rw [Ideal.Quotient.lift_mk]
+      show gD • IsLocalRing.residue A (f0 a) = IsLocalRing.residue A (f0 a)
+      rw [← IsLocalRing.ResidueField.residue_smul (ValuationSubring.decompositionSubgroup K A) gD
+          (f0 a),
+        hfix]
+  }
+  obtain ⟨i, hi⟩ :=
+    frob_pow_fin (𝓞 K ⧸ v.asIdeal) (IsLocalRing.ResidueField A) τ (S.image (IsLocalRing.residue A))
   refine ⟨i, fun x hx => ?_⟩
   have h1 : gD • IsLocalRing.residue A x = IsLocalRing.residue A x ^ normV v ^ i :=
     hi _ (Finset.mem_image_of_mem _ hx)
@@ -161,25 +180,35 @@ private theorem dec_pow_fin {K Ω : Type} [Field K] [NumberField K] [Field Ω] [
   rw [IsLocalRing.residue_eq_zero_iff, ValuationSubring.valuation_lt_one_iff] at h2
   exact h2
 
-private theorem closed_ev {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω] (x : Ω)
-    (P : Ω → Prop) : IsClosed {h : G K Ω | P (h x)} := by
+private theorem closed_ev
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω] (x : Ω) (P : Ω → Prop)
+    : IsClosed {h : G K Ω | P (h x)} := by
   rw [← isOpen_compl_iff, isOpen_iff_forall_mem_open]
   intro h hh
   haveI : FiniteDimensional K (IntermediateField.adjoin K {x}) :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
-  refine ⟨(fun k => h * k) '' (((IntermediateField.adjoin K {x}).fixingSubgroup : Subgroup (G K Ω)) : Set (G K Ω)),
-    ?_, ?_, ⟨1, one_mem _, mul_one h⟩⟩
+  refine ⟨
+    (fun k => h * k)
+      '' (((IntermediateField.adjoin K {x}).fixingSubgroup : Subgroup (G K Ω)) : Set (G K Ω)),
+    ?_,
+    ?_,
+    ⟨1, one_mem _, mul_one h⟩
+  ⟩
   · rintro _ ⟨k, hk, rfl⟩
     have hkx : k x = x :=
-      (IntermediateField.mem_fixingSubgroup_iff _ _).1 hk x (IntermediateField.mem_adjoin_simple_self K x)
+      (IntermediateField.mem_fixingSubgroup_iff _ _).1 hk x
+        (IntermediateField.mem_adjoin_simple_self K x)
     show ¬ P ((h * k) x)
     rw [AlgEquiv.mul_apply, hkx]
     exact hh
   · exact isOpenMap_mul_left h _ (IntermediateField.fixingSubgroup_isOpen _)
 
-theorem UpperTheory.V.Kum.decGen :
-    ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (σ : G K Ω) (H : Subgroup (G K Ω)),
-    IsPlaceOver A v → IsFrob (F := K) A (normV v) σ → IsOpen (H : Set (G K Ω)) → Ine (F := K) A ≤ H → σ ∈ H → Dec (F := K) A ≤ H := by
+theorem UpperTheory.V.Kum.decGen
+    : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (σ : G K Ω) (H : Subgroup (G K Ω)),
+      IsPlaceOver A v → IsFrob (F := K) A (normV v) σ → IsOpen (H : Set (G K Ω))
+        → Ine (F := K) A ≤ H → σ ∈ H
+        → Dec (F := K) A ≤ H := by
   classical
   intro K Ω _ _ _ _ _ A v σ H hA hσ hHo hI hσH g hg
   haveI : Algebra.IsAlgebraic K Ω := IsAlgClosure.isAlgebraic
@@ -203,18 +232,25 @@ theorem UpperTheory.V.Kum.decGen :
     rw [e]
     exact isClosed_iInter fun x => closed_ev x (fun y => (y ∈ A ↔ x ∈ A))
   let Cl : Set (G K Ω) := closure (Set.range fun i : ℕ => σ ^ i)
-  have hClH : Cl ⊆ H := closure_minimal (by
-    rintro _ ⟨i, rfl⟩
-    exact H.pow_mem hσH i) hHc
-  have hClD : Cl ⊆ Dec (F := K) A := closure_minimal (by
-    rintro _ ⟨i, rfl⟩
-    exact (Dec (F := K) A).pow_mem hσD i) hDc
+  have hClH : Cl ⊆ H :=
+    closure_minimal
+      (by
+        rintro _ ⟨i, rfl⟩
+        exact H.pow_mem hσH i)
+      hHc
+  have hClD : Cl ⊆ Dec (F := K) A :=
+    closure_minimal
+      (by
+        rintro _ ⟨i, rfl⟩
+        exact (Dec (F := K) A).pow_mem hσD i)
+      hDc
   let C : Finset A → Set (G K Ω) := fun S => Cl ∩ {τ | ∀ x ∈ S, A.valuation (g x - τ x) < 1}
   have hCcl : ∀ S, IsClosed (C S) := by
     intro S
     apply isClosed_closure.inter
-    have e : {τ : G K Ω | ∀ x ∈ S, A.valuation (g x - τ x) < 1} =
-        ⋂ x ∈ S, {τ : G K Ω | A.valuation (g x - τ x) < 1} := by
+    have e
+        : {τ : G K Ω | ∀ x ∈ S, A.valuation (g x - τ x) < 1}
+          = ⋂ x ∈ S, {τ : G K Ω | A.valuation (g x - τ x) < 1} := by
       ext τ
       simp
     rw [e]
@@ -225,7 +261,9 @@ theorem UpperTheory.V.Kum.decGen :
     refine ⟨σ ^ i, subset_closure ⟨i, rfl⟩, fun x hx => ?_⟩
     have h1 := hi x hx
     have h2 := (frob_pow hσ i).2 x (A.valuation_le_one x)
-    have e : g x - (σ ^ i) x = (g x - (x : Ω) ^ normV v ^ i) - ((σ ^ i) x - (x : Ω) ^ normV v ^ i) := by
+    have e
+        : g x - (σ ^ i) x
+          = (g x - (x : Ω) ^ normV v ^ i) - ((σ ^ i) x - (x : Ω) ^ normV v ^ i) := by
       ring
     rw [e]
     exact lt_of_le_of_lt (A.valuation.map_sub _ _) (max_lt h1 h2)
@@ -236,12 +274,15 @@ theorem UpperTheory.V.Kum.decGen :
       exact ⟨h1, fun x hx => h2 x (Finset.mem_union_left _ hx)⟩
     · rintro τ ⟨h1, h2⟩
       exact ⟨h1, fun x hx => h2 x (Finset.mem_union_right _ hx)⟩
-  obtain ⟨τ, hτ⟩ := IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed C hdir hCne
-    (fun S => (hCcl S).isCompact) hCcl
+  obtain ⟨τ, hτ⟩ :=
+    IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed C hdir hCne
+      (fun S => (hCcl S).isCompact)
+      hCcl
   rw [Set.mem_iInter] at hτ
   have hτCl : τ ∈ Cl := (hτ ∅).1
   have hτD := hClD hτCl
-  have hτx : ∀ x : A, A.valuation (g x - τ x) < 1 := fun x => (hτ {x}).2 x (Finset.mem_singleton_self x)
+  have hτx : ∀ x : A, A.valuation (g x - τ x) < 1 := fun x =>
+    (hτ {x}).2 x (Finset.mem_singleton_self x)
   have hι : τ⁻¹ * g ∈ Ine (F := K) A := by
     show τ⁻¹ * g ∈ Inertia A
     refine ⟨(Dec (F := K) A).mul_mem ((Dec (F := K) A).inv_mem hτD) hg, fun x hx => ?_⟩

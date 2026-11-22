@@ -4,14 +4,15 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DiagonalizeThreeByThree.diagonalize_three_by_three_split :
-    ∀ {K : Type} [inst : Field K] (d : Fin (3 : ℕ) → K),
-    Function.Injective d →
-      ∀ (M : Matrix (Fin (3 : ℕ)) (Fin (3 : ℕ)) K),
-        M.charpoly = ∏ a : Fin (3 : ℕ), (Polynomial.X - (Polynomial.C : K → Polynomial K) (d a)) →
-          ∃ (h : GL (Fin (3 : ℕ)) K),
-            (↑h⁻¹ : Matrix (Fin (3 : ℕ)) (Fin (3 : ℕ)) K) * M * (↑h : Matrix (Fin (3 : ℕ)) (Fin (3 : ℕ)) K) =
-              Matrix.diagonal d := by
+theorem UpperTheory.Reformulated.B.DiagonalizeThreeByThree.diagonalize_three_by_three_split
+    : ∀ {K : Type} [inst : Field K] (d : Fin (3 : ℕ) → K),
+      Function.Injective d
+        → ∀ (M : Matrix (Fin (3 : ℕ)) (Fin (3 : ℕ)) K),
+          M.charpoly = ∏ a : Fin (3 : ℕ), (Polynomial.X - (Polynomial.C : K → Polynomial K) (d a))
+            → ∃ (h : GL (Fin (3 : ℕ)) K),
+              (↑h⁻¹ : Matrix (Fin (3 : ℕ)) (Fin (3 : ℕ)) K) * M
+                  * (↑h : Matrix (Fin (3 : ℕ)) (Fin (3 : ℕ)) K)
+                = Matrix.diagonal d := by
   intro K _ d hd M hM
   have hev : ∀ a, Module.End.HasEigenvalue (Matrix.toLin' M) (d a) := by
     intro a

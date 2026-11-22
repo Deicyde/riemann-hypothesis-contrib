@@ -11,8 +11,12 @@ noncomputable section
 
 namespace Formalism.L2.G.ServJoint
 
-theorem carrier_sum {O : Type} [CommRing O] {φ : O →+* ℂ} {V : Type} [AddCommGroup V] [Module ℂ V] (M : Rows.OLat O φ V)
-    {ι : Type} (S : Finset ι) (f : ι → V) (h : ∀ i ∈ S, f i ∈ M.carrier) : ∑ i ∈ S, f i ∈ M.carrier := by
+theorem carrier_sum
+    {O : Type} [CommRing O]
+    {φ : O →+* ℂ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (M : Rows.OLat O φ V)
+    {ι : Type} (S : Finset ι) (f : ι → V) (h : ∀ i ∈ S, f i ∈ M.carrier)
+    : ∑ i ∈ S, f i ∈ M.carrier := by
   classical
   simp only [Rows.OLat.carrier, Set.mem_setOf_eq] at h ⊢
   induction S using Finset.induction_on with
@@ -26,17 +30,23 @@ theorem carrier_sum {O : Type} [CommRing O] {φ : O →+* ℂ} {V : Type} [AddCo
     refine Finset.sum_congr rfl (fun w _ => ?_)
     simp [add_smul]
 
-theorem gen_mem_carrier {O : Type} [CommRing O] {φ : O →+* ℂ} {V : Type} [AddCommGroup V] [Module ℂ V] (M : Rows.OLat O φ V)
-    {v : V} (hv : v ∈ M.gen) : v ∈ M.carrier := by
+theorem gen_mem_carrier
+    {O : Type} [CommRing O]
+    {φ : O →+* ℂ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (M : Rows.OLat O φ V)
+    {v : V} (hv : v ∈ M.gen)
+    : v ∈ M.carrier := by
   classical
   simp only [Rows.OLat.carrier, Set.mem_setOf_eq]
   refine ⟨fun w => if w = v then 1 else 0, ?_⟩
   rw [Finset.sum_eq_single v (fun b _ hb => by simp [hb]) (fun h => absurd hv h)]
   simp
 
-theorem cutUp_of_stable (D : D7) (μ : D.what₂.Tup)
-    (h : ∀ (a : 𝓞 D.what₂.LL), ∀ x ∈ (D.what₂.Mtilde μ).carrier, D.what₂.embLL (a : D.what₂.LL) • x ∈ (D.what₂.Mtilde μ).carrier) :
-    CutUp D μ := by
+theorem cutUp_of_stable
+    (D : D7) (μ : D.what₂.Tup)
+    (h : ∀ (a : 𝓞 D.what₂.LL), ∀ x ∈ (D.what₂.Mtilde μ).carrier,
+      D.what₂.embLL (a : D.what₂.LL) • x ∈ (D.what₂.Mtilde μ).carrier)
+    : CutUp D μ := by
   classical
   unfold CutUp
   rintro x ⟨c, hc⟩ hx0

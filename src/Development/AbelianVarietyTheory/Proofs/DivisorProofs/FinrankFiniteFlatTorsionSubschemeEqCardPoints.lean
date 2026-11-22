@@ -9,17 +9,25 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped NumberField CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TorsionRank
 
-theorem etale_pullback_snd {S : Scheme.{0}} (A : Over S) [GrpObj A] [IsCommMonObj A]
-    (hA : IsAbelianScheme A) (K : Over S) (i : K ⟶ A) (c : ℕ) [Mono i] [IsFinite K.hom]
-    [Flat K.hom] (hi : i ^ c = 1) (k : Type) [Field k] (hc : (c : k) ≠ 0) (y : Sp k ⟶ S) :
-    Etale (pullback.snd K.hom y) := by
+theorem etale_pullback_snd
+    {S : Scheme.{0}} (A : Over S) [GrpObj A] [IsCommMonObj A]
+    (hA : IsAbelianScheme A)
+    (K : Over S) (i : K ⟶ A)
+    (c : ℕ)
+    [Mono i] [IsFinite K.hom] [Flat K.hom]
+    (hi : i ^ c = 1)
+    (k : Type) [Field k]
+    (hc : (c : k) ≠ 0) (y : Sp k ⟶ S)
+    : Etale (pullback.snd K.hom y) := by
   let A' := (Over.pullback y).obj A
   let K' := (Over.pullback y).obj K
   let i' : K' ⟶ A' := (Over.pullback y).map i
@@ -47,21 +55,33 @@ theorem etale_pullback_snd {S : Scheme.{0}} (A : Over S) [GrpObj A] [IsCommMonOb
   have : LocallyOfFinitePresentation K'.hom := inferInstance
   exact Etale.of_formallyUnramified_of_flat K'.hom
 
-theorem finrank_eq_card : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A], IsAbelianScheme A → ∀ (K : Over S) (i : K ⟶ A) (c : ℕ), Mono i → IsFinite K.hom → Flat K.hom → i ^ c = 1 → ∀ (k : Type) [Field k] [IsAlgClosed k], (c : k) ≠ 0 → ∀ (y : Sp k ⟶ S) (z : Sp k), K.hom.finrank (y z) = Nat.card (Over.mk y ⟶ K) := by
+theorem finrank_eq_card
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A],
+      IsAbelianScheme A
+        → ∀ (K : Over S) (i : K ⟶ A) (c : ℕ),
+          Mono i → IsFinite K.hom → Flat K.hom → i ^ c = 1
+            → ∀ (k : Type) [Field k] [IsAlgClosed k],
+              (c : k) ≠ 0
+                → ∀ (y : Sp k ⟶ S) (z : Sp k), K.hom.finrank (y z) = Nat.card (Over.mk y ⟶ K) := by
   intro S A _ _ hA K i c hi hfin hfl hic k _ _ hc y z
   have het := etale_pullback_snd A hA K i c hic k hc y
   obtain ⟨-, hcard⟩ := GlobalTheory.FinEt.card_points_eq_finrank (pullback.snd K.hom y) (𝟙 (Sp k)) z
   have hz : (𝟙 (Sp k) : Sp k ⟶ Sp k) z = z := rfl
   rw [hz, Scheme.Hom.finrank_pullback_snd] at hcard
   rw [← hcard]
-  refine Nat.card_congr
-    { toFun := fun x => Over.homMk (x.1 ≫ pullback.fst K.hom y) (by
+  refine Nat.card_congr {
+    toFun := fun x =>
+      Over.homMk (x.1 ≫ pullback.fst K.hom y) (by
         change (x.1 ≫ pullback.fst K.hom y) ≫ K.hom = y
         rw [Category.assoc, pullback.condition, ← Category.assoc, x.2, Category.id_comp])
-      invFun := fun g => ⟨pullback.lift g.left (𝟙 _) (by
-        rw [Category.id_comp]; exact Over.w g), pullback.lift_snd _ _ _⟩
-      left_inv := fun x => Subtype.ext (pullback.hom_ext (pullback.lift_fst _ _ _)
+    invFun := fun g => ⟨
+      pullback.lift g.left (𝟙 _) (by rw [Category.id_comp]; exact Over.w g),
+      pullback.lift_snd _ _ _
+    ⟩
+    left_inv := fun x =>
+      Subtype.ext (pullback.hom_ext (pullback.lift_fst _ _ _)
         ((pullback.lift_snd _ _ _).trans x.2.symm))
-      right_inv := fun g => Over.OverMorphism.ext (pullback.lift_fst _ _ _) }
+    right_inv := fun g => Over.OverMorphism.ext (pullback.lift_fst _ _ _)
+  }
 
 end GlobalTheory.TorsionRank

@@ -15,8 +15,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial MeasureTheory Filter Topology Matrix ComplexSets
 
-theorem RegMassNearSmall.proof (hCmp : RegFormCompare.Statement) (hBall : RegBallMass.Statement)
-    (hCov : SmallSetBallCover.Statement) : RegMassNearSmall.Statement := by
+theorem RegMassNearSmall.proof
+    (hCmp : RegFormCompare.Statement) (hBall : RegBallMass.Statement)
+    (hCov : SmallSetBallCover.Statement)
+    : RegMassNearSmall.Statement := by
   classical
   intro n d J I u φ f hJ hdim hu hφ hIdim hf hfc δ hδ
   by_cases h : ∃ A : Matrix (Fin (d + 1)) (Fin n) ℂ, IsFiniteProjection J A
@@ -24,7 +26,8 @@ theorem RegMassNearSmall.proof (hCmp : RegFormCompare.Statement) (hBall : RegBal
   · exact ⟨Set.univ, isOpen_univ, Set.subset_univ _, fun χ _ _ _ ε _ => by simp [varInt, h, hδ.le]⟩
   set A := h.choose
   have hA : IsFiniteProjection J A := h.choose_spec
-  have hfin : ∀ y, (fibre J A y).Finite := fun y => (FibreBound.proof n (d + 1) J A hJ hdim hA y).2.1
+  have hfin : ∀ y, (fibre J A y).Finite := fun y =>
+    (FibreBound.proof n (d + 1) J A hJ hdim hA y).2.1
   set K := tsupport f
   obtain ⟨C₁, hC₁, h₁⟩ := hCmp n d J A φ f hJ hdim hA hφ hf hfc
   obtain ⟨C₂, hC₂, h₂⟩ := hBall n d J A u K hJ hdim hA hu hfc
@@ -41,8 +44,8 @@ theorem RegMassNearSmall.proof (hCmp : RegFormCompare.Statement) (hBall : RegBal
     · exact Or.inr hxK
   set ψ : Fin (d + 1) → (Fin n → ℂ) → ℝ := vecCons (logReg u ε) fun _ => euclPot
   set w : (Fin n → ℂ) → ℝ := fun x => ∑ c ∈ T, (Metric.ball c r).indicator (fun _ => (1 : ℝ)) x with hw
-  have hi0 : ∀ c x : Fin n → ℂ, 0 ≤ (Metric.ball c r).indicator (fun _ => (1 : ℝ)) x :=
-    fun c x => Set.indicator_nonneg (fun _ _ => zero_le_one) x
+  have hi0 : ∀ c x : Fin n → ℂ, 0 ≤ (Metric.ball c r).indicator (fun _ => (1 : ℝ)) x := fun c x =>
+    Set.indicator_nonneg (fun _ _ => zero_le_one) x
   have hw0 : ∀ x, 0 ≤ w x := fun x => Finset.sum_nonneg fun c _ => hi0 c x
   have hvw : ∀ x ∈ K, |χ x| ≤ w x := by
     intro x hxK
@@ -51,13 +54,20 @@ theorem RegMassNearSmall.proof (hCmp : RegFormCompare.Statement) (hBall : RegBal
       exact hw0 x
     rcases hχU (subset_tsupport χ h0) with hxB | hxK'
     · obtain ⟨c, hc, hxc⟩ := Set.mem_iUnion₂.1 hxB
-      calc |χ x| ≤ 1 := hχ1 x
-        _ = (Metric.ball c r).indicator (fun _ => (1 : ℝ)) x := (Set.indicator_of_mem hxc (fun _ => (1 : ℝ))).symm
-        _ ≤ w x := Finset.single_le_sum (f := fun c => (Metric.ball c r).indicator (fun _ => (1 : ℝ)) x)
-            (fun c _ => hi0 c x) hc
+      calc
+        |χ x|
+          ≤ 1 := hχ1 x
+        _ = (Metric.ball c r).indicator (fun _ => (1 : ℝ)) x :=
+          (Set.indicator_of_mem hxc (fun _ => (1 : ℝ))).symm
+        _ ≤ w x :=
+          Finset.single_le_sum
+            (f := fun c => (Metric.ball c r).indicator (fun _ => (1 : ℝ)) x)
+            (fun c _ => hi0 c x)
+            hc
     · exact absurd hxK hxK'
-  have hsum : chartDens J A w ψ =
-      fun y => ∑ c ∈ T, chartDens J A ((Metric.ball c r).indicator fun _ => 1) ψ y := by
+  have hsum
+      : chartDens J A w ψ
+        = fun y => ∑ c ∈ T, chartDens J A ((Metric.ball c r).indicator fun _ => 1) ψ y := by
     funext y
     simp only [chartDens, sheetSum]
     simp_rw [finsum_mem_eq_finite_toFinset_sum _ (hfin y)]
@@ -72,19 +82,21 @@ theorem RegMassNearSmall.proof (hCmp : RegFormCompare.Statement) (hBall : RegBal
     rw [hsum, integral_finsetSum _ fun c hc => (hball c hc).1, ← nsmul_eq_mul, ← Finset.sum_const]
     exact Finset.sum_le_sum fun c hc => (hball c hc).2
   rw [varInt, dite_eq_left h]
-  calc |chartInt J A (fun x => χ x * f x) (vecCons (logReg u ε) φ)|
-      ≤ ∫ y, C₁ * chartDens J A w ψ y := by
-        refine abs_integral_le_integral_abs.trans (integral_mono_of_nonneg
-          (Eventually.of_forall fun y => abs_nonneg _) (hint.const_mul C₁) (Eventually.of_forall fun y => ?_))
-        exact (VarIntAdd.abs_chartDens_le hfin _ _ y).trans (h₁ u ε hε.1 χ w hw0 hvw y)
+  calc
+    |chartInt J A (fun x => χ x * f x) (vecCons (logReg u ε) φ)|
+        ≤ ∫ y, C₁ * chartDens J A w ψ y := by
+      refine abs_integral_le_integral_abs.trans (integral_mono_of_nonneg
+        (Eventually.of_forall fun y => abs_nonneg _) (hint.const_mul C₁)
+        (Eventually.of_forall fun y => ?_))
+      exact (VarIntAdd.abs_chartDens_le hfin _ _ y).trans (h₁ u ε hε.1 χ w hw0 hvw y)
     _ = C₁ * ∫ y, chartDens J A w ψ y := integral_const_mul _ _
     _ ≤ C₁ * (T.card * (C₂ * r ^ (2 * d))) := mul_le_mul_of_nonneg_left hT hC₁
     _ = C₁ * C₂ * (T.card * r ^ (2 * d)) := by ring
     _ ≤ C₁ * C₂ * (C₃ * r ^ 2) := mul_le_mul_of_nonneg_left hcard (by positivity)
     _ ≤ (C₁ * C₂ * C₃ + 1) * r := by
-        nlinarith [mul_le_mul_of_nonneg_left hr.2 (mul_nonneg hM hr.1.le), hr.1]
+      nlinarith [mul_le_mul_of_nonneg_left hr.2 (mul_nonneg hM hr.1.le), hr.1]
     _ ≤ (C₁ * C₂ * C₃ + 1) * (δ / (C₁ * C₂ * C₃ + 1)) :=
-        mul_le_mul_of_nonneg_left (min_le_right _ _) (by positivity)
+      mul_le_mul_of_nonneg_left (min_le_right _ _) (by positivity)
     _ = δ := mul_div_cancel₀ _ (by positivity)
 
 end GroundTheory.Heights₂.Heights

@@ -7,15 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Twisted
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.SepCommutant
 
-theorem exists_eq_sum_pow_of_commute :
-    ∀ {K : Type} [Field K] {n : ℕ} (g t : Matrix (Fin n) (Fin n) K), g.charpoly.Separable →
-    t * g = g * t → ∃ c : Fin n → K, t = ∑ i, c i • g ^ (i : ℕ) := by
+theorem exists_eq_sum_pow_of_commute
+    : ∀ {K : Type} [Field K] {n : ℕ} (g t : Matrix (Fin n) (Fin n) K),
+      g.charpoly.Separable → t * g = g * t → ∃ c : Fin n → K, t = ∑ i, c i • g ^ (i : ℕ) := by
   intro K _ n g t hs hc
   have hm := GlobalTheory.Tw.CentralizerAdjoin.mem_adjoin_of_commute g t hs hc
   rw [Algebra.adjoin_singleton_eq_range_aeval] at hm
@@ -29,7 +30,10 @@ theorem exists_eq_sum_pow_of_commute :
     rwa [Matrix.charpoly_degree_eq_dim, Fintype.card_fin] at this
   refine ⟨fun i => r.coeff i, ?_⟩
   change aeval g p = _
-  rw [hae, aeval_def, eval₂_eq_sum, ← Polynomial.sum_fin (fun e a => algebraMap K (Matrix (Fin n) (Fin n) K) a * g ^ e) (by simp) hdeg]
+  rw [hae, aeval_def, eval₂_eq_sum,
+    ← Polynomial.sum_fin
+      (fun e a => algebraMap K (Matrix (Fin n) (Fin n) K) a * g ^ e)
+      (by simp) hdeg]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Algebra.smul_def]
 

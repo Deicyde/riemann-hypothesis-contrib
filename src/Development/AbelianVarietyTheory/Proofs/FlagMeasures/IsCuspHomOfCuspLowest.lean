@@ -13,13 +13,18 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IntegralInvOf
 
 @[expose] public section
 
-open MeasureTheory Formalism.MainNotions.S Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult GlobalTheory.RowLev NumberField Matrix
+open MeasureTheory Formalism.MainNotions.S Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.L2.Theta Formalism.IndefR.Mult GlobalTheory.RowLev NumberField Matrix
 open scoped InnerProductSpace TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.RowLev
 
-theorem isCuspHom_of_cusp_lowest : ∀ (B : RowsAut), (∀ v, IsDS (B.I.ε v) (B.lam v) (B.σ v)) → (∀ v, ‖B.w v‖ = 1) → ∀ A ∈ B.I.eHom B.σs B.μf B.fund B.R B.Re, B.I.IsCuspFn (B.I.muA B.μf) (B.I.ext (A (B.tens B.w))) → IsCuspHom B.I A := by
+theorem isCuspHom_of_cusp_lowest
+    : ∀ (B : RowsAut),
+      (∀ v, IsDS (B.I.ε v) (B.lam v) (B.σ v)) → (∀ v, ‖B.w v‖ = 1)
+        → ∀ A ∈ B.I.eHom B.σs B.μf B.fund B.R B.Re,
+          B.I.IsCuspFn (B.I.muA B.μf) (B.I.ext (A (B.tens B.w))) → IsCuspHom B.I A := by
   intro B hDS hw A hA hcusp
   obtain ⟨S, hS, hSc, hSR, -⟩ := GlobalTheory.CuspSubspace.cuspidal_closed_stable B
   obtain ⟨-, -, -, -, hirr⟩ :=
@@ -28,8 +33,7 @@ theorem isCuspHom_of_cusp_lowest : ∀ (B : RowsAut), (∀ v, IsDS (B.I.ε v) (B
   have hT₀' : ∀ g : B.I.Ginf, T₀.comp (B.σs g) = (B.R (g, 1)).comp T₀ := hT₀
   have hRe := (GlobalTheory.IdemProj.re_orth_proj B).2.1
 
-  have hint : ∀ (g : B.I.Ginf) (u : B.Hs),
-      B.Re (T₀ (B.σs g u)) = B.R (g, 1) (B.Re (T₀ u)) := by
+  have hint : ∀ (g : B.I.Ginf) (u : B.Hs), B.Re (T₀ (B.σs g u)) = B.R (g, 1) (B.Re (T₀ u)) := by
     intro g u
     have h1 := congrArg (fun L => L u) (hT₀' g)
     have h2 := congrArg (fun L => L (T₀ u)) (hRe g)
@@ -37,8 +41,7 @@ theorem isCuspHom_of_cusp_lowest : ∀ (B : RowsAut), (∀ v, IsDS (B.I.ε v) (B
     rw [h1, h2]
 
   let P : Submodule ℂ B.Hs := S.comap (B.Re.comp T₀ : B.Hs →L[ℂ] B.I.L2 B.μf B.fund).toLinearMap
-  have hPc : IsClosed (P : Set B.Hs) :=
-    hSc.preimage (B.Re.comp T₀).continuous
+  have hPc : IsClosed (P : Set B.Hs) := hSc.preimage (B.Re.comp T₀).continuous
   have hPs : ∀ g, ∀ u ∈ P, B.σs g u ∈ P := by
     intro g u hu
     change B.Re (T₀ (B.σs g u)) ∈ S

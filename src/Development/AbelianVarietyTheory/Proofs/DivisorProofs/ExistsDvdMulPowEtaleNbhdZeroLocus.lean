@@ -13,9 +13,11 @@ namespace GlobalTheory.LocDivEtale
 
 open IsLocalRing
 
-theorem span_singleton_eq_maximalIdeal_pow {L : Type} [CommRing L] [IsLocalRing L] [IsNoetherianRing L] (π : L)
-    (hπ : maximalIdeal L = Ideal.span {π}) (x : L) (hx : x ≠ 0) :
-    ∃ n : ℕ, Ideal.span {x} = maximalIdeal L ^ n := by
+theorem span_singleton_eq_maximalIdeal_pow
+    {L : Type} [CommRing L] [IsLocalRing L] [IsNoetherianRing L]
+    (π : L) (hπ : maximalIdeal L = Ideal.span {π})
+    (x : L) (hx : x ≠ 0)
+    : ∃ n : ℕ, Ideal.span {x} = maximalIdeal L ^ n := by
   classical
   have hK := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal L) (maximalIdeal.isMaximal L).ne_top
   have hex : ∃ n, x ∉ maximalIdeal L ^ (n + 1) := by
@@ -23,11 +25,13 @@ theorem span_singleton_eq_maximalIdeal_pow {L : Type} [CommRing L] [IsLocalRing 
     push_neg at h
     apply hx
     have : x ∈ ⨅ i, maximalIdeal L ^ i := by
-      rw [Ideal.mem_iInf]; intro i
+      rw [Ideal.mem_iInf]
+      intro i
       cases i with
       | zero => simp
       | succ k => exact h k
-    rw [hK] at this; exact this
+    rw [hK] at this
+    exact this
   obtain ⟨n, hn, hn'⟩ : ∃ n, x ∉ maximalIdeal L ^ (n + 1) ∧ x ∈ maximalIdeal L ^ n := by
     refine ⟨Nat.find hex, Nat.find_spec hex, ?_⟩
     rcases Nat.eq_zero_or_pos (Nat.find hex) with h0 | hpos
@@ -50,8 +54,9 @@ theorem span_singleton_eq_maximalIdeal_pow {L : Type} [CommRing L] [IsLocalRing 
   rw [← hy]
   exact Ideal.span_singleton_mul_left_unit hyu _
 
-theorem exists_local_uniformizer (B : Type) [CommRing B] [IsDedekindDomain B] (m : Ideal B) [m.IsPrime]
-    (hm0 : m ≠ ⊥) : ∃ π ∈ m, ∀ b ∈ m, ∃ t ∉ m, ∃ c : B, t * b = π * c := by
+theorem exists_local_uniformizer
+    (B : Type) [CommRing B] [IsDedekindDomain B] (m : Ideal B) [m.IsPrime] (hm0 : m ≠ ⊥)
+    : ∃ π ∈ m, ∀ b ∈ m, ∃ t ∉ m, ∃ c : B, t * b = π * c := by
   haveI : IsDiscreteValuationRing (Localization.AtPrime m) :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain B hm0 _
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible (Localization.AtPrime m)
@@ -68,25 +73,32 @@ theorem exists_local_uniformizer (B : Type) [CommRing B] [IsDedekindDomain B] (m
     obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 hb'
     obtain ⟨⟨c, u⟩, hcu⟩ := IsLocalization.surj m.primeCompl z
     simp only at hcu
-    have heq : algebraMap B (Localization.AtPrime m) (b * (t * u)) =
-        algebraMap B (Localization.AtPrime m) (π * c) := by
+    have heq
+        : algebraMap B (Localization.AtPrime m) (b * (t * u))
+          = algebraMap B (Localization.AtPrime m) (π * c) := by
       rw [map_mul, map_mul, map_mul, ← hz, ← hπt, ← hcu]; ring
     obtain ⟨w, hw⟩ := (IsLocalization.eq_iff_exists m.primeCompl (Localization.AtPrime m)).1 heq
     refine ⟨w * (t * u), ?_, w * c, ?_⟩
     · exact (m.primeCompl).mul_mem w.2 ((m.primeCompl).mul_mem t.2 u.2)
     · rw [show (w : B) * (t * u) * b = w * (b * (t * u)) by ring, hw]; ring
 
-theorem exists_dvd_mul_pow : ∀ (B A' : Type) [CommRing B] [IsDedekindDomain B] [CommRing A'] [Algebra B A']
-    [Algebra.Etale B A'] (f : B), f ≠ 0 → IsNbhd B A' f → ∀ a ∈ nonZeroDivisors A', ∀ M : Ideal A', M.IsMaximal →
-    algebraMap B A' f ∈ M → ∃ s ∉ M, ∃ N : ℕ, a ∣ s * algebraMap B A' f ^ N := by
+theorem exists_dvd_mul_pow
+    : ∀ (B A' : Type) [CommRing B] [IsDedekindDomain B] [CommRing A'] [Algebra B A']
+        [Algebra.Etale B A'] (f : B),
+      f ≠ 0 → IsNbhd B A' f
+        → ∀ a ∈ nonZeroDivisors A', ∀ M : Ideal A',
+          M.IsMaximal → algebraMap B A' f ∈ M
+            → ∃ s ∉ M, ∃ N : ℕ, a ∣ s * algebraMap B A' f ^ N := by
   intro B A' _ _ _ _ _ f hf hN a ha M hM hfM
   classical
   set m : Ideal B := M.comap (algebraMap B A') with hm_def
   haveI : m.IsPrime := Ideal.comap_isPrime _ _
   have hfm : f ∈ m := hfM
   have hm0 : m ≠ ⊥ := by
-    intro h; apply hf
-    rw [h] at hfm; exact (Submodule.mem_bot _).1 hfm
+    intro h
+    apply hf
+    rw [h] at hfm
+    exact (Submodule.mem_bot _).1 hfm
   obtain ⟨π, hπm, hπ⟩ := exists_local_uniformizer B m hm0
   let L := Localization.AtPrime M
   haveI : IsNoetherianRing A' := Algebra.FiniteType.isNoetherianRing B A'
@@ -108,7 +120,8 @@ theorem exists_dvd_mul_pow : ∀ (B A' : Type) [CommRing B] [IsDedekindDomain B]
       have hbm : b ∈ m := by
         show algebraMap B A' b ∈ M
         have : algebraMap B A' b = x - c * algebraMap B A' f := by rw [hc]; ring
-        rw [this]; exact M.sub_mem hx (M.mul_mem_left _ hfM)
+        rw [this]
+        exact M.sub_mem hx (M.mul_mem_left _ hfM)
       have hx' : x = algebraMap B A' b + c * algebraMap B A' f := by rw [hc]; ring
       show algebraMap A' L x ∈ Ideal.span {φ π}
       rw [hx', map_add (f := _), map_mul]
@@ -129,9 +142,11 @@ theorem exists_dvd_mul_pow : ∀ (B A' : Type) [CommRing B] [IsDedekindDomain B]
   have heq : algebraMap A' L (algebraMap B A' f ^ n * s) = algebraMap A' L (y * a) := by
     rw [map_mul, map_mul, map_pow, ← hys]
     show φ f ^ n * _ = _
-    rw [← hz]; ring
+    rw [← hz]
+    ring
   obtain ⟨w, hw⟩ := (IsLocalization.eq_iff_exists M.primeCompl L).1 heq
   refine ⟨w * s, (M.primeCompl).mul_mem w.2 s.2, n, w * y, ?_⟩
-  rw [show (w : A') * s * algebraMap B A' f ^ n = w * (algebraMap B A' f ^ n * s) by ring, hw]; ring
+  rw [show (w : A') * s * algebraMap B A' f ^ n = w * (algebraMap B A' f ^ n * s) by ring, hw]
+  ring
 
 end GlobalTheory.LocDivEtale

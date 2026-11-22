@@ -40,5 +40,7 @@ public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSheetSimpleNu
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.CycleAverage : GroundTheory.Heights₂.Heights.CycleAverage.Statement :=
-  @GroundTheory.Heights₂.Heights.CycleAverage.proof GroundTheory.Heights₂.Heights.AutoClose.ConeAverage
+theorem GroundTheory.Heights₂.Heights.AutoClose.CycleAverage
+    : GroundTheory.Heights₂.Heights.CycleAverage.Statement :=
+  @GroundTheory.Heights₂.Heights.CycleAverage.proof
+    GroundTheory.Heights₂.Heights.AutoClose.ConeAverage

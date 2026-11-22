@@ -11,10 +11,12 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.PerfectRing
 
-theorem mul_eq_zero_of_C_pow_mem_span (K : Type) [CommRing K]
-    (hred : ∀ (x : K) (n : ℕ), x ^ n = 0 → x = 0) (f g a : K) (n : ℕ)
-    (h : (Polynomial.C a) ^ n ∈
-      Ideal.span {Polynomial.C f - Polynomial.X * Polynomial.C g}) : g * a = 0 := by
+theorem mul_eq_zero_of_C_pow_mem_span
+    (K : Type) [CommRing K]
+    (hred : ∀ (x : K) (n : ℕ), x ^ n = 0 → x = 0)
+    (f g a : K) (n : ℕ)
+    (h : (Polynomial.C a) ^ n ∈ Ideal.span {Polynomial.C f - Polynomial.X * Polynomial.C g})
+    : g * a = 0 := by
   let L := Localization.Away g
   let u : L := IsLocalization.Away.invSelf g
   have hu : algebraMap K L g * u = 1 := IsLocalization.Away.mul_invSelf g
@@ -35,15 +37,19 @@ theorem mul_eq_zero_of_C_pow_mem_span (K : Type) [CommRing K]
   obtain ⟨M, rfl⟩ := hm
   have e' : g ^ M * a ^ n = 0 := e
   apply hred _ (M + n)
-  calc (g * a) ^ (M + n) = g ^ n * a ^ M * (g ^ M * a ^ n) := by ring
+  calc
+    (g * a) ^ (M + n)
+      = g ^ n * a ^ M * (g ^ M * a ^ n) := by ring
     _ = 0 := by rw [e', mul_zero]
 
-theorem b_inj : ∀ (p : ℕ) [Fact p.Prime] (K : Type) [CommRing K] (K₁ : Type) [CommRing K₁]
-    (K₂ : Type) [CommRing K₂] (f g : K) (i₁ : Polynomial K →+* K₁) (i₂ : Polynomial K →+* K₂)
-    (r : ℕ → K) (N : ℕ), Pf p K → IsRt p r → r 0 ^ N ∈ Ideal.span {f, g} →
-    PQ p i₁ (Ideal.span {Polynomial.C f - Polynomial.X * Polynomial.C g}) →
-    PQ p i₂ (Ideal.span {Polynomial.C g - Polynomial.X * Polynomial.C f}) →
-    ∀ a : K, i₁ (Polynomial.C a) = 0 → i₂ (Polynomial.C a) = 0 → ∀ k, r k * a = 0 := by
+theorem b_inj
+    : ∀ (p : ℕ) [Fact p.Prime] (K : Type) [CommRing K] (K₁ : Type) [CommRing K₁] (K₂ : Type)
+        [CommRing K₂] (f g : K) (i₁ : Polynomial K →+* K₁) (i₂ : Polynomial K →+* K₂) (r : ℕ → K)
+        (N : ℕ),
+      Pf p K → IsRt p r → r 0 ^ N ∈ Ideal.span {f, g}
+        → PQ p i₁ (Ideal.span {Polynomial.C f - Polynomial.X * Polynomial.C g})
+        → PQ p i₂ (Ideal.span {Polynomial.C g - Polynomial.X * Polynomial.C f})
+        → ∀ a : K, i₁ (Polynomial.C a) = 0 → i₂ (Polynomial.C a) = 0 → ∀ k, r k * a = 0 := by
   intro p _ K _ K₁ _ K₂ _ f g i₁ i₂ r N hK hr hN h₁ h₂ a ha₁ ha₂
   obtain ⟨-, hred, -, -, hroots⟩ := pf_facts p K hK
   obtain ⟨k₁, hk₁⟩ := (h₁.ker _).1 ha₁

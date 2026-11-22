@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Eventuall
 @[expose] public section
 
 open MeasureTheory Set Filter Polynomial NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots GlobalTheory.TrEll
 open GlobalTheory.IndefiniteRowSideFullHecke.AdelicUnitaryGroups (mapH diagH)
 open scoped TensorProduct ComplexConjugate Matrix
@@ -20,32 +21,51 @@ open scoped TensorProduct ComplexConjugate Matrix
 noncomputable section
 
 namespace GlobalTheory.TrUnitLat
-theorem alpha_mem_stab : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (r : ℕ) (P : PPol σ r), ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, diagH (star' P) (one₁ P) (Fv F v) (alphaRat P) ∈ stabLoc (star' P) (one₁ P) (stdLattice (Fld P) 1) v := by
-  intro F E _ _ _ _ _ σ r P
-  filter_upwards [eventually_one_tmul_mem_intLoc (F := F) (alpha P),
-    eventually_one_tmul_mem_intLoc (F := F) (alpha P)⁻¹] with v h1 h2
-  have e0 : ∀ Y : Fin 1 → Fv F v ⊗[F] Fld P,
-      (matHom _ (star' P) (one₁ P) (diagH (star' P) (one₁ P) (Fv F v) (alphaRat P))).1 *ᵥ Y ∈
-        latLoc F (stdLattice (Fld P) 1) v ↔ (1 : Fv F v) ⊗ₜ[F] alpha P * Y 0 ∈ intLoc F (Fld P) v := fun Y => by
-    have e : (matHom _ (star' P) (one₁ P) (diagH (star' P) (one₁ P) (Fv F v) (alphaRat P))).1 0 0 =
-        (1 : Fv F v) ⊗ₜ[F] alpha P := rfl
-    rw [mem_latLoc_stdLattice, Fin.forall_fin_one, ← e]
-    simp [Matrix.mulVec, dotProduct]
-  have hinv : (1 : Fv F v) ⊗ₜ[F] (alpha P)⁻¹ * (1 : Fv F v) ⊗ₜ[F] alpha P = 1 := by
-    rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, inv_mul_cancel₀ (alpha_ne_zero P), Algebra.TensorProduct.one_def]
-  refine mem_stabLoc.2 fun Y => ?_
-  rw [e0, mem_latLoc_stdLattice, Fin.forall_fin_one]
-  refine ⟨mul_mem h1, fun hY => ?_⟩
-  have := mul_mem h2 hY
-  rwa [← mul_assoc, hinv, one_mul] at this
+theorem alpha_mem_stab
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (r : ℕ) (P : PPol σ r),
+      ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, diagH (star' P) (one₁ P) (Fv F v) (alphaRat P) ∈ stabLoc (star' P) (one₁ P) (stdLattice (Fld P) 1) v :=
+  by
+    intro F E _ _ _ _ _ σ r P
+    filter_upwards [eventually_one_tmul_mem_intLoc (F := F) (alpha P),
+      eventually_one_tmul_mem_intLoc (F := F) (alpha P)⁻¹] with v h1 h2
+    have e0
+        : ∀ Y : Fin 1 → Fv F v ⊗[F] Fld P,
+          (matHom _ (star' P) (one₁ P) (diagH (star' P) (one₁ P) (Fv F v) (alphaRat P))).1 *ᵥ Y
+              ∈ latLoc F (stdLattice (Fld P) 1) v
+            ↔ (1 : Fv F v) ⊗ₜ[F] alpha P * Y 0 ∈ intLoc F (Fld P) v := fun Y => by
+      have e
+          : (matHom _ (star' P) (one₁ P) (diagH (star' P) (one₁ P) (Fv F v) (alphaRat P))).1 0 0
+            = (1 : Fv F v) ⊗ₜ[F] alpha P :=
+        rfl
+      rw [mem_latLoc_stdLattice, Fin.forall_fin_one, ← e]
+      simp [Matrix.mulVec, dotProduct]
+    have hinv : (1 : Fv F v) ⊗ₜ[F] (alpha P)⁻¹ * (1 : Fv F v) ⊗ₜ[F] alpha P = 1 := by
+      rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, inv_mul_cancel₀ (alpha_ne_zero P),
+        Algebra.TensorProduct.one_def]
+    refine mem_stabLoc.2 fun Y => ?_
+    rw [e0, mem_latLoc_stdLattice, Fin.forall_fin_one]
+    refine ⟨mul_mem h1, fun hY => ?_⟩
+    have := mul_mem h2 hY
+    rwa [← mul_assoc, hinv, one_mul] at this
 
-theorem stab_torEmb_iff : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) (r n : ℕ) (P : PPol σ r) (v : HeightOneSpectrum (𝓞 F)) (J : Matrix (Fin n) (Fin n) E) (L : Submodule (𝓞 E) (Fin n → E)) (x : Fv F v ⊗[F] Fld P) (φ : (Fv F v ⊗[F] Fld P) ≃ₗ[Fv F v ⊗[F] E] (Fin n → Fv F v ⊗[F] E)) (h : IsIsom P (Fv F v) J x φ), (∀ y, y ∈ intLoc F (Fld P) v ↔ φ y ∈ latLoc F L v) → ∀ t, torEmb h t ∈ stabLoc σ J L v ↔ t ∈ stabLoc (star' P) (one₁ P) (stdLattice (Fld P) 1) v := by
+theorem stab_torEmb_iff
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) (r n : ℕ)
+        (P : PPol σ r) (v : HeightOneSpectrum (𝓞 F)) (J : Matrix (Fin n) (Fin n) E)
+        (L : Submodule (𝓞 E) (Fin n → E)) (x : Fv F v ⊗[F] Fld P)
+        (φ : (Fv F v ⊗[F] Fld P) ≃ₗ[Fv F v ⊗[F] E] (Fin n → Fv F v ⊗[F] E))
+        (h : IsIsom P (Fv F v) J x φ),
+      (∀ y, y ∈ intLoc F (Fld P) v ↔ φ y ∈ latLoc F L v)
+        → ∀ t,
+          torEmb h t ∈ stabLoc σ J L v
+            ↔ t ∈ stabLoc (star' P) (one₁ P) (stdLattice (Fld P) 1) v := by
   intro F E _ _ _ _ σ r n P v J L x φ h hφ t
   have e1 : (matHom _ σ J (torEmb h t)).1 = mulMat φ (torUnit t).1 := rfl
   have e0 : (torUnit t).1 = t.1.1 0 0 := Matrix.det_fin_one _
-  have e2 : ∀ Y : Fin 1 → Fv F v ⊗[F] Fld P,
-      (matHom _ (star' P) (one₁ P) t).1 *ᵥ Y ∈ latLoc F (stdLattice (Fld P) 1) v ↔
-        (torUnit t).1 * Y 0 ∈ intLoc F (Fld P) v := fun Y => by
+  have e2
+      : ∀ Y : Fin 1 → Fv F v ⊗[F] Fld P,
+        (matHom _ (star' P) (one₁ P) t).1 *ᵥ Y ∈ latLoc F (stdLattice (Fld P) 1) v
+          ↔ (torUnit t).1 * Y 0 ∈ intLoc F (Fld P) v := fun Y => by
     rw [mem_latLoc_stdLattice, Fin.forall_fin_one, e0]
     simp [Matrix.mulVec, dotProduct, matHom]
     exact Iff.rfl
@@ -65,11 +85,15 @@ end GlobalTheory.TrUnitLat
 
 namespace GlobalTheory.TrUnitLat
 
-theorem hform_mulVec' {A : Type} [CommRing A] (s : A →+* A) {n : ℕ} (J k : Matrix (Fin n) (Fin n) A) (a b : Fin n → A) :
-    Formalism.UG.hform s J (k *ᵥ a) (k *ᵥ b) = Formalism.UG.hform s (Formalism.UG.cT s k * J * k) a b := by
-  have e2 : ∀ (J : Matrix (Fin n) (Fin n) A) a b, Formalism.UG.hform s J a b = (s ∘ a) ⬝ᵥ J *ᵥ b := by
+theorem hform_mulVec'
+    {A : Type} [CommRing A] (s : A →+* A) {n : ℕ} (J k : Matrix (Fin n) (Fin n) A) (a b : Fin n → A)
+    : Formalism.UG.hform s J (k *ᵥ a) (k *ᵥ b)
+      = Formalism.UG.hform s (Formalism.UG.cT s k * J * k) a b := by
+  have e2
+      : ∀ (J : Matrix (Fin n) (Fin n) A) a b, Formalism.UG.hform s J a b = (s ∘ a) ⬝ᵥ J *ᵥ b := by
     intro J a b
-    simp only [Formalism.UG.hform, dotProduct, Matrix.mulVec, Finset.mul_sum, Function.comp_apply, mul_assoc]
+    simp only [Formalism.UG.hform, dotProduct, Matrix.mulVec, Finset.mul_sum, Function.comp_apply,
+      mul_assoc]
   have e3 : s ∘ (k *ᵥ a) = (s ∘ a) ᵥ* Formalism.UG.cT s k := by
     funext i
     rw [Formalism.UG.cT, Matrix.vecMul_transpose, Function.comp_apply, RingHom.map_mulVec]

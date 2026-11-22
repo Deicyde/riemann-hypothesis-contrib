@@ -6,8 +6,12 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Twis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.fundamentalLemmaLatticeFrobFixed_forall_degree : ∀ r : ℕ, FLAt r := by
-  first | exact @GlobalTheory.PMon.flAt_all | exact GlobalTheory.PMon.flAt_all | (intros; apply GlobalTheory.PMon.flAt_all <;> assumption)
+  first
+  | exact @GlobalTheory.PMon.flAt_all
+  | exact GlobalTheory.PMon.flAt_all
+  | (intros; apply GlobalTheory.PMon.flAt_all <;> assumption)

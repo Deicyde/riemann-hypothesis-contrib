@@ -9,14 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FjCauchyB
 
 @[expose] public section
 
-open NumberField AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.HeckeEx
+open NumberField AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory
+  MonObj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj GlobalTheory.HeckeEx
 open GlobalTheory.Dict (castFr)
 open GlobalTheory.FrameNorm (IsUnitFr)
 open scoped Matrix
 
 namespace GlobalTheory.HeckeEx
 
-theorem bddSec_tendsto_constTerm : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ), X.IsBddSec la P → ∀ ξ, X.IsIso ξ → ∀ x ∈ X.dom, (∀ t : ℝ, 0 ≤ t → X.flow ξ (fun _ => Complex.I * t) x ∈ X.dom) ∧ Filter.Tendsto (fun t : ℝ => P (X.flow ξ (fun _ => Complex.I * t) x)) Filter.atTop (nhds (X.fj la ξ 0 P x)) := by
+theorem bddSec_tendsto_constTerm
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (la : Wt X.Ψ r)
+        (P : Frame X.Ψ r → ℂ),
+      X.IsBddSec la P
+        → ∀ ξ,
+          X.IsIso ξ
+            → ∀ x ∈ X.dom,
+              (∀ t : ℝ, 0 ≤ t → X.flow ξ (fun _ => Complex.I * t) x ∈ X.dom) ∧ Filter.Tendsto
+                (fun t : ℝ => P (X.flow ξ (fun _ => Complex.I * t) x))
+                Filter.atTop (nhds (X.fj la ξ 0 P x)) := by
   intro E _ _ _ r X la P hP ξ hξ x hx
   have hdom : ∀ t : ℝ, 0 ≤ t → X.flow ξ (fun _ => Complex.I * t) x ∈ X.dom := fun t ht =>
     GlobalTheory.FjCauchy.flow_mem_dom X hξ hx _ fun τ => by
@@ -27,9 +39,10 @@ theorem bddSec_tendsto_constTerm : ∀ (E : Type) [Field E] [NumberField E] [IsC
   refine ⟨hdom, ?_⟩
   have hexp := m3bExp_holds (E := E) r X la P hP.1 ξ hξ x hx
 
-  have hfac : ∀ (ν : X.Ψ → ℝ) (t : ℝ),
-      Complex.exp (4 * Real.pi * Complex.I * ∑ τ, (ν τ : ℂ) * (fun _ => Complex.I * (t : ℂ)) τ) =
-        ((Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t)) : ℝ) : ℂ) := by
+  have hfac
+      : ∀ (ν : X.Ψ → ℝ) (t : ℝ),
+        Complex.exp (4 * Real.pi * Complex.I * ∑ τ, (ν τ : ℂ) * (fun _ => Complex.I * (t : ℂ)) τ)
+          = ((Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t)) : ℝ) : ℂ) := by
     intro ν t
     rw [Complex.ofReal_exp]
     congr 1
@@ -43,7 +56,9 @@ theorem bddSec_tendsto_constTerm : ∀ (E : Type) [Field E] [NumberField E] [IsC
   set F : ℝ → (X.Ψ → ℝ) → ℂ := fun t ν =>
     X.fj la ξ ν P x * Complex.exp (4 * Real.pi * Complex.I * ∑ τ, (ν τ : ℂ) * (fun _ => Complex.I * (t : ℂ)) τ)
     with hF
-  have hF' : ∀ t ν, F t ν = X.fj la ξ ν P x * ((Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t)) : ℝ) : ℂ) := by
+  have hF'
+      : ∀ t ν,
+        F t ν = X.fj la ξ ν P x * ((Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t)) : ℝ) : ℂ) := by
     intro t ν; rw [hF]; dsimp only; rw [hfac]
 
   have hsum0 : Summable fun ν : X.Ψ → ℝ => X.fj la ξ ν P x := by
@@ -56,12 +71,14 @@ theorem bddSec_tendsto_constTerm : ∀ (E : Type) [Field E] [NumberField E] [IsC
   have hbound : Summable fun ν : X.Ψ → ℝ => ‖X.fj la ξ ν P x‖ := summable_norm_iff.mpr hsum0
   have hsign : ∀ ν : X.Ψ → ℝ, X.fj la ξ ν P x ≠ 0 → ∀ τ, 0 ≤ ν τ := fun ν h =>
     BoundedSectionAlgebra.sign_of_bdd X moderateCoefficientPositivity_holds hP hξ ν hx h
-  have hlim : Filter.Tendsto (fun t => ∑' ν, F t ν) Filter.atTop
-      (nhds (∑' ν : X.Ψ → ℝ, if ν = 0 then X.fj la ξ 0 P x else 0)) := by
+  have hlim : Filter.Tendsto
+      (fun t => ∑' ν, F t ν)
+      Filter.atTop (nhds (∑' ν : X.Ψ → ℝ, if ν = 0 then X.fj la ξ 0 P x else 0)) := by
     refine tendsto_tsum_of_dominated_convergence hbound (fun ν => ?_) ?_
     · by_cases h0 : X.fj la ξ ν P x = 0
       · have : (if ν = 0 then X.fj la ξ 0 P x else 0) = 0 := by
-          split_ifs with h; · subst h; exact h0
+          split_ifs with h
+          · subst h; exact h0
           · rfl
         rw [this]
         simp only [hF', h0, zero_mul]
@@ -73,12 +90,14 @@ theorem bddSec_tendsto_constTerm : ∀ (E : Type) [Field E] [NumberField E] [IsC
         exact tendsto_const_nhds
       · rw [if_neg hν]
         have hnn := hsign ν h0
-        obtain ⟨τ0, hτ0⟩ : ∃ τ0, ν τ0 ≠ 0 := by
-          by_contra hc; push_neg at hc; exact hν (funext hc)
+        obtain ⟨τ0, hτ0⟩ : ∃ τ0, ν τ0 ≠ 0 := by by_contra hc; push_neg at hc; exact hν (funext hc)
         have hS : 0 < ∑ τ, ν τ :=
-          Finset.sum_pos' (fun τ _ => hnn τ) ⟨τ0, Finset.mem_univ _, lt_of_le_of_ne (hnn τ0) (Ne.symm hτ0)⟩
+          Finset.sum_pos'
+            (fun τ _ => hnn τ)
+            ⟨τ0, Finset.mem_univ _, lt_of_le_of_ne (hnn τ0) (Ne.symm hτ0)⟩
         have hk : 0 < 4 * Real.pi * ∑ τ, ν τ := by positivity
-        have he : Filter.Tendsto (fun t : ℝ => Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t)))
+        have he : Filter.Tendsto
+            (fun t : ℝ => Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t)))
             Filter.atTop (nhds 0) :=
           Real.tendsto_exp_neg_atTop_nhds_zero.comp (Filter.tendsto_id.const_mul_atTop hk)
         have := ((Complex.continuous_ofReal.tendsto 0).comp he).const_mul (X.fj la ξ ν P x)
@@ -94,7 +113,8 @@ theorem bddSec_tendsto_constTerm : ∀ (E : Type) [Field E] [NumberField E] [IsC
         rw [Real.exp_le_one_iff]
         have : 0 ≤ 4 * Real.pi * (∑ τ, ν τ) * t := by positivity
         linarith
-      calc ‖X.fj la ξ ν P x‖ * Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t))
+      calc
+        ‖X.fj la ξ ν P x‖ * Real.exp (-(4 * Real.pi * (∑ τ, ν τ) * t))
           ≤ ‖X.fj la ξ ν P x‖ * 1 := mul_le_mul_of_nonneg_left this (norm_nonneg _)
         _ = ‖X.fj la ξ ν P x‖ := _root_.mul_one _
   rw [tsum_ite_eq] at hlim

@@ -5,7 +5,8 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafDescendVCut
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4 LateralTheory.E.LeafDescendVCut
+open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
+  LateralTheory.E.LeafDescendVCut
 
 namespace LateralTheory.E.LeafDescendMapPf
 
@@ -14,7 +15,11 @@ variable {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω]
 abbrev J (R : Subalgebra k Ω) : Type := {S : Subalgebra k Ω // R ≤ S ∧ S.FG}
 
 instance (R : Subalgebra k Ω) : IsDirected (J R) (· ≤ ·) :=
-  ⟨fun a b => ⟨⟨a.1 ⊔ b.1, le_sup_of_le_left a.2.1, a.2.2.sup b.2.2⟩, le_sup_left (a := a.1), le_sup_right (a := a.1)⟩⟩
+  ⟨fun a b => ⟨
+    ⟨a.1 ⊔ b.1, le_sup_of_le_left a.2.1, a.2.2.sup b.2.2⟩,
+    le_sup_left (a := a.1),
+    le_sup_right (a := a.1)
+  ⟩⟩
 
 lemma toR_incl {R S : Subalgebra k Ω} (h : R ≤ S) : toR S ≫ incl h = toR R := by
   rw [toR, incl, toR, ← Spec.map_comp]; rfl
@@ -57,10 +62,22 @@ def cocIsColimit (hR : R.FG) : IsColimit (coc R) := by
   refine Types.FilteredColimit.isColimitOf _ _ ?_ ?_
   · intro (x : Ω)
     have hx : x ∈ R ⊔ Algebra.adjoin k {x} := le_sup_right (a := R) (Algebra.subset_adjoin rfl)
-    exact ⟨⟨R ⊔ Algebra.adjoin k {x}, le_sup_left, hR.sup (by simpa using Subalgebra.fg_adjoin_finset (R := k) ({x} : Finset Ω))⟩, ⟨x, hx⟩, rfl⟩
+    exact ⟨
+      ⟨
+        R ⊔ Algebra.adjoin k {x},
+        le_sup_left,
+        hR.sup (by simpa using Subalgebra.fg_adjoin_finset (R := k) ({x} : Finset Ω))
+      ⟩,
+      ⟨x, hx⟩,
+      rfl
+    ⟩
   · intro i j xi xj h
-    refine ⟨⟨i.1 ⊔ j.1, le_sup_of_le_left i.2.1, i.2.2.sup j.2.2⟩, homOfLE (le_sup_left (a := i.1)),
-      homOfLE (le_sup_right (a := i.1)), ?_⟩
+    refine ⟨
+      ⟨i.1 ⊔ j.1, le_sup_of_le_left i.2.1, i.2.2.sup j.2.2⟩,
+      homOfLE (le_sup_left (a := i.1)),
+      homOfLE (le_sup_right (a := i.1)),
+      ?_
+    ⟩
     apply Subtype.ext
     exact h
 
@@ -75,17 +92,37 @@ variable {D0 : Scheme.{0}} (q : D0 ⟶ Sp R)
 
 abbrev D : (J R)ᵒᵖ ⥤ Scheme.{0} where
   obj S := pullback q (incl S.unop.2.1)
-  map {S T} h := pullback.lift (pullback.fst _ _) (pullback.snd _ _ ≫ incl (leOfHom h.unop))
-    (by rw [pullback.condition, Category.assoc, incl_incl])
-  map_id S := by apply pullback.hom_ext <;> simp only [pullback.lift_fst, pullback.lift_snd, pullback.lift_fst_assoc, pullback.lift_snd_assoc, Category.assoc, Category.id_comp, Category.comp_id, Functor.const_obj_map, incl_incl, toR_incl, incl_self, incl_base, CategoryTheory.Functor.id_obj]
-  map_comp f g := by apply pullback.hom_ext <;> simp only [pullback.lift_fst, pullback.lift_snd, pullback.lift_fst_assoc, pullback.lift_snd_assoc, Category.assoc, Category.id_comp, Category.comp_id, Functor.const_obj_map, incl_incl, toR_incl, incl_self, incl_base, CategoryTheory.Functor.id_obj]
+  map {S T} h :=
+    pullback.lift (pullback.fst _ _) (pullback.snd _ _ ≫ incl (leOfHom h.unop))
+      (by rw [pullback.condition, Category.assoc, incl_incl])
+  map_id S := by
+    apply pullback.hom_ext <;> simp only [pullback.lift_fst, pullback.lift_snd,
+      pullback.lift_fst_assoc, pullback.lift_snd_assoc, Category.assoc, Category.id_comp,
+      Category.comp_id, Functor.const_obj_map, incl_incl, toR_incl, incl_self, incl_base,
+      CategoryTheory.Functor.id_obj]
+  map_comp f g := by
+    apply pullback.hom_ext <;> simp only [pullback.lift_fst, pullback.lift_snd,
+      pullback.lift_fst_assoc, pullback.lift_snd_assoc, Category.assoc, Category.id_comp,
+      Category.comp_id, Functor.const_obj_map, incl_incl, toR_incl, incl_self, incl_base,
+      CategoryTheory.Functor.id_obj]
 
 variable {C0 : Scheme.{0}} (c0 : C0 ⟶ Sp Ω) (v0 : C0 ⟶ D0) (hPB : IsPullback v0 c0 q (toR R))
 
 abbrev cone : Cone (D R q) where
   pt := C0
-  π := { app S := pullback.lift v0 (c0 ≫ toR S.unop.1) (by rw [hPB.w, Category.assoc, toR_incl])
-         naturality S T h := by apply pullback.hom_ext <;> (dsimp only [D]; simp only [pullback.lift_fst, pullback.lift_snd, pullback.lift_fst_assoc, pullback.lift_snd_assoc, Category.assoc, Category.id_comp, Category.comp_id, Functor.const_obj_map, incl_incl, toR_incl, incl_self, incl_base, CategoryTheory.Functor.id_obj]) <;> simp }
+  π := {
+    app S := pullback.lift v0 (c0 ≫ toR S.unop.1) (by rw [hPB.w, Category.assoc, toR_incl])
+    naturality S T h := by
+      apply pullback.hom_ext
+        <;> (
+          dsimp only [D]
+          simp only [pullback.lift_fst, pullback.lift_snd, pullback.lift_fst_assoc,
+            pullback.lift_snd_assoc, Category.assoc, Category.id_comp, Category.comp_id,
+            Functor.const_obj_map, incl_incl, toR_incl, incl_self, incl_base,
+            CategoryTheory.Functor.id_obj]
+        )
+        <;> simp
+  }
 
 lemma fstAff {S : Subalgebra k Ω} (h : R ≤ S) : IsAffineHom (pullback.fst q (incl h)) :=
   MorphismProperty.IsStableUnderBaseChange.of_isPullback (P := @IsAffineHom) (IsPullback.of_hasPullback q (incl h)).flip
@@ -108,12 +145,14 @@ variable {C0 : Scheme.{0}} (c0 : C0 ⟶ Sp Ω) (v0 : C0 ⟶ D0) (hPB : IsPullbac
 
 abbrev specCone (s : Cone (D R q)) : Cone ((F R).op ⋙ Scheme.Spec) where
   pt := s.pt
-  π := { app S := s.π.app S ≫ pullback.snd _ _
-         naturality S T h := by
-           have hw := s.w h
-           rw [← hw]
-           erw [Category.id_comp, Category.assoc, pullback.lift_snd]
-           exact (Category.assoc _ _ _).symm }
+  π := {
+    app S := s.π.app S ≫ pullback.snd _ _
+    naturality S T h := by
+      have hw := s.w h
+      rw [← hw]
+      erw [Category.id_comp, Category.assoc, pullback.lift_snd]
+      exact (Category.assoc _ _ _).symm
+  }
 
 def bL (hR : R.FG) (s : Cone (D R q)) : s.pt ⟶ Sp Ω := (specLim R hR).lift (specCone R q s)
 

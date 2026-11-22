@@ -6,15 +6,19 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.
 @[expose] public section
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 namespace GlobalTheory
 
-theorem eq_zero_of_setIntegral_compact_eq_zero {K : Type} [MetricSpace K] [ProperSpace K]
-    [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [IsFiniteMeasureOnCompacts ν]
-    [ν.IsOpenPosMeasure] {B : Set K} (hB : IsOpen B) {h : K → ℂ} (hc : ContinuousOn h B)
-    (hz : ∀ S : Set K, IsCompact S → S ⊆ B → ∫ b in S, h b ∂ν = 0) {t : K} (ht : t ∈ B) :
-    h t = 0 := by
+theorem eq_zero_of_setIntegral_compact_eq_zero
+    {K : Type} [MetricSpace K] [ProperSpace K] [MeasurableSpace K] [BorelSpace K]
+    (ν : Measure K) [IsFiniteMeasureOnCompacts ν] [ν.IsOpenPosMeasure]
+    {B : Set K} (hB : IsOpen B)
+    {h : K → ℂ}
+    (hc : ContinuousOn h B) (hz : ∀ S : Set K, IsCompact S → S ⊆ B → ∫ b in S, h b ∂ν = 0)
+    {t : K} (ht : t ∈ B)
+    : h t = 0 := by
   by_contra hne
   have hpos : 0 < ‖h t‖ := norm_pos_iff.2 hne
   have hca : ContinuousAt h t := hc.continuousAt (hB.mem_nhds ht)
@@ -39,14 +43,28 @@ theorem eq_zero_of_setIntegral_compact_eq_zero {K : Type} [MetricSpace K] [Prope
     integrableOn_const hνSf.ne
   have key := integral_sub hIh hIc
   rw [hz _ hSc hSB, setIntegral_const, zero_sub] at key
-  have hbound := norm_setIntegral_le_of_norm_le_const hνSf (f := fun b => h b - h t)
-    (C := ‖h t‖ / 2) (fun b hb => by rw [← dist_eq_norm]; exact (hball (hmemS b hb).1).le)
+  have hbound :=
+    norm_setIntegral_le_of_norm_le_const hνSf
+      (f := fun b => h b - h t)
+      (C := ‖h t‖ / 2)
+      (fun b hb => by rw [← dist_eq_norm]; exact (hball (hmemS b hb).1).le)
   rw [key, norm_neg, norm_smul, Real.norm_of_nonneg measureReal_nonneg] at hbound
   have hreal : 0 < ν.real (Metric.closedBall t (min (ε / 2) (δ / 2))) := by
     rw [measureReal_def]; exact ENNReal.toReal_pos hνS.ne' hνSf.ne
   nlinarith [mul_pos hreal hpos]
 
-theorem contDensityOn_eq_fibre_mass : ∀ (K V : Type) [NormedField K] [ProperSpace K] [MeasurableSpace K] [BorelSpace K] [TopologicalSpace V] [T2Space V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) (ν : Measure K) [ν.IsAddHaarMeasure] (q : V → K), Continuous q → ∀ (fib : K → Measure V), IsFibreFamily μ q id Set.univ ν {t | t ≠ 0} fib → ∀ (L : Set V), IsCompact L → IsOpen L → ∀ g : K → ℂ, IsContDensityOn μ q id ν {t | t ≠ 0} (L.indicator 1) g → ∀ t : K, t ≠ 0 → g t = (((fib t L).toReal : ℝ) : ℂ) := by
+theorem contDensityOn_eq_fibre_mass
+    : ∀ (K V : Type) [NormedField K] [ProperSpace K] [MeasurableSpace K] [BorelSpace K]
+        [TopologicalSpace V] [T2Space V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V)
+        (ν : Measure K) [ν.IsAddHaarMeasure] (q : V → K),
+      Continuous q
+        → ∀ (fib : K → Measure V),
+          IsFibreFamily μ q id Set.univ ν {t | t ≠ 0} fib
+            → ∀ (L : Set V),
+              IsCompact L → IsOpen L
+                → ∀ g : K → ℂ,
+                  IsContDensityOn μ q id ν {t | t ≠ 0} (L.indicator 1) g
+                    → ∀ t : K, t ≠ 0 → g t = (((fib t L).toReal : ℝ) : ℂ) := by
   intro K V _ _ _ _ _ _ _ _ μ ν _ q hq fib hfib L hLc hLo g hg t ht
   obtain ⟨hf1, hf2, hf3⟩ := hfib
   obtain ⟨hgc, hgS⟩ := hg
@@ -68,12 +86,15 @@ theorem contDensityOn_eq_fibre_mass : ∀ (K V : Type) [NormedField K] [ProperSp
     exact ((integrableOn_const_iff (C := (1 : ℝ))).1 hi).resolve_left (by simp)
   have hmcC : ContinuousOn (fun b => (((fib b L).toReal : ℝ) : ℂ)) {t : K | t ≠ 0} :=
     Complex.continuous_ofReal.comp_continuousOn hmc
-  have key : ∀ S : Set K, IsCompact S → S ⊆ {t : K | t ≠ 0} →
-      ∫ b in S, (g b - (((fib b L).toReal : ℝ) : ℂ)) ∂ν = 0 := by
+  have key
+      : ∀ S : Set K,
+        IsCompact S → S ⊆ {t : K | t ≠ 0}
+          → ∫ b in S, (g b - (((fib b L).toReal : ℝ) : ℂ)) ∂ν = 0 := by
     intro S hS hSB
     have hSm : MeasurableSet S := hS.measurableSet
     rw [integral_sub ((hgc.mono hSB).integrableOn_compact hS)
-      ((hmcC.mono hSB).integrableOn_compact hS), sub_eq_zero, ← hgS S hS hSB, Set.image_id]
+        ((hmcC.mono hSB).integrableOn_compact hS),
+      sub_eq_zero, ← hgS S hS hSB, Set.image_id]
     have hind : L.indicator (1 : V → ℂ) = L.indicator (fun _ => (1 : ℂ)) := rfl
     rw [hind, integral_indicator_const _ hLm, integral_complex_ofReal, Complex.real_smul, mul_one]
     congr 1
@@ -97,8 +118,8 @@ theorem contDensityOn_eq_fibre_mass : ∀ (K V : Type) [NormedField K] [ProperSp
       simp only [Set.mem_preimage, hv.1, hb]
     · rw [Set.indicator_of_notMem hb]
       refine measure_mono_null (fun v hv => ?_) (hf1 b)
-      simp only [Set.mem_compl_iff, Set.mem_inter_iff, Set.mem_preimage, Set.mem_singleton_iff,
-        id, Set.mem_univ, and_true]
+      simp only [Set.mem_compl_iff, Set.mem_inter_iff, Set.mem_preimage, Set.mem_singleton_iff, id,
+        Set.mem_univ, and_true]
       intro hqv
       exact hb (hqv ▸ hv.2)
   exact sub_eq_zero.1 (eq_zero_of_setIntegral_compact_eq_zero ν hBo (hgc.sub hmcC) key

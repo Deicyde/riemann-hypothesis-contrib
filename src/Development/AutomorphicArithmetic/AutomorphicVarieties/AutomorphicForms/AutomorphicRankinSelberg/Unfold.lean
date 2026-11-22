@@ -18,25 +18,31 @@ private theorem unf_meas_strip : MeasurableSet strip := by
 private theorem unf_meas_smul (γ : SL(2, ℤ)) : Measurable (fun z : ℍ => γ • z) := by
   refine Continuous.measurable ?_
   rw [UpperHalfPlane.isOpenEmbedding_coe.isEmbedding.continuous_iff]
-  have h : (UpperHalfPlane.coe ∘ fun z : ℍ => γ • z) = fun z : ℍ =>
-      (((algebraMap ℤ ℝ (γ 0 0) : ℂ) * z + (algebraMap ℤ ℝ (γ 0 1) : ℂ)) /
-      ((algebraMap ℤ ℝ (γ 1 0) : ℂ) * z + (algebraMap ℤ ℝ (γ 1 1) : ℂ))) :=
+  have h
+      : (UpperHalfPlane.coe ∘ fun z : ℍ => γ • z)
+        = fun z : ℍ =>
+          (((algebraMap ℤ ℝ (γ 0 0) : ℂ) * z + (algebraMap ℤ ℝ (γ 0 1) : ℂ))
+            / ((algebraMap ℤ ℝ (γ 1 0) : ℂ) * z + (algebraMap ℤ ℝ (γ 1 1) : ℂ))) :=
     funext fun z => UpperHalfPlane.coe_specialLinearGroup_apply γ z
   rw [h]
   refine Continuous.div₀ (by fun_prop) (by fun_prop) fun z => ?_
   have := UpperHalfPlane.denom_ne_zero (Matrix.SpecialLinearGroup.mapGL ℝ γ) z
   simpa [UpperHalfPlane.denom] using this
 
-private theorem unf_countable : Countable SL(2, ℤ) := @Subtype.countable (Matrix (Fin 2) (Fin 2) ℤ) (show Countable (Fin 2 → Fin 2 → ℤ) from inferInstance) _
+private theorem unf_countable : Countable SL(2, ℤ) :=
+  @Subtype.countable (Matrix (Fin 2) (Fin 2) ℤ)
+    (show Countable (Fin 2 → Fin 2 → ℤ) from inferInstance) _
 
 end UpperTheory.V.Af.Rs
 
-private theorem hasSum_integral_fd_smul_eq_two_integral {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    (hU : UpperTheory.V.Af.Rs.UnfM) (f : ℍ → E) (hfm : StronglyMeasurable f)
-    (hfi : Integrable f volume) :
-    HasSum (fun γ : SL(2, ℤ) => ∫ z in ModularGroup.fd, f (γ • z)) ((2 : ℝ) • ∫ z, f z) := by
-  have hsum : Integrable f (Measure.sum fun γ : SL(2, ℤ) =>
-      Measure.map (fun z => γ • z) (volume.restrict ModularGroup.fd)) := by
+private theorem hasSum_integral_fd_smul_eq_two_integral
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (hU : UpperTheory.V.Af.Rs.UnfM)
+    (f : ℍ → E) (hfm : StronglyMeasurable f) (hfi : Integrable f volume)
+    : HasSum (fun γ : SL(2, ℤ) => ∫ z in ModularGroup.fd, f (γ • z)) ((2 : ℝ) • ∫ z, f z) := by
+  have hsum : Integrable f
+      (Measure.sum fun γ : SL(2, ℤ) =>
+        Measure.map (fun z => γ • z) (volume.restrict ModularGroup.fd)) := by
     rw [hU, two_smul]
     exact hfi.add_measure hfi
   have h1 := hasSum_integral_measure hsum
@@ -46,8 +52,9 @@ private theorem hasSum_integral_fd_smul_eq_two_integral {E : Type*} [NormedAddCo
   rw [integral_map (UpperTheory.V.Af.Rs.unf_meas_smul γ).aemeasurable hfm.aestronglyMeasurable]
 
 open UpperTheory.V.Af.Rs in
-theorem UpperTheory.V.Af.Rs.unfold :
-    UpperTheory.V.Af.Rs.FdFin → UpperTheory.V.Af.Rs.UnfM → UpperTheory.V.Af.Rs.RowBij → UpperTheory.V.Af.Rs.Unfold := by
+theorem UpperTheory.V.Af.Rs.unfold
+    : UpperTheory.V.Af.Rs.FdFin → UpperTheory.V.Af.Rs.UnfM → UpperTheory.V.Af.Rs.RowBij
+      → UpperTheory.V.Af.Rs.Unfold := by
   classical
   intro _ hU hR H Φ hH hHi hHΦ hΦ
   haveI := unf_countable
@@ -70,11 +77,12 @@ theorem UpperTheory.V.Af.Rs.unfold :
   let g : SL(2, ℤ) → Cop := fun γ => ⟨row γ, hR.1 γ⟩
   have hA' := (Equiv.sigmaFiberEquiv g).hasSum_iff.mpr hA
   refine HasSum.sigma hA' fun x => ?_
-  have hint : ∀ c : {γ // g γ = x},
-      Integrable (fun z => f (c.1 • z)) (volume.restrict ModularGroup.fd) := by
+  have hint
+      : ∀ c : {γ // g γ = x},
+        Integrable (fun z => f (c.1 • z)) (volume.restrict ModularGroup.fd) := by
     intro c
-    refine Integrable.mono (hΦ x)
-      ((hfm.comp_measurable (unf_meas_smul c.1)).aestronglyMeasurable) (ae_of_all _ fun z => ?_)
+    refine Integrable.mono (hΦ x) ((hfm.comp_measurable (unf_meas_smul c.1)).aestronglyMeasurable)
+      (ae_of_all _ fun z => ?_)
     have hrow : row c.1 = x := congrArg Subtype.val c.2
     rw [hfγ]
     split_ifs

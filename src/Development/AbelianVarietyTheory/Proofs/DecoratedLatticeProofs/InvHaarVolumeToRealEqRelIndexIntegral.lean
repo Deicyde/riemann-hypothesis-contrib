@@ -18,8 +18,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.L2.Forms MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.QPl GlobalTheory.QTw GlobalTheory.AdForm GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Fam
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.L2.Forms MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.QPl GlobalTheory.QTw GlobalTheory.AdForm
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Fam
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.StepData GlobalTheory.SplitWeil
@@ -29,11 +34,14 @@ namespace GlobalTheory.HaarIdx
 
 open MeasureTheory
 
-theorem inv_toReal_eq_relIndex {Γ : Type*} [Group Γ] [MeasurableSpace Γ] [MeasurableMul Γ] (μ : Measure Γ) [μ.IsMulLeftInvariant]
-    (K H : Subgroup Γ) (hHK : H ≤ K) (hH : MeasurableSet (H : Set Γ)) (hK : μ (K : Set Γ) = 1)
-    (hn : H.relIndex K ≠ 0) : ((μ (H : Set Γ)).toReal)⁻¹ = (H.relIndex K : ℝ) := by
-  have hmeas : ∀ g : Γ, AEMeasurable (fun x => g * x) μ :=
-    fun g => (measurable_const_mul g).aemeasurable
+theorem inv_toReal_eq_relIndex
+    {Γ : Type*} [Group Γ] [MeasurableSpace Γ] [MeasurableMul Γ]
+    (μ : Measure Γ) [μ.IsMulLeftInvariant]
+    (K H : Subgroup Γ)
+    (hHK : H ≤ K) (hH : MeasurableSet (H : Set Γ)) (hK : μ (K : Set Γ) = 1) (hn : H.relIndex K ≠ 0)
+    : ((μ (H : Set Γ)).toReal)⁻¹ = (H.relIndex K : ℝ) := by
+  have hmeas : ∀ g : Γ, AEMeasurable (fun x => g * x) μ := fun g =>
+    (measurable_const_mul g).aemeasurable
   have hpre : ∀ g : Γ, μ ((fun x => g * x) ⁻¹' (H : Set Γ)) = μ H := by
     intro g
     rw [← Measure.map_apply_of_aemeasurable (hmeas g) hH, map_mul_left_eq_self μ g]
@@ -70,20 +78,17 @@ theorem inv_toReal_eq_relIndex {Γ : Type*} [Group Γ] [MeasurableSpace Γ] [Mea
     rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
     have := H.mul_mem hy (H.inv_mem hy')
     simpa [_root_.mul_inv_rev, mul_assoc] using this
-  have hnull : ∀ q, NullMeasurableSet (C q) μ := fun q =>
-    (hmeas _).nullMeasurableSet_preimage hH
+  have hnull : ∀ q, NullMeasurableSet (C q) μ := fun q => (hmeas _).nullMeasurableSet_preimage hH
   have hsum : μ (K : Set Γ) = (Fintype.card (K ⧸ L) : ℝ≥0∞) * μ H := by
     rw [hcov, measure_iUnion₀ hdisj hnull, tsum_fintype]
     simp [C, hpre, Finset.sum_const, nsmul_eq_mul]
-  have hcard : (Fintype.card (K ⧸ L) : ℕ) = H.relIndex K := by
-    rw [Fintype.card_eq_nat_card]; rfl
+  have hcard : (Fintype.card (K ⧸ L) : ℕ) = H.relIndex K := by rw [Fintype.card_eq_nat_card]; rfl
   rw [hK, hcard] at hsum
   have hne : μ (H : Set Γ) ≠ ⊤ := by
     intro h; rw [h, ENNReal.mul_top (by exact_mod_cast hn)] at hsum; exact ENNReal.one_ne_top hsum
   have hr := congrArg ENNReal.toReal hsum
   rw [ENNReal.toReal_mul, ENNReal.toReal_natCast, ENNReal.toReal_one] at hr
-  have hpos : (μ (H : Set Γ)).toReal ≠ 0 := by
-    intro h; rw [h, mul_zero] at hr; exact one_ne_zero hr
+  have hpos : (μ (H : Set Γ)).toReal ≠ 0 := by intro h; rw [h, mul_zero] at hr; exact one_ne_zero hr
   field_simp
   linarith [hr]
 
@@ -91,8 +96,14 @@ end GlobalTheory.HaarIdx
 
 namespace GlobalTheory
 
-
-theorem QTw.QExt.m_inv_toReal_eq_relIndex : ∀ {D : D7} {c : Comm D} {v : VCom c} {B : GlobalTheory.Fam.Base c} {PP : Formalism.L2.DIV.Pl D.host.E} (G : GlobalTheory.QTw.QGeo v B PP) (χ : ℕ → (AE D)ˣ →* Circle) (E : GlobalTheory.QTw.QExt G χ) (j : ℕ) (H : Subgroup (GL (XIx (Fin D.R.k) (Fin D.R.t) j) G.k)), H ≤ KO G.k _ → MeasurableSet (H : Set (GL (XIx (Fin D.R.k) (Fin D.R.t) j) G.k)) → H.relIndex (KO G.k _) ≠ 0 → ((((E.m j H).toReal)⁻¹ : ℝ) : ℂ) = (H.relIndex (KO G.k _) : ℂ) := by
+theorem QTw.QExt.m_inv_toReal_eq_relIndex
+    : ∀ {D : D7} {c : Comm D} {v : VCom c} {B : GlobalTheory.Fam.Base c}
+        {PP : Formalism.L2.DIV.Pl D.host.E} (G : GlobalTheory.QTw.QGeo v B PP)
+        (χ : ℕ → (AE D)ˣ →* Circle) (E : GlobalTheory.QTw.QExt G χ) (j : ℕ)
+        (H : Subgroup (GL (XIx (Fin D.R.k) (Fin D.R.t) j) G.k)),
+      H ≤ KO G.k _ → MeasurableSet (H : Set (GL (XIx (Fin D.R.k) (Fin D.R.t) j) G.k))
+        → H.relIndex (KO G.k _) ≠ 0
+        → ((((E.m j H).toReal)⁻¹ : ℝ) : ℂ) = (H.relIndex (KO G.k _) : ℂ) := by
   intro D c v B PP G χ E j H hHK hH hn
   letI : MeasurableSpace (Matrix (XIx (Fin D.R.k) (Fin D.R.t) j) (XIx (Fin D.R.k) (Fin D.R.t) j) G.k) := Formalism.DoubleCosetMeasures.instMeasMat
   obtain ⟨_, _⟩ := Model.secondCountable_and_t2_local_field (k := G.k)

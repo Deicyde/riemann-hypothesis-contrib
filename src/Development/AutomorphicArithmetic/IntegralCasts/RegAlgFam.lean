@@ -9,19 +9,23 @@ open NumberField
 
 namespace UpperTheory.RegAlgFam
 
-theorem exists_pairs {α : Type*} (s t : Multiset α) (h : s.card = t.card) :
-    ∃ P : Multiset (α × α), P.map Prod.fst = s ∧ P.map Prod.snd = t := by
-  induction s using Quotient.inductionOn with | _ l =>
-  induction t using Quotient.inductionOn with | _ k =>
-  have hl : l.length = k.length := by simpa using h
-  refine ⟨(l.zip k : List (α × α)), ?_, ?_⟩
-  · simp [List.map_fst_zip hl.le]
-  · simp [List.map_snd_zip hl.ge]
+theorem exists_pairs {α : Type*} (s t : Multiset α) (h : s.card = t.card)
+    : ∃ P : Multiset (α × α), P.map Prod.fst = s ∧ P.map Prod.snd = t := by
+  induction s using Quotient.inductionOn with
+  | _ l =>
+    induction t using Quotient.inductionOn with
+    | _ k =>
+      have hl : l.length = k.length := by simpa using h
+      refine ⟨(l.zip k : List (α × α)), ?_, ?_⟩
+      · simp [List.map_fst_zip hl.le]
+      · simp [List.map_snd_zip hl.ge]
 
-theorem exists_iff {F : Type*} [Field F] [IsTotallyComplex F] {n : ℕ} (μ : (F →+* ℂ) → Multiset ℂ)
-    (hc : ∀ τ, (μ τ).card = n) :
-    (∃ t : Reformulated.AlgebraicInfinityType.InfinityType F n, t.IsRegularAlgebraic ∧ ∀ τ, t.exponents τ = μ τ) ↔
-      ∀ τ, (μ τ).Nodup ∧ ∀ z ∈ μ τ, ∃ m : ℤ, z = (m : ℂ) + ((n : ℂ) - 1) / 2 := by
+theorem exists_iff
+    {F : Type*} [Field F] [IsTotallyComplex F]
+    {n : ℕ} (μ : (F →+* ℂ) → Multiset ℂ) (hc : ∀ τ, (μ τ).card = n)
+    : (∃ t : Reformulated.AlgebraicInfinityType.InfinityType F n,
+        t.IsRegularAlgebraic ∧ ∀ τ, t.exponents τ = μ τ)
+      ↔ ∀ τ, (μ τ).Nodup ∧ ∀ z ∈ μ τ, ∃ m : ℤ, z = (m : ℂ) + ((n : ℂ) - 1) / 2 := by
   classical
   constructor
   · rintro ⟨t, ⟨ha, hr⟩, he⟩ τ
@@ -59,8 +63,11 @@ theorem exists_iff {F : Type*} [Field F] [IsTotallyComplex F] {n : ℕ} (μ : (F
         simp only [Q, if_pos e, if_neg e', cc]
       · simp only [Q, if_neg e, if_pos ((hg τ).2 e), Multiset.map_map]
         simp
-    refine ⟨⟨Q, fun τ => by rw [← hc τ, ← q1 τ, Multiset.card_map], fun τ p hp => ?_, qc⟩,
-      ⟨fun τ z hz => ?_, fun τ => ?_⟩, q1⟩
+    refine ⟨
+      ⟨Q, fun τ => by rw [← hc τ, ← q1 τ, Multiset.card_map], fun τ p hp => ?_, qc⟩,
+      ⟨fun τ z hz => ?_, fun τ => ?_⟩,
+      q1
+    ⟩
     · obtain ⟨a, ha⟩ := (h τ).2 p.1 (q1 τ ▸ Multiset.mem_map_of_mem _ hp)
       have hp' : p.2 ∈ μ (ComplexEmbedding.conjugate τ) := by
         rw [← q1, qc]

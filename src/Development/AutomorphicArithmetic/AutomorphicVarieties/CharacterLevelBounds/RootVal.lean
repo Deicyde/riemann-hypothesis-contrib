@@ -6,10 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
 
-private theorem sub_one_dvd {O : Type} [CommRing O] [IsDomain O] {n : ℕ} {ζ : O} (h : ζ ^ n = 1) (h1 : ζ ≠ 1) :
-    ζ - 1 ∣ (n : O) := by
+private theorem sub_one_dvd
+    {O : Type} [CommRing O] [IsDomain O] {n : ℕ} {ζ : O} (h : ζ ^ n = 1) (h1 : ζ ≠ 1)
+    : ζ - 1 ∣ (n : O) := by
   have hS : ∑ i ∈ Finset.range n, ζ ^ i = 0 := by
     have hg := mul_geom_sum ζ n
     rw [h, sub_self] at hg
@@ -24,9 +26,15 @@ private theorem sub_one_dvd {O : Type} [CommRing O] [IsDomain O] {n : ℕ} {ζ :
   rw [← neg_sub (ζ ^ i) 1]
   exact (dvd_neg).mpr hd
 
-theorem UpperTheory.V.Chr.rootVal :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (n : ℕ), n ≠ 0 → IsDiscreteValuationRing.addVal O (n : O) = (n.factorization l : ℕ∞) * eO l O ∧
-          (∀ ζ : O, ζ ^ n = 1 → ζ ≠ 1 → IsDiscreteValuationRing.addVal O (ζ - 1) ≤ (n.factorization l : ℕ∞) * eO l O) ∧ eO l O ≠ ⊤ ∧ CharZero O := by
+theorem UpperTheory.V.Chr.rootVal
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (n : ℕ),
+      n ≠ 0
+        → IsDiscreteValuationRing.addVal O (n : O) = (n.factorization l : ℕ∞) * eO l O
+          ∧ (∀ ζ : O,
+            ζ ^ n = 1 → ζ ≠ 1
+              → IsDiscreteValuationRing.addVal O (ζ - 1) ≤ (n.factorization l : ℕ∞) * eO l O)
+          ∧ eO l O ≠ ⊤ ∧ CharZero O := by
   intro l _ O _ _ _ _ _ n hn
   obtain ⟨hiO, -, -, -, -, -, -, hvO, hunit⟩ := dvrFacts l O
   have hp : l.Prime := Fact.out

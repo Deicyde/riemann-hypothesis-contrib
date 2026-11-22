@@ -10,9 +10,9 @@ noncomputable section
 
 namespace GenFrameSpan
 
-theorem det_mul_rect {R : Type*} [CommRing R] {k n : ℕ}
-    (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n) (Fin k) R) :
-    (A * B).det = ∑ f : Fin k → Fin n, (∏ i, B (f i) i) * (A.submatrix id f).det := by
+theorem det_mul_rect
+    {R : Type*} [CommRing R] {k n : ℕ} (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n) (Fin k) R)
+    : (A * B).det = ∑ f : Fin k → Fin n, (∏ i, B (f i) i) * (A.submatrix id f).det := by
   simp only [Matrix.det_apply, Matrix.mul_apply, Finset.prod_univ_sum, Fintype.piFinset_univ,
     Matrix.submatrix_apply, id, Finset.smul_sum, Finset.mul_sum, Finset.prod_mul_distrib]
   rw [Finset.sum_comm]
@@ -20,10 +20,11 @@ theorem det_mul_rect {R : Type*} [CommRing R] {k n : ℕ}
   simp only [Units.smul_def, zsmul_eq_mul]
   ring
 
-theorem det_submatrix_fun {R : Type*} [CommRing R] {p n : ℕ} (M : Matrix (Fin p) (Fin n) R)
-    (f : Fin p → Fin n) :
-    (M.submatrix id f).det = 0 ∨ ∃ (J : Fin p ↪o Fin n) (e : ℤ),
-      (M.submatrix id f).det = (e : R) * (M.submatrix id J).det := by
+theorem det_submatrix_fun
+    {R : Type*} [CommRing R] {p n : ℕ} (M : Matrix (Fin p) (Fin n) R) (f : Fin p → Fin n)
+    : (M.submatrix id f).det = 0
+      ∨ ∃ (J : Fin p ↪o Fin n) (e : ℤ),
+        (M.submatrix id f).det = (e : R) * (M.submatrix id J).det := by
   classical
   by_cases hf : Function.Injective f
   · right

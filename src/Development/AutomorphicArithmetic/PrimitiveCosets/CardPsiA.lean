@@ -6,16 +6,23 @@ public import Mathlib.Analysis.Fourier.FiniteAbelian.PontryaginDuality
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-private theorem exists_comp_eq {G Q M : Type} [AddCommGroup G] [AddCommGroup Q] [CommGroupWithZero M] (π : G →+ Q)
-    (hπ : Function.Surjective π) (ψ : AddChar G M) (h : ∀ x, π x = 0 → ψ x = 1) :
-    ∃ χ : AddChar Q M, χ.compAddMonoidHom π = ψ := by
+private theorem exists_comp_eq
+    {G Q M : Type} [AddCommGroup G] [AddCommGroup Q] [CommGroupWithZero M]
+    (π : G →+ Q) (hπ : Function.Surjective π)
+    (ψ : AddChar G M) (h : ∀ x, π x = 0 → ψ x = 1)
+    : ∃ χ : AddChar Q M, χ.compAddMonoidHom π = ψ := by
   have wd : ∀ x y, π x = π y → ψ x = ψ y := by
     intro x y hxy
     have h0 : π (x - y) = 0 := by rw [map_sub, hxy, sub_self]
-    calc ψ x = ψ (y + (x - y)) := by rw [add_sub_cancel]
+    calc
+      ψ x
+        = ψ (y + (x - y)) := by rw [add_sub_cancel]
       _ = ψ y * ψ (x - y) := AddChar.map_add_eq_mul ψ _ _
       _ = ψ y := by rw [h _ h0, mul_one]
   let s := Function.surjInv hπ
@@ -27,8 +34,9 @@ private theorem exists_comp_eq {G Q M : Type} [AddCommGroup G] [AddCommGroup Q] 
   · ext x
     exact wd _ _ (hs _)
 
-private theorem card_PsiA_index {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H] (A0 : AddSubgroup H) :
-    (PsiA A0).card = 4 * A0.index := by
+private theorem card_PsiA_index
+    {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H] (A0 : AddSubgroup H)
+    : (PsiA A0).card = 4 * A0.index := by
   classical
   let π : E0 × H →+ E0 × (H ⧸ A0) := (AddMonoidHom.id E0).prodMap (QuotientAddGroup.mk' A0)
   have hπ : Function.Surjective π := by
@@ -40,7 +48,9 @@ private theorem card_PsiA_index {H : Type} [AddCommGroup H] [Fintype H] [Decidab
     ext q
     obtain ⟨x, rfl⟩ := hπ q
     exact DFunLike.congr_fun h x
-  have himg : PsiA A0 = Finset.univ.image (fun χ : AddChar (E0 × (H ⧸ A0)) ℂ => χ.compAddMonoidHom π) := by
+  have himg
+      : PsiA A0
+        = Finset.univ.image (fun χ : AddChar (E0 × (H ⧸ A0)) ℂ => χ.compAddMonoidHom π) := by
     ext ψ
     simp only [PsiA, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image]
     constructor
@@ -54,14 +64,12 @@ private theorem card_PsiA_index {H : Type} [AddCommGroup H] [Fintype H] [Decidab
       exact h b hb
     · rintro ⟨χ, rfl⟩ s hs
       show χ (π (0, s)) = 1
-      have : π (0, s) = 0 := by
-        simp [π, QuotientAddGroup.eq_zero_iff, hs]
+      have : π (0, s) = 0 := by simp [π, QuotientAddGroup.eq_zero_iff, hs]
       rw [this, AddChar.map_zero_eq_one]
-  rw [himg, Finset.card_image_of_injective _ inj, Finset.card_univ, AddChar.card_eq, Fintype.card_prod,
-    AddSubgroup.index_eq_card, Nat.card_eq_fintype_card]
+  rw [himg, Finset.card_image_of_injective _ inj, Finset.card_univ, AddChar.card_eq,
+    Fintype.card_prod, AddSubgroup.index_eq_card, Nat.card_eq_fintype_card]
   simp [E0]
 
-theorem UpperTheory.Comparison₂.card_PsiA :
-    ∀ φ : Frame, (PsiA φ.A0).card = 4 * φ.o := by
+theorem UpperTheory.Comparison₂.card_PsiA : ∀ φ : Frame, (PsiA φ.A0).card = 4 * φ.o := by
   intro φ
   rw [card_PsiA_index, φ.index_A0_eq_o]

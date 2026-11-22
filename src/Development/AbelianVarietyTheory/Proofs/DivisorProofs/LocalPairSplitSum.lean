@@ -11,9 +11,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.KeyOriginCut
 
-theorem etale_of_isZTorsor (B D : Type) [CommRing B] [CommRing D] [Algebra B D] (q : ℕ)
-    (act : Multiplicative (ZMod q) →* (D ≃ₐ[B] D)) (h : IsZTorsor B D q act) :
-    Algebra.Etale B D := by
+theorem etale_of_isZTorsor
+    (B D : Type) [CommRing B] [CommRing D] [Algebra B D]
+    (q : ℕ) (act : Multiplicative (ZMod q) →* (D ≃ₐ[B] D)) (h : IsZTorsor B D q act)
+    : Algebra.Etale B D := by
   obtain ⟨hfin, hproj, hff, hbij⟩ := h
   set Φ := Algebra.TensorProduct.productMap
       (Pi.algHom B (fun _ : Multiplicative (ZMod q) => D) (fun _ => AlgHom.id B D))
@@ -29,7 +30,8 @@ theorem etale_of_isZTorsor (B D : Type) [CommRing B] [CommRing D] [Algebra B D] 
     have heI : e ∈ KaehlerDifferential.ideal B D := by
       rw [KaehlerDifferential.ideal, RingHom.mem_ker]
       change Algebra.TensorProduct.lmul' B e = 0
-      rw [hmul, he]; simp
+      rw [hmul, he]
+      simp
     apply le_antisymm Ideal.mul_le_left
     intro x hx
     have hx0 : Φ x 1 = 0 := by

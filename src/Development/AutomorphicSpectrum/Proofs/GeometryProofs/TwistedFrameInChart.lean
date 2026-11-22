@@ -7,7 +7,8 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtIffChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.FlagBun GlobalTheory.CompanionTheory.Ar.FlagBun.Sm
+open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.FlagBun GlobalTheory.CompanionTheory.Ar.FlagBun.Sm
 
 noncomputable section
 
@@ -15,8 +16,9 @@ namespace GlobalTheory.CompanionTheory.Ar.FlagBun.Sm
 
 namespace ChartFrame
 
-theorem locSub_le_of_mul {F : Type} [Field F] {R : Subring F} {a b : F} (ha : a ∈ R) (hb : b ∈ R)
-    (h0 : a * b ≠ 0) : locSub R a ≤ locSub R (a * b) := by
+theorem locSub_le_of_mul
+    {F : Type} [Field F] {R : Subring F} {a b : F} (ha : a ∈ R) (hb : b ∈ R) (h0 : a * b ≠ 0)
+    : locSub R a ≤ locSub R (a * b) := by
   have hb0 : b ≠ 0 := right_ne_zero_of_mul h0
   unfold GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.locSub
   rw [Subring.closure_le]
@@ -29,8 +31,8 @@ theorem locSub_le_of_mul {F : Type} [Field F] {R : Subring F} {a b : F} (ha : a 
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
 
-theorem unitAt_mul' {p : Cpt ξ} {f g : Ω} (hf : unitAt ξ p f) (hg : unitAt ξ p g) :
-    unitAt ξ p (f * g) := by
+theorem unitAt_mul' {p : Cpt ξ} {f g : Ω} (hf : unitAt ξ p f) (hg : unitAt ξ p g)
+    : unitAt ξ p (f * g) := by
   unfold GlobalTheory.CompanionTheory.Ar.unitAt at hf hg ⊢
   obtain ⟨hf0, hf1, hf2⟩ := hf
   obtain ⟨hg0, hg1, hg2⟩ := hg
@@ -38,8 +40,9 @@ theorem unitAt_mul' {p : Cpt ξ} {f g : Ω} (hf : unitAt ξ p f) (hg : unitAt ξ
   rw [mul_inv]
   exact mul_mem hf2 hg2
 
-theorem unitAt_prod' {p : Cpt ξ} {ι : Type} (s : Finset ι) (f : ι → Ω) (h : ∀ i ∈ s, unitAt ξ p (f i)) :
-    unitAt ξ p (∏ i ∈ s, f i) := by
+theorem unitAt_prod'
+    {p : Cpt ξ} {ι : Type} (s : Finset ι) (f : ι → Ω) (h : ∀ i ∈ s, unitAt ξ p (f i))
+    : unitAt ξ p (∏ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -53,13 +56,14 @@ theorem unitAt_prod' {p : Cpt ξ} {ι : Type} (s : Finset ι) (f : ι → Ω) (h
     exact unitAt_mul' (h a (Finset.mem_insert_self a s))
       (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem exists_dual_family {E : Type} [AddCommGroup E] [Module Ω E] {r : ℕ} {β : Fin r → E}
-    (hβ : LinearIndependent Ω β) :
-    ∃ w : Fin r → Module.Dual Ω E, ∀ l l', w l (β l') = (1 : Matrix (Fin r) (Fin r) Ω) l l' := by
+theorem exists_dual_family
+    {E : Type} [AddCommGroup E] [Module Ω E] {r : ℕ} {β : Fin r → E} (hβ : LinearIndependent Ω β)
+    : ∃ w : Fin r → Module.Dual Ω E, ∀ l l', w l (β l') = (1 : Matrix (Fin r) (Fin r) Ω) l l' := by
   classical
-  have hext : ∀ l : Fin r, ∃ g : Module.Dual Ω E,
-      g.comp (Submodule.span Ω (Set.range β)).subtype = (Module.Basis.span hβ).coord l :=
-    fun l => LinearMap.exists_extend ((Module.Basis.span hβ).coord l)
+  have hext
+      : ∀ l : Fin r, ∃ g : Module.Dual Ω E,
+        g.comp (Submodule.span Ω (Set.range β)).subtype = (Module.Basis.span hβ).coord l := fun l =>
+    LinearMap.exists_extend ((Module.Basis.span hβ).coord l)
   choose w hw using hext
   refine ⟨w, fun l l' => ?_⟩
   have h1 : w l (β l') = (Module.Basis.span hβ).coord l (Module.Basis.span hβ l') := by
@@ -71,9 +75,20 @@ theorem exists_dual_family {E : Type} [AddCommGroup E] [Module Ω E] {r : ℕ} {
 
 end ChartFrame
 
-
 open ChartFrame ChartTie in
-theorem exists_chart_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E] (κ : Type) (x : κ → Ω) (r : ℕ) (V : Submodule Ω E) (L : Lat ξ E) (m n : ℕ) (φ : Fin n → Module.Dual Ω E) (b : Fin r → E) (c : κ) (p : Cpt ξ), CoordTie ℤ ξ x → (∀ q : X, genPt ξ ⤳ q) → L.IsVB r V → IsTwistGen ξ x L m φ → (LinearIndependent Ω b ∧ Submodule.span Ω (Set.range b) = V) → InChart ξ x c p → ∃ g ∈ chartSub x c, unitAt ξ p g ∧ ∃ (T : Matrix (Fin r) (Fin r) Ω) (M : Matrix (Fin n) (Fin r) Ω) (N : Matrix (Fin r) (Fin n) Ω), T.det ≠ 0 ∧ (∀ j l, M j l ∈ locSub (chartSub x c) g) ∧ (∀ l j, N l j ∈ locSub (chartSub x c) g) ∧ N * M = 1 ∧ ∀ j l, φ j (b l) = x c ^ m * (M * T) j l := by
+theorem exists_chart_frame
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
+        [AddCommGroup E] [Module Ω E] (κ : Type) (x : κ → Ω) (r : ℕ) (V : Submodule Ω E)
+        (L : Lat ξ E) (m n : ℕ) (φ : Fin n → Module.Dual Ω E) (b : Fin r → E) (c : κ) (p : Cpt ξ),
+      CoordTie ℤ ξ x → (∀ q : X, genPt ξ ⤳ q) → L.IsVB r V → IsTwistGen ξ x L m φ
+        → (LinearIndependent Ω b ∧ Submodule.span Ω (Set.range b) = V) → InChart ξ x c p
+        → ∃ g ∈ chartSub x c,
+          unitAt ξ p g
+            ∧ ∃ (T : Matrix (Fin r) (Fin r) Ω) (M : Matrix (Fin n) (Fin r) Ω)
+                (N : Matrix (Fin r) (Fin n) Ω),
+              T.det ≠ 0 ∧ (∀ j l, M j l ∈ locSub (chartSub x c) g)
+                ∧ (∀ l j, N l j ∈ locSub (chartSub x c) g) ∧ N * M = 1
+                ∧ ∀ j l, φ j (b l) = x c ^ m * (M * T) j l := by
   intro X Ω _ ξ E _ _ κ x r V L m n φ b c p hCT _hgen hVB hTw hb hIn
   classical
   obtain ⟨hbli, hbV⟩ := hb
@@ -103,23 +118,23 @@ theorem exists_chart_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
     obtain ⟨v, hv0, hTv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hdet0
     apply hv0
     have hsum : ∑ l, v l • b l = 0 := by
-      calc ∑ l, v l • b l = ∑ l, v l • ∑ k, w k (b l) • b' k :=
-            Finset.sum_congr rfl fun l _ => by rw [← hbexp l]
+      calc
+        ∑ l, v l • b l
+          = ∑ l, v l • ∑ k, w k (b l) • b' k := Finset.sum_congr rfl fun l _ => by rw [← hbexp l]
         _ = ∑ l, ∑ k, (v l * w k (b l)) • b' k := by simp only [Finset.smul_sum, smul_smul]
         _ = ∑ k, ∑ l, (v l * w k (b l)) • b' k := Finset.sum_comm
         _ = ∑ k, (Matrix.mulVec (Matrix.of fun k l => w k (b l)) v) k • b' k := by
-            refine Finset.sum_congr rfl fun k _ => ?_
-            rw [← Finset.sum_smul]
-            congr 1
-            simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
-            exact Finset.sum_congr rfl fun l _ => mul_comm _ _
+          refine Finset.sum_congr rfl fun k _ => ?_
+          rw [← Finset.sum_smul]
+          congr 1
+          simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
+          exact Finset.sum_congr rfl fun l _ => mul_comm _ _
         _ = 0 := by simp [hTv]
     exact funext (Fintype.linearIndependent_iff.1 hbli v hsum)
   have hb'Lp : ∀ k, b' k ∈ L p := fun k => by
     rw [hLp]
     exact Submodule.subset_span ⟨k, rfl⟩
-  have hMreg : ∀ j k, φ j (b' k) / x c ^ m ∈ regAt ξ p := fun j k =>
-    hTw1 j p c hIn (b' k) (hb'Lp k)
+  have hMreg : ∀ j k, φ j (b' k) / x c ^ m ∈ regAt ξ p := fun j k => hTw1 j p c hIn (b' k) (hb'Lp k)
   have hwreg : ∀ l, ∀ e ∈ L p, w l e ∈ regAt ξ p := by
     intro l e he
     rw [hLp] at he
@@ -133,8 +148,9 @@ theorem exists_chart_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
     split_ifs
     · exact one_mem _
     · exact zero_mem _
-  have hN : ∀ l, ∃ gv : Fin n → Ω, (∀ j, gv j ∈ regAt ξ p) ∧
-      ∀ e ∈ L p, w l e = ∑ j, gv j * (φ j e / x c ^ m) := fun l =>
+  have hN
+      : ∀ l, ∃ gv : Fin n → Ω,
+        (∀ j, gv j ∈ regAt ξ p) ∧ ∀ e ∈ L p, w l e = ∑ j, gv j * (φ j e / x c ^ m) := fun l =>
     hTw2 p c hIn (w l) (hwreg l)
   choose gv hgvreg hgv using hN
   have hNM : (Matrix.of fun l j => gv l j) * (Matrix.of fun j k => φ j (b' k) / x c ^ m) = 1 := by
@@ -144,7 +160,8 @@ theorem exists_chart_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
     rw [← hgv l (b' l') (hb'Lp l'), hw]
   have hreg : ∀ a ∈ regAt ξ p, ∃ s ∈ chartSub x c, unitAt ξ p s ∧ a ∈ locSub (chartSub x c) s := by
     intro a ha
-    obtain ⟨s, hs, hsu, hsa⟩ := (GlobalTheory.T.regAt_iff_chart_localization X Ω ξ ℤ κ x hCT c p hIn a).1 ha
+    obtain ⟨s, hs, hsu, hsa⟩ :=
+      (GlobalTheory.T.regAt_iff_chart_localization X Ω ξ ℤ κ x hCT c p hIn a).1 ha
     have hs0 : s ≠ 0 := by
       unfold GlobalTheory.CompanionTheory.Ar.unitAt at hsu
       exact hsu.1
@@ -152,10 +169,12 @@ theorem exists_chart_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
     unfold GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.locSub
     rw [show a = s * a * s⁻¹ by rw [mul_comm s a, mul_assoc, mul_inv_cancel₀ hs0, mul_one]]
     exact mul_mem
-      (Subring.subset_closure (Set.mem_union_left _ (by unfold GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.chartSub; exact hsa)))
+      (Subring.subset_closure (Set.mem_union_left _
+        (by unfold GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.chartSub; exact hsa)))
       (Subring.subset_closure (Set.mem_union_right _ (Set.mem_singleton _)))
-  have hent : ∀ i : (Fin n × Fin r) ⊕ (Fin r × Fin n),
-      Sum.elim (fun jk => φ jk.1 (b' jk.2) / x c ^ m) (fun lj => gv lj.1 lj.2) i ∈ regAt ξ p := by
+  have hent
+      : ∀ i : (Fin n × Fin r) ⊕ (Fin r × Fin n),
+        Sum.elim (fun jk => φ jk.1 (b' jk.2) / x c ^ m) (fun lj => gv lj.1 lj.2) i ∈ regAt ξ p := by
     rintro (⟨j, k⟩ | ⟨l, j⟩)
     · exact hMreg j k
     · exact hgvreg l j
@@ -171,8 +190,19 @@ theorem exists_chart_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
     have hsplit := Finset.mul_prod_erase Finset.univ s (Finset.mem_univ i)
     rw [← hsplit]
     exact locSub_le_of_mul (hsR i) (prod_mem fun j _ => hsR j) (by rw [hsplit]; exact hg0)
-  refine ⟨∏ i, s i, hgR, hgU, Matrix.of fun k l => w k (b l),
-    Matrix.of fun j k => φ j (b' k) / x c ^ m, Matrix.of fun l j => gv l j, hdet, ?_, ?_, hNM, ?_⟩
+  refine ⟨
+    ∏ i, s i,
+    hgR,
+    hgU,
+    Matrix.of fun k l => w k (b l),
+    Matrix.of fun j k => φ j (b' k) / x c ^ m,
+    Matrix.of fun l j => gv l j,
+    hdet,
+    ?_,
+    ?_,
+    hNM,
+    ?_
+  ⟩
   · intro j k
     simp only [Matrix.of_apply]
     exact hmono _ (hsloc (Sum.inl (j, k)))
@@ -188,9 +218,11 @@ theorem exists_chart_frame : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, smul_eq_mul]
     first
-      | (rw [div_mul_eq_mul_div, mul_div_assoc', mul_comm (x c ^ m), mul_div_assoc, div_self hxm,
-          mul_one, mul_comm])
-      | (field_simp; ring)
-      | field_simp
+    | (
+        rw [div_mul_eq_mul_div, mul_div_assoc', mul_comm (x c ^ m), mul_div_assoc, div_self hxm,
+          mul_one, mul_comm]
+      )
+    | (field_simp; ring)
+    | field_simp
 
 end GlobalTheory.CompanionTheory.Ar.FlagBun.Sm

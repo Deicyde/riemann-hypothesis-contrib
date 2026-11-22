@@ -47,8 +47,10 @@ theorem frobenius_orbit_irreducible : FrobOrbitIrred := by
       rw [hmx, hmy]
     obtain ⟨σ, hσ⟩ := (Normal.minpoly_eq_iff_mem_orbit E).1 hxy
     obtain ⟨n, hn⟩ := (FiniteField.bijective_frobeniusAlgEquivOfAlgebraic_pow K E).2 σ
-    have key : ∀ (m : ℕ) (w : E), (((FiniteField.frobeniusAlgEquivOfAlgebraic K E ^ m) w : E) : L) =
-        (fun z : L => z ^ Fintype.card K)^[m] (w : L) := by
+    have key
+        : ∀ (m : ℕ) (w : E),
+          (((FiniteField.frobeniusAlgEquivOfAlgebraic K E ^ m) w : E) : L)
+            = (fun z : L => z ^ Fintype.card K)^[m] (w : L) := by
       intro m
       induction m with
       | zero => intro w; rfl
@@ -59,16 +61,17 @@ theorem frobenius_orbit_irreducible : FrobOrbitIrred := by
         all_goals (try rw [FiniteField.coe_frobeniusAlgEquivOfAlgebraic])
         all_goals (try simp)
     simp only at hσ
-    have h2 : ((σ ⟨x, hxE⟩ : E) : L) = y := by
-      rw [← AlgEquiv.smul_def, hσ]
+    have h2 : ((σ ⟨x, hxE⟩ : E) : L) = y := by rw [← AlgEquiv.smul_def, hσ]
     simp only at hn
     rw [← hn, key] at h2
     exact ⟨_, h2⟩
   · have hsep : f.Separable := by
       first
       | exact PerfectField.separable_of_irreducible hirr
-      | (haveI : PerfectField K := PerfectField.ofFinite
-         exact PerfectField.separable_of_irreducible hirr)
+      | (
+          haveI : PerfectField K := PerfectField.ofFinite
+          exact PerfectField.separable_of_irreducible hirr
+        )
     rw [Multiset.toFinset_card_of_nodup (nodup_roots (hsep.map (f := algebraMap K L)))]
     show Multiset.card (f.map (algebraMap K L)).roots = f.natDegree
     rw [IsAlgClosed.card_roots_eq_natDegree, natDegree_map]

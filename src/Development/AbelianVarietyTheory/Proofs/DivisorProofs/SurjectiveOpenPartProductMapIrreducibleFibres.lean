@@ -5,22 +5,31 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsDescen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem exists_over_lift_of_range_subset {T : Scheme.{0}} {Z H V : Over T} (e : V ⟶ H) [IsOpenImmersion e.left]
-    (f : Z ⟶ H) (h : Set.range f.left ⊆ Set.range e.left) : ∃ a : Z ⟶ V, a ≫ e = f := by
+theorem exists_over_lift_of_range_subset
+    {T : Scheme.{0}} {Z H V : Over T} (e : V ⟶ H) [IsOpenImmersion e.left]
+    (f : Z ⟶ H) (h : Set.range f.left ⊆ Set.range e.left)
+    : ∃ a : Z ⟶ V, a ≫ e = f := by
   refine ⟨Over.homMk (IsOpenImmersion.lift e.left f.left h) ?_, ?_⟩
   · rw [← Over.w e, ← Category.assoc, IsOpenImmersion.lift_fac, Over.w f]
   · ext
     simp
 
-theorem surjective_mul_of_open_of_irreducible_fibres : ∀ (T : Scheme.{0}) (H V : Over T) [GrpObj H] (e : V ⟶ H), IsOpenImmersion e.left → Surjective V.hom → (∀ (K : Type) [Field K] (t : Spec (CommRingCat.of K) ⟶ T), IrreducibleSpace (pullback H.hom t : Scheme.{0})) → Surjective ((fst V V ≫ e) * (snd V V ≫ e)).left := by
+theorem surjective_mul_of_open_of_irreducible_fibres
+    : ∀ (T : Scheme.{0}) (H V : Over T) [GrpObj H] (e : V ⟶ H),
+      IsOpenImmersion e.left → Surjective V.hom
+        → (∀ (K : Type) [Field K] (t : Spec (CommRingCat.of K) ⟶ T),
+          IrreducibleSpace (pullback H.hom t : Scheme.{0}))
+        → Surjective ((fst V V ≫ e) * (snd V V ≫ e)).left := by
   intro T H V _ e he hV hirr
   refine ⟨fun x => ?_⟩
   let t : Spec (CommRingCat.of (H.left.residueField x)) ⟶ T := H.left.fromSpecResidueField x ≫ H.hom
@@ -66,12 +75,14 @@ theorem surjective_mul_of_open_of_irreducible_fibres : ∀ (T : Scheme.{0}) (H V
   let U : X.left.Opens := ⟨_, ho1.inter ho2⟩
   let Z : Over T := Over.mk (U.ι ≫ X.hom)
   let j : Z ⟶ X := Over.homMk U.ι rfl
-  obtain ⟨a, ha⟩ := exists_over_lift_of_range_subset e (j ≫ φ) (by
-    rintro _ ⟨u, rfl⟩
-    exact u.2.2)
-  obtain ⟨b, hb⟩ := exists_over_lift_of_range_subset e (j ≫ p) (by
-    rintro _ ⟨u, rfl⟩
-    exact u.2.1)
+  obtain ⟨a, ha⟩ :=
+    exists_over_lift_of_range_subset e (j ≫ φ) (by
+      rintro _ ⟨u, rfl⟩
+      exact u.2.2)
+  obtain ⟨b, hb⟩ :=
+    exists_over_lift_of_range_subset e (j ≫ p) (by
+      rintro _ ⟨u, rfl⟩
+      exact u.2.1)
   have key : lift a b ≫ ((fst V V ≫ e) * (snd V V ≫ e)) = j ≫ c ≫ g := by
     rw [MonObj.comp_mul, lift_fst_assoc, lift_snd_assoc, ha, hb, ← MonObj.comp_mul]
     simp only [φ, inv_mul_cancel_right]

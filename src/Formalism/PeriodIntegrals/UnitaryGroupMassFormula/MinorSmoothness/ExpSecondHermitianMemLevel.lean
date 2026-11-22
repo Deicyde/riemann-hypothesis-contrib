@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.Q.TPresMain
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Q.TPresLie
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Q.TPresLie
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -95,7 +96,8 @@ lemma exp_second_hermitian_mem_level (p q : Fin (mdim k r i)) (t : ℝ) :
 
 section Rd
 
-variable {E E' : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E'] [NormedSpace ℂ E']
+variable
+  {E E' : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
 private lemma Glev_mul_mem {g h : Mx k r} (hg : g ∈ Glev k r i) (hh : h ∈ Glev k r i) :
     g * h ∈ Glev k r i := by
@@ -176,7 +178,8 @@ end Rd
 
 section Fold
 
-variable {E E' : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E'] [NormedSpace ℂ E']
+variable
+  {E E' : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
 lemma top_smooth (hD : IsOpen D) (c : ℂ) (p q : Fin (mdim k r i)) (f : Mx k r → E)
     (hf : SmoothLev k r i D f) :
@@ -202,8 +205,11 @@ lemma top_clm (c : ℂ) (p q : Fin (mdim k r i)) (L : E →L[ℂ] E') (f : Mx k 
   rw [eh_clm p q L f hf g hg]
   split_ifs <;> simp only [map_add (f := _), map_smul, map_zero]
 
-def foldP (k r : ℕ) (i : Fin (r + 1)) {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (l : List (ℂ × Fin (mdim k r i) × Fin (mdim k r i))) (f : Mx k r → E) : Mx k r → E :=
+def foldP
+    (k r : ℕ) (i : Fin (r + 1))
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (l : List (ℂ × Fin (mdim k r i) × Fin (mdim k r i))) (f : Mx k r → E)
+    : Mx k r → E :=
   (l.map fun x => Top (EH k r) x.1 (posL k r i x.2.1) (posL k r i x.2.2)).foldr (fun T h => T h) f
 
 lemma iteratedOperator_nil (f : Mx k r → E) : foldP k r i [] f = f := rfl

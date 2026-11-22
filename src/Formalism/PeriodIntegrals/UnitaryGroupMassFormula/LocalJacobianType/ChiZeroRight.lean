@@ -10,37 +10,43 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.LocJacTyp.Sd
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField IsDedekindDomain Topology Filter PI.LocJacTyp
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain Topology Filter PI.LocJacTyp
 open PI.VolStabSW.SdUniqW
 open scoped TensorProduct
 
 attribute [local instance] PI.VolStabSW.secondCountable_Fv PI.VolStabSW.locallyCompact_Fv finDim
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F)) (ψ : AddChar (AF F) ℂ)
 
 def chi (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E) : ℂ :=
   psiV F ψ v (∑ i, Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (x i * y i))
 
 open Classical in
-theorem sdE_eq (ι : Type) [Fintype ι] :
-    sdE (E := E) ψ v ι = if h : ∃ μ : Measure (ι → Fv F v ⊗[F] E), SelfDual μ (chi (E := E) v ψ ι)
-      then h.choose else 0 := rfl
+theorem sdE_eq (ι : Type) [Fintype ι]
+    : sdE (E := E) ψ v ι
+      = if h : ∃ μ : Measure (ι → Fv F v ⊗[F] E), SelfDual μ (chi (E := E) v ψ ι) then
+          h.choose
+        else
+          0 :=
+  rfl
 
-theorem chi_add_left (ι : Type) [Fintype ι] (x t y : ι → Fv F v ⊗[F] E) :
-    chi (E := E) v ψ ι (t + x) y = chi (E := E) v ψ ι t y * chi (E := E) v ψ ι x y := by
+theorem chi_add_left (ι : Type) [Fintype ι] (x t y : ι → Fv F v ⊗[F] E)
+    : chi (E := E) v ψ ι (t + x) y = chi (E := E) v ψ ι t y * chi (E := E) v ψ ι x y := by
   simp only [chi, Pi.add_apply, add_mul, map_add (f := _), Finset.sum_add_distrib, psiV_add']
 
-theorem chi_symm (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E) :
-    chi (E := E) v ψ ι x y = chi (E := E) v ψ ι y x := by
+theorem chi_symm (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E)
+    : chi (E := E) v ψ ι x y = chi (E := E) v ψ ι y x := by
   simp only [chi, mul_comm]
 
-theorem chi_zero_right (ι : Type) [Fintype ι] (x : ι → Fv F v ⊗[F] E) :
-    chi (E := E) v ψ ι x 0 = 1 := by
+theorem chi_zero_right (ι : Type) [Fintype ι] (x : ι → Fv F v ⊗[F] E)
+    : chi (E := E) v ψ ι x 0 = 1 := by
   simp [chi, psiV_zero]
 
-theorem chi_smul (ι : Type) [Fintype ι] (c : Fv F v) (x y : ι → Fv F v ⊗[F] E) :
-    chi (E := E) v ψ ι (c • x) y = chi (E := E) v ψ ι x (c • y) := by
+theorem chi_smul (ι : Type) [Fintype ι] (c : Fv F v) (x y : ι → Fv F v ⊗[F] E)
+    : chi (E := E) v ψ ι (c • x) y = chi (E := E) v ψ ι x (c • y) := by
   simp only [chi, Pi.smul_apply, smul_mul_assoc, mul_smul_comm]
 
 def D1 : Set (Fv F v ⊗[F] E) :=
@@ -48,18 +54,20 @@ def D1 : Set (Fv F v ⊗[F] E) :=
 
 def Dbox (ι : Type) : Set (ι → Fv F v ⊗[F] E) := Set.univ.pi fun _ => D1 (E := E) v ψ
 
-theorem ann_obox (ι : Type) [Fintype ι] :
-    ann (chi (E := E) v ψ ι) (Obox (E := E) v ι) = Dbox (E := E) v ψ ι := by
+theorem ann_obox (ι : Type) [Fintype ι]
+    : ann (chi (E := E) v ψ ι) (Obox (E := E) v ι) = Dbox (E := E) v ψ ι := by
   classical
   ext y
   constructor
   · intro hy i _ x hx
-    have h := hy (Pi.single i x) (fun j _ => by
-      by_cases hj : j = i
-      · subst hj; simpa using hx
-      · simpa [Pi.single_apply, hj] using oev_zero v)
-    have hs : ∑ j, Algebra.trace (Fv F v) (Fv F v ⊗[F] E) ((Pi.single i x : ι → Fv F v ⊗[F] E) j * y j) =
-        Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (x * y i) := by
+    have h :=
+      hy (Pi.single i x) (fun j _ => by
+        by_cases hj : j = i
+        · subst hj; simpa using hx
+        · simpa [Pi.single_apply, hj] using oev_zero v)
+    have hs
+        : ∑ j, Algebra.trace (Fv F v) (Fv F v ⊗[F] E) ((Pi.single i x : ι → Fv F v ⊗[F] E) j * y j)
+          = Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (x * y i) := by
       rw [Finset.sum_eq_single i]
       · simp
       · intro j _ hj
@@ -72,7 +80,8 @@ theorem ann_obox (ι : Type) [Fintype ι] :
     rw [psiV_sum]
     exact Finset.prod_eq_one fun i _ => hy i trivial (x i) (hx i trivial)
 
-def ObS (ι : Type) : AddSubgroup (ι → Fv F v ⊗[F] E) := AddSubgroup.pi Set.univ fun _ => Osub (E := E) v
+def ObS (ι : Type) : AddSubgroup (ι → Fv F v ⊗[F] E) :=
+  AddSubgroup.pi Set.univ fun _ => Osub (E := E) v
 
 theorem coe_ObS (ι : Type) : (ObS (E := E) v ι : Set (ι → Fv F v ⊗[F] E)) = Obox (E := E) v ι := by
   simp [ObS, AddSubgroup.coe_pi, Obox, Osub]
@@ -83,15 +92,16 @@ theorem isCompact_obox (ι : Type) [Fintype ι] : IsCompact (Obox (E := E) v ι)
 theorem isOpen_obox (ι : Type) [Fintype ι] : IsOpen (Obox (E := E) v ι) :=
   isOpen_set_pi Set.finite_univ fun _ _ => isOpen_oev v
 
-theorem zero_mem_obox (ι : Type) : (0 : ι → Fv F v ⊗[F] E) ∈ Obox (E := E) v ι :=
-  fun _ _ => oev_zero v
+theorem zero_mem_obox (ι : Type) : (0 : ι → Fv F v ⊗[F] E) ∈ Obox (E := E) v ι := fun _ _ =>
+  oev_zero v
 
 variable [SecondCountableTopology (Fv F v ⊗[F] E)]
 
-theorem sd_test (ι : Type) [Fintype ι] (μ : Measure (ι → Fv F v ⊗[F] E))
-    (hμ : SelfDual μ (chi (E := E) v ψ ι)) (hA : MeasurableSet (Dbox (E := E) v ψ ι))
-    (hfin : μ (Dbox (E := E) v ψ ι) < ⊤) :
-    μ.real (Obox (E := E) v ι) * μ.real (Dbox (E := E) v ψ ι) = 1 := by
+theorem sd_test
+    (ι : Type) [Fintype ι]
+    (μ : Measure (ι → Fv F v ⊗[F] E)) (hμ : SelfDual μ (chi (E := E) v ψ ι))
+    (hA : MeasurableSet (Dbox (E := E) v ψ ι)) (hfin : μ (Dbox (E := E) v ψ ι) < ⊤)
+    : μ.real (Obox (E := E) v ι) * μ.real (Dbox (E := E) v ψ ι) = 1 := by
   have := hμ.1
   set L := ObS (E := E) v ι
   have hLo : IsOpen (L : Set (ι → Fv F v ⊗[F] E)) := by rw [coe_ObS]; exact isOpen_obox v ι
@@ -103,11 +113,17 @@ theorem sd_test (ι : Type) [Fintype ι] (μ : Measure (ι → Fv F v ⊗[F] E))
     rw [show Φ = (L : Set _).piecewise (fun _ => (1 : ℂ)) (fun _ => 0) from
       (Set.piecewise_eq_indicator).symm]
     exact continuous_const.piecewise (by simp [hcl.frontier_eq]) continuous_const
-  have hΦs : HasCompactSupport Φ := HasCompactSupport.intro hLc fun x hx => Set.indicator_of_notMem hx _
-  have hχ : ∀ x t y, chi (E := E) v ψ ι (t + x) y = chi (E := E) v ψ ι t y * chi (E := E) v ψ ι x y :=
+  have hΦs : HasCompactSupport Φ :=
+    HasCompactSupport.intro hLc fun x hx => Set.indicator_of_notMem hx _
+  have hχ
+      : ∀ x t y, chi (E := E) v ψ ι (t + x) y = chi (E := E) v ψ ι t y * chi (E := E) v ψ ι x y :=
     chi_add_left v ψ ι
-  have hT : ∀ y, ∫ x, Φ x * chi (E := E) v ψ ι x y ∂μ =
-      (Dbox (E := E) v ψ ι).indicator (fun _ => ((μ.real (Obox (E := E) v ι) : ℝ) : ℂ)) y := by
+  have hT
+      : ∀ y,
+        ∫ x, Φ x * chi (E := E) v ψ ι x y ∂μ
+          = (Dbox (E := E) v ψ ι).indicator
+            (fun _ => ((μ.real (Obox (E := E) v ι) : ℝ) : ℂ))
+            y := by
     intro y
     have h := PI.VolStabSW.SdUniqW.transform_indicator μ (chi (E := E) v ψ ι) hχ L hLo y
     rw [coe_ObS, ann_obox] at h

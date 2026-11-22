@@ -14,8 +14,8 @@ namespace GlobalTheory.ConjugateMultiplicitySum
 
 open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-theorem conj_eq_iff {z w : ℂ} {d : ℕ} (hd : 0 < d) (hz : z ^ 2 = -(d : ℂ)) (hw : w ^ 2 = -(d : ℂ)) :
-    starRingEnd ℂ z = w ↔ ¬ z = w := by
+theorem conj_eq_iff {z w : ℂ} {d : ℕ} (hd : 0 < d) (hz : z ^ 2 = -(d : ℂ)) (hw : w ^ 2 = -(d : ℂ))
+    : starRingEnd ℂ z = w ↔ ¬ z = w := by
   have hd' : (0 : ℝ) < d := by exact_mod_cast hd
   have hre : z.re * z.re - z.im * z.im = -(d : ℝ) := by
     have := congrArg Complex.re hz
@@ -29,8 +29,7 @@ theorem conj_eq_iff {z w : ℂ} {d : ℕ} (hd : 0 < d) (hz : z ^ 2 = -(d : ℂ))
     · exact h
     · rw [h] at hre
       nlinarith [mul_self_nonneg z.re]
-  have hc : starRingEnd ℂ z = -z := by
-    apply Complex.ext <;> simp [hre0]
+  have hc : starRingEnd ℂ z = -z := by apply Complex.ext <;> simp [hre0]
   have hz0 : z ≠ 0 := by
     rintro rfl
     simp at hre
@@ -46,8 +45,9 @@ theorem conj_eq_iff {z w : ℂ} {d : ℕ} (hd : 0 < d) (hz : z ^ 2 = -(d : ℂ))
     · exact absurd h1 h
     · rw [h1, neg_neg]
 
-theorem mult_add_mult_conj {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H)
-    (τ : E →+* ℂ) : Datum.mult D τ + Datum.mult D (conjEmb τ) = D.p + D.q := by
+theorem mult_add_mult_conj
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H) (τ : E →+* ℂ)
+    : Datum.mult D τ + Datum.mult D (conjEmb τ) = D.p + D.q := by
   have hsq : (τ (H.rt : E)) ^ 2 = -(H.d : ℂ) := by
     have h := congrArg (fun a : 𝓞 E => τ (algebraMap (𝓞 E) E a)) H.rt_sq
     simpa using h

@@ -15,10 +15,11 @@ open Matrix
 
 namespace GlobalTheory.IdemRankLocal
 
-theorem exists_conj_diag (W : Type) [CommRing W] [IsLocalRing W] (n : ℕ)
-    (p : Matrix (Fin n) (Fin n) W) (hp : p * p = p) :
-    ∃ (r : ℕ) (P P' : Matrix (Fin n) (Fin n) W), P * P' = 1 ∧
-    p = P * Matrix.diagonal (fun i : Fin n => if i.val < r then (1 : W) else 0) * P' := by
+theorem exists_conj_diag
+    (W : Type) [CommRing W] [IsLocalRing W] (n : ℕ) (p : Matrix (Fin n) (Fin n) W) (hp : p * p = p)
+    : ∃ (r : ℕ) (P P' : Matrix (Fin n) (Fin n) W),
+      P * P' = 1
+        ∧ p = P * Matrix.diagonal (fun i : Fin n => if i.val < r then (1 : W) else 0) * P' := by
   classical
   set f : (Fin n → W) →ₗ[W] (Fin n → W) := Matrix.toLin' p with hfdef
   have hf : IsIdempotentElem f := by
@@ -64,18 +65,24 @@ theorem exists_conj_diag (W : Type) [CommRing W] [IsLocalRing W] (n : ℕ)
   let b : Module.Basis (Fin n) W (Fin n → W) := bs.reindex (finSumFinEquiv.trans (finCongr hrs))
   have hb : ∀ j : Fin n, f (b j) = (if j.val < r then (1 : W) else 0) • b j := by
     intro j
-    have hj : b j = bs ((finSumFinEquiv.trans (finCongr hrs)).symm j) := Module.Basis.reindex_apply _ _ _
+    have hj : b j = bs ((finSumFinEquiv.trans (finCongr hrs)).symm j) :=
+      Module.Basis.reindex_apply _ _ _
     rw [hj]
     by_cases h : j.val < r
     · have : (finSumFinEquiv.trans (finCongr hrs)).symm j = Sum.inl ⟨j, h⟩ := by
         apply (finSumFinEquiv.trans (finCongr hrs)).injective
-        ext; simp
+        ext
+        simp
       rw [this, if_pos h, one_smul, hbs1]
     · have : (finSumFinEquiv.trans (finCongr hrs)).symm j = Sum.inr ⟨j.val - r, by omega⟩ := by
         apply (finSumFinEquiv.trans (finCongr hrs)).injective
-        ext; simp; omega
+        ext
+        simp
+        omega
       rw [this, if_neg h, zero_smul, hbs2]
-  have hdiag : LinearMap.toMatrix b b f = Matrix.diagonal (fun i : Fin n => if i.val < r then (1 : W) else 0) := by
+  have hdiag
+      : LinearMap.toMatrix b b f
+        = Matrix.diagonal (fun i : Fin n => if i.val < r then (1 : W) else 0) := by
     ext i j
     rw [LinearMap.toMatrix_apply, hb j, map_smul, b.repr_self]
     by_cases hij : i = j
@@ -88,8 +95,9 @@ theorem exists_conj_diag (W : Type) [CommRing W] [IsLocalRing W] (n : ℕ)
   · have := basis_toMatrix_mul_linearMap_toMatrix_mul_basis_toMatrix e b e b f
     rw [← hdiag, this, LinearMap.toMatrix_eq_toMatrix', hfdef, LinearMap.toMatrix'_toLin']
 
-theorem rank_map_const : ∀ (W : Type) [CommRing W] [IsLocalRing W] (n : ℕ) (Q : Matrix (Fin n) (Fin n) W),
-    Q * Q = Q → ∃ r : ℕ, ∀ (k : Type) [Field k] (β : W →+* k), (Q.map β).rank = r := by
+theorem rank_map_const
+    : ∀ (W : Type) [CommRing W] [IsLocalRing W] (n : ℕ) (Q : Matrix (Fin n) (Fin n) W),
+      Q * Q = Q → ∃ r : ℕ, ∀ (k : Type) [Field k] (β : W →+* k), (Q.map β).rank = r := by
   intro W _ _ n Q hQ
   classical
   obtain ⟨r, P, P', hPP', hQeq⟩ := exists_conj_diag W n Q hQ

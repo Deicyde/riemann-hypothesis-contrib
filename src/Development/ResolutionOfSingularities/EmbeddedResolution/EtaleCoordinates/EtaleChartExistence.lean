@@ -20,45 +20,48 @@ private theorem opens_op_hom_ext {X : Scheme.{u}} {A B : (X.Opens)ᵒᵖ} (f g :
   apply Quiver.Hom.unop_inj
   apply Subsingleton.elim
 
-private theorem presheaf_map_eq {X : Scheme.{u}} {A B : (X.Opens)ᵒᵖ} (f g : A ⟶ B) :
-    X.presheaf.map f = X.presheaf.map g := by
+private theorem presheaf_map_eq {X : Scheme.{u}} {A B : (X.Opens)ᵒᵖ} (f g : A ⟶ B)
+    : X.presheaf.map f = X.presheaf.map g := by
   rw [opens_op_hom_ext f g]
 
-private theorem appTop_homOfLE_comp_topIso_hom {X : Scheme.{u}} {V W : X.Opens} (h : W ≤ V) :
-    Scheme.Hom.appTop (X.homOfLE h) ≫ W.topIso.hom =
-      V.topIso.hom ≫ X.presheaf.map (homOfLE h).op := by
+private theorem appTop_homOfLE_comp_topIso_hom {X : Scheme.{u}} {V W : X.Opens} (h : W ≤ V)
+    : Scheme.Hom.appTop (X.homOfLE h) ≫ W.topIso.hom
+      = V.topIso.hom ≫ X.presheaf.map (homOfLE h).op := by
   simp
-  exact (X.presheaf.map_comp _ _).symm.trans
-    ((presheaf_map_eq _ _).trans (X.presheaf.map_comp _ _))
+  exact (X.presheaf.map_comp _ _).symm.trans ((presheaf_map_eq _ _).trans (X.presheaf.map_comp _ _))
 
-private theorem smooth_ΓSpecIso_inv_comp_appTop {X : Scheme.{u}} {k : Type u} [Field k]
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p] (V : X.Opens)
-    (hV : IsAffineOpen V) :
-    RingHom.Smooth (CommRingCat.Hom.hom
+private theorem smooth_ΓSpecIso_inv_comp_appTop
+    {X : Scheme.{u}} {k : Type u} [Field k]
+    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (V : X.Opens) (hV : IsAffineOpen V)
+    : RingHom.Smooth (CommRingCat.Hom.hom
       ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ Scheme.Hom.appTop (V.ι ≫ p))) := by
   have : IsAffine V.toScheme := hV
-  have hfac : V.toScheme.isoSpec.hom ≫
-      Spec.map ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ Scheme.Hom.appTop (V.ι ≫ p)) =
-        V.ι ≫ p := by
+  have hfac
+      : V.toScheme.isoSpec.hom
+          ≫ Spec.map ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ Scheme.Hom.appTop (V.ι ≫ p))
+        = V.ι ≫ p := by
     rw [Scheme.isoSpec_hom, Spec.map_comp, ← Category.assoc, ← Scheme.toSpecΓ_naturality]
     simp
-  have h3 := congrArg
-    (fun f : V.toScheme ⟶ Spec (CommRingCat.of k) => V.toScheme.isoSpec.inv ≫ f) hfac
+  have h3 :=
+    congrArg (fun f : V.toScheme ⟶ Spec (CommRingCat.of k) => V.toScheme.isoSpec.inv ≫ f) hfac
   simp only [← Category.assoc, Iso.inv_hom_id, Category.id_comp] at h3
-  have h2 : AlgebraicGeometry.Smooth
-      (Spec.map ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ Scheme.Hom.appTop (V.ι ≫ p))) := by
+  have h2 : AlgebraicGeometry.Smooth (Spec.map
+      ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫ Scheme.Hom.appTop (V.ι ≫ p))) := by
     rw [h3]
     infer_instance
   exact AlgebraicGeometry.HasRingHomProperty.Spec_iff.mp h2
 
-private theorem exists_mem_basicOpen_of_span_eq_top {X : Scheme.{u}} {U : X.Opens}
-    (x : X) (hx : x ∈ U) (s : Set Γ(X, U)) (hs : Ideal.span s = ⊤) :
-    ∃ t ∈ s, x ∈ X.basicOpen t := by
+private theorem exists_mem_basicOpen_of_span_eq_top
+    {X : Scheme.{u}} {U : X.Opens} (x : X) (hx : x ∈ U) (s : Set Γ(X, U)) (hs : Ideal.span s = ⊤)
+    : ∃ t ∈ s, x ∈ X.basicOpen t := by
   by_contra hcon
   push Not at hcon
   have : IsLocalRing (X.presheaf.stalk x) := inferInstance
-  have hnu : ∀ t ∈ s, t ∈ Ideal.comap (X.presheaf.germ U x hx).hom
-      (IsLocalRing.maximalIdeal (X.presheaf.stalk x)) := by
+  have hnu
+      : ∀ t ∈ s,
+        t ∈ Ideal.comap (X.presheaf.germ U x hx).hom
+          (IsLocalRing.maximalIdeal (X.presheaf.stalk x)) := by
     intro t ht
     rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
     intro hunit
@@ -71,36 +74,49 @@ private theorem exists_mem_basicOpen_of_span_eq_top {X : Scheme.{u}} {U : X.Open
   exact (IsLocalRing.maximalIdeal.isMaximal (X.presheaf.stalk x)).ne_top
     ((Ideal.eq_top_iff_one _).mpr h1)
 
-private theorem exists_etale_eval₂Hom_of_submersivePresentation {k S : Type u} [CommRing k] [CommRing S] [Algebra k S]
-    {ι σ : Type} [Finite ι] [Finite σ] (P : Algebra.SubmersivePresentation k S ι σ) :
-    ∃ (n : ℕ) (v : ULift.{u} (Fin n) → S),
+private theorem exists_etale_eval₂Hom_of_submersivePresentation
+    {k S : Type u} [CommRing k] [CommRing S] [Algebra k S]
+    {ι σ : Type} [Finite ι] [Finite σ]
+    (P : Algebra.SubmersivePresentation k S ι σ)
+    : ∃ (n : ℕ) (v : ULift.{u} (Fin n) → S),
       RingHom.Etale (MvPolynomial.eval₂Hom (algebraMap k S) v) := by
   classical
   have : Fintype σ := Fintype.ofFinite σ
   obtain ⟨n, ⟨g0⟩⟩ := Finite.exists_equiv_fin ((Set.range P.map)ᶜ : Set ι)
-  obtain ⟨e, he⟩ : ∃ e : σ ⊕ ULift.{u} (Fin n) ≃ ι, ∀ s, e (Sum.inl s) = P.map s :=
-    ⟨(Equiv.sumCongr (Equiv.ofInjective P.map P.map_inj)
+  obtain ⟨e, he⟩ : ∃ e : σ ⊕ ULift.{u} (Fin n) ≃ ι, ∀ s, e (Sum.inl s) = P.map s := ⟨
+    (Equiv.sumCongr (Equiv.ofInjective P.map P.map_inj)
         ((g0.trans (Equiv.ulift : ULift.{u} (Fin n) ≃ Fin n).symm).symm)).trans
-          (Equiv.Set.sumCompl (Set.range P.map)), fun s => rfl⟩
+      (Equiv.Set.sumCompl (Set.range P.map)),
+    fun s => rfl
+  ⟩
   refine ⟨n, fun t => P.val (e (Sum.inr t)), ?_⟩
   let : Algebra (MvPolynomial (ULift.{u} (Fin n)) k) S :=
     (MvPolynomial.eval₂Hom (algebraMap k S) fun t => P.val (e (Sum.inr t))).toAlgebra
-  have halg : ∀ z : MvPolynomial (ULift.{u} (Fin n)) k,
-      algebraMap (MvPolynomial (ULift.{u} (Fin n)) k) S z =
-        MvPolynomial.eval₂Hom (algebraMap k S) (fun t => P.val (e (Sum.inr t))) z := fun _ => rfl
+  have halg
+      : ∀ z : MvPolynomial (ULift.{u} (Fin n)) k,
+        algebraMap (MvPolynomial (ULift.{u} (Fin n)) k) S z
+          = MvPolynomial.eval₂Hom (algebraMap k S) (fun t => P.val (e (Sum.inr t))) z := fun _ =>
+    rfl
   have : IsScalarTower k (MvPolynomial (ULift.{u} (Fin n)) k) S := by
     refine IsScalarTower.of_algebraMap_eq fun a => ?_
     rw [halg]
     simp
-  obtain ⟨Φ, hΦl, hΦr, hΦC⟩ :
-      ∃ Φ : MvPolynomial ι k →+* MvPolynomial σ (MvPolynomial (ULift.{u} (Fin n)) k),
-        (∀ s, Φ (MvPolynomial.X (e (Sum.inl s))) = MvPolynomial.X s) ∧
-        (∀ t, Φ (MvPolynomial.X (e (Sum.inr t))) = MvPolynomial.C (MvPolynomial.X t)) ∧
-        (∀ a : k, Φ (MvPolynomial.C a) = MvPolynomial.C (MvPolynomial.C a)) := by
-    refine ⟨((MvPolynomial.aeval (fun i => Sum.elim (fun s => MvPolynomial.X s)
-        (fun t => MvPolynomial.C (MvPolynomial.X t)) (e.symm i)) :
-          MvPolynomial ι k →ₐ[k] MvPolynomial σ (MvPolynomial (ULift.{u} (Fin n)) k))).toRingHom,
-      ?_, ?_, ?_⟩
+  obtain ⟨Φ, hΦl, hΦr, hΦC⟩
+      : ∃ Φ : MvPolynomial ι k →+* MvPolynomial σ (MvPolynomial (ULift.{u} (Fin n)) k),
+        (∀ s, Φ (MvPolynomial.X (e (Sum.inl s))) = MvPolynomial.X s)
+          ∧ (∀ t, Φ (MvPolynomial.X (e (Sum.inr t))) = MvPolynomial.C (MvPolynomial.X t))
+          ∧ (∀ a : k, Φ (MvPolynomial.C a) = MvPolynomial.C (MvPolynomial.C a)) := by
+    refine ⟨
+      ((MvPolynomial.aeval (fun i =>
+          Sum.elim
+            (fun s => MvPolynomial.X s)
+            (fun t => MvPolynomial.C (MvPolynomial.X t))
+            (e.symm i))
+        : MvPolynomial ι k →ₐ[k] MvPolynomial σ (MvPolynomial (ULift.{u} (Fin n)) k))).toRingHom,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · intro s; simp
     · intro t; simp
     · intro a
@@ -116,44 +132,47 @@ private theorem exists_etale_eval₂Hom_of_submersivePresentation {k S : Type u}
     intro z
     induction z using MvPolynomial.induction_on with
     | C q =>
-        induction q using MvPolynomial.induction_on with
-        | C a => exact ⟨MvPolynomial.C a, hΦC a⟩
-        | add q₁ q₂ h₁ h₂ =>
-            obtain ⟨x, hx⟩ := h₁
-            obtain ⟨y, hy⟩ := h₂
-            exact ⟨x + y, by rw [map_add (f := _), hx, hy, ← map_add (f := _)]⟩
-        | mul_X q t hq =>
-            obtain ⟨x, hx⟩ := hq
-            exact ⟨x * MvPolynomial.X (e (Sum.inr t)), by rw [map_mul, hx, hΦr, ← map_mul]⟩
-    | add z₁ z₂ h₁ h₂ =>
+      induction q using MvPolynomial.induction_on with
+      | C a => exact ⟨MvPolynomial.C a, hΦC a⟩
+      | add q₁ q₂ h₁ h₂ =>
         obtain ⟨x, hx⟩ := h₁
         obtain ⟨y, hy⟩ := h₂
-        exact ⟨x + y, by rw [map_add (f := _), hx, hy]⟩
+        exact ⟨x + y, by rw [map_add (f := _), hx, hy, ← map_add (f := _)]⟩
+      | mul_X q t hq =>
+        obtain ⟨x, hx⟩ := hq
+        exact ⟨x * MvPolynomial.X (e (Sum.inr t)), by rw [map_mul, hx, hΦr, ← map_mul]⟩
+    | add z₁ z₂ h₁ h₂ =>
+      obtain ⟨x, hx⟩ := h₁
+      obtain ⟨y, hy⟩ := h₂
+      exact ⟨x + y, by rw [map_add (f := _), hx, hy]⟩
     | mul_X z s hz =>
-        obtain ⟨x, hx⟩ := hz
-        exact ⟨x * MvPolynomial.X (e (Sum.inl s)), by rw [map_mul, hx, hΦl]⟩
-  have hA : ∀ y : P.Ring, algebraMap P.Ring S y = MvPolynomial.aeval P.val y :=
-    fun y => Algebra.Generators.algebraMap_apply _ y
-  have hcompX : ∀ i : ι,
-      (MvPolynomial.aeval (fun s => P.val (e (Sum.inl s)))) (Φ (MvPolynomial.X i)) = P.val i := by
+      obtain ⟨x, hx⟩ := hz
+      exact ⟨x * MvPolynomial.X (e (Sum.inl s)), by rw [map_mul, hx, hΦl]⟩
+  have hA : ∀ y : P.Ring, algebraMap P.Ring S y = MvPolynomial.aeval P.val y := fun y =>
+    Algebra.Generators.algebraMap_apply _ y
+  have hcompX
+      : ∀ i : ι,
+        (MvPolynomial.aeval (fun s => P.val (e (Sum.inl s)))) (Φ (MvPolynomial.X i)) = P.val i := by
     intro i
     rcases hecases i with ⟨s, rfl⟩ | ⟨t, rfl⟩
     · rw [hΦl, MvPolynomial.aeval_X]
     · rw [hΦr, MvPolynomial.aeval_C, halg]
       simp
-  have hcomp : ∀ z : MvPolynomial ι k,
-      (MvPolynomial.aeval (fun s => P.val (e (Sum.inl s)))) (Φ z) =
-        MvPolynomial.aeval P.val z := by
+  have hcomp
+      : ∀ z : MvPolynomial ι k,
+        (MvPolynomial.aeval (fun s => P.val (e (Sum.inl s)))) (Φ z)
+          = MvPolynomial.aeval P.val z := by
     intro z
     induction z using MvPolynomial.induction_on with
     | C a =>
-        rw [hΦC, MvPolynomial.aeval_C, halg, MvPolynomial.aeval_C]
-        simp
+      rw [hΦC, MvPolynomial.aeval_C, halg, MvPolynomial.aeval_C]
+      simp
     | add z₁ z₂ h₁ h₂ => simp only [map_add (f := _), h₁, h₂]
     | mul_X z i hz => simp only [map_mul, hz, hcompX, MvPolynomial.aeval_X]
-  have hpdX : ∀ (s : σ) (i : ι),
-      MvPolynomial.pderiv s (Φ (MvPolynomial.X i)) =
-        Φ (MvPolynomial.pderiv (P.map s) (MvPolynomial.X i)) := by
+  have hpdX
+      : ∀ (s : σ) (i : ι),
+        MvPolynomial.pderiv s (Φ (MvPolynomial.X i))
+          = Φ (MvPolynomial.pderiv (P.map s) (MvPolynomial.X i)) := by
     intro s i
     rcases hecases i with ⟨s', rfl⟩ | ⟨t, rfl⟩
     · rw [hΦl, he]
@@ -169,16 +188,16 @@ private theorem exists_etale_eval₂Hom_of_submersivePresentation {k S : Type u}
           rw [hh, he]
         simp at hsum
       rw [hΦr, MvPolynomial.pderiv_C, MvPolynomial.pderiv_X_of_ne hne, map_zero]
-  have hpd : ∀ (s : σ) (q : MvPolynomial ι k),
-      MvPolynomial.pderiv s (Φ q) = Φ (MvPolynomial.pderiv (P.map s) q) := by
+  have hpd
+      : ∀ (s : σ) (q : MvPolynomial ι k),
+        MvPolynomial.pderiv s (Φ q) = Φ (MvPolynomial.pderiv (P.map s) q) := by
     intro s q
     induction q using MvPolynomial.induction_on with
     | C a => rw [hΦC, MvPolynomial.pderiv_C, MvPolynomial.pderiv_C, map_zero]
     | add q₁ q₂ h₁ h₂ => simp only [map_add (f := _), h₁, h₂]
     | mul_X q i hq => simp only [map_mul, MvPolynomial.pderiv_mul, map_add (f := _), hq, hpdX]
-  have hsurjW : Function.Surjective
-      (MvPolynomial.aeval (R := MvPolynomial (ULift.{u} (Fin n)) k)
-        (fun s => P.val (e (Sum.inl s)))) := by
+  have hsurjW : Function.Surjective (MvPolynomial.aeval (R := MvPolynomial (ULift.{u} (Fin n)) k)
+      (fun s => P.val (e (Sum.inl s)))) := by
     intro s
     exact ⟨Φ (P.σ' s), by rw [hcomp, P.aeval_val_σ']⟩
   let G : Algebra.Generators (MvPolynomial (ULift.{u} (Fin n)) k) S σ :=
@@ -193,17 +212,22 @@ private theorem exists_etale_eval₂Hom_of_submersivePresentation {k S : Type u}
       simp only [Ideal.mem_comap, RingHom.mem_ker, hGval, hcomp]
     rw [h1, ← Ideal.map_span, P.span_range_relation_eq_ker, h2,
       Ideal.map_comap_of_surjective Φ hΦsurj]
-  obtain ⟨Q, hQmap, hQrel, hQalg⟩ :
-      ∃ Q : Algebra.PreSubmersivePresentation (MvPolynomial (ULift.{u} (Fin n)) k) S σ σ,
-        (∀ i, Q.map i = i) ∧ (∀ j, Q.relation j = Φ (P.relation j)) ∧
-        (∀ z, algebraMap Q.Ring S z =
-          MvPolynomial.aeval (fun s => P.val (e (Sum.inl s))) z) :=
-    ⟨{ toGenerators := G
-       relation := fun j => Φ (P.relation j)
-       span_range_relation_eq_ker := hspanQ
-       map := id
-       map_inj := Function.injective_id },
-      fun i => rfl, fun j => rfl, fun z => Algebra.Generators.algebraMap_apply G z⟩
+  obtain ⟨Q, hQmap, hQrel, hQalg⟩
+      : ∃ Q : Algebra.PreSubmersivePresentation (MvPolynomial (ULift.{u} (Fin n)) k) S σ σ,
+        (∀ i, Q.map i = i) ∧ (∀ j, Q.relation j = Φ (P.relation j))
+          ∧ (∀ z,
+            algebraMap Q.Ring S z = MvPolynomial.aeval (fun s => P.val (e (Sum.inl s))) z) := ⟨
+    {
+      toGenerators := G
+      relation := fun j => Φ (P.relation j)
+      span_range_relation_eq_ker := hspanQ
+      map := id
+      map_inj := Function.injective_id
+    },
+    fun i => rfl,
+    fun j => rfl,
+    fun z => Algebra.Generators.algebraMap_apply G z
+  ⟩
   have hmat : ∀ i j, Q.jacobiMatrix i j = Φ (P.jacobiMatrix i j) := by
     intro i j
     rw [Algebra.PreSubmersivePresentation.jacobiMatrix_apply,
@@ -219,64 +243,76 @@ private theorem exists_etale_eval₂Hom_of_submersivePresentation {k S : Type u}
   have hunit : IsUnit Q.jacobian := by
     rw [hjac]
     exact P.jacobian_isUnit
-  have : Algebra.IsStandardSmoothOfRelativeDimension 0
-      (MvPolynomial (ULift.{u} (Fin n)) k) S := by
+  have : Algebra.IsStandardSmoothOfRelativeDimension 0 (MvPolynomial (ULift.{u} (Fin n)) k) S := by
     refine ⟨σ, σ, inferInstance, inferInstance, ⟨Q, hunit⟩, ?_⟩
     simp [Algebra.Presentation.dimension]
   show Algebra.Etale (MvPolynomial (ULift.{u} (Fin n)) k) S
   infer_instance
 
-theorem homOfLE_comp_map_comp_affineSpaceFinToSpec {X : Scheme.{u}} {k : Type u} [Field k]
+theorem homOfLE_comp_map_comp_affineSpaceFinToSpec
+    {X : Scheme.{u}} {k : Type u} [Field k]
     {p : X ⟶ Spec (CommRingCat.of k)} {U : X.Opens} {m : ℕ} (c : EtaleChart p U m)
-    {V : X.Opens} (hVU : V ≤ U) :
-    (X.homOfLE hVU ≫ c.map) ≫ affineSpaceFinToSpec k m = V.ι ≫ p := by
+    {V : X.Opens} (hVU : V ≤ U)
+    : (X.homOfLE hVU ≫ c.map) ≫ affineSpaceFinToSpec k m = V.ι ≫ p := by
   rw [Category.assoc, c.comp_struct, ← Category.assoc, Scheme.homOfLE_ι]
 
-theorem etale_homOfLE_comp_map {X : Scheme.{u}} {k : Type u} [Field k]
+theorem etale_homOfLE_comp_map
+    {X : Scheme.{u}} {k : Type u} [Field k]
     {p : X ⟶ Spec (CommRingCat.of k)} {U : X.Opens} {m : ℕ} (c : EtaleChart p U m)
-    {V : X.Opens} (hVU : V ≤ U) :
-    AlgebraicGeometry.Etale (X.homOfLE hVU ≫ c.map) := by
+    {V : X.Opens} (hVU : V ≤ U)
+    : AlgebraicGeometry.Etale (X.homOfLE hVU ≫ c.map) := by
   have := c.isEtale
   infer_instance
 
-def EtaleChart.restrict {X : Scheme.{u}} {k : Type u} [Field k]
+def EtaleChart.restrict
+    {X : Scheme.{u}} {k : Type u} [Field k]
     {p : X ⟶ Spec (CommRingCat.of k)} {U : X.Opens} {m : ℕ} (c : EtaleChart p U m)
-    {V : X.Opens} (hVU : V ≤ U) : EtaleChart p V m where
+    {V : X.Opens} (hVU : V ≤ U)
+    : EtaleChart p V m where
   map := X.homOfLE hVU ≫ c.map
   comp_struct := homOfLE_comp_map_comp_affineSpaceFinToSpec c hVU
   isEtale := etale_homOfLE_comp_map c hVU
 
 @[simp]
-theorem EtaleChart.restrict_map {X : Scheme.{u}} {k : Type u} [Field k]
+theorem EtaleChart.restrict_map
+    {X : Scheme.{u}} {k : Type u} [Field k]
     {p : X ⟶ Spec (CommRingCat.of k)} {U : X.Opens} {m : ℕ} (c : EtaleChart p U m)
-    {V : X.Opens} (hVU : V ≤ U) :
-    (c.restrict hVU).map = X.homOfLE hVU ≫ c.map := rfl
+    {V : X.Opens} (hVU : V ≤ U)
+    : (c.restrict hVU).map = X.homOfLE hVU ≫ c.map :=
+  rfl
 
-theorem homOfVector_comp_affineSpaceFinToSpec {X : Scheme.{u}} {k : Type u} [Field k]
-    (p : X ⟶ Spec (CommRingCat.of k)) (U : X.Opens) {m : ℕ}
-    (v : ULift.{u} (Fin m) → U.toScheme.presheaf.obj (op ⊤)) :
-    AffineSpace.homOfVector (U.ι ≫ p) v ≫ affineSpaceFinToSpec k m = U.ι ≫ p := by
+theorem homOfVector_comp_affineSpaceFinToSpec
+    {X : Scheme.{u}} {k : Type u} [Field k]
+    (p : X ⟶ Spec (CommRingCat.of k))
+    (U : X.Opens)
+    {m : ℕ} (v : ULift.{u} (Fin m) → U.toScheme.presheaf.obj (op ⊤))
+    : AffineSpace.homOfVector (U.ι ≫ p) v ≫ affineSpaceFinToSpec k m = U.ι ≫ p := by
   simp
 
-def EtaleChart.ofCoords {X : Scheme.{u}} {k : Type u} [Field k]
-    (p : X ⟶ Spec (CommRingCat.of k)) (U : X.Opens) {m : ℕ}
-    (v : ULift.{u} (Fin m) → U.toScheme.presheaf.obj (op ⊤))
-    (he : AlgebraicGeometry.Etale (AffineSpace.homOfVector (U.ι ≫ p) v)) :
-    EtaleChart p U m where
+def EtaleChart.ofCoords
+    {X : Scheme.{u}} {k : Type u} [Field k]
+    (p : X ⟶ Spec (CommRingCat.of k)) (U : X.Opens)
+    {m : ℕ} (v : ULift.{u} (Fin m) → U.toScheme.presheaf.obj (op ⊤))
+    (he : AlgebraicGeometry.Etale (AffineSpace.homOfVector (U.ι ≫ p) v))
+    : EtaleChart p U m where
   map := AffineSpace.homOfVector (U.ι ≫ p) v
   comp_struct := homOfVector_comp_affineSpaceFinToSpec p U v
   isEtale := he
 
 @[simp]
-theorem EtaleChart.ofCoords_map {X : Scheme.{u}} {k : Type u} [Field k]
-    (p : X ⟶ Spec (CommRingCat.of k)) (U : X.Opens) {m : ℕ}
-    (v : ULift.{u} (Fin m) → U.toScheme.presheaf.obj (op ⊤))
-    (he : AlgebraicGeometry.Etale (AffineSpace.homOfVector (U.ι ≫ p) v)) :
-    (EtaleChart.ofCoords p U v he).map = AffineSpace.homOfVector (U.ι ≫ p) v := rfl
+theorem EtaleChart.ofCoords_map
+    {X : Scheme.{u}} {k : Type u} [Field k]
+    (p : X ⟶ Spec (CommRingCat.of k)) (U : X.Opens)
+    {m : ℕ} (v : ULift.{u} (Fin m) → U.toScheme.presheaf.obj (op ⊤))
+    (he : AlgebraicGeometry.Etale (AffineSpace.homOfVector (U.ι ≫ p) v))
+    : (EtaleChart.ofCoords p U v he).map = AffineSpace.homOfVector (U.ι ≫ p) v :=
+  rfl
 
-theorem exists_etaleChart {X : Scheme.{u}} {k : Type u} [Field k]
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p] (x : X) :
-    ∃ (U : X.Opens) (m : ℕ), x ∈ U ∧ IsAffineOpen U ∧ Nonempty (EtaleChart p U m) := by
+theorem exists_etaleChart
+    {X : Scheme.{u}} {k : Type u} [Field k]
+    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (x : X)
+    : ∃ (U : X.Opens) (m : ℕ), x ∈ U ∧ IsAffineOpen U ∧ Nonempty (EtaleChart p U m) := by
   classical
   obtain ⟨V, hxV, hV⟩ := Scheme.exists_isAffineOpen_mem (X := X) x
   have : IsAffine V.toScheme := hV
@@ -306,13 +342,18 @@ theorem exists_etaleChart {X : Scheme.{u}} {k : Type u} [Field k]
     rw [appTop_homOfLE_comp_topIso_hom]
   have hstdψU : RingHom.IsStandardSmooth ψU.hom := by
     have := hV.isLocalization_basicOpen t
-    have h1 := RingHom.isStandardSmooth_respectsIso.left
-      ((algebraMap Γ(X, V) (Localization.Away t)).comp ψV.hom)
-      (IsLocalization.algEquiv (Submonoid.powers t) (Localization.Away t)
-        Γ(X, X.basicOpen t)).toRingEquiv (hloc t hts)
-    have h2 : (((IsLocalization.algEquiv (Submonoid.powers t) (Localization.Away t)
-        Γ(X, X.basicOpen t)).toRingEquiv : Localization.Away t →+* Γ(X, X.basicOpen t)).comp
-        ((algebraMap Γ(X, V) (Localization.Away t)).comp ψV.hom)) = ψU.hom := by
+    have h1 :=
+      RingHom.isStandardSmooth_respectsIso.left
+        ((algebraMap Γ(X, V) (Localization.Away t)).comp ψV.hom)
+        (IsLocalization.algEquiv (Submonoid.powers t) (Localization.Away t)
+          Γ(X, X.basicOpen t)).toRingEquiv
+        (hloc t hts)
+    have h2
+        : (((IsLocalization.algEquiv (Submonoid.powers t) (Localization.Away t)
+                Γ(X, X.basicOpen t)).toRingEquiv
+              : Localization.Away t →+* Γ(X, X.basicOpen t)).comp
+            ((algebraMap Γ(X, V) (Localization.Away t)).comp ψV.hom))
+          = ψU.hom := by
       rw [hψUeq, CommRingCat.hom_comp]
       apply RingHom.ext
       intro a
@@ -321,19 +362,21 @@ theorem exists_etaleChart {X : Scheme.{u}} {k : Type u} [Field k]
     rw [← h2]
     exact h1
   have hstdθU : RingHom.IsStandardSmooth θU.hom := by
-    have h1 := RingHom.isStandardSmooth_respectsIso.left ψU.hom
-      (X.basicOpen t).topIso.symm.commRingCatIsoToRingEquiv hstdψU
+    have h1 :=
+      RingHom.isStandardSmooth_respectsIso.left ψU.hom
+        (X.basicOpen t).topIso.symm.commRingCatIsoToRingEquiv hstdψU
     have h3 : θU = ψU ≫ (X.basicOpen t).topIso.inv := by
       rw [hψUdef, Category.assoc, Iso.hom_inv_id, Category.comp_id]
-    have h2 : (((X.basicOpen t).topIso.symm.commRingCatIsoToRingEquiv :
-        Γ(X, X.basicOpen t) →+* Γ((X.basicOpen t).toScheme, ⊤)).comp ψU.hom) = θU.hom := by
+    have h2
+        : (((X.basicOpen t).topIso.symm.commRingCatIsoToRingEquiv
+            : Γ(X, X.basicOpen t) →+* Γ((X.basicOpen t).toScheme, ⊤)).comp ψU.hom)
+          = θU.hom := by
       rw [h3, CommRingCat.hom_comp]
       rfl
     rw [← h2]
     exact h1
   let : Algebra (CommRingCat.of k) Γ((X.basicOpen t).toScheme, ⊤) := θU.hom.toAlgebra
-  have hAlg : Algebra.IsStandardSmooth (CommRingCat.of k) Γ((X.basicOpen t).toScheme, ⊤) :=
-    hstdθU
+  have hAlg : Algebra.IsStandardSmooth (CommRingCat.of k) Γ((X.basicOpen t).toScheme, ⊤) := hstdθU
   obtain ⟨⟨ι, σ, hσ, hι, ⟨P⟩⟩⟩ := hAlg
   have : Finite σ := hσ
   have : Finite ι := hι
@@ -352,21 +395,32 @@ theorem exists_etaleChart {X : Scheme.{u}} {k : Type u} [Field k]
         (algebraMap (CommRingCat.of k) Γ((X.basicOpen t).toScheme, ⊤)) v (MvPolynomial.C a)
       = θU.hom a
     exact MvPolynomial.eval₂_C _ _ a
-  have hcs : ((X.basicOpen t).toScheme.isoSpec.hom ≫ Spec.map φ ≫
-      (AffineSpace.SpecIso (ULift.{u} (Fin n)) (CommRingCat.of k)).inv) ≫
-        affineSpaceFinToSpec k n = (X.basicOpen t).ι ≫ p := by
-    rw [Category.assoc, Category.assoc, AffineSpace.SpecIso_inv_over, ← Spec.map_comp, hφC,
-      hθUdef]
+  have hcs
+      : ((X.basicOpen t).toScheme.isoSpec.hom ≫ Spec.map φ
+            ≫ (AffineSpace.SpecIso (ULift.{u} (Fin n)) (CommRingCat.of k)).inv)
+          ≫ affineSpaceFinToSpec k n
+        = (X.basicOpen t).ι ≫ p := by
+    rw [Category.assoc, Category.assoc, AffineSpace.SpecIso_inv_over, ← Spec.map_comp, hφC, hθUdef]
     rw [Scheme.isoSpec_hom, Spec.map_comp, ← Category.assoc, ← Scheme.toSpecΓ_naturality]
     simp
-  exact ⟨X.basicOpen t, n, hxt, hU,
-    ⟨⟨(X.basicOpen t).toScheme.isoSpec.hom ≫ Spec.map φ ≫
-      (AffineSpace.SpecIso (ULift.{u} (Fin n)) (CommRingCat.of k)).inv, hcs, inferInstance⟩⟩⟩
+  exact ⟨
+    X.basicOpen t,
+    n,
+    hxt,
+    hU,
+    ⟨⟨
+      (X.basicOpen t).toScheme.isoSpec.hom ≫ Spec.map φ
+        ≫ (AffineSpace.SpecIso (ULift.{u} (Fin n)) (CommRingCat.of k)).inv,
+      hcs,
+      inferInstance
+    ⟩⟩
+  ⟩
 
-theorem exists_etaleChart_le {X : Scheme.{u}} {k : Type u} [Field k]
-    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p] (x : X)
-    (W : X.Opens) (hx : x ∈ W) :
-    ∃ (U : X.Opens) (m : ℕ), x ∈ U ∧ U ≤ W ∧ IsAffineOpen U ∧ Nonempty (EtaleChart p U m) := by
+theorem exists_etaleChart_le
+    {X : Scheme.{u}} {k : Type u} [Field k]
+    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (x : X) (W : X.Opens) (hx : x ∈ W)
+    : ∃ (U : X.Opens) (m : ℕ), x ∈ U ∧ U ≤ W ∧ IsAffineOpen U ∧ Nonempty (EtaleChart p U m) := by
   obtain ⟨U, m, hxU, hU, ⟨c⟩⟩ := exists_etaleChart p x
   have hxUW : x ∈ (U ⊓ W : X.Opens) := ⟨hxU, hx⟩
   obtain ⟨f, hfle, hxf⟩ := hU.exists_basicOpen_le (⟨x, hxUW⟩ : (U ⊓ W : X.Opens)) hxU

@@ -8,10 +8,16 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 open ValuativeRel PositivityTheory.Rg.Tf.Loc
 
-private theorem ramOne (k K : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-    [Algebra k K] [ValuativeExtension k K] [FiniteDimensional k K] (h : IsUnramifiedLoc k K) :
-    (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation k))) = 1 := by
+private theorem ramOne
+    (k K : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] [Algebra k K]
+    [ValuativeExtension k K] [FiniteDimensional k K]
+    (h : IsUnramifiedLoc k K)
+    : (_root_.Ideal.ramificationIdx
+        (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+          K)))
+        (_root_.Valuation.integer (_root_.ValuativeRel.valuation k)))
+      = 1 := by
   obtain ⟨π, hπ, hmin⟩ := h
   have hv := Valuation.integer.integers (valuation K)
   rw [← GroundTheory.LocalField.isUnramified_iff, ← GroundTheory.LocalField.map_maximalIdeal_eq_iff]
@@ -41,15 +47,25 @@ private theorem ramOne (k K : Type) [Field k] [ValuativeRel k] [TopologicalSpace
     rw [hz]
     exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ hp)
 
-theorem UpperTheory.Gal.InertialTypesAlt.L.resEx :
-    UpperTheory.Gal.InertialTypesAlt.L.ResEx := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.resEx : UpperTheory.Gal.InertialTypesAlt.L.ResEx := by
   intro k K _ _ _ _ _ _ _ _ _ _ _ _ hu
   have h1 := ramOne k K hu
   letI : Fintype 𝓀[k] := Fintype.ofFinite _
   letI : Fintype 𝓀[K] := Fintype.ofFinite _
-  refine ⟨𝓀[k], 𝓀[K], inferInstance, inferInstance, inferInstance, inferInstance, inferInstance,
-    IsLocalRing.residue _, IsLocalRing.residue _, GroundTheory.LocalField.frobenius k K h1,
-    GroundTheory.LocalField.residueAlgEquiv k K (GroundTheory.LocalField.frobenius k K h1), ?_⟩
+  refine ⟨
+    𝓀[k],
+    𝓀[K],
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    IsLocalRing.residue _,
+    IsLocalRing.residue _,
+    GroundTheory.LocalField.frobenius k K h1,
+    GroundTheory.LocalField.residueAlgEquiv k K (GroundTheory.LocalField.frobenius k K h1),
+    ?_
+  ⟩
   refine ⟨?_, IsLocalRing.residue_surjective, IsLocalRing.residue_surjective, ?_, ?_, ?_⟩
   · rw [← GroundTheory.LocalField.residueDegree_eq_finrank,
       GroundTheory.LocalField.residueDegree_eq_finrank_of_unramified k K h1]
@@ -58,7 +74,10 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.resEx :
     rw [e]
     rfl
   · intro x y h
-    have e : y = GroundTheory.LocalField.integerAlgEquiv k K (GroundTheory.LocalField.frobenius k K h1) x :=
+    have e
+        : y
+          = GroundTheory.LocalField.integerAlgEquiv k K (GroundTheory.LocalField.frobenius k K h1)
+            x :=
       Subtype.ext h
     rw [e, GroundTheory.LocalField.residueAlgEquiv_residue]
   · intro z

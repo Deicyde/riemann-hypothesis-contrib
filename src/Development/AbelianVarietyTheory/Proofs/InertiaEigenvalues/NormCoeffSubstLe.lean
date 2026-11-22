@@ -21,7 +21,8 @@ def Ex (u a e : K⟦X⟧) : Prop :=
 
 end General
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct
 
 open PowerSeries Filter Topology in
 open TensorProduct in
@@ -351,13 +352,31 @@ private lemma ex_subst_of_ex_of_coeff_decay {u v Y a e : K⟦X⟧} (hu : ‖cons
         gcongr; exact norm_sub_le_norm_sub_add_norm_sub B W _
     _ < ε := by linarith
 
-
 open PowerSeries Filter Topology in
 open TensorProduct in
-theorem _root_.GlobalTheory.HWL.ExpSub.conv_isExp_subst : ∀ (l : ℕ) [Fact l.Prime] (LL : _root_.Formalism.BasicNotions.Loc.FinExt l) (ζ ζ' c : ↥LL.1) (y : PowerSeries ↥(_root_.Formalism.BasicNotions.Loc.OL LL)), ‖((ζ : _root_.Formalism.BasicNotions.Loc.Om l)) - 1‖ < 1 → ‖((ζ' : _root_.Formalism.BasicNotions.Loc.Om l)) - 1‖ < 1 → PowerSeries.constantCoeff y = 0 → _root_.GlobalTheory.HWL.IsExp ζ (PowerSeries.map (algebraMap ↥(_root_.Formalism.BasicNotions.Loc.OL LL) ↥LL.1) y) (PowerSeries.C ζ' * PowerSeries.rescale c (PowerSeries.exp ↥LL.1) - 1) → ∀ a e : PowerSeries ↥LL.1, _root_.GlobalTheory.HWL.Conv a → _root_.GlobalTheory.HWL.IsExp ζ' a e → _root_.GlobalTheory.HWL.Conv (PowerSeries.subst (PowerSeries.map (algebraMap ↥(_root_.Formalism.BasicNotions.Loc.OL LL) ↥LL.1) y) a) ∧ _root_.GlobalTheory.HWL.IsExp ζ (PowerSeries.subst (PowerSeries.map (algebraMap ↥(_root_.Formalism.BasicNotions.Loc.OL LL) ↥LL.1) y) a) (PowerSeries.rescale c e) := by
+theorem _root_.GlobalTheory.HWL.ExpSub.conv_isExp_subst
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : _root_.Formalism.BasicNotions.Loc.FinExt l) (ζ ζ' c : ↥LL.1)
+        (y : PowerSeries ↥(_root_.Formalism.BasicNotions.Loc.OL LL)),
+      ‖((ζ : _root_.Formalism.BasicNotions.Loc.Om l)) - 1‖ < 1
+        → ‖((ζ' : _root_.Formalism.BasicNotions.Loc.Om l)) - 1‖ < 1
+        → PowerSeries.constantCoeff y = 0
+        → _root_.GlobalTheory.HWL.IsExp ζ
+          (PowerSeries.map (algebraMap ↥(_root_.Formalism.BasicNotions.Loc.OL LL) ↥LL.1) y)
+          (PowerSeries.C ζ' * PowerSeries.rescale c (PowerSeries.exp ↥LL.1) - 1)
+        → ∀ a e : PowerSeries ↥LL.1,
+          _root_.GlobalTheory.HWL.Conv a → _root_.GlobalTheory.HWL.IsExp ζ' a e
+            → _root_.GlobalTheory.HWL.Conv (PowerSeries.subst
+                (PowerSeries.map (algebraMap ↥(_root_.Formalism.BasicNotions.Loc.OL LL) ↥LL.1) y) a)
+              ∧ _root_.GlobalTheory.HWL.IsExp ζ
+                (PowerSeries.subst
+                  (PowerSeries.map (algebraMap ↥(_root_.Formalism.BasicNotions.Loc.OL LL) ↥LL.1) y)
+                  a)
+                (PowerSeries.rescale c e) := by
   intro l _ LL ζ ζ' c y hζ hζ' hy0 hyexp a e ha hae
-  have hiff : ∀ (z : ↥LL.1) (f g : PowerSeries ↥LL.1), _root_.GlobalTheory.HWL.IsExp z f g ↔
-      _root_.GlobalTheory.HWL.ExpSub.Ex (C z * exp ↥LL.1 - 1) f g := by
+  have hiff
+      : ∀ (z : ↥LL.1) (f g : PowerSeries ↥LL.1),
+        _root_.GlobalTheory.HWL.IsExp z f g
+          ↔ _root_.GlobalTheory.HWL.ExpSub.Ex (C z * exp ↥LL.1 - 1) f g := by
     intro z f g
     unfold _root_.GlobalTheory.HWL.IsExp _root_.GlobalTheory.HWL.ExpSub.Ex
     simp only [(Topology.IsInducing.subtypeVal).tendsto_nhds_iff, Function.comp_def]
@@ -367,8 +386,8 @@ theorem _root_.GlobalTheory.HWL.ExpSub.conv_isExp_subst : ∀ (l : ℕ) [Fact l.
     rw [hYdef, coeff_map]
     exact norm_le_one_of_mem_integralClosure_padicInt _ (coeff m y).2
   have h0 : constantCoeff Y = 0 := by
-    rw [hYdef, ← coeff_zero_eq_constantCoeff_apply, coeff_map, coeff_zero_eq_constantCoeff_apply, hy0,
-      map_zero]
+    rw [hYdef, ← coeff_zero_eq_constantCoeff_apply, coeff_map, coeff_zero_eq_constantCoeff_apply,
+      hy0, map_zero]
   have hu : ‖constantCoeff (C ζ * exp ↥LL.1 - 1)‖ < 1 := by
     have h : constantCoeff (C ζ * exp ↥LL.1 - 1) = ζ - 1 := by simp
     rw [h]
@@ -392,14 +411,15 @@ theorem _root_.GlobalTheory.HWL.ExpSub.conv_isExp_subst : ∀ (l : ℕ) [Fact l.
   have hS : ∀ k, ‖coeff k (PowerSeries.subst Y a)‖ * s ^ k ≤ B :=
     norm_coeff_subst_mul_pow_le_of_weighted_bound h0 hY hs0 hs1.le hB0 hB'
   have hq : Tendsto (fun k : ℕ => B * (r / s) ^ k) atTop (𝓝 0) := by
-    simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one (by positivity)
-      ((div_lt_one hs0).mpr hrs)).const_mul B
+    simpa using
+      (tendsto_pow_atTop_nhds_zero_of_lt_one (by positivity) ((div_lt_one hs0).mpr hrs)).const_mul B
   refine squeeze_zero (fun k => by positivity) (fun k => ?_) hq
-  calc ‖coeff k (PowerSeries.subst Y a)‖ * r ^ k =
-        ‖coeff k (PowerSeries.subst Y a)‖ * s ^ k * (r / s) ^ k := by
-          rw [mul_assoc, ← mul_pow]
-          congr 2
-          field_simp
+  calc
+    ‖coeff k (PowerSeries.subst Y a)‖ * r ^ k
+        = ‖coeff k (PowerSeries.subst Y a)‖ * s ^ k * (r / s) ^ k := by
+      rw [mul_assoc, ← mul_pow]
+      congr 2
+      field_simp
     _ ≤ B * (r / s) ^ k := by gcongr; exact hS k
 
 end GlobalTheory.HWL.ExpSub

@@ -5,7 +5,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaSesquili
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
 open scoped ContDiff
 
 namespace Formalism.FourierDecayAlt.P.CutMP
@@ -41,8 +42,13 @@ theorem class_lower_decay_holds : JDCCLower := by
     obtain ⟨C, hC⟩ := hcb m
     obtain ⟨c, hc⟩ : B.InCC (A - d + d) m (B.Rw T.word F) := by
       rw [sub_add_cancel]; exact InCC_Rw T.word_lie (hFA _)
-    exact ⟨_, prodBound hO hcov (sCkOn_mono le_top hc1)
-      (fun u v hu hv hl g hg _ => (hC u v hu hv hl g hg).1) hc (fun g _ hg => by simp at hg)⟩
+    exact ⟨
+      _,
+      prodBound hO hcov (sCkOn_mono le_top hc1)
+        (fun u v hu hv hl g hg _ => (hC u v hu hv hl g hg).1)
+        hc
+        (fun g _ hg => by simp at hg)
+    ⟩
 
 end
 

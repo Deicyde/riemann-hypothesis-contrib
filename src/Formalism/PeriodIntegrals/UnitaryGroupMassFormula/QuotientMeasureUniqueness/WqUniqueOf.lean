@@ -34,15 +34,18 @@ theorem wqUnique_of (hw : QmuWeight) (hl : QmuLift) : PI.WeilQuotMeas.WqUnique :
     rw [hW, hW]
     have := lintegral_mul_left_eq_self (μ := ν) (fun h : H => w (g * h)) h₀
     simpa only [Subgroup.coe_mul, mul_assoc] using this
-  have hwc : ∀ g : G, Measurable fun h : H => w (g * h) :=
-    fun g => hwm.comp (measurable_const.mul measurable_subtype_coe)
+  have hwc : ∀ g : G, Measurable fun h : H => w (g * h) := fun g =>
+    hwm.comp (measurable_const.mul measurable_subtype_coe)
   have hWm : Measurable W := by
     have e : W = fun g => ∫⁻ h : H, w (g * h) ∂ν := funext hW
     rw [e]
-    exact (hwm.comp (measurable_fst.mul (measurable_subtype_coe.comp measurable_snd))).lintegral_prod_right'
+    exact (hwm.comp (measurable_fst.mul (measurable_subtype_coe.comp
+      measurable_snd))).lintegral_prod_right'
 
-  obtain ⟨f, hf⟩ : ∃ f : Set (G ⧸ H) → G → ℝ≥0∞, ∀ s x,
-      f s x = s.indicator 1 (QuotientGroup.mk x : G ⧸ H) * (w x * (W x)⁻¹) := ⟨_, fun _ _ => rfl⟩
+  obtain ⟨f, hf⟩
+      : ∃ f : Set (G ⧸ H) → G → ℝ≥0∞, ∀ s x,
+        f s x = s.indicator 1 (QuotientGroup.mk x : G ⧸ H) * (w x * (W x)⁻¹) :=
+    ⟨_, fun _ _ => rfl⟩
   have hfm : ∀ s, MeasurableSet s → Measurable (f s) := by
     intro s hs
     have e : f s = fun x => s.indicator 1 (QuotientGroup.mk x : G ⧸ H) * (w x * (W x)⁻¹) :=
@@ -50,14 +53,20 @@ theorem wqUnique_of (hw : QmuWeight) (hl : QmuLift) : PI.WeilQuotMeas.WqUnique :
     rw [e]
     exact ((measurable_const.indicator hs).comp
       (measurable_quotient_mk'' : Measurable (QuotientGroup.mk : G → G ⧸ H))).mul (hwm.mul hWm.inv)
-  have hrec : ∀ (μ : Measure (G ⧸ H)) (m : Measure G),
-      (∀ φ : G → ℝ≥0∞, Measurable φ →
-        ∫⁻ x, φ x ∂m = ∫⁻ y : G ⧸ H, ∫⁻ h : H, φ (@Quotient.out G (QuotientGroup.leftRel H) y * h) ∂ν ∂μ) →
-      ∀ s, MeasurableSet s → μ s = ∫⁻ x, f s x ∂m := by
+  have hrec
+      : ∀ (μ : Measure (G ⧸ H)) (m : Measure G),
+        (∀ φ : G → ℝ≥0∞,
+            Measurable φ
+              → ∫⁻ x, φ x ∂m
+                = ∫⁻ y : G ⧸ H, ∫⁻ h : H, φ (@Quotient.out G (QuotientGroup.leftRel H) y * h) ∂ν ∂μ)
+          → ∀ s, MeasurableSet s → μ s = ∫⁻ x, f s x ∂m := by
     intro μ m hm s hs
     rw [hm _ (hfm s hs), ← lintegral_indicator_one hs]
     refine lintegral_congr (fun y => ?_)
-    have hy : ∀ h : H, (QuotientGroup.mk (@Quotient.out G (QuotientGroup.leftRel H) y * (h : G)) : G ⧸ H) = y := by
+    have hy
+        : ∀ h : H,
+          (QuotientGroup.mk (@Quotient.out G (QuotientGroup.leftRel H) y * (h : G)) : G ⧸ H)
+            = y := by
       intro h
       rw [QuotientGroup.mk_mul_of_mem _ h.2]
       exact @Quotient.out_eq G (QuotientGroup.leftRel H) y
@@ -65,7 +74,10 @@ theorem wqUnique_of (hw : QmuWeight) (hl : QmuLift) : PI.WeilQuotMeas.WqUnique :
     rw [lintegral_const_mul _ ((hwc _).mul_const _), lintegral_mul_const _ (hwc _), ← hW,
       ENNReal.mul_inv_cancel (hW0 _) (hWt _), mul_one]
 
-  haveI := hlI; haveI := hlF; haveI := hlI'; haveI := hlF'
+  haveI := hlI
+  haveI := hlF
+  haveI := hlI'
+  haveI := hlF'
   obtain ⟨μG, hμG⟩ : ∃ μG : Measure G, μG = Measure.haar := ⟨_, rfl⟩
   haveI : μG.IsHaarMeasure := by rw [hμG]; infer_instance
   obtain ⟨c, hc1⟩ : ∃ c : NNReal, l = c • μG := ⟨_, Measure.isMulLeftInvariant_eq_smul l μG⟩

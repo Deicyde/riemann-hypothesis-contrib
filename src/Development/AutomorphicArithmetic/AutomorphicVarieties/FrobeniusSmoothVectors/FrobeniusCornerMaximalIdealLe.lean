@@ -9,8 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem mem_of_forall_sup_pow {B : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
-    (P : Ideal B) (b : B) (h : ∀ N : ℕ, ∃ y ∈ P, b - y ∈ maximalIdeal B ^ N) : b ∈ P := by
+private theorem mem_of_forall_sup_pow
+    {B : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
+    (P : Ideal B) (b : B) (h : ∀ N : ℕ, ∃ y ∈ P, b - y ∈ maximalIdeal B ^ N)
+    : b ∈ P := by
   by_cases hP : P = ⊤
   · rw [hP]
     exact Submodule.mem_top
@@ -36,12 +38,20 @@ private theorem mem_of_forall_sup_pow {B : Type} [CommRing B] [IsLocalRing B] [I
     rw [Ideal.map_pow] at h3
     have h4 := Ideal.pow_right_mono (Ideal.map_le_iff_le_comap.2 hmap) N h3
     rwa [map_sub, Ideal.Quotient.eq_zero_iff_mem.2 hy, sub_zero] at h4
-  rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal _).ne_top, Ideal.mem_bot,
-    Ideal.Quotient.eq_zero_iff_mem] at hb
+  rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal _).ne_top,
+      Ideal.mem_bot, Ideal.Quotient.eq_zero_iff_mem]
+    at hb
   exact hb
 
-theorem UpperTheory.V.Fr.frobenius_corner_maximalIdeal_le :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ (S : Space O F n) (P : Ideal S.B), (maximalIdeal O).map (algebraMap O S.B) ≤ P → (∀ x : S.B, (x : S.R) ∈ S.ρ.mon 0 → ∃ c : O, x - algebraMap O S.B c ∈ P) → (∀ v i g, ∃ c : O, S.ψB v i g - algebraMap O S.B c ∈ P) → S.mB ≤ P := by
+theorem UpperTheory.V.Fr.frobenius_corner_maximalIdeal_le
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : Space O F n) (P : Ideal S.B),
+          (maximalIdeal O).map (algebraMap O S.B) ≤ P
+            → (∀ x : S.B, (x : S.R) ∈ S.ρ.mon 0 → ∃ c : O, x - algebraMap O S.B c ∈ P)
+            → (∀ v i g, ∃ c : O, S.ψB v i g - algebraMap O S.B c ∈ P)
+            → S.mB ≤ P := by
   intro l _ O _ _ _ _ F C₀ n hF hn S P hO hmon hψ
   obtain ⟨hco, hmax⟩ := co_B hF hn S
   haveI := hco
@@ -55,35 +65,40 @@ theorem UpperTheory.V.Fr.frobenius_corner_maximalIdeal_le :
   · rw [hPt]
     exact le_top
   have hPm : P ≤ S.mB := hmax ▸ IsLocalRing.le_maximalIdeal hPt
-  let T : Subalgebra O S.R :=
-    { carrier := {r | ∃ hr : r ∈ S.B, ∃ c : O, (⟨r, hr⟩ : S.B) - algebraMap O S.B c ∈ P}
-      mul_mem' := by
-        rintro a b ⟨ha, c, hc⟩ ⟨hb, d, hd⟩
-        refine ⟨S.B.mul_mem ha hb, c * d, ?_⟩
-        have e1 : (⟨a * b, S.B.mul_mem ha hb⟩ : S.B) = ⟨a, ha⟩ * ⟨b, hb⟩ := rfl
-        have e : (⟨a, ha⟩ * ⟨b, hb⟩ : S.B) - algebraMap O S.B (c * d) =
-            (⟨a, ha⟩ - algebraMap O S.B c) * ⟨b, hb⟩ + algebraMap O S.B c * (⟨b, hb⟩ - algebraMap O S.B d) := by
-          rw [map_mul]
-          ring
-        rw [e1, e]
-        exact P.add_mem (P.mul_mem_right _ hc) (P.mul_mem_left _ hd)
-      add_mem' := by
-        rintro a b ⟨ha, c, hc⟩ ⟨hb, d, hd⟩
-        refine ⟨S.B.add_mem ha hb, c + d, ?_⟩
-        have e1 : (⟨a + b, S.B.add_mem ha hb⟩ : S.B) = ⟨a, ha⟩ + ⟨b, hb⟩ := rfl
-        have e : (⟨a, ha⟩ + ⟨b, hb⟩ : S.B) - algebraMap O S.B (c + d) =
-            (⟨a, ha⟩ - algebraMap O S.B c) + (⟨b, hb⟩ - algebraMap O S.B d) := by
-          rw [map_add (f := _)]
-          ring
-        rw [e1, e]
-        exact P.add_mem hc hd
-      algebraMap_mem' := by
-        intro c
-        refine ⟨S.B.algebraMap_mem c, c, ?_⟩
-        have e : (⟨algebraMap O S.R c, S.B.algebraMap_mem c⟩ : S.B) = algebraMap O S.B c := rfl
-        rw [e, sub_self]
-        exact P.zero_mem }
-  have hB0 : Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = ((S.ρ.ψ v i g : S.Rˣ) : S.R)}) ≤ T := by
+  let T : Subalgebra O S.R := {
+    carrier := {r | ∃ hr : r ∈ S.B, ∃ c : O, (⟨r, hr⟩ : S.B) - algebraMap O S.B c ∈ P}
+    mul_mem' := by
+      rintro a b ⟨ha, c, hc⟩ ⟨hb, d, hd⟩
+      refine ⟨S.B.mul_mem ha hb, c * d, ?_⟩
+      have e1 : (⟨a * b, S.B.mul_mem ha hb⟩ : S.B) = ⟨a, ha⟩ * ⟨b, hb⟩ := rfl
+      have e
+          : (⟨a, ha⟩ * ⟨b, hb⟩ : S.B) - algebraMap O S.B (c * d)
+            = (⟨a, ha⟩ - algebraMap O S.B c) * ⟨b, hb⟩
+              + algebraMap O S.B c * (⟨b, hb⟩ - algebraMap O S.B d) := by
+        rw [map_mul]
+        ring
+      rw [e1, e]
+      exact P.add_mem (P.mul_mem_right _ hc) (P.mul_mem_left _ hd)
+    add_mem' := by
+      rintro a b ⟨ha, c, hc⟩ ⟨hb, d, hd⟩
+      refine ⟨S.B.add_mem ha hb, c + d, ?_⟩
+      have e1 : (⟨a + b, S.B.add_mem ha hb⟩ : S.B) = ⟨a, ha⟩ + ⟨b, hb⟩ := rfl
+      have e
+          : (⟨a, ha⟩ + ⟨b, hb⟩ : S.B) - algebraMap O S.B (c + d)
+            = (⟨a, ha⟩ - algebraMap O S.B c) + (⟨b, hb⟩ - algebraMap O S.B d) := by
+        rw [map_add (f := _)]
+        ring
+      rw [e1, e]
+      exact P.add_mem hc hd
+    algebraMap_mem' := by
+      intro c
+      refine ⟨S.B.algebraMap_mem c, c, ?_⟩
+      have e : (⟨algebraMap O S.R c, S.B.algebraMap_mem c⟩ : S.B) = algebraMap O S.B c := rfl
+      rw [e, sub_self]
+      exact P.zero_mem
+  }
+  have hB0
+      : Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = ((S.ρ.ψ v i g : S.Rˣ) : S.R)}) ≤ T := by
     rw [Algebra.adjoin_le_iff]
     rintro r (hr | ⟨v, i, g, rfl⟩)
     · exact ⟨S.mon_mem hr, hmon ⟨r, S.mon_mem hr⟩ hr⟩
@@ -92,8 +107,11 @@ theorem UpperTheory.V.Fr.frobenius_corner_maximalIdeal_le :
   apply mem_of_forall_sup_pow P x
   intro N
   obtain ⟨M, hM⟩ := hcl 0 (N + 1)
-  have hxB : ∀ K : ℕ, ∃ y ∈ Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = ((S.ρ.ψ v i g : S.Rˣ) : S.R)}),
-      (x : S.R) - y ∈ maximalIdeal S.R ^ K := x.2
+  have hxB
+      : ∀ K : ℕ,
+        ∃ y ∈ Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = ((S.ρ.ψ v i g : S.Rˣ) : S.R)}),
+          (x : S.R) - y ∈ maximalIdeal S.R ^ K :=
+    x.2
   obtain ⟨y0, hy0, hxy⟩ := hxB M
   obtain ⟨hy0B, c, hc⟩ := hB0 hy0
   obtain ⟨z, hzdef⟩ : ∃ z : S.B, z = x - ⟨y0, hy0B⟩ := ⟨_, rfl⟩
@@ -104,9 +122,13 @@ theorem UpperTheory.V.Fr.frobenius_corner_maximalIdeal_le :
     · rw [hzdef]
       exact hxy
   rw [h0] at hz
-  have key : ∀ a ∈ S.mB ^ (N + 1) • (1 : Submodule S.B S.A), ∃ w ∈ S.mB ^ (N + 1), a = algebraMap S.B S.A w := by
+  have key
+      : ∀ a ∈ S.mB ^ (N + 1) • (1 : Submodule S.B S.A), ∃ w ∈ S.mB ^ (N + 1),
+        a = algebraMap S.B S.A w := by
     intro a ha
-    refine Submodule.smul_induction_on (p := fun a => ∃ w ∈ S.mB ^ (N + 1), a = algebraMap S.B S.A w) ha ?_ ?_
+    refine Submodule.smul_induction_on
+      (p := fun a => ∃ w ∈ S.mB ^ (N + 1), a = algebraMap S.B S.A w)
+      ha ?_ ?_
     · intro r hr t ht
       obtain ⟨s, rfl⟩ := Submodule.mem_one.1 ht
       exact ⟨r * s, Ideal.mul_mem_right _ _ hr, by rw [Algebra.smul_def, map_mul]⟩
@@ -121,7 +143,8 @@ theorem UpperTheory.V.Fr.frobenius_corner_maximalIdeal_le :
     rw [e]
     exact S.mB.sub_mem hx hzm
   have hcB : algebraMap O S.B c ∈ S.mB := by
-    have e : algebraMap O S.B c = ⟨y0, hy0B⟩ - (⟨y0, hy0B⟩ - algebraMap O S.B c) := (sub_sub_cancel _ _).symm
+    have e : algebraMap O S.B c = ⟨y0, hy0B⟩ - (⟨y0, hy0B⟩ - algebraMap O S.B c) :=
+      (sub_sub_cancel _ _).symm
     rw [e]
     exact S.mB.sub_mem hyB (hPm hc)
   have hcO : c ∈ maximalIdeal O := by
@@ -131,7 +154,8 @@ theorem UpperTheory.V.Fr.frobenius_corner_maximalIdeal_le :
     have h2 : IsUnit ((algebraMap O S.B c : S.B) : S.R) := hu.map (algebraMap O S.R)
     exact ((IsLocalRing.mem_maximalIdeal _).1 h1) h2
   have hyP : (⟨y0, hy0B⟩ : S.B) ∈ P := by
-    have e : (⟨y0, hy0B⟩ : S.B) = (⟨y0, hy0B⟩ - algebraMap O S.B c) + algebraMap O S.B c := (sub_add_cancel _ _).symm
+    have e : (⟨y0, hy0B⟩ : S.B) = (⟨y0, hy0B⟩ - algebraMap O S.B c) + algebraMap O S.B c :=
+      (sub_add_cancel _ _).symm
     rw [e]
     exact P.add_mem hc (hO (Ideal.mem_map_of_mem _ hcO))
   refine ⟨⟨y0, hy0B⟩, hyP, ?_⟩

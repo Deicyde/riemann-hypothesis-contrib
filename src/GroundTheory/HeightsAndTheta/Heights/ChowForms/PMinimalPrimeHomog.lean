@@ -13,9 +13,9 @@ open MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-theorem isHomogIdeal_iff_isHomogeneous_degree {R : Type*} [CommRing R] {n : ℕ}
-    (I : Ideal (MvPolynomial (Fin n) R)) :
-    IsHomogIdeal I ↔ I.IsHomogeneous (homogeneousSubmodule (Fin n) R) := by
+theorem isHomogIdeal_iff_isHomogeneous_degree
+    {R : Type*} [CommRing R] {n : ℕ} (I : Ideal (MvPolynomial (Fin n) R))
+    : IsHomogIdeal I ↔ I.IsHomogeneous (homogeneousSubmodule (Fin n) R) := by
   constructor
   · intro h i r hr
     convert h r hr i using 1

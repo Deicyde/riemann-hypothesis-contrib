@@ -18,8 +18,11 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.Expansion
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
@@ -28,13 +31,14 @@ namespace GlobalTheory.UT.PrimGen
 
 open GlobalTheory.FieldBaseChange
 
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
   {D : DegData V (maximalIdeal V)} {A : PolAV (Spec (CommRingCat.of (FractionRing V)))}
   {G : Over (Spec (CommRingCat.of V))} [GrpObj G] [IsCommMonObj G]
   {F : Type} [Field F] [Algebra (FractionRing V) F]
 
-theorem exists_lower (v : AddValuation F (WithTop ℚ)) {n : ℕ} (c : Fin n → F) :
-    ∃ r : ℚ, ∀ i, (r : WithTop ℚ) ≤ v (c i) := by
+theorem exists_lower (v : AddValuation F (WithTop ℚ)) {n : ℕ} (c : Fin n → F)
+    : ∃ r : ℚ, ∀ i, (r : WithTop ℚ) ≤ v (c i) := by
   obtain ⟨m, hm⟩ := (Set.finite_range fun i => (v (c i)).untopD 0).bddBelow
   refine ⟨m, fun i => ?_⟩
   have h := hm ⟨i, rfl⟩
@@ -44,28 +48,50 @@ theorem exists_lower (v : AddValuation F (WithTop ℚ)) {n : ℕ} (c : Fin n →
     simp only [e, WithTop.untopD_coe] at h
     exact WithTop.coe_le_coe.2 h
 
-theorem exists_vge (U : UnifPre (maximalIdeal V) D A G) (v : AddValuation F (WithTop ℚ)) {k : ℕ}
-    {σ : U.SecGF F k} {s : Fam D.toPre F k} (h : U.ExpandsG F k σ s) (α : D.toPre.X) :
-    ∃ r : ℚ, VGe D F v k α (s.s α) r := by
+theorem exists_vge
+    (U : UnifPre (maximalIdeal V) D A G)
+    (v : AddValuation F (WithTop ℚ))
+    {k : ℕ} {σ : U.SecGF F k} {s : Fam D.toPre F k} (h : U.ExpandsG F k σ s)
+    (α : D.toPre.X)
+    : ∃ r : ℚ, VGe D F v k α (s.s α) r := by
   obtain ⟨n, c, x, -, -, hs⟩ := (expandsG_iff U F k σ s).1 h
   obtain ⟨r, hr⟩ := exists_lower v c
-  refine ⟨r, n, c, fun i => (x i).2 α,
-    fun i => termPull D.toPre (FractionRing V) F k α (genericTerm D k α ((x i).2 α)), fun i => ?_, hr, fun j => ?_⟩
+  refine ⟨
+    r,
+    n,
+    c,
+    fun i => (x i).2 α,
+    fun i => termPull D.toPre (FractionRing V) F k α (genericTerm D k α ((x i).2 α)),
+    fun i => ?_,
+    hr,
+    fun j => ?_
+  ⟩
   · exact SectionScalarValuation.secScal_of_sval D.toPre.P.isLB fun y J hJ =>
-      ((sval_pullOver _ _ _ _ hJ).trans ((sval_pullOver _ _ _ _ hJ).trans
-        (congrArg (fun q => sval ((x i).2 α) q y J) ((Category.assoc _ _ _).trans (congrArg (𝟙 _ ≫ ·)
-          (congrArg (fun q => q.left) (famMap_snd D.toPre (FractionRing V) F))))))).symm
-  · exact (congrArg (chartLin (famBase D.toPre F) _ j) (hs α)).trans (map_sum (chartLin (famBase D.toPre F) _ j) _ _)
+      ((sval_pullOver _ _ _ _ hJ).trans
+        ((sval_pullOver _ _ _ _ hJ).trans
+          (congrArg
+            (fun q => sval ((x i).2 α) q y J)
+            ((Category.assoc _ _ _).trans
+              (congrArg (𝟙 _ ≫ ·)
+                (congrArg (fun q => q.left) (famMap_snd D.toPre (FractionRing V) F))))))).symm
+  · exact (congrArg (chartLin (famBase D.toPre F) _ j) (hs α)).trans
+      (map_sum (chartLin (famBase D.toPre F) _ j) _ _)
 
-theorem exists_prim_span (hU : UUStatement) {ϖ : V} (hϖ : Irreducible ϖ) {Q : D.toPre.X → ℤ}
-    (hQ : QForm.IsQ D.toPre ϖ Q) [IsAlgClosed F] {v : AddValuation F (WithTop ℚ)} (hv : ValOver ϖ F v) :
-    ∃ ϑ : Fam D.toPre F 1, Prim D Q v ϑ ∧
-      ∀ s : Fam D.toPre F 1, (∃ r : ℚ, VGe D F v 1 0 (s.s 0) r) → ∃ c : F, s = c • ϑ := by
+theorem exists_prim_span
+    (hU : UUStatement)
+    {ϖ : V} (hϖ : Irreducible ϖ)
+    {Q : D.toPre.X → ℤ} (hQ : QForm.IsQ D.toPre ϖ Q)
+    [IsAlgClosed F]
+    {v : AddValuation F (WithTop ℚ)} (hv : ValOver ϖ F v)
+    : ∃ ϑ : Fam D.toPre F 1,
+      Prim D Q v ϑ
+        ∧ ∀ s : Fam D.toPre F 1, (∃ r : ℚ, VGe D F v 1 0 (s.s 0) r) → ∃ c : F, s = c • ϑ := by
   classical
   obtain ⟨b, hli, hb, hsp⟩ := hU V ϖ hϖ D Q hQ F v hv (Or.inl inferInstance) 1 le_rfl
   have : Subsingleton (Fin (1 ^ (D.toPre.rank + D.toPre.P.g))) := by rw [one_pow]; infer_instance
   let i₀ : Fin (1 ^ (D.toPre.rank + D.toPre.P.g)) := ⟨0, by rw [one_pow]; exact one_pos⟩
-  have hsp' : ∀ s, NuGe D Q F v 1 s 0 → ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ s = c • b i₀ := fun s hs => by
+  have hsp'
+      : ∀ s, NuGe D Q F v 1 s 0 → ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ s = c • b i₀ := fun s hs => by
     obtain ⟨c, hc, e⟩ := (hsp s).1 hs
     exact ⟨c i₀, hc i₀, e.trans (Fintype.sum_subsingleton _ i₀)⟩
   refine ⟨b i₀, ⟨hb i₀, fun r hr h => ?_⟩, ?_⟩
@@ -80,7 +106,9 @@ theorem exists_prim_span (hU : UUStatement) {ϖ : V} (hϖ : Irreducible ϖ) {Q :
     exact lt_irrefl _ h0
   · rintro s ⟨r, hr⟩
     have h1 : NuGe D Q F v 1 s (-(|r| + 1)) := by
-      rw [n1a V ϖ hϖ D Q hQ F v hv 1 le_rfl {0} (fun χ => ⟨0, Finset.mem_singleton_self _, χ, by simp⟩) s]
+      rw [n1a V ϖ hϖ D Q hQ F v hv 1 le_rfl {0}
+        (fun χ => ⟨0, Finset.mem_singleton_self _, χ, by simp⟩)
+        s]
       intro α hα
       obtain rfl := Finset.mem_singleton.1 hα
       refine hr.mono ?_
@@ -100,10 +128,17 @@ namespace GlobalTheory.UT
 
 open GlobalTheory.FieldBaseChange
 
-theorem exists_prim_generator : LL → TwistBCSpanStatement → TWM.VRatioGtStatement → TWStatement → UUStatement → AllUV fun {V} _ _ _ {ϖ} hϖ {D} Q {F} _ _ {v} hv {A} {G} _ _ U => ∀ w₀ : W0 U.toUnifPre, w₀.IsGen → ∃ (th : SecA A F 1) (ϑ : Fam D.toPre F 1), U.ExpandsF F 1 w₀ th ϑ ∧ Prim D Q v ϑ ∧ IsGenSec A.A A.L 1 th := by
+theorem exists_prim_generator
+    : LL → TwistBCSpanStatement → TWM.VRatioGtStatement → TWStatement → UUStatement
+      → AllUV fun {V} _ _ _ {ϖ} hϖ {D} Q {F} _ _ {v} hv {A} {G} _ _ U =>
+        ∀ w₀ : W0 U.toUnifPre,
+          w₀.IsGen
+            → ∃ (th : SecA A F 1) (ϑ : Fam D.toPre F 1),
+              U.ExpandsF F 1 w₀ th ϑ ∧ Prim D Q v ϑ ∧ IsGenSec A.A A.L 1 th := by
   intro hL _ _ _ hU V _ _ _ _ _ ϖ hϖ D Q hQ F _ _ _ v hv A G _ _ _ U w₀ hw
   obtain ⟨ϑ, hp, hsp⟩ := PrimGen.exists_prim_span hU hϖ hQ hv
-  obtain ⟨e, he⟩ := GlobalTheory.exists_linearEquiv_expandsF hL.1.globalFns U F (k := 1) le_rfl w₀ hw
+  obtain ⟨e, he⟩ :=
+    GlobalTheory.exists_linearEquiv_expandsF hL.1.globalFns U F (k := 1) le_rfl w₀ hw
   refine ⟨e.symm ϑ, ϑ, (he _ _).2 (e.apply_symm_apply ϑ), hp, fun t => ?_⟩
   obtain ⟨σ, -, hσ⟩ := (he t _).2 rfl
   obtain ⟨c, hc⟩ := hsp _ (PrimGen.exists_vge U.toUnifPre v hσ 0)

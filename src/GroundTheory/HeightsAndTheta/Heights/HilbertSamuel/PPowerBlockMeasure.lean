@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MeasureTheory
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MeasureTheory
 open scoped ENNReal
 
 noncomputable section
@@ -27,18 +28,20 @@ variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
 theorem isOpen_nz : IsOpen {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
   simp only [Set.ofPred_forall, Set.ofPred_exists]
-  exact isOpen_iInter_of_finite fun k => isOpen_iUnion fun i =>
-    isOpen_ne_fun (continuous_apply _) continuous_const
+  exact isOpen_iInter_of_finite fun k =>
+    isOpen_iUnion fun i => isOpen_ne_fun (continuous_apply _) continuous_const
 
 theorem measurableSet_mcPts (P : Ideal (MRing ι)) : MeasurableSet (mcPts P) := by
   have hcl : IsClosed {z : (Σ k, ι k) → ℂ | ∀ f ∈ P, eval z (map (Int.castRingHom ℂ) f) = 0} := by
     simp only [Set.ofPred_forall]
-    exact isClosed_iInter fun f => isClosed_iInter fun _ => isClosed_eq (continuous_eval _) continuous_const
+    exact isClosed_iInter fun f =>
+      isClosed_iInter fun _ => isClosed_eq (continuous_eval _) continuous_const
   exact isOpen_nz.measurableSet.inter hcl.measurableSet
 
-theorem eval_smul_homogC (g : MvPolynomial (Σ k, ι k) ℂ) (d : K → ℕ) (hg : IsMultiHomog g d) (c : K → ℂ)
-    (z : (Σ k, ι k) → ℂ) :
-    eval (fun p => c p.1 * z p) g = (∏ k, c k ^ d k) * eval z g := by
+theorem eval_smul_homogC
+    (g : MvPolynomial (Σ k, ι k) ℂ) (d : K → ℕ) (hg : IsMultiHomog g d)
+    (c : K → ℂ) (z : (Σ k, ι k) → ℂ)
+    : eval (fun p => c p.1 * z p) g = (∏ k, c k ^ d k) * eval z g := by
   rw [eval_eq', eval_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun e he => ?_
   have hc : (∏ i : (Σ k, ι k), c i.1 ^ e i) = ∏ k, c k ^ d k := by
@@ -49,12 +52,13 @@ theorem eval_smul_homogC (g : MvPolynomial (Σ k, ι k) ℂ) (d : K → ℕ) (hg
   simp only [mul_pow, Finset.prod_mul_distrib, hc]
   ring
 
-theorem isMultiHomog_map {F : MRing ι} {d : K → ℕ} (hF : IsMultiHomog F d) :
-    IsMultiHomog (map (Int.castRingHom ℂ) F) d :=
-  fun e he => hF e (support_map_subset _ _ he)
+theorem isMultiHomog_map {F : MRing ι} {d : K → ℕ} (hF : IsMultiHomog F d)
+    : IsMultiHomog (map (Int.castRingHom ℂ) F) d := fun e he =>
+  hF e (support_map_subset _ _ he)
 
-theorem eval_conjPt_map (z : (Σ k, ι k) → ℂ) (f : MRing ι) :
-    eval (conjPt z) (map (Int.castRingHom ℂ) f) = starRingEnd ℂ (eval z (map (Int.castRingHom ℂ) f)) := by
+theorem eval_conjPt_map (z : (Σ k, ι k) → ℂ) (f : MRing ι)
+    : eval (conjPt z) (map (Int.castRingHom ℂ) f)
+      = starRingEnd ℂ (eval z (map (Int.castRingHom ℂ) f)) := by
   rw [eval_map, eval_map, eval₂_comp_left]
   congr 1
   exact RingHom.ext_int _ _
@@ -62,13 +66,15 @@ theorem eval_conjPt_map (z : (Σ k, ι k) → ℂ) (f : MRing ι) :
 theorem continuous_conjPt' : Continuous (conjPt : ((Σ k, ι k) → ℂ) → (Σ k, ι k) → ℂ) :=
   continuous_pi fun p => Complex.continuous_conj.comp (continuous_apply p)
 
-theorem conjPt_mem {P : Ideal (MRing ι)} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P) : conjPt z ∈ mcPts P := by
+theorem conjPt_mem {P : Ideal (MRing ι)} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
+    : conjPt z ∈ mcPts P := by
   refine ⟨fun k => ?_, fun f hf => ?_⟩
   · obtain ⟨i, hi⟩ := hz.1 k
     exact ⟨i, by simpa [conjPt] using hi⟩
   · rw [eval_conjPt_map, hz.2 f hf, map_zero]
 
-theorem sameOrbit_conj {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') : SameOrbit (conjPt z) (conjPt z') := by
+theorem sameOrbit_conj {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
+    : SameOrbit (conjPt z) (conjPt z') := by
   obtain ⟨c, hc, rfl⟩ := h
   refine ⟨fun k => starRingEnd ℂ (c k), fun k => (map_ne_zero _).2 (hc k), ?_⟩
   funext p
@@ -88,10 +94,11 @@ theorem measurable_oldPart : Measurable (basePart₂ : ((Σ k, addIdx ι N k) �
 theorem continuous_oldPart : Continuous (basePart₂ : ((Σ k, addIdx ι N k) → ℂ) → (Σ k, ι k) → ℂ) :=
   continuous_pi fun _ => continuous_apply _
 
-theorem rename_old_mem (y : (Σ k, ι k) → Ω) (v : Fin N → Ω) {f : MRing ι} (hf : f ∈ mCoordIdeal y) :
-    rename (oldV (N := N)) f ∈ mCoordIdeal (addBlock y v) := by
-  have key : (mConeMap (addBlock y v)).comp (rename (oldV (N := N))) =
-      ((rename (some : K → Option K)).restrictScalars ℤ).comp (mConeMap y) := by
+theorem rename_old_mem (y : (Σ k, ι k) → Ω) (v : Fin N → Ω) {f : MRing ι} (hf : f ∈ mCoordIdeal y)
+    : rename (oldV (N := N)) f ∈ mCoordIdeal (addBlock y v) := by
+  have key
+      : (mConeMap (addBlock y v)).comp (rename (oldV (N := N)))
+        = ((rename (some : K → Option K)).restrictScalars ℤ).comp (mConeMap y) := by
     apply MvPolynomial.algHom_ext
     intro p
     simp [mConeMap, oldV, addBlock]
@@ -102,15 +109,18 @@ theorem rename_old_mem (y : (Σ k, ι k) → Ω) (v : Fin N → Ω) {f : MRing �
   have : mConeMap y f = 0 := hf
   rw [this, map_zero]
 
-theorem oldPart_mem {y : (Σ k, ι k) → Ω} {v : Fin N → Ω} {z : (Σ k, addIdx ι N k) → ℂ}
-    (hz : z ∈ mcPts (mCoordIdeal (addBlock y v))) : basePart₂ z ∈ mcPts (mCoordIdeal y) := by
+theorem oldPart_mem
+    {y : (Σ k, ι k) → Ω} {v : Fin N → Ω} {z : (Σ k, addIdx ι N k) → ℂ}
+    (hz : z ∈ mcPts (mCoordIdeal (addBlock y v)))
+    : basePart₂ z ∈ mcPts (mCoordIdeal y) := by
   refine ⟨fun k => hz.1 (some k), fun f hf => ?_⟩
   have h := hz.2 _ (rename_old_mem y v hf)
   rwa [map_rename, eval_rename] at h
 
-theorem eval_oldPart_orbit {g : MvPolynomial (Σ k, ι k) ℂ} {d : K → ℕ} (hg : IsMultiHomog g d)
-    {z z' : (Σ k, addIdx ι N k) → ℂ} (h : SameOrbit z z') :
-    ∃ u : ℂ, u ≠ 0 ∧ eval (basePart₂ z) g = u * eval (basePart₂ z') g := by
+theorem eval_oldPart_orbit
+    {g : MvPolynomial (Σ k, ι k) ℂ} {d : K → ℕ} (hg : IsMultiHomog g d)
+    {z z' : (Σ k, addIdx ι N k) → ℂ} (h : SameOrbit z z')
+    : ∃ u : ℂ, u ≠ 0 ∧ eval (basePart₂ z) g = u * eval (basePart₂ z') g := by
   obtain ⟨c, hc, rfl⟩ := h
   refine ⟨∏ k, c (some k) ^ d k, Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hc _), ?_⟩
   exact eval_smul_homogC g d hg (fun k => c (some k)) (basePart₂ z')
@@ -128,13 +138,18 @@ theorem continuousOn_lift (R : AnRes P J e) (x₀ : R.X) : ContinuousOn (R.lift 
   have hzt : R.A.chart j z ∈ (R.A.chart j).target := (R.A.chart j).map_source hj
   have hc : ContinuousAt ((fun z => R.lift x₀ z p) ∘ (R.A.chart j).symm) (R.A.chart j z) :=
     (R.holo x₀ p j _ ⟨hzt, by rwa [Set.mem_preimage, (R.A.chart j).left_inv hj]⟩).continuousAt
-  have h := ((R.A.chart j).symm.continuousAt_iff_continuousAt_comp_right
-    (f := fun z => R.lift x₀ z p) (x := z) (by simpa using hj)).mpr (by simpa using hc)
+  have h :=
+    ((R.A.chart j).symm.continuousAt_iff_continuousAt_comp_right
+      (f := fun z => R.lift x₀ z p)
+      (x := z) (by simpa using hj)).mpr (by simpa using hc)
   exact h.continuousWithinAt
 
-theorem continuous_orbitFun (R : AnRes P J e) {β : Type*} [TopologicalSpace β] {g : ((Σ k, ι k) → ℂ) → β}
-    (hgc : ContinuousOn g {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0}) (hg : ∀ z z', SameOrbit z z' → g z = g z') :
-    Continuous fun x => g (R.lift x x) := by
+theorem continuous_orbitFun
+    (R : AnRes P J e)
+    {β : Type*} [TopologicalSpace β]
+    {g : ((Σ k, ι k) → ℂ) → β}
+    (hgc : ContinuousOn g {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0}) (hg : ∀ z z', SameOrbit z z' → g z = g z')
+    : Continuous fun x => g (R.lift x x) := by
   refine continuous_iff_continuousAt.2 fun x₀ => ?_
   have hU := (R.isOpen_U x₀).mem_nhds (R.mem_U x₀)
   have h1 : ContinuousAt (R.lift x₀) x₀ := (continuousOn_lift R x₀).continuousAt hU
@@ -144,13 +159,17 @@ theorem continuous_orbitFun (R : AnRes P J e) {β : Type*} [TopologicalSpace β]
   filter_upwards [hU] with x hx
   exact hg _ _ (R.compat x₀ x x ⟨hx, R.mem_U x⟩)
 
-theorem exists_measurable_lift (R : AnRes P J e) [MeasurableSpace R.X] [BorelSpace R.X] :
-    ∃ φ : R.X → (Σ k, ι k) → ℂ, Measurable φ ∧ ∀ x, ∃ x₀, x ∈ R.U x₀ ∧ φ x = R.lift x₀ x := by
+theorem exists_measurable_lift (R : AnRes P J e) [MeasurableSpace R.X] [BorelSpace R.X]
+    : ∃ φ : R.X → (Σ k, ι k) → ℂ, Measurable φ ∧ ∀ x, ∃ x₀, x ∈ R.U x₀ ∧ φ x = R.lift x₀ x := by
   classical
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun x₀ : R.X => R.U x₀) R.isOpen_U
-    fun x _ => Set.mem_iUnion.2 ⟨x, R.mem_U x⟩
-  have key : ∀ l : List R.X, ∃ φ : R.X → (Σ k, ι k) → ℂ, Measurable φ ∧
-      ∀ x, (∃ x₀ ∈ l, x ∈ R.U x₀) → ∃ x₀, x ∈ R.U x₀ ∧ φ x = R.lift x₀ x := by
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun x₀ : R.X => R.U x₀)
+      R.isOpen_U
+      fun x _ => Set.mem_iUnion.2 ⟨x, R.mem_U x⟩
+  have key
+      : ∀ l : List R.X, ∃ φ : R.X → (Σ k, ι k) → ℂ,
+        Measurable φ ∧ ∀ x, (∃ x₀ ∈ l, x ∈ R.U x₀) → ∃ x₀, x ∈ R.U x₀ ∧ φ x = R.lift x₀ x := by
     intro l
     induction l with
     | nil => exact ⟨fun _ => 0, measurable_const, fun x ⟨_, h, _⟩ => absurd h List.not_mem_nil⟩
@@ -158,7 +177,9 @@ theorem exists_measurable_lift (R : AnRes P J e) [MeasurableSpace R.X] [BorelSpa
       obtain ⟨φ, hφm, hφ⟩ := ih
       refine ⟨(R.U x₀).piecewise ((R.U x₀).piecewise (R.lift x₀) fun _ => 0) φ, ?_, ?_⟩
       · exact Measurable.piecewise (R.isOpen_U x₀).measurableSet
-          ((continuousOn_lift R x₀).measurable_piecewise continuousOn_const (R.isOpen_U x₀).measurableSet) hφm
+          ((continuousOn_lift R x₀).measurable_piecewise continuousOn_const
+            (R.isOpen_U x₀).measurableSet)
+          hφm
       · intro x hx
         by_cases hxU : x ∈ R.U x₀
         · exact ⟨x₀, hxU, by simp [Set.piecewise, hxU]⟩
@@ -172,8 +193,11 @@ theorem exists_measurable_lift (R : AnRes P J e) [MeasurableSpace R.X] [BorelSpa
   obtain ⟨x₀, hx₀t, hx₀U⟩ := Set.mem_iUnion₂.1 (ht (Set.mem_univ x))
   exact ⟨x₀, Finset.mem_toList.2 hx₀t, hx₀U⟩
 
-theorem dV_pos_of_isOpen (R : AnRes P J e) [MeasurableSpace R.X] [BorelSpace R.X] {dV : Measure R.X}
-    (hV : IsSmoothVolume R.A dV) {S : Set R.X} (hS : IsOpen S) (hne : S.Nonempty) : 0 < dV S := by
+theorem dV_pos_of_isOpen
+    (R : AnRes P J e) [MeasurableSpace R.X] [BorelSpace R.X]
+    {dV : Measure R.X} (hV : IsSmoothVolume R.A dV)
+    {S : Set R.X} (hS : IsOpen S) (hne : S.Nonempty)
+    : 0 < dV S := by
   obtain ⟨y, hy⟩ := hne
   obtain ⟨j, hj⟩ := R.A.cover y
   obtain ⟨ν, hνc, hνp, hν⟩ := hV.2 j
@@ -203,9 +227,13 @@ theorem dV_pos_of_isOpen (R : AnRes P J e) [MeasurableSpace R.X] [BorelSpace R.X
 
 end Resolution
 
-theorem aesm_map {α V : Type*} [MeasurableSpace α] [TopologicalSpace V] [MeasurableSpace V] [OpensMeasurableSpace V]
-    {μ : Measure α} {h : α → V} (hh : Measurable h) {T : Set V} (hT : MeasurableSet T) (hhT : ∀ x, h x ∈ T)
-    {g : V → ℝ} (hg : ContinuousOn g T) : AEStronglyMeasurable g (μ.map h) := by
+theorem aesm_map
+    {α V : Type*}
+    [MeasurableSpace α] [TopologicalSpace V] [MeasurableSpace V] [OpensMeasurableSpace V]
+    {μ : Measure α} {h : α → V} (hh : Measurable h)
+    {T : Set V} (hT : MeasurableSet T) (hhT : ∀ x, h x ∈ T)
+    {g : V → ℝ} (hg : ContinuousOn g T)
+    : AEStronglyMeasurable g (μ.map h) := by
   classical
   have hG : Measurable (T.piecewise g fun _ => 0) := hg.measurable_piecewise continuousOn_const hT
   have h0 : μ.map h Tᶜ = 0 := by
@@ -220,10 +248,11 @@ theorem aesm_map {α V : Type*} [MeasurableSpace α] [TopologicalSpace V] [Measu
 
 end PowerBlockMeasure
 
-
 open PowerBlockMeasure in
-theorem PowerBlockMeasure.proof (hPN : PowerBlockPointNorm.Statement) (hOS : PowerBlockOldPartSurj.Statement)
-    (hZD : PrimeZariskiDense.Statement) : PowerBlockMeasure.Statement := by
+theorem PowerBlockMeasure.proof
+    (hPN : PowerBlockPointNorm.Statement) (hOS : PowerBlockOldPartSurj.Statement)
+    (hZD : PrimeZariskiDense.Statement)
+    : PowerBlockMeasure.Statement := by
   intro K _ _ ι _ Ω _ y A m N D v B J R _ _ dV hA hB hBa hV hv hgen hrel
   classical
   have := hV.1
@@ -243,13 +272,12 @@ theorem PowerBlockMeasure.proof (hPN : PowerBlockPointNorm.Statement) (hOS : Pow
   have hcP : ∀ x, (conjPt ∘ ψ) x ∈ mcPts (mCoordIdeal y) := fun x => conjPt_mem (hψP x)
   have hT := measurableSet_mcPts (mCoordIdeal y)
   refine ⟨(2⁻¹ : ℝ≥0∞) • (dV.map ψ + dV.map (conjPt ∘ ψ)), ?_, ?_, ?_, ?_⟩
-  ·
-    constructor
+  · constructor
     rw [Measure.smul_apply, Measure.add_apply, Measure.map_apply hψm MeasurableSet.univ,
-      Measure.map_apply hcm MeasurableSet.univ, Set.preimage_univ, Set.preimage_univ, measure_univ, smul_eq_mul,
-      one_add_one_eq_two, ENNReal.inv_mul_cancel two_ne_zero ENNReal.ofNat_ne_top]
-  ·
-    rw [Measure.smul_apply, Measure.add_apply, Measure.map_apply hψm hT.compl, Measure.map_apply hcm hT.compl]
+      Measure.map_apply hcm MeasurableSet.univ, Set.preimage_univ, Set.preimage_univ, measure_univ,
+      smul_eq_mul, one_add_one_eq_two, ENNReal.inv_mul_cancel two_ne_zero ENNReal.ofNat_ne_top]
+  · rw [Measure.smul_apply, Measure.add_apply, Measure.map_apply hψm hT.compl,
+      Measure.map_apply hcm hT.compl]
     have h1 : ψ ⁻¹' (mcPts (mCoordIdeal y))ᶜ = ∅ := by
       ext x
       simp [hψP x]
@@ -257,8 +285,7 @@ theorem PowerBlockMeasure.proof (hPN : PowerBlockPointNorm.Statement) (hOS : Pow
       ext x
       simpa using hcP x
     rw [h1, h2, measure_empty, add_zero, smul_zero]
-  ·
-    intro d f hf hae
+  · intro d f hf hae
 
     have h1 : dV {x | ¬ eval (ψ x) f = 0} = 0 := by
       have hS0 := ae_iff.1 hae
@@ -310,8 +337,11 @@ theorem PowerBlockMeasure.proof (hPN : PowerBlockPointNorm.Statement) (hOS : Pow
     obtain ⟨j, hjJ, hjP⟩ := SetLike.not_le_iff_exists.1 R.nondeg
     have h4 : ∀ z ∈ mcPts (mCoordIdeal (addBlock y v)), eval (basePart₂ z) f = 0 := by
       intro z hz
-      have := hZD (Option K) (addIdx ι N) (mCoordIdeal (addBlock y v)) j hprime hjP
-        (rename (oldV (ι := ι) (N := N)) f) (fun z' hz' hj => ?_) z hz
+      have :=
+        hZD (Option K) (addIdx ι N) (mCoordIdeal (addBlock y v)) j hprime hjP
+          (rename (oldV (ι := ι) (N := N)) f)
+          (fun z' hz' hj => ?_)
+          z hz
       · rwa [eval_rename] at this
       · rw [eval_rename]
         exact h3 z' hz' fun hzJ => hj (hzJ.2 j hjJ)
@@ -319,16 +349,16 @@ theorem PowerBlockMeasure.proof (hPN : PowerBlockPointNorm.Statement) (hOS : Pow
     intro x hx
     obtain ⟨z, hz, rfl⟩ := hOS K ι Ω y A.a m N v hv hgen x hx
     exact h4 z hz
-  ·
-    intro q F hF
+  · intro q F hF
     obtain ⟨hcont, hpt⟩ := hPN K ι Ω y A m N v B hA.continuousOn hBa hv hrel q F hF
     have hFC := isMultiHomog_map hF
     set Φ : ((Σ k, addIdx ι N k) → ℂ) → ℝ :=
       fun z => (‖eval z (map (Int.castRingHom ℂ) F)‖ / B.h z ^ q) ^ 2 with hΦdef
     have hΦinv : ∀ z z', SameOrbit z z' → Φ z = Φ z' := by
       rintro _ z' ⟨c, hc, rfl⟩
-      have hF' : eval (fun p => c p.1 * z' p) (map (Int.castRingHom ℂ) F) =
-          c none ^ q * eval z' (map (Int.castRingHom ℂ) F) := by
+      have hF'
+          : eval (fun p => c p.1 * z' p) (map (Int.castRingHom ℂ) F)
+            = c none ^ q * eval z' (map (Int.castRingHom ℂ) F) := by
         rw [eval_smul_homogC _ _ hFC c z', Finset.prod_eq_single (none : Option K)]
         · simp [blockDeg]
         · intro k _ hk
@@ -344,12 +374,16 @@ theorem PowerBlockMeasure.proof (hPN : PowerBlockPointNorm.Statement) (hOS : Pow
       simp only [hΦdef, hF', hB', norm_mul, norm_pow, mul_pow]
       rw [mul_div_mul_left _ _ hcn]
     have hΦc : ContinuousOn Φ {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
-      refine ContinuousOn.pow (ContinuousOn.div (continuous_eval _).norm.continuousOn
-        (hB.continuousOn.pow q) fun z hz => pow_ne_zero _ (B.pos z hz).ne') 2
+      refine ContinuousOn.pow
+        (ContinuousOn.div (continuous_eval _).norm.continuousOn (hB.continuousOn.pow q) fun z hz =>
+          pow_ne_zero _ (B.pos z hz).ne')
+        2
     have hc1 : Continuous fun x => Φ (R.lift x x) := continuous_orbitFun R hΦc hΦinv
     have hc2 : Continuous fun x => Φ (conjPt (R.lift x x)) := by
-      refine continuous_orbitFun R (g := fun z => Φ (conjPt z))
-        (hΦc.comp continuous_conjPt'.continuousOn fun z hz k => ?_) fun z z' h => hΦinv _ _ (sameOrbit_conj h)
+      refine continuous_orbitFun R
+        (g := fun z => Φ (conjPt z))
+        (hΦc.comp continuous_conjPt'.continuousOn fun z hz k => ?_)
+        fun z z' h => hΦinv _ _ (sameOrbit_conj h)
       obtain ⟨i, hi⟩ := hz k
       exact ⟨i, by simpa [conjPt] using hi⟩
     set s := aeval (addBlock y v) F

@@ -50,20 +50,23 @@ lemma min_mul_abs_log_le {t : ℝ} (ht : 0 < t) : min t t⁻¹ * |Real.log t| �
     rw [Real.log_inv, abs_mul, abs_neg, abs_of_pos (inv_pos.mpr ht)] at this
     linarith
 
-theorem integrable_and_differentiable {X : Type} [MeasurableSpace X] (ν : Measure X)
-    (A : X → ℂ) (T : X → ℝ)
-    (hA : AEStronglyMeasurable A ν) (hT : Measurable T) (hTpos : ∀ x, 0 < T x)
-    (hw : Integrable (fun x => min (T x) (T x)⁻¹) ν)
-    (hdec : ∀ N : ℕ, ∃ C : ℝ, ∀ x, ‖A x‖ ≤ C * (min (T x) (T x)⁻¹) ^ N) :
-    (∀ s : ℂ, Integrable (fun x => A x * ((T x : ℝ) : ℂ) ^ s) ν) ∧
-      Differentiable ℂ (fun s : ℂ => ∫ x, A x * ((T x : ℝ) : ℂ) ^ s ∂ν) := by
+theorem integrable_and_differentiable
+    {X : Type} [MeasurableSpace X]
+    (ν : Measure X) (A : X → ℂ) (T : X → ℝ) (hA : AEStronglyMeasurable A ν) (hT : Measurable T)
+    (hTpos : ∀ x, 0 < T x) (hw : Integrable (fun x => min (T x) (T x)⁻¹) ν)
+    (hdec : ∀ N : ℕ, ∃ C : ℝ, ∀ x, ‖A x‖ ≤ C * (min (T x) (T x)⁻¹) ^ N)
+    : (∀ s : ℂ, Integrable (fun x => A x * ((T x : ℝ) : ℂ) ^ s) ν)
+      ∧ Differentiable ℂ (fun s : ℂ => ∫ x, A x * ((T x : ℝ) : ℂ) ^ s ∂ν) := by
   have wpos : ∀ x, 0 < min (T x) (T x)⁻¹ := fun x => min_inv_pos (hTpos x)
   have wle : ∀ x, min (T x) (T x)⁻¹ ≤ 1 := fun x => min_inv_le_one (hTpos x)
   have hTc : Measurable fun x => ((T x : ℝ) : ℂ) := Complex.measurable_ofReal.comp hT
-  have meas : ∀ s : ℂ, AEStronglyMeasurable (fun x => A x * ((T x : ℝ) : ℂ) ^ s) ν :=
-    fun s => hA.mul (hTc.pow_const s).aestronglyMeasurable
-  have bnd : ∀ K : ℕ, ∃ C : ℝ, 0 ≤ C ∧ ∀ x (s : ℂ), |s.re| ≤ K →
-      ‖A x * ((T x : ℝ) : ℂ) ^ s‖ ≤ C * (min (T x) (T x)⁻¹) ^ 2 := by
+  have meas : ∀ s : ℂ, AEStronglyMeasurable (fun x => A x * ((T x : ℝ) : ℂ) ^ s) ν := fun s =>
+    hA.mul (hTc.pow_const s).aestronglyMeasurable
+  have bnd
+      : ∀ K : ℕ, ∃ C : ℝ,
+        0 ≤ C
+          ∧ ∀ x (s : ℂ),
+            |s.re| ≤ K → ‖A x * ((T x : ℝ) : ℂ) ^ s‖ ≤ C * (min (T x) (T x)⁻¹) ^ 2 := by
     intro K
     obtain ⟨C, hC⟩ := hdec (K + 2)
     refine ⟨|C|, abs_nonneg _, fun x s hs => ?_⟩
@@ -72,11 +75,11 @@ theorem integrable_and_differentiable {X : Type} [MeasurableSpace X] (ν : Measu
       (hC x).trans (mul_le_mul_of_nonneg_right (le_abs_self C) (pow_nonneg (wpos x).le _))
     have h2 := rpow_mul_min_pow_le (hTpos x) hs
     have h0 : 0 ≤ T x ^ s.re := Real.rpow_nonneg (hTpos x).le _
-    calc ‖A x‖ * T x ^ s.re ≤ |C| * (min (T x) (T x)⁻¹) ^ (K + 2) * T x ^ s.re :=
-          mul_le_mul_of_nonneg_right hA' h0
+    calc
+      ‖A x‖ * T x ^ s.re
+        ≤ |C| * (min (T x) (T x)⁻¹) ^ (K + 2) * T x ^ s.re := mul_le_mul_of_nonneg_right hA' h0
       _ = |C| * (min (T x) (T x)⁻¹) ^ 2 * (T x ^ s.re * (min (T x) (T x)⁻¹) ^ K) := by ring
-      _ ≤ |C| * (min (T x) (T x)⁻¹) ^ 2 * 1 := by
-          gcongr
+      _ ≤ |C| * (min (T x) (T x)⁻¹) ^ 2 * 1 := by gcongr
       _ = |C| * (min (T x) (T x)⁻¹) ^ 2 := mul_one _
   have sq_le : ∀ x, (min (T x) (T x)⁻¹) ^ 2 ≤ min (T x) (T x)⁻¹ := fun x => by
     nlinarith [wpos x, wle x]
@@ -95,15 +98,17 @@ theorem integrable_and_differentiable {X : Type} [MeasurableSpace X] (ν : Measu
       have h3 := Nat.le_ceil |s₀.re|
       push_cast
       linarith
-    have key := hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := ν)
-      (F := fun s x => A x * ((T x : ℝ) : ℂ) ^ s)
-      (F' := fun s x => A x * (((T x : ℝ) : ℂ) ^ s * Complex.log ((T x : ℝ) : ℂ)))
-      (x₀ := s₀) (bound := fun x => C * min (T x) (T x)⁻¹) (s := Metric.ball s₀ 1) (Metric.ball_mem_nhds s₀ one_pos)
-      (Filter.Eventually.of_forall fun s => meas s) ((fun s => ?_ : ∀ s : ℂ,
-        Integrable (fun x => A x * ((T x : ℝ) : ℂ) ^ s) ν) s₀)
-      (hA.mul ((hTc.pow_const s₀).mul (Complex.measurable_log.comp hTc)).aestronglyMeasurable)
-      (ae_of_all _ fun x s hs => ?_) (hw.const_mul C)
-      (ae_of_all _ fun x s _ => ?_)
+    have key :=
+      hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := ν)
+        (F := fun s x => A x * ((T x : ℝ) : ℂ) ^ s)
+        (F' := fun s x => A x * (((T x : ℝ) : ℂ) ^ s * Complex.log ((T x : ℝ) : ℂ)))
+        (x₀ := s₀)
+        (bound := fun x => C * min (T x) (T x)⁻¹)
+        (s := Metric.ball s₀ 1) (Metric.ball_mem_nhds s₀ one_pos)
+        (Filter.Eventually.of_forall fun s => meas s)
+        ((fun s => ?_ : ∀ s : ℂ, Integrable (fun x => A x * ((T x : ℝ) : ℂ) ^ s) ν) s₀)
+        (hA.mul ((hTc.pow_const s₀).mul (Complex.measurable_log.comp hTc)).aestronglyMeasurable)
+        (ae_of_all _ fun x s hs => ?_) (hw.const_mul C) (ae_of_all _ fun x s _ => ?_)
     · exact key.2.differentiableAt
     · obtain ⟨C', hC0', hC'⟩ := bnd ⌈|s.re|⌉₊
       refine Integrable.mono' (hw.const_mul C') (meas s) (ae_of_all _ fun x => ?_)
@@ -113,13 +118,14 @@ theorem integrable_and_differentiable {X : Type} [MeasurableSpace X] (ν : Measu
         Real.norm_eq_abs]
       have h1 := hC x s (hre s hs)
       have h2 := min_mul_abs_log_le (hTpos x)
-      calc ‖A x * ((T x : ℝ) : ℂ) ^ s‖ * |Real.log (T x)|
-          ≤ C * (min (T x) (T x)⁻¹) ^ 2 * |Real.log (T x)| :=
-            mul_le_mul_of_nonneg_right h1 (abs_nonneg _)
+      calc
+        ‖A x * ((T x : ℝ) : ℂ) ^ s‖ * |Real.log (T x)|
+            ≤ C * (min (T x) (T x)⁻¹) ^ 2 * |Real.log (T x)| :=
+          mul_le_mul_of_nonneg_right h1 (abs_nonneg _)
         _ = C * min (T x) (T x)⁻¹ * (min (T x) (T x)⁻¹ * |Real.log (T x)|) := by ring
         _ ≤ C * min (T x) (T x)⁻¹ * 1 := by
-            gcongr
-            exact mul_nonneg hC0 (wpos x).le
+          gcongr
+          exact mul_nonneg hC0 (wpos x).le
         _ = C * min (T x) (T x)⁻¹ := mul_one _
     · have hne : ((T x : ℝ) : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr (hTpos x).ne'
       exact (Complex.hasStrictDerivAt_const_cpow (Or.inl hne)).hasDerivAt.const_mul (A x)

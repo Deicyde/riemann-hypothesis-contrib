@@ -5,10 +5,14 @@ public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.B
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.t_E6Cut UpperTheory.Aff
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.t_E6Cut
+  UpperTheory.Aff
 
-private theorem unit_unique {A : Type} [CommRing A] {N : ℕ} (v : Fin N → A)
-    (h : Ideal.span (Set.range v) = ⊤) (a b : A) (hab : ∀ j, a * v j = b * v j) : a = b := by
+private theorem unit_unique
+    {A : Type} [CommRing A]
+    {N : ℕ} (v : Fin N → A) (h : Ideal.span (Set.range v) = ⊤)
+    (a b : A) (hab : ∀ j, a * v j = b * v j)
+    : a = b := by
   have h1 : (1 : A) ∈ Ideal.span (Set.range v) := by rw [h]; trivial
   have key : ∀ c ∈ Ideal.span (Set.range v), (a - b) * c = 0 := by
     intro c hc
@@ -23,13 +27,17 @@ private theorem unit_unique {A : Type} [CommRing A] {N : ℕ} (v : Fin N → A)
   rw [mul_one] at h2
   exact sub_eq_zero.1 h2
 
-private theorem fam_inj (D : Type) [CommRing D] (d m : ℕ) {A : Type} [CommRing A]
+private theorem fam_inj
+    (D : Type) [CommRing D]
+    (d m : ℕ)
+    {A : Type} [CommRing A]
     (x y : Fin (m + 1) → (L2 D d).obj A)
     (hx : ∀ i j, (L2 D d).rel (x i) (x j)) (hy : ∀ i j, (L2 D d).rel (y i) (y j))
     (h1 : ∀ i, (fstV D d).app A (x i) = (fstV D d).app A (y i))
-    (h2 : (x 0).1.1.2 (Fin.last d) = (y 0).1.1.2 (Fin.last d)) : x = y := by
-  have hv : ∀ i (j : Fin d), (x i).1.1.2 j.castSucc = (y i).1.1.2 j.castSucc :=
-    fun i j => congrFun (congrArg (fun z => z.1.2) (h1 i)) j
+    (h2 : (x 0).1.1.2 (Fin.last d) = (y 0).1.1.2 (Fin.last d))
+    : x = y := by
+  have hv : ∀ i (j : Fin d), (x i).1.1.2 j.castSucc = (y i).1.1.2 j.castSucc := fun i j =>
+    congrFun (congrArg (fun z => z.1.2) (h1 i)) j
   have hr : ∀ i, (x i).1.1.1 = (y i).1.1.1 := fun i => congrArg (fun z => z.1.1) (h1 i)
   refine funext fun i => Subtype.ext (Subtype.ext (Prod.ext (hr i) (funext fun j => ?_)))
   obtain ⟨-, u, hu⟩ := hx i 0

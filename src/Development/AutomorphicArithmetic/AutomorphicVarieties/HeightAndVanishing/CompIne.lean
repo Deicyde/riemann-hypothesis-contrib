@@ -7,19 +7,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem compIne_map (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (r : ℕ) (hr : r.Prime)
-    (A : ValuationSubring Ω) (hA : A.valuation (r : Ω) < 1) :
-    (Ine (F := ℚ) A).map (Chr.cls ℚ Ω N) = (ZMod.unitsMap (Nat.ordCompl_dvd N r)).ker := by
+private theorem compIne_map
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (N : ℕ) [NeZero N]
+    (r : ℕ) (hr : r.Prime)
+    (A : ValuationSubring Ω) (hA : A.valuation (r : Ω) < 1)
+    : (Ine (F := ℚ) A).map (Chr.cls ℚ Ω N) = (ZMod.unitsMap (Nat.ordCompl_dvd N r)).ker := by
   haveI : Fact r.Prime := ⟨hr⟩
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI hMz : NeZero (N / r ^ N.factorization r) := ⟨(Nat.ordCompl_pos r (NeZero.ne N)).ne'⟩
   have hMcop : (N / r ^ N.factorization r).Coprime r := (Nat.coprime_ordCompl hr (NeZero.ne N)).symm
   have fix : ∀ σ ∈ Ine (F := ℚ) A, ∀ ζ : Ω, ζ ^ (N / r ^ N.factorization r) = 1 → σ ζ = ζ :=
     fun σ hσ ζ hζ => (LDataCardLeFinrank.ineFixRoots ℚ Ω r A hA _ hMcop ζ hζ).2 σ hσ
-  have powOne : ∀ ζ : Ω, ζ ^ (N / r ^ N.factorization r) = 1 →
-      ζ ^ (((1 : (ZMod (N / r ^ N.factorization r))ˣ) : ZMod (N / r ^ N.factorization r))).val = ζ := by
+  have powOne
+      : ∀ ζ : Ω,
+        ζ ^ (N / r ^ N.factorization r) = 1
+          → ζ ^ (((1 : (ZMod (N / r ^ N.factorization r))ˣ) : ZMod (N / r ^ N.factorization r))).val
+            = ζ := by
     intro ζ hζ
     rw [Units.val_one, ZMod.val_one_eq_one_mod]
     by_cases h1 : N / r ^ N.factorization r = 1
@@ -37,7 +44,9 @@ private theorem compIne_map (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure �
     rw [e]
     exact kerCls σ hσ
   · intro hu
-    obtain ⟨v, hv⟩ := KStar.TotallyRealRoots.redPow_surjective (l := r) (N.factorization r) (ZMod.unitsMap (Nat.ordProj_dvd N r) u)
+    obtain ⟨v, hv⟩ :=
+      KStar.TotallyRealRoots.redPow_surjective (l := r) (N.factorization r)
+        (ZMod.unitsMap (Nat.ordProj_dvd N r) u)
     obtain ⟨σ, hσ, hσv⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω r A hA v
     refine ⟨σ, hσ, ?_⟩
     apply (Chr.clsFacts ℚ Ω N).2.2.1
@@ -48,16 +57,20 @@ private theorem compIne_map (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure �
     · rw [← hv, ← hσv]
       rfl
 
-private theorem compIne_unit {O : Type} [CommRing O] {N : ℕ} (r : ℕ) (χ : DirichletCharacter O N) :
-    (comp r χ).toUnitHom = χ.toUnitHom.comp (proj r N) := by
+private theorem compIne_unit {O : Type} [CommRing O] {N : ℕ} (r : ℕ) (χ : DirichletCharacter O N)
+    : (comp r χ).toUnitHom = χ.toUnitHom.comp (proj r N) := by
   ext u
   simp [UpperTheory.V.HV.comp]
 
-theorem UpperTheory.V.HV.compIne :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (r : ℕ), r.Prime → ∀ A : ValuationSubring Ω, A.valuation (r : Ω) < 1 →
-      (Ine (F := ℚ) A).map (Chr.cls ℚ Ω N) = (proj r N).range ∧
-      ∀ (O : Type) [CommRing O] [IsDomain O] (χ : DirichletCharacter O N), (∀ σ ∈ Ine (F := ℚ) A, Chr.dirG ℚ Ω χ σ = Chr.dirG ℚ Ω (comp r χ) σ) ∧
-        (Ine (F := ℚ) A ≤ (Chr.dirG ℚ Ω χ).ker ↔ comp r χ = 1) := by
+theorem UpperTheory.V.HV.compIne
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (r : ℕ),
+      r.Prime
+        → ∀ A : ValuationSubring Ω,
+          A.valuation (r : Ω) < 1
+            → (Ine (F := ℚ) A).map (Chr.cls ℚ Ω N) = (proj r N).range
+              ∧ ∀ (O : Type) [CommRing O] [IsDomain O] (χ : DirichletCharacter O N),
+                (∀ σ ∈ Ine (F := ℚ) A, Chr.dirG ℚ Ω χ σ = Chr.dirG ℚ Ω (comp r χ) σ)
+                  ∧ (Ine (F := ℚ) A ≤ (Chr.dirG ℚ Ω χ).ker ↔ comp r χ = 1) := by
   intro Ω _ _ _ N _ r hr A hA
   have hrange : (Ine (F := ℚ) A).map (Chr.cls ℚ Ω N) = (proj r N).range := by
     rw [compIne_map Ω N r hr A hA, (projFacts N r hr).2.2.2.2.2.1]

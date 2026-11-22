@@ -11,10 +11,10 @@ open KaehlerDifferential
 
 namespace GlobalTheory.BertiniAlg
 
-theorem linearIndependent_D_of_algebraicIndependent (k κ : Type) [Field k] [CharZero k] [Field κ]
-    [Algebra k κ] [Algebra.EssFiniteType k κ] {σ : Type} (t : σ → κ)
-    (ht : AlgebraicIndependent k t) :
-    LinearIndependent κ (fun s => KaehlerDifferential.D k κ (t s)) := by
+theorem linearIndependent_D_of_algebraicIndependent
+    (k κ : Type) [Field k] [CharZero k] [Field κ] [Algebra k κ] [Algebra.EssFiniteType k κ]
+    {σ : Type} (t : σ → κ) (ht : AlgebraicIndependent k t)
+    : LinearIndependent κ (fun s => KaehlerDifferential.D k κ (t s)) := by
   let P := MvPolynomial σ k
   let φ : P →ₐ[k] κ := MvPolynomial.aeval t
   have hφ : Function.Injective φ := ht
@@ -23,17 +23,19 @@ theorem linearIndependent_D_of_algebraicIndependent (k κ : Type) [Field k] [Cha
   let K := FractionRing P
   have hinj : Function.Injective (algebraMap P κ) := hφ
   let : Algebra K κ := (IsFractionRing.lift (K := K) hinj).toAlgebra
-  have : IsScalarTower P K κ := IsScalarTower.of_algebraMap_eq fun a =>
-    (IsFractionRing.lift_algebraMap (K := K) hinj a).symm
-  have : IsScalarTower k K κ := IsScalarTower.of_algebraMap_eq fun a => by
-    rw [IsScalarTower.algebraMap_apply k P K, ← IsScalarTower.algebraMap_apply P K κ,
-      ← IsScalarTower.algebraMap_apply]
+  have : IsScalarTower P K κ :=
+    IsScalarTower.of_algebraMap_eq fun a => (IsFractionRing.lift_algebraMap (K := K) hinj a).symm
+  have : IsScalarTower k K κ :=
+    IsScalarTower.of_algebraMap_eq fun a => by
+      rw [IsScalarTower.algebraMap_apply k P K, ← IsScalarTower.algebraMap_apply P K κ,
+        ← IsScalarTower.algebraMap_apply]
   have : Algebra.EssFiniteType K κ := .of_comp k K κ
   have : CharZero K := charZero_of_injective_algebraMap (algebraMap k K).injective
   have : Algebra.FormallySmooth K κ := Algebra.FormallySmooth.of_perfectField
   have : Algebra.FormallyEtale P K := .of_isLocalization (nonZeroDivisors P)
   have : Algebra.FormallySmooth P κ := .comp P K κ
-  have hH : Subsingleton (Algebra.H1Cotangent P κ) := Algebra.FormallySmooth.subsingleton_h1Cotangent
+  have hH : Subsingleton (Algebra.H1Cotangent P κ) :=
+    Algebra.FormallySmooth.subsingleton_h1Cotangent
   have hinjm : Function.Injective (mapBaseChange k P κ) := by
     refine (injective_iff_map_eq_zero _).2 fun x hx => ?_
     obtain ⟨y, rfl⟩ := (Algebra.H1Cotangent.exact_δ_mapBaseChange k P κ x).1 hx

@@ -10,9 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.F
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,9 +23,11 @@ noncomputable section
 
 namespace GlobalTheory.UMin.FinAct
 
-theorem finite_oActs : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (K : Type) [Field K]
-    [IsAlgClosed K] [CharZero K] (P : PolAV (Sp K)), letI := H.starRing;
-    Set.Finite {act : 𝓞 E → (P.A ⟶ P.A) | ∃ ρ : P.OAct (𝓞 E), ∀ a, ρ.act a = act a} := by
+theorem finite_oActs
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (K : Type) [Field K]
+        [IsAlgClosed K] [CharZero K] (P : PolAV (Sp K)),
+      letI := H.starRing
+      Set.Finite {act : 𝓞 E → (P.A ⟶ P.A) | ∃ ρ : P.OAct (𝓞 E), ∀ a, ρ.act a = act a} := by
   intro E _ _ _ H K _ _ _ P
   letI := H.starRing
   have h₂ := GlobalTheory.thetaPtDetermines_and_endDeterminedOnTorsion.2
@@ -32,7 +37,9 @@ theorem finite_oActs : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
   set M := 4 ^ g * g.factorial * (2 * s.sup cn) + 1 with hM
   have hM1 : 1 ≤ M := Nat.le_add_left _ _
   have key : ∀ c, c ≤ s.sup cn → 4 ^ g * g.factorial * (2 * c) < M ^ 2 := fun c hc =>
-    calc 4 ^ g * g.factorial * (2 * c) ≤ 4 ^ g * g.factorial * (2 * s.sup cn) := by gcongr
+    calc
+      4 ^ g * g.factorial * (2 * c)
+        ≤ 4 ^ g * g.factorial * (2 * s.sup cn) := by gcongr
       _ < M := Nat.lt_succ_self _
       _ ≤ M ^ 2 := Nat.le_self_pow two_ne_zero _
   have hK : (M : K) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
@@ -49,24 +56,27 @@ theorem finite_oActs : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
     rw [x.2, map_one] at e
     exact e.symm
   have onS : ∀ a ∈ s, ρ₁.act a = ρ₂.act a := fun a ha => by
-    have := h₂ g (cn a) M (key _ (Finset.le_sup ha)) K hK P P rfl rfl (Iso.refl _)
-      (ThetaPtDet.isPolIso_refl P) (𝓞 E) ρ₁ ρ₂ a (hcn a) fun y hy => by
-        have e := congrFun (congrFun hF ⟨a, ha⟩) ⟨y, hy⟩
-        simp only [F, h₁, h₂'] at e
-        rw [dite_eq_left (h₁ a ▸ tor ρ₁ a ⟨y, hy⟩), dite_eq_left (h₂' a ▸ tor ρ₂ a ⟨y, hy⟩)] at e
-        have e' := congrArg Subtype.val (Option.some_injective _ e)
-        simp only [Iso.refl_hom, Category.comp_id, Category.id_comp, h₁, h₂']
-        exact e'
+    have :=
+      h₂ g (cn a) M (key _ (Finset.le_sup ha)) K hK P P rfl rfl (Iso.refl _)
+        (ThetaPtDet.isPolIso_refl P) (𝓞 E) ρ₁ ρ₂ a (hcn a)
+        fun y hy => by
+          have e := congrFun (congrFun hF ⟨a, ha⟩) ⟨y, hy⟩
+          simp only [F, h₁, h₂'] at e
+          rw [dite_eq_left (h₁ a ▸ tor ρ₁ a ⟨y, hy⟩), dite_eq_left (h₂' a ▸ tor ρ₂ a ⟨y, hy⟩)] at e
+          have e' := congrArg Subtype.val (Option.some_injective _ e)
+          simp only [Iso.refl_hom, Category.comp_id, Category.id_comp, h₁, h₂']
+          exact e'
     simpa only [Iso.refl_hom, Category.comp_id, Category.id_comp] using this
   have add₁ : ∀ a b, ρ₁.act (a + b) = ρ₁.act a * ρ₁.act b := ρ₁.map_add
   have add₂ : ∀ a b, ρ₂.act (a + b) = ρ₂.act a * ρ₂.act b := ρ₂.map_add
-  let f₁ : 𝓞 E →+ Additive (P.A ⟶ P.A) := AddMonoidHom.mk' (fun a => Additive.ofMul (ρ₁.act a))
-    fun a b => by rw [add₁]; rfl
-  let f₂ : 𝓞 E →+ Additive (P.A ⟶ P.A) := AddMonoidHom.mk' (fun a => Additive.ofMul (ρ₂.act a))
-    fun a b => by rw [add₂]; rfl
-  have hf : f₁ = f₂ := AddMonoidHom.eq_of_eqOn_dense (s := (s : Set (𝓞 E)))
-    (by rw [← Submodule.span_int_eq_addSubgroupClosure, hs]; rfl) fun a ha =>
-      congrArg Additive.ofMul (onS a ha)
+  let f₁ : 𝓞 E →+ Additive (P.A ⟶ P.A) :=
+    AddMonoidHom.mk' (fun a => Additive.ofMul (ρ₁.act a)) fun a b => by rw [add₁]; rfl
+  let f₂ : 𝓞 E →+ Additive (P.A ⟶ P.A) :=
+    AddMonoidHom.mk' (fun a => Additive.ofMul (ρ₂.act a)) fun a b => by rw [add₂]; rfl
+  have hf : f₁ = f₂ :=
+    AddMonoidHom.eq_of_eqOn_dense (s := (s : Set (𝓞 E)))
+      (by rw [← Submodule.span_int_eq_addSubgroupClosure, hs]; rfl)
+      fun a ha => congrArg Additive.ofMul (onS a ha)
   funext a
   rw [← h₁, ← h₂']
   exact Additive.ofMul.injective (DFunLike.congr_fun hf a)

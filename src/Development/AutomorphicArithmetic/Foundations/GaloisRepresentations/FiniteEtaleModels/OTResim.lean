@@ -20,16 +20,21 @@ theorem tResim : TResim := by
   have hadd : ∀ n : ℕ, 0 < n → ∀ (x z : G.La), I.ev n (x + n • z) = I.ev n x := by
     intro n h0 x z
     rw [I.add, hn n h0, mul_one]
-  refine ⟨{ ζ := I.ζ
-            ζ_prim := I.ζ_prim
-            ζ_pow := I.ζ_pow
-            ev := fun n x => if 0 < n then I.ev n (g n x) else I.ev n x
-            add := ?_
-            lin := ?_
-            ker := ?_
-            onto := ?_
-            tower := ?_
-            isom := ?_ }, ?_⟩
+  refine ⟨
+    {
+      ζ := I.ζ
+      ζ_prim := I.ζ_prim
+      ζ_pow := I.ζ_pow
+      ev := fun n x => if 0 < n then I.ev n (g n x) else I.ev n x
+      add := ?_
+      lin := ?_
+      ker := ?_
+      onto := ?_
+      tower := ?_
+      isom := ?_
+    },
+    ?_
+  ⟩
   · intro n x y
     by_cases h0 : 0 < n
     · simp only [if_pos h0, map_add (f := _), I.add]
@@ -71,8 +76,7 @@ theorem tResim : TResim := by
       rw [zpow_natCast]
       exact (I.ζ_prim n h0).pow_eq_one
     have hE : I.ζ n ^ (2 * G.EF (g n x) (g n y)) = I.ζ n ^ (2 * G.EF x y) := by
-      have : 2 * G.EF (g n x) (g n y) = 2 * G.EF x y + (n : ℤ) * (2 * c) := by
-        linarith [hc]
+      have : 2 * G.EF (g n x) (g n y) = 2 * G.EF x y + (n : ℤ) * (2 * c) := by linarith [hc]
       rw [this, zpow_add, zpow_mul (I.ζ n) (n : ℤ), hz, one_zpow, mul_one]
     rw [hE] at h
     exact h

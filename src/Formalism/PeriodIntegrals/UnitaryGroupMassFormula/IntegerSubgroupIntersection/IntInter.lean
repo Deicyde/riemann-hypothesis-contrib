@@ -13,8 +13,8 @@ open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.Genus
 
 def IntInter : Prop :=
   ∀ (F : Type) [Field F] [NumberField F] (a : F),
-    (∀ v : HeightOneSpectrum (𝓞 F), algebraMap F (Af F) a v ∈ v.adicCompletionIntegers F) →
-    ∃ b : 𝓞 F, (b : F) = a
+    (∀ v : HeightOneSpectrum (𝓞 F), algebraMap F (Af F) a v ∈ v.adicCompletionIntegers F)
+      → ∃ b : 𝓞 F, (b : F) = a
 
 def OpenInt : Prop :=
   ∀ (F : Type) [Field F] [NumberField F],
@@ -22,8 +22,10 @@ def OpenInt : Prop :=
 
 def ExtChar : Prop :=
   ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
-    (K U : AddSubgroup G), IsOpen (U : Set G) →
-    ∀ g : G →+ AddCircle (1 : ℝ), Continuous g → (∀ x ∈ K, x ∈ U → g x = 0) →
-    ∃ h : G →+ AddCircle (1 : ℝ), Continuous h ∧ (∀ x ∈ K, h x = 0) ∧ ∀ x ∈ U, h x = g x
+      (K U : AddSubgroup G),
+    IsOpen (U : Set G)
+      → ∀ g : G →+ AddCircle (1 : ℝ),
+        Continuous g → (∀ x ∈ K, x ∈ U → g x = 0)
+          → ∃ h : G →+ AddCircle (1 : ℝ), Continuous h ∧ (∀ x ∈ K, h x = 0) ∧ ∀ x ∈ U, h x = g x
 
 end PI.GaugeCharW

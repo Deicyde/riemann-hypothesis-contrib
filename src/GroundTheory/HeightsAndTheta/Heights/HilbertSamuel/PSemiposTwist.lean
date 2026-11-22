@@ -38,12 +38,13 @@ theorem SemiposTwist.proof : SemiposTwist.Statement := by
   refine ⟨hsm, fun z hz w hw => ?_⟩
   have hzU : z ∈ U := hz.1
   have hlog : ∀ A : HermLine ι, IsSmoothHerm A → ContDiffAt ℝ 2 (fun y => Real.log (A.h y)) z :=
-    fun A hA => ((hA.contDiffAt (hUo.mem_nhds hzU)).of_le (WithTop.coe_le_coe.2 le_top)).log
-      (A.pos z hzU).ne'
+    fun A hA =>
+      ((hA.contDiffAt (hUo.mem_nhds hzU)).of_le (WithTop.coe_le_coe.2 le_top)).log (A.pos z hzU).ne'
   have h1 := hlog L hL.1
   have h2 := hlog (fsH ι) hH
-  have hev : (fun y => Real.log ((HermLine.zcomb L (fsH ι) q p).h y)) =ᶠ[𝓝 z]
-      fun y => (0 + (q : ℝ) * Real.log (L.h y)) + (p : ℝ) * Real.log ((fsH ι).h y) := by
+  have hev
+      : (fun y => Real.log ((HermLine.zcomb L (fsH ι) q p).h y)) =ᶠ[𝓝 z]
+        fun y => (0 + (q : ℝ) * Real.log (L.h y)) + (p : ℝ) * Real.log ((fsH ι).h y) := by
     filter_upwards [hUo.mem_nhds hzU] with y hy
     show Real.log (L.h y ^ (q : ℤ) * (fsH ι).h y ^ (p : ℤ)) = _
     rw [Real.log_mul (zpow_pos (L.pos y hy) _).ne' (zpow_pos ((fsH ι).pos y hy) _).ne',
@@ -53,11 +54,18 @@ theorem SemiposTwist.proof : SemiposTwist.Statement := by
   have hLz : 0 ≤ ReciprocityTheory.AnForm.levi (fun y => Real.log (L.h y)) z w := hL.2 z hz w hw
   have hHz : 0 ≤ ReciprocityTheory.AnForm.levi (fun y => Real.log ((fsH ι).h y)) z w :=
     FsLineLevi.proof K ι z w hzU
-  have e1 := ReciprocityTheory.AnForm.levi_add_smul (f := fun y => 0 + (q : ℝ) * Real.log (L.h y))
-    (g := fun y => Real.log ((fsH ι).h y)) (p : ℝ) (contDiffAt_const.add (contDiffAt_const.mul h1)) h2 w
-  have e2 := ReciprocityTheory.AnForm.levi_add_smul (f := fun _ => (0 : ℝ))
-    (g := fun y => Real.log (L.h y)) (q : ℝ) contDiffAt_const h1 w
-  have hl0 : ReciprocityTheory.AnForm.levi (fun _ => (0 : ℝ)) z w = 0 := by simp [ReciprocityTheory.AnForm.levi]
+  have e1 :=
+    ReciprocityTheory.AnForm.levi_add_smul
+      (f := fun y => 0 + (q : ℝ) * Real.log (L.h y))
+      (g := fun y => Real.log ((fsH ι).h y))
+      (p : ℝ) (contDiffAt_const.add (contDiffAt_const.mul h1)) h2 w
+  have e2 :=
+    ReciprocityTheory.AnForm.levi_add_smul
+      (f := fun _ => (0 : ℝ))
+      (g := fun y => Real.log (L.h y))
+      (q : ℝ) contDiffAt_const h1 w
+  have hl0 : ReciprocityTheory.AnForm.levi (fun _ => (0 : ℝ)) z w = 0 := by
+    simp [ReciprocityTheory.AnForm.levi]
   change 0 ≤ ReciprocityTheory.AnForm.levi _ z w
   rw [ReciprocityTheory.AnForm.levi_congr hev, e1, e2, hl0]
   have a1 := mul_nonneg (Nat.cast_nonneg (α := ℝ) q) hLz

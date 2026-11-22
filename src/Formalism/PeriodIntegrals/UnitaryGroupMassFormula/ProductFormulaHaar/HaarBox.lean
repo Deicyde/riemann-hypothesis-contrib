@@ -31,8 +31,8 @@ theorem secondCountable : SecondCountableTopology K := by
 
 variable {K}
 
-theorem isOpen_ball (γ : ValueGroupWithZero K) (hγ : γ ≠ 0) :
-    IsOpen {x : K | valuation K x ≤ γ} := by
+theorem isOpen_ball (γ : ValueGroupWithZero K) (hγ : γ ≠ 0)
+    : IsOpen {x : K | valuation K x ≤ γ} := by
   rw [isOpen_iff_mem_nhds]
   intro x hx
   rw [IsValuativeTopology.mem_nhds_iff']
@@ -62,16 +62,16 @@ theorem continuous_equivFun_symm (b : Basis ι K E) : Continuous b.equivFun.symm
   haveI := IsModuleTopology.toContinuousAdd K E
   exact IsModuleTopology.continuous_of_linearMap (R := K) b.equivFun.symm.toLinearMap
 
-theorem isOpen_box (b : Basis ι K E) (γ : ι → ValueGroupWithZero K) (hγ : ∀ i, γ i ≠ 0) :
-    IsOpen (box b γ) := by
+theorem isOpen_box (b : Basis ι K E) (γ : ι → ValueGroupWithZero K) (hγ : ∀ i, γ i ≠ 0)
+    : IsOpen (box b γ) := by
   have e : box b γ = ⋂ i, (fun x : E => b.repr x i) ⁻¹' {a : K | valuation K a ≤ γ i} := by
     ext x
     simp [box]
   rw [e]
   exact isOpen_iInter_of_finite fun i => (isOpen_ball (γ i) (hγ i)).preimage (continuous_coord b i)
 
-theorem box_eq_image (b : Basis ι K E) (γ : ι → ValueGroupWithZero K) :
-    box b γ = b.equivFun.symm '' Set.univ.pi (fun i => {a : K | valuation K a ≤ γ i}) := by
+theorem box_eq_image (b : Basis ι K E) (γ : ι → ValueGroupWithZero K)
+    : box b γ = b.equivFun.symm '' Set.univ.pi (fun i => {a : K | valuation K a ≤ γ i}) := by
   have hr : ∀ y : ι → K, b.repr (b.equivFun.symm y) = y := fun y => by
     have h1 := b.equivFun.apply_symm_apply y
     rw [Basis.equivFun_apply] at h1
@@ -94,10 +94,11 @@ theorem zero_mem_box (b : Basis ι K E) (γ : ι → ValueGroupWithZero K) : (0 
   simp
 
 theorem locallyCompact (b : Basis ι K E) : LocallyCompactSpace E := by
-  let e : E ≃ₜ (ι → K) :=
-    { toEquiv := b.equivFun.toEquiv
-      continuous_toFun := IsModuleTopology.continuous_of_linearMap (R := K) b.equivFun.toLinearMap
-      continuous_invFun := continuous_equivFun_symm b }
+  let e : E ≃ₜ (ι → K) := {
+    toEquiv := b.equivFun.toEquiv
+    continuous_toFun := IsModuleTopology.continuous_of_linearMap (R := K) b.equivFun.toLinearMap
+    continuous_invFun := continuous_equivFun_symm b
+  }
   exact e.isOpenEmbedding.locallyCompactSpace
 
 def homeo (b : Basis ι K E) : E ≃ₜ (ι → K) where
@@ -111,14 +112,16 @@ theorem secondCountableE (b : Basis ι K E) : SecondCountableTopology E := by
 
 def toCLE (T : E ≃ₗ[K] E) : E ≃L[K] E :=
   haveI : ContinuousAdd E := IsModuleTopology.toContinuousAdd K E
-  { T with
+  {
+    T with
     continuous_toFun := IsModuleTopology.continuous_of_linearMap (R := K) T.toLinearMap
-    continuous_invFun := IsModuleTopology.continuous_of_linearMap (R := K) T.symm.toLinearMap }
+    continuous_invFun := IsModuleTopology.continuous_of_linearMap (R := K) T.symm.toLinearMap
+  }
 
 variable [MeasurableSpace E] [BorelSpace E]
 
-theorem image_eq_smul (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (T : E ≃ₗ[K] E) :
-    ∃ c : ℝ≥0, ∀ S : Set E, μ (T '' S) = c * μ S := by
+theorem image_eq_smul (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (T : E ≃ₗ[K] E)
+    : ∃ c : ℝ≥0, ∀ S : Set E, μ (T '' S) = c * μ S := by
   haveI : IsTopologicalAddGroup E := IsModuleTopology.topologicalAddGroup K E
   haveI := locallyCompact b
   haveI := secondCountableE b
@@ -141,9 +144,14 @@ theorem image_eq_smul (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] 
   rw [← h2, h']
   first | rfl | exact (nnreal_smul_coe_apply _ _ _) | simp
 
-theorem image_eq_of_box (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (T : E ≃ₗ[K] E)
-    (γ : ι → ValueGroupWithZero K) (hγ : ∀ i, γ i ≠ 0) (c : ℝ≥0∞)
-    (hc : μ (T '' box b γ) = c * μ (box b γ)) (S : Set E) : μ (T '' S) = c * μ S := by
+theorem image_eq_of_box
+    (b : Basis ι K E)
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (T : E ≃ₗ[K] E)
+    (γ : ι → ValueGroupWithZero K) (hγ : ∀ i, γ i ≠ 0)
+    (c : ℝ≥0∞) (hc : μ (T '' box b γ) = c * μ (box b γ))
+    (S : Set E)
+    : μ (T '' S) = c * μ S := by
   obtain ⟨c', hc'⟩ := image_eq_smul b μ T
   have hpos : μ (box b γ) ≠ 0 := (isOpen_box b γ hγ).measure_ne_zero μ ⟨0, zero_mem_box b γ⟩
   have hfin : μ (box b γ) ≠ ⊤ := (isCompact_box b γ).measure_lt_top.ne

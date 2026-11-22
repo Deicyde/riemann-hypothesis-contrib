@@ -9,19 +9,20 @@ open Finset
 
 namespace Formalism.HermitianLattices.ZeroFreeRegionGL2
 
-theorem numerical_nonvanishing_bound : Formalism.HermitianLattices.ZeroFreeRegionGL2.SmoothingSizeBounds := by
+theorem numerical_nonvanishing_bound
+    : Formalism.HermitianLattices.ZeroFreeRegionGL2.SmoothingSizeBounds := by
   unfold Formalism.HermitianLattices.ZeroFreeRegionGL2.SmoothingSizeBounds
   intro ε hε
   have hε' : ε ≠ 0 := ne_of_gt hε
-  refine ⟨max 2 ((4:ℝ) ^ (3 / ε)), ?_⟩
+  refine ⟨max 2 ((4 : ℝ) ^ (3 / ε)), ?_⟩
   intro x hx y lam hy hlam hlamle
   have hx2 : 2 ≤ x := le_trans (le_max_left _ _) hx
   have hx0 : 0 < x := by linarith
-  have hx4 : (4:ℝ) ^ (3 / ε) ≤ x := le_trans (le_max_right _ _) hx
+  have hx4 : (4 : ℝ) ^ (3 / ε) ≤ x := le_trans (le_max_right _ _) hx
   have ht4 : 4 ≤ x ^ (ε / 3) := by
-    have h1 : ((4:ℝ) ^ (3 / ε)) ^ (ε / 3) ≤ x ^ (ε / 3) :=
+    have h1 : ((4 : ℝ) ^ (3 / ε)) ^ (ε / 3) ≤ x ^ (ε / 3) :=
       Real.rpow_le_rpow (by positivity) hx4 (by positivity)
-    rw [← Real.rpow_mul (by norm_num : (0:ℝ) ≤ 4)] at h1
+    rw [← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 4)] at h1
     have h3 : 3 / ε * (ε / 3) = 1 := by field_simp <;> ring
     rw [h3, Real.rpow_one] at h1
     exact h1
@@ -29,32 +30,35 @@ theorem numerical_nonvanishing_bound : Formalism.HermitianLattices.ZeroFreeRegio
   have hLne : Real.log x ≠ 0 := ne_of_gt hL
   have hypos : 0 < y := lt_of_lt_of_le (by positivity) hy
   have hlog3 : Real.log 3 ≤ 2 := by
-    have := Real.log_le_sub_one_of_pos (by norm_num : (0:ℝ) < 3)
+    have := Real.log_le_sub_one_of_pos (by norm_num : (0 : ℝ) < 3)
     linarith
   have hly : x ^ (ε / 3) - Real.log 3 ≤ Real.log y := by
     rw [← Real.exp_le_exp, Real.exp_log hypos, Real.exp_sub,
-      Real.exp_log (by norm_num : (0:ℝ) < 3)]
+      Real.exp_log (by norm_num : (0 : ℝ) < 3)]
     exact hy
   have ha : x ^ (ε / 3) / 2 ≤ Real.log y := by linarith
   refine ⟨ha, ?_, ?_⟩
   · have hsplit : x ^ (ε / 3) = x ^ (2 * ε / 15) * x ^ (ε / 5) := by
       rw [← Real.rpow_add hx0]; congr 1; ring
     rw [le_div_iff₀ hlam]
-    calc x ^ (2 * ε / 15) / (4 * Real.log x ^ 2) * lam
-        ≤ x ^ (2 * ε / 15) / (4 * Real.log x ^ 2) * (2 * x ^ (ε / 5) * Real.log x ^ 2) :=
-          mul_le_mul_of_nonneg_left hlamle (by positivity)
+    calc
+      x ^ (2 * ε / 15) / (4 * Real.log x ^ 2) * lam
+          ≤ x ^ (2 * ε / 15) / (4 * Real.log x ^ 2) * (2 * x ^ (ε / 5) * Real.log x ^ 2) :=
+        mul_le_mul_of_nonneg_left hlamle (by positivity)
       _ = x ^ (ε / 3) / 2 := by rw [hsplit]; field_simp <;> ring
       _ ≤ Real.log y := ha
   · have hsplit : x ^ (ε / 3) = x ^ (ε / 6) * x ^ (ε / 6) := by
       rw [← Real.rpow_add hx0]; congr 1; ring
     have hs : 0 ≤ x ^ (ε / 6) / 2 := by positivity
-    calc x ^ (ε / 6) / 2 = Real.sqrt ((x ^ (ε / 6) / 2) ^ 2) := (Real.sqrt_sq hs).symm
+    calc
+      x ^ (ε / 6) / 2
+        = Real.sqrt ((x ^ (ε / 6) / 2) ^ 2) := (Real.sqrt_sq hs).symm
       _ ≤ Real.sqrt (Real.log y) := by
-          apply Real.sqrt_le_sqrt
-          have h5 : (x ^ (ε / 6) / 2) ^ 2 = x ^ (ε / 3) / 4 := by rw [hsplit]; ring
-          rw [h5]
-          have : 0 ≤ x ^ (ε / 3) := by positivity
-          linarith
+        apply Real.sqrt_le_sqrt
+        have h5 : (x ^ (ε / 6) / 2) ^ 2 = x ^ (ε / 3) / 4 := by rw [hsplit]; ring
+        rw [h5]
+        have : 0 ≤ x ^ (ε / 3) := by positivity
+        linarith
 
 private lemma gl2b2_intH (b : ℝ) (hb : 0 < b) :
     MeasureTheory.IntegrableOn (fun v : ℝ => v ^ (2 : ℝ) * Real.exp (-b * v ^ (39 / 100 : ℝ)))
@@ -124,7 +128,7 @@ theorem gl2b2_thinIntegral : Formalism.HermitianLattices.ZeroFreeRegionGL2.ThinI
   have hx1 : X1 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hx
   have hx2 : X2 ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx
   have hx3 : X3 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hx
-  have hx4 : (2:ℝ) ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx
+  have hx4 : (2 : ℝ) ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx
   have hx0 : 0 < x := by linarith
   have hxone : 1 ≤ x := by linarith
   have hVx : x ^ (33 * ε / 100) ≤ V := by
@@ -142,13 +146,14 @@ theorem gl2b2_thinIntegral : Formalism.HermitianLattices.ZeroFreeRegionGL2.ThinI
     rw [le_div_iff₀ hδ'pos]
     linarith
   have hL2 : Real.log x ^ 2 ≤ x ^ δ / δ' ^ 2 := by
-    have hsq : x ^ δ = x ^ δ' * x ^ δ' := by
-      rw [← Real.rpow_add hx0]; congr 1; rw [hδ, hδ']; ring
+    have hsq : x ^ δ = x ^ δ' * x ^ δ' := by rw [← Real.rpow_add hx0]; congr 1; rw [hδ, hδ']; ring
     have h2 : Real.log x ^ 2 ≤ (x ^ δ' / δ') ^ 2 := by
       nlinarith [mul_nonneg (sub_nonneg.mpr hLle) hL0.le,
         mul_nonneg (sub_nonneg.mpr hLle) (sub_nonneg.mpr hLle)]
     rw [hsq]
-    calc Real.log x ^ 2 ≤ (x ^ δ' / δ') ^ 2 := h2
+    calc
+      Real.log x ^ 2
+        ≤ (x ^ δ' / δ') ^ 2 := h2
       _ = x ^ δ' * x ^ δ' / δ' ^ 2 := by ring
   have hlamV : lam ≤ V ^ (61 / 100 : ℝ) := by
     have h1 : (x ^ (33 * ε / 100)) ^ (61 / 100 : ℝ) ≤ V ^ (61 / 100 : ℝ) :=
@@ -164,9 +169,11 @@ theorem gl2b2_thinIntegral : Formalism.HermitianLattices.ZeroFreeRegionGL2.ThinI
     have h6 : x ^ (ε / 5) * x ^ δ * (2 / δ' ^ 2) ≤ x ^ (ε / 5) * x ^ δ * x ^ δ :=
       mul_le_mul_of_nonneg_left h3 (by positivity)
     linarith
-  have hpt : ∀ v ∈ Set.Ioi V, (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)) ≤
-      4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) *
-        (v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ))) := by
+  have hpt
+      : ∀ v ∈ Set.Ioi V,
+        (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v))
+          ≤ 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ))
+            * (v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ))) := by
     intro v hv
     have hv' : V < v := hv
     have hv1 : 1 ≤ v := by linarith
@@ -175,20 +182,28 @@ theorem gl2b2_thinIntegral : Formalism.HermitianLattices.ZeroFreeRegionGL2.ThinI
     have h1 := gl2b2_ptw c v lam hc hv1 (by linarith) hlv
     have h39 : V ^ (39 / 100 : ℝ) ≤ v ^ (39 / 100 : ℝ) :=
       Real.rpow_le_rpow hV0.le hv'.le (by norm_num)
-    have h2 : Real.exp (-(c / 2) * v ^ (39 / 100 : ℝ)) ≤
-        Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ)) := by
+    have h2
+        : Real.exp (-(c / 2) * v ^ (39 / 100 : ℝ))
+          ≤ Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ))
+            * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ)) := by
       rw [← Real.exp_add]
       apply Real.exp_le_exp.mpr
       nlinarith [mul_le_mul_of_nonneg_left h39 hc.le]
     have hv2 : 0 ≤ v ^ (2 : ℝ) := by positivity
-    calc (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v))
+    calc
+      (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v))
         ≤ 4 * (v ^ (2 : ℝ) * Real.exp (-(c / 2) * v ^ (39 / 100 : ℝ))) := h1
-      _ ≤ 4 * (v ^ (2 : ℝ) * (Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) *
-            Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ)))) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h2 hv2) (by norm_num)
+      _ ≤ 4
+          * (v ^ (2 : ℝ)
+            * (Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ))
+              * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ)))) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h2 hv2) (by norm_num)
       _ = _ := by ring
-  have hgint : MeasureTheory.IntegrableOn (fun v : ℝ => 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) *
-      (v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ)))) (Set.Ioi V) :=
+  have hgint : MeasureTheory.IntegrableOn
+      (fun v : ℝ =>
+        4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ))
+          * (v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ))))
+      (Set.Ioi V) :=
     (hIint.mono_set (Set.Ioi_subset_Ioi hV0.le)).const_mul _
   have hFmeas : MeasureTheory.AEStronglyMeasurable
       (fun v : ℝ => (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)))
@@ -196,7 +211,8 @@ theorem gl2b2_thinIntegral : Formalism.HermitianLattices.ZeroFreeRegionGL2.ThinI
     apply Measurable.aestronglyMeasurable
     fun_prop
   have hFint : MeasureTheory.IntegrableOn
-      (fun v : ℝ => (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v))) (Set.Ioi V) := by
+      (fun v : ℝ => (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)))
+      (Set.Ioi V) := by
     refine MeasureTheory.Integrable.mono' hgint hFmeas ?_
     refine MeasureTheory.ae_restrict_of_forall_mem measurableSet_Ioi ?_
     intro v hv
@@ -209,25 +225,27 @@ theorem gl2b2_thinIntegral : Formalism.HermitianLattices.ZeroFreeRegionGL2.ThinI
     rw [← Real.rpow_mul hx0.le] at h1
     refine le_trans (Real.rpow_le_rpow_of_exponent_le hxone ?_) h1
     linarith
-  have hInt_le : (∫ v in Set.Ioi V, (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v))) ≤
-      4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) * I := by
-    calc (∫ v in Set.Ioi V, (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)))
-        ≤ ∫ v in Set.Ioi V, 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) *
-            (v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ))) :=
-          MeasureTheory.setIntegral_mono_on hFint hgint measurableSet_Ioi hpt
-      _ = 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) *
-            ∫ v in Set.Ioi V, v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ)) :=
-          MeasureTheory.integral_const_mul _ _
+  have hInt_le
+      : (∫ v in Set.Ioi V, (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)))
+        ≤ 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) * I := by
+    calc
+      (∫ v in Set.Ioi V, (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)))
+          ≤ ∫ v in Set.Ioi V, 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) *
+              (v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ))) :=
+        MeasureTheory.setIntegral_mono_on hFint hgint measurableSet_Ioi hpt
+      _ = 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ))
+          * ∫ v in Set.Ioi V, v ^ (2 : ℝ) * Real.exp (-(c / 4) * v ^ (39 / 100 : ℝ)) :=
+        MeasureTheory.integral_const_mul _ _
       _ ≤ 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) * I := by
-          refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-          rw [hI]
-          apply MeasureTheory.setIntegral_mono_set hIint
-          · refine MeasureTheory.ae_restrict_of_forall_mem measurableSet_Ioi ?_
-            intro v hv
-            have : 0 < v := hv
-            show (0:ℝ) ≤ _
-            positivity
-          · exact Filter.Eventually.of_forall (Set.Ioi_subset_Ioi hV0.le)
+        refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+        rw [hI]
+        apply MeasureTheory.setIntegral_mono_set hIint
+        · refine MeasureTheory.ae_restrict_of_forall_mem measurableSet_Ioi ?_
+          intro v hv
+          have : 0 < v := hv
+          show (0:ℝ) ≤ _
+          positivity
+        · exact Filter.Eventually.of_forall (Set.Ioi_subset_Ioi hV0.le)
   have hw2 : 32 * I / c ≤ x ^ (ε / 8) := hX2' x hx2
   have h4I : 4 * I ≤ Real.exp (c / 8 * x ^ (ε / 8)) := by
     have h1 := Real.add_one_le_exp (c / 8 * x ^ (ε / 8))
@@ -238,23 +256,25 @@ theorem gl2b2_thinIntegral : Formalism.HermitianLattices.ZeroFreeRegionGL2.ThinI
   have hE1 : Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) ≤ Real.exp (-(c / 4) * x ^ (ε / 8)) := by
     apply Real.exp_le_exp.mpr
     nlinarith [mul_le_mul_of_nonneg_left hw hc.le]
-  have hsplitE : Real.exp (-(c / 4) * x ^ (ε / 8)) =
-      (Real.exp (c / 8 * x ^ (ε / 8)))⁻¹ * Real.exp (-(c / 8) * x ^ (ε / 8)) := by
+  have hsplitE
+      : Real.exp (-(c / 4) * x ^ (ε / 8))
+        = (Real.exp (c / 8 * x ^ (ε / 8)))⁻¹ * Real.exp (-(c / 8) * x ^ (ε / 8)) := by
     rw [← Real.exp_neg, ← Real.exp_add]; congr 1; ring
-  calc (∫ v in Set.Ioi V, (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)))
+  calc
+    (∫ v in Set.Ioi V, (v + lam) ^ 2 * Real.exp (-c * v / (lam + Real.sqrt v)))
       ≤ 4 * Real.exp (-(c / 4) * V ^ (39 / 100 : ℝ)) * I := hInt_le
     _ ≤ 4 * Real.exp (-(c / 4) * x ^ (ε / 8)) * I :=
-        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hE1 (by norm_num)) hI0
+      mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hE1 (by norm_num)) hI0
     _ = (4 * I) * (Real.exp (c / 8 * x ^ (ε / 8)))⁻¹ * Real.exp (-(c / 8) * x ^ (ε / 8)) := by
-        rw [hsplitE]; ring
-    _ ≤ Real.exp (c / 8 * x ^ (ε / 8)) * (Real.exp (c / 8 * x ^ (ε / 8)))⁻¹ *
-          Real.exp (-(c / 8) * x ^ (ε / 8)) :=
-        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right h4I (by positivity))
-          (Real.exp_pos _).le
-    _ = Real.exp (-(c / 8) * x ^ (ε / 8)) := by
-        rw [mul_inv_cancel₀ (Real.exp_pos _).ne']; ring
+      rw [hsplitE]; ring
+    _ ≤ Real.exp (c / 8 * x ^ (ε / 8)) * (Real.exp (c / 8 * x ^ (ε / 8)))⁻¹
+        * Real.exp (-(c / 8) * x ^ (ε / 8)) :=
+      mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right h4I (by positivity))
+        (Real.exp_pos _).le
+    _ = Real.exp (-(c / 8) * x ^ (ε / 8)) := by rw [mul_inv_cancel₀ (Real.exp_pos _).ne']; ring
 
-theorem nonvanishing_of_hypothesis : Formalism.HermitianLattices.ZeroFreeRegionGL2.TailIntegralBoundOfPsiBound := by
+theorem nonvanishing_of_hypothesis
+    : Formalism.HermitianLattices.ZeroFreeRegionGL2.TailIntegralBoundOfPsiBound := by
   unfold Formalism.HermitianLattices.ZeroFreeRegionGL2.TailIntegralBoundOfPsiBound
   intro ε c C hε hc hC
   obtain ⟨c0, X0, hc0, hX0⟩ := gl2b2_thinIntegral ε c hε hc
@@ -285,11 +305,11 @@ theorem nonvanishing_of_hypothesis : Formalism.HermitianLattices.ZeroFreeRegionG
   have hinj : Set.InjOn Real.log (Set.Ioi y) :=
     Real.log_injOn_pos.mono (Set.Ioi_subset_Ioi hypos.le)
   have hHint : MeasureTheory.IntegrableOn (fun u : ℝ => |u⁻¹| • G (Real.log u)) (Set.Ioi y) :=
-    (MeasureTheory.integrableOn_image_iff_integrableOn_abs_deriv_smul measurableSet_Ioi hderiv
-      hinj G).mp (by rw [himg]; exact hGint)
+    (MeasureTheory.integrableOn_image_iff_integrableOn_abs_deriv_smul measurableSet_Ioi hderiv hinj
+      G).mp (by rw [himg]; exact hGint)
   have hHeq : (∫ u in Set.Ioi y, |u⁻¹| • G (Real.log u)) = ∫ v in Set.Ioi (Real.log y), G v := by
-    have h1 := MeasureTheory.integral_image_eq_integral_abs_deriv_smul measurableSet_Ioi hderiv
-      hinj G
+    have h1 :=
+      MeasureTheory.integral_image_eq_integral_abs_deriv_smul measurableSet_Ioi hderiv hinj G
     rw [himg] at h1
     exact h1.symm
   have hbound : ∀ u ∈ Set.Ioi y, ‖psi0 u / (u : ℂ) ^ 2‖ ≤ C * (|u⁻¹| • G (Real.log u)) := by
@@ -299,23 +319,36 @@ theorem nonvanishing_of_hypothesis : Formalism.HermitianLattices.ZeroFreeRegionG
     have h1 := hpsi u (le_of_lt hu)
     rw [norm_div, norm_pow, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hu0,
       abs_of_pos (inv_pos.mpr hu0), smul_eq_mul, div_le_iff₀ (by positivity)]
-    have hG : G (Real.log u) = (Real.log u + lam) ^ 2 *
-        Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))) := rfl
-    have hu2 : u⁻¹ * u ^ 2 = u := by
-      rw [pow_two, ← mul_assoc, inv_mul_cancel₀ hu0', one_mul]
+    have hG
+        : G (Real.log u)
+          = (Real.log u + lam) ^ 2 * Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))) :=
+      rfl
+    have hu2 : u⁻¹ * u ^ 2 = u := by rw [pow_two, ← mul_assoc, inv_mul_cancel₀ hu0', one_mul]
     rw [hG]
-    calc ‖psi0 u‖ ≤ C * u * (Real.log u + lam) ^ 2 *
-          Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))) := h1
-      _ = C * (u⁻¹ * ((Real.log u + lam) ^ 2 *
-          Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))))) * u ^ 2 := by
-        rw [show C * (u⁻¹ * ((Real.log u + lam) ^ 2 *
-          Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))))) * u ^ 2 =
-          C * ((Real.log u + lam) ^ 2 *
-          Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u)))) * (u⁻¹ * u ^ 2) by ring,
+    calc
+      ‖psi0 u‖
+          ≤ C * u * (Real.log u + lam) ^ 2
+            * Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))) :=
+        h1
+      _ = C
+          * (u⁻¹
+            * ((Real.log u + lam) ^ 2
+              * Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u)))))
+          * u ^ 2 := by
+        rw [show C
+                * (u⁻¹
+                  * ((Real.log u + lam) ^ 2
+                    * Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u)))))
+                * u ^ 2
+              = C
+                * ((Real.log u + lam) ^ 2
+                  * Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))))
+                * (u⁻¹ * u ^ 2) by
+            ring,
           hu2]
         ring
-  have hnorm : ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖ ≤
-      ∫ u in Set.Ioi y, C * (|u⁻¹| • G (Real.log u)) :=
+  have hnorm
+      : ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖ ≤ ∫ u in Set.Ioi y, C * (|u⁻¹| • G (Real.log u)) :=
     MeasureTheory.norm_integral_le_of_norm_le (hHint.const_mul C)
       (MeasureTheory.ae_restrict_of_forall_mem measurableSet_Ioi hbound)
   rw [MeasureTheory.integral_const_mul, hHeq] at hnorm
@@ -326,10 +359,12 @@ theorem nonvanishing_of_hypothesis : Formalism.HermitianLattices.ZeroFreeRegionG
     have h1 := Real.add_one_le_exp (c0 / 2 * x ^ (ε / 8))
     rw [div_le_iff₀ hc0] at hw
     linarith
-  calc ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖ ≤ C * ∫ v in Set.Ioi (Real.log y), G v := hnorm
+  calc
+    ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖
+      ≤ C * ∫ v in Set.Ioi (Real.log y), G v := hnorm
     _ ≤ C * Real.exp (-c0 * x ^ (ε / 8)) := mul_le_mul_of_nonneg_left hGle hC.le
     _ ≤ Real.exp (c0 / 2 * x ^ (ε / 8)) * Real.exp (-c0 * x ^ (ε / 8)) :=
-        mul_le_mul_of_nonneg_right hCexp (Real.exp_pos _).le
+      mul_le_mul_of_nonneg_right hCexp (Real.exp_pos _).le
     _ = Real.exp (-(c0 / 2) * x ^ (ε / 8)) := by rw [← Real.exp_add]; congr 1; ring
 
 end Formalism.HermitianLattices.ZeroFreeRegionGL2

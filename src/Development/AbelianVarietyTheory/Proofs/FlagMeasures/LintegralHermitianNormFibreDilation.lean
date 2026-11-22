@@ -14,7 +14,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IsFibr
 
 noncomputable section
 
-open MeasureTheory Matrix Filter Topology Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding
+open MeasureTheory Matrix Filter Topology Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding
 open scoped ENNReal NNReal
 
 namespace GlobalTheory.FibreScaling
@@ -32,8 +34,8 @@ theorem qf_real_smul (r : ℝ) (x : Sp P Q) : qf (r • x) = r ^ 2 * qf x := by
 theorem finrank_sp : Module.finrank ℝ (Sp P Q) = 2 * (P + Q) := by
   simp [Module.finrank_pi_fintype, Complex.finrank_real_complex, mul_comm]
 
-theorem map_dx_smul {t : ℝ} (ht : 0 < t) :
-    ENNReal.ofReal (t ^ (P + Q)) • (dx P Q).map (fun y => Real.sqrt t • y) = dx P Q := by
+theorem map_dx_smul {t : ℝ} (ht : 0 < t)
+    : ENNReal.ofReal (t ^ (P + Q)) • (dx P Q).map (fun y => Real.sqrt t • y) = dx P Q := by
   have hs : Real.sqrt t ≠ 0 := (Real.sqrt_pos.2 ht).ne'
   have hm : AEMeasurable (fun y : Sp P Q => Real.sqrt t • y) (volume : Measure (Sp P Q)) :=
     (continuous_const_smul _).aemeasurable
@@ -43,17 +45,18 @@ theorem map_dx_smul {t : ℝ} (ht : 0 < t) :
     ← ENNReal.ofReal_mul (by positivity), mul_inv_cancel₀ (by positivity), ENNReal.ofReal_one,
     one_smul]
 
-theorem lintegral_inv_mul {t : ℝ} (ht : 0 < t) (g : ℝ → ℝ≥0∞) :
-    ∫⁻ b, g (t⁻¹ * b) = ENNReal.ofReal t * ∫⁻ b, g b := by
-  have h := (Homeomorph.mulLeft₀ t⁻¹ (inv_ne_zero ht.ne')).measurableEmbedding.lintegral_map
-    (μ := volume) g
+theorem lintegral_inv_mul {t : ℝ} (ht : 0 < t) (g : ℝ → ℝ≥0∞)
+    : ∫⁻ b, g (t⁻¹ * b) = ENNReal.ofReal t * ∫⁻ b, g b := by
+  have h :=
+    (Homeomorph.mulLeft₀ t⁻¹ (inv_ne_zero ht.ne')).measurableEmbedding.lintegral_map (μ := volume) g
   rw [Homeomorph.coe_mulLeft₀, Real.map_volume_mul_left (inv_ne_zero ht.ne'), inv_inv,
-    abs_of_pos ht, lintegral_smul_measure, smul_eq_mul] at h
+      abs_of_pos ht, lintegral_smul_measure, smul_eq_mul]
+    at h
   exact h.symm
 
-theorem isDxDq_scale {fib : ℝ → Measure (Sp P Q)} (h : IsDxDq fib) {t : ℝ} (ht : 0 < t) :
-    IsDxDq fun b => ENNReal.ofReal (t ^ (P + Q) / t) •
-      (fib (t⁻¹ * b)).map (fun y => Real.sqrt t • y) := by
+theorem isDxDq_scale {fib : ℝ → Measure (Sp P Q)} (h : IsDxDq fib) {t : ℝ} (ht : 0 < t)
+    : IsDxDq fun b =>
+      ENNReal.ofReal (t ^ (P + Q) / t) • (fib (t⁻¹ * b)).map (fun y => Real.sqrt t • y) := by
   have hs : Real.sqrt t ≠ 0 := (Real.sqrt_pos.2 ht).ne'
   have hc : Continuous (fun y : Sp P Q => Real.sqrt t • y) := continuous_const_smul _
   have hm := hc.measurable
@@ -62,8 +65,9 @@ theorem isDxDq_scale {fib : ℝ → Measure (Sp P Q)} (h : IsDxDq fib) {t : ℝ}
   refine ⟨fun b => ?_, fun φ hφ => ?_, fun φ hφ hsu hts => ?_⟩
   · have hS : MeasurableSet (qf ⁻¹' {id b} ∩ {x : Sp P Q | x ≠ 0})ᶜ :=
       ((qf_continuous.measurable (measurableSet_singleton _)).inter isOpen_ne.measurableSet).compl
-    have h0 : ((fib (t⁻¹ * b)).map (fun y => Real.sqrt t • y))
-        (qf ⁻¹' {id b} ∩ {x : Sp P Q | x ≠ 0})ᶜ = 0 := by
+    have h0
+        : ((fib (t⁻¹ * b)).map (fun y => Real.sqrt t • y)) (qf ⁻¹' {id b} ∩ {x : Sp P Q | x ≠ 0})ᶜ
+          = 0 := by
       rw [Measure.map_apply hm hS]
       convert h.1 (t⁻¹ * b) using 2
       rw [Set.preimage_compl, Set.preimage_inter, hpre]
@@ -93,17 +97,21 @@ theorem isDxDq_scale {fib : ℝ → Measure (Sp P Q)} (h : IsDxDq fib) {t : ℝ}
       exact (((continuousOn_univ.1 h2).comp (continuous_const_mul t⁻¹)).const_smul
         (ENNReal.ofReal (t ^ (P + Q) / t)).toReal).continuousOn
 
-theorem lintegral_fibre_scale : ∀ (P Q : ℕ) (fib : ℝ → Measure (Sp P Q)) (β t : ℝ), IsDxDq fib →
-    β ≠ 0 → 0 < t → ∀ φ : Sp P Q → ℝ≥0∞, Measurable φ →
-      ∫⁻ y, φ y ∂(fib (t * β)) =
-        ENNReal.ofReal (t ^ (P + Q) / t) * ∫⁻ y, φ (Real.sqrt t • y) ∂(fib β) := by
+theorem lintegral_fibre_scale
+    : ∀ (P Q : ℕ) (fib : ℝ → Measure (Sp P Q)) (β t : ℝ),
+      IsDxDq fib → β ≠ 0 → 0 < t
+        → ∀ φ : Sp P Q → ℝ≥0∞,
+          Measurable φ
+            → ∫⁻ y, φ y ∂(fib (t * β))
+              = ENNReal.ofReal (t ^ (P + Q) / t) * ∫⁻ y, φ (Real.sqrt t • y) ∂(fib β) := by
   intro P Q fib β t h hβ ht φ hφ
   have hO : (qf : Sp P Q → ℝ) ⁻¹' {t * β} ⊆ {x | x ≠ 0} := by
     rintro x hx rfl
     exact mul_ne_zero ht.ne' hβ (by simpa [qf] using hx.symm)
-  have e := GlobalTheory.IsFibreFamily_eq_at (dx P Q) qf {x | x ≠ 0} {x | x ≠ 0} {x | x ≠ 0} Set.univ
-    Set.univ fib _ (t * β) qf_continuous.measurable isOpen_ne subset_rfl subset_rfl hO isOpen_univ
-    isOpen_univ trivial trivial h (isDxDq_scale h ht)
+  have e :=
+    GlobalTheory.IsFibreFamily_eq_at (dx P Q) qf {x | x ≠ 0} {x | x ≠ 0} {x | x ≠ 0} Set.univ
+      Set.univ fib _ (t * β) qf_continuous.measurable isOpen_ne subset_rfl subset_rfl hO isOpen_univ
+      isOpen_univ trivial trivial h (isDxDq_scale h ht)
   rw [e, lintegral_smul_measure, smul_eq_mul, inv_mul_cancel_left₀ ht.ne',
     lintegral_map hφ (continuous_const_smul _).measurable]
 

@@ -9,6 +9,6 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CollSBo
 
 open GlobalTheory.Core.Deg
 
-theorem GlobalTheory.T.degenerateTerms_and_collisionBounds_uniform_widths :
-    (∀ c : ℝ, On {c} VanishingGramTermsBound) ∧ ∀ c : ℝ, On {c} CollS :=
+theorem GlobalTheory.T.degenerateTerms_and_collisionBounds_uniform_widths
+    : (∀ c : ℝ, On {c} VanishingGramTermsBound) ∧ ∀ c : ℝ, On {c} CollS :=
   degenerate_and_collisions_uncond

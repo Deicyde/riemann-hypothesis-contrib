@@ -11,17 +11,15 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp.LocFrame.Comm
 
 variable {L : Type} [Field L] [NumberField L] {n : ℕ}
 
-noncomputable def mulBy (b : 𝓞 L) : (Fin n → L) →+ (Fin n → L) :=
-  DistribSMul.toAddMonoidHom _ b
+noncomputable def mulBy (b : 𝓞 L) : (Fin n → L) →+ (Fin n → L) := DistribSMul.toAddMonoidHom _ b
 
 theorem mulBy_apply (b : 𝓞 L) (x : Fin n → L) (i : Fin n) : mulBy b x i = (b : L) * x i := by
   simp [mulBy, Algebra.smul_def]
 
-theorem coe_ne_zero {b : 𝓞 L} (hb : b ≠ 0) : (b : L) ≠ 0 := by
-  simpa using hb
+theorem coe_ne_zero {b : 𝓞 L} (hb : b ≠ 0) : (b : L) ≠ 0 := by simpa using hb
 
-theorem mulBy_injective {b : 𝓞 L} (hb : b ≠ 0) :
-    Function.Injective (mulBy (L := L) (n := n) b) := by
+theorem mulBy_injective {b : 𝓞 L} (hb : b ≠ 0)
+    : Function.Injective (mulBy (L := L) (n := n) b) := by
   intro x y h
   funext i
   have := congrFun h i
@@ -39,9 +37,9 @@ theorem incl_injective : Function.Injective (incl (L := L) (n := n)) := by
   have := congrFun h i
   exact RingOfIntegers.coe_injective this
 
-theorem frame_one_eq :
-    (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup =
-      (⊤ : AddSubgroup (Fin n → 𝓞 L)).map incl := by
+theorem frame_one_eq
+    : (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup
+      = (⊤ : AddSubgroup (Fin n → 𝓞 L)).map incl := by
   ext x
   simp only [Submodule.mem_toAddSubgroup, mem_frame_one, AddSubgroup.mem_map, AddSubgroup.mem_top,
     true_and]
@@ -52,9 +50,10 @@ theorem frame_one_eq :
   · rintro ⟨z, rfl⟩ i
     exact ⟨z i, rfl⟩
 
-theorem relIndex_mulBy_ne_zero {b : 𝓞 L} (hb : b ≠ 0) :
-    ((frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.map (mulBy b)).relIndex
-      (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup ≠ 0 := by
+theorem relIndex_mulBy_ne_zero {b : 𝓞 L} (hb : b ≠ 0)
+    : ((frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.map (mulBy b)).relIndex
+        (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup
+      ≠ 0 := by
   classical
   let I : Ideal (𝓞 L) := Ideal.span {b}
   have hI : I ≠ ⊥ := by simpa [I] using hb
@@ -66,19 +65,20 @@ theorem relIndex_mulBy_ne_zero {b : 𝓞 L} (hb : b ≠ 0) :
     intro z hz
     have h1 : ∀ i, ∃ c, z i = b * c := fun i => by
       have : (Ideal.Quotient.mk I) (z i) = 0 := congrFun (AddMonoidHom.mem_ker.1 hz) i
-      exact Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq_zero_iff_mem.1 this) |>.imp
-        fun c hc => by rw [← hc, mul_comm]
+      exact Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq_zero_iff_mem.1 this)
+        |>.imp fun c hc => by rw [← hc, mul_comm]
     choose c hc using h1
     exact ⟨c, funext fun i => by simp [m, hc i]⟩
   have hf : f.ker.index ≠ 0 := by
     rw [AddSubgroup.index_ker]
     exact Nat.card_pos.ne'
-  have hm : m.range.index ≠ 0 := fun h => hf (by
-    have := AddSubgroup.index_dvd_of_le hk
-    rw [h] at this
-    exact Nat.eq_zero_of_zero_dvd this)
-  have e : (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.map (mulBy b) =
-      m.range.map incl := by
+  have hm : m.range.index ≠ 0 := fun h =>
+    hf (by
+      have := AddSubgroup.index_dvd_of_le hk
+      rw [h] at this
+      exact Nat.eq_zero_of_zero_dvd this)
+  have e
+      : (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.map (mulBy b) = m.range.map incl := by
     rw [frame_one_eq]
     ext x
     constructor
@@ -94,12 +94,17 @@ theorem relIndex_mulBy_ne_zero {b : 𝓞 L} (hb : b ≠ 0) :
     AddSubgroup.relIndex_top_right]
   exact hm
 
-theorem exists_clearing (T : FinitePlace L → Matrix (Fin n) (Fin n) L)
-    (hS : {v : FinitePlace L | ¬ UnitAt v (T v)}.Finite) :
-    ∃ a : 𝓞 L, a ≠ 0 ∧ ∀ (w : FinitePlace L) (i j : Fin n), w ((a : L) * T w i j) ≤ 1 ∧ w ((a : L) * (T w)⁻¹ i j) ≤ 1 := by
+theorem exists_clearing
+    (T : FinitePlace L → Matrix (Fin n) (Fin n) L)
+    (hS : {v : FinitePlace L | ¬ UnitAt v (T v)}.Finite)
+    : ∃ a : 𝓞 L,
+      a ≠ 0
+        ∧ ∀ (w : FinitePlace L) (i j : Fin n),
+          w ((a : L) * T w i j) ≤ 1 ∧ w ((a : L) * (T w)⁻¹ i j) ≤ 1 := by
   classical
-  let s : Finset L := hS.toFinset.biUnion fun w =>
-    (Finset.univ : Finset (Fin n × Fin n)).biUnion fun p => {T w p.1 p.2, (T w)⁻¹ p.1 p.2}
+  let s : Finset L :=
+    hS.toFinset.biUnion fun w =>
+      (Finset.univ : Finset (Fin n × Fin n)).biUnion fun p => {T w p.1 p.2, (T w)⁻¹ p.1 p.2}
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 L)) s
   have hint : ∀ x ∈ s, ∀ w : FinitePlace L, w (((b : 𝓞 L) : L) * x) ≤ 1 := by
     intro x hx w
@@ -111,19 +116,24 @@ theorem exists_clearing (T : FinitePlace L → Matrix (Fin n) (Fin n) L)
     exact place_int_le_one w r
   refine ⟨b, nonZeroDivisors.ne_zero b.2, fun w i j => ?_⟩
   by_cases hw : UnitAt w (T w)
-  · exact ⟨place_mul_le_one w (place_int_le_one w _) (hw.1 i j),
-      place_mul_le_one w (place_int_le_one w _) (hw.inv_le_one i j)⟩
+  · exact ⟨
+      place_mul_le_one w (place_int_le_one w _) (hw.1 i j),
+      place_mul_le_one w (place_int_le_one w _) (hw.inv_le_one i j)
+    ⟩
   · have hwS : w ∈ hS.toFinset := by simpa using hw
     constructor
-    · refine hint _ (Finset.mem_biUnion.2 ⟨w, hwS, Finset.mem_biUnion.2 ⟨(i, j), Finset.mem_univ _, ?_⟩⟩) w
+    · refine hint _
+        (Finset.mem_biUnion.2 ⟨w, hwS, Finset.mem_biUnion.2 ⟨(i, j), Finset.mem_univ _, ?_⟩⟩) w
       simp
-    · refine hint _ (Finset.mem_biUnion.2 ⟨w, hwS, Finset.mem_biUnion.2 ⟨(i, j), Finset.mem_univ _, ?_⟩⟩) w
+    · refine hint _
+        (Finset.mem_biUnion.2 ⟨w, hwS, Finset.mem_biUnion.2 ⟨(i, j), Finset.mem_univ _, ?_⟩⟩) w
       simp
 
-theorem mulBy_frame_le_glued (T : FinitePlace L → Matrix (Fin n) (Fin n) L)
-    (hT : ∀ v, (T v).det ≠ 0) {a : 𝓞 L}
-    (ha : ∀ (w : FinitePlace L) (i j : Fin n), w ((a : L) * (T w)⁻¹ i j) ≤ 1) :
-    (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.map (mulBy a) ≤ (glued T).toAddSubgroup := by
+theorem mulBy_frame_le_glued
+    (T : FinitePlace L → Matrix (Fin n) (Fin n) L) (hT : ∀ v, (T v).det ≠ 0)
+    {a : 𝓞 L} (ha : ∀ (w : FinitePlace L) (i j : Fin n), w ((a : L) * (T w)⁻¹ i j) ≤ 1)
+    : (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.map (mulBy a)
+      ≤ (glued T).toAddSubgroup := by
   rintro _ ⟨x, hx, rfl⟩
   have hx' : x ∈ frame (1 : Matrix (Fin n) (Fin n) L) := hx
   obtain hxi := mem_frame_one.1 hx'
@@ -141,9 +151,11 @@ theorem mulBy_frame_le_glued (T : FinitePlace L → Matrix (Fin n) (Fin n) L)
     funext i
     simp [mulBy_apply]
 
-theorem mulBy_glued_le_frame (T : FinitePlace L → Matrix (Fin n) (Fin n) L) {a : 𝓞 L}
-    (ha : ∀ (w : FinitePlace L) (i j : Fin n), w ((a : L) * T w i j) ≤ 1) :
-    (glued T).toAddSubgroup.map (mulBy a) ≤ (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup := by
+theorem mulBy_glued_le_frame
+    (T : FinitePlace L → Matrix (Fin n) (Fin n) L)
+    {a : 𝓞 L} (ha : ∀ (w : FinitePlace L) (i j : Fin n), w ((a : L) * T w i j) ≤ 1)
+    : (glued T).toAddSubgroup.map (mulBy a)
+      ≤ (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup := by
   rintro _ ⟨x, hx, rfl⟩
   have hx' : x ∈ glued T := hx
   show mulBy a x ∈ frame (1 : Matrix (Fin n) (Fin n) L)
@@ -156,11 +168,13 @@ theorem mulBy_glued_le_frame (T : FinitePlace L → Matrix (Fin n) (Fin n) L) {a
   rw [← mul_assoc]
   exact place_mul_le_one w (ha w i j) (hy j)
 
-theorem glued_commensurable (L : Type) [Field L] [NumberField L] (n : ℕ)
-    (T : FinitePlace L → Matrix (Fin n) (Fin n) L) (hT : ∀ v, (T v).det ≠ 0)
-    (hS : {v : FinitePlace L | ¬ UnitAt v (T v)}.Finite) :
-    (glued T).toAddSubgroup.relIndex (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup ≠ 0 ∧
-      (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.relIndex (glued T).toAddSubgroup ≠ 0 := by
+theorem glued_commensurable
+    (L : Type) [Field L] [NumberField L]
+    (n : ℕ) (T : FinitePlace L → Matrix (Fin n) (Fin n) L)
+    (hT : ∀ v, (T v).det ≠ 0) (hS : {v : FinitePlace L | ¬ UnitAt v (T v)}.Finite)
+    : (glued T).toAddSubgroup.relIndex (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup ≠ 0
+      ∧ (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup.relIndex (glued T).toAddSubgroup
+        ≠ 0 := by
   obtain ⟨a, ha0, ha⟩ := exists_clearing T hS
   set F := (frame (1 : Matrix (Fin n) (Fin n) L)).toAddSubgroup with hF
   set G := (glued T).toAddSubgroup with hG
@@ -181,8 +195,8 @@ theorem glued_commensurable (L : Type) [Field L] [NumberField L] (n : ℕ)
     rw [h] at this
     exact i1 (Nat.eq_zero_of_zero_dvd this)
   · have i3 : ((F.map (mulBy a)).map (mulBy a)).relIndex (G.map (mulBy a)) ≠ 0 :=
-      AddSubgroup.relIndex_ne_zero_trans i2 (by
-        rw [AddSubgroup.relIndex_eq_one.2 h2]; exact one_ne_zero)
+      AddSubgroup.relIndex_ne_zero_trans i2
+        (by rw [AddSubgroup.relIndex_eq_one.2 h2]; exact one_ne_zero)
     rw [AddSubgroup.relIndex_map_map_of_injective _ _ (mulBy_injective ha0)] at i3
     intro h
     have := AddSubgroup.relIndex_dvd_of_le_left G (show F.map (mulBy a) ≤ F from ?_)

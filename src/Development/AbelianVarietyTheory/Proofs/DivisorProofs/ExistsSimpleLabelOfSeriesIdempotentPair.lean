@@ -9,14 +9,18 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.IrreducibleChara
 
 @[expose] public section
 
-open CategoryTheory Polynomial Formalism.IrreducibleCountingLemmas.TYPES Formalism.BasicNotions Formalism.L2.DIV
+open CategoryTheory Polynomial Formalism.IrreducibleCountingLemmas.TYPES Formalism.BasicNotions
+  Formalism.L2.DIV
 
 noncomputable section
 
 namespace GlobalTheory.SeriesIdem
 
-theorem zIdem_pair_ne_zero {G : Type} [Group G] [Fintype G] (τ W : FDRep ℂ G) [Simple τ] [Simple W]
-    (h : ∑ x, (zIdem τ).coeff x * W.character x ≠ 0) : Nonempty (W ≅ τ) := by
+theorem zIdem_pair_ne_zero
+    {G : Type} [Group G] [Fintype G]
+    (τ W : FDRep ℂ G) [Simple τ] [Simple W]
+    (h : ∑ x, (zIdem τ).coeff x * W.character x ≠ 0)
+    : Nonempty (W ≅ τ) := by
   classical
   have hcard : (Fintype.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
   haveI := invertibleOfNonzero hcard
@@ -28,22 +32,29 @@ theorem zIdem_pair_ne_zero {G : Type} [Group G] [Fintype G] (τ W : FDRep ℂ G)
     rcases mul_eq_zero.mp ho with h0 | h0
     · exact absurd h0 (inv_ne_zero (Nat.cast_ne_zero.mpr Nat.card_pos.ne'))
     · exact h0
-  calc ∑ x, (zIdem τ).coeff x * W.character x
-      = (Module.finrank ℂ τ : ℂ) / Fintype.card G * ∑ g, W.character g * τ.character g⁻¹ := by
-        rw [Finset.mul_sum]
-        refine Finset.sum_congr rfl fun x _ => ?_
-        rw [zIdem_coeff]
-        simp only [FDRep.character]
-        ring
+  calc
+    ∑ x, (zIdem τ).coeff x * W.character x
+        = (Module.finrank ℂ τ : ℂ) / Fintype.card G * ∑ g, W.character g * τ.character g⁻¹ := by
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl fun x _ => ?_
+      rw [zIdem_coeff]
+      simp only [FDRep.character]
+      ring
     _ = 0 := by rw [hs, mul_zero]
 
 end GlobalTheory.SeriesIdem
 
 open GlobalTheory.SeriesIdem in
-theorem GlobalTheory.SeriesIdem.exists_simple_of_eSerO_pair : ∀ (g : ℕ) [Fact g.Prime] (C : LabelConv (ZMod g)) (O : LabelMap (ZMod g) C) (r : ℕ) (f : (ZMod g)[X]) (ψ : GL (Fin r) (ZMod g) → ℂ), Formalism.L2.NT.IsIrrChar ψ → ∑ x, (Formalism.L2.NT.eSerO O r f).coeff x * ψ x = ψ 1 → ∃ τ : FDRep ℂ (GL (Fin r) (ZMod g)), Simple τ ∧ HasLabelO O τ f ∧ ∀ x, τ.character x = ψ x := by
+theorem GlobalTheory.SeriesIdem.exists_simple_of_eSerO_pair
+    : ∀ (g : ℕ) [Fact g.Prime] (C : LabelConv (ZMod g)) (O : LabelMap (ZMod g) C) (r : ℕ)
+        (f : (ZMod g)[X]) (ψ : GL (Fin r) (ZMod g) → ℂ),
+      Formalism.L2.NT.IsIrrChar ψ → ∑ x, (Formalism.L2.NT.eSerO O r f).coeff x * ψ x = ψ 1
+        → ∃ τ : FDRep ℂ (GL (Fin r) (ZMod g)),
+          Simple τ ∧ HasLabelO O τ f ∧ ∀ x, τ.character x = ψ x := by
   intro g _ C O r f ψ hψ hsum
   classical
-  obtain ⟨W, hWs, rfl⟩ := (PI.SerBridgeGLW.irrCharIff_of PI.SerBridgeGLW.conjugate_character_formula _ ψ).1 hψ
+  obtain ⟨W, hWs, rfl⟩ :=
+    (PI.SerBridgeGLW.irrCharIff_of PI.SerBridgeGLW.conjugate_character_formula _ ψ).1 hψ
   haveI := hWs
   by_contra hno
   push_neg at hno
@@ -61,9 +72,10 @@ theorem GlobalTheory.SeriesIdem.exists_simple_of_eSerO_pair : ∀ (g : ℕ) [Fac
   apply h1
   rw [← hsum]
 
-  have hz : ∀ z : MonoidAlgebra ℂ (GL (Fin r) (ZMod g)),
-      (∃ τ : FDRep ℂ (GL (Fin r) (ZMod g)), Simple τ ∧ zIdem τ = z ∧ HasLabelO O τ f) →
-      ∑ x, z.coeff x * W.character x = 0 := by
+  have hz
+      : ∀ z : MonoidAlgebra ℂ (GL (Fin r) (ZMod g)),
+        (∃ τ : FDRep ℂ (GL (Fin r) (ZMod g)), Simple τ ∧ zIdem τ = z ∧ HasLabelO O τ f)
+          → ∑ x, z.coeff x * W.character x = 0 := by
     rintro z ⟨τ, hτs, rfl, hτl⟩
     haveI := hτs
     by_contra hne
@@ -75,8 +87,9 @@ theorem GlobalTheory.SeriesIdem.exists_simple_of_eSerO_pair : ∀ (g : ℕ) [Fac
     ∑ᶠ (_ : ∃ τ : FDRep ℂ (GL (Fin r) (ZMod g)), Simple τ ∧ zIdem τ = z ∧ HasLabelO O τ f), z with hF
   by_cases hfin : (Function.support F).Finite
   · rw [finsum_eq_sum F hfin]
-    have hsplit : ∑ x, (∑ z ∈ hfin.toFinset, F z).coeff x * W.character x =
-        ∑ z ∈ hfin.toFinset, ∑ x, (F z).coeff x * W.character x := by
+    have hsplit
+        : ∑ x, (∑ z ∈ hfin.toFinset, F z).coeff x * W.character x
+          = ∑ z ∈ hfin.toFinset, ∑ x, (F z).coeff x * W.character x := by
       simp only [MonoidAlgebra.coeff_sum, Finset.sum_apply', Finset.sum_mul]
       exact Finset.sum_comm
     rw [hsplit]

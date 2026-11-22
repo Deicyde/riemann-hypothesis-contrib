@@ -22,8 +22,11 @@ theorem eval_sS (t : ℕ → ℂ) (m N : ℕ) : (sS t m N).eval (m : ℂ) = (-1)
     simp only [eval_mul, eval_C, eval_pow, eval_sub, eval_X, sub_self]
     rw [zero_pow (by omega), mul_zero]
 
-theorem eq_of_defect (m : ℕ) (t t' : ℕ → ℂ) (Q : ℂ[X]) (hQ : Q.natDegree = m + 1)
-    (h : ∀ N, (defect t m N Q).natDegree ≤ m) (h' : ∀ N, (defect t' m N Q).natDegree ≤ m) (k : ℕ) : t k = t' k := by
+theorem eq_of_defect
+    (m : ℕ) (t t' : ℕ → ℂ) (Q : ℂ[X]) (hQ : Q.natDegree = m + 1)
+    (h : ∀ N, (defect t m N Q).natDegree ≤ m) (h' : ∀ N, (defect t' m N Q).natDegree ≤ m)
+    (k : ℕ)
+    : t k = t' k := by
   have hQ0 : Q ≠ 0 := by intro e; rw [e, natDegree_zero] at hQ; omega
   have hS : sS t m k = sS t' m k := by
     have e : defect t m k Q - defect t' m k Q = Q * (sS t' m k - sS t m k) := by
@@ -39,7 +42,8 @@ theorem eq_of_defect (m : ℕ) (t t' : ℕ → ℂ) (Q : ℂ[X]) (hQ : Q.natDegr
   have hu : ((-1 : ℂ) ^ k) ≠ 0 := pow_ne_zero _ (by norm_num)
   exact mul_left_cancel₀ hu e
 
-theorem exists_enum (s : Multiset ℂ) : ∀ n, Multiset.card s = n → ∃ r : Fin n → ℂ, Multiset.map r univ.val = s := by
+theorem exists_enum (s : Multiset ℂ)
+    : ∀ n, Multiset.card s = n → ∃ r : Fin n → ℂ, Multiset.map r univ.val = s := by
   induction s using Multiset.induction_on with
   | empty =>
     intro n hn
@@ -55,16 +59,18 @@ theorem exists_enum (s : Multiset ℂ) : ∀ n, Multiset.card s = n → ∃ r : 
     conv_rhs => rw [← hr]
     simp [Fin.univ_succ, Multiset.map_map, Function.comp_def]
 
-theorem exists_gelf (V : Type) [AddCommGroup V] [Module ℂ V] (m : ℕ) (M : Fin (m + 1) → Fin (m + 1) → Module.End ℂ V)
-    (hM : Formalism.REAL.GlRel M) (v : V) (hv : v ≠ 0) (t : ℕ → ℂ) (ht : ∀ k, Formalism.REAL.etr M k v = t k • v) :
-    ∃ χ : Fin (m + 1) → ℂ, ∀ k, GlobalTheory.Dec.gelfVal χ k = t k := by
+theorem exists_gelf
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (m : ℕ) (M : Fin (m + 1) → Fin (m + 1) → Module.End ℂ V) (hM : Formalism.REAL.GlRel M)
+    (v : V) (hv : v ≠ 0)
+    (t : ℕ → ℂ) (ht : ∀ k, Formalism.REAL.etr M k v = t k • v)
+    : ∃ χ : Fin (m + 1) → ℂ, ∀ k, GlobalTheory.Dec.gelfVal χ k = t k := by
   obtain ⟨f₀, hf₀⟩ : ∃ f : Module.Dual ℂ V, f v ≠ 0 := by
     by_contra hc
     push Not at hc
     exact hv ((Module.forall_dual_apply_eq_zero_iff ℂ v).mp hc)
   set f : Module.Dual ℂ V := (f₀ v)⁻¹ • f₀ with hfd
-  have hf : f v = 1 := by
-    rw [hfd, LinearMap.smul_apply, smul_eq_mul, inv_mul_cancel₀ hf₀]
+  have hf : f v = 1 := by rw [hfd, LinearMap.smul_apply, smul_eq_mul, inv_mul_cancel₀ hf₀]
   obtain ⟨c, hc1, hc⟩ := GlobalTheory.T.exists_monic_poly_eq_qdet (Module.End ℂ V) (m + 1) M
   set Q := GlobalTheory.CapelliNewton.polyOf (m + 1) c f v with hQd
   have hQ : ∀ u : ℂ, Q.eval u = f (Formalism.REAL.qdet M u v) := fun u => by
@@ -75,10 +81,8 @@ theorem exists_gelf (V : Type) [AddCommGroup V] [Module ℂ V] (m : ℕ) (M : Fi
   have hQn : Q.natDegree = m + 1 :=
     le_antisymm (GlobalTheory.CapelliNewton.polyOf_natDegree _ _ _ _)
       (le_natDegree_of_ne_zero (by rw [hQc]; exact one_ne_zero))
-  have hQm : Q.Monic := by
-    rw [Monic, leadingCoeff, hQn, hQc]
-  have hcard : Multiset.card Q.roots = m + 1 := by
-    rw [IsAlgClosed.card_roots_eq_natDegree, hQn]
+  have hQm : Q.Monic := by rw [Monic, leadingCoeff, hQn, hQc]
+  have hcard : Multiset.card Q.roots = m + 1 := by rw [IsAlgClosed.card_roots_eq_natDegree, hQn]
   have hprod : (Q.roots.map fun a => X - Polynomial.C a).prod = Q :=
     prod_multiset_X_sub_C_of_monic_of_roots_card_eq hQm (by rw [hcard, hQn])
   obtain ⟨r, hr⟩ := exists_enum Q.roots (m + 1) hcard
@@ -90,7 +94,9 @@ theorem exists_gelf (V : Type) [AddCommGroup V] [Module ℂ V] (m : ℕ) (M : Fi
     refine Multiset.map_congr rfl fun s _ => ?_
     simp only [Function.comp_apply, map_sub]
     ring
-  have h1 : ∀ N, (defect (GlobalTheory.Dec.gelfVal fun s => (m : ℂ) / 2 - r s) m N Q).natDegree ≤ m := by
+  have h1
+      : ∀ N,
+        (defect (GlobalTheory.Dec.gelfVal fun s => (m : ℂ) / 2 - r s) m N Q).natDegree ≤ m := by
     intro N
     have := natDegree_defect_gelf m (fun s => (m : ℂ) / 2 - r s) N
     rwa [hcq] at this

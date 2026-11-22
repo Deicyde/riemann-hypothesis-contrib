@@ -20,13 +20,17 @@ theorem schurYOff_of : OffClrRed → VdmSplit → SchurYOff := by
     have hij : i < j := by simpa using hj
     simpa using (hu i j (ne_of_gt hij)).neg
   apply hv.mul_right_cancel
-  have hR : sch lam g * (∑ i, y ^ (∑ k ∈ univ.erase i, lam k + (i : ℕ))) * vdm g =
-      sch lam g * vdm g * ∑ i, y ^ (∑ k ∈ univ.erase i, lam k + (i : ℕ)) := by ring
+  have hR
+      : sch lam g * (∑ i, y ^ (∑ k ∈ univ.erase i, lam k + (i : ℕ))) * vdm g
+        = sch lam g * vdm g * ∑ i, y ^ (∑ k ∈ univ.erase i, lam k + (i : ℕ)) := by
+    ring
   rw [hR, ← hOff R n lam g y, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hSplit R n g i]
-  have key : (∏ k ∈ univ.erase i, (g i - y * g k) * Ring.inverse (g i - g k)) *
-      ∏ k ∈ univ.erase i, (g i - g k) = ∏ k ∈ univ.erase i, (g i - y * g k) := by
+  have key
+      : (∏ k ∈ univ.erase i, (g i - y * g k) * Ring.inverse (g i - g k))
+          * ∏ k ∈ univ.erase i, (g i - g k)
+        = ∏ k ∈ univ.erase i, (g i - y * g k) := by
     rw [← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun k hk => ?_
     have hki : k ≠ i := Finset.ne_of_mem_erase hk

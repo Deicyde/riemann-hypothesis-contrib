@@ -8,7 +8,17 @@ public import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
 open Formalism.REAL
 namespace GlobalTheory
 
-theorem hw_component_tensor_dual_standard (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (n : ℕ) (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V) (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (θ : Fin (n + 1) → ℂ) (lam : ℂ) (y : (PiLp 2 (fun _ : Fin (n + 1) => V))) (hEt : ∀ a b y c, Et a b y c = E a b (y c) - if c = b then y a else 0) (hOm : ∀ y a, Om y a = ∑ c, E a c (y c)) (hy : y ≠ 0) (hw : IsHW Et θ y) (hl : Om y = lam • y) : ∃ c, y c ≠ 0 ∧ IsHW E (fun a => θ a + if a = c then 1 else 0) (y c) ∧ lam = θ c + 1 - ((c : ℕ) : ℂ) + (n : ℂ) := by
+theorem hw_component_tensor_dual_standard
+    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+    (n : ℕ) (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V)
+    (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)))
+    (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (θ : Fin (n + 1) → ℂ)
+    (lam : ℂ) (y : (PiLp 2 (fun _ : Fin (n + 1) => V)))
+    (hEt : ∀ a b y c, Et a b y c = E a b (y c) - if c = b then y a else 0)
+    (hOm : ∀ y a, Om y a = ∑ c, E a c (y c)) (hy : y ≠ 0) (hw : IsHW Et θ y) (hl : Om y = lam • y)
+    : ∃ c,
+      y c ≠ 0 ∧ IsHW E (fun a => θ a + if a = c then 1 else 0) (y c)
+        ∧ lam = θ c + 1 - ((c : ℕ) : ℂ) + (n : ℂ) := by
   classical
   have hex : ∃ c, y c ≠ 0 := by
     by_contra h
@@ -44,8 +54,10 @@ theorem hw_component_tensor_dual_standard (V : Type) [NormedAddCommGroup V] [Inn
       exact h.symm
   · have h := hOm y c
     rw [hl, PiLp.smul_apply] at h
-    have hterm : ∀ d, E c d (y d) =
-        ((if d = c then θ c + 1 else 0) + (if c < d then (1 : ℂ) else 0)) • y c := by
+    have hterm
+        : ∀ d,
+          E c d (y d)
+            = ((if d = c then θ c + 1 else 0) + (if c < d then (1 : ℂ) else 0)) • y c := by
       intro d
       rcases lt_trichotomy d c with hdc | hdc | hdc
       · simp [hlt d hdc, hdc.ne, hdc.not_gt]
@@ -60,11 +72,13 @@ theorem hw_component_tensor_dual_standard (V : Type) [NormedAddCommGroup V] [Inn
     rw [← Finset.sum_smul] at h
     have h4 := smul_left_injective ℂ hc' h
     simp only [Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true,
-      Finset.sum_boole] at h4
+        Finset.sum_boole]
+      at h4
     have h5 : (Finset.univ.filter (fun d : Fin (n + 1) => c < d)).card = n - c := by
-      have : Finset.univ.filter (fun d : Fin (n + 1) => c < d) = Finset.Ioi c := by
-        ext d; simp
-      rw [this, Fin.card_Ioi]; omega
+      have : Finset.univ.filter (fun d : Fin (n + 1) => c < d) = Finset.Ioi c := by ext d; simp
+      rw [this, Fin.card_Ioi]
+      omega
     rw [h5, Nat.cast_sub (Nat.lt_succ_iff.mp c.2)] at h4
-    rw [h4]; ring
+    rw [h4]
+    ring
 end GlobalTheory

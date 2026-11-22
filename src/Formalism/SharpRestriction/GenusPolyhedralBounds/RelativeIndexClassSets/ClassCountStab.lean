@@ -34,14 +34,15 @@ namespace Formalism.MainNotions.Gaps.CC.Stab
 
 open Formalism.UG Formalism.UG.CS
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {n : Type} [Fintype n] [DecidableEq n]
 
 theorem exists_place_two : ∃ v : HeightOneSpectrum (𝓞 F), ((2 : ℕ) : 𝓞 F) ∈ v.asIdeal := by
   have hp : Nat.Prime 2 := Nat.prime_two
   have hpZ : Prime ((2 : ℕ) : ℤ) := Nat.prime_iff_prime_int.1 hp
-  obtain ⟨Q, hQ, hov⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 F)
-    (Ideal.span {((2 : ℕ) : ℤ)})
+  obtain ⟨Q, hQ, hov⟩ :=
+    Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 F) (Ideal.span {((2 : ℕ) : ℤ)})
   have hmem : ((2 : ℕ) : 𝓞 F) ∈ Q := by
     have : ((2 : ℕ) : ℤ) ∈ Q.under ℤ := by rw [← hov.over]; exact Ideal.mem_span_singleton_self _
     simpa using this
@@ -56,26 +57,18 @@ instance finiteAdeleRing_nontrivial : Nontrivial (FiniteAdeleRing (𝓞 F) F) :=
 
 section Herm
 
-variable [StarRing E] (σ : E →ₐ[F] E) (hσ : ∀ e, σ e = star e)
-  (h : (n → E) →ₗ⋆[E] (n → E) →ₗ[E] E)
-
-
-
-
-
-
+variable [StarRing E] (σ : E →ₐ[F] E) (hσ : ∀ e, σ e = star e) (h : (n → E) →ₗ⋆[E] (n → E) →ₗ[E] E)
 
 section Mass
 
-variable (hsymm : h.IsSymm) (hpos : ∀ x : n → E, x ≠ 0 → 0 < Algebra.trace ℚ E (h x x))
+variable
+  (hsymm : h.IsSymm) (hpos : ∀ x : n → E, x ≠ 0 → 0 < Algebra.trace ℚ E (h x x))
   (Λ : Submodule (𝓞 E) (n → E)) (hΛ : Submodule.IsLattice E Λ)
-  (hIn : ∀ g ∈ UPts σ (Formalism.UG.gram h) (FiniteAdeleRing (𝓞 F) F), globLat g Λ ∈ Formalism.HermitianLatticesTheory.genus h Λ)
-  (hSurj : ∀ M ∈ Formalism.HermitianLatticesTheory.genus h Λ, ∃ g ∈ UPts σ (Formalism.UG.gram h) (FiniteAdeleRing (𝓞 F) F), globLat g Λ = M)
-
-
-
-
-
+  (hIn : ∀ g ∈ UPts σ (Formalism.UG.gram h) (FiniteAdeleRing (𝓞 F) F),
+    globLat g Λ ∈ Formalism.HermitianLatticesTheory.genus h Λ)
+  (hSurj : ∀ M ∈ Formalism.HermitianLatticesTheory.genus h Λ,
+    ∃ g ∈ UPts σ (Formalism.UG.gram h) (FiniteAdeleRing (𝓞 F) F),
+      globLat g Λ = M)
 
 end Mass
 
@@ -87,12 +80,7 @@ open Formalism.MainNotions.StandardLattice
 
 variable {k : ℕ} [StarRing E] (σ : E →ₐ[F] E) (hσ : ∀ e, σ e = star e)
 
-
 variable (hc : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a))
-
-
-
-
 
 end Std
 

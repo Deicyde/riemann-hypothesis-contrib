@@ -18,43 +18,42 @@ namespace ClosedPointAffineChart
 
 variable {T : Type} [Fintype T] {K' : Type} [Field K'] (y : (Σ _ : Unit, T) → K')
 
-
 omit [Fintype T] in
 theorem ratio_mem (t u : T) : y ⟨(), u⟩ / y ⟨(), t⟩ ∈ chartRingZ y (fun _ => t) :=
   Algebra.subset_adjoin ⟨⟨(), u⟩, rfl⟩
 
-
 omit [Fintype T] in
-theorem mem_chart_of_mem_curveRing {b : K'} (hb : b ∈ curveRing y) (t : T) (ht : y ⟨(), t⟩ ≠ 0) :
-    b ∈ chartRingZ y (fun _ => t) :=
+theorem mem_chart_of_mem_curveRing {b : K'} (hb : b ∈ curveRing y) (t : T) (ht : y ⟨(), t⟩ ≠ 0)
+    : b ∈ chartRingZ y (fun _ => t) :=
   mem_curveRing.mp hb (fun _ => t) (fun _ => ht)
 
-
 omit [Fintype T] in
-theorem mem_curveRing_of_forall {b : K'}
-    (h : ∀ t : T, y ⟨(), t⟩ ≠ 0 → b ∈ chartRingZ y (fun _ => t)) : b ∈ curveRing y := by
+theorem mem_curveRing_of_forall
+    {b : K'} (h : ∀ t : T, y ⟨(), t⟩ ≠ 0 → b ∈ chartRingZ y (fun _ => t))
+    : b ∈ curveRing y := by
   rw [mem_curveRing]
   intro c hc
   have hc' : c = fun _ => c () := funext fun u => by cases u; rfl
   have h1 := h (c ()) (hc ())
   rwa [← hc'] at h1
 
-
 omit [Fintype T] in
-theorem div_pow_mem_of_mem_chartLat {e : ℕ} {g : K'} (hg : g ∈ chartLat y 1 e) (t : T)
-    (ht : y ⟨(), t⟩ ≠ 0) : g / y ⟨(), t⟩ ^ e ∈ chartRingZ y (fun _ => t) := by
+theorem div_pow_mem_of_mem_chartLat
+    {e : ℕ} {g : K'} (hg : g ∈ chartLat y 1 e) (t : T) (ht : y ⟨(), t⟩ ≠ 0)
+    : g / y ⟨(), t⟩ ^ e ∈ chartRingZ y (fun _ => t) := by
   have h : g * ∏ k : Unit, y ⟨k, t⟩ ^ (-((e : ℤ) * (1 : Unit → ℤ) k)) ∈ chartRingZ y (fun _ => t) :=
     hg (fun _ => t) (fun _ => ht)
   simpa [zpow_neg, zpow_natCast, div_eq_mul_inv] using h
 
-
 omit [Fintype T] in
-theorem exists_mul_inv_mem {m : Ideal (curveRing y)} [m.IsPrime] {e : ℕ} {g : K'} (hg0 : g ≠ 0)
-    (hgL : g ∈ chartLat y 1 e)
-    (hW : ∀ W : ValuationSubring K', (∀ b : curveRing y, (b : K') ∈ W) →
-      (∀ b : curveRing y, b ∉ m → W.valuation (b : K') = 1) → ∀ u : T, y ⟨(), u⟩ ^ e / g ∈ W)
-    (t : T) (ht : y ⟨(), t⟩ ≠ 0) :
-    ∃ s : curveRing y, s ∉ m ∧ (s : K') * (y ⟨(), t⟩ ^ e / g) ∈ chartRingZ y (fun _ => t) := by
+theorem exists_mul_inv_mem
+    {m : Ideal (curveRing y)} [m.IsPrime]
+    {e : ℕ} {g : K'} (hg0 : g ≠ 0) (hgL : g ∈ chartLat y 1 e)
+    (hW : ∀ W : ValuationSubring K',
+      (∀ b : curveRing y, (b : K') ∈ W) → (∀ b : curveRing y, b ∉ m → W.valuation (b : K') = 1)
+        → ∀ u : T, y ⟨(), u⟩ ^ e / g ∈ W)
+    (t : T) (ht : y ⟨(), t⟩ ≠ 0)
+    : ∃ s : curveRing y, s ∉ m ∧ (s : K') * (y ⟨(), t⟩ ^ e / g) ∈ chartRingZ y (fun _ => t) := by
   by_contra hcon
   push Not at hcon
   let R : Subring K' := (chartRingZ y (fun _ => t)).toSubring
@@ -91,16 +90,19 @@ theorem exists_mul_inv_mem {m : Ideal (curveRing y)} [m.IsPrime] {e : ℕ} {g : 
     lt_of_le_of_lt (mul_le_of_le_one_right' h5) h2
   exact ne_of_lt h6 h4
 
-theorem exists_mul_div_mem_curveRing {m : Ideal (curveRing y)} (hm : m.IsMaximal) {e : ℕ} {g : K'}
-    (hg0 : g ≠ 0) (hgL : g ∈ chartLat y 1 e)
-    (hW : ∀ W : ValuationSubring K', (∀ b : curveRing y, (b : K') ∈ W) →
-      (∀ b : curveRing y, b ∉ m → W.valuation (b : K') = 1) → ∀ u : T, y ⟨(), u⟩ ^ e / g ∈ W)
-    {h : K'} (hh : ∀ t : T, y ⟨(), t⟩ ≠ 0 → h / y ⟨(), t⟩ ^ e ∈ chartRingZ y (fun _ => t)) :
-    ∃ s : curveRing y, s ∉ m ∧ (s : K') * (h / g) ∈ curveRing y := by
+theorem exists_mul_div_mem_curveRing
+    {m : Ideal (curveRing y)} (hm : m.IsMaximal)
+    {e : ℕ} {g : K'} (hg0 : g ≠ 0) (hgL : g ∈ chartLat y 1 e)
+    (hW : ∀ W : ValuationSubring K',
+      (∀ b : curveRing y, (b : K') ∈ W) → (∀ b : curveRing y, b ∉ m → W.valuation (b : K') = 1)
+        → ∀ u : T, y ⟨(), u⟩ ^ e / g ∈ W)
+    {h : K'} (hh : ∀ t : T, y ⟨(), t⟩ ≠ 0 → h / y ⟨(), t⟩ ^ e ∈ chartRingZ y (fun _ => t))
+    : ∃ s : curveRing y, s ∉ m ∧ (s : K') * (h / g) ∈ curveRing y := by
   classical
   have := hm.isPrime
-  have key : ∀ t : T, ∃ s : curveRing y, s ∉ m ∧
-      (y ⟨(), t⟩ ≠ 0 → (s : K') * (h / g) ∈ chartRingZ y (fun _ => t)) := by
+  have key
+      : ∀ t : T, ∃ s : curveRing y,
+        s ∉ m ∧ (y ⟨(), t⟩ ≠ 0 → (s : K') * (h / g) ∈ chartRingZ y (fun _ => t)) := by
     intro t
     by_cases ht : y ⟨(), t⟩ = 0
     · exact ⟨1, fun h1 => hm.ne_top ((Ideal.eq_top_iff_one _).mpr h1), fun h' => (h' ht).elim⟩
@@ -116,8 +118,9 @@ theorem exists_mul_div_mem_curveRing {m : Ideal (curveRing y)} (hm : m.IsMaximal
     exact hSm t ht
   · apply mem_curveRing_of_forall
     intro t ht
-    have e1 : ((∏ u, S u : curveRing y) : K') * (h / g) =
-        (∏ u ∈ Finset.univ.erase t, (S u : K')) * ((S t : K') * (h / g)) := by
+    have e1
+        : ((∏ u, S u : curveRing y) : K') * (h / g)
+          = (∏ u ∈ Finset.univ.erase t, (S u : K')) * ((S t : K') * (h / g)) := by
       push_cast
       rw [← Finset.mul_prod_erase Finset.univ (fun u => (S u : K')) (Finset.mem_univ t)]
       ring
@@ -126,14 +129,15 @@ theorem exists_mul_div_mem_curveRing {m : Ideal (curveRing y)} (hm : m.IsMaximal
 
 end ClosedPointAffineChart
 
-theorem ClosedPointChart.proof (hU : ClosedPointUnitSection.Statement) : ClosedPointChart.Statement := by
+theorem ClosedPointChart.proof (hU : ClosedPointUnitSection.Statement)
+    : ClosedPointChart.Statement := by
   intro T _ K' _ _ y hy m hm
   obtain ⟨e, g, he, hg0, hgL, hW⟩ := hU T K' y hy m hm
   have := hm.isPrime
   obtain ⟨W, hBW, hBunit, hBlt⟩ := ClosedPointUnitSection.exists_valuationSubring (curveRing y) m
   obtain ⟨t0, ht0⟩ := CurveAffineCharts.exists_chart y hy
-  obtain ⟨t, -, ht⟩ := Finset.exists_max_image Finset.univ (fun u => W.valuation (y ⟨(), u⟩))
-    ⟨t0, Finset.mem_univ _⟩
+  obtain ⟨t, -, ht⟩ :=
+    Finset.exists_max_image Finset.univ (fun u => W.valuation (y ⟨(), u⟩)) ⟨t0, Finset.mem_univ _⟩
   have hyt : y ⟨(), t⟩ ≠ 0 := by
     intro h0
     have h1 := ht t0 (Finset.mem_univ _)
@@ -159,8 +163,8 @@ theorem ClosedPointChart.proof (hU : ClosedPointUnitSection.Statement) : ClosedP
     hchartW _ (ClosedPointAffineChart.div_pow_mem_of_mem_chartLat y hgL t hyt)
   have hval : W.valuation (y ⟨(), t⟩ ^ e / g) = 1 := by
     have h1 : W.valuation (y ⟨(), t⟩ ^ e / g) * W.valuation (g / y ⟨(), t⟩ ^ e) = 1 := by
-      rw [← map_mul, show y ⟨(), t⟩ ^ e / g * (g / y ⟨(), t⟩ ^ e) = 1 by
-        field_simp [pow_ne_zero e hyt]]
+      rw [← map_mul,
+        show y ⟨(), t⟩ ^ e / g * (g / y ⟨(), t⟩ ^ e) = 1 by field_simp [pow_ne_zero e hyt]]
       exact map_one _
     have h2 := (W.valuation_le_one_iff _).mpr hinv
     have h3 := (W.valuation_le_one_iff _).mpr hgt
@@ -168,11 +172,14 @@ theorem ClosedPointChart.proof (hU : ClosedPointUnitSection.Statement) : ClosedP
     have h4 : W.valuation (y ⟨(), t⟩ ^ e / g) * W.valuation (g / y ⟨(), t⟩ ^ e) < 1 :=
       lt_of_le_of_lt (mul_le_of_le_one_right' h3) (lt_of_le_of_ne h2 hne)
     exact ne_of_lt h4 h1
-  have hmon : ∀ u t' : T, y ⟨(), t'⟩ ≠ 0 →
-      y ⟨(), u⟩ * y ⟨(), t⟩ ^ (e - 1) / y ⟨(), t'⟩ ^ e ∈ chartRingZ y (fun _ => t') := by
+  have hmon
+      : ∀ u t' : T,
+        y ⟨(), t'⟩ ≠ 0
+          → y ⟨(), u⟩ * y ⟨(), t⟩ ^ (e - 1) / y ⟨(), t'⟩ ^ e ∈ chartRingZ y (fun _ => t') := by
     intro u t' ht'
-    have e1 : y ⟨(), u⟩ * y ⟨(), t⟩ ^ (e - 1) / y ⟨(), t'⟩ ^ e =
-        (y ⟨(), u⟩ / y ⟨(), t'⟩) * (y ⟨(), t⟩ / y ⟨(), t'⟩) ^ (e - 1) := by
+    have e1
+        : y ⟨(), u⟩ * y ⟨(), t⟩ ^ (e - 1) / y ⟨(), t'⟩ ^ e
+          = (y ⟨(), u⟩ / y ⟨(), t'⟩) * (y ⟨(), t⟩ / y ⟨(), t'⟩) ^ (e - 1) := by
       rw [div_pow, div_mul_div_comm, mul_pow_sub_one (by omega : e ≠ 0)]
     rw [e1]
     exact mul_mem (ClosedPointAffineChart.ratio_mem y t' u)

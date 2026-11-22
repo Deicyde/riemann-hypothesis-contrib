@@ -14,7 +14,8 @@ theorem D7.eight_le_f (D : D7) : 8 ≤ D.R.f := by
   unfold Ranks.f Ranks.n
   omega
 
-theorem ParameterChoice'.m_sq_le_k {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) : D.R.m ^ 2 ≤ D.R.k := by
+theorem ParameterChoice'.m_sq_le_k {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
+    : D.R.m ^ 2 ≤ D.R.k := by
   have h1 : (1 : ℝ) ≤ L.sc.L := by
     unfold Scale.L
     exact Real.one_le_rpow L.sc.one_lt_alt.le L.sc.eps_pos.le
@@ -30,13 +31,15 @@ def D7.NodeGap (D : D7) (h : ℝ) : Prop :=
 theorem D7.NodeGap.mono {D : D7} {h h' : ℝ} (H : D.NodeGap h) (hle : h' ≤ h) : D.NodeGap h' :=
   fun u τ j hj => le_trans hle (H u τ j hj)
 
-theorem ParameterChoice'.nodeGap_ge_heightBound {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) : D.NodeGap (LevelStarExponents.h0 L) := by
+theorem ParameterChoice'.nodeGap_ge_heightBound
+    {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
+    : D.NodeGap (LevelStarExponents.h0 L) := by
   intro u τ j hj
   rw [D.hcW_b u τ]
   exact (P.nodes_gap τ j hj).1
 
-theorem ParameterChoice'.nodeGap_ge_cubic_rank {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) :
-    D.NodeGap (4 * (D.R.N D.R.m : ℝ) ^ 3 + 2 * D.R.t + 6) :=
+theorem ParameterChoice'.nodeGap_ge_cubic_rank {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
+    : D.NodeGap (4 * (D.R.N D.R.m : ℝ) ^ 3 + 2 * D.R.t + 6) :=
   P.nodeGap_ge_heightBound.mono P.h0_ge.2.2.2.2.1
 
 end Formalism.BasicNotions

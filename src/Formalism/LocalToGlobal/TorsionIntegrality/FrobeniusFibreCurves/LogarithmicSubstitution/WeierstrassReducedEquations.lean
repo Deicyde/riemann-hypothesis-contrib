@@ -19,8 +19,7 @@ theorem dz_ofNat (n : ℕ) [n.AtLeastTwo] : dz (OfNat.ofNat n : PowerSeries K) =
   rw [show (OfNat.ofNat n : PowerSeries K) = C (OfNat.ofNat n : K) from (map_ofNat C n).symm]
   exact PowerSeries.derivative_C
 
-theorem dz_one : dz (1 : PowerSeries K) = 0 := by
-  exact Derivation.map_one_eq_zero _
+theorem dz_one : dz (1 : PowerSeries K) = 0 := by exact Derivation.map_one_eq_zero _
 
 theorem dz_C (a : K) : dz (C a : PowerSeries K) = 0 := PowerSeries.derivative_C
 
@@ -30,7 +29,7 @@ theorem dz_add (f g : PowerSeries K) : dz (f + g) = dz f + dz g := map_add _ f g
 
 theorem dz_sub (f g : PowerSeries K) : dz (f - g) = dz f - dz g := map_sub _ f g
 
-theorem dz_neg (f : PowerSeries K) : dz (-f) = -dz f := map_neg _ f
+theorem dz_neg (f : PowerSeries K) : dz (-f) = - dz f := map_neg _ f
 
 theorem dz_mul (f g : PowerSeries K) : dz (f * g) = f * dz g + g * dz f := by
   simp only [dz, Derivation.leibniz, smul_eq_mul]
@@ -53,7 +52,8 @@ theorem dz_cube (f : PowerSeries K) : dz (f ^ 3) = 3 * f ^ 2 * dz f := by
   rw [pow_succ, dz_mul, dz_sq]
   ring
 
-theorem dz_X_pow (n : ℕ) : dz ((X : PowerSeries K) ^ (n + 1)) = ((n : PowerSeries K) + 1) * X ^ n := by
+theorem dz_X_pow (n : ℕ)
+    : dz ((X : PowerSeries K) ^ (n + 1)) = ((n : PowerSeries K) + 1) * X ^ n := by
   induction n with
   | zero => simp [dz_X]
   | succ n ih =>
@@ -72,9 +72,10 @@ end Rules
 theorem weierstrassReducedEquations : WpReduced := by
   intro K _ _ g2 g3 P hP
   obtain ⟨_, _, hE⟩ := hP
-  have E1 : X ^ 4 * dz P ^ 2 - 4 * X * dz P =
-      12 * P + 12 * X ^ 2 * P ^ 2 + 4 * X ^ 4 * P ^ 3 - C g2 * X ^ 2 * (1 + X ^ 2 * P) -
-        C g3 * X ^ 4 := by
+  have E1
+      : X ^ 4 * dz P ^ 2 - 4 * X * dz P
+        = 12 * P + 12 * X ^ 2 * P ^ 2 + 4 * X ^ 4 * P ^ 3 - C g2 * X ^ 2 * (1 + X ^ 2 * P)
+          - C g3 * X ^ 4 := by
     apply mul_left_cancel₀ (pow_ne_zero 2 (X_ne (K := K)))
     linear_combination hE
   refine ⟨E1, ?_⟩
@@ -86,13 +87,15 @@ theorem weierstrassReducedEquations : WpReduced := by
   have d4 : dz ((X : PowerSeries K) ^ 4) = 4 * X ^ 3 := by
     rw [show (X : PowerSeries K) ^ 4 = (X ^ 2) ^ 2 by ring, dz_sq, dz_sq, dz_X]
     ring
-  have hdiff : 4 * X ^ 3 * dz P ^ 2 + 2 * X ^ 4 * dz P * dz (dz P) - 4 * dz P - 4 * X * dz (dz P) =
-      12 * dz P + 24 * X * P ^ 2 + 24 * X ^ 2 * P * dz P + 16 * X ^ 3 * P ^ 3 +
-        12 * X ^ 4 * P ^ 2 * dz P - 2 * C (g2 / 2) * (2 * X + 4 * X ^ 3 * P + X ^ 4 * dz P) -
-        4 * C g3 * X ^ 3 := by
+  have hdiff
+      : 4 * X ^ 3 * dz P ^ 2 + 2 * X ^ 4 * dz P * dz (dz P) - 4 * dz P - 4 * X * dz (dz P)
+        = 12 * dz P + 24 * X * P ^ 2 + 24 * X ^ 2 * P * dz P + 16 * X ^ 3 * P ^ 3
+          + 12 * X ^ 4 * P ^ 2 * dz P - 2 * C (g2 / 2) * (2 * X + 4 * X ^ 3 * P + X ^ 4 * dz P)
+          - 4 * C g3 * X ^ 3 := by
     have h := congrArg dz E1
     have c12 : dz (12 : PowerSeries K) = 0 := dz_ofNat 12
-    simp only [dz_add, dz_sub, dz_mul, dz_sq, dz_cube, dz_C, dz_X, dz_two, dz_four, c12, dz_one, d4] at h
+    simp only [dz_add, dz_sub, dz_mul, dz_sq, dz_cube, dz_C, dz_X, dz_two, dz_four, c12, dz_one, d4]
+      at h
     linear_combination h
   refine mul_left_cancel₀ (?_ : (2 * X * (X ^ 3 * dz P - 2) : PowerSeries K) ≠ 0) ?_
   · refine mul_ne_zero (mul_ne_zero two_ne X_ne) (ne_zero_of_constantCoeff ?_)
@@ -139,11 +142,17 @@ theorem shiftedReciprocalInverted : WOfWp := by
 
     have hA : (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 2 * dz (wOf e1 P) = -X * (X ^ 3 * dz P - 2) := by
       linear_combination (1 + X ^ 2 * P - C e1 * X ^ 2) * hd - (2 * X * P + X ^ 2 * dz P - 2 * C e1 * X) * hw
-    have h1 : (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 4 * wOf e1 P = X ^ 2 * (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 3 := by
+    have h1
+        : (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 4 * wOf e1 P
+          = X ^ 2 * (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 3 := by
       linear_combination (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 3 * hw
-    have h2 : (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 4 * wOf e1 P ^ 2 = X ^ 4 * (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 2 := by
+    have h2
+        : (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 4 * wOf e1 P ^ 2
+          = X ^ 4 * (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 2 := by
       linear_combination ((1 + X ^ 2 * P - C e1 * X ^ 2) ^ 3 * wOf e1 P + X ^ 2 * (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 2) * hw
-    have h3 : (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 4 * wOf e1 P ^ 3 = X ^ 6 * (1 + X ^ 2 * P - C e1 * X ^ 2) := by
+    have h3
+        : (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 4 * wOf e1 P ^ 3
+          = X ^ 6 * (1 + X ^ 2 * P - C e1 * X ^ 2) := by
       linear_combination ((1 + X ^ 2 * P - C e1 * X ^ 2) ^ 3 * wOf e1 P ^ 2 + X ^ 2 * (1 + X ^ 2 * P - C e1 * X ^ 2) ^ 2 * wOf e1 P + X ^ 4 * (1 + X ^ 2 * P - C e1 * X ^ 2)) * hw
     have hg4 : (C g2 : PowerSeries K) = 4 * C (g2 / 4) := by
       rw [← map_ofNat C 4, ← map_mul]

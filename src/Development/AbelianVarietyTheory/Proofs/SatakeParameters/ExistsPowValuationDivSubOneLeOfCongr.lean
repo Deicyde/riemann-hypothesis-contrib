@@ -8,18 +8,19 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem exists_pow_valuation_div_sub_one_le :
-    ∀ (E : Type) [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) (c : 𝓞 E), c ≠ 0 →
-      ∀ n : ℕ, ∃ N : ℕ, ∀ k : 𝓞 E, k - c ∈ v.asIdeal ^ N →
-        v.valuation E ((k : E) / (c : E) - 1) ≤ WithZero.exp (-(n : ℤ)) := by
+theorem exists_pow_valuation_div_sub_one_le
+    : ∀ (E : Type) [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) (c : 𝓞 E),
+      c ≠ 0
+        → ∀ n : ℕ, ∃ N : ℕ, ∀ k : 𝓞 E,
+          k - c ∈ v.asIdeal ^ N
+            → v.valuation E ((k : E) / (c : E) - 1) ≤ WithZero.exp (-(n : ℤ)) := by
   intro E _ _ v c hc n
   set e : ℕ := (Associates.mk v.asIdeal).count (Associates.mk (Ideal.span {c})).factors with he
   have hval : v.valuation E (c : E) = WithZero.exp (-(e : ℤ)) := by
     have h := HeightOneSpectrum.valuation_of_algebraMap (K := E) v c
     have h' : v.valuation E (c : E) = v.intValuation c := h
     rw [h', v.intValuation_if_neg hc]
-  have hcE : (c : E) ≠ 0 := by
-    simpa using hc
+  have hcE : (c : E) ≠ 0 := by simpa using hc
   refine ⟨n + e, fun k hk => ?_⟩
   have hle : v.intValuation (k - c) ≤ WithZero.exp (-((n + e : ℕ) : ℤ)) :=
     (v.intValuation_le_pow_iff_mem (k - c) (n + e)).2 hk

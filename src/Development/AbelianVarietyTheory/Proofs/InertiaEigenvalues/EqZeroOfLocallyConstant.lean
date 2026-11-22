@@ -9,30 +9,35 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsG
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory.UnramifiedClasses
 
-theorem eq_zero_of_locallyConstant {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    {A : Type} [AddCommGroup A] (I : Subgroup G) (φ : G)
-    (hgen : (Subgroup.zpowers φ ⊔ I).topologicalClosure = ⊤) (c : G → A)
-    (hlc : IsLocallyConstant c) (hc : ∀ g h, c (g * h) = c g + c h) (hφ : c φ = 0)
-    (hI : ∀ g ∈ I, c g = 0) (g : G) : c g = 0 := by
+theorem eq_zero_of_locallyConstant
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {A : Type} [AddCommGroup A]
+    (I : Subgroup G) (φ : G) (hgen : (Subgroup.zpowers φ ⊔ I).topologicalClosure = ⊤)
+    (c : G → A) (hlc : IsLocallyConstant c) (hc : ∀ g h, c (g * h) = c g + c h) (hφ : c φ = 0)
+    (hI : ∀ g ∈ I, c g = 0)
+    (g : G)
+    : c g = 0 := by
   have h1 : c 1 = 0 := by
     have := hc 1 1
     rw [mul_one] at this
     exact left_eq_add.mp this
-  let H : Subgroup G :=
-    { carrier := {g | c g = 0}
-      mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_ofPred_eq] at ha hb ⊢
-        rw [hc, ha, hb, add_zero]
-      one_mem' := h1
-      inv_mem' := fun {a} ha => by
-        simp only [Set.mem_ofPred_eq] at ha ⊢
-        have := hc a a⁻¹
-        rw [mul_inv_cancel, h1, ha, zero_add] at this
-        exact this.symm }
+  let H : Subgroup G := {
+    carrier := {g | c g = 0}
+    mul_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_ofPred_eq] at ha hb ⊢
+      rw [hc, ha, hb, add_zero]
+    one_mem' := h1
+    inv_mem' := fun {a} ha => by
+      simp only [Set.mem_ofPred_eq] at ha ⊢
+      have := hc a a⁻¹
+      rw [mul_inv_cancel, h1, ha, zero_add] at this
+      exact this.symm
+  }
   have hle : Subgroup.zpowers φ ⊔ I ≤ H :=
     sup_le ((Subgroup.zpowers_le (G := G)).mpr hφ) (fun g hg => hI g hg)
   have hcl : (Subgroup.zpowers φ ⊔ I).topologicalClosure ≤ H :=
@@ -40,28 +45,55 @@ theorem eq_zero_of_locallyConstant {G : Type} [Group G] [TopologicalSpace G] [Is
   rw [hgen] at hcl
   exact hcl (Subgroup.mem_top g)
 
-theorem isLocallyConstant_mkQ {X : Type} [TopologicalSpace X] {O V : Type} [CommRing O]
-    [AddCommGroup V] [Module O V] [TopologicalSpace V] [ContinuousAdd V] (T : Submodule O V)
-    (hT : IsOpen (T : Set V)) (f : X → V) (hf : Continuous f) :
-    IsLocallyConstant (fun x => T.mkQ (f x)) := by
+theorem isLocallyConstant_mkQ
+    {X : Type} [TopologicalSpace X]
+    {O V : Type} [CommRing O] [AddCommGroup V] [Module O V] [TopologicalSpace V] [ContinuousAdd V]
+    (T : Submodule O V) (hT : IsOpen (T : Set V))
+    (f : X → V) (hf : Continuous f)
+    : IsLocallyConstant (fun x => T.mkQ (f x)) := by
   rw [IsLocallyConstant.iff_exists_open]
   intro x
-  refine ⟨(fun y => f y + (-f x)) ⁻¹' (T : Set V),
-    hT.preimage (hf.add continuous_const), by simp, fun y hy => ?_⟩
+  refine ⟨
+    (fun y => f y + (- f x)) ⁻¹' (T : Set V),
+    hT.preimage (hf.add continuous_const),
+    by simp,
+    fun y hy => ?_
+  ⟩
   simp only [Submodule.mkQ_apply]
   rw [Submodule.Quotient.eq, sub_eq_add_neg]
   exact hy
 
-theorem exists_not_mem_range {O LL : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Field LL] [Algebra O LL] [IsFractionRing O LL] :
-    ∃ y : LL, y ∉ Set.range (algebraMap O LL) := by
+theorem exists_not_mem_range
+    {O LL : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field LL] [Algebra O LL]
+    [IsFractionRing O LL]
+    : ∃ y : LL, y ∉ Set.range (algebraMap O LL) := by
   by_contra h
   push Not at h
   apply IsDiscreteValuationRing.not_isField O
-  exact (RingEquiv.ofBijective (algebraMap O LL)
-    ⟨IsFractionRing.injective O LL, h⟩).toMulEquiv.isField (Field.toIsField LL)
+  exact
+    (RingEquiv.ofBijective (algebraMap O LL) ⟨IsFractionRing.injective O LL, h⟩).toMulEquiv.isField
+      (Field.toIsField LL)
 
-theorem HfD_eq_unramified : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] (PD : PeriodData G Qp K₀ K B BdR) [IsTopologicalGroup G] [TopologicalSpace Qp] {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] {O : Type} [CommRing O] [Algebra O LL] [IsTopologicalRing LL], GoodO (Qp := Qp) LL O → ∀ (T : LocLat G Qp LL O), Module.finrank LL T.V = 1 → (∀ g x, T.ρ g x = x) → Module.finrank LL (FiniteCohomology PD T.ρ) = 1 → ∀ (I : Subgroup G) (φ : G), (Subgroup.zpowers φ ⊔ I).topologicalClosure = ⊤ → ∀ δ : G → LL, δ ∈ finiteCocycles PD (1 : Representation LL G LL) → (∀ g ∈ I, δ g = 0) → δ ≠ 0 → HfD PD T.L ≠ ⊥ ∧ ∀ c : G → T.V ⧸ T.L.T, c ∈ HfD PD T.L ↔ (c ∈ divisibleCocycles T.L ∧ ∃ x, ∀ g ∈ I, c g = actD T.L g x - x) := by
+theorem HfD_eq_unramified
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+        [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type}
+        [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+        [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+        [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] (PD : PeriodData G Qp K₀ K B BdR)
+        [IsTopologicalGroup G] [TopologicalSpace Qp] {LL : Type} [Field LL] [Algebra Qp LL]
+        [TopologicalSpace LL] {O : Type} [CommRing O] [Algebra O LL] [IsTopologicalRing LL],
+      GoodO (Qp := Qp) LL O
+        → ∀ (T : LocLat G Qp LL O),
+          Module.finrank LL T.V = 1 → (∀ g x, T.ρ g x = x)
+            → Module.finrank LL (FiniteCohomology PD T.ρ) = 1
+            → ∀ (I : Subgroup G) (φ : G),
+              (Subgroup.zpowers φ ⊔ I).topologicalClosure = ⊤
+                → ∀ δ : G → LL,
+                  δ ∈ finiteCocycles PD (1 : Representation LL G LL) → (∀ g ∈ I, δ g = 0) → δ ≠ 0
+                    → HfD PD T.L ≠ ⊥
+                      ∧ ∀ c : G → T.V ⧸ T.L.T,
+                        c ∈ HfD PD T.L
+                          ↔ (c ∈ divisibleCocycles T.L ∧ ∃ x, ∀ g ∈ I, c g = actD T.L g x - x) := by
   intro G _ _ Qp K₀ K _ _ _ _ _ _ _ B BdR _ _ _ _ _ _ _ _ _ _ _ PD _ _ LL _ _ _ O _ _ _ hO T hV hρ
     hH I φ hgen δ hδ hδI hδ0
   have hopen := GlobalTheory.Cyc.locLat_isOpen hO T
@@ -143,8 +175,7 @@ theorem HfD_eq_unramified : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K�
     exact hc₀c.const_smul a
   have hradd : ∀ a g h, r a (g * h) = r a g + r a h := fun a g h => by
     simp only [r, hδadd, mul_add, map_add (f := _)]
-  have hrI : ∀ a, ∀ g ∈ I, r a g = 0 := fun a g hg => by
-    simp only [r, hδI g hg, mul_zero, map_zero]
+  have hrI : ∀ a, ∀ g ∈ I, r a g = 0 := fun a g hg => by simp only [r, hδI g hg, mul_zero, map_zero]
   have hr₀ : r (y₀ / δ g₀) g₀ ≠ 0 := by
     intro h
     simp only [r, div_mul_cancel₀ _ hg₀, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at h
@@ -160,13 +191,21 @@ theorem HfD_eq_unramified : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K�
   · rw [hHf]
     constructor
     · rintro ⟨a, rfl⟩
-      exact ⟨⟨hrlc a, fun g h => by rw [hact, hradd]⟩, 0, fun g hg => by
-        rw [hrI a g hg, hact, sub_zero]⟩
+      exact ⟨
+        ⟨hrlc a, fun g h => by rw [hact, hradd]⟩,
+        0,
+        fun g hg => by rw [hrI a g hg, hact, sub_zero]
+      ⟩
     · rintro ⟨⟨hlc, hcoc⟩, x, hx⟩
       obtain ⟨v, hv⟩ := Submodule.Quotient.mk_surjective _ (c φ)
       refine ⟨e.symm v / δ φ, funext fun g => sub_eq_zero.mp ?_⟩
-      refine eq_zero_of_locallyConstant I φ hgen (fun g => c g - r (e.symm v / δ φ) g)
-        (hlc.sub (hrlc _)) (fun g h => ?_) ?_ (fun g hg => ?_) g
+      refine eq_zero_of_locallyConstant I φ hgen
+        (fun g => c g - r (e.symm v / δ φ) g)
+        (hlc.sub (hrlc _))
+        (fun g h => ?_)
+        ?_
+        (fun g hg => ?_)
+        g
       · simp only [hcoc, hact, hradd]
         abel
       · simp only [r, div_mul_cancel₀ _ hφ, LinearEquiv.apply_symm_apply, Submodule.mkQ_apply, hv,

@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.NatMultipleIntegralCoefficients
 
-theorem exists_nat_smul_coeff_isIntegral {σ K : Type} [Field K] [CharZero K]
-    [FiniteDimensional ℚ K] (P : MvPolynomial σ K) :
-    ∃ N : ℕ, 0 < N ∧ ∀ m : σ →₀ ℕ, IsIntegral ℤ (AddMonoidAlgebra.coeff ((N : K) • P) m) := by
+theorem exists_nat_smul_coeff_isIntegral
+    {σ K : Type} [Field K] [CharZero K] [FiniteDimensional ℚ K] (P : MvPolynomial σ K)
+    : ∃ N : ℕ, 0 < N ∧ ∀ m : σ →₀ ℕ, IsIntegral ℤ (AddMonoidAlgebra.coeff ((N : K) • P) m) := by
   classical
   have halg : ∀ x : K, IsAlgebraic ℤ x := fun x =>
     (IsFractionRing.isAlgebraic_iff ℤ ℚ K).2 (Algebra.IsAlgebraic.isAlgebraic x)
@@ -29,8 +29,9 @@ theorem exists_nat_smul_coeff_isIntegral {σ K : Type} [Field K] [CharZero K]
   by_cases hm : m ∈ P.support
   · rw [← Finset.prod_erase_mul _ _ hm, Nat.cast_mul, mul_assoc]
     refine IsIntegral.mul ?_ (hi _)
-    simpa using (isIntegral_algebraMap (R := ℤ) (A := K)
-      (x := ((∏ k ∈ P.support.erase m, n (P.coeff k) : ℕ) : ℤ)))
+    simpa using
+      (isIntegral_algebraMap (R := ℤ) (A := K)
+        (x := ((∏ k ∈ P.support.erase m, n (P.coeff k) : ℕ) : ℤ)))
   · rw [MvPolynomial.notMem_support_iff.1 hm, mul_zero]
     exact isIntegral_zero
 

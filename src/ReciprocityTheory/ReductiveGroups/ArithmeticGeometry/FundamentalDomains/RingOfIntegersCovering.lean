@@ -12,8 +12,7 @@ open scoped Classical
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem cover_OE (Z : VS E) :
-    ∃ α : 𝓞 E, ‖Z - iota E (α : E)‖ ≤ 2 * (fdeg E : ℝ) ^ 2 * rdE E := by
+theorem cover_OE (Z : VS E) : ∃ α : 𝓞 E, ‖Z - iota E (α : E)‖ ≤ 2 * (fdeg E : ℝ) ^ 2 * rdE E := by
   set f : ℝ := (Fintype.card (CP E) : ℝ) with hf_def
   have hf : 0 < f := Nat.cast_pos.mpr card_complexPlaces_pos
   set D := dE E with hD_def
@@ -54,10 +53,12 @@ theorem cover_OE (Z : VS E) :
     have : 0 ≤ rdE E := Real.rpow_nonneg (abs_nonneg _) _
     positivity
   rw [← pow_le_pow_iff_left₀ (norm_nonneg _) hB (by norm_num : (2 : ℕ) ≠ 0)]
-  calc ‖Z - iota E (α : E)‖ ^ 2 ≤ 2 * f ^ 4 * t := hxb
+  calc
+    ‖Z - iota E (α : E)‖ ^ 2
+      ≤ 2 * f ^ 4 * t := hxb
     _ ≤ 4 * f ^ 4 * t := by nlinarith [pow_pos hf 4]
     _ = (2 * (fdeg E : ℝ) ^ 2 * rdE E) ^ 2 := by
-        rw [mul_pow, mul_pow, hrd, hfdeg]
-        ring
+      rw [mul_pow, mul_pow, hrd, hfdeg]
+      ring
 
 end ReciprocityTheory.ChartRestriction.G.FD.RingOfIntegersCovering

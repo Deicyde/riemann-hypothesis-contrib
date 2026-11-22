@@ -15,8 +15,10 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxForm GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.HermFrame
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxForm GlobalTheory.Points GlobalTheory.CxPts
+  GlobalTheory.VB GlobalTheory.HermFrame
 
 namespace GlobalTheory.LineForm
 
@@ -32,7 +34,8 @@ def fld (w : A.Pt → Ev n) : A.Fld := fun x => w x
 def evalF {ι : Type} (w : ι → A.Pt → Ev n) (P : MvPolynomial ι ℝ) : A.Fld :=
   fld A fun x => aeval (fun i => w i x) (P.map (algebraMap ℝ ℂ))
 
-def wInt [MeasurableSpace M] (g : M → ℝ) (α : A.Fld) : ℝ := ∫ y, g y ∂A.part α 1 - ∫ y, g y ∂A.part α (-1)
+def wInt [MeasurableSpace M] (g : M → ℝ) (α : A.Fld) : ℝ :=
+  ∫ y, g y ∂A.part α 1 - ∫ y, g y ∂A.part α (-1)
 
 theorem wInt_one [MeasurableSpace M] (α : A.Fld) : wInt A (fun _ => 1) α = A.integral α := by
   simp [wInt, HolAtlas.integral]

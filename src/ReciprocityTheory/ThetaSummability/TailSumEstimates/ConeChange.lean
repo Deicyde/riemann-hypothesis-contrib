@@ -10,19 +10,23 @@ open MeasureTheory Finset
 
 variable {r : ℕ}
 
-theorem tailSum_eq_add (y : Fin r → ℝ) (k : Fin r) :
-    tailSum y k = y k + (if h : k.val + 1 < r then tailSum y ⟨k.val + 1, h⟩ else 0) := by
-  have h1 : univ.filter (fun j : Fin r => k ≤ j) = insert k (univ.filter (fun j : Fin r => k < j)) := by
+theorem tailSum_eq_add (y : Fin r → ℝ) (k : Fin r)
+    : tailSum y k = y k + (if h : k.val + 1 < r then tailSum y ⟨k.val + 1, h⟩ else 0) := by
+  have h1
+      : univ.filter (fun j : Fin r => k ≤ j) = insert k (univ.filter (fun j : Fin r => k < j)) := by
     ext j; simp [le_iff_eq_or_lt, eq_comm]
   unfold tailSum
   rw [h1, Finset.sum_insert (by simp)]
   congr 1
   split_ifs with h
   · apply Finset.sum_congr _ (fun _ _ => rfl)
-    ext j; simp only [Finset.mem_filter, Finset.mem_univ, true_and, Fin.lt_def, Fin.le_def]; omega
+    ext j
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Fin.lt_def, Fin.le_def]
+    omega
   · apply Finset.sum_eq_zero
     intro j hj
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Fin.lt_def] at hj; omega
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Fin.lt_def] at hj
+    omega
 
 theorem gap_tailSum (y : Fin r → ℝ) : gap (tailSum y) = y := by
   funext k
@@ -66,8 +70,7 @@ theorem continuous_gap : Continuous (gap (r := r)) := by
   · exact (continuous_apply _).sub (continuous_apply _)
   · exact (continuous_apply _).sub continuous_const
 
-theorem measurePreserving_tailSum :
-    MeasurePreserving (tailSum (r := r)) volume volume := by
+theorem measurePreserving_tailSum : MeasurePreserving (tailSum (r := r)) volume volume := by
   refine ⟨continuous_tailSum.measurable, ?_⟩
   rw [tailSum_eq_toLin', Real.map_linearMap_volume_pi_eq_smul_volume_pi]
   · simp [LinearMap.det_toLin', det_tailMat]
@@ -84,15 +87,15 @@ def tailSumEquiv (r : ℕ) : (Fin r → ℝ) ≃ᵐ (Fin r → ℝ) where
 theorem measurableEmbedding_tailSum : MeasurableEmbedding (tailSum (r := r)) :=
   (tailSumEquiv r).measurableEmbedding
 
-theorem tailSum_mem_logCone_iff (c : ℝ) (y : Fin r → ℝ) :
-    tailSum y ∈ logCone r c ↔ y ∈ lowerBox r c := by
+theorem tailSum_mem_logCone_iff (c : ℝ) (y : Fin r → ℝ)
+    : tailSum y ∈ logCone r c ↔ y ∈ lowerBox r c := by
   simp [logCone, lowerBox, gap_tailSum, Pi.le_def]
 
 theorem preimage_tailSum_logCone (c : ℝ) : tailSum ⁻¹' logCone r c = lowerBox r c := by
   ext y; exact tailSum_mem_logCone_iff c y
 
-theorem integrableOn_logCone_iff (c : ℝ) (f : (Fin r → ℝ) → ℝ) :
-    IntegrableOn f (logCone r c) ↔ IntegrableOn (fun y => f (tailSum y)) (lowerBox r c) := by
+theorem integrableOn_logCone_iff (c : ℝ) (f : (Fin r → ℝ) → ℝ)
+    : IntegrableOn f (logCone r c) ↔ IntegrableOn (fun y => f (tailSum y)) (lowerBox r c) := by
   rw [← preimage_tailSum_logCone c]
   exact (measurePreserving_tailSum.integrableOn_comp_preimage measurableEmbedding_tailSum).symm
 

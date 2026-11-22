@@ -19,10 +19,13 @@ theorem kerSwap : KerUnif → KerSwap := by
     ⟨by rw [Measure.restrict_apply_univ]; exact hK.measure_lt_top⟩
   have hmc : Continuous (matCoord ι) := hι.continuous
   set G : H × H → ℂ := fun z => W (matCoord ι z.1, p z.2) with hG
-  have hGc : Continuous G := hW.continuous.comp ((hmc.comp continuous_fst).prodMk (hp.comp continuous_snd))
+  have hGc : Continuous G :=
+    hW.continuous.comp ((hmc.comp continuous_fst).prodMk (hp.comp continuous_snd))
   set F : H → Ω → ℂ := fun k x => ker c q (fun y => W (matCoord ι y, p k)) x with hF
 
-  have hvan : ∀ x, ∀ k ∈ K, ∀ i, i ∉ (hk.fin x C hC).toFinset → c i x * W (matCoord ι (q i x), p k) = 0 := by
+  have hvan
+      : ∀ x, ∀ k ∈ K, ∀ i,
+        i ∉ (hk.fin x C hC).toFinset → c i x * W (matCoord ι (q i x), p k) = 0 := by
     intro x k hkK i hi
     simp only [Set.Finite.mem_toFinset, Set.mem_ofPred_eq, not_and_or, not_not] at hi
     rcases hi with h | h
@@ -32,7 +35,8 @@ theorem kerSwap : KerUnif → KerSwap := by
   have hmeas : AEStronglyMeasurable (Function.uncurry F) ((μ.restrict K).prod m) := by
     obtain ⟨u, hu⟩ := (atTop : Filter (Finset I)).exists_seq_tendsto
     refine aestronglyMeasurable_of_tendsto_ae (u := atTop)
-      (f := fun N (z : H × Ω) => ∑ i ∈ u N, c i z.2 * W (matCoord ι (q i z.2), p z.1)) ?_ ?_
+      (f := fun N (z : H × Ω) => ∑ i ∈ u N, c i z.2 * W (matCoord ι (q i z.2), p z.1))
+      ?_ ?_
     · intro N
       refine (Finset.measurable_sum _ fun i _ => ?_).aestronglyMeasurable
       refine ((hk.mc i).comp measurable_snd).mul ?_
@@ -42,7 +46,8 @@ theorem kerSwap : KerUnif → KerSwap := by
     · have hae : ∀ᵐ z ∂((μ.restrict K).prod m), z.1 ∈ K :=
         Measure.QuasiMeasurePreserving.ae Measure.quasiMeasurePreserving_fst (ae_restrict_mem hKm)
       filter_upwards [hae] with z hz
-      have hs : HasSum (fun i => c i z.2 * W (matCoord ι (q i z.2), p z.1))
+      have hs : HasSum
+          (fun i => c i z.2 * W (matCoord ι (q i z.2), p z.1))
           (∑' i, c i z.2 * W (matCoord ι (q i z.2), p z.1)) :=
         (summable_of_ne_finset_zero (s := (hk.fin z.2 C hC).toFinset) (hvan z.2 z.1 hz)).hasSum
       exact hs.comp hu

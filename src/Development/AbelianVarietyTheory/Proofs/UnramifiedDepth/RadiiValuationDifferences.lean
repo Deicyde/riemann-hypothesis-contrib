@@ -15,8 +15,7 @@ theorem sub_one_pos {l : ℕ} (hl : 2 ≤ l) : (0 : ℝ) < (l : ℝ) - 1 := by
   have : (2 : ℝ) ≤ l := by exact_mod_cast hl
   linarith
 
-theorem sq_sub_one_eq (l : ℕ) : (l : ℝ) ^ 2 - 1 = ((l : ℝ) - 1) * ((l : ℝ) + 1) := by
-  ring
+theorem sq_sub_one_eq (l : ℕ) : (l : ℝ) ^ 2 - 1 = ((l : ℝ) - 1) * ((l : ℝ) + 1) := by ring
 
 theorem exponent_integral : Formalism.L2.FormalSeriesBounds.EInt := by
   intro l i hl hi
@@ -62,7 +61,9 @@ theorem slope_identity : I2 := by
   have hsq : ((l : ℝ) ^ 2 - 1) = ((l : ℝ) - 1) * ((l : ℝ) + 1) := sq_sub_one_eq l
   have hl2 : (2 : ℝ) ≤ l := by exact_mod_cast hl
   have hli : (l : ℝ) ≤ (l : ℝ) ^ i := by
-    calc (l : ℝ) = (l : ℝ) ^ 1 := (pow_one _).symm
+    calc
+      (l : ℝ)
+        = (l : ℝ) ^ 1 := (pow_one _).symm
       _ ≤ (l : ℝ) ^ i := pow_le_pow_right₀ (by linarith) hi
   refine ⟨?_, ?_⟩
   · simp only [Ereal, rho, gam]
@@ -73,19 +74,20 @@ theorem slope_identity : I2 := by
     rw [hsq, sub_nonneg, mul_div_assoc', le_div_iff₀ (by positivity)]
     nlinarith
 
-theorem val_natCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℕ) :
-    0 ≤ v (n : C) := by
+theorem val_natCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℕ)
+    : 0 ≤ v (n : C) := by
   induction n with
   | zero => simp
   | succ k ih =>
     push_cast
-    calc (0 : WithTop ℝ) ≤ min (v (k : C)) (v 1) := by
-          rw [AddValuation.map_one]
-          exact le_min ih le_rfl
+    calc
+      (0 : WithTop ℝ) ≤ min (v (k : C)) (v 1) := by
+        rw [AddValuation.map_one]
+        exact le_min ih le_rfl
       _ ≤ v ((k : C) + 1) := AddValuation.map_add v _ _
 
-theorem val_intCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℤ) :
-    0 ≤ v (n : C) := by
+theorem val_intCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℤ)
+    : 0 ≤ v (n : C) := by
   rcases Int.eq_nat_or_neg n with ⟨k, rfl | rfl⟩
   · exact_mod_cast val_natCast_nonneg v k
   · push_cast
@@ -115,8 +117,10 @@ theorem val_other_prime : ValOther := by
 
 theorem weight_forms_agree : WeightConditionIff := by
   intro C _ v l i n0 h1
-  have e1 : rho l + 1 / (2 * (l : ℝ) ^ i) - 1 / (8 * (l : ℝ) ^ i) =
-      rho l + ((l : ℝ) ^ i)⁻¹ / 2 - ((l : ℝ) ^ i)⁻¹ / 8 := by ring
+  have e1
+      : rho l + 1 / (2 * (l : ℝ) ^ i) - 1 / (8 * (l : ℝ) ^ i)
+        = rho l + ((l : ℝ) ^ i)⁻¹ / 2 - ((l : ℝ) ^ i)⁻¹ / 8 := by
+    ring
   have e2 : rho l + 1 / 2 - 1 / (8 * (l : ℝ) ^ i) = rho l + 1 / 2 - ((l : ℝ) ^ i)⁻¹ / 8 := by ring
   simp only [HM1, WeightCond, r1, r2, del, e1, e2]
 
@@ -141,11 +145,15 @@ theorem binomial_differences : F5 := by
 
 end RadiiIdentities
 
-
 open RadiiIdentities in
-theorem radii_valuation_differences :
-    Formalism.L2.FormalSeriesBounds.EInt ∧ I1 ∧ I2 ∧ ValOther ∧ WeightConditionIff ∧ F5 :=
-  ⟨exponent_integral, radii_sum, slope_identity, val_other_prime, weight_forms_agree,
-    binomial_differences⟩
+theorem radii_valuation_differences
+    : Formalism.L2.FormalSeriesBounds.EInt ∧ I1 ∧ I2 ∧ ValOther ∧ WeightConditionIff ∧ F5 := ⟨
+  exponent_integral,
+  radii_sum,
+  slope_identity,
+  val_other_prime,
+  weight_forms_agree,
+  binomial_differences
+⟩
 
 end GlobalTheory

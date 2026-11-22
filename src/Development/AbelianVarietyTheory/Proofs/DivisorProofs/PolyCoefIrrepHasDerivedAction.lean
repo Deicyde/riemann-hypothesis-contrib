@@ -13,7 +13,8 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.PsCo.PcEF.PolynomialCoefficientDerivedAction
 
-open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7 ReciprocityTheory.ChartRestriction.DS.HW
+open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
+  ReciprocityTheory.ChartRestriction.DS.HW
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
@@ -49,15 +50,16 @@ lemma not_cdom {Λ : Fin n → ℝ} {a b : Fin n} (hab : a < b) :
 
 section Der
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-  (τ : KG ε →* unitary (H →L[ℂ] H))
-  (dτ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] (H →L[ℂ] H))
-  (hder : ∀ X, inK ε X → ∀ γ : ℝ → KG ε,
-    (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) →
-      HasDerivAt (fun t => ((τ (γ t) : unitary (H →L[ℂ] H)) : H →L[ℂ] H)) (dτ X) 0)
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  (τ : KG ε →* unitary (H →L[ℂ] H)) (dτ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] (H →L[ℂ] H))
+  (hder : ∀ X,
+    inK ε X
+      → ∀ γ : ℝ → KG ε,
+        (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+          → HasDerivAt (fun t => ((τ (γ t) : unitary (H →L[ℂ] H)) : H →L[ℂ] H)) (dτ X) 0)
   (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
   (hσ : ∀ g : KG ε, σ (toMK g) = ((τ g : unitary (H →L[ℂ] H)) : H →L[ℂ] H))
-
 
 include hder in
 lemma conj (g : KG ε) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y) :
@@ -92,7 +94,6 @@ lemma conj (g : KG ε) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y) :
   have h3 := h2.unique (by simpa [Function.comp_def, mul_assoc] using h1)
   simpa [mul_assoc] using h3
 
-
 include hder in
 lemma conj_single (g : KG ε) {a b : Fin n} (hab : ε a = ε b) :
     ((τ g : unitary (H →L[ℂ] H)) : H →L[ℂ] H) * dτ (Matrix.single a b 1) *
@@ -104,7 +105,6 @@ lemma conj_single (g : KG ε) {a b : Fin n} (hab : ε a = ε b) :
     rw [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul]
   rw [e, map_add (f := _), map_smul, map_add (f := _), map_smul, ← conj τ dτ hder g (inK_hermitian_unit hab),
     ← conj τ dτ hder g (inK_skew_hermitian_unit hab), mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
-
 
 include hder hσ in
 lemma dτ_of_wt {μ : Fin n → ℝ} {v : H}
@@ -150,7 +150,6 @@ lemma dτ_of_wt {μ : Fin n → ℝ} {v : H}
   rw [hdX, _root_.smul_apply, mul_comm, mul_smul] at heq
   exact smul_right_injective _ Complex.I_ne_zero heq
 
-
 include hder hσ in
 lemma hw {Λ : Fin n → ℝ}
     (hK5 : ∀ (μ : Fin n → ℝ) (v : H), v ∈ (⊤ : Submodule ℂ H) → v ≠ 0 →
@@ -190,32 +189,39 @@ end GlobalTheory.PsCo.PcEF.PolynomialCoefficientDerivedAction
 
 namespace GlobalTheory.PsCo.PcEF
 
-open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7 ReciprocityTheory.ChartRestriction.DS.HW
+open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
+  ReciprocityTheory.ChartRestriction.DS.HW
 
-theorem polyCoefIrrep_hasDerivedAction :
-    ∀ (n : ℕ) (ε : Fin n → Bool) (γ : Fin n → ℝ) (W : Type)
-      [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
-      (T : GlobalTheory.PsCo.Pc1.Mat n → (W →L[ℂ] W)), IsKIrr ε γ T →
-      (∀ v w : W, PolyOnK ε fun k => ⟪w, T k v⟫_ℂ) →
-      ∃ T₀ : KType ε γ, ∀ k : KG ε,
-        ReciprocityTheory.ChartRestriction.TR.Weyl.kChar T₀ k = trK T (toMK k) := by
+theorem polyCoefIrrep_hasDerivedAction
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (γ : Fin n → ℝ) (W : Type) [NormedAddCommGroup W]
+        [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
+        (T : GlobalTheory.PsCo.Pc1.Mat n → (W →L[ℂ] W)),
+      IsKIrr ε γ T → (∀ v w : W, PolyOnK ε fun k => ⟪w, T k v⟫_ℂ)
+        → ∃ T₀ : KType ε γ, ∀ k : KG ε,
+          ReciprocityTheory.ChartRestriction.TR.Weyl.kChar T₀ k = trK T (toMK k) := by
   intro n ε γ W _ _ _ T hT _
   obtain ⟨-, hU, hK⟩ := hT
   have : CompleteSpace W := FiniteDimensional.completeSpace ℂ W
   obtain ⟨τ, hτc, hτ⟩ := uRepHom n ε W T hU
   obtain ⟨dτ, hder⟩ := derivExists n ε W τ hτc
-  have hσ : ∀ g : KG ε, T (toMK g) = ((τ g : unitary (W →L[ℂ] W)) : W →L[ℂ] W) := fun g => (hτ g).symm
+  have hσ : ∀ g : KG ε, T (toMK g) = ((τ g : unitary (W →L[ℂ] W)) : W →L[ℂ] W) := fun g =>
+    (hτ g).symm
   obtain ⟨v0, -, hv0, hwt0⟩ := hK.2.2.2.1
   have hn : ‖v0‖ ≠ 0 := norm_ne_zero_iff.2 hv0
   set w : W := ((‖v0‖⁻¹ : ℝ) : ℂ) • v0 with hwdef
   have hwn : ‖w‖ = 1 := by
-    rw [hwdef, norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_inv, abs_norm, inv_mul_cancel₀ hn]
+    rw [hwdef, norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_inv, abs_norm,
+      inv_mul_cancel₀ hn]
   have hwt : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) T γ w := by
     intro θ hθ
     rw [hwdef, map_smul, hwt0 θ hθ, smul_comm]
-  refine ⟨KType.mk (V := W) τ hτc ?_ dτ hder w hwn
-    (fun a => PolynomialCoefficientDerivedAction.dτ_of_wt τ dτ hder T hσ hwt a)
-    (fun a b hab he => PolynomialCoefficientDerivedAction.hw τ dτ hder T hσ hK.2.2.2.2 hwt a b hab he), fun k => ?_⟩
+  refine ⟨
+    KType.mk (V := W) τ hτc ?_ dτ hder w hwn
+      (fun a => PolynomialCoefficientDerivedAction.dτ_of_wt τ dτ hder T hσ hwt a)
+      (fun a b hab he =>
+        PolynomialCoefficientDerivedAction.hw τ dτ hder T hσ hK.2.2.2.2 hwt a b hab he),
+    fun k => ?_
+  ⟩
   · intro S hS
     refine hK.2.2.1 S le_top (fun g hg v hv => ?_)
     have h := hS (torepK ε hg) v hv

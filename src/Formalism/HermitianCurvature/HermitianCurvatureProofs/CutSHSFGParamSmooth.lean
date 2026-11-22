@@ -11,17 +11,23 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSH.SFG
 
-private theorem parameter_smooth_lemma {Pm X W : Type} [NormedAddCommGroup Pm] [NormedSpace ℝ Pm]
-    [NormedAddCommGroup X] [NormedSpace ℝ X] [NormedAddCommGroup W] [NormedSpace ℝ W]
-    (h : Pm → X → W) (s : Set Pm) (K : Set X) (hs : IsOpen s) (hK : IsCompact K)
-    (hv : ∀ p ∈ s, ∀ x ∉ K, h p x = 0)
-    (hh : ContDiffOn ℝ ∞ (fun q : Pm × X => h q.1 q.2) (s ×ˢ Set.univ)) :
-    (∀ p ∈ s, ∀ x ∉ K, (fderiv ℝ (fun q : Pm × X => h q.1 q.2) (p, x)).comp
-        (ContinuousLinearMap.inl ℝ Pm X) = 0) ∧
-    ContDiffOn ℝ ∞ (fun q : Pm × X => (fderiv ℝ (fun q : Pm × X => h q.1 q.2) (q.1, q.2)).comp
-        (ContinuousLinearMap.inl ℝ Pm X)) (s ×ˢ Set.univ) ∧
-    ∀ p ∈ s, ∀ x, HasFDerivAt (fun p' => h p' x)
-      ((fderiv ℝ (fun q : Pm × X => h q.1 q.2) (p, x)).comp (ContinuousLinearMap.inl ℝ Pm X)) p := by
+private theorem parameter_smooth_lemma
+    {Pm X W : Type} [NormedAddCommGroup Pm] [NormedSpace ℝ Pm] [NormedAddCommGroup X]
+    [NormedSpace ℝ X] [NormedAddCommGroup W] [NormedSpace ℝ W]
+    (h : Pm → X → W) (s : Set Pm) (K : Set X)
+    (hs : IsOpen s) (hK : IsCompact K) (hv : ∀ p ∈ s, ∀ x ∉ K, h p x = 0)
+    (hh : ContDiffOn ℝ ∞ (fun q : Pm × X => h q.1 q.2) (s ×ˢ Set.univ))
+    : (∀ p ∈ s, ∀ x ∉ K,
+        (fderiv ℝ (fun q : Pm × X => h q.1 q.2) (p, x)).comp (ContinuousLinearMap.inl ℝ Pm X) = 0)
+      ∧ ContDiffOn ℝ ∞
+        (fun q : Pm × X =>
+          (fderiv ℝ (fun q : Pm × X => h q.1 q.2) (q.1, q.2)).comp (ContinuousLinearMap.inl ℝ Pm X))
+        (s ×ˢ Set.univ)
+      ∧ ∀ p ∈ s, ∀ x,
+        HasFDerivAt
+          (fun p' => h p' x)
+          ((fderiv ℝ (fun q : Pm × X => h q.1 q.2) (p, x)).comp (ContinuousLinearMap.inl ℝ Pm X))
+          p := by
   have hO : IsOpen (s ×ˢ (Set.univ : Set X)) := hs.prod isOpen_univ
   refine ⟨?_, ?_, ?_⟩
   · intro p hp x hx
@@ -41,18 +47,21 @@ private theorem parameter_smooth_lemma {Pm X W : Type} [NormedAddCommGroup Pm] [
       hasFDerivAt_prodMk_left (𝕜 := ℝ) p x
     exact HasFDerivAt.comp (x := p) hd.hasFDerivAt hl
 
-private theorem parameter_smooth_lemma_2 {Pm X W : Type} [NormedAddCommGroup Pm] [NormedSpace ℝ Pm]
-    [NormedAddCommGroup X] [NormedSpace ℝ X] [FiniteDimensional ℝ X] [MeasurableSpace X]
-    [BorelSpace X] [NormedAddCommGroup W] [NormedSpace ℝ W]
+private theorem parameter_smooth_lemma_2
+    {Pm X W : Type} [NormedAddCommGroup Pm] [NormedSpace ℝ Pm] [NormedAddCommGroup X]
+    [NormedSpace ℝ X] [FiniteDimensional ℝ X] [MeasurableSpace X] [BorelSpace X]
+    [NormedAddCommGroup W] [NormedSpace ℝ W]
     (μ : Measure X) [IsFiniteMeasureOnCompacts μ]
-    (h : Pm → X → W) (D : Pm → X → (Pm →L[ℝ] W)) (s : Set Pm) (K : Set X)
-    (hs : IsOpen s) (hK : IsCompact K)
-    (hv : ∀ p ∈ s, ∀ x ∉ K, h p x = 0) (hDv : ∀ p ∈ s, ∀ x ∉ K, D p x = 0)
+    (h : Pm → X → W) (D : Pm → X → (Pm →L[ℝ] W))
+    (s : Set Pm)
+    (K : Set X)
+    (hs : IsOpen s) (hK : IsCompact K) (hv : ∀ p ∈ s, ∀ x ∉ K, h p x = 0)
+    (hDv : ∀ p ∈ s, ∀ x ∉ K, D p x = 0)
     (hc : ContinuousOn (fun q : Pm × X => h q.1 q.2) (s ×ˢ Set.univ))
     (hDc : ContinuousOn (fun q : Pm × X => D q.1 q.2) (s ×ˢ Set.univ))
     (hD : ∀ p ∈ s, ∀ x, HasFDerivAt (fun p' => h p' x) (D p x) p)
-    (p0 : Pm) (hp0 : p0 ∈ s) :
-    HasFDerivAt (fun p => ∫ x, h p x ∂μ) (∫ x, D p0 x ∂μ) p0 := by
+    (p0 : Pm) (hp0 : p0 ∈ s)
+    : HasFDerivAt (fun p => ∫ x, h p x ∂μ) (∫ x, D p0 x ∂μ) p0 := by
   have hO : IsOpen (s ×ˢ (Set.univ : Set X)) := hs.prod isOpen_univ
   have hcont : ∀ p ∈ s, Continuous (h p) := fun p hp =>
     hc.comp_continuous (continuous_const.prodMk continuous_id) (fun _ => ⟨hp, trivial⟩)
@@ -67,8 +76,8 @@ private theorem parameter_smooth_lemma_2 {Pm X W : Type} [NormedAddCommGroup Pm]
     exact hca.norm.eventually (gt_mem_nhds (lt_of_le_of_lt (hC x hx) (lt_add_one C)))
   have hS : {p | p ∈ s ∧ ∀ x ∈ K, ‖D p x‖ < C + 1} ∈ nhds p0 :=
     Filter.inter_mem (hs.mem_nhds hp0) hev
-  refine hasFDerivAt_integral_of_dominated_of_fderiv_le (bound := K.indicator fun _ => C + 1) hS
-    ?_ ?_ ?_ ?_ ?_ ?_
+  refine hasFDerivAt_integral_of_dominated_of_fderiv_le (bound := K.indicator fun _ => C + 1) hS ?_
+    ?_ ?_ ?_ ?_ ?_
   · filter_upwards [hs.mem_nhds hp0] with p hp
     exact (hcont p hp).aestronglyMeasurable
   · exact (hcont p0 hp0).integrable_of_hasCompactSupport (HasCompactSupport.intro hK (hv p0 hp0))
@@ -84,10 +93,10 @@ private theorem parameter_smooth_lemma_2 {Pm X W : Type} [NormedAddCommGroup Pm]
 
 theorem parameter_smooth : ParamSmooth := by
   intro Pm X W _ _ _ _ _ _ _ _ _ μ _ h s K hs hK hv hh
-  have key : ∀ n : ℕ, ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] (g : Pm → X → V),
-      (∀ p ∈ s, ∀ x ∉ K, g p x = 0) →
-      ContDiffOn ℝ ∞ (fun q : Pm × X => g q.1 q.2) (s ×ˢ Set.univ) →
-      ContDiffOn ℝ n (fun p => ∫ x, g p x ∂μ) s := by
+  have key
+      : ∀ n : ℕ, ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] (g : Pm → X → V),
+        (∀ p ∈ s, ∀ x ∉ K, g p x = 0) → ContDiffOn ℝ ∞ (fun q : Pm × X => g q.1 q.2) (s ×ˢ Set.univ)
+          → ContDiffOn ℝ n (fun p => ∫ x, g p x ∂μ) s := by
     intro n
     induction n with
     | zero =>
@@ -104,8 +113,10 @@ theorem parameter_smooth : ParamSmooth := by
         parameter_smooth_lemma_2 μ g _ s K hs hK hgv hDv hg.continuousOn hDs.continuousOn hD p hp
       rw [Nat.cast_succ, contDiffOn_succ_iff_fderiv_of_isOpen hs]
       refine ⟨fun p hp => (hder p hp).differentiableAt.differentiableWithinAt, by simp, ?_⟩
-      exact (ih (Pm →L[ℝ] V) (fun p x => (fderiv ℝ (fun q : Pm × X => g q.1 q.2) (p, x)).comp
-        (ContinuousLinearMap.inl ℝ Pm X)) hDv hDs).congr fun p hp => (hder p hp).fderiv
+      exact (ih (Pm →L[ℝ] V)
+        (fun p x =>
+          (fderiv ℝ (fun q : Pm × X => g q.1 q.2) (p, x)).comp (ContinuousLinearMap.inl ℝ Pm X))
+        hDv hDs).congr fun p hp => (hder p hp).fderiv
   exact contDiffOn_infty.2 fun n => key n W h hv hh
 
 end Formalism.FourierDecayAlt.P.CutSH.SFG

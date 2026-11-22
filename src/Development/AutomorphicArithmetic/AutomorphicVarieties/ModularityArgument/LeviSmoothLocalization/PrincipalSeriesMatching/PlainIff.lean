@@ -9,8 +9,10 @@ public import GroundTheory.GlobalFields.TateThesis.RootNumberLocalPlace
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
-open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam
+  UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
+open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL ValuativeRel
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -25,8 +27,7 @@ private theorem valuation_unif : valuation k (unif k : k) = uniformizer k := by
   obtain ⟨y, hy⟩ := valuation_surjective (uniformizer k : ValueGroupWithZero k)
   exact le_antisymm (le_uniformizer_iff.2 h1) (hy ▸ h2 y (hy ▸ uniformizer_lt_one))
 
-private theorem absPow_one_unif :
-    ((absPow k 1 (unif k) : ℂˣ) : ℂ) * (resCard k : ℂ) = 1 := by
+private theorem absPow_one_unif : ((absPow k 1 (unif k) : ℂˣ) : ℂ) * (resCard k : ℂ) = 1 := by
   have hq : (resCard k : ℂ) ≠ 0 := by
     have := Nat.card_pos (α := IsLocalRing.ResidueField 𝒪[k])
     exact_mod_cast this.ne'
@@ -34,16 +35,15 @@ private theorem absPow_one_unif :
   push_cast
   exact inv_mul_cancel₀ hq
 
-private theorem link_iff {ξ ξ' : kˣ →* ℂˣ} (hξ : IsSmoothChar ξ) (hξ' : IsSmoothChar ξ') :
-    IrrGL.ofChar ξ hξ = (IrrGL.ofChar ξ' hξ').nu 1 ↔
-      IsUnram (ξ' * ξ⁻¹) ∧ (((ξ' * ξ⁻¹) (unif k) : ℂˣ) : ℂ) = (resCard k : ℂ) := by
+private theorem link_iff {ξ ξ' : kˣ →* ℂˣ} (hξ : IsSmoothChar ξ) (hξ' : IsSmoothChar ξ')
+    : IrrGL.ofChar ξ hξ = (IrrGL.ofChar ξ' hξ').nu 1
+      ↔ IsUnram (ξ' * ξ⁻¹) ∧ (((ξ' * ξ⁻¹) (unif k) : ℂˣ) : ℂ) = (resCard k : ℂ) := by
   have hA := absPow_one_unif (k := k)
   have hA0 : ((absPow k 1 (unif k) : ℂˣ) : ℂ) ≠ 0 := Units.ne_zero _
   rw [IrrGL.nu, IrrGL.tw_ofChar, IrrGL.ofChar_inj]
   constructor
   · rintro rfl
-    have e : ξ' * (ξ' * absPow k 1)⁻¹ = (absPow k 1)⁻¹ := by
-      rw [mul_inv, mul_inv_cancel_left]
+    have e : ξ' * (ξ' * absPow k 1)⁻¹ = (absPow k 1)⁻¹ := by rw [mul_inv, mul_inv_cancel_left]
     rw [e]
     refine ⟨isUnram_inv (isUnram_absPow k 1), ?_⟩
     rw [MonoidHom.inv_apply, Units.val_inv_eq_inv_val]
@@ -69,8 +69,8 @@ end Loc
 
 end UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
 
-theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.plainIff :
-    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.PlainIff := by
+theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.plainIff
+    : UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.PlainIff := by
   intro K _ _ _ n hn π v
   obtain ⟨-, huniq, -, -, -⟩ := suppFacts K n hn π v
   have hq : (Ideal.absNorm v.asIdeal : ℂ) = (resCard (v.adicCompletion K) : ℂ) := by
@@ -85,7 +85,8 @@ theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.plainIff :
       exact ⟨s, h1, h2⟩
     · obtain ⟨σ, hσ, -⟩ := id hs
       obtain ⟨t, ht, -, hl⟩ := h σ hσ
-      obtain rfl : s = t := huniq s t hs ⟨σ, hσ, ht.of_equiv (IrrGL.equivOf σ.ρ σ.smooth σ.irred).symm⟩
+      obtain rfl : s = t :=
+        huniq s t hs ⟨σ, hσ, ht.of_equiv (IrrGL.equivOf σ.ρ σ.smooth σ.irred).symm⟩
       obtain ⟨a, ha⟩ := hξ
       obtain ⟨b, hb⟩ := hξ'
       exact hl _ hb _ ha ((link_iff b a).2 ⟨hu, e.trans hq⟩)
@@ -95,4 +96,5 @@ theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.plainIff :
     obtain ⟨ξ, hξ, rfl⟩ := GlobalTheory.RoadU.PlainChars.exists_eq_ofChar y (h1 y hy)
     obtain ⟨ξ', hξ', rfl⟩ := GlobalTheory.RoadU.PlainChars.exists_eq_ofChar z (h1 z hz)
     obtain ⟨h2, h3⟩ := (link_iff hξ hξ').1 e
-    exact hu s ⟨σ, hσ, hs.of_equiv (IrrGL.equivOf σ.ρ σ.smooth σ.irred).symm⟩ ξ' ⟨hξ', hz⟩ ξ ⟨hξ, hy⟩ h2 (h3.trans hq.symm)
+    exact hu s ⟨σ, hσ, hs.of_equiv (IrrGL.equivOf σ.ρ σ.smooth σ.irred).symm⟩ ξ' ⟨hξ', hz⟩ ξ
+      ⟨hξ, hy⟩ h2 (h3.trans hq.symm)

@@ -9,14 +9,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_veryGeneral_point_of_holomorphic_family :
-    ∀ (o : Type) [CommRing o] [Countable o] (em : o →+* ℂ) (I : Type) [Countable I] (m : ℕ) (B : Set (Fin m → ℂ)) (θ : (Fin m → ℂ) → I → ℂ), IsOpen B → IsPreconnected B → B.Nonempty → (∀ a, DifferentiableOn ℂ (fun z => θ z a) B) → ∃ z ∈ B, ∃ c : ℂ, c ≠ 0 ∧ ∀ F : MvPolynomial I o, MvPolynomial.eval₂ em (c • θ z) F = 0 → ∀ z' ∈ B, ∀ c' : ℂ, c' ≠ 0 → MvPolynomial.eval₂ em (c' • θ z') F = 0 := by
+theorem exists_veryGeneral_point_of_holomorphic_family
+    : ∀ (o : Type) [CommRing o] [Countable o] (em : o →+* ℂ) (I : Type) [Countable I] (m : ℕ)
+        (B : Set (Fin m → ℂ)) (θ : (Fin m → ℂ) → I → ℂ),
+      IsOpen B → IsPreconnected B → B.Nonempty → (∀ a, DifferentiableOn ℂ (fun z => θ z a) B)
+        → ∃ z ∈ B, ∃ c : ℂ,
+          c ≠ 0
+            ∧ ∀ F : MvPolynomial I o,
+              MvPolynomial.eval₂ em (c • θ z) F = 0
+                → ∀ z' ∈ B, ∀ c' : ℂ, c' ≠ 0 → MvPolynomial.eval₂ em (c' • θ z') F = 0 := by
   intro o _ _ em I _ m B θ hB hBc hBne hθ
   classical
   have : Countable (MvPolynomial I o) :=
@@ -30,8 +39,10 @@ theorem exists_veryGeneral_point_of_holomorphic_family :
   have hhead : Differentiable ℂ (fun p : Fin (m + 1) → ℂ => p 0) := differentiable_apply _
   have hΩo : IsOpen Ω :=
     (hB.preimage htail.continuous).inter (isOpen_compl_singleton.preimage hhead.continuous)
-  have hΩimg : Ω = (fun q : (Fin m → ℂ) × ℂ => (Fin.cons q.2 q.1 : Fin (m + 1) → ℂ)) ''
-      (B ×ˢ ({0}ᶜ : Set ℂ)) := by
+  have hΩimg
+      : Ω
+        = (fun q : (Fin m → ℂ) × ℂ => (Fin.cons q.2 q.1 : Fin (m + 1) → ℂ))
+          '' (B ×ˢ ({0}ᶜ : Set ℂ)) := by
     ext p
     constructor
     · intro hp
@@ -47,8 +58,8 @@ theorem exists_veryGeneral_point_of_holomorphic_family :
     obtain ⟨z₀, hz₀⟩ := hBne
     exact ⟨Fin.cons 1 z₀, by simpa using hz₀, by simp⟩
 
-  let f : MvPolynomial I o → (Fin (m + 1) → ℂ) → ℂ :=
-    fun F p => MvPolynomial.eval₂ em (p 0 • θ (Fin.tail p)) F
+  let f : MvPolynomial I o → (Fin (m + 1) → ℂ) → ℂ := fun F p =>
+    MvPolynomial.eval₂ em (p 0 • θ (Fin.tail p)) F
   have hfd : ∀ F, DifferentiableOn ℂ (f F) Ω := by
     intro F
     induction F using MvPolynomial.induction_on with

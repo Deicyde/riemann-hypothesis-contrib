@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Her
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal
 open GlobalTheory.SWC
 
@@ -21,12 +22,14 @@ end GlobalTheory.HermSD
 
 namespace GlobalTheory.HermSD
 
-theorem eq_of_test_haar {V : Type} [AddCommGroup V] [TopologicalSpace V]
-    [IsTopologicalAddGroup V] [LocallyCompactSpace V] [SecondCountableTopology V]
-    [MeasurableSpace V] [BorelSpace V] {κ P : Measure V} {χ : V → V → ℂ}
-    (hκ : SelfDual κ χ) (hP : P.IsAddHaarMeasure) (Φ : V → ℂ) (hc : Continuous Φ)
-    (hs : HasCompactSupport Φ) (hI : Integrable (fun y => ∫ x, Φ x * χ x y ∂P) P) (z : V)
-    (h1 : ∫ y, (∫ x, Φ x * χ x y ∂P) * χ y z ∂P = Φ (-z)) (hz : Φ (-z) ≠ 0) : κ = P := by
+theorem eq_of_test_haar
+    {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+    [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+    {κ P : Measure V} {χ : V → V → ℂ} (hκ : SelfDual κ χ) (hP : P.IsAddHaarMeasure)
+    (Φ : V → ℂ) (hc : Continuous Φ) (hs : HasCompactSupport Φ)
+    (hI : Integrable (fun y => ∫ x, Φ x * χ x y ∂P) P)
+    (z : V) (h1 : ∫ y, (∫ x, Φ x * χ x y ∂P) * χ y z ∂P = Φ (-z)) (hz : Φ (-z) ≠ 0)
+    : κ = P := by
   have := hκ.1
   have e : κ = Measure.addHaarScalarFactor κ P • P := Measure.isAddLeftInvariant_eq_smul κ P
   set c : NNReal := Measure.addHaarScalarFactor κ P with hcdef
@@ -40,8 +43,9 @@ theorem eq_of_test_haar {V : Type} [AddCommGroup V] [TopologicalSpace V]
   have h2 := hκ.2 Φ hc hs hI' z
   simp only [hT] at h2
   rw [e, integral_smul_nnreal_measure, NNReal.smul_def, Complex.real_smul] at h2
-  have h3 : ∫ y, ((c : ℂ) * ∫ x, Φ x * χ x y ∂P) * χ y z ∂P =
-      (c : ℂ) * ∫ y, (∫ x, Φ x * χ x y ∂P) * χ y z ∂P := by
+  have h3
+      : ∫ y, ((c : ℂ) * ∫ x, Φ x * χ x y ∂P) * χ y z ∂P
+        = (c : ℂ) * ∫ y, (∫ x, Φ x * χ x y ∂P) * χ y z ∂P := by
     rw [← integral_const_mul]
     exact integral_congr_ae (ae_of_all _ fun y => by ring)
   rw [h3, h1, ← mul_assoc] at h2

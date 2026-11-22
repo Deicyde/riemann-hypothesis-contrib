@@ -13,20 +13,24 @@ noncomputable section
 
 open Classical
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
-  [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)] [∀ x, NormedAddCommGroup (Wq x)]
-  [∀ x, InnerProductSpace ℂ (Wq x)]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Wp Wq : InfinitePlace E → Type}
+  [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+  [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
 
-theorem re_mix_le (S : C.HidaSetting E Wp Wq) (v : Fin S.f) (ε : ℝ) (i : ℕ) (U : Finset (List C.Letter))
-    (θ : List C.Letter → ℝ) (hθ : ∀ a, 0 ≤ θ a) (p : C.LPt) (B : List C.Letter → ℝ)
-    (hB : ∀ u ∈ U, ‖KB.gN S v ε i u p p‖ ≤ B u) :
-    (KB.mix S v ε i U θ p p).re ≤ ∑ u ∈ U, θ u * max (B u) 0 := by
+theorem re_mix_le
+    (S : C.HidaSetting E Wp Wq) (v : Fin S.f)
+    (ε : ℝ) (i : ℕ) (U : Finset (List C.Letter))
+    (θ : List C.Letter → ℝ) (hθ : ∀ a, 0 ≤ θ a)
+    (p : C.LPt) (B : List C.Letter → ℝ) (hB : ∀ u ∈ U, ‖KB.gN S v ε i u p p‖ ≤ B u)
+    : (KB.mix S v ε i U θ p p).re ≤ ∑ u ∈ U, θ u * max (B u) 0 := by
   unfold KB.mix
   rw [Complex.re_sum]
   refine Finset.sum_le_sum fun u hu => ?_
   rw [Complex.re_ofReal_mul]
-  exact mul_le_mul_of_nonneg_left
-    ((Complex.re_le_norm _).trans ((hB u hu).trans (le_max_left _ _))) (hθ u)
+  exact mul_le_mul_of_nonneg_left ((Complex.re_le_norm _).trans ((hB u hu).trans (le_max_left _ _)))
+    (hθ u)
 
 private lemma two_mul_norm_le_add_of_psdOn_pair {α : Type} [DecidableEq α] (G : α → α → ℂ) (p q : α) (hpq : p ≠ q)
     (h : TB.PSDOn ({p, q} : Finset α) G) : 2 * ‖G p q‖ ≤ ‖G p p‖ + ‖G q q‖ := by
@@ -66,9 +70,13 @@ private lemma two_mul_norm_le_add_of_psdOn_pair {α : Type} [DecidableEq α] (G 
   have hb := Complex.re_le_norm (G q q)
   linarith
 
-theorem gN_entry (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (v : Fin S.f) (ε : ℝ) (hε : 0 < ε) (j : ℕ)
-    (hj : j ≤ S.G.r + 1) (w : S.W) (p q : C.LPt) (B : ℝ) (hp : ‖KB.gN S v ε j (w.1 v) p p‖ ≤ B)
-    (hq : ‖KB.gN S v ε j (w.1 v) q q‖ ≤ B) : ‖KB.gN S v ε j (w.1 v) p q‖ ≤ B := by
+theorem gN_entry
+    (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (v : Fin S.f)
+    (ε : ℝ) (hε : 0 < ε)
+    (j : ℕ) (hj : j ≤ S.G.r + 1)
+    (w : S.W) (p q : C.LPt) (B : ℝ)
+    (hp : ‖KB.gN S v ε j (w.1 v) p p‖ ≤ B) (hq : ‖KB.gN S v ε j (w.1 v) q q‖ ≤ B)
+    : ‖KB.gN S v ε j (w.1 v) p q‖ ≤ B := by
   by_cases hpq : p = q
   · subst hpq
     exact hp
@@ -82,13 +90,16 @@ theorem gN_entry (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (v : Fin S.f) 
   · rw [div_le_iff₀ hs] at hp hq ⊢
     linarith
 
-theorem locSup_step (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hg : 0 < S.g) (v : Fin S.f)
+theorem locSup_step
+    (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hg : 0 < S.g) (v : Fin S.f)
     (Λ : ℕ → ℕ → Fin S.f → ℝ) (hLL : KB.LiftLoc S v fun b s => Λ b s v) (hGL : KB.GermLoc S v)
-    (ε : ℝ) (hε : 0 < ε) (n : ℕ) (hn : 2 ≤ n) (b : ℕ) (hb : 1 ≤ b) (hbn : b + n ≤ S.G.r + 2)
-    (hΛ0 : 0 ≤ Λ b (n - 1) v) (h : C.LPt) (hh : D.ptSize h = b - 1)
+    (ε : ℝ) (hε : 0 < ε)
+    (n : ℕ) (hn : 2 ≤ n)
+    (b : ℕ) (hb : 1 ≤ b) (hbn : b + n ≤ S.G.r + 2) (hΛ0 : 0 ≤ Λ b (n - 1) v)
+    (h : C.LPt) (hh : D.ptSize h = b - 1)
     (hIH : ∀ u, D.AdmAt S v u → u.length + (n - 2) * C.Kst ≤ S.Ntop → LocSup S v ε (n - 1) b u h)
-    (a : List C.Letter) (ha : D.AdmAt S v a) (hlen : a.length + (n - 1) * C.Kst ≤ S.Ntop) :
-    LocSup S v ε n b a h := by
+    (a : List C.Letter) (ha : D.AdmAt S v a) (hlen : a.length + (n - 1) * C.Kst ≤ S.Ntop)
+    : LocSup S v ε n b a h := by
   have hk : (n - 1) * C.Kst = (n - 2) * C.Kst + C.Kst := by
     have : n - 1 = (n - 2) + 1 := by omega
     rw [this, add_mul, one_mul]
@@ -97,13 +108,15 @@ theorem locSup_step (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hg : 0 < S
   rw [hl2] at hBa
   obtain ⟨w, rfl⟩ := exists_word_of_admissible_at_place S ha
 
-  have hsup : ∃ B : ℝ, ∀ p ∈ ({h} : Finset C.LPt), ∀ t : ℂ, t ≠ 0 →
-      ‖KB.gN S v ε (b + n - 2) (w.1 v) (p ++ [(n - 1, t)]) (p ++ [(n - 1, t)])‖ ≤ B :=
+  have hsup
+      : ∃ B : ℝ, ∀ p ∈ ({h} : Finset C.LPt), ∀ t : ℂ,
+        t ≠ 0 → ‖KB.gN S v ε (b + n - 2) (w.1 v) (p ++ [(n - 1, t)]) (p ++ [(n - 1, t)])‖ ≤ B :=
     ⟨Ba, fun p hp t ht => by rw [Finset.mem_singleton] at hp; subst hp; exact hBa t ht⟩
   obtain ⟨hcont, Pua, Paa, hblk, ⟨B', hB'⟩, hlim⟩ :=
     hGL ε hε b n hb hn hbn (w.1 v) ha {h} (by simp [hh]) hsup
 
-  obtain ⟨Up, θp, Um, θm, hUp, hUm, hLB⟩ := hLL b (n - 1) hb (by omega) (by omega) (w.1 v) ha (by omega)
+  obtain ⟨Up, θp, Um, θm, hUp, hUm, hLB⟩ :=
+    hLL b (n - 1) hb (by omega) (by omega) (w.1 v) ha (by omega)
   have hBu : ∀ u ∈ Up ∪ Um, LocSup S v ε (n - 1) b u h := by
     intro u hu
     rcases Finset.mem_union.1 hu with hu | hu
@@ -118,39 +131,58 @@ theorem locSup_step (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hg : 0 < S
   have hBt0 : 0 ≤ Bt := (le_max_right _ _).trans (le_max_left _ _)
 
   obtain ⟨i1, i2, hcov, -⟩ := pbc_lstdFacts 1 1 one_pos
-  have := i1; have := i2
+  have := i1
+  have := i2
   have hgR : (0 : ℝ) < S.g := by exact_mod_cast hg
   obtain ⟨Lm, j1, j2, hLm⟩ := GlobalTheory.dual_smul_mem (Lstd 1 1) (S.g : ℝ) hgR.ne'
-  have := j1; have := j2
+  have := j1
+  have := j2
   obtain ⟨Cs, -, hCsum⟩ := pbc_lstdSum
   obtain ⟨hsm, -⟩ := hCsum 1 1 (S.g : ℝ) (fun _ => Λ b (n - 1) v) one_pos hgR (fun _ => hΛ0)
   let D : Fin 1 → C.LPt → C.LPt → ℂ → ℂ := fun _ p q c =>
     KB.gN S v ε (b + n - 1) (w.1 v) (p ++ [(n, c)]) (q ++ [(n, c)])
   let U : Fin 1 → C.LPt × ℂ → C.LPt × ℂ → ℂ := fun _ p q =>
     KB.gN S v ε (b + n - 2) (w.1 v) (p.1 ++ [(n - 1, p.2⁻¹)]) (q.1 ++ [(n - 1, q.2⁻¹)])
-  have hGD : GermData {h} U (fun _ => Pua) (fun _ => Paa) (fun _ σ p q => KB.hatB S v ε b n (w.1 v) σ p q) := by
-    refine ⟨fun _ Xs hXs => hblk Xs hXs, ⟨max Ba B' ⊔ 0, le_max_right _ _, fun _ p hp x hx => ?_⟩,
-      fun _ p hp q hq σ => (hlim p hp q hq σ).1, fun _ p hp q hq σ => (hlim p hp q hq σ).2.1,
-      fun _ p hp q hq σ => (hlim p hp q hq σ).2.2⟩
-    rw [Finset.mem_singleton] at hp; subst hp
-    refine ⟨(hBa x⁻¹ (inv_ne_zero hx)).trans ?_, (hB' p (Finset.mem_singleton_self p) x hx).trans ?_⟩
+  have hGD : GermData {h} U
+      (fun _ => Pua)
+      (fun _ => Paa)
+      (fun _ σ p q => KB.hatB S v ε b n (w.1 v) σ p q) := by
+    refine ⟨
+      fun _ Xs hXs => hblk Xs hXs,
+      ⟨max Ba B' ⊔ 0, le_max_right _ _, fun _ p hp x hx => ?_⟩,
+      fun _ p hp q hq σ => (hlim p hp q hq σ).1,
+      fun _ p hp q hq σ => (hlim p hp q hq σ).2.1,
+      fun _ p hp q hq σ => (hlim p hp q hq σ).2.2
+    ⟩
+    rw [Finset.mem_singleton] at hp
+    subst hp
+    refine
+      ⟨(hBa x⁻¹ (inv_ne_zero hx)).trans ?_, (hB' p (Finset.mem_singleton_self p) x hx).trans ?_⟩
     · exact (le_max_left _ _).trans (le_max_left _ _)
     · exact (le_max_right _ _).trans (le_max_left _ _)
-  have hD : ∀ (v' : Fin 1) (z : ℂ), z ≠ 0 → TB.PSDOn ({h} : Finset C.LPt) (fun p q => D v' p q z) := by
+  have hD
+      : ∀ (v' : Fin 1) (z : ℂ), z ≠ 0 → TB.PSDOn ({h} : Finset C.LPt) (fun p q => D v' p q z) := by
     intro v' z _
-    have := PBB.gN_psd S hpos v ε hε (b + n - 1) (by omega) w (({h} : Finset C.LPt).image fun p => p ++ [(n, z)])
-    exact JCx1.decay.psd_pull _ _ this {h} (fun p => p ++ [(n, z)]) (fun p hp => Finset.mem_image_of_mem _ hp)
+    have :=
+      PBB.gN_psd S hpos v ε hε (b + n - 1) (by omega) w
+        (({h} : Finset C.LPt).image fun p => p ++ [(n, z)])
+    exact JCx1.decay.psd_pull _ _ this {h}
+      (fun p => p ++ [(n, z)])
+      (fun p hp => Finset.mem_image_of_mem _ hp)
 
-  have hF : ∀ σ ∈ crystallineComparison.dualSet (Lstd 1 1), ∀ x : crystallineComparison.V 1, Good x → Good (x + (S.g : ℝ) • σ) →
-      ‖phi {h} (fun _ _ => (1 : ℂ)) U x (x + (S.g : ℝ) • σ)‖ ≤
-        Bt * crystallineComparison.mL C.Kst (fun _ => Λ b (n - 1) v) ((S.g : ℝ) • σ) := by
+  have hF
+      : ∀ σ ∈ crystallineComparison.dualSet (Lstd 1 1), ∀ x : crystallineComparison.V 1,
+        Good x → Good (x + (S.g : ℝ) • σ)
+          → ‖phi {h} (fun _ _ => (1 : ℂ)) U x (x + (S.g : ℝ) • σ)‖
+            ≤ Bt * crystallineComparison.mL C.Kst (fun _ => Λ b (n - 1) v) ((S.g : ℝ) • σ) := by
     intro σ _ x hx hx'
     set t := (x 0)⁻¹ with ht_def
     set t' := ((x + (S.g : ℝ) • σ) 0)⁻¹ with ht'_def
     have ht : t ≠ 0 := inv_ne_zero (hx 0)
     have ht' : t' ≠ 0 := inv_ne_zero (hx' 0)
-    have ephi : phi {h} (fun _ _ => (1 : ℂ)) U x (x + (S.g : ℝ) • σ) =
-        KB.gN S v ε (b + n - 2) (w.1 v) (h ++ [(n - 1, t)]) (h ++ [(n - 1, t')]) := by
+    have ephi
+        : phi {h} (fun _ _ => (1 : ℂ)) U x (x + (S.g : ℝ) • σ)
+          = KB.gN S v ε (b + n - 2) (w.1 v) (h ++ [(n - 1, t)]) (h ++ [(n - 1, t')]) := by
       simp [phi, U, t, t']
     rw [ephi, mL_one]
     set a0 := ‖((S.g : ℝ) • σ) 0‖
@@ -161,21 +193,26 @@ theorem locSup_step (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hg : 0 < S
       gN_entry S hpos v ε hε _ (by omega) w _ _ Ba (hBa t ht) (hBa t' ht')
 
     obtain ⟨u, hu, hB⟩ := hLB ε hε t t' {h} ht ht' (by simp [hh])
-    have hob := offdiag_bound _ _ _ h {h} (Finset.mem_singleton_self h) hB
-      (Λ b (n - 1) v ^ C.Kst * Bp) (Λ b (n - 1) v ^ C.Kst * Bq) ?_ ?_
+    have hob :=
+      offdiag_bound _ _ _ h {h} (Finset.mem_singleton_self h) hB (Λ b (n - 1) v ^ C.Kst * Bp)
+        (Λ b (n - 1) v ^ C.Kst * Bq) ?_ ?_
     rotate_left
     · simp only
-      rw [show (((Λ b (n - 1) v ^ C.Kst : ℝ) : ℂ) * KB.mix S v ε (b + (n - 1) - 1) Up θp (h ++ [(n - 1, t)])
-          (h ++ [(n - 1, t)])).re = Λ b (n - 1) v ^ C.Kst * (KB.mix S v ε (b + (n - 1) - 1) Up θp (h ++ [(n - 1, t)])
-          (h ++ [(n - 1, t)])).re from Complex.re_ofReal_mul _ _]
+      rw [show (((Λ b (n - 1) v ^ C.Kst : ℝ) : ℂ)
+            * KB.mix S v ε (b + (n - 1) - 1) Up θp (h ++ [(n - 1, t)]) (h ++ [(n - 1, t)])).re
+          = Λ b (n - 1) v ^ C.Kst
+            * (KB.mix S v ε (b + (n - 1) - 1) Up θp (h ++ [(n - 1, t)]) (h ++ [(n - 1, t)])).re from
+        Complex.re_ofReal_mul _ _]
       refine mul_le_mul_of_nonneg_left ?_ (pow_nonneg hΛ0 _)
       rw [hl2]
       exact re_mix_le S v ε _ Up θp hUp.1.1 _ Bu fun u hu => by
         have := hBu' u (Finset.mem_union_left _ hu) t ht; rwa [hl2] at this
     · simp only
-      rw [show (((Λ b (n - 1) v ^ C.Kst : ℝ) : ℂ) * KB.mix S v ε (b + (n - 1) - 1) Um θm (h ++ [(n - 1, t')])
-          (h ++ [(n - 1, t')])).re = Λ b (n - 1) v ^ C.Kst * (KB.mix S v ε (b + (n - 1) - 1) Um θm
-          (h ++ [(n - 1, t')]) (h ++ [(n - 1, t')])).re from Complex.re_ofReal_mul _ _]
+      rw [show (((Λ b (n - 1) v ^ C.Kst : ℝ) : ℂ)
+            * KB.mix S v ε (b + (n - 1) - 1) Um θm (h ++ [(n - 1, t')]) (h ++ [(n - 1, t')])).re
+          = Λ b (n - 1) v ^ C.Kst * (KB.mix S v ε (b + (n - 1) - 1) Um θm (h ++ [(n - 1, t')])
+            (h ++ [(n - 1, t')])).re from
+        Complex.re_ofReal_mul _ _]
       refine mul_le_mul_of_nonneg_left ?_ (pow_nonneg hΛ0 _)
       rw [hl2]
       exact re_mix_le S v ε _ Um θm hUm.1.1 _ Bu fun u hu => by
@@ -201,35 +238,62 @@ theorem locSup_step (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hg : 0 < S
       refine h2.trans ?_
       rw [mul_comm]
       exact mul_le_mul_of_nonneg_right (le_max_right _ _) (pow_nonneg (div_nonneg hΛ0 ha0.le) _)
-  refine ⟨(∏ _v : Fin 1, KB.dlB S b n) *
-    ∑' σ : crystallineComparison.dualSet (Lstd 1 1), Bt * crystallineComparison.mL C.Kst (fun _ => Λ b (n - 1) v) ((S.g : ℝ) • (σ : crystallineComparison.V 1)),
-    fun t ht => ?_⟩
-  have hH := herglotz_germ (H := C.LPt) (f := 1) {h} (fun _ _ => 1) (psd_single_one h) D hD
-    (fun _ p hp q hq => (hcont p hp q hq).1) (fun _ p hp q hq => (hcont p hp q hq).2) (S.g : ℝ) hgR
-    (fun _ => KB.dlB S b n) (fun _ => dlB_pos S hg b n) U (fun _ => Pua) (fun _ => Paa)
-    (fun _ σ p q => KB.hatB S v ε b n (w.1 v) σ p q) hGD (fun _ _ _ _ => rfl) (Lstd 1 1) Lm hLm
-    (fun σ => Bt * crystallineComparison.mL C.Kst (fun _ => Λ b (n - 1) v) ((S.g : ℝ) • σ)) (hsm.mul_left Bt) hF
-    (fun _ => t) {fun _ => t} (by simp)
+  refine ⟨
+    (∏ _v : Fin 1, KB.dlB S b n)
+      * ∑' σ : crystallineComparison.dualSet (Lstd 1 1), Bt * crystallineComparison.mL C.Kst (fun _ => Λ b (n - 1) v) ((S.g : ℝ) • (σ : crystallineComparison.V 1)),
+    fun t ht => ?_
+  ⟩
+  have hH :=
+    herglotz_germ (H := C.LPt) (f := 1) {h}
+      (fun _ _ => 1)
+      (psd_single_one h) D hD
+      (fun _ p hp q hq => (hcont p hp q hq).1)
+      (fun _ p hp q hq => (hcont p hp q hq).2)
+      (S.g : ℝ) hgR
+      (fun _ => KB.dlB S b n)
+      (fun _ => dlB_pos S hg b n)
+      U
+      (fun _ => Pua)
+      (fun _ => Paa)
+      (fun _ σ p q => KB.hatB S v ε b n (w.1 v) σ p q)
+      hGD
+      (fun _ _ _ _ => rfl)
+      (Lstd 1 1) Lm hLm
+      (fun σ => Bt * crystallineComparison.mL C.Kst (fun _ => Λ b (n - 1) v) ((S.g : ℝ) • σ))
+      (hsm.mul_left Bt) hF
+      (fun _ => t)
+      {fun _ => t} (by simp)
   rw [hcov, Finset.sum_singleton] at hH
   have hgood : Good (fun _ : Fin 1 => t) := fun _ => ht
-  have hN : Nz {h} (fun _ _ => (1 : ℂ)) D (fun _ => t) =
-      (KB.gN S v ε (b + n - 1) (w.1 v) (h ++ [(n, t)]) (h ++ [(n, t)])).re := by
+  have hN
+      : Nz {h} (fun _ _ => (1 : ℂ)) D (fun _ => t)
+        = (KB.gN S v ε (b + n - 1) (w.1 v) (h ++ [(n, t)]) (h ++ [(n, t)])).re := by
     simp [Nz, hgood, Fz, D]
   rw [hN, one_pow, one_mul] at hH
-  have h0 := psd_diag _ _ (PBB.gN_psd S hpos v ε hε (b + n - 1) (by omega) w {h ++ [(n, t)]})
-    (Finset.mem_singleton_self _)
+  have h0 :=
+    psd_diag _ _ (PBB.gN_psd S hpos v ε hε (b + n - 1) (by omega) w {h ++ [(n, t)]})
+      (Finset.mem_singleton_self _)
   have hc := Complex.nonneg_iff.1 h0
-  have e : KB.gN S v ε (b + n - 1) (w.1 v) (h ++ [(n, t)]) (h ++ [(n, t)]) =
-      ((KB.gN S v ε (b + n - 1) (w.1 v) (h ++ [(n, t)]) (h ++ [(n, t)])).re : ℂ) :=
+  have e
+      : KB.gN S v ε (b + n - 1) (w.1 v) (h ++ [(n, t)]) (h ++ [(n, t)])
+        = ((KB.gN S v ε (b + n - 1) (w.1 v) (h ++ [(n, t)]) (h ++ [(n, t)])).re : ℂ) :=
     Complex.ext (by simp) (by simp [hc.2.symm])
   rw [e, Complex.norm_real, Real.norm_of_nonneg hc.1]
   exact hH
 
-theorem locSup_all (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hI : KB.IntAll S) (hg : 0 < S.g) (v : Fin S.f)
+theorem locSup_all
+    (S : C.HidaSetting E Wp Wq) (hpos : C.ThmPPos S) (hI : KB.IntAll S) (hg : 0 < S.g) (v : Fin S.f)
     (Λ : ℕ → ℕ → Fin S.f → ℝ) (hLL : KB.LiftLoc S v fun b s => Λ b s v) (hGL : KB.GermLoc S v)
-    (hΛ0 : ∀ b s, 1 ≤ b → 1 ≤ s → b + s ≤ S.G.r + 1 → 0 ≤ Λ b s v) (ε : ℝ) (hε : 0 < ε) :
-    ∀ n, 1 ≤ n → ∀ b, 1 ≤ b → b + n ≤ S.G.r + 2 → ∀ h, D.ptSize h = b - 1 → ∀ a, D.AdmAt S v a →
-      a.length + (n - 1) * C.Kst ≤ S.Ntop → LocSup S v ε n b a h := by
+    (hΛ0 : ∀ b s, 1 ≤ b → 1 ≤ s → b + s ≤ S.G.r + 1 → 0 ≤ Λ b s v)
+    (ε : ℝ) (hε : 0 < ε)
+    : ∀ n,
+      1 ≤ n
+        → ∀ b,
+          1 ≤ b → b + n ≤ S.G.r + 2
+            → ∀ h,
+              D.ptSize h = b - 1
+                → ∀ a,
+                  D.AdmAt S v a → a.length + (n - 1) * C.Kst ≤ S.Ntop → LocSup S v ε n b a h := by
   intro n
   induction n with
   | zero => intro h0; omega

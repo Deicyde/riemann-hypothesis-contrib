@@ -16,16 +16,25 @@ namespace ReciprocityTheory.PGsh.Up
 
 open ReciprocityTheory.PGsh.L2
 
-theorem hasLen_le_of_surj {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R]
-    [Algebra R C] (hv : v.Integers R) {M : Type} [AddCommGroup M] [Module R M] {z : NNReal}
-    (hz : HasLen v R M z) (q : R) (r : ℕ)
-    (π : M →ₗ[R] ((t : Fin r) → R ⧸ Ideal.span {q})) (hπ : Function.Surjective π) :
-    z ≤ v (algebraMap R C q) ^ r := by
+theorem hasLen_le_of_surj
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    {M : Type} [AddCommGroup M] [Module R M]
+    {z : NNReal} (hz : HasLen v R M z)
+    (q : R) (r : ℕ) (π : M →ₗ[R] ((t : Fin r) → R ⧸ Ideal.span {q})) (hπ : Function.Surjective π)
+    : z ≤ v (algebraMap R C q) ^ r := by
   obtain ⟨m, c, ⟨e⟩, hzc⟩ := hz
-  have hx : HasLen v R ((t : Fin r) → R ⧸ Ideal.span {q}) (v (algebraMap R C q) ^ r) :=
-    ⟨r, fun _ => q, ⟨LinearEquiv.refl R _⟩, by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]⟩
-  have hs : Submodule.span R (Set.range fun i : Fin m =>
-      (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j})) = ⊤ := by
+  have hx : HasLen v R ((t : Fin r) → R ⧸ Ideal.span {q}) (v (algebraMap R C q) ^ r) := ⟨
+    r,
+    fun _ => q,
+    ⟨LinearEquiv.refl R _⟩,
+    by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+  ⟩
+  have hs
+      : Submodule.span R
+          (Set.range fun i : Fin m => (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j}))
+        = ⊤ := by
     rw [eq_top_iff]
     intro x _
     rw [show x = ∑ i, (Pi.single i (x i) : (j : Fin m) → R ⧸ Ideal.span {c j}) from
@@ -42,11 +51,16 @@ theorem hasLen_le_of_surj {C : Type} [Field C] {v : Valuation C NNReal} {R : Typ
       · simp [Pi.single_eq_of_ne hj]
     rw [hsi]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
-  have hy : Submodule.span R (Set.range fun i : Fin m =>
-      π (e.symm (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j}))) = ⊤ := by
-    have hr : (Set.range fun i : Fin m => π (e.symm (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j}))) =
-        (π ∘ₗ e.symm.toLinearMap) '' Set.range fun i : Fin m =>
-          (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j}) := by
+  have hy
+      : Submodule.span R
+          (Set.range fun i : Fin m =>
+            π (e.symm (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j})))
+        = ⊤ := by
+    have hr
+        : (Set.range fun i : Fin m =>
+            π (e.symm (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j})))
+          = (π ∘ₗ e.symm.toLinearMap)
+            '' Set.range fun i : Fin m => (Pi.single i 1 : (j : Fin m) → R ⧸ Ideal.span {c j}) := by
       rw [← Set.range_comp]
       rfl
     rw [hr, Submodule.span_image, hs, Submodule.map_top, LinearMap.range_eq_top]
@@ -67,10 +81,13 @@ theorem hasLen_le_of_surj {C : Type} [Field C] {v : Valuation C NNReal} {R : Typ
 
 section Mono
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
-  {σ : O ≃ₐ[ℤ_[p]] O} {cp : R} {H : HodgeTateDatum p g v R O σ cp} {U : UnramData p g v R O σ cp H}
-  {X : Fin U.m → NNReal}
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+  {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
+  {H : HodgeTateDatum p g v R O σ cp} {U : UnramData p g v R O σ cp H} {X : Fin U.m → NNReal}
 
 lemma monX_eq (D : Lifts H U X) (α : Nb p g) : monX D α = ∏ j, xL D j ^ (α j).val := by
   funext y

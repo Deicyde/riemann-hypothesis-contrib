@@ -15,9 +15,9 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.UnramCard
 
-theorem card_quot_mul {R : Type*} [CommRing R] {a : R} (ha : a ∈ nonZeroDivisors R) (b : R) :
-    Nat.card (R ⧸ Ideal.span {a * b}) =
-      Nat.card (R ⧸ Ideal.span {a}) * Nat.card (R ⧸ Ideal.span {b}) := by
+theorem card_quot_mul {R : Type*} [CommRing R] {a : R} (ha : a ∈ nonZeroDivisors R) (b : R)
+    : Nat.card (R ⧸ Ideal.span {a * b})
+      = Nat.card (R ⧸ Ideal.span {a}) * Nat.card (R ⧸ Ideal.span {b}) := by
   have h : Ideal.span {a * b} = a • Ideal.span {b} := by
     rw [← Ideal.span_singleton_mul_span_singleton, ← Submodule.ideal_span_singleton_smul,
       smul_eq_mul]
@@ -29,13 +29,22 @@ theorem card_quot_mul {R : Type*} [CommRing R] {a : R} (ha : a ∈ nonZeroDiviso
     Nat.card_congr (LinearMap.quotKerEquivOfSurjective _ hs).toEquiv, he.linearMap_ker_eq,
     ← Nat.card_congr (LinearEquiv.ofInjective _ hi).toEquiv, mul_comm]
 
-theorem card_quot_map {R : Type*} [CommRing R] (c : R ≃+* R) (a : R) :
-    Nat.card (R ⧸ Ideal.span {c a}) = Nat.card (R ⧸ Ideal.span {a}) := by
-  refine (Nat.card_congr (Ideal.quotientEquiv (Ideal.span {a}) (Ideal.span {c a}) c ?_).toEquiv).symm
+theorem card_quot_map {R : Type*} [CommRing R] (c : R ≃+* R) (a : R)
+    : Nat.card (R ⧸ Ideal.span {c a}) = Nat.card (R ⧸ Ideal.span {a}) := by
+  refine (Nat.card_congr (Ideal.quotientEquiv (Ideal.span {a}) (Ideal.span {c a}) c
+    ?_).toEquiv).symm
   rw [Ideal.map_span]
   simp
 
-theorem card_quot_eq_pow : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (ϖ : 𝒪[F]), Irreducible ϖ → ∀ δ : L.O, IsUnit (δ : E) → 0 ≤ vE L ϖ ((δ : E) * L.cj δ) ∧ Nat.card (L.O ⧸ Ideal.span {δ}) = resQ ϖ ^ (vE L ϖ ((δ : E) * L.cj δ)).toNat := by
+theorem card_quot_eq_pow
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (ϖ : 𝒪[F]),
+        Irreducible ϖ
+          → ∀ δ : L.O,
+            IsUnit (δ : E)
+              → 0 ≤ vE L ϖ ((δ : E) * L.cj δ)
+                ∧ Nat.card (L.O ⧸ Ideal.span {δ}) = resQ ϖ ^ (vE L ϖ ((δ : E) * L.cj δ)).toNat := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ δ hδ
   obtain ⟨-, h2, -, -, h5, h6, -, -⟩ := GlobalTheory.UnramOrder.order_facts L ϖ hϖ
   obtain ⟨-, -, v3, v4⟩ := GlobalTheory.UnramVal.vE_valuation L ϖ hϖ
@@ -53,13 +62,14 @@ theorem card_quot_eq_pow : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologica
   obtain ⟨j, hj⟩ := Int.eq_ofNat_of_zero_le hv
   rw [hj, zpow_natCast] at hu
   rw [hj, Int.toNat_natCast]
-  let c : L.O ≃+* L.O :=
-    { toFun := fun x => ⟨L.cj x, GlobalTheory.UnramOrder.cj_mem L x.2⟩
-      invFun := fun x => ⟨L.cj x, GlobalTheory.UnramOrder.cj_mem L x.2⟩
-      left_inv := fun x => Subtype.ext (L.cj_cj x)
-      right_inv := fun x => Subtype.ext (L.cj_cj x)
-      map_mul' := fun x y => Subtype.ext (map_mul L.cj (x : E) y)
-      map_add' := fun x y => Subtype.ext (map_add L.cj (x : E) y) }
+  let c : L.O ≃+* L.O := {
+    toFun := fun x => ⟨L.cj x, GlobalTheory.UnramOrder.cj_mem L x.2⟩
+    invFun := fun x => ⟨L.cj x, GlobalTheory.UnramOrder.cj_mem L x.2⟩
+    left_inv := fun x => Subtype.ext (L.cj_cj x)
+    right_inv := fun x => Subtype.ext (L.cj_cj x)
+    map_mul' := fun x y => Subtype.ext (map_mul L.cj (x : E) y)
+    map_add' := fun x y => Subtype.ext (map_add L.cj (x : E) y)
+  }
   have hnz : δ ∈ nonZeroDivisors L.O := by
     rw [mem_nonZeroDivisors_iff_right]
     intro x hx

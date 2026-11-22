@@ -7,15 +7,21 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwCen
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.G8.Fin GlobalTheory.CompanionTheory.LocalHypotheses
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.G8.Fin
+  GlobalTheory.CompanionTheory.LocalHypotheses
 open scoped Classical
 
 namespace GlobalTheory.CompanionTheory.UnitTransport
 
-theorem unitConds_of_homeo : ∀ {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G'] (e : G ≃ₜ* G') (θ : G →* G) (θ' : G' →* G')
-  (K : Subgroup G) (K' : Subgroup G') (d : G) (f : G → ℂ) (f' : G' → ℂ), (∀ x, e (θ x) = θ' (e x)) → (∀ x, x ∈ K ↔ e x ∈ K') →
-  (∀ x, f x = f' (e x)) → UnitConds θ' K' (e d) f' → UnitConds θ K d f := by
+theorem unitConds_of_homeo
+    : ∀ {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G'] (e : G ≃ₜ* G')
+        (θ : G →* G) (θ' : G' →* G') (K : Subgroup G) (K' : Subgroup G') (d : G) (f : G → ℂ)
+        (f' : G' → ℂ),
+      (∀ x, e (θ x) = θ' (e x)) → (∀ x, x ∈ K ↔ e x ∈ K') → (∀ x, f x = f' (e x))
+        → UnitConds θ' K' (e d) f'
+        → UnitConds θ K d f := by
   intro G G' _ _ _ _ e θ θ' K K' d f f' hθ hK hf h
   unfold GlobalTheory.CompanionTheory.LocalHypotheses.UnitConds at h ⊢
   obtain ⟨h1, h2, h3, h4⟩ := h
@@ -31,8 +37,9 @@ theorem unitConds_of_homeo : ∀ {G G' : Type} [Group G] [TopologicalSpace G] [G
       have htd : t * d = d * θ t := ht
       show e t * e d = e d * θ' (e t)
       rw [← hθ, ← map_mul e, ← map_mul e, htd]
-    have hcl : closure (Subgroup.zpowers (e t) : Set G') =
-        e '' closure (Subgroup.zpowers t : Set G) := by
+    have hcl
+        : closure (Subgroup.zpowers (e t) : Set G')
+          = e '' closure (Subgroup.zpowers t : Set G) := by
       apply Set.Subset.antisymm
       · intro y hy
         refine ⟨e.symm y, ?_, e.apply_symm_apply y⟩

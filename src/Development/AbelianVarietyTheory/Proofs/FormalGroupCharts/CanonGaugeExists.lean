@@ -9,11 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.PderivSe
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB
 
 namespace GlobalTheory
 
-theorem canonGauge_exists : CanonGaugeSt :=
-  canonGauge_of_log FormalLog.logSt_and_logDerivSt.1
+theorem canonGauge_exists : CanonGaugeSt := canonGauge_of_log FormalLog.logSt_and_logDerivSt.1
 
 end GlobalTheory

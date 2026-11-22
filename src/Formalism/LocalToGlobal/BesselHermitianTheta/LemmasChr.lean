@@ -6,7 +6,9 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.MinfDensity
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory
 open scoped TensorProduct
 
 namespace Formalism.L2.Theta
@@ -15,22 +17,28 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem norm_idF (a : (AF D.host.F)ˣ) :
-    Units.map (Algebra.norm (AF D.host.F) : AE D →* AF D.host.F) (idF D a) = a ^ 2 := by
+theorem norm_idF (a : (AF D.host.F)ˣ)
+    : Units.map (Algebra.norm (AF D.host.F) : AE D →* AF D.host.F) (idF D a) = a ^ 2 := by
   apply Units.ext
   have b : Module.Basis (Fin 2) D.host.F D.host.E := Module.finBasisOfFinrankEq _ _ D.sp.cm.deg2
-  have := Algebra.norm_algebraMap_of_basis (Algebra.TensorProduct.basis (AF D.host.F) b) (a : AF D.host.F)
+  have :=
+    Algebra.norm_algebraMap_of_basis (Algebra.TensorProduct.basis (AF D.host.F) b) (a : AF D.host.F)
   simpa [idF] using this
 
-theorem eta_sq {η : (AF D.host.F)ˣ →* Circle} (h : IsEta D η) (a : (AF D.host.F)ˣ) : η a ^ 2 = 1 := by
+theorem eta_sq {η : (AF D.host.F)ˣ →* Circle} (h : IsEta D η) (a : (AF D.host.F)ˣ)
+    : η a ^ 2 = 1 := by
   have h1 := h.2.2.1 (idF D a)
   rw [norm_idF, map_pow] at h1
   exact h1
 
-theorem eta_pow_parity {η : (AF D.host.F)ˣ →* Circle} (h : IsEta D η) (a : (AF D.host.F)ˣ) {n m : ℕ}
-    (e : n % 2 = m % 2) : η a ^ n = η a ^ m := by
+theorem eta_pow_parity
+    {η : (AF D.host.F)ˣ →* Circle} (h : IsEta D η)
+    (a : (AF D.host.F)ˣ)
+    {n m : ℕ} (e : n % 2 = m % 2)
+    : η a ^ n = η a ^ m := by
   have h2 := eta_sq h a
-  rw [← Nat.mod_add_div n 2, ← Nat.mod_add_div m 2, pow_add, pow_add, pow_mul, pow_mul, h2, one_pow, one_pow, e]
+  rw [← Nat.mod_add_div n 2, ← Nat.mod_add_div m 2, pow_add, pow_add, pow_mul, pow_mul, h2, one_pow,
+    one_pow, e]
 
 variable {χ χ' : (AE D)ˣ →* Circle} {n m : ℕ}
 
@@ -52,12 +60,18 @@ theorem resEta_inv (h : ResEta D χ n) : ResEta D χ⁻¹ n := by
 
 variable {X : ThetaX D}
 
-theorem col_ok (T : ThetaTied D X) (μ : D.what₂.Tup) (s : ℕ) (h1 : 1 ≤ s) (h2 : s ≤ D.R.m) (n : ℕ) (hn : Even n) :
-    ResEta D (T.eChr (X.chrOf μ s)) n :=
+theorem col_ok
+    (T : ThetaTied D X) (μ : D.what₂.Tup)
+    (s : ℕ) (h1 : 1 ≤ s) (h2 : s ≤ D.R.m)
+    (n : ℕ) (hn : Even n)
+    : ResEta D (T.eChr (X.chrOf μ s)) n :=
   resEta_parity (T.chrOf_res μ s h1 h2) (by rw [Nat.even_iff.1 hn])
 
-theorem carY_ok (T : ThetaTied D X) (μ : D.what₂.Tup) (s : ℕ) (h1 : 1 ≤ s) (h2 : s ≤ D.R.m) (i n : ℕ)
-    (hn : Even n ↔ Odd i) : ResEta D (T.eChr (X.carY μ s i)) n := by
+theorem carY_ok
+    (T : ThetaTied D X) (μ : D.what₂.Tup)
+    (s : ℕ) (h1 : 1 ≤ s) (h2 : s ≤ D.R.m)
+    (i n : ℕ) (hn : Even n ↔ Odd i)
+    : ResEta D (T.eChr (X.carY μ s i)) n := by
   unfold ThetaX.carY
   split_ifs with hi
   · have hn' : n % 2 = 1 := by
@@ -68,9 +82,12 @@ theorem carY_ok (T : ThetaTied D X) (μ : D.what₂.Tup) (s : ℕ) (h1 : 1 ≤ s
     exact resEta_parity (resEta_mul (T.chrOf_res μ s h1 h2) (resEta_inv T.etaT_res)) (by rw [hn'])
   · exact col_ok T μ s h1 h2 n (hn.2 (Nat.not_even_iff_odd.1 hi))
 
-theorem rank_X (X : ThetaX D) (j : ℕ) (hj : j ≤ D.R.m) : (D.sp.X j).rank = D.R.k + j * (D.R.t + 1) := D.sp.X_rank j hj
+theorem rank_X (X : ThetaX D) (j : ℕ) (hj : j ≤ D.R.m)
+    : (D.sp.X j).rank = D.R.k + j * (D.R.t + 1) :=
+  D.sp.X_rank j hj
 
-theorem rank_Y (X : ThetaX D) (i : ℕ) (hi : i ≤ D.R.m) : (D.sp.Y i).rank = D.R.r + i * D.R.t := D.sp.Y_rank i hi
+theorem rank_Y (X : ThetaX D) (i : ℕ) (hi : i ≤ D.R.m) : (D.sp.Y i).rank = D.R.r + i * D.R.t :=
+  D.sp.Y_rank i hi
 
 theorem r_odd (D : D7) : Odd D.R.r := by
   obtain ⟨a, ha⟩ := D.R.k_even
@@ -80,8 +97,11 @@ theorem r_odd (D : D7) : Odd D.R.r := by
   show D.R.k + D.R.m - 1 = 2 * (a + b - 1) + 1
   omega
 
-theorem row_lift_ok (T : ThetaTied D X) (μ : D.what₂.Tup) (s : ℕ) (h1 : 1 ≤ s) (h2 : s ≤ D.R.m) (i : ℕ) (hi : i ≤ D.R.m) :
-    ResEta D (T.eChr (X.carY μ s i)) (D.sp.Y i).rank := by
+theorem row_lift_ok
+    (T : ThetaTied D X) (μ : D.what₂.Tup)
+    (s : ℕ) (h1 : 1 ≤ s) (h2 : s ≤ D.R.m)
+    (i : ℕ) (hi : i ≤ D.R.m)
+    : ResEta D (T.eChr (X.carY μ s i)) (D.sp.Y i).rank := by
   apply carY_ok T μ s h1 h2
   rw [rank_Y X i hi]
   have hr := r_odd D
@@ -94,7 +114,8 @@ theorem row_lift_ok (T : ThetaTied D X) (μ : D.what₂.Tup) (s : ℕ) (h1 : 1 �
   · intro ho
     exact hr.add_odd (ho.mul ht)
 
-theorem rank_Y_ne (X : ThetaX D) (j : ℕ) (hj : j < D.R.m) : (D.sp.Y (j + 1)).rank ≠ (D.sp.Y j).rank := by
+theorem rank_Y_ne (X : ThetaX D) (j : ℕ) (hj : j < D.R.m)
+    : (D.sp.Y (j + 1)).rank ≠ (D.sp.Y j).rank := by
   rw [rank_Y X (j + 1) hj, rank_Y X j hj.le, Nat.succ_mul]
   have ht := D.R.t_odd.pos
   generalize j * D.R.t = q

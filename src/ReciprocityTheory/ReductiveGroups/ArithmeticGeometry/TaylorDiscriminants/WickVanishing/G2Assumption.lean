@@ -12,8 +12,10 @@ open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace ReciprocityTheory.ChartRestriction.G.TB.G2
 
-theorem galois_twist_preserves_siegel_bound (hA : ExpAddZeroConstant) (hE : ConstantCoeffSubstitution) (hG : CanonicalGaugeDiffBiadditive) (hQ : QuadraticFormDerivatives)
-    (hW : WickOperatorVanishing) : AdmissibilitySecond := by
+theorem galois_twist_preserves_siegel_bound
+    (hA : ExpAddZeroConstant) (hE : ConstantCoeffSubstitution) (hG : CanonicalGaugeDiffBiadditive)
+    (hQ : QuadraticFormDerivatives) (hW : WickOperatorVanishing)
+    : AdmissibilitySecond := by
   intro R _ d O _ _ _ _ _ k _ _ _ B h h' hh hh' w0 m ι _ u P hP f
   unfold FB.nabVal
   set a : Fin 2 → Pt k 1 d := ![pt k d 0, comp1 (B.actK k w0) (pt k d 0)] with hadef
@@ -42,17 +44,23 @@ theorem galois_twist_preserves_siegel_bound (hA : ExpAddZeroConstant) (hE : Cons
   have hL0 : constantCoeff (B.hL k h w0) = 0 := by
     simp only [FB.hL]
     rw [hE k d 2 1 _ h hac, hh0]
-  have hexp : FB.expS k ((m : k) • B.hL k h' w0) =
-      FB.expS k ((m : k) • B.hL k h w0) * FB.expS k ((m : k) • q) := by
+  have hexp
+      : FB.expS k ((m : k) • B.hL k h' w0)
+        = FB.expS k ((m : k) • B.hL k h w0) * FB.expS k ((m : k) • q) := by
     rw [hL', smul_add]
     exact hA k 1 d _ _ (by rw [MvPowerSeries.smul_eq_C_mul, map_mul, hL0, mul_zero])
       (by rw [MvPowerSeries.smul_eq_C_mul, map_mul, hq0, mul_zero])
   rw [hexp, ← mul_assoc]
   symm
   exact hW k d (B.FK k) ι u
-    (fun l l' => dotProduct (u l) ((bilinPart k (h' - h)).mulVec ((dAct k B w0).mulVec (u l'))) +
-      dotProduct (u l') ((bilinPart k (h' - h)).mulVec ((dAct k B w0).mulVec (u l))))
-    P q (fun l l' => add_comm _ _) hq0 (fun l => hq1 (u l)) (fun l l' => hq2 (u l) (u l')) hP (m : k)
-    (f * FB.expS k ((m : k) • B.hL k h w0))
+    (fun l l' =>
+      dotProduct (u l) ((bilinPart k (h' - h)).mulVec ((dAct k B w0).mulVec (u l')))
+        + dotProduct (u l') ((bilinPart k (h' - h)).mulVec ((dAct k B w0).mulVec (u l))))
+    P q
+    (fun l l' => add_comm _ _)
+    hq0
+    (fun l => hq1 (u l))
+    (fun l l' => hq2 (u l) (u l'))
+    hP (m : k) (f * FB.expS k ((m : k) • B.hL k h w0))
 
 end ReciprocityTheory.ChartRestriction.G.TB.G2

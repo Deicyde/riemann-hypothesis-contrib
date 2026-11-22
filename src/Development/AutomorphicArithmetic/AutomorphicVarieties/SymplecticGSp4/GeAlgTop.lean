@@ -4,11 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_mul {H : Type} [Group H] {K : Type} [Field K] (r : H →* M4 K) {x y : M4 K}
-    (hx : x ∈ Submodule.span K (Set.range r)) (hy : y ∈ Submodule.span K (Set.range r)) :
-    x * y ∈ Submodule.span K (Set.range r) := by
+private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_mul
+    {H : Type} [Group H]
+    {K : Type} [Field K]
+    (r : H →* M4 K)
+    {x y : M4 K} (hx : x ∈ Submodule.span K (Set.range r)) (hy : y ∈ Submodule.span K (Set.range r))
+    : x * y ∈ Submodule.span K (Set.range r) := by
   induction hx using Submodule.span_induction with
   | mem a ha =>
     induction hy using Submodule.span_induction with
@@ -23,8 +28,11 @@ private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_mul {H : Type}
   | add b c _ _ hb hc => rw [add_mul]; exact add_mem hb hc
   | smul c b _ hb => rw [smul_mul_assoc]; exact Submodule.smul_mem _ _ hb
 
-private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_top {K : Type} [Field K] {n : Type} [Fintype n] [DecidableEq n]
-    (S : Submodule K (Matrix n n K)) (h : ∀ i j, Matrix.single i j (1 : K) ∈ S) : S = ⊤ := by
+private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_top
+    {K : Type} [Field K]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (S : Submodule K (Matrix n n K)) (h : ∀ i j, Matrix.single i j (1 : K) ∈ S)
+    : S = ⊤ := by
   rw [eq_top_iff]
   intro x _
   rw [Matrix.matrix_eq_sum_single x]
@@ -32,9 +40,12 @@ private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_top {K : Type}
   have := S.smul_mem (x i j) (h i j)
   simpa [Matrix.smul_single] using this
 
-private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_iff {H : Type} [Group H] {K : Type} [Field K] (r : H →* M4 K)
-    (he : ∀ i, Matrix.single i i (1 : K) ∈ Submodule.span K (Set.range r)) (i j : Fin 4) :
-    Ge r i j ↔ Matrix.single i j (1 : K) ∈ Submodule.span K (Set.range r) := by
+private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_iff
+    {H : Type} [Group H]
+    {K : Type} [Field K]
+    (r : H →* M4 K) (he : ∀ i, Matrix.single i i (1 : K) ∈ Submodule.span K (Set.range r))
+    (i j : Fin 4)
+    : Ge r i j ↔ Matrix.single i j (1 : K) ∈ Submodule.span K (Set.range r) := by
   constructor
   · rintro ⟨g, hg⟩
     have h1 := geAlg_mul r (geAlg_mul r (he i) (Submodule.subset_span ⟨g, rfl⟩)) (he j)
@@ -55,8 +66,14 @@ private theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg_iff {H : Type}
       | smul c b _ hb => simp [hb]
     simpa using key _ h
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg :
-    ∀ {H : Type} [Group H] (K : Type) [Field K] (r : H →* M4 K) (ν : H → K), (∀ g, IsGSp (ν g) (r g)) → (∀ i, Matrix.single i i (1 : K) ∈ Submodule.span K (Set.range r)) → (∀ i j, Ge r i j ↔ Matrix.single i j (1 : K) ∈ Submodule.span K (Set.range r)) ∧ (∀ i, Ge r i i) ∧ (∀ i j k, Ge r i j → Ge r j k → Ge r i k) ∧ (∀ i j, Ge r i j → Ge r j.rev i.rev) ∧ (Irr r ↔ ∀ i j, Ge r i j) ∧ (Ge r 0 2 → Ge r 2 0 → (∀ g, IsBlock (r g)) → Submodule.span K (Set.range fun g => (r g).submatrix ixA ixA) = ⊤) := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg
+    : ∀ {H : Type} [Group H] (K : Type) [Field K] (r : H →* M4 K) (ν : H → K),
+      (∀ g, IsGSp (ν g) (r g)) → (∀ i, Matrix.single i i (1 : K) ∈ Submodule.span K (Set.range r))
+        → (∀ i j, Ge r i j ↔ Matrix.single i j (1 : K) ∈ Submodule.span K (Set.range r))
+          ∧ (∀ i, Ge r i i) ∧ (∀ i j k, Ge r i j → Ge r j k → Ge r i k)
+          ∧ (∀ i j, Ge r i j → Ge r j.rev i.rev) ∧ (Irr r ↔ ∀ i j, Ge r i j)
+          ∧ (Ge r 0 2 → Ge r 2 0 → (∀ g, IsBlock (r g))
+            → Submodule.span K (Set.range fun g => (r g).submatrix ixA ixA) = ⊤) := by
   intro H _ K _ r ν hν he
   have hiff := geAlg_iff r he
   refine ⟨hiff, fun i => (hiff i i).2 (he i), ?_, ?_, ?_, ?_⟩
@@ -80,12 +97,14 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.geAlg :
     · intro h
       exact geAlg_top _ fun i j => (hiff i j).1 (h i j)
   · intro h02 h20 _
-    let f : M4 K →ₗ[K] Matrix (Fin 2) (Fin 2) K :=
-      { toFun := fun x => x.submatrix ixA ixA
-        map_add' := fun _ _ => rfl
-        map_smul' := fun _ _ => rfl }
-    have hm : ∀ x ∈ Submodule.span K (Set.range r),
-        f x ∈ Submodule.span K (Set.range fun g => (r g).submatrix ixA ixA) := by
+    let f : M4 K →ₗ[K] Matrix (Fin 2) (Fin 2) K := {
+      toFun := fun x => x.submatrix ixA ixA
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+    }
+    have hm
+        : ∀ x ∈ Submodule.span K (Set.range r),
+          f x ∈ Submodule.span K (Set.range fun g => (r g).submatrix ixA ixA) := by
       intro x hx
       have := Submodule.mem_map_of_mem (f := f) hx
       rwa [Submodule.map_span, ← Set.range_comp] at this

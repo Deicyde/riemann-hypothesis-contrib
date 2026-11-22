@@ -168,23 +168,23 @@ private lemma key {F : Type} [Field F] [NumberField F] [NumberField.IsTotallyRea
     _ ≤ (4 * C) ^ n := pow_le_pow_left₀ (by positivity) hKs n
     _ = (4 * B * N) ^ n := by rw [hC]; ring_nf
 
-theorem UpperTheory.Reformulated.B.GaloisBoundSecond.main :
-    ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F] [NumberField.IsTotallyReal F] (N : ℕ),
-      (0 : ℕ) < N →
-        ∀ (I : Ideal (NumberField.RingOfIntegers F)),
-          I ≠ ⊥ →
-            ∀ (B : ℝ),
-              (0 : ℝ) ≤ B →
-                {x : F |
-                      x ≠ (0 : F) ∧
-                        (∃ y ∈ I, (↑y : F) = (↑N : F) * x) ∧
-                          ∀ (w : NumberField.InfinitePlace F), (w : F → ℝ) x ≤ B}.Finite ∧
-                  (↑{x : F |
-                              x ≠ (0 : F) ∧
-                                (∃ y ∈ I, (↑y : F) = (↑N : F) * x) ∧
-                                  ∀ (w : NumberField.InfinitePlace F), (w : F → ℝ) x ≤ B}.ncard :
-                        ℝ) *
-                      (↑((Ideal.absNorm : Ideal (NumberField.RingOfIntegers F) → ℕ) I) : ℝ) ≤
-                    ((4 : ℝ) * B * (↑N : ℝ)) ^ Module.finrank ℚ F := by
+theorem UpperTheory.Reformulated.B.GaloisBoundSecond.main
+    : ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F] [NumberField.IsTotallyReal F] (N : ℕ),
+      (0 : ℕ) < N
+        → ∀ (I : Ideal (NumberField.RingOfIntegers F)),
+          I ≠ ⊥
+            → ∀ (B : ℝ),
+              (0 : ℝ) ≤ B
+                → {x : F |
+                        x ≠ (0 : F) ∧
+                          (∃ y ∈ I, (↑y : F) = (↑N : F) * x) ∧
+                            ∀ (w : NumberField.InfinitePlace F), (w : F → ℝ) x ≤ B}.Finite
+                  ∧ (↑{x : F |
+                                x ≠ (0 : F) ∧
+                                  (∃ y ∈ I, (↑y : F) = (↑N : F) * x) ∧
+                                    ∀ (w : NumberField.InfinitePlace F), (w : F → ℝ) x ≤ B}.ncard
+                        : ℝ)
+                      * (↑((Ideal.absNorm : Ideal (NumberField.RingOfIntegers F) → ℕ) I) : ℝ)
+                    ≤ ((4 : ℝ) * B * (↑N : ℝ)) ^ Module.finrank ℚ F := by
   intro F _ _ _ N hN I hI B hB
   exact key N hN I hI B hB _ rfl

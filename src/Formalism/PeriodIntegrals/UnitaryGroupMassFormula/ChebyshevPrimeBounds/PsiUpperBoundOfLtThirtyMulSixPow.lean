@@ -28,8 +28,7 @@ theorem chebyshevConstantNumeric : ANum := by
   rw [log_thirty]
   constructor <;> norm_num at * <;> linarith
 
-theorem lcmUpto_le_three_pow : ∀ n < 30, Nat.lcmUpto n ≤ 3 ^ n := by
-  decide +kernel
+theorem lcmUpto_le_three_pow : ∀ n < 30, Nat.lcmUpto n ≤ 3 ^ n := by decide +kernel
 
 theorem psi_le_of_lt_thirty {x : ℝ} (h0 : 0 ≤ x) (hx : x < 30) : Chebyshev.psi x ≤ 1.1056 * x := by
   have hn : ⌊x⌋₊ < 30 := (Nat.floor_lt h0).2 (by exact_mod_cast hx)
@@ -46,8 +45,8 @@ theorem psi_le_of_lt_thirty {x : ℝ} (h0 : 0 ≤ x) (hx : x < 30) : Chebyshev.p
     mul_le_mul_of_nonneg_left (by norm_num at h3 ⊢; linarith) h5
   nlinarith
 
-theorem psiUpperBound_of_lt_thirty_mul_six_pow (hA : ANum) (hD : DUpper) (hS : Sandwich) (k : ℕ) :
-    ∀ x : ℝ, 1 ≤ x → x < 30 * 6 ^ k → Chebyshev.psi x ≤ 1.1056 * x + 0.7 * (log x) ^ 2 := by
+theorem psiUpperBound_of_lt_thirty_mul_six_pow (hA : ANum) (hD : DUpper) (hS : Sandwich) (k : ℕ)
+    : ∀ x : ℝ, 1 ≤ x → x < 30 * 6 ^ k → Chebyshev.psi x ≤ 1.1056 * x + 0.7 * (log x) ^ 2 := by
   induction k with
   | zero =>
     intro x h1 hx
@@ -62,7 +61,8 @@ theorem psiUpperBound_of_lt_thirty_mul_six_pow (hA : ANum) (hD : DUpper) (hS : S
       linarith
     · have hx6 : x / 6 < 30 * 6 ^ k := by
         rw [div_lt_iff₀ (by norm_num)]
-        calc x < 30 * 6 ^ (k + 1) := hx
+        calc
+          x < 30 * 6 ^ (k + 1) := hx
           _ = 30 * 6 ^ k * 6 := by ring
       have e1 := ih (x / 6) (by linarith) hx6
       have e2 := (hS x (by linarith)).1

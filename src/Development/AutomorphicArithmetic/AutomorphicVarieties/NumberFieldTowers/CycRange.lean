@@ -8,10 +8,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.NumberField
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Tower
 
-theorem UpperTheory.V.Tower.cycRange :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime], HasMuQ l L → (cycZ L Ω l).range = KStar.TotallyRealRoots.princ l (cZero l L) := by
+theorem UpperTheory.V.Tower.cycRange
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
+        [Fact l.Prime],
+      HasMuQ l L → (cycZ L Ω l).range = KStar.TotallyRealRoots.princ l (cZero l L) := by
   intro L Ω _ _ _ _ _ l _ hq
   have hmu := muQ L Ω l
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed L
@@ -20,17 +24,23 @@ theorem UpperTheory.V.Tower.cycRange :
   haveI : NeZero (l : Ω) := ⟨by exact_mod_cast (Fact.out : l.Prime).ne_zero⟩
   haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
   have hinj := (algebraMap L Ω).injective
-  have key : ∀ (σ : G L Ω) (n : ℕ) (t : Ω), t ^ l ^ n = 1 →
-      σ t = t ^ ((cycZ L Ω l σ : ℤ_[l]).toZModPow n).val := by
+  have key
+      : ∀ (σ : G L Ω) (n : ℕ) (t : Ω),
+        t ^ l ^ n = 1 → σ t = t ^ ((cycZ L Ω l σ : ℤ_[l]).toZModPow n).val := by
     intro σ n t ht
     exact cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (G L Ω) Ω σ) t ht
-  have hmem : ∀ (a : ℕ) (u : ℤ_[l]ˣ), u ∈ KStar.TotallyRealRoots.princ l a ↔ (u : ℤ_[l]).toZModPow a = 1 := by
+  have hmem
+      : ∀ (a : ℕ) (u : ℤ_[l]ˣ),
+        u ∈ KStar.TotallyRealRoots.princ l a ↔ (u : ℤ_[l]).toZModPow a = 1 := by
     intro a u
-    simp [KStar.TotallyRealRoots.princ, KStar.TotallyRealRoots.redPow, MonoidHom.mem_ker, Units.ext_iff]
+    simp [KStar.TotallyRealRoots.princ, KStar.TotallyRealRoots.redPow, MonoidHom.mem_ker,
+      Units.ext_iff]
   have hone : ∀ (n : ℕ) (t : Ω), IsPrimitiveRoot t (l ^ n) → t ^ ((1 : ZMod (l ^ n)).val) = t := by
     intro n t ht
     rw [ZMod.val_one_eq_one_mod, ht.eq_orderOf, pow_mod_orderOf, pow_one]
-  have hfixed : ∀ (n : ℕ) (t : Ω) (a : ZMod (l ^ n)), IsPrimitiveRoot t (l ^ n) → t ^ a.val = t → a = 1 := by
+  have hfixed
+      : ∀ (n : ℕ) (t : Ω) (a : ZMod (l ^ n)),
+        IsPrimitiveRoot t (l ^ n) → t ^ a.val = t → a = 1 := by
     intro n t a ht h
     apply ZMod.val_injective
     apply ht.pow_inj (ZMod.val_lt a) (ZMod.val_lt 1)

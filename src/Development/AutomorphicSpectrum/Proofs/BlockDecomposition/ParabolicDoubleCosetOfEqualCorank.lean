@@ -11,25 +11,32 @@ namespace GlobalTheory.CompanionTheory.Jp.Dbl
 
 variable {k : Type} [Field k]
 
-theorem glue {X₁ X₂ : Type} [AddCommGroup X₁] [Module k X₁] [AddCommGroup X₂] [Module k X₂]
-    {Y₁ Z₁ : Submodule k X₁} {Y₂ Z₂ : Submodule k X₂} (h₁ : IsCompl Y₁ Z₁) (h₂ : IsCompl Y₂ Z₂)
-    (u : Y₁ ≃ₗ[k] Y₂) (v : Z₁ ≃ₗ[k] Z₂) :
-    ∃ e : X₁ ≃ₗ[k] X₂, (∀ y : Y₁, e y = u y) ∧ ∀ z : Z₁, e z = v z := by
-  refine ⟨(Submodule.prodEquivOfIsCompl Y₁ Z₁ h₁).symm ≪≫ₗ (u.prodCongr v) ≪≫ₗ
-    Submodule.prodEquivOfIsCompl Y₂ Z₂ h₂, ?_, ?_⟩
+theorem glue
+    {X₁ X₂ : Type} [AddCommGroup X₁] [Module k X₁] [AddCommGroup X₂] [Module k X₂]
+    {Y₁ Z₁ : Submodule k X₁} {Y₂ Z₂ : Submodule k X₂}
+    (h₁ : IsCompl Y₁ Z₁) (h₂ : IsCompl Y₂ Z₂) (u : Y₁ ≃ₗ[k] Y₂) (v : Z₁ ≃ₗ[k] Z₂)
+    : ∃ e : X₁ ≃ₗ[k] X₂, (∀ y : Y₁, e y = u y) ∧ ∀ z : Z₁, e z = v z := by
+  refine ⟨
+    (Submodule.prodEquivOfIsCompl Y₁ Z₁ h₁).symm ≪≫ₗ (u.prodCongr v)
+      ≪≫ₗ Submodule.prodEquivOfIsCompl Y₂ Z₂ h₂,
+    ?_,
+    ?_
+  ⟩
   · intro y; simp
   · intro z; simp
 
-theorem exists_equiv_pair {X₁ X₂ : Type} [AddCommGroup X₁] [Module k X₁] [AddCommGroup X₂] [Module k X₂]
-    [FiniteDimensional k X₁] [FiniteDimensional k X₂] (hX : finrank k X₁ = finrank k X₂)
-    (Y₁ : Submodule k X₁) (Y₂ : Submodule k X₂) (hY : finrank k Y₁ = finrank k Y₂) :
-    ∃ e : X₁ ≃ₗ[k] X₂, ∀ y ∈ Y₁, e y ∈ Y₂ := by
+theorem exists_equiv_pair
+    {X₁ X₂ : Type} [AddCommGroup X₁] [Module k X₁] [AddCommGroup X₂] [Module k X₂]
+    [FiniteDimensional k X₁] [FiniteDimensional k X₂]
+    (hX : finrank k X₁ = finrank k X₂)
+    (Y₁ : Submodule k X₁) (Y₂ : Submodule k X₂) (hY : finrank k Y₁ = finrank k Y₂)
+    : ∃ e : X₁ ≃ₗ[k] X₂, ∀ y ∈ Y₁, e y ∈ Y₂ := by
   obtain ⟨Z₁, h₁⟩ := Submodule.exists_isCompl Y₁
   obtain ⟨Z₂, h₂⟩ := Submodule.exists_isCompl Y₂
   have a₁ := Submodule.finrank_add_eq_of_isCompl h₁
   have a₂ := Submodule.finrank_add_eq_of_isCompl h₂
-  obtain ⟨e, he, -⟩ := glue h₁ h₂ (LinearEquiv.ofFinrankEq _ _ hY)
-    (LinearEquiv.ofFinrankEq _ _ (by omega))
+  obtain ⟨e, he, -⟩ :=
+    glue h₁ h₂ (LinearEquiv.ofFinrankEq _ _ hY) (LinearEquiv.ofFinrankEq _ _ (by omega))
   refine ⟨e, fun y hy => ?_⟩
   have := he ⟨y, hy⟩
   simp only at this
@@ -38,8 +45,8 @@ theorem exists_equiv_pair {X₁ X₂ : Type} [AddCommGroup X₁] [Module k X₁]
 
 variable {V : Type} [AddCommGroup V] [Module k V]
 
-theorem exists_rel_compl (S T : Submodule k V) :
-    ∃ A : Submodule k V, Disjoint S A ∧ (S ⊓ T) ⊔ A = T := by
+theorem exists_rel_compl (S T : Submodule k V)
+    : ∃ A : Submodule k V, Disjoint S A ∧ (S ⊓ T) ⊔ A = T := by
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl (S ⊓ T)
   refine ⟨C ⊓ T, ?_, ?_⟩
   · rw [Submodule.disjoint_def]
@@ -49,8 +56,8 @@ theorem exists_rel_compl (S T : Submodule k V) :
     simpa using this
   · rw [← sup_inf_assoc_of_le C (inf_le_right : S ⊓ T ≤ T), hC.sup_eq_top, top_inf_eq]
 
-theorem exists_compl_ge (S A : Submodule k V) (h : Disjoint S A) :
-    ∃ R : Submodule k V, IsCompl S R ∧ A ≤ R := by
+theorem exists_compl_ge (S A : Submodule k V) (h : Disjoint S A)
+    : ∃ R : Submodule k V, IsCompl S R ∧ A ≤ R := by
   obtain ⟨Q, hQ⟩ := Submodule.exists_isCompl (S ⊔ A)
   refine ⟨A ⊔ Q, ⟨?_, ?_⟩, le_sup_left⟩
   · rw [Submodule.disjoint_def]
@@ -68,36 +75,40 @@ theorem exists_compl_ge (S A : Submodule k V) (h : Disjoint S A) :
     exact (Submodule.disjoint_def.1 h) a hS ha
   · rw [codisjoint_iff, ← sup_assoc, hQ.sup_eq_top]
 
-theorem exists_equiv_triple [FiniteDimensional k V] (S T₁ T₂ : Submodule k V)
-    (hT : finrank k T₁ = finrank k T₂) (hI : finrank k ↥(S ⊓ T₁) = finrank k ↥(S ⊓ T₂)) :
-    ∃ e : V ≃ₗ[k] V, (∀ s ∈ S, e s ∈ S) ∧ ∀ t ∈ T₁, e t ∈ T₂ := by
+theorem exists_equiv_triple
+    [FiniteDimensional k V]
+    (S T₁ T₂ : Submodule k V)
+    (hT : finrank k T₁ = finrank k T₂) (hI : finrank k ↥(S ⊓ T₁) = finrank k ↥(S ⊓ T₂))
+    : ∃ e : V ≃ₗ[k] V, (∀ s ∈ S, e s ∈ S) ∧ ∀ t ∈ T₁, e t ∈ T₂ := by
   obtain ⟨A₁, d₁, s₁⟩ := exists_rel_compl S T₁
   obtain ⟨A₂, d₂, s₂⟩ := exists_rel_compl S T₂
   obtain ⟨R₁, c₁, l₁⟩ := exists_compl_ge S A₁ d₁
   obtain ⟨R₂, c₂, l₂⟩ := exists_compl_ge S A₂ d₂
-  have dimA : ∀ (T A : Submodule k V), Disjoint S A → (S ⊓ T) ⊔ A = T →
-      finrank k ↥(S ⊓ T) + finrank k A = finrank k T := by
+  have dimA
+      : ∀ (T A : Submodule k V),
+        Disjoint S A → (S ⊓ T) ⊔ A = T → finrank k ↥(S ⊓ T) + finrank k A = finrank k T := by
     intro T A d s
     have := Submodule.finrank_sup_add_finrank_inf_eq (S ⊓ T) A
-    have hb : (S ⊓ T) ⊓ A = ⊥ :=
-      le_bot_iff.1 ((inf_le_inf_right A inf_le_left).trans d.le_bot)
+    have hb : (S ⊓ T) ⊓ A = ⊥ := le_bot_iff.1 ((inf_le_inf_right A inf_le_left).trans d.le_bot)
     rw [s, hb, finrank_bot, add_zero] at this
     exact this.symm
   have a₁ := dimA T₁ A₁ d₁ s₁
   have a₂ := dimA T₂ A₂ d₂ s₂
   have r₁ := Submodule.finrank_add_eq_of_isCompl c₁
   have r₂ := Submodule.finrank_add_eq_of_isCompl c₂
-  have cS : ∀ T : Submodule k V, finrank k (Submodule.comap S.subtype (S ⊓ T)) = finrank k ↥(S ⊓ T) :=
+  have cS
+      : ∀ T : Submodule k V, finrank k (Submodule.comap S.subtype (S ⊓ T)) = finrank k ↥(S ⊓ T) :=
     fun T => LinearEquiv.finrank_eq (Submodule.comapSubtypeEquivOfLe inf_le_left)
-  obtain ⟨eS, hS⟩ := exists_equiv_pair (X₁ := S) (X₂ := S) rfl
-    (Submodule.comap S.subtype (S ⊓ T₁)) (Submodule.comap S.subtype (S ⊓ T₂))
-    (by rw [cS, cS, hI])
+  obtain ⟨eS, hS⟩ :=
+    exists_equiv_pair (X₁ := S) (X₂ := S) rfl (Submodule.comap S.subtype (S ⊓ T₁))
+      (Submodule.comap S.subtype (S ⊓ T₂)) (by rw [cS, cS, hI])
   have f₁ : finrank k (Submodule.comap R₁.subtype A₁) = finrank k A₁ :=
     LinearEquiv.finrank_eq (Submodule.comapSubtypeEquivOfLe l₁)
   have f₂ : finrank k (Submodule.comap R₂.subtype A₂) = finrank k A₂ :=
     LinearEquiv.finrank_eq (Submodule.comapSubtypeEquivOfLe l₂)
-  obtain ⟨eR, hR⟩ := exists_equiv_pair (X₁ := R₁) (X₂ := R₂) (by omega)
-    (Submodule.comap R₁.subtype A₁) (Submodule.comap R₂.subtype A₂) (by omega)
+  obtain ⟨eR, hR⟩ :=
+    exists_equiv_pair (X₁ := R₁) (X₂ := R₂) (by omega) (Submodule.comap R₁.subtype A₁)
+      (Submodule.comap R₂.subtype A₂) (by omega)
   obtain ⟨e, he₁, he₂⟩ := glue c₁ c₂ eS eR
   refine ⟨e, fun s hs => ?_, fun t ht => ?_⟩
   · have e₀ : e s = eS ⟨s, hs⟩ := he₁ ⟨s, hs⟩
@@ -136,17 +147,19 @@ theorem phi_inj (g : GL (Ix n) k) : Function.Injective (phi g) := by
   ext i
   exact congrFun h2 (Sum.inr i)
 
-theorem phi_inr (g : GL (Ix n) k) (w : Fin n → k) (j : Fin n) :
-    phi g w (Sum.inr j) = ((dBlk g).mulVecLin w) j := by
+theorem phi_inr (g : GL (Ix n) k) (w : Fin n → k) (j : Fin n)
+    : phi g w (Sum.inr j) = ((dBlk g).mulVecLin w) j := by
   simp [phi, incR, Matrix.mulVec, dotProduct, Fintype.sum_sum_type, dBlk, Matrix.toBlocks₂₂]
 
-theorem hodgeTateLatticePoint_finrank_tateModule (g : GL (Ix n) k) : finrank k (LinearMap.range (phi g)) = n := by
+theorem hodgeTateLatticePoint_finrank_tateModule (g : GL (Ix n) k)
+    : finrank k (LinearMap.range (phi g)) = n := by
   rw [LinearMap.finrank_range_of_inj (phi_inj g)]; simp
 
-theorem finrank_inf (g : GL (Ix n) k) :
-    finrank k ↥(sS (k := k) (n := n) ⊓ LinearMap.range (phi g)) + (dBlk g).rank = n := by
-  have h : sS (k := k) (n := n) ⊓ LinearMap.range (phi g) =
-      (LinearMap.ker (dBlk g).mulVecLin).map (phi g) := by
+theorem finrank_inf (g : GL (Ix n) k)
+    : finrank k ↥(sS (k := k) (n := n) ⊓ LinearMap.range (phi g)) + (dBlk g).rank = n := by
+  have h
+      : sS (k := k) (n := n) ⊓ LinearMap.range (phi g)
+        = (LinearMap.ker (dBlk g).mulVecLin).map (phi g) := by
     ext v
     constructor
     · rintro ⟨hs, w, rfl⟩
@@ -165,40 +178,48 @@ theorem finrank_inf (g : GL (Ix n) k) :
   have hr : (dBlk g).rank = finrank k (LinearMap.range (dBlk g).mulVecLin) := rfl
   omega
 
-theorem exists_pM (E : GL (Ix n) k) (h : E.1.toBlocks₂₁ = 0) :
-    ∃ (a d : GL (Fin n) k) (b : Matrix (Fin n) (Fin n) k), E = pM a d b := by
+theorem exists_pM (E : GL (Ix n) k) (h : E.1.toBlocks₂₁ = 0)
+    : ∃ (a d : GL (Fin n) k) (b : Matrix (Fin n) (Fin n) k), E = pM a d b := by
   have hE : E.1 = fromBlocks E.1.toBlocks₁₁ E.1.toBlocks₁₂ 0 E.1.toBlocks₂₂ := by
     rw [← h, fromBlocks_toBlocks]
   have hdet : E.1.toBlocks₁₁.det * E.1.toBlocks₂₂.det ≠ 0 := by
     rw [← det_fromBlocks_zero₂₁ _ E.1.toBlocks₁₂, ← hE]
     exact (Matrix.isUnits_det_units E).ne_zero
-  refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero _ (left_ne_zero_of_mul hdet),
-    Matrix.GeneralLinearGroup.mkOfDetNeZero _ (right_ne_zero_of_mul hdet), E.1.toBlocks₁₂, ?_⟩
+  refine ⟨
+    Matrix.GeneralLinearGroup.mkOfDetNeZero _ (left_ne_zero_of_mul hdet),
+    Matrix.GeneralLinearGroup.mkOfDetNeZero _ (right_ne_zero_of_mul hdet),
+    E.1.toBlocks₁₂,
+    ?_
+  ⟩
   apply Units.ext
   exact hE
 
-theorem pM_inv (a d : GL (Fin n) k) (b : Matrix (Fin n) (Fin n) k) :
-    (pM a d b)⁻¹ = pM a⁻¹ d⁻¹ (-((a⁻¹).1 * b * (d⁻¹).1)) := by
+theorem pM_inv (a d : GL (Fin n) k) (b : Matrix (Fin n) (Fin n) k)
+    : (pM a d b)⁻¹ = pM a⁻¹ d⁻¹ (-((a⁻¹).1 * b * (d⁻¹).1)) := by
   apply Units.ext
   rfl
 
-theorem main : ∀ (k : Type) [Field k] (n : ℕ) (g₁ g₂ : GL (Ix n) k), iD g₁ = iD g₂ →
-    ∃ (a d : GL (Fin n) k) (b : Matrix (Fin n) (Fin n) k) (x : GL (Ix n) k),
-      x.1.toBlocks₁₂ = 0 ∧ g₂ = pM a d b * g₁ * x := by
+theorem main
+    : ∀ (k : Type) [Field k] (n : ℕ) (g₁ g₂ : GL (Ix n) k),
+      iD g₁ = iD g₂
+        → ∃ (a d : GL (Fin n) k) (b : Matrix (Fin n) (Fin n) k) (x : GL (Ix n) k),
+          x.1.toBlocks₁₂ = 0 ∧ g₂ = pM a d b * g₁ * x := by
   intro k _ n g₁ g₂ h
   have hr : (dBlk g₁).rank = (dBlk g₂).rank := by
     have h1 := (dBlk g₁).rank_le_height
     have h2 := (dBlk g₂).rank_le_height
     unfold iD at h
     omega
-  obtain ⟨e, heS, heT⟩ := exists_equiv_triple (sS (k := k) (n := n))
-    (LinearMap.range (phi g₂)) (LinearMap.range (phi g₁))
-    (by rw [hodgeTateLatticePoint_finrank_tateModule, hodgeTateLatticePoint_finrank_tateModule])
-    (by have := finrank_inf g₁; have := finrank_inf g₂; omega)
-  let E : GL (Ix n) k :=
-    ⟨LinearMap.toMatrix' e.toLinearMap, LinearMap.toMatrix' e.symm.toLinearMap,
-      by rw [← LinearMap.toMatrix'_comp]; simp,
-      by rw [← LinearMap.toMatrix'_comp]; simp⟩
+  obtain ⟨e, heS, heT⟩ :=
+    exists_equiv_triple (sS (k := k) (n := n)) (LinearMap.range (phi g₂)) (LinearMap.range (phi g₁))
+      (by rw [hodgeTateLatticePoint_finrank_tateModule, hodgeTateLatticePoint_finrank_tateModule])
+      (by have := finrank_inf g₁; have := finrank_inf g₂; omega)
+  let E : GL (Ix n) k := ⟨
+    LinearMap.toMatrix' e.toLinearMap,
+    LinearMap.toMatrix' e.symm.toLinearMap,
+    by rw [← LinearMap.toMatrix'_comp]; simp,
+    by rw [← LinearMap.toMatrix'_comp]; simp
+  ⟩
   have hE : ∀ v, E.1 *ᵥ v = e v := fun v => LinearMap.toMatrix'_mulVec _ _
   have h21 : E.1.toBlocks₂₁ = 0 := by
     ext i j

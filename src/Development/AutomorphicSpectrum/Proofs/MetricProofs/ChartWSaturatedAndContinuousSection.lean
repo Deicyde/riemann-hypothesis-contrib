@@ -11,7 +11,9 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLattice
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 open GlobalTheory.CompanionTheory.Ar.RiemannLimit GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
 noncomputable section
@@ -20,14 +22,16 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit.NoMonodromy
 
 variable {a g : ℕ}
 
-theorem map_mulVec_real (M : Matrix (Fin g) (Fin g) ℤ) (v : Fin g → ℤ) :
-    M.map (fun x : ℤ => (x : ℝ)) *ᵥ (fun k => (v k : ℝ)) = fun k => ((M *ᵥ v) k : ℝ) := by
+theorem map_mulVec_real (M : Matrix (Fin g) (Fin g) ℤ) (v : Fin g → ℤ)
+    : M.map (fun x : ℤ => (x : ℝ)) *ᵥ (fun k => (v k : ℝ)) = fun k => ((M *ᵥ v) k : ℝ) := by
   funext k
   simp [mulVec, dotProduct]
 
-theorem ker_each (B : Fin a → Matrix (Fin g) (Fin g) ℤ)
-    (hB : ∀ j, ((B j).map (fun x : ℤ => (x : ℝ))).PosSemidef) (v : Fin g → ℤ)
-    (hv : (∑ j, B j) *ᵥ v = 0) (j : Fin a) : B j *ᵥ v = 0 := by
+theorem ker_each
+    (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (hB : ∀ j, ((B j).map (fun x : ℤ => (x : ℝ))).PosSemidef)
+    (v : Fin g → ℤ) (hv : (∑ j, B j) *ᵥ v = 0)
+    (j : Fin a)
+    : B j *ᵥ v = 0 := by
   set r : Fin g → ℝ := fun k => (v k : ℝ) with hr
   have hsum : (∑ j, B j).map (fun x : ℤ => (x : ℝ)) = ∑ j, (B j).map (fun x : ℤ => (x : ℝ)) := by
     ext p q
@@ -36,8 +40,7 @@ theorem ker_each (B : Fin a → Matrix (Fin g) (Fin g) ℤ)
     rw [← hsum, hr, map_mulVec_real, hv]
     funext k
     simp
-  have h0 : r ⬝ᵥ ((∑ j, (B j).map (fun x : ℤ => (x : ℝ))) *ᵥ r) = 0 := by
-    rw [h1]; simp
+  have h0 : r ⬝ᵥ ((∑ j, (B j).map (fun x : ℤ => (x : ℝ))) *ᵥ r) = 0 := by rw [h1]; simp
   rw [Matrix.sum_mulVec, dotProduct_sum] at h0
   have hnn : ∀ i ∈ Finset.univ, 0 ≤ r ⬝ᵥ ((B i).map (fun x : ℤ => (x : ℝ)) *ᵥ r) := by
     intro i _
@@ -60,7 +63,17 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
 open NoMonodromy
 
-theorem noMonodromy_lattice : ∀ (n a g : ℕ) (Λ : Type) [AddCommGroup Λ] (L : Flat.LogPeriods n a g Λ) (bas : Module.Basis (Fin g ⊕ Fin g) ℤ Λ) (A T0 : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (c ρ : ℝ), IsChart L bas A T0 B c ρ → (∀ (x : Λ) (k : ℤ), k ≠ 0 → k • x ∈ chartW bas B → x ∈ chartW bas B) ∧ (∀ x ∈ chartW bas B, ContinuousAt (chartS bas A T0 x) 0 ∧ ∀ w ∈ logCover L.a_le, chartS bas A T0 x (expCover a w) = L.P w x) ∧ Function.Injective (chartPer bas A T0 B) ∧ Submodule.span ℂ (Set.range (chartPer bas A T0 B)) = ⊤ := by
+theorem noMonodromy_lattice
+    : ∀ (n a g : ℕ) (Λ : Type) [AddCommGroup Λ] (L : Flat.LogPeriods n a g Λ)
+        (bas : Module.Basis (Fin g ⊕ Fin g) ℤ Λ) (A T0 : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ)
+        (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (c ρ : ℝ),
+      IsChart L bas A T0 B c ρ
+        → (∀ (x : Λ) (k : ℤ), k ≠ 0 → k • x ∈ chartW bas B → x ∈ chartW bas B)
+          ∧ (∀ x ∈ chartW bas B,
+            ContinuousAt (chartS bas A T0 x) 0
+              ∧ ∀ w ∈ logCover L.a_le, chartS bas A T0 x (expCover a w) = L.P w x)
+          ∧ Function.Injective (chartPer bas A T0 B)
+          ∧ Submodule.span ℂ (Set.range (chartPer bas A T0 B)) = ⊤ := by
   intro n a g Λ _ L bas A T0 B c ρ h
   have hmem : ∀ x, x ∈ chartW bas B ↔ (∑ j, B j) *ᵥ vCo bas x = 0 := fun x => by
     rw [chartW, LinearMap.mem_ker]
@@ -84,8 +97,11 @@ theorem noMonodromy_lattice : ∀ (n a g : ℕ) (Λ : Type) [AddCommGroup Λ] (L
       exact ContinuousAt.comp (f := fun z => (A z, T0 z)) hcts.continuousAt (hA0.prodMk hT0)
     · rw [h.per w hw x]
       simp only [chartS, tauAt]
-      have hz : (∑ j, (w (Fin.castLE L.a_le j) / (2 * Real.pi * Complex.I)) •
-          (B j).map (fun x : ℤ => (x : ℂ))) *ᵥ cst (vCo bas x) = 0 := by
+      have hz
+          : (∑ j, (w (Fin.castLE L.a_le j) / (2 * Real.pi * Complex.I)) •
+              (B j).map (fun x : ℤ => (x : ℂ)))
+              *ᵥ cst (vCo bas x)
+            = 0 := by
         rw [Matrix.sum_mulVec]
         refine Finset.sum_eq_zero fun j _ => ?_
         rw [Matrix.smul_mulVec, cst_mulVec, ker_each B h.B_psd _ hxv j, cst_zero, smul_zero]
@@ -104,13 +120,17 @@ theorem noMonodromy_lattice : ∀ (n a g : ℕ) (Λ : Type) [AddCommGroup Λ] (L
       funext i
       have h1 := congrArg Complex.im (congrFun hy i)
       simpa [cst, mulVec, dotProduct, hr] using h1
-    have hlow := GlobalTheory.CompanionTheory.ChartBlockLower.im_lower_on_kernel n a g L.a_le (Metric.ball 0 ρ) T0 B c
-      Metric.isOpen_ball (h.T_cont.mono (Metric.ball_subset_ball h.ρ_le)) h.B_psd h.c_pos h.im_lower 0
-      (Metric.mem_ball_self h.ρ_pos) 0 (fun j hj => absurd rfl hj) (fun _ _ => rfl) r
-      (fun j _ => by
-        rw [hr, map_mulVec_real, ker_each B h.B_psd _ hxv j]
-        funext k
-        simp)
+    have hlow :=
+      GlobalTheory.CompanionTheory.ChartBlockLower.im_lower_on_kernel n a g L.a_le (Metric.ball 0 ρ)
+        T0 B c Metric.isOpen_ball (h.T_cont.mono (Metric.ball_subset_ball h.ρ_le)) h.B_psd h.c_pos
+        h.im_lower 0 (Metric.mem_ball_self h.ρ_pos) 0
+        (fun j hj => absurd rfl hj)
+        (fun _ _ => rfl)
+        r
+        (fun j _ => by
+          rw [hr, map_mulVec_real, ker_each B h.B_psd _ hxv j]
+          funext k
+          simp)
     simp only [Pi.zero_apply, zero_div, zero_smul, Finset.sum_const_zero, add_zero] at hlow
     rw [him, dotProduct_zero] at hlow
     have hrr : r ⬝ᵥ r ≤ 0 := by
@@ -136,8 +156,10 @@ theorem noMonodromy_lattice : ∀ (n a g : ℕ) (Λ : Type) [AddCommGroup Λ] (L
     set t : Fin g → ℂ := ((A 0)ᵀ)⁻¹ *ᵥ y with ht
     have hyt : y = (A 0)ᵀ *ᵥ t := by
       rw [ht, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hunit, Matrix.one_mulVec]
-    have hper : ∀ i, (A 0)ᵀ *ᵥ cst (Pi.single i 1 : Fin g → ℤ) ∈
-        Submodule.span ℂ (Set.range (chartPer bas A T0 B)) := by
+    have hper
+        : ∀ i,
+          (A 0)ᵀ *ᵥ cst (Pi.single i 1 : Fin g → ℤ)
+            ∈ Submodule.span ℂ (Set.range (chartPer bas A T0 B)) := by
       intro i
       refine Submodule.subset_span ⟨⟨mk bas (Pi.single i 1) 0, ?_⟩, ?_⟩
       · rw [hmem, vCo_mk]; simp

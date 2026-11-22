@@ -11,9 +11,11 @@ open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.FlatBound
 
-theorem harmonicOnNhd_line {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set (Fin n → ℂ)} (hO : IsOpen O)
-    (hφ : ContDiffOn ℝ ∞ φ O) (hl : ∀ z ∈ O, ∀ w, levi φ z w = 0) (z₀ e : Fin n → ℂ) :
-    InnerProductSpace.HarmonicOnNhd (fun t : ℂ => φ (z₀ + t • e))
+theorem harmonicOnNhd_line
+    {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set (Fin n → ℂ)}
+    (hO : IsOpen O) (hφ : ContDiffOn ℝ ∞ φ O) (hl : ∀ z ∈ O, ∀ w, levi φ z w = 0) (z₀ e : Fin n → ℂ)
+    : InnerProductSpace.HarmonicOnNhd
+      (fun t : ℂ => φ (z₀ + t • e))
       ((fun t : ℂ => z₀ + t • e) ⁻¹' O) := by
   let L : ℂ →L[ℝ] (Fin n → ℂ) := ((ContinuousLinearMap.id ℂ ℂ).smulRight e).restrictScalars ℝ
   have hLw : ∀ w : ℂ, L w = w • e := fun _ => rfl
@@ -22,13 +24,16 @@ theorem harmonicOnNhd_line {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set (Fi
   have hcont : Continuous (fun t : ℂ => z₀ + t • e) := by fun_prop
   have hU : IsOpen ((fun t : ℂ => z₀ + t • e) ⁻¹' O) := hO.preimage hcont
   have hφ2 : ∀ y ∈ O, ContDiffAt ℝ 2 φ y := fun y hy =>
-    ((hφ y hy).contDiffAt (hO.mem_nhds hy)).of_le (by first | exact WithTop.coe_le_coe.mpr le_top | simp)
-  have hlap : ∀ t ∈ (fun t : ℂ => z₀ + t • e) ⁻¹' O,
-      Laplacian.laplacian (fun t : ℂ => φ (z₀ + t • e)) t = 0 := by
+    ((hφ y hy).contDiffAt (hO.mem_nhds hy)).of_le
+      (by first | exact WithTop.coe_le_coe.mpr le_top | simp)
+  have hlap
+      : ∀ t ∈ (fun t : ℂ => z₀ + t • e) ⁻¹' O,
+        Laplacian.laplacian (fun t : ℂ => φ (z₀ + t • e)) t = 0 := by
     intro t ht
     have hy : z₀ + t • e ∈ O := ht
-    have h1 : fderiv ℝ (fun w : ℂ => φ (z₀ + w • e)) =ᶠ[𝓝 t]
-        fun w : ℂ => (fderiv ℝ φ (z₀ + w • e)).comp L := by
+    have h1
+        : fderiv ℝ (fun w : ℂ => φ (z₀ + w • e)) =ᶠ[𝓝 t]
+          fun w : ℂ => (fderiv ℝ φ (z₀ + w • e)).comp L := by
       filter_upwards [hU.mem_nhds ht] with w hw
       exact (((hφ2 _ hw).differentiableAt (by simp)).hasFDerivAt.comp w (hline w)).fderiv
     have hD : HasFDerivAt (fderiv ℝ φ) (fderiv ℝ (fderiv ℝ φ) (z₀ + t • e)) (z₀ + t • e) :=
@@ -51,9 +56,11 @@ theorem harmonicOnNhd_line {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set (Fi
   · filter_upwards [hU.mem_nhds ht] with s hs
     simpa using hlap s hs
 
-theorem eventually_eq_of_isMax {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set (Fin n → ℂ)} (hO : IsOpen O)
-    (hφ : ContDiffOn ℝ ∞ φ O) (hl : ∀ z ∈ O, ∀ w, levi φ z w = 0) {z₀ : Fin n → ℂ} (hz₀ : z₀ ∈ O)
-    (hmax : ∀ z ∈ O, φ z ≤ φ z₀) : ∀ᶠ z in 𝓝 z₀, φ z = φ z₀ := by
+theorem eventually_eq_of_isMax
+    {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set (Fin n → ℂ)}
+    (hO : IsOpen O) (hφ : ContDiffOn ℝ ∞ φ O) (hl : ∀ z ∈ O, ∀ w, levi φ z w = 0)
+    {z₀ : Fin n → ℂ} (hz₀ : z₀ ∈ O) (hmax : ∀ z ∈ O, φ z ≤ φ z₀)
+    : ∀ᶠ z in 𝓝 z₀, φ z = φ z₀ := by
   obtain ⟨r, hr, hrO⟩ := Metric.isOpen_iff.1 hO z₀ hz₀
   filter_upwards [Metric.ball_mem_nhds z₀ hr] with z hz
   set e : Fin n → ℂ := z - z₀ with he
@@ -73,10 +80,11 @@ theorem eventually_eq_of_isMax {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set
   obtain ⟨F, hF, hre⟩ := InnerProductSpace.HarmonicOnNhd.exists_analyticOnNhd_ball_re_eq hh
   have h0 : (0 : ℂ) ∈ Metric.ball (0 : ℂ) R := Metric.mem_ball_self (by linarith)
   have h1 : (1 : ℂ) ∈ Metric.ball (0 : ℂ) R := by simpa using hR1
-  have hnorm : ∀ t ∈ Metric.ball (0 : ℂ) R, ‖Complex.exp (F t)‖ = Real.exp (φ (z₀ + t • e)) :=
-    fun t ht => by
-      rw [Complex.norm_exp]
-      exact congrArg Real.exp (hre ht)
+  have hnorm
+      : ∀ t ∈ Metric.ball (0 : ℂ) R,
+        ‖Complex.exp (F t)‖ = Real.exp (φ (z₀ + t • e)) := fun t ht => by
+    rw [Complex.norm_exp]
+    exact congrArg Real.exp (hre ht)
   have hdiff : DifferentiableOn ℂ (fun t => Complex.exp (F t)) (Metric.ball (0 : ℂ) R) :=
     fun t ht => (hF t ht).differentiableAt.cexp.differentiableWithinAt
   have hM : IsMaxOn (norm ∘ fun t => Complex.exp (F t)) (Metric.ball (0 : ℂ) R) 0 := by
@@ -84,17 +92,20 @@ theorem eventually_eq_of_isMax {n : ℕ} {φ : (Fin n → ℂ) → ℝ} {O : Set
     simp only [Set.mem_setOf_eq, Function.comp_apply]
     rw [hnorm t ht, hnorm 0 h0]
     simpa using hmax _ (hsub ht)
-  have hEq := Complex.norm_eqOn_of_isPreconnected_of_isMaxOn
-    (convex_ball (0 : ℂ) R).isPreconnected Metric.isOpen_ball hdiff h0 hM h1
+  have hEq :=
+    Complex.norm_eqOn_of_isPreconnected_of_isMaxOn (convex_ball (0 : ℂ) R).isPreconnected
+      Metric.isOpen_ball hdiff h0 hM h1
   simp only [Function.comp_apply, Function.const_apply] at hEq
   rw [hnorm 1 h1, hnorm 0 h0] at hEq
   have := Real.exp_injective hEq
   simpa [he] using this
 
-theorem eq_of_mem_connectedComponent {X : Type} [TopologicalSpace X] [CompactSpace X]
-    [LocallyConnectedSpace X] {v : X → ℝ} (hv : Continuous v)
-    (hloc : ∀ (x : X) (V : Set X), IsOpen V → x ∈ V → (∀ y ∈ V, v y ≤ v x) →
-      ∀ᶠ y in 𝓝 x, v y = v x) {x y : X} (hxy : y ∈ connectedComponent x) : v y = v x := by
+theorem eq_of_mem_connectedComponent
+    {X : Type} [TopologicalSpace X] [CompactSpace X] [LocallyConnectedSpace X]
+    {v : X → ℝ} (hv : Continuous v)
+    (hloc : ∀ (x : X) (V : Set X), IsOpen V → x ∈ V → (∀ y ∈ V, v y ≤ v x) → ∀ᶠ y in 𝓝 x, v y = v x)
+    {x y : X} (hxy : y ∈ connectedComponent x)
+    : v y = v x := by
   have hKo : IsOpen (connectedComponent x) := isOpen_connectedComponent
   have hKc : IsClosed (connectedComponent x) := isClosed_connectedComponent
   obtain ⟨m, hmK, hm⟩ := hKc.isCompact.exists_isMaxOn ⟨x, mem_connectedComponent⟩ hv.continuousOn
@@ -115,8 +126,9 @@ theorem eq_of_mem_connectedComponent {X : Type} [TopologicalSpace X] [CompactSpa
   have h2 : v x = v m := (hsub mem_connectedComponent).2
   rw [h1, h2]
 
-theorem continuous_of_smooth {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas e X}
-    {f : X → ℝ} (h : A.Smooth f) : Continuous f := by
+theorem continuous_of_smooth
+    {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas e X} {f : X → ℝ} (h : A.Smooth f)
+    : Continuous f := by
   rw [continuous_iff_continuousAt]
   intro x
   obtain ⟨j, hj⟩ := A.cover x
@@ -134,18 +146,24 @@ section System
 
 variable {e : ℕ} {σ : Type} (S : PB.AnSys e σ) (a : σ)
 
-theorem contDiffAt_phT {t : ℝ} (ht : 0 < t) (ht' : t ≤ S.t₀) (j : Fin S.A.n) {y : Fin e → ℂ}
-    (hy : y ∈ (S.A.chart j).target) : ContDiffAt ℝ 2 (S.phT a t ∘ (S.A.chart j).symm) y := by
+theorem contDiffAt_phT
+    {t : ℝ} (ht : 0 < t) (ht' : t ≤ S.t₀)
+    (j : Fin S.A.n)
+    {y : Fin e → ℂ} (hy : y ∈ (S.A.chart j).target)
+    : ContDiffAt ℝ 2 (S.phT a t ∘ (S.A.chart j).symm) y := by
   have hs := ((S.reg a).2.2 t ht ht').1 j
   have hmem : (S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' Set.univ ∈ 𝓝 y := by
     simpa using (S.A.chart j).open_target.mem_nhds hy
   exact (hs.contDiffAt hmem).of_le (by first | exact WithTop.coe_le_coe.mpr le_top | simp)
 
-theorem levi_potT_eq_zero (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t))
-    {t : ℝ} (ht : 0 < t) (ht' : t ≤ S.t₀) (j : Fin S.A.n) {y : Fin e → ℂ}
-    (hy : y ∈ (S.A.chart j).target) (w : Fin e → ℂ) :
-    ContDiffAt ℝ 2 ((S.potT a t).φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) y ∧
-      levi ((S.potT a t).φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) y w = 0 := by
+theorem levi_potT_eq_zero
+    (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t))
+    {t : ℝ} (ht : 0 < t) (ht' : t ≤ S.t₀)
+    (j : Fin S.A.n)
+    {y : Fin e → ℂ} (hy : y ∈ (S.A.chart j).target)
+    (w : Fin e → ℂ)
+    : ContDiffAt ℝ 2 ((S.potT a t).φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) y
+      ∧ levi ((S.potT a t).φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) y w = 0 := by
   set p : S.X := (S.A.chart j).symm y with hp
   have hU : p ∈ (S.th a).U p := (S.th a).mem_U p
   have hth : ContDiffAt ℝ 2 ((S.th a).φ p ∘ (S.A.chart j).symm) y := by
@@ -160,8 +178,9 @@ theorem levi_potT_eq_zero (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ Is
     ⟨hy, hU, trivial⟩
   have h1 := (h t).2 p j y hmemU w
   have h2 := (h t).1 p j y hmemU w
-  have heq : ((S.potT a t).rsmul (-1)).φ p ∘ (S.A.chart j).symm =
-      fun z => (fun _ => (0 : ℝ)) z + (-1) * ((S.potT a t).φ p ∘ (S.A.chart j).symm) z := by
+  have heq
+      : ((S.potT a t).rsmul (-1)).φ p ∘ (S.A.chart j).symm
+        = fun z => (fun _ => (0 : ℝ)) z + (-1) * ((S.potT a t).φ p ∘ (S.A.chart j).symm) z := by
     funext z
     simp [LocPot.rsmul]
   rw [heq, levi_add_smul (-1) contDiffAt_const hG w] at h2
@@ -169,79 +188,94 @@ theorem levi_potT_eq_zero (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ Is
   rw [h0] at h2
   linarith
 
-theorem levi_sub_eq_zero (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t))
-    {t t' : ℝ} (ht : 0 < t) (ht₀ : t ≤ S.t₀) (ht' : 0 < t') (ht₀' : t' ≤ S.t₀) (j : Fin S.A.n)
-    {y : Fin e → ℂ} (hy : y ∈ (S.A.chart j).target) (w : Fin e → ℂ) :
-    levi ((fun x => S.phT a t x - S.phT a t' x) ∘ (S.A.chart j).symm) y w = 0 := by
+theorem levi_sub_eq_zero
+    (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t))
+    {t t' : ℝ} (ht : 0 < t) (ht₀ : t ≤ S.t₀) (ht' : 0 < t') (ht₀' : t' ≤ S.t₀)
+    (j : Fin S.A.n)
+    {y : Fin e → ℂ} (hy : y ∈ (S.A.chart j).target)
+    (w : Fin e → ℂ)
+    : levi ((fun x => S.phT a t x - S.phT a t' x) ∘ (S.A.chart j).symm) y w = 0 := by
   obtain ⟨hG, h1⟩ := levi_potT_eq_zero S a h ht ht₀ j hy w
   obtain ⟨hG', h2⟩ := levi_potT_eq_zero S a h ht' ht₀' j hy w
-  have heq : (fun x => S.phT a t x - S.phT a t' x) ∘ (S.A.chart j).symm =
-      fun z => ((S.potT a t).φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) z +
-        (-1) * ((S.potT a t').φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) z := by
+  have heq
+      : (fun x => S.phT a t x - S.phT a t' x) ∘ (S.A.chart j).symm
+        = fun z =>
+          ((S.potT a t).φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) z
+            + (-1) * ((S.potT a t').φ ((S.A.chart j).symm y) ∘ (S.A.chart j).symm) z := by
     funext z
-    have e1 : ∀ s, (S.potT a s).φ ((S.A.chart j).symm y) ((S.A.chart j).symm z) =
-        (S.th a).φ ((S.A.chart j).symm y) ((S.A.chart j).symm z) +
-          S.phT a s ((S.A.chart j).symm z) := fun _ => rfl
+    have e1
+        : ∀ s,
+          (S.potT a s).φ ((S.A.chart j).symm y) ((S.A.chart j).symm z)
+            = (S.th a).φ ((S.A.chart j).symm y) ((S.A.chart j).symm z)
+              + S.phT a s ((S.A.chart j).symm z) := fun _ =>
+      rfl
     simp only [Function.comp_apply, e1]
     ring
   rw [heq, levi_add_smul (-1) hG hG' w, h1, h2]
   ring
 
-theorem eventually_eq_sub (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t))
+theorem eventually_eq_sub
+    (h : ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t))
     {t t' : ℝ} (ht : 0 < t) (ht₀ : t ≤ S.t₀) (ht' : 0 < t') (ht₀' : t' ≤ S.t₀)
     (x : S.X) (V : Set S.X) (hV : IsOpen V) (hx : x ∈ V)
-    (hmax : ∀ y ∈ V, S.phT a t y - S.phT a t' y ≤ S.phT a t x - S.phT a t' x) :
-    ∀ᶠ y in 𝓝 x, S.phT a t y - S.phT a t' y = S.phT a t x - S.phT a t' x := by
+    (hmax : ∀ y ∈ V, S.phT a t y - S.phT a t' y ≤ S.phT a t x - S.phT a t' x)
+    : ∀ᶠ y in 𝓝 x, S.phT a t y - S.phT a t' y = S.phT a t x - S.phT a t' x := by
   obtain ⟨j, hj⟩ := S.A.cover x
   have hO : IsOpen ((S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' V) :=
     (S.A.chart j).isOpen_inter_preimage_symm hV
   have hxO : S.A.chart j x ∈ (S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' V :=
-    ⟨(S.A.chart j).map_source hj, by
-      simpa [Set.mem_preimage, (S.A.chart j).left_inv hj] using hx⟩
+    ⟨(S.A.chart j).map_source hj, by simpa [Set.mem_preimage, (S.A.chart j).left_inv hj] using hx⟩
   have hsm : ContDiffOn ℝ ∞ ((fun x => S.phT a t x - S.phT a t' x) ∘ (S.A.chart j).symm)
       ((S.A.chart j).target ∩ (S.A.chart j).symm ⁻¹' V) := by
     have h1 := ((S.reg a).2.2 t ht ht₀).1 j
     have h2 := ((S.reg a).2.2 t' ht' ht₀').1 j
     exact (h1.sub h2).mono fun z hz => ⟨hz.1, trivial⟩
-  have hev := eventually_eq_of_isMax hO hsm
-    (fun z hz w => levi_sub_eq_zero S a h ht ht₀ ht' ht₀' j hz.1 w) hxO
-    (fun z hz => by
-      simpa [Function.comp_apply, (S.A.chart j).left_inv hj] using hmax _ hz.2)
+  have hev :=
+    eventually_eq_of_isMax hO hsm
+      (fun z hz w => levi_sub_eq_zero S a h ht ht₀ ht' ht₀' j hz.1 w)
+      hxO
+      (fun z hz => by simpa [Function.comp_apply, (S.A.chart j).left_inv hj] using hmax _ hz.2)
   have hev2 := ((S.A.chart j).continuousAt hj).eventually hev
   filter_upwards [hev2, (S.A.chart j).open_source.mem_nhds hj] with y hy hys
   simpa [Function.comp_apply, (S.A.chart j).left_inv hj, (S.A.chart j).left_inv hys] using hy
 
 end System
 
-theorem flat_phT_bounded : ∀ (e : ℕ) (σ : Type) (S : PB.AnSys e σ) (a : σ),
-    (∀ t, ReciprocityTheory.AnForm.M.IsPsh S.A ((S.potT a t).rsmul (-1)) ∧
-      ReciprocityTheory.AnForm.M.IsPsh S.A (S.potT a t)) →
-    ∃ C : ℝ, ∀ t, 0 < t → t ≤ S.t₀ → ∀ x, |S.phT a t x| ≤ C := by
+theorem flat_phT_bounded
+    : ∀ (e : ℕ) (σ : Type) (S : PB.AnSys e σ) (a : σ),
+      (∀ t,
+          ReciprocityTheory.AnForm.M.IsPsh S.A ((S.potT a t).rsmul (-1))
+            ∧ ReciprocityTheory.AnForm.M.IsPsh S.A (S.potT a t))
+        → ∃ C : ℝ, ∀ t, 0 < t → t ≤ S.t₀ → ∀ x, |S.phT a t x| ≤ C := by
   intro e σ S a h
-  let _ : ChartedSpace (Fin e → ℂ) S.X :=
-    { atlas := Set.range S.A.chart
-      chartAt := fun x => S.A.chart (S.A.cover x).choose
-      mem_chart_source := fun x => (S.A.cover x).choose_spec
-      chart_mem_atlas := fun _ => ⟨_, rfl⟩ }
+  let _ : ChartedSpace (Fin e → ℂ) S.X := {
+    atlas := Set.range S.A.chart
+    chartAt := fun x => S.A.chart (S.A.cover x).choose
+    mem_chart_source := fun x => (S.A.cover x).choose_spec
+    chart_mem_atlas := fun _ => ⟨_, rfl⟩
+  }
   haveI : LocallyConnectedSpace S.X := ChartedSpace.locallyConnectedSpace (Fin e → ℂ) S.X
   obtain ⟨ht₀, -, hreg⟩ := S.reg a
-  have hdense := (GlobalTheory.CompanionTheory.Ar.Bdry.bdry_isClosed_dense_compl e S.X S.A S.L S.s S.nb S.m S.W
-    S.sec S.snc).2
+  have hdense :=
+    (GlobalTheory.CompanionTheory.Ar.Bdry.bdry_isClosed_dense_compl e S.X S.A S.L S.s S.nb S.m S.W
+      S.sec S.snc).2
   have hc₀ : Continuous (S.phT a S.t₀) := continuous_of_smooth (hreg S.t₀ ht₀ le_rfl).1
   obtain ⟨M, hM⟩ := isCompact_univ.exists_bound_of_continuousOn hc₀.continuousOn
   have hM' : ∀ x, |S.phT a S.t₀ x| ≤ M := fun x => by simpa using hM x (Set.mem_univ x)
   have hpt : ∀ x : S.X, ∃ y, y ∈ connectedComponent x ∧ y ∈ (bdry S.s)ᶜ := fun x => by
-    obtain ⟨y, hy1, hy2⟩ := hdense.inter_open_nonempty _ isOpen_connectedComponent
-      ⟨x, mem_connectedComponent⟩
+    obtain ⟨y, hy1, hy2⟩ :=
+      hdense.inter_open_nonempty _ isOpen_connectedComponent ⟨x, mem_connectedComponent⟩
     exact ⟨y, hy1, hy2⟩
   choose y hyc hyb using hpt
-  obtain ⟨T, hT⟩ := isCompact_univ.elim_finite_subcover (fun x : S.X => connectedComponent x)
-    (fun _ => isOpen_connectedComponent) (fun x _ => Set.mem_iUnion.2 ⟨x, mem_connectedComponent⟩)
-  obtain ⟨B, hB⟩ := (T.image fun x => -S.ph a (y x)).exists_le
+  obtain ⟨T, hT⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun x : S.X => connectedComponent x)
+      (fun _ => isOpen_connectedComponent)
+      (fun x _ => Set.mem_iUnion.2 ⟨x, mem_connectedComponent⟩)
+  obtain ⟨B, hB⟩ := (T.image fun x => - S.ph a (y x)).exists_le
   refine ⟨|S.C| + |B| + 2 * M, fun t ht ht' x => ?_⟩
   have hM0 : 0 ≤ M := (abs_nonneg _).trans (hM' x)
-  obtain ⟨x₁, hx₁, hxc⟩ : ∃ x₁ ∈ T, x ∈ connectedComponent x₁ := by
-    simpa using hT (Set.mem_univ x)
+  obtain ⟨x₁, hx₁, hxc⟩ : ∃ x₁ ∈ T, x ∈ connectedComponent x₁ := by simpa using hT (Set.mem_univ x)
   have hcv : Continuous fun x => S.phT a t x - S.phT a S.t₀ x :=
     (continuous_of_smooth (hreg t ht ht').1).sub hc₀
   have hloc := fun (z : S.X) (V : Set S.X) (hV : IsOpen V) (hz : z ∈ V) hm =>
@@ -250,7 +284,7 @@ theorem flat_phT_bounded : ∀ (e : ℕ) (σ : Type) (S : PB.AnSys e σ) (a : σ
   have e2 := eq_of_mem_connectedComponent hcv hloc (hyc x₁)
   have hlow : S.ph a (y x₁) ≤ S.phT a t (y x₁) := (hreg t ht ht').2.2.1 _ (hyb x₁)
   have hup : S.phT a t x ≤ S.C := (hreg t ht ht').2.1 x
-  have hb : -S.ph a (y x₁) ≤ B := hB _ (Finset.mem_image_of_mem _ hx₁)
+  have hb : - S.ph a (y x₁) ≤ B := hB _ (Finset.mem_image_of_mem _ hx₁)
   have b1 := abs_le.1 (hM' x)
   have b2 := abs_le.1 (hM' (y x₁))
   rw [abs_le]

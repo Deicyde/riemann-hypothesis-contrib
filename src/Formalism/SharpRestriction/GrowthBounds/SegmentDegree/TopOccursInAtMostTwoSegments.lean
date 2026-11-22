@@ -11,19 +11,25 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 section Occ
 
 variable {n' r : ℕ} [NeZero n'] [NeZero r] {F : Frames n' r} {L₁ N₁ : ℕ}
 
 open Classical in
-theorem occ_Ioc (hV : F.Valid L₁ N₁) (c : ℤ) (t : Fin n') :
-    ∑ j ∈ Finset.range F.J, ((Finset.Ioc (eFr F ((j : ℤ) + c)) (eFr F (((j + 1 : ℕ) : ℤ) + c))).filter
-      fun y => posOf n' y = t).card ≤ 1 := by
+theorem occ_Ioc (hV : F.Valid L₁ N₁) (c : ℤ) (t : Fin n')
+    : ∑ j ∈ Finset.range F.J, ((Finset.Ioc (eFr F ((j : ℤ) + c)) (eFr F (((j + 1 : ℕ) : ℤ) + c))).filter
+        fun y => posOf n' y = t).card
+      ≤ 1 := by
   have hm := eFr_strictMono hV
-  have h3 := sum_card_Ioc (fun i : ℕ => eFr F ((i : ℤ) + c)) (fun a b hab => hm.monotone (by omega))
-    (fun y => posOf n' y = t) F.J
+  have h3 :=
+    sum_card_Ioc
+      (fun i : ℕ => eFr F ((i : ℤ) + c))
+      (fun a b hab => hm.monotone (by omega))
+      (fun y => posOf n' y = t)
+      F.J
   rw [h3]
   have h2 : eFr F ((F.J : ℤ) + c) = eFr F (((0 : ℕ) : ℤ) + c) + n' := by
     have := hV.2.1 c (r - 1)
@@ -44,9 +50,13 @@ theorem top_occurs_in_at_most_two_segments : LeadingLetterInAtMostTwoSegments :=
   have hV := hX.valid
   have h1 := occ_Ioc hV (-2) t
   have h2 := occ_Ioc hV (-1) t
-  have key : ∀ j ∈ Finset.range X.F.J, ((X.F.letters (j : ℤ)).filter fun y => posOf n' y = t).card ≤
-      ((Finset.Ioc (eFr X.F ((j : ℤ) + -2)) (eFr X.F (((j + 1 : ℕ) : ℤ) + -2))).filter fun y => posOf n' y = t).card +
-      ((Finset.Ioc (eFr X.F ((j : ℤ) + -1)) (eFr X.F (((j + 1 : ℕ) : ℤ) + -1))).filter fun y => posOf n' y = t).card := by
+  have key
+      : ∀ j ∈ Finset.range X.F.J,
+        ((X.F.letters (j : ℤ)).filter fun y => posOf n' y = t).card
+          ≤ ((Finset.Ioc (eFr X.F ((j : ℤ) + -2)) (eFr X.F (((j + 1 : ℕ) : ℤ) + -2))).filter
+              fun y => posOf n' y = t).card
+            + ((Finset.Ioc (eFr X.F ((j : ℤ) + -1)) (eFr X.F (((j + 1 : ℕ) : ℤ) + -1))).filter
+              fun y => posOf n' y = t).card := by
     intro j _
     refine le_trans (Finset.card_le_card ?_) (Finset.card_union_le _ _)
     intro y hy
@@ -58,7 +68,8 @@ theorem top_occurs_in_at_most_two_segments : LeadingLetterInAtMostTwoSegments :=
     have h4 := hV.2.2.2.1 ((j : ℤ) + -2)
     have e4 : (j : ℤ) + -2 + 1 = (j : ℤ) - 1 := by ring
     rw [e4] at h4
-    rw [e1, e2, e3, Finset.mem_union, Finset.mem_filter, Finset.mem_filter, Finset.mem_Ioc, Finset.mem_Ioc]
+    rw [e1, e2, e3, Finset.mem_union, Finset.mem_filter, Finset.mem_filter, Finset.mem_Ioc,
+      Finset.mem_Ioc]
     simp only [eFr]
     by_cases hc : y ≤ X.F.fr ((j : ℤ) - 1) (r - 1)
     · exact Or.inl ⟨⟨lt_of_lt_of_le h4 hb.1, hc⟩, hyt⟩

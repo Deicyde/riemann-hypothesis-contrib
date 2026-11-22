@@ -18,19 +18,24 @@ noncomputable section
 
 namespace GlobalTheory.OneMapAll
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
-  Formalism.L2.DIV GlobalTheory.FieldBC Formalism Formalism.IndefR Formalism.IndefR.FWT Formalism.MainNotions Formalism.IndefR.Links Formalism.IndefR.Mult
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+  Formalism.L2.DIV GlobalTheory.FieldBC Formalism Formalism.IndefR Formalism.IndefR.FWT
+  Formalism.MainNotions Formalism.IndefR.Links Formalism.IndefR.Mult
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
 
 section Merge
 
 variable {C : Core D} [Algebra C.Q.c.F D.what₂.LL] {R : RealDat D A C.Q.c.F} {i : Fin D.R.m}
 
-def comap {Tp Tp' : Type} {tup : Tp → T0} (O : OMDat C R i Tp tup) (f : Tp' → Tp) : OMDat C R i Tp' (fun t => tup (f t)) where
+def comap {Tp Tp' : Type} {tup : Tp → T0} (O : OMDat C R i Tp tup) (f : Tp' → Tp)
+    : OMDat C R i Tp' (fun t => tup (f t)) where
   c' := O.c'
   hle := O.hle
   jL := O.jL
@@ -59,17 +64,32 @@ def comap {Tp Tp' : Type} {tup : Tp → T0} (O : OMDat C R i Tp tup) (f : Tp' �
   thAd := fun t => O.thAd (f t)
   Plc := fun t => O.Plc (f t)
 
-theorem pins_comap {Tp Tp' : Type} {tup : Tp → T0} {O : OMDat C R i Tp tup} (f : Tp' → Tp) {κ : WeightFamilies.Wt D ((i : ℕ) + 1)}
-    {v₀ ι x₀} (h : O.Pins κ v₀ ι x₀) : (comap O f).Pins κ v₀ ι x₀ :=
-  ⟨h.lift, fun t => h.tuple (f t), h.act, fun t => h.bad (f t), fun t => h.reps (f t), fun t => h.ep (f t), h.io,
-    fun t => h.w (f t), fun t => h.cov (f t), h.cxi.imp fun _ hc => ⟨hc.1, fun t => hc.2 (f t)⟩, fun t => h.model₂ (f t)⟩
+theorem pins_comap
+    {Tp Tp' : Type} {tup : Tp → T0} {O : OMDat C R i Tp tup} (f : Tp' → Tp)
+    {κ : WeightFamilies.Wt D ((i : ℕ) + 1)} {v₀ ι x₀} (h : O.Pins κ v₀ ι x₀)
+    : (comap O f).Pins κ v₀ ι x₀ := ⟨
+  h.lift,
+  fun t => h.tuple (f t),
+  h.act,
+  fun t => h.bad (f t),
+  fun t => h.reps (f t),
+  fun t => h.ep (f t),
+  h.io,
+  fun t => h.w (f t),
+  fun t => h.cov (f t),
+  h.cxi.imp fun _ hc => ⟨hc.1, fun t => hc.2 (f t)⟩,
+  fun t => h.model₂ (f t)
+⟩
 
-variable {J : Type} {tup : J → T0} (src : ∀ j, OMDat C R i Unit (fun _ => tup j)) (c₃ : Coeff C.Q.l) (h₃ : C.Q.c.F ≤ c₃.F)
-  (hs : ∀ j, (src j).c'.F ≤ c₃.F) (jL₃ : D.what₂.LL →+* c₃.F) (hV₃ : C.V ((i : ℕ) + 1) (sOv C c₃ h₃) = Wc D i)
-  (c0₃ : VsV D i c₃.F →ₛₗ[inC c₃] (R.cV i).W)
+variable
+  {J : Type} {tup : J → T0} (src : ∀ j, OMDat C R i Unit (fun _ => tup j))
+  (c₃ : Coeff C.Q.l) (h₃ : C.Q.c.F ≤ c₃.F)
+  (hs : ∀ j, (src j).c'.F ≤ c₃.F) (jL₃ : D.what₂.LL →+* c₃.F)
+  (hV₃ : C.V ((i : ℕ) + 1) (sOv C c₃ h₃) = Wc D i) (c0₃ : VsV D i c₃.F →ₛₗ[inC c₃] (R.cV i).W)
   (lev : G → (C.Q.Dw ((i : ℕ) + 1)).La →ₗ[𝓞 D.host.E] (C.Q.Dw ((i : ℕ) + 1)).La)
-  (io₃ : VsV D i c₃.F →ₗ[c₃.F] MvPolynomial (LtN (C.Q.Dw ((i : ℕ) + 1)) (Vc D i).rank) c₃.F) (hw₃ : VsV D i c₃.F)
-  (u : J → c₃.F) (h : ∀ j, (src j).Cl' () → GA D (Vc D i)) (v₀ : (R.MW i (sg0 D A)).Vec)
+  (io₃ : VsV D i c₃.F →ₗ[c₃.F] MvPolynomial (LtN (C.Q.Dw ((i : ℕ) + 1)) (Vc D i).rank) c₃.F)
+  (hw₃ : VsV D i c₃.F) (u : J → c₃.F) (h : ∀ j, (src j).Cl' () → GA D (Vc D i))
+  (v₀ : (R.MW i (sg0 D A)).Vec)
 
 def merge : OMDat C R i J tup where
   c' := c₃
@@ -100,11 +120,14 @@ def merge : OMDat C R i J tup where
   thAd := fun j => thAdOf R i (tup j) (h j) c0₃ v₀
   Plc := fun j x => ∃ x₀, Place R i (tup j) (h j) c0₃ (jVx R i (tup j) x₀) x
 
-theorem repsR_map {K K' : Type} [Field K] [Field K'] (j : K →+* K') {t : T0} {Cl : Type} {h : Cl → GA D (Vc D i)} {bad J' Lh gam}
-    {vol : K} (hr : RepsR R i t h bad J' Lh gam vol) : RepsR R i t h bad J' Lh gam (j vol) := by
+theorem repsR_map
+    {K K' : Type} [Field K] [Field K']
+    (j : K →+* K')
+    {t : T0} {Cl : Type} {h : Cl → GA D (Vc D i)} {bad J' Lh gam} {vol : K}
+    (hr : RepsR R i t h bad J' Lh gam vol)
+    : RepsR R i t h bad J' Lh gam (j vol) := by
   obtain ⟨h1, h2, h3, h4, h5, h6⟩ := hr
   exact ⟨h1, h2, h3, h4, by rw [h5, map_inv₀, map_natCast], h6⟩
-
 
 end Merge
 

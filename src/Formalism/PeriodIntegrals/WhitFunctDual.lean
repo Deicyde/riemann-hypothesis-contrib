@@ -9,6 +9,7 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GGMi
 namespace PI
 
 def WhitFunctDual : Prop :=
-  Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.GelfandGraevMultOne → Formalism.L2.SG.GGMirabolic.GelfandGraevMultOne
+  Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.GelfandGraevMultOne
+    → Formalism.L2.SG.GGMirabolic.GelfandGraevMultOne
 
 end PI

@@ -27,8 +27,8 @@ lemma ne_zero_and_div_im_pos (a b : ℂ) (hab : 0 < ((starRingEnd ℂ) a * b).im
   rw [conj_mul_im_eq_normSq_mul_div_im a b ha] at hab
   exact pos_of_mul_pos_right hab (Complex.normSq_nonneg a)
 
-theorem discr_closure_pair_ne_zero (a b : ℂ) (hab : 0 < ((starRingEnd ℂ) a * b).im) :
-    discr (AddSubgroup.closure {a, b}) ≠ 0 := by
+theorem discr_closure_pair_ne_zero (a b : ℂ) (hab : 0 < ((starRingEnd ℂ) a * b).im)
+    : discr (AddSubgroup.closure {a, b}) ≠ 0 := by
   obtain ⟨ha, hpos⟩ := ne_zero_and_div_im_pos a b hab
   rw [discr_closure_pair a b hpos]
   have hpi : (2 * Real.pi / a : ℂ) ≠ 0 := by

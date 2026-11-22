@@ -11,12 +11,13 @@ open TensorProduct
 
 namespace GlobalTheory.PointSupport
 
-
 open TensorProduct in
 open TensorProduct in
-theorem _root_.GlobalTheory.PointSupport.exists_algHom_ker_eq (K : Type) [Field K] [IsAlgClosed K] (R : Type)
-    [CommRing R] [Algebra K R] [Algebra.FiniteType K R] (M : Ideal R) [M.IsMaximal] :
-    ∃ χ : R →ₐ[K] K, RingHom.ker χ = M := by
+theorem _root_.GlobalTheory.PointSupport.exists_algHom_ker_eq
+    (K : Type) [Field K] [IsAlgClosed K]
+    (R : Type) [CommRing R] [Algebra K R] [Algebra.FiniteType K R]
+    (M : Ideal R) [M.IsMaximal]
+    : ∃ χ : R →ₐ[K] K, RingHom.ker χ = M := by
   letI : Field (R ⧸ M) := Ideal.Quotient.field M
   haveI : Module.Finite K (R ⧸ M) := finite_of_finite_type_of_isJacobsonRing K (R ⧸ M)
   let e : K ≃ₐ[K] R ⧸ M :=
@@ -25,18 +26,16 @@ theorem _root_.GlobalTheory.PointSupport.exists_algHom_ker_eq (K : Type) [Field 
   ext x
   simp [RingHom.mem_ker, Ideal.Quotient.eq_zero_iff_mem]
 
-
 open TensorProduct in
 open TensorProduct in
-theorem _root_.GlobalTheory.PointSupport.finiteLength_and_finrank_eq_length :
-    ∀ (K : Type) [Field K] [IsAlgClosed K] (R : Type) [CommRing R] [Algebra K R]
-      [Algebra.FiniteType K R] (χ₀ : R →ₐ[K] K) (O : Type) [CommRing O] [Algebra R O]
-      [(RingHom.ker χ₀).IsPrime] [IsLocalization.AtPrime O (RingHom.ker χ₀)]
-      (H : Type) [AddCommGroup H] [Module R H] [Module K H] [IsScalarTower K R H]
-      [Module.Finite R H],
-      (∀ χ : R →ₐ[K] K, χ ≠ χ₀ → ∃ r : R, χ r ≠ 0 ∧ ∀ z : H, r • z = 0) →
-      IsFiniteLength O (O ⊗[R] H) ∧ Module.Finite K H ∧
-        (Module.finrank K H : ℕ∞) = Module.length O (O ⊗[R] H) := by
+theorem _root_.GlobalTheory.PointSupport.finiteLength_and_finrank_eq_length
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (R : Type) [CommRing R] [Algebra K R]
+        [Algebra.FiniteType K R] (χ₀ : R →ₐ[K] K) (O : Type) [CommRing O] [Algebra R O]
+        [(RingHom.ker χ₀).IsPrime] [IsLocalization.AtPrime O (RingHom.ker χ₀)] (H : Type)
+        [AddCommGroup H] [Module R H] [Module K H] [IsScalarTower K R H] [Module.Finite R H],
+      (∀ χ : R →ₐ[K] K, χ ≠ χ₀ → ∃ r : R, χ r ≠ 0 ∧ ∀ z : H, r • z = 0)
+        → IsFiniteLength O (O ⊗[R] H) ∧ Module.Finite K H
+          ∧ (Module.finrank K H : ℕ∞) = Module.length O (O ⊗[R] H) := by
   intro K _ _ R _ _ _ χ₀ O _ _ _ _ H _ _ _ _ _ hsupp
   classical
   haveI : IsJacobsonRing R := isJacobsonRing_of_finiteType (A := K)
@@ -76,8 +75,9 @@ theorem _root_.GlobalTheory.PointSupport.finiteLength_and_finrank_eq_length :
         smul_assoc]⟩
   haveI : Module.Finite (R ⧸ Module.annihilator R H) H :=
     Module.Finite.of_restrictScalars_finite R _ H
-  have hprimeq : ∀ Q : Ideal (R ⧸ Module.annihilator R H), Q.IsPrime →
-      Q.comap (Ideal.Quotient.mk _) = RingHom.ker χ₀ := fun Q hQ =>
+  have hprimeq
+      : ∀ Q : Ideal (R ⧸ Module.annihilator R H),
+        Q.IsPrime → Q.comap (Ideal.Quotient.mk _) = RingHom.ker χ₀ := fun Q hQ =>
     hprime _ (Ideal.comap_isPrime _ Q) fun r hr => by
       rw [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.mpr hr]
       exact Q.zero_mem
@@ -109,8 +109,9 @@ theorem _root_.GlobalTheory.PointSupport.finiteLength_and_finrank_eq_length :
   haveI : IsLocalizedModule (RingHom.ker χ₀).primeCompl (LinearMap.id : H →ₗ[R] H) :=
     IsLocalizedModule.mk hunit (fun y => ⟨⟨y, 1⟩, one_smul _ _⟩)
       (fun {x₁ x₂} h => ⟨1, by simpa using h⟩)
-  let e : H ≃ₗ[R] O ⊗[R] H := IsLocalizedModule.linearEquiv (RingHom.ker χ₀).primeCompl
-    LinearMap.id (TensorProduct.mk R O H 1)
+  let e : H ≃ₗ[R] O ⊗[R] H :=
+    IsLocalizedModule.linearEquiv (RingHom.ker χ₀).primeCompl LinearMap.id
+      (TensorProduct.mk R O H 1)
 
   letI : Algebra K O := ((algebraMap R O).comp (algebraMap K R)).toAlgebra
   haveI : IsScalarTower K R O := IsScalarTower.of_algebraMap_eq fun _ => rfl
@@ -123,10 +124,12 @@ theorem _root_.GlobalTheory.PointSupport.finiteLength_and_finrank_eq_length :
     · exact isUnit_iff_ne_zero.mpr h0⟩
   haveI : Module.Finite K (O ⊗[R] H) := Module.Finite.equiv eK
 
-  have hsurj : Function.Surjective
-      (algebraMap (IsLocalRing.ResidueField K) (IsLocalRing.ResidueField O)) := by
-    have hR : ∀ r : R, IsLocalRing.residue O (algebraMap R O r) ∈
-        (algebraMap (IsLocalRing.ResidueField K) (IsLocalRing.ResidueField O)).fieldRange := by
+  have hsurj : Function.Surjective (algebraMap (IsLocalRing.ResidueField K)
+      (IsLocalRing.ResidueField O)) := by
+    have hR
+        : ∀ r : R,
+          IsLocalRing.residue O (algebraMap R O r) ∈ (algebraMap (IsLocalRing.ResidueField K)
+            (IsLocalRing.ResidueField O)).fieldRange := by
       intro r
       refine ⟨IsLocalRing.residue K (χ₀ r), ?_⟩
       have hmem : algebraMap R O (r - algebraMap K R (χ₀ r)) ∈ IsLocalRing.maximalIdeal O := by
@@ -139,16 +142,18 @@ theorem _root_.GlobalTheory.PointSupport.finiteLength_and_finrank_eq_length :
     obtain ⟨o, rfl⟩ := IsLocalRing.residue_surjective x
     obtain ⟨r, s, rfl⟩ := IsLocalization.exists_mk'_eq (RingHom.ker χ₀).primeCompl o
     rw [IsLocalization.mk'_eq_mul_mk'_one, map_mul]
-    have hs : IsLocalRing.residue O (IsLocalization.mk' O (1 : R) s) =
-        (IsLocalRing.residue O (algebraMap R O s))⁻¹ := by
+    have hs
+        : IsLocalRing.residue O (IsLocalization.mk' O (1 : R) s)
+          = (IsLocalRing.residue O (algebraMap R O s))⁻¹ := by
       apply eq_inv_of_mul_eq_one_left
       rw [← map_mul, IsLocalization.mk'_spec, map_one, map_one]
     rw [hs]
     exact Subfield.mul_mem _ (hR r) (Subfield.inv_mem _ (hR s))
   have hres : Module.length (IsLocalRing.ResidueField K) (IsLocalRing.ResidueField O) = 1 := by
-    let f := LinearEquiv.ofBijective
-      (Algebra.linearMap (IsLocalRing.ResidueField K) (IsLocalRing.ResidueField O))
-      ⟨(algebraMap (IsLocalRing.ResidueField K) (IsLocalRing.ResidueField O)).injective, hsurj⟩
+    let f :=
+      LinearEquiv.ofBijective
+        (Algebra.linearMap (IsLocalRing.ResidueField K) (IsLocalRing.ResidueField O))
+        ⟨(algebraMap (IsLocalRing.ResidueField K) (IsLocalRing.ResidueField O)).injective, hsurj⟩
     rw [← f.length_eq, Module.length_eq_one_iff]
     infer_instance
   have hlen := IsLocalRing.length_restrictScalars K O (O ⊗[R] H)

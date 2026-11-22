@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo GlobalTheory.CuspRep Filter Topology
 
-theorem UpperTheory.V.Lit.Geo.Pf.csLie :
-    UpperTheory.V.Lit.Geo.Pf.CsLie := by
+theorem UpperTheory.V.Lit.Geo.Pf.csLie : UpperTheory.V.Lit.Geo.Pf.CsLie := by
   intro E _ _ _ a φ X ⟨R, hR⟩
   obtain ⟨c, c0, -, ccont, cder, -⟩ := UpperTheory.V.Lit.Bor.oneParam E a X
   obtain ⟨h1, -, h3, -⟩ := qhtFacts E a

@@ -9,22 +9,27 @@ public import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.ComatrixEigen
 
 open Formalism.REAL
 
-theorem qminor_exists_poly {A : Type} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : Fin n → Fin n → A)
-    (a b : Fin t → Fin n) :
-    ∃ p : Polynomial A, ∀ u : ℂ, qminor E a b u = ∑ d ∈ p.support, u ^ d • p.coeff d := by
-  refine ⟨∑ σ : Equiv.Perm (Fin t), ((Equiv.Perm.sign σ : ℤ) : Polynomial A) *
-    (List.ofFn fun k : Fin t => ((if a (σ k) = b k then
-      Polynomial.X - Polynomial.C (algebraMap ℂ A (k : ℂ)) else 0) + Polynomial.C (E (a (σ k)) (b k)) :
-        Polynomial A)).prod, fun u => ?_⟩
-  let φ : Polynomial A →+* A := Polynomial.eval₂RingHom' (RingHom.id A) (algebraMap ℂ A u)
-    (fun x => (Algebra.commutes u x).symm)
+theorem qminor_exists_poly
+    {A : Type} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : Fin n → Fin n → A) (a b : Fin t → Fin n)
+    : ∃ p : Polynomial A, ∀ u : ℂ, qminor E a b u = ∑ d ∈ p.support, u ^ d • p.coeff d := by
+  refine ⟨
+    ∑ σ : Equiv.Perm (Fin t), ((Equiv.Perm.sign σ : ℤ) : Polynomial A) *
+      (List.ofFn fun k : Fin t => ((if a (σ k) = b k then
+        Polynomial.X - Polynomial.C (algebraMap ℂ A (k : ℂ)) else 0) + Polynomial.C (E (a (σ k)) (b k)) :
+          Polynomial A)).prod,
+    fun u => ?_
+  ⟩
+  let φ : Polynomial A →+* A :=
+    Polynomial.eval₂RingHom' (RingHom.id A) (algebraMap ℂ A u)
+      (fun x => (Algebra.commutes u x).symm)
   have hφ : ∀ p : Polynomial A, φ p = ∑ d ∈ p.support, u ^ d • p.coeff d := by
     intro p
     change Polynomial.eval₂ (RingHom.id A) (algebraMap ℂ A u) p = _
@@ -44,32 +49,42 @@ theorem qminor_exists_poly {A : Type} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : 
   · rw [map_sub φ, hX, hC, map_sub]
   · rw [map_zero]
 
-theorem continuous_qminor_apply {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {n t : ℕ}
-    (E : Fin n → Fin n → Module.End ℂ M) (a b : Fin t → Fin n) (v : M) :
-    Continuous fun u : ℂ => qminor E a b u v := by
+theorem continuous_qminor_apply
+    {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+    {n t : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (a b : Fin t → Fin n)
+    (v : M)
+    : Continuous fun u : ℂ => qminor E a b u v := by
   obtain ⟨p, hp⟩ := qminor_exists_poly E a b
   simp only [hp, LinearMap.sum_apply, LinearMap.smul_apply]
   fun_prop
 
-theorem cof_eigen {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {m : ℕ}
-    (E : Fin (m + 1) → Fin (m + 1) → Module.End ℂ M) (mu : Fin (m + 1) → ℝ) (x : Fin (m + 1) → M)
-    (hE : GlRel E)
-    (hq : ∀ (Y : ℂ) (w : M), qdet E (Y + (((m + 1 : ℕ) : ℂ) - 1) / 2) w = (∏ s, (Y + (mu s : ℂ))) • w)
-    (t : Fin (m + 1))
-    (hx : splitCas E x = ((-mu t + (1 - ((m + 1 : ℕ) : ℝ)) / 2 : ℝ) : ℂ) • x) (i : Fin (m + 1)) (Y : ℂ) :
-    ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) •
-      qminor E (Fin.succAbove j) (Fin.succAbove i) (Y + (m : ℂ) / 2) (x j) =
-      (∏ r ∈ univ.erase t, (Y + (mu r : ℂ))) • x i := by
-  have key : ∀ Y : ℂ, (Y + (mu t : ℂ)) • ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) •
-      qminor E (Fin.succAbove j) (Fin.succAbove i) (Y + (m : ℂ) / 2) (x j) =
-      (Y + (mu t : ℂ)) • (∏ r ∈ univ.erase t, (Y + (mu r : ℂ))) • x i := by
+theorem cof_eigen
+    {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+    {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → Module.End ℂ M) (mu : Fin (m + 1) → ℝ)
+    (x : Fin (m + 1) → M) (hE : GlRel E)
+    (hq
+      : ∀ (Y : ℂ) (w : M), qdet E (Y + (((m + 1 : ℕ) : ℂ) - 1) / 2) w = (∏ s, (Y + (mu s : ℂ))) • w)
+    (t : Fin (m + 1)) (hx : splitCas E x = ((- mu t + (1 - ((m + 1 : ℕ) : ℝ)) / 2 : ℝ) : ℂ) • x)
+    (i : Fin (m + 1))
+    (Y : ℂ)
+    : ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) •
+        qminor E (Fin.succAbove j) (Fin.succAbove i) (Y + (m : ℂ) / 2) (x j)
+      = (∏ r ∈ univ.erase t, (Y + (mu r : ℂ))) • x i := by
+  have key
+      : ∀ Y : ℂ,
+        (Y + (mu t : ℂ))
+            • ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) •
+              qminor E (Fin.succAbove j) (Fin.succAbove i) (Y + (m : ℂ) / 2) (x j)
+          = (Y + (mu t : ℂ)) • (∏ r ∈ univ.erase t, (Y + (mu r : ℂ))) • x i := by
     intro Y
     have hT : ∀ j, ∑ l, Tm E (Y + (m : ℂ) / 2 - (m : ℂ)) j l (x l) = (Y + (mu t : ℂ)) • x j := by
       intro j
       have h1 := congrFun hx j
       simp only [splitCas, Pi.smul_apply] at h1
-      have h2 : ∀ l, Tm E (Y + (m : ℂ) / 2 - (m : ℂ)) j l (x l) =
-          (if j = l then (Y + (m : ℂ) / 2 - (m : ℂ)) • x l else 0) + E j l (x l) := by
+      have h2
+          : ∀ l,
+            Tm E (Y + (m : ℂ) / 2 - (m : ℂ)) j l (x l)
+              = (if j = l then (Y + (m : ℂ) / 2 - (m : ℂ)) • x l else 0) + E j l (x l) := by
         intro l
         rw [Tm, LinearMap.add_apply]
         split_ifs
@@ -82,10 +97,12 @@ theorem cof_eigen {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {m
       push_cast
       ring
     have hu : Y + (m : ℂ) / 2 = Y + (((m + 1 : ℕ) : ℂ) - 1) / 2 := by push_cast; ring
-    have h3 : ∑ l, (if i = l then qdet E (Y + (m : ℂ) / 2) else 0) (x l) =
-        (Y + (mu t : ℂ)) • (∏ r ∈ univ.erase t, (Y + (mu r : ℂ))) • x i := by
+    have h3
+        : ∑ l, (if i = l then qdet E (Y + (m : ℂ) / 2) else 0) (x l)
+          = (Y + (mu t : ℂ)) • (∏ r ∈ univ.erase t, (Y + (mu r : ℂ))) • x i := by
       rw [Finset.sum_eq_single i]
-      · rw [if_pos rfl, hu, hq, smul_smul, Finset.mul_prod_erase _ (fun r => Y + (mu r : ℂ)) (Finset.mem_univ t)]
+      · rw [if_pos rfl, hu, hq, smul_smul,
+          Finset.mul_prod_erase _ (fun r => Y + (mu r : ℂ)) (Finset.mem_univ t)]
       · intro l _ hl
         rw [if_neg (Ne.symm hl), LinearMap.zero_apply]
       · simp
@@ -96,11 +113,12 @@ theorem cof_eigen {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {m
     simp only [Module.End.mul_apply]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← map_sum, ← map_sum, hT, map_smul, map_smul, Module.End.intCast_apply,
-      ← Int.cast_smul_eq_zsmul ℂ]
+        ← Int.cast_smul_eq_zsmul ℂ]
     push_cast
     rfl
-  have hc1 : Continuous fun Y : ℂ => ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) •
-      qminor E (Fin.succAbove j) (Fin.succAbove i) (Y + (m : ℂ) / 2) (x j) := by
+  have hc1 : Continuous fun Y : ℂ =>
+      ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) •
+        qminor E (Fin.succAbove j) (Fin.succAbove i) (Y + (m : ℂ) / 2) (x j) := by
     refine continuous_finsetSum _ fun j _ => Continuous.const_smul ?_ _
     exact (continuous_qminor_apply E _ _ (x j)).comp (continuous_add_const _)
   have hc2 : Continuous fun Y : ℂ => (∏ r ∈ univ.erase t, (Y + (mu r : ℂ))) • x i := by fun_prop
@@ -113,7 +131,17 @@ end GlobalTheory.ComatrixEigen
 
 namespace GlobalTheory
 
-theorem comatrix_picks_eigencomponent : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (m : ℕ) (E : Fin (m + 1) → Fin (m + 1) → Module.End ℂ M) (mu : Fin (m + 1) → ℝ) (y : Fin (m + 1) → Fin (m + 1) → M), Formalism.REAL.GlRel E → (∀ (Y : ℂ) (w : M), Formalism.REAL.qdet E (Y + (((m + 1 : ℕ) : ℂ) - 1) / 2) w = (∏ s, (Y + (mu s : ℂ))) • w) → (∀ t, splitCas E (y t) = ((-mu t + (1 - ((m + 1 : ℕ) : ℝ)) / 2 : ℝ) : ℂ) • y t) → ∀ s i, ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) • Formalism.REAL.qminor E (Fin.succAbove j) (Fin.succAbove i) (-(mu s : ℂ) + (m : ℂ) / 2) (∑ t, y t j) = (∏ t ∈ univ.erase s, ((mu t : ℂ) - mu s)) • y s i := by
+theorem comatrix_picks_eigencomponent
+    : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (m : ℕ)
+        (E : Fin (m + 1) → Fin (m + 1) → Module.End ℂ M) (mu : Fin (m + 1) → ℝ)
+        (y : Fin (m + 1) → Fin (m + 1) → M),
+      Formalism.REAL.GlRel E
+        → (∀ (Y : ℂ) (w : M),
+          Formalism.REAL.qdet E (Y + (((m + 1 : ℕ) : ℂ) - 1) / 2) w = (∏ s, (Y + (mu s : ℂ))) • w)
+        → (∀ t, splitCas E (y t) = ((- mu t + (1 - ((m + 1 : ℕ) : ℝ)) / 2 : ℝ) : ℂ) • y t)
+        → ∀ s i,
+          ∑ j : Fin (m + 1), ((-1 : ℂ) ^ (i.val + j.val)) • Formalism.REAL.qminor E (Fin.succAbove j) (Fin.succAbove i) (-(mu s : ℂ) + (m : ℂ) / 2) (∑ t, y t j)
+            = (∏ t ∈ univ.erase s, ((mu t : ℂ) - mu s)) • y s i := by
   intro M _ _ m E mu y hE hq hy s i
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, Finset.smul_sum]
@@ -122,7 +150,8 @@ theorem comatrix_picks_eigencomponent : ∀ (M : Type) [NormedAddCommGroup M] [I
   rw [Finset.sum_eq_single s]
   · simp only [neg_add_eq_sub]
   · intro t _ ht
-    rw [Finset.prod_eq_zero (i := s) (Finset.mem_erase.2 ⟨Ne.symm ht, Finset.mem_univ _⟩) (neg_add_cancel _),
+    rw [Finset.prod_eq_zero (i := s) (Finset.mem_erase.2 ⟨Ne.symm ht, Finset.mem_univ _⟩)
+        (neg_add_cancel _),
       zero_smul]
   · simp
 

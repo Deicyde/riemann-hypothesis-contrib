@@ -23,8 +23,8 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
-private theorem psum_ne (Z : Multiset ℂ) (hZ : Z ≠ 0) (h0 : (0 : ℂ) ∉ Z) :
-    ∃ j : ℕ, 1 ≤ j ∧ (Z.map (· ^ j)).sum ≠ 0 := by
+private theorem psum_ne (Z : Multiset ℂ) (hZ : Z ≠ 0) (h0 : (0 : ℂ) ∉ Z)
+    : ∃ j : ℕ, 1 ≤ j ∧ (Z.map (· ^ j)).sum ≠ 0 := by
   classical
   by_contra hcon
   push Not at hcon
@@ -44,27 +44,35 @@ private theorem psum_ne (Z : Multiset ℂ) (hZ : Z ≠ 0) (h0 : (0 : ℂ) ∉ Z)
     refine Finset.sum_eq_zero fun j _ => ?_
     rcases Nat.eq_zero_or_pos j with rfl | hj
     · simp [hq0]
-    · calc _ = Q.coeff j * ∑ a ∈ S, (Z.count a : ℂ) * a ^ j := by
-              rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun a _ => by ring
+    · calc
+        _ = Q.coeff j * ∑ a ∈ S, (Z.count a : ℂ) * a ^ j := by
+          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun a _ => by ring
         _ = 0 := by rw [hp j hj, mul_zero]
   have h2 : ∑ a ∈ S, (Z.count a : ℂ) * Q.eval a = (Z.count z₀ : ℂ) * Q.eval z₀ := by
     refine Finset.sum_eq_single_of_mem z₀ (Multiset.mem_toFinset.2 hz₀) fun a ha hne => ?_
     have : Q.eval a = 0 := by
-      simp only [Q, Polynomial.eval_mul, Polynomial.eval_X, Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_C]
+      simp only [Q, Polynomial.eval_mul, Polynomial.eval_X, Polynomial.eval_prod,
+        Polynomial.eval_sub, Polynomial.eval_C]
       rw [Finset.prod_eq_zero (Finset.mem_erase.2 ⟨hne, ha⟩) (sub_self a), mul_zero]
     rw [this, mul_zero]
   rw [h2] at h1
   have hc : (Z.count z₀ : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (Multiset.count_ne_zero.2 hz₀)
   have hQ : Q.eval z₀ ≠ 0 := by
-    simp only [Q, Polynomial.eval_mul, Polynomial.eval_X, Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_C]
-    refine mul_ne_zero (fun h => h0 (h ▸ hz₀)) (Finset.prod_ne_zero_iff.2 fun a ha => sub_ne_zero.2 (Finset.ne_of_mem_erase ha).symm)
+    simp only [Q, Polynomial.eval_mul, Polynomial.eval_X, Polynomial.eval_prod, Polynomial.eval_sub,
+      Polynomial.eval_C]
+    refine mul_ne_zero
+      (fun h => h0 (h ▸ hz₀))
+      (Finset.prod_ne_zero_iff.2 fun a ha => sub_ne_zero.2 (Finset.ne_of_mem_erase ha).symm)
   exact mul_ne_zero hc hQ h1
 
-private theorem exists_pow_trace {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [Nontrivial W]
-    (T : Module.End ℂ W) (hT : IsUnit T) : ∃ j : ℕ, 1 ≤ j ∧ LinearMap.trace ℂ W (T ^ j) ≠ 0 := by
+private theorem exists_pow_trace
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] [Nontrivial W]
+    (T : Module.End ℂ W) (hT : IsUnit T)
+    : ∃ j : ℕ, 1 ≤ j ∧ LinearMap.trace ℂ W (T ^ j) ≠ 0 := by
   obtain ⟨u, rfl⟩ := hT
   let R : Representation ℂ (Multiplicative ℤ) W := (Units.coeHom _).comp (zpowersHom _ u)
-  obtain ⟨E, -, hE⟩ := GlobalTheory.IwahoriTraceProof.exists_exponents (G := Multiplicative ℤ) _ W R rfl
+  obtain ⟨E, -, hE⟩ :=
+    GlobalTheory.IwahoriTraceProof.exists_exponents (G := Multiplicative ℤ) _ W R rfl
   have hR : ∀ j : ℕ, R (Multiplicative.ofAdd 1 ^ j) = (u : Module.End ℂ W) ^ j := fun j => by
     rw [map_pow]
     congr 1
@@ -101,8 +109,8 @@ private theorem fixed_eq (ρ : Representation ℂ G V) (I : Subgroup G) : fixed 
   rw [GlobalTheory.TwTrLevel.mem_fixed_iff]
   rfl
 
-private theorem mem_orbit (I : Subgroup G) (x g : G) :
-    (g : G ⧸ I) ∈ MulAction.orbit I (x : G ⧸ I) ↔ ∃ a ∈ I, ∃ b ∈ I, g = a * x * b := by
+private theorem mem_orbit (I : Subgroup G) (x g : G)
+    : (g : G ⧸ I) ∈ MulAction.orbit I (x : G ⧸ I) ↔ ∃ a ∈ I, ∃ b ∈ I, g = a * x * b := by
   constructor
   · rintro ⟨a, ha⟩
     have ha' : (((a : G) * x : G) : G ⧸ I) = g := ha
@@ -113,15 +121,20 @@ private theorem mem_orbit (I : Subgroup G) (x g : G) :
     exact (QuotientGroup.mk_mul_of_mem _ hb).symm
 
 open scoped Classical in
-private theorem levOp_eq (ρ : Representation ℂ G V) (K I : Subgroup G) (x : G) (hx : FinOrb I I x) (f : G → ℂ)
-    (hf : ∀ y, f y = if ∃ a ∈ I, ∃ b ∈ I, y = a * x * b then 1 else 0) (v : fixd ρ I) :
-    levOp ρ K I f LinearMap.id (v : V) = ((I.relIndex K : ℕ) : ℂ)⁻¹ • (hk ρ I x v : V) := by
+private theorem levOp_eq
+    (ρ : Representation ℂ G V)
+    (K I : Subgroup G) (x : G) (hx : FinOrb I I x)
+    (f : G → ℂ) (hf : ∀ y, f y = if ∃ a ∈ I, ∃ b ∈ I, y = a * x * b then 1 else 0)
+    (v : fixd ρ I)
+    : levOp ρ K I f LinearMap.id (v : V) = ((I.relIndex K : ℕ) : ℂ)⁻¹ • (hk ρ I x v : V) := by
   have hx' : (MulAction.orbit I (x : G ⧸ I)).Finite := hx
   have h1 : (hk ρ I x v : V) = ∑ q ∈ hx'.toFinset, ρ q.out v := by
     rw [hk, (hkApply ℂ G V ρ I I x hx).1 v, UpperTheory.V.Hi.dc,
-      finsum_set_coe_eq_finsum_mem (f := fun q : G ⧸ I => ρ q.out), finsum_mem_eq_finite_toFinset_sum _ hx',
-      LinearMap.sum_apply]
-  have hmem : ∀ q : G ⧸ I, q ∈ MulAction.orbit I (x : G ⧸ I) ↔ ∃ a ∈ I, ∃ b ∈ I, q.out = a * x * b := fun q => by
+      finsum_set_coe_eq_finsum_mem (f := fun q : G ⧸ I => ρ q.out),
+      finsum_mem_eq_finite_toFinset_sum _ hx', LinearMap.sum_apply]
+  have hmem
+      : ∀ q : G ⧸ I,
+        q ∈ MulAction.orbit I (x : G ⧸ I) ↔ ∃ a ∈ I, ∃ b ∈ I, q.out = a * x * b := fun q => by
     rw [← mem_orbit, QuotientGroup.out_eq']
   have h2 : (∑ᶠ q : G ⧸ I, f q.out • (ρ q.out ∘ₗ LinearMap.id)) = ∑ q ∈ hx'.toFinset, ρ q.out := by
     rw [finsum_eq_sum_of_support_subset (s := hx'.toFinset)]
@@ -135,39 +148,50 @@ private theorem levOp_eq (ρ : Representation ℂ G V) (K I : Subgroup G) (x : G
   unfold levOp
   rw [h2, h1, LinearMap.smul_apply, LinearMap.sum_apply]
 
-private theorem trace_move {M M' : Submodule ℂ V} (h : M = M') (L : V →ₗ[ℂ] V) (hL : ∀ v ∈ M, L v ∈ M)
-    (B : Module.End ℂ M') (hB : ∀ v : M', L v = B v) :
-    LinearMap.trace ℂ M (L.restrict hL) = LinearMap.trace ℂ M' B := by
+private theorem trace_move
+    {M M' : Submodule ℂ V} (h : M = M')
+    (L : V →ₗ[ℂ] V) (hL : ∀ v ∈ M, L v ∈ M)
+    (B : Module.End ℂ M') (hB : ∀ v : M', L v = B v)
+    : LinearMap.trace ℂ M (L.restrict hL) = LinearMap.trace ℂ M' B := by
   subst h
   congr 1
   ext v
   exact hB v
 
 open scoped Classical in
-private theorem twTr_eq (ρ : Representation ℂ G V) (K I : Subgroup G) (x : G) (hx : FinOrb I I x) (f : G → ℂ)
-    (hf : ∀ y, f y = if ∃ a ∈ I, ∃ b ∈ I, y = a * x * b then 1 else 0) :
-    twTr ρ K I f LinearMap.id = ((I.relIndex K : ℕ) : ℂ)⁻¹ * LinearMap.trace ℂ (fixd ρ I) (hk ρ I x) := by
+private theorem twTr_eq
+    (ρ : Representation ℂ G V)
+    (K I : Subgroup G) (x : G) (hx : FinOrb I I x)
+    (f : G → ℂ) (hf : ∀ y, f y = if ∃ a ∈ I, ∃ b ∈ I, y = a * x * b then 1 else 0)
+    : twTr ρ K I f LinearMap.id
+      = ((I.relIndex K : ℕ) : ℂ)⁻¹ * LinearMap.trace ℂ (fixd ρ I) (hk ρ I x) := by
   have hst : ∀ v ∈ fixed ρ I, levOp ρ K I f LinearMap.id v ∈ fixed ρ I := fun v hv => by
     rw [fixed_eq] at hv ⊢
     rw [levOp_eq ρ K I x hx f hf ⟨v, hv⟩]
     exact Submodule.smul_mem _ _ (hk ρ I x ⟨v, hv⟩).2
   unfold twTr
-  rw [dite_eq_left hst, trace_move (fixed_eq ρ I) _ hst (((I.relIndex K : ℕ) : ℂ)⁻¹ • hk ρ I x)
-    fun v => levOp_eq ρ K I x hx f hf v, map_smul, smul_eq_mul]
+  rw [dite_eq_left hst,
+    trace_move (fixed_eq ρ I) _ hst (((I.relIndex K : ℕ) : ℂ)⁻¹ • hk ρ I x) fun v =>
+      levOp_eq ρ K I x hx f hf v,
+    map_smul, smul_eq_mul]
 
 end Abs
 
 section Lev
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
 
 open scoped Classical in
-private theorem trc_eq (ρ : Representation ℂ G V) (K I : Subgroup G) (hKo : IsOpen (K : Set G))
-    (hKc : IsCompact (K : Set G)) (hIo : IsOpen (I : Set G)) (hIc : IsCompact (I : Set G)) (hIK : I ≤ K) (x : G)
-    (f : G → ℂ) (hf : ∀ y, f y = if ∃ a ∈ I, ∃ b ∈ I, y = a * x * b then 1 else 0)
-    (hfd : FiniteDimensional ℂ (fixed ρ I)) :
-    trc ρ K f = twTr ρ K I f LinearMap.id :=
-  _root_.UpperTheory.Reformulated.B.trace_eq_twisted_trace_of_fixed.trc_eq ρ K I hKo hKc hIo hIc hIK x f hf hfd
+private theorem trc_eq
+    (ρ : Representation ℂ G V)
+    (K I : Subgroup G) (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G))
+    (hIo : IsOpen (I : Set G)) (hIc : IsCompact (I : Set G)) (hIK : I ≤ K)
+    (x : G) (f : G → ℂ) (hf : ∀ y, f y = if ∃ a ∈ I, ∃ b ∈ I, y = a * x * b then 1 else 0)
+    (hfd : FiniteDimensional ℂ (fixed ρ I))
+    : trc ρ K f = twTr ρ K I f LinearMap.id :=
+  _root_.UpperTheory.Reformulated.B.trace_eq_twisted_trace_of_fixed.trc_eq ρ K I hKo hKc hIo hIc hIK
+    x f hf hfd
 
 end Lev
 
@@ -175,20 +199,25 @@ section Loc
 
 open ValuativeRel GlobalTheory.SmGL
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-private theorem dom_pow {ϖ : kˣ} (hϖ : valuation k (ϖ : k) < 1) {a : Fin n → ℤ} (ha : Antitone a) :
-    Dom fun i => ϖ ^ a i := by
+private theorem dom_pow {ϖ : kˣ} (hϖ : valuation k (ϖ : k) < 1) {a : Fin n → ℤ} (ha : Antitone a)
+    : Dom fun i => ϖ ^ a i := by
   intro i j hij
   have h0 : 0 < valuation k (ϖ : k) := zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 ϖ.ne_zero)
   simp only [Units.val_zpow_eq_zpow_val, map_zpow₀]
   exact (zpow_le_zpow_iff_right_of_lt_one₀ h0 hϖ).2 (ha hij)
 
-private theorem exists_hk_trace {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL (Fin n) k) V)
-    {I : Subgroup (GL (Fin n) k)} (hI : iwC k n ⊤ = I) [FiniteDimensional ℂ (fixd ρ I)] [Nontrivial (fixd ρ I)]
-    {ϖ : kˣ} (hϖ : valuation k (ϖ : k) < 1) :
-    ∃ x : Fin n → ℤ, StrictAnti x ∧
-      LinearMap.trace ℂ (fixd ρ I) (hk ρ I (diagT k (Fin n) fun i => ϖ ^ x i)) ≠ 0 := by
+private theorem exists_hk_trace
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL (Fin n) k) V)
+    {I : Subgroup (GL (Fin n) k)} (hI : iwC k n ⊤ = I)
+    [FiniteDimensional ℂ (fixd ρ I)] [Nontrivial (fixd ρ I)]
+    {ϖ : kˣ} (hϖ : valuation k (ϖ : k) < 1)
+    : ∃ x : Fin n → ℤ,
+      StrictAnti x
+        ∧ LinearMap.trace ℂ (fixd ρ I) (hk ρ I (diagT k (Fin n) fun i => ϖ ^ x i)) ≠ 0 := by
   subst hI
   obtain ⟨hmul, hunit, -⟩ := domMul k n ⊤ ℂ V ρ
   have hq : IsUnit ((GlobalTheory.SplitWeil.resCard k : ℕ) : ℂ) :=
@@ -204,7 +233,9 @@ private theorem exists_hk_trace {V : Type} [AddCommGroup V] [Module ℂ V] (ρ :
     have h1 := hx₀ h
     simp only [Pi.smul_apply, nsmul_eq_mul]
     exact mul_lt_mul_of_pos_left h1 (by exact_mod_cast hj)
-  have hpow : ∀ j : ℕ, hk ρ (iwC k n ⊤) (diagT k (Fin n) fun i => ϖ ^ ((j + 1) • x₀) i) = T ^ (j + 1) := by
+  have hpow
+      : ∀ j : ℕ,
+        hk ρ (iwC k n ⊤) (diagT k (Fin n) fun i => ϖ ^ ((j + 1) • x₀) i) = T ^ (j + 1) := by
     intro j
     induction j with
     | zero => simp [T]
@@ -227,8 +258,10 @@ private theorem exists_hk_trace {V : Type} [AddCommGroup V] [Module ℂ V] (ρ :
 
 end Loc
 
-private theorem v_lt_one {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {x : L} (h : Formalism.UG.ordL x = 1) :
-    Valued.v x < 1 := by
+private theorem v_lt_one
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    {x : L} (h : Formalism.UG.ordL x = 1)
+    : Valued.v x < 1 := by
   unfold Formalism.UG.ordL at h
   split_ifs at h with h0
   · exact absurd h (by norm_num)
@@ -242,18 +275,20 @@ private theorem v_lt_one {L : Type} [Field L] [Valued L (WithZero (Multiplicativ
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
 open ValuativeRel GlobalTheory.SmGL GlobalTheory.LFun in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.dcosTr :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.DcosTr := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.dcosTr
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.DcosTr := by
   classical
   intro E _ _ _ n w ϖ hϖ τ hτ
   let I := iwGL n w
   have hI : iwC (w.adicCompletion E) n ⊤ = I := (memIwC (w.adicCompletion E) n ⊤).2.1
   have hIo : IsOpen (I : Set (GLw n w)) := GroundTheory.Automorphic.GLnLocal.isOpen_iwahori _ _
-  have hIc : IsCompact (I : Set (GLw n w)) := GroundTheory.Automorphic.GLnLocal.isCompact_iwahori _ _
+  have hIc : IsCompact (I : Set (GLw n w)) :=
+    GroundTheory.Automorphic.GLnLocal.isCompact_iwahori _ _
   obtain ⟨hKo, hKc⟩ := GlobalTheory.LFun.SatCompare.isOpen_isCompact_KGL (E := E) w n
   have hIK : I ≤ KGL w n := GlobalTheory.CompanionTheory.IwLevels.iwGL_le_KGL w n
   have hfd : FiniteDimensional ℂ (fixed τ.ρ I) :=
-    (PositivityTheory.PfBern.Props1.irrSmoothAdmissible_holds _ _ _ τ.ρ τ.smooth τ.irred).2 _ hIo hIc
+    (PositivityTheory.PfBern.Props1.irrSmoothAdmissible_holds _ _ _ τ.ρ τ.smooth τ.irred).2 _ hIo
+      hIc
   haveI hfd' : FiniteDimensional ℂ (UpperTheory.V.Hi.fixd τ.ρ I) := by
     rw [← fixed_eq]
     exact hfd
@@ -270,7 +305,9 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.dcosTr :
     GlobalTheory.CjInv.lt_one_iff _ |>.2 (v_lt_one hϖ)
   obtain ⟨x, hx, hne⟩ := exists_hk_trace τ.ρ hI hv
   refine ⟨x, hx, ?_⟩
-  have hfx : ∀ y, dcos n w (tdiag ϖ x) y = if ∃ a ∈ I, ∃ b ∈ I, y = a * tdiag ϖ x * b then 1 else 0 := fun y => rfl
+  have hfx
+      : ∀ y, dcos n w (tdiag ϖ x) y = if ∃ a ∈ I, ∃ b ∈ I, y = a * tdiag ϖ x * b then 1 else 0 :=
+    fun y => rfl
   have hfin : UpperTheory.V.AlgebraTools.FinOrb I I (tdiag ϖ x) := by
     rw [← hI]
     exact (heckePairIwC (w.adicCompletion E) n ⊤).1 _

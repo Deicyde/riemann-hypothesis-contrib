@@ -7,14 +7,16 @@ public import Formalism.GaloisCohomology.Statement
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate
 open Pointwise
 
 namespace GlobalTheory.UnramCocycle
 
-theorem conj_mem_ine_of_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    (A : ValuationSubring Ω) (g σ : G F Ω) (hσ : σ ∈ Ine (F := F) (g • A)) :
-    g⁻¹ * σ * g ∈ Ine (F := F) A := by
+theorem conj_mem_ine_of_smul
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (A : ValuationSubring Ω) (g σ : G F Ω) (hσ : σ ∈ Ine (F := F) (g • A))
+    : g⁻¹ * σ * g ∈ Ine (F := F) A := by
   rw [mem_Ine] at hσ ⊢
   obtain ⟨hdec, hval⟩ := hσ
 
@@ -42,9 +44,11 @@ theorem conj_mem_ine_of_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] 
     · right
       rwa [← map_inv₀, ← hmem]
 
-def kerSub {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRing R] [AddCommGroup M]
-    [Module R M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R Γ M)
-    (x : Z1 ρ) : Subgroup Γ where
+def kerSub
+    {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRing R] [AddCommGroup M] [Module R M]
+    [TopologicalSpace M] [DiscreteTopology M]
+    (ρ : Representation R Γ M) (x : Z1 ρ)
+    : Subgroup Γ where
   carrier := {n | x.1 n = 0 ∧ ∀ m, ρ n m = m}
   one_mem' := ⟨by simpa using x.2.2 1 1, fun m => by simp⟩
   mul_mem' := by
@@ -61,25 +65,26 @@ def kerSub {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRing R] [AddCom
     · conv_lhs => rw [← ha' m]
       rw [← mul_apply_eq_comp, ← map_mul, inv_mul_cancel, map_one, one_apply_eq_self]
 
-theorem kerSub_normal {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRing R] [AddCommGroup M]
-    [Module R M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R Γ M)
-    (x : Z1 ρ) : (kerSub ρ x).Normal where
+theorem kerSub_normal
+    {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRing R] [AddCommGroup M] [Module R M]
+    [TopologicalSpace M] [DiscreteTopology M]
+    (ρ : Representation R Γ M) (x : Z1 ρ)
+    : (kerSub ρ x).Normal where
   conj_mem := by
     intro n hn g
     obtain ⟨hx, hρ⟩ := hn
     have h1 : x.1 1 = 0 := by simpa using x.2.2 1 1
     refine ⟨?_, fun m => ?_⟩
-    ·
-      rw [x.2.2, x.2.2, hx, map_zero, add_zero, map_mul, mul_apply_eq_comp, hρ, ← x.2.2,
+    · rw [x.2.2, x.2.2, hx, map_zero, add_zero, map_mul, mul_apply_eq_comp, hρ, ← x.2.2,
         mul_inv_cancel, h1]
-    · rw [map_mul, map_mul, mul_apply_eq_comp, mul_apply_eq_comp, hρ,
-        ← mul_apply_eq_comp, ← map_mul, mul_inv_cancel, map_one, one_apply_eq_self]
+    · rw [map_mul, map_mul, mul_apply_eq_comp, mul_apply_eq_comp, hρ, ← mul_apply_eq_comp,
+        ← map_mul, mul_inv_cancel, map_one, one_apply_eq_self]
 
-theorem kerSub_isClosed {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRing R]
-    [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M]
-    (ρ : Representation R Γ M) (hρ : ContAction ρ) (x : Z1 ρ) :
-    IsClosed (kerSub ρ x : Set Γ) := by
-
+theorem kerSub_isClosed
+    {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRing R] [AddCommGroup M] [Module R M]
+    [TopologicalSpace M] [DiscreteTopology M]
+    (ρ : Representation R Γ M) (hρ : ContAction ρ) (x : Z1 ρ)
+    : IsClosed (kerSub ρ x : Set Γ) := by
   have h1 : IsClosed {n : Γ | x.1 n = 0} := isClosed_eq x.2.1 continuous_const
   have hc : Continuous fun p : Γ × M => ρ p.1 p.2 := hρ
   have h2 : IsClosed {n : Γ | ∀ m, ρ n m = m} := by
@@ -88,7 +93,20 @@ theorem kerSub_isClosed {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [CommRi
       isClosed_eq (hc.comp (continuous_id.prodMk continuous_const)) continuous_const
   exact h1.inter h2
 
-theorem vanish_on_NS : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R (G F Ω) M), ContAction ρ → ∀ (A : Formalism.GaloisCohomology.Places F Ω) (S : Set (HeightOneSpectrum (𝓞 F))), (∀ v ∉ S, ∀ B : ValuationSubring Ω, IsPlaceOver B v → ∀ σ ∈ Ine (F := F) B, ∀ m, ρ σ m = m) → ∀ x : Z1 ρ, (∀ v ∉ S, resH1 ρ (Dec (F := F) (A.1 v)).subtype continuous_subtype_val (Submodule.Quotient.mk x) ∈ Formalism.GaloisCohomology.unrAt ρ (A.1 v)) → ∀ n ∈ NS Ω S, x.1 n = 0 ∧ ∀ m, ρ n m = m := by
+theorem vanish_on_NS
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [TopologicalSpace M]
+        [DiscreteTopology M] (ρ : Representation R (G F Ω) M),
+      ContAction ρ
+        → ∀ (A : Formalism.GaloisCohomology.Places F Ω) (S : Set (HeightOneSpectrum (𝓞 F))),
+          (∀ v ∉ S, ∀ B : ValuationSubring Ω,
+              IsPlaceOver B v → ∀ σ ∈ Ine (F := F) B, ∀ m, ρ σ m = m)
+            → ∀ x : Z1 ρ,
+              (∀ v ∉ S,
+                  resH1 ρ (Dec (F := F) (A.1 v)).subtype continuous_subtype_val
+                      (Submodule.Quotient.mk x)
+                    ∈ Formalism.GaloisCohomology.unrAt ρ (A.1 v))
+                → ∀ n ∈ NS Ω S, x.1 n = 0 ∧ ∀ m, ρ n m = m := by
   intro F Ω _ _ _ _ _ R M _ _ _ _ _ ρ hρ A S htriv x hx
   have := kerSub_normal ρ x
 
@@ -110,7 +128,8 @@ theorem vanish_on_NS : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [A
       rw [LinearMap.mem_ker] at hu
       unfold resH1 at hu
       rw [Submodule.mapQ_apply, Submodule.mapQ_apply, Submodule.Quotient.mk_eq_zero,
-        Submodule.mem_comap, Submodule.coe_subtype, mem_coboundaries1] at hu
+          Submodule.mem_comap, Submodule.coe_subtype, mem_coboundaries1]
+        at hu
       obtain ⟨m, hm⟩ := hu
       have hmem : g⁻¹ * σ * g ∈ Dec (F := F) (A.1 v) := Ine_le_Dec _ hc
       have h := hm ⟨⟨g⁻¹ * σ * g, hmem⟩, (Subgroup.mem_subgroupOf).2 hc⟩

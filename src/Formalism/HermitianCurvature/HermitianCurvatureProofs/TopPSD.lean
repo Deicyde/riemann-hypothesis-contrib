@@ -16,10 +16,11 @@ theorem top_positive_semidefinite : Top.TopPSDT := by
   set F := D.cutF T.base χ f ε
   set dd := Top.dH P l0 (Formalism.QuantumDeterminants.Tz P.k P.r T.base.z * Formalism.QuantumDeterminants.Tz P.k P.r T.base.z') w
 
-  let X : Wd.Ix (Fin w.length) → M.Ty P → C.LPt → (Wq →L[ℂ] Wp) :=
-    fun e ρ p => (TP.E ρ).comp (D.vecV T.base ν' m₀ (Θ.Θ w e F) p)
+  let X : Wd.Ix (Fin w.length) → M.Ty P → C.LPt → (Wq →L[ℂ] Wp) := fun e ρ p =>
+    (TP.E ρ).comp (D.vecV T.base ν' m₀ (Θ.Θ w e F) p)
   let g : Wd.Ix (Fin w.length) → M.Ty P → Matrix Y Y ℂ := fun e ρ =>
-    Matrix.of fun x y => ((dd (x : C.LPt) e ρ * dd (y : C.LPt) e ρ : ℝ) : ℂ) * B.hsInner (X e ρ x) (X e ρ y)
+    Matrix.of fun x y =>
+      ((dd (x : C.LPt) e ρ * dd (y : C.LPt) e ρ : ℝ) : ℂ) * B.hsInner (X e ρ x) (X e ρ y)
   have hterm : ∀ e ρ, (g e ρ).PosSemidef := by
     intro e ρ
     let v : Y → _ := fun x => ((dd (x : C.LPt) e ρ : ℝ) : ℂ) • B.hsVec (X e ρ x)
@@ -36,9 +37,13 @@ theorem top_positive_semidefinite : Top.TopPSDT := by
     ext x y
     simp [g, X, dd, Top.topOf, Matrix.sum_apply]
   rw [hsum]
-  refine Finset.sum_induction _ Matrix.PosSemidef (fun _ _ ha hb => ha.add hb) Matrix.PosSemidef.zero
+  refine Finset.sum_induction _ Matrix.PosSemidef
+    (fun _ _ ha hb => ha.add hb)
+    Matrix.PosSemidef.zero
     (fun e _ => ?_)
-  exact Finset.sum_induction _ Matrix.PosSemidef (fun _ _ ha hb => ha.add hb) Matrix.PosSemidef.zero
+  exact Finset.sum_induction _ Matrix.PosSemidef
+    (fun _ _ ha hb => ha.add hb)
+    Matrix.PosSemidef.zero
     (fun ρ _ => hterm e ρ)
 
 end Formalism.FourierDecayAlt.P

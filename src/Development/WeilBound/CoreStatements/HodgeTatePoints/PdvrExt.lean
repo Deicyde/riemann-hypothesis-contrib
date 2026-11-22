@@ -8,15 +8,16 @@ namespace PositivityTheory.HtPt.Pdvr
 
 open Polynomial IsLocalRing
 
-theorem exists_root (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-    (q : (ResidueField V)[X]) (hm : q.Monic) (hq : Irreducible q) :
-    ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
-      (f : V →+* R) (_ : IsLocalHom f), Function.Injective f ∧
-      ∃ a, (q.map (ResidueField.map f)).IsRoot a := by
-  obtain ⟨P, hP, hdeg, hPm⟩ := lifts_and_degree_eq_and_monic
-    ((mem_lifts q).mpr (map_surjective (residue V) residue_surjective q)) hm
-  have hPi : Irreducible P :=
-    Monic.irreducible_of_irreducible_map (residue V) P hPm (hP ▸ hq)
+theorem exists_root
+    (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    (q : (ResidueField V)[X]) (hm : q.Monic) (hq : Irreducible q)
+    : ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R) (f : V →+* R)
+        (_ : IsLocalHom f),
+      Function.Injective f ∧ ∃ a, (q.map (ResidueField.map f)).IsRoot a := by
+  obtain ⟨P, hP, hdeg, hPm⟩ :=
+    lifts_and_degree_eq_and_monic
+      ((mem_lifts q).mpr (map_surjective (residue V) residue_surjective q)) hm
+  have hPi : Irreducible P := Monic.irreducible_of_irreducible_map (residue V) P hPm (hP ▸ hq)
   have : IsDomain (AdjoinRoot P) := AdjoinRoot.isDomain_of_prime hPi.prime
   have hinj : Function.Injective (AdjoinRoot.of P) :=
     AdjoinRoot.of.injective_of_degree_ne_zero (hdeg ▸ (degree_pos_of_irreducible hq).ne')
@@ -27,15 +28,17 @@ theorem exists_root (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRin
     have h1 : IsField (AdjoinRoot (P.map (residue V))) := Field.toIsField _
     exact MulEquiv.isField h1
       (AdjoinRoot.quotEquivQuotMap P (maximalIdeal V)).toRingEquiv.toMulEquiv
-  have huniq : ∀ M : Ideal (AdjoinRoot P), M.IsMaximal →
-      M = Ideal.map (AdjoinRoot.of P) (maximalIdeal V) := by
+  have huniq
+      : ∀ M : Ideal (AdjoinRoot P),
+        M.IsMaximal → M = Ideal.map (AdjoinRoot.of P) (maximalIdeal V) := by
     intro M hM
     have h1 : (M.comap (algebraMap V (AdjoinRoot P))).IsMaximal := by
       letI := hM
-      exact Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
-        (algebraMap V (AdjoinRoot P)) (by
+      exact Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap V (AdjoinRoot P))
+        (by
           intro x
-          exact Algebra.IsIntegral.isIntegral x) M
+          exact Algebra.IsIntegral.isIntegral x)
+        M
     have h2 := eq_maximalIdeal h1
     refine (hmax.eq_of_le hM.ne_top ?_).symm
     rw [Ideal.map_le_iff_le_comap, ← h2]
@@ -56,24 +59,41 @@ theorem exists_root (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRin
   have hloc : IsLocalHom (AdjoinRoot.of P) := by
     refine ⟨fun a ha => ?_⟩
     by_contra h
-    have : AdjoinRoot.of P a ∈ maximalIdeal (AdjoinRoot P) :=
-      hme ▸ Ideal.mem_map_of_mem _ h
+    have : AdjoinRoot.of P a ∈ maximalIdeal (AdjoinRoot P) := hme ▸ Ideal.mem_map_of_mem _ h
     exact this ha
-  refine ⟨AdjoinRoot P, inferInstance, inferInstance, hdvr, AdjoinRoot.of P, hloc, hinj,
-    residue _ (AdjoinRoot.root P), ?_⟩
+  refine ⟨
+    AdjoinRoot P,
+    inferInstance,
+    inferInstance,
+    hdvr,
+    AdjoinRoot.of P,
+    hloc,
+    hinj,
+    residue _ (AdjoinRoot.root P),
+    ?_
+  ⟩
   rw [← hP, Polynomial.map_map, ResidueField.map_comp_residue, IsRoot.def, eval_map,
     ← Polynomial.hom_eval₂, AdjoinRoot.eval₂_root, map_zero]
 
-theorem exists_splits (n : ℕ) : ∀ (V : Type) [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] (q : (ResidueField V)[X]), q.natDegree = n →
-    ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
-      (f : V →+* R) (_ : IsLocalHom f), Function.Injective f ∧
-      (q.map (ResidueField.map f)).Splits := by
+theorem exists_splits (n : ℕ)
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (q : (ResidueField V)[X]),
+      q.natDegree = n
+        → ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
+            (f : V →+* R) (_ : IsLocalHom f),
+          Function.Injective f ∧ (q.map (ResidueField.map f)).Splits := by
   induction n with
   | zero =>
     intro V _ _ _ q hq
-    exact ⟨V, inferInstance, inferInstance, inferInstance, RingHom.id V, inferInstance,
-      Function.injective_id, (Splits.of_natDegree_eq_zero hq).map _⟩
+    exact ⟨
+      V,
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      RingHom.id V,
+      inferInstance,
+      Function.injective_id,
+      (Splits.of_natDegree_eq_zero hq).map _
+    ⟩
   | succ n ih =>
     intro V _ _ _ q hq
     have hq0 : q ≠ 0 := by
@@ -93,15 +113,15 @@ theorem exists_splits (n : ℕ) : ∀ (V : Type) [CommRing V] [IsDomain V]
       rw [natDegree_map, natDegree_mul (X_sub_C_ne_zero a) h2, natDegree_X_sub_C] at h1
       omega
     obtain ⟨S, _, _, _, f', _, hf', hs⟩ := ih R q' hd
-    refine ⟨S, inferInstance, inferInstance, inferInstance, f'.comp f, inferInstance,
-      hf'.comp hf, ?_⟩
+    refine
+      ⟨S, inferInstance, inferInstance, inferInstance, f'.comp f, inferInstance, hf'.comp hf, ?_⟩
     rw [ResidueField.map_comp, ← Polynomial.map_map, hq', Polynomial.map_mul]
     exact ((Splits.X_sub_C a).map _).mul hs
 
-theorem exists_complete (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] :
-    ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
-      (f : V →+* R) (_ : IsLocalHom f), IsAdicComplete (maximalIdeal R) R ∧
-      Function.Injective f := by
+theorem exists_complete (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    : ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R) (f : V →+* R)
+        (_ : IsLocalHom f),
+      IsAdicComplete (maximalIdeal R) R ∧ Function.Injective f := by
   classical
   let R := AdicCompletion (maximalIdeal V) V
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible V
@@ -143,19 +163,21 @@ theorem exists_complete (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuatio
       rw [hn, pow_succ] at h3
       exact h3 (mul_dvd_mul_left _ h2)
     exact ⟨n, hy.unit, rfl⟩
-  have : NoZeroDivisors R := ⟨fun {a b} hab => by
-    by_cases ha : a = 0
-    · exact Or.inl ha
-    · right
-      obtain ⟨n, u, rfl⟩ := hfac a ha
-      have h1 : algebraMap V R (π ^ n) * (u * b) = 0 := by
-        rw [map_pow, ← mul_assoc]
-        exact hab
-      have h2 := hreg _ (pow_ne_zero n hπ.ne_zero) _ h1
-      exact (Units.mul_right_eq_zero u).mp h2⟩
+  have : NoZeroDivisors R :=
+    ⟨fun {a b} hab => by
+      by_cases ha : a = 0
+      · exact Or.inl ha
+      · right
+        obtain ⟨n, u, rfl⟩ := hfac a ha
+        have h1 : algebraMap V R (π ^ n) * (u * b) = 0 := by
+          rw [map_pow, ← mul_assoc]
+          exact hab
+        have h2 := hreg _ (pow_ne_zero n hπ.ne_zero) _ h1
+        exact (Units.mul_right_eq_zero u).mp h2⟩
   have : IsDomain R := NoZeroDivisors.to_isDomain R
   have hinj : Function.Injective (algebraMap V R) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     by_contra h
     exact one_ne_zero (hreg a h 1 (by rw [ha, zero_mul]))
@@ -165,9 +187,16 @@ theorem exists_complete (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuatio
     rw [← hme]
     infer_instance
   have hdvr : IsDiscreteValuationRing R :=
-    IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
-      ⟨ϖ, hϖ, fun {x} hx => hfac x hx⟩
-  exact ⟨R, inferInstance, inferInstance, hdvr, algebraMap V R, inferInstance,
-    (inferInstance : IsAdicComplete (maximalIdeal R) R), hinj⟩
+    IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization ⟨ϖ, hϖ, fun {x} hx => hfac x hx⟩
+  exact ⟨
+    R,
+    inferInstance,
+    inferInstance,
+    hdvr,
+    algebraMap V R,
+    inferInstance,
+    (inferInstance : IsAdicComplete (maximalIdeal R) R),
+    hinj
+  ⟩
 
 end PositivityTheory.HtPt.Pdvr

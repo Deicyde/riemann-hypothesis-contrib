@@ -8,13 +8,17 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsClosed
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw PositivityTheory.Rg.Rsw.L
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+  PositivityTheory.Rg.Rsw.L
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.RswEmTop
-
 
 set_option synthInstance.maxHeartbeats 400000 in
 theorem topX : PositivityTheory.Rg.Rsw.Em.TopX := by
@@ -41,7 +45,16 @@ theorem topX : PositivityTheory.Rg.Rsw.Em.TopX := by
   have hC : IsClosed {z : Mx D a r × Mx D a t | e • z.1 = z.1 ∧ e • z.2 = z.2} :=
     (isClosed_eq c1 continuous_fst).inter (isClosed_eq c2 continuous_snd)
   have hE := hC.isClosedEmbedding_subtypeVal
-  exact ⟨inferInstance, hE.locallyCompactSpace, hE.isEmbedding.secondCountableTopology,
-    Subtype.borelSpace _, bP, MeasurableEmbedding.subtype_coe hC.measurableSet, s4, s3, s1⟩
+  exact ⟨
+    inferInstance,
+    hE.locallyCompactSpace,
+    hE.isEmbedding.secondCountableTopology,
+    Subtype.borelSpace _,
+    bP,
+    MeasurableEmbedding.subtype_coe hC.measurableSet,
+    s4,
+    s3,
+    s1
+  ⟩
 
 end GlobalTheory.CompanionTheory.RswEmTop

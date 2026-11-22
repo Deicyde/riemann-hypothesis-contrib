@@ -10,9 +10,10 @@ open ReciprocityTheory.ChartRestriction.G.FD NumberField Complex Metric
 
 noncomputable section
 
-theorem inv_mul_between_ratio {c m m0 ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (hc : 0 < c) (hm0 : c * m0 = 1)
-    (hlo : (1 - ρ) / (1 + ρ) * m0 ≤ m) (hhi : m ≤ (1 + ρ) / (1 - ρ) * m0) :
-    (1 - ρ) / (1 + ρ) ≤ 1 / (c * m) ∧ 1 / (c * m) ≤ (1 + ρ) / (1 - ρ) := by
+theorem inv_mul_between_ratio
+    {c m m0 ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (hc : 0 < c) (hm0 : c * m0 = 1)
+    (hlo : (1 - ρ) / (1 + ρ) * m0 ≤ m) (hhi : m ≤ (1 + ρ) / (1 - ρ) * m0)
+    : (1 - ρ) / (1 + ρ) ≤ 1 / (c * m) ∧ 1 / (c * m) ≤ (1 + ρ) / (1 - ρ) := by
   have hm0pos : 0 < m0 := by nlinarith
   have h1ρ : 0 < 1 - ρ := by linarith
   have h1ρ' : 0 < 1 + ρ := by linarith
@@ -31,8 +32,9 @@ theorem inv_mul_between_ratio {c m m0 ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) 
     rw [div_mul_eq_mul_div, div_le_iff₀ h1ρ'] at h
     linarith
 
-theorem div_le_exp_of_abs_log_sub_le {a b K : ℝ} (ha : 0 < a) (hb : 0 < b) (h : |Real.log b - Real.log a| ≤ K) :
-    a / b ≤ Real.exp K := by
+theorem div_le_exp_of_abs_log_sub_le
+    {a b K : ℝ} (ha : 0 < a) (hb : 0 < b) (h : |Real.log b - Real.log a| ≤ K)
+    : a / b ≤ Real.exp K := by
   have h1 : a / b = Real.exp (Real.log a - Real.log b) := by
     rw [Real.exp_sub, Real.exp_log ha, Real.exp_log hb]
   rw [h1]
@@ -40,17 +42,18 @@ theorem div_le_exp_of_abs_log_sub_le {a b K : ℝ} (ha : 0 < a) (hb : 0 < b) (h 
   have h2 := neg_le_abs (Real.log b - Real.log a)
   linarith
 
-theorem small_power_bound {w r rh z : ℝ} (hr0 : 0 ≤ r) (hrw : r ≤ w) (hw : 0 ≤ w) (hrh : 0 ≤ rh)
-    (hwrh : w * rh ≤ 1 / 36) (hz0 : 0 ≤ z) (hz : z ≤ rh) : 4 * w * r * z ^ 2 ≤ 1 / 4 := by
+theorem small_power_bound
+    {w r rh z : ℝ} (hr0 : 0 ≤ r) (hrw : r ≤ w) (hw : 0 ≤ w) (hrh : 0 ≤ rh) (hwrh : w * rh ≤ 1 / 36)
+    (hz0 : 0 ≤ z) (hz : z ≤ rh)
+    : 4 * w * r * z ^ 2 ≤ 1 / 4 := by
   have h1 : w * r ≤ w * w := mul_le_mul_of_nonneg_left hrw hw
   have h2 : z ^ 2 ≤ rh ^ 2 := pow_le_pow_left₀ hz0 hz 2
   have h3 : (w * rh) ^ 2 ≤ (1 / 36) ^ 2 := pow_le_pow_left₀ (mul_nonneg hw hrh) hwrh 2
-  have h4 : w * r * z ^ 2 ≤ w * w * rh ^ 2 :=
-    mul_le_mul h1 h2 (sq_nonneg z) (mul_nonneg hw hw)
+  have h4 : w * r * z ^ 2 ≤ w * w * rh ^ 2 := mul_le_mul h1 h2 (sq_nonneg z) (mul_nonneg hw hw)
   nlinarith
 
-theorem rh_facts {c1 w : ℝ} (hc1 : 0 < c1) (hw1 : 1 ≤ w) :
-    0 < d6rh c1 w ∧ d6rh c1 w < 1 / 10 ∧ w * d6rh c1 w ≤ 1 / 36 := by
+theorem rh_facts {c1 w : ℝ} (hc1 : 0 < c1) (hw1 : 1 ≤ w)
+    : 0 < d6rh c1 w ∧ d6rh c1 w < 1 / 10 ∧ w * d6rh c1 w ≤ 1 / 36 := by
   unfold ReciprocityTheory.ChartRestriction.G.FD.d6rh
   have hpi := Real.pi_gt_three
   have hw0 : 0 < w := by linarith
@@ -62,12 +65,14 @@ theorem rh_facts {c1 w : ℝ} (hc1 : 0 < c1) (hw1 : 1 ≤ w) :
   · rw [mul_one_div, div_le_div_iff₀ hpos (by norm_num)]
     nlinarith [mul_pos hc1 hp3, mul_pos hw0 hp3]
 
-theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMField E]
+theorem fundamentalDomain_of_parts
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
     (hFd : FjDiff E) (hFb : FjBEq E) (hFc : FjBdd E) (hOD : OrthoDom E) (hUD : UnitDom E)
     (hBF : BorFlag E) (hZs : ZnSmul E) (hZn : ZnNonneg E) (hNp : NfacPos E) (hX0 : XZZero E)
-    (h0 : OrthonormalFlagTranslate (E := E)) (h1 : OrthonormalChartNormControl (E := E)) (h2 : NearSupremumTransference (E := E))
-    (h3 : SchwarzLemmaBall) (h4 : OrthonormalShortVectorBound (E := E)) (h7 : UnitaryUnipotentMove (E := E)) :
-    FundamentalDomainPointBound (E := E) := by
+    (h0 : OrthonormalFlagTranslate (E := E)) (h1 : OrthonormalChartNormControl (E := E))
+    (h2 : NearSupremumTransference (E := E)) (h3 : SchwarzLemmaBall)
+    (h4 : OrthonormalShortVectorBound (E := E)) (h7 : UnitaryUnipotentMove (E := E))
+    : FundamentalDomainPointBound (E := E) := by
   intro r X la P ξ ν c1 w z0 hD hrw
   dsimp only
   intro n' hn'
@@ -75,16 +80,16 @@ theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMFie
   have hBdd : X.IsBddSec la P := hPSS.1
   have hSec : X.IsSec la P := hBdd.1
   have hFdiff : DifferentiableOn ℂ (X.fj la ξ ν P) X.dom := hFd r X.toData la P ξ ν hBdd hIso
-  have hFb' : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r,
-      X.fj la ξ ν P (rmul x b) = bchar la b * X.fj la ξ ν P x :=
+  have hFb'
+      : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, X.fj la ξ ν P (rmul x b) = bchar la b * X.fj la ξ ν P x :=
     hFb r X.toData la P ξ ν hSec hIso
   obtain ⟨C, hC⟩ := hFc r X.toData la P ξ ν hBdd hIso
   obtain ⟨hP0a, hP0b, hP0c⟩ := h0 r X.toData
   have hpn_inv := hP0b la (X.fj la ξ ν P) hFb'
   obtain ⟨hz0dom, hz0c⟩ := hz0D1
   have hself : ∀ x, X.SameFlag x x := fun x τ => rfl
-  have htrans : ∀ x y z, X.SameFlag x y → X.SameFlag y z → X.SameFlag x z :=
-    fun x y z h1 h2 τ => (h1 τ).trans (h2 τ)
+  have htrans : ∀ x y z, X.SameFlag x y → X.SameFlag y z → X.SameFlag x z := fun x y z h1 h2 τ =>
+    (h1 τ).trans (h2 τ)
   set F := X.fj la ξ ν P with hF
   have hpn_le_hat : ∀ y ∈ X.dom, X.pnorm la F y ≤ X.hatN la F y := by
     intro y hy
@@ -106,8 +111,10 @@ theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMFie
     change S / 2 < X.hatN la F z0
     linarith
   obtain ⟨_, ⟨x', hx'dom, hzx', rfl⟩, hx'lt⟩ :=
-    exists_lt_of_lt_csSup (⟨_, z0, hz0dom, hself z0, rfl⟩ :
-      {t | ∃ x' ∈ X.dom, X.SameFlag z0 x' ∧ t = X.pnorm la F x'}.Nonempty) hlt
+    exists_lt_of_lt_csSup
+      (⟨_, z0, hz0dom, hself z0, rfl⟩
+        : {t | ∃ x' ∈ X.dom, X.SameFlag z0 x' ∧ t = X.pnorm la F x'}.Nonempty)
+      hlt
   have hx'le : X.pnorm la F x' ≤ S := by
     refine le_trans ?_ hz0S
     refine le_csSup ⟨C, ?_⟩ ⟨x', hx'dom, hzx', rfl⟩
@@ -129,8 +136,8 @@ theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMFie
   obtain ⟨lam, h1m, Z1, hU1, hline, hUz, hsplit1, hflag1, hZ1⟩ :=
     h4 r X la P ξ ν c1 w z0 hD x0 hx0dom hortho hz0x0
   obtain ⟨n, Z, hUn, -, hn'p, hsplit, hflag, hZ⟩ :=
-    h7 r X la P ξ ν c1 w z0 hD x0 hx0dom hortho hz0x0 lam h1m Z1 hU1 hline hUz hsplit1 hflag1
-      hZ1 n' hn'
+    h7 r X la P ξ ν c1 w z0 hD x0 hx0dom hortho hz0x0 lam h1m Z1 hU1 hline hUz hsplit1 hflag1 hZ1 n'
+      hn'
   set rh := d6rh c1 w with hrh
   have hZn0 : 0 ≤ X.zN Z := hZn r X.toData Z
   have hZle : X.zN Z ≤ rh := by linarith
@@ -138,8 +145,9 @@ theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMFie
   have hx''dom : X.lmulC n (X.lmulC h1m z0) ∈ X.dom :=
     hUD r X.toData n _ hUn (hUD r X.toData h1m z0 hU1 hz0dom)
   obtain ⟨hJ, -, hA⟩ := (hP0c _ hx''dom _ hxdom hflag).1 ξ
-  have hucomp : ∀ u, X.ucomp (X.lmulC n (X.lmulC h1m z0)) ξ u = X.ucomp (X.xZ x0 Z) ξ u :=
-    fun u => by simp only [Data.ucomp, hA]
+  have hucomp
+      : ∀ u, X.ucomp (X.lmulC n (X.lmulC h1m z0)) ξ u = X.ucomp (X.xZ x0 Z) ξ u := fun u => by
+    simp only [Data.ucomp, hA]
   refine ⟨X.xZ x0 Z, hxdom, lam, ?_⟩
   obtain ⟨s1, s2, s3, s4, s5, s6⟩ := hsplit
   refine ⟨s1, s2, s3, fun j hj => ?_, fun j hj => ?_, s6, fun μ hμ => ?_, ?_⟩
@@ -170,7 +178,9 @@ theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMFie
     have hzt : ∀ t : ℂ, ‖t‖ ≤ ρ → X.zN (t • Z) ≤ rh := by
       intro t ht
       rw [hZs r X.toData t Z]
-      calc ‖t‖ * s ≤ ρ * s := mul_le_mul_of_nonneg_right ht hZn0
+      calc
+        ‖t‖ * s
+          ≤ ρ * s := mul_le_mul_of_nonneg_right ht hZn0
         _ ≤ rh := hρs
     have hx0nf : 0 < X.nfac la x0 := hNp r X.toData la x0 hx0dom
     let γ : ℂ → ℂ := fun t => F (X.xZ x0 (t • Z)) * (X.nfac la x0 : ℂ)
@@ -192,11 +202,12 @@ theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMFie
         small_power_bound (by positivity) hrw (by linarith) hrh0.le hwrh (hZn r X.toData _) htb
       have hratio : X.nfac la x0 / X.nfac la (X.xZ x0 (t • Z)) ≤ Real.exp (1 / 4) :=
         div_le_exp_of_abs_log_sub_le hx0nf hynf (by linarith)
-      have htt : ∀ τ, (1 - rh) / (1 + rh) ≤ X.tt ξ (X.xZ x0 (t • Z)) τ ∧
-          X.tt ξ (X.xZ x0 (t • Z)) τ ≤ (1 + rh) / (1 - rh) := by
+      have htt
+          : ∀ τ,
+            (1 - rh) / (1 + rh) ≤ X.tt ξ (X.xZ x0 (t • Z)) τ
+              ∧ X.tt ξ (X.xZ x0 (t • Z)) τ ≤ (1 + rh) / (1 - rh) := by
         intro τ
-        have hcpos : 0 < X.c τ :=
-          mul_pos two_pos (norm_pos_iff.mpr ((map_ne_zero _).mpr X.ξ0_ne))
+        have hcpos : 0 < X.c τ := mul_pos two_pos (norm_pos_iff.mpr ((map_ne_zero _).mpr X.ξ0_ne))
         have hm0 : X.c τ * X.maj x0 τ (Data.emb τ.1 ξ) = 1 := by
           rw [← hmaj]
           exact hz0c τ
@@ -204,28 +215,31 @@ theorem fundamentalDomain_of_parts {E : Type} [Field E] [NumberField E] [IsCMFie
         exact inv_mul_between_ratio hrh0 (by linarith) hcpos hm0 hlo hhi
       have hyhat : X.hatN la F (X.xZ x0 (t • Z)) ≤ Real.exp 2 * S :=
         h2 r X la P ξ ν c1 w z0 hD _ hydom htt
-      have hpy : X.pnorm la F (X.xZ x0 (t • Z)) =
-          ‖F (X.xZ x0 (t • Z))‖ * X.nfac la (X.xZ x0 (t • Z)) := by
+      have hpy
+          : X.pnorm la F (X.xZ x0 (t • Z))
+            = ‖F (X.xZ x0 (t • Z))‖ * X.nfac la (X.xZ x0 (t • Z)) := by
         rw [Data.pnorm, Data.nfac]
-      have hnorm : ‖γ t‖ = X.pnorm la F (X.xZ x0 (t • Z)) *
-          (X.nfac la x0 / X.nfac la (X.xZ x0 (t • Z))) := by
+      have hnorm
+          : ‖γ t‖
+            = X.pnorm la F (X.xZ x0 (t • Z)) * (X.nfac la x0 / X.nfac la (X.xZ x0 (t • Z))) := by
         simp only [γ, norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hx0nf, hpy]
         field_simp
       rw [hnorm]
-      calc X.pnorm la F (X.xZ x0 (t • Z)) * (X.nfac la x0 / X.nfac la (X.xZ x0 (t • Z)))
-          ≤ (Real.exp 2 * S) * Real.exp (1 / 4) :=
-            mul_le_mul ((hpn_le_hat _ hydom).trans hyhat) hratio
-              (div_nonneg hx0nf.le hynf.le) (mul_nonneg (Real.exp_pos 2).le hS0)
+      calc
+        X.pnorm la F (X.xZ x0 (t • Z)) * (X.nfac la x0 / X.nfac la (X.xZ x0 (t • Z)))
+            ≤ (Real.exp 2 * S) * Real.exp (1 / 4) :=
+          mul_le_mul ((hpn_le_hat _ hydom).trans hyhat) hratio (div_nonneg hx0nf.le hynf.le)
+            (mul_nonneg (Real.exp_pos 2).le hS0)
         _ = Real.exp (9 / 4) * S := by
-            rw [mul_right_comm, ← Real.exp_add]
-            norm_num
+          rw [mul_right_comm, ← Real.exp_add]
+          norm_num
     have hγ0 : ‖γ 0‖ = X.pnorm la F x0 := by
-      simp only [γ, zero_smul, hX0 r X.toData x0, norm_mul, Complex.norm_real,
-        Real.norm_eq_abs, abs_of_pos hx0nf]
+      simp only [γ, zero_smul, hX0 r X.toData x0, norm_mul, Complex.norm_real, Real.norm_eq_abs,
+        abs_of_pos hx0nf]
       rw [Data.pnorm, Data.nfac]
-    have hP3 := h3 ℂ γ ρ S hρpos hγd hγb (by rw [hγ0, hpx0]; linarith)
-      (by rw [hγ0, hpx0]; exact hx'le) 1
-      (by rw [mem_ball_zero_iff, norm_one, lt_div_iff₀ (by norm_num)]; linarith)
+    have hP3 :=
+      h3 ℂ γ ρ S hρpos hγd hγb (by rw [hγ0, hpx0]; linarith) (by rw [hγ0, hpx0]; exact hx'le) 1
+        (by rw [mem_ball_zero_iff, norm_one, lt_div_iff₀ (by norm_num)]; linarith)
     intro hF0
     apply hP3
     simp only [γ, one_smul]

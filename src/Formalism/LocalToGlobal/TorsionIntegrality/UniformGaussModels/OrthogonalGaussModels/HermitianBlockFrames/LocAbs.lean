@@ -47,7 +47,8 @@ theorem NU_mul {x z : K} (hz : z ∈ S.O) (hx : S.NU x) : S.NU (z * x) := by
   obtain ⟨a, ha, rfl⟩ := hx
   exact ⟨z * a, S.O.mul_mem hz ha, by ring⟩
 
-theorem NU_sum {ι : Type*} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, S.NU (f i)) : S.NU (∑ i ∈ s, f i) := by
+theorem NU_sum {ι : Type*} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, S.NU (f i))
+    : S.NU (∑ i ∈ s, f i) := by
   exact Finset.sum_induction _ S.NU (fun _ _ => S.NU_add) S.NU_zero h
 
 theorem ne_zero_of_not_NU {x : K} (hx : ¬ S.NU x) : x ≠ 0 := by
@@ -79,21 +80,23 @@ def hf (Γ : Matrix ι ι K) (x y : ι → K) : K := S.cv x ⬝ᵥ (Γ *ᵥ y)
 def UM (Γ : Matrix ι ι K) : Prop :=
   ∀ x : ι → K, S.IntV x → (∀ i, S.NU ((Γ *ᵥ x) i)) → ∃ x', S.IntV x' ∧ Γ *ᵥ x = S.p • (Γ *ᵥ x')
 
-theorem IntV_mulVec {Γ : Matrix ι ι K} (hΓ : S.IntM Γ) {x : ι → K} (hx : S.IntV x) : S.IntV (Γ *ᵥ x) := by
+theorem IntV_mulVec {Γ : Matrix ι ι K} (hΓ : S.IntM Γ) {x : ι → K} (hx : S.IntV x)
+    : S.IntV (Γ *ᵥ x) := by
   intro i
   simp only [Matrix.mulVec, dotProduct]
   exact S.O.sum_mem fun j _ => S.O.mul_mem (hΓ i j) (hx j)
 
 theorem IntV_cv {x : ι → K} (hx : S.IntV x) : S.IntV (S.cv x) := fun i => S.hσO (x i) (hx i)
 
-theorem hf_mem {Γ : Matrix ι ι K} (hΓ : S.IntM Γ) {x y : ι → K} (hx : S.IntV x) (hy : S.IntV y) :
-    S.hf Γ x y ∈ S.O := by
+theorem hf_mem {Γ : Matrix ι ι K} (hΓ : S.IntM Γ) {x y : ι → K} (hx : S.IntV x) (hy : S.IntV y)
+    : S.hf Γ x y ∈ S.O := by
   unfold hf
   simp only [dotProduct]
   exact S.O.sum_mem fun i _ => S.O.mul_mem (S.IntV_cv hx i) (S.IntV_mulVec hΓ hy i)
 
-theorem hf_swap {Γ : Matrix ι ι K} (hΓ : S.IntM Γ) (hH : S.Herm Γ) {x y : ι → K} (hx : S.IntV x)
-    (hy : S.IntV y) : S.hf Γ y x = S.σ (S.hf Γ x y) := by
+theorem hf_swap
+    {Γ : Matrix ι ι K} (hΓ : S.IntM Γ) (hH : S.Herm Γ) {x y : ι → K} (hx : S.IntV x) (hy : S.IntV y)
+    : S.hf Γ y x = S.σ (S.hf Γ x y) := by
   unfold hf cv
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.mul_sum]
@@ -102,14 +105,14 @@ theorem hf_swap {Γ : Matrix ι ι K} (hΓ : S.IntM Γ) (hH : S.Herm Γ) {x y : 
   rw [S.hσσ _ (hx _), hH]
   ring
 
-theorem σ_mulVec {Γ : Matrix ι ι K} (hH : S.Herm Γ) (a : ι → K) (i : ι) :
-    S.σ ((Γ *ᵥ a) i) = (S.cv a ᵥ* Γ) i := by
+theorem σ_mulVec {Γ : Matrix ι ι K} (hH : S.Herm Γ) (a : ι → K) (i : ι)
+    : S.σ ((Γ *ᵥ a) i) = (S.cv a ᵥ* Γ) i := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Matrix.mulVec, Matrix.vecMul, dotProduct, map_sum, map_mul, cv, hH i]
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-theorem σ_vecMul {Γ : Matrix ι ι K} (hH : S.Herm Γ) {a : ι → K} (ha : S.IntV a) (j : ι) :
-    S.σ ((S.cv a ᵥ* Γ) j) = (Γ *ᵥ a) j := by
+theorem σ_vecMul {Γ : Matrix ι ι K} (hH : S.Herm Γ) {a : ι → K} (ha : S.IntV a) (j : ι)
+    : S.σ ((S.cv a ᵥ* Γ) j) = (Γ *ᵥ a) j := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Matrix.mulVec, Matrix.vecMul, dotProduct, map_sum, map_mul, cv]
   refine Finset.sum_congr rfl fun i _ => ?_

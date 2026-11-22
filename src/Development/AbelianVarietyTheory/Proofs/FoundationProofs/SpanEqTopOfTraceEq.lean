@@ -6,33 +6,38 @@ public import Mathlib
 
 namespace GlobalTheory.TraceFormNondegenerate
 
-theorem eq_zero_of_trace_mul {K : Type} [Field K] {n : ℕ} (X : Matrix (Fin n) (Fin n) K)
-    (h : ∀ Y : Matrix (Fin n) (Fin n) K, Matrix.trace (X * Y) = 0) : X = 0 := by
+theorem eq_zero_of_trace_mul
+    {K : Type} [Field K]
+    {n : ℕ}
+    (X : Matrix (Fin n) (Fin n) K) (h : ∀ Y : Matrix (Fin n) (Fin n) K, Matrix.trace (X * Y) = 0)
+    : X = 0 := by
   ext i j
   have hij := h (Matrix.single j i 1)
   rw [Matrix.trace_mul_single] at hij
   simpa using hij
 
-theorem span_eq_top_of_trace_eq {Γ K : Type} [Monoid Γ] [Field K] {n : ℕ}
-    (M N : Γ →* Matrix (Fin n) (Fin n) K)
-    (htr : ∀ g : Γ, Matrix.trace (M g) = Matrix.trace (N g))
-    (hN : Submodule.span K (Set.range (⇑N : Γ → Matrix (Fin n) (Fin n) K)) = ⊤) :
-    Submodule.span K (Set.range (⇑M : Γ → Matrix (Fin n) (Fin n) K)) = ⊤ := by
-  obtain ⟨A, hA⟩ : ∃ A : (Γ →₀ K) →ₗ[K] Matrix (Fin n) (Fin n) K,
-      A = Finsupp.linearCombination K (⇑M) := ⟨_, rfl⟩
-  obtain ⟨B, hB⟩ : ∃ B : (Γ →₀ K) →ₗ[K] Matrix (Fin n) (Fin n) K,
-      B = Finsupp.linearCombination K (⇑N) := ⟨_, rfl⟩
+theorem span_eq_top_of_trace_eq
+    {Γ K : Type} [Monoid Γ] [Field K]
+    {n : ℕ}
+    (M N : Γ →* Matrix (Fin n) (Fin n) K) (htr : ∀ g : Γ, Matrix.trace (M g) = Matrix.trace (N g))
+    (hN : Submodule.span K (Set.range (⇑N : Γ → Matrix (Fin n) (Fin n) K)) = ⊤)
+    : Submodule.span K (Set.range (⇑M : Γ → Matrix (Fin n) (Fin n) K)) = ⊤ := by
+  obtain ⟨A, hA⟩
+      : ∃ A : (Γ →₀ K) →ₗ[K] Matrix (Fin n) (Fin n) K, A = Finsupp.linearCombination K (⇑M) :=
+    ⟨_, rfl⟩
+  obtain ⟨B, hB⟩
+      : ∃ B : (Γ →₀ K) →ₗ[K] Matrix (Fin n) (Fin n) K, B = Finsupp.linearCombination K (⇑N) :=
+    ⟨_, rfl⟩
 
-  have hprod : ∀ (f : Γ →₀ K) (h : Γ),
-      Matrix.trace (B f * N h) = Matrix.trace (A f * M h) := by
+  have hprod : ∀ (f : Γ →₀ K) (h : Γ), Matrix.trace (B f * N h) = Matrix.trace (A f * M h) := by
     intro f h
     induction f using Finsupp.induction_linear with
     | zero => simp
     | add f g hf hg => simp [add_mul, hf, hg]
     | single g a =>
       subst hA hB
-      simp only [Finsupp.linearCombination_single, smul_mul_assoc, Matrix.trace_smul,
-        ← map_mul, htr]
+      simp only [Finsupp.linearCombination_single, smul_mul_assoc, Matrix.trace_smul, ← map_mul,
+        htr]
 
   have hker : LinearMap.ker A ≤ LinearMap.ker B := by
     intro f hf

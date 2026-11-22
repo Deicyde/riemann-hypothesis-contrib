@@ -23,11 +23,12 @@ theorem gaussE_pow_odd (n : ℕ) : (∏ i ∈ range n, Real.pi ^ (2 * i + 1)) = 
     rw [Finset.sum_range_succ, ih]
     ring
 
-theorem gaussE_volU_mul :
-    volU N * (Real.pi ^ (N * (N - 1) / 2) * (∏ i ∈ range N, (i.factorial : ℝ)) / 2 ^ N) =
-      Real.pi ^ (N ^ 2) := by
-  have hX : Real.pi ^ (N * (N - 1) / 2) * (∏ i ∈ range N, (i.factorial : ℝ)) / 2 ^ N =
-      ∏ i ∈ range N, (Real.pi ^ i * (i.factorial : ℝ) / 2) := by
+theorem gaussE_volU_mul
+    : volU N * (Real.pi ^ (N * (N - 1) / 2) * (∏ i ∈ range N, (i.factorial : ℝ)) / 2 ^ N)
+      = Real.pi ^ (N ^ 2) := by
+  have hX
+      : Real.pi ^ (N * (N - 1) / 2) * (∏ i ∈ range N, (i.factorial : ℝ)) / 2 ^ N
+        = ∏ i ∈ range N, (Real.pi ^ i * (i.factorial : ℝ) / 2) := by
     rw [Finset.prod_div_distrib, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum,
       Finset.sum_range_id, Finset.prod_const, Finset.card_range]
   rw [hX, volU, ← Finset.prod_mul_distrib, ← gaussE_pow_odd N]
@@ -36,19 +37,29 @@ theorem gaussE_volU_mul :
   field_simp
   ring
 
-theorem gaussE_qr_const (μ : Measure (UNgrp N)) [IsProbabilityMeasure μ] (C : ℝ)
-    (hC : ∀ f : (Fin N → Fin N → ℂ) → ENNReal, Measurable f →
-      ∫⁻ Z, f Z = ENNReal.ofReal C * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ) :
-    C = volU N := by
+theorem gaussE_qr_const
+    (μ : Measure (UNgrp N)) [IsProbabilityMeasure μ]
+    (C : ℝ)
+    (hC : ∀ f : (Fin N → Fin N → ℂ) → ENNReal,
+      Measurable f
+        → ∫⁻ Z, f Z
+          = ENNReal.ofReal C
+            * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ)
+    : C = volU N := by
   have hcont : Continuous fun Z : Fin N → Fin N → ℂ => hs (Matrix.of Z) := by
     unfold hs
     simp only [Matrix.of_apply]
     fun_prop
-  have h := hC (fun Z => ENNReal.ofReal (Real.exp (-hs (Matrix.of Z))))
-    (ENNReal.measurable_ofReal.comp (Real.continuous_exp.comp hcont.neg).measurable)
-  have hin : ∀ k : UNgrp N, (∫⁻ t in triPos N, ENNReal.ofReal (Real.exp (-hs (Matrix.of (qrMap (k, t))))) *
-      ENNReal.ofReal (qrWt t)) =
-      ENNReal.ofReal (Real.pi ^ (N * (N - 1) / 2) * (∏ i ∈ range N, (i.factorial : ℝ)) / 2 ^ N) := by
+  have h :=
+    hC
+      (fun Z => ENNReal.ofReal (Real.exp (- hs (Matrix.of Z))))
+      (ENNReal.measurable_ofReal.comp (Real.continuous_exp.comp hcont.neg).measurable)
+  have hin
+      : ∀ k : UNgrp N,
+        (∫⁻ t in triPos N, ENNReal.ofReal (Real.exp (-hs (Matrix.of (qrMap (k, t))))) *
+          ENNReal.ofReal (qrWt t))
+          = ENNReal.ofReal
+            (Real.pi ^ (N * (N - 1) / 2) * (∏ i ∈ range N, (i.factorial : ℝ)) / 2 ^ N) := by
     intro k
     simp only [qrMap, Equiv.apply_symm_apply, gaussB_hs_unitary_mul]
     exact gaussD_tri
@@ -69,10 +80,15 @@ theorem gaussE_qr_const (μ : Measure (UNgrp N)) [IsProbabilityMeasure μ] (C : 
   rw [← hXdef] at h2
   exact mul_right_cancel₀ hXpos.ne' (h.symm.trans h2.symm)
 
-theorem qr_const (μ : Measure (UNgrp N)) [IsProbabilityMeasure μ] (C : ℝ)
-    (hC : ∀ f : (Fin N → Fin N → ℂ) → ENNReal, Measurable f →
-      ∫⁻ Z, f Z = ENNReal.ofReal C * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ) :
-    C = volU N :=
+theorem qr_const
+    (μ : Measure (UNgrp N)) [IsProbabilityMeasure μ]
+    (C : ℝ)
+    (hC : ∀ f : (Fin N → Fin N → ℂ) → ENNReal,
+      Measurable f
+        → ∫⁻ Z, f Z
+          = ENNReal.ofReal C
+            * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ)
+    : C = volU N :=
   gaussE_qr_const μ C hC
 
 end ReciprocityTheory.ChartRestriction.DS

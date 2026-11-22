@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Geo
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 
-theorem GlobalTheory.lift_of_reduced_of_support {X Y T : Scheme.{0}} (i : X ⟶ Y) [IsClosedImmersion i]
-    [IsReduced T] (g : T ⟶ Y) (hg : ∀ t, g t ∈ i.ker.support) : ∃ h : T ⟶ X, h ≫ i = g := by
+theorem GlobalTheory.lift_of_reduced_of_support
+    {X Y T : Scheme.{0}} (i : X ⟶ Y) [IsClosedImmersion i] [IsReduced T]
+    (g : T ⟶ Y) (hg : ∀ t, g t ∈ i.ker.support)
+    : ∃ h : T ⟶ X, h ≫ i = g := by
   have hle : i.ker ≤ g.ker := by
     refine (Scheme.IdealSheafData.le_ofIdeals_iff (I := i.ker)).mpr ?_
     intro U a ha

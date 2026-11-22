@@ -15,14 +15,13 @@ noncomputable section
 
 namespace KThetaCharIntegral
 
-theorem integral_Icc_exp (n : ℤ) :
-    ∫ t in Set.Icc (0 : ℝ) 1, Complex.exp (2 * π * Complex.I * ((n : ℂ) * (t : ℂ))) =
-      if n = 0 then 1 else 0 := by
+theorem integral_Icc_exp (n : ℤ)
+    : ∫ t in Set.Icc (0 : ℝ) 1, Complex.exp (2 * π * Complex.I * ((n : ℂ) * (t : ℂ)))
+      = if n = 0 then 1 else 0 := by
   rw [integral_Icc_eq_integral_Ioc, ← intervalIntegral.integral_of_le zero_le_one]
   split_ifs with hn
   · subst hn; simp
-  · have hc : (2 * π * Complex.I * n : ℂ) ≠ 0 := by
-      simp [Real.pi_ne_zero, Complex.I_ne_zero, hn]
+  · have hc : (2 * π * Complex.I * n : ℂ) ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero, hn]
     have h1 : ∀ t : ℝ, 2 * π * Complex.I * ((n : ℂ) * (t : ℂ)) = 2 * π * Complex.I * n * t := by
       intro t; ring
     simp_rw [h1]
@@ -33,8 +32,8 @@ theorem integral_Icc_exp (n : ℤ) :
     rw [h2]
     simp
 
-theorem torusChar_eq_prod {g : ℕ} (m : Fin g → ℤ) (u : Fin g → ℝ) :
-    torusChar m u = ∏ i, Complex.exp (2 * π * Complex.I * ((m i : ℂ) * (u i : ℂ))) := by
+theorem torusChar_eq_prod {g : ℕ} (m : Fin g → ℤ) (u : Fin g → ℝ)
+    : torusChar m u = ∏ i, Complex.exp (2 * π * Complex.I * ((m i : ℂ) * (u i : ℂ))) := by
   unfold torusChar
   rw [Finset.mul_sum, Complex.exp_sum]
 

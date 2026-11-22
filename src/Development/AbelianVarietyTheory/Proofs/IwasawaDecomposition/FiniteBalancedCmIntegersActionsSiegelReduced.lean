@@ -7,22 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Trace
 
 @[expose] public section
 
-open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.RedTh
 
-theorem finite_balanced_actions : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (n : ℕ),
-    {ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) ℤ | ∃ (d : Fin n → ℝ) (u : Matrix (Fin n) (Fin n) ℝ), IsSiegel d u ∧
-      (∀ i, 0 < d i) ∧ ∀ c, ((ρ c).map (Int.cast : ℤ → ℝ))ᵀ * gram d u = gram d u *
-        (ρ (H.bar c)).map (Int.cast : ℤ → ℝ)}.Finite := by
+theorem finite_balanced_actions
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (n : ℕ),
+      {ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) ℤ | ∃ (d : Fin n → ℝ) (u : Matrix (Fin n) (Fin n) ℝ), IsSiegel d u ∧
+        (∀ i, 0 < d i) ∧ ∀ c, ((ρ c).map (Int.cast : ℤ → ℝ))ᵀ * gram d u = gram d u *
+          (ρ (H.bar c)).map (Int.cast : ℤ → ℝ)}.Finite := by
   intro E _ _ _ H n
   classical
   set S := {ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) ℤ | ∃ (d : Fin n → ℝ) (u : Matrix (Fin n) (Fin n) ℝ), IsSiegel d u ∧
       (∀ i, 0 < d i) ∧ ∀ c, ((ρ c).map (Int.cast : ℤ → ℝ))ᵀ * gram d u = gram d u *
         (ρ (H.bar c)).map (Int.cast : ℤ → ℝ)} with hSdef
 
-  have hK : ∀ c : 𝓞 E, ∃ K : ℝ, ∀ ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) ℤ,
-      (((ρ (H.bar c) * ρ c).trace : ℤ) : ℝ) ≤ K := by
+  have hK
+      : ∀ c : 𝓞 E, ∃ K : ℝ, ∀ ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) ℤ,
+        (((ρ (H.bar c) * ρ c).trace : ℤ) : ℝ) ≤ K := by
     intro c
     obtain ⟨p, hpm, hp⟩ := Algebra.IsIntegral.isIntegral (R := ℤ) (H.bar c * c)
     obtain ⟨K, hK⟩ := GlobalTheory.T.trace_bounded_of_aeval_monic_eq_zero p hpm n
@@ -44,10 +47,13 @@ theorem finite_balanced_actions : ∀ (E : Type) [Field E] [NumberField E] [IsCM
     exact abs_le.mp h3
   choose N hN using hC
   let b := RingOfIntegers.basis E
-  let F : (𝓞 E →+* Matrix (Fin n) (Fin n) ℤ) → (Module.Free.ChooseBasisIndex ℤ (𝓞 E) → Fin n → Fin n → ℤ) :=
-    fun ρ l => ρ (b l)
+  let F
+      : (𝓞 E →+* Matrix (Fin n) (Fin n) ℤ)
+        → (Module.Free.ChooseBasisIndex ℤ (𝓞 E) → Fin n → Fin n → ℤ) := fun ρ l =>
+    ρ (b l)
   let T : Set (Module.Free.ChooseBasisIndex ℤ (𝓞 E) → Fin n → Fin n → ℤ) :=
-    Set.pi Set.univ fun l => Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => Set.Icc (-N (b l)) (N (b l))
+    Set.pi Set.univ fun l =>
+      Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => Set.Icc (- N (b l)) (N (b l))
   have hT : T.Finite :=
     Set.Finite.pi fun l => Set.Finite.pi fun _ => Set.Finite.pi fun _ => Set.finite_Icc _ _
   refine Set.Finite.of_injOn (f := F) (t := T) ?_ ?_ hT

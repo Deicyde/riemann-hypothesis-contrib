@@ -13,10 +13,12 @@ namespace ObjectsChow
 
 open MvPolynomial
 
-theorem aeval_cone_of_isHomogeneous {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω] {n d : ℕ}
-    (y : Fin n → Ω) {p : MvPolynomial (Fin n) F} (hp : p.IsHomogeneous d) :
-    aeval (fun j => Polynomial.C (y j) * Polynomial.X) p =
-      Polynomial.C (aeval y p) * Polynomial.X ^ d := by
+theorem aeval_cone_of_isHomogeneous
+    {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
+    {n d : ℕ} (y : Fin n → Ω)
+    {p : MvPolynomial (Fin n) F} (hp : p.IsHomogeneous d)
+    : aeval (fun j => Polynomial.C (y j) * Polynomial.X) p
+      = Polynomial.C (aeval y p) * Polynomial.X ^ d := by
   classical
   conv_lhs => rw [p.as_sum]
   conv_rhs => rw [p.as_sum]
@@ -44,12 +46,14 @@ theorem ClosedPointConeCoord.proof : ClosedPointConeCoord.Statement := by
       rw [← sum_homogeneousComponent g, map_sum]
     refine Finset.sum_eq_zero fun d _ => ?_
     rw [show φ (homogeneousComponent d g) = _ from
-      aeval_cone_of_isHomogeneous y (homogeneousComponent_isHomogeneous d g),
+        aeval_cone_of_isHomogeneous y (homogeneousComponent_isHomogeneous d g),
       hyI _ (hI.isHomog g hg d), map_zero, zero_mul]
-  let m : Ideal (MvPolynomial (Fin n) F) := RingHom.ker (constantCoeff : MvPolynomial (Fin n) F →+* F)
+  let m : Ideal (MvPolynomial (Fin n) F) :=
+    RingHom.ker (constantCoeff : MvPolynomial (Fin n) F →+* F)
   have hmprime : m.IsPrime := RingHom.ker_isPrime _
-  have key : (Polynomial.evalRingHom (0 : Ω)).comp (φ : MvPolynomial (Fin n) F →+* Polynomial Ω) =
-      (algebraMap F Ω).comp constantCoeff := by
+  have key
+      : (Polynomial.evalRingHom (0 : Ω)).comp (φ : MvPolynomial (Fin n) F →+* Polynomial Ω)
+        = (algebraMap F Ω).comp constantCoeff := by
     apply MvPolynomial.ringHom_ext <;> intro <;> simp [φ]
   have hPm : P ≤ m := by
     intro g hg
@@ -84,8 +88,11 @@ theorem ClosedPointConeCoord.proof : ClosedPointConeCoord.Statement := by
         ⟨⟨m, hmprime⟩, fun _ h => hPm (hIP h)⟩
       have hab : a < b := hIlt
       have hbc : b < c := hPlt
-      exact ⟨LTSeries.mk 2 ![a, b, c]
-        (Fin.strictMono_iff_lt_succ.mpr fun k => by fin_cases k; exacts [hab, hbc]), rfl⟩
+      exact ⟨
+        LTSeries.mk 2 ![a, b, c]
+          (Fin.strictMono_iff_lt_succ.mpr fun k => by fin_cases k; exacts [hab, hbc]),
+        rfl
+      ⟩
     rw [hdim] at h2
     norm_num at h2
   intro hyi

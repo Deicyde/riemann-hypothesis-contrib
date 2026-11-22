@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.FiltrationCocycleLiftCriterion
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ShortIntervalPrimes NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ShortIntervalPrimes
+  NumberField
 
 section Ray
 

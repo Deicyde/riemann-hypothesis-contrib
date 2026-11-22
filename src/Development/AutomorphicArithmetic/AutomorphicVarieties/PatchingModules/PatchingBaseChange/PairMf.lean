@@ -11,8 +11,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.BC.pair_mf :
-    ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [IsLocalRing O] [Finite (ResidueField O)] [CharP (ResidueField O) l] [Algebra ℤ_[l] O] (n : ℕ) (r : Resid F O n) (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B), PhiCond F.G₀ l → Finite (ResidueField B) ∧ (∃ (χ : Fin n → F.G₀ →* (ResidueField B)ˣ) (h : ℕ), u.D.map (residue B) = GDet.ofChars χ ∧ UpperTheory.V.CA.MultFree χ h) ∧ ∀ Z : Set (MonoidAlgebra B F.G₀), ∃ s : Finset F.G₀, ∀ y : MonoidAlgebra B F.G₀, ∃ c : F.G₀ → B, y - ∑ g ∈ s, MonoidAlgebra.single g (c g) ∈ u.D.chBar Z := by
+theorem UpperTheory.V.Pa.BC.pair_mf
+    : ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [IsLocalRing O]
+        [Finite (ResidueField O)] [CharP (ResidueField O) l] [Algebra ℤ_[l] O] (n : ℕ)
+        (r : Resid F O n) (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B),
+      PhiCond F.G₀ l
+        → Finite (ResidueField B)
+          ∧ (∃ (χ : Fin n → F.G₀ →* (ResidueField B)ˣ) (h : ℕ),
+            u.D.map (residue B) = GDet.ofChars χ ∧ UpperTheory.V.CA.MultFree χ h)
+          ∧ ∀ Z : Set (MonoidAlgebra B F.G₀), ∃ s : Finset F.G₀, ∀ y : MonoidAlgebra B F.G₀,
+            ∃ c : F.G₀ → B,
+              y - ∑ g ∈ s, MonoidAlgebra.single g (c g) ∈ u.D.chBar Z := by
   intro l _ F O _ _ _ _ _ n r B _ _ _ u hPhi
   haveI : CompactSpace F.G₀ :=
     isCompact_iff_compactSpace.mp (Subgroup.isClosed_of_isOpen _ F.η_open).isCompact
@@ -23,8 +32,8 @@ theorem UpperTheory.V.Pa.BC.pair_mf :
     charP_of_injective_ringHom (f := (e : ResidueField O →+* ResidueField B)) e.injective l
   have hE : Function.Injective (Units.map (e : ResidueField O →* ResidueField B)) :=
     Units.map_injective (f := (e : ResidueField O →* ResidueField B)) e.injective
-  let χ : Fin n → F.G₀ →* (ResidueField B)ˣ :=
-    fun i => (Units.map (e : ResidueField O →* ResidueField B)).comp (r.chib i)
+  let χ : Fin n → F.G₀ →* (ResidueField B)ˣ := fun i =>
+    (Units.map (e : ResidueField O →* ResidueField B)).comp (r.chib i)
   have hker : ∀ i, (χ i).ker = (r.chib i).ker := by
     intro i
     ext g
@@ -37,7 +46,9 @@ theorem UpperTheory.V.Pa.BC.pair_mf :
   have hinj : Function.Injective χ := by
     intro i j hij
     exact r.chib_inj (MonoidHom.ext fun g => hE (DFunLike.congr_fun hij g))
-  have hres : (residue B) = (e : ResidueField O →+* ResidueField B).comp (res O B : B →+* ResidueField O) :=
+  have hres
+      : (residue B)
+        = (e : ResidueField O →+* ResidueField B).comp (res O B : B →+* ResidueField O) :=
     RingHom.ext fun b => (e.apply_symm_apply (residue B b)).symm
   obtain ⟨-, hcomp, -, -⟩ := UpperTheory.V.CA.d_gmap u.D
   obtain ⟨-, -, -, hrep⟩ := UpperTheory.V.CA.d_gmap (GDet.ofRep (diagRep r.chib))
@@ -49,12 +60,14 @@ theorem UpperTheory.V.Pa.BC.pair_mf :
     ext g i j
     simp [diagRep, GDet.diagRep, χ, Matrix.diagonal_apply]
     split_ifs <;> simp
-  obtain ⟨h, hmf⟩ := UpperTheory.V.CA.exists_multFree_of_phiCond_of_injective_chars l χ hPhi hopen hinj
+  obtain ⟨h, hmf⟩ :=
+    UpperTheory.V.CA.exists_multFree_of_phiCond_of_injective_chars l χ hPhi hopen hinj
   refine ⟨hfin, ⟨χ, h, hmap, hmf⟩, fun Z => ?_⟩
   obtain ⟨⟨s, -, hs⟩, -, -⟩ := UpperTheory.V.CA.finE u.D χ u.cont hmap hmf Z
   refine ⟨s, fun y => ?_⟩
-  have hy : u.D.toQuot Z y ∈ Submodule.span B
-      ((fun g ↦ (u.D.toQuot Z) (MonoidAlgebra.single g 1)) '' (s : Set F.G₀)) := by
+  have hy
+      : u.D.toQuot Z y ∈ Submodule.span B
+        ((fun g ↦ (u.D.toQuot Z) (MonoidAlgebra.single g 1)) '' (s : Set F.G₀)) := by
     rw [hs]
     exact Submodule.mem_top
   obtain ⟨c, hc, hcy⟩ := (Finsupp.mem_span_image_iff_linearCombination B).mp hy

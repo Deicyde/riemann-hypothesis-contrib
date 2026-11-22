@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
-theorem UpperTheory.V.J.domMin :
-    ∀ (A : Type) [CommRing A] (q : Ideal A) [q.IsPrime], IsDomain (Localization.AtPrime q) → ∀ P ∈ minimalPrimes A, P ≤ q → ∀ a ∈ P, ∃ s ∉ P, s * a = 0 := by
+theorem UpperTheory.V.J.domMin
+    : ∀ (A : Type) [CommRing A] (q : Ideal A) [q.IsPrime],
+      IsDomain (Localization.AtPrime q)
+        → ∀ P ∈ minimalPrimes A, P ≤ q → ∀ a ∈ P, ∃ s ∉ P, s * a = 0 := by
   intro A _ q _ hD P hP hPq a ha
   letI : Nontrivial (Localization.AtPrime q) := hD.toNontrivial
   letI : NoZeroDivisors (Localization.AtPrime q) :=
@@ -19,5 +23,6 @@ theorem UpperTheory.V.J.domMin :
     have h0 : (m : A) * x ∈ P := by rw [hm]; exact P.zero_mem
     exact (hP.1.1.mem_or_mem h0).resolve_left (fun h => m.2 (hPq h))
   have hge : P ≤ RingHom.ker (algebraMap A (Localization.AtPrime q)) := hP.2 ⟨hK, bot_le⟩ hle
-  obtain ⟨m, hm⟩ := (IsLocalization.map_eq_zero_iff q.primeCompl (Localization.AtPrime q) a).1 (hge ha)
+  obtain ⟨m, hm⟩ :=
+    (IsLocalization.map_eq_zero_iff q.primeCompl (Localization.AtPrime q) a).1 (hge ha)
   exact ⟨m, fun h => m.2 (hPq h), hm⟩

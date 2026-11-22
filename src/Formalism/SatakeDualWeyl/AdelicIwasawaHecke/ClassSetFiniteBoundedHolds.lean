@@ -15,8 +15,8 @@ open NumberField
 
 namespace Formalism.UG.P
 
-theorem csBdd_nat_mul {K : Type} [Field K] [NumberField K] (d : 𝓞 K) (hd : d ≠ 0) :
-    ∃ m : ℕ, 0 < m ∧ ∃ t : 𝓞 K, (m : 𝓞 K) = d * t := by
+theorem csBdd_nat_mul {K : Type} [Field K] [NumberField K] (d : 𝓞 K) (hd : d ≠ 0)
+    : ∃ m : ℕ, 0 < m ∧ ∃ t : 𝓞 K, (m : 𝓞 K) = d * t := by
   classical
   refine ⟨Ideal.absNorm (Ideal.span {d}), ?_, ?_⟩
   · refine Nat.pos_of_ne_zero ?_
@@ -25,15 +25,16 @@ theorem csBdd_nat_mul {K : Type} [Field K] [NumberField K] (d : 𝓞 K) (hd : d 
   · obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.1 (Ideal.absNorm_mem (Ideal.span {d}))
     exact ⟨t, by rw [← ht, mul_comm]⟩
 
-theorem class_set_finite_bounded_holds (hCovolOfDual : Formalism.UG.CS.CovolOfDual) :
-    Formalism.UG.CS.ClassSetFiniteBdd := by
+theorem class_set_finite_bounded_holds (hCovolOfDual : Formalism.UG.CS.CovolOfDual)
+    : Formalism.UG.CS.ClassSetFiniteBdd := by
   intro K V _ _ _ _ _ _ _ _ h hsymm hpos d e hd he
   obtain ⟨N, ι, hι, hmul, hlat⟩ := Formalism.HermitianLatticesTheory.traceReal_main h hsymm hpos
   obtain ⟨C, hC⟩ := hCovolOfDual K V h hsymm hpos N ι hι e he
   obtain ⟨m, hm, t, ht⟩ := csBdd_nat_mul d hd
-  let S : Set (Submodule (𝓞 K) V) := {M | Submodule.IsLattice K M ∧
-    (∀ x ∈ M, ∀ y ∈ M, (d : K) * h x y ∈ (1 : Submodule (𝓞 K) K)) ∧
-    (∀ x ∈ Formalism.HermitianLatticesTheory.dual h M, (e : K) • x ∈ M)}
+  let S : Set (Submodule (𝓞 K) V) :=
+    {M | Submodule.IsLattice K M ∧
+      (∀ x ∈ M, ∀ y ∈ M, (d : K) * h x y ∈ (1 : Submodule (𝓞 K) K)) ∧
+      (∀ x ∈ Formalism.HermitianLatticesTheory.dual h M, (e : K) • x ∈ M)}
   have hfull : ∀ M ∈ S, Submodule.IsFullLattice K M := by
     intro M hM
     let W := Submodule.span K (M : Set V)
@@ -63,9 +64,12 @@ theorem class_set_finite_bounded_holds (hCovolOfDual : Formalism.UG.CS.CovolOfDu
       by_contra hx0
       simpa [hxx0] using hpos x hx0
     have hdim := LinearMap.finrank_le_finrank_of_injective hf
-    exact { hM.1 with
-      span_eq_top := Submodule.eq_of_le_of_finrank_le le_top
-        (by simpa only [finrank_top, Module.finrank_fin_fun] using hdim) }
+    exact {
+      hM.1 with
+      span_eq_top :=
+        Submodule.eq_of_le_of_finrank_le le_top
+          (by simpa only [finrank_top, Module.finrank_fin_fun] using hdim)
+    }
   have hSd : ∀ M ∈ S, ∀ x ∈ M, ∀ y ∈ M, (m : K) * h x y ∈ (1 : Submodule (𝓞 K) K) := by
     intro M hM x hx y hy
     obtain ⟨a, ha⟩ := Submodule.mem_one.mp (hM.2.1 x hx y hy)
@@ -77,9 +81,13 @@ theorem class_set_finite_bounded_holds (hCovolOfDual : Formalism.UG.CS.CovolOfDu
     have htc : algebraMap (𝓞 K) K t = (t : K) := rfl
     rw [htc]
     ring
-  obtain ⟨s, -, hs⟩ := Formalism.HermitianLatticesTheory.classSetFinite_core Formalism.HermitianLatticesTheory.shortVectors
-    Formalism.HermitianLatticesTheory.finIntermediate Formalism.HermitianLatticesTheory.isomOfTrace h hpos N ι hι hmul m hm C S hSd
-    (fun M hM => hlat M (hfull M hM)) (fun M hM _ _ => hC M hM.1 hM.2.2)
+  obtain ⟨s, -, hs⟩ :=
+    Formalism.HermitianLatticesTheory.classSetFinite_core
+      Formalism.HermitianLatticesTheory.shortVectors
+      Formalism.HermitianLatticesTheory.finIntermediate
+      Formalism.HermitianLatticesTheory.isomOfTrace h hpos N ι hι hmul m hm C S hSd
+      (fun M hM => hlat M (hfull M hM))
+      (fun M hM _ _ => hC M hM.1 hM.2.2)
   exact ⟨s, fun M hM hdM heM => hs M ⟨hM, hdM, heM⟩⟩
 
 end Formalism.UG.P

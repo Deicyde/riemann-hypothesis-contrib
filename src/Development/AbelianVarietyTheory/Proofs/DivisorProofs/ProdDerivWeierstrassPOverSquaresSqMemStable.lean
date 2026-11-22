@@ -11,22 +11,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProdDerivWei
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology
 
-theorem GlobalTheory.CMModel.sqProd_sq_mem_and_stable : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L : PeriodPair) (t : ℂ),
-    p.Prime → p % 4 = 3 → 3 < p → Datum p F L t →
-    sqProd p L t ^ 2 ∈ F ∧ (sqProd p L t ∈ F → Stable L F (sqPt p t)) := by
+theorem GlobalTheory.CMModel.sqProd_sq_mem_and_stable
+    : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L : PeriodPair) (t : ℂ),
+      p.Prime → p % 4 = 3 → 3 < p → Datum p F L t
+        → sqProd p L t ^ 2 ∈ F ∧ (sqProd p L t ∈ F → Stable L F (sqPt p t)) := by
   intro p F L t hp h4 h3 hD
   refine ⟨?_, ?_⟩
   · apply GlobalTheory.T.mem_intermediateField_of_forall_complexAut_fixed F
     intro σ hσ
     rw [map_pow]
-    rcases GlobalTheory.T.prodDerivWeierstrassPOverSquares_conj p F L t hp h4 h3 hD σ hσ with ⟨h, _⟩ | h
+    rcases GlobalTheory.T.prodDerivWeierstrassPOverSquares_conj p F L t hp h4 h3 hD σ hσ with
+      ⟨h, _⟩ | h
     · rw [h]
     · rw [h, neg_sq]
   · intro hmem σ hσ
-    rcases GlobalTheory.T.prodDerivWeierstrassPOverSquares_conj p F L t hp h4 h3 hD σ hσ with ⟨_, he⟩ | h
+    rcases GlobalTheory.T.prodDerivWeierstrassPOverSquares_conj p F L t hp h4 h3 hD σ hσ with
+      ⟨_, he⟩ | h
     · exact he
     · exfalso
       have hne := (GlobalTheory.T.prodDerivWeierstrassPOverSquares_ne_zero p F L t hp h4 h3 hD).2

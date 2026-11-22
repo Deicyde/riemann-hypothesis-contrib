@@ -41,14 +41,11 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-theorem IntDomainDim.full : IntDomainDim.Statement :=
-  IntDomainDim.proof
+theorem IntDomainDim.full : IntDomainDim.Statement := IntDomainDim.proof
 
-theorem ConeTrdeg.full : ConeTrdeg.Statement :=
-  ConeTrdeg.proof
+theorem ConeTrdeg.full : ConeTrdeg.Statement := ConeTrdeg.proof
 
-theorem FibreCompDimZ.full : FibreCompDimZ.Statement :=
-  FibreCompDimZ.proof
+theorem FibreCompDimZ.full : FibreCompDimZ.Statement := FibreCompDimZ.proof
 
 end GroundTheory.Heights₂.Heights
 

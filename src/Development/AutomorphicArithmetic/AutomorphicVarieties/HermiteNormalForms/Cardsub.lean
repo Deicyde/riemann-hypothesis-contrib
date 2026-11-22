@@ -7,10 +7,11 @@ public import Mathlib
 open Matrix
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.cardsub :
-    ∀ (α : Type) (S : Set α) (k : ℕ), S.Finite →
-    {M : Finset α | (↑M : Set α) ⊆ S ∧ M.card ≤ k}.Finite ∧
-      {M : Finset α | (↑M : Set α) ⊆ S ∧ M.card ≤ k}.ncard ≤ (S.ncard + 1) ^ k := by
+theorem UpperTheory.V.KT.cardsub
+    : ∀ (α : Type) (S : Set α) (k : ℕ),
+      S.Finite
+        → {M : Finset α | (↑M : Set α) ⊆ S ∧ M.card ≤ k}.Finite
+          ∧ {M : Finset α | (↑M : Set α) ⊆ S ∧ M.card ≤ k}.ncard ≤ (S.ncard + 1) ^ k := by
   intro α S k hS
   classical
   set T := hS.toFinset with hT
@@ -23,7 +24,8 @@ theorem UpperTheory.V.KT.cardsub :
     simpa [T] using hM hx
   have hfin := F.finite_toSet.subset hsub
   refine ⟨hfin, ?_⟩
-  calc _ ≤ (↑F : Set (Finset α)).ncard := Set.ncard_le_ncard hsub F.finite_toSet
+  calc
+    _ ≤ (↑F : Set (Finset α)).ncard := Set.ncard_le_ncard hsub F.finite_toSet
     _ = F.card := Set.ncard_coe_finset F
     _ ≤ ∑ j ∈ Finset.range (k + 1), (T.powersetCard j).card := Finset.card_biUnion_le
     _ = ∑ j ∈ Finset.range (k + 1), T.card.choose j := by simp [Finset.card_powersetCard]
@@ -33,7 +35,9 @@ theorem UpperTheory.V.KT.cardsub :
       have h1 : T.card.choose j ≤ T.card ^ j := Nat.choose_le_pow _ _
       have h2 : 1 ≤ k.choose j := Nat.choose_pos (by simp at hj; omega)
       rw [one_pow, mul_one]
-      calc T.card.choose j ≤ T.card ^ j := h1
+      calc
+        T.card.choose j
+          ≤ T.card ^ j := h1
         _ = T.card ^ j * 1 := (mul_one _).symm
         _ ≤ T.card ^ j * k.choose j := Nat.mul_le_mul_left _ h2
     _ = (T.card + 1) ^ k := (add_pow _ _ _).symm

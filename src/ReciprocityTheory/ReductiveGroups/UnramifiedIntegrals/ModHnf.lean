@@ -12,9 +12,10 @@ open ModularForm EisensteinSeries ModularFormClass UpperHalfPlane Formalism.L2.T
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem exists_hermite_normal_form_coords {m : ℕ} (hm : 0 < m) (p q r s : ℤ) (h : p * s - q * r = m) :
-    ∃ (x y z w : ℤ) (a b e : ℕ), x * w - y * z = 1 ∧ a * e = m ∧ b < e ∧
-      p = x * a ∧ q = x * b + y * e ∧ r = z * a ∧ s = z * b + w * e := by
+theorem exists_hermite_normal_form_coords {m : ℕ} (hm : 0 < m) (p q r s : ℤ) (h : p * s - q * r = m)
+    : ∃ (x y z w : ℤ) (a b e : ℕ),
+      x * w - y * z = 1 ∧ a * e = m ∧ b < e ∧ p = x * a ∧ q = x * b + y * e ∧ r = z * a
+        ∧ s = z * b + w * e := by
   have hm' : (0 : ℤ) < m := by exact_mod_cast hm
   set g : ℕ := Int.gcd p r with hg
   have hg0 : 0 < g := by
@@ -32,7 +33,8 @@ theorem exists_hermite_normal_form_coords {m : ℕ} (hm : 0 < m) (p q r s : ℤ)
   have hbez : (g : ℤ) = p * u + r * v := Int.gcd_eq_gcd_ab p r
   have h1 : x * u + z * v = 1 := by
     have : (g : ℤ) * (x * u + z * v) = g * 1 := by
-      rw [mul_one]; conv_rhs => rw [hbez, hx, hz]
+      rw [mul_one]
+      conv_rhs => rw [hbez, hx, hz]
       ring
     exact mul_left_cancel₀ hgZ.ne' this
   set E : ℤ := x * s - z * q with hE
@@ -65,19 +67,26 @@ theorem exists_hermite_normal_form_coords {m : ℕ} (hm : 0 < m) (p q r s : ℤ)
     rw [this, hb0, hE]
     linear_combination (-s) * h1
 
-theorem hnf_exists {m : ℕ} (hm : 0 < m) (M : Matrix (Fin 2) (Fin 2) ℤ) (hM : M.det = m) :
-    ∃ (γ : SL(2, ℤ)) (t : ℕ × ℕ × ℕ), t ∈ Tm m ∧ M = (γ : Matrix (Fin 2) (Fin 2) ℤ) * Tmat t := by
+theorem hnf_exists {m : ℕ} (hm : 0 < m) (M : Matrix (Fin 2) (Fin 2) ℤ) (hM : M.det = m)
+    : ∃ (γ : SL(2, ℤ)) (t : ℕ × ℕ × ℕ), t ∈ Tm m ∧ M = (γ : Matrix (Fin 2) (Fin 2) ℤ) * Tmat t := by
   rw [Matrix.det_fin_two] at hM
   obtain ⟨x, y, z, w, a, b, e, hdet, hae, hbe, h00, h01, h10, h11⟩ :=
     exists_hermite_normal_form_coords hm (M 0 0) (M 0 1) (M 1 0) (M 1 1) hM
-  refine ⟨⟨!![x, y; z, w], by rw [Matrix.det_fin_two_of]; exact hdet⟩, (a, b, e),
-    (mem_Tm hm _).2 ⟨hae, hbe⟩, ?_⟩
+  refine ⟨
+    ⟨!![x, y; z, w], by rw [Matrix.det_fin_two_of]; exact hdet⟩,
+    (a, b, e),
+    (mem_Tm hm _).2 ⟨hae, hbe⟩,
+    ?_
+  ⟩
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Tmat, Matrix.mul_apply, Fin.sum_univ_two, h00, h01, h10, h11]
+  fin_cases i <;> fin_cases j
+    <;> simp [Tmat, Matrix.mul_apply, Fin.sum_univ_two, h00, h01, h10, h11]
 
-theorem hnf_unique {m : ℕ} (hm : 0 < m) {t t' : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) (ht' : t' ∈ Tm m)
-    (γ : SL(2, ℤ)) (h : Tmat t = (γ : Matrix (Fin 2) (Fin 2) ℤ) * Tmat t') : t = t' := by
+theorem hnf_unique
+    {m : ℕ} (hm : 0 < m)
+    {t t' : ℕ × ℕ × ℕ} (ht : t ∈ Tm m) (ht' : t' ∈ Tm m)
+    (γ : SL(2, ℤ)) (h : Tmat t = (γ : Matrix (Fin 2) (Fin 2) ℤ) * Tmat t')
+    : t = t' := by
   obtain ⟨a, b, e⟩ := t
   obtain ⟨a', b', e'⟩ := t'
   obtain ⟨hae, hbe⟩ := (mem_Tm hm _).1 ht
@@ -85,8 +94,7 @@ theorem hnf_unique {m : ℕ} (hm : 0 < m) {t t' : ℕ × ℕ × ℕ} (ht : t ∈
   obtain ⟨ha, he⟩ := Tm_pos hm ht
   obtain ⟨ha', he'⟩ := Tm_pos hm ht'
   simp only at hae hbe hae' hbe' ha he ha' he'
-  have hdet : γ.1 0 0 * γ.1 1 1 - γ.1 0 1 * γ.1 1 0 = 1 := by
-    rw [← Matrix.det_fin_two]; exact γ.2
+  have hdet : γ.1 0 0 * γ.1 1 1 - γ.1 0 1 * γ.1 1 0 = 1 := by rw [← Matrix.det_fin_two]; exact γ.2
   have h00 : (a : ℤ) = γ.1 0 0 * a' := by
     have := congrFun (congrFun h 0) 0
     simpa [Tmat, Matrix.mul_apply, Fin.sum_univ_two] using this

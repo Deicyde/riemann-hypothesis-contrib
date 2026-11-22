@@ -39,15 +39,20 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.ExistsIsFun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop GlobalTheory.CovTop.MeasRd
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+  GlobalTheory.CovTop.MeasRd
 open Formalism.MainNotions
-open MeasureTheory Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR.Mult Formalism.BasicNotions.TH Formalism.L2.Theta
+open MeasureTheory Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR.Mult
+  Formalism.BasicNotions.TH Formalism.L2.Theta
 
 namespace GlobalTheory.OneMeasureRatio
 
-theorem log_r_add_three_le (D : D7) (L : ℝ) (hL : GlobalTheory.IndefiniteRowSideFullHecke.OneMeasureSizes.Sizes D L) :
-    Real.log ((D.R.r : ℝ) + 3) ≤ L := by
+theorem log_r_add_three_le
+    (D : D7) (L : ℝ) (hL : GlobalTheory.IndefiniteRowSideFullHecke.OneMeasureSizes.Sizes D L)
+    : Real.log ((D.R.r : ℝ) + 3) ≤ L := by
   have hr : 6 ≤ D.R.r := by
     unfold Ranks.r; have := D.R.two_le_m; have := D.R.m_add_three_le_k; omega
   have hf : 2 ≤ D.R.f := by

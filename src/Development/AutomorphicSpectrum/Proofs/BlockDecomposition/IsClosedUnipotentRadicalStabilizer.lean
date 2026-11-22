@@ -9,18 +9,24 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Fou
 
 noncomputable section
 open scoped Matrix NNReal ENNReal TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.CompanionTheory.QKAvg
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.QKAvg
 
-theorem isClosed_radN : ∀ (D : D7) (B W : HSp D) (t : ℕ) (d : HypDec B W t),
-    IsClosed (radN d : Set (GlobalTheory.RegSW.stab d)) := by
+theorem isClosed_radN
+    : ∀ (D : D7) (B W : HSp D) (t : ℕ) (d : HypDec B W t),
+      IsClosed (radN d : Set (GlobalTheory.RegSW.stab d)) := by
   intro D B W t d
-  have e : (radN d : Set (GlobalTheory.RegSW.stab d)) =
-      (Subtype.val : GlobalTheory.RegSW.stab d → GA D B) ⁻¹' (GlobalTheory.MixPer.radX d : Set (GA D B)) := by
+  have e
+      : (radN d : Set (GlobalTheory.RegSW.stab d))
+        = (Subtype.val : GlobalTheory.RegSW.stab d → GA D B)
+          ⁻¹' (GlobalTheory.MixPer.radX d : Set (GA D B)) := by
     ext q
     constructor
     · rintro ⟨c, b, h⟩

@@ -27,15 +27,15 @@ theorem cpt_const {ε : Fin n → Bool} (h : pOf ε = 0 ∨ qOf ε = 0) (a b : F
       simpa using this
     rw [h1 a, h1 b]
 
-theorem cpt_Jm_comm {ε : Fin n → Bool} (hc : ∀ a b, ε a = ε b) (M : Matrix (Fin n) (Fin n) ℂ) :
-    Formalism.REAL.Jm ε * M = M * Formalism.REAL.Jm ε := by
+theorem cpt_Jm_comm {ε : Fin n → Bool} (hc : ∀ a b, ε a = ε b) (M : Matrix (Fin n) (Fin n) ℂ)
+    : Formalism.REAL.Jm ε * M = M * Formalism.REAL.Jm ε := by
   ext i j
   delta Formalism.REAL.Jm
   simp only [Matrix.diagonal_mul, Matrix.mul_diagonal, hc i j]
   ring
 
-theorem cpt_Kset_eq {ε : Fin n → Bool} (hc : ∀ a b, ε a = ε b) :
-    Formalism.REAL.Kset ε = Formalism.MainNotions.S.UJset ε := by
+theorem cpt_Kset_eq {ε : Fin n → Bool} (hc : ∀ a b, ε a = ε b)
+    : Formalism.REAL.Kset ε = Formalism.MainNotions.S.UJset ε := by
   ext g
   delta Formalism.REAL.Kset Formalism.MainNotions.S.UJset Formalism.REAL.inUJ
   simp only [Set.mem_ofPred_eq, Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]

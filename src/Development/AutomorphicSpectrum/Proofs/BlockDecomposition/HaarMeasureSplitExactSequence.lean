@@ -9,31 +9,40 @@ open scoped ENNReal Pointwise
 
 namespace GlobalTheory.CompanionTheory.FiberInt
 
-variable {A A' : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A]
+variable
+  {A A' : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A]
   [LocallyCompactSpace A] [T2Space A] [SecondCountableTopology A] [MeasurableSpace A] [BorelSpace A]
   [AddCommGroup A'] [TopologicalSpace A'] [IsTopologicalAddGroup A'] [LocallyCompactSpace A']
   [T2Space A'] [SecondCountableTopology A'] [MeasurableSpace A'] [BorelSpace A']
 
-noncomputable def periodized (π : A →+ A') (Γ' : AddSubgroup A') (lam : Measure A) (𝓖 : Set A) :
-    Measure A' :=
+noncomputable def periodized (π : A →+ A') (Γ' : AddSubgroup A') (lam : Measure A) (𝓖 : Set A)
+    : Measure A' :=
   Measure.sum fun γ : Γ' => ((lam.restrict 𝓖).map π).map ((γ : A') + ·)
 
-theorem lintegral_periodized {π : A →+ A'} (hπ : Measurable π) {Γ' : AddSubgroup A'} [Countable Γ']
-    (lam : Measure A) (𝓖 : Set A) {f : A' → ℝ≥0∞} (hf : Measurable f) :
-    ∫⁻ y, f y ∂(periodized π Γ' lam 𝓖) = ∫⁻ x in 𝓖, ∑' γ : Γ', f ((γ : A') + π x) ∂lam := by
-  rw [show periodized π Γ' lam 𝓖 = Measure.sum (fun γ : Γ' => ((lam.restrict 𝓖).map π).map ((γ : A') + ·)) from rfl, lintegral_sum_measure,
-    lintegral_tsum]
+theorem lintegral_periodized
+    {π : A →+ A'} (hπ : Measurable π)
+    {Γ' : AddSubgroup A'} [Countable Γ']
+    (lam : Measure A) (𝓖 : Set A)
+    {f : A' → ℝ≥0∞} (hf : Measurable f)
+    : ∫⁻ y, f y ∂(periodized π Γ' lam 𝓖) = ∫⁻ x in 𝓖, ∑' γ : Γ', f ((γ : A') + π x) ∂lam := by
+  rw [show periodized π Γ' lam 𝓖
+        = Measure.sum (fun γ : Γ' => ((lam.restrict 𝓖).map π).map ((γ : A') + ·)) from
+      rfl,
+    lintegral_sum_measure, lintegral_tsum]
   · refine tsum_congr fun γ => ?_
     rw [lintegral_map hf (measurable_const_add _), lintegral_map _ hπ]
     exact hf.comp (measurable_const_add _)
   · intro γ
     exact (hf.comp ((measurable_const_add _).comp hπ)).aemeasurable
 
-theorem periodized_invariant {π : A →+ A'} (hπ : Measurable π) {s : A' →+ A}
-    (hs : ∀ x, π (s x) = x) {Γ : AddSubgroup A} {Γ' : AddSubgroup A'} [Countable Γ] [Countable Γ']
-    (hΓ : ∀ γ ∈ Γ, π γ ∈ Γ') {lam : Measure A} [lam.IsAddHaarMeasure] {𝓖 : Set A}
-    (hG : IsAddFundamentalDomain Γ 𝓖 lam) :
-    (periodized π Γ' lam 𝓖).IsAddLeftInvariant := by
+theorem periodized_invariant
+    {π : A →+ A'} (hπ : Measurable π)
+    {s : A' →+ A} (hs : ∀ x, π (s x) = x)
+    {Γ : AddSubgroup A} {Γ' : AddSubgroup A'} [Countable Γ] [Countable Γ']
+    (hΓ : ∀ γ ∈ Γ, π γ ∈ Γ')
+    {lam : Measure A} [lam.IsAddHaarMeasure]
+    {𝓖 : Set A} (hG : IsAddFundamentalDomain Γ 𝓖 lam)
+    : (periodized π Γ' lam 𝓖).IsAddLeftInvariant := by
   constructor
   intro c
   apply Measure.ext_of_lintegral
@@ -41,7 +50,8 @@ theorem periodized_invariant {π : A →+ A'} (hπ : Measurable π) {s : A' →+
   rw [lintegral_map hf (measurable_const_add c),
     lintegral_periodized hπ lam 𝓖 (f := fun y => f (c + y)) (hf.comp (measurable_const_add c)),
     lintegral_periodized hπ lam 𝓖 hf]
-  have key : ∀ x : A, ∑' γ : Γ', f (c + ((γ : A') + π x)) = ∑' γ : Γ', f ((γ : A') + π (s c + x)) := by
+  have key
+      : ∀ x : A, ∑' γ : Γ', f (c + ((γ : A') + π x)) = ∑' γ : Γ', f ((γ : A') + π (s c + x)) := by
     intro x
     refine tsum_congr fun γ => ?_
     rw [map_add (f := _), hs]
@@ -51,7 +61,8 @@ theorem periodized_invariant {π : A →+ A'} (hπ : Measurable π) {s : A' →+
   have hemb : MeasurableEmbedding (fun x : A => s c + x) :=
     (MeasurableEquiv.addLeft (s c)).measurableEmbedding
   rw [(measurePreserving_add_left lam (s c)).setLIntegral_comp_emb hemb
-    (fun x => ∑' γ : Γ', f ((γ : A') + π x)) 𝓖]
+    (fun x => ∑' γ : Γ', f ((γ : A') + π x))
+    𝓖]
   have hG' : IsAddFundamentalDomain Γ ((fun x : A => s c + x) '' 𝓖) lam := hG.vadd_of_comm (s c)
   refine hG'.setLIntegral_eq hG _ ?_
   intro g x
@@ -60,18 +71,21 @@ theorem periodized_invariant {π : A →+ A'} (hπ : Measurable π) {s : A' →+
   refine tsum_congr fun γ => ?_
   simp only [Equiv.coe_addRight, AddSubgroup.coe_add, map_add (f := _), add_assoc]
 
-instance {π : A →+ A'} {Γ' : AddSubgroup A'} [Countable Γ'] {lam : Measure A} [SFinite lam]
-    {𝓖 : Set A} : SFinite (periodized π Γ' lam 𝓖) := by
+instance
+    {π : A →+ A'} {Γ' : AddSubgroup A'} [Countable Γ'] {lam : Measure A} [SFinite lam] {𝓖 : Set A}
+    : SFinite (periodized π Γ' lam 𝓖) := by
   unfold periodized; infer_instance
 
-theorem measure_preimage_inter_eq {π : A →+ A'} (hπ : Measurable π) {s : A' →+ A}
-    (hs : ∀ x, π (s x) = x) {Γ : AddSubgroup A} {Γ' : AddSubgroup A'} [Countable Γ] [Countable Γ']
-    (hΓ : ∀ γ ∈ Γ, π γ ∈ Γ') {lam : Measure A} {lam' : Measure A'} [lam.IsAddHaarMeasure]
-    [lam'.IsAddHaarMeasure] {𝓖 : Set A} {𝓖' : Set A'}
-    (hG : IsAddFundamentalDomain Γ 𝓖 lam) (h1 : lam 𝓖 = 1)
+theorem measure_preimage_inter_eq
+    {π : A →+ A'} (hπ : Measurable π)
+    {s : A' →+ A} (hs : ∀ x, π (s x) = x)
+    {Γ : AddSubgroup A} {Γ' : AddSubgroup A'} [Countable Γ] [Countable Γ']
+    (hΓ : ∀ γ ∈ Γ, π γ ∈ Γ')
+    {lam : Measure A} {lam' : Measure A'} [lam.IsAddHaarMeasure] [lam'.IsAddHaarMeasure]
+    {𝓖 : Set A} {𝓖' : Set A'} (hG : IsAddFundamentalDomain Γ 𝓖 lam) (h1 : lam 𝓖 = 1)
     (hG' : IsAddFundamentalDomain Γ' 𝓖' lam') (h1' : lam' 𝓖' = 1)
-    {S : Set A'} (hS : MeasurableSet S) (hinv : ∀ γ ∈ Γ', ∀ x, γ + x ∈ S ↔ x ∈ S) :
-    lam (π ⁻¹' S ∩ 𝓖) = lam' (S ∩ 𝓖') := by
+    {S : Set A'} (hS : MeasurableSet S) (hinv : ∀ γ ∈ Γ', ∀ x, γ + x ∈ S ↔ x ∈ S)
+    : lam (π ⁻¹' S ∩ 𝓖) = lam' (S ∩ 𝓖') := by
   obtain ⟨P, hPdef⟩ : ∃ P, P = periodized π Γ' lam 𝓖 := ⟨_, rfl⟩
   obtain ⟨ν, hνdef⟩ : ∃ ν, ν = Measure.map π (lam.restrict 𝓖) := ⟨_, rfl⟩
   have hPsum : P = Measure.sum fun γ : Γ' => ν.map ((γ : A') + ·) := by rw [hPdef, hνdef]; rfl
@@ -93,8 +107,9 @@ theorem measure_preimage_inter_eq {π : A →+ A'} (hπ : Measurable π) {s : A'
   have hνac : ν ≪ lam' := by
     intro t ht
     exact le_antisymm ((Measure.le_iff'.1 hνP t).trans (hPac ht).le) zero_le
-  have claim : ∀ T : Set A', MeasurableSet T → (∀ γ ∈ Γ', ∀ x, γ + x ∈ T ↔ x ∈ T) →
-      lam (π ⁻¹' T ∩ 𝓖) = P (T ∩ M) := by
+  have claim
+      : ∀ T : Set A',
+        MeasurableSet T → (∀ γ ∈ Γ', ∀ x, γ + x ∈ T ↔ x ∈ T) → lam (π ⁻¹' T ∩ 𝓖) = P (T ∩ M) := by
     intro T hT hTinv
     have e1 : lam (π ⁻¹' T ∩ 𝓖) = ν T := by
       rw [hνdef, Measure.map_apply hπ hT, Measure.restrict_apply (hπ hT)]
@@ -122,16 +137,34 @@ theorem measure_preimage_inter_eq {π : A →+ A'} (hπ : Measurable π) {s : A'
       simp_rw [add_comm _ x]
       exact measure_preimage_add P x M
     simp_rw [hc]
-    rw [lintegral_const_mul (P M) (f := fun x => t.indicator 1 (-x))
-      ((measurable_one.indicator ht).comp measurable_neg),
+    rw [lintegral_const_mul (P M)
+        (f := fun x => t.indicator 1 (-x))
+        ((measurable_one.indicator ht).comp measurable_neg),
       lintegral_neg_eq_self (t.indicator 1), lintegral_indicator_one ht]
   have hU := claim Set.univ MeasurableSet.univ (fun _ _ _ => by simp)
   rw [Set.preimage_univ, Set.univ_inter, h1, Set.univ_inter] at hU
   rw [claim S hS hinv, hPt _ (hS.inter hMm), ← hU, one_mul]
   exact measure_congr (.inter .rfl hMae)
 
-theorem integral_comp_eq : ∀ {A A' : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [LocallyCompactSpace A] [T2Space A] [SecondCountableTopology A] [MeasurableSpace A] [BorelSpace A] [AddCommGroup A'] [TopologicalSpace A'] [IsTopologicalAddGroup A'] [LocallyCompactSpace A'] [T2Space A'] [SecondCountableTopology A'] [MeasurableSpace A'] [BorelSpace A'] (π : A →+ A') (s : A' →+ A), Continuous π → Continuous s → (∀ x, π (s x) = x) → ∀ (Γ : AddSubgroup A) (Γ' : AddSubgroup A'), Countable Γ → Countable Γ' → (∀ γ ∈ Γ, π γ ∈ Γ') → (∀ γ ∈ Γ', s γ ∈ Γ) → ∀ (lam : Measure A) (lam' : Measure A'), lam.IsAddHaarMeasure → lam'.IsAddHaarMeasure → ∀ (𝓖 : Set A) (𝓖' : Set A'), IsAddFundamentalDomain Γ 𝓖 lam → lam 𝓖 = 1 → IsAddFundamentalDomain Γ' 𝓖' lam' → lam' 𝓖' = 1 → ∀ G : A' → ℂ, Continuous G → (∀ γ ∈ Γ', ∀ x, G (γ + x) = G x) → ∫ x in 𝓖, G (π x) ∂lam = ∫ x in 𝓖', G x ∂lam' := by
-  intro A A' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ π s hπc _ hs Γ Γ' hΓc hΓ'c hΓ _ lam lam' hlam hlam' 𝓖 𝓖' hG h1 hG' h1' G hGc hGinv
+theorem integral_comp_eq
+    : ∀ {A A' : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A]
+        [LocallyCompactSpace A] [T2Space A] [SecondCountableTopology A] [MeasurableSpace A]
+        [BorelSpace A] [AddCommGroup A'] [TopologicalSpace A'] [IsTopologicalAddGroup A']
+        [LocallyCompactSpace A'] [T2Space A'] [SecondCountableTopology A'] [MeasurableSpace A']
+        [BorelSpace A'] (π : A →+ A') (s : A' →+ A),
+      Continuous π → Continuous s → (∀ x, π (s x) = x)
+        → ∀ (Γ : AddSubgroup A) (Γ' : AddSubgroup A'),
+          Countable Γ → Countable Γ' → (∀ γ ∈ Γ, π γ ∈ Γ') → (∀ γ ∈ Γ', s γ ∈ Γ)
+            → ∀ (lam : Measure A) (lam' : Measure A'),
+              lam.IsAddHaarMeasure → lam'.IsAddHaarMeasure
+                → ∀ (𝓖 : Set A) (𝓖' : Set A'),
+                  IsAddFundamentalDomain Γ 𝓖 lam → lam 𝓖 = 1 → IsAddFundamentalDomain Γ' 𝓖' lam'
+                    → lam' 𝓖' = 1
+                    → ∀ G : A' → ℂ,
+                      Continuous G → (∀ γ ∈ Γ', ∀ x, G (γ + x) = G x)
+                        → ∫ x in 𝓖, G (π x) ∂lam = ∫ x in 𝓖', G x ∂lam' := by
+  intro A A' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ π s hπc _ hs Γ Γ' hΓc hΓ'c hΓ _ lam lam' hlam hlam' 𝓖
+    𝓖' hG h1 hG' h1' G hGc hGinv
   have := hΓc
   have := hΓ'c
   have := hlam
@@ -145,10 +178,11 @@ theorem integral_comp_eq : ∀ {A A' : Type} [AddCommGroup A] [TopologicalSpace 
     rw [Measure.map_apply hGm hB, Measure.map_apply hGm hB, Measure.map_apply hπ (hGm hB),
       Measure.restrict_apply (hπ (hGm hB)), Measure.restrict_apply (hGm hB)]
     exact measure_preimage_inter_eq hπ hs hΓ hG h1 hG' h1' (hGm hB) hinvB
-  calc ∫ x in 𝓖, G (π x) ∂lam = ∫ y, G y ∂(Measure.map π (lam.restrict 𝓖)) :=
-        (integral_map hπ.aemeasurable hGc.aestronglyMeasurable).symm
+  calc
+    ∫ x in 𝓖, G (π x) ∂lam = ∫ y, G y ∂(Measure.map π (lam.restrict 𝓖)) :=
+      (integral_map hπ.aemeasurable hGc.aestronglyMeasurable).symm
     _ = ∫ z, z ∂(Measure.map G (Measure.map π (lam.restrict 𝓖))) :=
-        (integral_map hGm.aemeasurable aestronglyMeasurable_id).symm
+      (integral_map hGm.aemeasurable aestronglyMeasurable_id).symm
     _ = ∫ z, z ∂(Measure.map G (lam'.restrict 𝓖')) := by rw [key]
     _ = ∫ x in 𝓖', G x ∂lam' := integral_map hGm.aemeasurable aestronglyMeasurable_id
 

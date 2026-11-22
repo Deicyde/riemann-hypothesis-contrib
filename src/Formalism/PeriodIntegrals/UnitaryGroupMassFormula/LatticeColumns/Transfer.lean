@@ -11,18 +11,24 @@ noncomputable section
 
 namespace PIW.MassDataColumns
 
-open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge Formalism.L2.SG.TypedSets Formalism.L2.SG.Measures Formalism.L2.SG.Sub
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.PoincareInHH PI.MassDataKppVolLemmas
+open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
+  Formalism.L2.SG.TypedSets Formalism.L2.SG.Measures Formalism.L2.SG.Sub
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.PoincareInHH
+  PI.MassDataKppVolLemmas
 open scoped TensorProduct
 open Matrix
 
-theorem card_dc_congr {G G' : Type} [Group G] [Group G'] (φ : G ≃* G') (Γ K : Subgroup G) (Γ' K' : Subgroup G')
-    (hΓ : Γ.map φ.toMonoidHom = Γ') (hK : K.map φ.toMonoidHom = K') :
-    Nat.card (DoubleCoset.Quotient (Γ : Set G) (K : Set G)) =
-      Nat.card (DoubleCoset.Quotient (Γ' : Set G') (K' : Set G')) := by
+theorem card_dc_congr
+    {G G' : Type} [Group G] [Group G']
+    (φ : G ≃* G') (Γ K : Subgroup G) (Γ' K' : Subgroup G')
+    (hΓ : Γ.map φ.toMonoidHom = Γ') (hK : K.map φ.toMonoidHom = K')
+    : Nat.card (DoubleCoset.Quotient (Γ : Set G) (K : Set G))
+      = Nat.card (DoubleCoset.Quotient (Γ' : Set G') (K' : Set G')) := by
   classical
-  have himg : ∀ a : G, φ '' DoubleCoset.doubleCoset a (Γ : Set G) (K : Set G) =
-      DoubleCoset.doubleCoset (φ a) (Γ' : Set G') (K' : Set G') := by
+  have himg
+      : ∀ a : G,
+        φ '' DoubleCoset.doubleCoset a (Γ : Set G) (K : Set G)
+          = DoubleCoset.doubleCoset (φ a) (Γ' : Set G') (K' : Set G') := by
     intro a
     subst hΓ hK
     ext y
@@ -40,28 +46,37 @@ theorem card_dc_congr {G G' : Type} [Group G] [Group G'] (φ : G ≃* G') (Γ K 
   rw [← himg, ← himg]
   exact (Set.image_injective.2 φ.injective).eq_iff.symm
 
-def tfE (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) : I.Gf ≃* HA (Af I.F) I.cm.sig I.J :=
+def tfE (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I)
+    : I.Gf ≃* HA (Af I.F) I.cm.sig I.J :=
   MulEquiv.ofBijective (tfHom I hb) ⟨Bridge_tf_injective I hb, Bridge_tf_surjective I hb⟩
 
-theorem tfE_apply (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (x : I.Gf) : tfE I hb x = tf I hb x := rfl
+theorem tfE_apply (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (x : I.Gf)
+    : tfE I hb x = tf I hb x :=
+  rfl
 
-theorem ratV_eq_swap (I : Formalism.MainNotions.S.AutInst) (w : Fin I.n → I.E) :
-    ratV (F := I.F) (Af I.F) w = fun i => swapE I (Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) := by
+theorem ratV_eq_swap (I : Formalism.MainNotions.S.AutInst) (w : Fin I.n → I.E)
+    : ratV (F := I.F) (Af I.F) w
+      = fun i => swapE I (Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) := by
   funext i
   simp [ratV, swapE, Formalism.UG.inclE, inclR]
 
-theorem lin_tf_fix_iff (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (x : I.Gf) (w : Fin I.n → I.E) :
-    lin (Af I.F) I.cm.sig I.J (tf I hb x) (ratV (F := I.F) (Af I.F) w) = ratV (F := I.F) (Af I.F) w ↔
-      I.fmat x *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) =
-        (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) := by
+theorem lin_tf_fix_iff
+    (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (x : I.Gf) (w : Fin I.n → I.E)
+    : lin (Af I.F) I.cm.sig I.J (tf I hb x) (ratV (F := I.F) (Af I.F) w)
+        = ratV (F := I.F) (Af I.F) w
+      ↔ I.fmat x *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (w i))
+        = (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) := by
   have hm := Bridge_mat I hb x
   simp only [lin, Matrix.mulVecLin_apply]
   rw [hm, ratV_eq_swap]
-  have key : ∀ v : Fin I.n → I.E ⊗[I.F] Af I.F,
-      (I.fmat x).map (swapE I) *ᵥ (fun i => swapE I (v i)) = fun i => swapE I ((I.fmat x *ᵥ v) i) := by
+  have key
+      : ∀ v : Fin I.n → I.E ⊗[I.F] Af I.F,
+        (I.fmat x).map (swapE I) *ᵥ (fun i => swapE I (v i))
+          = fun i => swapE I ((I.fmat x *ᵥ v) i) := by
     intro v
     funext i
-    exact (RingHom.map_mulVec (swapE I : I.E ⊗[I.F] Af I.F →+* Af I.F ⊗[I.F] I.E) (I.fmat x) v i).symm
+    exact (RingHom.map_mulVec (swapE I : I.E ⊗[I.F] Af I.F →+* Af I.F ⊗[I.F] I.E) (I.fmat x) v
+      i).symm
   rw [key]
   constructor
   · intro h
@@ -70,8 +85,10 @@ theorem lin_tf_fix_iff (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I
   · intro h
     rw [h]
 
-theorem mem_Hfin_iff {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (x : X.B.I.Gf) :
-    x ∈ PoincareSetting.Hfin X u ↔ tf X.B.I hb x ∈ Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u) := by
+theorem mem_Hfin_iff
+    {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (x : X.B.I.Gf)
+    : x ∈ PoincareSetting.Hfin X u
+      ↔ tf X.B.I hb x ∈ Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u) := by
   unfold Hsub
   rw [mem_stabT]
   simp only [lin_tf_fix_iff]
@@ -102,9 +119,9 @@ theorem mem_Hfin_iff {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : 
       rw [tupH, Fin.append_left, F0, Fin.snoc_last] at this
       exact this
 
-theorem map_Hfin {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) :
-    (PoincareSetting.Hfin X u).map (tfE X.B.I hb).toMonoidHom =
-      Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u) := by
+theorem map_Hfin {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word)
+    : (PoincareSetting.Hfin X u).map (tfE X.B.I hb).toMonoidHom
+      = Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u) := by
   ext y
   rw [Subgroup.mem_map]
   constructor
@@ -114,23 +131,35 @@ theorem map_Hfin {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.wh
     obtain ⟨x, rfl⟩ := Bridge_tf_surjective X.B.I hb y
     exact ⟨x, (mem_Hfin_iff X hb u x).2 hy, rfl⟩
 
-def hE {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) :
-    ↥(PoincareSetting.Hfin X u) ≃* ↥(Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)) :=
-  ((tfE X.B.I hb).subgroupMap (PoincareSetting.Hfin X u)).trans (MulEquiv.subgroupCongr (map_Hfin X hb u))
+def hE {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word)
+    : ↥(PoincareSetting.Hfin X u) ≃* ↥(Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)) :=
+  ((tfE X.B.I hb).subgroupMap (PoincareSetting.Hfin X u)).trans
+    (MulEquiv.subgroupCongr (map_Hfin X hb u))
 
-theorem hE_val {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (h : PoincareSetting.Hfin X u) :
-    ((hE X hb u h : Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)) : HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J) =
-      tf X.B.I hb (h : X.B.I.Gf) := rfl
+theorem hE_val
+    {D : D7}
+    (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (h : PoincareSetting.Hfin X u)
+    : ((hE X hb u h : Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))
+        : HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J)
+      = tf X.B.I hb (h : X.B.I.Gf) :=
+  rfl
 
-theorem coe_K2Hg {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter) (u : D.what₂.Word) :
-    (unitaryLevelClosureSubgroup X hb u : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))) = Subtype.val ⁻¹' K2u X hb u := by
+theorem coe_K2Hg
+    {D : D7}
+    (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter) (u : D.what₂.Word)
+    : (unitaryLevelClosureSubgroup X hb u
+        : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)))
+      = Subtype.val ⁻¹' K2u X hb u := by
   unfold unitaryLevelClosureSubgroup
-  have : (Subtype.val ⁻¹' K2u X hb u : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))) =
-      (unitaryLevelIntersection X hb hK u : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))) := rfl
+  have : (Subtype.val ⁻¹' K2u X hb u : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)))
+      = (unitaryLevelIntersection X hb hK u
+        : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))) :=
+    rfl
   rw [this, Subgroup.closure_eq]
 
-theorem mem_conjugate_level_finite_iff {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (x : X.B.I.Gf) :
-    tf X.B.I hb x ∈ K2u X hb u ↔ (X.xu u)⁻¹ * x * X.xu u ∈ X.K2 := by
+theorem mem_conjugate_level_finite_iff
+    {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (x : X.B.I.Gf)
+    : tf X.B.I hb x ∈ K2u X hb u ↔ (X.xu u)⁻¹ * x * X.xu u ∈ X.K2 := by
   rw [mem_conjugate_level_iff]
   constructor
   · rintro ⟨k, hk, e⟩
@@ -142,18 +171,23 @@ theorem mem_conjugate_level_finite_iff {D : D7} (X : HidaSetting D) (hb : AdBrid
     simpa [mul_assoc] using hk
   · intro h
     refine ⟨_, h, ?_⟩
-    have : finHA X hb (X.xu u) * finHA X hb ((X.xu u)⁻¹ * x * X.xu u) * (finHA X hb (X.xu u))⁻¹ =
-        tfE X.B.I hb (X.xu u * ((X.xu u)⁻¹ * x * X.xu u) * (X.xu u)⁻¹) := by
+    have : finHA X hb (X.xu u) * finHA X hb ((X.xu u)⁻¹ * x * X.xu u) * (finHA X hb (X.xu u))⁻¹
+        = tfE X.B.I hb (X.xu u * ((X.xu u)⁻¹ * x * X.xu u) * (X.xu u)⁻¹) := by
       rw [map_mul, map_mul, map_inv]
       rfl
     rw [this]
     simp [mul_assoc, tfE_apply]
 
-theorem map_Ku {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter) (u : D.what₂.Word) :
-    (PoincareSetting.Ku X u hK).map (hE X hb u).toMonoidHom = unitaryLevelClosureSubgroup X hb u := by
+theorem map_Ku
+    {D : D7}
+    (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter) (u : D.what₂.Word)
+    : (PoincareSetting.Ku X u hK).map (hE X hb u).toMonoidHom
+      = unitaryLevelClosureSubgroup X hb u := by
   ext y
   rw [Subgroup.mem_map]
-  have hy : y ∈ unitaryLevelClosureSubgroup X hb u ↔ (y : HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J) ∈ K2u X hb u := by
+  have hy
+      : y ∈ unitaryLevelClosureSubgroup X hb u
+        ↔ (y : HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J) ∈ K2u X hb u := by
     rw [← SetLike.mem_coe, coe_K2Hg X hb hK u]
     rfl
   rw [hy]
@@ -167,9 +201,11 @@ theorem map_Ku {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.Lev
     rw [hE_val, mem_conjugate_level_finite_iff] at h2
     exact h2
 
-theorem fin_mat (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (γ : I.GA) :
-    ((HA.mat (Af I.F) I.cm.sig I.J ((splitA I.cm.sig I.J (toHA I hb γ)).2) : GL (Fin I.n) (Af I.F ⊗[I.F] I.E)) :
-      Matrix (Fin I.n) (Fin I.n) _) = (I.fmat γ.2).map (swapE I) := by
+theorem fin_mat (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (γ : I.GA)
+    : ((HA.mat (Af I.F) I.cm.sig I.J ((splitA I.cm.sig I.J (toHA I hb γ)).2)
+          : GL (Fin I.n) (Af I.F ⊗[I.F] I.E))
+        : Matrix (Fin I.n) (Fin I.n) _)
+      = (I.fmat γ.2).map (swapE I) := by
   have hB := (toHA_isBridge I hb γ).2
   rw [hB]
   ext i j
@@ -177,12 +213,17 @@ theorem fin_mat (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I) (γ :
   rw [← Bridge_tens_eq]
   rfl
 
-theorem inclR_comp_sig {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    (σ : E →ₐ[F] E) : (inclR (F := F) R).comp (σ : E →+* E) = (sigR R σ).comp (inclR (F := F) R) := by
+theorem inclR_comp_sig
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    : (inclR (F := F) R).comp (σ : E →+* E) = (sigR R σ).comp (inclR (F := F) R) := by
   exact RingHom.ext fun e => by simp [inclR, sigR]
 
-theorem map_iotaF {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (hGF : AdBridgeGF X.B.I) :
-    (PoincareSetting.iotaF X u).range.map (hE X hb u).toMonoidHom = GamHA X u := by
+theorem map_iotaF
+    {D : D7}
+    (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.what₂.Word) (hGF : AdBridgeGF X.B.I)
+    : (PoincareSetting.iotaF X u).range.map (hE X hb u).toMonoidHom = GamHA X u := by
   ext y
   rw [Subgroup.mem_map]
   constructor
@@ -196,12 +237,16 @@ theorem map_iotaF {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.w
     rw [Bridge_mat, hf, Matrix.map_map]
     congr 1
   · intro hy
-    have hy' : (HA.mat (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (y : HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J) :
-        GL (Fin X.B.I.n) _) ∈ HFin (Af X.B.I.F) X.B.I.cm.sig X.B.I.J := hy
+    have hy'
+        : (HA.mat (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (y : HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J)
+            : GL (Fin X.B.I.n) _)
+          ∈ HFin (Af X.B.I.F) X.B.I.cm.sig X.B.I.J :=
+      hy
     obtain ⟨M, hM, hMy⟩ := Subgroup.mem_map.1 hy'
-    let Hf : HA (AF X.B.I.F) X.B.I.cm.sig X.B.I.J :=
-      ⟨Formalism.UG.bc (inclR (F := X.B.I.F) (AF X.B.I.F)) M,
-        Formalism.UG.P.bc_mem _ _ _ (inclR_comp_sig (AF X.B.I.F) X.B.I.cm.sig) _ M hM⟩
+    let Hf : HA (AF X.B.I.F) X.B.I.cm.sig X.B.I.J := ⟨
+      Formalism.UG.bc (inclR (F := X.B.I.F) (AF X.B.I.F)) M,
+      Formalism.UG.P.bc_mem _ _ _ (inclR_comp_sig (AF X.B.I.F) X.B.I.cm.sig) _ M hM
+    ⟩
     have hrat : Hf ∈ ratHA X.B.I := ⟨M, hM, rfl⟩
     rw [← hGF (toHA X.B.I hb) (toHA_isBridge X.B.I hb)] at hrat
     obtain ⟨γ, hγ, hγe⟩ := hrat
@@ -224,20 +269,27 @@ theorem map_iotaF {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (u : D.w
         have := PIW.AdelClassFin.DictRing.nontrivial (F := X.B.I.F)
         apply Formalism.UG.P.inclE_injective X.B.I.F X.B.I.E (Af X.B.I.F)
         have h1 := congrFun h0 i
-        have h2 := RingHom.map_mulVec (Formalism.UG.inclE (F := X.B.I.F) (E := X.B.I.E) (Af X.B.I.F))
-          (M' : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) x i
+        have h2 :=
+          RingHom.map_mulVec (Formalism.UG.inclE (F := X.B.I.F) (E := X.B.I.E) (Af X.B.I.F))
+            (M' : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) x i
         exact h2.trans h1
       have hPP : X.B.I.P v * (X.B.I.P v)⁻¹ = 1 :=
         Matrix.mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).1 (X.B.I.P_unit v))
       rw [hinf v]
       simp only [rv]
-      rw [Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_assoc, hPP, Matrix.mul_one, ← Matrix.mulVec_mulVec]
+      rw [Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_assoc, hPP, Matrix.mul_one,
+        ← Matrix.mulVec_mulVec]
       congr 1
       funext i
-      have h3 := RingHom.map_mulVec (X.B.I.φ v) (M' : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) x i
+      have h3 :=
+        RingHom.map_mulVec (X.B.I.φ v) (M' : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) x i
       rw [hfix] at h3
       exact h3.symm
-    refine ⟨⟨γ.2, hγ2⟩, ⟨⟨γ, Subgroup.mem_inf.2 ⟨⟨M', hM', hinf, hfin⟩, Subgroup.mem_prod.2 ⟨hγ1, hγ2⟩⟩⟩, rfl⟩, ?_⟩
+    refine ⟨
+      ⟨γ.2, hγ2⟩,
+      ⟨⟨γ, Subgroup.mem_inf.2 ⟨⟨M', hM', hinf, hfin⟩, Subgroup.mem_prod.2 ⟨hγ1, hγ2⟩⟩⟩, rfl⟩,
+      ?_
+    ⟩
     apply Subtype.ext
     exact htf
 

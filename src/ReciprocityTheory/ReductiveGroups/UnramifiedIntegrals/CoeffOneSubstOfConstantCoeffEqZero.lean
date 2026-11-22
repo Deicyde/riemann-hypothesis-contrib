@@ -14,8 +14,8 @@ open PowerSeries Formalism.G Formalism.LT Formalism.L2.Th1.CM
 section Field
 variable {K : Type} [Field K] (g2 g3 : K)
 
-theorem coeff_one_subst_of_constantCoeff_eq_zero (f g : PowerSeries K) (hg : constantCoeff g = 0) :
-    coeff 1 (f.subst g) = coeff 1 f * coeff 1 g := by
+theorem coeff_one_subst_of_constantCoeff_eq_zero (f g : PowerSeries K) (hg : constantCoeff g = 0)
+    : coeff 1 (f.subst g) = coeff 1 f * coeff 1 g := by
   have hs : HasSubst g := HasSubst.of_constantCoeff_zero hg
   have hX : X ∣ g := X_dvd_iff.mpr hg
   rw [PowerSeries.coeff_subst' hs, finsum_eq_single _ 1]
@@ -43,8 +43,12 @@ theorem isUnit_coeff_one_weierstrassExp : IsUnit (coeff 1 (uSer g2 g3)) := by
   rw [uSer_coeff_one]
   exact isUnit_one
 
-theorem exists_rightInverse_weierstrassExp : ∃ t : PowerSeries K, constantCoeff t = 0 ∧ (uSer g2 g3).subst t = X := ⟨(uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3), PowerSeries.constantCoeff_substInvOfIsUnit _ _,
-  PowerSeries.subst_substInvOfIsUnit_right _ (uSer_const g2 g3) _⟩
+theorem exists_rightInverse_weierstrassExp
+    : ∃ t : PowerSeries K, constantCoeff t = 0 ∧ (uSer g2 g3).subst t = X := ⟨
+  (uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3),
+  PowerSeries.constantCoeff_substInvOfIsUnit _ _,
+  PowerSeries.subst_substInvOfIsUnit_right _ (uSer_const g2 g3) _
+⟩
 
 theorem lgS_const : constantCoeff (lgS g2 g3) = 0 := by
   unfold lgS
@@ -59,23 +63,28 @@ theorem lgS_coeff_one : coeff 1 (lgS g2 g3) = 1 := by
   rw [coeff_one_subst_of_constantCoeff_eq_zero _ _ (lgS_const g2 g3), uSer_coeff_one, one_mul] at h
   simpa using h
 
-theorem eq_substInv_of_rightInverse (t : PowerSeries K) (ht : constantCoeff t = 0)
-    (h : (uSer g2 g3).subst t = X) :
-    t = (uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3) := by
-  have h1 := PowerSeries.subst_comp_subst_apply (HasSubst.of_constantCoeff_zero (uSer_const g2 g3))
-    (HasSubst.of_constantCoeff_zero ht) ((uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3))
-  rw [PowerSeries.subst_substInvOfIsUnit_left _ (uSer_const g2 g3), PowerSeries.subst_X (HasSubst.of_constantCoeff_zero ht),
-    h, PowerSeries.X_subst] at h1
+theorem eq_substInv_of_rightInverse
+    (t : PowerSeries K) (ht : constantCoeff t = 0) (h : (uSer g2 g3).subst t = X)
+    : t = (uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3) := by
+  have h1 :=
+    PowerSeries.subst_comp_subst_apply (HasSubst.of_constantCoeff_zero (uSer_const g2 g3))
+      (HasSubst.of_constantCoeff_zero ht)
+      ((uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3))
+  rw [PowerSeries.subst_substInvOfIsUnit_left _ (uSer_const g2 g3),
+      PowerSeries.subst_X (HasSubst.of_constantCoeff_zero ht), h, PowerSeries.X_subst]
+    at h1
   exact h1
 
-theorem weierstrassLog_eq_substInv : lgS g2 g3 = (uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3) := eq_substInv_of_rightInverse g2 g3 (lgS g2 g3) (lgS_const g2 g3) (uSer_subst_lgS g2 g3)
+theorem weierstrassLog_eq_substInv
+    : lgS g2 g3 = (uSer g2 g3).substInvOfIsUnit (isUnit_coeff_one_weierstrassExp g2 g3) :=
+  eq_substInv_of_rightInverse g2 g3 (lgS g2 g3) (lgS_const g2 g3) (uSer_subst_lgS g2 g3)
 
 theorem lgS_subst_uSer : (lgS g2 g3).subst (uSer g2 g3) = X := by
   rw [weierstrassLog_eq_substInv]
   exact PowerSeries.subst_substInvOfIsUnit_left _ (uSer_const g2 g3) _
 
-theorem lgS_unique (t : PowerSeries K) (ht : constantCoeff t = 0) (h : (uSer g2 g3).subst t = X) :
-    t = lgS g2 g3 := by
+theorem lgS_unique (t : PowerSeries K) (ht : constantCoeff t = 0) (h : (uSer g2 g3).subst t = X)
+    : t = lgS g2 g3 := by
   exact (eq_substInv_of_rightInverse g2 g3 t ht h).trans (weierstrassLog_eq_substInv g2 g3).symm
 
 theorem constantCoeff_C_mul_weierstrassLog (b : K) : constantCoeff (C b * lgS g2 g3) = 0 := by
@@ -88,15 +97,17 @@ theorem mult_const (b : K) : constantCoeff ((uSer g2 g3).subst (C b * lgS g2 g3)
   · simp [uSer_const]
   · intro d hd
     simp [map_pow, hs, zero_pow hd]
-theorem mult_log (b : K) :
-    (lgS g2 g3).subst ((uSer g2 g3).subst (C b * lgS g2 g3)) = C b * lgS g2 g3 := by
+theorem mult_log (b : K)
+    : (lgS g2 g3).subst ((uSer g2 g3).subst (C b * lgS g2 g3)) = C b * lgS g2 g3 := by
   have hu := HasSubst.of_constantCoeff_zero (uSer_const g2 g3)
   have ha := HasSubst.of_constantCoeff_zero (constantCoeff_C_mul_weierstrassLog g2 g3 b)
   have h1 := PowerSeries.subst_comp_subst_apply hu ha (lgS g2 g3)
   rw [lgS_subst_uSer, PowerSeries.subst_X ha] at h1
   exact h1.symm
-theorem mult_unique (b : K) (e : PowerSeries K) (he : constantCoeff e = 0)
-    (h : (lgS g2 g3).subst e = C b * lgS g2 g3) : e = (uSer g2 g3).subst (C b * lgS g2 g3) := by
+theorem mult_unique
+    (b : K) (e : PowerSeries K)
+    (he : constantCoeff e = 0) (h : (lgS g2 g3).subst e = C b * lgS g2 g3)
+    : e = (uSer g2 g3).subst (C b * lgS g2 g3) := by
   have hl := HasSubst.of_constantCoeff_zero (lgS_const g2 g3)
   have hE := HasSubst.of_constantCoeff_zero he
   have h1 := PowerSeries.subst_comp_subst_apply hl hE (uSer g2 g3)
@@ -116,19 +127,24 @@ end Field
 section Map
 variable {K L : Type} [Field K] [Field L] (φ : K →+* L) (g2 g3 : K)
 
-theorem cW_unfold {K : Type} [Field K] (g2 g3 : K) (k : ℕ) : cW g2 g3 k =
-    if k = 2 then g2 / 20 else if k = 3 then g3 / 28 else
-    if 4 ≤ k then
-      3 / ((2 * (k : K) + 1) * ((k : K) - 3)) *
-        ∑ m : Fin (k - 3), cW g2 g3 (m.val + 2) * cW g2 g3 (k - (m.val + 2))
-    else 0 := by
+theorem cW_unfold {K : Type} [Field K] (g2 g3 : K) (k : ℕ)
+    : cW g2 g3 k
+      = if k = 2 then
+          g2 / 20
+        else if k = 3 then
+          g3 / 28
+        else if 4 ≤ k then
+          3 / ((2 * (k : K) + 1) * ((k : K) - 3))
+            * ∑ m : Fin (k - 3), cW g2 g3 (m.val + 2) * cW g2 g3 (k - (m.val + 2))
+        else
+          0 := by
   rw [cW]
   first
-    | (rw [Nat.strongRecOn_beta]; rfl)
-    | (rw [Nat.strongRecOn'_beta]; rfl)
-    | (rw [Nat.strongRecOn_eq]; rfl)
-    | (unfold Nat.strongRecOn; rw [Nat.strongRec_eq]; rfl)
-    | (exact (Nat.strongRecOn_beta' ..).trans rfl)
+  | (rw [Nat.strongRecOn_beta]; rfl)
+  | (rw [Nat.strongRecOn'_beta]; rfl)
+  | (rw [Nat.strongRecOn_eq]; rfl)
+  | (unfold Nat.strongRecOn; rw [Nat.strongRec_eq]; rfl)
+  | (exact (Nat.strongRecOn_beta' ..).trans rfl)
 
 theorem cW_map (k : ℕ) : φ (cW g2 g3 k) = cW (φ g2) (φ g3) k := by
   induction k using Nat.strong_induction_on with
@@ -142,7 +158,8 @@ theorem cW_map (k : ℕ) : φ (cW g2 g3 k) = cW (φ g2) (φ g3) k := by
       congr 1
       exact_mod_cast map_natCast φ 28
     · set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_mul, map_div₀, map_sum, map_ofNat, map_natCast, map_sub, map_add (f := _), map_one]
+        simp only [map_mul, map_div₀, map_sum, map_ofNat, map_natCast, map_sub, map_add (f := _),
+          map_one]
       congr 1
       refine Finset.sum_congr rfl fun m _ => ?_
       have hm := m.2
@@ -175,8 +192,8 @@ theorem uSer_map : PowerSeries.map φ (uSer g2 g3) = uSer (φ g2) (φ g3) := by
   unfold uSer
   rw [map_mul, map_mul, map_X, wpNum_map, h]
 
-theorem map_subst_ps {a : PowerSeries K} (ha : constantCoeff a = 0) (f : PowerSeries K) :
-    PowerSeries.map φ (f.subst a) = (PowerSeries.map φ f).subst (PowerSeries.map φ a) := by
+theorem map_subst_ps {a : PowerSeries K} (ha : constantCoeff a = 0) (f : PowerSeries K)
+    : PowerSeries.map φ (f.subst a) = (PowerSeries.map φ f).subst (PowerSeries.map φ a) := by
   erw [PowerSeries.map_subst (HasSubst.of_constantCoeff_zero ha)]
   try rfl
 
@@ -192,13 +209,14 @@ theorem ltLog_map (l : ℕ) : PowerSeries.map φ (ltLog K l) = ltLog L l := by
   rw [coeff_map, coeff_mk, coeff_mk]
   split_ifs <;> simp
 
-theorem mult_map (b : K) :
-    PowerSeries.map φ ((uSer g2 g3).subst (C b * lgS g2 g3))
+theorem mult_map (b : K)
+    : PowerSeries.map φ ((uSer g2 g3).subst (C b * lgS g2 g3))
       = (uSer (φ g2) (φ g3)).subst (C (φ b) * lgS (φ g2) (φ g3)) := by
-  rw [map_subst_ps φ (constantCoeff_C_mul_weierstrassLog g2 g3 b), uSer_map, map_mul, map_C, lgS_map]
+  rw [map_subst_ps φ (constantCoeff_C_mul_weierstrassLog g2 g3 b), uSer_map, map_mul, map_C,
+    lgS_map]
 
-theorem lt_map (l : ℕ) (hl : 2 ≤ l) (ε : K) :
-    PowerSeries.map φ ((uSer g2 g3).subst (C ε * ltLog K l))
+theorem lt_map (l : ℕ) (hl : 2 ≤ l) (ε : K)
+    : PowerSeries.map φ ((uSer g2 g3).subst (C ε * ltLog K l))
       = (uSer (φ g2) (φ g3)).subst (C (φ ε) * ltLog L l) := by
   have h0 : constantCoeff (C ε * ltLog K l) = 0 := by
     rw [map_mul, constantCoeff_C, ltLog_const l hl, mul_zero]
@@ -206,8 +224,8 @@ theorem lt_map (l : ℕ) (hl : 2 ≤ l) (ε : K) :
 
 end Map
 
-theorem omegaK_quad (d : ℕ) (hd : d % 4 = 3) :
-    omegaK d ^ 2 - omegaK d + (((d + 1) / 4 : ℕ) : ℂ) = 0 := by
+theorem omegaK_quad (d : ℕ) (hd : d % 4 = 3)
+    : omegaK d ^ 2 - omegaK d + (((d + 1) / 4 : ℕ) : ℂ) = 0 := by
   unfold omegaK
   have h4 : (((d + 1) / 4 : ℕ) : ℂ) = ((d : ℂ) + 1) / 4 := by
     have h : 4 ∣ d + 1 := by omega

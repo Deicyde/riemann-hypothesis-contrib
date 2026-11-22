@@ -6,26 +6,28 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.IW
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Filter
-  Metric
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Filter Metric
 open scoped ContDiff ENNReal Matrix
 
 noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-def bmul (a b : Frame X.Ψ r) : Frame X.Ψ r := fun τ => (mat a τ * mat b τ : Matrix (Fin r) (Fin r) ℂ)
+def bmul (a b : Frame X.Ψ r) : Frame X.Ψ r := fun τ =>
+  (mat a τ * mat b τ : Matrix (Fin r) (Fin r) ℂ)
 
 def binv (b : Frame X.Ψ r) : Frame X.Ψ r := fun τ => ((mat b τ)⁻¹ : Matrix (Fin r) (Fin r) ℂ)
 
 theorem rmul_rmul (x a b : Frame X.Ψ r) : rmul (rmul x a) b = rmul x (bmul X a b) := by
   funext τ
   first
-    | exact Matrix.mul_assoc (mat x τ) (mat a τ) (mat b τ)
-    | (ext i j; simp [rmul, bmul, mat, Matrix.mul_assoc])
+  | exact Matrix.mul_assoc (mat x τ) (mat a τ) (mat b τ)
+  | (ext i j; simp [rmul, bmul, mat, Matrix.mul_assoc])
 
-theorem bmul_mem {a b : Frame X.Ψ r} (ha : a ∈ Bor X.Ψ r) (hb : b ∈ Bor X.Ψ r) :
-    bmul X a b ∈ Bor X.Ψ r := by
+theorem bmul_mem {a b : Frame X.Ψ r} (ha : a ∈ Bor X.Ψ r) (hb : b ∈ Bor X.Ψ r)
+    : bmul X a b ∈ Bor X.Ψ r := by
   simp only [Bor, Set.mem_setOf_eq] at ha hb ⊢
   intro τ
   obtain ⟨ha1, ha2⟩ := ha τ
@@ -49,13 +51,14 @@ theorem binv_mem {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r) : binv X b ∈ Bor X
     intro i j h
     exact hb2 i j h
   haveI : Invertible (mat b τ) := Matrix.invertibleOfIsUnitDet _ (isUnit_iff_ne_zero.mpr hb1)
-  have hI : Matrix.BlockTriangular (mat b τ)⁻¹ id := Matrix.blockTriangular_inv_of_blockTriangular hB
+  have hI : Matrix.BlockTriangular (mat b τ)⁻¹ id :=
+    Matrix.blockTriangular_inv_of_blockTriangular hB
   refine ⟨?_, fun i j h => hI h⟩
   show ((mat b τ)⁻¹).det ≠ 0
   exact (Matrix.isUnit_nonsing_inv_det _ (isUnit_iff_ne_zero.mpr hb1)).ne_zero
 
-theorem rmul_binv (x : Frame X.Ψ r) {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r) :
-    rmul (rmul x b) (binv X b) = x := by
+theorem rmul_binv (x : Frame X.Ψ r) {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r)
+    : rmul (rmul x b) (binv X b) = x := by
   simp only [Bor, Set.mem_setOf_eq] at hb
   funext τ
   have h := isUnit_iff_ne_zero.mpr (hb τ).1
@@ -63,8 +66,8 @@ theorem rmul_binv (x : Frame X.Ψ r) {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r) 
   rw [Matrix.mul_nonsing_inv_cancel_right _ _ h]
   rfl
 
-theorem lact_rmul (γ : GL (Fin r) E) (x b : Frame X.Ψ r) :
-    lact γ (rmul x b) = rmul (lact γ x) b := by
+theorem lact_rmul (γ : GL (Fin r) E) (x b : Frame X.Ψ r)
+    : lact γ (rmul x b) = rmul (lact γ x) b := by
   funext τ
   exact (Matrix.mul_assoc ((γ : Matrix (Fin r) (Fin r) E).map τ.1) (mat x τ) (mat b τ)).symm
 
@@ -81,14 +84,15 @@ theorem lact_inv (γ : GL (Fin r) E) (x : Frame X.Ψ r) : lact γ⁻¹ (lact γ 
   rw [Units.val_one, Matrix.map_one _ (map_zero τ.1) (map_one τ.1), Matrix.one_mul]
   try rfl
 
-theorem avoid_base (Xa : ArchInM X) (Fl : FlatM X Xa) (j j' : Fin Fl.δ) {γ : GL (Fin r) E}
-    (hγ : γ ∈ X.Γ) (hne : γ ≠ 1 ∨ j' ≠ j) (x0 b0 : Frame X.Ψ r) (hb0 : b0 ∈ Bor X.Ψ r)
-    (hx : Fl.xs j = rmul x0 b0) (x1 b1 : Frame X.Ψ r) (hb1 : b1 ∈ Bor X.Ψ r)
-    (hy : lact γ (Fl.xs j') = rmul x1 b1) (ε : ℝ)
-    (hball : closedBall (0 : V (nd X)) (2 * ε) ⊆ OmF X x0)
+theorem avoid_base
+    (Xa : ArchInM X) (Fl : FlatM X Xa) (j j' : Fin Fl.δ)
+    {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) (hne : γ ≠ 1 ∨ j' ≠ j)
+    (x0 b0 : Frame X.Ψ r) (hb0 : b0 ∈ Bor X.Ψ r) (hx : Fl.xs j = rmul x0 b0)
+    (x1 b1 : Frame X.Ψ r) (hb1 : b1 ∈ Bor X.Ψ r) (hy : lact γ (Fl.xs j') = rmul x1 b1)
+    (ε : ℝ) (hball : closedBall (0 : V (nd X)) (2 * ε) ⊆ OmF X x0)
     (hiso : ∀ y ∈ closedBall (0 : V (nd X)) (2 * ε), (∀ k, Fl.s k (cpt X x0 y) = 0) → y = 0)
-    (hs1 : ∀ k, Fl.s k x1 = 0) :
-    ∀ z ∈ closedBall (0 : V (nd X)) (2 * ε), ∀ b ∈ Bor X.Ψ r, x1 ≠ rmul (cpt X x0 z) b := by
+    (hs1 : ∀ k, Fl.s k x1 = 0)
+    : ∀ z ∈ closedBall (0 : V (nd X)) (2 * ε), ∀ b ∈ Bor X.Ψ r, x1 ≠ rmul (cpt X x0 z) b := by
   intro z hz b hb h1
   have hbc : ∀ c ∈ Bor X.Ψ r, bchar Xa.L c ≠ 0 := by
     intro c hc

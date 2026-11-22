@@ -85,22 +85,27 @@ private lemma coeff_substX_lemma_2 (i : Fin 2) (f : PowerSeries k) (e : Fin 2 �
       simp
     simp only [hz, finsum_zero]
 
-theorem exp_biv :
-    PowerSeries.subst (X (0 : Fin 2) + X 1 : MvPowerSeries (Fin 2) k) (PowerSeries.exp k) =
-      PowerSeries.subst (X (0 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k) *
-        PowerSeries.subst (X (1 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k) := by
+theorem exp_biv
+    : PowerSeries.subst (X (0 : Fin 2) + X 1 : MvPowerSeries (Fin 2) k) (PowerSeries.exp k)
+      = PowerSeries.subst (X (0 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k)
+        * PowerSeries.subst (X (1 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k) := by
   ext e
   have hsum : PowerSeries.HasSubst (X 0 + X 1 : MvPowerSeries (Fin 2) k) :=
     PowerSeries.HasSubst.of_constantCoeff_zero (by simp)
-  have hL : coeff e (PowerSeries.subst (X (0 : Fin 2) + X 1 : MvPowerSeries (Fin 2) k) (PowerSeries.exp k)) =
-      PowerSeries.coeff (e 0 + e 1) (PowerSeries.exp k) * ((e 0 + e 1).choose (e 0) : k) := by
+  have hL
+      : coeff e
+          (PowerSeries.subst (X (0 : Fin 2) + X 1 : MvPowerSeries (Fin 2) k) (PowerSeries.exp k))
+        = PowerSeries.coeff (e 0 + e 1) (PowerSeries.exp k) * ((e 0 + e 1).choose (e 0) : k) := by
     rw [PowerSeries.coeff_subst hsum, finsum_eq_single _ (e 0 + e 1)]
     · rw [coeff_XX_pow_lemma, if_pos rfl, smul_eq_mul]
     · intro d hd
       rw [coeff_XX_pow_lemma, if_neg (fun h => hd h.symm), smul_zero]
-  have hR : coeff e (PowerSeries.subst (X (0 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k) *
-        PowerSeries.subst (X (1 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k)) =
-      PowerSeries.coeff (e 0) (PowerSeries.exp k) * PowerSeries.coeff (e 1) (PowerSeries.exp k) := by
+  have hR
+      : coeff e
+          (PowerSeries.subst (X (0 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k)
+            * PowerSeries.subst (X (1 : Fin 2) : MvPowerSeries (Fin 2) k) (PowerSeries.exp k))
+        = PowerSeries.coeff (e 0) (PowerSeries.exp k)
+          * PowerSeries.coeff (e 1) (PowerSeries.exp k) := by
     rw [coeff_mul, Finset.sum_eq_single (Finsupp.single 0 (e 0), Finsupp.single 1 (e 1))]
     · rw [coeff_substX_lemma_2, coeff_substX_lemma_2, if_pos (by simp), if_pos (by simp)]
       simp
@@ -142,34 +147,35 @@ theorem exp_biv :
   have hle : e 0 ≤ e 0 + e 1 := Nat.le_add_right _ _
   have h := Nat.choose_mul_factorial_mul_factorial hle
   rw [Nat.add_sub_cancel_left] at h
-  have h' : ((e 0 + e 1).choose (e 0) : ℚ) * ((e 0).factorial : ℚ) * ((e 1).factorial : ℚ) =
-      ((e 0 + e 1).factorial : ℚ) := by
+  have h'
+      : ((e 0 + e 1).choose (e 0) : ℚ) * ((e 0).factorial : ℚ) * ((e 1).factorial : ℚ)
+        = ((e 0 + e 1).factorial : ℚ) := by
     exact_mod_cast h
-  have hc : ((e 0 + e 1).choose (e 0) : ℚ) ≠ 0 := by
-    exact_mod_cast (Nat.choose_pos hle).ne'
-  have hf0 : ((e 0).factorial : ℚ) ≠ 0 := by
-    exact_mod_cast (Nat.factorial_pos _).ne'
-  have hf1 : ((e 1).factorial : ℚ) ≠ 0 := by
-    exact_mod_cast (Nat.factorial_pos _).ne'
+  have hc : ((e 0 + e 1).choose (e 0) : ℚ) ≠ 0 := by exact_mod_cast (Nat.choose_pos hle).ne'
+  have hf0 : ((e 0).factorial : ℚ) ≠ 0 := by exact_mod_cast (Nat.factorial_pos _).ne'
+  have hf1 : ((e 1).factorial : ℚ) ≠ 0 := by exact_mod_cast (Nat.factorial_pos _).ne'
   rw [← h']
   field_simp
 
-theorem psubst_comp {τ υ : Type} (b : τ → MvPowerSeries υ k) (hb : HasSubst b)
-    (a : MvPowerSeries τ k) (ha : constantCoeff a = 0) (f : PowerSeries k) :
-    subst b (PowerSeries.subst a f) = PowerSeries.subst (subst b a) f := by
+theorem psubst_comp
+    {τ υ : Type}
+    (b : τ → MvPowerSeries υ k) (hb : HasSubst b) (a : MvPowerSeries τ k) (ha : constantCoeff a = 0)
+    (f : PowerSeries k)
+    : subst b (PowerSeries.subst a f) = PowerSeries.subst (subst b a) f := by
   have ha' : HasSubst (fun _ : Unit => a) := hasSubst_of_constantCoeff_zero (fun _ => ha)
   simp only [PowerSeries.subst]
   rw [subst_comp_subst_apply ha' hb]
 
-theorem expS_add {τ : Type} (x y : MvPowerSeries τ k) (hx : constantCoeff x = 0)
-    (hy : constantCoeff y = 0) :
-    PowerSeries.subst (x + y) (PowerSeries.exp k) =
-      PowerSeries.subst x (PowerSeries.exp k) * PowerSeries.subst y (PowerSeries.exp k) := by
+theorem expS_add
+    {τ : Type} (x y : MvPowerSeries τ k) (hx : constantCoeff x = 0) (hy : constantCoeff y = 0)
+    : PowerSeries.subst (x + y) (PowerSeries.exp k)
+      = PowerSeries.subst x (PowerSeries.exp k) * PowerSeries.subst y (PowerSeries.exp k) := by
   have hb : HasSubst (![x, y] : Fin 2 → MvPowerSeries τ k) :=
     hasSubst_of_constantCoeff_zero (fun s => by fin_cases s <;> simp [hx, hy])
   have h := congrArg (subst (![x, y] : Fin 2 → MvPowerSeries τ k)) (exp_biv (k := k))
   rw [psubst_comp _ hb (X 0 + X 1) (by simp), subst_mul hb, psubst_comp _ hb (X 0) (by simp),
-    psubst_comp _ hb (X 1) (by simp)] at h
+      psubst_comp _ hb (X 1) (by simp)]
+    at h
   simpa [subst_add hb, subst_X hb] using h
 
 end Formalism.MainNotions.ModuliIntegralCharts.H1.PartialDerivativeExponent

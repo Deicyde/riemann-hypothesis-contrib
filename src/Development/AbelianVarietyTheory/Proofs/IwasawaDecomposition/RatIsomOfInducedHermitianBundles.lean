@@ -13,19 +13,24 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjVar GlobalTheory.TrueGeo Formalism.BasicNotions
+open CategoryTheory AlgebraicGeometry TopologicalSpace NumberField IsDedekindDomain
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts
+  GlobalTheory.ProjVar GlobalTheory.TrueGeo Formalism.BasicNotions
 
 namespace GlobalTheory.TrueGeo.InducedIsom
 
 open OfModel
 
-theorem isRatSec_lift {X Z : Scheme.{0}} [IsIntegral X] [IsIntegral Z] (j : Z ⟶ X)
-    (ρ : X.functionField ≃+* Z.functionField)
+theorem isRatSec_lift
+    {X Z : Scheme.{0}} [IsIntegral X] [IsIntegral Z]
+    (j : Z ⟶ X) (ρ : X.functionField ≃+* Z.functionField)
     (hρ : ∀ (U : X.Opens) (hU : genericPoint X ∈ U) (hU' : genericPoint Z ∈ j ⁻¹ᵁ U) (s : Γ(X, U)),
       ρ (fnOf U hU s) = fnOf (j ⁻¹ᵁ U) hU' (j.app U s))
-    (hj : j (genericPoint Z) = genericPoint X) (B : LB X) {r : (B.pull j).ι → Z.functionFieldˣ}
-    (hr : IsRatSec (B.pull j) r) :
-    IsRatSec B fun i => Units.map ρ.symm.toMonoidHom (r fun _ => i) := by
+    (hj : j (genericPoint Z) = genericPoint X)
+    (B : LB X)
+    {r : (B.pull j).ι → Z.functionFieldˣ} (hr : IsRatSec (B.pull j) r)
+    : IsRatSec B fun i => Units.map ρ.symm.toMonoidHom (r fun _ => i) := by
   intro i i' h
   have h' : genericPoint Z ∈ j ⁻¹ᵁ (B.U i ⊓ B.U i') := by
     change j (genericPoint Z) ∈ B.U i ⊓ B.U i'

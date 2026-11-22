@@ -24,9 +24,10 @@ theorem redPts_of : RedPts := by
     intro q1 q2 hq
     have hm := (h _ _).1 hq
     have e := (Submodule.Quotient.eq C).2 hm
-    simpa [Submodule.mkQ_apply, hs q1, hs q2] using
-      (show C.mkQ (s q1) = C.mkQ (s q2) from e)
-  have himg : ∀ E : Submodule k H, ρ '' (E : Set H) = g '' ((Submodule.map C.mkQ E : Submodule k (H ⧸ C)) : Set (H ⧸ C)) := by
+    simpa [Submodule.mkQ_apply, hs q1, hs q2] using (show C.mkQ (s q1) = C.mkQ (s q2) from e)
+  have himg
+      : ∀ E : Submodule k H,
+        ρ '' (E : Set H) = g '' ((Submodule.map C.mkQ E : Submodule k (H ⧸ C)) : Set (H ⧸ C)) := by
     intro E
     rw [Submodule.map_coe, Set.image_image]
     exact Set.image_congr (fun a _ => hg a)

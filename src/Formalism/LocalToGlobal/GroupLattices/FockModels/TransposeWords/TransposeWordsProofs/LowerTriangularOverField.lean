@@ -14,7 +14,8 @@ open Formalism.GradedWeylDivisibility
 
 open scoped MonomialOrder
 
-theorem lowerTri_of_interlaced {r n : ℕ} {m : Fin r × Fin n →₀ ℕ} (h : Interlaced m) : LowerTri m := by
+theorem lowerTri_of_interlaced {r n : ℕ} {m : Fin r × Fin n →₀ ℕ} (h : Interlaced m)
+    : LowerTri m := by
   suffices key : ∀ (k : ℕ) (s : Fin n), s.val = k → ∀ a : Fin r, a.val < s.val → m (a, s) = 0 from
     fun a s has => key s.val s rfl a has
   intro k
@@ -34,7 +35,9 @@ theorem lowerTri_of_interlaced {r n : ℕ} {m : Fin r × Fin n →₀ ℕ} (h : 
       exact ih ⟨k, hk⟩ rfl b (by show b.val < k; omega)
     rw [h2, zero_add] at h1
     have h3 : m (a, s) ≤ ∑ b : Fin r with b ≤ a, m (b, s) :=
-      Finset.single_le_sum (f := fun b => m (b, s)) (fun _ _ => Nat.zero_le _)
+      Finset.single_le_sum
+        (f := fun b => m (b, s))
+        (fun _ _ => Nat.zero_le _)
         (Finset.mem_filter.mpr ⟨Finset.mem_univ a, le_rfl⟩)
     omega
 
@@ -43,9 +46,12 @@ theorem lower_triangular_over_field : LowerTriK := by
   have hlead : ∀ f ∈ dualWeyl K r n ν, f ≠ 0 → LowerTri ((colLex r n).degree f) := fun f hf hf0 =>
     lowerTri_of_interlaced (leadInterlaced K r n ν f hf hf0)
   refine ⟨?_, ?_⟩
-  · suffices key : ∀ d : (colLex r n).syn, ∀ f ∈ dualWeyl K r n ν,
-        (∀ e : Fin r × Fin n →₀ ℕ, LowerTri e → AddMonoidAlgebra.coeff f e ∈ Set.range (algebraMap O K)) →
-        (colLex r n).toSyn ((colLex r n).degree f) = d → f ∈ (dualWeyl O r n ν).map (toK O K) by
+  · suffices key
+        : ∀ d : (colLex r n).syn, ∀ f ∈ dualWeyl K r n ν,
+          (∀ e : Fin r × Fin n →₀ ℕ,
+              LowerTri e → AddMonoidAlgebra.coeff f e ∈ Set.range (algebraMap O K))
+            → (colLex r n).toSyn ((colLex r n).degree f) = d
+            → f ∈ (dualWeyl O r n ν).map (toK O K) by
       intro h
       exact key _ Q hQ h rfl
     intro d
@@ -72,26 +78,33 @@ theorem lower_triangular_over_field : LowerTriK := by
         ldlat_map_bidet (algebraMap O K) sz hsz I
       obtain ⟨c, hc⟩ := hco m (lowerTri_of_interlaced hint)
       have hc' : (colLex r n).leadingCoeff f = algebraMap O K c := hc.symm
-      have hcb : (colLex r n).leadingCoeff f • bideterminant K sz hsz I = toK O K (c • bideterminant O sz hsz I) := by
+      have hcb
+          : (colLex r n).leadingCoeff f • bideterminant K sz hsz I
+            = toK O K (c • bideterminant O sz hsz I) := by
         rw [map_smul, hmap, hc', algebraMap_smul]
-      have hcbmem : (colLex r n).leadingCoeff f • bideterminant K sz hsz I ∈ (dualWeyl O r n ν).map (toK O K) := by
+      have hcbmem
+          : (colLex r n).leadingCoeff f • bideterminant K sz hsz I
+            ∈ (dualWeyl O r n ν).map (toK O K) := by
         rw [hcb]
         exact Submodule.mem_map_of_mem (Submodule.smul_mem _ _ hbO)
       set f' := f - (colLex r n).leadingCoeff f • bideterminant K sz hsz I with hf'
-      have hf'mem : f' ∈ dualWeyl K r n ν :=
-        Submodule.sub_mem _ hf (Submodule.smul_mem _ _ hbK)
+      have hf'mem : f' ∈ dualWeyl K r n ν := Submodule.sub_mem _ hf (Submodule.smul_mem _ _ hbK)
       have hdecomp : f = f' + (colLex r n).leadingCoeff f • bideterminant K sz hsz I := by
         rw [hf']; abel
       rw [hdecomp]
       refine Submodule.add_mem _ ?_ hcbmem
       by_cases h0 : f' = 0
       · rw [h0]; exact Submodule.zero_mem _
-      have hlt := lcassem_sub_lt (colLex r n) (f := f) (g := bideterminant K sz hsz I) (hbdeg.trans hexp) hblc h0
+      have hlt :=
+        lcassem_sub_lt (colLex r n) (f := f) (g := bideterminant K sz hsz I) (hbdeg.trans hexp) hblc
+          h0
       refine ih _ (hd ▸ hlt) f' hf'mem ?_ rfl
       intro e he
       obtain ⟨x, hx⟩ := hco e he
       refine ⟨x - AddMonoidAlgebra.coeff (c • bideterminant O sz hsz I) e, ?_⟩
-      have hce : AddMonoidAlgebra.coeff (toK O K (c • bideterminant O sz hsz I)) e = algebraMap O K (AddMonoidAlgebra.coeff (c • bideterminant O sz hsz I) e) :=
+      have hce
+          : AddMonoidAlgebra.coeff (toK O K (c • bideterminant O sz hsz I)) e
+            = algebraMap O K (AddMonoidAlgebra.coeff (c • bideterminant O sz hsz I) e) :=
         coeff_map (algebraMap O K) _ e
       rw [hf', coeff_sub, hcb, map_sub, hx, hce]
   · intro h

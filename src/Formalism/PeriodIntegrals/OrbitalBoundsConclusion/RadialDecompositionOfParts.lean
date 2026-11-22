@@ -4,4 +4,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.QuadraticFormTwo
 
 @[expose] public section
 
-theorem radial_decomposition_of_parts : Formalism.FourierDecayAlt.Q.RadialDecompositionOfParts := Formalism.FourierDecayAlt.Q.LieAlgebraWeightVectors.radial_decomposition_of_parts'
+theorem radial_decomposition_of_parts : Formalism.FourierDecayAlt.Q.RadialDecompositionOfParts :=
+  Formalism.FourierDecayAlt.Q.LieAlgebraWeightVectors.radial_decomposition_of_parts'

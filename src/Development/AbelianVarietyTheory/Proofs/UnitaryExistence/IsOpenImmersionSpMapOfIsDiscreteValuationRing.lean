@@ -14,12 +14,14 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
 
 namespace GlobalTheory
 
-theorem isOpenImmersion_spMap_of_isDiscreteValuationRing (T K : Type) [CommRing T] [IsDomain T]
-    [IsDiscreteValuationRing T] [Field K] [Algebra T K] [IsFractionRing T K] :
-    IsOpenImmersion (spMap (algebraMap T K)) := by
+theorem isOpenImmersion_spMap_of_isDiscreteValuationRing
+    (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K]
+    [IsFractionRing T K]
+    : IsOpenImmersion (spMap (algebraMap T K)) := by
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible T
   have : IsLocalization.Away π K := by
-    refine IsLocalization.Away.mk π (IsUnit.mk0 _ (by simpa using hπ.ne_zero)) (fun s => ?_)
+    refine IsLocalization.Away.mk π (IsUnit.mk0 _ (by simpa using hπ.ne_zero))
+      (fun s => ?_)
       (fun a b hab => ⟨0, by simpa using IsFractionRing.injective T K hab⟩)
     obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := T) s
     obtain ⟨n, v, rfl⟩ :=
@@ -31,9 +33,10 @@ theorem isOpenImmersion_spMap_of_isDiscreteValuationRing (T K : Type) [CommRing 
     field_simp
   exact IsOpenImmersion.of_isLocalization π
 
-theorem isIntegral_of_flat_of_isIntegral_genericFibre (T K : Type) [CommRing T] [IsDomain T]
-    [Field K] [Algebra T K] [IsFractionRing T K] {X : Scheme.{0}} (f : X ⟶ Sp T) [Flat f]
-    [IsIntegral (pullback f (spMap (algebraMap T K)))] : IsIntegral X := by
+theorem isIntegral_of_flat_of_isIntegral_genericFibre
+    (T K : Type) [CommRing T] [IsDomain T] [Field K] [Algebra T K] [IsFractionRing T K]
+    {X : Scheme.{0}} (f : X ⟶ Sp T) [Flat f] [IsIntegral (pullback f (spMap (algebraMap T K)))]
+    : IsIntegral X := by
   have := isDominant_spMap_of_isFractionRing T K
   have := IsSchemeTheoreticallyDominant.of_isDominant (spMap (algebraMap T K))
   let g := pullback.fst f (spMap (algebraMap T K))
@@ -46,12 +49,13 @@ theorem isIntegral_of_flat_of_isIntegral_genericFibre (T K : Type) [CommRing T] 
   have : IrreducibleSpace X := (irreducibleSpace_def X).mpr h
   exact isIntegral_of_irreducibleSpace_of_isReduced X
 
-theorem isIso_of_quasiFinite_of_isIso_genericFibre_dvr :
-    ∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K]
-      [IsFractionRing T K] (Ga G : Over (Sp T)) [GrpObj Ga] [GrpObj G] (p : Ga ⟶ G), IsMonHom p →
-      Flat Ga.hom → IsSeparated p.left → LocallyOfFiniteType p.left → QuasiCompact p.left →
-      LocallyQuasiFinite p.left → Smooth G.hom → GeometricallyConnected G.hom →
-      IsIso ((Over.pullback (spMap (algebraMap T K))).map p) → IsIso p := by
+theorem isIso_of_quasiFinite_of_isIso_genericFibre_dvr
+    : ∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K]
+        [IsFractionRing T K] (Ga G : Over (Sp T)) [GrpObj Ga] [GrpObj G] (p : Ga ⟶ G),
+      IsMonHom p → Flat Ga.hom → IsSeparated p.left → LocallyOfFiniteType p.left
+        → QuasiCompact p.left → LocallyQuasiFinite p.left → Smooth G.hom
+        → GeometricallyConnected G.hom → IsIso ((Over.pullback (spMap (algebraMap T K))).map p)
+        → IsIso p := by
   intro T K _ _ _ _ _ _ Ga G _ _ p _ _ _ _ _ _ _ _ _
   let t := spMap (algebraMap T K)
   have : IsOpenImmersion t := isOpenImmersion_spMap_of_isDiscreteValuationRing T K
@@ -71,7 +75,8 @@ theorem isIso_of_quasiFinite_of_isIso_genericFibre_dvr :
     rw [← j.isoOpensRange_inv_comp, Category.assoc, ← e]
     infer_instance
   have : IsOpenImmersion p.left :=
-    isOpenImmersion_of_quasiFinite_of_isOpenImmersion_restrict p.left (fun y ↦ (hN y).2)
+    isOpenImmersion_of_quasiFinite_of_isOpenImmersion_restrict p.left
+      (fun y ↦ (hN y).2)
       j.opensRange ⟨⟨j (Classical.arbitrary _), _, rfl⟩⟩
   exact isIso_of_isOpenImmersion_of_geometricallyConnected _ Ga G p ‹_› ‹_› inferInstance ‹_›
 

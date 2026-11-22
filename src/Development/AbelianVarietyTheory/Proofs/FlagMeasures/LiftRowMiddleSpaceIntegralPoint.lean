@@ -13,18 +13,19 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Disjoi
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN
 open scoped TensorProduct ENNReal nonZeroDivisors
 
 namespace GlobalTheory.SnMass.VolN.RowLift
 
-theorem Hpk_mulVec_eI (k r : ℕ) (a : Fin r) (y : Fin (2 * r + k + 1) → ℂ) :
-    (Hpk k r *ᵥ y) (eI k r a) = y (esI k r a) := by
+theorem Hpk_mulVec_eI (k r : ℕ) (a : Fin r) (y : Fin (2 * r + k + 1) → ℂ)
+    : (Hpk k r *ᵥ y) (eI k r a) = y (esI k r a) := by
   have ha := a.isLt
   have h : ∀ j, Hpk k r (eI k r a) j = if j = esI k r a then 1 else 0 := by
     intro j
-    have hj : j = esI k r a ↔ j.val = 2 * r + k - a.val := by
-      rw [Fin.ext_iff]; rfl
+    have hj : j = esI k r a ↔ j.val = 2 * r + k - a.val := by rw [Fin.ext_iff]; rfl
     simp only [Hpk, eI, hj, Fin.ext_iff]
     split_ifs <;> first | rfl | omega
   simp [Matrix.mulVec, dotProduct, h]
@@ -33,8 +34,8 @@ theorem Hpk_symm (k r : ℕ) (i j : Fin (2 * r + k + 1)) : Hpk k r i j = Hpk k r
   simp only [Hpk, Fin.ext_iff]
   split_ifs <;> first | rfl | omega
 
-theorem herm_bvec_eI (k r : ℕ) (c : Fin r) (v : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (bvec (eI k r c)) v = star (v (esI k r c)) := by
+theorem herm_bvec_eI (k r : ℕ) (c : Fin r) (v : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (bvec (eI k r c)) v = star (v (esI k r c)) := by
   have h : Hpk k r *ᵥ bvec (eI k r c) = bvec (esI k r c) := by
     funext i
     have h1 : (Hpk k r *ᵥ bvec (eI k r c)) i = Hpk k r i (eI k r c) := by
@@ -47,8 +48,8 @@ theorem herm_bvec_eI (k r : ℕ) (c : Fin r) (v : Fin (2 * r + k + 1) → ℂ) :
   rw [herm, h]
   simp [bvec, dotProduct, Pi.single_apply]
 
-theorem herm_bvec_esI (k r : ℕ) (c : Fin r) (v : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (bvec (esI k r c)) v = star (v (eI k r c)) := by
+theorem herm_bvec_esI (k r : ℕ) (c : Fin r) (v : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (bvec (esI k r c)) v = star (v (eI k r c)) := by
   have h : Hpk k r *ᵥ bvec (esI k r c) = bvec (eI k r c) := by
     funext i
     have h1 : (Hpk k r *ᵥ bvec (esI k r c)) i = Hpk k r i (esI k r c) := by
@@ -65,29 +66,37 @@ section Place
 
 variable {E : Type} [Field E]
 
-theorem pair_isom {k r : ℕ} (σ : E →+* E) (τ : E →+* ℂ) (hτ : ∀ x, τ (σ x) = star (τ x))
+theorem pair_isom
+    {k r : ℕ}
+    (σ : E →+* E) (τ : E →+* ℂ) (hτ : ∀ x, τ (σ x) = star (τ x))
     (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
     (B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hB : Bᴴ * Hpk k r * B = J.map τ)
-    (x x' : Fin (2 * r + k + 1) → E) :
-    star (B *ᵥ fun i => τ (x' i)) ⬝ᵥ (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i))) = τ (form σ J x x') := by
+    (x x' : Fin (2 * r + k + 1) → E)
+    : star (B *ᵥ fun i => τ (x' i)) ⬝ᵥ (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i)))
+      = τ (form σ J x x') := by
   have hJg : J.map τ *ᵥ (fun i => τ (x i)) = fun i => τ ((J *ᵥ x) i) := by
     funext i
     exact (RingHom.map_mulVec τ J x i).symm
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hB, hJg]
+  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
+    hB, hJg]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [form, dotProduct, map_sum, map_mul, hτ, Pi.star_apply]
+  simp only [form, dotProduct, map_sum, map_mul, hτ, Pi.star_apply]
 
-theorem coord_zero {k r : ℕ} (σ : E →+* E) (τ : E →+* ℂ) (hτ : ∀ x, τ (σ x) = star (τ x))
+theorem coord_zero
+    {k r : ℕ}
+    (σ : E →+* E) (τ : E →+* ℂ) (hτ : ∀ x, τ (σ x) = star (τ x))
     (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
     (B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (hB : Bᴴ * Hpk k r * B = J.map τ)
-    (x x' : Fin (2 * r + k + 1) → E) (h0 : form σ J x x' = 0) (c : ℝ) (hc : c ≠ 0)
-    (j : Fin (2 * r + k + 1)) (hx' : (B *ᵥ fun i => τ (x' i)) = (c : ℂ) • bvec j) :
-    (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i))) j = 0 := by
+    (x x' : Fin (2 * r + k + 1) → E) (h0 : form σ J x x' = 0)
+    (c : ℝ) (hc : c ≠ 0)
+    (j : Fin (2 * r + k + 1)) (hx' : (B *ᵥ fun i => τ (x' i)) = (c : ℂ) • bvec j)
+    : (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i))) j = 0 := by
   have h := pair_isom σ τ hτ J B hB x x'
   rw [h0, map_zero, hx'] at h
   have hcC : (c : ℂ) ≠ 0 := by exact_mod_cast hc
-  have h1 : star ((c : ℂ) • bvec j) ⬝ᵥ (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i))) =
-      (c : ℂ) * (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i))) j := by
+  have h1
+      : star ((c : ℂ) • bvec j) ⬝ᵥ (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i)))
+        = (c : ℂ) * (Hpk k r *ᵥ (B *ᵥ fun i => τ (x i))) j := by
     simp [bvec, dotProduct, Pi.single_apply, apply_ite]
   rw [h1] at h
   exact (mul_eq_zero.1 h).resolve_left hcC
@@ -96,10 +105,11 @@ end Place
 
 section Trace
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem exists_add_conj_eq_one (h : IsCMExt F E σ) (hu : Algebra.FormallyUnramified (𝓞 F) (𝓞 E)) :
-    ∃ θ : 𝓞 E, (θ : E) + σ (θ : E) = 1 := by
+theorem exists_add_conj_eq_one (h : IsCMExt F E σ) (hu : Algebra.FormallyUnramified (𝓞 F) (𝓞 E))
+    : ∃ θ : 𝓞 E, (θ : E) + σ (θ : E) = 1 := by
   have h1 : differentIdeal (𝓞 F) (𝓞 E) = ⊤ :=
     (GlobalTheory.formallyUnramified_ringOfIntegers_iff_differentIdeal_eq_top F E).1 hu
   have hdual : FractionalIdeal.dual (𝓞 F) F (1 : FractionalIdeal (𝓞 E)⁰ E) = 1 := by
@@ -113,7 +123,8 @@ theorem exists_add_conj_eq_one (h : IsCMExt F E σ) (hu : Algebra.FormallyUnrami
     have : Algebra.intTrace (𝓞 F) (𝓞 E) 1 ∈ I := ⟨1, rfl⟩
     rw [hb, Ideal.mem_bot] at this
     have h2 := Algebra.algebraMap_intTrace (A := 𝓞 F) (K := F) (L := E) (B := 𝓞 E) 1
-    rw [this, map_zero, map_one, ← map_one (algebraMap F E), Algebra.trace_algebraMap, h.2.2.1] at h2
+    rw [this, map_zero, map_one, ← map_one (algebraMap F E), Algebra.trace_algebraMap, h.2.2.1]
+      at h2
     norm_num at h2
   have hinv : (I : FractionalIdeal (𝓞 F)⁰ F)⁻¹ ≤ 1 := by
     intro a ha
@@ -125,8 +136,9 @@ theorem exists_add_conj_eq_one (h : IsCMExt F E σ) (hu : Algebra.FormallyUnrami
       obtain ⟨z, rfl⟩ := hb
       rw [Algebra.traceForm_apply, ← Algebra.smul_def, map_smul, smul_eq_mul,
         ← Algebra.algebraMap_intTrace (A := 𝓞 F)]
-      have := ha (algebraMap (𝓞 F) F (Algebra.intTrace (𝓞 F) (𝓞 E) z))
-        ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, ⟨z, rfl⟩, rfl⟩)
+      have :=
+        ha (algebraMap (𝓞 F) F (Algebra.intTrace (𝓞 F) (𝓞 E) z))
+          ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, ⟨z, rfl⟩, rfl⟩)
       rw [FractionalIdeal.mem_one_iff] at this
       exact this
     rw [hdual, FractionalIdeal.mem_one_iff] at hmem
@@ -137,8 +149,9 @@ theorem exists_add_conj_eq_one (h : IsCMExt F E σ) (hu : Algebra.FormallyUnrami
     rw [FractionalIdeal.mem_one_iff]
     exact ⟨⟨a, hint⟩, rfl⟩
   have hone : (1 : FractionalIdeal (𝓞 F)⁰ F) ≤ I := by
-    calc (1 : FractionalIdeal (𝓞 F)⁰ F) = I * (I : FractionalIdeal (𝓞 F)⁰ F)⁻¹ :=
-          (mul_inv_cancel₀ hI0).symm
+    calc
+      (1 : FractionalIdeal (𝓞 F)⁰ F)
+        = I * (I : FractionalIdeal (𝓞 F)⁰ F)⁻¹ := (mul_inv_cancel₀ hI0).symm
       _ ≤ I * 1 := mul_le_mul_right hinv _
       _ = I := mul_one _
   have h1I : (1 : F) ∈ (I : FractionalIdeal (𝓞 F)⁰ F) := hone (FractionalIdeal.one_mem_one _)
@@ -152,15 +165,31 @@ theorem exists_add_conj_eq_one (h : IsCMExt F E σ) (hu : Algebra.FormallyUnrami
 
 end Trace
 
-theorem lift_row : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E) (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E)) (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E) (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F) (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (s : Fin r → ℝ), IsVolData σ J Λ P f T A s → ∀ (a : Fin r) (l : InfinitePlace E → Fin (k + 1) → ℂ), l ∈ homLat (σ : E →+* E) J Λ P f A (dInv E (r - a.val)) (s a) → ∃ γ ∈ GN (σ : E →+* E) J Λ P, (∀ w, cM k r (.inr (.inl a)) (Matrix.of.symm (gM A γ w)) = l w) ∧ ∀ β : Bk r, β ≠ (.inr (.inl a)) → degB r β ≤ degB r (.inr (.inl a)) → ∀ w, cM k r β (Matrix.of.symm (gM A γ w)) = 0 := by
+theorem lift_row
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
+        (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E))
+        (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E)
+        (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F)
+        (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+        (s : Fin r → ℝ),
+      IsVolData σ J Λ P f T A s
+        → ∀ (a : Fin r) (l : InfinitePlace E → Fin (k + 1) → ℂ),
+          l ∈ homLat (σ : E →+* E) J Λ P f A (dInv E (r - a.val)) (s a)
+            → ∃ γ ∈ GN (σ : E →+* E) J Λ P,
+              (∀ w, cM k r (.inr (.inl a)) (Matrix.of.symm (gM A γ w)) = l w)
+                ∧ ∀ β : Bk r,
+                  β ≠ (.inr (.inl a)) → degB r β ≤ degB r (.inr (.inl a))
+                    → ∀ w, cM k r β (Matrix.of.symm (gM A γ w)) = 0 := by
   intro F E _ _ _ _ _ σ k r J Λ P f T A s hD a l hl
   obtain ⟨t₀, ⟨ht₀, htΛ⟩, hlt⟩ := hl
   have hD' := hD
   obtain ⟨hCM, hU, hND, hSD, -, -, -, hMod, hs, hAd⟩ := hD
   have hconj : ∀ (τ : E →+* ℂ) x, τ ((σ : E →+* E) x) = star (τ x) := hCM.2.2.2
   have hσσ : ∀ x, σ (σ x) = x := GlobalTheory.SelfDualLatticeCompare.conj_conj hCM
-  let te : E ≃ₐ[ℚ] E := AlgEquiv.ofAlgHom (σ : E →+* E).toRatAlgHom (σ : E →+* E).toRatAlgHom
-    (AlgHom.ext hσσ) (AlgHom.ext hσσ)
+  let te : E ≃ₐ[ℚ] E :=
+    AlgEquiv.ofAlgHom (σ : E →+* E).toRatAlgHom (σ : E →+* E).toRatAlgHom (AlgHom.ext hσσ)
+      (AlgHom.ext hσσ)
   have hte : ∀ x, te x = σ x := fun _ => rfl
   set y : Fin (2 * r + k + 1) → E := -t₀ with hy
   set c : E := form (σ : E →+* E) J y y with hc
@@ -178,7 +207,9 @@ theorem lift_row : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
     intro x hx
     have := Λ.neg_mem (htΛ x hx)
     rwa [← smul_neg] at this
-  have hDm : ((differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)) ^ (r - a.val) = (dInv E (r - a.val))⁻¹ := by
+  have hDm
+      : ((differentIdeal ℤ (𝓞 E) : FractionalIdeal (𝓞 E)⁰ E)) ^ (r - a.val)
+        = (dInv E (r - a.val))⁻¹ := by
     simp [dInv, inv_pow]
   have hmem : c ∈ dInv E (2 * (r - a.val)) := by
     refine IntG.mem_dInv_two_mul te (fun x => hσσ x) _ c ?_
@@ -194,7 +225,8 @@ theorem lift_row : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
     rwa [h3] at h2
   set t : E := -((θ : E) * c) with ht
   have htm : t ∈ dInv E (2 * (r - a.val)) := by
-    have h1 : θ • c ∈ dInv E (2 * (r - a.val)) := Submodule.smul_mem (dInv E (2 * (r - a.val))).coeToSubmodule θ hmem
+    have h1 : θ • c ∈ dInv E (2 * (r - a.val)) :=
+      Submodule.smul_mem (dInv E (2 * (r - a.val))).coeToSubmodule θ hmem
     have h2 := Submodule.neg_mem (dInv E (2 * (r - a.val))).coeToSubmodule h1
     have h3 : -(θ • c) = t := by rw [ht, Algebra.smul_def]
     rw [h3] at h2
@@ -202,8 +234,10 @@ theorem lift_row : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
   have hsum : form (σ : E →+* E) J y y + t + σ t = 0 := by
     rw [← hc, ht, map_neg, map_mul, hfix]
     linear_combination (-c) * hθ
-  have horth : ∀ b : Fin r, form (σ : E →+* E) J y (fun i => P i b.castSucc) = 0 ∧
-      form (σ : E →+* E) J y (fun i => f i b) = 0 := by
+  have horth
+      : ∀ b : Fin r,
+        form (σ : E →+* E) J y (fun i => P i b.castSucc) = 0
+          ∧ form (σ : E →+* E) J y (fun i => f i b) = 0 := by
     intro b
     have h1 := ht₀ b
     constructor
@@ -211,18 +245,29 @@ theorem lift_row : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
       exact h1.1
     · simp only [hy, form, Matrix.mulVec_neg, dotProduct_neg, neg_eq_zero]
       exact h1.2
-  have hγ := GlobalTheory.T.rowE_mem_GN_of_form_add_trace_eq_zero F E σ k r J Λ P f T A s hD' a y t (fun b _ => (horth b).1) hsum hyΛ htm
+  have hγ :=
+    GlobalTheory.T.rowE_mem_GN_of_form_add_trace_eq_zero F E σ k r J Λ P f T A s hD' a y t
+      (fun b _ => (horth b).1)
+      hsum hyΛ htm
   have hent := GlobalTheory.SnMass.VolN.rowE_entries F E σ k r J Λ P f T A s hD' a y t
 
-  have hzS : ∀ (w : InfinitePlace E) (b : Fin r), ((A w).mulVec fun l => w.embedding (y l)) (esI k r b) = 0 := by
+  have hzS
+      : ∀ (w : InfinitePlace E) (b : Fin r),
+        ((A w).mulVec fun l => w.embedding (y l)) (esI k r b) = 0 := by
     intro w b
-    have h1 := coord_zero (σ : E →+* E) w.embedding (hconj _) J (A w) (hMod w) y (fun i => P i b.castSucc)
-      (horth b).1 (s b) (hs b).ne' (eI k r b) (by simpa using (hAd w b).1)
+    have h1 :=
+      coord_zero (σ : E →+* E) w.embedding (hconj _) J (A w) (hMod w) y
+        (fun i => P i b.castSucc)
+        (horth b).1 (s b) (hs b).ne' (eI k r b) (by simpa using (hAd w b).1)
     rwa [Hpk_mulVec_eI] at h1
-  have hzE : ∀ (w : InfinitePlace E) (b : Fin r), ((A w).mulVec fun l => w.embedding (y l)) (eI k r b) = 0 := by
+  have hzE
+      : ∀ (w : InfinitePlace E) (b : Fin r),
+        ((A w).mulVec fun l => w.embedding (y l)) (eI k r b) = 0 := by
     intro w b
-    have h1 := coord_zero (σ : E →+* E) w.embedding (hconj _) J (A w) (hMod w) y (fun i => f i b)
-      (horth b).2 (s b)⁻¹ (inv_ne_zero (hs b).ne') (esI k r b) (by simpa using (hAd w b).2)
+    have h1 :=
+      coord_zero (σ : E →+* E) w.embedding (hconj _) J (A w) (hMod w) y
+        (fun i => f i b)
+        (horth b).2 (s b)⁻¹ (inv_ne_zero (hs b).ne') (esI k r b) (by simpa using (hAd w b).2)
     rwa [IntG.Hpk_mulVec_esI] at h1
   have nEE : ∀ b c : Fin r, b ≠ c → eI k r b ≠ eI k r c := by
     intro b c h e
@@ -259,7 +304,9 @@ theorem lift_row : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
   refine ⟨_, hγ, fun w => ?_, fun β hβ hdeg w => ?_⟩
   · funext j
     change gM A _ w (eI k r a) (wI k r j) = l w j
-    have hAy : ((A w).mulVec fun l => w.embedding (y l)) = -((A w).mulVec fun l => w.embedding (t₀ l)) := by
+    have hAy
+        : ((A w).mulVec fun l => w.embedding (y l))
+          = -((A w).mulVec fun l => w.embedding (t₀ l)) := by
       rw [← Matrix.mulVec_neg]
       congr 1
       funext i
@@ -278,7 +325,9 @@ theorem lift_row : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
       rw [hent w, if_neg (nEW b j), if_neg (nWS j a), if_neg (nEE _ _ hba)]
       simp
     · change gM A _ w (eI k r p.1.1) (esI k r p.1.2) = 0
-      have hh : herm (Hpk k r) (bvec (esI k r p.1.2)) ((A w).mulVec fun l => w.embedding (y l)) = 0 := by
+      have hh
+          : herm (Hpk k r) (bvec (esI k r p.1.2)) ((A w).mulVec fun l => w.embedding (y l))
+            = 0 := by
         rw [herm_bvec_esI, hzE]
         simp
       rw [hent w, if_neg (nES _ _), hh]

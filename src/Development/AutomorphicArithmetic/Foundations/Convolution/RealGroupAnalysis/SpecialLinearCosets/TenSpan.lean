@@ -6,8 +6,11 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.ConvolutionTheory.R2.I
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
+  UpperTheory.ConvolutionTheory.R2.I
 open scoped Classical nonZeroDivisors
 
 noncomputable section
@@ -39,22 +42,22 @@ private theorem sf_sub (x y : Kv v) : sf v (x - y) = sf v x - sf v y := by
   · simp only [sf_ne _ _ h, sub_zero]
 
 private theorem cont_sf : Continuous (sf v) :=
-  continuous_snd.comp (continuous_const.prodMk (GroundTheory.Global.continuous_finiteAdeleSingleAdd (K := F) v))
+  continuous_snd.comp (continuous_const.prodMk (GroundTheory.Global.continuous_finiteAdeleSingleAdd
+    (K := F) v))
 
-private theorem cont_ev : Continuous fun x : Af F => x v :=
-  RestrictedProduct.continuous_eval v
+private theorem cont_ev : Continuous fun x : Af F => x v := RestrictedProduct.continuous_eval v
 
 private def rm (x : Af F) : Af F := x - sf v (x v)
 
-private theorem cont_rm : Continuous (rm v) :=
-  continuous_id.sub ((cont_sf v).comp (cont_ev v))
+private theorem cont_rm : Continuous (rm v) := continuous_id.sub ((cont_sf v).comp (cont_ev v))
 
 private theorem rm_self (x : Af F) : rm v x v = 0 := by
   change x v - sf v (x v) v = 0
   rw [sf_self, sub_self]
 
-private theorem mem_split (J : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (z : Af F) :
-    z ∈ idealFiniteAdeles J ↔ rm v z ∈ idealFiniteAdeles J ∧ sf v (z v) ∈ idealFiniteAdeles J := by
+private theorem mem_split (J : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (z : Af F)
+    : z ∈ idealFiniteAdeles J
+      ↔ rm v z ∈ idealFiniteAdeles J ∧ sf v (z v) ∈ idealFiniteAdeles J := by
   constructor
   · intro h
     have h2 : sf v (z v) ∈ idealFiniteAdeles J := by
@@ -73,8 +76,7 @@ private theorem mem_split (J : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (z : Af F) :
 
 variable (θ : Kv v)
 
-private def mF (y : Fin 4 → Af F) : M2 v :=
-  !![y 1 v, y 2 v + y 3 v * θ; y 2 v - y 3 v * θ, y 0 v]
+private def mF (y : Fin 4 → Af F) : M2 v := !![y 1 v, y 2 v + y 3 v * θ; y 2 v - y 3 v * θ, y 0 v]
 
 private def co (m : M2 v) : Fin 4 → Kv v :=
   ![m 1 1, m 0 0, (m 0 1 + m 1 0) / 2, (m 0 1 - m 1 0) / (2 * θ)]
@@ -96,14 +98,16 @@ private theorem cont_mF : Continuous (mF v θ) := by
 
 private theorem cont_co : Continuous (co v θ) := by
   refine continuous_pi fun i => ?_
-  have e : ∀ a b : Fin 2, Continuous fun m : M2 v => m a b := fun a b => continuous_id.matrix_elem a b
+  have e : ∀ a b : Fin 2, Continuous fun m : M2 v => m a b := fun a b =>
+    continuous_id.matrix_elem a b
   fin_cases i
   · exact e 1 1
   · exact e 0 0
   · exact ((e 0 1).add (e 1 0)).div_const _
   · exact ((e 0 1).sub (e 1 0)).div_const _
 
-private theorem co_mF (hθ : θ ≠ 0) (y : Fin 4 → Af F) (i : Fin 4) : co v θ (mF v θ y) i = y i v := by
+private theorem co_mF (hθ : θ ≠ 0) (y : Fin 4 → Af F) (i : Fin 4)
+    : co v θ (mF v θ y) i = y i v := by
   have h2 := two_ne v
   fin_cases i
   · rfl
@@ -115,8 +119,8 @@ private theorem co_mF (hθ : θ ≠ 0) (y : Fin 4 → Af F) (i : Fin 4) : co v �
     field_simp
     ring
 
-private theorem mF_co (hθ : θ ≠ 0) (m : M2 v) (a : Fin 4 → Af F) :
-    mF v θ (fun i => rm v (a i) + sf v (co v θ m i)) = m := by
+private theorem mF_co (hθ : θ ≠ 0) (m : M2 v) (a : Fin 4 → Af F)
+    : mF v θ (fun i => rm v (a i) + sf v (co v θ m i)) = m := by
   have h2 := two_ne v
   have e : ∀ i, (rm v (a i) + sf v (co v θ m i)) v = co v θ m i := fun i => by
     change rm v (a i) v + sf v (co v θ m i) v = _
@@ -133,18 +137,24 @@ private theorem mF_co (hθ : θ ≠ 0) (m : M2 v) (a : Fin 4 → Af F) :
     ring
   · rfl
 
-private theorem ten_mem (hθ : θ ≠ 0) {g : (Fin 4 → Af F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F)
-    {b : M2 v → ℂ} (hb : b ∈ SB (M2 v)) :
-    (fun y : Fin 4 → Af F => g (fun i => rm v (y i)) * b (mF v θ y)) ∈ finiteSchwartzBruhatPi F := by
+private theorem ten_mem
+    (hθ : θ ≠ 0)
+    {g : (Fin 4 → Af F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F)
+    {b : M2 v → ℂ} (hb : b ∈ SB (M2 v))
+    : (fun y : Fin 4 → Af F => g (fun i => rm v (y i)) * b (mF v θ y))
+      ∈ finiteSchwartzBruhatPi F := by
   have hb' := GroundTheory.LocalField.mem_schwartzBruhat.1 hb
   have hrm : Continuous fun y : Fin 4 → Af F => fun i => rm v (y i) :=
     continuous_pi fun i => (cont_rm v).comp (continuous_apply i)
   refine ⟨(hg.1.comp_continuous hrm).mul (hb'.1.comp_continuous (cont_mF v θ)), ?_⟩
   have hc : Continuous fun p : (Fin 4 → Af F) × M2 v => fun i => p.1 i + sf v (co v θ p.2 i) :=
-    continuous_pi fun i => ((continuous_apply i).comp continuous_fst).add
-      ((cont_sf v).comp ((continuous_apply i).comp ((cont_co v θ).comp continuous_snd)))
-  refine HasCompactSupport.intro (((show IsCompact (tsupport g) from hg.2).prod
-    (show IsCompact (tsupport b) from hb'.2)).image hc) fun y hy => ?_
+    continuous_pi fun i =>
+      ((continuous_apply i).comp continuous_fst).add
+        ((cont_sf v).comp ((continuous_apply i).comp ((cont_co v θ).comp continuous_snd)))
+  refine HasCompactSupport.intro
+    (((show IsCompact (tsupport g) from hg.2).prod (show IsCompact (tsupport b) from hb'.2)).image
+      hc)
+    fun y hy => ?_
   by_contra hne
   refine hy ⟨((fun i => rm v (y i)), mF v θ y), ⟨?_, ?_⟩, ?_⟩
   · exact subset_tsupport _ (left_ne_zero_of_mul hne)
@@ -153,20 +163,28 @@ private theorem ten_mem (hθ : θ ≠ 0) {g : (Fin 4 → Af F) → ℂ} (hg : g 
     change rm v (y i) + sf v (co v θ (mF v θ y) i) = y i
     rw [co_mF v θ hθ, rm, sub_add_cancel]
 
-private theorem coset_ten (hθ : θ ≠ 0) (J : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (a : Fin 4 → Af F) :
-    ∃ g ∈ finiteSchwartzBruhatPi F (ι := Fin 4), ∃ b ∈ SB (M2 v), ∀ y : Fin 4 → Af F,
-      finiteTensor (fun i => cosetIndicator J (a i)) y = g (fun i => rm v (y i)) * b (mF v θ y) := by
+private theorem coset_ten (hθ : θ ≠ 0) (J : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (a : Fin 4 → Af F)
+    : ∃ g ∈ finiteSchwartzBruhatPi F (ι := Fin 4), ∃ b ∈ SB (M2 v), ∀ y : Fin 4 → Af F,
+      finiteTensor (fun i => cosetIndicator J (a i)) y
+        = g (fun i => rm v (y i)) * b (mF v θ y) := by
   have hG : finiteTensor (fun i => cosetIndicator J (a i)) ∈ finiteSchwartzBruhatPi F :=
     finiteTensor_mem fun i => cosetIndicator_mem_finiteSchwartzBruhat J (a i)
-  refine ⟨finiteTensor fun i => cosetIndicator J (rm v (a i)),
+  refine ⟨
+    finiteTensor fun i => cosetIndicator J (rm v (a i)),
     finiteTensor_mem fun i => cosetIndicator_mem_finiteSchwartzBruhat J _,
-    fun m => finiteTensor (fun i => cosetIndicator J (a i)) fun i => rm v (a i) + sf v (co v θ m i), ?_, ?_⟩
+    fun m => finiteTensor (fun i => cosetIndicator J (a i)) fun i => rm v (a i) + sf v (co v θ m i),
+    ?_,
+    ?_
+  ⟩
   · have hc : Continuous fun m : M2 v => fun i => rm v (a i) + sf v (co v θ m i) :=
-      continuous_pi fun i => continuous_const.add
-        ((cont_sf v).comp ((continuous_apply i).comp (cont_co v θ)))
+      continuous_pi fun i =>
+        continuous_const.add ((cont_sf v).comp ((continuous_apply i).comp (cont_co v θ)))
     have hcl : IsClosedEmbedding fun m : M2 v => fun i => rm v (a i) + sf v (co v θ m i) :=
-      Function.LeftInverse.isClosedEmbedding (f := mF v θ) (fun m => mF_co v θ hθ m a) (cont_mF v θ) hc
-    exact GroundTheory.LocalField.mem_schwartzBruhat.2 ⟨hG.1.comp_continuous hc, hG.2.comp_isClosedEmbedding hcl⟩
+      Function.LeftInverse.isClosedEmbedding (f := mF v θ)
+        (fun m => mF_co v θ hθ m a)
+        (cont_mF v θ) hc
+    exact GroundTheory.LocalField.mem_schwartzBruhat.2
+      ⟨hG.1.comp_continuous hc, hG.2.comp_isClosedEmbedding hcl⟩
   · intro y
     simp only [finiteTensor, co_mF v θ hθ]
     rw [← Finset.prod_mul_distrib]
@@ -203,7 +221,8 @@ private theorem pInf_away (X : V4 F) (i : Fin 4) : TR.pInf F (away v X i) = TR.p
     exact map_zero _
   simp only [away, map_sub, h0, sub_zero]
 
-private theorem poly_away {p : V4 F → ℂ} (hp : p ∈ polyFn (F := F)) (X : V4 F) : p (away v X) = p X := by
+private theorem poly_away {p : V4 F → ℂ} (hp : p ∈ polyFn (F := F)) (X : V4 F)
+    : p (away v X) = p X := by
   refine Algebra.adjoin_induction (p := fun p _ => p (away v X) = p X) ?_ ?_ ?_ ?_ hp
   · rintro _ ⟨i, w, rfl⟩
     simp only [pInf_away]
@@ -217,17 +236,23 @@ private theorem poly_away {p : V4 F → ℂ} (hp : p ∈ polyFn (F := F)) (X : V
 private theorem gauss_away (δ : F) (X : V4 F) : gauss δ (away v X) = gauss δ X := by
   simp only [gauss, map_add (f := _), map_sub, map_mul, map_pow, pInf_away]
 
-private theorem ten_eq (θ : Kv v) (δ : F) (p : V4 F → ℂ) (hp : p ∈ polyFn (F := F))
-    (g : (Fin 4 → Af F) → ℂ) (b : M2 v → ℂ) (X : V4 F) :
-    ten v θ (fun Y => p Y * gauss δ Y * g (finPartPi Y)) b X =
-      p X * gauss δ X * (fun y : Fin 4 → Af F => g (fun i => rm v (y i)) * b (mF v θ y)) (finPartPi X) := by
+private theorem ten_eq
+    (θ : Kv v) (δ : F)
+    (p : V4 F → ℂ) (hp : p ∈ polyFn (F := F))
+    (g : (Fin 4 → Af F) → ℂ) (b : M2 v → ℂ) (X : V4 F)
+    : ten v θ (fun Y => p Y * gauss δ Y * g (finPartPi Y)) b X
+      = p X * gauss δ X
+        * (fun y : Fin 4 → Af F => g (fun i => rm v (y i)) * b (mF v θ y)) (finPartPi X) := by
   simp only [ten, poly_away v hp, gauss_away]
   rw [mul_assoc]
   rfl
 
-private theorem good (θ : Kv v) (hθ : θ ≠ 0) (δ : F) (hδ : ∀ φ : F →+* ℝ, φ δ < 0) (p : V4 F → ℂ)
-    (hp : p ∈ polyFn (F := F)) {g : (Fin 4 → Af F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F) :
-    GoodU v δ θ fun Y => p Y * gauss δ Y * g (finPartPi Y) := by
+private theorem good
+    (θ : Kv v) (hθ : θ ≠ 0)
+    (δ : F) (hδ : ∀ φ : F →+* ℝ, φ δ < 0)
+    (p : V4 F → ℂ) (hp : p ∈ polyFn (F := F))
+    {g : (Fin 4 → Af F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F)
+    : GoodU v δ θ fun Y => p Y * gauss δ Y * g (finPartPi Y) := by
   intro b hb
   have hG := ten_mem v θ hθ hg hb
   refine ⟨⟨_, fockGen F δ hδ p hp _ hG⟩, Submodule.subset_span ⟨p, hp, _, hG, rfl⟩, ?_⟩
@@ -240,13 +265,18 @@ end UpperTheory.ConvolutionTheory.R2.I
 
 end
 
-theorem UpperTheory.ConvolutionTheory.R2.I.tenSpan :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (v : P F) (δ : F) (θ : Kv v), (∀ φ : F →+* ℝ, φ δ < 0) → θ ≠ 0 →
-      Fock δ ≤ Submodule.span ℂ {φ : S4 F | ∃ u b, GoodU v δ θ u ∧ b ∈ SB (M2 v) ∧ φ.1 = ten v θ u b} := by
+theorem UpperTheory.ConvolutionTheory.R2.I.tenSpan
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (v : P F) (δ : F) (θ : Kv v),
+      (∀ φ : F →+* ℝ, φ δ < 0) → θ ≠ 0
+        → Fock δ
+          ≤ Submodule.span ℂ
+            {φ : S4 F | ∃ u b, GoodU v δ θ u ∧ b ∈ SB (M2 v) ∧ φ.1 = ten v θ u b} := by
   intro F _ _ _ v δ θ hδ hθ φ hφ
   set T := Submodule.span ℂ {φ : S4 F | ∃ u b, GoodU v δ θ u ∧ b ∈ SB (M2 v) ∧ φ.1 = ten v θ u b} with hT
-  have key : ∀ p ∈ polyFn (F := F), ∀ g ∈ finiteSchwartzBruhatPi F (ι := Fin 4),
-      (fun X => p X * gauss δ X * g (finPartPi X)) ∈ T.map (schwartzBruhatPi (K := F) (ι := Fin 4)).subtype := by
+  have key
+      : ∀ p ∈ polyFn (F := F), ∀ g ∈ finiteSchwartzBruhatPi F (ι := Fin 4),
+        (fun X => p X * gauss δ X * g (finPartPi X))
+          ∈ T.map (schwartzBruhatPi (K := F) (ι := Fin 4)).subtype := by
     intro p hp g hg
     rw [finiteSchwartzBruhatPi_eq_span] at hg
     induction hg using Submodule.span_induction with
@@ -266,22 +296,26 @@ theorem UpperTheory.ConvolutionTheory.R2.I.tenSpan :
       rw [this]
       exact zero_mem _
     | add x y _ _ hx hy =>
-      have : (fun X : V4 F => p X * gauss δ X * (x + y) (finPartPi X)) =
-          (fun X => p X * gauss δ X * x (finPartPi X)) + fun X => p X * gauss δ X * y (finPartPi X) := by
+      have : (fun X : V4 F => p X * gauss δ X * (x + y) (finPartPi X))
+          = (fun X => p X * gauss δ X * x (finPartPi X))
+            + fun X => p X * gauss δ X * y (finPartPi X) := by
         funext X
         simp only [Pi.add_apply, mul_add]
       rw [this]
       exact add_mem hx hy
     | smul c x _ hx =>
-      have : (fun X : V4 F => p X * gauss δ X * (c • x) (finPartPi X)) =
-          c • fun X => p X * gauss δ X * x (finPartPi X) := by
+      have : (fun X : V4 F => p X * gauss δ X * (c • x) (finPartPi X))
+          = c • fun X => p X * gauss δ X * x (finPartPi X) := by
         funext X
         simp only [Pi.smul_apply, smul_eq_mul]
         ring
       rw [this]
       exact Submodule.smul_mem _ _ hx
-  have hle : Submodule.span ℂ {φ : V4 F → ℂ | ∃ p ∈ polyFn (F := F), ∃ g ∈ finiteSchwartzBruhatPi F (ι := Fin 4),
-      φ = fun v => p v * gauss δ v * g (finPartPi v)} ≤ T.map (schwartzBruhatPi (K := F) (ι := Fin 4)).subtype :=
+  have hle
+      : Submodule.span ℂ
+          {φ : V4 F → ℂ | ∃ p ∈ polyFn (F := F), ∃ g ∈ finiteSchwartzBruhatPi F (ι := Fin 4),
+            φ = fun v => p v * gauss δ v * g (finPartPi v)}
+        ≤ T.map (schwartzBruhatPi (K := F) (ι := Fin 4)).subtype :=
     Submodule.span_le.2 (by
       rintro _ ⟨p, hp, g, hg, rfl⟩
       exact key p hp g hg)

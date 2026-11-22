@@ -15,8 +15,9 @@ open Formalism.QuantumDeterminants Formalism.QuantumDeterminants.WeylGroupFacts
 
 variable {k r : ℕ}
 
-theorem tau_val (i : Fin (2 * r + k + 1)) :
-    (tau k r i).val = if i.val < r ∨ r + k < i.val then 2 * r + k - i.val else i.val := rfl
+theorem tau_val (i : Fin (2 * r + k + 1))
+    : (tau k r i).val = if i.val < r ∨ r + k < i.val then 2 * r + k - i.val else i.val :=
+  rfl
 
 theorem wI_val (t : Fin (k + 1)) : (wI k r t).val = r + t.val := rfl
 
@@ -27,11 +28,11 @@ theorem wI_inj {u t : Fin (k + 1)} (h : wI k r u = wI k r t) : u = t := by
 
 def UT (k r : ℕ) (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : Prop :=
   ∀ i j : Fin (2 * r + k + 1),
-    (j.val ≤ i.val ∨ (r ≤ i.val ∧ i.val ≤ r + k ∧ r ≤ j.val ∧ j.val ≤ r + k)) →
-      a i j = if i = j then 1 else 0
+    (j.val ≤ i.val ∨ (r ≤ i.val ∧ i.val ≤ r + k ∧ r ≤ j.val ∧ j.val ≤ r + k))
+      → a i j = if i = j then 1 else 0
 
-theorem hpk_col (m q : Fin (2 * r + k + 1)) :
-    Hpk k r m q = if m = tau k r q then sgn k r q else 0 := by
+theorem hpk_col (m q : Fin (2 * r + k + 1))
+    : Hpk k r m q = if m = tau k r q then sgn k r q else 0 := by
   have ht := tau_val (k := k) (r := r) q
   unfold Hpk sgn
   by_cases hq : q.val < r ∨ r + k < q.val
@@ -53,7 +54,7 @@ private theorem tau_tau_lemma (i : Fin (2 * r + k + 1)) : tau k r (tau k r i) = 
     rw [if_pos hc2] at h2
     omega
   · rw [if_neg hc] at h1
-    have hc2 : ¬ ((tau k r i).val < r ∨ r + k < (tau k r i).val) := by omega
+    have hc2 : ¬((tau k r i).val < r ∨ r + k < (tau k r i).val) := by omega
     rw [if_neg hc2] at h2
     omega
 
@@ -67,8 +68,8 @@ private theorem sgn_tau' (i : Fin (2 * r + k + 1)) : sgn k r (tau k r i) = sgn k
   · rw [if_neg hc] at h1
     rw [h1]
 
-private theorem Hpk_apply_eq_ite_tau (p m : Fin (2 * r + k + 1)) :
-    Hpk k r p m = if m = tau k r p then sgn k r p else 0 := by
+private theorem Hpk_apply_eq_ite_tau (p m : Fin (2 * r + k + 1))
+    : Hpk k r p m = if m = tau k r p then sgn k r p else 0 := by
   rw [hpk_col]
   by_cases h : m = tau k r p
   · have h2 : p = tau k r m := by rw [h, tau_tau_lemma]
@@ -80,7 +81,7 @@ private theorem Hpk_mul_self' : Hpk k r * Hpk k r = 1 := by
   ext p q
   have e1 : ∀ m, Hpk k r m q = if m = tau k r q then sgn k r q else 0 := fun m => hpk_col m q
   rw [Matrix.mul_apply]
-  simp only [e1, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+  simp only [e1, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte]
   rw [hpk_col, tau_tau_lemma, Matrix.one_apply]
   split_ifs with h
   · rw [sgn_tau']
@@ -88,33 +89,36 @@ private theorem Hpk_mul_self' : Hpk k r * Hpk k r = 1 := by
     split_ifs <;> norm_num
   · simp
 
-theorem adj_apply (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (p q : Fin (2 * r + k + 1)) :
-    (Hpk k r * aᴴ * Hpk k r) p q = sgn k r p * sgn k r q * star (a (tau k r q) (tau k r p)) := by
+theorem adj_apply
+    (a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (p q : Fin (2 * r + k + 1))
+    : (Hpk k r * aᴴ * Hpk k r) p q = sgn k r p * sgn k r q * star (a (tau k r q) (tau k r p)) := by
   have e1 : ∀ m, Hpk k r m q = if m = tau k r q then sgn k r q else 0 := fun m => hpk_col m q
-  have e2 : ∀ m, Hpk k r p m = if m = tau k r p then sgn k r p else 0 := fun m => Hpk_apply_eq_ite_tau p m
+  have e2 : ∀ m, Hpk k r p m = if m = tau k r p then sgn k r p else 0 := fun m =>
+    Hpk_apply_eq_ite_tau p m
   rw [Matrix.mul_apply]
-  simp only [e1, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+  simp only [e1, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte]
   rw [Matrix.mul_apply]
-  simp only [e2, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte,
+  simp only [e2, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte,
     Matrix.conjTranspose_apply]
   ring
 
-theorem ut_of_mem {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (ha : a ∈ Nset k r) : UT k r a := by
+theorem ut_of_mem {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (ha : a ∈ Nset k r)
+    : UT k r a := by
   unfold Nset at ha
   rw [Set.mem_setOf_eq] at ha
   obtain ⟨hU, hcol, hmid⟩ := ha
   have hU' : aᴴ * Hpk k r * a = Hpk k r := hU
   have hba : (Hpk k r * aᴴ * Hpk k r) * a = 1 := by
-    calc (Hpk k r * aᴴ * Hpk k r) * a = Hpk k r * (aᴴ * Hpk k r * a) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      (Hpk k r * aᴴ * Hpk k r) * a
+        = Hpk k r * (aᴴ * Hpk k r * a) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hU', Hpk_mul_self']
   have hab : a * (Hpk k r * aᴴ * Hpk k r) = 1 := by
     rw [← Matrix.inv_eq_left_inv hba]
     exact Matrix.mul_nonsing_inv a (Matrix.isUnit_det_of_left_inverse hba)
-  have hcolv : ∀ p m : Fin (2 * r + k + 1), m.val < r → m.val ≤ p.val →
-      a p m = if p = m then 1 else 0 := by
+  have hcolv
+      : ∀ p m : Fin (2 * r + k + 1),
+        m.val < r → m.val ≤ p.val → a p m = if p = m then 1 else 0 := by
     intro p m hm hle
     have e := hcol ⟨m.val, hm⟩ p hle
     rwa [show eI k r ⟨m.val, hm⟩ = m from Fin.ext rfl] at e
@@ -122,8 +126,9 @@ theorem ut_of_mem {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
     intro m hm
     unfold sgn
     rw [if_neg hm]
-  have key : ∀ q : ℕ, ∀ i j : Fin (2 * r + k + 1), j.val = q → r + k < q → q ≤ i.val →
-      a i j = if i = j then 1 else 0 := by
+  have key
+      : ∀ q : ℕ, ∀ i j : Fin (2 * r + k + 1),
+        j.val = q → r + k < q → q ≤ i.val → a i j = if i = j then 1 else 0 := by
     intro q
     refine Nat.strong_induction_on q ?_
     intro q IH i j hjq hq hqi
@@ -176,11 +181,16 @@ theorem ut_of_mem {a : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
     · exact key j.val i j rfl (by omega) (by omega)
 
 def dd (k r : ℕ) (c : Fin r → ℂ) (j : Fin (2 * r + k + 1)) : ℂ :=
-  if h : j.val < r then c ⟨j.val, h⟩
-  else if h2 : r + k < j.val then (star (c ⟨2 * r + k - j.val, by omega⟩))⁻¹ else 0
+  if h : j.val < r then
+    c ⟨j.val, h⟩
+  else if h2 : r + k < j.val then
+    (star (c ⟨2 * r + k - j.val, by omega⟩))⁻¹
+  else
+    0
 
-theorem dd_ne {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (j : Fin (2 * r + k + 1))
-    (hj : j.val < r ∨ r + k < j.val) : dd k r c j ≠ 0 := by
+theorem dd_ne
+    {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (j : Fin (2 * r + k + 1)) (hj : j.val < r ∨ r + k < j.val)
+    : dd k r c j ≠ 0 := by
   unfold dd
   split_ifs with h1 h2
   · exact hc _
@@ -188,9 +198,9 @@ theorem dd_ne {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (j : Fin (2 * r + k + 
   · exfalso
     omega
 
-theorem dd_tau {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (j : Fin (2 * r + k + 1))
-    (hj : j.val < r ∨ r + k < j.val) :
-    dd k r (fun a => star (c a)) (tau k r j) * dd k r c j = 1 := by
+theorem dd_tau
+    {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (j : Fin (2 * r + k + 1)) (hj : j.val < r ∨ r + k < j.val)
+    : dd k r (fun a => star (c a)) (tau k r j) * dd k r c j = 1 := by
   have hjl := j.isLt
   have ht := tau_val (k := k) (r := r) j
   rw [if_pos hj] at ht
@@ -208,9 +218,10 @@ theorem dd_tau {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (j : Fin (2 * r + k +
     simp only [dd, dif_pos h1, dif_neg h0, dif_pos h, e]
     exact mul_inv_cancel₀ (star_ne_zero.mpr (hc _))
 
-theorem g_col_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (i j : Fin (2 * r + k + 1)) (hj : j.val < r ∨ r + k < j.val) :
-    bigCell k r c μ i j = if i = tau k r j then dd k r c j else 0 := by
+theorem g_col_out
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    (i j : Fin (2 * r + k + 1)) (hj : j.val < r ∨ r + k < j.val)
+    : bigCell k r c μ i j = if i = tau k r j then dd k r c j else 0 := by
   have hjl := j.isLt
   have ht := tau_val (k := k) (r := r) j
   rw [if_pos hj] at ht
@@ -226,15 +237,17 @@ theorem g_col_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) �
     · have hv : ¬ i.val = 2 * r + k - j.val := fun h' => hi (Fin.ext (by rw [h', ht]))
       rw [if_neg hv, if_neg hi]
 
-theorem g_mid_col (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (i j : Fin (2 * r + k + 1)) (hj1 : r ≤ j.val) (hj2 : j.val ≤ r + k)
-    (hi : i.val < r ∨ r + k < i.val) : bigCell k r c μ i j = 0 := by
+theorem g_mid_col
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    (i j : Fin (2 * r + k + 1))
+    (hj1 : r ≤ j.val) (hj2 : j.val ≤ r + k) (hi : i.val < r ∨ r + k < i.val)
+    : bigCell k r c μ i j = 0 := by
   have h0 : ¬ j.val < r := by omega
-  have h3 : ¬ (r ≤ i.val ∧ i.val ≤ r + k) := by omega
+  have h3 : ¬(r ≤ i.val ∧ i.val ≤ r + k) := by omega
   simp only [bigCell, dif_neg h0, dif_pos hj2, dif_neg h3]
 
-theorem g_wI (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (s t : Fin (k + 1)) :
-    bigCell k r c μ (wI k r s) (wI k r t) = μ s t := by
+theorem g_wI (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (s t : Fin (k + 1))
+    : bigCell k r c μ (wI k r s) (wI k r t) = μ s t := by
   have hs := s.isLt
   have ht := t.isLt
   have h1 : ¬ (wI k r t).val < r := by rw [wI_val]; omega
@@ -244,9 +257,10 @@ theorem g_wI (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (
   exact congrArg₂ μ (Fin.ext (by show r + s.val - r = s.val; omega))
     (Fin.ext (by show r + t.val - r = t.val; omega))
 
-theorem g_row_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (i m : Fin (2 * r + k + 1)) (hi : i.val < r ∨ r + k < i.val) :
-    bigCell k r c μ i m = if m = tau k r i then dd k r c (tau k r i) else 0 := by
+theorem g_row_out
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    (i m : Fin (2 * r + k + 1)) (hi : i.val < r ∨ r + k < i.val)
+    : bigCell k r c μ i m = if m = tau k r i then dd k r c (tau k r i) else 0 := by
   have hil := i.isLt
   have hml := m.isLt
   have hti := tau_val (k := k) (r := r) i
@@ -262,27 +276,30 @@ theorem g_row_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) �
     rw [if_neg hne]
     exact g_mid_col c μ i m (by omega) (by omega) hi
 
-theorem mul_g_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+theorem mul_g_out
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
     (A : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (i j : Fin (2 * r + k + 1)) (hj : j.val < r ∨ r + k < j.val) :
-    (A * bigCell k r c μ) i j = A i (tau k r j) * dd k r c j := by
-  have hcol : ∀ m, bigCell k r c μ m j = if m = tau k r j then dd k r c j else 0 :=
-    fun m => g_col_out c μ m j hj
+    (i j : Fin (2 * r + k + 1)) (hj : j.val < r ∨ r + k < j.val)
+    : (A * bigCell k r c μ) i j = A i (tau k r j) * dd k r c j := by
+  have hcol : ∀ m, bigCell k r c μ m j = if m = tau k r j then dd k r c j else 0 := fun m =>
+    g_col_out c μ m j hj
   rw [Matrix.mul_apply]
-  simp only [hcol, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+  simp only [hcol, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte]
 
-theorem g_mul_out (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+theorem g_mul_out
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
     (B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (i j : Fin (2 * r + k + 1)) (hi : i.val < r ∨ r + k < i.val) :
-    (bigCell k r c μ * B) i j = dd k r c (tau k r i) * B (tau k r i) j := by
+    (i j : Fin (2 * r + k + 1)) (hi : i.val < r ∨ r + k < i.val)
+    : (bigCell k r c μ * B) i j = dd k r c (tau k r i) * B (tau k r i) j := by
   have hrow : ∀ m, bigCell k r c μ i m = if m = tau k r i then dd k r c (tau k r i) else 0 :=
     fun m => g_row_out c μ i m hi
   rw [Matrix.mul_apply]
-  simp only [hrow, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+  simp only [hrow, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte]
 
-theorem sum_mid (f : Fin (2 * r + k + 1) → ℂ)
-    (hf : ∀ m : Fin (2 * r + k + 1), (m.val < r ∨ r + k < m.val) → f m = 0) :
-    ∑ m, f m = ∑ s : Fin (k + 1), f (wI k r s) := by
+theorem sum_mid
+    (f : Fin (2 * r + k + 1) → ℂ)
+    (hf : ∀ m : Fin (2 * r + k + 1), (m.val < r ∨ r + k < m.val) → f m = 0)
+    : ∑ m, f m = ∑ s : Fin (k + 1), f (wI k r s) := by
   have himg : ∑ s : Fin (k + 1), f (wI k r s) = ∑ m ∈ Finset.univ.image (wI k r), f m :=
     (Finset.sum_image (fun u _ t _ h => wI_inj h)).symm
   rw [himg]
@@ -299,10 +316,11 @@ theorem sum_mid (f : Fin (2 * r + k + 1) → ℂ)
   simp only [wI_val]
   omega
 
-theorem mul_g_mid (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (A : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (i : Fin (2 * r + k + 1)) (t : Fin (k + 1)) :
-    (A * bigCell k r c μ) i (wI k r t) = ∑ s, A i (wI k r s) * μ s t := by
+theorem mul_g_mid
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    (A : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i : Fin (2 * r + k + 1))
+    (t : Fin (k + 1))
+    : (A * bigCell k r c μ) i (wI k r t) = ∑ s, A i (wI k r s) * μ s t := by
   have htl := t.isLt
   rw [Matrix.mul_apply, sum_mid]
   · simp only [g_wI]
@@ -316,18 +334,23 @@ theorem hb_sq : Hb k * Hb k = 1 := by
   funext j
   split_ifs <;> norm_num
 
-theorem vec_zero {μ L : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (h : μ * L = 1)
-    (v : Fin (k + 1) → ℂ) (hv : ∀ t, ∑ s, v s * μ s t = 0) : v = 0 := by
+theorem vec_zero
+    {μ L : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (h : μ * L = 1)
+    (v : Fin (k + 1) → ℂ) (hv : ∀ t, ∑ s, v s * μ s t = 0)
+    : v = 0 := by
   have h1 : Matrix.vecMul v μ = 0 := by
     funext t
     rw [Pi.zero_apply, ← hv t]
     rfl
-  calc v = Matrix.vecMul v (μ * L) := by rw [h, Matrix.vecMul_one]
+  calc
+    v = Matrix.vecMul v (μ * L) := by rw [h, Matrix.vecMul_one]
     _ = Matrix.vecMul (Matrix.vecMul v μ) L := by rw [Matrix.vecMul_vecMul]
     _ = 0 := by rw [h1, Matrix.zero_vecMul]
 
-theorem g_left_inv {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) {μ L : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
-    (hL : L * μ = 1) : bigCell k r (fun a => star (c a)) L * bigCell k r c μ = 1 := by
+theorem g_left_inv
+    {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0)
+    {μ L : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hL : L * μ = 1)
+    : bigCell k r (fun a => star (c a)) L * bigCell k r c μ = 1 := by
   ext i j
   rw [Matrix.one_apply]
   have hil := i.isLt
@@ -349,7 +372,8 @@ theorem g_left_inv {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) {μ L : Matrix (F
       apply Finset.sum_eq_zero
       intro s _
       have hs := s.isLt
-      rw [g_mid_col _ _ i _ (by simp only [wI_val]; omega) (by simp only [wI_val]; omega) hi, zero_mul]
+      rw [g_mid_col _ _ i _ (by simp only [wI_val]; omega) (by simp only [wI_val]; omega) hi,
+        zero_mul]
     · have ei : i = wI k r ⟨i.val - r, by omega⟩ := Fin.ext (by simp only [wI_val]; omega)
       rw [ei]
       simp only [g_wI]
@@ -360,10 +384,12 @@ theorem g_left_inv {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) {μ L : Matrix (F
       · exact absurd (wI_inj h2) h1
       · rfl
 
-theorem eq_one_of {c : Fin r → ℂ} {μ L : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
+theorem eq_one_of
+    {c : Fin r → ℂ} {μ L : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
     (hc : ∀ a, c a ≠ 0) (hL : μ * L = 1)
     {a b : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (ha : UT k r a) (hb : UT k r b) (E : a * bigCell k r c μ = bigCell k r c μ * b) : a = 1 := by
+    (ha : UT k r a) (hb : UT k r b) (E : a * bigCell k r c μ = bigCell k r c μ * b)
+    : a = 1 := by
   ext i m
   rw [Matrix.one_apply]
   have hil := i.isLt
@@ -417,14 +443,17 @@ theorem eq_one_of {c : Fin r → ℂ} {μ L : Matrix (Fin (k + 1)) (Fin (k + 1))
         if_neg (fun h => by
           have e := congrArg Fin.val h
           simp only [wI_val] at e
-          omega), mul_zero]
+          omega),
+        mul_zero]
     rw [emw]
     exact congrFun hv _
 
 theorem stabBig : PI.StabBig := by
   intro k r c μ hc hμ
   have hL : (Hb k * μᴴ * Hb k) * μ = 1 := by
-    calc (Hb k * μᴴ * Hb k) * μ = Hb k * (μᴴ * Hb k * μ) := by simp only [Matrix.mul_assoc]
+    calc
+      (Hb k * μᴴ * Hb k) * μ
+        = Hb k * (μᴴ * Hb k * μ) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hμ, hb_sq]
   have hR : μ * (Hb k * μᴴ * Hb k) = 1 := by
     rw [← Matrix.inv_eq_left_inv hL]
@@ -440,8 +469,8 @@ theorem stabBig : PI.StabBig := by
   simp only [RStab, Set.mem_setOf_eq, Set.mem_singleton_iff]
   constructor
   · rintro ⟨ha, hb⟩
-    have E : a * bigCell k r c μ =
-        bigCell k r c μ * ((bigCell k r c μ)⁻¹ * a * bigCell k r c μ) := by
+    have E
+        : a * bigCell k r c μ = bigCell k r c μ * ((bigCell k r c μ)⁻¹ * a * bigCell k r c μ) := by
       rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hGr, Matrix.one_mul]
     exact eq_one_of hc hR (ut_of_mem ha) (ut_of_mem hb) E
   · rintro rfl

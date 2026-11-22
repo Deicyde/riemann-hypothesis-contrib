@@ -7,13 +7,25 @@ public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.Lie
 
 open GlobalTheory.CompanionTheory.Ar.Num
 
-theorem PositivityTheory.Xgn.t_summand_bc : ∀ {o Ω C : Type} [CommRing o] [Field Ω] [Field C] [Algebra o Ω] [Algebra o C] [Algebra Ω C] [IsScalarTower o Ω C] (R : Subalgebra o Ω) (RC : Subalgebra o C), (∀ a ∈ R, algebraMap Ω C a ∈ RC) → ∀ {V Vc : Type} [AddCommGroup V] [Module Ω V] [AddCommGroup Vc] [Module C Vc] [Module Ω Vc] [IsScalarTower Ω C Vc] (b : V →ₗ[Ω] Vc), IsBaseChange C b → ∀ (L : AddSubgroup V) (U : Submodule Ω V), (∀ a ∈ R, ∀ v ∈ L, a • v ∈ L) → Summand L U → Summand (spanOver RC (b '' L)) (Submodule.span C (b '' U)) ∧ spanOver RC (b '' L) ⊓ (Submodule.span C (b '' U)).toAddSubgroup = spanOver RC (b '' (L ⊓ U.toAddSubgroup : AddSubgroup V)) := by
+theorem PositivityTheory.Xgn.t_summand_bc
+    : ∀ {o Ω C : Type} [CommRing o] [Field Ω] [Field C] [Algebra o Ω] [Algebra o C] [Algebra Ω C]
+        [IsScalarTower o Ω C] (R : Subalgebra o Ω) (RC : Subalgebra o C),
+      (∀ a ∈ R, algebraMap Ω C a ∈ RC)
+        → ∀ {V Vc : Type} [AddCommGroup V] [Module Ω V] [AddCommGroup Vc] [Module C Vc]
+            [Module Ω Vc] [IsScalarTower Ω C Vc] (b : V →ₗ[Ω] Vc),
+          IsBaseChange C b
+            → ∀ (L : AddSubgroup V) (U : Submodule Ω V),
+              (∀ a ∈ R, ∀ v ∈ L, a • v ∈ L) → Summand L U
+                → Summand (spanOver RC (b '' L)) (Submodule.span C (b '' U))
+                  ∧ spanOver RC (b '' L) ⊓ (Submodule.span C (b '' U)).toAddSubgroup
+                    = spanOver RC (b '' (L ⊓ U.toAddSubgroup : AddSubgroup V)) := by
   intro o Ω C _ _ _ _ _ _ _ R RC hR V Vc _ _ _ _ _ _ b hb L U hL hS
   obtain ⟨ρ, hρU, hρid, hρL⟩ := hS
   let ρC : Vc →ₗ[C] Vc := hb.lift (b ∘ₗ ρ)
   have hρC : ∀ v, ρC (b v) = b (ρ v) := fun v => hb.lift_eq _ v
-  have hmap : ∀ {S T : Set V}, (∀ e ∈ S, ρ e ∈ T) →
-      ∀ x ∈ spanOver RC (b '' S), ρC x ∈ spanOver RC (b '' T) := by
+  have hmap
+      : ∀ {S T : Set V},
+        (∀ e ∈ S, ρ e ∈ T) → ∀ x ∈ spanOver RC (b '' S), ρC x ∈ spanOver RC (b '' T) := by
     intro S T hST x hx
     unfold spanOver at hx
     induction hx using AddSubgroup.closure_induction with
@@ -57,7 +69,8 @@ theorem PositivityTheory.Xgn.t_summand_bc : ∀ {o Ω C : Type} [CommRing o] [Fi
     · rintro x ⟨hx1, hx2⟩
       rw [← hid x hx2]
       exact hmap (S := (L : Set V)) (T := ((L ⊓ U.toAddSubgroup : AddSubgroup V) : Set V))
-        (fun e he => ⟨hρL e he, hρU e⟩) x hx1
+        (fun e he => ⟨hρL e he, hρU e⟩)
+        x hx1
     · apply (AddSubgroup.closure_le _).2
       rintro _ ⟨a, ha, _, ⟨e, he, rfl⟩, rfl⟩
       constructor

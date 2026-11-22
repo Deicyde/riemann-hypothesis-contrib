@@ -13,19 +13,25 @@ namespace GlobalTheory.HilbertSch
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits
 
-def transferMap {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z)
-    (hsq : eZ.hom ≫ z = z' ≫ eS.hom) {T : Scheme.{0}} (g' : T ⟶ S') (g : T ⟶ S) (hg : g' ≫ eS.hom = g) :
-    pullback z' g' ⟶ pullback z g :=
+def transferMap
+    {S Z S' Z' : Scheme.{0}}
+    (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z) (hsq : eZ.hom ≫ z = z' ≫ eS.hom)
+    {T : Scheme.{0}} (g' : T ⟶ S') (g : T ⟶ S) (hg : g' ≫ eS.hom = g)
+    : pullback z' g' ⟶ pullback z g :=
   pullback.map z' g' z g eZ.hom (𝟙 T) eS.hom hsq.symm (by rw [Category.id_comp, hg])
 
-instance {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z)
-    (hsq : eZ.hom ≫ z = z' ≫ eS.hom) {T : Scheme.{0}} (g' : T ⟶ S') (g : T ⟶ S) (hg : g' ≫ eS.hom = g) :
-    IsIso (transferMap z z' eS eZ hsq g' g hg) := by
+instance
+    {S Z S' Z' : Scheme.{0}}
+    (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z) (hsq : eZ.hom ≫ z = z' ≫ eS.hom)
+    {T : Scheme.{0}} (g' : T ⟶ S') (g : T ⟶ S) (hg : g' ≫ eS.hom = g)
+    : IsIso (transferMap z z' eS eZ hsq g' g hg) := by
   unfold transferMap; infer_instance
 
-def transferIso {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z)
-    (hsq : eZ.hom ≫ z = z' ≫ eS.hom) {T : Scheme.{0}} (g' : T ⟶ S') (g : T ⟶ S) (hg : g' ≫ eS.hom = g) :
-    pullback z' g' ≅ pullback z g :=
+def transferIso
+    {S Z S' Z' : Scheme.{0}}
+    (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z) (hsq : eZ.hom ≫ z = z' ≫ eS.hom)
+    {T : Scheme.{0}} (g' : T ⟶ S') (g : T ⟶ S) (hg : g' ≫ eS.hom = g)
+    : pullback z' g' ≅ pullback z g :=
   asIso (transferMap z z' eS eZ hsq g' g hg)
 
 lemma transferIso_hom_snd {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z)
@@ -50,8 +56,9 @@ lemma transferIso_map {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z' ⟶ S') (e
   apply pullback.hom_ext <;>
     simp only [Category.assoc, pullback.lift_fst, pullback.lift_snd, pullback.lift_fst_assoc, pullback.lift_snd_assoc, Category.comp_id, Category.id_comp]
 
-theorem isHilbRep_transfer : ∀ {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z),
-    eZ.hom ≫ z = z' ≫ eS.hom → ∀ r : ℕ, IsHilbRep z' r → IsHilbRep z r := by
+theorem isHilbRep_transfer
+    : ∀ {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z' ⟶ S') (eS : S' ≅ S) (eZ : Z' ≅ Z),
+      eZ.hom ≫ z = z' ≫ eS.hom → ∀ r : ℕ, IsHilbRep z' r → IsHilbRep z r := by
   intro S Z S' Z' z z' eS eZ hsq r hrep
   obtain ⟨H, h', U, u', hP, hC, hF, hFl, hR, hU⟩ := hrep
   set ΦH := transferIso z z' eS eZ hsq h' (h' ≫ eS.hom) rfl with hΦH
@@ -67,8 +74,9 @@ theorem isHilbRep_transfer : ∀ {S Z S' Z' : Scheme.{0}} (z : Z ⟶ S) (z' : Z'
   have ev : (v ≫ ΦT.inv) ≫ pullback.snd z' (g ≫ eS.inv) = v ≫ pullback.snd z g := by
     rw [Category.assoc, transferIso_inv_snd]
   have hv' : IsClosedImmersion (v ≫ ΦT.inv) := inferInstance
-  obtain ⟨f, ⟨hf', w, hpb⟩, huniq⟩ := hU T (g ≫ eS.inv) V (v ≫ ΦT.inv) hv' (by rw [ev]; exact hvF)
-    (by rw [ev]; exact hvFl) (by rw [ev]; exact hvR)
+  obtain ⟨f, ⟨hf', w, hpb⟩, huniq⟩ :=
+    hU T (g ≫ eS.inv) V (v ≫ ΦT.inv) hv' (by rw [ev]; exact hvF) (by rw [ev]; exact hvFl)
+      (by rw [ev]; exact hvR)
   have hf : f ≫ (h' ≫ eS.hom) = g := by rw [← Category.assoc, hf', hg]
   refine ⟨f, ⟨hf, w, ?_⟩, ?_⟩
   · refine hpb.of_iso (Iso.refl _) ΦT (Iso.refl _) ΦH ?_ ?_ ?_ ?_

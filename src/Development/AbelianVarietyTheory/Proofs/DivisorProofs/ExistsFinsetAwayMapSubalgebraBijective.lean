@@ -8,21 +8,26 @@ open AlgebraicGeometry CategoryTheory Limits
 
 namespace GlobalTheory
 
-theorem exists_finset_awayMap_subalgebra_bijective :
-    ∀ (R B : Type) [CommRing R] [CommRing B] [Algebra R B] (g : Finset B),
-      (∀ b ∈ g, Algebra.FiniteType R (Localization.Away b)) →
-      ∃ s : Finset B, (↑g : Set B) ⊆ ↑s ∧ ∀ C : Subalgebra R B, (↑s : Set B) ⊆ ↑C →
-        ∀ b ∈ g, ∀ hb : b ∈ C,
-          Function.Bijective (Localization.awayMap C.val.toRingHom (⟨b, hb⟩ : C)) := by
+theorem exists_finset_awayMap_subalgebra_bijective
+    : ∀ (R B : Type) [CommRing R] [CommRing B] [Algebra R B] (g : Finset B),
+      (∀ b ∈ g, Algebra.FiniteType R (Localization.Away b))
+        → ∃ s : Finset B,
+          (↑g : Set B) ⊆ ↑s
+            ∧ ∀ C : Subalgebra R B,
+              (↑s : Set B) ⊆ ↑C
+                → ∀ b ∈ g, ∀ hb : b ∈ C,
+                  Function.Bijective (Localization.awayMap C.val.toRingHom (⟨b, hb⟩ : C)) := by
   intro R B _ _ _ g hg
   classical
-  have key : ∀ b ∈ g, ∃ t : Finset B, ∀ C : Subalgebra R B, (↑t : Set B) ⊆ ↑C → b ∈ C →
-      ∀ x : B, ∃ m : ℕ, b ^ m * x ∈ C := by
+  have key
+      : ∀ b ∈ g, ∃ t : Finset B, ∀ C : Subalgebra R B,
+        (↑t : Set B) ⊆ ↑C → b ∈ C → ∀ x : B, ∃ m : ℕ, b ^ m * x ∈ C := by
     intro b hb
     obtain ⟨t, ht⟩ := (hg b hb).out
     refine ⟨t.image fun z => (IsLocalization.sec (Submonoid.powers b) z).1, fun C hC hbC x => ?_⟩
-    have main : ∀ z : Localization.Away b, ∃ (m : ℕ) (c : B), c ∈ C ∧
-        z * algebraMap B _ b ^ m = algebraMap B _ c := by
+    have main
+        : ∀ z : Localization.Away b, ∃ (m : ℕ) (c : B),
+          c ∈ C ∧ z * algebraMap B _ b ^ m = algebraMap B _ c := by
       intro z
       have hz : z ∈ Algebra.adjoin R (t : Set (Localization.Away b)) := ht ▸ Algebra.mem_top
       induction hz using Algebra.adjoin_induction with
@@ -36,13 +41,21 @@ theorem exists_finset_awayMap_subalgebra_bijective :
           rw [← hm] at this
           exact this
       | algebraMap r =>
-        exact ⟨0, algebraMap R B r, C.algebraMap_mem r, by
-          rw [pow_zero, mul_one, IsScalarTower.algebraMap_apply R B]⟩
+        exact ⟨
+          0,
+          algebraMap R B r,
+          C.algebraMap_mem r,
+          by rw [pow_zero, mul_one, IsScalarTower.algebraMap_apply R B]
+        ⟩
       | add x y _ _ hx hy =>
         obtain ⟨m, c, hc, e⟩ := hx
         obtain ⟨n, d, hd, e'⟩ := hy
-        refine ⟨m + n, c * b ^ n + d * b ^ m,
-          add_mem (mul_mem hc (pow_mem hbC _)) (mul_mem hd (pow_mem hbC _)), ?_⟩
+        refine ⟨
+          m + n,
+          c * b ^ n + d * b ^ m,
+          add_mem (mul_mem hc (pow_mem hbC _)) (mul_mem hd (pow_mem hbC _)),
+          ?_
+        ⟩
         rw [map_add (f := _), map_mul, map_mul, map_pow, map_pow, ← e, ← e']
         ring
       | mul x y _ _ hx hy =>
@@ -57,7 +70,8 @@ theorem exists_finset_awayMap_subalgebra_bijective :
     refine ⟨k + m, ?_⟩
     have : b ^ (k + m) * x = b ^ k * c := by
       have hk' : b ^ k * (x * b ^ m) = b ^ k * c := hk
-      rw [← hk']; ring
+      rw [← hk']
+      ring
     rw [this]
     exact mul_mem (pow_mem hbC _) hc
   choose! t ht using key
@@ -66,9 +80,13 @@ theorem exists_finset_awayMap_subalgebra_bijective :
     have : a = 0 := Subtype.ext ha
     simp [this]
   · refine (Localization.awayMap_surjective_iff).2 fun x => ?_
-    obtain ⟨m, hm⟩ := ht b hb C (fun y hy => hC (by
-      simp only [Finset.coe_union, Finset.coe_biUnion, Set.mem_union, Set.mem_iUnion]
-      exact Or.inr ⟨b, hb, hy⟩)) hbC x
+    obtain ⟨m, hm⟩ :=
+      ht b hb C
+        (fun y hy =>
+          hC (by
+            simp only [Finset.coe_union, Finset.coe_biUnion, Set.mem_union, Set.mem_iUnion]
+            exact Or.inr ⟨b, hb, hy⟩))
+        hbC x
     exact ⟨⟨_, hm⟩, m, rfl⟩
 
 end GlobalTheory

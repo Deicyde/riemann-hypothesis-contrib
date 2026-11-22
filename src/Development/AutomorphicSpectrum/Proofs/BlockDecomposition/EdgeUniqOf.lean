@@ -7,11 +7,15 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EdgeClass
 
-theorem edgeUniq_of : CrystallineSemistableComparison.E.StCol → CrystallineSemistableComparison.E.StAdd → CrystallineSemistableComparison.E.StUniq → CrystallineSemistableComparison.E.EdgeUniq := by
+theorem edgeUniq_of
+    : CrystallineSemistableComparison.E.StCol → CrystallineSemistableComparison.E.StAdd
+      → CrystallineSemistableComparison.E.StUniq
+      → CrystallineSemistableComparison.E.EdgeUniq := by
   intro _ hadd huniq R _ C _ F T hG j x x' h h' hx hx'
   obtain ⟨z, hz, st, rfl⟩ := hx
   obtain ⟨z', hz', st', rfl⟩ := hx'

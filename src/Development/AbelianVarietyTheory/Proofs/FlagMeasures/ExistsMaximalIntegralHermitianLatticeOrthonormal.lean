@@ -29,18 +29,34 @@ private lemma isIntLat_of_isUnimodular {K V : Type} [Field K] [NumberField K] [S
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-theorem _root_.GlobalTheory.Mass.MaxExists.main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K), _root_.Formalism.HermitianLatticesTheory.IsCMUnram K → h.IsSymm → h.Nondegenerate → (∀ M : Submodule (𝓞 K) V, _root_.GlobalTheory.Mass.IsIntLat h M → ∃ M', _root_.GlobalTheory.Mass.IsMaxLat h M' ∧ M ≤ M') ∧ (∀ M : Submodule (𝓞 K) V, Submodule.IsFullLattice K M → _root_.Formalism.HermitianLatticesTheory.IsUnimodular h M → _root_.GlobalTheory.Mass.IsMaxLat h M ∧ _root_.GlobalTheory.Mass.badP h M = ∅ ∧ _root_.GlobalTheory.Mass.lamMax h M = 1) ∧ (∀ (M : Submodule (𝓞 K) V) (n : ℕ), _root_.Formalism.HermitianLatticesTheory.IsOrthoLattice h M n → Submodule.IsLattice K M ∧ _root_.Formalism.HermitianLatticesTheory.IsUnimodular h M ∧ Module.finrank K V = n) := by
+theorem _root_.GlobalTheory.Mass.MaxExists.main
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      _root_.Formalism.HermitianLatticesTheory.IsCMUnram K → h.IsSymm → h.Nondegenerate
+        → (∀ M : Submodule (𝓞 K) V,
+            _root_.GlobalTheory.Mass.IsIntLat h M
+              → ∃ M', _root_.GlobalTheory.Mass.IsMaxLat h M' ∧ M ≤ M')
+          ∧ (∀ M : Submodule (𝓞 K) V,
+            Submodule.IsFullLattice K M → _root_.Formalism.HermitianLatticesTheory.IsUnimodular h M
+              → _root_.GlobalTheory.Mass.IsMaxLat h M ∧ _root_.GlobalTheory.Mass.badP h M = ∅
+                ∧ _root_.GlobalTheory.Mass.lamMax h M = 1)
+          ∧ (∀ (M : Submodule (𝓞 K) V) (n : ℕ),
+            _root_.Formalism.HermitianLatticesTheory.IsOrthoLattice h M n
+              → Submodule.IsLattice K M ∧ _root_.Formalism.HermitianLatticesTheory.IsUnimodular h M
+                ∧ Module.finrank K V = n) := by
   intro K V _ _ _ _ _ _ _ _ h hK hS hN
   have D := fun M hM => _root_.GlobalTheory.Mass.DiscOrder.main K V h hK hS hN M hM
   refine ⟨?_, ?_, ?_⟩
-  · have key : ∀ n : ℕ, ∀ M : Submodule (𝓞 K) V, _root_.GlobalTheory.Mass.IsIntLat h M →
-        _root_.GlobalTheory.Mass.discN h M = n →
-        ∃ M', _root_.GlobalTheory.Mass.IsMaxLat h M' ∧ M ≤ M' := by
+  · have key
+        : ∀ n : ℕ, ∀ M : Submodule (𝓞 K) V,
+          _root_.GlobalTheory.Mass.IsIntLat h M → _root_.GlobalTheory.Mass.discN h M = n
+            → ∃ M', _root_.GlobalTheory.Mass.IsMaxLat h M' ∧ M ≤ M' := by
       intro n
       induction n using Nat.strong_induction_on with
       | _ n ih =>
         intro M hM hn
-        by_cases hmax : ∀ N : Submodule (𝓞 K) V, _root_.GlobalTheory.Mass.IsIntLat h N → M ≤ N → N = M
+        by_cases hmax
+          : ∀ N : Submodule (𝓞 K) V, _root_.GlobalTheory.Mass.IsIntLat h N → M ≤ N → N = M
         · exact ⟨M, by unfold _root_.GlobalTheory.Mass.IsMaxLat; exact ⟨hM, hmax⟩, le_rfl⟩
         · push_neg at hmax
           obtain ⟨N, hNi, hMN, hne⟩ := hmax
@@ -48,17 +64,17 @@ theorem _root_.GlobalTheory.Mass.MaxExists.main : ∀ (K V : Type) [Field K] [Nu
           have hidx1 : _root_.GlobalTheory.Mass.idxN N M ≠ 1 := by
             intro h1
             exact hne (le_antisymm (_root_.GlobalTheory.Mass.DiscOrder.idxN_eq_one.1 h1) hMN)
-          have hNpos : 0 < _root_.GlobalTheory.Mass.discN h N :=
-            Nat.pos_of_ne_zero (D N hNi).1
+          have hNpos : 0 < _root_.GlobalTheory.Mass.discN h N := Nat.pos_of_ne_zero (D N hNi).1
           have hlt : _root_.GlobalTheory.Mass.discN h N < n := by
             rw [← hn, hdisc]
             have h2 : 2 ≤ _root_.GlobalTheory.Mass.idxN N M := by omega
             have h4 : 1 < _root_.GlobalTheory.Mass.idxN N M ^ 2 :=
               Nat.one_lt_pow (by norm_num) (by omega)
-            calc _root_.GlobalTheory.Mass.discN h N
+            calc
+              _root_.GlobalTheory.Mass.discN h N
                 = _root_.GlobalTheory.Mass.discN h N * 1 := (mul_one _).symm
               _ < _root_.GlobalTheory.Mass.discN h N * _root_.GlobalTheory.Mass.idxN N M ^ 2 :=
-                  Nat.mul_lt_mul_of_pos_left h4 hNpos
+                Nat.mul_lt_mul_of_pos_left h4 hNpos
           obtain ⟨M', hM', hNM'⟩ := ih _ hlt N hNi rfl
           exact ⟨M', hM', hMN.trans hNM'⟩
     exact fun M hM => key _ M hM rfl
@@ -80,13 +96,16 @@ theorem _root_.GlobalTheory.Mass.MaxExists.main : ∀ (K V : Type) [Field K] [Nu
       rw [hD1] at hdisc
       have h1 : _root_.GlobalTheory.Mass.idxN N M ^ 2 = 1 :=
         Nat.eq_one_of_mul_eq_one_left hdisc.symm
-      have h1' : _root_.GlobalTheory.Mass.idxN N M = 1 := by
-        simpa using h1
+      have h1' : _root_.GlobalTheory.Mass.idxN N M = 1 := by simpa using h1
       exact le_antisymm (_root_.GlobalTheory.Mass.DiscOrder.idxN_eq_one.1 h1') hMN
     · unfold _root_.GlobalTheory.Mass.lamMax
       rw [hbad]
       exact finprod_mem_empty
   · intro M n hO
-    exact ⟨_root_.ReciprocityTheory.ChartRestriction.L3.isLattice_of_ortho hO, _root_.ReciprocityTheory.ChartRestriction.L3.isUnimodular_of_ortho hO, _root_.ReciprocityTheory.ChartRestriction.L3.finrank_of_ortho hO⟩
+    exact ⟨
+      _root_.ReciprocityTheory.ChartRestriction.L3.isLattice_of_ortho hO,
+      _root_.ReciprocityTheory.ChartRestriction.L3.isUnimodular_of_ortho hO,
+      _root_.ReciprocityTheory.ChartRestriction.L3.finrank_of_ortho hO
+    ⟩
 
 end GlobalTheory.Mass.MaxExists

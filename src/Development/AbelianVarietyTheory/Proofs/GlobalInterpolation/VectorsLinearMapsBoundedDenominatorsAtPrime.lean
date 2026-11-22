@@ -10,12 +10,14 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Unipot
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.QNormal
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col GlobalTheory.QNormal
 
 namespace GlobalTheory.Proof.vectors_linearMaps_bounded_denominators_atPrime
 
-theorem exists_intAt_pow_mul {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) (a : E) :
-    ∃ m : ℕ, IntAt P ((qOf P : E) ^ m * a) := by
+theorem exists_intAt_pow_mul
+    {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) (a : E)
+    : ∃ m : ℕ, IntAt P ((qOf P : E) ^ m * a) := by
   have e : (qOf P : E) = algebraMap (𝓞 E) E (qOf P : 𝓞 E) := by rw [map_natCast]
   have h1 : P.valuation E (qOf P : E) < 1 := by
     rw [e, HeightOneSpectrum.valuation_of_algebraMap]
@@ -40,13 +42,25 @@ theorem exists_intAt_pow_mul {E : Type} [Field E] [NumberField E] (P : HeightOne
   obtain ⟨n, d, hnd⟩ := P.exists_primeCompl_mul_eq_of_integer _ h
   exact ⟨m, n, d, d.2, by rw [mul_comm]; exact hnd⟩
 
-theorem exists_intAt_family {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) {ι : Type} [Fintype ι]
-    (f : ι → E) : ∃ m : ℕ, ∀ m', m ≤ m' → ∀ i, IntAt P ((qOf P : E) ^ m' * f i) := by
+theorem exists_intAt_family
+    {E : Type} [Field E] [NumberField E]
+    (P : HeightOneSpectrum (𝓞 E))
+    {ι : Type} [Fintype ι]
+    (f : ι → E)
+    : ∃ m : ℕ, ∀ m', m ≤ m' → ∀ i, IntAt P ((qOf P : E) ^ m' * f i) := by
   choose g hg using fun i => exists_intAt_pow_mul P (f i)
-  exact ⟨Finset.univ.sup g, fun m' hm i =>
-    GlobalTheory.Proof.NormalFormAtPrime.intAt_pow_mono ((Finset.le_sup (Finset.mem_univ i)).trans hm) (hg i)⟩
+  exact ⟨
+    Finset.univ.sup g,
+    fun m' hm i =>
+      GlobalTheory.Proof.NormalFormAtPrime.intAt_pow_mono
+        ((Finset.le_sup (Finset.mem_univ i)).trans hm) (hg i)
+  ⟩
 
-theorem bounded_denominators : ∀ (E : Type) [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) (a b : ℕ), (∀ v : Fin a → E, ∃ m : ℕ, ∀ m', m ≤ m' → IntV P (((qOf P : E) ^ m') • v)) ∧ ∀ y : (Fin a → E) →ₗ[E] (Fin b → E), ∃ m : ℕ, ∀ m', m ≤ m' → IntHom P (((qOf P : E) ^ m') • y) := by
+theorem bounded_denominators
+    : ∀ (E : Type) [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) (a b : ℕ),
+      (∀ v : Fin a → E, ∃ m : ℕ, ∀ m', m ≤ m' → IntV P (((qOf P : E) ^ m') • v))
+        ∧ ∀ y : (Fin a → E) →ₗ[E] (Fin b → E), ∃ m : ℕ, ∀ m',
+          m ≤ m' → IntHom P (((qOf P : E) ^ m') • y) := by
   intro E _ _ P a b
   refine ⟨fun v => ?_, fun y => ?_⟩
   · obtain ⟨m, hm⟩ := exists_intAt_family P v

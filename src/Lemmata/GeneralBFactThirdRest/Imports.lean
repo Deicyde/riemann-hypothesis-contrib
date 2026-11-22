@@ -33,16 +33,16 @@ public import Formalism.TameInertiaTowers.CentralOrderTwo.ConjEqInvOfPowEqOne
 
 namespace Bl.general_b_fact_third''''
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [inst_1 : NumberField.{0} E] [inst_2 : StarRing.{0} E] (S : Formalism.BasicNotions.HSpace E)
-  (Λ : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) S.V),
-  Submodule.IsFullLattice.{0, 0, 0} E Λ →
-    ∀ (x : S.V),
-      Exists.{1} fun (a : NumberField.RingOfIntegers.{0} E) ↦
-        And (Ne.{1} a 0) (Membership.mem.{0, 0} Λ (HSMul.hSMul.{0, 0, 0} a x)) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [inst_1 : NumberField.{0} E] [inst_2 : StarRing.{0} E]
+        (S : Formalism.BasicNotions.HSpace E)
+        (Λ : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) S.V),
+      Submodule.IsFullLattice.{0, 0, 0} E Λ
+        → ∀ (x : S.V),
+          Exists.{1} fun (a : NumberField.RingOfIntegers.{0} E) ↦
+            And (Ne.{1} a 0) (Membership.mem.{0, 0} Λ (HSMul.hSMul.{0, 0, 0} a x)) := by
   intro E _ _ _ S Λ hL x
-  have hx : x ∈ Submodule.span E (Λ : Set S.V) := by
-    rw [hL.span_eq_top]; exact Submodule.mem_top
+  have hx : x ∈ Submodule.span E (Λ : Set S.V) := by rw [hL.span_eq_top]; exact Submodule.mem_top
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hy⟩
   | zero => exact ⟨1, one_ne_zero, by rw [smul_zero]; exact Λ.zero_mem⟩
@@ -57,7 +57,8 @@ theorem goal1 :
   | smul c y _ hy =>
     obtain ⟨a, ha, hay⟩ := hy
     obtain ⟨w, hw⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) c
-    refine ⟨(w.2 : NumberField.RingOfIntegers E) * a, mul_ne_zero (nonZeroDivisors.ne_zero w.2.2) ha, ?_⟩
+    refine
+      ⟨(w.2 : NumberField.RingOfIntegers E) * a, mul_ne_zero (nonZeroDivisors.ne_zero w.2.2) ha, ?_⟩
     have key : ((w.2 : NumberField.RingOfIntegers E) * a) • (c • y) = w.1 • (a • y) := by
       rw [← algebraMap_smul E ((w.2 : NumberField.RingOfIntegers E) * a), ← algebraMap_smul E w.1,
         ← algebraMap_smul E a, smul_smul, smul_smul, ← hw, map_mul]

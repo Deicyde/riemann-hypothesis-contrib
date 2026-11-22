@@ -7,15 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsMulIntSing
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.UG
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThetaDenom
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.UG
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThetaDenom
 open scoped TensorProduct NNReal Matrix
 
 namespace GlobalTheory.SBTransl
 
-theorem exists_nhds_zero_invariant {X : Type} [TopologicalSpace X] [AddCommGroup X] [IsTopologicalAddGroup X]
-    {β : Type} [Zero β] (g : X → β) (hg : IsLocallyConstant g) (hc : HasCompactSupport g) :
-    ∃ V ∈ 𝓝 (0 : X), ∀ x, ∀ u ∈ V, g (x + u) = g x := by
+theorem exists_nhds_zero_invariant
+    {X : Type} [TopologicalSpace X] [AddCommGroup X] [IsTopologicalAddGroup X]
+    {β : Type} [Zero β]
+    (g : X → β) (hg : IsLocallyConstant g) (hc : HasCompactSupport g)
+    : ∃ V ∈ 𝓝 (0 : X), ∀ x, ∀ u ∈ V, g (x + u) = g x := by
   have hW : ∀ x : X, {u : X | g (x + u) = g x} ∈ 𝓝 (0 : X) := fun x => by
     have h1 : IsOpen {y : X | g y = g x} := hg.isOpen_fiber _
     have h2 : Continuous fun u : X => x + u := continuous_const.add continuous_id
@@ -48,60 +52,84 @@ end GlobalTheory.SBTransl
 
 namespace GlobalTheory.SBTransl
 
-theorem norm_absNorm_lt_one {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
-    ‖((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F)‖ < 1 := by
+theorem norm_absNorm_lt_one {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : ‖((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F)‖ < 1 := by
   have := (NumberField.FinitePlace.norm_lt_one_iff_mem F v _).2 (Ideal.absNorm_mem v.asIdeal)
   simpa using this
 
-theorem exists_nat_subset_nhds {F : Type} [Field F] [NumberField F] (V : Set (FiniteAdeleRing (𝓞 F) F))
-    (hV : V ∈ 𝓝 (0 : FiniteAdeleRing (𝓞 F) F)) :
-    ∃ m : ℕ, 0 < m ∧ ∀ z : FiniteAdeleRing (𝓞 F) F,
-      (∀ v, ‖Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v z‖ ≤ ‖(m : Fv F v)‖) → z ∈ V := by
+theorem exists_nat_subset_nhds
+    {F : Type} [Field F] [NumberField F]
+    (V : Set (FiniteAdeleRing (𝓞 F) F)) (hV : V ∈ 𝓝 (0 : FiniteAdeleRing (𝓞 F) F))
+    : ∃ m : ℕ,
+      0 < m
+        ∧ ∀ z : FiniteAdeleRing (𝓞 F) F,
+          (∀ v,
+              ‖Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v z‖
+                ≤ ‖(m : Fv F v)‖)
+            → z ∈ V := by
   classical
-  have hopen : ∀ v : HeightOneSpectrum (𝓞 F),
-      IsOpen ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) := fun v => Valued.isOpen_integer _
+  have hopen
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        IsOpen ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) := fun v =>
+    Valued.isOpen_integer _
   let f : (∀ v : HeightOneSpectrum (𝓞 F), v.adicCompletionIntegers F) → FiniteAdeleRing (𝓞 F) F :=
-    RestrictedProduct.structureMap (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
-      (fun v => (v.adicCompletionIntegers F : Set (v.adicCompletion F))) Filter.cofinite
+    RestrictedProduct.structureMap
+      (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
+      (fun v => (v.adicCompletionIntegers F : Set (v.adicCompletion F)))
+      Filter.cofinite
   have hf : IsOpenEmbedding f := RestrictedProduct.isOpenEmbedding_structureMap hopen
   have hV' : f ⁻¹' V ∈ 𝓝 (0 : ∀ v : HeightOneSpectrum (𝓞 F), v.adicCompletionIntegers F) := by
     rw [← Filter.mem_map, hf.map_nhds_eq]
     exact hV
   rw [nhds_pi, Filter.mem_pi] at hV'
   obtain ⟨I, hI, t, ht, hsub⟩ := hV'
-  have hk : ∀ v, ∃ k : ℕ, ∀ y : v.adicCompletionIntegers F,
-      ‖(y : v.adicCompletion F)‖ ≤ ‖((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F)‖ ^ k → y ∈ t v := fun v => by
+  have hk
+      : ∀ v, ∃ k : ℕ, ∀ y : v.adicCompletionIntegers F,
+        ‖(y : v.adicCompletion F)‖ ≤ ‖((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F)‖ ^ k
+          → y ∈ t v := fun v => by
     have h1 := ht v
     rw [nhds_subtype, Filter.mem_comap] at h1
     obtain ⟨s, hs, hss⟩ := h1
     obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.1 hs
     obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one hε (norm_absNorm_lt_one v)
     refine ⟨k, fun y hy => hss (hball ?_)⟩
-    rw [Metric.mem_ball, show ((0 : ∀ v : HeightOneSpectrum (𝓞 F), v.adicCompletionIntegers F) v : v.adicCompletion F) = 0 from rfl,
+    rw [Metric.mem_ball,
+      show ((0 : ∀ v : HeightOneSpectrum (𝓞 F), v.adicCompletionIntegers F) v : v.adicCompletion F)
+          = 0 from
+        rfl,
       dist_zero_right]
     exact lt_of_le_of_lt hy hk
   choose k hk using hk
-  refine ⟨∏ v ∈ hI.toFinset, Ideal.absNorm v.asIdeal ^ k v, Finset.prod_pos fun v _ =>
-    pow_pos (lt_trans zero_lt_one (NumberField.HeightOneSpectrum.one_lt_absNorm v)) _, fun z hz => ?_⟩
+  refine ⟨
+    ∏ v ∈ hI.toFinset, Ideal.absNorm v.asIdeal ^ k v,
+    Finset.prod_pos fun v _ =>
+      pow_pos (lt_trans zero_lt_one (NumberField.HeightOneSpectrum.one_lt_absNorm v)) _,
+    fun z hz => ?_
+  ⟩
   have hint : ∀ v, z v ∈ v.adicCompletionIntegers F := fun v =>
-    Valued.toNormedField.norm_le_one_iff.1 ((hz v).trans (GlobalTheory.SmoothForms.denom_norm_natCast_le_one v _))
-  have hz' : z = f (fun v => ⟨z v, hint v⟩) := by
-    ext v; rfl
+    Valued.toNormedField.norm_le_one_iff.1 ((hz v).trans
+      (GlobalTheory.SmoothForms.denom_norm_natCast_le_one v _))
+  have hz' : z = f (fun v => ⟨z v, hint v⟩) := by ext v; rfl
   rw [hz']
   refine hsub (fun v hv => hk v _ ?_)
   have hvI : v ∈ hI.toFinset := hI.mem_toFinset.2 hv
   refine (hz v).trans ?_
   rw [← Finset.mul_prod_erase _ _ hvI, Nat.cast_mul, norm_mul, Nat.cast_pow, norm_pow]
-  exact mul_le_of_le_one_right (by positivity) (GlobalTheory.SmoothForms.denom_norm_natCast_le_one v _)
+  exact mul_le_of_le_one_right (by positivity)
+    (GlobalTheory.SmoothForms.denom_norm_natCast_le_one v _)
 
 end GlobalTheory.SBTransl
 
 namespace GlobalTheory.SBTransl
 
-theorem exists_mulInt_invariant {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ) (hg : g ∈ SB (κ → FiniteAdeleRing (𝓞 F) F)) :
-    ∃ m : ℕ, 0 < m ∧ ∀ a : κ → AF F, IsMulInt F m a → ∀ x : κ → FiniteAdeleRing (𝓞 F) F,
-      g (x + fun i => (a i).2) = g x := by
+theorem exists_mulInt_invariant
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ]
+    (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ) (hg : g ∈ SB (κ → FiniteAdeleRing (𝓞 F) F))
+    : ∃ m : ℕ,
+      0 < m
+        ∧ ∀ a : κ → AF F,
+          IsMulInt F m a → ∀ x : κ → FiniteAdeleRing (𝓞 F) F, g (x + fun i => (a i).2) = g x := by
   obtain ⟨hlc, hcs⟩ := hg
   obtain ⟨V, hV, hinv⟩ := exists_nhds_zero_invariant g hlc hcs
   rw [nhds_pi, Filter.mem_pi] at hV
@@ -110,9 +138,14 @@ theorem exists_mulInt_invariant {F : Type} [Field F] [NumberField F] {κ : Type}
   refine ⟨m, hm, fun a ha x => hinv x _ (hsub fun i _ => ?_)⟩
   exact Set.mem_iInter.1 (hmV _ fun v => ha.2 v i) i
 
-theorem transInv : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ),
-    g ∈ SB (κ → FiniteAdeleRing (𝓞 F) F) → ∃ m : ℕ, 0 < m ∧ ∀ a : κ → AF F, IsMulInt F m a →
-      ∀ x : κ → FiniteAdeleRing (𝓞 F) F, g (x + fun i => (a i).2) = g x :=
+theorem transInv
+    : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+        (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ),
+      g ∈ SB (κ → FiniteAdeleRing (𝓞 F) F)
+        → ∃ m : ℕ,
+          0 < m
+            ∧ ∀ a : κ → AF F,
+              IsMulInt F m a → ∀ x : κ → FiniteAdeleRing (𝓞 F) F, g (x + fun i => (a i).2) = g x :=
   fun g hg => exists_mulInt_invariant g hg
 
 end GlobalTheory.SBTransl

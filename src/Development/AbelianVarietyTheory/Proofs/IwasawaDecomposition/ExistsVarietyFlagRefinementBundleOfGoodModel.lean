@@ -11,29 +11,38 @@ noncomputable section
 
 namespace GlobalTheory.FlagBundle
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
 
 variable {F : Type} [Field F] {Ω Ω' : Type} [Field Ω] [Algebra F Ω] [Field Ω'] [Algebra F Ω']
 
-private theorem eq_spMap_of_specializes {X : Scheme.{0}} {K : Type} [Field K] (g : Sp K ⟶ X) {z : X}
-    (h : g (IsLocalRing.closedPoint K) ⤳ z) :
-    g = spMap (X.presheaf.stalkSpecializes h ≫ Scheme.stalkClosedPointTo (R := CommRingCat.of K) g).hom ≫
-      X.fromSpecStalk z := by
+private theorem eq_spMap_of_specializes
+    {X : Scheme.{0}} {K : Type} [Field K]
+    (g : Sp K ⟶ X)
+    {z : X} (h : g (IsLocalRing.closedPoint K) ⤳ z)
+    : g
+      = spMap
+          (X.presheaf.stalkSpecializes h ≫ Scheme.stalkClosedPointTo (R := CommRingCat.of K) g).hom
+        ≫ X.fromSpecStalk z := by
   conv_lhs => rw [← spMap_stalkClosedPointTo g]
   rw [← Scheme.SpecMap_stalkSpecializes_fromSpecStalk h]
   show Spec.map _ ≫ _ = Spec.map _ ≫ _
   simp only [CommRingCat.ofHom_hom, Spec.map_comp, Category.assoc]
 
-private theorem spMap_comp_spMap_divisor {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (g : B →+* C) (f : A →+* B) :
-    spMap (g.comp f) = spMap g ≫ spMap f := by
+private theorem spMap_comp_spMap_divisor
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (g : B →+* C) (f : A →+* B)
+    : spMap (g.comp f) = spMap g ≫ spMap f := by
   show Spec.map _ = Spec.map _ ≫ Spec.map _
   rw [CommRingCat.ofHom_comp, Spec.map_comp]
 
-theorem exists_isHom_of_generic (M : RatModel F Ω) (M' : RatModel F Ω') (f : M'.Z ⟶ M.Z) (hs : f ≫ M.s = M'.s)
-    (hg : f (genericPoint M'.Z) = genericPoint M.Z) : ∃ φ : Ω →ₐ[F] Ω', M.IsHom M' φ f := by
+theorem exists_isHom_of_generic
+    (M : RatModel F Ω) (M' : RatModel F Ω') (f : M'.Z ⟶ M.Z)
+    (hs : f ≫ M.s = M'.s) (hg : f (genericPoint M'.Z) = genericPoint M.Z)
+    : ∃ φ : Ω →ₐ[F] Ω', M.IsHom M' φ f := by
   classical
   have hp0 : (M'.pt ≫ f) (IsLocalRing.closedPoint Ω') = genericPoint M.Z := by
-    have h1 : (M'.pt ≫ f) (IsLocalRing.closedPoint Ω') = f (M'.pt (IsLocalRing.closedPoint Ω')) := rfl
+    have h1 : (M'.pt ≫ f) (IsLocalRing.closedPoint Ω') = f (M'.pt (IsLocalRing.closedPoint Ω')) :=
+      rfl
     rw [h1]
     exact (congrArg f (M'.pt_apply (IsLocalRing.closedPoint Ω'))).trans hg
   have hp : (M'.pt ≫ f) (IsLocalRing.closedPoint Ω') ⤳ genericPoint M.Z := by rw [hp0]
@@ -46,15 +55,17 @@ theorem exists_isHom_of_generic (M : RatModel F Ω) (M' : RatModel F Ω') (f : M
     refine ⟨a, ?_⟩
     rw [← RatModel.coe_stalkEquiv, ha]
   let E := RingEquiv.ofBijective (M.stalkHom (genericPoint M.Z)) ⟨M.stalkHom_injective _, hsurj⟩
-  let α := (M.Z.presheaf.stalkSpecializes hp ≫
-    Scheme.stalkClosedPointTo (R := CommRingCat.of Ω') (M'.pt ≫ f)).hom
+  let α :=
+    (M.Z.presheaf.stalkSpecializes hp
+      ≫ Scheme.stalkClosedPointTo (R := CommRingCat.of Ω') (M'.pt ≫ f)).hom
   let φ₀ : Ω →+* Ω' := α.comp E.symm.toRingHom
   have key : φ₀.comp (M.stalkHom (genericPoint M.Z)) = α := by
     ext a
     show α (E.symm (E a)) = α a
     rw [E.symm_apply_apply]
   have hpt : M'.pt ≫ f = spMap φ₀ ≫ M.pt := by
-    rw [eq_spMap_of_specializes (M'.pt ≫ f) hp, hq, ← Category.assoc, ← spMap_comp_spMap_divisor, key]
+    rw [eq_spMap_of_specializes (M'.pt ≫ f) hp, hq, ← Category.assoc, ← spMap_comp_spMap_divisor,
+      key]
   have hc : spMap (φ₀.comp (algebraMap F Ω)) = spMap (algebraMap F Ω') := by
     rw [spMap_comp_spMap_divisor, ← M.pt_s, ← Category.assoc, ← hpt, Category.assoc, hs, M'.pt_s]
   have hinj : φ₀.comp (algebraMap F Ω) = algebraMap F Ω' := by
@@ -64,7 +75,8 @@ theorem exists_isHom_of_generic (M : RatModel F Ω) (M' : RatModel F Ω') (f : M
     exact congrArg (fun g => g.hom a) h2
   exact ⟨⟨φ₀, fun a => RingHom.congr_fun hinj a⟩, hpt⟩
 
-theorem apply_eq_of_isHom_id {M : RatModel F Ω} {χ : Ω →ₐ[F] Ω} (h : M.IsHom M χ (𝟙 M.Z)) (x : Ω) : χ x = x := by
+theorem apply_eq_of_isHom_id {M : RatModel F Ω} {χ : Ω →ₐ[F] Ω} (h : M.IsHom M χ (𝟙 M.Z)) (x : Ω)
+    : χ x = x := by
   have hpt : (𝟙 M.Z : M.Z ⟶ M.Z) (M.pt (IsLocalRing.closedPoint Ω)) = genericPoint M.Z := by
     exact M.pt_apply _
   have hx : x ∈ M.O ((𝟙 M.Z : M.Z ⟶ M.Z) (M.pt (IsLocalRing.closedPoint Ω))) := by
@@ -73,17 +85,20 @@ theorem apply_eq_of_isHom_id {M : RatModel F Ω} {χ : Ω →ₐ[F] Ω} (h : M.I
   rw [Category.comp_id, RatModel.val_pt, RatModel.val_pt] at h2
   exact h2.symm
 
-theorem iso_genericPoint {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (e : X ≅ Y) :
-    e.hom (genericPoint X) = genericPoint Y := by
+theorem iso_genericPoint {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (e : X ≅ Y)
+    : e.hom (genericPoint X) = genericPoint Y := by
   exact genericPoint_eq_of_isOpenImmersion e.hom
 
-private theorem mat_map_mul_inv {ι : Type} {m : ι → ℕ} {K K' : Type} [Field K] [Field K'] (σ : K →+* K')
-    (X Y : Mat m K) : (X * Y⁻¹).map σ = X.map σ * (Y.map σ)⁻¹ := by
+private theorem mat_map_mul_inv
+    {ι : Type} {m : ι → ℕ} {K K' : Type} [Field K] [Field K'] (σ : K →+* K') (X Y : Mat m K)
+    : (X * Y⁻¹).map σ = X.map σ * (Y.map σ)⁻¹ := by
   rw [Mat.map_mul, Mat.map_inv]
 
-theorem exists_refines_of_iso {ι : Type} {m k : ι → ℕ} (M : RatModel F Ω) (M' : RatModel F Ω') (e : M'.Z ≅ M.Z)
-    (hs : e.hom ≫ M.s = M'.s) (S : Fr M m k) :
-    ∃ (φ : Ω →ₐ[F] Ω') (S' : Fr M' m k), Refines S S' φ e.hom := by
+theorem exists_refines_of_iso
+    {ι : Type} {m k : ι → ℕ}
+    (M : RatModel F Ω) (M' : RatModel F Ω') (e : M'.Z ≅ M.Z) (hs : e.hom ≫ M.s = M'.s)
+    (S : Fr M m k)
+    : ∃ (φ : Ω →ₐ[F] Ω') (S' : Fr M' m k), Refines S S' φ e.hom := by
   classical
   obtain ⟨φ, hφ⟩ := exists_isHom_of_generic M M' e.hom hs (iso_genericPoint e)
   have hs' : e.inv ≫ M'.s = M.s := by rw [← hs, ← Category.assoc, e.inv_hom_id, Category.id_comp]
@@ -121,21 +136,22 @@ theorem exists_refines_of_iso {ι : Type} {m k : ι → ℕ} (M : RatModel F Ω)
     have h1 : ((A.map φ) τ).det = φ (A τ).det := Mat.det_map A φ.toRingHom τ
     rw [h1]
     exact (map_ne_zero φ).2 (hA τ)
-  let S' : Fr M' m k :=
-    { S := fun z' => {A' | A'.map ψ ∈ S.S (e.hom z')}
-      loc := by
-        intro z'
-        obtain ⟨U, A, hzU, hA, hU⟩ := S.loc (e.hom z')
-        refine ⟨e.hom ⁻¹ᵁ U, A.map φ, hzU, hdet hA, fun z'' hz'' A'' => ?_⟩
-        show A''.map ψ ∈ S.S (e.hom z'') ↔ _
-        rw [hU (e.hom z'') hz'' (A''.map ψ), I1]
-        constructor
-        · intro h
-          have h1 : Par k (M'.O z'').toSubring (((A'' * (A.map φ)⁻¹).map ψ).map φ) :=
-            h.map φ.toRingHom (fun x hx => memφ hx)
-          rwa [mm2] at h1
-        · intro h
-          exact h.map ψ.toRingHom (fun x hx => memψ hx) }
+  let S' : Fr M' m k := {
+    S := fun z' => {A' | A'.map ψ ∈ S.S (e.hom z')}
+    loc := by
+      intro z'
+      obtain ⟨U, A, hzU, hA, hU⟩ := S.loc (e.hom z')
+      refine ⟨e.hom ⁻¹ᵁ U, A.map φ, hzU, hdet hA, fun z'' hz'' A'' => ?_⟩
+      show A''.map ψ ∈ S.S (e.hom z'') ↔ _
+      rw [hU (e.hom z'') hz'' (A''.map ψ), I1]
+      constructor
+      · intro h
+        have h1 : Par k (M'.O z'').toSubring (((A'' * (A.map φ)⁻¹).map ψ).map φ) :=
+          h.map φ.toRingHom (fun x hx => memφ hx)
+        rwa [mm2] at h1
+      · intro h
+        exact h.map ψ.toRingHom (fun x hx => memψ hx)
+  }
   refine ⟨φ, S', ⟨le_rfl, hφ, ?_, ?_, ?_⟩⟩
   · intro z' A' hA' A hA
     have h1 : Par k (M.O (e.hom z')).toSubring (A'.map ψ * A⁻¹) :=
@@ -157,13 +173,16 @@ theorem exists_refines_of_iso {ι : Type} {m k : ι → ℕ} (M : RatModel F Ω)
     exact h2
   · intro K _ x A hA h hh
     refine ⟨x ≫ e.inv, ⟨by simp, ?_⟩, fun p hp => ?_⟩
-    · have hx1 : e.hom ((x ≫ e.inv) (IsLocalRing.closedPoint K)) = x (IsLocalRing.closedPoint K) := by
-        have h1 : (x ≫ e.inv) (IsLocalRing.closedPoint K) = e.inv (x (IsLocalRing.closedPoint K)) := rfl
+    · have hx1
+          : e.hom ((x ≫ e.inv) (IsLocalRing.closedPoint K)) = x (IsLocalRing.closedPoint K) := by
+        have h1 : (x ≫ e.inv) (IsLocalRing.closedPoint K) = e.inv (x (IsLocalRing.closedPoint K)) :=
+          rfl
         rw [h1]
         simp
       have hd : ∀ τ, ((A.map φ) τ).det ≠ 0 := hdet (Fr.det_ne hA)
       have hone : (1 : Mat m Ω').map (M'.val (x ≫ e.inv)) = 1 := by
-        funext τ; ext i j
+        funext τ
+        ext i j
         simp only [Mat.map, Matrix.map_apply, Pi.one_apply, Matrix.one_apply]
         split_ifs
         · exact RatModel.val_one _
@@ -180,9 +199,13 @@ theorem exists_refines_of_iso {ι : Type} {m k : ι → ℕ} (M : RatModel F Ω)
         exact hh
     · rw [← hp.1, Category.assoc, e.hom_inv_id, Category.comp_id]
 
-theorem exists_var_refines (F Ω : Type) [Field F] [Field Ω] [Algebra F Ω] (M : RatModel F Ω) (d : ℕ) (ι : Type)
-    (m k : ι → ℕ) (S : Fr M m k) (h : Good M d) :
-    ∃ (Y : GlobalTheory.ProjVar.Var F) (φ : Ω →ₐ[F] Y.Fn) (f : Y.X ⟶ M.Z) (S' : Fr (ratOf Y) m k),
+theorem exists_var_refines
+    (F Ω : Type) [Field F] [Field Ω] [Algebra F Ω]
+    (M : RatModel F Ω)
+    (d : ℕ)
+    (ι : Type) (m k : ι → ℕ) (S : Fr M m k)
+    (h : Good M d)
+    : ∃ (Y : GlobalTheory.ProjVar.Var F) (φ : Ω →ₐ[F] Y.Fn) (f : Y.X ⟶ M.Z) (S' : Fr (ratOf Y) m k),
       Y.dim = d ∧ Refines S S' φ f := by
   obtain ⟨hP, hSm, hGI⟩ := h
   haveI : SmoothOfRelativeDimension d M.s := hSm

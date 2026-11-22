@@ -39,19 +39,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AtAlgebraMap
 noncomputable section
 
 open scoped TensorProduct Matrix Classical
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions.TH
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
 
 namespace GlobalTheory.RealLift.Main
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem incM_map_piInf {n m : Type} (J : Matrix n m E) {w : InfinitePlace F} (τ : EmbOver E w) :
-    (incM F J).map (piInf τ) = J.map τ.1 := by
+theorem incM_map_piInf {n m : Type} (J : Matrix n m E) {w : InfinitePlace F} (τ : EmbOver E w)
+    : (incM F J).map (piInf τ) = J.map τ.1 := by
   ext i j
   simp [incM, piInf, compInf, inclR, infEmb_tmul]
 
-theorem hasExp_div (τ : ∀ w : InfinitePlace F, EmbOver E w) {χ χ' : Chr F E} {m m' : InfinitePlace F → ℤ}
-    (h : HasExp τ χ m) (h' : HasExp τ χ' m') : HasExp τ (χ / χ') (fun w => m w - m' w) := by
+theorem hasExp_div
+    (τ : ∀ w : InfinitePlace F, EmbOver E w)
+    {χ χ' : Chr F E} {m m' : InfinitePlace F → ℤ} (h : HasExp τ χ m) (h' : HasExp τ χ' m')
+    : HasExp τ (χ / χ') (fun w => m w - m' w) := by
   intro z hz
   rw [MonoidHom.div_apply, Circle.coe_div, h z hz, h' z hz, ← Finset.prod_div_distrib]
   refine Finset.prod_congr rfl fun w _ => ?_
@@ -65,11 +69,15 @@ theorem hasExp_div (τ : ∀ w : InfinitePlace F, EmbOver E w) {χ χ' : Chr F E
   rw [zpow_sub₀ this]
 
 section Tensor
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {V W : ι → Type} [∀ i, AddCommGroup (V i)] [∀ i, Module ℂ (V i)]
-  [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {V W : ι → Type}
+  [∀ i, AddCommGroup (V i)] [∀ i, Module ℂ (V i)] [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
 
-theorem map_atPl (p : ∀ i, V i →ₗ[ℂ] W i) (w : ι) (L : Module.End ℂ (V w)) (L' : Module.End ℂ (W w))
-    (h : p w ∘ₗ L = L' ∘ₗ p w) : PiTensorProduct.map p ∘ₗ atPl w L = atPl w L' ∘ₗ PiTensorProduct.map p := by
+theorem map_atPl
+    (p : ∀ i, V i →ₗ[ℂ] W i) (w : ι)
+    (L : Module.End ℂ (V w)) (L' : Module.End ℂ (W w)) (h : p w ∘ₗ L = L' ∘ₗ p w)
+    : PiTensorProduct.map p ∘ₗ atPl w L = atPl w L' ∘ₗ PiTensorProduct.map p := by
   unfold atPl
   rw [← PiTensorProduct.map_comp, ← PiTensorProduct.map_comp]
   congr 1
@@ -78,52 +86,94 @@ theorem map_atPl (p : ∀ i, V i →ₗ[ℂ] W i) (w : ι) (L : Module.End ℂ (
   · subst hi; simp [h]
   · simp [Function.update_of_ne hi]
 
-theorem map_sumPl (p : ∀ i, V i →ₗ[ℂ] W i) (L : ∀ i, Module.End ℂ (V i)) (L' : ∀ i, Module.End ℂ (W i))
-    (h : ∀ i, p i ∘ₗ L i = L' i ∘ₗ p i) : PiTensorProduct.map p ∘ₗ sumPl L = sumPl L' ∘ₗ PiTensorProduct.map p := by
-  apply LinearMap.ext; intro x
+theorem map_sumPl
+    (p : ∀ i, V i →ₗ[ℂ] W i) (L : ∀ i, Module.End ℂ (V i)) (L' : ∀ i, Module.End ℂ (W i))
+    (h : ∀ i, p i ∘ₗ L i = L' i ∘ₗ p i)
+    : PiTensorProduct.map p ∘ₗ sumPl L = sumPl L' ∘ₗ PiTensorProduct.map p := by
+  apply LinearMap.ext
+  intro x
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [sumPl, LinearMap.comp_apply, LinearMap.sum_apply, map_sum]
   exact Finset.sum_congr rfl fun i _ => LinearMap.congr_fun (map_atPl p i (L i) (L' i) (h i)) x
 
 end Tensor
 
-theorem i_locfin : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (V : ι → Type) [∀ i, AddCommGroup (V i)] [∀ i, Module ℂ (V i)] (L : ∀ i, Module.End ℂ (V i)), (∀ i, GlobalTheory.RealLift.LocFin (L i)) → GlobalTheory.RealLift.LocFin (GlobalTheory.RealLift.sumPl L) := GlobalTheory.T.isLocallyFinite_piTensorSumOfFactorOperators
+theorem i_locfin
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (V : ι → Type) [∀ i, AddCommGroup (V i)]
+        [∀ i, Module ℂ (V i)] (L : ∀ i, Module.End ℂ (V i)),
+      (∀ i, GlobalTheory.RealLift.LocFin (L i))
+        → GlobalTheory.RealLift.LocFin (GlobalTheory.RealLift.sumPl L) :=
+  GlobalTheory.T.isLocallyFinite_piTensorSumOfFactorOperators
 
-theorem i_expact : ∀ (F : Type) [Field F] [NumberField F] (κ V : Type) [Fintype κ] [AddCommGroup V] [Module ℂ V] (Φ : V →ₗ[ℂ] GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ) (L : Module.End ℂ V) (om : Multiplicative ℝ →* Module.End ℂ ((κ → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) → ℂ)), GlobalTheory.RealLift.LocFin L → (∀ t, ∀ l ∈ (GlobalTheory.WeilM.adeleClass F).adm κ, l ∘ₗ om t ∈ (GlobalTheory.WeilM.adeleClass F).adm κ) → (∀ T, GlobalTheory.RealLift.SD (fun t => om (Multiplicative.ofAdd t)) (Φ T) (Φ (L T))) → ∃ U : Module.End ℂ V, GlobalTheory.RealLift.IsExp L U ∧ ∀ T, GlobalTheory.RealLift.SA (om (Multiplicative.ofAdd 1)) (Φ T) (Φ (U T)) := GlobalTheory.T.weakExponential_action_on_fockVectors
+theorem i_expact
+    : ∀ (F : Type) [Field F] [NumberField F] (κ V : Type) [Fintype κ] [AddCommGroup V] [Module ℂ V]
+        (Φ : V →ₗ[ℂ] GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F κ)
+        (L : Module.End ℂ V)
+        (om : Multiplicative ℝ →* Module.End ℂ
+          ((κ → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) → ℂ)),
+      GlobalTheory.RealLift.LocFin L
+        → (∀ t, ∀ l ∈ (GlobalTheory.WeilM.adeleClass F).adm κ,
+          l ∘ₗ om t ∈ (GlobalTheory.WeilM.adeleClass F).adm κ)
+        → (∀ T, GlobalTheory.RealLift.SD (fun t => om (Multiplicative.ofAdd t)) (Φ T) (Φ (L T)))
+        → ∃ U : Module.End ℂ V,
+          GlobalTheory.RealLift.IsExp L U
+            ∧ ∀ T, GlobalTheory.RealLift.SA (om (Multiplicative.ofAdd 1)) (Φ T) (Φ (U T)) :=
+  GlobalTheory.T.weakExponential_action_on_fockVectors
 
 theorem i_actslaws : GlobalTheory.RealLift.ActsLaws := GlobalTheory.T.archActionReadings_compatible
 
 theorem i_derex : GlobalTheory.RealLift.DerEx := GlobalTheory.T.archHeisenbergDerivatives_exist
 
-theorem i_fockex : GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.FockEx := GlobalTheory.T.fockToSchrodingerMapExists_of_archHeisenbergDerivatives
+theorem i_fockex : GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.FockEx :=
+  GlobalTheory.T.fockToSchrodingerMapExists_of_archHeisenbergDerivatives
 
-theorem i_vacline : GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.VacLine := GlobalTheory.T.schwartzFockVacuumLineUnique_of_heisenberg_derivatives
+theorem i_vacline : GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.VacLine :=
+  GlobalTheory.T.schwartzFockVacuumLineUnique_of_heisenberg_derivatives
 
-theorem i_polrange : GlobalTheory.RealLift.ActsLaws → GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.VacLine → GlobalTheory.RealLift.PolRange := GlobalTheory.T.fockPolynomialSpace_eq_fockImage_of_arch_laws
+theorem i_polrange
+    : GlobalTheory.RealLift.ActsLaws → GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.VacLine
+      → GlobalTheory.RealLift.PolRange :=
+  GlobalTheory.T.fockPolynomialSpace_eq_fockImage_of_arch_laws
 
 theorem i_genex : GlobalTheory.RealLift.GenEx := GlobalTheory.T.oneParamSubgroup_generators_exist
 
-theorem i_lineex : GlobalTheory.RealLift.LineEx := GlobalTheory.T.unitaryLieElements_generate_oneParamLines
+theorem i_lineex : GlobalTheory.RealLift.LineEx :=
+  GlobalTheory.T.unitaryLieElements_generate_oneParamLines
 
-theorem i_kline : GlobalTheory.RealLift.LineEx → GlobalTheory.RealLift.KLine := GlobalTheory.T.maximalCompact_oneParameterLines_of_lieLines
+theorem i_kline : GlobalTheory.RealLift.LineEx → GlobalTheory.RealLift.KLine :=
+  GlobalTheory.T.maximalCompact_oneParameterLines_of_lieLines
 
-theorem i_liescalar : GlobalTheory.FunPr.Hypotheses₂ → GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.VacLine → GlobalTheory.RealLift.LieScalar := GlobalTheory.T.lieScalar_of_prints_derEx_vacLine
+theorem i_liescalar
+    : GlobalTheory.FunPr.Hypotheses₂ → GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.VacLine
+      → GlobalTheory.RealLift.LieScalar :=
+  GlobalTheory.T.lieScalar_of_prints_derEx_vacLine
 
-theorem i_liesecond : GlobalTheory.FunPr.Hypotheses₂ → GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.FockEx → GlobalTheory.RealLift.VacLine → GlobalTheory.RealLift.LieScalar → GlobalTheory.RealLift.LieSecond := GlobalTheory.T.lieSecond_of_prints_derEx_fockEx_vacLine_lieScalar
+theorem i_liesecond
+    : GlobalTheory.FunPr.Hypotheses₂ → GlobalTheory.RealLift.DerEx → GlobalTheory.RealLift.FockEx
+      → GlobalTheory.RealLift.VacLine → GlobalTheory.RealLift.LieScalar
+      → GlobalTheory.RealLift.LieSecond :=
+  GlobalTheory.T.lieSecond_of_prints_derEx_fockEx_vacLine_lieScalar
 
-theorem i_liefirst : GlobalTheory.RealLift.LieSecond → GlobalTheory.RealLift.LieFirst := GlobalTheory.T.lieFirst_of_lieSecond'
+theorem i_liefirst : GlobalTheory.RealLift.LieSecond → GlobalTheory.RealLift.LieFirst :=
+  GlobalTheory.T.lieFirst_of_lieSecond'
 
-theorem i_frameex : GlobalTheory.RealLift.FrameEx := GlobalTheory.T.cartanEigen_orthonormalFrame_exists
+theorem i_frameex : GlobalTheory.RealLift.FrameEx :=
+  GlobalTheory.T.cartanEigen_orthonormalFrame_exists
 
 theorem i_parity : GlobalTheory.RealLift.Parity := GlobalTheory.T.realLift_parity
 
 section Helpers
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {V W : ι → Type} [∀ i, AddCommGroup (V i)] [∀ i, Module ℂ (V i)]
-  [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {V W : ι → Type}
+  [∀ i, AddCommGroup (V i)] [∀ i, Module ℂ (V i)] [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
 
-theorem atPl_eq (w : ι) (L : Module.End ℂ (V w)) :
-    atPl w L = PiTensorProduct.mapMultilinear ℂ V V (Function.update (fun i => (LinearMap.id : V i →ₗ[ℂ] V i)) w L) := rfl
+theorem atPl_eq (w : ι) (L : Module.End ℂ (V w))
+    : atPl w L
+      = PiTensorProduct.mapMultilinear ℂ V V
+        (Function.update (fun i => (LinearMap.id : V i →ₗ[ℂ] V i)) w L) :=
+  rfl
 
 theorem atPl_add (w : ι) (L L' : Module.End ℂ (V w)) : atPl w (L + L') = atPl w L + atPl w L' := by
   simp only [atPl_eq, MultilinearMap.map_update_add]
@@ -132,10 +182,12 @@ theorem atPl_smul (w : ι) (c : ℂ) (L : Module.End ℂ (V w)) : atPl w (c • 
   simp only [atPl_eq, MultilinearMap.map_update_smul, RingHom.id_apply]
 
 theorem atPl_one (w : ι) : atPl w (1 : Module.End ℂ (V w)) = 1 := by
-  rw [atPl_eq, show Function.update (fun i => (LinearMap.id : V i →ₗ[ℂ] V i)) w 1 = fun i => LinearMap.id by
-    funext i; by_cases h : i = w
-    · subst h; simp; rfl
-    · simp [Function.update_of_ne h]]
+  rw [atPl_eq,
+    show Function.update (fun i => (LinearMap.id : V i →ₗ[ℂ] V i)) w 1 = fun i => LinearMap.id by
+      funext i
+      by_cases h : i = w
+      · subst h; simp; rfl
+      · simp [Function.update_of_ne h]]
   exact PiTensorProduct.map_id
 
 theorem atPl_zero (w : ι) : atPl w (0 : Module.End ℂ (V w)) = 0 := by
@@ -145,19 +197,28 @@ end Helpers
 
 section Exp
 
-variable {V V' Z : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V'] [AddCommGroup Z] [Module ℂ Z]
+variable
+  {V V' Z : Type}
+  [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V'] [AddCommGroup Z] [Module ℂ Z]
 
-theorem pow_comm {q : V →ₗ[ℂ] Z} {L : Module.End ℂ V} {L0 : Module.End ℂ Z} (h : q ∘ₗ L = L0 ∘ₗ q) (n : ℕ) (v : V) :
-    q ((L ^ n) v) = (L0 ^ n) (q v) := by
+theorem pow_comm
+    {q : V →ₗ[ℂ] Z} {L : Module.End ℂ V} {L0 : Module.End ℂ Z} (h : q ∘ₗ L = L0 ∘ₗ q)
+    (n : ℕ) (v : V)
+    : q ((L ^ n) v) = (L0 ^ n) (q v) := by
   induction n with
   | zero => simp
-  | succ n ih => rw [pow_succ', pow_succ', Module.End.mul_apply, Module.End.mul_apply, ← ih, ← LinearMap.comp_apply, h,
-      LinearMap.comp_apply]
+  | succ n ih =>
+    rw [pow_succ', pow_succ', Module.End.mul_apply, Module.End.mul_apply, ← ih,
+      ← LinearMap.comp_apply, h, LinearMap.comp_apply]
 
-theorem exp_equiv {q : V →ₗ[ℂ] Z} {q' : V' →ₗ[ℂ] Z} {L U : Module.End ℂ V} {L' U' : Module.End ℂ V'} {L0 : Module.End ℂ Z}
-    (hU : IsExp L U) (hU' : IsExp L' U') (h : q ∘ₗ L = L0 ∘ₗ q) (h' : q' ∘ₗ L' = L0 ∘ₗ q') {v : V} {v' : V'}
-    (e : q v = q' v') : q (U v) = q' (U' v') := by
-  refine sub_eq_zero.1 ((Module.forall_dual_apply_eq_zero_iff ℂ (q (U v) - q' (U' v'))).1 fun l => ?_)
+theorem exp_equiv
+    {q : V →ₗ[ℂ] Z} {q' : V' →ₗ[ℂ] Z} {L U : Module.End ℂ V} {L' U' : Module.End ℂ V'}
+    {L0 : Module.End ℂ Z}
+    (hU : IsExp L U) (hU' : IsExp L' U') (h : q ∘ₗ L = L0 ∘ₗ q) (h' : q' ∘ₗ L' = L0 ∘ₗ q')
+    {v : V} {v' : V'} (e : q v = q' v')
+    : q (U v) = q' (U' v') := by
+  refine sub_eq_zero.1 ((Module.forall_dual_apply_eq_zero_iff ℂ (q (U v) - q' (U' v'))).1 fun l =>
+    ?_)
   rw [map_sub, sub_eq_zero]
   have a := hU v (l ∘ₗ q)
   have b := hU' v' (l ∘ₗ q')
@@ -166,26 +227,31 @@ theorem exp_equiv {q : V →ₗ[ℂ] Z} {q' : V' →ₗ[ℂ] Z} {L U : Module.En
 
 end Exp
 
-theorem locFin_fock1 (P Q R S : ℕ) (X : Mat P Q) (hX : IsKC X) (c : ℂ) :
-    LocFin (fockAct1 P Q R S X + c • 1) := fun v => by
+theorem locFin_fock1 (P Q R S : ℕ) (X : Mat P Q) (hX : IsKC X) (c : ℂ)
+    : LocFin (fockAct1 P Q R S X + c • 1) := fun v => by
   obtain ⟨⟨W, hW, hv, hs⟩, -⟩ := (GlobalTheory.FockPolGK.pol_locFin_weights P Q R S).1 v
   exact ⟨W, hW, hv, fun y hy => W.add_mem (hs X hX y hy) (W.smul_mem c hy)⟩
 
-theorem locFin_fock2 (P Q R S : ℕ) (Y : Mat R S) (hY : IsKC Y) (c : ℂ) :
-    LocFin (fockAct2 P Q R S Y + c • 1) := fun v => by
+theorem locFin_fock2 (P Q R S : ℕ) (Y : Mat R S) (hY : IsKC Y) (c : ℂ)
+    : LocFin (fockAct2 P Q R S Y + c • 1) := fun v => by
   obtain ⟨⟨W, hW, hv, hs⟩, -⟩ := (GlobalTheory.FockPolGK.pol_locFin_weights P Q R S).2 v
   exact ⟨W, hW, hv, fun y hy => W.add_mem (hs Y hY y hy) (W.smul_mem c hy)⟩
 
 section Side
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-  {n d P Q R S : ℕ} {Y : Spc F E n} {W : Spc F E d} (B : Base F E) (M : Model σ Y W) (om : Rep σ Y W)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n d P Q R S : ℕ} {Y : Spc F E n} {W : Spc F E d}
+  (B : Base F E) (M : Model σ Y W) (om : Rep σ Y W)
   (N : InfinitePlace F → GKMod R S) (p : ∀ w, Formalism.BasicNotions.TH.Pol P Q R S →ₗ[ℂ] (N w).V)
-  (Φ : Tens F P Q R S →ₗ[ℂ] SInf F (Fin n × Fin d)) (Ψ : SInf F (Fin n × Fin d) →ₗ[ℂ] Tens F P Q R S)
+  (Φ : Tens F P Q R S →ₗ[ℂ] SInf F (Fin n × Fin d))
+  (Ψ : SInf F (Fin n × Fin d) →ₗ[ℂ] Tens F P Q R S)
 
 include Φ in
-theorem pol_eq (hrange : LinearMap.range Φ = M.Pol B.ψ B.emb) {f : SInf F (Fin n × Fin d)} (hf : f ∈ M.Pol B.ψ B.emb) :
-    ∃ T, f = Φ T := by
+theorem pol_eq
+    (hrange : LinearMap.range Φ = M.Pol B.ψ B.emb)
+    {f : SInf F (Fin n × Fin d)} (hf : f ∈ M.Pol B.ψ B.emb)
+    : ∃ T, f = Φ T := by
   rw [← hrange] at hf
   obtain ⟨T, rfl⟩ := hf
   exact ⟨T, rfl⟩
@@ -194,10 +260,13 @@ end Side
 
 section SideW
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-  {n d P Q R S : ℕ} {Y : Spc F E n} {W : Spc F E d} (B : Base F E) (M : Model σ Y W) (om : Rep σ Y W)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n d P Q R S : ℕ} {Y : Spc F E n} {W : Spc F E d}
+  (B : Base F E) (M : Model σ Y W) (om : Rep σ Y W)
   (N : InfinitePlace F → GKMod R S) (p : ∀ w, Formalism.BasicNotions.TH.Pol P Q R S →ₗ[ℂ] (N w).V)
-  (Φ : Tens F P Q R S →ₗ[ℂ] SInf F (Fin n × Fin d)) (Ψ : SInf F (Fin n × Fin d) →ₗ[ℂ] Tens F P Q R S)
+  (Φ : Tens F P Q R S →ₗ[ℂ] SInf F (Fin n × Fin d))
+  (Ψ : SInf F (Fin n × Fin d) →ₗ[ℂ] Tens F P Q R S)
 
 end SideW
 

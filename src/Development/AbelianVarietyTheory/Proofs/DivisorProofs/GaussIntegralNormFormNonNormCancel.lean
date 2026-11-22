@@ -21,10 +21,13 @@ namespace GlobalTheory.KSp.Cancel
 open ValuativeRel
 open scoped Topology NNReal
 
-theorem compact_subset_cball {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] {K : Set F} (hK : IsCompact K) :
-    ∃ s : Fˣ, K ⊆ GlobalTheory.SplitWeil.cball s := by
-  refine hK.elim_directed_cover (fun s : Fˣ => GlobalTheory.SplitWeil.cball s) GlobalTheory.SplitWeil.isOpen_cball ?_ ?_
+theorem compact_subset_cball
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {K : Set F} (hK : IsCompact K)
+    : ∃ s : Fˣ, K ⊆ GlobalTheory.SplitWeil.cball s := by
+  refine hK.elim_directed_cover
+    (fun s : Fˣ => GlobalTheory.SplitWeil.cball s)
+    GlobalTheory.SplitWeil.isOpen_cball ?_ ?_
   · intro x _
     by_cases hx : x = 0
     · exact Set.mem_iUnion.mpr ⟨1, by simp [GlobalTheory.SplitWeil.cball, hx]⟩
@@ -34,22 +37,37 @@ theorem compact_subset_cball {F : Type} [Field F] [ValuativeRel F] [TopologicalS
     · exact ⟨b, fun x hx => le_trans (show valuation F x ≤ _ from hx) h, fun x hx => hx⟩
     · exact ⟨a, fun x hx => hx, fun x hx => le_trans (show valuation F x ≤ _ from hx) h⟩
 
-theorem punctured_neBot (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] : (𝓝[≠] (0 : F)).NeBot := by
+theorem punctured_neBot
+    (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    : (𝓝[≠] (0 : F)).NeBot := by
   by_contra h
   rw [Filter.not_neBot, ← isOpen_singleton_iff_punctured_nhds] at h
   obtain ⟨s, hs⟩ := GlobalTheory.SplitWeil.exists_cball_subset (h.mem_nhds rfl)
   exact s.ne_zero (hs (by simp [GlobalTheory.SplitWeil.cball]))
 
-theorem mul_mem_cball_iff {F : Type} [Field F] [ValuativeRel F] (a s : Fˣ) (x : F) :
-    valuation F ((a : F) * x) ≤ valuation F (s : F) ↔ valuation F x ≤ valuation F ((a⁻¹ * s : Fˣ) : F) := by
+theorem mul_mem_cball_iff {F : Type} [Field F] [ValuativeRel F] (a s : Fˣ) (x : F)
+    : valuation F ((a : F) * x) ≤ valuation F (s : F)
+      ↔ valuation F x ≤ valuation F ((a⁻¹ * s : Fˣ) : F) := by
   rw [Units.val_mul, map_mul, map_mul, Units.val_inv_eq_inv_val, map_inv₀,
     le_inv_mul_iff₀ (by simp [zero_lt_iff])]
 
-theorem gauss_cancel : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (E : Type) [Field E] [Algebra F E] [TopologicalSpace E] [IsModuleTopology F E] (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (ψ : AddChar F ℂ) (hψ : Continuous ψ) (_ : ∀ t, ‖ψ t‖ = 1) (_ : ψ ≠ 1) [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] (t : Fˣ), t ∉ (Units.map (Algebra.norm F : E →* F)).range → ∃ s₀ : Fˣ, ∀ s : Fˣ, (s₀ : F) ∈ GlobalTheory.SplitWeil.cball s → (∫ z in {z : E | Algebra.norm F z ∈ GlobalTheory.SplitWeil.cball s}, ψ (Algebra.norm F z) ∂μ) + (nabs F t : ℂ) * ∫ z in {z : E | (t : F) * Algebra.norm F z ∈ GlobalTheory.SplitWeil.cball s}, ψ ((t : F) * Algebra.norm F z) ∂μ = 0 := by
+theorem gauss_cancel
+    : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F]
+        [IsNonarchimedeanLocalField F] (E : Type) [Field E] [Algebra F E] [TopologicalSpace E]
+        [IsModuleTopology F E] (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (ψ : AddChar F ℂ)
+        (hψ : Continuous ψ) (_ : ∀ t, ‖ψ t‖ = 1) (_ : ψ ≠ 1) [MeasurableSpace E] [BorelSpace E]
+        (μ : Measure E) [μ.IsAddHaarMeasure] (t : Fˣ),
+      t ∉ (Units.map (Algebra.norm F : E →* F)).range
+        → ∃ s₀ : Fˣ, ∀ s : Fˣ,
+          (s₀ : F) ∈ GlobalTheory.SplitWeil.cball s
+            → (∫ z in {z : E | Algebra.norm F z ∈ GlobalTheory.SplitWeil.cball s}, ψ (Algebra.norm F z) ∂μ)
+                + (nabs F t : ℂ)
+                  * ∫ z in {z : E | (t : F) * Algebra.norm F z ∈ GlobalTheory.SplitWeil.cball s}, ψ ((t : F) * Algebra.norm F z) ∂μ
+              = 0 := by
   intro F _ _ _ _ _ E _ _ _ _ c δ hE ψ hψ hψ1 hψ0 _ _ μ _ t ht
   borelize F
-  obtain ⟨hfd, hring, -, ht2, -, hN, -, -⟩ := GlobalTheory.T.quadExt_topological_properties F E c δ hE
+  obtain ⟨hfd, hring, -, ht2, -, hN, -, -⟩ :=
+    GlobalTheory.T.quadExt_topological_properties F E c δ hE
   haveI := GlobalTheory.SplitWeil.t2Space F
   haveI := punctured_neBot F
   haveI : ContinuousSMul F E := IsModuleTopology.toContinuousSMul F E
@@ -64,14 +82,16 @@ theorem gauss_cancel : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [T
     (continuous_const.mul hN).measurable
   let m : Fˣ → Measure F := fun a => μ.map fun z : E => (a : F) * Algebra.norm F z
   let n : Fˣ → Measure F := fun a => distribHaarChar F a • m a
-  have hmc : ∀ a, IsFiniteMeasureOnCompacts (m a) := fun a => ⟨fun K hK => by
-    obtain ⟨s, hs⟩ := compact_subset_cball hK
-    obtain ⟨L, hL, h1, -⟩ := GlobalTheory.T.exists_compactOpen_normClosedBall_quadratic F E c δ hE (a⁻¹ * s)
-    rw [Measure.map_apply (hm a) hK.measurableSet]
-    refine lt_of_le_of_lt (measure_mono ?_) (h1.measure_lt_top (μ := μ))
-    intro z hz
-    rw [hL]
-    exact (mul_mem_cball_iff a s _).mp (hs hz)⟩
+  have hmc : ∀ a, IsFiniteMeasureOnCompacts (m a) := fun a =>
+    ⟨fun K hK => by
+      obtain ⟨s, hs⟩ := compact_subset_cball hK
+      obtain ⟨L, hL, h1, -⟩ :=
+        GlobalTheory.T.exists_compactOpen_normClosedBall_quadratic F E c δ hE (a⁻¹ * s)
+      rw [Measure.map_apply (hm a) hK.measurableSet]
+      refine lt_of_le_of_lt (measure_mono ?_) (h1.measure_lt_top (μ := μ))
+      intro z hz
+      rw [hL]
+      exact (mul_mem_cball_iff a s _).mp (hs hz)⟩
   have hnc : ∀ a, IsFiniteMeasureOnCompacts (n a) := fun a => by
     haveI := hmc a
     exact IsFiniteMeasureOnCompacts.smul_nnreal (m a) _
@@ -80,11 +100,13 @@ theorem gauss_cancel : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [T
       ext z; simp [Algebra.norm_eq_zero_iff]
     simp only [n, m, Measure.smul_apply]
     rw [Measure.map_apply (hm a) (measurableSet_singleton 0), this, hμ0, smul_zero]
-  have hn1 : ∀ (a : Fˣ) (b : Fˣ), b ∈ (Units.map (Algebra.norm F : E →* F)).range → n (b * a) = n a := by
+  have hn1
+      : ∀ (a : Fˣ) (b : Fˣ), b ∈ (Units.map (Algebra.norm F : E →* F)).range → n (b * a) = n a := by
     rintro a _ ⟨w, rfl⟩
     have h1 := GlobalTheory.T.map_mul_left_eq_inv_norm_haarChar_smul F E c δ hE μ w
-    have h2 : m (Units.map (Algebra.norm F : E →* F) w * a) =
-        (μ.map fun x => (w : E) * x).map fun z : E => (a : F) * Algebra.norm F z := by
+    have h2
+        : m (Units.map (Algebra.norm F : E →* F) w * a)
+          = (μ.map fun x => (w : E) * x).map fun z : E => (a : F) * Algebra.norm F z := by
       rw [Measure.map_map (hm a) (measurable_const_mul _)]
       simp only [m]
       congr 1
@@ -93,7 +115,8 @@ theorem gauss_cancel : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [T
     simp only [n]
     rw [h2, h1, Measure.map_smul _ (hm a).aemeasurable, smul_smul, map_mul, mul_right_comm,
       mul_inv_cancel₀ (distribHaarChar_pos).ne', one_mul]
-  have hn2 : ∀ a u : Fˣ, (n a).map (fun x => (u : F) * x) = (distribHaarChar F u)⁻¹ • n (u * a) := by
+  have hn2
+      : ∀ a u : Fˣ, (n a).map (fun x => (u : F) * x) = (distribHaarChar F u)⁻¹ • n (u * a) := by
     intro a u
     simp only [n, m]
     rw [Measure.map_smul _ (measurable_const_mul _).aemeasurable,
@@ -102,7 +125,9 @@ theorem gauss_cancel : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [T
     congr 2
     funext z
     simp [mul_assoc]
-  have hhom : ∀ u : Fˣ, (n 1 + n t).map (fun x => (u : F) * x) = (distribHaarChar F u)⁻¹ • (n 1 + n t) := by
+  have hhom
+      : ∀ u : Fˣ,
+        (n 1 + n t).map (fun x => (u : F) * x) = (distribHaarChar F u)⁻¹ • (n 1 + n t) := by
     intro u
     rw [Measure.map_add _ _ (measurable_const_mul _), hn2, hn2, ← smul_add]
     congr 1
@@ -121,20 +146,29 @@ theorem gauss_cancel : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [T
   haveI : IsFiniteMeasureOnCompacts (n 1 + n t) := ⟨fun K hK => by
     rw [Measure.add_apply]
     exact ENNReal.add_lt_top.mpr ⟨hK.measure_lt_top, hK.measure_lt_top⟩⟩
-  obtain ⟨r, hr⟩ := GlobalTheory.T.homogeneousMeasure_eq_smul_addHaar_localField F lam (n 1 + n t) (by rw [Measure.add_apply, hn0, hn0, add_zero]) hhom
+  obtain ⟨r, hr⟩ :=
+    GlobalTheory.T.homogeneousMeasure_eq_smul_addHaar_localField F lam (n 1 + n t)
+      (by rw [Measure.add_apply, hn0, hn0, add_zero]) hhom
   refine ⟨s₀, fun s hs => ?_⟩
   have hB := GlobalTheory.SplitWeil.isCompact_cball s
-  have hint : ∀ a : Fˣ, ∫ x in GlobalTheory.SplitWeil.cball s, ψ x ∂(n a) = (nabs F a : ℂ) *
-      ∫ z in {z : E | (a : F) * Algebra.norm F z ∈ GlobalTheory.SplitWeil.cball s}, ψ ((a : F) * Algebra.norm F z) ∂μ := by
-    intro a
-    simp only [n, m]
-    rw [Measure.restrict_smul, integral_smul_nnreal_measure,
-      setIntegral_map hB.measurableSet hψ.aestronglyMeasurable (hm a).aemeasurable]
-    rfl
+  have hint
+      : ∀ a : Fˣ,
+        ∫ x in GlobalTheory.SplitWeil.cball s, ψ x ∂(n a)
+          = (nabs F a : ℂ)
+            * ∫ z in {z : E | (a : F) * Algebra.norm F z ∈ GlobalTheory.SplitWeil.cball s}, ψ ((a : F) * Algebra.norm F z) ∂μ :=
+    by
+      intro a
+      simp only [n, m]
+      rw [Measure.restrict_smul, integral_smul_nnreal_measure,
+        setIntegral_map hB.measurableSet hψ.aestronglyMeasurable (hm a).aemeasurable]
+      rfl
   have h1 : ∫ x in GlobalTheory.SplitWeil.cball s, ψ x ∂(n 1 + n t) = 0 := by
     rw [hr, Measure.restrict_smul, integral_smul_nnreal_measure, hs₀ s hs, smul_zero]
-  rw [Measure.restrict_add, integral_add_measure (hψ.continuousOn.integrableOn_compact hB)
-    (hψ.continuousOn.integrableOn_compact hB), hint, hint] at h1
+  rw [Measure.restrict_add,
+      integral_add_measure (hψ.continuousOn.integrableOn_compact hB)
+        (hψ.continuousOn.integrableOn_compact hB),
+      hint, hint]
+    at h1
   simpa [GlobalTheory.SplitWeil.nabs_one] using h1
 
 end GlobalTheory.KSp.Cancel

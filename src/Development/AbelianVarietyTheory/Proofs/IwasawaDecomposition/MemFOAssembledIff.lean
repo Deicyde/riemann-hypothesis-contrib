@@ -15,10 +15,11 @@ open Formalism.L2.Pj
 
 namespace GlobalTheory.Mem
 
-theorem mem_FO_assembled_iff :
-    ∀ (X : Stages) (z : ℂ), z ∈ FO X.toD7 ↔ ∃ x ∈ X.B.Ks, X.B.embLL x = z := by
+theorem mem_FO_assembled_iff
+    : ∀ (X : Stages) (z : ℂ), z ∈ FO X.toD7 ↔ ∃ x ∈ X.B.Ks, X.B.embLL x = z := by
   intro X z
-  have hphi : ∀ y : 𝓞 X.B.Ks, X.toD7.what₂.phiO y = X.B.embLL ((y : X.B.Ks) : X.B.LL) := fun _ => rfl
+  have hphi : ∀ y : 𝓞 X.B.Ks, X.toD7.what₂.phiO y = X.B.embLL ((y : X.B.Ks) : X.B.LL) := fun _ =>
+    rfl
   constructor
   · intro hz
     have hle : FO X.toD7 ≤ X.B.Ks.map X.B.embLL.toRatAlgHom := by

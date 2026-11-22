@@ -44,20 +44,24 @@ lemma one_le_log {t : ℝ} (ht : 3 ≤ t) : 1 ≤ Real.log t := by
   calc (1 : ℝ) = Real.log (Real.exp 1) := (Real.log_exp 1).symm
     _ ≤ Real.log t := Real.log_le_log (Real.exp_pos 1) (by linarith [Real.exp_one_lt_d9])
 
-theorem alt_bound {α : Type*} [Preorder α] (f : α → ℝ) (hf : Monotone f) :
-    ∀ (k : ℕ) (a : Fin (k + 1) → α) (b : Fin k → α),
-      (∀ i : Fin k, b i ≤ a i.castSucc ∧ a i.succ ≤ b i) →
-      f (a (Fin.last k)) ≤ (∑ i, f (a i)) - ∑ i, f (b i) ∧
-      (∑ i, f (a i)) - ∑ i, f (b i) ≤ f (a 0) := by
+theorem alt_bound {α : Type*} [Preorder α] (f : α → ℝ) (hf : Monotone f)
+    : ∀ (k : ℕ) (a : Fin (k + 1) → α) (b : Fin k → α),
+      (∀ i : Fin k, b i ≤ a i.castSucc ∧ a i.succ ≤ b i)
+        → f (a (Fin.last k)) ≤ (∑ i, f (a i)) - ∑ i, f (b i)
+          ∧ (∑ i, f (a i)) - ∑ i, f (b i) ≤ f (a 0) := by
   intro k
   induction k with
   | zero =>
     intro a b _
-    refine ⟨?_, ?_⟩ <;> simp only [Fin.sum_univ_succ, Fin.sum_univ_zero, add_zero, sub_zero] <;> exact le_rfl
+    refine ⟨?_, ?_⟩ <;> simp only [Fin.sum_univ_succ, Fin.sum_univ_zero, add_zero, sub_zero]
+      <;> exact le_rfl
   | succ k ih =>
     intro a b hab
-    have ih' := ih (fun i => a i.castSucc) (fun i => b i.castSucc)
-      (fun i => ⟨(hab i.castSucc).1, (hab i.castSucc).2⟩)
+    have ih' :=
+      ih
+        (fun i => a i.castSucc)
+        (fun i => b i.castSucc)
+        (fun i => ⟨(hab i.castSucc).1, (hab i.castSucc).2⟩)
     simp only [Fin.castSucc_zero] at ih'
     obtain ⟨h1, h2⟩ := hab (Fin.last k)
     have m1 := hf h1
@@ -80,11 +84,16 @@ theorem sumInterlacedBound : Interlace := by
   obtain ⟨hc, hc'⟩ := hI
   have hS : 0 ≤ S := le_trans (hc 0).1 (hc 0).2
   have e1 : ∀ x : ℝ, 1 ≤ x → phm x = ph x := fun x hx => by unfold phm; rw [max_eq_left hx]
-  have hb : phm (w + c (Fin.last k)) ≤ (∑ i, phm (w + c i)) - ∑ i, phm (w + c' i) ∧
-      (∑ i, phm (w + c i)) - ∑ i, phm (w + c' i) ≤ phm (w + c 0) :=
-    alt_bound phm phm_mono k (fun i => w + c i) (fun i => w + c' i)
-      (fun i => ⟨by show w + c' i ≤ w + c i.castSucc; linarith [(hc' i).1],
-        by show w + c i.succ ≤ w + c' i; linarith [(hc' i).2]⟩)
+  have hb
+      : phm (w + c (Fin.last k)) ≤ (∑ i, phm (w + c i)) - ∑ i, phm (w + c' i)
+        ∧ (∑ i, phm (w + c i)) - ∑ i, phm (w + c' i) ≤ phm (w + c 0) :=
+    alt_bound phm phm_mono k
+      (fun i => w + c i)
+      (fun i => w + c' i)
+      (fun i => ⟨
+        by show w + c' i ≤ w + c i.castSucc; linarith [(hc' i).1],
+        by show w + c i.succ ≤ w + c' i; linarith [(hc' i).2]
+      ⟩)
   have s1 : (∑ i, phm (w + c i)) = ∑ i, ph (w + c i) :=
     Finset.sum_congr rfl fun i _ => e1 _ (by linarith [(hc i).1])
   have s2 : (∑ i, phm (w + c' i)) = ∑ i, ph (w + c' i) :=

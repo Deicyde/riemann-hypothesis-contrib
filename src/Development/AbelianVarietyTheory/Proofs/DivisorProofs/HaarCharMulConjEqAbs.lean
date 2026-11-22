@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AddHaarLe
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.LeviModulus
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.LeviModulus
 open GlobalTheory.Doubling (absE)
 
 noncomputable section
@@ -30,7 +32,8 @@ theorem exists_anti {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : ∃ δ : E, δ �
   by_cases hx : ∃ x, σ x ≠ x
   · obtain ⟨x, hx⟩ := hx
     refine ⟨x - σ x, sub_ne_zero.2 (Ne.symm hx), ?_⟩
-    rw [map_sub, sig_sig h]; ring
+    rw [map_sub, sig_sig h]
+    ring
   · push_neg at hx
     exfalso
     have hr : ComplexEmbedding.IsReal τ := by
@@ -42,10 +45,14 @@ theorem exists_anti {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : ∃ δ : E, δ �
       exact this.symm
     exact InfinitePlace.isComplex_mk_iff.1 (h.2.1.isComplex _) hr
 
-theorem cA_inclR (σ : E →ₐ[F] E) (e : E) : cA σ (inclR (F := F) (AF F) e) = inclR (F := F) (AF F) (σ e) := by
+theorem cA_inclR (σ : E →ₐ[F] E) (e : E)
+    : cA σ (inclR (F := F) (AF F) e) = inclR (F := F) (AF F) (σ e) := by
   simp [cA, inclR]
 
-theorem cA_eq_sigR (σ : E →ₐ[F] E) (z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) : cA σ z = sigR (AF F) σ z := by
+theorem cA_eq_sigR
+    (σ : E →ₐ[F] E)
+    (z : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    : cA σ z = sigR (AF F) σ z := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
@@ -53,9 +60,11 @@ theorem cA_eq_sigR (σ : E →ₐ[F] E) (z : _root_.GlobalTheory.IndefiniteRowSi
 
 section Iso
 
-variable (σ : E →ₐ[F] E) [IsTopologicalRing (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))]
+variable
+  (σ : E →ₐ[F] E)
+  [IsTopologicalRing (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+    (E := E))]
 
 end Iso
-
 
 end GlobalTheory.ImaginaryModulus

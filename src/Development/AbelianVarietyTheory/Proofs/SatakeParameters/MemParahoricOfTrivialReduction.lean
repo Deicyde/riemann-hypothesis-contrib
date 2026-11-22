@@ -5,7 +5,8 @@ public import Formalism.LocalToGlobal.Columns.FiniteSumNonzeroLargeDepth
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col
 
 noncomputable section
 
@@ -17,8 +18,8 @@ variable {k : Type} [CommRing k] {n : ℕ} (c : ℕ)
 
 def resX : (Fin (n + c) → k) →ₗ[k] (Fin n → k) := LinearMap.funLeft k k (Fin.castAdd c)
 
-theorem inX_apply (x : Fin n → k) (l : Fin (n + c)) :
-    Loc.inX k n c x l = if h : l.1 < n then x ⟨l.1, h⟩ else 0 := by
+theorem inX_apply (x : Fin n → k) (l : Fin (n + c))
+    : Loc.inX k n c x l = if h : l.1 < n then x ⟨l.1, h⟩ else 0 := by
   unfold Loc.inX
   rw [LinearMap.pi_apply]
   split_ifs <;> rfl
@@ -47,11 +48,13 @@ theorem inX_mem_Ufl (i : ℕ) (x : Fin n → k) : Loc.inX k n c x ∈ Loc.Ufl k 
 def extL (a : (Fin n → k) →ₗ[k] (Fin n → k)) : (Fin (n + c) → k) →ₗ[k] (Fin (n + c) → k) :=
   LinearMap.id + Loc.inX k n c ∘ₗ (a - LinearMap.id) ∘ₗ resX c
 
-theorem extL_apply (a : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k) :
-    extL c a v = v + Loc.inX k n c (a (resX c v) - resX c v) := rfl
+theorem extL_apply (a : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k)
+    : extL c a v = v + Loc.inX k n c (a (resX c v) - resX c v) :=
+  rfl
 
-theorem extL_extL (a b : (Fin n → k) →ₗ[k] (Fin n → k)) (hab : ∀ x, a (b x) = x) (v : Fin (n + c) → k) :
-    extL c a (extL c b v) = v := by
+theorem extL_extL
+    (a b : (Fin n → k) →ₗ[k] (Fin n → k)) (hab : ∀ x, a (b x) = x) (v : Fin (n + c) → k)
+    : extL c a (extL c b v) = v := by
   have h : resX c (extL c b v) = b (resX c v) := by
     rw [extL_apply, map_add (f := _), resX_inX]; abel
   rw [extL_apply c a, h, hab, extL_apply, map_sub, map_sub]
@@ -62,8 +65,9 @@ def extE (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) : (Fin (n + c) → k) ≃�
     (LinearMap.ext fun v => extL_extL c _ _ (fun x => κ.apply_symm_apply x) v)
     (LinearMap.ext fun v => extL_extL c _ _ (fun x => κ.symm_apply_apply x) v)
 
-theorem extE_apply (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) (v : Fin (n + c) → k) :
-    extE c κ v = v + Loc.inX k n c (κ (resX c v) - resX c v) := rfl
+theorem extE_apply (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) (v : Fin (n + c) → k)
+    : extE c κ v = v + Loc.inX k n c (κ (resX c v) - resX c v) :=
+  rfl
 
 theorem extE_inv (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) : (extE c κ)⁻¹ = extE c κ⁻¹ :=
   LinearEquiv.ext fun _ => rfl
@@ -79,11 +83,12 @@ theorem extE_R1cond (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) : Loc.R1cond k 
   · rw [h, sub_self]
     exact zero_mem _
 
-theorem extendByIdOnLastCoordsLinearEquiv_mem_firstRowGroup (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) : extE c κ ∈ Loc.R1 k n c :=
+theorem extendByIdOnLastCoordsLinearEquiv_mem_firstRowGroup (κ : (Fin n → k) ≃ₗ[k] (Fin n → k))
+    : extE c κ ∈ Loc.R1 k n c :=
   ⟨extE_R1cond c κ, by rw [extE_inv]; exact extE_R1cond c _⟩
 
-theorem extE_inX (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) (x : Fin n → k) :
-    extE c κ (Loc.inX k n c x) = Loc.inX k n c (κ x) := by
+theorem extE_inX (κ : (Fin n → k) ≃ₗ[k] (Fin n → k)) (x : Fin n → k)
+    : extE c κ (Loc.inX k n c x) = Loc.inX k n c (κ x) := by
   rw [extE_apply, resX_inX, map_sub]
   abel
 
@@ -93,18 +98,17 @@ section Lat
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) (q : ℕ)
 
-theorem mem_sclLat (N : ℕ) (e : ℕ → ℤ) (x : Sp E N) :
-    x ∈ LocE.sclLat P q N e ↔ ∀ l : Fin N, IntAt P (((q : E) ^ e l.1)⁻¹ * x l) := by
+theorem mem_sclLat (N : ℕ) (e : ℕ → ℤ) (x : Sp E N)
+    : x ∈ LocE.sclLat P q N e ↔ ∀ l : Fin N, IntAt P (((q : E) ^ e l.1)⁻¹ * x l) := by
   unfold LocE.sclLat stdAt
   rw [Submodule.mem_comap, mem_localization_standardLattice]
   rfl
 
 omit [StarRing E] in
-theorem intAt_nat (m : ℕ) : IntAt P (m : E) := by
-  simpa using IntAt.coe P (m : 𝓞 E)
+theorem intAt_nat (m : ℕ) : IntAt P (m : E) := by simpa using IntAt.coe P (m : 𝓞 E)
 
-theorem sclLat_le (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (p : ℕ → Prop) [DecidablePred p] :
-    LocE.sclLat P q N (fun l => e l + if p l then 1 else 0) ≤ LocE.sclLat P q N e := by
+theorem sclLat_le (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (p : ℕ → Prop) [DecidablePred p]
+    : LocE.sclLat P q N (fun l => e l + if p l then 1 else 0) ≤ LocE.sclLat P q N e := by
   intro x hx
   rw [mem_sclLat] at hx ⊢
   intro l
@@ -119,9 +123,12 @@ theorem sclLat_le (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (p : ℕ → 
   · rw [if_neg hp, add_zero] at h
     exact h
 
-theorem smul_mem_sclLat (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (p : ℕ → Prop) [DecidablePred p]
-    (x : Sp E N) (hx : (q : E)⁻¹ • x ∈ LocE.sclLat P q N e) :
-    x ∈ LocE.sclLat P q N (fun l => e l + if p l then 1 else 0) := by
+theorem smul_mem_sclLat
+    (hq : (q : E) ≠ 0)
+    (N : ℕ) (e : ℕ → ℤ)
+    (p : ℕ → Prop) [DecidablePred p]
+    (x : Sp E N) (hx : (q : E)⁻¹ • x ∈ LocE.sclLat P q N e)
+    : x ∈ LocE.sclLat P q N (fun l => e l + if p l then 1 else 0) := by
   rw [mem_sclLat] at hx ⊢
   intro l
   have h := hx l
@@ -137,8 +144,8 @@ theorem smul_mem_sclLat (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (p : �
     convert h2 using 1
     field_simp
 
-theorem bvec_mem (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (f : ℕ) :
-    ((q : E) ^ e f) • Loc.eN E N f ∈ LocE.sclLat P q N e := by
+theorem bvec_mem (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (f : ℕ)
+    : ((q : E) ^ e f) • Loc.eN E N f ∈ LocE.sclLat P q N e := by
   rw [mem_sclLat]
   intro l
   rw [Pi.smul_apply, smul_eq_mul]
@@ -148,10 +155,12 @@ theorem bvec_mem (hq : (q : E) ≠ 0) (N : ℕ) (e : ℕ → ℤ) (f : ℕ) :
     simpa using intAt_nat P 1
   · simpa using intAt_nat P 0
 
-theorem mem_flagU {N : ℕ} (L : Submodule (𝓞 E) (Sp E N)) (M : ℕ → Submodule (𝓞 E) (Sp E N)) (e : ℕ → Sp E N)
-    (r : ℕ) (st : Set ℕ) (hM : ∀ s, M s ≤ L) (hM' : ∀ s x, (q : E)⁻¹ • x ∈ L → x ∈ M s) (he : ∀ s, e s ∈ L)
-    (g : Sp E N ≃ₗ[E] Sp E N) (hg : g ∈ stabL E N L) (hc : ∀ x ∈ L, (q : E)⁻¹ • (g x - x) ∈ L) :
-    g ∈ LocE.flagU M e r st := by
+theorem mem_flagU
+    {N : ℕ} (L : Submodule (𝓞 E) (Sp E N)) (M : ℕ → Submodule (𝓞 E) (Sp E N)) (e : ℕ → Sp E N)
+    (r : ℕ) (st : Set ℕ) (hM : ∀ s, M s ≤ L) (hM' : ∀ s x, (q : E)⁻¹ • x ∈ L → x ∈ M s)
+    (he : ∀ s, e s ∈ L)
+    (g : Sp E N ≃ₗ[E] Sp E N) (hg : g ∈ stabL E N L) (hc : ∀ x ∈ L, (q : E)⁻¹ • (g x - x) ∈ L)
+    : g ∈ LocE.flagU M e r st := by
   have hs : ∀ s, g ∈ stabL E N (M s) := by
     intro s x
     constructor
@@ -165,8 +174,8 @@ theorem mem_flagU {N : ℕ} (L : Submodule (𝓞 E) (Sp E N)) (M : ℕ → Submo
       rwa [sub_add_cancel] at this
   exact ⟨fun s _ => hs s, fun s _ => ⟨hs s, hM' s _ (hc _ (he s))⟩⟩
 
-theorem inX_mem_lamY {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (x : Sp E n) (hx : x ∈ stdAt E n P) :
-    Loc.inX E n c x ∈ LocE.lamY P q n c ex := by
+theorem inX_mem_lamY {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (x : Sp E n) (hx : x ∈ stdAt E n P)
+    : Loc.inX E n c x ∈ LocE.lamY P q n c ex := by
   unfold LocE.lamY
   rw [mem_sclLat]
   intro l
@@ -177,8 +186,8 @@ theorem inX_mem_lamY {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (x : Sp E n) (hx : x
     exact (mem_localization_standardLattice P x).1 hx _
   · simpa using intAt_nat P 0
 
-theorem resX_mem {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (v : Sp E (n + c)) (hv : v ∈ LocE.lamY P q n c ex) :
-    resX c v ∈ stdAt E n P := by
+theorem resX_mem {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (v : Sp E (n + c)) (hv : v ∈ LocE.lamY P q n c ex)
+    : resX c v ∈ stdAt E n P := by
   unfold LocE.lamY at hv
   rw [mem_sclLat] at hv
   refine (mem_localization_standardLattice P _).2 fun i => ?_
@@ -187,24 +196,32 @@ theorem resX_mem {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (v : Sp E (n + c)) (hv :
   rw [if_pos (by simp), zpow_zero, inv_one, one_mul] at h
   exact h
 
-theorem extE_maps {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (κ : Sp E n ≃ₗ[E] Sp E n) (hκ : κ ∈ GLint E n P)
-    (v : Sp E (n + c)) (hv : v ∈ LocE.lamY P q n c ex) : extE c κ v ∈ LocE.lamY P q n c ex := by
+theorem extE_maps
+    {n : ℕ}
+    (c : ℕ) (ex : ℕ → ℕ)
+    (κ : Sp E n ≃ₗ[E] Sp E n) (hκ : κ ∈ GLint E n P)
+    (v : Sp E (n + c)) (hv : v ∈ LocE.lamY P q n c ex)
+    : extE c κ v ∈ LocE.lamY P q n c ex := by
   rw [extE_apply]
   have h := resX_mem P q c ex v hv
   exact add_mem hv (inX_mem_lamY P q c ex _ (sub_mem ((hκ _).2 h) h))
 
-theorem extE_stab {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (κ : Sp E n ≃ₗ[E] Sp E n) (hκ : κ ∈ GLint E n P) :
-    extE c κ ∈ stabL E (n + c) (LocE.lamY P q n c ex) := by
+theorem extE_stab {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (κ : Sp E n ≃ₗ[E] Sp E n) (hκ : κ ∈ GLint E n P)
+    : extE c κ ∈ stabL E (n + c) (LocE.lamY P q n c ex) := by
   intro v
   refine ⟨fun hv => ?_, extE_maps P q c ex κ hκ v⟩
   have h := extE_maps P q c ex κ⁻¹ (inv_mem hκ) _ hv
   rw [← extE_inv] at h
   rwa [show (extE c κ)⁻¹ (extE c κ v) = v from LinearEquiv.symm_apply_apply _ v] at h
 
-theorem extE_cong {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (q : E)))
-    (κ : Sp E n ≃ₗ[E] Sp E n) (hκ : κ ∈ GLint E n P) (hr : ∀ x ∈ stdAt E n P, redV P (κ x) = redV P x)
-    (v : Sp E (n + c)) (hv : v ∈ LocE.lamY P q n c ex) :
-    (q : E)⁻¹ • (extE c κ v - v) ∈ LocE.lamY P q n c ex := by
+theorem extE_cong
+    {n : ℕ}
+    (c : ℕ) (ex : ℕ → ℕ)
+    (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (q : E)))
+    (κ : Sp E n ≃ₗ[E] Sp E n)
+    (hκ : κ ∈ GLint E n P) (hr : ∀ x ∈ stdAt E n P, redV P (κ x) = redV P x)
+    (v : Sp E (n + c)) (hv : v ∈ LocE.lamY P q n c ex)
+    : (q : E)⁻¹ • (extE c κ v - v) ∈ LocE.lamY P q n c ex := by
   rw [extE_apply, add_sub_cancel_left, ← map_smul]
   have h := resX_mem P q c ex v hv
   refine inX_mem_lamY P q c ex _ ((mem_localization_standardLattice P _).2 fun i => ?_)
@@ -218,8 +235,10 @@ theorem extE_cong {n : ℕ} (c : ℕ) (ex : ℕ → ℕ) (hd : ∀ a : E, IntAt 
   exact h5
 
 omit [StarRing E] in
-theorem conj_cong {N : ℕ} (L : Submodule (𝓞 E) (Sp E N)) (g h : Sp E N ≃ₗ[E] Sp E N) (hh : h ∈ stabL E N L)
-    (hc : ∀ x ∈ L, (q : E)⁻¹ • (g x - x) ∈ L) : ∀ x ∈ L, (q : E)⁻¹ • ((h⁻¹ * g * h) x - x) ∈ L := by
+theorem conj_cong
+    {N : ℕ} (L : Submodule (𝓞 E) (Sp E N)) (g h : Sp E N ≃ₗ[E] Sp E N) (hh : h ∈ stabL E N L)
+    (hc : ∀ x ∈ L, (q : E)⁻¹ • (g x - x) ∈ L)
+    : ∀ x ∈ L, (q : E)⁻¹ • ((h⁻¹ * g * h) x - x) ∈ L := by
   intro x hx
   refine (hh _).1 ?_
   rw [map_smul, map_sub, show h ((h⁻¹ * g * h) x) = g (h x) from LinearEquiv.apply_symm_apply _ _]
@@ -227,7 +246,15 @@ theorem conj_cong {N : ℕ} (L : Submodule (𝓞 E) (Sp E N)) (g h : Sp E N ≃�
 
 end Lat
 
-theorem cong_mem_prCat : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (sharp : Bool) (j : ℕ) (w : HeightOneSpectrum (𝓞 X.E)), w ∈ Pr.vGs → (∀ a : X.E, IntAt w a → redP w a = 0 → IntAt w (a / (qOf w : X.E))) → ∀ h : AutY X R j, h ∈ stabL X.E _ (lamYat (Pr := Pr) j w) → ∀ κ : Sp X.E (R.N j) ≃ₗ[X.E] Sp X.E (R.N j), κ ∈ GLint X.E (R.N j) w → (∀ x ∈ stdAt X.E (R.N j) w, redV w (κ x) = redV w x) → κ ∈ prCat (Pr := Pr) sharp j w h := by
+theorem cong_mem_prCat
+    : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (sharp : Bool) (j : ℕ)
+        (w : HeightOneSpectrum (𝓞 X.E)),
+      w ∈ Pr.vGs → (∀ a : X.E, IntAt w a → redP w a = 0 → IntAt w (a / (qOf w : X.E)))
+        → ∀ h : AutY X R j,
+          h ∈ stabL X.E _ (lamYat (Pr := Pr) j w)
+            → ∀ κ : Sp X.E (R.N j) ≃ₗ[X.E] Sp X.E (R.N j),
+              κ ∈ GLint X.E (R.N j) w → (∀ x ∈ stdAt X.E (R.N j) w, redV w (κ x) = redV w x)
+                → κ ∈ prCat (Pr := Pr) sharp j w h := by
   intro X Pr R sharp j w hw hd h hh κ hκ hr
   have hq : ((qOf w : ℕ) : X.E) ≠ 0 := by
     rw [Nat.cast_ne_zero]

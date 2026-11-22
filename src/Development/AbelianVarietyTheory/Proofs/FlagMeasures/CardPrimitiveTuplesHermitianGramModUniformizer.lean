@@ -21,17 +21,17 @@ section Abstract
 
 variable {O : Type} [CommRing O]
 
-def quotInv (c : O →+* O) (p : O) (hp : c p = p) :
-    O ⧸ Ideal.span {p} →+* O ⧸ Ideal.span {p} :=
+def quotInv (c : O →+* O) (p : O) (hp : c p = p) : O ⧸ Ideal.span {p} →+* O ⧸ Ideal.span {p} :=
   Ideal.quotientMap _ c (by
     rw [Ideal.span_singleton_le_iff_mem, Ideal.mem_comap, hp]
     exact Ideal.mem_span_singleton_self p)
 
-theorem quotInv_mk (c : O →+* O) (p : O) (hp : c p = p) (u : O) :
-    quotInv c p hp (Ideal.Quotient.mk _ u) = Ideal.Quotient.mk _ (c u) := rfl
+theorem quotInv_mk (c : O →+* O) (p : O) (hp : c p = p) (u : O)
+    : quotInv c p hp (Ideal.Quotient.mk _ u) = Ideal.Quotient.mk _ (c u) :=
+  rfl
 
-theorem quotInv_quotInv (c : O →+* O) (hc : ∀ u, c (c u) = u) (p : O) (hp : c p = p) (u) :
-    quotInv c p hp (quotInv c p hp u) = u := by
+theorem quotInv_quotInv (c : O →+* O) (hc : ∀ u, c (c u) = u) (p : O) (hp : c p = p) (u)
+    : quotInv c p hp (quotInv c p hp u) = u := by
   obtain ⟨v, rfl⟩ := Ideal.Quotient.mk_surjective u
   rw [quotInv_mk, quotInv_mk, hc]
 
@@ -51,15 +51,19 @@ private lemma quotient_mk_dvd_mk_iff_dvd (p : O) (j : ℕ) (hj : 1 ≤ j) (u : O
   · rintro ⟨w, rfl⟩
     exact ⟨Ideal.Quotient.mk _ w, map_mul _ _ _⟩
 
-theorem count_quot (c : O →+* O) (hc : ∀ u, c (c u) = u) (ω : O) (hω : IsUnit (ω - c ω))
-    (p : O) (hp : c p = p) (hK : ∀ t, c t = t → ¬ p ∣ t → IsUnit t) (q : ℕ) (hq : 2 ≤ q)
-    (j : ℕ) (hj : 1 ≤ j) (h1 : Nat.card (O ⧸ Ideal.span {p}) = q ^ 2)
-    (h2 : Nat.card (O ⧸ Ideal.span {p ^ j}) = q ^ (2 * j)) (hpj : c (p ^ j) = p ^ j)
-    (m n : ℕ) (hmn : 2 * m + 3 ≤ n) (G : Matrix (Fin m) (Fin m) O)
-    (hG : ∀ a b, c (G b a) = G a b) (N : ℕ)
-    (hN : N = Set.ncard (sols (quotInv c (p ^ j) hpj) n (G.map (Ideal.Quotient.mk _)))) :
-    (q : ℝ) ^ (j * (2 * n * m - m ^ 2)) ≤ 2 * N ∧
-      (N : ℝ) ≤ 2 * (q : ℝ) ^ (j * (2 * n * m - m ^ 2)) := by
+theorem count_quot
+    (c : O →+* O) (hc : ∀ u, c (c u) = u)
+    (ω : O) (hω : IsUnit (ω - c ω))
+    (p : O) (hp : c p = p) (hK : ∀ t, c t = t → ¬ p ∣ t → IsUnit t)
+    (q : ℕ) (hq : 2 ≤ q)
+    (j : ℕ) (hj : 1 ≤ j)
+    (h1 : Nat.card (O ⧸ Ideal.span {p}) = q ^ 2)
+    (h2 : Nat.card (O ⧸ Ideal.span {p ^ j}) = q ^ (2 * j))
+    (hpj : c (p ^ j) = p ^ j)
+    (m n : ℕ) (hmn : 2 * m + 3 ≤ n) (G : Matrix (Fin m) (Fin m) O) (hG : ∀ a b, c (G b a) = G a b)
+    (N : ℕ) (hN : N = Set.ncard (sols (quotInv c (p ^ j) hpj) n (G.map (Ideal.Quotient.mk _))))
+    : (q : ℝ) ^ (j * (2 * n * m - m ^ 2)) ≤ 2 * N
+      ∧ (N : ℝ) ≤ 2 * (q : ℝ) ^ (j * (2 * n * m - m ^ 2)) := by
   classical
   have hq0 : 0 < q := by omega
 
@@ -91,9 +95,12 @@ theorem count_quot (c : O →+* O) (hc : ∀ u, c (c u) = u) (ω : O) (hω : IsU
     obtain ⟨v, rfl⟩ := Ideal.Quotient.mk_surjective u
     rw [hφmk, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton, hpAdef,
       quotient_mk_dvd_mk_iff_dvd p j hj v]
-  have hnil : IsNilpotent pA :=
-    ⟨j, by rw [hpAdef, ← map_pow, Ideal.Quotient.eq_zero_iff_mem]
-           exact Ideal.mem_span_singleton_self _⟩
+  have hnil : IsNilpotent pA := ⟨
+    j,
+    by
+      rw [hpAdef, ← map_pow, Ideal.Quotient.eq_zero_iff_mem]
+      exact Ideal.mem_span_singleton_self _
+  ⟩
   have hcA : ∀ u, cA (cA u) = u := quotInv_quotInv c hc _ hpj
   have hcB : ∀ u, cB (cB u) = u := quotInv_quotInv c hc _ hp
   have hωA : IsUnit (Ideal.Quotient.mk (Ideal.span {p ^ j}) ω - cA (Ideal.Quotient.mk _ ω)) := by
@@ -120,11 +127,10 @@ theorem count_quot (c : O →+* O) (hc : ∀ u, c (c u) = u) (ω : O) (hω : IsU
     have h' : Ideal.Quotient.mk (Ideal.span {p}) (c u) = Ideal.Quotient.mk _ u := by
       rw [hcBdef, quotInv_mk] at ht
       exact ht
-    have hv : c (θ * u + c (θ * u)) = θ * u + c (θ * u) := by
-      rw [map_add (f := _), hc, add_comm]
-    have hmk : Ideal.Quotient.mk (Ideal.span {p}) (θ * u + c (θ * u)) =
-        Ideal.Quotient.mk _ u := by
-      rw [map_mul c, map_add (f := _), map_mul, map_mul, h', ← add_mul, ← map_add (f := _), hθ, map_one, one_mul]
+    have hv : c (θ * u + c (θ * u)) = θ * u + c (θ * u) := by rw [map_add (f := _), hc, add_comm]
+    have hmk : Ideal.Quotient.mk (Ideal.span {p}) (θ * u + c (θ * u)) = Ideal.Quotient.mk _ u := by
+      rw [map_mul c, map_add (f := _), map_mul, map_mul, h', ← add_mul, ← map_add (f := _), hθ,
+        map_one, one_mul]
     have hnd : ¬ p ∣ θ * u + c (θ * u) := by
       intro hd
       apply ht0
@@ -136,18 +142,27 @@ theorem count_quot (c : O →+* O) (hc : ∀ u, c (c u) = u) (ω : O) (hω : IsU
     rw [← Nat.card_eq_fintype_card]
     exact h1
 
-  have h29 := GlobalTheory.T.primitiveTuplesWithGramMatrix_hensel_count cA hcA _ hωA pA hpA hnil m n GA hGA
-  have h31 := GlobalTheory.T.ncard_primitive_tuples_gram_mod_nilpotent cA cB hcA pA hnil φ hsurj hφc hker m n GA
+  have h29 :=
+    GlobalTheory.T.primitiveTuplesWithGramMatrix_hensel_count cA hcA _ hωA pA hpA hnil m n GA hGA
+  have h31 :=
+    GlobalTheory.T.ncard_primitive_tuples_gram_mod_nilpotent cA cB hcA pA hnil φ hsurj hφc hker m n
+      GA
   have h33 := GlobalTheory.T.card_hermitian_matrices_dvd_sq cA hcA _ hωA pA hpA m
-  have h62 := GlobalTheory.T.ncard_primitiveTuplesWithGramMatrix_residueRing cB hcB _ hωB hKB q hq hcardB m n hmn (GA.map φ) hGB
+  have h62 :=
+    GlobalTheory.T.ncard_primitiveTuplesWithGramMatrix_residueRing cB hcB _ hωB hKB q hq hcardB m n
+      hmn (GA.map φ) hGB
 
   have hD : Nat.card {u : O ⧸ Ideal.span {p ^ j} // pA ∣ u} = q ^ (2 * (j - 1)) := by
-    have hcard := AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup
-      (φ : (O ⧸ Ideal.span {p ^ j}) →+ (O ⧸ Ideal.span {p})).ker
+    have hcard :=
+      AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup
+        (φ : (O ⧸ Ideal.span {p ^ j}) →+ (O ⧸ Ideal.span {p})).ker
     rw [Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective
-      (φ : (O ⧸ Ideal.span {p ^ j}) →+ (O ⧸ Ideal.span {p})) hsurj).toEquiv, h1, h2] at hcard
-    have hsub : Nat.card ((φ : (O ⧸ Ideal.span {p ^ j}) →+ (O ⧸ Ideal.span {p})).ker) =
-        Nat.card {u : O ⧸ Ideal.span {p ^ j} // pA ∣ u} :=
+          (φ : (O ⧸ Ideal.span {p ^ j}) →+ (O ⧸ Ideal.span {p})) hsurj).toEquiv,
+        h1, h2]
+      at hcard
+    have hsub
+        : Nat.card ((φ : (O ⧸ Ideal.span {p ^ j}) →+ (O ⧸ Ideal.span {p})).ker)
+          = Nat.card {u : O ⧸ Ideal.span {p ^ j} // pA ∣ u} :=
       Nat.card_congr (Equiv.subtypeEquivRight fun u => by
         rw [AddMonoidHom.mem_ker]
         exact hker u)
@@ -160,8 +175,11 @@ theorem count_quot (c : O →+* O) (hc : ∀ u, c (c u) = u) (ω : O) (hω : IsU
     exact (Nat.eq_of_mul_eq_mul_left (pow_pos hq0 2) hcard).symm
   rw [hD] at h31 h33
 
-  have hH : Nat.card {H : Matrix (Fin m) (Fin m) (O ⧸ Ideal.span {p ^ j}) //
-      (∀ a b, cA (H b a) = H a b) ∧ ∀ a b, pA ∣ H a b} = q ^ ((j - 1) * (m * m)) := by
+  have hH
+      : Nat.card
+          {H : Matrix (Fin m) (Fin m) (O ⧸ Ideal.span {p ^ j})
+            // (∀ a b, cA (H b a) = H a b) ∧ ∀ a b, pA ∣ H a b}
+        = q ^ ((j - 1) * (m * m)) := by
     apply Nat.pow_left_injective (n := 2) (by norm_num)
     simp only
     rw [h33, ← pow_mul, ← pow_mul]
@@ -172,13 +190,13 @@ theorem count_quot (c : O →+* O) (hc : ∀ u, c (c u) = u) (ω : O) (hω : IsU
   have hK2 : 2 * n * m - m ^ 2 + m * m = 2 * n * m := by
     rw [sq]
     exact Nat.sub_add_cancel hle2
-  have hexp : 2 * (j - 1) * (n * m) =
-      (j - 1) * (2 * n * m - m ^ 2) + (j - 1) * (m * m) := by
+  have hexp : 2 * (j - 1) * (n * m) = (j - 1) * (2 * n * m - m ^ 2) + (j - 1) * (m * m) := by
     rw [← Nat.mul_add, hK2]
     ring
   rw [← pow_mul, hexp, pow_add] at h29
-  have hS : Set.ncard (sols cA n GA) =
-      q ^ ((j - 1) * (2 * n * m - m ^ 2)) * Set.ncard (sols cB n (GA.map φ)) := by
+  have hS
+      : Set.ncard (sols cA n GA)
+        = q ^ ((j - 1) * (2 * n * m - m ^ 2)) * Set.ncard (sols cB n (GA.map φ)) := by
     apply Nat.eq_of_mul_eq_mul_right (pow_pos hq0 ((j - 1) * (m * m)))
     rw [h29]
     ring

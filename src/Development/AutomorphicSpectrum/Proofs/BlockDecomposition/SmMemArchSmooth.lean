@@ -10,7 +10,8 @@ public import GroundTheory.AutomorphicForms.AutomorphicFormSpaces.GKStable
 
 set_option maxSynthPendingDepth 1
 
-open NumberField GlobalTheory.CuspRep GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+open NumberField GlobalTheory.CuspRep GroundTheory.Global GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction
 open IsDedekindDomain
 open scoped ContDiff
 
@@ -27,8 +28,8 @@ def cMap : mixedEmbedding.mixedSpace E →ₗ[ℝ] Cinf E where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem cMap_ringEquiv (x : InfiniteAdeleRing E) :
-    cMap E (InfiniteAdeleRing.ringEquiv_mixedSpace E x) = (infEq E).symm x := by
+theorem cMap_ringEquiv (x : InfiniteAdeleRing E)
+    : cMap E (InfiniteAdeleRing.ringEquiv_mixedSpace E x) = (infEq E).symm x := by
   funext w
   change (InfiniteAdeleRing.ringEquiv_mixedSpace E x).2 ⟨w, IsTotallyComplex.isComplex w⟩ = _
   rw [InfiniteAdeleRing.ringEquiv_mixedSpace_apply]
@@ -46,8 +47,8 @@ def mMap : ArchMatrix E a →ₗ[ℝ] Lie E a where
 def toGL (u : archGroup E a) : GL (Fin a) (Cinf E) :=
   Matrix.GeneralLinearGroup.map (infEq E).symm.toRingHom ((archEquiv E a).symm u)
 
-theorem toL_toGL (u : archGroup E a) :
-    toL (toGL E a u).val = mMap E a ((u : (ArchMatrix E a)ˣ) : ArchMatrix E a) := by
+theorem toL_toGL (u : archGroup E a)
+    : toL (toGL E a u).val = mMap E a ((u : (ArchMatrix E a)ˣ) : ArchMatrix E a) := by
   obtain ⟨b, rfl⟩ := (archEquiv E a).surjective u
   funext i j
   simp only [toGL, ContinuousMulEquiv.symm_apply_apply]
@@ -57,14 +58,19 @@ theorem infEmb_eq (u : archGroup E a) : infEmb E a u = infGL E a (toGL E a u) :=
   apply ga_ext
   · rw [pInf_infGL]
     ext i j : 2
-    have h := congrArg (fun p => (p.1 : Matrix (Fin a) (Fin a) (InfiniteAdeleRing E)) i j) (prodEquiv_infEmb u)
+    have h :=
+      congrArg
+        (fun p => (p.1 : Matrix (Fin a) (Fin a) (InfiniteAdeleRing E)) i j)
+        (prodEquiv_infEmb u)
     exact congrArg (infEq E).symm h
   · rw [pFin_infGL]
     ext i j : 2
-    exact congrArg (fun p => (p.2 : Matrix (Fin a) (Fin a) (FiniteAdeleRing (𝓞 E) E)) i j) (prodEquiv_infEmb u)
+    exact congrArg
+      (fun p => (p.2 : Matrix (Fin a) (Fin a) (FiniteAdeleRing (𝓞 E) E)) i j)
+      (prodEquiv_infEmb u)
 
-theorem archSlice_eq (φ : GA E a → ℂ) (g : GA E a) (u : archGroup E a) :
-    archSlice φ g u = chart φ g (mMap E a ((u : (ArchMatrix E a)ˣ) : ArchMatrix E a)) := by
+theorem archSlice_eq (φ : GA E a → ℂ) (g : GA E a) (u : archGroup E a)
+    : archSlice φ g u = chart φ g (mMap E a ((u : (ArchMatrix E a)ˣ) : ArchMatrix E a)) := by
   rw [← toL_toGL, chart_val, archSlice_apply, infEmb_eq]
 
 theorem sm_mem_archSmooth (φ : Sm E a) : φ.1 ∈ AutomorphicForm.archSmooth E a := by
@@ -78,12 +84,14 @@ theorem sm_mem_archSmooth (φ : Sm E a) : φ.1 ∈ AutomorphicForm.archSmooth E 
     contDiff_const.mul ((contDiff_exp ℝ (ArchMatrix E a)).comp (archLie E a).subtypeL.contDiff)
   have hs : ContDiff ℝ ∞ fun Y => L (F Y) := L.contDiff.comp hF
   have hmem : ∀ Y, L (F Y) ∈ invSet E a := fun Y => by
-    have : L (F Y) = toL (toGL E a (g' * (isExpLieAlgebra E a).expG Y)).val := (toL_toGL E a (g' * (isExpLieAlgebra E a).expG Y)).symm
+    have : L (F Y) = toL (toGL E a (g' * (isExpLieAlgebra E a).expG Y)).val :=
+      (toL_toGL E a (g' * (isExpLieAlgebra E a).expG Y)).symm
     rw [this]
     exact val_mem_invSet _
   have hc := (φ.2 g).comp_contDiff hs hmem
-  have e : (fun Y : archLie E a => archSlice φ.1 g (g' * (isExpLieAlgebra E a).expG Y)) =
-      chart φ.1 g ∘ fun Y => L (F Y) :=
+  have e
+      : (fun Y : archLie E a => archSlice φ.1 g (g' * (isExpLieAlgebra E a).expG Y))
+        = chart φ.1 g ∘ fun Y => L (F Y) :=
     funext fun Y => archSlice_eq E a φ.1 g _
   change ContDiff ℝ ∞ (fun Y : archLie E a => archSlice φ.1 g (g' * (isExpLieAlgebra E a).expG Y))
   rw [e]

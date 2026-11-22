@@ -11,13 +11,19 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoverInt
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR GlobalTheory.HodgeCoh CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Glob GlobalTheory.CompanionTheory.CechSerre
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR
+  GlobalTheory.HodgeCoh CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Glob
+  GlobalTheory.CompanionTheory.CechSerre
 universe w
 
 namespace GlobalTheory.CompanionTheory.CapVan
 
-theorem capO_eq_iInf_image {X : Scheme.{0}} {ι : Type} [DecidableEq ι] [Fintype ι] (V : ι → X.Opens) {m : ℕ}
-    (i : Fin m → ι) : capO V i = ⨅ α ∈ Finset.image i Finset.univ, V α := by
+theorem capO_eq_iInf_image
+    {X : Scheme.{0}} {ι : Type} [DecidableEq ι] [Fintype ι]
+    (V : ι → X.Opens)
+    {m : ℕ} (i : Fin m → ι)
+    : capO V i = ⨅ α ∈ Finset.image i Finset.univ, V α := by
   show (⨅ a, V (i a)) = _
   apply le_antisymm
   · refine le_iInf₂ fun α hα => ?_
@@ -25,9 +31,12 @@ theorem capO_eq_iInf_image {X : Scheme.{0}} {ι : Type} [DecidableEq ι] [Fintyp
     exact iInf_le _ a
   · exact le_iInf fun a => iInf₂_le (i a) (Finset.mem_image_of_mem i (Finset.mem_univ a))
 
-theorem van {K : Type} [Field K] [CharZero K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) [Smooth q]
-    (U : Cov q) (a n : ℕ) (i : Fin (n + 1) → U.ι) (r : ℕ) (hr : r ≠ a) :
-    Subsingleton (HU (Fk q U a) (capT (Vk q U a) i) r) := by
+theorem van
+    {K : Type} [Field K] [CharZero K]
+    {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) [Smooth q]
+    (U : Cov q) (a n : ℕ) (i : Fin (n + 1) → U.ι)
+    (r : ℕ) (hr : r ≠ a)
+    : Subsingleton (HU (Fk q U a) (capT (Vk q U a) i) r) := by
   classical
   obtain ⟨e⟩ := GlobalTheory.T.cover_intersection_graded_iso q U a n i r
   have hV : IsAffineOpen (capO U.U i) := by

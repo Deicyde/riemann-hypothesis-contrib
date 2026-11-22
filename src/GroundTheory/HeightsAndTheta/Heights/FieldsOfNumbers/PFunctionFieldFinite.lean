@@ -22,26 +22,30 @@ namespace FunctionFieldFinite
 
 variable {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
 
-def chartGens (P : Ideal (MRing ι F)) [P.IsPrime] (u : ∀ k, ι k) :
-    Set (FractionRing (MRing ι F ⧸ P)) :=
-  Set.range fun v => algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P)) (Ideal.Quotient.mk P (X v)) /
-    algebraMap (MRing ι F ⧸ P) _ (Ideal.Quotient.mk P (X ⟨v.1, u v.1⟩))
-
+def chartGens (P : Ideal (MRing ι F)) [P.IsPrime] (u : ∀ k, ι k)
+    : Set (FractionRing (MRing ι F ⧸ P)) :=
+  Set.range fun v =>
+    algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P)) (Ideal.Quotient.mk P (X v))
+      / algebraMap (MRing ι F ⧸ P) _ (Ideal.Quotient.mk P (X ⟨v.1, u v.1⟩))
 
 omit [Fintype K] [DecidableEq K] in
-theorem range_chartMap (P : Ideal (MRing ι F)) [P.IsPrime] (u : ∀ k, ι k) :
-    (chartMap P u).range = Algebra.adjoin F (chartGens P u) :=
+theorem range_chartMap (P : Ideal (MRing ι F)) [P.IsPrime] (u : ∀ k, ι k)
+    : (chartMap P u).range = Algebra.adjoin F (chartGens P u) :=
   aeval_range _
 
-theorem homFracDegZero_eq (hD : MChartDehomog.Statement.{u}) (P : Ideal (MRing ι F)) [P.IsPrime]
-    (u : ∀ k, ι k) (hu : ∀ k, (X ⟨k, u k⟩ : MRing ι F) ∉ P) :
-    homFracDegZero P = IntermediateField.adjoin F (chartGens P u) := by
+theorem homFracDegZero_eq
+    (hD : MChartDehomog.Statement.{u})
+    (P : Ideal (MRing ι F)) [P.IsPrime]
+    (u : ∀ k, ι k) (hu : ∀ k, (X ⟨k, u k⟩ : MRing ι F) ∉ P)
+    : homFracDegZero P = IntermediateField.adjoin F (chartGens P u) := by
   apply le_antisymm
   · unfold homFracDegZero
     rw [IntermediateField.adjoin_le_iff]
     rintro _ ⟨b, f, g, hf, hg, -, rfl⟩
-    have hm : algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P))
-        (Ideal.Quotient.mk P (chartMonomial u b)) ≠ 0 := by
+    have hm
+        : algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P))
+            (Ideal.Quotient.mk P (chartMonomial u b))
+          ≠ 0 := by
       rw [chartMonomial, map_prod, map_prod]
       refine Finset.prod_ne_zero_iff.mpr fun k _ => ?_
       rw [map_pow, map_pow]
@@ -54,26 +58,40 @@ theorem homFracDegZero_eq (hD : MChartDehomog.Statement.{u}) (P : Ideal (MRing �
     rwa [hD F K ι P u hu f b hf, hD F K ι P u hu g b hg, div_div_div_cancel_right₀ hm] at key
   · rw [IntermediateField.adjoin_le_iff]
     rintro _ ⟨v, rfl⟩
-    exact IntermediateField.subset_adjoin _ _ ⟨blockWeight ι v, X v, X ⟨v.1, u v.1⟩,
-      isWeightedHomogeneous_X _ _ _, isWeightedHomogeneous_X _ _ _, hu v.1, rfl⟩
-
+    exact IntermediateField.subset_adjoin _ _ ⟨
+      blockWeight ι v,
+      X v,
+      X ⟨v.1, u v.1⟩,
+      isWeightedHomogeneous_X _ _ _,
+      isWeightedHomogeneous_X _ _ _,
+      hu v.1,
+      rfl
+    ⟩
 
 open IntermediateField.algebraAdjoinAdjoin in
-theorem trdeg_homFracDegZero (hD : MChartDehomog.Statement.{u}) (hT : MChartTrdeg.Statement.{u})
-    [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)) [P.IsPrime] (hP : IsMultiHomogIdeal P)
-    (u : ∀ k, ι k) (hu : ∀ k, (X ⟨k, u k⟩ : MRing ι F) ∉ P) :
-    Algebra.trdeg F (homFracDegZero P) + Fintype.card K = Algebra.trdeg F (MRing ι F ⧸ P) := by
+theorem trdeg_homFracDegZero
+    (hD : MChartDehomog.Statement.{u}) (hT : MChartTrdeg.Statement.{u})
+    [∀ k, Fintype (ι k)]
+    (P : Ideal (MRing ι F)) [P.IsPrime]
+    (hP : IsMultiHomogIdeal P)
+    (u : ∀ k, ι k) (hu : ∀ k, (X ⟨k, u k⟩ : MRing ι F) ∉ P)
+    : Algebra.trdeg F (homFracDegZero P) + Fintype.card K = Algebra.trdeg F (MRing ι F ⧸ P) := by
   haveI : Algebra.FiniteType F (Algebra.adjoin F (chartGens P u)) :=
     Algebra.FiniteType.adjoin_of_finite (Set.finite_range _)
   rw [← hT F K ι P hP u hu, homFracDegZero_eq hD P u hu,
     GroundTheory.Arith.Abelian.Jacobian.trdeg_eq_of_isFractionRing (k := F)
-      (A := Algebra.adjoin F (chartGens P u)), ← range_chartMap]
+      (A := Algebra.adjoin F (chartGens P u)),
+    ← range_chartMap]
   exact congrArg (· + _) (Ideal.quotientKerEquivRange (chartMap P u)).trdeg_eq.symm
 
-theorem relDim_eq_trdeg (hD : MChartDehomog.Statement.{u}) (hT : MChartTrdeg.Statement.{u})
-    [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)) [P.IsPrime] (hP : IsMultiProjPrime P) :
-    ∃ n : ℕ, Algebra.trdeg F (homFracDegZero P) = n ∧
-      relDim P = (((n : ℤ) : WithTop ℤ) : WithBot (WithTop ℤ)) := by
+theorem relDim_eq_trdeg
+    (hD : MChartDehomog.Statement.{u}) (hT : MChartTrdeg.Statement.{u})
+    [∀ k, Fintype (ι k)]
+    (P : Ideal (MRing ι F)) [P.IsPrime]
+    (hP : IsMultiProjPrime P)
+    : ∃ n : ℕ,
+      Algebra.trdeg F (homFracDegZero P) = n
+        ∧ relDim P = (((n : ℤ) : WithTop ℤ) : WithBot (WithTop ℤ)) := by
   choose u hu using hP.relevant
   have h1 := trdeg_homFracDegZero hD hT P hP.multiHomog u hu
   obtain ⟨m, hdim, htr⟩ :=
@@ -91,10 +109,10 @@ theorem relDim_eq_trdeg (hD : MChartDehomog.Statement.{u}) (hT : MChartTrdeg.Sta
 
 end FunctionFieldFinite
 
-
 open FunctionFieldFinite in
-theorem FunctionFieldFinite.proof (hD : MChartDehomog.Statement.{u})
-    (hT : MChartTrdeg.Statement.{u}) : FunctionFieldFinite.Statement.{u} := by
+theorem FunctionFieldFinite.proof
+    (hD : MChartDehomog.Statement.{u}) (hT : MChartTrdeg.Statement.{u})
+    : FunctionFieldFinite.Statement.{u} := by
   intro F _ K K' _ _ _ _ j ι' _ P' hP' hrel
   have := hP'.isPrime
   have hP := isMultiProjPrime_contractPrime j ι' hP'
@@ -112,7 +130,8 @@ theorem FunctionFieldFinite.proof (hD : MChartDehomog.Statement.{u})
   have : IsScalarTower F E κ' := IsScalarTower.of_algebraMap_eq fun _ => rfl
   have : FaithfulSMul E κ' :=
     (faithfulSMul_iff_algebraMap_injective _ _).2 (IntermediateField.inclusion h).injective
-  have : FaithfulSMul F E := (faithfulSMul_iff_algebraMap_injective F E).2 (algebraMap F E).injective
+  have : FaithfulSMul F E :=
+    (faithfulSMul_iff_algebraMap_injective F E).2 (algebraMap F E).injective
   have htow := trdeg_add_eq F E (A := κ')
   rw [hE, hn', ← hnn] at htow
   have hlt : Algebra.trdeg E κ' < Cardinal.aleph0 :=
@@ -123,8 +142,10 @@ theorem FunctionFieldFinite.proof (hD : MChartDehomog.Statement.{u})
     have : n + m = n := by exact_mod_cast htow
     omega
   have : Algebra.IsAlgebraic E κ' := trdeg_eq_zero_iff.mp (by rw [hm, hm0]; rfl)
-  let g : κ' →ₐ[E] FractionRing (MRing ι' F ⧸ P') :=
-    { (κ'.val : κ' →+* FractionRing (MRing ι' F ⧸ P')) with commutes' := fun _ => rfl }
+  let g : κ' →ₐ[E] FractionRing (MRing ι' F ⧸ P') := {
+    (κ'.val : κ' →+* FractionRing (MRing ι' F ⧸ P')) with
+    commutes' := fun _ => rfl
+  }
   choose u hu using hP'.relevant
   have hκ' : κ' = IntermediateField.adjoin F (chartGens P' u) := homFracDegZero_eq hD P' u hu
   have hint : ∀ x ∈ chartGens P' u, IsIntegral E x := by

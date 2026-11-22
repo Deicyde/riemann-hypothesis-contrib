@@ -18,21 +18,26 @@ variable {n : ℕ}
 
 section Equiv
 
-variable {ε : Fin n → Bool}
-  {H₁ : Type*} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] {σ₁ : Matrix (Fin n) (Fin n) ℂ → (H₁ →L[ℂ] H₁)}
-  {H₂ : Type*} [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] {σ₂ : Matrix (Fin n) (Fin n) ℂ → (H₂ →L[ℂ] H₂)}
+variable
+  {ε : Fin n → Bool} {H₁ : Type*} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
+  {σ₁ : Matrix (Fin n) (Fin n) ℂ → (H₁ →L[ℂ] H₁)} {H₂ : Type*}
+  [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
+  {σ₂ : Matrix (Fin n) (Fin n) ℂ → (H₂ →L[ℂ] H₂)}
 
-theorem dSW_map_isometry (U : H₁ ≃ₗᵢ[ℂ] H₂) (hU : ∀ g ∈ UJset ε, ∀ x : H₁, U (σ₁ g x) = σ₂ g (U x)) :
-    ∀ (w : List (Matrix (Fin n) (Fin n) ℂ)), (∀ X ∈ w, inG ε X) → ∀ x : H₁, dSW σ₂ w (U x) = U (dSW σ₁ w x)
+theorem dSW_map_isometry (U : H₁ ≃ₗᵢ[ℂ] H₂) (hU : ∀ g ∈ UJset ε, ∀ x : H₁, U (σ₁ g x) = σ₂ g (U x))
+    : ∀ (w : List (Matrix (Fin n) (Fin n) ℂ)),
+      (∀ X ∈ w, inG ε X) → ∀ x : H₁, dSW σ₂ w (U x) = U (dSW σ₁ w x)
   | [], _, _ => rfl
   | X :: w, hw, x => by
     simp only [dSW]
     rw [dSW_map_isometry U hU w (fun Y hY => hw Y (List.mem_cons_of_mem _ hY)) x,
       dS_map_isometry U hU (hw X List.mem_cons_self)]
 
-theorem nuJ_map_isometry (U : H₁ ≃ₗᵢ[ℂ] H₂) (hU : ∀ g ∈ UJset ε, ∀ x : H₁, U (σ₁ g x) = σ₂ g (U x))
-    {Ws : List (List (Matrix (Fin n) (Fin n) ℂ))} (hWs : ∀ w ∈ Ws, ∀ X ∈ w, inG ε X) (x : H₁) :
-    nuJ σ₂ Ws (U x) = nuJ σ₁ Ws x := by
+theorem nuJ_map_isometry
+    (U : H₁ ≃ₗᵢ[ℂ] H₂) (hU : ∀ g ∈ UJset ε, ∀ x : H₁, U (σ₁ g x) = σ₂ g (U x))
+    {Ws : List (List (Matrix (Fin n) (Fin n) ℂ))} (hWs : ∀ w ∈ Ws, ∀ X ∈ w, inG ε X)
+    (x : H₁)
+    : nuJ σ₂ Ws (U x) = nuJ σ₁ Ws x := by
   delta nuJ
   congr 1
   refine List.map_congr_left fun w hw => ?_
@@ -40,14 +45,15 @@ theorem nuJ_map_isometry (U : H₁ ≃ₗᵢ[ℂ] H₂) (hU : ∀ g ∈ UJset ε
 
 end Equiv
 
-theorem decBoundJ_of_sigLam {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
-    {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {v₀ : T.V}
-    (hlam : S7.IsHCParam lam) {h : ℝ} (hgap : GapAtLeast ε lam h) (hth : thrStar ε < h)
+theorem decBoundJ_of_sigLam
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
+    {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {v₀ : T.V} (hlam : S7.IsHCParam lam)
+    {h : ℝ} (hgap : GapAtLeast ε lam h) (hth : thrStar ε < h)
     (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (hσ : Formalism.MainNotions.S.IsDS ε lam σ) (m N : ℕ) (hL : DecBoundJ ε (sigLam ε Ψ v₀) m N) :
-    DecBoundJ ε σ m N := by
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : Formalism.MainNotions.S.IsDS ε lam σ)
+    (m N : ℕ) (hL : DecBoundJ ε (sigLam ε Ψ v₀) m N)
+    : DecBoundJ ε σ m N := by
   have hstd : StdGap ε lam := ⟨hlam.1, h, hgap, lt_of_le_of_lt (le_max_left _ _) hth⟩
   obtain ⟨U, hU⟩ := equiv_sigLam_of_isDS hσ hstd hP hv₀
   obtain ⟨C, Ws, hWs, hB⟩ := hL

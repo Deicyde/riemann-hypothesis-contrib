@@ -16,7 +16,8 @@ namespace GlobalTheory.Amb
 
 variable {k : Type} [CommRing k]
 
-theorem ringKrullDim_eq_one' [IsDomain k] [CharZero k] (hf : Module.Finite ℤ k) : ringKrullDim k = 1 := by
+theorem ringKrullDim_eq_one' [IsDomain k] [CharZero k] (hf : Module.Finite ℤ k)
+    : ringKrullDim k = 1 := by
   have := hf
   have : Algebra.IsIntegral ℤ k := Algebra.IsIntegral.of_finite ℤ k
   have : Ring.DimensionLEOne k := Ring.DimensionLEOne.of_isIntegral (R := ℤ) k
@@ -29,15 +30,22 @@ theorem ringKrullDim_eq_one' [IsDomain k] [CharZero k] (hf : Module.Finite ℤ k
     have hk : IsField k := Ring.KrullDimLE.isField_of_isDomain
     exact Int.not_isField (isField_of_isIntegral_of_isField (R := ℤ) (S := k) Int.cast_injective hk)
 
-theorem topologicalKrullDim_of_polyCovered' [IsDomain k] [IsNoetherianRing k] (hk : ringKrullDim k = 1)
-    {X : Scheme.{0}} (f : X ⟶ Sp k) (d : ℕ) (h : PolyCovered f d) : topologicalKrullDim X = (d + 1 : ℕ) := by
+theorem topologicalKrullDim_of_polyCovered'
+    [IsDomain k] [IsNoetherianRing k]
+    (hk : ringKrullDim k = 1)
+    {X : Scheme.{0}} (f : X ⟶ Sp k)
+    (d : ℕ) (h : PolyCovered f d)
+    : topologicalKrullDim X = (d + 1 : ℕ) := by
   obtain ⟨ξ, -, hcov⟩ := h
-  have hdim : ∀ (σ : Type) [Fintype σ], Fintype.card σ = d →
-      topologicalKrullDim (Sp (MvPolynomial σ k)) = ((d + 1 : ℕ) : WithBot ℕ∞) := by
+  have hdim
+      : ∀ (σ : Type) [Fintype σ],
+        Fintype.card σ = d
+          → topologicalKrullDim (Sp (MvPolynomial σ k)) = ((d + 1 : ℕ) : WithBot ℕ∞) := by
     intro σ _ hσ
     change topologicalKrullDim (PrimeSpectrum (MvPolynomial σ k)) = _
     rw [PrimeSpectrum.topologicalKrullDim_eq_ringKrullDim,
-      MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, hk, Nat.card_eq_fintype_card, hσ, add_comm]
+      MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, hk, Nat.card_eq_fintype_card, hσ,
+      add_comm]
     norm_cast
   apply le_antisymm
   · unfold topologicalKrullDim
@@ -47,8 +55,10 @@ theorem topologicalKrullDim_of_polyCovered' [IsDomain k] [IsNoetherianRing k] (h
     obtain ⟨σ, _, e, he, hσ, -, ⟨y, rfl⟩, -⟩ := hcov x
     haveI := he
     let Φ := TopologicalSpace.IrreducibleCloseds.orderIsoOfIsOpenEmbedding e e.isOpenEmbedding
-    have hZ : TopologicalSpace.IrreducibleCloseds.map e e.isOpenEmbedding.continuous
-        (Φ.symm ⟨Z, ⟨y, hx⟩⟩) = Z :=
+    have hZ
+        : TopologicalSpace.IrreducibleCloseds.map e e.isOpenEmbedding.continuous
+            (Φ.symm ⟨Z, ⟨y, hx⟩⟩)
+          = Z :=
       congrArg Subtype.val (Φ.apply_symm_apply ⟨Z, ⟨y, hx⟩⟩)
     rw [← hZ, e.isOpenEmbedding.coheight_map]
     have h1 := Order.coheight_le_krullDim (Φ.symm ⟨Z, ⟨y, hx⟩⟩)
@@ -61,8 +71,9 @@ theorem topologicalKrullDim_of_polyCovered' [IsDomain k] [IsNoetherianRing k] (h
     rw [← hdim σ hσ]
     exact e.isOpenEmbedding.isInducing.topologicalKrullDim_le
 
-theorem isIntegral_of_polyCovered' [IsDomain k] {X : Scheme.{0}} (f : X ⟶ Sp k) (d : ℕ) (h : PolyCovered f d) :
-    IsIntegral X := by
+theorem isIntegral_of_polyCovered'
+    [IsDomain k] {X : Scheme.{0}} (f : X ⟶ Sp k) (d : ℕ) (h : PolyCovered f d)
+    : IsIntegral X := by
   obtain ⟨ξ, -, hcov⟩ := h
   haveI : ∀ x : X, _root_.IsReduced (X.presheaf.stalk x) := by
     intro x
@@ -93,24 +104,31 @@ theorem isIntegral_of_polyCovered' [IsDomain k] {X : Scheme.{0}} (f : X ⟶ Sp k
 theorem polyCovered_pSpace' [IsDomain k] (N : ℕ) : PolyCovered (PSpace.str k N) N := by
   classical
   letI : GradedAlgebra (ProjSpace.grading k N) := MvPolynomial.gradedAlgebra
-  have hX : ∀ i : Fin (N + 1), (MvPolynomial.X i : MvPolynomial (Fin (N + 1)) k) ≠ 0 :=
-    fun i => MvPolynomial.X_ne_zero i
-  let ξ0 : PSpace k N := (⟨⊥, by rw [HomogeneousIdeal.toIdeal_bot]; exact Ideal.isPrime_bot, fun hle => hX 0 (by
-      have h0 : MvPolynomial.X 0 ∈ HomogeneousIdeal.irrelevant (ProjSpace.grading k N) := by
-        rw [HomogeneousIdeal.mem_irrelevant_iff, GradedRing.proj_apply]
-        exact DirectSum.decompose_of_mem_ne _ (ProjSpace.X_mem k N 0) one_ne_zero
-      have h1 := hle h0
-      change _ ∈ (⊥ : HomogeneousIdeal (ProjSpace.grading k N)).toIdeal at h1
-      rwa [HomogeneousIdeal.toIdeal_bot, Ideal.mem_bot] at h1)⟩ :
-    ProjectiveSpectrum (ProjSpace.grading k N))
+  have hX : ∀ i : Fin (N + 1), (MvPolynomial.X i : MvPolynomial (Fin (N + 1)) k) ≠ 0 := fun i =>
+    MvPolynomial.X_ne_zero i
+  let ξ0 : PSpace k N :=
+    (⟨
+       ⊥,
+       by rw [HomogeneousIdeal.toIdeal_bot]; exact Ideal.isPrime_bot,
+       fun hle =>
+         hX 0 (by
+           have h0 : MvPolynomial.X 0 ∈ HomogeneousIdeal.irrelevant (ProjSpace.grading k N) := by
+             rw [HomogeneousIdeal.mem_irrelevant_iff, GradedRing.proj_apply]
+             exact DirectSum.decompose_of_mem_ne _ (ProjSpace.X_mem k N 0) one_ne_zero
+           have h1 := hle h0
+           change _ ∈ (⊥ : HomogeneousIdeal (ProjSpace.grading k N)).toIdeal at h1
+           rwa [HomogeneousIdeal.toIdeal_bot, Ideal.mem_bot] at h1)
+     ⟩
+      : ProjectiveSpectrum (ProjSpace.grading k N))
   have hmem : ∀ i, ξ0 ∈ ProjSpace.chart k N i := fun i =>
-    (Proj.mem_basicOpen _ _ _).mpr fun h => hX i (by
-      change _ ∈ (⊥ : HomogeneousIdeal (ProjSpace.grading k N)).toIdeal at h
-      rwa [HomogeneousIdeal.toIdeal_bot, Ideal.mem_bot] at h)
+    (Proj.mem_basicOpen _ _ _).mpr fun h =>
+      hX i (by
+        change _ ∈ (⊥ : HomogeneousIdeal (ProjSpace.grading k N)).toIdeal at h
+        rwa [HomogeneousIdeal.toIdeal_bot, Ideal.mem_bot] at h)
   have hspec : ∀ z : PSpace k N, ξ0 ⤳ z := fun z =>
-    specializes_iff_mem_closure.mpr
-      ((ProjectiveSpectrum.le_iff_mem_closure (𝒜 := ProjSpace.grading k N)
-        (ξ0 : ProjectiveSpectrum (ProjSpace.grading k N)) (z : ProjectiveSpectrum (ProjSpace.grading k N))).mp
+    specializes_iff_mem_closure.mpr ((ProjectiveSpectrum.le_iff_mem_closure
+        (𝒜 := ProjSpace.grading k N) (ξ0 : ProjectiveSpectrum (ProjSpace.grading k N))
+        (z : ProjectiveSpectrum (ProjSpace.grading k N))).mp
       (show (⊥ : HomogeneousIdeal (ProjSpace.grading k N)) ≤ z.asHomogeneousIdeal from bot_le))
   have hr : ∀ i, ξ0 ∈ Set.range (ProjSpace.chartι k N i) := fun i => by
     have := hmem i
@@ -130,14 +148,23 @@ theorem polyCovered_pSpace' [IsDomain k] (N : ℕ) : PolyCovered (PSpace.str k N
       rfl
     rw [hs]
     refine (PrimeSpectrum.le_iff_specializes _ _).mp ?_
-    change Ideal.comap (MvPolynomial.C : k →+* MvPolynomial {j : Fin (N + 1) // j ≠ 0} k) η.asIdeal ≤ y.asIdeal
+    change Ideal.comap (MvPolynomial.C : k →+* MvPolynomial {j : Fin (N + 1) // j ≠ 0} k) η.asIdeal
+      ≤ y.asIdeal
     intro a ha
     rw [Ideal.mem_comap, hηbot, Ideal.mem_bot, MvPolynomial.C_eq_zero] at ha
     rw [ha]
     exact zero_mem _
   · obtain ⟨i, hi⟩ := ProjSpace.exists_mem_chart k N x
-    refine ⟨{j : Fin (N + 1) // j ≠ i}, inferInstance, ProjSpace.chartι k N i, inferInstance, ?_,
-      ProjSpace.chartι_str k N i, ?_, hr i⟩
+    refine ⟨
+      {j : Fin (N + 1) // j ≠ i},
+      inferInstance,
+      ProjSpace.chartι k N i,
+      inferInstance,
+      ?_,
+      ProjSpace.chartι_str k N i,
+      ?_,
+      hr i
+    ⟩
     · simp
     · rw [← ProjSpace.opensRange_chartι] at hi
       exact hi

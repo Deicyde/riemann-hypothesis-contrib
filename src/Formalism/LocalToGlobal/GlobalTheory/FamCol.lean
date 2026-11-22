@@ -33,7 +33,8 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.FamCol
 
-open Formalism Formalism.BasicNotions Formalism.HN Formalism.LFunctionChainParameters Formalism.L2.Col Formalism.L2.DIV
+open Formalism Formalism.BasicNotions Formalism.HN Formalism.LFunctionChainParameters
+  Formalism.L2.Col Formalism.L2.DIV
 
 structure PlDat (K : Type) (I : Type) where
   N : NumDatum
@@ -69,7 +70,9 @@ structure RowArg {K : Type} [Field K] [NumberField K] [StarRing K] {I : Type} (C
   η1 : ℝ
   e0 : ℝ
 
-attribute [instance] RowArg.indexWFirst RowArg.indexWSecond RowArg.indexWThird RowArg.indexWFourth RowArg.firstRealIndex RowArg.secondRealIndex RowArg.firstRationalIndex RowArg.secondRationalIndex
+attribute [instance]
+  RowArg.indexWFirst RowArg.indexWSecond RowArg.indexWThird RowArg.indexWFourth
+  RowArg.firstRealIndex RowArg.secondRealIndex RowArg.firstRationalIndex RowArg.secondRationalIndex
 
 section Fam
 
@@ -91,16 +94,20 @@ attribute [instance] Pt.i1 Pt.i2 Pt.i3 Pt.i4
 
 section Family
 
-open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.LChain
-  Formalism.LFunctionChainParameters.LChain2
+open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LChain2
 
-variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H] {W : H → Type} [∀ u0, Fintype (W u0)] {m : ℕ}
+variable
+  {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
+  {W : H → Type} [∀ u0, Fintype (W u0)]
+  {m : ℕ}
 
 end Family
 
 section Rec
-
-
 
 end Rec
 
@@ -116,7 +123,10 @@ end Dat
 
 section ConcNum
 
-open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.LChain2
+open Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.LChain2
 
 variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
 

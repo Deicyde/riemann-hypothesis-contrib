@@ -15,39 +15,52 @@ open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants
 
 section norms
 
-variable {k p ρ : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k p ρ : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 theorem norm_gpsi (β w : ℂ) : ‖G.psi β w‖ = 1 := by
   unfold G.psi; rw [mul_comm]; exact Complex.norm_exp_ofReal_mul_I _
 
-theorem norm_psiStar (σ : Equiv.Perm (Fin p)) (z z' : Fin (2 * (p + 0 + ρ) + k + 1) → ℂ) (ξ : U.Xi k p 0 ρ σ) :
-    ‖U.psiStar k ρ σ z z' ξ‖ = 1 := by
+theorem norm_psiStar
+    (σ : Equiv.Perm (Fin p)) (z z' : Fin (2 * (p + 0 + ρ) + k + 1) → ℂ) (ξ : U.Xi k p 0 ρ σ)
+    : ‖U.psiStar k ρ σ z z' ξ‖ = 1 := by
   unfold U.psiStar U.psiH
   rw [norm_mul, norm_mul, norm_star, norm_psi, norm_psi, norm_gpsi, one_mul, one_mul]
 
-theorem opNorm_pi_le (Bs : B.RealPlaceData k ρ Wp Wq) {h : B.Mat k ρ} (hh : h ∈ UWset k ρ Bs.z) : ‖Bs.π h‖ ≤ 1 :=
+theorem opNorm_pi_le (Bs : B.RealPlaceData k ρ Wp Wq) {h : B.Mat k ρ} (hh : h ∈ UWset k ρ Bs.z)
+    : ‖Bs.π h‖ ≤ 1 :=
   ContinuousLinearMap.opNorm_le_bound _ zero_le_one (fun v => by rw [Bs.π_unitary h hh v, one_mul])
 
-theorem opNorm_pi'_le (Bs : B.RealPlaceData k ρ Wp Wq) {h : B.Mat k ρ} (hh : h ∈ UWset k ρ Bs.z') : ‖Bs.π' h‖ ≤ 1 :=
+theorem opNorm_pi'_le (Bs : B.RealPlaceData k ρ Wp Wq) {h : B.Mat k ρ} (hh : h ∈ UWset k ρ Bs.z')
+    : ‖Bs.π' h‖ ≤ 1 :=
   ContinuousLinearMap.opNorm_le_bound _ zero_le_one (fun v => by rw [Bs.π'_unitary h hh v, one_mul])
 
-theorem norm_pi_comp (Bs : B.RealPlaceData k ρ Wp Wq) {h : B.Mat k ρ} (hh : h ∈ UWset k ρ Bs.z) (A : Wq →L[ℂ] Wp) :
-    ‖(Bs.π h).comp A‖ = ‖A‖ := by
-  refine le_antisymm ((ContinuousLinearMap.opNorm_comp_le _ _).trans
-    (by simpa using mul_le_mul_of_nonneg_right (opNorm_pi_le Bs hh) (norm_nonneg A))) ?_
-  have hi : h⁻¹ ∈ UWset k ρ Bs.z := (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k ρ Bs.z).inv_mem h hh
+theorem norm_pi_comp
+    (Bs : B.RealPlaceData k ρ Wp Wq) {h : B.Mat k ρ} (hh : h ∈ UWset k ρ Bs.z) (A : Wq →L[ℂ] Wp)
+    : ‖(Bs.π h).comp A‖ = ‖A‖ := by
+  refine le_antisymm
+    ((ContinuousLinearMap.opNorm_comp_le _ _).trans
+      (by simpa using mul_le_mul_of_nonneg_right (opNorm_pi_le Bs hh) (norm_nonneg A)))
+    ?_
+  have hi : h⁻¹ ∈ UWset k ρ Bs.z :=
+    (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k ρ Bs.z).inv_mem h hh
   have hu : IsUnit h.det := (Formalism.FourierDecayAlt.P.weyl_subgroup_closed k ρ Bs.z).unit h hh
   have e : A = (Bs.π h⁻¹).comp ((Bs.π h).comp A) := by
-    rw [← ContinuousLinearMap.comp_assoc, ← Bs.π_rep.2 _ hi _ hh, Matrix.nonsing_inv_mul _ hu, Bs.π_rep.1]
+    rw [← ContinuousLinearMap.comp_assoc, ← Bs.π_rep.2 _ hi _ hh, Matrix.nonsing_inv_mul _ hu,
+      Bs.π_rep.1]
     rfl
-  calc ‖A‖ = ‖(Bs.π h⁻¹).comp ((Bs.π h).comp A)‖ := by rw [← e]
+  calc
+    ‖A‖
+      = ‖(Bs.π h⁻¹).comp ((Bs.π h).comp A)‖ := by rw [← e]
     _ ≤ ‖Bs.π h⁻¹‖ * ‖(Bs.π h).comp A‖ := ContinuousLinearMap.opNorm_comp_le _ _
     _ ≤ 1 * ‖(Bs.π h).comp A‖ := mul_le_mul_of_nonneg_right (opNorm_pi_le Bs hi) (norm_nonneg _)
     _ = ‖(Bs.π h).comp A‖ := one_mul _
 
-theorem sgs_mem {P : B.SS k ρ} (Bs : B.RealPlaceData k ρ Wp Wq) (hP : Bs.inSS P) {g : B.Mat k ρ} (hg : g ∈ B.GV k ρ) :
-    B.sgs P g ∈ B.GV k ρ := by
+theorem sgs_mem
+    {P : B.SS k ρ} (Bs : B.RealPlaceData k ρ Wp Wq) (hP : Bs.inSS P)
+    {g : B.Mat k ρ} (hg : g ∈ B.GV k ρ)
+    : B.sgs P g ∈ B.GV k ρ := by
   obtain ⟨h1, h2, h3, h4⟩ := hP
   have cG := Formalism.FourierDecayAlt.P.unitary_group_closed k ρ
   unfold B.sgs
@@ -55,12 +68,17 @@ theorem sgs_mem {P : B.SS k ρ} (Bs : B.RealPlaceData k ρ Wp Wq) (hP : Bs.inSS 
   have g2 : (Matrix.of P.1.2 : B.Mat k ρ) ∈ B.GV k ρ := h2.1
   have g3 : (Matrix.of P.2.1 : B.Mat k ρ) ∈ B.GV k ρ := h3.1
   have g4 : (Matrix.of P.2.2 : B.Mat k ρ) ∈ B.GV k ρ := h4.1
-  exact cG.mul_mem _ (cG.mul_mem _ (cG.mul_mem _ (cG.mul_mem _ (cG.inv_mem _ g1) _ (cG.inv_mem _ g2)) _ hg) _ g4) _ g3
+  exact cG.mul_mem _
+    (cG.mul_mem _ (cG.mul_mem _ (cG.mul_mem _ (cG.inv_mem _ g1) _ (cG.inv_mem _ g2)) _ hg) _ g4) _
+    g3
 
-theorem norm_fl_le (Bj : B.RealPlaceData k ρ Wp Wq) (z0 z0' : Fin (2 * (p + ρ) + k + 1) → ℂ) (σ : Equiv.Perm (Fin p))
-    (d : Fin p → ℂ) (H : B.Mat k (p + ρ) → (Wq →L[ℂ] Wp)) (g : B.Mat k ρ) (q : B.SS k ρ × U.Xi k p 0 ρ σ)
-    (hq : Bj.inSS q.1) :
-    ‖FL Bj z0 z0' σ d H g q‖ ≤ ‖H (U.gaXi k ρ σ d q.2 (fun a => a.elim0) (B.sgs q.1 g))‖ := by
+theorem norm_fl_le
+    (Bj : B.RealPlaceData k ρ Wp Wq)
+    (z0 z0' : Fin (2 * (p + ρ) + k + 1) → ℂ)
+    (σ : Equiv.Perm (Fin p))
+    (d : Fin p → ℂ) (H : B.Mat k (p + ρ) → (Wq →L[ℂ] Wp)) (g : B.Mat k ρ)
+    (q : B.SS k ρ × U.Xi k p 0 ρ σ) (hq : Bj.inSS q.1)
+    : ‖FL Bj z0 z0' σ d H g q‖ ≤ ‖H (U.gaXi k ρ σ d q.2 (fun a => a.elim0) (B.sgs q.1 g))‖ := by
   unfold FL
   rw [norm_smul, norm_xiP, one_mul, norm_pi_comp Bj hq.1]
   have hi : (Matrix.of q.1.2.1 : B.Mat k ρ)⁻¹ ∈ UWset k ρ Bj.z' :=
@@ -73,8 +91,9 @@ end norms
 
 section main
 
-variable {k p ρ : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k p ρ : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 theorem ae_inSS (Bs : B.RealPlaceData k ρ Wp Wq) : ∀ᵐ P ∂Bs.μSS, Bs.inSS P := by
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bs.haarW
@@ -90,7 +109,8 @@ theorem ae_inSS (Bs : B.RealPlaceData k ρ Wp Wq) : ∀ᵐ P ∂Bs.μSS, Bs.inSS
     Measure.quasiMeasurePreserving_snd.ae (Measure.quasiMeasurePreserving_snd.ae w2)] with P a b c e
   exact ⟨a, b, c, e⟩
 
-theorem ae_goodL (Bj : B.RealPlaceData k ρ Wp Wq) (σ : Equiv.Perm (Fin p)) : ∀ᵐ x ∂(muL Bj σ), GoodL Bj σ x := by
+theorem ae_goodL (Bj : B.RealPlaceData k ρ Wp Wq) (σ : Equiv.Perm (Fin p))
+    : ∀ᵐ x ∂(muL Bj σ), GoodL Bj σ x := by
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bj.haarW
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bj.haarN
   have := Formalism.FourierDecayAlt.P.Dx2.SplitF.sf_RC (k := k) p ρ
@@ -112,38 +132,56 @@ theorem ae_goodR (Bj : B.RealPlaceData k ρ Wp Wq) : ∀ᵐ y ∂(muR (p := p) B
     Measure.quasiMeasurePreserving_fst.ae (Measure.quasiMeasurePreserving_snd.ae w2)] with x a b
   exact ⟨a, b⟩
 
-theorem norm_cL (Bj : B.RealPlaceData k ρ Wp Wq) (σ : Equiv.Perm (Fin p)) (x : XL k p ρ σ) : ‖cL Bj σ x‖ = 1 := by
+theorem norm_cL (Bj : B.RealPlaceData k ρ Wp Wq) (σ : Equiv.Perm (Fin p)) (x : XL k p ρ σ)
+    : ‖cL Bj σ x‖ = 1 := by
   unfold cL
   rw [norm_mul, norm_mul, norm_psi, norm_psi, norm_gpsi, one_mul, one_mul]
 
-theorem norm_ellL (Bj : B.RealPlaceData k ρ Wp Wq) (σ : Equiv.Perm (Fin p)) (x : XL k p ρ σ) (hx : GoodL Bj σ x)
-    (A : Wq →L[ℂ] Wp) : ‖ellL Bj σ x A‖ = ‖A‖ := by
+theorem norm_ellL
+    (Bj : B.RealPlaceData k ρ Wp Wq) (σ : Equiv.Perm (Fin p)) (x : XL k p ρ σ) (hx : GoodL Bj σ x)
+    (A : Wq →L[ℂ] Wp)
+    : ‖ellL Bj σ x A‖ = ‖A‖ := by
   unfold ellL
   rw [ContinuousLinearMap.smul_apply, norm_smul, norm_cL, one_mul, ContinuousLinearMap.compL_apply,
     norm_pi_comp Bj hx.1]
 
 variable [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
-theorem core_main (hGS : GaXiSplit) (hPR : PsiRight) (hPA : PsiRnAct) (hPM : PsiMuP) (hRMP : RightMP)
-    (hp : 1 ≤ p) (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ) (hd : ∀ i, d i ≠ 0)
-    (Bj : B.RealPlaceData k ρ Wp Wq) (B0 : B.RealPlaceData k (p + ρ) Wp Wq) (hz' : B0.z' = liftVec k p ρ Bj.z')
-    (hπ' : ∀ y : B.Mat k ρ, Bj.π' y = B0.π' (U.embG k p ρ y)) (hW' : Bj.μW' Set.univ = 1)
-    (hW0' : B0.μW' = Bj.μW'.map (Formalism.FourierDecayAlt.P.PBM.levMt p ρ rfl)) (hNj : Bj.μN = D.muN k ρ)
-    (hN0 : B0.μN = D.muN k (p + ρ))
-    (g : B.Mat k ρ) (hg : g ∈ JF.Om k ρ Bj.z Bj.z') (H : B.Mat k (p + ρ) → (Wq →L[ℂ] Wp))
-    (hHc : ContinuousOn H {x | x ∈ B.GV k (p + ρ) ∧ U.DjU k p ρ x ≠ 0}) (R : ℝ)
-    (hR : ∀ x ∈ B.GV k (p + ρ), H x ≠ 0 → B.gN x ≤ R)
+theorem core_main
+    (hGS : GaXiSplit) (hPR : PsiRight) (hPA : PsiRnAct) (hPM : PsiMuP) (hRMP : RightMP) (hp : 1 ≤ p)
+    (σ : Equiv.Perm (Fin p))
+    (d : Fin p → ℂ) (hd : ∀ i, d i ≠ 0)
+    (Bj : B.RealPlaceData k ρ Wp Wq) (B0 : B.RealPlaceData k (p + ρ) Wp Wq)
+    (hz' : B0.z' = liftVec k p ρ Bj.z') (hπ' : ∀ y : B.Mat k ρ, Bj.π' y = B0.π' (U.embG k p ρ y))
+    (hW' : Bj.μW' Set.univ = 1)
+    (hW0' : B0.μW' = Bj.μW'.map (Formalism.FourierDecayAlt.P.PBM.levMt p ρ rfl))
+    (hNj : Bj.μN = D.muN k ρ) (hN0 : B0.μN = D.muN k (p + ρ))
+    (g : B.Mat k ρ) (hg : g ∈ JF.Om k ρ Bj.z Bj.z')
+    (H : B.Mat k (p + ρ) → (Wq →L[ℂ] Wp))
+    (hHc : ContinuousOn H {x | x ∈ B.GV k (p + ρ) ∧ U.DjU k p ρ x ≠ 0})
+    (R : ℝ) (hR : ∀ x ∈ B.GV k (p + ρ), H x ≠ 0 → B.gN x ≤ R)
     (hM1 : AEStronglyMeasurable (FL Bj (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') σ d H g)
       (Bj.μSS.prod (U.muXi k p 0 ρ σ)))
-    (hM2 : AEStronglyMeasurable (fun q : XL k p ρ σ × XR k p ρ =>
-      KrI B0 H (sxL Bj σ q.1 * U.mMap k p ρ (U.hMat σ d) g) (PsiR q.2)) ((muL Bj σ).prod (muR Bj)))
-    (hM3 : ∀ x, GoodL Bj σ x →
-      AEStronglyMeasurable (KrI B0 H (sxL Bj σ x * U.mMap k p ρ (U.hMat σ d) g)) (B0.μW'.prod B0.μN))
-    (hM4 : ∀ γ ∈ B.GV k ρ, Continuous (fun ξ : U.Xi k p 0 ρ σ =>
-      U.psiStar k ρ σ (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') ξ • H (U.gaXi k ρ σ d ξ (fun a => a.elim0) γ))) :
-    Integrable (fun x => ellL Bj σ x (PBG.Kr B0 H (sxL Bj σ x * U.mMap k p ρ (U.hMat σ d) g))) (muL Bj σ) ∧
-    B.JF Bj (U.PhiFun (s := 0) k ρ σ d (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') H (fun a => a.elim0)) g =
-      ∫ x, ellL Bj σ x (PBG.Kr B0 H (sxL Bj σ x * U.mMap k p ρ (U.hMat σ d) g)) ∂(muL Bj σ) := by
+    (hM2 : AEStronglyMeasurable
+      (fun q : XL k p ρ σ × XR k p ρ =>
+        KrI B0 H (sxL Bj σ q.1 * U.mMap k p ρ (U.hMat σ d) g) (PsiR q.2))
+      ((muL Bj σ).prod (muR Bj)))
+    (hM3 : ∀ x,
+      GoodL Bj σ x
+        → AEStronglyMeasurable (KrI B0 H (sxL Bj σ x * U.mMap k p ρ (U.hMat σ d) g))
+          (B0.μW'.prod B0.μN))
+    (hM4 : ∀ γ ∈ B.GV k ρ,
+      Continuous (fun ξ : U.Xi k p 0 ρ σ =>
+        U.psiStar k ρ σ (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') ξ
+          • H (U.gaXi k ρ σ d ξ (fun a => a.elim0) γ)))
+    : Integrable
+        (fun x => ellL Bj σ x (PBG.Kr B0 H (sxL Bj σ x * U.mMap k p ρ (U.hMat σ d) g)))
+        (muL Bj σ)
+      ∧ B.JF Bj
+          (U.PhiFun (s := 0) k ρ σ d (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') H
+            (fun a => a.elim0))
+          g
+        = ∫ x, ellL Bj σ x (PBG.Kr B0 H (sxL Bj σ x * U.mMap k p ρ (U.hMat σ d) g)) ∂(muL Bj σ) := by
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bj.haarW
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bj.haarN
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite Bj.haarW'
@@ -163,9 +201,13 @@ theorem core_main (hGS : GaXiSplit) (hPR : PsiRight) (hPA : PsiRnAct) (hPM : Psi
   have hgG : g ∈ B.GV k ρ := hg.1
   have hSS := ae_inSS Bj
 
-  have hS1 : ∀ γ ∈ B.GV k ρ, Integrable (fun ξ : U.Xi k p 0 ρ σ =>
-      U.psiStar k ρ σ (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') ξ • H (U.gaXi k ρ σ d ξ (fun a => a.elim0) γ))
-      (U.muXi k p 0 ρ σ) := by
+  have hS1
+      : ∀ γ ∈ B.GV k ρ,
+        Integrable
+          (fun ξ : U.Xi k p 0 ρ σ =>
+            U.psiStar k ρ σ (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') ξ
+              • H (U.gaXi k ρ σ d ξ (fun a => a.elim0) γ))
+          (U.muXi k p 0 ρ σ) := by
     intro γ hγ
     refine hball.mono' (hM4 γ hγ).aestronglyMeasurable (ae_of_all _ fun ξ => ?_)
     rw [norm_smul, norm_psiStar, one_mul]
@@ -175,17 +217,25 @@ theorem core_main (hGS : GaXiSplit) (hPR : PsiRight) (hPA : PsiRnAct) (hPM : Psi
       mul_nonneg hM0 (Set.indicator_nonneg (fun _ _ => zero_le_one) _)
     nlinarith [bumpG_nonneg R' γ]
 
-  have hbi : Integrable (fun q : B.SS k ρ × U.Xi k p 0 ρ σ => bumpG R' (B.sgs q.1 g) *
-      (M * (Metric.closedBall (0 : U.Xi k p 0 ρ σ) C).indicator (fun _ => (1 : ℝ)) q.2))
-      (Bj.μSS.prod (U.muXi k p 0 ρ σ)) := (bump_int Bj hg R').mul_prod hball
+  have hbi : Integrable
+      (fun q : B.SS k ρ × U.Xi k p 0 ρ σ =>
+        bumpG R' (B.sgs q.1 g)
+          * (M * (Metric.closedBall (0 : U.Xi k p 0 ρ σ) C).indicator (fun _ => (1 : ℝ)) q.2))
+      (Bj.μSS.prod (U.muXi k p 0 ρ σ)) :=
+    (bump_int Bj hg R').mul_prod hball
   have hFi : Integrable F (Bj.μSS.prod (U.muXi k p 0 ρ σ)) := by
     refine hbi.mono' hM1 ?_
     filter_upwards [Measure.quasiMeasurePreserving_fst.ae hSS] with q hq
-    refine (norm_fl_le Bj _ _ σ d H g q hq).trans ((hb q.2 _ _ (sgs_mem Bj hq hgG)).trans (le_of_eq ?_))
+    refine (norm_fl_le Bj _ _ σ d H g q hq).trans
+      ((hb q.2 _ _ (sgs_mem Bj hq hgG)).trans (le_of_eq ?_))
     ring
 
-  have hL : B.JF Bj (U.PhiFun (s := 0) k ρ σ d (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') H (fun a => a.elim0)) g =
-      ∫ q, F q ∂(Bj.μSS.prod (U.muXi k p 0 ρ σ)) := by
+  have hL
+      : B.JF Bj
+          (U.PhiFun (s := 0) k ρ σ d (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') H
+            (fun a => a.elim0))
+          g
+        = ∫ q, F q ∂(Bj.μSS.prod (U.muXi k p 0 ρ σ)) := by
     rw [integral_prod F hFi]
     show ∫ P, JF.integrand Bj _ g P ∂Bj.μSS = _
     refine integral_congr_ae ?_
@@ -194,15 +244,21 @@ theorem core_main (hGS : GaXiSplit) (hPR : PsiRight) (hPA : PsiRnAct) (hPM : Psi
     set L : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp) := JF.xiP Bj P •
       ((ContinuousLinearMap.compL ℂ Wq Wp Wp (Bj.π (Matrix.of P.1.1))).comp
         ((ContinuousLinearMap.compL ℂ Wq Wq Wp).flip (Bj.π' (Matrix.of P.2.1)⁻¹))) with hLdef
-    have e1 : ∀ ξ, F (P, ξ) = L (U.psiStar k ρ σ (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') ξ •
-        H (U.gaXi k ρ σ d ξ (fun a => a.elim0) (B.sgs P g))) := fun ξ => rfl
+    have e1
+        : ∀ ξ,
+          F (P, ξ)
+            = L
+              (U.psiStar k ρ σ (liftVec k p ρ Bj.z) (liftVec k p ρ Bj.z') ξ
+                • H (U.gaXi k ρ σ d ξ (fun a => a.elim0) (B.sgs P g))) := fun ξ =>
+      rfl
     simp_rw [e1]
     rw [L.integral_comp_comm hI]
     rfl
 
   have hmp := splitE_mp Bj σ
-  have hS4 : ∫ q, F q ∂(Bj.μSS.prod (U.muXi k p 0 ρ σ)) =
-      ∫ z, F ((splitE σ).symm z) ∂((muL Bj σ).prod (muR Bj)) :=
+  have hS4
+      : ∫ q, F q ∂(Bj.μSS.prod (U.muXi k p 0 ρ σ))
+        = ∫ z, F ((splitE σ).symm z) ∂((muL Bj σ).prod (muR Bj)) :=
     ((hmp.symm (splitE σ)).integral_comp' F).symm
 
   have hgood : ∀ᵐ z ∂((muL Bj σ).prod (muR (p := p) Bj)), GoodL Bj σ z.1 ∧ GoodR Bj z.2 := by
@@ -240,9 +296,11 @@ theorem core_main (hGS : GaXiSplit) (hPR : PsiRight) (hPA : PsiRnAct) (hPM : Psi
       rw [hmap]; exact hM3 x hx
     rw [kr_eq_int, ← hmap, integral_map hPm.aemeasurable hA]
 
-  have hS8 : ∀ᵐ x ∂(muL Bj σ), ellL Bj σ x (PBG.Kr B0 H (sxL Bj σ x * x1)) = ∫ y, GRl (x, y) ∂(muR Bj) := by
-    filter_upwards [ae_goodL Bj σ, hGR0i.prod_right_ae] with x hx hxi
-    rw [hS7 x hx, ← (ellL Bj σ x).integral_comp_comm hxi]
+  have hS8
+      : ∀ᵐ x ∂(muL Bj σ), ellL Bj σ x (PBG.Kr B0 H (sxL Bj σ x * x1)) = ∫ y, GRl (x, y) ∂(muR Bj) :=
+    by
+      filter_upwards [ae_goodL Bj σ, hGR0i.prod_right_ae] with x hx hxi
+      rw [hS7 x hx, ← (ellL Bj σ x).integral_comp_comm hxi]
   refine ⟨hGRli.integral_prod_left.congr (hS8.mono fun x hx => hx.symm), ?_⟩
   rw [integral_congr_ae hS8, ← integral_prod GRl hGRli, ← integral_congr_ae hS5, ← hS4, ← hL]
 

@@ -13,16 +13,24 @@ namespace GlobalTheory.CompanionTheory.HilbMoll
 
 variable {n : ℕ}
 
-theorem opConv_mem_of_isClosed {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (α : Matrix (Fin n) (Fin n) ℂ → ℂ)
+theorem opConv_mem_of_isClosed
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (α : Matrix (Fin n) (Fin n) ℂ → ℂ)
     (W : Submodule ℂ H) (hWc : IsClosed (W : Set H)) (hWs : ∀ g ∈ UJset ε, ∀ x ∈ W, σ g x ∈ W)
-    {x : H} (hx : x ∈ W) : opConv ε σ α x ∈ W := by
+    {x : H} (hx : x ∈ W)
+    : opConv ε σ α x ∈ W := by
   have : CompleteSpace W := hWc.completeSpace_coe
   unfold opConv
-  by_cases hint : Integrable (fun g : Formalism.REAL.UJ ε => α (Formalism.MainNotions.S.umat g) • σ (Formalism.MainNotions.S.umat g) x)
-      (Formalism.REAL.muG ε)
-  · have hfix : ∀ g : Formalism.REAL.UJ ε, W.starProjection (α (Formalism.MainNotions.S.umat g) • σ (Formalism.MainNotions.S.umat g) x) =
-        α (Formalism.MainNotions.S.umat g) • σ (Formalism.MainNotions.S.umat g) x := fun g =>
+  by_cases hint : Integrable
+    (fun g : Formalism.REAL.UJ ε =>
+      α (Formalism.MainNotions.S.umat g) • σ (Formalism.MainNotions.S.umat g) x)
+    (Formalism.REAL.muG ε)
+  · have hfix
+        : ∀ g : Formalism.REAL.UJ ε,
+          W.starProjection
+              (α (Formalism.MainNotions.S.umat g) • σ (Formalism.MainNotions.S.umat g) x)
+            = α (Formalism.MainNotions.S.umat g) • σ (Formalism.MainNotions.S.umat g) x := fun g =>
       Submodule.starProjection_eq_self_iff.2 (W.smul_mem _ (hWs _ (arb_umat_mem g) x hx))
     have h := W.starProjection.integral_comp_comm hint
     simp only [hfix] at h

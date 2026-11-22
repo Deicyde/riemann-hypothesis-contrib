@@ -8,13 +8,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
 
-private theorem sandwich {E M : Type} [Field E] [AddCommGroup M] [Module E M] (B S Z : Submodule E M)
-    (hBS : B ≤ S) (hSZ : S ≤ Z) [Module.Finite E B]
-    [hQ : Module.Finite E ↥((S.comap Z.subtype).map (B.comap Z.subtype).mkQ)] :
-    Module.Finite E S ∧
-      finrank E S = finrank E ↥((S.comap Z.subtype).map (B.comap Z.subtype).mkQ) + finrank E B := by
+private theorem sandwich
+    {E M : Type} [Field E] [AddCommGroup M] [Module E M]
+    (B S Z : Submodule E M) (hBS : B ≤ S) (hSZ : S ≤ Z)
+    [Module.Finite E B] [hQ : Module.Finite E ↥((S.comap Z.subtype).map (B.comap Z.subtype).mkQ)]
+    : Module.Finite E S
+      ∧ finrank E S
+        = finrank E ↥((S.comap Z.subtype).map (B.comap Z.subtype).mkQ) + finrank E B := by
   let f : S →ₗ[E] (Z ⧸ B.comap Z.subtype) := (B.comap Z.subtype).mkQ ∘ₗ Submodule.inclusion hSZ
   have hr : LinearMap.range f = (S.comap Z.subtype).map (B.comap Z.subtype).mkQ := by
     rw [LinearMap.range_comp, Submodule.range_inclusion]
@@ -22,8 +25,7 @@ private theorem sandwich {E M : Type} [Field E] [AddCommGroup M] [Module E M] (B
     ext x
     simp [f]
   have eB := Submodule.comapSubtypeEquivOfLe hBS
-  have hkf : Module.Finite E ↥(LinearMap.ker f) := by
-    rw [hk]; exact Module.Finite.equiv eB.symm
+  have hkf : Module.Finite E ↥(LinearMap.ker f) := by rw [hk]; exact Module.Finite.equiv eB.symm
   have hrf : Module.Finite E ↥(LinearMap.range f) := by rw [hr]; exact hQ
   have hS : Module.Finite E S := by
     rw [Module.finite_def]
@@ -33,10 +35,13 @@ private theorem sandwich {E M : Type} [Field E] [AddCommGroup M] [Module E M] (B
   refine ⟨hS, ?_⟩
   rw [← LinearMap.finrank_range_add_finrank_ker f, hr, hk, eB.finrank_eq]
 
-private theorem exists_ne_one {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G]
-    (φ : G →* GQ l) (hφ : IsOpenEmbedding φ) {E : Type} [Field E] [Algebra ℚ_[l] E] [Algebra ℤ_[l] E]
-    [IsScalarTower ℤ_[l] ℚ_[l] E] (κ : G →* Eˣ) (w : ℤ) (hw : w ≠ 0) (h : HasWeight φ κ w) :
-    ∃ g, κ g ≠ 1 := by
+private theorem exists_ne_one
+    {l : ℕ} [Fact l.Prime]
+    {G : Type} [Group G] [TopologicalSpace G]
+    (φ : G →* GQ l) (hφ : IsOpenEmbedding φ)
+    {E : Type} [Field E] [Algebra ℚ_[l] E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] ℚ_[l] E]
+    (κ : G →* Eˣ) (w : ℤ) (hw : w ≠ 0) (h : HasWeight φ κ w)
+    : ∃ g, κ g ≠ 1 := by
   obtain ⟨U, hU, h⟩ := h
   obtain ⟨-, s, ⟨⟨g, hg, rfl⟩, hs⟩, hfin⟩ := (cycInertia l).2 (U.map φ) (hφ.isOpenMap _ hU)
   refine ⟨g, fun h1 => hfin ?_⟩
@@ -51,9 +56,13 @@ private theorem exists_ne_one {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [Top
     exact h2.symm
   exact isOfFinOrder_iff_zpow_eq_one.2 ⟨w, hw, h3⟩
 
-private theorem finrank_ddr {l : ℕ} [Fact l.Prime] {G : Type} [Group G]
-    (φ : G →* GQ l) {E : Type} [Field E] [Algebra ℚ_[l] E] [FiniteDimensional ℚ_[l] E]
-    (ρ : Representation E G E) (h : IsDr φ ρ) : finrank E ↥(Ddr φ ρ) = φ.range.index := by
+private theorem finrank_ddr
+    {l : ℕ} [Fact l.Prime]
+    {G : Type} [Group G]
+    (φ : G →* GQ l)
+    {E : Type} [Field E] [Algebra ℚ_[l] E] [FiniteDimensional ℚ_[l] E]
+    (ρ : Representation E G E) (h : IsDr φ ρ)
+    : finrank E ↥(Ddr φ ρ) = φ.range.index := by
   have he : Ddr φ (resCoef ℚ_[l] ρ) = (Ddr φ ρ).restrictScalars ℚ_[l] := by
     ext x
     simp only [Ddr, Submodule.restrictScalars_mem, Submodule.mem_iInf, LinearMap.mem_ker]
@@ -65,8 +74,23 @@ private theorem finrank_ddr {l : ℕ} [Fact l.Prime] {G : Type} [Group G]
   rw [← Module.finrank_mul_finrank ℚ_[l] E, mul_comm] at h1
   exact Nat.eq_of_mul_eq_mul_right Module.finrank_pos h1
 
-theorem UpperTheory.V.Loc.z1fChar :
-    LocalPublishedTheorems → ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (φ : G →* GQ l) (hφ : IsOpenEmbedding φ) {E : Type} [Field E] [Algebra ℚ_[l] E] [FiniteDimensional ℚ_[l] E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] ℚ_[l] E] [TopologicalSpace E] [IsModuleTopology ℚ_[l] E] [IsTopologicalRing E] (κ : G →* Eˣ), Continuous (fun g => (κ g : E)) → ∀ w : ℤ, HasWeight φ κ w → (w < 0 → UpperTheory.V.Loc.finiteCocycles φ (chRep κ) = ReciprocityTheory.Gal.B1 (chRep κ) ∧ finrank E ↥(ReciprocityTheory.Gal.B1 (chRep κ)) = 1) ∧ (0 < w → Module.Finite E ↥(UpperTheory.V.Loc.finiteCocycles φ (chRep κ)) ∧ finrank E ↥(UpperTheory.V.Loc.finiteCocycles φ (chRep κ)) = φ.range.index + 1) := by
+theorem UpperTheory.V.Loc.z1fChar
+    : LocalPublishedTheorems
+      → ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+          (φ : G →* GQ l) (hφ : IsOpenEmbedding φ) {E : Type} [Field E] [Algebra ℚ_[l] E]
+          [FiniteDimensional ℚ_[l] E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] ℚ_[l] E]
+          [TopologicalSpace E] [IsModuleTopology ℚ_[l] E] [IsTopologicalRing E] (κ : G →* Eˣ),
+        Continuous (fun g => (κ g : E))
+          → ∀ w : ℤ,
+            HasWeight φ κ w
+              → (w < 0
+                  → UpperTheory.V.Loc.finiteCocycles φ (chRep κ)
+                      = ReciprocityTheory.Gal.B1 (chRep κ)
+                    ∧ finrank E ↥(ReciprocityTheory.Gal.B1 (chRep κ)) = 1)
+                ∧ (0 < w
+                  → Module.Finite E ↥(UpperTheory.V.Loc.finiteCocycles φ (chRep κ))
+                    ∧ finrank E ↥(UpperTheory.V.Loc.finiteCocycles φ (chRep κ))
+                      = φ.range.index + 1) := by
   intro hP l _ G _ _ _ φ hφ E _ _ _ _ _ _ _ _ κ hκ w hw
   have hc : ReciprocityTheory.Gal.ContAction (chRep κ) := by
     have : (fun p : G × E => chRep κ p.1 p.2) = fun p => (κ p.1 : E) * p.2 := by
@@ -77,19 +101,25 @@ theorem UpperTheory.V.Loc.z1fChar :
   obtain ⟨hdr, hfil⟩ := charFil φ hφ κ hκ w hw
   obtain ⟨hfin, hdim⟩ := bkDim hP φ hφ (chRep κ) hc hdr
   have hBS := (z1fMap φ (chRep κ) (chRep κ)).1 hc
-  have hSZ : UpperTheory.V.Loc.finiteCocycles φ (chRep κ) ≤ ReciprocityTheory.Gal.Z1 (chRep κ) := fun c h => h.1
+  have hSZ : UpperTheory.V.Loc.finiteCocycles φ (chRep κ) ≤ ReciprocityTheory.Gal.Z1 (chRep κ) :=
+    fun c h => h.1
   have hBf : Module.Finite E ↥(ReciprocityTheory.Gal.B1 (chRep κ)) := by
     unfold ReciprocityTheory.Gal.B1; infer_instance
   obtain ⟨hS, hSd⟩ := sandwich _ _ _ hBS hSZ (hQ := hfin)
-  replace hSd : finrank E ↥(UpperTheory.V.Loc.finiteCocycles φ (chRep κ)) =
-    finrank E ↥(finiteCohomology φ (chRep κ)) + finrank E ↥(ReciprocityTheory.Gal.B1 (chRep κ)) := hSd
-  have key : w ≠ 0 → ReciprocityTheory.Gal.H0 (chRep κ) = ⊥ ∧ finrank E ↥(ReciprocityTheory.Gal.B1 (chRep κ)) = 1 := by
+  replace hSd
+      : finrank E ↥(UpperTheory.V.Loc.finiteCocycles φ (chRep κ))
+        = finrank E ↥(finiteCohomology φ (chRep κ))
+          + finrank E ↥(ReciprocityTheory.Gal.B1 (chRep κ)) :=
+    hSd
+  have key
+      : w ≠ 0
+        → ReciprocityTheory.Gal.H0 (chRep κ) = ⊥
+          ∧ finrank E ↥(ReciprocityTheory.Gal.B1 (chRep κ)) = 1 := by
     intro h0
     obtain ⟨g, hg⟩ := exists_ne_one φ hφ κ w h0 hw
     have hz : ∀ m : E, chRep κ g m - m = 0 → m = 0 := by
       intro m hm
-      have h1 : ((κ g : E) - 1) * m = 0 := by
-        rw [sub_mul, one_mul]; simpa [chRep] using hm
+      have h1 : ((κ g : E) - 1) * m = 0 := by rw [sub_mul, one_mul]; simpa [chRep] using hm
       rcases mul_eq_zero.1 h1 with h | h
       · exact absurd (Units.val_eq_one.1 (sub_eq_zero.1 h)) hg
       · exact h
@@ -99,7 +129,8 @@ theorem UpperTheory.V.Loc.z1fChar :
       exact hz m (sub_eq_zero.2 ((mem_riemannRochSpace_iff_regularAt_everywhere _ _).1 hm g))
     · unfold ReciprocityTheory.Gal.B1
       rw [LinearMap.finrank_range_of_inj, finrank_self]
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro m hm
       exact hz m (congrFun hm g)
   refine ⟨fun h => ?_, fun h => ?_⟩

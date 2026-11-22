@@ -14,10 +14,11 @@ open NumberField IsDedekindDomain GlobalTheory.NT
 
 namespace GlobalTheory.UnramDiscr
 
-variable (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+variable
+  (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
 
-theorem not_dvd_iff_inertia (P : Ideal (𝓞 L)) [P.IsPrime] (hP : P ≠ ⊥) :
-    ¬ P ∣ differentIdeal (𝓞 K) (𝓞 L) ↔ P.inertia (L ≃ₐ[K] L) = ⊥ := by
+theorem not_dvd_iff_inertia (P : Ideal (𝓞 L)) [P.IsPrime] (hP : P ≠ ⊥)
+    : ¬ P ∣ differentIdeal (𝓞 K) (𝓞 L) ↔ P.inertia (L ≃ₐ[K] L) = ⊥ := by
   let _ : Algebra (FractionRing (𝓞 K)) (FractionRing (𝓞 L)) := FractionRing.liftAlgebra _ _
   haveI : P.IsMaximal := Ideal.IsPrime.isMaximal inferInstance hP
   rw [not_dvd_differentIdeal_iff, ← Ideal.ramificationIdx_eq_one_iff,
@@ -25,8 +26,8 @@ theorem not_dvd_iff_inertia (P : Ideal (𝓞 L)) [P.IsPrime] (hP : P ≠ ⊥) :
     ← Ideal.card_inertia_eq_ramificationIdxIn (G := L ≃ₐ[K] L) (P.under (𝓞 K)) P,
     Subgroup.card_eq_one]
 
-theorem unramIn_iff_differentIdeal_eq_top :
-    (∀ 𝔭 : HeightOneSpectrum (𝓞 K), UnramIn L 𝔭) ↔ differentIdeal (𝓞 K) (𝓞 L) = ⊤ := by
+theorem unramIn_iff_differentIdeal_eq_top
+    : (∀ 𝔭 : HeightOneSpectrum (𝓞 K), UnramIn L 𝔭) ↔ differentIdeal (𝓞 K) (𝓞 L) = ⊤ := by
   let _ : Algebra (FractionRing (𝓞 K)) (FractionRing (𝓞 L)) := FractionRing.liftAlgebra _ _
   have hD0 : differentIdeal (𝓞 K) (𝓞 L) ≠ ⊥ := differentIdeal_ne_bot
   unfold UnramIn InInertia
@@ -56,12 +57,12 @@ theorem unramIn_iff_differentIdeal_eq_top :
     rw [hb] at hmem
     exact Subgroup.mem_bot.mp hmem
 
-
 omit K L in
-theorem unramIn_iff_natAbs_discr :
-    ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L],
-      (∀ 𝔭 : HeightOneSpectrum (𝓞 K), UnramIn L 𝔭) ↔
-        (discr L).natAbs = (discr K).natAbs ^ Module.finrank K L := by
+theorem unramIn_iff_natAbs_discr
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+        [IsGalois K L],
+      (∀ 𝔭 : HeightOneSpectrum (𝓞 K), UnramIn L 𝔭)
+        ↔ (discr L).natAbs = (discr K).natAbs ^ Module.finrank K L := by
   intro K L _ _ _ _ _ _
   rw [unramIn_iff_differentIdeal_eq_top K L,
     natAbs_discr_eq_absNorm_differentIdeal_mul_natAbs_discr_pow K (𝓞 K) L (𝓞 L)]

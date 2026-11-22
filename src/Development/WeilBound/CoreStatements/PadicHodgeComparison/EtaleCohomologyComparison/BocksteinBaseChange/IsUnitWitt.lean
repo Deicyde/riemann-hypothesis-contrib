@@ -30,23 +30,30 @@ attribute [instance] Res.field Res.char Res.perf
 
 variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)}
 
-def Res.w (r : Res l K) : WittVector l r.k →+* Acris l := (algebraMap (Ainf l) (Acris l)).comp (WittVector.map r.s)
+def Res.w (r : Res l K) : WittVector l r.k →+* Acris l :=
+  (algebraMap (Ainf l) (Acris l)).comp (WittVector.map r.s)
 
-theorem isUnit_witt {k C : Type} [Field k] [CharP k l] [PerfectRing k l] [CommRing C] (g : WittVector l k →+* C) (h : IsUnit (l : C))
-    (y : nonZeroDivisors (WittVector l k)) : IsUnit (g y) := by
+theorem isUnit_witt
+    {k C : Type} [Field k] [CharP k l] [PerfectRing k l] [CommRing C]
+    (g : WittVector l k →+* C) (h : IsUnit (l : C)) (y : nonZeroDivisors (WittVector l k))
+    : IsUnit (g y) := by
   obtain ⟨m, b, e⟩ := WittVector.exists_eq_pow_p_mul' y.1 (nonZeroDivisors.coe_ne_zero y)
   rw [e, map_mul, map_pow, map_natCast]
   exact (h.pow m).mul (b.isUnit.map g)
 
-def k₀Lift {k C : Type} [Field k] [CharP k l] [PerfectRing k l] [CommRing C] (g : WittVector l k →+* C) (h : IsUnit (l : C)) :
-    Wc.K₀ l k →+* C := IsLocalization.lift (isUnit_witt g h)
+def k₀Lift
+    {k C : Type} [Field k] [CharP k l] [PerfectRing k l] [CommRing C]
+    (g : WittVector l k →+* C) (h : IsUnit (l : C))
+    : Wc.K₀ l k →+* C :=
+  IsLocalization.lift (isUnit_witt g h)
 
 def Res.iso (r : Res l K) : Iso l K (Wc.K₀ l r.k) where
   D M j := Wc.D l (B.schFn M.p) r.ρ j
   φ M j := Wc.phiD l (B.schFn M.p) r.ρ j
   pull u hu j := Wc.pullD l r.ρ (B.schMap u hu) j
 
-def ResEx : Prop := ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
-  Nonempty (Res l K)
+def ResEx : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
+    Nonempty (Res l K)
 
 end CrystallineSemistableComparison

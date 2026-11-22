@@ -7,10 +7,14 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.Hypercohomolo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Bc
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Bc
 
-theorem UpperTheory.exists_lift_free_to_middle_of_shortExact_acy :
-    ∀ (Q : Scheme.{0} → Prop) (S : ShortComplex (Shv ℤ)), S.ShortExact → Acy Q S.X₁ → ∀ P : PSh, Supp Q P → ∀ f : (free ℤ).obj P ⟶ S.X₃, ∃ h : (free ℤ).obj P ⟶ S.X₂, h ≫ S.g = f := by
+theorem UpperTheory.exists_lift_free_to_middle_of_shortExact_acy
+    : ∀ (Q : Scheme.{0} → Prop) (S : ShortComplex (Shv ℤ)),
+      S.ShortExact → Acy Q S.X₁
+        → ∀ P : PSh,
+          Supp Q P → ∀ f : (free ℤ).obj P ⟶ S.X₃, ∃ h : (free ℤ).obj P ⟶ S.X₂, h ≫ S.g = f := by
   intro Q S hS hA P hP f
   obtain ⟨z, hz⟩ := GlobalTheory.T.etaleCohomology_coefficient_longExactSequence ℤ S hS
   have e := (hz (sgl ((free ℤ).obj P)) 0).2.1

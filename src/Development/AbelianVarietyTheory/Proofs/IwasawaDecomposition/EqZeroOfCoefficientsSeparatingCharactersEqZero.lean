@@ -9,10 +9,23 @@ open MeasureTheory
 
 namespace GlobalTheory.SeparatingCharacters
 
-
 open MeasureTheory in
 open scoped Pointwise in
-theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G), IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K) → ∀ (A : Type) [AddCommGroup A] (χ : A → G → ℂ), (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y) → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ x, χ 0 x = 1) → (∀ a x, ‖χ a x‖ = 1) → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ) → ∀ (μ : Measure G) (𝓕 : Set G), μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ → ∀ Φ : G → ℂ, Continuous Φ → (∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x) → (∀ a, ∫ x in 𝓕, χ a x * Φ x ∂μ = 0) → Φ = 0 := by
+theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero
+    : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+        (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G),
+      IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K)
+        → ∀ (A : Type) [AddCommGroup A] (χ : A → G → ℂ),
+          (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y)
+            → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ x, χ 0 x = 1) → (∀ a x, ‖χ a x‖ = 1)
+            → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ)
+            → ∀ (μ : Measure G) (𝓕 : Set G),
+              μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ
+                → ∀ Φ : G → ℂ,
+                  Continuous Φ → (∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x)
+                    → (∀ a, ∫ x in 𝓕, χ a x * Φ x ∂μ = 0)
+                    → Φ = 0 := by
   intro G _ _ _ _ _ _ _ _ Γ _ K hK hKΓ A _ χ hχc hχx hχa hχ0 hχn hsep μ 𝓕 hμ h𝓕 Φ hΦc hΦp hcoef
   classical
   haveI : Countable Γ := Set.countable_univ_iff.mp isLindelof_univ.countable_of_discrete
@@ -20,8 +33,10 @@ theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero
   have hχper : ∀ a, ∀ γ ∈ Γ, ∀ x, χ a (γ + x) = χ a x := by
     intro a γ hγ x
     rw [add_comm, hχx, (hsep γ).2 hγ a, mul_one]
-  have hinv : ∀ {f : G → ℂ}, (∀ γ ∈ Γ, ∀ x, f (γ + x) = f x) →
-      ∀ x y : G, (QuotientAddGroup.leftRel Γ) x y → f x = f y := by
+  have hinv
+      : ∀ {f : G → ℂ},
+        (∀ γ ∈ Γ, ∀ x, f (γ + x) = f x)
+          → ∀ x y : G, (QuotientAddGroup.leftRel Γ) x y → f x = f y := by
     intro f hf x y hxy
     have h := QuotientAddGroup.leftRel_apply.mp hxy
     rw [← hf _ h x]
@@ -45,11 +60,13 @@ theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero
     obtain ⟨γ, hγ, hx⟩ := hKΓ x
     rw [← hΦp γ hγ x]
     exact hC _ hx
-  have h𝓕fin : μ 𝓕 < ⊤ := _root_.GlobalTheory.measure_addFundamentalDomain_lt_top_of_cocompact Γ hK hKΓ μ h𝓕
+  have h𝓕fin : μ 𝓕 < ⊤ :=
+    _root_.GlobalTheory.measure_addFundamentalDomain_lt_top_of_cocompact Γ hK hKΓ μ h𝓕
 
-  let ψ : A → C(G ⧸ Γ, ℂ) := fun a =>
-    ⟨Quotient.lift (s := QuotientAddGroup.leftRel Γ) (χ a) (hinv (hχper a)),
-      (hχc a).quotient_lift _⟩
+  let ψ : A → C(G ⧸ Γ, ℂ) := fun a => ⟨
+    Quotient.lift (s := QuotientAddGroup.leftRel Γ) (χ a) (hinv (hχper a)),
+    (hχc a).quotient_lift _
+  ⟩
   have hψ : ∀ a (x : G), ψ a (x : G ⧸ Γ) = χ a x := fun _ _ => rfl
   have hψmul : ∀ a b, ψ a * ψ b = ψ (a + b) := by
     intro a b
@@ -108,14 +125,15 @@ theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero
     intro c
     rw [Algebra.algebraMap_eq_smul_one, ← hψ0]
     exact S.smul_mem c (hSψ 0)
-  let T : StarSubalgebra ℂ C(G ⧸ Γ, ℂ) :=
-    { carrier := S
-      mul_mem' := fun {f g} hf hg => hSmul f g hf hg
-      one_mem' := hψ0 ▸ hSψ 0
-      add_mem' := fun {f g} hf hg => S.add_mem hf hg
-      zero_mem' := S.zero_mem
-      algebraMap_mem' := hSalg
-      star_mem' := fun {f} hf => hSstar f hf }
+  let T : StarSubalgebra ℂ C(G ⧸ Γ, ℂ) := {
+    carrier := S
+    mul_mem' := fun {f g} hf hg => hSmul f g hf hg
+    one_mem' := hψ0 ▸ hSψ 0
+    add_mem' := fun {f g} hf hg => S.add_mem hf hg
+    zero_mem' := S.zero_mem
+    algebraMap_mem' := hSalg
+    star_mem' := fun {f} hf => hSstar f hf
+  }
   have hTsep : T.SeparatesPoints := by
     intro q r hqr
     obtain ⟨x, rfl⟩ := QuotientAddGroup.mk_surjective q
@@ -139,30 +157,40 @@ theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero
     exact (mul_right_eq_self₀.mp this.symm).resolve_right hz
   have hclos := ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints T hTsep
 
-  have hint : ∀ f : C(G ⧸ Γ, ℂ), IntegrableOn (fun x => f (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x) 𝓕 μ := by
+  have hint
+      : ∀ f : C(G ⧸ Γ, ℂ), IntegrableOn (fun x => f (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x) 𝓕 μ := by
     intro f
     refine Measure.integrableOn_of_bounded (M := ‖f‖ * C) h𝓕fin.ne
       (((map_continuous f).comp QuotientAddGroup.continuous_mk).mul hΦc).aestronglyMeasurable
       (ae_of_all _ fun x => ?_)
     rw [norm_mul]
     exact mul_le_mul (f.norm_coe_le_norm _) (hC x) (norm_nonneg _) (norm_nonneg f)
-  let L₀ : C(G ⧸ Γ, ℂ) →ₗ[ℂ] ℂ :=
-    { toFun := fun f => ∫ x in 𝓕, f (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x ∂μ
-      map_add' := fun f g => by
-        simp only [ContinuousMap.add_apply, add_mul]
-        exact integral_add (hint f) (hint g)
-      map_smul' := fun c f => by
-        simp only [ContinuousMap.smul_apply, smul_eq_mul, mul_assoc, RingHom.id_apply]
-        exact integral_const_mul c _ }
-  let L : C(G ⧸ Γ, ℂ) →L[ℂ] ℂ := L₀.mkContinuous (C * μ.real 𝓕) fun f => by
-    have h := norm_setIntegral_le_of_norm_le_const (f := fun x => f (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x) h𝓕fin
-      (C := ‖f‖ * C) fun x _ => by
-        rw [norm_mul]
-        exact mul_le_mul (f.norm_coe_le_norm _) (hC x) (norm_nonneg _) (norm_nonneg f)
-    calc ‖L₀ f‖ ≤ ‖f‖ * C * μ.real 𝓕 := h
-      _ = C * μ.real 𝓕 * ‖f‖ := by ring
+  let L₀ : C(G ⧸ Γ, ℂ) →ₗ[ℂ] ℂ := {
+    toFun := fun f => ∫ x in 𝓕, f (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x ∂μ
+    map_add' := fun f g => by
+      simp only [ContinuousMap.add_apply, add_mul]
+      exact integral_add (hint f) (hint g)
+    map_smul' := fun c f => by
+      simp only [ContinuousMap.smul_apply, smul_eq_mul, mul_assoc, RingHom.id_apply]
+      exact integral_const_mul c _
+  }
+  let L : C(G ⧸ Γ, ℂ) →L[ℂ] ℂ :=
+    L₀.mkContinuous (C * μ.real 𝓕) fun f => by
+      have h :=
+        norm_setIntegral_le_of_norm_le_const
+          (f := fun x => f (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x)
+          h𝓕fin (C := ‖f‖ * C)
+          fun x _ => by
+            rw [norm_mul]
+            exact mul_le_mul (f.norm_coe_le_norm _) (hC x) (norm_nonneg _) (norm_nonneg f)
+      calc
+        ‖L₀ f‖
+          ≤ ‖f‖ * C * μ.real 𝓕 := h
+        _ = C * μ.real 𝓕 * ‖f‖ := by ring
   have hL : ∀ f, L f = ∫ x in 𝓕, f (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x ∂μ := fun _ => rfl
-  have hTL : ((T.topologicalClosure : StarSubalgebra ℂ C(G ⧸ Γ, ℂ)) : Set C(G ⧸ Γ, ℂ)) ⊆ {f | L f = 0} := by
+  have hTL
+      : ((T.topologicalClosure : StarSubalgebra ℂ C(G ⧸ Γ, ℂ)) : Set C(G ⧸ Γ, ℂ))
+        ⊆ {f | L f = 0} := by
     rw [StarSubalgebra.topologicalClosure_coe]
     refine closure_minimal ?_ (isClosed_eq L.continuous continuous_const)
     intro f hf
@@ -171,7 +199,8 @@ theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero
     | mem f hf =>
       obtain ⟨a, rfl⟩ := hf
       exact hcoef a
-    | zero => exact map_zero L
+    | zero =>
+      exact map_zero L
     | add x y _ _ hx hy =>
       simp only [Set.mem_setOf_eq] at hx hy ⊢
       rw [map_add (f := _), hx, hy, add_zero]
@@ -187,7 +216,8 @@ theorem _root_.GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero
     trivial
   rw [hL] at hzero
   have hsq : ∫ x in 𝓕, ‖Φ x‖ ^ 2 ∂μ = 0 := by
-    have : ∫ x in 𝓕, (star Φq) (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x ∂μ = ((∫ x in 𝓕, ‖Φ x‖ ^ 2 ∂μ : ℝ) : ℂ) := by
+    have : ∫ x in 𝓕, (star Φq) (QuotientAddGroup.mk x : G ⧸ Γ) * Φ x ∂μ
+        = ((∫ x in 𝓕, ‖Φ x‖ ^ 2 ∂μ : ℝ) : ℂ) := by
       rw [← integral_complex_ofReal]
       refine integral_congr_ae (ae_of_all _ fun x => ?_)
       simp only [ContinuousMap.star_apply]

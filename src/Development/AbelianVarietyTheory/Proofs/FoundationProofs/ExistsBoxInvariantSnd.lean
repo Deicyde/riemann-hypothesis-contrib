@@ -19,29 +19,32 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 variable {n : Type} [Fintype n] [DecidableEq n] {T : Type} [TopologicalSpace T] [T2Space T]
 variable {ψ : AddChar k Circle} {c : kˣ}
 
-theorem bijOn_comp {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y) :
-    Set.BijOn (fun f : Y → ℂ => f ∘ e) {f | f ∈ SB Y} {f | f ∈ SB X} := by
-  refine ⟨fun f hf => ⟨hf.1.comp_continuous e.continuous, hf.2.comp_homeomorph e⟩,
-    fun f _ g _ hfg => ?_, fun g hg => ⟨g ∘ e.symm, ⟨hg.1.comp_continuous e.symm.continuous,
-      hg.2.comp_homeomorph e.symm⟩, ?_⟩⟩
+theorem bijOn_comp {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y)
+    : Set.BijOn (fun f : Y → ℂ => f ∘ e) {f | f ∈ SB Y} {f | f ∈ SB X} := by
+  refine ⟨
+    fun f hf => ⟨hf.1.comp_continuous e.continuous, hf.2.comp_homeomorph e⟩,
+    fun f _ g _ hfg => ?_,
+    fun g hg =>
+      ⟨g ∘ e.symm, ⟨hg.1.comp_continuous e.symm.continuous, hg.2.comp_homeomorph e.symm⟩, ?_⟩
+  ⟩
   · funext y
     simpa using congrFun hfg (e.symm y)
   · funext x
     simp
 
-
 omit [DecidableEq n] [T2Space T] in
-theorem exists_box_invariant_snd {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k))) :
-    ∃ s : kˣ, ∀ u ∈ box n s, ∀ z : T × (n → k), f (z.1, z.2 + u) = f z := by
+theorem exists_box_invariant_snd {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k)))
+    : ∃ s : kˣ, ∀ u ∈ box n s, ∀ z : T × (n → k), f (z.1, z.2 + u) = f z := by
   obtain ⟨hlc, hcs⟩ := hf
   have hlc2 : IsLocallyConstant fun p : (T × (n → k)) × (n → k) => f (p.1.1, p.1.2 + p.2) - f p.1 :=
     (hlc.comp_continuous (by fun_prop)).sub (hlc.comp_continuous continuous_fst)
   have hW : IsOpen {p : (T × (n → k)) × (n → k) | f (p.1.1, p.1.2 + p.2) - f p.1 = 0} :=
     hlc2.isOpen_fiber 0
-  obtain ⟨U, V, -, hV, hKU, h0V, hUV⟩ := generalized_tube_lemma hcs.isCompact (isCompact_singleton (x := (0 : n → k))) hW (by
-    rintro ⟨z, u⟩ ⟨-, hu⟩
-    simp only [Set.mem_singleton_iff] at hu
-    simp [hu])
+  obtain ⟨U, V, -, hV, hKU, h0V, hUV⟩ :=
+    generalized_tube_lemma hcs.isCompact (isCompact_singleton (x := (0 : n → k))) hW (by
+      rintro ⟨z, u⟩ ⟨-, hu⟩
+      simp only [Set.mem_singleton_iff] at hu
+      simp [hu])
   obtain ⟨s, hs⟩ := exists_box_subset (hV.mem_nhds (h0V rfl))
   have key : ∀ z ∈ tsupport f, ∀ u ∈ box n s, f (z.1, z.2 + u) = f z := by
     intro z hz u hu
@@ -59,11 +62,13 @@ theorem exists_box_invariant_snd {f : T × (n → k) → ℂ} (hf : f ∈ SB (T 
     · rw [image_eq_zero_of_notMem_tsupport hz, image_eq_zero_of_notMem_tsupport hz']
 
 omit [DecidableEq n] [T2Space T] [Fintype n] in
-theorem slice_mem_SB {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k))) (t : T) :
-    (fun x => f (t, x)) ∈ SB (n → k) := by
+theorem slice_mem_SB {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k))) (t : T)
+    : (fun x => f (t, x)) ∈ SB (n → k) := by
   haveI := t2Space k
-  refine ⟨hf.1.comp_continuous (by fun_prop),
-    HasCompactSupport.intro (hf.2.isCompact.image continuous_snd) fun x hx => ?_⟩
+  refine ⟨
+    hf.1.comp_continuous (by fun_prop),
+    HasCompactSupport.intro (hf.2.isCompact.image continuous_snd) fun x hx => ?_
+  ⟩
   exact image_eq_zero_of_notMem_tsupport fun h => hx ⟨_, h, rfl⟩
 
 variable [MeasurableSpace k] [BorelSpace k]
@@ -71,16 +76,18 @@ variable [MeasurableSpace k] [BorelSpace k]
 def pf (ψ : AddChar k Circle) (μ : Measure (n → k)) (f : T × (n → k) → ℂ) : T × (n → k) → ℂ :=
   fun z => ∫ x, f (z.1, x) * (ψ (x ⬝ᵥ z.2) : ℂ) ∂μ
 
-private theorem exists_isOpen_nhd_eq_of_mem_SB {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k))) (t₀ : T) :
-    ∃ V : Set T, IsOpen V ∧ t₀ ∈ V ∧ ∀ t ∈ V, ∀ x, f (t, x) = f (t₀, x) := by
+private theorem exists_isOpen_nhd_eq_of_mem_SB
+    {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k))) (t₀ : T)
+    : ∃ V : Set T, IsOpen V ∧ t₀ ∈ V ∧ ∀ t ∈ V, ∀ x, f (t, x) = f (t₀, x) := by
   obtain ⟨hlc, hcs⟩ := hf
   have hW : IsOpen {p : T × (n → k) | f p - f (t₀, p.2) = 0} :=
     (hlc.sub (hlc.comp_continuous (by fun_prop))).isOpen_fiber 0
-  obtain ⟨U, V, hU, -, ht₀U, hLV, hUV⟩ := generalized_tube_lemma (isCompact_singleton (x := t₀))
-    (hcs.isCompact.image continuous_snd) hW (by
-      rintro ⟨t, x⟩ ⟨ht, -⟩
-      simp only [Set.mem_singleton_iff] at ht
-      simp [ht])
+  obtain ⟨U, V, hU, -, ht₀U, hLV, hUV⟩ :=
+    generalized_tube_lemma (isCompact_singleton (x := t₀)) (hcs.isCompact.image continuous_snd) hW
+      (by
+        rintro ⟨t, x⟩ ⟨ht, -⟩
+        simp only [Set.mem_singleton_iff] at ht
+        simp [ht])
   refine ⟨U, hU, ht₀U rfl, fun t ht x => ?_⟩
   by_cases hx : x ∈ Prod.snd '' tsupport f
   · have hm : (t, x) ∈ {p : T × (n → k) | f p - f (t₀, p.2) = 0} := hUV ⟨ht, hLV hx⟩
@@ -89,11 +96,14 @@ private theorem exists_isOpen_nhd_eq_of_mem_SB {f : T × (n → k) → ℂ} (hf 
     have h2 : (t₀, x) ∉ tsupport f := fun h => hx ⟨_, h, rfl⟩
     rw [image_eq_zero_of_notMem_tsupport h1, image_eq_zero_of_notMem_tsupport h2]
 
-theorem pf_mem_SB (μ : Measure (n → k)) [μ.IsAddRightInvariant] (h : HasConductor ψ c)
-    {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k))) : pf ψ μ f ∈ SB (T × (n → k)) := by
+theorem pf_mem_SB
+    (μ : Measure (n → k)) [μ.IsAddRightInvariant]
+    (h : HasConductor ψ c)
+    {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k)))
+    : pf ψ μ f ∈ SB (T × (n → k)) := by
   obtain ⟨s, hs⟩ := exists_box_invariant_snd hf
-  have hslice : ∀ t, (fun y => ∫ x, f (t, x) * (ψ (x ⬝ᵥ y) : ℂ) ∂μ) ∈ SB (n → k) :=
-    fun t => fourier_mem_SB μ h (slice_mem_SB hf t)
+  have hslice : ∀ t, (fun y => ∫ x, f (t, x) * (ψ (x ⬝ᵥ y) : ℂ) ∂μ) ∈ SB (n → k) := fun t =>
+    fourier_mem_SB μ h (slice_mem_SB hf t)
   refine ⟨?_, ?_⟩
   · rw [IsLocallyConstant.iff_exists_open]
     rintro ⟨t₀, y₀⟩
@@ -120,30 +130,38 @@ theorem pf_mem_SB (μ : Measure (n → k)) [μ.IsAddRightInvariant] (h : HasCond
     · show ∫ x, f (t, x) * (ψ (x ⬝ᵥ y) : ℂ) ∂μ = 0
       exact fourier_eq_zero_pi μ h (f := fun x => f (t, x)) (fun u hu x => hs u hu (t, x)) hy
 
-theorem inversion_const (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c)
-    {f : (n → k) → ℂ} (hf : f ∈ SB (n → k)) :
-    ∫ y : n → k, (∫ x, f x * (ψ (x ⬝ᵥ y) : ℂ) ∂(Measure.pi fun _ => m)) ∂(Measure.pi fun _ => m) =
-      (((m.real (𝒪[k] : Set k) ^ 2 * nabs k c) ^ Fintype.card n : ℝ) : ℂ) * f 0 := by
+theorem inversion_const
+    (m : Measure k) [m.IsAddHaarMeasure]
+    (h : HasConductor ψ c)
+    {f : (n → k) → ℂ} (hf : f ∈ SB (n → k))
+    : ∫ y : n → k, (∫ x, f x * (ψ (x ⬝ᵥ y) : ℂ) ∂(Measure.pi fun _ => m)) ∂(Measure.pi fun _ => m)
+      = (((m.real (𝒪[k] : Set k) ^ 2 * nabs k c) ^ Fintype.card n : ℝ) : ℂ) * f 0 := by
   haveI := secondCountable k
   obtain ⟨s, hs⟩ := fourier_inversion_pi (Measure.pi fun _ : n => m) h hf
-  have hbox : ∀ r : kˣ, (Measure.pi fun _ : n => m).real (box n r) =
-      (nabs k r * m.real (𝒪[k] : Set k)) ^ Fintype.card n := by
+  have hbox
+      : ∀ r : kˣ,
+        (Measure.pi fun _ : n => m).real (box n r)
+          = (nabs k r * m.real (𝒪[k] : Set k)) ^ Fintype.card n := by
     intro r
     have hc := measureReal_cball m r
     simp only [Measure.real] at hc ⊢
     rw [box, Measure.pi_pi, ENNReal.toReal_prod, hc, Finset.prod_const, Finset.card_univ]
   have h1 : nabs k s * nabs k (c * s⁻¹) = nabs k c := by
     rw [nabs_mul k, mul_left_comm, ← nabs_mul k, mul_inv_cancel, nabs_one k, mul_one]
-  have h2 : nabs k s * m.real (𝒪[k] : Set k) * (nabs k (c * s⁻¹) * m.real (𝒪[k] : Set k)) =
-      m.real (𝒪[k] : Set k) ^ 2 * nabs k c := by
+  have h2
+      : nabs k s * m.real (𝒪[k] : Set k) * (nabs k (c * s⁻¹) * m.real (𝒪[k] : Set k))
+        = m.real (𝒪[k] : Set k) ^ 2 * nabs k c := by
     rw [← h1]; ring
   rw [hs, hbox, hbox, ← mul_pow, h2]
 
 omit [T2Space T] in
-theorem pf_pf (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c)
-    {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k))) (z : T × (n → k)) :
-    pf ψ (Measure.pi fun _ => m) (pf ψ (Measure.pi fun _ => m) f) z =
-      (((m.real (𝒪[k] : Set k) ^ 2 * nabs k c) ^ Fintype.card n : ℝ) : ℂ) * f (z.1, -z.2) := by
+theorem pf_pf
+    (m : Measure k) [m.IsAddHaarMeasure]
+    (h : HasConductor ψ c)
+    {f : T × (n → k) → ℂ} (hf : f ∈ SB (T × (n → k)))
+    (z : T × (n → k))
+    : pf ψ (Measure.pi fun _ => m) (pf ψ (Measure.pi fun _ => m) f) z
+      = (((m.real (𝒪[k] : Set k) ^ 2 * nabs k c) ^ Fintype.card n : ℝ) : ℂ) * f (z.1, -z.2) := by
   haveI := secondCountable k
   obtain ⟨t, y⟩ := z
   have hsl := slice_mem_SB hf t
@@ -157,8 +175,10 @@ theorem pf_pf (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c)
   congr 1
   funext x
   rw [← integral_mul_const]
-  have e := integral_sub_right_eq_self (μ := Measure.pi fun _ : n => m)
-    (fun u => f (t, u) * (ψ ((u + y) ⬝ᵥ x) : ℂ)) y
+  have e :=
+    integral_sub_right_eq_self (μ := Measure.pi fun _ : n => m)
+      (fun u => f (t, u) * (ψ ((u + y) ⬝ᵥ x) : ℂ))
+      y
   simp only [sub_add_cancel] at e
   rw [e]
   congr 1
@@ -166,8 +186,9 @@ theorem pf_pf (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c)
   rw [add_dotProduct, AddChar.map_add_eq_mul, Circle.coe_mul, dotProduct_comm y x]
   ring
 
-theorem pf_bijOn (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c) :
-    Set.BijOn (pf ψ (Measure.pi fun _ => m)) {f | f ∈ SB (T × (n → k))} {f | f ∈ SB (T × (n → k))} := by
+theorem pf_bijOn (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c)
+    : Set.BijOn (pf ψ (Measure.pi fun _ => m)) {f | f ∈ SB (T × (n → k))}
+      {f | f ∈ SB (T × (n → k))} := by
   haveI := secondCountable k
   set C : ℂ := (((m.real (𝒪[k] : Set k) ^ 2 * nabs k c) ^ Fintype.card n : ℝ) : ℂ) with hC
   have hC0 : C ≠ 0 := by
@@ -178,14 +199,23 @@ theorem pf_bijOn (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c) :
     have h2 := nabs_pos k c
     rw [hC]
     exact Complex.ofReal_ne_zero.mpr (pow_pos (mul_pos (pow_pos h1 2) h2) _).ne'
-  have hsmul : ∀ (a : ℂ) (g : T × (n → k) → ℂ), pf ψ (Measure.pi fun _ : n => m) (a • g) = a • pf ψ (Measure.pi fun _ : n => m) g := by
+  have hsmul
+      : ∀ (a : ℂ) (g : T × (n → k) → ℂ),
+        pf ψ (Measure.pi fun _ : n => m) (a • g) = a • pf ψ (Measure.pi fun _ : n => m) g := by
     intro a g
     funext z
     simp only [pf, Pi.smul_apply, smul_eq_mul, mul_assoc]
     exact integral_const_mul a _
-  have hpp : ∀ g ∈ SB (T × (n → k)), ∀ z, pf ψ (Measure.pi fun _ : n => m) (pf ψ (Measure.pi fun _ : n => m) g) z = C * g (z.1, -z.2) :=
-    fun g hg z => pf_pf m h hg z
-  refine ⟨fun g hg => pf_mem_SB (Measure.pi fun _ : n => m) h hg, fun g hg g' hg' hgg => ?_, fun g hg => ?_⟩
+  have hpp
+      : ∀ g ∈ SB (T × (n → k)), ∀ z,
+        pf ψ (Measure.pi fun _ : n => m) (pf ψ (Measure.pi fun _ : n => m) g) z
+          = C * g (z.1, -z.2) := fun g hg z =>
+    pf_pf m h hg z
+  refine ⟨
+    fun g hg => pf_mem_SB (Measure.pi fun _ : n => m) h hg,
+    fun g hg g' hg' hgg => ?_,
+    fun g hg => ?_
+  ⟩
   · funext z
     have e1 := hpp g hg (z.1, -z.2)
     have e2 := hpp g' hg' (z.1, -z.2)
@@ -193,7 +223,12 @@ theorem pf_bijOn (m : Measure k) [m.IsAddHaarMeasure] (h : HasConductor ψ c) :
     simp only [neg_neg, Prod.mk.eta] at e1 e2
     exact mul_left_cancel₀ hC0 (e1.symm.trans e2)
   · have h2 := pf_mem_SB (Measure.pi fun _ : n => m) h (pf_mem_SB (Measure.pi fun _ : n => m) h hg)
-    refine ⟨(C ^ 2)⁻¹ • pf ψ (Measure.pi fun _ : n => m) (pf ψ (Measure.pi fun _ : n => m) (pf ψ (Measure.pi fun _ : n => m) g)), (SB _).smul_mem _ (pf_mem_SB (Measure.pi fun _ : n => m) h h2), ?_⟩
+    refine ⟨
+      (C ^ 2)⁻¹ • pf ψ (Measure.pi fun _ : n => m)
+        (pf ψ (Measure.pi fun _ : n => m) (pf ψ (Measure.pi fun _ : n => m) g)),
+      (SB _).smul_mem _ (pf_mem_SB (Measure.pi fun _ : n => m) h h2),
+      ?_
+    ⟩
     rw [hsmul]
     funext z
     rw [Pi.smul_apply, hpp _ h2, hpp _ hg]
@@ -220,14 +255,14 @@ section Main
 
 variable {k : Type} [Field k]
 
-variable [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [MeasurableSpace k] [BorelSpace k]
+variable
+  [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k]
+  [BorelSpace k]
 
 variable (ψ : AddChar k Circle) (m : Measure k) [m.IsAddHaarMeasure] (μ : kˣ →* ℂˣ) (s₁ s₂ : ℤˣ)
-variable {ρ v τ w W : Type} [Fintype ρ] [DecidableEq ρ] [Fintype v] [DecidableEq v]
-  [Fintype τ] [DecidableEq τ] [Fintype w] [DecidableEq w] [Fintype W] [DecidableEq W]
-
-
+variable
+  {ρ v τ w W : Type} [Fintype ρ] [DecidableEq ρ] [Fintype v] [DecidableEq v] [Fintype τ]
+  [DecidableEq τ] [Fintype w] [DecidableEq w] [Fintype W] [DecidableEq W]
 
 end Main
 

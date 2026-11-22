@@ -9,10 +9,15 @@ open Module NumberField GlobalTheory.CompanionTheory.Ar.HT
 
 namespace GlobalTheory.CompanionTheory.Ar.HT
 
-theorem fg_inf_restrictScalars_of_integers (C : Type) [Field C] (v : Valuation C NNReal) (O : Type)
-    [CommRing O] [Algebra O C] (hv : v.Integers O) (V : Type) [AddCommGroup V] [Module C V]
-    [Module O V] [IsScalarTower O C V] (L : Submodule O V) (U : Submodule C V) (hL : L.FG) :
-    (L ⊓ U.restrictScalars O).FG := by
+theorem fg_inf_restrictScalars_of_integers
+    (C : Type) [Field C]
+    (v : Valuation C NNReal)
+    (O : Type) [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    (V : Type) [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
+    (L : Submodule O V)
+    (U : Submodule C V) (hL : L.FG)
+    : (L ⊓ U.restrictScalars O).FG := by
   have hinj : Function.Injective (algebraMap O C) := hv.hom_inj
   haveI : IsDomain O := hinj.isDomain
   haveI : ValuationRing O := ValuationRing.of_integers v hv
@@ -30,8 +35,8 @@ theorem fg_inf_restrictScalars_of_integers (C : Type) [Field C] (v : Valuation C
     have : x = 0 := (smul_eq_zero.1 h1).resolve_left ha0
     simp [this]
   haveI : Module.Free O (LinearMap.range f) := Module.free_of_flat_of_isLocalRing
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property f.rangeRestrict LinearMap.id
-    f.surjective_rangeRestrict
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property f.rangeRestrict LinearMap.id f.surjective_rangeRestrict
   let p : L →ₗ[O] V := L.subtype.comp (LinearMap.id - s.comp f.rangeRestrict)
   have key : L ⊓ U.restrictScalars O = LinearMap.range p := by
     apply le_antisymm

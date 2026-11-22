@@ -14,10 +14,11 @@ open scoped Pointwise
 theorem ib_im_conj_mul (u v : ℂ) : ((starRingEnd ℂ) u * v).im = u.re * v.im - u.im * v.re := by
   simp [Complex.mul_im]; ring
 
-theorem ib_mem_range {K : Type} [Field K] [NumberField K] (φ : K →+* ℂ) (a₀ b₀ : ℂ)
-    (h₀ : latI φ ⊤ 1 = AddSubgroup.closure {a₀, b₀}) (w : ℂ)
-    (hw : w ∈ AddSubgroup.closure ({a₀, b₀} : Set ℂ)) :
-    ∃ c : 𝓞 K, (φ.comp (algebraMap (𝓞 K) K)) c = w := by
+theorem ib_mem_range
+    {K : Type} [Field K] [NumberField K]
+    (φ : K →+* ℂ) (a₀ b₀ : ℂ) (h₀ : latI φ ⊤ 1 = AddSubgroup.closure {a₀, b₀})
+    (w : ℂ) (hw : w ∈ AddSubgroup.closure ({a₀, b₀} : Set ℂ))
+    : ∃ c : 𝓞 K, (φ.comp (algebraMap (𝓞 K) K)) c = w := by
   rw [← h₀] at hw
   have hle : latI φ ⊤ 1 ≤ (φ.comp (algebraMap (𝓞 K) K)).toAddMonoidHom.range := by
     unfold latI
@@ -27,16 +28,16 @@ theorem ib_mem_range {K : Type} [Field K] [NumberField K] (φ : K →+* ℂ) (a�
   obtain ⟨c, hc⟩ := hle hw
   exact ⟨c, hc⟩
 
-theorem ib_exists_basis {K : Type} [Field K] [NumberField K] (φ : K →+* ℂ) (a₀ b₀ : ℂ)
-    (hab₀ : 0 < ((starRingEnd ℂ) a₀ * b₀).im)
-    (h₀ : latI φ ⊤ 1 = AddSubgroup.closure {a₀, b₀}) :
-    ∃ B : Module.Basis (Fin 2) ℤ (𝓞 K), (φ.comp (algebraMap (𝓞 K) K)) (B 0) = a₀ ∧
-      (φ.comp (algebraMap (𝓞 K) K)) (B 1) = b₀ := by
+theorem ib_exists_basis
+    {K : Type} [Field K] [NumberField K]
+    (φ : K →+* ℂ) (a₀ b₀ : ℂ)
+    (hab₀ : 0 < ((starRingEnd ℂ) a₀ * b₀).im) (h₀ : latI φ ⊤ 1 = AddSubgroup.closure {a₀, b₀})
+    : ∃ B : Module.Basis (Fin 2) ℤ (𝓞 K),
+      (φ.comp (algebraMap (𝓞 K) K)) (B 0) = a₀ ∧ (φ.comp (algebraMap (𝓞 K) K)) (B 1) = b₀ := by
   obtain ⟨e, he⟩ := ib_mem_range φ a₀ b₀ h₀ a₀ (AddSubgroup.subset_closure (by simp))
   obtain ⟨f, hf⟩ := ib_mem_range φ a₀ b₀ h₀ b₀ (AddSubgroup.subset_closure (by simp))
   set ψ : 𝓞 K →+* ℂ := φ.comp (algebraMap (𝓞 K) K) with hψ
-  have hinj : Function.Injective ψ :=
-    φ.injective.comp (FaithfulSMul.algebraMap_injective (𝓞 K) K)
+  have hinj : Function.Injective ψ := φ.injective.comp (FaithfulSMul.algebraMap_injective (𝓞 K) K)
   have hli : LinearIndependent ℤ ![e, f] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
@@ -66,10 +67,12 @@ theorem ib_exists_basis {K : Type} [Field K] [NumberField K] (φ : K →+* ℂ) 
       (Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
   refine ⟨Module.Basis.mk hli hsp, ?_, ?_⟩ <;> simp [he, hf]
 
-theorem ib_im_det {K : Type} [Field K] [NumberField K] (ψ : 𝓞 K →+* ℂ) (a₀ b₀ : ℂ)
-    (B : Module.Basis (Fin 2) ℤ (𝓞 K)) (hB0 : ψ (B 0) = a₀) (hB1 : ψ (B 1) = b₀)
-    (v : Fin 2 → 𝓞 K) :
-    ((starRingEnd ℂ) (ψ (v 0)) * ψ (v 1)).im = (B.det v : ℝ) * ((starRingEnd ℂ) a₀ * b₀).im := by
+theorem ib_im_det
+    {K : Type} [Field K] [NumberField K]
+    (ψ : 𝓞 K →+* ℂ) (a₀ b₀ : ℂ) (B : Module.Basis (Fin 2) ℤ (𝓞 K))
+    (hB0 : ψ (B 0) = a₀) (hB1 : ψ (B 1) = b₀)
+    (v : Fin 2 → 𝓞 K)
+    : ((starRingEnd ℂ) (ψ (v 0)) * ψ (v 1)).im = (B.det v : ℝ) * ((starRingEnd ℂ) a₀ * b₀).im := by
   have hv : ∀ j, ψ (v j) = (B.repr (v j) 0 : ℂ) * a₀ + (B.repr (v j) 1 : ℂ) * b₀ := by
     intro j
     conv_lhs => rw [← B.sum_repr (v j)]
@@ -81,11 +84,15 @@ theorem ib_im_det {K : Type} [Field K] [NumberField K] (ψ : 𝓞 K →+* ℂ) (
     Complex.intCast_im]
   ring
 
-theorem latI_basis (K : Type) [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
-    (φ : K →+* ℂ) (a₀ b₀ : ℂ) (hab₀ : 0 < ((starRingEnd ℂ) a₀ * b₀).im)
-    (h₀ : latI φ ⊤ 1 = AddSubgroup.closure {a₀, b₀}) (𝔞 : Ideal (𝓞 K)) (h𝔞 : 𝔞 ≠ ⊥) :
-    ∃ a b : ℂ, 0 < ((starRingEnd ℂ) a * b).im ∧ latI φ 𝔞 1 = AddSubgroup.closure {a, b} ∧
-      ((starRingEnd ℂ) a * b).im = (Ideal.absNorm 𝔞 : ℝ) * ((starRingEnd ℂ) a₀ * b₀).im := by
+theorem latI_basis
+    (K : Type) [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    (φ : K →+* ℂ) (a₀ b₀ : ℂ)
+    (hab₀ : 0 < ((starRingEnd ℂ) a₀ * b₀).im) (h₀ : latI φ ⊤ 1 = AddSubgroup.closure {a₀, b₀})
+    (𝔞 : Ideal (𝓞 K)) (h𝔞 : 𝔞 ≠ ⊥)
+    : ∃ a b : ℂ,
+      0 < ((starRingEnd ℂ) a * b).im ∧ latI φ 𝔞 1 = AddSubgroup.closure {a, b}
+        ∧ ((starRingEnd ℂ) a * b).im = (Ideal.absNorm 𝔞 : ℝ) * ((starRingEnd ℂ) a₀ * b₀).im := by
   set ψ : 𝓞 K →+* ℂ := φ.comp (algebraMap (𝓞 K) K) with hψ
   obtain ⟨B, hB0, hB1⟩ := ib_exists_basis φ a₀ b₀ hab₀ h₀
   set bI := Ideal.selfBasis B 𝔞 h𝔞
@@ -98,8 +105,7 @@ theorem latI_basis (K : Type) [Field K] [NumberField K] (hK : Module.finrank ℚ
   have hcross := ib_im_det ψ a₀ b₀ B hB0 hB1 ((↑) ∘ bI)
   rw [← hD] at hcross
   simp only [Function.comp_apply] at hcross
-  have hN : (Ideal.absNorm 𝔞 : ℝ) = |(D : ℝ)| := by
-    rw [← hdet, Nat.cast_natAbs, Int.cast_abs]
+  have hN : (Ideal.absNorm 𝔞 : ℝ) = |(D : ℝ)| := by rw [← hdet, Nat.cast_natAbs, Int.cast_abs]
   have hlat : latI φ 𝔞 1 = AddSubgroup.closure {ψ (bI 0 : 𝓞 K), ψ (bI 1 : 𝓞 K)} := by
     apply le_antisymm
     · unfold latI
@@ -116,12 +122,15 @@ theorem latI_basis (K : Type) [Field K] [NumberField K] (hK : Module.finrank ℚ
       conv_rhs => rw [hc']
       simp [map_add (f := _)]
     · rw [AddSubgroup.closure_le, Set.insert_subset_iff, Set.singleton_subset_iff]
-      exact ⟨AddSubgroup.subset_closure ⟨_, (bI 0).2, by simp [hψ]⟩,
-        AddSubgroup.subset_closure ⟨_, (bI 1).2, by simp [hψ]⟩⟩
+      exact ⟨
+        AddSubgroup.subset_closure ⟨_, (bI 0).2, by simp [hψ]⟩,
+        AddSubgroup.subset_closure ⟨_, (bI 1).2, by simp [hψ]⟩
+      ⟩
   rcases lt_or_gt_of_ne hD0 with hneg | hpos
   · have hneg' : (D : ℝ) < 0 := by exact_mod_cast hneg
-    have hsw : ((starRingEnd ℂ) (ψ (bI 1 : 𝓞 K)) * ψ (bI 0 : 𝓞 K)).im =
-        -((starRingEnd ℂ) (ψ (bI 0 : 𝓞 K)) * ψ (bI 1 : 𝓞 K)).im := by
+    have hsw
+        : ((starRingEnd ℂ) (ψ (bI 1 : 𝓞 K)) * ψ (bI 0 : 𝓞 K)).im
+          = -((starRingEnd ℂ) (ψ (bI 0 : 𝓞 K)) * ψ (bI 1 : 𝓞 K)).im := by
       rw [ib_im_conj_mul, ib_im_conj_mul]; ring
     refine ⟨ψ (bI 1 : 𝓞 K), ψ (bI 0 : 𝓞 K), ?_, by rw [hlat, Set.pair_comm], ?_⟩
     · rw [hsw, hcross]; nlinarith

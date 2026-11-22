@@ -15,41 +15,46 @@ open IsLocalRing GroundTheory.Arith.Abelian
 
 section E0
 
-variable {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
-  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] (W : WeierstrassCurve 𝒪)
+variable
+  {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
+  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
+  (W : WeierstrassCurve 𝒪)
   [(W.map (algebraMap 𝒪 K)).IsElliptic] [DecidableEq K] [DecidableEq (ResidueField 𝒪)]
 
 local notation "ι" => algebraMap 𝒪 K
 local notation "ρ" => residue 𝒪
 
 omit [DecidableEq (ResidueField 𝒪)] in
-theorem add_notMem_of_notMem_range {X₁ Y₁ X₂ Y₂ : K} (h₁ : (curveK K W).Nonsingular X₁ Y₁)
-    (hX₁ : X₁ ∉ Set.range ι) (h₂ : (curveK K W).Nonsingular X₂ Y₂) (hX₂ : X₂ ∉ Set.range ι)
-    {x y : 𝒪} (h : (curveK K W).Nonsingular (ι x) (ι y)) :
-    WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ ≠
-      WeierstrassCurve.Affine.Point.some _ _ h := by
+theorem add_notMem_of_notMem_range
+    {X₁ Y₁ X₂ Y₂ : K} (h₁ : (curveK K W).Nonsingular X₁ Y₁) (hX₁ : X₁ ∉ Set.range ι)
+    (h₂ : (curveK K W).Nonsingular X₂ Y₂) (hX₂ : X₂ ∉ Set.range ι)
+    {x y : 𝒪} (h : (curveK K W).Nonsingular (ι x) (ι y))
+    : WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂
+      ≠ WeierstrassCurve.Affine.Point.some _ _ h := by
   intro hS
   have hn : (curveK K W).Nonsingular X₂ ((curveK K W).negY X₂ Y₂) :=
     (WeierstrassCurve.Affine.nonsingular_neg _ _).2 h₂
   obtain ⟨x₃, y₃, h₃, e, -, -⟩ := add_of_notMem_range' K W hn hX₂ h
-  have hneg : -(WeierstrassCurve.Affine.Point.some _ _ h₂) =
-      WeierstrassCurve.Affine.Point.some _ _ hn := WeierstrassCurve.Affine.Point.neg_some h₂
-  have e' : WeierstrassCurve.Affine.Point.some _ _ h₁ =
-      WeierstrassCurve.Affine.Point.some _ _ h₃ := by
+  have hneg
+      : -(WeierstrassCurve.Affine.Point.some _ _ h₂) = WeierstrassCurve.Affine.Point.some _ _ hn :=
+    WeierstrassCurve.Affine.Point.neg_some h₂
+  have e'
+      : WeierstrassCurve.Affine.Point.some _ _ h₁ = WeierstrassCurve.Affine.Point.some _ _ h₃ := by
     rw [← e, ← hS, ← hneg]; abel
   rw [WeierstrassCurve.Affine.Point.some.injEq] at e'
   exact hX₁ ⟨x₃, e'.1.symm⟩
 
-theorem add_mem_E0Set_and_reducePoint_add {P Q : (curveK K W).Point} (hP : P ∈ E0Set K W)
-    (hQ : Q ∈ E0Set K W) :
-    P + Q ∈ E0Set K W ∧ reducePoint K W (P + Q) = reducePoint K W P + reducePoint K W Q := by
+theorem add_mem_E0Set_and_reducePoint_add
+    {P Q : (curveK K W).Point} (hP : P ∈ E0Set K W) (hQ : Q ∈ E0Set K W)
+    : P + Q ∈ E0Set K W ∧ reducePoint K W (P + Q) = reducePoint K W P + reducePoint K W Q := by
   rcases point_cases K W P with rfl | ⟨X₁, Y₁, h₁, rfl, hX₁⟩ | ⟨x₁, y₁, h₁, rfl⟩
   · rw [zero_add, reducePoint_zero, zero_add]; exact ⟨hQ, rfl⟩
   · rcases point_cases K W Q with rfl | ⟨X₂, Y₂, h₂, rfl, hX₂⟩ | ⟨x₂, y₂, h₂, rfl⟩
     · rw [add_zero, reducePoint_zero, add_zero]; exact ⟨hP, rfl⟩
     · rw [reducePoint_some_notMem K W h₁ hX₁, reducePoint_some_notMem K W h₂ hX₂, add_zero]
-      rcases point_cases K W (WeierstrassCurve.Affine.Point.some _ _ h₁ +
-          WeierstrassCurve.Affine.Point.some _ _ h₂) with h0 | ⟨X, Y, h, hS, hX⟩ | ⟨x, y, h, hS⟩
+      rcases point_cases K W
+          (WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂)
+        with h0 | ⟨X, Y, h, hS, hX⟩ | ⟨x, y, h, hS⟩
       · rw [h0]; exact ⟨zero_mem_E0Set K W, rfl⟩
       · rw [hS]; exact ⟨mem_E0Set_some_notMem K W h hX, reducePoint_some_notMem K W h hX⟩
       · exact absurd hS (add_notMem_of_notMem_range K W h₁ hX₁ h₂ hX₂ h)
@@ -81,7 +86,8 @@ theorem add_mem_E0Set_and_reducePoint_add {P Q : (curveK K W).Point} (hP : P ∈
             · exact h
             · exact absurd h hy
           have hD : ρ (y₁ + y₂ + W.a₁ * x₁ + W.a₃) ≠ 0 := by
-            intro h0; apply hy
+            intro h0
+            apply hy
             rw [map_add (f := _), map_add (f := _), map_add (f := _), map_mul] at h0
             simp only [WeierstrassCurve.Affine.negY, WeierstrassCurve.map_a₁,
               WeierstrassCurve.map_a₃, ← hx]

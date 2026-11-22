@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -17,12 +19,15 @@ noncomputable section
 
 namespace GlobalTheory.FieldPair
 
-theorem residuePlace_of_locModel : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (Q : Subring L) (hQ : IsLocModel cL Q) (t u : Q),
-  Ideal.span {t, u} = (letI := hQ.isLocalRing; IsLocalRing.maximalIdeal Q) → ringKrullDim Q = 2 →
-  ∀ (S : Place cL) (ψ : S.ring →+* K), S.IsPrimeOf Q → S.ord (t : L) = 1 →
-  Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a) →
-  ∃ F : Place cK, (∀ a : K, a ∈ F.ring ↔ ∃ q : S.ring, (q : L) ∈ Q ∧ ψ q = a) ∧
-    ∀ us : S.ring, (us : L) = u → F.ord (ψ us) = 1 := by
+theorem residuePlace_of_locModel
+    : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (Q : Subring L)
+        (hQ : IsLocModel cL Q) (t u : Q),
+      Ideal.span {t, u} = (letI := hQ.isLocalRing; IsLocalRing.maximalIdeal Q) → ringKrullDim Q = 2
+        → ∀ (S : Place cL) (ψ : S.ring →+* K),
+          S.IsPrimeOf Q → S.ord (t : L) = 1 → Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a)
+            → ∃ F : Place cK,
+              (∀ a : K, a ∈ F.ring ↔ ∃ q : S.ring, (q : L) ∈ Q ∧ ψ q = a)
+                ∧ ∀ us : S.ring, (us : L) = u → F.ord (ψ us) = 1 := by
   intro L K _ _ cL cK Q hQ t u hm hdim S ψ hS ht hψ hc
   letI := hQ.isLocalRing
   have hSQ : ∀ q : Q, (q : L) ∈ S.ring := fun q => hS.1 q q.2
@@ -63,12 +68,16 @@ theorem residuePlace_of_locModel : ∀ {L K : Type} [Field L] [Field K] (cL : �
       obtain ⟨v, hv⟩ := hbu.exists_right_inv
       have hv' : b * (v : L) = 1 := congrArg Subtype.val hv
       have hf' : f = a * (v : L) := by
-        calc f = f * (b * v) := by rw [hv', mul_one]
+        calc
+          f = f * (b * v) := by rw [hv', mul_one]
           _ = a * v := by rw [← mul_assoc, e]
       rw [hf']
       exact Q.mul_mem ha v.2
-    let e : Q ≃+* S.ring := RingEquiv.ofBijective φ₀
-      ⟨fun x y h => Subtype.ext (congrArg (fun s : S.ring => (s : L)) h), fun s => ⟨⟨s, hle s s.2⟩, rfl⟩⟩
+    let e : Q ≃+* S.ring :=
+      RingEquiv.ofBijective φ₀ ⟨
+        fun x y h => Subtype.ext (congrArg (fun s : S.ring => (s : L)) h),
+        fun s => ⟨⟨s, hle s s.2⟩, rfl⟩
+      ⟩
     have h := ringKrullDim_eq_of_ringEquiv e
     rw [hdim, IsDiscreteValuationRing.ringKrullDim_eq_one] at h
     norm_num at h
@@ -109,26 +118,27 @@ theorem residuePlace_of_locModel : ∀ {L K : Type} [Field L] [Field K] (cL : �
   haveI hdvr : IsDiscreteValuationRing R :=
     ((IsDiscreteValuationRing.TFAE R hnf).out 1 5).2
       (show (IsLocalRing.maximalIdeal R).IsPrincipal from ⟨_, hmR⟩)
-  let V : ValuationSubring K :=
-    { R with
-      mem_or_inv_mem' := by
-        intro a
-        obtain ⟨x, y, hy, e⟩ := hfrac a
-        obtain ⟨c, hc | hc⟩ := ValuationRing.cond (φR x) (φR y)
-        · right
-          have hc' : φ x * (c : K) = φ y := congrArg Subtype.val hc
-          have h1 : a * c = 1 := by
-            refine mul_right_cancel₀ hy ?_
-            linear_combination (c : K) * e + hc'
-          rw [inv_eq_of_mul_eq_one_right h1]
-          exact c.2
-        · left
-          have hc' : φ y * (c : K) = φ x := congrArg Subtype.val hc
-          have h1 : a = c := by
-            refine mul_right_cancel₀ hy ?_
-            linear_combination e - hc'
-          rw [h1]
-          exact c.2 }
+  let V : ValuationSubring K := {
+    R with
+    mem_or_inv_mem' := by
+      intro a
+      obtain ⟨x, y, hy, e⟩ := hfrac a
+      obtain ⟨c, hc | hc⟩ := ValuationRing.cond (φR x) (φR y)
+      · right
+        have hc' : φ x * (c : K) = φ y := congrArg Subtype.val hc
+        have h1 : a * c = 1 := by
+          refine mul_right_cancel₀ hy ?_
+          linear_combination (c : K) * e + hc'
+        rw [inv_eq_of_mul_eq_one_right h1]
+        exact c.2
+      · left
+        have hc' : φ y * (c : K) = φ x := congrArg Subtype.val hc
+        have h1 : a = c := by
+          refine mul_right_cancel₀ hy ?_
+          linear_combination e - hc'
+        rw [h1]
+        exact c.2
+  }
   have hconst : ∀ a, cK a ∈ V := fun a => (hmemR (cK a)).2 ⟨S.const a, hQ.const_mem a, hc a⟩
   have hφV : ∀ q : Q, φ q ∈ V := fun q => ⟨q, rfl⟩
   let φV : Q →+* V := φ.codRestrict V hφV
@@ -138,8 +148,12 @@ theorem residuePlace_of_locModel : ∀ {L K : Type} [Field L] [Field K] (cL : �
   haveI hdvrV : IsDiscreteValuationRing V := hdvr
   have hcomp : cK.codRestrict V hconst = φV.comp (cL.codRestrict Q hQ.const_mem) :=
     RingHom.ext fun a => Subtype.ext (hc a).symm
-  let F : Place cK :=
-    ⟨V, hconst, hdvrV, hcomp ▸ hQ.essFiniteType.comp (RingHom.FiniteType.of_surjective φV hφVs).essFiniteType⟩
+  let F : Place cK := ⟨
+    V,
+    hconst,
+    hdvrV,
+    hcomp ▸ hQ.essFiniteType.comp (RingHom.FiniteType.of_surjective φV hφVs).essFiniteType
+  ⟩
   refine ⟨F, hmemR, fun us hus => ?_⟩
   have h1 : ψ us = ((φV u : V) : K) := by
     show ψ us = ψ (φ₀ u)

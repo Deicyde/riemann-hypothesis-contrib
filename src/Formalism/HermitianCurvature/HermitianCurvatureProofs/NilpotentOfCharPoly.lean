@@ -4,7 +4,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ChartSysWOfP
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt NumberField Matrix Polynomial
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt NumberField Matrix
+  Polynomial
 open scoped ContDiff
 
 namespace Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity
@@ -16,8 +17,7 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 theorem nilpotent_of_char_poly : NilOfCharpoly := by
   intro n M h
   have hmon := Matrix.charpoly_monic M
-  have hdeg : M.charpoly.natDegree = n := by
-    rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+  have hdeg : M.charpoly.natDegree = n := by rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
   have hX : M.charpoly = (X : ℂ[X]) ^ n := by
     ext i
     rw [Polynomial.coeff_X_pow]
@@ -28,7 +28,8 @@ theorem nilpotent_of_char_poly : NilOfCharpoly := by
     · rw [if_pos hi]
       have h1 := hmon.coeff_natDegree
       rw [hdeg] at h1
-      rw [hi]; exact h1
+      rw [hi]
+      exact h1
     · rw [if_neg (by omega)]
       exact Polynomial.coeff_eq_zero_of_natDegree_lt (by omega)
   refine ⟨n, ?_⟩

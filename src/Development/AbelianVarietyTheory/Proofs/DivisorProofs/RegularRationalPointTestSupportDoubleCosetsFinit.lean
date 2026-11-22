@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EventuallyIn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -30,13 +31,15 @@ def cw (w : Pl E) : finU (E := E) (n := n) →* UL n w where
   map_one' := Subtype.ext (by simp)
   map_mul' x y := Subtype.ext (by simp)
 
-theorem toSub_eq (w : Pl E) (x : finU (E := E) (n := n)) : toSub (UL n w) (cLoc w (x : UA E n)) = cw w x :=
+theorem toSub_eq (w : Pl E) (x : finU (E := E) (n := n))
+    : toSub (UL n w) (cLoc w (x : UA E n)) = cw w x :=
   dif_pos (cLoc_mem_UL' w _)
 
 theorem cw_val (w : Pl E) (x : finU (E := E) (n := n)) : (cw w x).1 = cLoc w (x : UA E n) := rfl
 
-theorem ne_zero_of_finprod {S : Set (Pl E)} {g : Pl E → ℂ} (hg : ∀ᶠ w in cofinite, g w = 1)
-    (h : ∏ᶠ w ∈ S, g w ≠ 0) : ∀ w ∈ S, g w ≠ 0 := by
+theorem ne_zero_of_finprod
+    {S : Set (Pl E)} {g : Pl E → ℂ} (hg : ∀ᶠ w in cofinite, g w = 1) (h : ∏ᶠ w ∈ S, g w ≠ 0)
+    : ∀ w ∈ S, g w ≠ 0 := by
   intro w₀ hw₀ h₀
   apply h
   rw [finprod_mem_def]
@@ -46,7 +49,6 @@ theorem ne_zero_of_finprod {S : Set (Pl E)} {g : Pl E → ℂ} (hg : ∀ᶠ w in
   exact (Filter.eventually_cofinite.1 hg).subset Set.inter_subset_right
 
 end GlobalTheory.BCT.ClsSupp
-
 
 open GlobalTheory.BCT.ClsSupp in
 theorem GlobalTheory.BCT.ClsSupp.finite_supp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ n : ℕ, 1 ≤ n → ∀ (S : Set (Pl E)), IsSection S → ∀ (K' : ∀ w : Pl E, Subgroup (UL n w)), IsLevelFam (fun w : Pl E => MonoidHom.id (UL n w)) (KL n) K' → ∀ f : ∀ w : Pl E, UL n w → ℂ, IsTest (KL n) K' f → ∀ γ : UE E n, γ.1.val.charpoly.Separable → {q : DoubleCoset.Quotient (twCent (MonoidHom.id (finU (E := E) (n := n))) (finPt γ) : Set (finU (E := E) (n := n))) (globLev S K' : Set (finU (E := E) (n := n))) | globFn S f ((Quotient.out q)⁻¹ * finPt γ * (MonoidHom.id (finU (E := E) (n := n))) (Quotient.out q)) ≠ 0}.Finite := by

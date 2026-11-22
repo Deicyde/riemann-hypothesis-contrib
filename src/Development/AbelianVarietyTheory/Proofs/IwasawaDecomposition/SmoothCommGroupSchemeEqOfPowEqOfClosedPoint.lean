@@ -11,24 +11,34 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Exist
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 noncomputable section
 
 namespace GlobalTheory.LocalRigid
 
-theorem eq_of_diagonal_of_closedPoint {A : Type} [CommRing A] [IsLocalRing A] {X Y : Scheme.{0}} (f : X ⟶ Y)
-    [IsOpenImmersion (pullback.diagonal f)] (a b : Sp A ⟶ X) (h : a ≫ f = b ≫ f)
-    (κ : Type) [Field κ] (c : A →+* κ) [IsLocalHom c] (hc : spMap c ≫ a = spMap c ≫ b) : a = b := by
+theorem eq_of_diagonal_of_closedPoint
+    {A : Type} [CommRing A] [IsLocalRing A]
+    {X Y : Scheme.{0}} (f : X ⟶ Y) [IsOpenImmersion (pullback.diagonal f)]
+    (a b : Sp A ⟶ X) (h : a ≫ f = b ≫ f)
+    (κ : Type) [Field κ]
+    (c : A →+* κ) [IsLocalHom c]
+    (hc : spMap c ≫ a = spMap c ≫ b)
+    : a = b := by
   let l : Sp A ⟶ pullback f f := pullback.lift a b h
   have hq : (spMap c ≫ a) ≫ pullback.diagonal f = spMap c ≫ l := by
     apply pullback.hom_ext
-    · rw [Category.assoc, pullback.diagonal_fst, Category.comp_id, Category.assoc, pullback.lift_fst]
-    · rw [Category.assoc, pullback.diagonal_snd, Category.comp_id, Category.assoc, pullback.lift_snd, hc]
+    · rw [Category.assoc, pullback.diagonal_fst, Category.comp_id, Category.assoc,
+        pullback.lift_fst]
+    · rw [Category.assoc, pullback.diagonal_snd, Category.comp_id, Category.assoc,
+        pullback.lift_snd, hc]
   let q : Sp κ ⟶ pullback (pullback.diagonal f) l := pullback.lift _ _ hq
-  have hmem : (IsLocalRing.closedPoint A : Sp A) ∈ Set.range (pullback.snd (pullback.diagonal f) l) := by
+  have hmem
+      : (IsLocalRing.closedPoint A : Sp A) ∈ Set.range (pullback.snd (pullback.diagonal f) l) := by
     let pt : Sp κ := IsLocalRing.closedPoint κ
     refine ⟨q pt, ?_⟩
     have e : (q ≫ pullback.snd _ _) pt = spMap c pt := by rw [pullback.lift_snd]
@@ -40,7 +50,9 @@ theorem eq_of_diagonal_of_closedPoint {A : Type} [CommRing A] [IsLocalRing A] {X
       (pullback.snd (pullback.diagonal f) l).isOpenEmbedding.isOpen_range hmem
   have : Epi (pullback.snd (pullback.diagonal f) l).base := (TopCat.epi_iff_surjective _).2 hs
   have : IsIso (pullback.snd (pullback.diagonal f) l) := IsOpenImmersion.isIso _
-  have hl : l = inv (pullback.snd (pullback.diagonal f) l) ≫ pullback.fst _ _ ≫ pullback.diagonal f := by
+  have hl
+      : l
+        = inv (pullback.snd (pullback.diagonal f) l) ≫ pullback.fst _ _ ≫ pullback.diagonal f := by
     rw [pullback.condition, IsIso.inv_hom_id_assoc]
   have ha : a = l ≫ pullback.fst f f := (pullback.lift_fst _ _ _).symm
   have hb : b = l ≫ pullback.snd f f := (pullback.lift_snd _ _ _).symm
@@ -51,10 +63,15 @@ end GlobalTheory.LocalRigid
 
 namespace GlobalTheory.LocalRigid
 
-theorem eq_of_pow_eq_of_closedPoint : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G], Smooth G.hom →
-    ∀ (A : Type) [CommRing A] [IsLocalRing A] (s : Sp A ⟶ S) (k : ℕ), IsUnit (k : A) →
-    ∀ (x y : Over.mk s ⟶ G), x ^ k = y ^ k →
-    ∀ (κ : Type) [Field κ] (c : A →+* κ), IsLocalHom c → spMap c ≫ x.left = spMap c ≫ y.left → x = y := by
+theorem eq_of_pow_eq_of_closedPoint
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G],
+      Smooth G.hom
+        → ∀ (A : Type) [CommRing A] [IsLocalRing A] (s : Sp A ⟶ S) (k : ℕ),
+          IsUnit (k : A)
+            → ∀ (x y : Over.mk s ⟶ G),
+              x ^ k = y ^ k
+                → ∀ (κ : Type) [Field κ] (c : A →+* κ),
+                  IsLocalHom c → spMap c ≫ x.left = spMap c ≫ y.left → x = y := by
   intro S G _ _ hG A _ _ s k hk x y hxy κ _ c hc hxc
   haveI := hc
   let GA := (Over.pullback s).obj G

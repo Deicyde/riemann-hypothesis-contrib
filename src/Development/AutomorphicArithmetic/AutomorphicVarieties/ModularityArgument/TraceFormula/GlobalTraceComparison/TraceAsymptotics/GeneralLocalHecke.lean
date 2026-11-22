@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteDimens
 
 noncomputable section
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
@@ -19,9 +20,10 @@ namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 section Gen
 variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-private theorem exists_normal (K K₀ : Subgroup G) (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G))
-    (hK₀ : IsOpen (K₀ : Set G)) :
-    ∃ N : Subgroup G, IsOpen (N : Set G) ∧ N ≤ K₀ ∧ N ≤ K ∧ (N.subgroupOf K).Normal := by
+private theorem exists_normal
+    (K K₀ : Subgroup G)
+    (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G)) (hK₀ : IsOpen (K₀ : Set G))
+    : ∃ N : Subgroup G, IsOpen (N : Set G) ∧ N ≤ K₀ ∧ N ≤ K ∧ (N.subgroupOf K).Normal := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.mp hKc
   set U := K₀.subgroupOf K with hU
   have hUo : IsOpen (U : Set K) := hK₀.preimage continuous_subtype_val
@@ -46,10 +48,12 @@ private theorem exists_normal (K K₀ : Subgroup G) (hKo : IsOpen (K : Set G)) (
     rw [e]
     exact Subgroup.normalCore_normal U
 
-private theorem trc_eq {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K N : Subgroup G)
-    (hKc : IsCompact (K : Set G)) (hNo : IsOpen (N : Set G)) (hNK : N ≤ K)
-    (hfd : FiniteDimensional ℂ (fixed ρ N)) (F : G → ℂ) (hF : IsHecke N F) :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.trc ρ K F = twTr ρ K N F LinearMap.id := by
+private theorem trc_eq
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (K N : Subgroup G) (hKc : IsCompact (K : Set G))
+    (hNo : IsOpen (N : Set G)) (hNK : N ≤ K) (hfd : FiniteDimensional ℂ (fixed ρ N))
+    (F : G → ℂ) (hF : IsHecke N F)
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.trc ρ K F = twTr ρ K N F LinearMap.id := by
   unfold UpperTheory.V.Z.Tf.GlobalTraceComparison.trc
   refine (GlobalTheory.TraceLevel.twTr_level ρ K _ N F hNo hKc ?_ ?_ ⟨hF.1, ?_⟩ hfd).symm
   · intro k hk
@@ -65,7 +69,8 @@ private theorem trc_eq {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Represen
 
 end Gen
 
-private theorem hint_sub {H : Type} [Group H] [Subsingleton H] (K : Subgroup H) (u : H → ℂ) : hint K u = u 1 := by
+private theorem hint_sub {H : Type} [Group H] [Subsingleton H] (K : Subgroup H) (u : H → ℂ)
+    : hint K u = u 1 := by
   unfold hint
   have h1 : (rStab u ⊓ K).relIndex K = 1 :=
     Subgroup.relIndex_eq_one.2 fun x _ => by
@@ -82,27 +87,34 @@ private theorem hint_sub {H : Type} [Group H] [Subsingleton H] (K : Subgroup H) 
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-private theorem blk_zero {n : ℕ} (w : Pl E) (g : GLw n w) (m : GLw 0 w) (X : Matrix (Fin n) (Fin 0) (w.adicCompletion E)) :
-    blk (Nat.add_zero n) w (g, m) X = g := by
+private theorem blk_zero
+    {n : ℕ} (w : Pl E) (g : GLw n w) (m : GLw 0 w) (X : Matrix (Fin n) (Fin 0) (w.adicCompletion E))
+    : blk (Nat.add_zero n) w (g, m) X = g := by
   have e : ∀ i : Fin n, (finSumFinEquiv.trans (finCongr (Nat.add_zero n))).symm i = Sum.inl i := by
     intro i
     rw [Equiv.symm_apply_eq]
     ext
     simp
     rfl
-  have hM : Matrix.reindex (finSumFinEquiv.trans (finCongr (Nat.add_zero n))) (finSumFinEquiv.trans (finCongr (Nat.add_zero n)))
-      (Matrix.fromBlocks g.val (g.val * X) 0 m.val) = g.val := by
+  have hM
+      : Matrix.reindex (finSumFinEquiv.trans (finCongr (Nat.add_zero n)))
+          (finSumFinEquiv.trans (finCongr (Nat.add_zero n)))
+          (Matrix.fromBlocks g.val (g.val * X) 0 m.val)
+        = g.val := by
     ext i j
     simp only [Matrix.reindex_apply, Matrix.submatrix_apply, e, Matrix.fromBlocks_apply₁₁]
-  have key : ∀ (M : Matrix (Fin n) (Fin n) (w.adicCompletion E)), M = g.val →
-      (if hM : IsUnit M then hM.unit else (1 : GLw n w)) = g := by
+  have key
+      : ∀ (M : Matrix (Fin n) (Fin n) (w.adicCompletion E)),
+        M = g.val → (if hM : IsUnit M then hM.unit else (1 : GLw n w)) = g := by
     rintro _ rfl
     rw [dite_eq_left g.isUnit]
     exact Units.ext rfl
   exact key _ hM
 
-private theorem constant_term_parabolic_average {n : ℕ} (w : Pl E) (hw : IsSplitAt w) (μ : HChar E) (f : ∀ w : Pl E, GLw n w → ℂ) (g : GLw n w) :
-    ct0 μ (Nat.add_zero n) f w (g, 1) = avg fun k : KGL w (n := n) => f w ((k : GLw n w)⁻¹ * g * k) := by
+private theorem constant_term_parabolic_average
+    {n : ℕ} (w : Pl E) (hw : IsSplitAt w) (μ : HChar E) (f : ∀ w : Pl E, GLw n w → ℂ) (g : GLw n w)
+    : ct0 μ (Nat.add_zero n) f w (g, 1)
+      = avg fun k : KGL w (n := n) => f w ((k : GLw n w)⁻¹ * g * k) := by
   haveI : Subsingleton (Multiplicative (Matrix (Fin n) (Fin 0) (w.adicCompletion E))) :=
     ⟨fun a b => Multiplicative.toAdd.injective (by ext i j; exact j.elim0)⟩
   have hU : ∀ y : GLw n w, y ∈ UL n w := fun y => by
@@ -115,7 +127,8 @@ private theorem constant_term_parabolic_average {n : ℕ} (w : Pl E) (hw : IsSpl
   unfold ct0 ctMu ct
   rw [hint_sub]
   simp only [blk_zero, hs]
-  have h0 : absHalf w ((g, (1 : GLw 0 w)).1.val.det ^ 0 / (g, (1 : GLw 0 w)).2.val.det ^ n) = 1 := by
+  have h0
+      : absHalf w ((g, (1 : GLw 0 w)).1.val.det ^ 0 / (g, (1 : GLw 0 w)).2.val.det ^ n) = 1 := by
     simp [absHalf, ordL]
     exact zpow_zero _
   rw [h0]
@@ -129,8 +142,9 @@ theorem trAvg : TrAvg := by
   have hfd := finiteDimensional_fixed_openSubgroup_GLw E n w τ N hNo
   have hfN : IsHecke N (f w) := ⟨hH.1, fun k hk x => hH.2 k (hNK₀ hk) x⟩
   obtain ⟨hFN, -, -, htr⟩ := GlobalTheory.ConjAvg.conjAvg E n w τ.V τ.ρ N hNo hNK hNn (f w) hfN
-  have hct : (fun g => ct0 μ (Nat.add_zero n) f w (g, 1)) =
-      fun g => avg fun k : KGL w (n := n) => f w ((k : GLw n w)⁻¹ * g * k) :=
+  have hct
+      : (fun g => ct0 μ (Nat.add_zero n) f w (g, 1))
+        = fun g => avg fun k : KGL w (n := n) => f w ((k : GLw n w)⁻¹ * g * k) :=
     funext fun g => constant_term_parabolic_average w hw μ f g
   rw [hct, trc_eq τ.ρ _ N hKc hNo hNK hfd _ hFN, trc_eq τ.ρ _ N hKc hNo hNK hfd _ hfN, htr]
 

@@ -22,8 +22,10 @@ theorem SchRootOfUnityRowsPerm.proof : SchRootOfUnityRowsPerm.Statement := by
     intro j n
     conv_lhs => rw [← Nat.mod_add_div n k]
     rw [mul_add, pow_add, mul_left_comm j k, pow_mul (rootOfUnity k) k, hζk, one_pow, mul_one]
-  have hM : (Matrix.of fun i j : Fin k => rootOfUnity k ^ ((j : ℕ) * l i)) =
-      (Matrix.of fun i j : Fin k => rootOfUnity k ^ ((j : ℕ) * (k - 1 - (i : ℕ)))).submatrix π id := by
+  have hM
+      : (Matrix.of fun i j : Fin k => rootOfUnity k ^ ((j : ℕ) * l i))
+        = (Matrix.of fun i j : Fin k => rootOfUnity k ^ ((j : ℕ) * (k - 1 - (i : ℕ)))).submatrix π
+          id := by
     ext i j
     simp only [Matrix.of_apply, Matrix.submatrix_apply, id]
     rw [hmod, hl i]

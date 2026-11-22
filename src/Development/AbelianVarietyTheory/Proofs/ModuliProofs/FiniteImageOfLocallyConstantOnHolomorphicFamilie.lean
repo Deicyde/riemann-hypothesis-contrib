@@ -20,8 +20,10 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.IsConnectedB
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open Topology Filter
 
@@ -29,14 +31,17 @@ namespace GlobalTheory.FiniteClasses
 
 open GlobalTheory.Points
 
-theorem preconnectedSpace_pts (A : Type) [CommRing A] [IsDomain A] [Algebra ℂ A]
-    [Algebra.FiniteType ℂ A] : PreconnectedSpace (Pts (spMap (algebraMap ℂ A))) := by
-  have hc := isConnected_basicOpen_complexPoints_of_dense
-    (exists_isConnected_principalOpen noetherNormalization_primitive
-      (isConnected_unramified_cover_of_irreducible isConnected_and_dense_compl_hypersurface
-        exists_mvPolynomial_of_poly_bound_off_hypersurface))
-    (principalOpen_dense_complexPoints noetherNormalization_primitive
-      isConnected_and_dense_compl_hypersurface) A 1 one_ne_zero
+theorem preconnectedSpace_pts
+    (A : Type) [CommRing A] [IsDomain A] [Algebra ℂ A] [Algebra.FiniteType ℂ A]
+    : PreconnectedSpace (Pts (spMap (algebraMap ℂ A))) := by
+  have hc :=
+    isConnected_basicOpen_complexPoints_of_dense
+      (exists_isConnected_principalOpen noetherNormalization_primitive
+        (isConnected_unramified_cover_of_irreducible isConnected_and_dense_compl_hypersurface
+          exists_mvPolynomial_of_poly_bound_off_hypersurface))
+      (principalOpen_dense_complexPoints noetherNormalization_primitive
+        isConnected_and_dense_compl_hypersurface)
+      A 1 one_ne_zero
   have he := isEmbedding_ptsOverEquivAlgHom (C := ℂ) A (id_eq_spMap_algebraMap ℂ)
   refine ⟨he.isInducing.isPreconnected_image.1 ?_⟩
   convert hc.isPreconnected using 1
@@ -47,14 +52,19 @@ theorem preconnectedSpace_pts (A : Type) [CommRing A] [IsDomain A] [Algebra ℂ 
   · rintro ⟨φ, rfl, -⟩
     exact ⟨(ptsOverEquivAlgHom A (id_eq_spMap_algebraMap ℂ)).symm φ, trivial, by simp⟩
 
-theorem finite_range_affine (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A] {I : Type*}
-    (c : Pts (spMap (algebraMap ℂ A)) → I) (hc : IsLocallyConstant c) : (Set.range c).Finite := by
+theorem finite_range_affine
+    (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A]
+    {I : Type*} (c : Pts (spMap (algebraMap ℂ A)) → I) (hc : IsLocallyConstant c)
+    : (Set.range c).Finite := by
   have : IsNoetherianRing A := Algebra.FiniteType.isNoetherianRing ℂ A
-  have hcomp : ∀ P : Ideal A, spMap (Ideal.Quotient.mk P) ≫ spMap (algebraMap ℂ A) =
-      spMap (algebraMap ℂ (A ⧸ P)) := fun P => by
+  have hcomp
+      : ∀ P : Ideal A,
+        spMap (Ideal.Quotient.mk P) ≫ spMap (algebraMap ℂ A)
+          = spMap (algebraMap ℂ (A ⧸ P)) := fun P => by
     rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
-  have hfin : (⋃ P ∈ minimalPrimes A,
-      Set.range (c ∘ PtsOver.map (spMap (Ideal.Quotient.mk P)) (hcomp P) (𝟙 _))).Finite := by
+  have hfin
+      : (⋃ P ∈ minimalPrimes A,
+          Set.range (c ∘ PtsOver.map (spMap (Ideal.Quotient.mk P)) (hcomp P) (𝟙 _))).Finite := by
     refine (minimalPrimes.finite_of_isNoetherianRing A).biUnion fun P hP => ?_
     have : P.IsPrime := hP.1.1
     have := preconnectedSpace_pts (A ⧸ P)
@@ -65,23 +75,30 @@ theorem finite_range_affine (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.Fin
   rintro _ ⟨x, rfl⟩
   obtain ⟨φ, rfl⟩ := (ptsEquivAlgHom A).symm.surjective x
   have : (RingHom.ker φ.toRingHom).IsPrime := RingHom.ker_isPrime _
-  obtain ⟨P, hP, hle⟩ := Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal A))
-    (J := RingHom.ker φ.toRingHom) bot_le
-  refine Set.mem_biUnion (x := P) hP ⟨(ptsEquivAlgHom (A ⧸ P)).symm
-    (Ideal.Quotient.liftₐ P φ fun a ha => hle ha), congrArg c (Subtype.ext ?_)⟩
+  obtain ⟨P, hP, hle⟩ :=
+    Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal A)) (J := RingHom.ker φ.toRingHom) bot_le
+  refine Set.mem_biUnion (x := P) hP ⟨
+    (ptsEquivAlgHom (A ⧸ P)).symm (Ideal.Quotient.liftₐ P φ fun a ha => hle ha),
+    congrArg c (Subtype.ext ?_)
+  ⟩
   simp only [PtsOver.map_val, ptsOverEquivAlgHom_symm_val]
   rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
   rfl
 
-theorem finite_range {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ) [LocallyOfFiniteType p] [QuasiCompact p] {I : Type*}
-    (c : Pts p → I) (hc : IsLocallyConstant c) : (Set.range c).Finite := by
+theorem finite_range
+    {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ) [LocallyOfFiniteType p] [QuasiCompact p]
+    {I : Type*} (c : Pts p → I) (hc : IsLocallyConstant c)
+    : (Set.range c).Finite := by
   have : CompactSpace Y := QuasiCompact.compactSpace_of_compactSpace p
   let 𝒰 := Y.affineOpenCover
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (X := Y)
-    (fun i => ((𝒰.f i).opensRange : Set Y)) (fun i => (𝒰.f i).opensRange.isOpen)
-    (fun y _ => Set.mem_iUnion.2 ⟨𝒰.idx y, 𝒰.covers y⟩)
-  have key : ∀ {R : CommRingCat.{0}} (j : Spec R ⟶ Y) [IsOpenImmersion j],
-      (Set.range (c ∘ PtsOver.map j rfl (𝟙 _))).Finite := by
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover (X := Y)
+      (fun i => ((𝒰.f i).opensRange : Set Y))
+      (fun i => (𝒰.f i).opensRange.isOpen)
+      (fun y _ => Set.mem_iUnion.2 ⟨𝒰.idx y, 𝒰.covers y⟩)
+  have key
+      : ∀ {R : CommRingCat.{0}} (j : Spec R ⟶ Y) [IsOpenImmersion j],
+        (Set.range (c ∘ PtsOver.map j rfl (𝟙 _))).Finite := by
     intro R j _
     have hl : IsLocallyConstant (c ∘ PtsOver.map j rfl (𝟙 _)) :=
       hc.comp_continuous (PtsOver.continuous_map _ _ _)
@@ -101,15 +118,19 @@ theorem finite_range {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ) [LocallyOfFiniteType p]
   obtain ⟨z, rfl⟩ := hx'
   exact Set.mem_biUnion hi ⟨z, rfl⟩
 
-theorem isLocallyConstant_of_hol {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ) (d : ℕ)
-    (hp : SmoothOfRelativeDimension d p) {I : Type*} (c : Pts p → I)
-    (H : ∀ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → Pts p), IsOpen B → IsHolTo B (fun b => (y b).1) →
-      ∀ b₀ ∈ B, ∀ᶠ b in 𝓝 b₀, c (y b) = c (y b₀)) : IsLocallyConstant c := by
+theorem isLocallyConstant_of_hol
+    {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ)
+    (d : ℕ) (hp : SmoothOfRelativeDimension d p)
+    {I : Type*} (c : Pts p → I)
+    (H : ∀ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → Pts p),
+      IsOpen B → IsHolTo B (fun b => (y b).1) → ∀ b₀ ∈ B, ∀ᶠ b in 𝓝 b₀, c (y b) = c (y b₀))
+    : IsLocallyConstant c := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   let h := overHomeomorph (C := ℂ) (Over.mk p)
-  obtain ⟨W, σ, U, t, hW, h0, hσ, -, hhol, hco, hop, -⟩ := HolChart.exists_holomorphic_chart valAt'_rules
-    existsUnique_point_of_ringHom exists_holomorphic_section_of_etale (Over.mk p) d hp (h.symm x)
+  obtain ⟨W, σ, U, t, hW, h0, hσ, -, hhol, hco, hop, -⟩ :=
+    HolChart.exists_holomorphic_chart valAt'_rules existsUnique_point_of_ringHom
+      exists_holomorphic_section_of_etale (Over.mk p) d hp (h.symm x)
   have hop' : IsOpen (σ '' W) := by
     refine TopologicalSpace.le_def.1 (le_generateFrom ?_) _ hop
     rintro _ ⟨V, f, O, hO, rfl⟩
@@ -130,8 +151,26 @@ theorem isLocallyConstant_of_hol {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ) (d : ℕ)
   rw [this, hx] at hz'
   exact hz'
 
-theorem finite_image_of_locally_constant_on_holomorphic_families :
-    (∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (y₀ : Sp ℂ ⟶ X), SmoothOfRelativeDimension d s → y₀ ≫ s = spMap σ → ∃ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (U : X.Opens) (f : Fin d → Γ(X, U)) (n : ℕ) (r : Fin n → Γ(X, U)), IsOpen B ∧ (0 : Fin d → ℂ) ∈ B ∧ y 0 = y₀ ∧ (∀ b ∈ B, y b ≫ s = spMap σ) ∧ IsHolTo B y ∧ Set.InjOn y B ∧ ⊤ ≤ y₀ ⁻¹ᵁ U ∧ ∃ ε : ℝ, 0 < ε ∧ ∀ x : Sp ℂ ⟶ X, x ≫ s = spMap σ → ⊤ ≤ x ⁻¹ᵁ U → (∀ i, ‖valAt' x U (r i) - valAt' y₀ U (r i)‖ < ε) → x ∈ y '' B) → ∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (I : Type 1) (cls : (Sp ℂ ⟶ X) → I), SmoothOfRelativeDimension d s → QuasiCompact s → (∀ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)), IsOpen B → (∀ b ∈ B, y b ≫ s = spMap σ) → IsHolTo B y → ∀ b₀ ∈ B, ∀ᶠ b in nhds b₀, cls (y b) = cls (y b₀)) → (cls '' {x | x ≫ s = spMap σ}).Finite := by
+theorem finite_image_of_locally_constant_on_holomorphic_families
+    : (∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (y₀ : Sp ℂ ⟶ X),
+        SmoothOfRelativeDimension d s → y₀ ≫ s = spMap σ
+          → ∃ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (U : X.Opens)
+              (f : Fin d → Γ(X, U)) (n : ℕ) (r : Fin n → Γ(X, U)),
+            IsOpen B ∧ (0 : Fin d → ℂ) ∈ B ∧ y 0 = y₀ ∧ (∀ b ∈ B, y b ≫ s = spMap σ) ∧ IsHolTo B y
+              ∧ Set.InjOn y B ∧ ⊤ ≤ y₀ ⁻¹ᵁ U
+              ∧ ∃ ε : ℝ,
+                0 < ε
+                  ∧ ∀ x : Sp ℂ ⟶ X,
+                    x ≫ s = spMap σ → ⊤ ≤ x ⁻¹ᵁ U
+                      → (∀ i, ‖valAt' x U (r i) - valAt' y₀ U (r i)‖ < ε)
+                      → x ∈ y '' B)
+      → ∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (I : Type 1)
+          (cls : (Sp ℂ ⟶ X) → I),
+        SmoothOfRelativeDimension d s → QuasiCompact s
+          → (∀ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)),
+            IsOpen B → (∀ b ∈ B, y b ≫ s = spMap σ) → IsHolTo B y
+              → ∀ b₀ ∈ B, ∀ᶠ b in nhds b₀, cls (y b) = cls (y b₀))
+          → (cls '' {x | x ≫ s = spMap σ}).Finite := by
   intro _ k _ σ X s d I cls hs hq H
   let p := pullback.snd s (spMap σ)
   let q := pullback.fst s (spMap σ)

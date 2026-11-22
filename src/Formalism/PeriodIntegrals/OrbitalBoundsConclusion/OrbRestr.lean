@@ -5,5 +5,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.OrbitJetRestrict
 
 @[expose] public section
 
-theorem PI.OrbRestr : ∀ (D : Formalism.BasicNotions.D7) (E : PI.OrbJet.Ent D), PI.OrbJet.OrbitRestriction E :=
+theorem PI.OrbRestr
+    : ∀ (D : Formalism.BasicNotions.D7) (E : PI.OrbJet.Ent D), PI.OrbJet.OrbitRestriction E :=
   PI.OrbJet.OrbW.orbitRestriction

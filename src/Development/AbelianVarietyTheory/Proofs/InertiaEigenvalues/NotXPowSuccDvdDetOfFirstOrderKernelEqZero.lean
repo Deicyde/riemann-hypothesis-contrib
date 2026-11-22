@@ -8,16 +8,31 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem exists_det_one_mul_mul_eq_diagonal {K : Type} [Field K] {a : ℕ}
-    (A : Matrix (Fin a) (Fin a) K) :
-    ∃ (P Q : Matrix (Fin a) (Fin a) K) (D : Fin a → K),
+theorem exists_det_one_mul_mul_eq_diagonal
+    {K : Type} [Field K] {a : ℕ} (A : Matrix (Fin a) (Fin a) K)
+    : ∃ (P Q : Matrix (Fin a) (Fin a) K) (D : Fin a → K),
       P.det = 1 ∧ Q.det = 1 ∧ P * A * Q = Matrix.diagonal D := by
   obtain ⟨L, L', D, h⟩ := Matrix.Pivot.exists_list_transvec_mul_mul_list_transvec_eq_diagonal A
-  exact ⟨_, _, D, Matrix.TransvectionStruct.det_toMatrix_prod L,
-    Matrix.TransvectionStruct.det_toMatrix_prod L', h⟩
+  exact ⟨
+    _,
+    _,
+    D,
+    Matrix.TransvectionStruct.det_toMatrix_prod L,
+    Matrix.TransvectionStruct.det_toMatrix_prod L',
+    h
+  ⟩
 
-theorem not_X_pow_succ_dvd_det_of_first_order_kernel_eq_zero :
-    ∀ (K : Type) [Field K] (a m : ℕ) (Ψ : Matrix (Fin a) (Fin a) (Polynomial K)), (∀ x0 x1 : Fin (0 + 1) → Fin a → K, (∀ j, (Ψ.map fun p => p.coeff 0).mulVec (x0 j) = 0 ∧ (Ψ.map fun p => p.coeff 1).mulVec (x0 j) + (Ψ.map fun p => p.coeff 0).mulVec (x1 j) = 0) → ¬ LinearIndependent K x0) → Module.finrank K (LinearMap.ker (Ψ.map fun p => p.coeff 0).mulVecLin) ≤ m → ¬ (Polynomial.X : Polynomial K) ^ (m + 1) ∣ Ψ.det := by
+theorem not_X_pow_succ_dvd_det_of_first_order_kernel_eq_zero
+    : ∀ (K : Type) [Field K] (a m : ℕ) (Ψ : Matrix (Fin a) (Fin a) (Polynomial K)),
+      (∀ x0 x1 : Fin (0 + 1) → Fin a → K,
+          (∀ j,
+              (Ψ.map fun p => p.coeff 0).mulVec (x0 j) = 0
+                ∧ (Ψ.map fun p => p.coeff 1).mulVec (x0 j)
+                    + (Ψ.map fun p => p.coeff 0).mulVec (x1 j)
+                  = 0)
+            → ¬ LinearIndependent K x0)
+        → Module.finrank K (LinearMap.ker (Ψ.map fun p => p.coeff 0).mulVecLin) ≤ m
+        → ¬ (Polynomial.X : Polynomial K) ^ (m + 1) ∣ Ψ.det := by
   classical
   intro K _ a m Ψ hker hm hdvd
   set A := Ψ.map fun p => p.coeff 0 with hA

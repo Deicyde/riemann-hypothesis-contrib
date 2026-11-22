@@ -14,25 +14,38 @@ open DensInertW.Sub
 section
 variable {L : Type} [Field L]
 
-theorem diag_orth_family {m q : ℕ} {B : Matrix (Fin m) (Fin m) L}
+theorem diag_orth_family
+    {m q : ℕ} {B : Matrix (Fin m) (Fin m) L}
     (hadd : ∀ a b : L, (a + b) ^ q = a ^ q + b ^ q) (hinv : ∀ a : L, (a ^ q) ^ q = a)
-    (hB : IsHerm q B) (htr : ∀ z : L, z ≠ 0 → ∃ c : L, c * z + (c * z) ^ q ≠ 0) :
-    ∀ (d : ℕ) (W : Submodule L (Fin m → L)), finrank L W = d →
-      ∃ (v : Fin d → Fin m → L) (r : ℕ), r ≤ d ∧ (∀ i, v i ∈ W) ∧ LinearIndependent L v ∧
-        (∀ i j, i ≠ j → hf q B (v i) (v j) = 0) ∧ (∀ i, hf q B (v i) (v i) ≠ 0 ↔ i.val < r) := by
+    (hB : IsHerm q B) (htr : ∀ z : L, z ≠ 0 → ∃ c : L, c * z + (c * z) ^ q ≠ 0)
+    : ∀ (d : ℕ) (W : Submodule L (Fin m → L)),
+      finrank L W = d
+        → ∃ (v : Fin d → Fin m → L) (r : ℕ),
+          r ≤ d ∧ (∀ i, v i ∈ W) ∧ LinearIndependent L v ∧ (∀ i j, i ≠ j → hf q B (v i) (v j) = 0)
+            ∧ (∀ i, hf q B (v i) (v i) ≠ 0 ↔ i.val < r) := by
   have hq : q ≠ 0 := by
     rintro rfl
     have h := hinv 0
     simp at h
 
-  have iso : ∀ (d : ℕ) (W : Submodule L (Fin m → L)), finrank L W = d → (∀ e ∈ W, hf q B e e = 0) →
-      ∃ (v : Fin d → Fin m → L) (r : ℕ), r ≤ d ∧ (∀ i, v i ∈ W) ∧ LinearIndependent L v ∧
-        (∀ i j, i ≠ j → hf q B (v i) (v j) = 0) ∧ (∀ i, hf q B (v i) (v i) ≠ 0 ↔ i.val < r) := by
+  have iso
+      : ∀ (d : ℕ) (W : Submodule L (Fin m → L)),
+        finrank L W = d → (∀ e ∈ W, hf q B e e = 0)
+          → ∃ (v : Fin d → Fin m → L) (r : ℕ),
+            r ≤ d ∧ (∀ i, v i ∈ W) ∧ LinearIndependent L v ∧ (∀ i j, i ≠ j → hf q B (v i) (v j) = 0)
+              ∧ (∀ i, hf q B (v i) (v i) ≠ 0 ↔ i.val < r) := by
     intro d W hW h0
     have hz := hf_eq_zero_of_diag hadd hinv hB htr W h0
     let b := Module.finBasisOfFinrankEq L W hW
-    refine ⟨fun i => (b i : Fin m → L), 0, Nat.zero_le _, fun i => (b i).2, ?_,
-      fun i j _ => hz _ (b i).2 _ (b j).2, fun i => ?_⟩
+    refine ⟨
+      fun i => (b i : Fin m → L),
+      0,
+      Nat.zero_le _,
+      fun i => (b i).2,
+      ?_,
+      fun i j _ => hz _ (b i).2 _ (b j).2,
+      fun i => ?_
+    ⟩
     · exact b.linearIndependent.map' W.subtype (Submodule.ker_subtype W)
     · simp [hz _ (b i).2 _ (b i).2]
   intro d
@@ -88,19 +101,24 @@ theorem diag_orth_family {m q : ℕ} {B : Matrix (Fin m) (Fin m) L}
     · push Not at h
       exact iso _ W hW h
 
-theorem diag_of_hyps {m q : ℕ} (B : Matrix (Fin m) (Fin m) L)
-    (hadd : ∀ a b : L, (a + b) ^ q = a ^ q + b ^ q) (hinv : ∀ a : L, (a ^ q) ^ q = a)
-    (hB : IsHerm q B) (htr : ∀ z : L, z ≠ 0 → ∃ c : L, c * z + (c * z) ^ q ≠ 0) :
-    ∃ P : Matrix (Fin m) (Fin m) L, IsUnit P.det ∧ ∃ (w : Fin m → L) (r : ℕ), r ≤ m ∧
-        P * B * (P.map (fun y => y ^ q)).transpose = Matrix.diagonal w ∧
-        (∀ i, w i ≠ 0 ↔ i.val < r) ∧ (∀ i, w i ^ q = w i) := by
-  obtain ⟨v, r, hr, -, hli, horth, hdiag⟩ := diag_orth_family hadd hinv hB htr m ⊤
-    (by rw [finrank_top, Module.finrank_fin_fun])
+theorem diag_of_hyps
+    {m q : ℕ} (B : Matrix (Fin m) (Fin m) L) (hadd : ∀ a b : L, (a + b) ^ q = a ^ q + b ^ q)
+    (hinv : ∀ a : L, (a ^ q) ^ q = a) (hB : IsHerm q B)
+    (htr : ∀ z : L, z ≠ 0 → ∃ c : L, c * z + (c * z) ^ q ≠ 0)
+    : ∃ P : Matrix (Fin m) (Fin m) L,
+      IsUnit P.det
+        ∧ ∃ (w : Fin m → L) (r : ℕ),
+          r ≤ m ∧ P * B * (P.map (fun y => y ^ q)).transpose = Matrix.diagonal w
+            ∧ (∀ i, w i ≠ 0 ↔ i.val < r) ∧ (∀ i, w i ^ q = w i) := by
+  obtain ⟨v, r, hr, -, hli, horth, hdiag⟩ :=
+    diag_orth_family hadd hinv hB htr m ⊤ (by rw [finrank_top, Module.finrank_fin_fun])
   refine ⟨Matrix.of fun i => v i, ?_, fun i => hf q B (v i) (v i), r, hr, ?_, hdiag, fun i => ?_⟩
   · exact (Matrix.isUnit_iff_isUnit_det _).mp (Matrix.linearIndependent_row_iff_isUnit.mp hli)
   · ext i j
-    have e : (Matrix.of (fun i => v i) * B * ((Matrix.of fun i => v i).map fun y => y ^ q).transpose) i j =
-        hf q B (v i) (v j) := by
+    have e
+        : (Matrix.of (fun i => v i) * B * ((Matrix.of fun i => v i).map fun y => y ^ q).transpose) i
+            j
+          = hf q B (v i) (v j) := by
       simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Matrix.of_apply, hf,
         Finset.sum_mul]
       exact Finset.sum_comm
@@ -116,7 +134,9 @@ theorem hermitianDiagonalization : Diag := by
   obtain ⟨n, hp, hcard⟩ := FiniteField.card K (ringChar K)
   haveI : Fact (ringChar K).Prime := ⟨hp⟩
   haveI : CharP L (ringChar K) := charP_of_injective_algebraMap (algebraMap K L).injective _
-  have hadd : ∀ a b : L, (a + b) ^ Fintype.card K = a ^ Fintype.card K + b ^ Fintype.card K := fun a b => by
+  have hadd
+      : ∀ a b : L,
+        (a + b) ^ Fintype.card K = a ^ Fintype.card K + b ^ Fintype.card K := fun a b => by
     rw [hcard]
     exact add_pow_char_pow a b _ _
   have hcL : Fintype.card L = Fintype.card K ^ 2 := by
@@ -139,14 +159,16 @@ theorem hermitianDiagonalization : Diag := by
       intro h0
       have h := congrArg (fun p : Polynomial L => p.coeff 1) h0
       simp only [P, Polynomial.coeff_add, Polynomial.coeff_X_pow, Polynomial.coeff_X_one,
-        Polynomial.coeff_zero] at h
+          Polynomial.coeff_zero]
+        at h
       split_ifs at h with hh
       · omega
       · norm_num at h
     have hdeg : P.natDegree ≤ Fintype.card K :=
       (Polynomial.natDegree_add_le _ _).trans (max_le (by simp) (by simp; omega))
     have hsub : (Finset.univ : Finset L).val ≤ P.roots :=
-      (Multiset.le_iff_subset Finset.univ.nodup).mpr fun y _ => (Polynomial.mem_roots hP0).mpr (hroot y)
+      (Multiset.le_iff_subset Finset.univ.nodup).mpr fun y _ =>
+        (Polynomial.mem_roots hP0).mpr (hroot y)
     have hc := (Multiset.card_le_card hsub).trans ((Polynomial.card_roots' P).trans hdeg)
     rw [Finset.card_val, Finset.card_univ, hcL] at hc
     nlinarith

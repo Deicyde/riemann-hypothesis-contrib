@@ -12,7 +12,8 @@ namespace PositivityTheory.CW
 
 namespace CasimirEigenvector
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V}
 
 lemma comm_casimirK (T : Module.End ℂ V) (hT : ∀ a b, E a b * T = T * E a b) :
@@ -54,7 +55,8 @@ theorem casimir_eigen_exists : A3 := by
   have hTW : ∀ x ∈ W, T x ∈ W := by
     intro x hx
     rw [Module.End.mem_eigenspace_iff] at hx ⊢
-    have hc := congrArg (fun f : Module.End ℂ V => f x) (CasimirEigenvector.comm_casimirK (ε := ε) T hT)
+    have hc :=
+      congrArg (fun f : Module.End ℂ V => f x) (CasimirEigenvector.comm_casimirK (ε := ε) T hT)
     simp only [Module.End.mul_apply] at hc
     rw [hc, hx, map_smul]
   obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue (T.restrict hTW)

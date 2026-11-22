@@ -12,23 +12,29 @@ namespace GlobalTheory.RatSpan
 
 section Lin
 
-variable {K' V' W : Type} [Field K'] [AddCommGroup V'] [Module K' V'] [AddCommGroup W] [Module ℂ W]
+variable
+  {K' V' W : Type} [Field K'] [AddCommGroup V'] [Module K' V'] [AddCommGroup W] [Module ℂ W]
   {σ' : K' →+* ℂ} (j' : V' →ₛₗ[σ'] W)
 
-private theorem span_range_le_comap_span_image {κ : Type} (x : κ → V') :
-    Submodule.span K' (Set.range x) ≤ (Submodule.span ℂ (Set.range fun k => j' (x k))).comap j' := by
+private theorem span_range_le_comap_span_image {κ : Type} (x : κ → V')
+    : Submodule.span K' (Set.range x)
+      ≤ (Submodule.span ℂ (Set.range fun k => j' (x k))).comap j' := by
   rw [Submodule.span_le]
   rintro _ ⟨k, rfl⟩
   exact Submodule.subset_span ⟨k, rfl⟩
 
-private theorem linearIndependent_image_basis_of_linearIndependent {ι' : Type} [Fintype ι'] (b' : Basis ι' K' V')
-    (hb : LinearIndependent ℂ fun i => j' (b' i)) {κ : Type} [Fintype κ] (c : Basis κ K' V') :
-    LinearIndependent ℂ fun k => j' (c k) := by
+private theorem linearIndependent_image_basis_of_linearIndependent
+    {ι' : Type} [Fintype ι']
+    (b' : Basis ι' K' V') (hb : LinearIndependent ℂ fun i => j' (b' i))
+    {κ : Type} [Fintype κ]
+    (c : Basis κ K' V')
+    : LinearIndependent ℂ fun k => j' (c k) := by
   have := Module.Finite.of_basis b'
   have hcard : Fintype.card ι' = Fintype.card κ := by
     rw [← Module.finrank_eq_card_basis b', ← Module.finrank_eq_card_basis c]
-  have hle : Submodule.span ℂ (Set.range fun i => j' (b' i)) ≤
-      Submodule.span ℂ (Set.range fun k => j' (c k)) := by
+  have hle
+      : Submodule.span ℂ (Set.range fun i => j' (b' i))
+        ≤ Submodule.span ℂ (Set.range fun k => j' (c k)) := by
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     have hi : b' i ∈ Submodule.span K' (Set.range c) := by rw [c.span_eq]; trivial
@@ -41,8 +47,11 @@ private theorem linearIndependent_image_basis_of_linearIndependent {ι' : Type} 
     exact Submodule.finrank_mono hle
   · exact finrank_range_le_card _
 
-theorem linInd_comp {ι' : Type} [Fintype ι'] (b' : Basis ι' K' V') (hb : LinearIndependent ℂ fun i => j' (b' i))
-    {κ : Type} {x : κ → V'} (hx : LinearIndependent K' x) : LinearIndependent ℂ fun k => j' (x k) := by
+theorem linInd_comp
+    {ι' : Type} [Fintype ι']
+    (b' : Basis ι' K' V') (hb : LinearIndependent ℂ fun i => j' (b' i))
+    {κ : Type} {x : κ → V'} (hx : LinearIndependent K' x)
+    : LinearIndependent ℂ fun k => j' (x k) := by
   have := Module.Finite.of_basis b'
   have hs : LinearIndepOn K' id (Set.range x) := (linearIndepOn_id_range_iff hx.injective).mpr hx
   have : Fintype (hs.extend (Set.subset_univ _)) := by
@@ -58,12 +67,17 @@ end Lin
 
 section Main
 
-variable {K K' V V' W : Type} [Field K] [Field K'] [AddCommGroup V] [Module K V] [AddCommGroup V'] [Module K' V']
-  [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] {σ : K →+* ℂ} {σ' : K' →+* ℂ}
+variable
+  {K K' V V' W : Type} [Field K] [Field K'] [AddCommGroup V] [Module K V] [AddCommGroup V']
+  [Module K' V'] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+  {σ : K →+* ℂ} {σ' : K' →+* ℂ}
 
-theorem finrank_span_image (j' : V' →ₛₗ[σ'] W) {ι' : Type} [Fintype ι'] (b' : Basis ι' K' V')
-    (hb : LinearIndependent ℂ fun i => j' (b' i)) (X : Submodule K' V') :
-    finrank ℂ (Submodule.span ℂ (j' '' X)) = finrank K' X := by
+theorem finrank_span_image
+    (j' : V' →ₛₗ[σ'] W)
+    {ι' : Type} [Fintype ι']
+    (b' : Basis ι' K' V') (hb : LinearIndependent ℂ fun i => j' (b' i))
+    (X : Submodule K' V')
+    : finrank ℂ (Submodule.span ℂ (j' '' X)) = finrank K' X := by
   have := Module.Finite.of_basis b'
   let e := Module.finBasis K' X
   let x : Fin (finrank K' X) → V' := fun i => (e i : V')
@@ -84,10 +98,12 @@ theorem finrank_span_image (j' : V' →ₛₗ[σ'] W) {ι' : Type} [Fintype ι']
       exact ⟨x i, (e i).2, rfl⟩
   rw [hspan, finrank_span_eq_card hjx, Fintype.card_fin]
 
-theorem comap_eq_span (j : V →ₛₗ[σ] W) (j' : V' →ₛₗ[σ'] W) (ι : V → V') (hj : ∀ v, j' (ι v) = j v)
-    {ι' : Type} [Fintype ι'] (b' : Basis ι' K' V') (hb : LinearIndependent ℂ fun i => j' (b' i))
-    (U : Submodule ℂ W) (hU : U ≤ Submodule.span ℂ (j '' (U.comap j))) :
-    U.comap j' = Submodule.span K' (ι '' (U.comap j)) := by
+theorem comap_eq_span
+    (j : V →ₛₗ[σ] W) (j' : V' →ₛₗ[σ'] W) (ι : V → V') (hj : ∀ v, j' (ι v) = j v)
+    {ι' : Type} [Fintype ι']
+    (b' : Basis ι' K' V') (hb : LinearIndependent ℂ fun i => j' (b' i))
+    (U : Submodule ℂ W) (hU : U ≤ Submodule.span ℂ (j '' (U.comap j)))
+    : U.comap j' = Submodule.span K' (ι '' (U.comap j)) := by
   have := Module.Finite.of_basis b'
   have hle : Submodule.span K' (ι '' (U.comap j)) ≤ U.comap j' := by
     rw [Submodule.span_le]
@@ -98,16 +114,17 @@ theorem comap_eq_span (j : V →ₛₗ[σ] W) (j' : V' →ₛₗ[σ'] W) (ι : V
   symm
   apply Submodule.eq_of_le_of_finrank_le hle
   rw [← finrank_span_image j' b' hb, ← finrank_span_image j' b' hb]
-  calc finrank ℂ (Submodule.span ℂ (j' '' (U.comap j'))) ≤ finrank ℂ U := by
-        apply Submodule.finrank_mono
-        rw [Submodule.span_le]
-        rintro _ ⟨v, hv, rfl⟩
-        exact hv
+  calc
+    finrank ℂ (Submodule.span ℂ (j' '' (U.comap j'))) ≤ finrank ℂ U := by
+      apply Submodule.finrank_mono
+      rw [Submodule.span_le]
+      rintro _ ⟨v, hv, rfl⟩
+      exact hv
     _ ≤ finrank ℂ (Submodule.span ℂ (j' '' (Submodule.span K' (ι '' (U.comap j))))) := by
-        apply Submodule.finrank_mono
-        refine hU.trans (Submodule.span_mono ?_)
-        rintro _ ⟨v, hv, rfl⟩
-        exact ⟨ι v, Submodule.subset_span ⟨v, hv, rfl⟩, hj v⟩
+      apply Submodule.finrank_mono
+      refine hU.trans (Submodule.span_mono ?_)
+      rintro _ ⟨v, hv, rfl⟩
+      exact ⟨ι v, Submodule.subset_span ⟨v, hv, rfl⟩, hj v⟩
 
 end Main
 

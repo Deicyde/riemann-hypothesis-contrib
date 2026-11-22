@@ -13,8 +13,8 @@ section Abstract
 
 variable {E : Type*} [Field E] {c : E →+* E} {V : Type*} [AddCommGroup V] [Module E V]
 
-theorem exists_dual_ne_zero (H : Submodule E V) {x y : V} (hx : x ∉ H) (hy : y ∉ H) :
-    ∃ ψ : V →ₗ[E] E, (∀ h ∈ H, ψ h = 0) ∧ ψ x ≠ 0 ∧ ψ y ≠ 0 := by
+theorem exists_dual_ne_zero (H : Submodule E V) {x y : V} (hx : x ∉ H) (hy : y ∉ H)
+    : ∃ ψ : V →ₗ[E] E, (∀ h ∈ H, ψ h = 0) ∧ ψ x ≠ 0 ∧ ψ y ≠ 0 := by
   have kill : ∀ f : Module.Dual E V, H.map f = ⊥ → ∀ h ∈ H, f h = 0 := by
     intro f hf h hh
     have hm : f h ∈ H.map f := Submodule.mem_map_of_mem hh
@@ -33,12 +33,14 @@ theorem exists_dual_ne_zero (H : Submodule E V) {x y : V} (hx : x ∉ H) (hy : y
     · exact ⟨g, hg0, hgx, hgy⟩
   · exact ⟨f, hf0, hfx, hfy⟩
 
-theorem exists_isometry_step (hs : ∀ b : E, c b = b → ∃ s : E, s ≠ 0 ∧ s + c s = b)
-    (hc : ∀ t, c (c t) = t) {B : V →ₗ[E] V →ₛₗ[c] E} (hB : ∀ x y, c (B x y) = B y x)
-    (hrep : ∀ ψ : V →ₗ[E] E, ∃ w, ∀ z, B z w = ψ z) (S : Set V) {x y : V}
-    (hx : x ∉ Submodule.span E S) (hy : y ∉ Submodule.span E S) (hxy : B x x = B y y)
-    (hS : ∀ h ∈ S, B h x = B h y) :
-    ∃ γ : V ≃ₗ[E] V, (∀ z w, B (γ z) (γ w) = B z w) ∧ γ x = y ∧ ∀ h ∈ S, γ h = h := by
+theorem exists_isometry_step
+    (hs : ∀ b : E, c b = b → ∃ s : E, s ≠ 0 ∧ s + c s = b) (hc : ∀ t, c (c t) = t)
+    {B : V →ₗ[E] V →ₛₗ[c] E}
+    (hB : ∀ x y, c (B x y) = B y x) (hrep : ∀ ψ : V →ₗ[E] E, ∃ w, ∀ z, B z w = ψ z)
+    (S : Set V)
+    {x y : V} (hx : x ∉ Submodule.span E S) (hy : y ∉ Submodule.span E S) (hxy : B x x = B y y)
+    (hS : ∀ h ∈ S, B h x = B h y)
+    : ∃ γ : V ≃ₗ[E] V, (∀ z w, B (γ z) (γ w) = B z w) ∧ γ x = y ∧ ∀ h ∈ S, γ h = h := by
   have hSxy : ∀ h ∈ S, B h (x - y) = 0 := fun h hh => by rw [map_sub, hS h hh, sub_self]
   by_cases hne : B x (x - y) = 0
   swap
@@ -48,12 +50,13 @@ theorem exists_isometry_step (hs : ∀ b : E, c b = b → ∃ s : E, s ≠ 0 ∧
   obtain ⟨v, hv⟩ := hrep ψ
   obtain ⟨a, ha, hav⟩ := hs (B v v) (hB v v)
   have hca : c a ≠ 0 := (map_ne_zero c).2 ha
-  have hvS : ∀ h ∈ S, B h v = 0 := fun h hh => by
-    rw [hv]; exact hψH h (Submodule.subset_span hh)
-  obtain ⟨σ, hσq⟩ : ∃ σ : V ≃ₗ[E] V, ∀ z, σ z = quasiRefl B v a z :=
-    ⟨LinearEquiv.ofLinear (quasiRefl B v a) (quasiRefl B v (c a))
+  have hvS : ∀ h ∈ S, B h v = 0 := fun h hh => by rw [hv]; exact hψH h (Submodule.subset_span hh)
+  obtain ⟨σ, hσq⟩ : ∃ σ : V ≃ₗ[E] V, ∀ z, σ z = quasiRefl B v a z := ⟨
+    LinearEquiv.ofLinear (quasiRefl B v a) (quasiRefl B v (c a))
       (LinearMap.ext fun z => quasiRefl_quasiRefl B hca ha (by rw [add_comm]; exact hav) z)
-      (LinearMap.ext fun z => quasiRefl_quasiRefl B ha hca hav z), fun _ => rfl⟩
+      (LinearMap.ext fun z => quasiRefl_quasiRefl B ha hca hav z),
+    fun _ => rfl
+  ⟩
   have hσ : ∀ z w, B (σ z) (σ w) = B z w := fun z w => by
     rw [hσq, hσq]; exact apply_quasiRefl_quasiRefl hB ha hav z w
   have hσS : ∀ h ∈ S, σ h = h := fun h hh => by
@@ -69,8 +72,7 @@ theorem exists_isometry_step (hs : ∀ b : E, c b = b → ∃ s : E, s ≠ 0 ∧
     refine mul_ne_zero (mul_ne_zero (inv_ne_zero ha) (by rw [hv]; exact hψx)) ?_
     rw [← hB y v, hv]
     exact (map_ne_zero c).2 hψy
-  obtain ⟨γ, hγ, hγx, hγu⟩ :=
-    exists_isometry_of_apply_sub_ne_zero hB (by rw [hσ]; exact hxy) hkey
+  obtain ⟨γ, hγ, hγx, hγu⟩ := exists_isometry_of_apply_sub_ne_zero hB (by rw [hσ]; exact hxy) hkey
   refine ⟨σ.trans γ, fun z w => by simp only [LinearEquiv.trans_apply, hγ, hσ], ?_, ?_⟩
   · simp only [LinearEquiv.trans_apply]; exact hγx
   · intro h hh
@@ -81,16 +83,17 @@ theorem exists_isometry_step (hs : ∀ b : E, c b = b → ∃ s : E, s ≠ 0 ∧
     rw [map_sub, e, hS h hh, sub_self]
 
 theorem exists_isometry_of_linearIndependent
-    (hs : ∀ b : E, c b = b → ∃ s : E, s ≠ 0 ∧ s + c s = b)
-    (hc : ∀ t, c (c t) = t) {B : V →ₗ[E] V →ₛₗ[c] E} (hB : ∀ x y, c (B x y) = B y x)
-    (hrep : ∀ ψ : V →ₗ[E] E, ∃ w, ∀ z, B z w = ψ z) {ι : Type*} [Finite ι] {x y : ι → V}
-    (hx : LinearIndependent E x) (hy : LinearIndependent E y)
-    (hxy : ∀ i j, B (x i) (x j) = B (y i) (y j)) :
-    ∃ γ : V ≃ₗ[E] V, (∀ z w, B (γ z) (γ w) = B z w) ∧ ∀ i, γ (x i) = y i := by
+    (hs : ∀ b : E, c b = b → ∃ s : E, s ≠ 0 ∧ s + c s = b) (hc : ∀ t, c (c t) = t)
+    {B : V →ₗ[E] V →ₛₗ[c] E}
+    (hB : ∀ x y, c (B x y) = B y x) (hrep : ∀ ψ : V →ₗ[E] E, ∃ w, ∀ z, B z w = ψ z)
+    {ι : Type*} [Finite ι]
+    {x y : ι → V} (hx : LinearIndependent E x) (hy : LinearIndependent E y)
+    (hxy : ∀ i j, B (x i) (x j) = B (y i) (y j))
+    : ∃ γ : V ≃ₗ[E] V, (∀ z w, B (γ z) (γ w) = B z w) ∧ ∀ i, γ (x i) = y i := by
   classical
   have := Fintype.ofFinite ι
-  suffices H : ∀ s : Finset ι, ∃ γ : V ≃ₗ[E] V, (∀ z w, B (γ z) (γ w) = B z w) ∧
-      ∀ i ∈ s, γ (x i) = y i by
+  suffices H
+      : ∀ s : Finset ι, ∃ γ : V ≃ₗ[E] V, (∀ z w, B (γ z) (γ w) = B z w) ∧ ∀ i ∈ s, γ (x i) = y i by
     obtain ⟨γ, hγ, hγs⟩ := H Finset.univ
     exact ⟨γ, hγ, fun i => hγs i (Finset.mem_univ i)⟩
   intro s
@@ -110,10 +113,12 @@ theorem exists_isometry_of_linearIndependent
     intro hm
     exact hx.notMem_span_image hjs
       ((Submodule.apply_mem_span_image_iff_mem_span (f := (γ : V →ₗ[E] V)) γ.injective).1 hm)
-  obtain ⟨γ₁, hγ₁, hγ₁x, hγ₁S⟩ := exists_isometry_step hs hc hB hrep (y '' ↑s) hxj hyj
-    (by rw [hγ]; exact hxy j j) (by
+  obtain ⟨γ₁, hγ₁, hγ₁x, hγ₁S⟩ :=
+    exists_isometry_step hs hc hB hrep (y '' ↑s) hxj hyj (by rw [hγ]; exact hxy j j) (by
       rintro _ ⟨i, hi, rfl⟩
-      calc B (y i) (γ (x j)) = B (γ (x i)) (γ (x j)) := by rw [hγs i hi]
+      calc
+        B (y i) (γ (x j))
+          = B (γ (x i)) (γ (x j)) := by rw [hγs i hi]
         _ = B (x i) (x j) := hγ _ _
         _ = B (y i) (y j) := hxy i j)
   refine ⟨γ.trans γ₁, fun z w => by simp only [LinearEquiv.trans_apply, hγ₁, hγ], ?_⟩
@@ -125,8 +130,9 @@ theorem exists_isometry_of_linearIndependent
 
 end Abstract
 
-theorem linearIndependent_col_of_rank {K : Type*} [Field K] {n a : ℕ}
-    {X : Matrix (Fin n) (Fin a) K} (h : X.rank = a) : LinearIndependent K X.col := by
+theorem linearIndependent_col_of_rank
+    {K : Type*} [Field K] {n a : ℕ} {X : Matrix (Fin n) (Fin a) K} (h : X.rank = a)
+    : LinearIndependent K X.col := by
   rw [linearIndependent_iff_card_eq_finrank_span, Fintype.card_fin]
   rw [Matrix.rank_eq_finrank_span_cols] at h
   exact h.symm
@@ -161,11 +167,12 @@ private lemma eq_zero_of_mulVec_eq_zero_of_linearIndependent_col {K : Type} [Fie
   funext j
   exact Fintype.linearIndependent_iff.1 hX v h j
 
-theorem exists_isometry_mul_eq (K : Type) [Field K] [StarRing K] (θ : K) (hθ : θ + star θ = 1)
+theorem exists_isometry_mul_eq
+    (K : Type) [Field K] [StarRing K]
+    (θ : K) (hθ : θ + star θ = 1)
     (n a : ℕ) (J : Matrix (Fin n) (Fin n) K) (X Y : Matrix (Fin n) (Fin a) K) (hJ : Jᴴ = J)
-    (hdet : IsUnit J.det) (hX : X.rank = a) (hY : Y.rank = a)
-    (hXY : Xᴴ * J * X = Yᴴ * J * Y) :
-    ∃ g : Matrix (Fin n) (Fin n) K, gᴴ * J * g = J ∧ g * X = Y := by
+    (hdet : IsUnit J.det) (hX : X.rank = a) (hY : Y.rank = a) (hXY : Xᴴ * J * X = Yᴴ * J * Y)
+    : ∃ g : Matrix (Fin n) (Fin n) K, gᴴ * J * g = J ∧ g * X = Y := by
   have hXl := linearIndependent_col_of_rank hX
   have hYl := linearIndependent_col_of_rank hY
   by_cases h2 : (2 : K) = 0
@@ -177,9 +184,10 @@ theorem exists_isometry_mul_eq (K : Type) [Field K] [StarRing K] (θ : K) (hθ :
         ← dotProduct_mulVec, hJ]
     have hrep : ∀ ψ : (Fin n → K) →ₗ[K] K, ∃ w, ∀ z, B z w = ψ z := by
       intro ψ
-      obtain ⟨r, hr⟩ : ∃ r : Fin n → K, ∀ z, ψ z = r ⬝ᵥ z :=
-        ⟨fun k => ψ (fun j => if k = j then 1 else 0), fun z => by
-          rw [LinearMap.pi_apply_eq_sum_univ ψ z]; simp [dotProduct, mul_comm]⟩
+      obtain ⟨r, hr⟩ : ∃ r : Fin n → K, ∀ z, ψ z = r ⬝ᵥ z := ⟨
+        fun k => ψ (fun j => if k = j then 1 else 0),
+        fun z => by rw [LinearMap.pi_apply_eq_sum_univ ψ z]; simp [dotProduct, mul_comm]
+      ⟩
       refine ⟨star ((Jᵀ)⁻¹ *ᵥ r), fun z => ?_⟩
       have hdT : IsUnit Jᵀ.det := by rwa [det_transpose]
       rw [hBd, hr, star_star, dotProduct_mulVec, ← mulVec_transpose, mulVec_mulVec,
@@ -207,8 +215,9 @@ theorem exists_isometry_mul_eq (K : Type) [Field K] [StarRing K] (θ : K) (hθ :
       rw [entry_lemma_2, hcol, hcol, ← hBd, hγ, hBd]
       simp
     · ext i j
-      have e : (LinearMap.toMatrix' (γ : (Fin n → K) →ₗ[K] (Fin n → K)) * X).col j =
-          LinearMap.toMatrix' (γ : (Fin n → K) →ₗ[K] (Fin n → K)) *ᵥ X.col j := by
+      have e
+          : (LinearMap.toMatrix' (γ : (Fin n → K) →ₗ[K] (Fin n → K)) * X).col j
+            = LinearMap.toMatrix' (γ : (Fin n → K) →ₗ[K] (Fin n → K)) *ᵥ X.col j := by
         ext k
         simp [Matrix.col, Matrix.mul_apply, Matrix.mulVec, dotProduct]
       rw [LinearMap.toMatrix'_mulVec] at e

@@ -131,50 +131,94 @@ private lemma pairing_mem_intV_of_mem_dualSet (σ : E →ₐ[F] E) (w : HeightOn
     convert mul_mem (sigR_mem_intV' σ w c.2) ha using 1
     simp [Subring.smul_def, map_mul, Finset.mul_sum, mul_assoc]
 
-
 open NumberField IsDedekindDomain Matrix in
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.Mem.LevDual.unitary_carry_dual : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (w : HeightOneSpectrum (𝓞 F)) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (L : Submodule (𝓞 E) (Fin n → E)) (p : 𝓞 E), J = 1 → p ≠ 0 → (∀ x, x ∈ L ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → p ∣ r)) → ∀ (L' : Submodule (𝓞 E) (Fin n → E)) (Y : GL (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F))), Y ∈ _root_.Formalism.UG.UPts σ J (FiniteAdeleRing (𝓞 F) F) → (∀ x : Fin n → TensorProduct F E (FiniteAdeleRing (𝓞 F) F), x ∈ _root_.Formalism.UG.latS (F := F) (FiniteAdeleRing (𝓞 F) F) (_root_.Formalism.UG.tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (_root_.Formalism.UG.intOE E) (_root_.Formalism.UG.intAd F)) L' ↔ ((Y⁻¹ : GL (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F))) : Matrix (Fin n) (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F))) *ᵥ x ∈ _root_.Formalism.UG.latS (F := F) (FiniteAdeleRing (𝓞 F) F) (_root_.Formalism.UG.tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (_root_.Formalism.UG.intOE E) (_root_.Formalism.UG.intAd F)) L) → ∀ z ∈ _root_.Formalism.BasicNotions.dualSet (σ : E →+* E) J L', ((_root_.Formalism.UG.bc (_root_.Formalism.UG.prV (E := E) w) Y)⁻¹).1 *ᵥ (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (z a)) ∈ _root_.Formalism.UG.latS (F := F) (w.adicCompletion F) (_root_.Formalism.BasicNotions.intV E w) (Submodule.span (𝓞 E) (_root_.Formalism.BasicNotions.dualSet (σ : E →+* E) J L)) := by
+theorem _root_.GlobalTheory.Mem.LevDual.unitary_carry_dual
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (w : HeightOneSpectrum (𝓞 F)) (n : ℕ) (J : Matrix (Fin n) (Fin n) E)
+        (L : Submodule (𝓞 E) (Fin n → E)) (p : 𝓞 E),
+      J = 1 → p ≠ 0 → (∀ x, x ∈ L ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → p ∣ r))
+        → ∀ (L' : Submodule (𝓞 E) (Fin n → E))
+            (Y : GL (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F))),
+          Y ∈ _root_.Formalism.UG.UPts σ J (FiniteAdeleRing (𝓞 F) F)
+            → (∀ x : Fin n → TensorProduct F E (FiniteAdeleRing (𝓞 F) F),
+              x ∈ _root_.Formalism.UG.latS (F := F) (FiniteAdeleRing (𝓞 F) F)
+                  (_root_.Formalism.UG.tensInt (F := F) (FiniteAdeleRing (𝓞 F) F)
+                    (_root_.Formalism.UG.intOE E) (_root_.Formalism.UG.intAd F))
+                  L'
+                ↔ ((Y⁻¹ : GL (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F)))
+                      : Matrix (Fin n) (Fin n) (TensorProduct F E (FiniteAdeleRing (𝓞 F) F)))
+                    *ᵥ x
+                  ∈ _root_.Formalism.UG.latS (F := F) (FiniteAdeleRing (𝓞 F) F)
+                    (_root_.Formalism.UG.tensInt (F := F) (FiniteAdeleRing (𝓞 F) F)
+                      (_root_.Formalism.UG.intOE E) (_root_.Formalism.UG.intAd F))
+                    L)
+            → ∀ z ∈ _root_.Formalism.BasicNotions.dualSet (σ : E →+* E) J L',
+              ((_root_.Formalism.UG.bc (_root_.Formalism.UG.prV (E := E) w) Y)⁻¹).1
+                  *ᵥ (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (z a))
+                ∈ _root_.Formalism.UG.latS (F := F) (w.adicCompletion F)
+                  (_root_.Formalism.BasicNotions.intV E w)
+                  (Submodule.span (𝓞 E)
+                    (_root_.Formalism.BasicNotions.dualSet (σ : E →+* E) J L)) := by
   intro F E _ _ _ _ _ σ w n J L p hJ hp hL L' Y hY hLat z hz
   subst hJ
   cases n with
-  | zero =>
-    convert Submodule.zero_mem _ using 1
+  | zero => convert Submodule.zero_mem _ using 1
   | succ m =>
     set Yw := _root_.Formalism.UG.bc (_root_.Formalism.UG.prV (E := E) w) Y with hYw_def
-    have hYwU : Yw ∈ _root_.Formalism.UG.UPts σ 1 (w.adicCompletion F) := _root_.Formalism.UG.P.afsplit_bc_mem σ 1 w Y hY
-    have hunit : _root_.Formalism.UG.cT (_root_.Formalism.UG.sigR σ (w.adicCompletion F)) (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) *
-        (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) = 1 := by
+    have hYwU : Yw ∈ _root_.Formalism.UG.UPts σ 1 (w.adicCompletion F) :=
+      _root_.Formalism.UG.P.afsplit_bc_mem σ 1 w Y hY
+    have hunit
+        : _root_.Formalism.UG.cT (_root_.Formalism.UG.sigR σ (w.adicCompletion F))
+              (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+            * (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+          = 1 := by
       have h := hYwU
       unfold _root_.Formalism.UG.UPts _root_.Formalism.UG.UJ at h
       change _ * _ * _ = _ at h
       rwa [Matrix.map_one _ (map_zero _) (map_one _), mul_one] at h
-    have hinv : ((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F)) :
-        Matrix (Fin (m + 1)) (Fin (m + 1)) _) =
-        _root_.Formalism.UG.cT (_root_.Formalism.UG.sigR σ (w.adicCompletion F)) (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) := by
-      calc ((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F)) :
-            Matrix (Fin (m + 1)) (Fin (m + 1)) _)
-          = (_root_.Formalism.UG.cT (_root_.Formalism.UG.sigR σ (w.adicCompletion F)) (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) *
-              (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _)) * ((Yw⁻¹ : GL (Fin (m + 1)) _) :
-                Matrix (Fin (m + 1)) (Fin (m + 1)) _) := by rw [hunit, one_mul]
+    have hinv
+        : ((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F))
+            : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+          = _root_.Formalism.UG.cT (_root_.Formalism.UG.sigR σ (w.adicCompletion F))
+            (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) := by
+      calc
+        ((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F))
+              : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+            = (_root_.Formalism.UG.cT (_root_.Formalism.UG.sigR σ (w.adicCompletion F))
+                  (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+                * (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _))
+              * ((Yw⁻¹ : GL (Fin (m + 1)) _) : Matrix (Fin (m + 1)) (Fin (m + 1)) _) := by
+          rw [hunit, one_mul]
         _ = _ := by rw [mul_assoc, Units.mul_inv, mul_one]
     set v : Fin (m + 1) → E ⊗[F] w.adicCompletion F :=
       fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (z a) with hv
-    have hu_apply : ∀ i, (((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F)) :
-        Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ v) i =
-        ∑ j, _root_.Formalism.UG.sigR σ (w.adicCompletion F) ((Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) j i) * v j := by
-      intro i
-      rw [hinv]
-      unfold _root_.Formalism.UG.cT
-      simp [Matrix.mulVec, dotProduct]
-    have hcol : ∀ x ∈ L, (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ
-        (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (x a)) ∈
-        _root_.Formalism.UG.latS (F := F) (w.adicCompletion F) (_root_.Formalism.BasicNotions.intV E w) L' := by
+    have hu_apply
+        : ∀ i,
+          (((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F))
+                  : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+                *ᵥ v)
+              i
+            = ∑ j, _root_.Formalism.UG.sigR σ (w.adicCompletion F) ((Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) j i) * v j :=
+      by
+        intro i
+        rw [hinv]
+        unfold _root_.Formalism.UG.cT
+        simp [Matrix.mulVec, dotProduct]
+    have hcol
+        : ∀ x ∈ L,
+          (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+              *ᵥ (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (x a))
+            ∈ _root_.Formalism.UG.latS (F := F) (w.adicCompletion F)
+              (_root_.Formalism.BasicNotions.intV E w) L' := by
       intro x hx
-      have hA : (Y : Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ
-          (fun a => _root_.Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (x a)) ∈
-          _root_.Formalism.UG.latS (F := F) (FiniteAdeleRing (𝓞 F) F)
-            (_root_.Formalism.UG.tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (_root_.Formalism.UG.intOE E) (_root_.Formalism.UG.intAd F)) L' := by
+      have hA
+          : (Y : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+              *ᵥ (fun a => _root_.Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (x a))
+            ∈ _root_.Formalism.UG.latS (F := F) (FiniteAdeleRing (𝓞 F) F)
+              (_root_.Formalism.UG.tensInt (F := F) (FiniteAdeleRing (𝓞 F) F)
+                (_root_.Formalism.UG.intOE E) (_root_.Formalism.UG.intAd F))
+              L' := by
         rw [hLat, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
           Matrix.one_mulVec]
         exact Submodule.subset_span ⟨x, hx, rfl⟩
@@ -201,28 +245,43 @@ theorem _root_.GlobalTheory.Mem.LevDual.unitary_carry_dual : ∀ (F E : Type) [F
       · subst hj
         exact ⟨p, by simp, fun _ => dvd_refl _⟩
       · exact ⟨0, by simp [hj], fun _ => dvd_zero p⟩
-    have hcoef_low : ∀ i, i ≠ Fin.last m → (((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F)) :
-        Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ v) i ∈ _root_.Formalism.BasicNotions.intV (F := F) E w := by
+    have hcoef_low
+        : ∀ i,
+          i ≠ Fin.last m
+            → (((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F))
+                    : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+                  *ᵥ v)
+                i
+              ∈ _root_.Formalism.BasicNotions.intV (F := F) E w := by
       intro i hi
       have h := pairing_mem_intV_of_mem_dualSet σ w L' hz (hcol _ (hsingle i hi))
       rw [hu_apply]
       convert h using 2 with j
       congr 2
       simp [Matrix.mulVec, dotProduct, Pi.single_apply]
-    have hcoef_last : _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (σ (p : E)) *
-        (((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F)) :
-        Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ v) (Fin.last m) ∈ _root_.Formalism.BasicNotions.intV (F := F) E w := by
+    have hcoef_last
+        : _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (σ (p : E))
+            * (((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F))
+                  : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+                *ᵥ v)
+              (Fin.last m)
+          ∈ _root_.Formalism.BasicNotions.intV (F := F) E w := by
       have h := pairing_mem_intV_of_mem_dualSet σ w L' hz (hcol _ hpL)
       rw [hu_apply, Finset.mul_sum]
       convert h using 2 with j
-      have hc : ((Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ
-          (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F)
-            ((Pi.single (Fin.last m) (p : E) : Fin (m + 1) → E) a))) j =
-          (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) j (Fin.last m) *
-            _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (p : E) := by
-        have hv' : (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F)
-            ((Pi.single (Fin.last m) (p : E) : Fin (m + 1) → E) a)) =
-            Pi.single (Fin.last m) (_root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (p : E)) := by
+      have hc
+          : ((Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ (fun a =>
+                _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F)
+                  ((Pi.single (Fin.last m) (p : E) : Fin (m + 1) → E) a)))
+              j
+            = (Yw : Matrix (Fin (m + 1)) (Fin (m + 1)) _) j (Fin.last m)
+              * _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (p : E) := by
+        have hv'
+            : (fun a =>
+                _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F)
+                  ((Pi.single (Fin.last m) (p : E) : Fin (m + 1) → E) a))
+              = Pi.single (Fin.last m)
+                (_root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (p : E)) := by
           funext a
           by_cases ha : a = Fin.last m
           · subst ha
@@ -231,13 +290,18 @@ theorem _root_.GlobalTheory.Mem.LevDual.unitary_carry_dual : ∀ (F E : Type) [F
         rw [hv']
         simp [Matrix.mulVec, dotProduct, Pi.single_apply]
       rw [hc, map_mul]
-      have hs : _root_.Formalism.UG.sigR σ (w.adicCompletion F) (_root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (p : E)) =
-          _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (σ (p : E)) := by
+      have hs
+          : _root_.Formalism.UG.sigR σ (w.adicCompletion F)
+              (_root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (p : E))
+            = _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (σ (p : E)) := by
         unfold _root_.Formalism.UG.sigR _root_.Formalism.UG.inclE
         simp
       rw [hs]
       ring
-    have hd_single : ∀ i, (Pi.single i 1 : Fin (m + 1) → E) ∈ _root_.Formalism.BasicNotions.dualSet (σ : E →+* E) 1 L := by
+    have hd_single
+        : ∀ i,
+          (Pi.single i 1 : Fin (m + 1) → E)
+            ∈ _root_.Formalism.BasicNotions.dualSet (σ : E →+* E) 1 L := by
       intro i
       show ∀ x ∈ L, _root_.Formalism.UG.hform (σ : E →+* E) 1 x _ ∈ (algebraMap (𝓞 E) E).range
       intro x hx
@@ -274,26 +338,29 @@ theorem _root_.GlobalTheory.Mem.LevDual.unitary_carry_dual : ∀ (F E : Type) [F
         exact hd_single i
     let c : Fin (m + 1) → _root_.Formalism.BasicNotions.intV (F := F) E w := fun i =>
       if h : i = Fin.last m then ⟨_, hcoef_last⟩ else ⟨_, hcoef_low i h⟩
-    have hsum : ((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F)) :
-        Matrix (Fin (m + 1)) (Fin (m + 1)) _) *ᵥ v =
-        ∑ i, c i • (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (d i a)) := by
-      funext k
-      rw [Finset.sum_apply, Finset.sum_eq_single k]
-      · by_cases hk : k = Fin.last m
-        · subst hk
-          simp only [c, d, dif_pos, if_pos, Pi.smul_apply, Subring.smul_def, smul_eq_mul, he0_def,
-            Pi.single_eq_same]
-          rw [mul_comm, ← mul_assoc, ← map_mul, inv_mul_cancel₀ hq, map_one, one_mul]
-        · simp [c, d, hk, Subring.smul_def]
-      · intro b _ hb
-        by_cases hbl : b = Fin.last m
-        · subst hbl
-          simp [c, d, he0_def, Pi.single_apply, Ne.symm hb, Subring.smul_def]
-        · simp [c, d, hbl, Pi.single_apply, Ne.symm hb, Subring.smul_def]
-      · intro h
-        exact absurd (Finset.mem_univ k) h
+    have hsum
+        : ((Yw⁻¹ : GL (Fin (m + 1)) (E ⊗[F] w.adicCompletion F))
+              : Matrix (Fin (m + 1)) (Fin (m + 1)) _)
+            *ᵥ v
+          = ∑ i, c i • (fun a => _root_.Formalism.UG.inclE (F := F) (w.adicCompletion F) (d i a)) :=
+      by
+        funext k
+        rw [Finset.sum_apply, Finset.sum_eq_single k]
+        · by_cases hk : k = Fin.last m
+          · subst hk
+            simp only [c, d, dif_pos, if_pos, Pi.smul_apply, Subring.smul_def, smul_eq_mul, he0_def,
+              Pi.single_eq_same]
+            rw [mul_comm, ← mul_assoc, ← map_mul, inv_mul_cancel₀ hq, map_one, one_mul]
+          · simp [c, d, hk, Subring.smul_def]
+        · intro b _ hb
+          by_cases hbl : b = Fin.last m
+          · subst hbl
+            simp [c, d, he0_def, Pi.single_apply, Ne.symm hb, Subring.smul_def]
+          · simp [c, d, hbl, Pi.single_apply, Ne.symm hb, Subring.smul_def]
+        · intro h
+          exact absurd (Finset.mem_univ k) h
     rw [hsum]
-    exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _
-      (Submodule.subset_span ⟨d i, Submodule.subset_span (hd i), rfl⟩)
+    exact Submodule.sum_mem _ fun i _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨d i, Submodule.subset_span (hd i), rfl⟩)
 
 end GlobalTheory.Mem.LevDual

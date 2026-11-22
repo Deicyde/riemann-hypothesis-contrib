@@ -6,22 +6,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsMonHomProd
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc GlobalTheory.ActFin
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem closedSubscheme_iInter_exists :
-    ∀ (H : Scheme.{0}) (Idx : Type) [Finite Idx] (Z : Idx → Scheme.{0}) (i : ∀ k, Z k ⟶ H),
-      (∀ k, IsClosedImmersion (i k)) → ∃ (Z₀ : Scheme.{0}) (i₀ : Z₀ ⟶ H), IsClosedImmersion i₀ ∧
-        ∀ (T : Scheme.{0}) (h : T ⟶ H), (∃ z, z ≫ i₀ = h) ↔ ∀ k, ∃ z, z ≫ i k = h := by
+theorem closedSubscheme_iInter_exists
+    : ∀ (H : Scheme.{0}) (Idx : Type) [Finite Idx] (Z : Idx → Scheme.{0}) (i : ∀ k, Z k ⟶ H),
+      (∀ k, IsClosedImmersion (i k))
+        → ∃ (Z₀ : Scheme.{0}) (i₀ : Z₀ ⟶ H),
+          IsClosedImmersion i₀
+            ∧ ∀ (T : Scheme.{0}) (h : T ⟶ H), (∃ z, z ≫ i₀ = h) ↔ ∀ k, ∃ z, z ≫ i k = h := by
   intro H Idx _ Z i hi
   revert Z i hi
   refine Finite.induction_empty_option
-    (P := fun (α : Type) => ∀ (Z : α → Scheme.{0}) (i : ∀ k, Z k ⟶ H),
-      (∀ k, IsClosedImmersion (i k)) → ∃ (Z₀ : Scheme.{0}) (i₀ : Z₀ ⟶ H), IsClosedImmersion i₀ ∧
-        ∀ (T : Scheme.{0}) (h : T ⟶ H), (∃ z, z ≫ i₀ = h) ↔ ∀ k, ∃ z, z ≫ i k = h)
+    (P := fun (α : Type) =>
+      ∀ (Z : α → Scheme.{0}) (i : ∀ k, Z k ⟶ H),
+        (∀ k, IsClosedImmersion (i k))
+          → ∃ (Z₀ : Scheme.{0}) (i₀ : Z₀ ⟶ H),
+            IsClosedImmersion i₀
+              ∧ ∀ (T : Scheme.{0}) (h : T ⟶ H), (∃ z, z ≫ i₀ = h) ↔ ∀ k, ∃ z, z ≫ i k = h)
     ?_ ?_ ?_ Idx
   · intro α β e ih Z i hi
     obtain ⟨Z₀, i₀, h₀, hp⟩ := ih (fun a => Z (e a)) (fun a => i (e a)) (fun a => hi (e a))
@@ -42,6 +48,7 @@ theorem closedSubscheme_iInter_exists :
       · rw [Category.assoc, ← Limits.pullback.condition]
       · rfl
     · rintro ⟨⟨z₂, h₂⟩, ⟨z₁, h₁⟩⟩
-      exact ⟨Limits.pullback.lift z₁ z₂ (h₁.trans h₂.symm), by rw [Limits.pullback.lift_fst_assoc, h₁]⟩
+      exact
+        ⟨Limits.pullback.lift z₁ z₂ (h₁.trans h₂.symm), by rw [Limits.pullback.lift_fst_assoc, h₁]⟩
 
 end GlobalTheory

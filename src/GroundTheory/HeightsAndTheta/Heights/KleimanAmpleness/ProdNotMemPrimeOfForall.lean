@@ -18,9 +18,11 @@ section Between
 
 variable {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω]
 
-theorem prod_notMem_prime_of_forall {K : Type} [Fintype K] {A : Subalgebra S Ω} {p : Ideal A} (hp : p.IsPrime)
-    (f : K → Ω) (hf : ∀ k, f k ∈ A) (hnot : ∀ k, (⟨f k, hf k⟩ : A) ∉ p) :
-    (⟨∏ k, f k, prod_mem fun k _ => hf k⟩ : A) ∉ p := by
+theorem prod_notMem_prime_of_forall
+    {K : Type} [Fintype K]
+    {A : Subalgebra S Ω} {p : Ideal A} (hp : p.IsPrime)
+    (f : K → Ω) (hf : ∀ k, f k ∈ A) (hnot : ∀ k, (⟨f k, hf k⟩ : A) ∉ p)
+    : (⟨∏ k, f k, prod_mem fun k _ => hf k⟩ : A) ∉ p := by
   have := hp
   have h : (⟨∏ k, f k, prod_mem fun k _ => hf k⟩ : A) = ∏ k, (⟨f k, hf k⟩ : A) :=
     Subtype.ext (by simp)
@@ -30,13 +32,24 @@ theorem prod_notMem_prime_of_forall {K : Type} [Fintype K] {A : Subalgebra S Ω}
 
 variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
 
-theorem blockRing_between (y : (Σ k, ι k) → Ω) (k₀ : K) (j : ι k₀) (c : ∀ k, ι k) (hcj : c k₀ = j)
-    (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) (w : ∀ k, ι k → Ω)
-    (hw : ∀ k a b, y ⟨k, a⟩ * w k b ∈
-      chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀)) (fun _ => j))
-    (b : ∀ k, ι k) :
-    chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀)) (fun _ => j) ≤ chartRingOver S y c ∧
-      chartRingOver S y c ≤ powMulMem _ (∏ k, y ⟨k, c k⟩ * w k (b k)) (prod_mem fun k _ => hw k (c k) (b k)) := by
+theorem blockRing_between
+    (y : (Σ k, ι k) → Ω)
+    (k₀ : K) (j : ι k₀)
+    (c : ∀ k, ι k) (hcj : c k₀ = j) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    (w : ∀ k, ι k → Ω)
+    (hw : ∀ k a b,
+      y ⟨k, a⟩ * w k b ∈ chartRingOver S
+        (IndefiniteRowSideFullHecke.Kleiman2.oneBlock (IndefiniteRowSideFullHecke.Kleiman2.blockVec
+          y k₀))
+        (fun _ => j))
+    (b : ∀ k, ι k)
+    : chartRingOver S
+          (IndefiniteRowSideFullHecke.Kleiman2.oneBlock
+            (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀))
+          (fun _ => j)
+        ≤ chartRingOver S y c
+      ∧ chartRingOver S y c
+        ≤ powMulMem _ (∏ k, y ⟨k, c k⟩ * w k (b k)) (prod_mem fun k _ => hw k (c k) (b k)) := by
   subst hcj
   refine ⟨?_, ?_⟩
   · refine Algebra.adjoin_le ?_
@@ -46,8 +59,9 @@ theorem blockRing_between (y : (Σ k, ι k) → Ω) (k₀ : K) (j : ι k₀) (c 
     rintro _ ⟨⟨k, a⟩, rfl⟩
     refine ⟨1, ?_⟩
     have hk := hc k
-    have h : (∏ k', y ⟨k', c k'⟩ * w k' (b k')) ^ 1 * (y ⟨k, a⟩ / y ⟨k, c k⟩) =
-        y ⟨k, a⟩ * w k (b k) * ∏ k' ∈ Finset.univ.erase k, y ⟨k', c k'⟩ * w k' (b k') := by
+    have h
+        : (∏ k', y ⟨k', c k'⟩ * w k' (b k')) ^ 1 * (y ⟨k, a⟩ / y ⟨k, c k⟩)
+          = y ⟨k, a⟩ * w k (b k) * ∏ k' ∈ Finset.univ.erase k, y ⟨k', c k'⟩ * w k' (b k') := by
       rw [pow_one, ← Finset.mul_prod_erase _ _ (Finset.mem_univ k)]
       field_simp
     rw [h]

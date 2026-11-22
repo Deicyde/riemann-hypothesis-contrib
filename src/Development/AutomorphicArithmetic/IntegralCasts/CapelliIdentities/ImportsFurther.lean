@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DYdd7.main :
-    ∀ {l : ℕ} (f : ℕ → ℚ),
-      (∀ (k : ℕ), f (k + l) = f k) → ∀ (a : ℕ), ∑ k ∈ Finset.range l, f (a + k) = ∑ k ∈ Finset.range l, f k := by
+theorem UpperTheory.Reformulated.B.DYdd7.main
+    : ∀ {l : ℕ} (f : ℕ → ℚ),
+      (∀ (k : ℕ), f (k + l) = f k)
+        → ∀ (a : ℕ), ∑ k ∈ Finset.range l, f (a + k) = ∑ k ∈ Finset.range l, f k := by
   intro l f hf a
   induction a with
   | zero => simp

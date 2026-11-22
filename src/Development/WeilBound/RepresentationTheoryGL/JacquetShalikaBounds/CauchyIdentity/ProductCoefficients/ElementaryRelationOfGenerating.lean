@@ -23,8 +23,8 @@ theorem geom_mul (a : ℂ) : (PowerSeries.mk fun n => a ^ n : PowerSeries ℂ) *
   · rw [coeff_succ_mul_X, coeff_mul_C, coeff_mk, coeff_mk, coeff_one]
     simp [pow_succ]
 
-theorem coeff_prod_geom (α : Fin m → ℂ) (p : ℕ) :
-    coeff p (∏ i, (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ)) = hN p α := by
+theorem coeff_prod_geom (α : Fin m → ℂ) (p : ℕ)
+    : coeff p (∏ i, (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ)) = hN p α := by
   classical
   rw [coeff_prod, hN]
   refine Finset.sum_nbij' (fun l => ⇑l) (fun f => Finsupp.equivFunOnFinite.symm f) ?_ ?_ ?_ ?_ ?_
@@ -43,19 +43,22 @@ theorem coeff_prod_geom (α : Fin m → ℂ) (p : ℕ) :
   · intro l _
     simp [coeff_mk]
 
-theorem key (α : Fin m → ℂ) :
-    (PowerSeries.mk fun p => hN p α : PowerSeries ℂ) * ∏ i, (1 - C (α i) * X) = 1 := by
-  have h1 : (PowerSeries.mk fun p => hN p α : PowerSeries ℂ) = ∏ i, (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ) := by
+theorem key (α : Fin m → ℂ)
+    : (PowerSeries.mk fun p => hN p α : PowerSeries ℂ) * ∏ i, (1 - C (α i) * X) = 1 := by
+  have h1
+      : (PowerSeries.mk fun p => hN p α : PowerSeries ℂ)
+        = ∏ i, (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ) := by
     ext p
     rw [coeff_mk, coeff_prod_geom]
   rw [h1, ← Finset.prod_mul_distrib]
   exact Finset.prod_eq_one fun i _ => geom_mul (α i)
 
-theorem coeff_prod_one_sub (s : Finset (Fin m)) (α : Fin m → ℂ) (b : ℕ) :
-    coeff b (∏ l ∈ s, (1 - C (α l) * X : PowerSeries ℂ)) =
-      (-1) ^ b * ∑ S ∈ s.powersetCard b, ∏ l ∈ S, α l := by
-  have e : ∏ l ∈ s, (1 - C (α l) * X : PowerSeries ℂ) =
-      ∑ t ∈ s.powerset, C (∏ l ∈ t, -α l) * X ^ t.card := by
+theorem coeff_prod_one_sub (s : Finset (Fin m)) (α : Fin m → ℂ) (b : ℕ)
+    : coeff b (∏ l ∈ s, (1 - C (α l) * X : PowerSeries ℂ))
+      = (-1) ^ b * ∑ S ∈ s.powersetCard b, ∏ l ∈ S, α l := by
+  have e
+      : ∏ l ∈ s, (1 - C (α l) * X : PowerSeries ℂ)
+        = ∑ t ∈ s.powerset, C (∏ l ∈ t, -α l) * X ^ t.card := by
     rw [show (∏ l ∈ s, (1 - C (α l) * X : PowerSeries ℂ)) = ∏ l ∈ s, (C (-α l) * X + 1) from
       prod_congr rfl (fun l _ => by rw [map_neg]; ring)]
     rw [prod_add]
@@ -90,18 +93,24 @@ theorem hZ_of_lt (α : Fin m → ℂ) {p r : ℕ} (h : p < r) : hZ ((p : ℤ) - 
   simp only [hZ]
   rw [if_pos (by omega)]
 
-theorem coeff_eq (α : Fin m → ℂ) (i : Fin m) (p : ℕ) :
-    α i ^ p = ∑ k ∈ range (p + 1), hN k α * ((-1) ^ (p - k) * eEx α i (p - k)) := by
+theorem coeff_eq (α : Fin m → ℂ) (i : Fin m) (p : ℕ)
+    : α i ^ p = ∑ k ∈ range (p + 1), hN k α * ((-1) ^ (p - k) * eEx α i (p - k)) := by
   classical
-  have hsplit : (∏ l, (1 - C (α l) * X : PowerSeries ℂ)) =
-      (1 - C (α i) * X) * ∏ l ∈ univ.erase i, (1 - C (α l) * X) :=
+  have hsplit
+      : (∏ l, (1 - C (α l) * X : PowerSeries ℂ))
+        = (1 - C (α i) * X) * ∏ l ∈ univ.erase i, (1 - C (α l) * X) :=
     (Finset.mul_prod_erase univ _ (mem_univ i)).symm
-  have hg : (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ) =
-      (PowerSeries.mk fun p => hN p α) * ∏ l ∈ univ.erase i, (1 - C (α l) * X) := by
-    calc (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ)
-        = (PowerSeries.mk fun n => α i ^ n) * ((PowerSeries.mk fun p => hN p α) * ∏ l, (1 - C (α l) * X)) := by rw [key, mul_one]
-      _ = ((PowerSeries.mk fun n => α i ^ n) * (1 - C (α i) * X)) *
-            ((PowerSeries.mk fun p => hN p α) * ∏ l ∈ univ.erase i, (1 - C (α l) * X)) := by rw [hsplit]; ring
+  have hg
+      : (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ)
+        = (PowerSeries.mk fun p => hN p α) * ∏ l ∈ univ.erase i, (1 - C (α l) * X) := by
+    calc
+      (PowerSeries.mk fun n => α i ^ n : PowerSeries ℂ)
+          = (PowerSeries.mk fun n => α i ^ n)
+            * ((PowerSeries.mk fun p => hN p α) * ∏ l, (1 - C (α l) * X)) := by
+        rw [key, mul_one]
+      _ = ((PowerSeries.mk fun n => α i ^ n) * (1 - C (α i) * X))
+          * ((PowerSeries.mk fun p => hN p α) * ∏ l ∈ univ.erase i, (1 - C (α l) * X)) := by
+        rw [hsplit]; ring
       _ = _ := by rw [geom_mul, one_mul]
   have hc := congrArg (coeff p) hg
   rw [coeff_mk, coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk] at hc
@@ -115,16 +124,22 @@ end ElementarySymmetricRelation
 open ElementarySymmetricRelation in
 theorem elementary_relation_of_generating : HGen → ERel := by
   intro _ m α i p
-  have hF1 : ∑ r ∈ range (p + 1), (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α =
-      ∑ r ∈ range (p + 1 + m), (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α :=
-    sum_subset (fun x hx => by simp only [mem_range] at hx ⊢; omega) (fun r hr hr' => by
-      simp only [mem_range] at hr hr'
-      rw [hZ_of_lt α (show p < r by omega), mul_zero])
-  have hF2 : ∑ r ∈ range m, (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α =
-      ∑ r ∈ range (p + 1 + m), (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α :=
-    sum_subset (fun x hx => by simp only [mem_range] at hx ⊢; omega) (fun r hr hr' => by
-      simp only [mem_range] at hr hr'
-      rw [eEx_eq_zero α i (show m ≤ r by omega), mul_zero, zero_mul])
+  have hF1
+      : ∑ r ∈ range (p + 1), (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α
+        = ∑ r ∈ range (p + 1 + m), (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α :=
+    sum_subset
+      (fun x hx => by simp only [mem_range] at hx ⊢; omega)
+      (fun r hr hr' => by
+        simp only [mem_range] at hr hr'
+        rw [hZ_of_lt α (show p < r by omega), mul_zero])
+  have hF2
+      : ∑ r ∈ range m, (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α
+        = ∑ r ∈ range (p + 1 + m), (-1 : ℂ) ^ r * eEx α i r * hZ ((p : ℤ) - r) α :=
+    sum_subset
+      (fun x hx => by simp only [mem_range] at hx ⊢; omega)
+      (fun r hr hr' => by
+        simp only [mem_range] at hr hr'
+        rw [eEx_eq_zero α i (show m ≤ r by omega), mul_zero, zero_mul])
   rw [hF2, ← hF1, coeff_eq α i p]
   conv_lhs => rw [← sum_range_reflect]
   refine sum_congr rfl (fun j hj => ?_)

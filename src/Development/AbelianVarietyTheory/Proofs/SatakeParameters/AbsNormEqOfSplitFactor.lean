@@ -15,10 +15,13 @@ section Split
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem absNorm_eq_of_split_factor (h2 : Module.finrank F E = 2) {v : HeightOneSpectrum (𝓞 F)} (hv : DegOne v)
-    {P P' : HeightOneSpectrum (𝓞 E)} (hne : P ≠ P')
-    (hm : v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E)) = P.asIdeal * P'.asIdeal) :
-    Ideal.absNorm P.asIdeal = Ideal.absNorm v.asIdeal ∧ ((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2 := by
+theorem absNorm_eq_of_split_factor
+    (h2 : Module.finrank F E = 2)
+    {v : HeightOneSpectrum (𝓞 F)} (hv : DegOne v)
+    {P P' : HeightOneSpectrum (𝓞 E)}
+    (hne : P ≠ P') (hm : v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E)) = P.asIdeal * P'.asIdeal)
+    : Ideal.absNorm P.asIdeal = Ideal.absNorm v.asIdeal
+      ∧ ((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2 := by
   obtain ⟨hq, hq2⟩ := hv
   constructor
   · have hr : Module.finrank (𝓞 F) (𝓞 E) = 2 := by
@@ -42,7 +45,8 @@ theorem absNorm_eq_of_split_factor (h2 : Module.finrank F E = 2) {v : HeightOneS
       exact Ideal.absNorm_mem _
     have h3 := congrArg (Ideal.map (algebraMap (𝓞 F) (𝓞 E))) hI
     rw [Ideal.map_span, Set.image_singleton, map_natCast, Ideal.map_mul, hm, mul_assoc] at h3
-    have h4 : P.asIdeal * P.asIdeal ∣ P.asIdeal * (P'.asIdeal * I.map (algebraMap (𝓞 F) (𝓞 E))) := by
+    have h4
+        : P.asIdeal * P.asIdeal ∣ P.asIdeal * (P'.asIdeal * I.map (algebraMap (𝓞 F) (𝓞 E))) := by
       rw [← h3, ← sq, Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
       exact hmem
     have h5 := (mul_dvd_mul_iff_left P.ne_bot).1 h4
@@ -58,24 +62,26 @@ theorem absNorm_eq_of_split_factor (h2 : Module.finrank F E = 2) {v : HeightOneS
       rw [← Ideal.span_singleton_le_iff_mem, hI, sq]
       exact Ideal.mul_mono_right h6
 
-theorem absNorm_eq_of_splitAt (h2 : Module.finrank F E = 2) {v : HeightOneSpectrum (𝓞 F)} (hs : SplitAt E v)
-    (hv : DegOne v) {Q : HeightOneSpectrum (𝓞 E)} (hQ : Q.asIdeal.under (𝓞 F) = v.asIdeal) :
-    Ideal.absNorm Q.asIdeal = Ideal.absNorm v.asIdeal ∧ ((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 E) ∉ Q.asIdeal ^ 2 := by
+theorem absNorm_eq_of_splitAt
+    (h2 : Module.finrank F E = 2)
+    {v : HeightOneSpectrum (𝓞 F)} (hs : SplitAt E v) (hv : DegOne v)
+    {Q : HeightOneSpectrum (𝓞 E)} (hQ : Q.asIdeal.under (𝓞 F) = v.asIdeal)
+    : Ideal.absNorm Q.asIdeal = Ideal.absNorm v.asIdeal
+      ∧ ((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 E) ∉ Q.asIdeal ^ 2 := by
   obtain ⟨P, P', hne, hm⟩ := hs
-  have h1 : P.asIdeal * P'.asIdeal ≤ Q.asIdeal := by
-    rw [← hm, Ideal.map_le_iff_le_comap, ← hQ]
+  have h1 : P.asIdeal * P'.asIdeal ≤ Q.asIdeal := by rw [← hm, Ideal.map_le_iff_le_comap, ← hQ]
   rcases Q.isPrime.mul_le.1 h1 with h | h
   · obtain rfl : P = Q := HeightOneSpectrum.ext (P.isMaximal.eq_of_le Q.isPrime.ne_top h)
     exact absNorm_eq_of_split_factor h2 hv hne hm
   · obtain rfl : P' = Q := HeightOneSpectrum.ext (P'.isMaximal.eq_of_le Q.isPrime.ne_top h)
     exact absNorm_eq_of_split_factor h2 hv hne.symm (hm.trans (mul_comm _ _))
 
-
 omit [NumberField E] [Field E] [Algebra F E] in
-theorem plc_eq_absNorm {v : HeightOneSpectrum (𝓞 F)} (hq : (Ideal.absNorm v.asIdeal).Prime) :
-    Formalism.EigenvalueLevelCeiling.plc v = Ideal.absNorm v.asIdeal := by
+theorem plc_eq_absNorm {v : HeightOneSpectrum (𝓞 F)} (hq : (Ideal.absNorm v.asIdeal).Prime)
+    : Formalism.EigenvalueLevelCeiling.plc v = Ideal.absNorm v.asIdeal := by
   have h6 : ringChar (𝓞 F ⧸ v.asIdeal) ∣ Ideal.absNorm v.asIdeal := by
-    rw [← ringChar.spec, ← map_natCast (Ideal.Quotient.mk v.asIdeal), Ideal.Quotient.eq_zero_iff_mem]
+    rw [← ringChar.spec, ← map_natCast (Ideal.Quotient.mk v.asIdeal),
+      Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.absNorm_mem _
   have := v.isPrime
   rcases (Nat.dvd_prime hq).1 h6 with h7 | h7
@@ -84,8 +90,11 @@ theorem plc_eq_absNorm {v : HeightOneSpectrum (𝓞 F)} (hq : (Ideal.absNorm v.a
 
 end Split
 
-theorem degOneUnram_of_mem_vG {X : Fields} {Pr : Primes X} (hX : X.Ok) (hPr : Pr.Ok) (i : Fin 2)
-    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ Pr.vG i) : DegOneUnram P := by
+theorem degOneUnram_of_mem_vG
+    {X : Fields} {Pr : Primes X} (hX : X.Ok) (hPr : Pr.Ok)
+    (i : Fin 2)
+    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ Pr.vG i)
+    : DegOneUnram P := by
   have hcc : ∀ x, X.conjO (X.conjO x) = x := fun x => RingOfIntegers.ext (star_star (x : X.E))
   have hE : Module.finrank ℚ X.E = 2 * X.f := by
     rw [← Module.finrank_mul_finrank ℚ X.F X.E, hX.rankE, ← hX.card_Tau, mul_comm]
@@ -93,8 +102,8 @@ theorem degOneUnram_of_mem_vG {X : Fields} {Pr : Primes X} (hX : X.Ok) (hPr : Pr
   have hn : qOf P = Pr.g i := hPr.vG_norm i P hP
   refine ⟨hn ▸ hPr.g_prime i, ?_⟩
   rw [hn]
-  refine GlobalTheory.SplitUnram.natCast_notMem_sq X.E X.conjO (X.conjO (Pr.piG i)) (Pr.g i) hcc (hPr.g_prime i) ?_ ?_ ?_
-    (hPr.vG_norm i) P hP
+  refine GlobalTheory.SplitUnram.natCast_notMem_sq X.E X.conjO (X.conjO (Pr.piG i)) (Pr.g i) hcc
+    (hPr.g_prime i) ?_ ?_ ?_ (hPr.vG_norm i) P hP
   · rw [hcc, mul_comm]; exact hPr.piG_norm i
   · rw [hcc]; exact (hPr.piG_cop i).symm
   · rw [hE, ← hPr.vG_card i]; rfl

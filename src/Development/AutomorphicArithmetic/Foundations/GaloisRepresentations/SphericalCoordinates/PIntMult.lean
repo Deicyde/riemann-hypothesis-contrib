@@ -19,7 +19,8 @@ theorem intMult_of : IntMult := by
     | mem x hx =>
       obtain ⟨u, u', rfl⟩ := hx
       exact ⟨_, hval (ga u) (ga u'), h u u'⟩
-    | zero => exact ⟨0, Iv.zero_mem, by simp⟩
+    | zero =>
+      exact ⟨0, Iv.zero_mem, by simp⟩
     | add a b _ _ iha ihb =>
       obtain ⟨y, hy, e⟩ := iha
       obtain ⟨z, hz, e'⟩ := ihb

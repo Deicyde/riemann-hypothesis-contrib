@@ -20,10 +20,10 @@ open ReciprocityTheory.Gal (H0 H1 H2 Z2 B1 B2 ContAction charRep twDual cup20 TD
 
 section Abstract
 
-variable {n : ℕ} [NeZero n] {G : Type} [Group G] [TopologicalSpace G] {R : Type} [CommRing R] [Finite R]
-  [Algebra (ZMod n) R] [TopologicalSpace R] [DiscreteTopology R]
-
-
+variable
+  {n : ℕ} [NeZero n]
+  {G : Type} [Group G] [TopologicalSpace G]
+  {R : Type} [CommRing R] [Finite R] [Algebra (ZMod n) R] [TopologicalSpace R] [DiscreteTopology R]
 
 end Abstract
 
@@ -47,9 +47,9 @@ private lemma asIdeal_eq_span_of_prime_mem {l : ℕ} [Fact l.Prime] {w : HeightO
     ((Ideal.span_singleton_le_iff_mem _).2 hw)).symm
 
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.OrdLoc.Dcmp.locDeg_rat {l : ℕ} [Fact l.Prime] {v : HeightOneSpectrum (𝓞 ℚ)}
-    (hv : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal) :
-    _root_.ReciprocityTheory.Gal.locDeg v = 1 := by
+theorem _root_.GlobalTheory.OrdLoc.Dcmp.locDeg_rat
+    {l : ℕ} [Fact l.Prime] {v : HeightOneSpectrum (𝓞 ℚ)} (hv : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal)
+    : _root_.ReciprocityTheory.Gal.locDeg v = 1 := by
   have hT : ∀ w : HeightOneSpectrum (𝓞 ℚ), w ∈ ({v} : Finset _) ↔ ((l : ℕ) : 𝓞 ℚ) ∈ w.asIdeal := by
     intro w
     rw [Finset.mem_singleton]
@@ -57,8 +57,8 @@ theorem _root_.GlobalTheory.OrdLoc.Dcmp.locDeg_rat {l : ℕ} [Fact l.Prime] {v :
     · rintro rfl
       exact hv
     · intro hw
-      exact HeightOneSpectrum.ext
-        ((asIdeal_eq_span_of_prime_mem hw).trans (asIdeal_eq_span_of_prime_mem hv).symm)
+      exact HeightOneSpectrum.ext ((asIdeal_eq_span_of_prime_mem hw).trans
+        (asIdeal_eq_span_of_prime_mem hv).symm)
   have h := _root_.ReciprocityTheory.Gal.sum_locDegree (F := ℚ) l {v} hT
   rw [Finset.sum_singleton, Module.finrank_self] at h
   exact h

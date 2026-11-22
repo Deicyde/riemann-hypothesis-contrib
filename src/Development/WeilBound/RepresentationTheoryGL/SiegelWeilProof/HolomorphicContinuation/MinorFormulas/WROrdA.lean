@@ -10,16 +10,18 @@ open Function
 
 namespace PositivityTheory.Rg.Sw.SP
 
-theorem entire_factor (f : ℂ → ℂ) (hf : Differentiable ℂ f) (r : ℕ)
-    (h : ∀ j < r, iteratedDeriv j f 0 = 0) : ∃ g : ℂ → ℂ, Differentiable ℂ g ∧ ∀ z, f z = z ^ r * g z := by
+theorem entire_factor
+    (f : ℂ → ℂ) (hf : Differentiable ℂ f) (r : ℕ) (h : ∀ j < r, iteratedDeriv j f 0 = 0)
+    : ∃ g : ℂ → ℂ, Differentiable ℂ g ∧ ∀ z, f z = z ^ r * g z := by
   have hdiff : ∀ k : ℕ, Differentiable ℂ ((swap dslope (0 : ℂ))^[k] f) := by
     intro k
     induction k with
     | zero => simpa using hf
     | succ k ih =>
       rw [Function.iterate_succ_apply']
-      have := (Complex.differentiableOn_dslope (f := (swap dslope (0 : ℂ))^[k] f) (s := Set.univ) (c := 0)
-        Filter.univ_mem).2 ih.differentiableOn
+      have :=
+        (Complex.differentiableOn_dslope (f := (swap dslope (0 : ℂ))^[k] f) (s := Set.univ) (c := 0)
+          Filter.univ_mem).2 ih.differentiableOn
       simpa [swap, differentiableOn_univ] using this
   obtain ⟨p, hp⟩ := hf.analyticAt 0
   obtain ⟨R, hR⟩ := hp
@@ -38,7 +40,8 @@ theorem entire_factor (f : ℂ → ℂ) (hf : Differentiable ℂ f) (r : ℕ)
   have hzero : ∀ k < r, (swap dslope (0 : ℂ))^[k] f 0 = 0 := by
     intro k hk
     have := (hR.hasFPowerSeriesAt.has_fpower_series_iterate_dslope_fslope k).coeff_zero 1
-    rw [← this, ← FormalMultilinearSeries.coeff, FormalMultilinearSeries.coeff_iterate_fslope, zero_add]
+    rw [← this, ← FormalMultilinearSeries.coeff, FormalMultilinearSeries.coeff_iterate_fslope,
+      zero_add]
     exact hcoeff k hk
   refine ⟨(swap dslope (0 : ℂ))^[r] f, hdiff r, fun z => ?_⟩
   have := pow_sub_smul_iterate_dslope_of_zero r hzero z

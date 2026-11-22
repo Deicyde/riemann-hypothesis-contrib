@@ -21,8 +21,7 @@ theorem lowNat_holds : LowNatStatement.{u} := by
     apply Subtype.ext
     have hw : M'.coch.d 0 (P.hom.Z 0 ⟨c, hc⟩).1 = 0 := (P.hom.Z 0 ⟨c, hc⟩).2
     have hc' : M.coch.d 0 c = 0 := hc
-    change (e₀' (M'.coch.cls 0 (P.hom.Z 0 ⟨c, hc⟩).1 hw) : M'.V) =
-      P.u (e₀ (M.coch.cls 0 c hc'))
+    change (e₀' (M'.coch.cls 0 (P.hom.Z 0 ⟨c, hc⟩).1 hw) : M'.V) = P.u (e₀ (M.coch.cls 0 c hc'))
     have h1 := hL'.1 (P.hom.Z 0 ⟨c, hc⟩).1 hw
     have h2 := hL.1 c hc'
     rw [h1, h2]
@@ -33,8 +32,7 @@ theorem lowNat_holds : LowNatStatement.{u} := by
     obtain ⟨hz, he⟩ := hL.2.1 c hc
     have hw : M'.coch.d 1 (P.hom.Z 1 ⟨c, hc⟩).1 = 0 := (P.hom.Z 1 ⟨c, hc⟩).2
     obtain ⟨hz', he'⟩ := hL'.2.1 (P.hom.Z 1 ⟨c, hc⟩).1 hw
-    change e₁' (M'.coch.cls 1 (P.hom.Z 1 ⟨c, hc⟩).1 hw) =
-      P.h1 (e₁ (M.coch.cls 1 c hc))
+    change e₁' (M'.coch.cls 1 (P.hom.Z 1 ⟨c, hc⟩).1 hw) = P.h1 (e₁ (M.coch.cls 1 c hc))
     rw [he', he]
     unfold Pair.h1 pairH1DecompositionMap
     rw [Submodule.mapQ_apply]
@@ -48,8 +46,7 @@ theorem lowNat_holds : LowNatStatement.{u} := by
     obtain ⟨hz, he⟩ := hL.2.2 c hc
     have hw : M'.coch.d 2 (P.hom.Z 2 ⟨c, hc⟩).1 = 0 := (P.hom.Z 2 ⟨c, hc⟩).2
     obtain ⟨hz', he'⟩ := hL'.2.2 (P.hom.Z 2 ⟨c, hc⟩).1 hw
-    change e₂' (M'.coch.cls 2 (P.hom.Z 2 ⟨c, hc⟩).1 hw) =
-      P.h2 (e₂ (M.coch.cls 2 c hc))
+    change e₂' (M'.coch.cls 2 (P.hom.Z 2 ⟨c, hc⟩).1 hw) = P.h2 (e₂ (M.coch.cls 2 c hc))
     rw [he', he]
     unfold Pair.h2 compatiblePairH2
     rw [Submodule.mapQ_apply]

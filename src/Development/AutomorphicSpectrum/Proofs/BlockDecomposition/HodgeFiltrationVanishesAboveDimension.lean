@@ -25,19 +25,22 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InOpenFi
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.FilTop
 
 section Inj
 variable {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] {A : C ⥤ CommAlgCat.{0} R}
 
-theorem toSq_pullC_bij (a b : IdF A) (ha : ∀ T, a.S T = ⊤) (hb : ∀ T, b.S T = ⊥) (n : ℕ) :
-    Function.Bijective ((toSq a b ha).pullC n) := by
+theorem toSq_pullC_bij (a b : IdF A) (ha : ∀ T, a.S T = ⊤) (hb : ∀ T, b.S T = ⊥) (n : ℕ)
+    : Function.Bijective ((toSq a b ha).pullC n) := by
   have hτ : ∀ T, Function.Bijective ((toSq a b ha).τ T) := by
     intro T
     refine ⟨fun x y hxy => ?_, fun z => ?_⟩
-    · have h1 : (Ideal.Quotient.mk (b.S T) (show A.obj T from x)) = Ideal.Quotient.mk (b.S T) (show A.obj T from y) :=
+    · have h1
+          : (Ideal.Quotient.mk (b.S T) (show A.obj T from x))
+            = Ideal.Quotient.mk (b.S T) (show A.obj T from y) :=
         congrArg Subtype.val hxy
       rw [Ideal.Quotient.eq, hb T, Ideal.mem_bot, sub_eq_zero] at h1
       exact h1
@@ -53,10 +56,16 @@ theorem toSq_pullC_bij (a b : IdF A) (ha : ∀ T, a.S T = ⊤) (hb : ∀ T, b.S 
 
 end Inj
 
-theorem pull_inj_of_bij {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] {C' : Type 1} [Category.{0} C']
-    {F : C ⥤ ModuleCat.{0} R} {F' : C' ⥤ ModuleCat.{0} R} (m : CH.Mor F F' (RingHom.id R))
-    (hb : ∀ n, Function.Bijective (m.pullC n)) (n : ℕ) : Function.Injective (m.pull n) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem pull_inj_of_bij
+    {R : Type} [CommRing R]
+    {C : Type 1} [Category.{0} C]
+    {C' : Type 1} [Category.{0} C']
+    {F : C ⥤ ModuleCat.{0} R} {F' : C' ⥤ ModuleCat.{0} R}
+    (m : CH.Mor F F' (RingHom.id R)) (hb : ∀ n, Function.Bijective (m.pullC n))
+    (n : ℕ)
+    : Function.Injective (m.pull n) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   rw [Submodule.Quotient.mk_eq_zero]
@@ -69,7 +78,8 @@ theorem pull_inj_of_bij {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] {C
   | zero =>
     have h0 : m.pullC 0 z.1 = 0 := hx
     have : z.1 = 0 := (hb 0).1 (h0.trans (map_zero _).symm)
-    rw [this]; exact Submodule.zero_mem _
+    rw [this]
+    exact Submodule.zero_mem _
   | succ n =>
     obtain ⟨g, hg⟩ := hx
     obtain ⟨g0, rfl⟩ := (hb n).2 g
@@ -78,22 +88,30 @@ theorem pull_inj_of_bij {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] {C
     rw [← CH.Mor.d_pullC]
     exact hg
 
-theorem fil_top_vanish : KH.LocGr → KH.LocVan → KH.PolyTf → KH.GlobSerreSt → KH.GlobVanSt → KH.KIso → KH.GrAff → ∀ {K : Type} [Field K] [CharZero K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) [IsProper q] (d : ℕ)
-    [SmoothOfRelativeDimension d q] (j : ℕ), ∀ x ∈ FilR q j (d + 1), x = 0 := by
+theorem fil_top_vanish
+    : KH.LocGr → KH.LocVan → KH.PolyTf → KH.GlobSerreSt → KH.GlobVanSt → KH.KIso → KH.GrAff
+      → ∀ {K : Type} [Field K] [CharZero K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K))
+          [IsProper q] (d : ℕ) [SmoothOfRelativeDimension d q] (j : ℕ),
+        ∀ x ∈ FilR q j (d + 1),
+          x = 0 := by
   intro _ _ _ _ _ hKIso _ K _ _ X q _ d _ j x hx
   obtain ⟨U, hU⟩ := (GlobalTheory.T.exists_smooth_coordinate_cover q).2 d inferInstance
   have h𝒱 : sSup (Set.range U.U) = ⊤ := by rw [sSup_range]; exact U.cover
   have hk := hKIso q U (d + 1) (fun α => by rw [hU α]; omega) (Set.range U.U) h𝒱 j
-  have h0 : quoK q (KS q (d + 1) (Set.range U.U)) ((d + 1 : ℕ) : ℤ) j x = 0 := (hk.2 (d + 1) le_rfl x).1 hx
+  have h0 : quoK q (KS q (d + 1) (Set.range U.U)) ((d + 1 : ℕ) : ℤ) j x = 0 :=
+    (hk.2 (d + 1) le_rfl x).1 hx
   have hb : ∀ T, (sFil (KS q (d + 1) (Set.range U.U)) ((d + 1 : ℕ) : ℤ)).S T = ⊥ := by
     intro T
     change T.obj.pdPow ((d + 1 : ℕ) : ℤ).toNat = ⊥
     rw [Int.toNat_natCast]
     exact T.property.1.1
-  have hinj := GlobalTheory.CompanionTheory.FilTop.pull_inj_of_bij _
-    (GlobalTheory.CompanionTheory.FilTop.toSq_pullC_bij (sFil (KS q (d + 1) (Set.range U.U)) 0) _ (fun T => T.obj.pdPow_zero) hb) j
-  have h1 : resK q (KS q (d + 1) (Set.range U.U)) j x = 0 := hinj (by
-    rw [map_zero]; exact h0)
+  have hinj :=
+    GlobalTheory.CompanionTheory.FilTop.pull_inj_of_bij _
+      (GlobalTheory.CompanionTheory.FilTop.toSq_pullC_bij (sFil (KS q (d + 1) (Set.range U.U)) 0) _
+        (fun T => T.obj.pdPow_zero)
+        hb)
+      j
+  have h1 : resK q (KS q (d + 1) (Set.range U.U)) j x = 0 := hinj (by rw [map_zero]; exact h0)
   exact hk.1.1 (h1.trans (map_zero _).symm)
 
 end GlobalTheory.CompanionTheory.FilTop

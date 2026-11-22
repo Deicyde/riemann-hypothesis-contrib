@@ -5,9 +5,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
-private theorem frobEx_norm {l : ℕ} (hl : l.Prime) {v : Pl} (hv : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal) : normV v = l := by
+private theorem frobEx_norm {l : ℕ} (hl : l.Prime) {v : Pl} (hv : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal)
+    : normV v = l := by
   haveI : Fact l.Prime := ⟨hl⟩
   let e : 𝓞 ℚ ≃+* ℤ := Rat.ringOfIntegersEquiv
   have hJ : Ideal.span {((l : ℕ) : ℤ)} = v.asIdeal.map (e : 𝓞 ℚ →+* ℤ) := by
@@ -24,16 +27,18 @@ private theorem frobEx_norm {l : ℕ} (hl : l.Prime) {v : Pl} (hv : ((l : ℕ) :
   rw [Nat.card_congr (Ideal.quotientEquiv v.asIdeal _ e hJ).toEquiv,
     Nat.card_congr (Int.quotientSpanNatEquivZMod l).toEquiv, Nat.card_zmod]
 
-theorem UpperTheory.Kd.C7.pFrobEx :
-    UpperTheory.Kd.C7.SFrobEx := by
+theorem UpperTheory.Kd.C7.pFrobEx : UpperTheory.Kd.C7.SFrobEx := by
   intro l _ _ Ω _ _ _ A hA
   obtain ⟨v, hv, hlv⟩ := hA
   have hnorm : normV v = l := frobEx_norm Fact.out hlv
   have hval : A.valuation (l : Ω) < 1 := by
     have := (hv (l : 𝓞 ℚ)).2 hlv
     simpa using this
-  refine ⟨?_, fun σ _ σ' _ hσ hσ' => inv_mul_mem_Ine_of_isFrob hσ hσ',
-    GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hval⟩
+  refine ⟨
+    ?_,
+    fun σ _ σ' _ hσ hσ' => inv_mul_mem_Ine_of_isFrob hσ hσ',
+    GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hval
+  ⟩
   obtain ⟨σ, hσ⟩ := exists_isFrob (F := ℚ) hv
   rw [hnorm] at hσ
   obtain ⟨ι, hι, hιu⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hval (cycZ ℚ Ω l σ)⁻¹

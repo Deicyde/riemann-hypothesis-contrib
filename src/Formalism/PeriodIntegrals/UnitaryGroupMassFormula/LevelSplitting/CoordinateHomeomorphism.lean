@@ -10,12 +10,14 @@ noncomputable section
 
 namespace PI.LevelKSplit.W.NC
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.LevelKSplit
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.LevelKSplit
 open scoped TensorProduct
 
 section Gen
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   {Q : Type} [AddCommGroup Q] [TopologicalSpace Q] [ContinuousAdd Q]
 
 structure CoordHyp (N A N1 Z : Subgroup G) (Lev : G → G) (sH : Q → G) (yQ : N1 → Q) : Prop where
@@ -37,8 +39,8 @@ structure CoordHyp (N A N1 Z : Subgroup G) (Lev : G → G) (sH : Q → G) (yQ : 
 
 variable {N A N1 Z : Subgroup G} {Lev : G → G} {sH : Q → G} {yQ : N1 → Q}
 
-theorem lev_eq (H : CoordHyp N A N1 Z Lev sH yQ) (u : A) (w : G) (hw : w ∈ N1) :
-    Lev ((u : G) * w) = u := by
+theorem lev_eq (H : CoordHyp N A N1 Z Lev sH yQ) (u : A) (w : G) (hw : w ∈ N1)
+    : Lev ((u : G) * w) = u := by
   have hg : (u : G) * w ∈ N := N.mul_mem (H.hAN u.2) (H.coordinate_level_le hw)
   set v := Lev ((u : G) * w) with hv
   have h1 : v⁻¹ * (u : G) ∈ N1 := by
@@ -48,32 +50,33 @@ theorem lev_eq (H : CoordHyp N A N1 Z Lev sH yQ) (u : A) (w : G) (hw : w ∈ N1)
   have h2 : v⁻¹ * (u : G) ∈ A := A.mul_mem (A.inv_mem (H.lev_mem _ hg)) u.2
   have h3 := H.triv _ h2 h1
   have : (u : G) = v := by
-    calc (u : G) = v * (v⁻¹ * u) := by group
+    calc
+      (u : G)
+        = v * (v⁻¹ * u) := by group
       _ = v := by rw [h3, mul_one]
   exact this.symm
 
-def cfun (H : CoordHyp N A N1 Z Lev sH yQ) (p : A × (Q × Z)) : N :=
-  ⟨(p.1 : G) * sH p.2.1 * (p.2.2 : G),
-    N.mul_mem (N.mul_mem (H.hAN p.1.2) (H.coordinate_level_le (H.sH_mem _))) (H.coordinate_level_le (H.hZN1 p.2.2.2))⟩
+def cfun (H : CoordHyp N A N1 Z Lev sH yQ) (p : A × (Q × Z)) : N := ⟨
+  (p.1 : G) * sH p.2.1 * (p.2.2 : G),
+  N.mul_mem (N.mul_mem (H.hAN p.1.2) (H.coordinate_level_le (H.sH_mem _)))
+    (H.coordinate_level_le (H.hZN1 p.2.2.2))
+⟩
 
-def cm (H : CoordHyp N A N1 Z Lev sH yQ) (n : N) : N1 :=
-  ⟨(Lev n)⁻¹ * (n : G), H.lev_rest n n.2⟩
+def cm (H : CoordHyp N A N1 Z Lev sH yQ) (n : N) : N1 := ⟨(Lev n)⁻¹ * (n : G), H.lev_rest n n.2⟩
 
 def cinv (H : CoordHyp N A N1 Z Lev sH yQ) (n : N) : A × (Q × Z) :=
   (⟨Lev n, H.lev_mem n n.2⟩, yQ (cm H n), ⟨(sH (yQ (cm H n)))⁻¹ * (cm H n : G), H.dec _⟩)
 
-theorem cinv_cfun (H : CoordHyp N A N1 Z Lev sH yQ) (p : A × (Q × Z)) :
-    cinv H (cfun H p) = p := by
+theorem cinv_cfun (H : CoordHyp N A N1 Z Lev sH yQ) (p : A × (Q × Z)) : cinv H (cfun H p) = p := by
   obtain ⟨u, y, z⟩ := p
   have hw : sH y * (z : G) ∈ N1 := N1.mul_mem (H.sH_mem y) (H.hZN1 z.2)
-  have hL : Lev ((u : G) * sH y * (z : G)) = u := by
-    rw [mul_assoc]; exact lev_eq H u _ hw
+  have hL : Lev ((u : G) * sH y * (z : G)) = u := by rw [mul_assoc]; exact lev_eq H u _ hw
   have hm : cm H (cfun H (u, y, z)) = ⟨sH y * (z : G), hw⟩ := by
     apply Subtype.ext
     simp only [cm, cfun]
-    rw [hL]; group
-  have hy : yQ (cm H (cfun H (u, y, z))) = y := by
-    rw [hm]; exact H.yQ_sH y z z.2
+    rw [hL]
+    group
+  have hy : yQ (cm H (cfun H (u, y, z))) = y := by rw [hm]; exact H.yQ_sH y z z.2
   refine Prod.ext (Subtype.ext ?_) (Prod.ext hy (Subtype.ext ?_))
   · simp only [cinv, cfun]; exact hL
   · simp only [cinv]
@@ -93,22 +96,26 @@ def cHomeo (H : CoordHyp N A N1 Z Lev sH yQ) : (A × (Q × Z)) ≃ₜ N where
   invFun := cinv H
   left_inv := cinv_cfun H
   right_inv := cfun_cinv H
-  continuous_toFun := Continuous.subtype_mk
-    (((continuous_subtype_val.comp continuous_fst).mul
-      (H.csH.comp (continuous_fst.comp continuous_snd))).mul
-      (continuous_subtype_val.comp (continuous_snd.comp continuous_snd))) _
+  continuous_toFun :=
+    Continuous.subtype_mk
+      (((continuous_subtype_val.comp continuous_fst).mul
+          (H.csH.comp (continuous_fst.comp continuous_snd))).mul
+        (continuous_subtype_val.comp (continuous_snd.comp continuous_snd)))
+      _
   continuous_invFun := by
     have h1 := continuous_cm H
     refine Continuous.prodMk (Continuous.subtype_mk (H.cLev.comp continuous_subtype_val) _)
       (Continuous.prodMk (H.cyQ.comp h1) (Continuous.subtype_mk ?_ _))
     exact (H.csH.comp (H.cyQ.comp h1)).inv.mul (continuous_subtype_val.comp h1)
 
-theorem cHomeo_apply (H : CoordHyp N A N1 Z Lev sH yQ) (p : A × (Q × Z)) :
-    ((cHomeo H p : N) : G) = (p.1 : G) * sH p.2.1 * (p.2.2 : G) := rfl
+theorem cHomeo_apply (H : CoordHyp N A N1 Z Lev sH yQ) (p : A × (Q × Z))
+    : ((cHomeo H p : N) : G) = (p.1 : G) * sH p.2.1 * (p.2.2 : G) :=
+  rfl
 
-theorem coord_skew (H : CoordHyp N A N1 Z Lev sH yQ) (n0 : N) :
-    ∃ (a0 : A) (t : A → Q) (c : A × Q → Z), Continuous t ∧ Continuous c ∧
-      ∀ u y z, n0 * cHomeo H (u, y, z) = cHomeo H (a0 * u, y + t u, c (u, y) * z) := by
+theorem coord_skew (H : CoordHyp N A N1 Z Lev sH yQ) (n0 : N)
+    : ∃ (a0 : A) (t : A → Q) (c : A × Q → Z),
+      Continuous t ∧ Continuous c
+        ∧ ∀ u y z, n0 * cHomeo H (u, y, z) = cHomeo H (a0 * u, y + t u, c (u, y) * z) := by
   set a0 : A := ⟨Lev n0, H.lev_mem n0 n0.2⟩
   set n1 : G := (Lev n0)⁻¹ * (n0 : G) with hn1
   have hn1m : n1 ∈ N1 := H.lev_rest n0 n0.2
@@ -116,8 +123,9 @@ theorem coord_skew (H : CoordHyp N A N1 Z Lev sH yQ) (n0 : N) :
     have := H.norm1 ((u : G)⁻¹) (N.inv_mem (H.hAN u.2)) n1 hn1m
     simpa using this
   let mf : A → N1 := fun u => ⟨(u : G)⁻¹ * n1 * u, hmf u⟩
-  have cmf : Continuous mf := Continuous.subtype_mk
-    ((continuous_subtype_val.inv.mul continuous_const).mul continuous_subtype_val) _
+  have cmf : Continuous mf :=
+    Continuous.subtype_mk
+      ((continuous_subtype_val.inv.mul continuous_const).mul continuous_subtype_val) _
   let t : A → Q := fun u => yQ (mf u)
   have ct : Continuous t := H.cyQ.comp cmf
   let zm : A → G := fun u => (sH (t u))⁻¹ * (mf u : G)
@@ -139,13 +147,16 @@ theorem coord_skew (H : CoordHyp N A N1 Z Lev sH yQ) (n0 : N) :
   have e3 : zm u * sH y = sH y * zm u := H.cent _ (hzm u) _ (H.sH_mem y)
   have e4 : sH (t u) * sH y = sH (t u + y) * k (u, y) := by
     have h := H.cent _ (hk (u, y)) _ (H.sH_mem (t u + y))
-    calc sH (t u) * sH y = k (u, y) * sH (t u + y) := by show _ = sH (t u) * sH y * (sH (t u + y))⁻¹ * sH (t u + y); group
+    calc
+      sH (t u) * sH y = k (u, y) * sH (t u + y) := by
+        show _ = sH (t u) * sH y * (sH (t u + y))⁻¹ * sH (t u + y); group
       _ = sH (t u + y) * k (u, y) := h
   have e1 : (n0 : G) * ((u : G) * sH y * (z : G)) = Lev n0 * u * (mf u : G) * sH y * z := by
     show _ = Lev n0 * u * ((u : G)⁻¹ * ((Lev n0)⁻¹ * (n0 : G)) * u) * sH y * z
     group
   rw [e1, e2, add_comm y (t u)]
-  calc Lev n0 * (u : G) * (sH (t u) * zm u) * sH y * (z : G)
+  calc
+    Lev n0 * (u : G) * (sH (t u) * zm u) * sH y * (z : G)
       = Lev n0 * u * sH (t u) * (zm u * sH y) * z := by group
     _ = Lev n0 * u * sH (t u) * (sH y * zm u) * z := by rw [e3]
     _ = Lev n0 * u * (sH (t u) * sH y) * zm u * z := by group

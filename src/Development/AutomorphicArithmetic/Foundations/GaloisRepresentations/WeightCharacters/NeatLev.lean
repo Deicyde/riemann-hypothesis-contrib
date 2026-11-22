@@ -7,14 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.Branching
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.Branching
 open UpperTheory.Gal.Gen (IsLevel fixedBy)
 open UpperTheory.Gal.Wt
 
-theorem UpperTheory.Gal.Wt.neatLev_of :
-    UpperTheory.Gal.Wt.NeatLev := by
+theorem UpperTheory.Gal.Wt.neatLev_of : UpperTheory.Gal.Wt.NeatLev := by
   intro E _ _ _ l hl a ha w₀ hmem hs v' hv' hap K hK hint Kv hKv W f hf
   obtain ⟨N, hN, hNf⟩ := UpperTheory.Gal.Gen.smoothAt_holds E a w₀ hs W f
   obtain ⟨J, hJ, hJN, hJt, -⟩ := UpperTheory.Gal.Gen.tower_holds E w₀ a l hl hmem ha N hN
@@ -23,19 +25,24 @@ theorem UpperTheory.Gal.Wt.neatLev_of :
   have hKC : K ≤ UpperTheory.Gal.Gen.lev K w₀ (J 0) := le_sup_left
   refine ⟨UpperTheory.Gal.Gen.lev K w₀ (J 0), hLev, hKC, ?_, ?_, ?_⟩
   · intro g γ hγ c hc x hx h
-    have hT : UpperTheory.Gal.CharacterCongruences.TorsFreeAt (UpperTheory.Gal.Gen.lev K w₀ (J 0)) w₀ :=
+    have hT
+        : UpperTheory.Gal.CharacterCongruences.TorsFreeAt (UpperTheory.Gal.Gen.lev K w₀ (J 0)) w₀ :=
       fun k hk ho => hJt _ (hcJ k hk) ho
-    exact UpperTheory.Gal.CharacterCongruences.neatOfPlace_holds E a _ ⟨hLev.fin, hLev.compact, hLev.isOpen⟩ w₀ hT
-      g γ hγ c hc x hx h
-  · have hKGL : GlobalTheory.LFun.KGL v' (n := a) ≤ (UpperTheory.Gal.Gen.lev K w₀ (J 0)).map (cLoc v') := by
+    exact UpperTheory.Gal.CharacterCongruences.neatOfPlace_holds E a _
+      ⟨hLev.fin, hLev.compact, hLev.isOpen⟩ w₀ hT g γ hγ c hc x hx h
+  · have hKGL
+        : GlobalTheory.LFun.KGL v' (n := a)
+          ≤ (UpperTheory.Gal.Gen.lev K w₀ (J 0)).map (cLoc v') := by
       intro y hy
       obtain ⟨e, he⟩ := GlobalTheory.locU_equiv_GL E a v' hv'
       have hy' : cLoc v' (e.symm y : UA E a) = y := by rw [← he]; simp
       exact ⟨(e.symm y : UA E a), hKC (hint _ (e.symm y).2 (hy'.symm ▸ hy)), hy'⟩
-    have hmax := UpperTheory.Gal.Gen.maxCpt_holds E v' a ((UpperTheory.Gal.Gen.lev K w₀ (J 0)).map (cLoc v'))
-      (cLoc v' '' (UpperTheory.Gal.Gen.lev K w₀ (J 0) : Set (UA E a)))
-      (hLev.compact.image (GlobalTheory.BCT.GlobLev.continuous_cLoc v'))
-      (fun _ h => h) hKGL
+    have hmax :=
+      UpperTheory.Gal.Gen.maxCpt_holds E v' a ((UpperTheory.Gal.Gen.lev K w₀ (J 0)).map (cLoc v'))
+        (cLoc v' '' (UpperTheory.Gal.Gen.lev K w₀ (J 0) : Set (UA E a)))
+        (hLev.compact.image (GlobalTheory.BCT.GlobLev.continuous_cLoc v'))
+        (fun _ h => h)
+        hKGL
     intro c hc
     exact hmax ⟨c, hc, rfl⟩
   · intro c hc v g

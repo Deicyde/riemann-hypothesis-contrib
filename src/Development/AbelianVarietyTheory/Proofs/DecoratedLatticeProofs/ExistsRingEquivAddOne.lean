@@ -6,21 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory.ShiftVariables
 
-noncomputable def shiftVars (ι k : Type) [CommRing k] :
-    MvPolynomial ι k ≃ₐ[k] MvPolynomial ι k :=
-  AlgEquiv.ofAlgHom
-    (MvPolynomial.aeval fun i => MvPolynomial.X i + 1)
-    (MvPolynomial.aeval fun i => MvPolynomial.X i - 1)
-    (by ext1 i; simp) (by ext1 i; simp)
+noncomputable def shiftVars (ι k : Type) [CommRing k] : MvPolynomial ι k ≃ₐ[k] MvPolynomial ι k :=
+  AlgEquiv.ofAlgHom (MvPolynomial.aeval fun i => MvPolynomial.X i + 1)
+    (MvPolynomial.aeval fun i => MvPolynomial.X i - 1) (by ext1 i; simp) (by ext1 i; simp)
 
-theorem shiftVars_X (ι k : Type) [CommRing k] (i : ι) :
-    shiftVars ι k (MvPolynomial.X i) = MvPolynomial.X i + 1 := by
+theorem shiftVars_X (ι k : Type) [CommRing k] (i : ι)
+    : shiftVars ι k (MvPolynomial.X i) = MvPolynomial.X i + 1 := by
   change MvPolynomial.aeval (fun i => MvPolynomial.X i + 1) (MvPolynomial.X i) = _
   simp
 
-theorem exists_ringEquiv_add_one {Ω : Type} [Field Ω] [IsAlgClosed Ω] (k : Subfield Ω) (c : Ω)
-    (hc : Transcendental (↥k) c) :
-    ∃ (σ : Ω ≃+* Ω), (∀ a ∈ k, (σ : Ω → Ω) a = a) ∧ (σ : Ω → Ω) c = c + (1 : Ω) := by
+theorem exists_ringEquiv_add_one
+    {Ω : Type} [Field Ω] [IsAlgClosed Ω] (k : Subfield Ω) (c : Ω) (hc : Transcendental (↥k) c)
+    : ∃ (σ : Ω ≃+* Ω), (∀ a ∈ k, (σ : Ω → Ω) a = a) ∧ (σ : Ω → Ω) c = c + (1 : Ω) := by
   classical
   have hs : AlgebraicIndepOn (↥k) id ({c} : Set Ω) :=
     algebraicIndependent_unique_type_iff.mpr (by simpa using hc)
@@ -32,15 +29,14 @@ theorem exists_ringEquiv_add_one {Ω : Type} [Field Ω] [IsAlgClosed Ω] (k : Su
     IsFractionRing.algEquivOfAlgEquiv (K := FractionRing (MvPolynomial t ↥k))
       (L := FractionRing (MvPolynomial t ↥k)) (shiftVars t ↥k)
   let τ : K ≃ₐ[↥k] K := e.symm.trans (φ.trans e)
-  have hmem : ∀ i : t, (i : Ω) ∈ K := fun i =>
-    IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩
+  have hmem : ∀ i : t, (i : Ω) ∈ K := fun i => IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩
   have he : ∀ i : t, e (algebraMap (MvPolynomial t ↥k) _ (MvPolynomial.X i)) = ⟨i, hmem i⟩ := by
     intro i
     apply Subtype.ext
     rw [hind.aevalEquivField_algebraMap_apply_coe]
     simp
-  have he1 : ∀ i : t, e (algebraMap (MvPolynomial t ↥k) _ (MvPolynomial.X i + 1)) =
-      ⟨i, hmem i⟩ + 1 := by
+  have he1
+      : ∀ i : t, e (algebraMap (MvPolynomial t ↥k) _ (MvPolynomial.X i + 1)) = ⟨i, hmem i⟩ + 1 := by
     intro i
     apply Subtype.ext
     rw [hind.aevalEquivField_algebraMap_apply_coe]

@@ -12,30 +12,39 @@ noncomputable section
 
 namespace PI.OmLocU.UnN
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix Formalism.UG PI.OmLocU.Orb PI.OmLocU
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix Formalism.UG PI.OmLocU.Orb PI.OmLocU
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
 
-theorem hR_smul_right_F (x w : Fin n → Fv F v ⊗[F] E) (c : Fv F v) :
-    hR (Fv F v) σ J x (c • w) = c • hR (Fv F v) σ J x w := by
+theorem hR_smul_right_F (x w : Fin n → Fv F v ⊗[F] E) (c : Fv F v)
+    : hR (Fv F v) σ J x (c • w) = c • hR (Fv F v) σ J x w := by
   rw [← algebraMap_smul (Fv F v ⊗[F] E) c w, hR_smul_right, Algebra.smul_def]
 
-def perpMap {ι : Type} (X : ι → Fin n → Fv F v ⊗[F] E) :
-    (Fin n → Fv F v ⊗[F] E) →ₗ[Fv F v] (ι → Fv F v ⊗[F] E) where
+def perpMap {ι : Type} (X : ι → Fin n → Fv F v ⊗[F] E)
+    : (Fin n → Fv F v ⊗[F] E) →ₗ[Fv F v] (ι → Fv F v ⊗[F] E) where
   toFun w i := hR (Fv F v) σ J (X i) w
   map_add' x y := funext fun i => hR_add_right' σ J v (X i) x y
   map_smul' c w := funext fun i => hR_smul_right_F σ J v (X i) w c
 
-theorem exists_perp_ne_zero (hcm : IsCMExt F E σ) {ι : Type} [Fintype ι] (X : ι → Fin n → Fv F v ⊗[F] E)
-    (hc : Fintype.card ι < n) : ∃ w : Fin n → Fv F v ⊗[F] E, w ≠ 0 ∧ ∀ i, hR (Fv F v) σ J (X i) w = 0 := by
+theorem exists_perp_ne_zero
+    (hcm : IsCMExt F E σ)
+    {ι : Type} [Fintype ι]
+    (X : ι → Fin n → Fv F v ⊗[F] E) (hc : Fintype.card ι < n)
+    : ∃ w : Fin n → Fv F v ⊗[F] E, w ≠ 0 ∧ ∀ i, hR (Fv F v) σ J (X i) w = 0 := by
   have : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   have h2 : Module.finrank F E = 2 := hcm.2.2.1
-  have hlt : Module.finrank (Fv F v) (ι → Fv F v ⊗[F] E) < Module.finrank (Fv F v) (Fin n → Fv F v ⊗[F] E) := by
+  have hlt
+      : Module.finrank (Fv F v) (ι → Fv F v ⊗[F] E)
+        < Module.finrank (Fv F v) (Fin n → Fv F v ⊗[F] E) := by
     rw [Module.finrank_pi_fintype, Module.finrank_pi_fintype]
-    simp only [Module.finrank_baseChange, h2, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
+    simp only [Module.finrank_baseChange, h2, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      smul_eq_mul]
     omega
   have hker := LinearMap.ker_ne_bot_of_finrank_lt (f := perpMap σ J v X) hlt
   obtain ⟨w, hw, hne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hker
@@ -58,15 +67,17 @@ theorem primPerp_holds : PrimPerp σ J ψ v Λ := by
     have hopen := LocMassOrdLat.isOpen_latLoc σ J v (L : Set (Fin n → E)) hsd hfg
     rw [eq_top_iff]
     intro x _
-    obtain ⟨t, ht, htx⟩ := LocMassOrdLat.exists_scale v
-      (hopen.mem_nhds M.zero_mem) (fun _ : Unit => x)
+    obtain ⟨t, ht, htx⟩ :=
+      LocMassOrdLat.exists_scale v (hopen.mem_nhds M.zero_mem) (fun _ : Unit => x)
     have hmem : t • x ∈ Submodule.span (Fv F v) (M : Set (Fin n → Fv F v ⊗[F] E)) :=
       Submodule.subset_span (htx ())
     have hx : t⁻¹ • (t • x) ∈ Submodule.span (Fv F v) (M : Set (Fin n → Fv F v ⊗[F] E)) :=
       Submodule.smul_mem _ t⁻¹ hmem
     rwa [inv_smul_smul₀ ht] at hx
-  have : Submodule.IsFullLattice (Fv F v) M :=
-    { toIsLattice := Submodule.IsLattice.of_fg (Fv F v) hfg, span_eq_top := hspan }
+  have : Submodule.IsFullLattice (Fv F v) M := {
+    toIsLattice := Submodule.IsLattice.of_fg (Fv F v) hfg
+    span_eq_top := hspan
+  }
   have : Module.Finite (v.adicCompletionIntegers F) M := Module.Finite.iff_fg.2 hfg
   have : Module.Free (v.adicCompletionIntegers F) M := Submodule.IsLattice.free (Fv F v) M
   let m := Module.finrank (v.adicCompletionIntegers F) M
@@ -74,8 +85,8 @@ theorem primPerp_holds : PrimPerp σ J ψ v Λ := by
   let B := b.extendOfIsFullLattice (Fv F v)
   have hB (i : Fin m) : B i = (b i : Fin n → Fv F v ⊗[F] E) :=
     Module.Basis.extendOfIsFullLattice_apply (Fv F v) b i
-  have hmem (x : Fin n → Fv F v ⊗[F] E) : x ∈ M ↔
-      ∃ c : Fin m → v.adicCompletionIntegers F, x = ∑ i, (c i : Fv F v) • B i := by
+  have hmem (x : Fin n → Fv F v ⊗[F] E)
+      : x ∈ M ↔ ∃ c : Fin m → v.adicCompletionIntegers F, x = ∑ i, (c i : Fv F v) • B i := by
     constructor
     · intro hx
       refine ⟨fun i => b.repr ⟨x, hx⟩ i, ?_⟩
@@ -112,8 +123,9 @@ theorem primPerp_holds : PrimPerp σ J ψ v Λ := by
   have hpmem : p ∈ latLoc (E := E) v (L : Set (Fin n → E)) := by
     refine (hmem p).2 ⟨fun i => ⟨(c j)⁻¹ * c i, ?_⟩, ?_⟩
     · rw [HeightOneSpectrum.mem_adicCompletionIntegers, map_mul, map_inv₀]
-      calc (Valued.v (c j))⁻¹ * Valued.v (c i) ≤ (Valued.v (c j))⁻¹ * Valued.v (c j) :=
-            mul_le_mul' le_rfl (hj i (Finset.mem_univ _))
+      calc
+        (Valued.v (c j))⁻¹ * Valued.v (c i)
+          ≤ (Valued.v (c j))⁻¹ * Valued.v (c j) := mul_le_mul' le_rfl (hj i (Finset.mem_univ _))
         _ = 1 := inv_mul_cancel₀ hvj
     · rw [← hsymm]
       change p = B.equivFun.symm ((c j)⁻¹ • c)
@@ -132,7 +144,9 @@ theorem primPerp_holds : PrimPerp σ J ψ v Λ := by
     rw [HeightOneSpectrum.mem_adicCompletionIntegers] at hint
     have h1 : Valued.v (ϖ * ϖ⁻¹) ≤ WithZero.exp (-1 : ℤ) := by
       rw [map_mul, hv]
-      calc WithZero.exp (-1 : ℤ) * Valued.v ϖ⁻¹ ≤ WithZero.exp (-1 : ℤ) * 1 := mul_le_mul' le_rfl hint
+      calc
+        WithZero.exp (-1 : ℤ) * Valued.v ϖ⁻¹
+          ≤ WithZero.exp (-1 : ℤ) * 1 := mul_le_mul' le_rfl hint
         _ = _ := mul_one _
     rw [mul_inv_cancel₀ hϖ0, map_one] at h1
     exact absurd h1 (by decide)

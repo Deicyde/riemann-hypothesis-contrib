@@ -9,23 +9,27 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open MeasureTheory NumberField IsDedekindDomain Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.GaussDecay
 
-theorem isCMFam_of_over {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (φ : InfinitePlace F → (E →+* ℂ))
-    (hφ : ∀ v (a : F), φ v (algebraMap F E a) = v.embedding a) : GlobalTheory.Mem.Vol.IsCMFam φ := by
+theorem isCMFam_of_over
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (h : IsCMExt F E σ)
+    (φ : InfinitePlace F → (E →+* ℂ)) (hφ : ∀ v (a : F), φ v (algebraMap F E a) = v.embedding a)
+    : GlobalTheory.Mem.Vol.IsCMFam φ := by
   obtain ⟨hF, hE, h2, -⟩ := h
   unfold GlobalTheory.Mem.Vol.IsCMFam
   rw [Fintype.bijective_iff_injective_and_card]
   constructor
   · have key : ∀ v, (InfinitePlace.mk (φ v)).comap (algebraMap F E) = v := by
       intro v
-      rw [InfinitePlace.comap_mk, show (φ v).comp (algebraMap F E) = v.embedding from RingHom.ext (hφ v),
+      rw [InfinitePlace.comap_mk,
+        show (φ v).comp (algebraMap F E) = v.embedding from RingHom.ext (hφ v),
         InfinitePlace.mk_embedding]
     intro v w hvw
     rw [← key v, ← key w]

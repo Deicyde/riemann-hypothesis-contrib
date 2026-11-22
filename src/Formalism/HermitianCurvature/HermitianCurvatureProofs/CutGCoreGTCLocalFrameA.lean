@@ -13,11 +13,15 @@ namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
 noncomputable section
 
-theorem gcl_slice_iter {r : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
-    (F : (Fin r → ℂ) × ℂ → V) (s : Set ((Fin r → ℂ) × ℂ)) (hs : IsOpen s)
-    (hF : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) F s) (q : (Fin r → ℂ) × ℂ) (hq : q ∈ s) (j : ℕ) :
-    iteratedFDeriv ℝ j (fun ζ => F (q.1, ζ)) q.2 =
-      (iteratedFDeriv ℝ j F q).compContinuousLinearMap (fun _ => ContinuousLinearMap.inr ℝ (Fin r → ℂ) ℂ) := by
+theorem gcl_slice_iter
+    {r : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    (F : (Fin r → ℂ) × ℂ → V) (s : Set ((Fin r → ℂ) × ℂ))
+    (hs : IsOpen s) (hF : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) F s)
+    (q : (Fin r → ℂ) × ℂ) (hq : q ∈ s)
+    (j : ℕ)
+    : iteratedFDeriv ℝ j (fun ζ => F (q.1, ζ)) q.2
+      = (iteratedFDeriv ℝ j F q).compContinuousLinearMap
+        (fun _ => ContinuousLinearMap.inr ℝ (Fin r → ℂ) ℂ) := by
   let a : (Fin r → ℂ) × ℂ := (q.1, 0)
   let L : ℂ →L[ℝ] (Fin r → ℂ) × ℂ := ContinuousLinearMap.inr ℝ (Fin r → ℂ) ℂ
   let G : (Fin r → ℂ) × ℂ → V := fun p => F (a + p)
@@ -45,16 +49,21 @@ theorem gcl_slice_iter {r : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace 
     ext <;> simp [a, L]
   rw [hGq]
 
-theorem gcl_isRadDiff {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq)
+theorem gcl_isRadDiff
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+    (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq)
     (hRB : NF.RadBase P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π')
-    (T : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')) (hT : RadDZ P Bs T) :
-    NF.IsRadDiff P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π' T := by
+    (T : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')) (hT : RadDZ P Bs T)
+    : NF.IsRadDiff P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π' T := by
   obtain ⟨n, A, hA, hT'⟩ := hT
-  have hmem : ∀ Φ : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π',
-      ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
-        (NF.radR P.k P.r Bs.z Bs.z' Bs.μsec (Φ : Q.Fn P.k P.r (Wq →L[ℂ] Wp))) (NF.QR P.k P.r Bs.z Bs.z') :=
-    fun Φ => (Formalism.FourierDecayAlt.P.radical_reduction_mem Wp Wq P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π' hRB Φ Φ.2).1
+  have hmem
+      : ∀ Φ : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π',
+        ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+          (NF.radR P.k P.r Bs.z Bs.z' Bs.μsec (Φ : Q.Fn P.k P.r (Wq →L[ℂ] Wp)))
+          (NF.QR P.k P.r Bs.z Bs.z') := fun Φ =>
+    (Formalism.FourierDecayAlt.P.radical_reduction_mem Wp Wq P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π'
+      hRB Φ Φ.2).1
   have hopen : IsOpen (NF.QR P.k P.r Bs.z Bs.z') := by
     have h1 : IsOpen (Formalism.QuantumDeterminants.OmX P.r) := by
       have h2 : Formalism.QuantumDeterminants.OmX P.r = ⋂ l, {x : Fin P.r → ℂ | x l ≠ 0} := by
@@ -64,10 +73,18 @@ theorem gcl_isRadDiff {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace 
       exact isOpen_iInter_of_finite (fun l => isOpen_ne_fun (continuous_apply l) continuous_const)
     exact (h1.preimage continuous_fst).inter
       (isOpen_lt continuous_const (Complex.continuous_normSq.comp continuous_snd))
-  refine ⟨n, fun j q => (A j q.2).comp (ContinuousMultilinearMap.compContinuousLinearMapL
-    (fun _ : Fin j => ContinuousLinearMap.inr ℝ (Fin P.r → ℂ) ℂ)), ?_, ?_⟩
+  refine ⟨
+    n,
+    fun j q =>
+      (A j q.2).comp
+        (ContinuousMultilinearMap.compContinuousLinearMapL (fun _ : Fin j =>
+          ContinuousLinearMap.inr ℝ (Fin P.r → ℂ) ℂ)),
+    ?_,
+    ?_
+  ⟩
   · intro j
-    have hA' : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun q : (Fin P.r → ℂ) × ℂ => A j q.2)
+    have hA' : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+        (fun q : (Fin P.r → ℂ) × ℂ => A j q.2)
         (NF.QR P.k P.r Bs.z Bs.z') :=
       (hA j).comp contDiff_snd.contDiffOn (fun q hq => hq.2)
     exact hA'.clm_comp contDiffOn_const
@@ -75,7 +92,8 @@ theorem gcl_isRadDiff {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace 
     rw [hT' Φ q hq]
     refine Finset.sum_congr rfl (fun j _ => ?_)
     rw [gcl_slice_iter _ _ hopen (hmem Φ) q hq j]
-    simp only [ContinuousLinearMap.comp_apply, ContinuousMultilinearMap.compContinuousLinearMapL_apply]
+    simp only [ContinuousLinearMap.comp_apply,
+      ContinuousMultilinearMap.compContinuousLinearMapL_apply]
 
 end
 

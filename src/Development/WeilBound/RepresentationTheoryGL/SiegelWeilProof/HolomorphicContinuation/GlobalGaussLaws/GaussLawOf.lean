@@ -7,10 +7,14 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct ComplexOrder
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -26,7 +30,8 @@ theorem gaussLaw_of : TensInj → LawN → LawM → VacK → LocMul → GZSch �
     unfold cLoc
     exact mul_pos (mul_pos two_pos Real.pi_pos) (abs_pos.2 (hLNe D ψ θ l hcx.hψ hcx.hθ hcx.hl τ))
   have hI := isSiegel_I (n := n)
-  have hGi : IsSch (gZf ε (tLoc l τ) (cLoc l τ) (Complex.I • 1)) := hGZ V.rank n ε _ _ hc (abs_tLoc l τ) _ hI
+  have hGi : IsSch (gZf ε (tLoc l τ) (cLoc l τ) (Complex.I • 1)) :=
+    hGZ V.rank n ε _ _ hc (abs_tLoc l τ) _ hI
   obtain ⟨q, hq21, hqZ⟩ := siegelOrb n Z hZ
   obtain ⟨p0, k, hyq, hp0, hk⟩ := iwaGR n (y * q)
   have e1 := pLaw hN hMul hcx hL hLev q hq21 (Complex.I • 1) hGi
@@ -37,8 +42,11 @@ theorem gaussLaw_of : TensInj → LawN → LawM → VacK → LocMul → GZSch �
     rw [siegelP_jF q hq21]
     obtain ⟨hA, -, -⟩ := siegelP_data q hq21
     exact mul_ne_zero (zpow_ne_zero _ hA.ne_zero) (zpow_ne_zero _ (hA.star).ne_zero)
-  have hGZeq : gZf ε (tLoc l τ) (cLoc l τ) Z =
-      fun u => (jF e p p' q (Complex.I • 1))⁻¹ * L q (gZf ε (tLoc l τ) (cLoc l τ) (Complex.I • 1)) u := by
+  have hGZeq
+      : gZf ε (tLoc l τ) (cLoc l τ) Z
+        = fun u =>
+          (jF e p p' q (Complex.I • 1))⁻¹
+            * L q (gZf ε (tLoc l τ) (cLoc l τ) (Complex.I • 1)) u := by
     funext u
     rw [e1]
     field_simp
@@ -54,9 +62,14 @@ theorem gaussLaw_of : TensInj → LawN → LawM → VacK → LocMul → GZSch �
   rw [actZ_K hk] at cp
   rw [hyq] at cy
   have hact : actZ p0 (Complex.I • 1) = actZ y Z := cp.1.symm.trans cy.1
-  have hrel : jF e p p' y Z * jF e p p' q (Complex.I • 1) = jF e p p' p0 (Complex.I • 1) * jF e p p' k (Complex.I • 1) :=
+  have hrel
+      : jF e p p' y Z * jF e p p' q (Complex.I • 1)
+        = jF e p p' p0 (Complex.I • 1) * jF e p p' k (Complex.I • 1) :=
     cy.2.symm.trans cp.2
-  have hjy : jF e p p' y Z = jF e p p' p0 (Complex.I • 1) * jF e p p' k (Complex.I • 1) * (jF e p p' q (Complex.I • 1))⁻¹ := by
+  have hjy
+      : jF e p p' y Z
+        = jF e p p' p0 (Complex.I • 1) * jF e p p' k (Complex.I • 1)
+          * (jF e p p' q (Complex.I • 1))⁻¹ := by
     rw [← hrel]; field_simp
   funext u
   rw [hact, hjy]

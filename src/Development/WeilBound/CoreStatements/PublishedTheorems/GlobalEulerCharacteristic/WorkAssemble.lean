@@ -34,8 +34,8 @@ theorem ratio_eq_one_of_coprime_cyclic' (ℓ : ℕ) [Fact ℓ.Prime] (K : Finite
   W_killed_c.ratio_eq_one_of_cyclic ℓ K S hS hSℓ ιr L hL hN M hℓ htriv
     (fun L' _ hL' hle hcyc => W_killed_b.ratio_coind_cyclic ℓ K S hS hSℓ ιr L hL hN M hℓ htriv hK L' hL' hle hcyc)
 
-theorem ratioOneKilled_of_lemmaX (ℓ : ℕ) [Fact ℓ.Prime] (hX : GlobalEulerCharCoprime) :
-    RatioOneKilled ℓ (fun _ => True) := by
+theorem ratioOneKilled_of_lemmaX (ℓ : ℕ) [Fact ℓ.Prime] (hX : GlobalEulerCharCoprime)
+    : RatioOneKilled ℓ (fun _ => True) := by
   intro K S hS hSℓ _ ιr M _ _ hℓ
   obtain ⟨L, hKL, hsplit⟩ := W_split.exists_split ℓ K S hS hSℓ M
   letI := hKL

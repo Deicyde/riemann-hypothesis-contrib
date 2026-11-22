@@ -11,8 +11,8 @@ noncomputable section
 
 namespace PI.PolynomialProperness.TM
 
-theorem sum_emb {N n : ℕ} (e : Fin n ↪ Fin N) (f : Fin N → ℂ) (hf : ∀ i, (∀ t, e t ≠ i) → f i = 0) :
-    ∑ i, f i = ∑ t, f (e t) := by
+theorem sum_emb {N n : ℕ} (e : Fin n ↪ Fin N) (f : Fin N → ℂ) (hf : ∀ i, (∀ t, e t ≠ i) → f i = 0)
+    : ∑ i, f i = ∑ t, f (e t) := by
   rw [← Finset.sum_map Finset.univ e f]
   symm
   apply Finset.sum_subset (Finset.subset_univ _)
@@ -26,11 +26,16 @@ theorem sum_emb {N n : ℕ} (e : Fin n ↪ Fin N) (f : Fin N → ℂ) (hf : ∀ 
 def eIe (k r : ℕ) : Fin r ↪ Fin (2 * r + k + 1) :=
   ⟨eI k r, fun a b h => Fin.ext (by have := congrArg Fin.val h; exact this)⟩
 
-def esIe (k r : ℕ) : Fin r ↪ Fin (2 * r + k + 1) :=
-  ⟨esI k r, fun a b h => Fin.ext (by
-    have h1 := congrArg Fin.val h
-    have ha := a.isLt; have hb := b.isLt
-    simp only [esI] at h1; omega)⟩
+def esIe (k r : ℕ) : Fin r ↪ Fin (2 * r + k + 1) := ⟨
+  esI k r,
+  fun a b h =>
+    Fin.ext (by
+      have h1 := congrArg Fin.val h
+      have ha := a.isLt
+      have hb := b.isLt
+      simp only [esI] at h1
+      omega)
+⟩
 
 theorem eIe_apply (k r : ℕ) (a : Fin r) : eIe k r a = eI k r a := rfl
 theorem esIe_apply (k r : ℕ) (a : Fin r) : esIe k r a = esI k r a := rfl
@@ -61,38 +66,41 @@ theorem sig_esI (k r : ℕ) (t : Fin r) : GBasic.sig k r (esI k r t) = eI k r t 
   show 2 * r + k - (2 * r + k - t.val) = t.val
   omega
 
-theorem herm_coords (k r : ℕ) (x y : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) x y = star (qX k r y) ⬝ᵥ pX k r x + star (pX k r y) ⬝ᵥ qX k r x + midF k r x y := by
+theorem herm_coords (k r : ℕ) (x y : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) x y
+      = star (qX k r y) ⬝ᵥ pX k r x + star (pX k r y) ⬝ᵥ qX k r x + midF k r x y := by
   have hmul : ∀ i, (Hpk k r *ᵥ x) i = GBasic.sgn k r i * x (GBasic.sig k r i) := by
     intro i
     simp only [Matrix.mulVec, dotProduct, GBasic.Hpk_eq, ite_mul, zero_mul, Finset.sum_ite_eq',
       Finset.mem_univ, if_true]
-  have hsplit : ∀ i : Fin (2 * r + k + 1),
-      star (y i) * (GBasic.sgn k r i * x (GBasic.sig k r i)) =
-        (if i.val < r then star (y i) * x (GBasic.sig k r i) else 0) +
-        (if r + k < i.val then star (y i) * x (GBasic.sig k r i) else 0) +
-        (if r ≤ i.val ∧ i.val ≤ r + k then star (y i) * (GBasic.sgn k r i * x i) else 0) := by
+  have hsplit
+      : ∀ i : Fin (2 * r + k + 1),
+        star (y i) * (GBasic.sgn k r i * x (GBasic.sig k r i))
+          = (if i.val < r then star (y i) * x (GBasic.sig k r i) else 0)
+            + (if r + k < i.val then star (y i) * x (GBasic.sig k r i) else 0)
+            + (if r ≤ i.val ∧ i.val ≤ r + k then star (y i) * (GBasic.sgn k r i * x i) else 0) := by
     intro i
     by_cases h1 : i.val < r
     · have hs : GBasic.sgn k r i = 1 := by
         unfold GBasic.sgn
-        rw [if_neg (show ¬ (i.val = r + k) by omega)]
-      rw [if_pos h1, if_neg (show ¬ (r + k < i.val) by omega),
-        if_neg (show ¬ (r ≤ i.val ∧ i.val ≤ r + k) by omega), hs]
+        rw [if_neg (show ¬(i.val = r + k) by omega)]
+      rw [if_pos h1, if_neg (show ¬(r + k < i.val) by omega),
+        if_neg (show ¬(r ≤ i.val ∧ i.val ≤ r + k) by omega), hs]
       ring
     · by_cases h2 : r + k < i.val
       · have hs : GBasic.sgn k r i = 1 := by
           unfold GBasic.sgn
-          rw [if_neg (show ¬ (i.val = r + k) by omega)]
-        rw [if_neg h1, if_pos h2, if_neg (show ¬ (r ≤ i.val ∧ i.val ≤ r + k) by omega), hs]
+          rw [if_neg (show ¬(i.val = r + k) by omega)]
+        rw [if_neg h1, if_pos h2, if_neg (show ¬(r ≤ i.val ∧ i.val ≤ r + k) by omega), hs]
         ring
       · have hs : GBasic.sig k r i = i := by
           unfold GBasic.sig
-          rw [if_neg (show ¬ (i.val < r ∨ r + k < i.val) by omega)]
+          rw [if_neg (show ¬(i.val < r ∨ r + k < i.val) by omega)]
         rw [if_neg h1, if_neg h2, if_pos (show r ≤ i.val ∧ i.val ≤ r + k by omega), hs]
         ring
-  have hA : (∑ i : Fin (2 * r + k + 1), if i.val < r then star (y i) * x (GBasic.sig k r i) else 0)
-      = star (pX k r y) ⬝ᵥ qX k r x := by
+  have hA
+      : (∑ i : Fin (2 * r + k + 1), if i.val < r then star (y i) * x (GBasic.sig k r i) else 0)
+        = star (pX k r y) ⬝ᵥ qX k r x := by
     refine (sum_emb (eIe k r) _ ?_).trans ?_
     · intro i hi
       by_cases h : i.val < r
@@ -103,8 +111,9 @@ theorem herm_coords (k r : ℕ) (x y : Fin (2 * r + k + 1) → ℂ) :
       intro t _
       have hc : (eI k r t).val < r := t.isLt
       simp [hc, sig_eI]
-  have hB : (∑ i : Fin (2 * r + k + 1), if r + k < i.val then star (y i) * x (GBasic.sig k r i) else 0)
-      = star (qX k r y) ⬝ᵥ pX k r x := by
+  have hB
+      : (∑ i : Fin (2 * r + k + 1), if r + k < i.val then star (y i) * x (GBasic.sig k r i) else 0)
+        = star (qX k r y) ⬝ᵥ pX k r x := by
     refine (sum_emb (esIe k r) _ ?_).trans ?_
     · intro i hi
       by_cases h : r + k < i.val
@@ -125,20 +134,24 @@ theorem herm_coords (k r : ℕ) (x y : Fin (2 * r + k + 1) → ℂ) :
   have hH : herm (Hpk k r) x y = ∑ i, star (y i) * (GBasic.sgn k r i * x (GBasic.sig k r i)) := by
     unfold herm
     simp only [dotProduct, Pi.star_apply, hmul]
-  rw [hH, Finset.sum_congr rfl (fun i _ => hsplit i), Finset.sum_add_distrib, Finset.sum_add_distrib, hA, hB]
+  rw [hH, Finset.sum_congr rfl (fun i _ => hsplit i), Finset.sum_add_distrib,
+    Finset.sum_add_distrib, hA, hB]
   unfold midF
   ring
 
-theorem uh_of_herm {m : ℕ} {H g : Matrix (Fin m) (Fin m) ℂ}
-    (h : ∀ x y : Fin m → ℂ, herm H (g *ᵥ x) (g *ᵥ y) = herm H x y) : g ∈ UH H := by
+theorem uh_of_herm
+    {m : ℕ} {H g : Matrix (Fin m) (Fin m) ℂ}
+    (h : ∀ x y : Fin m → ℂ, herm H (g *ᵥ x) (g *ᵥ y) = herm H x y)
+    : g ∈ UH H := by
   show gᴴ * H * g = H
   have hg : ∀ v w : Fin m → ℂ, herm H (g *ᵥ v) (g *ᵥ w) = herm (gᴴ * H * g) v w := by
     intro v w
     unfold herm
     rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
       Matrix.mul_assoc]
-  have e1 : ∀ (M : Matrix (Fin m) (Fin m) ℂ) (i j : Fin m),
-      herm M (Pi.single j 1) (Pi.single i 1) = M i j := by
+  have e1
+      : ∀ (M : Matrix (Fin m) (Fin m) ℂ) (i j : Fin m),
+        herm M (Pi.single j 1) (Pi.single i 1) = M i j := by
     intro M i j
     have hs : star (Pi.single i 1 : Fin m → ℂ) = (Pi.single i 1 : Fin m → ℂ) := by
       funext k
@@ -154,18 +167,18 @@ theorem uh_of_herm {m : ℕ} {H g : Matrix (Fin m) (Fin m) ℂ}
   rw [hg, e1, e1] at h1
   exact h1
 
-theorem mX_eI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (a : Fin r) (j : Fin (2 * r + k + 1)) :
-    mX k r vX (eI k r a) j = if h : j.val < r then vX a ⟨j.val, h⟩ else 0 := by
+theorem mX_eI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (a : Fin r) (j : Fin (2 * r + k + 1))
+    : mX k r vX (eI k r a) j = if h : j.val < r then vX a ⟨j.val, h⟩ else 0 := by
   unfold mX
   rw [dite_eq_left (show (eI k r a).val < r from a.isLt)]
   rfl
 
-theorem mX_esI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (a : Fin r) (j : Fin (2 * r + k + 1)) :
-    mX k r vX (esI k r a) j =
-      if h : r + k < j.val then (vXᴴ)⁻¹ a ⟨2 * r + k - j.val, by omega⟩ else 0 := by
+theorem mX_esI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (a : Fin r) (j : Fin (2 * r + k + 1))
+    : mX k r vX (esI k r a) j
+      = if h : r + k < j.val then (vXᴴ)⁻¹ a ⟨2 * r + k - j.val, by omega⟩ else 0 := by
   have ha := a.isLt
   unfold mX
-  rw [dite_eq_right (show ¬ ((esI k r a).val < r) by show ¬ (2 * r + k - a.val < r); omega),
+  rw [dite_eq_right (show ¬((esI k r a).val < r) by show ¬ (2 * r + k - a.val < r); omega),
     dite_eq_left (show r + k < (esI k r a).val by show r + k < 2 * r + k - a.val; omega)]
   by_cases hj : r + k < j.val
   · rw [dite_eq_left hj, dite_eq_left hj]
@@ -174,13 +187,16 @@ theorem mX_esI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (a : Fin r) (j : Fi
     rw [e]
   · rw [dite_eq_right hj, dite_eq_right hj]
 
-theorem mX_mid (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (i j : Fin (2 * r + k + 1))
-    (h1 : r ≤ i.val) (h2 : i.val ≤ r + k) : mX k r vX i j = if i = j then 1 else 0 := by
+theorem mX_mid
+    (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (i j : Fin (2 * r + k + 1))
+    (h1 : r ≤ i.val) (h2 : i.val ≤ r + k)
+    : mX k r vX i j = if i = j then 1 else 0 := by
   unfold mX
-  rw [dite_eq_right (show ¬ (i.val < r) by omega), dite_eq_right (show ¬ (r + k < i.val) by omega)]
+  rw [dite_eq_right (show ¬(i.val < r) by omega), dite_eq_right (show ¬(r + k < i.val) by omega)]
 
-theorem mX_mulVec_eI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ) (a : Fin r) :
-    (mX k r vX *ᵥ x) (eI k r a) = (vX *ᵥ pX k r x) a := by
+theorem mX_mulVec_eI
+    (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ) (a : Fin r)
+    : (mX k r vX *ᵥ x) (eI k r a) = (vX *ᵥ pX k r x) a := by
   simp only [Matrix.mulVec, dotProduct, mX_eI]
   refine (sum_emb (eIe k r) _ ?_).trans ?_
   · intro i hi
@@ -193,8 +209,9 @@ theorem mX_mulVec_eI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 *
     rw [dite_eq_left hc]
     rfl
 
-theorem mX_mulVec_esI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ) (a : Fin r) :
-    (mX k r vX *ᵥ x) (esI k r a) = ((vXᴴ)⁻¹ *ᵥ qX k r x) a := by
+theorem mX_mulVec_esI
+    (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ) (a : Fin r)
+    : (mX k r vX *ᵥ x) (esI k r a) = ((vXᴴ)⁻¹ *ᵥ qX k r x) a := by
   simp only [Matrix.mulVec, dotProduct, mX_esI]
   refine (sum_emb (esIe k r) _ ?_).trans ?_
   · intro i hi
@@ -217,23 +234,25 @@ theorem mX_mulVec_esI (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 
     rw [e]
     try rfl
 
-theorem mX_mulVec_mid (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ)
-    (i : Fin (2 * r + k + 1)) (h1 : r ≤ i.val) (h2 : i.val ≤ r + k) : (mX k r vX *ᵥ x) i = x i := by
+theorem mX_mulVec_mid
+    (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ)
+    (i : Fin (2 * r + k + 1)) (h1 : r ≤ i.val) (h2 : i.val ≤ r + k)
+    : (mX k r vX *ᵥ x) i = x i := by
   simp only [Matrix.mulVec, dotProduct, mX_mid k r vX i _ h1 h2, ite_mul, one_mul, zero_mul,
     Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
-theorem pX_mX (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ) :
-    pX k r (mX k r vX *ᵥ x) = vX *ᵥ pX k r x := by
+theorem pX_mX (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ)
+    : pX k r (mX k r vX *ᵥ x) = vX *ᵥ pX k r x := by
   funext a
   exact mX_mulVec_eI k r vX x a
 
-theorem qX_mX (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ) :
-    qX k r (mX k r vX *ᵥ x) = (vXᴴ)⁻¹ *ᵥ qX k r x := by
+theorem qX_mX (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x : Fin (2 * r + k + 1) → ℂ)
+    : qX k r (mX k r vX *ᵥ x) = (vXᴴ)⁻¹ *ᵥ qX k r x := by
   funext a
   exact mX_mulVec_esI k r vX x a
 
-theorem midF_mX (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x y : Fin (2 * r + k + 1) → ℂ) :
-    midF k r (mX k r vX *ᵥ x) (mX k r vX *ᵥ y) = midF k r x y := by
+theorem midF_mX (k r : ℕ) (vX : Matrix (Fin r) (Fin r) ℂ) (x y : Fin (2 * r + k + 1) → ℂ)
+    : midF k r (mX k r vX *ᵥ x) (mX k r vX *ᵥ y) = midF k r x y := by
   unfold midF
   apply Finset.sum_congr rfl
   intro i _
@@ -257,12 +276,13 @@ theorem mxFacts : MXFacts := by
   have hu' : IsUnit vXᴴ.det := by rw [Matrix.det_conjTranspose, hdet, star_one]; exact isUnit_one
   have d1 : ∀ p q : Fin r → ℂ, star ((vXᴴ)⁻¹ *ᵥ q) ⬝ᵥ (vX *ᵥ p) = star q ⬝ᵥ p := by
     intro p q
-    rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul, Matrix.conjTranspose_nonsing_inv,
-      Matrix.conjTranspose_conjTranspose, Matrix.nonsing_inv_mul _ hu, Matrix.vecMul_one]
+    rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul,
+      Matrix.conjTranspose_nonsing_inv, Matrix.conjTranspose_conjTranspose,
+      Matrix.nonsing_inv_mul _ hu, Matrix.vecMul_one]
   have d2 : ∀ p q : Fin r → ℂ, star (vX *ᵥ p) ⬝ᵥ ((vXᴴ)⁻¹ *ᵥ q) = star p ⬝ᵥ q := by
     intro p q
-    rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hu',
-      Matrix.vecMul_one]
+    rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul,
+      Matrix.mul_nonsing_inv _ hu', Matrix.vecMul_one]
   refine ⟨?_, ?_, ?_⟩
   · simp only [Nset, Set.mem_setOf_eq]
     refine ⟨?_, ?_, ?_⟩
@@ -293,14 +313,15 @@ theorem mxFacts : MXFacts := by
           exact a.isLt
         by_cases hi2 : r + k < i.val
         · have ha := a.isLt
-          rw [dite_eq_left hi2, dite_eq_right (show ¬ (r + k < (eI k r a).val) by show ¬ (r + k < a.val); omega),
+          rw [dite_eq_left hi2,
+            dite_eq_right (show ¬(r + k < (eI k r a).val) by show ¬ (r + k < a.val); omega),
             if_neg hne]
         · rw [dite_eq_right hi2]
     · intro i j hj1 hj2 hi
       unfold mX
-      rw [dite_eq_right (show ¬ (i.val < r) by omega)]
+      rw [dite_eq_right (show ¬(i.val < r) by omega)]
       by_cases hi2 : r + k < i.val
-      · rw [dite_eq_left hi2, dite_eq_right (show ¬ (r + k < j.val) by omega),
+      · rw [dite_eq_left hi2, dite_eq_right (show ¬(r + k < j.val) by omega),
           if_neg (show i ≠ j from fun h => by rw [h] at hi2; omega)]
       · rw [dite_eq_right hi2]
   · intro p
@@ -335,7 +356,7 @@ theorem mxFacts : MXFacts := by
           have ha := a.isLt
           show xiV k r p (esI k r a) = 0
           unfold xiV
-          rw [dite_eq_right (show ¬ ((esI k r a).val < r) by show ¬ (2 * r + k - a.val < r); omega)]
+          rw [dite_eq_right (show ¬((esI k r a).val < r) by show ¬ (2 * r + k - a.val < r); omega)]
         rw [hq, Matrix.mulVec_zero, Pi.zero_apply]
       · rw [mX_mulVec_mid k r vX _ i (by omega) (by omega)]
         unfold xiV

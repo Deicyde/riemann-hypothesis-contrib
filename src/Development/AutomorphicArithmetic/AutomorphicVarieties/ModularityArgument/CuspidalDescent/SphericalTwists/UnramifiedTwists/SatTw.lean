@@ -5,12 +5,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsI
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.Desc.W.satTw :
-    UpperTheory.V.Z.Desc.W.SatTw := by
+theorem UpperTheory.V.Z.Desc.W.satTw : UpperTheory.V.Z.Desc.W.SatTw := by
   intro E _ _ _ a P s w B h
   have h1 := (GlobalTheory.CuspRep.CG.HasSat.twist_absPow h s).1
   have h2 := (GlobalTheory.HeckeGal.Model.absPow_isAbsPow E s).2.1 w
-  have h3 : GlobalTheory.WeilDeligne.qPow w (-s) = (GlobalTheory.HeckeGal.Model.absPow E s).val w := by
+  have h3
+      : GlobalTheory.WeilDeligne.qPow w (-s) = (GlobalTheory.HeckeGal.Model.absPow E s).val w := by
     refine Units.ext ?_
     rw [h2, GlobalTheory.WeilDeligne.coe_qPow]
     simp only [Formalism.ConjugateSelfDual.normV, Complex.ofReal_neg]

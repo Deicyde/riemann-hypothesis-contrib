@@ -12,9 +12,12 @@ namespace GroundTheory.Heights₂.Heights.Inter
 
 open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem mem_mcPts_span_singleton {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {P : Ideal (MRing ι)} {s : MRing ι} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
-    (hs : eval z (map (Int.castRingHom ℂ) s) = 0) : z ∈ mcPts (Ideal.span {s}) := by
+theorem mem_mcPts_span_singleton
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} {s : MRing ι} {z : (Σ k, ι k) → ℂ}
+    (hz : z ∈ mcPts P) (hs : eval z (map (Int.castRingHom ℂ) s) = 0)
+    : z ∈ mcPts (Ideal.span {s}) := by
   refine ⟨hz.1, fun f hf => ?_⟩
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hf
   rw [map_mul, map_mul, hs, mul_zero]

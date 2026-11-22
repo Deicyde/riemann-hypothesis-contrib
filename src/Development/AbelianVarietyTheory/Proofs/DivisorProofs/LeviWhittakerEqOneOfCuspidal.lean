@@ -38,15 +38,22 @@ section Main
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V] {b : Fin r → ℕ}
 
-theorem leviWh_eq_one : ∀ (F : Type) [Field F] [Fintype F] (ψ : AddChar F ℂ), ψ ≠ 1 → ∀ (r : ℕ) (V : Type)
-    [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (b : Fin r → ℕ)
-    (σ : Representation ℂ (blockTri (κ := F) b) V), IsCuspDatum b σ → leviWh ψ b σ = 1 := by
+theorem leviWh_eq_one
+    : ∀ (F : Type) [Field F] [Fintype F] (ψ : AddChar F ℂ),
+      ψ ≠ 1
+        → ∀ (r : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (b : Fin r → ℕ)
+            (σ : Representation ℂ (blockTri (κ := F) b) V),
+          IsCuspDatum b σ → leviWh ψ b σ = 1 := by
   first
   | exact @_root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one
   | exact _root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one
   | (apply _root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one <;> assumption)
   | (intros; apply _root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.BlockDecompositionExistence.leviWh_eq_one ..)
 
 end Main

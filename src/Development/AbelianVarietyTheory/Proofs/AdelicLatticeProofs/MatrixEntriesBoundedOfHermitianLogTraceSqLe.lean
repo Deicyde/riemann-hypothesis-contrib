@@ -30,7 +30,9 @@ private lemma energy_trace_conj {ι : Type} [Fintype ι] [DecidableEq ι] (U : M
   rw [Matrix.trace_mul_cycle, hU', one_mul, Matrix.trace_diagonal, Complex.re_sum]
   simp
 
-theorem entries_le_of_energy_le : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (E : ℝ), ∃ C : ℝ, ∀ x H : Matrix ι ι ℂ, IsLog H (xᴴ * x) → (Matrix.trace (H * H)).re ≤ E → ∀ i j, ‖x i j‖ ≤ C ∧ ‖H i j‖ ≤ C := by
+theorem entries_le_of_energy_le
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (E : ℝ), ∃ C : ℝ, ∀ x H : Matrix ι ι ℂ,
+      IsLog H (xᴴ * x) → (Matrix.trace (H * H)).re ≤ E → ∀ i j, ‖x i j‖ ≤ C ∧ ‖H i j‖ ≤ C := by
   intro ι _ _ E
   refine ⟨max (√E) (√(Fintype.card ι * Real.exp (√E))), ?_⟩
   rintro x H ⟨U, d, hU, hH, hA⟩ hE i j
@@ -40,15 +42,17 @@ theorem entries_le_of_energy_le : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] 
     simp [Matrix.conjTranspose_mul, Matrix.diagonal_conjTranspose, Matrix.mul_assoc, Pi.star_def]
   have hHH : H * H = U * diagonal (fun i => ((d i ^ 2 : ℝ) : ℂ)) * Uᴴ := by
     rw [hH]
-    calc U * diagonal (fun i => (d i : ℂ)) * Uᴴ * (U * diagonal (fun i => (d i : ℂ)) * Uᴴ)
-        = U * (diagonal (fun i => (d i : ℂ)) * (Uᴴ * U) * diagonal (fun i => (d i : ℂ))) * Uᴴ := by
-          simp only [Matrix.mul_assoc]
+    calc
+      U * diagonal (fun i => (d i : ℂ)) * Uᴴ * (U * diagonal (fun i => (d i : ℂ)) * Uᴴ)
+          = U * (diagonal (fun i => (d i : ℂ)) * (Uᴴ * U) * diagonal (fun i => (d i : ℂ)))
+            * Uᴴ := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by
-          rw [hU', Matrix.mul_one, Matrix.diagonal_mul_diagonal]
-          congr 3
-          funext k
-          push_cast
-          ring
+        rw [hU', Matrix.mul_one, Matrix.diagonal_mul_diagonal]
+        congr 3
+        funext k
+        push_cast
+        ring
   have hd : ∀ k, d k ≤ √E := by
     intro k
     have h1 : ∑ k, d k ^ 2 ≤ E := by
@@ -62,8 +66,9 @@ theorem entries_le_of_energy_le : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] 
     apply Real.le_sqrt_of_sq_le
     refine (energy_entry_sq_le x i j).trans ?_
     rw [hA, energy_trace_conj U hU (fun i => Real.exp (d i))]
-    calc ∑ k, Real.exp (d k) ≤ ∑ _k : ι, Real.exp (√E) :=
-          Finset.sum_le_sum fun k _ => Real.exp_le_exp.mpr (hd k)
+    calc
+      ∑ k, Real.exp (d k)
+        ≤ ∑ _k : ι, Real.exp (√E) := Finset.sum_le_sum fun k _ => Real.exp_le_exp.mpr (hd k)
       _ = _ := by simp
   · refine le_trans ?_ (le_max_left _ _)
     apply Real.le_sqrt_of_sq_le

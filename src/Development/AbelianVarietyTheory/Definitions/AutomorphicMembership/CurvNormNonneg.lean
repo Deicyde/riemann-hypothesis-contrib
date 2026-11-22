@@ -19,7 +19,8 @@ variable {ι n : Type} [Fintype ι] [Fintype n]
 
 def nsq (M : ι → Matrix n n ℂ) (v : ι → n → ℂ) : ℝ := ∑ τ, (star (v τ) ⬝ᵥ M τ *ᵥ v τ).re
 
-theorem nsq_pos {M : ι → Matrix n n ℂ} (hM : ∀ τ, (M τ).PosDef) {v : ι → n → ℂ} (hv : v ≠ 0) : 0 < nsq M v := by
+theorem nsq_pos {M : ι → Matrix n n ℂ} (hM : ∀ τ, (M τ).PosDef) {v : ι → n → ℂ} (hv : v ≠ 0)
+    : 0 < nsq M v := by
   obtain ⟨τ, hτ⟩ := Function.ne_iff.mp hv
   have hnn : ∀ σ, 0 ≤ (star (v σ) ⬝ᵥ M σ *ᵥ v σ).re := fun σ =>
     (Complex.nonneg_iff.mp ((hM σ).posSemidef.dotProduct_mulVec_nonneg (v σ))).1
@@ -28,7 +29,8 @@ theorem nsq_pos {M : ι → Matrix n n ℂ} (hM : ∀ τ, (M τ).PosDef) {v : ι
   unfold nsq
   exact Finset.sum_pos' (fun σ _ => hnn σ) ⟨τ, Finset.mem_univ _, hp⟩
 
-theorem nsq_smul (M : ι → Matrix n n ℂ) (t : ℝ) (v : ι → n → ℂ) : nsq M (t • v) = t ^ 2 * nsq M v := by
+theorem nsq_smul (M : ι → Matrix n n ℂ) (t : ℝ) (v : ι → n → ℂ)
+    : nsq M (t • v) = t ^ 2 * nsq M v := by
   simp only [nsq, Finset.mul_sum]
   refine Finset.sum_congr rfl fun τ _ => ?_
   rw [Pi.smul_apply, star_smul, star_trivial, Matrix.mulVec_smul, dotProduct_smul, smul_dotProduct,
@@ -42,8 +44,8 @@ theorem continuous_nsq (M : ι → Matrix n n ℂ) : Continuous (nsq M) := by
   refine continuous_finsetSum _ fun τ _ => Complex.continuous_re.comp ?_
   exact ((continuous_apply τ).star).dotProduct (continuous_const.matrix_mulVec (continuous_apply τ))
 
-theorem exists_bounds {M : ι → Matrix n n ℂ} (hM : ∀ τ, (M τ).PosDef) :
-    ∃ a b : ℝ, 0 < a ∧ 0 < b ∧ ∀ v, a * ‖v‖ ^ 2 ≤ nsq M v ∧ nsq M v ≤ b * ‖v‖ ^ 2 := by
+theorem exists_bounds {M : ι → Matrix n n ℂ} (hM : ∀ τ, (M τ).PosDef)
+    : ∃ a b : ℝ, 0 < a ∧ 0 < b ∧ ∀ v, a * ‖v‖ ^ 2 ≤ nsq M v ∧ nsq M v ≤ b * ‖v‖ ^ 2 := by
   have hc := continuous_nsq M
   have hpos : ∀ v ∈ Metric.sphere (0 : ι → n → ℂ) 1, 0 < nsq M v := by
     intro v hv
@@ -52,10 +54,12 @@ theorem exists_bounds {M : ι → Matrix n n ℂ} (hM : ∀ τ, (M τ).PosDef) :
     simp at hv
   have hom : ∀ v : ι → n → ℂ, v ≠ 0 → nsq M v = ‖v‖ ^ 2 * nsq M (‖v‖⁻¹ • v) := by
     intro v hv
-    rw [nsq_smul, ← mul_assoc, ← mul_pow, mul_inv_cancel₀ (norm_ne_zero_iff.mpr hv), one_pow, one_mul]
+    rw [nsq_smul, ← mul_assoc, ← mul_pow, mul_inv_cancel₀ (norm_ne_zero_iff.mpr hv), one_pow,
+      one_mul]
   have mem : ∀ v : ι → n → ℂ, v ≠ 0 → ‖v‖⁻¹ • v ∈ Metric.sphere (0 : ι → n → ℂ) 1 := by
     intro v hv
-    rw [mem_sphere_zero_iff_norm, norm_smul, norm_inv, norm_norm, inv_mul_cancel₀ (norm_ne_zero_iff.mpr hv)]
+    rw [mem_sphere_zero_iff_norm, norm_smul, norm_inv, norm_norm,
+      inv_mul_cancel₀ (norm_ne_zero_iff.mpr hv)]
   rcases (Metric.sphere (0 : ι → n → ℂ) 1).eq_empty_or_nonempty with hE | hne
   · refine ⟨1, 1, one_pos, one_pos, fun v => ?_⟩
     have hv : v = 0 := by
@@ -67,7 +71,8 @@ theorem exists_bounds {M : ι → Matrix n n ℂ} (hM : ∀ τ, (M τ).PosDef) :
     simp [nsq_zero]
   · obtain ⟨u, hu, hmin⟩ := (isCompact_sphere (0 : ι → n → ℂ) 1).exists_isMinOn hne hc.continuousOn
     obtain ⟨w, -, hmax⟩ := (isCompact_sphere (0 : ι → n → ℂ) 1).exists_isMaxOn hne hc.continuousOn
-    refine ⟨nsq M u, max (nsq M w) 1, hpos u hu, lt_of_lt_of_le one_pos (le_max_right _ _), fun v => ?_⟩
+    refine
+      ⟨nsq M u, max (nsq M w) 1, hpos u hu, lt_of_lt_of_le one_pos (le_max_right _ _), fun v => ?_⟩
     rcases eq_or_ne v 0 with rfl | hv
     · simp [nsq_zero]
     · rw [hom v hv]
@@ -94,8 +99,8 @@ theorem ratios_nonempty [Nonempty ι] [Nonempty n] : (ratios h h0).Nonempty := b
   have h1 := congrFun (congrFun hv0 (Classical.arbitrary ι)) (Classical.arbitrary n)
   simp at h1
 
-theorem ratios_bounds (hh : ∀ τ, (h τ).PosDef) (hh0 : ∀ τ, (h0 τ).PosDef) :
-    ∃ a b : ℝ, 0 < a ∧ ∀ t ∈ ratios h h0, a ≤ t ∧ t ≤ b := by
+theorem ratios_bounds (hh : ∀ τ, (h τ).PosDef) (hh0 : ∀ τ, (h0 τ).PosDef)
+    : ∃ a b : ℝ, 0 < a ∧ ∀ t ∈ ratios h h0, a ≤ t ∧ t ≤ b := by
   obtain ⟨a1, b1, ha1, hb1, H1⟩ := exists_bounds hh
   obtain ⟨a0, b0, ha0, hb0, H0⟩ := exists_bounds hh0
   refine ⟨a1 / b0, b1 / a0, div_pos ha1 hb0, ?_⟩
@@ -109,8 +114,8 @@ theorem ratios_bounds (hh : ∀ τ, (h τ).PosDef) (hh0 : ∀ τ, (h0 τ).PosDef
   · rw [div_le_div_iff₀ hp0 ha0]
     nlinarith [mul_le_mul_of_nonneg_left u1 ha0.le, mul_le_mul_of_nonneg_left l0 hb1.le]
 
-theorem eigLo_pos [Nonempty ι] [Nonempty n] (hh : ∀ τ, (h τ).PosDef) (hh0 : ∀ τ, (h0 τ).PosDef) :
-    0 < eigLo h h0 ∧ eigLo h h0 ≤ eigUp h h0 := by
+theorem eigLo_pos [Nonempty ι] [Nonempty n] (hh : ∀ τ, (h τ).PosDef) (hh0 : ∀ τ, (h0 τ).PosDef)
+    : 0 < eigLo h h0 ∧ eigLo h h0 ≤ eigUp h h0 := by
   obtain ⟨a, b, ha, hab⟩ := ratios_bounds hh hh0
   have hne : (ratios h h0).Nonempty := ratios_nonempty
   have hbb : BddBelow (ratios h h0) := ⟨a, fun t ht => (hab t ht).1⟩
@@ -128,9 +133,11 @@ abbrev Pt (ι : Type) (p q : ℕ) : Type := ι → Matrix (Fin p) (Fin q) ℂ
 
 def dR (f : Pt ι p q → ℂ) (z ξ : Pt ι p q) : ℂ := fderiv ℝ (fun v => f (unflat v)) (flat z) (flat ξ)
 
-def dHol (f : Pt ι p q → ℂ) (z ξ : Pt ι p q) : ℂ := (dR f z ξ - Complex.I * dR f z (Complex.I • ξ)) / 2
+def dHol (f : Pt ι p q → ℂ) (z ξ : Pt ι p q) : ℂ :=
+  (dR f z ξ - Complex.I * dR f z (Complex.I • ξ)) / 2
 
-def dAnti (f : Pt ι p q → ℂ) (z η : Pt ι p q) : ℂ := (dR f z η + Complex.I * dR f z (Complex.I • η)) / 2
+def dAnti (f : Pt ι p q → ℂ) (z η : Pt ι p q) : ℂ :=
+  (dR f z η + Complex.I * dR f z (Complex.I • η)) / 2
 
 def ddc (f : Pt ι p q → ℝ) (z ξ : Pt ι p q) : ℝ :=
   (dHol (fun w => dAnti (fun u => (f u : ℂ)) w ξ) z ξ).re / Real.pi
@@ -143,15 +150,18 @@ def connMat (M : Pt ι p q → ι → Matrix n n ℂ) (z ξ : Pt ι p q) (τ : �
   (M z τ)⁻¹ * Matrix.of fun a b => dHol (fun w => M w τ a b) z ξ
 
 def curvMat (M : Pt ι p q → ι → Matrix n n ℂ) (z ξ η : Pt ι p q) (τ : ι) : Matrix n n ℂ :=
-  Matrix.of fun a b => -dAnti (fun w => connMat M w ξ τ a b) z η
+  Matrix.of fun a b => - dAnti (fun w => connMat M w ξ τ a b) z η
 
-def connNorm (h h0 : Pt ι p q → ι → Matrix n n ℂ) (β : Pt ι p q → Pt ι p q → ℝ) (z : Pt ι p q) : ℝ :=
-  sSup {t | ∃ ξ v, β z ξ ≤ 1 ∧ nsq (h0 z) v ≤ 1 ∧
-    t = Real.sqrt (nsq (h0 z) fun τ => (connMat h z ξ τ - connMat h0 z ξ τ) *ᵥ v τ)}
+def connNorm (h h0 : Pt ι p q → ι → Matrix n n ℂ) (β : Pt ι p q → Pt ι p q → ℝ) (z : Pt ι p q)
+    : ℝ :=
+  sSup
+    {t | ∃ ξ v, β z ξ ≤ 1 ∧ nsq (h0 z) v ≤ 1 ∧
+      t = Real.sqrt (nsq (h0 z) fun τ => (connMat h z ξ τ - connMat h0 z ξ τ) *ᵥ v τ)}
 
 def curvNorm (h : Pt ι p q → ι → Matrix n n ℂ) (β : Pt ι p q → Pt ι p q → ℝ) (z : Pt ι p q) : ℝ :=
-  sSup {t | ∃ ξ η v, β z ξ ≤ 1 ∧ β z η ≤ 1 ∧ nsq (h z) v ≤ 1 ∧
-    t = Real.sqrt (nsq (h z) fun τ => curvMat h z ξ η τ *ᵥ v τ)}
+  sSup
+    {t | ∃ ξ η v, β z ξ ≤ 1 ∧ β z η ≤ 1 ∧ nsq (h z) v ≤ 1 ∧
+      t = Real.sqrt (nsq (h z) fun τ => curvMat h z ξ η τ *ᵥ v τ)}
 
 end Calculus
 
@@ -160,40 +170,41 @@ section Boundary
 variable {ι : Type} [Fintype ι] {p q : ℕ}
 
 structure BdData (ι : Type) [Fintype ι] (p q : ℕ) (Γ : Subgroup (ι → GL (Fin p ⊕ Fin q) ℂ)) where
-
   m : ℕ
-
   nrm : Fin m → Pt ι p q → ℝ
   nrm_pos : ∀ i, ∀ z ∈ DomI ι p q, 0 < nrm i z
   nrm_le : ∀ i, ∀ z ∈ DomI ι p q, nrm i z ≤ 1
   nrm_smooth : ∀ i, SmoothOn fun z => (nrm i z : ℂ)
   nrm_inv : ∀ i, ∀ γ ∈ Γ, ∀ z ∈ DomI ι p q, nrm i (moebI γ z) = nrm i z
-
   kae : Pt ι p q → Pt ι p q →ₗ[ℂ] Pt ι p q →ₗ⋆[ℂ] ℂ
   kae_herm : ∀ z ∈ DomI ι p q, ∀ ξ η, kae z η ξ = starRingEnd ℂ (kae z ξ η)
   kae_pos : ∀ z ∈ DomI ι p q, ∀ ξ, ξ ≠ 0 → 0 < (kae z ξ ξ).re
   kae_smooth : ∀ ξ η, SmoothOn fun z => kae z ξ η
-  kae_inv : ∀ γ ∈ Γ, ∀ z ∈ DomI ι p q, ∀ ξ η,
-    kae (moebI γ z) (fun τ => tanAct (γ τ) (z τ) (ξ τ)) (fun τ => tanAct (γ τ) (z τ) (η τ)) = kae z ξ η
-
+  kae_inv
+    : ∀ γ ∈ Γ, ∀ z ∈ DomI ι p q, ∀ ξ η,
+      kae (moebI γ z) (fun τ => tanAct (γ τ) (z τ) (ξ τ)) (fun τ => tanAct (γ τ) (z τ) (η τ))
+        = kae z ξ η
   cst : ℝ
   cst_pos : 0 < cst
-  cst_small : ∀ i, ∀ z ∈ DomI ι p q, ∀ ξ,
-    2 * m * cst * |ddc (fun w => Real.exp 1 - Real.log (nrm i w ^ 2)) z ξ| ≤ Real.exp 1 * (kae z ξ ξ).re
-
+  cst_small
+    : ∀ i, ∀ z ∈ DomI ι p q, ∀ ξ,
+      2 * m * cst * |ddc (fun w => Real.exp 1 - Real.log (nrm i w ^ 2)) z ξ|
+        ≤ Real.exp 1 * (kae z ξ ξ).re
   metW : Pt ι p q → ι → Matrix (Fin p) (Fin p) ℂ
-
   metOm : Pt ι p q → ι → Matrix (Fin q) (Fin q) ℂ
   metW_pos : ∀ z ∈ DomI ι p q, ∀ τ, (metW z τ).PosDef
   metOm_pos : ∀ z ∈ DomI ι p q, ∀ τ, (metOm z τ).PosDef
   metW_smooth : ∀ τ a b, SmoothOn fun z => metW z τ a b
   metOm_smooth : ∀ τ a b, SmoothOn fun z => metOm z τ a b
-  metW_inv : ∀ γ ∈ Γ, ∀ z ∈ DomI ι p q, ∀ τ,
-    (jW (γ τ) (z τ))ᴴ * metW (moebI γ z) τ * jW (γ τ) (z τ) = metW z τ
-  metOm_inv : ∀ γ ∈ Γ, ∀ z ∈ DomI ι p q, ∀ τ,
-    (kapQ (γ τ) (z τ))ᴴ * metOm (moebI γ z) τ * kapQ (γ τ) (z τ) = metOm z τ
+  metW_inv
+    : ∀ γ ∈ Γ, ∀ z ∈ DomI ι p q, ∀ τ,
+      (jW (γ τ) (z τ))ᴴ * metW (moebI γ z) τ * jW (γ τ) (z τ) = metW z τ
+  metOm_inv
+    : ∀ γ ∈ Γ, ∀ z ∈ DomI ι p q, ∀ τ,
+      (kapQ (γ τ) (z τ))ᴴ * metOm (moebI γ z) τ * kapQ (γ τ) (z τ) = metOm z τ
 
-def hodgeI (c : ι → ℝ) (z : Pt ι p q) (τ : ι) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ := hodge (c τ) (z τ)
+def hodgeI (c : ι → ℝ) (z : Pt ι p q) (τ : ι) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ :=
+  hodge (c τ) (z τ)
 
 namespace BdData
 
@@ -203,16 +214,19 @@ def ri (i : Fin B.m) (z : Pt ι p q) : ℝ := Real.exp 1 - Real.log (B.nrm i z ^
 
 def r (z : Pt ι p q) : ℝ := Real.exp 1 - Real.log ((∏ i, B.nrm i z) ^ 2)
 
-def beta (z ξ : Pt ι p q) : ℝ := (B.kae z ξ ξ).re - B.cst * ∑ i, ddc (fun w => Real.log (B.ri i w)) z ξ
+def beta (z ξ : Pt ι p q) : ℝ :=
+  (B.kae z ξ ξ).re - B.cst * ∑ i, ddc (fun w => Real.log (B.ri i w)) z ξ
 
-def met (z : Pt ι p q) (τ : ι) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ := blkMet (B.metW z τ) (B.metOm z τ)
+def met (z : Pt ι p q) (τ : ι) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ :=
+  blkMet (B.metW z τ) (B.metOm z τ)
 
 theorem exp_le_r {z : Pt ι p q} (hz : z ∈ DomI ι p q) : Real.exp 1 ≤ B.r z := by
   unfold r
   have h0 : 0 ≤ ∏ i, B.nrm i z := Finset.prod_nonneg fun i _ => (B.nrm_pos i z hz).le
   have h1 : ∏ i, B.nrm i z ≤ 1 :=
     Finset.prod_le_one₀ (fun i _ => (B.nrm_pos i z hz).le) fun i _ => B.nrm_le i z hz
-  have h3 : Real.log ((∏ i, B.nrm i z) ^ 2) ≤ 0 := Real.log_nonpos (by positivity) (pow_le_one₀ h0 h1)
+  have h3 : Real.log ((∏ i, B.nrm i z) ^ 2) ≤ 0 :=
+    Real.log_nonpos (by positivity) (pow_le_one₀ h0 h1)
   linarith
 
 theorem met_posDef {z : Pt ι p q} (hz : z ∈ DomI ι p q) (τ : ι) : (B.met z τ).PosDef := by

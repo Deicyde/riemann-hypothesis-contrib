@@ -7,20 +7,29 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
 private theorem UpperTheory.V.Ws.P1.condD_roots : ∀ w ∈ roots, ∃ i j : Fin 4, w = wt i j := by
   decide
 
-private theorem UpperTheory.V.Ws.P1.condD_rt {O Γ : Type} [CommRing O] [Group Γ] (Φ : Fr O Γ) (g : Γ)
-    (h : Φ.χ 0 g * Φ.χ 3 g = Φ.χ 1 g * Φ.χ 2 g) (i j : Fin 4) : Φ.rt (wt i j) g * Φ.χ j g = Φ.χ i g := by
+private theorem UpperTheory.V.Ws.P1.condD_rt
+    {O Γ : Type} [CommRing O] [Group Γ]
+    (Φ : Fr O Γ) (g : Γ) (h : Φ.χ 0 g * Φ.χ 3 g = Φ.χ 1 g * Φ.χ 2 g)
+    (i j : Fin 4)
+    : Φ.rt (wt i j) g * Φ.χ j g = Φ.χ i g := by
   have hd : Φ.χ 3 g = Φ.χ 1 g * Φ.χ 2 g * (Φ.χ 0 g)⁻¹ := by
     rw [← h, mul_comm (Φ.χ 0 g) (Φ.χ 3 g), mul_inv_cancel_right]
-  fin_cases i <;> fin_cases j <;> simp [Fr.rt, wt, lamW, muW, hd] <;>
-    (apply Additive.ofMul.injective; simp only [ofMul_mul, ofMul_inv]; abel)
+  fin_cases i <;> fin_cases j <;> simp [Fr.rt, wt, lamW, muW, hd]
+    <;> (apply Additive.ofMul.injective; simp only [ofMul_mul, ofMul_inv]; abel)
 
-theorem UpperTheory.V.Ws.P1.condD :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D), T.Fit → T.Deep → ∀ (c' : Coef l) (h : c.O ≤ c'.O) (K : Link T c' h), ∃ i j, ∀ n : ℕ, 0 < n → n ≤ 4 → (K.r.chib i / K.r.chib j) ^ n ≠ 1 := by
+theorem UpperTheory.V.Ws.P1.condD
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c) (T : Tower D),
+      T.Fit → T.Deep
+        → ∀ (c' : Coef l) (h : c.O ≤ c'.O) (K : Link T c' h), ∃ i j, ∀ n : ℕ,
+          0 < n → n ≤ 4 → (K.r.chib i / K.r.chib j) ^ n ≠ 1 := by
   intro Ω _ _ _ l _ c D T hfit _ c' h K
   obtain ⟨w, hw, hord⟩ := hfit.1.ord
   obtain ⟨i, j, rfl⟩ := condD_roots w hw
@@ -38,8 +47,9 @@ theorem UpperTheory.V.Ws.P1.condD :
   have hA : (T.fr ∅).χ i g = chi D T.pr i (resQ T.L g') := by rw [← hq]; rfl
   have hB : (T.fr ∅).χ j g = chi D T.pr j (resQ T.L g') := by rw [← hq]; rfl
   rw [hA, hB] at hrt
-  have hAval : ((chi D T.pr i (resQ T.L g') : (c.O)ˣ) : c.O) =
-      (((T.fr ∅).rt (wt i j) g : (c.O)ˣ) : c.O) * (chi D T.pr j (resQ T.L g') : c.O) := by
+  have hAval
+      : ((chi D T.pr i (resQ T.L g') : (c.O)ˣ) : c.O)
+        = (((T.fr ∅).rt (wt i j) g : (c.O)ˣ) : c.O) * (chi D T.pr j (resQ T.L g') : c.O) := by
     rw [← hrt, Units.val_mul]
   have hx : (K.r.chib i (K.V.pr g') / K.r.chib j (K.V.pr g')) ^ n = 1 :=
     DFunLike.congr_fun heq (K.V.pr g')

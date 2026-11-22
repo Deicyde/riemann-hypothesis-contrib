@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.RealEmbeddingCharacters
 
-open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
+open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
 open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
@@ -105,8 +106,7 @@ instance periods_discrete : DiscreteTopology (X.periods la) := by
   apply Subtype.ext
   have hq' : ‖(q : X.Ψ → ℝ)‖ < min ε 1 := by simpa using hq
   by_contra hne
-  have hmem : (q : X.Ψ → ℝ) ∈ T :=
-    ⟨⟨q.2, lt_of_lt_of_le hq' (min_le_right _ _)⟩, hne⟩
+  have hmem : (q : X.Ψ → ℝ) ∈ T := ⟨⟨q.2, lt_of_lt_of_le hq' (min_le_right _ _)⟩, hne⟩
   have : (q : X.Ψ → ℝ) ∈ Metric.ball (0 : X.Ψ → ℝ) ε := by
     rw [Metric.mem_ball, dist_zero_right]; exact lt_of_lt_of_le hq' (min_le_left _ _)
   exact hball this hmem
@@ -115,7 +115,8 @@ def fixF : Subfield E where
   carrier := {a | cc a = a}
   mul_mem' {a b} ha hb := by
     show cc (a * b) = a * b
-    rw [show cc (a * b) = cc a * cc b from map_mul _ a b, show cc a = a from ha, show cc b = b from hb]
+    rw [show cc (a * b) = cc a * cc b from map_mul _ a b, show cc a = a from ha,
+      show cc b = b from hb]
   one_mem' := show cc (1 : E) = 1 from map_one _
   add_mem' {a b} ha hb := by
     show cc (a + b) = a + b

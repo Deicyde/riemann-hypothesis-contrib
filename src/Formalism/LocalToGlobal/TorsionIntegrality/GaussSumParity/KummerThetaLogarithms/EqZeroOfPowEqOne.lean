@@ -21,8 +21,8 @@ section Gen
 
 variable {K : Type} [Field K] {τ : Type} [DecidableEq τ] {l d : ℕ}
 
-def gLog (K : Type) [Field K] (l : ℕ) (φ : ZMod d → τ) (s : ZMod d) : MvPowerSeries τ K :=
-  fun n => ∑ e ∈ Finset.range (n.degree + 1),
+def gLog (K : Type) [Field K] (l : ℕ) (φ : ZMod d → τ) (s : ZMod d) : MvPowerSeries τ K := fun n =>
+  ∑ e ∈ Finset.range (n.degree + 1),
     if n = Finsupp.single (φ (s - 2 * (e : ZMod d))) ((l ^ 2) ^ e) then ((l : K) ^ e)⁻¹ else 0
 
 lemma pow_inj (hl : 2 ≤ l) {a b : ℕ} (h : (l ^ 2) ^ a = (l ^ 2) ^ b) : a = b := by

@@ -6,19 +6,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMulEqZ
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.InjFlat
 
-instance evalLeft_preservesMono (S : Type 1) [Ring S] (c : Scheme.{0}ᵒᵖ) :
-    (evaluationLeftAdjoint (ModuleCat.{1} S) c).PreservesMonomorphisms where
+instance evalLeft_preservesMono (S : Type 1) [Ring S] (c : Scheme.{0}ᵒᵖ)
+    : (evaluationLeftAdjoint (ModuleCat.{1} S) c).PreservesMonomorphisms where
   preserves {a b} f _ := by
     have : AB4OfSize.{0} (ModuleCat.{1} S) := AB4OfSize_shrink.{0, 1} _
     rw [NatTrans.mono_iff_mono_app']
     intro t
-    have h : ((evaluationLeftAdjoint (ModuleCat.{1} S) c).map f).app t =
-        colim.map (Discrete.natTrans (fun _ => f) :
-          Discrete.functor (fun _ : c ⟶ t => a) ⟶ Discrete.functor (fun _ : c ⟶ t => b)) := by
+    have h
+        : ((evaluationLeftAdjoint (ModuleCat.{1} S) c).map f).app t
+          = colim.map
+            (Discrete.natTrans (fun _ => f)
+              : Discrete.functor (fun _ : c ⟶ t => a) ⟶ Discrete.functor (fun _ : c ⟶ t => b)) := by
       apply Sigma.hom_ext
       intro g
       simp only [evaluationLeftAdjoint_map_app]
@@ -27,26 +30,32 @@ instance evalLeft_preservesMono (S : Type 1) [Ring S] (c : Scheme.{0}ᵒᵖ) :
     rw [h]
     have : HasExactColimitsOfShape (Discrete (c ⟶ t)) (ModuleCat.{1} S) := inferInstance
     have : PreservesFiniteLimits (colim : (Discrete (c ⟶ t) ⥤ ModuleCat.{1} S) ⥤ _) := inferInstance
-    have hm : Mono (Discrete.natTrans (fun _ => f) :
-        Discrete.functor (fun _ : c ⟶ t => a) ⟶ Discrete.functor (fun _ : c ⟶ t => b)) :=
-      have : ∀ X, Mono ((Discrete.natTrans (fun _ => f) :
-          Discrete.functor (fun _ : c ⟶ t => a) ⟶ Discrete.functor (fun _ : c ⟶ t => b)).app X) :=
-        fun _ => inferInstanceAs (Mono f)
+    have hm : Mono
+        (Discrete.natTrans (fun _ => f)
+          : Discrete.functor (fun _ : c ⟶ t => a) ⟶ Discrete.functor (fun _ : c ⟶ t => b)) :=
+      have : ∀ X,
+          Mono
+            ((Discrete.natTrans (fun _ => f)
+                : Discrete.functor (fun _ : c ⟶ t => a) ⟶ Discrete.functor (fun _ : c ⟶ t => b)).app
+              X) := fun _ =>
+        inferInstanceAs (Mono f)
       NatTrans.mono_of_mono_app _
     exact Functor.map_mono colim _
 
-theorem sec_injective (S : Type) [CommRing S] (M : Shv S) [Injective M] (U : Scheme.{0}) :
-    Injective (M.obj.obj (op U)) := by
+theorem sec_injective (S : Type) [CommRing S] (M : Shv S) [Injective M] (U : Scheme.{0})
+    : Injective (M.obj.obj (op U)) := by
   have h1 : Injective M.obj :=
-    (sheafificationAdjunction Scheme.etaleTopology (ModuleCat.{1} (ULift.{1} S))).map_injective M inferInstance
+    (sheafificationAdjunction Scheme.etaleTopology (ModuleCat.{1} (ULift.{1} S))).map_injective M
+      inferInstance
   exact (evaluationAdjunctionRight (ModuleCat.{1} (ULift.{1} S)) (op U)).map_injective M.obj h1
 
 end GlobalTheory.EtC.InjFlat
 
 namespace GlobalTheory.EtC.InjFlat
 
-theorem zmod_mul_eq_zero (q d e : ℕ) [NeZero q] (hde : d * e = q) (z : ZMod q) (hz : (e : ZMod q) * z = 0) :
-    ∃ c : ZMod q, z = c * d := by
+theorem zmod_mul_eq_zero
+    (q d e : ℕ) [NeZero q] (hde : d * e = q) (z : ZMod q) (hz : (e : ZMod q) * z = 0)
+    : ∃ c : ZMod q, z = c * d := by
   have hq : q ≠ 0 := NeZero.ne q
   have he : e ≠ 0 := by rintro rfl; simp at hde; exact hq hde.symm
   have h1 : q ∣ e * z.val := by
@@ -56,8 +65,8 @@ theorem zmod_mul_eq_zero (q d e : ℕ) [NeZero q] (hde : d * e = q) (z : ZMod q)
   refine ⟨k, ?_⟩
   rw [← ZMod.natCast_zmod_val z, hk, Nat.cast_mul, mul_comm]
 
-theorem div_of_injective (q : ℕ) [NeZero q] (N : ModuleCat.{1} (ULift.{1} (ZMod q))) [Injective N] :
-    ∀ d e : ℕ, d * e = q → ∀ x : N, d • x = 0 → ∃ y : N, x = e • y := by
+theorem div_of_injective (q : ℕ) [NeZero q] (N : ModuleCat.{1} (ULift.{1} (ZMod q))) [Injective N]
+    : ∀ d e : ℕ, d * e = q → ∀ x : N, d • x = 0 → ∃ y : N, x = e • y := by
   intro d e hde x hx
   let R := ULift.{1} (ZMod q)
   let I : Submodule R R := Submodule.span R {(d : R)}
@@ -65,7 +74,8 @@ theorem div_of_injective (q : ℕ) [NeZero q] (N : ModuleCat.{1} (ULift.{1} (ZMo
     rw [Submodule.span_le, Set.singleton_subset_iff]
     change (e : R) • (d : R) = 0
     rw [smul_eq_mul, ← Nat.cast_mul, mul_comm, hde]
-    ext; simp
+    ext
+    simp
   have hJ : I ≤ LinearMap.ker (LinearMap.toSpanSingleton R N x) := by
     rw [Submodule.span_le, Set.singleton_subset_iff]
     change (d : R) • x = 0
@@ -80,10 +90,11 @@ theorem div_of_injective (q : ℕ) [NeZero q] (N : ModuleCat.{1} (ULift.{1} (ZMo
     rw [LinearMap.mem_ker] at hr
     change (e : R) • r = 0 at hr
     rw [Submodule.mem_bot, Submodule.Quotient.mk_eq_zero]
-    obtain ⟨c, hc⟩ := zmod_mul_eq_zero q d e hde r.down (by
-      have := congrArg ULift.down hr
-      rw [smul_eq_mul, ULift.mul_down, ULift.down_natCast] at this
-      exact this)
+    obtain ⟨c, hc⟩ :=
+      zmod_mul_eq_zero q d e hde r.down (by
+        have := congrArg ULift.down hr
+        rw [smul_eq_mul, ULift.mul_down, ULift.down_natCast] at this
+        exact this)
     rw [Submodule.mem_span_singleton]
     refine ⟨ULift.up c, ?_⟩
     apply ULift.down_injective
@@ -106,12 +117,14 @@ theorem div_of_injective (q : ℕ) [NeZero q] (N : ModuleCat.{1} (ULift.{1} (ZMo
   rw [hi1, hf1] at h2
   rw [← h2, ← Nat.cast_smul_eq_nsmul R, ← map_smul, smul_eq_mul, mul_one]
 
-theorem flat_of_injective : ∀ (q : ℕ) [NeZero q] (M : Shv (ZMod q)) [Injective M],
-    (∀ U : Scheme.{0}, Module.Flat (ULift.{1} (ZMod q)) (Sec M U)) ∧ FlatS M := by
+theorem flat_of_injective
+    : ∀ (q : ℕ) [NeZero q] (M : Shv (ZMod q)) [Injective M],
+      (∀ U : Scheme.{0}, Module.Flat (ULift.{1} (ZMod q)) (Sec M U)) ∧ FlatS M := by
   intro q _ M _
   have hflat : ∀ U : Scheme.{0}, Module.Flat (ULift.{1} (ZMod q)) (Sec M U) := fun U => by
     have := sec_injective (ZMod q) M U
-    exact GlobalTheory.ZModFlat.flat_of_divisibility q (Sec M U) (div_of_injective q (M.obj.obj (op U)))
+    exact GlobalTheory.ZModFlat.flat_of_divisibility q (Sec M U)
+      (div_of_injective q (M.obj.obj (op U)))
   refine ⟨hflat, M.obj, 𝟙 _, ?_, ?_, fun U _ => hflat U⟩
   · intro U y
     exact ⟨⊤, Scheme.etaleTopology.top_mem U, fun V g _ => ⟨(M.obj.map g.op).hom y, rfl⟩⟩

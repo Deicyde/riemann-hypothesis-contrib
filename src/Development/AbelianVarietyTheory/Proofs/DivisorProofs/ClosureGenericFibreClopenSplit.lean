@@ -6,10 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RangeComapIn
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
-theorem GlobalTheory.closure_generic_fibre_clopen_split : ∀ (R A : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [CommRing A] [Algebra R A], Algebra.Smooth R A → ∀ C C' : Set (PrimeSpectrum A), C ∪ C' = {r | r.asIdeal.comap (algebraMap R A) = ⊥} → Disjoint C (closure C') → Disjoint (closure C) C' → Disjoint (closure C) (closure C') ∧ closure C ∪ closure C' = Set.univ := by
+theorem GlobalTheory.closure_generic_fibre_clopen_split
+    : ∀ (R A : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [CommRing A] [Algebra R A],
+      Algebra.Smooth R A
+        → ∀ C C' : Set (PrimeSpectrum A),
+          C ∪ C' = {r | r.asIdeal.comap (algebraMap R A) = ⊥} → Disjoint C (closure C')
+            → Disjoint (closure C) C'
+            → Disjoint (closure C) (closure C') ∧ closure C ∪ closure C' = Set.univ := by
   intro R A _ _ _ _ _ hsm C C' hU hd1 hd2
   let K := FractionRing R
   let f : A →+* A ⊗[R] K := (Algebra.TensorProduct.includeLeft : A →ₐ[R] A ⊗[R] K).toRingHom
@@ -23,7 +30,9 @@ theorem GlobalTheory.closure_generic_fibre_clopen_split : ∀ (R A : Type) [Comm
     rw [hker] at h1
     rw [← h1]
     let e := (Algebra.TensorProduct.comm R A K).toRingEquiv
-    have hg : (Algebra.TensorProduct.includeRight : A →ₐ[R] K ⊗[R] A).toRingHom = e.toRingHom.comp f := by
+    have hg
+        : (Algebra.TensorProduct.includeRight : A →ₐ[R] K ⊗[R] A).toRingHom
+          = e.toRingHom.comp f := by
       ext a
       simp [f, e]
     rw [hg, PrimeSpectrum.comap_comp, Set.range_comp]
@@ -34,11 +43,12 @@ theorem GlobalTheory.closure_generic_fibre_clopen_split : ∀ (R A : Type) [Comm
     rw [hsurj, Set.image_univ]
 
   have hinj : Function.Injective f := by
-    have hl := Module.Flat.lTensor_preserves_injective_linearMap (M := A) (Algebra.linearMap R K)
-      (IsFractionRing.injective R K)
+    have hl :=
+      Module.Flat.lTensor_preserves_injective_linearMap (M := A) (Algebra.linearMap R K)
+        (IsFractionRing.injective R K)
     intro x y hxy
-    have : (LinearMap.lTensor A (Algebra.linearMap R K)) ((TensorProduct.rid R A).symm x) =
-        (LinearMap.lTensor A (Algebra.linearMap R K)) ((TensorProduct.rid R A).symm y) := by
+    have : (LinearMap.lTensor A (Algebra.linearMap R K)) ((TensorProduct.rid R A).symm x)
+        = (LinearMap.lTensor A (Algebra.linearMap R K)) ((TensorProduct.rid R A).symm y) := by
       simpa [f] using hxy
     exact (TensorProduct.rid R A).symm.injective (hl this)
   have hdense : DenseRange φ :=
@@ -47,8 +57,7 @@ theorem GlobalTheory.closure_generic_fibre_clopen_split : ∀ (R A : Type) [Comm
   have hCC' : Disjoint C C' := hd1.mono_right subset_closure
   have hunion : φ ⁻¹' C ∪ φ ⁻¹' C' = Set.univ := by
     rw [← Set.preimage_union, hU, hF, Set.preimage_range]
-  have hcompl : IsCompl (φ ⁻¹' C) (φ ⁻¹' C') :=
-    ⟨hCC'.preimage φ, codisjoint_iff.2 hunion⟩
+  have hcompl : IsCompl (φ ⁻¹' C) (φ ⁻¹' C') := ⟨hCC'.preimage φ, codisjoint_iff.2 hunion⟩
   have hS1 : φ ⁻¹' closure C = φ ⁻¹' C := by
     refine Set.Subset.antisymm (fun x hx => ?_) (Set.preimage_mono subset_closure)
     have hx' : x ∈ φ ⁻¹' C ∪ φ ⁻¹' C' := hunion ▸ Set.mem_univ x
@@ -63,8 +72,7 @@ theorem GlobalTheory.closure_generic_fibre_clopen_split : ∀ (R A : Type) [Comm
     · exact absurd hx (Set.disjoint_left.1 hd1 h)
     · exact h
   have hclosed' : IsClosed (φ ⁻¹' C') := hS2 ▸ isClosed_closure.preimage hφc
-  have hopen : IsOpen (φ ⁻¹' C) := by
-    rw [← isClosed_compl_iff, hcompl.compl_eq]; exact hclosed'
+  have hopen : IsOpen (φ ⁻¹' C) := by rw [← isClosed_compl_iff, hcompl.compl_eq]; exact hclosed'
   obtain ⟨ε, hε, hεS⟩ := PrimeSpectrum.isClopen_iff.1 ⟨hclosed, hopen⟩
   obtain ⟨a, ha, haε⟩ := GlobalTheory.T.exists_idempotent_tmul_one_eq_of_smooth_algebra R A hsm ε hε
   have hfa : f a = ε := by simp [f, haε]

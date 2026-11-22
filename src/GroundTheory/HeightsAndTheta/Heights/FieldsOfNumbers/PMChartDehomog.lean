@@ -15,9 +15,11 @@ noncomputable section
 
 universe u
 
-theorem prod_pow_blockWeight {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {M : Type*}
-    [CommMonoid M] (w : K → M) (e : (Σ k, ι k) →₀ ℕ) :
-    ∏ k, w k ^ (Finsupp.weight (blockWeight ι) e k) = e.prod fun v n => w v.1 ^ n := by
+theorem prod_pow_blockWeight
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} {M : Type*} [CommMonoid M]
+    (w : K → M) (e : (Σ k, ι k) →₀ ℕ)
+    : ∏ k, w k ^ (Finsupp.weight (blockWeight ι) e k) = e.prod fun v n => w v.1 ^ n := by
   simp only [Finsupp.weight_apply, Finsupp.sum, Finset.sum_apply, ← Finset.prod_pow_eq_pow_sum]
   rw [Finset.prod_comm, Finsupp.prod]
   refine Finset.prod_congr rfl fun v _ => ?_
@@ -36,14 +38,15 @@ theorem MChartDehomog.proof : MChartDehomog.Statement := by
     simp only [w, φ, RingHom.comp_apply, ne_eq, IsFractionRing.to_map_eq_zero_iff,
       Ideal.Quotient.eq_zero_iff_mem]
     exact hu k
-  have hD : φ (chartMonomial u b) = ∏ k, w k ^ b k := by
-    simp [chartMonomial, w, map_prod, map_pow]
+  have hD : φ (chartMonomial u b) = ∏ k, w k ^ b k := by simp [chartMonomial, w, map_prod, map_pow]
   have hC : ∀ c : F, φ (C c) = algebraMap F L c := fun c => by
     simp only [φ, RingHom.comp_apply]
     rw [← MvPolynomial.algebraMap_eq, ← Ideal.Quotient.mkₐ_eq_mk F, AlgHom.commutes,
       ← IsScalarTower.algebraMap_apply]
-  have hmono : ∀ e ∈ f.support, chartMap P u (monomial e (AddMonoidAlgebra.coeff f e)) * ∏ k, w k ^ b k =
-      φ (monomial e (AddMonoidAlgebra.coeff f e)) := by
+  have hmono
+      : ∀ e ∈ f.support,
+        chartMap P u (monomial e (AddMonoidAlgebra.coeff f e)) * ∏ k, w k ^ b k
+          = φ (monomial e (AddMonoidAlgebra.coeff f e)) := by
     intro e he
     have hwe : Finsupp.weight (blockWeight ι) e = b := hf (mem_support_iff.mp he)
     rw [← hwe, prod_pow_blockWeight, chartMap, aeval_monomial, mul_assoc, ← Finsupp.prod_mul,

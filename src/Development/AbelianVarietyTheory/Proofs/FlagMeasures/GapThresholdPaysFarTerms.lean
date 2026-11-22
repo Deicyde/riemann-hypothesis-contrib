@@ -8,8 +8,7 @@ open Matrix Finset Real
 
 namespace GlobalTheory
 
-private theorem log_le_sqrt_of_one_le (x : ℝ) (hx : 1 ≤ x) :
-    Real.log x ≤ Real.sqrt x := by
+private theorem log_le_sqrt_of_one_le (x : ℝ) (hx : 1 ≤ x) : Real.log x ≤ Real.sqrt x := by
   have hs : 0 < Real.sqrt x := Real.sqrt_pos.2 (by linarith)
   have hx2 : Real.sqrt x ^ 2 = x := Real.sq_sqrt (by linarith)
   have h1 : Real.log (Real.sqrt x / 2) ≤ Real.sqrt x / 2 - 1 :=
@@ -24,9 +23,17 @@ private theorem log_le_sqrt_of_one_le (x : ℝ) (hx : 1 ≤ x) :
   have h4 := Real.log_two_lt_d9
   linarith
 
-
 set_option maxHeartbeats 800000 in
-theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : ℝ) (h t : ℝ), 0 ≤ Cg → 3 ≤ n → 1 ≤ f → 1 ≤ q → q ^ 2 ≤ n → 1 ≤ rd → Real.log f ≤ Real.sqrt n → 2 ≤ b → 1 ≤ g → g ≤ b ^ Cg → 8 * 10 ^ 14 * (Cg + 4) * (n : ℝ) ^ 19 * (f : ℝ) ^ 5 * Real.log (b * rd) ≤ h → ((n : ℝ) * f * rd * g * b)⁻¹ ^ (11 * q) ≤ t → t ≤ 1 / 2 → let ep : ℝ := 1 / 10 ^ 6 / ((n : ℝ) ^ 8 * (f : ℝ) ^ 2); 64 * (n : ℝ) ^ 2 ≤ h * ep ∧ 1 ≤ h * ep ^ 2 / 16 ∧ (3 * Real.sqrt n / t ^ 2) ^ (2 * (n ^ 2 * f)) * (2 * f * 3 ^ f * Real.exp (-(h * ep ^ 2 / 16))) ≤ Real.exp (-((n : ℝ) ^ 2 * f)) := by
+theorem gap_threshold_pays_far_terms
+    : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : ℝ) (h t : ℝ),
+      0 ≤ Cg → 3 ≤ n → 1 ≤ f → 1 ≤ q → q ^ 2 ≤ n → 1 ≤ rd → Real.log f ≤ Real.sqrt n → 2 ≤ b → 1 ≤ g
+        → g ≤ b ^ Cg → 8 * 10 ^ 14 * (Cg + 4) * (n : ℝ) ^ 19 * (f : ℝ) ^ 5 * Real.log (b * rd) ≤ h
+        → ((n : ℝ) * f * rd * g * b)⁻¹ ^ (11 * q) ≤ t → t ≤ 1 / 2
+        → let ep : ℝ := 1 / 10 ^ 6 / ((n : ℝ) ^ 8 * (f : ℝ) ^ 2)
+          64 * (n : ℝ) ^ 2 ≤ h * ep ∧ 1 ≤ h * ep ^ 2 / 16
+            ∧ (3 * Real.sqrt n / t ^ 2) ^ (2 * (n ^ 2 * f))
+                * (2 * f * 3 ^ f * Real.exp (-(h * ep ^ 2 / 16)))
+              ≤ Real.exp (-((n : ℝ) ^ 2 * f)) := by
   intro Cg n f q rd g b h t hCg hn hf hq hqn hrd hlogf hb hg1 hgb hh ht1 _ht2 ep
   have hep : ep = 1 / 10 ^ 6 / ((n : ℝ) ^ 8 * (f : ℝ) ^ 2) := rfl
   clear_value ep
@@ -48,13 +55,15 @@ theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : �
     have e1 := Real.log_le_log (by norm_num) hbrd
     have e2 := Real.log_two_gt_d9
     linarith
-  have hlogb : Real.log b ≤ ℓ := Real.log_le_log (by linarith) (le_mul_of_one_le_right (by linarith) hrd)
+  have hlogb : Real.log b ≤ ℓ :=
+    Real.log_le_log (by linarith) (le_mul_of_one_le_right (by linarith) hrd)
   have hlogb0 : 0 ≤ Real.log b := Real.log_nonneg (by linarith)
   have hKl : 2.76 ≤ (Cg + 4) * ℓ := by nlinarith [mul_nonneg hCg (by linarith : (0 : ℝ) ≤ ℓ)]
 
   have hX : 50 * (Cg + 4) * (n : ℝ) ^ 3 * f * ℓ ≤ h * ep ^ 2 / 16 := by
-    have e : 8 * 10 ^ 14 * (Cg + 4) * (n : ℝ) ^ 19 * (f : ℝ) ^ 5 * ℓ * ep ^ 2 / 16
-        = 50 * (Cg + 4) * (n : ℝ) ^ 3 * f * ℓ := by
+    have e
+        : 8 * 10 ^ 14 * (Cg + 4) * (n : ℝ) ^ 19 * (f : ℝ) ^ 5 * ℓ * ep ^ 2 / 16
+          = 50 * (Cg + 4) * (n : ℝ) ^ 3 * f * ℓ := by
       rw [hep]
       field_simp
       norm_num
@@ -64,8 +73,9 @@ theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : �
   have hn3f : 1 ≤ (n : ℝ) ^ 3 * f := by
     exact one_le_mul_of_one_le_of_one_le (one_le_pow₀ (by linarith)) hfR
   refine ⟨?_, ?_, ?_⟩
-  · have e : 8 * 10 ^ 14 * (Cg + 4) * (n : ℝ) ^ 19 * (f : ℝ) ^ 5 * ℓ * ep
-        = 800000000 * ((Cg + 4) * ℓ) * ((n : ℝ) ^ 11 * f ^ 3) := by
+  · have e
+        : 8 * 10 ^ 14 * (Cg + 4) * (n : ℝ) ^ 19 * (f : ℝ) ^ 5 * ℓ * ep
+          = 800000000 * ((Cg + 4) * ℓ) * ((n : ℝ) ^ 11 * f ^ 3) := by
       rw [hep]
       field_simp
       norm_num
@@ -95,13 +105,18 @@ theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : �
       linarith
 
     have hnexp : (n : ℝ) ≤ Real.exp s := by
-      calc (n : ℝ) = Real.exp (Real.log n) := (Real.exp_log hnpos).symm
+      calc
+        (n : ℝ)
+          = Real.exp (Real.log n) := (Real.exp_log hnpos).symm
         _ ≤ Real.exp s := Real.exp_le_exp.2 (log_le_sqrt_of_one_le _ (by linarith))
     have hfexp : (f : ℝ) ≤ Real.exp s := by
-      calc (f : ℝ) = Real.exp (Real.log f) := (Real.exp_log hfpos).symm
+      calc
+        (f : ℝ)
+          = Real.exp (Real.log f) := (Real.exp_log hfpos).symm
         _ ≤ Real.exp s := Real.exp_le_exp.2 hlogf
     have hgexp : g ≤ Real.exp (Cg * ℓ) := by
-      calc g ≤ b ^ Cg := hgb
+      calc
+        g ≤ b ^ Cg := hgb
         _ = Real.exp (Real.log b * Cg) := Real.rpow_def_of_pos (by linarith) Cg
         _ ≤ Real.exp (Cg * ℓ) := by
           apply Real.exp_le_exp.2
@@ -130,15 +145,18 @@ theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : �
         push_cast
         have : 11 * (q : ℝ) ≤ 11 * s := by linarith
         exact mul_le_mul_of_nonneg_right this hLb0
-      calc t⁻¹ ≤ M ^ (11 * q) := a1
+      calc
+        t⁻¹
+          ≤ M ^ (11 * q) := a1
         _ ≤ Real.exp Lb ^ (11 * q) := a2
         _ = Real.exp (((11 * q : ℕ) : ℝ) * Lb) := a3
         _ ≤ Real.exp (11 * s * Lb) := Real.exp_le_exp.2 a4
 
     have hA : 3 * s / t ^ 2 ≤ Real.exp (2 + s + 22 * s * Lb) := by
       have e1 : 3 * s / t ^ 2 = 3 * s * (t⁻¹) ^ 2 := by rw [div_eq_mul_inv, inv_pow]
-      have e2 : Real.exp (2 + s + 22 * s * Lb)
-          = Real.exp 2 * Real.exp s * (Real.exp (11 * s * Lb)) ^ 2 := by
+      have e2
+          : Real.exp (2 + s + 22 * s * Lb)
+            = Real.exp 2 * Real.exp s * (Real.exp (11 * s * Lb)) ^ 2 := by
         rw [sq, ← Real.exp_add, ← Real.exp_add, ← Real.exp_add]
         congr 1
         ring
@@ -149,13 +167,12 @@ theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : �
       have b2 : s ≤ Real.exp s := by
         have := Real.add_one_le_exp s
         linarith
-      have b3 : (t⁻¹) ^ 2 ≤ (Real.exp (11 * s * Lb)) ^ 2 :=
-        pow_le_pow_left₀ (by positivity) hinvt 2
-      have b4 : 3 * s ≤ Real.exp 2 * Real.exp s :=
-        mul_le_mul b1 b2 (by linarith) (by positivity)
+      have b3 : (t⁻¹) ^ 2 ≤ (Real.exp (11 * s * Lb)) ^ 2 := pow_le_pow_left₀ (by positivity) hinvt 2
+      have b4 : 3 * s ≤ Real.exp 2 * Real.exp s := mul_le_mul b1 b2 (by linarith) (by positivity)
       exact mul_le_mul b4 b3 (by positivity) (by positivity)
-    have hpow : (3 * s / t ^ 2) ^ (2 * (n ^ 2 * f))
-        ≤ Real.exp (((2 * (n ^ 2 * f) : ℕ) : ℝ) * (2 + s + 22 * s * Lb)) := by
+    have hpow
+        : (3 * s / t ^ 2) ^ (2 * (n ^ 2 * f))
+          ≤ Real.exp (((2 * (n ^ 2 * f) : ℕ) : ℝ) * (2 + s + 22 * s * Lb)) := by
       rw [Real.exp_nat_mul]
       exact pow_le_pow_left₀ (by positivity) hA _
 
@@ -176,8 +193,9 @@ theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : �
       rw [e]
       exact mul_le_mul c1 c2 (by positivity) (by positivity)
 
-    have hexp : ((2 * (n ^ 2 * f) : ℕ) : ℝ) * (2 + s + 22 * s * Lb) + (4 * f + -X)
-        ≤ -((n : ℝ) ^ 2 * f) := by
+    have hexp
+        : ((2 * (n ^ 2 * f) : ℕ) : ℝ) * (2 + s + 22 * s * Lb) + (4 * f + -X)
+          ≤ -((n : ℝ) ^ 2 * f) := by
       push_cast
       have hP0 : (0 : ℝ) ≤ (n : ℝ) ^ 2 * f := by positivity
       have hKl0 : 0 ≤ (Cg + 1) * ℓ := mul_nonneg (by linarith) (by linarith)
@@ -195,13 +213,14 @@ theorem gap_threshold_pays_far_terms : ∀ (Cg : ℝ) (n f q : ℕ) (rd g b : �
       have k8 : (0 : ℝ) ≤ (n : ℝ) ^ 2 * f * n := by positivity
       rw [hLb_def]
       linarith
-    calc (3 * s / t ^ 2) ^ (2 * (n ^ 2 * f)) * (2 * f * 3 ^ f * Real.exp (-X))
-        ≤ Real.exp (((2 * (n ^ 2 * f) : ℕ) : ℝ) * (2 + s + 22 * s * Lb))
+    calc
+      (3 * s / t ^ 2) ^ (2 * (n ^ 2 * f)) * (2 * f * 3 ^ f * Real.exp (-X))
+          ≤ Real.exp (((2 * (n ^ 2 * f) : ℕ) : ℝ) * (2 + s + 22 * s * Lb))
             * (Real.exp (4 * f) * Real.exp (-X)) := by
-          apply mul_le_mul hpow (mul_le_mul_of_nonneg_right hsmall (by positivity))
-            (by positivity) (by positivity)
+        apply mul_le_mul hpow (mul_le_mul_of_nonneg_right hsmall (by positivity)) (by positivity)
+          (by positivity)
       _ = Real.exp (((2 * (n ^ 2 * f) : ℕ) : ℝ) * (2 + s + 22 * s * Lb) + (4 * f + -X)) := by
-          rw [Real.exp_add, Real.exp_add]
+        rw [Real.exp_add, Real.exp_add]
       _ ≤ Real.exp (-((n : ℝ) ^ 2 * f)) := Real.exp_le_exp.2 hexp
 
 end GlobalTheory

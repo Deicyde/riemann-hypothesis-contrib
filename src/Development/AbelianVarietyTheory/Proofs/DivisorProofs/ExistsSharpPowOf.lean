@@ -17,8 +17,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -29,9 +31,12 @@ namespace GlobalTheory.EighthPowerLocal
 
 open GlobalTheory.SS GlobalTheory.CechPic GlobalTheory.MatrixBundle
 
-theorem relAmple_diag_lam {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R] {B : Over (Sp R)} [GrpObj B]
-    [IsCommMonObj B] (hB : IsAbelianScheme B) {M : LB B.left} (hM : M.IsLB) (hΘ : ∃ t : LB.Gen (Theta B M), t.IsGen)
-    (ha : Out.RelAmple B M) : Out.RelAmple B ((abelian₂ B M).pull (lift (𝟙 B) (𝟙 B)).left) := by
+theorem relAmple_diag_lam
+    {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    {B : Over (Sp R)} [GrpObj B] [IsCommMonObj B]
+    (hB : IsAbelianScheme B)
+    {M : LB B.left} (hM : M.IsLB) (hΘ : ∃ t : LB.Gen (Theta B M), t.IsGen) (ha : Out.RelAmple B M)
+    : Out.RelAmple B ((abelian₂ B M).pull (lift (𝟙 B) (𝟙 B)).left) := by
   have hlam : (abelian₂ B M).IsLB := LB.isLB_linComb hM _ _
   let q := Out.powIsPowGrp B 2
   have hG : IsAbelianScheme (Out.powObj B 2) := (PowGrp.powers _ _ B 2 q).2.2.2.1 hB
@@ -48,8 +53,9 @@ theorem relAmple_diag_lam {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianR
       exact inferInstanceAs (IsFinite (𝟙 B.left))
     exact IsFinite.of_comp _ (q.pr 0).left
   have hid : IsFinite (𝟙 B : B ⟶ B).left := inferInstanceAs (IsFinite (𝟙 B.left))
-  have a₁ := (relAmple_finite_pow_iso _ B _ ψ _ 1 one_pos hB hG hbox hfin).1
-    (relAmple_boxLB _ _ B 2 q M hM ha)
+  have a₁ :=
+    (relAmple_finite_pow_iso _ B _ ψ _ 1 one_pos hB hG hbox hfin).1
+      (relAmple_boxLB _ _ B 2 q M hM ha)
   refine (relAmple_finite_pow_iso _ B B (𝟙 B) _ 1 one_pos hB hB (pull_isLB hbox _) hid).2.2.2 _
     (pull_isLB hlam _) ((cls_eq_iff (pull_isLB hbox _) (pull_isLB hlam _)).1 ?_) a₁
   have h₀ : pull (1 : B ⟶ B).left (cls M hM) = 0 := by
@@ -61,12 +67,12 @@ theorem relAmple_diag_lam {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianR
   have h₂ := lam_mul_left hM hΘ (𝟙 B) (𝟙 B)⁻¹ (𝟙 B)
   rw [mul_inv_cancel, lam_one_left, lam.eq_1 _ (𝟙 B)⁻¹, inv_mul_cancel, h₀] at h₂
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [cls_pull hbox, cls_pull hlam, h₁, pull_lam, lift_fst, lift_snd, cls_linComb hM, map_sum, Fin.sum_univ_two,
-    one_smul, one_smul, ← pull_comp, ← pull_comp, ← Over.comp_left, ← Over.comp_left, hψ, hψ]
+    rw [cls_pull hbox, cls_pull hlam, h₁, pull_lam, lift_fst, lift_snd, cls_linComb hM, map_sum,
+      Fin.sum_univ_two, one_smul, one_smul, ← pull_comp, ← pull_comp, ← Over.comp_left,
+      ← Over.comp_left, hψ, hψ]
   refine Eq.trans ?_ (eq_neg_of_add_eq_zero_left h₂.symm).symm
   simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
   abel
-
 
 end GlobalTheory.EighthPowerLocal
 

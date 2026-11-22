@@ -28,15 +28,19 @@ private theorem rop_smul (r : H →₀ ℂ) (a : ℂ) (Φ : H → V) : rop r (a 
   simp only [rop, Finsupp.sum, Pi.smul_apply, Finset.smul_sum]
   exact Finset.sum_congr rfl fun u _ => smul_comm _ _ _
 
-private def eigForms (ι : Γ →* H) (K : Subgroup H) (ξ : Representation ℂ Γ V) (r : J → H →₀ ℂ) (θ : J → ℂ) :
-    Submodule ℂ (H → V) where
+private def eigForms
+    (ι : Γ →* H) (K : Subgroup H) (ξ : Representation ℂ Γ V) (r : J → H →₀ ℂ) (θ : J → ℂ)
+    : Submodule ℂ (H → V) where
   carrier := {Φ | Φ ∈ forms ι K ξ ∧ ∀ j, rop (r j) Φ = θ j • Φ}
   add_mem' := by
     rintro a b ⟨ha, ha'⟩ ⟨hb, hb'⟩
     exact ⟨add_mem ha hb, fun j => by rw [rop_add, ha', hb', smul_add]⟩
-  zero_mem' := ⟨zero_mem _, fun j => by
-    have := rop_smul (r j) (0 : ℂ) (0 : H → V)
-    simpa using this⟩
+  zero_mem' := ⟨
+    zero_mem _,
+    fun j => by
+      have := rop_smul (r j) (0 : ℂ) (0 : H → V)
+      simpa using this
+  ⟩
   smul_mem' := by
     rintro a b ⟨hb, hb'⟩
     exact ⟨Submodule.smul_mem _ a hb, fun j => by rw [rop_smul, hb', smul_comm]⟩

@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DYlb6.main :
-    ∀ {R W T : Type} [inst : CommRing R] [inst_1 : AddCommGroup W] [inst_2 : AddCommGroup T] [inst_3 : _root_.Module R T]
-      (j : TensorProduct ℤ R W ≃ₗ[R] T),
-      Submodule.span R (Set.range fun (a : W) ↦ (j : TensorProduct ℤ R W → T) ((1 : R) ⊗ₜ[ℤ] a)) = ⊤ := by
+theorem UpperTheory.Reformulated.B.DYlb6.main
+    : ∀ {R W T : Type} [inst : CommRing R] [inst_1 : AddCommGroup W] [inst_2 : AddCommGroup T]
+        [inst_3 : _root_.Module R T] (j : TensorProduct ℤ R W ≃ₗ[R] T),
+      Submodule.span R (Set.range fun (a : W) ↦ (j : TensorProduct ℤ R W → T) ((1 : R) ⊗ₜ[ℤ] a))
+        = ⊤ := by
   intro R W T _ _ _ _ j
   rw [Submodule.eq_top_iff']
   intro t

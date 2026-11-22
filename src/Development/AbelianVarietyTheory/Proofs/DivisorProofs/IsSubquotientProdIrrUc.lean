@@ -19,7 +19,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SatakeP
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.ResW GlobalTheory.Published
+open NumberField IsDedekindDomain MeasureTheory Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.ResW GlobalTheory.Published
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -32,9 +33,12 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 variable (k) in
-abbrev uc (a : ℂˣ) : IrrGL (k := k) := IrrGL.ofChar (unrChar k a) (isSmoothChar_of_isUnram (isUnram_unrChar k a))
+abbrev uc (a : ℂˣ) : IrrGL (k := k) :=
+  IrrGL.ofChar (unrChar k a) (isSmoothChar_of_isUnram (isUnram_unrChar k a))
 
-theorem eq_first_of_isLSeg {Δ : Segment k} {y : IrrGL (k := k)} (h : IsLSeg Δ y.rep) (h1 : Δ.len = 1) : y = Δ.first := by
+theorem eq_first_of_isLSeg
+    {Δ : Segment k} {y : IrrGL (k := k)} (h : IsLSeg Δ y.rep) (h1 : Δ.len = 1)
+    : y = Δ.first := by
   have h2 := h.hasSupport
   obtain ⟨z, hz⟩ := Multiset.card_eq_one.1 ((Segment.card_ms Δ).trans h1)
   have h3 : z = Δ.first := by
@@ -45,15 +49,20 @@ theorem eq_first_of_isLSeg {Δ : Segment k} {y : IrrGL (k := k)} (h : IsLSeg Δ 
   rw [hz, h3] at h2
   exact GlobalTheory.CompanionTheory.CuspPairSub.eq_of_hasSupport_singleton h2
 
-theorem isSpherical_prodIrr_uc {c N : ℕ} (β : Fin c → ℂˣ) (hd : ∑ i, (uc k (β i)).1 = N) :
-    IsSpherical (prodIrr (fun i => uc k (β i)) hd) := by
-  have hv : ∀ i, ∃ v : (uc k (β i)).2.rep.V, v ≠ 0 ∧
-      ∀ g ∈ GlobalTheory.SplitWeil.KO k (Fin (uc k (β i)).1), (uc k (β i)).rep g v = v := fun i => by
-    let r := IrrRep.det (Fin 1) (unrChar k (β i)) (isSmoothChar_of_isUnram (isUnram_unrChar k (β i)))
+theorem isSpherical_prodIrr_uc {c N : ℕ} (β : Fin c → ℂˣ) (hd : ∑ i, (uc k (β i)).1 = N)
+    : IsSpherical (prodIrr (fun i => uc k (β i)) hd) := by
+  have hv
+      : ∀ i, ∃ v : (uc k (β i)).2.rep.V,
+        v ≠ 0
+          ∧ ∀ g ∈ GlobalTheory.SplitWeil.KO k (Fin (uc k (β i)).1),
+            (uc k (β i)).rep g v = v := fun i => by
+    let r :=
+      IrrRep.det (Fin 1) (unrChar k (β i)) (isSmoothChar_of_isUnram (isUnram_unrChar k (β i)))
     let e := equivRep r
     let u : r.V := (1 : ℂ)
     have hu : u ≠ 0 := show (1 : ℂ) ≠ 0 from one_ne_zero
-    refine ⟨e u, fun h0 => hu (e.toLinearEquiv.injective (h0.trans (map_zero _).symm)), fun g hg => ?_⟩
+    refine
+      ⟨e u, fun h0 => hu (e.toLinearEquiv.injective (h0.trans (map_zero _).symm)), fun g hg => ?_⟩
     change GL (Fin 1) k at g
     have h1 := e.toIntertwiningMap.isIntertwining _ _ g u
     refine h1.symm.trans (congrArg e ?_)
@@ -62,12 +71,14 @@ theorem isSpherical_prodIrr_uc {c N : ℕ} (β : Fin c → ℂˣ) (hd : ∑ i, (
     show ((ofChar (detChar (Fin 1) (unrChar k (β i)))) g) (1 : ℂ) = (1 : ℂ)
     simp [detChar_apply, h4]
   choose v hv0 hvK using hv
-  obtain ⟨f, hf, hf1⟩ := GlobalTheory.SatInd.exists_fixed_apply_one (stdBlocks (fun i => (uc k (β i)).1) hd)
-    (ρ := piTensor fun i => (uc k (β i)).rep) (x := PiTensorProduct.tprod ℂ v) fun g hg => by
-      rw [piTensor_tprod]
-      congr 1
-      funext a
-      exact hvK a _ (hg a)
+  obtain ⟨f, hf, hf1⟩ :=
+    GlobalTheory.SatInd.exists_fixed_apply_one (stdBlocks (fun i => (uc k (β i)).1) hd)
+      (ρ := piTensor fun i => (uc k (β i)).rep) (x := PiTensorProduct.tprod ℂ v)
+      fun g hg => by
+        rw [piTensor_tprod]
+        congr 1
+        funext a
+        exact hvK a _ (hg a)
   refine (Submodule.ne_bot_iff _).2 ⟨f, hf, fun h0 => ?_⟩
   have h5 : PiTensorProduct.tprod ℂ v = 0 := by rw [← hf1, h0]; rfl
   have hl : ∀ i, ∃ l : Module.Dual ℂ (uc k (β i)).2.rep.V, l (v i) ≠ 0 := fun i => by
@@ -80,10 +91,12 @@ theorem isSpherical_prodIrr_uc {c N : ℕ} (β : Fin c → ℂˣ) (hd : ∑ i, (
   rw [h5, map_zero] at h6
   exact Finset.prod_ne_zero_iff.2 (fun i _ => hl i) h6.symm
 
-theorem isSubquotient_prodIrr_uc {N : ℕ} (α : Fin N → ℂˣ) (hd : ∑ i, (uc k (α i)).1 = N) :
-    IsSubquotient (prodIrr (fun i => uc k (α i)) hd) (prinSeries fun i => unrChar k (α i)) := by
-  let φ := multiProdEquiv (stdBlocks (fun i => (uc k (α i)).1) hd) fun a =>
-    (equivRep (IrrRep.det (Fin 1) (unrChar k (α a)) (isSmoothChar_of_isUnram (isUnram_unrChar k (α a))))).symm
+theorem isSubquotient_prodIrr_uc {N : ℕ} (α : Fin N → ℂˣ) (hd : ∑ i, (uc k (α i)).1 = N)
+    : IsSubquotient (prodIrr (fun i => uc k (α i)) hd) (prinSeries fun i => unrChar k (α i)) := by
+  let φ :=
+    multiProdEquiv (stdBlocks (fun i => (uc k (α i)).1) hd) fun a =>
+      (equivRep (IrrRep.det (Fin 1) (unrChar k (α a))
+        (isSmoothChar_of_isUnram (isUnram_unrChar k (α a))))).symm
   exact (IsSubquotient.of_injective φ.toIntertwiningMap φ.toLinearEquiv.injective).trans
     (GlobalTheory.PermPrin.isSubquotient_multiProd_prinSeries _ _)
 

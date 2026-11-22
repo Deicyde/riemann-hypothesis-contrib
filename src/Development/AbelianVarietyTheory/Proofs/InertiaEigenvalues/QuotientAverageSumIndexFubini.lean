@@ -13,8 +13,8 @@ open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.CuspRep Glob
 
 namespace GlobalTheory.CuspGeneric
 
-def sumArrowAddHomeo (A ι κ : Type) [AddCommGroup A] [TopologicalSpace A] :
-    ((ι → A) × (κ → A)) ≃ₜ+ (ι ⊕ κ → A) where
+def sumArrowAddHomeo (A ι κ : Type) [AddCommGroup A] [TopologicalSpace A]
+    : ((ι → A) × (κ → A)) ≃ₜ+ (ι ⊕ κ → A) where
   toFun p := Sum.elim p.1 p.2
   invFun f := (fun i => f (Sum.inl i), fun j => f (Sum.inr j))
   left_inv _ := rfl
@@ -28,19 +28,25 @@ def sumArrowAddHomeo (A ι κ : Type) [AddCommGroup A] [TopologicalSpace A] :
   continuous_invFun :=
     (continuous_pi fun i => continuous_apply _).prodMk (continuous_pi fun j => continuous_apply _)
 
-theorem sum_elim_mem_ratV (E : Type) [Field E] [NumberField E] (ι κ : Type) (x : ι → Ad E) (y : κ → Ad E) :
-    Sum.elim x y ∈ ratV E (ι ⊕ κ) ↔ x ∈ ratV E ι ∧ y ∈ ratV E κ := by
+theorem sum_elim_mem_ratV
+    (E : Type) [Field E] [NumberField E] (ι κ : Type) (x : ι → Ad E) (y : κ → Ad E)
+    : Sum.elim x y ∈ ratV E (ι ⊕ κ) ↔ x ∈ ratV E ι ∧ y ∈ ratV E κ := by
   constructor
   · rintro ⟨c, hc⟩
-    exact ⟨⟨fun i => c (Sum.inl i), funext fun i => congrFun hc (Sum.inl i)⟩,
-      ⟨fun j => c (Sum.inr j), funext fun j => congrFun hc (Sum.inr j)⟩⟩
+    exact ⟨
+      ⟨fun i => c (Sum.inl i), funext fun i => congrFun hc (Sum.inl i)⟩,
+      ⟨fun j => c (Sum.inr j), funext fun j => congrFun hc (Sum.inr j)⟩
+    ⟩
   · rintro ⟨⟨c, rfl⟩, ⟨d, rfl⟩⟩
     refine ⟨Sum.elim c d, funext fun s => ?_⟩
     rcases s with i | j <;> rfl
 
-theorem avg_sum_index : ∀ (E : Type) [Field E] [NumberField E] (ι κ : Type) [Fintype ι] [Fintype κ]
-    (Φ : (ι ⊕ κ → Ad E) → ℂ), Per (ratV E (ι ⊕ κ)) Φ →
-    avg (ratV E (ι ⊕ κ)) Φ = avg (ratV E ι) (fun x => avg (ratV E κ) (fun y => Φ (Sum.elim x y))) := by
+theorem avg_sum_index
+    : ∀ (E : Type) [Field E] [NumberField E] (ι κ : Type) [Fintype ι] [Fintype κ]
+        (Φ : (ι ⊕ κ → Ad E) → ℂ),
+      Per (ratV E (ι ⊕ κ)) Φ
+        → avg (ratV E (ι ⊕ κ)) Φ
+          = avg (ratV E ι) (fun x => avg (ratV E κ) (fun y => Φ (Sum.elim x y))) := by
   intro E _ _ ι κ _ _ Φ hΦ
   have hι := isCoLat_ratV E ι
   have hκ := isCoLat_ratV E κ
@@ -49,7 +55,8 @@ theorem avg_sum_index : ∀ (E : Type) [Field E] [NumberField E] (ι κ : Type) 
     obtain ⟨d₁, K₁, hK₁, c₁⟩ := hι
     obtain ⟨d₂, K₂, hK₂, c₂⟩ := hκ
     refine ⟨?_, K₁ ×ˢ K₂, hK₁.prod hK₂, fun x => ?_⟩
-    · let f : ↥((ratV E ι).prod (ratV E κ)) → ratV E ι × ratV E κ := fun p => (⟨p.1.1, p.2.1⟩, ⟨p.1.2, p.2.2⟩)
+    · let f : ↥((ratV E ι).prod (ratV E κ)) → ratV E ι × ratV E κ := fun p =>
+        (⟨p.1.1, p.2.1⟩, ⟨p.1.2, p.2.2⟩)
       have hf : Continuous f :=
         (continuous_subtype_val.fst.subtype_mk _).prodMk (continuous_subtype_val.snd.subtype_mk _)
       refine DiscreteTopology.of_continuous_injective hf fun p q h => ?_

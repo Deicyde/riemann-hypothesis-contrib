@@ -18,50 +18,56 @@ section Coord
 
 variable {O : Type} [CommRing O] {r : ℕ}
 
-def coordA (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (w : Fin r → PowerSeries O) :
-    PowerSeries O :=
+def coordA (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (w : Fin r → PowerSeries O)
+    : PowerSeries O :=
   ∑ i, C (b.repr (Pi.single i 1) j) * w i
 
-theorem coordA_add (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r)
-    (w w' : Fin r → PowerSeries O) : coordA b j (w + w') = coordA b j w + coordA b j w' := by
+theorem coordA_add
+    (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (w w' : Fin r → PowerSeries O)
+    : coordA b j (w + w') = coordA b j w + coordA b j w' := by
   simp [coordA, mul_add, Finset.sum_add_distrib]
 
-theorem coordA_smul (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (g : PowerSeries O)
-    (w : Fin r → PowerSeries O) : coordA b j (g • w) = g * coordA b j w := by
+theorem coordA_smul
+    (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (g : PowerSeries O)
+    (w : Fin r → PowerSeries O)
+    : coordA b j (g • w) = g * coordA b j w := by
   simp [coordA, Finset.mul_sum, mul_left_comm]
 
-theorem coordA_zero (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) :
-    coordA b j 0 = 0 := by
+theorem coordA_zero (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) : coordA b j 0 = 0 := by
   simp [coordA]
 
 theorem sum_single_smul (v : Fin r → O) : ∑ i, v i • (Pi.single i (1 : O) : Fin r → O) = v := by
   ext k
   simp [Finset.sum_apply, Pi.single_apply]
 
-theorem coordA_cst (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (v : Fin r → O) :
-    coordA b j (cst v) = C (b.repr v j) := by
+theorem coordA_cst (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (v : Fin r → O)
+    : coordA b j (cst v) = C (b.repr v j) := by
   conv_rhs => rw [← sum_single_smul v]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [coordA, cst, map_sum, mul_comm]
+  simp [coordA, cst, map_sum, mul_comm]
 
-theorem sum_coordA (b : Module.Basis (Fin r) O (Fin r → O)) (w : Fin r → PowerSeries O) :
-    ∑ j, coordA b j w • cst (b j) = w := by
+theorem sum_coordA (b : Module.Basis (Fin r) O (Fin r → O)) (w : Fin r → PowerSeries O)
+    : ∑ j, coordA b j w • cst (b j) = w := by
   ext k
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, coordA, cst, Finset.sum_mul]
   rw [Finset.sum_comm]
-  have hi : ∀ i, ∑ j, C (b.repr (Pi.single i 1) j) * w i * C (b j k) =
-      w i * C ((Pi.single i (1 : O) : Fin r → O) k) := by
+  have hi
+      : ∀ i,
+        ∑ j, C (b.repr (Pi.single i 1) j) * w i * C (b j k)
+          = w i * C ((Pi.single i (1 : O) : Fin r → O) k) := by
     intro i
     have h := congrFun (b.sum_repr (Pi.single i 1)) k
     rw [← h]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Finset.sum_apply, map_sum, Finset.mul_sum, mul_comm, mul_left_comm]
+    simp [Finset.sum_apply, map_sum, Finset.mul_sum, mul_comm, mul_left_comm]
   simp_rw [hi]
   simp [Pi.single_apply]
 
-theorem coordA_mem_of_ext (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r)
-    (U : Submodule O (Fin r → O)) (a : O) (hU : ∀ u ∈ U, b.repr u j ∈ Ideal.span {a})
-    (c : Fin r → PowerSeries O) (hc : c ∈ ext U) : coordA b j c ∈ Ideal.span {C a} := by
+theorem coordA_mem_of_ext
+    (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (U : Submodule O (Fin r → O)) (a : O)
+    (hU : ∀ u ∈ U, b.repr u j ∈ Ideal.span {a})
+    (c : Fin r → PowerSeries O) (hc : c ∈ ext U)
+    : coordA b j c ∈ Ideal.span {C a} := by
   induction hc using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨u, hu, rfl⟩ := hx
@@ -73,13 +79,13 @@ theorem coordA_mem_of_ext (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r)
   | add x y _ _ hx hy => rw [coordA_add]; exact add_mem hx hy
   | smul g x _ hx => rw [coordA_smul]; exact Ideal.mul_mem_left _ _ hx
 
-theorem coordA_mem_ideal (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r)
-    (J : Ideal (PowerSeries O)) (w : Fin r → PowerSeries O) (hw : ∀ i, w i ∈ J) :
-    coordA b j w ∈ J :=
+theorem coordA_mem_ideal
+    (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r)
+    (J : Ideal (PowerSeries O)) (w : Fin r → PowerSeries O) (hw : ∀ i, w i ∈ J)
+    : coordA b j w ∈ J :=
   Ideal.sum_mem _ (fun i _ => Ideal.mul_mem_left _ _ (hw i))
 
-theorem cst_mem_ext (V : Submodule O (Fin r → O)) (v : Fin r → O) (hv : v ∈ V) :
-    cst v ∈ ext V :=
+theorem cst_mem_ext (V : Submodule O (Fin r → O)) (v : Fin r → O) (hv : v ∈ V) : cst v ∈ ext V :=
   Submodule.subset_span ⟨v, hv, rfl⟩
 
 end Coord
@@ -88,8 +94,8 @@ section PID
 
 variable {O : Type} [CommRing O] [IsDomain O] {r : ℕ}
 
-theorem exists_adapted_basis [IsPrincipalIdealRing O] (U : Submodule O (Fin r → O)) :
-    ∃ b : Module.Basis (Fin r) O (Fin r → O), ∀ j, ∃ a : O,
+theorem exists_adapted_basis [IsPrincipalIdealRing O] (U : Submodule O (Fin r → O))
+    : ∃ b : Module.Basis (Fin r) O (Fin r → O), ∀ j, ∃ a : O,
       (∀ u ∈ U, b.repr u j ∈ Ideal.span {a}) ∧ a • b j ∈ U := by
   obtain ⟨n, S⟩ := U.smithNormalForm (Pi.basisFun O (Fin r))
   refine ⟨S.bM, fun j => ?_⟩
@@ -103,12 +109,16 @@ theorem exists_adapted_basis [IsPrincipalIdealRing O] (U : Submodule O (Fin r �
     · rw [← S.snf i]; exact (S.bN i).2
   · refine ⟨0, fun u hu => ?_, by simp⟩
     have h : S.bM.repr u j = 0 := S.repr_eq_zero_of_notMem_range ⟨u, hu⟩ hj
-    rw [h]; exact zero_mem _
+    rw [h]
+    exact zero_mem _
 
-theorem adapted_of_saturated [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
-    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V) (b : Module.Basis (Fin r) O (Fin r → O))
-    (j : Fin r) (a : O) (ha : ∀ u ∈ V, b.repr u j ∈ Ideal.span {a}) (hab : a • b j ∈ V) :
-    b j ∈ V ∨ ∀ u ∈ V, b.repr u j = 0 := by
+theorem adapted_of_saturated
+    [IsDiscreteValuationRing O]
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V)
+    (b : Module.Basis (Fin r) O (Fin r → O)) (j : Fin r) (a : O)
+    (ha : ∀ u ∈ V, b.repr u j ∈ Ideal.span {a}) (hab : a • b j ∈ V)
+    : b j ∈ V ∨ ∀ u ∈ V, b.repr u j = 0 := by
   by_cases a0 : a = 0
   · right
     intro u hu
@@ -128,24 +138,25 @@ theorem adapted_of_saturated [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreduc
     have haa : a = ϖ * a' := by rw [hw, ha', pow_succ]; ring
     have h1 : a' • b j ∈ V := hV _ (by rw [smul_smul, ← haa]; exact hab)
     have h2 := ha _ h1
-    rw [map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_eq_same,
-      smul_eq_mul, mul_one, Ideal.mem_span_singleton, haa] at h2
+    rw [map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_eq_same, smul_eq_mul,
+        mul_one, Ideal.mem_span_singleton, haa]
+      at h2
     obtain ⟨t, ht⟩ := h2
-    have a'0 : a' ≠ 0 := by
-      intro h0; apply a0; rw [haa, h0, mul_zero]
+    have a'0 : a' ≠ 0 := by intro h0; apply a0; rw [haa, h0, mul_zero]
     have : a' * 1 = a' * (ϖ * t) := by rw [mul_one]; nth_rewrite 1 [ht]; ring
     have h3 := mul_left_cancel₀ a'0 this
     exact hϖ.not_isUnit (IsUnit.of_mul_eq_one t h3.symm)
 
-theorem ext_add_sat_step [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
-    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V) (P : PowerSeries O)
-    (hP : ∀ z, C ϖ * z ∈ Ideal.span {P} → z ∈ Ideal.span {P}) (w : Fin r → PowerSeries O)
-    (h : ∃ c z, c ∈ ext V ∧ C ϖ • w = c + P • z) :
-    ∃ c z, c ∈ ext V ∧ w = c + P • z := by
+theorem ext_add_sat_step
+    [IsDiscreteValuationRing O]
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V)
+    (P : PowerSeries O) (hP : ∀ z, C ϖ * z ∈ Ideal.span {P} → z ∈ Ideal.span {P})
+    (w : Fin r → PowerSeries O) (h : ∃ c z, c ∈ ext V ∧ C ϖ • w = c + P • z)
+    : ∃ c z, c ∈ ext V ∧ w = c + P • z := by
   obtain ⟨c, z, hc, hw⟩ := h
   obtain ⟨b, hb⟩ := exists_adapted_basis V
-  have hj : ∀ j, ∃ c' t' : PowerSeries O, coordA b j w = c' + P * t' ∧
-      c' • cst (b j) ∈ ext V := by
+  have hj : ∀ j, ∃ c' t' : PowerSeries O, coordA b j w = c' + P * t' ∧ c' • cst (b j) ∈ ext V := by
     intro j
     obtain ⟨a, ha, hab⟩ := hb j
     rcases adapted_of_saturated ϖ hϖ V hV b j a ha hab with hbj | h0
@@ -165,11 +176,13 @@ theorem ext_add_sat_step [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible
   conv_lhs => rw [← sum_coordA b w]
   simp_rw [hct, add_smul, Finset.sum_add_distrib, Finset.smul_sum, mul_smul]
 
-theorem ext_add_sat [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
-    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V) (P : PowerSeries O)
-    (hP : ∀ z, C ϖ * z ∈ Ideal.span {P} → z ∈ Ideal.span {P}) (N : ℕ)
-    (w : Fin r → PowerSeries O) (h : ∃ c z, c ∈ ext V ∧ C (ϖ ^ N) • w = c + P • z) :
-    ∃ c z, c ∈ ext V ∧ w = c + P • z := by
+theorem ext_add_sat
+    [IsDiscreteValuationRing O]
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V)
+    (P : PowerSeries O) (hP : ∀ z, C ϖ * z ∈ Ideal.span {P} → z ∈ Ideal.span {P})
+    (N : ℕ) (w : Fin r → PowerSeries O) (h : ∃ c z, c ∈ ext V ∧ C (ϖ ^ N) • w = c + P • z)
+    : ∃ c z, c ∈ ext V ∧ w = c + P • z := by
   induction N generalizing w with
   | zero => simpa using h
   | succ N ih =>
@@ -179,12 +192,15 @@ theorem ext_add_sat [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
     refine ⟨c, z, hc, ?_⟩
     rw [← hw, smul_smul, ← map_mul, ← pow_succ']
 
-theorem const_mem_of_ext_add_ideal [IsPrincipalIdealRing O] (U : Submodule O (Fin r → O))
+theorem const_mem_of_ext_add_ideal
+    [IsPrincipalIdealRing O]
+    (U : Submodule O (Fin r → O))
     (J : Ideal (PowerSeries O)) (e : O)
     (hQ : ∀ a c : O, (∃ g h, h ∈ J ∧ C c = C a * g + h) → ∃ x y, c = x * a + y * e)
-    (δ : Fin r → O) (u : Fin r → PowerSeries O) (hu : u ∈ ext U) (jv : Fin r → PowerSeries O)
-    (hjv : ∀ i, jv i ∈ J) (hδ : cst δ = u + jv) :
-    ∃ u' ∈ U, ∃ w : Fin r → O, δ = u' + e • w := by
+    (δ : Fin r → O)
+    (u : Fin r → PowerSeries O) (hu : u ∈ ext U)
+    (jv : Fin r → PowerSeries O) (hjv : ∀ i, jv i ∈ J) (hδ : cst δ = u + jv)
+    : ∃ u' ∈ U, ∃ w : Fin r → O, δ = u' + e • w := by
   obtain ⟨b, hb⟩ := exists_adapted_basis U
   have hj : ∀ j, ∃ u₁ ∈ U, ∃ y : O, b.repr δ j • b j = u₁ + e • (y • b j) := by
     intro j
@@ -192,8 +208,9 @@ theorem const_mem_of_ext_add_ideal [IsPrincipalIdealRing O] (U : Submodule O (Fi
     have e1 := congrArg (coordA b j) hδ
     rw [coordA_cst, coordA_add] at e1
     obtain ⟨g, hg⟩ := Ideal.mem_span_singleton'.mp (coordA_mem_of_ext b j U a ha u hu)
-    obtain ⟨x, y, hxy⟩ := hQ a (b.repr δ j)
-      ⟨g, coordA b j jv, coordA_mem_ideal b j J jv hjv, by rw [e1, ← hg, mul_comm]⟩
+    obtain ⟨x, y, hxy⟩ :=
+      hQ a (b.repr δ j)
+        ⟨g, coordA b j jv, coordA_mem_ideal b j J jv hjv, by rw [e1, ← hg, mul_comm]⟩
     refine ⟨x • (a • b j), U.smul_mem x hab, y, ?_⟩
     rw [hxy, add_smul, smul_smul, smul_smul, mul_comm e y]
   choose u₁ hu₁ y hy using hj
@@ -201,9 +218,11 @@ theorem const_mem_of_ext_add_ideal [IsPrincipalIdealRing O] (U : Submodule O (Fi
   conv_lhs => rw [← b.sum_repr δ]
   simp_rw [hy, Finset.sum_add_distrib, Finset.smul_sum]
 
-theorem const_mem_of_span_add [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
-    (J : Ideal (PowerSeries O)) (e : O) (hJ : ∀ v : ℕ, C (ϖ ^ v) ∈ J → e ∣ ϖ ^ v) :
-    ∀ a c : O, (∃ g h, h ∈ J ∧ C c = C a * g + h) → ∃ x y, c = x * a + y * e := by
+theorem const_mem_of_span_add
+    [IsDiscreteValuationRing O]
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (J : Ideal (PowerSeries O)) (e : O) (hJ : ∀ v : ℕ, C (ϖ ^ v) ∈ J → e ∣ ϖ ^ v)
+    : ∀ a c : O, (∃ g h, h ∈ J ∧ C c = C a * g + h) → ∃ x y, c = x * a + y * e := by
   intro a c ⟨g, h, hh, hc⟩
   by_cases c0 : c = 0
   · exact ⟨0, 0, by simp [c0]⟩
@@ -224,8 +243,9 @@ theorem const_mem_of_span_add [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irredu
   by_cases htv : t ≤ v
   · right
     refine ⟨↑u'⁻¹ * u * ϖ ^ (v - t), ?_⟩
-    have : (u' : O) * ϖ ^ t * (↑u'⁻¹ * u * ϖ ^ (v - t)) =
-        ((u' : O) * ↑u'⁻¹) * u * (ϖ ^ t * ϖ ^ (v - t)) := by ring
+    have : (u' : O) * ϖ ^ t * (↑u'⁻¹ * u * ϖ ^ (v - t))
+        = ((u' : O) * ↑u'⁻¹) * u * (ϖ ^ t * ϖ ^ (v - t)) := by
+      ring
     rw [this, Units.mul_inv, one_mul, ← pow_add, Nat.add_sub_cancel' htv]
   · left
     push Not at htv
@@ -244,14 +264,12 @@ theorem const_mem_of_span_add [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irredu
       rw [hcF]
       by_contra hn
       have hm : (u' : O) * ϖ ^ (t - v) * constantCoeff g ∈ IsLocalRing.maximalIdeal O :=
-        Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _
-          (Ideal.pow_mem_of_mem _ hϖm _ (by omega)))
+        Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ hϖm _ (by omega)))
       have h1 := add_mem ((IsLocalRing.mem_maximalIdeal _).mpr hn) hm
       rw [sub_add_cancel] at h1
       exact ((IsLocalRing.mem_maximalIdeal _).mp h1) u.isUnit
     obtain ⟨Fu, hFu⟩ := hFu
-    have : C (ϖ ^ v) = h * ↑Fu⁻¹ := by
-      rw [← hFeq, ← hFu, mul_assoc, Units.mul_inv, mul_one]
+    have : C (ϖ ^ v) = h * ↑Fu⁻¹ := by rw [← hFeq, ← hFu, mul_assoc, Units.mul_inv, mul_one]
     rw [this]
     exact Ideal.mul_mem_right _ _ hh
 
@@ -265,30 +283,31 @@ theorem coprimeRat_symm {f g : PowerSeries O} (h : CoprimeRat ϖ f g) : CoprimeR
   obtain ⟨N, a, a', e⟩ := h
   exact ⟨N, a', a, by rw [← e]; ring⟩
 
-theorem coprimeRat_one_right (f : PowerSeries O) : CoprimeRat ϖ f 1 :=
-  ⟨0, 0, 1, by simp⟩
+theorem coprimeRat_one_right (f : PowerSeries O) : CoprimeRat ϖ f 1 := ⟨0, 0, 1, by simp⟩
 
-theorem coprimeRat_mul_right {f g h : PowerSeries O} (h1 : CoprimeRat ϖ f g)
-    (h2 : CoprimeRat ϖ f h) : CoprimeRat ϖ f (g * h) := by
+theorem coprimeRat_mul_right {f g h : PowerSeries O} (h1 : CoprimeRat ϖ f g) (h2 : CoprimeRat ϖ f h)
+    : CoprimeRat ϖ f (g * h) := by
   obtain ⟨N, a, a', e1⟩ := h1
   obtain ⟨M, c, c', e2⟩ := h2
-  exact ⟨N + M, a * (c * f + c' * h) + a' * g * c, a' * c', by
-    rw [pow_add, map_mul, ← e1, ← e2]; ring⟩
+  exact
+    ⟨N + M, a * (c * f + c' * h) + a' * g * c, a' * c', by rw [pow_add, map_mul, ← e1, ← e2]; ring⟩
 
-theorem coprimeRat_pow_right {f g : PowerSeries O} (h : CoprimeRat ϖ f g) (k : ℕ) :
-    CoprimeRat ϖ f (g ^ k) := by
+theorem coprimeRat_pow_right {f g : PowerSeries O} (h : CoprimeRat ϖ f g) (k : ℕ)
+    : CoprimeRat ϖ f (g ^ k) := by
   induction k with
   | zero => rw [pow_zero]; exact coprimeRat_one_right ϖ f
   | succ k ih => rw [pow_succ]; exact coprimeRat_mul_right ϖ ih h
 
-theorem coprimeRat_pow_pow {f g : PowerSeries O} (h : CoprimeRat ϖ f g) (k m : ℕ) :
-    CoprimeRat ϖ (f ^ k) (g ^ m) :=
+theorem coprimeRat_pow_pow {f g : PowerSeries O} (h : CoprimeRat ϖ f g) (k m : ℕ)
+    : CoprimeRat ϖ (f ^ k) (g ^ m) :=
   coprimeRat_symm ϖ (coprimeRat_pow_right ϖ (coprimeRat_symm ϖ (coprimeRat_pow_right ϖ h m)) k)
 
-theorem coprimeRat_prod_right {ι : Type} (f : PowerSeries O) (T : Finset ι)
-    (g : ι → PowerSeries O) (h : ∀ t ∈ T, CoprimeRat ϖ f (g t)) :
-    CoprimeRat ϖ f (∏ t ∈ T, g t) :=
-  Finset.prod_induction _ _ (fun _ _ h1 h2 => coprimeRat_mul_right ϖ h1 h2)
+theorem coprimeRat_prod_right
+    {ι : Type}
+    (f : PowerSeries O) (T : Finset ι) (g : ι → PowerSeries O) (h : ∀ t ∈ T, CoprimeRat ϖ f (g t))
+    : CoprimeRat ϖ f (∏ t ∈ T, g t) :=
+  Finset.prod_induction _ _
+    (fun _ _ h1 h2 => coprimeRat_mul_right ϖ h1 h2)
     (coprimeRat_one_right ϖ f) h
 
 def SatSpan (f : PowerSeries O) : Prop :=
@@ -299,29 +318,34 @@ theorem satSpan_one : SatSpan ϖ (1 : PowerSeries O) := by
 
 variable [IsDomain O]
 
-theorem satSpan_mul {f g : PowerSeries O} (hf : SatSpan ϖ f) (hg : SatSpan ϖ g) :
-    SatSpan ϖ (f * g) := by
+theorem satSpan_mul {f g : PowerSeries O} (hf : SatSpan ϖ f) (hg : SatSpan ϖ g)
+    : SatSpan ϖ (f * g) := by
   by_cases f0 : f = 0
   · rw [f0, zero_mul]; rw [f0] at hf; exact hf
   intro N z hz
-  have hzf : z ∈ Ideal.span {f} := hf N z (Ideal.mem_span_singleton.mpr
-      (dvd_trans (dvd_mul_right f g) (Ideal.mem_span_singleton.mp hz)))
+  have hzf : z ∈ Ideal.span {f} :=
+    hf N z
+      (Ideal.mem_span_singleton.mpr (dvd_trans (dvd_mul_right f g)
+        (Ideal.mem_span_singleton.mp hz)))
   obtain ⟨z', rfl⟩ := Ideal.mem_span_singleton'.mp hzf
   obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.mp hz
   have h1 : C (ϖ ^ N) * z' = w * g := by
     apply mul_right_cancel₀ f0
     linear_combination -hw
-  obtain ⟨t, rfl⟩ := Ideal.mem_span_singleton'.mp (hg N z' (by
-    rw [h1]; exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)))
+  obtain ⟨t, rfl⟩ :=
+    Ideal.mem_span_singleton'.mp (hg N z'
+      (by rw [h1]; exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)))
   exact Ideal.mem_span_singleton'.mpr ⟨t, by ring⟩
 
-theorem satSpan_prod {ι : Type} (T : Finset ι) (g : ι → PowerSeries O)
-    (h : ∀ t ∈ T, SatSpan ϖ (g t)) : SatSpan ϖ (∏ t ∈ T, g t) :=
+theorem satSpan_prod
+    {ι : Type} (T : Finset ι) (g : ι → PowerSeries O) (h : ∀ t ∈ T, SatSpan ϖ (g t))
+    : SatSpan ϖ (∏ t ∈ T, g t) :=
   Finset.prod_induction _ _ (fun _ _ h1 h2 => satSpan_mul ϖ h1 h2) (satSpan_one ϖ) h
 
-theorem mem_span_mul_of_coprime {f g z : PowerSeries O} (hc : CoprimeRat ϖ f g)
-    (hs : SatSpan ϖ (f * g)) (hf : z ∈ Ideal.span {f}) (hg : z ∈ Ideal.span {g}) :
-    z ∈ Ideal.span {f * g} := by
+theorem mem_span_mul_of_coprime
+    {f g z : PowerSeries O} (hc : CoprimeRat ϖ f g) (hs : SatSpan ϖ (f * g))
+    (hf : z ∈ Ideal.span {f}) (hg : z ∈ Ideal.span {g})
+    : z ∈ Ideal.span {f * g} := by
   obtain ⟨N, a, a', e⟩ := hc
   obtain ⟨z₁, h1⟩ := Ideal.mem_span_singleton'.mp hf
   obtain ⟨z₂, h2⟩ := Ideal.mem_span_singleton'.mp hg
@@ -339,13 +363,15 @@ variable {O : Type} [CommRing O] [IsDomain O] {r : ℕ}
 def lamAway (p : ℕ → PowerSeries O) (H : ℕ → ℕ) (ell s : ℕ) : PowerSeries O :=
   ∏ t ∈ (Finset.range ell).erase s, p t ^ H t
 
-theorem lam_split (p : ℕ → PowerSeries O) (H : ℕ → ℕ) (ell s : ℕ) (hs : s < ell) :
-    abelian₂ p H ell = p s ^ H s * lamAway p H ell s :=
+theorem lam_split (p : ℕ → PowerSeries O) (H : ℕ → ℕ) (ell s : ℕ) (hs : s < ell)
+    : abelian₂ p H ell = p s ^ H s * lamAway p H ell s :=
   (Finset.mul_prod_erase _ _ (Finset.mem_range.mpr hs)).symm
 
-theorem mem_span_of_levelCond (ϖ : O) (P : PowerSeries O) (H b : ℕ) (k : Kind)
-    (hk : k ≠ Kind.up) (V : Submodule O (Fin r → O)) (w : Fin r → PowerSeries O)
-    (h : LevelCond ϖ P H b k V w) : ∃ N, ∀ i, C (ϖ ^ N) * w i ∈ Ideal.span {P ^ H} := by
+theorem mem_span_of_levelCond
+    (ϖ : O) (P : PowerSeries O) (H b : ℕ)
+    (k : Kind) (hk : k ≠ Kind.up)
+    (V : Submodule O (Fin r → O)) (w : Fin r → PowerSeries O) (h : LevelCond ϖ P H b k V w)
+    : ∃ N, ∀ i, C (ϖ ^ N) * w i ∈ Ideal.span {P ^ H} := by
   cases k with
   | thin =>
     obtain ⟨N, z, hz⟩ := h
@@ -354,7 +380,8 @@ theorem mem_span_of_levelCond (ϖ : O) (P : PowerSeries O) (H b : ℕ) (k : Kind
     simp only [Pi.smul_apply, smul_eq_mul] at this
     rw [this]
     exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)
-  | up => exact absurd rfl hk
+  | up =>
+    exact absurd rfl hk
   | down =>
     obtain ⟨N, c, z, -, hz⟩ := h
     refine ⟨N, fun i => ?_⟩
@@ -363,11 +390,14 @@ theorem mem_span_of_levelCond (ϖ : O) (P : PowerSeries O) (H b : ℕ) (k : Kind
     rw [this, Ideal.mem_span_singleton]
     exact ⟨c i + P ^ b * z i, by rw [pow_add]; ring⟩
 
-theorem down_reduce (ϖ : O) (P Λ' : PowerSeries O) (H b : ℕ) (V : Submodule O (Fin r → O))
-    (hP : P ≠ 0) (hcop : CoprimeRat ϖ Λ' (P ^ b)) (x : Fin r → PowerSeries O) (d : Fin r → O)
-    (k : ℕ)
-    (h : LevelCond ϖ P H b Kind.down V (C (ϖ ^ k) • ((P ^ H * Λ') • x) - (P ^ H * Λ') • cst d)) :
-    ∃ N c z, c ∈ ext V ∧ C (ϖ ^ N) • (C (ϖ ^ k) • x - cst d) = c + P ^ b • z := by
+theorem down_reduce
+    (ϖ : O) (P Λ' : PowerSeries O)
+    (H b : ℕ)
+    (V : Submodule O (Fin r → O))
+    (hP : P ≠ 0) (hcop : CoprimeRat ϖ Λ' (P ^ b))
+    (x : Fin r → PowerSeries O) (d : Fin r → O) (k : ℕ)
+    (h : LevelCond ϖ P H b Kind.down V (C (ϖ ^ k) • ((P ^ H * Λ') • x) - (P ^ H * Λ') • cst d))
+    : ∃ N c z, c ∈ ext V ∧ C (ϖ ^ N) • (C (ϖ ^ k) • x - cst d) = c + P ^ b • z := by
   obtain ⟨N, c, z, hc, hz⟩ := h
   have h2 : Λ' • (C (ϖ ^ N) • (C (ϖ ^ k) • x - cst d)) = c + P ^ b • z := by
     funext i
@@ -377,44 +407,60 @@ theorem down_reduce (ϖ : O) (P Λ' : PowerSeries O) (H b : ℕ) (V : Submodule 
     rw [pow_add] at this
     linear_combination this
   obtain ⟨M, a, a', hM⟩ := hcop
-  refine ⟨M + N, a • c, a • z + a' • (C (ϖ ^ N) • (C (ϖ ^ k) • x - cst d)),
-    Submodule.smul_mem _ _ hc, ?_⟩
+  refine ⟨
+    M + N,
+    a • c,
+    a • z + a' • (C (ϖ ^ N) • (C (ϖ ^ k) • x - cst d)),
+    Submodule.smul_mem _ _ hc,
+    ?_
+  ⟩
   funext i
   have := congrFun h2 i
   simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst] at this ⊢
   rw [pow_add, map_mul (C : O →+* PowerSeries O)]
   linear_combination a * this - (C (ϖ ^ N) * (C (ϖ ^ k) * x i - C (d i))) * hM
 
-theorem const_reduce [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ) (D : ℕ)
-    (P : PowerSeries O) (hP : UnitDist ϖ D P) (hD : 1 ≤ D) (b : ℕ)
-    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V) (x : Fin r → PowerSeries O)
-    (d : Fin r → O) (k : ℕ)
-    (h : ∃ N c z, c ∈ ext V ∧ C (ϖ ^ N) • (C (ϖ ^ k) • x - cst d) = c + P ^ b • z) :
-    ∃ lam c z, c ∈ ext V ∧ x - cst lam = c + P ^ b • z := by
+theorem const_reduce
+    [IsDiscreteValuationRing O]
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (D : ℕ) (P : PowerSeries O) (hP : UnitDist ϖ D P)
+    (hD : 1 ≤ D)
+    (b : ℕ)
+    (V : Submodule O (Fin r → O)) (hV : Saturated ϖ V)
+    (x : Fin r → PowerSeries O) (d : Fin r → O) (k : ℕ)
+    (h : ∃ N c z, c ∈ ext V ∧ C (ϖ ^ N) • (C (ϖ ^ k) • x - cst d) = c + P ^ b • z)
+    : ∃ lam c z, c ∈ ext V ∧ x - cst lam = c + P ^ b • z := by
   rcases Nat.eq_zero_or_pos b with hb | hb
   · refine ⟨0, 0, x, zero_mem _, ?_⟩
-    ext i; simp [cst, hb]
+    ext i
+    simp [cst, hb]
   obtain ⟨b', rfl⟩ : ∃ b', b = b' + 1 := ⟨b - 1, by omega⟩
-  have hPs : ∀ z, C ϖ * z ∈ Ideal.span {P ^ (b' + 1)} → z ∈ Ideal.span {P ^ (b' + 1)} :=
-    fun z hz => mem_span_pow_of_uniformizer_mul O ϖ hϖ D P hP (b' + 1) 1 z (by rwa [pow_one])
+  have hPs : ∀ z, C ϖ * z ∈ Ideal.span {P ^ (b' + 1)} → z ∈ Ideal.span {P ^ (b' + 1)} := fun z hz =>
+    mem_span_pow_of_uniformizer_mul O ϖ hϖ D P hP (b' + 1) 1 z (by rwa [pow_one])
   obtain ⟨N, h⟩ := h
   obtain ⟨c, z, hc, hz⟩ := ext_add_sat ϖ hϖ V hV (P ^ (b' + 1)) hPs N _ h
-  have hQ := const_mem_of_span_add ϖ hϖ (Ideal.span {C (ϖ ^ k), P ^ (b' + 1)}) (ϖ ^ k)
-    (fun v hv => by
+  have hQ :=
+    const_mem_of_span_add ϖ hϖ (Ideal.span {C (ϖ ^ k), P ^ (b' + 1)}) (ϖ ^ k) (fun v hv => by
       obtain ⟨g, w, hgw⟩ := Ideal.mem_span_pair.mp hv
       refine pow_dvd_of_const_mem_span O ϖ hϖ D P hP hD (ϖ ^ v) k 0 g ?_
       rw [pow_zero, map_one, one_mul, Ideal.mem_span_singleton]
       exact ⟨w * P ^ b', by rw [← hgw, pow_succ]; ring⟩)
-  obtain ⟨u', hu', w', hδ⟩ := const_mem_of_ext_add_ideal V _ (ϖ ^ k) hQ d (-c) (neg_mem hc)
-    (C (ϖ ^ k) • x - P ^ (b' + 1) • z)
-    (fun i => Ideal.mem_span_pair.mpr ⟨x i, -z i, by
-      simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
-      ring⟩)
-    (by
-      funext i
-      have := congrFun hz i
-      simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, Pi.neg_apply, cst] at this ⊢
-      linear_combination (-1 : PowerSeries O) * this)
+  obtain ⟨u', hu', w', hδ⟩ :=
+    const_mem_of_ext_add_ideal V _ (ϖ ^ k) hQ d (-c) (neg_mem hc) (C (ϖ ^ k) • x - P ^ (b' + 1) • z)
+      (fun i =>
+        Ideal.mem_span_pair.mpr ⟨
+          x i,
+          - z i,
+          by
+            simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+            ring
+        ⟩)
+      (by
+        funext i
+        have := congrFun hz i
+        simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, Pi.neg_apply, cst]
+          at this ⊢
+        linear_combination (-1 : PowerSeries O) * this)
   refine ⟨w', ?_⟩
   apply ext_add_sat ϖ hϖ V hV (P ^ (b' + 1)) hPs k
   refine ⟨c + cst u', z, add_mem hc (cst_mem_ext V u' hu'), ?_⟩
@@ -429,46 +475,64 @@ theorem const_reduce [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
 theorem ext_mono {V W : Submodule O (Fin r → O)} (h : V ≤ W) : ext V ≤ ext W :=
   Submodule.span_mono (Set.image_mono h)
 
-theorem two_const_reduce [IsDiscreteValuationRing O] (ϖ : O) (hϖ : Irreducible ϖ)
-    (P₀ P₁ : PowerSeries O) (b₀ b₁ : ℕ) (V₀ V₁ : Submodule O (Fin r → O)) (ρ : ℕ)
-    (fρ : PowerSeries O)
+theorem two_const_reduce
+    [IsDiscreteValuationRing O]
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (P₀ P₁ : PowerSeries O) (b₀ b₁ : ℕ)
+    (V₀ V₁ : Submodule O (Fin r → O))
+    (ρ : ℕ) (fρ : PowerSeries O)
     (hρmin : ∀ k : ℕ, C (ϖ ^ k) ∈ Ideal.span {P₁ ^ b₁, P₀ ^ b₀} → ρ ≤ k)
     (hf1 : fρ ∈ Ideal.span {P₁ ^ b₁}) (hf0 : fρ - C (ϖ ^ ρ) ∈ Ideal.span {P₀ ^ b₀})
     (x : Fin r → PowerSeries O) (l₀ l₁ : Fin r → O) (c₀ z₀ c₁ z₁ : Fin r → PowerSeries O)
     (hc₀ : c₀ ∈ ext V₀) (hc₁ : c₁ ∈ ext V₁) (h₀ : x - cst l₀ = c₀ + P₀ ^ b₀ • z₀)
-    (h₁ : x - cst l₁ = c₁ + P₁ ^ b₁ • z₁) :
-    ∃ (lam lam' : Fin r → O) (μ : Fin r → PowerSeries O), x = cst lam + fρ • cst lam' + μ ∧
-      (∃ c z, c ∈ ext V₀ ∧ μ = c + P₀ ^ b₀ • z) ∧ (∃ c z, c ∈ ext V₁ ∧ μ = c + P₁ ^ b₁ • z) := by
-  have hQ := const_mem_of_span_add ϖ hϖ (Ideal.span {P₁ ^ b₁, P₀ ^ b₀}) (ϖ ^ ρ)
-    (fun v hv => pow_dvd_pow ϖ (hρmin v hv))
-  obtain ⟨u', hu', lam', hδ⟩ := const_mem_of_ext_add_ideal (V₀ ⊔ V₁) _ (ϖ ^ ρ) hQ (l₀ - l₁)
-    (c₁ - c₀) (sub_mem (ext_mono le_sup_right hc₁) (ext_mono le_sup_left hc₀))
-    (P₁ ^ b₁ • z₁ - P₀ ^ b₀ • z₀)
-    (fun i => Ideal.mem_span_pair.mpr ⟨z₁ i, -z₀ i, by
-      simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
-      ring⟩)
-    (by
-      funext i
-      have e0 := congrFun h₀ i
-      have e1 := congrFun h₁ i
-      simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, map_sub] at e0 e1 ⊢
-      linear_combination e1 - e0)
+    (h₁ : x - cst l₁ = c₁ + P₁ ^ b₁ • z₁)
+    : ∃ (lam lam' : Fin r → O) (μ : Fin r → PowerSeries O),
+      x = cst lam + fρ • cst lam' + μ ∧ (∃ c z, c ∈ ext V₀ ∧ μ = c + P₀ ^ b₀ • z)
+        ∧ (∃ c z, c ∈ ext V₁ ∧ μ = c + P₁ ^ b₁ • z) := by
+  have hQ :=
+    const_mem_of_span_add ϖ hϖ (Ideal.span {P₁ ^ b₁, P₀ ^ b₀}) (ϖ ^ ρ)
+      (fun v hv => pow_dvd_pow ϖ (hρmin v hv))
+  obtain ⟨u', hu', lam', hδ⟩ :=
+    const_mem_of_ext_add_ideal (V₀ ⊔ V₁) _ (ϖ ^ ρ) hQ (l₀ - l₁) (c₁ - c₀)
+      (sub_mem (ext_mono le_sup_right hc₁) (ext_mono le_sup_left hc₀)) (P₁ ^ b₁ • z₁ - P₀ ^ b₀ • z₀)
+      (fun i =>
+        Ideal.mem_span_pair.mpr ⟨
+          z₁ i,
+          - z₀ i,
+          by
+            simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+            ring
+        ⟩)
+      (by
+        funext i
+        have e0 := congrFun h₀ i
+        have e1 := congrFun h₁ i
+        simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, map_sub] at e0 e1 ⊢
+        linear_combination e1 - e0)
   obtain ⟨v₀, hv₀, v₁, hv₁, rfl⟩ := Submodule.mem_sup.mp hu'
   obtain ⟨g, hg⟩ := Ideal.mem_span_singleton'.mp hf1
   obtain ⟨h, hh⟩ := Ideal.mem_span_singleton'.mp hf0
-  refine ⟨l₁ + v₁, lam', x - cst (l₁ + v₁) - fρ • cst lam', by abel,
+  refine ⟨
+    l₁ + v₁,
+    lam',
+    x - cst (l₁ + v₁) - fρ • cst lam',
+    by abel,
     ⟨c₀ + cst v₀, z₀ - h • cst lam', add_mem hc₀ (cst_mem_ext _ _ hv₀), ?_⟩,
-    ⟨c₁ - cst v₁, z₁ - g • cst lam', sub_mem hc₁ (cst_mem_ext _ _ hv₁), ?_⟩⟩
+    ⟨c₁ - cst v₁, z₁ - g • cst lam', sub_mem hc₁ (cst_mem_ext _ _ hv₁), ?_⟩
+  ⟩
   · funext i
     have e0 := congrFun h₀ i
     have hC := congrArg C (congrFun hδ i)
     simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, map_add (f := _), map_sub,
-      map_mul] at hC
-    simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, map_add (f := _)] at e0 ⊢
+        map_mul]
+      at hC
+    simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, map_add (f := _)]
+      at e0 ⊢
     linear_combination e0 + hC + C (lam' i) * hh
   · funext i
     have e1 := congrFun h₁ i
-    simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, map_add (f := _)] at e1 ⊢
+    simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, map_add (f := _)]
+      at e1 ⊢
     linear_combination e1 + C (lam' i) * hg
 
 end Steps
@@ -478,8 +542,8 @@ end TwoDown
 open TwoDown PowerSeries
 
 theorem levels_mod_const_iff_of_down_down : MDD := by
-  intro O _ _ _ ϖ hϖ ℓ ell r p H b kind V hℓ hPS hsat _hub s₀ s₁ h01 h1 hk1 hk0 hthin ρ fρ
-    _hρ hρmin hf1 hf0 y
+  intro O _ _ _ ϖ hϖ ℓ ell r p H b kind V hℓ hPS hsat _hub s₀ s₁ h01 h1 hk1 hk0 hthin ρ fρ _hρ hρmin
+    hf1 hf0 y
   have : (Ideal.span {ϖ}).IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible hϖ
   have hs0 : s₀ < ell := by omega
   have hUD : ∀ s < ell, UnitDist ϖ (ℓ ^ s) (p s) := hPS.1
@@ -504,7 +568,8 @@ theorem levels_mod_const_iff_of_down_down : MDD := by
         · rw [e1, hk1]; decide
         by_cases e0 : s = s₀
         · rw [e0, hk0]; decide
-        rw [hthin s hs e0 e1]; decide
+        rw [hthin s hs e0 e1]
+        decide
       obtain ⟨N, hN⟩ := mem_span_of_levelCond ϖ (p s) (H s) (b s) (kind s) hk (V s) _ hL
       have h2 := hN i
       simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, cst] at h2
@@ -538,7 +603,8 @@ theorem levels_mod_const_iff_of_down_down : MDD := by
             · exact mem_span_pow_of_uniformizer_mul O ϖ hϖ _ (p s) (hUD s hs) (H s)
             · apply satSpan_prod
               intro t ht
-              exact mem_span_pow_of_uniformizer_mul O ϖ hϖ _ (p t) (hUD t (Finset.mem_range.mp (hT' ht))) (H t)
+              exact mem_span_pow_of_uniformizer_mul O ϖ hϖ _ (p t)
+                (hUD t (Finset.mem_range.mp (hT' ht))) (H t)
           · exact hstep1 s hs i
           · exact ih hT'
       exact key _ subset_rfl
@@ -548,25 +614,27 @@ theorem levels_mod_const_iff_of_down_down : MDD := by
       simp only [Pi.smul_apply, smul_eq_mul]
       rw [← hx i, mul_comm]
 
-    have hdown : ∀ s, s < ell → kind s = Kind.down →
-        ∃ lam c z, c ∈ ext (V s) ∧ x - cst lam = c + p s ^ b s • z := by
+    have hdown
+        : ∀ s,
+          s < ell → kind s = Kind.down
+            → ∃ lam c z, c ∈ ext (V s) ∧ x - cst lam = c + p s ^ b s • z := by
       intro s hs hks
       obtain ⟨d, k, hL⟩ := hII s hs
       rw [hks, hy, lam_split p H ell s hs] at hL
       exact const_reduce ϖ hϖ (ℓ ^ s) (p s) (hUD s hs) (hdeg s) (b s) (V s) (hsat s hs) x d k
-        (down_reduce ϖ (p s) (lamAway p H ell s) (H s) (b s) (V s) (hp0 s hs)
-          (hcopΛ s hs (b s)) x d k hL)
+        (down_reduce ϖ (p s) (lamAway p H ell s) (H s) (b s) (V s) (hp0 s hs) (hcopΛ s hs (b s)) x d
+          k hL)
     obtain ⟨l₁, c₁, z₁, hc₁, e₁⟩ := hdown s₁ h1 hk1
     obtain ⟨l₀, c₀, z₀, hc₀, e₀⟩ := hdown s₀ hs0 hk0
     obtain ⟨lam, lam', μ, hxμ, ⟨c₀', z₀', hc₀', hμ₀⟩, ⟨c₁', z₁', hc₁', hμ₁⟩⟩ :=
-      two_const_reduce ϖ hϖ (p s₀) (p s₁) (b s₀) (b s₁) (V s₀) (V s₁) ρ fρ hρmin hf1 hf0 x
-        l₀ l₁ c₀ z₀ c₁ z₁ hc₀ hc₁ e₀ e₁
+      two_const_reduce ϖ hϖ (p s₀) (p s₁) (b s₀) (b s₁) (V s₀) (V s₁) ρ fρ hρmin hf1 hf0 x l₀ l₁ c₀
+        z₀ c₁ z₁ hc₀ hc₁ e₀ e₁
     refine ⟨lam, lam', abelian₂ p H ell • μ, ?_, ?_⟩
     · intro s hs
       by_cases es1 : s = s₁
       · rw [es1, hk1]
-        refine ⟨0, lamAway p H ell s₁ • c₁', lamAway p H ell s₁ • z₁',
-          Submodule.smul_mem _ _ hc₁', ?_⟩
+        refine
+          ⟨0, lamAway p H ell s₁ • c₁', lamAway p H ell s₁ • z₁', Submodule.smul_mem _ _ hc₁', ?_⟩
         rw [hμ₁, lam_split p H ell s₁ h1]
         funext i
         simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, pow_zero, map_one, one_mul]
@@ -574,8 +642,8 @@ theorem levels_mod_const_iff_of_down_down : MDD := by
         ring
       by_cases es0 : s = s₀
       · rw [es0, hk0]
-        refine ⟨0, lamAway p H ell s₀ • c₀', lamAway p H ell s₀ • z₀',
-          Submodule.smul_mem _ _ hc₀', ?_⟩
+        refine
+          ⟨0, lamAway p H ell s₀ • c₀', lamAway p H ell s₀ • z₀', Submodule.smul_mem _ _ hc₀', ?_⟩
         rw [hμ₀, lam_split p H ell s₀ hs0]
         funext i
         simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, pow_zero, map_one, one_mul]
@@ -603,7 +671,8 @@ theorem levels_mod_const_iff_of_down_down : MDD := by
       funext i
       have e := congrFun hz i
       simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, pow_zero, map_one,
-        one_mul] at e ⊢
+          one_mul]
+        at e ⊢
       rw [lam_split p H ell s₁ h1, ← hg, pow_add]
       rw [pow_add] at e
       linear_combination e
@@ -618,7 +687,8 @@ theorem levels_mod_const_iff_of_down_down : MDD := by
       funext i
       have e := congrFun hz i
       simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, pow_zero, map_one,
-        one_mul, map_add, map_mul] at e ⊢
+          one_mul, map_add, map_mul]
+        at e ⊢
       rw [lam_split p H ell s₀ hs0, pow_add]
       rw [pow_add] at e
       linear_combination e - (C (ϖ ^ N) * p s₀ ^ H s₀ * lamAway p H ell s₀ * C (lam' i)) * hh
@@ -631,7 +701,8 @@ theorem levels_mod_const_iff_of_down_down : MDD := by
     funext i
     have e := congrFun hz i
     simp only [Pi.smul_apply, smul_eq_mul, Pi.add_apply, Pi.sub_apply, cst, pow_zero, map_one,
-      one_mul] at e ⊢
+        one_mul]
+      at e ⊢
     rw [lam_split p H ell s hs]
     linear_combination e
 

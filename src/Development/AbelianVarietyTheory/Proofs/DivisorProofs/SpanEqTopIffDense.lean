@@ -6,24 +6,29 @@ public import Mathlib
 
 namespace GlobalTheory.Morita
 
-structure MatrixUnits (R : Type*) [CommRing R] (N : Type*) [AddCommGroup N] [Module R N]
+structure MatrixUnits
+    (R : Type*) [CommRing R]
+    (N : Type*) [AddCommGroup N] [Module R N]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
-
   E : ι → ι → Module.End R N
   mul_eq : ∀ i j k l, E i j * E k l = if j = k then E i l else 0
   sum_diag : ∑ i, E i i = 1
 
-variable {R : Type*} [CommRing R] {N : Type*} [AddCommGroup N] [Module R N]
+variable
+  {R : Type*} [CommRing R]
+  {N : Type*} [AddCommGroup N] [Module R N]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 namespace MatrixUnits
 
 variable (U : MatrixUnits R N ι)
 
-theorem apply_apply (i j k l : ι) (x : N) : U.E i j (U.E k l x) = if j = k then U.E i l x else 0 := by
+theorem apply_apply (i j k l : ι) (x : N)
+    : U.E i j (U.E k l x) = if j = k then U.E i l x else 0 := by
   have h := LinearMap.congr_fun (U.mul_eq i j k l) x
   rw [Module.End.mul_apply] at h
-  rw [h]; split_ifs <;> simp
+  rw [h]
+  split_ifs <;> simp
 
 theorem sum_apply (x : N) : ∑ i, U.E i i x = x := by
   have h := LinearMap.congr_fun U.sum_diag x
@@ -36,7 +41,8 @@ theorem mem_corner_iff (a : ι) (x : N) : x ∈ U.corner a ↔ U.E a a x = x := 
   · rintro ⟨y, rfl⟩; rw [U.apply_apply]; simp
   · intro h; exact ⟨x, h⟩
 
-theorem apply_mem_corner (a i : ι) (x : N) : U.E a i x ∈ U.corner a := ⟨U.E a i x, by rw [U.apply_apply]; simp⟩
+theorem apply_mem_corner (a i : ι) (x : N) : U.E a i x ∈ U.corner a :=
+  ⟨U.E a i x, by rw [U.apply_apply]; simp⟩
 
 def toPi (a : ι) : N ≃ₗ[R] (ι → U.corner a) where
   toFun x i := ⟨U.E a i x, U.apply_mem_corner a i x⟩
@@ -47,7 +53,8 @@ def toPi (a : ι) : N ≃ₗ[R] (ι → U.corner a) where
     simp only
     conv_rhs => rw [← U.sum_apply x]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [U.apply_apply]; simp
+    rw [U.apply_apply]
+    simp
   right_inv v := by
     ext j
     set_option synthInstance.maxHeartbeats 100000 in
@@ -79,20 +86,28 @@ def stdUnits (M : Type*) [AddCommGroup M] [Module R M] : MatrixUnits R (ι → M
 end GlobalTheory.Morita
 
 namespace GlobalTheory.Morita
-variable {R : Type*} [CommRing R] {N : Type*} [AddCommGroup N] [Module R N]
+variable
+  {R : Type*} [CommRing R]
+  {N : Type*} [AddCommGroup N] [Module R N]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 end GlobalTheory.Morita
 
 namespace GlobalTheory.Morita.MatrixUnits
-variable {R : Type*} [CommRing R] {N : Type*} [AddCommGroup N] [Module R N]
-  {ι : Type*} [Fintype ι] [DecidableEq ι] (U : MatrixUnits R N ι)
+variable
+  {R : Type*} [CommRing R]
+  {N : Type*} [AddCommGroup N] [Module R N]
+  {ι : Type*} [Fintype ι] [DecidableEq ι]
+  (U : MatrixUnits R N ι)
 
 end GlobalTheory.Morita.MatrixUnits
 
 namespace GlobalTheory.Morita.MatrixUnits
-variable {R : Type*} [CommRing R] {N : Type*} [AddCommGroup N] [Module R N]
-  {ι : Type*} [Fintype ι] [DecidableEq ι] (U : MatrixUnits R N ι)
+variable
+  {R : Type*} [CommRing R]
+  {N : Type*} [AddCommGroup N] [Module R N]
+  {ι : Type*} [Fintype ι] [DecidableEq ι]
+  (U : MatrixUnits R N ι)
 
 section semilinear
 
@@ -103,14 +118,20 @@ end semilinear
 end GlobalTheory.Morita.MatrixUnits
 
 namespace GlobalTheory.Morita.MatrixUnits
-variable {R : Type*} [CommRing R] {N : Type*} [AddCommGroup N] [Module R N]
-  {ι : Type*} [Fintype ι] [DecidableEq ι] (U : MatrixUnits R N ι)
+variable
+  {R : Type*} [CommRing R]
+  {N : Type*} [AddCommGroup N] [Module R N]
+  {ι : Type*} [Fintype ι] [DecidableEq ι]
+  (U : MatrixUnits R N ι)
 
 end GlobalTheory.Morita.MatrixUnits
 
 namespace GlobalTheory.Morita.MatrixUnits
-variable {R : Type*} [CommRing R] {N : Type*} [AddCommGroup N] [Module R N]
-  {ι : Type*} [Fintype ι] [DecidableEq ι] (U : MatrixUnits R N ι)
+variable
+  {R : Type*} [CommRing R]
+  {N : Type*} [AddCommGroup N] [Module R N]
+  {ι : Type*} [Fintype ι] [DecidableEq ι]
+  (U : MatrixUnits R N ι)
 
 section extend
 
@@ -139,8 +160,9 @@ universe w
 
 namespace GlobalTheory.Morita
 
-variable {R : Type*} [CommRing R] {N : Type*} [AddCommGroup N] [Module R N]
+variable
+  {R : Type*} [CommRing R]
+  {N : Type*} [AddCommGroup N] [Module R N]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
-
 
 end GlobalTheory.Morita

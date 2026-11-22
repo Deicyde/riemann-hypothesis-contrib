@@ -11,41 +11,49 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite UpperTheory.V.HV UpperTheory.V.Alg
+open IsLocalRing UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite UpperTheory.V.HV
+  UpperTheory.V.Alg
 
-private theorem algHom_mvPowerSeries_C_eq_algebraMap {A K : Type} [CommRing A] [CommRing K] [Algebra A K] {σ : Type}
-    (y : MvPowerSeries σ A →ₐ[A] K) (a : A) : y (MvPowerSeries.C a) = algebraMap A K a := by
+private theorem algHom_mvPowerSeries_C_eq_algebraMap
+    {A K : Type} [CommRing A] [CommRing K] [Algebra A K]
+    {σ : Type} (y : MvPowerSeries σ A →ₐ[A] K)
+    (a : A)
+    : y (MvPowerSeries.C a) = algebraMap A K a := by
   have h := y.commutes a
   simpa [MvPowerSeries.algebraMap_apply] using h
 
-private theorem exists_injective_mvPowerSeries_last_to_powerSeries (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [IsAdicComplete (IsLocalRing.maximalIdeal R) R] (D : ℕ) :
-    ∃ S : MvPowerSeries (Fin (D + 1)) R →+* PowerSeries (MvPowerSeries (Fin D) R),
-      Function.Injective S ∧
-      (∀ a : R, S (MvPowerSeries.C a) = PowerSeries.C (MvPowerSeries.C a)) ∧
-      S (MvPowerSeries.X (Fin.last D)) = PowerSeries.X ∧
-      ∀ i : Fin D, S (MvPowerSeries.X i.castSucc) = PowerSeries.C (MvPowerSeries.X i) := by
+private theorem exists_injective_mvPowerSeries_last_to_powerSeries
+    (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    [IsAdicComplete (IsLocalRing.maximalIdeal R) R]
+    (D : ℕ)
+    : ∃ S : MvPowerSeries (Fin (D + 1)) R →+* PowerSeries (MvPowerSeries (Fin D) R),
+      Function.Injective S ∧ (∀ a : R, S (MvPowerSeries.C a) = PowerSeries.C (MvPowerSeries.C a))
+        ∧ S (MvPowerSeries.X (Fin.last D)) = PowerSeries.X
+        ∧ ∀ i : Fin D, S (MvPowerSeries.X i.castSucc) = PowerSeries.C (MvPowerSeries.X i) := by
   haveI hA : UpperTheory.V.Alg.IsCO R (MvPowerSeries (Fin D) R) := UpperTheory.V.Alg.co_mvps R R (Fin D)
   haveI hB : UpperTheory.V.Alg.IsCO R (MvPowerSeries (Fin (D + 1)) R) :=
     UpperTheory.V.Alg.co_mvps R R (Fin (D + 1))
   haveI hP : UpperTheory.V.Alg.IsCO R (MvPowerSeries Unit (MvPowerSeries (Fin D) R)) :=
     UpperTheory.V.Alg.co_mvps R (MvPowerSeries (Fin D) R) Unit
-  have nX : ∀ (τ : Type) (s : τ), MvPowerSeries.X s ∈
-      IsLocalRing.maximalIdeal (MvPowerSeries τ R) := by
+  have nX
+      : ∀ (τ : Type) (s : τ), MvPowerSeries.X s ∈ IsLocalRing.maximalIdeal (MvPowerSeries τ R) := by
     intro τ s
     rw [IsLocalRing.mem_maximalIdeal]
     intro h
     rw [MvPowerSeries.isUnit_iff_constantCoeff, MvPowerSeries.constantCoeff_X] at h
     exact not_isUnit_zero h
-  have nX' : (MvPowerSeries.X () : MvPowerSeries Unit (MvPowerSeries (Fin D) R)) ∈
-      IsLocalRing.maximalIdeal _ := by
+  have nX'
+      : (MvPowerSeries.X () : MvPowerSeries Unit (MvPowerSeries (Fin D) R))
+        ∈ IsLocalRing.maximalIdeal _ := by
     rw [IsLocalRing.mem_maximalIdeal]
     intro h
     rw [MvPowerSeries.isUnit_iff_constantCoeff, MvPowerSeries.constantCoeff_X] at h
     exact not_isUnit_zero h
-  have hmem : ∀ s : Fin (D + 1), (Fin.lastCases (MvPowerSeries.X ())
-      (fun i => MvPowerSeries.C (MvPowerSeries.X i)) s :
-        MvPowerSeries Unit (MvPowerSeries (Fin D) R)) ∈ IsLocalRing.maximalIdeal _ := by
+  have hmem
+      : ∀ s : Fin (D + 1),
+        (Fin.lastCases (MvPowerSeries.X ()) (fun i => MvPowerSeries.C (MvPowerSeries.X i)) s
+            : MvPowerSeries Unit (MvPowerSeries (Fin D) R))
+          ∈ IsLocalRing.maximalIdeal _ := by
     intro s
     refine Fin.lastCases ?_ (fun i => ?_) s
     · rw [Fin.lastCases_last]
@@ -54,14 +62,20 @@ private theorem exists_injective_mvPowerSeries_last_to_powerSeries (R : Type) [C
       intro h
       rw [MvPowerSeries.isUnit_iff_constantCoeff, MvPowerSeries.constantCoeff_C] at h
       exact (IsLocalRing.mem_maximalIdeal _).1 (nX (Fin D) i) h
-  obtain ⟨S, ⟨hSC, hSX⟩, -⟩ := UpperTheory.V.Alg.co_ev R R (MvPowerSeries Unit (MvPowerSeries (Fin D) R))
-    (Fin (D + 1)) (Algebra.ofId R _) _ hmem
-  obtain ⟨ι, ⟨hιC, hιX⟩, -⟩ := UpperTheory.V.Alg.co_ev R R (MvPowerSeries (Fin (D + 1)) R) (Fin D)
-    (Algebra.ofId R _) (fun i => MvPowerSeries.X i.castSucc) (fun i => nX _ _)
-  obtain ⟨T, ⟨hTC, hTX⟩, -⟩ := UpperTheory.V.Alg.co_ev R (MvPowerSeries (Fin D) R)
-    (MvPowerSeries (Fin (D + 1)) R) Unit ι (fun _ => MvPowerSeries.X (Fin.last D)) (fun _ => nX _ _)
-  obtain ⟨F, -, hF⟩ := UpperTheory.V.Alg.co_ev R R (MvPowerSeries (Fin (D + 1)) R) (Fin (D + 1))
-    (Algebra.ofId R _) MvPowerSeries.X (fun s => nX _ s)
+  obtain ⟨S, ⟨hSC, hSX⟩, -⟩ :=
+    UpperTheory.V.Alg.co_ev R R (MvPowerSeries Unit (MvPowerSeries (Fin D) R)) (Fin (D + 1))
+      (Algebra.ofId R _) _ hmem
+  obtain ⟨ι, ⟨hιC, hιX⟩, -⟩ :=
+    UpperTheory.V.Alg.co_ev R R (MvPowerSeries (Fin (D + 1)) R) (Fin D) (Algebra.ofId R _)
+      (fun i => MvPowerSeries.X i.castSucc)
+      (fun i => nX _ _)
+  obtain ⟨T, ⟨hTC, hTX⟩, -⟩ :=
+    UpperTheory.V.Alg.co_ev R (MvPowerSeries (Fin D) R) (MvPowerSeries (Fin (D + 1)) R) Unit ι
+      (fun _ => MvPowerSeries.X (Fin.last D))
+      (fun _ => nX _ _)
+  obtain ⟨F, -, hF⟩ :=
+    UpperTheory.V.Alg.co_ev R R (MvPowerSeries (Fin (D + 1)) R) (Fin (D + 1)) (Algebra.ofId R _)
+      MvPowerSeries.X (fun s => nX _ s)
   have hTS : T.comp S = AlgHom.id R _ := by
     have e1 := hF (T.comp S) ⟨fun x => ?_, fun s => ?_⟩
     · have e2 := hF (AlgHom.id R _) ⟨fun x => ?_, fun s => rfl⟩
@@ -76,22 +90,27 @@ private theorem exists_injective_mvPowerSeries_last_to_powerSeries (R : Type) [C
     simpa [← AlgHom.comp_apply, hTS] using h'
   · have := hSC a
     simp only [Algebra.ofId_apply, MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self,
-      RingHom.id_apply] at this
+        RingHom.id_apply]
+      at this
     exact this
   · exact (hSX (Fin.last D)).trans (by rw [Fin.lastCases_last]; rfl)
   · exact (hSX i.castSucc).trans (by rw [Fin.lastCases_castSucc]; rfl)
 
-private theorem eq_zero_of_eval_eq_zero_on_infinite_unit_ball (l : ℕ) [Fact l.Prime] : ∀ (D : ℕ) (c : Coef l)
-    (Z : Fin D → Set (PadicAlgCl l)), (∀ i, (Z i).Infinite) → (∀ i, ∀ z ∈ Z i, ‖z‖ < 1) →
-    ∀ f : MvPowerSeries (Fin D) c.O,
-      (∀ (c' : Coef l) (y : MvPowerSeries (Fin D) c.O →ₐ[c.O] PadicAlgCl l),
-        (∀ g, y g ∈ c'.O) → (∀ i, y (MvPowerSeries.X i) ∈ Z i) → y f = 0) → f = 0 := by
+private theorem eq_zero_of_eval_eq_zero_on_infinite_unit_ball (l : ℕ) [Fact l.Prime]
+    : ∀ (D : ℕ) (c : Coef l) (Z : Fin D → Set (PadicAlgCl l)),
+      (∀ i, (Z i).Infinite) → (∀ i, ∀ z ∈ Z i, ‖z‖ < 1)
+        → ∀ f : MvPowerSeries (Fin D) c.O,
+          (∀ (c' : Coef l) (y : MvPowerSeries (Fin D) c.O →ₐ[c.O] PadicAlgCl l),
+              (∀ g, y g ∈ c'.O) → (∀ i, y (MvPowerSeries.X i) ∈ Z i) → y f = 0)
+            → f = 0 := by
   intro D
   induction D with
   | zero =>
     intro c Z hZ hn f hf
-    obtain ⟨c', y, -, hy, -⟩ := UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.existsPt l c (Fin 0) (fun i => i.elim0)
-      (fun i => i.elim0)
+    obtain ⟨c', y, -, hy, -⟩ :=
+      UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.existsPt l c (Fin 0)
+        (fun i => i.elim0)
+        (fun i => i.elim0)
     have h1 : f = MvPowerSeries.C (MvPowerSeries.constantCoeff f) := by
       ext n
       have hn0 : n = 0 := Subsingleton.elim _ _
@@ -119,19 +138,23 @@ private theorem eq_zero_of_eval_eq_zero_on_infinite_unit_ball (l : ℕ) [Fact l.
     let ycr : MvPowerSeries (Fin D) c.O →+* c''.O := y''.toRingHom.codRestrict c''.O hint
     have hycr : ∀ x, ((ycr x : c''.O) : PadicAlgCl l) = y'' x := fun x => rfl
     have hg : PowerSeries.map ycr (S f) = 0 := by
-      refine UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.oneVar c''.O (PadicAlgCl l) c''.O.val.toRingHom
-        Subtype.val_injective _ (Z (Fin.last D)) (hZ _) ?_
+      refine UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.oneVar c''.O (PadicAlgCl l)
+        c''.O.val.toRingHom Subtype.val_injective _ (Z (Fin.last D)) (hZ _) ?_
       intro z hz
-      obtain ⟨c3, ev, -, hev, hevX⟩ := UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.existsPt l c'' Unit (fun _ => z)
-        (fun _ => hn _ z hz)
-      have hevC : ∀ b : c''.O, ev (PowerSeries.C b) = b := fun b => algHom_mvPowerSeries_C_eq_algebraMap ev b
-      let G : MvPowerSeries (Fin (D + 1)) c.O →ₐ[c.O] PadicAlgCl l :=
-        { toRingHom := ev.toRingHom.comp ((PowerSeries.map ycr).comp S)
-          commutes' := by
-            intro a
-            show ev (PowerSeries.map ycr (S (algebraMap c.O _ a))) = _
-            rw [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply, hSC,
-              PowerSeries.map_C, hevC, hycr, algHom_mvPowerSeries_C_eq_algebraMap] }
+      obtain ⟨c3, ev, -, hev, hevX⟩ :=
+        UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.existsPt l c'' Unit
+          (fun _ => z)
+          (fun _ => hn _ z hz)
+      have hevC : ∀ b : c''.O, ev (PowerSeries.C b) = b := fun b =>
+        algHom_mvPowerSeries_C_eq_algebraMap ev b
+      let G : MvPowerSeries (Fin (D + 1)) c.O →ₐ[c.O] PadicAlgCl l := {
+        toRingHom := ev.toRingHom.comp ((PowerSeries.map ycr).comp S)
+        commutes' := by
+          intro a
+          show ev (PowerSeries.map ycr (S (algebraMap c.O _ a))) = _
+          rw [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply, hSC,
+            PowerSeries.map_C, hevC, hycr, algHom_mvPowerSeries_C_eq_algebraMap]
+      }
       have hG : G f = 0 := by
         refine hf c3 G (fun g => hev _) (fun i => ?_)
         refine Fin.lastCases ?_ (fun j => ?_) i
@@ -148,7 +171,11 @@ private theorem eq_zero_of_eval_eq_zero_on_infinite_unit_ball (l : ℕ) [Fact l.
     rw [hycr] at h5
     exact h5
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.denseBox :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (D : ℕ) (Z : Fin D → Set (PadicAlgCl l)), (∀ i, (Z i).Infinite) → (∀ i, ∀ z ∈ Z i, ‖z‖ < 1) → Sep {y : MvPowerSeries (Fin D) c.O →ₐ[c.O] PadicAlgCl l | ∀ i, y (MvPowerSeries.X i) ∈ Z i} := by
-  intro l _ c D Z hZ hn f hf
-  exact eq_zero_of_eval_eq_zero_on_infinite_unit_ball l D c Z hZ hn f (fun c' y _ hX => hf y hX)
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.denseBox
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (D : ℕ) (Z : Fin D → Set (PadicAlgCl l)),
+      (∀ i, (Z i).Infinite) → (∀ i, ∀ z ∈ Z i, ‖z‖ < 1)
+        → Sep
+          {y : MvPowerSeries (Fin D) c.O →ₐ[c.O] PadicAlgCl l | ∀ i, y (MvPowerSeries.X i) ∈ Z i} :=
+  by
+    intro l _ c D Z hZ hn f hf
+    exact eq_zero_of_eval_eq_zero_on_infinite_unit_ball l D c Z hZ hn f (fun c' y _ hX => hf y hX)

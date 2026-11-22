@@ -20,12 +20,15 @@ theorem four_f_r_le_k_pow_eight (R : Ranks) : 4 * R.f * R.r ≤ R.k ^ 8 := by
     omega
   have hk : 2 ≤ R.k := by omega
   have h6 : 8 ≤ R.k ^ 6 := le_trans (by norm_num) (Nat.pow_le_pow_left hk 6)
-  calc 4 * R.f * R.r ≤ 4 * R.k * (2 * R.k) := Nat.mul_le_mul (Nat.mul_le_mul_left _ hf) hr
+  calc
+    4 * R.f * R.r
+      ≤ 4 * R.k * (2 * R.k) := Nat.mul_le_mul (Nat.mul_le_mul_left _ hf) hr
     _ = 8 * R.k ^ 2 := by ring
     _ ≤ R.k ^ 6 * R.k ^ 2 := Nat.mul_le_mul_right _ h6
     _ = R.k ^ 8 := by ring
 
-theorem four_f_r_le_min_g_of_sizeG {D : D7} (L : SizeData₂ D) (h : SizeG L) : Formalism.MainNotions.PrimeDegreeVariant.LevelRatioBound D := by
+theorem four_f_r_le_min_g_of_sizeG {D : D7} (L : SizeData₂ D) (h : SizeG L)
+    : Formalism.MainNotions.PrimeDegreeVariant.LevelRatioBound D := by
   have hb : (1 : ℝ) ≤ L.sc.b := by
     unfold Scale.b Scale.L
     exact Real.one_le_exp (Real.rpow_nonneg (le_trans zero_le_one L.sc.one_lt_alt.le) _)
@@ -40,8 +43,10 @@ theorem four_f_r_le_min_g_of_sizeG {D : D7} (L : SizeData₂ D) (h : SizeG L) : 
   unfold Formalism.MainNotions.PrimeDegreeVariant.LevelRatioBound
   exact le_min (key 0) (key 1)
 
-theorem four_f_r_le_min_g_family : ∀ (eps : ℝ) (Fm : FamP eps), ∃ x0 : ℝ, ∀ x, x0 ≤ x → Fm.x1 < x →
-    ∀ i : Fm.Ix x, Formalism.MainNotions.PrimeDegreeVariant.LevelRatioBound (Fm.D x i) := by
+theorem four_f_r_le_min_g_family
+    : ∀ (eps : ℝ) (Fm : FamP eps), ∃ x0 : ℝ, ∀ x,
+      x0 ≤ x → Fm.x1 < x
+        → ∀ i : Fm.Ix x, Formalism.MainNotions.PrimeDegreeVariant.LevelRatioBound (Fm.D x i) := by
   intro eps Fm
   refine ⟨0, fun x _ hx i => ?_⟩
   obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -, hG, -⟩ := Fm.sizes x hx i

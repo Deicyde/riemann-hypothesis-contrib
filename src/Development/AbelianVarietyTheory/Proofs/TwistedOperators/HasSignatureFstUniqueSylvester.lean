@@ -30,8 +30,8 @@ lemma inlMap_injective (a b : ℕ) : Function.Injective (inlMap a b) := by
 lemma inrMap_injective (a b : ℕ) : Function.Injective (inrMap a b) := by
   intro z z' h; funext i; exact congrFun h (Sum.inr i)
 
-def chg {a b : ℕ} (e : n ≃ Fin a ⊕ Fin b) (P : GL (Fin a ⊕ Fin b) ℂ) :
-    (Fin a ⊕ Fin b → ℂ) →ₗ[ℂ] (n → ℂ) :=
+def chg {a b : ℕ} (e : n ≃ Fin a ⊕ Fin b) (P : GL (Fin a ⊕ Fin b) ℂ)
+    : (Fin a ⊕ Fin b → ℂ) →ₗ[ℂ] (n → ℂ) :=
   LinearMap.funLeft ℂ ℂ e ∘ₗ (P : Matrix (Fin a ⊕ Fin b) (Fin a ⊕ Fin b) ℂ).mulVecLin
 
 lemma chg_apply {a b : ℕ} (e : n ≃ Fin a ⊕ Fin b) (P : GL (Fin a ⊕ Fin b) ℂ) (y : Fin a ⊕ Fin b → ℂ) :
@@ -89,8 +89,10 @@ lemma nonpos_of_mem {a b : ℕ} {J : Matrix n n ℂ} {e : n ≃ Fin a ⊕ Fin b}
   rw [LinearMap.comp_apply, qf_chg J e P h, jpq_inr]
   exact neg_nonpos.mpr (dotProduct_star_self_nonneg z)
 
-theorem fst_le_of_hasSignature {J : Matrix n n ℂ} {a b a' b' : ℕ}
-    (h : Formalism.UG.HasSignature J a b) (h' : Formalism.UG.HasSignature J a' b') : a ≤ a' := by
+theorem fst_le_of_hasSignature
+    {J : Matrix n n ℂ} {a b a' b' : ℕ}
+    (h : Formalism.UG.HasSignature J a b) (h' : Formalism.UG.HasSignature J a' b')
+    : a ≤ a' := by
   obtain ⟨e, P, hP⟩ := h
   obtain ⟨e', P', hP'⟩ := h'
   by_contra hlt
@@ -98,10 +100,12 @@ theorem fst_le_of_hasSignature {J : Matrix n n ℂ} {a b a' b' : ℕ}
   set U := LinearMap.range (chg e P ∘ₗ inlMap a b)
   set N := LinearMap.range (chg e' P' ∘ₗ inrMap a' b')
   have hU : finrank ℂ U = a := by
-    rw [LinearMap.finrank_range_of_inj (by rw [LinearMap.coe_comp]; exact (chg_injective e P).comp (inlMap_injective a b))]
+    rw [LinearMap.finrank_range_of_inj (by
+      rw [LinearMap.coe_comp]; exact (chg_injective e P).comp (inlMap_injective a b))]
     simp
   have hN : finrank ℂ N = b' := by
-    rw [LinearMap.finrank_range_of_inj (by rw [LinearMap.coe_comp]; exact (chg_injective e' P').comp (inrMap_injective a' b'))]
+    rw [LinearMap.finrank_range_of_inj (by
+      rw [LinearMap.coe_comp]; exact (chg_injective e' P').comp (inrMap_injective a' b'))]
     simp
   have hcard : Fintype.card n = a' + b' := by simpa using Fintype.card_congr e'
   have hsup : finrank ℂ ↥(U ⊔ N) ≤ Fintype.card n := by
@@ -117,8 +121,9 @@ theorem fst_le_of_hasSignature {J : Matrix n n ℂ} {a b a' b' : ℕ}
   have h2 := nonpos_of_mem hP' (Submodule.mem_inf.1 hx).2
   exact lt_irrefl _ (lt_of_lt_of_le h1 h2)
 
-theorem hasSignature_fst_unique : ∀ {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} {a b a' b' : ℕ},
-    Formalism.UG.HasSignature J a b → Formalism.UG.HasSignature J a' b' → a = a' :=
-  fun h h' => le_antisymm (fst_le_of_hasSignature h h') (fst_le_of_hasSignature h' h)
+theorem hasSignature_fst_unique
+    : ∀ {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} {a b a' b' : ℕ},
+      Formalism.UG.HasSignature J a b → Formalism.UG.HasSignature J a' b' → a = a' := fun h h' =>
+  le_antisymm (fst_le_of_hasSignature h h') (fst_le_of_hasSignature h' h)
 
 end GlobalTheory.SylvesterInertia

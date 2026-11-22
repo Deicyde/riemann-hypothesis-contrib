@@ -11,7 +11,10 @@ import Development.AbelianVarietyTheory.Proofs.FlagMeasures.GluedUnimodularLatti
 
 noncomputable section
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -19,16 +22,18 @@ namespace GlobalTheory.FrameSpanLat
 
 variable {D : D7}
 
-theorem localComplementUnitary_fixes_both_frames {Z : LocDat D} {p : PlF D} (P : LocNG.FPair (locH Z p) D.R.rS)
-    {g : Vp D p ≃ₗ[(D.s.atP p).Ep] Vp D p} (hg : g ∈ P.UW0) :
-    ∀ b, g (P.A.f b) = P.A.f b ∧ g (P.B.f b) = P.B.f b := by
+theorem localComplementUnitary_fixes_both_frames
+    {Z : LocDat D} {p : PlF D} (P : LocNG.FPair (locH Z p) D.R.rS)
+    {g : Vp D p ≃ₗ[(D.s.atP p).Ep] Vp D p} (hg : g ∈ P.UW0)
+    : ∀ b, g (P.A.f b) = P.A.f b ∧ g (P.B.f b) = P.B.f b := by
   induction hg using Subgroup.closure_induction with
   | mem x hx => exact hx.2
   | one => exact fun _ => ⟨rfl, rfl⟩
   | mul x y _ _ hx hy =>
     intro b
     change x (y _) = _ ∧ x (y _) = _
-    rw [(hy b).1, (hy b).2]; exact hx b
+    rw [(hy b).1, (hy b).2]
+    exact hx b
   | inv x _ hx =>
     intro b
     refine ⟨?_, ?_⟩
@@ -41,8 +46,10 @@ theorem h_zero_left {Z : LocDat D} {p : PlF D} (y : Vp D p) : (locH Z p).h 0 y =
   show LocFacts₂ Z.M p 0 y = 0
   simp [LocFacts₂]
 
-theorem frame_ne_zero {Z : LocDat D} {p : PlF D} (Fr : LocNG.FrameD (locH Z p) D.R.rS) (hT : Fr.T ≠ 0)
-    (a : Fin (D.R.rS + 1)) : Fr.f a ≠ 0 := by
+theorem frame_ne_zero
+    {Z : LocDat D} {p : PlF D} (Fr : LocNG.FrameD (locH Z p) D.R.rS) (hT : Fr.T ≠ 0)
+    (a : Fin (D.R.rS + 1))
+    : Fr.f a ≠ 0 := by
   intro h0
   induction a using Fin.lastCases with
   | last =>
@@ -55,11 +62,14 @@ theorem frame_ne_zero {Z : LocDat D} {p : PlF D} (Fr : LocNG.FrameD (locH Z p) D
     rw [h0, h_zero_left, if_pos rfl] at h1
     exact zero_ne_one h1
 
-theorem frFac_unit {p : PlF D} (δ : ∀ p, (D.s.atP p).Fp) (a : Fin (D.R.rS + 1)) (v : Vp D p)
-    (hv : frFac δ p a • v ≠ 0) : IsUnit (frFac δ p a) := by
+theorem frFac_unit
+    {p : PlF D} (δ : ∀ p, (D.s.atP p).Fp)
+    (a : Fin (D.R.rS + 1)) (v : Vp D p) (hv : frFac δ p a • v ≠ 0)
+    : IsUnit (frFac δ p a) := by
   unfold frFac at hv ⊢
-  by_cases hu : IsUnit ((algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (δ p) * (D.s.atP p).ιE (uP p : D.host.E)) ^
-    (D.R.rS - a.val))
+  by_cases hu : IsUnit
+    ((algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (δ p) * (D.s.atP p).ιE (uP p : D.host.E))
+      ^ (D.R.rS - a.val))
   · exact isUnit_ringInverse.mpr hu
   · rw [Ring.inverse_non_unit _ hu, zero_smul] at hv
     exact absurd rfl hv
@@ -76,8 +86,10 @@ def fixSub (p : PlF D) (g : Vp D p ≃ₗ[(D.s.atP p).Ep] Vp D p) : Submodule D.
     simp only [Set.mem_setOf_eq] at *
     rw [baseChange_smul₂, map_smul, ha]
 
-theorem xplus_le {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (S : Submodule D.host.E (VS D).V)
-    (h : ∀ a, frame F a ∈ S) : Xplus F ≤ S := by
+theorem xplus_le
+    {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
+    (S : Submodule D.host.E (VS D).V) (h : ∀ a, frame F a ∈ S)
+    : Xplus F ≤ S := by
   show F.fl.X ⊔ Submodule.span _ {F.fl.z} ≤ S
   refine sup_le (Submodule.span_le.2 ?_) (Submodule.span_le.2 ?_)
   · rintro _ ⟨i, rfl⟩
@@ -89,17 +101,22 @@ theorem xplus_le {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (S : Submodule D
     have := h (Fin.last _)
     simpa [frame, FlagG.fvec] using this
 
-theorem le_of_loc (Z : LocDat D) (Λ₂ : LV D) (h2 : Submodule.IsLattice D.host.E Λ₂) (N : LV D)
-    (hN : ∀ z ∈ N, ∀ p, baseChange₂ D p z ∈ lattice₂ D Z.M p Λ₂) : N ≤ Λ₂ := by
+theorem le_of_loc
+    (Z : LocDat D)
+    (Λ₂ : LV D) (h2 : Submodule.IsLattice D.host.E Λ₂)
+    (N : LV D) (hN : ∀ z ∈ N, ∀ p, baseChange₂ D p z ∈ lattice₂ D Z.M p Λ₂)
+    : N ≤ Λ₂ := by
   intro x hx
   exact GlobalTheory.GenMass.GlueLoc.mem_of_bcP Z h2.fg (hN x hx)
 
-theorem fix_span {u u' : D.what₂.Word}
-    (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
+theorem fix_span
+    {u u' : D.what₂.Word} (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
+    (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
     (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS)
-    (hB : Based Z FP (Tu D u) (Tu D u') F F') (hR : ∀ p, (FP p).RelG (LocNG.theta (Z.M p))) (p : PlF D)
-    {g : Vp D p ≃ₗ[(D.s.atP p).Ep] Vp D p} (hg : g ∈ (FP p).UW0) :
-    Xplus F ⊔ Xplus F' ≤ fixSub p g := by
+    (hB : Based Z FP (Tu D u) (Tu D u') F F') (hR : ∀ p, (FP p).RelG (LocNG.theta (Z.M p)))
+    (p : PlF D)
+    {g : Vp D p ≃ₗ[(D.s.atP p).Ep] Vp D p} (hg : g ∈ (FP p).UW0)
+    : Xplus F ⊔ Xplus F' ≤ fixSub p g := by
   have hN := (hR p).2.2.2.2.2.2
   refine sup_le (xplus_le F _ fun a => ?_) (xplus_le F' _ fun a => ?_)
   · have hfa := (localComplementUnitary_fixes_both_frames (FP p) hg a).1
@@ -117,7 +134,22 @@ theorem fix_span {u u' : D.what₂.Word}
     rw [map_smul] at hfa
     exact hu.smul_left_cancel.mp hfa
 
-theorem inf_span_eq : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word), ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (w : Point D.host.E (D.R.rS + 1)), ZhatOM (ZhatL F F') = ptMat w → Gval F F' ≠ 0 → ∀ (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS), Based Z FP (Tu D u) (Tu D u') F F' → (∀ p, (FP p).RelG (LocNG.theta (Z.M p))) → ∀ Λ₀ : LV D, Submodule.IsLattice D.host.E Λ₀ → ∀ Λ : LV D, Submodule.IsLattice D.host.E Λ → (∀ p, ∃ h ∈ (FP p).UW0, LocNG.img h (lattice₂ D Z.M p Λ₀) = lattice₂ D Z.M p Λ) → Λ ⊓ toO (VS D) (Xplus F ⊔ Xplus F') = Λ₀ ⊓ toO (VS D) (Xplus F ⊔ Xplus F') := by
+theorem inf_span_eq
+    : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
+      ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
+          (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
+          (w : Point D.host.E (D.R.rS + 1)),
+        ZhatOM (ZhatL F F') = ptMat w → Gval F F' ≠ 0
+          → ∀ (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS),
+            Based Z FP (Tu D u) (Tu D u') F F' → (∀ p, (FP p).RelG (LocNG.theta (Z.M p)))
+              → ∀ Λ₀ : LV D,
+                Submodule.IsLattice D.host.E Λ₀
+                  → ∀ Λ : LV D,
+                    Submodule.IsLattice D.host.E Λ
+                      → (∀ p, ∃ h ∈ (FP p).UW0,
+                        LocNG.img h (lattice₂ D Z.M p Λ₀) = lattice₂ D Z.M p Λ)
+                      → Λ ⊓ toO (VS D) (Xplus F ⊔ Xplus F')
+                        = Λ₀ ⊓ toO (VS D) (Xplus F ⊔ Xplus F') := by
   intro D X Y u u' F F' w _ _ Z FP hB hR Λ₀ h0 Λ h1 hloc
   apply le_antisymm
   · refine le_inf (le_of_loc Z Λ₀ h0 _ fun z hz p => ?_) inf_le_right

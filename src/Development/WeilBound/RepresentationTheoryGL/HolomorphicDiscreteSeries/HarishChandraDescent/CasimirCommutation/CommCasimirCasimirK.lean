@@ -27,14 +27,17 @@ def Bq (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (y z : M)
 def Qop (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) : Module.End ℂ M :=
   ∑ a, ∑ b, (adjSign ε a b • E b a - (if a = b then (μ a : ℂ) else 0) • (1 : Module.End ℂ M)) * Lop E μ a b
 
-theorem qf_eq (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (x : M) :
-    qf E μ x = RCLike.re (Bq E μ x x) := by
+theorem qf_eq (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (x : M)
+    : qf E μ x = RCLike.re (Bq E μ x x) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [qf, Bq, Lop, map_sum, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+  simp only [qf, Bq, Lop, map_sum, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
     inner_self_eq_norm_sq]
 
-theorem Bq_eq (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E) (μ : Fin n → ℝ) (y z : M) :
-    Bq E μ y z = ⟪y, Qop ε E μ z⟫_ℂ := by
+theorem Bq_eq
+    (ε : Fin n → Bool)
+    {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
+    (μ : Fin n → ℝ) (y z : M)
+    : Bq E μ y z = ⟪y, Qop ε E μ z⟫_ℂ := by
   simp only [Bq, Qop, inner_sum, LinearMap.sum_apply, Module.End.mul_apply]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   generalize Lop E μ a b z = w
@@ -42,8 +45,8 @@ theorem Bq_eq (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End ℂ M} (
     inner_sub_right, inner_smul_left, inner_smul_right, hU a b y w]
   split_ifs <;> simp
 
-theorem glRep_diag {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (a c : Fin n) :
-    E c c * E a a = E a a * E c c := by
+theorem glRep_diag {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (a c : Fin n)
+    : E c c * E a a = E a a * E c c := by
   have h := hE c c a a
   by_cases hca : c = a
   · subst hca
@@ -51,61 +54,80 @@ theorem glRep_diag {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (
   · rw [if_neg hca, if_neg (Ne.symm hca), sub_zero] at h
     exact sub_eq_zero.mp h
 
-theorem sum_adj (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) :
-    ∑ a, ∑ b, adjSign ε a b • (E b a * E a b) = (2 : ℂ) • casimirK ε E - casimir E := by
+theorem sum_adj (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M)
+    : ∑ a, ∑ b, adjSign ε a b • (E b a * E a b) = (2 : ℂ) • casimirK ε E - casimir E := by
   rw [Finset.sum_comm]
   simp only [casimirK, casimir, Finset.smul_sum, Finset.sum_filter, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   simp only [adjSign]
   split_ifs <;> simp [two_smul]
 
-theorem Qop_eq (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) :
-    Qop ε E μ = ((2 : ℂ) • casimirK ε E - casimir E) +
-      ∑ a, ((E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) * (E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) - E a a * E a a) := by
-  rw [← sum_adj]
-  simp only [Qop, Lop]
-  rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun a _ => ?_
-  have key : ∀ b, (adjSign ε a b • E b a - (if a = b then (μ a : ℂ) else 0) • (1 : Module.End ℂ M)) *
-      (E a b - (if a = b then (μ a : ℂ) else 0) • (1 : Module.End ℂ M)) =
-      adjSign ε a b • (E b a * E a b) + if a = b then
-        ((E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) * (E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) -
-          E a a * E a a) else 0 := by
-    intro b
-    split_ifs with h
-    · subst h
-      simp only [adjSign, if_true, one_smul]
-      abel
-    · simp [smul_mul_assoc]
-  simp only [key, Finset.sum_add_distrib, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+theorem Qop_eq (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ)
+    : Qop ε E μ
+      = ((2 : ℂ) • casimirK ε E - casimir E)
+        + ∑ a, ((E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) * (E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) - E a a * E a a) :=
+  by
+    rw [← sum_adj]
+    simp only [Qop, Lop]
+    rw [← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    have key
+        : ∀ b,
+          (adjSign ε a b • E b a - (if a = b then (μ a : ℂ) else 0) • (1 : Module.End ℂ M))
+              * (E a b - (if a = b then (μ a : ℂ) else 0) • (1 : Module.End ℂ M))
+            = adjSign ε a b • (E b a * E a b)
+              + if a = b then
+                  ((E a a - (μ a : ℂ) • (1 : Module.End ℂ M))
+                      * (E a a - (μ a : ℂ) • (1 : Module.End ℂ M))
+                    - E a a * E a a)
+                else
+                  0 := by
+      intro b
+      split_ifs with h
+      · subst h
+        simp only [adjSign, if_true, one_smul]
+        abel
+      · simp [smul_mul_assoc]
+    simp only [key, Finset.sum_add_distrib, Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
-theorem comm_casimir_casimirK {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (ε : Fin n → Bool) :
-    Commute (casimirK ε E) (casimir E) := by
+theorem comm_casimir_casimirK
+    {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (ε : Fin n → Bool)
+    : Commute (casimirK ε E) (casimir E) := by
   have hc : ∀ c d, Commute (E c d) (casimir E) := by
     intro c d
-    have key : ∀ a b, E c d * (E a b * E b a) - E a b * E b a * E c d =
-        ((if d = a then E c b else 0) - (if b = c then E a d else 0)) * E b a +
-          E a b * ((if d = b then E c a else 0) - (if a = c then E b d else 0)) := by
+    have key
+        : ∀ a b,
+          E c d * (E a b * E b a) - E a b * E b a * E c d
+            = ((if d = a then E c b else 0) - (if b = c then E a d else 0)) * E b a
+              + E a b * ((if d = b then E c a else 0) - (if a = c then E b d else 0)) := by
       intro a b
       rw [← hE c d a b, ← hE c d b a]
       noncomm_ring
     show E c d * casimir E = casimir E * E c d
     rw [← sub_eq_zero, casimir, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
     simp only [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, key]
-    simp [sub_mul, mul_sub, add_mul, mul_add, Finset.sum_add_distrib, Finset.sum_sub_distrib, ite_mul,
-      mul_ite]
-  exact Commute.sum_left _ _ _ fun a _ => Commute.sum_left _ _ _ fun b _ => (hc a b).mul_left (hc b a)
+    simp [sub_mul, mul_sub, add_mul, mul_add, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+      ite_mul, mul_ite]
+  exact Commute.sum_left _ _ _ fun a _ =>
+    Commute.sum_left _ _ _ fun b _ => (hc a b).mul_left (hc b a)
 
-theorem comm_Qop {E : Fin n → Fin n → Module.End ℂ M} (ε : Fin n → Bool) (μ : Fin n → ℝ)
-    (A : Module.End ℂ M) (hA1 : Commute A (casimirK ε E)) (hA2 : Commute A (casimir E)) (hA3 : ∀ a, Commute A (E a a)) :
-    Commute A (Qop ε E μ) := by
+theorem comm_Qop
+    {E : Fin n → Fin n → Module.End ℂ M}
+    (ε : Fin n → Bool)
+    (μ : Fin n → ℝ)
+    (A : Module.End ℂ M)
+    (hA1 : Commute A (casimirK ε E)) (hA2 : Commute A (casimir E)) (hA3 : ∀ a, Commute A (E a a))
+    : Commute A (Qop ε E μ) := by
   rw [Qop_eq]
   refine ((hA1.smul_right _).sub_right hA2).add_right (Commute.sum_right _ _ _ fun a _ => ?_)
-  have h1 : Commute A (E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) := (hA3 a).sub_right ((Commute.one_right A).smul_right _)
+  have h1 : Commute A (E a a - (μ a : ℂ) • (1 : Module.End ℂ M)) :=
+    (hA3 a).sub_right ((Commute.one_right A).smul_right _)
   exact (h1.mul_right h1).sub_right ((hA3 a).mul_right (hA3 a))
 
-theorem orth {A P : Module.End ℂ M} (hA : ∀ x y : M, ⟪A x, y⟫_ℂ = ⟪x, A y⟫_ℂ) (hP : Commute A P) {y z : M} {α β : ℂ}
-    (hy : A y = α • y) (hz : A z = β • z) (hαβ : α ≠ β) : ⟪y, P z⟫_ℂ = 0 := by
+theorem orth
+    {A P : Module.End ℂ M} (hA : ∀ x y : M, ⟪A x, y⟫_ℂ = ⟪x, A y⟫_ℂ) (hP : Commute A P)
+    {y z : M} {α β : ℂ} (hy : A y = α • y) (hz : A z = β • z) (hαβ : α ≠ β)
+    : ⟪y, P z⟫_ℂ = 0 := by
   by_cases hy0 : y = 0
   · simp [hy0]
   have hα : (starRingEnd ℂ) α = α := by
@@ -114,12 +136,15 @@ theorem orth {A P : Module.End ℂ M} (hA : ∀ x y : M, ⟪A x, y⟫_ℂ = ⟪x
     exact mul_right_cancel₀ (inner_self_ne_zero.2 hy0) h
   have h := hA y (P z)
   rw [hy, inner_smul_left, hα] at h
-  have h2 : A (P z) = β • P z := by rw [← Module.End.mul_apply, hP.eq, Module.End.mul_apply, hz, map_smul]
+  have h2 : A (P z) = β • P z := by
+    rw [← Module.End.mul_apply, hP.eq, Module.End.mul_apply, hz, map_smul]
   rw [h2, inner_smul_right] at h
   exact (mul_eq_mul_right_iff.1 h).resolve_left hαβ
 
-theorem real_of_eigen {A : Module.End ℂ M} (hA : ∀ x y : M, ⟪A x, y⟫_ℂ = ⟪x, A y⟫_ℂ) {y : M} {α : ℂ}
-    (hy : A y = α • y) (hy0 : y ≠ 0) : ((α.re : ℝ) : ℂ) = α := by
+theorem real_of_eigen
+    {A : Module.End ℂ M} (hA : ∀ x y : M, ⟪A x, y⟫_ℂ = ⟪x, A y⟫_ℂ)
+    {y : M} {α : ℂ} (hy : A y = α • y) (hy0 : y ≠ 0)
+    : ((α.re : ℝ) : ℂ) = α := by
   have h := hA y y
   rw [hy, inner_smul_left, inner_smul_right] at h
   have h2 := mul_right_cancel₀ (inner_self_ne_zero.2 hy0) h
@@ -131,12 +156,16 @@ def Aop (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) : Optio
 
 end CompactOperatorsAlt
 
-private theorem commute_E_casimir_of_isGlRep {n : ℕ} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
-    {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (c d : Fin n) :
-    Commute (E c d) (casimir E) := by
-  have key : ∀ a b, E c d * (E a b * E b a) - E a b * E b a * E c d =
-      ((if d = a then E c b else 0) - (if b = c then E a d else 0)) * E b a +
-        E a b * ((if d = b then E c a else 0) - (if a = c then E b d else 0)) := by
+private theorem commute_E_casimir_of_isGlRep
+    {n : ℕ} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+    {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E)
+    (c d : Fin n)
+    : Commute (E c d) (casimir E) := by
+  have key
+      : ∀ a b,
+        E c d * (E a b * E b a) - E a b * E b a * E c d
+          = ((if d = a then E c b else 0) - (if b = c then E a d else 0)) * E b a
+            + E a b * ((if d = b then E c a else 0) - (if a = c then E b d else 0)) := by
     intro a b
     rw [← hE c d a b, ← hE c d b a]
     noncomm_ring
@@ -146,15 +175,18 @@ private theorem commute_E_casimir_of_isGlRep {n : ℕ} {M : Type} [NormedAddComm
   simp [sub_mul, mul_sub, add_mul, mul_add, Finset.sum_add_distrib, Finset.sum_sub_distrib, ite_mul,
     mul_ite]
 
-private theorem commute_E_diag_E_mul_E_of_isGlRep {n : ℕ} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
-    {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (c a b : Fin n) :
-    Commute (E c c) (E a b * E b a) := by
+private theorem commute_E_diag_E_mul_E_of_isGlRep
+    {n : ℕ} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+    {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E)
+    (c a b : Fin n)
+    : Commute (E c c) (E a b * E b a) := by
   have h1 := hE c c a b
   have h2 := hE c c b a
   show E c c * (E a b * E b a) = E a b * E b a * E c c
   rw [← sub_eq_zero]
-  have h3 : E c c * (E a b * E b a) - E a b * E b a * E c c =
-      (E c c * E a b - E a b * E c c) * E b a + E a b * (E c c * E b a - E b a * E c c) := by
+  have h3
+      : E c c * (E a b * E b a) - E a b * E b a * E c c
+        = (E c c * E a b - E a b * E c c) * E b a + E a b * (E c c * E b a - E b a * E c c) := by
     noncomm_ring
   rw [h3, h1, h2]
   clear h1 h2 h3 hE
@@ -191,7 +223,8 @@ theorem comp_proof : SqId → Comp := by
       rw [hU c c]
       simp [adjSign]
   have hKc : ∀ c, Commute (E c c) (casimirK ε E) := fun c =>
-    Commute.sum_right _ _ _ fun a _ => Commute.sum_right _ _ _ fun b _ => commute_E_diag_E_mul_E_of_isGlRep hE c a b
+    Commute.sum_right _ _ _ fun a _ =>
+      Commute.sum_right _ _ _ fun b _ => commute_E_diag_E_mul_E_of_isGlRep hE c a b
   have hcomm : ∀ o o', Commute (Aop ε E o) (Aop ε E o') := by
     intro o o'
     cases o with
@@ -206,8 +239,10 @@ theorem comp_proof : SqId → Comp := by
   have hQ : ∀ o, Commute (Aop ε E o) (Qop ε E μ) := by
     intro o
     cases o with
-    | none => exact comm_Qop ε μ _ (Commute.refl _) (comm_casimir_casimirK hE ε) fun a => (hKc a).symm
-    | some c => exact comm_Qop ε μ _ (hKc c) (commute_E_casimir_of_isGlRep hE c c) fun a => glRep_diag hE a c
+    | none =>
+      exact comm_Qop ε μ _ (Commute.refl _) (comm_casimir_casimirK hE ε) fun a => (hKc a).symm
+    | some c =>
+      exact comm_Qop ε μ _ (hKc c) (commute_E_casimir_of_isGlRep hE c c) fun a => glRep_diag hE a c
   let T : Option (Fin n) → Module.End ℂ F := fun o => (Aop ε E o).restrict (hstab o)
   have hTs : ∀ o, (T o).IsSymmetric := fun o u v => by
     simp only [T, Submodule.coe_inner, LinearMap.restrict_coe_apply]
@@ -238,13 +273,15 @@ theorem comp_proof : SqId → Comp := by
   have hne : ∀ χ ∈ s, c χ ≠ 0 := by
     intro χ hχ h
     exact (Finsupp.mem_support_iff.mp hχ) (Subtype.ext h)
-  have hoff : ∀ χ ψ, χ ≠ ψ → ∀ P : Module.End ℂ M, (∀ o, Commute (Aop ε E o) P) →
-      ⟪c χ, P (c ψ)⟫_ℂ = 0 := by
+  have hoff
+      : ∀ χ ψ,
+        χ ≠ ψ → ∀ P : Module.End ℂ M, (∀ o, Commute (Aop ε E o) P) → ⟪c χ, P (c ψ)⟫_ℂ = 0 := by
     intro χ ψ hχψ P hP
     obtain ⟨o, ho⟩ := Function.ne_iff.mp hχψ
     exact orth (hsa o) (hP o) (heig χ o) (heig ψ o) ho
-  have hdiagsum : ∀ P : Module.End ℂ M, (∀ o, Commute (Aop ε E o) P) →
-      ⟪x, P x⟫_ℂ = ∑ χ ∈ s, ⟪c χ, P (c χ)⟫_ℂ := by
+  have hdiagsum
+      : ∀ P : Module.End ℂ M,
+        (∀ o, Commute (Aop ε E o) P) → ⟪x, P x⟫_ℂ = ∑ χ ∈ s, ⟪c χ, P (c χ)⟫_ℂ := by
     intro P hP
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hxs, map_sum, sum_inner]

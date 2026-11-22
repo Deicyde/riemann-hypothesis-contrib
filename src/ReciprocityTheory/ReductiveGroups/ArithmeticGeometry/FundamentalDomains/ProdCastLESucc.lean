@@ -94,7 +94,8 @@ lemma sgn_dOf_pos {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (k : Fin r) 
 
 def sOf (x : Frame X.Ψ r) (τ : X.Ψ) (k : Fin r) : ℂ := ((Real.sqrt |(dOf X x τ k).re|)⁻¹ : ℝ)
 
-def bOf (x : Frame X.Ψ r) : Frame X.Ψ r := fun τ => (uOf X x τ * Matrix.diagonal (sOf X x τ) : Matrix _ _ ℂ)
+def bOf (x : Frame X.Ψ r) : Frame X.Ψ r := fun τ =>
+  (uOf X x τ * Matrix.diagonal (sOf X x τ) : Matrix _ _ ℂ)
 
 lemma sgn_sq (p0 k : ℕ) : sgn p0 k = 1 ∨ sgn p0 k = -1 := by
   unfold sgn

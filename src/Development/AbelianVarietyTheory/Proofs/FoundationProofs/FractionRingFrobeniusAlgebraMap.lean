@@ -26,17 +26,19 @@ section Witt
 
 variable (p : ℕ) [hp : Fact p.Prime]
 
-theorem fractionRing_frobenius_algebraMap {k : Type*} [Field k] [CharP k p] [PerfectRing k p]
-    (x : WittVector p k) : WittVector.FractionRing.frobenius p k (algebraMap _ _ x) =
-      algebraMap _ (FractionRing (WittVector p k)) (WittVector.frobenius x) := by
+theorem fractionRing_frobenius_algebraMap
+    {k : Type*} [Field k] [CharP k p] [PerfectRing k p] (x : WittVector p k)
+    : WittVector.FractionRing.frobenius p k (algebraMap _ _ x)
+      = algebraMap _ (FractionRing (WittVector p k)) (WittVector.frobenius x) := by
   simp [WittVector.FractionRing.frobenius]
 
-theorem fractionRing_frobenius_pow {n : ℕ} (hn : n ≠ 0) :
-    WittVector.FractionRing.frobenius p (GaloisField p n) ^ n = 1 := by
-  have h1 : ∀ (m : ℕ) (x : WittVector p (GaloisField p n)),
-      ∃ y : WittVector p (GaloisField p n), (∀ i, y.coeff i = x.coeff i ^ p ^ m) ∧
-        (WittVector.FractionRing.frobenius p (GaloisField p n) ^ m) (algebraMap _ _ x) =
-          algebraMap _ (FractionRing (WittVector p (GaloisField p n))) y := by
+theorem fractionRing_frobenius_pow {n : ℕ} (hn : n ≠ 0)
+    : WittVector.FractionRing.frobenius p (GaloisField p n) ^ n = 1 := by
+  have h1
+      : ∀ (m : ℕ) (x : WittVector p (GaloisField p n)), ∃ y : WittVector p (GaloisField p n),
+        (∀ i, y.coeff i = x.coeff i ^ p ^ m)
+          ∧ (WittVector.FractionRing.frobenius p (GaloisField p n) ^ m) (algebraMap _ _ x)
+            = algebraMap _ (FractionRing (WittVector p (GaloisField p n))) y := by
     intro m x
     induction m with
     | zero => exact ⟨x, by simp, rfl⟩

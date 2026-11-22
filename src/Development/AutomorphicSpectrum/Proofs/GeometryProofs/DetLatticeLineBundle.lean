@@ -14,18 +14,24 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SncPts
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.SncBase GlobalTheory.CompanionTheory.Ar.GeoModel
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.SncBase
+  GlobalTheory.CompanionTheory.Ar.GeoModel
 open GroundTheory.Heights₂.Heights.LowerBoundFree
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.DetLine
 
-theorem matrix_eq_mul {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] {r : ℕ} {b₀ c b : Fin r → E}
-    {T T' A : Matrix (Fin r) (Fin r) Ω} (hb₀ : LinearIndependent Ω b₀)
-    (hT : ∀ k, c k = ∑ k', T k' k • b₀ k') (hT' : ∀ k, b k = ∑ k', T' k' k • b₀ k')
-    (hA : ∀ k, b k = ∑ i, A i k • c i) : T' = T * A := by
+theorem matrix_eq_mul
+    {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
+    {r : ℕ} {b₀ c b : Fin r → E} {T T' A : Matrix (Fin r) (Fin r) Ω}
+    (hb₀ : LinearIndependent Ω b₀) (hT : ∀ k, c k = ∑ k', T k' k • b₀ k')
+    (hT' : ∀ k, b k = ∑ k', T' k' k • b₀ k') (hA : ∀ k, b k = ∑ i, A i k • c i)
+    : T' = T * A := by
   ext i k
   have h : ∑ k', (T' k' k - (T * A) k' k) • b₀ k' = 0 := by
     simp only [sub_smul, Finset.sum_sub_distrib, Matrix.mul_apply, Finset.sum_smul, ← hT']
@@ -36,12 +42,16 @@ theorem matrix_eq_mul {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] {r
     rw [smul_smul, _root_.mul_comm]
   exact sub_eq_zero.1 (Fintype.linearIndependent_iff.1 hb₀ _ h i)
 
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem det_mem_span (L : Lat ξ E) {r : ℕ} {b₀ c b : Fin r → E} {q : Cpt ξ} {T T' : Matrix (Fin r) (Fin r) Ω}
+theorem det_mem_span
+    (L : Lat ξ E)
+    {r : ℕ} {b₀ c b : Fin r → E} {q : Cpt ξ} {T T' : Matrix (Fin r) (Fin r) Ω}
     (hb₀ : LinearIndependent Ω b₀) (hc : L.IsFrameAt c q) (hb : L.IsFrameAt b q)
-    (hT : ∀ k, c k = ∑ k', T k' k • b₀ k') (hT' : ∀ k, b k = ∑ k', T' k' k • b₀ k') :
-    T'.det ∈ Submodule.span (regAt ξ q) {T.det} := by
+    (hT : ∀ k, c k = ∑ k', T k' k • b₀ k') (hT' : ∀ k, b k = ∑ k', T' k' k • b₀ k')
+    : T'.det ∈ Submodule.span (regAt ξ q) {T.det} := by
   have hmem : ∀ k, b k ∈ Submodule.span (regAt ξ q) (Set.range c) := fun k => by
     rw [← hc.2, hb.2]
     exact Submodule.subset_span ⟨k, rfl⟩
@@ -53,9 +63,11 @@ theorem det_mem_span (L : Lat ξ E) {r : ℕ} {b₀ c b : Fin r → E} {q : Cpt 
   rw [hM, Matrix.det_mul, ← RingHom.map_det, _root_.mul_comm]
   rfl
 
-theorem isVB_detLat : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E]
-    (L : Lat ξ E) (r : ℕ) (V : Submodule Ω E) (b₀ : Fin r → E), LinearIndependent Ω b₀ →
-    Submodule.span Ω (Set.range b₀) = V → L.IsVB r V → (Cusp.detLat L b₀).IsVB 1 ⊤ := by
+theorem isVB_detLat
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (E : Type) [AddCommGroup E]
+        [Module Ω E] (L : Lat ξ E) (r : ℕ) (V : Submodule Ω E) (b₀ : Fin r → E),
+      LinearIndependent Ω b₀ → Submodule.span Ω (Set.range b₀) = V → L.IsVB r V
+        → (Cusp.detLat L b₀).IsVB 1 ⊤ := by
   intro X Ω _ ξ E _ _ L r V b₀ hb₀ hsp hL p _
   obtain ⟨U, hU, c, hc, hf⟩ := hL p trivial
   have hcV : ∀ k, c k ∈ Submodule.span Ω (Set.range b₀) := fun k => by

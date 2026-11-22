@@ -8,13 +8,21 @@ public import Formalism.PieriBlockIdeals.PieriColumnMinors.WeightBounds
 
 @[expose] public section
 
-open Formalism.CohomologicalDescent Formalism.CohomologicalDescent.LogSmallConstantBounds Formalism.CohomologicalDescent.ShortWeightBounds
+open Formalism.CohomologicalDescent Formalism.CohomologicalDescent.LogSmallConstantBounds
+  Formalism.CohomologicalDescent.ShortWeightBounds
 
 namespace GlobalTheory
 
-theorem exponent_of_record_vs_formulas :
-    Formalism.CohomologicalDescent.E.ExCut → ∀ P : Par, P.Hyp → P.Large → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (W : Wts ι), W.Ok P →
-      ∀ l : ℕ, l.Prime → (¬ W.WRange P l → W.JA P l ≤ W.Jrec7 P l) ∧ (W.WRange P l → W.coarseWeightBound P l = W.Jrec7 P l) := by
+theorem exponent_of_record_vs_formulas
+    : Formalism.CohomologicalDescent.E.ExCut
+      → ∀ P : Par,
+        P.Hyp → P.Large
+          → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (W : Wts ι),
+            W.Ok P
+              → ∀ l : ℕ,
+                l.Prime
+                  → (¬ W.WRange P l → W.JA P l ≤ W.Jrec7 P l)
+                    ∧ (W.WRange P l → W.coarseWeightBound P l = W.Jrec7 P l) := by
   intro hC P hH hL ι _ _ W hW l hl
   refine ⟨fun hR => ?_, fun hR => ?_⟩
   · by_cases hc : (l : ℝ) ≤ P.lJ ∨ P.Excl l ∨ l ∈ W.Sp
@@ -23,11 +31,13 @@ theorem exponent_of_record_vs_formulas :
       have h2 : ¬ P.Excl l := fun h => hc (Or.inr (Or.inl h))
       have h3 : l ∉ W.Sp := fun h => hc (Or.inr (Or.inr h))
       have hh : P.h < (l : ℝ) := not_le.mp fun h => hR ⟨h1, h, h2, h3⟩
-      have hb := Formalism.CohomologicalDescent.E.beyond_height_exceptional (Formalism.CohomologicalDescent.E.exIntervalLt_of_exCut hC) hC P hH hL ι W hW l hl h1 hh
+      have hb :=
+        Formalism.CohomologicalDescent.E.beyond_height_exceptional
+          (Formalism.CohomologicalDescent.E.exIntervalLt_of_exCut hC) hC P hH hL ι W hW l hl h1 hh
       rw [hb.2.1]
       exact Nat.zero_le _
   · obtain ⟨h1, _, h2, h3⟩ := hR
-    have hc : ¬ ((l : ℝ) ≤ P.lJ ∨ P.Excl l ∨ l ∈ W.Sp) := by
+    have hc : ¬((l : ℝ) ≤ P.lJ ∨ P.Excl l ∨ l ∈ W.Sp) := by
       rintro (h | h | h)
       · exact absurd h (not_le.mpr h1)
       · exact h2 h

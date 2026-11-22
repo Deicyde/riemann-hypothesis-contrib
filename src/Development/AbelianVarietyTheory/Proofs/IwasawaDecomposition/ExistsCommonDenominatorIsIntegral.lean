@@ -9,8 +9,8 @@ open ReciprocityTheory.ChartRestriction.G.FD NumberField
 
 namespace GlobalTheory
 
-theorem exists_common_denominator (E : Type) [Field E] [NumberField E] (n : ℕ) (f : Fin n → E) :
-    ∃ d : ℕ, 0 < d ∧ ∀ j, IsIntegral ℤ ((d : E) * f j) := by
+theorem exists_common_denominator (E : Type) [Field E] [NumberField E] (n : ℕ) (f : Fin n → E)
+    : ∃ d : ℕ, 0 < d ∧ ∀ j, IsIntegral ℤ ((d : E) * f j) := by
   classical
   obtain ⟨y, hy, h⟩ := exists_integral_multiples ℤ ℚ (L := E) (Finset.univ.image f)
   refine ⟨y.natAbs, Int.natAbs_pos.mpr hy, fun j => ?_⟩
@@ -20,10 +20,12 @@ theorem exists_common_denominator (E : Type) [Field E] [NumberField E] (n : ℕ)
   · have : ((y.natAbs : ℕ) : E) = (y : E) := by
       conv_rhs => rw [e]
       simp
-    rw [this]; exact hj
+    rw [this]
+    exact hj
   · have : ((y.natAbs : ℕ) : E) = -(y : E) := by
       conv_rhs => rw [e]
       simp
-    rw [this, neg_mul]; exact hj.neg
+    rw [this, neg_mul]
+    exact hj.neg
 
 end GlobalTheory

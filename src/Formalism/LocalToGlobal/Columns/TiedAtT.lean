@@ -22,7 +22,8 @@ section Gen
 variable {X : Fields} {Pr : Primes X} (hc : CMData X.F X.E) (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word)
 
 include hPr in
-theorem att_T_mem_under (P : {P // P ∈ Pr.vT u}) : (Pr.T u : 𝓞 X.F) ∈ (underPl X.F P.1).asIdeal := by
+theorem att_T_mem_under (P : {P // P ∈ Pr.vT u})
+    : (Pr.T u : 𝓞 X.F) ∈ (underPl X.F P.1).asIdeal := by
   show (Pr.T u : 𝓞 X.F) ∈ P.1.asIdeal.comap (algebraMap (𝓞 X.F) (𝓞 X.E))
   rw [Ideal.mem_comap, map_natCast]
   exact T_mem hPr u P
@@ -36,19 +37,22 @@ def tieEV : {P // P ∈ Pr.vT u} ≃ {v : HeightOneSpectrum (𝓞 X.F) // (Pr.T 
       have hQ : IsOver (underPl X.F P.1) Q.1 := by rw [h1]; rfl
       exact Subtype.ext ((basePi_of_ok hX hPr u).over_unique hc P.2 hP Q.1 Q.2 hQ).symm
     · rintro ⟨v, hv⟩
-      obtain ⟨P, hP, hov⟩ := (mem_plUnder_iff_norm hc (rls_vT_iff hX hPr u) (Pr.T u) (hPr.piT_norm u) v).2 hv
+      obtain ⟨P, hP, hov⟩ :=
+        (mem_plUnder_iff_norm hc (rls_vT_iff hX hPr u) (Pr.T u) (hPr.piT_norm u) v).2 hv
       exact ⟨⟨P, hP⟩, Subtype.ext (HeightOneSpectrum.ext hov.symm)⟩)
 
 end Gen
 
 section Val
 
-variable {K : Type} [Field K] [NumberField K] (Pl : Rows.Places K) (pw : Pl.Pl → HeightOneSpectrum (𝓞 K))
+variable
+  {K : Type} [Field K] [NumberField K]
+  (Pl : Rows.Places K) (pw : Pl.Pl → HeightOneSpectrum (𝓞 K))
   (hval : ∀ w (x : K), x ≠ 0 → Pl.val w x = ((vAdd (pw w) x : ℤ) : WithTop ℤ))
 
-
 include hval in
-theorem att_val_pos (w : Pl.Pl) (x : 𝓞 K) : (0 : WithTop ℤ) < Pl.val w (x : K) ↔ x ∈ (pw w).asIdeal := by
+theorem att_val_pos (w : Pl.Pl) (x : 𝓞 K)
+    : (0 : WithTop ℤ) < Pl.val w (x : K) ↔ x ∈ (pw w).asIdeal := by
   by_cases hx : x = 0
   · subst hx
     have h0 : Pl.val w (((0 : 𝓞 K) : 𝓞 K) : K) = ⊤ := by
@@ -60,14 +64,15 @@ theorem att_val_pos (w : Pl.Pl) (x : 𝓞 K) : (0 : WithTop ℤ) < Pl.val w (x :
     have h0 : (pw w).valuation K (x : K) ≠ 0 := (Valuation.ne_zero_iff _).2 hx'
     rw [hval w _ hx', ← (pw w).valuation_lt_one_iff_mem (K := K)]
     unfold Formalism.BasicNotions.vAdd
-    rw [← WithTop.coe_zero, WithTop.coe_lt_coe, neg_pos, ← WithZero.log_one, WithZero.log_lt_log h0 one_ne_zero]
-
+    rw [← WithTop.coe_zero, WithTop.coe_lt_coe, neg_pos, ← WithZero.log_one,
+      WithZero.log_lt_log h0 one_ne_zero]
 
 include hval in
 theorem att_resChar_mem (w : Pl.Pl) : ((Pl.resChar w : ℕ) : 𝓞 K) ∈ (pw w).asIdeal := by
   rw [← att_val_pos Pl pw hval]
   have h := Pl.val_resChar w
-  have e : ((((Pl.resChar w : ℕ) : 𝓞 K) : 𝓞 K) : K) = ((Pl.resChar w : ℕ) : K) := map_natCast (algebraMap (𝓞 K) K) _
+  have e : ((((Pl.resChar w : ℕ) : 𝓞 K) : 𝓞 K) : K) = ((Pl.resChar w : ℕ) : K) :=
+    map_natCast (algebraMap (𝓞 K) K) _
   rw [e, h, ← WithTop.coe_zero, WithTop.coe_lt_coe]
   exact_mod_cast Pl.ramIdx_pos w
 
@@ -77,14 +82,17 @@ section Seen
 
 variable {X : Fields} {Pr : Primes X} (hc : CMData X.F X.E) (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word)
 
-
 include hc in
-theorem att_mem_conjP (P : Pl X.E) (x : 𝓞 X.F) :
-    algebraMap (𝓞 X.F) (𝓞 X.E) x ∈ (conjPrime₂ P).asIdeal ↔ algebraMap (𝓞 X.F) (𝓞 X.E) x ∈ P.asIdeal := by
+theorem att_mem_conjP (P : Pl X.E) (x : 𝓞 X.F)
+    : algebraMap (𝓞 X.F) (𝓞 X.E) x ∈ (conjPrime₂ P).asIdeal
+      ↔ algebraMap (𝓞 X.F) (𝓞 X.E) x ∈ P.asIdeal := by
   rw [mem_conjP, rll_cO_algebraMap hc]
 
-theorem att_tauOf (w : HeightOneSpectrum (𝓞 X.K)) (hw : (Pr.T u : 𝓞 X.K) ∈ w.asIdeal) (P : {P // P ∈ Pr.vT u}) (x : 𝓞 X.F) :
-    x ∈ (tieEV hc hX hPr u P).1.asIdeal ↔ X.embO (tauOfR hX hPr u w P) (algebraMap (𝓞 X.F) (𝓞 X.E) x) ∈ w.asIdeal := by
+theorem att_tauOf
+    (w : HeightOneSpectrum (𝓞 X.K)) (hw : (Pr.T u : 𝓞 X.K) ∈ w.asIdeal)
+    (P : {P // P ∈ Pr.vT u}) (x : 𝓞 X.F)
+    : x ∈ (tieEV hc hX hPr u P).1.asIdeal
+      ↔ X.embO (tauOfR hX hPr u w P) (algebraMap (𝓞 X.F) (𝓞 X.E) x) ∈ w.asIdeal := by
   have := hX.nonempty_Tau
   have e : tauOfR hX hPr u w P = tauOfC w P.1 := by
     unfold tauOfR
@@ -96,15 +104,14 @@ theorem att_tauOf (w : HeightOneSpectrum (𝓞 X.K)) (hw : (Pr.T u : 𝓞 X.K) �
   · rw [show pullW (tauOfC w P.1) w = P.1 from h]
   · rw [show pullW (tauOfC w P.1) w = conjPrime₂ P.1 from h, att_mem_conjP hc]
 
-
 end Seen
 
 section Rec
 
 variable {d : ColDat} (a : ColArgs d)
 
-theorem att_star_eq (x : d.host.E) : star x = d.host.conj x := Formalism.BasicNotions.Examples₂.star_eq_conj d.host x
-
+theorem att_star_eq (x : d.host.E) : star x = d.host.conj x :=
+  Formalism.BasicNotions.Examples₂.star_eq_conj d.host x
 
 set_option maxHeartbeats 1000000 in
 def atTTied (hH : HostHyp d) (u : d.what₂.Word) : CF.AtTTied (D := d.colRec a) u where
@@ -140,15 +147,24 @@ def atTTied (hH : HostHyp d) (u : d.what₂.Word) : CF.AtTTied (D := d.colRec a)
       have := att_resChar_mem d.what₂.places d.plEq hH.val_eq w
       rw [hw] at this
       exact this
-    exact (att_tauOf d.sp.cm d.hX d.hPr u (d.plEq w) hT v x).trans (att_val_pos d.what₂.places d.plEq hH.val_eq w _).symm
+    exact (att_tauOf d.sp.cm d.hX d.hPr u (d.plEq w) hT v x).trans
+      (att_val_pos d.what₂.places d.plEq hH.val_eq w _).symm
   seenP := fun w hw τ => by
     have hT : (d.Pr.T u : 𝓞 d.X.K) ∈ (d.plEq w).asIdeal := by
       have := att_resChar_mem d.what₂.places d.plEq hH.val_eq w
       rw [hw] at this
       exact this
-    have key : ∀ b : Bool, b = (open Classical in decide (seenC d.Pr u (d.plEq w))) →
-        (0 : WithTop ℤ) < d.what₂.places.val w (d.embE (d.host.sigmaOf (d.eTau τ : d.R.GG)
-          (if b = true then (d.piT u : d.host.E) else d.host.conj (d.piT u : d.host.E)))) := by
+    have key
+        : ∀ b : Bool,
+          b = (open Classical in
+              decide (seenC d.Pr u (d.plEq w)))
+            → (0 : WithTop ℤ)
+              < d.what₂.places.val w
+                (d.embE (d.host.sigmaOf (d.eTau τ : d.R.GG)
+                  (if b = true then
+                     (d.piT u : d.host.E)
+                   else
+                     d.host.conj (d.piT u : d.host.E)))) := by
       intro b hb
       by_cases hs : seenC d.Pr u (d.plEq w)
       · have hb' : b = true := by rw [hb]; exact @decide_eq_true _ (Classical.propDecidable _) hs
@@ -156,8 +172,9 @@ def atTTied (hH : HostHyp d) (u : d.what₂.Word) : CF.AtTTied (D := d.colRec a)
         exact (att_val_pos d.what₂.places d.plEq hH.val_eq w (d.X.embO τ (d.Pr.piT u))).2 (hs τ)
       · have hb' : ¬ b = true := by rw [hb]; simpa using hs
         rw [if_neg hb', ← att_star_eq]
-        exact (att_val_pos d.what₂.places d.plEq hH.val_eq w (d.X.embO τ (d.X.conjO (d.Pr.piT u)))).2
-          (((seenC_or_seenBarC d.hX d.hPr u (d.plEq w) hT).resolve_left hs) τ)
+        exact
+          (att_val_pos d.what₂.places d.plEq hH.val_eq w (d.X.embO τ (d.X.conjO (d.Pr.piT u)))).2
+            (((seenC_or_seenBarC d.hX d.hPr u (d.plEq w) hT).resolve_left hs) τ)
     exact key _ rfl
 
 end Rec

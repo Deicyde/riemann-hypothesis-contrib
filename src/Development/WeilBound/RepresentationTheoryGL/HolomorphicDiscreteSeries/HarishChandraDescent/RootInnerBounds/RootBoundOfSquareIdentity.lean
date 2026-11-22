@@ -51,23 +51,27 @@ theorem root_bound_of_square_identity : SqId → RootBd := by
     · have hba : E b a v = 0 := hv.2 b a hlt he
       have hcomm : E b a (E a b v) = ((Λ b - Λ a : ℝ) : ℂ) • v := by
         have h := congrArg (fun T : Module.End ℂ M => T v) (hG b a a b)
-        simp only [LinearMap.sub_apply, Module.End.mul_apply, hba, map_zero, sub_zero,
-          ↓reduceIte] at h
+        simp only [LinearMap.sub_apply, Module.End.mul_apply, hba, map_zero, sub_zero, ↓ reduceIte]
+          at h
         rw [h, hv.1 b, hv.1 a, ← sub_smul, Complex.ofReal_sub]
       have hs : adjSign ε a b = 1 := by simp [adjSign, he.symm]
       have key : ‖E a b v‖ ^ 2 = (Λ b - Λ a) * ‖v‖ ^ 2 := by
         rw [norm_sq_eq_re', hU a b, hs, one_mul, hcomm, re_inner_smul_real]
       rw [key]
       apply mul_le_mul_of_nonneg_right _ hv2
-      calc Λ b - Λ a ≤ |Λ a - Λ b| := by rw [abs_sub_comm]; exact le_abs_self _
+      calc
+        Λ b - Λ a
+          ≤ |Λ a - Λ b| := by rw [abs_sub_comm]; exact le_abs_self _
         _ ≤ _ := le_add_of_nonneg_right (abs_nonneg _)
   · have hle : ‖E a b v‖ ^ 2 ≤ ∑ a' : Fin n, ∑ b' : Fin n with ε b' ≠ ε a', ‖E a' b' v‖ ^ 2 := by
-      calc ‖E a b v‖ ^ 2 ≤ ∑ b' : Fin n with ε b' ≠ ε a, ‖E a b' v‖ ^ 2 :=
-            Finset.single_le_sum (f := fun b' => ‖E a b' v‖ ^ 2) (fun _ _ => hnn _)
-              (by simp [he])
-        _ ≤ _ := Finset.single_le_sum
-              (f := fun a' => ∑ b' : Fin n with ε b' ≠ ε a', ‖E a' b' v‖ ^ 2)
-              (fun _ _ => Finset.sum_nonneg fun _ _ => hnn _) (Finset.mem_univ a)
+      calc
+        ‖E a b v‖ ^ 2 ≤ ∑ b' : Fin n with ε b' ≠ ε a, ‖E a b' v‖ ^ 2 :=
+          Finset.single_le_sum (f := fun b' => ‖E a b' v‖ ^ 2) (fun _ _ => hnn _) (by simp [he])
+        _ ≤ _ :=
+          Finset.single_le_sum
+            (f := fun a' => ∑ b' : Fin n with ε b' ≠ ε a', ‖E a' b' v‖ ^ 2)
+            (fun _ _ => Finset.sum_nonneg fun _ _ => hnn _)
+            (Finset.mem_univ a)
     rw [← h2, ← sub_mul] at hle
     exact hle.trans (mul_le_mul_of_nonneg_right
       ((le_abs_self _).trans (le_add_of_nonneg_left (abs_nonneg _))) hv2)

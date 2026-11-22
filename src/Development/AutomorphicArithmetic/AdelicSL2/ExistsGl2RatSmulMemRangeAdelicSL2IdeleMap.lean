@@ -6,8 +6,12 @@ public import GroundTheory.GlobalFields.IdeleGroups.Rational
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Cp UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.Fb
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Cp
+  UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.Fb
 open scoped Classical ENNReal NNReal
 
 private lemma eq_one_of_mul' {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] {a b : Γ}
@@ -38,11 +42,12 @@ private lemma mem_UU_of_pos {y : IdeleGroup ℚ} (hy : y ∈ RationalIdeles.posi
         ((y⁻¹ : IdeleGroup ℚ) : NumberField.AdeleRing (𝓞 ℚ) ℚ).2 v = 1 := h
     exact (congrArg _ h').trans (map_one _)
 
-theorem UpperTheory.exists_gl2Rat_smul_mem_range_adelicSL2IdeleMap :
-    ∀ x : GG, ∃ γ : Ga, γ • x ∈ Set.range pm := by
+theorem UpperTheory.exists_gl2Rat_smul_mem_range_adelicSL2IdeleMap
+    : ∀ x : GG, ∃ γ : Ga, γ • x ∈ Set.range pm := by
   intro x
-  obtain ⟨⟨q, y⟩, hq⟩ := RationalIdeles.mulMap_bijective.2
-    (GroundTheory.Automorphic.AdelicGLn.det ℚ 2 (x : GL (Fin 2) (A ℚ)))
+  obtain ⟨⟨q, y⟩, hq⟩ :=
+    RationalIdeles.mulMap_bijective.2 (GroundTheory.Automorphic.AdelicGLn.det ℚ 2
+      (x : GL (Fin 2) (A ℚ)))
   rw [RationalIdeles.mulMap_apply] at hq
   dsimp only at hq
   have hx := GroundTheory.Automorphic.Reduction.mem_normOneGL.1 x.2
@@ -52,16 +57,27 @@ theorem UpperTheory.exists_gl2Rat_smul_mem_range_adelicSL2IdeleMap :
     refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero !![1, 0; 0, ((q⁻¹ : ℚˣ) : ℚ)] ?_, Units.ext ?_⟩
     · simp [Matrix.det_fin_two_of]
     · simp [Matrix.det_fin_two_of]
-  have h : GroundTheory.Automorphic.AdelicGLn.det ℚ 2 (GroundTheory.Automorphic.AdelicGLn.diagonal ℚ 2 r) =
-      IdeleGroup.diagonal ℚ (Matrix.GeneralLinearGroup.det r) := by
+  have h
+      : GroundTheory.Automorphic.AdelicGLn.det ℚ 2
+          (GroundTheory.Automorphic.AdelicGLn.diagonal ℚ 2 r)
+        = IdeleGroup.diagonal ℚ (Matrix.GeneralLinearGroup.det r) := by
     refine Units.ext ?_
     rw [GroundTheory.Automorphic.AdelicGLn.coe_det, IdeleGroup.coe_diagonal]
     exact (RingHom.map_det (algebraMap ℚ (NumberField.AdeleRing (𝓞 ℚ) ℚ))
       (r : Matrix (Fin 2) (Fin 2) ℚ)).symm
-  refine ⟨⟨⟨GroundTheory.Automorphic.AdelicGLn.diagonal ℚ 2 r,
-    GroundTheory.Automorphic.Reduction.rationalGL_le_normOneGL ⟨r, rfl⟩⟩, ⟨r, rfl⟩⟩, ?_⟩
+  refine ⟨
+    ⟨
+      ⟨
+        GroundTheory.Automorphic.AdelicGLn.diagonal ℚ 2 r,
+        GroundTheory.Automorphic.Reduction.rationalGL_le_normOneGL ⟨r, rfl⟩
+      ⟩,
+      ⟨r, rfl⟩
+    ⟩,
+    ?_
+  ⟩
   rw [range_pm]
   change GroundTheory.Automorphic.AdelicGLn.det ℚ 2
-    (GroundTheory.Automorphic.AdelicGLn.diagonal ℚ 2 r * (x : GL (Fin 2) (A ℚ))) ∈ UU
+      (GroundTheory.Automorphic.AdelicGLn.diagonal ℚ 2 r * (x : GL (Fin 2) (A ℚ)))
+    ∈ UU
   rw [map_mul, h, hr, ← hq, map_inv, inv_mul_cancel_left]
   exact hy

@@ -6,14 +6,19 @@ public import GroundTheory.AutomorphicForms.SupercuspidalCoefficients
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-private theorem eq_of_esymm {n : ℕ} {B B' : Multiset ℂ} (hB : B.card = n) (hB' : B'.card = n)
-    (h : ∀ i : Fin n, B.esymm (i + 1) = B'.esymm (i + 1)) : B = B' := by
-  have h2 : (B.map fun r => Polynomial.X - Polynomial.C r).prod = (B'.map fun r => Polynomial.X - Polynomial.C r).prod := by
+private theorem eq_of_esymm
+    {n : ℕ} {B B' : Multiset ℂ}
+    (hB : B.card = n) (hB' : B'.card = n) (h : ∀ i : Fin n, B.esymm (i + 1) = B'.esymm (i + 1))
+    : B = B' := by
+  have h2
+      : (B.map fun r => Polynomial.X - Polynomial.C r).prod
+        = (B'.map fun r => Polynomial.X - Polynomial.C r).prod := by
     rw [Multiset.prod_X_sub_X_eq_sum_esymm, Multiset.prod_X_sub_X_eq_sum_esymm, hB, hB']
     refine Finset.sum_congr rfl fun j hj => ?_
     rcases j with _ | j
@@ -22,12 +27,15 @@ private theorem eq_of_esymm {n : ℕ} {B B' : Multiset ℂ} (hB : B.card = n) (h
   simpa using congrArg Polynomial.roots h2
 
 open UpperTheory.ConvolutionTheory in
-theorem UpperTheory.ConvolutionTheory.Dp.sSatUnit :
-    UpperTheory.ConvolutionTheory.Dp.SSatUnit := by
+theorem UpperTheory.ConvolutionTheory.Dp.sSatUnit : UpperTheory.ConvolutionTheory.Dp.SSatUnit := by
   intro K _ _ n μ _ w V B hB
   obtain ⟨v, hv, h0⟩ := (Submodule.ne_bot_iff _).1 hB.2.1
-  refine ⟨?_, fun B₁ h₁ => eq_of_esymm h₁.1 hB.1 fun i =>
-    smul_left_injective ℂ h0 ((h₁.2.2 i v hv).symm.trans (hB.2.2 i v hv))⟩
+  refine ⟨
+    ?_,
+    fun B₁ h₁ =>
+      eq_of_esymm h₁.1 hB.1 fun i =>
+        smul_left_injective ℂ h0 ((h₁.2.2 i v hv).symm.trans (hB.2.2 i v hv))
+  ⟩
   have hne : ∀ b ∈ B, b ≠ 0 := by
     intro b hb e
     subst e
@@ -39,10 +47,14 @@ theorem UpperTheory.ConvolutionTheory.Dp.sSatUnit :
     set J := GLnLocal.integralGL (w.adicCompletion K) n
     set x := Cartan.diagPow (w.adicCompletion K) n fun _ => 1 with hx
     have hxc : x ∈ Subgroup.center _ :=
-      Matrix.GeneralLinearGroup.mem_center_iff_val_mem_range_scalar.2 ⟨_, by rw [Matrix.scalar_apply, hx, Cartan.coe_diagPow]⟩
-    have e1 : (fun a : Fin n => if a ≤ (⟨n - 1, by omega⟩ : Fin n) then (1 : ℤ) else 0) = fun _ => 1 :=
+      Matrix.GeneralLinearGroup.mem_center_iff_val_mem_range_scalar.2
+        ⟨_, by rw [Matrix.scalar_apply, hx, Cartan.coe_diagPow]⟩
+    have e1
+        : (fun a : Fin n => if a ≤ (⟨n - 1, by omega⟩ : Fin n) then (1 : ℤ) else 0) = fun _ => 1 :=
       funext fun a => if_pos (Fin.le_def.2 (by have := a.2; simp only; omega))
-    have e2 : {c : GL (Fin n) (w.adicCompletion K) ⧸ J | ∃ k ∈ J, c = QuotientGroup.mk (k * x)} = {QuotientGroup.mk x} := by
+    have e2
+        : {c : GL (Fin n) (w.adicCompletion K) ⧸ J | ∃ k ∈ J, c = QuotientGroup.mk (k * x)}
+          = {QuotientGroup.mk x} := by
       ext c
       constructor
       · rintro ⟨k, hk, rfl⟩

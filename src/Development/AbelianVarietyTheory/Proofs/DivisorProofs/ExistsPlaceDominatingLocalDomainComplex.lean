@@ -11,15 +11,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNormal
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
 
 namespace GlobalTheory.DvrDom
 
-theorem exists_fractions_of_essFiniteType : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O : Subring κ) (hc : ∀ a : ℂ, algebraMap ℂ κ a ∈ O), ((algebraMap ℂ κ).codRestrict O hc).EssFiniteType → ∃ G : Finset κ, (∀ x ∈ G, x ∈ O) ∧ ∀ o ∈ O, ∃ b ∈ Algebra.adjoin ℂ (G : Set κ), ∃ d ∈ Algebra.adjoin ℂ (G : Set κ), d ≠ 0 ∧ d⁻¹ ∈ O ∧ o = b / d := by
+theorem exists_fractions_of_essFiniteType
+    : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O : Subring κ) (hc : ∀ a : ℂ, algebraMap ℂ κ a ∈ O),
+      ((algebraMap ℂ κ).codRestrict O hc).EssFiniteType
+        → ∃ G : Finset κ,
+          (∀ x ∈ G, x ∈ O)
+            ∧ ∀ o ∈ O, ∃ b ∈ Algebra.adjoin ℂ (G : Set κ), ∃ d ∈ Algebra.adjoin ℂ (G : Set κ),
+              d ≠ 0 ∧ d⁻¹ ∈ O ∧ o = b / d := by
   classical
   intro κ _ _ O hc h
   letI : Algebra ℂ O := ((algebraMap ℂ κ).codRestrict O hc).toAlgebra
@@ -30,8 +38,9 @@ theorem exists_fractions_of_essFiniteType : ∀ {κ : Type} [Field κ] [Algebra 
     rw [Finset.mem_image] at hx
     obtain ⟨y, -, rfl⟩ := hx
     exact y.2
-  have key : ∀ x ∈ Algebra.adjoin ℂ (s : Set O),
-      ((x : O) : κ) ∈ Algebra.adjoin ℂ ((s.image (fun x : O => (x : κ)) : Finset κ) : Set κ) := by
+  have key
+      : ∀ x ∈ Algebra.adjoin ℂ (s : Set O),
+        ((x : O) : κ) ∈ Algebra.adjoin ℂ ((s.image (fun x : O => (x : κ)) : Finset κ) : Set κ) := by
     intro x hx
     induction hx using Algebra.adjoin_induction with
     | mem x hx =>
@@ -42,8 +51,10 @@ theorem exists_fractions_of_essFiniteType : ∀ {κ : Type} [Field κ] [Algebra 
     | add x y _ _ hx hy => simpa using Subalgebra.add_mem _ hx hy
     | mul x y _ _ hx hy => simpa using Subalgebra.mul_mem _ hx hy
   intro v hv
-  obtain ⟨⟨a, m⟩, hm⟩ := IsLocalization.surj
-    (Submonoid.comap (algebraMap (↥(Algebra.adjoin ℂ (s : Set O))) O) (IsUnit.submonoid O)) (⟨v, hv⟩ : O)
+  obtain ⟨⟨a, m⟩, hm⟩ :=
+    IsLocalization.surj
+      (Submonoid.comap (algebraMap (↥(Algebra.adjoin ℂ (s : Set O))) O) (IsUnit.submonoid O))
+      (⟨v, hv⟩ : O)
   have hu : IsUnit ((m : Algebra.adjoin ℂ (s : Set O)) : O) := m.2
   obtain ⟨u, hu'⟩ := hu
   have hinv : (((m : Algebra.adjoin ℂ (s : Set O)) : O) : κ) * (((u⁻¹ : Oˣ) : O) : κ) = 1 := by
@@ -56,14 +67,25 @@ theorem exists_fractions_of_essFiniteType : ∀ {κ : Type} [Field κ] [Algebra 
     exact zero_ne_one hinv
   have hmL := congrArg (fun z : O => (z : κ)) hm
   simp only at hmL
-  refine ⟨((a : O) : κ), key _ a.2, (((m : Algebra.adjoin ℂ (s : Set O)) : O) : κ),
-    key _ (m : Algebra.adjoin ℂ (s : Set O)).2, hd0, ?_, ?_⟩
+  refine ⟨
+    ((a : O) : κ),
+    key _ a.2,
+    (((m : Algebra.adjoin ℂ (s : Set O)) : O) : κ),
+    key _ (m : Algebra.adjoin ℂ (s : Set O)).2,
+    hd0,
+    ?_,
+    ?_
+  ⟩
   · rw [inv_eq_of_mul_eq_one_right hinv]
     exact ((u⁻¹ : Oˣ) : O).2
   · rw [eq_div_iff hd0]
     simpa using hmL
 
-theorem exists_minimal_prime_le : ∀ {R : Type} [CommRing R] [IsDomain R] [IsNoetherianRing R] (P : Ideal R) [P.IsPrime] (a : R), a ≠ 0 → a ∈ P → ∃ Q : Ideal R, Q.IsPrime ∧ a ∈ Q ∧ Q ≤ P ∧ Q ≠ ⊥ ∧ ∀ p : Ideal R, p.IsPrime → p ≠ ⊥ → p ≤ Q → p = Q := by
+theorem exists_minimal_prime_le
+    : ∀ {R : Type} [CommRing R] [IsDomain R] [IsNoetherianRing R] (P : Ideal R) [P.IsPrime] (a : R),
+      a ≠ 0 → a ∈ P
+        → ∃ Q : Ideal R,
+          Q.IsPrime ∧ a ∈ Q ∧ Q ≤ P ∧ Q ≠ ⊥ ∧ ∀ p : Ideal R, p.IsPrime → p ≠ ⊥ → p ≤ Q → p = Q := by
   intro R _ _ _ P _ a ha haP
   have hle : Ideal.span {a} ≤ P := (Ideal.span_singleton_le_iff_mem P).2 haP
   obtain ⟨Q, hQ, hQP⟩ := Ideal.exists_minimalPrimes_le hle
@@ -82,8 +104,12 @@ theorem exists_minimal_prime_le : ∀ {R : Type} [CommRing R] [IsDomain R] [IsNo
   have h2 : (1 : ℕ∞) + 1 ≤ 1 := (add_le_add_left hp1 1).trans (h1.trans hht)
   exact absurd h2 (by decide)
 
-theorem exists_place_dominating : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O : Subring κ) (hO : IsLocModel (algebraMap ℂ κ) O), letI := hO.isLocalRing;
-  ¬ IsField O → ∃ F : Place (algebraMap ℂ κ), F.Contains O ∧ ∀ f : O, f ∈ IsLocalRing.maximalIdeal O → (f : κ) ≠ 0 → 0 < F.ord f := by
+theorem exists_place_dominating
+    : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O : Subring κ) (hO : IsLocModel (algebraMap ℂ κ) O),
+      letI := hO.isLocalRing
+      ¬ IsField O
+        → ∃ F : Place (algebraMap ℂ κ),
+          F.Contains O ∧ ∀ f : O, f ∈ IsLocalRing.maximalIdeal O → (f : κ) ≠ 0 → 0 < F.ord f := by
   intro κ _ _ O hO
   letI := hO.isLocalRing
   intro hnf
@@ -92,14 +118,16 @@ theorem exists_place_dominating : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O
   letI : Algebra ℂ O := ((algebraMap ℂ κ).codRestrict O hO.const_mem).toAlgebra
   haveI : Algebra.EssFiniteType ℂ O := hO.essFiniteType
   haveI : IsNoetherianRing O := Algebra.EssFiniteType.isNoetherianRing ℂ O
-  obtain ⟨Y, hY⟩ := (IsNoetherian.noetherian (IsLocalRing.maximalIdeal O) :
-    (IsLocalRing.maximalIdeal O).FG)
+  obtain ⟨Y, hY⟩ :=
+    (IsNoetherian.noetherian (IsLocalRing.maximalIdeal O) : (IsLocalRing.maximalIdeal O).FG)
 
   obtain ⟨V, hOV⟩ := (LocalSubring.mk O).exists_le_valuationSubring
   obtain ⟨hle, hloc⟩ := (LocalSubring.le_def).1 hOV
   have hOV' : ∀ x ∈ O, x ∈ V := fun x hx => hle hx
-  have hVnu : ∀ x : O, x ∈ IsLocalRing.maximalIdeal O → ∀ hx : (x : κ) ∈ V,
-      (⟨x, hx⟩ : V) ∈ IsLocalRing.maximalIdeal V := by
+  have hVnu
+      : ∀ x : O,
+        x ∈ IsLocalRing.maximalIdeal O
+          → ∀ hx : (x : κ) ∈ V, (⟨x, hx⟩ : V) ∈ IsLocalRing.maximalIdeal V := by
     intro x hxm hx
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
     intro hu
@@ -140,19 +168,27 @@ theorem exists_place_dominating : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O
     · exact hdivV y hy
   have hGT : Algebra.adjoin ℂ (G : Set κ) ≤ Algebra.adjoin ℂ (T : Set κ) :=
     Algebra.adjoin_mono (by intro x hx; simp [T, Finset.mem_coe.1 hx])
-  have hfracT : ∀ f : κ, ∃ u ∈ Algebra.adjoin ℂ (T : Set κ), ∃ v ∈ Algebra.adjoin ℂ (T : Set κ),
-      v ≠ 0 ∧ f * v = u := by
+  have hfracT
+      : ∀ f : κ, ∃ u ∈ Algebra.adjoin ℂ (T : Set κ), ∃ v ∈ Algebra.adjoin ℂ (T : Set κ),
+        v ≠ 0 ∧ f * v = u := by
     intro f
     obtain ⟨x, hx, z, hz, hz0, hfz⟩ := hO.frac f
     obtain ⟨b, hb, d, hd, hd0, -, rfl⟩ := hGfrac x hx
     obtain ⟨b', hb', d', hd', hd0', -, rfl⟩ := hGfrac z hz
     have hb0' : b' ≠ 0 := by rintro rfl; exact hz0 (zero_div _)
-    refine ⟨b * d', Subalgebra.mul_mem _ (hGT hb) (hGT hd'), b' * d,
-      Subalgebra.mul_mem _ (hGT hb') (hGT hd), mul_ne_zero hb0' hd0, ?_⟩
+    refine ⟨
+      b * d',
+      Subalgebra.mul_mem _ (hGT hb) (hGT hd'),
+      b' * d,
+      Subalgebra.mul_mem _ (hGT hb') (hGT hd),
+      mul_ne_zero hb0' hd0,
+      ?_
+    ⟩
     field_simp at hfz
     linear_combination hfz
   have hcV : ∀ z : ℂ, algebraMap ℂ κ z ∈ V := fun z => hOV' _ (hO.const_mem z)
-  obtain ⟨R, hcR, hft, hTR, hRV, hRn, hRi, hRf⟩ := GlobalTheory.T.exists_normal_finiteType_subring_le_valuationSubring' V T hcV hTV hfracT
+  obtain ⟨R, hcR, hft, hTR, hRV, hRn, hRi, hRf⟩ :=
+    GlobalTheory.T.exists_normal_finiteType_subring_le_valuationSubring' V T hcV hTV hfracT
   haveI := hRn
   haveI := hRi
   haveI := hRf
@@ -161,12 +197,13 @@ theorem exists_place_dominating : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O
     have : Algebra.adjoin ℂ (T : Set κ) ≤ R' := Algebra.adjoin_le (fun x hx => hTR x hx)
     exact fun x hx => this hx
 
-  let ι : R →+* V :=
-    { toFun := fun r => ⟨r, hRV r.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let ι : R →+* V := {
+    toFun := fun r => ⟨r, hRV r.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   let P : Ideal R := (IsLocalRing.maximalIdeal V).comap ι
   haveI : P.IsPrime := Ideal.comap_isPrime _ _
   have haT : (a : κ) ∈ T := by simp [T, haY]
@@ -175,12 +212,15 @@ theorem exists_place_dominating : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O
   have ha'P : a' ∈ P := hVnu a (hY ▸ Submodule.subset_span haY) _
   obtain ⟨Q, hQp, haQ, hQP, hQ0, hmin⟩ := exists_minimal_prime_le P a' ha'0 ha'P
   haveI := hQp
-  obtain ⟨W, hWd, hRW, hinvW, hninvW, hWfrac⟩ := GlobalTheory.T.exists_dvr_localization_of_minimal_prime' R Q hQ0 hmin
+  obtain ⟨W, hWd, hRW, hinvW, hninvW, hWfrac⟩ :=
+    GlobalTheory.T.exists_dvr_localization_of_minimal_prime' R Q hQ0 hmin
 
   have hcW : ∀ z : ℂ, algebraMap ℂ κ z ∈ W := fun z => hRW ⟨_, hcR z⟩
   have hWft : ((algebraMap ℂ κ).codRestrict W hcW).EssFiniteType :=
     GlobalTheory.EssFiniteDescent.essFiniteType_of_eq_div κ (algebraMap ℂ κ) R hcR W hcW
-      (fun x hx => hRW ⟨x, hx⟩) hft (fun e he => by
+      (fun x hx => hRW ⟨x, hx⟩)
+      hft
+      (fun e he => by
         obtain ⟨b, s, hs, rfl⟩ := hWfrac e he
         exact ⟨b, b.2, s, s.2, hinvW s hs, rfl⟩)
   let F : Place (algebraMap ℂ κ) := ⟨W, hcW, hWd, hWft⟩
@@ -206,7 +246,8 @@ theorem exists_place_dominating : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O
       · simp only [T, Finset.mem_union, Finset.mem_image]
         exact Or.inr ⟨y, hy, rfl⟩
       · field_simp
-    | zero => exact ⟨0, zero_mem _, by simp⟩
+    | zero =>
+      exact ⟨0, zero_mem _, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨w, hw, ex⟩ := hx
       obtain ⟨w', hw', ey⟩ := hy
@@ -214,7 +255,8 @@ theorem exists_place_dominating : ∀ {κ : Type} [Field κ] [Algebra ℂ κ] (O
     | smul c x _ hx =>
       obtain ⟨w, hw, ex⟩ := hx
       refine ⟨c * w, mul_mem (hOW _ c.2) hw, ?_⟩
-      rw [smul_eq_mul, Subring.coe_mul, ex]; ring
+      rw [smul_eq_mul, Subring.coe_mul, ex]
+      ring
   rw [← hY] at hf
   obtain ⟨w, hw, efw⟩ := hspan f hf
   have hw0 : w ≠ 0 := by rintro rfl; exact hf0 (by rw [efw, mul_zero])

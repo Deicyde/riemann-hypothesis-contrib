@@ -10,11 +10,14 @@ namespace PositivityTheory.HtPt.Htat.Lie
 
 open TensorProduct
 
-theorem bijective_of_cover {R M N J : Type} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (f : J → R) (hf : Ideal.span (Set.range f) = ⊤) (φ : M →ₗ[R] N)
+theorem bijective_of_cover
+    {R M N J : Type} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (f : J → R) (hf : Ideal.span (Set.range f) = ⊤)
+    (φ : M →ₗ[R] N)
     (h : ∀ i, ∃ (Q : Type) (_ : AddCommGroup Q) (_ : Module R Q) (a : N →ₗ[R] Q),
-      IsLocalizedModule (Submonoid.powers (f i)) a ∧ IsLocalizedModule (Submonoid.powers (f i)) (a ∘ₗ φ)) :
-    Function.Bijective φ := by
+      IsLocalizedModule (Submonoid.powers (f i)) a
+        ∧ IsLocalizedModule (Submonoid.powers (f i)) (a ∘ₗ φ))
+    : Function.Bijective φ := by
   constructor
   · rw [← LinearMap.ker_eq_bot, eq_bot_iff]
     intro m hm
@@ -40,12 +43,14 @@ theorem bijective_of_cover {R M N J : Type} [CommRing R] [AddCommGroup M] [Modul
     show φ (f i ^ l • m) = f i ^ (l + k) • n
     rw [map_smul, pow_add, mul_smul, hl']
 
-theorem isBaseChange_hom {R A C P : Type} [CommRing R] [CommRing A] [CommRing C] [Algebra R A] [Algebra R C]
-    [Algebra A C] [IsScalarTower R A C] [AddCommGroup P] [Module R P] [Module A P] [IsScalarTower R A P]
-    [Module.Finite A P] [Module.Projective A P]
+theorem isBaseChange_hom
+    {R A C P : Type} [CommRing R] [CommRing A] [CommRing C] [Algebra R A] [Algebra R C]
+    [Algebra A C] [IsScalarTower R A C] [AddCommGroup P] [Module R P] [Module A P]
+    [IsScalarTower R A P] [Module.Finite A P] [Module.Projective A P]
     (hA : ∀ (φ : P →ₗ[R] A) (a : A) p, φ (a • p) = a * φ p)
     (hC : ∀ (φ : P →ₗ[R] C) (a : A) p, φ (a • p) = algebraMap A C a * φ p)
-    (g : (P →ₗ[R] A) →ₗ[A] (P →ₗ[R] C)) (hg : ∀ φ p, g φ p = algebraMap A C (φ p)) : IsBaseChange C g := by
+    (g : (P →ₗ[R] A) →ₗ[A] (P →ₗ[R] C)) (hg : ∀ φ p, g φ p = algebraMap A C (φ p))
+    : IsBaseChange C g := by
   obtain ⟨n, π, hπ⟩ := Module.Finite.exists_fin' A P
   obtain ⟨s, hs⟩ := Module.projective_lifting_property π LinearMap.id hπ
   let b : Fin n → P := fun k => π (fun j => if k = j then 1 else 0)
@@ -63,7 +68,7 @@ theorem isBaseChange_hom {R A C P : Type} [CommRing R] [CommRing A] [CommRing C]
     ext p
     conv_rhs => rw [← hexp p]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hA, hco, mul_comm]
+    simp [map_sum, hA, hco, mul_comm]
   let θ : C ⊗[A] (P →ₗ[R] A) →ₗ[C] (P →ₗ[R] C) := g.liftBaseChange C
   have hθ : ∀ c φ, θ (c ⊗ₜ φ) = c • g φ := fun c φ => LinearMap.liftBaseChange_tmul _ _ _ _
   let inv : (P →ₗ[R] C) → C ⊗[A] (P →ₗ[R] A) := fun ψ => ∑ k, ψ (b k) ⊗ₜ co k
@@ -79,15 +84,19 @@ theorem isBaseChange_hom {R A C P : Type} [CommRing R] [CommRing A] [CommRing C]
       rw [hθ]
       conv_rhs => rw [← hsum φ, tmul_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
-      rw [LinearMap.smul_apply, hg, tmul_smul, smul_tmul', Algebra.smul_def (φ (b k)), smul_eq_mul, mul_comm]
+      rw [LinearMap.smul_apply, hg, tmul_smul, smul_tmul', Algebra.smul_def (φ (b k)), smul_eq_mul,
+        mul_comm]
   have hr : ∀ ψ, θ (inv ψ) = ψ := by
     intro ψ
     ext p
     conv_rhs => rw [← hexp p]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [inv, map_sum, hθ, LinearMap.sum_apply, LinearMap.smul_apply, hg, hco, hC, smul_eq_mul, mul_comm]
-  refine IsBaseChange.of_equiv (LinearEquiv.ofBijective θ
-    ⟨Function.LeftInverse.injective hl, Function.RightInverse.surjective hr⟩) fun φ => ?_
+    simp only [inv, map_sum, hθ, LinearMap.sum_apply, LinearMap.smul_apply, hg, hco, hC,
+      smul_eq_mul, mul_comm]
+  refine IsBaseChange.of_equiv
+    (LinearEquiv.ofBijective θ
+      ⟨Function.LeftInverse.injective hl, Function.RightInverse.surjective hr⟩)
+    fun φ => ?_
   exact (hθ 1 φ).trans (one_smul _ _)
 
 end PositivityTheory.HtPt.Htat.Lie

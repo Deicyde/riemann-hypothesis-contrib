@@ -16,27 +16,30 @@ namespace GlobalTheory.FieldSize
 set_option autoImplicit false in
 open NumberField IsDedekindDomain Polynomial in
 open scoped IntermediateField nonZeroDivisors in
-private theorem natCast_mul_pow_pred_mem_differentIdeal_of_pow_eq {K L : Type} [Field K]
-    [NumberField K] [Field L] [NumberField L] [Algebra K L] (k : ℕ) (β : 𝓞 L) (r : 𝓞 K)
-    (hβ : β ^ k = algebraMap (𝓞 K) (𝓞 L) r)
-    (hgen : Algebra.adjoin K {algebraMap (𝓞 L) L β} = ⊤) :
-    (k : 𝓞 L) * β ^ (k - 1) ∈ differentIdeal (𝓞 K) (𝓞 L) := by
+private theorem natCast_mul_pow_pred_mem_differentIdeal_of_pow_eq
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    (k : ℕ) (β : 𝓞 L) (r : 𝓞 K) (hβ : β ^ k = algebraMap (𝓞 K) (𝓞 L) r)
+    (hgen : Algebra.adjoin K {algebraMap (𝓞 L) L β} = ⊤)
+    : (k : 𝓞 L) * β ^ (k - 1) ∈ differentIdeal (𝓞 K) (𝓞 L) := by
   have hint : IsIntegral (𝓞 K) β := Algebra.IsIntegral.isIntegral β
   obtain ⟨h, hh⟩ := minpoly.isIntegrallyClosed_dvd hint (p := X ^ k - C r) (by simp [hβ])
   have hmem := aeval_derivative_mem_differentIdeal (𝓞 K) K L β hgen
   have hder : aeval β (derivative (X ^ k - C r : (𝓞 K)[X])) = (k : 𝓞 L) * β ^ (k - 1) := by
     simp [derivative_X_pow]
-  rw [← hder, hh, derivative_mul, map_add (f := _), map_mul, map_mul, minpoly.aeval, zero_mul, add_zero]
+  rw [← hder, hh, derivative_mul, map_add (f := _), map_mul, map_mul, minpoly.aeval, zero_mul,
+    add_zero]
   exact Ideal.mul_mem_right _ _ hmem
-
 
 set_option autoImplicit false in
 open NumberField IsDedekindDomain Polynomial in
 open scoped IntermediateField nonZeroDivisors in
-theorem _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] (k : ℕ) (hk : 0 < k) (y : K) (hy : y ≠ 0) (I : Submodule (𝓞 K) K)
-    (hI : I ^ k = Submodule.span (𝓞 K) {y}) (z : L) (hz : z ^ k = algebraMap K L y)
-    (hL : Algebra.adjoin K {z} = ⊤) : (k : 𝓞 L) ∈ differentIdeal (𝓞 K) (𝓞 L) := by
+theorem _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    (k : ℕ) (hk : 0 < k)
+    (y : K) (hy : y ≠ 0)
+    (I : Submodule (𝓞 K) K) (hI : I ^ k = Submodule.span (𝓞 K) {y})
+    (z : L) (hz : z ^ k = algebraMap K L y) (hL : Algebra.adjoin K {z} = ⊤)
+    : (k : 𝓞 L) ∈ differentIdeal (𝓞 K) (𝓞 L) := by
   classical
   have hy' : algebraMap K L y ≠ 0 := (_root_.map_ne_zero _).mpr hy
   have hz0 : z ≠ 0 := by
@@ -87,9 +90,11 @@ theorem _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root {K L : 
         exact div_mem (IntermediateField.algebraMap_mem _ b)
           (IntermediateField.mem_adjoin_simple_self K _)
       rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-        (Algebra.IsAlgebraic.isAlgebraic _), hK, IntermediateField.top_toSubalgebra]
-  have key : ∀ n : ℕ, ∀ w ∈ I ^ n, ∃ t ∈ Ideal.span S ^ n,
-      algebraMap (𝓞 L) L t * z ^ n = algebraMap K L w := by
+          (Algebra.IsAlgebraic.isAlgebraic _),
+        hK, IntermediateField.top_toSubalgebra]
+  have key
+      : ∀ n : ℕ, ∀ w ∈ I ^ n, ∃ t ∈ Ideal.span S ^ n,
+        algebraMap (𝓞 L) L t * z ^ n = algebraMap K L w := by
     intro n
     induction n with
     | zero =>
@@ -102,8 +107,10 @@ theorem _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root {K L : 
     | succ n ih =>
       intro w hw
       rw [pow_succ] at hw
-      refine Submodule.mul_induction_on (C := fun w => ∃ t ∈ Ideal.span S ^ (n + 1),
-        algebraMap (𝓞 L) L t * z ^ (n + 1) = algebraMap K L w) hw ?_ ?_
+      refine Submodule.mul_induction_on
+        (C := fun w =>
+          ∃ t ∈ Ideal.span S ^ (n + 1), algebraMap (𝓞 L) L t * z ^ (n + 1) = algebraMap K L w)
+        hw ?_ ?_
       · intro a ha b hb
         obtain ⟨t, ht, hta⟩ := ih a ha
         by_cases hb0 : b = 0
@@ -115,7 +122,8 @@ theorem _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root {K L : 
         · rw [map_mul, map_mul, pow_succ, ← hta, ← hβ]
           ring
       · rintro x x' ⟨t, ht, htx⟩ ⟨t', ht', htx'⟩
-        exact ⟨t + t', add_mem ht ht', by rw [map_add (f := _), add_mul, htx, htx', map_add (f := _)]⟩
+        exact
+          ⟨t + t', add_mem ht ht', by rw [map_add (f := _), add_mul, htx, htx', map_add (f := _)]⟩
   have hspan : Ideal.span S = ⊤ := by
     have hyk : y ∈ I ^ k := by
       rw [hI]
@@ -131,18 +139,23 @@ theorem _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root {K L : 
   have h1 : (1 : 𝓞 L) ∈ Ideal.span ((fun x => x ^ (k - 1)) '' S) := by
     rw [Ideal.span_pow_eq_top S hspan]
     exact Submodule.mem_top
-  have hfin := Submodule.span_induction
-    (p := fun x _ => (k : 𝓞 L) * x ∈ differentIdeal (𝓞 K) (𝓞 L))
-    (by rintro _ ⟨β, hβ, rfl⟩; exact hmemS β hβ) (by simp)
-    (fun x x' _ _ hx hx' => by rw [mul_add]; exact add_mem hx hx')
-    (fun a x _ hx => by rw [smul_eq_mul, mul_left_comm]; exact Ideal.mul_mem_left _ a hx) h1
+  have hfin :=
+    Submodule.span_induction
+      (p := fun x _ => (k : 𝓞 L) * x ∈ differentIdeal (𝓞 K) (𝓞 L))
+      (by rintro _ ⟨β, hβ, rfl⟩; exact hmemS β hβ) (by simp)
+      (fun x x' _ _ hx hx' => by rw [mul_add]; exact add_mem hx hx')
+      (fun a x _ hx => by rw [smul_eq_mul, mul_left_comm]; exact Ideal.mul_mem_left _ a hx)
+      h1
   simpa using hfin
-
 
 set_option autoImplicit false in
 open NumberField IsDedekindDomain Polynomial in
 open scoped IntermediateField nonZeroDivisors in
-theorem _root_.GlobalTheory.FieldSize.sz_sup_adjoin_root : ∀ (F : IntermediateField ℚ ℂ) (a b : ℝ) (k : ℕ) (y : F) (I : Submodule (𝓞 F) F) (z : ℂ), _root_.GlobalTheory.FieldSize.Sz F a b → 0 < k → y ≠ 0 → I ^ k = Submodule.span (𝓞 F) {y} → z ^ k = (y : ℂ) → _root_.GlobalTheory.FieldSize.Sz (F ⊔ ℚ⟮z⟯) (a + Real.log k) (b + Real.log k) := by
+theorem _root_.GlobalTheory.FieldSize.sz_sup_adjoin_root
+    : ∀ (F : IntermediateField ℚ ℂ) (a b : ℝ) (k : ℕ) (y : F) (I : Submodule (𝓞 F) F) (z : ℂ),
+      _root_.GlobalTheory.FieldSize.Sz F a b → 0 < k → y ≠ 0 → I ^ k = Submodule.span (𝓞 F) {y}
+        → z ^ k = (y : ℂ)
+        → _root_.GlobalTheory.FieldSize.Sz (F ⊔ ℚ⟮z⟯) (a + Real.log k) (b + Real.log k) := by
   intro F a b k y I z hF hk hy hI hz
   unfold _root_.GlobalTheory.FieldSize.Sz at hF ⊢
   obtain ⟨hfd, hdeg, hdisc⟩ := hF
@@ -157,8 +170,7 @@ theorem _root_.GlobalTheory.FieldSize.sz_sup_adjoin_root : ∀ (F : Intermediate
   letI : Algebra F E := (IntermediateField.inclusion hle).toAlgebra
   letI : Module.Free F E := Module.Free.of_divisionRing F E
   let z' : E := ⟨z, (le_sup_right : ℚ⟮z⟯ ≤ E) (IntermediateField.mem_adjoin_simple_self ℚ z)⟩
-  have hz' : z' ^ k = algebraMap F E y :=
-    Subtype.ext (by rw [IntermediateField.coe_pow]; exact hz)
+  have hz' : z' ^ k = algebraMap F E y := Subtype.ext (by rw [IntermediateField.coe_pow]; exact hz)
   have hzF : IsIntegral F z := IsIntegral.of_pow hk (by rw [hz]; exact isIntegral_algebraMap)
   let φ : E →ₐ[F] ℂ := { E.val with commutes' := fun _ => rfl }
   have hL : Algebra.adjoin F {z'} = ⊤ := by
@@ -178,7 +190,8 @@ theorem _root_.GlobalTheory.FieldSize.sz_sup_adjoin_root : ∀ (F : Intermediate
     obtain ⟨w', hw', hww⟩ := hw
     have hw'w : w' = w := Subtype.val_injective hww
     exact hw'w ▸ hw'
-  have hdiff := _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root k hk y hy I hI z' hz' hL
+  have hdiff :=
+    _root_.GlobalTheory.FieldSize.natCast_mem_differentIdeal_of_root k hk y hy I hI z' hz' hL
   have hroot := _root_.GlobalTheory.log_rootDiscr_le_of_natCast_mem_differentIdeal F E k hk hdiff
   have hFE : IntermediateField.adjoin F {z'} = ⊤ := by
     rw [← IntermediateField.toSubalgebra_inj, IntermediateField.top_toSubalgebra, eq_top_iff, ← hL]
@@ -189,8 +202,9 @@ theorem _root_.GlobalTheory.FieldSize.sz_sup_adjoin_root : ∀ (F : Intermediate
     rw [hFE, IntermediateField.finrank_top'] at h1
     rw [h1]
     have hp : (X ^ k - C y : F[X]) ≠ 0 := X_pow_sub_C_ne_zero hk y
-    calc (minpoly F z').natDegree ≤ (X ^ k - C y : F[X]).natDegree :=
-          natDegree_le_of_dvd (minpoly.dvd F z' (by simp [hz'])) hp
+    calc
+      (minpoly F z').natDegree ≤ (X ^ k - C y : F[X]).natDegree :=
+        natDegree_le_of_dvd (minpoly.dvd F z' (by simp [hz'])) hp
       _ = k := natDegree_X_pow_sub_C _
   haveI : FiniteDimensional F E := FiniteDimensional.right ℚ F E
   have hdF : 0 < Module.finrank ℚ F := Module.finrank_pos

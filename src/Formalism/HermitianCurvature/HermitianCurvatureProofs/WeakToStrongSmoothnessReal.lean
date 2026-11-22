@@ -179,62 +179,80 @@ lemma hasFDeriv_of {V I : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [Comp
     rw [e]; exact hT i h hh
   · ext h; rw [ContinuousLinearMap.comp_apply, hL, hℓ]
 
-theorem weak_to_strong_smoothness_real (m : ℕ) : ∀ (V I : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [CompleteSpace V]
-    (lam : I → V →L[ℝ] E), Norming lam → ∀ (Ω : Set X) (Φ : X → V) (bd : X → ℝ), IsOpen Ω →
-    ContinuousOn bd Ω →
-    (∀ i, ContDiffOn ℝ ((m + 1 : ℕ) : WithTop ℕ∞) (fun x => lam i (Φ x)) Ω) →
-    (∀ i, ∀ q ≤ m + 1, ∀ x ∈ Ω, ‖iteratedFDeriv ℝ q (fun x => lam i (Φ x)) x‖ ≤ bd x) →
-    ContDiffOn ℝ (m : WithTop ℕ∞) Φ Ω ∧ ∀ q ≤ m, ∀ x ∈ Ω, ‖iteratedFDeriv ℝ q Φ x‖ ≤ bd x := by
+theorem weak_to_strong_smoothness_real (m : ℕ)
+    : ∀ (V I : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [CompleteSpace V]
+        (lam : I → V →L[ℝ] E),
+      Norming lam
+        → ∀ (Ω : Set X) (Φ : X → V) (bd : X → ℝ),
+          IsOpen Ω → ContinuousOn bd Ω
+            → (∀ i, ContDiffOn ℝ ((m + 1 : ℕ) : WithTop ℕ∞) (fun x => lam i (Φ x)) Ω)
+            → (∀ i, ∀ q ≤ m + 1, ∀ x ∈ Ω, ‖iteratedFDeriv ℝ q (fun x => lam i (Φ x)) x‖ ≤ bd x)
+            → ContDiffOn ℝ (m : WithTop ℕ∞) Φ Ω
+              ∧ ∀ q ≤ m, ∀ x ∈ Ω, ‖iteratedFDeriv ℝ q Φ x‖ ≤ bd x := by
   induction m with
   | zero =>
     intro V I _ _ _ lam hN Ω Φ bd hΩ hbd hcd hb
-    have h0 : ∀ x ∈ Ω, ‖Φ x‖ ≤ bd x := fun x hx => hN _ _ (fun i => by
-      have := hb i 0 (Nat.zero_le _) x hx
-      rwa [norm_iteratedFDeriv_zero] at this)
+    have h0 : ∀ x ∈ Ω, ‖Φ x‖ ≤ bd x := fun x hx =>
+      hN _ _ (fun i => by
+        have := hb i 0 (Nat.zero_le _) x hx
+        rwa [norm_iteratedFDeriv_zero] at this)
     refine ⟨?_, fun q hq x hx => ?_⟩
     · have hc : ContinuousOn Φ Ω := by
         intro x₀ hx₀
         obtain ⟨r, hr, hball⟩ := loc hΩ hbd hx₀
-        refine (continuousAt_of_locally_lipschitz hr (bd x₀ + 1) (fun y hy => ?_)).continuousWithinAt
+        refine (continuousAt_of_locally_lipschitz hr (bd x₀ + 1)
+          (fun y hy => ?_)).continuousWithinAt
         rw [dist_eq_norm, dist_eq_norm]
         refine hN _ _ (fun i => ?_)
         rw [map_sub]
         refine lip_ball (f := fun x => lam i (Φ x)) (fun z hz => ?_) (fun z hz => ?_) hy
-        · exact ((hcd i).differentiableOn (Nat.cast_ne_zero.2 (Nat.succ_ne_zero _))).differentiableAt
-            (hΩ.mem_nhds (hball z hz).1)
+        · exact
+            ((hcd i).differentiableOn (Nat.cast_ne_zero.2 (Nat.succ_ne_zero _))).differentiableAt
+              (hΩ.mem_nhds (hball z hz).1)
         · rw [← norm_iteratedFDeriv_one]
           exact (hb i 1 (by omega) z (hball z hz).1).trans (hball z hz).2
       have := (contDiffOn_zero (𝕜 := ℝ)).2 hc
       simpa using this
     · obtain rfl : q = 0 := Nat.le_zero.1 hq
-      rw [norm_iteratedFDeriv_zero]; exact h0 x hx
+      rw [norm_iteratedFDeriv_zero]
+      exact h0 x hx
   | succ m ih =>
     intro V I _ _ _ lam hN Ω Φ bd hΩ hbd hcd hb
     obtain ⟨i₀⟩ := hN.nonempty
     have hf1 : ∀ i, ContDiffOn ℝ ((m + 1 : ℕ) : WithTop ℕ∞) (fderiv ℝ (fun x => lam i (Φ x))) Ω :=
       fun i => (hcd i).fderiv_of_isOpen hΩ (by push_cast; exact le_rfl)
     have hdiff : ∀ i, ∀ y ∈ Ω, DifferentiableAt ℝ (fun x => lam i (Φ x)) y := fun i y hy =>
-      ((hcd i).differentiableOn (Nat.cast_ne_zero.2 (Nat.succ_ne_zero _))).differentiableAt (hΩ.mem_nhds hy)
-    have hdiff2 : ∀ i, ∀ y ∈ Ω, DifferentiableAt ℝ (fderiv ℝ (fun x => lam i (Φ x))) y := fun i y hy =>
-      ((hf1 i).differentiableOn (Nat.cast_ne_zero.2 (Nat.succ_ne_zero _))).differentiableAt (hΩ.mem_nhds hy)
-    have hder : ∀ x₀ ∈ Ω, ∃ L : X →L[ℝ] V, HasFDerivAt Φ L x₀ ∧
-        ∀ i, (lam i).comp L = fderiv ℝ (fun x => lam i (Φ x)) x₀ := by
+      ((hcd i).differentiableOn (Nat.cast_ne_zero.2 (Nat.succ_ne_zero _))).differentiableAt
+        (hΩ.mem_nhds hy)
+    have hdiff2
+        : ∀ i, ∀ y ∈ Ω, DifferentiableAt ℝ (fderiv ℝ (fun x => lam i (Φ x))) y := fun i y hy =>
+      ((hf1 i).differentiableOn (Nat.cast_ne_zero.2 (Nat.succ_ne_zero _))).differentiableAt
+        (hΩ.mem_nhds hy)
+    have hder
+        : ∀ x₀ ∈ Ω, ∃ L : X →L[ℝ] V,
+          HasFDerivAt Φ L x₀ ∧ ∀ i, (lam i).comp L = fderiv ℝ (fun x => lam i (Φ x)) x₀ := by
       intro x₀ hx₀
       obtain ⟨r, hr, hball⟩ := loc hΩ hbd hx₀
       refine hasFDeriv_of hN hr (M := bd x₀ + 1) _ (fun i h hh => ?_)
       have hmem : ∀ y ∈ Metric.ball x₀ r, y ∈ Ω := fun y hy => (hball y hy).1
-      exact taylor2 (f := fun x => lam i (Φ x)) (fun y hy => hdiff i y (hmem y hy))
+      exact taylor2
+        (f := fun x => lam i (Φ x))
+        (fun y hy => hdiff i y (hmem y hy))
         (fun y hy => hdiff2 i y (hmem y hy))
         (fun y hy => by
           rw [← norm_iteratedFDeriv_one, norm_iteratedFDeriv_fderiv]
-          exact (hb i 2 (by omega) y (hmem y hy)).trans (hball y hy).2) hh
-    have hD : ∀ x ∈ Ω, HasFDerivAt Φ (fderiv ℝ Φ x) x ∧
-        ∀ i, (lam i).comp (fderiv ℝ Φ x) = fderiv ℝ (fun x => lam i (Φ x)) x := by
+          exact (hb i 2 (by omega) y (hmem y hy)).trans (hball y hy).2)
+        hh
+    have hD
+        : ∀ x ∈ Ω,
+          HasFDerivAt Φ (fderiv ℝ Φ x) x
+            ∧ ∀ i, (lam i).comp (fderiv ℝ Φ x) = fderiv ℝ (fun x => lam i (Φ x)) x := by
       intro x hx
       obtain ⟨L, hL, hc⟩ := hder x hx
-      rw [hL.fderiv]; exact ⟨hL, hc⟩
-    let lam' : I × {h : X // ‖h‖ ≤ 1} → (X →L[ℝ] V) →L[ℝ] E :=
-      fun j => (lam j.1).comp (ContinuousLinearMap.apply ℝ V j.2.1)
+      rw [hL.fderiv]
+      exact ⟨hL, hc⟩
+    let lam' : I × {h : X // ‖h‖ ≤ 1} → (X →L[ℝ] V) →L[ℝ] E := fun j =>
+      (lam j.1).comp (ContinuousLinearMap.apply ℝ V j.2.1)
     have hlam' : ∀ j T, lam' j T = lam j.1 (T j.2.1) := fun j T => rfl
     have hN' : Norming lam' := by
       intro T c hc
@@ -244,27 +262,34 @@ theorem weak_to_strong_smoothness_real (m : ℕ) : ∀ (V I : Type) [NormedAddCo
       refine ContinuousLinearMap.opNorm_le_of_unit_norm c0 (fun h hh => hN _ _ (fun i => ?_))
       have := hc (i, ⟨h, hh.le⟩)
       rwa [hlam'] at this
-    have heq : ∀ j : I × {h : X // ‖h‖ ≤ 1}, ∀ y ∈ Ω, lam' j (fderiv ℝ Φ y) =
-        ContinuousLinearMap.apply ℝ E j.2.1 (fderiv ℝ (fun x => lam j.1 (Φ x)) y) := by
+    have heq
+        : ∀ j : I × {h : X // ‖h‖ ≤ 1}, ∀ y ∈ Ω,
+          lam' j (fderiv ℝ Φ y)
+            = ContinuousLinearMap.apply ℝ E j.2.1 (fderiv ℝ (fun x => lam j.1 (Φ x)) y) := by
       intro j y hy
-      rw [hlam', ContinuousLinearMap.apply_apply, ← (hD y hy).2 j.1]; rfl
-    have hcd' : ∀ j, ContDiffOn ℝ ((m + 1 : ℕ) : WithTop ℕ∞) (fun x => lam' j (fderiv ℝ Φ x)) Ω := by
+      rw [hlam', ContinuousLinearMap.apply_apply, ← (hD y hy).2 j.1]
+      rfl
+    have hcd'
+        : ∀ j, ContDiffOn ℝ ((m + 1 : ℕ) : WithTop ℕ∞) (fun x => lam' j (fderiv ℝ Φ x)) Ω := by
       intro j
       exact ((ContinuousLinearMap.apply ℝ E j.2.1).contDiff.comp_contDiffOn (hf1 j.1)).congr
         (fun x hx => heq j x hx)
-    have hb' : ∀ j, ∀ q ≤ m + 1, ∀ x ∈ Ω,
-        ‖iteratedFDeriv ℝ q (fun x => lam' j (fderiv ℝ Φ x)) x‖ ≤ bd x := by
+    have hb'
+        : ∀ j, ∀ q ≤ m + 1, ∀ x ∈ Ω,
+          ‖iteratedFDeriv ℝ q (fun x => lam' j (fderiv ℝ Φ x)) x‖ ≤ bd x := by
       intro j q hq x hx
       rw [iter_congr hΩ (heq j) hx q]
-      calc _ ≤ ‖ContinuousLinearMap.apply ℝ E j.2.1‖ *
-            ‖iteratedFDeriv ℝ q (fderiv ℝ (fun x => lam j.1 (Φ x))) x‖ :=
-            norm_iter_comp _ (hf1 j.1) hΩ hx (by exact_mod_cast hq)
+      calc
+        _ ≤ ‖ContinuousLinearMap.apply ℝ E j.2.1‖
+            * ‖iteratedFDeriv ℝ q (fderiv ℝ (fun x => lam j.1 (Φ x))) x‖ :=
+          norm_iter_comp _ (hf1 j.1) hΩ hx (by exact_mod_cast hq)
         _ ≤ 1 * bd x := by
-            refine mul_le_mul (norm_apply_le _ j.2.2) ?_ (norm_nonneg _) zero_le_one
-            rw [norm_iteratedFDeriv_fderiv]; exact hb j.1 (q + 1) (by omega) x hx
+          refine mul_le_mul (norm_apply_le _ j.2.2) ?_ (norm_nonneg _) zero_le_one
+          rw [norm_iteratedFDeriv_fderiv]
+          exact hb j.1 (q + 1) (by omega) x hx
         _ = bd x := one_mul _
-    obtain ⟨hcD, hbD⟩ := ih (X →L[ℝ] V) (I × {h : X // ‖h‖ ≤ 1}) lam' hN' Ω (fun x => fderiv ℝ Φ x) bd
-      hΩ hbd hcd' hb'
+    obtain ⟨hcD, hbD⟩ :=
+      ih (X →L[ℝ] V) (I × {h : X // ‖h‖ ≤ 1}) lam' hN' Ω (fun x => fderiv ℝ Φ x) bd hΩ hbd hcd' hb'
     refine ⟨?_, fun q hq x hx => ?_⟩
     · rw [show ((m + 1 : ℕ) : WithTop ℕ∞) = (m : WithTop ℕ∞) + 1 by push_cast; rfl,
         contDiffOn_succ_iff_fderiv_of_isOpen hΩ]
@@ -280,18 +305,23 @@ theorem weak_to_strong_smoothness_real (m : ℕ) : ∀ (V I : Type) [NormedAddCo
 
 end real
 
-theorem _root_.Formalism.FourierDecayAlt.P.weak_to_strong_smoothness : Formalism.FourierDecayAlt.U.WeakToStrong := by
+theorem _root_.Formalism.FourierDecayAlt.P.weak_to_strong_smoothness
+    : Formalism.FourierDecayAlt.U.WeakToStrong := by
   intro X V E I _ _ _ _ _ _ _ _ lam hN Ω Φ m bd hΩ hbd hcd hb
-  exact weak_to_strong_smoothness_real (X := X) (E := E) m V I (fun i => (lam i).restrictScalars ℝ) hN Ω Φ bd hΩ hbd hcd hb
+  exact weak_to_strong_smoothness_real (X := X) (E := E) m V I
+    (fun i => (lam i).restrictScalars ℝ)
+    hN Ω Φ bd hΩ hbd hcd hb
 
 section thm
 
 def Idx (k ρ mm : ℕ) : Type :=
-  {t : List (B.Mat k ρ) × List (B.Mat k ρ) × B.Mat k ρ //
-    U.unitW k ρ t.1 ∧ U.unitW k ρ t.2.1 ∧ t.1.length + t.2.1.length ≤ mm ∧ t.2.2 ∈ B.GV k ρ}
+  {t : List (B.Mat k ρ) × List (B.Mat k ρ) × B.Mat k ρ
+    // U.unitW k ρ t.1 ∧ U.unitW k ρ t.2.1 ∧ t.1.length + t.2.1.length ≤ mm ∧ t.2.2 ∈ B.GV k ρ}
 
-variable {k ρ mm : ℕ} {E V : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup V]
-  [NormedSpace ℂ V] {a : ℝ} {S : Set (B.Mat k ρ)}
+variable
+  {k ρ mm : ℕ} {E V : Type}
+  [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup V] [NormedSpace ℂ V]
+  {a : ℝ} {S : Set (B.Mat k ρ)}
 
 lemma gNa_nonneg (γ : B.Mat k ρ) (a : ℝ) : 0 ≤ B.gN γ ^ a := Real.rpow_nonneg (Real.sqrt_nonneg _) a
 
@@ -309,8 +339,12 @@ lemma ck_len (M : U.CCModel k ρ E a mm S V) (t : Idx k ρ mm) (w : V) :
 def lamL (M : U.CCModel k ρ E a mm S V) (t : Idx k ρ mm) : V →ₗ[ℂ] E where
   toFun w := ((B.gN t.1.2.2 ^ a : ℝ) : ℂ) • B.dLR t.1.1 t.1.2.1 (M.ev w) t.1.2.2
   map_add' w₁ w₂ := by
-    rw [ev_add, BetaSesquilinearity.dLR_eq, BetaSesquilinearity.Dw_add (BetaSesquilinearity.lie_LR (BetaSesquilinearity.unit_lie t.2.1) (BetaSesquilinearity.unit_lie t.2.2.1))
-      (ck_len M t w₁) (ck_len M t w₂) _ t.2.2.2.2, ← BetaSesquilinearity.dLR_eq, ← BetaSesquilinearity.dLR_eq, smul_add]
+    rw [ev_add, BetaSesquilinearity.dLR_eq,
+      BetaSesquilinearity.Dw_add
+        (BetaSesquilinearity.lie_LR (BetaSesquilinearity.unit_lie t.2.1)
+          (BetaSesquilinearity.unit_lie t.2.2.1))
+        (ck_len M t w₁) (ck_len M t w₂) _ t.2.2.2.2,
+      ← BetaSesquilinearity.dLR_eq, ← BetaSesquilinearity.dLR_eq, smul_add]
   map_smul' c w := by
     simp only [ev_smul, BetaSesquilinearity.dLR_eq, BetaSesquilinearity.Dw_smul, RingHom.id_apply]
     exact smul_comm _ _ _
@@ -345,15 +379,18 @@ lemma sc_norm (c : ℝ) (hc : 0 ≤ c) : ‖sc E c‖ ≤ c :=
 
 end thm
 
-theorem _root_.Formalism.FourierDecayAlt.P.theorem_u_of_parts : Formalism.FourierDecayAlt.U.TheoremUOfParts := by
+theorem _root_.Formalism.FourierDecayAlt.P.theorem_u_of_parts
+    : Formalism.FourierDecayAlt.U.TheoremUOfParts := by
   intro hU41 hSupp hW k p s ρ σ d hd hs K hK hK0 m mm Q A₁ hQ ha
   obtain ⟨C, hC⟩ := hU41 k p s ρ σ d hd hs K hK hK0 m mm Q A₁ hQ ha
   refine ⟨C, fun z z' E _ _ _ F₁ B₁ hStar => ?_⟩
   obtain ⟨hint, hcc, hder⟩ := hC z z' E F₁ B₁ hStar
-  refine ⟨hint, fun Z hZ hKZ γ hγ => hSupp k p s ρ σ d z z' E F₁ A₁ B₁ Q K hd hStar Z hZ hKZ γ hγ, ?_⟩
+  refine
+    ⟨hint, fun Z hZ hKZ γ hγ => hSupp k p s ρ σ d z z' E F₁ A₁ B₁ Q K hd hStar Z hZ hKZ γ hγ, ?_⟩
   intro S V _ _ _ M hS
-  have hex : ∀ Z : G.Mat s, ∃ v : V, G.detM Z ≠ 0 →
-      ∀ γ ∈ B.GV k ρ, M.ev v γ = U.PhiFun k ρ σ d z z' F₁ Z γ := by
+  have hex
+      : ∀ Z : G.Mat s, ∃ v : V,
+        G.detM Z ≠ 0 → ∀ γ ∈ B.GV k ρ, M.ev v γ = U.PhiFun k ρ σ d z z' F₁ Z γ := by
     intro Z
     by_cases hZ : G.detM Z ≠ 0
     · obtain ⟨v, hv⟩ := M.surj _ ⟨_, hcc Z hZ⟩ (hS Z hZ)
@@ -365,36 +402,46 @@ theorem _root_.Formalism.FourierDecayAlt.P.theorem_u_of_parts : Formalism.Fourie
     unfold G.detM
     exact Continuous.matrix_det continuous_id
   have hΩ : IsOpen {Z : G.Mat s | G.detM Z ≠ 0} := isOpen_ne_fun hdet continuous_const
-  have hbd : ContinuousOn (fun Z : G.Mat s => C * B₁ * (1 + ‖Z‖) ^ (-(U.a1 (p + s + ρ) A₁ m mm)))
+  have hbd : ContinuousOn
+      (fun Z : G.Mat s => C * B₁ * (1 + ‖Z‖) ^ (-(U.a1 (p + s + ρ) A₁ m mm)))
       {Z : G.Mat s | G.detM Z ≠ 0} :=
     (continuous_const.mul ((continuous_const.add continuous_norm).rpow_const
       (fun Z => Or.inl (add_pos_of_pos_of_nonneg one_pos (norm_nonneg Z)).ne'))).continuousOn
-  have key : ∀ (t : Idx k ρ mm), ∀ Z ∈ {Z : G.Mat s | G.detM Z ≠ 0}, lamC M t (Φ Z) =
-      sc E (B.gN t.1.2.2 ^ (U.a1 (p + s + ρ) A₁ m mm))
-        (B.dLR t.1.1 t.1.2.1 (U.PhiFun k ρ σ d z z' F₁ Z) t.1.2.2) := by
+  have key
+      : ∀ (t : Idx k ρ mm), ∀ Z ∈ {Z : G.Mat s | G.detM Z ≠ 0},
+        lamC M t (Φ Z)
+          = sc E (B.gN t.1.2.2 ^ (U.a1 (p + s + ρ) A₁ m mm))
+            (B.dLR t.1.1 t.1.2.1 (U.PhiFun k ρ σ d z z' F₁ Z) t.1.2.2) := by
     intro t Z hZ
     rw [lamC_apply, sc_apply]
     congr 1
     rw [BetaSesquilinearity.dLR_eq, BetaSesquilinearity.dLR_eq]
-    exact BetaSesquilinearity.Dw_congr (BetaSesquilinearity.lie_LR (BetaSesquilinearity.unit_lie t.2.1) (BetaSesquilinearity.unit_lie t.2.2.1)) (hΦ Z hZ) _ t.2.2.2.2
-  obtain ⟨hcont, hbound⟩ := hW (G.Mat s) V E (Idx k ρ mm) (lamC M) (lamC_norming M)
-    {Z : G.Mat s | G.detM Z ≠ 0} Φ m (fun Z => C * B₁ * (1 + ‖Z‖) ^ (-(U.a1 (p + s + ρ) A₁ m mm)))
-    hΩ hbd
-    (fun t => ((sc E _).contDiff.comp_contDiffOn
-      (hder t.1.1 t.1.2.1 t.2.1 t.2.2.1 t.2.2.2.1 t.1.2.2 t.2.2.2.2).1).congr (fun Z hZ => key t Z hZ))
-    (fun t q hq Z hZ => by
-      rw [iter_congr hΩ (key t) hZ q]
-      have h2 := (hder t.1.1 t.1.2.1 t.2.1 t.2.2.1 t.2.2.2.1 t.1.2.2 t.2.2.2.2).2 q hq Z hZ
-      calc _ ≤ ‖sc E (B.gN t.1.2.2 ^ (U.a1 (p + s + ρ) A₁ m mm))‖ *
-            ‖iteratedFDeriv ℝ q (fun Z' : G.Mat s =>
-              B.dLR t.1.1 t.1.2.1 (U.PhiFun k ρ σ d z z' F₁ Z') t.1.2.2) Z‖ :=
+    exact BetaSesquilinearity.Dw_congr
+      (BetaSesquilinearity.lie_LR (BetaSesquilinearity.unit_lie t.2.1)
+        (BetaSesquilinearity.unit_lie t.2.2.1))
+      (hΦ Z hZ) _ t.2.2.2.2
+  obtain ⟨hcont, hbound⟩ :=
+    hW (G.Mat s) V E (Idx k ρ mm) (lamC M) (lamC_norming M) {Z : G.Mat s | G.detM Z ≠ 0} Φ m
+      (fun Z => C * B₁ * (1 + ‖Z‖) ^ (-(U.a1 (p + s + ρ) A₁ m mm)))
+      hΩ hbd
+      (fun t =>
+        ((sc E _).contDiff.comp_contDiffOn
+            (hder t.1.1 t.1.2.1 t.2.1 t.2.2.1 t.2.2.2.1 t.1.2.2 t.2.2.2.2).1).congr
+          (fun Z hZ => key t Z hZ))
+      (fun t q hq Z hZ => by
+        rw [iter_congr hΩ (key t) hZ q]
+        have h2 := (hder t.1.1 t.1.2.1 t.2.1 t.2.2.1 t.2.2.2.1 t.1.2.2 t.2.2.2.2).2 q hq Z hZ
+        calc
+          _ ≤ ‖sc E (B.gN t.1.2.2 ^ (U.a1 (p + s + ρ) A₁ m mm))‖
+              * ‖iteratedFDeriv ℝ q (fun Z' : G.Mat s =>
+                  B.dLR t.1.1 t.1.2.1 (U.PhiFun k ρ σ d z z' F₁ Z') t.1.2.2) Z‖ :=
             norm_iter_comp _ (hder t.1.1 t.1.2.1 t.2.1 t.2.2.1 t.2.2.2.1 t.1.2.2 t.2.2.2.2).1 hΩ hZ
               (by exact_mod_cast hq)
-        _ ≤ B.gN t.1.2.2 ^ (U.a1 (p + s + ρ) A₁ m mm) *
-            ‖iteratedFDeriv ℝ q (fun Z' : G.Mat s =>
-              B.dLR t.1.1 t.1.2.1 (U.PhiFun k ρ σ d z z' F₁ Z') t.1.2.2) Z‖ :=
+          _ ≤ B.gN t.1.2.2 ^ (U.a1 (p + s + ρ) A₁ m mm)
+              * ‖iteratedFDeriv ℝ q (fun Z' : G.Mat s =>
+                  B.dLR t.1.1 t.1.2.1 (U.PhiFun k ρ σ d z z' F₁ Z') t.1.2.2) Z‖ :=
             mul_le_mul_of_nonneg_right (sc_norm _ (gNa_nonneg _ _)) (norm_nonneg _)
-        _ ≤ _ := h2)
+          _ ≤ _ := h2)
   exact fun Z hZ => ⟨hcont.contDiffAt (hΩ.mem_nhds hZ), fun q hq => hbound q hq Z hZ⟩
 
 end Formalism.FourierDecayAlt.P.Ux11

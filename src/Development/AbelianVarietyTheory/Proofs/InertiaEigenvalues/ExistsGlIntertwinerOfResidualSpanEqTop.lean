@@ -8,19 +8,21 @@ open scoped BigOperators
 
 namespace GlobalTheory
 
-
 open Matrix in
-theorem det_ne_zero_of_intertwines_of_span_eq_top {k : Type} [Field k] {G : Type} {r : ℕ}
+theorem det_ne_zero_of_intertwines_of_span_eq_top
+    {k : Type} [Field k]
+    {G : Type} {r : ℕ}
     (M N : G → Matrix (Fin r) (Fin r) k) (hM : Submodule.span k (Set.range M) = ⊤)
-    (B : Matrix (Fin r) (Fin r) k) (i j : Fin r) (hB : B i j ≠ 0)
-    (h : ∀ g, N g * B = B * M g) : B.det ≠ 0 := by
+    (B : Matrix (Fin r) (Fin r) k) (i j : Fin r) (hB : B i j ≠ 0) (h : ∀ g, N g * B = B * M g)
+    : B.det ≠ 0 := by
   classical
   intro hdet
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdet
   have hall : ∀ X : Matrix (Fin r) (Fin r) k, ∃ Y, Y * B = B * X := by
     intro X
-    have hle : Submodule.span k (Set.range M) ≤
-        (LinearMap.range (LinearMap.mulRight k B)).comap (LinearMap.mulLeft k B) := by
+    have hle
+        : Submodule.span k (Set.range M)
+          ≤ (LinearMap.range (LinearMap.mulRight k B)).comap (LinearMap.mulLeft k B) := by
       rw [Submodule.span_le]
       rintro _ ⟨g, rfl⟩
       rw [SetLike.mem_coe, Submodule.mem_comap, LinearMap.mem_range]
@@ -49,16 +51,25 @@ theorem det_ne_zero_of_intertwines_of_span_eq_top {k : Type} [Field k] {G : Type
   simp [Matrix.mulVec, dotProduct, Pi.single_apply] at hi
   exact hB hi
 
-theorem exists_gl_intertwiner_of_residual_span_eq_top :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (G : Type) [Group G] (r : ℕ) (ρ ρ' : G →* Matrix.GeneralLinearGroup (Fin r) O), Submodule.span (IsLocalRing.ResidueField O) (Set.range fun g => (ρ g : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O)) = ⊤ → (∃ A : Matrix (Fin r) (Fin r) O, A.det ≠ 0 ∧ ∀ g, (ρ' g : Matrix (Fin r) (Fin r) O) * A = A * ρ g) → ∃ U : Matrix.GeneralLinearGroup (Fin r) O, ∀ g, ρ' g * U = U * ρ g := by
+theorem exists_gl_intertwiner_of_residual_span_eq_top
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (G : Type) [Group G]
+        (r : ℕ) (ρ ρ' : G →* Matrix.GeneralLinearGroup (Fin r) O),
+      Submodule.span (IsLocalRing.ResidueField O)
+            (Set.range fun g => (ρ g : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O))
+          = ⊤
+        → (∃ A : Matrix (Fin r) (Fin r) O,
+          A.det ≠ 0 ∧ ∀ g, (ρ' g : Matrix (Fin r) (Fin r) O) * A = A * ρ g)
+        → ∃ U : Matrix.GeneralLinearGroup (Fin r) O, ∀ g, ρ' g * U = U * ρ g := by
   classical
   intro O _ _ _ G _ r ρ ρ' hspan ⟨A, hdet, hA⟩
   by_cases hr : r = 0
   · subst hr
     exact ⟨1, fun g => Units.ext (Matrix.ext fun a _ => a.elim0)⟩
   have : Nonempty (Fin r) := ⟨⟨0, Nat.pos_of_ne_zero hr⟩⟩
-  obtain ⟨p, -, hp⟩ := Finset.exists_min_image Finset.univ
-    (fun q : Fin r × Fin r => IsDiscreteValuationRing.addVal O (A q.1 q.2)) Finset.univ_nonempty
+  obtain ⟨p, -, hp⟩ :=
+    Finset.exists_min_image Finset.univ
+      (fun q : Fin r × Fin r => IsDiscreteValuationRing.addVal O (A q.1 q.2))
+      Finset.univ_nonempty
   have hdvd : ∀ x y, A p.1 p.2 ∣ A x y := fun x y =>
     IsDiscreteValuationRing.addVal_le_iff_dvd.mp (hp (x, y) (Finset.mem_univ _))
   have hd : A p.1 p.2 ≠ 0 := by
@@ -77,8 +88,10 @@ theorem exists_gl_intertwiner_of_residual_span_eq_top :
   have hAeq : A = d • Matrix.of C := by
     ext x y
     rw [Matrix.smul_apply, Matrix.of_apply, smul_eq_mul, ← hC]
-  have hint : ∀ g, (ρ' g : Matrix (Fin r) (Fin r) O) * Matrix.of C =
-      Matrix.of C * (ρ g : Matrix (Fin r) (Fin r) O) := by
+  have hint
+      : ∀ g,
+        (ρ' g : Matrix (Fin r) (Fin r) O) * Matrix.of C
+          = Matrix.of C * (ρ g : Matrix (Fin r) (Fin r) O) := by
     intro g
     have h1 := hA g
     rw [hAeq, Matrix.mul_smul, Matrix.smul_mul] at h1
@@ -89,11 +102,12 @@ theorem exists_gl_intertwiner_of_residual_span_eq_top :
   have hB : (Matrix.of C).map (IsLocalRing.residue O) p.1 p.2 ≠ 0 := by
     rw [Matrix.map_apply, Matrix.of_apply, hC1, map_one]
     exact one_ne_zero
-  have hdet' := det_ne_zero_of_intertwines_of_span_eq_top
-    (fun g => (ρ g : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O))
-    (fun g => (ρ' g : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O)) hspan
-    ((Matrix.of C).map (IsLocalRing.residue O)) p.1 p.2 hB
-    (fun g => by rw [← Matrix.map_mul, ← Matrix.map_mul, hint g])
+  have hdet' :=
+    det_ne_zero_of_intertwines_of_span_eq_top
+      (fun g => (ρ g : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O))
+      (fun g => (ρ' g : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O))
+      hspan ((Matrix.of C).map (IsLocalRing.residue O)) p.1 p.2 hB
+      (fun g => by rw [← Matrix.map_mul, ← Matrix.map_mul, hint g])
   have hunit : IsUnit (Matrix.of C).det := by
     by_contra hu
     apply hdet'

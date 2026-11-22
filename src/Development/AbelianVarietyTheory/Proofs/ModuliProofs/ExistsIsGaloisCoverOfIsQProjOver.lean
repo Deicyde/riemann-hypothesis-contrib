@@ -11,42 +11,64 @@ public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.Exis
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.ZM
 
-def autOfRightAction {X : Scheme.{0}} {Ga : Type} [Group Ga] (ρ : Ga → (X ⟶ X)) (h1 : ρ 1 = 𝟙 X)
-    (hm : ∀ a c, ρ (a * c) = ρ a ≫ ρ c) : Ga →* Aut X :=
-  MonoidHom.mk' (fun a ↦
-    Aut.of
-      { hom := ρ a⁻¹
+def autOfRightAction
+    {X : Scheme.{0}} {Ga : Type} [Group Ga]
+    (ρ : Ga → (X ⟶ X)) (h1 : ρ 1 = 𝟙 X) (hm : ∀ a c, ρ (a * c) = ρ a ≫ ρ c)
+    : Ga →* Aut X :=
+  MonoidHom.mk'
+    (fun a ↦
+      Aut.of {
+        hom := ρ a⁻¹
         inv := ρ a
         hom_inv_id := by rw [← hm, inv_mul_cancel, h1]
-        inv_hom_id := by rw [← hm, mul_inv_cancel, h1] }) fun a c ↦
-    Aut.ext (Iso.ext (show ρ (a * c)⁻¹ = ρ c⁻¹ ≫ ρ a⁻¹ by rw [mul_inv_rev, hm]))
+        inv_hom_id := by rw [← hm, mul_inv_cancel, h1]
+      })
+    fun a c ↦ Aut.ext (Iso.ext (show ρ (a * c)⁻¹ = ρ c⁻¹ ≫ ρ a⁻¹ by rw [mul_inv_rev, hm]))
 
-theorem autOfRightAction_hom {X : Scheme.{0}} {Ga : Type} [Group Ga] (ρ : Ga → (X ⟶ X))
-    (h1 : ρ 1 = 𝟙 X) (hm : ∀ a c, ρ (a * c) = ρ a ≫ ρ c) (a : Ga) :
-    (autOfRightAction ρ h1 hm a).asIso.hom = ρ a⁻¹ := rfl
+theorem autOfRightAction_hom
+    {X : Scheme.{0}} {Ga : Type} [Group Ga]
+    (ρ : Ga → (X ⟶ X)) (h1 : ρ 1 = 𝟙 X) (hm : ∀ a c, ρ (a * c) = ρ a ≫ ρ c)
+    (a : Ga)
+    : (autOfRightAction ρ h1 hm a).asIso.hom = ρ a⁻¹ :=
+  rfl
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.ZM.isSeparated_finiteType_of_isQProjOver {R : Type} [CommRing R] {X : Scheme.{0}}
-    {f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R} (h : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsQProjOver f) :
-    IsSeparated f ∧ LocallyOfFiniteType f ∧ QuasiCompact f := by
+theorem _root_.GlobalTheory.ZM.isSeparated_finiteType_of_isQProjOver
+    {R : Type} [CommRing R]
+    {X : Scheme.{0}} {f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R}
+    (h : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsQProjOver f)
+    : IsSeparated f ∧ LocallyOfFiniteType f ∧ QuasiCompact f := by
   obtain ⟨N, i, hi, hqc, rfl⟩ := h
   haveI := _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.isProper_str R N
   exact ⟨inferInstance, inferInstance, inferInstance⟩
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.ZM.exists_isGaloisCover_of_isQProjOver :
-    ∀ (K : Type) [Field K] (X : Scheme.{0}) (s : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K) (Ga : Type) [Group Ga] [Finite Ga] (ρ : Ga → (X ⟶ X)), _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsQProjOver s → ρ 1 = 𝟙 X → (∀ a c, ρ (a * c) = ρ a ≫ ρ c) → (∀ a, ρ a ≫ s = s) → (∀ (k : Type) [Field k] [IsAlgClosed k] (y : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k ⟶ X) (a : Ga), y ≫ ρ a = y → a = 1) → ∃ (Y : Scheme.{0}) (π : X ⟶ Y) (sY : Y ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K), π ≫ sY = s ∧ _root_.GlobalTheory.ZM.IsGaloisCover Ga ρ π ∧ IsSeparated sY ∧ LocallyOfFiniteType sY ∧ QuasiCompact sY := by
+theorem _root_.GlobalTheory.ZM.exists_isGaloisCover_of_isQProjOver
+    : ∀ (K : Type) [Field K] (X : Scheme.{0})
+        (s : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K) (Ga : Type) [Group Ga]
+        [Finite Ga] (ρ : Ga → (X ⟶ X)),
+      _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsQProjOver s → ρ 1 = 𝟙 X
+        → (∀ a c, ρ (a * c) = ρ a ≫ ρ c) → (∀ a, ρ a ≫ s = s)
+        → (∀ (k : Type) [Field k] [IsAlgClosed k]
+            (y : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k ⟶ X) (a : Ga),
+          y ≫ ρ a = y → a = 1)
+        → ∃ (Y : Scheme.{0}) (π : X ⟶ Y)
+            (sY : Y ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K),
+          π ≫ sY = s ∧ _root_.GlobalTheory.ZM.IsGaloisCover Ga ρ π ∧ IsSeparated sY
+            ∧ LocallyOfFiniteType sY ∧ QuasiCompact sY := by
   intro K _ X s Ga _ _ ρ hq h1 hm hs hfree
   set τ := _root_.GlobalTheory.ZM.autOfRightAction ρ h1 hm with hτ
   have horbits : _root_.GlobalTheory.OrbitsInAffineOpens τ :=
@@ -61,15 +83,24 @@ theorem _root_.GlobalTheory.ZM.exists_isGaloisCover_of_isQProjOver :
   have hπs : π ≫ sY = s := hQ.comp_desc s hτs
   obtain ⟨hsep, hlft, hqc⟩ := _root_.GlobalTheory.ZM.isSeparated_finiteType_of_isQProjOver hq
   refine ⟨Y, π, sY, hπs, ?_, ?_, ?_, ?_⟩
-  · refine ⟨inferInstance, h1, hm, fun a ↦ ?_,
-      hQ.isFinite_of_isFreeAction hfreeτ, hQ.etale_of_isFreeAction hfreeτ, hQ.surjective, ?_⟩
+  · refine ⟨
+      inferInstance,
+      h1,
+      hm,
+      fun a ↦ ?_,
+      hQ.isFinite_of_isFreeAction hfreeτ,
+      hQ.etale_of_isFreeAction hfreeτ,
+      hQ.surjective,
+      ?_
+    ⟩
     · have := hQ.comp_eq a⁻¹
       rwa [hτg, inv_inv] at this
     · intro k _ _ y y' hyy
       obtain ⟨g, hg⟩ := (hQ.comp_eq_comp_iff y y').mp hyy
       refine ⟨g⁻¹, hg, fun b hb ↦ ?_⟩
       have key : y ≫ ρ (b * g) = y := by
-        rw [hm, ← Category.assoc, hb, ← hg, hτg, Category.assoc, ← hm, inv_mul_cancel, h1, Category.comp_id]
+        rw [hm, ← Category.assoc, hb, ← hg, hτg, Category.assoc, ← hm, inv_mul_cancel, h1,
+          Category.comp_id]
       exact eq_inv_of_mul_eq_one_left (hfree k y _ key)
   · haveI : IsSeparated (π ≫ sY) := by
       rw [hπs]; exact hsep

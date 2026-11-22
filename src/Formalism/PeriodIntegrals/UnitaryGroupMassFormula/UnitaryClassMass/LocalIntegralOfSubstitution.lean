@@ -39,7 +39,8 @@ theorem local_integral_of_substitution : LocInt := by
     have hvm : t.intValuation m ≠ 0 := HeightOneSpectrum.intValuation_ne_zero t m hm0
     have hnm' : t.intValuation n ≤ t.intValuation m := by
       rw [← hnm, map_div₀, HeightOneSpectrum.valuation_of_algebraMap,
-        HeightOneSpectrum.valuation_of_algebraMap] at hv
+          HeightOneSpectrum.valuation_of_algebraMap]
+        at hv
       exact (div_le_one₀ (zero_lt_iff.2 hvm)).1 hv
     have hI0 : Ideal.span {m} ≠ 0 := by
       rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
@@ -59,8 +60,9 @@ theorem local_integral_of_substitution : LocInt := by
     refine ⟨d, hdt, a, ?_⟩
     have hmF : algebraMap (𝓞 F) F m ≠ 0 := by
       rwa [Ne, map_eq_zero_iff _ (IsFractionRing.injective (𝓞 F) F)]
-    have ha' : algebraMap (𝓞 F) F a * algebraMap (𝓞 F) F m =
-        algebraMap (𝓞 F) F d * algebraMap (𝓞 F) F n := by
+    have ha'
+        : algebraMap (𝓞 F) F a * algebraMap (𝓞 F) F m
+          = algebraMap (𝓞 F) F d * algebraMap (𝓞 F) F n := by
       rw [← map_mul, ← map_mul, ha]
     have hzm : z * algebraMap (𝓞 F) F m = (c : F) * algebraMap (𝓞 F) F n := by
       have h3 : z = (c : F) * (algebraMap (𝓞 F) F n / algebraMap (𝓞 F) F m) := by

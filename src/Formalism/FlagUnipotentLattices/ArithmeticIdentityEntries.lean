@@ -7,6 +7,8 @@ public import Formalism.FlagUnipotentLattices.MinkowskiFactorialBounds.IntegerGr
 
 namespace Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure
 
-theorem unitsSquareIndex : Formalism.HermitianLatticeCounting.LocalIntegralStructure.UnitsSquareIndex := Formalism.HermitianLatticeCounting.P.units_square_index
+theorem unitsSquareIndex
+    : Formalism.HermitianLatticeCounting.LocalIntegralStructure.UnitsSquareIndex :=
+  Formalism.HermitianLatticeCounting.P.units_square_index
 
 end Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure

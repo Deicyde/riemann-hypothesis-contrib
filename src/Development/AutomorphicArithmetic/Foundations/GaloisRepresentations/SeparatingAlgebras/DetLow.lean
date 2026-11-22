@@ -39,10 +39,11 @@ private lemma det_zero_of_card {k : Type} [Field k] {N ρ : ℕ}
   rw [finrank_span_eq_card hli', Fintype.card_coe] at hle
   omega
 
-private theorem det_add_smul_eq_sum_powerset_pow_card_mul_det {k : Type} [Field k] {N : ℕ} (A B : Matrix (Fin N) (Fin N) k)
-    (c : k) :
-    (A + c • B).det = ∑ t ∈ (Finset.univ : Finset (Fin N)).powerset,
-      c ^ t.card * (Matrix.of fun r j => if r ∈ t then B r j else A r j).det := by
+private theorem det_add_smul_eq_sum_powerset_pow_card_mul_det
+    {k : Type} [Field k] {N : ℕ} (A B : Matrix (Fin N) (Fin N) k) (c : k)
+    : (A + c • B).det
+      = ∑ t ∈ (Finset.univ : Finset (Fin N)).powerset,
+        c ^ t.card * (Matrix.of fun r j => if r ∈ t then B r j else A r j).det := by
   classical
   rw [← Matrix.det_transpose]
   simp_rw [← Matrix.det_transpose (Matrix.of _)]
@@ -64,13 +65,15 @@ theorem detLow_pf : DetLow := by
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity) fun t _ => ?_
   rw [norm_mul, norm_pow]
   by_cases ht : N - ρ ≤ t.card
-  · have h1 := det_norm_le_one (Matrix.of fun r j => if r ∈ t then B r j else A r j) (by
-      intro i j
-      simp only [Matrix.of_apply]
-      split_ifs
-      · exact hB i j
-      · exact hA i j)
-    calc ‖c‖ ^ t.card * ‖(Matrix.of fun r j => if r ∈ t then B r j else A r j).det‖
+  · have h1 :=
+      det_norm_le_one (Matrix.of fun r j => if r ∈ t then B r j else A r j) (by
+        intro i j
+        simp only [Matrix.of_apply]
+        split_ifs
+        · exact hB i j
+        · exact hA i j)
+    calc
+      ‖c‖ ^ t.card * ‖(Matrix.of fun r j => if r ∈ t then B r j else A r j).det‖
         ≤ ‖c‖ ^ t.card * 1 := mul_le_mul_of_nonneg_left h1 (by positivity)
       _ ≤ ‖c‖ ^ (N - ρ) := by
         rw [mul_one]

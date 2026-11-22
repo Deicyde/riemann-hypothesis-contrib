@@ -8,9 +8,12 @@ noncomputable section
 
 namespace Formalism.BasicNotions.Examples₂.LB
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Pointwise Formalism.BasicNotions.Loc
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Pointwise Formalism.BasicNotions.Loc
 
-variable {l : ℕ} [hl : Fact l.Prime] {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+variable
+  {l : ℕ} [hl : Fact l.Prime]
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
   (j : Ω →+* PadicAlgCl l)
 
 def jE : E →+* PadicAlgCl l := j.comp (algebraMap E Ω)
@@ -28,16 +31,17 @@ theorem jE_mem (x : E) : jE j x ∈ KwF (E := E) j := by
   rw [Algebra.smul_def, map_mul, eq_ratCast (algebraMap ℚ E), map_ratCast]
   exact mul_mem (SubfieldClass.ratCast_mem _ _) (IntermediateField.subset_adjoin ℚ_[l] _ ⟨i, rfl⟩)
 
-theorem mem_GK_of_fix (σ : GQ l) (h : ∀ x : E, σ (jE j x) = jE j x) :
-    σ ∈ (KwF (E := E) j).fixingSubgroup := by
+theorem mem_GK_of_fix (σ : GQ l) (h : ∀ x : E, σ (jE j x) = jE j x)
+    : σ ∈ (KwF (E := E) j).fixingSubgroup := by
   rw [IntermediateField.mem_fixingSubgroup_iff]
   have hle : KwF (E := E) j ≤ IntermediateField.fixedField (Subgroup.zpowers σ) := by
     rw [KwF, IntermediateField.adjoin_le_iff]
     rintro _ ⟨i, rfl⟩
     rw [SetLike.mem_coe, IntermediateField.mem_fixedField_iff]
     intro f hf
-    have hst : Subgroup.zpowers σ ≤
-        MulAction.stabilizer (GQ l) (jE (E := E) j (Module.finBasis ℚ E i)) :=
+    have hst
+        : Subgroup.zpowers σ
+          ≤ MulAction.stabilizer (GQ l) (jE (E := E) j (Module.finBasis ℚ E i)) :=
       Subgroup.zpowers_le.mpr (MulAction.mem_stabilizer_iff.mpr (h _))
     exact MulAction.mem_stabilizer_iff.mp (hst hf)
   intro x hx

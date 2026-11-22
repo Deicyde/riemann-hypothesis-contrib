@@ -64,22 +64,29 @@ open Formalism.RepresentationBoundsCohomology.BR (yY)
 open Formalism.RepresentationBoundsCohomology.LocallyConstantCohomology (lcH1)
 open ReciprocityTheory.ChartRestriction.T2 (PadicCoeff IsFGTop)
 
-theorem lc_of_torsion (p : ℕ) {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
-    [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)]
-    {A T' G : Type} [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G] [TopologicalSpace G]
+theorem lc_of_torsion
+    (p : ℕ)
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+    [TopologicalSpace (FractionRing O)] [IsTopologicalAddGroup (FractionRing O)]
+    [ContinuousSMul O (FractionRing O)]
+    {A T' G : Type}
+    [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G] [TopologicalSpace G]
     [TopologicalSpace A] [IsTopologicalAddGroup A] [ContinuousConstSMul O A] [ContinuousMul A]
-    (r : G →* A) (χ : G →* T'ˣ) (E : A)
+    (r : G →* A) (χ : G →* T'ˣ)
+    (E : A)
     (hO : PadicCoeff p O) (hA : IsFGTop O A) (hur : Continuous fun g : G => uElt r χ g)
-    {M : Type} [AddCommGroup M] [Module O M] (htors : ∀ m : M, ∃ c : O, c ≠ 0 ∧ c • m = 0)
-    (ψ : Ymod r χ E →ₗ[O] M) : IsLocallyConstant fun g => ψ (yY r χ E g) := by
+    {M : Type} [AddCommGroup M] [Module O M]
+    (htors : ∀ m : M, ∃ c : O, c ≠ 0 ∧ c • m = 0) (ψ : Ymod r χ E →ₗ[O] M)
+    : IsLocallyConstant fun g => ψ (yY r χ E g) := by
   have hfg : IsFGTop O (Ymod r χ E) := by
     have := hA.fg
     have := hA.t2
     have := hA.csmul
     refine ⟨?_, inferInstance, ?_⟩
-    · exact Module.Finite.of_injective ((Ymod r χ E).subtype.restrictScalars O) Subtype.val_injective
-    · exact ⟨Continuous.subtype_mk (f := fun q : O × (Ymod r χ E) => q.1 • (q.2 : A))
+    · exact Module.Finite.of_injective ((Ymod r χ E).subtype.restrictScalars O)
+        Subtype.val_injective
+    · exact ⟨Continuous.subtype_mk
+        (f := fun q : O × (Ymod r χ E) => q.1 • (q.2 : A))
         (continuous_fst.smul (continuous_subtype_val.comp continuous_snd)) _⟩
   obtain ⟨a, ha, hka⟩ : ∃ a : O, a ≠ 0 ∧ ∀ y : Ymod r χ E, a • ψ y = 0 := by
     obtain ⟨s, hs⟩ := hfg.fg.fg_top
@@ -95,40 +102,49 @@ theorem lc_of_torsion (p : ℕ) {O : Type} [CommRing O] [IsDomain O] [IsDiscrete
     | smul c x _ hx => rw [map_smul, smul_comm, hx, smul_zero]
   have hopen := hfg.isOpen_mulSub hO ha
   have hy : Continuous fun g => yY r χ E g :=
-    Continuous.subtype_mk (f := fun g => (uElt r χ g - 1) * E)
+    Continuous.subtype_mk
+      (f := fun g => (uElt r χ g - 1) * E)
       ((hur.sub continuous_const).mul continuous_const) _
   rw [IsLocallyConstant.iff_exists_open]
   intro g₀
-  refine ⟨(fun g => yY r χ E g - yY r χ E g₀) ⁻¹' _, hopen.preimage (hy.sub continuous_const), ?_, ?_⟩
+  refine
+    ⟨(fun g => yY r χ E g - yY r χ E g₀) ⁻¹' _, hopen.preimage (hy.sub continuous_const), ?_, ?_⟩
   · show yY r χ E g₀ - yY r χ E g₀ ∈ Formalism.RepresentationBoundsCohomology.LOC.mulSub a (Ymod r χ E)
     rw [sub_self]
     exact zero_mem _
   · rintro g ⟨z, hz⟩
     have hz' : a • z = yY r χ E g - yY r χ E g₀ := hz
-    have h1 : ψ (yY r χ E g - yY r χ E g₀) = 0 := by
-      rw [← hz', map_smul, hka]
+    have h1 : ψ (yY r χ E g - yY r χ E g₀) = 0 := by rw [← hz', map_smul, hka]
     rw [map_sub, sub_eq_zero] at h1
     exact h1
 
-theorem colPsi_lc (p : ℕ) {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
-    [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)]
-    {A T' G : Type} [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G] [TopologicalSpace G]
+theorem colPsi_lc
+    (p : ℕ)
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+    [TopologicalSpace (FractionRing O)] [IsTopologicalAddGroup (FractionRing O)]
+    [ContinuousSMul O (FractionRing O)]
+    {A T' G : Type}
+    [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G] [TopologicalSpace G]
     [TopologicalSpace A] [IsTopologicalAddGroup A] [ContinuousConstSMul O A] [ContinuousMul A]
-    (r : G →* A) (χ : G →* T'ˣ) (E e₁ : A) (δ : T')
+    (r : G →* A) (χ : G →* T'ˣ)
+    (E e₁ : A) (δ : T')
     (hO : PadicCoeff p O) (hA : IsFGTop O A) (hur : Continuous fun g : G => uElt r χ g)
-    {M : Type} [AddCommGroup M] [Module A M] [Module O M] [SMulCommClass A O M] [IsScalarTower O A M]
+    {M : Type}
+    [AddCommGroup M] [Module A M] [Module O M] [SMulCommClass A O M] [IsScalarTower O A M]
     (htors : ∀ m : M, ∃ c : O, c ≠ 0 ∧ c • m = 0)
-    {ι : Type} [DecidableEq ι] (D : ι → Subgroup G) (j : ι → ℕ) (Kc : ∀ l, Fin (j l) → G → A) (k0 : ι → G → A)
-    (φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M) :
-    Submodule.mkQ _ (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ) ∈ lcH1 (uRep O (M := M) r χ) := by
+    {ι : Type} [DecidableEq ι]
+    (D : ι → Subgroup G)
+    (j : ι → ℕ) (Kc : ∀ l, Fin (j l) → G → A)
+    (k0 : ι → G → A) (φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M)
+    : Submodule.mkQ _ (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)
+      ∈ lcH1 (uRep O (M := M) r χ) := by
   refine ⟨colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ, ?_, rfl⟩
   let ψ : Ymod r χ E →ₗ[O] M :=
     (φ ∘ₗ (colRelJ r χ E e₁ δ D j Kc k0).mkQ ∘ₗ LinearMap.inl A (Ymod r χ E) _).restrictScalars O
   exact lc_of_torsion p r χ E hO hA hur htors ψ
 
-theorem pi_ko_torsion (O : Type) [CommRing O] [IsDomain O] (d : Type) [Fintype d] (m : d → KO O) :
-    ∃ c : O, c ≠ 0 ∧ c • m = 0 := by
+theorem pi_ko_torsion (O : Type) [CommRing O] [IsDomain O] (d : Type) [Fintype d] (m : d → KO O)
+    : ∃ c : O, c ≠ 0 ∧ c • m = 0 := by
   classical
   have h1 : ∀ y : KO O, ∃ c : O, c ≠ 0 ∧ c • y = 0 := by
     intro y
@@ -143,9 +159,5 @@ theorem pi_ko_torsion (O : Type) [CommRing O] [IsDomain O] (d : Type) [Fintype d
   funext i
   rw [Pi.smul_apply, ← Finset.prod_erase_mul _ _ (Finset.mem_univ i), mul_smul, hc i, smul_zero]
   rfl
-
-
-
-
 
 end Formalism.RepresentationBoundsCohomology.FIN

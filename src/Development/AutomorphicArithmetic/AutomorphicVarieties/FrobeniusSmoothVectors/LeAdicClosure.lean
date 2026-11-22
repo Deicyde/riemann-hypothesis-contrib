@@ -14,12 +14,18 @@ def w (n : ℕ) (i : Fin n) : ℤ := if n = 3 then 1 - (i : ℕ) else (n : ℤ) 
 
 variable {l : ℕ} [Fact l.Prime] {k : Type} [Field k] (F : Frame l k) (n : ℕ)
 
-def ordProd {H K : Type} [CommRing K] {n : ℕ} (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H) :
-    Matrix (Fin n) (Fin n) K := (List.ofFn fun i => r (g i) - ψ i (g i) • (1 : Matrix (Fin n) (Fin n) K)).prod
+def ordProd
+    {H K : Type} [CommRing K]
+    {n : ℕ} (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H)
+    : Matrix (Fin n) (Fin n) K :=
+  (List.ofFn fun i => r (g i) - ψ i (g i) • (1 : Matrix (Fin n) (Fin n) K)).prod
 
-theorem ordProd_map {H K K' : Type} [CommRing K] [CommRing K'] {n : ℕ} (f : K →+* K')
-    (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H) :
-    ordProd (fun s => f.mapMatrix (r s)) (fun i s => f (ψ i s)) g = f.mapMatrix (ordProd r ψ g) := by
+theorem ordProd_map
+    {H K K' : Type} [CommRing K] [CommRing K']
+    {n : ℕ}
+    (f : K →+* K') (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H)
+    : ordProd (fun s => f.mapMatrix (r s)) (fun i s => f (ψ i s)) g
+      = f.mapMatrix (ordProd r ψ g) := by
   simp only [ordProd, map_list_prod, List.map_ofFn]
   congr 1
   refine congrArg List.ofFn (funext fun i => ?_)
@@ -28,7 +34,8 @@ theorem ordProd_map {H K K' : Type} [CommRing K] [CommRing K'] {n : ℕ} (f : K 
   ext a b
   by_cases h : a = b <;> simp [h]
 
-@[ext] structure NRep (K : Type) [CommRing K] where
+@[ext]
+structure NRep (K : Type) [CommRing K] where
   r : F.G0 →* Matrix (Fin n) (Fin n) K
   ψ : ∀ v, Fin n → F.Gv v →* Kˣ
   pol : ∀ g, r (F.star g) = Jmat (R := K) n * (r g)ᵀ * Jmat (R := K) n
@@ -53,29 +60,44 @@ def map (f : K →+* K') (ρ : NRep F n K) : NRep F n K' where
     exact (congrArg f (ρ.diag i j h)).trans (map_zero f)
   ord v g := (ordProd_map f _ _ g).trans (by rw [ρ.ord, map_zero])
 
-@[simp] theorem map_r (f : K →+* K') (ρ : NRep F n K) (g : F.G0) (i j : Fin n) :
-    (ρ.map f).r g i j = f (ρ.r g i j) := rfl
+@[simp]
+theorem map_r (f : K →+* K') (ρ : NRep F n K) (g : F.G0) (i j : Fin n)
+    : (ρ.map f).r g i j = f (ρ.r g i j) :=
+  rfl
 
-@[simp] theorem map_ψ (f : K →+* K') (ρ : NRep F n K) (v : F.V) (i : Fin n) (g : F.Gv v) :
-    ((ρ.map f).ψ v i g : K') = f (ρ.ψ v i g) := rfl
+@[simp]
+theorem map_ψ (f : K →+* K') (ρ : NRep F n K) (v : F.V) (i : Fin n) (g : F.Gv v)
+    : ((ρ.map f).ψ v i g : K') = f (ρ.ψ v i g) :=
+  rfl
 
-theorem map_map {K'' : Type} [CommRing K''] (f : K →+* K') (f' : K' →+* K'') (ρ : NRep F n K) :
-    (ρ.map f).map f' = ρ.map (f'.comp f) := rfl
+theorem map_map {K'' : Type} [CommRing K''] (f : K →+* K') (f' : K' →+* K'') (ρ : NRep F n K)
+    : (ρ.map f).map f' = ρ.map (f'.comp f) :=
+  rfl
 
-def restrict {O : Type} [CommRing O] [Algebra O K] (ρ : NRep F n K) (A : Subalgebra O K)
-    (h1 : ∀ g i j, ρ.r g i j ∈ A) (h2 : ∀ v i g, (ρ.ψ v i g : K) ∈ A) : NRep F n A where
-  r :=
-    { toFun := fun g => Matrix.of fun i j => ⟨ρ.r g i j, h1 g i j⟩
-      map_one' := by
-        ext i j
-        by_cases h : i = j <;> simp [h, Matrix.one_apply]
-      map_mul' := fun g h => by
-        ext i j
-        simp [Matrix.mul_apply] }
-  ψ v i :=
-    { toFun := fun g => ⟨⟨ρ.ψ v i g, h2 v i g⟩, ⟨ρ.ψ v i g⁻¹, h2 v i g⁻¹⟩, Subtype.ext (by simp), Subtype.ext (by simp)⟩
-      map_one' := by ext; simp
-      map_mul' := fun g h => by ext; simp }
+def restrict
+    {O : Type} [CommRing O] [Algebra O K]
+    (ρ : NRep F n K) (A : Subalgebra O K)
+    (h1 : ∀ g i j, ρ.r g i j ∈ A) (h2 : ∀ v i g, (ρ.ψ v i g : K) ∈ A)
+    : NRep F n A where
+  r := {
+    toFun := fun g => Matrix.of fun i j => ⟨ρ.r g i j, h1 g i j⟩
+    map_one' := by
+      ext i j
+      by_cases h : i = j <;> simp [h, Matrix.one_apply]
+    map_mul' := fun g h => by
+      ext i j
+      simp [Matrix.mul_apply]
+  }
+  ψ v i := {
+    toFun := fun g => ⟨
+      ⟨ρ.ψ v i g, h2 v i g⟩,
+      ⟨ρ.ψ v i g⁻¹, h2 v i g⁻¹⟩,
+      Subtype.ext (by simp),
+      Subtype.ext (by simp)
+    ⟩
+    map_one' := by ext; simp
+    map_mul' := fun g h => by ext; simp
+  }
   pol g := by
     refine Matrix.map_injective (f := (A.val : A →+* K)) Subtype.val_injective ?_
     show _ = (A.val : A →+* K).mapMatrix _
@@ -93,7 +115,8 @@ def Cont (I : Ideal K) (ρ : NRep F n K) : Prop :=
   (∀ i j, AdicCont I fun g => ρ.r g i j) ∧ ∀ v i, AdicCont I fun g => (ρ.ψ v i g : K)
 
 def IsBar (f : k →+* K) (ρ : NRep F n K) : Prop :=
-  (∀ g i, ρ.r g i i = f ((F.Ψ g ^ w n i : kˣ) : k)) ∧ ∀ v i g, (ρ.ψ v i g : K) = f ((F.Ψ (F.loc v g) ^ w n i : kˣ) : k)
+  (∀ g i, ρ.r g i i = f ((F.Ψ g ^ w n i : kˣ) : k))
+    ∧ ∀ v i g, (ρ.ψ v i g : K) = f ((F.Ψ (F.loc v g) ^ w n i : kˣ) : k)
 
 def IsDiag (ρ : NRep F n K) : Prop := ∀ g i j, i ≠ j → ρ.r g i j = 0
 
@@ -118,8 +141,9 @@ def mon (ρ : NRep F n K) (j : ℤ) : Set K :=
 
 end NRep
 
-def adicClosure {O R : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] (S : Subalgebra O R) :
-    Subalgebra O R where
+def adicClosure
+    {O R : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] (S : Subalgebra O R)
+    : Subalgebra O R where
   carrier := {x | ∀ N : ℕ, ∃ y ∈ S, x - y ∈ maximalIdeal R ^ N}
   mul_mem' {a b} ha hb N := by
     obtain ⟨x, hx, h1⟩ := ha N
@@ -136,10 +160,13 @@ def adicClosure {O R : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra 
     exact add_mem h1 h2
   algebraMap_mem' c N := ⟨_, S.algebraMap_mem c, by simp⟩
 
-theorem le_adicClosure {O R : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] (S : Subalgebra O R) :
-    S ≤ adicClosure S := fun x hx _ => ⟨x, hx, by simp⟩
+theorem le_adicClosure
+    {O R : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] (S : Subalgebra O R)
+    : S ≤ adicClosure S := fun x hx _ =>
+  ⟨x, hx, by simp⟩
 
-class IsCoef (l : outParam ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] : Prop where
+class IsCoef (l : outParam ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    : Prop where
   complete : IsAdicComplete (maximalIdeal O) O
   fin : Finite (ResidueField O)
   char : CharP (ResidueField O) l
@@ -148,12 +175,15 @@ attribute [instance] IsCoef.complete IsCoef.fin IsCoef.char
 
 section Space
 
-variable {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] (F : Frame l (ResidueField O)) (n : ℕ)
+variable
+  {l : ℕ} [Fact l.Prime]
+  (O : Type) [CommRing O] [IsLocalRing O]
+  (F : Frame l (ResidueField O)) (n : ℕ)
 
 variable {F n} in
 def IsLift {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (ρ : NRep F n R) : Prop :=
-  ρ.Cont (maximalIdeal R) ∧ (ρ.map (res O R : R →+* ResidueField O)).IsBar (RingHom.id _) ∧
-    (ρ.map (res O R : R →+* ResidueField O)).IsDiag
+  ρ.Cont (maximalIdeal R) ∧ (ρ.map (res O R : R →+* ResidueField O)).IsBar (RingHom.id _)
+    ∧ (ρ.map (res O R : R →+* ResidueField O)).IsDiag
 
 structure Space : Type 1 where
   R : Type
@@ -162,8 +192,9 @@ structure Space : Type 1 where
   [co : IsCO O R]
   ρ : NRep F n R
   lift : IsLift O ρ
-  univ : ∀ (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (ρ' : NRep F n C), IsLift O ρ' →
-    ∃! f : R →ₐ[O] C, ρ.map (f : R →+* C) = ρ'
+  univ
+    : ∀ (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (ρ' : NRep F n C),
+      IsLift O ρ' → ∃! f : R →ₐ[O] C, ρ.map (f : R →+* C) = ρ'
 
 attribute [instance] Space.cr Space.al Space.co
 
@@ -181,9 +212,11 @@ theorem B_le_A : S.B ≤ S.A := fun _ hx => Algebra.subset_adjoin (Or.inl hx)
 theorem ψ_mem (v : F.V) (i : Fin n) (g : F.Gv v) : (S.ρ.ψ v i g : S.R) ∈ S.B :=
   le_adicClosure _ (Algebra.subset_adjoin (Or.inr ⟨v, i, g, rfl⟩))
 
-theorem mon_mem {x : S.R} (hx : x ∈ S.ρ.mon 0) : x ∈ S.B := le_adicClosure _ (Algebra.subset_adjoin (Or.inl hx))
+theorem mon_mem {x : S.R} (hx : x ∈ S.ρ.mon 0) : x ∈ S.B :=
+  le_adicClosure _ (Algebra.subset_adjoin (Or.inl hx))
 
-theorem r_mem (g : F.G0) (i j : Fin n) : S.ρ.r g i j ∈ S.A := Algebra.subset_adjoin (Or.inr ⟨g, i, j, rfl⟩)
+theorem r_mem (g : F.G0) (i j : Fin n) : S.ρ.r g i j ∈ S.A :=
+  Algebra.subset_adjoin (Or.inr ⟨g, i, j, rfl⟩)
 
 def inc : S.B →ₐ[O] S.A := Subalgebra.inclusion S.B_le_A
 
@@ -208,8 +241,8 @@ def gr (j : ℤ) : Submodule S.B S.A := Submodule.span S.B (S.u.mon j)
 def IsHom (I : Ideal S.A) : Prop := I = Ideal.span {x | x ∈ I ∧ ∃ j, x ∈ S.gr j}
 
 def lamId : Ideal S.B :=
-  (maximalIdeal O).map (algebraMap O S.B) ⊔
-    Ideal.span {x | ∃ v i g, g ∈ F.Iv v ∧ F.Ψ (F.loc v g) = 1 ∧ x = S.ψB v i g - 1}
+  (maximalIdeal O).map (algebraMap O S.B)
+    ⊔ Ideal.span {x | ∃ v i g, g ∈ F.Iv v ∧ F.Ψ (F.loc v g) = 1 ∧ x = S.ψB v i g - 1}
 
 def FinLam (I : Ideal S.B) : Prop := S.mB ≤ (I ⊔ S.lamId).radical
 
@@ -232,8 +265,10 @@ structure Loc (x : Ideal S.A) : Type 1 where
   [tw : IsScalarTower O O' R]
   ι : S.A →ₐ[O] R
   lies : (maximalIdeal R).comap (ι : S.A →+* R) = x
-  univ : ∀ (C : Type) [CommRing C] [Algebra O' C] [IsCO O' C] [Algebra O C] [IsScalarTower O O' C]
-    (f : S.A →ₐ[O] C), (∀ a, res O' C (f a) = res O' R (ι a)) → ∃! g : R →ₐ[O'] C, ∀ a, g (ι a) = f a
+  univ
+    : ∀ (C : Type) [CommRing C] [Algebra O' C] [IsCO O' C] [Algebra O C] [IsScalarTower O O' C]
+        (f : S.A →ₐ[O] C),
+      (∀ a, res O' C (f a) = res O' R (ι a)) → ∃! g : R →ₐ[O'] C, ∀ a, g (ι a) = f a
 
 attribute [instance] Loc.cO Loc.dO Loc.vO Loc.coef Loc.aO Loc.fO Loc.cr Loc.al' Loc.co Loc.al Loc.tw
 
@@ -253,18 +288,23 @@ end Space
 
 end Space
 
-structure IsThickMod {F : Frame l k} {Q : Type} [CommRing Q] (ρ : NRep F 3 Q) (r : F.G0 →* Matrix (Fin 3) (Fin 3) Q) :
-    Prop where
+structure IsThickMod
+    {F : Frame l k} {Q : Type} [CommRing Q] (ρ : NRep F 3 Q) (r : F.G0 →* Matrix (Fin 3) (Fin 3) Q)
+    : Prop where
   even : ∀ g i j, ¬ Odd (w 3 i - w 3 j) → r g i j = ρ.r g i j
   sub : ∀ g, r g 1 0 = 0 ∧ r g 1 2 = 0
   ord : ∀ v g, ordProd (fun s => r (F.loc0 v s)) (fun i s => (ρ.ψ v i s : Q)) g = 0
-  ord_star : ∀ v g, ordProd (fun s => r (F.star (F.loc0 v s))) (fun i s => (ρ.ψ v i.rev s : Q)) g = 0
-  nonsplit : ∀ (K : Type) [Field K] (f : Q →+* K), Function.Injective f →
-    ¬ ∃ y : Fin 3 → K, y 1 = 1 ∧ ∀ g, (r g).map f *ᵥ y = f (r g 1 1) • y
+  ord_star
+    : ∀ v g, ordProd (fun s => r (F.star (F.loc0 v s))) (fun i s => (ρ.ψ v i.rev s : Q)) g = 0
+  nonsplit
+    : ∀ (K : Type) [Field K] (f : Q →+* K),
+      Function.Injective f → ¬ ∃ y : Fin 3 → K, y 1 = 1 ∧ ∀ g, (r g).map f *ᵥ y = f (r g 1 1) • y
 
-def Thick {F : Frame l k} {R : Type} [CommRing R] [IsLocalRing R] (ρ : NRep F 3 R) (P : Ideal R) : Prop :=
-  ρ.TE P ∧ ∃ r : F.G0 →* Matrix (Fin 3) (Fin 3) (R ⧸ P),
-    (∀ i j, AdicCont ((maximalIdeal R).map (Ideal.Quotient.mk P)) fun g => r g i j) ∧
-      IsThickMod (ρ.map (Ideal.Quotient.mk P)) r
+def Thick {F : Frame l k} {R : Type} [CommRing R] [IsLocalRing R] (ρ : NRep F 3 R) (P : Ideal R)
+    : Prop :=
+  ρ.TE P
+    ∧ ∃ r : F.G0 →* Matrix (Fin 3) (Fin 3) (R ⧸ P),
+      (∀ i j, AdicCont ((maximalIdeal R).map (Ideal.Quotient.mk P)) fun g => r g i j)
+        ∧ IsThickMod (ρ.map (Ideal.Quotient.mk P)) r
 
 end UpperTheory.V.Fr

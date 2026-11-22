@@ -10,7 +10,10 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Gaug
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 namespace GlobalTheory.GdatIota
@@ -18,38 +21,49 @@ open Formalism.L2.SG.Pf GlobalTheory.StabCnt
 
 variable {D : D7} {T T' : D.host.E}
 
-theorem mem_gmap' (φ : GV D) (M : LV D) (x : (VS D).V) : x ∈ Formalism.HermitianLatticesTheory.gmap φ M ↔ φ.symm x ∈ M := by
+theorem mem_gmap' (φ : GV D) (M : LV D) (x : (VS D).V)
+    : x ∈ Formalism.HermitianLatticesTheory.gmap φ M ↔ φ.symm x ∈ M := by
   rw [← gmap_apply_mem φ M, LinearEquiv.apply_symm_apply]
 
-theorem xlam_adapt {A B : LFlag (D.sp.Y 0) D.R.rS T} {φ : GV D} (h : Adapt φ A B) (M : LV D) :
-    XLam (Formalism.HermitianLatticesTheory.gmap φ M) B = Formalism.HermitianLatticesTheory.gmap φ (XLam M A) := by
+theorem xlam_adapt {A B : LFlag (D.sp.Y 0) D.R.rS T} {φ : GV D} (h : Adapt φ A B) (M : LV D)
+    : XLam (Formalism.HermitianLatticesTheory.gmap φ M) B
+      = Formalism.HermitianLatticesTheory.gmap φ (XLam M A) := by
   rw [XLam, XLam, gmap_inf', gmap_toO, adapt_xsp h]
 
-theorem lrep_adapt {A B : LFlag (D.sp.Y 0) D.R.rS T} {φ : GV D} (h : Adapt φ A B) (M : LV D) :
-    Lrep (Formalism.HermitianLatticesTheory.gmap φ M) B = Formalism.HermitianLatticesTheory.gmap φ (Lrep M A) := by
+theorem lrep_adapt {A B : LFlag (D.sp.Y 0) D.R.rS T} {φ : GV D} (h : Adapt φ A B) (M : LV D)
+    : Lrep (Formalism.HermitianLatticesTheory.gmap φ M) B
+      = Formalism.HermitianLatticesTheory.gmap φ (Lrep M A) := by
   rw [Lrep, Lrep, gmap_inf', gmap_toO, adapt_orth h]
 
-theorem lsub_adapt {A B : LFlag (D.sp.Y 0) D.R.rS T} {φ : GV D} (h : Adapt φ A B) (M : LV D) :
-    Lsub (Formalism.HermitianLatticesTheory.gmap φ M) B = Formalism.HermitianLatticesTheory.gmap φ (Lsub M A) := by
+theorem lsub_adapt {A B : LFlag (D.sp.Y 0) D.R.rS T} {φ : GV D} (h : Adapt φ A B) (M : LV D)
+    : Lsub (Formalism.HermitianLatticesTheory.gmap φ M) B
+      = Formalism.HermitianLatticesTheory.gmap φ (Lsub M A) := by
   rw [Lsub, Lsub, lrep_adapt h, gmap_inf', gmap_sup', gmap_toO, gmap_toO, adapt_xsp h, adapt_orth h]
 
-theorem ngx_adapt {A B : LFlag (D.sp.Y 0) D.R.rS T} {A' B' : LFlag (D.sp.Y 0) D.R.rS T'} {φ : GV D} (h : Adapt φ A B)
-    (h' : Adapt φ A' B') (M : LV D) (n : ℕ) :
-    NgX (Formalism.HermitianLatticesTheory.gmap φ M) n B B' = Formalism.HermitianLatticesTheory.gmap φ (NgX M n A A') := by
+theorem ngx_adapt
+    {A B : LFlag (D.sp.Y 0) D.R.rS T} {A' B' : LFlag (D.sp.Y 0) D.R.rS T'} {φ : GV D}
+    (h : Adapt φ A B) (h' : Adapt φ A' B')
+    (M : LV D) (n : ℕ)
+    : NgX (Formalism.HermitianLatticesTheory.gmap φ M) n B B'
+      = Formalism.HermitianLatticesTheory.gmap φ (NgX M n A A') := by
   rw [NgX, NgX, gmap_sup', gmap_sup', gmap_ideal_smul, xlam_adapt h, xlam_adapt h']
 
-theorem aut_lrep {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A : GV D} (hA : A ∈ Aut0 F M) (x : (VS D).V) :
-    A x ∈ Lrep M F ↔ x ∈ Lrep M F := by
+theorem aut_lrep
+    {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A : GV D} (hA : A ∈ Aut0 F M) (x : (VS D).V)
+    : A x ∈ Lrep M F ↔ x ∈ Lrep M F := by
   have := lrep_adapt hA.1 M
   rw [hA.2] at this
   rw [← gmap_apply_mem A (Lrep M F) x, ← this]
 
-theorem aut_lrep_symm {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A : GV D} (hA : A ∈ Aut0 F M) (x : (VS D).V) :
-    A.symm x ∈ Lrep M F ↔ x ∈ Lrep M F := by
+theorem aut_lrep_symm
+    {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A : GV D} (hA : A ∈ Aut0 F M) (x : (VS D).V)
+    : A.symm x ∈ Lrep M F ↔ x ∈ Lrep M F := by
   rw [← aut_lrep hA (A.symm x), LinearEquiv.apply_symm_apply]
 
-theorem lsub_eq {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A h : GV D} (hA : A ∈ Aut0 F M) (hh : Adapt h F F)
-    (hc : ∀ x ∈ orth (VS D) (Xsp F), h x - A x ∈ Xsp F) : Lsub (Formalism.HermitianLatticesTheory.gmap h M) F = Lsub M F := by
+theorem lsub_eq
+    {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A h : GV D}
+    (hA : A ∈ Aut0 F M) (hh : Adapt h F F) (hc : ∀ x ∈ orth (VS D) (Xsp F), h x - A x ∈ Xsp F)
+    : Lsub (Formalism.HermitianLatticesTheory.gmap h M) F = Lsub M F := by
   rw [lsub_adapt hh]
   ext y
   rw [mem_gmap']
@@ -62,7 +76,8 @@ theorem lsub_eq {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A h : GV D} (hA : A 
     refine ⟨?_, hy2⟩
     have e2 : y = A l + ((h l - A l) + h ξ) := by
       have : y = h (l + ξ) := by rw [e, LinearEquiv.apply_symm_apply]
-      rw [this, map_add (f := _)]; abel
+      rw [this, map_add (f := _)]
+      abel
     rw [e2]
     exact Submodule.add_mem_sup ((aut_lrep hA l).2 hl)
       (show _ ∈ Xsp F from add_mem (hc l hl.2) (mem_of_map_eq (adapt_xsp hh) hξ))
@@ -78,25 +93,30 @@ theorem lsub_eq {F : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {A h : GV D} (hA : A 
     exact Submodule.add_mem_sup hm
       (show _ ∈ Xsp F from symm_mem_of_map_eq (adapt_xsp hh) (sub_mem (show ξ ∈ Xsp F from hξ) h1))
 
-theorem ngx_shift {F : LFlag (D.sp.Y 0) D.R.rS T} {F' : LFlag (D.sp.Y 0) D.R.rS T'} {M : LV D} {n : ℕ}
-    {l m l' m' : (VS D).V} (hl : l ∈ Lrep M F) (hm : m ∈ Lrep M F) (hl' : l' ∈ Lrep M F') (hm' : m' ∈ Lrep M F')
-    (h1 : l - m ∈ Xsp F) (h2 : l' - m' ∈ Xsp F') (h : m - m' ∈ NgX M n F F') : l - l' ∈ NgX M n F F' := by
+theorem ngx_shift
+    {F : LFlag (D.sp.Y 0) D.R.rS T} {F' : LFlag (D.sp.Y 0) D.R.rS T'} {M : LV D} {n : ℕ}
+    {l m l' m' : (VS D).V} (hl : l ∈ Lrep M F) (hm : m ∈ Lrep M F) (hl' : l' ∈ Lrep M F')
+    (hm' : m' ∈ Lrep M F') (h1 : l - m ∈ Xsp F) (h2 : l' - m' ∈ Xsp F') (h : m - m' ∈ NgX M n F F')
+    : l - l' ∈ NgX M n F F' := by
   have e : l - l' = (m - m') + (l - m) - (l' - m') := by abel
   rw [e]
   refine sub_mem (add_mem h ?_) ?_
   · exact Submodule.mem_sup_left (Submodule.mem_sup_right ⟨M.sub_mem hl.1 hm.1, h1⟩)
   · exact Submodule.mem_sup_right ⟨M.sub_mem hl'.1 hm'.1, h2⟩
 
-theorem gdat_iff {F : LFlag (D.sp.Y 0) D.R.rS T} {F' : LFlag (D.sp.Y 0) D.R.rS T'} {M : LV D} {A A' h : GV D}
+theorem gdat_iff
+    {F : LFlag (D.sp.Y 0) D.R.rS T} {F' : LFlag (D.sp.Y 0) D.R.rS T'} {M : LV D} {A A' h : GV D}
     (hA : A ∈ Aut0 F M) (hA' : A' ∈ Aut0 F' M) (hh : Adapt h F F) (hh' : Adapt h F' F')
     (hc : ∀ x ∈ orth (VS D) (Xsp F), h x - A x ∈ Xsp F)
-    (hc' : ∀ x ∈ orth (VS D) (Xsp F'), h x - A' x ∈ Xsp F') :
-    gdat F F' (Formalism.HermitianLatticesTheory.gmap h M) = gdat F F' M ↔
-      ∀ x' ∈ Lrep M F', ∀ l ∈ Lrep M F,
+    (hc' : ∀ x ∈ orth (VS D) (Xsp F'), h x - A' x ∈ Xsp F')
+    : gdat F F' (Formalism.HermitianLatticesTheory.gmap h M) = gdat F F' M
+      ↔ ∀ x' ∈ Lrep M F', ∀ l ∈ Lrep M F,
         (l - x' ∈ NgX M (gS D) F F' ↔ A l - A' x' ∈ NgX M (gS D) F F') := by
-  have hG : ∀ p : (VS D).V × (VS D).V, p ∈ (gdat F F' (Formalism.HermitianLatticesTheory.gmap h M)).2.2 ↔
-      ∃ l' ∈ Lrep M F', ∃ l ∈ Lrep M F, p.1 - A' l' ∈ Xsp F' ∧ p.2 - A l ∈ Xsp F ∧
-        l - l' ∈ NgX M (gS D) F F' := by
+  have hG
+      : ∀ p : (VS D).V × (VS D).V,
+        p ∈ (gdat F F' (Formalism.HermitianLatticesTheory.gmap h M)).2.2
+          ↔ ∃ l' ∈ Lrep M F', ∃ l ∈ Lrep M F,
+            p.1 - A' l' ∈ Xsp F' ∧ p.2 - A l ∈ Xsp F ∧ l - l' ∈ NgX M (gS D) F F' := by
     intro p
     show (∃ l' ∈ Lrep (Formalism.HermitianLatticesTheory.gmap h M) F', ∃ l ∈ Lrep (Formalism.HermitianLatticesTheory.gmap h M) F, p.1 - l' ∈ Xsp F' ∧
       p.2 - l ∈ Xsp F ∧ l - l' ∈ NgX (Formalism.HermitianLatticesTheory.gmap h M) (gS D) F F') ↔ _
@@ -115,9 +135,12 @@ theorem gdat_iff {F : LFlag (D.sp.Y 0) D.R.rS T} {F' : LFlag (D.sp.Y 0) D.R.rS T
       · simpa using sub_mem h1 (hc' m' hl'.2)
       · simpa using sub_mem h2 (hc m hl.2)
       · rw [← map_sub, gmap_apply_mem]; exact h3
-  have hG0 : ∀ p : (VS D).V × (VS D).V, p ∈ (gdat F F' M).2.2 ↔
-      ∃ l' ∈ Lrep M F', ∃ l ∈ Lrep M F, p.1 - l' ∈ Xsp F' ∧ p.2 - l ∈ Xsp F ∧
-        l - l' ∈ NgX M (gS D) F F' := fun p => Iff.rfl
+  have hG0
+      : ∀ p : (VS D).V × (VS D).V,
+        p ∈ (gdat F F' M).2.2
+          ↔ ∃ l' ∈ Lrep M F', ∃ l ∈ Lrep M F,
+            p.1 - l' ∈ Xsp F' ∧ p.2 - l ∈ Xsp F ∧ l - l' ∈ NgX M (gS D) F F' := fun p =>
+    Iff.rfl
   constructor
   · intro he x' hx' l hl
     have hx2 := (aut_lrep hA' x').2 hx'
@@ -144,7 +167,8 @@ theorem gdat_iff {F : LFlag (D.sp.Y 0) D.R.rS T} {F' : LFlag (D.sp.Y 0) D.R.rS T
     rw [hG, hG0]
     constructor
     · rintro ⟨l', hl', l, hl, h1, h2, h3⟩
-      exact ⟨A' l', (aut_lrep hA' l').2 hl', A l, (aut_lrep hA l).2 hl, h1, h2, (hR l' hl' l hl).1 h3⟩
+      exact
+        ⟨A' l', (aut_lrep hA' l').2 hl', A l, (aut_lrep hA l).2 hl, h1, h2, (hR l' hl' l hl).1 h3⟩
     · rintro ⟨l', hl', l, hl, h1, h2, h3⟩
       obtain ⟨m', rfl⟩ := A'.surjective l'
       obtain ⟨m, rfl⟩ := A.surjective l
@@ -152,13 +176,25 @@ theorem gdat_iff {F : LFlag (D.sp.Y 0) D.R.rS T} {F' : LFlag (D.sp.Y 0) D.R.rS T
       rw [aut_lrep hA] at hl
       exact ⟨m', hl', m, hl, h1, h2, (hR m' hl' m hl).2 h3⟩
 
-theorem aut_conj {A B : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {g b : GV D} (hg : Adapt g A B) (hb : b ∈ Aut0 A M) :
-    g * b * g⁻¹ ∈ Aut0 B (Formalism.HermitianLatticesTheory.gmap g M) := by
+theorem aut_conj
+    {A B : LFlag (D.sp.Y 0) D.R.rS T} {M : LV D} {g b : GV D} (hg : Adapt g A B) (hb : b ∈ Aut0 A M)
+    : g * b * g⁻¹ ∈ Aut0 B (Formalism.HermitianLatticesTheory.gmap g M) := by
   refine ⟨?_, (conj_gmap g b M).2 hb.2⟩
   rw [mul_assoc]
   exact adapt_mul (adapt_mul (adapt_inv hg) hb.1) hg
 
-theorem gdat_iff_iotaCompat : ∀ (D : D7) (T T' : D.host.E) (F0 F : LFlag (D.sp.Y 0) D.R.rS T) (F0' F' : LFlag (D.sp.Y 0) D.R.rS T') (lam lam' Λ : LV D) (γ g h b₁ b₂ : GV D), γ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT → Formalism.HermitianLatticesTheory.gmap γ lam' = lam → Adapt g F0 F → Adapt g (mapLF γ F0') F' → Λ = Formalism.HermitianLatticesTheory.gmap g lam → b₁ ∈ Aut0 F0 lam → b₂ ∈ Aut0 F0' lam' → h ∈ H0 F F' → (∀ x ∈ orth (VS D) (Xsp F), h x - (g * b₁ * g⁻¹) x ∈ Xsp F) → (∀ x ∈ orth (VS D) (Xsp F'), h x - (g * γ * b₂ * γ⁻¹ * g⁻¹) x ∈ Xsp F') → (gdat F F' (Formalism.HermitianLatticesTheory.gmap h Λ) = gdat F F' Λ ↔ IotaCompat lam F0 (mapLF γ F0') (mapLF (b₁ * γ * b₂⁻¹) F0') (b₁ * γ * b₂⁻¹ * γ⁻¹) (gS D)) := by
+theorem gdat_iff_iotaCompat
+    : ∀ (D : D7) (T T' : D.host.E) (F0 F : LFlag (D.sp.Y 0) D.R.rS T)
+        (F0' F' : LFlag (D.sp.Y 0) D.R.rS T') (lam lam' Λ : LV D) (γ g h b₁ b₂ : GV D),
+      γ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT
+        → Formalism.HermitianLatticesTheory.gmap γ lam' = lam → Adapt g F0 F
+        → Adapt g (mapLF γ F0') F' → Λ = Formalism.HermitianLatticesTheory.gmap g lam
+        → b₁ ∈ Aut0 F0 lam → b₂ ∈ Aut0 F0' lam' → h ∈ H0 F F'
+        → (∀ x ∈ orth (VS D) (Xsp F), h x - (g * b₁ * g⁻¹) x ∈ Xsp F)
+        → (∀ x ∈ orth (VS D) (Xsp F'), h x - (g * γ * b₂ * γ⁻¹ * g⁻¹) x ∈ Xsp F')
+        → (gdat F F' (Formalism.HermitianLatticesTheory.gmap h Λ) = gdat F F' Λ
+          ↔ IotaCompat lam F0 (mapLF γ F0') (mapLF (b₁ * γ * b₂⁻¹) F0') (b₁ * γ * b₂⁻¹ * γ⁻¹)
+            (gS D)) := by
   intro D T T' F0 F F0' F' lam lam' Λ γ g h b₁ b₂ hγ hlam hg hg' hΛ hb₁ hb₂ hh hc hc'
   have hγa : Adapt γ F0' (mapLF γ F0') := adapt_mapLF hγ
   have hc₂ : γ * b₂ * γ⁻¹ ∈ Aut0 (mapLF γ F0') lam := by
@@ -169,7 +205,9 @@ theorem gdat_iff_iotaCompat : ∀ (D : D7) (T T' : D.host.E) (F0 F : LFlag (D.sp
   have e1 : g * γ * b₂ * γ⁻¹ * g⁻¹ = g * (γ * b₂ * γ⁻¹) * g⁻¹ := by group
   rw [e1] at hc'
   subst hΛ
-  rw [gdat_iff hA hA' (frameAdaptedIsometry_of_fixing_both_frames hh).1 (frameAdaptedIsometry_of_fixing_both_frames hh).2 hc hc', lrep_adapt hg, lrep_adapt hg', ngx_adapt hg hg']
+  rw [gdat_iff hA hA' (frameAdaptedIsometry_of_fixing_both_frames hh).1
+      (frameAdaptedIsometry_of_fixing_both_frames hh).2 hc hc',
+    lrep_adapt hg, lrep_adapt hg', ngx_adapt hg hg']
   have hi : b₁ * γ * b₂⁻¹ ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT :=
     Subgroup.mul_mem _ (Subgroup.mul_mem _ hb₁.1.1 hγ) (Subgroup.inv_mem _ hb₂.1.1)
   have hβ : Adapt (b₁ * γ * b₂⁻¹ * (b₂ * γ⁻¹)) (mapLF γ F0') (mapLF (b₁ * γ * b₂⁻¹) F0') :=

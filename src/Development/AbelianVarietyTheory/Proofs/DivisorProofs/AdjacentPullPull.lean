@@ -28,7 +28,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsFrameOfFor
 set_option autoImplicit false
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.Vert
 
 namespace GlobalTheory.FlagChain
@@ -49,8 +50,10 @@ end Bundles
 
 section Covers
 
-variable {k : Type} [CommRing k] {D : ℕ} {X Y Z : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
-  [IsIntegral Z] {p : X ⟶ Sp k} {A E L H : X.Modules} {r : ℕ}
+variable
+  {k : Type} [CommRing k]
+  {D : ℕ} {X Y Z : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [IsIntegral Z]
+  {p : X ⟶ Sp k} {A E L H : X.Modules} {r : ℕ}
 
 def IsCov (p : X ⟶ Sp k) (D : ℕ) (ρ : Y ⟶ X) : Prop :=
   IsArithVar (ρ ≫ p) D ∧ ρ (genericPoint Y) = genericPoint X ∧ ρ.residueDegree (genericPoint Y) ≠ 0

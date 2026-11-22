@@ -8,9 +8,12 @@ public import Formalism.SatakeDualWeyl.KpqSubgroupCompact
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Polynomial
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -23,9 +26,11 @@ section Comb
 
 variable {n : ℕ}
 
-theorem tail_sum_le {μ : Fin n → ℕ} (hμ : Antitone μ) (j : ℕ) (S : Finset (Fin n))
-    (hS : (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card = S.card) :
-    ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), μ i ≤ ∑ i ∈ S, μ i := by
+theorem tail_sum_le
+    {μ : Fin n → ℕ} (hμ : Antitone μ)
+    (j : ℕ) (S : Finset (Fin n))
+    (hS : (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card = S.card)
+    : ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), μ i ≤ ∑ i ∈ S, μ i := by
   set T := Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ) with hT
   refine Finset.sum_sdiff_le_sum_sdiff.1 ?_
   have hc := Finset.card_sdiff_comm hS
@@ -43,17 +48,20 @@ theorem tail_sum_le {μ : Fin n → ℕ} (hμ : Antitone μ) (j : ℕ) (S : Fins
   rw [hc] at h1
   exact h1.trans h2
 
-theorem abel_head (a x : Fin n → ℤ) (ha : Antitone a)
-    (hH : ∀ j : ℕ, 0 ≤ ∑ i ∈ Finset.univ.filter (fun i : Fin n => (i : ℕ) < j), x i) (j : ℕ) (hj : j ≤ n) (c : ℤ)
-    (hc : ∀ i : Fin n, (i : ℕ) < j → c ≤ a i) :
-    c * ∑ i ∈ Finset.univ.filter (fun i : Fin n => (i : ℕ) < j), x i ≤
-      ∑ i ∈ Finset.univ.filter (fun i : Fin n => (i : ℕ) < j), x i * a i := by
+theorem abel_head
+    (a x : Fin n → ℤ) (ha : Antitone a)
+    (hH : ∀ j : ℕ, 0 ≤ ∑ i ∈ Finset.univ.filter (fun i : Fin n => (i : ℕ) < j), x i)
+    (j : ℕ) (hj : j ≤ n)
+    (c : ℤ) (hc : ∀ i : Fin n, (i : ℕ) < j → c ≤ a i)
+    : c * ∑ i ∈ Finset.univ.filter (fun i : Fin n => (i : ℕ) < j), x i
+      ≤ ∑ i ∈ Finset.univ.filter (fun i : Fin n => (i : ℕ) < j), x i * a i := by
   induction j generalizing c with
   | zero => simp
   | succ j ih =>
     have hjn : j < n := hj
-    have e : Finset.univ.filter (fun i : Fin n => (i : ℕ) < j + 1) =
-        insert (⟨j, hjn⟩ : Fin n) (Finset.univ.filter fun i : Fin n => (i : ℕ) < j) := by
+    have e
+        : Finset.univ.filter (fun i : Fin n => (i : ℕ) < j + 1)
+          = insert (⟨j, hjn⟩ : Fin n) (Finset.univ.filter fun i : Fin n => (i : ℕ) < j) := by
       ext i
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.ext_iff]
       omega
@@ -65,10 +73,12 @@ theorem abel_head (a x : Fin n → ℤ) (ha : Antitone a)
     rw [Finset.sum_insert hn]
     nlinarith [mul_nonneg (sub_nonneg.2 h3) h2]
 
-theorem sq_lt {d d' : Fin n → ℕ} (hd' : Antitone d') (htot : ∑ i, d' i = ∑ i, d i)
-    (hT : ∀ j : ℕ, ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d i ≤
-      ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d' i) :
-    d' = d ∨ ∑ i, d' i ^ 2 < ∑ i, d i ^ 2 := by
+theorem sq_lt
+    {d d' : Fin n → ℕ} (hd' : Antitone d') (htot : ∑ i, d' i = ∑ i, d i)
+    (hT : ∀ j : ℕ,
+      ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d i
+        ≤ ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d' i)
+    : d' = d ∨ ∑ i, d' i ^ 2 < ∑ i, d i ^ 2 := by
   by_cases hne : d' = d
   · exact Or.inl hne
   refine Or.inr ?_
@@ -84,22 +94,21 @@ theorem sq_lt {d d' : Fin n → ℕ} (hd' : Antitone d') (htot : ∑ i, d' i = �
     omega
   have ha : Antitone a := fun i j h => by simpa [a] using hd' h
   have hA := abel_head a x ha hH n le_rfl 0 fun i _ => by simp [a]
-  have e : Finset.univ.filter (fun i : Fin n => (i : ℕ) < n) = Finset.univ := by
-    ext i; simp
+  have e : Finset.univ.filter (fun i : Fin n => (i : ℕ) < n) = Finset.univ := by ext i; simp
   rw [e, zero_mul] at hA
   have hx : 0 < ∑ i, x i ^ 2 := by
     obtain ⟨i, hi⟩ := Function.ne_iff.1 hne
     refine Finset.sum_pos' (fun i _ => sq_nonneg _) ⟨i, Finset.mem_univ _, ?_⟩
-    have : x i ≠ 0 := by
-      simp only [x]; omega
+    have : x i ≠ 0 := by simp only [x]; omega
     positivity
-  have key : ((∑ i, d i ^ 2 : ℕ) : ℤ) = ∑ i, (d' i : ℤ) ^ 2 + ∑ i, x i ^ 2 + 2 * ∑ i, x i * a i := by
+  have key
+      : ((∑ i, d i ^ 2 : ℕ) : ℤ) = ∑ i, (d' i : ℤ) ^ 2 + ∑ i, x i ^ 2 + 2 * ∑ i, x i * a i := by
     push_cast
     rw [Finset.mul_sum, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
-    simp only [x, a]; ring
-  have : ((∑ i, d' i ^ 2 : ℕ) : ℤ) < ((∑ i, d i ^ 2 : ℕ) : ℤ) := by
-    rw [key]; push_cast; linarith
+    simp only [x, a]
+    ring
+  have : ((∑ i, d' i ^ 2 : ℕ) : ℤ) < ((∑ i, d i ^ 2 : ℕ) : ℤ) := by rw [key]; push_cast; linarith
   exact_mod_cast this
 
 end Comb
@@ -113,11 +122,12 @@ def MinorLe (c : WithZero (Multiplicative ℤ)) (r : ℕ) (M : Matrix (Fin n) (F
 
 theorem mem_intL_iff {x : L} : x ∈ Formalism.UG.intL L ↔ Valued.v x ≤ 1 := Iff.rfl
 
-theorem det_submatrix_mul_expand {r : ℕ} (A M : Matrix (Fin n) (Fin n) L) (I J : Fin r → Fin n) :
-    ((A * M).submatrix I J).det =
-      ∑ f : Fin r → Fin n, (∏ i, A (I i) (f i)) * (M.submatrix f J).det := by
-  have h := (Matrix.detRowAlternating (R := L) (n := Fin r)).toMultilinearMap.map_sum
-    (fun (i : Fin r) (k : Fin n) => A (I i) k • (fun j => M k (J j)))
+theorem det_submatrix_mul_expand {r : ℕ} (A M : Matrix (Fin n) (Fin n) L) (I J : Fin r → Fin n)
+    : ((A * M).submatrix I J).det
+      = ∑ f : Fin r → Fin n, (∏ i, A (I i) (f i)) * (M.submatrix f J).det := by
+  have h :=
+    (Matrix.detRowAlternating (R := L) (n := Fin r)).toMultilinearMap.map_sum
+      (fun (i : Fin r) (k : Fin n) => A (I i) k • (fun j => M k (J j)))
   have e : (fun i => ∑ k, A (I i) k • (fun j => M k (J j))) = (A * M).submatrix I J := by
     ext i j
     simp [Matrix.mul_apply, Finset.sum_apply]
@@ -126,70 +136,90 @@ theorem det_submatrix_mul_expand {r : ℕ} (A M : Matrix (Fin n) (Fin n) L) (I J
   rw [MultilinearMap.map_smul_univ]
   rfl
 
-theorem minorLe_mul_left {c : WithZero (Multiplicative ℤ)} {r : ℕ} {A M : Matrix (Fin n) (Fin n) L}
-    (hA : ∀ i j, A i j ∈ Formalism.UG.intL L) (h : MinorLe c r M) : MinorLe c r (A * M) := by
+theorem minorLe_mul_left
+    {c : WithZero (Multiplicative ℤ)} {r : ℕ} {A M : Matrix (Fin n) (Fin n) L}
+    (hA : ∀ i j, A i j ∈ Formalism.UG.intL L) (h : MinorLe c r M)
+    : MinorLe c r (A * M) := by
   intro I J
   rw [det_submatrix_mul_expand]
   refine Valuation.map_sum_le _ fun f _ => ?_
   rw [map_mul]
-  have h1 : Valued.v (∏ i, A (I i) (f i)) ≤ 1 :=
-    mem_intL_iff.1 (prod_mem fun i _ => hA _ _)
-  calc _ ≤ 1 * c := mul_le_mul' h1 (h f J)
+  have h1 : Valued.v (∏ i, A (I i) (f i)) ≤ 1 := mem_intL_iff.1 (prod_mem fun i _ => hA _ _)
+  calc
+    _ ≤ 1 * c := mul_le_mul' h1 (h f J)
     _ = c := one_mul c
 
-theorem minorLe_transpose {c : WithZero (Multiplicative ℤ)} {r : ℕ} {M : Matrix (Fin n) (Fin n) L}
-    (h : MinorLe c r M) :
-    MinorLe c r M.transpose := by
+theorem minorLe_transpose
+    {c : WithZero (Multiplicative ℤ)} {r : ℕ} {M : Matrix (Fin n) (Fin n) L} (h : MinorLe c r M)
+    : MinorLe c r M.transpose := by
   intro I J
   have : (M.transpose.submatrix I J) = (M.submatrix J I).transpose := by ext; rfl
   rw [this, Matrix.det_transpose]
   exact h J I
 
-theorem minorLe_mul_right {c : WithZero (Multiplicative ℤ)} {r : ℕ} {B M : Matrix (Fin n) (Fin n) L}
-    (hB : ∀ i j, B i j ∈ Formalism.UG.intL L) (h : MinorLe c r M) : MinorLe c r (M * B) := by
-  have := minorLe_transpose (minorLe_mul_left (A := B.transpose) (fun i j => hB j i) (minorLe_transpose h))
+theorem minorLe_mul_right
+    {c : WithZero (Multiplicative ℤ)} {r : ℕ} {B M : Matrix (Fin n) (Fin n) L}
+    (hB : ∀ i j, B i j ∈ Formalism.UG.intL L) (h : MinorLe c r M)
+    : MinorLe c r (M * B) := by
+  have :=
+    minorLe_transpose
+      (minorLe_mul_left (A := B.transpose) (fun i j => hB j i) (minorLe_transpose h))
   rwa [← Matrix.transpose_mul, Matrix.transpose_transpose] at this
 
-theorem det_int {r : ℕ} (M : Matrix (Fin r) (Fin r) L) (h : ∀ i j, M i j ∈ Formalism.UG.intL L) :
-    Valued.v M.det ≤ 1 := by
+theorem det_int {r : ℕ} (M : Matrix (Fin r) (Fin r) L) (h : ∀ i j, M i j ∈ Formalism.UG.intL L)
+    : Valued.v M.det ≤ 1 := by
   refine mem_intL_iff.1 ?_
   rw [Matrix.det_apply']
   exact sum_mem fun σ _ => mul_mem (intCast_mem _ _) (prod_mem fun i _ => h _ _)
 
-theorem glint_entry {g : GL (Fin n) L} (hg : g ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L)) (i j : Fin n) :
-    (g : Matrix (Fin n) (Fin n) L) i j ∈ Formalism.UG.intL L := by
+theorem glint_entry
+    {g : GL (Fin n) L} (hg : g ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L)) (i j : Fin n)
+    : (g : Matrix (Fin n) (Fin n) L) i j ∈ Formalism.UG.intL L := by
   obtain ⟨g0, rfl⟩ := hg
   exact ((g0 : Matrix (Fin n) (Fin n) (Formalism.UG.intL L)) i j).2
 
-theorem glint_det {g : GL (Fin n) L} (hg : g ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L)) :
-    Valued.v (g : Matrix (Fin n) (Fin n) L).det = 1 := by
+theorem glint_det {g : GL (Fin n) L} (hg : g ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L))
+    : Valued.v (g : Matrix (Fin n) (Fin n) L).det = 1 := by
   have h1 := det_int _ (glint_entry hg)
   have h2 := det_int _ (glint_entry (inv_mem hg))
-  have h3 : (g : Matrix (Fin n) (Fin n) L).det * ((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).det = 1 := by
+  have h3
+      : (g : Matrix (Fin n) (Fin n) L).det * ((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).det
+        = 1 := by
     rw [← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.det_one]
   have h4 := congrArg Valued.v h3
   rw [map_mul, map_one] at h4
   refine le_antisymm h1 ?_
-  calc (1 : WithZero (Multiplicative ℤ)) = _ := h4.symm
+  calc
+    (1 : WithZero (Multiplicative ℤ))
+      = _ := h4.symm
     _ ≤ Valued.v (g : Matrix (Fin n) (Fin n) L).det * 1 := mul_le_mul' le_rfl h2
     _ = _ := mul_one _
 
 variable {ϖ : L}
 
-theorem v_pow_anti {q : WithZero (Multiplicative ℤ)} (hq : q < 1) (h0 : 0 < q) {a b : ℕ}
-    (h : q ^ a ≤ q ^ b) : b ≤ a := by
+theorem v_pow_anti
+    {q : WithZero (Multiplicative ℤ)} (hq : q < 1) (h0 : 0 < q) {a b : ℕ} (h : q ^ a ≤ q ^ b)
+    : b ≤ a := by
   by_contra hc
   exact absurd (pow_lt_pow_right_of_lt_one₀ h0 hq (not_le.1 hc)) (not_lt.2 h)
 
-theorem sum_inj_image {M : Type} [AddCommMonoid M] {r : ℕ} (f : Fin n → M) {I : Fin r → Fin n}
-    (hI : Function.Injective I) : ∑ t, f (I t) = ∑ i ∈ Finset.univ.image I, f i :=
+theorem sum_inj_image
+    {M : Type} [AddCommMonoid M]
+    {r : ℕ}
+    (f : Fin n → M)
+    {I : Fin r → Fin n} (hI : Function.Injective I)
+    : ∑ t, f (I t) = ∑ i ∈ Finset.univ.image I, f i :=
   (Finset.sum_image fun _ _ _ _ h => hI h).symm
 
-theorem minorLe_diag (q : WithZero (Multiplicative ℤ)) (hq : q < 1) (hϖ : Valued.v ϖ = q)
+theorem minorLe_diag
+    (q : WithZero (Multiplicative ℤ)) (hq : q < 1) (hϖ : Valued.v ϖ = q)
     {μ ω : Fin n → ℕ} (hμ : Antitone μ) (hω : Antitone ω)
-    {h : Matrix (Fin n) (Fin n) L} (hh : ∀ i j, h i j ∈ Formalism.UG.intL L) (j : ℕ) :
-    MinorLe (q ^ (∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), μ i +
-        ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), ω i))
+    {h : Matrix (Fin n) (Fin n) L} (hh : ∀ i j, h i j ∈ Formalism.UG.intL L)
+    (j : ℕ)
+    : MinorLe
+      (q
+        ^ (∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), μ i
+          + ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), ω i))
       (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card
       (Matrix.diagonal (fun i => ϖ ^ μ i) * h * Matrix.diagonal (fun i => ϖ ^ ω i)) := by
   intro I J
@@ -203,31 +233,38 @@ theorem minorLe_diag (q : WithZero (Multiplicative ℤ)) (hq : q < 1) (hϖ : Val
   · obtain ⟨a, b, e, ne⟩ := Function.not_injective_iff.1 hJ
     rw [Matrix.det_zero_of_column_eq ne (by intro c; simp [e]), map_zero]
     exact zero_le
-  have e : (Matrix.diagonal (fun i => ϖ ^ μ i) * h * Matrix.diagonal (fun i => ϖ ^ ω i)).submatrix I J =
-      Matrix.diagonal (fun t => ϖ ^ μ (I t)) * h.submatrix I J * Matrix.diagonal (fun t => ϖ ^ ω (J t)) := by
+  have e
+      : (Matrix.diagonal (fun i => ϖ ^ μ i) * h * Matrix.diagonal (fun i => ϖ ^ ω i)).submatrix I J
+        = Matrix.diagonal (fun t => ϖ ^ μ (I t)) * h.submatrix I J
+          * Matrix.diagonal (fun t => ϖ ^ ω (J t)) := by
     ext a b
     simp only [Matrix.submatrix_apply, Matrix.mul_diagonal, Matrix.diagonal_mul]
   rw [e, Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal, Matrix.det_diagonal, map_mul, map_mul,
-    Finset.prod_pow_eq_pow_sum, Finset.prod_pow_eq_pow_sum, map_pow, map_pow, hϖ, sum_inj_image μ hI,
-    sum_inj_image ω hJ]
-  have c1 : (Finset.univ.image I).card = (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card := by
+    Finset.prod_pow_eq_pow_sum, Finset.prod_pow_eq_pow_sum, map_pow, map_pow, hϖ,
+    sum_inj_image μ hI, sum_inj_image ω hJ]
+  have c1
+      : (Finset.univ.image I).card = (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card := by
     rw [Finset.card_image_of_injective _ hI]; simp
-  have c2 : (Finset.univ.image J).card = (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card := by
+  have c2
+      : (Finset.univ.image J).card = (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card := by
     rw [Finset.card_image_of_injective _ hJ]; simp
   have t1 := tail_sum_le hμ j _ c1.symm
   have t2 := tail_sum_le hω j _ c2.symm
   have hd := det_int (h.submatrix I J) fun a b => hh _ _
-  calc _ ≤ q ^ (∑ i ∈ Finset.univ.image I, μ i) * 1 * q ^ (∑ i ∈ Finset.univ.image J, ω i) :=
-        mul_le_mul' (mul_le_mul' le_rfl hd) le_rfl
+  calc
+    _ ≤ q ^ (∑ i ∈ Finset.univ.image I, μ i) * 1 * q ^ (∑ i ∈ Finset.univ.image J, ω i) :=
+      mul_le_mul' (mul_le_mul' le_rfl hd) le_rfl
     _ = q ^ (∑ i ∈ Finset.univ.image I, μ i + ∑ i ∈ Finset.univ.image J, ω i) := by
-        rw [mul_one, pow_add]
+      rw [mul_one, pow_add]
     _ ≤ _ := pow_le_pow_right_of_le_one' hq.le (add_le_add t1 t2)
 
-theorem tail_of_minorLe (q : WithZero (Multiplicative ℤ)) (hq : q < 1) (h0 : 0 < q) (hϖ : Valued.v ϖ = q)
-    {d' : Fin n → ℕ} {t : ℕ} (j : ℕ)
+theorem tail_of_minorLe
+    (q : WithZero (Multiplicative ℤ)) (hq : q < 1) (h0 : 0 < q) (hϖ : Valued.v ϖ = q)
+    {d' : Fin n → ℕ} {t : ℕ}
+    (j : ℕ)
     (h : MinorLe (q ^ t) (Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)).card
-      (Matrix.diagonal fun i => ϖ ^ d' i)) :
-    t ≤ ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d' i := by
+      (Matrix.diagonal fun i => ϖ ^ d' i))
+    : t ≤ ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d' i := by
   set T := Finset.univ.filter fun i : Fin n => j ≤ (i : ℕ)
   have hI : Function.Injective (T.orderEmbOfFin rfl) := (T.orderEmbOfFin rfl).injective
   have := h (T.orderEmbOfFin rfl) (T.orderEmbOfFin rfl)
@@ -241,9 +278,34 @@ theorem tail_of_minorLe (q : WithZero (Multiplicative ℤ)) (hq : q < 1) (h0 : 0
 
 end Val
 
-theorem elemDiv_mul_minuscule : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L) (n : ℕ), Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) → ∀ (d : Fin n → ℕ) (k : ℕ), Antitone d → (∀ i : Fin n, 0 < d i ↔ (i : ℕ) < k) → ∀ (g a : GL (Fin n) L), (∃ k₁ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L), ∃ k₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L), ((k₁ * g * k₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) = Matrix.diagonal fun i => ϖ ^ (d i - 1)) → (∃ k₁ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L), ∃ k₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L), ((k₁ * a * k₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) = Matrix.diagonal fun i : Fin n => if (i : ℕ) < k then ϖ else 1) → ∀ d' : Fin n → ℕ, Antitone d' → (∃ k₁ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L), ∃ k₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L), ((k₁ * (g * a) * k₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) = Matrix.diagonal fun i => ϖ ^ d' i) → d' = d ∨ (∑ i, d' i = ∑ i, d i ∧ ∑ i, d' i ^ 2 < ∑ i, d i ^ 2) := by
-  intro L _ _ ϖ n hϖ d k hd hk g a ⟨k₁, hk₁, k₂, hk₂, eg⟩ ⟨l₁, hl₁, l₂, hl₂, ea⟩ d' hd' ⟨m₁, hm₁, m₂, hm₂, e⟩
-  obtain ⟨q, hqdef⟩ : ∃ q : WithZero (Multiplicative ℤ), q = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := ⟨_, rfl⟩
+theorem elemDiv_mul_minuscule
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L) (n : ℕ),
+      Valued.v ϖ
+          = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
+        → ∀ (d : Fin n → ℕ) (k : ℕ),
+          Antitone d → (∀ i : Fin n, 0 < d i ↔ (i : ℕ) < k)
+            → ∀ (g a : GL (Fin n) L),
+              (∃ k₁ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L),
+                  ∃ k₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L),
+                    ((k₁ * g * k₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+                      = Matrix.diagonal fun i => ϖ ^ (d i - 1))
+                → (∃ k₁ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L),
+                  ∃ k₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L),
+                    ((k₁ * a * k₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+                      = Matrix.diagonal fun i : Fin n => if (i : ℕ) < k then ϖ else 1)
+                → ∀ d' : Fin n → ℕ,
+                  Antitone d'
+                    → (∃ k₁ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L),
+                      ∃ k₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L),
+                        ((k₁ * (g * a) * k₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+                          = Matrix.diagonal fun i => ϖ ^ d' i)
+                    → d' = d ∨ (∑ i, d' i = ∑ i, d i ∧ ∑ i, d' i ^ 2 < ∑ i, d i ^ 2) := by
+  intro L _ _ ϖ n hϖ d k hd hk g a ⟨k₁, hk₁, k₂, hk₂, eg⟩ ⟨l₁, hl₁, l₂, hl₂, ea⟩ d' hd'
+    ⟨m₁, hm₁, m₂, hm₂, e⟩
+  obtain ⟨q, hqdef⟩
+      : ∃ q : WithZero (Multiplicative ℤ),
+        q = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) :=
+    ⟨_, rfl⟩
   rw [← hqdef] at hϖ
   have hq0 : 0 < q := by rw [hqdef]; exact WithZero.zero_lt_coe _
   have hq1 : q < 1 := by
@@ -261,34 +323,49 @@ theorem elemDiv_mul_minuscule : ∀ (L : Type) [Field L] [Valued L (WithZero (Mu
     have := hk i
     simp only [μ, ω]
     split_ifs <;> omega
-  have ea' : ((l₁ * a * l₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) = Matrix.diagonal fun i => ϖ ^ ω i := by
+  have ea'
+      : ((l₁ * a * l₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+        = Matrix.diagonal fun i => ϖ ^ ω i := by
     rw [ea]
     congr 1
     funext i
     by_cases hi : (i : ℕ) < k <;> simp [ω, hi]
-  have hA : m₁ * k₁⁻¹ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L) := mul_mem hm₁ (inv_mem hk₁)
-  have hh : k₂⁻¹ * l₁⁻¹ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L) := mul_mem (inv_mem hk₂) (inv_mem hl₁)
-  have hB : l₂⁻¹ * m₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L) := mul_mem (inv_mem hl₂) hm₂
-  have key : m₁ * (g * a) * m₂ = (m₁ * k₁⁻¹) * ((k₁ * g * k₂) * (k₂⁻¹ * l₁⁻¹) * (l₁ * a * l₂)) * (l₂⁻¹ * m₂) := by
+  have hA : m₁ * k₁⁻¹ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L) :=
+    mul_mem hm₁ (inv_mem hk₁)
+  have hh : k₂⁻¹ * l₁⁻¹ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L) :=
+    mul_mem (inv_mem hk₂) (inv_mem hl₁)
+  have hB : l₂⁻¹ * m₂ ∈ Formalism.UG.GLint (Fin n) (Formalism.UG.intL L) :=
+    mul_mem (inv_mem hl₂) hm₂
+  have key
+      : m₁ * (g * a) * m₂
+        = (m₁ * k₁⁻¹) * ((k₁ * g * k₂) * (k₂⁻¹ * l₁⁻¹) * (l₁ * a * l₂)) * (l₂⁻¹ * m₂) := by
     group
-  have em : (Matrix.diagonal fun i => ϖ ^ d' i) =
-      ((m₁ * k₁⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) *
-        ((Matrix.diagonal fun i => ϖ ^ μ i) * ((k₂⁻¹ * l₁⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) *
-          (Matrix.diagonal fun i => ϖ ^ ω i)) * ((l₂⁻¹ * m₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) := by
-    rw [← e, key, ← ea', Units.val_mul, Units.val_mul (m₁ * k₁⁻¹), Units.val_mul (k₁ * g * k₂ * (k₂⁻¹ * l₁⁻¹)),
-      Units.val_mul (k₁ * g * k₂) (k₂⁻¹ * l₁⁻¹), eg]
-  have hT : ∀ j : ℕ, ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d i ≤
-      ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d' i := by
+  have em
+      : (Matrix.diagonal fun i => ϖ ^ d' i)
+        = ((m₁ * k₁⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+          * ((Matrix.diagonal fun i => ϖ ^ μ i)
+            * ((k₂⁻¹ * l₁⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+            * (Matrix.diagonal fun i => ϖ ^ ω i))
+          * ((l₂⁻¹ * m₂ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) := by
+    rw [← e, key, ← ea', Units.val_mul, Units.val_mul (m₁ * k₁⁻¹),
+      Units.val_mul (k₁ * g * k₂ * (k₂⁻¹ * l₁⁻¹)), Units.val_mul (k₁ * g * k₂) (k₂⁻¹ * l₁⁻¹), eg]
+  have hT
+      : ∀ j : ℕ,
+        ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d i
+          ≤ ∑ i ∈ Finset.univ.filter (fun i : Fin n => j ≤ (i : ℕ)), d' i := by
     intro j
-    have m := minorLe_mul_right (glint_entry hB) (minorLe_mul_left (glint_entry hA)
-      (minorLe_diag (ϖ := ϖ) q hq1 hϖ hμ hω (glint_entry hh) j))
+    have m :=
+      minorLe_mul_right (glint_entry hB)
+        (minorLe_mul_left (glint_entry hA)
+          (minorLe_diag (ϖ := ϖ) q hq1 hϖ hμ hω (glint_entry hh) j))
     rw [← em] at m
     have := tail_of_minorLe q hq1 hq0 hϖ j m
     rwa [← Finset.sum_add_distrib, Finset.sum_congr rfl fun i _ => (hdμ i).symm] at this
   have htot : ∑ i, d' i = ∑ i, d i := by
     have h1 := congrArg (fun M => Valued.v (Matrix.det M)) em
-    simp only [Matrix.det_mul, Matrix.det_diagonal, map_mul, glint_det hA, glint_det hB, glint_det hh,
-      Finset.prod_pow_eq_pow_sum, map_pow, hϖ, one_mul, mul_one] at h1
+    simp only [Matrix.det_mul, Matrix.det_diagonal, map_mul, glint_det hA, glint_det hB,
+        glint_det hh, Finset.prod_pow_eq_pow_sum, map_pow, hϖ, one_mul, mul_one]
+      at h1
     rw [← pow_add] at h1
     have h2 : ∑ i, d' i = ∑ i, μ i + ∑ i, ω i :=
       le_antisymm (v_pow_anti hq1 hq0 h1.ge) (v_pow_anti hq1 hq0 h1.le)

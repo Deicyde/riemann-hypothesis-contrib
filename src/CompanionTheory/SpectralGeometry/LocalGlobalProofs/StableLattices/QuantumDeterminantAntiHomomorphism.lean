@@ -11,18 +11,24 @@ open Finset
 
 namespace GlobalTheory.CompanionTheory.RgTransport
 
-open CompanionTheory.RgExh CompanionTheory.RgExh.Dec CompanionTheory.RgExh.Dec.J Formalism.REAL ReciprocityTheory.ChartRestriction.DS GlobalTheory.SmGL
+open CompanionTheory.RgExh CompanionTheory.RgExh.Dec CompanionTheory.RgExh.Dec.J Formalism.REAL
+  ReciprocityTheory.ChartRestriction.DS GlobalTheory.SmGL
 
-theorem anti_list_prod {A B : Type} [Ring A] [Ring B] (f : A → B) (h1 : f 1 = 1)
-    (hm : ∀ x y, f (x * y) = f y * f x) (l : List A) :
-    f l.prod = (l.map f).reverse.prod := by
+theorem anti_list_prod
+    {A B : Type} [Ring A] [Ring B]
+    (f : A → B) (h1 : f 1 = 1) (hm : ∀ x y, f (x * y) = f y * f x)
+    (l : List A)
+    : f l.prod = (l.map f).reverse.prod := by
   induction l with
   | nil => simpa using h1
   | cons a l ih => simp [List.prod_cons, hm, ih]
 
-theorem anti_Tm {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B] (f : A →ₗ[ℂ] B) (h1 : f 1 = 1)
-    {m : ℕ} (E : Fin m → Fin m → A) (v : ℂ) (a b : Fin m) :
-    f (Tm E v a b) = Tm (fun a b => f (E b a)) v b a := by
+theorem anti_Tm
+    {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B]
+    (f : A →ₗ[ℂ] B) (h1 : f 1 = 1)
+    {m : ℕ} (E : Fin m → Fin m → A)
+    (v : ℂ) (a b : Fin m)
+    : f (Tm E v a b) = Tm (fun a b => f (E b a)) v b a := by
   have hal : f (algebraMap ℂ A v) = algebraMap ℂ B v := by
     rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, map_smul, h1]
   unfold Tm
@@ -30,17 +36,21 @@ theorem anti_Tm {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B] (
   · subst h; simp [hal]
   · simp [h, Ne.symm h]
 
-theorem qdet_eq_qminorRow_rev {A : Type} [Ring A] [Algebra ℂ A] {m : ℕ} (E : Fin m → Fin m → A) (hE : GlRel E)
-    (u : ℂ) : qdet E u = PI.qminorRow E (id ∘ Fin.revPerm) (id ∘ Fin.revPerm) u := by
+theorem qdet_eq_qminorRow_rev
+    {A : Type} [Ring A] [Algebra ℂ A] {m : ℕ} (E : Fin m → Fin m → A) (hE : GlRel E) (u : ℂ)
+    : qdet E u = PI.qminorRow E (id ∘ Fin.revPerm) (id ∘ Fin.revPerm) u := by
   have hrow : PI.RowForm := quantum_minor_row_form
   rw [← hrow A m m E hE, quantumMinorRowSkew_holds A m m E id _ Fin.revPerm u,
-    quantumMinorColSkew_holds A m m E hE id id Fin.revPerm u, ← mul_assoc, ← Int.cast_mul, ← Units.val_mul,
-    Int.units_mul_self, Units.val_one, Int.cast_one, one_mul]
+    quantumMinorColSkew_holds A m m E hE id id Fin.revPerm u, ← mul_assoc, ← Int.cast_mul,
+    ← Units.val_mul, Int.units_mul_self, Units.val_one, Int.cast_one, one_mul]
   rfl
 
-theorem qdet_anti {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B] (f : A →ₗ[ℂ] B) (h1 : f 1 = 1)
-    (hm : ∀ x y, f (x * y) = f y * f x) {m : ℕ} (E : Fin m → Fin m → A) (hE : GlRel E) (u : ℂ) :
-    qdet (fun a b => f (E b a)) u = f (qdet E u) := by
+theorem qdet_anti
+    {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B]
+    (f : A →ₗ[ℂ] B) (h1 : f 1 = 1) (hm : ∀ x y, f (x * y) = f y * f x)
+    {m : ℕ} (E : Fin m → Fin m → A) (hE : GlRel E)
+    (u : ℂ)
+    : qdet (fun a b => f (E b a)) u = f (qdet E u) := by
   rw [qdet_eq_qminorRow_rev E hE]
   unfold qdet qminor PI.qminorRow
   set_option synthInstance.maxHeartbeats 100000 in

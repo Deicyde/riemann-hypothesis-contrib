@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.P22
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
 open GlobalTheory.FlagMod (ev frX frVec)
 open GlobalTheory.FlagTan (psiSet HIx VIx TIx IsDef IsVert KSIso)
@@ -21,10 +22,12 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem derivation_extend_localization_atPrime (F A R : Type) [CommRing F] [CommRing A] [CommRing R]
-    [Algebra F A] [Algebra A R] [Algebra F R] [IsScalarTower F A R] (P : Ideal A) [P.IsPrime]
-    [IsLocalization.AtPrime R P] (D : Derivation F A R) :
-    ∃ D' : Derivation F R R, ∀ a, D' (algebraMap A R a) = D a := by
+theorem derivation_extend_localization_atPrime
+    (F A R : Type) [CommRing F] [CommRing A] [CommRing R] [Algebra F A] [Algebra A R] [Algebra F R]
+    [IsScalarTower F A R]
+    (P : Ideal A) [P.IsPrime] [IsLocalization.AtPrime R P]
+    (D : Derivation F A R)
+    : ∃ D' : Derivation F R R, ∀ a, D' (algebraMap A R a) = D a := by
   haveI : Algebra.FormallyEtale A R := Algebra.FormallyEtale.of_isLocalization P.primeCompl
   have hb := KaehlerDifferential.isBaseChange_of_formallyEtale F A R
   refine ⟨(hb.lift D.liftKaehlerDifferential).compDer (KaehlerDifferential.D F R), fun a => ?_⟩

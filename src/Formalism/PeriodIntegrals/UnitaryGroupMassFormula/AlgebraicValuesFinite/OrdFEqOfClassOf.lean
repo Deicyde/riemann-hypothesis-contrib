@@ -15,21 +15,21 @@ variable {L : Type} [Field L] [NumberField L]
 def piU (v : HeightOneSpectrum (𝓞 L)) : (v.adicCompletion L)ˣ :=
   Classical.choose (exists_isUniformiserAt L v)
 
-theorem piU_spec (v : HeightOneSpectrum (𝓞 L)) :
-    IsUniformiserAt L v ((piU v : (v.adicCompletion L)ˣ) : v.adicCompletion L) :=
+theorem piU_spec (v : HeightOneSpectrum (𝓞 L))
+    : IsUniformiserAt L v ((piU v : (v.adicCompletion L)ˣ) : v.adicCompletion L) :=
   Classical.choose_spec (exists_isUniformiserAt L v)
 
 def eU (v : HeightOneSpectrum (𝓞 L)) : Ideles L := localIdele L v (piU v)
 
-theorem ordAt_eU (v w : HeightOneSpectrum (𝓞 L)) [Decidable (w = v)] :
-    ordAt L w (eU v) = if w = v then 1 else 0 := by
+theorem ordAt_eU (v w : HeightOneSpectrum (𝓞 L)) [Decidable (w = v)]
+    : ordAt L w (eU v) = if w = v then 1 else 0 := by
   classical
   unfold eU
   rw [ordAt_localIdele L v w (piU v) (piU_spec v)]
   congr 1
 
-theorem ordAt_pow' (w : HeightOneSpectrum (𝓞 L)) (a : Ideles L) (n : ℕ) :
-    ordAt L w (a ^ n) = n * ordAt L w a := by
+theorem ordAt_pow' (w : HeightOneSpectrum (𝓞 L)) (a : Ideles L) (n : ℕ)
+    : ordAt L w (a ^ n) = n * ordAt L w a := by
   unfold ordAt
   have h : ((a ^ n : Ideles L) : AdeleRing (𝓞 L) L).2 w = ((a : AdeleRing (𝓞 L) L).2 w) ^ n := by
     rw [Units.val_pow_eq_pow_val]
@@ -38,8 +38,8 @@ theorem ordAt_pow' (w : HeightOneSpectrum (𝓞 L)) (a : Ideles L) (n : ℕ) :
   simp only [nsmul_eq_mul]
   ring
 
-theorem ordF_eq_of_classOf (a : Ideles L) (ha : classOf L a = 1) :
-    ∃ k : Lˣ, ∀ w : HeightOneSpectrum (𝓞 L), ordF w k = ordAt L w a := by
+theorem ordF_eq_of_classOf (a : Ideles L) (ha : classOf L a = 1)
+    : ∃ k : Lˣ, ∀ w : HeightOneSpectrum (𝓞 L), ordF w k = ordAt L w a := by
   obtain ⟨k, u, hu, rfl⟩ := (classOf_eq_one_iff L a).1 ha
   refine ⟨k, fun w => ?_⟩
   rw [ordAt_mul, ordAt_diag, (ordAt_eq_zero_iff L w u).2 ((rayUnits_top_iff L u).1 hu w), add_zero]

@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ScalarCorankO
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.SnFam
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt Formalism.L2.SG.RowsConc
+  Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.SnFam
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -25,8 +28,10 @@ theorem famGen : GlobalTheory.SnFam.FamGen := by
     show Gt t = 0
     simp [Gt, h0]
   exact GlobalTheory.T.genericTerms_scalarClasses_form_family D X Y u u'
-    (fun t ht t' ht' _ hs hc => GlobalTheory.T.corank_one_scalar_pair_symmetric D X Y u u' t t' (hG t ht) (hG t' ht') hs hc)
+    (fun t ht t' ht' _ hs hc =>
+      GlobalTheory.T.corank_one_scalar_pair_symmetric D X Y u u' t t' (hG t ht) (hG t' ht') hs hc)
     (fun t ht t' ht' t'' ht'' _ _ hs hc hs' hc' =>
-      GlobalTheory.T.scalarCorankOnePairs_trans D X Y u u' t t' t'' (hG t ht) (hG t' ht') (hG t'' ht'') hs hc hs' hc')
+      GlobalTheory.T.scalarCorankOnePairs_trans D X Y u u' t t' t'' (hG t ht) (hG t' ht')
+        (hG t'' ht'') hs hc hs' hc')
 
 end GlobalTheory.SnFamGenAll

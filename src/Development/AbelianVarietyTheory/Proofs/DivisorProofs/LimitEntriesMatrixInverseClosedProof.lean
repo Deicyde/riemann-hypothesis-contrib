@@ -18,7 +18,8 @@ def limSub (φ : R →+* V) (q : R) : Subring V where
     obtain ⟨a, z, ha⟩ := hs N
     obtain ⟨b, w, hb⟩ := ht N
     refine ⟨a * b, z * t + s * w + φ q ^ N * z * w, ?_⟩
-    rw [map_mul, ha, hb]; ring
+    rw [map_mul, ha, hb]
+    ring
   one_mem' := fun N => ⟨1, 0, by simp⟩
   add_mem' := by
     intro s t hs ht N
@@ -31,9 +32,11 @@ def limSub (φ : R →+* V) (q : R) : Subring V where
     obtain ⟨a, z, ha⟩ := hs N
     exact ⟨-a, -z, by rw [map_neg, ha]; ring⟩
 
-theorem inv_mem_limSub [IsDedekindDomain R] [IsDomain V] [IsDiscreteValuationRing V]
-    (φ : R →+* V) (q : R) (hq0 : φ q ≠ 0) (hqu : ¬ IsUnit (φ q)) (u : Vˣ)
-    (hu : (u : V) ∈ limSub φ q) : ((u⁻¹ : Vˣ) : V) ∈ limSub φ q := by
+theorem inv_mem_limSub
+    [IsDedekindDomain R] [IsDomain V] [IsDiscreteValuationRing V]
+    (φ : R →+* V) (q : R) (hq0 : φ q ≠ 0) (hqu : ¬ IsUnit (φ q))
+    (u : Vˣ) (hu : (u : V) ∈ limSub φ q)
+    : ((u⁻¹ : Vˣ) : V) ∈ limSub φ q := by
   intro N
   obtain ⟨a, z, ha⟩ := hu (N + 1)
   have hqm : φ q ∈ IsLocalRing.maximalIdeal V := (IsLocalRing.mem_maximalIdeal _).2 hqu
@@ -44,7 +47,8 @@ theorem inv_mem_limSub [IsDedekindDomain R] [IsDomain V] [IsDiscreteValuationRin
       Ideal.mul_mem_right _ _ (Ideal.pow_mem_of_mem _ hqm _ (Nat.succ_pos N))
     have h3 : (u : V) ∈ IsLocalRing.maximalIdeal V := by
       have : (u : V) = φ a - φ q ^ (N + 1) * z := by rw [ha]; ring
-      rw [this]; exact Ideal.sub_mem _ h1 h2
+      rw [this]
+      exact Ideal.sub_mem _ h1 h2
     exact ((IsLocalRing.mem_maximalIdeal _).1 h3) u.isUnit
   set w : Ideal R := (IsLocalRing.maximalIdeal V).comap φ with hw
   have hwp : w.IsPrime := Ideal.comap_isPrime φ _
@@ -64,7 +68,9 @@ theorem inv_mem_limSub [IsDedekindDomain R] [IsDomain V] [IsDiscreteValuationRin
   have hab : φ a * φ b = 1 - φ q ^ N * ((e⁻¹ : Vˣ) * c ^ n) := by
     have h1 : a * b = 1 - i ^ n := by
       have : a * y = 1 - i := by linear_combination hyi
-      calc a * b = (a * y) * ∑ j ∈ Finset.range n, i ^ j := by ring
+      calc
+        a * b
+          = (a * y) * ∑ j ∈ Finset.range n, i ^ j := by ring
         _ = 1 - i ^ n := by rw [this, mul_neg_geom_sum]
     have h2 : φ a * φ b = 1 - φ i ^ n := by rw [← map_mul, h1, map_sub, map_one, map_pow]
     rw [h2, he, ← hc, mul_pow]
@@ -87,8 +93,7 @@ theorem GlobalTheory.IsoTriv.limitEntriesMatrixInverseClosed_proof : InvSt := by
     intro b b'
     rw [← hMM, ← RingHom.map_adjugate]
     exact (M₀.adjugate b b').2
-  have hdetS : M.det ∈ S := by
-    rw [← hMM, ← RingHom.map_det]; exact (M₀.det).2
+  have hdetS : M.det ∈ S := by rw [← hMM, ← RingHom.map_det]; exact (M₀.det).2
   set u := hdet.unit with hu
   have huS : (u : V) ∈ S := by rw [hu, IsUnit.unit_spec]; exact hdetS
   have hinv := inv_mem_limSub φ q hq0 hqu u huS

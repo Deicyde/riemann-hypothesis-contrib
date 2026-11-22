@@ -14,16 +14,24 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.FiniteO
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.UU
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.FiniteStabiliser
 
-theorem apply_eq_of_range_subset_affine {K : Type} [Field K] {F Z : Scheme.{0}} [IsIntegral F]
-    (q : F ⟶ Spec (.of K)) [UniversallyClosed q] (h : F ⟶ Z) {W : Z.Opens} (hW : IsAffineOpen W)
-    (hh : ∀ a, h a ∈ W) (a b : F) : h a = h b := by
+theorem apply_eq_of_range_subset_affine
+    {K : Type} [Field K]
+    {F Z : Scheme.{0}} [IsIntegral F]
+    (q : F ⟶ Spec (.of K)) [UniversallyClosed q]
+    (h : F ⟶ Z)
+    {W : Z.Opens} (hW : IsAffineOpen W) (hh : ∀ a, h a ∈ W)
+    (a b : F)
+    : h a = h b := by
   have hr : Set.range h ⊆ Set.range W.ι := by
     rw [Scheme.Opens.range_ι]
     rintro _ ⟨c, rfl⟩
@@ -34,16 +42,18 @@ theorem apply_eq_of_range_subset_affine {K : Type} [Field K] {F Z : Scheme.{0}} 
   have e' : l = F.toSpecΓ ≫ Spec.map l.appTop ≫ W.toScheme.isoSpec.inv := by
     rw [← Scheme.toSpecΓ_naturality_assoc, Scheme.toSpecΓ_isoSpec_inv, Category.comp_id]
   letI := (isField_of_universallyClosed K q).toField
-  have hab : F.toSpecΓ a = F.toSpecΓ b :=
-    Subsingleton.elim (α := PrimeSpectrum Γ(F, ⊤)) _ _
+  have hab : F.toSpecΓ a = F.toSpecΓ b := Subsingleton.elim (α := PrimeSpectrum Γ(F, ⊤)) _ _
   rw [← e, e']
   simp only [Scheme.Hom.comp_apply, hab]
 
-theorem slice_eq {K : Type} [Field K] [IsAlgClosed K] {F B Z : Over (Spec (CommRingCat.of K))}
-    [IsIntegral F.left] [UniversallyClosed F.hom] [IsIntegral B.left] [LocallyOfFiniteType B.hom]
-    [IsSeparated Z.hom] [LocallyOfFiniteType Z.hom] (g : F ⊗ B ⟶ Z) (b : 𝟙_ _ ⟶ B) (z : Z.left)
-    (hz : ∀ a, (lift (𝟙 F) (toUnit F ≫ b) ≫ g).left a = z) (f f' : 𝟙_ _ ⟶ F) :
-    lift (toUnit B ≫ f) (𝟙 B) ≫ g = lift (toUnit B ≫ f') (𝟙 B) ≫ g := by
+theorem slice_eq
+    {K : Type} [Field K] [IsAlgClosed K]
+    {F B Z : Over (Spec (CommRingCat.of K))} [IsIntegral F.left] [UniversallyClosed F.hom]
+    [IsIntegral B.left] [LocallyOfFiniteType B.hom] [IsSeparated Z.hom] [LocallyOfFiniteType Z.hom]
+    (g : F ⊗ B ⟶ Z) (b : 𝟙_ _ ⟶ B) (z : Z.left)
+    (hz : ∀ a, (lift (𝟙 F) (toUnit F ≫ b) ≫ g).left a = z)
+    (f f' : 𝟙_ _ ⟶ F)
+    : lift (toUnit B ≫ f) (𝟙 B) ≫ g = lift (toUnit B ≫ f') (𝟙 B) ≫ g := by
   have huc : UniversallyClosed (snd F B).left := by
     change UniversallyClosed (pullback.snd F.hom B.hom); infer_instance
   let j : (𝟙_ _ ⟶ B) → (F ⟶ F ⊗ B) := fun x ↦ lift (𝟙 F) (toUnit F ≫ x)
@@ -65,7 +75,9 @@ theorem slice_eq {K : Type} [Field K] [IsAlgClosed K] {F B Z : Over (Spec (CommR
   have hlft : LocallyOfFiniteType ((lift (toUnit B ≫ f) (𝟙 B) ≫ g).left ≫ Z.hom) := by
     rw [Over.w]; infer_instance
   refine Over.OverMorphism.ext (ext_of_apply_eq (K := K) Z.hom _ hcl.isOpen_compl.isLocallyClosed
-    (hcl.isOpen_compl.dense ⟨b.left pt, ?_⟩) (fun x hxV hx ↦ ?_) (by rw [Over.w, Over.w]))
+    (hcl.isOpen_compl.dense ⟨b.left pt, ?_⟩)
+    (fun x hxV hx ↦ ?_)
+    (by rw [Over.w, Over.w]))
   · rintro ⟨w, hw, hwb⟩
     obtain ⟨a, rfl, -⟩ := Scheme.exists_preimage_of_isPullback (hpb b) w pt hwb
     apply hw
@@ -82,8 +94,8 @@ theorem slice_eq {K : Type} [Field K] [IsAlgClosed K] {F B Z : Over (Spec (CommR
       · rw [Over.comp_left, Scheme.Hom.comp_apply] at hn
         exact hn
       · rw [← Scheme.Hom.comp_apply, (hpb p).w, Scheme.Hom.comp_apply, hp]
-    have key (u : 𝟙_ _ ⟶ F) :
-        (lift (toUnit B ≫ u) (𝟙 B) ≫ g).left x = (j p ≫ g).left (u.left pt) := by
+    have key (u : 𝟙_ _ ⟶ F)
+        : (lift (toUnit B ≫ u) (𝟙 B) ≫ g).left x = (j p ≫ g).left (u.left pt) := by
       have e : p ≫ lift (toUnit B ≫ u) (𝟙 B) ≫ g = u ≫ j p ≫ g := by
         rw [← Category.assoc, ← Category.assoc]
         congr 1
@@ -95,12 +107,14 @@ theorem slice_eq {K : Type} [Field K] [IsAlgClosed K] {F B Z : Over (Spec (CommR
     rw [key, key]
     exact apply_eq_of_range_subset_affine (K := K) F.hom _ hW hin _ _
 
-theorem finite_closedPoints_of_contracted {K : Type} [Field K] [IsAlgClosed K]
-    {B Z : Over (Spec (CommRingCat.of K))} [GrpObj B] [IsIntegral B.left] [IsProper B.hom]
-    [IsSeparated Z.hom] [LocallyOfFiniteType Z.hom] (φ : B ⟶ Z)
-    (hφ : {x : 𝟙_ _ ⟶ B | ((toUnit B ≫ x) * 𝟙 B) ≫ φ = φ}.Finite)
-    (S : TopologicalSpace.Closeds B.left) (hS : IsIrreducible (S : Set B.left)) (z : Z.left)
-    (hz : ∀ y ∈ S, φ.left y = z) : ((S : Set B.left) ∩ closedPoints B.left).Finite := by
+theorem finite_closedPoints_of_contracted
+    {K : Type} [Field K] [IsAlgClosed K]
+    {B Z : Over (Spec (CommRingCat.of K))}
+    [GrpObj B] [IsIntegral B.left] [IsProper B.hom] [IsSeparated Z.hom] [LocallyOfFiniteType Z.hom]
+    (φ : B ⟶ Z) (hφ : {x : 𝟙_ _ ⟶ B | ((toUnit B ≫ x) * 𝟙 B) ≫ φ = φ}.Finite)
+    (S : TopologicalSpace.Closeds B.left) (hS : IsIrreducible (S : Set B.left))
+    (z : Z.left) (hz : ∀ y ∈ S, φ.left y = z)
+    : ((S : Set B.left) ∩ closedPoints B.left).Finite := by
   let I := Scheme.IdealSheafData.vanishingIdeal S
   have hrange : Set.range I.subschemeι = S := by
     rw [Scheme.IdealSheafData.range_subschemeι]
@@ -116,15 +130,18 @@ theorem finite_closedPoints_of_contracted {K : Type} [Field K] [IsAlgClosed K]
   have : IsIntegral F.left := isIntegral_of_irreducibleSpace_of_isReduced _
   have : IsProper F.hom := by change IsProper (I.subschemeι ≫ B.hom); infer_instance
   let pt : Spec (CommRingCat.of K) := IsLocalRing.closedPoint K
-  have hpt (y : B.left) (hy : y ∈ (S : Set B.left) ∩ closedPoints B.left) :
-      ∃ u : 𝟙_ _ ⟶ F, (u ≫ i).left pt = y := by
+  have hpt (y : B.left) (hy : y ∈ (S : Set B.left) ∩ closedPoints B.left)
+      : ∃ u : 𝟙_ _ ⟶ F, (u ≫ i).left pt = y := by
     obtain ⟨a, rfl⟩ : y ∈ Set.range I.subschemeι := hrange ▸ hy.1
     have ha : IsClosed ({a} : Set F.left) := by
       refine hemb.isClosed_iff_image_isClosed.mpr ?_
       rw [Set.image_singleton]
       exact hy.2
-    refine ⟨Over.homMk (pointOfClosedPoint (K := K) F.hom a ha)
-      (pointOfClosedPoint_comp (K := K) F.hom a ha), ?_⟩
+    refine ⟨
+      Over.homMk (pointOfClosedPoint (K := K) F.hom a ha)
+        (pointOfClosedPoint_comp (K := K) F.hom a ha),
+      ?_
+    ⟩
     rw [Over.comp_left, Scheme.Hom.comp_apply]
     exact congrArg I.subschemeι (pointOfClosedPoint_apply (K := K) F.hom a ha pt)
   rcases ((S : Set B.left) ∩ closedPoints B.left).eq_empty_or_nonempty with h | ⟨y₀, hy₀⟩
@@ -133,20 +150,29 @@ theorem finite_closedPoints_of_contracted {K : Type} [Field K] [IsAlgClosed K]
   refine (hφ.image fun s ↦ (s * (u₀ ≫ i)).left pt).subset fun y hy ↦ ?_
   obtain ⟨u, rfl⟩ := hpt y hy
   refine ⟨(u ≫ i) * (u₀ ≫ i)⁻¹, ?_, by simp only [inv_mul_cancel_right]⟩
-  have key := slice_eq (((fst F B ≫ i) * snd F B) ≫ φ) (1 : 𝟙_ _ ⟶ B) z (fun a ↦ by
-    rw [← Category.assoc, MonObj.comp_mul, lift_fst_assoc, lift_snd, MonObj.comp_one,
-      _root_.mul_one, Category.id_comp, Over.comp_left, Scheme.Hom.comp_apply]
-    exact hz _ (hrange.le ⟨a, rfl⟩)) u u₀
+  have key :=
+    slice_eq (((fst F B ≫ i) * snd F B) ≫ φ) (1 : 𝟙_ _ ⟶ B) z
+      (fun a ↦ by
+        rw [← Category.assoc, MonObj.comp_mul, lift_fst_assoc, lift_snd, MonObj.comp_one,
+          _root_.mul_one, Category.id_comp, Over.comp_left, Scheme.Hom.comp_apply]
+        exact hz _ (hrange.le ⟨a, rfl⟩))
+      u u₀
   have key' := congrArg (fun t ↦ ((toUnit B ≫ u₀ ≫ i)⁻¹ * 𝟙 B) ≫ t) key
   have hu (t : B ⟶ B) : t ≫ toUnit B = toUnit B := toUnit_unique _ _
   simp only [← Category.assoc, MonObj.comp_mul, lift_fst, lift_snd, hu, Category.comp_id,
-    mul_inv_cancel_left, Category.id_comp] at key'
+      mul_inv_cancel_left, Category.id_comp]
+    at key'
   change (toUnit B ≫ ((u ≫ i) * (u₀ ≫ i)⁻¹) * 𝟙 B) ≫ φ = φ
   simp only [MonObj.comp_mul, GrpObj.comp_inv, _root_.mul_assoc, ← Category.assoc]
   exact key'
 
-theorem locallyQuasiFinite_of_finite_stabiliser :
-    ∀ (K : Type) [Field K] [IsAlgClosed K] (B : Over (Spec (CommRingCat.of K))) [GrpObj B] [IsCommMonObj B], IsAbelianScheme B → ∀ (Z : Over (Spec (CommRingCat.of K))) [IsSeparated Z.hom] [LocallyOfFiniteType Z.hom] (φ : B ⟶ Z), {x : 𝟙_ _ ⟶ B | ((toUnit B ≫ x) * 𝟙 B) ≫ φ = φ}.Finite → LocallyQuasiFinite φ.left := by
+theorem locallyQuasiFinite_of_finite_stabiliser
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (B : Over (Spec (CommRingCat.of K))) [GrpObj B]
+        [IsCommMonObj B],
+      IsAbelianScheme B
+        → ∀ (Z : Over (Spec (CommRingCat.of K))) [IsSeparated Z.hom] [LocallyOfFiniteType Z.hom]
+            (φ : B ⟶ Z),
+          {x : 𝟙_ _ ⟶ B | ((toUnit B ≫ x) * 𝟙 B) ≫ φ = φ}.Finite → LocallyQuasiFinite φ.left := by
   intro K _ _ B _ _ hB Z _ _ φ hφ
   have := hB.proper
   have := hB.smooth

@@ -37,7 +37,8 @@ theorem thetaLogIsSubst : ThetaLogIsSubst := by
     rcases d with _ | d
     · simp [hμ]
     · simp [map_pow, hz0 x]
-  have ha : MvPowerSeries.HasSubst (fun x : Bool × EV ν r0 r1 => MvPowerSeries.C ϖ * sSub om oms μ x) :=
+  have ha
+      : MvPowerSeries.HasSubst (fun x : Bool × EV ν r0 r1 => MvPowerSeries.C ϖ * sSub om oms μ x) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun x => by simp [hs x])
   have hb : MvPowerSeries.HasSubst (fun y : ZV ν r0 r1 =>
       MvPowerSeries.C ϖ⁻¹ * (MvPowerSeries.X y : MvPowerSeries (ZV ν r0 r1) K)) :=

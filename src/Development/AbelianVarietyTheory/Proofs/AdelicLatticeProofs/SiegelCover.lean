@@ -173,22 +173,25 @@ private lemma exists_det_one_of_det_neg_one {ι : Type} [Fintype ι] [DecidableE
           rw [← Matrix.mul_assoc (diagonal a) D (n * D), ← hcomm]
           simp only [Matrix.mul_assoc]
 
-
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
-theorem _root_.GlobalTheory.ClassFin.siegel_cover (ι : Type) [Fintype ι] [DecidableEq ι] [LinearOrder ι] :
-    ∃ C : ℝ, ∀ g : Matrix ι ι ℝ, g.det = 1 → ∃ γ : Matrix ι ι ℤ, γ.det = 1 ∧ ∃ k a n, _root_.GlobalTheory.ClassFin.IsSiegel C k a n ∧
-      g * γ.map (Int.cast : ℤ → ℝ) = k * diagonal a * n := by
+theorem _root_.GlobalTheory.ClassFin.siegel_cover
+    (ι : Type) [Fintype ι] [DecidableEq ι] [LinearOrder ι]
+    : ∃ C : ℝ, ∀ g : Matrix ι ι ℝ,
+      g.det = 1
+        → ∃ γ : Matrix ι ι ℤ,
+          γ.det = 1
+            ∧ ∃ k a n,
+              _root_.GlobalTheory.ClassFin.IsSiegel C k a n
+                ∧ g * γ.map (Int.cast : ℤ → ℝ) = k * diagonal a * n := by
   refine ⟨2 ^ Fintype.card ι, fun g hg => ?_⟩
   have hC : (1 : ℝ) ≤ 2 ^ Fintype.card ι := one_le_pow₀ (by norm_num)
   obtain ⟨γ, k, a, n, hγ, hk, ha, hn1, hn0, hnb, hlt, hdec⟩ :=
     exists_reduced_iwasawa_decomposition g (by rw [hg]; norm_num)
   rcases hγ with hγ | hγ
-  · exact ⟨γ, hγ, k, a, n,
-      isSiegel_of_reduced hC hg hγ hk ha hn1 hn0 hnb hlt hdec, hdec⟩
+  · exact ⟨γ, hγ, k, a, n, isSiegel_of_reduced hC hg hγ hk ha hn1 hn0 hnb hlt hdec, hdec⟩
   · obtain ⟨γ', k', n', hγ', hk', hn1', hn0', hnb', hdec'⟩ :=
       exists_det_one_of_det_neg_one hγ hk hn1 hn0 hnb hdec
-    exact ⟨γ', hγ', k', a, n',
-      isSiegel_of_reduced hC hg hγ' hk' ha hn1' hn0' hnb' hlt hdec', hdec'⟩
+    exact ⟨γ', hγ', k', a, n', isSiegel_of_reduced hC hg hγ' hk' ha hn1' hn0' hnb' hlt hdec', hdec'⟩
 
 end GlobalTheory.ClassFin

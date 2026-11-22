@@ -17,8 +17,8 @@ section Unit
 
 variable {V T U : Scheme.{u}}
 
-noncomputable def pullbackUnitApp (g : T ⟶ U) (N : U.Modules) (O : U.Opens) :
-    Γ(N, O) →+ Γ((Scheme.Modules.pullback g).obj N, g ⁻¹ᵁ O) :=
+noncomputable def pullbackUnitApp (g : T ⟶ U) (N : U.Modules) (O : U.Opens)
+    : Γ(N, O) →+ Γ((Scheme.Modules.pullback g).obj N, g ⁻¹ᵁ O) :=
   (((Scheme.Modules.pullbackPushforwardAdjunction g).unit.app N).app O).hom
 
 lemma pullbackUnitApp_res (g : T ⟶ U) (N : U.Modules) {O O' : U.Opens} (i : O' ⟶ O)

@@ -12,11 +12,15 @@ def PtW {p : ℕ} [Fact p.Prime] {σ : Type} (a : MvPowerSeries σ ℂ_[p]) : Pr
   IntegralW a ∧ MvPowerSeries.constantCoeff a = 0
 
 def AddPtW : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p), g.Ok → IntegralW (g.add (Xv 0) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p]) →
-    ∀ (σ : Type) (a b : MvPowerSeries σ ℂ_[p]), PtW a → PtW b → PtW (g.add a b)
+  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p),
+    g.Ok → IntegralW (g.add (Xv 0) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p])
+      → ∀ (σ : Type) (a b : MvPowerSeries σ ℂ_[p]), PtW a → PtW b → PtW (g.add a b)
 
 def MulPtW : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p), g.Ok → ∀ c : ℂ_[p], IntegralW (g.mulBy c (Xv ()) : MvPowerSeries Unit ℂ_[p]) →
-    ∀ (σ : Type) (a : MvPowerSeries σ ℂ_[p]), PtW a → PtW (g.mulBy c a)
+  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p),
+    g.Ok
+      → ∀ c : ℂ_[p],
+        IntegralW (g.mulBy c (Xv ()) : MvPowerSeries Unit ℂ_[p])
+          → ∀ (σ : Type) (a : MvPowerSeries σ ℂ_[p]), PtW a → PtW (g.mulBy c a)
 
 end Formalism.MainNotions.Ext

@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_lprim :
-    ∀ {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (k : ℕ), 1 ≤ k → χ.LFunction (1 - k) = -genB k χ / k ∧ Lprim χ (1 - k) = -Bprim k χ / k := by
+theorem UpperTheory.V.Bern.b_lprim
+    : ∀ {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (k : ℕ),
+      1 ≤ k → χ.LFunction (1 - k) = - genB k χ / k ∧ Lprim χ (1 - k) = - Bprim k χ / k := by
   intro N _ χ k hk
   refine ⟨UpperTheory.V.Bern.b_lval χ k hk, ?_⟩
   unfold UpperTheory.V.Bern.Lprim UpperTheory.V.Bern.Bprim

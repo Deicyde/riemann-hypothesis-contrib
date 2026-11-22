@@ -13,8 +13,7 @@ open LaurentPolynomial
 def lpScaleF (c : ℚˣ) : Multiplicative ℤ →* LaurentPolynomial ℚ where
   toFun m := ((c ^ m.toAdd : ℚˣ) : ℚ) • T m.toAdd
   map_one' := by simp
-  map_mul' a b := by
-    rw [toAdd_mul, zpow_add, Units.val_mul, T_add, smul_mul_smul_comm]
+  map_mul' a b := by rw [toAdd_mul, zpow_add, Units.val_mul, T_add, smul_mul_smul_comm]
 
 @[simp] lemma lpScaleF_apply (c : ℚˣ) (m : Multiplicative ℤ) :
     lpScaleF c m = ((c ^ m.toAdd : ℚˣ) : ℚ) • T m.toAdd := rfl
@@ -45,12 +44,14 @@ lemma lpScale_coeff (c : ℚˣ) (f : LaurentPolynomial ℚ) (m : ℤ) :
 
 def lpScaleE (c : ℚˣ) : LaurentPolynomial ℚ ≃ₐ[ℚ] LaurentPolynomial ℚ :=
   AlgEquiv.ofAlgHom (lpScale c) (lpScale c⁻¹)
-    (AlgHom.ext fun f => LaurentPolynomial.ext fun m => by
-      simp [lpScale_coeff, ← mul_assoc]
-      rw [mul_inv_cancel₀ (zpow_ne_zero _ c.ne_zero), one_mul])
-    (AlgHom.ext fun f => LaurentPolynomial.ext fun m => by
-      simp [lpScale_coeff, ← mul_assoc]
-      rw [inv_mul_cancel₀ (zpow_ne_zero _ c.ne_zero), one_mul])
+    (AlgHom.ext fun f =>
+      LaurentPolynomial.ext fun m => by
+        simp [lpScale_coeff, ← mul_assoc]
+        rw [mul_inv_cancel₀ (zpow_ne_zero _ c.ne_zero), one_mul])
+    (AlgHom.ext fun f =>
+      LaurentPolynomial.ext fun m => by
+        simp [lpScale_coeff, ← mul_assoc]
+        rw [inv_mul_cancel₀ (zpow_ne_zero _ c.ne_zero), one_mul])
 
 lemma lpScaleE_coeff (c : ℚˣ) (f : LaurentPolynomial ℚ) (m : ℤ) :
     (lpScaleE c f).coeff m = ((c ^ m : ℚˣ) : ℚ) * f.coeff m := by
@@ -60,8 +61,10 @@ lemma lpScaleE_coeff (c : ℚˣ) (f : LaurentPolynomial ℚ) (m : ℤ) :
 def lpScaleHom : ℚˣ →* (LaurentPolynomial ℚ ≃ₐ[ℚ] LaurentPolynomial ℚ) where
   toFun := lpScaleE
   map_one' := AlgEquiv.ext fun f => LaurentPolynomial.ext fun m => by simp [lpScaleE_coeff]
-  map_mul' c d := AlgEquiv.ext fun f => LaurentPolynomial.ext fun m => by
-    simp [lpScaleE_coeff, AlgEquiv.mul_apply, mul_zpow, mul_assoc]
+  map_mul' c d :=
+    AlgEquiv.ext fun f =>
+      LaurentPolynomial.ext fun m => by
+        simp [lpScaleE_coeff, AlgEquiv.mul_apply, mul_zpow, mul_assoc]
 
 def lpTwo : ℚˣ := Units.mk0 2 (by norm_num)
 
@@ -107,7 +110,8 @@ lemma lpFil_mul (a b : ℤ) (x y : LaurentPolynomial ℚ) (hx : x ∈ lpFil a) (
 theorem existsPeriodRingData_holds : ExPD := by
   let χ : Multiplicative ℤ →* ℚˣ := zpowersHom ℚˣ lpTwo
   let act : Multiplicative ℤ →* (LaurentPolynomial ℚ ≃ₐ[ℚ] LaurentPolynomial ℚ) := lpScaleHom.comp χ
-  have hact : ∀ g (f : LaurentPolynomial ℚ) m, (act g f).coeff m = ((χ g ^ m : ℚˣ) : ℚ) * f.coeff m := by
+  have hact
+      : ∀ g (f : LaurentPolynomial ℚ) m, (act g f).coeff m = ((χ g ^ m : ℚˣ) : ℚ) * f.coeff m := by
     intro g f m
     exact lpScaleE_coeff (χ g) f m
   have hone : act (Multiplicative.ofAdd 1) = lpScaleE lpTwo := by
@@ -130,10 +134,11 @@ theorem existsPeriodRingData_holds : ExPD := by
     φ := (lpScaleE lpTwo).toAlgHom
     φ_inj := (lpScaleE lpTwo).injective
     φ_K₀ := fun c => (lpScaleE lpTwo).toAlgHom.commutes c
-    φ_comm := fun g b => LaurentPolynomial.ext fun m => by
-      change (lpScaleE lpTwo (act g b)).coeff m = (act g (lpScaleE lpTwo b)).coeff m
-      rw [lpScaleE_coeff, hact, hact, lpScaleE_coeff]
-      ring
+    φ_comm := fun g b =>
+      LaurentPolynomial.ext fun m => by
+        change (lpScaleE lpTwo (act g b)).coeff m = (act g (lpScaleE lpTwo b)).coeff m
+        rw [lpScaleE_coeff, hact, hact, lpScaleE_coeff]
+        ring
     actdR := act
     invdR := hfix
     ι := AlgHom.id ℚ _
@@ -150,31 +155,35 @@ theorem existsPeriodRingData_holds : ExPD := by
       have h1 := Finset.single_le_sum (f := fun i : ℤ => |i|) (fun i _ => abs_nonneg i) hm'
       have h2 := neg_abs_le m
       linarith
-    Fil_sep := fun x hx => LaurentPolynomial.ext fun m => by
-      rw [hx (m + 1) m (by omega)]
-      rfl
+    Fil_sep := fun x hx =>
+      LaurentPolynomial.ext fun m => by
+        rw [hx (m + 1) m (by omega)]
+        rfl
     Fil_G := fun g a x hx m hm => by rw [hact, hx m hm, mul_zero]
     χ := χ
     t := T 1
     t_unit := isUnit_T 1
-    t_act := fun g => LaurentPolynomial.ext fun m => by
-      rw [hact, AddMonoidAlgebra.coeff_smul_apply, T_apply, smul_eq_mul]
-      by_cases h : (1 : ℤ) = m
-      · subst h
-        simp
-      · simp [h]
-    t_φ := LaurentPolynomial.ext fun m => by
-      change (lpScaleE lpTwo (T 1)).coeff m = _
-      rw [lpScaleE_coeff, AddMonoidAlgebra.coeff_smul_apply, T_apply, smul_eq_mul, lpTwo_zpow]
-      by_cases h : (1 : ℤ) = m
-      · subst h
-        norm_num
-      · simp [h]
+    t_act := fun g =>
+      LaurentPolynomial.ext fun m => by
+        rw [hact, AddMonoidAlgebra.coeff_smul_apply, T_apply, smul_eq_mul]
+        by_cases h : (1 : ℤ) = m
+        · subst h
+          simp
+        · simp [h]
+    t_φ :=
+      LaurentPolynomial.ext fun m => by
+        change (lpScaleE lpTwo (T 1)).coeff m = _
+        rw [lpScaleE_coeff, AddMonoidAlgebra.coeff_smul_apply, T_apply, smul_eq_mul, lpTwo_zpow]
+        by_cases h : (1 : ℤ) = m
+        · subst h
+          norm_num
+        · simp [h]
     mem_filtration_one := fun m hm => by rw [AlgHom.id_apply, T_apply, if_neg (by omega)]
     not_mem_filtration_two := fun h => by
       have h1 := h 1 (by norm_num)
       rw [AlgHom.id_apply, T_apply, if_pos rfl] at h1
       exact one_ne_zero h1
-    fund := fun b hb _ => ⟨b.coeff 0, lpTwo_fix b hb⟩ }⟩
+    fund := fun b hb _ => ⟨b.coeff 0, lpTwo_fix b hb⟩
+  }⟩
 
 end Formalism.WeaklyAdmissibleFiltrations

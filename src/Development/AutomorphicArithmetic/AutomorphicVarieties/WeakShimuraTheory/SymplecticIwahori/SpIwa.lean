@@ -6,10 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOfValI
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Pp
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Ws.Pp
 
-theorem UpperTheory.V.Ws.Pp.spIwa :
-    ∀ {F : Type} [Field F] (V : ValuationSubring F) (h : M4 F), IsGSp 1 h → ∃ k : M4 V, IsGSp 1 k ∧ IsUp (adj (k.map V.subtype) * h) := by
+theorem UpperTheory.V.Ws.Pp.spIwa
+    : ∀ {F : Type} [Field F] (V : ValuationSubring F) (h : M4 F),
+      IsGSp 1 h → ∃ k : M4 V, IsGSp 1 k ∧ IsUp (adj (k.map V.subtype) * h) := by
   intro F _ V h hh
   let f : V →+* F := V.subtype
   let hU : GL (Fin 4) F := ⟨h, adj h, mul_adj_self hh, adj_mul_self hh⟩
@@ -17,8 +19,10 @@ theorem UpperTheory.V.Ws.Pp.spIwa :
   have hbU : IsUp (b : M4 F) := (isUp_iff _).mpr hb
   have hbi : IsUp ((b⁻¹ : GL (Fin 4) F) : M4 F) := IsUp_inv hbU
   have hKmap : (k0 : M4 V).map f = h * ((b⁻¹ : GL (Fin 4) F) : M4 F) := by
-    have h1 : (hU : M4 F) =
-        ((Matrix.GeneralLinearGroup.map (algebraMap V F) k0 : GL (Fin 4) F) : M4 F) * (b : M4 F) := by
+    have h1
+        : (hU : M4 F)
+          = ((Matrix.GeneralLinearGroup.map (algebraMap V F) k0 : GL (Fin 4) F) : M4 F)
+            * (b : M4 F) := by
       rw [hk]
       rfl
     have h2 : (hU : M4 F) = h := rfl
@@ -34,8 +38,8 @@ theorem UpperTheory.V.Ws.Pp.spIwa :
     simpa [f] using hz
   have hQ : IsUp (adj (k0 : M4 V) * (k0 : M4 V)) := by
     apply upMap
-    rw [Matrix.map_mul, ← hmapadj, hKmap, (grp F).1, Matrix.mul_assoc,
-      ← Matrix.mul_assoc (adj h), adj_mul_self hh, Matrix.one_mul]
+    rw [Matrix.map_mul, ← hmapadj, hKmap, (grp F).1, Matrix.mul_assoc, ← Matrix.mul_assoc (adj h),
+      adj_mul_self hh, Matrix.one_mul]
     exact IsUp_mul (IsUp_adj hbi) hbi
   obtain ⟨t, ht, hkt⟩ := gram k0 hQ
   refine ⟨(k0 : M4 V) * (t : M4 V), hkt, ?_⟩

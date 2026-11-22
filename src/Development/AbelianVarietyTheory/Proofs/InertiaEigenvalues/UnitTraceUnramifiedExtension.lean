@@ -17,23 +17,27 @@ variable {K K' : UQ} {d : ℕ} {φ : K.E →+* K'.E}
 
 def intMap (hU : IsUnrExt K K' d φ) : K.O →+* K'.O where
   toFun a := Classical.choose (exists_int_image hU a)
-  map_one' := IsFractionRing.injective K'.O K'.E (by
-    rw [Classical.choose_spec (exists_int_image hU 1)]; simp)
-  map_mul' a b := IsFractionRing.injective K'.O K'.E (by
-    have h1 := Classical.choose_spec (exists_int_image hU (a * b))
-    have h2 := Classical.choose_spec (exists_int_image hU a)
-    have h3 := Classical.choose_spec (exists_int_image hU b)
-    rw [h1]; simp only [map_mul, h2, h3])
-  map_zero' := IsFractionRing.injective K'.O K'.E (by
-    rw [Classical.choose_spec (exists_int_image hU 0)]; simp)
-  map_add' a b := IsFractionRing.injective K'.O K'.E (by
-    have h1 := Classical.choose_spec (exists_int_image hU (a + b))
-    have h2 := Classical.choose_spec (exists_int_image hU a)
-    have h3 := Classical.choose_spec (exists_int_image hU b)
-    rw [h1]; simp only [map_add (f := _), h2, h3])
+  map_one' :=
+    IsFractionRing.injective K'.O K'.E (by rw [Classical.choose_spec (exists_int_image hU 1)]; simp)
+  map_mul' a b :=
+    IsFractionRing.injective K'.O K'.E (by
+      have h1 := Classical.choose_spec (exists_int_image hU (a * b))
+      have h2 := Classical.choose_spec (exists_int_image hU a)
+      have h3 := Classical.choose_spec (exists_int_image hU b)
+      rw [h1]
+      simp only [map_mul, h2, h3])
+  map_zero' :=
+    IsFractionRing.injective K'.O K'.E (by rw [Classical.choose_spec (exists_int_image hU 0)]; simp)
+  map_add' a b :=
+    IsFractionRing.injective K'.O K'.E (by
+      have h1 := Classical.choose_spec (exists_int_image hU (a + b))
+      have h2 := Classical.choose_spec (exists_int_image hU a)
+      have h3 := Classical.choose_spec (exists_int_image hU b)
+      rw [h1]
+      simp only [map_add (f := _), h2, h3])
 
-theorem intMap_spec (hU : IsUnrExt K K' d φ) (a : K.O) :
-    algebraMap K'.O K'.E (intMap hU a) = φ (algebraMap K.O K.E a) :=
+theorem intMap_spec (hU : IsUnrExt K K' d φ) (a : K.O)
+    : algebraMap K'.O K'.E (intMap hU a) = φ (algebraMap K.O K.E a) :=
   Classical.choose_spec (exists_int_image hU a)
 
 theorem intMap_injective (hU : IsUnrExt K K' d φ) : Function.Injective (intMap hU) := by
@@ -42,16 +46,20 @@ theorem intMap_injective (hU : IsUnrExt K K' d φ) : Function.Injective (intMap 
   apply φ.injective
   rw [← intMap_spec hU, ← intMap_spec hU, h]
 
-theorem val_mul_ne (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0) :
-    val K.O (x * y) = val K.O x + val K.O y := by
+theorem val_mul_ne (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0)
+    : val K.O (x * y) = val K.O x + val K.O y := by
   unfold val
-  rw [map_mul, WithZero.log_mul (by simpa using hx) (by simpa using hy)]; ring
+  rw [map_mul, WithZero.log_mul (by simpa using hx) (by simpa using hy)]
+  ring
 
-theorem val_irreducible (K : UQ) {ϖ : K.O} (h : Irreducible ϖ) : val K.O (algebraMap K.O K.E ϖ) = 1 := by
+theorem val_irreducible (K : UQ) {ϖ : K.O} (h : Irreducible ϖ)
+    : val K.O (algebraMap K.O K.E ϖ) = 1 := by
   unfold val
   rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
     IsDedekindDomain.HeightOneSpectrum.intValuation_singleton _ h.ne_zero
-      ((IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 h), WithZero.log_exp]; rfl
+      ((IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 h),
+    WithZero.log_exp]
+  rfl
 
 theorem val_pow_ne (K : UQ) {x : K.E} (hx : x ≠ 0) (n : ℕ) : val K.O (x ^ n) = n * val K.O x := by
   induction n with
@@ -69,22 +77,23 @@ theorem val_isUnit (K : UQ) {u : K.O} (hu : IsUnit u) : val K.O (algebraMap K.O 
   have h5 : val K.O (1 : K.E) = 0 := by simp [val]
   omega
 
-theorem irreducible_of_val_one (K : UQ) {x : K.O} (hx : val K.O (algebraMap K.O K.E x) = 1) :
-    Irreducible x := by
+theorem irreducible_of_val_one (K : UQ) {x : K.O} (hx : val K.O (algebraMap K.O K.E x) = 1)
+    : Irreducible x := by
   have hx0 : x ≠ 0 := by rintro rfl; simp [val] at hx
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible K.O
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hx0 hϖ
   have hϖ0 : algebraMap K.O K.E ϖ ≠ 0 := by simpa using hϖ.ne_zero
   have hu0 : algebraMap K.O K.E (u : K.O) ≠ 0 := by simp
   rw [map_mul, map_pow, val_mul_ne K hu0 (pow_ne_zero _ hϖ0), val_pow_ne K hϖ0,
-    val_isUnit K u.isUnit, val_irreducible K hϖ] at hx
+      val_isUnit K u.isUnit, val_irreducible K hϖ]
+    at hx
   have hn : n = 1 := by omega
   subst hn
   rw [pow_one]
   exact (irreducible_units_mul u).2 hϖ
 
-theorem map_maximalIdeal (hU : IsUnrExt K K' d φ) :
-    Ideal.map (intMap hU) (IsLocalRing.maximalIdeal K.O) = IsLocalRing.maximalIdeal K'.O := by
+theorem map_maximalIdeal (hU : IsUnrExt K K' d φ)
+    : Ideal.map (intMap hU) (IsLocalRing.maximalIdeal K.O) = IsLocalRing.maximalIdeal K'.O := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible K.O
   have h1 := (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 hϖ
   have h2 : Irreducible (intMap hU ϖ) :=
@@ -92,13 +101,15 @@ theorem map_maximalIdeal (hU : IsUnrExt K K' d φ) :
   rw [h1, Ideal.map_span, Set.image_singleton,
     (IsDiscreteValuationRing.irreducible_iff_uniformizer _).1 h2]
 
-
 open scoped nonZeroDivisors in
-theorem exists_trace_unit_of_span (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ)
+theorem exists_trace_unit_of_span
+    (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ)
     (hB : ∃ u : Fin d → K'.O, ∀ y : K'.O, ∃ a : Fin d → K.O,
-      algebraMap K'.O K'.E y = ∑ i, φ (algebraMap K.O K.E (a i)) * algebraMap K'.O K'.E (u i)) :
-    ∃ y : K'.O, ∃ a : K.O, IsUnit a ∧
-      @Algebra.trace K.E K'.E _ _ φ.toAlgebra (algebraMap K'.O K'.E y) = algebraMap K.O K.E a := by
+      algebraMap K'.O K'.E y = ∑ i, φ (algebraMap K.O K.E (a i)) * algebraMap K'.O K'.E (u i))
+    : ∃ y : K'.O, ∃ a : K.O,
+      IsUnit a
+        ∧ @Algebra.trace K.E K'.E _ _ φ.toAlgebra (algebraMap K'.O K'.E y)
+          = algebraMap K.O K.E a := by
   letI : Algebra K.E K'.E := φ.toAlgebra
   letI : Algebra K.O K'.O := (intMap hU).toAlgebra
   letI : Algebra K.O K'.E := (φ.comp (algebraMap K.O K.E)).toAlgebra
@@ -149,8 +160,10 @@ theorem exists_trace_unit_of_span (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (h
     · intro x y h
       exact ⟨1, by rw [IsFractionRing.injective K'.O K'.E h]⟩
 
-  have hpS : Ideal.map (algebraMap K.O K'.O) (IsLocalRing.maximalIdeal K.O) =
-      IsLocalRing.maximalIdeal K'.O := map_maximalIdeal hU
+  have hpS
+      : Ideal.map (algebraMap K.O K'.O) (IsLocalRing.maximalIdeal K.O)
+        = IsLocalRing.maximalIdeal K'.O :=
+    map_maximalIdeal hU
   haveI hmax : (Ideal.map (algebraMap K.O K'.O) (IsLocalRing.maximalIdeal K.O)).IsMaximal := by
     rw [hpS]; infer_instance
   letI : Field (K.O ⧸ IsLocalRing.maximalIdeal K.O) := Ideal.Quotient.field _
@@ -164,8 +177,9 @@ theorem exists_trace_unit_of_span (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (h
       (K'.O ⧸ Ideal.map (algebraMap K.O K'.O) (IsLocalRing.maximalIdeal K.O)) := inferInstance
   haveI : Algebra.IsSeparable (K.O ⧸ IsLocalRing.maximalIdeal K.O)
       (K'.O ⧸ Ideal.map (algebraMap K.O K'.O) (IsLocalRing.maximalIdeal K.O)) := inferInstance
-  obtain ⟨z, hz⟩ := Algebra.trace_surjective (K.O ⧸ IsLocalRing.maximalIdeal K.O)
-    (K'.O ⧸ Ideal.map (algebraMap K.O K'.O) (IsLocalRing.maximalIdeal K.O)) 1
+  obtain ⟨z, hz⟩ :=
+    Algebra.trace_surjective (K.O ⧸ IsLocalRing.maximalIdeal K.O)
+      (K'.O ⧸ Ideal.map (algebraMap K.O K'.O) (IsLocalRing.maximalIdeal K.O)) 1
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective z
   have htr := Algebra.trace_quotient_mk (R := K.O) (S := K'.O) y
   rw [hz] at htr
@@ -177,9 +191,10 @@ theorem exists_trace_unit_of_span (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (h
     exact one_ne_zero htr
   · exact Algebra.trace_localization K.O K.O⁰ (Rₘ := K.E) (Sₘ := K'.E) y
 
-theorem exists_trace_unit (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ) :
-    ∃ y : K'.O, ∃ a : K.O, IsUnit a ∧
-      @Algebra.trace K.E K'.E _ _ φ.toAlgebra (algebraMap K'.O K'.E y) = algebraMap K.O K.E a :=
+theorem exists_trace_unit (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ)
+    : ∃ y : K'.O, ∃ a : K.O,
+      IsUnit a
+        ∧ @Algebra.trace K.E K'.E _ _ φ.toAlgebra (algebraMap K'.O K'.E y) = algebraMap K.O K.E a :=
   exists_trace_unit_of_span K K' d φ hU (exists_int_basis_of_unr K K' d φ hU)
 
 end GlobalTheory.UnitLemma.Unr

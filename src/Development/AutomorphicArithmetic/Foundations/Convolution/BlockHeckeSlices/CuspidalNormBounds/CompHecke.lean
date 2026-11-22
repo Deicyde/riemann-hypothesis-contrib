@@ -22,31 +22,36 @@ open GlobalTheory.CuspRep GlobalTheory.CompanionTheory.CTFin UpperTheory.V.Cm
 
 variable {E : Type} [Field E] [NumberField E] [IsTotallyComplex E] {S : Set (Pl E)} {n r s : ℕ}
 
-private theorem sum_pi {m j : ℕ} (F : (Fin (m + 1) → ℕ) → ℂ) :
-    ∑ A ∈ Finset.piAntidiag Finset.univ j, F A =
-      ∑ a ∈ Finset.range (j + 1), ∑ A ∈ Finset.piAntidiag Finset.univ (j - a), F (Fin.cons a A) := by
-  rw [Finset.sum_sigma']
-  refine Finset.sum_bij' (fun A _ => ⟨A 0, Fin.tail A⟩) (fun p _ => Fin.cons p.1 p.2) ?_ ?_ ?_ ?_ ?_
-  · intro A hA
-    simp only [Finset.mem_piAntidiag, Finset.mem_univ, implies_true, and_true, Fin.sum_univ_succ, Finset.mem_sigma,
-      Finset.mem_range] at hA ⊢
-    refine ⟨by omega, ?_⟩
-    change ∑ i : Fin m, A i.succ = _
-    omega
-  · intro p hp
-    simp only [Finset.mem_piAntidiag, Finset.mem_univ, implies_true, and_true, Fin.sum_univ_succ, Finset.mem_sigma,
-      Finset.mem_range, Fin.cons_zero, Fin.cons_succ] at hp ⊢
-    have h2 : ∑ i, p.2 i = j - p.1 := hp.2
-    omega
-  · intro A _
-    exact Fin.cons_self_tail A
-  · intro p _
-    simp
-  · intro A _
-    simp
+private theorem sum_pi {m j : ℕ} (F : (Fin (m + 1) → ℕ) → ℂ)
+    : ∑ A ∈ Finset.piAntidiag Finset.univ j, F A
+      = ∑ a ∈ Finset.range (j + 1), ∑ A ∈ Finset.piAntidiag Finset.univ (j - a), F (Fin.cons a A) :=
+  by
+    rw [Finset.sum_sigma']
+    refine
+      Finset.sum_bij' (fun A _ => ⟨A 0, Fin.tail A⟩) (fun p _ => Fin.cons p.1 p.2) ?_ ?_ ?_ ?_ ?_
+    · intro A hA
+      simp only [Finset.mem_piAntidiag, Finset.mem_univ, implies_true, and_true, Fin.sum_univ_succ,
+          Finset.mem_sigma, Finset.mem_range]
+        at hA ⊢
+      refine ⟨by omega, ?_⟩
+      change ∑ i : Fin m, A i.succ = _
+      omega
+    · intro p hp
+      simp only [Finset.mem_piAntidiag, Finset.mem_univ, implies_true, and_true, Fin.sum_univ_succ,
+          Finset.mem_sigma, Finset.mem_range, Fin.cons_zero, Fin.cons_succ]
+        at hp ⊢
+      have h2 : ∑ i, p.2 i = j - p.1 := hp.2
+      omega
+    · intro A _
+      exact Fin.cons_self_tail A
+    · intro p _
+      simp
+    · intro A _
+      simp
 
-private theorem comp_sum (d : Dat S n) {ι : Type} (A : Finset ι) (c : ι → ℂ) (φ : ι → Sm E n) (h : ∀ i, Umg (φ i)) (t) :
-    d.comp (∑ i ∈ A, c i • φ i).1 t = ∑ i ∈ A, c i * d.comp (φ i).1 t := by
+private theorem comp_sum
+    (d : Dat S n) {ι : Type} (A : Finset ι) (c : ι → ℂ) (φ : ι → Sm E n) (h : ∀ i, Umg (φ i)) (t)
+    : d.comp (∑ i ∈ A, c i • φ i).1 t = ∑ i ∈ A, c i * d.comp (φ i).1 t := by
   classical
   induction A using Finset.induction_on with
   | empty =>
@@ -55,13 +60,16 @@ private theorem comp_sum (d : Dat S n) {ι : Type} (A : Finset ι) (c : ι → �
     rw [one_smul, add_zero, one_mul, left_eq_add] at h1
     exact h1
   | insert a A ha ih =>
-    rw [Finset.sum_insert ha, Finset.sum_insert ha, (compBound E S n d).2 _ _ _ (h a) (Umg.sum fun i _ => (h i).smul _), ih]
+    rw [Finset.sum_insert ha, Finset.sum_insert ha,
+      (compBound E S n d).2 _ _ _ (h a) (Umg.sum fun i _ => (h i).smul _), ih]
 
 end UpperTheory.ConvolutionTheory.BW
 
-open UpperTheory.ConvolutionTheory.BW GlobalTheory.CuspRep GlobalTheory.CompanionTheory.CTFin UpperTheory.V.Cm in
-theorem UpperTheory.ConvolutionTheory.BW.compHecke :
-    ∀ (E : Type) [Field E] [NumberField E] [IsTotallyComplex E], UpperTheory.ConvolutionTheory.BW.CompHecke E := by
+open UpperTheory.ConvolutionTheory.BW GlobalTheory.CuspRep GlobalTheory.CompanionTheory.CTFin
+  UpperTheory.V.Cm in
+theorem UpperTheory.ConvolutionTheory.BW.compHecke
+    : ∀ (E : Type) [Field E] [NumberField E] [IsTotallyComplex E],
+      UpperTheory.ConvolutionTheory.BW.CompHecke E := by
   intro E _ _ _ S n d
   induction d with
   | nil =>
@@ -91,7 +99,8 @@ theorem UpperTheory.ConvolutionTheory.BW.compHecke :
       simp only [Dat.sat_succ, Dat.rho_succ]
       change _ = _ * qc w ^ (_ * (a : ℂ)) * ∏ l, _ * qc w ^ (_ * (A l : ℂ))
       simp only [Finset.prod_mul_distrib, Formalism.UG.P.satake_cpow_prod _ hq]
-      rw [mul_mul_mul_comm, mul_mul_mul_comm _ (qc w ^ _), ← Complex.cpow_add _ _ hq, ← Complex.cpow_add _ _ hq]
+      rw [mul_mul_mul_comm, mul_mul_mul_comm _ (qc w ^ _), ← Complex.cpow_add _ _ hq,
+        ← Complex.cpow_add _ _ hq]
       congr 2
       push_cast
       simp only [neg_add, add_mul, Finset.sum_add_distrib, ← Finset.mul_sum, hA']

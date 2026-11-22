@@ -8,27 +8,30 @@ namespace GlobalTheory
 
 open CommRing
 
-theorem natCast_mul_mem_units_submodule {B B' : Type} [CommRing B] [CommRing B'] [Algebra B B']
+theorem natCast_mul_mem_units_submodule
+    {B B' : Type} [CommRing B] [CommRing B'] [Algebra B B']
     (n : ℕ) (hn : ∀ b' : B', (n : B') * b' ∈ (algebraMap B B').range)
-    (I : (Submodule B B')ˣ) (x : B') : (n : B') * x ∈ (I : Submodule B B') := by
+    (I : (Submodule B B')ˣ) (x : B')
+    : (n : B') * x ∈ (I : Submodule B B') := by
   have h1 : (1 : B') ∈ ((I⁻¹ : (Submodule B B')ˣ) : Submodule B B') * (I : Submodule B B') := by
     rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
     exact Submodule.one_le.mp le_rfl
-  have key : ∀ y ∈ ((I⁻¹ : (Submodule B B')ˣ) : Submodule B B') * (I : Submodule B B'),
-      ((n : B') * x) * y ∈ (I : Submodule B B') := by
+  have key
+      : ∀ y ∈ ((I⁻¹ : (Submodule B B')ˣ) : Submodule B B') * (I : Submodule B B'),
+        ((n : B') * x) * y ∈ (I : Submodule B B') := by
     intro y hy
     refine Submodule.mul_induction_on hy (fun j _ i hi => ?_) (fun y z hy hz => ?_)
     · obtain ⟨b, hb⟩ := hn (x * j)
-      have : (n : B') * x * (j * i) = b • i := by
-        rw [Algebra.smul_def, hb]; ring
-      rw [this]; exact Submodule.smul_mem _ b hi
+      have : (n : B') * x * (j * i) = b • i := by rw [Algebra.smul_def, hb]; ring
+      rw [this]
+      exact Submodule.smul_mem _ b hi
     · rw [mul_add]; exact Submodule.add_mem _ hy hz
   simpa using key 1 h1
 
-theorem finite_units_submodule {B B' : Type} [CommRing B] [CommRing B'] [Algebra B B']
-    [Module.Finite ℤ B'] (n : ℕ) (hn0 : n ≠ 0)
-    (hn : ∀ b' : B', (n : B') * b' ∈ (algebraMap B B').range) :
-    Finite (Submodule B B')ˣ := by
+theorem finite_units_submodule
+    {B B' : Type} [CommRing B] [CommRing B'] [Algebra B B'] [Module.Finite ℤ B']
+    (n : ℕ) (hn0 : n ≠ 0) (hn : ∀ b' : B', (n : B') * b' ∈ (algebraMap B B').range)
+    : Finite (Submodule B B')ˣ := by
   set C : Submodule ℤ B' := (Ideal.span {(n : ℤ)}) • (⊤ : Submodule ℤ B') with hCdef
   haveI : NeZero n := ⟨hn0⟩
   haveI : Finite (ℤ ⧸ Ideal.span {(n : ℤ)}) :=
@@ -53,10 +56,10 @@ theorem finite_units_submodule {B B' : Type} [CommRing B] [CommRing B'] [Algebra
     rwa [sup_eq_right.mpr (hC I), sup_eq_right.mpr (hC J)] at this
   exact Units.ext (Submodule.restrictScalars_injective ℤ _ _ hIJ)
 
-theorem isOfFinOrder_of_isOfFinOrder_mapRingHom : ∀ (B B' : Type) [CommRing B] [CommRing B']
-    [Module.Finite ℤ B'] (φ : B →+* B') (n : ℕ), Function.Injective φ → n ≠ 0 →
-    (∀ b' : B', (n : B') * b' ∈ φ.range) → ∀ M : CommRing.Pic B,
-    IsOfFinOrder (CommRing.Pic.mapRingHom φ M) → IsOfFinOrder M := by
+theorem isOfFinOrder_of_isOfFinOrder_mapRingHom
+    : ∀ (B B' : Type) [CommRing B] [CommRing B'] [Module.Finite ℤ B'] (φ : B →+* B') (n : ℕ),
+      Function.Injective φ → n ≠ 0 → (∀ b' : B', (n : B') * b' ∈ φ.range)
+        → ∀ M : CommRing.Pic B, IsOfFinOrder (CommRing.Pic.mapRingHom φ M) → IsOfFinOrder M := by
   intro B B' _ _ _ φ n hφ hn0 hn M hM
   letI : Algebra B B' := φ.toAlgebra
   haveI : FaithfulSMul B B' := (faithfulSMul_iff_algebraMap_injective B B').mpr hφ

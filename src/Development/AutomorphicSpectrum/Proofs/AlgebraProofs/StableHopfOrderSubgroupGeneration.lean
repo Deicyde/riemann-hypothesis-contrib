@@ -19,11 +19,25 @@ open scoped Matrix
 
 namespace GlobalTheory.CompanionTheory.Ar.GR
 
-theorem idealX_le_idealD : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable F AA.carrier → ∀ (K : Submodule F N) (t : N), t ∉ K → GenAF p AA.carrier K.toAddSubgroup → ∀ τ : MulChar F R, IsFund p τ → idealX AA.carrier K t τ ≤ idealD p AA.carrier K t τ := by
+theorem idealX_le_idealD
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+                (AA : HopfOrder (C := C) R N),
+              FStable F AA.carrier
+                → ∀ (K : Submodule F N) (t : N),
+                  t ∉ K → GenAF p AA.carrier K.toAddSubgroup
+                    → ∀ τ : MulChar F R,
+                      IsFund p τ → idealX AA.carrier K t τ ≤ idealD p AA.carrier K t τ := by
   intro p _ C _ _ _ v R _ _ hv hp F _ _ _ _ f hq N _ _ _ _ AA hst K t ht hgen τ hτ
   have hp1 : 1 < p := (Fact.out : p.Prime).one_lt
-  obtain ⟨⟨S, hS, hSst⟩, -⟩ := GlobalTheory.T.stable_hopf_order_subgroup_translation p C v R hv hp F f hq N AA hst K t ht
-  obtain ⟨hord, -, hfund, hfunds, -⟩ := GlobalTheory.T.teichmuller_character_order_generates p C v R hv hp F f hq τ hτ
+  obtain ⟨⟨S, hS, hSst⟩, -⟩ :=
+    GlobalTheory.T.stable_hopf_order_subgroup_translation p C v R hv hp F f hq N AA hst K t ht
+  obtain ⟨hord, -, hfund, hfunds, -⟩ :=
+    GlobalTheory.T.teichmuller_character_order_generates p C v R hv hp F f hq τ hτ
   have hf0 : f ≠ 0 := by
     rintro rfl
     have := Fintype.one_lt_card (α := F)
@@ -38,15 +52,17 @@ theorem idealX_le_idealD : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [Is
     induction m with
     | zero => simp
     | succ m ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, hper1]
-  have hprin : ∀ χ : MulChar F R, ∃ c : R, c ≠ 0 ∧ xIdeal S.carrier χ = Ideal.span {c} :=
-    fun χ => (GlobalTheory.T.character_ideal_principal_eigen p C v R hv hp F f hq S hSst χ).1
+  have hprin : ∀ χ : MulChar F R, ∃ c : R, c ≠ 0 ∧ xIdeal S.carrier χ = Ideal.span {c} := fun χ =>
+    (GlobalTheory.T.character_ideal_principal_eigen p C v R hv hp F f hq S hSst χ).1
   choose c0 hc0 hc0' using hprin
   let c : ℕ → R := fun n => c0 (τ ^ p ^ n)
   have hcX : ∀ n, idealX AA.carrier K t (τ ^ p ^ n) = Ideal.span {c n} := by
     intro n
     rw [idealX, ← hS]
     exact hc0' _
-  have hom := GlobalTheory.T.fundamental_ideal_frobenius_product p C v R hv hp F f hq S hSst τ hτ c (fun n => hc0' _)
+  have hom :=
+    GlobalTheory.T.fundamental_ideal_frobenius_product p C v R hv hp F f hq S hSst τ hτ c
+      (fun n => hc0' _)
   have hcper : ∀ m, c (f * m) = c 0 := by
     intro m
     simp only [c, hper m, pow_zero, pow_one]
@@ -69,13 +85,18 @@ theorem idealX_le_idealD : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [Is
     rw [← pow_mul, ← pow_succ]
   have hlt : ∀ n, y n ^ p < y (n + 1) → c (n + 1) ∈ idealD p AA.carrier K t (τ ^ p ^ (n + 1)) := by
     intro n h
-    have := GlobalTheory.T.stable_hopf_order_subgroup_quotient p C v R hv hp F f hq N AA hst K t ht hgen (τ ^ p ^ n) (hfund n)
-      (c n) (c (n + 1)) (hcX n) (by rw [hpowp]; exact hcX (n + 1)) h
+    have :=
+      GlobalTheory.T.stable_hopf_order_subgroup_quotient p C v R hv hp F f hq N AA hst K t ht hgen
+        (τ ^ p ^ n) (hfund n) (c n) (c (n + 1)) (hcX n) (by rw [hpowp]; exact hcX (n + 1)) h
     rwa [hpowp] at this
-  have heq : ∀ n, y n ^ p = y (n + 1) → c n ∈ idealD p AA.carrier K t (τ ^ p ^ n) →
-      c (n + 1) ∈ idealD p AA.carrier K t (τ ^ p ^ (n + 1)) := by
+  have heq
+      : ∀ n,
+        y n ^ p = y (n + 1) → c n ∈ idealD p AA.carrier K t (τ ^ p ^ n)
+          → c (n + 1) ∈ idealD p AA.carrier K t (τ ^ p ^ (n + 1)) := by
     intro n h hg
-    have h1 := GlobalTheory.T.stable_hopf_order_subgroup_length p C v R hv hp F f hq N AA hst K t (τ ^ p ^ n) (c n) hg
+    have h1 :=
+      GlobalTheory.T.stable_hopf_order_subgroup_length p C v R hv hp F f hq N AA hst K t (τ ^ p ^ n)
+        (c n) hg
     rw [hpowp] at h1
     obtain ⟨δ, hδ⟩ := (hom n).2.1
     have hv1 : v (algebraMap R C δ) = 1 := by
@@ -121,7 +142,8 @@ theorem idealX_le_idealD : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [Is
         rw [pow_zero, pow_one] at this
         rw [this]
         exact Ideal.span_singleton_eq_top.2 hu
-      obtain ⟨τ', hτ', hD⟩ := GlobalTheory.T.hopf_order_ideals_eq_top p C v R hv hp F f hq N AA hst K t ht hgen τ hX
+      obtain ⟨τ', hτ', hD⟩ :=
+        GlobalTheory.T.hopf_order_ideals_eq_top p C v R hv hp F f hq N AA hst K t ht hgen τ hX
       obtain ⟨n, -, rfl⟩ := hfunds τ' hτ'
       exact ⟨n, by rw [hD]; trivial⟩
   obtain ⟨n, hn⟩ := hex

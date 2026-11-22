@@ -16,13 +16,13 @@ namespace GlobalTheory.HeckeTwoExp
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem phi_zero (w : ℂ) : phi 0 w = w⁻¹ ^ 2 := by
-  simp [phi]
+theorem phi_zero (w : ℂ) : phi 0 w = w⁻¹ ^ 2 := by simp [phi]
 
 theorem hTrans_zero_neg (ν y : ℝ) : hTrans 0 ν (-y) = hTrans 0 (-ν) y := by
   unfold hTrans
   conv_lhs => rw [← MeasureTheory.integral_neg_eq_self]
-  congr 1; funext t
+  congr 1
+  funext t
   simp only [phi_zero, ofReal_neg]
   congr 1
   · rw [show -(t : ℂ) + -(y : ℂ) * I = -((t : ℂ) + (y : ℂ) * I) by ring, inv_neg, neg_sq]
@@ -35,12 +35,14 @@ theorem emb_nonempty [IsTotallyReal F] : Nonempty (Emb F) := by
   obtain ⟨φ⟩ := this
   exact ⟨(IsTotallyReal.complexEmbedding_isReal φ).embedding⟩
 
-theorem abs_norm_eq_prod [IsTotallyReal F] (ν : F) :
-    ((|(Algebra.norm ℚ ν : ℝ)| : ℝ) : ℂ) = ∏ τ : Emb F, ((|τ ν| : ℝ) : ℂ) := by
+theorem abs_norm_eq_prod [IsTotallyReal F] (ν : F)
+    : ((|(Algebra.norm ℚ ν : ℝ)| : ℝ) : ℂ) = ∏ τ : Emb F, ((|τ ν| : ℝ) : ℂ) := by
   have h := prod_emb ν
   have h' : ((Algebra.norm ℚ ν : ℚ) : ℝ) = ∏ τ : Emb F, τ ν := by
     apply Complex.ofReal_injective
-    rw [Complex.ofReal_prod, h]; push_cast; rfl
+    rw [Complex.ofReal_prod, h]
+    push_cast
+    rfl
   rw [h', Finset.abs_prod, Complex.ofReal_prod]
 
 end GlobalTheory.HeckeTwoExp
@@ -49,9 +51,11 @@ namespace GlobalTheory.HeckeTwoExp
 
 variable {F : Type} [Field F] [NumberField F]
 
-def toQ (𝔞 𝔟 : Frac F) : (Σ c : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)),
-    {ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) // ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1)}) → Quotient (qRel 𝔞 𝔟) :=
-  fun s => Quotient.mk _ ⟨(s.2.1.1, s.1.out.1), s.2.1.2.1, s.1.out.2.1, s.2.2⟩
+def toQ (𝔞 𝔟 : Frac F)
+    : (Σ c : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)),
+        {ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) // ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1)})
+      → Quotient (qRel 𝔞 𝔟) := fun s =>
+  Quotient.mk _ ⟨(s.2.1.1, s.1.out.1), s.2.1.2.1, s.1.out.2.1, s.2.2⟩
 
 theorem toQ_injective (𝔞 𝔟 : Frac F) : Function.Injective (toQ 𝔞 𝔟) := by
   rintro ⟨c, ν⟩ ⟨c', ν'⟩ h
@@ -83,7 +87,8 @@ theorem toQ_surjective [IsTotallyReal F] (𝔞 𝔟 : Frac F) : Function.Surject
   have hb0 : b ≠ 0 := right_ne_zero_of_mul hνb
   have hν0 : ν ≠ 0 := left_ne_zero_of_mul hνb
   set c : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)) := Quotient.mk _ ⟨b, hb, hb0⟩ with hcdef
-  obtain ⟨ε, hε⟩ := Quotient.exact (Quotient.out_eq c : Quotient.mk _ c.out = Quotient.mk _ ⟨b, hb, hb0⟩)
+  obtain ⟨ε, hε⟩ :=
+    Quotient.exact (Quotient.out_eq c : Quotient.mk _ c.out = Quotient.mk _ ⟨b, hb, hb0⟩)
   dsimp only at hε
   have hmem : ((ε : 𝓞 F) : F) * ν ∈ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) := by
     have := Submodule.smul_mem (𝔞 : FractionalIdeal (𝓞 F)⁰ F).coeToSubmodule (ε : 𝓞 F) hν
@@ -92,7 +97,9 @@ theorem toQ_surjective [IsTotallyReal F] (𝔞 𝔟 : Frac F) : Function.Surject
   have hne : ((ε : 𝓞 F) : F) * ν ≠ 0 := by
     refine mul_ne_zero ?_ hν0
     intro h0
-    have := unit_inv_mul ε; rw [h0, mul_zero] at this; exact zero_ne_one this
+    have := unit_inv_mul ε
+    rw [h0, mul_zero] at this
+    exact zero_ne_one this
   have hprod : ((ε : 𝓞 F) : F) * ν * c.out.1 = ν * b := by rw [hε]; ring
   refine ⟨⟨c, ⟨⟨((ε : 𝓞 F) : F) * ν, hmem, hne⟩, fun τ => by rw [hprod]; exact hpos τ⟩⟩, ?_⟩
   apply Quotient.sound
@@ -100,20 +107,24 @@ theorem toQ_surjective [IsTotallyReal F] (𝔞 𝔟 : Frac F) : Function.Surject
   show ν = _ * (((ε : 𝓞 F) : F) * ν)
   rw [← mul_assoc, unit_inv_mul, one_mul]
 
-theorem tsum_qClass_eq [IsTotallyReal F] (𝔞 𝔟 : Frac F) (z : Emb F → ℂ) (hS : Summable (qClass 𝔞 𝔟 2 z)) :
-    ∑' c, qClass 𝔞 𝔟 2 z c = ∑' c : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)),
-      ∑' ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F),
-        if ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1) then qTerm 𝔞 2 z (ν.1, c.out.1) else 0 := by
+theorem tsum_qClass_eq
+    [IsTotallyReal F] (𝔞 𝔟 : Frac F) (z : Emb F → ℂ) (hS : Summable (qClass 𝔞 𝔟 2 z))
+    : ∑' c, qClass 𝔞 𝔟 2 z c
+      = ∑' c : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)),
+        ∑' ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F),
+          if ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1) then qTerm 𝔞 2 z (ν.1, c.out.1) else 0 := by
   set e := Equiv.ofBijective (toQ 𝔞 𝔟) ⟨toQ_injective 𝔞 𝔟, toQ_surjective 𝔞 𝔟⟩ with he
   have hS' : Summable (qClass 𝔞 𝔟 2 z ∘ e) := e.summable_iff.2 hS
   have h1 : ∑' c, qClass 𝔞 𝔟 2 z c = ∑' p, qClass 𝔞 𝔟 2 z (e p) := (e.tsum_eq _).symm
   have h2 : ∑' p, qClass 𝔞 𝔟 2 z (e p) = ∑' c, ∑' ν, qClass 𝔞 𝔟 2 z (e ⟨c, ν⟩) := hS'.tsum_sigma
   rw [h1, h2]
   refine tsum_congr fun c => ?_
-  have h3 := tsum_subtype {ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) | ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1)}
-    (fun ν => qTerm 𝔞 2 z (ν.1, c.out.1))
-  have h4 : ∀ ν : {ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) // ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1)},
-      qClass 𝔞 𝔟 2 z (e ⟨c, ν⟩) = qTerm 𝔞 2 z (ν.1.1, c.out.1) := fun ν => by
+  have h3 :=
+    tsum_subtype {ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) | ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1)}
+      (fun ν => qTerm 𝔞 2 z (ν.1, c.out.1))
+  have h4
+      : ∀ ν : {ν : NZ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) // ∀ τ : Emb F, 0 < τ (ν.1 * c.out.1)},
+        qClass 𝔞 𝔟 2 z (e ⟨c, ν⟩) = qTerm 𝔞 2 z (ν.1.1, c.out.1) := fun ν => by
     rw [he]; exact qClass_mk 𝔞 𝔟 2 z _
   rw [tsum_congr h4]
   refine h3.trans (tsum_congr fun ν => ?_)

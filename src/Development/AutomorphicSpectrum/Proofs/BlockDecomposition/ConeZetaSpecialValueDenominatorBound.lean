@@ -13,12 +13,16 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ConeSeriesSumm
 
 set_option autoImplicit false
 noncomputable section
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
-theorem eq_at_neg_of_eq_right (k p : ℕ) (hp : p < k) (T G : ℂ → ℂ)
-    (hT : DifferentiableOn ℂ T {1}ᶜ) (hG : DifferentiableOn ℂ G {s | -(k : ℝ) < s.re})
-    (h : ∀ s : ℂ, 1 < s.re → T s = G s) : T (-(p : ℂ)) = G (-(p : ℂ)) := by
+theorem eq_at_neg_of_eq_right
+    (k p : ℕ) (hp : p < k)
+    (T G : ℂ → ℂ) (hT : DifferentiableOn ℂ T {1}ᶜ) (hG : DifferentiableOn ℂ G {s | -(k : ℝ) < s.re})
+    (h : ∀ s : ℂ, 1 < s.re → T s = G s)
+    : T (-(p : ℂ)) = G (-(p : ℂ)) := by
   have hk : (0 : ℝ) < k := by exact_mod_cast (lt_of_le_of_lt (Nat.zero_le p) hp)
   have hpk : (p : ℝ) < k := by exact_mod_cast hp
   have hp0 : (0 : ℝ) ≤ p := Nat.cast_nonneg p
@@ -48,18 +52,15 @@ theorem eq_at_neg_of_eq_right (k p : ℕ) (hp : p < k) (T G : ℂ → ℂ)
   have hAT₂ : AnalyticOnNhd ℂ T C₂ := (hT.mono hs₂).analyticOnNhd hO₂
   have hAG₂ : AnalyticOnNhd ℂ G C₂ :=
     (hG.mono (show C₂ ⊆ {s | -(k : ℝ) < s.re} from fun _ hs => hs.1)).analyticOnNhd hO₂
-  have hz₁ : (2 + Complex.I : ℂ) ∈ C₁ := by
-    refine ⟨?_, ?_⟩ <;> simp <;> linarith
+  have hz₁ : (2 + Complex.I : ℂ) ∈ C₁ := by refine ⟨?_, ?_⟩ <;> simp <;> linarith
   have hev₁ : T =ᶠ[nhds (2 + Complex.I : ℂ)] G := by
     have hopen : IsOpen {s : ℂ | 1 < s.re} := isOpen_lt continuous_const Complex.continuous_re
     filter_upwards [hopen.mem_nhds (by simp : (2 + Complex.I : ℂ) ∈ {s : ℂ | 1 < s.re})] with s hs
     exact h s hs
   have hE₁ : Set.EqOn T G C₁ :=
     hAT₁.eqOn_of_preconnected_of_eventuallyEq hAG₁ hV₁.isPreconnected hz₁ hev₁
-  have hz₂ : (Complex.I : ℂ) ∈ C₂ := by
-    refine ⟨?_, ?_⟩ <;> simp <;> linarith
-  have hz₂' : (Complex.I : ℂ) ∈ C₁ := by
-    refine ⟨?_, ?_⟩ <;> simp <;> linarith
+  have hz₂ : (Complex.I : ℂ) ∈ C₂ := by refine ⟨?_, ?_⟩ <;> simp <;> linarith
+  have hz₂' : (Complex.I : ℂ) ∈ C₁ := by refine ⟨?_, ?_⟩ <;> simp <;> linarith
   have hev₂ : T =ᶠ[nhds (Complex.I : ℂ)] G := by
     filter_upwards [hO₁.mem_nhds hz₂'] with s hs
     exact hE₁ hs
@@ -72,19 +73,25 @@ theorem eq_at_neg_of_eq_right (k p : ℕ) (hp : p < k) (T G : ℂ → ℂ)
   · simp only [Set.mem_setOf_eq, Complex.neg_re, Complex.natCast_re]
     linarith
 
-theorem abelValue_mem_zInv (ι : Type) [Fintype ι] (r l : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ)
-    (w : (Fin r → ℕ) → ℚ) (hr : r ≤ Fintype.card ι) (hl : 0 < l) (ha : ∀ j i, 0 < a j i)
-    (hb : ∀ j, 0 < b j) (hw : GoodWeight l w) (hz : ∀ m, ∃ z : ℤ, w m = z) (T : ℂ → ℂ)
-    (hT : DifferentiableOn ℂ T {1}ᶜ)
-    (hS : ∀ s : ℂ, 1 < s.re → HasSum (fun m => (w m : ℂ) * coneTerm a b s m) (T s)) (p : ℕ)
-    (hp : ∀ m : Fin r → ℕ, ∃ z : ℤ, ∏ j, (b j + ∑ i, a j i * (m i : ℝ)) ^ p = (z : ℝ)) :
-    ∃ (q : ℚ) (K : ℕ) (z : ℤ), T (-(p : ℂ)) = (q : ℂ) ∧ (l : ℚ) ^ K * q = z := by
+theorem abelValue_mem_zInv
+    (ι : Type) [Fintype ι]
+    (r l : ℕ) (a : ι → Fin r → ℝ)
+    (b : ι → ℝ)
+    (w : (Fin r → ℕ) → ℚ)
+    (hr : r ≤ Fintype.card ι) (hl : 0 < l) (ha : ∀ j i, 0 < a j i) (hb : ∀ j, 0 < b j)
+    (hw : GoodWeight l w) (hz : ∀ m, ∃ z : ℤ, w m = z)
+    (T : ℂ → ℂ) (hT : DifferentiableOn ℂ T {1}ᶜ)
+    (hS : ∀ s : ℂ, 1 < s.re → HasSum (fun m => (w m : ℂ) * coneTerm a b s m) (T s))
+    (p : ℕ) (hp : ∀ m : Fin r → ℕ, ∃ z : ℤ, ∏ j, (b j + ∑ i, a j i * (m i : ℝ)) ^ p = (z : ℝ))
+    : ∃ (q : ℚ) (K : ℕ) (z : ℤ), T (-(p : ℂ)) = (q : ℂ) ∧ (l : ℚ) ^ K * q = z := by
   obtain ⟨Q, _, cs, u, K, hu, hc, hK, hid⟩ :=
-    GlobalTheory.T.weighted_sum_decomposition_denominators r l (Fintype.card ι * (p + 1) + 2) w hl hw hz
+    GlobalTheory.T.weighted_sum_decomposition_denominators r l (Fintype.card ι * (p + 1) + 2) w hl
+      hw hz
   set G : ℂ → ℂ := fun s => ∑ q, ∑' m, (u q m : ℂ) * DL (cs q) (coneTerm a b s) m with hGdef
   have hG : DifferentiableOn ℂ G {s | -((p + 1 : ℕ) : ℝ) < s.re} := by
     refine DifferentiableOn.fun_sum fun q _ => ?_
-    exact GlobalTheory.T.cone_series_differentiable_left_strip ι r a b ha hb (p + 1) _ (cs q) (u q) le_rfl (hu q) (hc q)
+    exact GlobalTheory.T.cone_series_differentiable_left_strip ι r a b ha hb (p + 1) _ (cs q) (u q)
+      le_rfl (hu q) (hc q)
   have hTG : ∀ s : ℂ, 1 < s.re → T s = G s := by
     intro s hs
     rw [← (hS s hs).tsum_eq]
@@ -99,7 +106,16 @@ theorem abelValue_mem_zInv (ι : Type) [Fintype ι] (r l : ℕ) (a : ι → Fin 
     push_cast
     exact Finset.sum_congr rfl fun q _ => hζ q
 
-theorem abelValue_mem_zInv' : ∀ (ι : Type) [Fintype ι] (r l : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ) (w : (Fin r → ℕ) → ℚ), r ≤ Fintype.card ι → 0 < l → (∀ j i, 0 < a j i) → (∀ j, 0 < b j) → GoodWeight l w → (∀ m, ∃ z : ℤ, w m = z) → ∀ T : ℂ → ℂ, DifferentiableOn ℂ T {1}ᶜ → (∀ s : ℂ, 1 < s.re → HasSum (fun m => (w m : ℂ) * coneTerm a b s m) (T s)) → ∀ p : ℕ, (∀ m : Fin r → ℕ, ∃ z : ℤ, ∏ j, (b j + ∑ i, a j i * (m i : ℝ)) ^ p = (z : ℝ)) → ∃ (q : ℚ) (K : ℕ) (z : ℤ), T (-(p : ℂ)) = (q : ℂ) ∧ (l : ℚ) ^ K * q = z := by
+theorem abelValue_mem_zInv'
+    : ∀ (ι : Type) [Fintype ι] (r l : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ) (w : (Fin r → ℕ) → ℚ),
+      r ≤ Fintype.card ι → 0 < l → (∀ j i, 0 < a j i) → (∀ j, 0 < b j) → GoodWeight l w
+        → (∀ m, ∃ z : ℤ, w m = z)
+        → ∀ T : ℂ → ℂ,
+          DifferentiableOn ℂ T {1}ᶜ
+            → (∀ s : ℂ, 1 < s.re → HasSum (fun m => (w m : ℂ) * coneTerm a b s m) (T s))
+            → ∀ p : ℕ,
+              (∀ m : Fin r → ℕ, ∃ z : ℤ, ∏ j, (b j + ∑ i, a j i * (m i : ℝ)) ^ p = (z : ℝ))
+                → ∃ (q : ℚ) (K : ℕ) (z : ℤ), T (-(p : ℂ)) = (q : ℂ) ∧ (l : ℚ) ^ K * q = z := by
   intro ι _ r l a b w hr hl ha hb hw hz T hT hS p hp
   exact abelValue_mem_zInv ι r l a b w hr hl ha hb hw hz T hT hS p hp
 

@@ -12,8 +12,10 @@ namespace Formalism.MainNotions.Pk.SD
 
 open Formalism.BasicNotions Formalism.MainNotions.S
 
-theorem first_section_hypotheses_at_family_constants {eps : ℝ} (Fm : FamP eps) (hR : S.ResidualStandingConditions Fm) :
-    OwnEv Fm fun C' Cl x i => StandingHypotheses (Fm.D x i) (Fm.L x i) C' Cl (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu := by
+theorem first_section_hypotheses_at_family_constants
+    {eps : ℝ} (Fm : FamP eps) (hR : S.ResidualStandingConditions Fm)
+    : OwnEv Fm fun C' Cl x i =>
+      StandingHypotheses (Fm.D x i) (Fm.L x i) C' Cl (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu := by
   have t1 := @Formalism.MainNotions.S.standing_hypotheses_of_bounds
   have t2 := @Formalism.MainNotions.S.eps_pos'
   have t3 := @Formalism.MainNotions.S.sCl_le_CCount
@@ -24,8 +26,9 @@ theorem first_section_hypotheses_at_family_constants {eps : ℝ} (Fm : FamP eps)
   obtain ⟨x2, hx2⟩ := hTu
   have hε := t2 Fm
   have hs : 0 < eps / 100 := by positivity
-  obtain ⟨x3, hx3⟩ := Filter.eventually_atTop.1
-    ((tendsto_rpow_atTop hs).eventually_ge_atTop (max (2 * sCl Fm) (max 2 (500 / eps))))
+  obtain ⟨x3, hx3⟩ :=
+    Filter.eventually_atTop.1 ((tendsto_rpow_atTop hs).eventually_ge_atTop
+      (max (2 * sCl Fm) (max 2 (500 / eps))))
   refine ⟨max (max x0 x2) (max x3 (Fm.x1 + 1)), fun x hx i => ?_⟩
   have hx1 : Fm.x1 < x := by
     have := le_trans (le_max_right x3 (Fm.x1 + 1)) (le_max_right (max x0 x2) (max x3 (Fm.x1 + 1)))
@@ -42,21 +45,13 @@ theorem first_section_hypotheses_at_family_constants {eps : ℝ} (Fm : FamP eps)
   have key := t1 (Fm.L x i) (Fm.params x hx1 i) (Fm.sizes x hx1 i) (sCl Fm) (1 / 2) Fm.CTu (t4 Fm)
   have hK := Fm.params_K x hx1 i
   have eCkLow : (Fm.params x hx1 i).CkLow = Fm.CkLow := by
-    first
-      | (unfold FamP.CkLow; rw [← hK]; rfl)
-      | simp [FamP.CkLow, ← hK, parConsts]
+    first | (unfold FamP.CkLow; rw [← hK]; rfl) | simp [FamP.CkLow, ← hK, parConsts]
   have eCCount : (Fm.params x hx1 i).CCount = Fm.CCount := by
-    first
-      | (unfold FamP.CCount; rw [← hK]; rfl)
-      | simp [FamP.CCount, ← hK, parConsts]
+    first | (unfold FamP.CCount; rw [← hK]; rfl) | simp [FamP.CCount, ← hK, parConsts]
   have eCgap : (Fm.params x hx1 i).Cgap = Fm.Cgap := by
-    first
-      | (unfold FamP.Cgap; rw [← hK]; rfl)
-      | simp [FamP.Cgap, ← hK, parConsts]
+    first | (unfold FamP.Cgap; rw [← hK]; rfl) | simp [FamP.Cgap, ← hK, parConsts]
   have eCYL : (Fm.params x hx1 i).CYL = Fm.CYL := by
-    first
-      | (unfold FamP.CYL; rw [← hK]; rfl)
-      | simp [FamP.CYL, ← hK, parConsts]
+    first | (unfold FamP.CYL; rw [← hK]; rfl) | simp [FamP.CYL, ← hK, parConsts]
   show StandingHypotheses (Fm.D x i) (Fm.L x i) (sC' Fm) (sCl Fm) (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu
   unfold sC'
   rw [← eCkLow, ← eCYL]

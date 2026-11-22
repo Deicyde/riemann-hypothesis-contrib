@@ -21,8 +21,10 @@ theorem locVanish_of (hN : NilChange) (hQ : QuotVanish) : LocVanish := by
   intro n _ _ μ _ f u d μd _ W₁ W₂ hf hfc hV hsep hW1 hle h12 h21 hu hub huK huT huN
   have hTw : Continuous fun x : GL (Fin n) ℂ => twConj (thC n) x d :=
     (continuous_inv.mul continuous_const).mul continuous_thC
-  refine hQ n μ d μd W₁ W₂ hsep hW1 hle h12 h21 _
-    (((hf.comp hTw).measurable).mul hu) (fun t ht x => ?_) (fun x k hk => ?_) ?_
+  refine hQ n μ d μd W₁ W₂ hsep hW1 hle h12 h21 _ (((hf.comp hTw).measurable).mul hu)
+    (fun t ht x => ?_)
+    (fun x k hk => ?_)
+    ?_
   · show f (twConj (thC n) (t * x) d) * u (t * x) = f (twConj (thC n) x d) * u x
     rw [twConj_mul_left _ _ ht, huT t ht]
   · show f (twConj (thC n) (x * k) d) * u (x * k) = f (twConj (thC n) x d) * u x
@@ -36,8 +38,9 @@ theorem locVanish_of (hN : NilChange) (hQ : QuotVanish) : LocVanish := by
     set g : nilrad W₁ W₂ → ℂ := fun Y => f (q⁻¹ * uOf Y * d * thC n q) with hg
     have hgc : Continuous g :=
       hf.comp (((continuous_const.mul continuous_uOf).mul continuous_const).mul continuous_const)
-    have e1 : ∀ X : nilrad W₁ W₂,
-        f (twConj (thC n) (uOf X * q) d) * u (uOf X * q) = u q * g (Φ X) := fun X => by
+    have e1
+        : ∀ X : nilrad W₁ W₂,
+          f (twConj (thC n) (uOf X * q) d) * u (uOf X * q) = u q * g (Φ X) := fun X => by
       have hm : (uOf X).val - 1 ∈ nilrad W₁ W₂ := by simpa using X.2
       rw [huN _ hm, mul_comm]
       congr 2
@@ -56,11 +59,14 @@ theorem locVanish_of (hN : NilChange) (hQ : QuotVanish) : LocVanish := by
     have hcn := continuous_conjNil q W₁ W₂
     haveI : (ν.map (conjNil q W₁ W₂)).IsAddHaarMeasure :=
       (conjNil q W₁ W₂).isAddHaarMeasure_map ν hcn (continuous_conjNil_symm q W₁ W₂)
-    have key := hV.2 (twConj (thC n) q d) (img q⁻¹ W₁) (img q⁻¹ W₂) (img_ne_bot _ hW1)
-      (img_le_img _ hle) (by rw [perpD_twConj, h12]) (by rw [perpD_twConj, h21]) uOf
-      (fun X => uOf_val X) (ν.map (conjNil q W₁ W₂))
-    have hcont : Continuous fun Z : nilrad (img q⁻¹ W₁) (img q⁻¹ W₂) =>
-        f (uOf Z * twConj (thC n) q d) := hf.comp (continuous_uOf.mul continuous_const)
+    have key :=
+      hV.2 (twConj (thC n) q d) (img q⁻¹ W₁) (img q⁻¹ W₂) (img_ne_bot _ hW1) (img_le_img _ hle)
+        (by rw [perpD_twConj, h12]) (by rw [perpD_twConj, h21]) uOf
+        (fun X => uOf_val X)
+        (ν.map (conjNil q W₁ W₂))
+    have hcont
+        : Continuous fun Z : nilrad (img q⁻¹ W₁) (img q⁻¹ W₂) => f (uOf Z * twConj (thC n) q d) :=
+      hf.comp (continuous_uOf.mul continuous_const)
     rw [integral_map hcn.measurable.aemeasurable hcont.aestronglyMeasurable] at key
     rw [← key]
     refine integral_congr_ae (Filter.Eventually.of_forall fun Y => ?_)

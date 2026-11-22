@@ -23,11 +23,16 @@ def complF (v : HeightOneSpectrum (𝓞 F)) : Submonoid (𝓞 E) :=
 
 variable {E}
 
-def locF {W : Type} [AddCommGroup W] [Module (𝓞 E) W] (v : HeightOneSpectrum (𝓞 F)) (L : Submodule (𝓞 E) W) :
-    Submodule (𝓞 E) W :=
+def locF
+    {W : Type} [AddCommGroup W] [Module (𝓞 E) W]
+    (v : HeightOneSpectrum (𝓞 F)) (L : Submodule (𝓞 E) W)
+    : Submodule (𝓞 E) W :=
   Formalism.HermitianLatticesTheory.locS (complF E v) L
 
-def IntAt {n : ℕ} (v : HeightOneSpectrum (𝓞 F)) (y : Matrix (Fin n) (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) : Prop :=
+def IntAt
+    {n : ℕ}
+    (v : HeightOneSpectrum (𝓞 F)) (y : Matrix (Fin n) (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+    : Prop :=
   ∀ i j, eAt E v * y i j ∈ Formalism.L2.Herm.intAf F E
 
 end Formalism.L2.GenusGluing.Gen

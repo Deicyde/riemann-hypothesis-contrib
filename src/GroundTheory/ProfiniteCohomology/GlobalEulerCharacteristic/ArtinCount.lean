@@ -10,9 +10,10 @@ namespace GroundTheory.ProfCoh
 
 open MulAction
 
-theorem natCard_subtype_eq_sum_natCard_fiber {α β : Type*} [Finite α] [DecidableEq β] (f : α → β)
-    (t : Finset β) (P : α → Prop) (hP : ∀ a, P a ↔ f a ∈ t) :
-    Nat.card {a // P a} = ∑ b ∈ t, Nat.card {a // f a = b} := by
+theorem natCard_subtype_eq_sum_natCard_fiber
+    {α β : Type*} [Finite α] [DecidableEq β]
+    (f : α → β) (t : Finset β) (P : α → Prop) (hP : ∀ a, P a ↔ f a ∈ t)
+    : Nat.card {a // P a} = ∑ b ∈ t, Nat.card {a // f a = b} := by
   classical
   have := Fintype.ofFinite α
   simp only [Nat.card_eq_fintype_card, Fintype.card_subtype]
@@ -26,10 +27,12 @@ theorem natCard_subtype_eq_sum_natCard_fiber {α β : Type*} [Finite α] [Decida
 
 variable {Γ : Type*} [Group Γ]
 
-theorem card_mul_card_fixedBy_quotient [Finite Γ] (D : Subgroup Γ) (x : Γ) :
-    Nat.card D * Nat.card (fixedBy (Γ ⧸ D) x) = Nat.card {y : Γ // y⁻¹ * x * y ∈ D} := by
-  have hP : ∀ y : Γ, y⁻¹ * x * y ∈ D ↔
-      (Subgroup.groupEquivQuotientProdSubgroup (s := D) y).1 ∈ fixedBy (Γ ⧸ D) x := by
+theorem card_mul_card_fixedBy_quotient [Finite Γ] (D : Subgroup Γ) (x : Γ)
+    : Nat.card D * Nat.card (fixedBy (Γ ⧸ D) x) = Nat.card {y : Γ // y⁻¹ * x * y ∈ D} := by
+  have hP
+      : ∀ y : Γ,
+        y⁻¹ * x * y ∈ D
+          ↔ (Subgroup.groupEquivQuotientProdSubgroup (s := D) y).1 ∈ fixedBy (Γ ⧸ D) x := by
     intro y
     change _ ↔ x • (y : Γ ⧸ D) = y
     rw [MulAction.Quotient.smul_mk, eq_comm, QuotientGroup.eq, smul_eq_mul, ← mul_assoc]
@@ -38,28 +41,36 @@ theorem card_mul_card_fixedBy_quotient [Finite Γ] (D : Subgroup Γ) (x : Γ) :
       (Equiv.prodSubtypeFstEquivSubtypeProd (p := fun q => q ∈ fixedBy (Γ ⧸ D) x))
   rw [Nat.card_congr e, Nat.card_prod, mul_comm]
 
-theorem exists_artin_relation [Finite Γ] :
-    ∃ (s : Finset (Subgroup Γ)) (c : Subgroup Γ → ℤ), (∀ D ∈ s, IsCyclic D) ∧
-      ∀ x : Γ, (Nat.card Γ : ℤ) = ∑ D ∈ s, c D * Nat.card (fixedBy (Γ ⧸ D) x) := by
+theorem exists_artin_relation [Finite Γ]
+    : ∃ (s : Finset (Subgroup Γ)) (c : Subgroup Γ → ℤ),
+      (∀ D ∈ s, IsCyclic D)
+        ∧ ∀ x : Γ, (Nat.card Γ : ℤ) = ∑ D ∈ s, c D * Nat.card (fixedBy (Γ ⧸ D) x) := by
   classical
   have := Fintype.ofFinite (Subgroup Γ)
   let π : Subgroup Γ → Γ → ℤ := fun D x => Nat.card (fixedBy (Γ ⧸ D) x)
   let f : Subgroup Γ → Γ → ℤ := fun C x => Nat.card {y : Γ // Subgroup.zpowers (y⁻¹ * x * y) = C}
   let V : Submodule ℤ (Γ → ℤ) :=
     Submodule.span ℤ (Set.range fun D : {D : Subgroup Γ // IsCyclic D} => π D)
-  have hrec : ∀ (C : Subgroup Γ) (x : Γ),
-      (Nat.card C : ℤ) * π C x = ∑ D ∈ Finset.univ.filter (· ≤ C), f D x := by
+  have hrec
+      : ∀ (C : Subgroup Γ) (x : Γ),
+        (Nat.card C : ℤ) * π C x = ∑ D ∈ Finset.univ.filter (· ≤ C), f D x := by
     intro C x
     simp only [π, f]
     rw [← Nat.cast_mul, card_mul_card_fixedBy_quotient,
-      natCard_subtype_eq_sum_natCard_fiber (fun y => Subgroup.zpowers (y⁻¹ * x * y))
-        (Finset.univ.filter (· ≤ C)) _ (fun y => by simp [Subgroup.zpowers_le])]
+      natCard_subtype_eq_sum_natCard_fiber
+        (fun y => Subgroup.zpowers (y⁻¹ * x * y))
+        (Finset.univ.filter (· ≤ C)) _
+        (fun y => by simp [Subgroup.zpowers_le])]
     push_cast
     rfl
   have htot : ∀ x : Γ, (Nat.card Γ : ℤ) = ∑ C, f C x := by
     intro x
-    have h := natCard_subtype_eq_sum_natCard_fiber (fun y : Γ => Subgroup.zpowers (y⁻¹ * x * y))
-      Finset.univ (fun _ => True) (by simp)
+    have h :=
+      natCard_subtype_eq_sum_natCard_fiber
+        (fun y : Γ => Subgroup.zpowers (y⁻¹ * x * y))
+        Finset.univ
+        (fun _ => True)
+        (by simp)
     rw [Nat.card_congr (Equiv.subtypeUnivEquiv (fun _ => trivial))] at h
     simp only [f]
     exact_mod_cast h
@@ -100,12 +111,18 @@ theorem exists_artin_relation [Finite Γ] :
     rw [h]
     exact V.sum_mem fun C _ => hmem C
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 hconst
-  refine ⟨Finset.univ.filter (fun D => IsCyclic D), fun D => if h : IsCyclic D then c ⟨D, h⟩ else 0,
-    fun D hD => (Finset.mem_filter.1 hD).2, fun x => ?_⟩
+  refine ⟨
+    Finset.univ.filter (fun D => IsCyclic D),
+    fun D => if h : IsCyclic D then c ⟨D, h⟩ else 0,
+    fun D hD => (Finset.mem_filter.1 hD).2,
+    fun x => ?_
+  ⟩
   have h := congrFun hc x
   rw [Finset.sum_apply] at h
-  rw [← h, Finset.sum_subtype (Finset.univ.filter (fun D => IsCyclic D))
-    (p := fun D : Subgroup Γ => IsCyclic D) (by simp)]
+  rw [← h,
+    Finset.sum_subtype (Finset.univ.filter (fun D => IsCyclic D))
+      (p := fun D : Subgroup Γ => IsCyclic D)
+      (by simp)]
   refine Finset.sum_congr rfl fun D _ => ?_
   rw [Pi.smul_apply, smul_eq_mul]
   show c D * π D x = (if h : IsCyclic (D : Subgroup Γ) then c ⟨D, h⟩ else 0) * π D x

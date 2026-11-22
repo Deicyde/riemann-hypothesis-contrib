@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.V.Af.Smo (Eig EigAt)
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
 open scoped Classical
@@ -71,11 +73,16 @@ private lemma W_zero {K : Type} [Field K] [NumberField K] {v : P K} {ϖ : (Kv v)
   have e2 : χ (((ϖ⁻¹ : (Kv v)ˣ) : Kv v) * c) = 1 := mul_right_cancel₀ h (by rw [e1, one_mul])
   rwa [mul_comm] at e2
 
-theorem UpperTheory.ConvolutionTheory.R2.H.whTorus :
-    ∀ (K : Type) [Field K] [NumberField K] (v : P K) (ϖ : (Kv v)ˣ), IsU ϖ → ∀ (χ : Kv v → ℂ), Good χ → ∀ (α β : ℂˣ) (W : GL (Fin 2) (Kv v) → ℂ), Eig v {α, β} W →
-      (∀ b y, W (nL b * y) = χ b * W y) →
-      q v * W (dL ϖ 1) = q v ^ (1 / 2 : ℂ) * ((α : ℂ) + β) * W 1 ∧
-        (α : ℂ) * β * q v * W (dL ϖ ϖ⁻¹) = ((α : ℂ) ^ 2 + α * β + (β : ℂ) ^ 2) * W 1 := by
+theorem UpperTheory.ConvolutionTheory.R2.H.whTorus
+    : ∀ (K : Type) [Field K] [NumberField K] (v : P K) (ϖ : (Kv v)ˣ),
+      IsU ϖ
+        → ∀ (χ : Kv v → ℂ),
+          Good χ
+            → ∀ (α β : ℂˣ) (W : GL (Fin 2) (Kv v) → ℂ),
+              Eig v {α, β} W → (∀ b y, W (nL b * y) = χ b * W y)
+                → q v * W (dL ϖ 1) = q v ^ (1 / 2 : ℂ) * ((α : ℂ) + β) * W 1
+                  ∧ (α : ℂ) * β * q v * W (dL ϖ ϖ⁻¹)
+                    = ((α : ℂ) ^ 2 + α * β + (β : ℂ) ^ 2) * W 1 := by
   intro K _ _ v ϖ hϖ χ hχ α β W hW hn
   obtain ⟨R, hcard, hRint, hR⟩ := UpperTheory.ConvolutionTheory.R2.H.heckeExpl K v ϖ hϖ
   have hsum := fun g => (hR α β W hW g).1

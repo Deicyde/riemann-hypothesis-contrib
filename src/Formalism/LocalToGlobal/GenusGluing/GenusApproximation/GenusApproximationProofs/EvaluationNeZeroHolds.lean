@@ -17,15 +17,19 @@ section SlopeTestRemainingChoices
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem one_tmul_injective : Function.Injective (fun a : Formalism.L2.Herm.Af F => (1 : E) ⊗ₜ[F] a) := by
-  have h := Algebra.TensorProduct.includeRight_injective (R := F) (A := E) (B := Formalism.L2.Herm.Af F)
-    (algebraMap F E).injective
+theorem one_tmul_injective
+    : Function.Injective (fun a : Formalism.L2.Herm.Af F => (1 : E) ⊗ₜ[F] a) := by
+  have h :=
+    Algebra.TensorProduct.includeRight_injective (R := F) (A := E) (B := Formalism.L2.Herm.Af F)
+      (algebraMap F E).injective
   intro a b hab
   apply h
   simpa [Algebra.TensorProduct.includeRight_apply] using hab
 
-theorem eAt_eq (v : HeightOneSpectrum (𝓞 F)) :
-    eAt E v = (1 : E) ⊗ₜ[F] ((Formalism.L2.DIV.idemAd (fun w => w = v) : Formalism.UG.intAd F) : Formalism.L2.Herm.Af F) := rfl
+theorem eAt_eq (v : HeightOneSpectrum (𝓞 F))
+    : eAt E v
+      = (1 : E) ⊗ₜ[F] ((Formalism.L2.DIV.idemAd (fun w => w = v) : Formalism.UG.intAd F) : Formalism.L2.Herm.Af F) :=
+  rfl
 
 end SlopeTestRemainingChoices
 
@@ -33,8 +37,11 @@ theorem evaluationNeZero_holds : EAtNeZero := by
   intro F E _ _ _ _ _ v h
   rw [eAt_eq, ← TensorProduct.tmul_zero (R := F) (Formalism.L2.Herm.Af F) (1 : E)] at h
   have h2 := one_tmul_injective h
-  have h3 : ((Formalism.L2.DIV.idemAd (fun w => w = v) : Formalism.UG.intAd F) : Formalism.L2.Herm.Af F) v =
-      (0 : Formalism.L2.Herm.Af F) v := by rw [h2]
+  have h3
+      : ((Formalism.L2.DIV.idemAd (fun w => w = v) : Formalism.UG.intAd F) : Formalism.L2.Herm.Af F)
+          v
+        = (0 : Formalism.L2.Herm.Af F) v := by
+    rw [h2]
   rw [Formalism.L2.DIV.idemAd_pos (P := fun w => w = v) rfl] at h3
   exact one_ne_zero h3
 
@@ -42,15 +49,14 @@ theorem unitDichotomy_holds : UnitDich := by
   classical
   intro F E _ _ _ _ _ _ hc v u
   set σ := Formalism.UG.sigR hc.sig (Formalism.L2.Herm.Af F) with hσ
-  have hfix : σ (u * σ u) = u * σ u := by
-    rw [map_mul, hσ, Formalism.L2.DIV.sigR_sigR, mul_comm]
+  have hfix : σ (u * σ u) = u * σ u := by rw [map_mul, hσ, Formalism.L2.DIV.sigR_sigR, mul_comm]
   obtain ⟨a, ha⟩ := Formalism.L2.DIV.exists_adele_of_fixed hc _ hfix
   set idem : Formalism.L2.Herm.Af F := ((Formalism.L2.DIV.idemAd (fun w => w = v) : Formalism.UG.intAd F) : Formalism.L2.Herm.Af F)
     with hidem
   by_cases hav : a v = 0
   · left
-    rw [ha, eAt_eq, Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← TensorProduct.tmul_zero (R := F)
-      (Formalism.L2.Herm.Af F) (1 : E)]
+    rw [ha, eAt_eq, Algebra.TensorProduct.tmul_mul_tmul, one_mul,
+      ← TensorProduct.tmul_zero (R := F) (Formalism.L2.Herm.Af F) (1 : E)]
     congr 1
     apply FiniteAdeleRing.ext
     intro w
@@ -59,7 +65,8 @@ theorem unitDichotomy_holds : UnitDich := by
     · subst hw; rw [hav, mul_zero]
     · rw [hidem, Formalism.L2.DIV.idemAd_neg (P := fun x => x = v) hw, zero_mul]
   · right
-    let f : ∀ w : HeightOneSpectrum (𝓞 F), w.adicCompletion F := fun w => if w = v then (a w)⁻¹ else 0
+    let f : ∀ w : HeightOneSpectrum (𝓞 F), w.adicCompletion F := fun w =>
+      if w = v then (a w)⁻¹ else 0
     have hf : ∀ᶠ w in Filter.cofinite, f w ∈ w.adicCompletionIntegers F := by
       filter_upwards [Filter.eventually_cofinite_ne v] with w hw
       simp only [f, if_neg hw]
@@ -87,15 +94,18 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarR
 theorem exists_star_ne (hc : Formalism.BasicNotions.CMData F E) : ∃ θ : E, star θ ≠ θ := by
   by_contra h
   push Not at h
-  have hb : Function.Bijective (algebraMap F E) :=
-    ⟨(algebraMap F E).injective, fun x => by
+  have hb : Function.Bijective (algebraMap F E) := ⟨
+    (algebraMap F E).injective,
+    fun x => by
       obtain ⟨y, hy⟩ := RingHom.mem_range.1 ((hc.fixed x).1 (h x))
-      exact ⟨y, hy⟩⟩
+      exact ⟨y, hy⟩
+  ⟩
   have h1 := Module.finrank_of_bijective_algebraMap hb
   rw [hc.deg2] at h1
   exact absurd h1 (by norm_num)
 
-theorem exists_norm_one (hc : Formalism.BasicNotions.CMData F E) : ∃ t : E, star t * t = 1 ∧ star t - t ≠ 0 := by
+theorem exists_norm_one (hc : Formalism.BasicNotions.CMData F E)
+    : ∃ t : E, star t * t = 1 ∧ star t - t ≠ 0 := by
   obtain ⟨θ, hθ⟩ := exists_star_ne hc
   set d : E := θ - star θ with hd_def
   have hd : star d = -d := by rw [hd_def, star_sub, star_star, neg_sub]
@@ -135,8 +145,10 @@ theorem shiftOne_holds : ShiftOne := by
   set σ := Formalism.UG.sigR hc.sig (Formalism.L2.Herm.Af F) with hσ
   have hσι : ∀ t : E, σ (iA F E t) = iA F E (star t) := fun t => rfl
   set b := β * α' with hb
-  have win : ∀ t : E, star t * t = 1 → (∃ u', e * ((iA F E t + b) * u') = e) →
-      ∃ t : E, star t * t = 1 ∧ ∃ w, e * ((α * iA F E t + β) * w) = e := by
+  have win
+      : ∀ t : E,
+        star t * t = 1 → (∃ u', e * ((iA F E t + b) * u') = e)
+          → ∃ t : E, star t * t = 1 ∧ ∃ w, e * ((α * iA F E t + β) * w) = e := by
     rintro t ht ⟨u', hu'⟩
     refine ⟨t, ht, α' * u', ?_⟩
     rw [hb] at hu'
@@ -163,10 +175,11 @@ theorem shiftOne_holds : ShiftOne := by
   have hk : (S - T) * k = 1 := by rw [← map_sub, ← map_mul, mul_inv_cancel₀ hne, map_one]
   set half := iA F E (2 : E)⁻¹
   have hh : half * 2 = 1 := by
-    rw [show (2 : E ⊗[F] Formalism.L2.Herm.Af F) = iA F E 2 from (map_ofNat (iA F E) 2).symm, ← map_mul,
-      inv_mul_cancel₀ (two_ne_zero : (2 : E) ≠ 0), map_one]
+    rw [show (2 : E ⊗[F] Formalism.L2.Herm.Af F) = iA F E 2 from (map_ofNat (iA F E) 2).symm,
+      ← map_mul, inv_mul_cancel₀ (two_ne_zero : (2 : E) ≠ 0), map_one]
   have A : e * (b + sb) = 0 := by linear_combination half * h1 - half * h2 - (e * (b + sb)) * hh
-  have B : e * (1 + b * sb) = 0 := by linear_combination half * h1 + half * h2 - (e * (1 + b * sb)) * hh
+  have B : e * (1 + b * sb) = 0 := by
+    linear_combination half * h1 + half * h2 - (e * (1 + b * sb)) * hh
   have C : e * b * (S - T) = 0 := by linear_combination h3 - B - T * A - e * hTS
   have D : e * b = 0 := by linear_combination k * C - (e * b) * hk
   have hE : e = 0 := by linear_combination B - sb * D

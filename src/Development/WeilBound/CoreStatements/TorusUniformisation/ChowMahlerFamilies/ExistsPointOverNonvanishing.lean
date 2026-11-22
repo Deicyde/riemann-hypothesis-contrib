@@ -6,12 +6,15 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticInt
 
 @[expose] public section
 
-open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 GlobalTheory.CompanionTheory.Ar.Flat
+open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2 GlobalTheory.CompanionTheory.Ar.Flat
 
 namespace PositivityTheory.Xgn.PointOverExistence
 
-theorem exists_algHom (F R : Type) [Field F] [CommRing R] [Nontrivial R] [Algebra F R]
-    [Algebra.FiniteType F R] [Algebra F ℂ] : Nonempty (R →ₐ[F] ℂ) := by
+theorem exists_algHom
+    (F R : Type)
+    [Field F] [CommRing R] [Nontrivial R] [Algebra F R] [Algebra.FiniteType F R] [Algebra F ℂ]
+    : Nonempty (R →ₐ[F] ℂ) := by
   obtain ⟨m, hm⟩ := Ideal.exists_maximal R
   letI : Field (R ⧸ m) := Ideal.Quotient.field m
   haveI : Module.Finite F (R ⧸ m) := finite_of_finite_type_of_isJacobsonRing F (R ⧸ m)
@@ -19,9 +22,11 @@ theorem exists_algHom (F R : Type) [Field F] [CommRing R] [Nontrivial R] [Algebr
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem scale {S : Type} [CommRing S] (t : K → S) (u : (Σ k, ι k) → S) {g : MRing ι} {d : K → ℕ}
-    (hg : IsMultiHomog g d) :
-    aeval (fun p : Σ k, ι k => t p.1 * u p) g = (∏ k, t k ^ d k) * aeval u g := by
+theorem scale
+    {S : Type} [CommRing S]
+    (t : K → S) (u : (Σ k, ι k) → S)
+    {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d)
+    : aeval (fun p : Σ k, ι k => t p.1 * u p) g = (∏ k, t k ^ d k) * aeval u g := by
   classical
   rw [aeval_def, aeval_def, eval₂_eq', eval₂_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
@@ -33,8 +38,9 @@ theorem scale {S : Type} [CommRing S] (t : K → S) (u : (Σ k, ι k) → S) {g 
   simp only [mul_pow, Finset.prod_mul_distrib, h]
   ring
 
-theorem map_aeval' {S T : Type} [CommRing S] [CommRing T] (j : S →+* T) (u : (Σ k, ι k) → S)
-    (g : MRing ι) : j (aeval u g) = aeval (fun p => j (u p)) g := by
+theorem map_aeval'
+    {S T : Type} [CommRing S] [CommRing T] (j : S →+* T) (u : (Σ k, ι k) → S) (g : MRing ι)
+    : j (aeval u g) = aeval (fun p => j (u p)) g := by
   induction g using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -48,15 +54,19 @@ theorem evC_eq (z : (Σ k, ι k) → ℂ) (g : MRing ι) : evC z g = aeval z g :
 
 variable {Ω : Type} [Field Ω]
 
-theorem cone_eq (y : (Σ k, ι k) → Ω) (g : MRing ι) : mConeMap y g =
-    @aeval ℤ (MvPolynomial K Ω) _ _ _ (Ring.toIntAlgebra _) (fun p : Σ k, ι k => X p.1 * C (y p)) g := by
+theorem cone_eq (y : (Σ k, ι k) → Ω) (g : MRing ι)
+    : mConeMap y g
+      = @aeval ℤ (MvPolynomial K Ω) _ _ _ (Ring.toIntAlgebra _)
+        (fun p : Σ k, ι k => X p.1 * C (y p))
+        g := by
   induction g using MvPolynomial.induction_on with
   | C a => simp only [eq_intCast, map_intCast]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p i hp => rw [map_mul, map_mul, hp, aeval_X, mConeMap, aeval_X, mul_comm (C _)]
 
-theorem aeval_ne_zero {y : (Σ k, ι k) → Ω} {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d)
-    (hn : g ∉ mCoordIdeal y) : aeval y g ≠ 0 := by
+theorem aeval_ne_zero
+    {y : (Σ k, ι k) → Ω} {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (hn : g ∉ mCoordIdeal y)
+    : aeval y g ≠ 0 := by
   intro h0
   apply hn
   have h := scale (S := MvPolynomial K Ω) (fun k => X k) (fun p => C (y p)) hg
@@ -64,11 +74,10 @@ theorem aeval_ne_zero {y : (Σ k, ι k) → Ω} {g : MRing ι} {d : K → ℕ} (
   show mConeMap y g = 0
   rw [cone_eq, h]
 
-theorem aeval_eq_zero {y : (Σ k, ι k) → Ω} (t : K → Ω) {f : MRing ι} (hf : f ∈ mCoordIdeal y) :
-    aeval (fun p : Σ k, ι k => t p.1 * y p) f = 0 := by
+theorem aeval_eq_zero {y : (Σ k, ι k) → Ω} (t : K → Ω) {f : MRing ι} (hf : f ∈ mCoordIdeal y)
+    : aeval (fun p : Σ k, ι k => t p.1 * y p) f = 0 := by
   have h0 : mConeMap y f = 0 := hf
-  have h := map_aeval' (eval t : MvPolynomial K Ω →+* Ω)
-    (fun p : Σ k, ι k => X p.1 * C (y p)) f
+  have h := map_aeval' (eval t : MvPolynomial K Ω →+* Ω) (fun p : Σ k, ι k => X p.1 * C (y p)) f
   rw [← cone_eq, h0, map_zero] at h
   rw [h]
   simp only [map_mul, eval_C, eval_X]
@@ -76,7 +85,11 @@ theorem aeval_eq_zero {y : (Σ k, ι k) → Ω} (t : K → Ω) {f : MRing ι} (h
 end PositivityTheory.Xgn.PointOverExistence
 
 open PositivityTheory.Xgn.PointOverExistence in
-theorem PositivityTheory.Xgn.exists_point_over_nonvanishing : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] (y : (Σ k, ι k) → Ω) (φ : F →+* Ω) (σ : F →+* ℂ) (g : MRing ι) (d : K → ℕ), OverInt y φ → IsMultiHomog g d → g ∉ mCoordIdeal y → ∃ z, PtOver y φ σ z ∧ evC z g ≠ 0 := by
+theorem PositivityTheory.Xgn.exists_point_over_nonvanishing
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (F : Type)
+        [Field F] [NumberField F] (y : (Σ k, ι k) → Ω) (φ : F →+* Ω) (σ : F →+* ℂ) (g : MRing ι)
+        (d : K → ℕ),
+      OverInt y φ → IsMultiHomog g d → g ∉ mCoordIdeal y → ∃ z, PtOver y φ σ z ∧ evC z g ≠ 0 := by
   intro K _ ι _ Ω _ F _ _ y φ σ g d hO hg hn
   choose c hc using hO.1
   letI : Algebra F Ω := φ.toAlgebra

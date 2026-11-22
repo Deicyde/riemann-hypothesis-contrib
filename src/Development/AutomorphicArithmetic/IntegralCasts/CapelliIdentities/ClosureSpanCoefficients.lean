@@ -4,11 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.closure_span_coefficients :
-    ∀ {R M L : Type} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup L] (O : AddSubgroup R) (f : L →+ M) {m : ℕ} (x : Fin m → L),
-        Submodule.span ℤ (Set.range x) = ⊤ → ∀ z : M,
-          z ∈ AddSubgroup.closure {z : M | ∃ a ∈ O, ∃ l : L, z = a • f l} ↔
-            ∃ a : Fin m → R, (∀ i, a i ∈ O) ∧ ∑ i, a i • f (x i) = z := by
+theorem UpperTheory.closure_span_coefficients
+    : ∀ {R M L : Type} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup L] (O : AddSubgroup R)
+        (f : L →+ M) {m : ℕ} (x : Fin m → L),
+      Submodule.span ℤ (Set.range x) = ⊤
+        → ∀ z : M,
+          z ∈ AddSubgroup.closure {z : M | ∃ a ∈ O, ∃ l : L, z = a • f l}
+            ↔ ∃ a : Fin m → R, (∀ i, a i ∈ O) ∧ ∑ i, a i • f (x i) = z := by
   intro R M L _ _ _ _ O f m x hx z
   constructor
   · intro hz
@@ -22,12 +24,12 @@ theorem UpperTheory.closure_span_coefficients :
         rw [map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_zsmul, smul_assoc, smul_comm]
-    | zero => exact ⟨0, fun _ => O.zero_mem, by simp⟩
+    | zero =>
+      exact ⟨0, fun _ => O.zero_mem, by simp⟩
     | add u v _ _ hu hv =>
       obtain ⟨a, ha, rfl⟩ := hu
       obtain ⟨b, hb, rfl⟩ := hv
-      exact ⟨a + b, fun i => O.add_mem (ha i) (hb i), by
-        simp [add_smul, Finset.sum_add_distrib]⟩
+      exact ⟨a + b, fun i => O.add_mem (ha i) (hb i), by simp [add_smul, Finset.sum_add_distrib]⟩
     | neg u _ hu =>
       obtain ⟨a, ha, rfl⟩ := hu
       exact ⟨-a, fun i => O.neg_mem (ha i), by simp⟩

@@ -35,18 +35,24 @@ private lemma ncard_preimage_surjective_eq {A B : Type} [CommRing A] [CommRing B
   rw [Nat.card_congr e2, Nat.card_prod, Nat.card_fun, Nat.card_fun, Nat.card_fin, Nat.card_fin]
   ring
 
-theorem ncard_gram_mod_eq_card_ker_pow_mul {A B : Type} [CommRing A] [Finite A] [CommRing B]
-    (c : A →+* A) (c' : B →+* B) (hc : ∀ u, c (c u) = u) (p : A) (hp : IsNilpotent p)
-    (φ : A →+* B) (hs : Function.Surjective φ) (hφ : ∀ u, φ (c u) = c' (φ u))
-    (hk : ∀ u, φ u = 0 ↔ p ∣ u) (m n : ℕ) (G : Matrix (Fin m) (Fin m) A) :
-    Set.ncard {x : Fin m → Fin n → A | Prim c x ∧ ∀ a b, p ∣ ip c (x b) (x a) - G a b} =
-      Nat.card {u : A // p ∣ u} ^ (n * m) * Set.ncard (sols c' n (G.map φ)) := by
+theorem ncard_gram_mod_eq_card_ker_pow_mul
+    {A B : Type} [CommRing A] [Finite A] [CommRing B]
+    (c : A →+* A)
+    (c' : B →+* B)
+    (hc : ∀ u, c (c u) = u)
+    (p : A) (hp : IsNilpotent p)
+    (φ : A →+* B)
+    (hs : Function.Surjective φ) (hφ : ∀ u, φ (c u) = c' (φ u)) (hk : ∀ u, φ u = 0 ↔ p ∣ u)
+    (m n : ℕ) (G : Matrix (Fin m) (Fin m) A)
+    : Set.ncard {x : Fin m → Fin n → A | Prim c x ∧ ∀ a b, p ∣ ip c (x b) (x a) - G a b}
+      = Nat.card {u : A // p ∣ u} ^ (n * m) * Set.ncard (sols c' n (G.map φ)) := by
   have hk' : ∀ u, φ u = 0 → IsUnit (1 + u) := fun u hu => by
     obtain ⟨v, rfl⟩ := (hk u).1 hu
     exact (Commute.all p v).isNilpotent_mul_right hp |>.isUnit_one_add
 
-  have hset : {x : Fin m → Fin n → A | Prim c x ∧ ∀ a b, p ∣ ip c (x b) (x a) - G a b} =
-      {x | (fun a i => φ (x a i)) ∈ sols c' n (G.map φ)} := by
+  have hset
+      : {x : Fin m → Fin n → A | Prim c x ∧ ∀ a b, p ∣ ip c (x b) (x a) - G a b}
+        = {x | (fun a i => φ (x a i)) ∈ sols c' n (G.map φ)} := by
     ext x
     simp only [Set.mem_setOf_eq, sols]
     constructor

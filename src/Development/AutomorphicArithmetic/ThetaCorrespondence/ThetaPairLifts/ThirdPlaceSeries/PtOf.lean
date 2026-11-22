@@ -19,16 +19,27 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
-open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.L2.Pj Formalism.IndefR.FWT
+open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.L2.Pj Formalism.IndefR.FWT
 open GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.BigTop
 namespace GlobalTheory.Fc.Ind
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX}
-variable {Rc : _root_.Formalism.L2.RecTAlt ex} {P : RowSideFamily ex} {Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs)}
-  {Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs)} {S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc}
-def pointOfRealisation (pin : _root_.Formalism.L2.Rows.RowSideDeterminedAlt Rc.T P) {Del h0 : ℕ} (hDel : D.s.Del = (Del : ℚ)) (hh0 : L.etaSz = (D.R.m : ℝ) * (h0 : ℝ)) {c : ℝ}
-    (B : _root_.Formalism.IndefR.RealTBAlt Rc P Dcf Spf (zscOf P Del h0 c) S) (Qp : _root_.Formalism.IndefR.IndefiniteRealisationNormalisation B.Q) (Qr : _root_.Formalism.IndefR.IndefiniteRealisationRecursion B.Q) : PtAt ex c where
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX}
+variable
+  {Rc : _root_.Formalism.L2.RecTAlt ex} {P : RowSideFamily ex}
+  {Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs)}
+  {Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs)}
+  {S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc}
+def pointOfRealisation
+    (pin : _root_.Formalism.L2.Rows.RowSideDeterminedAlt Rc.T P)
+    {Del h0 : ℕ} (hDel : D.s.Del = (Del : ℚ)) (hh0 : L.etaSz = (D.R.m : ℝ) * (h0 : ℝ))
+    {c : ℝ} (B : _root_.Formalism.IndefR.RealTBAlt Rc P Dcf Spf (zscOf P Del h0 c) S)
+    (Qp : _root_.Formalism.IndefR.IndefiniteRealisationNormalisation B.Q)
+    (Qr : _root_.Formalism.IndefR.IndefiniteRealisationRecursion B.Q)
+    : PtAt ex c where
   P := rowSideOfCompatibleThetaPair P
   Del := Del
   h0 := h0
@@ -81,10 +92,14 @@ def pointOfRealisation (pin : _root_.Formalism.L2.Rows.RowSideDeterminedAlt Rc.T
   tupTie := Qr.tupTie
   tupT_tup := Qr.tupT_tup
   muEq := Qr.muEq
-def PointSummands.pt {D : D7} {O : Obj D} {c : ℝ} (b : _root_.GlobalTheory.Fc.Ind.PointSummands D O c) : PtAt O.ex c :=
+def PointSummands.pt
+    {D : D7} {O : Obj D} {c : ℝ} (b : _root_.GlobalTheory.Fc.Ind.PointSummands D O c)
+    : PtAt O.ex c :=
   _root_.GlobalTheory.Fc.Ind.pointOfRealisation b.pin b.DH.2.1 b.DH.2.2 b.B b.pins b.Rr
-def conditionOnPoint (G : PtP) : BdP _root_.GlobalTheory.Fc.Ind.PointSummands := fun D O c b => G D O c b.pt
-def RowPointSummands : BdP _root_.GlobalTheory.Fc.Ind.PointSummands := fun _ _ _ b => b.pt.PointConditions'
+def conditionOnPoint (G : PtP) : BdP _root_.GlobalTheory.Fc.Ind.PointSummands := fun D O c b =>
+  G D O c b.pt
+def RowPointSummands : BdP _root_.GlobalTheory.Fc.Ind.PointSummands := fun _ _ _ b =>
+  b.pt.PointConditions'
 end GlobalTheory.Fc.Ind
 end
 end

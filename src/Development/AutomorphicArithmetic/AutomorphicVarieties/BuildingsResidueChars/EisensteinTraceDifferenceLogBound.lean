@@ -4,18 +4,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial GlobalTheory.GalOfCusp UpperTheory.V.Af
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+  GlobalTheory.GalOfCusp UpperTheory.V.Af
 
-theorem UpperTheory.eisenstein_trace_difference_log_bound :
-    ∀ (q e k : ℕ), 7 ≤ q → 1 ≤ e → 0 < k → ∀ z t : ℂ, z ^ k = 1 → ‖t‖ ≤ 3 → IsIntegral ℤ ((q : ℂ) ^ e * t) → t ≠ eis3 q e z ∧ IsIntegral ℤ ((q : ℂ) ^ e * (t - eis3 q e z)) ∧ Real.log ‖(q : ℂ) ^ e * (t - eis3 q e z)‖ ≤ 2 * e * Real.log q + 1 := by
+theorem UpperTheory.eisenstein_trace_difference_log_bound
+    : ∀ (q e k : ℕ),
+      7 ≤ q → 1 ≤ e → 0 < k
+        → ∀ z t : ℂ,
+          z ^ k = 1 → ‖t‖ ≤ 3 → IsIntegral ℤ ((q : ℂ) ^ e * t)
+            → t ≠ eis3 q e z ∧ IsIntegral ℤ ((q : ℂ) ^ e * (t - eis3 q e z))
+              ∧ Real.log ‖(q : ℂ) ^ e * (t - eis3 q e z)‖ ≤ 2 * e * Real.log q + 1 := by
   intro q e k hq he hk z t hz ht hI
   have hzn : ‖z‖ = 1 := Complex.norm_eq_one_of_pow_eq_one hz hk.ne'
   have hz0 : z ≠ 0 := by
     rintro rfl
     simp at hzn
   have hQN : 7 ≤ q ^ e := le_trans hq (Nat.le_self_pow (by omega) q)
-  have hlogQ : Real.log ((q ^ e : ℕ) : ℝ) = e * Real.log q := by
-    rw [Nat.cast_pow, Real.log_pow]
+  have hlogQ : Real.log ((q ^ e : ℕ) : ℝ) = e * Real.log q := by rw [Nat.cast_pow, Real.log_pow]
   have hcast : (q : ℂ) ^ e = ((q ^ e : ℕ) : ℂ) := by push_cast; rfl
   unfold eis3
   rw [hcast] at hI ⊢
@@ -24,8 +30,9 @@ theorem UpperTheory.eisenstein_trace_difference_log_bound :
   have hN0 : (N : ℂ) ≠ 0 := by
     have : N ≠ 0 := by omega
     exact_mod_cast this
-  have hexp : (N : ℂ) * (t - ((N : ℂ)⁻¹ * z + 1 + (N : ℂ) * z⁻¹)) =
-      (N : ℂ) * t - z - N - (N : ℂ) * N * z⁻¹ := by
+  have hexp
+      : (N : ℂ) * (t - ((N : ℂ)⁻¹ * z + 1 + (N : ℂ) * z⁻¹))
+        = (N : ℂ) * t - z - N - (N : ℂ) * N * z⁻¹ := by
     field_simp
     ring
   have hnA : ‖(N : ℂ) * t - z - N‖ ≤ 4 * N + 1 := by
@@ -36,8 +43,7 @@ theorem UpperTheory.eisenstein_trace_difference_log_bound :
     have h3 := norm_sub_le ((N : ℂ) * t) z
     rw [Complex.norm_natCast] at h2
     linarith
-  have hnB : ‖(N : ℂ) * N * z⁻¹‖ = N * N := by
-    simp [hzn]
+  have hnB : ‖(N : ℂ) * N * z⁻¹‖ = N * N := by simp [hzn]
   have hne : (N : ℂ) * t - z - N - (N : ℂ) * N * z⁻¹ ≠ 0 := by
     intro h
     rw [sub_eq_zero.mp h, hnB] at hnA

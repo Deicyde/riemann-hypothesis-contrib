@@ -11,11 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.CofinalDual
 
-theorem card_le_of_pairing {A B : Type} [AddCommGroup A] [AddCommGroup B] [Finite A] [Finite B]
-    (b : A → B → ℂ) (hn : ∀ x y, ‖b x y‖ = 1)
-    (hl : ∀ x x' y, b (x + x') y = b x y * b x' y)
-    (hr : ∀ x y y', b x (y + y') = b x y * b x y')
-    (hk : ∀ x, (∀ y, b x y = 1) → x = 0) : Nat.card A ≤ Nat.card B := by
+theorem card_le_of_pairing
+    {A B : Type} [AddCommGroup A] [AddCommGroup B] [Finite A] [Finite B]
+    (b : A → B → ℂ) (hn : ∀ x y, ‖b x y‖ = 1) (hl : ∀ x x' y, b (x + x') y = b x y * b x' y)
+    (hr : ∀ x y y', b x (y + y') = b x y * b x y') (hk : ∀ x, (∀ y, b x y = 1) → x = 0)
+    : Nat.card A ≤ Nat.card B := by
   classical
   haveI := Fintype.ofFinite B
   have hne : ∀ x y, b x y ≠ 0 := fun x y h => by
@@ -25,27 +25,32 @@ theorem card_le_of_pairing {A B : Type} [AddCommGroup A] [AddCommGroup B] [Finit
     have := hr x 0 0
     rw [add_zero] at this
     exact (mul_eq_left₀ (hne x 0)).1 this.symm
-  let f : A → AddChar B ℂ := fun x =>
-    { toFun := b x, map_zero_eq_one' := h0 x, map_add_eq_mul' := hr x }
+  let f : A → AddChar B ℂ := fun x => {
+    toFun := b x
+    map_zero_eq_one' := h0 x
+    map_add_eq_mul' := hr x
+  }
   have hf : Function.Injective f := by
     intro x x' h
     have e : ∀ y, b x y = b x' y := fun y => congrArg (fun ψ : AddChar B ℂ => ψ y) h
-    have : x - x' = 0 := hk _ fun y => by
-      have h1 := hl (x - x') x' y
-      rw [sub_add_cancel, e y] at h1
-      exact (mul_eq_right₀ (hne x' y)).1 h1.symm
+    have : x - x' = 0 :=
+      hk _ fun y => by
+        have h1 := hl (x - x') x' y
+        rw [sub_add_cancel, e y] at h1
+        exact (mul_eq_right₀ (hne x' y)).1 h1.symm
     exact sub_eq_zero.1 this
   have e : Nat.card (AddChar B ℂ) = Nat.card B := by
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, AddChar.card_eq]
   exact e ▸ Nat.card_le_card_of_injective f hf
 
-theorem index_eq_of_pairing {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (c : X → Y → ℂ)
-    (hn : ∀ x y, ‖c x y‖ = 1)
-    (hl : ∀ x x' y, c (x + x') y = c x y * c x' y)
+theorem index_eq_of_pairing
+    {X Y : Type} [AddCommGroup X] [AddCommGroup Y]
+    (c : X → Y → ℂ) (hn : ∀ x y, ‖c x y‖ = 1) (hl : ∀ x x' y, c (x + x') y = c x y * c x' y)
     (hr : ∀ x y y', c x (y + y') = c x y * c x y')
     (N : AddSubgroup X) (M : AddSubgroup Y)
     (hN : ∀ x, x ∈ N ↔ ∀ y, c x y = 1) (hM : ∀ y, y ∈ M ↔ ∀ x, c x y = 1)
-    [N.FiniteIndex] [M.FiniteIndex] : N.index = M.index := by
+    [N.FiniteIndex] [M.FiniteIndex]
+    : N.index = M.index := by
   have hx : ∀ (x x' : X) (y : Y), (x : X ⧸ N) = x' → c x y = c x' y := by
     intro x x' y h
     have hm : -x + x' ∈ N := QuotientAddGroup.eq.1 h
@@ -84,12 +89,17 @@ theorem index_eq_of_pairing {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (c : 
     obtain ⟨y, rfl⟩ := QuotientAddGroup.mk_surjective q
     exact (QuotientAddGroup.eq_zero_iff y).2 ((hM y).2 fun x => by rw [← hb, h])
   exact le_antisymm (card_le_of_pairing b bn bl br k1)
-    (card_le_of_pairing (fun q p => b p q) (fun q p => bn p q) (fun q q' p => br p q q')
-      (fun q p p' => bl p p' q) k2)
+    (card_le_of_pairing
+      (fun q p => b p q)
+      (fun q p => bn p q)
+      (fun q q' p => br p q q')
+      (fun q p p' => bl p p' q)
+      k2)
 
-theorem relIndex_ne_zero_of_isOpen {V : Type} [AddCommGroup V] [TopologicalSpace V]
-    [IsTopologicalAddGroup V] (S T : AddSubgroup V) (hS : IsOpen (S : Set V))
-    (hT : IsCompact (T : Set V)) : S.relIndex T ≠ 0 := by
+theorem relIndex_ne_zero_of_isOpen
+    {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+    (S T : AddSubgroup V) (hS : IsOpen (S : Set V)) (hT : IsCompact (T : Set V))
+    : S.relIndex T ≠ 0 := by
   haveI : CompactSpace T := isCompact_iff_compactSpace.1 hT
   have ho : IsOpen ((S.addSubgroupOf T : AddSubgroup T) : Set T) :=
     hS.preimage continuous_subtype_val
@@ -97,10 +107,12 @@ theorem relIndex_ne_zero_of_isOpen {V : Type} [AddCommGroup V] [TopologicalSpace
   have : (S.addSubgroupOf T).FiniteIndex := AddSubgroup.finiteIndex_of_finite_quotient
   exact this.index_ne_zero
 
-theorem measure_eq_relIndex_mul {V : Type} [AddCommGroup V] [TopologicalSpace V]
-    [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V)
-    [μ.IsAddLeftInvariant] (S T : AddSubgroup V) (hST : S ≤ T) (hS : IsOpen (S : Set V))
-    (hf : S.relIndex T ≠ 0) : μ T = S.relIndex T * μ S := by
+theorem measure_eq_relIndex_mul
+    {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V]
+    [BorelSpace V]
+    (μ : Measure V) [μ.IsAddLeftInvariant]
+    (S T : AddSubgroup V) (hST : S ≤ T) (hS : IsOpen (S : Set V)) (hf : S.relIndex T ≠ 0)
+    : μ T = S.relIndex T * μ S := by
   classical
   haveI : (S.addSubgroupOf T).FiniteIndex := ⟨hf⟩
   haveI := Fintype.ofFinite (T ⧸ S.addSubgroupOf T)
@@ -140,9 +152,12 @@ theorem measure_eq_relIndex_mul {V : Type} [AddCommGroup V] [TopologicalSpace V]
   congr 2
   rw [AddSubgroup.relIndex, AddSubgroup.index, Nat.card_eq_fintype_card]
 
-def perpSub {V : Type} [AddCommGroup V] (χ : V → V → ℂ) (hs : ∀ x y, χ x y = χ y x)
-    (hn : ∀ x y, ‖χ x y‖ = 1) (ha : ∀ x x' y, χ (x + x') y = χ x y * χ x' y)
-    (L : AddSubgroup V) : AddSubgroup V where
+def perpSub
+    {V : Type} [AddCommGroup V]
+    (χ : V → V → ℂ) (hs : ∀ x y, χ x y = χ y x) (hn : ∀ x y, ‖χ x y‖ = 1)
+    (ha : ∀ x x' y, χ (x + x') y = χ x y * χ x' y)
+    (L : AddSubgroup V)
+    : AddSubgroup V where
   carrier := perp χ L
   add_mem' := by
     intro y y' hy hy' x hx
@@ -170,19 +185,23 @@ def perpSub {V : Type} [AddCommGroup V] (χ : V → V → ℂ) (hs : ∀ x y, χ
     rw [hs]
     exact this.symm
 
-theorem relIndex_eq_of_pairing {V : Type} [AddCommGroup V] (χ : V → V → ℂ)
-    (hs : ∀ x y, χ x y = χ y x) (hn : ∀ x y, ‖χ x y‖ = 1)
-    (ha : ∀ x x' y, χ (x + x') y = χ x y * χ x' y) (X₀ X Y₀ Y : AddSubgroup V)
-    (hX : ∀ x ∈ X, (x ∈ X₀ ↔ ∀ y ∈ Y, χ x y = 1))
-    (hY : ∀ y ∈ Y, (y ∈ Y₀ ↔ ∀ x ∈ X, χ x y = 1))
-    (fX : X₀.relIndex X ≠ 0) (fY : Y₀.relIndex Y ≠ 0) : X₀.relIndex X = Y₀.relIndex Y := by
+theorem relIndex_eq_of_pairing
+    {V : Type} [AddCommGroup V]
+    (χ : V → V → ℂ) (hs : ∀ x y, χ x y = χ y x) (hn : ∀ x y, ‖χ x y‖ = 1)
+    (ha : ∀ x x' y, χ (x + x') y = χ x y * χ x' y)
+    (X₀ X Y₀ Y : AddSubgroup V) (hX : ∀ x ∈ X, (x ∈ X₀ ↔ ∀ y ∈ Y, χ x y = 1))
+    (hY : ∀ y ∈ Y, (y ∈ Y₀ ↔ ∀ x ∈ X, χ x y = 1)) (fX : X₀.relIndex X ≠ 0) (fY : Y₀.relIndex Y ≠ 0)
+    : X₀.relIndex X = Y₀.relIndex Y := by
   haveI : (X₀.addSubgroupOf X).FiniteIndex := ⟨fX⟩
   haveI : (Y₀.addSubgroupOf Y).FiniteIndex := ⟨fY⟩
-  refine index_eq_of_pairing (fun (x : X) (y : Y) => χ x y) (fun x y => hn _ _)
+  refine index_eq_of_pairing
+    (fun (x : X) (y : Y) => χ x y)
+    (fun x y => hn _ _)
     (fun x x' y => ha _ _ _)
     (fun x y y' => by
       change χ x ((y : V) + y') = _
-      rw [hs, ha, hs y, hs y']) _ _ ?_ ?_
+      rw [hs, ha, hs y, hs y'])
+    _ _ ?_ ?_
   · intro x
     rw [AddSubgroup.mem_addSubgroupOf, hX x x.2]
     exact ⟨fun h y => h y y.2, fun h y hy => h ⟨y, hy⟩⟩
@@ -190,13 +209,22 @@ theorem relIndex_eq_of_pairing {V : Type} [AddCommGroup V] (χ : V → V → ℂ
     rw [AddSubgroup.mem_addSubgroupOf, hY y y.2]
     exact ⟨fun h x => h x x.2, fun h x hx => h ⟨x, hx⟩⟩
 
-theorem selfDual_of_between : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V] (χ : V → V → ℂ) (μ : Measure V), μ.IsAddHaarMeasure → (∀ x y, χ x y = χ y x) → (∀ x y, ‖χ x y‖ = 1) → (∀ x x' y, χ (x + x') y = χ x y * χ x' y) → ∀ L₁ L L₂ : AddSubgroup V, L₁ ≤ L → L ≤ L₂ → IsOpen (L₁ : Set V) → IsCompact (L₂ : Set V) → IsCompact (perp χ L₁) → IsOpen (perp χ L₂) → perp χ (perp χ L₁) ⊆ L₁ → perp χ (perp χ L₂) ⊆ L₂ → μ L₁ * μ (perp χ L₁) = 1 → μ L₂ * μ (perp χ L₂) = 1 → IsCompact (perp χ L) ∧ IsOpen (perp χ L) ∧ perp χ (perp χ L) ⊆ L ∧ μ L * μ (perp χ L) = 1 := by
+theorem selfDual_of_between
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+        [MeasurableSpace V] [BorelSpace V] (χ : V → V → ℂ) (μ : Measure V),
+      μ.IsAddHaarMeasure → (∀ x y, χ x y = χ y x) → (∀ x y, ‖χ x y‖ = 1)
+        → (∀ x x' y, χ (x + x') y = χ x y * χ x' y)
+        → ∀ L₁ L L₂ : AddSubgroup V,
+          L₁ ≤ L → L ≤ L₂ → IsOpen (L₁ : Set V) → IsCompact (L₂ : Set V) → IsCompact (perp χ L₁)
+            → IsOpen (perp χ L₂) → perp χ (perp χ L₁) ⊆ L₁ → perp χ (perp χ L₂) ⊆ L₂
+            → μ L₁ * μ (perp χ L₁) = 1 → μ L₂ * μ (perp χ L₂) = 1
+            → IsCompact (perp χ L) ∧ IsOpen (perp χ L) ∧ perp χ (perp χ L) ⊆ L
+              ∧ μ L * μ (perp χ L) = 1 := by
   intro V _ _ _ _ _ χ μ hμ hs hn ha L₁ L L₂ h1 h2 oL₁ cL₂ cP₁ oP₂ dd₁ dd₂ _ m₂
   let Q : AddSubgroup V → AddSubgroup V := perpSub χ hs hn ha
   have hQ : ∀ (A : AddSubgroup V) (y : V), y ∈ Q A ↔ ∀ x ∈ A, χ x y = 1 := fun _ _ => Iff.rfl
   have hQc : ∀ A : AddSubgroup V, (Q A : Set V) = perp χ A := fun _ => rfl
-  have anti : ∀ A B : AddSubgroup V, A ≤ B → Q B ≤ Q A :=
-    fun A B h y hy x hx => hy x (h hx)
+  have anti : ∀ A B : AddSubgroup V, A ≤ B → Q B ≤ Q A := fun A B h y hy x hx => hy x (h hx)
   have hself : ∀ A : AddSubgroup V, A ≤ Q (Q A) := fun A x hx y hy => by
     rw [hs]
     exact hy x hx
@@ -215,22 +243,30 @@ theorem selfDual_of_between : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace 
   have q0 : (Q L₂).relIndex (Q L) ≠ 0 := fun h => p0 (by rw [← ep, h, zero_mul])
   have q'0 : (Q L).relIndex (Q L₁) ≠ 0 := fun h => p0 (by rw [← ep, h, mul_zero])
   have m0 : (Q (Q L)).relIndex L₂ ≠ 0 := fun h => a'0 (by rw [← ek, h, mul_zero])
-  have kerL₁ : ∀ x, x ∈ L₁ ↔ ∀ y ∈ Q L₁, χ x y = 1 := fun x =>
-    ⟨fun hx y hy => hy x hx, fun h => dd₁ fun y hy => by
-      rw [hs]
-      exact h y hy⟩
+  have kerL₁ : ∀ x, x ∈ L₁ ↔ ∀ y ∈ Q L₁, χ x y = 1 := fun x => ⟨
+    fun hx y hy => hy x hx,
+    fun h =>
+      dd₁ fun y hy => by
+        rw [hs]
+        exact h y hy
+  ⟩
   have e1 : L₁.relIndex L = (Q L).relIndex (Q L₁) :=
-    relIndex_eq_of_pairing χ hs hn ha L₁ L (Q L) (Q L₁) (fun x _ => kerL₁ x)
-      (fun y _ => hQ L y) a0 q'0
+    relIndex_eq_of_pairing χ hs hn ha L₁ L (Q L) (Q L₁)
+      (fun x _ => kerL₁ x)
+      (fun y _ => hQ L y)
+      a0 q'0
   have e2 : (Q (Q L)).relIndex L₂ = (Q L₂).relIndex (Q L) :=
     relIndex_eq_of_pairing χ hs hn ha (Q (Q L)) L₂ (Q L₂) (Q L)
       (fun x _ => by
         rw [hQ]
         exact forall₂_congr fun y _ => by rw [hs])
-      (fun y _ => hQ L₂ y) m0 q0
+      (fun y _ => hQ L₂ y)
+      m0 q0
   have e3 : L₁.relIndex L₂ = (Q L₂).relIndex (Q L₁) :=
-    relIndex_eq_of_pairing χ hs hn ha L₁ L₂ (Q L₂) (Q L₁) (fun x _ => kerL₁ x)
-      (fun y _ => hQ L₂ y) n0 p0
+    relIndex_eq_of_pairing χ hs hn ha L₁ L₂ (Q L₂) (Q L₁)
+      (fun x _ => kerL₁ x)
+      (fun y _ => hQ L₂ y)
+      n0 p0
   have e4 : L.relIndex L₂ = (Q L₂).relIndex (Q L) := by
     have : L₁.relIndex L * L.relIndex L₂ = L₁.relIndex L * (Q L₂).relIndex (Q L) := by
       rw [ea, e3, ← ep, e1, mul_comm]

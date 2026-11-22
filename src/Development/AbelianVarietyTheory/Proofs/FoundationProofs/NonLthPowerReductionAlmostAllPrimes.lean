@@ -15,8 +15,8 @@ namespace GlobalTheory.LthPowRed
 
 open Polynomial
 
-theorem exists_comap_eq {K L : Type} [Field K] [Field L] (f : K →+* L) (U : ValuationSubring K) :
-    ∃ W : ValuationSubring L, W.comap f = U := by
+theorem exists_comap_eq {K L : Type} [Field K] [Field L] (f : K →+* L) (U : ValuationSubring K)
+    : ∃ W : ValuationSubring L, W.comap f = U := by
   obtain ⟨W, hW, hloc⟩ := IsLocalRing.exists_factor_valuationRing (f.comp U.subtype)
   have key : ∀ x ∈ U.nonunits, f x ∈ W.nonunits := by
     intro x hx
@@ -30,8 +30,7 @@ theorem exists_comap_eq {K L : Type} [Field K] [Field L] (f : K →+* L) (U : Va
     have h0 : x ≠ 0 := by rintro rfl; exact hxU U.zero_mem
     have h1 : x⁻¹ ∈ U.nonunits := by
       rw [ValuationSubring.mem_nonunits_iff, map_inv₀]
-      have : 1 < U.valuation x := by
-        rw [← not_le, ValuationSubring.valuation_le_one_iff]; exact hxU
+      have : 1 < U.valuation x := by rw [← not_le, ValuationSubring.valuation_le_one_iff]; exact hxU
       exact inv_lt_one_of_one_lt₀ this
     have h2 := key _ h1
     rw [ValuationSubring.mem_nonunits_iff, map_inv₀, map_inv₀] at h2
@@ -42,35 +41,49 @@ theorem exists_comap_eq {K L : Type} [Field K] [Field L] (f : K →+* L) (U : Va
   · intro x hx
     exact hW ⟨x, hx⟩
 
-theorem mem_nonunits_iff_of_mem_iff {K L : Type} [Field K] [Field L] (f : K →+* L)
-    {A : ValuationSubring K} {B : ValuationSubring L} (hAB : ∀ a, f a ∈ B ↔ a ∈ A) (a : K) :
-    f a ∈ B.nonunits ↔ a ∈ A.nonunits := by
+theorem mem_nonunits_iff_of_mem_iff
+    {K L : Type} [Field K] [Field L]
+    (f : K →+* L)
+    {A : ValuationSubring K} {B : ValuationSubring L} (hAB : ∀ a, f a ∈ B ↔ a ∈ A)
+    (a : K)
+    : f a ∈ B.nonunits ↔ a ∈ A.nonunits := by
   rw [ValuationSubring.mem_nonunits_iff_or, ValuationSubring.mem_nonunits_iff_or, ← map_inv₀, hAB,
     map_eq_zero]
 
-theorem val_eq_one_iff {L : Type} [Field L] (A : ValuationSubring L) (x : L) :
-    A.valuation x = 1 ↔ x ∈ A ∧ x ∉ A.nonunits := by
+theorem val_eq_one_iff {L : Type} [Field L] (A : ValuationSubring L) (x : L)
+    : A.valuation x = 1 ↔ x ∈ A ∧ x ∉ A.nonunits := by
   rw [ValuationSubring.mem_nonunits_iff, ← ValuationSubring.valuation_le_one_iff]
   constructor
   · intro h; rw [h]; exact ⟨le_rfl, lt_irrefl _⟩
   · rintro ⟨h1, h2⟩; exact le_antisymm h1 (not_lt.1 h2)
 
-theorem val_eq_one_iff_of_mem_iff {K L : Type} [Field K] [Field L] (f : K →+* L)
-    {A : ValuationSubring K} {B : ValuationSubring L} (hAB : ∀ a, f a ∈ B ↔ a ∈ A) (a : K) :
-    B.valuation (f a) = 1 ↔ A.valuation a = 1 := by
+theorem val_eq_one_iff_of_mem_iff
+    {K L : Type} [Field K] [Field L]
+    (f : K →+* L)
+    {A : ValuationSubring K} {B : ValuationSubring L} (hAB : ∀ a, f a ∈ B ↔ a ∈ A)
+    (a : K)
+    : B.valuation (f a) = 1 ↔ A.valuation a = 1 := by
   rw [val_eq_one_iff, val_eq_one_iff, hAB, mem_nonunits_iff_of_mem_iff f hAB]
 
-theorem val_eq_one_of_pow {L : Type} [Field L] (A : ValuationSubring L) {x : L} {n : ℕ} (hn : n ≠ 0)
-    (h : A.valuation (x ^ n) = 1) : A.valuation x = 1 := by
+theorem val_eq_one_of_pow
+    {L : Type} [Field L]
+    (A : ValuationSubring L)
+    {x : L} {n : ℕ} (hn : n ≠ 0) (h : A.valuation (x ^ n) = 1)
+    : A.valuation x = 1 := by
   rw [map_pow] at h
   rcases lt_trichotomy (A.valuation x) 1 with h1 | h1 | h1
   · exact absurd h (ne_of_lt (pow_lt_one₀ zero_le' h1 hn))
   · exact h1
   · exact absurd h (ne_of_gt (one_lt_pow₀ h1 hn))
 
-theorem not_both_nonunits {F : Type} [Field F] (V : ValuationSubring F) {q l : ℕ} (hq : q.Prime)
-    (hl : l.Prime) (hql : q ≠ l) (h1 : (q : F) ∈ V.nonunits) (h2 : (l : F) ∈ V.nonunits) : False := by
-  have hcop : IsCoprime (q : ℤ) (l : ℤ) := Nat.isCoprime_iff_coprime.2 ((Nat.coprime_primes hq hl).2 hql)
+theorem not_both_nonunits
+    {F : Type} [Field F]
+    (V : ValuationSubring F)
+    {q l : ℕ} (hq : q.Prime) (hl : l.Prime) (hql : q ≠ l) (h1 : (q : F) ∈ V.nonunits)
+    (h2 : (l : F) ∈ V.nonunits)
+    : False := by
+  have hcop : IsCoprime (q : ℤ) (l : ℤ) :=
+    Nat.isCoprime_iff_coprime.2 ((Nat.coprime_primes hq hl).2 hql)
   obtain ⟨a, b, hab⟩ := hcop
   have hab' : (a : F) * q + (b : F) * l = 1 := by
     have := congrArg (Int.cast : ℤ → F) hab; push_cast at this; exact this
@@ -84,14 +97,18 @@ theorem not_both_nonunits {F : Type} [Field F] (V : ValuationSubring F) {q l : �
   rw [hab', map_one] at this
   exact lt_irrefl _ this
 
-theorem natCast_mem_nonunits_of_primitive {F : Type} [Field F] (V : ValuationSubring F) {l : ℕ}
-    (hl : 1 < l) {ζ : F} (hζ : IsPrimitiveRoot ζ l) (hV : ζ - 1 ∈ V.nonunits) :
-    (l : F) ∈ V.nonunits := by
+theorem natCast_mem_nonunits_of_primitive
+    {F : Type} [Field F]
+    (V : ValuationSubring F)
+    {l : ℕ} (hl : 1 < l)
+    {ζ : F} (hζ : IsPrimitiveRoot ζ l) (hV : ζ - 1 ∈ V.nonunits)
+    : (l : F) ∈ V.nonunits := by
   rw [ValuationSubring.mem_nonunits_iff] at hV ⊢
   have hζV : ζ ∈ V := by
     have h1 : ζ - 1 ∈ V := (V.valuation_le_one_iff _).1 (le_of_lt hV)
     have : ζ = (ζ - 1) + 1 := by ring
-    rw [this]; exact add_mem h1 V.one_mem
+    rw [this]
+    exact add_mem h1 V.one_mem
   have hsum : ∑ i ∈ Finset.range l, ζ ^ i = 0 := hζ.geom_sum_eq_zero hl
   have hl' : (l : F) = ∑ i ∈ Finset.range l, (1 - ζ ^ i) := by
     rw [Finset.sum_sub_distrib, hsum]; simp
@@ -109,10 +126,12 @@ namespace GlobalTheory.LthPowRed
 
 open Polynomial
 
-theorem finiteDimensional_adjoin_map {F K L : Type} [Field F] [Field K] [Field L] [Algebra F K]
-    [Algebra K L] [Algebra F L] [IsScalarTower F K L] (hKL : FiniteDimensional K L) (t : K)
-    (ht : FiniteDimensional (IntermediateField.adjoin F {t}) K) :
-    FiniteDimensional (IntermediateField.adjoin F {algebraMap K L t}) L := by
+theorem finiteDimensional_adjoin_map
+    {F K L : Type}
+    [Field F] [Field K] [Field L] [Algebra F K] [Algebra K L] [Algebra F L] [IsScalarTower F K L]
+    (hKL : FiniteDimensional K L)
+    (t : K) (ht : FiniteDimensional (IntermediateField.adjoin F {t}) K)
+    : FiniteDimensional (IntermediateField.adjoin F {algebraMap K L t}) L := by
   set E := IntermediateField.adjoin F {t}
   set E' := IntermediateField.adjoin F {algebraMap K L t}
   have h1 : E.map (IsScalarTower.toAlgHom F K L) = E' := by
@@ -121,31 +140,43 @@ theorem finiteDimensional_adjoin_map {F K L : Type} [Field F] [Field K] [Field L
     intro e
     rw [← h1]
     exact ⟨e, e.2, rfl⟩
-  let g : E →+* E' :=
-    { toFun := fun e => ⟨algebraMap K L e, hmem e⟩
-      map_one' := by ext; simp
-      map_mul' := by intros; ext; simp
-      map_zero' := by ext; simp
-      map_add' := by intros; ext; simp }
+  let g : E →+* E' := {
+    toFun := fun e => ⟨algebraMap K L e, hmem e⟩
+    map_one' := by ext; simp
+    map_mul' := by intros; ext; simp
+    map_zero' := by ext; simp
+    map_add' := by intros; ext; simp
+  }
   letI : Algebra E E' := g.toAlgebra
   haveI : IsScalarTower E E' L := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   haveI : Module.Finite E L := Module.Finite.trans K L
   exact Module.Finite.of_restrictScalars_finite E E' L
 
-def GaussOver {F L : Type} [Field F] [Field L] [Algebra F L] (V : ValuationSubring F) (t : L)
-    (W : ValuationSubring L) : Prop :=
-  (∀ a : F, algebraMap F L a ∈ W ↔ a ∈ V) ∧ (∀ P : Polynomial F, (∀ i, P.coeff i ∈ V) →
-    (∃ i, P.coeff i ∈ V ∧ P.coeff i ≠ 0 ∧ (P.coeff i)⁻¹ ∈ V) → W.valuation (Polynomial.aeval t P) = 1)
+def GaussOver
+    {F L : Type} [Field F] [Field L] [Algebra F L]
+    (V : ValuationSubring F) (t : L) (W : ValuationSubring L)
+    : Prop :=
+  (∀ a : F, algebraMap F L a ∈ W ↔ a ∈ V)
+    ∧ (∀ P : Polynomial F,
+      (∀ i, P.coeff i ∈ V) → (∃ i, P.coeff i ∈ V ∧ P.coeff i ≠ 0 ∧ (P.coeff i)⁻¹ ∈ V)
+        → W.valuation (Polynomial.aeval t P) = 1)
 
-theorem core {F K L : Type} [Field F] [IsAlgClosed F] [Field K] [Field L] [Algebra F K] [Algebra K L]
-    [Algebra F L] [IsScalarTower F K L] (t : K) {l : ℕ} (hl : l.Prime) {ζ₀ : F}
-    (hζ₀ : IsPrimitiveRoot ζ₀ l) (s : K) (θ : L) (hθ : θ ^ l = algebraMap K L s) (τ : L →ₐ[K] L)
-    (hτ : τ θ = algebraMap F L ζ₀ * θ) (V : ValuationSubring F) {q : ℕ} (hq : q.Prime) (hql : q ≠ l)
-    (hqV : (q : F) ∈ V.nonunits)
-    (huniq : ∀ W₁ W₂ : ValuationSubring L, GaussOver V (algebraMap K L t) W₁ →
-      GaussOver V (algebraMap K L t) W₂ → W₁ = W₂)
-    (W : ValuationSubring K) (hW : GaussOver V t W) (h : K) (c : F) (hc0 : c ≠ 0) (hcV : c ∈ V)
-    (hciV : c⁻¹ ∈ V) : ¬ W.valuation (s * h ^ l - algebraMap F K c) < 1 := by
+theorem core
+    {F K L : Type} [Field F] [IsAlgClosed F] [Field K] [Field L] [Algebra F K] [Algebra K L]
+    [Algebra F L] [IsScalarTower F K L]
+    (t : K)
+    {l : ℕ} (hl : l.Prime)
+    {ζ₀ : F} (hζ₀ : IsPrimitiveRoot ζ₀ l)
+    (s : K) (θ : L) (hθ : θ ^ l = algebraMap K L s)
+    (τ : L →ₐ[K] L) (hτ : τ θ = algebraMap F L ζ₀ * θ)
+    (V : ValuationSubring F)
+    {q : ℕ} (hq : q.Prime) (hql : q ≠ l) (hqV : (q : F) ∈ V.nonunits)
+    (huniq : ∀ W₁ W₂ : ValuationSubring L,
+      GaussOver V (algebraMap K L t) W₁ → GaussOver V (algebraMap K L t) W₂ → W₁ = W₂)
+    (W : ValuationSubring K) (hW : GaussOver V t W)
+    (h : K)
+    (c : F) (hc0 : c ≠ 0) (hcV : c ∈ V) (hciV : c⁻¹ ∈ V)
+    : ¬ W.valuation (s * h ^ l - algebraMap F K c) < 1 := by
   intro hlt
   obtain ⟨W', hW'⟩ := exists_comap_eq (algebraMap K L) W
   have hKL : ∀ y : K, algebraMap K L y ∈ W' ↔ y ∈ W := fun y => by
@@ -201,11 +232,11 @@ theorem core {F K L : Type} [Field F] [IsAlgClosed F] [Field K] [Field L] [Algeb
   have hprod : y ^ l - 1 = ∏ ζ ∈ nthRootsFinset l (1 : F), (y - algebraMap F L ζ) := by
     have := congrArg (Polynomial.aeval y) (X_pow_sub_one_eq_prod hl.pos hζ₀)
     simpa [map_prod] using this
-  obtain ⟨ζ, hζm, hζ⟩ : ∃ ζ ∈ nthRootsFinset l (1 : F), W'.valuation (y - algebraMap F L ζ) < 1 := by
+  obtain ⟨ζ, hζm, hζ⟩
+      : ∃ ζ ∈ nthRootsFinset l (1 : F), W'.valuation (y - algebraMap F L ζ) < 1 := by
     by_contra hne
     push_neg at hne
-    have : 1 ≤ W'.valuation (y ^ l - 1) := by
-      rw [hprod, map_prod]; exact Finset.one_le_prod' hne
+    have : 1 ≤ W'.valuation (y ^ l - 1) := by rw [hprod, map_prod]; exact Finset.one_le_prod' hne
     exact absurd hy1 (not_lt.2 this)
   have hζpow : ζ ^ l = 1 := (mem_nthRootsFinset hl.pos _).1 hζm
   have hτy : τ y = algebraMap F L ζ₀ * y := by
@@ -217,8 +248,9 @@ theorem core {F K L : Type} [Field F] [IsAlgClosed F] [Field K] [Field L] [Algeb
   have h3 : W'.valuation (algebraMap F L ζ₀ * y - algebraMap F L ζ₀ * algebraMap F L ζ) < 1 := by
     rw [← mul_sub, map_mul, hζW, one_mul]; exact hζ
   have h4 : W'.valuation (algebraMap F L (ζ * (ζ₀ - 1))) < 1 := by
-    have : algebraMap F L (ζ * (ζ₀ - 1)) = (algebraMap F L ζ₀ * y - algebraMap F L ζ) -
-        (algebraMap F L ζ₀ * y - algebraMap F L ζ₀ * algebraMap F L ζ) := by
+    have : algebraMap F L (ζ * (ζ₀ - 1))
+        = (algebraMap F L ζ₀ * y - algebraMap F L ζ)
+          - (algebraMap F L ζ₀ * y - algebraMap F L ζ₀ * algebraMap F L ζ) := by
       simp only [map_mul, map_sub, map_one]; ring
     rw [this]
     exact lt_of_le_of_lt (Valuation.map_sub _ _ _) (max_lt h2 h3)
@@ -237,14 +269,27 @@ namespace GlobalTheory.LthPowRed
 
 open Polynomial
 
-theorem not_valuation_lt_one : ∀ {F : Type} [Field F] [CharZero F] [IsAlgClosed F] [Algebra.IsAlgebraic ℚ F]
-    {K : Type} [Field K] [Algebra F K] (t : K), Transcendental F t →
-    FiniteDimensional (IntermediateField.adjoin F {t}) K → ∀ (l : ℕ), l.Prime → ∀ (s : K),
-    (∀ u : K, u ^ l ≠ s) → ∃ S : Finset ℕ, ∀ q : ℕ, q.Prime → q ∉ S → ∀ V : ValuationSubring F,
-    ((q : ℕ) : F) ∈ V.nonunits → ∀ W : ValuationSubring K, ((∀ a : F, algebraMap F K a ∈ W ↔ a ∈ V) ∧
-    (∀ P : Polynomial F, (∀ i, P.coeff i ∈ V) → (∃ i, P.coeff i ∈ V ∧ P.coeff i ≠ 0 ∧ (P.coeff i)⁻¹ ∈ V) →
-    W.valuation (Polynomial.aeval t P) = 1)) → ∀ (h : K) (c : F), h ≠ 0 → c ≠ 0 → c ∈ V → c⁻¹ ∈ V →
-    ¬ W.valuation (s * h ^ l - algebraMap F K c) < 1 := by
+theorem not_valuation_lt_one
+    : ∀ {F : Type} [Field F] [CharZero F] [IsAlgClosed F] [Algebra.IsAlgebraic ℚ F] {K : Type}
+        [Field K] [Algebra F K] (t : K),
+      Transcendental F t → FiniteDimensional (IntermediateField.adjoin F {t}) K
+        → ∀ (l : ℕ),
+          l.Prime
+            → ∀ (s : K),
+              (∀ u : K, u ^ l ≠ s)
+                → ∃ S : Finset ℕ, ∀ q : ℕ,
+                  q.Prime → q ∉ S
+                    → ∀ V : ValuationSubring F,
+                      ((q : ℕ) : F) ∈ V.nonunits
+                        → ∀ W : ValuationSubring K,
+                          ((∀ a : F, algebraMap F K a ∈ W ↔ a ∈ V)
+                              ∧ (∀ P : Polynomial F,
+                                (∀ i, P.coeff i ∈ V)
+                                  → (∃ i, P.coeff i ∈ V ∧ P.coeff i ≠ 0 ∧ (P.coeff i)⁻¹ ∈ V)
+                                  → W.valuation (Polynomial.aeval t P) = 1))
+                            → ∀ (h : K) (c : F),
+                              h ≠ 0 → c ≠ 0 → c ∈ V → c⁻¹ ∈ V
+                                → ¬ W.valuation (s * h ^ l - algebraMap F K c) < 1 := by
   intro F _ _ _ _ K _ _ t ht hfin l hl s hs
   haveI : Fact (Irreducible (X ^ l - C s)) := ⟨X_pow_sub_C_irreducible_of_prime hl hs⟩
   have hf0 : (X ^ l - C s : K[X]) ≠ 0 := X_pow_sub_C_ne_zero hl.pos s
@@ -261,12 +306,15 @@ theorem not_valuation_lt_one : ∀ {F : Type} [Field F] [CharZero F] [IsAlgClose
   have hθ : AdjoinRoot.root (X ^ l - C s) ^ l = algebraMap K _ s := by
     have := AdjoinRoot.eval₂_root (X ^ l - C s)
     rw [eval₂_sub, eval₂_X_pow, eval₂_C, sub_eq_zero] at this
-    rw [AdjoinRoot.algebraMap_eq]; exact this
+    rw [AdjoinRoot.algebraMap_eq]
+    exact this
   have hτroot : aeval (algebraMap F _ ζ₀ * AdjoinRoot.root (X ^ l - C s)) (X ^ l - C s) = 0 := by
-    rw [map_sub, map_pow, aeval_X, aeval_C, mul_pow, hθ, ← map_pow, hζ₀.pow_eq_one, map_one, one_mul,
-      sub_self]
-  have hτ : AdjoinRoot.liftAlgHom (X ^ l - C s) (Algebra.ofId K _) _ hτroot
-      (AdjoinRoot.root (X ^ l - C s)) = algebraMap F _ ζ₀ * AdjoinRoot.root (X ^ l - C s) :=
+    rw [map_sub, map_pow, aeval_X, aeval_C, mul_pow, hθ, ← map_pow, hζ₀.pow_eq_one, map_one,
+      one_mul, sub_self]
+  have hτ
+      : AdjoinRoot.liftAlgHom (X ^ l - C s) (Algebra.ofId K _) _ hτroot
+          (AdjoinRoot.root (X ^ l - C s))
+        = algebraMap F _ ζ₀ * AdjoinRoot.root (X ^ l - C s) :=
     AdjoinRoot.liftAlgHom_root _ _ _ _
   exact core t hl hζ₀ s _ hθ _ hτ V hq hql hqV (hS₀ q hq hqS₀ V hqV) W hW h c hc0 hcV hciV
 

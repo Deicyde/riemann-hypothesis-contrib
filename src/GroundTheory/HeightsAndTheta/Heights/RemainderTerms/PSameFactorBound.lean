@@ -14,52 +14,60 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem sameFactor_descFactorial_le (n₁ N : ℕ) :
-    ∀ k : ℕ, 1 ≤ k → k ≤ N →
-      (n₁ + k).descFactorial k * 2 ^ (k - 1) ≤ (n₁ + 1) * (2 * (n₁ + N)) ^ (k - 1)
+theorem sameFactor_descFactorial_le (n₁ N : ℕ)
+    : ∀ k : ℕ,
+      1 ≤ k → k ≤ N → (n₁ + k).descFactorial k * 2 ^ (k - 1) ≤ (n₁ + 1) * (2 * (n₁ + N)) ^ (k - 1)
   | 0, h, _ => absurd h (by norm_num)
   | 1, _, _ => by simp [Nat.descFactorial]
   | k + 2, _, hN => by
     have ih : (n₁ + (k + 1)).descFactorial (k + 1) * 2 ^ k ≤ (n₁ + 1) * (2 * (n₁ + N)) ^ k := by
       simpa only [Nat.add_sub_cancel] using
         sameFactor_descFactorial_le n₁ N (k + 1) (by omega) (by omega)
-    have hd : (n₁ + (k + 2)).descFactorial (k + 2) =
-        (n₁ + (k + 1) + 1) * (n₁ + (k + 1)).descFactorial (k + 1) :=
+    have hd
+        : (n₁ + (k + 2)).descFactorial (k + 2)
+          = (n₁ + (k + 1) + 1) * (n₁ + (k + 1)).descFactorial (k + 1) :=
       Nat.succ_descFactorial_succ (n₁ + (k + 1)) (k + 1)
     rw [show k + 2 - 1 = k + 1 by omega, pow_succ 2 k, pow_succ (2 * (n₁ + N)) k, hd]
-    have hleft :
-        (n₁ + (k + 1) + 1) * (n₁ + (k + 1)).descFactorial (k + 1) * (2 ^ k * 2) =
-          ((n₁ + (k + 1)).descFactorial (k + 1) * 2 ^ k) * (2 * (n₁ + (k + 1) + 1)) := by
+    have hleft
+        : (n₁ + (k + 1) + 1) * (n₁ + (k + 1)).descFactorial (k + 1) * (2 ^ k * 2)
+          = ((n₁ + (k + 1)).descFactorial (k + 1) * 2 ^ k) * (2 * (n₁ + (k + 1) + 1)) := by
       ring
     rw [hleft, ← mul_assoc (n₁ + 1)]
     exact Nat.mul_le_mul ih (by omega)
 
-theorem sameFactor_choose_le (r a k : ℕ) (hk1 : 1 ≤ k) (hkN : k ≤ r + a) :
-    (Nat.choose (r * a + k) k : ℚ) * 2 ^ (k - 1) / ((r * a : ℕ) + 1 : ℚ) ≤
-      restX r a ^ (k - 1) / (k.factorial : ℚ) := by
+theorem sameFactor_choose_le (r a k : ℕ) (hk1 : 1 ≤ k) (hkN : k ≤ r + a)
+    : (Nat.choose (r * a + k) k : ℚ) * 2 ^ (k - 1) / ((r * a : ℕ) + 1 : ℚ)
+      ≤ restX r a ^ (k - 1) / (k.factorial : ℚ) := by
   have h := sameFactor_descFactorial_le (r * a) (r + a) k hk1 hkN
   rw [Nat.descFactorial_eq_factorial_mul_choose] at h
-  have hq : ((k.factorial * Nat.choose (r * a + k) k * 2 ^ (k - 1) : ℕ) : ℚ) ≤
-      ((((r * a) + 1) * (2 * ((r * a) + (r + a))) ^ (k - 1) : ℕ) : ℚ) := by exact_mod_cast h
-  have hX : restX r a = ((2 * ((r * a) + (r + a)) : ℕ) : ℚ) := by
-    simp only [restX]; push_cast; ring
+  have hq
+      : ((k.factorial * Nat.choose (r * a + k) k * 2 ^ (k - 1) : ℕ) : ℚ)
+        ≤ ((((r * a) + 1) * (2 * ((r * a) + (r + a))) ^ (k - 1) : ℕ) : ℚ) := by
+    exact_mod_cast h
+  have hX : restX r a = ((2 * ((r * a) + (r + a)) : ℕ) : ℚ) := by simp only [restX]; push_cast; ring
   rw [div_le_div_iff₀ (by positivity) (by positivity), hX]
   push_cast at hq ⊢
   linarith
 
-theorem SameFactorBound.proof (hF : SameFactorFormula.Statement) (hS : SchurSignCoefficient.Statement)
-    (hB : CharacterBound.Statement) (hH : HookSumBound.Statement)
-    (hR : RectangleTablePos.Statement) (hD : RestPolynomialDecomposes.Statement) :
-    SameFactorBound.Statement := by
+theorem SameFactorBound.proof
+    (hF : SameFactorFormula.Statement) (hS : SchurSignCoefficient.Statement)
+    (hB : CharacterBound.Statement) (hH : HookSumBound.Statement) (hR : RectangleTablePos.Statement)
+    (hD : RestPolynomialDecomposes.Statement)
+    : SameFactorBound.Statement := by
   intro f r a c hf hr ha
   obtain ⟨C₀, hC₀, hJ, hT⟩ := hF f r a c hf hr ha
   have hfR : (0 : ℚ) < numStandardTable (rectangle r a) := by exact_mod_cast hR r a
   obtain ⟨f', rfl⟩ : ∃ f', f = f' + 1 := ⟨f - 1, by omega⟩
-  have hJabs : |fibreDegree (f' + 1) r a c| =
-      |C₀| * (((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1) *
-        (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1)) := by
-    have hJp : (0 : ℚ) ≤ ((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1) *
-        (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1) := by positivity
+  have hJabs
+      : |fibreDegree (f' + 1) r a c|
+        = |C₀|
+          * (((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1)
+            * (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1)) := by
+    have hJp
+        : (0 : ℚ)
+          ≤ ((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1)
+            * (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1) := by
+      positivity
     rw [hJ, ← abs_of_nonneg hJp, ← abs_mul]
     congr 1
     ring
@@ -93,69 +101,87 @@ theorem SameFactorBound.proof (hF : SameFactorFormula.Statement) (hS : SchurSign
     congr 1
     simp [powerSumHom, hchi]
   set e : Fin (r + a) →₀ ℕ := Finsupp.single (⟨k - 1, by omega⟩ : Fin (r + a)) 1 with he
-  have hcoef : |S.coeff e| ≤
-      (∑ nu ∈ (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1),
-        |chi nu|) / k := by
+  have hcoef
+      : |S.coeff e|
+        ≤ (∑ nu ∈ (partitionsOf r k).filter (fun nu => ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1),
+            |chi nu|)
+          / k := by
     rw [hSeq, coeff_sum]
     simp only [coeff_C_mul]
-    calc |∑ nu ∈ partitionsOf r k, chi nu * (Sν nu).coeff e|
+    calc
+      |∑ nu ∈ partitionsOf r k, chi nu * (Sν nu).coeff e|
         ≤ ∑ nu ∈ partitionsOf r k, |chi nu * (Sν nu).coeff e| := Finset.abs_sum_le_sum_abs _ _
       _ = ∑ nu ∈ partitionsOf r k,
             if ∀ i : Fin r, (i : ℕ) ≠ 0 → nu i ≤ 1 then |chi nu| / k else 0 := by
-          refine Finset.sum_congr rfl fun nu hnu => ?_
-          rw [hSν2 nu hnu]
-          split_ifs
-          · rw [abs_mul, abs_mul, hsk, abs_div, abs_pow, abs_neg, abs_one, one_pow, Nat.abs_cast]
-            ring
-          · simp
+        refine Finset.sum_congr rfl fun nu hnu => ?_
+        rw [hSν2 nu hnu]
+        split_ifs
+        · rw [abs_mul, abs_mul, hsk, abs_div, abs_pow, abs_neg, abs_one, one_pow, Nat.abs_cast]
+          ring
+        · simp
       _ = _ := by rw [Finset.sum_div, Finset.sum_filter]
-  have hhook := hH r a k chi hk1 (fun nu hnu => hB r _ _
-    (fun i j hij => Nat.add_le_add_left ((hmem nu hnu).1 hij) a)
-    (fun q hq => by
-      simp only [List.mem_cons, List.mem_replicate] at hq
-      omega))
+  have hhook :=
+    hH r a k chi hk1 (fun nu hnu =>
+      hB r _ _
+        (fun i j hij => Nat.add_le_add_left ((hmem nu hnu).1 hij) a)
+        (fun q hq => by
+          simp only [List.mem_cons, List.mem_replicate] at hq
+          omega))
 
   set K : ℚ := k * ((f' + 1) * (r * a) + 1).factorial /
       (((r * a + 1).factorial : ℚ) * ((r * a).factorial : ℚ) ^ (f' + 1 - 1)) *
       (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1 - 1) with hK
   have hK0 : 0 ≤ K := by positivity
-  have hTabs : |restTerm (f' + 1) (r + a) Q k τ (smallPowerSum (f' + 1) r a c (k - 1) τ)| =
-      |C₀| * K * |S.coeff e| := by
-    rw [hTk, show ∀ x : ℚ, C₀ * k * ((f' + 1) * (r * a) + 1).factorial /
-        (((r * a + 1).factorial : ℚ) * ((r * a).factorial : ℚ) ^ (f' + 1 - 1)) *
-        (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1 - 1) * x = C₀ * K * x from
-        fun x => by rw [hK]; ring, abs_mul, abs_mul, abs_of_nonneg hK0]
+  have hTabs
+      : |restTerm (f' + 1) (r + a) Q k τ (smallPowerSum (f' + 1) r a c (k - 1) τ)|
+        = |C₀| * K * |S.coeff e| := by
+    rw [hTk,
+      show ∀ x : ℚ,
+          C₀ * k * ((f' + 1) * (r * a) + 1).factorial
+              / (((r * a + 1).factorial : ℚ) * ((r * a).factorial : ℚ) ^ (f' + 1 - 1))
+              * (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1 - 1) * x
+            = C₀ * K * x from fun x => by
+        rw [hK]; ring,
+      abs_mul, abs_mul, abs_of_nonneg hK0]
   rw [hTabs, hJabs]
   set B : ℚ := (Nat.choose (r * a + k) k : ℚ) * 2 ^ (k - 1) *
     numStandardTable (rectangle r a) with hBdef
   have hk0 : (0 : ℚ) < k := by exact_mod_cast (show 0 < k by omega)
   have hcoefB : |S.coeff e| ≤ B / k := le_trans hcoef (div_le_div_of_nonneg_right hhook hk0.le)
-  have hKB : K * (B / k) = ((f' + 1) * (r * a) + 1 : ℕ) *
-      ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1) *
-        (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1))) *
-      ((Nat.choose (r * a + k) k : ℚ) * 2 ^ (k - 1) / ((r * a : ℕ) + 1 : ℚ)) := by
+  have hKB
+      : K * (B / k)
+        = ((f' + 1) * (r * a) + 1 : ℕ)
+          * ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1)
+            * (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1)))
+          * ((Nat.choose (r * a + k) k : ℚ) * 2 ^ (k - 1) / ((r * a : ℕ) + 1 : ℚ)) := by
     rw [hK, hBdef, Nat.add_sub_cancel, Nat.factorial_succ, Nat.factorial_succ (r * a)]
     have : ((r * a).factorial : ℚ) ≠ 0 := by positivity
     have : (((f' + 1) * (r * a)).factorial : ℚ) ≠ 0 := by positivity
     field_simp
     push_cast
     ring
-  have hP : (0 : ℚ) ≤ ((f' + 1) * (r * a) + 1 : ℕ) *
-      ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1) *
-        (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1))) := by positivity
-  calc |C₀| * K * |S.coeff e| ≤ |C₀| * K * (B / k) :=
-        mul_le_mul_of_nonneg_left hcoefB (by positivity)
-    _ = |C₀| * (((f' + 1) * (r * a) + 1 : ℕ) *
-          ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1) *
-            (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1))) *
-          ((Nat.choose (r * a + k) k : ℚ) * 2 ^ (k - 1) / ((r * a : ℕ) + 1 : ℚ))) := by
-        rw [mul_assoc, hKB]
-    _ ≤ |C₀| * (((f' + 1) * (r * a) + 1 : ℕ) *
-          ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1) *
-            (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1))) *
-          (restX r a ^ (k - 1) / (k.factorial : ℚ))) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left
-          (sameFactor_choose_le r a k hk1 hkN) hP) (abs_nonneg _)
+  have hP
+      : (0 : ℚ)
+        ≤ ((f' + 1) * (r * a) + 1 : ℕ)
+          * ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1)
+            * (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1))) := by
+    positivity
+  calc
+    |C₀| * K * |S.coeff e|
+      ≤ |C₀| * K * (B / k) := mul_le_mul_of_nonneg_left hcoefB (by positivity)
+    _ = |C₀|
+        * (((f' + 1) * (r * a) + 1 : ℕ)
+          * ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1)
+            * (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1)))
+          * ((Nat.choose (r * a + k) k : ℚ) * 2 ^ (k - 1) / ((r * a : ℕ) + 1 : ℚ))) := by
+      rw [mul_assoc, hKB]
+    _ ≤ |C₀|
+        * (((f' + 1) * (r * a) + 1 : ℕ)
+          * ((((f' + 1) * (r * a)).factorial / ((r * a).factorial : ℚ) ^ (f' + 1)
+            * (numStandardTable (rectangle r a) : ℚ) ^ (f' + 1)))
+          * (restX r a ^ (k - 1) / (k.factorial : ℚ))) :=
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left (sameFactor_choose_le r a k hk1 hkN) hP)
+        (abs_nonneg _)
     _ = _ := by ring
 
 end

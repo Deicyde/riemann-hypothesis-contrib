@@ -11,8 +11,11 @@ namespace Formalism.WeaklyAdmissibleFiltrations
 
 open Module TensorProduct
 
-structure FilPhi (LL : Type) [Field LL] (D : Type) [AddCommGroup D] [Module LL D]
-    (n : ℕ) (Emb : Type) [Fintype Emb] where
+structure FilPhi
+    (LL : Type) [Field LL]
+    (D : Type) [AddCommGroup D] [Module LL D]
+    (n : ℕ)
+    (Emb : Type) [Fintype Emb] where
   letter : Emb → ZMod n
   e : ℕ
   fiber : ∀ i : ZMod n, (Finset.univ.filter fun τ => letter τ = i).card = e
@@ -31,23 +34,29 @@ structure FilPhi (LL : Type) [Field LL] (D : Type) [AddCommGroup D] [Module LL D
 
 namespace FilPhi
 
-variable {LL : Type} [Field LL] {D : Type} [AddCommGroup D] [Module LL D] [FiniteDimensional LL D]
-  {n : ℕ} {Emb : Type} [Fintype Emb] (F : FilPhi LL D n Emb)
+variable
+  {LL : Type} [Field LL]
+  {D : Type} [AddCommGroup D] [Module LL D] [FiniteDimensional LL D]
+  {n : ℕ} {Emb : Type} [Fintype Emb]
+  (F : FilPhi LL D n Emb)
 
-def IsSub (D' : Submodule LL D) : Prop :=
-  (∀ x ∈ D', F.φ x ∈ D') ∧ D' = ⨆ i, (D' ⊓ F.Dl i)
+def IsSub (D' : Submodule LL D) : Prop := (∀ x ∈ D', F.φ x ∈ D') ∧ D' = ⨆ i, (D' ⊓ F.Dl i)
 
 end FilPhi
 
 namespace FilPhi
 
-variable {LL : Type} [Field LL] {D D' : Type} [AddCommGroup D] [Module LL D] [AddCommGroup D']
-  [Module LL D'] {n : ℕ} {Emb : Type} [Fintype Emb]
+variable
+  {LL : Type} [Field LL]
+  {D D' : Type} [AddCommGroup D] [Module LL D] [AddCommGroup D'] [Module LL D']
+  {n : ℕ} {Emb : Type} [Fintype Emb]
 
 end FilPhi
 
-structure PeriodData (G : Type) [Group G] (Qp K₀ K : Type) [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+structure PeriodData
+    (G : Type) [Group G]
+    (Qp K₀ K : Type) [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+    [IsScalarTower Qp K₀ K]
     (B BdR : Type) [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
     [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
     [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] where
@@ -86,15 +95,17 @@ structure PeriodData (G : Type) [Group G] (Qp K₀ K : Type) [Field Qp] [Field K
 
 section Galois
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    (ρ : Representation LL G V)
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+  (ρ : Representation LL G V)
 
 def actVB (g : G) : V ⊗[Qp] B →ₗ[LL] V ⊗[Qp] B :=
   AlgebraTensorModule.map (ρ g) (((PD.actB g).toAlgHom.toLinearMap).restrictScalars Qp)
@@ -102,11 +113,9 @@ def actVB (g : G) : V ⊗[Qp] B →ₗ[LL] V ⊗[Qp] B :=
 def actVdR (g : G) : V ⊗[Qp] BdR →ₗ[LL] V ⊗[Qp] BdR :=
   AlgebraTensorModule.map (ρ g) (((PD.actdR g).toAlgHom.toLinearMap).restrictScalars Qp)
 
-def Dcris : Submodule LL (V ⊗[Qp] B) :=
-  ⨅ g : G, LinearMap.ker (actVB PD ρ g - LinearMap.id)
+def Dcris : Submodule LL (V ⊗[Qp] B) := ⨅ g : G, LinearMap.ker (actVB PD ρ g - LinearMap.id)
 
-def DdR : Submodule LL (V ⊗[Qp] BdR) :=
-  ⨅ g : G, LinearMap.ker (actVdR PD ρ g - LinearMap.id)
+def DdR : Submodule LL (V ⊗[Qp] BdR) := ⨅ g : G, LinearMap.ker (actVdR PD ρ g - LinearMap.id)
 
 def mulVB (c : K₀) : V ⊗[Qp] B →ₗ[LL] V ⊗[Qp] B :=
   AlgebraTensorModule.map LinearMap.id (LinearMap.mulLeft Qp (algebraMap K₀ B c))
@@ -115,10 +124,12 @@ def mulVdR (c : K) : V ⊗[Qp] BdR →ₗ[LL] V ⊗[Qp] BdR :=
   AlgebraTensorModule.map LinearMap.id (LinearMap.mulLeft Qp (algebraMap K BdR c))
 
 def DcrisL (τ₀ : K₀ →ₐ[Qp] LL) : Submodule LL (V ⊗[Qp] B) :=
-  Dcris PD ρ ⊓ ⨅ c : K₀, LinearMap.ker (mulVB (K₀ := K₀) (B := B) (V := V) (LL := LL) c - τ₀ c • LinearMap.id)
+  Dcris PD ρ
+    ⊓ ⨅ c : K₀, LinearMap.ker (mulVB (K₀ := K₀) (B := B) (V := V) (LL := LL) c - τ₀ c • LinearMap.id)
 
 def DdRE (τ : K →ₐ[Qp] LL) : Submodule LL (V ⊗[Qp] BdR) :=
-  DdR PD ρ ⊓ ⨅ c : K, LinearMap.ker (mulVdR (K := K) (BdR := BdR) (V := V) (LL := LL) c - τ c • LinearMap.id)
+  DdR PD ρ
+    ⊓ ⨅ c : K, LinearMap.ker (mulVdR (K := K) (BdR := BdR) (V := V) (LL := LL) c - τ c • LinearMap.id)
 
 def FilV (a : ℤ) : Submodule LL (V ⊗[Qp] BdR) :=
   LinearMap.range (AlgebraTensorModule.map (LinearMap.id : V →ₗ[LL] V)
@@ -162,7 +173,8 @@ def cob : V →ₗ[LL] (G → V) := LinearMap.pi fun g => ρ g - LinearMap.id
 def B1 : Submodule LL (G → V) := LinearMap.range (cob ρ)
 
 def finiteCocycles : Submodule LL (G → V) where
-  carrier := {c | c ∈ continuousCocycles ρ ∧ ∃ x : V ⊗[Qp] B, ∀ g, c g ⊗ₜ[Qp] (1 : B) = actVB PD ρ g x - x}
+  carrier :=
+    {c | c ∈ continuousCocycles ρ ∧ ∃ x : V ⊗[Qp] B, ∀ g, c g ⊗ₜ[Qp] (1 : B) = actVB PD ρ g x - x}
   zero_mem' := ⟨(continuousCocycles ρ).zero_mem, 0, fun g => by simp⟩
   add_mem' := by
     rintro a b ⟨ha, x, hx⟩ ⟨hb, y, hy⟩
@@ -179,17 +191,19 @@ end Galois
 
 section Lattice
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V]
-    (ρ : Representation LL G V)
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V]
+  (ρ : Representation LL G V)
 
 structure Lattice where
   T : Submodule O V
@@ -207,7 +221,8 @@ def latticeCocycles (L : Lattice (O := O) ρ) : Submodule O (G → V) :=
 def latticeCoboundaries (L : Lattice (O := O) ρ) : Submodule O (G → V) :=
   L.T.map ((cob ρ).restrictScalars O)
 
-abbrev LatticeCohomology (L : Lattice (O := O) ρ) : Type := ↥(latticeCocycles L) ⧸ (latticeCoboundaries L).comap (latticeCocycles L).subtype
+abbrev LatticeCohomology (L : Lattice (O := O) ρ) : Type :=
+  ↥(latticeCocycles L) ⧸ (latticeCoboundaries L).comap (latticeCocycles L).subtype
 
 def latticeFiniteCocycles (L : Lattice (O := O) ρ) : Submodule O (G → V) :=
   latticeCocycles L ⊓ (finiteCocycles PD ρ).restrictScalars O
@@ -217,9 +232,10 @@ def latticeFiniteCohomology (L : Lattice (O := O) ρ) : Submodule O (LatticeCoho
 
 section Map
 
-variable {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V']
-    [Module O V'] [IsScalarTower O LL V'] {ρ' : Representation LL G V'}
-    [TopologicalSpace V'] [ContinuousAdd V'] [ContinuousConstSMul LL V']
+variable
+  {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V'] [Module O V']
+  [IsScalarTower O LL V']
+  {ρ' : Representation LL G V'} [TopologicalSpace V'] [ContinuousAdd V'] [ContinuousConstSMul LL V']
 
 structure LatHom (L : Lattice (O := O) ρ) (L' : Lattice (O := O) ρ') where
   f : V →ₗ[LL] V'
@@ -231,22 +247,25 @@ variable {L : Lattice (O := O) ρ} {L' : Lattice (O := O) ρ'} (F : LatHom L L')
 
 def LatHom.post : (G → V) →ₗ[O] (G → V') := LinearMap.compLeft (F.f.restrictScalars O) G
 
-def LatHom.ImF : Submodule O (G → V') := (latticeFiniteCocycles PD L).map F.post ⊔ latticeCoboundaries L'
+def LatHom.ImF : Submodule O (G → V') :=
+  (latticeFiniteCocycles PD L).map F.post ⊔ latticeCoboundaries L'
 
 def LatHom.col : ℕ∞ :=
-  Module.length O (↥(latticeFiniteCocycles PD L') ⧸ (F.ImF PD).comap (latticeFiniteCocycles PD L').subtype)
+  Module.length O
+    (↥(latticeFiniteCocycles PD L') ⧸ (F.ImF PD).comap (latticeFiniteCocycles PD L').subtype)
 
 def LatHom.LiftF (e : ℕ) : Prop :=
   ∀ c ∈ latticeFiniteCocycles PD L', ((PD.p : O) ^ e) • c ∈ F.ImF PD
 
-theorem LatHom.post_Z1T (c : G → V) (hc : c ∈ latticeCocycles L) : F.post c ∈ latticeCocycles L' := by
+theorem LatHom.post_Z1T (c : G → V) (hc : c ∈ latticeCocycles L)
+    : F.post c ∈ latticeCocycles L' := by
   obtain ⟨hc1, hc2⟩ := Submodule.mem_inf.mp hc
   have hz : Continuous c ∧ ∀ g h, c (g * h) = c g + ρ g (c h) :=
     (Submodule.restrictScalars_mem _ _ _).mp hc1
   have hT : ∀ g, c g ∈ L.T := fun g => (Submodule.mem_pi.mp hc2) g (Set.mem_univ g)
   have hp : F.post c = fun g => F.f (c g) := rfl
-  refine Submodule.mem_inf.mpr ⟨(Submodule.restrictScalars_mem _ _ _).mpr ?_,
-    Submodule.mem_pi.mpr fun g _ => ?_⟩
+  refine Submodule.mem_inf.mpr
+    ⟨(Submodule.restrictScalars_mem _ _ _).mpr ?_, Submodule.mem_pi.mpr fun g _ => ?_⟩
   · show Continuous (F.post c) ∧ ∀ g h, F.post c (g * h) = F.post c g + ρ' g (F.post c h)
     rw [hp]
     refine ⟨F.cont.comp hz.1, fun g h => ?_⟩
@@ -255,7 +274,8 @@ theorem LatHom.post_Z1T (c : G → V) (hc : c ∈ latticeCocycles L) : F.post c 
   · rw [hp]
     exact F.T_le _ (hT g)
 
-theorem LatHom.post_B1T (c : G → V) (hc : c ∈ latticeCoboundaries L) : F.post c ∈ latticeCoboundaries L' := by
+theorem LatHom.post_B1T (c : G → V) (hc : c ∈ latticeCoboundaries L)
+    : F.post c ∈ latticeCoboundaries L' := by
   obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp hc
   refine Submodule.mem_map.mpr ⟨F.f x, F.T_le x hx, ?_⟩
   funext g
@@ -273,15 +293,17 @@ end Lattice
 
 section Rational
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    (ρ : Representation LL G V)
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+  (ρ : Representation LL G V)
 
 def H0V : Submodule LL V := ⨅ g : G, LinearMap.ker (ρ g - LinearMap.id)
 
@@ -289,23 +311,26 @@ variable [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [Continuous
 
 abbrev H1V : Type := ↥(continuousCocycles ρ) ⧸ (B1 ρ).comap (continuousCocycles ρ).subtype
 
-abbrev FiniteCohomology : Type := ↥(finiteCocycles PD ρ) ⧸ (B1 ρ).comap (finiteCocycles PD ρ).subtype
+abbrev FiniteCohomology : Type :=
+  ↥(finiteCocycles PD ρ) ⧸ (B1 ρ).comap (finiteCocycles PD ρ).subtype
 
 end Rational
 
 section AutomorphicFormsHyp
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    (LL : Type) [Field LL] [Algebra Qp LL]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  (LL : Type) [Field LL] [Algebra Qp LL]
 
 def FontaineLe : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [FiniteDimensional LL V] (ρ : Representation LL G V),
+      [FiniteDimensional LL V] (ρ : Representation LL G V),
     finrank LL ↥(Dcris PD ρ) ≤ finrank Qp K₀ * finrank LL V
 
 variable [TopologicalSpace G]
@@ -314,87 +339,103 @@ def Splits [Fintype (K →ₐ[Qp] LL)] : Prop :=
   FiniteDimensional Qp LL ∧ Fintype.card (K →ₐ[Qp] LL) = finrank Qp K
 
 def BlochKatoDim [TopologicalSpace LL] [Fintype (K →ₐ[Qp] LL)] : Prop :=
-  Splits LL (K := K) (Qp := Qp) →
-  ∀ (V : Type) [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [FiniteDimensional LL V] [TopologicalSpace V] [IsModuleTopology LL V] [IsTopologicalAddGroup V]
-    [ContinuousConstSMul LL V] (ρ : Representation LL G V),
-    (∀ x, Continuous fun g => ρ g x) → IsCrys PD ρ →
-    (finrank LL (FiniteCohomology PD ρ) : ℤ) = finrank LL ↥(H0V ρ) +
-      ∑ τ : K →ₐ[Qp] LL, ((finrank LL ↥(DdRE PD ρ τ) : ℤ) - finrank LL ↥(FildR PD ρ τ 0))
+  Splits LL (K := K) (Qp := Qp)
+    → ∀ (V : Type) [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+        [FiniteDimensional LL V] [TopologicalSpace V] [IsModuleTopology LL V]
+        [IsTopologicalAddGroup V] [ContinuousConstSMul LL V] (ρ : Representation LL G V),
+      (∀ x, Continuous fun g => ρ g x) → IsCrys PD ρ
+        → (finrank LL (FiniteCohomology PD ρ) : ℤ)
+          = finrank LL ↥(H0V ρ)
+            + ∑ τ : K →ₐ[Qp] LL, ((finrank LL ↥(DdRE PD ρ τ) : ℤ) - finrank LL ↥(FildR PD ρ τ 0))
 
 end AutomorphicFormsHyp
 
 section WachLink
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V]
-    {ρ : Representation LL G V}
-    [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V]
+  {ρ : Representation LL G V}
+  [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
 
-def WachLink (L : Lattice (O := O) ρ) {A D : Type} [CommRing A] [Algebra O A] [AddCommGroup D]
-    [Module A D] [Module O D] [IsScalarTower O A D] {Bw : Formalism.CoboundaryTransfers.Base O A} {M : ℕ}
-    (W : Formalism.CoboundaryTransfers.WachMod Bw M D) (cl : W.Z1 →ₗ[O] LatticeCohomology L) : Prop :=
-  Formalism.CoboundaryTransfers.HerrIso W cl ∧ Formalism.CoboundaryTransfers.HfIsZf W cl (latticeFiniteCohomology PD L)
+def WachLink
+    (L : Lattice (O := O) ρ)
+    {A D : Type}
+    [CommRing A] [Algebra O A] [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
+    {Bw : Formalism.CoboundaryTransfers.Base O A} {M : ℕ}
+    (W : Formalism.CoboundaryTransfers.WachMod Bw M D) (cl : W.Z1 →ₗ[O] LatticeCohomology L)
+    : Prop :=
+  Formalism.CoboundaryTransfers.HerrIso W cl
+    ∧ Formalism.CoboundaryTransfers.HfIsZf W cl (latticeFiniteCohomology PD L)
 
 def GoodCoeffs [TopologicalSpace LL] [Fintype (K →ₐ[Qp] LL)] : Prop :=
-  Splits LL (K := K) (Qp := Qp) ∧ IsModuleTopology LL V ∧
-    ∃ hO : IsDomain O, @IsDiscreteValuationRing O _ hO ∧ IsFractionRing O LL
+  Splits LL (K := K) (Qp := Qp) ∧ IsModuleTopology LL V
+    ∧ ∃ hO : IsDomain O, @IsDiscreteValuationRing O _ hO ∧ IsFractionRing O LL
 
 end WachLink
 
 section CF
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL] {n : ℕ} [NeZero n]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {n : ℕ} [NeZero n]
 
 variable (LL)
 
 def Letters (v : AddValuation LL (WithTop ℚ)) (emb : ZMod n → (K₀ →ₐ[Qp] LL)) : Prop :=
-  Function.Bijective (algebraMap K₀ K) ∧ FiniteDimensional Qp LL ∧ n = finrank Qp K₀ ∧
-    Function.Bijective emb ∧ (∀ i, (emb (i + 1)).comp PD.σ = emb i) ∧ v (PD.p : LL) = 1
+  Function.Bijective (algebraMap K₀ K) ∧ FiniteDimensional Qp LL ∧ n = finrank Qp K₀
+    ∧ Function.Bijective emb ∧ (∀ i, (emb (i + 1)).comp PD.σ = emb i) ∧ v (PD.p : LL) = 1
 
 end CF
 
 section Ops
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V] {ρ : Representation LL G V}
-    {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V']
-    [Module O V'] [IsScalarTower O LL V'] {ρ' : Representation LL G V'}
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V]
+  {ρ : Representation LL G V} {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V']
+  [IsScalarTower Qp LL V'] [Module O V'] [IsScalarTower O LL V']
+  {ρ' : Representation LL G V'}
 
 def multV (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL) (a : ℤ) : ℤ :=
   (finrank LL ↥(FildR PD ρ τ a) : ℤ) - finrank LL ↥(FildR PD ρ τ (a + 1))
 
 def lenOl : ℕ∞ := Module.length O (O ⧸ Ideal.span {((PD.p : ℕ) : O)})
 
-def IsSESLat {V₀ : Type} [AddCommGroup V₀] [Module LL V₀] [Module Qp V₀] [IsScalarTower Qp LL V₀]
-    [Module O V₀] [IsScalarTower O LL V₀] {ρ₀ : Representation LL G V₀}
-    [TopologicalSpace V₀] [TopologicalSpace V] [TopologicalSpace V']
+def IsSESLat
+    {V₀ : Type} [AddCommGroup V₀] [Module LL V₀] [Module Qp V₀] [IsScalarTower Qp LL V₀]
+    [Module O V₀] [IsScalarTower O LL V₀]
+    {ρ₀ : Representation LL G V₀} [TopologicalSpace V₀] [TopologicalSpace V] [TopologicalSpace V']
     {L₀ : Lattice (O := O) ρ₀} {L : Lattice (O := O) ρ} {L' : Lattice (O := O) ρ'}
-    (ι : LatHom L₀ L) (π : LatHom L L') : Prop :=
-  Function.Injective ι.f ∧ Function.Surjective π.f ∧ π.Onto ∧
-    (∀ x, π.f x = 0 ↔ ∃ y, ι.f y = x) ∧ (∀ y, ι.f y ∈ L.T → y ∈ L₀.T)
+    (ι : LatHom L₀ L) (π : LatHom L L')
+    : Prop :=
+  Function.Injective ι.f ∧ Function.Surjective π.f ∧ π.Onto ∧ (∀ x, π.f x = 0 ↔ ∃ y, ι.f y = x)
+    ∧ (∀ y, ι.f y ∈ L.T → y ∈ L₀.T)
 
 def charRep (χ : G →* LLˣ) : Representation LL G LL where
   toFun g := ((χ g : LLˣ) : LL) • LinearMap.id
@@ -402,17 +443,19 @@ def charRep (χ : G →* LLˣ) : Representation LL G LL where
   map_mul' g h := by ext; simp [mul_comm]
 
 def IsTwist (χ : G →* LLˣ) (L : Lattice (O := O) ρ) (L' : Lattice (O := O) ρ') : Prop :=
-  ∃ e : V ≃ₗ[LL] V', (∀ g x, ρ' g (e x) = ((χ g : LLˣ) : LL) • e (ρ g x)) ∧
-    L.T.map ((e : V →ₗ[LL] V').restrictScalars O) = L'.T
+  ∃ e : V ≃ₗ[LL] V',
+    (∀ g x, ρ' g (e x) = ((χ g : LLˣ) : LL) • e (ρ g x))
+      ∧ L.T.map ((e : V →ₗ[LL] V').restrictScalars O) = L'.T
 
-def IsDualLat (L : Lattice (O := O) ρ) (L' : Lattice (O := O) ρ') (P : V →ₗ[LL] V' →ₗ[LL] LL) :
-    Prop :=
-  (∀ g x y, P (ρ g x) (ρ' g y) = P x y) ∧ (∀ x, (∀ y, P x y = 0) → x = 0) ∧
-    (∀ y, (∀ x, P x y = 0) → y = 0) ∧ finrank LL V = finrank LL V' ∧
-    ∀ y, y ∈ L'.T ↔ ∀ x ∈ L.T, ∃ a : O, P x y = algebraMap O LL a
+def IsDualLat (L : Lattice (O := O) ρ) (L' : Lattice (O := O) ρ') (P : V →ₗ[LL] V' →ₗ[LL] LL)
+    : Prop :=
+  (∀ g x y, P (ρ g x) (ρ' g y) = P x y) ∧ (∀ x, (∀ y, P x y = 0) → x = 0)
+    ∧ (∀ y, (∀ x, P x y = 0) → y = 0) ∧ finrank LL V = finrank LL V'
+    ∧ ∀ y, y ∈ L'.T ↔ ∀ x ∈ L.T, ∃ a : O, P x y = algebraMap O LL a
 
-variable [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
-    [TopologicalSpace V'] [ContinuousAdd V'] [ContinuousConstSMul LL V']
+variable
+  [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
+  [TopologicalSpace V'] [ContinuousAdd V'] [ContinuousConstSMul LL V']
 
 def Z1ur (ρ : Representation LL G V) (I : Subgroup G) : Submodule LL (G → V) where
   carrier := {c | c ∈ continuousCocycles ρ ∧ ∃ x : V, ∀ g ∈ I, c g = ρ g x - x}
@@ -429,10 +472,13 @@ def Z1ur (ρ : Representation LL G V) (I : Subgroup G) : Submodule LL (G → V) 
 
 variable {L : Lattice (O := O) ρ} {L' : Lattice (O := O) ρ'} (F : LatHom L L')
 
-theorem LatHom.post_Z1fT (c : G → V) (hc : c ∈ latticeFiniteCocycles PD L) : F.post c ∈ latticeFiniteCocycles PD L' := by
+theorem LatHom.post_Z1fT (c : G → V) (hc : c ∈ latticeFiniteCocycles PD L)
+    : F.post c ∈ latticeFiniteCocycles PD L' := by
   obtain ⟨hcT, hcf⟩ := Submodule.mem_inf.mp hc
   refine Submodule.mem_inf.mpr ⟨F.post_Z1T c hcT, ?_⟩
-  have hf : c ∈ continuousCocycles ρ ∧ ∃ x : V ⊗[Qp] B, ∀ g, c g ⊗ₜ[Qp] (1 : B) = actVB PD ρ g x - x := hcf
+  have hf
+      : c ∈ continuousCocycles ρ ∧ ∃ x : V ⊗[Qp] B, ∀ g, c g ⊗ₜ[Qp] (1 : B) = actVB PD ρ g x - x :=
+    hcf
   obtain ⟨-, x, hx⟩ := hf
   have hz' : F.post c ∈ continuousCocycles ρ' :=
     (Submodule.restrictScalars_mem _ _ _).mp (Submodule.mem_inf.mp (F.post_Z1T c hcT)).1
@@ -442,7 +488,8 @@ theorem LatHom.post_Z1fT (c : G → V) (hc : c ∈ latticeFiniteCocycles PD L) :
     induction y using TensorProduct.induction_on with
     | zero => simp
     | tmul v b => simp [actVB, M, AlgebraTensorModule.map_tmul, F.equiv]
-    | add y z hy hz => rw [map_add (f := _), map_add (f := _), hy, hz, map_add (f := _), map_add (f := _)]
+    | add y z hy hz =>
+      rw [map_add (f := _), map_add (f := _), hy, hz, map_add (f := _), map_add (f := _)]
   show F.post c ∈ continuousCocycles ρ' ∧ ∃ x : V' ⊗[Qp] B, ∀ g, F.post c g ⊗ₜ[Qp] (1 : B) = actVB PD ρ' g x - x
   refine ⟨hz', M x, fun g => ?_⟩
   have h := congrArg M (hx g)
@@ -450,31 +497,37 @@ theorem LatHom.post_Z1fT (c : G → V) (hc : c ∈ latticeFiniteCocycles PD L) :
   rw [← h]
   simp [M, AlgebraTensorModule.map_tmul, LatHom.post]
 
-def LatHom.ColLe (b : ℚ) : Prop :=
-  ∃ m k : ℕ, F.col PD = m ∧ lenOl PD (O := O) = k ∧ (m : ℚ) ≤ b * k
+def LatHom.ColLe (b : ℚ) : Prop := ∃ m k : ℕ, F.col PD = m ∧ lenOl PD (O := O) = k ∧ (m : ℚ) ≤ b * k
 
 end Ops
 
 section Published2
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V] {ρ : Representation LL G V}
-    [TopologicalSpace G] [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousConstSMul LL V]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V]
+  {ρ : Representation LL G V}
+  [TopologicalSpace G] [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousConstSMul LL V]
 
-def FiniteCohomologyGeneratorsBound [TopologicalSpace LL] [Fintype (K →ₐ[Qp] LL)] (L : Lattice (O := O) ρ) : Prop :=
-  GoodCoeffs (K := K) (Qp := Qp) (LL := LL) (O := O) (V := V) → IsCrys PD ρ →
-    (∀ x, Continuous fun g => ρ g x) →
-    ∃ s : Finset (LatticeCohomology L), Submodule.span O (s : Set (LatticeCohomology L)) = latticeFiniteCohomology PD L ∧
-      (s.card : ℤ) ≤ finrank LL ↥(H0V ρ) + finrank LL V +
-        ∑ τ : K →ₐ[Qp] LL, ((finrank LL ↥(DdRE PD ρ τ) : ℤ) - finrank LL ↥(FildR PD ρ τ 0))
+def FiniteCohomologyGeneratorsBound
+    [TopologicalSpace LL] [Fintype (K →ₐ[Qp] LL)] (L : Lattice (O := O) ρ)
+    : Prop :=
+  GoodCoeffs (K := K) (Qp := Qp) (LL := LL) (O := O) (V := V) → IsCrys PD ρ
+    → (∀ x, Continuous fun g => ρ g x)
+    → ∃ s : Finset (LatticeCohomology L),
+      Submodule.span O (s : Set (LatticeCohomology L)) = latticeFiniteCohomology PD L
+        ∧ (s.card : ℤ)
+          ≤ finrank LL ↥(H0V ρ) + finrank LL V
+            + ∑ τ : K →ₐ[Qp] LL, ((finrank LL ↥(DdRE PD ρ τ) : ℤ) - finrank LL ↥(FildR PD ρ τ 0))
 
 def UnrTriv [TopologicalSpace LL] [IsTopologicalRing LL] (I : Subgroup G) : Prop :=
   finiteCocycles PD (1 : Representation LL G LL) = Z1ur (1 : Representation LL G LL) I

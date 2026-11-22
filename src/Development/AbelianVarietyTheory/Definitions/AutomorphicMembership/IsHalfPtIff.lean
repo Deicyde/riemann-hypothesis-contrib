@@ -23,8 +23,7 @@ def jLat (Λ : AddSubgroup ℂ) : ℂ := 1728 * g2 Λ ^ 3 / discr Λ
 
 variable {R : Ranks} (H : Host R) {LL : Type} [Field LL] [NumberField LL]
 
-def baseLat : AddSubgroup ℂ :=
-  AddSubgroup.closure {w | ∃ c ∈ H.ccK, w = H.φ₀ (((c : H.K) : H.E))}
+def baseLat : AddSubgroup ℂ := AddSubgroup.closure {w | ∃ c ∈ H.ccK, w = H.φ₀ (((c : H.K) : H.E))}
 
 def IsConjLat (emb s : LL →+* ℂ) (Λ Λ' : AddSubgroup ℂ) : Prop :=
   discr Λ' = 1 ∧ ∃ a : LL, emb a = jLat Λ ∧ s a = jLat Λ'
@@ -32,8 +31,9 @@ def IsConjLat (emb s : LL →+* ℂ) (Λ Λ' : AddSubgroup ℂ) : Prop :=
 def conjLat (emb s : LL →+* ℂ) : AddSubgroup ℂ := Classical.epsilon (IsConjLat emb s (baseLat H))
 
 def ellLat (embE : H.E →+* LL) (g : R.GG) : Submodule (𝓞 LL) LL :=
-  Submodule.span (𝓞 LL) {y | ∃ a ∈ (H.AA0 : Submodule (𝓞 H.E) H.E),
-    ∃ b ∈ differentIdeal (𝓞 H.K) (𝓞 H.E), y = embE (H.sigmaOf g (a * (b : H.E)))}
+  Submodule.span (𝓞 LL)
+    {y | ∃ a ∈ (H.AA0 : Submodule (𝓞 H.E) H.E),
+      ∃ b ∈ differentIdeal (𝓞 H.K) (𝓞 H.E), y = embE (H.sigmaOf g (a * (b : H.E)))}
 
 def IsGen (embE : H.E →+* LL) (g : R.GG) (x : LL) : Prop :=
   Submodule.span (𝓞 LL) {x} = ellLat H embE g
@@ -44,7 +44,8 @@ def FieldOK (emb : LL →+* ℂ) (embE : H.E →+* LL) : Prop :=
   (∃ a : LL, emb a = jLat (baseLat H)) ∧ ∀ g, ∃ x, IsGen H embE g x
 
 def IsHalfPt (d : ℕ) (Λ : AddSubgroup ℂ) (t : ℂ) : Prop :=
-  2 * t ∈ Λ ∧ ((1 + Complex.I * (Real.sqrt d : ℂ)) / 2) * t ∉ Λ ∧ ((1 - Complex.I * (Real.sqrt d : ℂ)) / 2) * t ∉ Λ
+  2 * t ∈ Λ ∧ ((1 + Complex.I * (Real.sqrt d : ℂ)) / 2) * t ∉ Λ
+    ∧ ((1 - Complex.I * (Real.sqrt d : ℂ)) / 2) * t ∉ Λ
 
 def omAt (emb s : LL →+* ℂ) (x : LL) : ℝ := area (conjLat H emb s) / (Real.pi * ‖s x‖ ^ 2)
 

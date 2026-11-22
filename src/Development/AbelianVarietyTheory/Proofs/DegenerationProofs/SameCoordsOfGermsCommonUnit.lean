@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.HasWtZe
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH
 attribute [local instance] SplitExt.free SplitExt.finite
@@ -15,20 +16,34 @@ attribute [local instance] SplitExt.free SplitExt.finite
 noncomputable section
 namespace GlobalTheory.ZH.UFib
 
-theorem toStk_valR_gs {F : Type} [Field F] {X : Scheme.{0}} (x : Sp F ⟶ X) (U : X.Opens) (z : Sp F) (h : x z ∈ U)
-    (a : Γ(X, U)) : toStk z (valR x U a) = gs x z U a := by
+theorem toStk_valR_gs
+    {F : Type} [Field F]
+    {X : Scheme.{0}} (x : Sp F ⟶ X) (U : X.Opens)
+    (z : Sp F) (h : x z ∈ U)
+    (a : Γ(X, U))
+    : toStk z (valR x U a) = gs x z U a := by
   rw [valR, dite_eq_left ((top_le_iff_mem x U z).2 h), gs_eq x z U h]
   show ((Sp F).presheaf.germ ⊤ z trivial).hom ((Scheme.ΓSpecIso (CommRingCat.of F)).inv.hom
     ((Scheme.ΓSpecIso (CommRingCat.of F)).hom.hom _)) = _
   rw [Iso.hom_inv_id_apply]
-  exact TopCat.Presheaf.germ_res_apply (Sp F).presheaf (homOfLE ((top_le_iff_mem x U z).2 h)) z trivial _
+  exact TopCat.Presheaf.germ_res_apply (Sp F).presheaf (homOfLE ((top_le_iff_mem x U z).2 h)) z
+    trivial _
 
-theorem toStk_surjective {F : Type} [Field F] (y : Sp F) : Function.Surjective (toStk y) := fun s => by
+theorem toStk_surjective {F : Type} [Field F] (y : Sp F)
+    : Function.Surjective (toStk y) := fun s => by
   obtain ⟨U, hU, a, rfl⟩ := (Sp F).presheaf.exists_germ_eq s
   obtain rfl : U = ⊤ := top_le_iff.1 ((top_le_iff_mem (𝟙 (Sp F)) U y).2 hU)
   exact ⟨(Scheme.ΓSpecIso (CommRingCat.of F)).hom.hom a, by simp [toStk]⟩
 
-theorem crd_of_germs_unit : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) (H : LB X) (H' : LB Y), H'.IsLB → ∀ (J : Type) (F : J → H.Sec) (σ : J → H'.Sec) (x : Sp k ⟶ X) (y : Sp k ⟶ Y), (∀ (z : Sp k) (l : H.ι) (l' : H'.ι), x z ∈ H.U l → y z ∈ H'.U l' → ∃ u : ((Sp k).presheaf.stalk z)ˣ, ∀ i, gs x z (H.U l) ((F i).f l) = u.val * gs y z (H'.U l') ((σ i).f l')) → ∀ v : J → k, GlobalTheory.ZH.Crd H F x v → GlobalTheory.ZH.Crd H' σ y v := by
+theorem crd_of_germs_unit
+    : ∀ (k : Type) [Field k] (X Y : Scheme.{0}) (H : LB X) (H' : LB Y),
+      H'.IsLB
+        → ∀ (J : Type) (F : J → H.Sec) (σ : J → H'.Sec) (x : Sp k ⟶ X) (y : Sp k ⟶ Y),
+          (∀ (z : Sp k) (l : H.ι) (l' : H'.ι),
+              x z ∈ H.U l → y z ∈ H'.U l'
+                → ∃ u : ((Sp k).presheaf.stalk z)ˣ, ∀ i,
+                  gs x z (H.U l) ((F i).f l) = u.val * gs y z (H'.U l') ((σ i).f l'))
+            → ∀ v : J → k, GlobalTheory.ZH.Crd H F x v → GlobalTheory.ZH.Crd H' σ y v := by
   intro k _ X Y H H' hH' J F σ x y h v ⟨l, c, hl, hv⟩
   let z : Sp k := (⊥ : PrimeSpectrum k)
   obtain ⟨l', hl'⟩ := exists_chart hH' (y z)

@@ -14,8 +14,10 @@ universe u
 
 section Defs
 
-variable {o : Type*} {Ω : Type*} [CommRing o] [Field Ω] [Algebra o Ω] {ι κ : Type*}
-  {E : Type*} [AddCommGroup E] [Module Ω E] {r : ℕ}
+variable
+  {o : Type*} {Ω : Type*} [CommRing o] [Field Ω] [Algebra o Ω]
+  {ι κ : Type*} {E : Type*} [AddCommGroup E] [Module Ω E]
+  {r : ℕ}
 
 variable {x : ι → Ω}
 
@@ -26,8 +28,9 @@ def IsTwistedDualSec (B : ChartBundle o x r E) (φ : κ → E →ₗ[Ω] Ω) : P
   ∀ i, x i ≠ 0 → ∀ k, ∀ v ∈ B.lat i, φ k v ∈ lineLat o x 1 i
 
 def IsTwistedDualGen [Fintype κ] (B : ChartBundle o x r E) (φ : κ → E →ₗ[Ω] Ω) : Prop :=
-  ∀ i, x i ≠ 0 → ∀ ψ ∈ dualLat B i, ∃ c : κ → Ω, (∀ k, c k ∈ chartRing o x i) ∧
-    ψ = ∑ k, c k • (x i)⁻¹ • φ k
+  ∀ i,
+    x i ≠ 0
+      → ∀ ψ ∈ dualLat B i, ∃ c : κ → Ω, (∀ k, c k ∈ chartRing o x i) ∧ ψ = ∑ k, c k • (x i)⁻¹ • φ k
 
 variable {Φ : Type*} [Field Φ] [Algebra Ω Φ]
 
@@ -45,9 +48,11 @@ end Defs
 
 section Statements
 
-variable {o : Type*} {Ω : Type*} [CommRing o] [Field Ω] [Algebra o Ω] {ι κ : Type*} [Fintype κ]
-  {E : Type*} [AddCommGroup E] [Module Ω E] {x : ι → Ω}
-  {Φ : Type*} [Field Φ] [Algebra Ω Φ] [Algebra o Φ] [IsScalarTower o Ω Φ]
+variable
+  {o : Type*} {Ω : Type*} [CommRing o] [Field Ω] [Algebra o Ω]
+  {ι κ : Type*} [Fintype κ]
+  {E : Type*} [AddCommGroup E] [Module Ω E]
+  {x : ι → Ω} {Φ : Type*} [Field Φ] [Algebra Ω Φ] [Algebra o Φ] [IsScalarTower o Ω Φ]
 
 end Statements
 

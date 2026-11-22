@@ -8,12 +8,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial UpperTheory.V.W
 
-theorem UpperTheory.V.AlgebraTools.Det.glue :
-    ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] [TopologicalSpace A] [CompactSpace A] [TopologicalSpace G] {A' : Type} [CommRing A'] [TopologicalSpace A'] [T2Space A']
-    (ι : A →+* A') (D' : GDet n A' G) (S : Set G), Continuous ι → Function.Injective ι → Dense S →
-    (∀ i ≤ n, Continuous fun g : G => D'.lam i (MonoidAlgebra.single g 1)) →
-    (∀ g ∈ S, ∀ i ≤ n, D'.lam i (MonoidAlgebra.single g 1) ∈ ι.range) →
-    ∃ D : GDet n A G, D.map ι = D' ∧ ∀ i ≤ n, Continuous fun g : G => D.lam i (MonoidAlgebra.single g 1) := by
+theorem UpperTheory.V.AlgebraTools.Det.glue
+    : ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] [TopologicalSpace A] [CompactSpace A]
+        [TopologicalSpace G] {A' : Type} [CommRing A'] [TopologicalSpace A'] [T2Space A']
+        (ι : A →+* A') (D' : GDet n A' G) (S : Set G),
+      Continuous ι → Function.Injective ι → Dense S
+        → (∀ i ≤ n, Continuous fun g : G => D'.lam i (MonoidAlgebra.single g 1))
+        → (∀ g ∈ S, ∀ i ≤ n, D'.lam i (MonoidAlgebra.single g 1) ∈ ι.range)
+        → ∃ D : GDet n A G,
+          D.map ι = D' ∧ ∀ i ≤ n, Continuous fun g : G => D.lam i (MonoidAlgebra.single g 1) := by
   intro n A G _ _ _ _ _ A' _ _ _ ι D' S hι hinj hS hcont hmem
   have hemb := hι.isClosedEmbedding hinj
   have hall : ∀ i ≤ n, ∀ g : G, D'.lam i (MonoidAlgebra.single g 1) ∈ ι.range := by
@@ -22,22 +25,25 @@ theorem UpperTheory.V.AlgebraTools.Det.glue :
       have hr : IsClosed (Set.range ι) := hemb.isClosed_range
       rw [← RingHom.coe_range] at hr
       exact hr.preimage (hcont i hi)
-    have hsub : S ⊆ {g : G | D'.lam i (MonoidAlgebra.single g 1) ∈ ι.range} :=
-      fun g hg => hmem g hg i hi
+    have hsub : S ⊆ {g : G | D'.lam i (MonoidAlgebra.single g 1) ∈ ι.range} := fun g hg =>
+      hmem g hg i hi
     have h1 := closure_minimal hsub hcl
     rw [hS.closure_eq] at h1
     exact h1 (Set.mem_univ g)
   obtain ⟨D, hD, -⟩ := UpperTheory.V.AlgebraTools.Det.descendLam ι D' hinj hall
   refine ⟨D, hD, fun i hi => ?_⟩
   rw [hemb.isEmbedding.continuous_iff]
-  have heq : (⇑ι ∘ fun g : G => D.lam i (MonoidAlgebra.single g 1)) =
-      fun g => D'.lam i (MonoidAlgebra.single g 1) := by
+  have heq
+      : (⇑ι ∘ fun g : G => D.lam i (MonoidAlgebra.single g 1))
+        = fun g => D'.lam i (MonoidAlgebra.single g 1) := by
     funext g
     simp only [Function.comp]
     have hchi : ∀ y, (D.map ι).chi (MonoidAlgebra.mapRingHom G ι y) = (D.chi y).map ι := by
       intro y
-      have e : MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C (MonoidAlgebra.mapRingHom G ι y) =
-          MonoidAlgebra.mapRingHom G (Polynomial.mapRingHom ι) (MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C y) := by
+      have e
+          : MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C (MonoidAlgebra.mapRingHom G ι y)
+            = MonoidAlgebra.mapRingHom G (Polynomial.mapRingHom ι)
+              (MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C y) := by
         rw [map_sub, MonoidAlgebra.mapRingHom_single, Polynomial.coe_mapRingHom, Polynomial.map_X,
           ← RingHom.comp_apply, ← RingHom.comp_apply, ← MonoidAlgebra.mapRingHom_comp,
           ← MonoidAlgebra.mapRingHom_comp, Polynomial.mapRingHom_comp_C]
@@ -51,7 +57,8 @@ theorem UpperTheory.V.AlgebraTools.Det.glue :
     have hlam : ∀ i y, (D.map ι).lam i (MonoidAlgebra.mapRingHom G ι y) = ι (D.lam i y) := by
       intro i y
       simp only [GDet.lam, hchi, Polynomial.coeff_map, map_mul, map_pow, map_neg, map_one]
-    have hs : (D.map ι).lam i (MonoidAlgebra.single g 1) = ι (D.lam i (MonoidAlgebra.single g 1)) := by
+    have hs
+        : (D.map ι).lam i (MonoidAlgebra.single g 1) = ι (D.lam i (MonoidAlgebra.single g 1)) := by
       simpa using hlam i (MonoidAlgebra.single g 1)
     rw [← hs, hD]
   rw [heq]

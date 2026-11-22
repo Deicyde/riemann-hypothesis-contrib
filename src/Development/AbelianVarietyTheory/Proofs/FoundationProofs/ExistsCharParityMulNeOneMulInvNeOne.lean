@@ -6,7 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_char_parity_mul_ne_one_mul_inv_ne_one : ∀ (N r : ℕ) (χ : DirichletCharacter ℂ N) (sg : ℂ), 0 < N → r.Prime → 7 ≤ r → r ∣ N → (sg = 1 ∨ sg = -1) → ∃ θ : DirichletCharacter ℂ N, θ (-1) = sg ∧ θ * χ ≠ 1 ∧ θ * χ⁻¹ ≠ 1 := by
+theorem exists_char_parity_mul_ne_one_mul_inv_ne_one
+    : ∀ (N r : ℕ) (χ : DirichletCharacter ℂ N) (sg : ℂ),
+      0 < N → r.Prime → 7 ≤ r → r ∣ N → (sg = 1 ∨ sg = -1)
+        → ∃ θ : DirichletCharacter ℂ N, θ (-1) = sg ∧ θ * χ ≠ 1 ∧ θ * χ⁻¹ ≠ 1 := by
   intro N r χ sg hN hr hr7 hrN hsg
   haveI : NeZero N := ⟨hN.ne'⟩
   haveI : NeZero r := ⟨hr.ne_zero⟩
@@ -38,7 +41,8 @@ theorem exists_char_parity_mul_ne_one_mul_inv_ne_one : ∀ (N r : ℕ) (χ : Dir
   set ψ : DirichletCharacter ℂ N := DirichletCharacter.changeLevel hrN κ with hψ
   have hη4 : ψ ^ 4 ≠ 1 := by
     intro h
-    have h' : DirichletCharacter.changeLevel hrN (κ ^ 4) = DirichletCharacter.changeLevel hrN 1 := by
+    have h'
+        : DirichletCharacter.changeLevel hrN (κ ^ 4) = DirichletCharacter.changeLevel hrN 1 := by
       rw [map_pow, map_one]; exact h
     have hk := DirichletCharacter.changeLevel_injective hrN h'
     apply hκ
@@ -49,51 +53,48 @@ theorem exists_char_parity_mul_ne_one_mul_inv_ne_one : ∀ (N r : ℕ) (χ : Dir
       exact (Nat.coprime_primes Nat.prime_two hr).mpr (by omega)
     rw [MulChar.one_apply hu, MulChar.pow_apply' _ (by norm_num)] at this
     have e : (16 : ZMod r) = 2 ^ 4 := by norm_num
-    rw [e, map_pow]; exact this
+    rw [e, map_pow]
+    exact this
   set η : DirichletCharacter ℂ N := ψ ^ 2 with hηdef
-  have hηsq : η ^ 2 ≠ 1 := by
-    rw [hηdef, ← pow_mul]; exact hη4
-  have hη1 : η ≠ 1 := by
-    intro h; apply hηsq; rw [h, one_pow]
-  have hη2 : η (-1) = 1 := by
-    rw [hηdef, pow_two, MulChar.mul_apply, hsq]
-  have hη2' : (η ^ 2) (-1) = 1 := by
-    rw [pow_two, MulChar.mul_apply, hη2, mul_one]
+  have hηsq : η ^ 2 ≠ 1 := by rw [hηdef, ← pow_mul]; exact hη4
+  have hη1 : η ≠ 1 := by intro h; apply hηsq; rw [h, one_pow]
+  have hη2 : η (-1) = 1 := by rw [hηdef, pow_two, MulChar.mul_apply, hsq]
+  have hη2' : (η ^ 2) (-1) = 1 := by rw [pow_two, MulChar.mul_apply, hη2, mul_one]
 
   obtain ⟨θ₀, hθ₀⟩ : ∃ θ₀ : DirichletCharacter ℂ N, θ₀ (-1) = sg := by
     rcases hsg with h | h
     · exact ⟨1, by rw [h]; exact MulChar.one_apply (isUnit_one.neg)⟩
     · exact ⟨θ₁, by rw [h, hθ₁']⟩
 
-  have hab : θ₀ ≠ θ₀ * η := by
-    intro h; apply hη1; exact left_eq_mul.mp h
+  have hab : θ₀ ≠ θ₀ * η := by intro h; apply hη1; exact left_eq_mul.mp h
   have hbc : θ₀ * η ≠ θ₀ * η ^ 2 := by
-    intro h; apply hη1
+    intro h
+    apply hη1
     have h' := mul_left_cancel h
     rw [pow_two] at h'
     exact left_eq_mul.mp h'
-  have hac : θ₀ ≠ θ₀ * η ^ 2 := by
-    intro h; apply hηsq; exact left_eq_mul.mp h
-  have key : ∀ θ : DirichletCharacter ℂ N, ¬ (θ * χ ≠ 1 ∧ θ * χ⁻¹ ≠ 1) → θ = χ⁻¹ ∨ θ = χ := by
+  have hac : θ₀ ≠ θ₀ * η ^ 2 := by intro h; apply hηsq; exact left_eq_mul.mp h
+  have key : ∀ θ : DirichletCharacter ℂ N, ¬(θ * χ ≠ 1 ∧ θ * χ⁻¹ ≠ 1) → θ = χ⁻¹ ∨ θ = χ := by
     intro θ h
     by_cases h1 : θ * χ = 1
     · exact Or.inl (eq_inv_of_mul_eq_one_left h1)
-    · have h2 : θ * χ⁻¹ = 1 := by
-        by_contra h2; exact h ⟨h1, h2⟩
+    · have h2 : θ * χ⁻¹ = 1 := by by_contra h2; exact h ⟨h1, h2⟩
       right
       have := eq_inv_of_mul_eq_one_left h2
       rwa [inv_inv] at this
   by_contra hno
   push_neg at hno
   have ha := key θ₀ (fun h => by have := hno θ₀ hθ₀ h.1; exact h.2 this)
-  have hb := key (θ₀ * η) (fun h => by
-    have := hno (θ₀ * η) (by rw [MulChar.mul_apply, hθ₀, hη2, mul_one]) h.1; exact h.2 this)
-  have hc := key (θ₀ * η ^ 2) (fun h => by
-    have := hno (θ₀ * η ^ 2) (by rw [MulChar.mul_apply, hθ₀, hη2', mul_one]) h.1; exact h.2 this)
-  rcases ha with ha | ha <;> rcases hb with hb | hb <;> rcases hc with hc | hc <;>
-    first
-    | exact hab (ha.trans hb.symm)
-    | exact hac (ha.trans hc.symm)
-    | exact hbc (hb.trans hc.symm)
+  have hb :=
+    key (θ₀ * η) (fun h => by
+      have := hno (θ₀ * η) (by rw [MulChar.mul_apply, hθ₀, hη2, mul_one]) h.1; exact h.2 this)
+  have hc :=
+    key (θ₀ * η ^ 2) (fun h => by
+      have := hno (θ₀ * η ^ 2) (by rw [MulChar.mul_apply, hθ₀, hη2', mul_one]) h.1; exact h.2 this)
+  rcases ha with ha | ha <;> rcases hb with hb | hb <;> rcases hc with hc | hc
+    <;> first
+      | exact hab (ha.trans hb.symm)
+      | exact hac (ha.trans hc.symm)
+      | exact hbc (hb.trans hc.symm)
 
 end GlobalTheory

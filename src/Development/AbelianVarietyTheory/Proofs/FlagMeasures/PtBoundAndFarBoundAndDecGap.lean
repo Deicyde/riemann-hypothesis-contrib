@@ -12,8 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LowestKTypeCo
 
 namespace GlobalTheory.Deep
 
-theorem ptBound_and_farBound_and_decGap :
-    GlobalTheory.Deep.PtBound ∧ GlobalTheory.Deep.FarBound ∧ GlobalTheory.DSId.DecGap :=
+theorem ptBound_and_farBound_and_decGap
+    : GlobalTheory.Deep.PtBound ∧ GlobalTheory.Deep.FarBound ∧ GlobalTheory.DSId.DecGap :=
   have hd : GlobalTheory.DSId.DecGap :=
     GlobalTheory.DecGapBound.decGap_of_formulaGap GlobalTheory.Jet.FormGapFree.formulaGap
   have hp : GlobalTheory.Deep.PtBound := GlobalTheory.Deep.ptBound_of_decGap hd

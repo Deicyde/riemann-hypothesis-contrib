@@ -9,7 +9,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp.P_TzInj
 
@@ -29,7 +30,8 @@ theorem eq_zero_of_inPow {x : k} (hx : ∀ r, InPow r x) : x = 0 := by
     have : z = y := Subtype.val_injective e
     exact this ▸ hz
   have hmem : y ∈ ⨅ r : ℕ, IsLocalRing.maximalIdeal 𝒪[k] ^ r := (Submodule.mem_iInf _).2 hy
-  rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal 𝒪[k]).ne_top] at hmem
+  rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal 𝒪[k]).ne_top]
+    at hmem
   rw [(Ideal.mem_bot).1 hmem, map_zero]
 
 theorem eq_one_of_KC {n : ℕ} {g : GL (Fin n) k} (hg : ∀ r, g ∈ KC k n r) : g = 1 := by
@@ -39,9 +41,11 @@ theorem eq_one_of_KC {n : ℕ} {g : GL (Fin n) k} (hg : ∀ r, g ∈ KC k n r) :
   rw [h]
   simp [Matrix.one_apply]
 
-theorem exists_KC_subset {n : ℕ} (hsub : ∀ r, ((KCg k n r : Set (GL (Fin n) k)) = KC k n r))
-    (hop : ∀ r, IsOpen (KC k n r)) (U : Set (GL (Fin n) k)) (hU : IsOpen U) (h1 : (1 : GL (Fin n) k) ∈ U) :
-    ∃ r, KC k n r ⊆ U := by
+theorem exists_KC_subset
+    {n : ℕ}
+    (hsub : ∀ r, ((KCg k n r : Set (GL (Fin n) k)) = KC k n r)) (hop : ∀ r, IsOpen (KC k n r))
+    (U : Set (GL (Fin n) k)) (hU : IsOpen U) (h1 : (1 : GL (Fin n) k) ∈ U)
+    : ∃ r, KC k n r ⊆ U := by
   have hcl : ∀ r, IsClosed (KC k n r) := by
     intro r
     have := Subgroup.isClosed_of_isOpen (KCg k n r) (by rw [hsub r]; exact hop r)
@@ -53,10 +57,16 @@ theorem exists_KC_subset {n : ℕ} (hsub : ∀ r, ((KCg k n r : Set (GL (Fin n) 
     exact (hg' 0).2 (h1' ▸ h1)
   have hdt : Directed (· ⊇ ·) (fun r => KC k n r ∩ Uᶜ) := by
     intro a b
-    exact ⟨max a b, Set.inter_subset_inter_left _ (KC_anti (le_max_left a b)),
-      Set.inter_subset_inter_left _ (KC_anti (le_max_right a b))⟩
-  obtain ⟨r, hr⟩ := ((GlobalTheory.SplitFlip.isCompact_KO (k := k) (n := Fin n)).elim_directed_family_closed
-    (fun r => KC k n r ∩ Uᶜ) (fun r => (hcl r).inter hU.isClosed_compl) (Set.disjoint_iff_inter_eq_empty.2 hst) hdt).imp (fun _ => Disjoint.inter_eq)
+    exact ⟨
+      max a b,
+      Set.inter_subset_inter_left _ (KC_anti (le_max_left a b)),
+      Set.inter_subset_inter_left _ (KC_anti (le_max_right a b))
+    ⟩
+  obtain ⟨r, hr⟩ :=
+    ((GlobalTheory.SplitFlip.isCompact_KO (k := k) (n := Fin n)).elim_directed_family_closed
+      (fun r => KC k n r ∩ Uᶜ)
+      (fun r => (hcl r).inter hU.isClosed_compl)
+      (Set.disjoint_iff_inter_eq_empty.2 hst) hdt).imp (fun _ => Disjoint.inter_eq)
   refine ⟨r, fun g hg => ?_⟩
   by_contra hgU
   have : g ∈ (KO k (Fin n) : Set (GL (Fin n) k)) ∩ (KC k n r ∩ Uᶜ) := ⟨hg.1, hg, hgU⟩
@@ -65,19 +75,20 @@ theorem exists_KC_subset {n : ℕ} (hsub : ∀ r, ((KCg k n r : Set (GL (Fin n) 
 
 variable {n : ℕ} (G : Grp k n)
 
-theorem conj_unip (ϖ : kˣ) {u : GL (Fin n) k} (hu : u ∈ unipRad k G.e) :
-    (G.zEl ϖ)⁻¹ * u * G.zEl ϖ ∈ unipRad k G.e := by
+theorem conj_unip (ϖ : kˣ) {u : GL (Fin n) k} (hu : u ∈ unipRad k G.e)
+    : (G.zEl ϖ)⁻¹ * u * G.zEl ϖ ∈ unipRad k G.e := by
   have hz : G.zEl ϖ ∈ Subgroup.normalizer (unipRad k G.e : Set (GL (Fin n) k)) :=
     leviEmb_mem_normalizer k G.e _
   have := (Subgroup.mem_normalizer_iff.1 (inv_mem hz) u).1 hu
   simpa using this
 
-theorem mem_zN (ϖ : kˣ) (u : ↥G.NO) :
-    u ∈ G.zN ϖ 1 ↔ ∃ w ∈ G.NO, G.zEl ϖ * w * (G.zEl ϖ)⁻¹ = (u : GL (Fin n) k) := by
+theorem mem_zN (ϖ : kˣ) (u : ↥G.NO)
+    : u ∈ G.zN ϖ 1 ↔ ∃ w ∈ G.NO, G.zEl ϖ * w * (G.zEl ϖ)⁻¹ = (u : GL (Fin n) k) := by
   simp [Grp.zN, Subgroup.mem_subgroupOf, Subgroup.mem_map, MulAut.conj_apply]
 
-theorem PJ_zero {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V) (r : ℕ) :
-    G.PJ π r 0 = 0 := by
+theorem PJ_zero
+    {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V) (r : ℕ)
+    : G.PJ π r 0 = 0 := by
   simp [Grp.PJ]
 
 end UpperTheory.TNZ.Grp.P_TzInj
@@ -89,17 +100,23 @@ open P_TzInj
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 theorem step_TzInj {n : ℕ} (G : Grp k n) : TorusCentreInjectiveProp G := by
-  intro hcb hccB hΔU hΔM hJone hJmul hJinv hlM hlB hlU hiw hPJ hkill hni hTE hKC ϖ hϖ V _ _ π hs x hx hT
-  have h3 : ∀ a b c : GL (Fin n) k, ∀ v : V, π (a * b * c) v = π a (π b (π c v)) := fun a b c v => by
+  intro hcb hccB hΔU hΔM hJone hJmul hJinv hlM hlB hlU hiw hPJ hkill hni hTE hKC ϖ hϖ V _ _ π hs x
+    hx hT
+  have h3
+      : ∀ a b c : GL (Fin n) k, ∀ v : V, π (a * b * c) v = π a (π b (π c v)) := fun a b c v => by
     rw [map_mul, map_mul]; rfl
   have hQfin : Finite (↥G.NO ⧸ G.zN ϖ 1) := (hTE hcb hccB hΔU hΔM hJmul hJinv hlM hlU hiw ϖ hϖ 1).1
   let _ : Fintype (↥G.NO ⧸ G.zN ϖ 1) := Fintype.ofFinite _
 
-  have hsum : ∑ c : ↥G.NO ⧸ G.zN ϖ 1,
-      π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x = 0 := by
+  have hsum
+      : ∑ c : ↥G.NO ⧸ G.zN ϖ 1,
+          π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x
+        = 0 := by
     have e0 : π (G.zEl ϖ)⁻¹ (G.Tz π ϖ 1 x) = 0 := by rw [hT, map_zero]
-    have e1 : G.Tz π ϖ 1 x = ∑ c : ↥G.NO ⧸ G.zN ϖ 1,
-        π ((Quotient.out c : ↥G.NO) : GL (Fin n) k) (π (G.zEl ϖ ^ 1) x) := by
+    have e1
+        : G.Tz π ϖ 1 x
+          = ∑ c : ↥G.NO ⧸ G.zN ϖ 1,
+            π ((Quotient.out c : ↥G.NO) : GL (Fin n) k) (π (G.zEl ϖ ^ 1) x) := by
       unfold Grp.Tz
       exact finsum_eq_sum_of_fintype _
     set_option synthInstance.maxHeartbeats 100000 in
@@ -108,22 +125,24 @@ theorem step_TzInj {n : ℕ} (G : Grp k n) : TorusCentreInjectiveProp G := by
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [h3, pow_one]
 
-  let U : Set (GL (Fin n) k) := {g | π g x = x} ∩ ⋂ c : ↥G.NO ⧸ G.zN ϖ 1,
-    {g | π g (π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x) =
-      π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x}
+  let U : Set (GL (Fin n) k) :=
+    {g | π g x = x}
+      ∩ ⋂ c : ↥G.NO ⧸ G.zN ϖ 1,
+        {g | π g (π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x) =
+          π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x}
   have hUo : IsOpen U := (hs x).inter (isOpen_iInter_of_finite fun c => hs _)
   have hU1 : (1 : GL (Fin n) k) ∈ U := by
     refine ⟨by simp, Set.mem_iInter.2 fun c => ?_⟩
     simp
-  obtain ⟨r0, hr0⟩ := exists_KC_subset (fun r => (hKC hccB r).1) (fun r => (hKC hccB r).2.2.1) U hUo hU1
+  obtain ⟨r0, hr0⟩ :=
+    exists_KC_subset (fun r => (hKC hccB r).1) (fun r => (hKC hccB r).2.2.1) U hUo hU1
   set r := max r0 G.lev with hr
   have hrl : G.lev ≤ r := le_max_right _ _
   have hKCr : KC k n r ⊆ U := (KC_anti (le_max_left _ _)).trans hr0
   have hPJ' := hPJ hcb hccB hΔU hΔM hJone hJmul hJinv hlM hlB hKC V π r hrl
   have hJfin : Finite (↥G.Jg ⧸ (KCg k n r).subgroupOf G.Jg) := hPJ'.1
   let _ : Fintype (↥G.Jg ⧸ (KCg k n r).subgroupOf G.Jg) := Fintype.ofFinite _
-  have hlin : ∀ f : ↥G.NO ⧸ G.zN ϖ 1 → V,
-      G.PJ π r (∑ c, f c) = ∑ c, G.PJ π r (f c) := by
+  have hlin : ∀ f : ↥G.NO ⧸ G.zN ϖ 1 → V, G.PJ π r (∑ c, f c) = ∑ c, G.PJ π r (f c) := by
     intro f
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Grp.PJ, finsum_eq_sum_of_fintype, map_sum, Finset.smul_sum]
@@ -132,9 +151,10 @@ theorem step_TzInj {n : ℕ} (G : Grp k n) : TorusCentreInjectiveProp G := by
   rw [hlin, PJ_zero] at hsum'
   let c1 : ↥G.NO ⧸ G.zN ϖ 1 := QuotientGroup.mk (1 : ↥G.NO)
   rw [Finset.sum_eq_single c1] at hsum'
-  ·
-    have hu1 : (Quotient.out c1 : ↥G.NO) ∈ G.zN ϖ 1 := by
-      have h : (QuotientGroup.mk (Quotient.out c1) : ↥G.NO ⧸ G.zN ϖ 1) = QuotientGroup.mk (1 : ↥G.NO) :=
+  · have hu1 : (Quotient.out c1 : ↥G.NO) ∈ G.zN ϖ 1 := by
+      have h
+          : (QuotientGroup.mk (Quotient.out c1) : ↥G.NO ⧸ G.zN ϖ 1)
+            = QuotientGroup.mk (1 : ↥G.NO) :=
         Quotient.out_eq c1
       have := QuotientGroup.eq.1 h
       simpa using this
@@ -149,20 +169,24 @@ theorem step_TzInj {n : ℕ} (G : Grp k n) : TorusCentreInjectiveProp G := by
     have hcard : (Nat.card (↥G.Jg ⧸ (KCg k n r).subgroupOf G.Jg) : ℂ) ≠ 0 :=
       Nat.cast_ne_zero.2 Nat.card_pos.ne'
     exact (smul_eq_zero.1 hsum').resolve_left hcard
-  ·
-    intro c _ hc
-    have hfix : ∀ u ∈ KC k n r, π u (π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x) =
-        π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x :=
-      fun u hu => Set.mem_iInter.1 (hKCr hu).2 c
-    have hmem : ((Quotient.out c : ↥G.NO) : GL (Fin n) k) ∈ unipRad k G.e ⊓ KO k (Fin n) := (Quotient.out c).2
+  · intro c _ hc
+    have hfix
+        : ∀ u ∈ KC k n r,
+          π u (π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x)
+            = π ((G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ) x := fun u hu =>
+      Set.mem_iInter.1 (hKCr hu).2 c
+    have hmem : ((Quotient.out c : ↥G.NO) : GL (Fin n) k) ∈ unipRad k G.e ⊓ KO k (Fin n) :=
+      (Quotient.out c).2
     have hyU := conj_unip G ϖ (Subgroup.mem_inf.1 hmem).1
-    have hyK : (G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ ∉ KO k (Fin n) := by
+    have hyK
+        : (G.zEl ϖ)⁻¹ * ((Quotient.out c : ↥G.NO) : GL (Fin n) k) * G.zEl ϖ ∉ KO k (Fin n) := by
       intro hK
       apply hc
       have hin : (Quotient.out c : ↥G.NO) ∈ G.zN ϖ 1 := by
         refine (mem_zN G ϖ _).2 ⟨_, Subgroup.mem_inf.2 ⟨hyU, hK⟩, ?_⟩
         group
-      have h : (QuotientGroup.mk (Quotient.out c) : ↥G.NO ⧸ G.zN ϖ 1) = QuotientGroup.mk (1 : ↥G.NO) :=
+      have h
+          : (QuotientGroup.mk (Quotient.out c) : ↥G.NO ⧸ G.zN ϖ 1) = QuotientGroup.mk (1 : ↥G.NO) :=
         QuotientGroup.eq.2 (by simpa using inv_mem hin)
       exact (Quotient.out_eq c).symm.trans h
     exact hkill hcb hccB hΔU hΔM hJone hJmul hJinv hlM hlB hKC hPJ V π r hrl x hx _ hfix

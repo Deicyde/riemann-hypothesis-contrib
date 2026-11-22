@@ -6,15 +6,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
 open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Automorphic.Spherical
 open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.GM
 
-theorem UpperTheory.ConvolutionTheory.GM.convSpec :
-    ConvSpec := by
+theorem UpperTheory.ConvolutionTheory.GM.convSpec : ConvSpec := by
   intro K _ _ n _ ν _ β γ
-  obtain ⟨g, hg, -, hop⟩ := UpperTheory.ConvolutionTheory.Tf.homConv (archGroup K n) (archGroup K n) (MonoidHom.id _) continuous_id ν ν β γ
+  obtain ⟨g, hg, -, hop⟩ :=
+    UpperTheory.ConvolutionTheory.Tf.homConv (archGroup K n) (archGroup K n) (MonoidHom.id _)
+      continuous_id ν ν β γ
   have hex : ∃ δ : TI K n, ∀ x, δ x = ∫ y, β y * γ (y⁻¹ * x) ∂ν := ⟨g, hg⟩
   have h1 : ∀ x, GM.conv ν β γ x = ∫ y, β y * γ (y⁻¹ * x) ∂ν := by
     intro x
@@ -26,4 +29,5 @@ theorem UpperTheory.ConvolutionTheory.GM.convSpec :
     ext x
     exact (h1 x).trans (hg x).symm
   rw [h2]
-  exact hop (LL μ) ((rightRegularRep (rationalGLOne (K := K) (n := n)) μ).compHom (archP K n) continuous_archP)
+  exact hop (LL μ)
+    ((rightRegularRep (rationalGLOne (K := K) (n := n)) μ).compHom (archP K n) continuous_archP)

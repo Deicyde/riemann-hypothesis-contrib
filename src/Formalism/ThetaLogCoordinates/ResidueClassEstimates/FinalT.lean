@@ -13,8 +13,12 @@ public import Formalism.ThetaLogCoordinates.ResidueClassEstimates.VandermondeRan
 namespace Formalism.InvariantFactorPaths.BranchingDimensions.Top
 
 theorem lemma_t_one : PathWeightBound :=
-  pathWeightBound_of pathEntryBounds pathInterlacingCriterion logBinomialProperties logWeylDimensionEstimate logRankEstimate pathTailBounds logBinomialDeficit
-theorem weylGT : ∀ (n : ℕ) (μ : Fin n → ℤ), Antitone μ → weylDim n (extW μ) = (Formalism.InvariantFactorPaths.GelfandTsetlinBases.dGT n μ : ℝ) :=
+  pathWeightBound_of pathEntryBounds pathInterlacingCriterion logBinomialProperties
+    logWeylDimensionEstimate logRankEstimate pathTailBounds logBinomialDeficit
+theorem weylGT
+    : ∀ (n : ℕ) (μ : Fin n → ℤ),
+      Antitone μ
+        → weylDim n (extW μ) = (Formalism.InvariantFactorPaths.GelfandTsetlinBases.dGT n μ : ℝ) :=
   weyl_dim_eq_gelfand_tsetlin branchingDimensionFormula
 
 end Formalism.InvariantFactorPaths.BranchingDimensions.Top

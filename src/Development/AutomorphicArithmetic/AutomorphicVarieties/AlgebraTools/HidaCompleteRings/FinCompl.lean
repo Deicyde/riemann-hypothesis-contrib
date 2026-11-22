@@ -6,8 +6,8 @@ public import Mathlib
 
 open IsLocalRing
 
-private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R) :
-    x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
+private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R)
+    : x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
   constructor
   · intro hx
     refine Submodule.smul_induction_on hx (fun a ha y _ i => ?_) (fun a b ha hb i => ?_)
@@ -17,8 +17,8 @@ private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} 
     rw [pi_eq_sum_univ x]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (hx i) Submodule.mem_top
 
-private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ) :
-    IsPrecomplete I (Fin r → R) := by
+private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ)
+    : IsPrecomplete I (Fin r → R) := by
   refine ⟨fun f hf => ?_⟩
   have hc : ∀ i, ∃ L : R, ∀ n, f n i ≡ L [SMOD (I ^ n • ⊤ : Submodule R R)] := by
     intro i
@@ -34,8 +34,10 @@ private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecom
   rw [Ideal.smul_eq_mul, Ideal.mul_top] at this
   simpa using this
 
-private theorem isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    [Module.Finite R M] (I : Ideal R) [IsPrecomplete I R] : IsPrecomplete I M := by
+private theorem isPrecomplete_finite
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (I : Ideal R) [IsPrecomplete I R]
+    : IsPrecomplete I M := by
   obtain ⟨r, π, hπ⟩ := Module.Finite.exists_fin' R M
   haveI := isPrecomplete_pi I r
   have hmap : ∀ n, Submodule.map π (I ^ n • ⊤) = I ^ n • (⊤ : Submodule R M) := by
@@ -57,25 +59,33 @@ private theorem isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup M] 
     | succ n ih =>
       rw [Finset.sum_range_succ, ← add_assoc, map_add (f := _), ih, hdπ]
       abel
-  have hcau : ∀ {m n : ℕ}, m ≤ n → (g0 + ∑ k ∈ Finset.range m, d k) ≡
-      (g0 + ∑ k ∈ Finset.range n, d k) [SMOD (I ^ m • ⊤ : Submodule R (Fin r → R))] := by
+  have hcau
+      : ∀ {m n : ℕ},
+        m ≤ n
+          → (g0 + ∑ k ∈ Finset.range m, d k) ≡
+            (g0 + ∑ k ∈ Finset.range n, d k) [SMOD (I ^ m • ⊤ : Submodule R (Fin r → R))] := by
     intro m n hmn
     rw [SModEq.sub_mem, ← Finset.sum_range_add_sum_Ico _ hmn]
-    have e : g0 + ∑ k ∈ Finset.range m, d k
-        - (g0 + (∑ k ∈ Finset.range m, d k + ∑ k ∈ Finset.Ico m n, d k))
-        = -∑ k ∈ Finset.Ico m n, d k := by abel
+    have e
+        : g0 + ∑ k ∈ Finset.range m, d k
+            - (g0 + (∑ k ∈ Finset.range m, d k + ∑ k ∈ Finset.Ico m n, d k))
+          = - ∑ k ∈ Finset.Ico m n, d k := by
+      abel
     rw [e]
     refine Submodule.neg_mem _ (Submodule.sum_mem _ fun k hk => ?_)
     exact Submodule.smul_mono_left (Ideal.pow_le_pow_right (Finset.mem_Ico.1 hk).1) (hdI k)
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := I) inferInstance
-    (f := fun n => g0 + ∑ k ∈ Finset.range n, d k) hcau
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec (I := I) inferInstance (f := fun n => g0 + ∑ k ∈ Finset.range n, d k) hcau
   refine ⟨π L, fun n => ?_⟩
   rw [← hgπ n, SModEq.sub_mem, ← map_sub, ← hmap n]
   exact Submodule.mem_map_of_mem (SModEq.sub_mem.1 (hL n))
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.finCompl :
-    ∀ (Λ M : Type) [CommRing Λ] [IsNoetherianRing Λ] (I : Ideal Λ) [IsAdicComplete I Λ] [AddCommGroup M] [Module Λ M] [Module.Finite Λ M], IsAdicComplete I M := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.finCompl
+    : ∀ (Λ M : Type) [CommRing Λ] [IsNoetherianRing Λ] (I : Ideal Λ) [IsAdicComplete I Λ]
+        [AddCommGroup M] [Module Λ M] [Module.Finite Λ M],
+      IsAdicComplete I M := by
   intro Λ M _ _ I _ _ _ _
-  exact
-    { toIsHausdorff := IsHausdorff.of_le_jacobson I M (IsAdicComplete.le_jacobson I)
-      toIsPrecomplete := isPrecomplete_finite I }
+  exact {
+    toIsHausdorff := IsHausdorff.of_le_jacobson I M (IsAdicComplete.le_jacobson I)
+    toIsPrecomplete := isPrecomplete_finite I
+  }

@@ -13,7 +13,8 @@ namespace Formalism.L2.SG.Pf.G2
 
 open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
 
-variable {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+variable
+  {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
   [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 local notation "ι" => algebraMap (𝓞 F) (𝓞 K)
@@ -30,8 +31,9 @@ def phi {n : ℕ} (b : Fin n → V) (a : Fin n → 𝓞 F) : (Fin n → 𝓞 K) 
 
 section
 
-variable {h : V →ₗ⋆[K] V →ₗ[K] K} {X : Submodule K V} {L : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)}
-  {n : ℕ} {b : Fin n → V} {a : Fin n → 𝓞 F}
+variable
+  {h : V →ₗ⋆[K] V →ₗ[K] K} {X : Submodule K V} {L : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)} {n : ℕ}
+  {b : Fin n → V} {a : Fin n → 𝓞 F}
 
 private theorem coe_iota_eq_algebraMap_coe (a : 𝓞 F) : jK (ι a) = algebraMap F K (a : F) := by
   rw [← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K, IsScalarTower.algebraMap_apply (𝓞 F) F K]
@@ -41,9 +43,11 @@ private theorem jK_iota_ne_zero {a : 𝓞 F} (ha : a ≠ 0) : jK (ι a) ≠ 0 :=
   refine (map_ne_zero (algebraMap F K)).mpr ?_
   exact (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 F) F)).mpr ha
 
-theorem h_phi (horth : ∀ i j, i ≠ j → h (b i) (b j) = 0)
+theorem h_phi
+    (horth : ∀ i j, i ≠ j → h (b i) (b j) = 0)
     (hdiag : ∀ i, h (b i) (b i) = algebraMap F K ((a i : 𝓞 F) : F)) (ha : ∀ i, a i ≠ 0)
-    (z : Fin n → 𝓞 K) (k : Fin n) : h (b k) (phi b a z) = jK (z k) := by
+    (z : Fin n → 𝓞 K) (k : Fin n)
+    : h (b k) (phi b a z) = jK (z k) := by
   show h (b k) (∑ i, (jK (z i) / jK (ι (a i))) • b i) = jK (z k)
   rw [map_sum, Finset.sum_eq_single k]
   · rw [LinearMap.map_smul, smul_eq_mul, hdiag k, ← coe_iota_eq_algebraMap_coe,
@@ -56,11 +60,12 @@ theorem phi_mem (hbX : ∀ i, b i ∈ X) (z : Fin n → 𝓞 K) : phi b a z ∈ 
   show (∑ i, (jK (z i) / jK (ι (a i))) • b i) ∈ X
   exact X.sum_mem fun i _ => X.smul_mem _ (hbX i)
 
-theorem disc_equiv (hF : IsFixF K F) (h𝔭 : 𝔭.IsMaximal) (hL : IsLatIn X L) (hbX : ∀ i, b i ∈ X)
+theorem disc_equiv
+    (hF : IsFixF K F) (h𝔭 : 𝔭.IsMaximal) (hL : IsLatIn X L) (hbX : ∀ i, b i ∈ X)
     (hloc : locF 𝔭 (Submodule.span (𝓞 K) (Set.range b)) = locF 𝔭 L)
     (horth : ∀ i j, i ≠ j → h (b i) (b j) = 0)
-    (hdiag : ∀ i, h (b i) (b i) = algebraMap F K ((a i : 𝓞 F) : F)) (ha : ∀ i, a i ≠ 0) :
-    Nonempty (DiscMod h X L 𝔭 ≃ₗ[𝓞 K] ∀ i : Fin n, 𝓞 K ⧸ extP K 𝔭 ^ vF 𝔭 (a i)) := by
+    (hdiag : ∀ i, h (b i) (b i) = algebraMap F K ((a i : 𝓞 F) : F)) (ha : ∀ i, a i ≠ 0)
+    : Nonempty (DiscMod h X L 𝔭 ≃ₗ[𝓞 K] ∀ i : Fin n, 𝓞 K ⧸ extP K 𝔭 ^ vF 𝔭 (a i)) := by
   classical
   haveI := h𝔭.isPrime
   have hA : ∀ z, phi b a z ∈ locF 𝔭 (dualIn h X L) := fun z =>
@@ -92,8 +97,8 @@ theorem disc_equiv (hF : IsFixF K F) (h𝔭 : 𝔭.IsMaximal) (hL : IsLatIn X L)
     rw [map_sub, h_phi horth hdiag ha]
     have := Subring.neg_mem _ (hz i)
     rwa [← neg_div, neg_sub] at this
-  exact ⟨(LinearMap.quotKerEquivOfSurjective ψ hsurj).symm ≪≫ₗ
-    Submodule.quotEquivOfEq _ _ hker ≪≫ₗ Submodule.quotientPi _⟩
+  exact ⟨(LinearMap.quotKerEquivOfSurjective ψ hsurj).symm ≪≫ₗ Submodule.quotEquivOfEq _ _ hker
+    ≪≫ₗ Submodule.quotientPi _⟩
 
 end
 

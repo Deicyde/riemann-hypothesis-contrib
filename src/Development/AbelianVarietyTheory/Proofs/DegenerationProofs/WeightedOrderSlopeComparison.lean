@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.Semi
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory.SS.Slope
@@ -120,9 +121,30 @@ end GlobalTheory.SS.Slope
 
 namespace GlobalTheory.SS
 
-
 open MvPowerSeries Slope in
-theorem weightedOrder_slope_comparison : ∀ (k : Type) [Field k] (r : ℕ) (h : Fin r → MvPowerSeries (Fin 2) k) (d : MvPowerSeries (Fin 2) k), d ≠ 0 → ∀ Q : ℕ → ℕ → Prop, (∀ m n, Q m n ↔ ∀ i, MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d < MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i)) → ((∀ i, MvPowerSeries.X 1 ∣ h i) → ¬ MvPowerSeries.X 1 ∣ d → (∃ m n, 1 ≤ m ∧ m ≤ n ∧ ¬ Q m n) → ∃ m n, 1 ≤ m ∧ m ≤ n ∧ (∀ i, MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i)) ∧ ∃ i, MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d = MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i)) ∧ (Q 1 1 → ∃ m₀, ∀ m, m₀ ≤ m → Q m (m + 1)) ∧ (∀ m n l, 1 ≤ l → (Q (l * m) (l * n) ↔ Q m n)) ∧ ((∀ n, 1 ≤ n → Q 1 n) → ∀ i, ∃ u v, ¬ MvPowerSeries.X 1 ∣ v ∧ h i * v = d * u) := by
+theorem weightedOrder_slope_comparison
+    : ∀ (k : Type) [Field k] (r : ℕ) (h : Fin r → MvPowerSeries (Fin 2) k)
+        (d : MvPowerSeries (Fin 2) k),
+      d ≠ 0
+        → ∀ Q : ℕ → ℕ → Prop,
+          (∀ m n,
+              Q m n
+                ↔ ∀ i,
+                  MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d
+                    < MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i))
+            → ((∀ i, MvPowerSeries.X 1 ∣ h i) → ¬ MvPowerSeries.X 1 ∣ d
+                → (∃ m n, 1 ≤ m ∧ m ≤ n ∧ ¬ Q m n)
+                → ∃ m n,
+                  1 ≤ m ∧ m ≤ n
+                    ∧ (∀ i,
+                      MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d
+                        ≤ MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i))
+                    ∧ ∃ i,
+                      MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) d
+                        = MvPowerSeries.weightedOrder (![m, n] : Fin 2 → ℕ) (h i))
+              ∧ (Q 1 1 → ∃ m₀, ∀ m, m₀ ≤ m → Q m (m + 1))
+              ∧ (∀ m n l, 1 ≤ l → (Q (l * m) (l * n) ↔ Q m n))
+              ∧ ((∀ n, 1 ≤ n → Q 1 n) → ∀ i, ∃ u v, ¬ MvPowerSeries.X 1 ∣ v ∧ h i * v = d * u) := by
   classical
   intro k _ r h d hd Q hQ
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -136,11 +158,12 @@ theorem weightedOrder_slope_comparison : ∀ (k : Type) [Field k] (r : ℕ) (h :
       push Not at hdX
       exact hdX
     by_contra hcon
-    have key : ∀ m n, 1 ≤ m → m ≤ n → ¬ Q m n →
-        ∃ p, n * (s₀ 0).factorial < m * p ∧ ¬ Q (s₀ 0).factorial p := by
+    have key
+        : ∀ m n,
+          1 ≤ m → m ≤ n → ¬ Q m n → ∃ p, n * (s₀ 0).factorial < m * p ∧ ¬ Q (s₀ 0).factorial p := by
       intro m n hm hmn hnQ
-      by_cases hall : ∀ i, weightedOrder (![m, n] : Fin 2 → ℕ) d ≤
-          weightedOrder (![m, n] : Fin 2 → ℕ) (h i)
+      by_cases hall
+        : ∀ i, weightedOrder (![m, n] : Fin 2 → ℕ) d ≤ weightedOrder (![m, n] : Fin 2 → ℕ) (h i)
       · exfalso
         apply hcon
         refine ⟨m, n, hm, hmn, hall, ?_⟩
@@ -195,8 +218,8 @@ theorem weightedOrder_slope_comparison : ∀ (k : Type) [Field k] (r : ℕ) (h :
     rw [hQ, hQ]
     refine forall_congr' fun i => ?_
     rw [lt_iff, lt_iff]
-    refine exists_congr fun s => and_congr_right fun _ => forall_congr' fun t =>
-      imp_congr_right fun _ => ?_
+    refine exists_congr fun s =>
+      and_congr_right fun _ => forall_congr' fun t => imp_congr_right fun _ => ?_
     rw [Nat.mul_assoc, Nat.mul_assoc, Nat.mul_assoc, Nat.mul_assoc, ← Nat.mul_add, ← Nat.mul_add]
     exact Nat.mul_lt_mul_left hl
   · intro hall i

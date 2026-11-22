@@ -12,16 +12,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open MeasureTheory NumberField IsDedekindDomain Filter ValuativeRel
 open GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open UpperTheory.Gal.LocD UpperTheory.Gal.InertialTypesAlt.G UpperTheory.Gal.Join
 open scoped Classical
 
-private theorem continuous_mulSingle_units {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] {n : ℕ} (i : Fin n) :
-    Continuous (MonoidHom.mulSingle (fun _ : Fin n => kˣ) i) :=
+private theorem continuous_mulSingle_units
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] {n : ℕ} (i : Fin n)
+    : Continuous (MonoidHom.mulSingle (fun _ : Fin n => kˣ) i) :=
   continuous_mulSingle (A := fun _ : Fin n => kˣ) i
 
-theorem UpperTheory.Gal.Join.expSub :
-    UpperTheory.Gal.Join.ExpSub := by
+theorem UpperTheory.Gal.Join.expSub : UpperTheory.Gal.Join.ExpSub := by
   intro k _ _ _ _ n V _ _ π hsm hirr μ hexp
   obtain ⟨y, hy0, hy⟩ := hexp
   have hJs : IsSmooth (jacB π) := isSmooth_jacB hsm
@@ -44,11 +46,14 @@ theorem UpperTheory.Gal.Join.expSub :
     rw [← map_prod, Finset.univ_prod_mulSingle]
   have hωs : ∀ i, IsSmoothChar (ω i) := fun i => hμ.comp _ (continuous_mulSingle_units i)
   have hlen : HasFiniteLength (jacB π) := by
-    have hj := (GlobalTheory.T.bernstein_zelevinsky_finiteness k).2.1 (Fin n) (Fin n) (fun _ => Unit) (points (Fin n)) V π hsm
-      (hasFiniteLength_of_isIrreducible hirr)
+    have hj :=
+      (GlobalTheory.T.bernstein_zelevinsky_finiteness k).2.1 (Fin n) (Fin n)
+        (fun _ => Unit)
+        (points (Fin n)) V π hsm (hasFiniteLength_of_isIrreducible hirr)
     exact (hasFiniteLength_comp_iff _ _ (leviTorus k (Fin n)).surjective).mpr hj
-  obtain ⟨ψ, l, hl0, hl, hψω⟩ := GlobalTheory.T.exists_torusEigenform_of_compactTorus_eigenvector k n _ (jacB π) y ω hJs hlen hωs hy0
-    (fun t _ => by rw [hy t, hωμ])
+  obtain ⟨ψ, l, hl0, hl, hψω⟩ :=
+    GlobalTheory.T.exists_torusEigenform_of_compactTorus_eigenvector k n _ (jacB π) y ω hJs hlen hωs
+      hy0 (fun t _ => by rw [hy t, hωμ])
   have hψs : ∀ i, IsSmoothChar (ψ i) := fun i =>
     GlobalTheory.TameIwahori.isSmoothChar_of_eq_on_units (hωs i) (hψω i)
   have hsubψ : IsSubquotient π (prinSeries ψ) := quotEmb k n V π hsm hirr ψ l hl0 hl
@@ -60,8 +65,8 @@ theorem UpperTheory.Gal.Join.expSub :
   have hinv : ∀ i, UpperTheory.Gal.LocD.Inv (RingEquiv.refl k) (ψ i) := by
     intro i x
     congr 1
-  obtain ⟨-, hfd, -⟩ := locDesc_holds k n (RingEquiv.refl k) 1 hcyc V π hirr ψ hψs hinv hsubψ LinearMap.id hsemi
-    (by
+  obtain ⟨-, hfd, -⟩ :=
+    locDesc_holds k n (RingEquiv.refl k) 1 hcyc V π hirr ψ hψs hinv hsubψ LinearMap.id hsemi (by
       intro h
       obtain ⟨v, hv⟩ := exists_ne (0 : V)
       exact hv (by simpa using LinearMap.congr_fun h v))

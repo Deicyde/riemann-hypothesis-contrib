@@ -8,8 +8,14 @@ public import Development.AutomorphicArithmetic.PrimeDiscriminants.ExistsPrimiti
 open NumberField IsDedekindDomain Formalism.HC
 
 open Ideal in
-theorem UpperTheory.Mu.splitNotDvd :
-    ∀ (φ : Frame) (H : HostAx φ), H.toHostRaw.Exact → ∀ p : ℕ, p.Prime → {v : HeightOneSpectrum (𝓞 H.E) | ((p : ℕ) : 𝓞 H.E) ∈ v.asIdeal}.ncard = Module.finrank ℚ H.E → ¬ p ∣ H.QS := by
+theorem UpperTheory.Mu.splitNotDvd
+    : ∀ (φ : Frame) (H : HostAx φ),
+      H.toHostRaw.Exact
+        → ∀ p : ℕ,
+          p.Prime
+            → {v : HeightOneSpectrum (𝓞 H.E) | ((p : ℕ) : 𝓞 H.E) ∈ v.asIdeal}.ncard
+              = Module.finrank ℚ H.E
+            → ¬ p ∣ H.QS := by
   intro φ H hex p hp hcard hdvd
   haveI hpf : Fact p.Prime := ⟨hp⟩
   haveI hgal : IsGalois ℚ H.E := H.galois
@@ -31,8 +37,10 @@ theorem UpperTheory.Mu.splitNotDvd :
       simpa [Ideal.under] using hz
   have hset : (pZ.primesOver (𝓞 H.E)).ncard = Module.finrank ℚ H.E := by
     rw [← hcard]
-    have heq : pZ.primesOver (𝓞 H.E) =
-        (fun v : HeightOneSpectrum (𝓞 H.E) => v.asIdeal) '' {v | ((p : ℕ) : 𝓞 H.E) ∈ v.asIdeal} := by
+    have heq
+        : pZ.primesOver (𝓞 H.E)
+          = (fun v : HeightOneSpectrum (𝓞 H.E) => v.asIdeal)
+            '' {v | ((p : ℕ) : 𝓞 H.E) ∈ v.asIdeal} := by
       ext P
       constructor
       · rintro ⟨hP, hl⟩

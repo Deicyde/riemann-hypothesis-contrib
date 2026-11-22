@@ -15,9 +15,11 @@ section SlopeTestRemainingChoices
 
 variable {G k V : Type} [Group G] [Field k] [AddCommGroup V] [Module k V] {N : ℕ}
 
-theorem repr_diag_apply (ρ : Representation k G V) (e : Module.Basis (Fin N) k V)
-    (χ : Fin N → G → k) (y : G) (hy : ∀ i, ρ y (e i) = χ i y • e i) (v : V) (m : Fin N) :
-    e.repr (ρ y v) m = χ m y * e.repr v m := by
+theorem repr_diag_apply
+    (ρ : Representation k G V) (e : Module.Basis (Fin N) k V) (χ : Fin N → G → k) (y : G)
+    (hy : ∀ i, ρ y (e i) = χ i y • e i)
+    (v : V) (m : Fin N)
+    : e.repr (ρ y v) m = χ m y * e.repr v m := by
   have h : ρ y v = ∑ i, (e.repr v i * χ i y) • e i := by
     conv_lhs => rw [← e.sum_repr v]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -27,10 +29,11 @@ theorem repr_diag_apply (ρ : Representation k G V) (e : Module.Basis (Fin N) k 
   rw [h, e.repr_sum_self]
   exact mul_comm _ _
 
-theorem eigen_mem_span (ρ : Representation k G V) (e : Module.Basis (Fin N) k V)
-    (χ : Fin N → G → k) (I : Subgroup G) (he : ∀ i, ∀ y ∈ I, ρ y (e i) = χ i y • e i)
-    (hsep : ∀ i j, i ≠ j → ∃ y ∈ I, χ i y ≠ χ j y)
-    (j : Fin N) (v : V) (hv : ∀ y ∈ I, ρ y v = χ j y • v) : v ∈ k ∙ e j := by
+theorem eigen_mem_span
+    (ρ : Representation k G V) (e : Module.Basis (Fin N) k V) (χ : Fin N → G → k) (I : Subgroup G)
+    (he : ∀ i, ∀ y ∈ I, ρ y (e i) = χ i y • e i) (hsep : ∀ i j, i ≠ j → ∃ y ∈ I, χ i y ≠ χ j y)
+    (j : Fin N) (v : V) (hv : ∀ y ∈ I, ρ y v = χ j y • v)
+    : v ∈ k ∙ e j := by
   have hc : ∀ i, i ≠ j → e.repr v i = 0 := by
     intro i hij
     obtain ⟨y, hyI, hne⟩ := hsep i j hij
@@ -44,17 +47,17 @@ theorem eigen_mem_span (ρ : Representation k G V) (e : Module.Basis (Fin N) k V
   refine ⟨e.repr v j, ?_⟩
   conv_rhs => rw [← e.sum_repr v]
   symm
-  exact Finset.sum_eq_single j (fun i _ hij => by rw [hc i hij, zero_smul])
+  exact Finset.sum_eq_single j
+    (fun i _ hij => by rw [hc i hij, zero_smul])
     (fun h => absurd (Finset.mem_univ j) h)
 
-theorem mem_of_repr_ne_zero (ρ : Representation k G V) (e : Module.Basis (Fin N) k V)
-    (χ : Fin N → G → k) (I : Subgroup G) (he : ∀ i, ∀ y ∈ I, ρ y (e i) = χ i y • e i)
-    (hsep : ∀ i j, i ≠ j → ∃ y ∈ I, χ i y ≠ χ j y) (W : Submodule k V)
-    (hW : ∀ y ∈ I, ∀ x ∈ W, ρ y x ∈ W) :
-    ∀ w ∈ W, ∀ i, e.repr w i ≠ 0 → e i ∈ W := by
+theorem mem_of_repr_ne_zero
+    (ρ : Representation k G V) (e : Module.Basis (Fin N) k V) (χ : Fin N → G → k) (I : Subgroup G)
+    (he : ∀ i, ∀ y ∈ I, ρ y (e i) = χ i y • e i) (hsep : ∀ i j, i ≠ j → ∃ y ∈ I, χ i y ≠ χ j y)
+    (W : Submodule k V) (hW : ∀ y ∈ I, ∀ x ∈ W, ρ y x ∈ W)
+    : ∀ w ∈ W, ∀ i, e.repr w i ≠ 0 → e i ∈ W := by
   intro w hw i hi
-  have key : ∀ s : Finset (Fin N), i ∉ s →
-      ∃ u ∈ W, e.repr u i ≠ 0 ∧ ∀ l ∈ s, e.repr u l = 0 := by
+  have key : ∀ s : Finset (Fin N), i ∉ s → ∃ u ∈ W, e.repr u i ≠ 0 ∧ ∀ l ∈ s, e.repr u l = 0 := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · intro _
@@ -85,16 +88,19 @@ theorem mem_of_repr_ne_zero (ρ : Representation k G V) (e : Module.Basis (Fin N
       (fun l _ hl => by rw [hus l (Finset.mem_erase.mpr ⟨hl, Finset.mem_univ l⟩), zero_smul])
       (fun h => absurd (Finset.mem_univ i) h)
   have h2 : (e.repr u i)⁻¹ • u = e i := by
-    calc (e.repr u i)⁻¹ • u = (e.repr u i)⁻¹ • (e.repr u i • e i) := by rw [← hu]
+    calc
+      (e.repr u i)⁻¹ • u
+        = (e.repr u i)⁻¹ • (e.repr u i • e i) := by rw [← hu]
       _ = e i := by rw [smul_smul, inv_mul_cancel₀ hui, one_smul]
   rw [← h2]
   exact W.smul_mem _ huW
 
 end SlopeTestRemainingChoices
 
-theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransitive) : Restriction := by
-  intro G k V _ _ _ _ ρ N H _ I e χ φ π p hN8 hfin hsolv hIH hirr he hsep hφI hπ hp hcard hp3 hpc
-    W₀ hW₀
+theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransitive)
+    : Restriction := by
+  intro G k V _ _ _ _ ρ N H _ I e χ φ π p hN8 hfin hsolv hIH hirr he hsep hφI hπ hp hcard hp3 hpc W₀
+    hW₀
   classical
   by_cases hne : W₀ = ⊥
   · exact Or.inl hne
@@ -104,11 +110,14 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
   have hinj : ∀ g : G, Function.Injective (ρ g) := by
     intro g a b hab
     have h1 : ∀ x, ρ g⁻¹ (ρ g x) = x := fun x => by
-      calc ρ g⁻¹ (ρ g x) = ρ (g⁻¹ * g) x := by rw [map_mul ρ g⁻¹ g, Module.End.mul_apply]
+      calc
+        ρ g⁻¹ (ρ g x)
+          = ρ (g⁻¹ * g) x := by rw [map_mul ρ g⁻¹ g, Module.End.mul_apply]
         _ = x := by rw [inv_mul_cancel, map_one, Module.End.one_apply]
     rw [← h1 a, ← h1 b, hab]
-  have hI : ∀ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) →
-      ∀ w ∈ U, ∀ i, e.repr w i ≠ 0 → e i ∈ U := fun U hU =>
+  have hI
+      : ∀ U : Submodule k V,
+        (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → ∀ w ∈ U, ∀ i, e.repr w i ≠ 0 → e i ∈ U := fun U hU =>
     mem_of_repr_ne_zero ρ e χ I he hsep U (fun y hy x hx => hU y (hIH hy) x hx)
   have hspan : ∀ U : Submodule k V, ∀ x : V, (∀ i, e.repr x i ≠ 0 → e i ∈ U) → x ∈ U := by
     intro U x hx
@@ -118,19 +127,22 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
     · rw [h0, zero_smul]
       exact U.zero_mem
     · exact U.smul_mem _ (hx i h0)
-  have htr : ∀ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → ∀ g : G,
-      ∀ h ∈ H, ∀ x ∈ U.map (ρ g), ρ h x ∈ U.map (ρ g) := by
+  have htr
+      : ∀ U : Submodule k V,
+        (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U)
+          → ∀ g : G, ∀ h ∈ H, ∀ x ∈ U.map (ρ g), ρ h x ∈ U.map (ρ g) := by
     intro U hU g h hh x hx
     obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.mp hx
-    have hc : g⁻¹ * h * g ∈ H := by
-      simpa using (inferInstance : H.Normal).conj_mem h hh g⁻¹
+    have hc : g⁻¹ * h * g ∈ H := by simpa using (inferInstance : H.Normal).conj_mem h hh g⁻¹
     refine Submodule.mem_map.mpr ⟨ρ (g⁻¹ * h * g) y, hU _ hc y hy, ?_⟩
-    calc ρ g (ρ (g⁻¹ * h * g) y) = ρ (g * (g⁻¹ * h * g)) y := by
-          rw [map_mul ρ g (g⁻¹ * h * g), Module.End.mul_apply]
+    calc
+      ρ g (ρ (g⁻¹ * h * g) y)
+        = ρ (g * (g⁻¹ * h * g)) y := by rw [map_mul ρ g (g⁻¹ * h * g), Module.End.mul_apply]
       _ = ρ (h * g) y := by rw [show g * (g⁻¹ * h * g) = h * g by group]
       _ = ρ h (ρ g y) := by rw [map_mul ρ h g, Module.End.mul_apply]
-  have hsing : ∀ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → ∀ j, idx U = {j} →
-      ∀ x ∈ U, x = e.repr x j • e j := by
+  have hsing
+      : ∀ U : Submodule k V,
+        (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → ∀ j, idx U = {j} → ∀ x ∈ U, x = e.repr x j • e j := by
     intro U hU j hj x hx
     conv_lhs => rw [← e.sum_repr x]
     refine Finset.sum_eq_single j (fun l _ hl => ?_) (fun h => absurd (Finset.mem_univ j) h)
@@ -138,8 +150,8 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
     have h1 := (hidx U l).mpr (hI U hU x hx l (fun h0 => hne (by rw [h0, zero_smul])))
     rw [hj, Finset.mem_singleton] at h1
     exact hl h1
-  have hfinr : ∀ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) →
-      Module.finrank k U = (idx U).card := by
+  have hfinr
+      : ∀ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → Module.finrank k U = (idx U).card := by
     intro U hU
     have hli : LinearIndependent k (fun i : (idx U) => e i) :=
       e.linearIndependent.comp (fun i : (idx U) => (i : Fin N)) Subtype.val_injective
@@ -155,26 +167,32 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
     have h2 := finrank_span_eq_card hli
     rw [← heq] at h2
     rw [h2, Fintype.card_coe]
-  have hcardtr : ∀ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → ∀ g : G,
-      (idx (U.map (ρ g))).card = (idx U).card := by
+  have hcardtr
+      : ∀ U : Submodule k V,
+        (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → ∀ g : G, (idx (U.map (ρ g))).card = (idx U).card := by
     intro U hU g
     rw [← hfinr _ (htr U hU g), ← hfinr U hU]
     exact (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective (ρ g) (hinj g) U)).symm
-  have hex : ∃ n, ∃ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) ∧ U ≠ ⊥ ∧
-      (idx U).card = n := ⟨_, W₀, hW₀, hne, rfl⟩
+  have hex : ∃ n, ∃ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) ∧ U ≠ ⊥ ∧ (idx U).card = n :=
+    ⟨_, W₀, hW₀, hne, rfl⟩
   obtain ⟨W, hW, hWne, hWm⟩ := Nat.find_spec hex
-  have hmin : ∀ U : Submodule k V, (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → U ≠ ⊥ →
-      (idx W).card ≤ (idx U).card := by
+  have hmin
+      : ∀ U : Submodule k V,
+        (∀ h ∈ H, ∀ x ∈ U, ρ h x ∈ U) → U ≠ ⊥ → (idx W).card ≤ (idx U).card := by
     intro U hU hU0
     rw [hWm]
     exact Nat.find_min' hex ⟨U, hU, hU0, rfl⟩
   have hmap1 : W.map (ρ 1) = W := by rw [map_one, Module.End.one_eq_id, Submodule.map_id]
-  have hFeq : ∀ g₁ g₂ : G, ∀ j, e j ∈ W.map (ρ g₁) → e j ∈ W.map (ρ g₂) →
-      idx (W.map (ρ g₁)) = idx (W.map (ρ g₂)) := by
+  have hFeq
+      : ∀ g₁ g₂ : G, ∀ j,
+        e j ∈ W.map (ρ g₁) → e j ∈ W.map (ρ g₂) → idx (W.map (ρ g₁)) = idx (W.map (ρ g₂)) := by
     intro g₁ g₂ j h1 h2
     have hX : ∀ h ∈ H, ∀ x ∈ W.map (ρ g₁) ⊓ W.map (ρ g₂), ρ h x ∈ W.map (ρ g₁) ⊓ W.map (ρ g₂) :=
-      fun h hh x hx => Submodule.mem_inf.mpr ⟨htr W hW g₁ h hh x (Submodule.mem_inf.mp hx).1,
-        htr W hW g₂ h hh x (Submodule.mem_inf.mp hx).2⟩
+      fun h hh x hx =>
+        Submodule.mem_inf.mpr ⟨
+          htr W hW g₁ h hh x (Submodule.mem_inf.mp hx).1,
+          htr W hW g₂ h hh x (Submodule.mem_inf.mp hx).2
+        ⟩
     have hX0 : W.map (ρ g₁) ⊓ W.map (ρ g₂) ≠ ⊥ := by
       intro h0
       apply e.ne_zero j
@@ -187,14 +205,17 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
       (hidx _ i).mpr (Submodule.mem_inf.mp ((hidx _ i).mp hi)).2
     rw [← Finset.eq_of_subset_of_card_le hs1 (by rw [hcardtr W hW g₁]; exact hm),
       ← Finset.eq_of_subset_of_card_le hs2 (by rw [hcardtr W hW g₂]; exact hm)]
-  obtain ⟨Y, hY⟩ : ∃ Y : Submodule k V, ∀ x, x ∈ Y ↔
-      ∀ j, (∀ g, e j ∉ W.map (ρ g)) → e.repr x j = 0 :=
-    ⟨{ carrier := {x | ∀ j, (∀ g, e j ∉ W.map (ρ g)) → e.repr x j = 0}
-       add_mem' := fun {a b} ha hb j hj => by
-         rw [map_add (f := _), Finsupp.add_apply, ha j hj, hb j hj, add_zero]
-       zero_mem' := fun j _ => by rw [map_zero, Finsupp.zero_apply]
-       smul_mem' := fun c {x} hx j hj => by
-         rw [map_smul, Finsupp.smul_apply, hx j hj, smul_zero] }, fun x => Iff.rfl⟩
+  obtain ⟨Y, hY⟩
+      : ∃ Y : Submodule k V, ∀ x, x ∈ Y ↔ ∀ j, (∀ g, e j ∉ W.map (ρ g)) → e.repr x j = 0 := ⟨
+    {
+      carrier := {x | ∀ j, (∀ g, e j ∉ W.map (ρ g)) → e.repr x j = 0}
+      add_mem' := fun {a b} ha hb j hj => by
+        rw [map_add (f := _), Finsupp.add_apply, ha j hj, hb j hj, add_zero]
+      zero_mem' := fun j _ => by rw [map_zero, Finsupp.zero_apply]
+      smul_mem' := fun c {x} hx j hj => by rw [map_smul, Finsupp.smul_apply, hx j hj, smul_zero]
+    },
+    fun x => Iff.rfl
+  ⟩
   have hYst : ∀ g' : G, ∀ x ∈ Y, ρ g' x ∈ Y := by
     intro g' x hx
     set_option synthInstance.maxHeartbeats 100000 in
@@ -238,12 +259,12 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
     intro j
     have hv : ∀ y ∈ I, ρ y (ρ φ (e j)) = χ (π j) y • ρ φ (e j) := by
       intro y hy
-      have hy' : φ⁻¹ * y * φ ∈ I :=
-        (hφI _).mpr (by rwa [show φ * (φ⁻¹ * y * φ) * φ⁻¹ = y by group])
-      calc ρ y (ρ φ (e j)) = ρ (y * φ) (e j) := by rw [map_mul ρ y φ, Module.End.mul_apply]
+      have hy' : φ⁻¹ * y * φ ∈ I := (hφI _).mpr (by rwa [show φ * (φ⁻¹ * y * φ) * φ⁻¹ = y by group])
+      calc
+        ρ y (ρ φ (e j))
+          = ρ (y * φ) (e j) := by rw [map_mul ρ y φ, Module.End.mul_apply]
         _ = ρ (φ * (φ⁻¹ * y * φ)) (e j) := by rw [show φ * (φ⁻¹ * y * φ) = y * φ by group]
-        _ = ρ φ (ρ (φ⁻¹ * y * φ) (e j)) := by
-          rw [map_mul ρ φ (φ⁻¹ * y * φ), Module.End.mul_apply]
+        _ = ρ φ (ρ (φ⁻¹ * y * φ) (e j)) := by rw [map_mul ρ φ (φ⁻¹ * y * φ), Module.End.mul_apply]
         _ = ρ φ (χ j (φ⁻¹ * y * φ) • e j) := by rw [he j _ hy']
         _ = χ (π j) y • ρ φ (e j) := by rw [map_smul, hπ j y hy]
     obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp (eigen_mem_span ρ e χ I he hsep (π j) _ hv)
@@ -275,8 +296,8 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
     · intro h
       refine ⟨π.symm j', (hidx _ _).mpr ((hmemφ x _).mp ?_), π.apply_symm_apply j'⟩
       rwa [π.apply_symm_apply]
-  have hpow : ∀ n : ℕ, ∀ g : G,
-      (idx (W.map (ρ g))).image ⇑(π ^ n) = idx (W.map (ρ (φ ^ n * g))) := by
+  have hpow
+      : ∀ n : ℕ, ∀ g : G, (idx (W.map (ρ g))).image ⇑(π ^ n) = idx (W.map (ρ (φ ^ n * g))) := by
     intro n
     induction n with
     | zero =>
@@ -314,11 +335,12 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
     rw [hfun, hpow n g]
     exact (hBmem _).mpr ⟨φ ^ n * g, rfl⟩
   obtain ⟨kk, hkc, hks⟩ := Formalism.GaloisIrreducibility.power_of_p_cycle (Fin N) π p hp hpc hcard
-  obtain ⟨g₀, hg₀⟩ : ∃ g₀ : ↥(Subgroup.zpowers π),
-      (MulAction.toPerm g₀ : Equiv.Perm (Fin N)) = π ^ kk :=
+  obtain ⟨g₀, hg₀⟩
+      : ∃ g₀ : ↥(Subgroup.zpowers π), (MulAction.toPerm g₀ : Equiv.Perm (Fin N)) = π ^ kk :=
     ⟨⟨π ^ kk, Subgroup.pow_mem _ (Subgroup.mem_zpowers π) kk⟩, Equiv.ext fun _ => rfl⟩
   rcases hB (↥(Subgroup.zpowers π)) (Fin N) B (idx W).card p g₀ hBcard hBdisj hBcov hBinv hp hcard
-      (by rw [hg₀]; exact hkc) (by rw [hg₀]; exact hks) with h1 | hN
+      (by rw [hg₀]; exact hkc) (by rw [hg₀]; exact hks)
+    with h1 | hN
   · obtain ⟨S, hS⟩ := Finset.card_eq_one.mp h1
     have hWS : idx W = S := by
       have h3 : idx (W.map (ρ 1)) ∈ B := (hBmem _).mpr ⟨1, rfl⟩
@@ -336,17 +358,17 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
     have h0 := hmin W₀ hW₀ hne
     have h4 := Finset.card_le_univ (idx W₀)
     rw [Fintype.card_fin] at h4
-    have hu : idx W₀ = Finset.univ :=
-      Finset.eq_univ_of_card _ (by rw [Fintype.card_fin]; omega)
+    have hu : idx W₀ = Finset.univ := Finset.eq_univ_of_card _ (by rw [Fintype.card_fin]; omega)
     rw [Submodule.eq_top_iff']
     intro x
     apply hspan
     intro i _
     exact (hidx W₀ i).mp (by rw [hu]; exact Finset.mem_univ i)
   · exfalso
-    have hbu : B.biUnion id = Finset.univ := Finset.eq_univ_of_forall fun j => by
-      obtain ⟨g, hg⟩ := hcov j
-      exact Finset.mem_biUnion.mpr ⟨idx (W.map (ρ g)), (hBmem _).mpr ⟨g, rfl⟩, (hidx _ j).mpr hg⟩
+    have hbu : B.biUnion id = Finset.univ :=
+      Finset.eq_univ_of_forall fun j => by
+        obtain ⟨g, hg⟩ := hcov j
+        exact Finset.mem_biUnion.mpr ⟨idx (W.map (ρ g)), (hBmem _).mpr ⟨g, rfl⟩, (hidx _ j).mpr hg⟩
     have hsum : (B.biUnion id).card = B.card * (idx W).card := by
       rw [Finset.card_biUnion (by intro x hx y hy hxy; exact hBdisj x hx y hy hxy)]
       exact Finset.sum_const_nat hBcard
@@ -384,11 +406,19 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
         smul_smul]
     have hone : ∀ i, fo 1 i = i := fun i =>
       hsame (co 1 i) 1 _ _ one_ne_zero (by rw [← hfc 1 i, map_one, Module.End.one_apply, one_smul])
-    obtain ⟨σ, hσ⟩ : ∃ σ : G →* Equiv.Perm (Fin N), ∀ g i, σ g i = fo g i :=
-      ⟨{ toFun := fun g => ⟨fo g, fo g⁻¹, fun i => by rw [← hmulf, inv_mul_cancel, hone],
-            fun i => by rw [← hmulf, mul_inv_cancel, hone]⟩
-         map_one' := Equiv.ext fun i => hone i
-         map_mul' := fun g h => Equiv.ext fun i => hmulf g h i }, fun g i => rfl⟩
+    obtain ⟨σ, hσ⟩ : ∃ σ : G →* Equiv.Perm (Fin N), ∀ g i, σ g i = fo g i := ⟨
+      {
+        toFun := fun g => ⟨
+          fo g,
+          fo g⁻¹,
+          fun i => by rw [← hmulf, inv_mul_cancel, hone],
+          fun i => by rw [← hmulf, mul_inv_cancel, hone]
+        ⟩
+        map_one' := Equiv.ext fun i => hone i
+        map_mul' := fun g h => Equiv.ext fun i => hmulf g h i
+      },
+      fun g i => rfl
+    ⟩
     have hker1 : ∀ x ∈ H, σ x = 1 := by
       intro x hx
       refine Equiv.ext fun i => ?_
@@ -417,8 +447,11 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
       subst hxj
       have hmem : ρ g (e i₀) ∈ W.map (ρ g) := Submodule.mem_map.mpr ⟨e i₀, he₀, rfl⟩
       have hd := hsing _ (htr W hW g) x hj _ hmem
-      exact ⟨g, (hsame (e.repr (ρ g (e i₀)) x) (co g i₀) x (fo g i₀) (hc0 g i₀)
-        (by rw [← hfc g i₀]; exact hd.symm)).symm⟩
+      exact ⟨
+        g,
+        (hsame (e.repr (ρ g (e i₀)) x) (co g i₀) x (fo g i₀) (hc0 g i₀)
+          (by rw [← hfc g i₀]; exact hd.symm)).symm
+      ⟩
     letI : MulAction (G ⧸ H) (Fin N) := MulAction.compHom (Fin N) (QuotientGroup.lift H σ (by
       intro x hx
       first
@@ -435,7 +468,7 @@ theorem restriction_of_blocks_and_jordan (hB : BlocksCycle) (hJ : JordanTransiti
       refine ⟨((φ ^ kk : G) : G ⧸ H), Equiv.ext fun x => ?_⟩
       show σ (φ ^ kk) x = (π ^ kk) x
       rw [map_pow, hσφ]
-    exact (hJ (G ⧸ H) (Fin N) p g₁ htrans hp hcard (by simpa using hp3)
-      (by rw [hg₁]; exact hkc) (by rw [hg₁]; exact hks)).2 hsolv
+    exact (hJ (G ⧸ H) (Fin N) p g₁ htrans hp hcard (by simpa using hp3) (by rw [hg₁]; exact hkc)
+      (by rw [hg₁]; exact hks)).2 hsolv
 
 end Formalism.CyclotomicNorms

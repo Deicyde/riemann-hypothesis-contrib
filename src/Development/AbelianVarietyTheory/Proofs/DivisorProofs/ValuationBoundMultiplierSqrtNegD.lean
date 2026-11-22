@@ -11,16 +11,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AlgebraicVal
 @[expose] public section
 
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate
-open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
+open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal
+  ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
 open GlobalTheory.CMVal GlobalTheory.HeckeGal
 open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.SzMult
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (lam : algebraicClosure ℚ ℂ →+* ℂ_[l]) (d : ℕ) (σ p : ℂ), d.Prime → 4 < d → l ≠ d → Sz l lam 0 (12 * p) → Sz l lam 0 (-2 * (d : ℂ) * σ + ((d : ℂ) + 1) * p) → (l = 3 → d % 3 = 2) → Sz l lam (if l = 2 then (if d % 4 = 3 then 1 else 2) else 0) σ := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (lam : algebraicClosure ℚ ℂ →+* ℂ_[l]) (d : ℕ) (σ p : ℂ),
+      d.Prime → 4 < d → l ≠ d → Sz l lam 0 (12 * p)
+        → Sz l lam 0 (-2 * (d : ℂ) * σ + ((d : ℂ) + 1) * p) → (l = 3 → d % 3 = 2)
+        → Sz l lam (if l = 2 then (if d % 4 = 3 then 1 else 2) else 0) σ := by
   intro l _ lam d σ p hd hd4 hld hA hB h3
   have hlp : l.Prime := Fact.out
-  obtain ⟨hint, -, hmul, hmono, -, hl, -⟩ := GlobalTheory.T.algebraicValuationAtLeast_basic_properties l lam
+  obtain ⟨hint, -, hmul, hmono, -, hl, -⟩ :=
+    GlobalTheory.T.algebraicValuationAtLeast_basic_properties l lam
   obtain ⟨-, hadd2, -, -, hZ, -⟩ := GlobalTheory.QFam.SzSum.sz_ring l lam
   have hne : ∀ n : ℕ, ¬ l ∣ n → (n : ℂ) ≠ 0 := by
     intro n hn h
@@ -40,14 +46,17 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (lam : algebraicClosure ℚ ℂ →+
     intro r n x hn h
     have := hm0 r _ _ (hinv n hn) h
     rwa [← mul_assoc, inv_mul_cancel₀ (hne n hn), one_mul] at this
-  have hkey : ∀ r : ℝ, 0 ≤ r → Sz l lam r (((d : ℂ) + 1) * p) → Sz l lam r (((2 * d : ℕ) : ℂ) * σ) := by
+  have hkey
+      : ∀ r : ℝ, 0 ≤ r → Sz l lam r (((d : ℂ) + 1) * p) → Sz l lam r (((2 * d : ℕ) : ℂ) * σ) := by
     intro r hr h
     have hB' := hmono 0 r _ hr hB
     have := (hadd2 r _ _ h hB').2
     convert this using 1
     push_cast
     ring
-  have hmulk : ∀ (r : ℝ) (m k : ℕ), d + 1 = m * k → Sz l lam r ((m : ℂ) * p) → Sz l lam r (((d : ℂ) + 1) * p) := by
+  have hmulk
+      : ∀ (r : ℝ) (m k : ℕ),
+        d + 1 = m * k → Sz l lam r ((m : ℂ) * p) → Sz l lam r (((d : ℂ) + 1) * p) := by
     intro r m k hk h
     have := hm0 r (k : ℂ) _ (hnat k) h
     have e : ((d : ℂ) + 1) = (m : ℂ) * k := by exact_mod_cast hk
@@ -108,8 +117,7 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (lam : algebraicClosure ℚ ℂ →+
       have h12 : ¬ l ∣ 12 := by
         intro h
         rcases (Nat.Prime.dvd_mul hlp).mp (show l ∣ 2 * 2 * 3 from h) with h' | h'
-        · rcases (Nat.Prime.dvd_mul hlp).mp h' with h'' | h'' <;>
-            exact h2 (hl2 2 Nat.prime_two h'')
+        · rcases (Nat.Prime.dvd_mul hlp).mp h' with h'' | h'' <;> exact h2 (hl2 2 Nat.prime_two h'')
         · exact h3' (hl2 3 Nat.prime_three h')
       have h2d : ¬ l ∣ 2 * d := by
         intro h

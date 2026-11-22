@@ -10,28 +10,36 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 def OldestLetterInSegment : Prop :=
-  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r), X.Hyp p K → ∀ j, ∀ x ∈ X.toLate j,
-    X.F.oldest j x ∈ X.F.letters j ∧ (¬ X.F.IsW j (X.F.oldest j x) → X.F.oldest j x ∈ X.F.LLset j)
+  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r),
+    X.Hyp p K
+      → ∀ j, ∀ x ∈ X.toLate j,
+        X.F.oldest j x ∈ X.F.letters j
+          ∧ (¬ X.F.IsW j (X.F.oldest j x) → X.F.oldest j x ∈ X.F.LLset j)
 
 def OrderNumericBound (C₀ : ℝ) : Prop :=
-  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r), X.Hyp p K → C₀ ≤ X.CLa → C₀ ≤ X.Ck →
-    ∀ j, ∀ x ∈ X.toLate j,
-      ((p ^ X.Rj p K j : ℕ) : ℝ) * X.oc p K j x + Dat.k (r := r) K * ((p ^ X.Rj p K j : ℕ) : ℝ) ≤ X.o p K j x
+  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r),
+    X.Hyp p K → C₀ ≤ X.CLa → C₀ ≤ X.Ck
+      → ∀ j, ∀ x ∈ X.toLate j,
+        ((p ^ X.Rj p K j : ℕ) : ℝ) * X.oc p K j x + Dat.k (r := r) K * ((p ^ X.Rj p K j : ℕ) : ℝ)
+          ≤ X.o p K j x
 
 section Num
 
 variable {p n' r K : ℕ} [NeZero n'] [NeZero r] [NeZero K] {X : Dat n' r}
 
-theorem frame_zero_le {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) : ∀ i, i < r → F.fr j 0 ≤ F.fr j i := by
+theorem frame_zero_le {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ)
+    : ∀ i, i < r → F.fr j 0 ≤ F.fr j i := by
   intro i
   induction i with
   | zero => intro _; exact le_rfl
   | succ i ih => intro h; exact (ih (by omega)).trans (hV.2.2.1 j i h).le
 
-theorem reflection_mem_Glev_castSucc {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) : F.fr (j - 1) 0 ∈ F.letters j := by
+theorem reflection_mem_Glev_castSucc {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ)
+    : F.fr (j - 1) 0 ∈ F.letters j := by
   have hr : 0 < r := Nat.pos_of_ne_zero (NeZero.ne r)
   have h1 := frame_zero_le hV (j - 1) (r - 1) (by omega)
   have h2 := hV.2.2.2.1 (j - 1)
@@ -40,8 +48,8 @@ theorem reflection_mem_Glev_castSucc {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F
   simp only [Frames.letters, Finset.mem_filter, Finset.mem_Icc]
   exact ⟨⟨le_rfl, by omega⟩, (hV.2.2.2.2.1 (j - 1) 0 hr).1⟩
 
-theorem mem_letters_bounds {F : Frames n' r} {j x : ℤ} (hx : x ∈ F.letters j) :
-    F.fr (j - 1) 0 ≤ x ∧ x ≤ F.fr j (r - 1) ∧ posOf n' x ∈ F.TT := by
+theorem mem_letters_bounds {F : Frames n' r} {j x : ℤ} (hx : x ∈ F.letters j)
+    : F.fr (j - 1) 0 ≤ x ∧ x ≤ F.fr j (r - 1) ∧ posOf n' x ∈ F.TT := by
   simp only [Frames.letters, Finset.mem_filter, Finset.mem_Icc] at hx
   exact ⟨hx.1.1, hx.1.2, hx.2⟩
 
@@ -72,8 +80,9 @@ theorem basics (hX : X.Hyp p K) : Basics X p K := by
 def Tj (X : Dat n' r) (p K : ℕ) (j : ℤ) : ℝ :=
   X.a / (8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0))
 
-theorem den_pos (hX : X.Hyp p K) (j : ℤ) :
-    0 < 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0) := by
+theorem den_pos (hX : X.Hyp p K) (j : ℤ)
+    : 0
+      < 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0) := by
   have B := basics hX
   have h1 : (0 : ℝ) < p := by linarith [B.p1]
   have h2 : (0 : ℝ) < X.Y := by linarith [B.Y1]
@@ -97,10 +106,20 @@ theorem Tj_ge (hX : X.Hyp p K) (j : ℤ) : 4 * (p : ℝ) * ((X.E₀ : ℝ) + X.m
   have hm := mul_le_mul_of_nonneg_left hdQ hc
   unfold Tj
   rw [le_div_iff₀ hd, hk]
-  calc 4 * (p : ℝ) * ((X.E₀ : ℝ) + X.mStar + 1) * (8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0))
-        = 32 * ((p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((X.E₀ : ℝ) + X.mStar + 1) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0)) := by ring
-    _ ≤ 32 * ((p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((X.E₀ : ℝ) + X.mStar + 1) * X.Q ^ 2) := by linarith
-    _ = 32 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * X.Q ^ 2 * ((X.E₀ : ℝ) + X.mStar + 1) := by ring
+  calc
+    4 * (p : ℝ) * ((X.E₀ : ℝ) + X.mStar + 1)
+          * (8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0))
+        = 32
+          * ((p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((X.E₀ : ℝ) + X.mStar + 1)
+            * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0)) := by
+      ring
+    _ ≤ 32
+        * ((p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((X.E₀ : ℝ) + X.mStar + 1)
+          * X.Q ^ 2) := by
+      linarith
+    _ = 32 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * X.Q ^ 2
+        * ((X.E₀ : ℝ) + X.mStar + 1) := by
+      ring
     _ ≤ X.a := P3
 
 theorem pow_Rj_le (hX : X.Hyp p K) (j : ℤ) : ((p : ℝ) ^ X.Rj p K j) ≤ Tj X p K j := by
@@ -142,8 +161,9 @@ theorem power_exceeds_max_multiplicity (C₀ : ℝ) : PowerExceedsMaxMultiplicit
   have h4 : (X.mStar : ℝ) < ((p ^ X.Rj p K j : ℕ) : ℝ) := by push_cast; linarith
   exact_mod_cast h4
 
-theorem l42b (hX : X.Hyp p K) (j y : ℤ) (hy : y ∈ X.F.letters j) :
-    8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) ≤ X.a := by
+theorem l42b (hX : X.Hyp p K) (j y : ℤ) (hy : y ∈ X.F.letters j)
+    : 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j)
+      ≤ X.a := by
   have b := basics hX
   have hd := den_pos hX j
   have hy' := mem_letters_bounds hy
@@ -151,18 +171,27 @@ theorem l42b (hX : X.Hyp p K) (j y : ℤ) (hy : y ∈ X.F.letters j) :
     unfold Frames.dist
     exact Int.toNat_le_toNat (by linarith [hy'.1])
   have hp1 : (1 : ℝ) ≤ p := b.p1.le
-  have hpow : (p : ℝ) ^ X.F.dist j y ≤ (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0) := pow_le_pow_right₀ hp1 hdist
+  have hpow : (p : ℝ) ^ X.F.dist j y ≤ (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0) :=
+    pow_le_pow_right₀ hp1 hdist
   have hR := pow_Rj_le hX j
   have hY : 0 ≤ X.Y := by linarith [b.Y1]
-  have hTa : 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0) * Tj X p K j = X.a := by
+  have hTa
+      : 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0)
+          * Tj X p K j
+        = X.a := by
     unfold Tj
     exact mul_div_cancel₀ _ hd.ne'
   have hc0 : 0 ≤ 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) :=
     mul_nonneg (mul_nonneg (mul_nonneg (by norm_num) hY) (sq_nonneg _)) (Nat.cast_nonneg _)
-  have hm := mul_le_mul_of_nonneg_left (mul_le_mul hpow hR (pow_nonneg (by linarith) _) (pow_nonneg (by linarith) _)) hc0
+  have hm :=
+    mul_le_mul_of_nonneg_left
+      (mul_le_mul hpow hR (pow_nonneg (by linarith) _) (pow_nonneg (by linarith) _)) hc0
   rw [pow_add]
-  calc 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ X.F.dist j y * (p : ℝ) ^ X.Rj p K j)
-      ≤ 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0) * Tj X p K j) := hm
+  calc
+    8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ X.F.dist j y * (p : ℝ) ^ X.Rj p K j)
+        ≤ 8 * X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ)
+          * ((p : ℝ) ^ X.F.dist j (X.F.fr (j - 1) 0) * Tj X p K j) :=
+      hm
     _ = X.a := by rw [← hTa]; ring
 
 end Num

@@ -4,14 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ra8.star_eq_of_sq :
-    ∀ {z : ℂ} {r : ℝ},
-    (0 : ℝ) ≤ r → z * z = (↑r : ℂ) → Star.star z = z := by
+theorem UpperTheory.Reformulated.B.Ra8.star_eq_of_sq
+    : ∀ {z : ℂ} {r : ℝ}, (0 : ℝ) ≤ r → z * z = (↑r : ℂ) → Star.star z = z := by
   intro z r hr h
-  have hre : z.re * z.re - z.im * z.im = r := by
-    simpa using congrArg Complex.re h
-  have him : z.re * z.im + z.im * z.re = 0 := by
-    simpa using congrArg Complex.im h
+  have hre : z.re * z.re - z.im * z.im = r := by simpa using congrArg Complex.re h
+  have him : z.re * z.im + z.im * z.re = 0 := by simpa using congrArg Complex.im h
   have h0 : z.im = 0 := by
     by_contra hne
     have h1 : z.re * z.im = 0 := by linarith [mul_comm z.re z.im]

@@ -10,9 +10,12 @@ public import Development.WeilBound.CoreStatements.PlurisubharmonicCones.ContDif
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp
 open ReciprocityTheory.AnForm (levi)
 
 namespace LevelTowerAlt
@@ -21,20 +24,29 @@ section
 
 open GroundTheory.Heights₂.Heights.Regular (PotentialCharts contDiffAt_comp_symm_of_smoothOn)
 
-variable {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
-  {Ω : Type} [Field Ω] [Algebra ℚ Ω] {W : Ψ → Type} [∀ τ, AddCommGroup (W τ)] [∀ τ, Module Ω (W τ)]
+variable
+  {K : Type} [Fintype K]
+  {J : K → Type} [∀ k, Fintype (J k)]
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+  {W : Ψ → Type} [∀ τ, AddCommGroup (W τ)] [∀ τ, Module Ω (W τ)]
   (D : ComponentData II Ψ K J Ω W) (M : XModel D)
 
-theorem eventually_mem (a : Fin D.nCharts) {t : Fin D.n → ℂ} (ht : t ∈ Metric.ball (0 : Fin D.n → ℂ) 1) :
-    ∀ᶠ s : Fin D.n → ℂ in 𝓝 t, (D.chart a).γ s ∈ mcPts (mCoordIdeal D.y) := by
+theorem eventually_mem
+    (a : Fin D.nCharts) {t : Fin D.n → ℂ} (ht : t ∈ Metric.ball (0 : Fin D.n → ℂ) 1)
+    : ∀ᶠ s : Fin D.n → ℂ in 𝓝 t, (D.chart a).γ s ∈ mcPts (mCoordIdeal D.y) := by
   filter_upwards [Metric.isOpen_ball.mem_nhds ht] with s hs using (D.chart a).mem s hs
 
-theorem levi_chartFun_gen (P : PotentialCharts M.atlas) (ref : HermLine J) (hth : ThRef M ref P.th)
-    {φ : M.Xc → ℝ} (hφ : M.atlas.Smooth φ) {g : (Fin D.n → ℂ) → (Σ k, J k) → ℂ} {t : Fin D.n → ℂ}
-    (hg : AnalyticAt ℂ g t) (hm : ∀ᶠ s in 𝓝 t, g s ∈ mcPts (mCoordIdeal D.y)) (k : Fin P.N)
-    (hk : M.proj (g t) ∈ (P.chart k).source) (v : Fin D.n → ℂ) :
-    levi (fun s => Real.log (ref.h (g s)) + φ (M.proj (g s))) t v =
-      levi (P.chartFun φ k) (P.chart k (M.proj (g t))) (fderiv ℂ (fun s => P.chart k (M.proj (g s))) t v) := by
+theorem levi_chartFun_gen
+    (P : PotentialCharts M.atlas) (ref : HermLine J) (hth : ThRef M ref P.th)
+    {φ : M.Xc → ℝ} (hφ : M.atlas.Smooth φ)
+    {g : (Fin D.n → ℂ) → (Σ k, J k) → ℂ} {t : Fin D.n → ℂ}
+    (hg : AnalyticAt ℂ g t) (hm : ∀ᶠ s in 𝓝 t, g s ∈ mcPts (mCoordIdeal D.y))
+    (k : Fin P.N) (hk : M.proj (g t) ∈ (P.chart k).source)
+    (v : Fin D.n → ℂ)
+    : levi (fun s => Real.log (ref.h (g s)) + φ (M.proj (g s))) t v
+      = levi (P.chartFun φ k) (P.chart k (M.proj (g t)))
+        (fderiv ℂ (fun s => P.chart k (M.proj (g s))) t v) := by
   classical
   set y0 := M.proj (g t) with hy0
   obtain ⟨U, hUo, hyU, hUth, s, hs, hsholo, G1, hG1, hG1eq⟩ := hth y0 y0 (P.th.mem_U y0)
@@ -43,7 +55,8 @@ theorem levi_chartFun_gen (P : PotentialCharts M.atlas) (ref : HermLine J) (hth 
   have hFan : AnalyticAt ℂ F t := analyticAt_proj D M (P.compat k) hg hm hk
   have hpc : ContinuousAt (fun s' => M.proj (g s')) t := continuousAt_proj M hg.continuousAt hm
   have hev_set : ∀ᶠ s' in 𝓝 t, M.proj (g s') ∈ U ∩ W' ∩ P.th.U y0 ∩ (P.chart k).source :=
-    hpc.preimage_mem_nhds (IsOpen.mem_nhds (((hUo.inter hWo).inter (P.th.isOpen_U y0)).inter (P.chart k).open_source)
+    hpc.preimage_mem_nhds (IsOpen.mem_nhds
+      (((hUo.inter hWo).inter (P.th.isOpen_U y0)).inter (P.chart k).open_source)
       ⟨⟨⟨hyU, hyW⟩, P.th.mem_U y0⟩, hk⟩)
   have hsan : ∀ p, AnalyticAt ℂ (fun s' => s (M.proj (g s')) p) t := fun p =>
     analyticAt_holoOn_proj D M (hsholo p) hg hm hyU
@@ -68,105 +81,135 @@ theorem levi_chartFun_gen (P : PotentialCharts M.atlas) (ref : HermLine J) (hth 
   have hslit : ∀ᶠ s' in 𝓝 t, ∀ k', c s' k' / c t k' ∈ Complex.slitPlane := by
     rw [Filter.eventually_all]
     intro k'
-    have hcont : ContinuousAt (fun s' => c s' k' / c t k') t := (AnalyticAt.div_const (hcan k') : AnalyticAt ℂ (fun s' => c s' k' / c t k') t).continuousAt
+    have hcont : ContinuousAt (fun s' => c s' k' / c t k') t :=
+      (AnalyticAt.div_const (hcan k') : AnalyticAt ℂ (fun s' => c s' k' / c t k') t).continuousAt
     have h1 : c t k' / c t k' ∈ Complex.slitPlane := by
       rw [div_self (by rw [hct]; exact hc0 k')]; exact Complex.one_mem_slitPlane
     exact hcont.preimage_mem_nhds (Complex.isOpen_slitPlane.mem_nhds h1)
   set G : (Fin D.n → ℂ) → ℂ := fun s' => ∑ k', (ref.a k' : ℂ) * (Complex.log (c s' k' / c t k') + (Real.log ‖c t k'‖ : ℂ)) - G1 (M.proj (g s')) - G2 (M.proj (g s')) with hG
   have hGan : AnalyticAt ℂ G t := by
-    have hsum : AnalyticAt ℂ (fun s' => ∑ k', (ref.a k' : ℂ) * (Complex.log (c s' k' / c t k') + (Real.log ‖c t k'‖ : ℂ))) t := by
-      have hs' := Finset.analyticAt_sum (𝕜 := ℂ) (c := t)
-        (f := fun k' (s' : Fin D.n → ℂ) => (ref.a k' : ℂ) * (Complex.log (c s' k' / c t k') + (Real.log ‖c t k'‖ : ℂ)))
-        Finset.univ (fun k' _ => analyticAt_const.mul
-          ((AnalyticAt.clog (AnalyticAt.div_const (hcan k')) (hslit.self_of_nhds k')).add analyticAt_const))
+    have hsum : AnalyticAt ℂ
+        (fun s' =>
+          ∑ k', (ref.a k' : ℂ) * (Complex.log (c s' k' / c t k') + (Real.log ‖c t k'‖ : ℂ)))
+        t := by
+      have hs' :=
+        Finset.analyticAt_sum (𝕜 := ℂ) (c := t)
+          (f := fun k' (s' : Fin D.n → ℂ) =>
+            (ref.a k' : ℂ) * (Complex.log (c s' k' / c t k') + (Real.log ‖c t k'‖ : ℂ)))
+          Finset.univ
+          (fun k' _ =>
+            analyticAt_const.mul
+              ((AnalyticAt.clog (AnalyticAt.div_const (hcan k')) (hslit.self_of_nhds k')).add
+                analyticAt_const))
       convert hs' using 1
       funext s'
       simp [Finset.sum_apply]
-    exact (hsum.sub (analyticAt_holoOn_proj D M hG1 hg hm hyU)).sub (analyticAt_holoOn_proj D M hG2 hg hm hyW)
+    exact (hsum.sub (analyticAt_holoOn_proj D M hG1 hg hm hyU)).sub
+      (analyticAt_holoOn_proj D M hG2 hg hm hyW)
   have hq : ContDiffAt ℝ 2 (P.chartFun φ k) (F t) := by
     have h1 : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (P.q k) (F t) :=
       (P.q_smooth k).contDiffAt ((P.chart k).open_target.mem_nhds ((P.chart k).map_source hk))
     have h2 : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (φ ∘ (P.chart k).symm) (F t) :=
-      GroundTheory.Heights₂.Heights.Regular.contDiffAt_comp_symm_of_smoothOn (P.compat k) isOpen_univ hφ (Set.mem_univ _) hk
+      GroundTheory.Heights₂.Heights.Regular.contDiffAt_comp_symm_of_smoothOn (P.compat k)
+        isOpen_univ hφ (Set.mem_univ _) hk
     exact (h1.add h2).of_le (WithTop.coe_le_coe.mpr (le_top : ((2 : ℕ) : ℕ∞) ≤ ⊤))
   have hcomp : ContDiffAt ℝ 2 (P.chartFun φ k ∘ F) t :=
     hq.comp t (hFan.contDiffAt.restrict_scalars ℝ)
-  have hev : ∀ᶠ s' in 𝓝 t, Real.log (ref.h (g s')) + φ (M.proj (g s')) = (P.chartFun φ k ∘ F) s' + (G s').re := by
-    filter_upwards [hev_set, hden, hm] with s' hset hd hms
-    have hsz := hs _ hset.1.1.1
-    obtain ⟨c', hc', hgeq⟩ := (M.fibre (s (M.proj (g s'))) hsz.1 (g s') hms).1 hsz.2
-    have hcc : ∀ k', c s' k' = c' k' := fun k' => by
-      have h := congrFun hgeq ⟨k', i k'⟩
-      simp only [torusSmul] at h
-      show g s' ⟨k', i k'⟩ / s (M.proj (g s')) ⟨k', i k'⟩ = c' k'
-      rw [h]
-      field_simp [hd k']
-    have hlog := log_h_smul ref hsz.1.1 hc'
-    rw [← hgeq] at hlog
-    have e1 := hG1eq _ hset.1.1.1
-    have e2 := hG2eq _ ⟨⟨hset.1.1.2, hset.1.2⟩, hset.2⟩
-    have hsum : (∑ k', (ref.a k' : ℂ) * (Complex.log (c s' k' / c t k') + (Real.log ‖c t k'‖ : ℂ))).re =
-        ∑ k', (ref.a k' : ℝ) * Real.log ‖c' k'‖ := by
-      rw [Complex.re_sum]
-      refine Finset.sum_congr rfl fun k' _ => ?_
-      rw [hcc, hct]
-      simp only [Complex.mul_re, Complex.intCast_re, Complex.intCast_im, Complex.add_re, Complex.log_re,
-        Complex.ofReal_re, zero_mul, sub_zero]
-      rw [norm_div, Real.log_div (norm_ne_zero_iff.mpr (hc' k')) (norm_ne_zero_iff.mpr (hc0 k'))]
-      ring
-    have hch : (P.chartFun φ k ∘ F) s' = P.q k (F s') + φ (M.proj (g s')) := by
-      simp only [Function.comp, GroundTheory.Heights₂.Heights.Regular.PotentialCharts.chartFun, hF]
-      rw [(P.chart k).left_inv hset.2]
-    rw [hch, hG]
-    simp only [Complex.sub_re]
-    rw [hsum, hlog]
-    simp only [hF]
-    linarith
+  have hev
+      : ∀ᶠ s' in 𝓝 t, Real.log (ref.h (g s')) + φ (M.proj (g s')) = (P.chartFun φ k ∘ F) s' + (G s').re :=
+    by
+      filter_upwards [hev_set, hden, hm] with s' hset hd hms
+      have hsz := hs _ hset.1.1.1
+      obtain ⟨c', hc', hgeq⟩ := (M.fibre (s (M.proj (g s'))) hsz.1 (g s') hms).1 hsz.2
+      have hcc : ∀ k', c s' k' = c' k' := fun k' => by
+        have h := congrFun hgeq ⟨k', i k'⟩
+        simp only [torusSmul] at h
+        show g s' ⟨k', i k'⟩ / s (M.proj (g s')) ⟨k', i k'⟩ = c' k'
+        rw [h]
+        field_simp [hd k']
+      have hlog := log_h_smul ref hsz.1.1 hc'
+      rw [← hgeq] at hlog
+      have e1 := hG1eq _ hset.1.1.1
+      have e2 := hG2eq _ ⟨⟨hset.1.1.2, hset.1.2⟩, hset.2⟩
+      have hsum
+          : (∑ k', (ref.a k' : ℂ) * (Complex.log (c s' k' / c t k') + (Real.log ‖c t k'‖ : ℂ))).re
+            = ∑ k', (ref.a k' : ℝ) * Real.log ‖c' k'‖ := by
+        rw [Complex.re_sum]
+        refine Finset.sum_congr rfl fun k' _ => ?_
+        rw [hcc, hct]
+        simp only [Complex.mul_re, Complex.intCast_re, Complex.intCast_im, Complex.add_re,
+          Complex.log_re, Complex.ofReal_re, zero_mul, sub_zero]
+        rw [norm_div, Real.log_div (norm_ne_zero_iff.mpr (hc' k')) (norm_ne_zero_iff.mpr (hc0 k'))]
+        ring
+      have hch : (P.chartFun φ k ∘ F) s' = P.q k (F s') + φ (M.proj (g s')) := by
+        simp only [Function.comp, GroundTheory.Heights₂.Heights.Regular.PotentialCharts.chartFun,
+          hF]
+        rw [(P.chart k).left_inv hset.2]
+      rw [hch, hG]
+      simp only [Complex.sub_re]
+      rw [hsum, hlog]
+      simp only [hF]
+      linarith
   rw [levi_add_re hcomp hGan hev v, ReciprocityTheory.AnForm.levi_comp v hFan hq]
 
-theorem exists_deriv_bound (P : PotentialCharts M.atlas) (a : Fin D.nCharts) :
-    ∃ C : ℝ, ∀ t ∈ Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2), ∃ k, M.proj ((D.chart a).γ t) ∈ P.mid k ∧
-      ‖fderiv ℂ (fun s : Fin D.n → ℂ => P.chart k (M.proj ((D.chart a).γ s))) t‖ ≤ C := by
-  have hball : ∀ t ∈ Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2), t ∈ Metric.ball (0 : Fin D.n → ℂ) 1 := by
+theorem exists_deriv_bound (P : PotentialCharts M.atlas) (a : Fin D.nCharts)
+    : ∃ C : ℝ, ∀ t ∈ Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2), ∃ k,
+      M.proj ((D.chart a).γ t) ∈ P.mid k
+        ∧ ‖fderiv ℂ (fun s : Fin D.n → ℂ => P.chart k (M.proj ((D.chart a).γ s))) t‖ ≤ C := by
+  have hball
+      : ∀ t ∈ Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2), t ∈ Metric.ball (0 : Fin D.n → ℂ) 1 := by
     intro t ht
     rw [Metric.mem_closedBall] at ht
     rw [Metric.mem_ball]
     linarith
-  have hcont : ContinuousOn (fun t : Fin D.n → ℂ => M.proj ((D.chart a).γ t)) (Metric.closedBall 0 (1 / 2)) := by
+  have hcont : ContinuousOn
+      (fun t : Fin D.n → ℂ => M.proj ((D.chart a).γ t))
+      (Metric.closedBall 0 (1 / 2)) := by
     intro t ht
     have htb := hball t ht
-    exact (continuousAt_proj M ((D.chart a).analytic t htb).continuousAt (eventually_mem D a htb)).continuousWithinAt
-  have hk : ∀ k : Fin P.N, ∃ C : ℝ, ∀ t ∈ Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2) ∩
-      (fun t : Fin D.n → ℂ => M.proj ((D.chart a).γ t)) ⁻¹' closure (P.inner k),
-      ‖fderiv ℂ (fun s : Fin D.n → ℂ => P.chart k (M.proj ((D.chart a).γ s))) t‖ ≤ C := by
+    exact (continuousAt_proj M ((D.chart a).analytic t htb).continuousAt
+      (eventually_mem D a htb)).continuousWithinAt
+  have hk
+      : ∀ k : Fin P.N, ∃ C : ℝ,
+        ∀ t
+            ∈ Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2)
+              ∩ (fun t : Fin D.n → ℂ => M.proj ((D.chart a).γ t)) ⁻¹' closure (P.inner k),
+          ‖fderiv ℂ (fun s : Fin D.n → ℂ => P.chart k (M.proj ((D.chart a).γ s))) t‖ ≤ C := by
     intro k
-    have hcl : IsClosed (Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2) ∩
-        (fun t : Fin D.n → ℂ => M.proj ((D.chart a).γ t)) ⁻¹' closure (P.inner k)) :=
+    have hcl : IsClosed
+        (Metric.closedBall (0 : Fin D.n → ℂ) (1 / 2)
+          ∩ (fun t : Fin D.n → ℂ => M.proj ((D.chart a).γ t)) ⁻¹' closure (P.inner k)) :=
       hcont.preimage_isClosed_of_isClosed Metric.isClosed_closedBall isClosed_closure
-    have hcpt := (isCompact_closedBall (0 : Fin D.n → ℂ) (1 / 2)).of_isClosed_subset hcl Set.inter_subset_left
+    have hcpt :=
+      (isCompact_closedBall (0 : Fin D.n → ℂ) (1 / 2)).of_isClosed_subset hcl Set.inter_subset_left
     apply hcpt.exists_bound_of_continuousOn
     intro t ht
     have htb := hball t ht.1
     have hsrc : M.proj ((D.chart a).γ t) ∈ (P.chart k).source :=
       P.mid_subset_source k (P.closure_inner k ht.2)
-    have hF := analyticAt_proj D M (P.compat k) ((D.chart a).analytic t htb) (eventually_mem D a htb) hsrc
+    have hF :=
+      analyticAt_proj D M (P.compat k) ((D.chart a).analytic t htb) (eventually_mem D a htb) hsrc
     exact hF.fderiv.continuousAt.continuousWithinAt
   choose C hC using hk
   refine ⟨∑ k, |C k|, fun t ht => ?_⟩
   obtain ⟨k, hk⟩ := P.cover (M.proj ((D.chart a).γ t))
   refine ⟨k, P.closure_inner k (subset_closure hk), ?_⟩
-  calc ‖fderiv ℂ (fun s : Fin D.n → ℂ => P.chart k (M.proj ((D.chart a).γ s))) t‖ ≤ C k :=
-        hC k t ⟨ht, subset_closure hk⟩
+  calc
+    ‖fderiv ℂ (fun s : Fin D.n → ℂ => P.chart k (M.proj ((D.chart a).γ s))) t‖
+      ≤ C k := hC k t ⟨ht, subset_closure hk⟩
     _ ≤ |C k| := le_abs_self _
     _ ≤ ∑ k, |C k| := Finset.single_le_sum (fun j _ => abs_nonneg (C j)) (Finset.mem_univ k)
 
-theorem eventually_closedBall_subset (P : PotentialCharts M.atlas) :
-    ∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ j, ∀ x ∈ closure (P.mid j),
-      Metric.closedBall (P.chart j x) t ⊆ (P.chart j).target := by
-  have hK : ∀ j, ∃ ε > (0 : ℝ), Metric.cthickening ε (P.chart j '' closure (P.mid j)) ⊆ (P.chart j).target := by
+theorem eventually_closedBall_subset (P : PotentialCharts M.atlas)
+    : ∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ j, ∀ x ∈ closure (P.mid j),
+        Metric.closedBall (P.chart j x) t ⊆ (P.chart j).target := by
+  have hK
+      : ∀ j, ∃ ε > (0 : ℝ),
+        Metric.cthickening ε (P.chart j '' closure (P.mid j)) ⊆ (P.chart j).target := by
     intro j
     have hc : IsCompact (P.chart j '' closure (P.mid j)) :=
-      (isClosed_closure.isCompact).image_of_continuousOn ((P.chart j).continuousOn.mono (P.closure_mid j))
+      (isClosed_closure.isCompact).image_of_continuousOn
+        ((P.chart j).continuousOn.mono (P.closure_mid j))
     have hsub : P.chart j '' closure (P.mid j) ⊆ (P.chart j).target := by
       rintro _ ⟨x, hx, rfl⟩
       exact (P.chart j).map_source (P.closure_mid j hx)

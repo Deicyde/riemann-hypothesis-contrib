@@ -9,17 +9,26 @@ noncomputable section
 
 namespace Formalism.MainNotions.ColumnSystems.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees Formalism.MainNotions.G.GLWeightTheory
+open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
+  Formalism.MainNotions.G.GLWeightTheory
 
-theorem fact_abs {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D) {p : ℕ} (hp : p.Prime) (h5 : 5 ≤ p) (σ : Type)
-    [Fintype σ] [DecidableEq σ] (odd : σ → Prop) [DecidablePred odd] (t ρ L : σ → ℕ)
-    (hodd : ∀ v, odd v → L v = p ^ (t v + 1) ∧ ρ v < L v) (hend : ∀ v, ¬ odd v → L v = 1 ∧ ρ v = 0) (c : ℕ) :
-    ∃ (T : Finset (σ →₀ ℕ)) (q : (σ →₀ ℕ) → ℚ),
-      (∀ ν ∈ T, (ν.sum fun _ n => n) ≤ 4 * c ∧ (∀ v ∈ ν.support, odd v) ∧ PadicGe p (q ν) 0) ∧
-      ∀ μ : σ →₀ ℕ, ∃ h : ℚ, PadicGe p h c ∧
-        (∏ v, ((ρ v + L v * μ v).factorial : ℚ)) *
-            (∑ ν ∈ T, q ν * ((ν.prod fun k i => (μ k).choose i : ℕ) : ℚ)) =
-          (∏ v, ((ρ v).factorial : ℚ) * ((μ v).factorial : ℚ) * ((L v).factorial : ℚ) ^ (μ v)) * (1 + h) := by
+theorem fact_abs
+    {D : Formalism.BasicNotions.D7}
+    (h52 : Formalism.MainNotions.CovariantDegrees.FactorialUnitDecomposition D)
+    {p : ℕ} (hp : p.Prime) (h5 : 5 ≤ p)
+    (σ : Type) [Fintype σ] [DecidableEq σ]
+    (odd : σ → Prop) [DecidablePred odd]
+    (t ρ L : σ → ℕ)
+    (hodd : ∀ v, odd v → L v = p ^ (t v + 1) ∧ ρ v < L v) (hend : ∀ v, ¬ odd v → L v = 1 ∧ ρ v = 0)
+    (c : ℕ)
+    : ∃ (T : Finset (σ →₀ ℕ)) (q : (σ →₀ ℕ) → ℚ),
+      (∀ ν ∈ T, (ν.sum fun _ n => n) ≤ 4 * c ∧ (∀ v ∈ ν.support, odd v) ∧ PadicGe p (q ν) 0)
+        ∧ ∀ μ : σ →₀ ℕ, ∃ h : ℚ,
+          PadicGe p h c
+            ∧ (∏ v, ((ρ v + L v * μ v).factorial : ℚ))
+                * (∑ ν ∈ T, q ν * ((ν.prod fun k i => (μ k).choose i : ℕ) : ℚ))
+              = (∏ v, ((ρ v).factorial : ℚ) * ((μ v).factorial : ℚ) * ((L v).factorial : ℚ) ^ (μ v))
+                * (1 + h) := by
   haveI : Fact p.Prime := ⟨hp⟩
   obtain ⟨h1, h2⟩ := h52 p hp h5
   set t' : σ → ℕ := fun v => if odd v then t v else 0 with ht'
@@ -28,7 +37,8 @@ theorem fact_abs {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotions.Co
     intro k
     by_cases hk : odd k
     · simp only [hρ', ht', if_pos hk]
-      rw [← (hodd k hk).1]; exact (hodd k hk).2
+      rw [← (hodd k hk).1]
+      exact (hodd k hk).2
     · simp only [hρ', ht', if_neg hk]
       exact pow_pos hp.pos _
   obtain ⟨hunit, -, hop⟩ := h2 σ t' ρ' hlt
@@ -73,8 +83,10 @@ theorem fact_abs {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotions.Co
       have e : A / B = U := by rw [hAB]; field_simp
       rw [← hA, ← hB, e] at this
       exact this
-    have hgs : (∑ ν ∈ (T.filter fun j => ∀ v, ¬ odd v → j v = 0).image E,
-        q ν * ((ν.prod fun k i => (μ k).choose i : ℕ) : ℚ)) = g := by
+    have hgs
+        : (∑ ν ∈ (T.filter fun j => ∀ v, ¬ odd v → j v = 0).image E,
+            q ν * ((ν.prod fun k i => (μ k).choose i : ℕ) : ℚ))
+          = g := by
       rw [Finset.sum_image fun a _ b _ h => hE h, hg, Finset.sum_filter]
       refine Finset.sum_congr rfl fun j _ => ?_
       by_cases hj : ∀ v, ¬ odd v → j v = 0
@@ -107,7 +119,9 @@ theorem fact_abs {D : Formalism.BasicNotions.D7} (h52 : Formalism.MainNotions.Co
         · simp only [hρ', ht', he', if_pos hv, (hodd v hv).1, mul_one]
         · simp only [hρ', ht', he', if_neg hv, (hend v hv).1, (hend v hv).2]
           simp
-      have l2 : (∏ v, ((ρ v).factorial : ℚ) * ((μ v).factorial : ℚ) * ((L v).factorial : ℚ) ^ (μ v)) = B * M := by
+      have l2
+          : (∏ v, ((ρ v).factorial : ℚ) * ((μ v).factorial : ℚ) * ((L v).factorial : ℚ) ^ (μ v))
+            = B * M := by
         rw [hB, hM, ← Finset.prod_mul_distrib]
         refine Finset.prod_congr rfl fun v _ => ?_
         by_cases hv : odd v

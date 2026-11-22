@@ -36,12 +36,16 @@ def normOp (lam : ℕ →* ℂ) (W : X → M →ₗ[ℂ] M) (A B : Submodule R X
   (lam (idx A B))⁻¹ • sumOp W A B v
 
 def GoodNorm (σ : R →+* R) (lam : ℕ →* ℂ) : Prop :=
-  (∀ n, n ≠ 0 → lam n ≠ 0) ∧ ∀ P : Ideal R, P.IsMaximal → Finite (R ⧸ P) →
-    lam (Nat.card (R ⧸ P)) ^ 2 = (Nat.card (R ⧸ P) : ℂ) ∧
-    ((∀ r ∈ P, σ r ∈ P) → lam (Nat.card (R ⧸ P)) = -(Real.sqrt (Nat.card (R ⧸ P)) : ℂ) ∧ ∃ r, σ r - r ∉ P)
+  (∀ n, n ≠ 0 → lam n ≠ 0)
+    ∧ ∀ P : Ideal R,
+      P.IsMaximal → Finite (R ⧸ P)
+        → lam (Nat.card (R ⧸ P)) ^ 2 = (Nat.card (R ⧸ P) : ℂ)
+          ∧ ((∀ r ∈ P, σ r ∈ P)
+            → lam (Nat.card (R ⧸ P)) = -(Real.sqrt (Nat.card (R ⧸ P)) : ℂ) ∧ ∃ r, σ r - r ∉ P)
 
 def Adj (A B : Submodule R X) : Prop :=
-  ∃ x ∈ B, ∃ P : Ideal R, P.IsMaximal ∧ Finite (R ⧸ P) ∧ (∀ r : R, r • x ∈ A ↔ r ∈ P) ∧ B ≤ (A ⊓ B) ⊔ Submodule.span R {x}
+  ∃ x ∈ B, ∃ P : Ideal R,
+    P.IsMaximal ∧ Finite (R ⧸ P) ∧ (∀ r : R, r • x ∈ A ↔ r ∈ P) ∧ B ≤ (A ⊓ B) ⊔ Submodule.span R {x}
 
 namespace IsHeis
 
@@ -91,14 +95,18 @@ theorem nsmul_right (n : ℕ) (x y : X) : γ x (n • y) = γ x y ^ n := by
 
 theorem comm (x y : X) (v : M) : W x (W y v) = γ x y • W y (W x v) := by
   have h1 : γ (w • x) y = γ x y * γ (w • y) x := by
-    have h2 : γ x y = γ (w • x) y * γ (σ w • x) y := by rw [← h.add_left, ← add_smul, h.w_add, one_smul]
+    have h2 : γ x y = γ (w • x) y * γ (σ w • x) y := by
+      rw [← h.add_left, ← add_smul, h.w_add, one_smul]
     rw [h2, h.adj (σ w), h.sg_sg, mul_assoc, h.skew, mul_one]
   rw [h.comp, h.comp, smul_smul, h1, add_comm]
 
-theorem iso {A : Submodule R X} (hA : SelfDual γ A) {x y : X} (hx : x ∈ A) (hy : y ∈ A) : γ x y = 1 := (hA x).1 hx y hy
+theorem iso {A : Submodule R X} (hA : SelfDual γ A) {x y : X} (hx : x ∈ A) (hy : y ∈ A)
+    : γ x y = 1 :=
+  (hA x).1 hx y hy
 
-theorem comp_of_mem {A : Submodule R X} (hA : SelfDual γ A) {x y : X} (hx : x ∈ A) (hy : y ∈ A) (v : M) :
-    W x (W y v) = W (x + y) v := by
+theorem comp_of_mem
+    {A : Submodule R X} (hA : SelfDual γ A) {x y : X} (hx : x ∈ A) (hy : y ∈ A) (v : M)
+    : W x (W y v) = W (x + y) v := by
   rw [h.comp, h.iso hA (A.smul_mem w hx) hy, one_smul]
 
 theorem neg_comp (x : X) (v : M) : W (-x) (W x v) = γ (w • -x) x • v := by

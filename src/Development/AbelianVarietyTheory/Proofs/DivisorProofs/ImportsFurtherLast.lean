@@ -6,15 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory.ValuationExtensionExistence
 
-theorem exists_extension {V R K : Type} [CommRing V] [CommRing R] [IsDomain R] [Field K]
-    [IsAlgClosed K] [Algebra V R] [Algebra.IsIntegral V R] [FaithfulSMul V R] (ev : V →+* K) :
-    ∃ ev₁ : R →+* K, ev₁.comp (algebraMap V R) = ev := by
+theorem exists_extension
+    {V R K : Type} [CommRing V] [CommRing R] [IsDomain R] [Field K] [IsAlgClosed K] [Algebra V R]
+    [Algebra.IsIntegral V R] [FaithfulSMul V R]
+    (ev : V →+* K)
+    : ∃ ev₁ : R →+* K, ev₁.comp (algebraMap V R) = ev := by
   classical
-
   have : (RingHom.ker ev).IsPrime := RingHom.ker_isPrime ev
-  obtain ⟨Q, -, hQ, hQp⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := R) (RingHom.ker ev) ⊥ (by
-    rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective V R))]
-    exact bot_le)
+  obtain ⟨Q, -, hQ, hQp⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := R) (RingHom.ker ev) ⊥ (by
+      rw [(show Ideal.under _ ⊥ = ⊥ from
+        Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective V R))]
+      exact bot_le)
   have := hQ
   have : Q.LiesOver (RingHom.ker ev) := ⟨hQp.symm⟩
 
@@ -28,8 +31,7 @@ theorem exists_extension {V R K : Type} [CommRing V] [CommRing R] [IsDomain R] [
   have : Algebra.IsAlgebraic (V ⧸ RingHom.ker ev) (R ⧸ Q) := Algebra.IsIntegral.isAlgebraic
   let f : R ⧸ Q →ₐ[V ⧸ RingHom.ker ev] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨(f : R ⧸ Q →+* K).comp (Ideal.Quotient.mk Q), ?_⟩
   ext v
@@ -37,10 +39,11 @@ theorem exists_extension {V R K : Type} [CommRing V] [CommRing R] [IsDomain R] [
   rw [Ideal.Quotient.algebraMap_mk_of_liesOver] at h
   exact h.trans (RingHom.kerLift_mk ev v)
 
-theorem main : ∀ (V R K : Type) [inst : CommRing V] [IsDomain V] [IsLocalRing V]
-    [inst_3 : CommRing R] [IsDomain R] [IsLocalRing R] [inst_6 : Field K] [IsAlgClosed K]
-    (ρ : V →+* R), Function.Injective (⇑ρ : V → R) → RingHom.Finite ρ →
-      IsLocalHom ρ ∧ ∀ (ev : V →+* K), ∃ (ev₁ : R →+* K), RingHom.comp ev₁ ρ = ev := by
+theorem main
+    : ∀ (V R K : Type) [inst : CommRing V] [IsDomain V] [IsLocalRing V] [inst_3 : CommRing R]
+        [IsDomain R] [IsLocalRing R] [inst_6 : Field K] [IsAlgClosed K] (ρ : V →+* R),
+      Function.Injective (⇑ρ : V → R) → RingHom.Finite ρ
+        → IsLocalHom ρ ∧ ∀ (ev : V →+* K), ∃ (ev₁ : R →+* K), RingHom.comp ev₁ ρ = ev := by
   intro V R K _ _ _ _ _ _ _ _ ρ hinj hfin
   have hint : ρ.IsIntegral := hfin.to_isIntegral
   refine ⟨?_, fun ev => ?_⟩

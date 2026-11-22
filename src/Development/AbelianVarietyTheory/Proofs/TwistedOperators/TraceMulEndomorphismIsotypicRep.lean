@@ -11,9 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Intertwin
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,14 +24,31 @@ open scoped Classical
 
 namespace GlobalTheory.IsoTrace
 
-theorem intertwining_sum_apply {G N X : Type} [Group G] [AddCommGroup N] [Module ℂ N] [AddCommGroup X] [Module ℂ X]
-    {π : Representation ℂ G N} {ρ : Representation ℂ G X} {ι : Type} (t : Finset ι)
-    (c : ι → ℂ) (φ : ι → π.IntertwiningMap ρ) (n : N) : (∑ j ∈ t, c j • φ j) n = ∑ j ∈ t, c j • φ j n := by
+theorem intertwining_sum_apply
+    {G N X : Type} [Group G] [AddCommGroup N] [Module ℂ N] [AddCommGroup X] [Module ℂ X]
+    {π : Representation ℂ G N} {ρ : Representation ℂ G X} {ι : Type}
+    (t : Finset ι) (c : ι → ℂ) (φ : ι → π.IntertwiningMap ρ)
+    (n : N)
+    : (∑ j ∈ t, c j • φ j) n = ∑ j ∈ t, c j • φ j n := by
   induction t using Finset.induction_on with
   | empty => simp
   | insert a t ha ih => simp [Finset.sum_insert ha, ih]
 
-theorem trace_mul_isotypic : ∀ (G : Type) [Group G] (N X : Type) [AddCommGroup N] [Module ℂ N] [AddCommGroup X] [Module ℂ X] (π : Representation ℂ G N) (ρ : Representation ℂ G X), π.IsIrreducible → (∀ φ : π.IntertwiningMap π, ∃ c : ℂ, φ.toLinearMap = c • LinearMap.id) → IsIsotypicAlg π ρ → ∀ H : X →ₗ[ℂ] X, (∀ g x, H (ρ g x) = ρ g (H x)) → (∃ s : Finset (π.IntertwiningMap ρ), LinearMap.range H ≤ ⨆ φ ∈ s, LinearMap.range φ.toLinearMap) → ∃ c : ℂ, ∀ (A : N →ₗ[ℂ] N) (B : X →ₗ[ℂ] X), (∀ φ : π.IntertwiningMap ρ, B ∘ₗ φ.toLinearMap = φ.toLinearMap ∘ₗ A) → ∀ b, GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets.HasFinTrace A b → GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets.HasFinTrace (H ∘ₗ B) (c * b) := by
+theorem trace_mul_isotypic
+    : ∀ (G : Type) [Group G] (N X : Type) [AddCommGroup N] [Module ℂ N] [AddCommGroup X]
+        [Module ℂ X] (π : Representation ℂ G N) (ρ : Representation ℂ G X),
+      π.IsIrreducible → (∀ φ : π.IntertwiningMap π, ∃ c : ℂ, φ.toLinearMap = c • LinearMap.id)
+        → IsIsotypicAlg π ρ
+        → ∀ H : X →ₗ[ℂ] X,
+          (∀ g x, H (ρ g x) = ρ g (H x))
+            → (∃ s : Finset (π.IntertwiningMap ρ),
+              LinearMap.range H ≤ ⨆ φ ∈ s, LinearMap.range φ.toLinearMap)
+            → ∃ c : ℂ, ∀ (A : N →ₗ[ℂ] N) (B : X →ₗ[ℂ] X),
+              (∀ φ : π.IntertwiningMap ρ, B ∘ₗ φ.toLinearMap = φ.toLinearMap ∘ₗ A)
+                → ∀ b,
+                  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets.HasFinTrace A b
+                    → GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets.HasFinTrace
+                      (H ∘ₗ B) (c * b) := by
   intro G _ N X _ _ _ _ π ρ hirr hschur hiso H hH ⟨s, hs⟩
   let S := Submodule.span ℂ (s : Set (π.IntertwiningMap ρ))
   haveI : FiniteDimensional ℂ S := FiniteDimensional.span_finset ℂ s
@@ -44,17 +64,18 @@ theorem trace_mul_isotypic : ∀ (G : Type) [Group G] (N X : Type) [AddCommGroup
       rw [Submodule.coe_sum] at this
       exact this.symm
     rintro _ ⟨n, rfl⟩
-    have hn : ψ n = ∑ j, bS.repr ⟨ψ, hψS⟩ j • φ j n := by
-      rw [← intertwining_sum_apply, ← e]
+    have hn : ψ n = ∑ j, bS.repr ⟨ψ, hψS⟩ j • φ j n := by rw [← intertwining_sum_apply, ← e]
     change ψ n ∈ _
     rw [hn]
-    exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _
-      (Submodule.mem_iSup_of_mem j ⟨n, rfl⟩)
-  have hcoef : ∀ ψ : π.IntertwiningMap ρ, ∃ c : Fin (Module.finrank ℂ S) → ℂ,
-      ∀ n, H (ψ n) = ∑ j, c j • φ j n := by
+    exact Submodule.sum_mem _ fun j _ =>
+      Submodule.smul_mem _ _ (Submodule.mem_iSup_of_mem j ⟨n, rfl⟩)
+  have hcoef
+      : ∀ ψ : π.IntertwiningMap ρ, ∃ c : Fin (Module.finrank ℂ S) → ℂ, ∀ n,
+        H (ψ n) = ∑ j, c j • φ j n := by
     intro ψ
-    let Hψ : π.IntertwiningMap ρ := (H ∘ₗ ψ.toLinearMap).intertwiningMap_of_isIntertwiningMap π ρ
-      (fun g v => by simp [ψ.isIntertwining, hH])
+    let Hψ : π.IntertwiningMap ρ :=
+      (H ∘ₗ ψ.toLinearMap).intertwiningMap_of_isIntertwiningMap π ρ
+        (fun g v => by simp [ψ.isIntertwining, hH])
     have hr : LinearMap.range Hψ.toLinearMap ≤ ⨆ j, LinearMap.range (φ j).toLinearMap := by
       rintro _ ⟨n, rfl⟩
       exact hY ⟨ψ n, rfl⟩
@@ -96,14 +117,16 @@ theorem trace_mul_isotypic : ∀ (G : Type) [Group G] (N X : Type) [AddCommGroup
   have hT1 := GlobalTheory.T.hasFiniteRankTraceOf_of_range_le_finiteDimensional X (H ∘ₗ B) Z hrange
   let e : (Fin (Module.finrank ℂ S) → R) ≃ₗ[ℂ] Z := LinearEquiv.ofInjective Φ' hinj'
   let A' : R →ₗ[ℂ] R := A.restrict (p := R) (q := R) fun v _ => LinearMap.mem_range_self A v
-  let h : Matrix (Fin (Module.finrank ℂ S)) (Fin (Module.finrank ℂ S)) ℂ := Matrix.of fun k j => hc j k
+  let h : Matrix (Fin (Module.finrank ℂ S)) (Fin (Module.finrank ℂ S)) ℂ :=
+    Matrix.of fun k j => hc j k
   let M : (Fin (Module.finrank ℂ S) → R) →ₗ[ℂ] (Fin (Module.finrank ℂ S) → R) :=
     ∑ k, ∑ j, h k j • (LinearMap.single ℂ (fun _ => R) k ∘ₗ A' ∘ₗ LinearMap.proj j)
   have hM : ∀ w k, (M w k : N) = ∑ j, hc j k • A (w j) := by
     intro w k
     simp [M, h, LinearMap.sum_apply, Finset.sum_apply, Pi.single_apply, A']
-  have hconj : (H ∘ₗ B).restrict (p := Z) (q := Z) (fun x _ => hrange (LinearMap.mem_range_self _ x)) =
-      e.conj M := by
+  have hconj
+      : (H ∘ₗ B).restrict (p := Z) (q := Z) (fun x _ => hrange (LinearMap.mem_range_self _ x))
+        = e.conj M := by
     refine LinearMap.ext fun z => Subtype.ext ?_
     obtain ⟨w, rfl⟩ := e.surjective z
     rw [LinearEquiv.conj_apply_apply, LinearEquiv.symm_apply_apply]
@@ -113,8 +136,10 @@ theorem trace_mul_isotypic : ∀ (G : Type) [Group G] (N X : Type) [AddCommGroup
     set_option synthInstance.maxHeartbeats 100000 in
       simp_rw [hBφ, hhc, hM, map_sum, map_smul]
     rw [Finset.sum_comm]
-  have key : LinearMap.trace ℂ Z ((H ∘ₗ B).restrict (p := Z) (q := Z)
-      fun x _ => hrange (LinearMap.mem_range_self _ x)) = (∑ j, hc j j) * b := by
+  have key
+      : LinearMap.trace ℂ Z
+          ((H ∘ₗ B).restrict (p := Z) (q := Z) fun x _ => hrange (LinearMap.mem_range_self _ x))
+        = (∑ j, hc j j) * b := by
     rw [hconj, LinearMap.trace_conj', GlobalTheory.T.trace_sum_single_comp_proj_eq R _ h A', ← htr]
     simp [h, Matrix.trace, A', R]
   rw [← key]

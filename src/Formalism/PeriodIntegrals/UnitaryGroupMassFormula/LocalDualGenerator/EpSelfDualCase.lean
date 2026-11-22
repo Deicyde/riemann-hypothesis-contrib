@@ -17,8 +17,8 @@ private theorem nontrivial_of_finrank_eq_two (hr : finrank K L = 2) : Nontrivial
     exact absurd hr (by norm_num)
   · exact h
 
-private theorem exists_not_mem_range_algebraMap_of_finrank_eq_two (hr : finrank K L = 2) :
-    ∃ x : L, x ∉ Set.range (algebraMap K L) := by
+private theorem exists_not_mem_range_algebraMap_of_finrank_eq_two (hr : finrank K L = 2)
+    : ∃ x : L, x ∉ Set.range (algebraMap K L) := by
   by_contra h
   push Not at h
   have hsurj : LinearMap.range (Algebra.linearMap K L) = ⊤ := by
@@ -30,9 +30,9 @@ private theorem exists_not_mem_range_algebraMap_of_finrank_eq_two (hr : finrank 
   rw [hsurj, finrank_top, Module.finrank_self, hr] at h1
   omega
 
-private theorem exists_eq_add_mul_of_finrank_eq_two' (hr : finrank K L = 2) {x : L}
-    (hx : x ∉ Set.range (algebraMap K L)) (y : L) :
-    ∃ a c : K, algebraMap K L a + algebraMap K L c * x = y := by
+private theorem exists_eq_add_mul_of_finrank_eq_two'
+    (hr : finrank K L = 2) {x : L} (hx : x ∉ Set.range (algebraMap K L)) (y : L)
+    : ∃ a c : K, algebraMap K L a + algebraMap K L c * x = y := by
   have := nontrivial_of_finrank_eq_two hr
   have hli : LinearIndependent K ![(1 : L), x] := by
     rw [LinearIndependent.pair_iff]
@@ -51,11 +51,9 @@ private theorem exists_eq_add_mul_of_finrank_eq_two' (hr : finrank K L = 2) {x :
       have h2 : t • x = -(s • (1 : L)) := by
         rw [← sub_eq_zero, sub_neg_eq_add, add_comm]
         exact hst
-      have h3 : x = t⁻¹ • (t • x) := by
-        rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
+      have h3 : x = t⁻¹ • (t • x) := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
       rw [Algebra.algebraMap_eq_smul_one, h3, h2, smul_neg, smul_smul, neg_smul, div_eq_inv_mul]
-  have hcard : Fintype.card (Fin 2) = finrank K L := by
-    rw [hr, Fintype.card_fin]
+  have hcard : Fintype.card (Fin 2) = finrank K L := by rw [hr, Fintype.card_fin]
   let b := basisOfLinearIndependentOfCardEqFinrank hli hcard
   have hb0 : b 0 = 1 := by simp [b]
   have hb1 : b 1 = x := by simp [b]
@@ -63,8 +61,8 @@ private theorem exists_eq_add_mul_of_finrank_eq_two' (hr : finrank K L = 2) {x :
   rw [Fin.sum_univ_two, hb0, hb1, Algebra.smul_def, Algebra.smul_def, mul_one] at hy
   exact ⟨b.repr y 0, b.repr y 1, hy⟩
 
-theorem dichotomy (hr : finrank K L = 2) (hred : IsReduced L) :
-    IsField L ∨ ∃ e : L, IsIdempotentElem e ∧ e ≠ 0 ∧ e ≠ 1 := by
+theorem dichotomy (hr : finrank K L = 2) (hred : IsReduced L)
+    : IsField L ∨ ∃ e : L, IsIdempotentElem e ∧ e ≠ 0 ∧ e ≠ 1 := by
   have := nontrivial_of_finrank_eq_two hr
   obtain ⟨x, hx⟩ := exists_not_mem_range_algebraMap_of_finrank_eq_two hr
   have hrep := exists_eq_add_mul_of_finrank_eq_two' hr hx
@@ -87,15 +85,18 @@ theorem dichotomy (hr : finrank K L = 2) (hred : IsReduced L) :
       exact hx ⟨r, (sub_eq_zero.mp hz).symm⟩
     · right
       have hd : q - r - r ≠ 0 := sub_ne_zero.mpr (Ne.symm hrs)
-      have hsq : (x - algebraMap K L r) * (x - algebraMap K L r) =
-          algebraMap K L (q - r - r) * (x - algebraMap K L r) := by
+      have hsq
+          : (x - algebraMap K L r) * (x - algebraMap K L r)
+            = algebraMap K L (q - r - r) * (x - algebraMap K L r) := by
         have h' := hfac
         simp only [map_sub] at h' ⊢
         linear_combination h'
       have hu : algebraMap K L (q - r - r)⁻¹ * algebraMap K L (q - r - r) = 1 := by
         rw [← map_mul, inv_mul_cancel₀ hd, map_one]
-      have hback : x - algebraMap K L r = algebraMap K L (q - r - r) *
-          (algebraMap K L (q - r - r)⁻¹ * (x - algebraMap K L r)) := by
+      have hback
+          : x - algebraMap K L r
+            = algebraMap K L (q - r - r)
+              * (algebraMap K L (q - r - r)⁻¹ * (x - algebraMap K L r)) := by
         rw [← mul_assoc, ← map_mul, mul_inv_cancel₀ hd, map_one, one_mul]
       refine ⟨algebraMap K L (q - r - r)⁻¹ * (x - algebraMap K L r), ?_, ?_, ?_⟩
       · show _ * _ = _
@@ -125,13 +126,17 @@ theorem dichotomy (hr : finrank K L = 2) (hred : IsReduced L) :
       · apply hroot (-a / c)
         have hci : c * c⁻¹ = 1 := mul_inv_cancel₀ hc
         linear_combination (c⁻¹) ^ 2 * h0 + (p * (1 + c * c⁻¹) - q * a * c⁻¹) * hci
-    have hprod : (algebraMap K L a + algebraMap K L c * x) *
-        (algebraMap K L (a + c * q) - algebraMap K L c * x) =
-        algebraMap K L (a * a + a * c * q - c ^ 2 * p) := by
+    have hprod
+        : (algebraMap K L a + algebraMap K L c * x)
+            * (algebraMap K L (a + c * q) - algebraMap K L c * x)
+          = algebraMap K L (a * a + a * c * q - c ^ 2 * p) := by
       simp only [map_add (f := _), map_mul, map_sub, map_pow]
       linear_combination (-(algebraMap K L c) ^ 2) * hpq
-    refine ⟨algebraMap K L (a * a + a * c * q - c ^ 2 * p)⁻¹ *
-      (algebraMap K L (a + c * q) - algebraMap K L c * x), ?_⟩
+    refine ⟨
+      algebraMap K L (a * a + a * c * q - c ^ 2 * p)⁻¹
+        * (algebraMap K L (a + c * q) - algebraMap K L c * x),
+      ?_
+    ⟩
     rw [mul_left_comm, hprod, ← map_mul, inv_mul_cancel₀ hN, map_one]
 
 end PI.LocDualGen.EpC

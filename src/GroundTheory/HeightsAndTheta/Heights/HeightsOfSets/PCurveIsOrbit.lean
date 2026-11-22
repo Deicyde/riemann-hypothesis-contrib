@@ -22,9 +22,11 @@ variable {ι : Type} [Fintype ι] [DecidableEq ι] {n : ι → ℕ}
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem component_mem {W : Ideal (MvPolynomial (Coord n) ℤ)}
-    (hW : Geo.IsMultiHomogIdeal (ι := blockIdx n) W) {f : MvPolynomial (Coord n) ℤ} (hf : f ∈ W)
-    (m : ι → ℕ) : weightedHomogeneousComponent (coordDeg n) m f ∈ W := by
+theorem component_mem
+    {W : Ideal (MvPolynomial (Coord n) ℤ)} (hW : Geo.IsMultiHomogIdeal (ι := blockIdx n) W)
+    {f : MvPolynomial (Coord n) ℤ} (hf : f ∈ W)
+    (m : ι → ℕ)
+    : weightedHomogeneousComponent (coordDeg n) m f ∈ W := by
   classical
   obtain ⟨S, hS, rfl⟩ := hW
   have hh : (Ideal.span S).IsHomogeneous (weightedHomogeneousSubmodule ℤ (coordDeg n)) :=
@@ -33,8 +35,9 @@ theorem component_mem {W : Ideal (MvPolynomial (Coord n) ℤ)}
       exact ⟨a, (mem_weightedHomogeneousSubmodule _ _ _ _).mpr ((geoMultiHomog_iff g a).mp ha)⟩
   exact (mem_iff_weightedHomogeneousComponent_mem _ _ hh f).mp hf m
 
-def toArithVariety {W : Ideal (MvPolynomial (Coord n) ℤ)}
-    (hW : Geo.IsArithVar (ι := blockIdx n) W 1) : ArithVariety n where
+def toArithVariety
+    {W : Ideal (MvPolynomial (Coord n) ℤ)} (hW : Geo.IsArithVar (ι := blockIdx n) W 1)
+    : ArithVariety n where
   ideal := W
   isPrime := hW.2.1.1
   homogeneous _ hf m := component_mem hW.2.1.2.1 hf m
@@ -43,8 +46,9 @@ def toArithVariety {W : Ideal (MvPolynomial (Coord n) ℤ)}
     have h : a ∈ W.comap (C : ℤ →+* MvPolynomial (Coord n) ℤ) := ha
     rwa [hW.2.2.1, Ideal.mem_bot] at h
 
-theorem exists_algHom_algebraicClosure (B : Type*) [CommRing B] [Nontrivial B] [Algebra ℚ B]
-    [Algebra.FiniteType ℚ B] : Nonempty (B →ₐ[ℚ] AlgebraicClosure ℚ) := by
+theorem exists_algHom_algebraicClosure
+    (B : Type*) [CommRing B] [Nontrivial B] [Algebra ℚ B] [Algebra.FiniteType ℚ B]
+    : Nonempty (B →ₐ[ℚ] AlgebraicClosure ℚ) := by
   obtain ⟨m, hm⟩ := Ideal.exists_maximal B
   let := Ideal.Quotient.field m
   have : Algebra.FiniteType ℚ (B ⧸ m) :=
@@ -52,9 +56,12 @@ theorem exists_algHom_algebraicClosure (B : Type*) [CommRing B] [Nontrivial B] [
   have : Module.Finite ℚ (B ⧸ m) := finite_of_finite_type_of_isJacobsonRing ℚ (B ⧸ m)
   exact ⟨(IsAlgClosed.lift : B ⧸ m →ₐ[ℚ] AlgebraicClosure ℚ).comp (Ideal.Quotient.mkₐ ℚ m)⟩
 
-theorem eq_of_le_of_ringKrullDim_eq {R : Type*} [CommRing R] {W W' : Ideal R} [W.IsPrime]
-    (hle : W ≤ W') {d : ℕ} (hW : ringKrullDim (R ⧸ W) = d) (hW' : ringKrullDim (R ⧸ W') = d) :
-    W = W' := by
+theorem eq_of_le_of_ringKrullDim_eq
+    {R : Type*} [CommRing R]
+    {W W' : Ideal R} [W.IsPrime]
+    (hle : W ≤ W')
+    {d : ℕ} (hW : ringKrullDim (R ⧸ W) = d) (hW' : ringKrullDim (R ⧸ W') = d)
+    : W = W' := by
   by_contra hne
   obtain ⟨f, hfW', hfW⟩ := SetLike.exists_of_lt (lt_of_le_of_ne hle hne)
   have hr : Ideal.Quotient.mk W f ∈ nonZeroDivisors (R ⧸ W) :=

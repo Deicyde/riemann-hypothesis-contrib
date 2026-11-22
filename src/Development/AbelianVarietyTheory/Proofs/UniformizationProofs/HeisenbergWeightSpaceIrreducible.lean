@@ -9,14 +9,29 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem heisenberg_weightSpace_irreducible : ∀ (F : Type) [Field F] [IsAlgClosed F] (A : Type) [CommGroup A] [Finite A] (E : Type) [AddCommGroup E] [Module F E] [FiniteDimensional F E] (e : A → A → Fˣ) (Φ : A → (E ≃ₗ[F] E)), (Nat.card A : F) ≠ 0 → Module.finrank F E ^ 2 = Nat.card A → (∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v)) → (∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) → (∀ a, (∀ b, e a b = 1) → a = 1) → ∀ (T : Subgroup A) (lam : T →* (E ≃ₗ[F] E)), (∀ t : T, ∃ c : Fˣ, ∀ v, lam t v = (c : F) • Φ t v) → ∀ Wt : (T →* Fˣ) → Submodule F E, (∀ χ v, v ∈ Wt χ ↔ ∀ t, lam t v = (χ t : F) • v) → ∀ (χ : T →* Fˣ) (U : Submodule F E), U ≤ Wt χ → (∀ h : A, (∀ t : T, e t h = 1) → ∀ v ∈ U, Φ h v ∈ U) → U = ⊥ ∨ U = Wt χ := by
+theorem heisenberg_weightSpace_irreducible
+    : ∀ (F : Type) [Field F] [IsAlgClosed F] (A : Type) [CommGroup A] [Finite A] (E : Type)
+        [AddCommGroup E] [Module F E] [FiniteDimensional F E] (e : A → A → Fˣ)
+        (Φ : A → (E ≃ₗ[F] E)),
+      (Nat.card A : F) ≠ 0 → Module.finrank F E ^ 2 = Nat.card A
+        → (∀ a b, ∃ c : Fˣ, ∀ v, Φ (a * b) v = (c : F) • Φ a (Φ b v))
+        → (∀ a b v, Φ a (Φ b v) = (e a b : F) • Φ b (Φ a v)) → (∀ a, (∀ b, e a b = 1) → a = 1)
+        → ∀ (T : Subgroup A) (lam : T →* (E ≃ₗ[F] E)),
+          (∀ t : T, ∃ c : Fˣ, ∀ v, lam t v = (c : F) • Φ t v)
+            → ∀ Wt : (T →* Fˣ) → Submodule F E,
+              (∀ χ v, v ∈ Wt χ ↔ ∀ t, lam t v = (χ t : F) • v)
+                → ∀ (χ : T →* Fˣ) (U : Submodule F E),
+                  U ≤ Wt χ → (∀ h : A, (∀ t : T, e t h = 1) → ∀ v ∈ U, Φ h v ∈ U)
+                    → U = ⊥ ∨ U = Wt χ := by
   classical
   intro F _ _ A _ _ E _ _ _ e Φ hcard hdim hmul hcomm hnd T lam hlam Wt hWt χ U hU hstab
   by_cases hbot : U = ⊥
@@ -60,10 +75,10 @@ theorem heisenberg_weightSpace_irreducible : ∀ (F : Type) [Field F] [IsAlgClos
   obtain ⟨f, hf⟩ : ∃ f : E →ₗ[F] E, f u = v := by
     obtain ⟨φ, hφ⟩ := Module.Projective.exists_dual_eq_one F hu0
     exact ⟨φ.smulRight v, by simp [hφ]⟩
-  obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun F).mp
-    (hspan ▸ Submodule.mem_top : f ∈ Submodule.span F (Set.range fun a => (Φ a : E →ₗ[F] E)))
-  have hvs : v = ∑ a, c a • Φ a u := by
-    rw [← hf, ← hc]; simp
+  obtain ⟨c, hc⟩ :=
+    (Submodule.mem_span_range_iff_exists_fun F).mp
+      (hspan ▸ Submodule.mem_top : f ∈ Submodule.span F (Set.range fun a => (Φ a : E →ₗ[F] E)))
+  have hvs : v = ∑ a, c a • Φ a u := by rw [← hf, ← hc]; simp
   have hu := (hWt χ u).mp (hU huU)
   have hv' := (hWt χ v).mp hv
   have hlamΦ : ∀ (t : T) a, lam t (Φ a u) = ((χ t : F) * (e t a : F)) • Φ a u := by
@@ -82,7 +97,8 @@ theorem heisenberg_weightSpace_irreducible : ∀ (F : Type) [Field F] [IsAlgClos
       rw [map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [map_smul, hlamΦ, smul_smul, smul_smul]
-    congr 1; ring
+    congr 1
+    ring
   have hT : (Fintype.card T : F) ≠ 0 := by
     intro h
     apply hcard
@@ -97,10 +113,11 @@ theorem heisenberg_weightSpace_irreducible : ∀ (F : Type) [Field F] [IsAlgClos
   refine U.sum_mem fun a _ => ?_
   by_cases ha : ∀ t : T, e t a = 1
   · exact U.smul_mem _ (hstab a ha u huU)
-  · let ψ : T →* F :=
-      { toFun := fun t => (e t a : F)
-        map_one' := by simp [he1]
-        map_mul' := fun s t => by simp [hel] }
+  · let ψ : T →* F := {
+      toFun := fun t => (e t a : F)
+      map_one' := by simp [he1]
+      map_mul' := fun s t => by simp [hel]
+    }
     have hψ : ψ ≠ 1 := by
       intro h
       apply ha

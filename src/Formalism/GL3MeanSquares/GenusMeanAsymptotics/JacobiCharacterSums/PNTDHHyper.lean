@@ -15,8 +15,8 @@ open Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds Formalism.ZeroFre
 
 namespace Hyp
 
-theorem g_mono (a b : ℝ) (ha : 1 ≤ a) (hab : a ≤ b) :
-    (Real.log b + 1) / √b ≤ 2 * ((Real.log a + 1) / √a) := by
+theorem g_mono (a b : ℝ) (ha : 1 ≤ a) (hab : a ≤ b)
+    : (Real.log b + 1) / √b ≤ 2 * ((Real.log a + 1) / √a) := by
   have ha0 : 0 < a := by linarith
   have hb0 : 0 < b := by linarith
   have hL : 0 ≤ Real.log a := Real.log_nonneg ha
@@ -39,16 +39,16 @@ theorem g_mono (a b : ℝ) (ha : 1 ≤ a) (hab : a ≤ b) :
     ring
   have hlogs : Real.log s ≤ s - 1 := Real.log_le_sub_one_of_pos hs0
   rw [hsb', hlogb, div_le_iff₀ (by positivity)]
-  have e : 2 * ((Real.log a + 1) / √a) * (√a * s) = 2 * (Real.log a + 1) * s := by
-    field_simp
+  have e : 2 * ((Real.log a + 1) / √a) * (√a * s) = 2 * (Real.log a + 1) * s := by field_simp
   rw [e]
   nlinarith [mul_le_mul_of_nonneg_left hs1 hL]
 
 variable {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q)
 
-theorem diff_bound (hχ : χ ≠ 1) (N₀ N₁ : ℕ) (h0 : 1 ≤ N₀) (h01 : N₀ ≤ N₁) :
-    (cF χ N₁ - cF χ N₀).re ≤ ‖DirichletCharacter.LFunction χ 1‖ * (Real.log N₁ - Real.log N₀) +
-      86 * ((q : ℝ) + 1) * ((Real.log N₀ + 1) / √(N₀ : ℝ)) := by
+theorem diff_bound (hχ : χ ≠ 1) (N₀ N₁ : ℕ) (h0 : 1 ≤ N₀) (h01 : N₀ ≤ N₁)
+    : (cF χ N₁ - cF χ N₀).re
+      ≤ ‖DirichletCharacter.LFunction χ 1‖ * (Real.log N₁ - Real.log N₀)
+        + 86 * ((q : ℝ) + 1) * ((Real.log N₀ + 1) / √(N₀ : ℝ)) := by
   set L := DirichletCharacter.LFunction χ 1
   set U₀ := Nat.sqrt N₀ with hU₀
   set U₁ := Nat.sqrt N₁ with hU₁
@@ -64,30 +64,32 @@ theorem diff_bound (hχ : χ ≠ 1) (N₀ N₁ : ℕ) (h0 : 1 ≤ N₀) (h01 : N
   set R₁ := cF χ N₁ - (((Real.log N₁ + Real.eulerMascheroniConstant : ℝ) : ℂ) * L - cT χ U₁)
   set R₀ := cF χ N₀ - (((Real.log N₀ + Real.eulerMascheroniConstant : ℝ) : ℂ) * L - cT χ U₀)
   set t := Real.log N₁ - Real.log N₀ with ht
-  have ht0 : 0 ≤ t := by
-    have := Real.log_le_log (by linarith) hN01r; linarith
+  have ht0 : 0 ≤ t := by have := Real.log_le_log (by linarith) hN01r; linarith
   set W := -(cT χ U₁ - cT χ U₀) + R₁ - R₀ with hW
-  have eD : cF χ N₁ - cF χ N₀ = (t : ℂ) * L + W := by
-    simp only [hW, R₁, R₀, ht]; push_cast; ring
+  have eD : cF χ N₁ - cF χ N₀ = (t : ℂ) * L + W := by simp only [hW, R₁, R₀, ht]; push_cast; ring
   rw [eD, Complex.add_re, Complex.re_ofReal_mul]
   have hLre : L.re ≤ ‖L‖ := Complex.re_le_norm L
   have hWre : W.re ≤ ‖W‖ := Complex.re_le_norm W
   have hWn : ‖W‖ ≤ ‖cT χ U₁ - cT χ U₀‖ + ‖R₁‖ + ‖R₀‖ := by
     rw [hW]
-    calc ‖-(cT χ U₁ - cT χ U₀) + R₁ - R₀‖ ≤ ‖-(cT χ U₁ - cT χ U₀) + R₁‖ + ‖R₀‖ := norm_sub_le _ _
+    calc
+      ‖-(cT χ U₁ - cT χ U₀) + R₁ - R₀‖
+        ≤ ‖-(cT χ U₁ - cT χ U₀) + R₁‖ + ‖R₀‖ := norm_sub_le _ _
       _ ≤ ‖-(cT χ U₁ - cT χ U₀)‖ + ‖R₁‖ + ‖R₀‖ := by gcongr; exact norm_add_le _ _
       _ = _ := by rw [norm_neg]
   have hg := g_mono (N₀ : ℝ) (N₁ : ℝ) hN0r hN01r
   set g₀ := (Real.log N₀ + 1) / √(N₀ : ℝ)
   have hg0 : 0 ≤ g₀ := div_nonneg (by linarith [Real.log_natCast_nonneg N₀]) (Real.sqrt_nonneg _)
   have hR1' : ‖R₁‖ ≤ 52 * B * g₀ := by
-    have e : 26 * B * (Real.log N₁ + 1) / √(N₁ : ℝ) = 26 * B * ((Real.log N₁ + 1) / √(N₁ : ℝ)) := by ring
+    have e : 26 * B * (Real.log N₁ + 1) / √(N₁ : ℝ) = 26 * B * ((Real.log N₁ + 1) / √(N₁ : ℝ)) := by
+      ring
     rw [e] at hR1
     have := mul_le_mul_of_nonneg_left hg (by positivity : (0 : ℝ) ≤ 26 * B)
     nlinarith
   have hR0' : ‖R₀‖ ≤ 26 * B * g₀ := by
     have e : 26 * B * (Real.log N₀ + 1) / √(N₀ : ℝ) = 26 * B * g₀ := by ring
-    rw [e] at hR0; exact hR0
+    rw [e] at hR0
+    exact hR0
   have hT' : ‖cT χ U₁ - cT χ U₀‖ ≤ 8 * B * g₀ := by
     have hUr : (1 : ℝ) ≤ U₀ := by exact_mod_cast hU0
     have hUN : U₀ ≤ N₀ := Nat.sqrt_le_self N₀
@@ -99,7 +101,8 @@ theorem diff_bound (hχ : χ ≠ 1) (N₀ N₁ : ℕ) (h0 : 1 ≤ N₀) (h01 : N
       rwa [Real.sqrt_mul_self (by linarith)] at this
     have hs0 : 0 < √(N₀ : ℝ) := Real.sqrt_pos.mpr (by linarith)
     have hlog : Real.log ((U₀ : ℝ) + 1) ≤ 1 + Real.log N₀ := by
-      have h1 : Real.log ((U₀ : ℝ) + 1) ≤ Real.log (2 * N₀) := Real.log_le_log (by linarith) (by linarith)
+      have h1 : Real.log ((U₀ : ℝ) + 1) ≤ Real.log (2 * N₀) :=
+        Real.log_le_log (by linarith) (by linarith)
       rw [Real.log_mul (by norm_num) (by linarith)] at h1
       have := Real.log_two_lt_d9
       linarith
@@ -118,8 +121,11 @@ end Hyp
 theorem deuring_heilbronn_hypergeometric : DHHyper := by
   refine ⟨400, by norm_num, ?_⟩
   intro M _ χ₁ y x hM _ hne hy hyx
-  have e : ∀ N₀ N₁ : ℕ, N₀ ≤ N₁ → ∑ n ∈ Finset.Ioc N₀ N₁, (∑ d ∈ n.divisors, χ₁ (d : ZMod M)).re / (n : ℝ) =
-      (Hyp.cF χ₁ N₁ - Hyp.cF χ₁ N₀).re := by
+  have e
+      : ∀ N₀ N₁ : ℕ,
+        N₀ ≤ N₁
+          → ∑ n ∈ Finset.Ioc N₀ N₁, (∑ d ∈ n.divisors, χ₁ (d : ZMod M)).re / (n : ℝ)
+            = (Hyp.cF χ₁ N₁ - Hyp.cF χ₁ N₀).re := by
     intro N₀ N₁ h
     rw [Hyp.cF, Hyp.cF, ← Finset.sum_Ioc_consecutive _ (Nat.zero_le N₀) h, add_sub_cancel_left,
       Complex.re_sum]

@@ -5,35 +5,57 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.MixModel GlobalTheory.MixPer
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.MixModel GlobalTheory.MixPer
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.MixPer
 
-theorem exists_mul_of_mem_sup_range {G H : Type} [Group G] [Group H] (N : Subgroup G) (s : H →* G)
-    (hnorm : ∀ n ∈ N, ∀ h, s h * n * (s h)⁻¹ ∈ N) {g : G} (hg : g ∈ N ⊔ s.range) :
-    ∃ n ∈ N, ∃ h, g = n * s h := by
-  let K : Subgroup G :=
-    { carrier := {x | ∃ n ∈ N, ∃ h, x = n * s h}
-      one_mem' := ⟨1, N.one_mem, 1, by simp⟩
-      mul_mem' := by
-        rintro _ _ ⟨n₁, hn₁, h₁, rfl⟩ ⟨n₂, hn₂, h₂, rfl⟩
-        refine ⟨n₁ * (s h₁ * n₂ * (s h₁)⁻¹), N.mul_mem hn₁ (hnorm n₂ hn₂ h₁), h₁ * h₂, ?_⟩
-        rw [map_mul]
-        group
-      inv_mem' := by
-        rintro _ ⟨n, hn, h, rfl⟩
-        refine ⟨s h⁻¹ * n⁻¹ * (s h⁻¹)⁻¹, hnorm n⁻¹ (N.inv_mem hn) h⁻¹, h⁻¹, ?_⟩
-        rw [map_inv]
-        group }
+theorem exists_mul_of_mem_sup_range
+    {G H : Type} [Group G] [Group H]
+    (N : Subgroup G) (s : H →* G) (hnorm : ∀ n ∈ N, ∀ h, s h * n * (s h)⁻¹ ∈ N)
+    {g : G} (hg : g ∈ N ⊔ s.range)
+    : ∃ n ∈ N, ∃ h, g = n * s h := by
+  let K : Subgroup G := {
+    carrier := {x | ∃ n ∈ N, ∃ h, x = n * s h}
+    one_mem' := ⟨1, N.one_mem, 1, by simp⟩
+    mul_mem' := by
+      rintro _ _ ⟨n₁, hn₁, h₁, rfl⟩ ⟨n₂, hn₂, h₂, rfl⟩
+      refine ⟨n₁ * (s h₁ * n₂ * (s h₁)⁻¹), N.mul_mem hn₁ (hnorm n₂ hn₂ h₁), h₁ * h₂, ?_⟩
+      rw [map_mul]
+      group
+    inv_mem' := by
+      rintro _ ⟨n, hn, h, rfl⟩
+      refine ⟨s h⁻¹ * n⁻¹ * (s h⁻¹)⁻¹, hnorm n⁻¹ (N.inv_mem hn) h⁻¹, h⁻¹, ?_⟩
+      rw [map_inv]
+      group
+  }
   have hle : N ⊔ s.range ≤ K := by
     refine sup_le (fun n hn => ⟨n, hn, 1, by simp⟩) ?_
     rintro _ ⟨h, rfl⟩
     exact ⟨1, N.one_mem, h, by simp⟩
   exact hle hg
 
-theorem semiMeas_finite_on_compacts_and_open_pos : ∀ {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H] [SecondCountableTopology H] [MeasurableSpace H] [BorelSpace H] (N : Subgroup G) (s : H →* G), IsClosed (N : Set G) → Continuous s → (∀ n ∈ N, ∀ h, s h * n * (s h)⁻¹ ∈ N) → (∃ p : (N ⊔ s.range : Subgroup G) → H, Continuous p ∧ ∀ (h : H) (n : N), p ⟨n.1 * s h, mul_mem (Subgroup.mem_sup_left n.2) (Subgroup.mem_sup_right ⟨h, rfl⟩)⟩ = h) → ∀ (μ : Measure H) (ν : Measure N), μ.IsHaarMeasure → ν.IsHaarMeasure → (∀ h, ν.map (fun n : N => s h * n.1 * (s h)⁻¹) = ν.map Subtype.val) → IsFiniteMeasureOnCompacts (semiMeas N s μ ν) ∧ (semiMeas N s μ ν).IsOpenPosMeasure := by
+theorem semiMeas_finite_on_compacts_and_open_pos
+    : ∀ {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group H]
+        [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [T2Space H]
+        [SecondCountableTopology H] [MeasurableSpace H] [BorelSpace H] (N : Subgroup G)
+        (s : H →* G),
+      IsClosed (N : Set G) → Continuous s → (∀ n ∈ N, ∀ h, s h * n * (s h)⁻¹ ∈ N)
+        → (∃ p : (N ⊔ s.range : Subgroup G) → H,
+          Continuous p
+            ∧ ∀ (h : H) (n : N),
+              p ⟨n.1 * s h, mul_mem (Subgroup.mem_sup_left n.2) (Subgroup.mem_sup_right ⟨h, rfl⟩)⟩
+                = h)
+        → ∀ (μ : Measure H) (ν : Measure N),
+          μ.IsHaarMeasure → ν.IsHaarMeasure
+            → (∀ h, ν.map (fun n : N => s h * n.1 * (s h)⁻¹) = ν.map Subtype.val)
+            → IsFiniteMeasureOnCompacts (semiMeas N s μ ν)
+              ∧ (semiMeas N s μ ν).IsOpenPosMeasure := by
   intro G H _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ N s hN hs hnorm hp μ ν hμ hν _
   obtain ⟨p, hpc, hps⟩ := hp
   haveI : LocallyCompactSpace N := hN.locallyCompactSpace
@@ -53,7 +75,8 @@ theorem semiMeas_finite_on_compacts_and_open_pos : ∀ {G H : Type} [Group G] [T
     intro k
     obtain ⟨n, hn, h, hk⟩ := exists_mul_of_mem_sup_range N s hnorm k.2
     have hpk : p k = h := by
-      have hk' : k = ⟨n * s h, mul_mem (Subgroup.mem_sup_left hn) (Subgroup.mem_sup_right ⟨h, rfl⟩)⟩ :=
+      have hk'
+          : k = ⟨n * s h, mul_mem (Subgroup.mem_sup_left hn) (Subgroup.mem_sup_right ⟨h, rfl⟩)⟩ :=
         Subtype.ext hk
       rw [hk']
       exact hps h ⟨n, hn⟩

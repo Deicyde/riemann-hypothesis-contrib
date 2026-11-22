@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open Matrix
 
-theorem HermNorm.dualNorm_smul {n : ℕ} (h : HermNorm n) (t : ℂ) (y : Fin n → ℂ) :
-    h.dualNorm (t • y) = ‖t‖ * h.dualNorm y := by
+theorem HermNorm.dualNorm_smul {n : ℕ} (h : HermNorm n) (t : ℂ) (y : Fin n → ℂ)
+    : h.dualNorm (t • y) = ‖t‖ * h.dualNorm y := by
   unfold HermNorm.dualNorm
   rw [Matrix.mulVec_smul]
   have hs : (∑ i, ‖(t • ((h.mat)ᵀ⁻¹ *ᵥ y)) i‖ ^ 2) = ‖t‖ ^ 2 * ∑ i, ‖((h.mat)ᵀ⁻¹ *ᵥ y) i‖ ^ 2 := by

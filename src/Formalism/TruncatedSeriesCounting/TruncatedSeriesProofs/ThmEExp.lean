@@ -97,8 +97,9 @@ theorem total_exponent_le_eight_hundred : ExponentBoundOfRankAndKappaBounds := b
   have hlog2 : Real.logb ℓ (2 * h) = Real.logb ℓ 2 + Real.logb ℓ h :=
     Real.logb_mul (by norm_num) (by positivity)
   have hl2 : Real.logb ℓ 2 ≤ 1 := by
-    have := Real.logb_le_logb_of_le (by linarith : (1 : ℝ) < ℓ) (by norm_num : (0 : ℝ) < 2)
-      (by linarith : (2 : ℝ) ≤ ℓ)
+    have :=
+      Real.logb_le_logb_of_le (by linarith : (1 : ℝ) < ℓ) (by norm_num : (0 : ℝ) < 2)
+        (by linarith : (2 : ℝ) ≤ ℓ)
     rwa [Real.logb_self_eq_one (by linarith)] at this
   have hGL : (G : ℝ) / ℓ ≤ g / 3 := by
     rw [div_le_div_iff₀ (by positivity) (by norm_num)]
@@ -108,8 +109,10 @@ theorem total_exponent_le_eight_hundred : ExponentBoundOfRankAndKappaBounds := b
   have h4g : 4 * (g : ℝ) / ((ℓ : ℝ) - 1) ≤ 2 * g := by
     rw [div_le_iff₀ (by linarith)]
     nlinarith
-  have eσ : 3 / 2 * ((h : ℝ) + 2 * g) / ((ℓ : ℝ) - 1) ^ (j + 1) =
-      3 / 2 * ((h : ℝ) / ((ℓ : ℝ) - 1) ^ (j + 1)) + 3 * ((g : ℝ) / ((ℓ : ℝ) - 1) ^ (j + 1)) := by
+  have eσ
+      : 3 / 2 * ((h : ℝ) + 2 * g) / ((ℓ : ℝ) - 1) ^ (j + 1)
+        = 3 / 2 * ((h : ℝ) / ((ℓ : ℝ) - 1) ^ (j + 1))
+          + 3 * ((g : ℝ) / ((ℓ : ℝ) - 1) ^ (j + 1)) := by
     ring
   rw [eσ] at hσ
   rw [hlog2] at hkap

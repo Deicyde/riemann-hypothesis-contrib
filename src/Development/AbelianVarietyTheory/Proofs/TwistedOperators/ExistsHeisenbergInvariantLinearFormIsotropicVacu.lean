@@ -6,10 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsInt
 
 @[expose] public section
 
-open Matrix Formalism.UG GlobalTheory.Hk3 GlobalTheory.FinWeil GlobalTheory.SphTheta ValuativeRel Classical
+open Matrix Formalism.UG GlobalTheory.Hk3 GlobalTheory.FinWeil GlobalTheory.SphTheta ValuativeRel
+  Classical
 open GlobalTheory.LFun (HasSatU IsSatVecU heckeVec)
 open GlobalTheory.LGrp (bcParam extProd)
-open GlobalTheory.WeilM (UG IsQuad Darboux symp sbClass SB IsWeilB IsWeilPair TestClass schr dbl diagCols)
+open GlobalTheory.WeilM
+  (UG IsQuad Darboux symp sbClass SB IsWeilB IsWeilPair TestClass schr dbl diagCols)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace (str chi IsUnramAdd)
 open scoped TensorProduct
 
@@ -17,7 +19,17 @@ noncomputable section
 
 namespace GlobalTheory.SphTheta
 
-theorem exists_linearForm_invariant_isotropic_vacuum : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}, IsHeis σ w γ W → ∀ Λ : Submodule R X, SelfDual γ Λ → ∀ s : M, s ≠ 0 → Fixes W Λ s → Submodule.span ℂ (Set.range fun x => W x s) = ⊤ → ∀ A : Submodule R X, (∀ a ∈ A, ∀ b ∈ A, γ a b = 1) → ∃ ℓ : M →ₗ[ℂ] ℂ, ℓ s = 1 ∧ ∀ a ∈ A, ∀ v, ℓ (W a v) = ℓ v := by
+theorem exists_linearForm_invariant_isotropic_vacuum
+    : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+        {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
+      IsHeis σ w γ W
+        → ∀ Λ : Submodule R X,
+          SelfDual γ Λ
+            → ∀ s : M,
+              s ≠ 0 → Fixes W Λ s → Submodule.span ℂ (Set.range fun x => W x s) = ⊤
+                → ∀ A : Submodule R X,
+                  (∀ a ∈ A, ∀ b ∈ A, γ a b = 1)
+                    → ∃ ℓ : M →ₗ[ℂ] ℂ, ℓ s = 1 ∧ ∀ a ∈ A, ∀ v, ℓ (W a v) = ℓ v := by
   intro R X M _ _ _ _ _ σ w γ W h Λ hΛ s hs hfix hspan A hA
   have key : ∀ z y, y - z ∈ Λ → W z s = γ (w • z) (y - z) • W y s := by
     intro z y hyz
@@ -32,13 +44,19 @@ theorem exists_linearForm_invariant_isotropic_vacuum : ∀ {R X M : Type} [CommR
     · simp only [rep, dif_neg hq]; exact Quotient.out_eq q
   have hrepA : ∀ q, P q → rep q ∈ A := by
     intro q hq
-    simp only [rep, dif_pos hq]; exact hq.choose_spec.1
+    simp only [rep, dif_pos hq]
+    exact hq.choose_spec.1
   let e : X ⧸ Λ → M := fun q => W (rep q) s
-  have he : ∀ z, W z s = γ (w • z) (rep (Submodule.Quotient.mk z) - z) • e (Submodule.Quotient.mk z) := by
+  have he
+      : ∀ z,
+        W z s = γ (w • z) (rep (Submodule.Quotient.mk z) - z) • e (Submodule.Quotient.mk z) := by
     intro z
     exact key z _ ((Submodule.Quotient.eq Λ).1 (hrep _))
   have hli : LinearIndependent ℂ e := by
-    refine linearIndependent_of_simultaneous_eigen e (fun q (l : Λ) => γ l (rep q)) (fun l : Λ => W l) ?_ ?_ ?_
+    refine linearIndependent_of_simultaneous_eigen e
+      (fun q (l : Λ) => γ l (rep q))
+      (fun l : Λ => W l)
+      ?_ ?_ ?_
     · intro q q' hq
       have hm : rep q - rep q' ∈ Λ := by
         rw [hΛ]
@@ -82,13 +100,15 @@ theorem exists_linearForm_invariant_isotropic_vacuum : ∀ {R X M : Type} [CommR
       by_cases hq : P q
       · have hA1 : a + rep q ∈ A := A.add_mem ha (hrepA q hq)
         have hq' : P (Submodule.Quotient.mk (a + rep q)) := ⟨_, hA1, rfl⟩
-        rw [if_pos hq, if_pos hq', hwA a ha _ (hrepA q hq), hwA _ hA1 _ (A.sub_mem (hrepA _ hq') hA1)]
+        rw [if_pos hq, if_pos hq', hwA a ha _ (hrepA q hq),
+          hwA _ hA1 _ (A.sub_mem (hrepA _ hq') hA1)]
         simp
       · have hq' : ¬ P (Submodule.Quotient.mk (a + rep q)) := by
           rintro ⟨c, hc, hce⟩
           apply hq
           refine ⟨c - a, A.sub_mem hc ha, ?_⟩
-          rw [Submodule.Quotient.mk_sub, hce, ← Submodule.Quotient.mk_sub, add_sub_cancel_left, hrep]
+          rw [Submodule.Quotient.mk_sub, hce, ← Submodule.Quotient.mk_sub, add_sub_cancel_left,
+            hrep]
         rw [if_neg hq, if_neg hq']
         simp
     exact LinearMap.congr_fun hext v

@@ -14,9 +14,11 @@ namespace GlobalTheory.JOrbit
 
 open GroundTheory.Global.Elliptic
 
-theorem exists_smul_of_homothetic (τ σ : ℍ) {c : ℂ} (hc : c ≠ 0)
-    (h : ((latticeOfTau τ).lattice : Set ℂ) = (c * ·) '' (latticeOfTau σ).lattice) :
-    ∃ γ : SL(2, ℤ), τ = γ • σ := by
+theorem exists_smul_of_homothetic
+    (τ σ : ℍ)
+    {c : ℂ}
+    (hc : c ≠ 0) (h : ((latticeOfTau τ).lattice : Set ℂ) = (c * ·) '' (latticeOfTau σ).lattice)
+    : ∃ γ : SL(2, ℤ), τ = γ • σ := by
   have m1 : (τ : ℂ) ∈ (c * ·) '' ((latticeOfTau σ).lattice : Set ℂ) := by
     rw [← h]; exact (latticeOfTau τ).ω₁_mem_lattice
   have m2 : (1 : ℂ) ∈ (c * ·) '' ((latticeOfTau σ).lattice : Set ℂ) := by
@@ -52,10 +54,12 @@ theorem exists_smul_of_homothetic (τ σ : ℍ) {c : ℂ} (hc : c ≠ 0)
   simp at k1i k1r k2i k2r k3i k3r
   have e1 : ((p * a + q * e : ℤ) : ℝ) = (1 : ℤ) := by
     apply mul_right_cancel₀ hy.ne'
-    push_cast; linear_combination -k1i
+    push_cast
+    linear_combination -k1i
   have e3 : ((r * a + s * e : ℤ) : ℝ) = (0 : ℤ) := by
     apply mul_right_cancel₀ hy.ne'
-    push_cast; linear_combination -k2i
+    push_cast
+    linear_combination -k2i
   have e2 : ((p * b + q * f : ℤ) : ℝ) = (0 : ℤ) := by
     push_cast at e1 ⊢; linear_combination -k1r - σ.re * e1
   have e4 : ((r * b + s * f : ℤ) : ℝ) = (1 : ℤ) := by
@@ -85,14 +89,13 @@ theorem exists_smul_of_homothetic (τ σ : ℍ) {c : ℂ} (hc : c ≠ 0)
   simp [γ]
   rw [eq_div_iff hne, k3]
 
-theorem exists_smul_of_E₄_E₆ :
-    ∀ τ σ : ℍ, E₄ τ ^ 3 * E₆ σ ^ 2 = E₆ τ ^ 2 * E₄ σ ^ 3 → ∃ γ : SL(2, ℤ), τ = γ • σ := by
+theorem exists_smul_of_E₄_E₆
+    : ∀ τ σ : ℍ, E₄ τ ^ 3 * E₆ σ ^ 2 = E₆ τ ^ 2 * E₄ σ ^ 3 → ∃ γ : SL(2, ℤ), τ = γ • σ := by
   intro τ σ h
   have hj : modularJ σ = modularJ τ := by
     have h1 := ModularForm.discriminant_ne_zero τ
     have h2 := ModularForm.discriminant_ne_zero σ
-    rw [modularJ, modularJ, div_eq_div_iff h2 h1,
-      ModularForm.discriminant_eq_E₄_cube_sub_E₆_sq τ,
+    rw [modularJ, modularJ, div_eq_div_iff h2 h1, ModularForm.discriminant_eq_E₄_cube_sub_E₆_sq τ,
       ModularForm.discriminant_eq_E₄_cube_sub_E₆_sq σ]
     linear_combination h / 1728
   obtain ⟨c, hc, hl⟩ := (modularJ_eq_iff σ τ).1 hj

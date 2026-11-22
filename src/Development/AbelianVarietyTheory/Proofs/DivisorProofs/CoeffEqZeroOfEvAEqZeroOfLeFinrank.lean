@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowerSeriesE
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 namespace GlobalTheory.BoxMonomials
 
@@ -17,34 +18,34 @@ variable {d : ℕ}
 noncomputable def boxPt {q : ℕ} (a : Fin d → Fin q) : Fin d →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm (fun i => (a i : ℕ))
 
-theorem boxPt_apply {q : ℕ} (a : Fin d → Fin q) (i : Fin d) : boxPt a i = a i := by
-  simp [boxPt]
+theorem boxPt_apply {q : ℕ} (a : Fin d → Fin q) (i : Fin d) : boxPt a i = a i := by simp [boxPt]
 
 theorem boxPt_injective {q : ℕ} : Function.Injective (boxPt (d := d) (q := q)) := by
   intro a b h
   funext i
   exact Fin.ext (by simpa [boxPt_apply] using DFunLike.congr_fun h i)
 
-theorem exists_boxPt {q : ℕ} (β : Fin d →₀ ℕ) (h : ∀ i, β i < q) :
-    ∃ a : Fin d → Fin q, boxPt a = β :=
+theorem exists_boxPt {q : ℕ} (β : Fin d →₀ ℕ) (h : ∀ i, β i < q)
+    : ∃ a : Fin d → Fin q, boxPt a = β :=
   ⟨fun i => ⟨β i, h i⟩, by ext i; simp [boxPt_apply]⟩
 
 end GlobalTheory.BoxMonomials
 
-
 open GlobalTheory.BoxMonomials in
-theorem GlobalTheory.coeff_eq_zero_of_evA_eq_zero_of_le_finrank :
-    ∀ (K A : Type) [Field K] [CommRing A] [Algebra K A] [Module.Finite K A] (d q : ℕ)
-      (x : Fin d → A) (hx : ∀ i, IsNilpotent (x i)) (J : Ideal A),
-      Function.Surjective (MvPolynomial.aeval (R := K) x) → (∀ i, x i ^ q ∈ J) →
-      q ^ d ≤ Module.finrank K (A ⧸ J) → ∀ f : MvPowerSeries (Fin d) K, evA K x hx f = 0 →
-      ∀ α : Fin d →₀ ℕ, α.degree < q → coeff α f = 0 := by
+theorem GlobalTheory.coeff_eq_zero_of_evA_eq_zero_of_le_finrank
+    : ∀ (K A : Type) [Field K] [CommRing A] [Algebra K A] [Module.Finite K A] (d q : ℕ)
+        (x : Fin d → A) (hx : ∀ i, IsNilpotent (x i)) (J : Ideal A),
+      Function.Surjective (MvPolynomial.aeval (R := K) x) → (∀ i, x i ^ q ∈ J)
+        → q ^ d ≤ Module.finrank K (A ⧸ J)
+        → ∀ f : MvPowerSeries (Fin d) K,
+          evA K x hx f = 0 → ∀ α : Fin d →₀ ℕ, α.degree < q → coeff α f = 0 := by
   intro K A _ _ _ _ d q x hx J hsurj hJ hdim f hf α hα
   classical
   set E : MvPowerSeries (Fin d) K →ₐ[K] A ⧸ J := (Ideal.Quotient.mkₐ K J).comp (evA K x hx)
     with hE
   have hEapp : ∀ y, E y = Ideal.Quotient.mk J (evA K x hx y) := fun y => rfl
-  have hEX : ∀ i, evA K x hx (X i) = x i := fun i => GlobalTheory.T.powerSeriesEvalAtNilpotent_X_eq_coordinate K (Fin d) A x hx i
+  have hEX : ∀ i, evA K x hx (X i) = x i := fun i =>
+    GlobalTheory.T.powerSeriesEvalAtNilpotent_X_eq_coordinate K (Fin d) A x hx i
   have hEXq : ∀ i g, E (X i ^ q * g) = 0 := by
     intro i g
     rw [hEapp, Ideal.Quotient.eq_zero_iff_mem, map_mul, map_pow, hEX]
@@ -57,11 +58,12 @@ theorem GlobalTheory.coeff_eq_zero_of_evA_eq_zero_of_le_finrank :
     rw [this]
     exact hEXq i _
   set v : (Fin d → Fin q) → A ⧸ J := fun a => E (monomial (boxPt a) 1) with hv
-  have hcoe : ∀ P : MvPolynomial (Fin d) K,
-      Ideal.Quotient.mk J (MvPolynomial.aeval x P) = E (P : MvPowerSeries (Fin d) K) := by
+  have hcoe
+      : ∀ P : MvPolynomial (Fin d) K,
+        Ideal.Quotient.mk J (MvPolynomial.aeval x P) = E (P : MvPowerSeries (Fin d) K) := by
     intro P
-    have : (Ideal.Quotient.mkₐ K J).comp (MvPolynomial.aeval x) =
-        E.comp (MvPolynomial.coeToMvPowerSeries.algHom K) := by
+    have : (Ideal.Quotient.mkₐ K J).comp (MvPolynomial.aeval x)
+        = E.comp (MvPolynomial.coeToMvPowerSeries.algHom K) := by
       apply MvPolynomial.algHom_ext
       intro i
       simp [hEapp, hEX]
@@ -109,8 +111,9 @@ theorem GlobalTheory.coeff_eq_zero_of_evA_eq_zero_of_le_finrank :
   set h : MvPowerSeries (Fin d) K := f - P with hh
   let hi : Fin d → MvPowerSeries (Fin d) K := fun i β =>
     if q ≤ β i ∧ ∀ j < i, β j < q then coeff β h else 0
-  have hic : ∀ i β, coeff β (hi i) = if q ≤ β i ∧ ∀ j < i, β j < q then coeff β h else 0 :=
-    fun i β => by rw [coeff_apply]
+  have hic
+      : ∀ i β, coeff β (hi i) = if q ≤ β i ∧ ∀ j < i, β j < q then coeff β h else 0 := fun i β => by
+    rw [coeff_apply]
   have hdiv : ∀ i, X i ^ q ∣ hi i := by
     intro i
     rw [X_pow_dvd_iff]
@@ -133,8 +136,9 @@ theorem GlobalTheory.coeff_eq_zero_of_evA_eq_zero_of_le_finrank :
       have := hb i
       omega
     · push_neg at hb
-      obtain ⟨i0, hi0mem, hmin⟩ := (Finset.univ.filter (fun i => q ≤ β i)).exists_min_image id
-        (by obtain ⟨i, hi⟩ := hb; exact ⟨i, by simp [hi]⟩)
+      obtain ⟨i0, hi0mem, hmin⟩ :=
+        (Finset.univ.filter (fun i => q ≤ β i)).exists_min_image id
+          (by obtain ⟨i, hi⟩ := hb; exact ⟨i, by simp [hi]⟩)
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, id] at hi0mem hmin
       rw [Finset.sum_eq_single i0]
       · rw [if_pos]

@@ -4,12 +4,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-theorem UpperTheory.Gal.G3.pEtGood :
-    EtnGood → EtGood := by
+theorem UpperTheory.Gal.G3.pEtGood : EtnGood → EtGood := by
   intro hE l _ B hl
   have hn := fun n => hE l B hl n 0
   refine ⟨?_, ?_⟩
@@ -24,5 +24,5 @@ theorem UpperTheory.Gal.G3.pEtGood :
     intro W r c hc J _ σ hσ hsp
     refine fun (x : Htot l (sch.obj Y)) => DFinsupp.ext fun n => ?_
     have h1 := htr n W r c hc J σ hσ hsp (x n)
-    exact h1.trans (DirectSum.sum_apply Finset.univ
-      (fun j => ((et l B).pull (σ j) (hσ j)) x) n).symm
+    exact h1.trans
+      (DirectSum.sum_apply Finset.univ (fun j => ((et l B).pull (σ j) (hσ j)) x) n).symm

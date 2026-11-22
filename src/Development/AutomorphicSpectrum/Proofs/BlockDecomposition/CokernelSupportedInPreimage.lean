@@ -7,13 +7,27 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArtinRee
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 
 namespace GlobalTheory.CompanionTheory.GE.PSupp
 
-theorem cokernel_supportedIn_preimage : ∀ {X : Scheme.{0}} (O : X.Opens) {P : X.Modules} {E : (O : Scheme.{0}).Modules}, P.IsQuasicoherent → E.IsQuasicoherent → ∀ f : P.restrict O.ι ⟶ E, Epi f → ∀ Bb : Subobject P, ∀ B : Subobject E, (B : (O : Scheme.{0}).Modules).IsQuasicoherent → (∀ (W : (O : Scheme.{0}).Opens), IsAffineOpen W → secs B W = (fun x => f.app W ((P.restrictAppIso O.ι W).inv x)) '' secs Bb (O.ι ''ᵁ W)) → ∀ (C : Set X), (∀ U : X.Opens, IsAffineOpen U → Disjoint (U : Set X) C → secs Bb U = Set.univ) → Scheme.Modules.SupportedIn (cokernel B.arrow) (O.ι.base ⁻¹' C) := by
+theorem cokernel_supportedIn_preimage
+    : ∀ {X : Scheme.{0}} (O : X.Opens) {P : X.Modules} {E : (O : Scheme.{0}).Modules},
+      P.IsQuasicoherent → E.IsQuasicoherent
+        → ∀ f : P.restrict O.ι ⟶ E,
+          Epi f
+            → ∀ Bb : Subobject P, ∀ B : Subobject E,
+              (B : (O : Scheme.{0}).Modules).IsQuasicoherent
+                → (∀ (W : (O : Scheme.{0}).Opens),
+                  IsAffineOpen W
+                    → secs B W
+                      = (fun x => f.app W ((P.restrictAppIso O.ι W).inv x)) '' secs Bb (O.ι ''ᵁ W))
+                → ∀ (C : Set X),
+                  (∀ U : X.Opens, IsAffineOpen U → Disjoint (U : Set X) C → secs Bb U = Set.univ)
+                    → Scheme.Modules.SupportedIn (cokernel B.arrow) (O.ι.base ⁻¹' C) := by
   intro X O P E hP hE f hf Bb B hB hsec C hC
   haveI : P.IsQuasicoherent := hP
   haveI : E.IsQuasicoherent := hE

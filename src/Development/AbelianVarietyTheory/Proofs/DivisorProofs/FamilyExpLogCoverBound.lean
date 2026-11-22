@@ -9,16 +9,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalModule
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES GlobalTheory.IwLevel
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES GlobalTheory.IwLevel
 open ReciprocityTheory.ChartRestriction.G.Out (RingAct)
 open GlobalTheory.TanPtMod
 
 namespace GlobalTheory.UPel.HT.ES.WTors
 
-theorem killedBy_iff_map {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ}
-    {S : Scheme.{0}} {s : S ⟶ Sp R} (o : Obj b N s) (w : Ideal (𝓞 D.F)) {T : Over S} (x : T ⟶ o.A) :
-    GlobalTheory.IwLevel.KilledBy (GlobalTheory.IwLevel.htAct o) (w.map (algebraMap (𝓞 D.F) D.O)) x ↔ KilledBy o w x := by
+theorem killedBy_iff_map
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {R : Type} [CommRing R]
+    {b : Base D R} {N : ℕ} {S : Scheme.{0}} {s : S ⟶ Sp R} (o : Obj b N s)
+    (w : Ideal (𝓞 D.F))
+    {T : Over S} (x : T ⟶ o.A)
+    : GlobalTheory.IwLevel.KilledBy (GlobalTheory.IwLevel.htAct o) (w.map (algebraMap (𝓞 D.F) D.O))
+        x
+      ↔ KilledBy o w x := by
   constructor
   · intro h a ha
     exact h _ (Ideal.mem_map_of_mem _ ha)

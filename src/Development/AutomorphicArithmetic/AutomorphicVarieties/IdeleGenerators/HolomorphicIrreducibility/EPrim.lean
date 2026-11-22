@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-theorem UpperTheory.V.Sd.ePrim :
-    UpperTheory.V.Sd.EPrim := by
+theorem UpperTheory.V.Sd.ePrim : UpperTheory.V.Sd.EPrim := by
   intro l M w φ θ χ D
   have hM := D.one_lt
   have hw := D.prime
@@ -18,8 +17,8 @@ theorem UpperTheory.V.Sd.ePrim :
     ext u
     have h1 := D.mul (u : ZMod (M * w)).val
     rw [MulChar.mul_apply, hA, hB, DirichletCharacter.changeLevel_eq_cast_of_dvd,
-      DirichletCharacter.changeLevel_eq_cast_of_dvd, ← ZMod.natCast_val, ← ZMod.natCast_val,
-      ← h1, ZMod.natCast_zmod_val]
+      DirichletCharacter.changeLevel_eq_cast_of_dvd, ← ZMod.natCast_val, ← ZMod.natCast_val, ← h1,
+      ZMod.natCast_zmod_val]
   have hAc : A.conductor = M := by
     rw [hA, DirichletCharacter.conductor_changeLevel]
     exact D.prim

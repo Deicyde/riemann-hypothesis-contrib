@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 open UpperTheory.V.Cj.A UpperTheory.V.Lit
 open scoped ContDiff
 
-theorem UpperTheory.V.Cj.A.partMem :
-    PartMem := by
+theorem UpperTheory.V.Cj.A.partMem : PartMem := by
   intro Γ V S I _ _ _ _ d G φ hφ q c
   rw [Dr.Geo.mem_Om]
   intro s
@@ -23,6 +22,5 @@ theorem UpperTheory.V.Cj.A.partMem :
     rw [Set.Finite.coe_toFinset]
     refine ⟨x, hx, fun h => hi ?_⟩
     simp only [h, zero_smul]
-  · have h : ∀ i : I, φ i s p • (c i).1 s p = 0 := fun i => by
-      rw [((c i).2 s).2 p hp, smul_zero]
+  · have h : ∀ i : I, φ i s p • (c i).1 s p = 0 := fun i => by rw [((c i).2 s).2 p hp, smul_zero]
     simp only [h, finsum_zero]

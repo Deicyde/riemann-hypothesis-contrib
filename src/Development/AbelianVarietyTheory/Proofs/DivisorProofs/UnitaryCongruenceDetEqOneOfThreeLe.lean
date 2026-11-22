@@ -7,13 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetEqOneUnit
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 open Matrix Polynomial
 
 namespace GlobalTheory.UnitaryCongruenceDetAny
 
-theorem det_eq_one : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r M : ℕ) (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E)) (γ : GL (Fin r) E), 3 ≤ M → G.det ≠ 0 → Λ.FG → Submodule.span E (Λ : Set (Fin r → E)) = ⊤ → IsUStab G Λ γ → (∀ x ∈ Λ, ∃ y ∈ Λ, (γ : Matrix (Fin r) (Fin r) E).mulVec x - x = M • y) → (γ : Matrix (Fin r) (Fin r) E).det = 1 := by
+theorem det_eq_one
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r M : ℕ) (G : Matrix (Fin r) (Fin r) E)
+        (Λ : Submodule (𝓞 E) (Fin r → E)) (γ : GL (Fin r) E),
+      3 ≤ M → G.det ≠ 0 → Λ.FG → Submodule.span E (Λ : Set (Fin r → E)) = ⊤ → IsUStab G Λ γ
+        → (∀ x ∈ Λ, ∃ y ∈ Λ, (γ : Matrix (Fin r) (Fin r) E).mulVec x - x = M • y)
+        → (γ : Matrix (Fin r) (Fin r) E).det = 1 := by
   intro E _ _ _ r M G Λ γ hM hG hfg hspan hst hcong
   classical
   obtain ⟨hherm, -⟩ := hst
@@ -26,14 +32,15 @@ theorem det_eq_one : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r M
     intro x hx
     obtain ⟨y, hy, hxy⟩ := hcong x hx
     have : A *ᵥ x = y := by
-      rw [hA, smul_mulVec, sub_mulVec, one_mulVec, hxy, ← Nat.cast_smul_eq_nsmul E,
-        smul_smul, inv_mul_cancel₀ hME, one_smul]
-    rw [this]; exact hy
+      rw [hA, smul_mulVec, sub_mulVec, one_mulVec, hxy, ← Nat.cast_smul_eq_nsmul E, smul_smul,
+        inv_mul_cancel₀ hME, one_smul]
+    rw [this]
+    exact hy
   have hAmap : A.map φ = (M : AlgebraicClosure E)⁻¹ • (g.map φ - 1) := by
     ext i j
     by_cases hij : i = j <;> simp [hA, Matrix.one_apply, hij]
-  have hroot : ∀ l ∈ (g.map φ).charpoly.roots,
-      IsIntegral ℤ ((l - 1) / (M : AlgebraicClosure E)) := by
+  have hroot
+      : ∀ l ∈ (g.map φ).charpoly.roots, IsIntegral ℤ ((l - 1) / (M : AlgebraicClosure E)) := by
     intro l hl
     have hdet : (scalar (Fin r) l - g.map φ).det = 0 := by
       rw [← Matrix.eval_charpoly]; exact (mem_roots'.1 hl).2
@@ -77,14 +84,17 @@ theorem det_eq_one : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r M
     have hMR : (3 : ℝ) ≤ M := by exact_mod_cast hM
     rw [hz₀, map_div₀, map_sub, map_one, map_natCast, norm_div, Complex.norm_natCast,
       div_lt_one (by linarith)]
-    calc ‖ψ g.det - 1‖ ≤ ‖ψ g.det‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _
+    calc
+      ‖ψ g.det - 1‖
+        ≤ ‖ψ g.det‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _
       _ = 2 := by rw [hnorm, norm_one]; norm_num
       _ < M := by linarith
   have hz0 : z₀ = 0 := by
     by_contra hne
     let α : 𝓞 E := ⟨z₀, hz₀int⟩
     have hα : α ≠ 0 := by
-      intro h; apply hne
+      intro h
+      apply hne
       have := congrArg (fun a : 𝓞 E => (a : E)) h
       exact this
     obtain ⟨σ, hσ⟩ := NumberField.exists_conjugate_one_le_norm hα

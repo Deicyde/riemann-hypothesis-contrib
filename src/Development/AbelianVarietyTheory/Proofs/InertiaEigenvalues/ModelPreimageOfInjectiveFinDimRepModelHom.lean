@@ -13,8 +13,8 @@ namespace GlobalTheory.Models.SubModel
 
 variable {k G : Type} [Field k] [Group G]
 
-theorem exists_ker (A B : Ob k G) (g : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (hg : IsHom A B g) :
-    ∃ (K : Ob k G) (i : (Fin K.m → k) →ₗ[k] (Fin A.m → k)),
+theorem exists_ker (A B : Ob k G) (g : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (hg : IsHom A B g)
+    : ∃ (K : Ob k G) (i : (Fin K.m → k) →ₗ[k] (Fin A.m → k)),
       IsHom K A i ∧ Function.Injective i ∧ Function.Exact i g := by
   have hst : ∀ s : G, LinearMap.ker g ≤ (LinearMap.ker g).comap (A.ρ s) := by
     intro s x hx
@@ -34,8 +34,8 @@ theorem exists_ker (A B : Ob k G) (g : (Fin A.m → k) →ₗ[k] (Fin B.m → k)
     · rintro ⟨x, rfl⟩
       exact (e.symm x).2
 
-theorem exists_coker (A B : Ob k G) (f : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (hf : IsHom A B f) :
-    ∃ (Q : Ob k G) (q : (Fin B.m → k) →ₗ[k] (Fin Q.m → k)),
+theorem exists_coker (A B : Ob k G) (f : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (hf : IsHom A B f)
+    : ∃ (Q : Ob k G) (q : (Fin B.m → k) →ₗ[k] (Fin Q.m → k)),
       IsHom B Q q ∧ Function.Surjective q ∧ Function.Exact f q := by
   have hst : ∀ s : G, LinearMap.range f ≤ (LinearMap.range f).comap (B.ρ s) := by
     rintro s _ ⟨x, rfl⟩
@@ -50,13 +50,19 @@ theorem exists_coker (A B : Ob k G) (f : (Fin A.m → k) →ₗ[k] (Fin B.m → 
   · intro y
     simp [Submodule.Quotient.mk_eq_zero]
 
-theorem IsHom.comp' {A B C : Ob k G} {f : (Fin A.m → k) →ₗ[k] (Fin B.m → k)}
-    {g : (Fin B.m → k) →ₗ[k] (Fin C.m → k)} (hf : IsHom A B f) (hg : IsHom B C g) : IsHom A C (g ∘ₗ f) := by
+theorem IsHom.comp'
+    {A B C : Ob k G} {f : (Fin A.m → k) →ₗ[k] (Fin B.m → k)} {g : (Fin B.m → k) →ₗ[k] (Fin C.m → k)}
+    (hf : IsHom A B f) (hg : IsHom B C g)
+    : IsHom A C (g ∘ₗ f) := by
   intro s x
   simp only [LinearMap.comp_apply]
   rw [hf, hg]
 
-theorem model_pre : ∀ {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Prime] [CharP k l] [NeZero n] {R : RingPG k l} (F : DFun R n G) {r : ℕ} {Dt : TopData n r} (M : ModTh F Dt) (A B : Ob k G) (f : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (N : Lats k n B.m), IsHom A B f → Function.Injective f → M.Model B N → M.Model A (F.pre A B f N) := by
+theorem model_pre
+    : ∀ {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Prime] [CharP k l] [NeZero n]
+        {R : RingPG k l} (F : DFun R n G) {r : ℕ} {Dt : TopData n r} (M : ModTh F Dt) (A B : Ob k G)
+        (f : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (N : Lats k n B.m),
+      IsHom A B f → Function.Injective f → M.Model B N → M.Model A (F.pre A B f N) := by
   intro k G _ _ l n _ _ _ R F r Dt M A B f N hf hfi hN
   obtain ⟨C, Nb, A₁, j, p, hb, hj, hji, hp, hps, rfl⟩ := hN
   obtain ⟨Q, q, hq, hqs, hfq⟩ := exists_coker A B f hf
@@ -67,8 +73,9 @@ theorem model_pre : ∀ {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Pri
     (LinearEquiv.ofInjective f hfi).symm.toLinearMap ∘ₗ LinearMap.codRestrict _ (p ∘ₗ i) hr
   have hfp : ∀ x, f (p' x) = p (i x) := by
     intro x
-    have := congrArg Subtype.val ((LinearEquiv.ofInjective f hfi).apply_symm_apply
-      (LinearMap.codRestrict _ (p ∘ₗ i) hr x))
+    have :=
+      congrArg Subtype.val
+        ((LinearEquiv.ofInjective f hfi).apply_symm_apply (LinearMap.codRestrict _ (p ∘ₗ i) hr x))
     exact this
   have hp' : IsHom K A p' := by
     intro s x
@@ -100,8 +107,8 @@ theorem model_pre : ∀ {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Pri
   refine ⟨C, Nb, K, j ∘ₗ i, p', hb, IsHom.comp' hi hj, hji.comp hii, hp', hp's, ?_⟩
   funext a
   ext x
-  simp only [DFun.pre, DFun.push, Submodule.mem_comap, Submodule.mem_map, LinearMap.restrictScalars_apply,
-    F.map_comp K A₁ C i j oK o1 oC hi hj a, LinearMap.comp_apply]
+  simp only [DFun.pre, DFun.push, Submodule.mem_comap, Submodule.mem_map,
+    LinearMap.restrictScalars_apply, F.map_comp K A₁ C i j oK o1 oC hi hj a, LinearMap.comp_apply]
   constructor
   · rintro ⟨y, hy, hyx⟩
     have : F.map A₁ Q (q ∘ₗ p) a y = 0 := by

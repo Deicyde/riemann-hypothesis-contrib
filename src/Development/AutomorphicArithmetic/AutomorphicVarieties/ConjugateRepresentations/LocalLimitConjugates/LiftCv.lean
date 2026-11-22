@@ -9,13 +9,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
-theorem UpperTheory.V.Cj.H.liftCv :
-    UpperTheory.V.Cj.H.LiftCv := by
+theorem UpperTheory.V.Cj.H.liftCv : UpperTheory.V.Cj.H.LiftCv := by
   intro E _ _ _ a ha μ _ _ T hT T' hL ψ φ F hψ hφ
   obtain ⟨c1, c2, -, c4⟩ := clFacts E a μ
   have hφg : φ ∈ gard μ := Submodule.subset_span ⟨ψ, F, hψ, hφ⟩
@@ -32,9 +32,10 @@ theorem UpperTheory.V.Cj.H.liftCv :
   have hd : (1 : ℂ) • T' φ + (-1 : ℂ) • φ' ∈ gard μ :=
     add_mem (Submodule.smul_mem _ _ g1) (Submodule.smul_mem _ _ hφ'g)
   obtain ⟨d1, d2, -⟩ := gardFacts E a ha μ _ hd
-  have h0 := c2 _ d1 d2 (by
-    rw [(c1 _ _ 1 (-1) (gardFacts E a ha μ _ g1).2.1 (gardFacts E a ha μ _ hφ'g).2.1).2, e]
-    simp)
+  have h0 :=
+    c2 _ d1 d2 (by
+      rw [(c1 _ _ 1 (-1) (gardFacts E a ha μ _ g1).2.1 (gardFacts E a ha μ _ hφ'g).2.1).2, e]
+      simp)
   have h1 : T' φ = φ' := by
     rw [one_smul, neg_one_smul, add_neg_eq_zero] at h0
     exact h0

@@ -18,8 +18,8 @@ abbrev Sg (ι A B : Type) := (ι × A) ⊕ (ι × B)
 def Phi (g : Matrix ι ι ℂ) (z : Sg ι A B → ℂ) : Sg ι A B → ℂ :=
   Sum.elim (fun x => z (Sum.inl x)) (fun y => ∑ j, g y.1 j * z (Sum.inr (j, y.2)))
 
-theorem eval_sub (g : Matrix ι ι ℂ) (f : PV ι A B) (z : Sg ι A B → ℂ) :
-    eval z (sub 1 g f) = eval (Phi g z) f := by
+theorem eval_sub (g : Matrix ι ι ℂ) (f : PV ι A B) (z : Sg ι A B → ℂ)
+    : eval z (sub 1 g f) = eval (Phi g z) f := by
   have h : (eval z).comp (sub (A := A) (B := B) 1 g).toRingHom = eval (Phi g z) := by
     apply MvPolynomial.ringHom_ext
     · intro r
@@ -43,12 +43,12 @@ theorem Phi_one (z : Sg ι A B → ℂ) : Phi 1 z = z := by
   · rfl
   · simp [Phi, Matrix.one_apply]
 
-theorem unitary_norm (U : Matrix ι ι ℂ) (hU : star U * U = 1) (v : ι → ℂ) :
-    ∑ i, ‖∑ j, U i j * v j‖ ^ 2 = ∑ i, ‖v i‖ ^ 2 := by
+theorem unitary_norm (U : Matrix ι ι ℂ) (hU : star U * U = 1) (v : ι → ℂ)
+    : ∑ i, ‖∑ j, U i j * v j‖ ^ 2 = ∑ i, ‖v i‖ ^ 2 := by
   apply Complex.ofReal_injective
   have key : star (U.mulVec v) ⬝ᵥ U.mulVec v = star v ⬝ᵥ v := by
-    rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, ← Matrix.star_eq_conjTranspose, hU,
-      Matrix.one_mulVec]
+    rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
+      ← Matrix.star_eq_conjTranspose, hU, Matrix.one_mulVec]
   have e1' : ∀ w : ι → ℂ, star w ⬝ᵥ w = ((∑ i, ‖w i‖ ^ 2 : ℝ) : ℂ) := by
     intro w
     simp only [dotProduct, Pi.star_apply, Complex.star_def, Complex.conj_mul']
@@ -57,8 +57,8 @@ theorem unitary_norm (U : Matrix ι ι ℂ) (hU : star U * U = 1) (v : ι → �
   rw [← e1', ← e1', ← key]
   rfl
 
-theorem norm_Phi (U : Matrix ι ι ℂ) (hU : star U * U = 1) (z : Sg ι A B → ℂ) :
-    ∑ s, ‖Phi U z s‖ ^ 2 = ∑ s, ‖z s‖ ^ 2 := by
+theorem norm_Phi (U : Matrix ι ι ℂ) (hU : star U * U = 1) (z : Sg ι A B → ℂ)
+    : ∑ s, ‖Phi U z s‖ ^ 2 = ∑ s, ‖z s‖ ^ 2 := by
   rw [Fintype.sum_sum_type, Fintype.sum_sum_type]
   congr 1
   rw [Fintype.sum_prod_type_right, Fintype.sum_prod_type_right]
@@ -83,8 +83,8 @@ def PhiL (g : Matrix ι ι ℂ) : (Sg ι A B → ℂ) →ₗ[ℝ] (Sg ι A B →
 
 theorem PhiL_apply (g : Matrix ι ι ℂ) (z : Sg ι A B → ℂ) : PhiL g z = Phi g z := rfl
 
-theorem map_PhiL (U : Matrix ι ι ℂ) (hU1 : star U * U = 1) (hU2 : U * star U = 1) :
-    Measure.map (PhiL (A := A) (B := B) U) volume = volume := by
+theorem map_PhiL (U : Matrix ι ι ℂ) (hU1 : star U * U = 1) (hU2 : U * star U = 1)
+    : Measure.map (PhiL (A := A) (B := B) U) volume = volume := by
   set L := PhiL (A := A) (B := B) U
   set S : Set (Sg ι A B → ℂ) := {z | ∑ s, ‖z s‖ ^ 2 ≤ 1}
   have hU3 : star (star U) * star U = 1 := by rw [star_star]; exact hU2
@@ -102,14 +102,20 @@ theorem map_PhiL (U : Matrix ι ι ℂ) (hU1 : star U * U = 1) (hU2 : U * star U
   have hpos : 0 < volume S := by
     have hopen : IsOpen {z : Sg ι A B → ℂ | ∑ s, ‖z s‖ ^ 2 < 1} :=
       isOpen_lt (by fun_prop) continuous_const
-    refine lt_of_lt_of_le (hopen.measure_pos volume ⟨0, by simp⟩) (measure_mono fun z hz => show ∑ s, ‖z s‖ ^ 2 ≤ 1 from le_of_lt hz)
+    refine lt_of_lt_of_le (hopen.measure_pos volume ⟨0, by simp⟩)
+      (measure_mono fun z hz => show ∑ s, ‖z s‖ ^ 2 ≤ 1 from le_of_lt hz)
   have hfin : volume S ≠ ⊤ := by
     refine ne_top_of_le_ne_top (measure_closedBall_lt_top (x := (0 : Sg ι A B → ℂ)) (r := 1)).ne
       (measure_mono fun z hz => ?_)
     rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg zero_le_one]
     intro s
-    have h1 : ‖z s‖ ^ 2 ≤ 1 := le_trans (Finset.single_le_sum (f := fun s => ‖z s‖ ^ 2)
-      (fun _ _ => by positivity) (Finset.mem_univ s)) hz
+    have h1 : ‖z s‖ ^ 2 ≤ 1 :=
+      le_trans
+        (Finset.single_le_sum
+          (f := fun s => ‖z s‖ ^ 2)
+          (fun _ _ => by positivity)
+          (Finset.mem_univ s))
+        hz
     nlinarith [norm_nonneg (z s)]
   have hdet : |LinearMap.det L| = 1 := by
     have h := Measure.addHaar_image_linearMap (volume : Measure (Sg ι A B → ℂ)) L S
@@ -121,11 +127,13 @@ theorem map_PhiL (U : Matrix ι ι ℂ) (hU1 : star U * U = 1) (hU2 : U * star U
     intro h0
     rw [h0, abs_zero] at hdet
     exact zero_ne_one hdet
-  rw [Measure.map_linearMap_addHaar_eq_smul_addHaar volume hne, abs_inv, hdet, inv_one, ENNReal.ofReal_one, one_smul]
+  rw [Measure.map_linearMap_addHaar_eq_smul_addHaar volume hne, abs_inv, hdet, inv_one,
+    ENNReal.ofReal_one, one_smul]
 
-theorem integral_Phi (U : Matrix ι ι ℂ) (hU1 : star U * U = 1) (hU2 : U * star U = 1)
-    (H : (Sg ι A B → ℂ) → ℂ) (hH : Continuous H) :
-    ∫ z, H z = ∫ z, H (Phi U z) := by
+theorem integral_Phi
+    (U : Matrix ι ι ℂ) (hU1 : star U * U = 1) (hU2 : U * star U = 1)
+    (H : (Sg ι A B → ℂ) → ℂ) (hH : Continuous H)
+    : ∫ z, H z = ∫ z, H (Phi U z) := by
   have hL : Continuous (PhiL (A := A) (B := B) U) := LinearMap.continuous_of_finiteDimensional _
   conv_lhs => rw [← map_PhiL (A := A) (B := B) U hU1 hU2]
   rw [integral_map hL.measurable.aemeasurable hH.aestronglyMeasurable]

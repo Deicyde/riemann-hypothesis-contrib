@@ -10,14 +10,14 @@ open scoped SchwartzMap
 
 namespace GlobalTheory.RealWeil
 
-theorem continuous_matrixCoeff_rhoFun : ∀ (n : ℕ) (g g' : Sch (Fin n)),
-    Continuous (fun w : Fin n ⊕ Fin n → ℝ => ∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)) := by
+theorem continuous_matrixCoeff_rhoFun
+    : ∀ (n : ℕ) (g g' : Sch (Fin n)),
+      Continuous (fun w : Fin n ⊕ Fin n → ℝ => ∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)) := by
   intro n g g'
-  have hp : Continuous (fun w : Fin n ⊕ Fin n → ℝ => pPart w) := by
-    unfold pPart; fun_prop
-  have hq : Continuous (fun w : Fin n ⊕ Fin n → ℝ => qPart w) := by
-    unfold qPart; fun_prop
-  refine continuous_of_dominated (bound := fun x => SchwartzMap.seminorm ℂ 0 0 g * ‖g' x‖) ?_ ?_ ?_ ?_
+  have hp : Continuous (fun w : Fin n ⊕ Fin n → ℝ => pPart w) := by unfold pPart; fun_prop
+  have hq : Continuous (fun w : Fin n ⊕ Fin n → ℝ => qPart w) := by unfold qPart; fun_prop
+  refine
+    continuous_of_dominated (bound := fun x => SchwartzMap.seminorm ℂ 0 0 g * ‖g' x‖) ?_ ?_ ?_ ?_
   · intro w
     exact (((continuous_phase w).mul (g.continuous.comp (continuous_id.add continuous_const))).mul
       (continuous_star.comp g'.continuous)).aestronglyMeasurable

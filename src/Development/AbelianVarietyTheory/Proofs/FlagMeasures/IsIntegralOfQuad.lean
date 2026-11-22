@@ -15,34 +15,36 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.PlacesInt
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
-theorem val_le_iff (T : LocAt F E sig p) (x y : F) :
-    valuation T.Fp (T.ιF x) ≤ valuation T.Fp (T.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
+theorem val_le_iff (T : LocAt F E sig p) (x y : F)
+    : valuation T.Fp (T.ιF x) ≤ valuation T.Fp (T.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
   rw [← T.val, (valuation T.Fp).vle_iff_le]
 
-theorem mem_int_iff (T : LocAt F E sig p) (x : F) :
-    T.ιF x ∈ 𝒪[T.Fp] ↔ p.valuation F x ≤ 1 := by
+theorem mem_int_iff (T : LocAt F E sig p) (x : F) : T.ιF x ∈ 𝒪[T.Fp] ↔ p.valuation F x ≤ 1 := by
   have h := val_le_iff T x 1
   simp only [map_one] at h
-  rw [← h]; rfl
+  rw [← h]
+  rfl
 
-theorem val_lt_one_iff (T : LocAt F E sig p) (x : F) :
-    valuation T.Fp (T.ιF x) < 1 ↔ p.valuation F x < 1 := by
+theorem val_lt_one_iff (T : LocAt F E sig p) (x : F)
+    : valuation T.Fp (T.ιF x) < 1 ↔ p.valuation F x < 1 := by
   have h := val_le_iff T 1 x
   simp only [map_one] at h
   rw [← not_le, ← not_le, h]
 
-theorem resQ_eq_absNorm (T : LocAt F E sig p) (ϖ : 𝒪[T.Fp]) (h : Irreducible ϖ) :
-    resQ ϖ = Ideal.absNorm p.asIdeal := by
+theorem resQ_eq_absNorm (T : LocAt F E sig p) (ϖ : 𝒪[T.Fp]) (h : Irreducible ϖ)
+    : resQ ϖ = Ideal.absNorm p.asIdeal := by
   haveI := T.lf
   have hm : ∀ z : 𝒪[T.Fp], z ∈ Ideal.span {ϖ} ↔ valuation T.Fp (z : T.Fp) < 1 := by
     intro z
     rw [← h.maximalIdeal_eq, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
       Valuation.Integer.not_isUnit_iff_valuation_lt_one]
-  let φ : 𝓞 F →+* 𝒪[T.Fp] := (T.ιF.comp (algebraMap (𝓞 F) F)).codRestrict _
-    (fun a => (mem_int_iff T _).2 (p.valuation_le_one a))
+  let φ : 𝓞 F →+* 𝒪[T.Fp] :=
+    (T.ιF.comp (algebraMap (𝓞 F) F)).codRestrict _
+      (fun a => (mem_int_iff T _).2 (p.valuation_le_one a))
   have hφ : ∀ a, ((φ a : 𝒪[T.Fp]) : T.Fp) = T.ιF (algebraMap (𝓞 F) F a) := fun a => rfl
   let ψ : 𝓞 F →+* 𝒪[T.Fp] ⧸ Ideal.span {ϖ} := (Ideal.Quotient.mk _).comp φ
   have hker : RingHom.ker ψ = p.asIdeal := by
@@ -67,7 +69,8 @@ theorem resQ_eq_absNorm (T : LocAt F E sig p) (ϖ : 𝒪[T.Fp]) (h : Irreducible
     refine ⟨a, ?_⟩
     change Ideal.Quotient.mk _ (φ a) = _
     rw [Ideal.Quotient.eq, hm]
-    have ha' := (val_lt_one_iff T _).2 (by simpa using ha : p.valuation F (algebraMap (𝓞 F) F a - x) < 1)
+    have ha' :=
+      (val_lt_one_iff T _).2 (by simpa using ha : p.valuation F (algebraMap (𝓞 F) F a - x) < 1)
     have : ((φ a - y : 𝒪[T.Fp]) : T.Fp) = T.ιF (algebraMap (𝓞 F) F a - x) + (T.ιF x - y) := by
       rw [map_sub, ← hφ]; push_cast; ring
     rw [this]
@@ -78,11 +81,11 @@ theorem resQ_eq_absNorm (T : LocAt F E sig p) (ϖ : 𝒪[T.Fp]) (h : Irreducible
 theorem nontrivial_Ep (T : LocAt F E sig p) : Nontrivial T.Ep :=
   Module.nontrivial_of_finrank_pos (R := T.Fp) (by rw [T.rank]; norm_num)
 
-theorem exists_trace_norm (A : Places F E sig) (x : E) :
-    ∃ t n : F, algebraMap F E t = x + sig x ∧ algebraMap F E n = x * sig x := by
+theorem exists_trace_norm (A : Places F E sig) (x : E)
+    : ∃ t n : F, algebraMap F E t = x + sig x ∧ algebraMap F E n = x * sig x := by
   obtain ⟨P, hP⟩ := Ideal.exists_maximal (𝓞 F)
-  let p : HeightOneSpectrum (𝓞 F) := ⟨P, hP.isPrime,
-    Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField F)⟩
+  let p : HeightOneSpectrum (𝓞 F) :=
+    ⟨P, hP.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField F)⟩
   haveI := nontrivial_Ep (A.loc p)
   have hss : ∀ y, sig (sig y) = y := by
     intro y
@@ -118,26 +121,30 @@ theorem exists_trace_norm (A : Places F E sig) (x : E) :
   obtain ⟨n, hn⟩ := hfix (x * sig x) (by rw [map_mul, hss, mul_comm])
   exact ⟨t, n, ht, hn⟩
 
-theorem isIntegral_of_quad {R S : Type} [CommRing R] [Nontrivial R] [CommRing S] [Algebra R S]
-    (x y : S) (t n : R) (ht : algebraMap R S t = x + y) (hn : algebraMap R S n = x * y) :
-    IsIntegral R x := by
+theorem isIntegral_of_quad
+    {R S : Type} [CommRing R] [Nontrivial R] [CommRing S] [Algebra R S]
+    (x y : S) (t n : R) (ht : algebraMap R S t = x + y) (hn : algebraMap R S n = x * y)
+    : IsIntegral R x := by
   refine ⟨Polynomial.X ^ 2 - Polynomial.C t * Polynomial.X + Polynomial.C n, ?_, ?_⟩
   · monicity!
   · simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul,
       Polynomial.eval₂_pow, Polynomial.eval₂_X, Polynomial.eval₂_C, Polynomial.eval₂_X_pow, ht, hn]
     ring
 
-theorem mem_O_iff (A : Places F E sig) (p : HeightOneSpectrum (𝓞 F)) (x : E) (t n : F)
-    (ht : algebraMap F E t = x + sig x) (hn : algebraMap F E n = x * sig x) :
-    (A.loc p).ιE x ∈ (A.L p).O ↔ p.valuation F t ≤ 1 ∧ p.valuation F n ≤ 1 := by
+theorem mem_O_iff
+    (A : Places F E sig) (p : HeightOneSpectrum (𝓞 F))
+    (x : E) (t n : F) (ht : algebraMap F E t = x + sig x) (hn : algebraMap F E n = x * sig x)
+    : (A.loc p).ιE x ∈ (A.L p).O ↔ p.valuation F t ≤ 1 ∧ p.valuation F n ≤ 1 := by
   haveI := (A.loc p).lf
   haveI := (A.loc p).char0
   haveI := nontrivial_Ep (A.loc p)
-  have ht' : algebraMap _ (A.loc p).Ep ((A.loc p).ιF t)
-      = (A.loc p).ιE x + (A.L p).cj ((A.loc p).ιE x) := by
+  have ht'
+      : algebraMap _ (A.loc p).Ep ((A.loc p).ιF t)
+        = (A.loc p).ιE x + (A.L p).cj ((A.loc p).ιE x) := by
     rw [← (A.loc p).compat, ht, map_add (f := _), A.L_cj, (A.loc p).cj_ιE]
-  have hn' : algebraMap _ (A.loc p).Ep ((A.loc p).ιF n)
-      = (A.loc p).ιE x * (A.L p).cj ((A.loc p).ιE x) := by
+  have hn'
+      : algebraMap _ (A.loc p).Ep ((A.loc p).ιF n)
+        = (A.loc p).ιE x * (A.L p).cj ((A.loc p).ιE x) := by
     rw [← (A.loc p).compat, hn, map_mul, A.L_cj, (A.loc p).cj_ιE]
   rw [← mem_int_iff (A.loc p), ← mem_int_iff (A.loc p)]
   constructor
@@ -151,29 +158,38 @@ theorem mem_O_iff (A : Places F E sig) (p : HeightOneSpectrum (𝓞 F)) (x : E) 
     rw [(A.L p).O_def]
     exact isIntegral_of_quad (R := 𝒪[(A.loc p).Fp]) _ _ ⟨_, h1⟩ ⟨_, h2⟩ ht' hn'
 
-theorem integers_local : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E} (A : Places F E sig), (∀ x : E, (∀ p, (A.loc p).ιE x ∈ (A.L p).O) ↔ ∃ o : 𝓞 E, (o : E) = x) ∧ (∀ x : E, {p | (A.loc p).ιE x ∉ (A.L p).O}.Finite) ∧ (∀ (x : F) p, (A.loc p).ιF x ∈ 𝒪[(A.loc p).Fp] ↔ p.valuation F x ≤ 1) ∧ ∀ p (ϖ : 𝒪[(A.loc p).Fp]), Irreducible ϖ → resQ ϖ = Ideal.absNorm p.asIdeal := by
+theorem integers_local
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      (∀ x : E, (∀ p, (A.loc p).ιE x ∈ (A.L p).O) ↔ ∃ o : 𝓞 E, (o : E) = x)
+        ∧ (∀ x : E, {p | (A.loc p).ιE x ∉ (A.L p).O}.Finite)
+        ∧ (∀ (x : F) p, (A.loc p).ιF x ∈ 𝒪[(A.loc p).Fp] ↔ p.valuation F x ≤ 1)
+        ∧ ∀ p (ϖ : 𝒪[(A.loc p).Fp]), Irreducible ϖ → resQ ϖ = Ideal.absNorm p.asIdeal := by
   intro F E _ _ _ _ _ sig A
-  refine ⟨fun x => ⟨fun hx => ?_, ?_⟩, fun x => ?_, fun x p => mem_int_iff _ x,
-    fun p ϖ h => resQ_eq_absNorm _ ϖ h⟩
+  refine ⟨
+    fun x => ⟨fun hx => ?_, ?_⟩,
+    fun x => ?_,
+    fun x p => mem_int_iff _ x,
+    fun p ϖ h => resQ_eq_absNorm _ ϖ h
+  ⟩
   · obtain ⟨t, n, ht, hn⟩ := exists_trace_norm A x
     have h := fun p => (mem_O_iff A p x t n ht hn).1 (hx p)
-    obtain ⟨t', ht'⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F t
-      (fun p => (h p).1)
-    obtain ⟨n', hn'⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F n
-      (fun p => (h p).2)
-    have hi : IsIntegral (𝓞 F) x := isIntegral_of_quad x (sig x) t' n'
-      (by rw [IsScalarTower.algebraMap_apply (𝓞 F) F E, ht', ht])
-      (by rw [IsScalarTower.algebraMap_apply (𝓞 F) F E, hn', hn])
+    obtain ⟨t', ht'⟩ :=
+      HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F t (fun p => (h p).1)
+    obtain ⟨n', hn'⟩ :=
+      HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F n (fun p => (h p).2)
+    have hi : IsIntegral (𝓞 F) x :=
+      isIntegral_of_quad x (sig x) t' n' (by rw [IsScalarTower.algebraMap_apply (𝓞 F) F E, ht', ht])
+        (by rw [IsScalarTower.algebraMap_apply (𝓞 F) F E, hn', hn])
     exact ⟨⟨x, isIntegral_trans (R := ℤ) x hi⟩, rfl⟩
   · rintro ⟨o, rfl⟩ p
     rw [(A.L p).O_def]
-    have h : IsIntegral ℤ ((A.loc p).ιE (o : E)) :=
-      map_isIntegral_int (A.loc p).ιE o.isIntegral_coe
+    have h : IsIntegral ℤ ((A.loc p).ιE (o : E)) := map_isIntegral_int (A.loc p).ιE o.isIntegral_coe
     exact h.tower_top
   · obtain ⟨t, n, ht, hn⟩ := exists_trace_norm A x
     refine ((HeightOneSpectrum.Support.finite (𝓞 F) t).union
       (HeightOneSpectrum.Support.finite (𝓞 F) n)).subset fun p hp => ?_
-    have hp' : ¬ ((A.loc p).ιE x ∈ (A.L p).O) := hp
+    have hp' : ¬((A.loc p).ιE x ∈ (A.L p).O) := hp
     rw [mem_O_iff A p x t n ht hn, not_and_or, not_le, not_le] at hp'
     exact hp'
 

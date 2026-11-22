@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.MI
 
-open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData Finset
+open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData Finset
 
 noncomputable section
 
@@ -99,11 +100,14 @@ lemma norm_dmin {y : Frame X.Ψ r} (hy : y ∈ X.dom) (τ : X.Ψ) (i : Fin (r + 
   rw [hc] at hre ⊢
   exact (Complex.abs_re_eq_norm.2 hre).symm
 
-theorem exponent_identity {y : Frame X.Ψ r} (hy : y ∈ X.dom) (hlast : ∀ τ, ‖dmin X.Gm y τ (Fin.last r)‖ = 1) :
-    Complex.normSq (LinearMap.det (Lβ (β0 X y))) * Complex.normSq (jacβ (β0 X y)) =
-      ∏ τ, ∏ i : Fin r, ‖dmin X.Gm y τ i.castSucc‖ ^ 2 := by
-  have hτ : ∀ τ : X.Ψ, ∏ a : Fin r, ∏ b : Fin r, δ X y τ (min a b) =
-      ∏ i : Fin r, ‖dmin X.Gm y τ i.castSucc‖ ^ 2 := by
+theorem exponent_identity
+    {y : Frame X.Ψ r} (hy : y ∈ X.dom) (hlast : ∀ τ, ‖dmin X.Gm y τ (Fin.last r)‖ = 1)
+    : Complex.normSq (LinearMap.det (Lβ (β0 X y))) * Complex.normSq (jacβ (β0 X y))
+      = ∏ τ, ∏ i : Fin r, ‖dmin X.Gm y τ i.castSucc‖ ^ 2 := by
+  have hτ
+      : ∀ τ : X.Ψ,
+        ∏ a : Fin r, ∏ b : Fin r, δ X y τ (min a b)
+          = ∏ i : Fin r, ‖dmin X.Gm y τ i.castSucc‖ ^ 2 := by
     intro τ
     have hp := prod_min_range (fδ X y τ) r
     have hl : ∏ k ∈ range r, fδ X y τ k = 1 := by

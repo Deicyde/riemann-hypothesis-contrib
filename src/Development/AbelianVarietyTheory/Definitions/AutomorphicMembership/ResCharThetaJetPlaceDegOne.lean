@@ -29,8 +29,10 @@ structure GJStage (B : Base) (C : Cols B) where
   jetL1 : ∀ i, (C.mem (jetU1 i)).C.cls (jet.j1Of i - 1)
   jetL1' : ∀ i, (C.mem (jetU1 i)).C.cls (jet.j1Of i)
   gx : GlobalExtra B.LL (Tau B.R)
-  gat : ∀ u (w : B.places.Pl), GIdx B.host (C.mem u).A.T (B.places.resChar w) →
-    Formalism.MainNotions.G.GAtP (B.places.resChar w)
+  gat
+    : ∀ u (w : B.places.Pl),
+      GIdx B.host (C.mem u).A.T (B.places.resChar w)
+        → Formalism.MainNotions.G.GAtP (B.places.resChar w)
   gat_d : ∀ u w h, (gat u w h).d = Module.finrank ℂ (C.mem u).A.Mu0
 
 end GlobalTheory.Mem

@@ -11,9 +11,12 @@ open scoped TensorProduct
 noncomputable section
 namespace GlobalTheory.LocAcyc
 
-def zmodTensorAct (U B : Type) [CommRing U] [CommRing B] [Algebra U B] (q : ℕ) (D : Type)
-    [CommRing D] [Algebra U D] (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D)) :
-    Multiplicative (ZMod q) →* (B ⊗[U] D ≃ₐ[B] B ⊗[U] D) where
+def zmodTensorAct
+    (U B : Type) [CommRing U] [CommRing B] [Algebra U B]
+    (q : ℕ)
+    (D : Type) [CommRing D] [Algebra U D]
+    (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D))
+    : Multiplicative (ZMod q) →* (B ⊗[U] D ≃ₐ[B] B ⊗[U] D) where
   toFun g := Algebra.TensorProduct.congr AlgEquiv.refl (act g)
   map_one' := by
     ext z
@@ -28,15 +31,22 @@ def zmodTensorAct (U B : Type) [CommRing U] [CommRing B] [Algebra U B] (q : ℕ)
     | tmul b x => simp
     | add z w hz hw => simp_all [map_add (f := _)]
 
-@[simp] theorem zmodTensorAct_tmul (U B : Type) [CommRing U] [CommRing B] [Algebra U B] (q : ℕ)
-    (D : Type) [CommRing D] [Algebra U D] (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D))
-    (b : B) (x : D) (g : Multiplicative (ZMod q)) :
-    zmodTensorAct U B q D act g (b ⊗ₜ x) = b ⊗ₜ act g x := by simp [zmodTensorAct]
+@[simp]
+theorem zmodTensorAct_tmul
+    (U B : Type) [CommRing U] [CommRing B] [Algebra U B]
+    (q : ℕ)
+    (D : Type) [CommRing D] [Algebra U D]
+    (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D)) (b : B) (x : D) (g : Multiplicative (ZMod q))
+    : zmodTensorAct U B q D act g (b ⊗ₜ x) = b ⊗ₜ act g x := by
+  simp [zmodTensorAct]
 
-theorem isZModTorsor_tensorBase (U B : Type) [CommRing U] [CommRing B] [Algebra U B] (q : ℕ)
-    (D : Type) [CommRing D] [Algebra U D] (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D))
-    (hq : 0 < q) (hD : IsZModTorsor U D q act) :
-    IsZModTorsor B (B ⊗[U] D) q (zmodTensorAct U B q D act) := by
+theorem isZModTorsor_tensorBase
+    (U B : Type) [CommRing U] [CommRing B] [Algebra U B]
+    (q : ℕ)
+    (D : Type) [CommRing D] [Algebra U D]
+    (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D))
+    (hq : 0 < q) (hD : IsZModTorsor U D q act)
+    : IsZModTorsor B (B ⊗[U] D) q (zmodTensorAct U B q D act) := by
   haveI : NeZero q := ⟨hq.ne'⟩
   obtain ⟨h1, h2, h3, h4⟩ := hD
   refine ⟨inferInstance, inferInstance, inferInstance, ?_⟩
@@ -60,8 +70,7 @@ theorem isZModTorsor_tensorBase (U B : Type) [CommRing U] [CommRing B] [Algebra 
       | tmul x y =>
         funext g
         simp [e1, L, e2, hΦ, hΦB, Algebra.TensorProduct.productMap_apply_tmul]
-      | add w w' hw hw' =>
-        simp only [TensorProduct.tmul_add, map_add (f := _), hw, hw']
+      | add w w' hw hw' => simp only [TensorProduct.tmul_add, map_add (f := _), hw, hw']
     | add z w hz hw => simp only [map_add (f := _), hz, hw]
   have : (ΦB : _ → _) = e2 ∘ L ∘ e1.symm := by
     funext w
@@ -69,11 +78,12 @@ theorem isZModTorsor_tensorBase (U B : Type) [CommRing U] [CommRing B] [Algebra 
   rw [this]
   exact e2.bijective.comp (L.bijective.comp e1.symm.bijective)
 
-theorem exists_isZModTorsor_tensorBase : ∀ (U B : Type) [CommRing U] [CommRing B] [Algebra U B] (q : ℕ) (D : Type) [CommRing D]
-    [Algebra U D] (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D)), 0 < q →
-    GlobalTheory.LocAcyc.IsZModTorsor U D q act →
-    ∃ actB : Multiplicative (ZMod q) →* (TensorProduct U B D ≃ₐ[B] TensorProduct U B D),
-      GlobalTheory.LocAcyc.IsZModTorsor B (TensorProduct U B D) q actB :=
+theorem exists_isZModTorsor_tensorBase
+    : ∀ (U B : Type) [CommRing U] [CommRing B] [Algebra U B] (q : ℕ) (D : Type) [CommRing D]
+        [Algebra U D] (act : Multiplicative (ZMod q) →* (D ≃ₐ[U] D)),
+      0 < q → GlobalTheory.LocAcyc.IsZModTorsor U D q act
+        → ∃ actB : Multiplicative (ZMod q) →* (TensorProduct U B D ≃ₐ[B] TensorProduct U B D),
+          GlobalTheory.LocAcyc.IsZModTorsor B (TensorProduct U B D) q actB :=
   fun U B _ _ _ q D _ _ act hq hD => ⟨_, isZModTorsor_tensorBase U B q D act hq hD⟩
 
 end GlobalTheory.LocAcyc

@@ -23,64 +23,70 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ThetaZeroDivis
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
 open GroundTheory.Heights₂.Heights TensorProduct
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Sl
 
 namespace GlobalTheory.CompanionTheory.Ar.NForm
 
 open Matrix in
-theorem periodMatrix_im {g : ℕ} (X Y : Matrix (Fin g) (Fin g) ℝ) : (periodMatrix X Y).map Complex.im = Y := by
+theorem periodMatrix_im {g : ℕ} (X Y : Matrix (Fin g) (Fin g) ℝ)
+    : (periodMatrix X Y).map Complex.im = Y := by
   ext i j; simp [periodMatrix]
 
 open Matrix in
-theorem periodMatrix_isSymm {g : ℕ} {X Y : Matrix (Fin g) (Fin g) ℝ} (hX : X.IsSymm) (hY : Y.IsSymm) :
-    (periodMatrix X Y).IsSymm := by
+theorem periodMatrix_isSymm {g : ℕ} {X Y : Matrix (Fin g) (Fin g) ℝ} (hX : X.IsSymm) (hY : Y.IsSymm)
+    : (periodMatrix X Y).IsSymm := by
   ext i j
   have h1 := congrFun (congrFun hX i) j
   have h2 := congrFun (congrFun hY i) j
   simp only [Matrix.transpose_apply] at h1 h2
   simp [periodMatrix, h1, h2]
 
-theorem hermForm_add_left {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (x y w : Fin g → ℂ) :
-    hermForm Hm (x + y) w = hermForm Hm x w + hermForm Hm y w := by
+theorem hermForm_add_left {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (x y w : Fin g → ℂ)
+    : hermForm Hm (x + y) w = hermForm Hm x w + hermForm Hm y w := by
   simp [hermForm, add_dotProduct]
 
-theorem hermForm_add_right {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (w x y : Fin g → ℂ) :
-    hermForm Hm w (x + y) = hermForm Hm w x + hermForm Hm w y := by
+theorem hermForm_add_right {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (w x y : Fin g → ℂ)
+    : hermForm Hm w (x + y) = hermForm Hm w x + hermForm Hm w y := by
   simp [hermForm, Matrix.mulVec_add, dotProduct_add]
 
-theorem hermForm_zsmul_left {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (k : ℤ) (x w : Fin g → ℂ) :
-    hermForm Hm (k • x) w = k * hermForm Hm x w := by
+theorem hermForm_zsmul_left {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (k : ℤ) (x w : Fin g → ℂ)
+    : hermForm Hm (k • x) w = k * hermForm Hm x w := by
   rw [← Int.cast_smul_eq_zsmul ℂ k x]
   simp [hermForm, smul_dotProduct]
 
-theorem hermForm_zsmul_right {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (k : ℤ) (w x : Fin g → ℂ) :
-    hermForm Hm w (k • x) = k * hermForm Hm w x := by
+theorem hermForm_zsmul_right {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (k : ℤ) (w x : Fin g → ℂ)
+    : hermForm Hm w (k • x) = k * hermForm Hm w x := by
   rw [← Int.cast_smul_eq_zsmul ℂ k x]
-  have h : star ((k : ℂ) • x) = (k : ℂ) • star x := by
-    ext i; simp
+  have h : star ((k : ℂ) • x) = (k : ℂ) • star x := by ext i; simp
   simp [hermForm, h, Matrix.mulVec_smul, dotProduct_smul]
 
-theorem hermForm_sum_left {g : ℕ} {J : Type} (Hm : Matrix (Fin g) (Fin g) ℂ) (s : Finset J)
-    (f : J → Fin g → ℂ) (w : Fin g → ℂ) : hermForm Hm (∑ α ∈ s, f α) w = ∑ α ∈ s, hermForm Hm (f α) w := by
+theorem hermForm_sum_left
+    {g : ℕ} {J : Type}
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (s : Finset J) (f : J → Fin g → ℂ) (w : Fin g → ℂ)
+    : hermForm Hm (∑ α ∈ s, f α) w = ∑ α ∈ s, hermForm Hm (f α) w := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [hermForm]
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, hermForm_add_left, ih]
 
-theorem hermForm_sum_right {g : ℕ} {J : Type} (Hm : Matrix (Fin g) (Fin g) ℂ) (s : Finset J)
-    (f : J → Fin g → ℂ) (w : Fin g → ℂ) : hermForm Hm w (∑ α ∈ s, f α) = ∑ α ∈ s, hermForm Hm w (f α) := by
+theorem hermForm_sum_right
+    {g : ℕ} {J : Type}
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (s : Finset J) (f : J → Fin g → ℂ) (w : Fin g → ℂ)
+    : hermForm Hm w (∑ α ∈ s, f α) = ∑ α ∈ s, hermForm Hm w (f α) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [hermForm]
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, hermForm_add_right, ih]
 
-theorem hermForm_sum {g : ℕ} {J : Type} [Fintype J] (Hm : Matrix (Fin g) (Fin g) ℂ) (v : J → Fin g → ℂ)
-    (m n : J → ℤ) :
-    hermForm Hm (∑ α, m α • v α) (∑ β, n β • v β) =
-      ∑ α, ∑ β, ((m α * n β : ℤ) : ℂ) * hermForm Hm (v α) (v β) := by
+theorem hermForm_sum
+    {g : ℕ} {J : Type} [Fintype J] (Hm : Matrix (Fin g) (Fin g) ℂ) (v : J → Fin g → ℂ) (m n : J → ℤ)
+    : hermForm Hm (∑ α, m α • v α) (∑ β, n β • v β)
+      = ∑ α, ∑ β, ((m α * n β : ℤ) : ℂ) * hermForm Hm (v α) (v β) := by
   rw [hermForm_sum_left]
   refine Finset.sum_congr rfl fun α _ => ?_
   rw [hermForm_sum_right]
@@ -89,45 +95,68 @@ theorem hermForm_sum {g : ℕ} {J : Type} [Fintype J] (Hm : Matrix (Fin g) (Fin 
   push_cast
   ring
 
-theorem mulVec_zsum {g : ℕ} {J : Type} [Fintype J] (h : Matrix (Fin g) (Fin g) ℂ) (v : J → Fin g → ℂ)
-    (m : J → ℤ) : h.mulVec (∑ α, m α • v α) = ∑ α, m α • h.mulVec (v α) := by
-  calc h.mulVec (∑ α, m α • v α) = Matrix.mulVecLin h (∑ α, m α • v α) := rfl
+theorem mulVec_zsum
+    {g : ℕ} {J : Type} [Fintype J] (h : Matrix (Fin g) (Fin g) ℂ) (v : J → Fin g → ℂ) (m : J → ℤ)
+    : h.mulVec (∑ α, m α • v α) = ∑ α, m α • h.mulVec (v α) := by
+  calc
+    h.mulVec (∑ α, m α • v α)
+      = Matrix.mulVecLin h (∑ α, m α • v α) := rfl
     _ = ∑ α, Matrix.mulVecLin h (m α • v α) := map_sum _ _ _
     _ = ∑ α, m α • h.mulVec (v α) := Finset.sum_congr rfl fun α _ => by rw [map_zsmul]; rfl
 
-theorem zsum_single {g : ℕ} (m : Fin g → ℤ) :
-    (∑ i, m i • (Pi.single i 1 : Fin g → ℂ)) = fun i => (m i : ℂ) := by
+theorem zsum_single {g : ℕ} (m : Fin g → ℤ)
+    : (∑ i, m i • (Pi.single i 1 : Fin g → ℂ)) = fun i => (m i : ℂ) := by
   ext k
   simp [Finset.sum_apply, Pi.single_apply]
 
-theorem exists_reduced (g : ℕ) [NeZero g] (Λ : Submodule ℤ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ)
-    (hd : DiscreteTopology Λ) (hs : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤) (hH : Hm.IsHermitian)
-    (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re)
+theorem exists_reduced
+    (g : ℕ) [NeZero g]
+    (Λ : Submodule ℤ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ)
+    (hd : DiscreteTopology Λ) (hs : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤)
+    (hH : Hm.IsHermitian) (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re)
     (hint : ∀ l l' : Λ, ∃ k : ℤ, (hermForm Hm (l : Fin g → ℂ) (l' : Fin g → ℂ)).im = k)
-    (hdual : ∀ w : Fin g → ℂ, (∀ l : Λ, ∃ k : ℤ, (hermForm Hm w (l : Fin g → ℂ)).im = k) → w ∈ Λ) :
-    ∃ (bs : Module.Basis (Fin g ⊕ Fin g) ℤ Λ) (h : Matrix (Fin g) (Fin g) ℂ)
-      (X Y : Matrix (Fin g) (Fin g) ℝ) (ρ : ℝ),
-      IsUnit h.det ∧ X.IsSymm ∧ Y.PosDef ∧ IsReducedImaginaryPart Y ρ ∧
-      (∀ z w, hermForm Hm z w = hermForm (GlobalTheory.CanTh.imInv (periodMatrix X Y)) (h.mulVec z) (h.mulVec w)) ∧
-      (∀ x : Λ, h.mulVec (x : Fin g → ℂ) = (fun i => ((bs.repr x (Sum.inl i) : ℤ) : ℂ)) +
-        (periodMatrix X Y).mulVec fun i => ((bs.repr x (Sum.inr i) : ℤ) : ℂ)) ∧
-      (∀ x y : Λ, (hermForm Hm (x : Fin g → ℂ) (y : Fin g → ℂ)).im =
-        ((∑ i, (bs.repr x (Sum.inr i) * bs.repr y (Sum.inl i) -
-          bs.repr x (Sum.inl i) * bs.repr y (Sum.inr i)) : ℤ) : ℝ)) := by
-  obtain ⟨bs0, hJ0⟩ := GlobalTheory.T.exists_symplectic_basis_principal_polarization g Λ Hm hd hs hH hpos hint hdual
-  obtain ⟨h0, X0, Y0, -, hX0, hY0, -, -, -, hG0⟩ := GlobalTheory.T.hermitian_form_period_matrix_normal_form g Hm (fun α => (bs0 α : Fin g → ℂ)) hH hpos hJ0
+    (hdual : ∀ w : Fin g → ℂ, (∀ l : Λ, ∃ k : ℤ, (hermForm Hm w (l : Fin g → ℂ)).im = k) → w ∈ Λ)
+    : ∃ (bs : Module.Basis (Fin g ⊕ Fin g) ℤ Λ) (h : Matrix (Fin g) (Fin g) ℂ)
+        (X Y : Matrix (Fin g) (Fin g) ℝ) (ρ : ℝ),
+      IsUnit h.det ∧ X.IsSymm ∧ Y.PosDef ∧ IsReducedImaginaryPart Y ρ
+        ∧ (∀ z w,
+          hermForm Hm z w
+            = hermForm (GlobalTheory.CanTh.imInv (periodMatrix X Y)) (h.mulVec z) (h.mulVec w))
+        ∧ (∀ x : Λ,
+          h.mulVec (x : Fin g → ℂ)
+            = (fun i => ((bs.repr x (Sum.inl i) : ℤ) : ℂ))
+              + (periodMatrix X Y).mulVec fun i => ((bs.repr x (Sum.inr i) : ℤ) : ℂ))
+        ∧ (∀ x y : Λ,
+          (hermForm Hm (x : Fin g → ℂ) (y : Fin g → ℂ)).im
+            = ((∑ i, (bs.repr x (Sum.inr i) * bs.repr y (Sum.inl i) -
+                bs.repr x (Sum.inl i) * bs.repr y (Sum.inr i))
+                : ℤ)
+              : ℝ)) := by
+  obtain ⟨bs0, hJ0⟩ :=
+    GlobalTheory.T.exists_symplectic_basis_principal_polarization g Λ Hm hd hs hH hpos hint hdual
+  obtain ⟨h0, X0, Y0, -, hX0, hY0, -, -, -, hG0⟩ :=
+    GlobalTheory.T.hermitian_form_period_matrix_normal_form g Hm
+      (fun α => (bs0 α : Fin g → ℂ))
+      hH hpos hJ0
   have hS := (SiegelCoordinates.intersectionNumber_baseChange g).1 X0 Y0 hX0 hY0
   obtain ⟨bs, ρ, hρ, hρ2, hJ, hfirst, hmin, hdet⟩ :=
-    GlobalTheory.T.real_part_gram_in_symplectic_group g Λ Hm bs0 hH hpos hJ0 (by rw [hG0]; exact hS.1) (by rw [hG0]; exact hS.2)
-  obtain ⟨h, X, Y, hh, hX, hY, hHh, hin, hinr, -⟩ := GlobalTheory.T.hermitian_form_period_matrix_normal_form g Hm (fun α => (bs α : Fin g → ℂ)) hH hpos hJ
+    GlobalTheory.T.real_part_gram_in_symplectic_group g Λ Hm bs0 hH hpos hJ0
+      (by rw [hG0]; exact hS.1) (by rw [hG0]; exact hS.2)
+  obtain ⟨h, X, Y, hh, hX, hY, hHh, hin, hinr, -⟩ :=
+    GlobalTheory.T.hermitian_form_period_matrix_normal_form g Hm
+      (fun α => (bs α : Fin g → ℂ))
+      hH hpos hJ
   have hτim : (periodMatrix X Y).map Complex.im = Y := periodMatrix_im X Y
   have hexp : ∀ x : Λ, (x : Fin g → ℂ) = ∑ α, (bs.repr x α) • (bs α : Fin g → ℂ) := fun x => by
     have := congrArg Subtype.val (bs.sum_repr x)
     simp only [AddSubmonoidClass.coe_finsetSum, SetLike.val_smul] at this
     exact this.symm
-  have hYe : ∀ i j, Y⁻¹ i j = (hermForm Hm (bs (Sum.inl i) : Fin g → ℂ) (bs (Sum.inl j) : Fin g → ℂ)).re := by
+  have hYe
+      : ∀ i j,
+        Y⁻¹ i j = (hermForm Hm (bs (Sum.inl i) : Fin g → ℂ) (bs (Sum.inl j) : Fin g → ℂ)).re := by
     intro i j
-    rw [hHh, hin, hin, hermForm, GlobalTheory.SiegelNormalForm.form_single, GlobalTheory.CanTh.imInv, hτim]
+    rw [hHh, hin, hin, hermForm, GlobalTheory.SiegelNormalForm.form_single,
+      GlobalTheory.CanTh.imInv, hτim]
     simp
   have hred : IsReducedImaginaryPart Y ρ := by
     refine ⟨hρ, hρ2, by rw [hYe]; exact hfirst, fun l hl => ?_, ?_⟩
@@ -147,13 +176,15 @@ theorem exists_reduced (g : ℕ) [NeZero g] (Λ : Submodule ℤ (Fin g → ℂ))
       have := hmin x hx0
       rw [hHh, hhx, hermForm, GlobalTheory.CanTh.imInv, hτim] at this
       convert this using 1
-      have hst : star (fun i => (l i : ℂ)) = fun i : Fin g => (l i : ℂ) := by
-        ext i; simp
+      have hst : star (fun i => (l i : ℂ)) = fun i : Fin g => (l i : ℂ) := by ext i; simp
       rw [hst]
-      simp only [qf, intVec, dotProduct, Matrix.mulVec, Matrix.map_apply, Finset.mul_sum, Complex.re_sum]
+      simp only [qf, intVec, dotProduct, Matrix.mulVec, Matrix.map_apply, Finset.mul_sum,
+        Complex.re_sum]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       simp
-    · have : Y⁻¹ = Matrix.of fun i j : Fin g => (hermForm Hm (bs (Sum.inl i) : Fin g → ℂ) (bs (Sum.inl j) : Fin g → ℂ)).re := by
+    · have : Y⁻¹
+          = Matrix.of fun i j : Fin g =>
+            (hermForm Hm (bs (Sum.inl i) : Fin g → ℂ) (bs (Sum.inl j) : Fin g → ℂ)).re := by
         ext i j; simp [hYe]
       rw [this]
       simpa using hdet
@@ -162,16 +193,19 @@ theorem exists_reduced (g : ℕ) [NeZero g] (Λ : Submodule ℤ (Fin g → ℂ))
     simp only [hin, hinr]
     rw [zsum_single (fun i => bs.repr x (Sum.inl i))]
     congr 1
-    have e : (fun i => ((bs.repr x (Sum.inr i) : ℤ) : ℂ)) = ∑ i, bs.repr x (Sum.inr i) • (Pi.single i 1 : Fin g → ℂ) :=
+    have e
+        : (fun i => ((bs.repr x (Sum.inr i) : ℤ) : ℂ))
+          = ∑ i, bs.repr x (Sum.inr i) • (Pi.single i 1 : Fin g → ℂ) :=
       (zsum_single (fun i => bs.repr x (Sum.inr i))).symm
     rw [e, mulVec_zsum]
   · rw [hexp x, hexp y, hermForm_sum, Complex.im_sum]
     simp only [Complex.im_sum]
     have hc : ∀ (k : ℤ) (c : ℂ), ((k : ℂ) * c).im = (k : ℝ) * c.im := fun k c => by simp
-    simp only [hc, hJ, Fintype.sum_sum_type, Matrix.J, Matrix.fromBlocks_apply₁₁, Matrix.fromBlocks_apply₁₂,
-      Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂, Matrix.zero_apply, Matrix.neg_apply, Matrix.one_apply]
-    simp only [mul_zero, Finset.sum_const_zero, zero_add, add_zero, mul_neg, mul_ite, _root_.mul_one,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.sum_neg_distrib]
+    simp only [hc, hJ, Fintype.sum_sum_type, Matrix.J, Matrix.fromBlocks_apply₁₁,
+      Matrix.fromBlocks_apply₁₂, Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂,
+      Matrix.zero_apply, Matrix.neg_apply, Matrix.one_apply]
+    simp only [mul_zero, Finset.sum_const_zero, zero_add, add_zero, mul_neg, mul_ite,
+      _root_.mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.sum_neg_distrib]
     push_cast
     rw [Finset.sum_sub_distrib]
     ring

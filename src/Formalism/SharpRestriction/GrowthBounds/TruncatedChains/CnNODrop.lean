@@ -10,8 +10,10 @@ open Formalism.MainNotions.G
 
 variable {n : ℕ}
 
-theorem cn_front {j : ℕ} {l : List (Fin n × Fin n)} (h : NO n j l) (a b : Fin n) (ha : a.val = j)
-    (hab : a.val + 1 = b.val) : ∃ l', Steps n l ((a, b) :: l') := by
+theorem cn_front
+    {j : ℕ} {l : List (Fin n × Fin n)} (h : NO n j l)
+    (a b : Fin n) (ha : a.val = j) (hab : a.val + 1 = b.val)
+    : ∃ l', Steps n l ((a, b) :: l') := by
   obtain ⟨lF, lG, hs, hNO, hF, hG⟩ := cn_sort (meas j l + 1) l h (Nat.lt_succ_self _)
   cases lF with
   | nil =>
@@ -42,8 +44,10 @@ private lemma idxOf_append_of_not_mem_beq {α : Type} [BEq α] [LawfulBEq α] (l
     have hxt : x ∉ t := fun h => hx (List.mem_cons_of_mem _ h)
     simp [List.idxOf_cons, ih hxt, hxy] <;> omega
 
-theorem cn_NO_drop {j : ℕ} {lF lG : List (Fin n × Fin n)} (h : NO n j (lF ++ lG)) (hF : ∀ r ∈ lF, r.1.val = j)
-    (hG : ∀ r ∈ lG, r.1.val ≠ j) : NO n (j + 1) lG := by
+theorem cn_NO_drop
+    {j : ℕ} {lF lG : List (Fin n × Fin n)}
+    (h : NO n j (lF ++ lG)) (hF : ∀ r ∈ lF, r.1.val = j) (hG : ∀ r ∈ lG, r.1.val ≠ j)
+    : NO n (j + 1) lG := by
   obtain ⟨hnd, hrange, hall, hord⟩ := h
   have hmem : ∀ x y : Fin n, j + 1 ≤ x.val → (x, y) ∉ lF := fun x y hx hm => by
     have h1 := hF _ hm
@@ -60,20 +64,22 @@ theorem cn_NO_drop {j : ℕ} {lF lG : List (Fin n × Fin n)} (h : NO n j (lF ++ 
     · exact h1
   · intro a b c ha hab hbc
     have ho := hord a b c (by omega) hab hbc
-    rw [idxOf_append_of_not_mem_beq lF lG _ (hmem a b ha), idxOf_append_of_not_mem_beq lF lG _ (hmem a c ha),
-      idxOf_append_of_not_mem_beq lF lG _ (hmem b c (by omega))] at ho
+    rw [idxOf_append_of_not_mem_beq lF lG _ (hmem a b ha),
+        idxOf_append_of_not_mem_beq lF lG _ (hmem a c ha),
+        idxOf_append_of_not_mem_beq lF lG _ (hmem b c (by omega))]
+      at ho
     omega
 
-theorem cn_back {j : ℕ} {l : List (Fin n × Fin n)} (h : NO n j l) :
-    ∃ l' R, Steps n l (l' ++ R) ∧ NO n (j + 1) l' := by
+theorem cn_back {j : ℕ} {l : List (Fin n × Fin n)} (h : NO n j l)
+    : ∃ l' R, Steps n l (l' ++ R) ∧ NO n (j + 1) l' := by
   obtain ⟨lF, lG, hs, hno, hF, hG⟩ :=
     cn_sort (meas j l.reverse + 1) l.reverse (cn_NO_rev h) (Nat.lt_succ_self _)
   refine ⟨lG.reverse, lF.reverse, ?_, cn_NO_rev (cn_NO_drop hno hF hG)⟩
   have h2 := cn_steps_rev hs
   rwa [List.reverse_reverse, List.reverse_append] at h2
 
-theorem cn_iter {ord : List (Fin n × Fin n)} (h : NO n 0 ord) :
-    ∀ j : ℕ, ∃ l' R, Steps n ord (l' ++ R) ∧ NO n j l' := by
+theorem cn_iter {ord : List (Fin n × Fin n)} (h : NO n 0 ord)
+    : ∀ j : ℕ, ∃ l' R, Steps n ord (l' ++ R) ∧ NO n j l' := by
   intro j
   induction j with
   | zero => exact ⟨ord, [], by simpa using (Relation.ReflTransGen.refl : Steps n ord ord), h⟩

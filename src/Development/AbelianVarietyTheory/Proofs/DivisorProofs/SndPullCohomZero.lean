@@ -13,10 +13,13 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Preim
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -27,37 +30,51 @@ namespace GlobalTheory.PtExt
 
 variable {R : Type} [CommRing R]
 
-theorem spOver_epsHom_ptV {A B : Over (Sp R)} [GrpObj A] [GrpObj B] (v : epsR R ⟶ B)
-    {D D' : Type} [CommRing D] [Algebra R D] [CommRing D'] [Algebra R D'] (φ : D →ₐ[R] D') (x : Pt A D) :
-    (spOver (epsHom φ) ≫ ptV v x : Pt (A ⊗ B) (DualNumber D')) =
-      ptV v (spOver φ ≫ x : Pt A D') := by
-  have h1 : (epsHom φ).comp (TrivSqZeroExt.inlAlgHom R D D) = (TrivSqZeroExt.inlAlgHom R D' D').comp φ :=
+theorem spOver_epsHom_ptV
+    {A B : Over (Sp R)} [GrpObj A] [GrpObj B]
+    (v : epsR R ⟶ B)
+    {D D' : Type} [CommRing D] [Algebra R D] [CommRing D'] [Algebra R D']
+    (φ : D →ₐ[R] D') (x : Pt A D)
+    : (spOver (epsHom φ) ≫ ptV v x : Pt (A ⊗ B) (DualNumber D'))
+      = ptV v (spOver φ ≫ x : Pt A D') := by
+  have h1
+      : (epsHom φ).comp (TrivSqZeroExt.inlAlgHom R D D)
+        = (TrivSqZeroExt.inlAlgHom R D' D').comp φ :=
     AlgHom.ext fun a ↦ by simp [epsHom]
   have h2 : (epsHom φ).comp (EpsWeil.epsMap R D) = EpsWeil.epsMap R D' :=
     DualNumber.algHom_ext (by simp [epsHom, EpsWeil.epsMap, DualNumber.lift_apply_apply])
   simp only [ptV, comp_lift, ← Category.assoc, spOver_comp, h1, h2]
 
-theorem fst_ptV {A B : Over (Sp R)} [GrpObj A] [GrpObj B] {v : epsR R ⟶ B} (hv : IsTangent v)
-    {D : Type} [CommRing D] [Algebra R D] (x : Pt A D) :
-    (spOver (TrivSqZeroExt.fstHom R D D) ≫ ptV v x : Pt (A ⊗ B) D) = pt0 B x := by
+theorem fst_ptV
+    {A B : Over (Sp R)} [GrpObj A] [GrpObj B]
+    {v : epsR R ⟶ B} (hv : IsTangent v)
+    {D : Type} [CommRing D] [Algebra R D]
+    (x : Pt A D)
+    : (spOver (TrivSqZeroExt.fstHom R D D) ≫ ptV v x : Pt (A ⊗ B) D) = pt0 B x := by
   have h1 : (TrivSqZeroExt.fstHom R D D).comp (TrivSqZeroExt.inlAlgHom R D D) = AlgHom.id R D :=
     AlgHom.ext fun _ ↦ rfl
-  have h2 : (TrivSqZeroExt.fstHom R D D).comp (EpsWeil.epsMap R D) =
-      (Algebra.ofId R D).comp (TrivSqZeroExt.fstHom R R R) :=
+  have h2
+      : (TrivSqZeroExt.fstHom R D D).comp (EpsWeil.epsMap R D)
+        = (Algebra.ofId R D).comp (TrivSqZeroExt.fstHom R R R) :=
     DualNumber.algHom_ext (by simp [EpsWeil.epsMap, DualNumber.lift_apply_apply])
   rw [ptV, pt0, comp_lift, ← Category.assoc, spOver_comp, h1, spOver_id, Category.id_comp,
     ← Category.assoc, spOver_comp, h2, ← spOver_comp, Category.assoc]
   congr 1
   ext1
-  rw [Over.comp_left, Over.comp_left, spOver_left, spOver_left, Hom.one_def, Over.comp_left, Over.toUnit_left]
+  rw [Over.comp_left, Over.comp_left, spOver_left, spOver_left, Hom.one_def, Over.comp_left,
+    Over.toUnit_left]
   have := hv
   unfold IsTangent at this
   erw [this]
   rfl
 
-theorem sm_ptV {A B : Over (Sp R)} [GrpObj A] [GrpObj B] (P : LB (A ⊗ B).left) {v : epsR R ⟶ B}
-    (hv : IsTangent v) {D : Type} [CommRing D] [Algebra R D] {x : Pt A D}
-    (hx : Sm (chartsA (A := A) (B := B) P) x) : Sm (X := A ⊗ B) P.U (ptV v x) := by
+theorem sm_ptV
+    {A B : Over (Sp R)} [GrpObj A] [GrpObj B]
+    (P : LB (A ⊗ B).left)
+    {v : epsR R ⟶ B} (hv : IsTangent v)
+    {D : Type} [CommRing D] [Algebra R D]
+    {x : Pt A D} (hx : Sm (chartsA (A := A) (B := B) P) x)
+    : Sm (X := A ⊗ B) P.U (ptV v x) := by
   obtain ⟨i, hi⟩ := hx
   refine ⟨i, ?_⟩
   have hsurj : Surjective (spOver (TrivSqZeroExt.fstHom R D D)).left := by
@@ -69,13 +86,16 @@ theorem sm_ptV {A B : Over (Sp R)} [GrpObj A] [GrpObj B] (P : LB (A ⊗ B).left)
     have hb' : b.fst = 0 := hb
     rw [Ideal.mem_bot]
     ext <;> simp [ha', hb']
-  have e : (spOver (TrivSqZeroExt.fstHom R D D) ≫ ptV v x : Pt (A ⊗ B) D).left =
-      x.left ≫ (AbDual.inl A B).left := by
+  have e
+      : (spOver (TrivSqZeroExt.fstHom R D D) ≫ ptV v x : Pt (A ⊗ B) D).left
+        = x.left ≫ (AbDual.inl A B).left := by
     rw [fst_ptV hv, ← Over.comp_left, pt0, AbDual.inl, comp_lift, Category.comp_id, MonObj.comp_one]
-  have := GlobalTheory.TorusLift.preimage_eq_top_of_surjective (spOver (TrivSqZeroExt.fstHom R D D)).left
-    (ptV v x).left (U := P.U i) (by
-      rw [← Over.comp_left, e, Scheme.Hom.comp_preimage]
-      exact top_unique hi)
+  have :=
+    GlobalTheory.TorusLift.preimage_eq_top_of_surjective (spOver (TrivSqZeroExt.fstHom R D D)).left
+      (ptV v x).left (U := P.U i)
+      (by
+        rw [← Over.comp_left, e, Scheme.Hom.comp_preimage]
+        exact top_unique hi)
   exact this.ge
 
 end GlobalTheory.PtExt

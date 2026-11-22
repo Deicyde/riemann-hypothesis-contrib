@@ -18,58 +18,65 @@ namespace SectionSum
 
 open MvPolynomial MeasureTheory
 
-theorem sImg_indep_finite (K Ω : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] (D N : ℕ)
-    (j₀ : Fin (N + 1)) (x : Fin N → Ω) (hfg : (⊤ : IntermediateField K Ω).FG)
-    (htr : Algebra.trdeg K Ω = D)
-    (hJ : ∃ J : Fin D → Fin N, LinearIndependent Ω fun k => KaehlerDifferential.D K Ω (x (J k))) :
-    Function.Injective (sHom (K := K) (D := D) j₀ x) ∧
-      FiniteDimensional (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x)))
-        (OmS Ω D N) := by
+theorem sImg_indep_finite
+    (K Ω : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω]
+    (D N : ℕ) (j₀ : Fin (N + 1)) (x : Fin N → Ω)
+    (hfg : (⊤ : IntermediateField K Ω).FG) (htr : Algebra.trdeg K Ω = D)
+    (hJ : ∃ J : Fin D → Fin N, LinearIndependent Ω fun k => KaehlerDifferential.D K Ω (x (J k)))
+    : Function.Injective (sHom (K := K) (D := D) j₀ x) ∧ FiniteDimensional
+      (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))) (OmS Ω D N) := by
   have hfs := ReciprocityTheory.MultiplicativeHeights.Closed.fieldOfS K Ω D N x hfg htr hJ
-  let e : TVar D N ≃ TVar D N :=
-    Equiv.prodCongr (Equiv.refl _) (Fin.cycleRange j₀).symm
-  have key : (ReciprocityTheory.MultiplicativeHeights.sImage (D := D) x) = (sImg (D := D) j₀ x) ∘ e := by
+  let e : TVar D N ≃ TVar D N := Equiv.prodCongr (Equiv.refl _) (Fin.cycleRange j₀).symm
+  have key
+      : (ReciprocityTheory.MultiplicativeHeights.sImage (D := D) x) = (sImg (D := D) j₀ x) ∘ e := by
     funext p
     obtain ⟨i, j⟩ := p
     refine Fin.cases ?_ (fun k => ?_) j
     · simp [e, ReciprocityTheory.MultiplicativeHeights.sImage, sImg, Fin.cycleRange_symm_zero]
     · simp [e, ReciprocityTheory.MultiplicativeHeights.sImage, sImg, Fin.cycleRange_symm_succ]
-  have hrange : Set.range (ReciprocityTheory.MultiplicativeHeights.sImage (D := D) x) = Set.range (sImg (D := D) j₀ x) := by
+  have hrange
+      : Set.range (ReciprocityTheory.MultiplicativeHeights.sImage (D := D) x)
+        = Set.range (sImg (D := D) j₀ x) := by
     rw [key, EquivLike.range_comp]
   refine ⟨?_, ?_⟩
-  · have hind : AlgebraicIndependent K (ReciprocityTheory.MultiplicativeHeights.sImage (D := D) x) := hfs.1
+  · have hind
+        : AlgebraicIndependent K (ReciprocityTheory.MultiplicativeHeights.sImage (D := D) x) :=
+      hfs.1
     rw [key] at hind
     have h2 := hind.comp _ e.symm.injective
-    have h3 : AlgebraicIndependent K (sImg (D := D) j₀ x) := by
-      simpa [Function.comp_def] using h2
+    have h3 : AlgebraicIndependent K (sImg (D := D) j₀ x) := by simpa [Function.comp_def] using h2
     exact h3
   · have h2 := hfs.2
     rw [hrange] at h2
     exact h2
 
-noncomputable def liftS {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : ℕ}
-    {j₀ : Fin (N + 1)} {x : Fin N → Ω} (h : Function.Injective (sHom (K := K) (D := D) j₀ x)) :
-    FractionRing (MvPolynomial (TVar D N) K) →+* OmS Ω D N :=
+noncomputable def liftS
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    {D N : ℕ} {j₀ : Fin (N + 1)} {x : Fin N → Ω}
+    (h : Function.Injective (sHom (K := K) (D := D) j₀ x))
+    : FractionRing (MvPolynomial (TVar D N) K) →+* OmS Ω D N :=
   IsFractionRing.lift (A := MvPolynomial (TVar D N) K)
     (g := (sHom (K := K) (D := D) j₀ x).toRingHom) h
 
-theorem liftS_algebraMap {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : ℕ}
-    {j₀ : Fin (N + 1)} {x : Fin N → Ω} (h : Function.Injective (sHom (K := K) (D := D) j₀ x))
-    (q : MvPolynomial (TVar D N) K) :
-    liftS h (algebraMap _ _ q) = sHom (K := K) (D := D) j₀ x q := by
+theorem liftS_algebraMap
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    {D N : ℕ} {j₀ : Fin (N + 1)} {x : Fin N → Ω}
+    (h : Function.Injective (sHom (K := K) (D := D) j₀ x)) (q : MvPolynomial (TVar D N) K)
+    : liftS h (algebraMap _ _ q) = sHom (K := K) (D := D) j₀ x q := by
   rw [liftS, IsFractionRing.lift_algebraMap]; rfl
 
-theorem liftS_fieldRange {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : ℕ}
-    {j₀ : Fin (N + 1)} {x : Fin N → Ω} (h : Function.Injective (sHom (K := K) (D := D) j₀ x)) :
-    (liftS h).fieldRange =
-      (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))).toSubfield := by
+theorem liftS_fieldRange
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    {D N : ℕ} {j₀ : Fin (N + 1)} {x : Fin N → Ω}
+    (h : Function.Injective (sHom (K := K) (D := D) j₀ x))
+    : (liftS h).fieldRange
+      = (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))).toSubfield := by
   rw [IntermediateField.adjoin_toSubfield, liftS, IsFractionRing.lift_fieldRange]
   apply le_antisymm
   · rw [Subfield.closure_le]
     rintro _ ⟨p, rfl⟩
     induction p using MvPolynomial.induction_on
-    next a =>
-      exact Subfield.subset_closure (Or.inl ⟨a, by simp [sHom]⟩)
+    next a => exact Subfield.subset_closure (Or.inl ⟨a, by simp [sHom]⟩)
     next p q hp hq =>
       rw [map_add (f := _)]
       exact add_mem hp hq
@@ -81,20 +88,24 @@ theorem liftS_fieldRange {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N 
     · exact Subfield.subset_closure ⟨MvPolynomial.C a, by simp [sHom]⟩
     · exact Subfield.subset_closure ⟨MvPolynomial.X i, by simp [sHom]⟩
 
-theorem liftS_finite {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : ℕ}
-    {j₀ : Fin (N + 1)} {x : Fin N → Ω} (h : Function.Injective (sHom (K := K) (D := D) j₀ x))
-    (hfin : FiniteDimensional (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x)))
-        (OmS Ω D N)) :
-    letI : Algebra (FractionRing (MvPolynomial (TVar D N) K)) (OmS Ω D N) := (liftS h).toAlgebra;
-    FiniteDimensional (FractionRing (MvPolynomial (TVar D N) K)) (OmS Ω D N) := by
+theorem liftS_finite
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    {D N : ℕ} {j₀ : Fin (N + 1)} {x : Fin N → Ω}
+    (h : Function.Injective (sHom (K := K) (D := D) j₀ x))
+    (hfin
+      : FiniteDimensional (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))) (OmS Ω D N))
+    : letI : Algebra (FractionRing (MvPolynomial (TVar D N) K)) (OmS Ω D N) := (liftS h).toAlgebra
+      FiniteDimensional (FractionRing (MvPolynomial (TVar D N) K)) (OmS Ω D N) := by
   letI : Algebra (FractionRing (MvPolynomial (TVar D N) K)) (OmS Ω D N) := (liftS h).toAlgebra
-  let i : FractionRing (MvPolynomial (TVar D N) K) ≃+*
-      (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))) :=
+  let i
+      : FractionRing (MvPolynomial (TVar D N) K)
+        ≃+* (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))) :=
     (liftS h).rangeRestrictFieldEquiv.trans (RingEquiv.subfieldCongr (liftS_fieldRange h))
-  have hc : (algebraMap (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x)))
-      (OmS Ω D N)).comp i.toRingHom =
-      (RingEquiv.refl (OmS Ω D N)).toRingHom.comp
-        (algebraMap (FractionRing (MvPolynomial (TVar D N) K)) (OmS Ω D N)) := by
+  have hc
+      : (algebraMap (IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))) (OmS Ω D N)).comp
+          i.toRingHom
+        = (RingEquiv.refl (OmS Ω D N)).toRingHom.comp
+          (algebraMap (FractionRing (MvPolynomial (TVar D N) K)) (OmS Ω D N)) := by
     refine RingHom.ext fun y => ?_
     show ((i y : IntermediateField.adjoin K (Set.range (sImg (D := D) j₀ x))) : OmS Ω D N) =
       liftS h y
@@ -104,10 +115,12 @@ theorem liftS_finite {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : �
   rw [hrk]
   exact Module.finrank_pos
 
-theorem exists_ae_cons {α : Type} [MeasurableSpace α] (μ : Measure α) [SigmaFinite μ] (hμ : μ ≠ 0)
-    (D : ℕ) (p : (Fin (D + 1) → α) → Prop)
-    (hp : ∀ᵐ t ∂(Measure.pi fun _ : Fin (D + 1) => μ), p t) :
-    ∃ t₀ : α, ∀ᵐ t ∂(Measure.pi fun _ : Fin D => μ), p (Fin.cons t₀ t) := by
+theorem exists_ae_cons
+    {α : Type} [MeasurableSpace α]
+    (μ : Measure α) [SigmaFinite μ]
+    (hμ : μ ≠ 0)
+    (D : ℕ) (p : (Fin (D + 1) → α) → Prop) (hp : ∀ᵐ t ∂(Measure.pi fun _ : Fin (D + 1) => μ), p t)
+    : ∃ t₀ : α, ∀ᵐ t ∂(Measure.pi fun _ : Fin D => μ), p (Fin.cons t₀ t) := by
   have hm := (measurePreserving_piFinSuccAbove (fun _ : Fin (D + 1) => μ) 0).symm
   have h1 := hm.quasiMeasurePreserving.ae hp
   have h2 := Measure.ae_ae_of_ae_prod h1
@@ -116,32 +129,41 @@ theorem exists_ae_cons {α : Type} [MeasurableSpace α] (μ : Measure α) [Sigma
   refine ⟨t₀, ht₀.mono fun t ht => ?_⟩
   simpa [MeasurableEquiv.piFinSuccAbove_symm_apply, Fin.insertNthEquiv] using ht
 
-theorem sImg_rel {Ω : Type} [Field Ω] {D N : ℕ} (j₀ : Fin (N + 1)) (x : Fin N → Ω) (i : Fin D) :
-    sImg (D := D) j₀ x (i.succ, j₀) +
-      ∑ k, sImg (D := D) j₀ x (i.succ, j₀.succAbove k) * algebraMap Ω (OmS Ω D N) (x k) = 0 := by
-  have hC : ∀ a : Ω, algebraMap (MvPolynomial (SVar D N) Ω) (OmS Ω D N) (C a) =
-      algebraMap Ω (OmS Ω D N) a := fun a => by
+theorem sImg_rel {Ω : Type} [Field Ω] {D N : ℕ} (j₀ : Fin (N + 1)) (x : Fin N → Ω) (i : Fin D)
+    : sImg (D := D) j₀ x (i.succ, j₀)
+        + ∑ k, sImg (D := D) j₀ x (i.succ, j₀.succAbove k) * algebraMap Ω (OmS Ω D N) (x k)
+      = 0 := by
+  have hC
+      : ∀ a : Ω,
+        algebraMap (MvPolynomial (SVar D N) Ω) (OmS Ω D N) (C a)
+          = algebraMap Ω (OmS Ω D N) a := fun a => by
     rw [← MvPolynomial.algebraMap_eq, ← IsScalarTower.algebraMap_apply]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sImg, sac_self, sac_succAbove, Fin.succ_ne_zero, if_false,
-    ↓reduceIte, map_neg, map_sum, map_mul, hC]
+    simp only [sImg, sac_self, sac_succAbove, Fin.succ_ne_zero, if_false, ↓ reduceIte, map_neg,
+      map_sum, map_mul, hC]
   exact neg_add_cancel _
 
-theorem bijOn_restrict {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : ℕ}
-    (j₀ : Fin (N + 1)) (x : Fin N → Ω) (sg : K →+* ℂ) (pt : TVar D N → ℂ)
-    (hext : ∀ Q : Ω →+* ℂ, Q ∈ PT (Ω := Ω) sg →
-      (∀ i : Fin D, pt (i.succ, j₀) + ∑ k, pt (i.succ, j₀.succAbove k) * Q (x k) = 0) →
-      ∃! P : OmS Ω D N →+* ℂ, (∀ a : Ω, P (algebraMap Ω (OmS Ω D N) a) = Q a) ∧
-        ∀ p, P (sImg j₀ x p) = pt p) :
-    Set.BijOn (fun P : OmS Ω D N →+* ℂ => P.comp (algebraMap Ω (OmS Ω D N)))
+theorem bijOn_restrict
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    {D N : ℕ} (j₀ : Fin (N + 1)) (x : Fin N → Ω)
+    (sg : K →+* ℂ) (pt : TVar D N → ℂ)
+    (hext : ∀ Q : Ω →+* ℂ,
+      Q ∈ PT (Ω := Ω) sg
+        → (∀ i : Fin D, pt (i.succ, j₀) + ∑ k, pt (i.succ, j₀.succAbove k) * Q (x k) = 0)
+        → ∃! P : OmS Ω D N →+* ℂ, (∀ a : Ω, P (algebraMap Ω (OmS Ω D N) a) = Q a) ∧
+            ∀ p, P (sImg j₀ x p) = pt p)
+    : Set.BijOn
+      (fun P : OmS Ω D N →+* ℂ => P.comp (algebraMap Ω (OmS Ω D N)))
       {P | ∀ p : MvPolynomial (TVar D N) K, P (sHom (K := K) j₀ x p) = eval₂ sg pt p}
       {Q | Q ∈ PT (Ω := Ω) sg ∧
         ∀ i : Fin D, pt (i.succ, j₀) + ∑ k, pt (i.succ, j₀.succAbove k) * Q (x k) = 0} := by
-  have hX : ∀ P : OmS Ω D N →+* ℂ,
-      (∀ p : MvPolynomial (TVar D N) K, P (sHom (K := K) j₀ x p) = eval₂ sg pt p) →
-      ∀ p, P (sImg j₀ x p) = pt p := fun P hP p => by
+  have hX
+      : ∀ P : OmS Ω D N →+* ℂ,
+        (∀ p : MvPolynomial (TVar D N) K, P (sHom (K := K) j₀ x p) = eval₂ sg pt p)
+          → ∀ p, P (sImg j₀ x p) = pt p := fun P hP p => by
     simpa [sHom] using hP (X p)
-  have hmaps : Set.MapsTo (fun P : OmS Ω D N →+* ℂ => P.comp (algebraMap Ω (OmS Ω D N)))
+  have hmaps : Set.MapsTo
+      (fun P : OmS Ω D N →+* ℂ => P.comp (algebraMap Ω (OmS Ω D N)))
       {P | ∀ p : MvPolynomial (TVar D N) K, P (sHom (K := K) j₀ x p) = eval₂ sg pt p}
       {Q | Q ∈ PT (Ω := Ω) sg ∧
         ∀ i : Fin D, pt (i.succ, j₀) + ∑ k, pt (i.succ, j₀.succAbove k) * Q (x k) = 0} := by
@@ -152,11 +174,12 @@ theorem bijOn_restrict {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : 
       rw [← IsScalarTower.algebraMap_apply K Ω (OmS Ω D N)]
       have := hP (C a)
       rwa [show sHom (K := K) (D := D) j₀ x (C a) = algebraMap K _ a by
-        rw [← MvPolynomial.algebraMap_eq]; exact (sHom (K := K) (D := D) j₀ x).commutes a,
-        eval₂_C] at this
+            rw [← MvPolynomial.algebraMap_eq]; exact (sHom (K := K) (D := D) j₀ x).commutes a,
+          eval₂_C]
+        at this
     · have := congrArg P (sImg_rel (D := D) j₀ x i)
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, map_mul, hX P hP] using this
+      simpa [map_sum, map_mul, hX P hP] using this
   refine ⟨hmaps, ?_, ?_⟩
   · intro P₁ h₁ P₂ h₂ he
     have hm := hmaps h₁
@@ -179,7 +202,6 @@ theorem bijOn_restrict {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] {D N : 
     exact DFunLike.congr_fun this p
 
 end SectionSum
-
 
 open SectionSum MeasureTheory in
 theorem aemeasurable_finsum_section :

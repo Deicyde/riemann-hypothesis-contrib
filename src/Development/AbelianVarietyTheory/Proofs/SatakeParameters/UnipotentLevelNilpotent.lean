@@ -8,14 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.NatCastMe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.L2.DIV Classical
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.L2.DIV Classical
 
 namespace GlobalTheory.UnipVol
 
 section Group
 
-theorem index_eq_prime_pow {G : Type*} [Group G] (H : Subgroup G) [H.FiniteIndex] {p : ℕ} (hp : p.Prime)
-    (hroot : ∀ (g : G) (m : ℕ), m.Coprime p → g ^ m ∈ H → g ∈ H) : ∃ k, H.index = p ^ k := by
+theorem index_eq_prime_pow
+    {G : Type*} [Group G]
+    (H : Subgroup G) [H.FiniteIndex]
+    {p : ℕ} (hp : p.Prime) (hroot : ∀ (g : G) (m : ℕ), m.Coprime p → g ^ m ∈ H → g ∈ H)
+    : ∃ k, H.index = p ^ k := by
   haveI : Fact p.Prime := ⟨hp⟩
   have hN : ∀ (g : G) (m : ℕ), m.Coprime p → g ^ m ∈ H.normalCore → g ∈ H.normalCore := by
     intro g m hm hg
@@ -62,19 +66,24 @@ theorem exists_one_add_X_pow (m : ℕ) : ∃ w : ℤ[X], (1 + X) ^ m - 1 = X * (
     push_cast
     ring
 
-theorem exists_pow_expansion (m k : ℕ) :
-    ∃ v : ℤ[X], ((1 + X : ℤ[X]) ^ m - 1) ^ k = (m : ℤ[X]) ^ k * X ^ k + X ^ (k + 1) * v := by
+theorem exists_pow_expansion (m k : ℕ)
+    : ∃ v : ℤ[X], ((1 + X : ℤ[X]) ^ m - 1) ^ k = (m : ℤ[X]) ^ k * X ^ k + X ^ (k + 1) * v := by
   obtain ⟨w, hw⟩ := exists_one_add_X_pow m
   obtain ⟨z, hz⟩ := sub_dvd_pow_sub_pow ((m : ℤ[X]) + X * w) (m : ℤ[X]) k
   refine ⟨w * z, ?_⟩
   rw [hw, mul_pow]
-  have : ((m : ℤ[X]) + X * w) ^ k = (m : ℤ[X]) ^ k + ((m : ℤ[X]) + X * w - (m : ℤ[X])) * z := by rw [← hz]; ring
+  have : ((m : ℤ[X]) + X * w) ^ k = (m : ℤ[X]) ^ k + ((m : ℤ[X]) + X * w - (m : ℤ[X])) * z := by
+    rw [← hz]; ring
   rw [this]
   ring
 
-theorem smul_mem_of_pow {A V : Type*} [Ring A] [AddCommGroup V] [Module A V] (M : AddSubgroup V) (ν : A) {d : ℕ}
-    (hν : ν ^ d = 0) (m : ℕ) (hdiv : ∀ x, m • x ∈ M → x ∈ M)
-    (hu : ∀ x ∈ M, ((1 + ν) ^ m - 1) • x ∈ M) : ∀ x ∈ M, ν • x ∈ M := by
+theorem smul_mem_of_pow
+    {A V : Type*} [Ring A] [AddCommGroup V] [Module A V]
+    (M : AddSubgroup V)
+    (ν : A)
+    {d : ℕ} (hν : ν ^ d = 0)
+    (m : ℕ) (hdiv : ∀ x, m • x ∈ M → x ∈ M) (hu : ∀ x ∈ M, ((1 + ν) ^ m - 1) • x ∈ M)
+    : ∀ x ∈ M, ν • x ∈ M := by
   have hdivk : ∀ (k : ℕ) x, (m ^ k) • x ∈ M → x ∈ M := by
     intro k
     induction k with
@@ -110,7 +119,8 @@ theorem smul_mem_of_pow {A V : Type*} [Ring A] [AddCommGroup V] [Module A V] (M 
         have h5 := M.sub_mem h3 h4
         rw [add_sub_cancel_right] at h5
         convert h5 using 1
-        rw [map_mul, mul_smul, map_pow, map_pow, map_natCast, ← Nat.cast_pow, Nat.cast_smul_eq_nsmul]
+        rw [map_mul, mul_smul, map_pow, map_pow, map_natCast, ← Nat.cast_pow,
+          Nat.cast_smul_eq_nsmul]
       have e : X ^ k * f = C (f.coeff 0) * X ^ k + X ^ (k + 1) * f.divX := by
         conv_lhs => rw [← divX_mul_X_add f]
         ring
@@ -134,8 +144,8 @@ variable {k : Type} [CommRing k] {n c : ℕ}
 abbrev T (V : Type) [AddCommGroup V] [Module k V] : (V ≃ₗ[k] V) →* Module.End k V :=
   LinearEquiv.automorphismGroup.toLinearMapMonoidHom
 
-theorem nil_Ufl {g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hg : g ∈ Loc.N1 k n c) (i : ℕ) :
-    ∀ v ∈ Loc.Ufl k n c i, ((T (k := k) _ g - 1) ^ (i + 1)) v = 0 := by
+theorem nil_Ufl {g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hg : g ∈ Loc.N1 k n c) (i : ℕ)
+    : ∀ v ∈ Loc.Ufl k n c i, ((T (k := k) _ g - 1) ^ (i + 1)) v = 0 := by
   have hR := hg.1.1
   have hX := hg.2
   induction i with
@@ -169,8 +179,7 @@ theorem nil_Ufl {g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hg : g 
             simp only [Set.mem_setOf_eq]
             omega
           simp [he, Loc.eN, h, hv l this]
-      have e1 : ((T (k := k) _ g - 1)) v =
-          (g (v - t • e) - (v - t • e)) + t • (g e - e) := by
+      have e1 : ((T (k := k) _ g - 1)) v = (g (v - t • e) - (v - t • e)) + t • (g e - e) := by
         simp only [map_sub, map_smul]
         show g v - v = _
         module
@@ -179,8 +188,9 @@ theorem nil_Ufl {g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hg : g 
     rw [pow_succ, Module.End.mul_apply]
     exact ih _ hmem
 
-theorem unipotent_level_nilpotent {g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hg : g ∈ Loc.N1 k n c) :
-    (T (k := k) _ g - 1) ^ (c + 1) = 0 := by
+theorem unipotent_level_nilpotent
+    {g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hg : g ∈ Loc.N1 k n c)
+    : (T (k := k) _ g - 1) ^ (c + 1) = 0 := by
   exact LinearMap.ext fun v => nil_Ufl hg c v fun l hl => absurd l.2 hl
 
 end Unip
@@ -189,12 +199,16 @@ section Stab
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem stab_fwd {n c : ℕ} {Λ : Submodule (𝓞 E) (Sp E (n + c))} {m : ℕ}
-    (hdiv : ∀ x, m • x ∈ Λ → x ∈ Λ) {g : Sp E (n + c) ≃ₗ[E] Sp E (n + c)}
-    (hg : g ∈ Loc.N1 E n c) (hm : g ^ m ∈ stabL E _ Λ) : ∀ x ∈ Λ, g x ∈ Λ := by
+theorem stab_fwd
+    {n c : ℕ} {Λ : Submodule (𝓞 E) (Sp E (n + c))} {m : ℕ} (hdiv : ∀ x, m • x ∈ Λ → x ∈ Λ)
+    {g : Sp E (n + c) ≃ₗ[E] Sp E (n + c)} (hg : g ∈ Loc.N1 E n c) (hm : g ^ m ∈ stabL E _ Λ)
+    : ∀ x ∈ Λ, g x ∈ Λ := by
   intro x hx
-  have h1 := smul_mem_of_pow (A := Module.End E (Sp E (n + c))) Λ.toAddSubgroup (T (k := E) _ g - 1) (unipotent_level_nilpotent hg) m hdiv
-    (fun y hy => ?_) x hx
+  have h1 :=
+    smul_mem_of_pow (A := Module.End E (Sp E (n + c))) Λ.toAddSubgroup (T (k := E) _ g - 1)
+      (unipotent_level_nilpotent hg) m hdiv
+      (fun y hy => ?_)
+      x hx
   · have h2 : (T (k := E) _ g - 1) x ∈ Λ := h1
     have h3 := Λ.add_mem h2 hx
     simpa using h3
@@ -205,27 +219,34 @@ theorem stab_fwd {n c : ℕ} {Λ : Submodule (𝓞 E) (Sp E (n + c))} {m : ℕ}
     rw [h3]
     exact Λ.sub_mem h2 hy
 
-theorem stab_root {n c : ℕ} {Λ : Submodule (𝓞 E) (Sp E (n + c))} {m : ℕ}
-    (hdiv : ∀ x, m • x ∈ Λ → x ∈ Λ) {g : Sp E (n + c) ≃ₗ[E] Sp E (n + c)}
-    (hg : g ∈ Loc.N1 E n c) (hm : g ^ m ∈ stabL E _ Λ) : g ∈ stabL E _ Λ := by
+theorem stab_root
+    {n c : ℕ} {Λ : Submodule (𝓞 E) (Sp E (n + c))} {m : ℕ} (hdiv : ∀ x, m • x ∈ Λ → x ∈ Λ)
+    {g : Sp E (n + c) ≃ₗ[E] Sp E (n + c)} (hg : g ∈ Loc.N1 E n c) (hm : g ^ m ∈ stabL E _ Λ)
+    : g ∈ stabL E _ Λ := by
   intro x
   refine ⟨fun h => ?_, stab_fwd hdiv hg hm x⟩
   have h1 := stab_fwd hdiv (inv_mem hg) (by rw [inv_pow]; exact inv_mem hm) _ h
   have h2 : g⁻¹ (g x) = x := g.symm_apply_apply x
   rwa [h2] at h1
 
-theorem relIndex_prime_pow {n c : ℕ} {Λ : Submodule (𝓞 E) (Sp E (n + c))} {p : ℕ} (hp : p.Prime)
-    (hdiv : ∀ m : ℕ, m.Coprime p → ∀ x, m • x ∈ Λ → x ∈ Λ) {C : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c))}
-    (hC : C ≤ Loc.N1 E n c) (h0 : (Loc.N1 E n c ⊓ stabL E _ Λ).relIndex C ≠ 0) :
-    ∃ k, (Loc.N1 E n c ⊓ stabL E _ Λ).relIndex C = p ^ k := by
+theorem relIndex_prime_pow
+    {n c : ℕ} {Λ : Submodule (𝓞 E) (Sp E (n + c))} {p : ℕ}
+    (hp : p.Prime) (hdiv : ∀ m : ℕ, m.Coprime p → ∀ x, m • x ∈ Λ → x ∈ Λ)
+    {C : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c))}
+    (hC : C ≤ Loc.N1 E n c) (h0 : (Loc.N1 E n c ⊓ stabL E _ Λ).relIndex C ≠ 0)
+    : ∃ k, (Loc.N1 E n c ⊓ stabL E _ Λ).relIndex C = p ^ k := by
   haveI : ((Loc.N1 E n c ⊓ stabL E _ Λ).subgroupOf C).FiniteIndex := ⟨h0⟩
   refine index_eq_prime_pow _ hp fun g m hm hg => ?_
   rw [Subgroup.mem_subgroupOf] at hg ⊢
   refine ⟨hC g.2, stab_root (hdiv m hm) (hC g.2) ?_⟩
   simpa using hg.2
 
-theorem div_sclLat (P : HeightOneSpectrum (𝓞 E)) (q N : ℕ) (e : ℕ → ℤ) {m : ℕ} (hm : (m : 𝓞 E) ∉ P.asIdeal) (x : Sp E N)
-    (h : m • x ∈ LocE.sclLat P q N e) : x ∈ LocE.sclLat P q N e := by
+theorem div_sclLat
+    (P : HeightOneSpectrum (𝓞 E))
+    (q N : ℕ) (e : ℕ → ℤ)
+    {m : ℕ} (hm : (m : 𝓞 E) ∉ P.asIdeal)
+    (x : Sp E N) (h : m • x ∈ LocE.sclLat P q N e)
+    : x ∈ LocE.sclLat P q N e := by
   unfold LocE.sclLat stdAt at h ⊢
   rw [Submodule.mem_comap, mem_localization_standardLattice] at h ⊢
   intro l
@@ -235,8 +256,9 @@ theorem div_sclLat (P : HeightOneSpectrum (𝓞 E)) (q N : ℕ) (e : ℕ → ℤ
   simp
   ring
 
-theorem natCast_notMem {P : HeightOneSpectrum (𝓞 E)} {p m : ℕ} (hpP : (p : 𝓞 E) ∈ P.asIdeal) (hm : m.Coprime p) :
-    (m : 𝓞 E) ∉ P.asIdeal := by
+theorem natCast_notMem
+    {P : HeightOneSpectrum (𝓞 E)} {p m : ℕ} (hpP : (p : 𝓞 E) ∈ P.asIdeal) (hm : m.Coprime p)
+    : (m : 𝓞 E) ∉ P.asIdeal := by
   intro h
   have h1 : (((m.gcd p : ℕ) : ℤ) : 𝓞 E) ∈ P.asIdeal := by
     rw [Nat.gcd_eq_gcd_ab]
@@ -245,9 +267,13 @@ theorem natCast_notMem {P : HeightOneSpectrum (𝓞 E)} {p m : ℕ} (hpP : (p : 
   rw [hm.gcd_eq_one] at h1
   exact P.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 (by simpa using h1))
 
-theorem intOff_volN_inv {K : Type} [Field K] (σ : K →+* ℂ) {S : Finset ℕ} {P : HeightOneSpectrum (𝓞 E)} (hq : SNum S (qOf P))
-    {n c : ℕ} (e : ℕ → ℤ) (q : ℕ) (C : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c))) :
-    IntOff S (σ (Loc.volN K C (Loc.N1 E n c ⊓ stabL E _ (LocE.sclLat P q (n + c) e)))⁻¹) := by
+theorem intOff_volN_inv
+    {K : Type} [Field K]
+    (σ : K →+* ℂ)
+    {S : Finset ℕ} {P : HeightOneSpectrum (𝓞 E)} (hq : SNum S (qOf P))
+    {n c : ℕ}
+    (e : ℕ → ℤ) (q : ℕ) (C : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c)))
+    : IntOff S (σ (Loc.volN K C (Loc.N1 E n c ⊓ stabL E _ (LocE.sclLat P q (n + c) e)))⁻¹) := by
   have hq1 : qOf P ≠ 1 := by
     intro h
     exact P.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
@@ -255,19 +281,31 @@ theorem intOff_volN_inv {K : Type} [Field K] (σ : K →+* ℂ) {S : Finset ℕ}
   have hdvd := Nat.minFac_dvd (qOf P)
   have hpP := GlobalTheory.KerTie.natCast_mem_of_prime_dvd_absNorm P hp hdvd
   unfold Loc.volN
-  by_cases h0 : (Loc.N1 E n c ⊓ stabL E _ (LocE.sclLat P q (n + c) e)).relIndex (C ⊓ Loc.N1 E n c) = 0
+  by_cases h0
+    : (Loc.N1 E n c ⊓ stabL E _ (LocE.sclLat P q (n + c) e)).relIndex (C ⊓ Loc.N1 E n c) = 0
   · rw [h0]
     simpa using IntOff.zero
-  obtain ⟨k, hk⟩ := relIndex_prime_pow hp (fun m hm x hx => div_sclLat P q _ e (natCast_notMem hpP hm) x hx)
-    (inf_le_right : C ⊓ Loc.N1 E n c ≤ _) h0
+  obtain ⟨k, hk⟩ :=
+    relIndex_prime_pow hp
+      (fun m hm x hx => div_sclLat P q _ e (natCast_notMem hpP hm) x hx)
+      (inf_le_right : C ⊓ Loc.N1 E n c ≤ _) h0
   rw [hk, inv_div, map_div₀, map_natCast, map_natCast, div_eq_mul_inv]
-  refine IntOff.mul (Formalism.L2.KerInert.RepRec.intOff_natCast S _) (IntOff.inv_nat ⟨pow_pos hp.pos _, fun r hr hd => ?_⟩)
+  refine IntOff.mul (Formalism.L2.KerInert.RepRec.intOff_natCast S _)
+    (IntOff.inv_nat ⟨pow_pos hp.pos _, fun r hr hd => ?_⟩)
   rw [(Nat.prime_dvd_prime_iff_eq hr hp).1 (hr.dvd_of_dvd_pow hd)]
   exact hq.2 _ hp hdvd
 
 end Stab
 
-theorem intOff_volN_Cbe : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : G.Inst D L) (Gl : G.LatInst D) (K : G.Consts) (Y : DivX D) (cX : ExtraC) (ex : Extra D L hT Gi Gl K Y cX) (t : KerEntTied ex), ∀ u μ (i : ℕ) (P : rowSG t.Pr t.sel (t.tup μ)) (h : AutY t.X D.R (i + 1)), IntOff (t.O u μ).S (t.seam.σ₀ (Loc.volN t.X.K (Loc.Cbe (Jat (Pr := t.Pr) (t.cst μ).sharp (i + 1) P.1) h) (Loc.N1 t.X.E (D.R.N (i + 1)) (cOf D.R (i + 1)) ⊓ stabL t.X.E _ (lamYat (Pr := t.Pr) (i + 1) P.1)))⁻¹) := by
+theorem intOff_volN_Cbe
+    : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : G.Inst D L) (Gl : G.LatInst D)
+        (K : G.Consts) (Y : DivX D) (cX : ExtraC) (ex : Extra D L hT Gi Gl K Y cX)
+        (t : KerEntTied ex),
+      ∀ u μ (i : ℕ) (P : rowSG t.Pr t.sel (t.tup μ)) (h : AutY t.X D.R (i + 1)),
+        IntOff (t.O u μ).S
+          (t.seam.σ₀ (Loc.volN t.X.K (Loc.Cbe (Jat (Pr := t.Pr) (t.cst μ).sharp (i + 1) P.1) h)
+            (Loc.N1 t.X.E (D.R.N (i + 1)) (cOf D.R (i + 1))
+              ⊓ stabL t.X.E _ (lamYat (Pr := t.Pr) (i + 1) P.1)))⁻¹) := by
   intro D L hT Gi Gl K Y cX ex t u μ i P h
   exact intOff_volN_inv _ (GlobalTheory.KerTie.sNum_qOf_rowSG D L hT Gi Gl K Y cX ex t u μ P) _ _ _
 

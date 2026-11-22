@@ -18,13 +18,19 @@ open MvPolynomial Formalism.L2.Pj
 
 section Sub
 
-variable {Ty : Type} (r : Ty → ℕ) (n : ℕ) (k : Type) [Field k] (cc : Ty → Ty) (isX : Ty → Prop) (a : Ty → ℕ → ℕ)
+variable
+  {Ty : Type} (r : Ty → ℕ)
+  (n : ℕ)
+  (k : Type) [Field k]
+  (cc : Ty → Ty) (isX : Ty → Prop) (a : Ty → ℕ → ℕ)
 
 theorem hha_zero : (0 : MvPolynomial (Letter Ty r n) k) ∈ HHa r n k cc isX a := by
   refine ⟨Submodule.zero_mem _, fun σ i i' _ t => map_zero _, fun m hm => by simp at hm⟩
 
-theorem hha_add {P Q : MvPolynomial (Letter Ty r n) k} (hP : P ∈ HHa r n k cc isX a) (hQ : Q ∈ HHa r n k cc isX a) :
-    P + Q ∈ HHa r n k cc isX a := by
+theorem hha_add
+    {P Q : MvPolynomial (Letter Ty r n) k}
+    (hP : P ∈ HHa r n k cc isX a) (hQ : Q ∈ HHa r n k cc isX a)
+    : P + Q ∈ HHa r n k cc isX a := by
   obtain ⟨hP1, hP2, hP3⟩ := hP
   obtain ⟨hQ1, hQ2, hQ3⟩ := hQ
   refine ⟨Submodule.add_mem _ hP1 hQ1, fun σ i i' hii t => ?_, fun m hm => ?_⟩
@@ -33,8 +39,8 @@ theorem hha_add {P Q : MvPolynomial (Letter Ty r n) k} (hP : P ∈ HHa r n k cc 
     · exact hP3 m h
     · exact hQ3 m h
 
-theorem hha_smul (c : k) {P : MvPolynomial (Letter Ty r n) k} (hP : P ∈ HHa r n k cc isX a) :
-    c • P ∈ HHa r n k cc isX a := by
+theorem hha_smul (c : k) {P : MvPolynomial (Letter Ty r n) k} (hP : P ∈ HHa r n k cc isX a)
+    : c • P ∈ HHa r n k cc isX a := by
   obtain ⟨hP1, hP2, hP3⟩ := hP
   refine ⟨Submodule.smul_mem _ c hP1, fun σ i i' hii t => ?_, fun m hm => hP3 m (support_smul hm)⟩
   rw [map_smul, hP2 σ i i' hii t]
@@ -45,14 +51,20 @@ section Maps
 
 variable {Ty : Type} (r : Ty → ℕ) (n : ℕ)
 
-theorem lap_map {k k' : Type} [Field k] [Field k'] (φ : k →+* k') (τ τ' : Ty) (a0 : Fin (r τ)) (a1 : Fin (r τ'))
-    (p : MvPolynomial (Letter Ty r n) k) :
-    lap r n k' 1 τ τ' a0 a1 (map φ p) = map φ (lap r n k 1 τ τ' a0 a1 p) := by
+theorem lap_map
+    {k k' : Type} [Field k] [Field k']
+    (φ : k →+* k')
+    (τ τ' : Ty) (a0 : Fin (r τ)) (a1 : Fin (r τ'))
+    (p : MvPolynomial (Letter Ty r n) k)
+    : lap r n k' 1 τ τ' a0 a1 (map φ p) = map φ (lap r n k 1 τ τ' a0 a1 p) := by
   simp [lap, Matrix.one_apply, pderiv_map]
 
-theorem rowShift_map {k k' : Type} [Field k] [Field k'] (φ : k →+* k') (σ0 : Ty) (i i' : Fin (r σ0)) (t : k)
-    (p : MvPolynomial (Letter Ty r n) k) :
-    rowShift r n k' σ0 i i' (φ t) (map φ p) = map φ (rowShift r n k σ0 i i' t p) := by
+theorem rowShift_map
+    {k k' : Type} [Field k] [Field k']
+    (φ : k →+* k')
+    (σ0 : Ty) (i i' : Fin (r σ0))
+    (t : k) (p : MvPolynomial (Letter Ty r n) k)
+    : rowShift r n k' σ0 i i' (φ t) (map φ p) = map φ (rowShift r n k σ0 i i' t p) := by
   simp only [rowShift, aeval_def, algebraMap_eq, map_eval₂]
   congr 1
   funext ℓ
@@ -68,35 +80,37 @@ variable {K : Type} [Field K] [CharZero K] {σ : Type}
 def comp (lam : K →ₗ[ℚ] ℚ) (P : MvPolynomial σ K) : MvPolynomial σ ℚ :=
   ∑ m ∈ P.support, monomial m (lam (P.coeff m))
 
-theorem coeff_comp (lam : K →ₗ[ℚ] ℚ) (P : MvPolynomial σ K) (m : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (comp lam P) m = lam (AddMonoidAlgebra.coeff P m) := by
+theorem coeff_comp (lam : K →ₗ[ℚ] ℚ) (P : MvPolynomial σ K) (m : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (comp lam P) m = lam (AddMonoidAlgebra.coeff P m) := by
   by_cases h : AddMonoidAlgebra.coeff P m = 0 <;> simp [comp, coeff_monomial, h]
 
-theorem comp_zero (lam : K →ₗ[ℚ] ℚ) : comp lam (0 : MvPolynomial σ K) = 0 := by
-  simp [comp]
+theorem comp_zero (lam : K →ₗ[ℚ] ℚ) : comp lam (0 : MvPolynomial σ K) = 0 := by simp [comp]
 
-theorem comp_sum (lam : K →ₗ[ℚ] ℚ) {α : Type} (s : Finset α) (f : α → MvPolynomial σ K) :
-    comp lam (∑ i ∈ s, f i) = ∑ i ∈ s, comp lam (f i) := by
+theorem comp_sum (lam : K →ₗ[ℚ] ℚ) {α : Type} (s : Finset α) (f : α → MvPolynomial σ K)
+    : comp lam (∑ i ∈ s, f i) = ∑ i ∈ s, comp lam (f i) := by
   ext m
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coeff_comp, coeff_sum, map_sum]
+  simp only [coeff_comp, coeff_sum, map_sum]
 
-theorem comp_smul_map (lam : K →ₗ[ℚ] ℚ) (c : K) (p : MvPolynomial σ ℚ) :
-    comp lam (c • map (algebraMap ℚ K) p) = lam c • p := by
+theorem comp_smul_map (lam : K →ₗ[ℚ] ℚ) (c : K) (p : MvPolynomial σ ℚ)
+    : comp lam (c • map (algebraMap ℚ K) p) = lam c • p := by
   ext m
   simp only [coeff_comp, coeff_smul, coeff_map, smul_eq_mul]
   rw [mul_comm c, ← Algebra.smul_def, map_smul, smul_eq_mul]
   exact mul_comm _ _
 
-theorem comp_comm (lam : K →ₗ[ℚ] ℚ) (Φ : MvPolynomial σ K →ₗ[K] MvPolynomial σ K)
-    (Ψ : MvPolynomial σ ℚ →ₗ[ℚ] MvPolynomial σ ℚ)
-    (h : ∀ m, Φ (monomial m 1) = map (algebraMap ℚ K) (Ψ (monomial m 1))) (P : MvPolynomial σ K) :
-    comp lam (Φ P) = Ψ (comp lam P) := by
+theorem comp_comm
+    (lam : K →ₗ[ℚ] ℚ)
+    (Φ : MvPolynomial σ K →ₗ[K] MvPolynomial σ K) (Ψ : MvPolynomial σ ℚ →ₗ[ℚ] MvPolynomial σ ℚ)
+    (h : ∀ m, Φ (monomial m 1) = map (algebraMap ℚ K) (Ψ (monomial m 1)))
+    (P : MvPolynomial σ K)
+    : comp lam (Φ P) = Ψ (comp lam P) := by
   have hP : P = ∑ m ∈ P.support, AddMonoidAlgebra.coeff P m • monomial m (1 : K) := by
     conv_lhs => rw [P.as_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [smul_monomial, smul_eq_mul, mul_one]
-  have hc : comp lam P = ∑ m ∈ P.support, lam (AddMonoidAlgebra.coeff P m) • monomial m (1 : ℚ) := by
+  have hc
+      : comp lam P = ∑ m ∈ P.support, lam (AddMonoidAlgebra.coeff P m) • monomial m (1 : ℚ) := by
     unfold comp
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [smul_monomial, smul_eq_mul, mul_one]
@@ -110,23 +124,31 @@ theorem comp_comm (lam : K →ₗ[ℚ] ℚ) (Φ : MvPolynomial σ K →ₗ[K] Mv
 
 variable {Ty : Type} (r : Ty → ℕ) (n : ℕ) {cc : Ty → Ty} {isX : Ty → Prop} {a : Ty → ℕ → ℕ}
 
-theorem comp_mem (lam : K →ₗ[ℚ] ℚ) {P : MvPolynomial (Letter Ty r n) K} (hP : P ∈ HHa r n K cc isX a) :
-    comp lam P ∈ HHa r n ℚ cc isX a := by
+theorem comp_mem
+    (lam : K →ₗ[ℚ] ℚ) {P : MvPolynomial (Letter Ty r n) K} (hP : P ∈ HHa r n K cc isX a)
+    : comp lam P ∈ HHa r n ℚ cc isX a := by
   obtain ⟨h1, h2, h3⟩ := hP
-  have hmono : ∀ m : Letter Ty r n →₀ ℕ, monomial m (1 : K) = map (algebraMap ℚ K) (monomial m (1 : ℚ)) := by
+  have hmono
+      : ∀ m : Letter Ty r n →₀ ℕ,
+        monomial m (1 : K) = map (algebraMap ℚ K) (monomial m (1 : ℚ)) := by
     intro m
     rw [map_monomial, (algebraMap ℚ K).map_one]
   refine ⟨?_, fun σ i i' hii t => ?_, fun m hm => ?_⟩
   · simp only [harmK, Submodule.mem_iInf, LinearMap.mem_ker] at h1 ⊢
     intro τ hτ a0 a1
-    have hc := comp_comm lam (lap r n K 1 τ (cc τ) a0 a1) (lap r n ℚ 1 τ (cc τ) a0 a1)
-      (fun m => by rw [hmono, lap_map]) P
+    have hc :=
+      comp_comm lam (lap r n K 1 τ (cc τ) a0 a1) (lap r n ℚ 1 τ (cc τ) a0 a1)
+        (fun m => by rw [hmono, lap_map])
+        P
     rw [h1 τ hτ a0 a1, comp_zero] at hc
     exact hc.symm
-  · have hc := comp_comm lam (rowShift r n K σ i i' (algebraMap ℚ K t)).toLinearMap
-      (rowShift r n ℚ σ i i' t).toLinearMap (fun m => by
-        simp only [AlgHom.toLinearMap_apply]
-        rw [hmono, rowShift_map]) P
+  · have hc :=
+      comp_comm lam (rowShift r n K σ i i' (algebraMap ℚ K t)).toLinearMap
+        (rowShift r n ℚ σ i i' t).toLinearMap
+        (fun m => by
+          simp only [AlgHom.toLinearMap_apply]
+          rw [hmono, rowShift_map])
+        P
     simp only [AlgHom.toLinearMap_apply] at hc
     rw [h2 σ i i' hii] at hc
     exact hc.symm
@@ -139,8 +161,11 @@ section Up
 
 variable {Ty : Type} {r : Ty → ℕ} {n : ℕ} {cc : Ty → Ty} {isX : Ty → Prop} {a : Ty → ℕ → ℕ}
 
-theorem map_mem (hR : RowInvUpSt) (K : Type) [Field K] [CharZero K] (p : MvPolynomial (Letter Ty r n) ℚ)
-    (hp : p ∈ HHa r n ℚ cc isX a) : map (algebraMap ℚ K) p ∈ HHa r n K cc isX a := by
+theorem map_mem
+    (hR : RowInvUpSt)
+    (K : Type) [Field K] [CharZero K]
+    (p : MvPolynomial (Letter Ty r n) ℚ) (hp : p ∈ HHa r n ℚ cc isX a)
+    : map (algebraMap ℚ K) p ∈ HHa r n K cc isX a := by
   obtain ⟨h1, h2, h3⟩ := hp
   refine ⟨?_, hR Ty r n K _ fun σ i i' hii q => ?_, fun m hm => h3 m (support_map_subset _ _ hm)⟩
   · simp only [harmK, Submodule.mem_iInf, LinearMap.mem_ker] at h1 ⊢
@@ -149,8 +174,11 @@ theorem map_mem (hR : RowInvUpSt) (K : Type) [Field K] [CharZero K] (p : MvPolyn
   · have e : ((q : ℚ) : K) = algebraMap ℚ K q := (eq_ratCast (algebraMap ℚ K) q).symm
     rw [e, rowShift_map, h2 σ i i' hii q]
 
-theorem map_int_mem (hR : RowInvUpSt) (K : Type) [Field K] [CharZero K] (z : MvPolynomial (Letter Ty r n) ℤ)
-    (hz : map (Int.castRingHom ℚ) z ∈ HHa r n ℚ cc isX a) : map (Int.castRingHom K) z ∈ HHa r n K cc isX a := by
+theorem map_int_mem
+    (hR : RowInvUpSt)
+    (K : Type) [Field K] [CharZero K]
+    (z : MvPolynomial (Letter Ty r n) ℤ) (hz : map (Int.castRingHom ℚ) z ∈ HHa r n ℚ cc isX a)
+    : map (Int.castRingHom K) z ∈ HHa r n K cc isX a := by
   have e : map (Int.castRingHom K) z = map (algebraMap ℚ K) (map (Int.castRingHom ℚ) z) := by
     rw [map_map, RingHom.ext_int (Int.castRingHom K) ((algebraMap ℚ K).comp (Int.castRingHom ℚ))]
   rw [e]
@@ -165,8 +193,8 @@ variable {L : Type}
 def poly {R : Type} [CommRing R] (Bd : Finset (L →₀ ℕ)) (v : Bd → R) : MvPolynomial L R :=
   ∑ b : Bd, monomial b.1 (v b)
 
-theorem coeff_poly {R : Type} [CommRing R] (Bd : Finset (L →₀ ℕ)) (v : Bd → R) (m : L →₀ ℕ) :
-    AddMonoidAlgebra.coeff (poly Bd v) m = if h : m ∈ Bd then v ⟨m, h⟩ else 0 := by
+theorem coeff_poly {R : Type} [CommRing R] (Bd : Finset (L →₀ ℕ)) (v : Bd → R) (m : L →₀ ℕ)
+    : AddMonoidAlgebra.coeff (poly Bd v) m = if h : m ∈ Bd then v ⟨m, h⟩ else 0 := by
   unfold poly
   rw [coeff_sum]
   simp only [coeff_monomial]
@@ -185,8 +213,12 @@ theorem coeff_poly {R : Type} [CommRing R] (Bd : Finset (L →₀ ℕ)) (v : Bd 
     intro hbm
     exact h (hbm ▸ b.2)
 
-theorem coeff_map_poly {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) (Bd : Finset (L →₀ ℕ)) (v : Bd → R)
-    (m : L →₀ ℕ) : AddMonoidAlgebra.coeff (map φ (poly Bd v)) m = if h : m ∈ Bd then φ (v ⟨m, h⟩) else 0 := by
+theorem coeff_map_poly
+    {R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S)
+    (Bd : Finset (L →₀ ℕ)) (v : Bd → R)
+    (m : L →₀ ℕ)
+    : AddMonoidAlgebra.coeff (map φ (poly Bd v)) m = if h : m ∈ Bd then φ (v ⟨m, h⟩) else 0 := by
   rw [coeff_map, coeff_poly, apply_dite φ, map_zero]
 
 end Poly
@@ -199,8 +231,9 @@ def Wsub (Bd : Finset (Letter Ty r n →₀ ℕ)) : Submodule ℤ (Bd → ℤ) w
   carrier := {z | map (Int.castRingHom ℚ) (poly Bd z) ∈ HHa r n ℚ cc isX a}
   add_mem' := by
     intro x y hx hy
-    have e : map (Int.castRingHom ℚ) (poly Bd (x + y)) =
-        map (Int.castRingHom ℚ) (poly Bd x) + map (Int.castRingHom ℚ) (poly Bd y) := by
+    have e
+        : map (Int.castRingHom ℚ) (poly Bd (x + y))
+          = map (Int.castRingHom ℚ) (poly Bd x) + map (Int.castRingHom ℚ) (poly Bd y) := by
       ext m
       simp only [AddMonoidAlgebra.coeff_add, Finsupp.add_apply, coeff_map_poly]
       split_ifs <;> simp
@@ -217,7 +250,9 @@ def Wsub (Bd : Finset (Letter Ty r n →₀ ℕ)) : Submodule ℤ (Bd → ℤ) w
     exact hha_zero r n ℚ cc isX a
   smul_mem' := by
     intro c x hx
-    have e : map (Int.castRingHom ℚ) (poly Bd (c • x)) = (c : ℚ) • map (Int.castRingHom ℚ) (poly Bd x) := by
+    have e
+        : map (Int.castRingHom ℚ) (poly Bd (c • x))
+          = (c : ℚ) • map (Int.castRingHom ℚ) (poly Bd x) := by
       ext m
       rw [coeff_smul, coeff_map_poly, coeff_map_poly]
       split_ifs <;> simp
@@ -225,9 +260,13 @@ def Wsub (Bd : Finset (Letter Ty r n →₀ ℕ)) : Submodule ℤ (Bd → ℤ) w
     rw [e]
     exact hha_smul r n ℚ cc isX a _ hx
 
-theorem wsub_sat (Bd : Finset (Letter Ty r n →₀ ℕ)) (z : ℤ) (x : Bd → ℤ) (hz : z ≠ 0)
-    (hx : z • x ∈ Wsub r n cc isX a Bd) : x ∈ Wsub r n cc isX a Bd := by
-  have e : map (Int.castRingHom ℚ) (poly Bd (z • x)) = (z : ℚ) • map (Int.castRingHom ℚ) (poly Bd x) := by
+theorem wsub_sat
+    (Bd : Finset (Letter Ty r n →₀ ℕ))
+    (z : ℤ) (x : Bd → ℤ) (hz : z ≠ 0) (hx : z • x ∈ Wsub r n cc isX a Bd)
+    : x ∈ Wsub r n cc isX a Bd := by
+  have e
+      : map (Int.castRingHom ℚ) (poly Bd (z • x))
+        = (z : ℚ) • map (Int.castRingHom ℚ) (poly Bd x) := by
     ext m
     rw [coeff_smul, coeff_map_poly, coeff_map_poly]
     split_ifs <;> simp
@@ -243,34 +282,47 @@ end Main
 
 section Assembly
 
-theorem exists_clear (s : Type) [Fintype s] (u : s → ℚ) :
-    ∃ N : ℕ, N ≠ 0 ∧ ∃ z : s → ℤ, ∀ b, (z b : ℚ) = N * u b := by
-  refine ⟨∏ b, (u b).den, Finset.prod_ne_zero_iff.mpr fun b _ => (u b).den_nz,
-    fun b => (∏ b' ∈ Finset.univ.erase b, ((u b').den : ℤ)) * (u b).num, fun b => ?_⟩
+theorem exists_clear (s : Type) [Fintype s] (u : s → ℚ)
+    : ∃ N : ℕ, N ≠ 0 ∧ ∃ z : s → ℤ, ∀ b, (z b : ℚ) = N * u b := by
+  refine ⟨
+    ∏ b, (u b).den,
+    Finset.prod_ne_zero_iff.mpr fun b _ => (u b).den_nz,
+    fun b => (∏ b' ∈ Finset.univ.erase b, ((u b').den : ℤ)) * (u b).num,
+    fun b => ?_
+  ⟩
   have hq : u b * ((u b).den : ℚ) = ((u b).num : ℚ) := Rat.mul_den_eq_num (u b)
   rw [← Finset.mul_prod_erase Finset.univ (fun b' => (u b').den) (Finset.mem_univ b)]
   push_cast
   rw [← hq]
   ring
 
-private theorem fix_sum_lemma {ι : Type} [Fintype ι] [DecidableEq ι] (ρ : (ι → ℤ) →ₗ[ℤ] (ι → ℤ)) (z : ι → ℤ)
-    (hz : ρ z = z) (j : ι) : z j = ∑ b, z b * ρ (Pi.single b 1) j := by
+private theorem fix_sum_lemma
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (ρ : (ι → ℤ) →ₗ[ℤ] (ι → ℤ)) (z : ι → ℤ) (hz : ρ z = z)
+    (j : ι)
+    : z j = ∑ b, z b * ρ (Pi.single b 1) j := by
   have hz' : z = ∑ b, z b • (Pi.single b (1 : ℤ) : ι → ℤ) := by
     ext i
     simp [Finset.sum_apply, Pi.single_apply]
-  calc z j = ρ z j := (congrFun hz j).symm
+  calc
+    z j
+      = ρ z j := (congrFun hz j).symm
     _ = ρ (∑ b, z b • (Pi.single b (1 : ℤ) : ι → ℤ)) j := by rw [← hz']
     _ = ∑ b, z b * ρ (Pi.single b 1) j := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+      simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
 
 theorem haSpanSt_of (hS : SatRetrSt) (hR : RowInvUpSt) : HaSpanSt := by
   unfold HaSpanSt
   intro Ty _ r n cc isX a K _ _ O P hP
   obtain ⟨hPH, hPO⟩ := hP
   obtain ⟨Bd, hBd⟩ : ∃ Bd, Bd = P.support := ⟨_, rfl⟩
-  obtain ⟨ρ, hρW, hρfix⟩ := hS Bd (Wsub r n cc isX a Bd) (fun z x hz hx => wsub_sat r n cc isX a Bd z x hz hx)
-  have key : ∀ j : Bd, AddMonoidAlgebra.coeff P j.1 = ∑ b : Bd, AddMonoidAlgebra.coeff P b.1 * ((ρ (Pi.single b 1) j : ℤ) : K) := by
+  obtain ⟨ρ, hρW, hρfix⟩ :=
+    hS Bd (Wsub r n cc isX a Bd) (fun z x hz hx => wsub_sat r n cc isX a Bd z x hz hx)
+  have key
+      : ∀ j : Bd,
+        AddMonoidAlgebra.coeff P j.1
+          = ∑ b : Bd, AddMonoidAlgebra.coeff P b.1 * ((ρ (Pi.single b 1) j : ℤ) : K) := by
     intro j
     rw [← sub_eq_zero]
     refine (Module.forall_dual_apply_eq_zero_iff ℚ _).mp fun lam => ?_
@@ -294,33 +346,46 @@ theorem haSpanSt_of (hS : SatRetrSt) (hR : RowInvUpSt) : HaSpanSt := by
     simp only [hz] at hq
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sub, map_sum, sub_eq_zero]
-    have hl : lam (AddMonoidAlgebra.coeff P j.1) = ∑ b : Bd, lam (AddMonoidAlgebra.coeff P b.1) * ((ρ (Pi.single b 1) j : ℤ) : ℚ) := by
+    have hl
+        : lam (AddMonoidAlgebra.coeff P j.1)
+          = ∑ b : Bd, lam (AddMonoidAlgebra.coeff P b.1) * ((ρ (Pi.single b 1) j : ℤ) : ℚ) := by
       apply mul_left_cancel₀ hN'
       rw [hq, Finset.mul_sum]
       exact Finset.sum_congr rfl fun b _ => by ring
     rw [hl]
     refine Finset.sum_congr rfl fun b _ => ?_
-    have hs : AddMonoidAlgebra.coeff P b.1 * ((ρ (Pi.single b 1) j : ℤ) : K) = (ρ (Pi.single b 1) j) • AddMonoidAlgebra.coeff P b.1 := by
+    have hs
+        : AddMonoidAlgebra.coeff P b.1 * ((ρ (Pi.single b 1) j : ℤ) : K)
+          = (ρ (Pi.single b 1) j) • AddMonoidAlgebra.coeff P b.1 := by
       rw [zsmul_eq_mul, mul_comm]
     rw [hs, map_zsmul, zsmul_eq_mul, mul_comm]
-  have hmain : P = ∑ b : Bd, AddMonoidAlgebra.coeff P b.1 • map (Int.castRingHom K) (poly Bd (ρ (Pi.single b 1))) := by
-    ext m
-    rw [coeff_sum]
-    simp only [coeff_smul, coeff_map_poly, smul_eq_mul]
-    by_cases h : m ∈ Bd
-    · simp only [dite_eq_left h, eq_intCast]
-      exact key ⟨m, h⟩
-    · simp only [dite_eq_right h, mul_zero, Finset.sum_const_zero]
-      by_contra hc
-      exact h (by rw [hBd]; exact mem_support_iff.mpr hc)
-  have hsum : ∑ i : Fin (Fintype.card Bd), P.coeff ((Fintype.equivFin Bd).symm i).1 •
-      map (Int.castRingHom K) (poly Bd (ρ (Pi.single ((Fintype.equivFin Bd).symm i) 1))) =
-      ∑ b : Bd, AddMonoidAlgebra.coeff P b.1 • map (Int.castRingHom K) (poly Bd (ρ (Pi.single b 1))) :=
-    Equiv.sum_comp (Fintype.equivFin Bd).symm
-      (fun b : Bd => AddMonoidAlgebra.coeff P b.1 • map (Int.castRingHom K) (poly Bd (ρ (Pi.single b 1))))
-  refine ⟨Fintype.card Bd, fun i => P.coeff ((Fintype.equivFin Bd).symm i).1,
-    fun i => poly Bd (ρ (Pi.single ((Fintype.equivFin Bd).symm i) 1)), fun i => hPO _,
-    fun i K' _ _ => map_int_mem hR K' _ (hρW _), ?_⟩
+  have hmain
+      : P
+        = ∑ b : Bd, AddMonoidAlgebra.coeff P b.1 • map (Int.castRingHom K) (poly Bd (ρ (Pi.single b 1))) :=
+    by
+      ext m
+      rw [coeff_sum]
+      simp only [coeff_smul, coeff_map_poly, smul_eq_mul]
+      by_cases h : m ∈ Bd
+      · simp only [dite_eq_left h, eq_intCast]
+        exact key ⟨m, h⟩
+      · simp only [dite_eq_right h, mul_zero, Finset.sum_const_zero]
+        by_contra hc
+        exact h (by rw [hBd]; exact mem_support_iff.mpr hc)
+  have hsum
+      : ∑ i : Fin (Fintype.card Bd), P.coeff ((Fintype.equivFin Bd).symm i).1 •
+          map (Int.castRingHom K) (poly Bd (ρ (Pi.single ((Fintype.equivFin Bd).symm i) 1)))
+        = ∑ b : Bd, AddMonoidAlgebra.coeff P b.1 • map (Int.castRingHom K) (poly Bd (ρ (Pi.single b 1))) :=
+    Equiv.sum_comp (Fintype.equivFin Bd).symm (fun b : Bd =>
+      AddMonoidAlgebra.coeff P b.1 • map (Int.castRingHom K) (poly Bd (ρ (Pi.single b 1))))
+  refine ⟨
+    Fintype.card Bd,
+    fun i => P.coeff ((Fintype.equivFin Bd).symm i).1,
+    fun i => poly Bd (ρ (Pi.single ((Fintype.equivFin Bd).symm i) 1)),
+    fun i => hPO _,
+    fun i K' _ _ => map_int_mem hR K' _ (hρW _),
+    ?_
+  ⟩
   exact hmain.trans hsum.symm
 
 end Assembly

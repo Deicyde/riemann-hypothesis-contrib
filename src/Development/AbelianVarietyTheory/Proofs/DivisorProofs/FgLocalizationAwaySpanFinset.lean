@@ -9,29 +9,28 @@ namespace GlobalTheory
 open Submodule
 
 theorem fg_localizationAway_span_finset
-    {R A R' A' : Type} [CommRing R] [CommRing A] [CommRing R'] [CommRing A']
-    [Algebra R A] [Algebra R R'] [Algebra R' A'] [Algebra A A'] [Algebra R A']
-    [IsScalarTower R A A'] [IsScalarTower R R' A'] (g : R)
-    [IsLocalization.Away g R'] [IsLocalization.Away (algebraMap R A g) A']
-    (N : Submodule R' A') (hN : N.FG) :
-    ∃ E : Finset A, ∀ b : A, algebraMap A A' b ∈ N →
-      ∃ m : ℕ, algebraMap R A g ^ m * b ∈ Submodule.span R (E : Set A) := by
+    {R A R' A' : Type}
+    [CommRing R] [CommRing A] [CommRing R'] [CommRing A'] [Algebra R A] [Algebra R R']
+    [Algebra R' A'] [Algebra A A'] [Algebra R A'] [IsScalarTower R A A'] [IsScalarTower R R' A']
+    (g : R) [IsLocalization.Away g R'] [IsLocalization.Away (algebraMap R A g) A']
+    (N : Submodule R' A') (hN : N.FG)
+    : ∃ E : Finset A, ∀ b : A,
+      algebraMap A A' b ∈ N → ∃ m : ℕ, algebraMap R A g ^ m * b ∈ Submodule.span R (E : Set A) := by
   classical
   obtain ⟨S, rfl⟩ := hN
-  have hA : ∀ (c : R) (z : A),
-      algebraMap A A' (c • z) = algebraMap R A' c * algebraMap A A' z := by
+  have hA : ∀ (c : R) (z : A), algebraMap A A' (c • z) = algebraMap R A' c * algebraMap A A' z := by
     intro c z
     rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply]
-  have hsurj : ∀ n : A', ∃ e : A, ∃ k : ℕ,
-      n * algebraMap R A' g ^ k = algebraMap A A' e := by
+  have hsurj : ∀ n : A', ∃ e : A, ∃ k : ℕ, n * algebraMap R A' g ^ k = algebraMap A A' e := by
     intro n
     obtain ⟨k, e, h⟩ := IsLocalization.Away.surj (algebraMap R A g) n
     exact ⟨e, k, by rw [IsScalarTower.algebraMap_apply R A A']; exact h⟩
   choose e k he using hsurj
   refine ⟨S.image e, ?_⟩
-  have key : ∀ y ∈ Submodule.span R' (S : Set A'), ∃ m : ℕ,
-      ∃ z ∈ Submodule.span R ((S.image e : Finset A) : Set A),
-        algebraMap A A' z = algebraMap R A' g ^ m * y := by
+  have key
+      : ∀ y ∈ Submodule.span R' (S : Set A'), ∃ m : ℕ,
+        ∃ z ∈ Submodule.span R ((S.image e : Finset A) : Set A),
+          algebraMap A A' z = algebraMap R A' g ^ m * y := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem x hx =>
@@ -39,12 +38,12 @@ theorem fg_localizationAway_span_finset
       · simp only [Finset.coe_image]
         exact Set.mem_image_of_mem e hx
       · rw [← he, mul_comm]
-    | zero => exact ⟨0, 0, zero_mem _, by simp⟩
+    | zero =>
+      exact ⟨0, 0, zero_mem _, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨m1, z1, hz1, h1⟩ := hx
       obtain ⟨m2, z2, hz2, h2⟩ := hy
-      refine ⟨m1 + m2, g ^ m2 • z1 + g ^ m1 • z2,
-        add_mem (smul_mem _ _ hz1) (smul_mem _ _ hz2), ?_⟩
+      refine ⟨m1 + m2, g ^ m2 • z1 + g ^ m1 • z2, add_mem (smul_mem _ _ hz1) (smul_mem _ _ hz2), ?_⟩
       rw [map_add (f := _), hA, hA, h1, h2, map_pow, map_pow]
       ring
     | smul r' x _ hx =>

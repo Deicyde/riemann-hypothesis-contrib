@@ -8,6 +8,7 @@ public import Development.WeilBound.CoreStatements.ResolutionCharZero.Principali
 namespace NadelVanishingSeparation.NSI
 
 theorem isolatedNonKltDivisor : GlobalTheory.Published.IsolatedNonKltDivisor :=
-  GlobalTheory.isolatedNonKltDivisor_of_principalisation PositivityTheory.ResPlug.WeightsCompactStabilizer.principalisation_closed
+  GlobalTheory.isolatedNonKltDivisor_of_principalisation
+    PositivityTheory.ResPlug.WeightsCompactStabilizer.principalisation_closed
 
 end NadelVanishingSeparation.NSI

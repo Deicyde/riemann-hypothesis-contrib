@@ -15,25 +15,26 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem FlagAltTopDegree.proof (h1 : FlagCoeffBlockPermute.Statement)
-    (h2 : FlagAltCoeffInjective.Statement) (h3 : FlagInjSumBound.Statement)
-    (h4 : FlagStaircaseOrbit.Statement) (h5 : FlagVandermondeHomogeneous.Statement) :
-    FlagAltTopDegree.Statement := by
+theorem FlagAltTopDegree.proof
+    (h1 : FlagCoeffBlockPermute.Statement) (h2 : FlagAltCoeffInjective.Statement)
+    (h3 : FlagInjSumBound.Statement) (h4 : FlagStaircaseOrbit.Statement)
+    (h5 : FlagVandermondeHomogeneous.Statement)
+    : FlagAltTopDegree.Statement := by
   intro f N P hP hhom
 
-  have key : ∀ (R : RootRing f N) (β : Fin f × Fin N →₀ ℕ), IsBlockAlternating f N R →
-      R.IsHomogeneous (topDegree f N) → AddMonoidAlgebra.coeff R β ≠ 0 →
-      (∀ τ, Function.Injective fun i : Fin N => β (τ, i)) ∧ ∀ τ i, β (τ, i) < N := by
+  have key
+      : ∀ (R : RootRing f N) (β : Fin f × Fin N →₀ ℕ),
+        IsBlockAlternating f N R → R.IsHomogeneous (topDegree f N) → AddMonoidAlgebra.coeff R β ≠ 0
+          → (∀ τ, Function.Injective fun i : Fin N => β (τ, i)) ∧ ∀ τ i, β (τ, i) < N := by
     intro R β hR hRh hβ
     have hinj := h2 f N R β hR hβ
     refine ⟨hinj, ?_⟩
-    have hdeg : β.degree = topDegree f N := by
-      by_contra hne; exact hβ (hRh.coeff_eq_zero hne)
+    have hdeg : β.degree = topDegree f N := by by_contra hne; exact hβ (hRh.coeff_eq_zero hne)
     rw [Finsupp.degree_eq_sum, Fintype.sum_prod_type, topDegree] at hdeg
     set K := N * (N - 1) / 2
     have hge : ∀ τ, K ≤ ∑ i, β (τ, i) := fun τ => (h3 N _ (hinj τ)).1
-    have hsplit : ∑ τ : Fin f, ∑ i, β (τ, i) =
-        ∑ _τ : Fin f, K + ∑ τ : Fin f, (∑ i, β (τ, i) - K) := by
+    have hsplit
+        : ∑ τ : Fin f, ∑ i, β (τ, i) = ∑ _τ : Fin f, K + ∑ τ : Fin f, (∑ i, β (τ, i) - K) := by
       rw [← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun τ _ => (Nat.add_sub_of_le (hge τ)).symm
     rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul, hdeg] at hsplit
@@ -60,12 +61,16 @@ theorem FlagAltTopDegree.proof (h1 : FlagCoeffBlockPermute.Statement)
     obtain ⟨hinjα, hltα⟩ := key Q α hQalt hQhom hα
     obtain ⟨hinj₁, hlt₁⟩ := key _ α₁ hΔ (h5 f N) hα₁
     obtain ⟨w, hw⟩ := h4 f N α α₁ hltα hlt₁ hinjα hinj₁
-    have hα₁eq : (Finsupp.equivFunOnFinite.symm fun p : Fin f × Fin N => α (p.1, w p.1 p.2)) = α₁ := by
+    have hα₁eq
+        : (Finsupp.equivFunOnFinite.symm fun p : Fin f × Fin N => α (p.1, w p.1 p.2)) = α₁ := by
       ext p; simp [hw]
     have hc := h1 f N w Q α
     rw [hα₁eq, hQα₁, hQalt w, coeff_smul, smul_eq_mul] at hc
     have hs : blockSign f N w ≠ 0 := by
-      intro h0; have := Flag.blockSign_mul_self f N w; rw [h0, zero_mul] at this; exact zero_ne_one this
+      intro h0
+      have := Flag.blockSign_mul_self f N w
+      rw [h0, zero_mul] at this
+      exact zero_ne_one this
     exact hα ((mul_eq_zero.mp hc).resolve_left hs)
   exact ⟨e, sub_eq_zero.mp hQ0⟩
 

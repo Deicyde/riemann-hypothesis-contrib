@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.H
 
-variable (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+variable
+  (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
 theorem schwartz_decay_gaussian : SchwartzDecay V := by

@@ -8,8 +8,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-theorem UpperTheory.V.Pr.exists_nice_prime_above_of_large_dim :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [UpperTheory.V.Fr.IsCoef l O] (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (C₀ n : ℕ), F.Ok C₀ → F.Big C₀ → (n = 2 ∨ n = 3) → ∀ (S : UpperTheory.V.Fr.Space O F n) (x : Ideal S.A) (L : S.Loc x), ¬ S.u.triP ≤ x → ∀ I : Ideal S.B, S.FinLam I → ∀ P : Ideal L.R, I ≤ L.π P → ((n * F.d + 1 : ℕ) : WithBot ℕ∞) ≤ UpperTheory.V.Pr.qdim P → ∃ p, UpperTheory.V.Pr.Nice L.ρ p ∧ P ≤ p := by
+theorem UpperTheory.V.Pr.exists_nice_prime_above_of_large_dim
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [UpperTheory.V.Fr.IsCoef l O] (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O))
+        (C₀ n : ℕ),
+      F.Ok C₀ → F.Big C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : UpperTheory.V.Fr.Space O F n) (x : Ideal S.A) (L : S.Loc x),
+          ¬ S.u.triP ≤ x
+            → ∀ I : Ideal S.B,
+              S.FinLam I
+                → ∀ P : Ideal L.R,
+                  I ≤ L.π P → ((n * F.d + 1 : ℕ) : WithBot ℕ∞) ≤ UpperTheory.V.Pr.qdim P
+                    → ∃ p, UpperTheory.V.Pr.Nice L.ρ p ∧ P ≤ p := by
   intro l _ O _ _ _ _ F C₀ n hOk hBig hn S x L hx I hI P hIP hdim
   haveI := L.co
   haveI : IsLocalHom (algebraMap L.O' L.R) := L.co.isLocalHom
@@ -28,9 +38,11 @@ theorem UpperTheory.V.Pr.exists_nice_prime_above_of_large_dim :
     match o with
     | none => L.ρ.triM
     | some (v, i, j) =>
-      if i = j then ⊤ else
-        Ideal.map L.b I ⊔ Ideal.map (algebraMap O L.R) (IsLocalRing.maximalIdeal O) ⊔
-          Ideal.span {y | ∃ g ∈ F.Nv v, y = ↑((L.ρ.ψ v i) g) - ↑((L.ρ.ψ v j) g)}
+      if i = j then
+        ⊤
+      else
+        Ideal.map L.b I ⊔ Ideal.map (algebraMap O L.R) (IsLocalRing.maximalIdeal O)
+          ⊔ Ideal.span {y | ∃ g ∈ F.Nv v, y = ↑((L.ρ.ψ v i) g) - ↑((L.ρ.ψ v j) g)}
   have hN : 1 ≤ n * F.d := by
     have h1 : 1 ≤ n := by rcases hn with h | h <;> omega
     have h2 : 1 ≤ F.d := by have := hBig.1; omega

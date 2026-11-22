@@ -172,16 +172,17 @@ end
 
 end UpperTheory.Reformulated.B.StringRepresentationDecomposition
 
-theorem UpperTheory.Reformulated.B.StringRepresentationDecomposition.smith_gen.{u_1} :
-    ∀ {K : Type u_1} [inst : NormedField K] [IsUltrametricDist K] {n : ℕ} (P : GL (Fin n) K),
+theorem UpperTheory.Reformulated.B.StringRepresentationDecomposition.smith_gen.{u_1}
+    : ∀ {K : Type u_1} [inst : NormedField K] [IsUltrametricDist K] {n : ℕ} (P : GL (Fin n) K),
       ∃ (U : GL (Fin n) K) (V : GL (Fin n) K) (d : Fin n → K),
-        (∀ (i j : Fin n), ‖(↑U : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ)) ∧
-          (∀ (i j : Fin n), ‖(↑U⁻¹ : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ)) ∧
-            (∀ (i j : Fin n), ‖(↑V : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ)) ∧
-              (∀ (i j : Fin n), ‖(↑V⁻¹ : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ)) ∧
-                (∀ (i : Fin n), d i ≠ (0 : K)) ∧
-                  (↑P : Matrix (Fin n) (Fin n) K) =
-                    (↑U : Matrix (Fin n) (Fin n) K) * Matrix.diagonal d * (↑V : Matrix (Fin n) (Fin n) K) := by
+        (∀ (i j : Fin n), ‖(↑U : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ))
+          ∧ (∀ (i j : Fin n), ‖(↑U⁻¹ : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ))
+          ∧ (∀ (i j : Fin n), ‖(↑V : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ))
+          ∧ (∀ (i j : Fin n), ‖(↑V⁻¹ : Matrix (Fin n) (Fin n) K) i j‖ ≤ (1 : ℝ))
+          ∧ (∀ (i : Fin n), d i ≠ (0 : K))
+          ∧ (↑P : Matrix (Fin n) (Fin n) K)
+            = (↑U : Matrix (Fin n) (Fin n) K) * Matrix.diagonal d
+              * (↑V : Matrix (Fin n) (Fin n) K) := by
   intro K _ _ n P
   obtain ⟨A, B, d, hA, hB, h⟩ := smith_fin n (↑P : Matrix (Fin n) (Fin n) K)
   obtain ⟨U, rfl, hU⟩ := good_gl hA

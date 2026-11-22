@@ -12,14 +12,15 @@ open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Fins
 
 namespace GlobalTheory
 
-private theorem exp_real_smul_mem_UJset_of_inG {n : ℕ} (H X : Matrix (Fin n) (Fin n) ℂ) (hX : X.conjTranspose * H + H * X = 0)
-    (t : ℝ) : (NormedSpace.exp ((t : ℂ) • X)).conjTranspose * H * NormedSpace.exp ((t : ℂ) • X) = H := by
+private theorem exp_real_smul_mem_UJset_of_inG
+    {n : ℕ} (H X : Matrix (Fin n) (Fin n) ℂ) (hX : X.conjTranspose * H + H * X = 0) (t : ℝ)
+    : (NormedSpace.exp ((t : ℂ) • X)).conjTranspose * H * NormedSpace.exp ((t : ℂ) • X) = H := by
   set Y : Matrix (Fin n) (Fin n) ℂ := (t : ℂ) • X with hYdef
   have hHX : H * X = -(X.conjTranspose * H) := eq_neg_of_add_eq_zero_right hX
   have hY : SemiconjBy H Y (-Y.conjTranspose) := by
     show H * Y = -Y.conjTranspose * H
-    rw [hYdef, Matrix.mul_smul, hHX, Matrix.conjTranspose_smul, Complex.star_def, Complex.conj_ofReal,
-      Matrix.neg_mul, Matrix.smul_mul, smul_neg]
+    rw [hYdef, Matrix.mul_smul, hHX, Matrix.conjTranspose_smul, Complex.star_def,
+      Complex.conj_ofReal, Matrix.neg_mul, Matrix.smul_mul, smul_neg]
   have key : NormedSpace.exp (-(-Y.conjTranspose)) * H * NormedSpace.exp Y = H := by
     letI : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedRing
     letI : NormedAlgebra ℚ (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedAlgebra
@@ -28,30 +29,37 @@ private theorem exp_real_smul_mem_UJset_of_inG {n : ℕ} (H X : Matrix (Fin n) (
     exact hY.exp_neg_mul_mul_exp_eq_self
   rwa [neg_neg, Matrix.exp_conjTranspose] at key
 
-private theorem mul_mem_UH_Hpk' {k r : ℕ} {g h : B.Mat k r} (hg : g ∈ B.GV k r) (hh : h ∈ B.GV k r) :
-    g * h ∈ B.GV k r := by
+private theorem mul_mem_UH_Hpk' {k r : ℕ} {g h : B.Mat k r} (hg : g ∈ B.GV k r) (hh : h ∈ B.GV k r)
+    : g * h ∈ B.GV k r := by
   have hg' : g.conjTranspose * Hpk k r * g = Hpk k r := hg
   have hh' : h.conjTranspose * Hpk k r * h = Hpk k r := hh
   show (g * h).conjTranspose * Hpk k r * (g * h) = Hpk k r
-  rw [Matrix.conjTranspose_mul, show h.conjTranspose * g.conjTranspose * Hpk k r * (g * h) = h.conjTranspose * (g.conjTranspose * Hpk k r * g) * h by
-    simp only [Matrix.mul_assoc], hg', hh']
+  rw [Matrix.conjTranspose_mul,
+    show h.conjTranspose * g.conjTranspose * Hpk k r * (g * h)
+        = h.conjTranspose * (g.conjTranspose * Hpk k r * g) * h by
+      simp only [Matrix.mul_assoc],
+    hg', hh']
 
-private theorem exp_smul_mem_UJset' {k r : ℕ} {X : B.Mat k r} (hX : B.inLie k r X) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • X) ∈ B.GV k r :=
+private theorem exp_smul_mem_UJset' {k r : ℕ} {X : B.Mat k r} (hX : B.inLie k r X) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • X) ∈ B.GV k r :=
   exp_real_smul_mem_UJset_of_inG (Hpk k r) X hX t
 
-private theorem rdV_congr_on_GV {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    {X : B.Mat k r} (hX : B.inLie k r X) {f f' : B.Mat k r → E}
-    (h : ∀ g ∈ B.GV k r, f g = f' g) : ∀ g ∈ B.GV k r, RdV X f g = RdV X f' g := by
+private theorem rdV_congr_on_GV
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {X : B.Mat k r} (hX : B.inLie k r X)
+    {f f' : B.Mat k r → E} (h : ∀ g ∈ B.GV k r, f g = f' g)
+    : ∀ g ∈ B.GV k r, RdV X f g = RdV X f' g := by
   intro g hg
   simp only [RdV]
   congr 1
   funext t
   exact h _ (mul_mem_UH_Hpk' hg (exp_smul_mem_UJset' hX t))
 
-private theorem ldV_congr_on_GV {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    {X : B.Mat k r} (hX : B.inLie k r X) {f f' : B.Mat k r → E}
-    (h : ∀ g ∈ B.GV k r, f g = f' g) : ∀ g ∈ B.GV k r, B.LdV X f g = B.LdV X f' g := by
+private theorem ldV_congr_on_GV
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {X : B.Mat k r} (hX : B.inLie k r X)
+    {f f' : B.Mat k r → E} (h : ∀ g ∈ B.GV k r, f g = f' g)
+    : ∀ g ∈ B.GV k r, B.LdV X f g = B.LdV X f' g := by
   intro g hg
   simp only [B.LdV]
   congr 1
@@ -60,24 +68,34 @@ private theorem ldV_congr_on_GV {k r : ℕ} {E : Type} [NormedAddCommGroup E] [N
   rw [hneg]
   exact h _ (mul_mem_UH_Hpk' (exp_smul_mem_UJset' hX (-t)) hg)
 
-private theorem rw_congr_on_GV {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (v : List (B.Mat k r)) (hv : ∀ X ∈ v, B.inLie k r X) {f f' : B.Mat k r → E}
-    (h : ∀ g ∈ B.GV k r, f g = f' g) : ∀ g ∈ B.GV k r, B.Rw v f g = B.Rw v f' g := by
+private theorem rw_congr_on_GV
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (v : List (B.Mat k r)) (hv : ∀ X ∈ v, B.inLie k r X)
+    {f f' : B.Mat k r → E} (h : ∀ g ∈ B.GV k r, f g = f' g)
+    : ∀ g ∈ B.GV k r, B.Rw v f g = B.Rw v f' g := by
   induction v with
   | nil => exact h
   | cons X v ih =>
-    exact rdV_congr_on_GV (hv X List.mem_cons_self) (ih fun Y hY => hv Y (List.mem_cons_of_mem X hY))
+    exact rdV_congr_on_GV (hv X List.mem_cons_self)
+      (ih fun Y hY => hv Y (List.mem_cons_of_mem X hY))
 
-private theorem dLR_congr_on_GV {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+private theorem dLR_congr_on_GV
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (u v : List (B.Mat k r)) (hu : ∀ X ∈ u, B.inLie k r X) (hv : ∀ X ∈ v, B.inLie k r X)
-    {f f' : B.Mat k r → E} (h : ∀ g ∈ B.GV k r, f g = f' g) :
-    ∀ g ∈ B.GV k r, B.dLR u v f g = B.dLR u v f' g := by
+    {f f' : B.Mat k r → E} (h : ∀ g ∈ B.GV k r, f g = f' g)
+    : ∀ g ∈ B.GV k r, B.dLR u v f g = B.dLR u v f' g := by
   induction u with
   | nil => exact rw_congr_on_GV v hv h
   | cons X u ih =>
-    exact ldV_congr_on_GV (hu X List.mem_cons_self) (ih fun Y hY => hu Y (List.mem_cons_of_mem X hY))
+    exact ldV_congr_on_GV (hu X List.mem_cons_self)
+      (ih fun Y hY => hu Y (List.mem_cons_of_mem X hY))
 
-theorem ckOn_inCC_congr_on_group : ∀ (k r : ℕ) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (A : ℝ) (F F' : B.Mat k r → E), (∀ g ∈ B.GV k r, F g = F' g) → (B.CkOn ⊤ (B.GV k r) F → B.CkOn ⊤ (B.GV k r) F') ∧ ∀ m : ℕ, B.InCC A m F → B.InCC A m F' := by
+theorem ckOn_inCC_congr_on_group
+    : ∀ (k r : ℕ) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (A : ℝ)
+        (F F' : B.Mat k r → E),
+      (∀ g ∈ B.GV k r, F g = F' g)
+        → (B.CkOn ⊤ (B.GV k r) F → B.CkOn ⊤ (B.GV k r) F')
+          ∧ ∀ m : ℕ, B.InCC A m F → B.InCC A m F' := by
   intro k r E _ _ A F F' h
   have hck : ∀ m : ℕ∞, B.CkOn m (B.GV k r) F → B.CkOn m (B.GV k r) F' := by
     intro m hF g₀ hg₀

@@ -18,55 +18,62 @@ open CategoryTheory CategoryTheory.Limits groupCohomology GroundTheory.LocalFiel
 
 section Compare
 
-variable (K K' L L' : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K] [Field L] [ValuativeRel L] [TopologicalSpace L]
-  [IsNonarchimedeanLocalField L] [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
-  [IsUnramified K L] [Field K'] [Field L'] [Algebra K K'] [Algebra K L'] [Algebra K' L']
-  [Algebra L L'] [IsScalarTower K K' L'] [IsScalarTower K L L'] [Normal K L]
+variable
+  (K K' L L' : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L] [IsUnramified K L] [Field K'] [Field L']
+  [Algebra K K'] [Algebra K L'] [Algebra K' L'] [Algebra L L'] [IsScalarTower K K' L']
+  [IsScalarTower K L L'] [Normal K L]
 
-theorem h2GalUnitsAddEquiv_unitsRes_unitsInfl (y : groupCohomology (galUnits K L) 2) :
-    h2GalUnitsAddEquiv K' L' ((unitsInfl K L L' 2 ≫ unitsRes K K' L' 2).hom y) =
-      (unitsResH2 K K' L L').hom (h2GalUnitsAddEquiv K L y) := by
+theorem h2GalUnitsAddEquiv_unitsRes_unitsInfl (y : groupCohomology (galUnits K L) 2)
+    : h2GalUnitsAddEquiv K' L' ((unitsInfl K L L' 2 ≫ unitsRes K K' L' 2).hom y)
+      = (unitsResH2 K K' L L').hom (h2GalUnitsAddEquiv K L y) := by
   refine H2_induction_on y fun c => ?_
   rw [h2GalUnitsAddEquiv_H2_class, unitsInfl, unitsRes, ← groupCohomology.map_comp]
-  have h1 := congrArg (fun h => ModuleCat.Hom.hom h c) (groupCohomology.H2π_comp_map
-    ((AlgEquiv.restrictNormalHom (F := K) (K₁ := L') L).comp (galRestrictScalars K K' L'))
-    ((Rep.resFunctor (galRestrictScalars K K' L')).map (unitsInclHom K L L') ≫
-      unitsResScalarsHom K K' L'))
-  have h2 := congrArg (fun h => ModuleCat.Hom.hom h (cocycles₂IntRepAddEquiv (galUnitsHom K L) c))
-    (groupCohomology.H2π_comp_map (galRestrict K K' L L') (unitsResHom K K' L L'))
+  have h1 :=
+    congrArg
+      (fun h => ModuleCat.Hom.hom h c)
+      (groupCohomology.H2π_comp_map
+        ((AlgEquiv.restrictNormalHom (F := K) (K₁ := L') L).comp (galRestrictScalars K K' L'))
+        ((Rep.resFunctor (galRestrictScalars K K' L')).map (unitsInclHom K L L')
+          ≫ unitsResScalarsHom K K' L'))
+  have h2 :=
+    congrArg
+      (fun h => ModuleCat.Hom.hom h (cocycles₂IntRepAddEquiv (galUnitsHom K L) c))
+      (groupCohomology.H2π_comp_map (galRestrict K K' L L') (unitsResHom K K' L L'))
   simp only [ModuleCat.hom_comp, LinearMap.comp_apply] at h1 h2
   rw [h1, h2, h2GalUnitsAddEquiv_H2_class]
   rfl
 
-variable [ValuativeRel K'] [TopologicalSpace K'] [IsNonarchimedeanLocalField K'] [ValuativeRel L']
+variable
+  [ValuativeRel K'] [TopologicalSpace K'] [IsNonarchimedeanLocalField K'] [ValuativeRel L']
   [TopologicalSpace L'] [IsNonarchimedeanLocalField L'] [ValuativeExtension K K']
   [ValuativeExtension K' L'] [ValuativeExtension L L'] [FiniteDimensional K K']
   [FiniteDimensional K' L'] [IsUnramified K' L']
 
-theorem unitsInfl_comp_unitsRes_eq_zero (h : Module.finrank K L ∣ Module.finrank K K') :
-    unitsInfl K L L' 2 ≫ unitsRes K K' L' 2 = 0 := by
+theorem unitsInfl_comp_unitsRes_eq_zero (h : Module.finrank K L ∣ Module.finrank K K')
+    : unitsInfl K L L' 2 ≫ unitsRes K K' L' 2 = 0 := by
   ext y
   apply (h2GalUnitsAddEquiv K' L').injective
   rw [h2GalUnitsAddEquiv_unitsRes_unitsInfl, ModuleCat.hom_zero, LinearMap.zero_apply, map_zero]
   apply unramifiedInv_injective K' L'
   rw [unramifiedInv_unitsResH2, map_zero]
   obtain ⟨m, hm⟩ := h
-  have hz := (mem_range_unramifiedInv_iff K L (unramifiedInv K L (h2GalUnitsAddEquiv K L y))).1
-    ⟨_, rfl⟩
+  have hz :=
+    (mem_range_unramifiedInv_iff K L (unramifiedInv K L (h2GalUnitsAddEquiv K L y))).1 ⟨_, rfl⟩
   rw [hm, mul_comm, mul_nsmul, smul_comm, hz, nsmul_zero]
 
 end Compare
 
 section Main
 
-variable {K L : Type} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L] [IsGalois K L]
+variable
+  {K L : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L] [IsGalois K L]
 
-theorem finrank_le_natCard_groupCohomology_two_galUnits :
-    Module.finrank K L ≤ Nat.card (groupCohomology (galUnits K L) 2) := by
+theorem finrank_le_natCard_groupCohomology_two_galUnits
+    : Module.finrank K L ≤ Nat.card (groupCohomology (galUnits K L) 2) := by
   classical
   set n := Module.finrank K L with hn_def
   have hn : n ≠ 0 := Module.finrank_pos.ne'
@@ -97,8 +104,9 @@ theorem finrank_le_natCard_groupCohomology_two_galUnits :
   have := hKζgal
   have : FiniteDimensional K K⟮ζ⟯ := hKζ.1
   let M0 : IntermediateField K Ω := L0 ⊔ K⟮ζ⟯
-  let φL : L →ₐ[K] M0 := (IsScalarTower.toAlgHom K L Ω).codRestrict M0.toSubalgebra
-    fun x => (le_sup_left : L0 ≤ M0) ⟨x, rfl⟩
+  let φL : L →ₐ[K] M0 :=
+    (IsScalarTower.toAlgHom K L Ω).codRestrict M0.toSubalgebra fun x =>
+      (le_sup_left : L0 ≤ M0) ⟨x, rfl⟩
   let : Algebra L M0 := φL.toRingHom.toAlgebra
   have : IsScalarTower K L M0 := IsScalarTower.of_algebraMap_eq fun x => (φL.commutes x).symm
   have : FiniteDimensional L M0 := Module.Finite.of_restrictScalars_finite K L M0
@@ -111,8 +119,9 @@ theorem finrank_le_natCard_groupCohomology_two_galUnits :
   have hζM : IsPrimitiveRoot ζM (q ^ (f * n) - 1) :=
     (IsPrimitiveRoot.map_iff_of_injective (f := M0.val) M0.val.injective).1 hζ
 
-  have hF := isUnramifiedSubextension_adjoin (K := L) (Ksep := M0) hn
-    (show IsPrimitiveRoot ζM (Nat.card 𝓀[L] ^ n - 1) by rw [hQ, ← pow_mul]; exact hζM)
+  have hF :=
+    isUnramifiedSubextension_adjoin (K := L) (Ksep := M0) hn
+      (show IsPrimitiveRoot ζM (Nat.card 𝓀[L] ^ n - 1) by rw [hQ, ← pow_mul]; exact hζM)
   have htop : L⟮ζM⟯ = ⊤ := by
     rw [eq_top_iff]
     rintro x -
@@ -147,13 +156,15 @@ theorem finrank_le_natCard_groupCohomology_two_galUnits :
     rwa [one_pow, ← pow_mul, mul_comm] at this
   have hpos : 0 < q ^ n - 1 := Nat.sub_pos_of_lt (Nat.one_lt_pow hn hq)
   set k := (q ^ (f * n) - 1) / (q ^ n - 1) with hk_def
-  have hk0 : k ≠ 0 := (Nat.div_pos (Nat.le_of_dvd
-    (Nat.sub_pos_of_lt (Nat.one_lt_pow (mul_ne_zero hf hn) hq)) hdvd) hpos).ne'
+  have hk0 : k ≠ 0 :=
+    (Nat.div_pos (Nat.le_of_dvd (Nat.sub_pos_of_lt (Nat.one_lt_pow (mul_ne_zero hf hn) hq)) hdvd)
+      hpos).ne'
   have hkdvd : k ∣ q ^ (f * n) - 1 := Nat.div_dvd_of_dvd hdvd
   have hζk : IsPrimitiveRoot (ζM ^ k) (q ^ n - 1) := by
     have := hζM.pow_of_dvd hk0 hkdvd
-    rwa [hk_def, Nat.div_div_self hdvd
-      (Nat.sub_pos_of_lt (Nat.one_lt_pow (mul_ne_zero hf hn) hq)).ne'] at this
+    rwa [hk_def,
+        Nat.div_div_self hdvd (Nat.sub_pos_of_lt (Nat.one_lt_pow (mul_ne_zero hf hn) hq)).ne']
+      at this
   obtain ⟨hE, hEn, hEgal, hEcyc, -⟩ :=
     isUnramifiedSubextension_adjoin_spec (K := K) (Ksep := M0) hn hζk
   have := hEgal
@@ -167,8 +178,8 @@ theorem finrank_le_natCard_groupCohomology_two_galUnits :
   rw [natCard_groupCohomology_two_galUnits_of_isCyclic, hEn] at hle
   exact hle
 
-theorem natCard_groupCohomology_two_galUnits :
-    Nat.card (groupCohomology (galUnits K L) 2) = Module.finrank K L :=
+theorem natCard_groupCohomology_two_galUnits
+    : Nat.card (groupCohomology (galUnits K L) 2) = Module.finrank K L :=
   le_antisymm (Nat.le_of_dvd Module.finrank_pos natCard_groupCohomology_two_galUnits_dvd)
     finrank_le_natCard_groupCohomology_two_galUnits
 

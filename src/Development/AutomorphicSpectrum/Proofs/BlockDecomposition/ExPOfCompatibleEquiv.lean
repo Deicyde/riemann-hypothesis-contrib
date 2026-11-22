@@ -10,28 +10,34 @@ set_option autoImplicit false
 namespace GlobalTheory.CompanionTheory.SurjectionOntoH4
 open CrystallineSemistableComparison.Onto
 
-theorem dZ_addEquiv_apply {ι : Type} [DecidableEq ι] (M N : Finset ι → Type) [∀ S, AddCommGroup (M S)]
-    [∀ S, AddCommGroup (N S)] (r : ∀ {S T : Finset ι}, S ⊆ T → M S → M T)
-    (r' : ∀ {S T : Finset ι}, S ⊆ T → N S → N T) (e : ∀ S, M S ≃+ N S)
-    (hn : ∀ {S T : Finset ι} (h : S ⊆ T) x, e T (r h x) = r' h (e S x)) (m : ℕ)
-    (c : ∀ i : Fin (m + 1) → ι, M (ent i)) (i : Fin (m + 2) → ι) :
-    e _ (dZ M r m c i) = dZ N r' m (fun i => e _ (c i)) i := by
+theorem dZ_addEquiv_apply
+    {ι : Type} [DecidableEq ι]
+    (M N : Finset ι → Type) [∀ S, AddCommGroup (M S)] [∀ S, AddCommGroup (N S)]
+    (r : ∀ {S T : Finset ι}, S ⊆ T → M S → M T) (r' : ∀ {S T : Finset ι}, S ⊆ T → N S → N T)
+    (e : ∀ S, M S ≃+ N S) (hn : ∀ {S T : Finset ι} (h : S ⊆ T) x, e T (r h x) = r' h (e S x))
+    (m : ℕ) (c : ∀ i : Fin (m + 1) → ι, M (ent i)) (i : Fin (m + 2) → ι)
+    : e _ (dZ M r m c i) = dZ N r' m (fun i => e _ (c i)) i := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dZ, map_sum, map_zsmul, hn]
+  simp only [dZ, map_sum, map_zsmul, hn]
 
-theorem dZ_eq_zero_of_addEquiv {ι : Type} [DecidableEq ι] (M N : Finset ι → Type) [∀ S, AddCommGroup (M S)]
-    [∀ S, AddCommGroup (N S)] (r : ∀ {S T : Finset ι}, S ⊆ T → M S → M T)
-    (r' : ∀ {S T : Finset ι}, S ⊆ T → N S → N T) (e : ∀ S, M S ≃+ N S)
-    (hn : ∀ {S T : Finset ι} (h : S ⊆ T) x, e T (r h x) = r' h (e S x)) (m : ℕ)
-    (c : ∀ i : Fin (m + 1) → ι, N (ent i)) (hc : dZ N r' m c = 0) :
-    dZ M r m (fun i => (e _).symm (c i)) = 0 := by
+theorem dZ_eq_zero_of_addEquiv
+    {ι : Type} [DecidableEq ι]
+    (M N : Finset ι → Type) [∀ S, AddCommGroup (M S)] [∀ S, AddCommGroup (N S)]
+    (r : ∀ {S T : Finset ι}, S ⊆ T → M S → M T) (r' : ∀ {S T : Finset ι}, S ⊆ T → N S → N T)
+    (e : ∀ S, M S ≃+ N S) (hn : ∀ {S T : Finset ι} (h : S ⊆ T) x, e T (r h x) = r' h (e S x))
+    (m : ℕ) (c : ∀ i : Fin (m + 1) → ι, N (ent i)) (hc : dZ N r' m c = 0)
+    : dZ M r m (fun i => (e _).symm (c i)) = 0 := by
   funext i
   apply (e _).injective
   rw [dZ_addEquiv_apply M N r r' e hn m, Pi.zero_apply, map_zero]
   simp only [AddEquiv.apply_symm_apply]
   exact congrFun hc i
 
-theorem exP_of_addEquiv : ∀ {ι : Type} [DecidableEq ι] (M N : Finset ι → Type) [∀ S, AddCommGroup (M S)] [∀ S, AddCommGroup (N S)] (r : ∀ {S T : Finset ι}, S ⊆ T → M S → M T) (r' : ∀ {S T : Finset ι}, S ⊆ T → N S → N T) (e : ∀ S, M S ≃+ N S), (∀ {S T : Finset ι} (h : S ⊆ T) x, e T (r h x) = r' h (e S x)) → ExP M r → ExP N r' := by
+theorem exP_of_addEquiv
+    : ∀ {ι : Type} [DecidableEq ι] (M N : Finset ι → Type) [∀ S, AddCommGroup (M S)]
+        [∀ S, AddCommGroup (N S)] (r : ∀ {S T : Finset ι}, S ⊆ T → M S → M T)
+        (r' : ∀ {S T : Finset ι}, S ⊆ T → N S → N T) (e : ∀ S, M S ≃+ N S),
+      (∀ {S T : Finset ι} (h : S ⊆ T) x, e T (r h x) = r' h (e S x)) → ExP M r → ExP N r' := by
   intro ι _ M N _ _ r r' e hn hM
   obtain ⟨h0, h1, h2⟩ := hM
   refine ⟨?_, ?_, ?_⟩
@@ -53,7 +59,8 @@ theorem exP_of_addEquiv : ∀ {ι : Type} [DecidableEq ι] (M N : Finset ι → 
     rw [h5, AddEquiv.apply_symm_apply] at h6
     exact h6.symm
   · intro m c hc
-    obtain ⟨b, hb⟩ := h2 m (fun i => (e _).symm (c i)) (dZ_eq_zero_of_addEquiv M N r r' e hn (m + 1) c hc)
+    obtain ⟨b, hb⟩ :=
+      h2 m (fun i => (e _).symm (c i)) (dZ_eq_zero_of_addEquiv M N r r' e hn (m + 1) c hc)
     refine ⟨fun i => e _ (b i), ?_⟩
     funext i
     have h3 := dZ_addEquiv_apply M N r r' e hn m b i

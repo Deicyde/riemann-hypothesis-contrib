@@ -19,7 +19,10 @@ theorem eq_one_of_pow_two_pow_near {z : ℂ} (h : ∀ n : ℕ, ‖z ^ (2 ^ n) - 
   | exact _root_.GlobalTheory.PositiveFormRecursion.main
   | (apply _root_.GlobalTheory.PositiveFormRecursion.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.PositiveFormRecursion.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PositiveFormRecursion.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.PositiveFormRecursion.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PositiveFormRecursion.main ..)
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
@@ -52,12 +55,15 @@ theorem isLocallyConstant_addChar (ψ : AddChar k ℂ) (hψ : Continuous ψ) : I
     have hc : ContinuousAt (fun y : k => y - x) x := by fun_prop
     exact hc.preimage_mem_nhds (by simpa using hb.mem_of_mem hγ)
   filter_upwards [hn] with y hy
-  have e : ψ y = ψ (y - x) * ψ x := by
-    rw [← AddChar.map_add_eq_mul]; simp
+  have e : ψ y = ψ (y - x) * ψ x := by rw [← AddChar.map_add_eq_mul]; simp
   rw [e, hker _ hy, one_mul]
 
-theorem schr_mem_SB : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [Invertible (2 : k)] (ψ0 : AddChar k ℂ), Continuous ψ0 →
-    ∀ {κ : Type} [Fintype κ] (w : (κ → k) × (κ → k)), ∀ φ ∈ GlobalTheory.WeilM.SB (κ → k), GlobalTheory.WeilM.schr ψ0 w φ ∈ GlobalTheory.WeilM.SB (κ → k) := by
+theorem schr_mem_SB
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [Invertible (2 : k)] (ψ0 : AddChar k ℂ),
+      Continuous ψ0
+        → ∀ {κ : Type} [Fintype κ] (w : (κ → k) × (κ → k)), ∀ φ ∈ GlobalTheory.WeilM.SB (κ → k),
+          GlobalTheory.WeilM.schr ψ0 w φ ∈ GlobalTheory.WeilM.SB (κ → k) := by
   intro k _ _ _ _ _ ψ0 hψ κ _ w φ hφ
   obtain ⟨h1, h2⟩ : IsLocallyConstant φ ∧ HasCompactSupport φ := hφ
   have hl := isLocallyConstant_addChar ψ0 hψ
@@ -81,8 +87,18 @@ section
 
 open MeasureTheory Matrix
 
-theorem _root_.GlobalTheory.Adopt.schroedingerOperatorHeisenberg_preserves_schwartzBruhat : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [Invertible (2 : k)] (ψ0 : AddChar k ℂ), Continuous ψ0 →
-    ∀ {κ : Type} [Fintype κ] (w : (κ → k) × (κ → k)), ∀ φ ∈ GlobalTheory.WeilM.SB (κ → k), GlobalTheory.WeilM.schr ψ0 w φ ∈ GlobalTheory.WeilM.SB (κ → k) := by
-  first | exact @SchrodingerSchwartzBruhat.GlobalTheory.CompanionTheory.SchrSB.schr_mem_SB | exact SchrodingerSchwartzBruhat.GlobalTheory.CompanionTheory.SchrSB.schr_mem_SB | (intros; apply SchrodingerSchwartzBruhat.GlobalTheory.CompanionTheory.SchrSB.schr_mem_SB <;> assumption)
+theorem _root_.GlobalTheory.Adopt.schroedingerOperatorHeisenberg_preserves_schwartzBruhat
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [Invertible (2 : k)] (ψ0 : AddChar k ℂ),
+      Continuous ψ0
+        → ∀ {κ : Type} [Fintype κ] (w : (κ → k) × (κ → k)), ∀ φ ∈ GlobalTheory.WeilM.SB (κ → k),
+          GlobalTheory.WeilM.schr ψ0 w φ ∈ GlobalTheory.WeilM.SB (κ → k) := by
+  first
+  | exact @SchrodingerSchwartzBruhat.GlobalTheory.CompanionTheory.SchrSB.schr_mem_SB
+  | exact SchrodingerSchwartzBruhat.GlobalTheory.CompanionTheory.SchrSB.schr_mem_SB
+  | (
+      intros
+      apply SchrodingerSchwartzBruhat.GlobalTheory.CompanionTheory.SchrSB.schr_mem_SB <;> assumption
+    )
 
 end

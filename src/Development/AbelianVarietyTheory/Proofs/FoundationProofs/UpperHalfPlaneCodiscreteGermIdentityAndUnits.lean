@@ -34,8 +34,8 @@ theorem codiscreteWithin_Hs_neBot : (Filter.codiscreteWithin Hs).NeBot := by
     simpa using this
   exact (Filter.empty_mem_iff_bot.mp h3 ▸ (inferInstance : (𝓝[≠] Complex.I).NeBot)).ne rfl
 
-theorem eqOn_zero_of_germ_eq_zero {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (h0 : (a : Mero) = 0) :
-    ∀ z ∈ Hs, a z = 0 := by
+theorem eqOn_zero_of_germ_eq_zero {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (h0 : (a : Mero) = 0)
+    : ∀ z ∈ Hs, a z = 0 := by
   haveI := codiscreteWithin_Hs_neBot
   have han : AnalyticOnNhd ℂ a Hs := ha.analyticOnNhd isOpen_Hs
   rcases han.eqOn_zero_or_eventually_ne_zero_of_preconnected isPreconnected_Hs with h | h
@@ -45,12 +45,18 @@ theorem eqOn_zero_of_germ_eq_zero {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a
     obtain ⟨z, hz1, hz2⟩ := (h.and he).exists
     exact hz1 hz2
 
-theorem germ_main : Nontrivial Mero ∧ (∀ a b : ℂ → ℂ, DifferentiableOn ℂ a Hs → DifferentiableOn ℂ b Hs → (a : Mero) = (b : Mero) → ∀ z ∈ Hs, a z = b z) ∧ ∀ a : ℂ → ℂ, DifferentiableOn ℂ a Hs → (a : Mero) ≠ 0 → (∀ᶠ z in Filter.codiscreteWithin Hs, a z ≠ 0) ∧ IsUnit (a : Mero) := by
+theorem germ_main
+    : Nontrivial Mero
+      ∧ (∀ a b : ℂ → ℂ,
+        DifferentiableOn ℂ a Hs → DifferentiableOn ℂ b Hs → (a : Mero) = (b : Mero)
+          → ∀ z ∈ Hs, a z = b z)
+      ∧ ∀ a : ℂ → ℂ,
+        DifferentiableOn ℂ a Hs → (a : Mero) ≠ 0
+          → (∀ᶠ z in Filter.codiscreteWithin Hs, a z ≠ 0) ∧ IsUnit (a : Mero) := by
   haveI := codiscreteWithin_Hs_neBot
   refine ⟨inferInstance, ?_, ?_⟩
   · intro a b ha hb hab z hz
-    have h0 : ((a - b : ℂ → ℂ) : Mero) = 0 := by
-      rw [Filter.Germ.coe_sub, hab, sub_self]
+    have h0 : ((a - b : ℂ → ℂ) : Mero) = 0 := by rw [Filter.Germ.coe_sub, hab, sub_self]
     have := eqOn_zero_of_germ_eq_zero (ha.sub hb) h0 z hz
     simpa [sub_eq_zero] using this
   · intro a ha hne

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedTrace
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -26,25 +27,31 @@ def toFull (H : Subgroup G) (hH : ∀ g, g ∈ H) : G →* H where
   map_mul' _ _ := rfl
 
 def quotEquiv (H : Subgroup G) (hH : ∀ g, g ∈ H) (K : Subgroup H) : H ⧸ K ≃ G ⧸ K.map H.subtype :=
-  Quotient.congr (Equiv.ofBijective H.subtype ⟨Subtype.val_injective, fun g => ⟨⟨g, hH g⟩, rfl⟩⟩) fun a b => by
-    change QuotientGroup.leftRel K a b ↔ QuotientGroup.leftRel (K.map H.subtype) a.1 b.1
-    rw [QuotientGroup.leftRel_apply, QuotientGroup.leftRel_apply]
-    constructor
-    · intro h
-      exact ⟨_, h, rfl⟩
-    · rintro ⟨x, hx, hxe⟩
-      have : x = a⁻¹ * b := Subtype.ext hxe
-      exact this ▸ hx
+  Quotient.congr (Equiv.ofBijective H.subtype ⟨Subtype.val_injective, fun g => ⟨⟨g, hH g⟩, rfl⟩⟩)
+    fun a b => by
+      change QuotientGroup.leftRel K a b ↔ QuotientGroup.leftRel (K.map H.subtype) a.1 b.1
+      rw [QuotientGroup.leftRel_apply, QuotientGroup.leftRel_apply]
+      constructor
+      · intro h
+        exact ⟨_, h, rfl⟩
+      · rintro ⟨x, hx, hxe⟩
+        have : x = a⁻¹ * b := Subtype.ext hxe
+        exact this ▸ hx
 
-theorem finite_cosets [TopologicalSpace G] [IsTopologicalGroup G] (K : Subgroup G) (hK : IsOpen (K : Set G)) (f : G → ℂ)
-    (hc : HasCompactSupport f) : {q : G ⧸ K | f q.out ≠ 0}.Finite := by
+theorem finite_cosets
+    [TopologicalSpace G] [IsTopologicalGroup G]
+    (K : Subgroup G) (hK : IsOpen (K : Set G))
+    (f : G → ℂ) (hc : HasCompactSupport f)
+    : {q : G ⧸ K | f q.out ≠ 0}.Finite := by
   haveI : DiscreteTopology (G ⧸ K) := QuotientGroup.discreteTopology hK
-  have h1 : IsCompact ((QuotientGroup.mk : G → G ⧸ K) '' tsupport f) := hc.image continuous_quotient_mk'
+  have h1 : IsCompact ((QuotientGroup.mk : G → G ⧸ K) '' tsupport f) :=
+    hc.image continuous_quotient_mk'
   refine h1.finite_of_discrete.subset fun q hq => ?_
   exact ⟨q.out, subset_tsupport _ hq, QuotientGroup.out_eq' q⟩
 
-theorem hasCompactSupport_val [TopologicalSpace G] (H : Subgroup G) (hH : ∀ g, g ∈ H) (e : G → ℂ)
-    (hc : HasCompactSupport e) : HasCompactSupport fun x : H => e x.1 := by
+theorem hasCompactSupport_val
+    [TopologicalSpace G] (H : Subgroup G) (hH : ∀ g, g ∈ H) (e : G → ℂ) (hc : HasCompactSupport e)
+    : HasCompactSupport fun x : H => e x.1 := by
   have hcl : IsClosed {a : G | a ∈ H} := by
     have : {a : G | a ∈ H} = Set.univ := Set.eq_univ_of_forall hH
     rw [this]
@@ -53,21 +60,28 @@ theorem hasCompactSupport_val [TopologicalSpace G] (H : Subgroup G) (hH : ∀ g,
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem levOp_full [TopologicalSpace G] [IsTopologicalGroup G] (H : Subgroup G) (hH : ∀ g, g ∈ H)
-    (ρ : Representation ℂ H V) (K K' : Subgroup H) (hK' : IsOpen (K' : Set H)) (hr : K'.relIndex K ≠ 0) (e : G → ℂ)
-    (hc : HasCompactSupport e) (hinv : ∀ k ∈ K'.map H.subtype, ∀ g, e (g * k) = e g) (y : V) (hy : y ∈ fixed ρ K') :
-    levOp ρ K K' (fun x => ((K'.relIndex K : ℕ) : ℂ) * e x.1) LinearMap.id y =
-      ∑ᶠ q : G ⧸ K'.map H.subtype, e q.out • (ρ.comp (toFull H hH)) q.out y := by
+theorem levOp_full
+    [TopologicalSpace G] [IsTopologicalGroup G]
+    (H : Subgroup G) (hH : ∀ g, g ∈ H) (ρ : Representation ℂ H V) (K K' : Subgroup H)
+    (hK' : IsOpen (K' : Set H)) (hr : K'.relIndex K ≠ 0)
+    (e : G → ℂ) (hc : HasCompactSupport e) (hinv : ∀ k ∈ K'.map H.subtype, ∀ g, e (g * k) = e g)
+    (y : V) (hy : y ∈ fixed ρ K')
+    : levOp ρ K K' (fun x => ((K'.relIndex K : ℕ) : ℂ) * e x.1) LinearMap.id y
+      = ∑ᶠ q : G ⧸ K'.map H.subtype, e q.out • (ρ.comp (toFull H hH)) q.out y := by
   have hr' : ((K'.relIndex K : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hr
   have hfin := finite_cosets K' hK' _ (hasCompactSupport_val H hH e hc)
   have hs : (Function.support fun q : H ⧸ K' =>
-      ((fun x : H => ((K'.relIndex K : ℕ) : ℂ) * e x.1) q.out • (ρ q.out ∘ₗ LinearMap.id) : V →ₗ[ℂ] V)).Finite := by
+      ((fun x : H => ((K'.relIndex K : ℕ) : ℂ) * e x.1) q.out • (ρ q.out ∘ₗ LinearMap.id)
+        : V →ₗ[ℂ] V)).Finite := by
     refine hfin.subset fun q hq h0 => hq ?_
     have h0' : e q.out.1 = 0 := h0
     simp [h0']
-  have h1 : levOp ρ K K' (fun x => ((K'.relIndex K : ℕ) : ℂ) * e x.1) LinearMap.id y =
-      ((K'.relIndex K : ℕ) : ℂ)⁻¹ • (LinearMap.applyₗ y : (V →ₗ[ℂ] V) →ₗ[ℂ] V).toAddMonoidHom
-        (∑ᶠ q : H ⧸ K', (fun x : H => ((K'.relIndex K : ℕ) : ℂ) * e x.1) q.out • (ρ q.out ∘ₗ LinearMap.id)) := rfl
+  have h1
+      : levOp ρ K K' (fun x => ((K'.relIndex K : ℕ) : ℂ) * e x.1) LinearMap.id y
+        = ((K'.relIndex K : ℕ) : ℂ)⁻¹
+          • (LinearMap.applyₗ y : (V →ₗ[ℂ] V) →ₗ[ℂ] V).toAddMonoidHom
+            (∑ᶠ q : H ⧸ K', (fun x : H => ((K'.relIndex K : ℕ) : ℂ) * e x.1) q.out • (ρ q.out ∘ₗ LinearMap.id)) :=
+    rfl
   rw [h1, AddMonoidHom.map_finsum _ hs, smul_finsum, ← finsum_comp_equiv (quotEquiv H hH K')]
   refine finsum_congr fun q => ?_
   have hq : quotEquiv H hH K' q = ((q.out.1 : G) : G ⧸ K'.map H.subtype) := by
@@ -110,7 +124,8 @@ theorem splitDict : PositivityTheory.Rg.BcB.F.Eig.SplitDict := by
   refine ⟨fullIrr (UL n w) hH σ, LinearEquiv.refl ℂ σ.V, fun _ _ => rfl, ?_, ?_⟩
   · rintro π ⟨p, hp, -, f, hf0, hfm, hfe⟩
     refine ⟨(fullIrr (UL n w) hH σ).irred, f, hf0, hfm, fun x v => ?_⟩
-    have hpx : toFull (UL n w) hH (((cLoc w).comp (locU n w).subtype) x) = p x := Subtype.ext (hp x).symm
+    have hpx : toFull (UL n w) hH (((cLoc w).comp (locU n w).subtype) x) = p x :=
+      Subtype.ext (hp x).symm
     change f (σ.ρ (toFull (UL n w) hH (((cLoc w).comp (locU n w).subtype) x)) v) = _
     rw [hpx]
     exact hfe x v
@@ -127,7 +142,8 @@ theorem splitDict : PositivityTheory.Rg.BcB.F.Eig.SplitDict := by
       exact (GlobalTheory.TwTrLin.mem_fixed_iff σ.ρ K' y).1 hy k hk
     · have hr := (GlobalTheory.TwTrUnit.twTr_unit E n w K' hlev σ).2.1
       exact levOp_full (UL n w) hH σ.ρ (KL n w) K' hlev.1 hr e hcs
-        (fun k hk g => by simpa using hinv 1 (by simp) k hk g) y hy
+        (fun k hk g => by simpa using hinv 1 (by simp) k hk g)
+        y hy
 
 end GlobalTheory.CompanionTheory.SplitPlace
 

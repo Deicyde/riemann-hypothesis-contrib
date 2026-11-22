@@ -10,32 +10,36 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.GenCore
 
-theorem sup_eq_of_isIrreducible_subQuot :
-    ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
-      (A B E : Subrepresentation ρ), B ≤ A → (subQuot A B).IsIrreducible → E ≤ A → ¬ E ≤ B →
-      E ⊔ B = A := by
+theorem sup_eq_of_isIrreducible_subQuot
+    : ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
+        (A B E : Subrepresentation ρ),
+      B ≤ A → (subQuot A B).IsIrreducible → E ≤ A → ¬ E ≤ B → E ⊔ B = A := by
   intro G V _ _ _ ρ A B E hBA hirr hEA hEB
   haveI : IsSimpleOrder (Subrepresentation (GlobalTheory.SmGL.subQuot A B)) := hirr
   refine le_antisymm (sup_le hEA hBA) ?_
   let P := Submodule.comap A.toSubmodule.subtype B.toSubmodule
   let S : Submodule ℂ (A.toSubmodule ⧸ P) :=
     Submodule.map P.mkQ (Submodule.comap A.toSubmodule.subtype (E ⊔ B).toSubmodule)
-  have hS : ∀ (g : G) ⦃q : A.toSubmodule ⧸ P⦄, q ∈ S →
-      GlobalTheory.SmGL.subQuot A B g q ∈ S := by
+  have hS : ∀ (g : G) ⦃q : A.toSubmodule ⧸ P⦄, q ∈ S → GlobalTheory.SmGL.subQuot A B g q ∈ S := by
     intro g q hq
     obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.mp hq
-    exact Submodule.mem_map.mpr
-      ⟨⟨ρ g y, A.apply_mem_toSubmodule g y.2⟩, (E ⊔ B).apply_mem_toSubmodule g (v := (y : V)) hy, rfl⟩
+    exact Submodule.mem_map.mpr ⟨
+      ⟨ρ g y, A.apply_mem_toSubmodule g y.2⟩,
+      (E ⊔ B).apply_mem_toSubmodule g (v := (y : V)) hy,
+      rfl
+    ⟩
   let W : Subrepresentation (GlobalTheory.SmGL.subQuot A B) := ⟨S, hS⟩
   obtain ⟨e, heE, heB⟩ := SetLike.not_le_iff_exists.mp hEB
   have hea : e ∈ A.toSubmodule := hEA heE
   have heEB : e ∈ (E ⊔ B).toSubmodule := (le_sup_left : E ≤ E ⊔ B) heE
   rcases IsSimpleOrder.eq_bot_or_eq_top W with hW | hW
   · exfalso
-    let Z : Subrepresentation (GlobalTheory.SmGL.subQuot A B) :=
-      ⟨⊥, fun g q hq => by
+    let Z : Subrepresentation (GlobalTheory.SmGL.subQuot A B) := ⟨
+      ⊥,
+      fun g q hq => by
         rw [Submodule.mem_bot] at hq ⊢
-        rw [hq, map_zero]⟩
+        rw [hq, map_zero]
+    ⟩
     have hmem : Submodule.Quotient.mk (p := P) ⟨e, hea⟩ ∈ W := by
       show _ ∈ S
       exact Submodule.mem_map.mpr ⟨⟨e, hea⟩, heEB, rfl⟩
@@ -47,13 +51,12 @@ theorem sup_eq_of_isIrreducible_subQuot :
     exact heB heP
   · intro x hx
     have hxA : x ∈ A.toSubmodule := hx
-    let T : Subrepresentation (GlobalTheory.SmGL.subQuot A B) :=
-      ⟨⊤, fun _ _ _ => Submodule.mem_top⟩
+    let T : Subrepresentation (GlobalTheory.SmGL.subQuot A B) := ⟨⊤, fun _ _ _ => Submodule.mem_top⟩
     have hT : Submodule.Quotient.mk (p := P) ⟨x, hxA⟩ ∈ W := by
       rw [hW]
-      exact (le_top : T ≤ ⊤)
-        (show Submodule.Quotient.mk (p := P) ⟨x, hxA⟩ ∈ (⊤ : Submodule ℂ (A.toSubmodule ⧸ P)) from
-          Submodule.mem_top)
+      exact (le_top : T ≤ ⊤) (show Submodule.Quotient.mk (p := P) ⟨x, hxA⟩
+          ∈ (⊤ : Submodule ℂ (A.toSubmodule ⧸ P)) from
+        Submodule.mem_top)
     have hT' : Submodule.Quotient.mk (p := P) ⟨x, hxA⟩ ∈ S := hT
     obtain ⟨y, hy, hyx⟩ := Submodule.mem_map.mp hT'
     rw [Submodule.mkQ_apply, Submodule.Quotient.eq] at hyx

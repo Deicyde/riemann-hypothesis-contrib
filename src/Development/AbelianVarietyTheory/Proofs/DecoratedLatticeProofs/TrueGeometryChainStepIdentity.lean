@@ -34,8 +34,13 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Inv
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.L2.Forms MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.QPl GlobalTheory.QTw GlobalTheory.AdForm GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Fam
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.L2.Forms MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.QPl GlobalTheory.QTw GlobalTheory.AdForm
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Fam
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.StepData GlobalTheory.SplitWeil
@@ -45,20 +50,27 @@ noncomputable section
 namespace GlobalTheory.Fam
 namespace VolMid
 
-theorem index_pi_univ' {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] (H : ∀ i, Subgroup (G i)) :
-    (Subgroup.pi Set.univ H).index = ∏ i, (H i).index := by
+theorem index_pi_univ'
+    {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] (H : ∀ i, Subgroup (G i))
+    : (Subgroup.pi Set.univ H).index = ∏ i, (H i).index := by
   simp_rw [Subgroup.index, ← Nat.card_pi]
   refine Nat.card_congr ((Quotient.congrRight (fun x y ↦ ?_)).trans (Setoid.piQuotientEquiv _).symm)
   rw [QuotientGroup.leftRel_pi]
 
-theorem relIndex_eq_prod_of_pi {ι : Type} [Fintype ι] {G : Type} [Group G] {M : ι → Type} [∀ i, Group (M i)]
+theorem relIndex_eq_prod_of_pi
+    {ι : Type} [Fintype ι]
+    {G : Type} [Group G]
+    {M : ι → Type} [∀ i, Group (M i)]
     (φ : G →* ((i : ι) → M i)) (Up U : Subgroup G) (K H : ∀ i, Subgroup (M i))
-    (hK : ∀ g ∈ Up, ∀ i, φ g i ∈ K i) (hs : ∀ x : (i : ι) → M i, (∀ i, x i ∈ K i) → ∃ g ∈ Up, φ g = x)
-    (hU : ∀ g, g ∈ U ↔ g ∈ Up ∧ ∀ i, φ g i ∈ H i) : U.relIndex Up = ∏ i, (H i).relIndex (K i) := by
-  let ψ : Up →* ((i : ι) → K i) :=
-    { toFun := fun g i => ⟨φ g.1 i, hK g.1 g.2 i⟩
-      map_one' := by ext i; simp
-      map_mul' := by intro x y; ext i; simp }
+    (hK : ∀ g ∈ Up, ∀ i, φ g i ∈ K i)
+    (hs : ∀ x : (i : ι) → M i, (∀ i, x i ∈ K i) → ∃ g ∈ Up, φ g = x)
+    (hU : ∀ g, g ∈ U ↔ g ∈ Up ∧ ∀ i, φ g i ∈ H i)
+    : U.relIndex Up = ∏ i, (H i).relIndex (K i) := by
+  let ψ : Up →* ((i : ι) → K i) := {
+    toFun := fun g i => ⟨φ g.1 i, hK g.1 g.2 i⟩
+    map_one' := by ext i; simp
+    map_mul' := by intro x y; ext i; simp
+  }
   have hψ : Function.Surjective ψ := by
     intro x
     obtain ⟨g, hg, e⟩ := hs (fun i => (x i).1) (fun i => (x i).2)

@@ -6,23 +6,30 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
 open scoped Matrix
 
-private theorem irr_map {Γ E E' : Type} [Group Γ] [Field E] [Field E'] (f : E →+* E') {n : ℕ}
-    (r : Γ →* Matrix (Fin n) (Fin n) E) (hr : Irr r) (N : Submodule E' (Fin n → E'))
-    (hN : ∀ g, ∀ v ∈ N, (mapRep f r g) *ᵥ v ∈ N) : N = ⊥ ∨ N = ⊤ :=
+private theorem irr_map
+    {Γ E E' : Type} [Group Γ] [Field E] [Field E']
+    (f : E →+* E')
+    {n : ℕ} (r : Γ →* Matrix (Fin n) (Fin n) E) (hr : Irr r) (N : Submodule E' (Fin n → E'))
+    (hN : ∀ g, ∀ v ∈ N, (mapRep f r g) *ᵥ v ∈ N)
+    : N = ⊥ ∨ N = ⊤ :=
   _root_.UpperTheory.Reformulated.B.Qi38.irr_map f r hr N hN
 
-private theorem trace_swap {K V : Type} [Field K] [AddCommGroup V] [Module K V] [Module.Finite K V]
-    (N M : Submodule K V) (hc : IsCompl N M) (T : Module.End K V)
-    (h1 : ∀ v ∈ N, T v ∈ M) (h2 : ∀ v ∈ M, T v ∈ N) : LinearMap.trace K V T = 0 := by
-  obtain ⟨p, hpN, hpM⟩ : ∃ p : Module.End K V, (∀ v ∈ N, p v = v) ∧ (∀ v ∈ M, p v = 0) :=
-    ⟨N.subtype ∘ₗ N.linearProjOfIsCompl M hc, fun v hv =>
-      congrArg Subtype.val (Submodule.linearProjOfIsCompl_apply_left hc ⟨v, hv⟩),
-      fun v hv =>
-      congrArg Subtype.val (Submodule.linearProjOfIsCompl_apply_right hc ⟨v, hv⟩)⟩
+private theorem trace_swap
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [Module.Finite K V]
+    (N M : Submodule K V) (hc : IsCompl N M)
+    (T : Module.End K V) (h1 : ∀ v ∈ N, T v ∈ M) (h2 : ∀ v ∈ M, T v ∈ N)
+    : LinearMap.trace K V T = 0 := by
+  obtain ⟨p, hpN, hpM⟩ : ∃ p : Module.End K V, (∀ v ∈ N, p v = v) ∧ (∀ v ∈ M, p v = 0) := ⟨
+    N.subtype ∘ₗ N.linearProjOfIsCompl M hc,
+    fun v hv => congrArg Subtype.val (Submodule.linearProjOfIsCompl_apply_left hc ⟨v, hv⟩),
+    fun v hv => congrArg Subtype.val (Submodule.linearProjOfIsCompl_apply_right hc ⟨v, hv⟩)
+  ⟩
   have key : T = (p * T) * (1 - p) + ((1 - p) * T) * p := by
     ext v
     have hv : v ∈ N ⊔ M := by rw [hc.sup_eq_top]; trivial
@@ -33,13 +40,16 @@ private theorem trace_swap {K V : Type} [Field K] [AddCommGroup V] [Module K V] 
     have hv : v ∈ N ⊔ M := by rw [hc.sup_eq_top]; trivial
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 hv
     simp [hpN a ha, hpM b hb]
-  rw [key, map_add (f := _), LinearMap.trace_mul_comm K (p * T), LinearMap.trace_mul_comm K ((1 - p) * T),
-    ← mul_assoc, ← mul_assoc, sub_mul, mul_sub, hpp]
+  rw [key, map_add (f := _), LinearMap.trace_mul_comm K (p * T),
+    LinearMap.trace_mul_comm K ((1 - p) * T), ← mul_assoc, ← mul_assoc, sub_mul, mul_sub, hpp]
   simp
 
-theorem UpperTheory.V.Ws.P1.irrTr :
-    ∀ {Γ E E' : Type} [Group Γ] [Field E] [Field E'] (f : E →+* E') {n : ℕ} (H : Subgroup Γ) (r : Γ →* Matrix (Fin n) (Fin n) E), (2 : E) ≠ 0 → Irr r →
-          (∀ a b, a ∉ H → b ∉ H → a * b ∈ H) → (H = ⊤ ∨ ∃ g, g ∉ H ∧ (r g).trace ≠ 0) → U3.MatIrr H (mapRep f r) := by
+theorem UpperTheory.V.Ws.P1.irrTr
+    : ∀ {Γ E E' : Type} [Group Γ] [Field E] [Field E'] (f : E →+* E') {n : ℕ} (H : Subgroup Γ)
+        (r : Γ →* Matrix (Fin n) (Fin n) E),
+      (2 : E) ≠ 0 → Irr r → (∀ a b, a ∉ H → b ∉ H → a * b ∈ H)
+        → (H = ⊤ ∨ ∃ g, g ∉ H ∧ (r g).trace ≠ 0)
+        → U3.MatIrr H (mapRep f r) := by
   intro Γ E E' _ _ _ f n H r _ hr hH hg N hN
   rcases hg with rfl | ⟨g, hg, ht⟩
   · exact irr_map f r hr N fun g => hN g trivial
@@ -61,12 +71,14 @@ theorem UpperTheory.V.Ws.P1.irrTr :
   by_contra hcon
   obtain ⟨hb, htop⟩ := not_or.1 hcon
   have hinf : N ⊓ M = ⊥ := by
-    refine (irr_map f r hr (N ⊓ M) fun a v hv => ?_).resolve_right fun h => htop (top_le_iff.1 (h ▸ inf_le_left))
+    refine (irr_map f r hr (N ⊓ M) fun a v hv => ?_).resolve_right fun h =>
+      htop (top_le_iff.1 (h ▸ inf_le_left))
     by_cases ha : a ∈ H
     · exact ⟨hN a ha v hv.1, hMM a ha v hv.2⟩
     · exact ⟨hMN a ha v hv.2, hNM a ha v hv.1⟩
   have hsup : N ⊔ M = ⊤ := by
-    refine (irr_map f r hr (N ⊔ M) fun a v hv => ?_).resolve_left fun h => hb (le_bot_iff.1 (h ▸ le_sup_left))
+    refine (irr_map f r hr (N ⊔ M) fun a v hv => ?_).resolve_left fun h =>
+      hb (le_bot_iff.1 (h ▸ le_sup_left))
     obtain ⟨x, hx, y, hy, rfl⟩ := Submodule.mem_sup.1 hv
     rw [Matrix.mulVec_add]
     by_cases ha : a ∈ H
@@ -74,7 +86,8 @@ theorem UpperTheory.V.Ws.P1.irrTr :
     · rw [add_comm]
       exact Submodule.add_mem_sup (hMN a ha y hy) (hNM a ha x hx)
   have hc : IsCompl N M := ⟨disjoint_iff.2 hinf, codisjoint_iff.2 hsup⟩
-  have h0 := trace_swap N M hc (Matrix.toLin' (ρ g)) (fun v hv => hNM g hg v hv) (fun v hv => hMN g hg v hv)
+  have h0 :=
+    trace_swap N M hc (Matrix.toLin' (ρ g)) (fun v hv => hNM g hg v hv) (fun v hv => hMN g hg v hv)
   rw [Matrix.trace_toLin'_eq] at h0
   apply ht
   apply f.injective

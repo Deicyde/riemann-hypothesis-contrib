@@ -12,11 +12,12 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem prod_mem_span_range_prod_mul {R A : Type*} [CommRing R] [CommRing A] [Algebra R A]
-    {J : Type*} [Fintype J] (g : J → A) (m : ℕ) (f : Fin m → A)
-    (hf : ∀ l, f l ∈ Submodule.span R (Set.range g)) (y : A) :
-    (∏ l, f l) * y ∈
-      Submodule.span R (Set.range fun u : Fin m → J => (∏ l, g (u l)) * y) := by
+theorem prod_mem_span_range_prod_mul
+    {R A : Type*} [CommRing R] [CommRing A] [Algebra R A]
+    {J : Type*} [Fintype J]
+    (g : J → A) (m : ℕ) (f : Fin m → A) (hf : ∀ l, f l ∈ Submodule.span R (Set.range g))
+    (y : A)
+    : (∏ l, f l) * y ∈ Submodule.span R (Set.range fun u : Fin m → J => (∏ l, g (u l)) * y) := by
   choose c hc using fun l => (Submodule.mem_span_range_iff_exists_fun R).1 (hf l)
   have h : (∏ l, f l) * y = ∑ u : Fin m → J, (∏ l, c l (u l)) • ((∏ l, g (u l)) * y) := by
     simp_rw [← hc, Fintype.prod_sum, Finset.sum_mul, Algebra.smul_def, Finset.prod_mul_distrib,
@@ -24,16 +25,23 @@ theorem prod_mem_span_range_prod_mul {R A : Type*} [CommRing R] [CommRing A] [Al
   rw [h]
   exact Submodule.sum_mem _ fun u _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨u, rfl⟩)
 
-theorem many_independent_products_in_function_field : ∀ (K : Type) [Field K] [CharZero K] (D : ℕ)
-    (x : Fin D → K), IsTranscendenceBasis ℤ x → ∀ (J : Type) [Fintype J] (e : J → K),
-    LinearIndependent ℤ e → ∀ m : ℕ, 0 < m → ∃ v : Fin (Fintype.card J * m ^ D) → K,
-    LinearIndependent ℤ v ∧ ∀ s, ∃ (u : Fin m → J) (a : Fin D → ℕ), (∀ i, a i < m) ∧
-      v s = (∏ l, e (u l)) * ∏ i, x i ^ a i := by
+theorem many_independent_products_in_function_field
+    : ∀ (K : Type) [Field K] [CharZero K] (D : ℕ) (x : Fin D → K),
+      IsTranscendenceBasis ℤ x
+        → ∀ (J : Type) [Fintype J] (e : J → K),
+          LinearIndependent ℤ e
+            → ∀ m : ℕ,
+              0 < m
+                → ∃ v : Fin (Fintype.card J * m ^ D) → K,
+                  LinearIndependent ℤ v
+                    ∧ ∀ s, ∃ (u : Fin m → J) (a : Fin D → ℕ),
+                      (∀ i, a i < m) ∧ v s = (∏ l, e (u l)) * ∏ i, x i ^ a i := by
   intro K _ _ D x hx J _ e he m hm
   haveI : Algebra.IsAlgebraic ℤ ℚ := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
   have hxQ : IsTranscendenceBasis ℚ x := (Algebra.IsAlgebraic.isTranscendenceBasis_iff ℤ ℚ).1 hx
   have heQ : LinearIndependent ℚ e := (LinearIndependent.iff_fractionRing ℤ ℚ).1 he
-  obtain ⟨P, ψ, g, c, hPm, hψ, hψx, hg, hge, hsep⟩ := GlobalTheory.T.exists_primitive_monic_separable_specialization' K D x hxQ J e
+  obtain ⟨P, ψ, g, c, hPm, hψ, hψx, hg, hge, hsep⟩ :=
+    GlobalTheory.T.exists_primitive_monic_separable_specialization' K D x hxQ J e
   choose e' he' using fun j => (AlgHom.mem_range ψ).1 (hge j)
   have he'Q : LinearIndependent ℚ e' := by
     have h1 : LinearIndependent ℚ (fun j => g * e j) := by
@@ -45,14 +53,19 @@ theorem many_independent_products_in_function_field : ∀ (K : Type) [Field K] [
   have hPCm : (P.map (MvPolynomial.map (algebraMap ℚ ℂ))).Monic := hPm.map _
   have hsepC : ((P.map (MvPolynomial.map (algebraMap ℚ ℂ))).map
       (MvPolynomial.eval (fun i => (c i : ℂ)))).Separable := by
-    have h : (P.map (MvPolynomial.map (algebraMap ℚ ℂ))).map (MvPolynomial.eval (fun i => (c i : ℂ))) =
-        (P.map (MvPolynomial.eval c)).map (algebraMap ℚ ℂ) := by
+    have h
+        : (P.map (MvPolynomial.map (algebraMap ℚ ℂ))).map (MvPolynomial.eval (fun i => (c i : ℂ)))
+          = (P.map (MvPolynomial.eval c)).map (algebraMap ℚ ℂ) := by
       rw [Polynomial.map_map, Polynomial.map_map]
       congr 1
       ext <;> simp
-    rw [h]; exact hsep.map
+    rw [h]
+    exact hsep.map
   let PC := P.map (MvPolynomial.map (algebraMap ℚ ℂ))
-  obtain ⟨n, φ, hφinj, hφX⟩ := GlobalTheory.T.exists_formal_branches_of_separable_reduction D PC (fun i => (c i : ℂ)) hPCm hsepC
+  obtain ⟨n, φ, hφinj, hφX⟩ :=
+    GlobalTheory.T.exists_formal_branches_of_separable_reduction D PC
+      (fun i => (c i : ℂ))
+      hPCm hsepC
   let w : (Fin m → J) × (Fin D → Fin m) → AdjoinRoot P := fun ub =>
     (∏ l, e' (ub.1 l)) * ∏ i, AdjoinRoot.of P (MvPolynomial.X i) ^ (ub.2 i : ℕ)
   obtain ⟨κ, a, ha, hspan, hind⟩ := exists_linearIndependent' ℚ w
@@ -70,15 +83,20 @@ theorem many_independent_products_in_function_field : ∀ (K : Type) [Field K] [
     | zero => simp
     | add y z _ _ hy hz => rw [map_add (f := _)]; exact G.add_mem hy hz
     | smul q y _ hy => rw [hτq]; exact G.smul_mem _ hy
-  have key := GlobalTheory.T.finrank_mul_pow_le_finrank_of_prod_mem D n (AdjoinRoot PC) φ xC (fun i => (c i : ℂ)) hφinj hφX F G m hm (by
-    intro f b hf hb
-    have h1 := prod_mem_span_range_prod_mul (R := ℂ) (fun j => τ (e' j)) m f hf (∏ i, xC i ^ b i)
-    refine Submodule.span_le.2 ?_ h1
-    rintro _ ⟨u, rfl⟩
-    have hw : w (u, fun i => ⟨b i, hb i⟩) ∈ Submodule.span ℚ (Set.range (w ∘ a)) := by
-      rw [hspan]; exact Submodule.subset_span ⟨_, rfl⟩
-    have h2 := hτspan _ hw
-    simpa [w, map_prod, map_mul, map_pow, hτX, xC] using h2)
+  have key :=
+    GlobalTheory.T.finrank_mul_pow_le_finrank_of_prod_mem D n (AdjoinRoot PC) φ xC
+      (fun i => (c i : ℂ))
+      hφinj hφX F G m hm
+      (by
+        intro f b hf hb
+        have h1 :=
+          prod_mem_span_range_prod_mul (R := ℂ) (fun j => τ (e' j)) m f hf (∏ i, xC i ^ b i)
+        refine Submodule.span_le.2 ?_ h1
+        rintro _ ⟨u, rfl⟩
+        have hw : w (u, fun i => ⟨b i, hb i⟩) ∈ Submodule.span ℚ (Set.range (w ∘ a)) := by
+          rw [hspan]; exact Submodule.subset_span ⟨_, rfl⟩
+        have h2 := hτspan _ hw
+        simpa [w, map_prod, map_mul, map_pow, hτX, xC] using h2)
   have hFr : Module.finrank ℂ F = Fintype.card J := finrank_span_eq_card (hτind J e' he'Q)
   have hGr : Module.finrank ℂ G ≤ Fintype.card κ := finrank_range_le_card _
   let L : AdjoinRoot P →ₗ[ℚ] K := (LinearMap.mulLeft ℚ ((g ^ m)⁻¹)).comp ψ.toLinearMap

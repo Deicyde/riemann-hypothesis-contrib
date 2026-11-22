@@ -6,14 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Continuou
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix MeasureTheory
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix
+  MeasureTheory
 
 namespace GlobalTheory.PolarU
 
-
 open scoped ComplexOrder in
-theorem det_ne_zero_of_add_conjTranspose {n : Type} [Fintype n] [DecidableEq n]
-    (P : Matrix n n ℂ) (h : P + Pᴴ = (2 : ℂ) • (1 : Matrix n n ℂ)) : P.det ≠ 0 := by
+theorem det_ne_zero_of_add_conjTranspose
+    {n : Type} [Fintype n] [DecidableEq n]
+    (P : Matrix n n ℂ) (h : P + Pᴴ = (2 : ℂ) • (1 : Matrix n n ℂ))
+    : P.det ≠ 0 := by
   intro hdet
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdet
   apply hv0
@@ -21,9 +23,9 @@ theorem det_ne_zero_of_add_conjTranspose {n : Type} [Fintype n] [DecidableEq n]
   have hquad : star v ⬝ᵥ ((P + Pᴴ) *ᵥ v) = 2 * (star v ⬝ᵥ v) := by
     rw [h]
     first
-      | simp [smul_mulVec, dotProduct_smul, smul_eq_mul]
-      | simp [Matrix.smul_mulVec_assoc, dotProduct_smul, smul_eq_mul]
-      | simp [dotProduct_smul, smul_eq_mul]
+    | simp [smul_mulVec, dotProduct_smul, smul_eq_mul]
+    | simp [Matrix.smul_mulVec_assoc, dotProduct_smul, smul_eq_mul]
+    | simp [dotProduct_smul, smul_eq_mul]
 
   have hzero : star v ⬝ᵥ ((P + Pᴴ) *ᵥ v) = 0 := by
     have hstar : star v ᵥ* Pᴴ = star (P *ᵥ v) := (star_mulVec P v).symm
@@ -64,8 +66,8 @@ private lemma eigP_add_star_eigP_eq_zero {p q : ℕ} (x y : Ix p q × Ix p q) (h
     rw [if_neg c1, if_neg c2]
     simp
 
-theorem eigenvectorMatrix_add_star {p q : ℕ} (ab cd : PIx p q) :
-    eigP ab.1 cd.1 + star (eigP cd.1 ab.1) = if cd = ab then 2 else 0 := by
+theorem eigenvectorMatrix_add_star {p q : ℕ} (ab cd : PIx p q)
+    : eigP ab.1 cd.1 + star (eigP cd.1 ab.1) = if cd = ab then 2 else 0 := by
   by_cases hc : cd = ab
   · subst hc
     rw [if_pos rfl]
@@ -73,8 +75,8 @@ theorem eigenvectorMatrix_add_star {p q : ℕ} (ab cd : PIx p q) :
   · rw [if_neg hc]
     exact eigP_add_star_eigP_eq_zero ab.1 cd.1 ab.2 cd.2 (fun h => hc (Subtype.ext h))
 
-theorem det_eigenvectorMatrix_ne_zero :
-    ∀ (p q : ℕ), (Matrix.of fun (cd ab : PIx p q) => eigP ab.1 cd.1).det ≠ 0 := by
+theorem det_eigenvectorMatrix_ne_zero
+    : ∀ (p q : ℕ), (Matrix.of fun (cd ab : PIx p q) => eigP ab.1 cd.1).det ≠ 0 := by
   intro p q
   apply det_ne_zero_of_add_conjTranspose
   ext cd ab

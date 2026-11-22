@@ -27,10 +27,12 @@ namespace PositivityTheory.Rg.BcB.E.E3
 theorem sizet_holds : SizeT := by
   intro E _ _ _ N Q₁ Q₂ h₁ h₂
   obtain ⟨hcpt, -, -, c, hc⟩ :=
-    GlobalTheory.CompanionTheory.Size.sizeBasic GlobalTheory.CompanionTheory.Dblock.SzFinProof.szFin GlobalTheory.CompanionTheory.ConjAtPlaces.conjPlaces E N
+    GlobalTheory.CompanionTheory.Size.sizeBasic GlobalTheory.CompanionTheory.Dblock.SzFinProof.szFin
+      GlobalTheory.CompanionTheory.ConjAtPlaces.conjPlaces E N
   obtain ⟨r₁, hr₁⟩ := hcpt Q₁ h₁
   obtain ⟨r₂, hr₂⟩ := hcpt Q₂ h₂
-  have htor := GlobalTheory.CompanionTheory.TorNorm.torNorm GlobalTheory.CompanionTheory.LogAbs.logAbsBasic E
+  have htor :=
+    GlobalTheory.CompanionTheory.TorNorm.torNorm GlobalTheory.CompanionTheory.LogAbs.logAbsBasic E
   have hd : (0 : ℝ) ≤ 2 * Module.finrank ℚ E := by positivity
   refine ⟨|r₁| + |r₂| + 2 * |c| + 2 * Module.finrank ℚ E, by positivity, fun q₁ hq₁ q₂ hq₂ x => ?_⟩
   have e₁ := hc (q₁ * An.tor E x) q₂

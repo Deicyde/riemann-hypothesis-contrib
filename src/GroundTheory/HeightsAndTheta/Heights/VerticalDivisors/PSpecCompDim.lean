@@ -16,15 +16,18 @@ open MvPolynomial NumberField IsDedekindDomain
 
 noncomputable section
 
-theorem homogeneousComponent_map_coeffs {R S : Type*} [CommRing R] [CommRing S] {n : ℕ}
-    (φ : R →+* S) (d : ℕ) (p : MvPolynomial (Fin n) R) :
-    homogeneousComponent d (MvPolynomial.map φ p) = MvPolynomial.map φ (homogeneousComponent d p) := by
+theorem homogeneousComponent_map_coeffs
+    {R S : Type*} [CommRing R] [CommRing S]
+    {n : ℕ}
+    (φ : R →+* S) (d : ℕ) (p : MvPolynomial (Fin n) R)
+    : homogeneousComponent d (MvPolynomial.map φ p)
+      = MvPolynomial.map φ (homogeneousComponent d p) := by
   ext m
   simp only [coeff_homogeneousComponent, coeff_map]
   split_ifs <;> simp
 
-theorem SpecCompDim.proof (hCone : ConeDimOfChowForm.Statement) (hFib : FibreCompDim.Statement) :
-    SpecCompDim.Statement := by
+theorem SpecCompDim.proof (hCone : ConeDimOfChowForm.Statement) (hFib : FibreCompDim.Statement)
+    : SpecCompDim.Statement := by
   intro K _ _ n e I f v hI hf W hW
   have : v.asIdeal.IsMaximal := v.isMaximal
   have : I.IsPrime := hI.isPrime
@@ -50,8 +53,8 @@ theorem SpecCompDim.proof (hCone : ConeDimOfChowForm.Statement) (hFib : FibreCom
       by_contra hc
       have hu : IsUnit (ψ (C c)) := by
         rw [show ψ (C c) = C (algebraMap (𝓞 K) K c) from map_C _ _]
-        exact (isUnit_iff_ne_zero.mpr
-          ((map_ne_zero_iff _ (IsFractionRing.injective (𝓞 K) K)).mpr hc)).map C
+        exact (isUnit_iff_ne_zero.mpr ((map_ne_zero_iff _ (IsFractionRing.injective (𝓞 K) K)).mpr
+          hc)).map C
       exact hI.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ h hu)
     · rintro rfl
       simp
@@ -63,8 +66,7 @@ theorem SpecCompDim.proof (hCone : ConeDimOfChowForm.Statement) (hFib : FibreCom
   have hdim := hFib (𝓞 K) K n (integralModel I) W v hP hPC hWmin
   rw [hPloc, hCone K n (e + 1) I f hI hf] at hdim
   refine ⟨⟨Ideal.map_isPrime_of_surjective hφ hkerW, ?_, ?_⟩, hdim⟩
-  ·
-    have hmin : reduceMod v W ∈ (reduceMod v (integralModel I)).minimalPrimes := by
+  · have hmin : reduceMod v W ∈ (reduceMod v (integralModel I)).minimalPrimes := by
       change W.map φ ∈ ((integralModel I).map φ).minimalPrimes
       rw [Ideal.minimalPrimes_map_of_surjective hφ, hker]
       exact ⟨W, hWmin, rfl⟩
@@ -77,14 +79,13 @@ theorem SpecCompDim.proof (hCone : ConeDimOfChowForm.Statement) (hFib : FibreCom
     change ψ (homogeneousComponent d p) ∈ I
     rw [← homogeneousComponent_map_coeffs]
     exact hI.isHomog _ hp d
-  ·
-    obtain ⟨j, hj⟩ := hWrel
+  · obtain ⟨j, hj⟩ := hWrel
     refine ⟨j, fun h => hj ?_⟩
     have h' : X j ∈ (W.map φ).comap φ := by
       rw [Ideal.mem_comap, map_X]
       exact h
-    rwa [Ideal.comap_map_of_surjective _ hφ, ← RingHom.ker_eq_comap_bot,
-      sup_eq_left.mpr hkerW] at h'
+    rwa [Ideal.comap_map_of_surjective _ hφ, ← RingHom.ker_eq_comap_bot, sup_eq_left.mpr hkerW] at
+      h'
 
 end
 

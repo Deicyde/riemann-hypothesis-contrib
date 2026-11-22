@@ -22,9 +22,9 @@ section Coordinates
 
 variable (K E : Type*) [Field K] [Field E] [Algebra K E] [Algebra.IsQuadraticExtension K E]
 
-theorem exists_algEquiv_quadraticAlgebra (h2 : (2 : K) ≠ 0) :
-    ∃ (d : K) (ψ : E ≃ₐ[K] QuadraticAlgebra K d 0), (∀ r : K, r ^ 2 ≠ d) ∧
-      ∀ x, ψ (conj K E x) = star (ψ x) := by
+theorem exists_algEquiv_quadraticAlgebra (h2 : (2 : K) ≠ 0)
+    : ∃ (d : K) (ψ : E ≃ₐ[K] QuadraticAlgebra K d 0),
+      (∀ r : K, r ^ 2 ≠ d) ∧ ∀ x, ψ (conj K E x) = star (ψ x) := by
   obtain ⟨ζ, hζ⟩ := exists_not_mem_range (F := K) (E := E)
   set α := ζ - algebraMap K E (Algebra.trace K E ζ / 2) with hαdef
   have hα : α ∉ Set.range (algebraMap K E) := by
@@ -44,12 +44,12 @@ theorem exists_algEquiv_quadraticAlgebra (h2 : (2 : K) ≠ 0) :
     linear_combination -this
   let f : QuadraticAlgebra K d 0 →ₐ[K] E :=
     QuadraticAlgebra.lift ⟨α, by rw [hαα, Algebra.algebraMap_eq_smul_one, zero_smul, add_zero]⟩
-  have hf : ∀ z : QuadraticAlgebra K d 0,
-      f z = algebraMap K E z.re + algebraMap K E z.im * α := by
+  have hf : ∀ z : QuadraticAlgebra K d 0, f z = algebraMap K E z.re + algebraMap K E z.im * α := by
     intro z
     simp [f, Algebra.smul_def]
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z hz
     rw [hf] at hz
     by_cases him : z.im = 0
@@ -66,8 +66,9 @@ theorem exists_algEquiv_quadraticAlgebra (h2 : (2 : K) ≠ 0) :
       linear_combination -hz
   have hbij : Function.Bijective f := by
     refine ⟨hinj, ?_⟩
-    have := LinearMap.injective_iff_surjective_of_finrank_eq_finrank (f := f.toLinearMap)
-      (by rw [QuadraticAlgebra.finrank_eq_two, Algebra.IsQuadraticExtension.finrank_eq_two])
+    have :=
+      LinearMap.injective_iff_surjective_of_finrank_eq_finrank (f := f.toLinearMap)
+        (by rw [QuadraticAlgebra.finrank_eq_two, Algebra.IsQuadraticExtension.finrank_eq_two])
     exact this.1 hinj
   refine ⟨d, (AlgEquiv.ofBijective f hbij).symm, ?_, ?_⟩
   · intro r hr
@@ -93,22 +94,23 @@ end Coordinates
 
 section BaseChange
 
-variable {K E : Type*} [Field K] [Field E] [Algebra K E] [Algebra.IsQuadraticExtension K E]
-  {d : K} (ψ : E ≃ₐ[K] QuadraticAlgebra K d 0) (R : Type*) [CommRing R] [Algebra K R]
+variable
+  {K E : Type*} [Field K] [Field E] [Algebra K E] [Algebra.IsQuadraticExtension K E]
+  {d : K} (ψ : E ≃ₐ[K] QuadraticAlgebra K d 0)
+  (R : Type*) [CommRing R] [Algebra K R]
 
 def tensorQuadEquiv : R ⊗[K] E ≃ₐ[R] QuadraticAlgebra R (algebraMap K R d) 0 :=
   (Algebra.TensorProduct.congr AlgEquiv.refl ψ).trans (quadTensorEquiv d R)
 
 omit [Algebra.IsQuadraticExtension K E] in
-theorem tensorQuadEquiv_tmul (r : R) (x : E) :
-    tensorQuadEquiv ψ R (r ⊗ₜ x) =
-      ⟨r * algebraMap K R (ψ x).re, r * algebraMap K R (ψ x).im⟩ := by
+theorem tensorQuadEquiv_tmul (r : R) (x : E)
+    : tensorQuadEquiv ψ R (r ⊗ₜ x)
+      = ⟨r * algebraMap K R (ψ x).re, r * algebraMap K R (ψ x).im⟩ := by
   simp [tensorQuadEquiv, quadTensorEquiv_tmul]
 
-
 variable {ψ} in
-theorem tensorQuadEquiv_conjBase (hψ : ∀ x, ψ (conj K E x) = star (ψ x)) (z : R ⊗[K] E) :
-    tensorQuadEquiv ψ R (conjBase K E R z) = star (tensorQuadEquiv ψ R z) := by
+theorem tensorQuadEquiv_conjBase (hψ : ∀ x, ψ (conj K E x) = star (ψ x)) (z : R ⊗[K] E)
+    : tensorQuadEquiv ψ R (conjBase K E R z) = star (tensorQuadEquiv ψ R z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul r x =>

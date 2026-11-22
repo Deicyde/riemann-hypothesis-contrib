@@ -56,47 +56,56 @@ def IsFrobLift (p q : ℕ) (σ : K →+* K) : Prop := ∀ a : K, ‖a‖ ≤ 1 �
 def IsFunEqType (p q : ℕ) (σ : K →+* K) (f : PowerSeries K) : Prop :=
   IntegralPS (f - (p : K)⁻¹ • (PowerSeries.map σ f).subst ((PowerSeries.X : PowerSeries K) ^ q))
 
-def IsFunEqTypeMv {ι : Type v} (p q : ℕ) (hq : q ≠ 0) (σ : K →+* K) (φ : MvPowerSeries ι K) :
-    Prop :=
+def IsFunEqTypeMv {ι : Type v} (p q : ℕ) (hq : q ≠ 0) (σ : K →+* K) (φ : MvPowerSeries ι K)
+    : Prop :=
   IntegralMv (φ - (p : K)⁻¹ • MvPowerSeries.expand q hq (MvPowerSeries.map σ φ))
 
 end FunEq
 
 def unitBall (K : Type u) [NormedField K] [IsUltrametricDist K] : Subring K := by
-  first | exact @Bl.FirstLemmaM.goal1 K ‹_› ‹_› | exact @Bl.FirstLemmaM.goal1 K ‹_› | exact @Bl.FirstLemmaM.goal1 K | exact @Bl.FirstLemmaM.goal1
+  first
+  | exact @Bl.FirstLemmaM.goal1 K ‹_› ‹_›
+  | exact @Bl.FirstLemmaM.goal1 K ‹_›
+  | exact @Bl.FirstLemmaM.goal1 K
+  | exact @Bl.FirstLemmaM.goal1
 
 def FunctionalEquationSetting (K : Type u) [NormedField K] (p q : ℕ) (σ : K →+* K) : Prop :=
   p.Prime ∧ (∃ h : ℕ, 0 < h ∧ q = p ^ h) ∧ ‖(p : K)‖ < 1 ∧ IsFrobLift p q σ
 
 def FunEqGroup : Prop :=
   ∀ (K : Type u) [NormedField K] [IsUltrametricDist K] [CharZero K] (p q : ℕ) (σ : K →+* K),
-    FunctionalEquationSetting K p q σ →
-    ∀ f : PowerSeries K, constantCoeff f = 0 → coeff 1 f = 1 → IsFunEqType p q σ f →
-      ∃ F : MvPowerSeries (Fin 2) K, MvPowerSeries.constantCoeff F = 0 ∧ IntegralMv F ∧
-        f.subst F = atX f + atY f
+    FunctionalEquationSetting K p q σ
+      → ∀ f : PowerSeries K,
+        constantCoeff f = 0 → coeff 1 f = 1 → IsFunEqType p q σ f
+          → ∃ F : MvPowerSeries (Fin 2) K,
+            MvPowerSeries.constantCoeff F = 0 ∧ IntegralMv F ∧ f.subst F = atX f + atY f
 
 def FunEqHom : Prop :=
   ∀ (K : Type u) [NormedField K] [IsUltrametricDist K] [CharZero K] (p q : ℕ) (σ : K →+* K),
-    FunctionalEquationSetting K p q σ →
-    ∀ f g : PowerSeries K, constantCoeff f = 0 → coeff 1 f = 1 → IsFunEqType p q σ f →
-      constantCoeff g = 0 → IsFunEqType p q σ g →
-      ∃ h : PowerSeries K, constantCoeff h = 0 ∧ IntegralPS h ∧ f.subst h = g
+    FunctionalEquationSetting K p q σ
+      → ∀ f g : PowerSeries K,
+        constantCoeff f = 0 → coeff 1 f = 1 → IsFunEqType p q σ f → constantCoeff g = 0
+          → IsFunEqType p q σ g
+          → ∃ h : PowerSeries K, constantCoeff h = 0 ∧ IntegralPS h ∧ f.subst h = g
 
 def FunEqSubst : Prop :=
   ∀ (K : Type u) [NormedField K] [IsUltrametricDist K] [CharZero K] (p q : ℕ) (hq : q ≠ 0)
-    (σ : K →+* K), FunctionalEquationSetting K p q σ →
-    ∀ f : PowerSeries K, constantCoeff f = 0 → IsFunEqType p q σ f →
-    ∀ (ι : Type v) (α : MvPowerSeries ι K), MvPowerSeries.constantCoeff α = 0 → IntegralMv α →
-      IsFunEqTypeMv p q hq σ (f.subst α)
+      (σ : K →+* K),
+    FunctionalEquationSetting K p q σ
+      → ∀ f : PowerSeries K,
+        constantCoeff f = 0 → IsFunEqType p q σ f
+          → ∀ (ι : Type v) (α : MvPowerSeries ι K),
+            MvPowerSeries.constantCoeff α = 0 → IntegralMv α → IsFunEqTypeMv p q hq σ (f.subst α)
 
 def SubstInjective : Prop :=
   ∀ (R : Type u) [CommRing R] (ι : Type v) (f : PowerSeries R) (a b : MvPowerSeries ι R),
-    constantCoeff f = 0 → coeff 1 f = 1 →
-    MvPowerSeries.constantCoeff a = 0 → MvPowerSeries.constantCoeff b = 0 →
-    f.subst a = f.subst b → a = b
+    constantCoeff f = 0 → coeff 1 f = 1 → MvPowerSeries.constantCoeff a = 0
+      → MvPowerSeries.constantCoeff b = 0 → f.subst a = f.subst b
+      → a = b
 
 def ltLog (p : ℕ) [Fact p.Prime] : PowerSeries ℚ_[p] :=
   PowerSeries.mk fun n => by
-    classical exact if ∃ k : ℕ, p ^ k = n then ((n : ℚ_[p]))⁻¹ else 0
+    classical
+    exact if ∃ k : ℕ, p ^ k = n then ((n : ℚ_[p]))⁻¹ else 0
 
 end Formalism.G

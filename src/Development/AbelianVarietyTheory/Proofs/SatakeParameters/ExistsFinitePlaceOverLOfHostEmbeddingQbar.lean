@@ -8,14 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Finit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 open Formalism.BasicNotions.Loc
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.PlaceOfEmb
 
-theorem norm_le_one_of_isIntegral' {K : Type} [NormedField K] [IsUltrametricDist K] {x : K}
-    (hx : IsIntegral ℤ x) : ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral'
+    {K : Type} [NormedField K] [IsUltrametricDist K] {x : K} (hx : IsIntegral ℤ x)
+    : ‖x‖ ≤ 1 := by
   have := (Valuation.integer.integers (NormedField.valuation (K := K))).mem_of_integral hx.tower_top
   rw [Valuation.mem_integer_iff, NormedField.valuation_apply] at this
   exact_mod_cast this
@@ -40,8 +44,9 @@ def ballIdeal (τ : E →+* C) : Ideal (𝓞 E) where
     change ‖τ (x : E)‖ < 1 at hx
     change ‖τ ((c : E) * (x : E))‖ < 1
     rw [map_mul, norm_mul]
-    calc ‖τ (c : E)‖ * ‖τ (x : E)‖ ≤ 1 * ‖τ (x : E)‖ :=
-          mul_le_mul_of_nonneg_right (norm_map_le_one τ c) (norm_nonneg _)
+    calc
+      ‖τ (c : E)‖ * ‖τ (x : E)‖
+        ≤ 1 * ‖τ (x : E)‖ := mul_le_mul_of_nonneg_right (norm_map_le_one τ c) (norm_nonneg _)
       _ < 1 := by rw [one_mul]; exact hx
 
 theorem mem_ballIdeal (τ : E →+* C) (x : 𝓞 E) : x ∈ ballIdeal τ ↔ ‖τ (x : E)‖ < 1 := Iff.rfl
@@ -57,12 +62,15 @@ theorem ballIdeal_isPrime (τ : E →+* C) : (ballIdeal τ).IsPrime := by
     rw [mem_ballIdeal, mem_ballIdeal] at h
     have ha : ‖τ (a : E)‖ = 1 := le_antisymm (norm_map_le_one τ a) (not_lt.1 h.1)
     have hb : ‖τ (b : E)‖ = 1 := le_antisymm (norm_map_le_one τ b) (not_lt.1 h.2)
-    rw [ha, hb] at hab; norm_num at hab
+    rw [ha, hb] at hab
+    norm_num at hab
 
 end GlobalTheory.PlaceOfEmb
 
 open GlobalTheory.PlaceOfEmb in
-theorem GlobalTheory.PlaceOfEmb.exists_place_of_emb : ∀ (D : D7) (l : ℕ) [Fact l.Prime] (τ : D.host.E →+* Qbar l), ∃ w : PlE D.host, w ∈ placesOver D.host.E l ∧ ∀ x : 𝓞 D.host.E, ‖τ (x : D.host.E)‖ < 1 ↔ x ∈ w.asIdeal := by
+theorem GlobalTheory.PlaceOfEmb.exists_place_of_emb
+    : ∀ (D : D7) (l : ℕ) [Fact l.Prime] (τ : D.host.E →+* Qbar l), ∃ w : PlE D.host,
+      w ∈ placesOver D.host.E l ∧ ∀ x : 𝓞 D.host.E, ‖τ (x : D.host.E)‖ < 1 ↔ x ∈ w.asIdeal := by
   intro D l _ τ
   have hl : ((l : 𝓞 D.host.E)) ∈ ballIdeal τ := by
     rw [mem_ballIdeal]

@@ -7,10 +7,11 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
 
 namespace GlobalTheory.TraceOnInjectiveMap
 
-theorem trOn_map_of_injective {X V : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup V] [Module ℂ V]
-    (j : X →ₗ[ℂ] V) (hj : Function.Injective j) (M : Submodule ℂ X) (L' : X →ₗ[ℂ] X) (L : V →ₗ[ℂ] V)
-    (hL : ∀ x ∈ M, L (j x) = j (L' x)) :
-    GlobalTheory.BCT.trOn (Submodule.map j M) L = GlobalTheory.BCT.trOn M L' := by
+theorem trOn_map_of_injective
+    {X V : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup V] [Module ℂ V]
+    (j : X →ₗ[ℂ] V) (hj : Function.Injective j)
+    (M : Submodule ℂ X) (L' : X →ₗ[ℂ] X) (L : V →ₗ[ℂ] V) (hL : ∀ x ∈ M, L (j x) = j (L' x))
+    : GlobalTheory.BCT.trOn (Submodule.map j M) L = GlobalTheory.BCT.trOn M L' := by
   have hpres : (∀ v ∈ Submodule.map j M, L v ∈ Submodule.map j M) ↔ ∀ x ∈ M, L' x ∈ M := by
     constructor
     · intro h x hx

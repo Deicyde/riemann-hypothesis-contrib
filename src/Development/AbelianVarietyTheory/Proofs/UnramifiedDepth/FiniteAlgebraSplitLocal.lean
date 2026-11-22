@@ -8,15 +8,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-private theorem finSplit_max_eq {O A : Type} [CommRing O] [IsLocalRing O] [CommRing A]
-    [Algebra O A] (φ : A →ₐ[O] O) (N : Ideal A) (hN : N.IsMaximal)
-    (h : RingHom.ker φ ≤ N) : N = (maximalIdeal O).comap φ := by
+private theorem finSplit_max_eq
+    {O A : Type} [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A]
+    (φ : A →ₐ[O] O) (N : Ideal A) (hN : N.IsMaximal) (h : RingHom.ker φ ≤ N)
+    : N = (maximalIdeal O).comap φ := by
   refine hN.eq_of_le ?_ ?_
   · intro htop
     have h1 : (1 : A) ∈ (maximalIdeal O).comap φ := htop ▸ Submodule.mem_top
@@ -35,14 +38,16 @@ private theorem finSplit_max_eq {O A : Type} [CommRing O] [IsLocalRing O] [CommR
       h (by rw [RingHom.mem_ker, map_sub, map_one, hφy, sub_self])
     simpa using N.add_mem hk hy
 
-private theorem finSplit_exists {O A : Type} [CommRing O] [IsLocalRing O] [CommRing A]
-    [Algebra O A] [Finite (A →ₐ[O] O)] (M : Ideal A) :
-    ∃ e : A, ∀ φ : A →ₐ[O] O, ((maximalIdeal O).comap φ = M → φ e = 1) ∧
-      ((maximalIdeal O).comap φ ≠ M → φ e = 0) := by
+private theorem finSplit_exists
+    {O A : Type} [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [Finite (A →ₐ[O] O)]
+    (M : Ideal A)
+    : ∃ e : A, ∀ φ : A →ₐ[O] O,
+      ((maximalIdeal O).comap φ = M → φ e = 1) ∧ ((maximalIdeal O).comap φ ≠ M → φ e = 0) := by
   classical
   have := Fintype.ofFinite (A →ₐ[O] O)
-  have key : ∀ φ ψ : A →ₐ[O] O, ∃ x : A, (maximalIdeal O).comap φ = M →
-      (maximalIdeal O).comap ψ ≠ M → φ x = 1 ∧ ψ x = 0 := by
+  have key
+      : ∀ φ ψ : A →ₐ[O] O, ∃ x : A,
+        (maximalIdeal O).comap φ = M → (maximalIdeal O).comap ψ ≠ M → φ x = 1 ∧ ψ x = 0 := by
     intro φ ψ
     by_cases hφ : (maximalIdeal O).comap φ = M
     swap
@@ -62,9 +67,11 @@ private theorem finSplit_exists {O A : Type} [CommRing O] [IsLocalRing O] [CommR
     rw [map_add (f := _), RingHom.mem_ker.1 ha, zero_add, map_one] at hφab
     exact hφab
   choose x hx using key
-  refine ⟨1 - ∏ φ ∈ Finset.univ.filter (fun φ : A →ₐ[O] O => (maximalIdeal O).comap φ = M),
+  refine ⟨
+    1 - ∏ φ ∈ Finset.univ.filter (fun φ : A →ₐ[O] O => (maximalIdeal O).comap φ = M),
       (1 - ∏ ψ ∈ Finset.univ.filter (fun ψ : A →ₐ[O] O => (maximalIdeal O).comap ψ ≠ M), x φ ψ),
-      fun φ0 => ⟨fun h0 => ?_, fun h0 => ?_⟩⟩
+    fun φ0 => ⟨fun h0 => ?_, fun h0 => ?_⟩
+  ⟩
   · rw [map_sub, map_one, map_prod, sub_eq_self]
     apply Finset.prod_eq_zero (i := φ0) (by simp [h0])
     rw [map_sub, map_one, map_prod, sub_eq_zero, eq_comm]
@@ -78,10 +85,12 @@ private theorem finSplit_exists {O A : Type} [CommRing O] [IsLocalRing O] [CommR
     apply Finset.prod_eq_zero (i := φ0) (by simp [h0])
     exact (hx φ φ0 (Finset.mem_filter.1 hφ).2 h0).2
 
-theorem finite_algebra_split_local :
-  (∀ (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [Module.Finite O A] [Finite (A →ₐ[O] O)],
-    (∀ f : A, (∀ φ : A →ₐ[O] O, φ f = 0) → f = 0) →
-    ∃ (n : ℕ) (ε : Fin n → A), CompleteOrthogonalIdempotents ε ∧ ∀ i, IsLocalRing (A ⧸ Ideal.span {1 - ε i})) := by
+theorem finite_algebra_split_local
+    : (∀ (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [Module.Finite O A]
+        [Finite (A →ₐ[O] O)],
+      (∀ f : A, (∀ φ : A →ₐ[O] O, φ f = 0) → f = 0)
+        → ∃ (n : ℕ) (ε : Fin n → A),
+          CompleteOrthogonalIdempotents ε ∧ ∀ i, IsLocalRing (A ⧸ Ideal.span {1 - ε i})) := by
   intro O A _ _ _ _ _ _ hsep
   classical
   have := Fintype.ofFinite (A →ₐ[O] O)
@@ -90,8 +99,9 @@ theorem finite_algebra_split_local :
   let Pts := Set.range (fun φ : A →ₐ[O] O => (maximalIdeal O).comap φ)
   let eqv : Fin (Fintype.card Pts) ≃ Pts := (Fintype.equivFin Pts).symm
   choose e he using fun M : Ideal A => finSplit_exists (O := O) M
-  have hval : ∀ (M : Ideal A) (φ : A →ₐ[O] O),
-      φ (e M) = if (maximalIdeal O).comap φ = M then 1 else 0 := by
+  have hval
+      : ∀ (M : Ideal A) (φ : A →ₐ[O] O),
+        φ (e M) = if (maximalIdeal O).comap φ = M then 1 else 0 := by
     intro M φ
     split_ifs with h
     · exact (he M φ).1 h
@@ -107,13 +117,15 @@ theorem finite_algebra_split_local :
     simp only [SetLike.not_le_iff_exists] at hnot
     choose a ha haN using hnot
     have := hN.isPrime
-    have h0 : ∏ φ, a φ = 0 := hsep _ fun ψ => by
-      rw [map_prod]
-      exact Finset.prod_eq_zero (Finset.mem_univ ψ) (RingHom.mem_ker.1 (ha ψ))
+    have h0 : ∏ φ, a φ = 0 :=
+      hsep _ fun ψ => by
+        rw [map_prod]
+        exact Finset.prod_eq_zero (Finset.mem_univ ψ) (RingHom.mem_ker.1 (ha ψ))
     have hin : ∏ φ, a φ ∈ N := h0 ▸ N.zero_mem
     obtain ⟨φ, -, hφ⟩ := Ideal.IsPrime.prod_mem_iff.1 hin
     exact haN φ hφ
-  refine ⟨Fintype.card Pts, fun i => e (eqv i).1, ⟨⟨fun i => ?_, fun i j hij => ?_⟩, ?_⟩, fun i => ?_⟩
+  refine
+    ⟨Fintype.card Pts, fun i => e (eqv i).1, ⟨⟨fun i => ?_, fun i j hij => ?_⟩, ?_⟩, fun i => ?_⟩
   · show e (eqv i).1 * e (eqv i).1 = e (eqv i).1
     apply ext
     intro φ
@@ -133,7 +145,8 @@ theorem finite_algebra_split_local :
       rw [map_sum, map_one]
     simp only [hval]
     rw [Fintype.sum_equiv eqv _
-      (fun M : Pts => if (maximalIdeal O).comap φ = M.1 then (1 : O) else 0) (fun _ => rfl)]
+      (fun M : Pts => if (maximalIdeal O).comap φ = M.1 then (1 : O) else 0)
+      (fun _ => rfl)]
     rw [Finset.sum_eq_single ⟨(maximalIdeal O).comap φ, φ, rfl⟩]
     · simp
     · intro b _ hb
@@ -144,8 +157,9 @@ theorem finite_algebra_split_local :
       exact absurd (Finset.mem_univ _) h
   · obtain ⟨φ0, hφ0⟩ := (eqv i).2
     replace hφ0 : (maximalIdeal O).comap φ0 = (eqv i).1 := hφ0
-    have hmem : ∀ ψ : A →ₐ[O] O,
-        1 - e (eqv i).1 ∈ (maximalIdeal O).comap ψ ↔ (maximalIdeal O).comap ψ = (eqv i).1 := by
+    have hmem
+        : ∀ ψ : A →ₐ[O] O,
+          1 - e (eqv i).1 ∈ (maximalIdeal O).comap ψ ↔ (maximalIdeal O).comap ψ = (eqv i).1 := by
       intro ψ
       rw [Ideal.mem_comap, map_sub, map_one, hval]
       split_ifs with h
@@ -166,15 +180,17 @@ theorem finite_algebra_split_local :
     have hJ : Ideal.span {1 - e (eqv i).1} ≠ ⊤ := fun h => hMtop (top_le_iff.1 (h ▸ hJM))
     have := Ideal.Quotient.nontrivial_iff.2 hJ
     obtain ⟨Q0, hQ0⟩ := Ideal.exists_maximal (A ⧸ Ideal.span {1 - e (eqv i).1})
-    have hcomap : ∀ Q : Ideal (A ⧸ Ideal.span {1 - e (eqv i).1}), Q.IsMaximal →
-        Q = (eqv i).1.map (Ideal.Quotient.mk _) := by
+    have hcomap
+        : ∀ Q : Ideal (A ⧸ Ideal.span {1 - e (eqv i).1}),
+          Q.IsMaximal → Q = (eqv i).1.map (Ideal.Quotient.mk _) := by
       intro Q hQ
       have := hQ
       have hQ' : (Q.comap (Ideal.Quotient.mk (Ideal.span {1 - e (eqv i).1}))).IsMaximal :=
         Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective
       obtain ⟨ψ, hψ⟩ := hmax _ hQ'
       have hin : 1 - e (eqv i).1 ∈ Q.comap (Ideal.Quotient.mk (Ideal.span {1 - e (eqv i).1})) := by
-        rw [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span (Set.mem_singleton _))]
+        rw [Ideal.mem_comap,
+          Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span (Set.mem_singleton _))]
         exact Q.zero_mem
       rw [← hψ] at hin
       have hψM := (hmem ψ).1 hin

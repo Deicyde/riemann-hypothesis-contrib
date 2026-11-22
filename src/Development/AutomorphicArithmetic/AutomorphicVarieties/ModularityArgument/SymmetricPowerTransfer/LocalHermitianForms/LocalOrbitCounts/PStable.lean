@@ -13,8 +13,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-theorem UpperTheory.V.Z.Sym.Loc.pStable :
-    UpperTheory.V.Z.Sym.Loc.PStable := by
+theorem UpperTheory.V.Z.Sym.Loc.pStable : UpperTheory.V.Z.Sym.Loc.PStable := by
   intro O K _ _ _ _ _ Δ τ L hr j χ hj hχ a ha
   haveI := L.frac
   have hnω : QuadraticAlgebra.norm (a : Etau K τ) = 1 := by
@@ -33,7 +32,8 @@ theorem UpperTheory.V.Z.Sym.Loc.pStable :
   have hpe : ¬ EvenVal O ((p : Kˣ) : K) := by
     rw [hpv]
     exact PS.not_even_irr L hπ
-  have hfv : ∀ t : Kˣ, (PS.Fv O τ).ncard = (PS.Gs O τ (↑t) 1).ncard + (PS.Gs O τ (↑(t * p)) 1).ncard :=
+  have hfv
+      : ∀ t : Kˣ, (PS.Fv O τ).ncard = (PS.Gs O τ (↑t) 1).ncard + (PS.Gs O τ (↑(t * p)) 1).ncard :=
     fun t => PS.fv_card L hr t p hpe
   by_cases hD : IsSquare (τ ^ 2 - 4)
   · have hI := UpperTheory.evenValuation_norm_compactUnits_of_split O K Δ τ L hr hD
@@ -85,8 +85,9 @@ theorem UpperTheory.V.Z.Sym.Loc.pStable :
         rcases PS.even_or L hyne hp0 hpe with he | he
         · obtain ⟨z, c, hc, hyc⟩ := hI.2 y he
           exact ⟨z, c, hc, Or.inl (by rw [one_mul, hyc])⟩
-        · have e : QuadraticAlgebra.norm ((y * y0⁻¹ : (Etau K τ)ˣ) : Etau K τ) =
-              QuadraticAlgebra.norm (y : Etau K τ) / ((p : Kˣ) : K) := by
+        · have e
+              : QuadraticAlgebra.norm ((y * y0⁻¹ : (Etau K τ)ˣ) : Etau K τ)
+                = QuadraticAlgebra.norm (y : Etau K τ) / ((p : Kˣ) : K) := by
             rw [← PS.nU_val, map_mul, map_inv, hy0u, Units.val_mul, Units.val_inv_eq_inv_val,
               PS.nU_val, div_eq_mul_inv]
           obtain ⟨z, c, hc, hyc⟩ := hI.2 (y * y0⁻¹) (e ▸ he)
@@ -97,16 +98,18 @@ theorem UpperTheory.V.Z.Sym.Loc.pStable :
         exfalso
         have hE := hI.1 _ hz
         have hzn : ((PS.nU z : Kˣ) : K) ≠ 0 := Units.ne_zero _
-        have e : QuadraticAlgebra.norm ((z ^ 2 * 1 * y0⁻¹ : (Etau K τ)ˣ) : Etau K τ) =
-            ((PS.nU z : Kˣ) : K) ^ 2 / ((p : Kˣ) : K) := by
-          rw [← PS.nU_val, map_mul, map_mul, map_pow, map_one, mul_one, map_inv, hy0u, Units.val_mul,
-            Units.val_pow_eq_pow_val, Units.val_inv_eq_inv_val, div_eq_mul_inv]
+        have e
+            : QuadraticAlgebra.norm ((z ^ 2 * 1 * y0⁻¹ : (Etau K τ)ˣ) : Etau K τ)
+              = ((PS.nU z : Kˣ) : K) ^ 2 / ((p : Kˣ) : K) := by
+          rw [← PS.nU_val, map_mul, map_mul, map_pow, map_one, mul_one, map_inv, hy0u,
+            Units.val_mul, Units.val_pow_eq_pow_val, Units.val_inv_eq_inv_val, div_eq_mul_inv]
         rw [e] at hE
         have hsq : EvenVal O (((PS.nU z : Kˣ) : K) ^ 2) := ⟨1, (PS.nU z : K), hzn, by simp⟩
         apply hpe
         have := PS.even_mul hsq (PS.even_inv hE)
-        have hp' : ((PS.nU z : Kˣ) : K) ^ 2 * (((PS.nU z : Kˣ) : K) ^ 2 / ((p : Kˣ) : K))⁻¹ =
-            ((p : Kˣ) : K) := by
+        have hp'
+            : ((PS.nU z : Kˣ) : K) ^ 2 * (((PS.nU z : Kˣ) : K) ^ 2 / ((p : Kˣ) : K))⁻¹
+              = ((p : Kˣ) : K) := by
           field_simp
         rwa [hp'] at this
       rw [PS.pcount_eq L hr t 1 y0 c1 c2]
@@ -118,8 +121,8 @@ theorem UpperTheory.V.Z.Sym.Loc.pStable :
         have e : y0 = (1 * c) * ((1 * c)⁻¹ * (y0 * c')) * c'⁻¹ := by group
         rw [e]
         exact mul_mem (mul_mem (by rw [one_mul]; exact hc) hu) (inv_mem hc')
-      rw [Set.ncard_union_eq hdisj (PS.gs_fin L hr t 1) (PS.gs_fin L hr t y0), PS.gs_ncard ((t : Kˣ) : K) y0,
-        hy0u, hfv t, Units.val_mul]
+      rw [Set.ncard_union_eq hdisj (PS.gs_fin L hr t 1) (PS.gs_fin L hr t y0),
+        PS.gs_ncard ((t : Kˣ) : K) y0, hy0u, hfv t, Units.val_mul]
     rw [finsum_eq_single _ (QuotientGroup.mk 1 : Kˣ ⧸ NE τ), hpc]
     intro t ht
     exfalso
@@ -128,8 +131,10 @@ theorem UpperTheory.V.Z.Sym.Loc.pStable :
   · have hC := UpperTheory.compactTorusUnits_eq_top_of_nonsplit O K Δ τ L hr hD
     have hpc : ∀ (t : Kˣ) (b : (Etau K τ)ˣ), pcount O τ ↑t = ((PS.Gs O τ (↑t) b).ncard : ℂ) := by
       intro t b
-      rw [PS.pcount_eq L hr t b b (fun y => ⟨1, b⁻¹ * y, by rw [hC]; trivial, Or.inl (by group)⟩)
-        (fun z _ => by rw [hC]; trivial), Set.union_self]
+      rw [PS.pcount_eq L hr t b b
+          (fun y => ⟨1, b⁻¹ * y, by rw [hC]; trivial, Or.inl (by group)⟩)
+          (fun z _ => by rw [hC]; trivial),
+        Set.union_self]
     have hinv : ∀ t ∈ NE τ, ∀ x : Kˣ, pcount O τ ↑(t * x) = pcount O τ ↑x := by
       rintro t ⟨b, rfl⟩ x
       rw [hpc x b, PS.gs_ncard, hpc _ 1, Units.val_mul, mul_comm]
@@ -139,13 +144,16 @@ theorem UpperTheory.V.Z.Sym.Loc.pStable :
       intro t
       rw [hfv t, Nat.cast_add, hpc t 1, hpc (t * p) 1]
     by_cases hpN : p ∈ NE τ
-    · have hS : ∑ᶠ t : Kˣ ⧸ NE τ, pcount O τ ↑(Quotient.out t) = pcount O τ ↑(1 : Kˣ) + pcount O τ ↑g0 :=
+    · have hS
+          : ∑ᶠ t : Kˣ ⧸ NE τ, pcount O τ ↑(Quotient.out t)
+            = pcount O τ ↑(1 : Kˣ) + pcount O τ ↑g0 :=
         hsum (fun x : Kˣ => pcount O τ ↑x) hinv g0 hg0
       rw [hS]
       have e1 := e 1
       have e2 := e g0
       rw [mul_comm, hinv p hpN] at e1 e2
       linear_combination (-1 / 2 : ℂ) * e1 + (-1 / 2 : ℂ) * e2
-    · have hS : ∑ᶠ t : Kˣ ⧸ NE τ, pcount O τ ↑(Quotient.out t) = pcount O τ ↑(1 : Kˣ) + pcount O τ ↑p :=
+    · have hS
+          : ∑ᶠ t : Kˣ ⧸ NE τ, pcount O τ ↑(Quotient.out t) = pcount O τ ↑(1 : Kˣ) + pcount O τ ↑p :=
         hsum (fun x : Kˣ => pcount O τ ↑x) hinv p hpN
       rw [hS, e 1, one_mul]

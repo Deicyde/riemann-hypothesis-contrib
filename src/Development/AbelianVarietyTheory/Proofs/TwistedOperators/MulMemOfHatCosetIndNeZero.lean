@@ -6,13 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsEmb
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.NormalRepresentationLattice
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.NormalRepresentationLattice
 
 namespace GlobalTheory.StepData
 
 open MeasureTheory ValuativeRel Matrix in
-private theorem sigmaCompactSpace_of_isNonarchimedeanLocalField' (k : Type) [Field k] [ValuativeRel k]
-    [TopologicalSpace k] [IsNonarchimedeanLocalField k] : SigmaCompactSpace k := by
+private theorem sigmaCompactSpace_of_isNonarchimedeanLocalField'
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : SigmaCompactSpace k := by
   obtain ⟨a, ha0, ha1⟩ := Valuation.RankOne.nontrivial (valuation k)
   obtain ⟨b, hb0, hb1⟩ : ∃ b : k, valuation k b ≠ 0 ∧ valuation k b < 1 := by
     rcases lt_or_gt_of_ne ha1 with h | h
@@ -23,8 +25,12 @@ private theorem sigmaCompactSpace_of_isNonarchimedeanLocalField' (k : Type) [Fie
   have hb : b ≠ 0 := by
     intro h
     simp [h] at hb0
-  refine ⟨⟨fun m : ℕ => (fun x => (b ^ m)⁻¹ * x) '' (𝒪[k] : Set k),
-    fun m => (_root_.GlobalTheory.SplitWeil.isCompact_int k).image (continuous_const.mul continuous_id), ?_⟩⟩
+  refine ⟨⟨
+    fun m : ℕ => (fun x => (b ^ m)⁻¹ * x) '' (𝒪[k] : Set k),
+    fun m =>
+      (_root_.GlobalTheory.SplitWeil.isCompact_int k).image (continuous_const.mul continuous_id),
+    ?_
+  ⟩⟩
   refine Set.eq_univ_of_forall fun x => ?_
   set S := (IsRankLeOne.nonempty (R := k)).some
   have hf := S.strictMono
@@ -39,7 +45,8 @@ private theorem sigmaCompactSpace_of_isNonarchimedeanLocalField' (k : Type) [Fie
       exact hf hb1
     obtain ⟨m, hm⟩ := exists_pow_lt_of_lt_one (inv_pos.2 hpos) hlt
     refine ⟨m, ?_⟩
-    calc _ ≤ (S.emb (valuation k x))⁻¹ * S.emb (valuation k x) := by gcongr
+    calc
+      _ ≤ (S.emb (valuation k x))⁻¹ * S.emb (valuation k x) := by gcongr
       _ = 1 := inv_mul_cancel₀ hpos.ne'
   simp only [Set.mem_iUnion, Set.mem_image]
   refine ⟨m, b ^ m * x, ?_, by field_simp⟩
@@ -47,15 +54,17 @@ private theorem sigmaCompactSpace_of_isNonarchimedeanLocalField' (k : Type) [Fie
     map_pow, map_pow]
   exact hm
 
-
 open MeasureTheory ValuativeRel Matrix in
-theorem _root_.GlobalTheory.StepData.mul_mem_of_hat_cosetInd_ne_zero : ∀ (k : Type) [Field k]
-    [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k]
-    [BorelSpace k] (ψ : AddChar k Circle) (_ : _root_.GlobalTheory.SplitWeil.HasConductor ψ 1) (ν : Measure k)
-    [ν.IsAddHaarMeasure] (n : Type) [Fintype n] [DecidableEq n] (c : kˣ) (ε : k)
-    (yb : (n → k) ⧸ _root_.GlobalTheory.StepData.box n c) (η : n → k),
-    _root_.GlobalTheory.StepData.hat ψ ν ε (_root_.GlobalTheory.StepData.cosetInd (_root_.GlobalTheory.StepData.box n c) yb) η ≠ 0 →
-    ∀ i, ε * η i * (c : k) ∈ 𝒪[k] := by
+theorem _root_.GlobalTheory.StepData.mul_mem_of_hat_cosetInd_ne_zero
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle)
+        (_ : _root_.GlobalTheory.SplitWeil.HasConductor ψ 1) (ν : Measure k) [ν.IsAddHaarMeasure]
+        (n : Type) [Fintype n] [DecidableEq n] (c : kˣ) (ε : k)
+        (yb : (n → k) ⧸ _root_.GlobalTheory.StepData.box n c) (η : n → k),
+      _root_.GlobalTheory.StepData.hat ψ ν ε
+            (_root_.GlobalTheory.StepData.cosetInd (_root_.GlobalTheory.StepData.box n c) yb) η
+          ≠ 0
+        → ∀ i, ε * η i * (c : k) ∈ 𝒪[k] := by
   intro k _ _ _ _ _ _ ψ hψ ν _ n _ _ c ε yb η hne i
   haveI := sigmaCompactSpace_of_isNonarchimedeanLocalField' k
   by_contra hx
@@ -76,13 +85,16 @@ theorem _root_.GlobalTheory.StepData.mul_mem_of_hat_cosetInd_ne_zero : ∀ (k : 
     (ψ (ε * η ⬝ᵥ y) : ℂ) with hg
   have hshift : ∀ y, g (y + Pi.single i ((c : k) * t)) = (ψ (t * (ε * η i * c)) : ℂ) * g y := by
     intro y
-    have hind : _root_.GlobalTheory.StepData.cosetInd (_root_.GlobalTheory.StepData.box n c) yb
-        (y + Pi.single i ((c : k) * t)) =
-          _root_.GlobalTheory.StepData.cosetInd (_root_.GlobalTheory.StepData.box n c) yb y := by
+    have hind
+        : _root_.GlobalTheory.StepData.cosetInd (_root_.GlobalTheory.StepData.box n c) yb
+            (y + Pi.single i ((c : k) * t))
+          = _root_.GlobalTheory.StepData.cosetInd (_root_.GlobalTheory.StepData.box n c) yb y := by
       unfold _root_.GlobalTheory.StepData.cosetInd
       simp only [Set.indicator]
-      have hq : Submodule.Quotient.mk (p := _root_.GlobalTheory.StepData.box n c)
-          (y + Pi.single i ((c : k) * t)) = Submodule.Quotient.mk y := by
+      have hq
+          : Submodule.Quotient.mk (p := _root_.GlobalTheory.StepData.box n c)
+              (y + Pi.single i ((c : k) * t))
+            = Submodule.Quotient.mk y := by
         rw [Submodule.Quotient.mk_add, (Submodule.Quotient.mk_eq_zero _).2 hvmem, add_zero]
       have hv0 := (Submodule.Quotient.mk_eq_zero _).2 hvmem
       split_ifs with h₁ h₂ h₂
@@ -95,8 +107,8 @@ theorem _root_.GlobalTheory.StepData.mul_mem_of_hat_cosetInd_ne_zero : ∀ (k : 
     have hr : ε * (η i * ((c : k) * t)) = t * (ε * η i * c) := by ring
     rw [hr]
     ring
-  have h1 := integral_add_right_eq_self (μ := Measure.pi fun _ : n => ν) g
-    (Pi.single i ((c : k) * t))
+  have h1 :=
+    integral_add_right_eq_self (μ := Measure.pi fun _ : n => ν) g (Pi.single i ((c : k) * t))
   simp only [hshift, integral_const_mul] at h1
   have hne1 : (ψ (t * (ε * η i * c)) : ℂ) ≠ 1 := by
     intro h

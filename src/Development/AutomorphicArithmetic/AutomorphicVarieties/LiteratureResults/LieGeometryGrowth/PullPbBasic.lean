@@ -6,9 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo
 
-private theorem UpperTheory.V.Lit.Geo.euler_flow {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {W : V → V} {p : V}
-    (hd : DifferentiableAt ℝ W p) (hh : ∀ t : ℝ, 0 < t → W (t • p) = t • W p) (t : ℝ) :
-    fderiv ℝ (flow W t) p p = flow W t p := by
+private theorem UpperTheory.V.Lit.Geo.euler_flow
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {W : V → V} {p : V} (hd : DifferentiableAt ℝ W p) (hh : ∀ t : ℝ, 0 < t → W (t • p) = t • W p)
+    (t : ℝ)
+    : fderiv ℝ (flow W t) p p = flow W t p := by
   have hp1 : HasFDerivAt W (fderiv ℝ W p) ((1 : ℝ) • p) := by
     rw [one_smul]
     exact hd.hasFDerivAt
@@ -16,7 +18,8 @@ private theorem UpperTheory.V.Lit.Geo.euler_flow {V : Type} [NormedAddCommGroup 
   have h1 : HasDerivAt (fun s : ℝ => W (s • p)) (fderiv ℝ W p ((1 : ℝ) • p)) 1 :=
     hp1.comp_hasDerivAt (1 : ℝ) hr
   have h2 : HasDerivAt (fun s : ℝ => W (s • p)) (W p) 1 := by
-    have hl : HasDerivAt (fun s : ℝ => s • W p) ((1 : ℝ) • W p) 1 := (hasDerivAt_id (1 : ℝ)).smul_const (W p)
+    have hl : HasDerivAt (fun s : ℝ => s • W p) ((1 : ℝ) • W p) 1 :=
+      (hasDerivAt_id (1 : ℝ)).smul_const (W p)
     rw [one_smul] at hl
     refine hl.congr_of_eventuallyEq ?_
     filter_upwards [lt_mem_nhds (zero_lt_one' ℝ)] with s hs
@@ -29,8 +32,7 @@ private theorem UpperTheory.V.Lit.Geo.euler_flow {V : Type} [NormedAddCommGroup 
   rw [hf.fderiv]
   simp [flow, heul]
 
-theorem UpperTheory.V.Lit.Geo.pbBasic :
-    PbBasic := by
+theorem UpperTheory.V.Lit.Geo.pbBasic : PbBasic := by
   intro V F _ _ _ _ _ _ Y hY W hW hh q
   have hdiff : ∀ p ∈ Y, DifferentiableAt ℝ W p := fun p hp =>
     (hW.1.contDiffAt (hY.mem_nhds hp)).differentiableAt (by simp)

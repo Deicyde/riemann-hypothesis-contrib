@@ -6,15 +6,17 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Poinc
 @[expose] public section
 
 open scoped Classical ENNReal
-open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting GlobalTheory.CovDom
+open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting
+  GlobalTheory.CovDom
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CovDom
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem vecOf_apply (x : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) :
-    vecOf X x = ∑ i, x i • X.bas (ci X i) := by
+theorem vecOf_apply (x : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E)
+    : vecOf X x = ∑ i, x i • X.bas (ci X i) := by
   simp only [vecOf, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
     Module.Basis.equivFun_symm_apply, LinearEquiv.funCongrLeft_apply, LinearMap.funLeft_apply]
   exact Fintype.sum_equiv (ci X).symm _ _ fun j => by simp
@@ -26,12 +28,13 @@ theorem vecOf_bijective : Function.Bijective (vecOf X) := by
 
 private theorem sig_eq_star' (a : D.host.E) : D.sp.cm.sig a = star a := by rfl
 
-theorem form_Jc (x y : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) :
-    GlobalTheory.SgAlg.form (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) x y = (VS D).hT (vecOf X y) (vecOf X x) := by
+theorem form_Jc (x y : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E)
+    : GlobalTheory.SgAlg.form (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) x y
+      = (VS D).hT (vecOf X y) (vecOf X x) := by
   rw [vecOf_apply, vecOf_apply]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [GlobalTheory.SgAlg.form, dotProduct, Matrix.mulVec, Jc, map_sum, map_smulₛₗ,
-    LinearMap.sum_apply, LinearMap.smul_apply, RingHom.id_apply, smul_eq_mul, Finset.mul_sum]
+      LinearMap.sum_apply, LinearMap.smul_apply, RingHom.id_apply, smul_eq_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
   rw [AlgHom.coe_toRingHom, sig_eq_star', starRingEnd_apply]
@@ -39,12 +42,16 @@ theorem form_Jc (x y : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) :
 
 end GlobalTheory.CovDom
 
-theorem GlobalTheory.CovDom.herm_selfDual : ∀ (D : D7) (X : HidaSetting D), Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsHermND D.sp.cm.sig (Jc X) ∧ GlobalTheory.SgGlob.SelfDual (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Lc X) := by
+theorem GlobalTheory.CovDom.herm_selfDual
+    : ∀ (D : D7) (X : HidaSetting D),
+      Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsHermND D.sp.cm.sig (Jc X)
+        ∧ GlobalTheory.SgGlob.SelfDual (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Lc X) := by
   intro D X
   have hform := form_Jc X
   have hinj := (vecOf_bijective X).1
   have hsurj := (vecOf_bijective X).2
-  unfold Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsHermND GlobalTheory.SgGlob.SelfDual
+  unfold Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsHermND
+    GlobalTheory.SgGlob.SelfDual
   refine ⟨⟨fun i j => ?_, ?_⟩, ?_, fun v => ?_⟩
   · simp only [Jc]
     rw [sig_eq_star']
@@ -66,8 +73,8 @@ theorem GlobalTheory.CovDom.herm_selfDual : ∀ (D : D7) (X : HidaSetting D), Fo
     exact (VS D).standardTuple_isLattice.fg.map _
   · show vecOf X v ∈ (VS D).L0 ↔ _
     conv_lhs => rw [← (VS D).baseLattice_isUnimodular]
-    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-      LinearMap.restrictScalars_apply]
+    simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+      Submodule.mem_comap, LinearMap.restrictScalars_apply]
     constructor
     · intro h w hw
       rw [hform v w]

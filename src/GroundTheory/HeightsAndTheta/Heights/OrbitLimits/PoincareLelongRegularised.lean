@@ -16,10 +16,11 @@ open ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
 
 def PoincareLelongRegularised.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (n : ℕ)
-    (L : Fin n → HermLine ι) (A B : HermLine ι) (s : MRing ι),
-    IsArithVar P (n + 2) → (∀ j, IsSmoothHerm (L j)) → IsSmoothHerm A → IsSmoothHerm B →
-    B.a = 0 → IsSectionOn P A s →
-    Tendsto (fun ε => ptsIntegral P (Fin.cons (fun z => Real.log (B.h z)) (pot L)) (regLog A s ε))
-      (𝓝[>] 0) (𝓝 (ptsIntegral P (Fin.cons (fun z => Real.log (B.h z)) (pot L)) (logNorm A s)))
+      (L : Fin n → HermLine ι) (A B : HermLine ι) (s : MRing ι),
+    IsArithVar P (n + 2) → (∀ j, IsSmoothHerm (L j)) → IsSmoothHerm A → IsSmoothHerm B → B.a = 0
+      → IsSectionOn P A s
+      → Tendsto
+        (fun ε => ptsIntegral P (Fin.cons (fun z => Real.log (B.h z)) (pot L)) (regLog A s ε))
+        (𝓝[>] 0) (𝓝 (ptsIntegral P (Fin.cons (fun z => Real.log (B.h z)) (pot L)) (logNorm A s)))
 
 end GroundTheory.Heights₂.Heights.Targets

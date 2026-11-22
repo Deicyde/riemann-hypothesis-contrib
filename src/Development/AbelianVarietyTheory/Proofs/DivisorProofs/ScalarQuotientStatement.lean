@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Geometric
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
 noncomputable section
 
@@ -19,7 +22,8 @@ theorem isIso_ι_of_eq_top {Z : Scheme.{0}} (V : Z.Opens) (hV : V = ⊤) : IsIso
   rw [← Z.isoOfEq_hom_ι hV, ← Z.topIso_hom]
   infer_instance
 
-theorem isUnit_of_basicOpen_eq_top {Z : Scheme.{0}} (a : Γ(Z, ⊤)) (h : Z.basicOpen a = ⊤) : IsUnit a :=
+theorem isUnit_of_basicOpen_eq_top {Z : Scheme.{0}} (a : Γ(Z, ⊤)) (h : Z.basicOpen a = ⊤)
+    : IsUnit a :=
   Z.toRingedSpace.isUnit_of_isUnit_germ _ _ fun x hx => (Z.mem_basicOpen _ x hx).1 (h.ge hx)
 
 theorem preimage_eq_top {X Y₀ : Scheme.{0}} (U : X.Opens) (g : Y₀ ⟶ U) : (g ≫ U.ι) ⁻¹ᵁ U = ⊤ := by
@@ -28,13 +32,16 @@ theorem preimage_eq_top {X Y₀ : Scheme.{0}} (U : X.Opens) (g : Y₀ ⟶ U) : (
   rw [Scheme.Hom.comp_apply]
   exact (g x).2
 
-theorem exists_normalization_of_etale {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    {X Y₀ : Scheme.{0}} (π : X ⟶ Sp R) [Smooth π] (U : X.Opens) [QuasiCompact U.ι] [QuasiSeparated U.ι]
-    (g : Y₀ ⟶ U) [IsFinite g] [Etale g] (hchar : ∀ y : Y₀, CharZero (Y₀.residueField y)) :
-    ∃ (Y : Scheme.{0}) (s : Y ⟶ X) (i : Y₀ ⟶ Y), IsOpenImmersion i ∧ IsDominant i ∧ i ≫ s = g ≫ U.ι ∧
-      IsFinite s ∧ (∀ y : Y, IsIntegrallyClosed (Y.presheaf.stalk y)) ∧ Flat (s ≫ π) ∧
-      IsLocallyNoetherian Y ∧
-      ∀ (S : Scheme.{0}) (f : S ⟶ Y), Set.range (f ≫ s) ⊆ U → ∃ f₀ : S ⟶ Y₀, f₀ ≫ i = f := by
+theorem exists_normalization_of_etale
+    {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    {X Y₀ : Scheme.{0}} (π : X ⟶ Sp R) [Smooth π]
+    (U : X.Opens) [QuasiCompact U.ι] [QuasiSeparated U.ι]
+    (g : Y₀ ⟶ U) [IsFinite g] [Etale g]
+    (hchar : ∀ y : Y₀, CharZero (Y₀.residueField y))
+    : ∃ (Y : Scheme.{0}) (s : Y ⟶ X) (i : Y₀ ⟶ Y),
+      IsOpenImmersion i ∧ IsDominant i ∧ i ≫ s = g ≫ U.ι ∧ IsFinite s
+        ∧ (∀ y : Y, IsIntegrallyClosed (Y.presheaf.stalk y)) ∧ Flat (s ≫ π) ∧ IsLocallyNoetherian Y
+        ∧ ∀ (S : Scheme.{0}) (f : S ⟶ Y), Set.range (f ≫ s) ⊆ U → ∃ f₀ : S ⟶ Y₀, f₀ ≫ i = f := by
   let s₀ := g ≫ U.ι
   haveI : QuasiCompact s₀ := inferInstance
   haveI : QuasiSeparated s₀ := inferInstance
@@ -61,16 +68,26 @@ theorem exists_normalization_of_etale {R : Type} [CommRing R] [IsDomain R] [IsDi
     rw [← Scheme.Hom.comp_apply, Scheme.Hom.toNormalization_fromNormalization]
     exact (g x).2
   haveI := isIso_ι_of_eq_top _ htop
-  have hi : s₀.toNormalization = inv (s₀.toNormalization ⁻¹ᵁ W).ι ≫ (s₀.toNormalization ∣_ W) ≫ W.ι := by
+  have hi
+      : s₀.toNormalization
+        = inv (s₀.toNormalization ⁻¹ᵁ W).ι ≫ (s₀.toNormalization ∣_ W) ≫ W.ι := by
     rw [morphismRestrict_ι, IsIso.inv_hom_id_assoc]
   haveI : Flat (s₀.toNormalization ≫ s₀.fromNormalization ≫ π) := by
     rw [← Category.assoc, Scheme.Hom.toNormalization_fromNormalization]
     infer_instance
-  refine ⟨s₀.normalization, s₀.fromNormalization, s₀.toNormalization, ?_, inferInstance,
-    Scheme.Hom.toNormalization_fromNormalization s₀, hfin,
+  refine ⟨
+    s₀.normalization,
+    s₀.fromNormalization,
+    s₀.toNormalization,
+    ?_,
+    inferInstance,
+    Scheme.Hom.toNormalization_fromNormalization s₀,
+    hfin,
     fun y => ((GlobalTheory.isNormalScheme_iff _).mp inferInstance y).2,
     GlobalTheory.flat_normalization s₀ (s₀.fromNormalization ≫ π),
-    LocallyOfFiniteType.isLocallyNoetherian s₀.fromNormalization, ?_⟩
+    LocallyOfFiniteType.isLocallyNoetherian s₀.fromNormalization,
+    ?_
+  ⟩
   · rw [hi]
     infer_instance
   · intro S f hf
@@ -78,14 +95,30 @@ theorem exists_normalization_of_etale {R : Type} [CommRing R] [IsDomain R] [IsDi
       rw [Scheme.Opens.range_ι]
       rintro _ ⟨x, rfl⟩
       exact hf ⟨x, rfl⟩
-    refine ⟨IsOpenImmersion.lift W.ι f hr ≫ inv (s₀.toNormalization ∣_ W) ≫ (s₀.toNormalization ⁻¹ᵁ W).ι, ?_⟩
-    rw [Category.assoc, Category.assoc, ← morphismRestrict_ι, IsIso.inv_hom_id_assoc, IsOpenImmersion.lift_fac]
+    refine ⟨
+      IsOpenImmersion.lift W.ι f hr ≫ inv (s₀.toNormalization ∣_ W) ≫ (s₀.toNormalization ⁻¹ᵁ W).ι,
+      ?_
+    ⟩
+    rw [Category.assoc, Category.assoc, ← morphismRestrict_ι, IsIso.inv_hom_id_assoc,
+      IsOpenImmersion.lift_fac]
 
 end GlobalTheory.UPel.HT.ES.NormCover
 
 namespace GlobalTheory.UPel.HT.ES.NormCover
 
-theorem exists_finite_normal_model : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CharZero R] (b : Base D R) (N : ℕ), (p : R) ∈ IsLocalRing.maximalIdeal R → ∀ (M : Model b N) (Y₀ : Scheme.{0}) (s₀ : Y₀ ⟶ M.X) (g : Y₀ ⟶ (M.X.basicOpen ((p : ℕ) : Γ(M.X, ⊤))).toScheme), IsFinite g → Etale g → g ≫ (M.X.basicOpen ((p : ℕ) : Γ(M.X, ⊤))).ι = s₀ → ∃ (Y : Scheme.{0}) (s : Y ⟶ M.X) (i : Y₀ ⟶ Y), IsOpenImmersion i ∧ IsDominant i ∧ i ≫ s = s₀ ∧ IsFinite s ∧ (∀ y : Y, IsIntegrallyClosed (Y.presheaf.stalk y)) ∧ Flat (s ≫ M.s) ∧ IsLocallyNoetherian Y ∧ (∀ (S : Scheme.{0}) (f : S ⟶ Y), IsUnit ((p : ℕ) : Γ(S, ⊤)) → ∃ f₀ : S ⟶ Y₀, f₀ ≫ i = f) := by
+theorem exists_finite_normal_model
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] [IsDomain R]
+        [IsDiscreteValuationRing R] [CharZero R] (b : Base D R) (N : ℕ),
+      (p : R) ∈ IsLocalRing.maximalIdeal R
+        → ∀ (M : Model b N) (Y₀ : Scheme.{0}) (s₀ : Y₀ ⟶ M.X)
+            (g : Y₀ ⟶ (M.X.basicOpen ((p : ℕ) : Γ(M.X, ⊤))).toScheme),
+          IsFinite g → Etale g → g ≫ (M.X.basicOpen ((p : ℕ) : Γ(M.X, ⊤))).ι = s₀
+            → ∃ (Y : Scheme.{0}) (s : Y ⟶ M.X) (i : Y₀ ⟶ Y),
+              IsOpenImmersion i ∧ IsDominant i ∧ i ≫ s = s₀ ∧ IsFinite s
+                ∧ (∀ y : Y, IsIntegrallyClosed (Y.presheaf.stalk y)) ∧ Flat (s ≫ M.s)
+                ∧ IsLocallyNoetherian Y
+                ∧ (∀ (S : Scheme.{0}) (f : S ⟶ Y),
+                  IsUnit ((p : ℕ) : Γ(S, ⊤)) → ∃ f₀ : S ⟶ Y₀, f₀ ≫ i = f) := by
   intro p _ D R _ _ _ _ b N _ M Y₀ s₀ g hgf hge hs
   subst hs
   haveI := M.smooth
@@ -97,8 +130,10 @@ theorem exists_finite_normal_model : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) 
     exact h
   have hcop : ∀ m : ℕ, m.Coprime p → IsUnit ((m : ℕ) : Γ(Y₀, ⊤)) := by
     intro m hm
-    have := (b.unit m hm).map ((Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫
-      (g ≫ (M.X.basicOpen ((p : ℕ) : Γ(M.X, ⊤))).ι ≫ M.s).appTop).hom
+    have :=
+      (b.unit m hm).map
+        ((Scheme.ΓSpecIso (CommRingCat.of R)).inv
+          ≫ (g ≫ (M.X.basicOpen ((p : ℕ) : Γ(M.X, ⊤))).ι ≫ M.s).appTop).hom
     rwa [map_natCast] at this
   have hunit : ∀ n : ℕ, n ≠ 0 → IsUnit ((n : ℕ) : Γ(Y₀, ⊤)) := by
     intro n hn

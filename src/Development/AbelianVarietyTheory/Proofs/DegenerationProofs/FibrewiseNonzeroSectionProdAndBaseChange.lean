@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.ExistsSe
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
@@ -24,36 +26,63 @@ open GlobalTheory.PsiRing
 noncomputable section
 namespace GlobalTheory.FibreNonzero
 
-def pullOne {X Y : Scheme.{0}} {L : LB X} (θ : L.Sec) (h : Y ⟶ X) :
-    LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => h) (fun _ => ((1 : ℕ) : ℤ))) :=
-  LBGerm.secOfGerm (fun j => (Y.presheaf.map (homOfLE (LB.wchart_le L (fun _ : Fin 1 => h) j 0)).op).hom
-      ((h.app (L.U (j 0))).hom (θ.f (j 0)))) fun y i j hi hj => by
-    have hi' : (𝟙 Y ≫ h) y ∈ L.U (i 0) := Set.mem_iInter.1 hi 0
-    have hj' : (𝟙 Y ≫ h) y ∈ L.U (j 0) := Set.mem_iInter.1 hj 0
-    refine ((gs_res _ y _ hi _).trans (gs_pull (𝟙 Y) h y _ hi' _)).trans ((gs_compat θ _ y hi' hj').trans
-      (congrArg₂ (· * ·) (congrArg Units.val ?_) ((gs_res _ y _ hj _).trans (gs_pull (𝟙 Y) h y _ hj' _)).symm))
-    refine Eq.trans ?_ (gm_linComb L (fun _ : Fin 1 => h) (fun _ => ((1 : ℕ) : ℤ)) (𝟙 Y) y i j hi hj).symm
-    simp
+def pullOne {X Y : Scheme.{0}} {L : LB X} (θ : L.Sec) (h : Y ⟶ X)
+    : LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => h) (fun _ => ((1 : ℕ) : ℤ))) :=
+  LBGerm.secOfGerm
+    (fun j =>
+      (Y.presheaf.map (homOfLE (LB.wchart_le L (fun _ : Fin 1 => h) j 0)).op).hom
+        ((h.app (L.U (j 0))).hom (θ.f (j 0))))
+    fun y i j hi hj => by
+      have hi' : (𝟙 Y ≫ h) y ∈ L.U (i 0) := Set.mem_iInter.1 hi 0
+      have hj' : (𝟙 Y ≫ h) y ∈ L.U (j 0) := Set.mem_iInter.1 hj 0
+      refine ((gs_res _ y _ hi _).trans (gs_pull (𝟙 Y) h y _ hi' _)).trans
+        ((gs_compat θ _ y hi' hj').trans
+          (congrArg₂ (· * ·) (congrArg Units.val ?_)
+            ((gs_res _ y _ hj _).trans (gs_pull (𝟙 Y) h y _ hj' _)).symm))
+      refine Eq.trans ?_
+        (gm_linComb L (fun _ : Fin 1 => h) (fun _ => ((1 : ℕ) : ℤ)) (𝟙 Y) y i j hi hj).symm
+      simp
 
-theorem mem_nonzeroLocus_pullOne {X Y : Scheme.{0}} {L : LB X} (θ : L.Sec) (h : Y ⟶ X) (y : Y) (i : L.ι)
-    (hy : h y ∈ X.basicOpen (θ.f i)) : y ∈ nonzeroLocus (pullOne θ h) := by
+theorem mem_nonzeroLocus_pullOne
+    {X Y : Scheme.{0}} {L : LB X}
+    (θ : L.Sec) (h : Y ⟶ X) (y : Y) (i : L.ι) (hy : h y ∈ X.basicOpen (θ.f i))
+    : y ∈ nonzeroLocus (pullOne θ h) := by
   have hi' : (𝟙 Y ≫ h) y ∈ L.U i := X.basicOpen_le _ hy
-  have hi : (𝟙 Y : Y ⟶ Y) y ∈ LB.wchart L (fun _ : Fin 1 => h) (fun _ => i) := Set.mem_iInter.2 fun _ => hi'
+  have hi : (𝟙 Y : Y ⟶ Y) y ∈ LB.wchart L (fun _ : Fin 1 => h) (fun _ => i) :=
+    Set.mem_iInter.2 fun _ => hi'
   refine (mem_nonzeroLocus_iff_isUnit (pullOne θ h) (k := fun _ => i) hi).2 ?_
-  have e := (gs_res (𝟙 Y) y (LB.wchart_le L (fun _ : Fin 1 => h) (fun _ => i) 0) hi _).trans
-    (gs_pull (𝟙 Y) h y _ hi' (θ.f i))
+  have e :=
+    (gs_res (𝟙 Y) y (LB.wchart_le L (fun _ : Fin 1 => h) (fun _ => i) 0) hi _).trans
+      (gs_pull (𝟙 Y) h y _ hi' (θ.f i))
   exact e ▸ (LBGerm.isUnit_gs_iff _ y _ hi' _).2 hy
 
 theorem isIso_snd_left {S : Scheme.{0}} (G : Over S) : IsIso (snd (𝟙_ (Over S)) G).left := by
-  have : IsIso (snd (𝟙_ (Over S)) G) := by
-    rw [← leftUnitor_hom]; infer_instance
+  have : IsIso (snd (𝟙_ (Over S)) G) := by rw [← leftUnitor_hom]; infer_instance
   exact inferInstanceAs (IsIso ((Over.forget S).map (snd (𝟙_ (Over S)) G)))
 
 end GlobalTheory.FibreNonzero
 
-
 open GlobalTheory.FibreNonzero in
-theorem GlobalTheory.fibNZ_prod_and_baseChange : ∀ (R V : Type) [CommRing R] [IsDomain R] [CommRing V] [IsDomain V] (I : Ideal R) (I' : Ideal V) (φ : R →+* V) (D : DegPre R) (D' : DegPre V) (A : PolAV (Sp (FractionRing R))) (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G] (A' : PolAV (Sp (FractionRing V))) (G' : Over (Spec (CommRingCat.of V))) [GrpObj G'] [IsCommMonObj G'] (U : PreU I D A G) (U' : PreU I' D' A' G') (F : G'.left ⟶ G.left) (C : Cmp φ U U' F), (ThetaNZ G U.P.L.L → ∃ σ : U.SecGT (𝟙_ _) 1, FibNZ (𝟙_ _ ⊗ G).hom σ) ∧ ∀ (k : ℕ) (σ : U.SecGT (𝟙_ _) k) (σ' : U'.SecGT (𝟙_ _) k), (∀ (Z : Scheme.{0}) (r' : Z ⟶ (𝟙_ _ ⊗ G').left) (r : Z ⟶ (𝟙_ _ ⊗ G).left), r ≫ (snd _ G).left = r' ≫ (snd _ G').left ≫ F → ∀ z J J', Good U.P.L.L z J → Good U'.P.L.L z J' → sval σ r z J = (gw C.wL (r' ≫ (snd _ G').left) z (J (r ≫ (snd _ G).left)) (J' (r' ≫ (snd _ G').left))).val ^ k * sval σ' r' z J') → FibNZ (𝟙_ _ ⊗ G).hom σ → FibNZ (𝟙_ _ ⊗ G').hom σ' := by
+theorem GlobalTheory.fibNZ_prod_and_baseChange
+    : ∀ (R V : Type) [CommRing R] [IsDomain R] [CommRing V] [IsDomain V] (I : Ideal R)
+        (I' : Ideal V) (φ : R →+* V) (D : DegPre R) (D' : DegPre V)
+        (A : PolAV (Sp (FractionRing R))) (G : Over (Spec (CommRingCat.of R))) [GrpObj G]
+        [IsCommMonObj G] (A' : PolAV (Sp (FractionRing V))) (G' : Over (Spec (CommRingCat.of V)))
+        [GrpObj G'] [IsCommMonObj G'] (U : PreU I D A G) (U' : PreU I' D' A' G')
+        (F : G'.left ⟶ G.left) (C : Cmp φ U U' F),
+      (ThetaNZ G U.P.L.L → ∃ σ : U.SecGT (𝟙_ _) 1, FibNZ (𝟙_ _ ⊗ G).hom σ)
+        ∧ ∀ (k : ℕ) (σ : U.SecGT (𝟙_ _) k) (σ' : U'.SecGT (𝟙_ _) k),
+          (∀ (Z : Scheme.{0}) (r' : Z ⟶ (𝟙_ _ ⊗ G').left) (r : Z ⟶ (𝟙_ _ ⊗ G).left),
+              r ≫ (snd _ G).left = r' ≫ (snd _ G').left ≫ F
+                → ∀ z J J',
+                  Good U.P.L.L z J → Good U'.P.L.L z J'
+                    → sval σ r z J
+                      = (gw C.wL (r' ≫ (snd _ G').left) z (J (r ≫ (snd _ G).left))
+                            (J' (r' ≫ (snd _ G').left))).val
+                          ^ k
+                        * sval σ' r' z J')
+            → FibNZ (𝟙_ _ ⊗ G).hom σ
+            → FibNZ (𝟙_ _ ⊗ G').hom σ' := by
   intro R V _ _ _ _ I I' φ D D' A G _ _ A' G' _ _ U U' F C
   have := isIso_snd_left G
   have := isIso_snd_left G'

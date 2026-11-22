@@ -17,8 +17,9 @@ open MvPolynomial
 
 universe u
 
-private theorem withBot_eq_of_add_one_eq (a : WithBot ℕ∞) (m : ℕ)
-    (h : a + 1 = ((m + 1 : ℕ) : WithBot ℕ∞)) : a = (m : WithBot ℕ∞) := by
+private theorem withBot_eq_of_add_one_eq
+    (a : WithBot ℕ∞) (m : ℕ) (h : a + 1 = ((m + 1 : ℕ) : WithBot ℕ∞))
+    : a = (m : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot =>
     exfalso
@@ -46,25 +47,24 @@ theorem FibreVarieties.proof
     (hGe : GenericDimGe.Statement.{u}) (hCorr : SpecialIdealCorresp.Statement.{u})
     (hSpecHomog : SpecialIdealMultiHomog.Statement.{u}) (hSup : SupSpanMultiHomog.Statement.{u})
     (hMin : MinimalPrimeMultiHomog.Statement.{u}) (hQuot : SpecialQuotDim.Statement.{u})
-    (hComp : ComponentDim.Statement.{u}) : FibreVarieties.Statement.{u} := by
+    (hComp : ComponentDim.Statement.{u})
+    : FibreVarieties.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP
   obtain ⟨hprime, hhomog, hforms⟩ := hGen O K ι P hP.multiProj hP.noTorsion
-  have hcast : ((d + 1 + Fintype.card K : ℕ) : WithBot ℕ∞) =
-      ((d + Fintype.card K + 1 : ℕ) : WithBot ℕ∞) := by
+  have hcast
+      : ((d + 1 + Fintype.card K : ℕ) : WithBot ℕ∞)
+        = ((d + Fintype.card K + 1 : ℕ) : WithBot ℕ∞) := by
     congr 1; omega
   refine ⟨⟨⟨hprime, hhomog, ?_⟩, ?_⟩, ?_⟩
-  ·
-    intro k
+  · intro k
     obtain ⟨i, hi⟩ := hP.multiProj.relevant k
     obtain ⟨-, h⟩ := hforms _ _ (isWeightedHomogeneous_X O (blockWeight ι) ⟨k, i⟩) hi
     exact ⟨i, by simpa [MvPolynomial.map_X] using h⟩
-  ·
-    have h1 := hBound O K ι P hP.multiProj hP.noTorsion
+  · have h1 := hBound O K ι P hP.multiProj hP.noTorsion
     have h2 := hGe O K ι P hP.multiProj.isPrime hP.noTorsion
     rw [hP.dim, hcast] at h1 h2
     exact withBot_eq_of_add_one_eq _ _ (le_antisymm h1 h2)
-  ·
-    intro W hW
+  · intro W hW
     have hW0 := hW
     unfold divCycle at hW
     split_ifs at hW with h

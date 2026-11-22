@@ -8,11 +8,12 @@ universe u_1 u_2
 
 namespace GlobalTheory.TranslateSum
 
-theorem sum_translate_eq {G : Type u_1} {M : Type u_2} [Group G] [AddCommMonoid M]
-    (H V : Subgroup G) (S : Finset G) (hS : ∀ s ∈ S, s ∈ H)
-    (huniq : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ V) (f : G → M)
-    (hf : ∀ (g v : G), v ∈ H → v ∈ V → f (g * v) = f g) :
-    ∀ h ∈ H, ∑ s ∈ S, f (h * s) = ∑ s ∈ S, f s := by
+theorem sum_translate_eq
+    {G : Type u_1} {M : Type u_2} [Group G] [AddCommMonoid M]
+    (H V : Subgroup G) (S : Finset G)
+    (hS : ∀ s ∈ S, s ∈ H) (huniq : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ V)
+    (f : G → M) (hf : ∀ (g v : G), v ∈ H → v ∈ V → f (g * v) = f g)
+    : ∀ h ∈ H, ∑ s ∈ S, f (h * s) = ∑ s ∈ S, f s := by
   intro h hh
   have hex : ∀ s ∈ S, ∃ t : G, t ∈ S ∧ t⁻¹ * (h * s) ∈ V := fun s hs =>
     (huniq (h * s) (H.mul_mem hh (hS s hs))).exists
@@ -24,8 +25,7 @@ theorem sum_translate_eq {G : Type u_1} {M : Type u_2} [Group G] [AddCommMonoid 
       rw [hst] at this
       have e : ((φ t ht)⁻¹ * (h * s))⁻¹ * ((φ t ht)⁻¹ * (h * t)) = s⁻¹ * t := by group
       rwa [e] at this
-    have h2 : t⁻¹ * t ∈ V := by
-      rw [inv_mul_cancel]; exact V.one_mem
+    have h2 : t⁻¹ * t ∈ V := by rw [inv_mul_cancel]; exact V.one_mem
     exact (huniq t (hS t ht)).unique ⟨hs, h1⟩ ⟨ht, h2⟩
   · intro u hu
     obtain ⟨s, hs, hsV⟩ := (huniq (h⁻¹ * u) (H.mul_mem (H.inv_mem hh) (hS u hu))).exists

@@ -109,42 +109,52 @@ theorem posSet_subset_omega : posSet n ⊆ OmegaSet n := by
 theorem phiM_differentiableOn (μ : Fin n → ℤ) : DifferentiableOn ℂ (PhiM μ) (OmegaSet n) := by
   intro z hz
   have hz' : ∀ i : Fin n, lead ((i : ℕ) + 1) z ≠ 0 := hz
-  have hL : ∀ i : ℕ, Differentiable ℂ (fun z : Matrix (Fin n) (Fin n) ℂ => lead i z) :=
-    fun i => lead_differentiable_lemma i
+  have hL : ∀ i : ℕ, Differentiable ℂ (fun z : Matrix (Fin n) (Fin n) ℂ => lead i z) := fun i =>
+    lead_differentiable_lemma i
   have hq : DifferentiableAt ℂ (PhiM μ) z := by
     unfold PhiM
     fun_prop (disch := exact Or.inl (hz' _))
   exact hq.differentiableWithinAt
 
-theorem phiM_tri_mul (μ : Fin n → ℤ) {c z c' : Matrix (Fin n) (Fin n) ℂ} (hc : IsLowerTri c) (hc' : IsUpperTri c')
-    (hcd : ∀ l, c l l ≠ 0) (hcd' : ∀ l, c' l l ≠ 0) (hz : z ∈ OmegaSet n) :
-    c * z * c' ∈ OmegaSet n ∧
-      PhiM μ (c * z * c') = (∏ l, (c l l * c' l l) ^ (-μ l)) * PhiM μ z := by
+theorem phiM_tri_mul
+    (μ : Fin n → ℤ)
+    {c z c' : Matrix (Fin n) (Fin n) ℂ} (hc : IsLowerTri c) (hc' : IsUpperTri c')
+    (hcd : ∀ l, c l l ≠ 0) (hcd' : ∀ l, c' l l ≠ 0) (hz : z ∈ OmegaSet n)
+    : c * z * c' ∈ OmegaSet n
+      ∧ PhiM μ (c * z * c') = (∏ l, (c l l * c' l l) ^ (-μ l)) * PhiM μ z := by
   have hd : ∀ l, c l l * c' l l ≠ 0 := fun l => mul_ne_zero (hcd l) (hcd' l)
-  have hlead : ∀ i : Fin n, lead ((i : ℕ) + 1) (c * z * c') =
-      (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1), c l l * c' l l) * lead ((i : ℕ) + 1) z :=
-    fun i => lead_tri_mul hc hc' _ i.isLt
-  have hP : ∀ i : Fin n,
-      (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1), c l l * c' l l) ≠ 0 :=
-    fun i => prod_ne_zero_iff.mpr fun l _ => hd l
+  have hlead
+      : ∀ i : Fin n,
+        lead ((i : ℕ) + 1) (c * z * c')
+          = (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1), c l l * c' l l)
+            * lead ((i : ℕ) + 1) z := fun i =>
+    lead_tri_mul hc hc' _ i.isLt
+  have hP
+      : ∀ i : Fin n,
+        (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1), c l l * c' l l) ≠ 0 := fun i =>
+    prod_ne_zero_iff.mpr fun l _ => hd l
   refine ⟨fun i => by rw [hlead i]; exact mul_ne_zero (hP i) (hz i), ?_⟩
-  have hterm : ∀ i : Fin n, lead ((i : ℕ) + 1) (c * z * c') ^ (-(μ i - muNext μ i)) =
-      (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1), c l l * c' l l) ^ (-(μ i - muNext μ i)) *
-        lead ((i : ℕ) + 1) z ^ (-(μ i - muNext μ i)) := fun i => by rw [hlead i, mul_zpow]
+  have hterm
+      : ∀ i : Fin n,
+        lead ((i : ℕ) + 1) (c * z * c') ^ (-(μ i - muNext μ i))
+          = (∏ l ∈ univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1), c l l * c' l l)
+              ^ (-(μ i - muNext μ i))
+            * lead ((i : ℕ) + 1) z ^ (-(μ i - muNext μ i)) := fun i => by
+    rw [hlead i, mul_zpow]
   unfold PhiM
-  rw [prod_congr rfl fun i _ => hterm i, prod_mul_distrib,
-    tele_fin (fun l => c l l * c' l l) hd μ]
+  rw [prod_congr rfl fun i _ => hterm i, prod_mul_distrib, tele_fin (fun l => c l l * c' l l) hd μ]
 
-theorem phiM_posDef (μ : Fin n → ℤ) {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) :
-    0 < (PhiM μ x).re ∧ (PhiM μ x).im = 0 := by
-  have hpos : ∀ i : Fin n, 0 < (lead ((i : ℕ) + 1) x).re :=
-    fun i => (lead_posDef hx _ (by have := i.2; omega)).1
+theorem phiM_posDef (μ : Fin n → ℤ) {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef)
+    : 0 < (PhiM μ x).re ∧ (PhiM μ x).im = 0 := by
+  have hpos : ∀ i : Fin n, 0 < (lead ((i : ℕ) + 1) x).re := fun i =>
+    (lead_posDef hx _ (by have := i.2; omega)).1
   have hr : ∀ i : Fin n, lead ((i : ℕ) + 1) x = ((lead ((i : ℕ) + 1) x).re : ℂ) := by
     intro i
     apply Complex.ext
     · simp
     · simp [(lead_posDef hx ((i : ℕ) + 1) (by have := i.2; omega)).2]
-  have hP : PhiM μ x = ((∏ i : Fin n, (lead ((i : ℕ) + 1) x).re ^ (-(μ i - muNext μ i)) : ℝ) : ℂ) := by
+  have hP
+      : PhiM μ x = ((∏ i : Fin n, (lead ((i : ℕ) + 1) x).re ^ (-(μ i - muNext μ i)) : ℝ) : ℂ) := by
     unfold PhiM
     push_cast
     exact Finset.prod_congr rfl fun i _ => by rw [← hr i]
@@ -156,7 +166,8 @@ theorem phiM_one (μ : Fin n → ℤ) : PhiM μ (1 : Matrix (Fin n) (Fin n) ℂ)
   have h1 : ∀ i : Fin n, lead ((i : ℕ) + 1) (1 : Matrix (Fin n) (Fin n) ℂ) = 1 := by
     intro i
     unfold lead
-    rw [dite_eq_left (by have := i.2; omega), Matrix.submatrix_one _ (Fin.castLE_injective _), Matrix.det_one]
+    rw [dite_eq_left (by have := i.2; omega), Matrix.submatrix_one _ (Fin.castLE_injective _),
+      Matrix.det_one]
   simp [h1]
 
 end ReciprocityTheory.ChartRestriction.DS.S7

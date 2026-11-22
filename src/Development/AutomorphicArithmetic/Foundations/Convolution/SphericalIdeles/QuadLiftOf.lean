@@ -7,9 +7,11 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Spherica
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspRep Formalism.L2.Host Formalism.ConjugateSelfDual UpperTheory.V.Published UpperTheory.CBC
+open NumberField IsDedekindDomain GlobalTheory.CuspRep Formalism.L2.Host Formalism.ConjugateSelfDual
+  UpperTheory.V.Published UpperTheory.CBC
 
-private theorem normV_two_le {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) : 2 ≤ normV v := by
+private theorem normV_two_le {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
+    : 2 ≤ normV v := by
   have e : normV v = Ideal.absNorm v.asIdeal := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
     rfl
@@ -18,8 +20,8 @@ private theorem normV_two_le {K : Type} [Field K] [NumberField K] (v : HeightOne
   have b := Ideal.absNorm_eq_one_iff.not.2 v.isPrime.ne_top
   omega
 
-theorem UpperTheory.ConvolutionTheory.Sph.quadLiftOf :
-    UpperTheory.ConvolutionTheory.Sph.RamSph → GlobalTheory.GalCut.QuadLift := by
+theorem UpperTheory.ConvolutionTheory.Sph.quadLiftOf
+    : UpperTheory.ConvolutionTheory.Sph.RamSph → GlobalTheory.GalCut.QuadLift := by
   intro hR K M _ _ _ _ _ _ _ h2 a ha π hw
   obtain ⟨P, hP⟩ := UpperTheory.ConvolutionTheory.Sph.quadLiftUnr K M h2 a ha π hw
   have hp : (Module.finrank K M).Prime := h2 ▸ Nat.prime_two

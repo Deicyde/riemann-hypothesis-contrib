@@ -14,7 +14,9 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField TopologicalSpace IsLocalRing
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts GlobalTheory.ShFam
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.ModuliIntegralCharts GlobalTheory.ShFam
 open Formalism.MainNotions.DIV.Cons (SCF intO)
 open GlobalTheory.LocM GlobalTheory.LocM.Cht
 open MonoidalCategory CartesianMonoidalCategory MonObj
@@ -22,15 +24,19 @@ open GlobalTheory.Models (LevComp)
 
 namespace GlobalTheory.LocM.Cocycle
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
 
 variable {Xo : ∀ l : Level H, Moduli Dw l} {p : ℕ} {W : ValuationSubring ℂ} {Y : LocalSystem Xo p W}
 
-theorem exists_sab_of_isTrans {i i₂ : Idx H p} {τ : (Y i₂).X ⟶ (Y i).X} {mu : SABMap (Y i₂).t (Y i).t τ}
-    (h : IsTrans i i₂ τ mu) :
-    ∃ (b : i.c.V W →+* i₂.c.V W) (r : (Xo i₂.l).XF i₂.c ⟶ (Xo i.l).XF i.c) (ν : SABMap (Y i₂).oF.t (Y i).oF.t r),
-      IsIncl b ∧ (Y i₂).j ≫ τ = r ≫ (Y i).j ∧ τ ≫ (Y i).s = (Y i₂).s ≫ spMap b ∧
-      ν.φ ≫ (Y i).m.φ = (Y i₂).m.φ ≫ mu.φ ∧ LevComp (Y i₂).oF (Y i).oF r ν := by
+theorem exists_sab_of_isTrans
+    {i i₂ : Idx H p} {τ : (Y i₂).X ⟶ (Y i).X} {mu : SABMap (Y i₂).t (Y i).t τ}
+    (h : IsTrans i i₂ τ mu)
+    : ∃ (b : i.c.V W →+* i₂.c.V W) (r : (Xo i₂.l).XF i₂.c ⟶ (Xo i.l).XF i.c)
+        (ν : SABMap (Y i₂).oF.t (Y i).oF.t r),
+      IsIncl b ∧ (Y i₂).j ≫ τ = r ≫ (Y i).j ∧ τ ≫ (Y i).s = (Y i₂).s ≫ spMap b
+        ∧ ν.φ ≫ (Y i).m.φ = (Y i₂).m.φ ≫ mu.φ ∧ LevComp (Y i₂).oF (Y i).oF r ν := by
   obtain ⟨b, π', r, hb, h₁, h₂, -, h₃, h₄, h₅⟩ := h
   have e : τ ≫ (Y i).s = (Y i₂).s ≫ spMap b := by
     rw [← h₁, ← h₂, Category.assoc, Category.assoc, pullback.condition]

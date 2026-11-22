@@ -27,9 +27,12 @@ theorem pullB : PullB := by
     intro v
     have hcomp : ContDiffAt ℝ ∞ (fun y => w (l y • y)) p :=
       ContDiffAt.comp (g := w) (f := fun x => l x • x) p (hwat p hp) (hφ p hp)
-    have h := applySmooth V V F q (fun y => w (l y • y))
-      (fun i y => fderiv ℝ (fun x => l x • x) y (v i)) p hcomp
-      (fun i => ((hφ p hp).fderiv_right (by simp)).clm_apply contDiffAt_const)
+    have h :=
+      applySmooth V V F q
+        (fun y => w (l y • y))
+        (fun i y => fderiv ℝ (fun x => l x • x) y (v i))
+        p hcomp
+        (fun i => ((hφ p hp).fderiv_right (by simp)).clm_apply contDiffAt_const)
     exact h
   · intro p hp
     exact extDeriv_pullback ((hwat p hp).differentiableAt (by simp)) (hφ p hp)

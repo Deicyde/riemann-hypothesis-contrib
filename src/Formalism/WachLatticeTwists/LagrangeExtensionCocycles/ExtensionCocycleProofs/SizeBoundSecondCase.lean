@@ -141,8 +141,9 @@ theorem size_bound_second_case : StatSizeB := by
   have h3 := Size.val_factorial_le_self ℓ (2 * H)
   have h4 := Size.val_factorial_le_self ℓ M
   have h5 := Size.val_factorial_le_self ℓ (h + M)
-  have hsum : ∑ j ∈ JSet jumps M, (s + padicValInt ℓ j) =
-      (JSet jumps M).card * s + ∑ j ∈ JSet jumps M, padicValInt ℓ j := by
+  have hsum
+      : ∑ j ∈ JSet jumps M, (s + padicValInt ℓ j)
+        = (JSet jumps M).card * s + ∑ j ∈ JSet jumps M, padicValInt ℓ j := by
     rw [Finset.sum_add_distrib, Finset.sum_const, smul_eq_mul]
   rw [hsum]
   have h6 : (JSet jumps M).card * s ≤ (h + 2 * M) * s := Nat.mul_le_mul_right s h1
@@ -165,24 +166,22 @@ theorem size_bound_first_case : StatSizeA := by
   have hM0 : (0 : ℝ) ≤ (M : ℝ) := Nat.cast_nonneg _
   have hMHr : (M : ℝ) + (h : ℝ) ≤ (H : ℝ) := by exact_mod_cast hMH
   have hh0 : (0 : ℝ) ≤ (h : ℝ) := Nat.cast_nonneg _
-  have hlog : 0 ≤ Real.logb ℓ ((H : ℝ) + 1) :=
-    Real.logb_nonneg (by linarith) (by linarith)
+  have hlog : 0 ≤ Real.logb ℓ ((H : ℝ) + 1) := Real.logb_nonneg (by linarith) (by linarith)
 
   have hW0 : 0 ≤ (H : ℝ) * ℓ / t ^ 2 + 3 + Real.logb ℓ ((H : ℝ) + 1) := by positivity
-  have hW : (eWA ℓ H : ℝ) ≤ (H : ℝ) * ℓ / t ^ 2 + 3 + Real.logb ℓ ((H : ℝ) + 1) :=
-    Nat.floor_le hW0
+  have hW : (eWA ℓ H : ℝ) ≤ (H : ℝ) * ℓ / t ^ 2 + 3 + Real.logb ℓ ((H : ℝ) + 1) := Nat.floor_le hW0
   have hW2 : (H : ℝ) * ℓ / t ^ 2 ≤ 3 / 2 * ((H : ℝ) / t) := by
     rw [div_le_iff₀ (by positivity)]
-    have e : 3 / 2 * ((H : ℝ) / t) * t ^ 2 = 3 / 2 * (H : ℝ) * t := by
-      field_simp
+    have e : 3 / 2 * ((H : ℝ) / t) * t ^ 2 = 3 / 2 * (H : ℝ) * t := by field_simp
     rw [e]
     have : (ℓ : ℝ) = t + 1 := by rw [ht]; ring
     rw [this]
     nlinarith
 
   have hv := Size.JSet_sum ℓ M h jumps hj
-  have hvr : ((∑ j ∈ JSet jumps M, padicValInt ℓ j : ℕ) : ℝ) ≤
-      (padicValNat ℓ M.factorial : ℝ) + (padicValNat ℓ (h + M).factorial : ℝ) := by
+  have hvr
+      : ((∑ j ∈ JSet jumps M, padicValInt ℓ j : ℕ) : ℝ)
+        ≤ (padicValNat ℓ M.factorial : ℝ) + (padicValNat ℓ (h + M).factorial : ℝ) := by
     exact_mod_cast hv
   have f2 := Size.val_factorial_le_div ℓ M
   have f3 := Size.val_factorial_le_div ℓ (h + M)
@@ -199,8 +198,9 @@ theorem size_bound_first_case : StatSizeA := by
   rw [← ht] at f4
   have f5 : (aStar ℓ M : ℝ) / t ≤ ((M : ℝ) / t + 1) / 2 := by
     have h0 : (0 : ℝ) ≤ (aStar ℓ M : ℝ) := Nat.cast_nonneg _
-    calc (aStar ℓ M : ℝ) / t ≤ (aStar ℓ M : ℝ) / 2 :=
-          div_le_div_of_nonneg_left h0 (by norm_num) ht2
+    calc
+      (aStar ℓ M : ℝ) / t
+        ≤ (aStar ℓ M : ℝ) / 2 := div_le_div_of_nonneg_left h0 (by norm_num) ht2
       _ ≤ ((M : ℝ) / t + 1) / 2 := by linarith
   have d1 : (M : ℝ) / t ≤ (H : ℝ) / t := div_le_div_of_nonneg_right (by linarith) htpos.le
   have d2 : (M : ℝ) / t + ((h : ℝ) + (M : ℝ)) / t ≤ 2 * ((H : ℝ) / t) := by

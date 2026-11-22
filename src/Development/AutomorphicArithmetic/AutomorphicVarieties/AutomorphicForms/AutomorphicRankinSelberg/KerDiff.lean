@@ -176,8 +176,7 @@ private lemma kd_ker (s : ℝ) (x : Fin 2 → ℤ) (z : ℍ) :
 end UpperTheory.V.Af.Rs
 
 open UpperTheory.V.Af.Rs in
-theorem UpperTheory.V.Af.Rs.kerDiff :
-    UpperTheory.V.Af.Rs.KerDiff := by
+theorem UpperTheory.V.Af.Rs.kerDiff : UpperTheory.V.Af.Rs.KerDiff := by
   refine ⟨1024, by norm_num, ?_⟩
   intro s hs x x' hx hx' z hz
   obtain ⟨hs1, hs2⟩ := hs
@@ -202,24 +201,26 @@ theorem UpperTheory.V.Af.Rs.kerDiff :
   have hD : |‖w‖ ^ (-(2 * s)) - ‖w'‖ ^ (-(2 * s))| ≤ 128 * (4 * ‖x - x'‖ * z.im) * S := by
     rcases le_total ‖w'‖ ‖w‖ with h | h
     · have := kd_pow (kd_one hx') (kd_low x' hz) h (by linarith : (2 : ℝ) ≤ 2 * s) (by linarith)
-      calc _ ≤ 128 * (‖w‖ - ‖w'‖) * ‖x'‖ ^ (-3 : ℝ) := this
+      calc
+        _ ≤ 128 * (‖w‖ - ‖w'‖) * ‖x'‖ ^ (-3 : ℝ) := this
         _ ≤ 128 * (4 * ‖x - x'‖ * z.im) * ‖x'‖ ^ (-3 : ℝ) := by
-            apply mul_le_mul_of_nonneg_right _ hS2
-            linarith [hdiff.1]
+          apply mul_le_mul_of_nonneg_right _ hS2
+          linarith [hdiff.1]
         _ ≤ _ := by
-            apply mul_le_mul_of_nonneg_left (by linarith)
-            have := norm_nonneg (x - x')
-            positivity
+          apply mul_le_mul_of_nonneg_left (by linarith)
+          have := norm_nonneg (x - x')
+          positivity
     · rw [abs_sub_comm]
       have := kd_pow (kd_one hx) (kd_low x hz) h (by linarith : (2 : ℝ) ≤ 2 * s) (by linarith)
-      calc _ ≤ 128 * (‖w'‖ - ‖w‖) * ‖x‖ ^ (-3 : ℝ) := this
+      calc
+        _ ≤ 128 * (‖w'‖ - ‖w‖) * ‖x‖ ^ (-3 : ℝ) := this
         _ ≤ 128 * (4 * ‖x - x'‖ * z.im) * ‖x‖ ^ (-3 : ℝ) := by
-            apply mul_le_mul_of_nonneg_right _ hS1
-            linarith [hdiff.2]
+          apply mul_le_mul_of_nonneg_right _ hS1
+          linarith [hdiff.2]
         _ ≤ _ := by
-            apply mul_le_mul_of_nonneg_left (by linarith)
-            have := norm_nonneg (x - x')
-            positivity
+          apply mul_le_mul_of_nonneg_left (by linarith)
+          have := norm_nonneg (x - x')
+          positivity
   have hys : z.im ^ s ≤ 2 * z.im ^ 2 := by
     rcases le_total z.im 1 with h | h
     · have h1 : z.im ^ s ≤ z.im ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_ge hy h hs1
@@ -230,7 +231,8 @@ theorem UpperTheory.V.Af.Rs.kerDiff :
       nlinarith
   have hyspos : 0 ≤ z.im ^ s := Real.rpow_nonneg hy.le _
   rw [← mul_sub, abs_mul, abs_of_nonneg hyspos]
-  calc z.im ^ s * |‖w‖ ^ (-(2 * s)) - ‖w'‖ ^ (-(2 * s))|
-      ≤ (2 * z.im ^ 2) * (128 * (4 * ‖x - x'‖ * z.im) * S) :=
-        mul_le_mul hys hD (abs_nonneg _) (by positivity)
+  calc
+    z.im ^ s * |‖w‖ ^ (-(2 * s)) - ‖w'‖ ^ (-(2 * s))|
+        ≤ (2 * z.im ^ 2) * (128 * (4 * ‖x - x'‖ * z.im) * S) :=
+      mul_le_mul hys hD (abs_nonneg _) (by positivity)
     _ = 1024 * ‖x - x'‖ * z.im ^ 3 * S := by ring

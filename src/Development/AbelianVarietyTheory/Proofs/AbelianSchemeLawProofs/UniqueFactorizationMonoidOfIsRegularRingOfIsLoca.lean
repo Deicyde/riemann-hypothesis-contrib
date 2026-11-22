@@ -6,8 +6,10 @@ public import ReciprocityTheory.CommutativeAlgebra.MaximalIdealSquares.RingKrull
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
@@ -18,7 +20,8 @@ open IsLocalRing
 
 end RegularFactorial
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open IsLocalRing in
 private lemma prime_of_mem_maximalIdeal_of_not_mem_sq {A : Type} [CommRing A] [IsRegularLocalRing A]
@@ -29,7 +32,8 @@ private lemma prime_of_mem_maximalIdeal_of_not_mem_sq {A : Type} [CommRing A] [I
   rw [← Ideal.span_singleton_prime hx0]
   exact (Ideal.Quotient.isDomain_iff_prime _).1 inferInstance
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 attribute [local instance] Over.cartesianMonoidalCategory in
 private lemma isPrincipal_of_isPrincipal_map_away_prime {A : Type} [CommRing A] [IsDomain A]
     [IsNoetherianRing A] {x : A} (hx : Prime x) {p : Ideal A} [hp : p.IsPrime] (hxp : x ∉ p)
@@ -79,7 +83,8 @@ private lemma isPrincipal_of_isPrincipal_map_away_prime {A : Type} [CommRing A] 
       exact Submodule.mem_span_singleton.2 ⟨c', by rw [smul_eq_mul, mul_comm]⟩
     · rw [Submodule.span_le, Set.singleton_subset_iff]; exact hg
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open IsLocalRing in
 private lemma uniqueFactorizationMonoid_localization_of_height_le
@@ -181,25 +186,28 @@ private lemma uniqueFactorizationMonoid_localization_of_height_le
     have hp : p = ⊥ := le_bot_iff.1 (hbot ▸ IsLocalRing.le_maximalIdeal (Ideal.IsPrime.ne_top ‹_›))
     exact absurd hph (by rw [hp, Ideal.height_bot]; exact zero_ne_one)
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open IsLocalRing in
-theorem _root_.GlobalTheory.uniqueFactorizationMonoid_of_isRegularRing_of_isLocalRing :
-    (∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (M : Type) [AddCommGroup M] [Module R M]
-      [Module.Finite R M], ∃ n : ℕ, HasProjectiveDimensionLE (ModuleCat.of R M) n) →
-    (∀ (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] [IsDomain R] (x : R)
-      (R' : Type) [CommRing R'] [Algebra R R'] [IsLocalization.Away x R'] (I : Ideal R) (n : ℕ),
-      HasProjectiveDimensionLE (ModuleCat.of R I) n →
-      Module.Projective R' (I.map (algebraMap R R')) → (I.map (algebraMap R R')).IsPrincipal) →
-    ∀ (R : Type) [CommRing R] [IsRegularRing R] [IsLocalRing R] [IsDomain R],
-      UniqueFactorizationMonoid R := by
+theorem _root_.GlobalTheory.uniqueFactorizationMonoid_of_isRegularRing_of_isLocalRing
+    : (∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (M : Type) [AddCommGroup M] [Module R M]
+          [Module.Finite R M],
+        ∃ n : ℕ,
+          HasProjectiveDimensionLE (ModuleCat.of R M) n)
+      → (∀ (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] [IsDomain R] (x : R)
+          (R' : Type) [CommRing R'] [Algebra R R'] [IsLocalization.Away x R'] (I : Ideal R) (n : ℕ),
+        HasProjectiveDimensionLE (ModuleCat.of R I) n
+          → Module.Projective R' (I.map (algebraMap R R'))
+          → (I.map (algebraMap R R')).IsPrincipal)
+      → ∀ (R : Type) [CommRing R] [IsRegularRing R] [IsLocalRing R] [IsDomain R],
+        UniqueFactorizationMonoid R := by
   intro hPD hPrin R _ _ _ _
   obtain ⟨n, hn⟩ := ENat.ne_top_iff_exists.1 (Ideal.height_ne_top (maximalIdeal.isMaximal R).ne_top)
   haveI := uniqueFactorizationMonoid_localization_of_height_le hPD hPrin n (maximalIdeal R) hn.symm.le
   exact (IsLocalization.atUnits R (maximalIdeal R).primeCompl
-    (S := Localization.AtPrime (maximalIdeal R))
-    (fun y hy => IsLocalRing.notMem_maximalIdeal.1 hy)).symm.toMulEquiv.uniqueFactorizationMonoid
+      (S := Localization.AtPrime (maximalIdeal R))
+      (fun y hy => IsLocalRing.notMem_maximalIdeal.1 hy)).symm.toMulEquiv.uniqueFactorizationMonoid
     inferInstance
 
 end GlobalTheory

@@ -5,16 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ProdSur
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.OntoSurj
 
-theorem surjective_of_points {R K : Type} [CommRing R] [Field K] [IsAlgClosed K] (σ : R →+* K)
-    (hσ : Function.Injective σ) {P A : Scheme.{0}} (a : A ⟶ Sp R) [LocallyOfFiniteType a]
-    (ha : IsOpenMap a) (ψ : P ⟶ A) (hψ : IsClosed (Set.range ψ))
-    (h : ∀ x : Sp K ⟶ A, x ≫ a = spMap σ → ∃ p : Sp K ⟶ P, x = p ≫ ψ) : Surjective ψ := by
+theorem surjective_of_points
+    {R K : Type} [CommRing R] [Field K] [IsAlgClosed K]
+    (σ : R →+* K) (hσ : Function.Injective σ)
+    {P A : Scheme.{0}} (a : A ⟶ Sp R) [LocallyOfFiniteType a]
+    (ha : IsOpenMap a)
+    (ψ : P ⟶ A)
+    (hψ : IsClosed (Set.range ψ)) (h : ∀ x : Sp K ⟶ A, x ≫ a = spMap σ → ∃ p : Sp K ⟶ P, x = p ≫ ψ)
+    : Surjective ψ := by
   have hd : Dense (Set.range (spMap σ)) := by
     have : DenseRange (PrimeSpectrum.comap σ) := by
       rw [PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical,
@@ -25,12 +31,13 @@ theorem surjective_of_points {R K : Type} [CommRing R] [Field K] [IsAlgClosed K]
     LocallyOfFiniteType.jacobsonSpace (pullback.snd a (spMap σ))
   have hZ : IsClosed ((pullback.fst a (spMap σ)) ⁻¹' Set.range ψ) :=
     hψ.preimage (pullback.fst a (spMap σ)).continuous
-  have hsub : closedPoints ↥(pullback a (spMap σ)) ⊆
-      (pullback.fst a (spMap σ)) ⁻¹' Set.range ψ := by
+  have hsub
+      : closedPoints ↥(pullback a (spMap σ)) ⊆ (pullback.fst a (spMap σ)) ⁻¹' Set.range ψ := by
     intro z hz
     replace hz : IsClosed {z} := hz
-    obtain ⟨p, hp⟩ := h (pointOfClosedPoint (pullback.snd a (spMap σ)) z hz ≫ pullback.fst _ _)
-      (by rw [Category.assoc, pullback.condition, pointOfClosedPoint_comp_assoc])
+    obtain ⟨p, hp⟩ :=
+      h (pointOfClosedPoint (pullback.snd a (spMap σ)) z hz ≫ pullback.fst _ _)
+        (by rw [Category.assoc, pullback.condition, pointOfClosedPoint_comp_assoc])
     obtain ⟨w⟩ : Nonempty ↥(Sp K) := inferInstance
     refine ⟨p w, ?_⟩
     rw [← Scheme.Hom.comp_apply, ← hp, Scheme.Hom.comp_apply, pointOfClosedPoint_apply]
@@ -44,8 +51,16 @@ theorem surjective_of_points {R K : Type} [CommRing R] [Field K] [IsAlgClosed K]
   rw [(hd.preimage ha).closure_eq] at hall'
   exact ⟨fun y ↦ hall' (Set.mem_univ y)⟩
 
-theorem surjective_of_onto_complex_points :
-    ∀ (R : Type) [CommRing R] [IsDomain R] (σ : R →+* ℂ), Function.Injective σ → ∀ (A B : Over (Sp R)) [GrpObj A] [GrpObj B] (Φ : B ⟶ A), IsAbelianScheme A → IsAbelianScheme B → (∀ y : Over.mk (spMap σ) ⟶ A, ∃ x : Over.mk (spMap σ) ⟶ B, y = x ≫ Φ) → Surjective Φ.left ∧ ∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ Sp R) (y : Over.mk t ⟶ A), ∃ x : Over.mk t ⟶ B, y = x ≫ Φ := by
+theorem surjective_of_onto_complex_points
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (σ : R →+* ℂ),
+      Function.Injective σ
+        → ∀ (A B : Over (Sp R)) [GrpObj A] [GrpObj B] (Φ : B ⟶ A),
+          IsAbelianScheme A → IsAbelianScheme B
+            → (∀ y : Over.mk (spMap σ) ⟶ A, ∃ x : Over.mk (spMap σ) ⟶ B, y = x ≫ Φ)
+            → Surjective Φ.left
+              ∧ ∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ Sp R) (y : Over.mk t ⟶ A),
+                ∃ x : Over.mk t ⟶ B,
+                  y = x ≫ Φ := by
   intro R _ _ σ hσ A B _ _ Φ hA hB h
   have := hB.proper
   have := hA.proper
@@ -54,8 +69,8 @@ theorem surjective_of_onto_complex_points :
     have : IsProper (Φ.left ≫ A.hom) := by rwa [Over.w]
     exact IsProper.of_comp Φ.left A.hom
   have hs : Surjective Φ.left := by
-    refine surjective_of_points σ hσ A.hom A.hom.isOpenMap Φ.left
-      Φ.left.isClosedMap.isClosed_range fun y hy ↦ ?_
+    refine surjective_of_points σ hσ A.hom A.hom.isOpenMap Φ.left Φ.left.isClosedMap.isClosed_range
+      fun y hy ↦ ?_
     obtain ⟨p, hp⟩ := h (Over.homMk y hy)
     exact ⟨p.left, congrArg (·.left) hp⟩
   refine ⟨hs, fun k _ _ t y ↦ ?_⟩

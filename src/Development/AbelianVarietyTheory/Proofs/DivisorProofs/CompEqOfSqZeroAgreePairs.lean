@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FormallyU
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SqZeroAgree
@@ -107,20 +108,23 @@ end GlobalTheory.SqZeroAgree
 
 namespace GlobalTheory
 
-
 open MulUnramified SqZeroAgree in
-theorem comp_eq_of_sqZero_agree : ∀ (C C₀ : Type) [CommRing C] [CommRing C₀] (π : C →+* C₀),
-    Function.Surjective π → RingHom.ker π ^ 2 = 0 → ∀ (K G : Over (Sp C)) (g g' : K ⟶ G),
-    (∀ (T₀ : Over (Sp C₀)) (y : Over.mk (T₀.hom ≫ spMap π) ⟶ K), y ≫ g = y ≫ g') →
-    ∀ (T : Over (Sp C)) (w w' : T ⟶ K),
-    (∀ (T₀ : Over (Sp C₀)) (j : Over.mk (T₀.hom ≫ spMap π) ⟶ T), j ≫ w = j ≫ w') →
-    w' ≫ g = w' ≫ g' → w ≫ g = w ≫ g' := by
+theorem comp_eq_of_sqZero_agree
+    : ∀ (C C₀ : Type) [CommRing C] [CommRing C₀] (π : C →+* C₀),
+      Function.Surjective π → RingHom.ker π ^ 2 = 0
+        → ∀ (K G : Over (Sp C)) (g g' : K ⟶ G),
+          (∀ (T₀ : Over (Sp C₀)) (y : Over.mk (T₀.hom ≫ spMap π) ⟶ K), y ≫ g = y ≫ g')
+            → ∀ (T : Over (Sp C)) (w w' : T ⟶ K),
+              (∀ (T₀ : Over (Sp C₀)) (j : Over.mk (T₀.hom ≫ spMap π) ⟶ T), j ≫ w = j ≫ w')
+                → w' ≫ g = w' ≫ g'
+                → w ≫ g = w ≫ g' := by
   intro C C₀ _ _ π hπ hsq K G g g' hg T w w' hw h'
   apply Over.OverMorphism.ext
   simp only [Over.comp_left]
   refine Scheme.hom_ext_of_forall _ _ fun t ↦ ?_
   obtain ⟨_, ⟨V, hV, rfl⟩, htV, -⟩ :=
-    G.left.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (g.left (w.left t))) isOpen_univ
+    G.left.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (g.left (w.left t)))
+      isOpen_univ
   obtain ⟨_, ⟨V', hV', rfl⟩, htV', hV'V : V' ≤ g.left ⁻¹ᵁ V⟩ :=
     K.left.isBasis_affineOpens.exists_subset_of_mem_open (a := w.left t) (u := g.left ⁻¹ᵁ V) htV
       (TopologicalSpace.Opens.isOpen _)
@@ -130,23 +134,28 @@ theorem comp_eq_of_sqZero_agree : ∀ (C C₀ : Type) [CommRing C] [CommRing C�
   have hV'V₂ : V' ≤ g'.left ⁻¹ᵁ V := preimage_eq_of_agree π hπ hsq hg V ▸ hV'V
   have hWV'₂ : W ≤ w'.left ⁻¹ᵁ V' := preimage_eq_of_agree π hπ hsq hw V' ▸ hWV'
   refine ⟨W, htW, ?_⟩
-  have key : ∀ s, w.left.appLE V' W hWV' (g.left.appLE V V' hV'V s) =
-      w.left.appLE V' W hWV' (g'.left.appLE V V' hV'V₂ s) := by
+  have key
+      : ∀ s,
+        w.left.appLE V' W hWV' (g.left.appLE V V' hV'V s)
+          = w.left.appLE V' W hWV' (g'.left.appLE V V' hV'V₂ s) := by
     intro s
     have hx := sub_mem π hπ hg hV hV' hV'V hV'V₂ s
-    have e := eq_on_map (RingHom.ker π) hsq (alg K V') (alg T W) (w.left.appLE V' W hWV').hom
-      (w'.left.appLE V' W hWV'₂).hom (RingHom.ext (appLE_alg w V' W hWV'))
-      (RingHom.ext (appLE_alg w' V' W hWV'₂)) (sub_mem π hπ hw hV' hW hWV' hWV'₂) hx
-    have e' : w'.left.appLE V' W hWV'₂ (g.left.appLE V V' hV'V s) =
-        w'.left.appLE V' W hWV'₂ (g'.left.appLE V V' hV'V₂ s) := by
+    have e :=
+      eq_on_map (RingHom.ker π) hsq (alg K V') (alg T W) (w.left.appLE V' W hWV').hom
+        (w'.left.appLE V' W hWV'₂).hom (RingHom.ext (appLE_alg w V' W hWV'))
+        (RingHom.ext (appLE_alg w' V' W hWV'₂)) (sub_mem π hπ hw hV' hW hWV' hWV'₂) hx
+    have e'
+        : w'.left.appLE V' W hWV'₂ (g.left.appLE V V' hV'V s)
+          = w'.left.appLE V' W hWV'₂ (g'.left.appLE V V' hV'V₂ s) := by
       rw [comp_appLE_apply _ _ rfl _ _ _ _ _ (le_preimage_of_comp _ _ hV'V hWV'₂),
         comp_appLE_apply _ _ rfl _ _ _ _ _ (le_preimage_of_comp _ _ hV'V₂ hWV'₂)]
       have hh : w'.left ≫ g.left = w'.left ≫ g'.left := by rw [← Over.comp_left, h', Over.comp_left]
       rw [appLE_congr hh V W _ (le_preimage_of_comp _ _ hV'V₂ hWV'₂)]
     simp only [map_sub] at e
     rw [← sub_eq_zero, ← sub_eq_zero.mpr e, e', sub_self, sub_zero]
-  have fin : (w.left ≫ g.left).appLE V W (le_preimage_of_comp _ _ hV'V hWV') =
-      (w.left ≫ g'.left).appLE V W (le_preimage_of_comp _ _ hV'V₂ hWV') := by
+  have fin
+      : (w.left ≫ g.left).appLE V W (le_preimage_of_comp _ _ hV'V hWV')
+        = (w.left ≫ g'.left).appLE V W (le_preimage_of_comp _ _ hV'V₂ hWV') := by
     ext s
     rw [← comp_appLE_apply _ _ rfl _ _ _ hV'V hWV', ← comp_appLE_apply _ _ rfl _ _ _ hV'V₂ hWV']
     exact key s

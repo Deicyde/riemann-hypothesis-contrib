@@ -12,8 +12,9 @@ namespace Descent
 
 section Algebra
 
-variable {A : Type*} (A' : Type*) [CommRing A] [CommRing A'] [Algebra A A']
-  [Module.FaithfullyFlat A A'] {M : Type*} [AddCommGroup M] [Module A M]
+variable
+  {A : Type*} (A' : Type*) [CommRing A] [CommRing A'] [Algebra A A'] [Module.FaithfullyFlat A A']
+  {M : Type*} [AddCommGroup M] [Module A M]
 
 theorem finite [Module.Finite A' (A' ⊗[A] M)] : Module.Finite A M :=
   Module.Finite.of_finite_tensorProduct_of_faithfullyFlat A'
@@ -29,8 +30,8 @@ theorem fg_of_baseChange {N : Submodule A M} (h : (N.baseChange A').FG) : N.FG :
   have : Module.Finite A' (A' ⊗[A] N) := Module.Finite.equiv e.symm
   exact Module.Finite.iff_fg.mp (finite A')
 
-theorem finitePresentation [Module.FinitePresentation A' (A' ⊗[A] M)] :
-    Module.FinitePresentation A M := by
+theorem finitePresentation [Module.FinitePresentation A' (A' ⊗[A] M)]
+    : Module.FinitePresentation A M := by
   have : Module.Finite A M := finite A'
   obtain ⟨n, f, hf⟩ := Module.Finite.exists_fin' A M
   refine Module.finitePresentation_of_free_of_surjective f hf (fg_of_baseChange A' ?_)
@@ -42,8 +43,8 @@ theorem finitePresentation [Module.FinitePresentation A' (A' ⊗[A] M)] :
   rw [hker]
   exact Module.FinitePresentation.fg_ker _ hf'
 
-theorem projective [Module.Finite A' (A' ⊗[A] M)] [Module.Projective A' (A' ⊗[A] M)] :
-    Module.Projective A M := by
+theorem projective [Module.Finite A' (A' ⊗[A] M)] [Module.Projective A' (A' ⊗[A] M)]
+    : Module.Projective A M := by
   have : Module.FinitePresentation A' (A' ⊗[A] M) := Module.finitePresentation_of_projective _ _
   have : Module.FinitePresentation A M := finitePresentation A'
   have : Module.Flat A M := flat A'
@@ -53,9 +54,11 @@ end Algebra
 
 section IsBaseChange
 
-variable {A A' : Type*} [CommRing A] [CommRing A'] [Algebra A A'] [Module.FaithfullyFlat A A']
+variable
+  {A A' : Type*} [CommRing A] [CommRing A'] [Algebra A A'] [Module.FaithfullyFlat A A']
   {M M' : Type*} [AddCommGroup M] [Module A M] [AddCommGroup M'] [Module A M'] [Module A' M']
-  [IsScalarTower A A' M'] {f : M →ₗ[A] M'} (hf : IsBaseChange A' f)
+  [IsScalarTower A A' M']
+  {f : M →ₗ[A] M'} (hf : IsBaseChange A' f)
 
 include hf
 
@@ -63,8 +66,8 @@ theorem finite_of_isBaseChange [Module.Finite A' M'] : Module.Finite A M :=
   have := Module.Finite.equiv hf.equiv.symm
   finite A'
 
-theorem projective_of_isBaseChange [Module.Finite A' M'] [Module.Projective A' M'] :
-    Module.Projective A M :=
+theorem projective_of_isBaseChange [Module.Finite A' M'] [Module.Projective A' M']
+    : Module.Projective A M :=
   have := Module.Finite.equiv hf.equiv.symm
   have := Module.Projective.of_equiv hf.equiv.symm
   projective A'
@@ -79,21 +82,21 @@ universe u
 
 variable {X : Scheme.{u}} (F : X.Modules)
 
-noncomputable instance stalkModule (x : X) :
-    Module (X.presheaf.stalk x) (F.presheaf.stalk x) :=
-  PresheafOfModules.instModuleCarrierStalkCommRingCatCarrierAbPresheafOpensCarrier
-    (R := X.presheaf) F.val x
+noncomputable instance stalkModule (x : X) : Module (X.presheaf.stalk x) (F.presheaf.stalk x) :=
+  PresheafOfModules.instModuleCarrierStalkCommRingCatCarrierAbPresheafOpensCarrier (R := X.presheaf)
+    F.val x
 
-theorem germ_smul (U : X.Opens) (x : X) (hx : x ∈ U) (r : Γ(X, U)) (m : Γ(F, U)) :
-    F.presheaf.germ U x hx (r • m) = X.presheaf.germ U x hx r • F.presheaf.germ U x hx m :=
+theorem germ_smul (U : X.Opens) (x : X) (hx : x ∈ U) (r : Γ(X, U)) (m : Γ(F, U))
+    : F.presheaf.germ U x hx (r • m) = X.presheaf.germ U x hx r • F.presheaf.germ U x hx m :=
   PresheafOfModules.germ_smul (R := X.presheaf) F.val x U hx r m
 
 variable {F} {U : X.Opens} {s : Γ(F, U)}
 
-theorem injective_smul_of_stalk {V : X.Opens} (hV : V ≤ U)
-    (h : ∀ (x : X) (hx : x ∈ V), Function.Injective
-      fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x (hV hx) s) :
-    Function.Injective fun a : Γ(X, V) ↦ a • F.presheaf.map (homOfLE hV).op s := by
+theorem injective_smul_of_stalk
+    {V : X.Opens} (hV : V ≤ U)
+    (h : ∀ (x : X) (hx : x ∈ V),
+      Function.Injective fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x (hV hx) s)
+    : Function.Injective fun a : Γ(X, V) ↦ a • F.presheaf.map (homOfLE hV).op s := by
   intro a b hab
   apply TopCat.Presheaf.section_ext X.sheaf V a b
   intro x hx
@@ -103,18 +106,20 @@ theorem injective_smul_of_stalk {V : X.Opens} (hV : V ≤ U)
   exact this
 
 theorem bijective_smul_of_stalk
-    (h : ∀ (x : X) (hx : x ∈ U), Function.Bijective
-      fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s)
-    {V : X.Opens} (hV : V ≤ U) :
-    Function.Bijective fun a : Γ(X, V) ↦ a • F.presheaf.map (homOfLE hV).op s := by
+    (h : ∀ (x : X) (hx : x ∈ U),
+      Function.Bijective fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s)
+    {V : X.Opens} (hV : V ≤ U)
+    : Function.Bijective fun a : Γ(X, V) ↦ a • F.presheaf.map (homOfLE hV).op s := by
   refine ⟨injective_smul_of_stalk hV fun x hx ↦ (h x (hV hx)).1, fun t ↦ ?_⟩
-  have hloc : ∀ x : V, ∃ (W : X.Opens) (_ : x.1 ∈ W) (hW : W ≤ V) (a : Γ(X, W)),
-      a • F.presheaf.map (homOfLE (hW.trans hV)).op s = F.presheaf.map (homOfLE hW).op t := by
+  have hloc
+      : ∀ x : V, ∃ (W : X.Opens) (_ : x.1 ∈ W) (hW : W ≤ V) (a : Γ(X, W)),
+        a • F.presheaf.map (homOfLE (hW.trans hV)).op s = F.presheaf.map (homOfLE hW).op t := by
     rintro ⟨x, hx⟩
     obtain ⟨a, ha⟩ := (h x (hV hx)).2 (F.presheaf.germ V x hx t)
     obtain ⟨W, hWV, hxW, a, rfl⟩ := X.presheaf.exists_le_germ_eq a hx
-    have h₁ : F.presheaf.germ W x hxW (a • F.presheaf.map (homOfLE (hWV.trans hV)).op s) =
-        F.presheaf.germ V x hx t := by
+    have h₁
+        : F.presheaf.germ W x hxW (a • F.presheaf.map (homOfLE (hWV.trans hV)).op s)
+          = F.presheaf.germ V x hx t := by
       rw [germ_smul, TopCat.Presheaf.germ_res_apply]
       exact ha
     obtain ⟨W', hxW', i₁, i₂, e⟩ := F.presheaf.germ_eq x hxW hx _ _ h₁
@@ -130,36 +135,40 @@ theorem bijective_smul_of_stalk
     have e₁ := congrArg (F.presheaf.map (Opens.infLELeft (W i) (W j)).op) (ha i)
     have e₂ := congrArg (F.presheaf.map (Opens.infLERight (W i) (W j)).op) (ha j)
     rw [Scheme.Modules.map_smul, ← ConcreteCategory.comp_apply, ← F.presheaf.map_comp,
-      ← ConcreteCategory.comp_apply, ← F.presheaf.map_comp] at e₁ e₂
+        ← ConcreteCategory.comp_apply, ← F.presheaf.map_comp]
+      at e₁ e₂
     exact e₁.trans e₂.symm
   obtain ⟨b, hb, -⟩ := X.sheaf.existsUnique_gluing' W V (fun i ↦ homOfLE (hWV i)) hcover a hcomp
   refine ⟨b, ?_⟩
   change Γ(X, V) at b
   apply TopCat.Sheaf.eq_of_locally_eq' (⟨F.presheaf, F.isSheaf⟩ : TopCat.Sheaf Ab X) W V
-    (fun i ↦ homOfLE (hWV i)) hcover
+    (fun i ↦ homOfLE (hWV i))
+    hcover
   intro i
   have hb' : X.presheaf.map (homOfLE (hWV i)).op b = a i := hb i
-  change F.presheaf.map (homOfLE (hWV i)).op (b • F.presheaf.map (homOfLE hV).op s) =
-    F.presheaf.map (homOfLE (hWV i)).op t
+  change F.presheaf.map (homOfLE (hWV i)).op (b • F.presheaf.map (homOfLE hV).op s)
+    = F.presheaf.map (homOfLE (hWV i)).op t
   rw [Scheme.Modules.map_smul, ← ConcreteCategory.comp_apply, ← F.presheaf.map_comp, hb', ← ha i]
   rfl
 
 theorem bijective_smul_stalk
     (h : ∀ (V : X.Opens) (hV : V ≤ U),
       Function.Bijective fun a : Γ(X, V) ↦ a • F.presheaf.map (homOfLE hV).op s)
-    (x : X) (hx : x ∈ U) :
-    Function.Bijective fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s := by
+    (x : X) (hx : x ∈ U)
+    : Function.Bijective fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s := by
   constructor
   · intro a b hab
     obtain ⟨V, hVU, hxV, a, rfl⟩ := X.presheaf.exists_le_germ_eq a hx
     obtain ⟨W, hWV, hxW, b, rfl⟩ := X.presheaf.exists_le_germ_eq b hxV
-    have h₁ : F.presheaf.germ V x hxV (a • F.presheaf.map (homOfLE hVU).op s) =
-        F.presheaf.germ W x hxW (b • F.presheaf.map (homOfLE (hWV.trans hVU)).op s) := by
+    have h₁
+        : F.presheaf.germ V x hxV (a • F.presheaf.map (homOfLE hVU).op s)
+          = F.presheaf.germ W x hxW (b • F.presheaf.map (homOfLE (hWV.trans hVU)).op s) := by
       rw [germ_smul, germ_smul, TopCat.Presheaf.germ_res_apply, TopCat.Presheaf.germ_res_apply]
       exact hab
     obtain ⟨W', hxW', i₁, i₂, e⟩ := F.presheaf.germ_eq x hxV hxW _ _ h₁
     rw [Scheme.Modules.map_smul, ← ConcreteCategory.comp_apply, ← F.presheaf.map_comp,
-      Scheme.Modules.map_smul, ← ConcreteCategory.comp_apply, ← F.presheaf.map_comp] at e
+        Scheme.Modules.map_smul, ← ConcreteCategory.comp_apply, ← F.presheaf.map_comp]
+      at e
     exact X.presheaf.germ_ext W' hxW' i₁ i₂ ((h W' (i₁.le.trans hVU)).1 e)
   · intro t
     obtain ⟨V, hVU, hxV, t, rfl⟩ := F.presheaf.exists_le_germ_eq t hx
@@ -167,10 +176,9 @@ theorem bijective_smul_stalk
     refine ⟨X.presheaf.germ V x hxV a, ?_⟩
     simp only [germ_smul, TopCat.Presheaf.germ_res_apply]
 
-
 variable (s) in
-noncomputable def sectionHom :
-    @Quiver.Hom (U : Scheme.{u}).Modules _ (SheafOfModules.unit (U : Scheme.{u}).ringCatSheaf)
+noncomputable def sectionHom
+    : @Quiver.Hom (U : Scheme.{u}).Modules _ (SheafOfModules.unit (U : Scheme.{u}).ringCatSheaf)
       (F.restrict U.ι) :=
   (SheafOfModules.unitHomEquiv (F.restrict U.ι)).symm
     (PresheafOfModules.sectionsMk
@@ -180,18 +188,18 @@ noncomputable def sectionHom :
         rw [← ConcreteCategory.comp_apply, ← F.presheaf.map_comp]
         rfl))
 
-
 variable (s) in
-theorem sectionHom_app (W : (U : Scheme.{u}).Opens) (a : Γ(X, U.ι ''ᵁ W)) :
-    ((sectionHom (s := s)).app W a : Γ(F, U.ι ''ᵁ W)) =
-      a • F.presheaf.map (homOfLE (U.ι_image_le W)).op s := by
-  have h1 : (sectionHom (s := s)).app W (1 : Γ((U : Scheme.{u}), W)) =
-      F.presheaf.map (homOfLE (U.ι_image_le W)).op s := by
+theorem sectionHom_app (W : (U : Scheme.{u}).Opens) (a : Γ(X, U.ι ''ᵁ W))
+    : ((sectionHom (s := s)).app W a : Γ(F, U.ι ''ᵁ W))
+      = a • F.presheaf.map (homOfLE (U.ι_image_le W)).op s := by
+  have h1
+      : (sectionHom (s := s)).app W (1 : Γ((U : Scheme.{u}), W))
+        = F.presheaf.map (homOfLE (U.ι_image_le W)).op s := by
     have := SheafOfModules.unitHomEquiv_apply_coe (F.restrict U.ι) (sectionHom (s := s)) (op W)
     rw [sectionHom, Equiv.apply_symm_apply] at this
     exact this.symm
-  have h2 := Scheme.Modules.Hom.app_smul (sectionHom (s := s)) (U := W) a
-    (1 : Γ((U : Scheme.{u}), W))
+  have h2 :=
+    Scheme.Modules.Hom.app_smul (sectionHom (s := s)) (U := W) a (1 : Γ((U : Scheme.{u}), W))
   have h3 : a = a * 1 := (mul_one a).symm
   refine (congrArg ((sectionHom (s := s)).app W) h3).trans (h2.trans ?_)
   rw [h1]
@@ -199,12 +207,15 @@ theorem sectionHom_app (W : (U : Scheme.{u}).Opens) (a : Γ(X, U.ι ''ᵁ W)) :
   rw [Scheme.Opens.ι_appIso]
   rfl
 
-theorem isIso_sectionHom_iff :
-    IsIso (sectionHom (s := s)) ↔ ∀ (x : X) (hx : x ∈ U), Function.Bijective
-      fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s := by
+theorem isIso_sectionHom_iff
+    : IsIso (sectionHom (s := s))
+      ↔ ∀ (x : X) (hx : x ∈ U),
+        Function.Bijective fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s := by
   refine Scheme.Modules.Hom.isIso_iff_isIso_app.trans ?_
-  have key (W : (U : Scheme.{u}).Opens) : IsIso ((sectionHom (s := s)).app W) ↔ Function.Bijective
-      fun a : Γ(X, U.ι ''ᵁ W) ↦ a • F.presheaf.map (homOfLE (U.ι_image_le W)).op s := by
+  have key (W : (U : Scheme.{u}).Opens)
+      : IsIso ((sectionHom (s := s)).app W)
+        ↔ Function.Bijective fun a : Γ(X, U.ι ''ᵁ W) ↦
+          a • F.presheaf.map (homOfLE (U.ι_image_le W)).op s := by
     rw [ConcreteCategory.isIso_iff_bijective, ← funext (sectionHom_app (s := s) W)]
     rfl
   simp_rw [key]
@@ -215,9 +226,9 @@ theorem isIso_sectionHom_iff :
   exact h W
 
 noncomputable def freeIso
-    (h : ∀ (x : X) (hx : x ∈ U), Function.Bijective
-      fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s) :
-    @Iso (U : Scheme.{u}).Modules _ (SheafOfModules.unit (U : Scheme.{u}).ringCatSheaf)
+    (h : ∀ (x : X) (hx : x ∈ U),
+      Function.Bijective fun a : X.presheaf.stalk x ↦ a • F.presheaf.germ U x hx s)
+    : @Iso (U : Scheme.{u}).Modules _ (SheafOfModules.unit (U : Scheme.{u}).ringCatSheaf)
       (F.restrict U.ι) :=
   @asIso _ _ _ _ (sectionHom (s := s)) (isIso_sectionHom_iff.mpr h)
 

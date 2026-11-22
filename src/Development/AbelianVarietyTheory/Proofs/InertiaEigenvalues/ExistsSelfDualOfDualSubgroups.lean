@@ -11,12 +11,11 @@ namespace GlobalTheory.JR.AbsInv
 
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
 
-
 open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
-theorem _root_.GlobalTheory.JR.AbsInv.exists_nhds_invariant {f : V → ℂ}
-    (hf : _root_.GlobalTheory.JR.IsTest f) :
-    ∃ U ∈ 𝓝 (0 : V), ∀ M : AddSubgroup V, (M : Set V) ⊆ U → ∀ x, ∀ m ∈ M, f (x + m) = f x := by
+theorem _root_.GlobalTheory.JR.AbsInv.exists_nhds_invariant
+    {f : V → ℂ} (hf : _root_.GlobalTheory.JR.IsTest f)
+    : ∃ U ∈ 𝓝 (0 : V), ∀ M : AddSubgroup V, (M : Set V) ⊆ U → ∀ x, ∀ m ∈ M, f (x + m) = f x := by
   have hf' : IsLocallyConstant f ∧ HasCompactSupport f := hf
   obtain ⟨hlc, hcs⟩ := hf'
   have hK : IsCompact (tsupport f) := hcs
@@ -35,8 +34,9 @@ theorem _root_.GlobalTheory.JR.AbsInv.exists_nhds_invariant {f : V → ℂ}
         apply subset_tsupport f
         rw [Function.mem_support, show f x = c from hx]
         exact hc
-      obtain ⟨W, hW0, hWs⟩ := compact_open_separated_add_right
-        (hK.of_isClosed_subset (hlc.isClosed_fiber c) hsub) (hlc.isOpen_fiber c) subset_rfl
+      obtain ⟨W, hW0, hWs⟩ :=
+        compact_open_separated_add_right (hK.of_isClosed_subset (hlc.isClosed_fiber c) hsub)
+          (hlc.isOpen_fiber c) subset_rfl
       exact ⟨W, hW0, fun _ => hWs⟩
   choose W hW0 hWsub using hW
   refine ⟨⋂ c ∈ f '' tsupport f, W c, (biInter_mem hfin).2 fun c _ => hW0 c, ?_⟩
@@ -55,14 +55,17 @@ theorem _root_.GlobalTheory.JR.AbsInv.exists_nhds_invariant {f : V → ℂ}
 
 variable [MeasurableSpace V] [BorelSpace V]
 
-
 open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
 variable [MeasurableSpace V] [BorelSpace V] in
-theorem _root_.GlobalTheory.JR.AbsInv.integral_eq_zero_of_translate (μ : Measure V) [μ.IsAddHaarMeasure] (g : V → ℂ) (m : V) (c : ℂ)
-    (hc : c ≠ 1) (h : ∀ x, g (x + m) = c * g x) : ∫ x, g x ∂μ = 0 := by
+theorem _root_.GlobalTheory.JR.AbsInv.integral_eq_zero_of_translate
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (g : V → ℂ) (m : V) (c : ℂ) (hc : c ≠ 1) (h : ∀ x, g (x + m) = c * g x)
+    : ∫ x, g x ∂μ = 0 := by
   have h1 : ∫ x, g x ∂μ = c * ∫ x, g x ∂μ := by
-    calc ∫ x, g x ∂μ = ∫ x, g (x + m) ∂μ := (integral_add_right_eq_self g m).symm
+    calc
+      ∫ x, g x ∂μ
+        = ∫ x, g (x + m) ∂μ := (integral_add_right_eq_self g m).symm
       _ = ∫ x, c * g x ∂μ := integral_congr_ae (Eventually.of_forall fun x => h x)
       _ = c * ∫ x, g x ∂μ := integral_const_mul c _
   have h2 : (1 - c) * ∫ x, g x ∂μ = 0 := by
@@ -76,11 +79,13 @@ open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
 variable [MeasurableSpace V] [BorelSpace V] in
 variable [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] in
-private theorem fourB_eq_zero_of_not_mem_annihilator (μ : Measure V)
-    [μ.IsAddHaarMeasure] (B : V → V → ℂ) (ha : ∀ x x' y, B (x + x') y = B x y * B x' y)
-    (M N : AddSubgroup V) (hN : ∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1) (f : V → ℂ)
-    (hi : ∀ x, ∀ m ∈ M, f (x + m) = f x) (y : V) (hy : y ∉ N) :
-    _root_.GlobalTheory.JR.fourB μ B f y = 0 := by
+private theorem fourB_eq_zero_of_not_mem_annihilator
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (B : V → V → ℂ) (ha : ∀ x x' y, B (x + x') y = B x y * B x' y)
+    (M N : AddSubgroup V) (hN : ∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1)
+    (f : V → ℂ) (hi : ∀ x, ∀ m ∈ M, f (x + m) = f x)
+    (y : V) (hy : y ∉ N)
+    : _root_.GlobalTheory.JR.fourB μ B f y = 0 := by
   have hex : ∃ m ∈ M, B m y ≠ 1 := by
     by_contra h
     push_neg at h
@@ -96,15 +101,17 @@ open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
 variable [MeasurableSpace V] [BorelSpace V] in
 variable [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] in
-private theorem integral_indicator_bicharacter_eq_indicator (μ : Measure V) [μ.IsAddHaarMeasure]
+private theorem integral_indicator_bicharacter_eq_indicator
+    (μ : Measure V) [μ.IsAddHaarMeasure]
     (B : V → V → ℂ) (hs : ∀ x y, B x y = B y x) (ha : ∀ x x' y, B (x + x') y = B x y * B x' y)
     (M N : AddSubgroup V) (hNo : IsOpen (N : Set V)) (hM : ∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1)
-    (w : V) :
-    ∫ y, (N : Set V).indicator (fun y => B w y) y ∂μ =
-      (M : Set V).indicator (fun _ => ((μ.real N : ℝ) : ℂ)) w := by
+    (w : V)
+    : ∫ y, (N : Set V).indicator (fun y => B w y) y ∂μ
+      = (M : Set V).indicator (fun _ => ((μ.real N : ℝ) : ℂ)) w := by
   by_cases hw : w ∈ (M : Set V)
   · rw [Set.indicator_of_mem hw]
-    have hfun : (N : Set V).indicator (fun y => B w y) = (N : Set V).indicator (fun _ => (1 : ℂ)) := by
+    have hfun
+        : (N : Set V).indicator (fun y => B w y) = (N : Set V).indicator (fun _ => (1 : ℂ)) := by
       funext y
       by_cases hy : y ∈ (N : Set V)
       · rw [Set.indicator_of_mem hy, Set.indicator_of_mem hy]
@@ -126,18 +133,21 @@ private theorem integral_indicator_bicharacter_eq_indicator (μ : Measure V) [μ
     · have hyn : y + n ∉ (N : Set V) := fun h => hy (by simpa using N.sub_mem h hn)
       rw [Set.indicator_of_notMem hyn, Set.indicator_of_notMem hy, mul_zero]
 
-
 open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
 variable [MeasurableSpace V] [BorelSpace V] in
 variable [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] in
-theorem _root_.GlobalTheory.JR.AbsInv.fourB_fourB (μ : Measure V) [μ.IsAddHaarMeasure] (B : V → V → ℂ)
-    (hB : Continuous (fun p : V × V => B p.1 p.2)) (hs : ∀ x y, B x y = B y x)
-    (ha : ∀ x x' y, B (x + x') y = B x y * B x' y) (M N : AddSubgroup V)
+theorem _root_.GlobalTheory.JR.AbsInv.fourB_fourB
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (B : V → V → ℂ) (hB : Continuous (fun p : V × V => B p.1 p.2)) (hs : ∀ x y, B x y = B y x)
+    (ha : ∀ x x' y, B (x + x') y = B x y * B x' y)
+    (M N : AddSubgroup V)
     (hMo : IsOpen (M : Set V)) (hNo : IsOpen (N : Set V)) (hNc : IsCompact (N : Set V))
     (hN : ∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1) (hM : ∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1)
-    (f : V → ℂ) (hf : Continuous f) (hfc : HasCompactSupport f) (hi : ∀ x, ∀ m ∈ M, f (x + m) = f x) (z : V) :
-    _root_.GlobalTheory.JR.fourB μ B (_root_.GlobalTheory.JR.fourB μ B f) z = ((μ.real M * μ.real N : ℝ) : ℂ) * f (-z) := by
+    (f : V → ℂ) (hf : Continuous f) (hfc : HasCompactSupport f) (hi : ∀ x, ∀ m ∈ M, f (x + m) = f x)
+    (z : V)
+    : _root_.GlobalTheory.JR.fourB μ B (_root_.GlobalTheory.JR.fourB μ B f) z
+      = ((μ.real M * μ.real N : ℝ) : ℂ) * f (-z) := by
   have hNclo : IsClopen (N : Set V) := ⟨N.isClosed_of_isOpen hNo, hNo⟩
   let P : V → V → ℂ := fun x y => (N : Set V).indicator (fun _ => (1 : ℂ)) y * (f x * B x y) * B y z
   have hPy : ∀ y, ∫ x, P x y ∂μ = _root_.GlobalTheory.JR.fourB μ B f y * B y z := by
@@ -150,10 +160,12 @@ theorem _root_.GlobalTheory.JR.AbsInv.fourB_fourB (μ : Measure V) [μ.IsAddHaar
       rfl
     · rw [Set.indicator_of_notMem hy, zero_mul,
         fourB_eq_zero_of_not_mem_annihilator μ B ha M N hN f hi y hy]
-  have hPx : ∀ x, ∫ y, P x y ∂μ =
-      f x * (M : Set V).indicator (fun _ => ((μ.real N : ℝ) : ℂ)) (x + z) := by
+  have hPx
+      : ∀ x,
+        ∫ y, P x y ∂μ = f x * (M : Set V).indicator (fun _ => ((μ.real N : ℝ) : ℂ)) (x + z) := by
     intro x
-    rw [← integral_indicator_bicharacter_eq_indicator μ B hs ha M N hNo hM (x + z), ← integral_const_mul]
+    rw [← integral_indicator_bicharacter_eq_indicator μ B hs ha M N hNo hM (x + z),
+      ← integral_const_mul]
     refine integral_congr_ae (Eventually.of_forall fun y => ?_)
     dsimp only [P]
     by_cases hy : y ∈ (N : Set V)
@@ -165,7 +177,8 @@ theorem _root_.GlobalTheory.JR.AbsInv.fourB_fourB (μ : Measure V) [μ.IsAddHaar
     apply Continuous.integrable_of_hasCompactSupport
     · have h1 : Continuous fun q : V × V => (N : Set V).indicator (fun _ => (1 : ℂ)) q.2 :=
         (hNclo.continuous_indicator continuous_const).comp continuous_snd
-      have h2 : Continuous fun q : V × V => B q.2 z := hB.comp (continuous_snd.prodMk continuous_const)
+      have h2 : Continuous fun q : V × V => B q.2 z :=
+        hB.comp (continuous_snd.prodMk continuous_const)
       exact (h1.mul ((hf.comp continuous_fst).mul hB)).mul h2
     · apply HasCompactSupport.intro (hfc.isCompact.prod hNc)
       rintro ⟨x, y⟩ hq
@@ -178,78 +191,86 @@ theorem _root_.GlobalTheory.JR.AbsInv.fourB_fourB (μ : Measure V) [μ.IsAddHaar
         ring
   have hpre : MeasurableSet ((fun x => x + z) ⁻¹' (M : Set V)) :=
     (hMo.preimage (continuous_add_const z)).measurableSet
-  calc _root_.GlobalTheory.JR.fourB μ B (_root_.GlobalTheory.JR.fourB μ B f) z
+  calc
+    _root_.GlobalTheory.JR.fourB μ B (_root_.GlobalTheory.JR.fourB μ B f) z
       = ∫ y, _root_.GlobalTheory.JR.fourB μ B f y * B y z ∂μ := rfl
     _ = ∫ y, ∫ x, P x y ∂μ ∂μ := integral_congr_ae (Eventually.of_forall fun y => (hPy y).symm)
     _ = ∫ x, ∫ y, P x y ∂μ ∂μ := (integral_integral_swap hPint).symm
     _ = ∫ x, f x * (M : Set V).indicator (fun _ => ((μ.real N : ℝ) : ℂ)) (x + z) ∂μ :=
-        integral_congr_ae (Eventually.of_forall hPx)
+      integral_congr_ae (Eventually.of_forall hPx)
     _ = ∫ x, ((fun x => x + z) ⁻¹' (M : Set V)).indicator
           (fun _ => ((μ.real N : ℝ) : ℂ) * f (-z)) x ∂μ := by
-        refine integral_congr_ae (Eventually.of_forall fun x => ?_)
-        dsimp only
-        by_cases hx : x + z ∈ (M : Set V)
-        · have hfx : f x = f (-z) := by
-            have e : -z + (x + z) = x := by abel
-            have := hi (-z) (x + z) hx
-            rwa [e] at this
-          rw [Set.indicator_of_mem hx, Set.indicator_of_mem (show x ∈ (fun x => x + z) ⁻¹' (M : Set V) from hx),
-            hfx, mul_comm]
-        · rw [Set.indicator_of_notMem hx,
-            Set.indicator_of_notMem (show x ∉ (fun x => x + z) ⁻¹' (M : Set V) from hx), mul_zero]
+      refine integral_congr_ae (Eventually.of_forall fun x => ?_)
+      dsimp only
+      by_cases hx : x + z ∈ (M : Set V)
+      · have hfx : f x = f (-z) := by
+          have e : -z + (x + z) = x := by abel
+          have := hi (-z) (x + z) hx
+          rwa [e] at this
+        rw [Set.indicator_of_mem hx,
+          Set.indicator_of_mem (show x ∈ (fun x => x + z) ⁻¹' (M : Set V) from hx), hfx, mul_comm]
+      · rw [Set.indicator_of_notMem hx,
+          Set.indicator_of_notMem (show x ∉ (fun x => x + z) ⁻¹' (M : Set V) from hx), mul_zero]
     _ = ((μ.real M * μ.real N : ℝ) : ℂ) * f (-z) := by
-        rw [integral_indicator_const _ hpre, Complex.real_smul]
-        simp only [measureReal_def, measure_preimage_add_right]
-        push_cast
-        ring
+      rw [integral_indicator_const _ hpre, Complex.real_smul]
+      simp only [measureReal_def, measure_preimage_add_right]
+      push_cast
+      ring
 
 open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
 variable [MeasurableSpace V] [BorelSpace V] in
 variable [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] in
-private theorem measureReal_mul_eq_of_dual_pairs_subset (μ : Measure V) [μ.IsAddHaarMeasure]
+private theorem measureReal_mul_eq_of_dual_pairs_subset
+    (μ : Measure V) [μ.IsAddHaarMeasure]
     (B : V → V → ℂ) (hB : Continuous (fun p : V × V => B p.1 p.2)) (hs : ∀ x y, B x y = B y x)
-    (ha : ∀ x x' y, B (x + x') y = B x y * B x' y) (M N M' N' : AddSubgroup V)
-    (hMo : IsOpen (M : Set V)) (hMc : IsCompact (M : Set V)) (hNo : IsOpen (N : Set V))
-    (hNc : IsCompact (N : Set V)) (hN : ∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1)
-    (hM : ∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1) (hM'o : IsOpen (M' : Set V))
-    (hN'o : IsOpen (N' : Set V)) (hN'c : IsCompact (N' : Set V))
-    (hN' : ∀ y, y ∈ N' ↔ ∀ x ∈ M', B x y = 1) (hM' : ∀ x, x ∈ M' ↔ ∀ y ∈ N', B x y = 1)
-    (hle : (M' : Set V) ⊆ M) :
-    μ.real M' * μ.real N' = μ.real M * μ.real N := by
+    (ha : ∀ x x' y, B (x + x') y = B x y * B x' y)
+    (M N M' N' : AddSubgroup V) (hMo : IsOpen (M : Set V)) (hMc : IsCompact (M : Set V))
+    (hNo : IsOpen (N : Set V)) (hNc : IsCompact (N : Set V)) (hN : ∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1)
+    (hM : ∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1) (hM'o : IsOpen (M' : Set V)) (hN'o : IsOpen (N' : Set V))
+    (hN'c : IsCompact (N' : Set V)) (hN' : ∀ y, y ∈ N' ↔ ∀ x ∈ M', B x y = 1)
+    (hM' : ∀ x, x ∈ M' ↔ ∀ y ∈ N', B x y = 1) (hle : (M' : Set V) ⊆ M)
+    : μ.real M' * μ.real N' = μ.real M * μ.real N := by
   have hMclo : IsClopen (M : Set V) := ⟨M.isClosed_of_isOpen hMo, hMo⟩
   have hf : Continuous ((M : Set V).indicator (fun _ => (1 : ℂ))) :=
     hMclo.continuous_indicator continuous_const
   have hfc : HasCompactSupport ((M : Set V).indicator (fun _ => (1 : ℂ))) :=
     HasCompactSupport.intro hMc (fun x hx => Set.indicator_of_notMem hx _)
-  have hinv : ∀ L : AddSubgroup V, (L : Set V) ⊆ M → ∀ x, ∀ m ∈ L,
-      (M : Set V).indicator (fun _ => (1 : ℂ)) (x + m) = (M : Set V).indicator (fun _ => (1 : ℂ)) x := by
+  have hinv
+      : ∀ L : AddSubgroup V,
+        (L : Set V) ⊆ M
+          → ∀ x, ∀ m ∈ L,
+            (M : Set V).indicator (fun _ => (1 : ℂ)) (x + m)
+              = (M : Set V).indicator (fun _ => (1 : ℂ)) x := by
     intro L hL x m hm
     have hmM : m ∈ M := hL hm
     by_cases hx : x ∈ (M : Set V)
     · rw [Set.indicator_of_mem hx, Set.indicator_of_mem (M.add_mem hx hmM)]
     · have hxm : x + m ∉ (M : Set V) := fun h => hx (by simpa using M.sub_mem h hmM)
       rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hxm]
-  have h1 := _root_.GlobalTheory.JR.AbsInv.fourB_fourB μ B hB hs ha M N hMo hNo hNc hN hM
-    _ hf hfc (hinv M subset_rfl) 0
-  have h2 := _root_.GlobalTheory.JR.AbsInv.fourB_fourB μ B hB hs ha M' N' hM'o hN'o hN'c
-    hN' hM' _ hf hfc (hinv M' hle) 0
+  have h1 :=
+    _root_.GlobalTheory.JR.AbsInv.fourB_fourB μ B hB hs ha M N hMo hNo hNc hN hM _ hf hfc
+      (hinv M subset_rfl) 0
+  have h2 :=
+    _root_.GlobalTheory.JR.AbsInv.fourB_fourB μ B hB hs ha M' N' hM'o hN'o hN'c hN' hM' _ hf hfc
+      (hinv M' hle) 0
   have h0 : (M : Set V).indicator (fun _ => (1 : ℂ)) (-0) = 1 := by
     rw [neg_zero, Set.indicator_of_mem (M.zero_mem)]
   rw [h0, mul_one] at h1 h2
   exact_mod_cast h2.symm.trans h1
 
-
 open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
 variable [MeasurableSpace V] [BorelSpace V] in
 variable [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] in
-theorem _root_.GlobalTheory.JR.AbsInv.exists_selfDual (B : V → V → ℂ)
-    (hB : Continuous (fun p : V × V => B p.1 p.2)) (hs : ∀ x y, B x y = B y x)
+theorem _root_.GlobalTheory.JR.AbsInv.exists_selfDual
+    (B : V → V → ℂ) (hB : Continuous (fun p : V × V => B p.1 p.2)) (hs : ∀ x y, B x y = B y x)
     (ha : ∀ x x' y, B (x + x') y = B x y * B x' y)
-    (H : ∀ U ∈ 𝓝 (0 : V), ∃ M N : AddSubgroup V, (M : Set V) ⊆ U ∧ IsOpen (M : Set V) ∧ IsCompact (M : Set V) ∧
-      IsOpen (N : Set V) ∧ IsCompact (N : Set V) ∧ (∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1) ∧
-      (∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1)) : ∃ μ : Measure V, _root_.GlobalTheory.JR.SelfDual μ B := by
+    (H : ∀ U ∈ 𝓝 (0 : V), ∃ M N : AddSubgroup V,
+      (M : Set V) ⊆ U ∧ IsOpen (M : Set V) ∧ IsCompact (M : Set V) ∧ IsOpen (N : Set V)
+        ∧ IsCompact (N : Set V) ∧ (∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1)
+        ∧ (∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1))
+    : ∃ μ : Measure V, _root_.GlobalTheory.JR.SelfDual μ B := by
   obtain ⟨M₀, N₀, -, hM₀o, hM₀c, hN₀o, hN₀c, hN₀, hM₀⟩ := H Set.univ univ_mem
   obtain ⟨ν, hν⟩ : ∃ ν : Measure V, ν.IsAddHaarMeasure := ⟨Measure.addHaar, inferInstance⟩
   have hpos : 0 < ν.real M₀ * ν.real N₀ := by
@@ -273,7 +294,9 @@ theorem _root_.GlobalTheory.JR.AbsInv.exists_selfDual (B : V → V → ℂ)
       ENNReal.toReal_ofReal (inv_nonneg.2 hr0.le), measureReal_def]
   have hone : (c • ν).real M₀ * (c • ν).real N₀ = 1 := by
     rw [hreal, hreal]
-    calc r⁻¹ * ν.real M₀ * (r⁻¹ * ν.real N₀) = (ν.real M₀ * ν.real N₀) / (r * r) := by ring
+    calc
+      r⁻¹ * ν.real M₀ * (r⁻¹ * ν.real N₀)
+        = (ν.real M₀ * ν.real N₀) / (r * r) := by ring
       _ = 1 := by rw [hrr, div_self hpos.ne']
   refine ⟨c • ν, ?_⟩
   unfold _root_.GlobalTheory.JR.SelfDual
@@ -284,19 +307,29 @@ theorem _root_.GlobalTheory.JR.AbsInv.exists_selfDual (B : V → V → ℂ)
   obtain ⟨M, N, hMU, hMo, hMc, hNo, hNc, hN, hM⟩ :=
     H (U ∩ M₀) (inter_mem hU (hM₀o.mem_nhds M₀.zero_mem))
   have hMN : (c • ν).real M * (c • ν).real N = 1 :=
-    (measureReal_mul_eq_of_dual_pairs_subset (c • ν) B hB hs ha M₀ N₀ M N hM₀o hM₀c hN₀o hN₀c
-      hN₀ hM₀ hMo hNo hNc hN hM (fun x hx => (hMU hx).2)).trans hone
-  rw [_root_.GlobalTheory.JR.AbsInv.fourB_fourB (c • ν) B hB hs ha M N hMo hNo hNc hN hM
-    f hf'.1.continuous hf'.2 (hUinv M (fun x hx => (hMU hx).1)) y, hMN]
+    (measureReal_mul_eq_of_dual_pairs_subset (c • ν) B hB hs ha M₀ N₀ M N hM₀o hM₀c hN₀o hN₀c hN₀
+      hM₀ hMo hNo hNc hN hM (fun x hx => (hMU hx).2)).trans hone
+  rw [_root_.GlobalTheory.JR.AbsInv.fourB_fourB (c • ν) B hB hs ha M N hMo hNo hNc hN hM f
+      hf'.1.continuous hf'.2 (hUinv M (fun x hx => (hMU hx).1)) y,
+    hMN]
   simp
 
 end GlobalTheory.JR.AbsInv
-
 
 open MeasureTheory Filter Topology Pointwise in
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] in
 variable [MeasurableSpace V] [BorelSpace V] in
 variable [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] in
-theorem _root_.GlobalTheory.JR.exists_selfDual_of_dual_subgroups : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V] (B : V → V → ℂ), Continuous (fun p : V × V => B p.1 p.2) → (∀ x y, B x y = B y x) → (∀ x x' y, B (x + x') y = B x y * B x' y) → (∀ y, B 0 y = 1) → (∀ U ∈ 𝓝 (0 : V), ∃ M N : AddSubgroup V, (M : Set V) ⊆ U ∧ IsOpen (M : Set V) ∧ IsCompact (M : Set V) ∧ IsOpen (N : Set V) ∧ IsCompact (N : Set V) ∧ (∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1) ∧ (∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1)) → ∃ μ : MeasureTheory.Measure V, _root_.GlobalTheory.JR.SelfDual μ B := by
+theorem _root_.GlobalTheory.JR.exists_selfDual_of_dual_subgroups
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+        [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+        (B : V → V → ℂ),
+      Continuous (fun p : V × V => B p.1 p.2) → (∀ x y, B x y = B y x)
+        → (∀ x x' y, B (x + x') y = B x y * B x' y) → (∀ y, B 0 y = 1)
+        → (∀ U ∈ 𝓝 (0 : V), ∃ M N : AddSubgroup V,
+          (M : Set V) ⊆ U ∧ IsOpen (M : Set V) ∧ IsCompact (M : Set V) ∧ IsOpen (N : Set V)
+            ∧ IsCompact (N : Set V) ∧ (∀ y, y ∈ N ↔ ∀ x ∈ M, B x y = 1)
+            ∧ (∀ x, x ∈ M ↔ ∀ y ∈ N, B x y = 1))
+        → ∃ μ : MeasureTheory.Measure V, _root_.GlobalTheory.JR.SelfDual μ B := by
   intro V _ _ _ _ _ _ _ _ B hB hs ha _ H
   exact _root_.GlobalTheory.JR.AbsInv.exists_selfDual B hB hs ha H

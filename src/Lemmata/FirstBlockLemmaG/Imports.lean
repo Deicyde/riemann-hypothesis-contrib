@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace Bl.FirstBlockLemmaG
 
-theorem goal1 :
-  ∀ {O : Type} [inst : CommRing.{0} O] [inst_1 : IsLocalRing.{0} O] {a m : O},
-  IsUnit.{0} a → Membership.mem.{0, 0} (IsLocalRing.maximalIdeal.{0} O) m → IsUnit.{0} (HSub.hSub.{0, 0, 0} a m) := by
+theorem goal1
+    : ∀ {O : Type} [inst : CommRing.{0} O] [inst_1 : IsLocalRing.{0} O] {a m : O},
+      IsUnit.{0} a → Membership.mem.{0, 0} (IsLocalRing.maximalIdeal.{0} O) m
+        → IsUnit.{0} (HSub.hSub.{0, 0, 0} a m) := by
   intro O _ _ a m ha hm
   by_contra h
   have h1 : a - m ∈ IsLocalRing.maximalIdeal O :=

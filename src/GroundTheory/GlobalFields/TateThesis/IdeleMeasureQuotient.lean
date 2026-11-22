@@ -22,16 +22,19 @@ open IdeleGroup
 variable (K : Type*) [Field K] [NumberField K]
 
 instance discreteTopology_range_diagonal : DiscreteTopology (diagonal K).range := by
-  let f : (diagonal K).range → AdeleRing.principalSubgroup (𝓞 K) K := fun x ↦
-    ⟨((x : IdeleGroup K) : 𝔸[K]), by
+  let f : (diagonal K).range → AdeleRing.principalSubgroup (𝓞 K) K := fun x ↦ ⟨
+    ((x : IdeleGroup K) : 𝔸[K]),
+    by
       obtain ⟨k, hk⟩ := x.2
-      exact ⟨(k : K), by rw [← hk]; rfl⟩⟩
+      exact ⟨(k : K), by rw [← hk]; rfl⟩
+  ⟩
   have : DiscreteTopology (AdeleRing.principalSubgroup (𝓞 K) K) :=
     discreteTopology_principalSubgroup K
   exact DiscreteTopology.of_continuous_injective (f := f)
     ((Units.continuous_val.comp continuous_subtype_val).subtype_mk _)
-    fun x y h ↦ Subtype.ext (Units.ext (show ((x : IdeleGroup K) : 𝔸[K]) = (y : IdeleGroup K)
-      from congrArg Subtype.val h))
+    fun x y h ↦
+      Subtype.ext (Units.ext (show ((x : IdeleGroup K) : 𝔸[K]) = (y : IdeleGroup K) from
+        congrArg Subtype.val h))
 
 abbrev diagonalNormOne : Subgroup (normOneSubgroup K) :=
   (diagonal K).range.subgroupOf (normOneSubgroup K)
@@ -41,24 +44,24 @@ instance discreteTopology_diagonalNormOne : DiscreteTopology (diagonalNormOne K)
     ⟨((x : normOneSubgroup K) : IdeleGroup K), x.2⟩
   exact DiscreteTopology.of_continuous_injective (f := f)
     ((continuous_subtype_val.comp continuous_subtype_val).subtype_mk _)
-    fun x y h ↦ Subtype.ext (Subtype.ext (show ((x : normOneSubgroup K) : IdeleGroup K) =
-      ((y : normOneSubgroup K) : IdeleGroup K) from
+    fun x y h ↦
+      Subtype.ext (Subtype.ext (show ((x : normOneSubgroup K) : IdeleGroup K)
+          = ((y : normOneSubgroup K) : IdeleGroup K) from
         congrArg (fun z : (diagonal K).range ↦ (z : IdeleGroup K)) h))
 
 def diagonalToNormOne : Kˣ →* normOneSubgroup K :=
-  (diagonal K).codRestrict (normOneSubgroup K) fun k ↦
-    range_diagonal_le_normOneSubgroup K ⟨k, rfl⟩
+  (diagonal K).codRestrict (normOneSubgroup K) fun k ↦ range_diagonal_le_normOneSubgroup K ⟨k, rfl⟩
 
 @[simp]
-theorem coe_diagonalToNormOne (k : Kˣ) :
-    ((diagonalToNormOne K k : normOneSubgroup K) : IdeleGroup K) = diagonal K k :=
+theorem coe_diagonalToNormOne (k : Kˣ)
+    : ((diagonalToNormOne K k : normOneSubgroup K) : IdeleGroup K) = diagonal K k :=
   rfl
 
 def diagonalNormOneEquiv : Kˣ ≃ diagonalNormOne K where
   toFun k := ⟨diagonalToNormOne K k, ⟨k, rfl⟩⟩
   invFun x := x.2.choose
-  left_inv k := diagonal_injective K ((⟨diagonalToNormOne K k, ⟨k, rfl⟩⟩ :
-    diagonalNormOne K).2.choose_spec)
+  left_inv k :=
+    diagonal_injective K ((⟨diagonalToNormOne K k, ⟨k, rfl⟩⟩ : diagonalNormOne K).2.choose_spec)
   right_inv x := Subtype.ext (Subtype.ext x.2.choose_spec)
 
 instance countable_units : Countable Kˣ := by
@@ -72,15 +75,15 @@ end Discrete
 
 section FundamentalDomain
 
-variable {G : Type*} [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+variable
+  {G : Type*} [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
   [LocallyCompactSpace G] [MeasurableSpace G] [BorelSpace G]
 
-theorem exists_fundamentalDomain_of_discrete (Γ : Subgroup G) [DiscreteTopology Γ] {D : Set G}
-    (hD : IsCompact D) (hcov : ∀ x : G, ∃ γ ∈ Γ, x * γ ∈ D) :
-    ∃ E : Set G, MeasurableSet E ∧ IsCompact (closure E) ∧
-      ∀ x : G, ∃! γ : Γ.op, γ • x ∈ E := by
+theorem exists_fundamentalDomain_of_discrete
+    (Γ : Subgroup G) [DiscreteTopology Γ]
+    {D : Set G} (hD : IsCompact D) (hcov : ∀ x : G, ∃ γ ∈ Γ, x * γ ∈ D)
+    : ∃ E : Set G, MeasurableSet E ∧ IsCompact (closure E) ∧ ∀ x : G, ∃! γ : Γ.op, γ • x ∈ E := by
   classical
-
   obtain ⟨U, hUo, hU⟩ : ∃ U : Set G, IsOpen U ∧ Subtype.val ⁻¹' U = ({1} : Set Γ) :=
     isOpen_induced_iff.1 (isOpen_discrete ({1} : Set Γ))
   have h1U : (1 : G) ∈ U := by
@@ -92,19 +95,19 @@ theorem exists_fundamentalDomain_of_discrete (Γ : Subgroup G) [DiscreteTopology
     exact congrArg Subtype.val (Set.mem_singleton_iff.1 this)
 
   have hW : IsOpen {q : G × G | q.1 / q.2 ∈ U} := hUo.preimage continuous_div'
-  obtain ⟨u, v, hu, hv, hu1, hv1, huv⟩ :=
-    isOpen_prod_iff.1 hW 1 1 (by simpa using h1U)
+  obtain ⟨u, v, hu, hv, hu1, hv1, huv⟩ := isOpen_prod_iff.1 hW 1 1 (by simpa using h1U)
   obtain ⟨C, hC, hCn⟩ := exists_compact_mem_nhds (1 : G)
   set V : Set G := u ∩ v ∩ interior C with hVdef
   have hVo : IsOpen V := (hu.inter hv).inter isOpen_interior
   have hV1 : (1 : G) ∈ V := ⟨⟨hu1, hv1⟩, mem_interior_iff_mem_nhds.2 hCn⟩
-  have hVdiv : ∀ a ∈ V, ∀ b ∈ V, a / b ∈ U := fun a ha b hb ↦
-    huv (Set.mk_mem_prod ha.1.1 hb.1.2)
+  have hVdiv : ∀ a ∈ V, ∀ b ∈ V, a / b ∈ U := fun a ha b hb ↦ huv (Set.mk_mem_prod ha.1.1 hb.1.2)
   have hVC : V ⊆ C := fun a ha ↦ interior_subset ha.2
 
-  obtain ⟨t, ht⟩ := hD.elim_finite_subcover (fun x : G ↦ (x * ·) '' V)
-    (fun x ↦ (Homeomorph.mulLeft x).isOpenMap _ hVo)
-    (fun x _ ↦ Set.mem_iUnion.2 ⟨x, 1, hV1, mul_one x⟩)
+  obtain ⟨t, ht⟩ :=
+    hD.elim_finite_subcover
+      (fun x : G ↦ (x * ·) '' V)
+      (fun x ↦ (Homeomorph.mulLeft x).isOpenMap _ hVo)
+      (fun x _ ↦ Set.mem_iUnion.2 ⟨x, 1, hV1, mul_one x⟩)
   let p : Fin t.card → G := fun i ↦ (t.equivFin.symm i : G)
   let B : Fin t.card → Set G := fun i ↦ (p i * ·) '' V
   let O : Fin t.card → Set G := fun j ↦ ⋃ γ : Γ, (· * (γ : G)) '' B j
@@ -128,8 +131,9 @@ theorem exists_fundamentalDomain_of_discrete (Γ : Subgroup G) [DiscreteTopology
     simp only [B, p, Equiv.symm_apply_apply]
     exact hyz
   refine ⟨E, ?_, ?_, ?_⟩
-  · exact MeasurableSet.iUnion fun i ↦ (hBo i).measurableSet.diff
-      (MeasurableSet.iUnion fun j ↦ MeasurableSet.iUnion fun _ ↦ (hOo j).measurableSet)
+  · exact MeasurableSet.iUnion fun i ↦
+      (hBo i).measurableSet.diff
+        (MeasurableSet.iUnion fun j ↦ MeasurableSet.iUnion fun _ ↦ (hOo j).measurableSet)
   · have hK : IsCompact (⋃ i, (p i * ·) '' C) :=
       isCompact_iUnion fun i ↦ hC.image (continuous_const.mul continuous_id)
     refine hK.of_isClosed_subset isClosed_closure (closure_minimal ?_ hK.isClosed)
@@ -152,8 +156,8 @@ theorem exists_fundamentalDomain_of_discrete (Γ : Subgroup G) [DiscreteTopology
     obtain ⟨γ, hγ, hγi⟩ := (Finset.mem_filter.1 (S.min'_mem hS)).2
     have hEi : ∀ j < i, x * γ ∉ O j := fun j hj hO ↦ by
       obtain ⟨γ', hγ', hB⟩ := (hmemO j _).1 hO
-      have hjS : j ∈ S := Finset.mem_filter.2 ⟨Finset.mem_univ _, γ * γ', Γ.mul_mem hγ hγ',
-        by rwa [← mul_assoc]⟩
+      have hjS : j ∈ S :=
+        Finset.mem_filter.2 ⟨Finset.mem_univ _, γ * γ', Γ.mul_mem hγ hγ', by rwa [← mul_assoc]⟩
       exact absurd (S.min'_le j hjS) (not_le.2 hj)
     refine ⟨⟨MulOpposite.op γ, Subgroup.mem_op.2 hγ⟩, ?_, ?_⟩
     · show x * γ ∈ E
@@ -164,8 +168,7 @@ theorem exists_fundamentalDomain_of_discrete (Γ : Subgroup G) [DiscreteTopology
       obtain ⟨k, hk, hkO⟩ := (hmemE _).1 hgE
       have hba : g.unop = γ := by
         rcases lt_trichotomy i k with hik | rfl | hki
-        · refine absurd ((hmemO i _).2 ⟨g.unop⁻¹ * γ, Γ.mul_mem (Γ.inv_mem hg') hγ, ?_⟩)
-            (hkO i hik)
+        · refine absurd ((hmemO i _).2 ⟨g.unop⁻¹ * γ, Γ.mul_mem (Γ.inv_mem hg') hγ, ?_⟩) (hkO i hik)
           rwa [mul_assoc, mul_inv_cancel_left]
         · obtain ⟨v₁, hv₁, h₁⟩ := hγi
           obtain ⟨v₂, hv₂, h₂⟩ := hk
@@ -173,8 +176,7 @@ theorem exists_fundamentalDomain_of_discrete (Γ : Subgroup G) [DiscreteTopology
             rw [← mul_div_mul_left_eq_div _ _ x, ← h₁, ← h₂, mul_div_mul_left_eq_div]
           have h1 := hUΓ _ (Γ.div_mem hg' hγ) (hdiv ▸ hVdiv v₂ hv₂ v₁ hv₁)
           exact div_eq_one.1 h1
-        · refine absurd ((hmemO k _).2 ⟨γ⁻¹ * g.unop, Γ.mul_mem (Γ.inv_mem hγ) hg', ?_⟩)
-            (hEi k hki)
+        · refine absurd ((hmemO k _).2 ⟨γ⁻¹ * g.unop, Γ.mul_mem (Γ.inv_mem hγ) hg', ?_⟩) (hEi k hki)
           rwa [mul_assoc, mul_inv_cancel_left]
       exact Subtype.ext (MulOpposite.unop_injective hba)
 
@@ -186,12 +188,12 @@ open IdeleGroup
 
 variable (K : Type*) [Field K] [NumberField K]
 
-theorem exists_fundamentalDomain_normOne :
-    ∃ E : Set (normOneSubgroup K), MeasurableSet E ∧ IsCompact (closure E) ∧
-      ∀ x : normOneSubgroup K, ∃! γ : (diagonalNormOne K).op, γ • x ∈ E := by
+theorem exists_fundamentalDomain_normOne
+    : ∃ E : Set (normOneSubgroup K),
+      MeasurableSet E ∧ IsCompact (closure E)
+        ∧ ∀ x : normOneSubgroup K, ∃! γ : (diagonalNormOne K).op, γ • x ∈ E := by
   obtain ⟨D, hD, hDJ, hxD⟩ := exists_isCompact_normOneSubgroup K
-  refine exists_fundamentalDomain_of_discrete (diagonalNormOne K)
-    (D := Subtype.val ⁻¹' D)
+  refine exists_fundamentalDomain_of_discrete (diagonalNormOne K) (D := Subtype.val ⁻¹' D)
     ((isClosed_normOneSubgroup K).isClosedEmbedding_subtypeVal.isCompact_preimage hD) ?_
   intro x
   obtain ⟨k, hk⟩ := hxD x x.2
@@ -202,18 +204,16 @@ theorem exists_fundamentalDomain_normOne :
 def normOneFundamentalDomain : Set (normOneSubgroup K) :=
   (exists_fundamentalDomain_normOne K).choose
 
-theorem measurableSet_normOneFundamentalDomain :
-    MeasurableSet (normOneFundamentalDomain K) :=
+theorem measurableSet_normOneFundamentalDomain : MeasurableSet (normOneFundamentalDomain K) :=
   (exists_fundamentalDomain_normOne K).choose_spec.1
 
-theorem isCompact_closure_normOneFundamentalDomain :
-    IsCompact (closure (normOneFundamentalDomain K)) :=
+theorem isCompact_closure_normOneFundamentalDomain
+    : IsCompact (closure (normOneFundamentalDomain K)) :=
   (exists_fundamentalDomain_normOne K).choose_spec.2.1
 
-theorem existsUnique_mul_mem_normOneFundamentalDomain (u : normOneSubgroup K) :
-    ∃! ξ : Kˣ, u * diagonalToNormOne K ξ ∈ normOneFundamentalDomain K := by
-  let e : Kˣ ≃ (diagonalNormOne K).op :=
-    (diagonalNormOneEquiv K).trans (diagonalNormOne K).equivOp
+theorem existsUnique_mul_mem_normOneFundamentalDomain (u : normOneSubgroup K)
+    : ∃! ξ : Kˣ, u * diagonalToNormOne K ξ ∈ normOneFundamentalDomain K := by
+  let e : Kˣ ≃ (diagonalNormOne K).op := (diagonalNormOneEquiv K).trans (diagonalNormOne K).equivOp
   have he : ∀ ξ : Kˣ, e ξ • u = u * diagonalToNormOne K ξ := fun _ ↦ rfl
   obtain ⟨γ, hγ, huniq⟩ := (exists_fundamentalDomain_normOne K).choose_spec.2.2 u
   refine ⟨e.symm γ, ?_, fun ξ hξ ↦ ?_⟩
@@ -224,13 +224,13 @@ theorem existsUnique_mul_mem_normOneFundamentalDomain (u : normOneSubgroup K) :
     rw [← he] at hξ
     rw [← huniq _ hξ, e.symm_apply_apply]
 
-theorem isFundamentalDomain_normOneFundamentalDomain (μ : Measure (normOneSubgroup K)) :
-    IsFundamentalDomain (diagonalNormOne K).op (normOneFundamentalDomain K) μ :=
+theorem isFundamentalDomain_normOneFundamentalDomain (μ : Measure (normOneSubgroup K))
+    : IsFundamentalDomain (diagonalNormOne K).op (normOneFundamentalDomain K) μ :=
   IsFundamentalDomain.mk' (measurableSet_normOneFundamentalDomain K).nullMeasurableSet
     (exists_fundamentalDomain_normOne K).choose_spec.2.2
 
-theorem normOneMeasure_normOneFundamentalDomain_lt_top :
-    normOneMeasure K (normOneFundamentalDomain K) < ∞ :=
+theorem normOneMeasure_normOneFundamentalDomain_lt_top
+    : normOneMeasure K (normOneFundamentalDomain K) < ∞ :=
   (measure_mono subset_closure).trans_lt
     (isCompact_closure_normOneFundamentalDomain K).measure_lt_top
 
@@ -251,42 +251,48 @@ open IdeleGroup
 
 variable {K : Type*} [Field K] [NumberField K]
 
-theorem integral_normOneMeasure_eq_setIntegral_tsum {E : Type*} [NormedAddCommGroup E]
-    [NormedSpace ℝ E] {f : normOneSubgroup K → E} (hf : Integrable f (normOneMeasure K)) :
-    ∫ u, f u ∂normOneMeasure K = ∫ u in normOneFundamentalDomain K,
-      ∑' ξ : Kˣ, f (diagonalToNormOne K ξ * u) ∂normOneMeasure K := by
+theorem integral_normOneMeasure_eq_setIntegral_tsum
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {f : normOneSubgroup K → E} (hf : Integrable f (normOneMeasure K))
+    : ∫ u, f u ∂normOneMeasure K
+      = ∫ u in normOneFundamentalDomain K,
+        ∑' ξ : Kˣ, f (diagonalToNormOne K ξ * u) ∂normOneMeasure K := by
   have h𝓕 := isFundamentalDomain_normOneFundamentalDomain K (normOneMeasure K)
-  let e : Kˣ ≃ (diagonalNormOne K).op :=
-    (diagonalNormOneEquiv K).trans (diagonalNormOne K).equivOp
+  let e : Kˣ ≃ (diagonalNormOne K).op := (diagonalNormOneEquiv K).trans (diagonalNormOne K).equivOp
   have he : ∀ ξ : Kˣ, ∀ u, f (diagonalToNormOne K ξ * u) = f (e ξ • u) := fun ξ u ↦ by
     change f (diagonalToNormOne K ξ * u) = f (u * diagonalToNormOne K ξ)
     rw [mul_comm]
-  calc ∫ u, f u ∂normOneMeasure K
-      = ∑' γ : (diagonalNormOne K).op, ∫ u in normOneFundamentalDomain K, f (γ • u)
-          ∂normOneMeasure K := h𝓕.integral_eq_tsum'' f hf
+  calc
+    ∫ u, f u ∂normOneMeasure K
+        = ∑' γ : (diagonalNormOne K).op, ∫ u in normOneFundamentalDomain K, f (γ • u)
+            ∂normOneMeasure K :=
+      h𝓕.integral_eq_tsum'' f hf
     _ = ∫ u in normOneFundamentalDomain K, ∑' γ : (diagonalNormOne K).op, f (γ • u)
           ∂normOneMeasure K := by
-        rw [integral_tsum]
-        · exact fun γ ↦ (hf.1.comp_quasiMeasurePreserving
-            (measurePreserving_smul γ (normOneMeasure K)).quasiMeasurePreserving).restrict
-        · rw [← h𝓕.lintegral_eq_tsum'' (‖f ·‖ₑ)]
-          exact ne_of_lt hf.2
+      rw [integral_tsum]
+      · exact fun γ ↦
+          (hf.1.comp_quasiMeasurePreserving (measurePreserving_smul γ
+            (normOneMeasure K)).quasiMeasurePreserving).restrict
+      · rw [← h𝓕.lintegral_eq_tsum'' (‖f ·‖ₑ)]
+        exact ne_of_lt hf.2
     _ = ∫ u in normOneFundamentalDomain K, ∑' ξ : Kˣ, f (diagonalToNormOne K ξ * u)
           ∂normOneMeasure K := by
-        refine integral_congr_ae (Filter.Eventually.of_forall fun u ↦ ?_)
-        simp only [he]
-        exact (e.tsum_eq (fun γ ↦ f (γ • u))).symm
+      refine integral_congr_ae (Filter.Eventually.of_forall fun u ↦ ?_)
+      simp only [he]
+      exact (e.tsum_eq (fun γ ↦ f (γ • u))).symm
 
-theorem integral_ideleMeasure_eq_integral_fundamentalDomain {E : Type*} [NormedAddCommGroup E]
-    [NormedSpace ℝ E] [CompleteSpace E] (w : InfinitePlace K) {F : IdeleGroup K → E}
-    (hF : Integrable F (ideleMeasure K)) :
-    ∫ x, F x ∂ideleMeasure K =
-      ∫ t, ∫ u in normOneFundamentalDomain K,
-        ∑' ξ : Kˣ, F (diagonal K ξ * moduleSection w t * u) ∂normOneMeasure K
-        ∂posRealMeasure := by
+theorem integral_ideleMeasure_eq_integral_fundamentalDomain
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    (w : InfinitePlace K)
+    {F : IdeleGroup K → E} (hF : Integrable F (ideleMeasure K))
+    : ∫ x, F x ∂ideleMeasure K
+      = ∫ t, ∫ u in normOneFundamentalDomain K,
+          ∑' ξ : Kˣ, F (diagonal K ξ * moduleSection w t * u) ∂normOneMeasure K
+          ∂posRealMeasure := by
   rw [integral_ideleMeasure_eq_integral_normOne w hF]
-  have hg : Integrable (fun p : normOneSubgroup K × {r : ℝ // 0 < r} ↦
-      F ((p.1 : IdeleGroup K) * moduleSection w p.2))
+  have hg : Integrable
+      (fun p : normOneSubgroup K × {r : ℝ // 0 < r} ↦
+        F ((p.1 : IdeleGroup K) * moduleSection w p.2))
       ((normOneMeasure K).prod posRealMeasure) := by
     rw [← map_normOneSplitting_eq_prod w]
     refine (integrable_map_equiv (normOneSplitting w).toHomeomorph.toMeasurableEquiv _).2 ?_

@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuL
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial Matrix UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Th.Det.finDet :
-    ∀ {K V S ι : Type} [Field K] [AddCommGroup V] [Module K V] [Module.Finite K V] (f : S → ι → V →ₗ[K] K), ∃ T : Finset S, ∀ v : V, (∀ s ∈ T, ∀ i, f s i v = 0) → ∀ s i, f s i v = 0 := by
+theorem UpperTheory.V.Th.Det.finDet
+    : ∀ {K V S ι : Type} [Field K] [AddCommGroup V] [Module K V] [Module.Finite K V]
+        (f : S → ι → V →ₗ[K] K),
+      ∃ T : Finset S, ∀ v : V,
+        (∀ s ∈ T, ∀ i, f s i v = 0) → ∀ s i, f s i v = 0 := by
   intro K V S ι _ _ _ _ f
   classical
   let U : Finset S → Submodule K V := fun T => ⨅ s ∈ T, ⨅ i, LinearMap.ker (f s i)

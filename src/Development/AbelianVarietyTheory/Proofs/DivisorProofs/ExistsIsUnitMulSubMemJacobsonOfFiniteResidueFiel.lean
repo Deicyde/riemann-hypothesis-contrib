@@ -10,16 +10,18 @@ open IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem finite_quotient_jacobson_of_finite_residueField (O : Type) [CommRing O] [IsLocalRing O]
-    [Finite (IsLocalRing.ResidueField O)] (A : Type) [CommRing A] [Algebra O A]
-    [Module.Finite O A] : Finite (A ⧸ (⊥ : Ideal A).jacobson) := by
+theorem finite_quotient_jacobson_of_finite_residueField
+    (O : Type) [CommRing O] [IsLocalRing O] [Finite (IsLocalRing.ResidueField O)]
+    (A : Type) [CommRing A] [Algebra O A] [Module.Finite O A]
+    : Finite (A ⧸ (⊥ : Ideal A).jacobson) := by
   set J : Ideal A := (⊥ : Ideal A).jacobson with hJ
 
   have hm : ∀ m ∈ IsLocalRing.maximalIdeal O, algebraMap O A m ∈ J := by
     intro m hm
     rw [hJ, Ideal.jacobson, Ideal.mem_sInf]
     rintro M ⟨-, hM⟩
-    have : (M.comap (algebraMap O A)).IsMaximal := Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := O) M
+    have : (M.comap (algebraMap O A)).IsMaximal :=
+      Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := O) M
     have h := IsLocalRing.eq_maximalIdeal this
     have : m ∈ M.comap (algebraMap O A) := h ▸ hm
     exact this
@@ -27,8 +29,8 @@ theorem finite_quotient_jacobson_of_finite_residueField (O : Type) [CommRing O] 
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ O J).toLinearMap Ideal.Quotient.mk_surjective
   obtain ⟨n, s, hs⟩ := Module.Finite.exists_fin (R := O) (M := A ⧸ J)
   have hsurj : Function.Surjective (IsLocalRing.residue O) := Ideal.Quotient.mk_surjective
-  let f : (Fin n → IsLocalRing.ResidueField O) → A ⧸ J :=
-    fun y ↦ ∑ i, Function.surjInv hsurj (y i) • s i
+  let f : (Fin n → IsLocalRing.ResidueField O) → A ⧸ J := fun y ↦
+    ∑ i, Function.surjInv hsurj (y i) • s i
   have : Function.Surjective f := by
     intro q
     have hq : q ∈ Submodule.span O (Set.range s) := hs ▸ Submodule.mem_top
@@ -36,23 +38,28 @@ theorem finite_quotient_jacobson_of_finite_residueField (O : Type) [CommRing O] 
     refine ⟨fun i ↦ IsLocalRing.residue O (c i), ?_⟩
     simp only [f]
     refine Finset.sum_congr rfl fun i _ ↦ ?_
-    have hd : Function.surjInv hsurj (IsLocalRing.residue O (c i)) - c i ∈
-        IsLocalRing.maximalIdeal O := by
+    have hd
+        : Function.surjInv hsurj (IsLocalRing.residue O (c i)) - c i
+          ∈ IsLocalRing.maximalIdeal O := by
       rw [← IsLocalRing.residue_eq_zero_iff, map_sub, Function.surjInv_eq hsurj, sub_self]
     rw [← sub_eq_zero, ← sub_smul, Algebra.smul_def]
-    have h0 : algebraMap O (A ⧸ J) (Function.surjInv hsurj (IsLocalRing.residue O (c i)) - c i)
-        = 0 := by
+    have h0
+        : algebraMap O (A ⧸ J) (Function.surjInv hsurj (IsLocalRing.residue O (c i)) - c i)
+          = 0 := by
       rw [IsScalarTower.algebraMap_apply O A (A ⧸ J), Ideal.Quotient.algebraMap_eq,
         Ideal.Quotient.eq_zero_iff_mem]
       exact hm _ hd
     rw [h0, zero_mul]
   exact Finite.of_surjective f this
 
-theorem exists_isUnit_mul_sub_mem_jacobson_of_finite_residueField :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [Finite (IsLocalRing.ResidueField O)] (A : Type)
-      [CommRing A] [Algebra O A] [Module.Finite O A] (τ : A →+* A), (∀ a, τ (τ a) = a) →
-      ∀ θ : A, IsUnit (θ - τ θ) → ∀ a : A, IsUnit a → τ a = a →
-      ∃ t : A, IsUnit t ∧ t * τ t - a ∈ (⊥ : Ideal A).jacobson := by
+theorem exists_isUnit_mul_sub_mem_jacobson_of_finite_residueField
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [Finite (IsLocalRing.ResidueField O)] (A : Type)
+        [CommRing A] [Algebra O A] [Module.Finite O A] (τ : A →+* A),
+      (∀ a, τ (τ a) = a)
+        → ∀ θ : A,
+          IsUnit (θ - τ θ)
+            → ∀ a : A,
+              IsUnit a → τ a = a → ∃ t : A, IsUnit t ∧ t * τ t - a ∈ (⊥ : Ideal A).jacobson := by
   intro O _ _ _ A _ _ _ τ hτ θ hθ a ha hτa
   set J : Ideal A := (⊥ : Ideal A).jacobson with hJ
   have : Finite (A ⧸ J) := finite_quotient_jacobson_of_finite_residueField O A
@@ -74,9 +81,9 @@ theorem exists_isUnit_mul_sub_mem_jacobson_of_finite_residueField :
     intro x
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
     rw [hτ', hτ', hτ]
-  obtain ⟨c, hc⟩ := norm_surj_of_finite_reduced_involution (A ⧸ J) τ' hinv
-    (Ideal.Quotient.mk J θ) (by rw [hτ', ← map_sub]; exact hθ.map _)
-    (Ideal.Quotient.mk J a) (ha.map _) (by rw [hτ', hτa])
+  obtain ⟨c, hc⟩ :=
+    norm_surj_of_finite_reduced_involution (A ⧸ J) τ' hinv (Ideal.Quotient.mk J θ)
+      (by rw [hτ', ← map_sub]; exact hθ.map _) (Ideal.Quotient.mk J a) (ha.map _) (by rw [hτ', hτa])
   obtain ⟨t, rfl⟩ := Ideal.Quotient.mk_surjective c
   refine ⟨t, isUnit_of_isUnit_mk_of_le_jacobson le_rfl ?_, ?_⟩
   · have : IsUnit (τ' (Ideal.Quotient.mk J t) * Ideal.Quotient.mk J t) := hc ▸ ha.map _

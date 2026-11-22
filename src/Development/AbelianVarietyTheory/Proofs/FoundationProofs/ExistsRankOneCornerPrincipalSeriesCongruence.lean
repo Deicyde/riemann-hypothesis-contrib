@@ -14,14 +14,17 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Glo
 namespace GlobalTheory.PsType
 
 section
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem corner_val_le_one {g : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (i j : Fin n) : valuation k (g.val i j) ≤ 1 := by
+theorem corner_val_le_one {g : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (i j : Fin n)
+    : valuation k (g.val i j) ≤ 1 := by
   obtain ⟨g, rfl⟩ := hg
   exact (g.val i j).2
 
-theorem corner_mem_KO {g : GL (Fin n) k} (hM : ∀ i j, valuation k (g.val i j) ≤ 1) (hd : valuation k g.val.det = 1) :
-    g ∈ KO k (Fin n) := by
+theorem corner_mem_KO
+    {g : GL (Fin n) k} (hM : ∀ i j, valuation k (g.val i j) ≤ 1) (hd : valuation k g.val.det = 1)
+    : g ∈ KO k (Fin n) := by
   let N : Matrix (Fin n) (Fin n) 𝒪[k] := fun i j => ⟨g.val i j, hM i j⟩
   have e : (algebraMap 𝒪[k] k).mapMatrix N = g.val := rfl
   have hu : IsUnit N.det := by
@@ -34,7 +37,17 @@ theorem corner_mem_KO {g : GL (Fin n) k} (hM : ∀ i j, valuation k (g.val i j) 
 
 end
 
-theorem corner_rankOne : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ), Ordered ψ → ∀ x ∈ KO k (Fin n), ∀ a b : Fin n, a < b → ¬ Triv (ψ a / ψ b) (x.val a b) → (∀ j, b < j → Triv (ψ a / ψ j) (x.val a j)) → ∃ j ∈ grp ψ, ∃ (u : kˣ) (s : k), valuation k (u : k) = 1 ∧ valuation k s ≤ 1 ∧ s * x.val a b = (u : k) - 1 ∧ ψ a u ≠ ψ b u ∧ theta ψ j = (ψ b u : ℂ) ∧ x * j * x⁻¹ ∈ KO k (Fin n) ∧ (x * j * x⁻¹).val = 1 + Matrix.vecMulVec (fun i => s * x.val i b) (Pi.single a 1) := by
+theorem corner_rankOne
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ),
+      Ordered ψ
+        → ∀ x ∈ KO k (Fin n), ∀ a b : Fin n,
+          a < b → ¬ Triv (ψ a / ψ b) (x.val a b) → (∀ j, b < j → Triv (ψ a / ψ j) (x.val a j))
+            → ∃ j ∈ grp ψ, ∃ (u : kˣ) (s : k),
+              valuation k (u : k) = 1 ∧ valuation k s ≤ 1 ∧ s * x.val a b = (u : k) - 1
+                ∧ ψ a u ≠ ψ b u ∧ theta ψ j = (ψ b u : ℂ) ∧ x * j * x⁻¹ ∈ KO k (Fin n)
+                ∧ (x * j * x⁻¹).val
+                  = 1 + Matrix.vecMulVec (fun i => s * x.val i b) (Pi.single a 1) := by
   intro k _ _ _ _ n ψ hord x hx a b hab hnt htr
   have hnt' := hnt
   unfold Triv at hnt'
@@ -52,7 +65,8 @@ theorem corner_rankOne : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalS
   let M : Matrix (Fin n) (Fin n) k := 1 + Matrix.vecMulVec (Pi.single b s) (x.val a)
   have hdet : M.det = (u : k) := by
     simp only [M]
-    rw [Matrix.vecMulVec_eq Unit, Matrix.det_one_add_replicateCol_mul_replicateRow, dotProduct_single, mul_comm, hsx]
+    rw [Matrix.vecMulVec_eq Unit, Matrix.det_one_add_replicateCol_mul_replicateRow,
+      dotProduct_single, mul_comm, hsx]
     ring
   let j : GL (Fin n) k := Matrix.GeneralLinearGroup.mkOfDetNeZero M (by rw [hdet]; exact u.ne_zero)
   have hj : j.val = 1 + Matrix.vecMulVec (Pi.single b s) (x.val a) := rfl
@@ -66,7 +80,8 @@ theorem corner_rankOne : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalS
       · exact (hsm _ _).trans (corner_val_le_one hx _ _)
       · simp
   refine ⟨j, ⟨hjK, fun i l hil => ?_⟩, u, s, hu, hs1, hsx, ?_, ?_, ?_, ?_⟩
-  · rw [hj, Matrix.add_apply, Matrix.one_apply_ne hil.ne, zero_add, Matrix.vecMulVec_apply, Pi.single_apply]
+  · rw [hj, Matrix.add_apply, Matrix.one_apply_ne hil.ne, zero_add, Matrix.vecMulVec_apply,
+      Pi.single_apply]
     split_ifs with h
     · subst h
       exact triv_mono _ _ _ (hsm _ _) (hord a i l l hab.le hil.le le_rfl _ (htr l hil))
@@ -81,8 +96,8 @@ theorem corner_rankOne : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalS
     · simp
   · exact mul_mem (mul_mem hx hjK) (inv_mem hx)
   · have hxx : x.val * (x⁻¹).val = 1 := by rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
-    rw [Units.val_mul, Units.val_mul, hj, Matrix.mul_add, Matrix.mul_one, Matrix.add_mul, hxx, Matrix.mul_vecMulVec,
-      Matrix.vecMulVec_mul]
+    rw [Units.val_mul, Units.val_mul, hj, Matrix.mul_add, Matrix.mul_one, Matrix.add_mul, hxx,
+      Matrix.mul_vecMulVec, Matrix.vecMulVec_mul]
     congr 2
     · ext i
       simp [Matrix.mulVec_single, mul_comm]

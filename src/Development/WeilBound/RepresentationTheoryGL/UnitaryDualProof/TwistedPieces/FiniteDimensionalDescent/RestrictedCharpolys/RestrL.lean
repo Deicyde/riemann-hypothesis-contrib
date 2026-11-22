@@ -8,7 +8,8 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Twis
 
 namespace PositivityTheory.RgUd.TP.Desc.Restr.Final
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc PositivityTheory.RgUd.TP.Desc.Restr
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc
+  PositivityTheory.RgUd.TP.Desc.Restr
 
 variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 

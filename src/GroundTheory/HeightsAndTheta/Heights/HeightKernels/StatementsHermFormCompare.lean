@@ -14,8 +14,9 @@ open scoped ComplexOrder
 noncomputable section
 
 def HermFormCompare.Statement : Prop :=
-  ∀ (n : ℕ) (M N : Matrix (Fin n) (Fin n) ℂ), M.PosDef → N.PosDef →
-    ∃ c : ℝ, 0 < c ∧ ∀ x : Fin n → ℂ, (star x ⬝ᵥ (M *ᵥ x)).re ≤ c * (star x ⬝ᵥ (N *ᵥ x)).re
+  ∀ (n : ℕ) (M N : Matrix (Fin n) (Fin n) ℂ),
+    M.PosDef → N.PosDef
+      → ∃ c : ℝ, 0 < c ∧ ∀ x : Fin n → ℂ, (star x ⬝ᵥ (M *ᵥ x)).re ≤ c * (star x ⬝ᵥ (N *ᵥ x)).re
 
 end
 

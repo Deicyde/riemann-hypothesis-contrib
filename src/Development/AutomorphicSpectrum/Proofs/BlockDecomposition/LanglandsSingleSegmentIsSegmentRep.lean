@@ -12,9 +12,11 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Loc
 
 namespace GlobalTheory.CompanionTheory.LocGL
 
-theorem isLSeg_of_isL_singleton : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (Δ : Segment k) (N : ℕ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (GL (Fin N) k) V), IsL {Δ} π → IsLSeg Δ π := by
+theorem isLSeg_of_isL_singleton
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (Δ : Segment k) (N : ℕ) {V : Type} [AddCommGroup V] [Module ℂ V]
+        (π : Representation ℂ (GL (Fin N) k) V),
+      IsL {Δ} π → IsLSeg Δ π := by
   intro k _ _ _ _ Δ N V _ _ π h
   obtain ⟨h', x, hd, ⟨Δ', ⟨hm, -⟩, hL⟩, hc⟩ := h
   have hcard : h' = 1 := by

@@ -14,8 +14,8 @@ open Formalism.G
 
 variable {K : Type u} [NormedField K] [IsUltrametricDist K] {τ : Type w}
 
-theorem integral_mul {A B : MvPowerSeries τ K} (hA : IntegralMv A) (hB : IntegralMv B) :
-    IntegralMv (A * B) := by
+theorem integral_mul {A B : MvPowerSeries τ K} (hA : IntegralMv A) (hB : IntegralMv B)
+    : IntegralMv (A * B) := by
   classical
   intro d
   rw [MvPowerSeries.coeff_mul]
@@ -29,23 +29,27 @@ theorem integral_one : IntegralMv (1 : MvPowerSeries τ K) := by
   rw [MvPowerSeries.coeff_one]
   split_ifs <;> simp
 
-theorem integral_pow {A : MvPowerSeries τ K} (hA : IntegralMv A) (n : ℕ) :
-    IntegralMv (A ^ n) := by
+theorem integral_pow {A : MvPowerSeries τ K} (hA : IntegralMv A) (n : ℕ) : IntegralMv (A ^ n) := by
   induction n with
   | zero => simpa using integral_one
   | succ n ih => rw [pow_succ]; exact integral_mul ih hA
 
-theorem integral_finsuppProd {ι : Type v} (a : ι → MvPowerSeries τ K) (ha : ∀ i, IntegralMv (a i))
-    (n : ι →₀ ℕ) : IntegralMv (n.prod fun s e => (a s) ^ e) := by
+theorem integral_finsuppProd
+    {ι : Type v} (a : ι → MvPowerSeries τ K) (ha : ∀ i, IntegralMv (a i)) (n : ι →₀ ℕ)
+    : IntegralMv (n.prod fun s e => (a s) ^ e) := by
   classical
   unfold Finsupp.prod
-  exact Finset.prod_induction _ (fun x => IntegralMv x) (fun _ _ hx hy => integral_mul hx hy)
-    integral_one (fun i _ => integral_pow (ha i) _)
+  exact Finset.prod_induction _
+    (fun x => IntegralMv x)
+    (fun _ _ hx hy => integral_mul hx hy)
+    integral_one
+    (fun i _ => integral_pow (ha i) _)
 
-theorem integralSubstV {ι : Type v} [Finite ι] (g : MvPowerSeries ι K)
-    (a : ι → MvPowerSeries τ K) (hg : IntegralMv g)
-    (ha0 : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (ha : ∀ i, IntegralMv (a i)) :
-    IntegralMv (MvPowerSeries.subst a g) := by
+theorem integralSubstV
+    {ι : Type v} [Finite ι]
+    (g : MvPowerSeries ι K) (a : ι → MvPowerSeries τ K) (hg : IntegralMv g)
+    (ha0 : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (ha : ∀ i, IntegralMv (a i))
+    : IntegralMv (MvPowerSeries.subst a g) := by
   intro d
   have hs : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha0
   rw [MvPowerSeries.coeff_subst hs g d]

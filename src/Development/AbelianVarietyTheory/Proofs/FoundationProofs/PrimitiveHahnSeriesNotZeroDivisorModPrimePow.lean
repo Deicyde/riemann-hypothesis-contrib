@@ -12,9 +12,11 @@ open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisens
 
 namespace GlobalTheory
 
-theorem primCan_mul_dvd {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (c : Ω) (a b : HahnSeries ℚ Ω)
-    (ha : ∀ r, a.coeff r ∈ A) (hb : ∀ r, ∃ z ∈ A, b.coeff r = c * z) :
-    ∀ r, ∃ z ∈ A, (a * b).coeff r = c * z := by
+theorem primCan_mul_dvd
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω) (c : Ω) (a b : HahnSeries ℚ Ω)
+    (ha : ∀ r, a.coeff r ∈ A) (hb : ∀ r, ∃ z ∈ A, b.coeff r = c * z)
+    : ∀ r, ∃ z ∈ A, (a * b).coeff r = c * z := by
   intro r
   rw [HahnSeries.coeff_mul]
   refine Finset.sum_induction _ (fun x => ∃ z ∈ A, x = c * z) ?_ ?_ ?_
@@ -25,12 +27,17 @@ theorem primCan_mul_dvd {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (c : Ω
     obtain ⟨z, hz, e⟩ := hb ij.2
     exact ⟨a.coeff ij.1 * z, A.mul_mem _ _ (ha _) hz, by rw [e]; ring⟩
 
-theorem primCan : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω),
-    ((l : ℕ) : Ω) ∈ A.nonunits → ∀ (n L : ℕ) (P φ : HahnSeries ℚ Ω), 0 < L → Prim A P →
-    (∀ r : ℚ, P.coeff r ≠ 0 → (r * L).den = 1) → (∀ r, φ.coeff r ∈ A) →
-    (∀ r, CgA A l n ((φ * P).coeff r) 0) → ∀ r, CgA A l n (φ.coeff r) 0 := by
+theorem primCan
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
+        (A : ValuationSubring Ω),
+      ((l : ℕ) : Ω) ∈ A.nonunits
+        → ∀ (n L : ℕ) (P φ : HahnSeries ℚ Ω),
+          0 < L → Prim A P → (∀ r : ℚ, P.coeff r ≠ 0 → (r * L).den = 1) → (∀ r, φ.coeff r ∈ A)
+            → (∀ r, CgA A l n ((φ * P).coeff r) 0)
+            → ∀ r, CgA A l n (φ.coeff r) 0 := by
   intro Ω _ _ _ l _ A hl n L P φ hL hP hden hφ hφP
-  obtain ⟨Q, hQ, -, hQP⟩ := GlobalTheory.T.primitive_hahnSeries_invertible_mod_prime_pow l A hl n L P hL hP hden
+  obtain ⟨Q, hQ, -, hQP⟩ :=
+    GlobalTheory.T.primitive_hahnSeries_invertible_mod_prime_pow l A hl n L P hL hP hden
   have h1 : ∀ r, ∃ z ∈ A, (Q * P - 1).coeff r = (l : Ω) ^ n * z := by
     intro r
     obtain ⟨z, hz, e⟩ := hQP r

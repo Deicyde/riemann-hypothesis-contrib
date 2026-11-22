@@ -7,21 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobKerIdeal
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 namespace GlobalTheory.PDivGroup
 
-theorem surjective_of_cotangentPullback_surjective_nilAug {k A B : Type} [Field k] [CommRing A] [CommRing B]
-    [Bialgebra k A] [Bialgebra k B] [Module.Finite k A] (f : B →ₐc[k] A)
-    (hA : ∀ a ∈ augIdeal k A, IsNilpotent a) (hf : Function.Surjective (cotMap f)) :
-    Function.Surjective f := by
+theorem surjective_of_cotangentPullback_surjective_nilAug
+    {k A B : Type}
+    [Field k] [CommRing A] [CommRing B] [Bialgebra k A] [Bialgebra k B] [Module.Finite k A]
+    (f : B →ₐc[k] A)
+    (hA : ∀ a ∈ augIdeal k A, IsNilpotent a) (hf : Function.Surjective (cotMap f))
+    : Function.Surjective f := by
   set I := augIdeal k A with hIdef
   set J := augIdeal k B with hJdef
   have hfJ : ∀ b ∈ J, f b ∈ I := by
     intro b hb
     have hb' : counit (R := k) b = 0 := hb
     show counit (R := k) (f b) = 0
-    rw [CoalgHomClass.counit_comp_apply]; exact hb'
+    rw [CoalgHomClass.counit_comp_apply]
+    exact hb'
 
   have step1 : ∀ x ∈ I, ∃ b ∈ J, x - f b ∈ I ^ 2 := by
     intro x hx
@@ -35,8 +39,7 @@ theorem surjective_of_cotangentPullback_surjective_nilAug {k A B : Type} [Field 
     have hdb : AugCot.d (counitAlgHom k A) (f b) = AugCot.d (counitAlgHom k A) (f b0) := by
       rw [hb, map_sub, AlgHomClass.commutes, map_sub, AugCot.d_algebraMap, sub_zero]
     refine ⟨b, hbJ, ?_⟩
-    have h1 : AugCot.d (counitAlgHom k A) (x - f b) = 0 := by
-      rw [map_sub, hdb, ← hc, sub_self]
+    have h1 : AugCot.d (counitAlgHom k A) (x - f b) = 0 := by rw [map_sub, hdb, ← hc, sub_self]
     have hmem : x - f b ∈ I := I.sub_mem hx (hfJ b hbJ)
     rw [AugCot.d_of_mem _ hmem, Ideal.toCotangent_eq_zero] at h1
     exact h1
@@ -80,7 +83,8 @@ theorem surjective_of_cotangentPullback_surjective_nilAug {k A B : Type} [Field 
       · rintro y1 y2 ⟨b1, hb1, h1⟩ ⟨b2, hb2, h2⟩
         refine ⟨b1 + b2, Ideal.add_mem _ hb1 hb2, ?_⟩
         have : y1 + y2 - f (b1 + b2) = (y1 - f b1) + (y2 - f b2) := by rw [map_add (f := _)]; ring
-        rw [this]; exact Ideal.add_mem _ h1 h2
+        rw [this]
+        exact Ideal.add_mem _ h1 h2
   have step3 : ∀ m : ℕ, ∀ x ∈ I, ∃ b : B, x - f b ∈ I ^ (m + 1) := by
     intro m
     induction m with
@@ -91,7 +95,8 @@ theorem surjective_of_cotangentPullback_surjective_nilAug {k A B : Type} [Field 
       obtain ⟨b', -, hb'⟩ := step2 m _ hb
       refine ⟨b + b', ?_⟩
       have : x - f (b + b') = x - f b - f b' := by rw [map_add (f := _)]; ring
-      rw [this]; exact hb'
+      rw [this]
+      exact hb'
 
   haveI : IsNoetherianRing A := IsNoetherianRing.of_finite k A
   have hnil : IsNilpotent I := by
@@ -113,7 +118,9 @@ theorem surjective_of_cotangentPullback_surjective_nilAug {k A B : Type} [Field 
   refine ⟨b + algebraMap k B (counit a), ?_⟩
   rw [map_add (f := _), AlgHomClass.commutes, hb, sub_add_cancel]
 
-theorem app_surjective_of_omegaMap_surjective : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] (G H : PDivGroup p k) (q : G ⟶ H), G.IsConn → Function.Surjective (omegaMap G H q) → ∀ n, Function.Surjective (q.app n) := by
+theorem app_surjective_of_omegaMap_surjective
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] (G H : PDivGroup p k) (q : G ⟶ H),
+      G.IsConn → Function.Surjective (omegaMap G H q) → ∀ n, Function.Surjective (q.app n) := by
   intro p _ k _ _ G H q hG hq n
   refine surjective_of_cotangentPullback_surjective_nilAug (q.app n) (hG n) fun w => ?_
   obtain ⟨v, rfl⟩ := G.omegaLevel_surjective n w

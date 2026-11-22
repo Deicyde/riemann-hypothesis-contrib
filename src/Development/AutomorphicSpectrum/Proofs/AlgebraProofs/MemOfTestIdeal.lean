@@ -11,7 +11,17 @@ open GlobalTheory.CompanionTheory.Ar.Num
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.HaTest
 
-theorem mem_of_test_ideal : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) (p : ℕ), p.Prime → (p : Ω) ≠ 0 → IsNoetherianRing R → IsFractionRing R Ω → IsIntegrallyClosedIn R Ω → ∀ (L : AddSubgroup Ω), LocFree R 1 L → ∀ v : Ω, (∃ m : ℕ, (p : Ω) ^ m * v ∈ L) → (∀ (C : Type) [Field C] [Algebra o C] [Algebra Ω C] [IsScalarTower o Ω C] (RC : Subalgebra o C), IsTestPt p R RC → algebraMap Ω C v ∈ spanOver RC (algebraMap Ω C '' L)) → v ∈ L := by
+theorem mem_of_test_ideal
+    : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) (p : ℕ),
+      p.Prime → (p : Ω) ≠ 0 → IsNoetherianRing R → IsFractionRing R Ω → IsIntegrallyClosedIn R Ω
+        → ∀ (L : AddSubgroup Ω),
+          LocFree R 1 L
+            → ∀ v : Ω,
+              (∃ m : ℕ, (p : Ω) ^ m * v ∈ L)
+                → (∀ (C : Type) [Field C] [Algebra o C] [Algebra Ω C] [IsScalarTower o Ω C]
+                    (RC : Subalgebra o C),
+                  IsTestPt p R RC → algebraMap Ω C v ∈ spanOver RC (algebraMap Ω C '' L))
+                → v ∈ L := by
   intro o Ω _ _ _ R p hp hp0 hN hF hI L hL v hm htest
   let e : Ω ≃ₗ[Ω] (Unit → Ω) := (LinearEquiv.funUnique Unit Ω Ω).symm
   have hL' : LocFree R 1 (L.map e.toLinearMap.toAddMonoidHom) :=
@@ -24,16 +34,15 @@ theorem mem_of_test_ideal : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o
       rwa [← this]
     · intro hx
       exact ⟨x, hx, rfl⟩
-  refine (hmem v).1 (GlobalTheory.T.locally_free_test_point_membership R p hp hp0 hN hF hI 1 _ hL' (e v) ?_ ?_)
+  refine (hmem v).1
+    (GlobalTheory.T.locally_free_test_point_membership R p hp hp0 hN hF hI 1 _ hL' (e v) ?_ ?_)
   · obtain ⟨m, hm⟩ := hm
     refine ⟨m, ?_⟩
-    have : (p : Ω) ^ m • e v = e ((p : Ω) ^ m * v) := by
-      rw [← smul_eq_mul, map_smul]
+    have : (p : Ω) ^ m • e v = e ((p : Ω) ^ m * v) := by rw [← smul_eq_mul, map_smul]
     rw [this]
     exact (hmem _).2 hm
   · intro C _ _ _ _ RC ht
-    let g : C →+ (Unit → C) :=
-      (LinearEquiv.funUnique Unit C C).symm.toLinearMap.toAddMonoidHom
+    let g : C →+ (Unit → C) := (LinearEquiv.funUnique Unit C C).symm.toLinearMap.toAddMonoidHom
     have hg : bcMap Ω C Unit (e v) = g (algebraMap Ω C v) := by
       funext u
       simp [bcMap, e, g]

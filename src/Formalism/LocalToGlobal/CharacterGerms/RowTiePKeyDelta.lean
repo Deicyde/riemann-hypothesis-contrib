@@ -68,8 +68,9 @@ private lemma le_v_pow_sub_pow_of_le_v_sub {s t : C} (hs : (0 : WithTop ℝ) ≤
   calc c = 0 + c := (zero_add c).symm
     _ ≤ _ := add_le_add h0 h
 
-theorem pow_l_close {s t : C} (hs : V.Ge 0 s) (ht : V.Ge 0 t) {r : ℝ} (hr : 0 ≤ r) (h : V.Ge r (s - t)) :
-    V.Ge (r + min 1 r) (s ^ V.l - t ^ V.l) := by
+theorem pow_l_close
+    {s t : C} (hs : V.Ge 0 s) (ht : V.Ge 0 t) {r : ℝ} (hr : 0 ≤ r) (h : V.Ge r (s - t))
+    : V.Ge (r + min 1 r) (s ^ V.l - t ^ V.l) := by
   unfold VF.Ge at hs ht h ⊢
   have hs0 : (0 : WithTop ℝ) ≤ V.v s := by simpa using hs
   have ht0 : (0 : WithTop ℝ) ≤ V.v t := by simpa using ht
@@ -81,30 +82,41 @@ theorem pow_l_close {s t : C} (hs : V.Ge 0 s) (ht : V.Ge 0 t) {r : ℝ} (hr : 0 
       have := Finset.mem_range.mp hi
       omega
     rw [Finset.sum_congr rfl hc, Finset.sum_const, Finset.card_range, nsmul_eq_mul]
-  have key : ∑ i ∈ Finset.range V.l, s ^ i * t ^ (V.l - 1 - i)
-      = (V.l : C) * t ^ (V.l - 1) + ∑ i ∈ Finset.range V.l, (s ^ i - t ^ i) * t ^ (V.l - 1 - i) := by
+  have key
+      : ∑ i ∈ Finset.range V.l, s ^ i * t ^ (V.l - 1 - i)
+        = (V.l : C) * t ^ (V.l - 1)
+          + ∑ i ∈ Finset.range V.l, (s ^ i - t ^ i) * t ^ (V.l - 1 - i) := by
     rw [← e, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     ring
-  have hd : V.v (s ^ V.l - t ^ V.l)
-      = V.v (s - t) + V.v (∑ i ∈ Finset.range V.l, s ^ i * t ^ (V.l - 1 - i)) := by
+  have hd
+      : V.v (s ^ V.l - t ^ V.l)
+        = V.v (s - t) + V.v (∑ i ∈ Finset.range V.l, s ^ i * t ^ (V.l - 1 - i)) := by
     rw [← geom_sum₂_mul, AddValuation.map_mul]
     exact add_comm _ _
   have hA : (1 : WithTop ℝ) ≤ V.v ((V.l : C) * t ^ (V.l - 1)) := by
     rw [AddValuation.map_mul, V.4]
-    calc (1 : WithTop ℝ) = 1 + 0 := (add_zero 1).symm
+    calc
+      (1 : WithTop ℝ)
+        = 1 + 0 := (add_zero 1).symm
       _ ≤ 1 + V.v (t ^ (V.l - 1)) :=
-        add_le_add le_rfl (show (0 : WithTop ℝ) ≤ V.v (t ^ (V.l - 1)) by
-          rw [AddValuation.map_pow]; exact nsmul_nonneg ht0 _)
-  have hB : (r : WithTop ℝ) ≤ V.v (∑ i ∈ Finset.range V.l, (s ^ i - t ^ i) * t ^ (V.l - 1 - i)) := by
+        add_le_add le_rfl
+          (show (0 : WithTop ℝ) ≤ V.v (t ^ (V.l - 1)) by
+            rw [AddValuation.map_pow]; exact nsmul_nonneg ht0 _)
+  have hB
+      : (r : WithTop ℝ) ≤ V.v (∑ i ∈ Finset.range V.l, (s ^ i - t ^ i) * t ^ (V.l - 1 - i)) := by
     apply le_v_finset_sum_of_forall_le
     intro i _
     rw [AddValuation.map_mul]
-    calc (r : WithTop ℝ) = r + 0 := (add_zero _).symm
-      _ ≤ _ := add_le_add (le_v_pow_sub_pow_of_le_v_sub hs0 ht0 h i)
-        (show (0 : WithTop ℝ) ≤ V.v (t ^ (V.l - 1 - i)) by
-          rw [AddValuation.map_pow]; exact nsmul_nonneg ht0 _)
-  have hG : ((min 1 r : ℝ) : WithTop ℝ) ≤ V.v (∑ i ∈ Finset.range V.l, s ^ i * t ^ (V.l - 1 - i)) := by
+    calc
+      (r : WithTop ℝ)
+        = r + 0 := (add_zero _).symm
+      _ ≤ _ :=
+        add_le_add (le_v_pow_sub_pow_of_le_v_sub hs0 ht0 h i)
+          (show (0 : WithTop ℝ) ≤ V.v (t ^ (V.l - 1 - i)) by
+            rw [AddValuation.map_pow]; exact nsmul_nonneg ht0 _)
+  have hG
+      : ((min 1 r : ℝ) : WithTop ℝ) ≤ V.v (∑ i ∈ Finset.range V.l, s ^ i * t ^ (V.l - 1 - i)) := by
     rw [key]
     refine le_trans ?_ (AddValuation.map_add _ _ _)
     rw [WithTop.coe_min, WithTop.coe_one]
@@ -118,8 +130,11 @@ private lemma ge_zero_pow_of_ge_zero {s : C} (hs : V.Ge 0 s) (n : ℕ) : V.Ge 0 
   have h0 : (0 : WithTop ℝ) ≤ V.v s := by simpa using hs
   simpa using nsmul_nonneg h0 n
 
-theorem pow_lk_close {s t : C} (hs : V.Ge 0 s) (ht : V.Ge 0 t) {r : ℝ} (hr : 0 ≤ r) (h : V.Ge r (s - t))
-    (k : ℕ) (hk : 0 < k) : V.Ge (r + min 1 r) (s ^ V.l ^ k - t ^ V.l ^ k) := by
+theorem pow_lk_close
+    {s t : C} (hs : V.Ge 0 s) (ht : V.Ge 0 t)
+    {r : ℝ} (hr : 0 ≤ r) (h : V.Ge r (s - t))
+    (k : ℕ) (hk : 0 < k)
+    : V.Ge (r + min 1 r) (s ^ V.l ^ k - t ^ V.l ^ k) := by
   induction k with
   | zero => exact absurd hk (lt_irrefl 0)
   | succ k ih =>
@@ -172,15 +187,18 @@ theorem keyDelta_holds : KeyDeltaSt := by
     have h := mm_add (hcong K.7) (K.9 c)
     rwa [sub_add_sub_cancel] at h
   have hunit' : V.v ((K.em c) K.7) = 0 := v_unit (K.9 c)
-  have hrad : ∀ x : O, (∀ a, V.MM ((K.em a) x)) → ∀ r : ℝ, (∀ w, V.Ge r (χ w - (K.em c) w)) →
-      V.Ge (r + 1) (χ x - (K.em c) x) := by
+  have hrad
+      : ∀ x : O,
+        (∀ a, V.MM ((K.em a) x))
+          → ∀ r : ℝ, (∀ w, V.Ge r (χ w - (K.em c) w)) → V.Ge (r + 1) (χ x - (K.em c) x) := by
     intro x hx r hr
     obtain ⟨w, hw⟩ := K.10 x hx
     have hχw : χ K.7 * χ x = (V.l : C) * χ w := by rw [← map_mul, hw, map_mul, map_natCast]
     have hew : (K.em c) K.7 * (K.em c) x = (V.l : C) * (K.em c) w := by
       rw [← map_mul, hw, map_mul, map_natCast]
-    have hid : χ K.7 * (χ x - (K.em c) x)
-        = (V.l : C) * (χ w - (K.em c) w) + -((χ K.7 - (K.em c) K.7) * (K.em c) x) := by
+    have hid
+        : χ K.7 * (χ x - (K.em c) x)
+          = (V.l : C) * (χ w - (K.em c) w) + -((χ K.7 - (K.em c) K.7) * (K.em c) x) := by
       linear_combination hχw - hew
     have hex : (1 : WithTop ℝ) ≤ V.v ((K.em c) x) := by
       have h := congrArg V.v hew
@@ -188,8 +206,11 @@ theorem keyDelta_holds : KeyDeltaSt := by
       rw [h]
       have h0 := K.5 c w
       unfold VF.Ge at h0
-      calc (1 : WithTop ℝ) = 1 + 0 := (add_zero 1).symm
-        _ ≤ 1 + V.v ((K.em c) w) := add_le_add le_rfl (show (0 : WithTop ℝ) ≤ V.v ((K.em c) w) by simpa using h0)
+      calc
+        (1 : WithTop ℝ)
+          = 1 + 0 := (add_zero 1).symm
+        _ ≤ 1 + V.v ((K.em c) w) :=
+          add_le_add le_rfl (show (0 : WithTop ℝ) ≤ V.v ((K.em c) w) by simpa using h0)
     have hv : V.v (χ x - (K.em c) x) = V.v (χ K.7 * (χ x - (K.em c) x)) := by
       rw [AddValuation.map_mul, hunit, zero_add]
     unfold VF.Ge
@@ -209,13 +230,17 @@ theorem keyDelta_holds : KeyDeltaSt := by
   have step : ∀ r : ℝ, (∀ w, V.Ge r (χ w - (K.em c) w)) → ∀ y, V.Ge (r + 1) (χ y - (K.em c) y) := by
     intro r hr y
     have hx := hrad _ (hradY y) r hr
-    have hpow : ∀ ρ : ℝ, 0 < ρ → V.Ge ρ (χ y - (K.em c) y) →
-        V.Ge (ρ + min 1 ρ) (χ (y ^ V.l ^ d) - (K.em c) (y ^ V.l ^ d)) := by
+    have hpow
+        : ∀ ρ : ℝ,
+          0 < ρ → V.Ge ρ (χ y - (K.em c) y)
+            → V.Ge (ρ + min 1 ρ) (χ (y ^ V.l ^ d) - (K.em c) (y ^ V.l ^ d)) := by
       intro ρ hρ hge
       rw [map_pow, map_pow]
       exact pow_lk_close (hχ y) (K.5 c y) hρ.le hge d (Nat.pos_of_ne_zero (NeZero.ne d))
-    have hdec : χ y - (K.em c) y = (χ (y ^ V.l ^ d) - (K.em c) (y ^ V.l ^ d))
-        + -(χ (y ^ V.l ^ d - y) - (K.em c) (y ^ V.l ^ d - y)) := by
+    have hdec
+        : χ y - (K.em c) y
+          = (χ (y ^ V.l ^ d) - (K.em c) (y ^ V.l ^ d))
+            + -(χ (y ^ V.l ^ d - y) - (K.em c) (y ^ V.l ^ d - y)) := by
       simp only [map_sub]
       ring
     unfold VF.Ge
@@ -232,7 +257,8 @@ theorem keyDelta_holds : KeyDeltaSt := by
         rw [hv]
       have h1 := hpow ρ hρ hge
       unfold VF.Ge at h1 hx
-      have h2 : min ((ρ + min 1 ρ : ℝ) : WithTop ℝ) ((r + 1 : ℝ) : WithTop ℝ) ≤ (ρ : WithTop ℝ) := by
+      have h2
+          : min ((ρ + min 1 ρ : ℝ) : WithTop ℝ) ((r + 1 : ℝ) : WithTop ℝ) ≤ (ρ : WithTop ℝ) := by
         rw [← hv, hdec]
         refine le_trans (min_le_min h1 ?_) (AddValuation.map_add _ _ _)
         rw [AddValuation.map_neg]

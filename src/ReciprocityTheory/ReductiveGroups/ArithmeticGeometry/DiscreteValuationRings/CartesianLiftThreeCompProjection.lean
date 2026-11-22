@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -60,7 +61,6 @@ lemma cartesian_lift_three_comp_projection (x y z : T ⟶ A) : (fun k => lift x 
 
 def lamP (u v : T ⟶ A) : (T ⟶ A) →₀ ℤ :=
   Finsupp.single (u * v) 1 - Finsupp.single u 1 - Finsupp.single v 1 + Finsupp.single 1 1
-
 
 private lemma fsum_eq_sum_single {X Y : Scheme} {K : Type} [Fintype K] (φ : K → (Y ⟶ X)) (ε : K → ℤ) :
     fsum φ ε = ∑ k, Finsupp.single (φ k) (ε k) := rfl
@@ -225,14 +225,20 @@ lemma act_natCast (ra : Out.RingAct A O) : ∀ n : ℕ, ra.act (n : O) = (𝟙 A
   | n + 1 => by
     rw [Nat.cast_succ, ra.map_add, padd_eq_mul, act_natCast ra n, ra.map_one, pow_succ]
 
-theorem hasGen_pullMul (ra : Out.RingAct A O) (w0 a : O) (N : ℕ) (hN : a * star a = (N : O))
+theorem hasGen_pullMul
+    (ra : Out.RingAct A O)
+    (w0 a : O) (N : ℕ) (hN : a * star a = (N : O))
     (uΨ : LB.Gen (LB.LinComb M (K := Fin 4)
-      ![(padd A (𝟙 _) (ra.act w0)).left, 𝟙 A.left, (ra.act w0).left, (toUnit A ≫ η[A]).left] ![1, -2, -1, 2]))
+      ![(padd A (𝟙 _) (ra.act w0)).left, 𝟙 A.left, (ra.act w0).left, (toUnit A ≫ η[A]).left]
+      ![1, -2, -1, 2]))
     (huΨ : uΨ.IsGen)
-    (uR : LB.Gen (LB.LinComb M (Out.rosatiφ A (ra.act a) (ra.act (star a))) Out.rosatiε)) (huR : uR.IsGen)
-    (t : LB.Gen (Theta A M)) (ht : t.IsGen) :
-    HasGen M (lf (Finsupp.single (ra.act a) 1 - (N : ℤ) • Finsupp.single (𝟙 A) 1 +
-      ((N : ℤ) - 1) • Finsupp.single (1 : A ⟶ A) 1)) := by
+    (uR : LB.Gen (LB.LinComb M (Out.rosatiφ A (ra.act a) (ra.act (star a))) Out.rosatiε))
+    (huR : uR.IsGen)
+    (t : LB.Gen (Theta A M)) (ht : t.IsGen)
+    : HasGen M
+      (lf
+        (Finsupp.single (ra.act a) 1 - (N : ℤ) • Finsupp.single (𝟙 A) 1
+          + ((N : ℤ) - 1) • Finsupp.single (1 : A ⟶ A) 1)) := by
   have hΨa := hasGen_psi (ra.act w0) uΨ huΨ (ra.act a)
   have hΨ1 := hasGen_psi (ra.act w0) uΨ huΨ (𝟙 A)
   have hR := hasGen_rosati (ra.act a) (ra.act (star a)) uR huR (𝟙 A) (ra.act a ≫ ra.act w0)
@@ -243,12 +249,14 @@ theorem hasGen_pullMul (ra : Out.RingAct A O) (w0 a : O) (N : ℕ) (hN : a * sta
       rw [← hN]
       ring
     rw [h1, ra.map_mul, act_natCast, comp_pow', Category.comp_id]
-  have key : Finsupp.single (ra.act a) 1 - (N : ℤ) • Finsupp.single (𝟙 A) 1 +
-      ((N : ℤ) - 1) • Finsupp.single (1 : A ⟶ A) 1 =
-      -(psiP (ra.act w0) (ra.act a)) +
-        (lamP (𝟙 A ≫ ra.act a) (ra.act a ≫ ra.act w0) - lamP (𝟙 A) ((ra.act a ≫ ra.act w0) ≫ ra.act (star a))) +
-        (lamP (𝟙 A) (ra.act w0 ^ N) - (N : ℤ) • lamP (𝟙 A) (ra.act w0)) +
-        (N : ℤ) • psiP (ra.act w0) (𝟙 A) := by
+  have key
+      : Finsupp.single (ra.act a) 1 - (N : ℤ) • Finsupp.single (𝟙 A) 1
+          + ((N : ℤ) - 1) • Finsupp.single (1 : A ⟶ A) 1
+        = -(psiP (ra.act w0) (ra.act a))
+          + (lamP (𝟙 A ≫ ra.act a) (ra.act a ≫ ra.act w0)
+            - lamP (𝟙 A) ((ra.act a ≫ ra.act w0) ≫ ra.act (star a)))
+          + (lamP (𝟙 A) (ra.act w0 ^ N) - (N : ℤ) • lamP (𝟙 A) (ra.act w0))
+          + (N : ℤ) • psiP (ra.act w0) (𝟙 A) := by
     rw [hz, Category.id_comp]
     unfold psiP
     rw [Category.id_comp]

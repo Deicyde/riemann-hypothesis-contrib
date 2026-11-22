@@ -14,8 +14,9 @@ private lemma mem_colon_span_range_iff {B : Type*} [CommRing B] {P : Ideal B} {�
   rw [Ideal.colon_span, Submodule.mem_colon]
   simp only [Set.forall_mem_range, smul_eq_mul]
 
-theorem _root_.GlobalTheory.ideal_map_colon_eq_of_flat : ∀ {A R : Type} [CommRing A] [IsNoetherianRing A] [CommRing R]
-    (φ : A →+* R), φ.Flat → ∀ I J : Ideal A, (I.colon J).map φ = (I.map φ).colon (J.map φ) := by
+theorem _root_.GlobalTheory.ideal_map_colon_eq_of_flat
+    : ∀ {A R : Type} [CommRing A] [IsNoetherianRing A] [CommRing R] (φ : A →+* R),
+      φ.Flat → ∀ I J : Ideal A, (I.colon J).map φ = (I.map φ).colon (J.map φ) := by
   intro A R _ _ _ φ hφ I J
   obtain ⟨n, a, hJ⟩ := Submodule.fg_iff_exists_fin_generating_family.mp (IsNoetherian.noetherian J)
   obtain ⟨m, b, hI⟩ := Submodule.fg_iff_exists_fin_generating_family.mp (IsNoetherian.noetherian I)
@@ -47,11 +48,12 @@ theorem _root_.GlobalTheory.ideal_map_colon_eq_of_flat : ∀ {A R : Type} [CommR
       refine LinearMap.ext fun v => ?_
       set_option synthInstance.maxHeartbeats 100000 in
         simp [f, x, Algebra.smul_def, Fintype.sum_prod_type, Fintype.linearCombination_apply,
-        LinearMap.pi_apply, map_sum, Finset.sum_mul]
+          LinearMap.pi_apply, map_sum, Finset.sum_mul]
       rw [← sub_eq_add_neg, sub_eq_zero]
       refine Finset.sum_congr rfl fun i _ => ?_
-      have e : ∑ j, algebraMap A R (b j) * algebraMap A R (v i) * c i j
-          = algebraMap A R (v i) * ∑ j, c i j * (φ ∘ b) j := by
+      have e
+          : ∑ j, algebraMap A R (b j) * algebraMap A R (v i) * c i j
+            = algebraMap A R (v i) * ∑ j, c i j * (φ ∘ b) j := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun j _ => ?_
         simp only [RingHom.algebraMap_toAlgebra, Function.comp_apply]
@@ -60,17 +62,18 @@ theorem _root_.GlobalTheory.ideal_map_colon_eq_of_flat : ∀ {A R : Type} [CommR
       simp only [RingHom.algebraMap_toAlgebra, Function.comp_apply]
       ring
     obtain ⟨k, g, y, hxy, hgf⟩ := Module.Flat.exists_factorization_of_comp_eq_zero_of_free hxf
-    have hdec : ∀ w : A × (Fin n × Fin m → A), g w = w.1 • g (1, 0) +
-        ∑ p, w.2 p • g (0, fun q => if p = q then 1 else 0) := by
+    have hdec
+        : ∀ w : A × (Fin n × Fin m → A),
+          g w = w.1 • g (1, 0) + ∑ p, w.2 p • g (0, fun q => if p = q then 1 else 0) := by
       intro w
-      have hw : w = w.1 • ((1 : A), (0 : Fin n × Fin m → A)) + ((0 : A), w.2) := by
-        ext <;> simp
+      have hw : w = w.1 • ((1 : A), (0 : Fin n × Fin m → A)) + ((0 : A), w.2) := by ext <;> simp
       conv_lhs => rw [hw]
       rw [map_add (f := _), map_smul]
       congr 1
       exact LinearMap.pi_apply_eq_sum_univ (g ∘ₗ LinearMap.inr A A (Fin n × Fin m → A)) w.2
-    have key : ∀ q, g (1, 0) q ∈
-        (Ideal.span (Set.range b)).colon (Ideal.span (Set.range a) : Set A) := by
+    have key
+        : ∀ q,
+          g (1, 0) q ∈ (Ideal.span (Set.range b)).colon (Ideal.span (Set.range a) : Set A) := by
       intro q
       rw [mem_colon_span_range_iff]
       intro i
@@ -78,14 +81,15 @@ theorem _root_.GlobalTheory.ideal_map_colon_eq_of_flat : ∀ {A R : Type} [CommR
       have hw1 : w.1 = a i := by simp [hw, f, Fintype.linearCombination_apply]
       have hw2 : ∀ p, w.2 p ∈ Ideal.span (Set.range b) := by
         intro p
-        simp only [hw, f, LinearMap.prod_apply, Function.prod, LinearMap.pi_apply, LinearMap.smul_apply,
-          LinearMap.proj_apply, smul_eq_mul]
+        simp only [hw, f, LinearMap.prod_apply, Function.prod, LinearMap.pi_apply,
+          LinearMap.smul_apply, LinearMap.proj_apply, smul_eq_mul]
         exact Ideal.mul_mem_right _ _ (neg_mem (Ideal.subset_span ⟨p.2, rfl⟩))
       have h0 := DFunLike.congr_fun (hdec w) q
       rw [show g w = 0 from LinearMap.congr_fun hgf _] at h0
       simp only [Finsupp.coe_zero, Pi.zero_apply, Finsupp.coe_add, Pi.add_apply, Finsupp.coe_smul,
-        Pi.smul_apply, smul_eq_mul, Finsupp.finsetSum_apply] at h0
-      have h1 : g (1, 0) q * a i = -∑ p, w.2 p * g (0, fun q => if p = q then 1 else 0) q := by
+          Pi.smul_apply, smul_eq_mul, Finsupp.finsetSum_apply]
+        at h0
+      have h1 : g (1, 0) q * a i = - ∑ p, w.2 p * g (0, fun q => if p = q then 1 else 0) q := by
         rw [← hw1]
         linear_combination -h0
       rw [h1]

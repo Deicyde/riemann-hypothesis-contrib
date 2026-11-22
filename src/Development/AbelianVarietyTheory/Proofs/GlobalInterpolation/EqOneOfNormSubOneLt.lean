@@ -17,9 +17,10 @@ private lemma norm_sub_one_le_norm_mul_self_sub_one (w : ℂ) (h : ‖w - 1‖ <
   rw [h1, norm_mul]
   nlinarith [norm_nonneg (w - 1)]
 
-theorem eq_one_of_norm_sub_one_lt {A : Type} [AddMonoid A] (ψ : AddChar A ℂ) (B : Set A)
-    (hB : ∀ x ∈ B, x + x ∈ B) (hψ : ∀ x ∈ B, ‖ψ x - 1‖ < 1 / 2) : ∀ x ∈ B, ψ x = 1 := by
-
+theorem eq_one_of_norm_sub_one_lt
+    {A : Type} [AddMonoid A]
+    (ψ : AddChar A ℂ) (B : Set A) (hB : ∀ x ∈ B, x + x ∈ B) (hψ : ∀ x ∈ B, ‖ψ x - 1‖ < 1 / 2)
+    : ∀ x ∈ B, ψ x = 1 := by
   have key : ∀ k : ℕ, ∀ x ∈ B, (3 / 2 : ℝ) ^ k * ‖ψ x - 1‖ < 1 / 2 := by
     intro k
     induction k with
@@ -29,7 +30,9 @@ theorem eq_one_of_norm_sub_one_lt {A : Type} [AddMonoid A] (ψ : AddChar A ℂ) 
       have h2 := ih (x + x) (hB x hx)
       have h3 := norm_sub_one_le_norm_mul_self_sub_one (ψ x) (hψ x hx)
       rw [AddChar.map_add_eq_mul] at h2
-      calc (3 / 2 : ℝ) ^ (k + 1) * ‖ψ x - 1‖ = (3 / 2) ^ k * (3 / 2 * ‖ψ x - 1‖) := by ring
+      calc
+        (3 / 2 : ℝ) ^ (k + 1) * ‖ψ x - 1‖
+          = (3 / 2) ^ k * (3 / 2 * ‖ψ x - 1‖) := by ring
         _ ≤ (3 / 2) ^ k * ‖ψ x * ψ x - 1‖ := by gcongr
         _ < 1 / 2 := h2
   intro x hx
@@ -40,10 +43,10 @@ theorem eq_one_of_norm_sub_one_lt {A : Type} [AddMonoid A] (ψ : AddChar A ℂ) 
   rw [div_lt_iff₀ hpos] at hk
   linarith
 
-theorem exists_ball_trivial {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
-    (ψ : AddChar K ℂ) (hc : Continuous (ψ : K → ℂ)) :
-    ∃ m : ℤ, ∀ x : K, Valued.v x ≤ WithZero.exp m → ψ x = 1 := by
-
+theorem exists_ball_trivial
+    {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
+    (ψ : AddChar K ℂ) (hc : Continuous (ψ : K → ℂ))
+    : ∃ m : ℤ, ∀ x : K, Valued.v x ≤ WithZero.exp m → ψ x = 1 := by
   have hnhds : (ψ : K → ℂ) ⁻¹' {w : ℂ | ‖w - 1‖ < 1 / 2} ∈ nhds (0 : K) := by
     apply hc.continuousAt.preimage_mem_nhds
     rw [AddChar.map_zero_eq_one]
@@ -62,7 +65,9 @@ theorem exists_ball_trivial {K : Type} [Field K] [Valued K (WithZero (Multiplica
     · apply hγ
       simpa [Valuation.restrict_lt_iff_lt_embedding] using hy
   refine ⟨WithZero.log c - 1, fun x hx => hlt x ?_⟩
-  calc Valued.v x ≤ WithZero.exp (WithZero.log c - 1) := hx
+  calc
+    Valued.v x
+      ≤ WithZero.exp (WithZero.log c - 1) := hx
     _ < WithZero.exp (WithZero.log c) := WithZero.exp_lt_exp.2 (by omega)
     _ = c := WithZero.exp_log hc0
 
@@ -85,27 +90,36 @@ private lemma addChar_trivial_mul_of_valuation_le {K : Type} [Field K] [Valued K
           gcongr
       _ = 1 := by rw [mul_one, mul_inv_cancel₀ hv]
 
-theorem exists_conductor {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
-    (ψ : AddChar K ℂ) (hc : Continuous (ψ : K → ℂ)) (hψ : ∃ t : K, ψ t ≠ 1) :
-    ∃ n : ℤ, ∀ t : K,
-      (∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t * s) = 1) ↔
-        Valued.v t ≤ WithZero.exp n := by
+theorem exists_conductor
+    {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
+    (ψ : AddChar K ℂ) (hc : Continuous (ψ : K → ℂ)) (hψ : ∃ t : K, ψ t ≠ 1)
+    : ∃ n : ℤ, ∀ t : K,
+      (∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t * s) = 1)
+        ↔ Valued.v t ≤ WithZero.exp n := by
   classical
   obtain ⟨m, hm⟩ := exists_ball_trivial ψ hc
   obtain ⟨t₀, ht₀⟩ := hψ
   have ht₀0 : t₀ ≠ 0 := by rintro rfl; simp [AddChar.map_zero_eq_one] at ht₀
-  have hnot : ¬ ∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t₀ * s) = 1 :=
-    fun h => ht₀ (by simpa using h 1 (by simp))
+  have hnot : ¬ ∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t₀ * s) = 1 := fun h =>
+    ht₀ (by simpa using h 1 (by simp))
 
-  have hmem : ∀ t : K, Valued.v t ≤ WithZero.exp m →
-      ∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t * s) = 1 := by
+  have hmem
+      : ∀ t : K,
+        Valued.v t ≤ WithZero.exp m
+          → ∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t * s) = 1 := by
     intro t ht s hs
     apply hm
     rw [map_mul]
-    calc Valued.v t * Valued.v s ≤ WithZero.exp m * 1 := by gcongr
+    calc
+      Valued.v t * Valued.v s
+        ≤ WithZero.exp m * 1 := by gcongr
       _ = WithZero.exp m := mul_one _
-  have hbdd : ∃ b : ℤ, ∀ k : ℤ, (∀ t : K, Valued.v t ≤ WithZero.exp k →
-      ∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t * s) = 1) → k ≤ b := by
+  have hbdd
+      : ∃ b : ℤ, ∀ k : ℤ,
+        (∀ t : K,
+            Valued.v t ≤ WithZero.exp k
+              → ∀ s : K, Valued.v s ≤ (1 : WithZero (Multiplicative ℤ)) → ψ (t * s) = 1)
+          → k ≤ b := by
     refine ⟨WithZero.log (Valued.v t₀), fun k hk => ?_⟩
     by_contra hlt
     apply hnot

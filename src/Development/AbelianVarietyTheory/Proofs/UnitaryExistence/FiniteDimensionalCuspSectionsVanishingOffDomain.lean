@@ -100,20 +100,23 @@ private lemma exists_finite_determining_set_SS
   · exact norm_eq_zero.mp h
   · exact absurd h hn.ne'
 
-
 open NumberField in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.CuspSecFinData.finiteDimensional_of_le_holSub : ∀ (E : Type) [Field E] [NumberField E]
-    [IsCMField E] (r : ℕ) (Comp : Type) [Fintype Comp] (X : Comp → _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
-    (la : ∀ k, _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt (X k).Ψ r) (W : Submodule ℂ (_root_.Formalism.L2.PjFree.FDSec X)), W ≤ _root_.Formalism.L2.PjFree.holSub X la →
-    (∀ P ∈ W, ∀ k, ∀ x ∉ (X k).dom, P k x = 0) → FiniteDimensional ℂ W := by
+theorem _root_.GlobalTheory.CuspSecFinData.finiteDimensional_of_le_holSub
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (Comp : Type) [Fintype Comp]
+        (X : Comp → _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+        (la : ∀ k, _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt (X k).Ψ r)
+        (W : Submodule ℂ (_root_.Formalism.L2.PjFree.FDSec X)),
+      W ≤ _root_.Formalism.L2.PjFree.holSub X la → (∀ P ∈ W, ∀ k, ∀ x ∉ (X k).dom, P k x = 0)
+        → FiniteDimensional ℂ W := by
   intro E _ _ _ r Comp _ X la W hW hoff
   choose N hNfin hN using fun k => exists_finite_determining_set_SS (X k) (la k)
   haveI : ∀ k, Fintype (N k) := fun k => (hNfin k).fintype
-  let L : W →ₗ[ℂ] ((k : Comp) → N k → ℂ) :=
-    { toFun := fun P k y => P.1 k y
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let L : W →ₗ[ℂ] ((k : Comp) → N k → ℂ) := {
+    toFun := fun P k y => P.1 k y
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hinj : Function.Injective L := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro P hP

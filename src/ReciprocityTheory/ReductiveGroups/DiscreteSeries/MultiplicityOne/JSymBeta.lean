@@ -37,8 +37,9 @@ theorem stSymBeta (h : UnitaryGroupStructuralFacts) : StSymBeta := by
   have hlt : Tz k r D.z * Tz k r D.z < Complex.normSq q.2 :=
     lt_of_le_of_ne hle (fun e => hq2 e.symm)
   have hEf : Ef D (scalF Wp f) q ≠ ⊤ := (hq hQ).2.ne
-  have e : JF D (scalF Wp (f ∘ th k r γ)) (bigCell k r q.1 (D.μsec q.2)) =
-      JF D (scalF Wp f) (bigCell k r q.1 (D.μsec q.2)) :=
+  have e
+      : JF D (scalF Wp (f ∘ th k r γ)) (bigCell k r q.1 (D.μsec q.2))
+        = JF D (scalF Wp f) (bigCell k r q.1 (D.μsec q.2)) :=
     hSym k r Wp D X hD hX γ hγ f q hfi hQ hlt hEf
   simp only [e]
 

@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 open Filter Topology
 open ReciprocityTheory.AnForm.M (FinHolAtlas)
 
-theorem BdNormCont.proof (hCC : ChartCont.Statement) (hEq : BdEqHolo.Statement) :
-    BdNormCont.Statement := by
+theorem BdNormCont.proof (hCC : ChartCont.Statement) (hEq : BdEqHolo.Statement)
+    : BdNormCont.Statement := by
   intro X _ D A R φ hφ c
   refine continuous_iff_continuousAt.2 fun y₀ => ?_
   set j := bdIdx R y₀

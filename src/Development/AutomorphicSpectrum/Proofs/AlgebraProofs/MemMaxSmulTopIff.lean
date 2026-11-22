@@ -9,9 +9,11 @@ open scoped BigOperators ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.CommAlg.SatOfInj
 
-theorem mem_max_smul_top_iff {R M : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [AddCommGroup M] [Module R M] {π : R} (hπ : Irreducible π) (x : M) :
-    x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R M) ↔ ∃ z : M, x = π • z := by
+theorem mem_max_smul_top_iff
+    {R M : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup M] [Module R M]
+    {π : R} (hπ : Irreducible π)
+    (x : M)
+    : x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R M) ↔ ∃ z : M, x = π • z := by
   rw [IsDiscreteValuationRing.irreducible_iff_uniformizer π |>.mp hπ,
     Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists]
   constructor
@@ -20,16 +22,23 @@ theorem mem_max_smul_top_iff {R M : Type} [CommRing R] [IsDomain R] [IsDiscreteV
   · rintro ⟨z, rfl⟩
     exact ⟨z, trivial, rfl⟩
 
-theorem eq_zero_of_smul {R M : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M]
-    [Module.IsTorsionFree R M] {a : R} (ha : a ≠ 0) {z : M} (h : a • z = 0) : z = 0 :=
+theorem eq_zero_of_smul
+    {R M : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M] [Module.IsTorsionFree R M]
+    {a : R} (ha : a ≠ 0)
+    {z : M} (h : a • z = 0)
+    : z = 0 :=
   (smul_eq_zero.mp h).resolve_left ha
 
-theorem pow_step {R P E : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [AddCommGroup P] [Module R P] [AddCommGroup E] [Module R E] [Module.IsTorsionFree R E]
-    (f : P →ₗ[R] E) {π : R} (hπ : Irreducible π)
-    (hf : ∀ x : P, f x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R E) →
-      x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R P))
-    (n : ℕ) : ∀ (y : E), π ^ n • y ∈ LinearMap.range f → y ∈ LinearMap.range f := by
+theorem pow_step
+    {R P E : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup P]
+    [Module R P] [AddCommGroup E] [Module R E] [Module.IsTorsionFree R E]
+    (f : P →ₗ[R] E)
+    {π : R} (hπ : Irreducible π)
+    (hf : ∀ x : P,
+      f x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R E)
+        → x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R P))
+    (n : ℕ)
+    : ∀ (y : E), π ^ n • y ∈ LinearMap.range f → y ∈ LinearMap.range f := by
   induction n with
   | zero => intro y hy; simpa using hy
   | succ n ih =>
@@ -44,13 +53,15 @@ theorem pow_step {R P E : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRi
       rw [smul_sub, ← map_smul, hx, pow_succ', mul_smul, sub_self]
     exact sub_eq_zero.mp (eq_zero_of_smul hπ.ne_zero h0)
 
-theorem sat_of_inj_mod : ∀ (R P E : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [AddCommGroup P] [Module R P] [Module.Finite R P] [AddCommGroup E] [Module R E]
-    [Module.IsTorsionFree R E] [Module.IsTorsionFree R P] (f : P →ₗ[R] E),
-    (∀ x : P, f x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R E) →
-      x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R P)) →
-    Function.Injective f ∧ ∀ (a : R) (y : E), a ≠ 0 → a • y ∈ LinearMap.range f →
-      y ∈ LinearMap.range f := by
+theorem sat_of_inj_mod
+    : ∀ (R P E : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup P]
+        [Module R P] [Module.Finite R P] [AddCommGroup E] [Module R E] [Module.IsTorsionFree R E]
+        [Module.IsTorsionFree R P] (f : P →ₗ[R] E),
+      (∀ x : P,
+          f x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R E)
+            → x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R P))
+        → Function.Injective f
+          ∧ ∀ (a : R) (y : E), a ≠ 0 → a • y ∈ LinearMap.range f → y ∈ LinearMap.range f := by
   intro R P E _ _ _ _ _ _ _ _ _ _ f hf
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible R
   refine ⟨?_, ?_⟩
@@ -66,7 +77,8 @@ theorem sat_of_inj_mod : ∀ (R P E : Type) [CommRing R] [IsDomain R] [IsDiscret
       rw [map_smul] at hx0
       exact eq_zero_of_smul hπ.ne_zero hx0
     exact Submodule.smul_mem_smul
-      ((IsDiscreteValuationRing.irreducible_iff_uniformizer π).mp hπ ▸ Ideal.mem_span_singleton_self π)
+      ((IsDiscreteValuationRing.irreducible_iff_uniformizer π).mp hπ
+        ▸ Ideal.mem_span_singleton_self π)
       (LinearMap.mem_ker.mpr hx')
   · intro a y ha hy
     obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha hπ

@@ -8,7 +8,12 @@ public import Development.AbelianVarietyTheory.Counterexamples.TwistSurvey.ConjM
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT GlobalTheory.HolRead
+open NumberField IsDedekindDomain Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT
+  GlobalTheory.HolRead
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -17,15 +22,18 @@ namespace GlobalTheory.HolRead.SecWt
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (conjEmb Coeff Level)
 
 section
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {l : Level H}
 
-theorem relab_inj (c : Coeff l) (σ : c.F →+* ℂ) : Function.Injective (relab (E := E) c σ) := fun τ τ' h => by
+theorem relab_inj (c : Coeff l) (σ : c.F →+* ℂ)
+    : Function.Injective (relab (E := E) c σ) := fun τ τ' h => by
   ext a
   have h1 : σ (embF c τ a) = σ (embF c τ' a) := congrArg (fun f : E →+* ℂ => f a) h
   exact congrArg Subtype.val (σ.injective h1)
 
-theorem relab_conjEmb (c : Coeff l) (σ : c.F →+* ℂ) (τ : E →+* ℂ) :
-    relab c σ (conjEmb τ) = conjEmb (relab c σ τ) := by
+theorem relab_conjEmb (c : Coeff l) (σ : c.F →+* ℂ) (τ : E →+* ℂ)
+    : relab c σ (conjEmb τ) = conjEmb (relab c σ τ) := by
   ext a
   have h1 : embF c (conjEmb τ) a = embF c τ (IsCMField.complexConj E a) :=
     Subtype.ext (IsCMField.complexEmbedding_complexConj E τ a).symm
@@ -50,8 +58,11 @@ theorem conjEmb_inj {E : Type} [Field E] : Function.Injective (conjEmb (E := E))
   ext x
   exact star_injective (RingHom.congr_fun h x)
 
-theorem wtA_pos {D : D7} (hne : ∀ s t, tauE D s ≠ conjEmb (tauE D t)) {j : ℕ} (w : WeightFamilies.Wt D j) (s : D.what₂.Tau) (n : ℕ) :
-    wtA w (tauE D s, n) = ext0 (w.aP s) n := by
+theorem wtA_pos
+    {D : D7} (hne : ∀ s t, tauE D s ≠ conjEmb (tauE D t))
+    {j : ℕ} (w : WeightFamilies.Wt D j)
+    (s : D.what₂.Tau) (n : ℕ)
+    : wtA w (tauE D s, n) = ext0 (w.aP s) n := by
   unfold wtA
   simp only [show DV.tauEmb D = tauE D from rfl]
   rw [Finset.sum_eq_single s]
@@ -60,23 +71,30 @@ theorem wtA_pos {D : D7} (hne : ∀ s t, tauE D s ≠ conjEmb (tauE D t)) {j : �
     rw [if_neg (fun h => ht (tauE_inj D h).symm), if_neg (hne s t), add_zero]
   · simp
 
-theorem wtA_neg {D : D7} (hne : ∀ s t, tauE D s ≠ conjEmb (tauE D t)) {j : ℕ} (w : WeightFamilies.Wt D j) (s : D.what₂.Tau) (n : ℕ) :
-    wtA w (conjEmb (tauE D s), n) = ext0 (w.aM s) n := by
+theorem wtA_neg
+    {D : D7} (hne : ∀ s t, tauE D s ≠ conjEmb (tauE D t))
+    {j : ℕ} (w : WeightFamilies.Wt D j)
+    (s : D.what₂.Tau) (n : ℕ)
+    : wtA w (conjEmb (tauE D s), n) = ext0 (w.aM s) n := by
   unfold wtA
   simp only [show DV.tauEmb D = tauE D from rfl]
   rw [Finset.sum_eq_single s]
   · rw [if_neg (fun h => hne s s (Eq.symm h)), if_pos rfl, zero_add]
   · intro t _ ht
-    rw [if_neg (fun h => hne t s (Eq.symm h)), if_neg (fun h => ht (tauE_inj D (conjEmb_inj h)).symm), add_zero]
+    rw [if_neg (fun h => hne t s (Eq.symm h)),
+      if_neg (fun h => ht (tauE_inj D (conjEmb_inj h)).symm), add_zero]
   · simp
 
-theorem aPl_cast (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau) (p n : ℕ) (hp : p = D.R.k + i) (hn : n < p) :
-    (aPl D i p τ n : ℚ) =
-      Formalism.L2.NTheta.lamAt (D.hc τ) n + (D.hc τ).e i - ((p : ℚ) - (n + 1)) - ((D.R.t : ℚ) + 1) / 2 := by
+theorem aPl_cast
+    (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau) (p n : ℕ) (hp : p = D.R.k + i) (hn : n < p)
+    : (aPl D i p τ n : ℚ)
+      = Formalism.L2.NTheta.lamAt (D.hc τ) n + (D.hc τ).e i - ((p : ℚ) - (n + 1))
+        - ((D.R.t : ℚ) + 1) / 2 := by
   have hk := D.R.m_add_three_le_k
   have hi := i.2
-  have h3 := Formalism.L2.NTheta.lamAt_add_add_le (D.hc τ) (p - 1 - n) n (by simp only [Ranks.r]; omega)
-  have hl : Formalism.L2.NTheta.lamAt (D.hc τ) (n + (p - 1 - n)) = -(D.hc τ).b i := by
+  have h3 :=
+    Formalism.L2.NTheta.lamAt_add_add_le (D.hc τ) (p - 1 - n) n (by simp only [Ranks.r]; omega)
+  have hl : Formalism.L2.NTheta.lamAt (D.hc τ) (n + (p - 1 - n)) = - (D.hc τ).b i := by
     unfold Formalism.L2.NTheta.lamAt
     rw [dite_eq_right (by omega), dite_eq_left (by omega)]
     congr 2
@@ -89,8 +107,10 @@ theorem aPl_cast (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau) (p n : ℕ) (hp :
   obtain ⟨z2, h2⟩ := (D.hc τ).e_int i
   obtain ⟨s, hs⟩ := D.R.t_odd
   have ht : (D.R.t : ℚ) = 2 * s + 1 := by exact_mod_cast hs
-  have hz : Formalism.L2.NTheta.lamAt (D.hc τ) n + (D.hc τ).e i - ((p : ℚ) - (n + 1)) - ((D.R.t : ℚ) + 1) / 2 =
-      ((z1 + z2 - (p - (n + 1)) - (s + 1) : ℤ) : ℚ) := by
+  have hz
+      : Formalism.L2.NTheta.lamAt (D.hc τ) n + (D.hc τ).e i - ((p : ℚ) - (n + 1))
+          - ((D.R.t : ℚ) + 1) / 2
+        = ((z1 + z2 - (p - (n + 1)) - (s + 1) : ℤ) : ℚ) := by
     rw [h1, h2, ht]; push_cast; ring
   have h0 : (0 : ℤ) ≤ z1 + z2 - (p - (n + 1)) - (s + 1) := by
     have : (0 : ℚ) ≤ ((z1 + z2 - (p - (n + 1)) - (s + 1) : ℤ) : ℚ) := by rw [← hz]; linarith
@@ -99,15 +119,17 @@ theorem aPl_cast (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau) (p n : ℕ) (hp :
   rw [if_pos hn, hz, Int.floor_intCast]
   exact_mod_cast Int.toNat_of_nonneg h0
 
-theorem aMi_cast (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau) (p q c : ℕ) (hp : p = D.R.k + i) (hq : q = D.R.m - (i + 1))
-    (hc : c < q) :
-    (aMi D i p q τ (q - 1 - c) : ℚ) =
-      -((D.hc τ).e i + Formalism.L2.NTheta.lamAt (D.hc τ) (p + c) + ((c : ℚ) + 1) + ((D.R.t : ℚ) - 1) / 2) := by
+theorem aMi_cast
+    (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau)
+    (p q c : ℕ) (hp : p = D.R.k + i) (hq : q = D.R.m - (i + 1)) (hc : c < q)
+    : (aMi D i p q τ (q - 1 - c) : ℚ)
+      = -((D.hc τ).e i + Formalism.L2.NTheta.lamAt (D.hc τ) (p + c) + ((c : ℚ) + 1)
+        + ((D.R.t : ℚ) - 1) / 2) := by
   have hk := D.R.m_add_three_le_k
   have hi := i.2
   have h3 := Formalism.L2.NTheta.lamAt_add_add_le (D.hc τ) c p (by simp only [Ranks.r]; omega)
   have hm : (i : ℕ) + 1 < D.R.m := by omega
-  have hl : Formalism.L2.NTheta.lamAt (D.hc τ) p = -(D.hc τ).b ⟨i + 1, hm⟩ := by
+  have hl : Formalism.L2.NTheta.lamAt (D.hc τ) p = - (D.hc τ).b ⟨i + 1, hm⟩ := by
     unfold Formalism.L2.NTheta.lamAt
     rw [dite_eq_right (by omega), dite_eq_left (by omega)]
     congr 2
@@ -118,18 +140,34 @@ theorem aMi_cast (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau) (p q c : ℕ) (hp
   obtain ⟨z2, h2⟩ := (D.hc τ).e_int i
   obtain ⟨s, hs⟩ := D.R.t_odd
   have ht : (D.R.t : ℚ) = 2 * s + 1 := by exact_mod_cast hs
-  have hz : -((D.hc τ).e i + Formalism.L2.NTheta.lamAt (D.hc τ) (p + c) + ((c : ℚ) + 1) + ((D.R.t : ℚ) - 1) / 2) =
-      ((-(z2 + z1 + (c + 1) + s) : ℤ) : ℚ) := by
+  have hz
+      : -((D.hc τ).e i + Formalism.L2.NTheta.lamAt (D.hc τ) (p + c) + ((c : ℚ) + 1)
+          + ((D.R.t : ℚ) - 1) / 2)
+        = ((-(z2 + z1 + (c + 1) + s) : ℤ) : ℚ) := by
     rw [h1, h2, ht]; push_cast; ring
   have h0 : (0 : ℤ) ≤ -(z2 + z1 + (c + 1) + s) := by
     have : (0 : ℚ) ≤ ((-(z2 + z1 + (c + 1) + s) : ℤ) : ℚ) := by rw [← hz]; linarith
     exact_mod_cast this
   unfold aMi
-  rw [if_pos (by omega), show q - (q - 1 - c) = c + 1 by omega, show p + (c + 1) - 1 = p + c by omega, Nat.cast_succ, hz,
-    Int.floor_intCast]
+  rw [if_pos (by omega), show q - (q - 1 - c) = c + 1 by omega,
+    show p + (c + 1) - 1 = p + c by omega, Nat.cast_succ, hz, Int.floor_intCast]
   exact_mod_cast Int.toNat_of_nonneg h0
 
-theorem laU_eq_wtCol : ∀ (D : D7) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL] (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)), LawsJ T → AlgTie T → KapIs κ → ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), GoodEmb T.Q.c (res T σ) → ∀ (e : D.what₂.Tau → ℤ), (∀ ρ, (e ρ : ℚ) = (D.hc (lab σ ρ)).e i) → ∀ k (ρ : D.what₂.Tau) (τ : ((T.U ((i : ℕ) + 1) (res T σ)).X k).Ψ), τ.1 = tauE D ρ → ∀ c : Fin D.R.r, laU (T.U ((i : ℕ) + 1) (res T σ)) (wtA (κ i)) (κ i).n k τ c = wtCol (D.hc (lab σ ρ)) (D.R.sigW ((i : ℕ) + 1)).1 (D.R.sigW ((i : ℕ) + 1)).2 c + e ρ := by
+theorem laU_eq_wtCol
+    : ∀ (D : D7) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
+        (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)),
+      LawsJ T → AlgTie T → KapIs κ
+        → ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ),
+          GoodEmb T.Q.c (res T σ)
+            → ∀ (e : D.what₂.Tau → ℤ),
+              (∀ ρ, (e ρ : ℚ) = (D.hc (lab σ ρ)).e i)
+                → ∀ k (ρ : D.what₂.Tau) (τ : ((T.U ((i : ℕ) + 1) (res T σ)).X k).Ψ),
+                  τ.1 = tauE D ρ
+                    → ∀ c : Fin D.R.r,
+                      laU (T.U ((i : ℕ) + 1) (res T σ)) (wtA (κ i)) (κ i).n k τ c
+                        = wtCol (D.hc (lab σ ρ)) (D.R.sigW ((i : ℕ) + 1)).1
+                            (D.R.sigW ((i : ℕ) + 1)).2 c
+                          + e ρ := by
   intro D T _ κ hl ha hκ i σ hσ e he k ρ τ hτ c
   have hlab := (GlobalTheory.ConjReading.branch_of_pins T ha hl.pins σ ρ).1 hσ
   have he' := he ρ
@@ -155,7 +193,8 @@ theorem laU_eq_wtCol : ∀ (D : D7) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
     rw [← hrel, ← relab_conjEmb]; exact Function.leftInverse_invFun (relab_inj _ _) _
   have hp0 : ((T.U ((i : ℕ) + 1) (res T σ)).X k).p0 = (D.R.sigW ((i : ℕ) + 1)).2 :=
     ((hl.unf _ (inR i) _ hσ).2.1 k).1.trans (hl.pins.2.2.2 _ (inR i)).2.1
-  have hs : (Wc D i).sig (tauE D s) = D.R.sigW ((i : ℕ) + 1) := D.sp.W_sigval _ (inR i).1 (inR i).2 _
+  have hs : (Wc D i).sig (tauE D s) = D.R.sigW ((i : ℕ) + 1) :=
+    D.sp.W_sigval _ (inR i).1 (inR i).2 _
   obtain ⟨hP, hM, hn⟩ := hκ i s
   rw [hs] at hP hM
   have hi := i.2
@@ -167,7 +206,8 @@ theorem laU_eq_wtCol : ∀ (D : D7) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
     rw [hp, hq]; simp only [Ranks.r]; omega
   obtain ⟨N, hN⟩ := (κ i).n_even
   have hN2 : (κ i).n / 2 = N := by omega
-  have hNq : (N : ℚ) + N = ((D.R.sigW ((i : ℕ) + 1)).1 : ℚ) + (D.R.sigW ((i : ℕ) + 1)).2 + D.R.t := by
+  have hNq
+      : (N : ℚ) + N = ((D.R.sigW ((i : ℕ) + 1)).1 : ℚ) + (D.R.sigW ((i : ℕ) + 1)).2 + D.R.t := by
     have : N + N = (D.R.sigW ((i : ℕ) + 1)).1 + (D.R.sigW ((i : ℕ) + 1)).2 + D.R.t := by
       rw [← hN, hn, ← hr]; rfl
     exact_mod_cast this

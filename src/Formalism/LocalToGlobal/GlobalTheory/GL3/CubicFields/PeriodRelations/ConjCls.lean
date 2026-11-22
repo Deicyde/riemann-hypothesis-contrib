@@ -14,16 +14,21 @@ namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5
 open NumberField Classical
 open scoped Pointwise
 open Formalism.BasicNotions (D7)
-open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity (IsLat jL Uniformization CMTransitive LinkPer KroneckerLimit DedekindFactor)
-open Formalism.MainNotions.TaylorLogMetric (lamConj lamOf embT meanLogOm DataIn tor0 IsCurveIdeal IsDiscriminantTwelfthRootOfIdealLattice per22 logOmVal)
+open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
+  (IsLat jL Uniformization CMTransitive LinkPer KroneckerLimit DedekindFactor)
+open Formalism.MainNotions.TaylorLogMetric
+  (lamConj lamOf embT meanLogOm DataIn tor0 IsCurveIdeal IsDiscriminantTwelfthRootOfIdealLattice
+    per22 logOmVal)
 
-theorem brcc_discr_one_ne (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : cc ≠ ⊥) :
-    discr (lamOf D cc 1) ≠ 0 :=
+theorem brcc_discr_one_ne (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : cc ≠ ⊥)
+    : discr (lamOf D cc 1) ≠ 0 :=
   discr_latI_ne_zero D.host.K D.host.d (discriminant_mod_four D) ⟨D.host.sqrtMinusD, br_sqrt_mem D⟩
     (br_sqrt_sq D) (br_finrank_K D) (brPhi D) cc hcc
 
-theorem brcc_delta_ne (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : IsCurveIdeal D cc) (δ : ℂ)
-    (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ) : δ ≠ 0 := by
+theorem brcc_delta_ne
+    (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : IsCurveIdeal D cc)
+    (δ : ℂ) (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ)
+    : δ ≠ 0 := by
   intro h0
   have hcc' := hcc
   obtain ⟨hcc0, -⟩ := hcc'
@@ -84,8 +89,10 @@ private lemma discr_map_mulLeft (Λ : AddSubgroup ℂ) (δ : ℂ) (hδ : δ ≠ 
   rw [g2_map_mulLeft Λ δ hδ, g3_map_mulLeft Λ δ hδ]
   ring
 
-theorem br_discr_lamOf (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : IsCurveIdeal D cc) (δ : ℂ)
-    (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ) : discr (lamOf D cc δ) = 1 := by
+theorem br_discr_lamOf
+    (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : IsCurveIdeal D cc)
+    (δ : ℂ) (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ)
+    : discr (lamOf D cc δ) = 1 := by
   have hne : δ ≠ 0 := brcc_delta_ne D cc hcc δ hδ
   have h12 : δ ^ 12 = Formalism.MainNotions.TaylorLogMetric.discr (lamOf D cc 1) := hδ
   show Formalism.MainNotions.TaylorLogMetric.discr (lamOf D cc δ) = 1

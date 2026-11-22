@@ -9,12 +9,14 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory.EtaleCoker
 
-theorem surjective_of_trace_of_smul_mem_range (S A B : Type) [CommRing S] [IsLocalRing S]
-    [IsDomain S] [CommRing A] [Algebra S A] [Module.Free S A] [Module.Finite S A]
-    [Algebra.Etale S A] [CommRing B] [Algebra S B] [Module.Free S B] [Module.Finite S B]
-    [Algebra.Etale S B] (φ : A →ₐ[S] B) (hφ : Function.Injective φ) (s : S) (hs : s ≠ 0)
-    (hcok : ∀ b : B, s • b ∈ φ.range)
-    (htr : ∀ x : A, Algebra.trace S B (φ x) = Algebra.trace S A x) : Function.Surjective φ := by
+theorem surjective_of_trace_of_smul_mem_range
+    (S A B : Type) [CommRing S] [IsLocalRing S] [IsDomain S] [CommRing A] [Algebra S A]
+    [Module.Free S A] [Module.Finite S A] [Algebra.Etale S A] [CommRing B] [Algebra S B]
+    [Module.Free S B] [Module.Finite S B] [Algebra.Etale S B]
+    (φ : A →ₐ[S] B) (hφ : Function.Injective φ)
+    (s : S) (hs : s ≠ 0) (hcok : ∀ b : B, s • b ∈ φ.range)
+    (htr : ∀ x : A, Algebra.trace S B (φ x) = Algebra.trace S A x)
+    : Function.Surjective φ := by
   classical
   have htf : ∀ b : B, s • b = 0 → b = 0 := by
     intro b hb
@@ -27,22 +29,23 @@ theorem surjective_of_trace_of_smul_mem_range (S A B : Type) [CommRing S] [IsLoc
   let L : A →ₗ[S] B := φ.toLinearMap
   have hL : Function.Injective L := hφ
   let E : A ≃ₗ[S] LinearMap.range L := LinearEquiv.ofInjective L hL
-  let g : B →ₗ[S] LinearMap.range L :=
-    { toFun := fun b => ⟨s • b, by obtain ⟨a, ha⟩ := hcok b; exact ⟨a, ha⟩⟩
-      map_add' := fun x y => by ext; simp [smul_add]
-      map_smul' := fun c x => by ext; simp [smul_comm s c] }
+  let g : B →ₗ[S] LinearMap.range L := {
+    toFun := fun b => ⟨s • b, by obtain ⟨a, ha⟩ := hcok b; exact ⟨a, ha⟩⟩
+    map_add' := fun x y => by ext; simp [smul_add]
+    map_smul' := fun c x => by ext; simp [smul_comm s c]
+  }
   have hg : Function.Injective g := by
     intro x y hxy
     have : s • x = s • y := congrArg Subtype.val hxy
     have h0 : s • (x - y) = 0 := by rw [smul_sub, this, sub_self]
     exact sub_eq_zero.mp (htf _ h0)
-  have h1 : Module.finrank S A ≤ Module.finrank S B :=
-    LinearMap.finrank_le_finrank_of_injective hL
+  have h1 : Module.finrank S A ≤ Module.finrank S B := LinearMap.finrank_le_finrank_of_injective hL
   have h2 : Module.finrank S B ≤ Module.finrank S A :=
     LinearMap.finrank_le_finrank_of_injective (f := E.symm.toLinearMap ∘ₗ g)
       (E.symm.injective.comp hg)
-  have hcard : Fintype.card (Module.Free.ChooseBasisIndex S A) =
-      Fintype.card (Module.Free.ChooseBasisIndex S B) := by
+  have hcard
+      : Fintype.card (Module.Free.ChooseBasisIndex S A)
+        = Fintype.card (Module.Free.ChooseBasisIndex S B) := by
     rw [← Module.finrank_eq_card_chooseBasisIndex, ← Module.finrank_eq_card_chooseBasisIndex]
     omega
   let eι := Fintype.equivOfCardEq hcard

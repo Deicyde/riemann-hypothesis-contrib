@@ -76,24 +76,27 @@ def hc0 : HCParam R0 where
     · exact ⟨91, by simp [hcB, R0]⟩
     · exact ⟨109, by simp [hcB, R0]⟩
 
-theorem exampleWeight_cloud_gap_four (l : ℕ) (h : l + 1 < R0.k - 1) :
-    hc0.v ⟨l, by omega⟩ - hc0.v ⟨l + 1, h⟩ = 4 * 1 := by
+theorem exampleWeight_cloud_gap_four (l : ℕ) (h : l + 1 < R0.k - 1)
+    : hc0.v ⟨l, by omega⟩ - hc0.v ⟨l + 1, h⟩ = 4 * 1 := by
   have h6 : l < 6 := by have := h; simp [R0] at this; omega
   interval_cases l <;> simp [hc0, hcV, R0] <;> norm_num
 
-theorem exampleWeight_middle_entries (l : ℕ) (h : l < R0.k - 2) :
-    hc0.u ⟨l + 1, by omega⟩ = hc0.v ⟨l, by omega⟩ - 1 / 2 := by
+theorem exampleWeight_middle_entries (l : ℕ) (h : l < R0.k - 2)
+    : hc0.u ⟨l + 1, by omega⟩ = hc0.v ⟨l, by omega⟩ - 1 / 2 := by
   have h6 : l < 6 := by simpa [R0] using h
   interval_cases l <;> simp [hc0, hcU, hcV, R0] <;> norm_num
 
 section RowsSec
 
-variable (LL : Type) [Field LL] [NumberField LL] (embLL : LL →+* ℂ) (P : Rows.Places LL)
-  (Tau : Type) [Fintype Tau] (hTau : Fintype.card Tau = R0.f) (Dst : ℝ)
-  (sha : ℕ → ℕ → ℚ) (hsha : ∀ l e, 0 ≤ sha l e) (cg : ℕ) (hcg : 0 < cg)
+variable
+  (LL : Type) [Field LL] [NumberField LL]
+  (embLL : LL →+* ℂ) (P : Rows.Places LL)
+  (Tau : Type) [Fintype Tau]
+  (hTau : Fintype.card Tau = R0.f) (Dst : ℝ)
+  (sha : ℕ → ℕ → ℚ) (hsha : ∀ l e, 0 ≤ sha l e)
+  (cg : ℕ) (hcg : 0 < cg)
 
-def zeroOLat {O : Type} [CommRing O] (φ : O →+* ℂ) : Rows.OLat O φ Z0 :=
-  ⟨∅, Subsingleton.elim _ _⟩
+def zeroOLat {O : Type} [CommRing O] (φ : O →+* ℂ) : Rows.OLat O φ Z0 := ⟨∅, Subsingleton.elim _ _⟩
 
 abbrev toyRowsOfNumberField : Rows.Data R0 where
   LL := LL
@@ -206,7 +209,8 @@ variable (T : ℕ) [hT : Fact T.Prime]
 
 abbrev atTExample (Dst : ℝ) (hD : 0 < Dst) : ColumnsAtT R0 (emptyColumnChain Tau) :=
   haveI : NeZero T := ⟨hT.out.ne_zero⟩
-  { T := T
+  {
+    T := T
     T_prime := hT.out
     vT := Fin 8
     card_vT := Fintype.card_fin 8
@@ -225,13 +229,15 @@ abbrev atTExample (Dst : ℝ) (hD : 0 < Dst) : ColumnsAtT R0 (emptyColumnChain T
     Dstar := Dst
     Dstar_pos := hD
     GamP := 2
-    one_lt_gammaP := one_lt_two }
+    one_lt_gammaP := one_lt_two
+  }
 
 def dstarOf : ℝ := ((T : ℝ) * (2 : ℝ) ^ ((2 : ℝ) / 64)) ^ (64 : ℕ)
 
 theorem dstarOf_pos : 0 < dstarOf T := by
   have : (0 : ℝ) < T := by exact_mod_cast hT.out.pos
-  unfold dstarOf; positivity
+  unfold dstarOf
+  positivity
 
 theorem atTToy_Tstar_eq : (atTExample Tau T (dstarOf T) (dstarOf_pos T)).Tstar = T := by
   have hT0 : (0 : ℝ) ≤ T := by exact_mod_cast hT.out.pos.le
@@ -243,11 +249,11 @@ theorem atTToy_Tstar_eq : (atTExample Tau T (dstarOf T) (dstarOf_pos T)).Tstar =
     ← Real.rpow_add (by norm_num)]
   norm_num
 
-theorem exampleLevel_near_lower :
-    (atTExample Tau T (dstarOf T) (dstarOf_pos T)).Tstar ≤
-        ((atTExample Tau T (dstarOf T) (dstarOf_pos T)).T : ℝ) ∧
-      ((atTExample Tau T (dstarOf T) (dstarOf_pos T)).T : ℝ) ≤
-        (1 + 1 / ((R0.f : ℝ) * R0.k)) * (atTExample Tau T (dstarOf T) (dstarOf_pos T)).Tstar := by
+theorem exampleLevel_near_lower
+    : (atTExample Tau T (dstarOf T) (dstarOf_pos T)).Tstar
+        ≤ ((atTExample Tau T (dstarOf T) (dstarOf_pos T)).T : ℝ)
+      ∧ ((atTExample Tau T (dstarOf T) (dstarOf_pos T)).T : ℝ)
+        ≤ (1 + 1 / ((R0.f : ℝ) * R0.k)) * (atTExample Tau T (dstarOf T) (dstarOf_pos T)).Tstar := by
   rw [atTToy_Tstar_eq]
   have hT0 : (0 : ℝ) ≤ T := by exact_mod_cast hT.out.pos.le
   refine ⟨le_refl _, ?_⟩
@@ -302,10 +308,14 @@ abbrev toyZeroLatticeDatum : DivData K Unit where
   RR := zeroHLat K
   Nu := fun _ => zeroHLat K
   Bk := fun _ => 0
-  h := fun _ => Formalism.HN.htMap (zeroHLat K).b (zeroHLat K).X (zeroHLat K).dualB (zeroHLat K).dualX 0
-  HH := sFrame (fun _ => zeroHLat K)
-      (fun _ => Formalism.HN.htMap (zeroHLat K).b (zeroHLat K).X (zeroHLat K).dualB (zeroHLat K).dualX 0) +
-    (zeroHLat K).muMax
+  h := fun _ =>
+    Formalism.HN.htMap (zeroHLat K).b (zeroHLat K).X (zeroHLat K).dualB (zeroHLat K).dualX 0
+  HH :=
+    sFrame
+        (fun _ => zeroHLat K)
+        (fun _ =>
+          Formalism.HN.htMap (zeroHLat K).b (zeroHLat K).X (zeroHLat K).dualB (zeroHLat K).dualX 0)
+      + (zeroHLat K).muMax
   HH_ge := le_refl _
   etaF := 0
   Dall := 0
@@ -314,14 +324,17 @@ abbrev toyZeroLatticeDatum : DivData K Unit where
 
 def jZero (embLL : K →+* ℂ) : (zeroHLat K).V →ₛₗ[embLL] Z0 := 0
 
-theorem jZero_basis (embLL : K →+* ℂ) :
-    LinearIndependent ℂ (fun i => jZero K embLL ((zeroHLat K).b i)) ∧
-      Submodule.span ℂ (Set.range (fun i => jZero K embLL ((zeroHLat K).b i))) = ⊤ :=
-  ⟨by have : IsEmpty (zeroHLat K).ι := inferInstanceAs (IsEmpty (Fin 0)); exact linearIndependent_empty_type,
-    Subsingleton.elim _ _⟩
+theorem jZero_basis (embLL : K →+* ℂ)
+    : LinearIndependent ℂ (fun i => jZero K embLL ((zeroHLat K).b i))
+      ∧ Submodule.span ℂ (Set.range (fun i => jZero K embLL ((zeroHLat K).b i))) = ⊤ := ⟨
+  by
+    have : IsEmpty (zeroHLat K).ι := inferInstanceAs (IsEmpty (Fin 0))
+    exact linearIndependent_empty_type,
+  Subsingleton.elim _ _
+⟩
 
-theorem zero_isLinear {V : Type} [AddCommGroup V] [Module ℂ V] :
-    IsLinearMap ℂ (fun _ : V => (0 : ℂ)) :=
+theorem zero_isLinear {V : Type} [AddCommGroup V] [Module ℂ V]
+    : IsLinearMap ℂ (fun _ : V => (0 : ℂ)) :=
   ⟨fun _ _ => by simp, fun _ _ => by simp⟩
 
 end Formalism.BasicNotions.Examples₂

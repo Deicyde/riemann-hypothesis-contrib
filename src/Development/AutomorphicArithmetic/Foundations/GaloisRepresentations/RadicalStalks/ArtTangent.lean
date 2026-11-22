@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
+open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.Ord
@@ -339,12 +342,18 @@ end ArtB
 
 end UpperTheory.Gal.Ord
 
-theorem UpperTheory.Gal.Ord.art :
-    ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] [CharP k p] (B : Type) [CommRing B] [IsLocalRing B] [Algebra k B] [Module.Finite k B] (f : ℕ), 0 < f →
-      (∀ u v : B →ₐ[k] DualNumber k, (∃ x, TrivSqZeroExt.snd (u x) ≠ 0) → ∃ l : k, ∀ x, TrivSqZeroExt.snd (v x) = l * TrivSqZeroExt.snd (u x)) →
-      ((p ^ f : ℕ) : ℕ∞) < Module.length B B →
-      ∃ (T : Type) (_ : CommRing T) (_ : Algebra k T) (τ : T →ₐ[k] DualNumber k) (j : DualNumber k →+* T) (u : B →ₐ[k] T),
-        Function.Injective j ∧ (∀ x, j (τ x) = x ^ p ^ f) ∧ ∃ x, TrivSqZeroExt.snd (τ (u x)) ≠ 0 := by
+theorem UpperTheory.Gal.Ord.art
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] [CharP k p] (B : Type)
+        [CommRing B] [IsLocalRing B] [Algebra k B] [Module.Finite k B] (f : ℕ),
+      0 < f
+        → (∀ u v : B →ₐ[k] DualNumber k,
+          (∃ x, TrivSqZeroExt.snd (u x) ≠ 0)
+            → ∃ l : k, ∀ x, TrivSqZeroExt.snd (v x) = l * TrivSqZeroExt.snd (u x))
+        → ((p ^ f : ℕ) : ℕ∞) < Module.length B B
+        → ∃ (T : Type) (_ : CommRing T) (_ : Algebra k T) (τ : T →ₐ[k] DualNumber k)
+            (j : DualNumber k →+* T) (u : B →ₐ[k] T),
+          Function.Injective j ∧ (∀ x, j (τ x) = x ^ p ^ f)
+            ∧ ∃ x, TrivSqZeroExt.snd (τ (u x)) ≠ 0 := by
   intro p _ k _ _ _ B _ _ _ _ f hf H hL
   obtain ⟨π, hπ⟩ := art_res (k := k) (B := B)
   obtain ⟨x, hxm, hx⟩ := art_gen π hπ H

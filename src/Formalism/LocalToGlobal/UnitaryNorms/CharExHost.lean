@@ -23,12 +23,14 @@ def aF (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) : Ideles L :=
 def aFi (w : InfinitePlace F) (k : Fˣ) : Ideles L :=
   ∏ w' ∈ aboveInf (L := L) F w, infIdele L w' (atInf w' (upF F k))
 
-theorem resFin_eq (χ : HChar L) (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) : χ.resFin v k = χ.1 (aF F v k) := by
+theorem resFin_eq (χ : HChar L) (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ)
+    : χ.resFin v k = χ.1 (aF F v k) := by
   unfold HChar.resFin aF
   rw [map_prod, MonoidHom.finsetProd_apply]
   exact Finset.prod_congr rfl fun P _ => rfl
 
-theorem resInf_eq (χ : HChar L) (w : InfinitePlace F) (k : Fˣ) : χ.resInf w k = χ.1 (aFi F w k) := by
+theorem resInf_eq (χ : HChar L) (w : InfinitePlace F) (k : Fˣ)
+    : χ.resInf w k = χ.1 (aFi F w k) := by
   unfold HChar.resInf aFi
   rw [map_prod, MonoidHom.finsetProd_apply]
   exact Finset.prod_congr rfl fun w' _ => rfl

@@ -6,9 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem wcomp_mul_homog (O : Type) [CommRing O] {σ X : Type} [AddCommGroup X] (wt : σ → X)
-    {w : X} {e : MvPowerSeries σ O} (he : e ∈ wtPart O wt w) (G : MvPowerSeries σ O) (j : X) :
-    wcomp O wt j (G * e) = wcomp O wt (j - w) G * e := by
+private theorem wcomp_mul_homog
+    (O : Type) [CommRing O]
+    {σ X : Type} [AddCommGroup X]
+    (wt : σ → X)
+    {w : X} {e : MvPowerSeries σ O} (he : e ∈ wtPart O wt w)
+    (G : MvPowerSeries σ O) (j : X)
+    : wcomp O wt j (G * e) = wcomp O wt (j - w) G * e := by
   classical
   ext n
   rw [coeff_wcomp, coeff_mul, coeff_mul]
@@ -29,15 +33,19 @@ private theorem wcomp_mul_homog (O : Type) [CommRing O] {σ X : Type} [AddCommGr
       rw [← hp', map_add (f := _), h1, h2, sub_add_cancel]
     · rw [he _ h2, mul_zero]
 
-theorem UpperTheory.V.Alg.homog_span :
-    ∀ (O R : Type) [CommRing O] [CommRing R] [Algebra O R] (X : Type) [AddCommGroup X] (W : WPres O X R) (κ : Type) [Finite κ] (g : κ → W.A) (c : κ → X), (∀ i, g i ∈ W.gr (c i)) →
-      IsHomog O W.wt ((Ideal.span (Set.range fun i => (g i : R))).comap W.π) ∧
-      ∀ x : W.A, (x : R) ∈ Ideal.span (Set.range fun i => (g i : R)) ↔ x ∈ Ideal.span (Set.range g) := by
+theorem UpperTheory.V.Alg.homog_span
+    : ∀ (O R : Type) [CommRing O] [CommRing R] [Algebra O R] (X : Type) [AddCommGroup X]
+        (W : WPres O X R) (κ : Type) [Finite κ] (g : κ → W.A) (c : κ → X),
+      (∀ i, g i ∈ W.gr (c i))
+        → IsHomog O W.wt ((Ideal.span (Set.range fun i => (g i : R))).comap W.π)
+          ∧ ∀ x : W.A,
+            (x : R) ∈ Ideal.span (Set.range fun i => (g i : R)) ↔ x ∈ Ideal.span (Set.range g) := by
   intro O R _ _ _ X _ W κ _ g c hg
   classical
   cases nonempty_fintype κ
-  have hback : ∀ x : W.A, x ∈ Ideal.span (Set.range g) →
-      (x : R) ∈ Ideal.span (Set.range fun i => (g i : R)) := by
+  have hback
+      : ∀ x : W.A,
+        x ∈ Ideal.span (Set.range g) → (x : R) ∈ Ideal.span (Set.range fun i => (g i : R)) := by
     intro x hx
     obtain ⟨a, ha⟩ := Ideal.mem_span_range_iff_exists_fun.1 hx
     refine Ideal.mem_span_range_iff_exists_fun.2 ⟨fun i => (a i : R), ?_⟩
@@ -45,8 +53,10 @@ theorem UpperTheory.V.Alg.homog_span :
     simp
   have hg' : ∀ i, ∃ e ∈ wtPart O W.wt (c i), W.π e = (g i : R) := fun i => hg i
   choose e he heg using hg'
-  have key : ∀ f, W.π f ∈ Ideal.span (Set.range fun i => (g i : R)) → ∀ j,
-      ∃ y ∈ Ideal.span (Set.range g), (y : R) = W.π (wcomp O W.wt j f) := by
+  have key
+      : ∀ f,
+        W.π f ∈ Ideal.span (Set.range fun i => (g i : R))
+          → ∀ j, ∃ y ∈ Ideal.span (Set.range g), (y : R) = W.π (wcomp O W.wt j f) := by
     intro f hf j
     obtain ⟨a, ha⟩ := Ideal.mem_span_range_iff_exists_fun.1 hf
     choose G hG using fun i => W.surj (a i)
@@ -59,7 +69,8 @@ theorem UpperTheory.V.Alg.homog_span :
       rw [RingHom.mem_ker, map_sub, map_sub, sub_eq_zero, map_sum, map_sum] at h2
     have hm : ∀ i, W.π (wcomp O W.wt (j - c i) (G i)) ∈ W.A := fun i =>
       W.part_le_A (j := j - c i) ⟨_, wcomp_mem O W.wt _ _, rfl⟩
-    refine ⟨∑ i, ⟨_, hm i⟩ * g i, Ideal.mem_span_range_iff_exists_fun.2 ⟨fun i => ⟨_, hm i⟩, rfl⟩, ?_⟩
+    refine
+      ⟨∑ i, ⟨_, hm i⟩ * g i, Ideal.mem_span_range_iff_exists_fun.2 ⟨fun i => ⟨_, hm i⟩, rfl⟩, ?_⟩
     rw [h2, AddSubmonoidClass.coe_finsetSum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [wcomp_mul_homog O W.wt (he i), map_mul, heg]
@@ -69,10 +80,13 @@ theorem UpperTheory.V.Alg.homog_span :
     rw [Ideal.mem_comap, ← hy']
     exact hback y hy
   · have hx' : (x : R) ∈ ⨆ j, W.part j := x.2
-    have hl : ∃ f, W.π f = (x : R) ∧ ∃ s : Finset X, ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0 := by
+    have hl
+        : ∃ f,
+          W.π f = (x : R) ∧ ∃ s : Finset X, ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0 := by
       refine Submodule.iSup_induction W.part
-        (motive := fun z : R => ∃ f, W.π f = z ∧
-          ∃ s : Finset X, ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0) hx' ?_ ?_ ?_
+        (motive := fun z : R =>
+          ∃ f, W.π f = z ∧ ∃ s : Finset X, ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0)
+        hx' ?_ ?_ ?_
       · rintro i _ ⟨f, hf, rfl⟩
         exact ⟨f, rfl, {i}, fun n hn => hf n (by simpa using hn)⟩
       · exact ⟨0, map_zero _, ∅, fun n _ => map_zero _⟩

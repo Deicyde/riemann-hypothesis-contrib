@@ -10,16 +10,20 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NonemptyIso
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
 open UpperTheory.Gal.Int.Geo
 
 namespace UpperTheory.Gal.Int.Geo.QCompPf
 
-variable {q : ℕ} [Fact q.Prime] {D : Datum q} {R R' : Type} [CommRing R] [CommRing R'] [Algebra ℚ R']
-  {b : Base D R} {gb : GBase D.toG R'} {N N₀ c : ℕ} {X X' X₁ X₂ : Scheme.{0}} {s : X ⟶ Sp R'}
-  {s' : X' ⟶ Sp R'} {s₁ : X₁ ⟶ Sp R} {s₂ : X₂ ⟶ Sp R} {o : GObj gb N s} {o' : GObj gb N s'}
-  {u₁ : Obj b N₀ s₁} {u₂ : Obj b N₀ s₂} {f : X ⟶ X₁} {g : X₁ ⟶ X₂} {e : X' ⟶ X}
+variable
+  {q : ℕ} [Fact q.Prime]
+  {D : Datum q} {R R' : Type} [CommRing R] [CommRing R'] [Algebra ℚ R']
+  {b : Base D R} {gb : GBase D.toG R'} {N N₀ c : ℕ} {X X' X₁ X₂ : Scheme.{0}}
+  {s : X ⟶ Sp R'} {s' : X' ⟶ Sp R'} {s₁ : X₁ ⟶ Sp R} {s₂ : X₂ ⟶ Sp R} {o : GObj gb N s}
+  {o' : GObj gb N s'} {u₁ : Obj b N₀ s₁} {u₂ : Obj b N₀ s₂} {f : X ⟶ X₁} {g : X₁ ⟶ X₂} {e : X' ⟶ X}
 
 private def after (n : QMap o u₁ f c) (m : ObjMap u₁ u₂ g) : QMap o u₂ (f ≫ g) c where
   φ := n.φ ≫ m.φ
@@ -31,8 +35,9 @@ private def after (n : QMap o u₁ f c) (m : ObjMap u₁ u₂ g) : QMap o u₂ (
     have h₂ := m.act x
     simp only [← Category.assoc, h₁]
     simp only [Category.assoc, h₂]
-  pol := (n.pol).trans o.isLB (pull_isLB u₁.isLB _) (pull_isLB u₂.isLB _)
-    (MapComp.lbIso_pull_comp m.pol n.φ₂ rfl)
+  pol :=
+    (n.pol).trans o.isLB (pull_isLB u₁.isLB _) (pull_isLB u₂.isLB _)
+      (MapComp.lbIso_pull_comp m.pol n.φ₂ rfl)
   eta y := by
     have h₁ := n.eta y
     have h₂ := m.eta y
@@ -49,18 +54,18 @@ private def before (m : GObjMap o' o e) (n : QMap o u₁ f c) : QMap o' u₁ (e 
     have h₂ := n.act x
     simp only [← Category.assoc, h₁]
     simp only [Category.assoc, h₂]
-  pol := (m.pol).trans o'.isLB (pull_isLB o.isLB _) (pull_isLB u₁.isLB _)
-    (MapComp.lbIso_pull_comp n.pol m.φ₂ rfl)
+  pol :=
+    (m.pol).trans o'.isLB (pull_isLB o.isLB _) (pull_isLB u₁.isLB _)
+      (MapComp.lbIso_pull_comp n.pol m.φ₂ rfl)
   eta y := by
     have h₁ := m.eta (c • y)
     have h₂ := n.eta y
     simp only [← Category.assoc, h₁]
     simp only [Category.assoc, h₂]
 
-private theorem factor (n' : QMap o u₂ (f ≫ g) c) (m : ObjMap u₁ u₂ g) :
-    ∃ n : QMap o u₁ f c, n'.φ = n.φ ≫ m.φ := by
-  have hw : n'.φ ≫ u₂.A.hom = (o.A.hom ≫ f) ≫ g := by
-    rw [n'.cart.1.w, Category.assoc]
+private theorem factor (n' : QMap o u₂ (f ≫ g) c) (m : ObjMap u₁ u₂ g)
+    : ∃ n : QMap o u₁ f c, n'.φ = n.φ ≫ m.φ := by
+  have hw : n'.φ ≫ u₂.A.hom = (o.A.hom ≫ f) ≫ g := by rw [n'.cart.1.w, Category.assoc]
   let ℓ : o.A.left ⟶ u₁.A.left := m.cart.1.lift n'.φ (o.A.hom ≫ f) hw
   have hℓφ : ℓ ≫ m.φ = n'.φ := m.cart.1.lift_fst _ _ _
   have hℓs : ℓ ≫ u₁.A.hom = o.A.hom ≫ f := m.cart.1.lift_snd _ _ _
@@ -84,8 +89,8 @@ private theorem factor (n' : QMap o u₂ (f ≫ g) c) (m : ObjMap u₁ u₂ g) :
     · rw [Category.assoc, Category.assoc, hℓs, ← Category.assoc, Over.w]
       simp [Over.w]
 
-private theorem bridge [IsIso f] (n : QMap o u₁ f c) (n' : QMap o u₂ (f ≫ g) c) :
-    ∃ m : ObjMap u₁ u₂ g, n'.φ = n.φ ≫ m.φ := by
+private theorem bridge [IsIso f] (n : QMap o u₁ f c) (n' : QMap o u₂ (f ≫ g) c)
+    : ∃ m : ObjMap u₁ u₂ g, n'.φ = n.φ ≫ m.φ := by
   haveI hiso : IsIso n.φ := n.cart.1.isIso_fst_of_isIso
   have hinvw : inv n.φ ≫ o.A.hom = u₁.A.hom ≫ inv f := by
     rw [IsIso.inv_comp_eq, ← Category.assoc, n.cart.1.w, Category.assoc, IsIso.hom_inv_id,
@@ -96,8 +101,7 @@ private theorem bridge [IsIso f] (n : QMap o u₁ f c) (n' : QMap o u₂ (f ≫ 
   have hcart : IsGrpPullback u₁.A u₂.A g (inv n.φ ≫ n'.φ) :=
     IsGrpPullback.congr (IsGrpPullback.comp hinv n'.cart) (by simp) rfl
   obtain ⟨ψ₂, hψ⟩ := MapComp.exists_isSquare (G := o.A) (G' := u₁.A) hinvw
-  have hid : Geo.Tor.IsSquare (𝟙 u₁.A.left) (𝟙 (u₁.A ⊗ u₁.A).left) := by
-    constructor <;> simp
+  have hid : Geo.Tor.IsSquare (𝟙 u₁.A.left) (𝟙 (u₁.A ⊗ u₁.A).left) := by constructor <;> simp
   have hψn : ψ₂ ≫ n.φ₂ = 𝟙 _ := by
     apply MapComp.isSquare_unique (MapComp.isSquare_comp hψ n.sq)
     rw [IsIso.inv_hom_id]
@@ -110,8 +114,7 @@ private theorem bridge [IsIso f] (n : QMap o u₁ f c) (n' : QMap o u₂ (f ≫ 
   · exact LBIso.trans u₁.isLB (pull_isLB u₁.isLB _) (pull_isLB u₂.isLB _)
       (GlobalTheory.SiegLower.lbIso_pull_id u₁.isLB)
       (LBIso.trans (pull_isLB u₁.isLB _) (pull_isLB o.isLB _) (pull_isLB u₂.isLB _)
-        (MapComp.lbIso_pull_comp n.pol ψ₂ hψn.symm).symm
-        (MapComp.lbIso_pull_comp n'.pol ψ₂ rfl))
+        (MapComp.lbIso_pull_comp n.pol ψ₂ hψn.symm).symm (MapComp.lbIso_pull_comp n'.pol ψ₂ rfl))
   · intro y
     have hy : Over.Hom.left (u₁.eta y) = inv f ≫ Over.Hom.left (o.eta (c • y)) ≫ n.φ := by
       rw [n.eta y, IsIso.inv_hom_id_assoc]

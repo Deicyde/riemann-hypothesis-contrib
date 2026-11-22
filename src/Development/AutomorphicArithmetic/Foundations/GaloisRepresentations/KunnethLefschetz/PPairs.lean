@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
-theorem UpperTheory.Gal.KunnethLefschetz.pairs_holds :
-    UpperTheory.Gal.KunnethLefschetz.Pairs := by
+theorem UpperTheory.Gal.KunnethLefschetz.pairs_holds : UpperTheory.Gal.KunnethLefschetz.Pairs := by
   unfold Pairs
   intro k _ d X p hsep hsm
   have hfst : SmoothOfRelativeDimension d (pullback.fst p p) :=
@@ -25,14 +25,16 @@ theorem UpperTheory.Gal.KunnethLefschetz.pairs_holds :
     exact IsClosedImmersion.of_comp y.1 p
   · rw [Nat.zero_add]; exact hsm
   · rw [y.2]; exact hid
-  · have key : ∀ s : PullbackCone (slice y) (pullback.diagonal p),
-        s.fst = s.snd ∧ s.fst ≫ p ≫ y.1 = s.snd := by
+  · have key
+        : ∀ s : PullbackCone (slice y) (pullback.diagonal p),
+          s.fst = s.snd ∧ s.fst ≫ p ≫ y.1 = s.snd := by
       intro s
       have c := s.condition
       have c1 := congrArg (· ≫ pullback.fst p p) c
       have c2 := congrArg (· ≫ pullback.snd p p) c
       simp only [Category.assoc, pullback.lift_fst, pullback.lift_snd, pullback.diagonal_fst,
-        pullback.diagonal_snd, Category.comp_id] at c1 c2
+          pullback.diagonal_snd, Category.comp_id]
+        at c1 c2
       exact ⟨c1, c2⟩
     refine IsPullback.of_isLimit' ⟨?_⟩ (PullbackCone.IsLimit.mk _ (fun s => s.fst ≫ p) ?_ ?_ ?_)
     · have e1 : slice y ≫ pullback.fst p p = 𝟙 X := pullback.lift_fst _ _ _

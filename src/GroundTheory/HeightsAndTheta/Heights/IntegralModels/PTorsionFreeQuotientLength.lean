@@ -16,9 +16,9 @@ namespace TorsionFreeQuotientLength
 
 variable {R : Type*} [CommRing R]
 
-theorem length_pi_quot_smul_top (t : ℕ) (a : R) :
-    Module.length R ((Fin t → R) ⧸ (a • ⊤ : Submodule R (Fin t → R))) =
-      t * Module.length R (R ⧸ Ideal.span {a}) := by
+theorem length_pi_quot_smul_top (t : ℕ) (a : R)
+    : Module.length R ((Fin t → R) ⧸ (a • ⊤ : Submodule R (Fin t → R)))
+      = t * Module.length R (R ⧸ Ideal.span {a}) := by
   let f : (Fin t → R) →ₗ[R] (Fin t → R ⧸ Ideal.span {a}) :=
     LinearMap.pi fun i => (Ideal.span {a}).mkQ ∘ₗ LinearMap.proj i
   have hf : Function.Surjective f := by
@@ -40,14 +40,16 @@ theorem length_pi_quot_smul_top (t : ℕ) (a : R) :
       funext i
       simp only [f, LinearMap.pi_apply, LinearMap.coe_comp, Function.comp_apply, Pi.smul_apply,
         LinearMap.coe_proj, Function.eval, mkQ_apply, Pi.zero_apply]
-      exact Ideal.Quotient.eq_zero_iff_mem.mpr
-        (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self a))
+      exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mul_mem_right _ _
+        (Ideal.mem_span_singleton_self a))
   rw [← hker, (f.quotKerEquivOfSurjective hf).length_eq, Module.length_pi]
   simp
 
-theorem isFiniteLength_of_torsion [IsDomain R] [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
+theorem isFiniteLength_of_torsion
+    [IsDomain R] [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
     (Q : Type*) [AddCommGroup Q] [Module R Q] [Module.Finite R Q]
-    (hQ : ∀ q : Q, ∃ c : R, c ≠ 0 ∧ c • q = 0) : IsFiniteLength R Q := by
+    (hQ : ∀ q : Q, ∃ c : R, c ≠ 0 ∧ c • q = 0)
+    : IsFiniteLength R Q := by
   have htors : Module.IsTorsion R Q := fun q => by
     obtain ⟨c, hc, hcq⟩ := hQ q
     exact ⟨⟨c, mem_nonZeroDivisors_of_ne_zero hc⟩, hcq⟩
@@ -68,12 +70,13 @@ theorem isFiniteLength_of_torsion [IsDomain R] [IsNoetherianRing R] [Ring.KrullD
   exact WithTop.mul_ne_top (ENat.natCast_ne_top _)
     (Module.length_ne_top_iff.mpr (isFiniteLength_quotient_span_singleton R hc2))
 
-theorem length_quot_smul_eq {N F₀ : Type*} [AddCommGroup N] [Module R N]
-    [AddCommGroup F₀] [Module R F₀] (φ : F₀ →ₗ[R] N) (hφ : Function.Injective φ) {a : R}
-    (hreg : Function.Injective fun x : N => a • x)
-    (hfin : IsFiniteLength R (N ⧸ LinearMap.range φ)) :
-    Module.length R (N ⧸ (a • ⊤ : Submodule R N)) =
-      Module.length R (F₀ ⧸ (a • ⊤ : Submodule R F₀)) := by
+theorem length_quot_smul_eq
+    {N F₀ : Type*} [AddCommGroup N] [Module R N] [AddCommGroup F₀] [Module R F₀]
+    (φ : F₀ →ₗ[R] N) (hφ : Function.Injective φ)
+    {a : R} (hreg : Function.Injective fun x : N => a • x)
+    (hfin : IsFiniteLength R (N ⧸ LinearMap.range φ))
+    : Module.length R (N ⧸ (a • ⊤ : Submodule R N))
+      = Module.length R (F₀ ⧸ (a • ⊤ : Submodule R F₀)) := by
   set P := LinearMap.range φ
   have hPa : a • P ≤ a • ⊤ := fun x hx => by
     obtain ⟨p, -, rfl⟩ := (mem_smul_pointwise_iff_exists _ _ _).mp hx
@@ -81,11 +84,11 @@ theorem length_quot_smul_eq {N F₀ : Type*} [AddCommGroup N] [Module R N]
   have hPP : a • P ≤ P := fun x hx => by
     obtain ⟨p, hp, rfl⟩ := (mem_smul_pointwise_iff_exists _ _ _).mp hx
     exact P.smul_mem a hp
-  let f1 : (N ⧸ P) →ₗ[R] (N ⧸ a • P) := P.mapQ (a • P) (a • LinearMap.id)
-    (fun x hx => by simpa using smul_mem_pointwise_smul x a P hx)
+  let f1 : (N ⧸ P) →ₗ[R] (N ⧸ a • P) :=
+    P.mapQ (a • P) (a • LinearMap.id) (fun x hx => by simpa using smul_mem_pointwise_smul x a P hx)
   let g1 : (N ⧸ a • P) →ₗ[R] (N ⧸ (a • ⊤ : Submodule R N)) := Submodule.factor hPa
-  let f2 : (F₀ ⧸ (a • ⊤ : Submodule R F₀)) →ₗ[R] (N ⧸ a • P) := (a • ⊤ : Submodule R F₀).mapQ (a • P) φ
-    (fun x hx => by
+  let f2 : (F₀ ⧸ (a • ⊤ : Submodule R F₀)) →ₗ[R] (N ⧸ a • P) :=
+    (a • ⊤ : Submodule R F₀).mapQ (a • P) φ (fun x hx => by
       obtain ⟨y, -, rfl⟩ := (mem_smul_pointwise_iff_exists _ _ _).mp hx
       simpa using smul_mem_pointwise_smul (φ y) a P (LinearMap.mem_range_self φ y))
   let g2 : (N ⧸ a • P) →ₗ[R] (N ⧸ P) := Submodule.factor hPP
@@ -93,7 +96,8 @@ theorem length_quot_smul_eq {N F₀ : Type*} [AddCommGroup N] [Module R N]
     refine (injective_iff_map_eq_zero _).mpr fun q hq => ?_
     obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ q
     simp only [f1, mapQ_apply, LinearMap.smul_apply, LinearMap.id_apply, Quotient.mk_eq_zero,
-      mem_smul_pointwise_iff_exists] at hq ⊢
+        mem_smul_pointwise_iff_exists]
+      at hq ⊢
     obtain ⟨p, hp, hpx⟩ := hq
     rwa [← hreg hpx]
   have hg1 : Function.Surjective g1 := fun y => by
@@ -172,11 +176,15 @@ theorem TorsionFreeQuotientLength.proof : TorsionFreeQuotientLength.Statement :=
 
   have hLtop : Module.length R ((Fin r → R) ⧸ (a • ⊤ : Submodule R (Fin r → R))) ≠ ⊤ := by
     rw [TorsionFreeQuotientLength.length_pi_quot_smul_top]
-    exact WithTop.mul_ne_top (ENat.natCast_ne_top _) (Module.length_ne_top_iff.mpr
-      (isFiniteLength_quotient_span_singleton R (mem_nonZeroDivisors_of_ne_zero ha)))
+    exact WithTop.mul_ne_top (ENat.natCast_ne_top _)
+      (Module.length_ne_top_iff.mpr (isFiniteLength_quotient_span_singleton R
+        (mem_nonZeroDivisors_of_ne_zero ha)))
   let T : Submodule R M := a • ⊤
-  have hfg : ∀ N : Submodule R M, N.FG → LinearMap.range φ ≤ N →
-      Module.length R (N.map T.mkQ) ≤ Module.length R ((Fin r → R) ⧸ (a • ⊤ : Submodule R (Fin r → R))) := by
+  have hfg
+      : ∀ N : Submodule R M,
+        N.FG → LinearMap.range φ ≤ N
+          → Module.length R (N.map T.mkQ)
+            ≤ Module.length R ((Fin r → R) ⧸ (a • ⊤ : Submodule R (Fin r → R))) := by
     intro N hN hφN
     have : Module.Finite R N := Module.Finite.iff_fg.mpr hN
     let φN : (Fin r → R) →ₗ[R] N := φ.codRestrict N fun y => hφN (LinearMap.mem_range_self φ y)
@@ -200,13 +208,17 @@ theorem TorsionFreeQuotientLength.proof : TorsionFreeQuotientLength.Statement :=
     rw [hmap, ← TorsionFreeQuotientLength.length_quot_smul_eq φN hφN' hreg hfin]
     exact Module.length_le_of_surjective _ (LinearMap.surjective_rangeRestrict _)
 
-  let S : Set ℕ := {n | ∃ N : Submodule R M, N.FG ∧ LinearMap.range φ ≤ N ∧
-    Module.length R (N.map T.mkQ) = n}
-  have hSb : BddAbove S := ⟨(Module.length R ((Fin r → R) ⧸ (a • ⊤ : Submodule R (Fin r → R)))).toNat, by
-    rintro n ⟨N, hN, hφN, hn⟩
-    have := hfg N hN hφN
-    rw [hn] at this
-    simpa using ENat.toNat_le_toNat this hLtop⟩
+  let S : Set ℕ :=
+    {n | ∃ N : Submodule R M, N.FG ∧ LinearMap.range φ ≤ N ∧
+      Module.length R (N.map T.mkQ) = n}
+  have hSb : BddAbove S := ⟨
+    (Module.length R ((Fin r → R) ⧸ (a • ⊤ : Submodule R (Fin r → R)))).toNat,
+    by
+      rintro n ⟨N, hN, hφN, hn⟩
+      have := hfg N hN hφN
+      rw [hn] at this
+      simpa using ENat.toNat_le_toNat this hLtop
+  ⟩
   have hφfg : (LinearMap.range φ).FG := by
     rw [LinearMap.range_eq_map]
     exact Module.Finite.fg_top.map φ
@@ -233,8 +245,9 @@ theorem TorsionFreeQuotientLength.proof : TorsionFreeQuotientLength.Statement :=
       exact ENat.natCast_lt_top _
     rw [hm, ← ENat.natCast_toNat hne] at h2
     exact absurd (ENat.natCast_lt_natCast.mp h2) (not_lt.mpr h1)
-  calc Module.length R (M ⧸ T) = Module.length R (N₀.map T.mkQ) := by
-        rw [htop, Module.length_top]
+  calc
+    Module.length R (M ⧸ T)
+      = Module.length R (N₀.map T.mkQ) := by rw [htop, Module.length_top]
     _ ≤ Module.length R ((Fin r → R) ⧸ (a • ⊤ : Submodule R (Fin r → R))) := hfg N₀ hN₀ hφN₀
 
 end GroundTheory.Heights₂.Heights.Model

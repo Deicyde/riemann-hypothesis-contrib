@@ -11,19 +11,18 @@ namespace GlobalTheory.Mem.ImagQuad
 
 open QuadraticZeta
 
-theorem exists_field_sq_eq_neg (d : ℕ) (hd : 0 < d) :
-    ∃ (K : Type) (_ : Field K) (_ : NumberField K) (r : K),
+theorem exists_field_sq_eq_neg (d : ℕ) (hd : 0 < d)
+    : ∃ (K : Type) (_ : Field K) (_ : NumberField K) (r : K),
       finrank ℚ K = 2 ∧ r ^ 2 = -(d : K) := by
   have hd' : (0 : ℚ) < d := by exact_mod_cast hd
   set p : Polynomial ℚ := Polynomial.X ^ 2 + Polynomial.C (d : ℚ) with hp
-  have hpdeg : p.natDegree = 2 := by
-    rw [hp]; compute_degree!
-  have hpmon : p.Monic := by
-    rw [hp]; monicity!
+  have hpdeg : p.natDegree = 2 := by rw [hp]; compute_degree!
+  have hpmon : p.Monic := by rw [hp]; monicity!
   have hroot : ∀ x : ℚ, ¬ p.IsRoot x := by
     intro x hx
     simp only [hp, Polynomial.IsRoot, Polynomial.eval_add, Polynomial.eval_pow, Polynomial.eval_X,
-      Polynomial.eval_C] at hx
+        Polynomial.eval_C]
+      at hx
     nlinarith [sq_nonneg x]
   have hirr : Irreducible p :=
     Polynomial.irreducible_of_degree_le_three_of_not_isRoot (by rw [hpdeg]; decide) hroot
@@ -35,15 +34,18 @@ theorem exists_field_sq_eq_neg (d : ℕ) (hd : 0 < d) :
   · rw [pb.finrank, AdjoinRoot.powerBasis_dim, hpdeg]
   · have h := AdjoinRoot.eval₂_root p
     simp only [hp, Polynomial.eval₂_add, Polynomial.eval₂_pow, Polynomial.eval₂_X,
-      Polynomial.eval₂_C] at h
+        Polynomial.eval₂_C]
+      at h
     rw [eq_neg_iff_add_eq_zero, ← h]
     simp
 
-theorem exists_imagQuad_integers : ∀ d : ℕ, d.Prime → d % 4 = 3 →
-    ∃ (K : Type) (_ : Field K) (_ : NumberField K) (ω : 𝓞 K), IsTotallyComplex K ∧
-      Module.finrank ℚ K = 2 ∧ discr K = -(d : ℤ) ∧ (2 * ω - 1) ^ 2 = -(d : 𝓞 K) ∧
-      (∀ z : 𝓞 K, ∃ a b : ℤ, z = a + b * ω) ∧
-      ∀ a b : ℤ, Algebra.norm ℤ ((a : 𝓞 K) + b * ω) * 4 = (2 * a + b) ^ 2 + d * b ^ 2 := by
+theorem exists_imagQuad_integers
+    : ∀ d : ℕ,
+      d.Prime → d % 4 = 3
+        → ∃ (K : Type) (_ : Field K) (_ : NumberField K) (ω : 𝓞 K),
+          IsTotallyComplex K ∧ Module.finrank ℚ K = 2 ∧ discr K = -(d : ℤ)
+            ∧ (2 * ω - 1) ^ 2 = -(d : 𝓞 K) ∧ (∀ z : 𝓞 K, ∃ a b : ℤ, z = a + b * ω)
+            ∧ ∀ a b : ℤ, Algebra.norm ℤ ((a : 𝓞 K) + b * ω) * 4 = (2 * a + b) ^ 2 + d * b ^ 2 := by
   intro d hdp hd4
   obtain ⟨K, _, _, r, h2, hr⟩ := exists_field_sq_eq_neg d hdp.pos
   have hsq : Squarefree d := hdp.squarefree
@@ -103,8 +105,7 @@ theorem exists_imagQuad_integers : ∀ d : ℕ, d.Prime → d % 4 = 3 →
   have hB1 : B 1 = w := by simp [B]
   have hrepr : ∀ s t : ℤ, B.repr ((s : 𝓞 K) + t * w) = Finsupp.single 0 s + Finsupp.single 1 t := by
     intro s t
-    have : (s : 𝓞 K) + t * w = s • B 0 + t • B 1 := by
-      rw [hB0, hB1]; simp [zsmul_eq_mul]
+    have : (s : 𝓞 K) + t * w = s • B 0 + t • B 1 := by rw [hB0, hB1]; simp [zsmul_eq_mul]
     rw [this, map_add (f := _), map_zsmul, map_zsmul, B.repr_self, B.repr_self]
     simp
   refine ⟨K, inferInstance, inferInstance, w, ?_, h2, ?_, hw2, hspan, ?_⟩

@@ -12,36 +12,48 @@ open Matrix IsLocalRing UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.HV
 
 section SlopeTestRemainingChoices
 
-variable {O A K : Type} [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
-  [Field K] [Algebra O K]
+variable
+  {O A K : Type} [CommRing O] [CommRing A] [Algebra O A]
+  (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [Field K] [Algebra O K]
 
-private theorem exists_twist (t : Kˣ) (D : A →ₗ[O] K) :
-    ∃ E : A →ₗ[O] K, ∀ j, ∀ a ∈ 𝒜 j, E a = ((t ^ j : Kˣ) : K) * D a := by
+private theorem exists_twist (t : Kˣ) (D : A →ₗ[O] K)
+    : ∃ E : A →ₗ[O] K, ∀ j, ∀ a ∈ 𝒜 j, E a = ((t ^ j : Kˣ) : K) * D a := by
   classical
-  refine ⟨(DirectSum.toModule O ℤ K (fun j => ((t ^ j : Kˣ) : K) • (D ∘ₗ (𝒜 j).subtype))) ∘ₗ
-    (DirectSum.decomposeLinearEquiv 𝒜).toLinearMap, ?_⟩
+  refine ⟨
+    (DirectSum.toModule O ℤ K (fun j => ((t ^ j : Kˣ) : K) • (D ∘ₗ (𝒜 j).subtype)))
+      ∘ₗ (DirectSum.decomposeLinearEquiv 𝒜).toLinearMap,
+    ?_
+  ⟩
   intro j a ha
-  simp only [LinearMap.comp_apply, LinearEquiv.coe_toLinearMap, DirectSum.decomposeLinearEquiv_apply,
-    DirectSum.decompose_of_mem 𝒜 ha]
+  simp only [LinearMap.comp_apply, LinearEquiv.coe_toLinearMap,
+    DirectSum.decomposeLinearEquiv_apply, DirectSum.decompose_of_mem 𝒜 ha]
   rw [← DirectSum.lof_eq_of O, DirectSum.toModule_lof]
   simp [smul_eq_mul]
 
-private theorem act_tz (t : Kˣ) (ξ : A →ₐ[O] K) {j : ℤ} {a : A} (ha : a ∈ 𝒜 j) :
-    act 𝒜 (tz t) ξ a = ((t ^ j : Kˣ) : K) * ξ a := act_of_mem 𝒜 _ ξ ha
+private theorem act_tz (t : Kˣ) (ξ : A →ₐ[O] K) {j : ℤ} {a : A} (ha : a ∈ 𝒜 j)
+    : act 𝒜 (tz t) ξ a = ((t ^ j : Kˣ) : K) * ξ a :=
+  act_of_mem 𝒜 _ ξ ha
 
-private theorem twist_der (t : Kˣ) (ξ : A →ₐ[O] K) (D E : A →ₗ[O] K) (hD : D ∈ PtDer ξ K)
-    (hE : ∀ j, ∀ a ∈ 𝒜 j, E a = ((t ^ j : Kˣ) : K) * D a) : E ∈ PtDer (act 𝒜 (tz t) ξ) K := by
+private theorem twist_der
+    (t : Kˣ) (ξ : A →ₐ[O] K) (D E : A →ₗ[O] K)
+    (hD : D ∈ PtDer ξ K) (hE : ∀ j, ∀ a ∈ 𝒜 j, E a = ((t ^ j : Kˣ) : K) * D a)
+    : E ∈ PtDer (act 𝒜 (tz t) ξ) K := by
   have hD' : ∀ f g : A, D (f * g) = ξ f • D g + ξ g • D f := hD
   show ∀ f g : A, E (f * g) = act 𝒜 (tz t) ξ f • E g + act 𝒜 (tz t) ξ g • E f
   intro f g
-  refine DirectSum.Decomposition.inductionOn 𝒜 (motive := fun f => E (f * g) = act 𝒜 (tz t) ξ f • E g + act 𝒜 (tz t) ξ g • E f) ?_ ?_ ?_ f
+  refine DirectSum.Decomposition.inductionOn 𝒜
+    (motive := fun f => E (f * g) = act 𝒜 (tz t) ξ f • E g + act 𝒜 (tz t) ξ g • E f)
+    ?_ ?_ ?_ f
   · simp
   · intro i a
-    refine DirectSum.Decomposition.inductionOn 𝒜 (motive := fun g => E (a * g) = act 𝒜 (tz t) ξ a • E g + act 𝒜 (tz t) ξ g • E a) ?_ ?_ ?_ g
+    refine DirectSum.Decomposition.inductionOn 𝒜
+      (motive := fun g => E (a * g) = act 𝒜 (tz t) ξ a • E g + act 𝒜 (tz t) ξ g • E a)
+      ?_ ?_ ?_ g
     · simp
     · intro j b
       have hab : (a : A) * b ∈ 𝒜 (i + j) := SetLike.GradedMul.mul_mem a.2 b.2
-      rw [hE _ _ hab, hE _ _ b.2, hE _ _ a.2, act_tz 𝒜 t ξ a.2, act_tz 𝒜 t ξ b.2, hD', _root_.zpow_add, Units.val_mul]
+      rw [hE _ _ hab, hE _ _ b.2, hE _ _ a.2, act_tz 𝒜 t ξ a.2, act_tz 𝒜 t ξ b.2, hD',
+        _root_.zpow_add, Units.val_mul]
       simp only [smul_eq_mul]
       ring
     · intro g g' h h'
@@ -54,21 +66,27 @@ private theorem twist_der (t : Kˣ) (ξ : A →ₐ[O] K) (D E : A →ₗ[O] K) (
     ring
 
 omit [GradedAlgebra 𝒜] in
-private theorem twist_kills {x : A →ₐ[O] O} {r s r' s' m : ℕ} (Q : Eqns 𝒜 x r s r' s' m) (t : Kˣ)
-    (ξ : A →ₐ[O] K) (D E : A →ₗ[O] K) (hξ : OnS Q.ideal ξ) (hE' : E ∈ PtDer ξ K)
-    (hE : ∀ j, ∀ a ∈ 𝒜 j, E a = ((t ^ j : Kˣ) : K) * D a) (hD : ∀ y ∈ Q.ideal, D y = 0) :
-    ∀ y ∈ Q.ideal, E y = 0 := by
+private theorem twist_kills
+    {x : A →ₐ[O] O} {r s r' s' m : ℕ} (Q : Eqns 𝒜 x r s r' s' m)
+    (t : Kˣ) (ξ : A →ₐ[O] K) (D E : A →ₗ[O] K) (hξ : OnS Q.ideal ξ) (hE' : E ∈ PtDer ξ K)
+    (hE : ∀ j, ∀ a ∈ 𝒜 j, E a = ((t ^ j : Kˣ) : K) * D a) (hD : ∀ y ∈ Q.ideal, D y = 0)
+    : ∀ y ∈ Q.ideal, E y = 0 := by
   intro y hy
   have hξ' : ∀ f ∈ Q.ideal, ξ f = 0 := hξ
   have hE'' : ∀ f g : A, E (f * g) = ξ f • E g + ξ g • E f := hE'
-  have hgen : ∀ z ∈ (Set.range Q.F ∪ Set.range Q.G ∪ Set.range Q.E ∪ Set.range Q.E' ∪ Set.range Q.Z), E z = 0 := by
+  have hgen
+      : ∀ z ∈ (Set.range Q.F ∪ Set.range Q.G ∪ Set.range Q.E ∪ Set.range Q.E' ∪ Set.range Q.Z),
+        E z = 0 := by
     intro z hz
     have hzI : z ∈ Q.ideal := Ideal.subset_span hz
     obtain ⟨j, hj⟩ : ∃ j, z ∈ 𝒜 j := by
       rcases hz with (((⟨i, rfl⟩ | ⟨i, rfl⟩) | ⟨i, rfl⟩) | ⟨i, rfl⟩) | ⟨i, rfl⟩
       exacts [⟨_, Q.hF i⟩, ⟨_, Q.hG i⟩, ⟨_, Q.hE i⟩, ⟨_, Q.hE' i⟩, ⟨_, (Q.hZ i).1⟩]
     rw [hE j z hj, hD z hzI, mul_zero]
-  have hy' : y ∈ Submodule.span A (Set.range Q.F ∪ Set.range Q.G ∪ Set.range Q.E ∪ Set.range Q.E' ∪ Set.range Q.Z) := hy
+  have hy'
+      : y ∈ Submodule.span A
+        (Set.range Q.F ∪ Set.range Q.G ∪ Set.range Q.E ∪ Set.range Q.E' ∪ Set.range Q.Z) :=
+    hy
   clear hy
   induction hy' using Submodule.span_induction with
   | mem z hz => exact hgen z hz
@@ -78,27 +96,37 @@ private theorem twist_kills {x : A →ₐ[O] O} {r s r' s' m : ℕ} (Q : Eqns �
     rw [smul_eq_mul, hE'', hb0, hξ' b hb]
     simp
 
-private theorem cob_smul {G C : Type} [Group G] [CommRing C] {m : ℕ} (r : G →* GG (m := m) (R := C)) (a : C)
-    (X : Matrix (Fin m) (Fin m) C) : cob r (a • X) = a • cob r X := by
+private theorem cob_smul
+    {G C : Type} [Group G] [CommRing C]
+    {m : ℕ} (r : G →* GG (m := m) (R := C))
+    (a : C) (X : Matrix (Fin m) (Fin m) C)
+    : cob r (a • X) = a • cob r X := by
   funext g
   simp only [cob, map_smul, Pi.smul_apply, smul_sub]
 
-private theorem zmat_map {G R R' : Type} [Group G] [CommRing R] [CommRing R'] (f : R →+* R')
-    (r : G →* GG (m := 3) (R := R))
-    (c g₁ : G) (a b : Fin 3) : zmat c g₁ ((GG.map f).comp r) a b = f (zmat c g₁ r a b) := by
+private theorem zmat_map
+    {G R R' : Type} [Group G] [CommRing R] [CommRing R']
+    (f : R →+* R') (r : G →* GG (m := 3) (R := R)) (c g₁ : G) (a b : Fin 3)
+    : zmat c g₁ ((GG.map f).comp r) a b = f (zmat c g₁ r a b) := by
   simp [zmat]
 
-private theorem normalised_map {G R R' : Type} [Group G] [CommRing R] [CommRing R'] (f : R →+* R')
-    (r : G →* GG (m := 3) (R := R)) (c g₁ : G) (h : Normalised c g₁ r) :
-    Normalised c g₁ ((GG.map f).comp r) := by
+private theorem normalised_map
+    {G R R' : Type} [Group G] [CommRing R] [CommRing R']
+    (f : R →+* R')
+    (r : G →* GG (m := 3) (R := R)) (c g₁ : G) (h : Normalised c g₁ r)
+    : Normalised c g₁ ((GG.map f).comp r) := by
   refine ⟨?_, ?_, ?_⟩
   · simp [GG.map_mat, h.atc]
   · rw [zmat_map, h.z12, map_zero]
   · rw [zmat_map, h.z21, map_zero]
 
-private theorem isUnit_zeta {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
-    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (r : GLift O η Ψ R)
-    {c g₁ : Γ} (h : Marks η Ψ c g₁) : IsUnit (zeta c g₁ r.hom) := by
+private theorem isUnit_zeta
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
+    (r : GLift O η Ψ R)
+    {c g₁ : Γ} (h : Marks η Ψ c g₁)
+    : IsUnit (zeta c g₁ r.hom) := by
   have hm : Marks η (barChar O Ψ) c g₁ := by
     refine ⟨h.csq, h.ηc, by simp [barChar, h.Ψc], h.ηg, ?_⟩
     have := h.Ψg.map (residue O)
@@ -114,11 +142,14 @@ private theorem isUnit_zeta {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} 
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.U3.gradedModel_derivationCondition_of_ptHyp :
-    ∀ {l : ℕ} [Fact l.Prime] {c : Coef l} {Γ H : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
-      {η : Γ →* ℤˣ} {Ψ : Γ →* (c.O)ˣ} {N : Set Γ} {ι : H →* Γ} {hι : Continuous ι}
-      {U : Univ (GCond.noCondition c.O (η.comp ι) (Ψ.comp ι))} {I : Ideal U.R} {cc g₁ : Γ} (S : SRing N hι U I cc g₁) (M : Model S (PadicAlgCl l)), l ≠ 2 → Marks η Ψ cc g₁ →
-      M2 M.𝒜 M.Q.ideal → PtHyp η S.r.hom M.x₀ → M4 M.𝒜 (PadicAlgCl l) M.Q.ideal := by
+theorem UpperTheory.V.U3.gradedModel_derivationCondition_of_ptHyp
+    : ∀ {l : ℕ} [Fact l.Prime] {c : Coef l} {Γ H : Type} [Group Γ] [TopologicalSpace Γ]
+        [IsTopologicalGroup Γ] [Group H] [TopologicalSpace H] [IsTopologicalGroup H] {η : Γ →* ℤˣ}
+        {Ψ : Γ →* (c.O)ˣ} {N : Set Γ} {ι : H →* Γ} {hι : Continuous ι}
+        {U : Univ (GCond.noCondition c.O (η.comp ι) (Ψ.comp ι))} {I : Ideal U.R} {cc g₁ : Γ}
+        (S : SRing N hι U I cc g₁) (M : Model S (PadicAlgCl l)),
+      l ≠ 2 → Marks η Ψ cc g₁ → M2 M.𝒜 M.Q.ideal → PtHyp η S.r.hom M.x₀
+        → M4 M.𝒜 (PadicAlgCl l) M.Q.ideal := by
   intro l _ c Γ H _ _ _ _ _ _ η Ψ N ι hι U I cc g₁ S M hl hm hM2 hpt
   intro ξ hξ hsign D hD D' hD' hDI hD'I
   obtain ⟨t, f, hf, hact⟩ := M.pts hM2 ξ hξ
@@ -133,7 +164,8 @@ theorem UpperTheory.V.U3.gradedModel_derivationCondition_of_ptHyp :
       exact hy
     simp [this]
   have hEI : ∀ y ∈ M.Q.ideal, E y = 0 := twist_kills M.𝒜 M.Q t (f.comp M.q) D E hon hEd hE hDI
-  have hE'I : ∀ y ∈ M.Q.ideal, E' y = 0 := twist_kills M.𝒜 M.Q t (f.comp M.q) D' E' hon hE'd hE' hD'I
+  have hE'I : ∀ y ∈ M.Q.ideal, E' y = 0 :=
+    twist_kills M.𝒜 M.Q t (f.comp M.q) D' E' hon hE'd hE' hD'I
   obtain ⟨F, hF, hFE⟩ := M.der hM2 f hf E hEd hEI
   obtain ⟨F', hF', hFE'⟩ := M.der hM2 f hf E' hE'd hE'I
   have htne : ∀ j : ℤ, ((t ^ j : (PadicAlgCl l)ˣ) : PadicAlgCl l) ≠ 0 := fun j => Units.ne_zero _
@@ -182,7 +214,8 @@ theorem UpperTheory.V.U3.gradedModel_derivationCondition_of_ptHyp :
     simp [push, GG.map, SemidirectProduct.map_right, hright, hm.ηc]
   have hg : (push f S.r.hom g₁).right = 1 := by
     simp [push, GG.map, SemidirectProduct.map_right, hright, hm.ηg]
-  have hPN : Normalised cc g₁ (push f S.r.hom) := normalised_map (f : S.R →+* PadicAlgCl l) S.r.hom cc g₁ hN
+  have hPN : Normalised cc g₁ (push f S.r.hom) :=
+    normalised_map (f : S.R →+* PadicAlgCl l) S.r.hom cc g₁ hN
   have hz : IsUnit (zeta cc g₁ (push f S.r.hom)) := by
     have := (isUnit_zeta S.r hm).map (f : S.R →+* PadicAlgCl l)
     simpa [zeta, push, zmat_map] using this
@@ -199,8 +232,9 @@ theorem UpperTheory.V.U3.gradedModel_derivationCondition_of_ptHyp :
     exact (normCoc_cob_iff _ cc g₁ X' h2 hc hg hPN hz).1 this
   obtain ⟨x, rfl⟩ := Submodule.mem_span_singleton.1 hXm
   obtain ⟨x', rfl⟩ := Submodule.mem_span_singleton.1 hX'm
-  obtain ⟨a, a', hne, hrel⟩ : ∃ a a' : PadicAlgCl l, (a ≠ 0 ∨ a' ≠ 0) ∧
-      a • tanCoc F S.r.hom + a' • tanCoc F' S.r.hom = 0 := by
+  obtain ⟨a, a', hne, hrel⟩
+      : ∃ a a' : PadicAlgCl l,
+        (a ≠ 0 ∨ a' ≠ 0) ∧ a • tanCoc F S.r.hom + a' • tanCoc F' S.r.hom = 0 := by
     rw [hX, hX', cob_smul, cob_smul]
     by_cases hx' : x' = 0
     · refine ⟨0, 1, Or.inr one_ne_zero, ?_⟩
@@ -220,7 +254,8 @@ theorem UpperTheory.V.U3.gradedModel_derivationCondition_of_ptHyp :
   apply LinearMap.ext
   intro y
   simp only [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.zero_apply, smul_eq_mul]
-  refine DirectSum.Decomposition.inductionOn M.𝒜 (motive := fun y => a * D y + a' * D' y = 0) ?_ ?_ ?_ y
+  refine
+    DirectSum.Decomposition.inductionOn M.𝒜 (motive := fun y => a * D y + a' * D' y = 0) ?_ ?_ ?_ y
   · simp
   · intro j z
     have h := hEE z

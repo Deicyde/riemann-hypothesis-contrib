@@ -14,8 +14,8 @@ def OsRingOfIntegers (D : D7) : Prop :=
   ∃ (K : Type) (_ : Field K) (_ : NumberField K), Nonempty (𝓞 K ≃+* D.what₂.O)
 
 def OsConcrete (D : D7) : Prop :=
-  Function.Injective D.what₂.OtoLL ∧ ∃ K : IntermediateField ℚ D.what₂.LL,
-    Set.range D.what₂.OtoLL = {x | x ∈ K ∧ IsIntegral ℤ x}
+  Function.Injective D.what₂.OtoLL
+    ∧ ∃ K : IntermediateField ℚ D.what₂.LL, Set.range D.what₂.OtoLL = {x | x ∈ K ∧ IsIntegral ℤ x}
 
 theorem OsRingOfIntegers_of_concrete (D : D7) (h : OsConcrete D) : OsRingOfIntegers D := by
   obtain ⟨hinj, K, hK⟩ := h
@@ -32,25 +32,36 @@ theorem OsRingOfIntegers_of_concrete (D : D7) (h : OsConcrete D) : OsRingOfInteg
     · rintro ⟨a, rfl⟩
       have hy : g a ∈ Set.range D.what₂.OtoLL := by
         rw [hK, Set.mem_setOf_eq]
-        exact ⟨(algebraMap (𝓞 K) K a).2,
+        exact ⟨
+          (algebraMap (𝓞 K) K a).2,
           IsIntegral.algebraMap (R := ℤ) (A := K) (B := D.what₂.LL)
-            ((IsIntegralClosure.isIntegral_iff (A := 𝓞 K) (R := ℤ) (B := K)).mpr ⟨a, rfl⟩)⟩
+            ((IsIntegralClosure.isIntegral_iff (A := 𝓞 K) (R := ℤ) (B := K)).mpr ⟨a, rfl⟩)
+        ⟩
       exact hy
     · rintro ⟨x, rfl⟩
       have hx : D.what₂.OtoLL x ∈ Set.range D.what₂.OtoLL := ⟨x, rfl⟩
       rw [hK, Set.mem_setOf_eq] at hx
       obtain ⟨hxK, hxI⟩ := hx
-      have hz : IsIntegral ℤ (⟨D.what₂.OtoLL x, hxK⟩ : K) :=
-        (isIntegral_algebraMap_iff ).mp hxI
+      have hz : IsIntegral ℤ (⟨D.what₂.OtoLL x, hxK⟩ : K) := (isIntegral_algebraMap_iff).mp hxI
       obtain ⟨a, ha⟩ := (IsIntegralClosure.isIntegral_iff (A := 𝓞 K) (R := ℤ) (B := K)).mp hz
       refine ⟨a, ?_⟩
       show algebraMap K D.what₂.LL (algebraMap (𝓞 K) K a) = _
       rw [ha]
       rfl
-  exact ⟨K, inferInstance, inferInstance, ⟨(RingEquiv.ofBijective g.rangeRestrict
-    ⟨fun a b hab => hg (by have h := congrArg Subtype.val hab; exact h), g.rangeRestrict_surjective⟩).trans
-    ((RingEquiv.subringCongr hrange).trans (RingEquiv.ofBijective D.what₂.OtoLL.rangeRestrict
-      ⟨fun a b hab => hinj (by have h := congrArg Subtype.val hab; exact h), D.what₂.OtoLL.rangeRestrict_surjective⟩).symm)⟩⟩
+  exact ⟨
+    K,
+    inferInstance,
+    inferInstance,
+    ⟨(RingEquiv.ofBijective g.rangeRestrict ⟨
+        fun a b hab => hg (by have h := congrArg Subtype.val hab; exact h),
+        g.rangeRestrict_surjective
+      ⟩).trans
+      ((RingEquiv.subringCongr hrange).trans
+        (RingEquiv.ofBijective D.what₂.OtoLL.rangeRestrict ⟨
+          fun a b hab => hinj (by have h := congrArg Subtype.val hab; exact h),
+          D.what₂.OtoLL.rangeRestrict_surjective
+        ⟩).symm)⟩
+  ⟩
 
 end Formalism.MainNotions.DIV.Inh
 

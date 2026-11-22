@@ -8,11 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Admissi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 
 namespace GlobalTheory.HTW
 
-theorem admissibleParameters_of_large_scale : ∀ eps A : ℝ, 0 < eps → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L), L.sc.eps = eps → P.CLw ≤ A → x0 ≤ L.sc.x → AdmissibleParameterJ.AdmPar L ∧ EmbeddingTypeJumps.ParametersPolynomiallyBounded L := by
+theorem admissibleParameters_of_large_scale
+    : ∀ eps A : ℝ,
+      0 < eps
+        → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L),
+          L.sc.eps = eps → P.CLw ≤ A → x0 ≤ L.sc.x
+            → AdmissibleParameterJ.AdmPar L
+              ∧ EmbeddingTypeJumps.ParametersPolynomiallyBounded L := by
   intro eps A heps
   obtain ⟨x0, hx0⟩ := admissible_params_large eps A heps
   refine ⟨x0, fun D L P h1 h2 h3 => ?_⟩

@@ -9,8 +9,10 @@ open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.Unita
 
 namespace GlobalTheory.UnitaryBC
 
-private theorem polyConj_coord_pInf {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (τ : E →+* ℂ) (x : E) :
-    coord τ (pInf E (algebraMap E (Ad E) x)) = τ x := by
+private theorem polyConj_coord_pInf
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (τ : E →+* ℂ) (x : E)
+    : coord τ (pInf E (algebraMap E (Ad E) x)) = τ x := by
   have h : ∀ w : InfinitePlace E, pInf E (algebraMap E (Ad E) x) w = w.embedding x := fun w => by
     first | exact pInf_algebraMap _ _ | exact pInf_algebraMap _ _ _ | simp [pInf_algebraMap]
   unfold coord
@@ -20,9 +22,12 @@ private theorem polyConj_coord_pInf {E : Type} [Field E] [NumberField E] [_root_
     · exact absurd h' hτ
     · simp [h, h']
 
-theorem exists_cEmb_entry_eq {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} {γ : UA E n}
-    (hγ : γ ∈ ratU E n) {k : UA E n} (hk : cInf k = cInf γ) (i j : Fin n) :
-    ∃ x : E, ∀ τ : E →+* ℂ, (cEmb τ k).val i j = τ x := by
+theorem exists_cEmb_entry_eq
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n : ℕ} {γ : UA E n} (hγ : γ ∈ ratU E n)
+    {k : UA E n} (hk : cInf k = cInf γ)
+    (i j : Fin n)
+    : ∃ x : E, ∀ τ : E →+* ℂ, (cEmb τ k).val i j = τ x := by
   obtain ⟨γ₀, h₀⟩ := Subgroup.mem_subgroupOf.1 hγ
   refine ⟨γ₀.val i j, fun τ => ?_⟩
   have h1 : (cEmb τ k).val i j = coord τ ((cInf k).val i j) := rfl
@@ -30,7 +35,16 @@ theorem exists_cEmb_entry_eq {E : Type} [Field E] [NumberField E] [IsCMField E] 
   rw [h1, hk, h2, ← h₀]
   exact polyConj_coord_pInf τ _
 
-theorem exists_conj_polyFun : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (σ : ℂ ≃+* ℂ), ∀ p ∈ Algebra.adjoin ℂ {f : infU E n → ℂ | ∃ (τ : E →+* ℂ) (i j : Fin n), f = fun x => (cEmb τ x.1).val i j}, ∃ p' ∈ Algebra.adjoin ℂ {f : infU E n → ℂ | ∃ (τ : E →+* ℂ) (i j : Fin n), f = fun x => (cEmb τ x.1).val i j}, ∀ γ ∈ ratU E n, ∀ k : infU E n, cInf k.1 = cInf γ → p' k = σ (p k) := by
+theorem exists_conj_polyFun
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (σ : ℂ ≃+* ℂ),
+      ∀ p
+          ∈ Algebra.adjoin ℂ
+            {f : infU E n → ℂ | ∃ (τ : E →+* ℂ) (i j : Fin n), f = fun x => (cEmb τ x.1).val i j},
+        ∃ p'
+            ∈ Algebra.adjoin ℂ
+              {f : infU E n → ℂ | ∃ (τ : E →+* ℂ) (i j : Fin n), f = fun x => (cEmb τ x.1).val i j},
+          ∀ γ ∈ ratU E n, ∀ k : infU E n,
+            cInf k.1 = cInf γ → p' k = σ (p k) := by
   intro E _ _ _ n σ p hp
   induction hp using Algebra.adjoin_induction with
   | mem f hf =>
@@ -39,7 +53,8 @@ theorem exists_conj_polyFun : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
     obtain ⟨x, hx⟩ := exists_cEmb_entry_eq hγ hk i j
     simp only [hx]
     rfl
-  | algebraMap c => exact ⟨_, Subalgebra.algebraMap_mem _ (σ c), fun _ _ _ _ => rfl⟩
+  | algebraMap c =>
+    exact ⟨_, Subalgebra.algebraMap_mem _ (σ c), fun _ _ _ _ => rfl⟩
   | add f g _ _ hf hg =>
     obtain ⟨f', hf', hf⟩ := hf
     obtain ⟨g', hg', hg⟩ := hg

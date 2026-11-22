@@ -22,8 +22,8 @@ section Units
 
 variable {Y Z W : Scheme.{0}}
 
-theorem appTop_eq_of_gm (τ₁ τ₂ : Z ⟶ Y) (c₁ c₂ : Γ(Y, ⊤)ˣ) (h : ∀ z, gm τ₁ z ⊤ c₁ = gm τ₂ z ⊤ c₂) :
-    τ₁.appTop.hom c₁.val = τ₂.appTop.hom c₂.val := by
+theorem appTop_eq_of_gm (τ₁ τ₂ : Z ⟶ Y) (c₁ c₂ : Γ(Y, ⊤)ˣ) (h : ∀ z, gm τ₁ z ⊤ c₁ = gm τ₂ z ⊤ c₂)
+    : τ₁.appTop.hom c₁.val = τ₂.appTop.hom c₂.val := by
   apply TopCat.Presheaf.section_ext Z.sheaf ⊤
   intro z hz
   have h1 := congrArg Units.val (h z)
@@ -34,8 +34,9 @@ theorem appTop_eq_of_gm (τ₁ τ₂ : Z ⟶ Y) (c₁ c₂ : Γ(Y, ⊤)ˣ) (h : 
   simp only [MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe] at h1
   exact h1
 
-theorem gm_comp_top (r : W ⟶ Z) (τ : Z ⟶ Y) (w : W) (c : Γ(Y, ⊤)ˣ) (c' : Γ(Z, ⊤)ˣ)
-    (h : τ.appTop.hom c.val = c'.val) : gm (r ≫ τ) w ⊤ c = gm r w ⊤ c' := by
+theorem gm_comp_top
+    (r : W ⟶ Z) (τ : Z ⟶ Y) (w : W) (c : Γ(Y, ⊤)ˣ) (c' : Γ(Z, ⊤)ˣ) (h : τ.appTop.hom c.val = c'.val)
+    : gm (r ≫ τ) w ⊤ c = gm r w ⊤ c' := by
   apply Units.ext
   unfold gm pullU
   have m1 : (r ≫ τ) w ∈ (⊤ : Y.Opens) := trivial
@@ -46,10 +47,13 @@ theorem gm_comp_top (r : W ⟶ Z) (τ : Z ⟶ Y) (w : W) (c : Γ(Y, ⊤)ˣ) (c' 
   rw [← h]
   rfl
 
-theorem exists_ratio {X : Scheme.{0}} {L : LB X} (hL : L.IsLB) {K : Type} [Fintype K] {φ φ' : K → (Y ⟶ X)}
-    {ε : K → ℤ} (hφ : φ = φ') (t : LB.Gen (LB.LinComb L φ ε)) (t' : LB.Gen (LB.LinComb L φ' ε)) (ht : t.IsGen)
-    (ht' : t'.IsGen) : ∃ ρ : Γ(Y, ⊤)ˣ, ∀ (Z : Scheme.{0}) (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι), Good L z J →
-      val t r z J = gm r z ⊤ ρ * val t' r z J := by
+theorem exists_ratio
+    {X : Scheme.{0}} {L : LB X} (hL : L.IsLB)
+    {K : Type} [Fintype K]
+    {φ φ' : K → (Y ⟶ X)} {ε : K → ℤ} (hφ : φ = φ') (t : LB.Gen (LB.LinComb L φ ε))
+    (t' : LB.Gen (LB.LinComb L φ' ε)) (ht : t.IsGen) (ht' : t'.IsGen)
+    : ∃ ρ : Γ(Y, ⊤)ˣ, ∀ (Z : Scheme.{0}) (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι),
+      Good L z J → val t r z J = gm r z ⊤ ρ * val t' r z J := by
   subst hφ
   obtain ⟨ρ, hρ⟩ := TLinPf.ratio_glue _ (TLinPf.linComb_cover L hL φ ε) t t' ht ht'
   refine ⟨ρ, fun Z r z J hJ => ?_⟩
@@ -69,15 +73,21 @@ theorem exists_ratio {X : Scheme.{0}} {L : LB X} (hL : L.IsLB) {K : Type} [Finty
   erw [← Scheme.Hom.germ_stalkMap_apply, ← Scheme.Hom.germ_stalkMap_apply]
   erw [TopCat.Presheaf.germ_res_apply]
 
-theorem val_charGen {S : Scheme.{0}} (X : Type) [AddCommGroup X] (G : Over S) {L : LB Y} (χ : X)
-    (w : W ⟶ (splitTorus S X ⊗ G).left) (z : W) (J : (W ⟶ Y) → L.ι) :
-    val (charGen X G L χ) w z J = gm (w ≫ (fst (splitTorus S X) G).left) z ⊤ (charUnit S X χ) := by
+theorem val_charGen
+    {S : Scheme.{0}}
+    (X : Type) [AddCommGroup X]
+    (G : Over S)
+    {L : LB Y}
+    (χ : X) (w : W ⟶ (splitTorus S X ⊗ G).left) (z : W) (J : (W ⟶ Y) → L.ι)
+    : val (charGen X G L χ) w z J
+      = gm (w ≫ (fst (splitTorus S X) G).left) z ⊤ (charUnit S X χ) := by
   unfold val gm charGen res pullU
   have hm : w z ∈ L.wchart PEmpty.elim (fun k => J (w ≫ k.elim)) := by
     unfold LB.wchart
     simp
-  rw [dite_eq_left hm, dite_eq_left (show (w ≫ (fst (splitTorus S X) G).left) z ∈
-    (⊤ : (splitTorus S X).left.Opens) from trivial)]
+  rw [dite_eq_left hm,
+    dite_eq_left
+      (show (w ≫ (fst (splitTorus S X) G).left) z ∈ (⊤ : (splitTorus S X).left.Opens) from trivial)]
   apply Units.ext
   simp only [MonoidHom.coe_comp, Function.comp_apply, Units.coe_map, MonoidHom.coe_coe,
     Scheme.Hom.comp_app, CommRingCat.comp_apply]
@@ -94,14 +104,19 @@ end Units
 
 section Weight
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegPre R} {e : ℕ}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (g : GtCoord I D e G)
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegPre R} {e : ℕ} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
+  (g : GtCoord I D e G)
 
-theorem val_t_act (χ : D.X) {W : Scheme.{0}} (w : W ⟶ (WeightPf.Te D I e ⊗ thickObj R I e G).left) (z : W)
-    {J : (W ⟶ D.P.A.left) → D.P.L.ι} (hJ : Good D.P.L z J) :
-    val (g.t χ) (w ≫ (WeightPf.act g).left) z J =
-      gm (w ≫ (fst (WeightPf.Te D I e) (thickObj R I e G)).left) z ⊤ (charUnit _ D.X χ) *
-        val (g.t χ) (w ≫ (snd (WeightPf.Te D I e) (thickObj R I e G)).left) z J := by
+theorem val_t_act
+    (χ : D.X)
+    {W : Scheme.{0}} (w : W ⟶ (WeightPf.Te D I e ⊗ thickObj R I e G).left) (z : W)
+    {J : (W ⟶ D.P.A.left) → D.P.L.ι} (hJ : Good D.P.L z J)
+    : val (g.t χ) (w ≫ (WeightPf.act g).left) z J
+      = gm (w ≫ (fst (WeightPf.Te D I e) (thickObj R I e G)).left) z ⊤ (charUnit _ D.X χ)
+        * val (g.t χ) (w ≫ (snd (WeightPf.Te D I e) (thickObj R I e G)).left) z J := by
   have hc := val_corr hJ (g.t_weight χ) w
   rw [val_pull, val_mul, val_pull, val_charGen] at hc
   · exact hc

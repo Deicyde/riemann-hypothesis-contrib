@@ -5,14 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SqRepTopV
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.Branching
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.Branching
 open UpperTheory.Gal.Gen (IsLevel fixedBy)
 open UpperTheory.Gal.Wt
 
-theorem UpperTheory.Gal.Wt.topUp_of :
-    UpperTheory.Gal.Wt.TopUp := by
+theorem UpperTheory.Gal.Wt.topUp_of : UpperTheory.Gal.Wt.TopUp := by
   intro a κ b hb
   have hbt : (b : Matrix (Fin a) (Fin a) ℂ).BlockTriangular id := fun i j h => hb i j h
   have hdiag : ∀ i, (b : Matrix (Fin a) (Fin a) ℂ) i i ≠ 0 := by
@@ -24,10 +26,13 @@ theorem UpperTheory.Gal.Wt.topUp_of :
   set D := diagGL ℂ a t with hD
   set u := D⁻¹ * b with hu
   have hbu : b = D * u := by rw [hu, mul_inv_cancel_left]
-  have hDinv : ((D⁻¹ : GL (Fin a) ℂ) : Matrix (Fin a) (Fin a) ℂ) =
-      Matrix.diagonal fun i => (((t i)⁻¹ : ℂˣ) : ℂ) := rfl
-  have hucoe : (u : Matrix (Fin a) (Fin a) ℂ) =
-      Matrix.diagonal (fun i => (((t i)⁻¹ : ℂˣ) : ℂ)) * (b : Matrix (Fin a) (Fin a) ℂ) := by
+  have hDinv
+      : ((D⁻¹ : GL (Fin a) ℂ) : Matrix (Fin a) (Fin a) ℂ)
+        = Matrix.diagonal fun i => (((t i)⁻¹ : ℂˣ) : ℂ) :=
+    rfl
+  have hucoe
+      : (u : Matrix (Fin a) (Fin a) ℂ)
+        = Matrix.diagonal (fun i => (((t i)⁻¹ : ℂˣ) : ℂ)) * (b : Matrix (Fin a) (Fin a) ℂ) := by
     rw [hu, Units.val_mul, hDinv]
   have hut : (u : Matrix (Fin a) (Fin a) ℂ).BlockTriangular id := by
     rw [hucoe]
@@ -47,6 +52,7 @@ theorem UpperTheory.Gal.Wt.topUp_of :
       simp only [Units.val_zpow_eq_zpow_val, chi, t, Units.val_mk0]
     rw [hc] at h
     exact h
-  calc (sqRep ℂ a κ b) (top κ) = (sqRep ℂ a κ D) ((sqRep ℂ a κ u) (top κ)) := by
-        rw [hbu, map_mul, Module.End.mul_apply]
+  calc
+    (sqRep ℂ a κ b) (top κ)
+      = (sqRep ℂ a κ D) ((sqRep ℂ a κ u) (top κ)) := by rw [hbu, map_mul, Module.End.mul_apply]
     _ = chi κ b • top κ := by rw [hfix, hscal]

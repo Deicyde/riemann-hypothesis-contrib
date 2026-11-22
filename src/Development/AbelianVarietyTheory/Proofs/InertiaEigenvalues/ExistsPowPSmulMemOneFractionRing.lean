@@ -5,15 +5,18 @@ public import ReciprocityTheory.ReductiveGroups.TraceFormulas.LatDefs
 
 @[expose] public section
 
-open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2
+open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC
+  ReciprocityTheory.ChartRestriction.T2
 open Formalism.NG (KO)
 
 namespace GlobalTheory
 
-theorem padicCoeff_exists_pow_smul_mem_one :
-    ∀ {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O],
-    PadicCoeff p O → ∀ y : FractionRing O,
-    ∃ n, y ∈ (1 : Submodule O (FractionRing O)).comap (LinearMap.lsmul O _ ((p : O) ^ n)) := by
+theorem padicCoeff_exists_pow_smul_mem_one
+    : ∀ {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [TopologicalSpace O],
+      PadicCoeff p O
+        → ∀ y : FractionRing O, ∃ n,
+          y ∈ (1 : Submodule O (FractionRing O)).comap (LinearMap.lsmul O _ ((p : O) ^ n)) := by
   intro p O _ _ _ _ hP y
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hdvd : ϖ ∣ (p : O) := by

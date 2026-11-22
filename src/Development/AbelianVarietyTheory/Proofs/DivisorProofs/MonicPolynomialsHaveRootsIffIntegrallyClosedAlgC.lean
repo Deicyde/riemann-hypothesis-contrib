@@ -10,9 +10,10 @@ open GlobalTheory.EtC
 namespace GlobalTheory.AICIff
 open Polynomial
 
-theorem root_mem_range {D K : Type} [CommRing D] [Nontrivial D] [CommRing K] [IsDomain K] [Algebra D K]
-    (h : AIC D) : ∀ (n : ℕ) (p : D[X]), p.Monic → p.natDegree = n →
-      ∀ x : K, aeval x p = 0 → ∃ y : D, algebraMap D K y = x := by
+theorem root_mem_range
+    {D K : Type} [CommRing D] [Nontrivial D] [CommRing K] [IsDomain K] [Algebra D K] (h : AIC D)
+    : ∀ (n : ℕ) (p : D[X]),
+      p.Monic → p.natDegree = n → ∀ x : K, aeval x p = 0 → ∃ y : D, algebraMap D K y = x := by
   intro n
   induction n with
   | zero =>
@@ -35,8 +36,9 @@ theorem root_mem_range {D K : Type} [CommRing D] [Nontrivial D] [CommRing K] [Is
       exact (sub_eq_zero.1 h0).symm
     · exact ih _ hq hqn x h0
 
-theorem aic_iff : ∀ (D : Type) [CommRing D] [IsDomain D],
-    AIC D ↔ (IsIntegrallyClosed D ∧ IsAlgClosed (FractionRing D)) := by
+theorem aic_iff
+    : ∀ (D : Type) [CommRing D] [IsDomain D],
+      AIC D ↔ (IsIntegrallyClosed D ∧ IsAlgClosed (FractionRing D)) := by
   intro D _ _
   constructor
   · intro h
@@ -53,28 +55,32 @@ theorem aic_iff : ∀ (D : Type) [CommRing D] [IsDomain D],
       set g := IsLocalization.integerNormalization (nonZeroDivisors D) f with hg
       have hc : algebraMap D (FractionRing D) b ≠ 0 :=
         IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb0
-      have hgmap : g.map (algebraMap D (FractionRing D)) = C (algebraMap D (FractionRing D) b) * f := by
+      have hgmap
+          : g.map (algebraMap D (FractionRing D)) = C (algebraMap D (FractionRing D) b) * f := by
         rw [hb, Algebra.smul_def]; rfl
       have hgdeg : g.natDegree = f.natDegree := by
         rw [← natDegree_map_eq_of_injective hinj g, hgmap, natDegree_C_mul hc]
-      have hg0 : g ≠ 0 := by
-        intro h0; rw [h0, natDegree_zero] at hgdeg; omega
-      obtain ⟨a, ha⟩ := h (integralNormalization g) (monic_integralNormalization hg0)
-        (by rw [natDegree_integralNormalization]; omega)
+      have hg0 : g ≠ 0 := by intro h0; rw [h0, natDegree_zero] at hgdeg; omega
+      obtain ⟨a, ha⟩ :=
+        h (integralNormalization g) (monic_integralNormalization hg0)
+          (by rw [natDegree_integralNormalization]; omega)
       have hl : algebraMap D (FractionRing D) g.leadingCoeff ≠ 0 := by
         rw [Ne, ← map_zero (algebraMap D (FractionRing D)), hinj.eq_iff]
         exact leadingCoeff_ne_zero.2 hg0
       refine ⟨algebraMap D (FractionRing D) a / algebraMap D (FractionRing D) g.leadingCoeff, ?_⟩
-      have key := integralNormalization_eval₂_leadingCoeff_mul (p := g) (by omega)
-        (algebraMap D (FractionRing D))
-        (algebraMap D (FractionRing D) a / algebraMap D (FractionRing D) g.leadingCoeff)
-      rw [mul_div_cancel₀ _ hl, eval₂_at_apply, ha, map_zero, ← eval_map, hgmap, eval_mul, eval_C] at key
+      have key :=
+        integralNormalization_eval₂_leadingCoeff_mul (p := g) (by omega)
+          (algebraMap D (FractionRing D))
+          (algebraMap D (FractionRing D) a / algebraMap D (FractionRing D) g.leadingCoeff)
+      rw [mul_div_cancel₀ _ hl, eval₂_at_apply, ha, map_zero, ← eval_map, hgmap, eval_mul, eval_C]
+        at key
       have := key.symm
       simpa [hl, hc] using this
   · rintro ⟨h1, h2⟩ p hp hpos
     have hd : (p.map (algebraMap D (FractionRing D))).degree ≠ 0 := by
       refine ne_of_gt (natDegree_pos_iff_degree_pos.1 ?_)
-      rw [hp.natDegree_map]; exact hpos
+      rw [hp.natDegree_map]
+      exact hpos
     obtain ⟨x, hx⟩ := IsAlgClosed.exists_root _ hd
     have hint : IsIntegral D x := ⟨p, hp, by rwa [IsRoot, eval_map] at hx⟩
     obtain ⟨y, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.1 hint

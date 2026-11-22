@@ -5,9 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
@@ -19,13 +21,15 @@ private def blk (k : Type) [Field k] {d : ℕ} (c : Fin d → ℕ) (i : ℕ) : S
   add_mem' ha hb j h := by simp [ha j h, hb j h]
   smul_mem' r v hv j h := by simp [hv j h]
 
-theorem grSS_of :
-    GrHom → SSOfSum → GrSS := by
+theorem grSS_of : GrHom → SSOfSum → GrSS := by
   intro _ hSS Γ k _ _ d ρ₀ ρ c hJH hρ
   obtain ⟨hinv, hmax⟩ := hJH
-  have key : ∀ (g : Γ) (i : ℕ) (u : Fin d → k), u ∈ blk k c i → ∀ a,
-      (↑(ρ g) : Matrix (Fin d) (Fin d) k).mulVec u a =
-        if c a = i then (↑(ρ₀ g) : Matrix (Fin d) (Fin d) k).mulVec u a else 0 := by
+  have key
+      : ∀ (g : Γ) (i : ℕ) (u : Fin d → k),
+        u ∈ blk k c i
+          → ∀ a,
+            (↑(ρ g) : Matrix (Fin d) (Fin d) k).mulVec u a
+              = if c a = i then (↑(ρ₀ g) : Matrix (Fin d) (Fin d) k).mulVec u a else 0 := by
     intro g i u hu a
     simp only [Matrix.mulVec, dotProduct, hρ]
     split_ifs with h

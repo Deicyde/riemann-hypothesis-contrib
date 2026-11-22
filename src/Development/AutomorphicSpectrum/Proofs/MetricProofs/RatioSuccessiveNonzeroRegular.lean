@@ -8,8 +8,19 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.Metric.UnitQuotients
 
-theorem consecutive_quotients_units :
-    ∀ (Φ : Type) [Field Φ] (R : Subring Φ) (N : ℕ) (G E : Fin N → Φ), (∀ i, E i ≠ 0) → (∀ i, (∏ k ∈ Finset.Iic i, G k) / E i ≠ 0 ∧ (∏ k ∈ Finset.Iic i, G k) / E i ∈ R ∧ ((∏ k ∈ Finset.Iic i, G k) / E i)⁻¹ ∈ R) → ∀ i : Fin N, G i / (if h : (i : ℕ) = 0 then E i else E i / E ⟨(i : ℕ) - 1, by have := i.2; omega⟩) ≠ 0 ∧ G i / (if h : (i : ℕ) = 0 then E i else E i / E ⟨(i : ℕ) - 1, by have := i.2; omega⟩) ∈ R ∧ (G i / (if h : (i : ℕ) = 0 then E i else E i / E ⟨(i : ℕ) - 1, by have := i.2; omega⟩))⁻¹ ∈ R := by
+theorem consecutive_quotients_units
+    : ∀ (Φ : Type) [Field Φ] (R : Subring Φ) (N : ℕ) (G E : Fin N → Φ),
+      (∀ i, E i ≠ 0)
+        → (∀ i,
+          (∏ k ∈ Finset.Iic i, G k) / E i ≠ 0 ∧ (∏ k ∈ Finset.Iic i, G k) / E i ∈ R
+            ∧ ((∏ k ∈ Finset.Iic i, G k) / E i)⁻¹ ∈ R)
+        → ∀ i : Fin N,
+          G i / (if h : (i : ℕ) = 0 then E i else E i / E ⟨(i : ℕ) - 1, by have := i.2; omega⟩) ≠ 0
+            ∧ G i / (if h : (i : ℕ) = 0 then E i else E i / E ⟨(i : ℕ) - 1, by have := i.2; omega⟩)
+              ∈ R
+            ∧ (G i
+                / (if h : (i : ℕ) = 0 then E i else E i / E ⟨(i : ℕ) - 1, by have := i.2; omega⟩))⁻¹
+              ∈ R := by
   intro Φ _ R N G E hE hU i
   by_cases h : (i : ℕ) = 0
   · have hI : Finset.Iic i = {i} := by
@@ -58,8 +69,7 @@ theorem consecutive_quotients_units :
     have hD : D ≠ 0 := fun e => b0 (by rw [e, zero_div])
     have hEi := hE i
     have hEj := hE j
-    have key : G i / (E i / E j) = (G i * D / E i) * (D / E j)⁻¹ := by
-      field_simp
+    have key : G i / (E i / E j) = (G i * D / E i) * (D / E j)⁻¹ := by field_simp
     rw [key]
     refine ⟨mul_ne_zero a0 (inv_ne_zero b0), R.mul_mem a1 b2, ?_⟩
     rw [mul_inv, inv_inv]

@@ -311,7 +311,8 @@ lemma upper_factor_bound {p : ℕ} (L U : Matrix (Fin p) (Fin p) ℂ) (d : Fin p
 theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := by
   intro p s σ d hd
   set dH : ℂ := (wP σ).det * ∏ i, d i with hdH
-  have hdH0 : dH ≠ 0 := mul_ne_zero (det_permutationMatrix_ne_zero σ) (Finset.prod_ne_zero_iff.mpr fun i _ => hd i)
+  have hdH0 : dH ≠ 0 :=
+    mul_ne_zero (det_permutationMatrix_ne_zero σ) (Finset.prod_ne_zero_iff.mpr fun i _ => hd i)
   have hdHpos : 0 < ‖dH‖ := norm_pos_iff.mpr hdH0
   have hdetH : ∀ v u, (headH σ d v u).det = dH := by
     intro v u
@@ -324,14 +325,18 @@ theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := 
     with hKd
   have hKd0 : 0 ≤ Kd := Finset.sum_nonneg fun _ _ => by positivity
   have hδi : 0 ≤ δ0⁻¹ := inv_nonneg.mpr hδ0pos.le
-  refine ⟨Kd * (1 + δ0⁻¹) + (p.factorial : ℝ) / ‖dH‖ + (1 + δ0⁻¹) + (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖),
-    fun η Z => ?_⟩
+  refine ⟨
+    Kd * (1 + δ0⁻¹) + (p.factorial : ℝ) / ‖dH‖ + (1 + δ0⁻¹) + (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖),
+    fun η Z => ?_
+  ⟩
   obtain ⟨⟨a, b⟩, ⟨v, u⟩⟩ := η
   set H := headH σ d v u with hH
   set m := mx (ZjH σ d ((a, b), (v, u)) Z) with hm
   have hm0 : 0 ≤ m := norm_nonneg _
-  have hZj : ZjH σ d ((a, b), (v, u)) Z =
-      blk2 H (H * Matrix.of b) (Matrix.of a * H) (Matrix.of a * H * Matrix.of b + Matrix.of Z) := by
+  have hZj
+      : ZjH σ d ((a, b), (v, u)) Z
+        = blk2 H (H * Matrix.of b) (Matrix.of a * H)
+          (Matrix.of a * H * Matrix.of b + Matrix.of Z) := by
     unfold ZjH
     exact zj_affine _ _ _ _
   have hent : ∀ x y, ‖ZjH σ d ((a, b), (v, u)) Z x y‖ ≤ m := fun x y => entry_le_mx _ x y
@@ -358,8 +363,7 @@ theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := 
     linarith
 
   set M0 := lowW σ v * diagonal d * G.upper u with hM0
-  have hHM : H = wP σ * M0 := by
-    simp only [hH, hM0, headH, mul_assoc]
+  have hHM : H = wP σ * M0 := by simp only [hH, hM0, headH, mul_assoc]
   have hM0b : EB M0 m := by
     intro i j
     have := hHb (σ.symm i) j
@@ -367,8 +371,8 @@ theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := 
   have hu : ∀ q : G.UT p, ‖u q‖ ≤ Kd * ((1 + δ0⁻¹) * m ^ p) := by
     intro q
     rw [← upper_entry u q]
-    exact upper_factor_bound (lowW σ v) (G.upper u) d hd (lowW_lower σ v) (lowW_diag σ v) (upper_upper u)
-      (upper_diag u) hm0 hδ0pos hδm hM0b _ _
+    exact upper_factor_bound (lowW σ v) (G.upper u) d hd (lowW_lower σ v) (lowW_diag σ v)
+      (upper_upper u) (upper_diag u) hm0 hδ0pos hδm hM0b _ _
   have hv : ∀ q : LW σ, ‖v q‖ ≤ Kd * ((1 + δ0⁻¹) * m ^ p) := by
     intro q
     rw [← lowW_entry σ v q]
@@ -378,11 +382,13 @@ theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := 
       intro i j
       rw [eT, transpose_apply]
       exact hM0b j i
-    have := upper_factor_bound ((G.upper u)ᵀ) ((lowW σ v)ᵀ) d hd
-      (fun a b h => by rw [transpose_apply]; exact upper_upper u b a h)
-      (fun a => by rw [transpose_apply]; exact upper_diag u a)
-      (fun a b h => by rw [transpose_apply]; exact lowW_lower σ v b a h)
-      (fun a => by rw [transpose_apply]; exact lowW_diag σ v a) hm0 hδ0pos hδm hT q.1.2 q.1.1
+    have :=
+      upper_factor_bound ((G.upper u)ᵀ) ((lowW σ v)ᵀ) d hd
+        (fun a b h => by rw [transpose_apply]; exact upper_upper u b a h)
+        (fun a => by rw [transpose_apply]; exact upper_diag u a)
+        (fun a b h => by rw [transpose_apply]; exact lowW_lower σ v b a h)
+        (fun a => by rw [transpose_apply]; exact lowW_diag σ v a)
+        hm0 hδ0pos hδm hT q.1.2 q.1.1
     rwa [transpose_apply] at this
 
   have hHu : IsUnit H.det := by rw [hdetH]; exact isUnit_iff_ne_zero.mpr hdH0
@@ -392,18 +398,23 @@ theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := 
   set bA : ℝ := (p.factorial : ℝ) / ‖dH‖ * m ^ p with hbA
   have hfa := nat_mul_factorial_bound p hm0 hdHpos
   have ha : EB (Matrix.of a) bA := by
-    have h1 : Matrix.of a = Matrix.of a * H * H⁻¹ := by rw [Matrix.mul_assoc, mul_nonsing_inv _ hHu, Matrix.mul_one]
+    have h1 : Matrix.of a = Matrix.of a * H * H⁻¹ := by
+      rw [Matrix.mul_assoc, mul_nonsing_inv _ hHu, Matrix.mul_one]
     have h2 := EB_mul hAHb hHi
     rw [← h1, Fintype.card_fin] at h2
     exact h2.mono hfa
   have hb : EB (Matrix.of b) bA := by
-    have h1 : Matrix.of b = H⁻¹ * (H * Matrix.of b) := by rw [← Matrix.mul_assoc, nonsing_inv_mul _ hHu, Matrix.one_mul]
+    have h1 : Matrix.of b = H⁻¹ * (H * Matrix.of b) := by
+      rw [← Matrix.mul_assoc, nonsing_inv_mul _ hHu, Matrix.one_mul]
     have h2 := EB_mul hHi hHBb
     rw [← h1, Fintype.card_fin] at h2
     exact h2.mono ((le_of_eq (by ring)).trans hfa)
   have hbA0 : 0 ≤ bA := by positivity
   have hZb : EB (Matrix.of Z) (m + p * (m * bA)) := by
-    have h1 : Matrix.of Z = (Matrix.of a * H * Matrix.of b + Matrix.of Z) - Matrix.of a * H * Matrix.of b := by abel
+    have h1
+        : Matrix.of Z
+          = (Matrix.of a * H * Matrix.of b + Matrix.of Z) - Matrix.of a * H * Matrix.of b := by
+      abel
     have h2 := EB_sub hBRb (EB_mul hAHb hb)
     rwa [← h1, Fintype.card_fin] at h2
   have hself := self_le_pow_succ hm0 hδ0pos hδm
@@ -413,18 +424,20 @@ theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := 
   have hC1 : Kd * (1 + δ0⁻¹) ≤ C := by
     have h1 : 0 ≤ (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖) := by positivity
     have h2 : 0 ≤ (p.factorial : ℝ) / ‖dH‖ := by positivity
-    rw [hC]; linarith
+    rw [hC]
+    linarith
   have hC2 : (p.factorial : ℝ) / ‖dH‖ ≤ C := by
-    rw [hC]; have : 0 ≤ (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖) := by positivity
+    rw [hC]
+    have : 0 ≤ (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖) := by positivity
     have : 0 ≤ Kd * (1 + δ0⁻¹) := by positivity
     linarith
   have hC3 : (1 + δ0⁻¹) + (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖) ≤ C := by
-    rw [hC]; have : 0 ≤ (p.factorial : ℝ) / ‖dH‖ := by positivity
+    rw [hC]
+    have : 0 ≤ (p.factorial : ℝ) / ‖dH‖ := by positivity
     have : 0 ≤ Kd * (1 + δ0⁻¹) := by positivity
     linarith
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
-  ·
-    show ‖a‖ ≤ C * m ^ p
+  · show ‖a‖ ≤ C * m ^ p
     refine norm_pi_pi_le a (by positivity) fun i t => (ha i t).trans ?_
     rw [hbA]
     exact mul_le_mul_of_nonneg_right hC2 hmp
@@ -442,30 +455,37 @@ theorem _root_.Formalism.FourierDecayAlt.P.aux_statement_17 : BlockHeadSizes := 
     exact mul_le_mul_of_nonneg_right hC1 hmp
   · show ‖Z‖ ≤ C * m ^ (p + 1)
     refine norm_pi_pi_le Z (by positivity) fun i t => (hZb i t).trans ?_
-    have e : m + p * (m * bA) ≤ ((1 + δ0⁻¹) + (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖)) * m ^ (p + 1) := by
+    have e
+        : m + p * (m * bA) ≤ ((1 + δ0⁻¹) + (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖)) * m ^ (p + 1) := by
       rw [hbA, add_mul, pow_succ]
-      have : (p : ℝ) * (m * ((p.factorial : ℝ) / ‖dH‖ * m ^ p)) =
-          (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖) * (m ^ p * m) := by ring
+      have : (p : ℝ) * (m * ((p.factorial : ℝ) / ‖dH‖ * m ^ p))
+          = (p : ℝ) * ((p.factorial : ℝ) / ‖dH‖) * (m ^ p * m) := by
+        ring
       rw [this]
       rw [pow_succ] at hself
       linarith
     exact e.trans (mul_le_mul_of_nonneg_right hC3 (by positivity))
-  ·
-    intro hZ0
+  · intro hZ0
     have hZu : IsUnit (Matrix.of Z).det := isUnit_iff_ne_zero.mpr hZ0
-    have hinv : (ZjH σ d ((a, b), (v, u)) Z)⁻¹ =
-        blk2 1 (-(Matrix.of b)) 0 1 * blk2 H⁻¹ 0 0 (Matrix.of Z)⁻¹ * blk2 1 0 (-(Matrix.of a)) 1 := by
+    have hinv
+        : (ZjH σ d ((a, b), (v, u)) Z)⁻¹
+          = blk2 1 (-(Matrix.of b)) 0 1 * blk2 H⁻¹ 0 0 (Matrix.of Z)⁻¹
+            * blk2 1 0 (-(Matrix.of a)) 1 := by
       apply Matrix.inv_eq_left_inv
-      have e1 : blk2 (1 : Matrix (Fin p) (Fin p) ℂ) 0 (-(Matrix.of a)) 1 * blk2 1 0 (Matrix.of a) 1 = 1 := by
+      have e1
+          : blk2 (1 : Matrix (Fin p) (Fin p) ℂ) 0 (-(Matrix.of a)) 1 * blk2 1 0 (Matrix.of a) 1
+            = 1 := by
         rw [block2_mul]; simp [block2_one]
       have e2 : blk2 H⁻¹ 0 0 (Matrix.of Z)⁻¹ * blk2 H 0 0 (Matrix.of Z) = 1 := by
         rw [block2_mul]; simp [nonsing_inv_mul _ hHu, nonsing_inv_mul _ hZu, block2_one]
-      have e3 : blk2 (1 : Matrix (Fin p) (Fin p) ℂ) (-(Matrix.of b)) 0 1 * blk2 1 (Matrix.of b) 0 1 = 1 := by
+      have e3
+          : blk2 (1 : Matrix (Fin p) (Fin p) ℂ) (-(Matrix.of b)) 0 1 * blk2 1 (Matrix.of b) 0 1
+            = 1 := by
         rw [block2_mul]; simp [block2_one]
       unfold ZjH Zj
       simp only [mul_assoc]
-      rw [← mul_assoc (blk2 1 0 (-(Matrix.of a)) 1), e1, one_mul, ← mul_assoc (blk2 H⁻¹ 0 0 (Matrix.of Z)⁻¹), e2,
-        one_mul, e3]
+      rw [← mul_assoc (blk2 1 0 (-(Matrix.of a)) 1), e1, one_mul,
+        ← mul_assoc (blk2 H⁻¹ 0 0 (Matrix.of Z)⁻¹), e2, one_mul, e3]
     refine mx_le (fun i t => ?_) (norm_nonneg _)
     have e := congrFun (congrFun hinv (finSumFinEquiv (Sum.inr i))) (finSumFinEquiv (Sum.inr t))
     rw [block2_mul, block2_mul, block2_apply_lower_right] at e
@@ -505,21 +525,25 @@ theorem _root_.Formalism.FourierDecayAlt.P.sizes_top_level : SizesTop := by
     have a5 : 1 ≤ 1 + ‖CC‖ := by linarith [norm_nonneg CC]
     rw [hX]
     unfold wtH
-    have := one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le
-      (one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le a1 a2) a3) a4) a5
+    have :=
+      one_le_mul_of_one_le_of_one_le
+        (one_le_mul_of_one_le_of_one_le
+          (one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le a1 a2) a3) a4)
+        a5
     exact this
   have hXle : X ≤ K * (1 + m) ^ (5 * p + 1) := by
     rw [hX]
     unfold wtH
-    calc (1 + ‖η.1.1‖) * (1 + ‖η.1.2‖) * (1 + ‖η.2.1‖) * (1 + ‖η.2.2‖) * (1 + ‖CC‖)
-        ≤ ((1 + Cp) * (1 + m) ^ p) * ((1 + Cp) * (1 + m) ^ p) * ((1 + Cp) * (1 + m) ^ p) *
-            ((1 + Cp) * (1 + m) ^ p) * ((1 + Cp) * (1 + m) ^ (p + 1)) := by
-          gcongr
-          · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h1)
-          · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h2)
-          · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h3)
-          · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h4)
-          · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h5)
+    calc
+      (1 + ‖η.1.1‖) * (1 + ‖η.1.2‖) * (1 + ‖η.2.1‖) * (1 + ‖η.2.2‖) * (1 + ‖CC‖)
+          ≤ ((1 + Cp) * (1 + m) ^ p) * ((1 + Cp) * (1 + m) ^ p) * ((1 + Cp) * (1 + m) ^ p)
+            * ((1 + Cp) * (1 + m) ^ p) * ((1 + Cp) * (1 + m) ^ (p + 1)) := by
+        gcongr
+        · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h1)
+        · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h2)
+        · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h3)
+        · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h4)
+        · exact one_add_le_mul_one_add_pow hCp0 hm0 (up h5)
       _ = K * (1 + m) ^ (5 * p + 1) := by rw [hK]; ring
   have hexp : ((5 * p + 1 : ℕ) : ℝ) * e ≤ A' := by
     rw [he, mul_div_assoc', div_le_iff₀ hps]
@@ -529,13 +553,15 @@ theorem _root_.Formalism.FourierDecayAlt.P.sizes_top_level : SizesTop := by
       linarith
     nlinarith
   have hXe : X ^ e ≤ K ^ e * (1 + m) ^ A' := by
-    calc X ^ e ≤ (K * (1 + m) ^ (5 * p + 1)) ^ e := Real.rpow_le_rpow (by linarith : (0 : ℝ) ≤ X) hXle he0
+    calc
+      X ^ e
+        ≤ (K * (1 + m) ^ (5 * p + 1)) ^ e := Real.rpow_le_rpow (by linarith : (0 : ℝ) ≤ X) hXle he0
       _ = K ^ e * ((1 + m) ^ (5 * p + 1)) ^ e := Real.mul_rpow hK0.le (by positivity)
       _ = K ^ e * (1 + m) ^ (((5 * p + 1 : ℕ) : ℝ) * e) := by
-          rw [← Real.rpow_natCast, ← Real.rpow_mul (by positivity)]
+        rw [← Real.rpow_natCast, ← Real.rpow_mul (by positivity)]
       _ ≤ K ^ e * (1 + m) ^ A' :=
-          mul_le_mul_of_nonneg_left (Real.rpow_le_rpow_of_exponent_le (by linarith : (1 : ℝ) ≤ 1 + m) hexp)
-            (by positivity)
+        mul_le_mul_of_nonneg_left
+          (Real.rpow_le_rpow_of_exponent_le (by linarith : (1 : ℝ) ≤ 1 + m) hexp) (by positivity)
   rw [Real.rpow_neg (by positivity), Real.rpow_neg (by positivity), ← div_eq_mul_inv,
     le_div_iff₀ (Real.rpow_pos_of_pos (by linarith : (0 : ℝ) < X) e),
     inv_mul_le_iff₀ (Real.rpow_pos_of_pos (by linarith : (0 : ℝ) < 1 + m) A')]
@@ -723,21 +749,26 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
   have hnr0 : 0 ≤ nr := by rw [hnr]; positivity
   have hK10 : 0 ≤ K1 := by rw [hK1]; positivity
   have hjr0 : (0 : ℝ) ≤ j := Nat.cast_nonneg j
-  obtain ⟨C, hC⟩ : ∃ C : ℝ, C = nr * (A0 + K1 * K2) + (j : ℝ) + K0 + Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) :=
+  obtain ⟨C, hC⟩
+      : ∃ C : ℝ, C = nr * (A0 + K1 * K2) + (j : ℝ) + K0 + Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) :=
     ⟨_, rfl⟩
   have hCa : nr * (A0 + K1 * K2) ≤ C := by
-    rw [hC]; have : 0 ≤ Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) := by positivity
+    rw [hC]
+    have : 0 ≤ Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) := by positivity
     linarith
   have hCb : (j : ℝ) ≤ C := by
-    rw [hC]; have : 0 ≤ Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) := by positivity
+    rw [hC]
+    have : 0 ≤ Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) := by positivity
     have : 0 ≤ nr * (A0 + K1 * K2) := by positivity
     linarith
   have hCc : K0 ≤ C := by
-    rw [hC]; have : 0 ≤ Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) := by positivity
+    rw [hC]
+    have : 0 ≤ Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) := by positivity
     have : 0 ≤ nr * (A0 + K1 * K2) := by positivity
     linarith
   have hCd : Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) ≤ C := by
-    rw [hC]; have : 0 ≤ nr * (A0 + K1 * K2) := by positivity
+    rw [hC]
+    have : 0 ≤ nr * (A0 + K1 * K2) := by positivity
     linarith
   refine ⟨C, ?_⟩
   intro x x' Z γ hZ _hγ
@@ -758,8 +789,8 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
   set g' := B.gN g with hg'
   have hg'0 : 0 ≤ g' := Real.sqrt_nonneg _
   have key : Rn k j ρ x * g = mMap k j ρ Z γ * Rn k j ρ x' := by
-    rw [hg, ← Matrix.mul_assoc, ← Matrix.mul_assoc, mul_nonsing_inv _ (by rw [det_Rn]; exact isUnit_one),
-      Matrix.one_mul]
+    rw [hg, ← Matrix.mul_assoc, ← Matrix.mul_assoc,
+      mul_nonsing_inv _ (by rw [det_Rn]; exact isUnit_one), Matrix.one_mul]
   set FourierUniquenessMirabolic := bk g (q1 k ρ) (q1 k ρ) with hG11
   set WeakApproximationGL := bk g (q1 k ρ) (q2 k j) with hG12
   set WhittakerVanishingImpliesZero := bk g (q1 k ρ) (q3 k ρ) with hG13
@@ -800,13 +831,14 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
   have hZu : IsUnit Z.det := isUnit_iff_ne_zero.mpr hZ
   set W := Z⁻¹ * w with hW
   have hνW : w * Z * W = 1 := by
-    rw [hW, Matrix.mul_assoc, ← Matrix.mul_assoc Z, mul_nonsing_inv _ hZu, Matrix.one_mul, hw, wMat_mul_self]
+    rw [hW, Matrix.mul_assoc, ← Matrix.mul_assoc Z, mul_nonsing_inv _ hZu, Matrix.one_mul, hw,
+      wMat_mul_self]
   have hWν : W * (w * Z) = 1 := by
-    rw [hW, Matrix.mul_assoc, ← Matrix.mul_assoc w, hw, wMat_mul_self, Matrix.one_mul, nonsing_inv_mul _ hZu]
+    rw [hW, Matrix.mul_assoc, ← Matrix.mul_assoc w, hw, wMat_mul_self, Matrix.one_mul,
+      nonsing_inv_mul _ hZu]
   have hα'W : α' = W * ContDiffOnLocalExtension := by
     rw [E32, ← Matrix.mul_assoc, hWν, Matrix.one_mul]
-  have hβ'W : β' = W * G33 := by
-    rw [E33, ← Matrix.mul_assoc, hWν, Matrix.one_mul]
+  have hβ'W : β' = W * G33 := by rw [E33, ← Matrix.mul_assoc, hWν, Matrix.one_mul]
   have hG21' : G21 = -(c * (w * Z)) := by
     rw [← E31]
     exact eq_neg_of_add_eq_zero_left E21
@@ -816,15 +848,18 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
     have e1 : FourierUniquenessMirabolic = (α * c - β) * (w * Z) := by
       have e := E11
       rw [hG21', E31] at e
-      calc FourierUniquenessMirabolic = (FourierUniquenessMirabolic + α * -(c * (w * Z)) + β * (w * Z)) + (α * (c * (w * Z)) - β * (w * Z)) := by
-            rw [Matrix.mul_neg]; abel
+      calc
+        FourierUniquenessMirabolic
+            = (FourierUniquenessMirabolic + α * -(c * (w * Z)) + β * (w * Z))
+              + (α * (c * (w * Z)) - β * (w * Z)) := by
+          rw [Matrix.mul_neg]; abel
         _ = (α * c - β) * (w * Z) := by rw [e, zero_add, Matrix.sub_mul, Matrix.mul_assoc α c]
     rw [e1, Matrix.mul_assoc, hνW, Matrix.mul_one, neg_sub]
   have hβT : β = -(w * (β - α * c)ᴴ * w) := beta_id H c S hHct (skew_ct x.2)
-  have hc'α : c' = -(w * α' * H)ᴴ := by
-    have e : w * α' * H = -c'ᴴ := by
-      rw [hα', Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_assoc, hHH,
-        Matrix.mul_one, ← Matrix.mul_assoc w w, hw, wMat_mul_self, Matrix.one_mul]
+  have hc'α : c' = - (w * α' * H)ᴴ := by
+    have e : w * α' * H = - c'ᴴ := by
+      rw [hα', Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_assoc,
+        hHH, Matrix.mul_one, ← Matrix.mul_assoc w w, hw, wMat_mul_self, Matrix.one_mul]
     rw [e, conjTranspose_neg, conjTranspose_conjTranspose, neg_neg]
   have hγG : γ = G22 + c * ContDiffOnLocalExtension := E22.symm
 
@@ -839,7 +874,8 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
     rw [Fintype.card_fin, mul_pow] at this
     rw [hA0]
     linarith
-  obtain ⟨ζ0, hζ0⟩ : ∃ ζ0 : ℝ, ζ0 = ((j - 1).factorial : ℝ) * ((j : ℝ) * g') ^ (j - 1) / δ := ⟨_, rfl⟩
+  obtain ⟨ζ0, hζ0⟩ : ∃ ζ0 : ℝ, ζ0 = ((j - 1).factorial : ℝ) * ((j : ℝ) * g') ^ (j - 1) / δ :=
+    ⟨_, rfl⟩
   have hζ00 : 0 ≤ ζ0 := by rw [hζ0]; positivity
   have hZib : EB Z⁻¹ ζ0 := by
     have := inv_entry_le Z hZb
@@ -881,15 +917,17 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
   have hp2 : 0 ≤ (j : ℝ) ^ 2 * Y := by positivity
   have hnb : EB (Rn k j ρ x) (1 + K1 * Y) := by
     rw [hRn]
-    refine entry_bound_block3 (EB_one.mono hB1) (hαb.mono ?_) (hβb.mono ?_) (EB_zero.mono (by linarith))
-      (EB_one.mono hB1) (hcb.mono ?_) (EB_zero.mono (by linarith)) (EB_zero.mono (by linarith)) (EB_one.mono hB1)
+    refine entry_bound_block3 (EB_one.mono hB1) (hαb.mono ?_) (hβb.mono ?_)
+      (EB_zero.mono (by linarith)) (EB_one.mono hB1) (hcb.mono ?_) (EB_zero.mono (by linarith))
+      (EB_zero.mono (by linarith)) (EB_one.mono hB1)
     · rw [hK1Y]; linarith
     · rw [hK1Y]; linarith
     · rw [hK1Y]; linarith
   have hn'b : EB (Rn k j ρ x') (1 + K1 * Y) := by
     rw [hRn']
-    refine entry_bound_block3 (EB_one.mono hB1) (hα'b.mono ?_) (hβ'b.mono ?_) (EB_zero.mono (by linarith))
-      (EB_one.mono hB1) (hc'b.mono ?_) (EB_zero.mono (by linarith)) (EB_zero.mono (by linarith)) (EB_one.mono hB1)
+    refine entry_bound_block3 (EB_one.mono hB1) (hα'b.mono ?_) (hβ'b.mono ?_)
+      (EB_zero.mono (by linarith)) (EB_one.mono hB1) (hc'b.mono ?_) (EB_zero.mono (by linarith))
+      (EB_zero.mono (by linarith)) (EB_one.mono hB1)
     · rw [hK1Y]; linarith
     · rw [hK1Y]; linarith
     · rw [hK1Y]; linarith
@@ -912,26 +950,25 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
     intro M hM
     have h1 := gN_le_of_EB M hM (by linarith)
     rw [← hnr] at h1
-    calc B.gN M ≤ nr * (1 + K1 * Y) := h1
+    calc
+      B.gN M
+        ≤ nr * (1 + K1 * Y) := h1
       _ ≤ nr * (A0 * R + K1 * (K2 * R)) := by
-          apply mul_le_mul_of_nonneg_left _ hnr0
-          have := mul_le_mul_of_nonneg_left hYR hK10
-          linarith
+        apply mul_le_mul_of_nonneg_left _ hnr0
+        have := mul_le_mul_of_nonneg_left hYR hK10
+        linarith
       _ = nr * (A0 + K1 * K2) * R := by ring
       _ ≤ C * R := mul_le_mul_of_nonneg_right hCa hR0
       _ = C * g' ^ j / μ := by rw [hR, mul_div_assoc]
   refine ⟨hRn_le _ hnb, hRn_le _ hn'b, ?_, ?_, ?_⟩
-  ·
-    exact (mx_le hZb (by positivity)).trans (mul_le_mul_of_nonneg_right hCb hg'0)
-  ·
-    refine (mx_le hZib hζ00).trans ?_
+  · exact (mx_le hZb (by positivity)).trans (mul_le_mul_of_nonneg_right hCb hg'0)
+  · refine (mx_le hZib hζ00).trans ?_
     rw [hζ0, mul_pow]
     have : ((j - 1).factorial : ℝ) * ((j : ℝ) ^ (j - 1) * g' ^ (j - 1)) = K0 * g' ^ (j - 1) := by
       rw [hK0]; ring
     rw [this]
     exact div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_right hCc (by positivity)) hδ0.le
-  ·
-    have h1 := gN_le_of_EB γ hγb (by positivity)
+  · have h1 := gN_le_of_EB γ hγb (by positivity)
     rw [← hNr] at h1
     have hsq : 1 ≤ (A0 * R) ^ 2 := one_le_pow₀ hA0R
     have e1 : g' ≤ A0 ^ 2 * (g' * R ^ 2) := by
@@ -942,15 +979,19 @@ theorem _root_.Formalism.FourierDecayAlt.P.block3_apply_embedding : BigCellCoord
       have h4 : K2 * R * g' ≤ K2 * R * g' * (A0 * R) := le_mul_of_one_le_right (by positivity) hA0R
       have h5 : (j : ℝ) * (Y * g') ≤ (j : ℝ) * (K2 * R * g' * (A0 * R)) :=
         mul_le_mul_of_nonneg_left (h3.trans h4) hjr0
-      calc (j : ℝ) * (Y * g') ≤ (j : ℝ) * (K2 * R * g' * (A0 * R)) := h5
+      calc
+        (j : ℝ) * (Y * g')
+          ≤ (j : ℝ) * (K2 * R * g' * (A0 * R)) := h5
         _ = (j : ℝ) * K2 * A0 * (g' * R ^ 2) := by ring
     have e3 : g' * R ^ 2 = g' ^ (2 * j + 1) / μ ^ 2 := by
       rw [hR, div_pow, ← pow_mul, pow_succ]
       ring
-    calc B.gN γ ≤ Nr * (g' + (j : ℝ) * (Y * g')) := h1
+    calc
+      B.gN γ
+        ≤ Nr * (g' + (j : ℝ) * (Y * g')) := h1
       _ ≤ Nr * (A0 ^ 2 * (g' * R ^ 2) + (j : ℝ) * K2 * A0 * (g' * R ^ 2)) := by
-          apply mul_le_mul_of_nonneg_left _ hNr0
-          linarith
+        apply mul_le_mul_of_nonneg_left _ hNr0
+        linarith
       _ = Nr * (A0 ^ 2 + (j : ℝ) * K2 * A0) * (g' * R ^ 2) := by ring
       _ ≤ C * (g' * R ^ 2) := mul_le_mul_of_nonneg_right hCd (by positivity)
       _ = C * g' ^ (2 * j + 1) / μ ^ 2 := by rw [e3, mul_div_assoc]

@@ -9,15 +9,15 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-
 open scoped TensorProduct in
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.quadratic_unramified_iff_inert_or_split (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F)) :
-    ((∀ w : HeightOneSpectrum (𝓞 E), w.asIdeal.LiesOver v.asIdeal →
-        Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal) ↔
-      ((v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E))).IsPrime ∨
-        (v.asIdeal.primesOver (𝓞 E)).ncard = 2)) := by
+theorem _root_.GlobalTheory.quadratic_unramified_iff_inert_or_split
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F))
+    : ((∀ w : HeightOneSpectrum (𝓞 E),
+        w.asIdeal.LiesOver v.asIdeal → Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal)
+      ↔ ((v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E))).IsPrime
+        ∨ (v.asIdeal.primesOver (𝓞 E)).ncard = 2)) := by
   classical
   haveI : v.asIdeal.IsMaximal := v.isMaximal
   set I := v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E)) with hIdef
@@ -26,10 +26,10 @@ theorem _root_.GlobalTheory.quadratic_unramified_iff_inert_or_split (F E : Type)
   have hv : v.asIdeal ≠ ⊥ := v.ne_bot
   have hI : I ≠ ⊥ :=
     (Ideal.map_eq_bot_iff_of_injective (FaithfulSMul.algebraMap_injective (𝓞 F) (𝓞 E))).not.mpr hv
-  have hs : ∀ P, P ∈ s ↔ P ∈ v.asIdeal.primesOver (𝓞 E) :=
-    fun P => IsDedekindDomain.mem_primesOverFinset_iff hv (𝓞 E)
-  have hM : ∀ P, P ∈ v.asIdeal.primesOver (𝓞 E) ↔ P ∈ M :=
-    fun P => Ideal.mem_primesOver_iff_mem_normalizedFactors (𝓞 E) hv
+  have hs : ∀ P, P ∈ s ↔ P ∈ v.asIdeal.primesOver (𝓞 E) := fun P =>
+    IsDedekindDomain.mem_primesOverFinset_iff hv (𝓞 E)
+  have hM : ∀ P, P ∈ v.asIdeal.primesOver (𝓞 E) ↔ P ∈ M := fun P =>
+    Ideal.mem_primesOver_iff_mem_normalizedFactors (𝓞 E) hv
   have hcount : ∀ P ∈ v.asIdeal.primesOver (𝓞 E), P.ramificationIdx (𝓞 F) = M.count P := by
     intro P hP
     haveI : P.LiesOver v.asIdeal := hP.2
@@ -57,8 +57,10 @@ theorem _root_.GlobalTheory.quadratic_unramified_iff_inert_or_split (F E : Type)
   have hcard_pos : 0 < s.card := by
     rw [← hncard]
     exact Nat.pos_of_ne_zero (IsDedekindDomain.primesOver_ncard_ne_zero v.asIdeal (𝓞 E))
-  have hU : (∀ w : HeightOneSpectrum (𝓞 E), w.asIdeal.LiesOver v.asIdeal →
-      Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal) ↔ ∀ P ∈ s, P.ramificationIdx (𝓞 F) = 1 := by
+  have hU
+      : (∀ w : HeightOneSpectrum (𝓞 E),
+          w.asIdeal.LiesOver v.asIdeal → Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal)
+        ↔ ∀ P ∈ s, P.ramificationIdx (𝓞 F) = 1 := by
     constructor
     · intro h P hP
       have hP' := (hs P).1 hP
@@ -89,8 +91,7 @@ theorem _root_.GlobalTheory.quadratic_unramified_iff_inert_or_split (F E : Type)
     have hcardM : M.card = 1 := by
       rw [← hcP]
       exact (Multiset.count_eq_card.2 fun x hx => (hallM x hx).symm).symm
-    have hMP : M = {P} := by
-      rw [Multiset.eq_replicate_of_mem hallM, hcardM, Multiset.replicate_one]
+    have hMP : M = {P} := by rw [Multiset.eq_replicate_of_mem hallM, hcardM, Multiset.replicate_one]
     have hassoc := UniqueFactorizationMonoid.prod_normalizedFactors hI0
     rw [← hMdef, hMP, Multiset.prod_singleton] at hassoc
     rw [← associated_iff_eq.1 hassoc]
@@ -114,8 +115,8 @@ theorem _root_.GlobalTheory.quadratic_unramified_iff_inert_or_split (F E : Type)
       have hf : 0 < v.asIdeal.inertiaDeg' P := Ideal.inertiaDeg'_pos v.asIdeal P
       have hge : 2 * 1 ≤ P.ramificationIdx (𝓞 F) * v.asIdeal.inertiaDeg' P :=
         Nat.mul_le_mul (by omega) hf
-      have hrest := Finset.card_nsmul_le_sum (s.erase P) _ 1
-        (fun Q hQ => hterm Q (Finset.mem_of_mem_erase hQ))
+      have hrest :=
+        Finset.card_nsmul_le_sum (s.erase P) _ 1 (fun Q hQ => hterm Q (Finset.mem_of_mem_erase hQ))
       rw [← Finset.add_sum_erase s _ hP] at hsum
       rw [Finset.card_erase_of_mem hP, h2c] at hrest
       simp only [smul_eq_mul, mul_one] at hrest

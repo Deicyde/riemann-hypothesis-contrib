@@ -24,11 +24,11 @@ theorem norm_toLp_sq {g : ℕ} (v : Fin g → ℝ) : ‖WithLp.toLp 2 v‖ ^ 2 =
 
 end PGaussPoissonBound
 
-
 open PGaussPoissonBound in
-theorem GaussPoissonBound.proof (hL : GaussLatticeIsLattice.Statement)
-    (hV : GaussLatticeCovolume.Statement) (hK : GaussLatticeCoords.Statement)
-    (hF : GaussFourierSelf.Statement) : GaussPoissonBound.Statement := by
+theorem GaussPoissonBound.proof
+    (hL : GaussLatticeIsLattice.Statement) (hV : GaussLatticeCovolume.Statement)
+    (hK : GaussLatticeCoords.Statement) (hF : GaussFourierSelf.Statement)
+    : GaussPoissonBound.Statement := by
   intro g B hB a
   obtain ⟨hdisc, hlat⟩ := hL g B hB
   have : DiscreteTopology (gaussLattice B) := hdisc
@@ -36,14 +36,16 @@ theorem GaussPoissonBound.proof (hL : GaussLatticeIsLattice.Statement)
   obtain ⟨hmem, hsurj, hinj⟩ := hK g B hB
   let E := EuclideanSpace ℝ (Fin g)
   let L := gaussLattice B
-  let φ : (Fin g → ℤ) ≃ L := Equiv.ofBijective
-    (fun k => ⟨WithLp.toLp 2 (B *ᵥ intVec k), hmem k⟩)
-    ⟨fun k k' h => hinj (by
-        have := congrArg (fun x : L => WithLp.ofLp (x : E)) h
-        simpa using this),
+  let φ : (Fin g → ℤ) ≃ L :=
+    Equiv.ofBijective (fun k => ⟨WithLp.toLp 2 (B *ᵥ intVec k), hmem k⟩) ⟨
+      fun k k' h =>
+        hinj (by
+          have := congrArg (fun x : L => WithLp.ofLp (x : E)) h
+          simpa using this),
       fun x => by
         obtain ⟨k, hk⟩ := hsurj x x.2
-        exact ⟨k, Subtype.ext hk.symm⟩⟩
+        exact ⟨k, Subtype.ext hk.symm⟩
+    ⟩
   let G := GroundTheory.Global.gaussianSchwartz E
   let a' : E := WithLp.toLp 2 (B *ᵥ a)
   let f : (Fin g → ℤ) → ℝ := fun k =>
@@ -58,17 +60,20 @@ theorem GaussPoissonBound.proof (hL : GaussLatticeIsLattice.Statement)
     funext fun x => GroundTheory.Global.gaussianSchwartz_apply x
   have hFG : ∀ μ : E, 𝓕 (G : E → ℂ) μ = ((Real.exp (-π * ‖μ‖ ^ 2) : ℝ) : ℂ) := fun μ => by
     rw [hGfun]; exact hF g μ
-  have hnD : ∀ μ : GroundTheory.Global.dualLattice L,
-      ‖𝓕 (G : E → ℂ) μ * 𝐞 ⟪(μ : E), a'⟫‖ = Real.exp (-π * ‖(μ : E)‖ ^ 2) := fun μ => by
+  have hnD
+      : ∀ μ : GroundTheory.Global.dualLattice L,
+        ‖𝓕 (G : E → ℂ) μ * 𝐞 ⟪(μ : E), a'⟫‖ = Real.exp (-π * ‖(μ : E)‖ ^ 2) := fun μ => by
     rw [norm_mul, Circle.norm_coe, mul_one, hFG, Complex.norm_of_nonneg (Real.exp_pos _).le]
 
   have hsumf : Summable f := by
-    have h := (φ.summable_iff (f := fun ℓ : L => ‖G (ℓ + a')‖)).2
-      (GroundTheory.Global.lattice_summable_norm L G a')
+    have h :=
+      (φ.summable_iff (f := fun ℓ : L => ‖G (ℓ + a')‖)).2
+        (GroundTheory.Global.lattice_summable_norm L G a')
     exact h.congr fun k => hnG k
 
   have hsumD := GroundTheory.Global.dualLattice_summable_norm L G a'
-  have hsumE : Summable fun μ : GroundTheory.Global.dualLattice L => Real.exp (-π * ‖(μ : E)‖ ^ 2) :=
+  have hsumE
+      : Summable fun μ : GroundTheory.Global.dualLattice L => Real.exp (-π * ‖(μ : E)‖ ^ 2) :=
     hsumD.congr hnD
   refine ⟨hsumf, hsumE, ?_⟩
 
@@ -79,17 +84,19 @@ theorem GaussPoissonBound.proof (hL : GaussLatticeIsLattice.Statement)
   rw [hlhs] at hP
   have hcov : ZLattice.covolume L = |B.det| := hV g B hB
   have hcpos : 0 < ZLattice.covolume L := ZLattice.covolume_pos L volume
-  calc ∑' k, f k = ‖((∑' k, f k : ℝ) : ℂ)‖ :=
-        (Complex.norm_of_nonneg (tsum_nonneg fun k => (Real.exp_pos _).le)).symm
-    _ = (ZLattice.covolume L)⁻¹ *
-          ‖∑' μ : GroundTheory.Global.dualLattice L, 𝓕 (G : E → ℂ) μ * 𝐞 ⟪(μ : E), a'⟫‖ := by
-        rw [hP, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.2 hcpos)]
-    _ ≤ (ZLattice.covolume L)⁻¹ *
-          ∑' μ : GroundTheory.Global.dualLattice L, ‖𝓕 (G : E → ℂ) μ * 𝐞 ⟪(μ : E), a'⟫‖ :=
-        mul_le_mul_of_nonneg_left (norm_tsum_le_tsum_norm hsumD) (inv_pos.2 hcpos).le
-    _ = |B.det|⁻¹ * ∑' μ : GroundTheory.Global.dualLattice (gaussLattice B),
+  calc
+    ∑' k, f k = ‖((∑' k, f k : ℝ) : ℂ)‖ :=
+      (Complex.norm_of_nonneg (tsum_nonneg fun k => (Real.exp_pos _).le)).symm
+    _ = (ZLattice.covolume L)⁻¹
+        * ‖∑' μ : GroundTheory.Global.dualLattice L, 𝓕 (G : E → ℂ) μ * 𝐞 ⟪(μ : E), a'⟫‖ := by
+      rw [hP, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.2 hcpos)]
+    _ ≤ (ZLattice.covolume L)⁻¹
+        * ∑' μ : GroundTheory.Global.dualLattice L, ‖𝓕 (G : E → ℂ) μ * 𝐞 ⟪(μ : E), a'⟫‖ :=
+      mul_le_mul_of_nonneg_left (norm_tsum_le_tsum_norm hsumD) (inv_pos.2 hcpos).le
+    _ = |B.det|⁻¹
+        * ∑' μ : GroundTheory.Global.dualLattice (gaussLattice B),
           Real.exp (-π * ‖(μ : EuclideanSpace ℝ (Fin g))‖ ^ 2) := by
-        rw [hcov]; exact congrArg _ (tsum_congr hnD)
+      rw [hcov]; exact congrArg _ (tsum_congr hnD)
 
 end
 

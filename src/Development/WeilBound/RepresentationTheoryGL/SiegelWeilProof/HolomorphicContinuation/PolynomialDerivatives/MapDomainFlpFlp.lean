@@ -18,22 +18,23 @@ abbrev Ix (m n : ℕ) := Fin m × Fin n × Bool
 
 def flp (k : Ix m n) : Ix m n := (k.1, k.2.1, !k.2.2)
 
-theorem flp_flp (k : Ix m n) : flp (flp k) = k := by
-  obtain ⟨a, i, b⟩ := k; simp [flp]
+theorem flp_flp (k : Ix m n) : flp (flp k) = k := by obtain ⟨a, i, b⟩ := k; simp [flp]
 
 def flpEquiv : Ix m n ≃ Ix m n := ⟨flp, flp, flp_flp, flp_flp⟩
 
 theorem flp_injective : Function.Injective (flp (m := m) (n := n)) := flpEquiv.injective
 
-theorem cr_apply (c : ℝ) (k : Ix m n) (P : PX m n) :
-    cr c k P = (2 * c : ℂ) • (X (flp k) * P) - pderiv k P := by
+theorem cr_apply (c : ℝ) (k : Ix m n) (P : PX m n)
+    : cr c k P = (2 * c : ℂ) • (X (flp k) * P) - pderiv k P := by
   obtain ⟨a, i, b⟩ := k
   cases b <;> (simp [cr, flp]; try abel)
 
-theorem pderiv_comm' (k l : Ix m n) (P : PX m n) :
-    pderiv k (pderiv l P) = pderiv l (pderiv k P) := by
+theorem pderiv_comm' (k l : Ix m n) (P : PX m n)
+    : pderiv k (pderiv l P) = pderiv l (pderiv k P) := by
   classical
-  have h : ⁅(pderiv k : Derivation ℂ (PX m n) (PX m n)), (pderiv l : Derivation ℂ (PX m n) (PX m n))⁆ = 0 := by
+  have h
+      : ⁅(pderiv k : Derivation ℂ (PX m n) (PX m n)), (pderiv l : Derivation ℂ (PX m n) (PX m n))⁆
+        = 0 := by
     apply MvPolynomial.derivation_ext
     intro i
     rw [Derivation.commutator_apply, pderiv_X, pderiv_X]
@@ -43,10 +44,10 @@ theorem pderiv_comm' (k l : Ix m n) (P : PX m n) :
   simp only [Derivation.commutator_apply] at h2
   exact sub_eq_zero.mp (by simpa using h2)
 
-theorem cr_comm (c : ℝ) (k l : Ix m n) (P : PX m n) :
-    cr c k (cr c l P) = cr c l (cr c k P) := by
+theorem cr_comm (c : ℝ) (k l : Ix m n) (P : PX m n) : cr c k (cr c l P) = cr c l (cr c k P) := by
   classical
-  simp only [cr_apply, map_sub, Derivation.map_smul, Derivation.leibniz, pderiv_X, Pi.single_apply, smul_eq_mul]
+  simp only [cr_apply, map_sub, Derivation.map_smul, Derivation.leibniz, pderiv_X, Pi.single_apply,
+    smul_eq_mul]
   simp only [MvPolynomial.smul_eq_C_mul, pderiv_C, mul_zero, zero_mul, add_zero, zero_add]
   rw [pderiv_comm' k l P]
   have e : (flp l = k) ↔ (flp k = l) :=
@@ -59,12 +60,14 @@ theorem cr_comm (c : ℝ) (k l : Ix m n) (P : PX m n) :
     simp only [h, h', if_false]
     ring
 
-theorem crAlg_comm (c : ℝ) : ∀ a ∈ Set.range (cr (m := m) (n := n) c), ∀ b ∈ Set.range (cr (m := m) (n := n) c),
-    a * b = b * a := by
+theorem crAlg_comm (c : ℝ)
+    : ∀ a ∈ Set.range (cr (m := m) (n := n) c), ∀ b ∈ Set.range (cr (m := m) (n := n) c),
+      a * b = b * a := by
   rintro _ ⟨k, rfl⟩ _ ⟨l, rfl⟩
   exact LinearMap.ext fun P => cr_comm c k l P
 
-abbrev CrAlg (m n : ℕ) (c : ℝ) : Subalgebra ℂ (Module.End ℂ (PX m n)) := Algebra.adjoin ℂ (Set.range (cr c))
+abbrev CrAlg (m n : ℕ) (c : ℝ) : Subalgebra ℂ (Module.End ℂ (PX m n)) :=
+  Algebra.adjoin ℂ (Set.range (cr c))
 
 instance instCommRingCrAlg (c : ℝ) : CommRing (CrAlg m n c) :=
   letI : IsMulCommutative (CrAlg m n c) :=
@@ -75,19 +78,20 @@ def gen (c : ℝ) (k : Ix m n) : CrAlg m n c := ⟨cr c k, Algebra.subset_adjoin
 
 def phi (c : ℝ) : PX m n →ₐ[ℂ] CrAlg m n c := MvPolynomial.aeval (gen c)
 
-theorem coe_phi_monomial (c : ℝ) (s : Ix m n →₀ ℕ) :
-    ((phi c (monomial s 1) : CrAlg m n c) : Module.End ℂ (PX m n)) =
-      ((Finset.univ : Finset (Ix m n)).toList.map fun k => (cr c k) ^ (s k)).prod := by
+theorem coe_phi_monomial (c : ℝ) (s : Ix m n →₀ ℕ)
+    : ((phi c (monomial s 1) : CrAlg m n c) : Module.End ℂ (PX m n))
+      = ((Finset.univ : Finset (Ix m n)).toList.map fun k => (cr c k) ^ (s k)).prod := by
   rw [phi, aeval_monomial, map_one, one_mul, Finsupp.prod_fintype _ _ (fun _ => pow_zero _),
     ← Finset.prod_map_toList]
   rw [SubmonoidClass.coe_list_prod, List.map_map]
   congr 1
 
-theorem fockMono_eq (c : ℝ) (s : Ix m n →₀ ℕ) :
-    fockMono c s = ((phi c (monomial s 1) : CrAlg m n c) : Module.End ℂ (PX m n)) 1 := by
+theorem fockMono_eq (c : ℝ) (s : Ix m n →₀ ℕ)
+    : fockMono c s = ((phi c (monomial s 1) : CrAlg m n c) : Module.End ℂ (PX m n)) 1 := by
   rw [coe_phi_monomial]; rfl
 
-theorem fock_eq (c : ℝ) (p : PX m n) : fock c p = ((phi c p : CrAlg m n c) : Module.End ℂ (PX m n)) 1 := by
+theorem fock_eq (c : ℝ) (p : PX m n)
+    : fock c p = ((phi c p : CrAlg m n c) : Module.End ℂ (PX m n)) 1 := by
   conv_rhs => rw [p.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, AddSubmonoidClass.coe_finsetSum, LinearMap.sum_apply]
@@ -109,8 +113,8 @@ theorem fock_sub (c : ℝ) (p q : PX m n) : fock c (p - q) = fock c p - fock c q
   rw [sub_add_cancel] at this
   rw [this, add_sub_cancel_right]
 
-theorem fock_sum (c : ℝ) {ι : Type*} (t : Finset ι) (f : ι → PX m n) :
-    fock c (∑ i ∈ t, f i) = ∑ i ∈ t, fock c (f i) := by
+theorem fock_sum (c : ℝ) {ι : Type*} (t : Finset ι) (f : ι → PX m n)
+    : fock c (∑ i ∈ t, f i) = ∑ i ∈ t, fock c (f i) := by
   classical
   induction t using Finset.induction_on with
   | empty => simp [fock_zero]
@@ -132,7 +136,8 @@ theorem degree_mapDomain (t : Ix m n →₀ ℕ) : (Finsupp.mapDomain flp t).deg
   refine Finset.sum_congr rfl fun i _ => ?_
   exact Finsupp.mapDomain_apply_of_injective flp_injective t i
 
-theorem mapDomain_flp_flp (t : Ix m n →₀ ℕ) : Finsupp.mapDomain flp (Finsupp.mapDomain flp t) = t := by
+theorem mapDomain_flp_flp (t : Ix m n →₀ ℕ)
+    : Finsupp.mapDomain flp (Finsupp.mapDomain flp t) = t := by
   rw [← Finsupp.mapDomain_comp]
   have : (flp ∘ flp : Ix m n → Ix m n) = id := funext flp_flp
   rw [this, Finsupp.mapDomain_id]
@@ -157,11 +162,11 @@ theorem DegLT.sub {d : ℕ} {P Q : PX m n} (hP : DegLT d P) (hQ : DegLT d Q) : D
 theorem DegLT.smul {d : ℕ} {P : PX m n} (a : ℂ) (hP : DegLT d P) : DegLT d (a • P) := by
   intro t ht; exact hP t (MvPolynomial.support_smul ht)
 
-theorem DegLT.mono {d d' : ℕ} {P : PX m n} (hP : DegLT d P) (h : d ≤ d') : DegLT d' P :=
-  fun t ht => lt_of_lt_of_le (hP t ht) h
+theorem DegLT.mono {d d' : ℕ} {P : PX m n} (hP : DegLT d P) (h : d ≤ d') : DegLT d' P := fun t ht =>
+  lt_of_lt_of_le (hP t ht) h
 
-theorem DegLT.sum {d : ℕ} {ι : Type*} (t : Finset ι) (f : ι → PX m n) (h : ∀ i ∈ t, DegLT d (f i)) :
-    DegLT d (∑ i ∈ t, f i) := by
+theorem DegLT.sum {d : ℕ} {ι : Type*} (t : Finset ι) (f : ι → PX m n) (h : ∀ i ∈ t, DegLT d (f i))
+    : DegLT d (∑ i ∈ t, f i) := by
   classical
   induction t using Finset.induction_on with
   | empty => simpa using DegLT.zero d
@@ -169,7 +174,8 @@ theorem DegLT.sum {d : ℕ} {ι : Type*} (t : Finset ι) (f : ι → PX m n) (h 
     rw [Finset.sum_insert ha]
     exact (h a (Finset.mem_insert_self a t)).add (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem DegLT.X_mul {d : ℕ} {P : PX m n} (j : Ix m n) (hP : DegLT d P) : DegLT (d + 1) (X j * P) := by
+theorem DegLT.X_mul {d : ℕ} {P : PX m n} (j : Ix m n) (hP : DegLT d P)
+    : DegLT (d + 1) (X j * P) := by
   intro t ht
   rw [MvPolynomial.support_X_mul] at ht
   obtain ⟨t', ht', rfl⟩ := Finset.mem_map.mp ht
@@ -191,15 +197,17 @@ theorem DegLT.pderiv {d : ℕ} {P : PX m n} (k : Ix m n) (hP : DegLT d P) : DegL
   simp only [Finsupp.degree_eq_sum]
   exact Finset.sum_le_sum fun i _ => tsub_le_self
 
-def Sm (c : ℝ) (s : Ix m n →₀ ℕ) : PX m n := monomial (Finsupp.mapDomain flp s) ((2 * c : ℂ) ^ s.degree)
+def Sm (c : ℝ) (s : Ix m n →₀ ℕ) : PX m n :=
+  monomial (Finsupp.mapDomain flp s) ((2 * c : ℂ) ^ s.degree)
 
 def err (c : ℝ) (s : Ix m n →₀ ℕ) : PX m n := fockMono c s - Sm c s
 
-theorem Sm_succ (c : ℝ) (s : Ix m n →₀ ℕ) (k : Ix m n) :
-    Sm c (s + Finsupp.single k 1) = (2 * c : ℂ) • (X (flp k) * Sm c s) := by
-  simp only [Sm, Finsupp.mapDomain_add, Finsupp.mapDomain_single, degree_add', Finsupp.degree_single, pow_succ]
-  rw [add_comm (Finsupp.mapDomain flp s), monomial_single_add, pow_one, ← mul_smul_comm, smul_monomial, smul_eq_mul,
-    mul_comm (2 * (c : ℂ))]
+theorem Sm_succ (c : ℝ) (s : Ix m n →₀ ℕ) (k : Ix m n)
+    : Sm c (s + Finsupp.single k 1) = (2 * c : ℂ) • (X (flp k) * Sm c s) := by
+  simp only [Sm, Finsupp.mapDomain_add, Finsupp.mapDomain_single, degree_add',
+    Finsupp.degree_single, pow_succ]
+  rw [add_comm (Finsupp.mapDomain flp s), monomial_single_add, pow_one, ← mul_smul_comm,
+    smul_monomial, smul_eq_mul, mul_comm (2 * (c : ℂ))]
 
 theorem Sm_deg (c : ℝ) (s : Ix m n →₀ ℕ) : DegLT (s.degree + 1) (Sm c s) := by
   intro t ht
@@ -209,8 +217,7 @@ theorem Sm_deg (c : ℝ) (s : Ix m n →₀ ℕ) : DegLT (s.degree + 1) (Sm c s)
   rw [degree_mapDomain]
   omega
 
-theorem fockMono_zero (c : ℝ) : fockMono (m := m) (n := n) c 0 = 1 := by
-  simp [fockMono]
+theorem fockMono_zero (c : ℝ) : fockMono (m := m) (n := n) c 0 = 1 := by simp [fockMono]
 
 theorem err_deg (c : ℝ) : ∀ d : ℕ, ∀ s : Ix m n →₀ ℕ, s.degree = d → DegLT d (err c s) := by
   intro d
@@ -222,10 +229,8 @@ theorem err_deg (c : ℝ) : ∀ d : ℕ, ∀ s : Ix m n →₀ ℕ, s.degree = d
     simp [err, Sm, fockMono_zero, DegLT.zero]
   | succ d ih =>
     intro s hs
-    have hs0 : s ≠ 0 := by
-      intro h; subst h; simp at hs
-    obtain ⟨k, hk⟩ : ∃ k, s k ≠ 0 := by
-      by_contra h; push_neg at h; exact hs0 (Finsupp.ext h)
+    have hs0 : s ≠ 0 := by intro h; subst h; simp at hs
+    obtain ⟨k, hk⟩ : ∃ k, s k ≠ 0 := by by_contra h; push_neg at h; exact hs0 (Finsupp.ext h)
     have hle : Finsupp.single k 1 ≤ s := by
       intro i
       by_cases hi : i = k
@@ -238,18 +243,20 @@ theorem err_deg (c : ℝ) : ∀ d : ℕ, ∀ s : Ix m n →₀ ℕ, s.degree = d
       rw [← hsplit, Finsupp.degree_single] at this
       omega
     have hrec : fockMono c s = cr c k (fockMono c s') := by
-      rw [← fock_monomial, ← fock_monomial, hsplit, add_comm, monomial_single_add, pow_one, fock_X_mul]
+      rw [← fock_monomial, ← fock_monomial, hsplit, add_comm, monomial_single_add, pow_one,
+        fock_X_mul]
     have e : err c s = (2 * c : ℂ) • (X (flp k) * err c s') - pderiv k (Sm c s' + err c s') := by
       rw [err, hrec, cr_apply, hsplit, Sm_succ, err]
       simp only [sub_add_cancel, mul_sub, smul_sub]
       abel
     rw [e]
-    refine DegLT.sub (DegLT.smul _ (DegLT.X_mul _ (ih s' hd'))) (DegLT.pderiv _ (DegLT.add ?_ ((ih s' hd').mono (by omega))))
+    refine DegLT.sub (DegLT.smul _ (DegLT.X_mul _ (ih s' hd')))
+      (DegLT.pderiv _ (DegLT.add ?_ ((ih s' hd').mono (by omega))))
     have := Sm_deg c s'
     rwa [hd'] at this
 
-theorem fock_decomp (c : ℝ) (p : PX m n) :
-    fock c p = ∑ s ∈ p.support, p.coeff s • (Sm c s + err c s) := by
+theorem fock_decomp (c : ℝ) (p : PX m n)
+    : fock c p = ∑ s ∈ p.support, p.coeff s • (Sm c s + err c s) := by
   simp only [fock, err, add_sub_cancel]
 
 theorem fock_injective (c : ℝ) (hc : 0 < c) : Function.Injective (fock (m := m) (n := n) c) := by
@@ -263,7 +270,9 @@ theorem fock_injective (c : ℝ) (hc : 0 < c) : Function.Injective (fock (m := m
   obtain ⟨s0, hs0, hmax⟩ := Finset.exists_max_image r.support Finsupp.degree hne
   have key := congrArg (AddMonoidAlgebra.coeff · (Finsupp.mapDomain flp s0)) h0
   rw [fock_decomp, MvPolynomial.coeff_zero, MvPolynomial.coeff_sum, Finset.sum_eq_single s0] at key
-  · rw [MvPolynomial.coeff_smul, MvPolynomial.coeff_add, Sm, MvPolynomial.coeff_monomial, if_pos rfl] at key
+  · rw [MvPolynomial.coeff_smul, MvPolynomial.coeff_add, Sm, MvPolynomial.coeff_monomial,
+        if_pos rfl]
+      at key
     have herr : AddMonoidAlgebra.coeff (err c s0) (Finsupp.mapDomain flp s0) = 0 := by
       by_contra hne'
       have := err_deg c _ s0 rfl _ (MvPolynomial.mem_support_iff.mpr hne')
@@ -276,8 +285,8 @@ theorem fock_injective (c : ℝ) (hc : 0 < c) : Function.Injective (fock (m := m
     exact (mul_ne_zero (MvPolynomial.mem_support_iff.mp hs0) (pow_ne_zero _ hc')) key
   · intro s hs hne'
     rw [MvPolynomial.coeff_smul, MvPolynomial.coeff_add, Sm, MvPolynomial.coeff_monomial]
-    have h1 : Finsupp.mapDomain flp s ≠ Finsupp.mapDomain flp s0 :=
-      fun h => hne' (Finsupp.mapDomain_injective flp_injective h)
+    have h1 : Finsupp.mapDomain flp s ≠ Finsupp.mapDomain flp s0 := fun h =>
+      hne' (Finsupp.mapDomain_injective flp_injective h)
     rw [if_neg h1]
     have herr : AddMonoidAlgebra.coeff (err c s) (Finsupp.mapDomain flp s0) = 0 := by
       by_contra hne''
@@ -287,8 +296,8 @@ theorem fock_injective (c : ℝ) (hc : 0 < c) : Function.Injective (fock (m := m
     rw [herr, add_zero, smul_zero]
   · intro h; exact absurd hs0 h
 
-theorem fock_surj_deg (c : ℝ) (hc : 0 < c) :
-    ∀ d : ℕ, ∀ Q : PX m n, DegLT d Q → ∃ p, fock c p = Q := by
+theorem fock_surj_deg (c : ℝ) (hc : 0 < c)
+    : ∀ d : ℕ, ∀ Q : PX m n, DegLT d Q → ∃ p, fock c p = Q := by
   classical
   have hc' : (2 * c : ℂ) ≠ 0 := by
     have : (c : ℂ) ≠ 0 := by exact_mod_cast hc.ne'
@@ -306,15 +315,19 @@ theorem fock_surj_deg (c : ℝ) (hc : 0 < c) :
   | succ d ih =>
     intro Q hQ
     set p0 : PX m n := ∑ t ∈ Q.support, (Q.coeff t / (2 * c : ℂ) ^ t.degree) • monomial (Finsupp.mapDomain flp t) 1
-    have hp0 : fock c p0 = (∑ t ∈ Q.support, monomial t (Q.coeff t)) + ∑ t ∈ Q.support,
-        (Q.coeff t / (2 * c : ℂ) ^ t.degree) • err c (Finsupp.mapDomain flp t) := by
+    have hp0
+        : fock c p0
+          = (∑ t ∈ Q.support, monomial t (Q.coeff t))
+            + ∑ t ∈ Q.support,
+              (Q.coeff t / (2 * c : ℂ) ^ t.degree) • err c (Finsupp.mapDomain flp t) := by
       rw [fock_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun t _ => ?_
-      rw [fock_smul, fock_monomial, err, smul_sub, Sm, mapDomain_flp_flp, degree_mapDomain, smul_monomial,
-        smul_eq_mul, div_mul_cancel₀ _ (pow_ne_zero _ hc')]
+      rw [fock_smul, fock_monomial, err, smul_sub, Sm, mapDomain_flp_flp, degree_mapDomain,
+        smul_monomial, smul_eq_mul, div_mul_cancel₀ _ (pow_ne_zero _ hc')]
       abel
-    have hR : DegLT d (∑ t ∈ Q.support,
-        (Q.coeff t / (2 * c : ℂ) ^ t.degree) • err c (Finsupp.mapDomain flp t)) := by
+    have hR : DegLT d
+        (∑ t ∈ Q.support,
+          (Q.coeff t / (2 * c : ℂ) ^ t.degree) • err c (Finsupp.mapDomain flp t)) := by
       refine DegLT.sum _ _ fun t ht => DegLT.smul _ ?_
       have h1 := err_deg c _ (Finsupp.mapDomain flp t) rfl
       rw [degree_mapDomain] at h1
@@ -329,7 +342,11 @@ theorem fock_surjective (c : ℝ) (hc : 0 < c) : Function.Surjective (fock (m :=
 
 theorem fockBasic : FockBasic := by
   intro m n c hc
-  exact ⟨⟨fock_add c, fun a p => fock_smul c a p⟩, ⟨fock_injective c hc, fock_surjective c hc⟩, fun k p => fock_X_mul c k p⟩
+  exact ⟨
+    ⟨fock_add c, fun a p => fock_smul c a p⟩,
+    ⟨fock_injective c hc, fock_surjective c hc⟩,
+    fun k p => fock_X_mul c k p
+  ⟩
 
 end PositivityTheory.Rg.Sw.LC.Basic
 

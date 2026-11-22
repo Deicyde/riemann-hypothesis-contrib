@@ -6,14 +6,30 @@ public import Formalism.LocalToGlobal.GaloisLevelStructure.TiedHecke
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.L2 Formalism.L2.NG Formalism.AUTREP Formalism.IndefR.principalLevelFrame
+open Formalism.BasicNotions Formalism.L2 Formalism.L2.NG Formalism.AUTREP
+  Formalism.IndefR.principalLevelFrame
 
 namespace GlobalTheory
 
-theorem finTyp_invariant_form_of_isotIn : ∀ (D : D7) (n : ℕ) (A : Type) [AddCommGroup A] [Module ℂ A] (ρ : GAf D.host.E n →* Module.End ℂ A) (C : Submodule ℂ A) (B : A → A → ℂ), (∀ x ∈ C, ∀ y ∈ C, ∀ z ∈ C, ∀ c : ℂ, B x (y + c • z) = B x y + c * B x z) → (∀ x ∈ C, ∀ y ∈ C, B x y = starRingEnd ℂ (B y x)) → (∀ x ∈ C, x ≠ 0 → 0 < (B x x).re) → (∀ h, ∀ x ∈ C, ρ h x ∈ C) → (∀ h, ∀ x ∈ C, ∀ y ∈ C, B (ρ h x) (ρ h y) = B x y) → ∀ π : FinTyp D.host.E n, isotIn (D := D) ρ C π ≠ ⊥ → ∃ B' : π.S → π.S → ℂ, (∀ x y z (c : ℂ), B' x (y + c • z) = B' x y + c * B' x z) ∧ (∀ x y, B' x y = starRingEnd ℂ (B' y x)) ∧ (∀ x, x ≠ 0 → 0 < (B' x x).re) ∧ ∀ h (x y x' y' : π.S), (x' : GAf D.host.E n → ℂ) = rt D.host.E n h x → (y' : GAf D.host.E n → ℂ) = rt D.host.E n h y → B' x' y' = B' x y := by
+theorem finTyp_invariant_form_of_isotIn
+    : ∀ (D : D7) (n : ℕ) (A : Type) [AddCommGroup A] [Module ℂ A]
+        (ρ : GAf D.host.E n →* Module.End ℂ A) (C : Submodule ℂ A) (B : A → A → ℂ),
+      (∀ x ∈ C, ∀ y ∈ C, ∀ z ∈ C, ∀ c : ℂ, B x (y + c • z) = B x y + c * B x z)
+        → (∀ x ∈ C, ∀ y ∈ C, B x y = starRingEnd ℂ (B y x)) → (∀ x ∈ C, x ≠ 0 → 0 < (B x x).re)
+        → (∀ h, ∀ x ∈ C, ρ h x ∈ C) → (∀ h, ∀ x ∈ C, ∀ y ∈ C, B (ρ h x) (ρ h y) = B x y)
+        → ∀ π : FinTyp D.host.E n,
+          isotIn (D := D) ρ C π ≠ ⊥
+            → ∃ B' : π.S → π.S → ℂ,
+              (∀ x y z (c : ℂ), B' x (y + c • z) = B' x y + c * B' x z)
+                ∧ (∀ x y, B' x y = starRingEnd ℂ (B' y x)) ∧ (∀ x, x ≠ 0 → 0 < (B' x x).re)
+                ∧ ∀ h (x y x' y' : π.S),
+                  (x' : GAf D.host.E n → ℂ) = rt D.host.E n h x
+                    → (y' : GAf D.host.E n → ℂ) = rt D.host.E n h y
+                    → B' x' y' = B' x y := by
   intro D n A _ _ ρ C B hlin hherm hpos _hstab hinv π hne
 
-  obtain ⟨Φ, ⟨hΦe, hΦC⟩, hΦne⟩ : ∃ Φ : π.S →ₗ[ℂ] A, (IsEqvA ρ π Φ ∧ LinearMap.range Φ ≤ C) ∧ LinearMap.range Φ ≠ ⊥ := by
+  obtain ⟨Φ, ⟨hΦe, hΦC⟩, hΦne⟩
+      : ∃ Φ : π.S →ₗ[ℂ] A, (IsEqvA ρ π Φ ∧ LinearMap.range Φ ≤ C) ∧ LinearMap.range Φ ≠ ⊥ := by
     by_contra hcon
     push_neg at hcon
     apply hne

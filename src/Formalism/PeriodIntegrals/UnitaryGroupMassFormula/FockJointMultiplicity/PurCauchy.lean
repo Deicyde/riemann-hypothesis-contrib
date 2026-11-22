@@ -10,31 +10,53 @@ open MvPolynomial Classical
 
 namespace PI.FJMB
 
-def HypAnti : Prop := ∀ (σ : Type) (m n : ℕ) (ι : Fin m × Fin n → σ), Function.Injective ι →
-  ∀ (α : Fin m → ℕ) (P : MvPolynomial σ ℂ), P ≠ 0 → (∀ a b : Fin m, a < b → PI.FJM.bRow ι a b P = 0) →
-  (∀ e ∈ P.support, ∀ i, ∑ k : Fin n, e (ι (i, k)) = α i) → Antitone α
+def HypAnti : Prop :=
+  ∀ (σ : Type) (m n : ℕ) (ι : Fin m × Fin n → σ),
+    Function.Injective ι
+      → ∀ (α : Fin m → ℕ) (P : MvPolynomial σ ℂ),
+        P ≠ 0 → (∀ a b : Fin m, a < b → PI.FJM.bRow ι a b P = 0)
+          → (∀ e ∈ P.support, ∀ i, ∑ k : Fin n, e (ι (i, k)) = α i)
+          → Antitone α
 
-def HypShape : Prop := ∀ (σ : Type) (m : ℕ) (ι : Fin m × Fin m → σ), Function.Injective ι →
-  ∀ (α : Fin m → ℕ), Antitone α →
-  HWB ι (PI.FJM.shapeProd (Matrix.of fun (i : Fin m) (k : Fin m) => (X (ι (i, k)) : MvPolynomial σ ℂ))
-    (List.ofFn α)) ∧
-  aeval (killS (offD ι)) (PI.FJM.shapeProd (Matrix.of fun (i : Fin m) (k : Fin m) =>
-    (X (ι (i, k)) : MvPolynomial σ ℂ)) (List.ofFn α)) = ∏ i, X (ι (i, i)) ^ α i
+def HypShape : Prop :=
+  ∀ (σ : Type) (m : ℕ) (ι : Fin m × Fin m → σ),
+    Function.Injective ι
+      → ∀ (α : Fin m → ℕ),
+        Antitone α
+          → HWB ι
+              (PI.FJM.shapeProd
+                (Matrix.of fun (i : Fin m) (k : Fin m) => (X (ι (i, k)) : MvPolynomial σ ℂ))
+                (List.ofFn α))
+            ∧ aeval (killS (offD ι))
+                (PI.FJM.shapeProd
+                  (Matrix.of fun (i : Fin m) (k : Fin m) => (X (ι (i, k)) : MvPolynomial σ ℂ))
+                  (List.ofFn α))
+              = ∏ i, X (ι (i, i)) ^ α i
 
 def diagOne' {σ : Type*} {m n : ℕ} (ι : Fin m × Fin n → σ) : σ → MvPolynomial σ ℂ := fun v =>
-  if v ∈ offD ι then 0 else if ∃ i k, ι (i, k) = v ∧ (i : ℕ) = k then 1 else X v
+  if v ∈ offD ι then
+    0
+  else if ∃ i k, ι (i, k) = v ∧ (i : ℕ) = k then
+    1
+  else
+    X v
 
-def HypDiag : Prop := ∀ (σ : Type) (m : ℕ) (ι : Fin m × Fin m → σ), Function.Injective ι →
-  ∀ (α : Fin m → ℕ) (P : MvPolynomial σ ℂ), (∀ e ∈ P.support, ∀ i, ∑ k : Fin m, e (ι (i, k)) = α i) →
-  aeval (killS (offD ι)) P = (∏ i, X (ι (i, i)) ^ α i) * aeval (diagOne' ι) P
+def HypDiag : Prop :=
+  ∀ (σ : Type) (m : ℕ) (ι : Fin m × Fin m → σ),
+    Function.Injective ι
+      → ∀ (α : Fin m → ℕ) (P : MvPolynomial σ ℂ),
+        (∀ e ∈ P.support, ∀ i, ∑ k : Fin m, e (ι (i, k)) = α i)
+          → aeval (killS (offD ι)) P = (∏ i, X (ι (i, i)) ^ α i) * aeval (diagOne' ι) P
 
-def HypFree : Prop := ∀ (σ : Type) (m n : ℕ) (ι : Fin m × Fin n → σ), Function.Injective ι →
-  ∀ P : MvPolynomial σ ℂ, ∀ e ∈ (aeval (diagOne' ι) P).support, ∀ x, e (ι x) = 0
+def HypFree : Prop :=
+  ∀ (σ : Type) (m n : ℕ) (ι : Fin m × Fin n → σ),
+    Function.Injective ι
+      → ∀ P : MvPolynomial σ ℂ, ∀ e ∈ (aeval (diagOne' ι) P).support, ∀ x, e (ι x) = 0
 
 variable {σ : Type*}
 
-theorem exists_support_of_killS {S : Set σ} {P : MvPolynomial σ ℂ} (h : aeval (killS S) P ≠ 0) :
-    ∃ e ∈ P.support, ∀ v ∈ S, e v = 0 := by
+theorem exists_support_of_killS {S : Set σ} {P : MvPolynomial σ ℂ} (h : aeval (killS S) P ≠ 0)
+    : ∃ e ∈ P.support, ∀ v ∈ S, e v = 0 := by
   by_contra hne
   push_neg at hne
   apply h
@@ -48,8 +70,8 @@ theorem exists_support_of_killS {S : Set σ} {P : MvPolynomial σ ℂ} (h : aeva
   refine Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hv) ?_
   simp [killS, hvS, hv]
 
-theorem aeval_killS_free {S : Set σ} {Q : MvPolynomial σ ℂ} (h : ∀ e ∈ Q.support, ∀ v ∈ S, e v = 0) :
-    aeval (killS S) Q = Q := by
+theorem aeval_killS_free {S : Set σ} {Q : MvPolynomial σ ℂ} (h : ∀ e ∈ Q.support, ∀ v ∈ S, e v = 0)
+    : aeval (killS S) Q = Q := by
   conv_rhs => rw [Q.as_sum]
   conv_lhs => rw [Q.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -61,46 +83,55 @@ theorem aeval_killS_free {S : Set σ} {Q : MvPolynomial σ ℂ} (h : ∀ e ∈ Q
   have hvS : v ∉ S := fun hvS => (Finsupp.mem_support_iff.mp hv) (h e he v hvS)
   simp only [killS, if_neg hvS]
 
-private theorem pderiv_eq_zero_of_forall_support_apply_eq_zero {v : σ} {Q : MvPolynomial σ ℂ} (h : ∀ e ∈ Q.support, e v = 0) :
-    pderiv v Q = 0 := by
+private theorem pderiv_eq_zero_of_forall_support_apply_eq_zero
+    {v : σ} {Q : MvPolynomial σ ℂ} (h : ∀ e ∈ Q.support, e v = 0)
+    : pderiv v Q = 0 := by
   conv_lhs => rw [Q.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_eq_zero fun e he => ?_
   simp [pderiv_monomial, h e he]
 
-theorem bRow_mul_free {m n : ℕ} (ι : Fin m × Fin n → σ) (a b : Fin m) (S Q : MvPolynomial σ ℂ)
-    (hQ : ∀ e ∈ Q.support, ∀ x, e (ι x) = 0) : PI.FJM.bRow ι a b (S * Q) = PI.FJM.bRow ι a b S * Q := by
+theorem bRow_mul_free
+    {m n : ℕ} (ι : Fin m × Fin n → σ) (a b : Fin m)
+    (S Q : MvPolynomial σ ℂ) (hQ : ∀ e ∈ Q.support, ∀ x, e (ι x) = 0)
+    : PI.FJM.bRow ι a b (S * Q) = PI.FJM.bRow ι a b S * Q := by
   show (∑ k : Fin n, LinearMap.mulLeft ℂ (X (ι (a, k))) * (pderiv (ι (b, k))).toLinearMap : Module.End ℂ (MvPolynomial σ ℂ)) (S * Q) =
     (∑ k : Fin n, LinearMap.mulLeft ℂ (X (ι (a, k))) * (pderiv (ι (b, k))).toLinearMap : Module.End ℂ (MvPolynomial σ ℂ)) S * Q
   rw [LinearMap.sum_apply, LinearMap.sum_apply, Finset.sum_mul]
   refine Finset.sum_congr rfl fun k _ => ?_
   change X (ι (a, k)) * pderiv (ι (b, k)) (S * Q) = X (ι (a, k)) * pderiv (ι (b, k)) S * Q
   have hl := (pderiv (ι (b, k))).leibniz S Q
-  rw [pderiv_eq_zero_of_forall_support_apply_eq_zero fun e he => hQ e he (b, k), smul_zero, zero_add, smul_eq_mul] at hl
+  rw [pderiv_eq_zero_of_forall_support_apply_eq_zero fun e he => hQ e he (b, k), smul_zero,
+      zero_add, smul_eq_mul]
+    at hl
   rw [hl]
   ring
 
-theorem bCol_mul_free {m n : ℕ} (ι : Fin m × Fin n → σ) (c d : Fin n) (S Q : MvPolynomial σ ℂ)
-    (hQ : ∀ e ∈ Q.support, ∀ x, e (ι x) = 0) : PI.FJM.bCol ι c d (S * Q) = PI.FJM.bCol ι c d S * Q := by
+theorem bCol_mul_free
+    {m n : ℕ} (ι : Fin m × Fin n → σ) (c d : Fin n)
+    (S Q : MvPolynomial σ ℂ) (hQ : ∀ e ∈ Q.support, ∀ x, e (ι x) = 0)
+    : PI.FJM.bCol ι c d (S * Q) = PI.FJM.bCol ι c d S * Q := by
   show (∑ i : Fin m, LinearMap.mulLeft ℂ (X (ι (i, c))) * (pderiv (ι (i, d))).toLinearMap : Module.End ℂ (MvPolynomial σ ℂ)) (S * Q) =
     (∑ i : Fin m, LinearMap.mulLeft ℂ (X (ι (i, c))) * (pderiv (ι (i, d))).toLinearMap : Module.End ℂ (MvPolynomial σ ℂ)) S * Q
   rw [LinearMap.sum_apply, LinearMap.sum_apply, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   change X (ι (i, c)) * pderiv (ι (i, d)) (S * Q) = X (ι (i, c)) * pderiv (ι (i, d)) S * Q
   have hl := (pderiv (ι (i, d))).leibniz S Q
-  rw [pderiv_eq_zero_of_forall_support_apply_eq_zero fun e he => hQ e he (i, d), smul_zero, zero_add, smul_eq_mul] at hl
+  rw [pderiv_eq_zero_of_forall_support_apply_eq_zero fun e he => hQ e he (i, d), smul_zero,
+      zero_add, smul_eq_mul]
+    at hl
   rw [hl]
   ring
 
-theorem cauchyHW_of (hA : HypAnti) (hS : HypShape) (hD : HypDiag) (hF : HypFree) : PI.FJM.CauchyHW := by
+theorem cauchyHW_of (hA : HypAnti) (hS : HypShape) (hD : HypDiag) (hF : HypFree)
+    : PI.FJM.CauchyHW := by
   intro τ m n ι hι α β P hP hrow hcol hsum hα hβ
   have hinvP : HWB ι P := ⟨hrow, hcol⟩
-  have hne : aeval (killS (offD ι)) P ≠ 0 := fun h0 =>
-    hP (diag_zero m n ι hι P hinvP h0)
+  have hne : aeval (killS (offD ι)) P ≠ 0 := fun h0 => hP (diag_zero m n ι hι P hinvP h0)
   obtain ⟨e, heP, he0⟩ := exists_support_of_killS hne
-  have hoff : ∀ (i : Fin m) (k : Fin n), (i : ℕ) ≠ k → e (ι (i, k)) = 0 :=
-    fun i k h => he0 _ ⟨i, k, rfl, h⟩
+  have hoff : ∀ (i : Fin m) (k : Fin n), (i : ℕ) ≠ k → e (ι (i, k)) = 0 := fun i k h =>
+    he0 _ ⟨i, k, rfl, h⟩
   have hrowsum : ∀ (i : Fin m) (k : Fin n), (i : ℕ) = k → α i = e (ι (i, k)) := by
     intro i k hik
     rw [← (hsum e heP).1 i, Finset.sum_eq_single k]

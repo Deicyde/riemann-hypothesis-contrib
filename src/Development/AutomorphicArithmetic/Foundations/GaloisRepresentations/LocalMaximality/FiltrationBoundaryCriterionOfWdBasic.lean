@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section
@@ -189,8 +190,8 @@ private lemma low' (hW : WdBasic) {A : Finset σ → Submodule ℂ E} {w : σ �
 
 end
 
-theorem UpperTheory.Gal.productCup_of_system.filtrationBoundaryCriterion_of_wdBasic :
-    WdBasic → FiltrationBoundaryCriterion := by
+theorem UpperTheory.Gal.productCup_of_system.filtrationBoundaryCriterion_of_wdBasic
+    : WdBasic → FiltrationBoundaryCriterion := by
   intro hW σ E _ _ _ _ A w Q d n hok hq c hc hl hy0
   obtain ⟨y, hy, hyl, hyd⟩ := hy0
   have hcx : (acx A w).IsCx := (hW σ E A w).2.1 hok
@@ -201,12 +202,13 @@ theorem UpperTheory.Gal.productCup_of_system.filtrationBoundaryCriterion_of_wdBa
     omega
   refine of_sub' hy (low' hW hok hq d.toNat le_rfl n _ (sub_cocycle' hcx hc hy) ?_)
   intro s hs
-  have hs' : ¬ (((s ∩ Q).card : ℤ) ≤ (d.toNat : ℤ) - 1) := hs
+  have hs' : ¬(((s ∩ Q).card : ℤ) ≤ (d.toNat : ℤ) - 1) := hs
   have hge : d ≤ ((s ∩ Q).card : ℤ) := by omega
   have e1 := wd_split' hW A w Q y s
-  have e2 : wd (wOn Qᶜ w) y s = 0 := levC' w Q hyl s (by
-    show ¬ (((s ∩ Q).card : ℤ) = d - 1)
-    omega)
+  have e2 : wd (wOn Qᶜ w) y s = 0 :=
+    levC' w Q hyl s (by
+      show ¬ (((s ∩ Q).card : ℤ) = d - 1)
+      omega)
   show c s - wd w y s = 0
   rw [e1, e2, add_zero]
   by_cases h : ((s ∩ Q).card : ℤ) = d

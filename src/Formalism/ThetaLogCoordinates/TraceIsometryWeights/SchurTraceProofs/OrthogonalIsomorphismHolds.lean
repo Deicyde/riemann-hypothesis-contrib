@@ -27,7 +27,8 @@ noncomputable def perpV (h : MvPolynomial σ ℚ_[p]) : Submodule ℚ_[p] (MvPol
 
 theorem mem_perpV (h x : MvPolynomial σ ℚ_[p]) : x ∈ perpV h ↔ fock p x h = 0 := Iff.rfl
 
-noncomputable def perpS (A : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])) : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p]) where
+noncomputable def perpS (A : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p]))
+    : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p]) where
   carrier := {y | ∀ x ∈ A, fock p x y = 0}
   add_mem' := by
     intro a b ha hb x hx
@@ -37,62 +38,77 @@ noncomputable def perpS (A : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])) : Subm
     intro c y hy x hx
     rw [fock_smul_right', hy x hx, mul_zero]
 
-theorem mem_perpS (A : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])) (y : MvPolynomial σ ℚ_[p]) :
-    y ∈ perpS A ↔ ∀ x ∈ A, fock p x y = 0 := Iff.rfl
+theorem mem_perpS (A : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])) (y : MvPolynomial σ ℚ_[p])
+    : y ∈ perpS A ↔ ∀ x ∈ A, fock p x y = 0 :=
+  Iff.rfl
 
 end perp
 
 variable {p : ℕ} [Fact p.Prime] {N r n : ℕ}
 
-private theorem cprod_sub_prod_smul_mem_of_cas_sub_smul_mem {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] {n : ℕ}
-    (G : GlW K V n) {U : Submodule K V} (hU : G.Stable U) {v : V} {c0 : ℤ}
-    (hv : G.Cas v - ((c0 : ℤ) : K) • v ∈ U) (cs : List ℤ) :
-    G.cprod cs v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v ∈ U := by
+private theorem cprod_sub_prod_smul_mem_of_cas_sub_smul_mem
+    {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V]
+    {n : ℕ} (G : GlW K V n)
+    {U : Submodule K V} (hU : G.Stable U)
+    {v : V} {c0 : ℤ} (hv : G.Cas v - ((c0 : ℤ) : K) • v ∈ U)
+    (cs : List ℤ)
+    : G.cprod cs v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v ∈ U := by
   induction cs with
   | nil =>
     simp only [List.map_nil, List.prod_nil, one_smul]
     rw [show G.cprod [] v = v from rfl, sub_self]
     exact U.zero_mem
   | cons c cs ih =>
-    have key : G.cprod (c :: cs) v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) (c :: cs)).prod • v
-        = (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • (G.Cas v - ((c0 : ℤ) : K) • v)
-          + (G.Cas (G.cprod cs v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v)
-            - ((c : ℤ) : K) • (G.cprod cs v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v)) := by
+    have key
+        : G.cprod (c :: cs) v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) (c :: cs)).prod • v
+          = (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • (G.Cas v - ((c0 : ℤ) : K) • v)
+            + (G.Cas (G.cprod cs v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v)
+              - ((c : ℤ) : K)
+                • (G.cprod cs v - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v)) := by
       rw [G.cprod_cons, List.map_cons, List.prod_cons, map_sub, map_smul]
       push_cast
       module
     rw [key]
     exact U.add_mem (U.smul_mem _ hv) (U.sub_mem (G.Cas_mem hU ih) (U.smul_mem _ ih))
 
-private theorem le_iSup_gS_highestWeight_of_stable_of_finW {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] {n : ℕ}
-    (G : GlW K V n) (W : Submodule K V) (hW : G.Stable W) (hF : G.FinW W) :
-    W ≤ ⨆ i : {h : V // h ∈ W ∧ h ≠ 0 ∧ ∃ ν, G.IsHW ν h}, G.gS {i.1} := by
+private theorem le_iSup_gS_highestWeight_of_stable_of_finW
+    {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V]
+    {n : ℕ} (G : GlW K V n)
+    (W : Submodule K V) (hW : G.Stable W) (hF : G.FinW W)
+    : W ≤ ⨆ i : {h : V // h ∈ W ∧ h ≠ 0 ∧ ∃ ν, G.IsHW ν h}, G.gS {i.1} := by
   set S := ⨆ i : {h : V // h ∈ W ∧ h ≠ 0 ∧ ∃ ν, G.IsHW ν h}, G.gS {i.1} with hS
   have hSst : G.Stable S := CountingSumsFrames.GlX.iSup_stable G (fun i => G.gS_stable _)
   by_contra hWS
-  obtain ⟨v, hvW, hvS, μ, hvμ, hraise⟩ :=
-    G.exists_hwmod (G.graded_of hW) (G.raising_of hW) hF hWS
+  obtain ⟨v, hvW, hvS, μ, hvμ, hraise⟩ := G.exists_hwmod (G.graded_of hW) (G.raising_of hW) hF hWS
   have hdomμ : DomW μ := G.dom_of_hwmod hSst hW hF hvW hvS hvμ hraise
   obtain ⟨c0, hc0⟩ : ∃ c0, c0 = GlW.casI μ := ⟨_, rfl⟩
   have hCas : G.Cas v - ((c0 : ℤ) : K) • v ∈ S := by
     rw [hc0]
     exact G.Cas_hwmod hSst hvμ hraise
-  have hdec : ∀ a b : Fin n, ∃ f : {h : V // h ∈ W ∧ h ≠ 0 ∧ ∃ ν, G.IsHW ν h} →₀ V,
-      (∀ i, f i ∈ G.gS {i.1}) ∧ (a < b → (f.sum fun _ x => x) = G.E a b v) := by
+  have hdec
+      : ∀ a b : Fin n, ∃ f : {h : V // h ∈ W ∧ h ≠ 0 ∧ ∃ ν, G.IsHW ν h} →₀ V,
+        (∀ i, f i ∈ G.gS {i.1}) ∧ (a < b → (f.sum fun _ x => x) = G.E a b v) := by
     intro a b
     by_cases hab : a < b
     · obtain ⟨f, hf1, hf2⟩ := (Submodule.mem_iSup_iff_exists_finsupp _ _).mp (hraise a b hab)
       exact ⟨f, hf1, fun _ => hf2⟩
     · exact ⟨0, fun i => by simp, fun h => absurd h hab⟩
   choose f hf1 hf2 using hdec
-  obtain ⟨cs, hcs⟩ : ∃ cs : List ℤ, cs = ((Finset.univ.biUnion fun a => Finset.univ.biUnion fun b =>
-      (f a b).support.image fun i => GlW.casI i.2.2.2.choose).filter (fun c => c ≠ c0)).toList := ⟨_, rfl⟩
+  obtain ⟨cs, hcs⟩
+      : ∃ cs : List ℤ,
+        cs
+          = ((Finset.univ.biUnion fun a =>
+              Finset.univ.biUnion fun b =>
+                (f a b).support.image fun i => GlW.casI i.2.2.2.choose).filter
+            (fun c => c ≠ c0)).toList :=
+    ⟨_, rfl⟩
   have hcs_ne : ∀ c ∈ cs, c ≠ c0 := by
     intro c hc
     rw [hcs, Finset.mem_toList, Finset.mem_filter] at hc
     exact hc.2
-  have hcs_mem : ∀ a b i, i ∈ (f a b).support → GlW.casI i.2.2.2.choose ≠ c0 →
-      GlW.casI i.2.2.2.choose ∈ cs := by
+  have hcs_mem
+      : ∀ a b i,
+        i ∈ (f a b).support → GlW.casI i.2.2.2.choose ≠ c0 → GlW.casI i.2.2.2.choose ∈ cs := by
     intro a b i hi hne
     rw [hcs, Finset.mem_toList, Finset.mem_filter]
     refine ⟨?_, hne⟩
@@ -101,7 +117,8 @@ private theorem le_iSup_gS_highestWeight_of_stable_of_finW {K V : Type} [Field K
   have hP : (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod ≠ 0 :=
     cprod_ne (K := K) (V := V) c0 cs hcs_ne
   have hmod := cprod_sub_prod_smul_mem_of_cas_sub_smul_mem G hSst hCas cs
-  have hv2mod : G.comp μ (G.cprod cs v) - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v ∈ S := by
+  have hv2mod
+      : G.comp μ (G.cprod cs v) - (List.map (fun c : ℤ => ((c0 - c : ℤ) : K)) cs).prod • v ∈ S := by
     have h := G.graded_of hSst μ _ hmod
     rwa [map_sub, map_smul, show G.comp μ v = v from hvμ] at h
   have hv2W : G.comp μ (G.cprod cs v) ∈ W := G.graded_of hW μ _ (G.cprod_mem hW cs hvW)
@@ -149,11 +166,12 @@ private theorem le_iSup_gS_highestWeight_of_stable_of_finW {K V : Type} [Field K
   rw [sub_sub_cancel] at hPv
   exact hvS ((Submodule.smul_mem_iff _ hP).mp hPv)
 
-theorem pol_le_iSup (LL L2 : Letters N) (j : ℕ) (Cs : Finset (Fin r)) :
-    Pol p r L2 ≤ ⨆ la : Fin r → ℤ, IsoC p LL j Cs la := by
+theorem pol_le_iSup (LL L2 : Letters N) (j : ℕ) (Cs : Finset (Fin r))
+    : Pol p r L2 ≤ ⨆ la : Fin r → ℤ, IsoC p LL j Cs la := by
   have hW := GAe_pol_stable (p := p) LL L2 j (enumC Cs)
   have hF := GAe_pol_finW (p := p) LL L2 j (enumC Cs)
-  refine le_trans (le_iSup_gS_highestWeight_of_stable_of_finW (GAe p LL j (enumC Cs)) (Pol p r L2) hW hF) ?_
+  refine le_trans
+    (le_iSup_gS_highestWeight_of_stable_of_finW (GAe p LL j (enumC Cs)) (Pol p r L2) hW hF) ?_
   refine iSup_le fun i => ?_
   refine le_iSup_of_le (Function.extend (⇑(enumC Cs)) i.2.2.2.choose 0) ?_
   rw [isoC_eq]
@@ -173,9 +191,12 @@ theorem span_isomorphism_holds : SpanIso := by
   refine Submodule.sum_mem _ fun m _ => ?_
   exact pol_le_iSup LL _ j Cs (monomial_mem_pol LL m _)
 
-theorem fock_wt_ne (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r) {μ ν : Fin n → ℤ} (hne : μ ≠ ν)
-    {x y : MvPolynomial (Fin N × Fin r) ℚ_[p]} (hx : (GAe p LL j e).IsWt μ x) (hy : (GAe p LL j e).IsWt ν y) :
-    fock p x y = 0 := by
+theorem fock_wt_ne
+    (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r)
+    {μ ν : Fin n → ℤ} (hne : μ ≠ ν)
+    {x y : MvPolynomial (Fin N × Fin r) ℚ_[p]}
+    (hx : (GAe p LL j e).IsWt μ x) (hy : (GAe p LL j e).IsWt ν y)
+    : fock p x y = 0 := by
   rw [GAe_isWt_iff, MvPolynomial.mem_restrictSupport_iff] at hx hy
   apply fock_disjoint
   intro m hmx hmy
@@ -184,9 +205,12 @@ theorem fock_wt_ne (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r) {μ ν : Fi
   have h2 : wt LL j (e a) m = ν a := hy hmy a
   exact ha (h1.symm.trans h2)
 
-theorem gS_le_perpV (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r) {μ ν : Fin n → ℤ} (hne : μ ≠ ν)
-    {h h' : MvPolynomial (Fin N × Fin r) ℚ_[p]} (hh : (GAe p LL j e).IsHW μ h) (hh' : (GAe p LL j e).IsHW ν h') :
-    (GAe p LL j e).gS {h} ≤ perpV h' := by
+theorem gS_le_perpV
+    (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r)
+    {μ ν : Fin n → ℤ} (hne : μ ≠ ν)
+    {h h' : MvPolynomial (Fin N × Fin r) ℚ_[p]}
+    (hh : (GAe p LL j e).IsHW μ h) (hh' : (GAe p LL j e).IsHW ν h')
+    : (GAe p LL j e).gS {h} ≤ perpV h' := by
   refine le_trans ((GAe p LL j e).gS_le_Lw hh) ?_
   refine (GAe p LL j e).Lw_le h ?_ ?_
   · rw [mem_perpV]
@@ -197,9 +221,11 @@ theorem gS_le_perpV (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r) {μ ν : F
     rw [GAe_E] at hk ⊢
     rw [fischerAdjointness_holds p N r LL j (e a) (e b) x h', hk, fock_zero_right']
 
-theorem gSall_le_perpV (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r) {μ ν : Fin n → ℤ} (hne : μ ≠ ν)
-    {h' : MvPolynomial (Fin N × Fin r) ℚ_[p]} (hh' : (GAe p LL j e).IsHW ν h') :
-    (GAe p LL j e).gS {v | (GAe p LL j e).IsHW μ v} ≤ perpV h' := by
+theorem gSall_le_perpV
+    (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r)
+    {μ ν : Fin n → ℤ} (hne : μ ≠ ν)
+    {h' : MvPolynomial (Fin N × Fin r) ℚ_[p]} (hh' : (GAe p LL j e).IsHW ν h')
+    : (GAe p LL j e).gS {v | (GAe p LL j e).IsHW μ v} ≤ perpV h' := by
   have hA : (GAe p LL j e).Stable ((GAe p LL j e).gS {h'}) := (GAe p LL j e).gS_stable _
   have hst : (GAe p LL j e).Stable (perpS ((GAe p LL j e).gS {h'})) := by
     intro a b y hy
@@ -221,9 +247,10 @@ theorem gSall_le_perpV (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r) {μ ν 
     rw [mem_perpV, fock_symm']
     exact hy h' ((GAe p LL j e).subset_gS {h'} (Set.mem_singleton h'))
 
-theorem perpS_stable (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r)
-    {A : Submodule ℚ_[p] (MvPolynomial (Fin N × Fin r) ℚ_[p])} (hA : (GAe p LL j e).Stable A) :
-    (GAe p LL j e).Stable (perpS A) := by
+theorem perpS_stable
+    (LL : Letters N) (j : ℕ) (e : Fin n ↪o Fin r)
+    {A : Submodule ℚ_[p] (MvPolynomial (Fin N × Fin r) ℚ_[p])} (hA : (GAe p LL j e).Stable A)
+    : (GAe p LL j e).Stable (perpS A) := by
   intro a b y hy
   rw [mem_perpS] at hy ⊢
   intro x hx
@@ -243,8 +270,10 @@ theorem orthogonal_isomorphism_holds : OrthIso := by
   have hB : (GAe p LL j (enumC Cs)).Stable
       ((GAe p LL j (enumC Cs)).gS {v | (GAe p LL j (enumC Cs)).IsHW (mu ∘ enumC Cs) v}) :=
     (GAe p LL j (enumC Cs)).gS_stable _
-  have hle : (GAe p LL j (enumC Cs)).gS {v | (GAe p LL j (enumC Cs)).IsHW (la ∘ enumC Cs) v} ≤
-      perpS ((GAe p LL j (enumC Cs)).gS {v | (GAe p LL j (enumC Cs)).IsHW (mu ∘ enumC Cs) v}) := by
+  have hle
+      : (GAe p LL j (enumC Cs)).gS {v | (GAe p LL j (enumC Cs)).IsHW (la ∘ enumC Cs) v}
+        ≤ perpS ((GAe p LL j (enumC Cs)).gS
+          {v | (GAe p LL j (enumC Cs)).IsHW (mu ∘ enumC Cs) v}) := by
     refine (GAe p LL j (enumC Cs)).gS_le ?_ (perpS_stable LL j (enumC Cs) hB)
     intro v hv
     rw [SetLike.mem_coe, mem_perpS]
@@ -260,8 +289,9 @@ theorem projection_lattice_holds : ProjP := by
   intro p _ N r LL j Cs T hT
   set A := ⨆ la ∈ T, IsoC p LL j Cs la with hA
   set B := ⨆ mu, ⨆ (_ : mu ∉ T), IsoC p LL j Cs mu with hB
-  have horth : ∀ la mu : Fin r → ℤ, la ∈ T → mu ∉ T →
-      ∀ x ∈ IsoC p LL j Cs la, ∀ y ∈ IsoC p LL j Cs mu, fock p x y = 0 := by
+  have horth
+      : ∀ la mu : Fin r → ℤ,
+        la ∈ T → mu ∉ T → ∀ x ∈ IsoC p LL j Cs la, ∀ y ∈ IsoC p LL j Cs mu, fock p x y = 0 := by
     intro la mu hla hmu x hx y hy
     have hne : ∃ c ∈ Cs, la c ≠ mu c := by
       by_contra hcon
@@ -307,7 +337,8 @@ theorem projection_lattice_holds : ProjP := by
       obtain ⟨g1, hg1, g2, hg2, rfl⟩ := Submodule.mem_sup.mp hG
       rw [fock_add_right', fock_symm', hAB' g1 hg1 x hxB, hAB' x hxA g2 hg2, add_zero]
     · rw [codisjoint_iff, hsup]
-  have hdec : ∀ H, ∃ h1 ∈ A, ∃ h2 ∈ B, H = h1 + h2 ∧ (A.subtype ∘ₗ A.projectionOnto B hcompl) H = h1 := by
+  have hdec
+      : ∀ H, ∃ h1 ∈ A, ∃ h2 ∈ B, H = h1 + h2 ∧ (A.subtype ∘ₗ A.projectionOnto B hcompl) H = h1 := by
     intro H
     have hH : H ∈ A ⊔ B := by
       rw [hsup]
@@ -324,7 +355,8 @@ theorem projection_lattice_holds : ProjP := by
   · ext x
     simp only [LinearMap.comp_apply, Submodule.coe_subtype, Submodule.projectionOnto_apply_left]
   · rw [LinearMap.range_comp, Submodule.range_projectionOnto, Submodule.map_subtype_top]
-  · rw [LinearMap.ker_comp, Submodule.ker_subtype, Submodule.comap_bot, Submodule.ker_projectionOnto]
+  · rw [LinearMap.ker_comp, Submodule.ker_subtype, Submodule.comap_bot,
+      Submodule.ker_projectionOnto]
   · intro F G
     obtain ⟨f1, hf1, f2, hf2, rfl, hPF⟩ := hdec F
     obtain ⟨g1, hg1, g2, hg2, rfl, hPG⟩ := hdec G

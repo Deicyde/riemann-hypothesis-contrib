@@ -9,8 +9,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-theorem UpperTheory.V.FW.algK :
-    ∀ (l : ℕ) [Fact l.Prime] (a m b K : ℕ) (k G Q : Type) [Field k] [CharP k l] [IsAlgClosed k] [CommGroup G] [Finite G] [CommGroup Q] (p : G →* G) (π : G →* Q) (γ J : G) (θ : MonoidAlgebra k G), m.Coprime l → γ ^ l ^ b = 1 → (∀ g, p g ∈ Subgroup.zpowers γ) → (∀ g, (g * (p g)⁻¹) ^ (l ^ a * m) = 1) → p J = 1 → (∀ g, π (p g) = π g) → π γ ^ l ^ K = 1 → (∀ χ : G →* kˣ, χ J = -1 → tw χ π θ ≠ 0) → (MonoidAlgebra.of k G γ - 1) ^ (l ^ K * l ^ a) ∈ Ideal.span {θ, 1 + MonoidAlgebra.of k G J} := by
+theorem UpperTheory.V.FW.algK
+    : ∀ (l : ℕ) [Fact l.Prime] (a m b K : ℕ) (k G Q : Type) [Field k] [CharP k l] [IsAlgClosed k]
+        [CommGroup G] [Finite G] [CommGroup Q] (p : G →* G) (π : G →* Q) (γ J : G)
+        (θ : MonoidAlgebra k G),
+      m.Coprime l → γ ^ l ^ b = 1 → (∀ g, p g ∈ Subgroup.zpowers γ)
+        → (∀ g, (g * (p g)⁻¹) ^ (l ^ a * m) = 1) → p J = 1 → (∀ g, π (p g) = π g) → π γ ^ l ^ K = 1
+        → (∀ χ : G →* kˣ, χ J = -1 → tw χ π θ ≠ 0)
+        → (MonoidAlgebra.of k G γ - 1) ^ (l ^ K * l ^ a)
+          ∈ Ideal.span {θ, 1 + MonoidAlgebra.of k G J} := by
   intro l _ a m b K k G Q _ _ _ _ _ _ p π γ J θ hml hγ hp hord hpJ hπ hπγ htw
   have hl : l.Prime := Fact.out
   let I : Ideal (MonoidAlgebra k G) := Ideal.span {θ, 1 + MonoidAlgebra.of k G J}
@@ -18,12 +25,13 @@ theorem UpperTheory.V.FW.algK :
   have hr : ∀ x, r x = 0 ↔ x ∈ I := fun x => by
     rw [Ideal.Quotient.mkₐ_eq_mk]
     exact Ideal.Quotient.eq_zero_iff_mem
-  let qh : G →* G :=
-    { toFun := fun g => (g * (p g)⁻¹) ^ (l ^ a)
-      map_one' := by simp
-      map_mul' := by
-        intro x y
-        rw [map_mul, mul_inv, mul_mul_mul_comm, mul_pow] }
+  let qh : G →* G := {
+    toFun := fun g => (g * (p g)⁻¹) ^ (l ^ a)
+    map_one' := by simp
+    map_mul' := by
+      intro x y
+      rw [map_mul, mul_inv, mul_mul_mul_comm, mul_pow]
+  }
   let D : Subgroup G := qh.range
   let qD : G →* D := qh.rangeRestrict
   have hcard : (Nat.card D : k) ≠ 0 := by
@@ -44,8 +52,8 @@ theorem UpperTheory.V.FW.algK :
     rw [hml] at h3
     exact hl.one_lt.ne' (Nat.dvd_one.mp h3)
   let ρ : D →* (MonoidAlgebra k G ⧸ I) :=
-    ((r : MonoidAlgebra k G →+* (MonoidAlgebra k G ⧸ I)) : MonoidAlgebra k G →* (MonoidAlgebra k G ⧸ I)).comp
-      ((MonoidAlgebra.of k G).comp D.subtype)
+    ((r : MonoidAlgebra k G →+* (MonoidAlgebra k G ⧸ I))
+      : MonoidAlgebra k G →* (MonoidAlgebra k G ⧸ I)).comp ((MonoidAlgebra.of k G).comp D.subtype)
   have hρ : ∀ g, ρ (qD g) = r (MonoidAlgebra.of k G ((g * (p g)⁻¹) ^ (l ^ a))) := fun g => rfl
   have hθ : r θ = 0 := (hr θ).mpr (Ideal.subset_span (Set.mem_insert _ _))
   have hJ : r (MonoidAlgebra.of k G J) = -1 := by
@@ -67,10 +75,11 @@ theorem UpperTheory.V.FW.algK :
     rw [← iterateFrobeniusEquiv_def]
     exact RingEquiv.apply_symm_apply _ _
   have hT : r (tw χ p θ) ^ (l ^ a) * e = 0 := by
-    have := frobEig l a k G _ r p χ e θ (by
-      intro g
-      rw [hχ g, ← hρ g]
-      exact he (qD g))
+    have :=
+      frobEig l a k G _ r p χ e θ (by
+        intro g
+        rw [hχ g, ← hρ g]
+        exact he (qD g))
     rw [← this, hθ, zero_pow hla, zero_mul]
   have hχJ : χ J = -1 := by
     have h1 := he (qD J)

@@ -11,8 +11,10 @@ open Formalism.L2.Th1.CM Formalism.L2.Th1.F Polynomial
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem sqrt_poly {E : Type} [Field E] [CharZero E] (k : Subfield E) (h : E[X]) (hm : h.Monic)
-    (hk : ∀ i, (h ^ 2).coeff i ∈ k) : ∀ i, h.coeff i ∈ k := by
+theorem sqrt_poly
+    {E : Type} [Field E] [CharZero E]
+    (k : Subfield E) (h : E[X]) (hm : h.Monic) (hk : ∀ i, (h ^ 2).coeff i ∈ k)
+    : ∀ i, h.coeff i ∈ k := by
   have key : ∀ m i : ℕ, h.natDegree ≤ i + m → h.coeff i ∈ k := by
     intro m
     induction m with
@@ -27,16 +29,19 @@ theorem sqrt_poly {E : Type} [Field E] [CharZero E] (k : Subfield E) (h : E[X]) 
       · exact ih i h0
       have hin : i < h.natDegree := by omega
       set n := h.natDegree with hn
-      have hmem : ∀ x ∈ Finset.HasAntidiagonal.antidiagonal (i + n),
-          h.coeff x.1 * h.coeff x.2 - (if x = (i, n) then h.coeff i else 0)
-            - (if x = (n, i) then h.coeff i else 0) ∈ k := by
+      have hmem
+          : ∀ x ∈ Finset.HasAntidiagonal.antidiagonal (i + n),
+            h.coeff x.1 * h.coeff x.2 - (if x = (i, n) then h.coeff i else 0)
+                - (if x = (n, i) then h.coeff i else 0)
+              ∈ k := by
         rintro ⟨a, b⟩ hx
         rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
         simp only at hx
         by_cases ha : a = i
         · have hb : b = n := by omega
-          subst ha; subst hb
-          have hne : ¬ ((a, h.natDegree) = (h.natDegree, a)) := by
+          subst ha
+          subst hb
+          have hne : ¬((a, h.natDegree) = (h.natDegree, a)) := by
             intro he
             have := (Prod.mk.injEq _ _ _ _ ▸ he : a = h.natDegree ∧ h.natDegree = a).1
             omega
@@ -46,32 +51,35 @@ theorem sqrt_poly {E : Type} [Field E] [CharZero E] (k : Subfield E) (h : E[X]) 
         · have hb : b = i := by omega
           subst hb
           rw [ha']
-          have hne : ¬ ((n, b) = (b, n)) := by
+          have hne : ¬((n, b) = (b, n)) := by
             intro he
             have := (Prod.mk.injEq _ _ _ _ ▸ he : n = b ∧ b = n).1
             omega
           rw [if_neg hne, if_pos rfl, hn, hm.coeff_natDegree]
           simp [k.zero_mem]
-        have hne1 : ¬ ((a, b) = (i, n)) := fun he => ha (congrArg Prod.fst he)
-        have hne2 : ¬ ((a, b) = (n, i)) := fun he => ha' (congrArg Prod.fst he)
+        have hne1 : ¬((a, b) = (i, n)) := fun he => ha (congrArg Prod.fst he)
+        have hne2 : ¬((a, b) = (n, i)) := fun he => ha' (congrArg Prod.fst he)
         rw [if_neg hne1, if_neg hne2, sub_zero, sub_zero]
         rcases lt_or_gt_of_ne ha with h1 | h1
         · have : n < b := by omega
           show h.coeff a * h.coeff b ∈ k
-          rw [coeff_eq_zero_of_natDegree_lt this, mul_zero]; exact k.zero_mem
+          rw [coeff_eq_zero_of_natDegree_lt this, mul_zero]
+          exact k.zero_mem
         · rcases lt_or_gt_of_ne ha' with h2 | h2
           · exact k.mul_mem (ih a (by omega)) (ih b (by omega))
           · show h.coeff a * h.coeff b ∈ k
-            rw [coeff_eq_zero_of_natDegree_lt h2, zero_mul]; exact k.zero_mem
+            rw [coeff_eq_zero_of_natDegree_lt h2, zero_mul]
+            exact k.zero_mem
       have hsum := k.sum_mem hmem
       rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← coeff_mul, ← pow_two,
-        Finset.sum_ite_eq', Finset.sum_ite_eq',
-        if_pos (by simp),
-        if_pos (by simp [add_comm])] at hsum
+          Finset.sum_ite_eq', Finset.sum_ite_eq', if_pos (by simp), if_pos (by simp [add_comm])]
+        at hsum
       have h2 : (2 : E) * h.coeff i ∈ k := by
         have := k.sub_mem (hk (i + n)) hsum
-        have e : (h ^ 2).coeff (i + n) - ((h ^ 2).coeff (i + n) - h.coeff i - h.coeff i)
-            = 2 * h.coeff i := by ring
+        have e
+            : (h ^ 2).coeff (i + n) - ((h ^ 2).coeff (i + n) - h.coeff i - h.coeff i)
+              = 2 * h.coeff i := by
+          ring
         rwa [e] at this
       have h2k : (2 : E) ∈ k := by
         have := k.add_mem k.one_mem k.one_mem

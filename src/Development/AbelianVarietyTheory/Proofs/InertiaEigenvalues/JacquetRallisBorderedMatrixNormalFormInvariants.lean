@@ -16,18 +16,19 @@ theorem ev_eq_single (i : ℕ) (hi : i < r) : ev r k i = Pi.single (⟨i, hi⟩ 
   funext j
   simp only [ev, Pi.single_apply, Fin.ext_iff]
 
-theorem sum_mulVec' {ι : Type} (s : Finset ι) (M : ι → Matrix (Fin r) (Fin r) k) (v : Fin r → k) :
-    (∑ i ∈ s, M i) *ᵥ v = ∑ i ∈ s, M i *ᵥ v := by
+theorem sum_mulVec' {ι : Type} (s : Finset ι) (M : ι → Matrix (Fin r) (Fin r) k) (v : Fin r → k)
+    : (∑ i ∈ s, M i) *ᵥ v = ∑ i ∈ s, M i *ᵥ v := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, add_mulVec, ih]
 
-theorem pow_card_eq (M : Matrix (Fin r) (Fin r) k) :
-    M ^ r = - ∑ l ∈ Finset.range r, M.charpoly.coeff l • M ^ l := by
+theorem pow_card_eq (M : Matrix (Fin r) (Fin r) k)
+    : M ^ r = - ∑ l ∈ Finset.range r, M.charpoly.coeff l • M ^ l := by
   have h0 := aeval_self_charpoly M
   rw [Polynomial.aeval_eq_sum_range, charpoly_natDegree_eq_dim, Fintype.card_fin,
-    Finset.sum_range_succ] at h0
+      Finset.sum_range_succ]
+    at h0
   have h1 : M.charpoly.coeff r = 1 := by
     have := (charpoly_monic M).leadingCoeff
     rwa [Polynomial.leadingCoeff, charpoly_natDegree_eq_dim, Fintype.card_fin] at this
@@ -35,33 +36,32 @@ theorem pow_card_eq (M : Matrix (Fin r) (Fin r) k) :
   rw [eq_neg_iff_add_eq_zero, add_comm]
   exact h0
 
-theorem companion_mulVec_ev (p : Fin r → k) (i : ℕ) (hi : i + 1 < r) :
-    companion p *ᵥ ev r k i = ev r k (i + 1) := by
+theorem companion_mulVec_ev (p : Fin r → k) (i : ℕ) (hi : i + 1 < r)
+    : companion p *ᵥ ev r k i = ev r k (i + 1) := by
   rw [ev_eq_single i (by omega)]
   funext j
   simp only [mulVec_single, companion, of_apply, mul_one, ev]
-  have : ¬ (i + 1 = r) := by omega
+  have : ¬(i + 1 = r) := by omega
   simp [this]
 
-theorem companion_mulVec_last (p : Fin r → k) (i : ℕ) (hi : i + 1 = r) :
-    companion p *ᵥ ev r k i = - p := by
+theorem companion_mulVec_last (p : Fin r → k) (i : ℕ) (hi : i + 1 = r)
+    : companion p *ᵥ ev r k i = -p := by
   rw [ev_eq_single i (by omega)]
   funext j
   simp [mulVec_single, companion, hi]
 
-theorem companion_pow_ev (p : Fin r → k) (i : ℕ) (hi : i < r) :
-    companion p ^ i *ᵥ ev r k 0 = ev r k i := by
+theorem companion_pow_ev (p : Fin r → k) (i : ℕ) (hi : i < r)
+    : companion p ^ i *ᵥ ev r k 0 = ev r k i := by
   induction i with
   | zero => simp
   | succ i ih => rw [pow_succ', ← mulVec_mulVec, ih (by omega), companion_mulVec_ev p i hi]
 
-theorem companion_pow_card (p : Fin r → k) (hr : 0 < r) :
-    companion p ^ r *ᵥ ev r k 0 = - p := by
+theorem companion_pow_card (p : Fin r → k) (hr : 0 < r) : companion p ^ r *ᵥ ev r k 0 = -p := by
   obtain ⟨m, rfl⟩ : ∃ m, r = m + 1 := ⟨r - 1, by omega⟩
   rw [pow_succ', ← mulVec_mulVec, companion_pow_ev p m (by omega), companion_mulVec_last p m rfl]
 
-theorem charpoly_companion_coeff (p : Fin r → k) (i : Fin r) :
-    (companion p).charpoly.coeff i = p i := by
+theorem charpoly_companion_coeff (p : Fin r → k) (i : Fin r)
+    : (companion p).charpoly.coeff i = p i := by
   have hr : 0 < r := i.pos
   have h := pow_card_eq (companion p)
   have h2 := congrArg (fun M => M *ᵥ ev r k 0) h
@@ -94,7 +94,8 @@ theorem inv_act' (g : GL (Fin r) k) (Y : Gl r k) : inv (act g Y) = inv Y := by
 
 theorem act_mul' (g h : GL (Fin r) k) (Y : Gl r k) : act (g * h) Y = act g (act h Y) := by
   obtain ⟨A, b, c, l⟩ := Y
-  simp only [act, _root_.mul_inv_rev, Units.val_mul, mulVec_mulVec, vecMul_vecMul, Prod.mk.injEq, and_true]
+  simp only [act, _root_.mul_inv_rev, Units.val_mul, mulVec_mulVec, vecMul_vecMul, Prod.mk.injEq,
+    and_true]
   try simp [mul_assoc]
 
 theorem inv_sec' (a : Inv r k) : inv (sec a) = a := by
@@ -102,7 +103,8 @@ theorem inv_sec' (a : Inv r k) : inv (sec a) = a := by
   simp only [inv, sec, Prod.mk.injEq, and_true]
   refine ⟨funext fun i => charpoly_companion_coeff p i, funext fun i => ?_⟩
   have he : (fun i : Fin r => if (i : ℕ) = 0 then (1 : k) else 0) = ev r k 0 := rfl
-  simp only [mom, he, companion_pow_ev p i i.2, ev_eq_single (i : ℕ) i.2, dotProduct_single, mul_one]
+  simp only [mom, he, companion_pow_ev p i i.2, ev_eq_single (i : ℕ) i.2, dotProduct_single,
+    mul_one]
 
 theorem charpoly_companion_inv (Y : Gl r k) : (companion (inv Y).1).charpoly = Y.1.charpoly := by
   apply Polynomial.ext
@@ -114,21 +116,23 @@ theorem charpoly_companion_inv (Y : Gl r k) : (companion (inv Y).1).charpoly = Y
     have h2 := (charpoly_monic Y.1).leadingCoeff
     rw [Polynomial.leadingCoeff, charpoly_natDegree_eq_dim, Fintype.card_fin] at h1 h2
     rw [h1, h2]
-  · rw [Polynomial.coeff_eq_zero_of_natDegree_lt, Polynomial.coeff_eq_zero_of_natDegree_lt] <;>
-      simpa using h
+  · rw [Polynomial.coeff_eq_zero_of_natDegree_lt, Polynomial.coeff_eq_zero_of_natDegree_lt]
+      <;> simpa using h
 
-theorem dot_pow_eq_sum (M : Matrix (Fin r) (Fin r) k) (hr : 0 < r) (b c : Fin r → k) (n : ℕ) :
-    c ⬝ᵥ (M ^ n *ᵥ b) = ∑ i ∈ Finset.range r,
-      ((Polynomial.X ^ n) %ₘ M.charpoly).coeff i * (c ⬝ᵥ (M ^ i *ᵥ b)) := by
+theorem dot_pow_eq_sum (M : Matrix (Fin r) (Fin r) k) (hr : 0 < r) (b c : Fin r → k) (n : ℕ)
+    : c ⬝ᵥ (M ^ n *ᵥ b)
+      = ∑ i ∈ Finset.range r,
+        ((Polynomial.X ^ n) %ₘ M.charpoly).coeff i * (c ⬝ᵥ (M ^ i *ᵥ b)) := by
   have hmon := charpoly_monic M
   have hdeg : M.charpoly.natDegree = r := by simp
-  have hne : M.charpoly ≠ 1 := by
-    intro h; rw [h, Polynomial.natDegree_one] at hdeg; omega
+  have hne : M.charpoly ≠ 1 := by intro h; rw [h, Polynomial.natDegree_one] at hdeg; omega
   have hM : M ^ n = Polynomial.aeval M ((Polynomial.X ^ n) %ₘ M.charpoly) := by
     rw [Polynomial.aeval_modByMonic_eq_self_of_root (aeval_self_charpoly M)]
     simp
-  rw [hM, Polynomial.aeval_eq_sum_range' (n := r)
-    (by have := Polynomial.natDegree_modByMonic_lt (Polynomial.X ^ n) hmon hne; omega), sum_mulVec', dotProduct_sum]
+  rw [hM,
+    Polynomial.aeval_eq_sum_range' (n := r)
+      (by have := Polynomial.natDegree_modByMonic_lt (Polynomial.X ^ n) hmon hne; omega),
+    sum_mulVec', dotProduct_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [smul_mulVec, dotProduct_smul, smul_eq_mul]
 
@@ -168,14 +172,14 @@ theorem mul_Bm (Y : Gl r k) : Y.1 * Bm Y = Bm Y * companion (inv Y).1 := by
   · simp only [companion, of_apply, hj, if_true, Bm, inv]
     rw [pow_card_eq Y.1, neg_mulVec, sum_mulVec']
     simp only [Pi.neg_apply, Finset.sum_apply, smul_mulVec, Pi.smul_apply, smul_eq_mul]
-    rw [Fin.sum_univ_eq_sum_range (fun l => (Y.1 ^ l *ᵥ Y.2.1) i * -Y.1.charpoly.coeff l),
+    rw [Fin.sum_univ_eq_sum_range (fun l => (Y.1 ^ l *ᵥ Y.2.1) i * - Y.1.charpoly.coeff l),
       ← Finset.sum_neg_distrib]
     exact Finset.sum_congr rfl fun l _ => by ring
   · have hj' : (j : ℕ) + 1 < r := by omega
     rw [Finset.sum_eq_single (⟨(j : ℕ) + 1, hj'⟩ : Fin r)]
     · simp [companion, hj, Bm]
     · intro l _ hne
-      have : ¬ ((l : ℕ) = (j : ℕ) + 1) := fun h => hne (Fin.ext h)
+      have : ¬((l : ℕ) = (j : ℕ) + 1) := fun h => hne (Fin.ext h)
       simp [companion, hj, this]
     · intro h; exact absurd (Finset.mem_univ _) h
 
@@ -188,9 +192,10 @@ theorem det_Bm_ne (Y : Gl r k) (h : Delta (inv Y) ≠ 0) : (Bm Y).det ≠ 0 := b
   apply h
   rw [Delta, ← hankel_eq, det_mul, h0, mul_zero]
 
-theorem unique_conj (Y Y₁ : Gl r k) (hΔ : Delta (inv Y) ≠ 0) (hI : inv Y₁ = inv Y) :
-    ∃! g : GL (Fin r) k, act g Y = Y₁ ∧ (g : Matrix (Fin r) (Fin r) k) * Bm Y = Bm Y₁ := by
-  have hB : IsUnit (Bm Y) := (Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr (det_Bm_ne Y hΔ))
+theorem unique_conj (Y Y₁ : Gl r k) (hΔ : Delta (inv Y) ≠ 0) (hI : inv Y₁ = inv Y)
+    : ∃! g : GL (Fin r) k, act g Y = Y₁ ∧ (g : Matrix (Fin r) (Fin r) k) * Bm Y = Bm Y₁ := by
+  have hB : IsUnit (Bm Y) :=
+    (Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr (det_Bm_ne Y hΔ))
   have hB₁ : IsUnit (Bm Y₁) :=
     (Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr (det_Bm_ne Y₁ (hI ▸ hΔ)))
   set u := hB.unit with hu
@@ -210,15 +215,16 @@ theorem unique_conj (Y Y₁ : Gl r k) (hΔ : Delta (inv Y) ≠ 0) (hI : inv Y₁
     have hl : l₁ = l := congrArg (fun a : Inv r k => a.2.2) hI
     simp only [act, _root_.mul_inv_rev, inv_inv, Units.val_mul, Prod.mk.injEq]
     refine ⟨?_, ?_, ?_, hl.symm⟩
-    · calc (u₁ : Matrix (Fin r) (Fin r) k) * ↑u⁻¹ * A * (↑u * ↑u₁⁻¹)
-            = ↑u₁ * (↑u⁻¹ * (A * ↑u)) * ↑u₁⁻¹ := by simp only [mul_assoc]
-          _ = ↑u₁ * companion (inv (A, b, c, l)).1 * ↑u₁⁻¹ := by
-            rw [hAB, Units.inv_mul_cancel_left]
-          _ = A₁ := by rw [← hAB₁, Units.mul_inv_cancel_right]
+    · calc
+        (u₁ : Matrix (Fin r) (Fin r) k) * ↑u⁻¹ * A * (↑u * ↑u₁⁻¹)
+          = ↑u₁ * (↑u⁻¹ * (A * ↑u)) * ↑u₁⁻¹ := by simp only [mul_assoc]
+        _ = ↑u₁ * companion (inv (A, b, c, l)).1 * ↑u₁⁻¹ := by rw [hAB, Units.inv_mul_cancel_left]
+        _ = A₁ := by rw [← hAB₁, Units.mul_inv_cancel_right]
     · rcases Nat.eq_zero_or_pos r with hr | hr
       · subst hr; funext i; exact i.elim0
-      have e0 : ∀ (B : Matrix (Fin r) (Fin r) k) (Z : Gl r k), B = Bm Z →
-          B *ᵥ Pi.single (⟨0, hr⟩ : Fin r) 1 = Z.2.1 := by
+      have e0
+          : ∀ (B : Matrix (Fin r) (Fin r) k) (Z : Gl r k),
+            B = Bm Z → B *ᵥ Pi.single (⟨0, hr⟩ : Fin r) 1 = Z.2.1 := by
         intro B Z hBZ; subst hBZ; funext i; simp [mulVec_single, Bm, Function.swap]
       have hb : (u : Matrix (Fin r) (Fin r) k) *ᵥ Pi.single (⟨0, hr⟩ : Fin r) 1 = b :=
         e0 _ (A, b, c, l) eu
@@ -235,7 +241,20 @@ theorem unique_conj (Y Y₁ : Gl r k) (hΔ : Delta (inv Y) ≠ 0) (hI : inv Y₁
 
 end GlobalTheory.JR.NormalFormL
 
-theorem GlobalTheory.JR.normalForm_invariants : ∀ (k : Type) [Field k] (r : ℕ), (∀ (g : GL (Fin r) k) (Y : Gl r k), inv (act g Y) = inv Y) ∧ (∀ a : Inv r k, inv (sec a) = a) ∧ (∀ Y : Gl r k, Cm Y * Bm Y = hankel (inv Y)) ∧ (∀ (g h : GL (Fin r) k) (Y : Gl r k), act (g * h) Y = act g (act h Y)) ∧ ∀ Y Y₁ : Gl r k, Delta (inv Y) ≠ 0 → inv Y₁ = inv Y → ∃! g : GL (Fin r) k, act g Y = Y₁ ∧ (g : Matrix (Fin r) (Fin r) k) * Bm Y = Bm Y₁ := by
-  intro k _ r
-  exact ⟨GlobalTheory.JR.NormalFormL.inv_act', GlobalTheory.JR.NormalFormL.inv_sec', GlobalTheory.JR.NormalFormL.hankel_eq,
-    GlobalTheory.JR.NormalFormL.act_mul', GlobalTheory.JR.NormalFormL.unique_conj⟩
+theorem GlobalTheory.JR.normalForm_invariants
+    : ∀ (k : Type) [Field k] (r : ℕ),
+      (∀ (g : GL (Fin r) k) (Y : Gl r k), inv (act g Y) = inv Y) ∧ (∀ a : Inv r k, inv (sec a) = a)
+        ∧ (∀ Y : Gl r k, Cm Y * Bm Y = hankel (inv Y))
+        ∧ (∀ (g h : GL (Fin r) k) (Y : Gl r k), act (g * h) Y = act g (act h Y))
+        ∧ ∀ Y Y₁ : Gl r k,
+          Delta (inv Y) ≠ 0 → inv Y₁ = inv Y
+            → ∃! g : GL (Fin r) k, act g Y = Y₁ ∧ (g : Matrix (Fin r) (Fin r) k) * Bm Y = Bm Y₁ :=
+  by
+    intro k _ r
+    exact ⟨
+      GlobalTheory.JR.NormalFormL.inv_act',
+      GlobalTheory.JR.NormalFormL.inv_sec',
+      GlobalTheory.JR.NormalFormL.hankel_eq,
+      GlobalTheory.JR.NormalFormL.act_mul',
+      GlobalTheory.JR.NormalFormL.unique_conj
+    ⟩

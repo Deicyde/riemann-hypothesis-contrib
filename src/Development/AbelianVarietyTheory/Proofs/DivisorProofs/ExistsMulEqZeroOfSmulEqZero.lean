@@ -5,23 +5,24 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace GlobalTheory.ZModFlat
 
 open scoped TensorProduct
 
-theorem exists_mul_eq_zero_of_smul_eq_zero (q : ℕ) [NeZero q] (M : Type 1) [AddCommGroup M]
-    [Module (ULift.{1} (ZMod q)) M]
+theorem exists_mul_eq_zero_of_smul_eq_zero
+    (q : ℕ) [NeZero q]
+    (M : Type 1) [AddCommGroup M] [Module (ULift.{1} (ZMod q)) M]
     (hdiv : ∀ d e : ℕ, d * e = q → ∀ x : M, d • x = 0 → ∃ y : M, x = e • y)
-    (a : ULift.{1} (ZMod q)) (y : M) (hy : a • y = 0) :
-    ∃ e : ℕ, (e : ULift.{1} (ZMod q)) * a = 0 ∧ ∃ z : M, y = e • z := by
+    (a : ULift.{1} (ZMod q)) (y : M) (hy : a • y = 0)
+    : ∃ e : ℕ, (e : ULift.{1} (ZMod q)) * a = 0 ∧ ∃ z : M, y = e • z := by
   set n := a.down.val with hn
   have ha : a = (n : ULift.{1} (ZMod q)) := by
     apply ULift.down_injective
     rw [ULift.down_natCast, hn, ZMod.natCast_zmod_val]
-  have hq : ((q : ℕ) : ULift.{1} (ZMod q)) = 0 := by
-    ext; simp
+  have hq : ((q : ℕ) : ULift.{1} (ZMod q)) = 0 := by ext; simp
   have hgq : Nat.gcd n q ∣ q := Nat.gcd_dvd_right n q
   have hgn : Nat.gcd n q ∣ n := Nat.gcd_dvd_left n q
   refine ⟨q / Nat.gcd n q, ?_, ?_⟩
@@ -32,22 +33,19 @@ theorem exists_mul_eq_zero_of_smul_eq_zero (q : ℕ) [NeZero q] (M : Type 1) [Ad
     obtain ⟨m, hm⟩ := this
     rw [hm, Nat.cast_mul, hq, zero_mul]
   · apply hdiv (Nat.gcd n q) (q / Nat.gcd n q) (Nat.mul_div_cancel' hgq)
-    have h1 : n • y = 0 := by
-      rw [← Nat.cast_smul_eq_nsmul (ULift.{1} (ZMod q)), ← ha, hy]
-    have h2 : q • y = 0 := by
-      rw [← Nat.cast_smul_eq_nsmul (ULift.{1} (ZMod q)), hq, zero_smul]
-    have hb : ((Nat.gcd n q : ℕ) : ℤ) = n * Nat.gcdA n q + q * Nat.gcdB n q :=
-      Nat.gcd_eq_gcd_ab n q
+    have h1 : n • y = 0 := by rw [← Nat.cast_smul_eq_nsmul (ULift.{1} (ZMod q)), ← ha, hy]
+    have h2 : q • y = 0 := by rw [← Nat.cast_smul_eq_nsmul (ULift.{1} (ZMod q)), hq, zero_smul]
+    have hb : ((Nat.gcd n q : ℕ) : ℤ) = n * Nat.gcdA n q + q * Nat.gcdB n q := Nat.gcd_eq_gcd_ab n q
     have h3 : ((n : ℤ) * Nat.gcdA n q) • y = 0 := by
       rw [mul_comm, mul_smul, natCast_zsmul, h1, smul_zero]
     have h4 : ((q : ℤ) * Nat.gcdB n q) • y = 0 := by
       rw [mul_comm, mul_smul, natCast_zsmul, h2, smul_zero]
     rw [← natCast_zsmul, hb, add_smul, h3, h4, add_zero]
 
-theorem flat_of_divisibility : ∀ (q : ℕ) [NeZero q] (M : Type 1) [AddCommGroup M]
-    [Module (ULift.{1} (ZMod q)) M],
-    (∀ d e : ℕ, d * e = q → ∀ x : M, d • x = 0 → ∃ y : M, x = e • y) →
-      Module.Flat (ULift.{1} (ZMod q)) M := by
+theorem flat_of_divisibility
+    : ∀ (q : ℕ) [NeZero q] (M : Type 1) [AddCommGroup M] [Module (ULift.{1} (ZMod q)) M],
+      (∀ d e : ℕ, d * e = q → ∀ x : M, d • x = 0 → ∃ y : M, x = e • y)
+        → Module.Flat (ULift.{1} (ZMod q)) M := by
   intro q _ M _ _ hdiv
   haveI : IsPrincipalIdealRing (ULift.{1} (ZMod q)) :=
     IsPrincipalIdealRing.of_surjective
@@ -76,7 +74,8 @@ theorem flat_of_divisibility : ∀ (q : ℕ) [NeZero q] (M : Type 1) [AddCommGro
       obtain ⟨y1, rfl⟩ := hs
       obtain ⟨y2, rfl⟩ := ht
       exact ⟨y1 + y2, (TensorProduct.tmul_add _ _ _).symm⟩
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro t ht
   obtain ⟨y, rfl⟩ := hall t
   have hy : a • y = 0 := by

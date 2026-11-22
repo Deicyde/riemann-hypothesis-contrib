@@ -142,12 +142,19 @@ end RegMaxDeriv
 
 theorem regMax_thm : RegMaxStatement := by
   intro ι _ _ _
-  refine ⟨fun η hη => ⟨regMax_contDiff hη, regMax_convex η, regMax_mono η,
-    fun t => ⟨regMax_ge η t, regMax_le hη.le t⟩,
-    fun t i hi => regMax_eq_of_dom hη.le t i hi,
-    fun t j k s hkj htj hs => regMax_update hη.le t j k s hkj htj hs,
-    fun t c => regMax_add_const η t c,
-    fun t => regMax_fderiv_sum hη t⟩, ?_⟩
+  refine ⟨
+    fun η hη => ⟨
+      regMax_contDiff hη,
+      regMax_convex η,
+      regMax_mono η,
+      fun t => ⟨regMax_ge η t, regMax_le hη.le t⟩,
+      fun t i hi => regMax_eq_of_dom hη.le t i hi,
+      fun t j k s hkj htj hs => regMax_update hη.le t j k s hkj htj hs,
+      fun t c => regMax_add_const η t c,
+      fun t => regMax_fderiv_sum hη t
+    ⟩,
+    ?_
+  ⟩
   obtain ⟨C, hC⟩ := regMax_fderiv2_bound (ι := ι)
   exact ⟨C, fun η hη t i j => hC η hη t _ _ (by simp [Pi.norm_single]) (by simp [Pi.norm_single])⟩
 
@@ -300,18 +307,24 @@ theorem regMaxLevi_thm : RegMaxLeviStatement := by
   have q1 := regMax_fderiv2_nonneg hη (fun j => u j z) (fun j => fderiv ℝ (u j) z w)
   have q2 := regMax_fderiv2_nonneg hη (fun j => u j z) (fun j => fderiv ℝ (u j) z (Complex.I • w))
   have hsum := regMax_fderiv_sum hη (fun j => u j z)
-  have h3 : 4 * g ≤ ∑ j, fderiv ℝ (fderiv ℝ (u j)) z w w *
-        fderiv ℝ (regMax (ι := ι) η) (fun j => u j z) (Pi.single j 1) +
-      ∑ j, fderiv ℝ (fderiv ℝ (u j)) z (Complex.I • w) (Complex.I • w) *
-        fderiv ℝ (regMax (ι := ι) η) (fun j => u j z) (Pi.single j 1) := by
-    have e4 : 4 * g = ∑ j, 4 * g * fderiv ℝ (regMax (ι := ι) η) (fun j => u j z) (Pi.single j 1) := by
+  have h3
+      : 4 * g
+        ≤ ∑ j, fderiv ℝ (fderiv ℝ (u j)) z w w *
+            fderiv ℝ (regMax (ι := ι) η) (fun j => u j z) (Pi.single j 1)
+          + ∑ j, fderiv ℝ (fderiv ℝ (u j)) z (Complex.I • w) (Complex.I • w) *
+              fderiv ℝ (regMax (ι := ι) η) (fun j => u j z) (Pi.single j 1) := by
+    have e4
+        : 4 * g = ∑ j, 4 * g * fderiv ℝ (regMax (ι := ι) η) (fun j => u j z) (Pi.single j 1) := by
       rw [← Finset.mul_sum, hsum, mul_one]
     rw [e4, ← Finset.sum_add_distrib]
     refine Finset.sum_le_sum fun j _ => ?_
     have hj := hg j
     unfold levi at hj
-    have hn := regMax_fderiv_nonneg hη (fun j => u j z) (Pi.single j 1)
-      (fun k => by rw [Pi.single_apply]; split_ifs <;> norm_num)
+    have hn :=
+      regMax_fderiv_nonneg hη
+        (fun j => u j z)
+        (Pi.single j 1)
+        (fun k => by rw [Pi.single_apply]; split_ifs <;> norm_num)
     nlinarith
   linarith
 

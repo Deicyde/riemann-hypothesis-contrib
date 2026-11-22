@@ -28,14 +28,17 @@ theorem UpperTheory.symmetric_fiber_covering : UpperTheory.V.Z.Sym.Glob.Fib.Cove
     have h2 := hU ((hUx _).1 h1)
     show ((((s : S ⧸ Ux).out : G) * x : G) : G ⧸ U') = _
     rw [QuotientGroup.eq]
-    have e : (((s : S ⧸ Ux).out : G) * x)⁻¹ * ((s : G) * x) = x⁻¹ * ((((s : S ⧸ Ux).out)⁻¹ * s : S) : G) * x := by
+    have e
+        : (((s : S ⧸ Ux).out : G) * x)⁻¹ * ((s : G) * x)
+          = x⁻¹ * ((((s : S ⧸ Ux).out)⁻¹ * s : S) : G) * x := by
       simp only [Subgroup.coe_mul, Subgroup.coe_inv]
       group
     rw [e]
     exact h2
   have hq : ∀ (h : H) (y : S ⧸ Ux), q (h • y) = h • q y := by
     intro h y
-    induction y using QuotientGroup.induction_on with | H s => ?_
+    induction y using QuotientGroup.induction_on with
+    | H s => ?_
     have e1 : h • (s : S ⧸ Ux) = ((ι h * s : S) : S ⧸ Ux) := rfl
     rw [e1, hq0, hq0]
     have e2 : ∀ z : G ⧸ U', h • z = ((ι h : S) : G) • z := fun _ => rfl
@@ -54,9 +57,15 @@ theorem UpperTheory.symmetric_fiber_covering : UpperTheory.V.Z.Sym.Glob.Fib.Cove
   have hT' : ∃ T : Finset (S ⧸ Ux), ∀ y, k y ≠ 0 → ∃ h : H, ∃ s ∈ T, y = h • s := by
     obtain ⟨T, hT⟩ := hT
     refine ⟨T.image (fun t : S => (QuotientGroup.mk t : S ⧸ Ux)), fun y _ => ?_⟩
-    induction y using QuotientGroup.induction_on with | H s => ?_
+    induction y using QuotientGroup.induction_on with
+    | H s => ?_
     obtain ⟨h, t, ht, u, hu, e⟩ := hT s
-    refine ⟨h, (QuotientGroup.mk t : S ⧸ Ux), Finset.mem_image_of_mem (fun t : S => (QuotientGroup.mk t : S ⧸ Ux)) ht, ?_⟩
+    refine ⟨
+      h,
+      (QuotientGroup.mk t : S ⧸ Ux),
+      Finset.mem_image_of_mem (fun t : S => (QuotientGroup.mk t : S ⧸ Ux)) ht,
+      ?_
+    ⟩
     rw [e]
     show ((ι h * t * u : S) : S ⧸ Ux) = ((ι h * t : S) : S ⧸ Ux)
     exact QuotientGroup.mk_mul_of_mem _ hu
@@ -87,10 +96,14 @@ theorem UpperTheory.symmetric_fiber_covering : UpperTheory.V.Z.Sym.Glob.Fib.Cove
       rwa [mul_assoc]
     haveI : Finite (stabilizer H (q y)) := hs.to_subtype
     exact Nat.card_pos.ne'
-  have hpush := UpperTheory.orbitalFiber_pushforward H (S ⧸ Ux) (G ⧸ U') ⊥ q k inferInstance hq
-    (fun z hz y => by rw [Subgroup.mem_bot.1 hz, one_smul]) hk hT' hfib hrel
-  have hK : (fun z : G ⧸ U' => ∑ᶠ (y : S ⧸ Ux) (_ : q y = z), k y) =
-      fun z => (U.relIndex (U' ⊓ S) : ℂ) * (orbit S (x : G ⧸ U')).indicator (fun y => Φ y.out) z := by
+  have hpush :=
+    UpperTheory.orbitalFiber_pushforward H (S ⧸ Ux) (G ⧸ U') ⊥ q k inferInstance hq
+      (fun z hz y => by rw [Subgroup.mem_bot.1 hz, one_smul])
+      hk hT' hfib hrel
+  have hK
+      : (fun z : G ⧸ U' => ∑ᶠ (y : S ⧸ Ux) (_ : q y = z), k y)
+        = fun z =>
+          (U.relIndex (U' ⊓ S) : ℂ) * (orbit S (x : G ⧸ U')).indicator (fun y => Φ y.out) z := by
     funext z
     by_cases hz : z ∈ orbit S (x : G ⧸ U')
     · rw [Set.indicator_of_mem hz]
@@ -98,12 +111,11 @@ theorem UpperTheory.symmetric_fiber_covering : UpperTheory.V.Z.Sym.Glob.Fib.Cove
       have e0 : (fun m : S => m • (x : G ⧸ U')) s₀ = (((s₀ : G) * x : G) : G ⧸ U') := rfl
       rw [e0]
       set z : G ⧸ U' := (((s₀ : G) * x : G) : G ⧸ U') with hzdef
-      have step : (∑ᶠ (y : S ⧸ Ux) (_ : q y = z), k y) = ∑ᶠ y ∈ {y | q y = z}, Φ z.out :=
-        by
-          change (∑ᶠ y ∈ {y | q y = z}, k y) = ∑ᶠ y ∈ {y | q y = z}, Φ z.out
-          exact finsum_mem_congr rfl fun y hy => by
-            have hy' : q y = z := hy
-            rw [hkq, hy']
+      have step : (∑ᶠ (y : S ⧸ Ux) (_ : q y = z), k y) = ∑ᶠ y ∈ {y | q y = z}, Φ z.out := by
+        change (∑ᶠ y ∈ {y | q y = z}, k y) = ∑ᶠ y ∈ {y | q y = z}, Φ z.out
+        exact finsum_mem_congr rfl fun y hy => by
+          have hy' : q y = z := hy
+          rw [hkq, hy']
       rw [step, finsum_mem_eq_finite_toFinset_sum _ (hfinF s₀), Finset.sum_const, nsmul_eq_mul,
         ← Set.ncard_eq_toFinset_card _ (hfinF s₀), hcard]
     · rw [Set.indicator_of_notMem hz, mul_zero]
@@ -112,8 +124,9 @@ theorem UpperTheory.symmetric_fiber_covering : UpperTheory.V.Z.Sym.Glob.Fib.Cove
         refine finsum_eq_if.trans (if_neg fun e => hz ?_)
         exact ⟨y.out, e⟩
       simp only [h0, finsum_zero]
-  have hbot := (UpperTheory.orbitalFiber_of_bot H (G ⧸ U') ⊥ ((orbit S (x : G ⧸ U')).indicator fun y => Φ y.out)).1
-    (U.relIndex (U' ⊓ S) : ℂ)
+  have hbot :=
+    (UpperTheory.orbitalFiber_of_bot H (G ⧸ U') ⊥
+      ((orbit S (x : G ⧸ U')).indicator fun y => Φ y.out)).1 (U.relIndex (U' ⊓ S) : ℂ)
   show UpperTheory.V.Z.Sym.gq ⊥ k = (U.relIndex (U' ⊓ S) : ℂ) *
     UpperTheory.V.Z.Sym.gq ⊥ ((orbit S (x : G ⧸ U')).indicator fun y => Φ y.out)
   rw [hpush, hK]

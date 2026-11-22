@@ -38,10 +38,9 @@ set_option linter.unusedSectionVars false
 
 variable {N : ℕ} [NeZero N] {k : ℤ}
 
-
-theorem posIdele_fst_rat (r : ℝ) (hr : 0 < r) :
-    ((Reduction.posIdele (K := ℚ) r hr : Global.IdeleGroup ℚ) : 𝔸[ℚ]).1 =
-      Global.RationalIdeles.realEquiv.symm r := by
+theorem posIdele_fst_rat (r : ℝ) (hr : 0 < r)
+    : ((Reduction.posIdele (K := ℚ) r hr : Global.IdeleGroup ℚ) : 𝔸[ℚ]).1
+      = Global.RationalIdeles.realEquiv.symm r := by
   apply Global.RationalIdeles.realEquiv.injective
   rw [RingEquiv.apply_symm_apply, Global.RationalIdeles.realEquiv_apply]
   have := Reduction.infiniteProj_posIdele (K := ℚ) r hr default

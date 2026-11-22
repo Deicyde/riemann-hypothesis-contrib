@@ -11,7 +11,13 @@ set_option autoImplicit false
 
 namespace GlobalTheory.GenDegAlg
 
-theorem isAlgebraic_appLE : ∀ {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (π : Y ⟶ X), π (genericPoint Y) = genericPoint X → π.residueDegree (genericPoint Y) ≠ 0 → ∀ {U : X.Opens} {V : Y.Opens}, IsAffineOpen U → (V : Set Y).Nonempty → ∀ h : V ≤ π ⁻¹ᵁ U, (letI := (π.appLE U V h).hom.toAlgebra; Algebra.IsAlgebraic Γ(X, U) Γ(Y, V)) := by
+theorem isAlgebraic_appLE
+    : ∀ {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (π : Y ⟶ X),
+      π (genericPoint Y) = genericPoint X → π.residueDegree (genericPoint Y) ≠ 0
+        → ∀ {U : X.Opens} {V : Y.Opens},
+          IsAffineOpen U → (V : Set Y).Nonempty
+            → ∀ h : V ≤ π ⁻¹ᵁ U,
+              (letI := (π.appLE U V h).hom.toAlgebra; Algebra.IsAlgebraic Γ(X, U) Γ(Y, V)) := by
   intro X Y _ _ π hgen hdeg U V hU hV h
   have hη : genericPoint Y ∈ V :=
     ((genericPoint_spec Y).mem_open_set_iff V.isOpen).2 (by simpa using hV)
@@ -27,8 +33,9 @@ theorem isAlgebraic_appLE : ∀ {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
     (X.evaluation U _ hx ≫ π.residueFieldMap (genericPoint Y)).hom.toAlgebra
   haveI : IsScalarTower Γ(X, U) (X.residueField (π (genericPoint Y)))
       (Y.residueField (genericPoint Y)) := IsScalarTower.of_algebraMap_eq' rfl
-  have hnat : π.appLE U V h ≫ Y.evaluation V _ hη =
-      X.evaluation U _ hx ≫ π.residueFieldMap (genericPoint Y) := by
+  have hnat
+      : π.appLE U V h ≫ Y.evaluation V _ hη
+        = X.evaluation U _ hx ≫ π.residueFieldMap (genericPoint Y) := by
     rw [Scheme.evaluation_naturality, Scheme.Hom.appLE, Category.assoc]
     congr 1
     simp [Scheme.evaluation]
@@ -48,7 +55,7 @@ theorem isAlgebraic_appLE : ∀ {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
       RingHom.injective (show Y.functionField →+* Y.residueField (genericPoint Y) from
         (Y.residue (genericPoint Y)).hom)
     exact h2.comp h1
-  exact Algebra.IsAlgebraic.of_injective (IsScalarTower.toAlgHom Γ(X, U) Γ(Y, V)
-    (Y.residueField (genericPoint Y))) hinj
+  exact Algebra.IsAlgebraic.of_injective
+    (IsScalarTower.toAlgHom Γ(X, U) Γ(Y, V) (Y.residueField (genericPoint Y))) hinj
 
 end GlobalTheory.GenDegAlg

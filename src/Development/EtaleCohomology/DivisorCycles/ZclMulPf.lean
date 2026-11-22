@@ -9,9 +9,12 @@ open Matrix PositivityTheory.AutomorphicGaloisHodgeTate.Div
 namespace LateralTheory.DivDb.ZclMulPf
 open LateralTheory.DivDb
 
-theorem left_mem (hC : Chain) {C : Type} [Field C] {N : ℕ} (S : Submonoid (Mat C N))
-    (s : Mat C N) (hs : s ∈ S) (y : Mat C N) (hy : y ∈ Zcl (S : Set (Mat C N))) :
-    s * y ∈ Zcl (S : Set (Mat C N)) := by
+theorem left_mem
+    (hC : Chain)
+    {C : Type} [Field C]
+    {N : ℕ} (S : Submonoid (Mat C N)) (s : Mat C N) (hs : s ∈ S) (y : Mat C N)
+    (hy : y ∈ Zcl (S : Set (Mat C N)))
+    : s * y ∈ Zcl (S : Set (Mat C N)) := by
   intro f hf
   obtain ⟨f', hf', -⟩ := hC C N N (LinearMap.mulLeft C s) f
   have hv : f' ∈ Van (S : Set (Mat C N)) := by
@@ -22,9 +25,12 @@ theorem left_mem (hC : Chain) {C : Type} [Field C] {N : ℕ} (S : Submonoid (Mat
   rw [hf'] at this
   simpa using this
 
-theorem mul_mem (hC : Chain) {C : Type} [Field C] {N : ℕ} (S : Submonoid (Mat C N))
-    (x : Mat C N) (hx : x ∈ Zcl (S : Set (Mat C N))) (y : Mat C N) (hy : y ∈ Zcl (S : Set (Mat C N))) :
-    x * y ∈ Zcl (S : Set (Mat C N)) := by
+theorem mul_mem
+    (hC : Chain)
+    {C : Type} [Field C]
+    {N : ℕ} (S : Submonoid (Mat C N)) (x : Mat C N) (hx : x ∈ Zcl (S : Set (Mat C N))) (y : Mat C N)
+    (hy : y ∈ Zcl (S : Set (Mat C N)))
+    : x * y ∈ Zcl (S : Set (Mat C N)) := by
   intro f hf
   obtain ⟨f', hf', -⟩ := hC C N N (LinearMap.mulRight C y) f
   have hv : f' ∈ Van (S : Set (Mat C N)) := by

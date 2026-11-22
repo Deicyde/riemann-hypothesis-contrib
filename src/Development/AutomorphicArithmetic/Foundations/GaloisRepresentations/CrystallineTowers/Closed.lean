@@ -8,7 +8,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 namespace UpperTheory.Gal.Seam
 
-theorem cstSmooth : CrystallineSemistableComparison.CstSmooth := CrystallineSemistableComparison.Close.cstSmooth_of_side HT.etSideS
+theorem cstSmooth : CrystallineSemistableComparison.CstSmooth :=
+  CrystallineSemistableComparison.Close.cstSmooth_of_side HT.etSideS
 
 theorem crysStep_holds : UpperTheory.Gal.Int.Geo.CrysStep := crysStep_of cstSmooth.1
 

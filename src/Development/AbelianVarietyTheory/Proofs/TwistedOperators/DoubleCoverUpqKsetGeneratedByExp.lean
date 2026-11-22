@@ -18,8 +18,8 @@ open GlobalTheory.RealPar GlobalTheory.RealPar.KStabLie GlobalTheory.RealPar.Tor
 
 variable {p q : ℕ}
 
-theorem blockOrd_std (p q : ℕ) :
-    BlockOrd (p := p) (q := q) finSumFinEquiv (fun i => (finSumFinEquiv.symm i).isLeft) := by
+theorem blockOrd_std (p q : ℕ)
+    : BlockOrd (p := p) (q := q) finSumFinEquiv (fun i => (finSumFinEquiv.symm i).isLeft) := by
   refine ⟨fun i => by simp, fun j => by simp, ?_⟩
   rintro (a | a) (b | b) hab
   · have hlt : a < b := hab
@@ -32,8 +32,8 @@ theorem blockOrd_std (p q : ℕ) :
     simp only [finSumFinEquiv_apply_right, Fin.lt_def, Fin.val_natAdd]
     omega
 
-theorem exists_log (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset) :
-    ∃ X, X ∈ upq p q ∧ IsKC X ∧ T.cov (T.expt X) = T.cov k := by
+theorem exists_log (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset)
+    : ∃ X, X ∈ upq p q ∧ IsKC X ∧ T.cov (T.expt X) = T.cov k := by
   have hB := blockOrd_std p q
   obtain ⟨Y, hY, hexp, -⟩ := Formalism.REAL.compact_exponential_surjective _ _ _ (mem_Kset hB T hk)
   letI : NormedRing (Mat p q) := Matrix.linftyOpNormedRing
@@ -53,8 +53,7 @@ theorem exists_log (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset) :
   have hJ : φ (Jm p q) = Formalism.REAL.Jm (fun i => (finSumFinEquiv.symm i).isLeft) := by
     rw [Matrix.coe_reindexAlgEquiv]
     exact hB.reindex_Jm
-  have hstar : ∀ M : Mat p q, φ Mᴴ = (φ M)ᴴ := fun M =>
-    (Matrix.conjTranspose_reindex _ _ M).symm
+  have hstar : ∀ M : Mat p q, φ Mᴴ = (φ M)ᴴ := fun M => (Matrix.conjTranspose_reindex _ _ M).symm
   have hX : φ.symm Y ∈ upq p q := by
     show (φ.symm Y)ᴴ * Jm p q + Jm p q * φ.symm Y = 0
     apply φ.injective
@@ -80,24 +79,24 @@ theorem torX_isKC (θ : Ix p q → ℝ) : IsKC (torX θ) := by
     exact hab (by cases a <;> trivial)
   simp [torX, Matrix.diagonal_apply_ne _ hne]
 
-theorem cov_expt_torX (T : GrpData p q) (θ : Ix p q → ℝ) :
-    ((T.cov (T.expt (torX θ)) : GL (Ix p q) ℂ) : Mat p q) =
-      Matrix.diagonal fun a => Complex.exp ((θ a : ℂ) * Complex.I) := by
+theorem cov_expt_torX (T : GrpData p q) (θ : Ix p q → ℝ)
+    : ((T.cov (T.expt (torX θ)) : GL (Ix p q) ℂ) : Mat p q)
+      = Matrix.diagonal fun a => Complex.exp ((θ a : ℂ) * Complex.I) := by
   rw [T.expt_cov _ (torX_mem θ)]
   unfold torX
   rw [Matrix.exp_diagonal, Pi.exp_def, Complex.exp_eq_exp_ℂ]
 
-private theorem sq_expt_torX_sq_eq_exp (T : GrpData p q) (θ : Ix p q → ℝ) :
-    ((T.sq (T.expt (torX θ)) : ℂˣ) : ℂ) ^ 2 =
-      Complex.exp ((∑ a, (θ a : ℂ)) * Complex.I / 2) ^ 2 := by
+private theorem sq_expt_torX_sq_eq_exp (T : GrpData p q) (θ : Ix p q → ℝ)
+    : ((T.sq (T.expt (torX θ)) : ℂˣ) : ℂ) ^ 2
+      = Complex.exp ((∑ a, (θ a : ℂ)) * Complex.I / 2) ^ 2 := by
   rw [T.sq_sq, cov_expt_torX, Matrix.det_diagonal, ← Complex.exp_sum, ← Complex.exp_nat_mul]
   congr 1
   rw [← Finset.sum_mul]
   push_cast
   ring
 
-theorem sq_expt_torX (T : GrpData p q) (θ : Ix p q → ℝ) :
-    ((T.sq (T.expt (torX θ)) : ℂˣ) : ℂ) = Complex.exp ((∑ a, (θ a : ℂ)) * Complex.I / 2) := by
+theorem sq_expt_torX (T : GrpData p q) (θ : Ix p q → ℝ)
+    : ((T.sq (T.expt (torX θ)) : ℂˣ) : ℂ) = Complex.exp ((∑ a, (θ a : ℂ)) * Complex.I / 2) := by
   let f : ℝ → ℂ := fun t => ((T.sq (T.expt (t • torX θ)) : ℂˣ) : ℂ)
   let g : ℝ → ℂ := fun t => Complex.exp ((∑ a, ((t * θ a : ℝ) : ℂ)) * Complex.I / 2)
   have hsq : ∀ t, f t ^ 2 = g t ^ 2 := fun t => by
@@ -113,11 +112,9 @@ theorem sq_expt_torX (T : GrpData p q) (θ : Ix p q → ℝ) :
     exact Units.continuous_val.comp (h2.comp h1)
   have hgc : Continuous g := by fun_prop
   have hh : ∀ t, f t / g t = 1 ∨ f t / g t = -1 := fun t => by
-    have h2 : (f t / g t) ^ 2 = 1 := by
-      rw [div_pow, hsq t, div_self (pow_ne_zero 2 (hg t))]
+    have h2 : (f t / g t) ^ 2 = 1 := by rw [div_pow, hsq t, div_self (pow_ne_zero 2 (hg t))]
     exact mul_self_eq_one_iff.mp (by rw [← sq]; exact h2)
-  have h0 : f 0 / g 0 = 1 := by
-    simp [f, g, T.expt_zero]
+  have h0 : f 0 / g 0 = 1 := by simp [f, g, T.expt_zero]
   have hcont : Continuous fun t => f t / g t := hfc.div hgc hg
   have h1 : f 1 / g 1 = 1 := by
     rcases hh 1 with h1 | h1
@@ -132,11 +129,15 @@ theorem sq_expt_torX (T : GrpData p q) (θ : Ix p q → ℝ) :
   have hfg : f 1 = g 1 := (div_eq_one_iff_eq (hg 1)).mp h1
   simpa [f, g] using hfg
 
-theorem kset_gen : ∀ (p q : ℕ), 1 ≤ p + q → ∀ (T : GrpData p q), ∀ k ∈ T.Kset,
-    k ∈ Subgroup.closure (T.expt '' {Y | Y ∈ upq p q ∧ IsKC Y}) := by
+theorem kset_gen
+    : ∀ (p q : ℕ),
+      1 ≤ p + q
+        → ∀ (T : GrpData p q), ∀ k ∈ T.Kset,
+          k ∈ Subgroup.closure (T.expt '' {Y | Y ∈ upq p q ∧ IsKC Y}) := by
   intro p q hpq T k hk
-  have mem : ∀ X, X ∈ upq p q → IsKC X →
-      T.expt X ∈ Subgroup.closure (T.expt '' {Y | Y ∈ upq p q ∧ IsKC Y}) :=
+  have mem
+      : ∀ X,
+        X ∈ upq p q → IsKC X → T.expt X ∈ Subgroup.closure (T.expt '' {Y | Y ∈ upq p q ∧ IsKC Y}) :=
     fun X h1 h2 => Subgroup.subset_closure ⟨X, ⟨h1, h2⟩, rfl⟩
   obtain ⟨a0⟩ : Nonempty (Ix p q) := by
     rcases Nat.eq_zero_or_pos p with hp | hp
@@ -157,7 +158,8 @@ theorem kset_gen : ∀ (p q : ℕ), 1 ≤ p + q → ∀ (T : GrpData p q), ∀ k
   have hsqc : T.sq (T.expt (torX (Pi.single a0 (2 * Real.pi)))) = -1 := by
     apply Units.ext
     rw [sq_expt_torX]
-    have hs : (∑ a, (((Pi.single a0 (2 * Real.pi) : Ix p q → ℝ) a : ℝ) : ℂ)) = 2 * (Real.pi : ℂ) := by
+    have hs
+        : (∑ a, (((Pi.single a0 (2 * Real.pi) : Ix p q → ℝ) a : ℝ) : ℂ)) = 2 * (Real.pi : ℂ) := by
       rw [Finset.sum_eq_single a0 (fun b _ hb => by simp [Pi.single_eq_of_ne hb]) (by simp)]
       simp
     have hpi : 2 * (Real.pi : ℂ) * Complex.I / 2 = Real.pi * Complex.I := by ring

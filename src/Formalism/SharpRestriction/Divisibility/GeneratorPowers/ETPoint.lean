@@ -11,10 +11,11 @@ noncomputable section
 
 namespace Formalism.MainNotions.ModuliIntegralCharts.H1
 
-open NumberField Formalism.MainNotions.ModuliIntegralCharts ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Out IsLocalRing
+open NumberField Formalism.MainNotions.ModuliIntegralCharts ReciprocityTheory.ChartRestriction.G.DVR
+  ReciprocityTheory.ChartRestriction.G.Out IsLocalRing
 
-theorem etPoint_min {X : Type} [AddCommGroup X] (Q : X → ℤ) (hQ : ∀ a, 0 ≤ Q a) (y : X) (R' : ℕ) :
-    ∃ z : X, ∀ z' : X, Q (y + R' • z) ≤ Q (y + R' • z') := by
+theorem etPoint_min {X : Type} [AddCommGroup X] (Q : X → ℤ) (hQ : ∀ a, 0 ≤ Q a) (y : X) (R' : ℕ)
+    : ∃ z : X, ∀ z' : X, Q (y + R' • z) ≤ Q (y + R' • z') := by
   let S : Set ℕ := Set.range fun z : X => (Q (y + R' • z)).toNat
   have hS : S.Nonempty := ⟨_, 0, rfl⟩
   obtain ⟨z, hz⟩ := Nat.sInf_mem hS

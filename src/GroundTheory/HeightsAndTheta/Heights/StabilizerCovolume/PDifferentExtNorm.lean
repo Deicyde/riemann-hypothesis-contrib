@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights.NineStatements
 
 open NumberField
 
-theorem absNorm_extDifferent {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] (ι : E →+* L) :
-    letI _ : Algebra E L := ι.toAlgebra;
-    Ideal.absNorm (extDifferent ι) = (discr E).natAbs ^ Module.finrank E L := by
+theorem absNorm_extDifferent
+    {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] (ι : E →+* L)
+    : letI _ : Algebra E L := ι.toAlgebra
+      Ideal.absNorm (extDifferent ι) = (discr E).natAbs ^ Module.finrank E L := by
   let _ : Algebra E L := ι.toAlgebra
   have h1 : RingOfIntegers.mapRingHom ι = algebraMap (𝓞 E) (𝓞 L) := rfl
   have h3 : Module.finrank (𝓞 E) (𝓞 L) = Module.finrank E L :=
@@ -30,8 +31,7 @@ theorem DifferentExtNorm.full : DifferentExtNorm.Statement := by
   have hdeg : Module.finrank ℚ L = Module.finrank ℚ E * Module.finrank E L :=
     (Module.finrank_mul_finrank ℚ E L).symm
   rw [hN, logRd, Nat.cast_pow, Real.log_pow, hdeg, Nat.cast_mul]
-  have habs : ((discr E).natAbs : ℝ) = |(discr E : ℝ)| := by
-    rw [Nat.cast_natAbs, Int.cast_abs]
+  have habs : ((discr E).natAbs : ℝ) = |(discr E : ℝ)| := by rw [Nat.cast_natAbs, Int.cast_abs]
   rw [habs]
   field_simp
 

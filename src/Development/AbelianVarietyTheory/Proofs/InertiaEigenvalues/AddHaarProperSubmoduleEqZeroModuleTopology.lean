@@ -10,10 +10,13 @@ open Set Pointwise Metric
 
 namespace GlobalTheory.HaarNullSub
 
-theorem addHaar_submodule_eq_zero (F : Type) [NontriviallyNormedField F] [LocallyCompactSpace F]
+theorem addHaar_submodule_eq_zero
+    (F : Type) [NontriviallyNormedField F] [LocallyCompactSpace F]
     (V : Type) [AddCommGroup V] [Module F V] [Module.Finite F V] [TopologicalSpace V]
-    [IsModuleTopology F V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V)
-    (hμ : μ.IsAddHaarMeasure) (s : Submodule F V) (hs : s ≠ ⊤) : μ (s : Set V) = 0 := by
+    [IsModuleTopology F V] [MeasurableSpace V] [BorelSpace V]
+    (μ : Measure V) (hμ : μ.IsAddHaarMeasure)
+    (s : Submodule F V) (hs : s ≠ ⊤)
+    : μ (s : Set V) = 0 := by
   haveI := hμ
   haveI : ProperSpace F := ProperSpace.of_nontriviallyNormedField_of_weaklyLocallyCompactSpace F
   haveI : ContinuousAdd V := IsModuleTopology.toContinuousAdd F V
@@ -22,16 +25,21 @@ theorem addHaar_submodule_eq_zero (F : Type) [NontriviallyNormedField F] [Locall
   let e₀ : V ≃ₗ[F] (Fin (Module.finrank F V) → F) := (Module.finBasis F V).equivFun
   have hc : Continuous e₀ := IsModuleTopology.continuous_of_linearMap e₀.toLinearMap
   have hc' : Continuous e₀.symm := IsModuleTopology.continuous_of_linearMap e₀.symm.toLinearMap
-  let h : V ≃ₜ (Fin (Module.finrank F V) → F) :=
-    { e₀.toEquiv with continuous_toFun := hc, continuous_invFun := hc' }
+  let h : V ≃ₜ (Fin (Module.finrank F V) → F) := {
+    e₀.toEquiv with
+    continuous_toFun := hc
+    continuous_invFun := hc'
+  }
 
   have hcl : IsClosed (s : Set V) := by
-    have h1 : IsClosed ((s.map e₀.toLinearMap : Submodule F _) : Set (Fin (Module.finrank F V) → F)) :=
+    have h1
+        : IsClosed ((s.map e₀.toLinearMap : Submodule F _) : Set (Fin (Module.finrank F V) → F)) :=
       Submodule.closed_of_finiteDimensional _
     have h2 : (s : Set V) = h ⁻¹' ((s.map e₀.toLinearMap : Submodule F _) : Set _) := by
       ext v
       simp [h, Submodule.mem_map]
-    rw [h2]; exact h1.preimage h.continuous
+    rw [h2]
+    exact h1.preimage h.continuous
 
   obtain ⟨x, hx⟩ : ∃ x, x ∉ s := by
     simpa only [Submodule.eq_top_iff', not_exists, Ne, not_forall] using hs
@@ -55,8 +63,10 @@ theorem addHaar_submodule_eq_zero (F : Type) [NontriviallyNormedField F] [Locall
     have hmem : (c ^ m - c ^ n) • x ∈ s := by
       have : (c ^ m - c ^ n) • x = b - a := by
         simp only [u] at hab
-        rw [sub_smul, show c ^ m • x = c ^ n • x + b - a by rw [hab]; abel]; abel
-      rw [this]; exact s.sub_mem (hA hb) (hA ha)
+        rw [sub_smul, show c ^ m • x = c ^ n • x + b - a by rw [hab]; abel]
+        abel
+      rw [this]
+      exact s.sub_mem (hA hb) (hA ha)
     exact (Submodule.smul_mem_iff s hne).mp hmem
 
   have key : ∀ R : ℝ, μ ((s : Set V) ∩ h ⁻¹' closedBall 0 R) = 0 := by
@@ -67,15 +77,18 @@ theorem addHaar_submodule_eq_zero (F : Type) [NontriviallyNormedField F] [Locall
         rw [← h.image_symm]
         exact (isCompact_closedBall (0 : Fin (Module.finrank F V) → F) R).image h.symm.continuous
       exact hK.inter_left hcl
-    have hAm : MeasurableSet A := hcl.measurableSet.inter (isClosed_closedBall.preimage h.continuous).measurableSet
+    have hAm : MeasurableSet A :=
+      hcl.measurableSet.inter (isClosed_closedBall.preimage h.continuous).measurableSet
     by_contra hne
     apply lt_irrefl (⊤ : ENNReal)
     calc
-      (⊤ : ENNReal) = ∑' _ : ℕ, μ A := (ENNReal.tsum_const_eq_top_of_ne_zero hne).symm
+      (⊤ : ENNReal)
+        = ∑' _ : ℕ, μ A := (ENNReal.tsum_const_eq_top_of_ne_zero hne).symm
       _ = ∑' n : ℕ, μ ({u n} + A) := by
         congr 1; ext1 n; simp only [image_add_left, measure_preimage_add, singleton_add]
-      _ = μ (⋃ n, {u n} + A) := Eq.symm <| measure_iUnion (hdisj A inter_subset_left) fun n => by
-        simpa only [image_add_left, singleton_add] using (measurable_const_add (-u n)) hAm
+      _ = μ (⋃ n, {u n} + A) :=
+        Eq.symm <| measure_iUnion (hdisj A inter_subset_left) fun n => by
+          simpa only [image_add_left, singleton_add] using (measurable_const_add (- u n)) hAm
       _ ≤ μ (insert 0 (range u) + A) := by
         apply measure_mono
         refine iUnion_subset fun n => add_subset_add ?_ Subset.rfl

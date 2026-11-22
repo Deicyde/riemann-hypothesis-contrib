@@ -12,7 +12,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal GlobalTheory.StringRepresentationDecomposition
+open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions
+  Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal
+  GlobalTheory.StringRepresentationDecomposition
 open GlobalTheory.MuCharProof
 noncomputable section
 namespace UpperTheory.GalS
@@ -41,8 +43,9 @@ theorem muChar_holds_alt : _root_.GlobalTheory.MuCharProof.muChar_holds_tyz := b
       simp [τ']
     have hj := D.naut.locAut_hodgeTateWeightsLevelZero_def i τ'
     rw [hτ] at hj
-    have h3 : -(z + (((D.R.t : ℂ) - 1) / 2 - ((0 : ℕ) : ℂ))) + ((D.R.nV : ℂ) - 1) / 2 ∈
-        (D.naut.locAutHodgeTateWeightsLevelZero i τ').map (fun n : ℤ => (n : ℂ)) := by
+    have h3
+        : -(z + (((D.R.t : ℂ) - 1) / 2 - ((0 : ℕ) : ℂ))) + ((D.R.nV : ℂ) - 1) / 2
+          ∈ (D.naut.locAutHodgeTateWeightsLevelZero i τ').map (fun n : ℤ => (n : ℂ)) := by
       rw [hj]
       exact Multiset.mem_map_of_mem _ h1
     obtain ⟨n, -, hn⟩ := Multiset.mem_map.1 h3
@@ -51,22 +54,28 @@ theorem muChar_holds_alt : _root_.GlobalTheory.MuCharProof.muChar_holds_tyz := b
     push_cast at hn ⊢
     linear_combination hn
   obtain ⟨ρ', hc', hw', -⟩ := (h2 i).2.2 χ s halg
-  have hc0 : Continuous fun g => ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 := by
-    have : (fun g => ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0) =
-        fun g => iotaOQ D.nd D.naut i (chi1 D.nd i g) := funext hρ
+  have hc0
+      : Continuous fun g => ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 := by
+    have : (fun g => ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0)
+        = fun g => iotaOQ D.nd D.naut i (chi1 D.nd i g) :=
+      funext hρ
     rw [this]
-    exact (Formalism.MainNotions.SumRepresentations.continuous_iotaOQ D.nd D.naut i).comp (D.nd.chi_cont i 1)
-  have hc0' : Continuous fun g => ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 :=
+    exact (Formalism.MainNotions.SumRepresentations.continuous_iotaOQ D.nd D.naut i).comp
+      (D.nd.chi_cont i 1)
+  have hc0'
+      : Continuous fun g => ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 :=
     hc'.matrix_elem 0 0
-  have hfin : (placesOver D.host.E (D.nd.l i) ∪ ↑(D.nd.S i) ∪ ↑(D.nd.Q i) : Set (PlE D.host)).Finite :=
-    ((Formalism.MainNotions.SumRepresentations.placesOver_finite D.host.E (D.nd.l i) (D.nd.lPrime i).out.ne_zero).union
-      (D.nd.S i).finite_toSet).union (D.nd.Q i).finite_toSet
+  have hfin
+      : (placesOver D.host.E (D.nd.l i) ∪ ↑(D.nd.S i) ∪ ↑(D.nd.Q i) : Set (PlE D.host)).Finite :=
+    ((Formalism.MainNotions.SumRepresentations.placesOver_finite D.host.E (D.nd.l i)
+      (D.nd.lPrime i).out.ne_zero).union (D.nd.S i).finite_toSet).union (D.nd.Q i).finite_toSet
   have hdense := h5.2.2.1 _ hfin
-  have hsub : {σ : Formalism.ConjugateSelfDual.G D.host.E D.nd.Om | ∃ w ∉ (placesOver D.host.E (D.nd.l i) ∪ ↑(D.nd.S i) ∪ ↑(D.nd.Q i) :
-      Set (PlE D.host)), IsSplitPl D.host w ∧ ∃ B : ValuationSubring D.nd.Om,
-      IsPlaceOver (F := D.host.E) B w ∧ IsFrob (F := D.host.E) B (normV w) σ} ⊆
-      {g | ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 =
-        ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0} := by
+  have hsub
+      : {σ : Formalism.ConjugateSelfDual.G D.host.E D.nd.Om | ∃ w ∉ (placesOver D.host.E (D.nd.l i) ∪ ↑(D.nd.S i) ∪ ↑(D.nd.Q i) :
+          Set (PlE D.host)), IsSplitPl D.host w ∧ ∃ B : ValuationSubring D.nd.Om,
+          IsPlaceOver (F := D.host.E) B w ∧ IsFrob (F := D.host.E) B (normV w) σ}
+        ⊆ {g | ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 =
+            ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0} := by
     rintro σ ⟨v, hv, hsp, B, hB, hσ⟩
     simp only [Set.mem_union, not_or, Finset.mem_coe] at hv
     have hso : SplitOut D.nd i v := ⟨hsp, hv.1.1, hv.1.2, hv.2⟩
@@ -75,17 +84,22 @@ theorem muChar_holds_alt : _root_.GlobalTheory.MuCharProof.muChar_holds_tyz := b
       rw [hw' v hv.1.1]
       exact (D.naut.unr_tw _ _).2 hu
     have e := D.naut.wdOf_frob i ρ' v hv.1.1 hc' hunr B σ hB hσ
-    rw [hw' v hv.1.1, hf B σ hB hσ, Multiset.map_singleton, Multiset.prod_singleton, charpoly_fin_one,
-      Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C] at e
+    rw [hw' v hv.1.1, hf B σ hB hσ, Multiset.map_singleton, Multiset.prod_singleton,
+        charpoly_fin_one, Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
+      at e
     have e2 := (D.naut.iotaQC i).injective (C_injective (sub_right_injective e))
     show _ = _
     rw [hρ σ]
     exact e2.symm
-  have hall : ∀ g, ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 =
-      ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 := by
+  have hall
+      : ∀ g,
+        ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0
+          = ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 := by
     intro g
-    have hcl : IsClosed {g | ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 =
-        ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0} := isClosed_eq hc0 hc0'
+    have hcl : IsClosed
+        {g | ((ρ g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0 =
+          ((ρ' g : GL _ _) : Matrix (Fin 1) (Fin 1) (Qbar (D.nd.l i))) 0 0} :=
+      isClosed_eq hc0 hc0'
     have := closure_minimal hsub hcl
     rw [hdense] at this
     exact this (Set.mem_univ g)

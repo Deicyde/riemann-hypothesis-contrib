@@ -14,15 +14,16 @@ section ScaleA2
 
 variable {E : Type} [CommRing E] (O : Subring E) (cj : E →+* E) {r : ℕ}
 
-def toOm {ι : Type} (X : Matrix ι ι E) (h : ∀ i j, X i j ∈ O) : Matrix ι ι O := Matrix.of fun i j => ⟨X i j, h i j⟩
+def toOm {ι : Type} (X : Matrix ι ι E) (h : ∀ i j, X i j ∈ O) : Matrix ι ι O :=
+  Matrix.of fun i j => ⟨X i j, h i j⟩
 
 theorem scC_mem (α β : E) (hα : α ∈ O) (hβ : β ∈ O) (i j : Ix r) : scC r α β i j ∈ O := by
-  rcases i with i | i <;> rcases j with j | j <;>
-    simp [scC, liftE, dlast, Matrix.fromBlocks, Matrix.one_apply, Matrix.diagonal_apply] <;>
-    split_ifs <;> simp_all [O.one_mem, O.zero_mem]
+  rcases i with i | i <;> rcases j with j | j
+    <;> simp [scC, liftE, dlast, Matrix.fromBlocks, Matrix.one_apply, Matrix.diagonal_apply]
+    <;> split_ifs <;> simp_all [O.one_mem, O.zero_mem]
 
-theorem scC_mul_inv (α β α' β' : E) (h1 : α * α' = 1) (h2 : β' = -(β * α')) :
-    scC r α β * scC r α' β' = 1 := by
+theorem scC_mul_inv (α β α' β' : E) (h1 : α * α' = 1) (h2 : β' = -(β * α'))
+    : scC r α β * scC r α' β' = 1 := by
   unfold scC
   rw [Matrix.fromBlocks_multiply]
   have hL : liftE (R := E) r * dlast r α' = α' • liftE r := by
@@ -34,8 +35,8 @@ theorem scC_mul_inv (α β α' β' : E) (h1 : α * α' = 1) (h2 : β' = -(β * �
     congr 1
     funext i
     split_ifs <;> simp [h1]
-  simp only [Matrix.smul_mul, hL, hD, h2, smul_smul, Matrix.mul_zero, Matrix.zero_mul, Matrix.one_mul,
-    Matrix.mul_one, add_zero, zero_add, smul_zero]
+  simp only [Matrix.smul_mul, hL, hD, h2, smul_smul, Matrix.mul_zero, Matrix.zero_mul,
+    Matrix.one_mul, Matrix.mul_one, add_zero, zero_add, smul_zero]
   rw [← Matrix.fromBlocks_one, ← add_smul]
   congr 1
   simp [mul_comm]

@@ -10,30 +10,34 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProjSpace
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 attribute [local instance] MvPolynomial.gradedAlgebra
 
 namespace UpperTheory.Gal.KunnethLefschetz.PnF
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 
-private def chartE (k : Type) [Field k] (N : ℕ) (i : Fin (N + 1)) :
-    Chart k i ≃+* MvPolynomial (Fin N) k :=
+private def chartE (k : Type) [Field k] (N : ℕ) (i : Fin (N + 1))
+    : Chart k i ≃+* MvPolynomial (Fin N) k :=
   (chartEquiv k i).trans (MvPolynomial.renameEquiv k (finSuccAboveEquiv i).symm).toRingEquiv
 
-private theorem chartE_C (k : Type) [Field k] (N : ℕ) (i : Fin (N + 1)) (a : k) :
-    chartE k N i (HomogeneousLocalization.fromZeroRingHom (grading k N) _
-      (algebraMap k (grading k N 0) a)) = MvPolynomial.C a := by
-  have h : HomogeneousLocalization.fromZeroRingHom (grading k N) _
-      (algebraMap k (grading k N 0) a) = polyToChart k i (MvPolynomial.C a) := by
+private theorem chartE_C (k : Type) [Field k] (N : ℕ) (i : Fin (N + 1)) (a : k)
+    : chartE k N i
+        (HomogeneousLocalization.fromZeroRingHom (grading k N) _ (algebraMap k (grading k N 0) a))
+      = MvPolynomial.C a := by
+  have h
+      : HomogeneousLocalization.fromZeroRingHom (grading k N) _ (algebraMap k (grading k N 0) a)
+        = polyToChart k i (MvPolynomial.C a) := by
     simp [polyToChart]
   rw [h]
   have h2 : chartToPoly k i (polyToChart k i (MvPolynomial.C a)) = MvPolynomial.C a := by
     rw [← RingHom.comp_apply, chartToPoly_polyToChart]
     rfl
   simp only [chartE, RingEquiv.trans_apply]
-  change (MvPolynomial.renameEquiv k (finSuccAboveEquiv i).symm)
-    (chartToPoly k i (polyToChart k i (MvPolynomial.C a))) = _
+  change (MvPolynomial.renameEquiv k (finSuccAboveEquiv i).symm) (chartToPoly k i
+      (polyToChart k i (MvPolynomial.C a)))
+    = _
   rw [h2]
   simp
 
@@ -42,8 +46,7 @@ private theorem chart_holds : LPdCut.LChart := by
   let e := chartE k N i
   let ι := Proj.awayι (grading k N) (MvPolynomial.X i) (X_mem i) one_pos
   have hiso : IsIso (Spec.map (CommRingCat.ofHom e.toRingHom)) := by
-    have : IsIso (CommRingCat.ofHom e.toRingHom) :=
-      (RingEquiv.toCommRingCatIso e).isIso_hom
+    have : IsIso (CommRingCat.ofHom e.toRingHom) := (RingEquiv.toCommRingCatIso e).isIso_hom
     infer_instance
   refine ⟨Spec.map (CommRingCat.ofHom e.toRingHom) ≫ ι, inferInstance, ?_, ?_⟩
   · simp only [PNto, Category.assoc]
@@ -84,15 +87,22 @@ private theorem iso0 (k : Type) [Field k] : IsIso (PNto k 0) := by
     have hb : Function.Bijective (MvPolynomial.C : k →+* MvPolynomial (Fin 0) k) :=
       ⟨MvPolynomial.C_injective _ _, MvPolynomial.C_surjective _⟩
     exact (RingEquiv.toCommRingCatIso (RingEquiv.ofBijective _ hb)).isIso_hom
-  have hP : PNto k 0 = inv j ≫ Spec.map (CommRingCat.ofHom (MvPolynomial.C : k →+* MvPolynomial (Fin 0) k)) := by
+  have hP
+      : PNto k 0
+        = inv j ≫ Spec.map (CommRingCat.ofHom (MvPolynomial.C : k →+* MvPolynomial (Fin 0) k)) := by
     rw [← hc, IsIso.inv_hom_id_assoc]
   rw [hP]
   infer_instance
 
 end UpperTheory.Gal.KunnethLefschetz.PnF
 
-theorem UpperTheory.Gal.KunnethLefschetz.pnFacts_holds :
-    UpperTheory.Gal.KunnethLefschetz.PnFacts := by
+theorem UpperTheory.Gal.KunnethLefschetz.pnFacts_holds
+    : UpperTheory.Gal.KunnethLefschetz.PnFacts := by
   unfold UpperTheory.Gal.KunnethLefschetz.PnFacts
   intro k _ d
-  exact ⟨⟨LProperPf.LProper_of k d, LSmoothPf.LSmooth_of PnF.chart_holds k d⟩, Cov.PNIntegral_of k d, PnF.locNml k d, PnF.iso0 k⟩
+  exact ⟨
+    ⟨LProperPf.LProper_of k d, LSmoothPf.LSmooth_of PnF.chart_holds k d⟩,
+    Cov.PNIntegral_of k d,
+    PnF.locNml k d,
+    PnF.iso0 k
+  ⟩

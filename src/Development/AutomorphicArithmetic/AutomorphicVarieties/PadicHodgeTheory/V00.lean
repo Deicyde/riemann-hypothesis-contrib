@@ -5,10 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Chebota
 
 @[expose] public section
 
-open Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc Topology NumberField IsDedekindDomain
+open Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc
+  ReciprocityTheory.Gal Module UpperTheory.V.Loc Topology NumberField IsDedekindDomain
 
-theorem UpperTheory.V.Loc.v00 :
-    ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [CharZero Ω] [Algebra F Ω] [IsAlgClosure F Ω] (U : Subgroup (G F Ω)) [U.Normal], IsOpen (U : Set (G F Ω)) → ∀ (g : G F Ω) (Sg : Finset (HeightOneSpectrum (𝓞 F))) (M : ℕ), M ≠ 0 → ∃ (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (p : ℕ) (σ : G F Ω), w ∉ Sg ∧ p.Prime ∧ ¬ p ∣ M ∧ ¬ (p : ℤ) ∣ discr F ∧ ((p : ℕ) : 𝓞 F) ∈ w.asIdeal ∧ normV w = p ∧ locDeg w = 1 ∧ IsPlaceOver A w ∧ Ine (F := F) A ≤ U ∧ Formalism.ConjugateSelfDual.IsFrob (F := F) A p σ ∧ σ⁻¹ * g ∈ U := by
+theorem UpperTheory.V.Loc.v00
+    : ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [CharZero Ω] [Algebra F Ω]
+        [IsAlgClosure F Ω] (U : Subgroup (G F Ω)) [U.Normal],
+      IsOpen (U : Set (G F Ω))
+        → ∀ (g : G F Ω) (Sg : Finset (HeightOneSpectrum (𝓞 F))) (M : ℕ),
+          M ≠ 0
+            → ∃ (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (p : ℕ) (σ : G F Ω),
+              w ∉ Sg ∧ p.Prime ∧ ¬ p ∣ M ∧ ¬ (p : ℤ) ∣ discr F ∧ ((p : ℕ) : 𝓞 F) ∈ w.asIdeal
+                ∧ normV w = p ∧ locDeg w = 1 ∧ IsPlaceOver A w ∧ Ine (F := F) A ≤ U
+                ∧ Formalism.ConjugateSelfDual.IsFrob (F := F) A p σ ∧ σ⁻¹ * g ∈ U := by
   intro F Ω _ _ _ _ _ _ U hU hUo g Sg M hM
   classical
   set N : ℕ := M * (discr F).natAbs with hNdef
@@ -24,8 +33,7 @@ theorem UpperTheory.V.Loc.v00 :
   have hp : (normV v).Prime := by
     rw [hnorm]
     exact ((GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified F).1 v).2 hinert
-  have hpv : ((normV v : ℕ) : 𝓞 F) ∈ v.asIdeal := by
-    rw [hnorm]; exact Ideal.absNorm_mem _
+  have hpv : ((normV v : ℕ) : 𝓞 F) ∈ v.asIdeal := by rw [hnorm]; exact Ideal.absNorm_mem _
   have hNv : (N : 𝓞 F) ∉ v.asIdeal := by
     intro h
     apply hvA
@@ -37,8 +45,23 @@ theorem UpperTheory.V.Loc.v00 :
     rintro k ⟨c, rfl⟩
     push_cast
     exact Ideal.mul_mem_right _ _ hpv
-  refine ⟨v, B, normV v, σ, fun h => hvA (Finset.mem_union_left _ h), hp, ?_, ?_, hpv, rfl,
-    ?_, hB, hBU, hσ, ?_⟩
+  refine ⟨
+    v,
+    B,
+    normV v,
+    σ,
+    fun h => hvA (Finset.mem_union_left _ h),
+    hp,
+    ?_,
+    ?_,
+    hpv,
+    rfl,
+    ?_,
+    hB,
+    hBU,
+    hσ,
+    ?_
+  ⟩
   · intro h
     exact hNv (hdvd N (dvd_mul_of_dvd_left h _))
   · intro h

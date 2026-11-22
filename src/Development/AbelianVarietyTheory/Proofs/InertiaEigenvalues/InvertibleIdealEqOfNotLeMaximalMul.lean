@@ -6,20 +6,22 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Delt
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory
 
-theorem ideal_dual_symm {A : Type} [CommRing A] (I : Ideal A) (f : Module.Dual A ↥I)
-    (x y : ↥I) : f x * (y : A) = f y * (x : A) := by
+theorem ideal_dual_symm {A : Type} [CommRing A] (I : Ideal A) (f : Module.Dual A ↥I) (x y : ↥I)
+    : f x * (y : A) = f y * (x : A) := by
   have h : (x : A) • y = (y : A) • x := Subtype.ext (by simp [mul_comm])
   have := congrArg f h
   simp only [map_smul, smul_eq_mul] at this
   rw [mul_comm (f x), ← this, mul_comm]
 
-theorem invertible_ideal_eq_of_not_le_maximal_mul (A : Type) [CommRing A] (I N : Ideal A) :
-    Module.Invertible A ↥I → N ≤ I → (∀ m : Ideal A, m.IsMaximal → ¬ N ≤ m * I) → N = I := by
+theorem invertible_ideal_eq_of_not_le_maximal_mul (A : Type) [CommRing A] (I N : Ideal A)
+    : Module.Invertible A ↥I → N ≤ I → (∀ m : Ideal A, m.IsMaximal → ¬ N ≤ m * I) → N = I := by
   intro hI hNI hm
 
   set c : Ideal A := N.colon I with hc

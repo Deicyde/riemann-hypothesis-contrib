@@ -8,19 +8,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjEqNegOfS
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Pj ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth GlobalTheory.RefSum
-open GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes (IsIntHom IsOrbit FrobOnType embX primeBelow SplitInK InertInK)
+open NumberField IsDedekindDomain Formalism.L2.Pj ReciprocityTheory.PGsh
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth GlobalTheory.RefSum
+open GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes
+  (IsIntHom IsOrbit FrobOnType embX primeBelow SplitInK InertInK)
 open GlobalTheory.IndefiniteRowSideFullHecke.BigBlockCharacters (HasChars)
 open GlobalTheory.IndefiniteRowSideFullHecke.FactorDepthInertBounds (boundAll boundInert boundFine)
 
 namespace GlobalTheory.FrobOrbit
 
-theorem card_ringHom_le (A k : Type) [CommRing A] [Module.Free ℤ A] [Module.Finite ℤ A] [Field k] :
-    Finite (A →+* k) ∧ Nat.card (A →+* k) ≤ Module.finrank ℤ A := by
+theorem card_ringHom_le (A k : Type) [CommRing A] [Module.Free ℤ A] [Module.Finite ℤ A] [Field k]
+    : Finite (A →+* k) ∧ Nat.card (A →+* k) ≤ Module.finrank ℤ A := by
   let g : (A →+* k) → (A →ₗ[ℤ] k) := fun f => f.toAddMonoidHom.toIntLinearMap
   have hli : LinearIndependent k g := by
     apply LinearIndependent.of_comp (LinearMap.ltoFun ℤ A k k)
-    exact (linearIndependent_monoidHom A k).comp (fun f : A →+* k => f.toMonoidHom)
+    exact (linearIndependent_monoidHom A k).comp
+      (fun f : A →+* k => f.toMonoidHom)
       (fun f f' h => RingHom.ext fun a => DFunLike.congr_fun h a)
   let e := (Module.Free.chooseBasis ℤ A).constr (M' := k) k
   have : Module.Finite k (A →ₗ[ℤ] k) := Module.Finite.equiv e
@@ -31,11 +35,15 @@ theorem card_ringHom_le (A k : Type) [CommRing A] [Module.Free ℤ A] [Module.Fi
   refine hli.fintype_card_le_finrank.trans (le_of_eq ?_)
   rw [← e.finrank_eq, Module.finrank_fintype_fun_eq_card, Module.finrank_eq_card_chooseBasisIndex]
 
-theorem bijective_frob_twist (F k : Type) [Field F] [Finite F] [Field k] (p : ℕ) [Fact p.Prime] [CharP k p]
-    [Algebra (ZMod p) F] (ψ : F →+* k) :
-    Function.Bijective (fun s : Fin (Module.finrank (ZMod p) F) => (iterateFrobenius k p s).comp ψ) := by
+theorem bijective_frob_twist
+    (F k : Type) [Field F] [Finite F] [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p] [Algebra (ZMod p) F]
+    (ψ : F →+* k)
+    : Function.Bijective (fun s : Fin (Module.finrank (ZMod p) F) =>
+      (iterateFrobenius k p s).comp ψ) := by
   let : Algebra (ZMod p) k := ZMod.algebra k p
-  have hinj : Function.Injective (fun s : Fin (Module.finrank (ZMod p) F) => (iterateFrobenius k p s).comp ψ) := by
+  have hinj : Function.Injective (fun s : Fin (Module.finrank (ZMod p) F) =>
+      (iterateFrobenius k p s).comp ψ) := by
     intro s t hst
     apply (FiniteField.bijective_frobeniusAlgHom_pow (ZMod p) F).1
     ext x
@@ -44,21 +52,29 @@ theorem bijective_frob_twist (F k : Type) [Field F] [Finite F] [Field k] (p : �
     have h2 := ψ.injective this
     simp only [AlgHom.coe_pow, FiniteField.coe_frobeniusAlgHom, pow_iterate, ZMod.card]
     exact h2
-  let e : (F →+* k) → (F →ₐ[ZMod p] k) := fun f =>
-    { f with
-      commutes' := fun r =>
-        DFunLike.congr_fun (Subsingleton.elim (f.comp (algebraMap (ZMod p) F)) (algebraMap (ZMod p) k)) r }
+  let e : (F →+* k) → (F →ₐ[ZMod p] k) := fun f => {
+    f with
+    commutes' := fun r =>
+      DFunLike.congr_fun
+        (Subsingleton.elim (f.comp (algebraMap (ZMod p) F)) (algebraMap (ZMod p) k)) r
+  }
   have he : Function.Injective e := fun f f' h => RingHom.ext fun a => DFunLike.congr_fun h a
   have : Finite (F →+* k) := Finite.of_injective e he
   refine hinj.bijective_of_nat_card_le ?_
   rw [Nat.card_eq_fintype_card (α := Fin _), Fintype.card_fin]
-  exact (Nat.card_le_card_of_injective e he).trans (by simpa using card_algHom_le_finrank (ZMod p) F k)
+  exact (Nat.card_le_card_of_injective e he).trans
+    (by simpa using card_algHom_le_finrank (ZMod p) F k)
 
-theorem orbit_of_ker (A k : Type) [CommRing A] [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] (ψ : A →+* k)
-    [Finite (A ⧸ RingHom.ker ψ)] :
-    ∃ h : ℕ, 0 < h ∧ Nat.card (A ⧸ RingHom.ker ψ) = p ^ h ∧ (iterateFrobenius k p h).comp ψ = ψ ∧
-      (∀ s t, s < h → t < h → (iterateFrobenius k p s).comp ψ = (iterateFrobenius k p t).comp ψ → s = t) ∧
-      ∀ φ : A →+* k, RingHom.ker φ = RingHom.ker ψ ↔ ∃ s < h, (iterateFrobenius k p s).comp ψ = φ := by
+theorem orbit_of_ker
+    (A k : Type) [CommRing A] [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (ψ : A →+* k) [Finite (A ⧸ RingHom.ker ψ)]
+    : ∃ h : ℕ,
+      0 < h ∧ Nat.card (A ⧸ RingHom.ker ψ) = p ^ h ∧ (iterateFrobenius k p h).comp ψ = ψ
+        ∧ (∀ s t,
+          s < h → t < h → (iterateFrobenius k p s).comp ψ = (iterateFrobenius k p t).comp ψ → s = t)
+        ∧ ∀ φ : A →+* k,
+          RingHom.ker φ = RingHom.ker ψ ↔ ∃ s < h, (iterateFrobenius k p s).comp ψ = φ := by
   have : (RingHom.ker ψ).IsPrime := RingHom.ker_isPrime ψ
   let : Field (A ⧸ RingHom.ker ψ) := (Finite.isField_of_domain _).toField
   let ψ' : A ⧸ RingHom.ker ψ →+* k := RingHom.kerLift ψ
@@ -72,7 +88,8 @@ theorem orbit_of_ker (A k : Type) [CommRing A] [Field k] (p : ℕ) [Fact p.Prime
   refine ⟨Module.finrank (ZMod p) (A ⧸ RingHom.ker ψ), Module.finrank_pos, ?_, ?_, ?_, ?_⟩
   · rw [Nat.card_eq_fintype_card, hc]
   · ext a
-    rw [RingHom.comp_apply, iterateFrobenius_def, ← hc, ← RingHom.kerLift_mk ψ a, ← map_pow, FiniteField.pow_card]
+    rw [RingHom.comp_apply, iterateFrobenius_def, ← hc, ← RingHom.kerLift_mk ψ a, ← map_pow,
+      FiniteField.pow_card]
   · intro s t hs ht hst
     have : (⟨s, hs⟩ : Fin _) = ⟨t, ht⟩ := by
       apply hb.1
@@ -93,12 +110,18 @@ theorem orbit_of_ker (A k : Type) [CommRing A] [Field k] (p : ℕ) [Fact p.Prime
       ext a
       simp [RingHom.mem_ker]
 
-theorem injective_of_det {E k : Type} [Field E] [NumberField E] [Field k] (p : ℕ) [CharP k p]
-    (hd : ¬ (p : ℤ) ∣ discr E) {R K : Type} [CommRing R] [CommRing K] [Algebra R K] (hR : Function.Injective (algebraMap R K))
-    (r : R →+* k) {F : Type} [Field F] (ι : F →+* ℂ) (j : F →+* K)
+theorem injective_of_det
+    {E k : Type} [Field E] [NumberField E] [Field k]
+    (p : ℕ) [CharP k p]
+    (hd : ¬ (p : ℤ) ∣ discr E)
+    {R K : Type} [CommRing R] [CommRing K] [Algebra R K]
+    (hR : Function.Injective (algebraMap R K)) (r : R →+* k)
+    {F : Type} [Field F]
+    (ι : F →+* ℂ)
+    (j : F →+* K)
     (u : (E →+* ℂ) → (𝓞 E →+* F)) (hu : ∀ τ a, ι (u τ a) = τ (a : E))
-    (t : (E →+* ℂ) → (𝓞 E →+* R)) (ht : ∀ τ a, algebraMap R K (t τ a) = j (u τ a)) :
-    Function.Injective fun τ => r.comp (t τ) := by
+    (t : (E →+* ℂ) → (𝓞 E →+* R)) (ht : ∀ τ a, algebraMap R K (t τ a) = j (u τ a))
+    : Function.Injective fun τ => r.comp (t τ) := by
   classical
   intro τ τ' h
   by_contra hne
@@ -106,7 +129,8 @@ theorem injective_of_det {E k : Type} [Field E] [NumberField E] [Field k] (p : �
   let M : Matrix (E →+* ℂ) (E →+* ℂ) F := Matrix.of fun i σ => u σ (b i)
   have hM : ι.mapMatrix M = basisMatrix E := by
     ext i σ
-    simp only [basisMatrix, Matrix.of_apply, canonicalEmbedding.latticeBasis_apply, integralBasis_apply]
+    simp only [basisMatrix, Matrix.of_apply, canonicalEmbedding.latticeBasis_apply,
+      integralBasis_apply]
     exact hu σ _
   have hdet : M.det ^ 2 = (discr E : F) := by
     apply ι.injective
@@ -117,16 +141,21 @@ theorem injective_of_det {E k : Type} [Field E] [NumberField E] [Field k] (p : �
     have : (algebraMap R K).mapMatrix N = j.mapMatrix M := by
       ext i σ
       exact ht σ _
-    rw [map_pow, RingHom.map_det, this, ← RingHom.map_det, ← map_pow, hdet, map_intCast, map_intCast]
+    rw [map_pow, RingHom.map_det, this, ← RingHom.map_det, ← map_pow, hdet, map_intCast,
+      map_intCast]
   have h0 : (r.mapMatrix N).det = 0 :=
     Matrix.det_zero_of_column_eq hne fun i => DFunLike.congr_fun h (b i)
-  have h1 : (discr E : k) = 0 := by
-    rw [← map_intCast r, ← hN, map_pow, RingHom.map_det, h0]; simp
+  have h1 : (discr E : k) = 0 := by rw [← map_intCast r, ← hN, map_pow, RingHom.map_det, h0]; simp
   exact hd ((CharP.intCast_eq_zero_iff k p _).1 h1)
 
-theorem pow_char_sqrt {k : Type} [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] (hp : p ≠ 2) (d : ℕ)
-    (hd : (d : ZMod p) ≠ 0) {r : k} (hr : r ^ 2 = -(d : k)) :
-    r ≠ -r ∧ (IsSquare (-(d : ZMod p)) → r ^ p = r) ∧ (¬ IsSquare (-(d : ZMod p)) → r ^ p = -r) := by
+theorem pow_char_sqrt
+    {k : Type} [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (hp : p ≠ 2)
+    (d : ℕ) (hd : (d : ZMod p) ≠ 0)
+    {r : k} (hr : r ^ 2 = -(d : k))
+    : r ≠ -r ∧ (IsSquare (-(d : ZMod p)) → r ^ p = r)
+      ∧ (¬ IsSquare (-(d : ZMod p)) → r ^ p = -r) := by
   let f : ZMod p →+* k := ZMod.castHom (dvd_refl p) k
   have hodd : p = 2 * (p / 2) + 1 := by
     have := (Fact.out : p.Prime).eq_two_or_odd
@@ -144,27 +173,34 @@ theorem pow_char_sqrt {k : Type} [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] 
       exact (mul_eq_zero.1 this).resolve_left h2
     apply hd'
     apply f.injective
-    rw [map_neg, map_natCast, ← hr, h3, map_zero]; simp
+    rw [map_neg, map_natCast, ← hr, h3, map_zero]
+    simp
   · rw [hpow, (ZMod.euler_criterion p hd').1 h, map_one, one_mul]
   · rcases ZMod.pow_div_two_eq_neg_one_or_one p hd' with h1 | h1
     · exact absurd ((ZMod.euler_criterion p hd').2 h1) h
     · rw [hpow, h1, map_neg, map_one, neg_one_mul]
 
 section
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
 
 theorem emb_rt_sq (σ : E →+* ℂ) : σ (H.rt : E) ^ 2 = -(H.d : ℂ) := by
   have := congrArg (σ.comp (algebraMap (𝓞 E) E)) H.rt_sq
   rw [map_pow, map_neg, map_natCast] at this
   exact this
 
-theorem conj_rt (σ : E →+* ℂ) : ComplexEmbedding.conjugate σ (H.rt : E) = -σ (H.rt : E) := by
+theorem conj_rt (σ : E →+* ℂ) : ComplexEmbedding.conjugate σ (H.rt : E) = - σ (H.rt : E) := by
   first
   | exact @_root_.GlobalTheory.ConjugateNegativeSquare.conjugate_rt
   | exact _root_.GlobalTheory.ConjugateNegativeSquare.conjugate_rt
   | (apply _root_.GlobalTheory.ConjugateNegativeSquare.conjugate_rt <;> assumption)
   | (intros; apply _root_.GlobalTheory.ConjugateNegativeSquare.conjugate_rt <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.ConjugateNegativeSquare.conjugate_rt <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.ConjugateNegativeSquare.conjugate_rt
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.ConjugateNegativeSquare.conjugate_rt ..)
 
 theorem cm_generator_sq_quadratic_eq : ∃ m : 𝓞 E, H.w0 ^ 2 = H.w0 - 2 * m := by
@@ -177,11 +213,14 @@ theorem cm_generator_sq_quadratic_eq : ∃ m : 𝓞 E, H.w0 ^ 2 = H.w0 - 2 * m :
   have h3 := H.two_weight_eq_one_add_root
   linear_combination (2 * H.w0 + H.rt - 1) * h3 + h2 - h1
 
-theorem frob_rt {k : Type} [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] (ψ : (E →+* ℂ) → (𝓞 E →+* k))
-    (hψ : ∀ σ σ' (a b : 𝓞 E), σ (a : E) = σ' (b : E) → ψ σ a = ψ σ' b) (σ σ' : E →+* ℂ)
-    (h : ∀ a, ψ σ' a = ψ σ a ^ p) :
-    (SplitInK H p → σ' (H.rt : E) = σ (H.rt : E)) ∧ (InertInK H p → σ' (H.rt : E) = -σ (H.rt : E)) := by
-  have hor : σ' (H.rt : E) = σ (H.rt : E) ∨ σ' (H.rt : E) = -σ (H.rt : E) :=
+theorem frob_rt
+    {k : Type} [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (ψ : (E →+* ℂ) → (𝓞 E →+* k)) (hψ : ∀ σ σ' (a b : 𝓞 E), σ (a : E) = σ' (b : E) → ψ σ a = ψ σ' b)
+    (σ σ' : E →+* ℂ) (h : ∀ a, ψ σ' a = ψ σ a ^ p)
+    : (SplitInK H p → σ' (H.rt : E) = σ (H.rt : E))
+      ∧ (InertInK H p → σ' (H.rt : E) = - σ (H.rt : E)) := by
+  have hor : σ' (H.rt : E) = σ (H.rt : E) ∨ σ' (H.rt : E) = - σ (H.rt : E) :=
     sq_eq_sq_iff_eq_or_eq_neg.1 (by rw [emb_rt_sq, emb_rt_sq])
   have hr : ψ σ H.rt ^ 2 = -(H.d : k) := by rw [← map_pow, H.rt_sq, map_neg, map_natCast]
   constructor
@@ -233,7 +272,15 @@ theorem frob_rt {k : Type} [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] (ψ : 
 
 end
 
-theorem frobOnType_and_orbit : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (c : Coeff l) (p : ℕ) [Fact p.Prime] (T : CDVR) (io : c.F →+* T.Fr) (X : ValExt T p), ¬ (p : ℤ) ∣ discr E → FrobOnType io X ∧ ∀ τ : E →+* ℂ, ∃ h : ℕ, 0 < h ∧ Nat.card (𝓞 E ⧸ primeBelow io X τ) = p ^ h ∧ ∃ lab : ZMod h → (E →+* ℂ), IsOrbit io X τ lab := by
+theorem frobOnType_and_orbit
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (c : Coeff l)
+        (p : ℕ) [Fact p.Prime] (T : CDVR) (io : c.F →+* T.Fr) (X : ValExt T p),
+      ¬ (p : ℤ) ∣ discr E
+        → FrobOnType io X
+          ∧ ∀ τ : E →+* ℂ, ∃ h : ℕ,
+            0 < h ∧ Nat.card (𝓞 E ⧸ primeBelow io X τ) = p ^ h
+              ∧ ∃ lab : ZMod h → (E →+* ℂ), IsOrbit io X τ lab := by
   intro E _ _ _ H l c p _ T io X hdisc
   obtain ⟨τT, -, hT, -⟩ := exists_types_valuationRing E H l c T io p X
   let t : (E →+* ℂ) → (𝓞 E →+* X.O) := fun τ => X.ι.comp (τT τ)
@@ -245,17 +292,21 @@ theorem frobOnType_and_orbit : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
       X.ints.isUnit_iff_valuation_eq_one, lt_iff_le_and_ne]
     exact and_iff_right (X.ints.map_le_one x)
-  have hch : CharP k p := (CharP.charP_iff_prime_eq_zero Fact.out).2 (by
-    rw [← map_natCast (IsLocalRing.residue X.O), IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal,
-      mem_nonunits_iff]
-    exact X.nonunit.out)
+  have hch : CharP k p :=
+    (CharP.charP_iff_prime_eq_zero Fact.out).2 (by
+      rw [← map_natCast (IsLocalRing.residue X.O), IsLocalRing.residue_eq_zero_iff,
+        IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
+      exact X.nonunit.out)
   have hker : ∀ τ, primeBelow io X τ = RingHom.ker (ψ τ) := by
     intro τ
     ext a
     change X.v (embX io X τ a) < 1 ↔ _
     rw [← ht, hv, RingHom.mem_ker]
     rfl
-  have hfrob : ∀ σ σ', GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes.IsFrob io X σ σ' ↔ ∀ a, ψ σ' a = ψ σ a ^ p := by
+  have hfrob
+      : ∀ σ σ',
+        GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes.IsFrob io X σ σ'
+          ↔ ∀ a, ψ σ' a = ψ σ a ^ p := by
     intro σ σ'
     refine forall_congr' fun a => ?_
     rw [← ht, ← ht, ← map_pow, ← map_sub, hv, map_sub, map_pow, sub_eq_zero]
@@ -263,9 +314,10 @@ theorem frobOnType_and_orbit : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   have hψ : ∀ σ σ' (a b : 𝓞 E), σ (a : E) = σ' (b : E) → ψ σ a = ψ σ' b := by
     intro σ σ' a b hab
     have h1 : embK c σ a = embK c σ' b := Subtype.ext (by rw [embK_coe, embK_coe, hab])
-    have h2 : t σ a = t σ' b := X.ints.hom_inj (by
-      rw [ht, ht]
-      exact congrArg (fun z => X.ιF (io z)) h1)
+    have h2 : t σ a = t σ' b :=
+      X.ints.hom_inj (by
+        rw [ht, ht]
+        exact congrArg (fun z => X.ιF (io z)) h1)
     exact congrArg (IsLocalRing.residue X.O) h2
   refine ⟨fun σ σ' hσ => ?_, fun τ => ?_⟩
   · obtain ⟨h1, h2⟩ := frob_rt H p ψ hψ σ σ' ((hfrob _ _).1 hσ)
@@ -275,12 +327,13 @@ theorem frobOnType_and_orbit : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     · unfold InPsi
       rw [h2 hi, conj_rt]
   have hinj : Function.Injective ψ :=
-    injective_of_det p hdisc X.ints.hom_inj (IsLocalRing.residue X.O) (algebraMap c.F ℂ) (X.ιF.comp io)
-      (embK c) (embK_coe c) t ht
+    injective_of_det p hdisc X.ints.hom_inj (IsLocalRing.residue X.O) (algebraMap c.F ℂ)
+      (X.ιF.comp io) (embK c) (embK_coe c) t ht
   obtain ⟨hfin, hcard⟩ := card_ringHom_le (𝓞 E) k
-  have hbij : Function.Bijective ψ := hinj.bijective_of_nat_card_le (by
-    rw [Nat.card_eq_fintype_card (α := E →+* ℂ), Embeddings.card, ← RingOfIntegers.rank]
-    exact hcard)
+  have hbij : Function.Bijective ψ :=
+    hinj.bijective_of_nat_card_le (by
+      rw [Nat.card_eq_fintype_card (α := E →+* ℂ), Embeddings.card, ← RingOfIntegers.rank]
+      exact hcard)
   let Φ := Equiv.ofBijective ψ hbij
   have hΦ : ∀ φ, ψ (Φ.symm φ) = φ := Φ.apply_symm_apply
   have hne : RingHom.ker (ψ τ) ≠ ⊥ := by
@@ -292,16 +345,28 @@ theorem frobOnType_and_orbit : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   have := Ideal.finiteQuotientOfFreeOfNeBot _ hne
   obtain ⟨h, hpos, hc, hper, hdist, hall⟩ := orbit_of_ker (𝓞 E) k p (ψ τ)
   have : NeZero h := ⟨hpos.ne'⟩
-  have hmod : ∀ m, (iterateFrobenius k p (m % h)).comp (ψ τ) = (iterateFrobenius k p m).comp (ψ τ) := by
-    have hq : ∀ q r, (iterateFrobenius k p (r + h * q)).comp (ψ τ) = (iterateFrobenius k p r).comp (ψ τ) := by
+  have hmod
+      : ∀ m, (iterateFrobenius k p (m % h)).comp (ψ τ) = (iterateFrobenius k p m).comp (ψ τ) := by
+    have hq
+        : ∀ q r,
+          (iterateFrobenius k p (r + h * q)).comp (ψ τ) = (iterateFrobenius k p r).comp (ψ τ) := by
       intro q r
       induction q with
       | zero => simp
-      | succ q ih => rw [mul_add, mul_one, ← add_assoc, iterateFrobenius_add, RingHom.comp_assoc, hper, ih]
+      | succ q ih =>
+        rw [mul_add, mul_one, ← add_assoc, iterateFrobenius_add, RingHom.comp_assoc, hper, ih]
     intro m
     rw [← hq (m / h), Nat.mod_add_div]
-  refine ⟨h, hpos, by rw [hker]; exact hc,
-    fun s => Φ.symm ((iterateFrobenius k p s.val).comp (ψ τ)), ?_, fun s => ?_, fun s s' hs => ?_, fun σ => ?_⟩
+  refine ⟨
+    h,
+    hpos,
+    by rw [hker]; exact hc,
+    fun s => Φ.symm ((iterateFrobenius k p s.val).comp (ψ τ)),
+    ?_,
+    fun s => ?_,
+    fun s s' hs => ?_,
+    fun σ => ?_
+  ⟩
   · apply hinj
     rw [hΦ, ZMod.val_zero, iterateFrobenius_zero, RingHom.id_comp]
   · rw [hfrob]

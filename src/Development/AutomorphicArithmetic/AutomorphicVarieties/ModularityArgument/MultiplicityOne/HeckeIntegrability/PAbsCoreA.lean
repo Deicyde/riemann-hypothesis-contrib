@@ -70,27 +70,36 @@ end
 end UpperTheory.V.Z.Mult.Pi.ACA
 
 open UpperTheory.V.Z.Mult.Pi.ACA in
-theorem UpperTheory.V.Z.Mult.Pi.absCoreA_pf :
-    AbsCore → RankOne → Corner → MinIdem → AbsCoreA := by
+theorem UpperTheory.V.Z.Mult.Pi.absCoreA_pf : AbsCore → RankOne → Corner → MinIdem → AbsCoreA := by
   intro hC hR hK hI I _ J M _ _ _ Y _ _ _ _ α a b A hM hrel haa hab hAA hAb hY
   classical
-  obtain ⟨d, hd0, hd⟩ := hC I (fun i => FreeAlgebra ℂ (J i)) M Y
-    (fun i q => FreeAlgebra.lift ℂ (α i) q) (fun i q => FreeAlgebra.lift ℂ (a i) q)
-    (fun i q => FreeAlgebra.lift ℂ (b i) q) A
-    (fun i W hW => hM i W fun f x hx => by simpa using hW (FreeAlgebra.ι ℂ f) x hx)
-    (fun i p h => by
-      rw [lift_lift] at h ⊢
-      exact hrel i _ h)
-    (fun i k h f g => lift_commute _ _ (haa i k h) f g)
-    (fun i k f g => lift_commute _ _ (hab i k) f g)
-    hAA
-    (fun i q => lift_intertwine _ _ A (hAb i) q)
-    (fun W hW => hY W fun i f x hx => by simpa using hW i (FreeAlgebra.ι ℂ f) x hx)
-  have hd' : ∀ x y : ∀ i, FreeAlgebra ℂ (J i),
-      LinearMap.trace ℂ Y (((Finset.univ : Finset I).toList.map fun i =>
-        FreeAlgebra.lift ℂ (a i) (x i) * FreeAlgebra.lift ℂ (b i) (y i)).prod * A) =
-      d * ∏ i, LinearMap.trace ℂ (M i)
-        (FreeAlgebra.lift ℂ (α i) (x i) * FreeAlgebra.lift ℂ (α i) (y i)) := hd
+  obtain ⟨d, hd0, hd⟩ :=
+    hC I
+      (fun i => FreeAlgebra ℂ (J i))
+      M Y
+      (fun i q => FreeAlgebra.lift ℂ (α i) q)
+      (fun i q => FreeAlgebra.lift ℂ (a i) q)
+      (fun i q => FreeAlgebra.lift ℂ (b i) q)
+      A
+      (fun i W hW => hM i W fun f x hx => by simpa using hW (FreeAlgebra.ι ℂ f) x hx)
+      (fun i p h => by
+        rw [lift_lift] at h ⊢
+        exact hrel i _ h)
+      (fun i k h f g => lift_commute _ _ (haa i k h) f g)
+      (fun i k f g => lift_commute _ _ (hab i k) f g)
+      hAA
+      (fun i q => lift_intertwine _ _ A (hAb i) q)
+      (fun W hW => hY W fun i f x hx => by simpa using hW i (FreeAlgebra.ι ℂ f) x hx)
+  have hd'
+      : ∀ x y : ∀ i, FreeAlgebra ℂ (J i),
+        LinearMap.trace ℂ Y
+            (((Finset.univ : Finset I).toList.map fun i =>
+                FreeAlgebra.lift ℂ (a i) (x i) * FreeAlgebra.lift ℂ (b i) (y i)).prod
+              * A)
+          = d
+            * ∏ i, LinearMap.trace ℂ (M i)
+              (FreeAlgebra.lift ℂ (α i) (x i) * FreeAlgebra.lift ℂ (α i) (y i)) :=
+    hd
   have hnt : ∀ i, Nontrivial (M i) := by
     intro i
     by_contra hn
@@ -102,18 +111,20 @@ theorem UpperTheory.V.Z.Mult.Pi.absCoreA_pf :
     rw [map_one] at h1
     obtain ⟨y, hy⟩ := exists_ne (0 : Y)
     exact hy (by simpa using LinearMap.congr_fun h1 y)
-  have hex : ∀ i, ∃ p : FreeAlgebra ℂ (J i),
-      LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) p * FreeAlgebra.lift ℂ (α i) p) = 1 ∧
-      FreeAlgebra.lift ℂ (a i) p * FreeAlgebra.lift ℂ (a i) p = FreeAlgebra.lift ℂ (a i) p ∧
-      ∀ q, ∃ c : ℂ, FreeAlgebra.lift ℂ (a i) p * FreeAlgebra.lift ℂ (a i) q *
-        FreeAlgebra.lift ℂ (a i) p = c • FreeAlgebra.lift ℂ (a i) p := fun i => by
+  have hex
+      : ∀ i, ∃ p : FreeAlgebra ℂ (J i),
+        LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) p * FreeAlgebra.lift ℂ (α i) p) = 1
+          ∧ FreeAlgebra.lift ℂ (a i) p * FreeAlgebra.lift ℂ (a i) p = FreeAlgebra.lift ℂ (a i) p
+          ∧ ∀ q, ∃ c : ℂ,
+            FreeAlgebra.lift ℂ (a i) p * FreeAlgebra.lift ℂ (a i) q * FreeAlgebra.lift ℂ (a i) p
+              = c • FreeAlgebra.lift ℂ (a i) p := fun i => by
     haveI := hnt i
     exact hI (J i) (M i) Y (α i) (a i) (hM i) (hrel i)
   choose p hp1 hp2 hp3 using hex
-  have hAq : ∀ i q, A * FreeAlgebra.lift ℂ (a i) q = FreeAlgebra.lift ℂ (b i) q * A :=
-    fun i q => lift_intertwine _ _ A (hAb i) q
-  have hbq : ∀ i q, FreeAlgebra.lift ℂ (b i) q = A * FreeAlgebra.lift ℂ (a i) q * A :=
-    fun i q => by rw [hAq, mul_assoc, hAA, mul_one]
+  have hAq : ∀ i q, A * FreeAlgebra.lift ℂ (a i) q = FreeAlgebra.lift ℂ (b i) q * A := fun i q =>
+    lift_intertwine _ _ A (hAb i) q
+  have hbq : ∀ i q, FreeAlgebra.lift ℂ (b i) q = A * FreeAlgebra.lift ℂ (a i) q * A := fun i q => by
+    rw [hAq, mul_assoc, hAA, mul_one]
   have hbf : ∀ i f, b i f = A * a i f * A := fun i f => by rw [hAb, mul_assoc, hAA, mul_one]
   have hbb : ∀ i k, i ≠ k → ∀ f g, Commute (b i f) (b k g) := by
     intro i k h f g
@@ -125,18 +136,27 @@ theorem UpperTheory.V.Z.Mult.Pi.absCoreA_pf :
     ⟨_, fun _ => rfl⟩
   have hee' : ∀ i, e' i = A * e i * A := fun i => by rw [he, he', hbq]
   have hidem : ∀ i, e i * e i = e i := fun i => by rw [he]; exact hp2 i
-  have hcorner := hK I J Y a b e e' haa hab hbb hY
-    (fun i => ⟨(mem_adjoin_iff _ _).2 ⟨p i, (he i).symm⟩, hidem i, fun x hx => by
-      obtain ⟨q, rfl⟩ := (mem_adjoin_iff _ _).1 hx
-      rw [he]
-      exact hp3 i q⟩)
-    (fun i => ⟨(mem_adjoin_iff _ _).2 ⟨p i, (he' i).symm⟩, by
-        rw [hee', conj_mul A _ _ hAA, hidem], fun x hx => by
-      obtain ⟨q, rfl⟩ := (mem_adjoin_iff _ _).1 hx
-      obtain ⟨c, hc⟩ := hp3 i q
-      refine ⟨c, ?_⟩
-      rw [hee', hbq, conj_mul A _ _ hAA, conj_mul A _ _ hAA, he, hc, mul_smul_comm, smul_mul_assoc]⟩)
-    _ rfl
+  have hcorner :=
+    hK I J Y a b e e' haa hab hbb hY
+      (fun i => ⟨
+        (mem_adjoin_iff _ _).2 ⟨p i, (he i).symm⟩,
+        hidem i,
+        fun x hx => by
+          obtain ⟨q, rfl⟩ := (mem_adjoin_iff _ _).1 hx
+          rw [he]
+          exact hp3 i q
+      ⟩)
+      (fun i => ⟨
+        (mem_adjoin_iff _ _).2 ⟨p i, (he' i).symm⟩,
+        by rw [hee', conj_mul A _ _ hAA, hidem],
+        fun x hx => by
+          obtain ⟨q, rfl⟩ := (mem_adjoin_iff _ _).1 hx
+          obtain ⟨c, hc⟩ := hp3 i q
+          refine ⟨c, ?_⟩
+          rw [hee', hbq, conj_mul A _ _ hAA, conj_mul A _ _ hAA, he, hc, mul_smul_comm,
+            smul_mul_assoc]
+      ⟩)
+      _ rfl
   obtain ⟨hff, hsc⟩ := hcorner
   have hfac : ∀ i, Commute A (e i * e' i) := by
     intro i
@@ -144,10 +164,11 @@ theorem UpperTheory.V.Z.Mult.Pi.absCoreA_pf :
       rw [he, he']
       exact lift_commute _ _ (hab i i) _ _
     have h1 : A * e i = e' i * A := by rw [he, he']; exact hAq i (p i)
-    have h2 : A * e' i = e i * A := by
-      rw [hee', ← mul_assoc, ← mul_assoc, hAA, one_mul]
+    have h2 : A * e' i = e i * A := by rw [hee', ← mul_assoc, ← mul_assoc, hAA, one_mul]
     show A * (e i * e' i) = e i * e' i * A
-    calc A * (e i * e' i) = A * e i * e' i := by rw [mul_assoc]
+    calc
+      A * (e i * e' i)
+        = A * e i * e' i := by rw [mul_assoc]
       _ = e' i * (A * e' i) := by rw [h1, mul_assoc]
       _ = e' i * e i * A := by rw [h2, mul_assoc]
       _ = e i * e' i * A := by rw [hce.eq]
@@ -156,8 +177,9 @@ theorem UpperTheory.V.Z.Mult.Pi.absCoreA_pf :
       intro z hz
       obtain ⟨k, _, rfl⟩ := List.mem_map.1 hz
       exact hfac k)
-  have htr : LinearMap.trace ℂ Y
-      (((Finset.univ : Finset I).toList.map fun i => e i * e' i).prod * A) = d := by
+  have htr
+      : LinearMap.trace ℂ Y (((Finset.univ : Finset I).toList.map fun i => e i * e' i).prod * A)
+        = d := by
     have h := hd' p p
     simp only [hp1, Finset.prod_const_one, mul_one] at h
     simpa only [he, he'] using h

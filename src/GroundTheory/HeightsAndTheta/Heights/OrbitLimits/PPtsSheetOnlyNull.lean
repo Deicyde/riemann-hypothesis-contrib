@@ -16,8 +16,9 @@ noncomputable section
 namespace GroundTheory.Heights₂.Heights
 
 open MeasureTheory Filter Topology
-open ReciprocityTheory.ChartRestriction.G.Geo (MRing IsArithVar IsGoodProj IsMultiHomogIdeal mcPts segre fibre IsSheet scaleBlock
-  scaleBlock_mem_zeroLocus segre_differentiableAt osgood fibreFinite)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (MRing IsArithVar IsGoodProj IsMultiHomogIdeal mcPts segre fibre IsSheet scaleBlock
+    scaleBlock_mem_zeroLocus segre_differentiableAt osgood fibreFinite)
 
 namespace PtsSheetOnlyNull
 
@@ -25,89 +26,121 @@ variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintyp
 
 def ratio (v : Fin (e + 1) → ℂ) : Fin e → ℂ := fun i => v i.succ / v 0
 
-theorem inv_smul_eq_cons (v : Fin (e + 1) → ℂ) (h : v 0 ≠ 0) : (v 0)⁻¹ • v = Fin.cons 1 (ratio v) := by
+theorem inv_smul_eq_cons (v : Fin (e + 1) → ℂ) (h : v 0 ≠ 0)
+    : (v 0)⁻¹ • v = Fin.cons 1 (ratio v) := by
   funext i
   refine Fin.cases ?_ (fun j => ?_) i
   · simp [h]
   · simp [ratio, div_eq_inv_mul]
 
-theorem ratio_smul_cons {a : ℂ} (ha : a ≠ 0) (x : Fin e → ℂ) : ratio (a • (Fin.cons 1 x : Fin (e + 1) → ℂ)) = x := by
+theorem ratio_smul_cons {a : ℂ} (ha : a ≠ 0) (x : Fin e → ℂ)
+    : ratio (a • (Fin.cons 1 x : Fin (e + 1) → ℂ)) = x := by
   funext i
   simp [ratio, ha]
 
-theorem segre_scaleBlock (k0 : K) (c : ℂ) (z : (Σ k, ι k) → ℂ) :
-    segre (scaleBlock k0 c z) = c • segre z := by
+theorem segre_scaleBlock (k0 : K) (c : ℂ) (z : (Σ k, ι k) → ℂ)
+    : segre (scaleBlock k0 c z) = c • segre z := by
   funext i
   simp only [segre, scaleBlock, Pi.smul_apply, smul_eq_mul]
   rw [Finset.prod_mul_distrib, Finset.prod_ite_eq']
   simp
 
-theorem smul_mem_fibre {P : Ideal (MRing ι)} (hPh : IsMultiHomogIdeal P) [Nonempty K] {z : (Σ k, ι k) → ℂ}
-    (hz : z ∈ mcPts P) (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (h0 : Ψ' (segre z) 0 ≠ 0) :
-    (Ψ' (segre z) 0)⁻¹ • segre z ∈ fibre P Ψ' (ratio (Ψ' (segre z))) := by
+theorem smul_mem_fibre
+    {P : Ideal (MRing ι)} (hPh : IsMultiHomogIdeal P)
+    [Nonempty K]
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
+    (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (h0 : Ψ' (segre z) 0 ≠ 0)
+    : (Ψ' (segre z) 0)⁻¹ • segre z ∈ fibre P Ψ' (ratio (Ψ' (segre z))) := by
   obtain ⟨k0⟩ := ‹Nonempty K›
-  refine ⟨scaleBlock k0 (Ψ' (segre z) 0)⁻¹ z, scaleBlock_mem_zeroLocus P hPh k0 (inv_ne_zero h0) hz, segre_scaleBlock _ _ _, ?_⟩
+  refine ⟨
+    scaleBlock k0 (Ψ' (segre z) 0)⁻¹ z,
+    scaleBlock_mem_zeroLocus P hPh k0 (inv_ne_zero h0) hz,
+    segre_scaleBlock _ _ _,
+    ?_
+  ⟩
   rw [map_smul]
   exact inv_smul_eq_cons _ h0
 
-theorem differentiableAt_proj_segre (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ} (hγ : DifferentiableAt ℂ γ y) :
-    DifferentiableAt ℂ (fun y' => Ψ' (segre (γ y'))) y :=
+theorem differentiableAt_proj_segre
+    (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ} (hγ : DifferentiableAt ℂ γ y)
+    : DifferentiableAt ℂ (fun y' => Ψ' (segre (γ y'))) y :=
   (LinearMap.toContinuousLinearMap Ψ').differentiableAt.comp y (segre_differentiableAt hγ)
 
-theorem differentiableAt_ratio (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ} (hγ : DifferentiableAt ℂ γ y)
-    (h0 : Ψ' (segre (γ y)) 0 ≠ 0) : DifferentiableAt ℂ (fun y' => ratio (Ψ' (segre (γ y')))) y := by
+theorem differentiableAt_ratio
+    (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ}
+    (hγ : DifferentiableAt ℂ γ y) (h0 : Ψ' (segre (γ y)) 0 ≠ 0)
+    : DifferentiableAt ℂ (fun y' => ratio (Ψ' (segre (γ y')))) y := by
   have h := differentiableAt_proj_segre Ψ' hγ
   refine differentiableAt_pi.2 fun i => ?_
   show DifferentiableAt ℂ (fun x => Ψ' (segre (γ x)) i.succ / Ψ' (segre (γ x)) 0) y
   simp only [div_eq_mul_inv]
   exact (differentiableAt_pi.1 h i.succ).fun_mul ((differentiableAt_pi.1 h 0).fun_inv h0)
 
-def swapProj (j : Fin (e + 1)) (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) :
-    (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ) :=
+def swapProj (j : Fin (e + 1)) (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ) :=
   (LinearMap.funLeft ℂ ℂ (Equiv.swap 0 j)) ∘ₗ Ψ'
 
-theorem swapProj_apply (j : Fin (e + 1)) (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    (w : ((k : K) → ι k) → ℂ) (i : Fin (e + 1)) : swapProj j Ψ' w i = Ψ' w (Equiv.swap 0 j i) := rfl
+theorem swapProj_apply
+    (j : Fin (e + 1)) (Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (w : ((k : K) → ι k) → ℂ)
+    (i : Fin (e + 1))
+    : swapProj j Ψ' w i = Ψ' w (Equiv.swap 0 j i) :=
+  rfl
 
-theorem isGoodProj_swapProj {P : Ideal (MRing ι)} {Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
-    (hΨ' : IsGoodProj P Ψ') (j : Fin (e + 1)) : IsGoodProj P (swapProj j Ψ') := by
+theorem isGoodProj_swapProj
+    {P : Ideal (MRing ι)} {Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    (hΨ' : IsGoodProj P Ψ')
+    (j : Fin (e + 1))
+    : IsGoodProj P (swapProj j Ψ') := by
   intro z hz h
   apply hΨ' z hz
   funext i
   have := congrFun h (Equiv.swap 0 j i)
   simpa [swapProj_apply] using this
 
-theorem not_injective_of_coord_eventually_const {f : (Fin e → ℂ) → Fin e → ℂ} {y : Fin e → ℂ} (m : Fin e) (c : ℂ)
-    (hf : DifferentiableAt ℂ f y) (hc : ∀ᶠ y' in 𝓝 y, f y' m = c) : ¬ Function.Injective (fderiv ℂ f y) := by
+theorem not_injective_of_coord_eventually_const
+    {f : (Fin e → ℂ) → Fin e → ℂ} {y : Fin e → ℂ}
+    (m : Fin e) (c : ℂ)
+    (hf : DifferentiableAt ℂ f y) (hc : ∀ᶠ y' in 𝓝 y, f y' m = c)
+    : ¬ Function.Injective (fderiv ℂ f y) := by
   intro hinj
   have h1 : HasFDerivAt (fun y' => f y' m) ((ContinuousLinearMap.proj m).comp (fderiv ℂ f y)) y :=
-    (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin e => ℂ) m).hasFDerivAt.comp y hf.hasFDerivAt
+    (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin e => ℂ) m).hasFDerivAt.comp y
+      hf.hasFDerivAt
   have h2 : HasFDerivAt (fun y' => f y' m) (0 : (Fin e → ℂ) →L[ℂ] ℂ) y :=
     (hasFDerivAt_const c y).congr_of_eventuallyEq hc
   have h3 := h1.unique h2
-  obtain ⟨v, hv⟩ := (LinearMap.injective_iff_surjective
-    (f := (fderiv ℂ f y : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))).1 hinj (Pi.single m 1)
+  obtain ⟨v, hv⟩ :=
+    (LinearMap.injective_iff_surjective (f := (fderiv ℂ f y : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))).1
+      hinj (Pi.single m 1)
   have h4 := congrArg (fun L : (Fin e → ℂ) →L[ℂ] ℂ => L v) h3
   have h5 : fderiv ℂ f y v m = 1 := by simpa using congrFun hv m
   simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply,
-    ContinuousLinearMap.zero_apply, h5] at h4
+      ContinuousLinearMap.zero_apply, h5]
+    at h4
   exact one_ne_zero h4
 
-theorem exists_injective (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
+theorem exists_injective
+    (hC : CriticalFibreInfinite.Statement)
+    {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
     {Ψ Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ' : IsGoodProj P Ψ')
     {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {V : Set (Fin e → ℂ)} (hV : IsOpen V) (hVne : V.Nonempty)
     (hγ : ∀ y ∈ V, DifferentiableAt ℂ γ y ∧ γ y ∈ mcPts P ∧ Ψ (segre (γ y)) = Fin.cons 1 y)
-    (h0 : ∀ y ∈ V, Ψ' (segre (γ y)) 0 ≠ 0) :
-    ∃ y ∈ V, Function.Injective (fderiv ℂ (fun y' => ratio (Ψ' (segre (γ y')))) y) := by
+    (h0 : ∀ y ∈ V, Ψ' (segre (γ y)) 0 ≠ 0)
+    : ∃ y ∈ V, Function.Injective (fderiv ℂ (fun y' => ratio (Ψ' (segre (γ y')))) y) := by
   by_contra hall
   push Not at hall
   have : Nonempty K := hP.1
-  obtain ⟨t, ht⟩ := hC e e V (fun y' => ratio (Ψ' (segre (γ y')))) hV hVne
-    (fun y hy => (differentiableAt_ratio Ψ' (hγ y hy).1 (h0 y hy)).differentiableWithinAt) hall
+  obtain ⟨t, ht⟩ :=
+    hC e e V
+      (fun y' => ratio (Ψ' (segre (γ y'))))
+      hV hVne
+      (fun y hy => (differentiableAt_ratio Ψ' (hγ y hy).1 (h0 y hy)).differentiableWithinAt)
+      hall
   refine (fibreFinite K ι P e Ψ' hP hΨ' t).not_infinite ?_
-  have hinj : Set.InjOn (fun y => (Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y))
+  have hinj : Set.InjOn
+      (fun y => (Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y))
       {y | y ∈ V ∧ ratio (Ψ' (segre (γ y))) = t} := by
     rintro y1 ⟨hy1, -⟩ y2 ⟨hy2, -⟩ h
     have h' := congrArg Ψ h
@@ -124,11 +157,14 @@ theorem exists_injective (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRin
   have := smul_mem_fibre hP.2.1.2.1 (hγ y hy).2.1 Ψ' (h0 y hy)
   rwa [hty] at this
 
-theorem exists_proj_ne_zero (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRing ι)}
-    (hP : IsArithVar P (e + 1)) {Ψ Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ' : IsGoodProj P Ψ')
+theorem exists_proj_ne_zero
+    (hC : CriticalFibreInfinite.Statement)
+    {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
+    {Ψ Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ' : IsGoodProj P Ψ')
     {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {V : Set (Fin e → ℂ)} (hV : IsOpen V)
     (hγ : ∀ y ∈ V, DifferentiableAt ℂ γ y ∧ γ y ∈ mcPts P ∧ Ψ (segre (γ y)) = Fin.cons 1 y)
-    {y : Fin e → ℂ} (hy : y ∈ V) : ∃ y' ∈ V, Ψ' (segre (γ y')) 0 ≠ 0 := by
+    {y : Fin e → ℂ} (hy : y ∈ V)
+    : ∃ y' ∈ V, Ψ' (segre (γ y')) 0 ≠ 0 := by
   by_contra hall
   push Not at hall
   have hne : Ψ' (segre (γ y)) ≠ 0 := hΨ' _ (hγ y hy).2.1
@@ -137,34 +173,41 @@ theorem exists_proj_ne_zero (hC : CriticalFibreInfinite.Statement) {P : Ideal (M
     rintro rfl
     exact hj (hall y hy)
   have hcont : ContinuousOn (fun y' => Ψ' (segre (γ y')) j) V := fun y' hy' =>
-    (differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγ y' hy').1) j).continuousAt.continuousWithinAt
+    (differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγ y' hy').1)
+      j).continuousAt.continuousWithinAt
   have hV'o : IsOpen (V ∩ (fun y' => Ψ' (segre (γ y')) j) ⁻¹' {0}ᶜ) :=
     hcont.isOpen_inter_preimage hV isOpen_compl_singleton
-  have h0' : ∀ y' ∈ V ∩ (fun y' => Ψ' (segre (γ y')) j) ⁻¹' {0}ᶜ, swapProj j Ψ' (segre (γ y')) 0 ≠ 0 := by
+  have h0'
+      : ∀ y' ∈ V ∩ (fun y' => Ψ' (segre (γ y')) j) ⁻¹' {0}ᶜ,
+        swapProj j Ψ' (segre (γ y')) 0 ≠ 0 := by
     intro y' hy'
     simpa [swapProj_apply] using hy'.2
-  obtain ⟨y1, hy1, hinj⟩ := exists_injective hC hP (isGoodProj_swapProj hΨ' j) hV'o ⟨y, hy, hj⟩
-    (fun y' hy' => hγ y' hy'.1) h0'
+  obtain ⟨y1, hy1, hinj⟩ :=
+    exists_injective hC hP (isGoodProj_swapProj hΨ' j) hV'o ⟨y, hy, hj⟩
+      (fun y' hy' => hγ y' hy'.1)
+      h0'
   refine not_injective_of_coord_eventually_const (j.pred hj0) 0
     (differentiableAt_ratio _ (hγ y1 hy1.1).1 (h0' y1 hy1)) ?_ hinj
   filter_upwards [hV'o.mem_nhds hy1] with y' hy'
   simp [ratio, swapProj_apply, hall y' hy'.1]
 
-theorem isSimpleSheetPt_of_injective {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
+theorem isSimpleSheetPt_of_injective
+    {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
     {Ψ Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
     {B : Set (Fin e → ℂ)} (hB : IsOpen B)
     (hγ : ∀ y ∈ B, DifferentiableAt ℂ γ y ∧ γ y ∈ mcPts P ∧ Ψ (segre (γ y)) = Fin.cons 1 y)
-    {y : Fin e → ℂ} (hyB : y ∈ B)
-    (huniq : ∀ᶠ q in 𝓝 (y, segre (γ y)), q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1))
+    {y : Fin e → ℂ}
+    (hyB : y ∈ B) (huniq : ∀ᶠ q in 𝓝 (y, segre (γ y)), q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1))
     (h0 : Ψ' (segre (γ y)) 0 ≠ 0)
-    (hinj : Function.Injective (fderiv ℂ (fun y' => ratio (Ψ' (segre (γ y')))) y)) :
-    IsSimpleSheetPt P Ψ' ((Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y)) := by
+    (hinj : Function.Injective (fderiv ℂ (fun y' => ratio (Ψ' (segre (γ y')))) y))
+    : IsSimpleSheetPt P Ψ' ((Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y)) := by
   have hK : Nonempty K := hP.1
   obtain ⟨k0⟩ := hP.1
   have hPh : IsMultiHomogIdeal P := hP.2.1.2.1
   set τ : (Fin e → ℂ) → Fin e → ℂ := fun y' => ratio (Ψ' (segre (γ y'))) with hτdef
   have hcont0 : ContinuousOn (fun y' => Ψ' (segre (γ y')) 0) B := fun y' hy' =>
-    (differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγ y' hy').1) 0).continuousAt.continuousWithinAt
+    (differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγ y' hy').1)
+      0).continuousAt.continuousWithinAt
   set D := B ∩ (fun y' => Ψ' (segre (γ y')) 0) ⁻¹' {0}ᶜ with hDdef
   have hDo : IsOpen D := hcont0.isOpen_inter_preimage hB isOpen_compl_singleton
   have hyD : y ∈ D := ⟨hyB, h0⟩
@@ -194,7 +237,8 @@ theorem isSimpleSheetPt_of_injective {P : Ideal (MRing ι)} (hP : IsArithVar P (
     intro t ht hdt
     have hg : DifferentiableAt ℂ (fun t => γ (φ.symm t)) t := (hγ _ ht.1).1.comp t hdt
     have hc : DifferentiableAt ℂ (fun t => (Ψ' (segre (γ (φ.symm t))) 0)⁻¹) t :=
-      ((differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγ _ ht.1).1) 0).fun_inv ht.2).comp t hdt
+      ((differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγ _ ht.1).1) 0).fun_inv ht.2).comp t
+        hdt
     refine differentiableAt_pi.2 fun p => ?_
     simp only [hγ'def, scaleBlock]
     split_ifs
@@ -214,8 +258,8 @@ theorem isSimpleSheetPt_of_injective {P : Ideal (MRing ι)} (hP : IsArithVar P (
   have hw'0 : Ψ w' 0 ≠ 0 := by
     rw [hΨw']
     simpa using h0
-  let m : (Fin e → ℂ) × (((k : K) → ι k) → ℂ) → (Fin e → ℂ) × (((k : K) → ι k) → ℂ) :=
-    fun q => (ratio (Ψ q.2), (Ψ q.2 0)⁻¹ • q.2)
+  let m : (Fin e → ℂ) × (((k : K) → ι k) → ℂ) → (Fin e → ℂ) × (((k : K) → ι k) → ℂ) := fun q =>
+    (ratio (Ψ q.2), (Ψ q.2 0)⁻¹ • q.2)
   have hm0 : m (τ y, w') = (y, segre (γ y)) := by
     refine Prod.ext ?_ ?_
     · show ratio (Ψ w') = y
@@ -223,13 +267,15 @@ theorem isSimpleSheetPt_of_injective {P : Ideal (MRing ι)} (hP : IsArithVar P (
     · show (Ψ w' 0)⁻¹ • w' = segre (γ y)
       rw [hΨw', hw'def]
       simp [h0]
-  have h2 : Continuous fun q : (Fin e → ℂ) × (((k : K) → ι k) → ℂ) => Ψ q.2 := hΨc.comp continuous_snd
+  have h2 : Continuous fun q : (Fin e → ℂ) × (((k : K) → ι k) → ℂ) => Ψ q.2 :=
+    hΨc.comp continuous_snd
   have h20 : ContinuousAt (fun q : (Fin e → ℂ) × (((k : K) → ι k) → ℂ) => Ψ q.2 0) (τ y, w') :=
     ((continuous_apply 0).comp h2).continuousAt
   have hmc : ContinuousAt m (τ y, w') := by
     refine ContinuousAt.prodMk ?_ ?_
     · refine continuousAt_pi.2 fun i => ?_
-      exact ContinuousAt.div (f := fun q : (Fin e → ℂ) × (((k : K) → ι k) → ℂ) => Ψ q.2 i.succ)
+      exact ContinuousAt.div
+        (f := fun q : (Fin e → ℂ) × (((k : K) → ι k) → ℂ) => Ψ q.2 i.succ)
         ((continuous_apply i.succ).comp h2).continuousAt h20 hw'0
     · exact (h20.inv₀ hw'0).smul continuous_snd.continuousAt
   have hm : Tendsto m (𝓝 (τ y, w')) (𝓝 (y, segre (γ y))) := hm0 ▸ hmc.tendsto
@@ -257,13 +303,19 @@ theorem isSimpleSheetPt_of_injective {P : Ideal (MRing ι)} (hP : IsArithVar P (
   rw [hsymm_q, segre_scaleBlock, hs', ← hE]
   simp [hq3]
 
-theorem piece_null (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
+theorem piece_null
+    (hC : CriticalFibreInfinite.Statement)
+    {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
     {Ψ Ψ' : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hΨ' : IsGoodProj P Ψ')
-    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {O : Set ((Fin e → ℂ) × (((k : K) → ι k) → ℂ))} (hOo : IsOpen O)
-    (hO : ∀ q ∈ O, (DifferentiableAt ℂ γ q.1 ∧ γ q.1 ∈ mcPts P ∧ Ψ (segre (γ q.1)) = Fin.cons 1 q.1) ∧
-      (q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1))) :
-    volume {y | (y, segre (γ y)) ∈ O ∧
-      ¬ IsSimpleSheetPt P Ψ' ((Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y))} = 0 := by
+    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {O : Set ((Fin e → ℂ) × (((k : K) → ι k) → ℂ))}
+    (hOo : IsOpen O)
+    (hO : ∀ q ∈ O,
+      (DifferentiableAt ℂ γ q.1 ∧ γ q.1 ∈ mcPts P ∧ Ψ (segre (γ q.1)) = Fin.cons 1 q.1)
+        ∧ (q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1)))
+    : volume
+        {y | (y, segre (γ y)) ∈ O ∧
+          ¬ IsSimpleSheetPt P Ψ' ((Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y))}
+      = 0 := by
   set τ : (Fin e → ℂ) → Fin e → ℂ := fun y' => ratio (Ψ' (segre (γ y'))) with hτdef
   set B := Prod.fst '' O with hBdef
   have hBo : IsOpen B := isOpenMap_fst O hOo
@@ -275,10 +327,12 @@ theorem piece_null (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRing ι)}
   set D := B ∩ (fun y => (y, segre (γ y))) ⁻¹' O with hDdef
   have hDo : IsOpen D := hgc.isOpen_inter_preimage hBo hOo
   have hcont0 : ContinuousOn (fun y' => Ψ' (segre (γ y')) 0) B := fun y' hy' =>
-    (differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγB y' hy').1) 0).continuousAt.continuousWithinAt
-  have hsub : {y | (y, segre (γ y)) ∈ O ∧ ¬ IsSimpleSheetPt P Ψ' ((Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y))} ⊆
-      {y | y ∈ D ∧ Ψ' (segre (γ y)) 0 = 0} ∪
-        {y | y ∈ D ∧ Ψ' (segre (γ y)) 0 ≠ 0 ∧ ¬ Function.Injective (fderiv ℂ τ y)} := by
+    (differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγB y' hy').1)
+      0).continuousAt.continuousWithinAt
+  have hsub
+      : {y | (y, segre (γ y)) ∈ O ∧ ¬ IsSimpleSheetPt P Ψ' ((Ψ' (segre (γ y)) 0)⁻¹ • segre (γ y))}
+        ⊆ {y | y ∈ D ∧ Ψ' (segre (γ y)) 0 = 0}
+          ∪ {y | y ∈ D ∧ Ψ' (segre (γ y)) 0 ≠ 0 ∧ ¬ Function.Injective (fderiv ℂ τ y)} := by
     rintro y ⟨hyO, hns⟩
     have hyD : y ∈ D := ⟨⟨_, hyO, rfl⟩, hyO⟩
     by_cases h0 : Ψ' (segre (γ y)) 0 = 0
@@ -291,11 +345,21 @@ theorem piece_null (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRing ι)}
   · apply ReciprocityTheory.AnForm.volume_eq_zero_of_locally_in_analytic_zero_set
     rintro y ⟨hyD, -⟩
     obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.1 hDo y hyD
-    refine ⟨Metric.ball y r, Metric.isOpen_ball, Metric.mem_ball_self hr, (convex_ball y r).isPreconnected,
-      fun y' => Ψ' (segre (γ y')) 0, ?_, ?_, fun y' hy' => hy'.1.2⟩
-    · exact (osgood e D _ hDo (fun y' hy' => (differentiableAt_pi.1
-        (differentiableAt_proj_segre Ψ' (hγB y' hy'.1).1) 0).differentiableWithinAt)).mono hball
-    · exact exists_proj_ne_zero hC hP hΨ' Metric.isOpen_ball (fun y' hy' => hγB y' (hball hy').1)
+    refine ⟨
+      Metric.ball y r,
+      Metric.isOpen_ball,
+      Metric.mem_ball_self hr,
+      (convex_ball y r).isPreconnected,
+      fun y' => Ψ' (segre (γ y')) 0,
+      ?_,
+      ?_,
+      fun y' hy' => hy'.1.2
+    ⟩
+    · exact (osgood e D _ hDo (fun y' hy' =>
+        (differentiableAt_pi.1 (differentiableAt_proj_segre Ψ' (hγB y' hy'.1).1)
+          0).differentiableWithinAt)).mono hball
+    · exact exists_proj_ne_zero hC hP hΨ' Metric.isOpen_ball
+        (fun y' hy' => hγB y' (hball hy').1)
         (Metric.mem_ball_self hr)
   · apply ReciprocityTheory.AnForm.volume_eq_zero_of_locally_in_analytic_zero_set
     rintro y ⟨hyD, hy0, -⟩
@@ -304,11 +368,20 @@ theorem piece_null (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRing ι)}
     obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.1 hD'o y ⟨hyD, hy0⟩
     have hτd : DifferentiableOn ℂ τ (D ∩ (fun y' => Ψ' (segre (γ y')) 0) ⁻¹' {0}ᶜ) := fun y' hy' =>
       (differentiableAt_ratio Ψ' (hγB y' hy'.1.1).1 hy'.2).differentiableWithinAt
-    refine ⟨Metric.ball y r, Metric.isOpen_ball, Metric.mem_ball_self hr, (convex_ball y r).isPreconnected,
+    refine ⟨
+      Metric.ball y r,
+      Metric.isOpen_ball,
+      Metric.mem_ball_self hr,
+      (convex_ball y r).isPreconnected,
       fun y' => (ReciprocityTheory.AnForm.A.jacC τ y').det,
-      (SheetOnlyNull.analyticOnNhd_det_jacC hD'o hτd).mono hball, ?_, ?_⟩
-    · obtain ⟨y1, hy1, hinj⟩ := exists_injective hC hP hΨ' Metric.isOpen_ball ⟨y, Metric.mem_ball_self hr⟩
-        (fun y' hy' => hγB y' (hball hy').1.1) (fun y' hy' => (hball hy').2)
+      (SheetOnlyNull.analyticOnNhd_det_jacC hD'o hτd).mono hball,
+      ?_,
+      ?_
+    ⟩
+    · obtain ⟨y1, hy1, hinj⟩ :=
+        exists_injective hC hP hΨ' Metric.isOpen_ball ⟨y, Metric.mem_ball_self hr⟩
+          (fun y' hy' => hγB y' (hball hy').1.1)
+          (fun y' hy' => (hball hy').2)
       refine ⟨y1, hy1, ?_⟩
       show (ReciprocityTheory.AnForm.A.jacC τ y1).det ≠ 0
       rw [ReciprocityTheory.AnForm.A.det_jacC]
@@ -322,11 +395,14 @@ theorem piece_null (hC : CriticalFibreInfinite.Statement) {P : Ideal (MRing ι)}
 theorem proof (hC : CriticalFibreInfinite.Statement) : PtsSheetOnlyNull.Statement := by
   intro K _ ι _ P e Ψ Ψ' hP hΨ hΨ'
   classical
-  have hloc : ∀ p : (Fin e → ℂ) × (((k : K) → ι k) → ℂ), ∃ (γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ)
-      (O : Set ((Fin e → ℂ) × (((k : K) → ι k) → ℂ))), IsOpen O ∧
-      (∀ q ∈ O, (DifferentiableAt ℂ γ q.1 ∧ γ q.1 ∈ mcPts P ∧ Ψ (segre (γ q.1)) = Fin.cons 1 q.1) ∧
-        (q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1))) ∧
-      (p.2 ∈ fibre P Ψ p.1 → IsSimpleSheetPt P Ψ p.2 → p ∈ O) := by
+  have hloc
+      : ∀ p : (Fin e → ℂ) × (((k : K) → ι k) → ℂ),
+        ∃ (γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ) (O : Set ((Fin e → ℂ) × (((k : K) → ι k) → ℂ))),
+          IsOpen O
+            ∧ (∀ q ∈ O,
+              (DifferentiableAt ℂ γ q.1 ∧ γ q.1 ∈ mcPts P ∧ Ψ (segre (γ q.1)) = Fin.cons 1 q.1)
+                ∧ (q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1)))
+            ∧ (p.2 ∈ fibre P Ψ p.1 → IsSimpleSheetPt P Ψ p.2 → p ∈ O) := by
     intro p
     by_cases hp : p.2 ∈ fibre P Ψ p.1 ∧ IsSimpleSheetPt P Ψ p.2
     · obtain ⟨hpf, y0, γ, ⟨hseg, hsh⟩, hun⟩ := hp
@@ -339,17 +415,18 @@ theorem proof (hC : CriticalFibreInfinite.Statement) : PtsSheetOnlyNull.Statemen
         simp only [Fin.cons_succ] at hi
         exact hi.symm
       subst hy0
-      have hev : ∀ᶠ q in 𝓝 (p.1, p.2),
-          (DifferentiableAt ℂ γ q.1 ∧ γ q.1 ∈ mcPts P ∧ Ψ (segre (γ q.1)) = Fin.cons 1 q.1) ∧
-            (q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1)) :=
+      have hev
+          : ∀ᶠ q in 𝓝 (p.1, p.2),
+            (DifferentiableAt ℂ γ q.1 ∧ γ q.1 ∈ mcPts P ∧ Ψ (segre (γ q.1)) = Fin.cons 1 q.1) ∧
+              (q.2 ∈ fibre P Ψ q.1 → q.2 = segre (γ q.1)) :=
         ((continuous_fst.tendsto (p.1, p.2)).eventually hsh).and hun
       obtain ⟨O, hO, hOo, hpO⟩ := eventually_nhds_iff.1 hev
       exact ⟨γ, O, hOo, hO, fun _ _ => hpO⟩
     · exact ⟨fun _ _ => 0, ∅, isOpen_empty, by simp, fun h1 h2 => absurd ⟨h1, h2⟩ hp⟩
   choose γ O hOo hO hpO using hloc
   obtain ⟨T, hTc, hTU⟩ := TopologicalSpace.isOpen_iUnion_countable O hOo
-  refine measure_mono_null ?_ ((measure_biUnion_null_iff hTc).2 fun p _ =>
-    piece_null hC hP hΨ' (hOo p) (hO p))
+  refine measure_mono_null ?_
+    ((measure_biUnion_null_iff hTc).2 fun p _ => piece_null hC hP hΨ' (hOo p) (hO p))
   rintro y ⟨w, hwf, hws, hwn⟩
   have hmem : (y, w) ∈ ⋃ p ∈ T, O p := hTU ▸ Set.mem_iUnion.2 ⟨(y, w), hpO (y, w) hwf hws⟩
   obtain ⟨p, hpT, hyw⟩ := Set.mem_iUnion₂.1 hmem

@@ -26,7 +26,8 @@ theorem LinearFormCut.proof : LinearFormCut.Statement := by
   classical
   let S := {Q : Ideal (MvPolynomial (Fin n) ℂ) | Q ∈ I.minimalPrimes ∧ Q ≠ originIdeal n}
   have : Finite S :=
-    ((Ideal.finite_minimalPrimes_of_isNoetherianRing _ I).subset fun Q (hQ : Q ∈ S) => hQ.1).to_subtype
+    ((Ideal.finite_minimalPrimes_of_isNoetherianRing _ I).subset fun Q (hQ : Q ∈ S) =>
+      hQ.1).to_subtype
   let p : S → Submodule ℂ (Fin n → ℂ) := fun Q => (Q.1.restrictScalars ℂ).comap (formMap n)
   have hp : ∀ Q, p Q ≠ ⊤ := by
     intro Q htop
@@ -51,14 +52,16 @@ theorem LinearFormCut.proof : LinearFormCut.Statement := by
       exact originIdeal_isMaximal n
     have h0 : l.length = 0 := by
       by_contra h
-      have hlt : l.head < l.last := l.strictMono (Fin.pos_iff_ne_zero.2 (by simp [Fin.ext_iff]; omega))
+      have hlt : l.head < l.last :=
+        l.strictMono (Fin.pos_iff_ne_zero.2 (by simp [Fin.ext_iff]; omega))
       have hlt' : l.head.1.asIdeal < l.last.1.asIdeal := hlt
       exact (hM.eq_of_le l.last.1.isPrime.ne_top hlt'.le ▸ hlt').false
     simp [h0]
   · have hQa : formMap n a ∉ Q := ha ⟨Q, hQ, hQo⟩
-    let f : PrimeSpectrum.zeroLocus (R := MvPolynomial (Fin n) ℂ) ↑(I ⊔ linIdeal B) →
-        PrimeSpectrum.zeroLocus (R := MvPolynomial (Fin n) ℂ) ↑I :=
-      fun x => ⟨x.1, fun y hy => x.2 (Ideal.mem_sup_left hy)⟩
+    let f
+        : PrimeSpectrum.zeroLocus (R := MvPolynomial (Fin n) ℂ) ↑(I ⊔ linIdeal B)
+          → PrimeSpectrum.zeroLocus (R := MvPolynomial (Fin n) ℂ) ↑I := fun x =>
+      ⟨x.1, fun y hy => x.2 (Ideal.mem_sup_left hy)⟩
     have hf : StrictMono f := fun x y h => h
     let q0 : PrimeSpectrum.zeroLocus (R := MvPolynomial (Fin n) ℂ) ↑I :=
       ⟨⟨Q, hQ.1.1⟩, fun y hy => hQ.1.2 hy⟩

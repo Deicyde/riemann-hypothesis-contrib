@@ -37,11 +37,16 @@ private lemma UpperTheory.eval_zero_pderiv {R : Type} [CommRing R] {n : ℕ} (j 
   | add p q hp hq =>
     rw [map_add (f := _), MvPolynomial.coeff_add, MvPolynomial.coeff_add, hp, hq]
 
-theorem UpperTheory.exists_zero_of_linear_form_jacobian_henselian :
-    ∀ (A E : Type) [CommRing A] [HenselianLocalRing A] [CommRing E] [Algebra A E] (n : ℕ) (Φ : MvPolynomial (Fin n) E) (L : E →ₗ[A] (Fin n → A)),
-      (∀ i, L (MvPolynomial.eval 0 Φ) i ∈ maximalIdeal A) →
-      (∀ i j, L (MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ)) i - (if i = j then 1 else 0) ∈ maximalIdeal A) →
-      ∃ x : Fin n → A, (∀ j, x j ∈ maximalIdeal A) ∧ L (MvPolynomial.eval (fun j => algebraMap A E (x j)) Φ) = 0 := by
+theorem UpperTheory.exists_zero_of_linear_form_jacobian_henselian
+    : ∀ (A E : Type) [CommRing A] [HenselianLocalRing A] [CommRing E] [Algebra A E] (n : ℕ)
+        (Φ : MvPolynomial (Fin n) E) (L : E →ₗ[A] (Fin n → A)),
+      (∀ i, L (MvPolynomial.eval 0 Φ) i ∈ maximalIdeal A)
+        → (∀ i j,
+          L (MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ)) i - (if i = j then 1 else 0)
+            ∈ maximalIdeal A)
+        → ∃ x : Fin n → A,
+          (∀ j, x j ∈ maximalIdeal A)
+            ∧ L (MvPolynomial.eval (fun j => algebraMap A E (x j)) Φ) = 0 := by
   intro A E _ _ _ _ n Φ L h0 h1
   let G : Fin n → MvPolynomial (Fin n) E → MvPolynomial (Fin n) A := fun i P =>
     ∑ d ∈ P.support, MvPolynomial.monomial d (L (AddMonoidAlgebra.coeff P d) i)
@@ -56,8 +61,10 @@ theorem UpperTheory.exists_zero_of_linear_form_jacobian_henselian :
     intro i p q
     ext d
     rw [MvPolynomial.coeff_add, hG, hG, hG, MvPolynomial.coeff_add, map_add (f := _), Pi.add_apply]
-  have key : ∀ i (x : Fin n → A) (P : MvPolynomial (Fin n) E),
-      MvPolynomial.eval x (G i P) = L (MvPolynomial.eval (fun j => algebraMap A E (x j)) P) i := by
+  have key
+      : ∀ i (x : Fin n → A) (P : MvPolynomial (Fin n) E),
+        MvPolynomial.eval x (G i P)
+          = L (MvPolynomial.eval (fun j => algebraMap A E (x j)) P) i := by
     intro i x P
     induction P using MvPolynomial.induction_on' with
     | monomial d c =>
@@ -66,7 +73,9 @@ theorem UpperTheory.exists_zero_of_linear_form_jacobian_henselian :
         rw [hG, MvPolynomial.coeff_monomial, MvPolynomial.coeff_monomial]
         split_ifs <;> simp
       rw [hm, MvPolynomial.eval_monomial, MvPolynomial.eval_monomial]
-      have hp : (d.prod fun k e => (algebraMap A E (x k)) ^ e) = algebraMap A E (d.prod fun k e => x k ^ e) := by
+      have hp
+          : (d.prod fun k e => (algebraMap A E (x k)) ^ e)
+            = algebraMap A E (d.prod fun k e => x k ^ e) := by
         simp [Finsupp.prod, map_prod, map_pow]
       rw [hp, ← Algebra.commutes, ← Algebra.smul_def, map_smul]
       simp [mul_comm]
@@ -83,17 +92,24 @@ theorem UpperTheory.exists_zero_of_linear_form_jacobian_henselian :
     show MvPolynomial.eval 0 (G i Φ) ∈ maximalIdeal A
     rw [h]
     exact h0 i
-  have hF1 : ∀ i j, MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i)) =
-      L (MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ)) i := by
+  have hF1
+      : ∀ i j,
+        MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i))
+          = L (MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ)) i := by
     intro i j
     rw [UpperTheory.eval_zero_pderiv, UpperTheory.eval_zero_pderiv]
     exact hG i _ Φ
-  have hdet : IsUnit (Matrix.of fun i j => MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i))).det := by
-    have hM : (residue A).mapMatrix (Matrix.of fun i j => MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i))) = 1 := by
+  have hdet
+      : IsUnit (Matrix.of fun i j => MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i))).det := by
+    have hM
+        : (residue A).mapMatrix
+            (Matrix.of fun i j => MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i)))
+          = 1 := by
       ext i j
       have h := (residue_eq_zero_iff _).mpr (h1 i j)
       rw [map_sub, sub_eq_zero] at h
-      simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, hF1, h, Matrix.one_apply]
+      simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, hF1, h,
+        Matrix.one_apply]
       split_ifs <;> simp
     by_contra hu
     have hm := (mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr hu)

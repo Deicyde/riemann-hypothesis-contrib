@@ -13,8 +13,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsKsFor
 set_option autoImplicit false
 noncomputable section
 open NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
-open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheory.RealIndexBound
+  GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries
 open scoped TensorProduct
 set_option synthInstance.maxHeartbeats 400000
@@ -23,21 +26,30 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp
 
-theorem exists_algExp {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 I0 T : Type}
-    {A3 : FamIn3 D.what₂.LL Γ Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
-    {Rl : RealDat3 D A3 Ks} {cG : G0 Rl.Pg D.R.r ≃* G0g D.nd} {S : NX.RatDat D.ntw} (YS : NX.NExpRealS Rl cG S)
-    (v₀ : ∀ (j : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (Rl.MW j σ).Vec) {ρ : Setup D.ntw} (hρ : ρ.Good) (i : D.ntw.Tw)
-    (j : Fin D.R.m) (b : Bool) (hU : Rl.toRealDat.LUnif) (hW : Rl.toRealDat.models_HW)
-    (hv : FWT.IsChosenExtremalVector Rl.toRealDat j (sg0 D A3.A) (v₀ j _)) (hK : (S.A ((j : ℕ) + 1)).IsKsForm)
-    (x : NX.KB S i b ⊗[S.Ks] NX.FmK S ((j : ℕ) + 1)) {n : ℕ} (z : Fin n → ℂ) (g : Fin n → NX.FmK S ((j : ℕ) + 1))
-    (hz : ∀ l, IsAlgebraic ℚ (z l)) (hx : evK YS v₀ hρ i j b x = ∑ l, z l • evW YS v₀ j (g l).val) :
-    ∃ (m : ℕ) (a : Fin m → NX.KB S i b) (g' : Fin m → NX.FmK S ((j : ℕ) + 1)),
+theorem exists_algExp
+    {D : D7} {Γ : Type} [Group Γ] [Fintype Γ]
+    {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL Γ Pl0 I0 (List ℕ) T D.R.m} {Ks : Type}
+    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    {Rl : RealDat3 D A3 Ks} {cG : G0 Rl.Pg D.R.r ≃* G0g D.nd} {S : NX.RatDat D.ntw}
+    (YS : NX.NExpRealS Rl cG S) (v₀ : ∀ (j : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (Rl.MW j σ).Vec)
+    {ρ : Setup D.ntw} (hρ : ρ.Good)
+    (i : D.ntw.Tw)
+    (j : Fin D.R.m)
+    (b : Bool)
+    (hU : Rl.toRealDat.LUnif) (hW : Rl.toRealDat.models_HW)
+    (hv : FWT.IsChosenExtremalVector Rl.toRealDat j (sg0 D A3.A) (v₀ j _))
+    (hK : (S.A ((j : ℕ) + 1)).IsKsForm)
+    (x : NX.KB S i b ⊗[S.Ks] NX.FmK S ((j : ℕ) + 1))
+    {n : ℕ} (z : Fin n → ℂ) (g : Fin n → NX.FmK S ((j : ℕ) + 1)) (hz : ∀ l, IsAlgebraic ℚ (z l))
+    (hx : evK YS v₀ hρ i j b x = ∑ l, z l • evW YS v₀ j (g l).val)
+    : ∃ (m : ℕ) (a : Fin m → NX.KB S i b) (g' : Fin m → NX.FmK S ((j : ℕ) + 1)),
       x = ∑ k, a k ⊗ₜ[S.Ks] g' k ∧ ∀ k, IsAlgebraic ℚ (ρ.e i b (a k)) := by
   classical
-  let L : (Rl.HW j (sg0 D A3.A)).H →ₗ[ℂ] (GA D (Wc D j) → ℂ) :=
-    { toFun := fun x => (Rl.HW j (sg0 D A3.A)).e x (v₀ j _)
-      map_add' := fun x y => by rw [map_add (f := _)]; rfl
-      map_smul' := fun c x => by rw [map_smul]; rfl }
+  let L : (Rl.HW j (sg0 D A3.A)).H →ₗ[ℂ] (GA D (Wc D j) → ℂ) := {
+    toFun := fun x => (Rl.HW j (sg0 D A3.A)).e x (v₀ j _)
+    map_add' := fun x y => by rw [map_add (f := _)]; rfl
+    map_smul' := fun c x => by rw [map_smul]; rfl
+  }
   have hL : LinearMap.ker L = ⊥ :=
     LinearMap.ker_eq_bot.2 fun x y h => GlobalTheory.LiftScalarCompare.eval_inj hW hv h
   obtain ⟨m, bb, -, hKs, hspan, hLL, -⟩ := hK
@@ -94,7 +106,8 @@ theorem exists_algExp {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 I0 T : T
   rw [h4 k]
   have hemb : ∀ y : S.Ks, IsAlgebraic ℚ (emb y) := fun y =>
     (Algebra.IsAlgebraic.isAlgebraic y).algHom emb.toRatAlgHom
-  have hmem : ∀ y : ℂ, y ∈ algebraicClosure ℚ ℂ ↔ IsAlgebraic ℚ y := fun y => mem_algebraicClosure_iff
+  have hmem : ∀ y : ℂ, y ∈ algebraicClosure ℚ ℂ ↔ IsAlgebraic ℚ y := fun y =>
+    mem_algebraicClosure_iff
   refine (hmem _).1 ?_
   refine sum_mem fun l _ => mul_mem ?_ ?_
   · exact (hmem _).2 (hz l)
@@ -112,7 +125,11 @@ end GlobalTheory.BigOn.Exp
 
 namespace GlobalTheory.BigOn.Exp
 
-theorem isAlgebraic_of_pow_eq_one {ζ : ℂ} {n : ℕ} (hn : n ≠ 0) (h : ζ ^ n = 1) : IsAlgebraic ℚ ζ :=
-  ⟨Polynomial.X ^ n - Polynomial.C 1, Polynomial.X_pow_sub_C_ne_zero (Nat.pos_of_ne_zero hn) 1, by simp [h]⟩
+theorem isAlgebraic_of_pow_eq_one {ζ : ℂ} {n : ℕ} (hn : n ≠ 0) (h : ζ ^ n = 1)
+    : IsAlgebraic ℚ ζ := ⟨
+  Polynomial.X ^ n - Polynomial.C 1,
+  Polynomial.X_pow_sub_C_ne_zero (Nat.pos_of_ne_zero hn) 1,
+  by simp [h]
+⟩
 
 end GlobalTheory.BigOn.Exp

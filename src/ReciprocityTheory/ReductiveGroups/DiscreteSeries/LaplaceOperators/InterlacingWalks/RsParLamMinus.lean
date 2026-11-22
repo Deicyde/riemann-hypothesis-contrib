@@ -16,42 +16,64 @@ theorem rsExt_mk {N : ℕ} (f : Fin N → ℝ) (x : ℕ) (h : x < N) : f ⟨x, h
   rw [rsExt, dif_pos h]
 
 def rsG (B : ℕ → ℝ) (t j m q : ℕ) : ℝ :=
-  if q < j then -B q else if q = j then -B q - (j : ℝ) * t + m else -B q - (q : ℝ) * t
+  if q < j then
+    - B q
+  else if q = j then
+    - B q - (j : ℝ) * t + m
+  else
+    - B q - (q : ℝ) * t
 
 def rsF (k : ℕ) (U B : ℕ → ℝ) (t j m x : ℕ) : ℝ :=
   if x < k then U x - 1 / 2 else rsG B t j m (x - (k - 1))
 
-def rsPt (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t j m : ℕ) :
-    Fin (2 * r + k + 1) → ℝ :=
-  fun a => rsF k (rsExt u) (rsExt b) t j m a.val
+def rsPt (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t j m : ℕ)
+    : Fin (2 * r + k + 1) → ℝ := fun a =>
+  rsF k (rsExt u) (rsExt b) t j m a.val
 
-theorem rsPt_zero (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t j : ℕ) :
-    rsPt k r u b t j 0 = raisePar k r u b t j := by
+theorem rsPt_zero (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t j : ℕ)
+    : rsPt k r u b t j 0 = raisePar k r u b t j := by
   funext a
   have ha := a.isLt
   simp only [rsPt, rsF, rsG, raisePar, rsExt]
-  split_ifs <;> first | (exfalso; omega) | ring1 | (push_cast; ring1) | (subst_vars; push_cast; ring1) | (subst_vars; ring1)
+  split_ifs <;> first
+    | (exfalso; omega)
+    | ring1
+    | (push_cast; ring1)
+    | (subst_vars; push_cast; ring1)
+    | (subst_vars; ring1)
 
-theorem rsPt_top (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t j : ℕ) :
-    rsPt k r u b t j (j * t) = raisePar k r u b t (j + 1) := by
+theorem rsPt_top (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t j : ℕ)
+    : rsPt k r u b t j (j * t) = raisePar k r u b t (j + 1) := by
   funext a
   have ha := a.isLt
   simp only [rsPt, rsF, rsG, raisePar, rsExt]
-  split_ifs <;> first | (exfalso; omega) | ring1 | (push_cast; ring1) | (subst_vars; push_cast; ring1) | (subst_vars; ring1)
+  split_ifs <;> first
+    | (exfalso; omega)
+    | ring1
+    | (push_cast; ring1)
+    | (subst_vars; push_cast; ring1)
+    | (subst_vars; ring1)
 
-theorem rsPt_succ (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t j m : ℕ)
-    (hk : 1 ≤ k) (hj : 1 ≤ j) (hj2 : j ≤ 2 * r + 1) :
-    rsPt k r u b t j (m + 1) =
-      rsPt k r u b t j m + Pi.single (⟨j + k - 1, by omega⟩ : Fin (2 * r + k + 1)) 1 := by
+theorem rsPt_succ
+    (k r : ℕ) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ)
+    (t j m : ℕ)
+    (hk : 1 ≤ k) (hj : 1 ≤ j) (hj2 : j ≤ 2 * r + 1)
+    : rsPt k r u b t j (m + 1)
+      = rsPt k r u b t j m + Pi.single (⟨j + k - 1, by omega⟩ : Fin (2 * r + k + 1)) 1 := by
   funext a
   have ha := a.isLt
   simp only [Pi.add_apply, Pi.single_apply, rsPt, rsF, rsG, rsExt, Fin.ext_iff, Fin.val_mk]
-  split_ifs <;> first | (exfalso; omega) | ring1 | (push_cast; ring1) | (subst_vars; push_cast; ring1) | (subst_vars; ring1)
+  split_ifs <;> first
+    | (exfalso; omega)
+    | ring1
+    | (push_cast; ring1)
+    | (subst_vars; push_cast; ring1)
+    | (subst_vars; ring1)
 
-theorem rsG_step (B : ℕ → ℝ) (h : ℝ) (t j m q N : ℕ) (hm : m ≤ j * t)
-    (hBlt : ∀ q, q + 1 < N → B q < B (q + 1)) (hBgap : ∀ q, q + 1 < N → h ≤ B (q + 1) - B q)
-    (hq : q + 1 < N) :
-    rsG B t j m (q + 1) < rsG B t j m q ∧ h ≤ rsG B t j m q - rsG B t j m (q + 1) := by
+theorem rsG_step
+    (B : ℕ → ℝ) (h : ℝ) (t j m q N : ℕ) (hm : m ≤ j * t) (hBlt : ∀ q, q + 1 < N → B q < B (q + 1))
+    (hBgap : ∀ q, q + 1 < N → h ≤ B (q + 1) - B q) (hq : q + 1 < N)
+    : rsG B t j m (q + 1) < rsG B t j m q ∧ h ≤ rsG B t j m q - rsG B t j m (q + 1) := by
   have hBq := hBlt q hq
   have hgq := hBgap q hq
   have hmR : (m : ℝ) ≤ (j : ℝ) * t := by exact_mod_cast hm
@@ -77,26 +99,26 @@ theorem rsG_step (B : ℕ → ℝ) (h : ℝ) (t j m q N : ℕ) (hm : m ≤ j * t
       push_cast
       constructor <;> linarith
 
-theorem rsG_le (B : ℕ → ℝ) (t j m q : ℕ) (hm : m ≤ j * t) : rsG B t j m q ≤ -B q := by
+theorem rsG_le (B : ℕ → ℝ) (t j m q : ℕ) (hm : m ≤ j * t) : rsG B t j m q ≤ - B q := by
   have hmR : (m : ℝ) ≤ (j : ℝ) * t := by exact_mod_cast hm
   have hqt : (0 : ℝ) ≤ (q : ℝ) * t := by positivity
   unfold rsG
   split_ifs <;> linarith
 
-theorem rsG_int (B : ℕ → ℝ) (t j m q : ℕ) : ∃ z : ℤ, rsG B t j m q = -B q + z := by
+theorem rsG_int (B : ℕ → ℝ) (t j m q : ℕ) : ∃ z : ℤ, rsG B t j m q = - B q + z := by
   unfold rsG
   split_ifs
   · exact ⟨0, by simp⟩
   · exact ⟨(m : ℤ) - (j : ℤ) * (t : ℤ), by push_cast; ring⟩
   · exact ⟨-((q : ℤ) * (t : ℤ)), by push_cast; ring⟩
 
-theorem rsF_step (k r : ℕ) (U B : ℕ → ℝ) (h : ℝ) (t j m x : ℕ) (hk : 1 ≤ k) (hm : m ≤ j * t)
-    (hBlt : ∀ q, q + 1 < 2 * r + 2 → B q < B (q + 1))
-    (hBgap : ∀ q, q + 1 < 2 * r + 2 → h ≤ B (q + 1) - B q)
-    (hUlt : ∀ x, x + 1 < k → U (x + 1) < U x) (hUhalf : -B 0 ≤ U (k - 1) - 1 / 2)
-    (hx : x + 1 < 2 * r + k + 1) :
-    rsF k U B t j m (x + 1) < rsF k U B t j m x ∧
-      (k - 1 ≤ x → h ≤ rsF k U B t j m x - rsF k U B t j m (x + 1)) := by
+theorem rsF_step
+    (k r : ℕ) (U B : ℕ → ℝ) (h : ℝ) (t j m x : ℕ)
+    (hk : 1 ≤ k) (hm : m ≤ j * t) (hBlt : ∀ q, q + 1 < 2 * r + 2 → B q < B (q + 1))
+    (hBgap : ∀ q, q + 1 < 2 * r + 2 → h ≤ B (q + 1) - B q) (hUlt : ∀ x, x + 1 < k → U (x + 1) < U x)
+    (hUhalf : - B 0 ≤ U (k - 1) - 1 / 2) (hx : x + 1 < 2 * r + k + 1)
+    : rsF k U B t j m (x + 1) < rsF k U B t j m x
+      ∧ (k - 1 ≤ x → h ≤ rsF k U B t j m x - rsF k U B t j m (x + 1)) := by
   by_cases hx1 : x + 1 < k
   · have hx0 : x < k := by omega
     rw [rsF, rsF, if_pos hx1, if_pos hx0]
@@ -119,9 +141,10 @@ theorem rsF_step (k r : ℕ) (U B : ℕ → ℝ) (h : ℝ) (t j m x : ℕ) (hk :
       obtain ⟨h1, h2⟩ := rsG_step B h t j m (x - (k - 1)) (2 * r + 2) hm hBlt hBgap hq
       exact ⟨h1, fun _ => h2⟩
 
-theorem rsParLam_minus (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ)
-    (a : Fin (2 * r + k + 1)) (ha : k - 1 ≤ a.val) :
-    parLam k r v b a = -rsExt b (a.val - (k - 1)) := by
+theorem rsParLam_minus
+    (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ) (a : Fin (2 * r + k + 1))
+    (ha : k - 1 ≤ a.val)
+    : parLam k r v b a = - rsExt b (a.val - (k - 1)) := by
   have h1 : ¬ a.val < k - 1 := by omega
   have h2 : a.val - (k - 1) < 2 * r + 2 := by have := a.isLt; omega
   simp only [parLam, rsExt, dif_neg h1, dif_pos h2]
@@ -158,10 +181,13 @@ theorem raiseStep : RaiseStepStatement := by
     intro q hq
     have hq0 : q + (k - 1) < 2 * r + k + 1 := by omega
     have hq1 : q + (k - 1) + 1 < 2 * r + k + 1 := by omega
-    have h1 := hpar.1 (Fin.mk_lt_mk.mpr (Nat.lt_succ_self _) :
-      (⟨q + (k - 1), hq0⟩ : Fin (2 * r + k + 1)) < ⟨q + (k - 1) + 1, hq1⟩)
+    have h1 :=
+      hpar.1
+        (Fin.mk_lt_mk.mpr (Nat.lt_succ_self _)
+          : (⟨q + (k - 1), hq0⟩ : Fin (2 * r + k + 1)) < ⟨q + (k - 1) + 1, hq1⟩)
     rw [rsParLam_minus k r v b ⟨q + (k - 1) + 1, hq1⟩ (show k - 1 ≤ q + (k - 1) + 1 by omega),
-      rsParLam_minus k r v b ⟨q + (k - 1), hq0⟩ (show k - 1 ≤ q + (k - 1) by omega)] at h1
+        rsParLam_minus k r v b ⟨q + (k - 1), hq0⟩ (show k - 1 ≤ q + (k - 1) by omega)]
+      at h1
     have e1 : (⟨q + (k - 1), hq0⟩ : Fin (2 * r + k + 1)).val - (k - 1) = q := by
       show q + (k - 1) - (k - 1) = q
       omega
@@ -179,13 +205,13 @@ theorem raiseStep : RaiseStepStatement := by
     rw [← rsExt_mk u (x + 1) hx, ← rsExt_mk u x (by omega)]
     have h1 := hint.1 ⟨x, by omega⟩
     exact lt_trans h1.2 h1.1
-  have hUhalf : -rsExt b 0 ≤ rsExt u (k - 1) - 1 / 2 := by
+  have hUhalf : - rsExt b 0 ≤ rsExt u (k - 1) - 1 / 2 := by
     have hk0 : k - 1 < k := by omega
     have h1 := hint.2 (by omega)
     obtain ⟨z, hz⟩ := hhalf ⟨k - 1, hk0⟩ ⟨k - 1, by omega⟩
     rw [rsParLam_minus k r v b ⟨k - 1, by omega⟩ (le_refl _)] at hz
-    have e0 : rsExt b ((⟨k - 1, by omega⟩ : Fin (2 * r + k + 1)).val - (k - 1)) =
-        b ⟨0, by omega⟩ := by
+    have e0
+        : rsExt b ((⟨k - 1, by omega⟩ : Fin (2 * r + k + 1)).val - (k - 1)) = b ⟨0, by omega⟩ := by
       show rsExt b (k - 1 - (k - 1)) = _
       rw [Nat.sub_self, ← rsExt_mk b 0 (by omega)]
     rw [e0] at hz
@@ -195,16 +221,30 @@ theorem raiseStep : RaiseStepStatement := by
       exact_mod_cast this
     have hz1 : (0 : ℝ) ≤ (z : ℝ) := by exact_mod_cast (show (0 : ℤ) ≤ z by omega)
     linarith
-  have hstep : ∀ m, m ≤ j * t → ∀ x, x + 1 < 2 * r + k + 1 →
-      rsF k (rsExt u) (rsExt b) t j m (x + 1) < rsF k (rsExt u) (rsExt b) t j m x ∧
-      (k - 1 ≤ x → h ≤ rsF k (rsExt u) (rsExt b) t j m x - rsF k (rsExt u) (rsExt b) t j m (x + 1)) :=
-    fun m hm x hx => rsF_step k r (rsExt u) (rsExt b) h t j m x hk hm hBlt hBgap hUlt hUhalf hx
-  have hanti : ∀ m, m ≤ j * t → ∀ x y, x < y → y < 2 * r + k + 1 →
-      rsF k (rsExt u) (rsExt b) t j m y < rsF k (rsExt u) (rsExt b) t j m x :=
-    fun m hm => strictAnti_lt_of_succ_lt (fun z => rsF k (rsExt u) (rsExt b) t j m z) (2 * r + k + 1)
+  have hstep
+      : ∀ m,
+        m ≤ j * t
+          → ∀ x,
+            x + 1 < 2 * r + k + 1
+              → rsF k (rsExt u) (rsExt b) t j m (x + 1) < rsF k (rsExt u) (rsExt b) t j m x
+                ∧ (k - 1 ≤ x
+                  → h
+                    ≤ rsF k (rsExt u) (rsExt b) t j m x
+                      - rsF k (rsExt u) (rsExt b) t j m (x + 1)) := fun m hm x hx =>
+    rsF_step k r (rsExt u) (rsExt b) h t j m x hk hm hBlt hBgap hUlt hUhalf hx
+  have hanti
+      : ∀ m,
+        m ≤ j * t
+          → ∀ x y,
+            x < y → y < 2 * r + k + 1
+              → rsF k (rsExt u) (rsExt b) t j m y < rsF k (rsExt u) (rsExt b) t j m x := fun m hm =>
+    strictAnti_lt_of_succ_lt
+      (fun z => rsF k (rsExt u) (rsExt b) t j m z)
+      (2 * r + k + 1)
       (fun x hx => (hstep m hm x hx).1)
-  have hepsc : ∀ x y : Fin (2 * r + k + 1), x.val < y.val → parEps k r x ≠ parEps k r y →
-      k - 1 < y.val := by
+  have hepsc
+      : ∀ x y : Fin (2 * r + k + 1),
+        x.val < y.val → parEps k r x ≠ parEps k r y → k - 1 < y.val := by
     intro x y hxy hne
     by_contra hcon
     apply hne
@@ -220,8 +260,11 @@ theorem raiseStep : RaiseStepStatement := by
     rw [e1, e2]
   have hGap : ∀ m, m ≤ j * t → GapAtLeast (parEps k r) (rsPt k r u b t j m) h := by
     intro m hm x y hne
-    have hg := gap_lemma_2 (fun z => rsF k (rsExt u) (rsExt b) t j m z) (2 * r + k + 1) (k - 1) h
-      (hanti m hm) (fun z hz hc => (hstep m hm z hz).2 hc)
+    have hg :=
+      gap_lemma_2
+        (fun z => rsF k (rsExt u) (rsExt b) t j m z)
+        (2 * r + k + 1) (k - 1) h (hanti m hm)
+        (fun z hz hc => (hstep m hm z hz).2 hc)
     rcases lt_trichotomy x.val y.val with h1 | h1 | h1
     · exact le_trans (hg x.val y.val h1 y.isLt (hepsc x y h1 hne)) (le_abs_self _)
     · exact absurd (congrArg (parEps k r) (Fin.ext h1)) hne
@@ -261,8 +304,10 @@ theorem raiseStep : RaiseStepStatement := by
         exact hGap (m + 1) hm
       · intro i heq
         have hi : i.val < j + k - 1 := by have := i.isLt; omega
-        have hlt := (hHC m hm').1 (Fin.mk_lt_mk.mpr hi :
-          (⟨i.val, by omega⟩ : Fin (2 * r + k + 1)) < ⟨j + k - 1, by omega⟩)
+        have hlt :=
+          (hHC m hm').1
+            (Fin.mk_lt_mk.mpr hi
+              : (⟨i.val, by omega⟩ : Fin (2 * r + k + 1)) < ⟨j + k - 1, by omega⟩)
         have hv : rsPt k r u b t j m ⟨i.val, by omega⟩ = u i - 1 / 2 := by
           show rsF k (rsExt u) (rsExt b) t j m i.val = u i - 1 / 2
           rw [rsF, if_pos i.isLt, ← rsExt_mk u i.val i.isLt]

@@ -15,19 +15,20 @@ open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.AbsSt
 
 variable {n : ℕ}
 
-theorem shape_mul (A B A' B' : Matrix (Fin n) (Fin n) ℂ) :
-    fromBlocks A B (-B) A * fromBlocks A' B' (-B') A' =
-      fromBlocks (A * A' - B * B') (A * B' + B * A') (-(A * B' + B * A')) (A * A' - B * B') := by
+theorem shape_mul (A B A' B' : Matrix (Fin n) (Fin n) ℂ)
+    : fromBlocks A B (-B) A * fromBlocks A' B' (-B') A'
+      = fromBlocks (A * A' - B * B') (A * B' + B * A') (-(A * B' + B * A')) (A * A' - B * B') := by
   rw [fromBlocks_multiply]
   congr 1 <;> noncomm_ring
 
-theorem kM_mul (a b a' b' : Matrix (Fin n) (Fin n) ℂ) : kM a b * kM a' b' = kM (a * a') (b * b') := by
+theorem kM_mul (a b a' b' : Matrix (Fin n) (Fin n) ℂ)
+    : kM a b * kM a' b' = kM (a * a') (b * b') := by
   simp only [kM]
   rw [shape_mul]
-  congr 1 <;>
-    simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, Matrix.mul_add, Matrix.add_mul,
-      Matrix.mul_sub, Matrix.sub_mul, smul_add, smul_sub, smul_neg, neg_add, neg_sub] <;>
-    match_scalars <;> ring_nf <;> (try simp only [Complex.I_sq]) <;> ring
+  congr 1
+    <;> simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, Matrix.mul_add, Matrix.add_mul,
+      Matrix.mul_sub, Matrix.sub_mul, smul_add, smul_sub, smul_neg, neg_add, neg_sub]
+    <;> match_scalars <;> ring_nf <;> (try simp only [Complex.I_sq]) <;> ring
 
 theorem kM_one : kM (1 : Matrix (Fin n) (Fin n) ℂ) 1 = 1 := by
   simp only [kM, sub_self, smul_zero, neg_zero]
@@ -39,8 +40,8 @@ theorem kM_conjTranspose (a b : Matrix (Fin n) (Fin n) ℂ) : (kM a b)ᴴ = kM a
     conjTranspose_neg]
   congr 1 <;> simp [Complex.conj_ofReal, map_div₀] <;> module
 
-theorem JJ_comm_shape (A B : Matrix (Fin n) (Fin n) ℂ) :
-    JJ n * fromBlocks A B (-B) A = fromBlocks A B (-B) A * JJ n := by
+theorem JJ_comm_shape (A B : Matrix (Fin n) (Fin n) ℂ)
+    : JJ n * fromBlocks A B (-B) A = fromBlocks A B (-B) A * JJ n := by
   simp only [JJ, fromBlocks_multiply]
   congr 1 <;> simp
 
@@ -50,14 +51,12 @@ theorem JJ_comm_kM (a b : Matrix (Fin n) (Fin n) ℂ) : JJ n * kM a b = kM a b *
 
 theorem first_unitary_block_of_pair (a b : Matrix (Fin n) (Fin n) ℂ) : u1 (kM a b) = a := by
   simp only [u1, kM, toBlocks_fromBlocks₂₁, toBlocks_fromBlocks₂₂, smul_neg, smul_smul]
-  rw [show Complex.I * (Complex.I / 2) = -(1/2 : ℂ) by
-    rw [mul_div_assoc', Complex.I_mul_I]; ring]
+  rw [show Complex.I * (Complex.I / 2) = -(1 / 2 : ℂ) by rw [mul_div_assoc', Complex.I_mul_I]; ring]
   module
 
 theorem second_unitary_block_of_pair (a b : Matrix (Fin n) (Fin n) ℂ) : u2 (kM a b) = b := by
   simp only [u2, kM, toBlocks_fromBlocks₂₁, toBlocks_fromBlocks₂₂, smul_neg, smul_smul, neg_neg]
-  rw [show Complex.I * (Complex.I / 2) = -(1/2 : ℂ) by
-    rw [mul_div_assoc', Complex.I_mul_I]; ring]
+  rw [show Complex.I * (Complex.I / 2) = -(1 / 2 : ℂ) by rw [mul_div_assoc', Complex.I_mul_I]; ring]
   module
 
 theorem kM_low (a : Matrix (Fin n) (Fin n) ℂ) : (kM a a).toBlocks₂₁ = 0 := by
@@ -65,8 +64,10 @@ theorem kM_low (a : Matrix (Fin n) (Fin n) ℂ) : (kM a a).toBlocks₂₁ = 0 :=
   rw [toBlocks_fromBlocks₂₁]
   simp
 
-theorem kM_of_unitary (a b : Matrix (Fin n) (Fin n) ℂ) (ha : a ∈ unitaryGroup (Fin n) ℂ)
-    (hb : b ∈ unitaryGroup (Fin n) ℂ) : ∃ k : GR n, k ∈ KR n ∧ mR k = kM a b := by
+theorem kM_of_unitary
+    (a b : Matrix (Fin n) (Fin n) ℂ)
+    (ha : a ∈ unitaryGroup (Fin n) ℂ) (hb : b ∈ unitaryGroup (Fin n) ℂ)
+    : ∃ k : GR n, k ∈ KR n ∧ mR k = kM a b := by
   have ha1 : aᴴ * a = 1 := by
     simpa [Matrix.star_eq_conjTranspose] using Matrix.mem_unitaryGroup_iff'.mp ha
   have ha2 : a * aᴴ = 1 := by
@@ -86,22 +87,25 @@ theorem kM_of_unitary (a b : Matrix (Fin n) (Fin n) ℂ) (ha : a ∈ unitaryGrou
   show InK (kM a b)
   exact ⟨hG, by rw [kM_conjTranspose, kM_mul, ha1, hb1, kM_one]⟩
 
-theorem KR_shape (k : GR n) (hk : k ∈ KR n) :
-    u1 (mR k) ∈ unitaryGroup (Fin n) ℂ ∧ u2 (mR k) ∈ unitaryGroup (Fin n) ℂ ∧
-      mR k = kM (u1 (mR k)) (u2 (mR k)) := by
+theorem KR_shape (k : GR n) (hk : k ∈ KR n)
+    : u1 (mR k) ∈ unitaryGroup (Fin n) ℂ ∧ u2 (mR k) ∈ unitaryGroup (Fin n) ℂ
+      ∧ mR k = kM (u1 (mR k)) (u2 (mR k)) := by
   have hk' : InK (mR k) := hk
   obtain ⟨hG, hU⟩ := hk'
   unfold InG at hG
   set g := mR k with hg
   have hU' : g * gᴴ = 1 := mul_eq_one_comm.mp hU
   have hc : JJ n * g = g * JJ n := by
-    calc JJ n * g = (g * gᴴ) * JJ n * g := by rw [hU', Matrix.one_mul]
+    calc
+      JJ n * g
+        = (g * gᴴ) * JJ n * g := by rw [hU', Matrix.one_mul]
       _ = g * (gᴴ * JJ n * g) := by simp only [Matrix.mul_assoc]
       _ = g * JJ n := by rw [hG]
   have hc' := hc
   rw [← fromBlocks_toBlocks g] at hc'
   simp only [JJ, fromBlocks_multiply, Matrix.zero_mul, Matrix.one_mul, zero_add, add_zero,
-    Matrix.neg_mul, Matrix.mul_neg, Matrix.mul_one, Matrix.mul_zero, neg_zero] at hc'
+      Matrix.neg_mul, Matrix.mul_neg, Matrix.mul_one, Matrix.mul_zero, neg_zero]
+    at hc'
   rw [fromBlocks_inj] at hc'
   obtain ⟨h1, h2, -, -⟩ := hc'
   have hshape : g = kM (u1 g) (u2 g) := by
@@ -120,7 +124,13 @@ theorem KR_shape (k : GR n) (hk : k ∈ KR n) :
 
 theorem kIso : KIso := by
   intro n
-  exact ⟨fun a b ha hb => kM_of_unitary a b ha hb, kM_mul, kM_one, fun a b => ⟨first_unitary_block_of_pair a b, second_unitary_block_of_pair a b⟩,
-    kM_low, KR_shape⟩
+  exact ⟨
+    fun a b ha hb => kM_of_unitary a b ha hb,
+    kM_mul,
+    kM_one,
+    fun a b => ⟨first_unitary_block_of_pair a b, second_unitary_block_of_pair a b⟩,
+    kM_low,
+    KR_shape
+  ⟩
 
 end PositivityTheory.Rg.Sw.AbsSt.Proj

@@ -8,34 +8,41 @@ open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem doubleCoset_fibre_card {G : Type} [Group G] (T Γ K' : Subgroup G) (x : G) :
-    Nat.card ((fun q : DoubleCoset.Quotient ((Γ ⊓ T : Subgroup G) : Set G) (K' : Set G) =>
-        DoubleCoset.mk T K' (Quotient.out q)) ⁻¹' {DoubleCoset.mk T K' x}) =
-      Nat.card (DoubleCoset.Quotient ((Γ.subgroupOf T : Subgroup T) : Set T)
+theorem doubleCoset_fibre_card {G : Type} [Group G] (T Γ K' : Subgroup G) (x : G)
+    : Nat.card
+        ((fun q : DoubleCoset.Quotient ((Γ ⊓ T : Subgroup G) : Set G) (K' : Set G) =>
+            DoubleCoset.mk T K' (Quotient.out q))
+          ⁻¹' {DoubleCoset.mk T K' x})
+      = Nat.card (DoubleCoset.Quotient ((Γ.subgroupOf T : Subgroup T) : Set T)
         (((T ⊓ K'.map (MulAut.conj x).toMonoidHom).subgroupOf T : Subgroup T) : Set T)) := by
   classical
   set U : Subgroup G := T ⊓ K'.map (MulAut.conj x).toMonoidHom with hU
   have memU : ∀ u : G, u ∈ U ↔ u ∈ T ∧ x⁻¹ * u * x ∈ K' := by
     intro u
-    simp only [hU, Subgroup.mem_inf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom,
-      MulAut.conj_apply]
+    simp only [hU, Subgroup.mem_inf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
     constructor
     · rintro ⟨hT, k, hk, rfl⟩
       exact ⟨hT, by simpa [mul_assoc] using hk⟩
     · rintro ⟨hT, hk⟩
       exact ⟨hT, _, hk, by group⟩
   let F := fun q : DoubleCoset.Quotient ((Γ ⊓ T : Subgroup G) : Set G) (K' : Set G) =>
-        DoubleCoset.mk T K' (Quotient.out q)
-  have hland : ∀ t : T, DoubleCoset.mk (Γ ⊓ T) K' ((t : G) * x) ∈ F ⁻¹' {DoubleCoset.mk T K' x} := by
+    DoubleCoset.mk T K' (Quotient.out q)
+  have hland
+      : ∀ t : T, DoubleCoset.mk (Γ ⊓ T) K' ((t : G) * x) ∈ F ⁻¹' {DoubleCoset.mk T K' x} := by
     intro t
     obtain ⟨h, hh, k, hk, he⟩ := DoubleCoset.mk_out_eq_mul (Γ ⊓ T) K' ((t : G) * x)
     simp only [Set.mem_preimage, Set.mem_singleton_iff, F]
     rw [eq_comm, DoubleCoset.eq]
     refine ⟨h * t, T.mul_mem (Subgroup.mem_inf.mp hh).2 t.2, k, hk, ?_⟩
-    rw [he]; group
+    rw [he]
+    group
   let φ₀ : T → F ⁻¹' {DoubleCoset.mk T K' x} := fun t => ⟨_, hland t⟩
-  have hwd : ∀ a b : T, (DoubleCoset.setoid ((Γ.subgroupOf T : Subgroup T) : Set T)
-      ((U.subgroupOf T : Subgroup T) : Set T)) a b → φ₀ a = φ₀ b := by
+  have hwd
+      : ∀ a b : T,
+        (DoubleCoset.setoid ((Γ.subgroupOf T : Subgroup T) : Set T)
+              ((U.subgroupOf T : Subgroup T) : Set T))
+            a b
+          → φ₀ a = φ₀ b := by
     intro a b hab
     obtain ⟨g, hg, u, hu, rfl⟩ := DoubleCoset.rel_iff.mp hab
     apply Subtype.ext
@@ -45,14 +52,18 @@ theorem doubleCoset_fibre_card {G : Type} [Group G] (T Γ K' : Subgroup G) (x : 
     refine ⟨g, Subgroup.mem_inf.mpr ⟨hg, g.2⟩, x⁻¹ * u * x, ((memU u).mp hu).2, ?_⟩
     simp only [Subgroup.coe_mul]
     group
-  let φ : DoubleCoset.Quotient ((Γ.subgroupOf T : Subgroup T) : Set T)
-      ((U.subgroupOf T : Subgroup T) : Set T) → F ⁻¹' {DoubleCoset.mk T K' x} :=
+  let φ
+      : DoubleCoset.Quotient ((Γ.subgroupOf T : Subgroup T) : Set T)
+          ((U.subgroupOf T : Subgroup T) : Set T)
+        → F ⁻¹' {DoubleCoset.mk T K' x} :=
     Quotient.lift (s := DoubleCoset.setoid _ _) φ₀ hwd
   have hφ : Function.Bijective φ := by
     constructor
     · intro p q hpq
-      induction p using Quotient.inductionOn with | h a => ?_
-      induction q using Quotient.inductionOn with | h b => ?_
+      induction p using Quotient.inductionOn with
+      | h a => ?_
+      induction q using Quotient.inductionOn with
+      | h b => ?_
       have h1 : DoubleCoset.mk (Γ ⊓ T) K' ((a : G) * x) = DoubleCoset.mk (Γ ⊓ T) K' ((b : G) * x) :=
         congrArg Subtype.val hpq
       obtain ⟨h, hh, k, hk, he⟩ := (@DoubleCoset.eq _ _ _ _ _ _).mp h1
@@ -68,7 +79,8 @@ theorem doubleCoset_fibre_card {G : Type} [Group G] (T Γ K' : Subgroup G) (x : 
           rw [show (b : G) = h * a * x * k * x⁻¹ by
             rw [show h * (a : G) * x * k * x⁻¹ = h * ((a : G) * x) * k * x⁻¹ by group, ← he]; group]
           group
-        rw [this]; exact hk
+        rw [this]
+        exact hk
       · apply Subtype.ext
         simp only [Subgroup.coe_mul]
         group
@@ -81,7 +93,8 @@ theorem doubleCoset_fibre_card {G : Type} [Group G] (T Γ K' : Subgroup G) (x : 
       conv_rhs => rw [← DoubleCoset.out_eq' q]
       rw [DoubleCoset.eq]
       refine ⟨1, Subgroup.one_mem _, k⁻¹, K'.inv_mem hk, ?_⟩
-      rw [he]; group
+      rw [he]
+      group
   exact (Nat.card_eq_of_bijective φ hφ).symm
 
 end GlobalTheory

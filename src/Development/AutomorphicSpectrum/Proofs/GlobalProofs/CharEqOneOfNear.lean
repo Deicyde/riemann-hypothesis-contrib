@@ -13,9 +13,12 @@ namespace GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Test
 theorem eq_one_of_pow_near (z : ℂ) (h : ∀ n : ℕ, ‖z ^ n - 1‖ < 1 / 2) : z = 1 :=
   _root_.UpperTheory.Reformulated.B.EqOneOfPowNear.eq_one_of_pow_near z h
 
-theorem char_eq_one_of_near {G : Type} [AddCommGroup G] (H : AddSubgroup G) (χ : G → ℂ) (h0 : χ 0 = 1)
-    (hχ : ∀ x y, χ (x + y) = χ x * χ y) (hs : ∀ x ∈ H, ‖χ x - 1‖ < 1 / 2) {x : G} (hx : x ∈ H) :
-    χ x = 1 := by
+theorem char_eq_one_of_near
+    {G : Type} [AddCommGroup G]
+    (H : AddSubgroup G) (χ : G → ℂ)
+    (h0 : χ 0 = 1) (hχ : ∀ x y, χ (x + y) = χ x * χ y) (hs : ∀ x ∈ H, ‖χ x - 1‖ < 1 / 2)
+    {x : G} (hx : x ∈ H)
+    : χ x = 1 := by
   have hn : ∀ n : ℕ, χ (n • x) = χ x ^ n := by
     intro n
     induction n with

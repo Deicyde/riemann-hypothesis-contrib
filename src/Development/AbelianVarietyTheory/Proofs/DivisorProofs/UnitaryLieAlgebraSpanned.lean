@@ -10,8 +10,8 @@ namespace GlobalTheory.TracelessSkewSpan
 
 variable {r : ℕ}
 
-noncomputable def skewSub (A : Matrix (Fin r) (Fin r) ℂ) :
-    Submodule ℝ (Matrix (Fin r) (Fin r) ℂ) where
+noncomputable def skewSub (A : Matrix (Fin r) (Fin r) ℂ)
+    : Submodule ℝ (Matrix (Fin r) (Fin r) ℂ) where
   carrier := {Y | Yᵀ * A + A * Y.map (starRingEnd ℂ) = 0}
   add_mem' := by
     intro X Y hX hY
@@ -19,7 +19,8 @@ noncomputable def skewSub (A : Matrix (Fin r) (Fin r) ℂ) :
     have h : (X + Y).map (starRingEnd ℂ) = X.map (starRingEnd ℂ) + Y.map (starRingEnd ℂ) := by
       ext i j; simp
     rw [transpose_add, h, Matrix.add_mul, Matrix.mul_add]
-    calc _ = (Xᵀ * A + A * X.map (starRingEnd ℂ)) + (Yᵀ * A + A * Y.map (starRingEnd ℂ)) := by abel
+    calc
+      _ = (Xᵀ * A + A * X.map (starRingEnd ℂ)) + (Yᵀ * A + A * Y.map (starRingEnd ℂ)) := by abel
       _ = 0 := by rw [hX, hY, add_zero]
   zero_mem' := by simp
   smul_mem' := by
@@ -82,15 +83,17 @@ lemma finrank_skewSub_mul_two_le {A : Matrix (Fin r) (Fin r) ℂ} (hA : A.det �
   simp only [Fintype.card_fin] at this
   linarith
 
-theorem mem_span_of_linearIndependent {r : ℕ} (A : Matrix (Fin r) (Fin r) ℂ) (hA : A.det ≠ 0)
+theorem mem_span_of_linearIndependent
+    {r : ℕ} (A : Matrix (Fin r) (Fin r) ℂ) (hA : A.det ≠ 0)
     (v : Fin (r ^ 2 - 1) → Matrix (Fin r) (Fin r) ℂ) (hv : LinearIndependent ℝ v)
     (hvu : ∀ i, (v i)ᵀ * A + A * (v i).map (starRingEnd ℂ) = 0 ∧ (v i).trace = 0)
-    (Y : Matrix (Fin r) (Fin r) ℂ) (hY : Yᵀ * A + A * Y.map (starRingEnd ℂ) = 0)
-    (hYt : Y.trace = 0) : Y ∈ Submodule.span ℝ (Set.range v) := by
+    (Y : Matrix (Fin r) (Fin r) ℂ) (hY : Yᵀ * A + A * Y.map (starRingEnd ℂ) = 0) (hYt : Y.trace = 0)
+    : Y ∈ Submodule.span ℝ (Set.range v) := by
   rcases Nat.eq_zero_or_pos r with hr | hr
   · subst hr
     have : Y = 0 := Subsingleton.elim _ _
-    rw [this]; exact Submodule.zero_mem _
+    rw [this]
+    exact Submodule.zero_mem _
   set u := skewSub A
   set su := u ⊓ LinearMap.ker ((Matrix.traceLinearMap (Fin r) ℂ ℂ).restrictScalars ℝ)
   have hYsu : Y ∈ su := ⟨hY, by simpa using hYt⟩
@@ -100,8 +103,9 @@ theorem mem_span_of_linearIndependent {r : ℕ} (A : Matrix (Fin r) (Fin r) ℂ)
     exact ⟨(hvu i).1, by simpa using (hvu i).2⟩
   have hIu : Complex.I • (1 : Matrix (Fin r) (Fin r) ℂ) ∈ u := by
     rw [mem_skewSub]
-    have hc : (Complex.I • (1 : Matrix (Fin r) (Fin r) ℂ)).map (starRingEnd ℂ)
-        = (-Complex.I) • (1 : Matrix (Fin r) (Fin r) ℂ) := by
+    have hc
+        : (Complex.I • (1 : Matrix (Fin r) (Fin r) ℂ)).map (starRingEnd ℂ)
+          = (-Complex.I) • (1 : Matrix (Fin r) (Fin r) ℂ) := by
       ext i j; by_cases h : i = j <;> simp [Matrix.one_apply, h]
     rw [hc, transpose_smul, transpose_one, Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul,
       Matrix.mul_one, neg_smul, add_neg_cancel]
@@ -123,6 +127,7 @@ theorem mem_span_of_linearIndependent {r : ℕ} (A : Matrix (Fin r) (Fin r) ℂ)
     change Module.finrank ℝ su ≤ r * r - 1
     generalize r * r = n at h2 ⊢
     omega
-  rw [heq]; exact hYsu
+  rw [heq]
+  exact hYsu
 
 end GlobalTheory.TracelessSkewSpan

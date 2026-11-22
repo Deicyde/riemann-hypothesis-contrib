@@ -9,6 +9,7 @@ public import Development.WeilBound.CoreStatements.ResolutionCharZero.Principali
 namespace NadelVanishingSeparation.NSI
 
 theorem nadelVanishingPair : GlobalTheory.Published.NadelVanishingPair :=
-  GlobalTheory.Discrepancy.nadelVanishingPair_of_principalisation PositivityTheory.ResPlug.WeightsCompactStabilizer.principalisation_closed
+  GlobalTheory.Discrepancy.nadelVanishingPair_of_principalisation
+    PositivityTheory.ResPlug.WeightsCompactStabilizer.principalisation_closed
 
 end NadelVanishingSeparation.NSI

@@ -8,12 +8,15 @@ open Module
 
 namespace GlobalTheory
 
-theorem exists_eq_add_nsmul_of_torsion_characters_eq (k X : Type) [Field k] [AddCommGroup X]
-    [Module.Free ℤ X] [Module.Finite ℤ X] (N : ℕ) (ζ : k) (hN : 0 < N)
-    (hζ : IsPrimitiveRoot ζ N) (α β : X)
-    (h : ∀ t : Multiplicative X →* kˣ, t ^ N = 1 →
-      t (Multiplicative.ofAdd α) = t (Multiplicative.ofAdd β)) :
-    ∃ w, α = β + N • w := by
+theorem exists_eq_add_nsmul_of_torsion_characters_eq
+    (k X : Type) [Field k] [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (N : ℕ)
+    (ζ : k)
+    (hN : 0 < N) (hζ : IsPrimitiveRoot ζ N)
+    (α β : X)
+    (h : ∀ t : Multiplicative X →* kˣ,
+      t ^ N = 1 → t (Multiplicative.ofAdd α) = t (Multiplicative.ofAdd β))
+    : ∃ w, α = β + N • w := by
   classical
   have hu : IsUnit ζ := hζ.isUnit hN.ne'
   obtain ⟨u, rfl⟩ := hu
@@ -21,17 +24,17 @@ theorem exists_eq_add_nsmul_of_torsion_characters_eq (k X : Type) [Field k] [Add
   let b := Module.Free.chooseBasis ℤ X
   have key : ∀ i, (N : ℤ) ∣ b.repr (α - β) i := by
     intro i
-    let t : Multiplicative X →* kˣ :=
-      { toFun := fun x => u ^ (b.repr (Multiplicative.toAdd x) i)
-        map_one' := by simp
-        map_mul' := by
-          intro x y
-          simp [zpow_add] }
+    let t : Multiplicative X →* kˣ := {
+      toFun := fun x => u ^ (b.repr (Multiplicative.toAdd x) i)
+      map_one' := by simp
+      map_mul' := by
+        intro x y
+        simp [zpow_add]
+    }
     have ht : t ^ N = 1 := by
       refine MonoidHom.ext fun x => ?_
       have : (u ^ (b.repr (Multiplicative.toAdd x) i)) ^ N = 1 := by
-        rw [← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hu'.pow_eq_one,
-          one_zpow]
+        rw [← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hu'.pow_eq_one, one_zpow]
       rw [MonoidHom.pow_apply, MonoidHom.one_apply]
       exact this
     have h1 : u ^ (b.repr α i) = u ^ (b.repr β i) := h t ht
@@ -42,17 +45,25 @@ theorem exists_eq_add_nsmul_of_torsion_characters_eq (k X : Type) [Field k] [Add
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hd i, mul_smul, natCast_zsmul]
 
-theorem finsupp_eq_zero_of_sum_torsion_characters_eq_zero :
-    ∀ (k X : Type) [Field k] [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (N : ℕ) (ζ : k), 0 < N → IsPrimitiveRoot ζ N → ∀ (M : Type) [AddCommGroup M] [Module k M] (c : X →₀ M), (∀ α ∈ c.support, ∀ β ∈ c.support, (∃ w, α = β + N • w) → α = β) → (∀ t : Multiplicative X →* kˣ, t ^ N = 1 → c.sum (fun α m => (t (Multiplicative.ofAdd α) : k) • m) = 0) → c = 0 := by
+theorem finsupp_eq_zero_of_sum_torsion_characters_eq_zero
+    : ∀ (k X : Type) [Field k] [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (N : ℕ)
+        (ζ : k),
+      0 < N → IsPrimitiveRoot ζ N
+        → ∀ (M : Type) [AddCommGroup M] [Module k M] (c : X →₀ M),
+          (∀ α ∈ c.support, ∀ β ∈ c.support, (∃ w, α = β + N • w) → α = β)
+            → (∀ t : Multiplicative X →* kˣ,
+              t ^ N = 1 → c.sum (fun α m => (t (Multiplicative.ofAdd α) : k) • m) = 0)
+            → c = 0 := by
   intro k X _ _ _ _ N ζ hN hζ M _ _ c hc hsum
   classical
   let G : Subgroup (Multiplicative X →* kˣ) := (powMonoidHom N).ker
-  let ev : c.support → (G →* k) := fun α =>
-    { toFun := fun t => ((t : Multiplicative X →* kˣ) (Multiplicative.ofAdd (α : X)) : k)
-      map_one' := by simp
-      map_mul' := by
-        intro s t
-        simp }
+  let ev : c.support → (G →* k) := fun α => {
+    toFun := fun t => ((t : Multiplicative X →* kˣ) (Multiplicative.ofAdd (α : X)) : k)
+    map_one' := by simp
+    map_mul' := by
+      intro s t
+      simp
+  }
   have hinj : Function.Injective ev := by
     intro α β hαβ
     apply Subtype.ext

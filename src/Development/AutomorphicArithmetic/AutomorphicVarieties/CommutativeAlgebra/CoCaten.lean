@@ -12,14 +12,17 @@ public import ReciprocityTheory.CommutativeAlgebra.SaturatedChains.RingKrullDimL
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem cm_of_regular (A : Type) [CommRing A] [IsRegularLocalRing A] : ReciprocityTheory.CA.IsCM A := by
+private theorem cm_of_regular (A : Type) [CommRing A] [IsRegularLocalRing A]
+    : ReciprocityTheory.CA.IsCM A := by
   obtain ⟨xs, h1, h2, h3⟩ :=
     PI.UnitaryGroupMassFormula.RLRS.IsRegularLocalRing.exists_isRegular_ofList_eq_maximalIdeal A
   exact ⟨inferInstance, xs.length, h2.symm, xs, rfl, fun r hr => h1 ▸ Ideal.subset_span hr, h3⟩
 
-private theorem dim_quot (A : Type) [CommRing A] [IsRegularLocalRing A] (P : Ideal A) [P.IsPrime]
-    (p : Ideal (A ⧸ P)) [p.IsPrime] :
-    (p.height : WithBot ℕ∞) + ringKrullDim ((A ⧸ P) ⧸ p) = ringKrullDim (A ⧸ P) := by
+private theorem dim_quot
+    (A : Type) [CommRing A] [IsRegularLocalRing A]
+    (P : Ideal A) [P.IsPrime]
+    (p : Ideal (A ⧸ P)) [p.IsPrime]
+    : (p.height : WithBot ℕ∞) + ringKrullDim ((A ⧸ P) ⧸ p) = ringKrullDim (A ⧸ P) := by
   have h := cm_of_regular A
   set Q := p.comap (Ideal.Quotient.mk P) with hQ
   have hPQ : P ≤ Q := fun x hx => by
@@ -38,14 +41,17 @@ private theorem dim_quot (A : Type) [CommRing A] [IsRegularLocalRing A] (P : Ide
   rw [← hn] at e2
   exact ENat.WithBot.natCast_add_cancel.1 e2
 
-theorem UpperTheory.V.Alg.co_caten :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] [IsDomain R] (p : Ideal R) [p.IsPrime], (p.height : WithBot ℕ∞) + ringKrullDim (R ⧸ p) = ringKrullDim R := by
+theorem UpperTheory.V.Alg.co_caten
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        [IsDomain R] (p : Ideal R) [p.IsPrime],
+      (p.height : WithBot ℕ∞) + ringKrullDim (R ⧸ p) = ringKrullDim R := by
   intro O _ _ _ _ R _ _ hR _ p _
   have hn : IsNoetherianRing R := hR.toIsNoetherian
   obtain ⟨s, hs⟩ : (maximalIdeal R).FG := IsNoetherian.noetherian _
   haveI := co_mvps O O s
-  obtain ⟨F, ⟨-, hF⟩, -⟩ := co_ev O O R s (Algebra.ofId O R) (fun i => i.1)
-    (fun i => hs ▸ Ideal.subset_span i.2)
+  obtain ⟨F, ⟨-, hF⟩, -⟩ :=
+    co_ev O O R s (Algebra.ofId O R) (fun i => i.1) (fun i => hs ▸ Ideal.subset_span i.2)
   have hsurj : Function.Surjective F := by
     refine co_surj O _ R F (le_sup_of_le_left ?_)
     rw [← hs, Ideal.span_le]
@@ -53,13 +59,15 @@ theorem UpperTheory.V.Alg.co_caten :
     have := hF ⟨y, hy⟩
     simp only at this
     rw [← this]
-    exact Ideal.mem_map_of_mem _ (GlobalTheory.FormalIsogeny.mem_maximalIdeal_iff_constantCoeff.2 (by simp))
+    exact Ideal.mem_map_of_mem _
+      (GlobalTheory.FormalIsogeny.mem_maximalIdeal_iff_constantCoeff.2 (by simp))
   haveI : IsRegularLocalRing (MvPowerSeries s O) :=
     GlobalTheory.FormalIsogeny.isRegularLocalRing_mvPowerSeries O s
   haveI : (RingHom.ker F).IsPrime := RingHom.ker_isPrime _
   let e : (MvPowerSeries s O ⧸ RingHom.ker F) ≃+* R := RingHom.quotientKerEquivOfSurjective hsurj
   have h := dim_quot (MvPowerSeries s O) (RingHom.ker F) (p.comap e)
   rw [RingEquiv.height_comap, ringKrullDim_eq_of_ringEquiv e,
-    ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv (p.comap e) p e
-      (Ideal.map_comap_of_surjective _ e.surjective p).symm)] at h
+      ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv (p.comap e) p e
+        (Ideal.map_comap_of_surjective _ e.surjective p).symm)]
+    at h
   exact h

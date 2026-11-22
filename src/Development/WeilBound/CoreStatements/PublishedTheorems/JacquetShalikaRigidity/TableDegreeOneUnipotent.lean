@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsGener
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -20,38 +22,56 @@ namespace tableDegreeOneUnipotent
 
 theorem mul_le_sq_add (a b : ℝ≥0∞) : a * b ≤ a ^ 2 + b ^ 2 := by
   rcases le_total a b with h | h
-  · calc a * b ≤ b * b := by gcongr
+  · calc
+      a * b
+        ≤ b * b := by gcongr
       _ = b ^ 2 := (sq b).symm
       _ ≤ _ := le_add_self
-  · calc a * b ≤ a * a := by gcongr
+  · calc
+      a * b
+        ≤ a * a := by gcongr
       _ = a ^ 2 := (sq a).symm
       _ ≤ _ := le_self_add
 
-theorem integ {X : Type} [MeasurableSpace X] {ν : Measure X} {f φ : X → ℂ}
-    (hf : AEStronglyMeasurable f ν) (hφ : AEStronglyMeasurable φ ν)
-    (h1 : ∫⁻ g, ‖f g‖ₑ ^ 2 ∂ν < ∞) (h2 : ∫⁻ g, ‖φ g‖ₑ ^ 2 ∂ν < ∞) :
-    Integrable (fun g => f g * conj (φ g)) ν := by
+theorem integ
+    {X : Type} [MeasurableSpace X]
+    {ν : Measure X} {f φ : X → ℂ} (hf : AEStronglyMeasurable f ν) (hφ : AEStronglyMeasurable φ ν)
+    (h1 : ∫⁻ g, ‖f g‖ₑ ^ 2 ∂ν < ∞) (h2 : ∫⁻ g, ‖φ g‖ₑ ^ 2 ∂ν < ∞)
+    : Integrable (fun g => f g * conj (φ g)) ν := by
   refine ⟨hf.mul (Complex.continuous_conj.comp_aestronglyMeasurable hφ), ?_⟩
   show ∫⁻ g, ‖f g * conj (φ g)‖ₑ ∂ν < ∞
-  calc ∫⁻ g, ‖f g * conj (φ g)‖ₑ ∂ν ≤ ∫⁻ g, (‖f g‖ₑ ^ 2 + ‖φ g‖ₑ ^ 2) ∂ν := by
-        refine lintegral_mono fun g => ?_
-        have hc : ‖conj (φ g)‖ₑ = ‖φ g‖ₑ := by simp [enorm_eq_nnnorm]
-        rw [enorm_mul, hc]
-        exact mul_le_sq_add _ _
+  calc
+    ∫⁻ g, ‖f g * conj (φ g)‖ₑ ∂ν ≤ ∫⁻ g, (‖f g‖ₑ ^ 2 + ‖φ g‖ₑ ^ 2) ∂ν := by
+      refine lintegral_mono fun g => ?_
+      have hc : ‖conj (φ g)‖ₑ = ‖φ g‖ₑ := by simp [enorm_eq_nnnorm]
+      rw [enorm_mul, hc]
+      exact mul_le_sq_add _ _
     _ = ∫⁻ g, ‖f g‖ₑ ^ 2 ∂ν + ∫⁻ g, ‖φ g‖ₑ ^ 2 ∂ν := lintegral_add_left' (hf.enorm.pow_const 2) _
     _ < ∞ := ENNReal.add_lt_top.2 ⟨h1, h2⟩
 
-theorem pre_of_good {E : Type} [Field E] [NumberField E] {k : ℕ} {ψ : AddChar (Ad E) ℂ} {m : ℕ}
-    {f : GA E k → ℂ} (h : Good ψ m f) : Pre ψ m f :=
+theorem pre_of_good
+    {E : Type} [Field E] [NumberField E]
+    {k : ℕ} {ψ : AddChar (Ad E) ℂ} {m : ℕ} {f : GA E k → ℂ} (h : Good ψ m f)
+    : Pre ψ m f :=
   ⟨h.cont, h.left, h.law⟩
 
-theorem main (hU1 : U1) (hP1 : P1) (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (k : ℕ)
-    (μ : Measure (GA E k)) [μ.IsHaarMeasure] (ψ : AddChar (Ad E) ℂ) (hψ : StdPsi ψ) :
-    ∀ m, m < k → ∀ β, IsWt (nuP E k m) β → ∃ β', IsWt (nuP E k 0) β' ∧
-      ∀ f φ, Pre ψ m f → Good ψ m φ → ∫⁻ g, ‖f g‖ₑ ^ 2 ∂μ.withDensity β < ∞ →
-        ∫⁻ g, ‖φ g‖ₑ ^ 2 ∂μ.withDensity β < ∞ →
-        Integrable (fun g => whit ψ m f g * conj (whit ψ m φ g)) (μ.withDensity β') ∧
-        ∫ g, f g * conj (φ g) ∂μ.withDensity β = ∫ g, whit ψ m f g * conj (whit ψ m φ g) ∂μ.withDensity β' := by
+theorem main
+    (hU1 : U1) (hP1 : P1)
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (k : ℕ) (μ : Measure (GA E k)) [μ.IsHaarMeasure]
+    (ψ : AddChar (Ad E) ℂ) (hψ : StdPsi ψ)
+    : ∀ m,
+      m < k
+        → ∀ β,
+          IsWt (nuP E k m) β
+            → ∃ β',
+              IsWt (nuP E k 0) β'
+                ∧ ∀ f φ,
+                  Pre ψ m f → Good ψ m φ → ∫⁻ g, ‖f g‖ₑ ^ 2 ∂μ.withDensity β < ∞
+                    → ∫⁻ g, ‖φ g‖ₑ ^ 2 ∂μ.withDensity β < ∞
+                    → Integrable (fun g => whit ψ m f g * conj (whit ψ m φ g)) (μ.withDensity β')
+                      ∧ ∫ g, f g * conj (φ g) ∂μ.withDensity β
+                        = ∫ g, whit ψ m f g * conj (whit ψ m φ g) ∂μ.withDensity β' := by
   intro m
   induction m with
   | zero =>
@@ -67,13 +87,16 @@ theorem main (hU1 : U1) (hP1 : P1) (E : Type) [Field E] [NumberField E] [_root_.
     have hφ' : Good ψ m (colT ψ (m + 1) φ) := by
       refine { cont := ?_, left := ?_, law := ?_, van := ?_ }
       · exact _root_.GlobalTheory.T.continuous_unipotentColumnWhittakerTransform E k ψ hψ m φ hφ
-      · exact _root_.GlobalTheory.T.unipotentColumnWhittakerTransform_mirabolic_invariant E k ψ hψ m φ hm hφ
+      · exact _root_.GlobalTheory.T.unipotentColumnWhittakerTransform_mirabolic_invariant E k ψ hψ m
+          φ hm hφ
       · intro j hj y g
         rcases Nat.lt_or_ge (m + 1) j with h | h
         · exact _root_.GlobalTheory.T.columnWhittakerTransform_keeps_later_law E k ψ m φ hφ j h y g
         · obtain rfl : j = m + 1 := by omega
-          exact _root_.GlobalTheory.T.unipotentColumnWhittakerTransform_column_law E k ψ hψ m φ hφ y g
-      · exact _root_.GlobalTheory.T.quotientAverage_unipotentBlock_columnTransform_eq_zero E k ψ hψ m φ hm hφ
+          exact _root_.GlobalTheory.T.unipotentColumnWhittakerTransform_column_law E k ψ hψ m φ hφ y
+            g
+      · exact _root_.GlobalTheory.T.quotientAverage_unipotentBlock_columnTransform_eq_zero E k ψ hψ
+          m φ hm hφ
     obtain ⟨hi, he⟩ := h _ _ hf' hφ' ((hL2 f hf).trans_lt h1) ((hL2 φ (pre_of_good hφ)).trans_lt h2)
     exact ⟨hi, (hip f φ hf hφ h1 h2).trans he⟩
 

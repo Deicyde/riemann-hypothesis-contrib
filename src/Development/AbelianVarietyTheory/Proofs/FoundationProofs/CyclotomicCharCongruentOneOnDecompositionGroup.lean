@@ -6,20 +6,26 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.EpsDec
 
-theorem natCast_eq_of_pow_eq {M : Type} [CommMonoid M] {ζ : M} {N : ℕ} (hζ : IsPrimitiveRoot ζ N) (hN : N ≠ 0)
-    {a b : ℕ} (h : ζ ^ a = ζ ^ b) : (a : ZMod N) = b := by
+theorem natCast_eq_of_pow_eq
+    {M : Type} [CommMonoid M]
+    {ζ : M} {N : ℕ} (hζ : IsPrimitiveRoot ζ N) (hN : N ≠ 0)
+    {a b : ℕ} (h : ζ ^ a = ζ ^ b)
+    : (a : ZMod N) = b := by
   rw [ZMod.natCast_eq_natCast_iff' a b N]
   rw [pow_eq_pow_mod a hζ.pow_eq_one, pow_eq_pow_mod b hζ.pow_eq_one] at h
   exact hζ.pow_inj (Nat.mod_lt _ (Nat.pos_of_ne_zero hN)) (Nat.mod_lt _ (Nat.pos_of_ne_zero hN)) h
 
-theorem eps_dec_cong : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (n : ℕ) (w : Pl)
-    (B : ValuationSubring Ω), IsPlaceOver B w → l ^ n ∣ normV w - 1 → 1 ≤ n →
-    ∀ σ ∈ Dec (F := ℚ) B, Cg n (eps l σ) 1 := by
+theorem eps_dec_cong
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (n : ℕ)
+        (w : Pl) (B : ValuationSubring Ω),
+      IsPlaceOver B w → l ^ n ∣ normV w - 1 → 1 ≤ n → ∀ σ ∈ Dec (F := ℚ) B, Cg n (eps l σ) 1 := by
   intro l _ Ω _ _ _ n w B hB hdiv hn σ hσ
   have hl : l.Prime := Fact.out
   have hl2 := hl.two_le
@@ -33,12 +39,12 @@ theorem eps_dec_cong : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Alge
     rw [e] at h1
     have h2 := Nat.le_of_dvd (by omega) h1
     omega
-  have hcop : (l ^ n).Coprime p :=
-    Nat.Coprime.pow_left n ((Nat.coprime_primes hl hp).2 hpl.symm)
+  have hcop : (l ^ n).Coprime p := Nat.Coprime.pow_left n ((Nat.coprime_primes hl hp).2 hpl.symm)
   obtain ⟨k, hk⟩ := UpperTheory.V.LDataCardLeFinrank.decActRoots ℚ Ω p B hA (l ^ n) hcop σ hσ
   have hp1 : (p : ZMod (l ^ n)) = 1 := by
     have h1 : 1 ≤ p := hp.one_lt.le
-    have : ((p - 1 : ℕ) : ZMod (l ^ n)) = 0 := (CharP.cast_eq_zero_iff (ZMod (l ^ n)) (l ^ n) _).2 hdiv
+    have : ((p - 1 : ℕ) : ZMod (l ^ n)) = 0 :=
+      (CharP.cast_eq_zero_iff (ZMod (l ^ n)) (l ^ n) _).2 hdiv
     rw [Nat.cast_sub h1, Nat.cast_one, sub_eq_zero] at this
     exact this
   have hIAC : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -46,8 +52,8 @@ theorem eps_dec_cong : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Alge
   haveI : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr hl.ne_zero⟩
   have hN0 : l ^ n ≠ 0 := pow_ne_zero _ hl.ne_zero
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (l ^ n)
-  have hspec := cyclotomicCharacter.spec (L := Ω) l
-    (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) ζ hζ.pow_eq_one
+  have hspec :=
+    cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) ζ hζ.pow_eq_one
   set c : ℤ_[l] := ((cycZ ℚ Ω l σ : ℤ_[l]ˣ) : ℤ_[l]) with hc
   have hσζ : σ ζ = ζ ^ (PadicInt.toZModPow n c).val := hspec
   have hζp : ζ ^ (p ^ k) = ζ ^ 1 := by

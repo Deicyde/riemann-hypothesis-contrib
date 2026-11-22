@@ -14,11 +14,14 @@ end GlobalTheory.UPel.HT.RealRepBij
 
 namespace GlobalTheory.UPel.HT.RealRepBij
 
-theorem span_range_eq_top {F B : Type} [Field F] [Ring B] [Algebra F B] [Algebra.IsCentral F B]
-    [IsSimpleRing B] [FiniteDimensional F B] {n : ℕ} (σ : F →+* ℂ)
-    (f : B →+* Matrix (Fin n) (Fin n) ℂ) (hdim : Module.finrank F B = n ^ 2)
-    (hf : ∀ a, f (algebraMap F B a) = Matrix.scalar (Fin n) (σ a)) :
-    Submodule.span ℂ (Set.range f) = ⊤ := by
+theorem span_range_eq_top
+    {F B : Type} [Field F] [Ring B] [Algebra F B] [Algebra.IsCentral F B] [IsSimpleRing B]
+    [FiniteDimensional F B]
+    {n : ℕ}
+    (σ : F →+* ℂ) (f : B →+* Matrix (Fin n) (Fin n) ℂ)
+    (hdim : Module.finrank F B = n ^ 2)
+    (hf : ∀ a, f (algebraMap F B a) = Matrix.scalar (Fin n) (σ a))
+    : Submodule.span ℂ (Set.range f) = ⊤ := by
   letI : Algebra F ℂ := σ.toAlgebra
   have hg : ∀ a, f (algebraMap F B a) = algebraMap F (Matrix (Fin n) (Fin n) ℂ) a := fun a => by
     rw [hf, Matrix.algebraMap_eq_diagonal]; rfl
@@ -48,7 +51,8 @@ theorem span_range_eq_top {F B : Type} [Field F] [Ring B] [Algebra F B] [Algebra
       dsimp only [L]
       rw [AlgHom.toLinearMap_apply]
       erw [Algebra.TensorProduct.lift_tmul]
-      rw [Algebra.ofId_apply, Algebra.smul_def]; rfl
+      rw [Algebra.ofId_apply, Algebra.smul_def]
+      rfl
     rw [this]
     exact Submodule.smul_mem _ c (Submodule.subset_span ⟨b, rfl⟩)
   | add x y hx hy => rw [map_add (f := _)]; exact Submodule.add_mem _ hx hy
@@ -57,8 +61,9 @@ end GlobalTheory.UPel.HT.RealRepBij
 
 namespace GlobalTheory.UPel.HT.RealRepBij
 
-variable {K F : Type} [Field K] [NumberField K] [NumberField.IsCMField K]
-  [Field F] [NumberField F] [NumberField.IsCMField F]
-  [Algebra K F] {p : ℕ} [Fact p.Prime]
+variable
+  {K F : Type} [Field K] [NumberField K] [NumberField.IsCMField K] [Field F] [NumberField F]
+  [NumberField.IsCMField F] [Algebra K F]
+  {p : ℕ} [Fact p.Prime]
 
 end GlobalTheory.UPel.HT.RealRepBij

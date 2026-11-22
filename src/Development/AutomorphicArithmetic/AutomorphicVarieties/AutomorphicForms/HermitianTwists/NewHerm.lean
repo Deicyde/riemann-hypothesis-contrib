@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 open Polynomial UpperTheory.V UpperTheory.V.Af Formalism.ConjugateSelfDual
 open scoped ComplexConjugate
 
-private theorem quad_inj {a b c d : ℂ} (h : (X ^ 2 - C a * X + C b : ℂ[X]) = X ^ 2 - C c * X + C d) : a = c ∧ b = d := by
+private theorem quad_inj {a b c d : ℂ} (h : (X ^ 2 - C a * X + C b : ℂ[X]) = X ^ 2 - C c * X + C d)
+    : a = c ∧ b = d := by
   have h0 := congrArg (Polynomial.eval 0) h
   have h1 := congrArg (Polynomial.eval 1) h
   simp only [eval_add, eval_sub, eval_mul, eval_pow, eval_X, eval_C] at h0 h1
@@ -16,8 +17,10 @@ private theorem quad_inj {a b c d : ℂ} (h : (X ^ 2 - C a * X + C b : ℂ[X]) =
   · linear_combination h0 - h1
   · linear_combination h0
 
-theorem UpperTheory.V.Af.Rn.newHerm :
-    UpperTheory.V.Published.NewformRep → UpperTheory.V.Af.Rn.UnitTw → UpperTheory.V.Af.Rn.HermOf → UpperTheory.V.Af.Rn.SatHerm → UpperTheory.V.Af.Rn.NewHerm := by
+theorem UpperTheory.V.Af.Rn.newHerm
+    : UpperTheory.V.Published.NewformRep → UpperTheory.V.Af.Rn.UnitTw → UpperTheory.V.Af.Rn.HermOf
+      → UpperTheory.V.Af.Rn.SatHerm
+      → UpperTheory.V.Af.Rn.NewHerm := by
   intro hN hT hO hS k hk f w hw
   obtain ⟨π, hi, hs⟩ := hN k hk f 0
   obtain ⟨π₀, hi₀, ht⟩ := hT k (by omega) 0 π hi

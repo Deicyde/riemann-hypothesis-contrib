@@ -4,22 +4,24 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.Yzb9.SelfDual :
-    {V : Type} →
-      [AddCommGroup V] → [TopologicalSpace V] → [inst : MeasurableSpace V] → MeasureTheory.Measure V → (V → V → ℂ) → Prop :=
-    fun {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V] (μ : MeasureTheory.Measure V) (χ : V → V → ℂ) ↦
-      μ.IsAddHaarMeasure ∧
-        ∀ (Φ : V → ℂ),
-          Continuous Φ →
-            HasCompactSupport Φ →
-              MeasureTheory.Integrable (fun (y : V) ↦ ∫ (x : V), Φ x * χ x y ∂μ) μ →
-                ∀ (z : V), ∫ (y : V), (∫ (x : V), Φ x * χ x y ∂μ) * χ y z ∂μ = Φ (-z)
+noncomputable def UpperTheory.Reformulated.B.Yzb9.SelfDual
+    : {V : Type} → [AddCommGroup V] → [TopologicalSpace V] → [inst : MeasurableSpace V]
+      → MeasureTheory.Measure V → (V → V → ℂ)
+      → Prop :=
+  fun {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V]
+      (μ : MeasureTheory.Measure V) (χ : V → V → ℂ) ↦
+    μ.IsAddHaarMeasure
+      ∧ ∀ (Φ : V → ℂ),
+        Continuous Φ → HasCompactSupport Φ
+          → MeasureTheory.Integrable (fun (y : V) ↦ ∫ (x : V), Φ x * χ x y ∂μ) μ
+          → ∀ (z : V), ∫ (y : V), (∫ (x : V), Φ x * χ x y ∂μ) * χ y z ∂μ = Φ (-z)
 
 section
 open MeasureTheory FourierTransform
 open scoped RealInnerProductSpace
 
-variable {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+variable
+  {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   [MeasurableSpace E] [BorelSpace E]
 
 private lemma UpperTheory.Reformulated.B.Yzb9.map_T (T : E ≃L[ℝ] E) :
@@ -84,7 +86,8 @@ section
 open MeasureTheory FourierTransform
 open scoped RealInnerProductSpace NNReal
 
-variable {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+variable
+  {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   [MeasurableSpace E] [BorelSpace E]
 
 private lemma UpperTheory.Reformulated.B.Yzb9.inner_eq (T : E ≃L[ℝ] E) (c : ℝ≥0) (Φ : E → ℂ) (y : E) :
@@ -246,33 +249,35 @@ private lemma UpperTheory.Reformulated.B.Yzb9.selfDual_map {V E : Type} [AddComm
   simpa using h2
 end
 
-theorem UpperTheory.Reformulated.B.Yzb9.existsUnique_of_equiv :
-    ∀ {V W : Type} [inst : AddCommGroup V] [inst_1 : TopologicalSpace V] [IsTopologicalAddGroup V]
-      [inst_3 : MeasurableSpace V] [BorelSpace V] [inst_5 : NormedAddCommGroup W] [inst_6 : NormedSpace ℝ W]
-      [FiniteDimensional ℝ W] (e : V ≃+ W),
-      Continuous (⇑e : V → W) →
-        Continuous (⇑e.symm : W → V) →
-          ∀ (l : V → V → ℝ),
-            (∀ (x x' y : V), l (x + x') y = l x y + l x' y) →
-              (∀ (x y : V), l x y = l y x) →
-                (∀ (y : V), Continuous fun (x : V) ↦ l x y) →
-                  (∀ (x : V), (∀ (y : V), l x y = (0 : ℝ)) → x = (0 : V)) →
-                    ∃! μ : MeasureTheory.Measure V,
-                      UpperTheory.Reformulated.B.Yzb9.SelfDual μ fun (x y : V) ↦
-                        Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑(l x y) : ℂ)) := by
+theorem UpperTheory.Reformulated.B.Yzb9.existsUnique_of_equiv
+    : ∀ {V W : Type} [inst : AddCommGroup V] [inst_1 : TopologicalSpace V] [IsTopologicalAddGroup V]
+        [inst_3 : MeasurableSpace V] [BorelSpace V] [inst_5 : NormedAddCommGroup W]
+        [inst_6 : NormedSpace ℝ W] [FiniteDimensional ℝ W] (e : V ≃+ W),
+      Continuous (⇑e : V → W) → Continuous (⇑e.symm : W → V)
+        → ∀ (l : V → V → ℝ),
+          (∀ (x x' y : V), l (x + x') y = l x y + l x' y) → (∀ (x y : V), l x y = l y x)
+            → (∀ (y : V), Continuous fun (x : V) ↦ l x y)
+            → (∀ (x : V), (∀ (y : V), l x y = (0 : ℝ)) → x = (0 : V))
+            → ∃! μ : MeasureTheory.Measure V,
+                UpperTheory.Reformulated.B.Yzb9.SelfDual μ fun (x y : V) ↦
+                  Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑(l x y) : ℂ)) := by
   intro V W _ _ _ _ _ _ _ _ e he he' l hadd hsym hcont hnd
   let ψ := toEuclidean (E := W)
   let f : V ≃+ EuclideanSpace ℝ (Fin (Module.finrank ℝ W)) := e.trans ψ.toLinearEquiv.toAddEquiv
   have hf : Continuous f := ψ.continuous.comp he
   have hf' : Continuous f.symm := he'.comp ψ.symm.continuous
-  obtain ⟨T, hT⟩ := UpperTheory.Reformulated.B.Yzb9.exists_strictHenselian_absolutely_closed_local_ring (fun u v => l (f.symm u) (f.symm v))
-    (fun u u' v => by simp only [map_add (f := _), hadd]) (fun u v => hsym _ _)
-    (fun v => (hcont _).comp hf')
-    (fun u hu => by
-      have : f.symm u = 0 := hnd _ (fun y => by
-        have := hu (f y)
+  obtain ⟨T, hT⟩ :=
+    UpperTheory.Reformulated.B.Yzb9.exists_strictHenselian_absolutely_closed_local_ring
+      (fun u v => l (f.symm u) (f.symm v))
+      (fun u u' v => by simp only [map_add (f := _), hadd])
+      (fun u v => hsym _ _)
+      (fun v => (hcont _).comp hf')
+      (fun u hu => by
+        have : f.symm u = 0 :=
+          hnd _ (fun y => by
+            have := hu (f y)
+            simpa using this)
         simpa using this)
-      simpa using this)
   have hTs : ∀ u v, inner ℝ u (T v) = inner ℝ (T u) v := by
     intro u v
     rw [← hT, hsym, hT, real_inner_comm]
@@ -281,9 +286,12 @@ theorem UpperTheory.Reformulated.B.Yzb9.existsUnique_of_equiv :
   have hfm' : Measurable f.symm := hf'.measurable
   refine ⟨m.map f.symm, ?_, ?_⟩
   · have h1 := UpperTheory.Reformulated.B.Yzb9.selfDual_map f.symm hf' hf m _ hm
-    have h2 : (fun (x y : V) => Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑(l x y) : ℂ))) =
-        fun x y => Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I *
-          (↑(inner ℝ (f.symm.symm x) (T (f.symm.symm y))) : ℂ)) := by
+    have h2
+        : (fun (x y : V) => Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑(l x y) : ℂ)))
+          = fun x y =>
+            Complex.exp
+              ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I
+                * (↑(inner ℝ (f.symm.symm x) (T (f.symm.symm y))) : ℂ)) := by
       funext x y
       rw [← hT]
       simp
@@ -292,9 +300,11 @@ theorem UpperTheory.Reformulated.B.Yzb9.existsUnique_of_equiv :
     exact h1
   · intro μ hμ
     have h1 := UpperTheory.Reformulated.B.Yzb9.selfDual_map f hf hf' μ _ hμ
-    have h2 : (fun u v => Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑(inner ℝ u (T v)) : ℂ))) =
-        fun u v => Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I *
-          (↑(l (f.symm u) (f.symm v)) : ℂ)) := by
+    have h2
+        : (fun u v => Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑(inner ℝ u (T v)) : ℂ)))
+          = fun u v =>
+            Complex.exp
+              ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑(l (f.symm u) (f.symm v)) : ℂ)) := by
       funext u v
       rw [← hT]
     have h3 : μ.map f = m := huniq _ (by rw [h2]; exact h1)

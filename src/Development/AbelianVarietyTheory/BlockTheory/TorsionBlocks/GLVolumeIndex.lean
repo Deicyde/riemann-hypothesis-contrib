@@ -20,38 +20,42 @@ variable {O : Type} [CommRing O] [IsLocalRing O]
 abbrev red {m n : Type} (A : Matrix m n O) : Matrix m n (IsLocalRing.ResidueField O) :=
   A.map (IsLocalRing.residue O)
 
-def princ (O : Type) [CommRing O] [IsLocalRing O] (n : Type) [Fintype n] [DecidableEq n] :
-    Subgroup (GL n O) :=
+def princ (O : Type) [CommRing O] [IsLocalRing O] (n : Type) [Fintype n] [DecidableEq n]
+    : Subgroup (GL n O) :=
   (Matrix.GeneralLinearGroup.map (n := n) (IsLocalRing.residue O)).ker
 
-theorem isUnit_of_red {n : Type} [Fintype n] [DecidableEq n] (A : Matrix n n O)
-    (h : IsUnit (red A)) : IsUnit A := by
+theorem isUnit_of_red {n : Type} [Fintype n] [DecidableEq n] (A : Matrix n n O) (h : IsUnit (red A))
+    : IsUnit A := by
   rw [Matrix.isUnit_iff_isUnit_det] at h ⊢
   have e : (red A).det = IsLocalRing.residue O A.det := (RingHom.map_det _ _).symm
   rw [e] at h
   exact (IsLocalRing.residue_ne_zero_iff_isUnit _).1 h.ne_zero
 
-theorem red_mul {l m n : Type} [Fintype m] (A : Matrix l m O) (B : Matrix m n O) :
-    red (A * B) = red A * red B := by
+theorem red_mul {l m n : Type} [Fintype m] (A : Matrix l m O) (B : Matrix m n O)
+    : red (A * B) = red A * red B := by
   exact Matrix.map_mul
 
 theorem red_add {m n : Type} (A B : Matrix m n O) : red (A + B) = red A + red B := by
   ext i j
   simp [red]
 
-theorem red_eq_zero {m n : Type} (A : Matrix m n O) :
-    red A = 0 ↔ ∀ i j, A i j ∈ IsLocalRing.maximalIdeal O := by
+theorem red_eq_zero {m n : Type} (A : Matrix m n O)
+    : red A = 0 ↔ ∀ i j, A i j ∈ IsLocalRing.maximalIdeal O := by
   rw [← Matrix.ext_iff]
   simp [red, IsLocalRing.residue_eq_zero_iff]
 
-theorem exists_mem_of_red {n : Type} [Fintype n] [DecidableEq n] {J : Subgroup (GL n O)}
-    (hJ : princ O n ≤ J) {k : GL n O} (hk : k ∈ J) {A : Matrix n n O}
-    (h : red A = red (k : Matrix n n O)) : ∃ k' ∈ J, (k' : Matrix n n O) = A := by
+theorem exists_mem_of_red
+    {n : Type} [Fintype n] [DecidableEq n]
+    {J : Subgroup (GL n O)} (hJ : princ O n ≤ J)
+    {k : GL n O} (hk : k ∈ J)
+    {A : Matrix n n O} (h : red A = red (k : Matrix n n O))
+    : ∃ k' ∈ J, (k' : Matrix n n O) = A := by
   have hred1 : red (((k⁻¹ : GL n O) : Matrix n n O) * A) = 1 := by
     rw [red_mul, h, ← red_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one]
     ext i j
     simp [red, Matrix.one_apply]
-  have hu : IsUnit (((k⁻¹ : GL n O) : Matrix n n O) * A) := isUnit_of_red _ (by rw [hred1]; exact isUnit_one)
+  have hu : IsUnit (((k⁻¹ : GL n O) : Matrix n n O) * A) :=
+    isUnit_of_red _ (by rw [hred1]; exact isUnit_one)
   have hup : hu.unit ∈ princ O n := by
     rw [princ, MonoidHom.mem_ker]
     ext1
@@ -59,18 +63,20 @@ theorem exists_mem_of_red {n : Type} [Fintype n] [DecidableEq n] {J : Subgroup (
   refine ⟨k * hu.unit, J.mul_mem hk (hJ hup), ?_⟩
   simp [← Matrix.mul_assoc]
 
-theorem blocks_mul {a t : Type} [Fintype a] [Fintype t] (g h : Matrix (a ⊕ t) (a ⊕ t) O) :
-    (g * h).toBlocks₁₁ = g.toBlocks₁₁ * h.toBlocks₁₁ + g.toBlocks₁₂ * h.toBlocks₂₁ ∧
-    (g * h).toBlocks₂₁ = g.toBlocks₂₁ * h.toBlocks₁₁ + g.toBlocks₂₂ * h.toBlocks₂₁ ∧
-    (g * h).toBlocks₂₂ = g.toBlocks₂₁ * h.toBlocks₁₂ + g.toBlocks₂₂ * h.toBlocks₂₂ := by
-  refine ⟨?_, ?_, ?_⟩ <;> ext i j <;>
-    simp [toBlocks₁₁, toBlocks₁₂, toBlocks₂₁, toBlocks₂₂, Matrix.mul_apply, Fintype.sum_sum_type]
+theorem blocks_mul {a t : Type} [Fintype a] [Fintype t] (g h : Matrix (a ⊕ t) (a ⊕ t) O)
+    : (g * h).toBlocks₁₁ = g.toBlocks₁₁ * h.toBlocks₁₁ + g.toBlocks₁₂ * h.toBlocks₂₁
+      ∧ (g * h).toBlocks₂₁ = g.toBlocks₂₁ * h.toBlocks₁₁ + g.toBlocks₂₂ * h.toBlocks₂₁
+      ∧ (g * h).toBlocks₂₂ = g.toBlocks₂₁ * h.toBlocks₁₂ + g.toBlocks₂₂ * h.toBlocks₂₂ := by
+  refine ⟨?_, ?_, ?_⟩ <;> ext i j
+    <;> simp [toBlocks₁₁, toBlocks₁₂, toBlocks₂₁, toBlocks₂₂, Matrix.mul_apply,
+      Fintype.sum_sum_type]
 
-def level {a : ℕ} (t : ℕ) (J' : Subgroup (GL (Fin a) O)) (hJ : princ O (Fin a) ≤ J') :
-    Subgroup (GL (Fin a ⊕ Fin t) O) where
-  carrier := {g | (∃ k ∈ J', (k : Matrix (Fin a) (Fin a) O) = g.val.toBlocks₁₁) ∧
-    (∀ i j, g.val.toBlocks₂₁ i j ∈ IsLocalRing.maximalIdeal O) ∧
-    ∃ d : GL (Fin t) O, (d : Matrix (Fin t) (Fin t) O) = g.val.toBlocks₂₂}
+def level {a : ℕ} (t : ℕ) (J' : Subgroup (GL (Fin a) O)) (hJ : princ O (Fin a) ≤ J')
+    : Subgroup (GL (Fin a ⊕ Fin t) O) where
+  carrier :=
+    {g | (∃ k ∈ J', (k : Matrix (Fin a) (Fin a) O) = g.val.toBlocks₁₁) ∧
+      (∀ i j, g.val.toBlocks₂₁ i j ∈ IsLocalRing.maximalIdeal O) ∧
+      ∃ d : GL (Fin t) O, (d : Matrix (Fin t) (Fin t) O) = g.val.toBlocks₂₂}
   one_mem' := by
     refine ⟨⟨1, J'.one_mem, ?_⟩, ?_, ⟨1, ?_⟩⟩
     · ext i j; simp [toBlocks₁₁, Matrix.one_apply]
@@ -106,12 +112,13 @@ def level {a : ℕ} (t : ℕ) (J' : Subgroup (GL (Fin a) O)) (hJ : princ O (Fin 
       have := congrArg (fun X => red (d⁻¹).val * red X) b2
       simp only [red_add, red_mul (toBlocks₂₁ _), c1, Matrix.zero_mul, zero_add] at this
       rw [← red_mul, ← red_mul, ← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul] at this
-      rw [← this]; simp [red]
+      rw [← this]
+      simp [red]
     refine ⟨exists_mem_of_red hJ (J'.inv_mem hk) ?_, (red_eq_zero _).1 c2, ?_⟩
     · have := congrArg (fun X => red (k⁻¹).val * red X) b1
       simp only [red_add, red_mul _ (toBlocks₂₁ _), c2, Matrix.mul_zero, add_zero] at this
-      rw [← red_mul, ← red_mul, ← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul,
-        Matrix.mul_one] at this
+      rw [← red_mul, ← red_mul, ← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul, Matrix.mul_one]
+        at this
       exact this.symm
     · apply isUnit_of_red
       have := congrArg red b3
@@ -143,7 +150,8 @@ variable [MeasurableSpace F]
 def volAdd (ν : Measure F) (m n : Type) [Fintype m] [Fintype n] : Measure (m → n → F) :=
   Measure.pi fun _ : m => Measure.pi fun _ : n => ν
 
-def volGroup (ν : Measure F) {n : Type} [Fintype n] [DecidableEq n] (H : Subgroup (GL n 𝒪[F])) : ℝ :=
+def volGroup (ν : Measure F) {n : Type} [Fintype n] [DecidableEq n] (H : Subgroup (GL n 𝒪[F]))
+    : ℝ :=
   (volAdd ν n n).real (groupSet H)
 
 def VolumeOfGL (ν : Measure F) : Prop :=

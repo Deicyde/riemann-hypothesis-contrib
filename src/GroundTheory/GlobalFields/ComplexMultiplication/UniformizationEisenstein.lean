@@ -20,10 +20,10 @@ def weierstrassCoeff {R : Type*} [CommRing R] [Algebra ℚ R] (a b : R) : ℕ �
   | 0 => 0
   | 1 => (1 / 20 : ℚ) • a
   | 2 => (1 / 28 : ℚ) • b
-  | n + 3 => (3 / ((2 * ((n : ℚ) + 3) + 3) * ((n : ℚ) + 1)) : ℚ) •
-      ∑ i : Fin (n + 1), weierstrassCoeff a b (i + 1) * weierstrassCoeff a b (n + 1 - i)
-decreasing_by
-  all_goals (have := i.isLt; omega)
+  | n + 3 =>
+    (3 / ((2 * ((n : ℚ) + 3) + 3) * ((n : ℚ) + 1)) : ℚ)
+      • ∑ i : Fin (n + 1), weierstrassCoeff a b (i + 1) * weierstrassCoeff a b (n + 1 - i)
+decreasing_by all_goals (have := i.isLt; omega)
 
 section Recursion
 
@@ -43,8 +43,8 @@ lemma weierstrassCoeff_add_three (a b : R) (n : ℕ) :
       ∑ i : Fin (n + 1), weierstrassCoeff a b (i + 1) * weierstrassCoeff a b (n + 1 - i) := by
   rw [weierstrassCoeff]
 
-theorem weierstrassCoeff_scale (t a b : R) (n : ℕ) :
-    weierstrassCoeff (t ^ 4 * a) (t ^ 6 * b) n = t ^ (2 * n + 2) * weierstrassCoeff a b n := by
+theorem weierstrassCoeff_scale (t a b : R) (n : ℕ)
+    : weierstrassCoeff (t ^ 4 * a) (t ^ 6 * b) n = t ^ (2 * n + 2) * weierstrassCoeff a b n := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     match n, ih with
@@ -67,7 +67,6 @@ theorem weierstrassCoeff_scale (t a b : R) (n : ℕ) :
 end Recursion
 
 variable {L : PeriodPair}
-
 
 variable (L) in
 def weierstrassLaurentCoeff (j : ℕ) : ℂ := if j = 0 then 0 else (j + 1) * L.G (j + 2)
@@ -209,8 +208,8 @@ lemma weierstrassLaurentCoeff_recursion (n : ℕ) :
   apply mul_left_cancel₀ (mul_ne_zero hK hf)
   linear_combination e
 
-theorem hasSum_weierstrassP_laurent {z : ℂ} (hz : ∀ l : L.lattice, (l : ℂ) ≠ 0 → ‖z‖ < ‖(l : ℂ)‖) :
-    HasSum (fun j ↦ weierstrassLaurentCoeff (L := L) j * z ^ j) (℘[L] z - 1 / z ^ 2) := by
+theorem hasSum_weierstrassP_laurent {z : ℂ} (hz : ∀ l : L.lattice, (l : ℂ) ≠ 0 → ‖z‖ < ‖(l : ℂ)‖)
+    : HasSum (fun j ↦ weierstrassLaurentCoeff (L := L) j * z ^ j) (℘[L] z - 1 / z ^ 2) := by
   have h := L.weierstrassPExceptSeries_hasSum 0 z 0 (fun l hl ↦ by simpa using hz l hl)
   rw [weierstrassP_eq_except_zero z, add_sub_cancel_right]
   convert h using 2 with j
@@ -226,8 +225,8 @@ lemma weierstrassLaurentCoeff_two_mul {n : ℕ} (hn : n ≠ 0) :
   push_cast
   ring
 
-theorem weierstrassLaurentCoeff_eq (n : ℕ) (hn : n ≠ 0) :
-    weierstrassLaurentCoeff (L := L) (2 * n) = weierstrassCoeff L.g₂ L.g₃ n := by
+theorem weierstrassLaurentCoeff_eq (n : ℕ) (hn : n ≠ 0)
+    : weierstrassLaurentCoeff (L := L) (2 * n) = weierstrassCoeff L.g₂ L.g₃ n := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     match n, ih, hn with
@@ -243,9 +242,11 @@ theorem weierstrassLaurentCoeff_eq (n : ℕ) (hn : n ≠ 0) :
       ring
     | n + 3, ih, _ =>
       have hrec := weierstrassLaurentCoeff_recursion (L := L) n
-      have hsum : ∑ i : Fin (n + 1), weierstrassLaurentCoeff (L := L) (2 * ((i : ℕ) + 1)) *
-          weierstrassLaurentCoeff (L := L) (2 * (n + 1 - i)) = ∑ i : Fin (n + 1),
-            weierstrassCoeff L.g₂ L.g₃ ((i : ℕ) + 1) * weierstrassCoeff L.g₂ L.g₃ (n + 1 - i) :=
+      have hsum
+          : ∑ i : Fin (n + 1), weierstrassLaurentCoeff (L := L) (2 * ((i : ℕ) + 1)) *
+              weierstrassLaurentCoeff (L := L) (2 * (n + 1 - i))
+            = ∑ i : Fin (n + 1),
+              weierstrassCoeff L.g₂ L.g₃ ((i : ℕ) + 1) * weierstrassCoeff L.g₂ L.g₃ (n + 1 - i) :=
         Finset.sum_congr rfl fun i _ ↦ by
           have := i.isLt
           rw [ih _ (by omega) (by omega), ih _ (by omega) (by omega)]
@@ -254,8 +255,7 @@ theorem weierstrassLaurentCoeff_eq (n : ℕ) (hn : n ≠ 0) :
       have hK : ((2 * n + 6 : ℂ) * (2 * n + 5) - 12) ≠ 0 := by
         have : ((2 * n + 6 : ℂ) * (2 * n + 5) - 12) = 2 * (2 * n + 9) * (n + 1) := by ring
         rw [this]
-        have : ((2 * (2 * n + 9) * (n + 1) : ℕ) : ℂ) ≠ 0 :=
-          Nat.cast_ne_zero.2 (by positivity)
+        have : ((2 * (2 * n + 9) * (n + 1) : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (by positivity)
         exact_mod_cast this
       apply mul_left_cancel₀ hK
       rw [hrec]
@@ -267,20 +267,21 @@ theorem weierstrassLaurentCoeff_eq (n : ℕ) (hn : n ≠ 0) :
       field_simp
       ring
 
-theorem mul_G_eq_weierstrassCoeff {n : ℕ} (hn : n ≠ 0) :
-    (2 * n + 1) * L.G (2 * n + 2) = weierstrassCoeff L.g₂ L.g₃ n := by
+theorem mul_G_eq_weierstrassCoeff {n : ℕ} (hn : n ≠ 0)
+    : (2 * n + 1) * L.G (2 * n + 2) = weierstrassCoeff L.g₂ L.g₃ n := by
   rw [← weierstrassLaurentCoeff_two_mul hn, weierstrassLaurentCoeff_eq n hn]
 
-theorem G_eq_weierstrassCoeff_div {n : ℕ} (hn : n ≠ 0) :
-    L.G (2 * n + 2) = weierstrassCoeff L.g₂ L.g₃ n / (2 * n + 1) := by
+theorem G_eq_weierstrassCoeff_div {n : ℕ} (hn : n ≠ 0)
+    : L.G (2 * n + 2) = weierstrassCoeff L.g₂ L.g₃ n / (2 * n + 1) := by
   have h : (2 * (n : ℂ) + 1) ≠ 0 := by
     have : ((2 * n + 1 : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
     exact_mod_cast this
   rw [← mul_G_eq_weierstrassCoeff hn, mul_div_cancel_left₀ _ h]
 
-theorem G_eq_of_g₂_g₃ {L' : PeriodPair} {t : ℂ} (h₂ : L'.g₂ = t ^ 4 * L.g₂)
-    (h₃ : L'.g₃ = t ^ 6 * L.g₃) {k : ℕ} (hk : 2 ≤ k) :
-    L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k) := by
+theorem G_eq_of_g₂_g₃
+    {L' : PeriodPair} {t : ℂ} (h₂ : L'.g₂ = t ^ 4 * L.g₂) (h₃ : L'.g₃ = t ^ 6 * L.g₃)
+    {k : ℕ} (hk : 2 ≤ k)
+    : L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k) := by
   obtain ⟨n, rfl⟩ : ∃ n, k = n + 1 := ⟨k - 1, by omega⟩
   have hn : n ≠ 0 := by omega
   rw [show 2 * (n + 1) = 2 * n + 2 by ring, G_eq_weierstrassCoeff_div hn,

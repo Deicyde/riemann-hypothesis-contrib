@@ -15,9 +15,10 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.
 
 namespace GlobalTheory.ChevalleyUnitsProof
 
-theorem normFacts (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (b : ℕ)
-    (hb : ((b : ℕ) : 𝓞 F) ∉ v.asIdeal) :
-    0 < normV v ∧ ((normV v : ℕ) : 𝓞 F) ∈ v.asIdeal ∧ (normV v).Coprime b := by
+theorem normFacts
+    (F : Type) [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (b : ℕ) (hb : ((b : ℕ) : 𝓞 F) ∉ v.asIdeal)
+    : 0 < normV v ∧ ((normV v : ℕ) : 𝓞 F) ∈ v.asIdeal ∧ (normV v).Coprime b := by
   classical
   have hN : normV v = Ideal.absNorm v.asIdeal := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]; rfl
@@ -33,8 +34,7 @@ theorem normFacts (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (�
     haveI := hp
     haveI : Fact p.Prime := ⟨CharP.char_is_prime (𝓞 F ⧸ v.asIdeal) p⟩
     obtain ⟨n, hp', hcard⟩ := FiniteField.card (𝓞 F ⧸ v.asIdeal) p
-    have hNv : normV v = p ^ (n : ℕ) := by
-      unfold normV; rw [Nat.card_eq_fintype_card, hcard]
+    have hNv : normV v = p ^ (n : ℕ) := by unfold normV; rw [Nat.card_eq_fintype_card, hcard]
     apply Nat.coprime_of_dvd
     intro q hq hqN hqb
     rw [hNv] at hqN
@@ -47,8 +47,10 @@ theorem normFacts (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (�
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
     exact CharP.cast_eq_zero _ _
 
-theorem core (E : Type) [Field E] [NumberField E] (l r b : ℕ) (hl : l.Prime) (hb : 0 < b) :
-    ∃ a : ℕ, 0 < a ∧ a.Coprime b ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 → ∃ v : (𝓞 E)ˣ, u = v ^ (l ^ r) := by
+theorem core (E : Type) [Field E] [NumberField E] (l r b : ℕ) (hl : l.Prime) (hb : 0 < b)
+    : ∃ a : ℕ,
+      0 < a ∧ a.Coprime b
+        ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 → ∃ v : (𝓞 E)ˣ, u = v ^ (l ^ r) := by
   classical
   have hm : 0 < l ^ r := pow_pos hl.pos r
   set m := l ^ r with hmdef
@@ -64,8 +66,10 @@ theorem core (E : Type) [Field E] [NumberField E] (l r b : ℕ) (hl : l.Prime) (
   haveI : IsAlgClosure K Ω := ⟨inferInstance, inferInstance⟩
   let ζK : K := ⟨ζ, IntermediateField.mem_adjoin_simple_self E ζ⟩
   have hζK : IsPrimitiveRoot ζK M :=
-    (show IsPrimitiveRoot (algebraMap K Ω ζK) M from hζ).of_map_of_injective (algebraMap K Ω).injective
-  obtain ⟨L, hLfin, hLgal, hLroots⟩ := GlobalTheory.T.exists_finite_galois_contains_roots_of_units E K Ω M hM0 ⟨ζK, hζK⟩
+    (show IsPrimitiveRoot (algebraMap K Ω ζK) M from hζ).of_map_of_injective
+      (algebraMap K Ω).injective
+  obtain ⟨L, hLfin, hLgal, hLroots⟩ :=
+    GlobalTheory.T.exists_finite_galois_contains_roots_of_units E K Ω M hM0 ⟨ζK, hζK⟩
   let S : Set (HeightOneSpectrum (𝓞 K)) := {v | ((M * b : ℕ) : 𝓞 K) ∈ v.asIdeal}
   have hS : S.Finite := by
     have hne : Ideal.span {((M * b : ℕ) : 𝓞 K)} ≠ 0 := by
@@ -74,10 +78,15 @@ theorem core (E : Type) [Field E] [NumberField E] (l r b : ℕ) (hl : l.Prime) (
     refine (Ideal.finite_factors hne).subset ?_
     intro v hv
     exact Ideal.dvd_span_singleton.2 hv
-  have hchoice : ∀ g : L ≃ₐ[K] L, ∃ v : HeightOneSpectrum (𝓞 K), v ∉ S ∧ ∃ B : ValuationSubring Ω,
-      IsPlaceOver B v ∧ ∃ σ : G K Ω, IsFrob B (normV v) σ ∧ AlgEquiv.restrictNormalHom L σ = g := by
+  have hchoice
+      : ∀ g : L ≃ₐ[K] L, ∃ v : HeightOneSpectrum (𝓞 K),
+        v ∉ S
+          ∧ ∃ B : ValuationSubring Ω,
+            IsPlaceOver B v
+              ∧ ∃ σ : G K Ω, IsFrob B (normV v) σ ∧ AlgEquiv.restrictNormalHom L σ = g := by
     intro g
-    obtain ⟨v, hv, -, B, hB, -, σ, hσ, hg⟩ := GlobalTheory.Published.chebotarevDegreeOne' K Ω L g S hS
+    obtain ⟨v, hv, -, B, hB, -, σ, hσ, hg⟩ :=
+      GlobalTheory.Published.chebotarevDegreeOne' K Ω L g S hS
     exact ⟨v, hv, B, hB, σ, hσ, hg⟩
   choose v hvS B hB σ hσ hg using hchoice
   have hvb : ∀ g, ((b : ℕ) : 𝓞 K) ∉ (v g).asIdeal := fun g h =>
@@ -106,11 +115,12 @@ theorem core (E : Type) [Field E] [NumberField E] (l r b : ℕ) (hl : l.Prime) (
     obtain ⟨e, he⟩ := hdvd
     rw [he, Nat.cast_mul]
     exact Ideal.mul_mem_right _ _ (hnf g).2.1
-  have hwx : w ^ M = algebraMap K Ω (x : K) := by
-    rw [hw]; rfl
+  have hwx : w ^ M = algebraMap K Ω (x : K) := by rw [hw]; rfl
   have hfix : ∀ g : L ≃ₐ[K] L, g ⟨w, hwL⟩ = ⟨w, hwL⟩ := by
     intro g
-    have h1 := GlobalTheory.T.isFrob_fixes_root_of_one_mod_place K Ω M ζK hζK (v g) (hvM g) (B g) (hB g) (σ g) (hσ g) x (hx1 g) w hwx
+    have h1 :=
+      GlobalTheory.T.isFrob_fixes_root_of_one_mod_place K Ω M ζK hζK (v g) (hvM g) (B g) (hB g)
+        (σ g) (hσ g) x (hx1 g) w hwx
     rw [← hg g]
     apply Subtype.ext
     rw [AlgEquiv.restrictNormalHom_apply]
@@ -119,34 +129,49 @@ theorem core (E : Type) [Field E] [NumberField E] (l r b : ℕ) (hl : l.Prime) (
   obtain ⟨k, hk⟩ := IntermediateField.mem_bot.1 hwK
   have hwK' : w ∈ K := by
     have : algebraMap K Ω k = w := congrArg Subtype.val hk
-    rw [← this]; exact k.2
+    rw [← this]
+    exact k.2
   obtain ⟨y, hy⟩ := hD Ω ζ hζ _ w hwK' hw
   have hu0 : ((u : 𝓞 E) : E) ≠ 0 := by
     intro h0
     have : ((u : 𝓞 E)) = 0 := RingOfIntegers.ext (by simpa using h0)
     exact u.ne_zero this
-  have hy0 : y ≠ 0 := by
-    rintro rfl; exact hu0 (by rw [← hy, zero_pow hm.ne'])
+  have hy0 : y ≠ 0 := by rintro rfl; exact hu0 (by rw [← hy, zero_pow hm.ne'])
   have hyi : IsIntegral ℤ y := IsIntegral.of_pow hm (by rw [hy]; exact (u : 𝓞 E).2)
-  have hyi' : IsIntegral ℤ y⁻¹ := IsIntegral.of_pow hm (by
-    rw [inv_pow, hy]
-    have : (((u⁻¹ : (𝓞 E)ˣ) : 𝓞 E) : E) = ((u : 𝓞 E) : E)⁻¹ := by
-      apply eq_inv_of_mul_eq_one_left
-      have h3 := congrArg (fun t : 𝓞 E => (t : E)) u.inv_mul
-      simpa using h3
-    rw [← this]; exact ((u⁻¹ : (𝓞 E)ˣ) : 𝓞 E).2)
-  refine ⟨⟨⟨y, hyi⟩, ⟨y⁻¹, hyi'⟩, RingOfIntegers.ext (by change y * y⁻¹ = 1; exact mul_inv_cancel₀ hy0), RingOfIntegers.ext (by change y⁻¹ * y = 1; exact inv_mul_cancel₀ hy0)⟩, ?_⟩
+  have hyi' : IsIntegral ℤ y⁻¹ :=
+    IsIntegral.of_pow hm (by
+      rw [inv_pow, hy]
+      have : (((u⁻¹ : (𝓞 E)ˣ) : 𝓞 E) : E) = ((u : 𝓞 E) : E)⁻¹ := by
+        apply eq_inv_of_mul_eq_one_left
+        have h3 := congrArg (fun t : 𝓞 E => (t : E)) u.inv_mul
+        simpa using h3
+      rw [← this]
+      exact ((u⁻¹ : (𝓞 E)ˣ) : 𝓞 E).2)
+  refine ⟨
+    ⟨
+      ⟨y, hyi⟩,
+      ⟨y⁻¹, hyi'⟩,
+      RingOfIntegers.ext (by change y * y⁻¹ = 1; exact mul_inv_cancel₀ hy0),
+      RingOfIntegers.ext (by change y⁻¹ * y = 1; exact inv_mul_cancel₀ hy0)
+    ⟩,
+    ?_
+  ⟩
   apply Units.ext
   apply RingOfIntegers.ext
   rw [Units.val_pow_eq_pow_val]
   change ((u : 𝓞 E) : E) = y ^ m
   rw [hy]
 
-theorem combine (E : Type) [Field E] [NumberField E] (b m₁ m₂ : ℕ) (hcop : m₁.Coprime m₂)
-    (h₁ : ∃ a : ℕ, 0 < a ∧ a.Coprime b ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 → ∃ v : (𝓞 E)ˣ, u = v ^ m₁)
-    (h₂ : ∃ a : ℕ, 0 < a ∧ a.Coprime b ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 → ∃ v : (𝓞 E)ˣ, u = v ^ m₂) :
-    ∃ a : ℕ, 0 < a ∧ a.Coprime b ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 →
-      ∃ v : (𝓞 E)ˣ, u = v ^ (m₁ * m₂) := by
+theorem combine
+    (E : Type) [Field E] [NumberField E]
+    (b m₁ m₂ : ℕ) (hcop : m₁.Coprime m₂)
+    (h₁ : ∃ a : ℕ,
+      0 < a ∧ a.Coprime b ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 → ∃ v : (𝓞 E)ˣ, u = v ^ m₁)
+    (h₂ : ∃ a : ℕ,
+      0 < a ∧ a.Coprime b ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 → ∃ v : (𝓞 E)ˣ, u = v ^ m₂)
+    : ∃ a : ℕ,
+      0 < a ∧ a.Coprime b
+        ∧ ∀ u : (𝓞 E)ˣ, (a : 𝓞 E) ∣ (u : 𝓞 E) - 1 → ∃ v : (𝓞 E)ˣ, u = v ^ (m₁ * m₂) := by
   obtain ⟨a₁, ha₁, hc₁, hu₁⟩ := h₁
   obtain ⟨a₂, ha₂, hc₂, hu₂⟩ := h₂
   refine ⟨a₁ * a₂, Nat.mul_pos ha₁ ha₂, Nat.Coprime.mul_left hc₁ hc₂, ?_⟩
@@ -159,16 +184,22 @@ theorem combine (E : Type) [Field E] [NumberField E] (b m₁ m₂ : ℕ) (hcop :
   set t := Nat.gcdB m₁ m₂
   have hg : ((1 : ℕ) : ℤ) = (m₁ : ℤ) * s + (m₂ : ℤ) * t := by
     rw [← hcop.gcd_eq_one]; exact Nat.gcd_eq_gcd_ab m₁ m₂
-  have key : u = u ^ ((m₁ : ℤ) * s + (m₂ : ℤ) * t) := by
-    rw [← hg]; simp
+  have key : u = u ^ ((m₁ : ℤ) * s + (m₂ : ℤ) * t) := by rw [← hg]; simp
   have e1 : u ^ ((m₁ : ℤ) * s) = v₂ ^ (s * ((m₁ * m₂ : ℕ) : ℤ)) := by
     conv_lhs => rw [hv₂]
-    rw [← zpow_natCast, ← zpow_mul]; congr 1; push_cast; ring
+    rw [← zpow_natCast, ← zpow_mul]
+    congr 1
+    push_cast
+    ring
   have e2 : u ^ ((m₂ : ℤ) * t) = v₁ ^ (t * ((m₁ * m₂ : ℕ) : ℤ)) := by
     conv_lhs => rw [hv₁]
-    rw [← zpow_natCast, ← zpow_mul]; congr 1; push_cast; ring
+    rw [← zpow_natCast, ← zpow_mul]
+    congr 1
+    push_cast
+    ring
   refine ⟨v₂ ^ s * v₁ ^ t, ?_⟩
-  calc u = u ^ ((m₁ : ℤ) * s + (m₂ : ℤ) * t) := key
+  calc
+    u = u ^ ((m₁ : ℤ) * s + (m₂ : ℤ) * t) := key
     _ = u ^ ((m₁ : ℤ) * s) * u ^ ((m₂ : ℤ) * t) := zpow_add _ _ _
     _ = (v₂ ^ s * v₁ ^ t) ^ (m₁ * m₂) := by
       rw [e1, e2, zpow_mul, zpow_mul, ← mul_zpow, zpow_natCast]
@@ -181,6 +212,7 @@ theorem GlobalTheory.Published.chevalleyUnits' : GlobalTheory.Published.Chevalle
   | prime_pow p n hp hn => exact GlobalTheory.ChevalleyUnitsProof.core E p n b hp hb
   | zero => exact absurd hm (lt_irrefl 0)
   | one => exact ⟨1, one_pos, Nat.coprime_one_left b, fun u _ => ⟨u, (pow_one u).symm⟩⟩
-  | coprime a b' ha hb' hab iha ihb => exact GlobalTheory.ChevalleyUnitsProof.combine E b a b' hab (iha (by omega)) (ihb (by omega))
+  | coprime a b' ha hb' hab iha ihb =>
+    exact GlobalTheory.ChevalleyUnitsProof.combine E b a b' hab (iha (by omega)) (ihb (by omega))
 
 end

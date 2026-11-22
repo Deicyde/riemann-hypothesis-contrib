@@ -17,9 +17,11 @@ structure IsCL (O R : Type) [CommRing O] [CommRing R] [Algebra O R] [IsLocalRing
   isLocalHom : IsLocalHom (algebraMap O R)
   res_fin : Module.Finite O (ResidueField R)
 
-theorem IsCL.of_isCO (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [Alg.IsCO O R] :
-    IsCL O R := by
-  refine ⟨inferInstance, UpperTheory.V.Alg.IsCO.complete (O := O), UpperTheory.V.Alg.IsCO.isLocalHom, ?_⟩
+theorem IsCL.of_isCO
+    (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [Alg.IsCO O R]
+    : IsCL O R := by
+  refine
+    ⟨inferInstance, UpperTheory.V.Alg.IsCO.complete (O := O), UpperTheory.V.Alg.IsCO.isLocalHom, ?_⟩
   refine Module.Finite.of_surjective (Algebra.linearMap O (ResidueField R)) ?_
   intro y
   obtain ⟨r, rfl⟩ := IsLocalRing.residue_surjective y
@@ -41,8 +43,9 @@ def dimAt (I : Ideal C) : WithBot ℕ∞ :=
 
 end Cpl
 
-structure IsCplAt {C : Type} [CommRing C] (x : Ideal C) (R : Type) [CommRing R] [Algebra C R] [IsLocalRing R] :
-    Prop where
+structure IsCplAt
+    {C : Type} [CommRing C] (x : Ideal C) (R : Type) [CommRing R] [Algebra C R] [IsLocalRing R]
+    : Prop where
   noeth : IsNoetherianRing R
   complete : IsAdicComplete (maximalIdeal R) R
   comap_pow : ∀ n : ℕ, (maximalIdeal R ^ n).comap (algebraMap C R) = x ^ n

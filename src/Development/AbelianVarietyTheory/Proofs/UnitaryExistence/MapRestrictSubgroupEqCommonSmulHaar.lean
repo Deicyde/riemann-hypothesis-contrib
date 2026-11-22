@@ -9,14 +9,16 @@ open scoped ENNReal
 
 namespace GlobalTheory
 
-theorem map_restrict_subgroup_eq_smul_haar (G : Type) [Group G] [MeasurableSpace G]
-    [MeasurableMul G] (μ : Measure G) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
+theorem map_restrict_subgroup_eq_smul_haar
+    (G : Type) [Group G] [MeasurableSpace G] [MeasurableMul G]
+    (μ : Measure G) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
     (H : Subgroup G) (hH : MeasurableSet (H : Set G)) (hμ : μ H ≠ 0)
     (R : Type) [Group R] [TopologicalSpace R] [IsTopologicalGroup R] [T2Space R]
     [LocallyCompactSpace R] [SecondCountableTopology R] [MeasurableSpace R] [BorelSpace R]
-    (ν : Measure R) [ν.IsHaarMeasure] (ψ : G →* R) (hψ : Measurable ψ)
-    (hs : ∀ t, ∃ h ∈ H, ψ h = t) (hf : ∀ t, ∃ W ∈ 𝓝 t, μ ((H : Set G) ∩ ψ ⁻¹' W) ≠ ⊤) :
-    ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ⊤ ∧ (μ.restrict H).map ψ = κ • ν ∧ ν.IsMulRightInvariant := by
+    (ν : Measure R) [ν.IsHaarMeasure]
+    (ψ : G →* R) (hψ : Measurable ψ) (hs : ∀ t, ∃ h ∈ H, ψ h = t)
+    (hf : ∀ t, ∃ W ∈ 𝓝 t, μ ((H : Set G) ∩ ψ ⁻¹' W) ≠ ⊤)
+    : ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ⊤ ∧ (μ.restrict H).map ψ = κ • ν ∧ ν.IsMulRightInvariant := by
   set m : Measure R := (μ.restrict H).map ψ with hm
   have happ : ∀ s, MeasurableSet s → m s = μ (ψ ⁻¹' s ∩ H) := by
     intro s hs'
@@ -66,7 +68,21 @@ theorem map_restrict_subgroup_eq_smul_haar (G : Type) [Group G] [MeasurableSpace
   rw [this]
   infer_instance
 
-theorem map_restrict_subgroup_eq_common_smul_haar : ∀ (G : Type) [Group G] [MeasurableSpace G] [MeasurableMul G] (μ : Measure G) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant] (H : Subgroup G), MeasurableSet (H : Set G) → μ H ≠ 0 → ∀ (ι : Type) (R : ι → Type) [∀ k, Group (R k)] [∀ k, TopologicalSpace (R k)] [∀ k, IsTopologicalGroup (R k)] [∀ k, T2Space (R k)] [∀ k, LocallyCompactSpace (R k)] [∀ k, SecondCountableTopology (R k)] [∀ k, MeasurableSpace (R k)] [∀ k, BorelSpace (R k)] (ν : ∀ k, Measure (R k)) [∀ k, (ν k).IsHaarMeasure] (ψ : ∀ k, G →* R k), (∀ k, Measurable (ψ k)) → (∀ k t, ∃ h ∈ H, ψ k h = t) → (∀ k t, ∃ W ∈ 𝓝 t, μ ((H : Set G) ∩ ψ k ⁻¹' W) ≠ ⊤) → (∀ k k', ∃ (e : R k ≃ᵐ R k') (α : R k → R k) (u : R k), MeasurePreserving e (ν k) (ν k') ∧ Measurable α ∧ (∀ g, ψ k' g = e (α (ψ k g))) ∧ ∀ t, α (α t) = u⁻¹ * t * u) → ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ⊤ ∧ ∀ k, (μ.restrict H).map (ψ k) = κ • ν k := by
+theorem map_restrict_subgroup_eq_common_smul_haar
+    : ∀ (G : Type) [Group G] [MeasurableSpace G] [MeasurableMul G] (μ : Measure G)
+        [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant] (H : Subgroup G),
+      MeasurableSet (H : Set G) → μ H ≠ 0
+        → ∀ (ι : Type) (R : ι → Type) [∀ k, Group (R k)] [∀ k, TopologicalSpace (R k)]
+            [∀ k, IsTopologicalGroup (R k)] [∀ k, T2Space (R k)] [∀ k, LocallyCompactSpace (R k)]
+            [∀ k, SecondCountableTopology (R k)] [∀ k, MeasurableSpace (R k)]
+            [∀ k, BorelSpace (R k)] (ν : ∀ k, Measure (R k)) [∀ k, (ν k).IsHaarMeasure]
+            (ψ : ∀ k, G →* R k),
+          (∀ k, Measurable (ψ k)) → (∀ k t, ∃ h ∈ H, ψ k h = t)
+            → (∀ k t, ∃ W ∈ 𝓝 t, μ ((H : Set G) ∩ ψ k ⁻¹' W) ≠ ⊤)
+            → (∀ k k', ∃ (e : R k ≃ᵐ R k') (α : R k → R k) (u : R k),
+              MeasurePreserving e (ν k) (ν k') ∧ Measurable α ∧ (∀ g, ψ k' g = e (α (ψ k g)))
+                ∧ ∀ t, α (α t) = u⁻¹ * t * u)
+            → ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ⊤ ∧ ∀ k, (μ.restrict H).map (ψ k) = κ • ν k := by
   intro G _ _ _ μ _ _ H hH hμ ι R _ _ _ _ _ _ _ _ ν _ ψ hψ hs hf hc
   choose κ h0 htop hκ hR using fun k =>
     map_restrict_subgroup_eq_smul_haar G μ H hH hμ (R k) (ν k) (ψ k) (hψ k) (hs k) (hf k)
@@ -82,7 +98,9 @@ theorem map_restrict_subgroup_eq_common_smul_haar : ∀ (G : Type) [Group G] [Me
       exact hψe g
     have h2 : κ k' • ν k = κ k • (ν k).map α := by
       have := congrArg (Measure.map e.symm) h1
-      rw [Measure.map_smul _ e.symm.measurable.aemeasurable, (he.symm e).map_eq, MeasurableEquiv.map_symm_map] at this
+      rw [Measure.map_smul _ e.symm.measurable.aemeasurable, (he.symm e).map_eq,
+          MeasurableEquiv.map_symm_map]
+        at this
       exact this
     have h3 : ((ν k).map α).map α = ν k := by
       rw [Measure.map_map hα hα]
@@ -96,8 +114,7 @@ theorem map_restrict_subgroup_eq_common_smul_haar : ∀ (G : Type) [Group G] [Me
     have h5 : (κ k' * κ k') • ν k = (κ k * κ k) • ν k := by
       rw [mul_smul, h2, smul_comm, h4, mul_smul]
     obtain ⟨K⟩ : Nonempty (TopologicalSpace.PositiveCompacts (R k)) := inferInstance
-    have hK0 : ν k K ≠ 0 :=
-      (Measure.measure_pos_of_nonempty_interior (ν k) K.interior_nonempty).ne'
+    have hK0 : ν k K ≠ 0 := (Measure.measure_pos_of_nonempty_interior (ν k) K.interior_nonempty).ne'
     have hKt : ν k K ≠ ⊤ := K.isCompact.measure_ne_top
     have h6 := congrArg (fun m : Measure (R k) => m K) h5
     simp only [Measure.smul_apply, smul_eq_mul] at h6

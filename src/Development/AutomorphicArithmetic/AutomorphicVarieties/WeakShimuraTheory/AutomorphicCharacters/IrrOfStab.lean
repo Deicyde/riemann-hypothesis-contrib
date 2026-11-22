@@ -4,17 +4,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-private theorem irr_of_stab {k Γ H : Type} [Field k] [Group Γ] [Group H] (r : Γ →* M4 k) (hr : Irr r)
-    (ρ : H →* GL (Fin 4) k)
-    (h : ∀ g, ∃ (s : H) (t : k), r g = t • (ρ s : Matrix (Fin 4) (Fin 4) k)) : Af.IsIrr ρ := by
+private theorem irr_of_stab
+    {k Γ H : Type} [Field k] [Group Γ] [Group H]
+    (r : Γ →* M4 k) (hr : Irr r)
+    (ρ : H →* GL (Fin 4) k) (h : ∀ g, ∃ (s : H) (t : k), r g = t • (ρ s : Matrix (Fin 4) (Fin 4) k))
+    : Af.IsIrr ρ := by
   refine ⟨top_ne_bot, fun _ _ _ => Submodule.mem_top, fun W _ hW => ?_⟩
   have key : ∀ M : Matrix (Fin 4) (Fin 4) k, ∀ v ∈ W, M.mulVec v ∈ W := by
     intro M
     have hM : M ∈ Submodule.span k (Set.range r) := by
       have h1 : Submodule.span k (Set.range r) = ⊤ := hr
-      rw [h1]; exact Submodule.mem_top
+      rw [h1]
+      exact Submodule.mem_top
     induction hM using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨g, rfl⟩ := hx
@@ -33,14 +38,20 @@ private theorem irr_of_stab {k Γ H : Type} [Field k] [Group Γ] [Group H] (r : 
   have hi' : v i ≠ 0 := hi
   refine eq_top_iff.2 fun w _ => ?_
   have h2 := key (Matrix.of fun a b => if b = i then w a * (v i)⁻¹ else 0) v hv
-  have h3 : (Matrix.of fun a b => if b = i then w a * (v i)⁻¹ else 0 : Matrix (Fin 4) (Fin 4) k).mulVec v = w := by
+  have h3
+      : (Matrix.of fun a b => if b = i then w a * (v i)⁻¹ else 0 : Matrix (Fin 4) (Fin 4) k).mulVec
+          v
+        = w := by
     funext a
-    simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, ite_mul, zero_mul, Finset.sum_ite_eq',
+      Finset.mem_univ, if_true]
     rw [mul_assoc, inv_mul_cancel₀ hi', mul_one]
   rwa [h3] at h2
 
-theorem UpperTheory.V.Ws.auIrr :
-    ∀ {k Γ Γ' : Type} [Field k] [Group Γ] [Group Γ'] (r : Γ →* M4 k) (r' : Γ' →* M4 k), Irr r → (∀ g, ∃ g', r' g' = r g) → Af.IsIrr r'.toHomUnits ∧ ∀ χ : Γ' →* kˣ, Af.IsIrr (Af.tw r'.toHomUnits χ) := by
+theorem UpperTheory.V.Ws.auIrr
+    : ∀ {k Γ Γ' : Type} [Field k] [Group Γ] [Group Γ'] (r : Γ →* M4 k) (r' : Γ' →* M4 k),
+      Irr r → (∀ g, ∃ g', r' g' = r g)
+        → Af.IsIrr r'.toHomUnits ∧ ∀ χ : Γ' →* kˣ, Af.IsIrr (Af.tw r'.toHomUnits χ) := by
   intro k Γ Γ' _ _ _ r r' hr h
   refine ⟨irr_of_stab r hr _ fun g => ?_, fun χ => irr_of_stab r hr _ fun g => ?_⟩
   · obtain ⟨s, hs⟩ := h g

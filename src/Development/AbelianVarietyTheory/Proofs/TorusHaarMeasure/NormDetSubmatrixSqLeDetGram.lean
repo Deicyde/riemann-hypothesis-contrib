@@ -10,10 +10,10 @@ open scoped ComplexOrder
 
 namespace GlobalTheory
 
-theorem norm_det_submatrix_sq_le_det_gram :
-    ∀ (m : Type) [Fintype m] (ι : Type) [Fintype ι] [DecidableEq ι] (M : Matrix m ι ℂ)
-      (e : ι → m), Function.Injective e →
-        ‖(M.submatrix e id).det‖ ^ 2 ≤ (Mᴴ * M).det.re := by
+theorem norm_det_submatrix_sq_le_det_gram
+    : ∀ (m : Type) [Fintype m] (ι : Type) [Fintype ι] [DecidableEq ι] (M : Matrix m ι ℂ)
+        (e : ι → m),
+      Function.Injective e → ‖(M.submatrix e id).det‖ ^ 2 ≤ (Mᴴ * M).det.re := by
   classical
   intro m _ ι _ _ M e he
   set N : Matrix ι ι ℂ := M.submatrix e id with hN

@@ -14,7 +14,8 @@ namespace PositivityTheory.Rg.BcB.FC
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {a b n : ℕ}
 
-abbrev Fam (E : Type) [Field E] [NumberField E] (a b : ℕ) : Type := ∀ w : Pl E, GLw a w × GLw b w → ℂ
+abbrev Fam (E : Type) [Field E] [NumberField E] (a b : ℕ) : Type :=
+  ∀ w : Pl E, GLw a w × GLw b w → ℂ
 
 end PositivityTheory.Rg.BcB.FC
 

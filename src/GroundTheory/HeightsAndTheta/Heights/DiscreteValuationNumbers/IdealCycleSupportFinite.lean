@@ -16,9 +16,11 @@ open MvPolynomial
 
 universe u
 
-theorem idealCycle_support_finite {R : Type*} [CommRing R] {K : Type*} {ι : K → Type*}
-    [IsNoetherianRing (MRing ι R)] (J : Ideal (MRing ι R)) :
-    (Function.support (idealCycle J)).Finite := by
+theorem idealCycle_support_finite
+    {R : Type*} [CommRing R]
+    {K : Type*} {ι : K → Type*} [IsNoetherianRing (MRing ι R)]
+    (J : Ideal (MRing ι R))
+    : (Function.support (idealCycle J)).Finite := by
   apply Set.Finite.subset (Ideal.finite_minimalPrimes_of_isNoetherianRing _ J)
   intro W hW
   by_contra hmin
@@ -27,9 +29,10 @@ theorem idealCycle_support_finite {R : Type*} [CommRing R] {K : Type*} {ι : K �
   rw [dite_eq_right]
   exact fun h => hmin h.1
 
-theorem finsum_mul_finsum_comm {α β : Type*} (a : α → ℤ) (c : α → β → ℤ) (n : β → ℤ)
-    (ha : (Function.support a).Finite) (hc : ∀ W, (Function.support (c W)).Finite) :
-    ∑ᶠ W, a W * ∑ᶠ U, c W U * n U = ∑ᶠ U, (∑ᶠ W, a W * c W U) * n U := by
+theorem finsum_mul_finsum_comm
+    {α β : Type*} (a : α → ℤ) (c : α → β → ℤ) (n : β → ℤ) (ha : (Function.support a).Finite)
+    (hc : ∀ W, (Function.support (c W)).Finite)
+    : ∑ᶠ W, a W * ∑ᶠ U, c W U * n U = ∑ᶠ U, (∑ᶠ W, a W * c W U) * n U := by
   classical
   set S := ha.toFinset
   set T := S.biUnion (fun W => (hc W).toFinset)
@@ -60,16 +63,20 @@ theorem finsum_mul_finsum_comm {α β : Type*} (a : α → ℤ) (c : α → β �
     rw [Finset.mem_coe, ha.mem_toFinset]
     exact left_ne_zero_of_mul hW
 
-theorem RightExpansion.proof (hV : VertCutEff.Statement.{u})
-    (hD : DivisorIdealCycle.Statement.{u}) : RightExpansion.Statement.{u} := by
+theorem RightExpansion.proof (hV : VertCutEff.Statement.{u}) (hD : DivisorIdealCycle.Statement.{u})
+    : RightExpansion.Statement.{u} := by
   classical
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hmodel b f g heff c s hs hsP hhor hnc L
   have hPmh : IsMultiHomogIdeal (P ⊔ Ideal.span {s}) :=
     SupSpanMultiHomog.proof O K ι P s c hmodel.multiProj.multiHomog hs
-  have key : ∀ W : Ideal (MRing ι O),
-      divCycle P s W * (if (C ϖ : MRing ι O) ∈ W then vNum W (Matrix.vecCons b L)
-          else cycEval (fun G => vNum G L) (ratDiv W f g)) =
-        divCycle P s W * cycEval (fun U => vNum U L) (idealCycle (W ⊔ divisorIdeal P f g)) := by
+  have key
+      : ∀ W : Ideal (MRing ι O),
+        divCycle P s W
+            * (if (C ϖ : MRing ι O) ∈ W then
+                 vNum W (Matrix.vecCons b L)
+               else
+                 cycEval (fun G => vNum G L) (ratDiv W f g))
+          = divCycle P s W * cycEval (fun U => vNum U L) (idealCycle (W ⊔ divisorIdeal P f g)) := by
     intro W
     by_cases hW : divCycle P s W = 0
     · rw [hW, zero_mul, zero_mul]
@@ -88,7 +95,9 @@ theorem RightExpansion.proof (hV : VertCutEff.Statement.{u})
       rw [hD O K ι P W f g g f hP hWp hPW heff.1.den_not_mem
         (fun U hU hWU hUrel => heff.2 U hU (hPW.trans hWU) hUrel)
         hv.den_not_mem hv.num_not_mem (by rw [mul_comm, sub_self]; exact P.zero_mem)]
-  exact (finsum_congr key).trans <| finsum_mul_finsum_comm _ (fun W U => idealCycle (W ⊔ divisorIdeal P f g) U) _
-    (DivCycleFiniteSupport.proof O K ι P s) (fun W => idealCycle_support_finite _)
+  exact (finsum_congr key).trans <| finsum_mul_finsum_comm _
+    (fun W U => idealCycle (W ⊔ divisorIdeal P f g) U)
+    _ (DivCycleFiniteSupport.proof O K ι P s)
+    (fun W => idealCycle_support_finite _)
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

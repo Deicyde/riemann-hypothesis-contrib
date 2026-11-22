@@ -12,7 +12,10 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Glo
 
 namespace GlobalTheory.PsType
 
-theorem theta_mul : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ), Ordered ψ → ∀ a ∈ grp ψ, ∀ b ∈ grp ψ, theta ψ (a * b) = theta ψ a * theta ψ b := by
+theorem theta_mul
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ),
+      Ordered ψ → ∀ a ∈ grp ψ, ∀ b ∈ grp ψ, theta ψ (a * b) = theta ψ a * theta ψ b := by
   intro k _ _ _ _ n ψ hψ a ha b hb
   have P := GlobalTheory.T.isTrivialOnUnitsModConductor_unitCharacterValue_props k
   obtain ⟨-, -, -, -, -, -, hevmul, hevcong, hevtriv⟩ := P

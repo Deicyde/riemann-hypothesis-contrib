@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FloorSize
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW.Rec
 
@@ -18,8 +20,7 @@ section Param
 
 variable {R : Ranks} (P : HCParam R)
 
-theorem v_step (a : ℕ) : ∀ (n : ℕ) (h : a + n + 1 < R.k - 1),
-    P.v ⟨a + n + 1, h⟩ < P.v ⟨a, by omega⟩
+theorem v_step (a : ℕ) : ∀ (n : ℕ) (h : a + n + 1 < R.k - 1), P.v ⟨a + n + 1, h⟩ < P.v ⟨a, by omega⟩
   | 0, h => (P.u_gt_v ⟨a + 1, h⟩).trans (P.v_gt_u ⟨a, by omega⟩)
   | n + 1, h => by
     have h1 := v_step a n (by omega)
@@ -27,8 +28,7 @@ theorem v_step (a : ℕ) : ∀ (n : ℕ) (h : a + n + 1 < R.k - 1),
       (P.u_gt_v ⟨a + (n + 1) + 1, h⟩).trans (P.v_gt_u ⟨a + n + 1, by omega⟩)
     exact h2.trans h1
 
-theorem b_step (a : ℕ) : ∀ (n : ℕ) (h : a + n + 1 < R.m),
-    P.b ⟨a, by omega⟩ < P.b ⟨a + n + 1, h⟩
+theorem b_step (a : ℕ) : ∀ (n : ℕ) (h : a + n + 1 < R.m), P.b ⟨a, by omega⟩ < P.b ⟨a + n + 1, h⟩
   | 0, h => by
     have h1 := P.gap_be ⟨a, by omega⟩
     have h2 := P.gap_eb ⟨a, by omega⟩ h
@@ -78,8 +78,8 @@ theorem floor_b_inj : Function.Injective fun a : Fin R.m => ⌊P.b a⌋ := by
   · exact h
   · exact absurd hxy (b_lt P h).ne'
 
-theorem cloud_add_lows_nodup (j : Fin R.m) (hv : ∀ a, 0 ≤ P.v a) (hb : ∀ i, 0 < P.b i) :
-    (cloud P j + lows P j).Nodup := by
+theorem cloud_add_lows_nodup (j : Fin R.m) (hv : ∀ a, 0 ≤ P.v a) (hb : ∀ i, 0 < P.b i)
+    : (cloud P j + lows P j).Nodup := by
   rw [Multiset.nodup_add]
   refine ⟨?_, ?_, ?_⟩
   · refine Multiset.Nodup.map (fun a c h => floor_v_inj P ?_) Finset.univ.nodup
@@ -103,8 +103,9 @@ theorem cloud_add_lows_nodup (j : Fin R.m) (hv : ∀ a, 0 ≤ P.v a) (hb : ∀ i
     simp only [hx, hy, Int.floor_intCast] at hi
     omega
 
-theorem twistedDualJumpsWithoutBlock_nodup_of_signs (j : Fin R.m) (s : Bool) (hv : ∀ a, 0 ≤ P.v a) (hb : ∀ i, 0 < P.b i) :
-    (jT2 P j s).Nodup := by
+theorem twistedDualJumpsWithoutBlock_nodup_of_signs
+    (j : Fin R.m) (s : Bool) (hv : ∀ a, 0 ≤ P.v a) (hb : ∀ i, 0 < P.b i)
+    : (jT2 P j s).Nodup := by
   have h := cloud_add_lows_nodup P j hv hb
   have h1 : Function.Injective fun u : ℤ => -u - 1 := fun a c h => by
     have : -a - 1 = -c - 1 := h
@@ -120,8 +121,9 @@ theorem twistedDualJumpsWithoutBlock_nodup_of_signs (j : Fin R.m) (s : Bool) (hv
 
 end Param
 
-theorem twistedDualJumpsWithoutBlock_nodup_of_roomy : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (g : D.R.GG) (s : Bool),
-    Roomy L C → (jT2 (hcAt D g) j s).Nodup := by
+theorem twistedDualJumpsWithoutBlock_nodup_of_roomy
+    : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (g : D.R.GG) (s : Bool),
+      Roomy L C → (jT2 (hcAt D g) j s).Nodup := by
   intro D L C j g s hR
   obtain ⟨hC, h100, hη, hwb, -, hCb⟩ := id hR
   have hS := L.Sc_pos

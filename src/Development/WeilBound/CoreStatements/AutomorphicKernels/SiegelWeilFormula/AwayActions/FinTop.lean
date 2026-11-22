@@ -8,19 +8,25 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.KAway
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 namespace SDf
 
 variable (d : SD σ)
 
-theorem step_of_triv (hT : TAll) (hA : AuxiliaryPrimeFunction) (hD : AdDecomp) (x : d.G) (hx : ∀ w, d.cw w (inFrame d.b x) = 1) :
-    ∃ B, StepF d x id B := by
+theorem step_of_triv
+    (hT : TAll) (hA : AuxiliaryPrimeFunction) (hD : AdDecomp)
+    (x : d.G) (hx : ∀ w, d.cw w (inFrame d.b x) = 1)
+    : ∃ B, StepF d x id B := by
   obtain ⟨-, ⟨ε, w₀, hw₀, -⟩, -⟩ := hA F E σ d
   have he : eInf F • inFrame d.b x = eInf F • (1 : Matrix _ _ (AE F E)) := (cw_one_iff d _).1 hx
   obtain ⟨x₁, x₂, x₃, x₄, t, c, b, a, a', hxe, h1, h2, h3, h4, ht, hc, hb, -, ha'⟩ :=
@@ -31,31 +37,35 @@ theorem step_of_triv (hT : TAll) (hA : AuxiliaryPrimeFunction) (hD : AdDecomp) (
   obtain ⟨BC, hC⟩ := step_conj d hT hW hW3 (stepN d hT x₂ c h2 hc) h4'
   have hinv : w₀⁻¹ = w₀ * w₀ * w₀ := (eq_inv_of_mul_eq_one_left (RD.w_four_pf hw₀)).symm
   obtain ⟨BM, hM⟩ := stepM d hT x₃ a a' h3 ha'
-  have hall := step_comp d (step_comp d (step_comp d (stepN d hT x₁ t h1 ht) hC) hM) (stepN d hT x₄ b h4 hb)
+  have hall :=
+    step_comp d (step_comp d (step_comp d (stepN d hT x₁ t h1 ht) hC) hM) (stepN d hT x₄ b h4 hb)
   rw [hxe, hinv]
   exact ⟨_, hall⟩
 
 end SDf
 
-
 variable (F) in
-theorem exists_schwartz_ne {κ : Type} [Fintype κ] :
-    ∃ (φ : 𝓢(κ → mixedEmbedding.mixedSpace F, ℂ)) (v : κ → mixedEmbedding.mixedSpace F), φ v ≠ 0 := by
+theorem exists_schwartz_ne {κ : Type} [Fintype κ]
+    : ∃ (φ : 𝓢(κ → mixedEmbedding.mixedSpace F, ℂ)) (v : κ → mixedEmbedding.mixedSpace F),
+      φ v ≠ 0 := by
   let b : ContDiffBump (0 : κ → mixedEmbedding.mixedSpace F) := ⟨1, 2, zero_lt_one, one_lt_two⟩
-  have h1 : HasCompactSupport (fun x => ((b x : ℝ) : ℂ)) := b.hasCompactSupport.comp_left Complex.ofReal_zero
-  have h2 : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun x => ((b x : ℝ) : ℂ)) := Complex.ofRealCLM.contDiff.comp b.contDiff
+  have h1 : HasCompactSupport (fun x => ((b x : ℝ) : ℂ)) :=
+    b.hasCompactSupport.comp_left Complex.ofReal_zero
+  have h2 : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun x => ((b x : ℝ) : ℂ)) :=
+    Complex.ofRealCLM.contDiff.comp b.contDiff
   refine ⟨h1.toSchwartzMap h2, 0, ?_⟩
   show ((b 0 : ℝ) : ℂ) ≠ 0
   rw [b.one_of_mem_closedBall (Metric.mem_closedBall_self zero_le_one)]
   simp
 
-theorem slice_mem {κ : Type} [Fintype κ] (Φ : (κ → AF F) → ℂ) (hΦ : Φ ∈ schA F κ) (a : κ → Ainf F) :
-    (fun y : κ → Af F => Φ (fun k => pairA F (a k) (y k))) ∈ SB (κ → Af F) := by
+theorem slice_mem {κ : Type} [Fintype κ] (Φ : (κ → AF F) → ℂ) (hΦ : Φ ∈ schA F κ) (a : κ → Ainf F)
+    : (fun y : κ → Af F => Φ (fun k => pairA F (a k) (y k))) ∈ SB (κ → Af F) := by
   induction hΦ using Submodule.span_induction with
   | mem Φ h =>
     obtain ⟨f, g, hg, rfl⟩ := h
-    have e : (fun y : κ → Af F => pureA F (⇑f) g (fun k => pairA F (a k) (y k))) =
-        (f fun i => (InfiniteAdeleRing.ringEquiv_mixedSpace F) (a i)) • g := by
+    have e
+        : (fun y : κ → Af F => pureA F (⇑f) g (fun k => pairA F (a k) (y k)))
+          = (f fun i => (InfiniteAdeleRing.ringEquiv_mixedSpace F) (a i)) • g := by
       funext y
       rfl
     rw [e]
@@ -67,10 +77,14 @@ theorem slice_mem {κ : Type} [Fintype κ] (Φ : (κ → AF F) → ℂ) (hΦ : �
 namespace SDf
 variable (d : SD σ)
 
-theorem finAct_step (hT : TAll) (x : d.G) {B : (Mx F E d.m d.n → ℂ) → Mx F E d.m d.n → ℂ} (hB : StepF d x id B) :
-    ∀ g ∈ SB (Fin d.m × Fin d.n × Fin 2 → Af F), ∃ g' ∈ SB (Fin d.m × Fin d.n × Fin 2 → Af F),
-      ∀ f : Mx F E d.m d.n → ℂ, (∀ X Z, (∀ w, d.cw w Z = 0) → f (X + Z) = f X) → ∀ Φ ∈ d.sch,
-        d.T Φ = (fun X => f X * g fun k => (d.crd X k).2) → d.T (d.om x Φ) = fun X => f X * g' fun k => (d.crd X k).2 := by
+theorem finAct_step
+    (hT : TAll) (x : d.G) {B : (Mx F E d.m d.n → ℂ) → Mx F E d.m d.n → ℂ} (hB : StepF d x id B)
+    : ∀ g ∈ SB (Fin d.m × Fin d.n × Fin 2 → Af F), ∃ g' ∈ SB (Fin d.m × Fin d.n × Fin 2 → Af F),
+      ∀ f : Mx F E d.m d.n → ℂ,
+        (∀ X Z, (∀ w, d.cw w Z = 0) → f (X + Z) = f X)
+          → ∀ Φ ∈ d.sch,
+            d.T Φ = (fun X => f X * g fun k => (d.crd X k).2)
+              → d.T (d.om x Φ) = fun X => f X * g' fun k => (d.crd X k).2 := by
   intro g hg
   set G : Mx F E d.m d.n → ℂ := fun X => g (fcrd d X) with hGdef
   have hG : InvInf d G := fcrd_invInf d g
@@ -126,13 +140,18 @@ theorem finAct_step (hT : TAll) (x : d.G) {B : (Mx F E d.m d.n → ℂ) → Mx F
   have hm := (hT.1 F E σ d).1 _ (d.om_sch x Φ₀ hΦ₀)
   rw [e] at hm
   have hs := slice_mem _ hm (fun k => (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (v₀ k))
-  have e2 : (fun y : Fin d.m × Fin d.n × Fin 2 → Af F =>
-      (fun X => id f₀ X * B G X) (d.cmb fun k => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (v₀ k)) (y k))) =
-      φ v₀ • g₁ := by
+  have e2
+      : (fun y : Fin d.m × Fin d.n × Fin 2 → Af F =>
+          (fun X => id f₀ X * B G X) (d.cmb fun k =>
+            pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (v₀ k)) (y k)))
+        = φ v₀ • g₁ := by
     funext y
     simp only [id, Pi.smul_apply, smul_eq_mul]
     rw [hBg]
-    have h1 : fcrd d (d.cmb fun k => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (v₀ k)) (y k)) = y := by
+    have h1
+        : fcrd d
+            (d.cmb fun k => pairA F ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (v₀ k)) (y k))
+          = y := by
       funext k
       simp only [fcrd, KFock.crd_cmb]
       rfl

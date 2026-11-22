@@ -19,12 +19,16 @@ section DerLemmas
 
 variable {A S M : Type*} [CommRing A] [CommRing S] [Algebra A S] [AddCommGroup M] [Module S M]
 
-theorem IsDerOn.mono' {B C : Subalgebra A S} {D : S → M} (h : IsDerOn C D) (hBC : B ≤ C) :
-    IsDerOn B D :=
-  ⟨fun x hx y hy => h.add x (hBC hx) y (hBC hy), fun x hx y hy => h.mul x (hBC hx) y (hBC hy), h.alg⟩
+theorem IsDerOn.mono' {B C : Subalgebra A S} {D : S → M} (h : IsDerOn C D) (hBC : B ≤ C)
+    : IsDerOn B D := ⟨
+  fun x hx y hy => h.add x (hBC hx) y (hBC hy),
+  fun x hx y hy => h.mul x (hBC hx) y (hBC hy),
+  h.alg
+⟩
 
-theorem IsDerOn.pow_succ_der {B : Subalgebra A S} {D : S → M} (h : IsDerOn B D) {x : S} (hx : x ∈ B)
-    (k : ℕ) : D (x ^ (k + 1)) = (((k + 1 : ℕ) : S) * x ^ k) • D x := by
+theorem IsDerOn.pow_succ_der
+    {B : Subalgebra A S} {D : S → M} (h : IsDerOn B D) {x : S} (hx : x ∈ B) (k : ℕ)
+    : D (x ^ (k + 1)) = (((k + 1 : ℕ) : S) * x ^ k) • D x := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -33,9 +37,10 @@ theorem IsDerOn.pow_succ_der {B : Subalgebra A S} {D : S → M} (h : IsDerOn B D
     push_cast
     ring
 
-theorem IsDerOn.eq_on_adjoin {s : Set S} {D₁ D₂ : S → M} (h₁ : IsDerOn (Algebra.adjoin A s) D₁)
-    (h₂ : IsDerOn (Algebra.adjoin A s) D₂) (hs : ∀ x ∈ s, D₁ x = D₂ x) :
-    ∀ x ∈ Algebra.adjoin A s, D₁ x = D₂ x := by
+theorem IsDerOn.eq_on_adjoin
+    {s : Set S} {D₁ D₂ : S → M} (h₁ : IsDerOn (Algebra.adjoin A s) D₁)
+    (h₂ : IsDerOn (Algebra.adjoin A s) D₂) (hs : ∀ x ∈ s, D₁ x = D₂ x)
+    : ∀ x ∈ Algebra.adjoin A s, D₁ x = D₂ x := by
   intro x hx
   induction hx using Algebra.adjoin_induction with
   | mem x hx => exact hs x hx
@@ -70,21 +75,23 @@ theorem qS_mem_levelAlg_succ (T : Tower p Ω) (m : ℕ) : qS T m ∈ levelAlg T 
   rw [← qS_succ_pow_p]; exact pow_mem (qS_mem_levelAlg T (m + 1)) _
 
 theorem levelAlg_le_succ (T : Tower p Ω) (m : ℕ) : levelAlg T m ≤ levelAlg T (m + 1) :=
-  Algebra.adjoin_le (Set.insert_subset_iff.2 ⟨zS_mem_levelAlg_succ T m,
-    Set.singleton_subset_iff.2 (qS_mem_levelAlg_succ T m)⟩)
+  Algebra.adjoin_le (Set.insert_subset_iff.2
+    ⟨zS_mem_levelAlg_succ T m, Set.singleton_subset_iff.2 (qS_mem_levelAlg_succ T m)⟩)
 
-theorem frac_smul_mk (s : integralClosure (O0 p) Ω) (x : Ω) :
-    s • (Submodule.Quotient.mk x : Frac p Ω) = Submodule.Quotient.mk ((s : Ω) * x) := by
+theorem frac_smul_mk (s : integralClosure (O0 p) Ω) (x : Ω)
+    : s • (Submodule.Quotient.mk x : Frac p Ω) = Submodule.Quotient.mk ((s : Ω) * x) := by
   rw [← Submodule.Quotient.mk_smul]; rfl
 
-theorem frac_mk_eq_zero (s : integralClosure (O0 p) Ω) :
-    (Submodule.Quotient.mk (s : Ω) : Frac p Ω) = 0 := by
+theorem frac_mk_eq_zero (s : integralClosure (O0 p) Ω)
+    : (Submodule.Quotient.mk (s : Ω) : Frac p Ω) = 0 := by
   rw [Submodule.Quotient.mk_eq_zero]
   exact ⟨s, rfl⟩
 
-theorem cyc_relation (hc : CharZero Ω) (T : Tower p Ω) (m : ℕ) :
-    (Polynomial.aeval (zS T (m + 1)) (Polynomial.derivative (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p)))) •
-      (Submodule.Quotient.mk (T.ζ (m + 1) * p / (p : Ω) ^ (m + 1)) : Frac p Ω) = 0 := by
+theorem cyc_relation (hc : CharZero Ω) (T : Tower p Ω) (m : ℕ)
+    : (Polynomial.aeval (zS T (m + 1))
+          (Polynomial.derivative (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p))))
+        • (Submodule.Quotient.mk (T.ζ (m + 1) * p / (p : Ω) ^ (m + 1)) : Frac p Ω)
+      = 0 := by
   set z := zS T (m + 1)
   set ζ := T.ζ (m + 1)
   have hp1 : 1 < p := hp.out.one_lt
@@ -92,13 +99,14 @@ theorem cyc_relation (hc : CharZero Ω) (T : Tower p Ω) (m : ℕ) :
   have hp0 : (p : Ω) ≠ 0 := by exact_mod_cast hp.out.ne_zero
 
   have hξ : IsPrimitiveRoot (ζ ^ p ^ m) p := by
-    have := (T.prim (m + 1)).pow_of_dvd (pow_ne_zero m hp.out.ne_zero) (pow_dvd_pow p (Nat.le_succ m))
+    have :=
+      (T.prim (m + 1)).pow_of_dvd (pow_ne_zero m hp.out.ne_zero) (pow_dvd_pow p (Nat.le_succ m))
     simpa [pow_succ, Nat.mul_div_cancel_left _ (pow_pos hp.out.pos m)] using this
 
   set gS : integralClosure (O0 p) Ω := ∑ i ∈ Finset.range p, ∑ j ∈ Finset.range i, (z ^ p ^ m) ^ j
   have hgval : (gS : Ω) = ∑ i ∈ Finset.range p, ∑ j ∈ Finset.range i, (ζ ^ p ^ m) ^ j := by
     simp [gS, z, ζ, zS]
-  have hg : (gS : Ω) * (ζ ^ p ^ m - 1) = - p := by
+  have hg : (gS : Ω) * (ζ ^ p ^ m - 1) = -p := by
     rw [hgval, Finset.sum_mul]
     simp_rw [geom_sum_mul]
     rw [Finset.sum_sub_distrib, hξ.geom_sum_eq_zero hp1]
@@ -107,12 +115,18 @@ theorem cyc_relation (hc : CharZero Ω) (T : Tower p Ω) (m : ℕ) :
   have hroot : Polynomial.aeval ζ (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p)) = 0 := by
     rw [aeval_def, eval₂_eq_eval_map, map_cyclotomic]
     exact (T.prim (m + 1)).isRoot_cyclotomic hpos
-  have hid := congrArg (fun f => Polynomial.aeval ζ (Polynomial.derivative f))
-    (cyclotomic_prime_pow_mul_X_pow_sub_one (O0 p) p m)
-  simp only [derivative_mul, derivative_sub, derivative_X_pow, derivative_one, map_add (f := _), map_mul,
-    map_sub, hroot, zero_mul, add_zero, sub_zero] at hid
-  have hzval : (Polynomial.aeval z (Polynomial.derivative (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p))) : Ω)
-      = Polynomial.aeval ζ (Polynomial.derivative (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p))) := by
+  have hid :=
+    congrArg
+      (fun f => Polynomial.aeval ζ (Polynomial.derivative f))
+      (cyclotomic_prime_pow_mul_X_pow_sub_one (O0 p) p m)
+  simp only [derivative_mul, derivative_sub, derivative_X_pow, derivative_one, map_add (f := _),
+      map_mul, map_sub, hroot, zero_mul, add_zero, sub_zero]
+    at hid
+  have hzval
+      : (Polynomial.aeval z (Polynomial.derivative (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p)))
+          : Ω)
+        = Polynomial.aeval ζ
+          (Polynomial.derivative (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p))) := by
     exact (Polynomial.aeval_algHom_apply (integralClosure (O0 p) Ω).val z _).symm
   rw [frac_smul_mk, hzval]
   set F := Polynomial.aeval ζ (Polynomial.derivative (Polynomial.cyclotomic (p ^ (m + 1)) (O0 p)))
@@ -139,31 +153,39 @@ namespace GlobalTheory.AlmostEt
 
 open GlobalTheory.K5
 
-theorem IsDerOn.pow_der {A S M : Type*} [CommRing A] [CommRing S] [Algebra A S] [AddCommGroup M]
-    [Module S M] {B : Subalgebra A S} {D : S → M} (h : IsDerOn B D) {x : S} (hx : x ∈ B) {n : ℕ}
-    (hn : 0 < n) : D (x ^ n) = ((n : S) * x ^ (n - 1)) • D x := by
+theorem IsDerOn.pow_der
+    {A S M : Type*} [CommRing A] [CommRing S] [Algebra A S] [AddCommGroup M] [Module S M]
+    {B : Subalgebra A S} {D : S → M} (h : IsDerOn B D)
+    {x : S} (hx : x ∈ B)
+    {n : ℕ} (hn : 0 < n)
+    : D (x ^ n) = ((n : S) * x ^ (n - 1)) • D x := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hn.ne'
   simpa using h.pow_succ_der hx k
 
-theorem zeta_derivation : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
-    IsClo p Ω → ∀ (T : Tower p Ω), ∃ D : (integralClosure (O0 p) Ω) → Frac p Ω,
-      IsDerOn (towerAlg T) D ∧ ∀ m : ℕ, D (zS T m) = Submodule.Quotient.mk (T.ζ m * p / (p : Ω) ^ m) ∧
-        D (qS T m) = 0 := by
+theorem zeta_derivation
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ (T : Tower p Ω), ∃ D : (integralClosure (O0 p) Ω) → Frac p Ω,
+          IsDerOn (towerAlg T) D
+            ∧ ∀ m : ℕ,
+              D (zS T m) = Submodule.Quotient.mk (T.ζ m * p / (p : Ω) ^ m) ∧ D (qS T m) = 0 := by
   intro p hp Ω _ _ hc T
   haveI : CharZero Ω := GlobalTheory.K5.Basic.charZero_of_isClo hc
   have hp0 : (p : Ω) ≠ 0 := by exact_mod_cast hp.out.ne_zero
-  have hlev : ∀ m : ℕ, ∃ D : (integralClosure (O0 p) Ω) → Frac p Ω,
-      IsDerOn (levelAlg T (m + 1)) D ∧
-        D (zS T (m + 1)) = Submodule.Quotient.mk (T.ζ (m + 1) * p / (p : Ω) ^ (m + 1)) ∧
-        D (qS T (m + 1)) = 0 := fun m =>
-    GlobalTheory.T.exists_derivation_towerLevelAlgebra_prescribed p Ω hc T (m + 1) (Nat.succ_pos m) (Frac p Ω) _ 0
-      (cyc_relation inferInstance T m) (smul_zero _)
+  have hlev
+      : ∀ m : ℕ, ∃ D : (integralClosure (O0 p) Ω) → Frac p Ω,
+        IsDerOn (levelAlg T (m + 1)) D
+          ∧ D (zS T (m + 1)) = Submodule.Quotient.mk (T.ζ (m + 1) * p / (p : Ω) ^ (m + 1))
+          ∧ D (qS T (m + 1)) = 0 := fun m =>
+    GlobalTheory.T.exists_derivation_towerLevelAlgebra_prescribed p Ω hc T (m + 1) (Nat.succ_pos m)
+      (Frac p Ω) _ 0 (cyc_relation inferInstance T m) (smul_zero _)
   choose D hD hDz hDq using hlev
-  have hval : ∀ m, D m (zS T m) = Submodule.Quotient.mk (T.ζ m * p / (p : Ω) ^ m) ∧
-      D m (qS T m) = 0 := by
+  have hval
+      : ∀ m, D m (zS T m) = Submodule.Quotient.mk (T.ζ m * p / (p : Ω) ^ m) ∧ D m (qS T m) = 0 := by
     intro m
     constructor
-    · rw [← zS_succ_pow_p, (hD m).pow_der (zS_mem_levelAlg T (m + 1)) hp.out.pos, hDz m, frac_smul_mk]
+    · rw [← zS_succ_pow_p, (hD m).pow_der (zS_mem_levelAlg T (m + 1)) hp.out.pos, hDz m,
+        frac_smul_mk]
       congr 1
       have hc1 : ((zS T (m + 1) : integralClosure (O0 p) Ω) : Ω) = T.ζ (m + 1) := rfl
       push_cast
@@ -180,8 +202,10 @@ theorem zeta_derivation : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [A
     · rw [Set.mem_singleton_iff.1 hx, (hval (m + 1)).2, hDq m]
   have hmono : Monotone (fun m => levelAlg T (m + 1)) :=
     monotone_nat_of_le_succ fun m => levelAlg_le_succ T (m + 1)
-  obtain ⟨D', hD', hD'eq⟩ := isDerOn_iSup_glue (O0 p) (integralClosure (O0 p) Ω) (Frac p Ω)
-    (fun m => levelAlg T (m + 1)) hmono D hD hcompat
+  obtain ⟨D', hD', hD'eq⟩ :=
+    isDerOn_iSup_glue (O0 p) (integralClosure (O0 p) Ω) (Frac p Ω)
+      (fun m => levelAlg T (m + 1))
+      hmono D hD hcompat
   have hle : towerAlg T ≤ ⨆ m, levelAlg T (m + 1) := by
     refine Algebra.adjoin_le ?_
     rintro x (⟨m, rfl⟩ | ⟨m, rfl⟩)

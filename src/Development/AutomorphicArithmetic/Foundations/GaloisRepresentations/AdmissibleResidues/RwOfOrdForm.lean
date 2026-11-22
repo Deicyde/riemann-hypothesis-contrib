@@ -9,18 +9,26 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial ValuativeRel
-open GlobalTheory GlobalTheory.CuspRep GlobalTheory.GalOfCusp GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.SmGL UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial ValuativeRel
+open GlobalTheory GlobalTheory.CuspRep GlobalTheory.GalOfCusp GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.SmGL UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Sd
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.GalN.V.rw_of_ordForm (PH : HypothesesH) (F Ω : Type) [Field F] [NumberField F] [IsTotallyReal F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (ξ : G F Ω →* (Qbar l)ˣ) (s c m a π r)
-    (H : OrdForm ι ξ s c m a π r) : UpperTheory.GalN.V.RW ι r := by
+theorem UpperTheory.GalN.V.rw_of_ordForm
+    (PH : HypothesesH)
+    (F Ω : Type)
+    [Field F] [NumberField F] [IsTotallyReal F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (ξ : G F Ω →* (Qbar l)ˣ) (s c m a π r) (H : OrdForm ι ξ s c m a π r)
+    : UpperTheory.GalN.V.RW ι r := by
   have P := PH.toClassicalTheorems
   refine UpperTheory.GalN.V.L.rwwd F Ω l ι 2 r H.cont fun w hl A h => ?_
   obtain ⟨χ, hχ⟩ := H.pol
-  obtain ⟨-, wt, HT, -, -, hall⟩ := UpperTheory.GalN.V.exRN (exR PH) F Ω l ι 2 one_le_two π χ H.reg hχ
+  obtain ⟨-, wt, HT, -, -, hall⟩ :=
+    UpperTheory.GalN.V.exRN (exR PH) F Ω l ι 2 one_le_two π χ H.reg hχ
   have hG := hall r H.cont H.att
   obtain ⟨⟨σ, hσ⟩, hiso⟩ := locCompR P F 2 π w
   obtain ⟨rc, hrc⟩ := P.exists_rec h
@@ -39,8 +47,9 @@ theorem UpperTheory.GalN.V.rw_of_ordForm (PH : HypothesesH) (F Ω : Type) [Field
       refine Submodule.iSup_induction _ (motive := fun z => τ.asModuleEquiv.symm z ∈ _) hy ?_ ?_ ?_
       · rintro f _ ⟨x, rfl⟩
         let x' : σ.ρ.asModule := σ.ρ.asModuleEquiv.symm x
-        let f' := Representation.IntertwiningMap.equivLinearMapAsModule σ.ρ τ
-          ⟨f.1, fun g => LinearMap.ext (f.2 g)⟩
+        let f' :=
+          Representation.IntertwiningMap.equivLinearMapAsModule σ.ρ τ
+            ⟨f.1, fun g => LinearMap.ext (f.2 g)⟩
         change f' x' ∈ _
         rcases f'.injective_or_eq_zero with h | h
         · have hrange : LinearMap.range f' ≤ isotypicComponent R τ.asModule σ.ρ.asModule :=
@@ -73,27 +82,37 @@ theorem UpperTheory.GalN.V.rw_of_ordForm (PH : HypothesesH) (F Ω : Type) [Field
       exact he
     obtain ⟨T, hTv⟩ := hTv
     let T' := (Representation.IntertwiningMap.equivLinearMapAsModule τ σ.ρ).symm T
-    obtain ⟨B, hB⟩ := (satLoc P F 2 w σ).1 ⟨T' v, hTv, fun u hu => by
-      have hmem : u ∈ K1 w 0 := by
-        obtain ⟨k, rfl⟩ := hu
-        refine ⟨k, ?_, rfl⟩
-        have : Subsingleton (w.adicCompletionIntegers F ⧸ IsLocalRing.maximalIdeal (w.adicCompletionIntegers F) ^ 0) :=
-          Ideal.Quotient.subsingleton_iff.2 (by simp)
-        exact Subsingleton.elim (α := Fin 2 → _) _ _
-      exact (LinearMap.congr_fun (T'.2 u) v).symm.trans (congrArg T' (hf u hmem))⟩
+    obtain ⟨B, hB⟩ :=
+      (satLoc P F 2 w σ).1 ⟨
+        T' v,
+        hTv,
+        fun u hu => by
+          have hmem : u ∈ K1 w 0 := by
+            obtain ⟨k, rfl⟩ := hu
+            refine ⟨k, ?_, rfl⟩
+            have : Subsingleton
+                (w.adicCompletionIntegers F ⧸ IsLocalRing.maximalIdeal (w.adicCompletionIntegers F) ^ 0) :=
+              Ideal.Quotient.subsingleton_iff.2 (by simp)
+            exact Subsingleton.elim (α := Fin 2 → _) _ _
+          exact (LinearMap.congr_fun (T'.2 u) v).symm.trans (congrArg T' (hf u hmem))
+      ⟩
     exact WD.unr_mono0 _ (UpperTheory.GalN.V.unr_algNorm hrc σ B hB)
-  · have hA : ¬ A.valuation (l : Ω) < 1 := fun e => hl (((UpperTheory.V.Base.places F Ω l A).2.2.1 w h).1 e)
+  · have hA : ¬ A.valuation (l : Ω) < 1 := fun e =>
+      hl (((UpperTheory.V.Base.places F Ω l A).2.2.1 w h).1 e)
     obtain ⟨s₀, hs₀, h0⟩ := IsConcreteLE.not_le_iff_exists.1 fun e => ((H.ram w A h).1 e).elim hc hl
     obtain ⟨g, hg⟩ := UpperTheory.V.Sd.ordAway_n PH F Ω l ι ξ s c m a π r H A hA
     refine UpperTheory.GalN.V.L.monosep F Ω A w h _ (ineIncl h ⟨s₀, hs₀⟩) (deg_ineIncl _) ?_
     have k : UpperTheory.GalN.V.WDN ι r (rc (algNorm σ)) :=
       .of_aw hl H.cont ⟨(hG.away w hl A h rc hrc σ hσ).pol, (hG.away w hl A h rc hrc σ hσ).n0⟩
-    have e : (r s₀ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly = (X - C 1) * (X - C (ξ s₀ : Qbar l)) := by
-      rw [← Matrix.charpoly_units_conj g, ← Matrix.coe_units_inv, ← Units.val_mul, ← Units.val_mul, hg s₀ hs₀,
-        Matrix.charpoly_diagonal, Fin.prod_univ_two]
+    have e
+        : (r s₀ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly
+          = (X - C 1) * (X - C (ξ s₀ : Qbar l)) := by
+      rw [← Matrix.charpoly_units_conj g, ← Matrix.coe_units_inv, ← Units.val_mul, ← Units.val_mul,
+        hg s₀ hs₀, Matrix.charpoly_diagonal, Fin.prod_univ_two]
       rfl
     rw [WD.eig, ← k.charpoly hl, coe_ineIncl, e]
     have h1 : ι (ξ s₀ : Qbar l) ≠ 1 := fun e' => h0 (Units.ext (ι.injective (by simpa using e')))
     rw [Polynomial.map_mul, Polynomial.map_sub, Polynomial.map_sub, map_X, map_C, map_C]
-    rw [roots_mul (mul_ne_zero (X_sub_C_ne_zero _) (X_sub_C_ne_zero _)), roots_X_sub_C, roots_X_sub_C]
+    rw [roots_mul (mul_ne_zero (X_sub_C_ne_zero _) (X_sub_C_ne_zero _)), roots_X_sub_C,
+      roots_X_sub_C]
     simpa using h1.symm

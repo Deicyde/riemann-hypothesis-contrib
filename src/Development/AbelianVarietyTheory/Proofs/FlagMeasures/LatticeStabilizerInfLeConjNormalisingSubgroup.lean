@@ -22,11 +22,14 @@ namespace GlobalTheory.HL.StabConj
 section Blocks
 variable {E : Type} [CommRing E]
 
-def bd {n : ℕ} (w : Pt E n) (A : Matrix (Fin n) (Fin n) E) : Matrix (Fin n) (Fin n) E :=
-  fun i j => if sameBlock w.blocks i j = true then A i j else 0
+def bd {n : ℕ} (w : Pt E n) (A : Matrix (Fin n) (Fin n) E) : Matrix (Fin n) (Fin n) E := fun i j =>
+  if sameBlock w.blocks i j = true then A i j else 0
 
-def Rep {n m : ℕ} (f : Fin m → Fin n → E) (g : (Fin n → E) ≃ₗ[E] (Fin n → E))
-    (s : Matrix (Fin m) (Fin m) E) : Prop := ∀ j, g (f j) = ∑ i, s i j • f i
+def Rep
+    {n m : ℕ}
+    (f : Fin m → Fin n → E) (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (s : Matrix (Fin m) (Fin m) E)
+    : Prop :=
+  ∀ j, g (f j) = ∑ i, s i j • f i
 
 end Blocks
 
@@ -94,38 +97,43 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-theorem _root_.GlobalTheory.HL.StabConj.main : ∀ {F : Type} [Field F] [ValuativeRel F]
-    [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : _root_.Formalism.MainNotions.S.Loc.LocE F E), ∀ (r k : ℕ)
-    (S : _root_.GlobalTheory.HL.Frames L r k), ∀ n ∈ S.N,
-    ∃ h ∈ S.St, S.St ⊓
-      _root_.GlobalTheory.HL.stabL L (Submodule.span L.O (Set.range fun b => n (S.f b))) ≤
-        MulAut.conj h • S.K0 ∧
-      ∃ u : Matrix (Fin (r + 1)) (Fin (r + 1)) E, _root_.GlobalTheory.HL.IsUni u ∧
-        (∀ i j : Fin (r + 1), _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = true → u i j ∈ L.O) ∧
-        ∀ j, h⁻¹ (n (S.f j)) = ∑ i, u i j • S.f i := by
+theorem _root_.GlobalTheory.HL.StabConj.main
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+        (L : _root_.Formalism.MainNotions.S.Loc.LocE F E),
+      ∀ (r k : ℕ) (S : _root_.GlobalTheory.HL.Frames L r k), ∀ n ∈ S.N, ∃ h ∈ S.St,
+        S.St ⊓ _root_.GlobalTheory.HL.stabL L (Submodule.span L.O (Set.range fun b => n (S.f b)))
+            ≤ MulAut.conj h • S.K0
+          ∧ ∃ u : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+            _root_.GlobalTheory.HL.IsUni u
+              ∧ (∀ i j : Fin (r + 1),
+                _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = true → u i j ∈ L.O)
+              ∧ ∀ j, h⁻¹ (n (S.f j)) = ∑ i, u i j • S.f i := by
   intro F _ _ _ _ _ E _ _ _ L r k S n hn
 
-  obtain ⟨σ, β, τ, hβ⟩ :=
-    _root_.GlobalTheory.HL.BlockStab.exists_monomial S.w.blocks
+  obtain ⟨σ, β, τ, hβ⟩ := _root_.GlobalTheory.HL.BlockStab.exists_monomial S.w.blocks
   rw [S.w.size] at hβ
-  have hsame : ∀ i j : Fin (r + 1),
-      _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = true ↔ β i = β j :=
-    fun i j => ((hβ i i.isLt).2.2.2 j j.isLt).1
-  have hmono : ∀ i j : Fin (r + 1), i ≤ j → β i ≤ β j :=
-    fun i j hij => ((hβ i i.isLt).2.2.2 j j.isLt).2.1 hij
-  have hfalse : ∀ i j : Fin (r + 1), β i ≠ β j →
-      _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = false :=
+  have hsame
+      : ∀ i j : Fin (r + 1),
+        _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = true ↔ β i = β j := fun i j =>
+    ((hβ i i.isLt).2.2.2 j j.isLt).1
+  have hmono : ∀ i j : Fin (r + 1), i ≤ j → β i ≤ β j := fun i j hij =>
+    ((hβ i i.isLt).2.2.2 j j.isLt).2.1 hij
+  have hfalse
+      : ∀ i j : Fin (r + 1),
+        β i ≠ β j → _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = false :=
     fun i j hij => Bool.eq_false_iff.mpr fun ht => hij ((hsame i j).1 ht)
-  have hoff : ∀ M : Matrix (Fin (r + 1)) (Fin (r + 1)) E, _root_.GlobalTheory.HL.IsUni M →
-      (∀ i j : Fin (r + 1), β i < β j → M i j = 0) →
-      ∀ i j : Fin (r + 1), β i ≠ β j → M i j = 0 := by
+  have hoff
+      : ∀ M : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+        _root_.GlobalTheory.HL.IsUni M → (∀ i j : Fin (r + 1), β i < β j → M i j = 0)
+          → ∀ i j : Fin (r + 1), β i ≠ β j → M i j = 0 := by
     intro M hM hlt i j hij
     rcases lt_or_gt_of_ne hij with h1 | h1
     · exact hlt i j h1
     · exact hM.1 i j (lt_of_not_ge fun hle => absurd (hmono i j hle) (not_le.mpr h1))
-  have hlower : ∀ M : Matrix (Fin (r + 1)) (Fin (r + 1)) E, _root_.GlobalTheory.HL.IsUni M →
-      ∀ i j : Fin (r + 1), β j < β i → M i j = 0 := by
+  have hlower
+      : ∀ M : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+        _root_.GlobalTheory.HL.IsUni M → ∀ i j : Fin (r + 1), β j < β i → M i j = 0 := by
     intro M hM i j hij
     exact hM.1 i j (lt_of_not_ge fun hle => absurd (hmono i j hle) (not_le.mpr hij))
 
@@ -143,22 +151,26 @@ theorem _root_.GlobalTheory.HL.StabConj.main : ∀ {F : Type} [Field F] [Valuati
     · rw [hsb]
       simp only [_root_.GlobalTheory.HL.StabConj.bd, (hsame i i).2 rfl, if_true]
       exact hsU'.2 i
-  have hsb0 : ∀ i j : Fin (r + 1),
-      _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = false → sb i j = 0 := by
+  have hsb0
+      : ∀ i j : Fin (r + 1),
+        _root_.Formalism.MainNotions.S.Loc.sameBlock S.w.blocks i j = false → sb i j = 0 := by
     intro i j hij
     rw [hsb]
     simp [_root_.GlobalTheory.HL.StabConj.bd, hij]
 
-  obtain ⟨s', hs'U, hs'⟩ := (_root_.GlobalTheory.HL.BlockStab.stabiliser_blockDiag L r k S).2 sb hsbU hsb0
+  obtain ⟨s', hs'U, hs'⟩ :=
+    (_root_.GlobalTheory.HL.BlockStab.stabiliser_blockDiag L r k S).2 sb hsbU hsb0
   obtain ⟨h, hhSt, hhf, -⟩ :=
     ((_root_.GlobalTheory.HL.FrameStab.stab_eq L r k S).2 sb s' hsbU hs'U).mp hs'
   have hhR : _root_.GlobalTheory.HL.StabConj.Rep S.f h sb := hhf
   obtain ⟨B, hsbB, hBsb, hBU, -, hBβ⟩ := _root_.GlobalTheory.HL.BlockStab.inv_facts sb hsbU
   have hBoff : ∀ i j : Fin (r + 1), β i ≠ β j → B i j = 0 :=
     hoff B hBU (hBβ (fun i => β i) fun i j hij => hsb0 i j (hfalse i j hij.ne))
-  have hu : _root_.GlobalTheory.HL.IsUni (B * s) := _root_.GlobalTheory.HL.FrameStabLat.uni_mul hBU hsU'
-  have hublk : ∀ i j : Fin (r + 1), β i = β j →
-      (B * s) i j = (1 : Matrix (Fin (r + 1)) (Fin (r + 1)) E) i j := by
+  have hu : _root_.GlobalTheory.HL.IsUni (B * s) :=
+    _root_.GlobalTheory.HL.FrameStabLat.uni_mul hBU hsU'
+  have hublk
+      : ∀ i j : Fin (r + 1),
+        β i = β j → (B * s) i j = (1 : Matrix (Fin (r + 1)) (Fin (r + 1)) E) i j := by
     intro i j hij
     rw [← hBsb, Matrix.mul_apply, Matrix.mul_apply]
     refine Finset.sum_congr rfl fun l _ => ?_
@@ -175,36 +187,36 @@ theorem _root_.GlobalTheory.HL.StabConj.main : ∀ {F : Type} [Field F] [Valuati
     (_root_.GlobalTheory.FrameBasic.main L r k S).1.comp Sum.inl Sum.inl_injective
   obtain ⟨B', -, hB'u, hB'U, -, -⟩ := _root_.GlobalTheory.HL.BlockStab.inv_facts _ hu
 
-  have key : ∀ g ∈ S.St ⊓ _root_.GlobalTheory.HL.stabL L
-      (Submodule.span L.O (Set.range fun b => n (S.f b))),
-      (h⁻¹ * g * h) • Submodule.span L.O (Set.range S.f) ≤
-          Submodule.span L.O (Set.range S.f) ∧
-        (h⁻¹ * g * h) • Submodule.span L.O (Set.range S.f') ≤
-          Submodule.span L.O (Set.range S.f') := by
+  have key
+      : ∀ g
+          ∈ S.St
+            ⊓ _root_.GlobalTheory.HL.stabL L (Submodule.span L.O (Set.range fun b => n (S.f b))),
+        (h⁻¹ * g * h) • Submodule.span L.O (Set.range S.f) ≤ Submodule.span L.O (Set.range S.f)
+          ∧ (h⁻¹ * g * h) • Submodule.span L.O (Set.range S.f')
+            ≤ Submodule.span L.O (Set.range S.f') := by
     intro g hg
     obtain ⟨hgSt, hgΛ⟩ := Subgroup.mem_inf.mp hg
-    have hgΛ' : g • Submodule.span L.O (Set.range fun b => n (S.f b)) =
-        Submodule.span L.O (Set.range fun b => n (S.f b)) := hgΛ
-    have hg'St : h⁻¹ * g * h ∈ S.St :=
-      mul_mem (mul_mem (inv_mem hhSt) hgSt) hhSt
+    have hgΛ'
+        : g • Submodule.span L.O (Set.range fun b => n (S.f b))
+          = Submodule.span L.O (Set.range fun b => n (S.f b)) :=
+      hgΛ
+    have hg'St : h⁻¹ * g * h ∈ S.St := mul_mem (mul_mem (inv_mem hhSt) hgSt) hhSt
     obtain ⟨t, htU, ht⟩ :=
       (_root_.GlobalTheory.HL.FrameOnto.unipotent_onto L r k S).1 _ (Subgroup.mem_inf.mp hg'St).1
     obtain ⟨t', ht'U, ht'⟩ :=
       (_root_.GlobalTheory.HL.FrameOnto.unipotent_onto L r k S).2.1 _ (Subgroup.mem_inf.mp hg'St).2
-    have heq := ((_root_.GlobalTheory.HL.FrameStab.stab_eq L r k S).2 t t' htU
-      ht'U).mpr ⟨_, hg'St, ht, ht'⟩
-    obtain ⟨htblk, htint⟩ := (_root_.GlobalTheory.HL.BlockStab.stabiliser_blockDiag L r k S).1 t t' htU
-      ht'U heq
+    have heq :=
+      ((_root_.GlobalTheory.HL.FrameStab.stab_eq L r k S).2 t t' htU ht'U).mpr ⟨_, hg'St, ht, ht'⟩
+    obtain ⟨htblk, htint⟩ :=
+      (_root_.GlobalTheory.HL.BlockStab.stabiliser_blockDiag L r k S).1 t t' htU ht'U heq
     have htU' : _root_.GlobalTheory.HL.IsUni t := htU
     have htR : _root_.GlobalTheory.HL.StabConj.Rep S.f (h⁻¹ * g * h) t := ht
-    have htoff : ∀ i j : Fin (r + 1), β i ≠ β j → t i j = 0 :=
-      fun i j hij => (htblk i j (hfalse i j hij)).1
+    have htoff : ∀ i j : Fin (r + 1), β i ≠ β j → t i j = 0 := fun i j hij =>
+      (htblk i j (hfalse i j hij)).1
 
-    have hcoef : ∀ j, ∃ c : Fin (r + 1) → L.O,
-        ∑ i, c i • n (S.f i) = g (n (S.f j)) := by
+    have hcoef : ∀ j, ∃ c : Fin (r + 1) → L.O, ∑ i, c i • n (S.f i) = g (n (S.f j)) := by
       intro j
-      have hmem : g • n (S.f j) ∈
-          g • Submodule.span L.O (Set.range fun b => n (S.f b)) :=
+      have hmem : g • n (S.f j) ∈ g • Submodule.span L.O (Set.range fun b => n (S.f b)) :=
         Submodule.smul_mem_pointwise_smul _ g _ (Submodule.subset_span ⟨j, rfl⟩)
       rw [hgΛ'] at hmem
       exact (Submodule.mem_span_range_iff_exists_fun L.O).mp hmem
@@ -212,10 +224,10 @@ theorem _root_.GlobalTheory.HL.StabConj.main : ∀ {F : Type} [Field F] [Valuati
     obtain ⟨C, hC⟩ : ∃ C : Matrix (Fin (r + 1)) (Fin (r + 1)) E, C = fun i j => (c j i : E) :=
       ⟨_, rfl⟩
     have hhh : ∀ x, h (h⁻¹ x) = x := fun x => h.apply_symm_apply x
-    have hlin : ∀ j, ∑ i, (t * (B * s)) i j • S.f i =
-        ∑ i, ((B * s) * C) i j • S.f i := by
+    have hlin : ∀ j, ∑ i, (t * (B * s)) i j • S.f i = ∑ i, ((B * s) * C) i j • S.f i := by
       intro j
-      rw [← rep_apply_sum_smul_eq_sum_mul_smul htR, ← rep_apply_sum_smul_eq_sum_mul_smul hnu, ← hnu j]
+      rw [← rep_apply_sum_smul_eq_sum_mul_smul htR, ← rep_apply_sum_smul_eq_sum_mul_smul hnu,
+        ← hnu j]
       show h⁻¹ (g (h (h⁻¹ (n (S.f j))))) = h⁻¹ (n (∑ i, C i j • S.f i))
       rw [hhh, ← hc j]
       congr 1
@@ -225,11 +237,11 @@ theorem _root_.GlobalTheory.HL.StabConj.main : ∀ {F : Type} [Field F] [Valuati
       rw [map_smul, hC]
       rfl
     have htu := matrix_eq_of_linearIndependent_sum_smul_eq hfli hlin
-    have hCeq : C = B' * (t * (B * s)) := by
-      rw [htu, ← Matrix.mul_assoc, hB'u, Matrix.one_mul]
+    have hCeq : C = B' * (t * (B * s)) := by rw [htu, ← Matrix.mul_assoc, hB'u, Matrix.one_mul]
     have hCU : _root_.GlobalTheory.HL.IsUni C := by
       rw [hCeq]
-      exact _root_.GlobalTheory.HL.FrameStabLat.uni_mul hB'U (_root_.GlobalTheory.HL.FrameStabLat.uni_mul htU' hu)
+      exact _root_.GlobalTheory.HL.FrameStabLat.uni_mul hB'U
+        (_root_.GlobalTheory.HL.FrameStabLat.uni_mul htU' hu)
     have htO : _root_.GlobalTheory.HL.IsIntM L t := by
       unfold _root_.GlobalTheory.HL.IsIntM
       intro i j
@@ -257,7 +269,10 @@ theorem _root_.GlobalTheory.HL.StabConj.main : ∀ {F : Type} [Field F] [Valuati
         exact (c j i).2
       · rw [htoff i j hij]
         exact L.O.zero_mem
-    exact ⟨smul_span_le_of_rep_entries_mem L htR htO, smul_span_le_of_rep_entries_mem L ht' (htint.mp htO)⟩
+    exact ⟨
+      smul_span_le_of_rep_entries_mem L htR htO,
+      smul_span_le_of_rep_entries_mem L ht' (htint.mp htO)
+    ⟩
   have hconj : ∀ (g : S.GLV) (K : Subgroup S.GLV), g ∈ MulAut.conj h • K ↔ h⁻¹ * g * h ∈ K := by
     intro g K
     rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]

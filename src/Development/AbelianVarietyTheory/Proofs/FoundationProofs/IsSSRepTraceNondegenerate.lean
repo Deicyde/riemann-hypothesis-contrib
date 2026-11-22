@@ -6,26 +6,33 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Crystalli
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N GlobalTheory.IndefiniteRowSideFullHecke.LatticeConditions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  GlobalTheory.IndefiniteRowSideFullHecke.LatticeConditions
 
 namespace GlobalTheory
 
 open NumberField IsDedekindDomain in
 open Polynomial Matrix in
-private theorem eq_zero_of_mulVec_eq_self_of_trace_mul_eq_zero {K : Type} [Field K] [CharZero K]
-    {a : ℕ} (B : Subalgebra K (Matrix (Fin a) (Fin a) K)) {z : Matrix (Fin a) (Fin a) K}
-    (hzB : z ∈ B) (htr : ∀ y ∈ B, (z * y).trace = 0) {v : Fin a → K} (hv : z *ᵥ v = v) :
-    v = 0 := by
+private theorem eq_zero_of_mulVec_eq_self_of_trace_mul_eq_zero
+    {K : Type} [Field K] [CharZero K]
+    {a : ℕ} (B : Subalgebra K (Matrix (Fin a) (Fin a) K))
+    {z : Matrix (Fin a) (Fin a) K} (hzB : z ∈ B) (htr : ∀ y ∈ B, (z * y).trace = 0)
+    {v : Fin a → K} (hv : z *ᵥ v = v)
+    : v = 0 := by
   classical
-  obtain ⟨q, hpq, hq⟩ := Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd z.charpoly
-    (Matrix.charpoly_monic z).ne_zero 0
+  obtain ⟨q, hpq, hq⟩ :=
+    Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd z.charpoly
+      (Matrix.charpoly_monic z).ne_zero 0
   set m := z.charpoly.rootMultiplicity 0 with hm
   simp only [map_zero, sub_zero] at hpq hq
   have hc : q.coeff 0 ≠ 0 := fun h => hq (Polynomial.X_dvd_iff.2 h)
   set c := q.coeff 0 with hcdef
   set R := aeval z q.divX with hR
   have hq' : aeval z q = z * R + c • 1 := by
-    calc aeval z q = aeval z (X * q.divX + C (q.coeff 0)) := by rw [Polynomial.X_mul_divX_add]
+    calc
+      aeval z q
+        = aeval z (X * q.divX + C (q.coeff 0)) := by rw [Polynomial.X_mul_divX_add]
       _ = z * R + c • 1 := by
         rw [map_add (f := _), map_mul, aeval_X, aeval_C, Algebra.algebraMap_eq_smul_one]
   have h0 : z ^ m * (z * R + c • 1) = 0 := by
@@ -64,8 +71,7 @@ private theorem eq_zero_of_mulVec_eq_self_of_trace_mul_eq_zero {K : Type} [Field
     show z ^ n * u ^ n * (z ^ n * u ^ n) = z ^ n * u ^ n
     rw [mul_assoc, ← mul_assoc (u ^ n) (z ^ n) (u ^ n), hc', ← mul_assoc, ← mul_assoc, ← pow_add,
       ← hnn]
-  have hez : z ^ n * u ^ n * z ^ n = z ^ n := by
-    rw [mul_assoc, hc', ← mul_assoc, ← pow_add, ← hnn]
+  have hez : z ^ n * u ^ n * z ^ n = z ^ n := by rw [mul_assoc, hc', ← mul_assoc, ← pow_add, ← hnn]
   have htre : (z ^ n * u ^ n).trace = 0 := by
     have : z ^ n * u ^ n = z * (z ^ m * u ^ n) := by
       show z ^ (m + 1) * u ^ n = _
@@ -76,8 +82,8 @@ private theorem eq_zero_of_mulVec_eq_self_of_trace_mul_eq_zero {K : Type} [Field
     have h1 : IsIdempotentElem (Matrix.toLin' (z ^ n * u ^ n)) := by
       unfold IsIdempotentElem at he ⊢
       rw [Module.End.mul_eq_comp, ← Matrix.toLin'_mul, he]
-    have h2 := (LinearMap.IsIdempotentElem.trace_eq_zero_iff h1).1
-      (by rw [Matrix.trace_toLin'_eq, htre])
+    have h2 :=
+      (LinearMap.IsIdempotentElem.trace_eq_zero_iff h1).1 (by rw [Matrix.trace_toLin'_eq, htre])
     exact Matrix.toLin'.injective (by rw [h2, map_zero])
   have hzn : z ^ n = 0 := by rw [← hez, he0, zero_mul]
   have hvn : ∀ k, (z ^ k) *ᵥ v = v := by
@@ -87,11 +93,15 @@ private theorem eq_zero_of_mulVec_eq_self_of_trace_mul_eq_zero {K : Type} [Field
     | succ k ih => rw [pow_succ, ← Matrix.mulVec_mulVec, hv, ih]
   rw [← hvn n, hzn, Matrix.zero_mulVec]
 
-
 open NumberField IsDedekindDomain in
 open Polynomial Matrix in
-theorem _root_.GlobalTheory.isSSRep_trace_nondegenerate :
-    ∀ (Γ K : Type) [Group Γ] [Field K] [CharZero K] (a : ℕ) (ρ : Γ →* GL (Fin a) K), _root_.Formalism.MainNotions.N.IsSSRep ρ → (∀ x ∈ Submodule.span K (Set.range fun g => ((ρ g : GL (Fin a) K) : Matrix (Fin a) (Fin a) K)), (∀ g, (x * ((ρ g : GL (Fin a) K) : Matrix (Fin a) (Fin a) K)).trace = 0) → x = 0) := by
+theorem _root_.GlobalTheory.isSSRep_trace_nondegenerate
+    : ∀ (Γ K : Type) [Group Γ] [Field K] [CharZero K] (a : ℕ) (ρ : Γ →* GL (Fin a) K),
+      _root_.Formalism.MainNotions.N.IsSSRep ρ
+        → (∀ x
+            ∈ Submodule.span K
+              (Set.range fun g => ((ρ g : GL (Fin a) K) : Matrix (Fin a) (Fin a) K)),
+          (∀ g, (x * ((ρ g : GL (Fin a) K) : Matrix (Fin a) (Fin a) K)).trace = 0) → x = 0) := by
   intro Γ K _ _ _ a ρ hss x hx htrx
   classical
   unfold _root_.Formalism.MainNotions.N.IsSSRep at hss
@@ -100,31 +110,33 @@ theorem _root_.GlobalTheory.isSSRep_trace_nondegenerate :
   have hPmul : ∀ g h, P (g * h) = P g * P h := fun g h => by simp [hP, map_mul]
   have hP1 : P 1 = 1 := by simp [hP]
   have hgen : ∀ g, P g ∈ Submodule.span K (Set.range P) := fun g => Submodule.subset_span ⟨g, rfl⟩
-  have hleft : ∀ g, ∀ y ∈ Submodule.span K (Set.range P),
-      P g * y ∈ Submodule.span K (Set.range P) := by
+  have hleft
+      : ∀ g, ∀ y ∈ Submodule.span K (Set.range P), P g * y ∈ Submodule.span K (Set.range P) := by
     intro g y hy
     induction hy using Submodule.span_induction with
     | mem y hy => obtain ⟨h, rfl⟩ := hy; rw [← hPmul]; exact hgen _
     | zero => rw [mul_zero]; exact Submodule.zero_mem _
     | add y w _ _ hy hw => rw [mul_add]; exact Submodule.add_mem _ hy hw
     | smul c y _ hy => rw [mul_smul_comm]; exact Submodule.smul_mem _ c hy
-  have hAmul : ∀ y ∈ Submodule.span K (Set.range P), ∀ w ∈ Submodule.span K (Set.range P),
-      y * w ∈ Submodule.span K (Set.range P) := by
+  have hAmul
+      : ∀ y ∈ Submodule.span K (Set.range P), ∀ w ∈ Submodule.span K (Set.range P),
+        y * w ∈ Submodule.span K (Set.range P) := by
     intro y hy w hw
     induction hy using Submodule.span_induction with
     | mem y hy => obtain ⟨g, rfl⟩ := hy; exact hleft g w hw
     | zero => rw [zero_mul]; exact Submodule.zero_mem _
     | add y t _ _ hy ht => rw [add_mul]; exact Submodule.add_mem _ hy ht
     | smul c y _ hy => rw [smul_mul_assoc]; exact Submodule.smul_mem _ c hy
-  let B : Subalgebra K (Matrix (Fin a) (Fin a) K) :=
-    { carrier := Submodule.span K (Set.range P)
-      mul_mem' := fun hy hw => hAmul _ hy _ hw
-      add_mem' := fun hy hw => Submodule.add_mem _ hy hw
-      algebraMap_mem' := fun c => by
-        rw [Algebra.algebraMap_eq_smul_one, ← hP1]
-        exact Submodule.smul_mem _ c (hgen 1) }
-  let J : Matrix (Fin a) (Fin a) K → Prop :=
-    fun z => z ∈ Submodule.span K (Set.range P) ∧ ∀ g, (z * P g).trace = 0
+  let B : Subalgebra K (Matrix (Fin a) (Fin a) K) := {
+    carrier := Submodule.span K (Set.range P)
+    mul_mem' := fun hy hw => hAmul _ hy _ hw
+    add_mem' := fun hy hw => Submodule.add_mem _ hy hw
+    algebraMap_mem' := fun c => by
+      rw [Algebra.algebraMap_eq_smul_one, ← hP1]
+      exact Submodule.smul_mem _ c (hgen 1)
+  }
+  let J : Matrix (Fin a) (Fin a) K → Prop := fun z =>
+    z ∈ Submodule.span K (Set.range P) ∧ ∀ g, (z * P g).trace = 0
   have hJtr : ∀ z, J z → ∀ y ∈ B, (z * y).trace = 0 := by
     intro z hz y hy
     have hy' : y ∈ Submodule.span K (Set.range P) := hy
@@ -145,14 +157,20 @@ theorem _root_.GlobalTheory.isSSRep_trace_nondegenerate :
     rw [mul_assoc, ← hPmul]
     exact hz.2 _
   have hJ0 : J 0 := ⟨Submodule.zero_mem _, fun g => by simp⟩
-  have hJadd : ∀ y z, J y → J z → J (y + z) := fun y z hy hz =>
-    ⟨Submodule.add_mem _ hy.1 hz.1, fun g => by rw [add_mul, Matrix.trace_add, hy.2, hz.2, add_zero]⟩
-  have hJsmul : ∀ (c : K) z, J z → J (c • z) := fun c z hz =>
-    ⟨Submodule.smul_mem _ c hz.1, fun g => by rw [smul_mul_assoc, Matrix.trace_smul, hz.2, smul_zero]⟩
+  have hJadd : ∀ y z, J y → J z → J (y + z) := fun y z hy hz => ⟨
+    Submodule.add_mem _ hy.1 hz.1,
+    fun g => by rw [add_mul, Matrix.trace_add, hy.2, hz.2, add_zero]
+  ⟩
+  have hJsmul : ∀ (c : K) z, J z → J (c • z) := fun c z hz => ⟨
+    Submodule.smul_mem _ c hz.1,
+    fun g => by rw [smul_mul_assoc, Matrix.trace_smul, hz.2, smul_zero]
+  ⟩
   have hfix : ∀ z, J z → ∀ v, z *ᵥ v = v → v = 0 := fun z hz v hv =>
     eq_zero_of_mulVec_eq_self_of_trace_mul_eq_zero B hz.1 (hJtr z hz) hv
-  have hpres : ∀ S : Submodule K (Fin a → K), _root_.Formalism.MainNotions.N.IsInv ρ S →
-      ∀ y ∈ Submodule.span K (Set.range P), ∀ s ∈ S, y *ᵥ s ∈ S := by
+  have hpres
+      : ∀ S : Submodule K (Fin a → K),
+        _root_.Formalism.MainNotions.N.IsInv ρ S
+          → ∀ y ∈ Submodule.span K (Set.range P), ∀ s ∈ S, y *ᵥ s ∈ S := by
     intro S hS y hy s hs
     unfold _root_.Formalism.MainNotions.N.IsInv at hS
     induction hy using Submodule.span_induction with
@@ -160,11 +178,12 @@ theorem _root_.GlobalTheory.isSSRep_trace_nondegenerate :
     | zero => rw [Matrix.zero_mulVec]; exact S.zero_mem
     | add y w _ _ h1 h2 => rw [Matrix.add_mulVec]; exact S.add_mem h1 h2
     | smul c y _ h => rw [Matrix.smul_mulVec]; exact S.smul_mem c h
-  let W : Submodule K (Fin a → K) :=
-    { carrier := {v | ∀ z, J z → z *ᵥ v = 0}
-      add_mem' := fun {v w} hv hw z hz => by rw [Matrix.mulVec_add, hv z hz, hw z hz, add_zero]
-      zero_mem' := fun z _ => Matrix.mulVec_zero z
-      smul_mem' := fun c v hv z hz => by rw [Matrix.mulVec_smul, hv z hz, smul_zero] }
+  let W : Submodule K (Fin a → K) := {
+    carrier := {v | ∀ z, J z → z *ᵥ v = 0}
+    add_mem' := fun {v w} hv hw z hz => by rw [Matrix.mulVec_add, hv z hz, hw z hz, add_zero]
+    zero_mem' := fun z _ => Matrix.mulVec_zero z
+    smul_mem' := fun c v hv z hz => by rw [Matrix.mulVec_smul, hv z hz, smul_zero]
+  }
   have hWst : _root_.Formalism.MainNotions.N.IsInv ρ W := by
     unfold _root_.Formalism.MainNotions.N.IsInv
     intro g v hv
@@ -176,18 +195,21 @@ theorem _root_.GlobalTheory.isSSRep_trace_nondegenerate :
   obtain ⟨W', hW'st, hcompl⟩ := hss W hWst
   have hW'bot : W' = ⊥ := by
     by_contra hne
-    obtain ⟨S, ⟨hSst, hSW', hSne⟩, hmin⟩ := WellFounded.has_min wellFounded_lt
-      {S : Submodule K (Fin a → K) | _root_.Formalism.MainNotions.N.IsInv ρ S ∧ S ≤ W' ∧ S ≠ ⊥} ⟨W', hW'st, le_rfl, hne⟩
+    obtain ⟨S, ⟨hSst, hSW', hSne⟩, hmin⟩ :=
+      WellFounded.has_min wellFounded_lt
+        {S : Submodule K (Fin a → K) | _root_.Formalism.MainNotions.N.IsInv ρ S ∧ S ≤ W' ∧ S ≠ ⊥}
+        ⟨W', hW'st, le_rfl, hne⟩
     obtain ⟨s, hsS, hs0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hSne
-    let T : Submodule K (Fin a → K) :=
-      { carrier := {w | ∃ z, J z ∧ z *ᵥ s = w}
-        add_mem' := by
-          rintro _ _ ⟨y, hy, rfl⟩ ⟨z, hz, rfl⟩
-          exact ⟨y + z, hJadd y z hy hz, Matrix.add_mulVec _ _ _⟩
-        zero_mem' := ⟨0, hJ0, Matrix.zero_mulVec _⟩
-        smul_mem' := by
-          rintro c _ ⟨z, hz, rfl⟩
-          exact ⟨c • z, hJsmul c z hz, Matrix.smul_mulVec _ _ _⟩ }
+    let T : Submodule K (Fin a → K) := {
+      carrier := {w | ∃ z, J z ∧ z *ᵥ s = w}
+      add_mem' := by
+        rintro _ _ ⟨y, hy, rfl⟩ ⟨z, hz, rfl⟩
+        exact ⟨y + z, hJadd y z hy hz, Matrix.add_mulVec _ _ _⟩
+      zero_mem' := ⟨0, hJ0, Matrix.zero_mulVec _⟩
+      smul_mem' := by
+        rintro c _ ⟨z, hz, rfl⟩
+        exact ⟨c • z, hJsmul c z hz, Matrix.smul_mulVec _ _ _⟩
+    }
     have hTS : T ≤ S := by
       rintro _ ⟨z, hz, rfl⟩
       exact hpres S hSst z hz.1 s hsS

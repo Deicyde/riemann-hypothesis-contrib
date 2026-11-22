@@ -11,24 +11,31 @@ namespace GlobalTheory.CompanionTheory.LinearODE
 
 noncomputable def companion (p : Polynomial ℂ) (n : ℕ) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ) :=
   LinearMap.pi fun i =>
-    if h : (i : ℕ) + 1 < n then LinearMap.proj ⟨i + 1, h⟩
-    else - ∑ k : Fin n, p.coeff k • LinearMap.proj k
+    if h : (i : ℕ) + 1 < n then
+      LinearMap.proj ⟨i + 1, h⟩
+    else
+      - ∑ k : Fin n, p.coeff k • LinearMap.proj k
 
-theorem top_eq {p : Polynomial ℂ} (hp : p.Monic) {F : ℕ → ℝ → ℂ}
-    (hrel : ∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0) (s : ℝ) :
-    F p.natDegree s = - ∑ k : Fin p.natDegree, p.coeff k * F k s := by
+theorem top_eq
+    {p : Polynomial ℂ} (hp : p.Monic)
+    {F : ℕ → ℝ → ℂ} (hrel : ∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0)
+    (s : ℝ)
+    : F p.natDegree s = - ∑ k : Fin p.natDegree, p.coeff k * F k s := by
   have h := hrel s
   rw [Finset.sum_range_succ, hp.coeff_natDegree, one_mul] at h
-  have e : ∑ k : Fin p.natDegree, p.coeff k * F k s =
-      ∑ k ∈ Finset.range p.natDegree, p.coeff k * F k s :=
+  have e
+      : ∑ k : Fin p.natDegree, p.coeff k * F k s
+        = ∑ k ∈ Finset.range p.natDegree, p.coeff k * F k s :=
     (Finset.sum_range (fun k => p.coeff k * F k s)).symm
   rw [e]
   linear_combination h
 
-theorem lower_eq_zero {p : Polynomial ℂ} (hp : p.Monic) {F : ℕ → ℝ → ℂ}
-    (hF : ∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s)
+theorem lower_eq_zero
+    {p : Polynomial ℂ} (hp : p.Monic)
+    {F : ℕ → ℝ → ℂ} (hF : ∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s)
     (hrel : ∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0)
-    (h0 : ∀ k < p.natDegree, F k 0 = 0) : ∀ k < p.natDegree, F k = 0 := by
+    (h0 : ∀ k < p.natDegree, F k 0 = 0)
+    : ∀ k < p.natDegree, F k = 0 := by
   let X : ℝ → (Fin p.natDegree → ℂ) := fun s i => F i s
   have hX : ∀ s, HasDerivAt X (companion p p.natDegree (X s)) s := by
     intro s
@@ -51,23 +58,28 @@ theorem lower_eq_zero {p : Polynomial ℂ} (hp : p.Monic) {F : ℕ → ℝ → �
     simpa using this
   have hzero : ∀ s, X s = 0 := by
     intro s
-    have key := ODE_solution_unique_of_mem_Icc (v := fun _ => companion p p.natDegree)
-      (s := fun _ => Set.univ) (a := -(|s| + 1)) (b := |s| + 1) (t₀ := 0)
-      (fun t _ => hA.lipschitzOnWith)
-      ⟨by linarith [abs_nonneg s], by linarith [abs_nonneg s]⟩
-      (fun t _ => (hX t).continuousAt.continuousWithinAt) (fun t _ => hX t)
-      (fun _ _ => Set.mem_univ _)
-      (continuousOn_const (c := (0 : Fin p.natDegree → ℂ)))
-      (fun t _ => by simpa using hasDerivAt_const t (0 : Fin p.natDegree → ℂ))
-      (fun _ _ => Set.mem_univ _)
-      (by funext i; simpa [X] using h0 i i.isLt)
+    have key :=
+      ODE_solution_unique_of_mem_Icc
+        (v := fun _ => companion p p.natDegree)
+        (s := fun _ => Set.univ)
+        (a := -(|s| + 1)) (b := |s| + 1) (t₀ := 0)
+        (fun t _ => hA.lipschitzOnWith)
+        ⟨by linarith [abs_nonneg s], by linarith [abs_nonneg s]⟩
+        (fun t _ => (hX t).continuousAt.continuousWithinAt)
+        (fun t _ => hX t)
+        (fun _ _ => Set.mem_univ _)
+        (continuousOn_const (c := (0 : Fin p.natDegree → ℂ)))
+        (fun t _ => by simpa using hasDerivAt_const t (0 : Fin p.natDegree → ℂ))
+        (fun _ _ => Set.mem_univ _)
+        (by funext i; simpa [X] using h0 i i.isLt)
     exact key ⟨by linarith [neg_abs_le s], by linarith [le_abs_self s]⟩
   intro k hk
   funext s
   simpa [X] using congrFun (hzero s) ⟨k, hk⟩
 
-theorem chain_zero {F : ℕ → ℝ → ℂ} (hF : ∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s)
-    {m : ℕ} (h : F m = 0) : ∀ k, m ≤ k → F k = 0 := by
+theorem chain_zero
+    {F : ℕ → ℝ → ℂ} (hF : ∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s) {m : ℕ} (h : F m = 0)
+    : ∀ k, m ≤ k → F k = 0 := by
   intro k hk
   induction k, hk using Nat.le_induction with
   | base => exact h
@@ -78,10 +90,12 @@ theorem chain_zero {F : ℕ → ℝ → ℂ} (hF : ∀ (k : ℕ) (s : ℝ), HasD
     show F (k + 1) s = 0
     exact h1.unique (hasDerivAt_const s (0 : ℂ))
 
-theorem eq_zero_of_initial {p : Polynomial ℂ} (hp : p.Monic) {F : ℕ → ℝ → ℂ}
-    (hF : ∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s)
+theorem eq_zero_of_initial
+    {p : Polynomial ℂ} (hp : p.Monic)
+    {F : ℕ → ℝ → ℂ} (hF : ∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s)
     (hrel : ∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0)
-    (h0 : ∀ k < p.natDegree, F k 0 = 0) : ∀ k, F k = 0 := by
+    (h0 : ∀ k < p.natDegree, F k 0 = 0)
+    : ∀ k, F k = 0 := by
   have hlow := lower_eq_zero hp hF hrel h0
   have htop : F p.natDegree = 0 := by
     funext s
@@ -96,8 +110,9 @@ theorem eq_zero_of_initial {p : Polynomial ℂ} (hp : p.Monic) {F : ℕ → ℝ 
   · exact chain_zero hF htop k hk
 
 def solSpace (p : Polynomial ℂ) : Submodule ℂ (ℕ → ℝ → ℂ) where
-  carrier := {F | (∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s) ∧
-    ∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0}
+  carrier :=
+    {F | (∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s) ∧
+      ∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0}
   add_mem' := by
     rintro F G ⟨hF, rF⟩ ⟨hG, rG⟩
     refine ⟨fun k s => (hF k s).add (hG k s), fun s => ?_⟩
@@ -111,38 +126,42 @@ def solSpace (p : Polynomial ℂ) : Submodule ℂ (ℕ → ℝ → ℂ) where
       ring
     simp only [h, ← Finset.mul_sum, rF s, mul_zero]
 
-theorem finiteDimensional_solSpace {p : Polynomial ℂ} (hp : p.Monic) :
-    FiniteDimensional ℂ (solSpace p) := by
-  let Φ : solSpace p →ₗ[ℂ] (Fin p.natDegree → ℂ) :=
-    { toFun := fun F i => (F : ℕ → ℝ → ℂ) i 0
-      map_add' := fun F G => rfl
-      map_smul' := fun c F => rfl }
+theorem finiteDimensional_solSpace {p : Polynomial ℂ} (hp : p.Monic)
+    : FiniteDimensional ℂ (solSpace p) := by
+  let Φ : solSpace p →ₗ[ℂ] (Fin p.natDegree → ℂ) := {
+    toFun := fun F i => (F : ℕ → ℝ → ℂ) i 0
+    map_add' := fun F G => rfl
+    map_smul' := fun c F => rfl
+  }
   refine Module.Finite.of_injective Φ ((injective_iff_map_eq_zero Φ).2 fun F hF => ?_)
   obtain ⟨hFd, hFr⟩ := F.2
   have hz := eq_zero_of_initial hp hFd hFr (fun k hk => congrFun hF ⟨k, hk⟩)
   exact Subtype.ext (funext hz)
 
-theorem deriv_zero_eq_sum :
-    ∀ p : Polynomial ℂ, p.Monic → ∃ (T : Finset ℝ) (w : ℝ → ℂ), ∀ F : ℕ → ℝ → ℂ,
-      (∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s) →
-      (∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0) →
-      F 1 0 = ∑ t ∈ T, w t * F 0 t := by
+theorem deriv_zero_eq_sum
+    : ∀ p : Polynomial ℂ,
+      p.Monic
+        → ∃ (T : Finset ℝ) (w : ℝ → ℂ), ∀ F : ℕ → ℝ → ℂ,
+          (∀ (k : ℕ) (s : ℝ), HasDerivAt (F k) (F (k + 1) s) s)
+            → (∀ s : ℝ, ∑ k ∈ Finset.range (p.natDegree + 1), p.coeff k * F k s = 0)
+            → F 1 0 = ∑ t ∈ T, w t * F 0 t := by
   intro p hp
   haveI := finiteDimensional_solSpace hp
-  let ev : ℝ → Module.Dual ℂ (solSpace p) := fun t =>
-    { toFun := fun F => (F : ℕ → ℝ → ℂ) 0 t
-      map_add' := fun F G => rfl
-      map_smul' := fun c F => rfl }
-  let φ : Module.Dual ℂ (solSpace p) :=
-    { toFun := fun F => (F : ℕ → ℝ → ℂ) 1 0
-      map_add' := fun F G => rfl
-      map_smul' := fun c F => rfl }
+  let ev : ℝ → Module.Dual ℂ (solSpace p) := fun t => {
+    toFun := fun F => (F : ℕ → ℝ → ℂ) 0 t
+    map_add' := fun F G => rfl
+    map_smul' := fun c F => rfl
+  }
+  let φ : Module.Dual ℂ (solSpace p) := {
+    toFun := fun F => (F : ℕ → ℝ → ℂ) 1 0
+    map_add' := fun F G => rfl
+    map_smul' := fun c F => rfl
+  }
   have hco : (Submodule.span ℂ (Set.range ev)).dualCoannihilator = ⊥ := by
     rw [eq_bot_iff]
     intro F hF
     rw [Submodule.mem_dualCoannihilator] at hF
-    have h0 : (F : ℕ → ℝ → ℂ) 0 = 0 :=
-      funext fun t => hF (ev t) (Submodule.subset_span ⟨t, rfl⟩)
+    have h0 : (F : ℕ → ℝ → ℂ) 0 = 0 := funext fun t => hF (ev t) (Submodule.subset_span ⟨t, rfl⟩)
     obtain ⟨hFd, -⟩ := F.2
     have hall := chain_zero hFd h0
     rw [Submodule.mem_bot]

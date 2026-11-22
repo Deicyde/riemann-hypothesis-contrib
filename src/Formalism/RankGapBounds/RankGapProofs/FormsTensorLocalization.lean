@@ -18,14 +18,17 @@ theorem tensor_reduction_holds : TensorStep := by
   | smul_tprod r f =>
     rw [smul_comm]
     refine Submodule.smul_mem _ r ?_
-    have h1 : l ^ (∑ i, e i) • PiTensorProduct.tprod k f =
-        PiTensorProduct.tprod k (fun i => ((⟨l ^ e i • f i, hB i (f i)⟩ : B i) : A i)) := by
+    have h1
+        : l ^ (∑ i, e i) • PiTensorProduct.tprod k f
+          = PiTensorProduct.tprod k (fun i => ((⟨l ^ e i • f i, hB i (f i)⟩ : B i) : A i)) := by
       show _ = PiTensorProduct.tprod k (fun i => l ^ e i • f i)
       rw [MultilinearMap.map_smul_univ]
       simp only [RingHom.id_apply, Finset.prod_pow_eq_pow_sum]
     rw [h1]
-    exact ⟨PiTensorProduct.tprod k (fun i => (⟨l ^ e i • f i, hB i (f i)⟩ : B i)), by
-      rw [PiTensorProduct.map_tprod]; rfl⟩
+    exact ⟨
+      PiTensorProduct.tprod k (fun i => (⟨l ^ e i • f i, hB i (f i)⟩ : B i)),
+      by rw [PiTensorProduct.map_tprod]; rfl
+    ⟩
   | add x y hx hy =>
     rw [smul_add]
     exact Submodule.add_mem _ hx hy

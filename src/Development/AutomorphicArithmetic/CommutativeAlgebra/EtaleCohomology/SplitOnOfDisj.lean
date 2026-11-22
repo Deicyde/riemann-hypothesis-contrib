@@ -12,51 +12,64 @@ namespace UpperTheory.Ru.crystallineComparison
 
 open UpperTheory.Gal.crystallineComparison
 
-private theorem sec_open {X S : Scheme.{0}} (f : X ⟶ S) [Etale f] (s : S ⟶ X) (hs : s ≫ f = 𝟙 S) : IsOpenImmersion s := by
-  have hgraph := MorphismProperty.of_isPullback (P := @IsOpenImmersion)
-    (pullback_lift_diagonal_isPullback s f) inferInstance
+private theorem sec_open {X S : Scheme.{0}} (f : X ⟶ S) [Etale f] (s : S ⟶ X) (hs : s ≫ f = 𝟙 S)
+    : IsOpenImmersion s := by
+  have hgraph :=
+    MorphismProperty.of_isPullback (P := @IsOpenImmersion) (pullback_lift_diagonal_isPullback s f)
+      inferInstance
   have hiso : ∀ u : S ⟶ S, u = 𝟙 S → IsIso (pullback.snd u f) := by
     rintro _ rfl
     infer_instance
   have := hiso _ hs
-  have h : IsOpenImmersion (pullback.lift (𝟙 S) s (by simp) ≫ pullback.snd (s ≫ f) f) := inferInstance
+  have h : IsOpenImmersion (pullback.lift (𝟙 S) s (by simp) ≫ pullback.snd (s ≫ f) f) :=
+    inferInstance
   rwa [pullback.lift_snd] at h
 
-private theorem disj_of_splitOn {X Y Z : Scheme.{0}} (p : Z ⟶ Y) (x : X ⟶ Y) {m : ℕ} (z : Fin m → (X ⟶ Z))
-    (h : SplitOn p x z) (a b : Fin m) (hab : a ≠ b) (S : Scheme.{0}) (t : S ⟶ X)
-    (ht : t ≫ z a = t ≫ z b) : IsEmpty S := by
+private theorem disj_of_splitOn
+    {X Y Z : Scheme.{0}} (p : Z ⟶ Y) (x : X ⟶ Y)
+    {m : ℕ} (z : Fin m → (X ⟶ Z)) (h : SplitOn p x z) (a b : Fin m) (hab : a ≠ b)
+    (S : Scheme.{0}) (t : S ⟶ X) (ht : t ≫ z a = t ≫ z b)
+    : IsEmpty S := by
   obtain ⟨h, hiso⟩ := h
   have e : (t ≫ Sigma.ι (fun _ : Fin m => X) a) = t ≫ Sigma.ι (fun _ : Fin m => X) b := by
-    rw [← cancel_mono (Sigma.desc (fun i => pullback.lift (z i) (𝟙 X) (by rw [h i, Category.id_comp])) :
-      ∐ (fun _ : Fin m => X) ⟶ pullback p x)]
+    rw [← cancel_mono
+      (Sigma.desc (fun i => pullback.lift (z i) (𝟙 X) (by rw [h i, Category.id_comp]))
+        : ∐ (fun _ : Fin m => X) ⟶ pullback p x)]
     simp only [Category.assoc, Sigma.ι_desc]
     apply pullback.hom_ext
     · simp only [Category.assoc, pullback.lift_fst]; exact ht
     · simp only [Category.assoc, pullback.lift_snd]
   refine ⟨fun s => ?_⟩
   have hd := disjoint_opensRange_sigmaι (fun _ : Fin m => X) a b hab
-  have h1 : (t ≫ Sigma.ι (fun _ : Fin m => X) a) s ∈ (Sigma.ι (fun _ : Fin m => X) a).opensRange := by
+  have h1
+      : (t ≫ Sigma.ι (fun _ : Fin m => X) a) s ∈ (Sigma.ι (fun _ : Fin m => X) a).opensRange := by
     simp
-  have h2 : (t ≫ Sigma.ι (fun _ : Fin m => X) a) s ∈ (Sigma.ι (fun _ : Fin m => X) b).opensRange := by
+  have h2
+      : (t ≫ Sigma.ι (fun _ : Fin m => X) a) s ∈ (Sigma.ι (fun _ : Fin m => X) b).opensRange := by
     rw [e]; simp
   have h3 := hd.le_bot ⟨h1, h2⟩
   exact h3
 
-private theorem liftClosed {W P : Scheme.{0}} (ι : W ⟶ P) [IsClosedImmersion ι] (U U' : Type) [CommRing U] [CommRing U']
-    (φ : U →+* U') (hφ : Function.Injective φ) (u : Spec (CommRingCat.of U) ⟶ P)
-    (v : Spec (CommRingCat.of U') ⟶ W) (h : v ≫ ι = Spec.map (CommRingCat.ofHom φ) ≫ u) :
-    ∃ w : Spec (CommRingCat.of U) ⟶ W, w ≫ ι = u := by
+private theorem liftClosed
+    {W P : Scheme.{0}} (ι : W ⟶ P) [IsClosedImmersion ι]
+    (U U' : Type) [CommRing U] [CommRing U']
+    (φ : U →+* U') (hφ : Function.Injective φ)
+    (u : Spec (CommRingCat.of U) ⟶ P) (v : Spec (CommRingCat.of U') ⟶ W)
+    (h : v ≫ ι = Spec.map (CommRingCat.ofHom φ) ≫ u)
+    : ∃ w : Spec (CommRingCat.of U) ⟶ W, w ≫ ι = u := by
   let g := pullback.snd ι u
   have hcl : IsClosedImmersion g := inferInstance
-  let v' : Spec (CommRingCat.of U') ⟶ pullback ι u := pullback.lift v (Spec.map (CommRingCat.ofHom φ)) h
+  let v' : Spec (CommRingCat.of U') ⟶ pullback ι u :=
+    pullback.lift v (Spec.map (CommRingCat.ofHom φ)) h
   have hv' : v' ≫ g = Spec.map (CommRingCat.ofHom φ) := pullback.lift_snd _ _ _
   obtain ⟨hA, hsurj⟩ := IsClosedImmersion.isAffine_surjective_of_isAffine g
   have hinj : Function.Injective g.appTop.hom := by
     have h0 : Function.Injective (Spec.map (CommRingCat.ofHom φ)).appTop.hom := by
       have e := Scheme.ΓSpecIso_naturality (CommRingCat.ofHom φ)
       intro a b hab
-      have h2 : ((Spec.map (CommRingCat.ofHom φ)).appTop ≫ (Scheme.ΓSpecIso _).hom).hom a =
-          ((Spec.map (CommRingCat.ofHom φ)).appTop ≫ (Scheme.ΓSpecIso _).hom).hom b := by
+      have h2
+          : ((Spec.map (CommRingCat.ofHom φ)).appTop ≫ (Scheme.ΓSpecIso _).hom).hom a
+            = ((Spec.map (CommRingCat.ofHom φ)).appTop ≫ (Scheme.ΓSpecIso _).hom).hom b := by
         simp only [CommRingCat.hom_comp, RingHom.comp_apply]
         rw [hab]
       rw [e] at h2
@@ -70,16 +83,15 @@ private theorem liftClosed {W P : Scheme.{0}} (ι : W ⟶ P) [IsClosedImmersion 
     exact ⟨hinj, hsurj⟩
   have hg : IsIso g := by
     have e := Scheme.isoSpec_hom_naturality g
-    have : IsIso (g ≫ (Spec (CommRingCat.of U)).isoSpec.hom) := by
-      rw [← e]; infer_instance
+    have : IsIso (g ≫ (Spec (CommRingCat.of U)).isoSpec.hom) := by rw [← e]; infer_instance
     exact IsIso.of_isIso_comp_right g (Spec (CommRingCat.of U)).isoSpec.hom
   refine ⟨inv g ≫ pullback.fst ι u, ?_⟩
   rw [Category.assoc, pullback.condition, IsIso.inv_hom_id_assoc]
 
-private theorem closureOf (P : Scheme.{0}) (a : Γ(P, ⊤)) (D D' : P.Opens) (h : D ⊔ D' = P.basicOpen a)
-    (h' : D ⊓ D' = ⊥) :
-    ∃ (W : Scheme.{0}) (ι : W ⟶ P) (v : D.toScheme ⟶ W), IsClosedImmersion ι ∧ v ≫ ι = D.ι ∧
-      ∀ w : W, ι w ∈ P.basicOpen a → ι w ∈ D := by
+private theorem closureOf
+    (P : Scheme.{0}) (a : Γ(P, ⊤)) (D D' : P.Opens) (h : D ⊔ D' = P.basicOpen a) (h' : D ⊓ D' = ⊥)
+    : ∃ (W : Scheme.{0}) (ι : W ⟶ P) (v : D.toScheme ⟶ W),
+      IsClosedImmersion ι ∧ v ≫ ι = D.ι ∧ ∀ w : W, ι w ∈ P.basicOpen a → ι w ∈ D := by
   have hq : QuasiCompact D.ι := by
     rw [quasiCompact_iff_forall_isAffineOpen]
     intro V hV
@@ -96,9 +108,11 @@ private theorem closureOf (P : Scheme.{0}) (a : Γ(P, ⊤)) (D D' : P.Opens) (h 
     · rintro ⟨hv, hd⟩
       refine ⟨⟨hv, ?_⟩, fun hd' => ?_⟩
       · have : x ∈ D ⊔ D' := Or.inl hd
-        rw [h] at this; exact this
+        rw [h] at this
+        exact this
       · have : x ∈ D ⊓ D' := ⟨hd, hd'⟩
-        rw [h'] at this; exact this
+        rw [h'] at this
+        exact this
     · rintro ⟨⟨hv, hb⟩, hd'⟩
       have : x ∈ D ⊔ D' := by rw [h]; exact hb
       exact ⟨hv, this.resolve_right hd'⟩
@@ -117,12 +131,14 @@ private theorem closureOf (P : Scheme.{0}) (a : Γ(P, ⊤)) (D D' : P.Opens) (h 
   rw [inf_comm, h'] at this
   exact this
 
-private theorem natUnit_comp {X S : Scheme.{0}} (t : S ⟶ X) (l : ℕ) (h : IsUnit (l : Γ(X, ⊤))) : IsUnit (l : Γ(S, ⊤)) := by
+private theorem natUnit_comp {X S : Scheme.{0}} (t : S ⟶ X) (l : ℕ) (h : IsUnit (l : Γ(X, ⊤)))
+    : IsUnit (l : Γ(S, ⊤)) := by
   have := h.map t.appTop.hom
   simpa using this
 
-private theorem natUnit_mem {X A : Scheme.{0}} (t : X ⟶ A) (l : ℕ) (h : IsUnit (l : Γ(X, ⊤))) (x : X) :
-    t x ∈ A.basicOpen (l : Γ(A, ⊤)) := by
+private theorem natUnit_mem
+    {X A : Scheme.{0}} (t : X ⟶ A) (l : ℕ) (h : IsUnit (l : Γ(X, ⊤))) (x : X)
+    : t x ∈ A.basicOpen (l : Γ(A, ⊤)) := by
   have h1 : X.basicOpen (t.appTop.hom (l : Γ(A, ⊤))) = ⊤ := by
     simpa using Scheme.basicOpen_of_isUnit X h
   have h2 : x ∈ t ⁻¹ᵁ A.basicOpen (l : Γ(A, ⊤)) := by
@@ -130,10 +146,11 @@ private theorem natUnit_mem {X A : Scheme.{0}} (t : X ⟶ A) (l : ℕ) (h : IsUn
     trivial
   exact h2
 
-private theorem eqLocus₀ {Z Y : Scheme.{0}} (p : Z ⟶ Y) [Etale p] [IsSeparated p] (A : Scheme.{0}) (f g : A ⟶ Z)
-    (hfg : f ≫ p = g ≫ p) :
-    ∃ O O' : A.Opens, O ⊔ O' = ⊤ ∧ O ⊓ O' = ⊥ ∧
-      ∀ (X : Scheme.{0}) (t : X ⟶ A), (∀ x, t x ∈ O) ↔ t ≫ f = t ≫ g := by
+private theorem eqLocus₀
+    {Z Y : Scheme.{0}} (p : Z ⟶ Y) [Etale p] [IsSeparated p]
+    (A : Scheme.{0}) (f g : A ⟶ Z) (hfg : f ≫ p = g ≫ p)
+    : ∃ O O' : A.Opens,
+      O ⊔ O' = ⊤ ∧ O ⊓ O' = ⊥ ∧ ∀ (X : Scheme.{0}) (t : X ⟶ A), (∀ x, t x ∈ O) ↔ t ≫ f = t ≫ g := by
   let Δ := pullback.diagonal p
   have hΔ : IsOpenImmersion Δ := sec_open (pullback.fst p p) Δ (pullback.diagonal_fst p)
   have hc : IsClosedImmersion Δ := inferInstance
@@ -160,29 +177,34 @@ private theorem eqLocus₀ {Z Y : Scheme.{0}} (p : Z ⟶ Y) [Etale p] [IsSeparat
     have e1 : k = t ≫ f := by
       have := congrArg (· ≫ pullback.fst p p) hk
       simp only [Category.assoc] at this
-      rw [show Δ ≫ pullback.fst p p = 𝟙 _ from pullback.diagonal_fst p, cf, Category.comp_id] at this
+      rw [show Δ ≫ pullback.fst p p = 𝟙 _ from pullback.diagonal_fst p, cf, Category.comp_id]
+        at this
       exact this
     have e2 : k = t ≫ g := by
       have := congrArg (· ≫ pullback.snd p p) hk
       simp only [Category.assoc] at this
-      rw [show Δ ≫ pullback.snd p p = 𝟙 _ from pullback.diagonal_snd p, cs, Category.comp_id] at this
+      rw [show Δ ≫ pullback.snd p p = 𝟙 _ from pullback.diagonal_snd p, cs, Category.comp_id]
+        at this
       exact this
     exact e1.symm.trans e2
   · have e : t ≫ c = (t ≫ f) ≫ Δ := by
       apply pullback.hom_ext
-      · rw [Category.assoc, Category.assoc, cf, show Δ ≫ pullback.fst p p = 𝟙 _ from pullback.diagonal_fst p,
-          Category.comp_id]
-      · rw [Category.assoc, Category.assoc, cs, show Δ ≫ pullback.snd p p = 𝟙 _ from pullback.diagonal_snd p,
-          Category.comp_id, h]
+      · rw [Category.assoc, Category.assoc, cf,
+          show Δ ≫ pullback.fst p p = 𝟙 _ from pullback.diagonal_fst p, Category.comp_id]
+      · rw [Category.assoc, Category.assoc, cs,
+          show Δ ≫ pullback.snd p p = 𝟙 _ from pullback.diagonal_snd p, Category.comp_id, h]
     have : (t ≫ c) x ∈ Set.range Δ := by
       rw [e]
       exact ⟨(t ≫ f) x, by simp⟩
     exact this
 
-private theorem eqLocus (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (A : Scheme.{0}) (f g : A ⟶ T.Z)
-    (hfg : f ≫ T.p = g ≫ T.p) :
-    ∃ O O' : A.Opens, O ⊔ O' = A.basicOpen (l : Γ(A, ⊤)) ∧ O ⊓ O' = ⊥ ∧
-      ∀ (X : Scheme.{0}) (t : X ⟶ A), IsUnit (l : Γ(X, ⊤)) → ((∀ x, t x ∈ O) ↔ t ≫ f = t ≫ g) := by
+private theorem eqLocus
+    (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y)
+    (A : Scheme.{0}) (f g : A ⟶ T.Z) (hfg : f ≫ T.p = g ≫ T.p)
+    : ∃ O O' : A.Opens,
+      O ⊔ O' = A.basicOpen (l : Γ(A, ⊤)) ∧ O ⊓ O' = ⊥
+        ∧ ∀ (X : Scheme.{0}) (t : X ⟶ A),
+          IsUnit (l : Γ(X, ⊤)) → ((∀ x, t x ∈ O) ↔ t ≫ f = t ≫ g) := by
   let U := Y.basicOpen (l : Γ(Y, ⊤))
   let B := A.basicOpen (l : Γ(A, ⊤))
   have hpre : ∀ h : A ⟶ Y, B ≤ h ⁻¹ᵁ U := by
@@ -192,7 +214,8 @@ private theorem eqLocus (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (A : Scheme.{0
   have het : Etale (T.p ∣_ U) := T.et
   have hfin : IsFinite T.p := T.fin
   have hsep : IsSeparated (T.p ∣_ U) :=
-    MorphismProperty.of_isPullback (P := @IsSeparated) (isPullback_morphismRestrict T.p U).flip inferInstance
+    MorphismProperty.of_isPullback (P := @IsSeparated) (isPullback_morphismRestrict T.p U).flip
+      inferInstance
   have hf : B ≤ f ⁻¹ᵁ (T.p ⁻¹ᵁ U) := hpre (f ≫ T.p)
   have hg : B ≤ g ⁻¹ᵁ (T.p ⁻¹ᵁ U) := hpre (g ≫ T.p)
   let f' := f.resLE (T.p ⁻¹ᵁ U) B hf
@@ -200,8 +223,8 @@ private theorem eqLocus (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (A : Scheme.{0
   have hf' : f' ≫ (T.p ⁻¹ᵁ U).ι = B.ι ≫ f := Scheme.Hom.resLE_comp_ι _ _
   have hg' : g' ≫ (T.p ⁻¹ᵁ U).ι = B.ι ≫ g := Scheme.Hom.resLE_comp_ι _ _
   have hfg' : f' ≫ (T.p ∣_ U) = g' ≫ (T.p ∣_ U) := by
-    rw [← cancel_mono U.ι, Category.assoc, Category.assoc, morphismRestrict_ι, ← Category.assoc, hf',
-      ← Category.assoc, hg', Category.assoc, Category.assoc, hfg]
+    rw [← cancel_mono U.ι, Category.assoc, Category.assoc, morphismRestrict_ι, ← Category.assoc,
+      hf', ← Category.assoc, hg', Category.assoc, Category.assoc, hfg]
   obtain ⟨O₀, O₀', a, b, c⟩ := eqLocus₀ (T.p ∣_ U) B.toScheme f' g' hfg'
   have memI : ∀ (V : B.toScheme.Opens) (x : B.toScheme), B.ι x ∈ B.ι ''ᵁ V ↔ x ∈ V := by
     intro V x
@@ -245,8 +268,9 @@ private theorem eqLocus (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (A : Scheme.{0
     rw [ef, eg]
     exact (cancel_mono _).symm
 
-private theorem etale_snd (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (X : Scheme.{0}) (x : X ⟶ Y)
-    (hl : IsUnit (l : Γ(X, ⊤))) : Etale (pullback.snd T.p x) := by
+private theorem etale_snd
+    (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (X : Scheme.{0}) (x : X ⟶ Y) (hl : IsUnit (l : Γ(X, ⊤)))
+    : Etale (pullback.snd T.p x) := by
   let U := Y.basicOpen (l : Γ(Y, ⊤))
   have het : Etale (T.p ∣_ U) := T.et
   have r : Set.range x ⊆ Set.range U.ι := by
@@ -256,7 +280,8 @@ private theorem etale_snd (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (X : Scheme.
   have hk := IsOpenImmersion.lift_fac U.ι x r
   generalize IsOpenImmersion.lift U.ι x r = x' at hk
   subst hk
-  have sq := (IsPullback.of_hasPullback (T.p ∣_ U) x').paste_horiz (isPullback_morphismRestrict T.p U).flip
+  have sq :=
+    (IsPullback.of_hasPullback (T.p ∣_ U) x').paste_horiz (isPullback_morphismRestrict T.p U).flip
   have h1 : Etale (pullback.snd (T.p ∣_ U) x') := inferInstance
   have e : pullback.snd T.p (x' ≫ U.ι) = sq.isoPullback.inv ≫ pullback.snd (T.p ∣_ U) x' := by
     rw [Iso.eq_inv_comp]
@@ -264,8 +289,11 @@ private theorem etale_snd (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (X : Scheme.
   rw [e]
   infer_instance
 
-private theorem sec_agree {Q X : Scheme.{0}} (q : Q ⟶ X) [Etale q] (σ τ : X ⟶ Q) (hσ : σ ≫ q = 𝟙 X) (hτ : τ ≫ q = 𝟙 X)
-    (u : X) (h : σ u = τ u) : ∃ V : X.Opens, u ∈ V ∧ V.ι ≫ σ = V.ι ≫ τ := by
+private theorem sec_agree
+    {Q X : Scheme.{0}} (q : Q ⟶ X) [Etale q]
+    (σ τ : X ⟶ Q) (hσ : σ ≫ q = 𝟙 X) (hτ : τ ≫ q = 𝟙 X)
+    (u : X) (h : σ u = τ u)
+    : ∃ V : X.Opens, u ∈ V ∧ V.ι ≫ σ = V.ι ≫ τ := by
   have ho : IsOpenImmersion σ := sec_open q σ hσ
   let V : X.Opens := τ ⁻¹ᵁ σ.opensRange
   refine ⟨V, ⟨u, h⟩, ?_⟩
@@ -280,9 +308,11 @@ private theorem sec_agree {Q X : Scheme.{0}} (q : Q ⟶ X) [Etale q] (σ τ : X 
     exact this
   rw [← hk, e]
 
-private theorem finite_sec (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (K : Type) [Field K] (hK : (l : K) ≠ 0)
-    (y : Spec (CommRingCat.of K) ⟶ Y) :
-    Finite {z : Spec (CommRingCat.of K) ⟶ T.Z // z ≫ T.p = y} := by
+private theorem finite_sec
+    (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y)
+    (K : Type) [Field K]
+    (hK : (l : K) ≠ 0) (y : Spec (CommRingCat.of K) ⟶ Y)
+    : Finite {z : Spec (CommRingCat.of K) ⟶ T.Z // z ≫ T.p = y} := by
   have hu : IsUnit (l : Γ(Spec (CommRingCat.of K), ⊤)) := by
     have := (IsUnit.mk0 _ hK).map (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
     simpa using this
@@ -297,8 +327,8 @@ private theorem finite_sec (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (K : Type) 
     have : r ⁻¹' {pt} = Set.univ := Set.eq_univ_of_forall fun a => hsub _ _
     rw [this] at h0
     exact Set.finite_univ_iff.1 h0
-  let F : {z : Spec (CommRingCat.of K) ⟶ T.Z // z ≫ T.p = y} → (pullback T.p y : Scheme.{0}) := fun z =>
-    pullback.lift z.1 (𝟙 _) (by rw [z.2, Category.id_comp]) pt
+  let F : {z : Spec (CommRingCat.of K) ⟶ T.Z // z ≫ T.p = y} → (pullback T.p y : Scheme.{0}) :=
+    fun z => pullback.lift z.1 (𝟙 _) (by rw [z.2, Category.id_comp]) pt
   refine Finite.of_injective F fun a b hab => ?_
   obtain ⟨V, hV, e⟩ := sec_agree r _ _ (pullback.lift_snd _ _ _) (pullback.lift_snd _ _ _) pt hab
   have hVt : V = ⊤ := by
@@ -312,22 +342,33 @@ private theorem finite_sec (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (K : Type) 
     isIso_of_isOpenImmersion_of_opensRange_eq_top _ (by simp)
   exact Subtype.ext ((cancel_epi _).1 e2)
 
-private theorem exists_geom (Q : Scheme.{0}) (ζ : Q) : ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K)
-    (g : Spec (CommRingCat.of K) ⟶ Q) (pt : Spec (CommRingCat.of K)), g pt = ζ := by
+private theorem exists_geom (Q : Scheme.{0}) (ζ : Q)
+    : ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (g : Spec (CommRingCat.of K) ⟶ Q)
+        (pt : Spec (CommRingCat.of K)),
+      g pt = ζ := by
   let κ := Q.residueField ζ
   let K := AlgebraicClosure κ
-  refine ⟨K, inferInstance, inferInstance,
-    Spec.map (CommRingCat.ofHom (algebraMap κ K)) ≫ Q.fromSpecResidueField ζ, IsLocalRing.closedPoint K, ?_⟩
+  refine ⟨
+    K,
+    inferInstance,
+    inferInstance,
+    Spec.map (CommRingCat.ofHom (algebraMap κ K)) ≫ Q.fromSpecResidueField ζ,
+    IsLocalRing.closedPoint K,
+    ?_
+  ⟩
   exact Q.fromSpecResidueField_apply ζ _
 
-private theorem splitOn_of_disj (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (X : Scheme.{0}) (x : X ⟶ Y)
-    (z : Fin T.d → (X ⟶ T.Z)) (hz : ∀ i, z i ≫ T.p = x) (hl : IsUnit (l : Γ(X, ⊤)))
-    (hd : ∀ a b, a ≠ b → ∀ (S : Scheme.{0}) (t : S ⟶ X), t ≫ z a = t ≫ z b → IsEmpty S) :
-    SplitOn T.p x z := by
+private theorem splitOn_of_disj
+    (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y)
+    (X : Scheme.{0}) (x : X ⟶ Y) (z : Fin T.d → (X ⟶ T.Z))
+    (hz : ∀ i, z i ≫ T.p = x) (hl : IsUnit (l : Γ(X, ⊤)))
+    (hd : ∀ a b, a ≠ b → ∀ (S : Scheme.{0}) (t : S ⟶ X), t ≫ z a = t ≫ z b → IsEmpty S)
+    : SplitOn T.p x z := by
   refine ⟨hz, ?_⟩
   have het := etale_snd l Y T X x hl
   let q := pullback.snd T.p x
-  let σ : ∀ i, X ⟶ pullback T.p x := fun i => pullback.lift (z i) (𝟙 X) (by rw [hz i, Category.id_comp])
+  let σ : ∀ i, X ⟶ pullback T.p x := fun i =>
+    pullback.lift (z i) (𝟙 X) (by rw [hz i, Category.id_comp])
   have hσq : ∀ i, σ i ≫ q = 𝟙 X := fun i => pullback.lift_snd _ _ _
   have hσf : ∀ i, σ i ≫ pullback.fst T.p x = z i := fun i => pullback.lift_fst _ _ _
   have ho : ∀ i, IsOpenImmersion (σ i) := fun i => sec_open q (σ i) (hσq i)
@@ -365,8 +406,8 @@ private theorem splitOn_of_disj (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (X : S
     by_contra hne
     exact (hd a b hne _ e (congrArg Subtype.val hab)).false pt
   have hbij := hinj.bijective_of_nat_card_le (by rw [hcard]; simp)
-  obtain ⟨i, hi⟩ := hbij.2 ⟨g ≫ pullback.fst T.p x, by
-    rw [Category.assoc, pullback.condition, ← Category.assoc]⟩
+  obtain ⟨i, hi⟩ :=
+    hbij.2 ⟨g ≫ pullback.fst T.p x, by rw [Category.assoc, pullback.condition, ← Category.assoc]⟩
   have hi' : e ≫ z i = g ≫ pullback.fst T.p x := congrArg Subtype.val hi
   have hgi : g = e ≫ σ i := by
     apply pullback.hom_ext
@@ -380,16 +421,16 @@ private theorem splitOn_of_disj (l : ℕ) (Y : Scheme.{0}) (T : Corr l Y) (X : S
   simp only [Scheme.Hom.comp_apply]
   rw [← Scheme.Hom.comp_apply, this]
 
-private theorem natUnit_away (l : ℕ) (U : Type) [CommRing U] :
-    IsUnit (l : Γ(Spec (CommRingCat.of (Localization.Away (l : U))), ⊤)) := by
+private theorem natUnit_away (l : ℕ) (U : Type) [CommRing U]
+    : IsUnit (l : Γ(Spec (CommRingCat.of (Localization.Away (l : U))), ⊤)) := by
   have h : IsUnit (l : Localization.Away (l : U)) := by
     have := IsLocalization.Away.algebraMap_isUnit (S := Localization.Away (l : U)) (l : U)
     simpa using this
   have := h.map (Scheme.ΓSpecIso (CommRingCat.of (Localization.Away (l : U)))).inv.hom
   simpa using this
 
-private theorem away_inj (l : ℕ) (U : Type) [CommRing U] (h : (l : U) ∈ nonZeroDivisors U) :
-    Function.Injective (algebraMap U (Localization.Away (l : U))) :=
+private theorem away_inj (l : ℕ) (U : Type) [CommRing U] (h : (l : U) ∈ nonZeroDivisors U)
+    : Function.Injective (algebraMap U (Localization.Away (l : U))) :=
   IsLocalization.injective _ (Submonoid.powers_le.2 h)
 
 theorem wEx : WEx := by
@@ -402,16 +443,20 @@ theorem wEx : WEx := by
   let π₀ : P ⟶ Y := WidePullback.base pi
   have hc : ∀ i, c i ≫ pi i = π₀ := WidePullback.π_arrow pi
   let Q := {q : Σ j, Fin (T j).d × Fin (T j).d // q.2.1 ≠ q.2.2}
-  have hE : ∀ q : Q, ∃ O O' : P.Opens, O ⊔ O' = P.basicOpen (l : Γ(P, ⊤)) ∧ O ⊓ O' = ⊥ ∧
-      ∀ (X : Scheme.{0}) (t : X ⟶ P), IsUnit (l : Γ(X, ⊤)) →
-        ((∀ x, t x ∈ O) ↔ t ≫ c ⟨q.1.1, q.1.2.1⟩ = t ≫ c ⟨q.1.1, q.1.2.2⟩) := fun q =>
+  have hE
+      : ∀ q : Q, ∃ O O' : P.Opens,
+        O ⊔ O' = P.basicOpen (l : Γ(P, ⊤)) ∧ O ⊓ O' = ⊥
+          ∧ ∀ (X : Scheme.{0}) (t : X ⟶ P),
+            IsUnit (l : Γ(X, ⊤))
+              → ((∀ x, t x ∈ O) ↔ t ≫ c ⟨q.1.1, q.1.2.1⟩ = t ≫ c ⟨q.1.1, q.1.2.2⟩) := fun q =>
     eqLocus l Y (T q.1.1) P (c ⟨q.1.1, q.1.2.1⟩) (c ⟨q.1.1, q.1.2.2⟩)
       ((hc ⟨q.1.1, q.1.2.1⟩).trans (hc ⟨q.1.1, q.1.2.2⟩).symm)
   choose O O' h1 h2 h3 using hE
   let B := P.basicOpen (l : Γ(P, ⊤))
   have hOB : ∀ q, O q ≤ B := fun q => le_sup_left.trans_eq (h1 q)
   have hOB' : ∀ q, O' q ≤ B := fun q => le_sup_right.trans_eq (h1 q)
-  let D : P.Opens := ⟨(B : Set P) ∩ ⋂ q, (O' q : Set P), B.2.inter (isOpen_iInter_of_finite fun q => (O' q).2)⟩
+  let D : P.Opens :=
+    ⟨(B : Set P) ∩ ⋂ q, (O' q : Set P), B.2.inter (isOpen_iInter_of_finite fun q => (O' q).2)⟩
   let D' : P.Opens := ⨆ q, O q
   have memD : ∀ x, x ∈ D ↔ x ∈ B ∧ ∀ q, x ∉ O q := by
     intro x
@@ -461,11 +506,13 @@ theorem wEx : WEx := by
       refine ((memD _).1 hD).2 q ?_
       simpa using key
   · intro U _ hl y z hz hsp
-    let u : Spec (CommRingCat.of U) ⟶ P := WidePullback.lift y (fun i => z i.1 i.2) (fun i => hz i.1 i.2)
+    let u : Spec (CommRingCat.of U) ⟶ P :=
+      WidePullback.lift y (fun i => z i.1 i.2) (fun i => hz i.1 i.2)
     have hu₀ : u ≫ π₀ = y := WidePullback.lift_base _ _ _ _
     have huc : ∀ i, u ≫ c i = z i.1 i.2 := fun i => WidePullback.lift_π _ _ _ _ _
     let a := awayPt l U
-    have hau : IsUnit (l : Γ(Spec (CommRingCat.of (Localization.Away (l : U))), ⊤)) := natUnit_away l U
+    have hau : IsUnit (l : Γ(Spec (CommRingCat.of (Localization.Away (l : U))), ⊤)) :=
+      natUnit_away l U
     have hrange : ∀ x, (a ≫ u) x ∈ D := by
       intro x
       refine (memD _).2 ⟨natUnit_mem _ l hau x, fun q hq => ?_⟩
@@ -480,7 +527,9 @@ theorem wEx : WEx := by
         simp only [Category.assoc] at e
         rw [e1, e2] at e
         exact e
-      have := disj_of_splitOn _ _ _ (hsp q.1.1) _ _ q.2 V.toScheme V.ι (by simpa [Category.assoc] using e')
+      have :=
+        disj_of_splitOn _ _ _ (hsp q.1.1) _ _ q.2 V.toScheme V.ι
+          (by simpa [Category.assoc] using e')
       exact this.false ⟨x, hq⟩
     have hr : Set.range (a ≫ u) ⊆ Set.range D.ι := by
       rintro _ ⟨x, rfl⟩
@@ -488,8 +537,9 @@ theorem wEx : WEx := by
       exact hrange x
     let v₀ := IsOpenImmersion.lift D.ι (a ≫ u) hr
     have hv₀ : v₀ ≫ D.ι = a ≫ u := IsOpenImmersion.lift_fac _ _ _
-    obtain ⟨w, hw⟩ := liftClosed ι U (Localization.Away (l : U)) (algebraMap U _) (away_inj l U hl) u (v₀ ≫ vD)
-      (by rw [Category.assoc, hvD, hv₀])
+    obtain ⟨w, hw⟩ :=
+      liftClosed ι U (Localization.Away (l : U)) (algebraMap U _) (away_inj l U hl) u (v₀ ≫ vD)
+        (by rw [Category.assoc, hvD, hv₀])
     refine ⟨w, ⟨?_, fun j i => ?_⟩, ?_⟩
     · rw [← Category.assoc, hw, hu₀]
     · rw [← Category.assoc, hw]

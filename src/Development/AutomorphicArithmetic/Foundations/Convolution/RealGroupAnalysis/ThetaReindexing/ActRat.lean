@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 
@@ -16,8 +18,8 @@ section
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-private theorem mkE_rt (D : Dat F E) (u t : F) :
-    D.mkE (rt u) (rt t) = rt (algebraMap F E u + algebraMap F E t * D.θ) := by
+private theorem mkE_rt (D : Dat F E) (u t : F)
+    : D.mkE (rt u) (rt t) = rt (algebraMap F E u + algebraMap F E t * D.θ) := by
   simp only [Dat.mkE, rt, AdeleBaseChange.adeleMap_algebraMap, map_add (f := _), map_mul]
 
 private theorem bar_rt (D : Dat F E) (z : E) : D.bar (rt z) = rt (D.σ z) :=
@@ -26,15 +28,17 @@ private theorem bar_rt (D : Dat F E) (z : E) : D.bar (rt z) = rt (D.σ z) :=
 private theorem co_rt (D : Dat F E) (z : E) (i : Fin 2) : D.co (rt z) i = rt (D.b.repr z i) :=
   AdeleBaseChange.adeleBasis_repr_algebraMap D.b z i
 
-private theorem herm_rt (D : Dat F E) (ξ : Fin 4 → F) :
-    D.herm (fun i => rt (ξ i)) =
-      (!![algebraMap F E (ξ 1) + algebraMap F E 0 * D.θ, algebraMap F E (ξ 2) + algebraMap F E (ξ 3) * D.θ;
-        algebraMap F E (ξ 2) + algebraMap F E (-ξ 3) * D.θ, algebraMap F E (ξ 0) + algebraMap F E 0 * D.θ]).map
+private theorem herm_rt (D : Dat F E) (ξ : Fin 4 → F)
+    : D.herm (fun i => rt (ξ i))
+      = (!![algebraMap F E (ξ 1) + algebraMap F E 0 * D.θ, algebraMap F E (ξ 2) + algebraMap F E (ξ 3) * D.θ;
+          algebraMap F E (ξ 2) + algebraMap F E (-ξ 3) * D.θ, algebraMap F E (ξ 0) + algebraMap F E 0 * D.θ]).map
         (algebraMap E (A E)) := by
   have e0 : ∀ u : F, D.mkE (rt u) 0 = rt (algebraMap F E u + algebraMap F E 0 * D.θ) := fun u => by
     rw [← mkE_rt, show (rt (0 : F) : A F) = 0 from map_zero _]
-  have e3 : D.mkE (rt (ξ 2)) (-rt (ξ 3)) = rt (algebraMap F E (ξ 2) + algebraMap F E (-ξ 3) * D.θ) := by
-    rw [← mkE_rt, show (rt (-ξ 3) : A F) = -rt (ξ 3) from map_neg _ _]
+  have e3
+      : D.mkE (rt (ξ 2)) (- rt (ξ 3))
+        = rt (algebraMap F E (ξ 2) + algebraMap F E (- ξ 3) * D.θ) := by
+    rw [← mkE_rt, show (rt (- ξ 3) : A F) = - rt (ξ 3) from map_neg _ _]
   ext i j
   fin_cases i <;> fin_cases j
   · exact e0 _
@@ -45,24 +49,29 @@ private theorem herm_rt (D : Dat F E) (ξ : Fin 4 → F) :
 variable [_root_.NumberField.IsTotallyComplex E]
 
 private theorem ab_nu (γ : GL (Fin 2) E) : ab (nu F (ratGL E 2 γ)) = 1 := by
-  have hd : Matrix.GeneralLinearGroup.det (ratGL E 2 γ) =
-      IdeleGroup.diagonal E (Matrix.GeneralLinearGroup.det γ) := Units.ext (by
-    change (ratGL E 2 γ).val.det = algebraMap E (A E) γ.val.det
-    rw [RingHom.map_det]
-    rfl)
+  have hd
+      : Matrix.GeneralLinearGroup.det (ratGL E 2 γ)
+        = IdeleGroup.diagonal E (Matrix.GeneralLinearGroup.det γ) :=
+    Units.ext (by
+      change (ratGL E 2 γ).val.det = algebraMap E (A E) γ.val.det
+      rw [RingHom.map_det]
+      rfl)
   rw [nu, hd, ideleNorm_diagonal, ab, IdeleGroup.ideleModule_diagonal]
   rfl
 
-private theorem act_rat (D : Dat F E) (γ : GL (Fin 2) E) (ξ : Fin 4 → F) :
-    ∃ ξ' : Fin 4 → F, D.act (ratGL E 2 γ) (fun i => rt (ξ i)) = fun i => rt (ξ' i) := by
-  obtain ⟨X, hX⟩ : ∃ X : Matrix (Fin 2) (Fin 2) E, D.herm (fun i => rt (ξ i)) = X.map (algebraMap E (A E)) := ⟨_, herm_rt D ξ⟩
+private theorem act_rat (D : Dat F E) (γ : GL (Fin 2) E) (ξ : Fin 4 → F)
+    : ∃ ξ' : Fin 4 → F, D.act (ratGL E 2 γ) (fun i => rt (ξ i)) = fun i => rt (ξ' i) := by
+  obtain ⟨X, hX⟩
+      : ∃ X : Matrix (Fin 2) (Fin 2) E, D.herm (fun i => rt (ξ i)) = X.map (algebraMap E (A E)) :=
+    ⟨_, herm_rt D ξ⟩
   have hh : (ratGL E 2 γ).val = γ.val.map (algebraMap E (A E)) := rfl
   have hb : (ratGL E 2 γ).val.map D.bar = (γ.val.map D.σ).map (algebraMap E (A E)) := by
     ext i j
     exact bar_rt D (γ.val i j)
   set P : Matrix (Fin 2) (Fin 2) E := γ.val * X * (γ.val.map D.σ)ᵀ with hP
-  have hm : (ratGL E 2 γ).val * D.herm (fun i => rt (ξ i)) * ((ratGL E 2 γ).val.map D.bar)ᵀ =
-      P.map (algebraMap E (A E)) := by
+  have hm
+      : (ratGL E 2 γ).val * D.herm (fun i => rt (ξ i)) * ((ratGL E 2 γ).val.map D.bar)ᵀ
+        = P.map (algebraMap E (A E)) := by
     rw [hX, hb, hh, hP, Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map]
   refine ⟨![D.b.repr (P 1 1) 0, D.b.repr (P 0 0) 0, D.b.repr (P 0 1) 0, D.b.repr (P 0 1) 1], ?_⟩
   rw [Dat.act, hm]
@@ -77,9 +86,11 @@ end
 
 end UpperTheory.ConvolutionTheory.R2.D
 
-theorem UpperTheory.ConvolutionTheory.R2.D.thL :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (γ : GL (Fin 2) E) (φ : V4 F → ℂ),
-    Th (fun v => (((ab (nu F (ratGL E 2 γ)))⁻¹ : ℝ) : ℂ) * φ (D.act (ratGL E 2 γ)⁻¹ v)) = Th φ := by
+theorem UpperTheory.ConvolutionTheory.R2.D.thL
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (γ : GL (Fin 2) E) (φ : V4 F → ℂ),
+      Th (fun v => (((ab (nu F (ratGL E 2 γ)))⁻¹ : ℝ) : ℂ) * φ (D.act (ratGL E 2 γ)⁻¹ v))
+        = Th φ := by
   intro F E _ _ _ _ _ _ D γ φ
   obtain ⟨ρ, hρ, -, -⟩ := UpperTheory.ConvolutionTheory.R2.D.actMat F E D
   have hmul : ∀ h h' v, D.act (h * h') v = D.act h (D.act h' v) := by
@@ -98,7 +109,7 @@ theorem UpperTheory.ConvolutionTheory.R2.D.thL :
     apply hinj
     change (fun i => (rt (f g⁻¹ (f g ξ) i) : A F)) = fun i => rt (ξ i)
     rw [← hf g⁻¹ (f g ξ), ← hf g ξ, ← hmul, ← map_mul, inv_mul_cancel, map_one, hone]
-  let e : (Fin 4 → F) ≃ (Fin 4 → F) :=
-    ⟨f γ⁻¹, f γ, fun ξ => by simpa using hinv γ⁻¹ ξ, hinv γ⟩
-  simp only [Th, UpperTheory.ConvolutionTheory.R2.D.ab_nu, inv_one, Complex.ofReal_one, one_mul, ← map_inv, hf]
+  let e : (Fin 4 → F) ≃ (Fin 4 → F) := ⟨f γ⁻¹, f γ, fun ξ => by simpa using hinv γ⁻¹ ξ, hinv γ⟩
+  simp only [Th, UpperTheory.ConvolutionTheory.R2.D.ab_nu, inv_one, Complex.ofReal_one, one_mul,
+    ← map_inv, hf]
   exact e.tsum_eq fun ξ => φ fun i => rt (ξ i)

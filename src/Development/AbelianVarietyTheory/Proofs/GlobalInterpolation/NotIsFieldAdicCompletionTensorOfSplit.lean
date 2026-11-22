@@ -31,26 +31,30 @@ private lemma exists_root_quadratic_of_isUnit_of_mem_maximalIdeal (R : Type) [Co
     (X ^ 2 + C b * X + C c) hmon 0 (by simpa using hc) (by simpa using hb.map _)
   exact ⟨β, by simpa using hβ⟩
 
-
 open scoped TensorProduct in
 open NumberField IsDedekindDomain Polynomial in
-theorem _root_.GlobalTheory.SplitPlace.not_isField_of_split : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E], Module.finrank F E = 2 → ∀ v : HeightOneSpectrum (𝓞 F),
-    (v.asIdeal.primesOver (𝓞 E)).ncard = 2 → ¬ IsField (v.adicCompletion F ⊗[F] E) := by
+theorem _root_.GlobalTheory.SplitPlace.not_isField_of_split
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
+      Module.finrank F E = 2
+        → ∀ v : HeightOneSpectrum (𝓞 F),
+          (v.asIdeal.primesOver (𝓞 E)).ncard = 2 → ¬ IsField (v.adicCompletion F ⊗[F] E) := by
   intro F E _ _ _ _ _ hrank v hsplit hfield
   obtain ⟨P, Q, hPQ, hset⟩ := Set.ncard_eq_two.mp hsplit
-  obtain ⟨hPmax, hPmem⟩ := isMaximal_and_algebraMap_mem_iff_of_mem_primesOver F E v P
-    (by rw [hset]; exact Set.mem_insert _ _)
-  obtain ⟨hQmax, hQmem⟩ := isMaximal_and_algebraMap_mem_iff_of_mem_primesOver F E v Q
-    (by rw [hset]; exact Set.mem_insert_of_mem _ rfl)
-  obtain ⟨α, hαP, hαQ⟩ := SetLike.not_le_iff_exists.mp
-    (fun h => hPQ (hPmax.eq_of_le hQmax.ne_top h))
+  obtain ⟨hPmax, hPmem⟩ :=
+    isMaximal_and_algebraMap_mem_iff_of_mem_primesOver F E v P
+      (by rw [hset]; exact Set.mem_insert _ _)
+  obtain ⟨hQmax, hQmem⟩ :=
+    isMaximal_and_algebraMap_mem_iff_of_mem_primesOver F E v Q
+      (by rw [hset]; exact Set.mem_insert_of_mem _ rfl)
+  obtain ⟨α, hαP, hαQ⟩ :=
+    SetLike.not_le_iff_exists.mp (fun h => hPQ (hPmax.eq_of_le hQmax.ne_top h))
   have hαF : (α : E) ∉ (algebraMap F E).range := by
     rintro ⟨a, ha⟩
     have hint : IsIntegral ℤ a := by
       have h1 : IsIntegral ℤ (algebraMap F E a) := ha ▸ RingOfIntegers.isIntegral_coe α
-      exact (isIntegral_algHom_iff ((Algebra.ofId F E).restrictScalars ℤ)
-        (algebraMap F E).injective).mp h1
+      exact
+        (isIntegral_algHom_iff ((Algebra.ofId F E).restrictScalars ℤ) (algebraMap F E).injective).mp
+          h1
     have hα : algebraMap (𝓞 F) (𝓞 E) ⟨a, hint⟩ = α := RingOfIntegers.ext (by rw [← ha]; rfl)
     have hav : (⟨a, hint⟩ : 𝓞 F) ∈ v.asIdeal := (hPmem _).mp (hα ▸ hαP)
     exact hαQ (hα ▸ (hQmem _).mpr hav)
@@ -61,9 +65,11 @@ theorem _root_.GlobalTheory.SplitPlace.not_isField_of_split : ∀ (F E : Type) [
       minpoly.algHom_eq (IsScalarTower.toAlgHom (𝓞 F) (𝓞 E) E) Subtype.val_injective α
     have hF : minpoly F (α : E) = (minpoly (𝓞 F) α).map (algebraMap (𝓞 F) F) := by
       rw [← hE]
-      exact minpoly.isIntegrallyClosed_eq_field_fractions' F (hint.map (IsScalarTower.toAlgHom (𝓞 F) (𝓞 E) E))
+      exact minpoly.isIntegrallyClosed_eq_field_fractions' F
+        (hint.map (IsScalarTower.toAlgHom (𝓞 F) (𝓞 E) E))
     have hle : (minpoly F (α : E)).natDegree ≤ 2 := hrank ▸ minpoly.natDegree_le (α : E)
-    have hne1 : (minpoly F (α : E)).natDegree ≠ 1 := fun h => hαF (minpoly.natDegree_eq_one_iff.mp h)
+    have hne1 : (minpoly F (α : E)).natDegree ≠ 1 := fun h =>
+      hαF (minpoly.natDegree_eq_one_iff.mp h)
     have hpos : 0 < (minpoly F (α : E)).natDegree :=
       minpoly.natDegree_pos (Algebra.IsIntegral.isIntegral _)
     rw [hF, (minpoly.monic hint).natDegree_map] at hle hne1 hpos
@@ -74,8 +80,9 @@ theorem _root_.GlobalTheory.SplitPlace.not_isField_of_split : ∀ (F E : Type) [
     have h := minpoly.aeval (𝓞 F) α
     have h2 : (minpoly (𝓞 F) α).coeff 2 = 1 := by
       rw [← hdeg]; exact (minpoly.monic hint).coeff_natDegree
-    rw [aeval_eq_sum_range, hdeg, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one,
-      h2] at h
+    rw [aeval_eq_sum_range, hdeg, Finset.sum_range_succ, Finset.sum_range_succ,
+        Finset.sum_range_one, h2]
+      at h
     simp only [Algebra.smul_def, map_one, one_mul, pow_zero, pow_one, mul_one] at h
     linear_combination h
   have hcv : c ∈ v.asIdeal := by
@@ -93,14 +100,18 @@ theorem _root_.GlobalTheory.SplitPlace.not_isField_of_split : ∀ (F E : Type) [
       exact Q.neg_mem (Q.add_mem (Q.mul_mem_right _ ((hQmem b).mpr hbv)) ((hQmem c).mpr hcv))
     exact hαQ (hQmax.isPrime.mem_of_pow_mem 2 hmem)
   haveI := _root_.GlobalTheory.SelfDualGenus.isAdicComplete_adicCompletionIntegers v
-  obtain ⟨β, hβ⟩ := exists_root_quadratic_of_isUnit_of_mem_maximalIdeal
-    (v.adicCompletionIntegers F) (algebraMap (𝓞 F) _ b) (algebraMap (𝓞 F) _ c)
-    ((_root_.GlobalTheory.SelfDualGenus.isUnit_algebraMap_iff v b).mpr hbv)
-    (by
-      rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, _root_.GlobalTheory.SelfDualGenus.isUnit_algebraMap_iff]
-      exact not_not.mpr hcv)
-  have hβF : (β : v.adicCompletion F) ^ 2 + algebraMap F (v.adicCompletion F) (b : F) * β
-      + algebraMap F (v.adicCompletion F) (c : F) = 0 := by
+  obtain ⟨β, hβ⟩ :=
+    exists_root_quadratic_of_isUnit_of_mem_maximalIdeal (v.adicCompletionIntegers F)
+      (algebraMap (𝓞 F) _ b) (algebraMap (𝓞 F) _ c)
+      ((_root_.GlobalTheory.SelfDualGenus.isUnit_algebraMap_iff v b).mpr hbv)
+      (by
+        rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
+          _root_.GlobalTheory.SelfDualGenus.isUnit_algebraMap_iff]
+        exact not_not.mpr hcv)
+  have hβF
+      : (β : v.adicCompletion F) ^ 2 + algebraMap F (v.adicCompletion F) (b : F) * β
+          + algebraMap F (v.adicCompletion F) (c : F)
+        = 0 := by
     have h := congrArg (v.adicCompletionIntegers F).subtype hβ
     rw [map_add (f := _), map_add (f := _), map_mul, map_pow, map_zero] at h
     exact h
@@ -114,17 +125,20 @@ theorem _root_.GlobalTheory.SplitPlace.not_isField_of_split : ∀ (F E : Type) [
     Algebra.TensorProduct.includeRight (A := v.adicCompletion F) (α : E) with hy
   have hxeq : x ^ 2 + algebraMap F _ (b : F) * x + algebraMap F _ (c : F) = 0 := by
     have h := congrArg (Algebra.TensorProduct.includeLeft (R := F) (S := F) (B := E)) hβF
-    rw [map_add (f := _), map_add (f := _), map_mul, map_pow, AlgHom.commutes, AlgHom.commutes, map_zero] at h
+    rw [map_add (f := _), map_add (f := _), map_mul, map_pow, AlgHom.commutes, AlgHom.commutes,
+        map_zero]
+      at h
     exact h
   have hyeq : y ^ 2 + algebraMap F _ (b : F) * y + algebraMap F _ (c : F) = 0 := by
     have h := congrArg (Algebra.TensorProduct.includeRight (R := F) (A := v.adicCompletion F)) hαE
-    rw [map_add (f := _), map_add (f := _), map_mul, map_pow, AlgHom.commutes, AlgHom.commutes, map_zero] at h
+    rw [map_add (f := _), map_add (f := _), map_mul, map_pow, AlgHom.commutes, AlgHom.commutes,
+        map_zero]
+      at h
     exact h
-  have hprod : (x - y) * (x + y + algebraMap F _ (b : F)) = 0 := by
-    linear_combination hxeq - hyeq
+  have hprod : (x - y) * (x + y + algebraMap F _ (b : F)) = 0 := by linear_combination hxeq - hyeq
   haveI := hfield.isDomain
-  obtain ⟨z, hz⟩ : ∃ z : v.adicCompletion F,
-      y = Algebra.TensorProduct.includeLeft (S := F) (B := E) z := by
+  obtain ⟨z, hz⟩
+      : ∃ z : v.adicCompletion F, y = Algebra.TensorProduct.includeLeft (S := F) (B := E) z := by
     rcases mul_eq_zero.mp hprod with h | h
     · exact ⟨β, (sub_eq_zero.mp h).symm⟩
     · refine ⟨-(β : v.adicCompletion F) - algebraMap F _ (b : F), ?_⟩
@@ -140,8 +154,11 @@ theorem _root_.GlobalTheory.SplitPlace.not_isField_of_split : ∀ (F E : Type) [
     refine ⟨ℓ, ?_, hℓα⟩
     have h := LinearMap.congr_fun hℓ ⟨1, Submodule.mem_span_singleton_self 1⟩
     simpa using h
-  have key := congrArg ((TensorProduct.rid F (v.adicCompletion F)).toLinearMap ∘ₗ
-    LinearMap.lTensor (v.adicCompletion F) ℓ) hz
+  have key :=
+    congrArg
+      ((TensorProduct.rid F (v.adicCompletion F)).toLinearMap
+        ∘ₗ LinearMap.lTensor (v.adicCompletion F) ℓ)
+      hz
   simp [hy, hℓ1, hℓα, Algebra.TensorProduct.includeLeft_apply] at key
 
 end GlobalTheory.SplitPlace

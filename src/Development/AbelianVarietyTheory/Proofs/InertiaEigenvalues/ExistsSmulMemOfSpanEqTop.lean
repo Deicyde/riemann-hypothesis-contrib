@@ -9,10 +9,12 @@ namespace GlobalTheory.DenominatorOfSpan
 
 open GlobalTheory.UnitLemma
 
-theorem exists_smul_mem_of_span_eq_top {O E A : Type} [CommRing O] [IsDomain O] [Field E] [Algebra O E]
-    [IsFractionRing O E] [AddCommGroup A] [Module E A] [Module O A] [IsScalarTower O E A]
-    (L : Submodule O A) (hL : Submodule.span E (L : Set A) = ⊤) (x : A) :
-    ∃ d : O, d ≠ 0 ∧ d • x ∈ L := by
+theorem exists_smul_mem_of_span_eq_top
+    {O E A : Type} [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E]
+    [AddCommGroup A] [Module E A] [Module O A] [IsScalarTower O E A]
+    (L : Submodule O A) (hL : Submodule.span E (L : Set A) = ⊤)
+    (x : A)
+    : ∃ d : O, d ≠ 0 ∧ d • x ∈ L := by
   have hx : x ∈ Submodule.span E (L : Set A) := by rw [hL]; exact Submodule.mem_top
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hy⟩
@@ -35,9 +37,10 @@ theorem exists_smul_mem_of_span_eq_top {O E A : Type} [CommRing O] [IsDomain O] 
     rw [mul_smul, h1, smul_comm]
     exact L.smul_mem n hay
 
-theorem exists_denominator {K : UQ} (B : InvAlg K) (L : Submodule K.O B.A)
-    (hL : Submodule.span K.E (L : Set B.A) = ⊤) (x : B.A) :
-    ∃ d : K.O, d ≠ 0 ∧ d • x ∈ L :=
+theorem exists_denominator
+    {K : UQ}
+    (B : InvAlg K) (L : Submodule K.O B.A) (hL : Submodule.span K.E (L : Set B.A) = ⊤) (x : B.A)
+    : ∃ d : K.O, d ≠ 0 ∧ d • x ∈ L :=
   exists_smul_mem_of_span_eq_top L hL x
 
 end GlobalTheory.DenominatorOfSpan

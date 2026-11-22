@@ -11,11 +11,10 @@ namespace ReciprocityTheory.MultiplicativeHeights.SemiDegIdx
 open NumberField
 open scoped nonZeroDivisors
 
-theorem relIndex_eq_map_mul_ker {G H : Type*} [AddCommGroup G] [AddCommGroup H]
-    (f : G →+ H) {A B : AddSubgroup G} (hAB : A ≤ B) :
-    A.relIndex B = (A.map f).relIndex (B.map f) * (A ⊓ f.ker).relIndex (B ⊓ f.ker) := by
-  have hN : A ⊓ (B ⊓ f.ker) = A ⊓ f.ker := by
-    rw [← inf_assoc, inf_eq_left.mpr hAB]
+theorem relIndex_eq_map_mul_ker
+    {G H : Type*} [AddCommGroup G] [AddCommGroup H] (f : G →+ H) {A B : AddSubgroup G} (hAB : A ≤ B)
+    : A.relIndex B = (A.map f).relIndex (B.map f) * (A ⊓ f.ker).relIndex (B ⊓ f.ker) := by
+  have hN : A ⊓ (B ⊓ f.ker) = A ⊓ f.ker := by rw [← inf_assoc, inf_eq_left.mpr hAB]
   have hC : (A ⊔ f.ker) ⊓ B = A ⊔ (B ⊓ f.ker) := by
     ext x
     simp only [AddSubgroup.mem_inf, AddSubgroup.mem_sup]
@@ -27,8 +26,8 @@ theorem relIndex_eq_map_mul_ker {G H : Type*} [AddCommGroup G] [AddCommGroup H]
     · rintro ⟨y, hy, z, ⟨hzB, hz⟩, rfl⟩
       exact ⟨⟨y, hy, z, hz, rfl⟩, B.add_mem (hAB hy) hzB⟩
   have h1 : (A.map f).relIndex (B.map f) = (A ⊔ (B ⊓ f.ker)).relIndex B := by
-    rw [← AddSubgroup.relIndex_comap, AddSubgroup.comap_map_eq,
-      ← AddSubgroup.inf_relIndex_right, hC]
+    rw [← AddSubgroup.relIndex_comap, AddSubgroup.comap_map_eq, ← AddSubgroup.inf_relIndex_right,
+      hC]
   have h2 : (A ⊓ f.ker).relIndex (B ⊓ f.ker) = A.relIndex (A ⊔ (B ⊓ f.ker)) := by
     rw [sup_comm A, AddSubgroup.relIndex_sup_right, ← AddSubgroup.inf_relIndex_right A (B ⊓ f.ker),
       hN]
@@ -38,15 +37,16 @@ theorem relIndex_eq_map_mul_ker {G H : Type*} [AddCommGroup G] [AddCommGroup H]
 def intVec (K : Type) [Field K] [NumberField K] (k : ℕ) : Submodule (𝓞 K) (Fin k → K) :=
   Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 K) K)
 
-theorem mem_intVec {K : Type} [Field K] [NumberField K] {k : ℕ} {x : Fin k → K} :
-    x ∈ intVec K k ↔ ∀ i, x i ∈ (1 : Submodule (𝓞 K) K) := by
+theorem mem_intVec {K : Type} [Field K] [NumberField K] {k : ℕ} {x : Fin k → K}
+    : x ∈ intVec K k ↔ ∀ i, x i ∈ (1 : Submodule (𝓞 K) K) := by
   simp [intVec, Submodule.mem_pi]
 
-theorem exists_section_of_image {K : Type} [Field K] [NumberField K] {V : Type*}
-    [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+theorem exists_section_of_image
+    {K : Type} [Field K] [NumberField K]
+    {V : Type*} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
     (X : Submodule (𝓞 K) V) (f : V →ₗ[K] K) (hfg : (X.map (f.restrictScalars (𝓞 K))).FG)
-    (h1 : (1 : Submodule (𝓞 K) K) ≤ X.map (f.restrictScalars (𝓞 K))) :
-    ∃ v : V, f v = 1 ∧ ∀ t ∈ X.map (f.restrictScalars (𝓞 K)), t • v ∈ X := by
+    (h1 : (1 : Submodule (𝓞 K) K) ≤ X.map (f.restrictScalars (𝓞 K)))
+    : ∃ v : V, f v = 1 ∧ ∀ t ∈ X.map (f.restrictScalars (𝓞 K)), t • v ∈ X := by
   classical
   let I : FractionalIdeal (𝓞 K)⁰ K :=
     ⟨X.map (f.restrictScalars (𝓞 K)), FractionalIdeal.isFractional_of_fg hfg⟩
@@ -56,11 +56,13 @@ theorem exists_section_of_image {K : Type} [Field K] [NumberField K] {V : Type*}
     have h1I : (1 : K) ∈ (I : Submodule (𝓞 K) K) := h1 hone
     rw [h, FractionalIdeal.coe_zero, Submodule.mem_bot] at h1I
     exact one_ne_zero h1I
-  have hII : (I : Submodule (𝓞 K) K) * ((I⁻¹ : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K) =
-      1 := by
+  have hII
+      : (I : Submodule (𝓞 K) K) * ((I⁻¹ : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K) = 1 := by
     rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ hI0, FractionalIdeal.coe_one]
-  have key : ∀ w ∈ (I : Submodule (𝓞 K) K) * ((I⁻¹ : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K),
-      ∃ u : V, f u = w ∧ ∀ t ∈ X.map (f.restrictScalars (𝓞 K)), t • u ∈ X := by
+  have key
+      : ∀ w ∈ (I : Submodule (𝓞 K) K) * ((I⁻¹ : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K),
+        ∃ u : V,
+          f u = w ∧ ∀ t ∈ X.map (f.restrictScalars (𝓞 K)), t • u ∈ X := by
     intro w hw
     refine Submodule.mul_induction_on hw (fun c hc d hd => ?_) (fun a b ha hb => ?_)
     · obtain ⟨x, hx, hfx⟩ := Submodule.mem_map.mp hc
@@ -75,15 +77,19 @@ theorem exists_section_of_image {K : Type} [Field K] [NumberField K] {V : Type*}
         exact X.smul_mem r hx
     · obtain ⟨u1, e1, h1'⟩ := ha
       obtain ⟨u2, e2, h2'⟩ := hb
-      exact ⟨u1 + u2, by rw [map_add (f := _), e1, e2], fun t ht => by
-        rw [smul_add]; exact X.add_mem (h1' t ht) (h2' t ht)⟩
+      exact ⟨
+        u1 + u2,
+        by rw [map_add (f := _), e1, e2],
+        fun t ht => by rw [smul_add]; exact X.add_mem (h1' t ht) (h2' t ht)
+      ⟩
   exact key 1 (by rw [hII]; exact hone)
 
-theorem absNorm_mul_relIndex_one {K : Type} [Field K] [NumberField K] (C : Submodule (𝓞 K) K)
-    (hC : C.FG) (h1 : 1 ≤ C) :
-    FractionalIdeal.absNorm
-        (⟨C, FractionalIdeal.isFractional_of_fg hC⟩ : FractionalIdeal (𝓞 K)⁰ K) *
-      ((1 : Submodule (𝓞 K) K).toAddSubgroup.relIndex C.toAddSubgroup : ℚ) = 1 := by
+theorem absNorm_mul_relIndex_one
+    {K : Type} [Field K] [NumberField K] (C : Submodule (𝓞 K) K) (hC : C.FG) (h1 : 1 ≤ C)
+    : FractionalIdeal.absNorm
+          (⟨C, FractionalIdeal.isFractional_of_fg hC⟩ : FractionalIdeal (𝓞 K)⁰ K)
+        * ((1 : Submodule (𝓞 K) K).toAddSubgroup.relIndex C.toAddSubgroup : ℚ)
+      = 1 := by
   classical
   set I : FractionalIdeal (𝓞 K)⁰ K := ⟨C, FractionalIdeal.isFractional_of_fg hC⟩ with hIdef
   have hden := FractionalIdeal.den_mul_self_eq_num I
@@ -99,8 +105,9 @@ theorem absNorm_mul_relIndex_one {K : Type} [Field K] [NumberField K] (C : Submo
   have hsm : ∀ y : K, (I.den : 𝓞 K) • y = μ y := fun y => by
     rw [Algebra.smul_def]
     rfl
-  have hone : AddSubgroup.map μ (1 : Submodule (𝓞 K) K).toAddSubgroup =
-      AddSubgroup.map ι (Ideal.span {d}).toAddSubgroup := by
+  have hone
+      : AddSubgroup.map μ (1 : Submodule (𝓞 K) K).toAddSubgroup
+        = AddSubgroup.map ι (Ideal.span {d}).toAddSubgroup := by
     ext x
     simp only [AddSubgroup.mem_map, Submodule.mem_toAddSubgroup, Submodule.mem_one,
       Ideal.mem_span_singleton']
@@ -112,8 +119,9 @@ theorem absNorm_mul_relIndex_one {K : Type} [Field K] [NumberField K] (C : Submo
   have hCm : AddSubgroup.map μ C.toAddSubgroup = AddSubgroup.map ι J.toAddSubgroup := by
     ext x
     open Pointwise in
-    have hx : x ∈ ((I.den : 𝓞 K) • (I : Submodule (𝓞 K) K)) ↔
-        x ∈ Submodule.map (Algebra.linearMap (𝓞 K) K) I.num := by
+    have hx
+        : x ∈ ((I.den : 𝓞 K) • (I : Submodule (𝓞 K) K))
+          ↔ x ∈ Submodule.map (Algebra.linearMap (𝓞 K) K) I.num := by
       rw [← hden]
       exact Iff.rfl
     rw [Submodule.mem_map, Submodule.mem_smul_pointwise_iff_exists] at hx
@@ -125,8 +133,9 @@ theorem absNorm_mul_relIndex_one {K : Type} [Field K] [NumberField K] (C : Submo
     · rintro ⟨z, hz, rfl⟩
       obtain ⟨y, hy, hyx⟩ := hx.mpr ⟨z, hz, rfl⟩
       exact ⟨y, hy, by rw [← hsm]; exact hyx⟩
-  have hidx : (1 : Submodule (𝓞 K) K).toAddSubgroup.relIndex C.toAddSubgroup =
-      (Ideal.span {d}).toAddSubgroup.relIndex J.toAddSubgroup := by
+  have hidx
+      : (1 : Submodule (𝓞 K) K).toAddSubgroup.relIndex C.toAddSubgroup
+        = (Ideal.span {d}).toAddSubgroup.relIndex J.toAddSubgroup := by
     rw [← AddSubgroup.relIndex_map_map_of_injective _ _ hμ, hone, hCm,
       AddSubgroup.relIndex_map_map_of_injective _ _ hι]
   have hle : Ideal.span {d} ≤ J := by
@@ -136,14 +145,13 @@ theorem absNorm_mul_relIndex_one {K : Type} [Field K] [NumberField K] (C : Submo
       rw [← hden]
       open Pointwise in
       show _ ∈ ((I.den : 𝓞 K) • (I : Submodule (𝓞 K) K))
-      exact (Submodule.mem_smul_pointwise_iff_exists _ _ _).mpr
-        ⟨1, h1C, by rw [hsm]; simp [μ]⟩
+      exact (Submodule.mem_smul_pointwise_iff_exists _ _ _).mpr ⟨1, h1C, by rw [hsm]; simp [μ]⟩
     obtain ⟨z, hz, hzd⟩ := Submodule.mem_map.mp hm
     have hzd' := hι hzd
     rw [hd, ← hzd']
     exact hz
-  have htower := AddSubgroup.relIndex_mul_relIndex (Ideal.span {d}).toAddSubgroup
-    J.toAddSubgroup ⊤ hle le_top
+  have htower :=
+    AddSubgroup.relIndex_mul_relIndex (Ideal.span {d}).toAddSubgroup J.toAddSubgroup ⊤ hle le_top
   rw [AddSubgroup.relIndex_top_right, AddSubgroup.relIndex_top_right] at htower
   have hiJ : J.toAddSubgroup.index = Ideal.absNorm J := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply, AddSubgroup.index_eq_card]

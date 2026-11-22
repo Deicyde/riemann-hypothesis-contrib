@@ -9,9 +9,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Filter Topology Matrix
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
 open scoped ComplexConjugate Classical InnerProductSpace
 
 namespace UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
@@ -30,8 +35,8 @@ private lemma oexp_pow (π : Equiv.Perm (Fin (2 + 2))) (ψ : U4 → ℂ) (μ : F
     exact h1
 
 private noncomputable def F (i j l : Fin (2 + 2)) (α β γ : ℕ) (δ : ℤ) (k : U4) : ℂ :=
-  en i i k ^ α * (en i i k * en j j k - en i j k * en j i k) ^ β * conj (en l l k) ^ γ *
-    (k : Matrix (Fin (2 + 2)) (Fin (2 + 2)) ℂ).det ^ δ
+  en i i k ^ α * (en i i k * en j j k - en i j k * en j i k) ^ β * conj (en l l k) ^ γ
+    * (k : Matrix (Fin (2 + 2)) (Fin (2 + 2)) ℂ).det ^ δ
 
 private lemma F_exp (π : Equiv.Perm (Fin (2 + 2))) (i j l : Fin (2 + 2)) (hi : π 0 = i) (hj : π 1 = j) (hl : π 3 = l)
     (α β γ : ℕ) (δ : ℤ) (μ : Fin (2 + 2) → ℤ)
@@ -163,8 +168,8 @@ private lemma c6 (α β γ : ℕ) (δ : ℤ) (n : ℕ) (q : ℤ) (n' : ℕ) (q' 
 
 end UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefEx :
-    ∀ n q n' q', ∃ ψ, Coef ψ n q n' q' := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefEx
+    : ∀ n q n' q', ∃ ψ, Coef ψ n q n' q' := by
   intro n q n' q'
   by_cases h1 : (n' : ℤ) + q' ≤ q
   · exact c1 n (q - n' - q').toNat n' (n' + q') n q n' q' rfl (by omega) rfl (by omega)
@@ -172,8 +177,12 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefEx :
   · exact c6 n' (q' - n - q).toNat n (n + q) n q n' q' rfl (by omega) rfl (by omega)
   by_cases h3 : (n' : ℤ) + q' ≤ n + q
   · by_cases h4 : q' ≤ q
-    · exact c2 (n + q - n' - q').toNat (n' + q' - q).toNat (q - q').toNat q n q n' q' (by omega) (by omega) (by omega) (by omega)
-    · exact c3 (n + q - n' - q').toNat n' (q' - q).toNat q' n q n' q' (by omega) (by omega) (by omega) (by omega)
+    · exact c2 (n + q - n' - q').toNat (n' + q' - q).toNat (q - q').toNat q n q n' q' (by omega)
+        (by omega) (by omega) (by omega)
+    · exact c3 (n + q - n' - q').toNat n' (q' - q).toNat q' n q n' q' (by omega) (by omega)
+        (by omega) (by omega)
   · by_cases h4 : q' ≤ q
-    · exact c4 (n' + q' - n - q).toNat n (q - q').toNat q n q n' q' (by omega) (by omega) (by omega) (by omega)
-    · exact c5 (n' + q' - n - q).toNat (n + q - q').toNat (q' - q).toNat q' n q n' q' (by omega) (by omega) (by omega) (by omega)
+    · exact c4 (n' + q' - n - q).toNat n (q - q').toNat q n q n' q' (by omega) (by omega) (by omega)
+        (by omega)
+    · exact c5 (n' + q' - n - q).toNat (n + q - q').toNat (q' - q).toNat q' n q n' q' (by omega)
+        (by omega) (by omega) (by omega)

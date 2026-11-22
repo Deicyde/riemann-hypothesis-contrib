@@ -6,13 +6,15 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.CasselmanWa
 
 noncomputable section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob
+  GlobalTheory.TypeSum
 
 namespace PositivityTheory.CW
 
 namespace KInvarianceAlt
 
-theorem kinv {n : ℕ} {ε : Fin n → Bool} {k : Mx n} (hk : k ∈ Kset ε) : ∃ k' ∈ Kset ε, k' * k = 1 := by
+theorem kinv {n : ℕ} {ε : Fin n → Bool} {k : Mx n} (hk : k ∈ Kset ε)
+    : ∃ k' ∈ Kset ε, k' * k = 1 := by
   obtain ⟨hu, hJ⟩ := hk
   have hu' : kᴴ * k = 1 := by
     have := Matrix.mem_unitaryGroup_iff'.1 hu; rwa [Matrix.star_eq_conjTranspose] at this
@@ -40,19 +42,26 @@ theorem e1a : SmoothSeminormGrowth := by
     exact pow_le_pow_left₀ (by linarith [hs_nonneg (a * b)]) (one_add_hs_mul_le a b) N
   have hmul : ∀ a ∈ UJset ε, ∀ b ∈ UJset ε, ∀ x, π (a * b) x = π a (π b x) := fun a ha b hb x => by
     rw [hπ.map_mul a ha b hb]; rfl
-  let f : UJset ε → Seminorm ℂ E := fun g => (Real.toNNReal (W g.1)⁻¹) • (p i).comp (π g.1 : E →ₗ[ℂ] E)
+  let f : UJset ε → Seminorm ℂ E := fun g =>
+    (Real.toNNReal (W g.1)⁻¹) • (p i).comp (π g.1 : E →ₗ[ℂ] E)
   have hf : ∀ g x, f g x = p i (π g.1 x) / W g.1 := fun g x => by
     show ((Real.toNNReal (W g.1)⁻¹ : NNReal) : ℝ) * p i (π g.1 x) = _
     rw [Real.coe_toNNReal _ (inv_nonneg.2 (hW _).le), div_eq_inv_mul]
   have hfq : ∀ g x, f g x ≤ q x := fun g x => by
     rw [hf, div_le_iff₀ (hW _), mul_comm]
     exact hg g.1 g.2 x
-  have hbdd : BddAbove (Set.range f) := ⟨q, by
-    rintro _ ⟨g, rfl⟩
-    exact Pi.le_def.2 fun x => hfq g x⟩
-  have hfb : ∀ x, BddAbove (Set.range fun g => f g x) := fun x => ⟨q x, by
-    rintro _ ⟨g, rfl⟩
-    exact hfq g x⟩
+  have hbdd : BddAbove (Set.range f) := ⟨
+    q,
+    by
+      rintro _ ⟨g, rfl⟩
+      exact Pi.le_def.2 fun x => hfq g x
+  ⟩
+  have hfb : ∀ x, BddAbove (Set.range fun g => f g x) := fun x => ⟨
+    q x,
+    by
+      rintro _ ⟨g, rfl⟩
+      exact hfq g x
+  ⟩
   set Q : Seminorm ℂ E := ⨆ g, f g with hQdef
   have hQ : ∀ x, Q x = ⨆ g, f g x := fun x => Seminorm.iSup_apply hbdd
   have hle : ∀ g x, f g x ≤ Q x := fun g x => by rw [hQ]; exact le_ciSup (hfb x) g
@@ -75,7 +84,9 @@ theorem e1a : SmoothSeminormGrowth := by
   · rw [hQ (π h x)]
     refine ciSup_le fun g => ?_
     rw [hf, hmul g.1 g.2 h hh x |>.symm, div_le_iff₀ (hW _)]
-    calc p i (π (g.1 * h) x) ≤ W (g.1 * h) * Q x := h1 _ (mul_mem_UJ g.2 hh) x
+    calc
+      p i (π (g.1 * h) x)
+        ≤ W (g.1 * h) * Q x := h1 _ (mul_mem_UJ g.2 hh) x
       _ ≤ (W g.1 * W h) * Q x := mul_le_mul_of_nonneg_right (hWm _ _) (apply_nonneg _ _)
       _ = W h * Q x * W g.1 := by ring
   · refine le_antisymm (hKk k hk x) ?_

@@ -11,16 +11,35 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalGl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 
 namespace GlobalTheory.Mem.RankSize
 
-theorem rank_ge_hundred : EvLgG fun K B f _ => KPx B f → ∀ (T : TwDat B) (w : ColW B f T) (Z : w.Lt), 100 ≤ (w.D Z).R.r := by
-  refine ⟨1, one_pos, fun _ _ _ _ _ _ _ _ _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun _ _ _ _ =>
-    ⟨0, fun _ _ => ⟨0, fun _ _ => ⟨100, fun K _ _ _ _ hx _ => ?_⟩⟩⟩⟩⟩
-  refine ⟨fun _ _ _ => ∅, fun _ _ _ _ => ∅, fun _ _ _ _ _ => ∅, fun _ _ _ _ _ => ∅, by simp_all, by simp_all,
-    fun B f _ hO _ _ _ _ T w Z => ?_⟩
+theorem rank_ge_hundred
+    : EvLgG fun K B f _ =>
+      KPx B f → ∀ (T : TwDat B) (w : ColW B f T) (Z : w.Lt), 100 ≤ (w.D Z).R.r := by
+  refine ⟨
+    1,
+    one_pos,
+    fun _ _ _ _ _ _ _ _ _ => ⟨
+      ⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩,
+      fun _ _ _ _ => ⟨0, fun _ _ => ⟨0, fun _ _ => ⟨100, fun K _ _ _ _ hx _ => ?_⟩⟩⟩
+    ⟩
+  ⟩
+  refine ⟨
+    fun _ _ _ => ∅,
+    fun _ _ _ _ => ∅,
+    fun _ _ _ _ _ => ∅,
+    fun _ _ _ _ _ => ∅,
+    by simp_all,
+    by simp_all,
+    fun B f _ hO _ _ _ _ T w Z => ?_
+  ⟩
   show 100 ≤ B.R.r
   obtain ⟨sp, hT, hY, hA, hV, hz, hB, -⟩ := hO
   have hRK : B.toPre.R = K.P.R := by rw [hB]; rfl
@@ -29,7 +48,9 @@ theorem rank_ge_hundred : EvLgG fun K B f _ => KPx B f → ∀ (T : TwDat B) (w 
   have hx1 := K.s.one_lt_alt
   have he := K.s.eps_pos
   have hk1 : K.s.x ≤ (B.toPre.R.k : ℝ) := by
-    calc K.s.x = K.s.x ^ (1 : ℝ) := (Real.rpow_one _).symm
+    calc
+      K.s.x
+        = K.s.x ^ (1 : ℝ) := (Real.rpow_one _).symm
       _ ≤ K.s.x ^ (9 / 2 + 10 * K.s.eps) := Real.rpow_le_rpow_of_exponent_le hx1.le (by linarith)
       _ ≤ _ := hk
   have h100 : (100 : ℝ) ≤ (B.toPre.R.k : ℝ) := hx.trans hk1

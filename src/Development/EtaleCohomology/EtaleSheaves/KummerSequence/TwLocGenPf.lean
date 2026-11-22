@@ -10,8 +10,9 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 namespace LateralTheory.E.H2CurveOrder.TwLocGenPf
 open LateralTheory.E.H2CurveOrder.TwLocGenPfSec
 
-theorem res_comp {R : Type} [CommRing R] {F : Shv R} {W V U : Scheme.{0}} (h : W ⟶ V) (g : V ⟶ U) (y : Sec F U) :
-    Sec.res (h ≫ g) y = Sec.res h (Sec.res g y) := by
+theorem res_comp
+    {R : Type} [CommRing R] {F : Shv R} {W V U : Scheme.{0}} (h : W ⟶ V) (g : V ⟶ U) (y : Sec F U)
+    : Sec.res (h ≫ g) y = Sec.res h (Sec.res g y) := by
   simp only [Sec.res, op_comp, Functor.map_comp, ModuleCat.hom_comp, LinearMap.comp_apply]
 
 theorem TwLocGen_of : LateralTheory.E.H2CurveOrder.LeafKumMuInjPf.TwLocGen := by
@@ -29,7 +30,8 @@ theorem TwLocGen_of : LateralTheory.E.H2CurveOrder.LeafKumMuInjPf.TwLocGen := by
       haveI : IsEmpty (Prim q Γ(V, ⊤)) := not_nonempty_iff.mp hP
       obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
       have : z = 0 := Subsingleton.elim _ _
-      rw [this]; rfl
+      rw [this]
+      rfl
     refine loc_mono (loc_true V) ?_
     intro W h _
     left

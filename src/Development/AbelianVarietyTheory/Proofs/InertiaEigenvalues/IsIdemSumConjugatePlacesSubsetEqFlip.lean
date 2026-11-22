@@ -9,10 +9,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinPartConjM
 @[expose] public section
 
 open NumberField Matrix Complex IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level Host
 open GlobalTheory.SW hiding Level IsSB
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -23,7 +27,11 @@ namespace GlobalTheory.FlipIdemSum
 
 open Formalism.L2.NTheta (IsIdemAt)
 
-theorem idemSum_flip_subset : ∀ (D : D7) (e eT e' : AE D) (P T : Finset (Formalism.L2.DIV.Pl D.host.E)), IsIdemSum e P → IsIdemSum eT T → T ⊆ P → IsIdemSum e' ((P \ T) ∪ T.image Formalism.L2.DIV.conjPl) → e' = e - eT + cA D eT := by
+theorem idemSum_flip_subset
+    : ∀ (D : D7) (e eT e' : AE D) (P T : Finset (Formalism.L2.DIV.Pl D.host.E)),
+      IsIdemSum e P → IsIdemSum eT T → T ⊆ P
+        → IsIdemSum e' ((P \ T) ∪ T.image Formalism.L2.DIV.conjPl)
+        → e' = e - eT + cA D eT := by
   intro D e eT e' P T he hT hTP he'
   obtain ⟨⟨es, hes, hsum⟩, hc⟩ := he
   obtain ⟨⟨ts, hts, htsum⟩, -⟩ := hT
@@ -51,19 +59,25 @@ theorem idemSum_flip_subset : ∀ (D : D7) (e eT e' : AE D) (P T : Finset (Forma
     have hea' : cA D e * cA D (es PP) = cA D (es PP) := by rw [← map_mul, hmul PP hPPP]
     exact hne _ _ (hconj PP hPPP)
       (by linear_combination (-1 : AE D) * h1 - e * hea' + cA D (es PP) * hc)
-  have hinj : ∀ a ∈ T, ∀ b ∈ T, Formalism.L2.DIV.conjPl a = Formalism.L2.DIV.conjPl b → a = b := fun a _ b _ hab => by
+  have hinj
+      : ∀ a ∈ T, ∀ b ∈ T,
+        Formalism.L2.DIV.conjPl a = Formalism.L2.DIV.conjPl b → a = b := fun a _ b _ hab => by
     rw [← Formalism.L2.DIV.conjPl_conjPl a, hab, Formalism.L2.DIV.conjPl_conjPl b]
-  have hA : ∑ Q ∈ P \ T, gs Q = ∑ Q ∈ P \ T, es Q := Finset.sum_congr rfl fun Q hQ =>
-    GlobalTheory.Tow.idemAt_unique (hgs Q (Finset.mem_union_left _ hQ)) (hes Q (Finset.mem_sdiff.1 hQ).1)
+  have hA : ∑ Q ∈ P \ T, gs Q = ∑ Q ∈ P \ T, es Q :=
+    Finset.sum_congr rfl fun Q hQ =>
+      GlobalTheory.Tow.idemAt_unique (hgs Q (Finset.mem_union_left _ hQ))
+        (hes Q (Finset.mem_sdiff.1 hQ).1)
   have hB : ∑ Q ∈ T.image Formalism.L2.DIV.conjPl, gs Q = cA D eT := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Finset.sum_image hinj, htsum, map_sum]
     refine Finset.sum_congr rfl fun PP hPP => ?_
     rw [GlobalTheory.Tow.idemAt_unique (hts PP hPP) (hes PP (hTP hPP))]
-    exact GlobalTheory.Tow.idemAt_unique (hgs _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ hPP))) (hconj PP (hTP hPP))
+    exact GlobalTheory.Tow.idemAt_unique
+      (hgs _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ hPP))) (hconj PP (hTP hPP))
   have hTs : eT = ∑ Q ∈ T, es Q := by
     rw [htsum]
-    exact Finset.sum_congr rfl fun PP hPP => GlobalTheory.Tow.idemAt_unique (hts PP hPP) (hes PP (hTP hPP))
+    exact Finset.sum_congr rfl fun PP hPP =>
+      GlobalTheory.Tow.idemAt_unique (hts PP hPP) (hes PP (hTP hPP))
   rw [hgsum, Finset.sum_union hdisj, hA, hB, hTs, hsum, ← Finset.sum_sdiff hTP]
   ring
 

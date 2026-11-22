@@ -22,14 +22,18 @@ open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.HeightsSet
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem inter_constLine_eq [Nonempty K] (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → Geo.HermLine ι) → ℝ)
-    (hI : IsIntersectionFamily I) {W : Ideal (MRing ι)} (hW : IsArithVar W 1)
-    (hH : IsMultiHomogIdeal W) (hdeg : 0 < degC W) (M : ℝ) (hM : 0 < M) :
-    I W 1 ![constLine M hM] = Real.log M * degC W := by
+theorem inter_constLine_eq
+    [Nonempty K]
+    (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → Geo.HermLine ι) → ℝ) (hI : IsIntersectionFamily I)
+    {W : Ideal (MRing ι)} (hW : IsArithVar W 1) (hH : IsMultiHomogIdeal W) (hdeg : 0 < degC W)
+    (M : ℝ) (hM : 0 < M)
+    : I W 1 ![constLine M hM] = Real.log M * degC W := by
   obtain ⟨c, hc⟩ := exists_chartMon_notMem hW
-  rw [inter_eq_recR I hI hW (isSmoothHerm_constLine M hM) (d := 0) (fun k ↦ rfl)
-    (isMultiHomog_chartMon c 0) (hc 0), chartMon_zero, recR_one]
-  have h : logNorm (constLine (ι := ι) M hM) 1 = fun _ ↦ -Real.log M := by
+  rw [inter_eq_recR I hI hW (isSmoothHerm_constLine M hM) (d := 0)
+      (fun k ↦ rfl)
+      (isMultiHomog_chartMon c 0) (hc 0),
+    chartMon_zero, recR_one]
+  have h : logNorm (constLine (ι := ι) M hM) 1 = fun _ ↦ - Real.log M := by
     funext z
     simp [logNorm, constLine, Real.log_inv]
   have hfin : Finite (projPts W) := by
@@ -56,7 +60,6 @@ def ptIdeal : Ideal (MRing (PBlk 2)) := orbitIdeal samplePoint
 end Point
 
 section Shift
-
 
 end Shift
 

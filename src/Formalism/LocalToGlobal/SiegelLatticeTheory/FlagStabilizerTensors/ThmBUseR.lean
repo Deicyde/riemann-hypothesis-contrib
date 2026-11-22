@@ -13,7 +13,8 @@ open scoped ENNReal
 
 namespace Formalism.L2.SG.ThmBUseR
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.FourierDecayAlt
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.FourierDecayAlt
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,21 +22,26 @@ section Stmt
 
 variable (D : D7)
 
-def JSqR {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} (X : BData D Ch Cg T T' b dist) (γ : Point D.host.E (D.R.rS + 1)) :
-    ENNReal :=
+def JSqR
+    {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} (X : BData D Ch Cg T T' b dist)
+    (γ : Point D.host.E (D.R.rS + 1))
+    : ENNReal :=
   ∏ v, orbSq (X.L v) (X.f v) (Formalism.MainNotions.S.Pv.Frames.turnPt (ptLoc D v γ))
 
-def BSumR {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} (X : BData D Ch Cg T T' b dist)
-    (W : Point D.host.E (D.R.rS + 1) → ℝ) : ENNReal :=
+def BSumR
+    {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} (X : BData D Ch Cg T T' b dist)
+    (W : Point D.host.E (D.R.rS + 1) → ℝ)
+    : ENNReal :=
   ∑' γ : {γ : Point D.host.E (D.R.rS + 1) // IsBPt D T T' γ},
     ENNReal.ofReal (wPt D γ.1 * ptWeightG D (rhoReal D) T T' γ.1.1 * W γ.1) * JSqR D X γ.1
 
 def theoremBRotated (Aw Ch Cg Cb : ℝ) : Prop :=
   ∀ (T T' : ℕ) (b : ℝ) (X : BData D Ch Cg T T' b 0),
-    (∀ v, AllGaps (X.L v).lam (Cg * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 4)) →
-    BSumR D X (fun γ => normWt D T T' γ ^ (Aw * ((D.R.rS : ℝ) + 1) ^ 2)) ≤
-      ENNReal.ofReal (Real.exp (Cb * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 5 * (Fintype.card D.what₂.Tau : ℝ) * Real.log b)) *
-        jSqG D X
+    (∀ v, AllGaps (X.L v).lam (Cg * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 4))
+      → BSumR D X (fun γ => normWt D T T' γ ^ (Aw * ((D.R.rS : ℝ) + 1) ^ 2))
+        ≤ ENNReal.ofReal (Real.exp
+            (Cb * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 5 * (Fintype.card D.what₂.Tau : ℝ) * Real.log b))
+          * jSqG D X
 
 end Stmt
 
@@ -44,19 +50,23 @@ def JointNormBoundRotatedUniform : Prop :=
 
 section Core
 
-variable {D : D7} {τ Rw I H H₁ : Type} [Fintype I] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] (X : PB.Terms τ Rw I H H₁)
+variable
+  {D : D7} {τ Rw I H H₁ : Type} [Fintype I] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
+  (X : PB.Terms τ Rw I H H₁)
   {Cl Nu : Type} (N : PN.NGData τ D.host.E D.R.rS Cl Nu)
 
-def JointNormBoundRotated {Ch Cg : ℝ} {T T' : ℕ} {b : ℝ} (Bd : BData D Ch Cg T T' b 0) (Cj : ℝ) : Prop :=
-  ∀ γ (w : Point D.host.E (D.R.rS + 1)), PN.IsPt X N γ → Formalism.L2.SG.RowsConc.toPts w = γ →
-    Formalism.L2.SG.ThmBUse.IsRowPt D T T' w → ENNReal.ofReal (N.jacobianSquareBound γ) ≤ ENNReal.ofReal Cj * JSqR D Bd w
+def JointNormBoundRotated {Ch Cg : ℝ} {T T' : ℕ} {b : ℝ} (Bd : BData D Ch Cg T T' b 0) (Cj : ℝ)
+    : Prop :=
+  ∀ γ (w : Point D.host.E (D.R.rS + 1)),
+    PN.IsPt X N γ → Formalism.L2.SG.RowsConc.toPts w = γ → Formalism.L2.SG.ThmBUse.IsRowPt D T T' w
+      → ENNReal.ofReal (N.jacobianSquareBound γ) ≤ ENNReal.ofReal Cj * JSqR D Bd w
 
 def TiesR (Ch Cg : ℝ) (T T' : ℕ) (b : ℝ) (A : ℕ) (Cb TB : ℝ) : Prop :=
-  ∃ (Bd : BData D Ch Cg T T' b 0) (Cw Cj : ℝ), 0 ≤ Cw ∧ 0 ≤ Cj ∧
-    (∀ v, AllGaps (Bd.L v).lam (Cg * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 4)) ∧
-    Formalism.L2.SG.ThmBUse.PtTie X N T T' ∧ Formalism.L2.SG.ThmBUse.WtTie X N T T' A Cw ∧ JointNormBoundRotated X N Bd Cj ∧
-    Formalism.L2.SG.ThmBUse.NormTie Bd Cw Cj Cb TB
+  ∃ (Bd : BData D Ch Cg T T' b 0) (Cw Cj : ℝ),
+    0 ≤ Cw ∧ 0 ≤ Cj ∧ (∀ v, AllGaps (Bd.L v).lam (Cg * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 4))
+      ∧ Formalism.L2.SG.ThmBUse.PtTie X N T T' ∧ Formalism.L2.SG.ThmBUse.WtTie X N T T' A Cw
+      ∧ JointNormBoundRotated X N Bd Cj ∧ Formalism.L2.SG.ThmBUse.NormTie Bd Cw Cj Cb TB
 
 theorem pointSum_of_B3R {Ch Cg Cb : ℝ} {T T' A : ℕ} {b TB : ℝ} (hB3 : theoremBRotated D (A : ℝ) Ch Cg Cb)
     (hJ0 : ∀ γ, 0 ≤ N.jacobianSquareBound γ) (hTB : 0 ≤ TB) (h : TiesR X N Ch Cg T T' b A Cb TB) :

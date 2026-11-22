@@ -14,6 +14,7 @@ set_option maxSynthPendingDepth 1
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 theorem SectionNormSqExtension.closed : SectionNormSqExtension.Statement :=
-  SectionNormSqExtension.proof LeviLogFlat.proof LeviHolPerturb.proof LeviCompHol.proof LeviFSInvariant.proof
+  SectionNormSqExtension.proof LeviLogFlat.proof LeviHolPerturb.proof LeviCompHol.proof
+    LeviFSInvariant.proof
 
 end GroundTheory.Heights₂.Heights.HilbertSamuel

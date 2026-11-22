@@ -12,7 +12,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
 theorem UpperTheory.V.Pa.arPl : ArPl := by
   intro hC l _ L Ω _ _ _ _ _ _ s V0 O _ _ _ hO _ n r hS
@@ -40,10 +41,12 @@ theorem UpperTheory.V.Pa.arPl : ArPl := by
   have hUo : ∀ N, IsOpen (U N : Set (G L Ω)) := by
     intro N
     refine IsOpen.inter ((W N).toOpenSubgroup.isOpen.preimage hρc) ?_
-    have h1 := (isOpen_discrete ({1} : Set (ZMod (l ^ N)))).preimage
-      (GlobalTheory.TameQuot.continuous_cycMod (F := L) (Ω := Ω) l N)
-    have e : ((cycMod L Ω l N).ker : Set (G L Ω)) =
-        (fun x => ((cycMod L Ω l N x : (ZMod (l ^ N))ˣ) : ZMod (l ^ N))) ⁻¹' {1} := by
+    have h1 :=
+      (isOpen_discrete ({1} : Set (ZMod (l ^ N)))).preimage
+        (GlobalTheory.TameQuot.continuous_cycMod (F := L) (Ω := Ω) l N)
+    have e
+        : ((cycMod L Ω l N).ker : Set (G L Ω))
+          = (fun x => ((cycMod L Ω l N x : (ZMod (l ^ N))ˣ) : ZMod (l ^ N))) ⁻¹' {1} := by
       ext x
       simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_preimage, Set.mem_singleton_iff,
         Units.val_eq_one]
@@ -63,9 +66,10 @@ theorem UpperTheory.V.Pa.arPl : ArPl := by
   choose τ hτ using fun N j => (hTQ N j).2.2.2.2.1
   choose VN hVS hN hNe using fun N => levUp l L Ω s V0 O n r (Set.range (v N)) (Set.finite_range _)
     (by rintro _ ⟨j, rfl⟩; exact ⟨B N j, (hP N j).2.2.1, (hP N j).2.2.2.1⟩)
-  have hK := fun N => kerLe l L Ω s V0 (VN N) O n r (hN N) (H.toOpenSubgroup : Subgroup V0.frame.Γ)
-    q (v N) (B N) (τ N) (hNe N) (hVS N)
-    (fun j => ⟨by rw [hS]; exact (hP N j).1, (hP N j).2.2.1, (hP N j).2.2.2.1, hτ N j⟩)
+  have hK := fun N =>
+    kerLe l L Ω s V0 (VN N) O n r (hN N) (H.toOpenSubgroup : Subgroup V0.frame.Γ) q (v N) (B N)
+      (τ N) (hNe N) (hVS N)
+      (fun j => ⟨by rw [hS]; exact (hP N j).1, (hP N j).2.2.1, (hP N j).2.2.2.1, hτ N j⟩)
   have hcg : ∀ j, cycZ L Ω l (g j) = 1 := by
     intro j
     have h1 : cycZ L Ω l (g j) = V0.ε (toGS Ω V0.S' (resP L Ω (g j))) := by
@@ -89,7 +93,8 @@ theorem UpperTheory.V.Pa.arPl : ArPl := by
     rw [hk', map_natCast] at hz
     rw [← ZMod.natCast_eq_natCast_iff, Nat.cast_one]
     exact hz.symm
-  have hWm : ∀ N j, (show V0.frame.Γ from (hN N).p ((VN N).pr (σ N j)⁻¹).1) * ((sg j).1)⁻¹ ∈ W N := by
+  have hWm
+      : ∀ N j, (show V0.frame.Γ from (hN N).p ((VN N).pr (σ N j)⁻¹).1) * ((sg j).1)⁻¹ ∈ W N := by
     intro N j
     have e1 : (hN N).p ((VN N).pr (σ N j)⁻¹).1 = ρ (σ N j)⁻¹ := hNe N (resP L Ω (σ N j)⁻¹)
     have e2 : (sg j).1 = ρ (g j) := by
@@ -106,61 +111,76 @@ theorem UpperTheory.V.Pa.arPl : ArPl := by
       group
     rw [eq]
     exact hi
-  have htame : ∀ N j, ((((VN N).pr (τ N j)) ^ normV (w N j))⁻¹ *
-      (((VN N).pr (σ N j)⁻¹)⁻¹ * (VN N).pr (τ N j) * (VN N).pr (σ N j)⁻¹)).1 ∈
-      PL l (Subgroup.comap (hN N).p (H.toOpenSubgroup : Subgroup V0.frame.Γ)) := by
+  have htame
+      : ∀ N j,
+        ((((VN N).pr (τ N j)) ^ normV (w N j))⁻¹
+            * (((VN N).pr (σ N j)⁻¹)⁻¹ * (VN N).pr (τ N j) * (VN N).pr (σ N j)⁻¹)).1
+          ∈ PL l (Subgroup.comap (hN N).p (H.toOpenSubgroup : Subgroup V0.frame.Γ)) := by
     intro N j
     have hσD : σ N j ∈ Dec (B N j) := (hP N j).2.2.2.2.1.1
     have hτD : τ N j ∈ Dec (B N j) := Ine_le_Dec _ (hτ N j).1
     have ht := ((hTQ N j).2.2.2.2.2 ⟨σ N j, hσD⟩ ⟨τ N j, hτD⟩ (hP N j).2.2.2.2.1 (hτ N j)).2.1
     have hm := (hK N).2.1 j _ ht
-    have e : (((VN N).pr (τ N j)) ^ normV (w N j))⁻¹ *
-        (((VN N).pr (σ N j)⁻¹)⁻¹ * (VN N).pr (τ N j) * (VN N).pr (σ N j)⁻¹) =
-        (VN N).pr (((⟨τ N j, hτD⟩ : Dec (B N j)) ^ normV (w N j))⁻¹ *
-          ((⟨σ N j, hσD⟩ : Dec (B N j)) * ⟨τ N j, hτD⟩ * (⟨σ N j, hσD⟩ : Dec (B N j))⁻¹) : Dec (B N j)) := by
-      simp only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_pow, map_mul, map_inv, map_pow, inv_inv]
+    have e
+        : (((VN N).pr (τ N j)) ^ normV (w N j))⁻¹
+            * (((VN N).pr (σ N j)⁻¹)⁻¹ * (VN N).pr (τ N j) * (VN N).pr (σ N j)⁻¹)
+          = (VN N).pr
+            (((⟨τ N j, hτD⟩ : Dec (B N j)) ^ normV (w N j))⁻¹
+                * ((⟨σ N j, hσD⟩ : Dec (B N j)) * ⟨τ N j, hτD⟩ * (⟨σ N j, hσD⟩ : Dec (B N j))⁻¹)
+              : Dec (B N j)) := by
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_pow, map_mul, map_inv, map_pow,
+        inv_inv]
     rw [e]
     exact hm
-  let T : TWGrp (globOf r V0) :=
-    { q := q
-      H := H
-      H_η := fun x hx => by
-        obtain ⟨h1, -, -⟩ := (hH x).1 hx
-        exact h1
-      H_ε := fun x hx => by
-        obtain ⟨-, -, h3⟩ := (hH x).1 hx
-        exact h3
-      GN := fun N => globOf r (VN N)
-      h := hN
-      sg := sg
-      sg_mem := hsg
-      Nq := fun N j => normV (w N j)
-      Nq_mod := hNq
-      ph := fun N j => (VN N).pr (σ N j)⁻¹
-      ta := fun N j => (VN N).pr (τ N j)
-      ph_lim := fun V j hV => (hWlim V hV).mono fun N hle => hle (hWm N j)
-      ph_H := fun N j => hWH N (hWm N j)
-      ta_ker := fun N j => (hK N).1 j _ (hτ N j).1
-      tame := htame
-      ker_le := fun N => (hK N).2.2
-      hb := Nat.card (HomL l (H.toOpenSubgroup : Subgroup V0.frame.Γ)) *
-        l ^ (q * (H.toOpenSubgroup : Subgroup V0.frame.Γ).index)
-      fin0 := hphi _ H.toOpenSubgroup.isOpen
-      finN := fun N => homBound l (VN N).frame.Γ V0.frame.Γ (hN N).p H q (fun j => ((VN N).pr (τ N j)).1) (hN N).cont
-        (hN N).surj (fun j => (hK N).1 j _ (hτ N j).1) ((hK N).2.2) (hphi _ H.toOpenSubgroup.isOpen)
-      phiV := fun x => phiDec hC.lf l L Ω (s.A x.1) (s.w x.1) (s.hw x.1)
-      phiU := fun u => phiDec hC.lf l L Ω (s.A u.1) (s.w u.1) (s.hw u.1) }
-  refine ⟨T, ⟨{
+  let T : TWGrp (globOf r V0) := {
+    q := q
+    H := H
+    H_η := fun x hx => by
+      obtain ⟨h1, -, -⟩ := (hH x).1 hx
+      exact h1
+    H_ε := fun x hx => by
+      obtain ⟨-, -, h3⟩ := (hH x).1 hx
+      exact h3
+    GN := fun N => globOf r (VN N)
+    h := hN
+    sg := sg
+    sg_mem := hsg
+    Nq := fun N j => normV (w N j)
+    Nq_mod := hNq
+    ph := fun N j => (VN N).pr (σ N j)⁻¹
+    ta := fun N j => (VN N).pr (τ N j)
+    ph_lim := fun V j hV => (hWlim V hV).mono fun N hle => hle (hWm N j)
+    ph_H := fun N j => hWH N (hWm N j)
+    ta_ker := fun N j => (hK N).1 j _ (hτ N j).1
+    tame := htame
+    ker_le := fun N => (hK N).2.2
+    hb :=
+      Nat.card (HomL l (H.toOpenSubgroup : Subgroup V0.frame.Γ))
+        * l ^ (q * (H.toOpenSubgroup : Subgroup V0.frame.Γ).index)
+    fin0 := hphi _ H.toOpenSubgroup.isOpen
+    finN := fun N =>
+      homBound l (VN N).frame.Γ V0.frame.Γ (hN N).p H q
+        (fun j => ((VN N).pr (τ N j)).1)
+        (hN N).cont (hN N).surj
+        (fun j => (hK N).1 j _ (hτ N j).1)
+        ((hK N).2.2) (hphi _ H.toOpenSubgroup.isOpen)
+    phiV := fun x => phiDec hC.lf l L Ω (s.A x.1) (s.w x.1) (s.hw x.1)
+    phiU := fun u => phiDec hC.lf l L Ω (s.A u.1) (s.w u.1) (s.hw u.1)
+  }
+  refine ⟨
+    T,
+    ⟨{
       V := VN
-      e := fun N =>
-        { p := MonoidHom.id _
-          cont := continuous_id
-          surj := Function.surjective_id
-          η := fun _ => rfl
-          c := rfl
-          ε := fun _ => rfl
-          φ := fun _ _ => rfl
-          φu := fun _ _ => rfl }
+      e := fun N => {
+        p := MonoidHom.id _
+        cont := continuous_id
+        surj := Function.surjective_id
+        η := fun _ => rfl
+        c := rfl
+        ε := fun _ => rfl
+        φ := fun _ _ => rfl
+        φu := fun _ _ => rfl
+      }
       e_inj := fun N => Function.injective_id
       e_h := fun N x => hNe N x
       v := v
@@ -180,4 +200,8 @@ theorem UpperTheory.V.Pa.arPl : ArPl := by
       τ_gen := hτ
       ph := fun N j => rfl
       ta := fun N j => rfl
-      H_eq := hH }⟩, rfl, fun j => rfl⟩
+      H_eq := hH
+    }⟩,
+    rfl,
+    fun j => rfl
+  ⟩

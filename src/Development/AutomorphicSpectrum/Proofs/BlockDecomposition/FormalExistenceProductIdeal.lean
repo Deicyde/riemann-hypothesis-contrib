@@ -11,7 +11,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArtinRee
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 
@@ -78,23 +79,26 @@ lemma propSupp_mono {A : Type} [CommRing A] [X.Over (Spec (.of A))] {E : X.Modul
     epi_of_epi_fac (cokernel.π_desc S.arrow (cokernel.π S'.arrow) w)
   exact Scheme.Modules.SupportedIn.of_epi (cokernel.desc S.arrow (cokernel.π S'.arrow) w) hsupp
 
-theorem statement_of_mul_mem : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A)
-    {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsSeparated (X ↘ Spec (.of A))]
-    [LocallyOfFiniteType (X ↘ Spec (.of A))] [QuasiCompact (X ↘ Spec (.of A))]
-    (J J₁ J₂ : X.IdealSheafData),
-    (∀ (U : X.affineOpens) (a b : Γ(X, U)), a ∈ J₁.ideal U → b ∈ J₂.ideal U → a * b ∈ J.ideal U) →
-    Statement I J₁ → Statement I J₂ → Statement I J := by
+theorem statement_of_mul_mem
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
+        [X.Over (Spec (.of A))] [IsSeparated (X ↘ Spec (.of A))]
+        [LocallyOfFiniteType (X ↘ Spec (.of A))] [QuasiCompact (X ↘ Spec (.of A))]
+        (J J₁ J₂ : X.IdealSheafData),
+      (∀ (U : X.affineOpens) (a b : Γ(X, U)), a ∈ J₁.ideal U → b ∈ J₂.ideal U → a * b ∈ J.ideal U)
+        → Statement I J₁ → Statement I J₂
+        → Statement I J := by
   intro A _ _ I X _ _ _ _ J J₁ J₂ hm h₁ h₂ E hE S hS hK hP
   have hln : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian (X ↘ Spec (.of A))
   have hEq : E.IsQuasicoherent := hE.1
   set K : Subobject E := idealSub J₁ E with hKdef
   have hKq : (K : X.Modules).IsQuasicoherent := isQuasicoherent_idealSub J₁ hE
-  have hS1 : ClosedSys I E (fun e => S e ⊔ K) :=
-    { qcoh := fun e => (GlobalTheory.T.quasicoherent_sup_sections hEq _ _ (hS.qcoh e) hKq).1
-      pow_le := fun e => (hS.pow_le e).trans le_sup_left
-      succ := fun e => by
-        conv_lhs => rw [hS.succ e]
-        exact sup_right_comm _ _ _ }
+  have hS1 : ClosedSys I E (fun e => S e ⊔ K) := {
+    qcoh := fun e => (GlobalTheory.T.quasicoherent_sup_sections hEq _ _ (hS.qcoh e) hKq).1
+    pow_le := fun e => (hS.pow_le e).trans le_sup_left
+    succ := fun e => by
+      conv_lhs => rw [hS.succ e]
+      exact sup_right_comm _ _ _
+  }
   have hK1 : ∀ e, Killed J₁ (S e ⊔ K) := by
     intro e U a ha x
     have hax : a • x ∈ secs K U := by
@@ -108,8 +112,9 @@ theorem statement_of_mul_mem : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] 
   have hc : ∀ e, S (e + 0) ≤ (B ⊔ K) ⊔ powSub I E (e + 1) := fun e =>
     (le_sup_left : S e ≤ S e ⊔ K).trans ((hB e).symm.le.trans (sup_le_sup_right le_sup_left _))
   obtain ⟨c', hS', hP', halg⟩ := GlobalTheory.T.artin_rees_closed_system I hE hS hP (B ⊔ K) hDq 0 hc
-  have hkill : ∀ (n : ℕ) (U : X.affineOpens) (a : Γ(X, U)), a ∈ J₂.ideal U →
-      ∀ x ∈ secs (B ⊔ K) U, a • x ∈ secs (S n) U := by
+  have hkill
+      : ∀ (n : ℕ) (U : X.affineOpens) (a : Γ(X, U)),
+        a ∈ J₂.ideal U → ∀ x ∈ secs (B ⊔ K) U, a • x ∈ secs (S n) U := by
     intro n U a ha x hx
     have hle : B ⊔ K ≤ S n ⊔ K :=
       sup_le ((le_sup_left : B ≤ B ⊔ powSub I E (n + 1)).trans (hB n).le) le_sup_right
@@ -119,12 +124,18 @@ theorem statement_of_mul_mem : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] 
     rw [smul_add]
     refine add_mem_secs _ (smul_mem_secs _ a hs) ?_
     rw [hKdef, secs_idealSub] at hk
-    refine Submodule.smul_induction_on (p := fun k => a • k ∈ secs (S n) U) hk
-      (fun b hb y _ => ?_) (fun y z hy hz => ?_)
+    refine Submodule.smul_induction_on
+      (p := fun k => a • k ∈ secs (S n) U)
+      hk
+      (fun b hb y _ => ?_)
+      (fun y z hy hz => ?_)
     · rw [smul_smul, mul_comm]
       exact hK n U _ (hm U b a hb ha) y
     · rw [smul_add]
       exact add_mem_secs _ hy hz
-  exact halg (h₂ _ (GlobalTheory.T.coherent_subobject_coherent hE _ hDq) _ hS' (GlobalTheory.T.restricted_system_killed_by_ideal I J₂ _ S c' hkill) hP') hDP
+  exact halg
+    (h₂ _ (GlobalTheory.T.coherent_subobject_coherent hE _ hDq) _ hS'
+      (GlobalTheory.T.restricted_system_killed_by_ideal I J₂ _ S c' hkill) hP')
+    hDP
 
 end GlobalTheory.CompanionTheory.GE.NonPrime

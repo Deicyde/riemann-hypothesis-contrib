@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Contin
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot
+open MeasureTheory Matrix Filter Topology Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot
 open scoped ENNReal NNReal
 
 namespace GlobalTheory.SublevelDensity
@@ -103,18 +105,34 @@ private lemma mul_prod_sublevel_add_le_of_snd_sublevel_le {A B B' : Type*} [Meas
     _ = b * ∫⁻ x, m' (Prod.mk x ⁻¹' {p : A × B' | g p.1 + n' p.2 < r}) ∂μ :=
         lintegral_const_mul _ (measurable_measure_prodMk_left hS')
 
-
 open MeasureTheory Matrix Filter Topology in
 open scoped ENNReal NNReal in
-theorem _root_.GlobalTheory.SublevelDensity.tendsto_prod_density : ∀ (A₁ E₁ A₂ E₂ : Type) [MeasurableSpace A₁] [MeasurableSpace E₁] [MeasurableSpace A₂] [MeasurableSpace E₂] (m₁ : Measure A₁) (l₁ : Measure E₁) (m₂ : Measure A₂) (l₂ : Measure E₂) [SFinite m₁] [SFinite l₁] [SFinite m₂] [SFinite l₂] (n₁ : A₁ → ℝ) (N₁ : E₁ → ℝ) (n₂ : A₂ → ℝ) (N₂ : E₂ → ℝ) (c₁ c₂ : ℝ≥0∞), Measurable n₁ → Measurable N₁ → Measurable n₂ → Measurable N₂ → (∀ x, 0 ≤ n₁ x) → (∀ x, 0 ≤ N₁ x) → (∀ x, 0 ≤ n₂ x) → (∀ x, 0 ≤ N₂ x) → c₁ ≠ ⊤ → c₂ ≠ ⊤ → (∀ r : ℝ, 0 < r → l₁ {x | N₁ x < r} ≠ 0 ∧ l₁ {x | N₁ x < r} ≠ ⊤) → (∀ r : ℝ, 0 < r → l₂ {x | N₂ x < r} ≠ 0 ∧ l₂ {x | N₂ x < r} ≠ ⊤) → Tendsto (fun r : ℝ => m₁ {x | n₁ x < r} / l₁ {x | N₁ x < r}) (𝓝[>] 0) (𝓝 c₁) → Tendsto (fun r : ℝ => m₂ {x | n₂ x < r} / l₂ {x | N₂ x < r}) (𝓝[>] 0) (𝓝 c₂) → Tendsto (fun r : ℝ => (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r} / (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r}) (𝓝[>] 0) (𝓝 (c₁ * c₂)) := by
-  intro A₁ E₁ A₂ E₂ _ _ _ _ m₁ l₁ m₂ l₂ _ _ _ _ n₁ N₁ n₂ N₂ c₁ c₂ hn₁ hN₁ hn₂ hN₂ hn₁0 hN₁0
-    hn₂0 hN₂0 hc₁ hc₂ hl₁ hl₂ h₁ h₂
-  have hG : ∀ r : ℝ, 0 < r → (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} ≠ 0 ∧
-      (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} ≠ ⊤ := by
+theorem _root_.GlobalTheory.SublevelDensity.tendsto_prod_density
+    : ∀ (A₁ E₁ A₂ E₂ : Type) [MeasurableSpace A₁] [MeasurableSpace E₁] [MeasurableSpace A₂]
+        [MeasurableSpace E₂] (m₁ : Measure A₁) (l₁ : Measure E₁) (m₂ : Measure A₂) (l₂ : Measure E₂)
+        [SFinite m₁] [SFinite l₁] [SFinite m₂] [SFinite l₂] (n₁ : A₁ → ℝ) (N₁ : E₁ → ℝ)
+        (n₂ : A₂ → ℝ) (N₂ : E₂ → ℝ) (c₁ c₂ : ℝ≥0∞),
+      Measurable n₁ → Measurable N₁ → Measurable n₂ → Measurable N₂ → (∀ x, 0 ≤ n₁ x)
+        → (∀ x, 0 ≤ N₁ x) → (∀ x, 0 ≤ n₂ x) → (∀ x, 0 ≤ N₂ x) → c₁ ≠ ⊤ → c₂ ≠ ⊤
+        → (∀ r : ℝ, 0 < r → l₁ {x | N₁ x < r} ≠ 0 ∧ l₁ {x | N₁ x < r} ≠ ⊤)
+        → (∀ r : ℝ, 0 < r → l₂ {x | N₂ x < r} ≠ 0 ∧ l₂ {x | N₂ x < r} ≠ ⊤)
+        → Tendsto (fun r : ℝ => m₁ {x | n₁ x < r} / l₁ {x | N₁ x < r}) (𝓝[>] 0) (𝓝 c₁)
+        → Tendsto (fun r : ℝ => m₂ {x | n₂ x < r} / l₂ {x | N₂ x < r}) (𝓝[>] 0) (𝓝 c₂)
+        → Tendsto
+          (fun r : ℝ =>
+            (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r} / (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r})
+          (𝓝[>] 0) (𝓝 (c₁ * c₂)) := by
+  intro A₁ E₁ A₂ E₂ _ _ _ _ m₁ l₁ m₂ l₂ _ _ _ _ n₁ N₁ n₂ N₂ c₁ c₂ hn₁ hN₁ hn₂ hN₂ hn₁0 hN₁0 hn₂0
+    hN₂0 hc₁ hc₂ hl₁ hl₂ h₁ h₂
+  have hG
+      : ∀ r : ℝ,
+        0 < r
+          → (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} ≠ 0
+            ∧ (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} ≠ ⊤ := by
     intro r hr
     constructor
-    · have hsub : {x | N₁ x < r / 2} ×ˢ {y | N₂ y < r / 2} ⊆
-          {p : E₁ × E₂ | N₁ p.1 + N₂ p.2 < r} := by
+    · have hsub
+          : {x | N₁ x < r / 2} ×ˢ {y | N₂ y < r / 2} ⊆ {p : E₁ × E₂ | N₁ p.1 + N₂ p.2 < r} := by
         rintro ⟨x, y⟩ ⟨hx, hy⟩
         simp only [Set.mem_setOf_eq] at hx hy ⊢
         linarith
@@ -161,12 +179,18 @@ theorem _root_.GlobalTheory.SublevelDensity.tendsto_prod_density : ∀ (A₁ E�
         hsub₂ ⟨hs, lt_of_le_of_lt hsr (lt_of_lt_of_le hrδ (min_le_right _ _))⟩
       rw [one_mul]
       exact ((ENNReal.lt_div_iff_mul_lt (Or.inl (hl₂ s hs).1) (Or.inl (hl₂ s hs).2)).1 hs').le
-    have s₁ := mul_prod_sublevel_add_le_of_fst_sublevel_le l₁ m₁ m₂ N₁ n₁ n₂ hN₁ hn₁ hn₂ hN₁0 hn₁0 hn₂0 _ 1 r k₁
-    have s₂ := mul_prod_sublevel_add_le_of_snd_sublevel_le l₁ l₂ m₂ N₁ N₂ n₂ hN₁ hN₂ hn₂ hN₁0 hN₂0 hn₂0 _ 1 r k₂
+    have s₁ :=
+      mul_prod_sublevel_add_le_of_fst_sublevel_le l₁ m₁ m₂ N₁ n₁ n₂ hN₁ hn₁ hn₂ hN₁0 hn₁0 hn₂0 _ 1 r
+        k₁
+    have s₂ :=
+      mul_prod_sublevel_add_le_of_snd_sublevel_le l₁ l₂ m₂ N₁ N₂ n₂ hN₁ hN₂ hn₂ hN₁0 hN₂0 hn₂0 _ 1 r
+        k₂
     rw [one_mul] at s₁ s₂
-    have key : ((c₁ - t) * (c₂ - t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} ≤
-        (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r} :=
-      calc ((c₁ - t) * (c₂ - t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r}
+    have key
+        : ((c₁ - t) * (c₂ - t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r}
+          ≤ (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r} :=
+      calc
+        ((c₁ - t) * (c₂ - t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r}
           = (c₁ - t) * ((c₂ - t) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r}) := mul_assoc _ _ _
         _ ≤ (c₁ - t) * (l₁.prod m₂) {p | N₁ p.1 + n₂ p.2 < r} := by gcongr
         _ ≤ (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r} := s₁
@@ -202,17 +226,21 @@ theorem _root_.GlobalTheory.SublevelDensity.tendsto_prod_density : ∀ (A₁ E�
         hsub₂ ⟨hs, lt_of_le_of_lt hsr (lt_of_lt_of_le hrδ (min_le_right _ _))⟩
       rw [one_mul]
       exact ((ENNReal.div_lt_iff (Or.inl (hl₂ s hs).1) (Or.inl (hl₂ s hs).2)).1 hs').le
-    have s₁ := mul_prod_sublevel_add_le_of_fst_sublevel_le m₁ l₁ m₂ n₁ N₁ n₂ hn₁ hN₁ hn₂ hn₁0 hN₁0 hn₂0 1 _ r k₁
-    have s₂ := mul_prod_sublevel_add_le_of_snd_sublevel_le l₁ m₂ l₂ N₁ n₂ N₂ hN₁ hn₂ hN₂ hN₁0 hn₂0 hN₂0 1 _ r k₂
+    have s₁ :=
+      mul_prod_sublevel_add_le_of_fst_sublevel_le m₁ l₁ m₂ n₁ N₁ n₂ hn₁ hN₁ hn₂ hn₁0 hN₁0 hn₂0 1 _ r
+        k₁
+    have s₂ :=
+      mul_prod_sublevel_add_le_of_snd_sublevel_le l₁ m₂ l₂ N₁ n₂ N₂ hN₁ hn₂ hN₂ hN₁0 hn₂0 hN₂0 1 _ r
+        k₂
     rw [one_mul] at s₁ s₂
-    have key : (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r} ≤
-        ((c₁ + t) * (c₂ + t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} :=
-      calc (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r}
+    have key
+        : (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r}
+          ≤ ((c₁ + t) * (c₂ + t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} :=
+      calc
+        (m₁.prod m₂) {p | n₁ p.1 + n₂ p.2 < r}
           ≤ (c₁ + t) * (l₁.prod m₂) {p | N₁ p.1 + n₂ p.2 < r} := s₁
-        _ ≤ (c₁ + t) * ((c₂ + t) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r}) :=
-          by gcongr
-        _ = ((c₁ + t) * (c₂ + t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} :=
-          (mul_assoc _ _ _).symm
+        _ ≤ (c₁ + t) * ((c₂ + t) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r}) := by gcongr
+        _ = ((c₁ + t) * (c₂ + t)) * (l₁.prod l₂) {p | N₁ p.1 + N₂ p.2 < r} := (mul_assoc _ _ _).symm
     exact lt_of_le_of_lt (ENNReal.div_le_of_le_mul key) ht
 
 end GlobalTheory.SublevelDensity

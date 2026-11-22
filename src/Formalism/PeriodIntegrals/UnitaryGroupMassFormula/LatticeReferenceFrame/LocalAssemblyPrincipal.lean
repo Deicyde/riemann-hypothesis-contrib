@@ -95,14 +95,16 @@ theorem local_assembly_principal : PPAssemble := by
   have hTA : (T : I.E) ^ 2 ∈ Ap I p := pow_mem (natCast_mem_Ap I p T) 2
   have hTw : ∀ i, (T : I.E) • w i ∈ I.L := by
     intro i
-    obtain ⟨d, hd⟩ : sw i ∣ T := dvd_trans (dvd_trans (Finset.dvd_prod_of_mem sw (Finset.mem_univ i))
-      (dvd_mul_right _ _)) hT0dvd
+    obtain ⟨d, hd⟩ : sw i ∣ T :=
+      dvd_trans (dvd_trans (Finset.dvd_prod_of_mem sw (Finset.mem_univ i)) (dvd_mul_right _ _))
+        hT0dvd
     rw [hd, Nat.cast_mul, mul_comm, mul_smul, natE_smul (I := I)]
     exact I.L.smul_mem _ (hsw i).2
   have hTwd : ∀ i, (T : I.E) • wd i ∈ I.L := by
     intro i
-    obtain ⟨d, hd⟩ : sd i ∣ T := dvd_trans (dvd_trans (Finset.dvd_prod_of_mem sd (Finset.mem_univ i))
-      (dvd_mul_left _ _)) hT0dvd
+    obtain ⟨d, hd⟩ : sd i ∣ T :=
+      dvd_trans (dvd_trans (Finset.dvd_prod_of_mem sd (Finset.mem_univ i)) (dvd_mul_left _ _))
+        hT0dvd
     rw [hd, Nat.cast_mul, mul_comm, mul_smul, natE_smul (I := I)]
     exact I.L.smul_mem _ (hsd i).2
 
@@ -115,8 +117,10 @@ theorem local_assembly_principal : PPAssemble := by
     rw [h, hts]
     ring
   obtain ⟨θs, hθs⟩ := isInt_star I θ
-  obtain ⟨z, hzdef⟩ : ∃ z : Fin I.n → I.E,
-      z = (T : I.E) • ((θ : I.E) • w (Fin.last k) - star (θ : I.E) • wd (Fin.last k)) := ⟨_, rfl⟩
+  obtain ⟨z, hzdef⟩
+      : ∃ z : Fin I.n → I.E,
+        z = (T : I.E) • ((θ : I.E) • w (Fin.last k) - star (θ : I.E) • wd (Fin.last k)) :=
+    ⟨_, rfl⟩
   have hz : z ∈ I.L := by
     rw [hzdef, smul_sub, smul_comm (T : I.E) (θ : I.E), smul_comm (T : I.E) (star (θ : I.E)), ← hθs]
     exact I.L.sub_mem (I.L.smul_mem θ (hTw _)) (I.L.smul_mem θs (hTwd _))
@@ -129,10 +133,22 @@ theorem local_assembly_principal : PPAssemble := by
     rw [hwd, if_neg (Fin.castSucc_ne_last i).symm]
   have hl4 : ∀ i : Fin k, hG I (w (Fin.last k)) (wd i.castSucc) = 0 := by
     intro i
-    rw [hG_symm (I := I) (wd i.castSucc) (w (Fin.last k)), hwd, if_neg (Fin.castSucc_ne_last i), star_zero]
+    rw [hG_symm (I := I) (wd i.castSucc) (w (Fin.last k)), hwd, if_neg (Fin.castSucc_ne_last i),
+      star_zero]
   unfold Concl
-  refine ⟨z, fun i => (T : I.E) • w i.castSucc, fun i => (T : I.E) • wd i.castSucc, hz,
-    fun i => ⟨hTw _, hTwd _⟩, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    z,
+    fun i => (T : I.E) • w i.castSucc,
+    fun i => (T : I.E) • wd i.castSucc,
+    hz,
+    fun i => ⟨hTw _, hTwd _⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro a
     rw [hzdef]
     refine ⟨?_, ?_⟩ <;> rw [hG_smul_right, hG_sub_right, hG_smul_right, hG_smul_right]
@@ -142,34 +158,43 @@ theorem local_assembly_principal : PPAssemble := by
       ring
   · intro a i
     simp [hG_smul_right, hew]
-  ·
-    apply GE_of_QA (I := I) p m (isInt_add I (isInt_hG I hz hz) (isInt_one I))
-    have hzz : hG I z z + 1 =
-        ((T : I.E) ^ 2 * (hG I (w (Fin.last k)) (w (Fin.last k)) + hG I (wd (Fin.last k)) (wd (Fin.last k))))
-          * ((θ : I.E) * star (θ : I.E))
-        - (T : I.E) ^ 2 * ((θ : I.E) * θ - θ)
-        - (T : I.E) ^ 2 * (star (θ : I.E) * star (θ : I.E) - star (θ : I.E))
-        + (T : I.E) ^ 2 * (1 - (θ : I.E) - star (θ : I.E))
-        + (1 - (T : I.E) ^ 2) := by
+  · apply GE_of_QA (I := I) p m (isInt_add I (isInt_hG I hz hz) (isInt_one I))
+    have hzz
+        : hG I z z + 1
+          = ((T : I.E) ^ 2
+                * (hG I (w (Fin.last k)) (w (Fin.last k))
+                  + hG I (wd (Fin.last k)) (wd (Fin.last k))))
+              * ((θ : I.E) * star (θ : I.E))
+            - (T : I.E) ^ 2 * ((θ : I.E) * θ - θ)
+            - (T : I.E) ^ 2 * (star (θ : I.E) * star (θ : I.E) - star (θ : I.E))
+            + (T : I.E) ^ 2 * (1 - (θ : I.E) - star (θ : I.E)) + (1 - (T : I.E) ^ 2) := by
       rw [hzdef]
-      simp only [hG_smul_left, hG_smul_right, hG_sub_left, hG_sub_right, star_natCast, star_star, star_sub,
-        star_smul]
+      simp only [hG_smul_left, hG_smul_right, hG_sub_left, hG_sub_right, star_natCast, star_star,
+        star_sub, star_smul]
       rw [hl1, hl2]
       ring
     rw [hzz]
-    have hAD : (T : I.E) ^ 2 * (hG I (w (Fin.last k)) (w (Fin.last k)) + hG I (wd (Fin.last k)) (wd (Fin.last k)))
-        ∈ Ap I p :=
-      mul_mem hTA (add_mem (hG_mem_Ap (I := I) p (hw _).1 (hw _).1) (hG_mem_Ap (I := I) p (hw _).2 (hw _).2))
-    refine QA_add (I := I) p _ (QA_add (I := I) p _ (QA_sub (I := I) p _ (QA_sub (I := I) p _
-      (QA_mul (I := I) p _ hAD (QA_of_GE (I := I) p _ hθ2))
-      (QA_mul (I := I) p _ hTA (QA_of_GE (I := I) p _ hθ1)))
-      (QA_mul (I := I) p _ hTA (QA_of_GE (I := I) p _ hθ1s)))
-      (QA_mul (I := I) p _ hTA (QA_of_GE (I := I) p _ hθ3))) hT1
+    have hAD
+        : (T : I.E) ^ 2
+            * (hG I (w (Fin.last k)) (w (Fin.last k)) + hG I (wd (Fin.last k)) (wd (Fin.last k)))
+          ∈ Ap I p :=
+      mul_mem hTA
+        (add_mem (hG_mem_Ap (I := I) p (hw _).1 (hw _).1) (hG_mem_Ap (I := I) p (hw _).2 (hw _).2))
+    refine QA_add (I := I) p _
+      (QA_add (I := I) p _
+        (QA_sub (I := I) p _
+          (QA_sub (I := I) p _ (QA_mul (I := I) p _ hAD (QA_of_GE (I := I) p _ hθ2))
+            (QA_mul (I := I) p _ hTA (QA_of_GE (I := I) p _ hθ1)))
+          (QA_mul (I := I) p _ hTA (QA_of_GE (I := I) p _ hθ1s)))
+        (QA_mul (I := I) p _ hTA (QA_of_GE (I := I) p _ hθ3)))
+      hT1
   · intro i
     constructor
     · apply GE_of_QA (I := I) p m (isInt_mul I (isInt_coe I θ) (isInt_hG I hz (hTw _)))
-      have h : (θ : I.E) * hG I z ((T : I.E) • w i.castSucc) =
-          ((T : I.E) ^ 2 * hG I (w (Fin.last k)) (w i.castSucc)) * ((θ : I.E) * star (θ : I.E)) := by
+      have h
+          : (θ : I.E) * hG I z ((T : I.E) • w i.castSucc)
+            = ((T : I.E) ^ 2 * hG I (w (Fin.last k)) (w i.castSucc))
+              * ((θ : I.E) * star (θ : I.E)) := by
         rw [hzdef]
         simp only [hG_smul_left, hG_smul_right, hG_sub_left, star_natCast, star_star, star_sub]
         rw [hl3]
@@ -179,8 +204,10 @@ theorem local_assembly_principal : PPAssemble := by
         (QA_of_GE (I := I) p _ hθ2)
     · apply GE_of_QA (I := I) p m
         (isInt_mul I (by rw [← hθs]; exact isInt_coe I θs) (isInt_hG I hz (hTwd _)))
-      have h : star (θ : I.E) * hG I z ((T : I.E) • wd i.castSucc) =
-          -((T : I.E) ^ 2 * hG I (wd (Fin.last k)) (wd i.castSucc)) * ((θ : I.E) * star (θ : I.E)) := by
+      have h
+          : star (θ : I.E) * hG I z ((T : I.E) • wd i.castSucc)
+            = -((T : I.E) ^ 2 * hG I (wd (Fin.last k)) (wd i.castSucc))
+              * ((θ : I.E) * star (θ : I.E)) := by
         rw [hzdef]
         simp only [hG_smul_left, hG_smul_right, hG_sub_left, star_natCast, star_star, star_sub]
         rw [hl4]
@@ -189,8 +216,9 @@ theorem local_assembly_principal : PPAssemble := by
       exact QA_mul (I := I) p _ (neg_mem (mul_mem hTA (hG_mem_Ap (I := I) p (hw _).2 (hw _).2)))
         (QA_of_GE (I := I) p _ hθ2)
   · intro i j
-    have h : hG I ((T : I.E) • wd i.castSucc) ((T : I.E) • w j.castSucc) =
-        (T : I.E) ^ 2 * (if i = j then 1 else 0) := by
+    have h
+        : hG I ((T : I.E) • wd i.castSucc) ((T : I.E) • w j.castSucc)
+          = (T : I.E) ^ 2 * (if i = j then 1 else 0) := by
       rw [hG_smul_left, hG_smul_right, hwd, star_natCast]
       simp only [Fin.castSucc_inj]
       ring
@@ -198,7 +226,8 @@ theorem local_assembly_principal : PPAssemble := by
     by_cases hij : i = j
     · rw [if_pos hij, mul_one]
       apply GE_of_QA (I := I) p m
-        (isInt_mul I (isInt_coe I θ) (isInt_sub I ⟨(T : 𝓞 I.E) ^ 2, by push_cast; rfl⟩ (isInt_one I)))
+        (isInt_mul I (isInt_coe I θ)
+          (isInt_sub I ⟨(T : 𝓞 I.E) ^ 2, by push_cast; rfl⟩ (isInt_one I)))
       have h2 : (θ : I.E) * ((T : I.E) ^ 2 - 1) = -(θ : I.E) * (1 - (T : I.E) ^ 2) := by ring
       rw [h2]
       exact QA_mul (I := I) p _ (neg_mem (int_mem_Ap (I := I) p θ)) hT1

@@ -18,17 +18,23 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace Pf.EigA
 
-theorem idem_data {E : Type} [Field E] [NumberField E] {k V : Type} [Field k] [CommRing V] [Algebra V k]
-    (ψ : E →+* k) (hint : ∀ x : 𝓞 E, ∃ v : V, algebraMap V k v = ψ (algebraMap (𝓞 E) E x)) (w : V)
-    (hw : algebraMap V k w * (((discr E).natAbs : ℕ) : k) = 1) :
-    ∃ (n : ℕ) (b : Fin n → 𝓞 E) (c : Fin n → V),
-      (∑ i, algebraMap V k (c i) * ψ (algebraMap (𝓞 E) E (b i)) = 1) ∧
-      ∀ a : 𝓞 E, ∃ m : Fin n → Fin n → ℤ, (∀ i, a * b i = ∑ j, m i j • b j) ∧
-        ∀ j, ∑ i, (m i j : k) * algebraMap V k (c i) = ψ (algebraMap (𝓞 E) E a) * algebraMap V k (c j) := by
+theorem idem_data
+    {E : Type} [Field E] [NumberField E]
+    {k V : Type} [Field k] [CommRing V] [Algebra V k]
+    (ψ : E →+* k) (hint : ∀ x : 𝓞 E, ∃ v : V, algebraMap V k v = ψ (algebraMap (𝓞 E) E x))
+    (w : V) (hw : algebraMap V k w * (((discr E).natAbs : ℕ) : k) = 1)
+    : ∃ (n : ℕ) (b : Fin n → 𝓞 E) (c : Fin n → V),
+      (∑ i, algebraMap V k (c i) * ψ (algebraMap (𝓞 E) E (b i)) = 1)
+        ∧ ∀ a : 𝓞 E, ∃ m : Fin n → Fin n → ℤ,
+          (∀ i, a * b i = ∑ j, m i j • b j)
+            ∧ ∀ j,
+              ∑ i, (m i j : k) * algebraMap V k (c i)
+                = ψ (algebraMap (𝓞 E) E a) * algebraMap V k (c j) := by
   classical
   obtain ⟨b, c, h1, h2⟩ := idem_data_basis ψ hint w hw
   set eq := Fintype.equivFin (Module.Free.ChooseBasisIndex ℤ (𝓞 E))

@@ -9,10 +9,14 @@ public import Mathlib.NumberTheory.LegendreSymbol.Basic
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-private theorem UpperTheory.V.CF.exists_quadratic_gauss_sum {K : Type} [Field K] [CharZero K] {d : ℕ} [hd : Fact d.Prime]
-    (hd2 : d ≠ 2) {ζ : K} (hζ : IsPrimitiveRoot ζ d) :
-    ∃ G : K, G ^ 2 = (pStar d : ℤ) ∧ G ∈ ℚ⟮ζ⟯ ∧ ∀ (σ : K →+* K) (a : ℕ), σ ζ = ζ ^ a →
-      σ G = (legendreSym d a : ℤ) * G := by
+private theorem UpperTheory.V.CF.exists_quadratic_gauss_sum
+    {K : Type} [Field K] [CharZero K]
+    {d : ℕ} [hd : Fact d.Prime]
+    (hd2 : d ≠ 2)
+    {ζ : K} (hζ : IsPrimitiveRoot ζ d)
+    : ∃ G : K,
+      G ^ 2 = (pStar d : ℤ) ∧ G ∈ ℚ⟮ζ⟯
+        ∧ ∀ (σ : K →+* K) (a : ℕ), σ ζ = ζ ^ a → σ G = (legendreSym d a : ℤ) * G := by
   classical
   haveI : NeZero d := ⟨hd.out.ne_zero⟩
   have hζd : ζ ^ d = 1 := hζ.pow_eq_one
@@ -29,8 +33,7 @@ private theorem UpperTheory.V.CF.exists_quadratic_gauss_sum {K : Type} [Field K]
   have hψa : ∀ n : ℕ, ψ (n : ZMod d) = ζ ^ n := fun n => AddChar.zmodChar_apply' hζd n
   refine ⟨gaussSum χ ψ, ?_, ?_, ?_⟩
   · rw [gaussSum_sq hχ1 hχq hψp, hχa, ZMod.card]
-    have h1 : quadraticChar (ZMod d) (-1) = legendreSym d (-1) := by
-      simp [legendreSym]
+    have h1 : quadraticChar (ZMod d) (-1) = legendreSym d (-1) := by simp [legendreSym]
     rw [h1, legendreSym.at_neg_one hd2, ZMod.χ₄_nat_eq_if_mod_four, pStar]
     have hodd : d % 2 = 1 := hd.out.eq_two_or_odd.resolve_left hd2
     have h4 : d % 4 = 1 ∨ d % 4 = 3 := by omega
@@ -66,12 +69,17 @@ private theorem UpperTheory.V.CF.exists_quadratic_gauss_sum {K : Type} [Field K]
       gaussSum_mulShift χ ψ (Units.mk0 _ hb)
     have hu2 : χ (b : ZMod d) * χ (b : ZMod d) = 1 := by
       rw [hχa, ← Int.cast_mul, ← sq, quadraticChar_sq_one hb, Int.cast_one]
-    have hleg : ((legendreSym d b : ℤ) : K) = χ (b : ZMod d) := by
-      rw [hχa]; simp [legendreSym]
+    have hleg : ((legendreSym d b : ℤ) : K) = χ (b : ZMod d) := by rw [hχa]; simp [legendreSym]
     rw [hG, hleg, ← hmul, ← mul_assoc, hu2, one_mul]
 
-theorem UpperTheory.V.CF.gauss :
-    ∀ (K : Type) [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (ζ : K), p ≠ 2 → IsPrimitiveRoot ζ p → (∃ x : K, x ^ 2 = (pStar p : ℤ)) ∧ ∀ x : K, x ^ 2 = (pStar p : ℤ) → x ∈ ℚ⟮ζ⟯ ∧ ∀ (σ : K →+* K) (b : ℕ), σ ζ = ζ ^ b → σ x = (legendreSym p b : ℤ) * x := by
+theorem UpperTheory.V.CF.gauss
+    : ∀ (K : Type) [Field K] [CharZero K] (p : ℕ) [Fact p.Prime] (ζ : K),
+      p ≠ 2 → IsPrimitiveRoot ζ p
+        → (∃ x : K, x ^ 2 = (pStar p : ℤ))
+          ∧ ∀ x : K,
+            x ^ 2 = (pStar p : ℤ)
+              → x ∈ ℚ⟮ζ⟯
+                ∧ ∀ (σ : K →+* K) (b : ℕ), σ ζ = ζ ^ b → σ x = (legendreSym p b : ℤ) * x := by
   intro K _ _ p _ ζ hp hζ
   obtain ⟨G, hG, hmem, hσ⟩ := UpperTheory.V.CF.exists_quadratic_gauss_sum hp hζ
   refine ⟨⟨G, hG⟩, fun x hx => ?_⟩

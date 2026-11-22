@@ -11,10 +11,13 @@ open scoped LaurentSeries PowerSeries
 
 namespace GlobalTheory.Models
 
-theorem exact_of_finrank_add {K U V W : Type*} [Field K] [AddCommGroup U] [Module K U] [AddCommGroup V]
-    [Module K V] [AddCommGroup W] [Module K W] [Module.Finite K V] (f : U →ₗ[K] V) (p : V →ₗ[K] W)
+theorem exact_of_finrank_add
+    {K U V W : Type*} [Field K] [AddCommGroup U] [Module K U] [AddCommGroup V] [Module K V]
+    [AddCommGroup W] [Module K W] [Module.Finite K V]
+    (f : U →ₗ[K] V) (p : V →ₗ[K] W)
     (hf : Function.Injective f) (hp : Function.Surjective p) (h0 : p ∘ₗ f = 0)
-    (hd : Module.finrank K V = Module.finrank K U + Module.finrank K W) : Function.Exact f p := by
+    (hd : Module.finrank K V = Module.finrank K U + Module.finrank K W)
+    : Function.Exact f p := by
   rw [LinearMap.exact_iff]
   have hle : LinearMap.range f ≤ LinearMap.ker p := by
     rintro _ ⟨x, rfl⟩
@@ -24,20 +27,26 @@ theorem exact_of_finrank_add {K U V W : Type*} [Field K] [AddCommGroup U] [Modul
   have hrf := LinearMap.finrank_range_of_inj hf
   exact (Submodule.eq_of_le_of_finrank_eq hle (by omega)).symm
 
-theorem finrank_add_of_exact {K U V W : Type*} [Field K] [AddCommGroup U] [Module K U] [AddCommGroup V]
-    [Module K V] [AddCommGroup W] [Module K W] [Module.Finite K V] (f : U →ₗ[K] V) (p : V →ₗ[K] W)
-    (hf : Function.Injective f) (hp : Function.Surjective p) (he : Function.Exact f p) :
-    Module.finrank K V = Module.finrank K U + Module.finrank K W := by
+theorem finrank_add_of_exact
+    {K U V W : Type*} [Field K] [AddCommGroup U] [Module K U] [AddCommGroup V] [Module K V]
+    [AddCommGroup W] [Module K W] [Module.Finite K V]
+    (f : U →ₗ[K] V) (p : V →ₗ[K] W)
+    (hf : Function.Injective f) (hp : Function.Surjective p) (he : Function.Exact f p)
+    : Module.finrank K V = Module.finrank K U + Module.finrank K W := by
   rw [LinearMap.exact_iff] at he
   have hrn := LinearMap.finrank_range_add_finrank_ker p
   rw [he, LinearMap.range_eq_top.mpr hp, finrank_top, LinearMap.finrank_range_of_inj hf] at hrn
   omega
 
-theorem DFun.map_exact_middle {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Prime] [CharP k l] [NeZero n]
-    {R : RingPG k l} (F : DFun R n G) (A B C : Ob k G) (f : (Fin A.m → k) →ₗ[k] (Fin B.m → k))
-    (p : (Fin B.m → k) →ₗ[k] (Fin C.m → k)) (hB : F.Obj B) (hf : IsHom A B f) (hp : IsHom B C p)
-    (hi : Function.Injective f) (hs : Function.Surjective p) (he : Function.Exact f p) (i : ZMod n) :
-    Function.Exact (F.map A B f i) (F.map B C p i) := by
+theorem DFun.map_exact_middle
+    {k G : Type} [Field k] [Group G]
+    {l n : ℕ} [Fact l.Prime] [CharP k l] [NeZero n]
+    {R : RingPG k l} (F : DFun R n G)
+    (A B C : Ob k G) (f : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (p : (Fin B.m → k) →ₗ[k] (Fin C.m → k))
+    (hB : F.Obj B) (hf : IsHom A B f) (hp : IsHom B C p) (hi : Function.Injective f)
+    (hs : Function.Surjective p) (he : Function.Exact f p)
+    (i : ZMod n)
+    : Function.Exact (F.map A B f i) (F.map B C p i) := by
   have hA : F.Obj A := F.obj_sub A B f hf hi hB
   have hC : F.Obj C := F.obj_quot B C p hp hs hB
   have hd := finrank_add_of_exact f p hi hs he

@@ -17,15 +17,14 @@ section Ext
 
 variable {V : Type} [TopologicalSpace V] [T2Space V]
 
-
 open Classical in
 def extZ (U : Set V) (φ : U → ℝ) : V → ℝ := fun v => if h : v ∈ U then φ ⟨v, h⟩ else 0
 
 theorem extZ_val (U : Set V) (φ : U → ℝ) (u : U) : extZ U φ u = φ u := by
   simp only [extZ, dif_pos u.2]
 
-private theorem tsupport_extZ_subset_image (U : Set V) (φ : U → ℝ) (hs : HasCompactSupport φ) :
-    tsupport (extZ U φ) ⊆ Subtype.val '' tsupport φ := by
+private theorem tsupport_extZ_subset_image (U : Set V) (φ : U → ℝ) (hs : HasCompactSupport φ)
+    : tsupport (extZ U φ) ⊆ Subtype.val '' tsupport φ := by
   have hK : IsCompact (Subtype.val '' tsupport φ) := hs.isCompact.image continuous_subtype_val
   refine closure_minimal ?_ hK.isClosed
   intro v hv
@@ -36,8 +35,9 @@ private theorem tsupport_extZ_subset_image (U : Set V) (φ : U → ℝ) (hs : Ha
     simpa only [extZ, dif_pos h] using hv
   · exact (hv (by simp only [extZ, dif_neg h])).elim
 
-theorem extZ_props {U : Set V} (hU : IsOpen U) (φ : U → ℝ) (hc : Continuous φ)
-    (hs : HasCompactSupport φ) : IsCcOn U (extZ U φ) := by
+theorem extZ_props
+    {U : Set V} (hU : IsOpen U) (φ : U → ℝ) (hc : Continuous φ) (hs : HasCompactSupport φ)
+    : IsCcOn U (extZ U φ) := by
   have hK : IsCompact (Subtype.val '' tsupport φ) := hs.isCompact.image continuous_subtype_val
   have hsub := tsupport_extZ_subset_image U φ hs
   refine ⟨?_, hK.of_isClosed_subset (isClosed_tsupport _) hsub, ?_⟩
@@ -83,26 +83,28 @@ end Ext
 
 section Dens
 
-variable {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X]
-  [MeasurableSpace X] {μ : Measure V} {ν : Measure X} {f : V → Y} {ι : X → Y} {U : Set V}
-
+variable
+  {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X] [MeasurableSpace X]
+  {μ : Measure V} {ν : Measure X} {f : V → Y} {ι : X → Y} {U : Set V}
 
 open Classical in
 def G (hD : DensAll μ f ι ν U) (φ : V → ℝ) : X → ℝ :=
   if h : IsCcOn U φ then Classical.choose (hD φ h.1 h.2.1 h.2.2) else 0
 
-theorem G_spec (hD : DensAll μ f ι ν U) {φ : V → ℝ} (h : IsCcOn U φ) :
-    Continuous (G hD φ) ∧ ∀ S : Set X, IsCompact S →
-      ∫ v in f ⁻¹' (ι '' S), φ v ∂μ = ∫ b in S, G hD φ b ∂ν := by
+theorem G_spec (hD : DensAll μ f ι ν U) {φ : V → ℝ} (h : IsCcOn U φ)
+    : Continuous (G hD φ)
+      ∧ ∀ S : Set X, IsCompact S → ∫ v in f ⁻¹' (ι '' S), φ v ∂μ = ∫ b in S, G hD φ b ∂ν := by
   have hc := Classical.choose_spec (hD φ h.1 h.2.1 h.2.2)
   simp only [G, dif_pos h]
   exact hc
 
-variable [OpensMeasurableSpace X] [T2Space X] [LocallyCompactSpace X]
-  [IsFiniteMeasureOnCompacts ν] [ν.IsOpenPosMeasure]
+variable
+  [OpensMeasurableSpace X] [T2Space X] [LocallyCompactSpace X] [IsFiniteMeasureOnCompacts ν]
+  [ν.IsOpenPosMeasure]
 
-private theorem nonneg_of_setIntegral_compact_nonneg {g : X → ℝ} (hg : Continuous g)
-    (h : ∀ S, IsCompact S → 0 ≤ ∫ b in S, g b ∂ν) (b0 : X) : 0 ≤ g b0 := by
+private theorem nonneg_of_setIntegral_compact_nonneg
+    {g : X → ℝ} (hg : Continuous g) (h : ∀ S, IsCompact S → 0 ≤ ∫ b in S, g b ∂ν) (b0 : X)
+    : 0 ≤ g b0 := by
   by_contra hlt
   push_neg at hlt
   have hcneg : g b0 / 2 < 0 := by linarith
@@ -120,19 +122,34 @@ private theorem nonneg_of_setIntegral_compact_nonneg {g : X → ℝ} (hg : Conti
     exact mul_neg_of_pos_of_neg (ENNReal.toReal_pos hpos.ne' hfin.ne) hcneg
   linarith [h K hK]
 
-theorem dens_unique {g1 g2 : X → ℝ} (h1 : Continuous g1) (h2 : Continuous g2)
-    (h : ∀ S, IsCompact S → ∫ b in S, g1 b ∂ν = ∫ b in S, g2 b ∂ν) : g1 = g2 := by
+theorem dens_unique
+    {g1 g2 : X → ℝ} (h1 : Continuous g1) (h2 : Continuous g2)
+    (h : ∀ S, IsCompact S → ∫ b in S, g1 b ∂ν = ∫ b in S, g2 b ∂ν)
+    : g1 = g2 := by
   funext b
   have ha : 0 ≤ g1 b - g2 b := by
-    refine nonneg_of_setIntegral_compact_nonneg (ν := ν) (g := fun x => g1 x - g2 x) (h1.sub h2) (fun S hS => ?_) b
-    rw [integral_sub (h1.continuousOn.integrableOn_compact hS) (h2.continuousOn.integrableOn_compact hS), h S hS, sub_self]
+    refine nonneg_of_setIntegral_compact_nonneg (ν := ν)
+      (g := fun x => g1 x - g2 x)
+      (h1.sub h2)
+      (fun S hS => ?_)
+      b
+    rw [integral_sub (h1.continuousOn.integrableOn_compact hS)
+        (h2.continuousOn.integrableOn_compact hS),
+      h S hS, sub_self]
   have hb : 0 ≤ g2 b - g1 b := by
-    refine nonneg_of_setIntegral_compact_nonneg (ν := ν) (g := fun x => g2 x - g1 x) (h2.sub h1) (fun S hS => ?_) b
-    rw [integral_sub (h2.continuousOn.integrableOn_compact hS) (h1.continuousOn.integrableOn_compact hS), h S hS, sub_self]
+    refine nonneg_of_setIntegral_compact_nonneg (ν := ν)
+      (g := fun x => g2 x - g1 x)
+      (h2.sub h1)
+      (fun S hS => ?_)
+      b
+    rw [integral_sub (h2.continuousOn.integrableOn_compact hS)
+        (h1.continuousOn.integrableOn_compact hS),
+      h S hS, sub_self]
   linarith
 
-theorem dens_nonneg {g : X → ℝ} (hg : Continuous g)
-    (h : ∀ S, IsCompact S → 0 ≤ ∫ b in S, g b ∂ν) (b0 : X) : 0 ≤ g b0 := by
+theorem dens_nonneg
+    {g : X → ℝ} (hg : Continuous g) (h : ∀ S, IsCompact S → 0 ≤ ∫ b in S, g b ∂ν) (b0 : X)
+    : 0 ≤ g b0 := by
   exact nonneg_of_setIntegral_compact_nonneg hg h b0
 
 variable [IsFiniteMeasureOnCompacts μ] [OpensMeasurableSpace V]
@@ -157,8 +174,8 @@ theorem isCc_smul (c : ℝ) {φ : V → ℝ} (hφ : IsCcOn U φ) : IsCcOn U (c �
     simp only [Pi.smul_apply, h0, smul_zero]
   exact ⟨hφ.1.const_smul c, hφ.2.1.mono hs, (closure_mono hs).trans hφ.2.2⟩
 
-theorem G_add (hD : DensAll μ f ι ν U) {φ ψ : V → ℝ} (hφ : IsCcOn U φ) (hψ : IsCcOn U ψ) :
-    G hD (φ + ψ) = G hD φ + G hD ψ := by
+theorem G_add (hD : DensAll μ f ι ν U) {φ ψ : V → ℝ} (hφ : IsCcOn U φ) (hψ : IsCcOn U ψ)
+    : G hD (φ + ψ) = G hD φ + G hD ψ := by
   have hs := G_spec hD (isCc_add hφ hψ)
   have h1 := G_spec hD hφ
   have h2 := G_spec hD hψ
@@ -167,11 +184,12 @@ theorem G_add (hD : DensAll μ f ι ν U) {φ ψ : V → ℝ} (hφ : IsCcOn U φ
   simp only [Pi.add_apply]
   rw [integral_add (hφ.1.integrable_of_hasCompactSupport hφ.2.1).integrableOn
       (hψ.1.integrable_of_hasCompactSupport hψ.2.1).integrableOn,
-    integral_add (h1.1.continuousOn.integrableOn_compact hS) (h2.1.continuousOn.integrableOn_compact hS),
+    integral_add (h1.1.continuousOn.integrableOn_compact hS)
+      (h2.1.continuousOn.integrableOn_compact hS),
     h1.2 S hS, h2.2 S hS]
 
-theorem G_smul (hD : DensAll μ f ι ν U) (c : ℝ) {φ : V → ℝ} (hφ : IsCcOn U φ) :
-    G hD (c • φ) = c • G hD φ := by
+theorem G_smul (hD : DensAll μ f ι ν U) (c : ℝ) {φ : V → ℝ} (hφ : IsCcOn U φ)
+    : G hD (c • φ) = c • G hD φ := by
   have hs := G_spec hD (isCc_smul c hφ)
   have h1 := G_spec hD hφ
   refine dens_unique (ν := ν) hs.1 (h1.1.const_smul c) (fun S hS => ?_)
@@ -179,8 +197,8 @@ theorem G_smul (hD : DensAll μ f ι ν U) (c : ℝ) {φ : V → ℝ} (hφ : IsC
   simp only [Pi.smul_apply]
   rw [integral_smul, integral_smul, h1.2 S hS]
 
-theorem G_nonneg (hD : DensAll μ f ι ν U) {φ : V → ℝ} (hφ : IsCcOn U φ) (h0 : 0 ≤ φ) :
-    0 ≤ G hD φ := by
+theorem G_nonneg (hD : DensAll μ f ι ν U) {φ : V → ℝ} (hφ : IsCcOn U φ) (h0 : 0 ≤ φ)
+    : 0 ≤ G hD φ := by
   intro b
   have hs := G_spec hD hφ
   refine dens_nonneg (ν := ν) hs.1 (fun S hS => ?_) b
@@ -191,19 +209,21 @@ end Dens
 
 section Riesz
 
-variable {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
-  [LocallyCompactSpace V] [T2Space V] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
-  [T2Space X] [LocallyCompactSpace X] [TopologicalSpace Y] [T2Space Y]
+variable
+  {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V] [LocallyCompactSpace V]
+  [T2Space V] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X] [T2Space X]
+  [LocallyCompactSpace X] [TopologicalSpace Y] [T2Space Y]
   {μ : Measure V} {ν : Measure X} {f : V → Y} {ι : X → Y} {U : Set V}
   [IsFiniteMeasureOnCompacts ν] [ν.IsOpenPosMeasure] [IsFiniteMeasureOnCompacts μ]
 
-theorem tsupport_extZ (U : Set V) (φ : U → ℝ) (hs : HasCompactSupport φ) :
-    tsupport (extZ U φ) ⊆ Subtype.val '' tsupport φ := by
+theorem tsupport_extZ (U : Set V) (φ : U → ℝ) (hs : HasCompactSupport φ)
+    : tsupport (extZ U φ) ⊆ Subtype.val '' tsupport φ := by
   exact tsupport_extZ_subset_image U φ hs
 
 def lam (hD : DensAll μ f ι ν U) (hU : IsOpen U) (b : X) : C_c(U, ℝ) →ₚ[ℝ] ℝ :=
   PositiveLinearMap.mk₀
-    { toFun := fun ψ => G hD (extZ U ψ) b
+    {
+      toFun := fun ψ => G hD (extZ U ψ) b
       map_add' := fun ψ1 ψ2 => by
         simp only [CompactlySupportedContinuousMap.coe_add, extZ_add]
         rw [G_add hD (extZ_props hU ψ1 ψ1.continuous ψ1.hasCompactSupport)
@@ -212,12 +232,15 @@ def lam (hD : DensAll μ f ι ν U) (hU : IsOpen U) (b : X) : C_c(U, ℝ) →ₚ
       map_smul' := fun c ψ => by
         simp only [CompactlySupportedContinuousMap.coe_smul, extZ_smul, RingHom.id_apply]
         rw [G_smul hD c (extZ_props hU ψ ψ.continuous ψ.hasCompactSupport)]
-        rfl }
-    (fun ψ hψ => G_nonneg hD (extZ_props hU ψ ψ.continuous ψ.hasCompactSupport)
-      (extZ_nonneg U ψ fun u => (CompactlySupportedContinuousMap.le_def.1 hψ) u) b)
+        rfl
+    }
+    (fun ψ hψ =>
+      G_nonneg hD (extZ_props hU ψ ψ.continuous ψ.hasCompactSupport)
+        (extZ_nonneg U ψ fun u => (CompactlySupportedContinuousMap.le_def.1 hψ) u) b)
 
-theorem lam_apply (hD : DensAll μ f ι ν U) (hU : IsOpen U) (b : X) (ψ : C_c(U, ℝ)) :
-    lam hD hU b ψ = G hD (extZ U ψ) b := rfl
+theorem lam_apply (hD : DensAll μ f ι ν U) (hU : IsOpen U) (b : X) (ψ : C_c(U, ℝ))
+    : lam hD hU b ψ = G hD (extZ U ψ) b :=
+  rfl
 
 variable [OpensMeasurableSpace V]
 
@@ -236,8 +259,7 @@ def restr (hU : IsOpen U) (φ : V → ℝ) (h : IsCcOn U φ) : C_c(U, ℝ) where
     exact HasCompactSupport.intro' hK ((isClosed_tsupport φ).preimage continuous_subtype_val)
       fun u hu => image_eq_zero_of_notMem_tsupport hu
 
-theorem extZ_restr (hU : IsOpen U) (φ : V → ℝ) (h : IsCcOn U φ) :
-    extZ U (restr hU φ h) = φ := by
+theorem extZ_restr (hU : IsOpen U) (φ : V → ℝ) (h : IsCcOn U φ) : extZ U (restr hU φ h) = φ := by
   funext v
   by_cases hv : v ∈ U
   · simp only [extZ, dif_pos hv]
@@ -245,24 +267,24 @@ theorem extZ_restr (hU : IsOpen U) (φ : V → ℝ) (h : IsCcOn U φ) :
   · simp only [extZ, dif_neg hv]
     exact (image_eq_zero_of_notMem_tsupport fun ht => hv (h.2.2 ht)).symm
 
-theorem fibG_integral (hD : DensAll μ f ι ν U) (hU : IsOpen U) (b : X) (φ : V → ℝ)
-    (h : IsCcOn U φ) :
-    Integrable φ (fibG hD hU b) ∧ ∫ v, φ v ∂(fibG hD hU b) = G hD φ b := by
+theorem fibG_integral (hD : DensAll μ f ι ν U) (hU : IsOpen U) (b : X) (φ : V → ℝ) (h : IsCcOn U φ)
+    : Integrable φ (fibG hD hU b) ∧ ∫ v, φ v ∂(fibG hD hU b) = G hD φ b := by
   haveI : LocallyCompactSpace U := hU.isOpenEmbedding_subtypeVal.locallyCompactSpace
   have hme : MeasurableEmbedding (Subtype.val : U → V) :=
     MeasurableEmbedding.subtype_coe hU.measurableSet
   unfold fibG
   refine ⟨?_, ?_⟩
   · rw [hme.integrable_map_iff]
-    exact (restr hU φ h).continuous.integrable_of_hasCompactSupport
-      (restr hU φ h).hasCompactSupport
+    exact (restr hU φ h).continuous.integrable_of_hasCompactSupport (restr hU φ h).hasCompactSupport
   · rw [hme.integral_map]
     have hR := RealRMK.integral_rieszMeasure (lam hD hU b) (restr hU φ h)
     rw [lam_apply, extZ_restr] at hR
     exact hR
 
-private theorem nonpos_of_setIntegral_compact_nonpos {g : X → ℝ} (hg : Continuous g) {b : X} {N : Set X} (hN : N ∈ 𝓝 b)
-    (h : ∀ S, IsCompact S → S ⊆ N → ∫ x in S, g x ∂ν ≤ 0) : g b ≤ 0 := by
+private theorem nonpos_of_setIntegral_compact_nonpos
+    {g : X → ℝ} (hg : Continuous g)
+    {b : X} {N : Set X} (hN : N ∈ 𝓝 b) (h : ∀ S, IsCompact S → S ⊆ N → ∫ x in S, g x ∂ν ≤ 0)
+    : g b ≤ 0 := by
   refine not_lt.mp fun hpos => ?_
   have hW : N ∩ {x | g b / 2 < g x} ∈ 𝓝 b :=
     inter_mem hN ((isOpen_lt continuous_const hg).mem_nhds (show g b / 2 < g b by linarith))
@@ -277,8 +299,9 @@ private theorem nonpos_of_setIntegral_compact_nonpos {g : X → ℝ} (hg : Conti
       (half_pos hpos)
   linarith [h K hK (fun x hx => (hKW hx).1)]
 
-theorem fibG_supp (hD : DensAll μ f ι ν U) (hU : IsOpen U) (hf : Continuous f)
-    (hι : Continuous ι) (b : X) : fibG hD hU b (f ⁻¹' {ι b} ∩ U)ᶜ = 0 := by
+theorem fibG_supp
+    (hD : DensAll μ f ι ν U) (hU : IsOpen U) (hf : Continuous f) (hι : Continuous ι) (b : X)
+    : fibG hD hU b (f ⁻¹' {ι b} ∩ U)ᶜ = 0 := by
   haveI : LocallyCompactSpace U := hU.isOpenEmbedding_subtypeVal.locallyCompactSpace
   have hW : IsOpen {u : U | f u ≠ ι b} :=
     isOpen_ne_fun (hf.comp continuous_subtype_val) continuous_const
@@ -287,8 +310,9 @@ theorem fibG_supp (hD : DensAll μ f ι ν U) (hU : IsOpen U) (hf : Continuous f
     simp
   have hmeas : MeasurableSet (f ⁻¹' {ι b} ∩ U)ᶜ :=
     ((isClosed_singleton.preimage hf).measurableSet.inter hU.measurableSet).compl
-  have hzero : ∀ K : Set U, K ⊆ {u : U | f u ≠ ι b} → IsCompact K →
-      RealRMK.rieszMeasure (lam hD hU b) K = 0 := by
+  have hzero
+      : ∀ K : Set U,
+        K ⊆ {u : U | f u ≠ ι b} → IsCompact K → RealRMK.rieszMeasure (lam hD hU b) K = 0 := by
     intro K hKW hK
     obtain ⟨g, hg1, hgc, hgW, hg01⟩ := exists_continuousMap_one_of_isCompact_subset_isOpen hK hW hKW
     let ψ : C_c(U, ℝ) := ⟨g, hgc⟩
@@ -301,8 +325,10 @@ theorem fibG_supp (hD : DensAll μ f ι ν U) (hU : IsOpen U) (hf : Continuous f
       exact hgW hu hv
     have hN : ι ⁻¹' (f '' (Subtype.val '' tsupport ψ))ᶜ ∈ 𝓝 b :=
       ((hK'.image hf).isClosed.isOpen_compl.preimage hι).mem_nhds hbK
-    have hSz : ∀ S, IsCompact S → S ⊆ ι ⁻¹' (f '' (Subtype.val '' tsupport ψ))ᶜ →
-        ∫ x in S, G hD (extZ U ψ) x ∂ν = 0 := by
+    have hSz
+        : ∀ S,
+          IsCompact S → S ⊆ ι ⁻¹' (f '' (Subtype.val '' tsupport ψ))ᶜ
+            → ∫ x in S, G hD (extZ U ψ) x ∂ν = 0 := by
       intro S hS hSN
       rw [← hGi S hS]
       apply setIntegral_eq_zero_of_forall_eq_zero
@@ -310,20 +336,24 @@ theorem fibG_supp (hD : DensAll μ f ι ν U) (hU : IsOpen U) (hf : Continuous f
       apply image_eq_zero_of_notMem_tsupport
       intro hvt
       exact hSN hs ⟨v, tsupport_extZ U ψ ψ.hasCompactSupport hvt, hsv.symm⟩
-    have hup := nonpos_of_setIntegral_compact_nonpos (ν := ν) hGc hN fun S hS hSN => (hSz S hS hSN).le
-    have hdown := nonpos_of_setIntegral_compact_nonpos (ν := ν) hGc.neg hN fun S hS hSN => by
-      simp only [Pi.neg_apply]
-      rw [integral_neg, hSz S hS hSN, neg_zero]
+    have hup :=
+      nonpos_of_setIntegral_compact_nonpos (ν := ν) hGc hN fun S hS hSN => (hSz S hS hSN).le
+    have hdown :=
+      nonpos_of_setIntegral_compact_nonpos (ν := ν) hGc.neg hN fun S hS hSN => by
+        simp only [Pi.neg_apply]
+        rw [integral_neg, hSz S hS hSN, neg_zero]
     have hΛ : lam hD hU b ψ = 0 := by
       rw [lam_apply]
       exact le_antisymm hup (neg_nonpos.mp hdown)
-    have hle := RealRMK.rieszMeasure_le_of_eq_one (lam hD hU b) (f := ψ) (fun x => (hg01 x).1) hK
-      (fun x hx => hg1 hx)
+    have hle :=
+      RealRMK.rieszMeasure_le_of_eq_one (lam hD hU b) (f := ψ)
+        (fun x => (hg01 x).1)
+        hK
+        (fun x hx => hg1 hx)
     rw [hΛ, ENNReal.ofReal_zero] at hle
     exact le_antisymm hle bot_le
   unfold fibG
-  rw [Measure.map_apply continuous_subtype_val.measurable hmeas, hpre,
-    hW.measure_eq_iSup_isCompact]
+  rw [Measure.map_apply continuous_subtype_val.measurable hmeas, hpre, hW.measure_eq_iSup_isCompact]
   simp only [ENNReal.iSup_eq_zero]
   exact hzero
 
@@ -331,18 +361,20 @@ end Riesz
 
 def DisintStep : Prop :=
   ∀ (V X Y : Type) [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V] [LocallyCompactSpace V]
-    [T2Space V] [SecondCountableTopology V] [TopologicalSpace X] [MeasurableSpace X]
-    [BorelSpace X] [LocallyCompactSpace X] [T2Space X] [SecondCountableTopology X]
-    [TopologicalSpace Y] [T2Space Y] (μ : Measure V) (ν : Measure X),
-    IsFiniteMeasureOnCompacts μ → IsFiniteMeasureOnCompacts ν → ν.IsOpenPosMeasure →
-    ∀ (f : V → Y) (ι : X → Y) (U : Set V), Continuous f → IsClosedEmbedding ι →
-      (∀ v, f v ∈ Set.range ι) → IsOpen U → ∀ fib : X → Measure V,
-      (∀ b, fib b (f ⁻¹' {ι b} ∩ U)ᶜ = 0) →
-      (∀ b K, IsCompact K → K ⊆ U → fib b K < ⊤) →
-      (∀ φ : V → ℝ, IsCcOn U φ → (∀ b, Integrable φ (fib b)) ∧
-        Continuous (fun b => ∫ v, φ v ∂(fib b)) ∧
-        ∀ S : Set X, IsCompact S → ∫ v in f ⁻¹' (ι '' S), φ v ∂μ = ∫ b in S, ∫ v, φ v ∂(fib b) ∂ν) →
-      ∀ φ : V → ENNReal, Measurable φ → ∫⁻ v in U, φ v ∂μ = ∫⁻ b, ∫⁻ v, φ v ∂(fib b) ∂ν
+      [T2Space V] [SecondCountableTopology V] [TopologicalSpace X] [MeasurableSpace X]
+      [BorelSpace X] [LocallyCompactSpace X] [T2Space X] [SecondCountableTopology X]
+      [TopologicalSpace Y] [T2Space Y] (μ : Measure V) (ν : Measure X),
+    IsFiniteMeasureOnCompacts μ → IsFiniteMeasureOnCompacts ν → ν.IsOpenPosMeasure
+      → ∀ (f : V → Y) (ι : X → Y) (U : Set V),
+        Continuous f → IsClosedEmbedding ι → (∀ v, f v ∈ Set.range ι) → IsOpen U
+          → ∀ fib : X → Measure V,
+            (∀ b, fib b (f ⁻¹' {ι b} ∩ U)ᶜ = 0) → (∀ b K, IsCompact K → K ⊆ U → fib b K < ⊤)
+              → (∀ φ : V → ℝ,
+                IsCcOn U φ
+                  → (∀ b, Integrable φ (fib b)) ∧ Continuous (fun b => ∫ v, φ v ∂(fib b))
+                    ∧ ∀ S : Set X,
+                      IsCompact S → ∫ v in f ⁻¹' (ι '' S), φ v ∂μ = ∫ b in S, ∫ v, φ v ∂(fib b) ∂ν)
+              → ∀ φ : V → ENNReal, Measurable φ → ∫⁻ v in U, φ v ∂μ = ∫⁻ b, ∫⁻ v, φ v ∂(fib b) ∂ν
 
 theorem fibOfDens_of (hDis : DisintStep) : FibOfDens := by
   intro V X Y _ _ _ _ _ _ _ _ _ _ _ _ _ _ μ ν hμ hν hνp f ι U hf hι hr hU hD
@@ -358,10 +390,13 @@ theorem fibOfDens_of (hDis : DisintStep) : FibOfDens := by
       rw [Subtype.range_coe]
       exact hKU
     exact ((Topology.IsInducing.subtypeVal.isCompact_preimage_iff hsub).2 hK).measure_lt_top
-  have hint : ∀ φ : V → ℝ, IsCcOn U φ → (∀ b, Integrable φ (fibG hD hU b)) ∧
-      Continuous (fun b => ∫ v, φ v ∂(fibG hD hU b)) ∧
-      ∀ S : Set X, IsCompact S →
-        ∫ v in f ⁻¹' (ι '' S), φ v ∂μ = ∫ b in S, ∫ v, φ v ∂(fibG hD hU b) ∂ν := by
+  have hint
+      : ∀ φ : V → ℝ,
+        IsCcOn U φ
+          → (∀ b, Integrable φ (fibG hD hU b)) ∧ Continuous (fun b => ∫ v, φ v ∂(fibG hD hU b))
+            ∧ ∀ S : Set X,
+              IsCompact S
+                → ∫ v in f ⁻¹' (ι '' S), φ v ∂μ = ∫ b in S, ∫ v, φ v ∂(fibG hD hU b) ∂ν := by
     intro φ hφ
     have hG := G_spec hD hφ
     have heq : (fun b => ∫ v, φ v ∂(fibG hD hU b)) = G hD φ :=

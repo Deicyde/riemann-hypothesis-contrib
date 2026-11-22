@@ -6,13 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-private theorem UpperTheory.V.ZK.Ct.kerF_tele {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I) :
-    ∑ j ∈ Finset.range D.n, (((D.a : ℤ) ^ j) • D.g ^ (D.n - j + 1) - ((D.a : ℤ) ^ (j + 1)) • D.g ^ (D.n - j))
+private theorem UpperTheory.V.ZK.Ct.kerF_tele
+    {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I)
+    : ∑ j ∈ Finset.range D.n, (((D.a : ℤ) ^ j) • D.g ^ (D.n - j + 1) - ((D.a : ℤ) ^ (j + 1)) • D.g ^ (D.n - j))
       = (1 - (D.a : ℤ) ^ D.n) • D.g := by
-  have key : ∀ j ∈ Finset.range D.n,
-      ((D.a : ℤ) ^ j • D.g ^ (D.n - j + 1) - (D.a : ℤ) ^ (j + 1) • D.g ^ (D.n - j))
-        = (fun k => (D.a : ℤ) ^ k • D.g ^ (D.n - k + 1)) j
-          - (fun k => (D.a : ℤ) ^ k • D.g ^ (D.n - k + 1)) (j + 1) := by
+  have key
+      : ∀ j ∈ Finset.range D.n,
+        ((D.a : ℤ) ^ j • D.g ^ (D.n - j + 1) - (D.a : ℤ) ^ (j + 1) • D.g ^ (D.n - j))
+          = (fun k => (D.a : ℤ) ^ k • D.g ^ (D.n - k + 1)) j
+            - (fun k => (D.a : ℤ) ^ k • D.g ^ (D.n - k + 1)) (j + 1) := by
     intro j hj
     have hj' : j < D.n := Finset.mem_range.mp hj
     have e : D.n - (j + 1) + 1 = D.n - j := by omega
@@ -21,36 +23,44 @@ private theorem UpperTheory.V.ZK.Ct.kerF_tele {Y I : Type} [AddCommGroup Y] [Add
   simp only [pow_zero, one_smul, Nat.sub_zero, Nat.sub_self, zero_add, pow_one]
   rw [pow_succ, D.g_pow, one_mul, sub_smul, one_smul]
 
-private theorem UpperTheory.V.ZK.Ct.kerF_nm_del {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I) :
-    D.nm * D.del = (1 - (D.a : ℤ) ^ D.n) • D.g := by
+private theorem UpperTheory.V.ZK.Ct.kerF_nm_del
+    {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I)
+    : D.nm * D.del = (1 - (D.a : ℤ) ^ D.n) • D.g := by
   rw [← kerF_tele D]
   simp only [Dat.nm, Dat.del, Finset.sum_mul]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [smul_mul_assoc, mul_sub, mul_smul_comm, mul_one, smul_sub, smul_smul, ← pow_succ, ← pow_succ]
 
-private theorem UpperTheory.V.ZK.Ct.kerF_del_nm {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I) :
-    D.del * D.nm = (1 - (D.a : ℤ) ^ D.n) • D.g := by
+private theorem UpperTheory.V.ZK.Ct.kerF_del_nm
+    {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I)
+    : D.del * D.nm = (1 - (D.a : ℤ) ^ D.n) • D.g := by
   rw [← kerF_tele D]
   simp only [Dat.nm, Dat.del, Finset.mul_sum]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [mul_smul_comm, sub_mul, smul_mul_assoc, one_mul, smul_sub, smul_smul, ← pow_succ, ← pow_succ']
 
-private theorem UpperTheory.V.ZK.Ct.kerF_tors {Y : Type} [AddCommGroup Y] (φ : Module.End ℤ Y) {t : Y}
-    (ht : t ∈ Submodule.torsion ℤ Y) : φ t ∈ Submodule.torsion ℤ Y := by
+private theorem UpperTheory.V.ZK.Ct.kerF_tors
+    {Y : Type} [AddCommGroup Y] (φ : Module.End ℤ Y) {t : Y} (ht : t ∈ Submodule.torsion ℤ Y)
+    : φ t ∈ Submodule.torsion ℤ Y := by
   obtain ⟨c, hc⟩ := (Submodule.mem_torsion_iff t).mp ht
   refine (Submodule.mem_torsion_iff _).mpr ⟨c, ?_⟩
   rw [Submonoid.smul_def] at hc ⊢
   rw [← φ.map_smul, hc, map_zero]
 
-private theorem UpperTheory.V.ZK.Ct.kerF_tors' {Y : Type} [AddCommGroup Y] {q : ℤ} (hq : q ≠ 0) {t : Y}
-    (ht : q • t ∈ Submodule.torsion ℤ Y) : t ∈ Submodule.torsion ℤ Y := by
+private theorem UpperTheory.V.ZK.Ct.kerF_tors'
+    {Y : Type} [AddCommGroup Y] {q : ℤ} (hq : q ≠ 0) {t : Y} (ht : q • t ∈ Submodule.torsion ℤ Y)
+    : t ∈ Submodule.torsion ℤ Y := by
   obtain ⟨c, hc⟩ := (Submodule.mem_torsion_iff _).mp ht
   rw [Submonoid.smul_def, smul_smul] at hc
   have hne : (c : ℤ) * q ≠ 0 := mul_ne_zero (nonZeroDivisors.coe_ne_zero c) hq
   exact (Submodule.mem_torsion_iff _).mpr ⟨⟨(c : ℤ) * q, mem_nonZeroDivisors_of_ne_zero hne⟩, hc⟩
 
-theorem UpperTheory.V.ZK.Ct.kerF :
-    ∀ (Y I : Type) [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I), ∀ (q s : ℕ) (u : ℤ), (D.a : ℤ) ^ D.n - 1 = q * u → ∃ f : D.W →ₗ[ℤ] Y ⧸ mt Y q, (∀ y : D.U, f (Submodule.Quotient.mk y) = Submodule.Quotient.mk ((s : ℤ) • D.nm y)) ∧ ∀ w, f w = 0 → (u * s) • w = 0 := by
+theorem UpperTheory.V.ZK.Ct.kerF
+    : ∀ (Y I : Type) [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I), ∀ (q s : ℕ) (u : ℤ),
+      (D.a : ℤ) ^ D.n - 1 = q * u
+        → ∃ f : D.W →ₗ[ℤ] Y ⧸ mt Y q,
+          (∀ y : D.U, f (Submodule.Quotient.mk y) = Submodule.Quotient.mk ((s : ℤ) • D.nm y))
+            ∧ ∀ w, f w = 0 → (u * s) • w = 0 := by
   intro Y I _ _ D q s u h
   set R : Submodule ℤ Y := LinearMap.range D.del ⊔ Submodule.torsion ℤ Y with hRdef
   have hq0 : (q : ℤ) ≠ 0 := by
@@ -94,7 +104,8 @@ theorem UpperTheory.V.ZK.Ct.kerF :
     have hw' : (s : ℤ) • D.nm (y : Y) ∈ mt Y q := by
       have := hw
       simp only [Submodule.liftQ_apply, φ, LinearMap.comp_apply, Submodule.mkQ_apply,
-        Submodule.Quotient.mk_eq_zero, LinearMap.smul_apply, Submodule.coe_subtype] at this
+          Submodule.Quotient.mk_eq_zero, LinearMap.smul_apply, Submodule.coe_subtype]
+        at this
       exact this
     set v : Y := (s : ℤ) • (y : Y) with hv
     have hnv : D.nm v = (s : ℤ) • D.nm (y : Y) := by rw [hv, map_smul]

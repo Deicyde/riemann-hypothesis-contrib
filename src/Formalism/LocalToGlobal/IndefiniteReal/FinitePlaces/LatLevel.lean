@@ -9,7 +9,9 @@ set_option synthInstance.maxHeartbeats 100000
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Matrix NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Matrix NumberField
 open scoped TensorProduct
 
 namespace Formalism.IndefR.Fin
@@ -18,9 +20,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem exists_nsmul_mem_cpt' {X : Type*} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
-    (K : Set X) (hK : IsCompact K) (hKs : ∀ y ∈ K, ∀ n : ℕ, n • y ∈ K) (H : AddSubgroup X)
-    (hH : IsOpen (H : Set X)) : ∃ m : ℕ, 0 < m ∧ ∀ y ∈ K, m • y ∈ H := by
+theorem exists_nsmul_mem_cpt'
+    {X : Type*} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
+    (K : Set X) (hK : IsCompact K) (hKs : ∀ y ∈ K, ∀ n : ℕ, n • y ∈ K)
+    (H : AddSubgroup X) (hH : IsOpen (H : Set X))
+    : ∃ m : ℕ, 0 < m ∧ ∀ y ∈ K, m • y ∈ H := by
   classical
   let U : X → Set X := fun y => (fun x => x - y) ⁻¹' (H : Set X)
   have hU : ∀ y, IsOpen (U y) := fun y => hH.preimage (continuous_id.sub continuous_const)
@@ -34,8 +38,9 @@ theorem exists_nsmul_mem_cpt' {X : Type*} [AddCommGroup X] [TopologicalSpace X] 
     obtain ⟨i, hi, hji⟩ := this
     exact ⟨i, by simpa using hi, hji⟩
   choose! f hf using hmaps
-  obtain ⟨j1, hj1, j2, hj2, hne, heq⟩ := Finset.exists_ne_map_eq_of_card_lt_of_maps_to
-    (s := Finset.range (t'.card + 1)) (t := t') (by simp) (f := f) (fun j hj => (hf j hj).1)
+  obtain ⟨j1, hj1, j2, hj2, hne, heq⟩ :=
+    Finset.exists_ne_map_eq_of_card_lt_of_maps_to (s := Finset.range (t'.card + 1)) (t := t')
+      (by simp) (f := f) (fun j hj => (hf j hj).1)
   have h1 := (hf j1 hj1).2
   have h2 := (hf j2 hj2).2
   rw [heq] at h1
@@ -62,14 +67,19 @@ theorem exists_nsmul_mem_cpt' {X : Type*} [AddCommGroup X] [TopologicalSpace X] 
     exact H.nsmul_mem hk c
 
 def LatLevel (D : D7) : Prop :=
-  ∀ ψ : AddChar (AF D.host.F) ℂ, IsStdChar D ψ (-1) → ∀ (S T : HSp D)
-    (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
-    IsSelfDualC S ΛS → IsSelfDualC T ΛT → ∀ f : WO S T → ℂ, IsThetaFunO ψ S T f →
-      ∃ k : ℕ, 0 < k ∧ ∀ u ∈ latAll S T ΛS ΛT, heisO ψ S T (k • u) f = f
+  ∀ ψ : AddChar (AF D.host.F) ℂ,
+    IsStdChar D ψ (-1)
+      → ∀ (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+          (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
+        IsSelfDualC S ΛS → IsSelfDualC T ΛT
+          → ∀ f : WO S T → ℂ,
+            IsThetaFunO ψ S T f → ∃ k : ℕ, 0 < k ∧ ∀ u ∈ latAll S T ΛS ΛT, heisO ψ S T (k • u) f = f
 
-theorem latAll_inf (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
-    (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) {u : WO S T} (hu : u ∈ latAll S T ΛS ΛT) :
-    u.map (infPart D) = 0 := by
+theorem latAll_inf
+    (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+    (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E))
+    {u : WO S T} (hu : u ∈ latAll S T ΛS ΛT)
+    : u.map (infPart D) = 0 := by
   induction hu using AddSubgroup.closure_induction with
   | mem x hx =>
     obtain ⟨α, -, -, a, -, s, -, t, -, rfl⟩ := hx
@@ -77,7 +87,8 @@ theorem latAll_inf (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank �
     simp only [Matrix.map_apply, Matrix.of_apply, Matrix.zero_apply]
     show fstA D.host.F (pairA D.host.F 0 α) ⊗ₜ[D.host.F] _ = 0
     rw [show fstA D.host.F (pairA D.host.F 0 α) = 0 from rfl, TensorProduct.zero_tmul]
-  | zero => ext i j; simp
+  | zero =>
+    ext i j; simp
   | add x y _ _ hx hy =>
     ext i j
     have h1 : infPart D (x i j) = 0 := congrFun (congrFun hx i) j
@@ -94,7 +105,8 @@ theorem latLevel_of (hL : LatSelfDual D) : LatLevel D := by
   intro ψ hψ S T ΛS ΛT hS hT f hf
   obtain ⟨U, hUo, hU⟩ := hf.level
   obtain ⟨hcpt, -, -, -⟩ := hL ψ hψ S T ΛS ΛT hS hT
-  obtain ⟨m, hm, hmU⟩ := exists_nsmul_mem_cpt' _ hcpt (fun y hy n => AddSubgroup.nsmul_mem _ hy n) U hUo
+  obtain ⟨m, hm, hmU⟩ :=
+    exists_nsmul_mem_cpt' _ hcpt (fun y hy n => AddSubgroup.nsmul_mem _ hy n) U hUo
   refine ⟨m, hm, fun u hu => hU _ (hmU u hu) ?_⟩
   have h0 := latAll_inf S T ΛS ΛT hu
   ext i j

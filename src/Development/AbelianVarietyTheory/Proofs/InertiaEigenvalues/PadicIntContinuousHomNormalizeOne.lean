@@ -6,7 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem padicInt_hom_normalize : ∀ {G : Type} [Group G] [TopologicalSpace G] (p : ℕ) [Fact p.Prime] (χ : G → ℤ_[p]), Continuous χ → (∀ g h, χ (g * h) = χ g + χ h) → ∀ (g₀ : G), χ g₀ ≠ 0 → ∃ ψ : G → ℤ_[p], Continuous ψ ∧ (∀ g h, ψ (g * h) = ψ g + ψ h) ∧ (∀ g, χ g = 0 → ψ g = 0) ∧ ∃ g, ψ g = 1 := by
+theorem padicInt_hom_normalize
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] (p : ℕ) [Fact p.Prime] (χ : G → ℤ_[p]),
+      Continuous χ → (∀ g h, χ (g * h) = χ g + χ h)
+        → ∀ (g₀ : G),
+          χ g₀ ≠ 0
+            → ∃ ψ : G → ℤ_[p],
+              Continuous ψ ∧ (∀ g h, ψ (g * h) = ψ g + ψ h) ∧ (∀ g, χ g = 0 → ψ g = 0)
+                ∧ ∃ g, ψ g = 1 := by
   intro G _ _ p _ χ hχ hadd g₀ hg₀
   classical
   have hex : ∃ n : ℕ, ∃ g, χ g ≠ 0 ∧ (χ g).valuation = n := ⟨_, g₀, hg₀, rfl⟩

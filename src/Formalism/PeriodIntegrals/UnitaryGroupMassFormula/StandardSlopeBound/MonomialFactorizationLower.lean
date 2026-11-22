@@ -9,14 +9,18 @@ namespace PI.SlopeSteps
 open Finset
 
 theorem multinomial_le_pow {N : ℕ} (f : Fin N → ℕ) : Nat.multinomial univ f ≤ N ^ (∑ a, f a) := by
-  have h := Finset.sum_pow_eq_sum_piAntidiag (R := ℕ) (univ : Finset (Fin N)) (fun _ => (1 : ℕ)) (∑ a, f a)
-  simp only [one_pow, prod_const_one, mul_one, sum_const, card_univ, Fintype.card_fin, smul_eq_mul] at h
+  have h :=
+    Finset.sum_pow_eq_sum_piAntidiag (R := ℕ) (univ : Finset (Fin N)) (fun _ => (1 : ℕ)) (∑ a, f a)
+  simp only [one_pow, prod_const_one, mul_one, sum_const, card_univ, Fintype.card_fin, smul_eq_mul]
+    at h
   rw [h]
-  exact Finset.single_le_sum (f := fun k => Nat.multinomial univ k) (fun _ _ => Nat.zero_le _)
+  exact Finset.single_le_sum
+    (f := fun k => Nat.multinomial univ k)
+    (fun _ _ => Nat.zero_le _)
     (mem_piAntidiag.mpr ⟨rfl, fun i _ => mem_univ i⟩)
 
-theorem col_fact_le {N : ℕ} (f : Fin N → ℕ) :
-    (∑ a, f a).factorial ≤ N ^ (∑ a, f a) * ∏ a, (f a).factorial := by
+theorem col_fact_le {N : ℕ} (f : Fin N → ℕ)
+    : (∑ a, f a).factorial ≤ N ^ (∑ a, f a) * ∏ a, (f a).factorial := by
   rw [← Nat.multinomial_spec univ f, mul_comm]
   exact Nat.mul_le_mul_right _ (multinomial_le_pow f)
 

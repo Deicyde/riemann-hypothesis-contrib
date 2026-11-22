@@ -4,14 +4,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.LFun
-open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Cj
+open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh
+  GlobalTheory.LFun
+open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo
+  UpperTheory.V.Lit.Bor UpperTheory.V.Cj
 open scoped TensorProduct
 
-private theorem irrAbs_module {R M S W κ ι : Type} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup S] [Module R S]
-    [AddCommGroup W] [Module R W] [IsSimpleModule R S] [Finite ι] (Φ : (κ →₀ S) →ₗ[R] M) (hs : Function.Surjective Φ)
-    (p : ι → W →ₗ[R] M) (hp : ∀ w, (∀ i, p i w = 0) → w = 0) (x : W) (hx : x ≠ 0) :
-    ∃ f : S →ₗ[R] W, Function.Injective f := by
+private theorem irrAbs_module
+    {R M S W κ ι : Type} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup S] [Module R S]
+    [AddCommGroup W] [Module R W] [IsSimpleModule R S] [Finite ι]
+    (Φ : (κ →₀ S) →ₗ[R] M) (hs : Function.Surjective Φ)
+    (p : ι → W →ₗ[R] M) (hp : ∀ w, (∀ i, p i w = 0) → w = 0)
+    (x : W) (hx : x ≠ 0)
+    : ∃ f : S →ₗ[R] W, Function.Injective f := by
   haveI := IsSemisimpleModule.range Φ
   haveI : IsSemisimpleModule R M :=
     IsSemisimpleModule.congr (LinearEquiv.ofTop _ (LinearMap.range_eq_top.2 hs)).symm
@@ -58,19 +63,24 @@ private theorem irrAbs_module {R M S W κ ι : Type} [Ring R] [AddCommGroup M] [
     (LinearMap.injective_or_eq_zero _).resolve_right hk
   exact ⟨N.subtype.comp ((r.comp Φ).comp (Finsupp.lsingle k)), N.injective_subtype.comp hf0⟩
 
-theorem UpperTheory.V.Cj.irrAbs :
-    UpperTheory.V.Cj.IrrAbs := by
+theorem UpperTheory.V.Cj.irrAbs : UpperTheory.V.Cj.IrrAbs := by
   intro G S V W ι _ _ _ _ _ _ _ _ _ ρS ρV ρW hirr hsup p hp hsep
   classical
-  let F : {f : S →ₗ[ℂ] V // ∀ (g : G) (v : S), f ((ρS g) v) = (ρV g) (f v)} →
-      (ρS.asModule →ₗ[MonoidAlgebra ℂ G] ρV.asModule) := fun f =>
+  let F
+      : {f : S →ₗ[ℂ] V // ∀ (g : G) (v : S), f ((ρS g) v) = (ρV g) (f v)}
+        → (ρS.asModule →ₗ[MonoidAlgebra ℂ G] ρV.asModule) := fun f =>
     Representation.IntertwiningMap.equivLinearMapAsModule ρS ρV
       ((f.1).intertwiningMap_of_isIntertwiningMap ρS ρV f.2)
   let Φ := Finsupp.lsum ℕ F
-  have key : ∀ u : V, u ∈ (⨆ f : {f : S →ₗ[ℂ] V // ∀ (g : G) (v : S), f ((ρS g) v) = (ρV g) (f v)},
-      LinearMap.range f.1) → ∃ z, Φ z = (show ρV.asModule from u) := by
+  have key
+      : ∀ u : V,
+        u ∈ (⨆ f : {f : S →ₗ[ℂ] V // ∀ (g : G) (v : S), f ((ρS g) v) = (ρV g) (f v)},
+              LinearMap.range f.1)
+          → ∃ z, Φ z = (show ρV.asModule from u) := by
     intro u hu
-    refine Submodule.iSup_induction (motive := fun u : V => ∃ z, Φ z = (show ρV.asModule from u)) _ hu ?_ ?_ ?_
+    refine Submodule.iSup_induction
+      (motive := fun u : V => ∃ z, Φ z = (show ρV.asModule from u))
+      _ hu ?_ ?_ ?_
     · rintro f u ⟨s, rfl⟩
       exact ⟨Finsupp.single f s, Finsupp.lsum_single ℕ F f s⟩
     · exact ⟨0, map_zero Φ⟩

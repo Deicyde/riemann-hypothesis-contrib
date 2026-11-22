@@ -8,16 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorModOfT
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 open scoped TensorProduct
 
 namespace GlobalTheory.UPel.HT
 
-
 open Polynomial in
-theorem exists_idem_crys : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R] (b : GlobalTheory.UPel.HT.Base D R) (C : Type) [CommRing C] (tR : R →+* C) (H : Type 1) [AddCommGroup H] [Module C H] (ρ : D.O →+* Module.End C H) (φ : LinearMap.BilinForm C H), (∀ (c : D.O) x y, φ (ρ c x) y = φ x (ρ (D.star c).unop y)) → ∃ e : Module.End C H, e * e = e ∧ (∀ c, ρ c * e = e * ρ c) ∧ (∀ x y, φ (e x) y = φ x (y - e y)) ∧ (∀ x, ρ (algebraMap (𝓞 D.F) D.O D.ω) (e x) = tR b.ρ • e x) ∧ (∃ v : C, IsUnit v ∧ ∀ x, e x = 0 → ρ (algebraMap (𝓞 D.F) D.O D.ω) x - tR b.ρ • x = v • x) ∧ ∀ N : Submodule C H, (∀ (c : D.O), ∀ x ∈ N, ρ c x ∈ N) → ∀ x ∈ N, e x ∈ N := by
+theorem exists_idem_crys
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R]
+        (b : GlobalTheory.UPel.HT.Base D R) (C : Type) [CommRing C] (tR : R →+* C) (H : Type 1)
+        [AddCommGroup H] [Module C H] (ρ : D.O →+* Module.End C H) (φ : LinearMap.BilinForm C H),
+      (∀ (c : D.O) x y, φ (ρ c x) y = φ x (ρ (D.star c).unop y))
+        → ∃ e : Module.End C H,
+          e * e = e ∧ (∀ c, ρ c * e = e * ρ c) ∧ (∀ x y, φ (e x) y = φ x (y - e y))
+            ∧ (∀ x, ρ (algebraMap (𝓞 D.F) D.O D.ω) (e x) = tR b.ρ • e x)
+            ∧ (∃ v : C,
+              IsUnit v ∧ ∀ x, e x = 0 → ρ (algebraMap (𝓞 D.F) D.O D.ω) x - tR b.ρ • x = v • x)
+            ∧ ∀ N : Submodule C H, (∀ (c : D.O), ∀ x ∈ N, ρ c x ∈ N) → ∀ x ∈ N, e x ∈ N := by
   intro p _ D R _ b C _ tR H _ _ ρ φ hφ
 
   have hroot : tR b.ρ ^ 2 - (D.tr : C) * tR b.ρ + (D.nm : C) = 0 := by
@@ -30,7 +41,9 @@ theorem exists_idem_crys : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.H
       rw [Int.ofNat_natAbs_of_nonpos (le_of_lt D.disc_neg)]; ring
     have hcop : (D.tr ^ 2 - 4 * D.nm).natAbs.Coprime p := by
       rw [Nat.coprime_comm, Nat.Prime.coprime_iff_not_dvd (Fact.out)]
-      intro h; apply D.disc_p; exact Int.natCast_dvd.mpr h
+      intro h
+      apply D.disc_p
+      exact Int.natCast_dvd.mpr h
     have h1 := (b.unit _ hcop).map tR
     have : IsUnit ((tR b.ρ - ((D.tr : C) - tR b.ρ)) ^ 2) := by
       rw [hu2, hk]; push_cast; simpa using h1.neg
@@ -50,10 +63,12 @@ theorem exists_idem_crys : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.H
   have hWx : ∀ x, W (W x) = (D.tr : C) • W x - (D.nm : C) • x := by
     intro x
     have := congrArg (fun f : Module.End C H => f x) hWrel
-    simp only [LinearMap.sub_apply, LinearMap.add_apply, Module.End.mul_apply, Module.End.intCast_apply,
-      LinearMap.zero_apply] at this
+    simp only [LinearMap.sub_apply, LinearMap.add_apply, Module.End.mul_apply,
+        Module.End.intCast_apply, LinearMap.zero_apply]
+      at this
     rw [← Int.cast_smul_eq_zsmul C, ← Int.cast_smul_eq_zsmul C] at this
-    rw [← sub_eq_zero, ← this]; abel
+    rw [← sub_eq_zero, ← this]
+    abel
 
   have hcomm : ∀ c : D.O, ∀ x, ρ c (W x) = W (ρ c x) := by
     intro c x
@@ -65,21 +80,33 @@ theorem exists_idem_crys : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.H
       LinearMap.sub_apply, Module.End.intCast_apply, ← Int.cast_smul_eq_zsmul C]
   refine ⟨ui • (W - ((D.tr : C) - r) • 1), ?_, ?_, ?_, ?_, ?_, ?_⟩
   · ext x
-    simp only [Module.End.mul_apply, LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply, map_smul,
-      map_sub, hWx]
+    simp only [Module.End.mul_apply, LinearMap.smul_apply, LinearMap.sub_apply,
+      Module.End.one_apply, map_smul, map_sub, hWx]
     match_scalars
-    all_goals first | linear_combination ui * hui | linear_combination (-ui * ((D.tr:C) - r)) * hui - ui ^ 2 * hroot | linear_combination (ui * ((D.tr:C) - r)) * hui + ui ^ 2 * hroot | linear_combination (-ui * ((D.tr:C) - r)) * hui + ui ^ 2 * hroot | linear_combination (ui * ((D.tr:C) - r)) * hui - ui ^ 2 * hroot
-  · intro c; ext x
-    simp only [Module.End.mul_apply, LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply, map_smul,
-      map_sub, hcomm]
+    all_goals
+      first
+      | linear_combination ui * hui
+      | linear_combination (-ui * ((D.tr:C) - r)) * hui - ui ^ 2 * hroot
+      | linear_combination (ui * ((D.tr:C) - r)) * hui + ui ^ 2 * hroot
+      | linear_combination (-ui * ((D.tr:C) - r)) * hui + ui ^ 2 * hroot
+      | linear_combination (ui * ((D.tr:C) - r)) * hui - ui ^ 2 * hroot
+  · intro c
+    ext x
+    simp only [Module.End.mul_apply, LinearMap.smul_apply, LinearMap.sub_apply,
+      Module.End.one_apply, map_smul, map_sub, hcomm]
   · intro x y
     simp only [LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply, map_smul, map_sub,
       LinearMap.smul_apply, LinearMap.sub_apply, hWadj, smul_eq_mul]
     linear_combination (φ x y) * hui
   · intro x
-    simp only [LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply, map_smul, map_sub, hWx]
+    simp only [LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply, map_smul, map_sub,
+      hWx]
     match_scalars
-    all_goals first | linear_combination (0:C) | linear_combination ui * hroot | linear_combination -ui * hroot
+    all_goals
+      first
+      | linear_combination (0:C)
+      | linear_combination ui * hroot
+      | linear_combination -ui * hroot
   · refine ⟨-(r - ((D.tr : C) - r)), by rw [← huu]; exact (Units.isUnit uu).neg, ?_⟩
     intro x hx
     simp only [LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply] at hx

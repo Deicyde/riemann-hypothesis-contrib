@@ -14,21 +14,26 @@ noncomputable section
 
 namespace GlobalTheory.RealPlaceMeasuresProof
 
-open MeasureTheory FourierTransform Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke
+open MeasureTheory FourierTransform Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke
 open scoped ENNReal NNReal
 
-theorem selfDual_of_map {V E : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
-    [MeasurableSpace V] [BorelSpace V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
-    (μ : Measure V) (hμ : μ.IsAddHaarMeasure) (β : V → V → ℝ) (hs : ∀ x y, β x y = β y x)
-    (T : V ≃L[ℝ] E) (R : V → E) (hRm : MeasurableEmbedding R)
-    (hR : ∀ x y, β x y = inner ℝ (T x) (R y)) (a b : ℝ≥0) (hab : a * b = 1)
-    (hT : μ.map T = a • (volume : Measure E)) (hRv : μ.map R = b • (volume : Measure E)) :
-    SelfDual μ (fun x y => Complex.exp (2 * Real.pi * Complex.I * ((β x y : ℝ) : ℂ))) := by
-  have gen : ∀ (S : V → E) (c : ℝ≥0), c ≠ 0 → MeasurableEmbedding S →
-      μ.map S = c • (volume : Measure E) →
-      (∀ g : E → ℂ, ∫ x, g (S x) ∂μ = ((c : ℝ) : ℂ) * ∫ w, g w) ∧
-      ∀ g : E → ℂ, Integrable (fun x => g (S x)) μ ↔ Integrable g := by
+theorem selfDual_of_map
+    {V E : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [MeasurableSpace V] [BorelSpace V]
+    [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure V) (hμ : μ.IsAddHaarMeasure)
+    (β : V → V → ℝ) (hs : ∀ x y, β x y = β y x)
+    (T : V ≃L[ℝ] E) (R : V → E)
+    (hRm : MeasurableEmbedding R) (hR : ∀ x y, β x y = inner ℝ (T x) (R y))
+    (a b : ℝ≥0) (hab : a * b = 1) (hT : μ.map T = a • (volume : Measure E))
+    (hRv : μ.map R = b • (volume : Measure E))
+    : SelfDual μ (fun x y => Complex.exp (2 * Real.pi * Complex.I * ((β x y : ℝ) : ℂ))) := by
+  have gen
+      : ∀ (S : V → E) (c : ℝ≥0),
+        c ≠ 0 → MeasurableEmbedding S → μ.map S = c • (volume : Measure E)
+          → (∀ g : E → ℂ, ∫ x, g (S x) ∂μ = ((c : ℝ) : ℂ) * ∫ w, g w)
+            ∧ ∀ g : E → ℂ, Integrable (fun x => g (S x)) μ ↔ Integrable g := by
     intro S c hc he h
     refine ⟨fun g => ?_, fun g => ?_⟩
     · rw [← he.integral_map, h, integral_smul_nnreal_measure, NNReal.smul_def, Complex.real_smul]
@@ -42,9 +47,10 @@ theorem selfDual_of_map {V E : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
   obtain ⟨hbI, hbG⟩ := gen R b hb hRm hRv
   have ha' : ((a : ℝ) : ℂ) ≠ 0 := by exact_mod_cast ha
   have hab' : ((a : ℝ) : ℂ) * ((b : ℝ) : ℂ) = 1 := by exact_mod_cast hab
-  have key : ∀ (Φ : V → ℂ) (y : V),
-      ∫ x, Φ x * Complex.exp (2 * Real.pi * Complex.I * ((β x y : ℝ) : ℂ)) ∂μ =
-        ((a : ℝ) : ℂ) * 𝓕⁻ (fun w => Φ (T.symm w)) (R y) := by
+  have key
+      : ∀ (Φ : V → ℂ) (y : V),
+        ∫ x, Φ x * Complex.exp (2 * Real.pi * Complex.I * ((β x y : ℝ) : ℂ)) ∂μ
+          = ((a : ℝ) : ℂ) * 𝓕⁻ (fun w => Φ (T.symm w)) (R y) := by
     intro Φ y
     rw [Real.fourierInv_eq', ← haI]
     refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
@@ -56,8 +62,7 @@ theorem selfDual_of_map {V E : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
   refine ⟨hμ, fun Φ hc hsup hF z => ?_⟩
   have hi : Integrable Φ μ := hc.integrable_of_hasCompactSupport hsup
   simp only [key Φ] at hF ⊢
-  have hf : Integrable (fun w => Φ (T.symm w)) := by
-    rw [← haG]; simpa using hi
+  have hf : Integrable (fun w => Φ (T.symm w)) := by rw [← haG]; simpa using hi
   have hF' : Integrable (𝓕⁻ (fun w => Φ (T.symm w))) := by
     rw [← hbG]
     simpa [← mul_assoc, ha'] using hF.const_mul ((a : ℝ) : ℂ)⁻¹
@@ -78,23 +83,31 @@ theorem selfDual_of_map {V E : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
   push_cast
   ring
 
-theorem selfDual_line {ε : ℝ} (hε : ε = 1 ∨ ε = -1) :
-    SelfDual (volume : Measure ℝ)
+theorem selfDual_line {ε : ℝ} (hε : ε = 1 ∨ ε = -1)
+    : SelfDual (volume : Measure ℝ)
       (fun t s : ℝ => Complex.exp (2 * Real.pi * Complex.I * ((ε * (t * s) : ℝ) : ℂ))) := by
   rcases hε with rfl | rfl
-  · exact selfDual_of_map volume inferInstance (fun t s => 1 * (t * s)) (fun x y => by ring)
-      (ContinuousLinearEquiv.refl ℝ ℝ) id MeasurableEmbedding.id (fun x y => by simp [mul_comm])
+  · exact selfDual_of_map volume inferInstance
+      (fun t s => 1 * (t * s))
+      (fun x y => by ring)
+      (ContinuousLinearEquiv.refl ℝ ℝ) id MeasurableEmbedding.id
+      (fun x y => by simp [mul_comm])
       1 1 (one_mul 1) (by simp) (by simp)
-  · exact selfDual_of_map volume inferInstance (fun t s => -1 * (t * s)) (fun x y => by ring)
+  · exact selfDual_of_map volume inferInstance
+      (fun t s => -1 * (t * s))
+      (fun x y => by ring)
       (ContinuousLinearEquiv.refl ℝ ℝ) Neg.neg (Homeomorph.neg ℝ).measurableEmbedding
-      (fun x y => by simp [mul_comm]) 1 1 (one_mul 1) (by simp) (by simp)
+      (fun x y => by simp [mul_comm])
+      1 1 (one_mul 1) (by simp) (by simp)
 
-theorem selfDual_dx {ε : ℝ} (hε : ε = 1 ∨ ε = -1) (P Q : ℕ) :
-    SelfDual (PerpendicularEmbedding.dx P Q) (fun x y : PerpendicularEmbedding.Sp P Q =>
-      Complex.exp (2 * Real.pi * Complex.I *
-        ((ε * (2 * (PerpendicularEmbedding.herm x y).re) : ℝ) : ℂ))) := by
-  obtain ⟨u, hu1, hu2⟩ : ∃ u : Fin P ⊕ Fin Q → (ℂ ≃ₗᵢ[ℝ] ℂ),
-      (∀ i z, u (Sum.inl i) z = ε * z) ∧ ∀ i z, u (Sum.inr i) z = -(ε * z) := by
+theorem selfDual_dx {ε : ℝ} (hε : ε = 1 ∨ ε = -1) (P Q : ℕ)
+    : SelfDual (PerpendicularEmbedding.dx P Q) (fun x y : PerpendicularEmbedding.Sp P Q =>
+      Complex.exp
+        (2 * Real.pi * Complex.I
+          * ((ε * (2 * (PerpendicularEmbedding.herm x y).re) : ℝ) : ℂ))) := by
+  obtain ⟨u, hu1, hu2⟩
+      : ∃ u : Fin P ⊕ Fin Q → (ℂ ≃ₗᵢ[ℝ] ℂ),
+        (∀ i z, u (Sum.inl i) z = ε * z) ∧ ∀ i z, u (Sum.inr i) z = -(ε * z) := by
     rcases hε with rfl | rfl
     · exact ⟨Sum.elim (fun _ => .refl ℝ ℂ) (fun _ => .neg ℝ), by simp, by simp⟩
     · exact ⟨Sum.elim (fun _ => .neg ℝ) (fun _ => .refl ℝ ℂ), by simp, by simp⟩
@@ -110,18 +123,20 @@ theorem selfDual_dx {ε : ℝ} (hε : ε = 1 ∨ ε = -1) (P Q : ℕ) :
     (Homeomorph.smulOfNeZero (2 : ℝ) two_ne_zero).measurableEmbedding
   refine selfDual_of_map _ (GlobalTheory.RealPlaceCompare.isAddHaar_dx P Q)
     (fun x y => ε * (2 * (PerpendicularEmbedding.herm x y).re))
-    (fun x y => by rw [← GlobalTheory.RealPlaceCompare.herm_star x y]; simp) T
-    ((fun w => (2 : ℝ) • w) ∘ (S ∘ T))
+    (fun x y => by rw [← GlobalTheory.RealPlaceCompare.herm_star x y]; simp)
+    T ((fun w => (2 : ℝ) • w) ∘ (S ∘ T))
     (h2.comp (S.toHomeomorph.measurableEmbedding.comp T.toHomeomorph.measurableEmbedding))
-    (fun x y => ?_) (2 ^ (P + Q)) (2 ^ (P + Q))⁻¹ (mul_inv_cancel₀ (by positivity)) ?_ ?_
-  · simp only [Function.comp, PiLp.inner_apply, Fintype.sum_sum_type,
-      PerpendicularEmbedding.herm, Complex.sub_re, Complex.re_sum]
+    (fun x y => ?_)
+    (2 ^ (P + Q)) (2 ^ (P + Q))⁻¹ (mul_inv_cancel₀ (by positivity)) ?_ ?_
+  · simp only [Function.comp, PiLp.inner_apply, Fintype.sum_sum_type, PerpendicularEmbedding.herm,
+      Complex.sub_re, Complex.re_sum]
     have e : ∀ i, S (T y) i = u i (y i) := fun i => rfl
     have e' : ∀ i, T x i = x i := fun i => rfl
     simp only [e', Complex.inner, mul_sub, Finset.mul_sum]
     rw [sub_eq_add_neg, ← Finset.sum_neg_distrib]
     congr 1 <;> refine Finset.sum_congr rfl fun i _ => ?_ <;> simp [e, hu1, hu2] <;> ring
-  · rw [PerpendicularEmbedding.dx, Measure.map_smul _ T.continuous.measurable.aemeasurable, hT.map_eq]
+  · rw [PerpendicularEmbedding.dx, Measure.map_smul _ T.continuous.measurable.aemeasurable,
+      hT.map_eq]
     ext s hs
     simp [ENNReal.smul_def]
   · rw [← Measure.map_map h2.measurable hST.measurable, PerpendicularEmbedding.dx,
@@ -141,7 +156,10 @@ theorem selfDualReal : PerpendicularEmbedding.SelfDualReal := fun _ hε =>
   ⟨selfDual_dx hε, selfDual_line hε⟩
 
 theorem realPlaceMeasures : ActionCoordinates.RealPlaceMeasures :=
-  GlobalTheory.RealPlaceCompare.typings_agree.2.2.2.1
-    ⟨selfDualReal, GlobalTheory.SphereMassProof.sphereMass, GlobalTheory.CompactDualQuot.compactDualQuotient⟩
+  GlobalTheory.RealPlaceCompare.typings_agree.2.2.2.1 ⟨
+    selfDualReal,
+    GlobalTheory.SphereMassProof.sphereMass,
+    GlobalTheory.CompactDualQuot.compactDualQuotient
+  ⟩
 
 end GlobalTheory.RealPlaceMeasuresProof

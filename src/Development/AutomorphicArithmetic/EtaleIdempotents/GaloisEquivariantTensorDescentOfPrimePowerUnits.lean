@@ -163,21 +163,18 @@ private lemma aux {W : Type u₁} {K : Type u₂} {A : Type u₅} {C : Type u₃
   rw [smul_sub, sub_eq_zero, smul_smul, smul_smul] at hb'
   rw [mul_comm, hb', pow_add]
 
-theorem UpperTheory.galois_equivariant_tensor_descent_of_prime_power_units :
-    ∀ (l : ℕ) {W A C Γ : Type} {L : Type 1} [CommRing W] [IsDomain W] [CommRing A] [Algebra W A] [CommRing C]
-        [AddCommGroup L] [Module W L] (c : A →+* C) (t : A) (σA : Γ → A →+* A) (σC : Γ → C →+* C) (χ : Γ → A)
-        (T : Γ → (A ⊗[W] L →+ A ⊗[W] L)) (z : A ⊗[W] L) (s : ℕ),
-        (∀ y : W, y ≠ 0 → ∃ (m : ℕ) (b : W), y = (l : W) ^ m * b ∧ IsUnit b) →
-        IsUnit (l : C) → IsUnit (c t) →
-        (∀ x : C, ∃ (r : ℕ) (a : A), c t ^ r * x = c a) →
-        (∀ a : A, c a = 0 → ∃ r : ℕ, t ^ r * a = 0) →
-        (∀ g a, σC g (c a) = c (σA g a)) →
-        (∀ g (w : W), σA g (algebraMap W A w) = algebraMap W A w) →
-        (∀ g, σA g t = χ g * t) →
-        (∀ g (a : A) (y : L), T g (a ⊗ₜ[W] y) = σA g a ⊗ₜ[W] y) →
-        (∀ x : C, (∀ g, σC g x = x) → ∃ (a : ℕ) (w : W), (l : C) ^ a * x = c (algebraMap W A w)) →
-        (∀ g, ∃ a b : ℕ, ((l : A) ^ a * t ^ b) • T g z = ((l : A) ^ a * t ^ b * χ g ^ s) • z) →
-        ∃ (a b : ℕ) (y : L), ((l : A) ^ a * t ^ b) • z = (t ^ (b + s)) • ((1 : A) ⊗ₜ[W] y) := by
+theorem UpperTheory.galois_equivariant_tensor_descent_of_prime_power_units
+    : ∀ (l : ℕ) {W A C Γ : Type} {L : Type 1} [CommRing W] [IsDomain W] [CommRing A] [Algebra W A]
+        [CommRing C] [AddCommGroup L] [Module W L] (c : A →+* C) (t : A) (σA : Γ → A →+* A)
+        (σC : Γ → C →+* C) (χ : Γ → A) (T : Γ → (A ⊗[W] L →+ A ⊗[W] L)) (z : A ⊗[W] L) (s : ℕ),
+      (∀ y : W, y ≠ 0 → ∃ (m : ℕ) (b : W), y = (l : W) ^ m * b ∧ IsUnit b) → IsUnit (l : C)
+        → IsUnit (c t) → (∀ x : C, ∃ (r : ℕ) (a : A), c t ^ r * x = c a)
+        → (∀ a : A, c a = 0 → ∃ r : ℕ, t ^ r * a = 0) → (∀ g a, σC g (c a) = c (σA g a))
+        → (∀ g (w : W), σA g (algebraMap W A w) = algebraMap W A w) → (∀ g, σA g t = χ g * t)
+        → (∀ g (a : A) (y : L), T g (a ⊗ₜ[W] y) = σA g a ⊗ₜ[W] y)
+        → (∀ x : C, (∀ g, σC g x = x) → ∃ (a : ℕ) (w : W), (l : C) ^ a * x = c (algebraMap W A w))
+        → (∀ g, ∃ a b : ℕ, ((l : A) ^ a * t ^ b) • T g z = ((l : A) ^ a * t ^ b * χ g ^ s) • z)
+        → ∃ (a b : ℕ) (y : L), ((l : A) ^ a * t ^ b) • z = (t ^ (b + s)) • ((1 : A) ⊗ₜ[W] y) := by
   intro l W A C Γ L _ _ _ _ _ _ _ c t σA σC χ T z s hW hl hct hlocC hker hσ hσW hσt hT hfix hz
   letI : Algebra A C := c.toAlgebra
   letI : Algebra W C := (c.comp (algebraMap W A)).toAlgebra

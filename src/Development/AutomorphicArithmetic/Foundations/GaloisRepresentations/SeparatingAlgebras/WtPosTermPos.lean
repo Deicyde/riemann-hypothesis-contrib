@@ -48,8 +48,7 @@ private lemma wtPos_sum (n : ℕ) (l : Fin n → ℤ) (c : ℤ) :
     ∑ i, l i * (c - ((i : ℕ) : ℤ)) = c * (∑ i, l i) - ∑ i : Fin n, l i * ((i : ℕ) : ℤ) := by
   simp only [mul_sub, Finset.sum_sub_distrib, Finset.mul_sum, mul_comm]
 
-theorem UpperTheory.Gal.Gen.wtPos_pf :
-    UpperTheory.Gal.Gen.WtPos := by
+theorem UpperTheory.Gal.Gen.wtPos_pf : UpperTheory.Gal.Gen.WtPos := by
   intro n l hl hl0
   set S : ℤ := ∑ i, l i with hS
   set T : ℤ := ∑ i : Fin n, l i * ((i : ℕ) : ℤ) with hT
@@ -59,8 +58,7 @@ theorem UpperTheory.Gal.Gen.wtPos_pf :
     have h1 : T ≤ |T| := le_abs_self T
     have h2 : 0 ≤ |T| := abs_nonneg T
     nlinarith
-  ·
-    obtain ⟨a, ha⟩ : ∃ a, l a ≠ 0 := by
+  · obtain ⟨a, ha⟩ : ∃ a, l a ≠ 0 := by
       by_contra hc
       push_neg at hc
       exact hl0 (funext hc)
@@ -76,8 +74,11 @@ theorem UpperTheory.Gal.Gen.wtPos_pf :
         exact_mod_cast this.ne'
       exact ha ((mul_eq_zero.mp hs.symm).resolve_left hn)
     have hpos : 0 < ∑ i : Fin n, ∑ j : Fin n, (((i : ℕ) : ℤ) - ((j : ℕ) : ℤ)) * (l j - l i) := by
-      refine Finset.sum_pos' (fun i _ => Finset.sum_nonneg fun j _ => wtPos_term hl i j) ⟨a, Finset.mem_univ a, ?_⟩
-      exact Finset.sum_pos' (fun j _ => wtPos_term hl a j) ⟨b, Finset.mem_univ b, wtPos_term_pos hl hb⟩
+      refine Finset.sum_pos'
+        (fun i _ => Finset.sum_nonneg fun j _ => wtPos_term hl i j)
+        ⟨a, Finset.mem_univ a, ?_⟩
+      exact
+        Finset.sum_pos' (fun j _ => wtPos_term hl a j) ⟨b, Finset.mem_univ b, wtPos_term_pos hl hb⟩
     rw [wtPos_expand, ← hS, ← hT, h] at hpos
     have hn : (0 : ℤ) ≤ n := Int.natCast_nonneg n
     have hT0 : T < 0 := by

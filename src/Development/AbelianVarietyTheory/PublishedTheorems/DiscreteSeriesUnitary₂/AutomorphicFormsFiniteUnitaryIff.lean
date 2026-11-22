@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.Convo
 
 @[expose] public section
 
-open NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL GlobalTheory.Count GlobalTheory.Dec
+open NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL GlobalTheory.Count
+  GlobalTheory.Dec
 
 noncomputable section
 

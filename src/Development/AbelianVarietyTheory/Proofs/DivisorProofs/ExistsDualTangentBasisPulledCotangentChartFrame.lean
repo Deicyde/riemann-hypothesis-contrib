@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIsoToBidua
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.KeyEven
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -26,8 +27,9 @@ open ReciprocityTheory.ChartRestriction.G.Pdiv (LieG ptMap dualScale specO)
 
 variable {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G]
 
-theorem fst_of_isTangent {w : epsR R ⟶ G} (hw : IsTangent w) :
-    ptMap (TrivSqZeroExt.fstHom R R R) ≫ (w : specO R (DualNumber R) ⟶ G) = toUnit (specO R R) ≫ η[G] := by
+theorem fst_of_isTangent {w : epsR R ⟶ G} (hw : IsTangent w)
+    : ptMap (TrivSqZeroExt.fstHom R R R) ≫ (w : specO R (DualNumber R) ⟶ G)
+      = toUnit (specO R R) ≫ η[G] := by
   have h : (toUnit (specO R R)).left = 𝟙 (Sp R) := by
     rw [Over.toUnit_left]
     exact Spec.map_id _
@@ -37,14 +39,15 @@ theorem fst_of_isTangent {w : epsR R ⟶ G} (hw : IsTangent w) :
 
 theorem isTangent_val (x : LieG G) : IsTangent (G := G) x.1 := sec_epsZero_comp x
 
-theorem exists_prod [QuasiSeparated G.hom] (l : List (LieG G)) :
-    ∃ p : LieG G, p.1 = (l.map (·.1)).prod ∧ tangent p = (l.map tangent).sum := by
+theorem exists_prod [QuasiSeparated G.hom] (l : List (LieG G))
+    : ∃ p : LieG G, p.1 = (l.map (·.1)).prod ∧ tangent p = (l.map tangent).sum := by
   induction l with
   | nil =>
     refine ⟨⟨1, ?_⟩, rfl, ?_⟩
     · exact comp_one _
     · refine dual_ext fun W _ s => ?_
-      have e : cotMap (1 : specO R (DualNumber R) ⟶ G) (epsZero_comp ⟨1, comp_one _⟩) = 0 := cotMap_eq_zero rfl _
+      have e : cotMap (1 : specO R (DualNumber R) ⟶ G) (epsZero_comp ⟨1, comp_one _⟩) = 0 :=
+        cotMap_eq_zero rfl _
       rw [List.map_nil, List.sum_nil]
       exact (congr((epsIso R).hom.app W (($e).app W s))).trans (map_zero _)
   | cons x l ih =>
@@ -52,9 +55,12 @@ theorem exists_prod [QuasiSeparated G.hom] (l : List (LieG G)) :
     refine ⟨⟨x.1 * p.1, OmegaGlobal.fst_mul x p⟩, by simp [hp], ?_⟩
     rw [tangent_mul, hp', List.map_cons, List.sum_cons]
 
-theorem isLieComb_iff [QuasiSeparated G.hom] {n : ℕ} (a : Fin n → R) (v : Fin n → LieG G) (w : LieG G) :
-    IsLieComb (G := G) a (fun i => (v i).1) w.1 ↔ tangent w = ∑ i, cst R (a i) • tangent (v i) := by
-  let u : Fin n → LieG G := fun i => ⟨ptMap (dualScale (a i)) ≫ (v i).1, OmegaGlobal.fst_scale (a i) (v i)⟩
+theorem isLieComb_iff
+    [QuasiSeparated G.hom] {n : ℕ} (a : Fin n → R) (v : Fin n → LieG G) (w : LieG G)
+    : IsLieComb (G := G) a (fun i => (v i).1) w.1
+      ↔ tangent w = ∑ i, cst R (a i) • tangent (v i) := by
+  let u : Fin n → LieG G := fun i =>
+    ⟨ptMap (dualScale (a i)) ≫ (v i).1, OmegaGlobal.fst_scale (a i) (v i)⟩
   have hu (i : Fin n) : (u i).1.left = spMap (epsScaleR (a i)) ≫ (v i).1.left := by
     have ha : (dualScale (a i)).toRingHom = epsScaleR (a i) := by
       ext y <;> simp [dualScale, epsScaleR]
@@ -66,23 +72,27 @@ theorem isLieComb_iff [QuasiSeparated G.hom] {n : ℕ} (a : Fin n → R) (v : Fi
     hp'.trans (Finset.sum_congr rfl fun i _ => tangent_scale (a i) (v i) _)
   constructor
   · rintro ⟨u', hu', e⟩
-    obtain rfl : u' = fun i => (u i).1 := funext fun i => Over.OverMorphism.ext ((hu' i).trans (hu i).symm)
+    obtain rfl : u' = fun i => (u i).1 :=
+      funext fun i => Over.OverMorphism.ext ((hu' i).trans (hu i).symm)
     obtain rfl : w = p := Subtype.ext (e.trans hp.symm)
     exact hs
   · intro e
     obtain rfl : w = p := tangent_injective R G (e.trans hs.symm)
     exact ⟨fun i => (u i).1, hu, hp⟩
 
-theorem exists_dual_of_isFrame [QuasiSeparated G.hom] {n : ℕ} {e : Fin n → Γ(omega G, ⊤)} (he : IsFrame e) :
-    ∃ v : Fin n → LieG G, (∀ j k, dualApp (tangent (v j)) le_top (e k) = if j = k then 1 else 0) ∧
-      IsLieBasis (G := G) fun j => (v j).1 := by
+theorem exists_dual_of_isFrame
+    [QuasiSeparated G.hom] {n : ℕ} {e : Fin n → Γ(omega G, ⊤)} (he : IsFrame e)
+    : ∃ v : Fin n → LieG G,
+      (∀ j k, dualApp (tangent (v j)) le_top (e k) = if j = k then 1 else 0)
+        ∧ IsLieBasis (G := G) fun j => (v j).1 := by
   choose v hv using fun j => TangentSurj.tangent_surjective R G (he.coord j)
   refine ⟨v, fun j k => ?_, fun j => isTangent_val (v j), fun w hw => ?_⟩
   · have h := he.dualApp_coord_frame j k le_rfl
     rw [Twist.resM_self] at h
     rw [hv]
     exact h.trans (if_congr eq_comm rfl rfl)
-  · have hc : Function.Bijective (cst R) := ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (.of R)).inv
+  · have hc : Function.Bijective (cst R) :=
+      ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (.of R)).inv
     let b := he.dual.basis le_rfl
     have hb (j : Fin n) : b j = tangent (v j) := by
       rw [hv]
@@ -95,9 +105,11 @@ theorem exists_dual_of_isFrame [QuasiSeparated G.hom] {n : ℕ} {e : Fin n → �
       exact (b.sum_repr _).symm
     · rw [ha, (key a').1 h', b.repr_sum_self]
 
-theorem exists_isDual : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (g : ℕ) (c : VB.Chart (LieVB.omega G) g) (R : Type) [CommRing R]
-    (ξ : Sp R ⟶ S), IsSemiAbelian G → SmoothOfRelativeDimension g G.hom → ⊤ ≤ ξ ⁻¹ᵁ c.U →
-    ∃ y : Fin g → (epsR R ⟶ KeyVals.bG G ξ), KeyVals.IsDual c ξ y ∧ IsLieBasis y := by
+theorem exists_isDual
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (g : ℕ) (c : VB.Chart (LieVB.omega G) g) (R : Type)
+        [CommRing R] (ξ : Sp R ⟶ S),
+      IsSemiAbelian G → SmoothOfRelativeDimension g G.hom → ⊤ ≤ ξ ⁻¹ᵁ c.U
+        → ∃ y : Fin g → (epsR R ⟶ KeyVals.bG G ξ), KeyVals.IsDual c ξ y ∧ IsLieBasis y := by
   intro S G _ g c R _ ξ hG _ hc
   have h := isGrpPullback_pullback G ξ
   have : QuasiSeparated (bG G ξ).hom := MorphismProperty.of_isPullback h.1 inferInstance

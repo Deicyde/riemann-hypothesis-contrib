@@ -23,12 +23,22 @@ theorem Model.smooth_q [FiniteDimensional ℚ_[l] K] (M : Model l K) (hM : M.Goo
   exact smooth_snd_of_isStrictlySemistable ϖ M.p hss
     (fun m r h1 h2 ↦ GlobalTheory.T.semistable_generic_fibre_localization (OK l K) ϖ hϖ m r h1 h2 K)
 
-theorem compGood : ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
-    CompM (Model.Good (l := l) (K := K)) := by
+theorem compGood
+    : ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
+        [FiniteDimensional ℚ_[l] K],
+      CompM (Model.Good (l := l) (K := K)) := by
   intro l _ K _
-  refine compM_of _ isOpenImmersion_gen (fun M hM U hU ↦ M.good_sub hM U hU) (fun M hM ↦ M.noetherianSpace hM) ?_
+  refine compM_of _ isOpenImmersion_gen
+    (fun M hM U hU ↦ M.good_sub hM U hU)
+    (fun M hM ↦ M.noetherianSpace hM)
+    ?_
   intro M hM
   have := good_flat M hM
-  exact ⟨good_isNormalScheme M hM, good_isLocallyNoetherian M hM, Flat.generalizingMap M.p, M.smooth_q hM⟩
+  exact ⟨
+    good_isNormalScheme M hM,
+    good_isLocallyNoetherian M hM,
+    Flat.generalizingMap M.p,
+    M.smooth_q hM
+  ⟩
 
 end CrystallineSemistableComparison

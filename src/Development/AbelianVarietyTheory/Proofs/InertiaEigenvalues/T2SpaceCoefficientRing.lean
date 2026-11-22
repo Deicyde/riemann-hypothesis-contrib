@@ -12,53 +12,65 @@ noncomputable section
 
 namespace GlobalTheory.ComplementCompare
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions.N ReciprocityTheory.Gal
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.MainNotions.N ReciprocityTheory.Gal
 open GlobalTheory.IndefiniteRowSideFullHecke
 
 section General
 
 variable {k Γ : Type} [Field k] [Group Γ]
 
-theorem semisimple_congr {V W : Type} [AddCommGroup V] [Module k V] [AddCommGroup W] [Module k W]
-    {ρ : Representation k Γ V} {σ : Representation k Γ W} (e : V ≃ₗ[k] W)
-    (he : ∀ g v, e (ρ g v) = σ g (e v)) :
-    ρ.IsSemisimpleRepresentation ↔ σ.IsSemisimpleRepresentation := by
+theorem semisimple_congr
+    {V W : Type} [AddCommGroup V] [Module k V] [AddCommGroup W] [Module k W]
+    {ρ : Representation k Γ V} {σ : Representation k Γ W}
+    (e : V ≃ₗ[k] W) (he : ∀ g v, e (ρ g v) = σ g (e v))
+    : ρ.IsSemisimpleRepresentation ↔ σ.IsSemisimpleRepresentation := by
   have he' : ∀ g w, e.symm (σ g w) = ρ g (e.symm w) := fun g w => by
     rw [LinearEquiv.symm_apply_eq, he, LinearEquiv.apply_symm_apply]
-  let o : Subrepresentation ρ ≃o Subrepresentation σ :=
-    { toFun := fun P => ⟨P.toSubmodule.comap e.symm.toLinearMap, fun g w hw => by
+  let o : Subrepresentation ρ ≃o Subrepresentation σ := {
+    toFun := fun P => ⟨
+      P.toSubmodule.comap e.symm.toLinearMap,
+      fun g w hw => by
         change e.symm (σ g w) ∈ P.toSubmodule
         rw [he']
-        exact P.apply_mem_toSubmodule g hw⟩
-      invFun := fun Q => ⟨Q.toSubmodule.comap e.toLinearMap, fun g v hv => by
+        exact P.apply_mem_toSubmodule g hw
+    ⟩
+    invFun := fun Q => ⟨
+      Q.toSubmodule.comap e.toLinearMap,
+      fun g v hv => by
         change e (ρ g v) ∈ Q.toSubmodule
         rw [he]
-        exact Q.apply_mem_toSubmodule g hv⟩
-      left_inv := fun P => by ext v; simp
-      right_inv := fun Q => by ext w; simp
-      map_rel_iff' := by
-        intro P Q
-        constructor
-        · intro h v hv
-          have := @h (e v) (by
+        exact Q.apply_mem_toSubmodule g hv
+    ⟩
+    left_inv := fun P => by ext v; simp
+    right_inv := fun Q => by ext w; simp
+    map_rel_iff' := by
+      intro P Q
+      constructor
+      · intro h v hv
+        have :=
+          @h (e v) (by
             change e.symm (e v) ∈ P.toSubmodule
             rw [e.symm_apply_apply]
             exact hv)
-          change e.symm (e v) ∈ Q.toSubmodule at this
-          rw [e.symm_apply_apply] at this
-          exact this
-        · intro h w hw
-          exact @h (e.symm w) hw }
+        change e.symm (e v) ∈ Q.toSubmodule at this
+        rw [e.symm_apply_apply] at this
+        exact this
+      · intro h w hw
+        exact @h (e.symm w) hw
+  }
   exact OrderIso.complementedLattice_iff o
 
-theorem isCompl_sub_iff {V : Type} [AddCommGroup V] [Module k V] {ρ : Representation k Γ V}
-    (P Q : Subrepresentation ρ) : IsCompl P Q ↔ IsCompl P.toSubmodule Q.toSubmodule := by
+theorem isCompl_sub_iff
+    {V : Type} [AddCommGroup V] [Module k V] {ρ : Representation k Γ V} (P Q : Subrepresentation ρ)
+    : IsCompl P Q ↔ IsCompl P.toSubmodule Q.toSubmodule := by
   rw [isCompl_iff, isCompl_iff, disjoint_iff, disjoint_iff, codisjoint_iff, codisjoint_iff,
-    ← Subrepresentation.toSubmodule_injective.eq_iff, ← Subrepresentation.toSubmodule_injective.eq_iff]
+    ← Subrepresentation.toSubmodule_injective.eq_iff,
+    ← Subrepresentation.toSubmodule_injective.eq_iff]
   rfl
 
-theorem isSSRep_iff {a : ℕ} (ρ : Γ →* GL (Fin a) k) :
-    IsSSRep ρ ↔ (glRep ρ).IsSemisimpleRepresentation := by
+theorem isSSRep_iff {a : ℕ} (ρ : Γ →* GL (Fin a) k)
+    : IsSSRep ρ ↔ (glRep ρ).IsSemisimpleRepresentation := by
   constructor
   · intro h
     refine ⟨fun P => ?_⟩
@@ -70,48 +82,64 @@ theorem isSSRep_iff {a : ℕ} (ρ : Γ →* GL (Fin a) k) :
 
 variable {O : Type} [CommRing O] [IsDomain O]
 
-theorem fracRep_eq {a : ℕ} (r : Γ →* GL (Fin a) O) :
-    BlockRepresentationsSemisimple.fracRep r = RepresentationOverSumChar.repOver (FractionRing O) ((Units.coeHom _).comp r) := rfl
+theorem fracRep_eq {a : ℕ} (r : Γ →* GL (Fin a) O)
+    : BlockRepresentationsSemisimple.fracRep r
+      = RepresentationOverSumChar.repOver (FractionRing O) ((Units.coeHom _).comp r) :=
+  rfl
 
-theorem sum_equivariant {a : ℕ} (ρ : Γ →* GL (Fin a) O) (χ : ℕ → (Γ →* Oˣ)) (t : ℕ) (g : Γ)
-    (v : Fin a ⊕ Fin t → FractionRing O) :
-    LinearEquiv.sumArrowLequivProdArrow (Fin a) (Fin t) (FractionRing O) (FractionRing O)
-        (RepresentationOverSumChar.repOver (FractionRing O) (RepresentationOverSumChar.blockSum t ρ χ) g v) =
-      BlockRepresentationsSemisimple.blockRep ρ χ t g
-        (LinearEquiv.sumArrowLequivProdArrow (Fin a) (Fin t) (FractionRing O) (FractionRing O) v) := by
+theorem sum_equivariant
+    {a : ℕ} (ρ : Γ →* GL (Fin a) O)
+    (χ : ℕ → (Γ →* Oˣ))
+    (t : ℕ)
+    (g : Γ) (v : Fin a ⊕ Fin t → FractionRing O)
+    : LinearEquiv.sumArrowLequivProdArrow (Fin a) (Fin t) (FractionRing O) (FractionRing O)
+        (RepresentationOverSumChar.repOver (FractionRing O)
+          (RepresentationOverSumChar.blockSum t ρ χ) g v)
+      = BlockRepresentationsSemisimple.blockRep ρ χ t g
+        (LinearEquiv.sumArrowLequivProdArrow (Fin a) (Fin t) (FractionRing O) (FractionRing O)
+          v) := by
   rw [BlockRepresentationsSemisimple.blockRep_apply]
-  have key : ∀ s : Fin a ⊕ Fin t, RepresentationOverSumChar.repOver (FractionRing O) (RepresentationOverSumChar.blockSum t ρ χ) g v s =
-      ∑ s' : Fin a ⊕ Fin t, algebraMap O (FractionRing O)
-        (Matrix.fromBlocks ((ρ g : GL (Fin a) O) : Matrix (Fin a) (Fin a) O) 0 0
-          (Matrix.diagonal fun c : Fin t => ((χ (c.1 + 1) g : Oˣ) : O)) s s') * v s' := fun s => rfl
+  have key
+      : ∀ s : Fin a ⊕ Fin t,
+        RepresentationOverSumChar.repOver (FractionRing O)
+            (RepresentationOverSumChar.blockSum t ρ χ) g v s
+          = ∑ s' : Fin a ⊕ Fin t, algebraMap O (FractionRing O)
+              (Matrix.fromBlocks ((ρ g : GL (Fin a) O) : Matrix (Fin a) (Fin a) O) 0 0
+                (Matrix.diagonal fun c : Fin t => ((χ (c.1 + 1) g : Oˣ) : O)) s s') * v s' :=
+    fun s => rfl
   refine Prod.ext (funext fun j => ?_) (funext fun c => ?_)
   · refine (key (Sum.inl j)).trans ?_
     simp [Fintype.sum_sum_type, Matrix.mulVec, dotProduct]
   · refine (key (Sum.inr c)).trans ?_
     simp [Fintype.sum_sum_type, Matrix.diagonal_apply, apply_ite]
 
-theorem trace_repOver {n : Type} [Fintype n] [DecidableEq n] (M : Γ →* Matrix n n O) (g : Γ) :
-    LinearMap.trace _ _ (RepresentationOverSumChar.repOver (FractionRing O) M g) =
-      algebraMap O (FractionRing O) (M g).trace := by
+theorem trace_repOver {n : Type} [Fintype n] [DecidableEq n] (M : Γ →* Matrix n n O) (g : Γ)
+    : LinearMap.trace _ _ (RepresentationOverSumChar.repOver (FractionRing O) M g)
+      = algebraMap O (FractionRing O) (M g).trace := by
   change LinearMap.trace _ _ (Matrix.toLin' ((M g).map (algebraMap O (FractionRing O)))) = _
   rw [Matrix.trace_toLin'_eq, AddMonoidHom.map_trace]
 
 omit [IsDomain O] in
-theorem trace_eq_of_charpoly_eq [Nontrivial O] {m n : Type} [Fintype m] [DecidableEq m] [Fintype n]
-    [DecidableEq n] (A : Matrix m m O) (B : Matrix n n O) (h : A.charpoly = B.charpoly) :
-    A.trace = B.trace := by
+theorem trace_eq_of_charpoly_eq
+    [Nontrivial O]
+    {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
+    (A : Matrix m m O) (B : Matrix n n O) (h : A.charpoly = B.charpoly)
+    : A.trace = B.trace := by
   rw [Matrix.trace_eq_neg_charpoly_nextCoeff, Matrix.trace_eq_neg_charpoly_nextCoeff, h]
 
 end General
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂)
 
-theorem ss_iff (i : N.Loc) (ρ : GE N →* GL (Fin R.r) (N.O i)) :
-    BlockRepresentationsSemisimple.BlockSemisimple ρ (N.chi i) R.t ↔ RepresentationOverSumChar.IsSSSum N i ρ :=
+theorem ss_iff (i : N.Loc) (ρ : GE N →* GL (Fin R.r) (N.O i))
+    : BlockRepresentationsSemisimple.BlockSemisimple ρ (N.chi i) R.t
+      ↔ RepresentationOverSumChar.IsSSSum N i ρ :=
   (semisimple_congr _ (sum_equivariant ρ (N.chi i) R.t)).symm
 
-theorem isoBlock_iff (i : N.Loc) (r₀ : GE N →* GL (Fin R.nV) (N.O i)) (ρ : GE N →* GL (Fin R.r) (N.O i)) :
-    BlockRepresentationsSemisimple.IsoBlock r₀ ρ (N.chi i) R.t ↔ RepresentationOverSumChar.SplitsAs N i r₀ ρ := by
+theorem isoBlock_iff
+    (i : N.Loc) (r₀ : GE N →* GL (Fin R.nV) (N.O i)) (ρ : GE N →* GL (Fin R.r) (N.O i))
+    : BlockRepresentationsSemisimple.IsoBlock r₀ ρ (N.chi i) R.t
+      ↔ RepresentationOverSumChar.SplitsAs N i r₀ ρ := by
   constructor
   · rintro ⟨e, he⟩
     refine ⟨e.trans (LinearEquiv.sumArrowLequivProdArrow _ _ _ _).symm, fun g u => ?_⟩
@@ -124,21 +152,25 @@ theorem isoBlock_iff (i : N.Loc) (r₀ : GE N →* GL (Fin R.nV) (N.O i)) (ρ : 
     rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, fracRep_eq, he g u]
     exact sum_equivariant ρ (N.chi i) R.t g _
 
-theorem isHeckeGalois_iff (i : N.Loc) (x : N.X i) (r : GE N →* GL (Fin R.nV) (N.O i)) :
-    IsHeckeGalois N i x r ↔ RepresentationOverSumChar.IsRx N i x ((Units.coeHom _).comp r) :=
+theorem isHeckeGalois_iff (i : N.Loc) (x : N.X i) (r : GE N →* GL (Fin R.nV) (N.O i))
+    : IsHeckeGalois N i x r ↔ RepresentationOverSumChar.IsRx N i x ((Units.coeHom _).comp r) :=
   and_congr Iff.rfl (and_congr (isSSRep_iff _) Iff.rfl)
 
-theorem second_of_first (i : N.Loc) (π : N.X i) (r₀ : GE N →* GL (Fin R.nV) (N.O i))
-    (ρ : GE N →* GL (Fin R.r) (N.O i)) (hr : IsHeckeGalois N i π r₀)
-    (h : BlockRepresentationsSemisimple.IsComplement N i r₀ ρ) : RepresentationOverSumChar.IsComplement N i π ρ :=
-  ⟨RepresentationOverSumChar.isRhoAt_of_splitsAs N i π r₀ ρ hr.2.2 ((isoBlock_iff N i r₀ ρ).1 h.rho),
-    (ss_iff N i ρ).1 h.ss, h.cont⟩
+theorem second_of_first
+    (i : N.Loc) (π : N.X i) (r₀ : GE N →* GL (Fin R.nV) (N.O i)) (ρ : GE N →* GL (Fin R.r) (N.O i))
+    (hr : IsHeckeGalois N i π r₀) (h : BlockRepresentationsSemisimple.IsComplement N i r₀ ρ)
+    : RepresentationOverSumChar.IsComplement N i π ρ := ⟨
+  RepresentationOverSumChar.isRhoAt_of_splitsAs N i π r₀ ρ hr.2.2 ((isoBlock_iff N i r₀ ρ).1 h.rho),
+  (ss_iff N i ρ).1 h.ss,
+  h.cont
+⟩
 
 theorem exists_conj_ne (H : Host R) : ∃ x y : 𝓞 H.E, (y : H.E) = H.conj (x : H.E) ∧ y - x ≠ 0 := by
   by_contra hc
   push Not at hc
   have h1 : ∀ x : 𝓞 H.E, H.conj (x : H.E) = x := fun x => by
-    have := hc x ⟨H.conj x, (RingOfIntegers.isIntegral_coe x).map (H.conj.toAlgHom.restrictScalars ℤ)⟩ rfl
+    have :=
+      hc x ⟨H.conj x, (RingOfIntegers.isIntegral_coe x).map (H.conj.toAlgHom.restrictScalars ℤ)⟩ rfl
     exact congrArg (fun z : 𝓞 H.E => (z : H.E)) (sub_eq_zero.1 this)
   have h2 : ∀ z : H.E, H.conj z = z := fun z => by
     obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 H.E) z
@@ -149,8 +181,11 @@ theorem exists_conj_ne (H : Host R) : ∃ x y : 𝓞 H.E, (y : H.E) = H.conj (x 
   ext z
   exact (H.conjE_apply H.φ₀ z).symm.trans (congrArg H.φ₀ (h2 z))
 
-theorem exists_int_sub_mem {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E))
-    (hv : v.asIdeal.inertiaDeg ℤ = 1) (x : 𝓞 E) : ∃ n : ℤ, x - n ∈ v.asIdeal := by
+theorem exists_int_sub_mem
+    {E : Type} [Field E] [NumberField E]
+    (v : HeightOneSpectrum (𝓞 E)) (hv : v.asIdeal.inertiaDeg ℤ = 1)
+    (x : 𝓞 E)
+    : ∃ n : ℤ, x - n ∈ v.asIdeal := by
   have := v.isPrime
   have : NeZero v.asIdeal := ⟨v.ne_bot⟩
   have hp := Nat.absNorm_under_prime v.asIdeal
@@ -161,16 +196,23 @@ theorem exists_int_sub_mem {E : Type} [Field E] [NumberField E] (v : HeightOneSp
   have hc : Nat.card (𝓞 E ⧸ v.asIdeal) = Ideal.absNorm v.asIdeal :=
     (Ideal.absNorm_eq_natCard v.asIdeal).symm
   have : Nontrivial (𝓞 E ⧸ v.asIdeal) := Ideal.Quotient.nontrivial_iff.2 v.isPrime.ne_top
-  have hm := mem_zmultiples_of_prime_card hc (g := (1 : 𝓞 E ⧸ v.asIdeal)) (g' := Ideal.Quotient.mk _ x)
-    one_ne_zero
+  have hm :=
+    mem_zmultiples_of_prime_card hc (g := (1 : 𝓞 E ⧸ v.asIdeal)) (g' := Ideal.Quotient.mk _ x)
+      one_ne_zero
   obtain ⟨n, hn⟩ := AddSubgroup.mem_zmultiples_iff.1 hm
   refine ⟨n, Ideal.Quotient.eq.1 ?_⟩
   rw [← hn]
   simp
 
-theorem eq_univ_of_frob (hC : GlobalTheory.TwSys.Cheb) (i : N.Loc) (s : Set (GE N)) (hs : IsClosed s)
-    (h : ∀ w : PlE H, SplitOut N i w → ∀ (B : ValuationSubring N.Om) (σ : GE N),
-      IsPlaceOver (F := H.E) B w → IsFrob (F := H.E) B (normV w) σ → σ ∈ s) (g : GE N) : g ∈ s := by
+theorem eq_univ_of_frob
+    (hC : GlobalTheory.TwSys.Cheb)
+    (i : N.Loc) (s : Set (GE N)) (hs : IsClosed s)
+    (h : ∀ w : PlE H,
+      SplitOut N i w
+        → ∀ (B : ValuationSubring N.Om) (σ : GE N),
+          IsPlaceOver (F := H.E) B w → IsFrob (F := H.E) B (normV w) σ → σ ∈ s)
+    (g : GE N)
+    : g ∈ s := by
   classical
   by_contra hg
   have : IsGalois H.E N.Om := {}
@@ -183,10 +225,12 @@ theorem eq_univ_of_frob (hC : GlobalTheory.TwSys.Cheb) (i : N.Loc) (s : Set (GE 
     Ideal.finite_factors (by simpa using hne)
   have f2 : {v : PlE H | v.asIdeal ∣ Ideal.span {((N.l i : ℕ) : 𝓞 H.E)}}.Finite :=
     Ideal.finite_factors (by simpa using (N.lPrime i).out.ne_zero)
-  obtain ⟨v, hv, hf, -, B, hB, -, σ, hσ, hU⟩ := hC H.E N.Om L.fixingSubgroup L.fixingSubgroup_isOpen
-    ((InfiniteGalois.normal_iff_isGalois L).2 hgal) g (f1.toFinset ∪ f2.toFinset ∪ N.S i ∪ N.Q i)
+  obtain ⟨v, hv, hf, -, B, hB, -, σ, hσ, hU⟩ :=
+    hC H.E N.Om L.fixingSubgroup L.fixingSubgroup_isOpen
+      ((InfiniteGalois.normal_iff_isGalois L).2 hgal) g (f1.toFinset ∪ f2.toFinset ∪ N.S i ∪ N.Q i)
   simp only [Finset.mem_union, Set.Finite.mem_toFinset, Set.mem_setOf_eq, Ideal.dvd_span_singleton,
-    not_or] at hv
+      not_or]
+    at hv
   obtain ⟨⟨⟨h1, h2⟩, h3⟩, h4⟩ := hv
   obtain ⟨n, hx⟩ := exists_int_sub_mem v hf x
   have hsplit : IsSplitPl H v := by
@@ -205,11 +249,15 @@ theorem t2Space_coefficientRing (i : N.Loc) : T2Space (N.O i) :=
   have := N.O_complete i
   (N.O_adic i).isHausdorff_iff.1 inferInstance
 
-theorem isRx_unique (hC : GlobalTheory.TwSys.Cheb) (i : N.Loc) (x : N.X i) {m n : Type} [Fintype m] [DecidableEq m]
-    [Fintype n] [DecidableEq n] (M : GE N →* Matrix m m (N.O i)) (M' : GE N →* Matrix n n (N.O i))
-    (h : RepresentationOverSumChar.IsRx N i x M) (h' : RepresentationOverSumChar.IsRx N i x M') :
-    ∃ e : (m → KK N i) ≃ₗ[KK N i] (n → KK N i), ∀ g u,
-      e (RepresentationOverSumChar.repOver (KK N i) M g u) = RepresentationOverSumChar.repOver (KK N i) M' g (e u) := by
+theorem isRx_unique
+    (hC : GlobalTheory.TwSys.Cheb)
+    (i : N.Loc) (x : N.X i)
+    {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
+    (M : GE N →* Matrix m m (N.O i)) (M' : GE N →* Matrix n n (N.O i))
+    (h : RepresentationOverSumChar.IsRx N i x M) (h' : RepresentationOverSumChar.IsRx N i x M')
+    : ∃ e : (m → KK N i) ≃ₗ[KK N i] (n → KK N i), ∀ g u,
+      e (RepresentationOverSumChar.repOver (KK N i) M g u)
+        = RepresentationOverSumChar.repOver (KK N i) M' g (e u) := by
   have := t2Space_coefficientRing N i
   have : CharZero what₂.LL := what₂.embLL.charZero
   have : CharZero (FractionRing (N.O i)) :=
@@ -218,7 +266,9 @@ theorem isRx_unique (hC : GlobalTheory.TwSys.Cheb) (i : N.Loc) (x : N.X i) {m n 
   rw [trace_repOver, trace_repOver]
   congr 1
   refine eq_univ_of_frob N hC i {g | (M g).trace = (M' g).trace}
-    (isClosed_eq h.1.matrix_trace h'.1.matrix_trace) (fun w hw B σ hB hσ => ?_) g
+    (isClosed_eq h.1.matrix_trace h'.1.matrix_trace)
+    (fun w hw B σ hB hσ => ?_)
+    g
   exact trace_eq_of_charpoly_eq _ _ ((h.2.2 w hw B σ hB hσ).trans (h'.2.2 w hw B σ hB hσ).symm)
 
 end GlobalTheory.ComplementCompare

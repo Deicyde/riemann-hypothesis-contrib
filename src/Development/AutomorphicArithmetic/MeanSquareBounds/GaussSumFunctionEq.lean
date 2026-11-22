@@ -8,12 +8,13 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.SmallZeros
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-private theorem gauss_sum_function_eq {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (y : ℝ) :
-    Formalism.HC.An.gChi χ y = G0 χ y := by
+private theorem gauss_sum_function_eq {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (y : ℝ)
+    : Formalism.HC.An.gChi χ y = G0 χ y := by
   have key : ∀ n ∈ Icc 1 ⌊y⌋₊, max (y / (n : ℝ) - 1) 0 = y / n - 1 := by
     intro n hn
     rw [Finset.mem_Icc] at hn
@@ -34,8 +35,9 @@ private theorem gauss_sum_function_eq {N : ℕ} [NeZero N] (χ : DirichletCharac
     congr 1
     exact Finset.sum_congr rfl fun n hn => by rw [key n hn]
 
-private theorem isReal_of_sq {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (h2 : χ ^ 2 = 1) (a : ZMod N) :
-    (χ a).im = 0 := by
+private theorem isReal_of_sq
+    {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (h2 : χ ^ 2 = 1) (a : ZMod N)
+    : (χ a).im = 0 := by
   by_cases ha : IsUnit a
   · have h := congrArg (fun f : DirichletCharacter ℂ N => f a) h2
     simp only [pow_two, MulChar.one_apply ha] at h
@@ -48,16 +50,19 @@ private theorem isReal_of_sq {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N
     rcases hz with hz | hz <;> simp [hz]
   · simp [MulChar.map_nonunit χ ha]
 
-private theorem level_dvd {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N)
-    (h : H.IsCharE χ) : N ∣ H.condN := by
+private theorem level_dvd
+    {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ)
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter ℂ N) (h : H.IsCharE χ)
+    : N ∣ H.condN := by
   obtain ⟨θ, hθ⟩ := h
-  have hp : (Formalism.HC.PChar.mk N χ hθ.1) = H.prim θ := (H.isPrimOf_iff θ (Formalism.HC.PChar.mk N χ hθ.1)).1 hθ
+  have hp : (Formalism.HC.PChar.mk N χ hθ.1) = H.prim θ :=
+    (H.isPrimOf_iff θ (Formalism.HC.PChar.mk N χ hθ.1)).1 hθ
   have hN : N = (H.prim θ).N := congrArg Formalism.HC.PChar.N hp
   rw [hN]
   exact DirichletCharacter.conductor_dvd_level (H.dir θ)
 
-theorem thinH :
-    UpperTheory.Top.ThinH := by
+theorem thinH : UpperTheory.Top.ThinH := by
   refine ⟨1, one_pos, fun B eps he he52 => ?_⟩
   obtain ⟨c₀s, hc₀s, hsmall⟩ := small_zeros (8 * ⌊B⌋₊)
   have hc₀ : 0 < min c₀s (1 / 400) := lt_min hc₀s (by norm_num)
@@ -83,7 +88,9 @@ theorem thinH :
   · push_neg at hqd
     have hQ0 : H.QS ≠ 0 := (H.QS_pos).ne'
     have hsplitQ := Nat.ordProj_mul_ordCompl_eq_self H.QS 2
-    have hprimes : ∀ p : ℕ, p.Prime → p ∣ N → p ∣ 8 * (H.QS / 2 ^ H.QS.factorization 2) ∨ p = H.q ∨ p = H.d := by
+    have hprimes
+        : ∀ p : ℕ,
+          p.Prime → p ∣ N → p ∣ 8 * (H.QS / 2 ^ H.QS.factorization 2) ∨ p = H.q ∨ p = H.d := by
       intro p hp hpN
       have hpc : p ∣ H.QS * H.q * H.d := hpN.trans hNd
       rcases (Nat.Prime.dvd_mul hp).1 hpc with h | h
@@ -99,8 +106,9 @@ theorem thinH :
             exact hcop.dvd_of_dvd_mul_left h'
         · exact Or.inr (Or.inl ((Nat.prime_dvd_prime_iff_eq hp hq).1 h'))
       · exact Or.inr (Or.inr ((Nat.prime_dvd_prime_iff_eq hp hd).1 h))
-    have hdiv := real_cond (8 * (H.QS / 2 ^ H.QS.factorization 2)) H.q H.d N χ hprim h2
-      (dvd_mul_right 8 _) hq hd hprimes
+    have hdiv :=
+      real_cond (8 * (H.QS / 2 ^ H.QS.factorization 2)) H.q H.d N χ hprim h2 (dvd_mul_right 8 _) hq
+        hd hprimes
     have hcq : Nat.Coprime N H.q := ((Nat.Prime.coprime_iff_not_dvd hq).2 hqd.1).symm
     have hcd : Nat.Coprime N H.d := ((Nat.Prime.coprime_iff_not_dvd hd).2 hqd.2).symm
     have hN0 : N ∣ 8 * (H.QS / 2 ^ H.QS.factorization 2) :=

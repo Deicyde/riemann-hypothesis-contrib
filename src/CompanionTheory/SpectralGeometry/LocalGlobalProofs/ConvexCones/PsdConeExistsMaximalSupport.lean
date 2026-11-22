@@ -9,13 +9,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-theorem exists_smul_mem_of_le_of_finrank_le {M : Type} [AddCommGroup M] [Module.Finite ℤ M] {P Q : Submodule ℤ M}
-    (h : P ≤ Q) (hr : Module.finrank ℤ Q ≤ Module.finrank ℤ P) {y : M} (hy : y ∈ Q) :
-    ∃ n : ℤ, n ≠ 0 ∧ n • y ∈ P := by
+theorem exists_smul_mem_of_le_of_finrank_le
+    {M : Type} [AddCommGroup M] [Module.Finite ℤ M]
+    {P Q : Submodule ℤ M} (h : P ≤ Q) (hr : Module.finrank ℤ Q ≤ Module.finrank ℤ P)
+    {y : M} (hy : y ∈ Q)
+    : ∃ n : ℤ, n ≠ 0 ∧ n • y ∈ P := by
   have e : (P.comap Q.subtype) ≃ₗ[ℤ] P := Submodule.comapSubtypeEquivOfLe h
   have h1 := Submodule.finrank_quotient_add_finrank (P.comap Q.subtype)
   rw [e.finrank_eq] at h1
@@ -25,8 +29,9 @@ theorem exists_smul_mem_of_le_of_finrank_le {M : Type} [AddCommGroup M] [Module.
   rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at hz
   simpa using hz
 
-theorem diag_eq_zero_iff_of_isPosDef {X₁ : Type} [AddCommGroup X₁] {B : X₁ →ₗ[ℤ] X₁ →ₗ[ℤ] ℝ} (h : IsPosDef B) (z : X₁) :
-    B z z = 0 ↔ z ∈ Submodule.torsion ℤ X₁ := by
+theorem diag_eq_zero_iff_of_isPosDef
+    {X₁ : Type} [AddCommGroup X₁] {B : X₁ →ₗ[ℤ] X₁ →ₗ[ℤ] ℝ} (h : IsPosDef B) (z : X₁)
+    : B z z = 0 ↔ z ∈ Submodule.torsion ℤ X₁ := by
   constructor
   · intro h0
     by_contra hz
@@ -41,28 +46,33 @@ theorem diag_eq_zero_iff_of_isPosDef {X₁ : Type} [AddCommGroup X₁] {B : X₁
   · intro hz
     obtain ⟨a, ha⟩ := (Submodule.mem_torsion_iff _).1 hz
     have ha' : (a : ℤ) • z = 0 := ha
-    have h1 : ((a : ℤ) : ℝ) * B z z = 0 := by
-      rw [← zsmul_eq_mul, ← map_smul, ha', map_zero]
+    have h1 : ((a : ℤ) : ℝ) * B z z = 0 := by rw [← zsmul_eq_mul, ← map_smul, ha', map_zero]
     exact (mul_eq_zero.1 h1).resolve_left (by exact_mod_cast nonZeroDivisors.ne_zero a.2)
 
-theorem exists_radical_of_mem_psdCone {O : Type} [CommRing O] {bar : O → O} {X : Type} [AddCommGroup X] [Module O X]
-    {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (hB : B ∈ psdCone (bar := bar) (X := X)) : ∃ N : Submodule ℤ X, ∀ y, y ∈ N ↔ B y y = 0 := by
+theorem exists_radical_of_mem_psdCone
+    {O : Type} [CommRing O]
+    {bar : O → O} {X : Type} [AddCommGroup X] [Module O X]
+    {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (hB : B ∈ psdCone (bar := bar) (X := X))
+    : ∃ N : Submodule ℤ X, ∀ y, y ∈ N ↔ B y y = 0 := by
   obtain ⟨X₁, _, _, _, r, B₁, -, -, h1, h2⟩ := hB
   refine ⟨(Submodule.torsion ℤ X₁).comap r.toAddMonoidHom.toIntLinearMap, fun y => ?_⟩
   rw [h2, diag_eq_zero_iff_of_isPosDef h1]
   rfl
 
-theorem exists_least_radical : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O)
-    (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (K : Set (X →ₗ[ℤ] X →ₗ[ℤ] ℝ)),
-    K.Nonempty → K ⊆ psdCone (bar := bar) (X := X) → (∀ B ∈ K, ∀ B' ∈ K, B + B' ∈ K) →
-      ∃ B₁ ∈ K, ∀ B ∈ K, ∀ y, B₁ y y = 0 → B y y = 0 := by
+theorem exists_least_radical
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O)
+        (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (K : Set (X →ₗ[ℤ] X →ₗ[ℤ] ℝ)),
+      K.Nonempty → K ⊆ psdCone (bar := bar) (X := X) → (∀ B ∈ K, ∀ B' ∈ K, B + B' ∈ K)
+        → ∃ B₁ ∈ K, ∀ B ∈ K, ∀ y, B₁ y y = 0 → B y y = 0 := by
   intro O _ _ _ _ bar X _ _ _ K hne hK hadd
   haveI : Module.Finite ℤ X := Module.Finite.trans O X
   choose! N hN using fun B (hB : B ∈ K) => exists_radical_of_mem_psdCone (hK hB)
   have hnn : ∀ B ∈ K, ∀ y, 0 ≤ B y y := fun B hB y => nonneg_of_mem_psdCone (hK hB) y
-  obtain ⟨B₁, hB₁, hmin⟩ : ∃ B₁ ∈ K, ∀ B ∈ K, Module.finrank ℤ (N B₁) ≤ Module.finrank ℤ (N B) :=
-    ⟨Function.argminOn (fun B => Module.finrank ℤ (N B)) K hne, Function.argminOn_mem _ _ hne,
-      fun B hB => Function.argminOn_le (fun B => Module.finrank ℤ (N B)) K hB⟩
+  obtain ⟨B₁, hB₁, hmin⟩ : ∃ B₁ ∈ K, ∀ B ∈ K, Module.finrank ℤ (N B₁) ≤ Module.finrank ℤ (N B) := ⟨
+    Function.argminOn (fun B => Module.finrank ℤ (N B)) K hne,
+    Function.argminOn_mem _ _ hne,
+    fun B hB => Function.argminOn_le (fun B => Module.finrank ℤ (N B)) K hB
+  ⟩
   refine ⟨B₁, hB₁, fun B hB y hy => ?_⟩
   have hsum := hadd B hB B₁ hB₁
   have hle : N (B + B₁) ≤ N B₁ := fun z hz => by

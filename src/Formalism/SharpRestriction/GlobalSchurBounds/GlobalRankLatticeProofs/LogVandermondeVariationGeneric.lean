@@ -8,8 +8,9 @@ noncomputable section
 namespace Formalism.MainNotions.StandardLattice
 open NumberField Formalism.BasicNotions Finset
 
-theorem abs_log_sub_le_div (X X' e c : ℝ) (hc : 0 < c) (hX : c ≤ X) (hX' : c ≤ X') (he : |X - X'| ≤ e) :
-    |Real.log X - Real.log X'| ≤ e / c := by
+theorem abs_log_sub_le_div
+    (X X' e c : ℝ) (hc : 0 < c) (hX : c ≤ X) (hX' : c ≤ X') (he : |X - X'| ≤ e)
+    : |Real.log X - Real.log X'| ≤ e / c := by
   have he0 : 0 ≤ e := le_trans (abs_nonneg _) he
   have key : ∀ A B : ℝ, c ≤ A → c ≤ B → A - B ≤ e → Real.log A - Real.log B ≤ e / c := by
     intro A B hA hB hAB
@@ -32,12 +33,16 @@ theorem abs_log_sub_le_div (X X' e c : ℝ) (hc : 0 < c) (hX : c ≤ X) (hX' : c
     linarith
   · exact key X X' hX hX' (by linarith [h.2])
 
-theorem harmonic_gap_sum_le (k : ℕ) (a : Fin k) :
-    ∑ b ∈ univ.filter (fun b : Fin k => a < b), (1 : ℝ) / ((b.val : ℝ) - (a.val : ℝ)) ≤ 1 + Real.log k := by
-  have e : (∑ b ∈ univ.filter (fun b : Fin k => a < b), (1 : ℝ) / ((b.val : ℝ) - (a.val : ℝ))) =
-      ∑ i ∈ range k, (if a.val < i then (1 : ℝ) / ((i : ℝ) - (a.val : ℝ)) else 0) := by
-    rw [Finset.sum_filter, ← Fin.sum_univ_eq_sum_range
-      (fun i => if a.val < i then (1 : ℝ) / ((i : ℝ) - (a.val : ℝ)) else 0) k]
+theorem harmonic_gap_sum_le (k : ℕ) (a : Fin k)
+    : ∑ b ∈ univ.filter (fun b : Fin k => a < b), (1 : ℝ) / ((b.val : ℝ) - (a.val : ℝ))
+      ≤ 1 + Real.log k := by
+  have e
+      : (∑ b ∈ univ.filter (fun b : Fin k => a < b), (1 : ℝ) / ((b.val : ℝ) - (a.val : ℝ)))
+        = ∑ i ∈ range k, (if a.val < i then (1 : ℝ) / ((i : ℝ) - (a.val : ℝ)) else 0) := by
+    rw [Finset.sum_filter,
+      ← Fin.sum_univ_eq_sum_range
+        (fun i => if a.val < i then (1 : ℝ) / ((i : ℝ) - (a.val : ℝ)) else 0)
+        k]
     refine Finset.sum_congr rfl (fun b _ => ?_)
     try dsimp only
     by_cases h : a < b
@@ -46,11 +51,13 @@ theorem harmonic_gap_sum_le (k : ℕ) (a : Fin k) :
   obtain ⟨m, hm⟩ : ∃ m, k = (a.val + 1) + m := ⟨k - (a.val + 1), by have := a.isLt; omega⟩
   have hr : range k = range ((a.val + 1) + m) := congrArg range hm
   rw [e, hr, Finset.sum_range_add]
-  have h1 : ∑ i ∈ range (a.val + 1), (if a.val < i then (1 : ℝ) / ((i : ℝ) - (a.val : ℝ)) else 0) = 0 :=
+  have h1
+      : ∑ i ∈ range (a.val + 1), (if a.val < i then (1 : ℝ) / ((i : ℝ) - (a.val : ℝ)) else 0) = 0 :=
     Finset.sum_eq_zero (fun i hi => if_neg (by have := Finset.mem_range.mp hi; omega))
-  have h2 : ∑ x ∈ range m, (if a.val < a.val + 1 + x then
-      (1 : ℝ) / (((a.val + 1 + x : ℕ) : ℝ) - (a.val : ℝ)) else 0) =
-      ∑ x ∈ range m, (1 : ℝ) / ((x : ℝ) + 1) :=
+  have h2
+      : ∑ x ∈ range m, (if a.val < a.val + 1 + x then
+          (1 : ℝ) / (((a.val + 1 + x : ℕ) : ℝ) - (a.val : ℝ)) else 0)
+        = ∑ x ∈ range m, (1 : ℝ) / ((x : ℝ) + 1) :=
     Finset.sum_congr rfl (fun x _ => by
       rw [if_pos (show a.val < a.val + 1 + x by omega)]
       push_cast
@@ -58,28 +65,40 @@ theorem harmonic_gap_sum_le (k : ℕ) (a : Fin k) :
       ring)
   rw [h1, zero_add, h2]
   have h3 : ∑ x ∈ range m, (1 : ℝ) / ((x : ℝ) + 1) ≤ ∑ x ∈ range k, (1 : ℝ) / ((x : ℝ) + 1) :=
-    Finset.sum_le_sum_of_subset_of_nonneg (fun x hx => Finset.mem_range.mpr (by have := Finset.mem_range.mp hx; omega))
+    Finset.sum_le_sum_of_subset_of_nonneg
+      (fun x hx => Finset.mem_range.mpr (by have := Finset.mem_range.mp hx; omega))
       (fun i _ _ => by positivity)
-  have h4 : ∑ x ∈ range k, (1 : ℝ) / ((x : ℝ) + 1) = (harmonic k : ℝ) := by
-    simp [harmonic]
+  have h4 : ∑ x ∈ range k, (1 : ℝ) / ((x : ℝ) + 1) = (harmonic k : ℝ) := by simp [harmonic]
   have h5 := harmonic_le_one_add_log k
   linarith
 
-theorem log_vandermonde_variation_of_separated (k : ℕ) (Δ : ℝ) (u u' : Fin k → ℝ) (h0 : 0 < Δ)
-    (G0 : ∀ a b : Fin k, a.val = 0 → a < b → (k : ℝ) * (4 * Δ) ≤ u a - u b ∧ (k : ℝ) * (4 * Δ) ≤ u' a - u' b ∧
-      |(u a - u b) - (u' a - u' b)| ≤ Δ)
-    (G1 : ∀ a b : Fin k, 1 ≤ a.val → a < b → 3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ ≤ u a - u b ∧
-      3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ ≤ u' a - u' b ∧ |(u a - u b) - (u' a - u' b)| ≤ 2 * Δ) :
-    |Real.log (vand u) - Real.log (vand u')| ≤ 1 / 4 + 2 / 3 * k * (1 + Real.log k) := by
+theorem log_vandermonde_variation_of_separated
+    (k : ℕ)
+    (Δ : ℝ) (u u' : Fin k → ℝ) (h0 : 0 < Δ)
+    (G0 : ∀ a b : Fin k,
+      a.val = 0 → a < b
+        → (k : ℝ) * (4 * Δ) ≤ u a - u b ∧ (k : ℝ) * (4 * Δ) ≤ u' a - u' b
+          ∧ |(u a - u b) - (u' a - u' b)| ≤ Δ)
+    (G1 : ∀ a b : Fin k,
+      1 ≤ a.val → a < b
+        → 3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ ≤ u a - u b
+          ∧ 3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ ≤ u' a - u' b
+          ∧ |(u a - u b) - (u' a - u' b)| ≤ 2 * Δ)
+    : |Real.log (vand u) - Real.log (vand u')| ≤ 1 / 4 + 2 / 3 * k * (1 + Real.log k) := by
   rcases Nat.eq_zero_or_pos k with rfl | hk
   · norm_num [vand]
   have hkR : (0 : ℝ) < k := by exact_mod_cast hk
   have hk0 : (k : ℝ) ≠ 0 := hkR.ne'
   have hlogk : 0 ≤ Real.log (k : ℝ) := Real.log_natCast_nonneg k
-  have hpair : ∀ a b : Fin k, a < b →
-      0 < u a - u b ∧ 0 < u' a - u' b ∧
-      |Real.log (u a - u b) - Real.log (u' a - u' b)| ≤
-        (if a.val = 0 then 1 / (4 * (k : ℝ)) else 2 / 3 * (1 / ((b.val : ℝ) - (a.val : ℝ)))) := by
+  have hpair
+      : ∀ a b : Fin k,
+        a < b
+          → 0 < u a - u b ∧ 0 < u' a - u' b
+            ∧ |Real.log (u a - u b) - Real.log (u' a - u' b)|
+              ≤ (if a.val = 0 then
+                   1 / (4 * (k : ℝ))
+                 else
+                   2 / 3 * (1 / ((b.val : ℝ) - (a.val : ℝ)))) := by
     intro a b hab
     by_cases ha : a.val = 0
     · obtain ⟨h1, h2, h3⟩ := G0 a b ha hab
@@ -99,26 +118,33 @@ theorem log_vandermonde_variation_of_separated (k : ℕ) (Δ : ℝ) (u u' : Fin 
       have hc : 0 < 3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ := mul_pos (mul_pos (by norm_num) hba) h0
       refine ⟨by linarith, by linarith, ?_⟩
       rw [if_neg ha]
-      have h4 := abs_log_sub_le_div (u a - u b) (u' a - u' b) (2 * Δ) (3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ)
-        hc h1 h2 h3
-      have h5 : 2 * Δ / (3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ) =
-          2 / 3 * (1 / ((b.val : ℝ) - (a.val : ℝ))) := by
+      have h4 :=
+        abs_log_sub_le_div (u a - u b) (u' a - u' b) (2 * Δ) (3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ)
+          hc h1 h2 h3
+      have h5
+          : 2 * Δ / (3 * ((b.val : ℝ) - (a.val : ℝ)) * Δ)
+            = 2 / 3 * (1 / ((b.val : ℝ) - (a.val : ℝ))) := by
         have hx : (1 / ((b.val : ℝ) - (a.val : ℝ))) * ((b.val : ℝ) - (a.val : ℝ)) = 1 :=
           one_div_mul_cancel hba.ne'
         rw [div_eq_iff hc.ne']
         linear_combination (-2 * Δ) * hx
       linarith
-  have hlog : ∀ v : Fin k → ℝ, (∀ a b : Fin k, a < b → 0 < v a - v b) →
-      Real.log (vand v) = ∑ a : Fin k, ∑ b ∈ univ.filter (fun b => a < b), Real.log (v a - v b) := by
+  have hlog
+      : ∀ v : Fin k → ℝ,
+        (∀ a b : Fin k, a < b → 0 < v a - v b)
+          → Real.log (vand v)
+            = ∑ a : Fin k, ∑ b ∈ univ.filter (fun b => a < b), Real.log (v a - v b) := by
     intro v hv
     simp only [vand]
     rw [Real.log_prod (fun a _ =>
       (Finset.prod_pos (fun b hb => hv a b (Finset.mem_filter.mp hb).2)).ne')]
     refine Finset.sum_congr rfl (fun a _ => ?_)
     exact Real.log_prod (fun b hb => (hv a b (Finset.mem_filter.mp hb).2).ne')
-  have hrow : ∀ a : Fin k, ∑ b ∈ univ.filter (fun b => a < b),
-      (if a.val = 0 then 1 / (4 * (k : ℝ)) else 2 / 3 * (1 / ((b.val : ℝ) - (a.val : ℝ)))) ≤
-      (if a.val = 0 then (1 : ℝ) / 4 else 0) + 2 / 3 * (1 + Real.log k) := by
+  have hrow
+      : ∀ a : Fin k,
+        ∑ b ∈ univ.filter (fun b => a < b),
+            (if a.val = 0 then 1 / (4 * (k : ℝ)) else 2 / 3 * (1 / ((b.val : ℝ) - (a.val : ℝ))))
+          ≤ (if a.val = 0 then (1 : ℝ) / 4 else 0) + 2 / 3 * (1 + Real.log k) := by
     intro a
     by_cases ha : a.val = 0
     · simp only [if_pos ha]
@@ -136,8 +162,9 @@ theorem log_vandermonde_variation_of_separated (k : ℕ) (Δ : ℝ) (u u' : Fin 
     · simp only [if_neg ha]
       rw [← Finset.mul_sum, zero_add]
       exact mul_le_mul_of_nonneg_left (harmonic_gap_sum_le k a) (by norm_num)
-  have hS : ∑ a : Fin k, ((if a.val = 0 then (1 : ℝ) / 4 else 0) + 2 / 3 * (1 + Real.log k)) ≤
-      1 / 4 + 2 / 3 * k * (1 + Real.log k) := by
+  have hS
+      : ∑ a : Fin k, ((if a.val = 0 then (1 : ℝ) / 4 else 0) + 2 / 3 * (1 + Real.log k))
+        ≤ 1 / 4 + 2 / 3 * k * (1 + Real.log k) := by
     rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
       Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul]
     have hc1 : ((univ.filter (fun a : Fin k => a.val = 0)).card : ℝ) ≤ 1 := by
@@ -150,16 +177,20 @@ theorem log_vandermonde_variation_of_separated (k : ℕ) (Δ : ℝ) (u u' : Fin 
   simp only [← Finset.sum_sub_distrib]
   refine le_trans (Finset.abs_sum_le_sum_abs _ _) ?_
   refine le_trans (Finset.sum_le_sum (fun a _ => Finset.abs_sum_le_sum_abs _ _)) ?_
-  refine le_trans (Finset.sum_le_sum (fun a _ => Finset.sum_le_sum (fun b hb =>
-    (hpair a b (Finset.mem_filter.mp hb).2).2.2))) ?_
+  refine le_trans
+    (Finset.sum_le_sum (fun a _ =>
+      Finset.sum_le_sum (fun b hb => (hpair a b (Finset.mem_filter.mp hb).2).2.2)))
+    ?_
   refine le_trans (Finset.sum_le_sum (fun a _ => hrow a)) ?_
   exact hS
 
-theorem vandermonde_variation_at_place (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hA : DataA D sc C0 CY Δ w)
-    (u u' : D.what₂.Word) (ρ : D.what₂.Tau) :
-    |Real.log (vand (uColR D u ρ)) - Real.log (vand (uColR D u' ρ))| ≤
-      1 / 4 + 2 / 3 * D.R.k * (1 + Real.log D.R.k) := by
-  obtain ⟨⟨-, -, -, -, -, -, hΔ1, hv, hvstep, hmid, -, hnt, -⟩, ⟨-, -, hm44, hmk, -, -, -, htop⟩⟩ := hA
+theorem vandermonde_variation_at_place
+    (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hA : DataA D sc C0 CY Δ w)
+    (u u' : D.what₂.Word) (ρ : D.what₂.Tau)
+    : |Real.log (vand (uColR D u ρ)) - Real.log (vand (uColR D u' ρ))|
+      ≤ 1 / 4 + 2 / 3 * D.R.k * (1 + Real.log D.R.k) := by
+  obtain ⟨⟨-, -, -, -, -, -, hΔ1, hv, hvstep, hmid, -, hnt, -⟩, ⟨-, -, hm44, hmk, -, -, -, htop⟩⟩ :=
+    hA
   have hk44 : 44 ≤ D.R.k := le_trans hm44 hmk
   have hkpos : 0 < D.R.k := by omega
   have h0 : 0 < Δ := by linarith
@@ -176,8 +207,8 @@ theorem vandermonde_variation_at_place (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w
     have h := (D.hcW_last u ρ hkpos).trans (D.hcW_last u' ρ hkpos).symm
     simp only [uN, dif_pos h1]
     exact congrArg (fun q : ℚ => (q : ℝ)) h
-  have hchain : ∀ i j : ℕ, i ≤ j → j < D.R.k - 1 →
-      vN D ρ i - vN D ρ j = 4 * Δ * ((j : ℝ) - (i : ℝ)) := by
+  have hchain
+      : ∀ i j : ℕ, i ≤ j → j < D.R.k - 1 → vN D ρ i - vN D ρ j = 4 * Δ * ((j : ℝ) - (i : ℝ)) := by
     intro i j
     induction j with
     | zero =>
@@ -195,9 +226,11 @@ theorem vandermonde_variation_at_place (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w
         push_cast
         linarith
   have hV0 : 0 ≤ vN D ρ 0 := (hv ρ 0 (by omega)).1
-  have hmidR : ∀ w l, 1 ≤ l → l ≤ D.R.k - 2 →
-      vN D ρ 0 - 4 * Δ * ((l : ℝ) - 1) - 1 / 2 - Δ ≤ uN D w ρ l ∧
-      uN D w ρ l ≤ vN D ρ 0 - 4 * Δ * ((l : ℝ) - 1) - 1 / 2 := by
+  have hmidR
+      : ∀ w l,
+        1 ≤ l → l ≤ D.R.k - 2
+          → vN D ρ 0 - 4 * Δ * ((l : ℝ) - 1) - 1 / 2 - Δ ≤ uN D w ρ l
+            ∧ uN D w ρ l ≤ vN D ρ 0 - 4 * Δ * ((l : ℝ) - 1) - 1 / 2 := by
     intro w l h1 h2
     have hc := hchain 0 (l - 1) (by omega) (by omega)
     rw [Nat.cast_sub h1, Nat.cast_one, Nat.cast_zero] at hc
@@ -214,8 +247,8 @@ theorem vandermonde_variation_at_place (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w
   have hK1 : ((D.R.k - 1 : ℕ) : ℝ) = (D.R.k : ℝ) - 1 := by
     rw [Nat.cast_sub (by omega)]
     norm_num
-  have hlastR : ∀ w, ¬ IsTop D ρ →
-      uN D w ρ (D.R.k - 1) = vN D ρ 0 - 4 * Δ * ((D.R.k : ℝ) - 2) - 1 / 2 := by
+  have hlastR
+      : ∀ w, ¬ IsTop D ρ → uN D w ρ (D.R.k - 1) = vN D ρ 0 - 4 * Δ * ((D.R.k : ℝ) - 2) - 1 / 2 := by
     intro w hT
     have hc := hchain 0 (D.R.k - 2) (by omega) (by omega)
     rw [hK2, Nat.cast_zero] at hc
@@ -258,8 +291,9 @@ theorem vandermonde_variation_at_place (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w
         rw [hbe, hlast, sub_self, abs_zero]
         linarith
     refine ⟨by linarith [hu0 u, hub u], by linarith [hu0 u', hub u'], ?_⟩
-    have e3 : (uN D u ρ 0 - uN D u ρ b.val) - (uN D u' ρ 0 - uN D u' ρ b.val) =
-        uN D u' ρ b.val - uN D u ρ b.val := by
+    have e3
+        : (uN D u ρ 0 - uN D u ρ b.val) - (uN D u' ρ 0 - uN D u' ρ b.val)
+          = uN D u' ρ b.val - uN D u ρ b.val := by
       rw [hfirst]
       ring
     rw [e3]
@@ -288,8 +322,9 @@ theorem vandermonde_variation_at_place (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w
       have hd : |uN D u ρ a.val - uN D u' ρ a.val| ≤ Δ := by
         rw [abs_le]
         constructor <;> linarith
-      have e3 : (uN D u ρ a.val - uN D u ρ (D.R.k - 1)) - (uN D u' ρ a.val - uN D u' ρ (D.R.k - 1)) =
-          uN D u ρ a.val - uN D u' ρ a.val := by
+      have e3
+          : (uN D u ρ a.val - uN D u ρ (D.R.k - 1)) - (uN D u' ρ a.val - uN D u' ρ (D.R.k - 1))
+            = uN D u ρ a.val - uN D u' ρ a.val := by
         rw [hlast]
         ring
       by_cases hT : IsTop D ρ
@@ -308,7 +343,8 @@ theorem vandermonde_variation_at_place (D : D7) (sc : Scale) (C0 CY Δ : ℝ) (w
         rw [e3]
         linarith
 
-theorem vandermonde_variation_holds (D : D7) (sc : Scale) (C0 CY : ℝ) : VandermondeVariationExplicitBound D sc C0 CY := by
+theorem vandermonde_variation_holds (D : D7) (sc : Scale) (C0 CY : ℝ)
+    : VandermondeVariationExplicitBound D sc C0 CY := by
   unfold VandermondeVariationExplicitBound
   intro Δ w hA
   have hlogk : 0 ≤ Real.log (D.R.k : ℝ) := Real.log_natCast_nonneg _
@@ -320,8 +356,9 @@ theorem vandermonde_variation_holds (D : D7) (sc : Scale) (C0 CY : ℝ) : Vander
   have hplace := fun u u' ρ => vandermonde_variation_at_place D sc C0 CY Δ w hA u u' ρ
   refine ⟨fun u u' ρ => le_trans (hplace u u' ρ) (by linarith), ?_⟩
   intro u u'
-  have hdec : ∀ (x : D.what₂.Word) (ρ : D.what₂.Tau) (i j : ℕ) (hi : i < D.R.k) (hj : j < D.R.k), i < j →
-      (((D.hcW x ρ).u ⟨j, hj⟩ : ℚ) : ℝ) < (((D.hcW x ρ).u ⟨i, hi⟩ : ℚ) : ℝ) := by
+  have hdec
+      : ∀ (x : D.what₂.Word) (ρ : D.what₂.Tau) (i j : ℕ) (hi : i < D.R.k) (hj : j < D.R.k),
+        i < j → (((D.hcW x ρ).u ⟨j, hj⟩ : ℚ) : ℝ) < (((D.hcW x ρ).u ⟨i, hi⟩ : ℚ) : ℝ) := by
     intro x ρ i j
     induction j with
     | zero =>
@@ -332,7 +369,8 @@ theorem vandermonde_variation_holds (D : D7) (sc : Scale) (C0 CY : ℝ) : Vander
       have h1 := (D.hcW x ρ).v_gt_u ⟨n, by omega⟩
       have h2 := (D.hcW x ρ).u_gt_v ⟨n, by omega⟩
       have h3 := h1.trans h2
-      have step : (((D.hcW x ρ).u ⟨n + 1, hj⟩ : ℚ) : ℝ) < (((D.hcW x ρ).u ⟨n, by omega⟩ : ℚ) : ℝ) := by
+      have step
+          : (((D.hcW x ρ).u ⟨n + 1, hj⟩ : ℚ) : ℝ) < (((D.hcW x ρ).u ⟨n, by omega⟩ : ℚ) : ℝ) := by
         exact_mod_cast h3
       rcases Nat.lt_succ_iff_lt_or_eq.mp h with h' | h'
       · exact step.trans (ih hi (by omega) h')
@@ -345,21 +383,27 @@ theorem vandermonde_variation_holds (D : D7) (sc : Scale) (C0 CY : ℝ) : Vander
     have hab : a < b := (Finset.mem_filter.mp hb).2
     simp only [uColR]
     exact sub_pos.mpr (hdec x ρ a.val b.val a.isLt b.isLt hab)
-  have hdu : ∀ x, duStarU D x = (massI D D.R.k * idxPi D (D.host.g 0) (D.host.g 1) /
-      ∏ ρ : D.what₂.Tau, facProd D.R.k) * ∏ ρ, vand (uColR D x ρ) := by
+  have hdu
+      : ∀ x,
+        duStarU D x
+          = (massI D D.R.k * idxPi D (D.host.g 0) (D.host.g 1) / ∏ ρ : D.what₂.Tau, facProd D.R.k)
+            * ∏ ρ, vand (uColR D x ρ) := by
     intro x
     simp only [duStarU, duStarP, dimV]
     rw [Finset.prod_div_distrib]
     ring
-  have hsum : |Real.log (∏ ρ, vand (uColR D u ρ)) - Real.log (∏ ρ, vand (uColR D u' ρ))| ≤
-      (D.R.f : ℝ) * (1 / 4 + 2 / 3 * D.R.k * (1 + Real.log D.R.k)) := by
+  have hsum
+      : |Real.log (∏ ρ, vand (uColR D u ρ)) - Real.log (∏ ρ, vand (uColR D u' ρ))|
+        ≤ (D.R.f : ℝ) * (1 / 4 + 2 / 3 * D.R.k * (1 + Real.log D.R.k)) := by
     rw [Real.log_prod (fun ρ _ => (hvpos u ρ).ne'), Real.log_prod (fun ρ _ => (hvpos u' ρ).ne'),
       ← Finset.sum_sub_distrib]
     refine le_trans (Finset.abs_sum_le_sum_abs _ _) ?_
     refine le_trans (Finset.sum_le_sum (fun ρ _ => hplace u u' ρ)) ?_
     rw [Finset.sum_const, Finset.card_univ, D.what₂.card_Tau, nsmul_eq_mul]
-  have hkey : ∀ (Ds K P P' : ℝ), 0 < P → 0 < P' →
-      |Real.log (Ds / (K * P)) - Real.log (Ds / (K * P'))| ≤ |Real.log P - Real.log P'| := by
+  have hkey
+      : ∀ (Ds K P P' : ℝ),
+        0 < P → 0 < P'
+          → |Real.log (Ds / (K * P)) - Real.log (Ds / (K * P'))| ≤ |Real.log P - Real.log P'| := by
     intro Ds K P P' hP hP'
     by_cases hD : Ds = 0
     · simp [hD]
@@ -371,10 +415,16 @@ theorem vandermonde_variation_holds (D : D7) (sc : Scale) (C0 CY : ℝ) : Vander
     congr 1
     ring
   simp only [logXuD, logXu]
-  rw [hdu u, hdu u', ← mul_sub, abs_mul, abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / ((D.R.f : ℝ) * D.R.k))]
-  refine le_trans (mul_le_mul_of_nonneg_left (le_trans (hkey _ _ _ _
-    (Finset.prod_pos (fun ρ _ => hvpos u ρ)) (Finset.prod_pos (fun ρ _ => hvpos u' ρ))) hsum)
-    (by positivity)) ?_
+  rw [hdu u, hdu u', ← mul_sub, abs_mul,
+    abs_of_nonneg (by positivity : (0 : ℝ) ≤ 1 / ((D.R.f : ℝ) * D.R.k))]
+  refine le_trans
+    (mul_le_mul_of_nonneg_left
+      (le_trans
+        (hkey _ _ _ _ (Finset.prod_pos (fun ρ _ => hvpos u ρ))
+          (Finset.prod_pos (fun ρ _ => hvpos u' ρ)))
+        hsum)
+      (by positivity))
+    ?_
   rcases Nat.eq_zero_or_pos D.R.f with hf0 | hf0
   · rw [hf0]
     simp only [Nat.cast_zero, zero_mul, div_zero]

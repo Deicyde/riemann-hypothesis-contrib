@@ -11,11 +11,12 @@ open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions.EC
 
 namespace GlobalTheory.CompanionTheory.BruhatCoeffs
 
-theorem exists_coeff_matrices_of_span_eq {K : Type} [Field K] {n r : ℕ}
-    (C : Matrix (Fin n) (Fin n) K) (c : Matrix (Fin r) (Fin n) K)
-    (hc : LinearIndependent K c)
-    (hs : Submodule.span K (Set.range c) = Submodule.span K (Set.range C)) :
-    ∃ (T : Matrix (Fin n) (Fin r) K) (L : Matrix (Fin r) (Fin n) K),
+theorem exists_coeff_matrices_of_span_eq
+    {K : Type} [Field K]
+    {n r : ℕ}
+    (C : Matrix (Fin n) (Fin n) K) (c : Matrix (Fin r) (Fin n) K) (hc : LinearIndependent K c)
+    (hs : Submodule.span K (Set.range c) = Submodule.span K (Set.range C))
+    : ∃ (T : Matrix (Fin n) (Fin r) K) (L : Matrix (Fin r) (Fin n) K),
       C = T * c ∧ c = L * C ∧ L * T = 1 := by
   have hT0 : ∀ j, ∃ t : Fin r → K, ∑ i, t i • c i = C j := by
     intro j
@@ -51,7 +52,8 @@ theorem exists_coeff_matrices_of_span_eq {K : Type} [Field K] {n r : ℕ}
     have h0 := congrFun (congrFun hz0 i0) k
     rw [Matrix.mul_apply] at h0
     simpa [Finset.sum_apply] using h0
-  have h1 : (L * T - 1 : Matrix (Fin r) (Fin r) K) i0 i = 0 := hc' (fun i => (L * T - 1 : Matrix (Fin r) (Fin r) K) i0 i) hrow i
+  have h1 : (L * T - 1 : Matrix (Fin r) (Fin r) K) i0 i = 0 :=
+    hc' (fun i => (L * T - 1 : Matrix (Fin r) (Fin r) K) i0 i) hrow i
   rwa [Matrix.sub_apply, sub_eq_zero] at h1
 
 end GlobalTheory.CompanionTheory.BruhatCoeffs

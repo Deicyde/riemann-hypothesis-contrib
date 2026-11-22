@@ -103,6 +103,9 @@ end UpperTheory.Esk.AnnihilatorQuotientResidues
 
 theorem UpperTheory.Esk.action_integral_swap_proof : UpperTheory.Esk.C1 := by
   intro G Y _ _ _ _ μ hP b b' hb hb'
-  refine ⟨fun u hu hinv => UpperTheory.Esk.AnnihilatorQuotientResidues.lint_eq hP hb hb' u hu hinv, fun u hu hinv hi => ?_⟩
+  refine ⟨
+    fun u hu hinv => UpperTheory.Esk.AnnihilatorQuotientResidues.lint_eq hP hb hb' u hu hinv,
+    fun u hu hinv hi => ?_
+  ⟩
   have hi' := UpperTheory.Esk.AnnihilatorQuotientResidues.integrable_swap hP hb hb' u hu hinv hi
   exact ⟨hi', UpperTheory.Esk.AnnihilatorQuotientResidues.int_eq hP hb hb' u hu hinv hi hi'⟩

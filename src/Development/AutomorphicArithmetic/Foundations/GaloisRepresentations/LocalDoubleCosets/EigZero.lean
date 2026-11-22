@@ -10,9 +10,10 @@ noncomputable section
 
 namespace UpperTheory.Gal.LocD
 
-private theorem common_eigenvector {T D : Type} [AddCommGroup D] [Module ℂ D] [FiniteDimensional ℂ D] [Nontrivial D]
-    (φ : T → Module.End ℂ D) (hc : ∀ s t, Commute (φ s) (φ t)) :
-    ∃ (l : D) (a : T → ℂ), l ≠ 0 ∧ ∀ t, φ t l = a t • l :=
+private theorem common_eigenvector
+    {T D : Type} [AddCommGroup D] [Module ℂ D] [FiniteDimensional ℂ D] [Nontrivial D]
+    (φ : T → Module.End ℂ D) (hc : ∀ s t, Commute (φ s) (φ t))
+    : ∃ (l : D) (a : T → ℂ), l ≠ 0 ∧ ∀ t, φ t l = a t • l :=
   _root_.UpperTheory.Reformulated.B.CommonEigenvectorExistence.common_eigenvector φ hc
 
 theorem eigZero : EigZero := by
@@ -28,12 +29,15 @@ theorem eigZero : EigZero := by
       exact hy ((Module.forall_dual_apply_eq_zero_iff ℂ y).1 h)
     obtain ⟨g, hg⟩ := hex
     exact ⟨g, 0, fun h => hg (by simp [h])⟩
-  obtain ⟨l, a, hl0, hl⟩ := common_eigenvector (fun t => (ρ t).dualMap) (fun s t => by
-    change (ρ s).dualMap * (ρ t).dualMap = (ρ t).dualMap * (ρ s).dualMap
-    ext g y
-    have h := congrArg (fun F : Module.End ℂ J => F y) (hcomm s t).eq
-    simp only [Module.End.mul_apply] at h
-    simp [Module.End.mul_apply, LinearMap.dualMap_apply, h])
+  obtain ⟨l, a, hl0, hl⟩ :=
+    common_eigenvector
+      (fun t => (ρ t).dualMap)
+      (fun s t => by
+        change (ρ s).dualMap * (ρ t).dualMap = (ρ t).dualMap * (ρ s).dualMap
+        ext g y
+        have h := congrArg (fun F : Module.End ℂ J => F y) (hcomm s t).eq
+        simp only [Module.End.mul_apply] at h
+        simp [Module.End.mul_apply, LinearMap.dualMap_apply, h])
   have hact : ∀ t y, l (ρ t y) = a t * l y := fun t y => by
     have := congrArg (fun g : Module.Dual ℂ J => g y) (hl t)
     simpa [LinearMap.dualMap_apply] using this
@@ -41,33 +45,38 @@ theorem eigZero : EigZero := by
     by_contra h
     push_neg at h
     exact hl0 (LinearMap.ext h)
-  let am : T →* ℂ :=
-    { toFun := a
-      map_one' := by
-        have := hact 1 y₀
-        simp only [map_one, Module.End.one_apply] at this
-        exact (mul_right_cancel₀ hy₀ (by rw [one_mul]; exact this)).symm
-      map_mul' := fun s t => by
-        have := hact (s * t) y₀
-        rw [map_mul, Module.End.mul_apply, hact s, hact t, ← mul_assoc] at this
-        exact (mul_right_cancel₀ hy₀ this).symm }
+  let am : T →* ℂ := {
+    toFun := a
+    map_one' := by
+      have := hact 1 y₀
+      simp only [map_one, Module.End.one_apply] at this
+      exact (mul_right_cancel₀ hy₀ (by rw [one_mul]; exact this)).symm
+    map_mul' := fun s t => by
+      have := hact (s * t) y₀
+      rw [map_mul, Module.End.mul_apply, hact s, hact t, ← mul_assoc] at this
+      exact (mul_right_cancel₀ hy₀ this).symm
+  }
   refine ⟨am.toHomUnits, l, ?_, ?_, ?_⟩
   · exact hl0
   · intro t y
     simpa [am] using hact t y
   · have hval : ∀ t, ((am.toHomUnits t : ℂˣ) : ℂ) = a t := fun t => by simp [am]
-    have htop := Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
-      (fun t => ρ t) (fun s t _ => hcomm s t)
-      (fun t => Module.End.iSup_maxGenEigenspace_eq_top (ρ t))
-    obtain ⟨χ, y, hy, hly⟩ : ∃ (χ : T → ℂ) (y : J),
-        y ∈ (⨅ t, Module.End.maxGenEigenspace (ρ t) (χ t) : Submodule ℂ J) ∧ l y ≠ 0 := by
+    have htop :=
+      Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute
+        (fun t => ρ t)
+        (fun s t _ => hcomm s t)
+        (fun t => Module.End.iSup_maxGenEigenspace_eq_top (ρ t))
+    obtain ⟨χ, y, hy, hly⟩
+        : ∃ (χ : T → ℂ) (y : J),
+          y ∈ (⨅ t, Module.End.maxGenEigenspace (ρ t) (χ t) : Submodule ℂ J) ∧ l y ≠ 0 := by
       by_contra h
       push_neg at h
       have : (⊤ : Submodule ℂ J) ≤ LinearMap.ker l := by
         rw [← htop]
         exact iSup_le fun χ y hy => LinearMap.mem_ker.2 (h χ y hy)
       exact hl0 (LinearMap.ker_eq_top.1 (top_le_iff.1 this))
-    have hpow : ∀ (t : T) (c : ℂ) (m : ℕ) (z : J), l (((ρ t - c • 1) ^ m) z) = (a t - c) ^ m * l z := by
+    have hpow
+        : ∀ (t : T) (c : ℂ) (m : ℕ) (z : J), l (((ρ t - c • 1) ^ m) z) = (a t - c) ^ m * l z := by
       intro t c m
       induction m with
       | zero => intro z; simp
@@ -89,7 +98,10 @@ theorem eigZero : EigZero := by
         simp at this
       exact (sub_eq_zero.1 ((pow_eq_zero_iff hm0).1 this)).symm
     intro hbot
-    have hy' : y ∈ (⨅ t, Module.End.maxGenEigenspace (ρ t) ((am.toHomUnits t : ℂˣ) : ℂ) : Submodule ℂ J) := by
+    have hy'
+        : y
+          ∈ (⨅ t, Module.End.maxGenEigenspace (ρ t) ((am.toHomUnits t : ℂˣ) : ℂ)
+            : Submodule ℂ J) := by
       simp only [hval, ← hχ]
       exact hy
     rw [hbot, Submodule.mem_bot] at hy'

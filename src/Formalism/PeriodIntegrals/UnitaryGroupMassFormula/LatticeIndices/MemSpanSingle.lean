@@ -15,8 +15,8 @@ section Span
 
 variable {K : Type} [Field K] {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem mem_span_single (s : Set ι) (v : ι → K) :
-    v ∈ Submodule.span K ((fun j => Pi.single j (1 : K)) '' s) ↔ ∀ i, i ∉ s → v i = 0 := by
+theorem mem_span_single (s : Set ι) (v : ι → K)
+    : v ∈ Submodule.span K ((fun j => Pi.single j (1 : K)) '' s) ↔ ∀ i, i ∉ s → v i = 0 := by
   classical
   constructor
   · intro hv
@@ -46,17 +46,20 @@ variable {K : Type} [Field K] {r k : ℕ}
 def pe (b : Fin (r + 1)) : Idx r k := if h : (b : ℕ) < r then Sum.inl ⟨b, h⟩ else zI
 
 def ColFlag (m : Matrix (Idx r k) (Idx r k) K) : Prop :=
-  ∀ b : Fin (r + 1), m *ᵥ Pi.single (pe b) 1 - Pi.single (pe b) 1 ∈
-    Submodule.span K ((fun a => Pi.single (pe (k := k) a) (1 : K)) '' {a | a < b})
+  ∀ b : Fin (r + 1),
+    m *ᵥ Pi.single (pe b) 1 - Pi.single (pe b) 1
+      ∈ Submodule.span K ((fun a => Pi.single (pe (k := k) a) (1 : K)) '' {a | a < b})
 
-theorem colFlag_iff' (m : Matrix (Idx r k) (Idx r k) K) :
-    ColFlag m ↔ ∀ b : Fin (r + 1), ∀ i, (∀ a, a < b → i ≠ pe a) →
-      m i (pe b) = if i = pe b then 1 else 0 := by
+theorem colFlag_iff' (m : Matrix (Idx r k) (Idx r k) K)
+    : ColFlag m
+      ↔ ∀ b : Fin (r + 1), ∀ i,
+        (∀ a, a < b → i ≠ pe a) → m i (pe b) = if i = pe b then 1 else 0 := by
   classical
   unfold ColFlag
   refine forall_congr' fun b => ?_
-  have himg : (fun a => Pi.single (pe (k := k) a) (1 : K)) '' {a | a < b} =
-      (fun j => Pi.single j (1 : K)) '' (pe '' {a | a < b}) := by
+  have himg
+      : (fun a => Pi.single (pe (k := k) a) (1 : K)) '' {a | a < b}
+        = (fun j => Pi.single j (1 : K)) '' (pe '' {a | a < b}) := by
     rw [Set.image_image]
   rw [himg, mem_span_single]
   refine forall_congr' fun i => ?_
@@ -86,18 +89,22 @@ theorem colFlag_iff (m : Matrix (Idx r k) (Idx r k) K) : ColFlag m ↔ ColC m :=
   rw [colFlag_iff']
   constructor
   · intro H
-    have Hc : ∀ (j : Fin r) (i : Idx r k), (∀ a : Fin r, a < j → i ≠ Sum.inl a) →
-        m i (Sum.inl j) = if i = Sum.inl j then 1 else 0 := by
+    have Hc
+        : ∀ (j : Fin r) (i : Idx r k),
+          (∀ a : Fin r, a < j → i ≠ Sum.inl a)
+            → m i (Sum.inl j) = if i = Sum.inl j then 1 else 0 := by
       intro j i hi
-      have := H (Fin.castSucc j) i (fun a ha => by
-        rw [pe_inl_of_lt ha]
-        exact hi _ (by rw [Fin.lt_def] at ha ⊢; simpa using ha))
+      have :=
+        H (Fin.castSucc j) i (fun a ha => by
+          rw [pe_inl_of_lt ha]
+          exact hi _ (by rw [Fin.lt_def] at ha ⊢; simpa using ha))
       rwa [pe_castSucc] at this
     have Hz : ∀ i : Idx r k, (∀ a : Fin r, i ≠ Sum.inl a) → m i zI = if i = zI then 1 else 0 := by
       intro i hi
-      have := H (Fin.last r) i (fun a ha => by
-        rw [pe_inl_of_lt ha]
-        exact hi _)
+      have :=
+        H (Fin.last r) i (fun a ha => by
+          rw [pe_inl_of_lt ha]
+          exact hi _)
       rwa [pe_last] at this
     have Hinr : ∀ (j : Fin r) (x : Mid k ⊕ Fin r), m (Sum.inr x) (Sum.inl j) = 0 := by
       intro j x
@@ -107,13 +114,15 @@ theorem colFlag_iff (m : Matrix (Idx r k) (Idx r k) K) : ColFlag m ↔ ColC m :=
     refine ⟨⟨?_, fun a => ?_⟩, ?_, ?_, fun w => ?_, ?_, fun j => ?_⟩
     · intro i j hij
       have hij' : j < i := hij
-      have := Hc j (Sum.inl i) (fun a ha h => by
-        cases h
-        exact lt_irrefl _ (ha.trans hij'))
+      have :=
+        Hc j (Sum.inl i) (fun a ha h => by
+          cases h
+          exact lt_irrefl _ (ha.trans hij'))
       simpa [b11, hij'.ne'] using this
-    · have := Hc a (Sum.inl a) (fun a' ha' h => by
-        cases h
-        exact lt_irrefl _ ha')
+    · have :=
+        Hc a (Sum.inl a) (fun a' ha' h => by
+          cases h
+          exact lt_irrefl _ ha')
       simpa [b11] using this
     · ext a b
       simp [b21, Hinr]

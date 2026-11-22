@@ -14,19 +14,23 @@ open GroundTheory.Heights₂.Heights
 
 noncomputable section
 
-variable {K : Type*} [Field K] [NumberField K] {E : Type*} [AddCommGroup E] [Module (𝓞 K) E]
-  [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
+variable
+  {K : Type*} [Field K] [NumberField K]
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
 
-theorem span_fibreVec_eq_top (h : HermitianMetric K E) (σ : K →+* ℂ) {ι : Type*} [Fintype ι]
+theorem span_fibreVec_eq_top
+    (h : HermitianMetric K E) (σ : K →+* ℂ)
+    {ι : Type*} [Fintype ι]
     {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
-    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E) :
-    Submodule.span ℂ (Set.range fun i ↦ fibreVec h σ (s i)) = ⊤ := by
+    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E)
+    : Submodule.span ℂ (Set.range fun i ↦ fibreVec h σ (s i)) = ⊤ := by
   set N := Submodule.span (𝓞 K) (Set.range s)
   have := finite_quotient_span hs hcard
   set m := Nat.card (E ⧸ N)
   have hm : 0 < m := Nat.card_pos
   have hmem : ∀ e : E, m • e ∈ N := fun e ↦
-    (Submodule.Quotient.mk_eq_zero N).mp (by rw [Submodule.Quotient.mk_smul]; exact card_nsmul_eq_zero')
+    (Submodule.Quotient.mk_eq_zero N).mp
+      (by rw [Submodule.Quotient.mk_smul]; exact card_nsmul_eq_zero')
   set W := Submodule.span ℂ (Set.range fun i ↦ fibreVec h σ (s i))
   have h1 : ∀ e ∈ N, fibreVec h σ e ∈ W := by
     intro e he

@@ -8,20 +8,33 @@ open Module
 
 namespace GlobalTheory.SemilinearReading
 
-theorem exists_semilinear_extension_rep :
-    ∀ {K LL Cs W G : Type} [Field K] [Field LL] [Algebra K LL] [AddCommGroup Cs] [Module K Cs] [AddCommGroup W] [Module ℂ W] [Group G] {n m : ℕ} (σ₀ : K →+* ℂ) (σ : LL →+* ℂ), (∀ a, σ (algebraMap K LL a) = σ₀ a) → ∀ (cu : Cs →ₗ[K] (Fin n → LL)) (b : Fin m → Cs), Submodule.span K (Set.range b) = ⊤ → LinearIndependent LL (fun k => cu (b k)) → Submodule.span LL (Set.range fun k => cu (b k)) = ⊤ → ∀ (R : Cs →ₛₗ[σ₀] W), LinearIndependent ℂ (fun k => R (b k)) → Submodule.span ℂ (Set.range R) = ⊤ → ∀ (ρL : G →* ((Fin n → LL) →ₗ[LL] (Fin n → LL))), ∃ (f : (Fin n → LL) →ₛₗ[σ] W) (ρ : Representation ℂ G W), (∀ F, f (cu F) = R F) ∧ (∀ g w, ρ g (f w) = f (ρL g w)) ∧ (LinearIndependent ℂ fun k => f (Pi.single k 1)) ∧ Submodule.span ℂ (Set.range f) = ⊤ := by
+theorem exists_semilinear_extension_rep
+    : ∀ {K LL Cs W G : Type} [Field K] [Field LL] [Algebra K LL] [AddCommGroup Cs] [Module K Cs]
+        [AddCommGroup W] [Module ℂ W] [Group G] {n m : ℕ} (σ₀ : K →+* ℂ) (σ : LL →+* ℂ),
+      (∀ a, σ (algebraMap K LL a) = σ₀ a)
+        → ∀ (cu : Cs →ₗ[K] (Fin n → LL)) (b : Fin m → Cs),
+          Submodule.span K (Set.range b) = ⊤ → LinearIndependent LL (fun k => cu (b k))
+            → Submodule.span LL (Set.range fun k => cu (b k)) = ⊤
+            → ∀ (R : Cs →ₛₗ[σ₀] W),
+              LinearIndependent ℂ (fun k => R (b k)) → Submodule.span ℂ (Set.range R) = ⊤
+                → ∀ (ρL : G →* ((Fin n → LL) →ₗ[LL] (Fin n → LL))),
+                  ∃ (f : (Fin n → LL) →ₛₗ[σ] W) (ρ : Representation ℂ G W),
+                    (∀ F, f (cu F) = R F) ∧ (∀ g w, ρ g (f w) = f (ρL g w))
+                      ∧ (LinearIndependent ℂ fun k => f (Pi.single k 1))
+                      ∧ Submodule.span ℂ (Set.range f) = ⊤ := by
   intro K LL Cs W G _ _ _ _ _ _ _ _ n m σ₀ σ hσ cu b hbs hbi hbt R hR hRs ρL
   classical
   let B : Basis (Fin m) LL (Fin n → LL) := Basis.mk hbi hbt.ge
   have hB : ∀ k, B k = cu (b k) := fun k => Basis.mk_apply _ _ _
-  let f : (Fin n → LL) →ₛₗ[σ] W :=
-    { toFun := fun w => ∑ k, σ (B.repr w k) • R (b k)
-      map_add' := by
-        intro x y
-        simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := by
-        intro c x
-        simp [Finset.smul_sum, mul_smul] }
+  let f : (Fin n → LL) →ₛₗ[σ] W := {
+    toFun := fun w => ∑ k, σ (B.repr w k) • R (b k)
+    map_add' := by
+      intro x y
+      simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := by
+      intro c x
+      simp [Finset.smul_sum, mul_smul]
+  }
   have hfB : ∀ k, f (B k) = R (b k) := by
     intro k
     change ∑ j, σ (B.repr (B k) j) • R (b j) = _
@@ -43,8 +56,7 @@ theorem exists_semilinear_extension_rep :
     rintro _ ⟨F, rfl⟩
     rw [← hcu]
     change ∑ j, σ (B.repr (cu F) j) • R (b j) ∈ _
-    exact Submodule.sum_mem _ fun j _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
+    exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
   let C : Basis (Fin m) ℂ W := Basis.mk hR hsp
   have hC : ∀ k, C k = f (B k) := fun k => by rw [hfB]; exact Basis.mk_apply _ _ _
   let r : G → W →ₗ[ℂ] W := fun g => C.constr ℂ fun k => f (ρL g (B k))
@@ -57,14 +69,13 @@ theorem exists_semilinear_extension_rep :
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smulₛₗ f, map_smul, map_smul, map_smulₛₗ f, ← hC]
     simp [r]
-  let ρ : Representation ℂ G W :=
-    { toFun := r
-      map_one' := C.ext fun k => by rw [hC, hr]; simp
-      map_mul' := fun g h => C.ext fun k => by
-        rw [hC, Module.End.mul_apply, hr, hr, hr, map_mul]; rfl }
+  let ρ : Representation ℂ G W := {
+    toFun := r
+    map_one' := C.ext fun k => by rw [hC, hr]; simp
+    map_mul' := fun g h => C.ext fun k => by rw [hC, Module.End.mul_apply, hr, hr, hr, map_mul]; rfl
+  }
   refine ⟨f, ρ, hcu, hr, ?_, ?_⟩
-  · have hmn : m = n := by
-      simpa using (Module.finrank_eq_card_basis B).symm
+  · have hmn : m = n := by simpa using (Module.finrank_eq_card_basis B).symm
     apply linearIndependent_of_top_le_span_of_card_eq_finrank
     · refine hsp.trans ?_
       rw [Submodule.span_le]

@@ -10,7 +10,8 @@ noncomputable section
 
 namespace MassDataLevelSSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Measures Formalism.L2.SG.AdBridge
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Measures
+  Formalism.L2.SG.AdBridge
 open Formalism.MainNotions.S (AutInst)
 
 theorem finProjOpen_holds : FinProjOpen := by

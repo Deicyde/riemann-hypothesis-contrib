@@ -6,4 +6,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CubeFormalIdenti
 
 @[expose] public section
 
-theorem cube_relation_of_parallelogram : PI.FglGram.CubeRelationOfParallelogram := PI.UnitaryGroupMassFormula.CubeRelationOfParallelogram.cubeRelationOfParallelogram
+theorem cube_relation_of_parallelogram : PI.FglGram.CubeRelationOfParallelogram :=
+  PI.UnitaryGroupMassFormula.CubeRelationOfParallelogram.cubeRelationOfParallelogram

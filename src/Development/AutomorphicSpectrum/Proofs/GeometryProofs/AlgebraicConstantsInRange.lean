@@ -10,11 +10,15 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagConst
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
-theorem exists_C_eq_of_isAlgebraic {k I : Type} [Field k] (P : MvPolynomial I k) (h : IsAlgebraic k P) :
-    ∃ p : k, MvPolynomial.C p = P := by
+theorem exists_C_eq_of_isAlgebraic
+    {k I : Type} [Field k] (P : MvPolynomial I k) (h : IsAlgebraic k P)
+    : ∃ p : k, MvPolynomial.C p = P := by
   by_cases h0 : P = 0
   · exact ⟨0, by simp [h0]⟩
   obtain ⟨r, hr, hd⟩ := h.exists_nonzero_dvd (mem_nonZeroDivisors_of_ne_zero h0)
@@ -22,9 +26,11 @@ theorem exists_C_eq_of_isAlgebraic {k I : Type} [Field k] (P : MvPolynomial I k)
   obtain ⟨p, -, hp⟩ := MvPolynomial.isUnit_iff_eq_C_of_isReduced.1 hu
   exact ⟨p, hp.symm⟩
 
-theorem mem_range_of_isAlgebraic {k L I : Type} [Field k] [Field L] [Algebra k L] (x : I → L)
-    (hx : AlgebraicIndependent k x) (ht : IntermediateField.adjoin k (Set.range x) = ⊤) (a : L)
-    (ha : IsAlgebraic k a) : a ∈ (algebraMap k L).range := by
+theorem mem_range_of_isAlgebraic
+    {k L I : Type} [Field k] [Field L] [Algebra k L]
+    (x : I → L) (hx : AlgebraicIndependent k x) (ht : IntermediateField.adjoin k (Set.range x) = ⊤)
+    (a : L) (ha : IsAlgebraic k a)
+    : a ∈ (algebraMap k L).range := by
   let g : MvPolynomial I k →ₐ[k] L := MvPolynomial.aeval x
   have hg : Function.Injective g := hx
   letI : Algebra (MvPolynomial I k) L := g.toRingHom.toAlgebra
@@ -46,13 +52,16 @@ theorem mem_range_of_isAlgebraic {k L I : Type} [Field k] [Field L] [Algebra k L
   rw [← hP, hmap]
   exact (g.commutes p).symm
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l}
 
-theorem exists_cst₀ {Y : Model Xo c (algebraMap (𝓞 c.F) c.F)} {S : Finset ℕ} {Ω : Type} [Field Ω] {K : Type} [Fintype K]
-    {J : K → Type} {y : (Σ k, J k) → Ω} (𝔐 : HodgeCpt Y S y) :
-    ∃ cst₀ : c.F →+* 𝔐.Ω₀, 𝔐.fn.comp cst₀ = 𝔐.cst ∧
-      𝔐.ξ₀ ≫ Y.s = spMap (cst₀.comp (algebraMap (𝓞 c.F) c.F)) := by
+theorem exists_cst₀
+    {Y : Model Xo c (algebraMap (𝓞 c.F) c.F)} {S : Finset ℕ} {Ω : Type} [Field Ω]
+    {K : Type} [Fintype K]
+    {J : K → Type} {y : (Σ k, J k) → Ω} (𝔐 : HodgeCpt Y S y)
+    : ∃ cst₀ : c.F →+* 𝔐.Ω₀,
+      𝔐.fn.comp cst₀ = 𝔐.cst ∧ 𝔐.ξ₀ ≫ Y.s = spMap (cst₀.comp (algebraMap (𝓞 c.F) c.F)) := by
   haveI : FiniteDimensional ℚ c.F := c.fin
   haveI : NumberField c.F := {}
   let b₀ : 𝓞 c.F →+* 𝔐.Ω₀ := (Spec.preimage (𝔐.ξ₀ ≫ Y.s)).hom
@@ -60,8 +69,7 @@ theorem exists_cst₀ {Y : Model Xo c (algebraMap (𝓞 c.F) c.F)} {S : Finset �
   have hc : 𝔐.fn.comp b₀ = 𝔐.cst.comp (algebraMap (𝓞 c.F) c.F) := by
     have hsp : spMap (𝔐.fn.comp b₀) = spMap (𝔐.cst.comp (algebraMap (𝓞 c.F) c.F)) := by
       have hd : 𝔐.ξ ≫ 𝔐.f = spMap 𝔐.fn ≫ 𝔐.ξ₀ := 𝔐.fn_over
-      have hm : spMap (𝔐.fn.comp b₀) = spMap 𝔐.fn ≫ spMap b₀ := by
-        rw [← Spec.map_comp]; rfl
+      have hm : spMap (𝔐.fn.comp b₀) = spMap 𝔐.fn ≫ spMap b₀ := by rw [← Spec.map_comp]; rfl
       rw [hm, ← hb, ← 𝔐.cst_over, ← Category.assoc, ← Category.assoc, hd]
     have := CommRingCat.hom_ext_iff.1 (Spec.map_injective hsp)
     simpa using this
@@ -79,17 +87,25 @@ theorem exists_cst₀ {Y : Model Xo c (algebraMap (𝓞 c.F) c.F)} {S : Finset �
   refine IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 c.F)) ?_
   rw [RingHom.comp_assoc, hl, hc]
 
-theorem isAlgebraic_mem_cst_range : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y) (Fl : 𝔐.Flag), SplitComps Y → Fl.deg = 1 → ∀ a : Ω, IsAlgebraic ℤ a → a ∈ 𝔐.cst.range := by
+theorem isAlgebraic_mem_cst_range
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ)
+        (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) (y : (Σ k, J k) → Ω)
+        (𝔐 : HodgeCpt Y S y) (Fl : 𝔐.Flag),
+      SplitComps Y → Fl.deg = 1 → ∀ a : Ω, IsAlgebraic ℤ a → a ∈ 𝔐.cst.range := by
   intro E _ _ _ H D l Xo c Y S Ω _ K _ J y 𝔐 Fl hS hdeg a ha
   obtain ⟨cst₀, h1, h2⟩ := exists_cst₀ 𝔐
   haveI : CharZero Ω := charZero_of_injective_ringHom 𝔐.cst.injective
   letI : Algebra 𝔐.Ω₀ Ω := 𝔐.fn.toAlgebra
   obtain ⟨-, u, -, -, -, -, hdiag, hup, -, hind, -, hfin⟩ := Fl.generic
   rw [hdeg] at hfin
-  let x : (Σ q : CMType H ⊕ CMType H, {lk : Fin (labelRk D q) × Fin (labelRk D q) // lk.2 < lk.1}) → Ω :=
-    fun q => u q.1 q.2.1.1 q.2.1.2
-  let A := IntermediateField.adjoin 𝔐.Ω₀
-    (Set.range fun q : Σ σ, Fin (labelRk D σ) × Fin (labelRk D σ) => u q.1 q.2.1 q.2.2)
+  let x
+      : (Σ q : CMType H ⊕ CMType H, {lk : Fin (labelRk D q) × Fin (labelRk D q) // lk.2 < lk.1})
+        → Ω := fun q =>
+    u q.1 q.2.1.1 q.2.1.2
+  let A :=
+    IntermediateField.adjoin 𝔐.Ω₀
+      (Set.range fun q : Σ σ, Fin (labelRk D σ) × Fin (labelRk D σ) => u q.1 q.2.1 q.2.2)
   have hA : A = ⊤ := by
     have hb := Subalgebra.bot_eq_top_of_finrank_eq_one hfin
     refine eq_top_iff.2 fun z _ => ?_

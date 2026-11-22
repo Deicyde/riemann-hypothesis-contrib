@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowEqO
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
 open scoped Matrix
 open GlobalTheory.UPel.HT
 
@@ -62,16 +64,22 @@ lemma half_unique {La : Type} [AddCommGroup La] (E E' : LinearMap.BilinForm ℤ 
 
 end GlobalTheory.UPel.HT.Build
 
-
 open GlobalTheory.UPel.HT.Build in
-theorem GlobalTheory.UPel.HT.exists_obj_unifAt_of_period : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ) (σ : R →+* ℂ) (ρ : D.O →+* Matrix (Fin D.g) (Fin D.g) ℂ) (D' : PLat D.O D.inv) t Q, 0 < N → N.Coprime p → b.IsType σ ρ → D.Cls N D' t → IsPeriod D' ρ Q → ∃ (o : Obj b N (spMap σ)) (h : _) (hL : _) (e : _), UnifAt (o.fam h hL) σ ρ N D' t Q (𝟙 _) e := by
+theorem GlobalTheory.UPel.HT.exists_obj_unifAt_of_period
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ)
+        (σ : R →+* ℂ) (ρ : D.O →+* Matrix (Fin D.g) (Fin D.g) ℂ) (D' : PLat D.O D.inv) t Q,
+      0 < N → N.Coprime p → b.IsType σ ρ → D.Cls N D' t → IsPeriod D' ρ Q
+        → ∃ (o : Obj b N (spMap σ)) (h : _) (hL : _) (e : _),
+          UnifAt (o.fam h hL) σ ρ N D' t Q (𝟙 _) e := by
   intro p _ D R _ b N σ ρ D' t Q hN hNp htype hcls hper
   obtain ⟨hgen, E₁, hE₁, e₀, he₀p, hperf⟩ := hcls
   obtain ⟨A, _, _, act, P, e, hab, hdim, hP, r₁, r₂, hsy, ham, hexp, hker, hact, hweil⟩ :=
     GlobalTheory.T.exists_abelianVariety_of_halved_periodMap D.O D.inv D.g ρ D' Q E₁ hper hE₁
   have hadd := hexp.1
   have hsurj := hexp.2.1
-  obtain ⟨hlie, hlieR⟩ := GlobalTheory.T.lieCondition_of_complexExp_intertwines_action p D R b N σ ρ A act e hab hdim hexp hact htype
+  obtain ⟨hlie, hlieR⟩ :=
+    GlobalTheory.T.lieCondition_of_complexExp_intertwines_action p D R b N σ ρ A act e hab hdim hexp
+      hact htype
   have hgen' := hgen
   obtain ⟨f, ν, rfl, -, hf⟩ := hgen
   have hfN := hf N hN hNp
@@ -82,63 +90,79 @@ theorem GlobalTheory.UPel.HT.exists_obj_unifAt_of_period : ∀ (p : ℕ) [Fact p
     rw [hper.1, ← Matrix.mulVec_smul, hact]
   have hNz : (N : ℂ) ≠ 0 := by exact_mod_cast hN.ne'
   have hQ1 : ∀ x, e (Q x) = 1 := fun x => (hker _).2 ⟨x, rfl⟩
-  have hgeom := GlobalTheory.T.exists_primeToP_tateSimilitude_complexTorus p D N ρ A act _ D' (f N) Q e eta hN hNp hab (pull_isLB hP _) hgen' hper hadd hsurj hker
-    hact hweil heta
-  let o : Obj b N (spMap σ) :=
-    { A := A
-      ab := hab
-      act := act
-      P := P
-      isLB := hP
-      rig₁ := r₁
-      rig₂ := r₂
-      symm := hsy
-      ample := ham
-      kerP := ⟨e₀, he₀p, GlobalTheory.T.birigidified_bundle_kernel_killed_of_complex_points A D.g hab hdim P hP r₁ r₂ hsy ham e₀ (fun x hx => by
-        obtain ⟨k, hk, hxk⟩ := GlobalTheory.T.exists_pow_eq_one_of_poincareKernel_complex A D.g hab hdim P hP r₁ r₂ hsy ham e D'.La Q D'.EF hexp hper.2.1
-          hper.2.2.2.1 hker hweil x hx
-        obtain ⟨z, rfl⟩ := hsurj x
-        have hk' : (k : ℂ) ≠ 0 := by exact_mod_cast hk.ne'
-        have h1 : e (k • z) = 1 := by rw [exp_nsmul e hadd]; exact hxk
-        obtain ⟨a, ha⟩ := (hker _).1 h1
-        have hz : z = (k : ℂ)⁻¹ • Q a := by
-          rw [ha, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hk', one_smul]
-        obtain ⟨E₁', hE₁', hdiv⟩ := GlobalTheory.T.diag_form_two_smul_and_ker_alt A D.g hab hdim P hP r₁ r₂ hsy ham e D'.La Q D'.EF hexp
-          hper.2.1 hker hweil
-        have hx' : ∃ t : (P.pull (lift (snd A (Over.mk (𝟙 (Sp ℂ))) ≫ e ((k : ℂ)⁻¹ • Q a))
-            (fst A (Over.mk (𝟙 (Sp ℂ))))).left).Gen, t.IsGen := by
-          rw [← hz]; exact hx
-        have hdv : ∀ y, (k : ℤ) ∣ E₁' a y := (hdiv k a hk).2 hx'
-        have hEE : E₁' = E₁ := half_unique _ _ (hE₁'.symm.trans hE₁)
-        rw [hEE] at hdv
-        obtain ⟨x', key⟩ := exists_nsmul_eq_of_dvd D'.EF E₁ hE₁ e₀ a k hdv D'.nondeg hperf
-        have hQ : Q x' = e₀ • ((k : ℂ)⁻¹ • Q a) := by
-          rw [smul_comm, ← map_nsmul, key, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hk',
-            one_smul]
-        show e z ^ e₀ = 1
-        rw [← exp_nsmul e hadd, hz, ← hQ]
-        exact hQ1 x')⟩
-      rosati := fun c => by
-        refine (GlobalTheory.T.rosati_adjoint_iff_biextension_pullbacks_isomorphic A D.g hab hdim P hP r₁ r₂ hsy ham e D'.La Q D'.EF hexp hper.2.1 hker hweil
-          (act.act c) (act.act (D.star c).unop) (AddMonoidHom.mk' (fun x => c • x) (smul_add c))
-          (AddMonoidHom.mk' (fun x => (D.star c).unop • x) (smul_add _)) (act.hom c) (act.hom _)
-          (fun k x _ => hsc c _ x) (fun k x _ => hsc _ _ x)).2 ?_
-        intro x y
-        exact D'.adj c x y
-      lie := hlie
-      lieRank := fun k _ _ x β hx i => hlieR k x β hx i
-      eta := eta
-      eta_add := fun x y => by
-        show e _ = e _ * e _
-        erw [map_add (f N) x y, map_add, smul_add, hadd]
-        rfl
-      eta_lin := fun c x => by
-        obtain ⟨e', he'⟩ := hfN.2.1 c x
-        show e _ = e _ ≫ _
-        erw [he', map_add, smul_add, hadd, hsc, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hNz, one_smul, hQ1, _root_.mul_one]
-      eta_ker := fun x => by
-        show e _ = 1
-        erw [map_nsmul (f N) N x, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hNz, one_smul, hQ1]
-      geom := fun k _ _ x β _ => hgeom k x }
+  have hgeom :=
+    GlobalTheory.T.exists_primeToP_tateSimilitude_complexTorus p D N ρ A act _ D' (f N) Q e eta hN
+      hNp hab (pull_isLB hP _) hgen' hper hadd hsurj hker hact hweil heta
+  let o : Obj b N (spMap σ) := {
+    A := A
+    ab := hab
+    act := act
+    P := P
+    isLB := hP
+    rig₁ := r₁
+    rig₂ := r₂
+    symm := hsy
+    ample := ham
+    kerP := ⟨
+      e₀,
+      he₀p,
+      GlobalTheory.T.birigidified_bundle_kernel_killed_of_complex_points A D.g hab hdim P hP r₁ r₂
+        hsy ham e₀
+        (fun x hx => by
+          obtain ⟨k, hk, hxk⟩ :=
+            GlobalTheory.T.exists_pow_eq_one_of_poincareKernel_complex A D.g hab hdim P hP r₁ r₂ hsy
+              ham e D'.La Q D'.EF hexp hper.2.1 hper.2.2.2.1 hker hweil x hx
+          obtain ⟨z, rfl⟩ := hsurj x
+          have hk' : (k : ℂ) ≠ 0 := by exact_mod_cast hk.ne'
+          have h1 : e (k • z) = 1 := by rw [exp_nsmul e hadd]; exact hxk
+          obtain ⟨a, ha⟩ := (hker _).1 h1
+          have hz : z = (k : ℂ)⁻¹ • Q a := by
+            rw [ha, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hk', one_smul]
+          obtain ⟨E₁', hE₁', hdiv⟩ :=
+            GlobalTheory.T.diag_form_two_smul_and_ker_alt A D.g hab hdim P hP r₁ r₂ hsy ham e D'.La
+              Q D'.EF hexp hper.2.1 hker hweil
+          have hx'
+              : ∃ t : (P.pull (lift (snd A (Over.mk (𝟙 (Sp ℂ))) ≫ e ((k : ℂ)⁻¹ • Q a))
+                  (fst A (Over.mk (𝟙 (Sp ℂ))))).left).Gen,
+                t.IsGen := by
+            rw [← hz]; exact hx
+          have hdv : ∀ y, (k : ℤ) ∣ E₁' a y := (hdiv k a hk).2 hx'
+          have hEE : E₁' = E₁ := half_unique _ _ (hE₁'.symm.trans hE₁)
+          rw [hEE] at hdv
+          obtain ⟨x', key⟩ := exists_nsmul_eq_of_dvd D'.EF E₁ hE₁ e₀ a k hdv D'.nondeg hperf
+          have hQ : Q x' = e₀ • ((k : ℂ)⁻¹ • Q a) := by
+            rw [smul_comm, ← map_nsmul, key, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
+              inv_mul_cancel₀ hk', one_smul]
+          show e z ^ e₀ = 1
+          rw [← exp_nsmul e hadd, hz, ← hQ]
+          exact hQ1 x')
+    ⟩
+    rosati := fun c => by
+      refine (GlobalTheory.T.rosati_adjoint_iff_biextension_pullbacks_isomorphic A D.g hab hdim P hP
+        r₁ r₂ hsy ham e D'.La Q D'.EF hexp hper.2.1 hker hweil (act.act c) (act.act (D.star c).unop)
+        (AddMonoidHom.mk' (fun x => c • x) (smul_add c))
+        (AddMonoidHom.mk' (fun x => (D.star c).unop • x) (smul_add _)) (act.hom c) (act.hom _)
+        (fun k x _ => hsc c _ x)
+        (fun k x _ => hsc _ _ x)).2 ?_
+      intro x y
+      exact D'.adj c x y
+    lie := hlie
+    lieRank := fun k _ _ x β hx i => hlieR k x β hx i
+    eta := eta
+    eta_add := fun x y => by
+      show e _ = e _ * e _
+      erw [map_add (f N) x y, map_add, smul_add, hadd]
+      rfl
+    eta_lin := fun c x => by
+      obtain ⟨e', he'⟩ := hfN.2.1 c x
+      show e _ = e _ ≫ _
+      erw [he', map_add, smul_add, hadd, hsc, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
+        inv_mul_cancel₀ hNz, one_smul, hQ1, _root_.mul_one]
+    eta_ker := fun x => by
+      show e _ = 1
+      erw [map_nsmul (f N) N x, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
+        inv_mul_cancel₀ hNz, one_smul, hQ1]
+    geom := fun k _ _ x β _ => hgeom k x
+  }
   refine ⟨o, hdim, pull_isLB hP _, e, ?_⟩
   refine ⟨Category.id_comp _, hper, hexp, hker, hact, hweil, heta⟩

@@ -38,39 +38,48 @@ def unipReal (t : ℝ) : GL (Fin 2) ℝ := unipGL (n := 2) (r := 1) fun _ => t
 
 def unipFin (y : 𝔸ᶠ[ℚ]) : FiniteAdelicGL ℚ 2 := unipGL (n := 2) (r := 1) fun _ => y
 
-theorem unipMatrix_apply {R : Type*} [CommRing R] (x : R) (a b : Fin 2) :
-    unipMatrix (n := 2) (r := 1) (fun _ => x) a b = if a = 0 ∧ b = 1 then x else if a = b then 1 else 0 := by
+theorem unipMatrix_apply {R : Type*} [CommRing R] (x : R) (a b : Fin 2)
+    : unipMatrix (n := 2) (r := 1) (fun _ => x) a b
+      = if a = 0 ∧ b = 1 then
+          x
+        else if a = b then
+          1
+        else
+          0 := by
   fin_cases a <;> fin_cases b <;> simp [unipMatrix, blockEntry_apply]
 
 theorem unipAdele_add (x y : 𝔸[ℚ]) : unipAdele (x + y) = unipAdele x * unipAdele y :=
   unipGL_add (n := 2) (r := 1) (fun _ => x) (fun _ => y)
 
-theorem unipAdele_algebraMap (q : ℚ) :
-    unipAdele (algebraMap ℚ 𝔸[ℚ] q) = diagonal ℚ 2 (unipGL (n := 2) (r := 1) fun _ => q) :=
+theorem unipAdele_algebraMap (q : ℚ)
+    : unipAdele (algebraMap ℚ 𝔸[ℚ] q) = diagonal ℚ 2 (unipGL (n := 2) (r := 1) fun _ => q) :=
   (diagonal_unipGL (K := ℚ) (n := 2) (r := 1) fun _ => q).symm
 
-theorem realEquiv_algebraMap (q : ℚ) :
-    RationalIdeles.realEquiv (algebraMap ℚ (InfiniteAdeleRing ℚ) q) = q :=
-  RingHom.congr_fun (RingHom.ext_rat (RationalIdeles.realEquiv.toRingHom.comp
-    (algebraMap ℚ (InfiniteAdeleRing ℚ))) (Rat.castHom ℝ)) q
+theorem realEquiv_algebraMap (q : ℚ)
+    : RationalIdeles.realEquiv (algebraMap ℚ (InfiniteAdeleRing ℚ) q) = q :=
+  RingHom.congr_fun
+    (RingHom.ext_rat (RationalIdeles.realEquiv.toRingHom.comp (algebraMap ℚ (InfiniteAdeleRing ℚ)))
+      (Rat.castHom ℝ))
+    q
 
-theorem unipAdele_eq (x : 𝔸[ℚ]) :
-    unipAdele x = realEmb (unipReal (RationalIdeles.realEquiv x.1)) * finEmb ℚ 2 (unipFin x.2) := by
+theorem unipAdele_eq (x : 𝔸[ℚ])
+    : unipAdele x
+      = realEmb (unipReal (RationalIdeles.realEquiv x.1)) * finEmb ℚ 2 (unipFin x.2) := by
   apply (prodEquiv ℚ 2).injective
   rw [map_mul, prodEquiv_realEmb, prodEquiv_finEmb, Prod.mk_mul_mk, mul_one, one_mul]
   refine Prod.ext (Units.ext (Matrix.ext fun a b => ?_)) (Units.ext (Matrix.ext fun a b => ?_))
   · rw [prodEquiv_apply_fst]
-    change (unipMatrix (n := 2) (r := 1) (fun _ => x) a b).1 =
-      RationalIdeles.realEquiv.symm (unipMatrix (n := 2) (r := 1)
-        (fun _ => RationalIdeles.realEquiv x.1) a b)
+    change (unipMatrix (n := 2) (r := 1) (fun _ => x) a b).1
+      = RationalIdeles.realEquiv.symm
+        (unipMatrix (n := 2) (r := 1) (fun _ => RationalIdeles.realEquiv x.1) a b)
     rw [unipMatrix_apply, unipMatrix_apply]
     split_ifs
     · exact (RationalIdeles.realEquiv.symm_apply_apply _).symm
     · exact (map_one RationalIdeles.realEquiv.symm).symm
     · exact (map_zero RationalIdeles.realEquiv.symm).symm
   · rw [prodEquiv_apply_snd]
-    change (unipMatrix (n := 2) (r := 1) (fun _ => x) a b).2 =
-      unipMatrix (n := 2) (r := 1) (fun _ => x.2) a b
+    change (unipMatrix (n := 2) (r := 1) (fun _ => x) a b).2
+      = unipMatrix (n := 2) (r := 1) (fun _ => x.2) a b
     rw [unipMatrix_apply, unipMatrix_apply]
     split_ifs <;> rfl
 
@@ -84,18 +93,18 @@ def realHomeomorph : InfiniteAdeleRing ℚ ≃ₜ ℝ where
 
 variable (N : ℕ) [NeZero N]
 
-def levelDomain : Set 𝔸[ℚ] :=
-  (RationalIdeles.realEquiv ⁻¹' Set.Ico (0 : ℝ) N) ×ˢ levelIdeal N
+def levelDomain : Set 𝔸[ℚ] := (RationalIdeles.realEquiv ⁻¹' Set.Ico (0 : ℝ) N) ×ˢ levelIdeal N
 
 theorem measurableSet_levelIdeal : MeasurableSet (levelIdeal N) :=
   (isOpen_levelIdeal N).measurableSet
 
 theorem measurableSet_levelDomain : MeasurableSet (levelDomain N) :=
-  (measurableSet_Ico.preimage realHomeomorph.continuous.measurable).prod (measurableSet_levelIdeal N)
+  (measurableSet_Ico.preimage realHomeomorph.continuous.measurable).prod
+    (measurableSet_levelIdeal N)
 
 variable {N} in
-theorem sub_mem_levelIdeal {x y : 𝔸ᶠ[ℚ]} (hx : x ∈ levelIdeal N) (hy : y ∈ levelIdeal N) :
-    x - y ∈ levelIdeal N := by
+theorem sub_mem_levelIdeal {x y : 𝔸ᶠ[ℚ]} (hx : x ∈ levelIdeal N) (hy : y ∈ levelIdeal N)
+    : x - y ∈ levelIdeal N := by
   obtain ⟨s, hs, rfl⟩ := hx
   obtain ⟨t, ht, rfl⟩ := hy
   exact ⟨s - t, sub_mem hs ht, by rw [mul_sub]⟩
@@ -107,8 +116,9 @@ theorem levelIdeal_subset : levelIdeal N ⊆ (integralFiniteAdeles (𝓞 ℚ) �
   rintro _ ⟨t, ht, rfl⟩
   exact mul_mem (natCast_mem _ N) ht
 
-theorem isAddFundamentalDomain_levelDomain :
-    IsAddFundamentalDomain (AdeleRing.principalSubgroup (𝓞 ℚ) ℚ) (levelDomain N) (adeleMeasure ℚ) := by
+theorem isAddFundamentalDomain_levelDomain
+    : IsAddFundamentalDomain (AdeleRing.principalSubgroup (𝓞 ℚ) ℚ) (levelDomain N)
+      (adeleMeasure ℚ) := by
   refine IsAddFundamentalDomain.mk' (measurableSet_levelDomain N).nullMeasurableSet fun a => ?_
   have hN : (0 : ℝ) < N := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne N)
 
@@ -124,8 +134,10 @@ theorem isAddFundamentalDomain_levelDomain :
   set r : ℝ := RationalIdeles.realEquiv a.1 + q₀
   set m : ℤ := ⌊r / N⌋
   set q : ℚ := q₀ - N * m
-  have hreal : ∀ q' : ℚ, ((algebraMap ℚ 𝔸[ℚ] q' + a : 𝔸[ℚ]).1) =
-      algebraMap ℚ (InfiniteAdeleRing ℚ) q' + a.1 := fun _ => rfl
+  have hreal
+      : ∀ q' : ℚ,
+        ((algebraMap ℚ 𝔸[ℚ] q' + a : 𝔸[ℚ]).1) = algebraMap ℚ (InfiniteAdeleRing ℚ) q' + a.1 :=
+    fun _ => rfl
   have hfin : ∀ q' : ℚ, ((algebraMap ℚ 𝔸[ℚ] q' + a : 𝔸[ℚ]).2) = algebraMap ℚ 𝔸ᶠ[ℚ] q' + a.2 :=
     fun _ => rfl
   refine ⟨⟨algebraMap ℚ 𝔸[ℚ] q, q, rfl⟩, ⟨?_, ?_⟩, ?_⟩
@@ -139,13 +151,15 @@ theorem isAddFundamentalDomain_levelDomain :
     constructor <;> nlinarith
   · change (algebraMap ℚ 𝔸[ℚ] q + a : 𝔸[ℚ]).2 ∈ levelIdeal N
     rw [hfin]
-    have : algebraMap ℚ 𝔸ᶠ[ℚ] q + a.2 = (a.2 + algebraMap ℚ 𝔸ᶠ[ℚ] q₀) - (N : 𝔸ᶠ[ℚ]) * (m : 𝔸ᶠ[ℚ]) := by
+    have : algebraMap ℚ 𝔸ᶠ[ℚ] q + a.2
+        = (a.2 + algebraMap ℚ 𝔸ᶠ[ℚ] q₀) - (N : 𝔸ᶠ[ℚ]) * (m : 𝔸ᶠ[ℚ]) := by
       simp only [q, map_sub, map_mul, map_natCast, map_intCast]
       ring
     rw [this]
     exact sub_mem_levelIdeal hq₀ (natCast_mul_intCast_mem_levelIdeal N m)
   · rintro ⟨_, q', rfl⟩ ⟨hr', hf'⟩
-    have hr : RationalIdeles.realEquiv ((algebraMap ℚ 𝔸[ℚ] q + a : 𝔸[ℚ]).1) ∈ Set.Ico (0 : ℝ) N := by
+    have hr
+        : RationalIdeles.realEquiv ((algebraMap ℚ 𝔸[ℚ] q + a : 𝔸[ℚ]).1) ∈ Set.Ico (0 : ℝ) N := by
       rw [hreal, map_add (f := _), realEquiv_algebraMap]
       have h1 : (m : ℝ) ≤ r / N := Int.floor_le _
       have h2 : r / N < m + 1 := Int.lt_floor_add_one _
@@ -155,7 +169,8 @@ theorem isAddFundamentalDomain_levelDomain :
       constructor <;> nlinarith
     have hf : (algebraMap ℚ 𝔸[ℚ] q + a : 𝔸[ℚ]).2 ∈ levelIdeal N := by
       rw [hfin]
-      have : algebraMap ℚ 𝔸ᶠ[ℚ] q + a.2 = (a.2 + algebraMap ℚ 𝔸ᶠ[ℚ] q₀) - (N : 𝔸ᶠ[ℚ]) * (m : 𝔸ᶠ[ℚ]) := by
+      have : algebraMap ℚ 𝔸ᶠ[ℚ] q + a.2
+          = (a.2 + algebraMap ℚ 𝔸ᶠ[ℚ] q₀) - (N : 𝔸ᶠ[ℚ]) * (m : 𝔸ᶠ[ℚ]) := by
         simp only [q, map_sub, map_mul, map_natCast, map_intCast]
         ring
       rw [this]
@@ -185,20 +200,19 @@ theorem isAddFundamentalDomain_levelDomain :
       exact hm'
     exact Subtype.ext (by simp only [this])
 
-
-instance isAddHaarMeasure_map_realHomeomorph :
-    ((infiniteAdeleMeasure ℚ).map realHomeomorph).IsAddHaarMeasure :=
+instance isAddHaarMeasure_map_realHomeomorph
+    : ((infiniteAdeleMeasure ℚ).map realHomeomorph).IsAddHaarMeasure :=
   RationalIdeles.realEquiv.toAddEquiv.isAddHaarMeasure_map (infiniteAdeleMeasure ℚ)
     RationalIdeles.continuous_realEquiv RationalIdeles.continuous_realEquiv_symm
 
-theorem map_infiniteAdeleMeasure :
-    (infiniteAdeleMeasure ℚ).map realHomeomorph =
-      Measure.addHaarScalarFactor ((infiniteAdeleMeasure ℚ).map realHomeomorph) volume • volume :=
+theorem map_infiniteAdeleMeasure
+    : (infiniteAdeleMeasure ℚ).map realHomeomorph
+      = Measure.addHaarScalarFactor ((infiniteAdeleMeasure ℚ).map realHomeomorph) volume • volume :=
   Measure.isAddLeftInvariant_eq_smul _ _
 
 def levelConstant : ℝ :=
-  (finiteAdeleMeasure ℚ (levelIdeal N)).toReal *
-    Measure.addHaarScalarFactor ((infiniteAdeleMeasure ℚ).map realHomeomorph) volume
+  (finiteAdeleMeasure ℚ (levelIdeal N)).toReal
+    * Measure.addHaarScalarFactor ((infiniteAdeleMeasure ℚ).map realHomeomorph) volume
 
 variable {N} {k : ℤ}
 

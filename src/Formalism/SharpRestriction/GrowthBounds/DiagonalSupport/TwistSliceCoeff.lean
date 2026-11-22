@@ -46,7 +46,10 @@ theorem offT_eq_zero (m : ι × Fin n →₀ ℕ) (h : ∀ i, i ∉ T → multid
     have h1 := h v.1 hv
     unfold multideg at h1
     have h2 : m (v.1, v.2) ≤ ∑ c : Fin n, m (v.1, c) :=
-      Finset.single_le_sum (f := fun c : Fin n => m (v.1, c)) (fun _ _ => Nat.zero_le _) (Finset.mem_univ v.2)
+      Finset.single_le_sum
+        (f := fun c : Fin n => m (v.1, c))
+        (fun _ _ => Nat.zero_le _)
+        (Finset.mem_univ v.2)
     rw [h1] at h2
     exact Nat.le_zero.1 h2
   · rw [if_neg hv]
@@ -60,8 +63,10 @@ theorem multideg_onT (mo : ι × Fin n →₀ ℕ) (i : ι) (hi : i ∉ T) : mul
 
 end Sl
 
-def sliceT {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (T : Set ι) (F : MvPolynomial (ι × Fin n) R)
-    (M : ι × Fin n →₀ ℕ) : MvPolynomial (ι × Fin n) R :=
+def sliceT
+    {R : Type*} [CommRing R]
+    {ι : Type*} {n : ℕ} (T : Set ι) (F : MvPolynomial (ι × Fin n) R) (M : ι × Fin n →₀ ℕ)
+    : MvPolynomial (ι × Fin n) R :=
   ∑ mo ∈ F.support.filter (fun mo => offT T mo = M), monomial (onT T mo) (F.coeff mo)
 
 section Sl2
@@ -69,8 +74,10 @@ section Sl2
 variable {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (T : Set ι) (F : MvPolynomial (ι × Fin n) R)
 
 theorem slice_sum : F = ∑ M ∈ F.support.image (offT T), sliceT T F M * monomial M 1 := by
-  have h1 : ∀ M ∈ F.support.image (offT T), sliceT T F M * monomial M 1 =
-      ∑ mo ∈ F.support.filter (fun mo => offT T mo = M), monomial mo (F.coeff mo) := by
+  have h1
+      : ∀ M ∈ F.support.image (offT T),
+        sliceT T F M * monomial M 1
+          = ∑ mo ∈ F.support.filter (fun mo => offT T mo = M), monomial mo (F.coeff mo) := by
     intro M _
     rw [sliceT, Finset.sum_mul]
     refine Finset.sum_congr rfl fun mo hmo => ?_
@@ -79,12 +86,13 @@ theorem slice_sum : F = ∑ M ∈ F.support.image (offT T), sliceT T F M * monom
     Finset.sum_fiberwise_of_maps_to (fun mo hmo => Finset.mem_image_of_mem (offT T) hmo)]
   exact F.as_sum
 
-theorem slice_support (M mo' : ι × Fin n →₀ ℕ) (h : mo' ∈ (sliceT T F M).support) :
-    ∃ mo ∈ F.support, offT T mo = M ∧ onT T mo = mo' := by
+theorem slice_support (M mo' : ι × Fin n →₀ ℕ) (h : mo' ∈ (sliceT T F M).support)
+    : ∃ mo ∈ F.support, offT T mo = M ∧ onT T mo = mo' := by
   obtain ⟨mo, hmo, rfl⟩ := mem_support_sum_monomial _ _ _ _ h
   exact ⟨mo, (Finset.mem_filter.1 hmo).1, (Finset.mem_filter.1 hmo).2, rfl⟩
 
-theorem slice_supported (M : ι × Fin n →₀ ℕ) : sliceT T F M ∈ supported R {v : ι × Fin n | v.1 ∈ T} := by
+theorem slice_supported (M : ι × Fin n →₀ ℕ)
+    : sliceT T F M ∈ supported R {v : ι × Fin n | v.1 ∈ T} := by
   refine Subalgebra.sum_mem _ fun mo hmo => ?_
   rw [mem_supported, vars_monomial (mem_support_iff.1 (Finset.mem_filter.1 hmo).1)]
   intro v hv
@@ -92,21 +100,24 @@ theorem slice_supported (M : ι × Fin n →₀ ℕ) : sliceT T F M ∈ supporte
 
 variable (LL : Letters ι) (S : Set ι) (j : Fin n)
 
-theorem twist_slice_off (M m : ι × Fin n →₀ ℕ) (hm : m ∈ (twistSub LL S j (sliceT T F M)).support) :
-    offT T m = 0 := by
+theorem twist_slice_off (M m : ι × Fin n →₀ ℕ) (hm : m ∈ (twistSub LL S j (sliceT T F M)).support)
+    : offT T m = 0 := by
   obtain ⟨u, hu, hmu⟩ := twistSub_support LL S j _ m hm
   obtain ⟨mo, _, _, rfl⟩ := slice_support T F M u hu
   exact offT_eq_zero T m fun i hi => (hmu i).trans (multideg_onT T mo i hi)
 
-theorem twist_slice_coeff (hST : S ⊆ T) (M : ι × Fin n →₀ ℕ) (hM : M ∈ F.support.image (offT T))
-    (m : ι × Fin n →₀ ℕ) (hm : m ∈ (twistSub LL S j (sliceT T F M)).support) :
-    (twistSub LL S j F).coeff (m + M) = (twistSub LL S j (sliceT T F M)).coeff m := by
+theorem twist_slice_coeff
+    (hST : S ⊆ T)
+    (M : ι × Fin n →₀ ℕ) (hM : M ∈ F.support.image (offT T))
+    (m : ι × Fin n →₀ ℕ) (hm : m ∈ (twistSub LL S j (sliceT T F M)).support)
+    : (twistSub LL S j F).coeff (m + M) = (twistSub LL S j (sliceT T F M)).coeff m := by
   have hoff : ∀ M' ∈ F.support.image (offT T), ∀ v ∈ M'.support, v.1 ∉ T := by
     intro M' hM'
     obtain ⟨mo, _, rfl⟩ := Finset.mem_image.1 hM'
     exact offT_support T mo
-  have hsum : twistSub LL S j F =
-      ∑ M' ∈ F.support.image (offT T), twistSub LL S j (sliceT T F M') * monomial M' 1 := by
+  have hsum
+      : twistSub LL S j F
+        = ∑ M' ∈ F.support.image (offT T), twistSub LL S j (sliceT T F M') * monomial M' 1 := by
     conv_lhs => rw [slice_sum T F]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
@@ -124,7 +135,8 @@ theorem twist_slice_coeff (hST : S ⊆ T) (M : ι × Fin n →₀ ℕ) (hM : M �
       have h3 : m + M - M' + M' = m + M := tsub_add_cancel_of_le hle
       have h4 := congrArg (offT T) h3
       rw [offT_add, offT_add, h1, h2, zero_add, zero_add, offT_eq_self T M' (hoff M' hM'),
-        offT_eq_self T M (hoff M hM)] at h4
+          offT_eq_self T M (hoff M hM)]
+        at h4
       exact hne h4
     · rfl
   · intro h
@@ -134,7 +146,15 @@ end Sl2
 
 theorem valSlice : ValSlice := by
   intro R _ _ ι n _ LL T F
-  refine ⟨F.support.image (offT T), sliceT T F, ?_, fun M _ => slice_supported T F M, slice_sum T F, ?_, ?_⟩
+  refine ⟨
+    F.support.image (offT T),
+    sliceT T F,
+    ?_,
+    fun M _ => slice_supported T F M,
+    slice_sum T F,
+    ?_,
+    ?_
+  ⟩
   · intro M hM
     obtain ⟨mo, _, rfl⟩ := Finset.mem_image.1 hM
     exact offT_support T mo

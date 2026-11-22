@@ -5,4 +5,6 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.unrField_holds : UpperTheory.Gal.NearKilling.UnrField := UpperTheory.Gal.UnramifiedFromSplittingCriterion.unrSplit_holds
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.unrField_holds
+    : UpperTheory.Gal.NearKilling.UnrField :=
+  UpperTheory.Gal.UnramifiedFromSplittingCriterion.unrSplit_holds

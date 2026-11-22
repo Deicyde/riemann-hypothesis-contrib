@@ -6,20 +6,23 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGener
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
 
 section
 
-variable {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
+variable
+  {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
 
-private theorem mem_iw {g : GL (Fin n) E} : g ∈ iwahori E (Fin n) ↔
-    ((∀ i j, valuation E (g.val i j) ≤ 1) ∧ ∀ i j, valuation E (g⁻¹.val i j) ≤ 1) ∧
-      ∀ i j, j < i → valuation E (g.val i j) < 1 := by
+private theorem mem_iw {g : GL (Fin n) E}
+    : g ∈ iwahori E (Fin n)
+      ↔ ((∀ i j, valuation E (g.val i j) ≤ 1) ∧ ∀ i j, valuation E (g⁻¹.val i j) ≤ 1)
+        ∧ ∀ i j, j < i → valuation E (g.val i j) < 1 := by
   rw [mem_iwahori, GlobalTheory.SplitFlip.mem_KO_iff]
   rfl
 
-private theorem diag_one {g : GL (Fin n) E} (hg : g ∈ iwahori E (Fin n)) (i : Fin n) :
-    valuation E (g.val i i) = 1 := by
+private theorem diag_one {g : GL (Fin n) E} (hg : g ∈ iwahori E (Fin n)) (i : Fin n)
+    : valuation E (g.val i i) = 1 := by
   obtain ⟨⟨h1, h2⟩, h3⟩ := mem_iw.1 hg
   have h4 := (mem_iw.1 (inv_mem hg)).2
   refine le_antisymm (h1 i i) (not_lt.1 fun h => ?_)
@@ -35,18 +38,25 @@ private theorem diag_one {g : GL (Fin n) E} (hg : g ∈ iwahori E (Fin n)) (i : 
   rw [g.mul_inv] at this
   simp at this
 
-private theorem sg_mem {σ : E ≃+* E} (hσ : Isom σ) {g : GL (Fin n) E} (hg : g ∈ iwahori E (Fin n)) :
-    sg σ g ∈ iwahori E (Fin n) := by
+private theorem sg_mem {σ : E ≃+* E} (hσ : Isom σ) {g : GL (Fin n) E} (hg : g ∈ iwahori E (Fin n))
+    : sg σ g ∈ iwahori E (Fin n) := by
   obtain ⟨⟨h1, h2⟩, h3⟩ := mem_iw.1 hg
   rw [mem_iw, ← map_inv]
-  exact ⟨⟨fun i j => (hσ _).le.trans (h1 i j), fun i j => (hσ _).le.trans (h2 i j)⟩,
-    fun i j h => (hσ _).le.trans_lt (h3 i j h)⟩
+  exact ⟨
+    ⟨fun i j => (hσ _).le.trans (h1 i j), fun i j => (hσ _).le.trans (h2 i j)⟩,
+    fun i j h => (hσ _).le.trans_lt (h3 i j h)
+  ⟩
 
 end
 
-theorem UpperTheory.ConvolutionTheory.Loc.contractI :
-    ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (n : ℕ) (σ : E ≃+* E), Isom σ → ∀ t : Fin n → Eˣ, Strict t → ∀ g ∈ iwahoriCoset t,
-      ∃ k ∈ iwahori E (Fin n), ∃ s ∈ torusO E (Fin n), g = k⁻¹ * diagT E (Fin n) (t * s) * sg σ k := by
+theorem UpperTheory.ConvolutionTheory.Loc.contractI
+    : ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
+        (n : ℕ) (σ : E ≃+* E),
+      Isom σ
+        → ∀ t : Fin n → Eˣ,
+          Strict t
+            → ∀ g ∈ iwahoriCoset t, ∃ k ∈ iwahori E (Fin n), ∃ s ∈ torusO E (Fin n),
+              g = k⁻¹ * diagT E (Fin n) (t * s) * sg σ k := by
   rintro E _ _ _ _ n σ hσ t ht g ⟨a, ha, b, hb, rfl⟩
   have hb' : b * sg σ a ∈ iwahori E (Fin n) := mul_mem hb (sg_mem hσ ha)
   obtain ⟨⟨h1, h2⟩, h3⟩ := mem_iw.1 hb'
@@ -59,10 +69,12 @@ theorem UpperTheory.ConvolutionTheory.Loc.contractI :
   have hone (i j : Fin n) : valuation E ((1 : Matrix (Fin n) (Fin n) E) i j) ≤ 1 := by
     rw [Matrix.one_apply]
     split_ifs <;> simp
-  have hconj : ∃ k ∈ ball n (uniformizer E), (∀ i j, valuation E (k⁻¹.val i j) ≤ 1) ∧
-      ∃ s : Fin n → Eˣ,
-        (∀ i, valuation E ((((s i)⁻¹ : Eˣ) : E) - B⁻¹.val i i) ≤ uniformizer E) ∧
-        diagT E (Fin n) t * B = k⁻¹ * diagT E (Fin n) (t * s) * sg σ k := by
+  have hconj
+      : ∃ k ∈ ball n (uniformizer E),
+        (∀ i j, valuation E (k⁻¹.val i j) ≤ 1)
+          ∧ ∃ s : Fin n → Eˣ,
+            (∀ i, valuation E ((((s i)⁻¹ : Eˣ) : E) - B⁻¹.val i i) ≤ uniformizer E)
+              ∧ diagT E (Fin n) t * B = k⁻¹ * diagT E (Fin n) (t * s) * sg σ k := by
     choose x μ hμ hx hxe using exists_row hσ t le_rfl hu ht' B.val B⁻¹.val B.inv_mul
       h1 h2 (diag_one hb') hdiag (fun j l h => le_uniformizer_iff.2 (h3 j l h))
       (fun j l h => by
@@ -81,24 +93,38 @@ theorem UpperTheory.ConvolutionTheory.Loc.contractI :
       change valuation E (x i i) = 1
       rw [← sub_add_cancel (x i i) 1, Valuation.map_add_eq_of_lt_right, map_one]
       simpa only [map_one] using hi
-    have hbound := vecMul_bound M (fun i j => by
-      by_cases h : i = j
-      · exact h ▸ (hd i).le
-      · exact (hoff i j h).le) hd (fun i j h => hoff i j h.ne') n
+    have hbound :=
+      vecMul_bound M
+        (fun i j => by
+          by_cases h : i = j
+          · exact h ▸ (hd i).le
+          · exact (hoff i j h).le)
+        hd
+        (fun i j h => hoff i j h.ne')
+        n
     have hunit : IsUnit M := by
       refine vecMul_injective_iff_isUnit.1 fun u v huv => funext fun l => ?_
       have hzero : (u - v) ᵥ* M = 0 := by
         rw [sub_vecMul, sub_eq_zero]
         exact huv
-      have hl := hbound (u - v) 0 (fun j hj => absurd j.2 (not_lt.2 hj))
-        (fun j _ => le_of_eq ((map_eq_zero _).2 (congrFun hzero j))) l
+      have hl :=
+        hbound (u - v) 0
+          (fun j hj => absurd j.2 (not_lt.2 hj))
+          (fun j _ => le_of_eq ((map_eq_zero _).2 (congrFun hzero j)))
+          l
       simpa [sub_eq_zero] using hl
     obtain ⟨k, hk⟩ := hunit
-    refine ⟨k, fun i j => by rw [hk]; exact hx i j, ?_, fun i => (Units.mk0 _ (hμ0 i))⁻¹,
-      fun i => by simpa using hμ i, ?_⟩
+    refine ⟨
+      k,
+      fun i j => by rw [hk]; exact hx i j,
+      ?_,
+      fun i => (Units.mk0 _ (hμ0 i))⁻¹,
+      fun i => by simpa using hμ i,
+      ?_
+    ⟩
     · intro i j
-      refine hbound (fun l => k⁻¹.val i l) 1 (fun l hl => absurd l.2 (not_lt.2 hl))
-        (fun j _ => ?_) j
+      refine
+        hbound (fun l => k⁻¹.val i l) 1 (fun l hl => absurd l.2 (not_lt.2 hl)) (fun j _ => ?_) j
       rw [← hk]
       change valuation E ((k⁻¹.val * k.val) i j) ≤ 1
       rw [k.inv_mul]
@@ -116,13 +142,17 @@ theorem UpperTheory.ConvolutionTheory.Loc.contractI :
       rfl
   obtain ⟨k, hk, hk', s, hs, e⟩ := hconj
   have hkI : k ∈ iwahori E (Fin n) := by
-    refine mem_iw.2 ⟨⟨fun i j => ?_, hk'⟩, fun i j h => by simpa [one_apply_ne h.ne'] using (hk i j).trans_lt hu⟩
+    refine mem_iw.2
+      ⟨⟨fun i j => ?_, hk'⟩, fun i j h => by simpa [one_apply_ne h.ne'] using (hk i j).trans_lt hu⟩
     rw [← sub_add_cancel (k.val i j) ((1 : Matrix (Fin n) (Fin n) E) i j)]
     exact Valuation.map_add_le _ ((hk i j).trans hu.le) (hone i j)
   refine ⟨k * a⁻¹, mul_mem hkI (inv_mem ha), s, inv_mem_iff.1 fun i => ?_, ?_⟩
   · have hd := diag_one (inv_mem hb') i
     show valuation E (((s i)⁻¹ : Eˣ) : E) = 1
-    rw [← sub_add_cancel (((s i)⁻¹ : Eˣ) : E) ((b * sg σ a)⁻¹.val i i), Valuation.map_add_eq_of_lt_right, hd]
+    rw [← sub_add_cancel (((s i)⁻¹ : Eˣ) : E) ((b * sg σ a)⁻¹.val i i),
+      Valuation.map_add_eq_of_lt_right, hd]
     exact hd ▸ (hs i).trans_lt hu
-  · calc a * diagT E (Fin n) t * b = a * (diagT E (Fin n) t * (b * sg σ a)) * (sg σ a)⁻¹ := by group
+  · calc
+      a * diagT E (Fin n) t * b
+        = a * (diagT E (Fin n) t * (b * sg σ a)) * (sg σ a)⁻¹ := by group
       _ = _ := by rw [e, map_mul (sg σ), map_inv]; group

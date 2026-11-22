@@ -12,8 +12,9 @@ open Polynomial
 
 namespace GlobalTheory.MonicRootRange
 
-theorem isAlgClosed_fractionRing (T : Type) [CommRing T] [IsDomain T]
-    (h : GlobalTheory.LocAcyc.AbsIntClosed T) : IsAlgClosed (FractionRing T) := by
+theorem isAlgClosed_fractionRing
+    (T : Type) [CommRing T] [IsDomain T] (h : GlobalTheory.LocAcyc.AbsIntClosed T)
+    : IsAlgClosed (FractionRing T) := by
   refine IsAlgClosed.of_exists_root _ fun p hmon hirr => ?_
   obtain ⟨b, hb, hq⟩ := IsLocalization.integerNormalization_spec (nonZeroDivisors T) p
   set q := IsLocalization.integerNormalization (nonZeroDivisors T) p
@@ -28,8 +29,9 @@ theorem isAlgClosed_fractionRing (T : Type) [CommRing T] [IsDomain T]
     rwa [natDegree_map_eq_of_injective hinj, hsmul, natDegree_C_mul hb0] at this
   have hq0 : q ≠ 0 := fun h0 => by rw [h0, natDegree_zero] at hdeg; omega
   have hc0 : f q.leadingCoeff ≠ 0 := (map_ne_zero_iff f hinj).mpr (leadingCoeff_ne_zero.mpr hq0)
-  obtain ⟨w, hw⟩ := h q.integralNormalization (monic_integralNormalization hq0)
-    (by rw [natDegree_integralNormalization]; omega)
+  obtain ⟨w, hw⟩ :=
+    h q.integralNormalization (monic_integralNormalization hq0)
+      (by rw [natDegree_integralNormalization]; omega)
   refine ⟨f w / f q.leadingCoeff, ?_⟩
   have key := integralNormalization_eval₂_leadingCoeff_mul (hdeg ▸ hn) f (f w / f q.leadingCoeff)
   rw [mul_div_cancel₀ _ hc0, eval₂_at_apply, hw, map_zero] at key

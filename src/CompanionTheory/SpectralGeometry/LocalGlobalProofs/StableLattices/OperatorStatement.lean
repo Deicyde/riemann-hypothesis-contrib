@@ -5,14 +5,16 @@ public import CompanionTheory.RealGroups.UnitaryAdmissibility.ArchimedeanUnitary
 
 @[expose] public section
 
-open CompanionTheory.Rg.Fl GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace GlobalTheory.AutMult
+open CompanionTheory.Rg.Fl GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace
+  GlobalTheory.AutMult
 open scoped InnerProductSpace
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.RgFl
 
-variable {G X H : Type} [Group G] [TopologicalSpace G] [NormedAddCommGroup X] [InnerProductSpace ℂ X]
+variable
+  {G X H : Type} [Group G] [TopologicalSpace G] [NormedAddCommGroup X] [InnerProductSpace ℂ X]
   [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {δ : G →* (X →L[ℂ] X)} {ρ : G →* (H →L[ℂ] H)}
 
@@ -21,20 +23,22 @@ def evalHom (δ : G →* (X →L[ℂ] X)) (ρ : G →* (H →L[ℂ] H)) (u : X) 
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem norm_evalHom (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) {u : X} (hu : ‖u‖ = 1) (y : X)
-    (T : homIn δ ρ ⊤) : ‖evalHom δ ρ y T‖ = ‖y‖ * ‖evalHom δ ρ u T‖ := by
+theorem norm_evalHom
+    (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) {u : X} (hu : ‖u‖ = 1) (y : X) (T : homIn δ ρ ⊤)
+    : ‖evalHom δ ρ y T‖ = ‖y‖ * ‖evalHom δ ρ u T‖ := by
   change ‖T.1 y‖ = ‖y‖ * ‖T.1 u‖
   rw [norm_apply_eq hδ hρ T.2 y, norm_apply_eq hδ hρ T.2 u, hu, mul_one, mul_comm]
 
-theorem evalHom_injective (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) {u : X} (hu : ‖u‖ = 1) :
-    Function.Injective (evalHom δ ρ u) := by
-  refine (injective_iff_map_eq_zero _).2 fun T hT => Subtype.ext (ContinuousLinearMap.ext fun x => ?_)
+theorem evalHom_injective (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) {u : X} (hu : ‖u‖ = 1)
+    : Function.Injective (evalHom δ ρ u) := by
+  refine (injective_iff_map_eq_zero _).2 fun T hT =>
+    Subtype.ext (ContinuousLinearMap.ext fun x => ?_)
   have h := norm_evalHom hδ hρ hu x T
   rw [hT, norm_zero, mul_zero] at h
   exact norm_eq_zero.1 h
 
-theorem exists_op_unit (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) (y : X) {u : X} (hu : ‖u‖ = 1) :
-    ∃ A : H →L[ℂ] H, ∀ T ∈ homIn δ ρ ⊤, ∀ x, A (T x) = ⟪u, x⟫_ℂ • T y := by
+theorem exists_op_unit (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) (y : X) {u : X} (hu : ‖u‖ = 1)
+    : ∃ A : H →L[ℂ] H, ∀ T ∈ homIn δ ρ ⊤, ∀ x, A (T x) = ⟪u, x⟫_ℂ • T y := by
   have hinj := evalHom_injective hδ hρ hu
   let S : Submodule ℂ H := LinearMap.range (evalHom δ ρ u)
   let e := LinearEquiv.ofInjective (evalHom δ ρ u) hinj
@@ -73,17 +77,18 @@ theorem exists_op_unit (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) (y : X) {
   change B (K.orthogonalProjection (T x)) = _
   rw [hproj, map_smul, hB, hLe ⟨T, hT⟩]
 
-theorem exists_op (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) (y ξ : X) :
-    ∃ A : H →L[ℂ] H, ∀ T ∈ homIn δ ρ ⊤, ∀ x, A (T x) = ⟪ξ, x⟫_ℂ • T y := by
+theorem exists_op (hδ : IsIrrUnitary δ) (hρ : IsUnitaryRep ρ) (y ξ : X)
+    : ∃ A : H →L[ℂ] H, ∀ T ∈ homIn δ ρ ⊤, ∀ x, A (T x) = ⟪ξ, x⟫_ℂ • T y := by
   by_cases h0 : ξ = 0
   · exact ⟨0, fun T _ x => by simp [h0]⟩
   have hn : ‖ξ‖ ≠ 0 := norm_ne_zero_iff.2 h0
   have hn' : (‖ξ‖ : ℂ) ≠ 0 := by exact_mod_cast hn
-  obtain ⟨A, hA⟩ := exists_op_unit hδ hρ y (u := (‖ξ‖ : ℂ)⁻¹ • ξ) (by
-    rw [norm_smul, norm_inv, Complex.norm_real, norm_norm, inv_mul_cancel₀ hn])
+  obtain ⟨A, hA⟩ :=
+    exists_op_unit hδ hρ y (u := (‖ξ‖ : ℂ)⁻¹ • ξ)
+      (by rw [norm_smul, norm_inv, Complex.norm_real, norm_norm, inv_mul_cancel₀ hn])
   refine ⟨(‖ξ‖ : ℂ) • A, fun T hT x => ?_⟩
-  rw [ContinuousLinearMap.smul_apply, hA T hT, inner_smul_left, smul_smul, map_inv₀, Complex.conj_ofReal,
-    ← mul_assoc, mul_inv_cancel₀ hn', one_mul]
+  rw [ContinuousLinearMap.smul_apply, hA T hT, inner_smul_left, smul_smul, map_inv₀,
+    Complex.conj_ofReal, ← mul_assoc, mul_inv_cancel₀ hn', one_mul]
 
 theorem stOp : StOp := by
   intro G X H _ _ _ _ _ _ _ δ ρ hδ hρ _

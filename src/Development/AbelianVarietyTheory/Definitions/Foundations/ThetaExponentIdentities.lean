@@ -16,7 +16,8 @@ noncomputable section
 
 namespace GlobalTheory.SlopeRec
 
-open NumberField Finset Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Indef.Tree GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants
+open NumberField Finset Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Indef.Tree
+  GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants
 
 def zetaLogDeriv {n : ℕ} [NeZero n] (χ : DirichletCharacter ℂ n) : ℝ :=
   (logDeriv (fun s => riemannZeta s * DirichletCharacter.LFunction χ s) 0).re
@@ -56,14 +57,11 @@ def pageOf : SlopeBoundParameters where
 
 section Weights
 
-
 variable (D) in
 def uMinus (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ := uAn D j τ i - (cTw D j : ℤ) * deW D j i
 
-
 variable (D) in
 def kapMinus (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ := kap D j τ i - (cTw D j : ℤ) * deW D j i
-
 
 variable (D) in
 def twW (j : ℕ) (_ : D.what₂.Tau) (i : ℕ) : ℤ := (cTw D j : ℤ) * deW D j i
@@ -73,7 +71,8 @@ def remW (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ :=
 
 def uTwo (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ := uOne Q j τ i + remW Q j τ i
 
-def uCan (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ := canW D j i + uTwo Q j τ i + (placeRankTwoOne.dimY D : ℤ) * uOne Q j τ i
+def uCan (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ :=
+  canW D j i + uTwo Q j τ i + (placeRankTwoOne.dimY D : ℤ) * uOne Q j τ i
 
 def uTop (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ := uCan Q j τ i + (tN Q : ℤ) * uOne Q j τ i
 
@@ -85,18 +84,20 @@ def nOneW (j : ℕ) : ℝ := ∑ τ, nrm D (uOne Q j τ)
 
 def nPrW (j : ℕ) : ℝ := ∑ τ, nrm D (uPr Q j τ)
 
-def supPrW (j : ℕ) : ℕ := univ.sup fun τ : D.what₂.Tau => (range D.R.r).sup fun i => (uPr Q j τ i).natAbs
+def supPrW (j : ℕ) : ℕ :=
+  univ.sup fun τ : D.what₂.Tau => (range D.R.r).sup fun i => (uPr Q j τ i).natAbs
 
-def bZero (j : ℕ) : ℝ := 4 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * (1 + (supPrW Q j : ℝ) / (LevelStarExponents.h0 L / (4 * tR Q)))
-
+def bZero (j : ℕ) : ℝ :=
+  4 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2
+    * (1 + (supPrW Q j : ℝ) / (LevelStarExponents.h0 L / (4 * tR Q)))
 
 variable (D L) in
 def badPrimes (B : ℝ) : Finset ℕ :=
   (range (⌊B⌋₊ + 1)).filter Nat.Prime ∪ (2 * (discr D.host.E).natAbs * levDeep D L).primeFactors
 
-
 variable (D) in
-def diff_vp (p : ℕ) : ℝ := (padicValNat p (discr D.host.E).natAbs : ℝ) / (Module.finrank ℚ D.host.E : ℝ)
+def diff_vp (p : ℕ) : ℝ :=
+  (padicValNat p (discr D.host.E).natAbs : ℝ) / (Module.finrank ℚ D.host.E : ℝ)
 
 def aSum (j : ℕ) : ℝ :=
   ∑ p ∈ badPrimes D L (bZero Q j), (1 / ((p : ℝ) - 1) + 40 * diff_vp D p) * (nPrW Q j + (numAt Q j).Pa) * Real.log p
@@ -108,20 +109,19 @@ def cA (j : ℕ) : ℝ := 26 * (26 * dY D ^ 2 + 2 * zed Q j * tR Q)
 def lZero (j : ℕ) : ℝ := (numAt Q j).PPp * (nKap D j / tR Q + 1) + (numAt Q j).al
 
 def cJ (C2 : ℝ) (j : ℕ) : ℝ :=
-  dY D * (numAt Q j).PPp * (nKap D j / tR Q + 1) + tR Q * ((numAt Q j).QJ + (numAt Q j).PPp) +
-    (dY D + 3) * addY C2 (pageOf Q) / tR Q
+  dY D * (numAt Q j).PPp * (nKap D j / tR Q + 1) + tR Q * ((numAt Q j).QJ + (numAt Q j).PPp)
+    + (dY D + 3) * addY C2 (pageOf Q) / tR Q
 
 def cG (j : ℕ) : ℝ := (dY D + 1) * ((numAt Q j).o + (numAt Q j).B7 + 1) / 2 + 1
 
 def rOne (C2 : ℝ) (j : ℕ) : ℝ :=
-  cJ Q C2 j + 26 * dY D ^ 2 * (lZero Q j + Real.log (tR Q)) + (tR Q + dY D + 1) * (numAt Q j).Bt +
-    (tR Q + dY D ^ 2) * (cG Q j + 2)
+  cJ Q C2 j + 26 * dY D ^ 2 * (lZero Q j + Real.log (tR Q)) + (tR Q + dY D + 1) * (numAt Q j).Bt
+    + (tR Q + dY D ^ 2) * (cG Q j + 2)
 
 def rTwo (j : ℕ) : ℝ :=
   tR Q * (Real.log 2 + lZero Q j + (numAt Q j).Bt / 2) + 2 * ((numAt Q j).PPp * nKap D j)
 
 def lamKap (j : ℕ) : ℝ := (numAt Q j).G * (nKap D j - (D.R.f : ℝ) * D.R.r * D.R.nV / 2 + D.R.nV)
-
 
 variable (D L) in
 def measureMove : ℝ := 61 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * L.sc.L
@@ -135,15 +135,17 @@ open Formalism.L2.Pj hiding kap
 
 variable {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E}
 
-
 open Classical in
-def toWt (Dw : Datum H) (v : D.what₂.Tau → ℕ → ℤ) : Weight Dw :=
-  fun τ i => ∑ t, if τ.1 = DV.tauEmb D t then v t i else 0
+def toWt (Dw : Datum H) (v : D.what₂.Tau → ℕ → ℤ) : Weight Dw := fun τ i =>
+  ∑ t, if τ.1 = DV.tauEmb D t then v t i else 0
 
 variable {Dw : Datum H}
 
-theorem toWt_apply (v : D.what₂.Tau → ℕ → ℤ) {τ : Psi H} {t : D.what₂.Tau} (h : τ.1 = DV.tauEmb D t)
-    (i : Fin (Dw.p + Dw.q)) : toWt Dw v τ i = v t i := by
+theorem toWt_apply
+    (v : D.what₂.Tau → ℕ → ℤ)
+    {τ : Psi H} {t : D.what₂.Tau} (h : τ.1 = DV.tauEmb D t)
+    (i : Fin (Dw.p + Dw.q))
+    : toWt Dw v τ i = v t i := by
   rw [toWt, sum_eq_single t (fun s _ hs => if_neg fun e => hs ?_) (by simp), if_pos h]
   exact GlobalTheory.WeightExponents.tauEmb_injective D (e.symm.trans h)
 
@@ -151,40 +153,51 @@ def psiOf {T : Par D} (h : T.PinHost) (t : D.what₂.Tau) : Psi T.H := ⟨DV.tau
 
 theorem psiOf_bijective {T : Par D} (h : T.Pins) : Function.Bijective (psiOf h.1) := by
   have hj : InR D 1 := ⟨le_rfl, le_trans one_le_two D.R.two_le_m⟩
-  refine ⟨fun s t e => GlobalTheory.WeightExponents.tauEmb_injective D (congrArg Subtype.val e), fun τ => ?_⟩
-  obtain ⟨t, ht⟩ := ((GlobalTheory.WeightExponents.weight_exponents D T h 1 hj
-    (WeightAlgebra.wscalar D 1 0 Even.zero)).2.2.1 τ.1).1 τ.2
+  refine ⟨
+    fun s t e => GlobalTheory.WeightExponents.tauEmb_injective D (congrArg Subtype.val e),
+    fun τ => ?_
+  ⟩
+  obtain ⟨t, ht⟩ :=
+    ((GlobalTheory.WeightExponents.weight_exponents D T h 1 hj
+      (WeightAlgebra.wscalar D 1 0 Even.zero)).2.2.1 τ.1).1 τ.2
   exact ⟨t, Subtype.ext ht.symm⟩
 
-theorem toWt_psiOf {T : Par D} (h : T.PinHost) {Dw : Datum T.H} (v : D.what₂.Tau → ℕ → ℤ) (t : D.what₂.Tau)
-    (i : Fin (Dw.p + Dw.q)) : toWt Dw v (psiOf h t) i = v t i := toWt_apply v rfl i
+theorem toWt_psiOf
+    {T : Par D} (h : T.PinHost)
+    {Dw : Datum T.H}
+    (v : D.what₂.Tau → ℕ → ℤ) (t : D.what₂.Tau) (i : Fin (Dw.p + Dw.q))
+    : toWt Dw v (psiOf h t) i = v t i :=
+  toWt_apply v rfl i
 
 variable {T : Par D} {j : ℕ}
 
-theorem sig_eq (h : T.Pins) (hj : InR D j) :
-    (T.Dw j).p = pp D j ∧ (T.Dw j).q = qq D j ∧ (T.Dw j).p + (T.Dw j).q = D.R.r := by
+theorem sig_eq (h : T.Pins) (hj : InR D j)
+    : (T.Dw j).p = pp D j ∧ (T.Dw j).q = qq D j ∧ (T.Dw j).p + (T.Dw j).q = D.R.r := by
   obtain ⟨h1, h2, -⟩ := h.2.2.2 j hj
   refine ⟨h1, h2, ?_⟩
   have := D.R.m_add_three_le_k
   have := hj.1
   have := hj.2
   rw [h1, h2]
-  simp only [Ranks.sigW, Ranks.r]; omega
+  simp only [Ranks.sigW, Ranks.r]
+  omega
 
 theorem dimFlag_eq (h : T.Pins) (hj : InR D j) : dimFlag (T.Dw j) = placeRankTwoOne.dimY D := by
-  rw [dimFlag, Formalism.DegreeFormula.dimFl, (sig_eq h hj).2.2, ← Fintype.card_of_bijective (psiOf_bijective h), D.what₂.card_Tau,
-    placeRankTwoOne.dimY, Nat.choose_two_right]
-
+  rw [dimFlag, Formalism.DegreeFormula.dimFl, (sig_eq h hj).2.2,
+    ← Fintype.card_of_bijective (psiOf_bijective h), D.what₂.card_Tau, placeRankTwoOne.dimY,
+    Nat.choose_two_right]
 
 variable (D) in
-def thetaExp (Dw : Datum H) (v : D.what₂.Tau → ℕ → ℤ) : WTZ D.host.E := wtOf Dw (toWt Dw v) ((D.R.nV / 2 : ℕ) : ℤ)
-
+def thetaExp (Dw : Datum H) (v : D.what₂.Tau → ℕ → ℤ) : WTZ D.host.E :=
+  wtOf Dw (toWt Dw v) ((D.R.nV / 2 : ℕ) : ℤ)
 
 variable (D) in
 def plainExp (Dw : Datum H) (v : D.what₂.Tau → ℕ → ℤ) : WTZ D.host.E := wtOf Dw (toWt Dw v) 0
 
-theorem thetaExp_kap_eq (h : T.Pins) (hj : InR D j) (w : WeightFamilies.Wt D j) (hn : w.n = D.R.nV)
-    (hw : Formalism.L2.Geo.wtOf w = DV.kapW D j) : thetaExp D (T.Dw j) (kap D j) = wtZ (wtA w) w.n := by
+theorem thetaExp_kap_eq
+    (h : T.Pins) (hj : InR D j)
+    (w : WeightFamilies.Wt D j) (hn : w.n = D.R.nV) (hw : Formalism.L2.Geo.wtOf w = DV.kapW D j)
+    : thetaExp D (T.Dw j) (kap D j) = wtZ (wtA w) w.n := by
   obtain ⟨hp, hq, hr⟩ := sig_eq h hj
   obtain ⟨-, -, hΨ, hΨ', hA⟩ := GlobalTheory.WeightExponents.weight_exponents D T h j hj w
   have hp' : (T.Dw j).p = (D.R.sigW j).1 := hp
@@ -196,23 +209,30 @@ theorem thetaExp_kap_eq (h : T.Pins) (hj : InR D j) (w : WeightFamilies.Wt D j) 
       rw [(hA t i).1, ext0]
       by_cases hi : i < (T.Dw j).p
       · refine (wtOf_big _ _ (psiOf h.1 t) i hi).trans ?_
-        rw [toWt_psiOf, GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants.kap, dite_eq_left (by show i < _; omega), ← hw, dite_eq_left (by omega)]
+        rw [toWt_psiOf, GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants.kap,
+          dite_eq_left (by show i < _; omega), ← hw, dite_eq_left (by omega)]
         simp only [Formalism.L2.Geo.wtOf, Formalism.L2.Geo.wtOfN, hn]
-        rw [dite_eq_left (by omega)]; ring
+        rw [dite_eq_left (by omega)]
+        ring
       · rw [dite_eq_right (by omega)]
         simp only [thetaExp, wtOf]
         unfold InPsi at hτ
-        rw [dite_eq_left hτ, dite_eq_right hi]; rfl
+        rw [dite_eq_left hτ, dite_eq_right hi]
+        rfl
     · obtain ⟨t, rfl⟩ := (hΨ' τ).1 hτ
       rw [(hA t i).2, ext0]
       by_cases hi : i < (T.Dw j).q
       · refine (wtOf_small _ _ (psiOf h.1 t) i hi).trans ?_
-        rw [toWt_psiOf, GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants.kap, dite_eq_left (by show (T.Dw j).p + _ < _; omega), ← hw, dite_eq_left (by omega)]
+        rw [toWt_psiOf, GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants.kap,
+          dite_eq_left (by show (T.Dw j).p + _ < _; omega), ← hw, dite_eq_left (by omega)]
         simp only [Formalism.L2.Geo.wtOf, Formalism.L2.Geo.wtOfN, hn]
         rw [dite_eq_right (by omega), dite_eq_left (by omega)]
-        have e : ∀ (a : Fin (D.R.sigW j).2) (b : Fin (D.R.sigW j).2), (a : ℕ) + b + 1 = (D.R.sigW j).2 → Fin.rev a = b :=
-          fun a b hab => Fin.ext (by rw [Fin.val_rev]; omega)
-        rw [e _ ⟨i, by omega⟩ (by simp only; omega)]; ring
+        have e
+            : ∀ (a : Fin (D.R.sigW j).2) (b : Fin (D.R.sigW j).2),
+              (a : ℕ) + b + 1 = (D.R.sigW j).2 → Fin.rev a = b := fun a b hab =>
+          Fin.ext (by rw [Fin.val_rev]; omega)
+        rw [e _ ⟨i, by omega⟩ (by simp only; omega)]
+        ring
       · rw [dite_eq_right (by omega)]
         simp only [thetaExp, wtOf]
         unfold InPsi at hτ
@@ -222,10 +242,11 @@ theorem thetaExp_kap_eq (h : T.Pins) (hj : InR D j) (w : WeightFamilies.Wt D j) 
     show 2 * ((D.R.nV / 2 : ℕ) : ℤ) = ((w.n : ℕ) : ℤ)
     omega
 
-theorem thetaExp_kap_kapTop (h : T.Pins) (hK : DV.KapDef D) (i : Fin D.R.m) :
-    thetaExp D (T.Dw ((i : ℕ) + 1)) (kap D ((i : ℕ) + 1)) =
-      wtZ (wtA (Formalism.IndefR.FWT.kapTop D i)) (Formalism.IndefR.FWT.kapTop D i).n :=
-  thetaExp_kap_eq h ⟨Nat.le_add_left _ _, i.2⟩ _ rfl (GlobalTheory.RecordWeightVec.wtOf_kapTop D hK i).2
+theorem thetaExp_kap_kapTop (h : T.Pins) (hK : DV.KapDef D) (i : Fin D.R.m)
+    : thetaExp D (T.Dw ((i : ℕ) + 1)) (kap D ((i : ℕ) + 1))
+      = wtZ (wtA (Formalism.IndefR.FWT.kapTop D i)) (Formalism.IndefR.FWT.kapTop D i).n :=
+  thetaExp_kap_eq h ⟨Nat.le_add_left _ _, i.2⟩ _ rfl
+    (GlobalTheory.RecordWeightVec.wtOf_kapTop D hK i).2
 
 end Transport
 

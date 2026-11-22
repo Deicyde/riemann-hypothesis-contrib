@@ -80,7 +80,8 @@ def r2 : ℝ := N.r ^ 2 - 1
 
 def hHat : ℝ := N.f * N.lrd + 2 * N.f * Real.log (1 + N.f * N.lrd)
 
-def muHat : ℝ := Real.log 2 + N.hHat + 2 * N.f * (N.r ^ 2 + 1) * N.lM + N.f * (N.r ^ 2 - 1) / 2 * N.lrd
+def muHat : ℝ :=
+  Real.log 2 + N.hHat + 2 * N.f * (N.r ^ 2 + 1) * N.lM + N.f * (N.r ^ 2 - 1) / 2 * N.lrd
 
 def ncHat : ℝ := max (N.hHat + 2 * N.f * N.lM) (N.muHat + N.f * N.r ^ 2 / 2 * Real.log N.r)
 
@@ -90,34 +91,35 @@ def rsHat : ℝ := 19 * N.f * N.r ^ 2 * N.L + 198 * N.f * N.L
 
 def omHat : ℝ := 2.42 + N.lrd + N.LL
 
-def hat : Num :=
-  { N with
-    lh := N.hHat
-    lNc := N.ncHat
-    lpi := N.ncHat
-    lmu := N.muHat
-    lmu1 := max (N.f * N.r ^ 2 * N.lM + N.f * N.r ^ 2 / 2 * N.lrd + 2 * N.f) N.muHat
-    V := 38 * N.f * N.r ^ 2 * N.L
-    hb := N.f * N.r ^ 2 * N.lM
-    logGenusConstant := 20 * N.f * N.r ^ 2 * N.L
-    dS := N.dsHat
-    rS := N.rsHat
-    dP := N.dsHat + 60 * N.f * N.L + 1.4 * N.r + 1.4
-    rP := N.rsHat + 30 * N.L
-    lNA := 2 * N.lrd
-    Om := N.omHat
-    nu := 2 * N.L
-    lc := 0
-    leE := 2 * N.f * N.lrd
-    ln0 := 4 * N.f * N.r ^ 2 * Real.log 5
-    c1 := N.r / 2 * N.omHat
-    sc1 := N.f * N.r / 2 * N.omHat
-    G1 := 1009 * N.Z
-    CL := N.Z
-    lR := 40 * N.Z
-    rho := N.m
-    dp := 2 * N.f * N.m
-    gC := N.f * N.m * N.r }
+def hat : Num := {
+  N with
+  lh := N.hHat
+  lNc := N.ncHat
+  lpi := N.ncHat
+  lmu := N.muHat
+  lmu1 := max (N.f * N.r ^ 2 * N.lM + N.f * N.r ^ 2 / 2 * N.lrd + 2 * N.f) N.muHat
+  V := 38 * N.f * N.r ^ 2 * N.L
+  hb := N.f * N.r ^ 2 * N.lM
+  logGenusConstant := 20 * N.f * N.r ^ 2 * N.L
+  dS := N.dsHat
+  rS := N.rsHat
+  dP := N.dsHat + 60 * N.f * N.L + 1.4 * N.r + 1.4
+  rP := N.rsHat + 30 * N.L
+  lNA := 2 * N.lrd
+  Om := N.omHat
+  nu := 2 * N.L
+  lc := 0
+  leE := 2 * N.f * N.lrd
+  ln0 := 4 * N.f * N.r ^ 2 * Real.log 5
+  c1 := N.r / 2 * N.omHat
+  sc1 := N.f * N.r / 2 * N.omHat
+  G1 := 1009 * N.Z
+  CL := N.Z
+  lR := 40 * N.Z
+  rho := N.m
+  dp := 2 * N.f * N.m
+  gC := N.f * N.m * N.r
+}
 
 def AO : ℝ := (max (N.dS + N.rS) (N.dP + N.rP))
 
@@ -131,11 +133,25 @@ def G : ℝ := N.G1 + 3 * N.L + 2 * N.AO + 2 * N.f * N.r * N.Lp + 31 * N.f * N.r
 
 def muM : ℝ := Real.log (2) + N.lh + 2 * N.f * (N.r * N.r + 1) * N.lM + N.f * N.r2 * N.lrd / 2
 
-def P7 : ℝ := 2 + (N.D : ℝ) * Real.log (510 * N.r * N.r) + 4 * N.f * N.f * N.r * N.r * (Real.log (5 * N.f * N.r) + 1.5 * N.lrd + (max (0) (N.lM + Real.log (8 * N.f * N.w) + N.ld / 2))) + N.muM
+def P7 : ℝ :=
+  2 + (N.D : ℝ) * Real.log (510 * N.r * N.r)
+    + 4 * N.f * N.f * N.r * N.r
+      * (Real.log (5 * N.f * N.r) + 1.5 * N.lrd
+        + (max (0) (N.lM + Real.log (8 * N.f * N.w) + N.ld / 2)))
+    + N.muM
 
-def tableDegreeTwoSeven : ℝ := 2 + lf N.DX + (N.DX : ℝ) * Real.log ((max (4) (16 * N.f * N.r * N.w))) + 4 * N.f * N.f * N.r * N.r * (Real.log (7 * N.f * N.r) + 1.5 * N.lrd + (max (0) (N.lM + Real.log (8 * N.f * N.w) + N.ld / 2 + Real.log (1.77)))) + N.muM + N.f * N.r * N.r * Real.log (1 + 16 * N.w)
+def tableDegreeTwoSeven : ℝ :=
+  2 + lf N.DX + (N.DX : ℝ) * Real.log ((max (4) (16 * N.f * N.r * N.w)))
+    + 4 * N.f * N.f * N.r * N.r
+      * (Real.log (7 * N.f * N.r) + 1.5 * N.lrd
+        + (max (0) (N.lM + Real.log (8 * N.f * N.w) + N.ld / 2 + Real.log (1.77))))
+    + N.muM + N.f * N.r * N.r * Real.log (1 + 16 * N.w)
 
-def sizeConstantAtParamsWeight : ℝ := (max (90 * (N.f * N.r + 1)) (max (360 * N.f * N.m ^ 3) (max (2 * (3 * N.r + 3 + N.r * Real.log (N.r))) (max (N.nW) (max (1250 * N.r) (max (N.f * N.r * N.r + 6) (11)))))))
+def sizeConstantAtParamsWeight : ℝ :=
+  (max (90 * (N.f * N.r + 1))
+    (max (360 * N.f * N.m ^ 3)
+      (max (2 * (3 * N.r + 3 + N.r * Real.log (N.r)))
+        (max (N.nW) (max (1250 * N.r) (max (N.f * N.r * N.r + 6) (11)))))))
 
 def p1 : ℝ := 1 + N.f * N.r * (Real.log (7) + (Real.log (N.f * N.r) + N.lM) / 2)
 
@@ -157,9 +173,13 @@ def cnt : ℝ := N.lM + 2 * N.lrd + N.primePairSetFirst + 1
 
 def Pdeg : ℝ := (1 + N.Om + N.lrd) / 2
 
-def tableDegreeThreeBase : ℝ := 3 * N.lrd + 12.57 * (xl (4 * N.tableDegreeOneSquareM) / 4 + N.tableDegreeOneSquareM * N.cnt + 4) + N.primePairSetFirst + 2 * Real.log (2 * N.f * N.r) + 1 + N.Pdeg
+def tableDegreeThreeBase : ℝ :=
+  3 * N.lrd + 12.57 * (xl (4 * N.tableDegreeOneSquareM) / 4 + N.tableDegreeOneSquareM * N.cnt + 4)
+    + N.primePairSetFirst + 2 * Real.log (2 * N.f * N.r) + 1 + N.Pdeg
 
-def T7 : ℝ := N.tableDegreeThreeBase + 2 * N.tableDegreeTwoSeven + 10 * (N.D : ℝ) * N.L + (max (N.rS) (N.rP)) / 2
+def T7 : ℝ :=
+  N.tableDegreeThreeBase + 2 * N.tableDegreeTwoSeven + 10 * (N.D : ℝ) * N.L
+    + (max (N.rS) (N.rP)) / 2
 
 def lbad : ℝ := N.l2q + N.lg + Real.log (15) + 2 * N.lp
 
@@ -191,9 +211,13 @@ def TH : ℝ := N.tableDegreeFiveTheta + N.Iq + N.Ifr + N.MK + N.rts
 
 def U0 : ℝ := N.TH + 2 * N.ldg
 
-def tableLogDegreeOneTwelve : ℝ := Real.log (10000) + N.leE + N.f * N.lrd + 2 * Real.log (2 * N.f * N.m)
+def tableLogDegreeOneTwelve : ℝ :=
+  Real.log (10000) + N.leE + N.f * N.lrd + 2 * Real.log (2 * N.f * N.m)
 
-def cubicPeriodConstant : ℝ := 2 * (N.f * N.m * N.r + 8 * N.f ^ 3 * N.m * N.m * N.tableLogDegreeOneTwelve + xl (8 * N.f ^ 3 * N.m * N.m) + 3) + N.ln0
+def cubicPeriodConstant : ℝ :=
+  2 * (N.f * N.m * N.r + 8 * N.f ^ 3 * N.m * N.m * N.tableLogDegreeOneTwelve
+      + xl (8 * N.f ^ 3 * N.m * N.m) + 3)
+    + N.ln0
 
 def PPA : ℝ := 3 * (N.D : ℝ) + 3 * N.cubicPeriodConstant
 
@@ -237,9 +261,14 @@ def E0 : ℝ := N.f * N.r * (N.c0p + 4 * N.r)
 
 def tableDegreeThreeSecondValue : ℝ := 2 * (1 + N.r) * N.G + N.c1 + N.m * N.lrd
 
-def A0 : ℝ := (2 * N.r * N.G + N.c1 + N.m * N.lrd) * N.f * (N.Np + 1 + 3 * N.r) + 2 * N.G * N.Np + 35 * N.L + 3 * N.o + N.B7 + N.rtN
+def A0 : ℝ :=
+  (2 * N.r * N.G + N.c1 + N.m * N.lrd) * N.f * (N.Np + 1 + 3 * N.r) + 2 * N.G * N.Np + 35 * N.L
+    + 3 * N.o + N.B7 + N.rtN
 
-def PPp : ℝ := 10 * ((N.tableDegreeThreeSecondValue + N.CL * N.LL0) * (1 + N.E0) + N.A0 + N.Gka + 3 * N.tableDegreeThreeBase + N.f * N.r * N.L + N.B7 + N.hb + N.gG)
+def PPp : ℝ :=
+  10
+    * ((N.tableDegreeThreeSecondValue + N.CL * N.LL0) * (1 + N.E0) + N.A0 + N.Gka
+      + 3 * N.tableDegreeThreeBase + N.f * N.r * N.L + N.B7 + N.hb + N.gG)
 
 def al : ℝ := 26 * (N.o + 2 * N.B7 + 4 * N.L + N.tableDegreeThreeSecondValue + N.A0)
 
@@ -253,7 +282,10 @@ def xn : ℝ := ((N.D : ℝ) + 1) * (N.o + N.B7 + 1) + 6
 
 def xA : ℝ := 1352 * (N.L + Real.log (1352)) + 4
 
-def QJ : ℝ := 4 * N.tableDegreeThreeSecondValue * N.f * N.r * N.r + 3 * N.A0 + 4 * N.B7 + N.V + N.o + 40 * N.L + N.PPe + N.PPA + 3 * N.Pt0 + 12 * N.f * N.r * (N.c1 + N.m * N.lrd) + 1.5 * N.f * N.r * N.r * N.lrd
+def QJ : ℝ :=
+  4 * N.tableDegreeThreeSecondValue * N.f * N.r * N.r + 3 * N.A0 + 4 * N.B7 + N.V + N.o + 40 * N.L
+    + N.PPe + N.PPA + 3 * N.Pt0 + 12 * N.f * N.r * (N.c1 + N.m * N.lrd)
+    + 1.5 * N.f * N.r * N.r * N.lrd
 
 def Qc : ℝ := N.PPe + N.XW + 104 * N.L * N.Pa + 3 * N.Pinf
 

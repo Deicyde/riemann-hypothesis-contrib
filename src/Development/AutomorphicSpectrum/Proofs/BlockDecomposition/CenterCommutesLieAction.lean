@@ -8,16 +8,21 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Commu
 
 noncomputable section
 
-open NumberField MeasureTheory Topology Matrix GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum GlobalTheory.OpTrace GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+open NumberField MeasureTheory Topology Matrix GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.DiscreteSum GlobalTheory.OpTrace GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
 
 namespace GlobalTheory.CompanionTheory.ZalgCentral
 
-theorem Zalg_mul_lie : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (z : Module.End ℂ (Sm E a)),
-    z ∈ Zalg E a → ∀ X, z * lie E a X = lie E a X * z := by
+theorem Zalg_mul_lie
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (z : Module.End ℂ (Sm E a)),
+      z ∈ Zalg E a → ∀ X, z * lie E a X = lie E a X * z := by
   intro E _ _ _ a z hz X
   unfold Zalg at hz
-  have hle : Algebra.adjoin ℂ {z : Module.End ℂ (Sm E a) | ∃ τ u, z = cap τ u} ≤
-      Subalgebra.centralizer ℂ {lie E a X} := by
+  have hle
+      : Algebra.adjoin ℂ {z : Module.End ℂ (Sm E a) | ∃ τ u, z = cap τ u}
+        ≤ Subalgebra.centralizer ℂ {lie E a X} := by
     rw [Algebra.adjoin_le_iff]
     rintro _ ⟨τ, u, rfl⟩
     rw [SetLike.mem_coe, Subalgebra.mem_centralizer_iff]

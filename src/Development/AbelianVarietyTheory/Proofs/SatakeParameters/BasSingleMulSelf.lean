@@ -17,11 +17,10 @@ namespace GlobalTheory.CxForm
 
 def holCount {n : ℕ} (S : Finset (Fin (n + n))) : ℕ := (S.filter (·.val < n)).card
 
-def holGe (n p : ℕ) : Submodule ℂ (Alt n) :=
-  Submodule.span ℂ (bas n '' {S | p ≤ holCount S})
+def holGe (n p : ℕ) : Submodule ℂ (Alt n) := Submodule.span ℂ (bas n '' {S | p ≤ holCount S})
 
-theorem mem_holGe_iff {n p : ℕ} (β : Alt n) :
-    β ∈ holGe n p ↔ ∀ S, (bas n).repr β S ≠ 0 → p ≤ holCount S := by
+theorem mem_holGe_iff {n p : ℕ} (β : Alt n)
+    : β ∈ holGe n p ↔ ∀ S, (bas n).repr β S ≠ 0 → p ≤ holCount S := by
   rw [holGe, Module.Basis.mem_span_image]
   constructor
   · intro h S hS

@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ModelsAre
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix GlobalTheory.RealPar
-open Formalism.MainNotions.S (IsURepOn IsIrredOn IsKFin IsKStableOn IsWtOn IsKTypeOf IsDS IsSqIntOn UJset)
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix
+  GlobalTheory.RealPar
+open Formalism.MainNotions.S
+  (IsURepOn IsIrredOn IsKFin IsKStableOn IsWtOn IsKTypeOf IsDS IsSqIntOn UJset)
 open scoped InnerProductSpace
 open GlobalTheory.CoverModel GlobalTheory.IndefiniteRowSideFullHecke.BarMatrix
 
@@ -22,13 +24,23 @@ noncomputable section
 
 namespace GlobalTheory.RealPar.CoverFactor
 
-theorem signCompat_of_blockOrd {p q n : ℕ} {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) :
-    SignCompat ε e := by
+theorem signCompat_of_blockOrd
+    {p q n : ℕ} {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε)
+    : SignCompat ε e := by
   rintro (a | a)
   · simpa using h.1 a
   · simpa using h.2.1 a
 
-theorem dictionary : ∀ (p q n : ℕ) (e : Ix p q ≃ Fin n) (ε : Fin n → Bool) (T : GrpData p q) (U : URep T) (σ : Matrix (Fin n) (Fin n) ℂ → (U.H →L[ℂ] U.H)), BlockOrd e ε → Factors U e σ → IsURepOn (UJset ε) σ ∧ (IrrU U → IsIrredOn (UJset ε) σ) ∧ (∀ x, KFin T U.π x ↔ IsKFin ε σ x) ∧ (∀ Y, Y ∈ upq p q ↔ Formalism.REAL.inG ε (Matrix.reindex e e Y)) ∧ (∀ Y ∈ upq p q, ∀ t : ℝ, U.π (T.expt (t • Y)) = σ (NormedSpace.exp (t • Matrix.reindex e e Y))) ∧ ∀ k ∈ Formalism.REAL.Kset ε, ∃ x ∈ T.Kset, U.π x = σ k := by
+theorem dictionary
+    : ∀ (p q n : ℕ) (e : Ix p q ≃ Fin n) (ε : Fin n → Bool) (T : GrpData p q) (U : URep T)
+        (σ : Matrix (Fin n) (Fin n) ℂ → (U.H →L[ℂ] U.H)),
+      BlockOrd e ε → Factors U e σ
+        → IsURepOn (UJset ε) σ ∧ (IrrU U → IsIrredOn (UJset ε) σ)
+          ∧ (∀ x, KFin T U.π x ↔ IsKFin ε σ x)
+          ∧ (∀ Y, Y ∈ upq p q ↔ Formalism.REAL.inG ε (Matrix.reindex e e Y))
+          ∧ (∀ Y ∈ upq p q, ∀ t : ℝ,
+            U.π (T.expt (t • Y)) = σ (NormedSpace.exp (t • Matrix.reindex e e Y)))
+          ∧ ∀ k ∈ Formalism.REAL.Kset ε, ∃ x ∈ T.Kset, U.π x = σ k := by
   intro p q n e ε T U σ h hF
   have hφ : IsFormIso ε (plainMat e) := isFormIso_plainMat (signCompat_of_blockOrd h)
   refine ⟨⟨⟨?_, ?_⟩, ?_, ?_⟩, ?_, ?_, ?_, ?_, ?_⟩
@@ -55,8 +67,12 @@ theorem dictionary : ∀ (p q n : ℕ) (e : Ix p q ≃ Fin n) (ε : Fin n → Bo
     rw [hF x]
     exact hst _ (h.cov_mem T x) v hv
   · intro x
-    have := kFin_iff (s := RingHom.id ℂ) hφ (T := T) (π := U.π) (σ := σ) (LinearIsometryEquiv.refl ℂ U.H)
-      (c := fun _ => 1) (fun _ => one_ne_zero) (fun g y => by rw [one_smul, hF g]; rfl) x
+    have :=
+      kFin_iff (s := RingHom.id ℂ) hφ (T := T) (π := U.π) (σ := σ) (LinearIsometryEquiv.refl ℂ U.H)
+        (c := fun _ => 1)
+        (fun _ => one_ne_zero)
+        (fun g y => by rw [one_smul, hF g]; rfl)
+        x
     exact this.symm
   · intro Y
     exact (hφ.mem_lie Y).symm

@@ -11,12 +11,16 @@ open scoped TensorProduct
 
 namespace GlobalTheory.GoodEtaleSection
 
-theorem algHom_quot_eq_of_etaleLow : ∀ (A R C : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R]
-    [CommRing C] [Algebra R C] (ρ : R →+* A), ρ.comp (algebraMap A R) = RingHom.id A →
-    ∀ t : R, RingHom.ker ρ = Ideal.span {t} → t ∈ nonZeroDivisors R →
-    GlobalTheory.GoodEtale.EtaleLow A R C →
-    ∀ (n : ℕ) (f f' : C →ₐ[R] R ⧸ Ideal.span {t} ^ n),
-      (∀ c : C, f c - f' c ∈ Ideal.span {Ideal.Quotient.mk (Ideal.span {t} ^ n) t}) → f = f' := by
+theorem algHom_quot_eq_of_etaleLow
+    : ∀ (A R C : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R] [CommRing C]
+        [Algebra R C] (ρ : R →+* A),
+      ρ.comp (algebraMap A R) = RingHom.id A
+        → ∀ t : R,
+          RingHom.ker ρ = Ideal.span {t} → t ∈ nonZeroDivisors R
+            → GlobalTheory.GoodEtale.EtaleLow A R C
+            → ∀ (n : ℕ) (f f' : C →ₐ[R] R ⧸ Ideal.span {t} ^ n),
+              (∀ c : C, f c - f' c ∈ Ideal.span {Ideal.Quotient.mk (Ideal.span {t} ^ n) t})
+                → f = f' := by
   intro A R C _ _ _ _ _ _ ρ hρ t hker ht hE n f f' hff
   set P₀ : Ideal R := RingHom.ker ρ with hP₀
   haveI hP : P₀.IsPrime := RingHom.ker_isPrime ρ
@@ -61,7 +65,9 @@ theorem algHom_quot_eq_of_etaleLow : ∀ (A R C : Type) [CommRing A] [IsDomain A
       simp only [u, e, map_sub, sub_sub_cancel]
     have hzero : algebraMap A R (a ^ n) • x = 0 := by
       rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, map_pow, map_pow, ← hue, hk]
-      calc u * k * x = k * (x * u) := by ring
+      calc
+        u * k * x
+          = k * (x * u) := by ring
         _ = 0 := by rw [show x * u = 0 from hx, mul_zero]
     exact torsionFree_quot A R ρ hρ t hker ht n (a ^ n) (pow_ne_zero n ha) x hzero
   have hinj : Function.Injective (algebraMap Q B) := IsLocalization.injective B hle
@@ -72,10 +78,10 @@ theorem algHom_quot_eq_of_etaleLow : ∀ (A R C : Type) [CommRing A] [IsDomain A
   set J : Ideal B := Ideal.span {algebraMap R B t}
   have hJ : IsNilpotent J := by
     refine ⟨n, ?_⟩
-    rw [Ideal.span_singleton_pow (algebraMap R B t) n, ← map_pow, IsScalarTower.algebraMap_apply R Q B,
-      Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem.2
-        (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self t) n), map_zero, Ideal.zero_eq_bot,
-      Ideal.span_singleton_eq_bot]
+    rw [Ideal.span_singleton_pow (algebraMap R B t) n, ← map_pow,
+      IsScalarTower.algebraMap_apply R Q B, Ideal.Quotient.algebraMap_eq,
+      Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self t) n),
+      map_zero, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
   have e : (Ideal.Quotient.mkₐ R J).comp g₁ = (Ideal.Quotient.mkₐ R J).comp g₂ := by
     apply Algebra.TensorProduct.ext
     · apply AlgHom.ext; intro x; simp [g₁, g₂]
@@ -90,8 +96,8 @@ theorem algHom_quot_eq_of_etaleLow : ∀ (A R C : Type) [CommRing A] [IsDomain A
       rw [show ι (Ideal.Quotient.mk _ t) = algebraMap R B t from
         (IsScalarTower.algebraMap_apply R Q B t).symm]
       exact Ideal.mem_span_singleton_self _
-  have hg : g₁ = g₂ := Algebra.FormallyUnramified.ext J hJ fun x => by
-    simpa using congrArg (fun g => g x) e
+  have hg : g₁ = g₂ :=
+    Algebra.FormallyUnramified.ext J hJ fun x => by simpa using congrArg (fun g => g x) e
   ext c
   apply hinj
   have := congrArg (fun g => g ((1 : Rp) ⊗ₜ[R] c)) hg

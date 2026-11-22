@@ -30,21 +30,26 @@ theorem ϖ_ne : M.ϖ ≠ 0 := by
 
 end StModel
 
-theorem divAt_of_map {Q : Ideal (𝓞 E)} {N : ℕ} (A : Matrix (Fin N) (Fin N) (𝓞 E)) (c : 𝓞 E)
-    (h : ∀ a b, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * A a b = c * w) (a b : Fin N) :
-    DivAt Q c ((algebraMap (𝓞 E) E).mapMatrix A a b) := by
+theorem divAt_of_map
+    {Q : Ideal (𝓞 E)} {N : ℕ} (A : Matrix (Fin N) (Fin N) (𝓞 E))
+    (c : 𝓞 E) (h : ∀ a b, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * A a b = c * w)
+    (a b : Fin N)
+    : DivAt Q c ((algebraMap (𝓞 E) E).mapMatrix A a b) := by
   obtain ⟨s, hs, w, hw⟩ := h a b
   refine ⟨s, hs, w, ?_⟩
   have h2 := congrArg (algebraMap (𝓞 E) E) hw
   rw [map_mul, map_mul] at h2
   exact h2
 
-theorem divAt_conj {Q : Ideal (𝓞 E)} [hQ : Q.IsPrime] {N : ℕ} (ϖ d : 𝓞 E) (hϖ : ϖ ≠ 0)
-    (hd : d ∉ Q) (k m : ℕ) (G : Matrix (Fin N) (Fin N) (𝓞 E)) (X : Matrix (Fin N) (Fin N) E)
-    (hGX : ∀ a b, algebraMap (𝓞 E) E (G a b) =
-      algebraMap (𝓞 E) E d * algebraMap (𝓞 E) E ϖ ^ (2 * k) * X a b)
-    (h : ∀ a b, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * G a b = ϖ ^ (2 * k + m) * w) (a b : Fin N) :
-    DivAt Q (ϖ ^ m) (X a b) := by
+theorem divAt_conj
+    {Q : Ideal (𝓞 E)} [hQ : Q.IsPrime]
+    {N : ℕ}
+    (ϖ d : 𝓞 E) (hϖ : ϖ ≠ 0) (hd : d ∉ Q)
+    (k m : ℕ) (G : Matrix (Fin N) (Fin N) (𝓞 E)) (X : Matrix (Fin N) (Fin N) E)
+    (hGX : ∀ a b,
+      algebraMap (𝓞 E) E (G a b) = algebraMap (𝓞 E) E d * algebraMap (𝓞 E) E ϖ ^ (2 * k) * X a b)
+    (h : ∀ a b, ∃ s : 𝓞 E, s ∉ Q ∧ ∃ w : 𝓞 E, s * G a b = ϖ ^ (2 * k + m) * w) (a b : Fin N)
+    : DivAt Q (ϖ ^ m) (X a b) := by
   obtain ⟨s, hs, w, hw⟩ := h a b
   refine ⟨s * d, fun hm => (hQ.mem_or_mem hm).elim hs hd, w, ?_⟩
   have h2 := congrArg (algebraMap (𝓞 E) E) hw
@@ -53,21 +58,21 @@ theorem divAt_conj {Q : Ideal (𝓞 E)} [hQ : Q.IsPrime] {N : ℕ} (ϖ d : 𝓞 
     intro h0
     apply hϖ
     first
-      | exact (map_eq_zero_iff _ (NoZeroSMulDivisors.algebraMap_injective (𝓞 E) E)).mp h0
-      | exact (map_eq_zero_iff _ (FaithfulSMul.algebraMap_injective (𝓞 E) E)).mp h0
-      | exact_mod_cast h0
+    | exact (map_eq_zero_iff _ (NoZeroSMulDivisors.algebraMap_injective (𝓞 E) E)).mp h0
+    | exact (map_eq_zero_iff _ (FaithfulSMul.algebraMap_injective (𝓞 E) E)).mp h0
+    | exact_mod_cast h0
   have hp : algebraMap (𝓞 E) E ϖ ^ (2 * k) ≠ 0 := pow_ne_zero _ hϖE
-  have h3 : algebraMap (𝓞 E) E ϖ ^ (2 * k) *
-      (algebraMap (𝓞 E) E s * algebraMap (𝓞 E) E d * X a b) =
-      algebraMap (𝓞 E) E ϖ ^ (2 * k) * (algebraMap (𝓞 E) E ϖ ^ m * algebraMap (𝓞 E) E w) := by
+  have h3
+      : algebraMap (𝓞 E) E ϖ ^ (2 * k) * (algebraMap (𝓞 E) E s * algebraMap (𝓞 E) E d * X a b)
+        = algebraMap (𝓞 E) E ϖ ^ (2 * k) * (algebraMap (𝓞 E) E ϖ ^ m * algebraMap (𝓞 E) E w) := by
     linear_combination h2
   have h4 := mul_left_cancel₀ hp h3
   show algebraMap (𝓞 E) E (s * d) * X a b = algebraMap (𝓞 E) E (ϖ ^ m) * algebraMap (𝓞 E) E w
   rw [map_mul, map_pow]
   exact h4
 
-theorem intAt_of_divAt_zero {Q : Ideal (𝓞 E)} (ϖ : 𝓞 E) {x : E} (h : DivAt Q (ϖ ^ 0) x) :
-    IntAt Q x := by
+theorem intAt_of_divAt_zero {Q : Ideal (𝓞 E)} (ϖ : 𝓞 E) {x : E} (h : DivAt Q (ϖ ^ 0) x)
+    : IntAt Q x := by
   obtain ⟨s, hs, w, hw⟩ := h
   exact ⟨s, hs, w, by simpa using hw⟩
 

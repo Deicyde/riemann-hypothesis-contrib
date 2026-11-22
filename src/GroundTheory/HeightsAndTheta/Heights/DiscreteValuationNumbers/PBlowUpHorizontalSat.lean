@@ -20,13 +20,16 @@ section Saturation
 
 variable {K : Type*} {ι : K → Type} {J : Type} {R : Type*} [CommRing R]
 
-theorem exists_pow_mul_mem_of_aeval_chartSubst_mem {P : Ideal (MRing ι R)} {u a : J → MRing ι R}
-    {W : Ideal (MRing ι R)} (j₀ : J)
-    (hrel : ∀ j, newVar j * liftForm (a j₀) - newVar j₀ * liftForm (a j) ∈ blowUpOf P u)
+theorem exists_pow_mul_mem_of_aeval_chartSubst_mem
+    {P : Ideal (MRing ι R)} {u a : J → MRing ι R} {W : Ideal (MRing ι R)}
+    (j₀ : J) (hrel : ∀ j, newVar j * liftForm (a j₀) - newVar j₀ * liftForm (a j) ∈ blowUpOf P u)
     {F : MRing (extIdx ι J) R}
-    (hF : aeval (chartSubst a) F ∈ Ideal.map (Polynomial.C : MRing ι R →+* Polynomial (MRing ι R)) W) :
-    ∃ n : ℕ, liftForm (a j₀ ^ n) * F ∈
-      blowUpOf P u ⊔ Ideal.map (liftForm (J := J) : MRing ι R →ₐ[R] MRing (extIdx ι J) R) W := by
+    (hF
+      : aeval (chartSubst a) F ∈ Ideal.map (Polynomial.C : MRing ι R →+* Polynomial (MRing ι R)) W)
+    : ∃ n : ℕ,
+      liftForm (a j₀ ^ n) * F
+        ∈ blowUpOf P u
+          ⊔ Ideal.map (liftForm (J := J) : MRing ι R →ₐ[R] MRing (extIdx ι J) R) W := by
   set B' := blowUpOf P u ⊔ Ideal.map (liftForm (J := J) : MRing ι R →ₐ[R] MRing (extIdx ι J) R) W
   let π := Ideal.Quotient.mk B'
   let x₀ := π (liftForm (a j₀))
@@ -35,7 +38,8 @@ theorem exists_pow_mul_mem_of_aeval_chartSubst_mem {P : Ideal (MRing ι R)} {u a
   let t : L := IsLocalization.Away.invSelf x₀
   have hinv : q (liftForm (a j₀)) * t = 1 := IsLocalization.Away.mul_invSelf x₀
   let ψ : Polynomial (MRing ι R) →+* L :=
-    Polynomial.eval₂RingHom (q.comp (liftForm (J := J) : MRing ι R →ₐ[R] _).toRingHom) (q (newVar j₀) * t)
+    Polynomial.eval₂RingHom (q.comp (liftForm (J := J) : MRing ι R →ₐ[R] _).toRingHom)
+      (q (newVar j₀) * t)
   have key : ψ.comp (aeval (R := R) (chartSubst a)).toRingHom = q := by
     apply MvPolynomial.ringHom_ext
     · intro r
@@ -60,7 +64,8 @@ theorem exists_pow_mul_mem_of_aeval_chartSubst_mem {P : Ideal (MRing ι R)} {u a
     rw [Ideal.mem_comap, RingHom.mem_ker]
     simp only [ψ, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_C, RingHom.comp_apply,
       AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, q]
-    rw [Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_sup_right (Ideal.mem_map_of_mem _ hp)), map_zero]
+    rw [Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_sup_right (Ideal.mem_map_of_mem _ hp)),
+      map_zero]
   have h2 := RingHom.mem_ker.mp (hle hF)
   have h3 := DFunLike.congr_fun key F
   simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom] at h3
@@ -97,13 +102,18 @@ theorem BlowUpHorizontalSat.full : BlowUpHorizontalSat.Statement.{u} := by
       rwa [sub_add_cancel] at this
     exact hj ((hPp.mem_or_mem h1).resolve_left fun h' => hv j (hPW₀ h'))
 
-  obtain ⟨u₀, a, hu₀W, hrelP⟩ : ∃ (u₀ : MRing ι O) (a : J → MRing ι O), u₀ ∉ W₀ ∧
-      ∀ j, u₀ * u j - u j₀ * a j ∈ P := by
+  obtain ⟨u₀, a, hu₀W, hrelP⟩
+      : ∃ (u₀ : MRing ι O) (a : J → MRing ι O), u₀ ∉ W₀ ∧ ∀ j, u₀ * u j - u j₀ * a j ∈ P := by
     have := hW₀p
-    refine ⟨∏ j, v j, fun j => w j * ∏ j' ∈ Finset.univ.erase j, v j',
-      fun h => W₀.primeCompl.prod_mem (fun j _ => hv j) h, fun j => ?_⟩
-    have e : (∏ j, v j) * u j - u j₀ * (w j * ∏ j' ∈ Finset.univ.erase j, v j') =
-        (∏ j' ∈ Finset.univ.erase j, v j') * (v j * u j - w j * u j₀) := by
+    refine ⟨
+      ∏ j, v j,
+      fun j => w j * ∏ j' ∈ Finset.univ.erase j, v j',
+      fun h => W₀.primeCompl.prod_mem (fun j _ => hv j) h,
+      fun j => ?_
+    ⟩
+    have e
+        : (∏ j, v j) * u j - u j₀ * (w j * ∏ j' ∈ Finset.univ.erase j, v j')
+          = (∏ j' ∈ Finset.univ.erase j, v j') * (v j * u j - w j * u j₀) := by
       rw [← Finset.mul_prod_erase Finset.univ v (Finset.mem_univ j)]; ring
     rw [e]
     exact P.mul_mem_left _ (hvw j)
@@ -119,15 +129,18 @@ theorem BlowUpHorizontalSat.full : BlowUpHorizontalSat.Statement.{u} := by
   have hrelB : ∀ j, newVar j * liftForm (a j₀) - newVar j₀ * liftForm (a j) ∈ blowUpOf P u := by
     intro j
     apply mem_blowUpOf_of_sub
-    have e : u₀ * (u j * a j₀ - u j₀ * a j) =
-        a j₀ * (u₀ * u j - u j₀ * a j) - a j * (u₀ * u j₀ - u j₀ * a j₀) := by ring
+    have e
+        : u₀ * (u j * a j₀ - u j₀ * a j)
+          = a j₀ * (u₀ * u j - u j₀ * a j) - a j * (u₀ * u j₀ - u j₀ * a j₀) := by
+      ring
     have h1 : u₀ * (u j * a j₀ - u j₀ * a j) ∈ P := by
       rw [e]; exact P.sub_mem (P.mul_mem_left _ (hrelP j)) (P.mul_mem_left _ (hrelP j₀))
     exact (hPp.mem_or_mem h1).resolve_left hu₀P
 
   have := hW₀p
-  let Q' := (Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) W₀).comap
-    (aeval (R := O) (chartSubst a))
+  let Q' :=
+    (Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) W₀).comap
+      (aeval (R := O) (chartSubst a))
   have hQ'p : Q'.IsPrime := Ideal.comap_isPrime _ _
   have hxW : liftForm x ∈ W := hmin.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
   have hBQ' : blowUpOf P u ⊔ Ideal.span {liftForm x} ≤ Q' := by

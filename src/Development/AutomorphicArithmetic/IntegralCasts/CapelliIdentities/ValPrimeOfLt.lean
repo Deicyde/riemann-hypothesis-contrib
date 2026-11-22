@@ -4,12 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qi55.val_prime_of_lt :
-    ∀ {Ω : Type} [inst : Field Ω]
-    (A : ValuationSubring Ω) (n : ℕ),
-    n ≠ (0 : ℕ) →
-      (A.valuation : Ω → A.ValueGroup) (↑n : Ω) < (1 : A.ValueGroup) →
-        ∃ (t : ℕ), Nat.Prime t ∧ t ∣ n ∧ (A.valuation : Ω → A.ValueGroup) (↑t : Ω) < (1 : A.ValueGroup) := by
+theorem UpperTheory.Reformulated.B.Qi55.val_prime_of_lt
+    : ∀ {Ω : Type} [inst : Field Ω] (A : ValuationSubring Ω) (n : ℕ),
+      n ≠ (0 : ℕ) → (A.valuation : Ω → A.ValueGroup) (↑n : Ω) < (1 : A.ValueGroup)
+        → ∃ (t : ℕ),
+          Nat.Prime t ∧ t ∣ n ∧ (A.valuation : Ω → A.ValueGroup) (↑t : Ω) < (1 : A.ValueGroup) := by
   intro Ω _ A n
   induction n using induction_on_primes with
   | zero => intro h; exact absurd rfl h

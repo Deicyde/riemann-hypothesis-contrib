@@ -8,17 +8,26 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Unramif
 
 open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
-theorem GlobalTheory.JR.WeilMix.negB_ptrB_wS_ptrB : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ), IsStdChar ψ → ∀ f : Gl r F → ℂ, IsTest f → WeilMix.negB (WeilMix.ptrB M ψ (WeilMix.rowAct (wS F) (WeilMix.ptrB M ψ f))) = fourG M ψ f := by
+theorem GlobalTheory.JR.WeilMix.negB_ptrB_wS_ptrB
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ
+        → ∀ f : Gl r F → ℂ,
+          IsTest f
+            → WeilMix.negB (WeilMix.ptrB M ψ (WeilMix.rowAct (wS F) (WeilMix.ptrB M ψ f)))
+              = fourG M ψ f := by
   intro F E _ _ _ _ hU r M ψ hψ f hf
   letI := M.mF
   haveI := M.bF
   haveI := M.haarF
   haveI : LocallyCompactSpace F := hU.lcF
   haveI : ProperSpace F := ProperSpace.of_locallyCompactSpace F
-  have hψc : Continuous (fun x => ψ x) := ((GlobalTheory.T.unramifiedStandardAddChar_conductor_properties F E).2 ψ hψ).1.continuous
+  have hψc : Continuous (fun x => ψ x) :=
+    ((GlobalTheory.T.unramifiedStandardAddChar_conductor_properties F E).2 ψ hψ).1.continuous
   funext Y
   obtain ⟨A, b, c, l⟩ := Y
-  have hw : ((wS F : SpecialLinearGroup (Fin 2) F) : Matrix (Fin 2) (Fin 2) F) = !![0, 1; -1, 0] := rfl
+  have hw : ((wS F : SpecialLinearGroup (Fin 2) F) : Matrix (Fin 2) (Fin 2) F) = !![0, 1; -1, 0] :=
+    rfl
   simp only [WeilMix.negB, WeilMix.ptrB, WeilMix.rowAct, WeilMix.rowMap, fourG, hw]
   simp
   set μ : Measure (Fin r → F) := Measure.pi fun _ : Fin r => M.μF with hμ
@@ -34,8 +43,8 @@ theorem GlobalTheory.JR.WeilMix.negB_ptrB_wS_ptrB : ∀ (F E : Type) [Nontrivial
       hψc.comp (continuous_fst.dotProduct continuous_const)
     exact (h1.mul h2).mul h3
   have hHs : HasCompactSupport (Function.uncurry H) := by
-    refine HasCompactSupport.intro ((hf.2.isCompact).image
-      (show Continuous (fun Y : Gl r F => (Y.2.2.1, Y.2.1)) by fun_prop)) ?_
+    refine HasCompactSupport.intro
+      ((hf.2.isCompact).image (show Continuous (fun Y : Gl r F => (Y.2.2.1, Y.2.1)) by fun_prop)) ?_
     intro p hp
     by_contra hne
     apply hp
@@ -44,13 +53,15 @@ theorem GlobalTheory.JR.WeilMix.negB_ptrB_wS_ptrB : ∀ (F E : Type) [Nontrivial
     apply hne
     simp [Function.uncurry, H, h0]
   have hint : Integrable (Function.uncurry H) (μ.prod μ) := hHc.integrable_of_hasCompactSupport hHs
-  calc _ = ∫ x, G (-x) ∂μ := by
-        congr 1; funext x; simp only [G, neg_dotProduct, neg_neg]; rfl
+  calc
+    _ = ∫ x, G (-x) ∂μ := by congr 1; funext x; simp only [G, neg_dotProduct, neg_neg]; rfl
     _ = ∫ x, G x ∂μ := integral_neg_eq_self G μ
-    _ = ∫ x, ∫ b', H x b' ∂μ ∂μ := by
-        congr 1; funext x; simp only [G, H]; rw [integral_mul_const]
+    _ = ∫ x, ∫ b', H x b' ∂μ ∂μ := by congr 1; funext x; simp only [G, H]; rw [integral_mul_const]
     _ = ∫ b', ∫ x, H x b' ∂μ ∂μ := integral_integral_swap hint
     _ = _ := by
-        congr 1; funext b'; congr 1; funext x
-        simp only [H]
-        rw [mul_assoc, ← AddChar.map_add_eq_mul, dotProduct_comm b' c, add_comm]
+      congr 1
+      funext b'
+      congr 1
+      funext x
+      simp only [H]
+      rw [mul_assoc, ← AddChar.map_add_eq_mul, dotProduct_comm b' c, add_comm]

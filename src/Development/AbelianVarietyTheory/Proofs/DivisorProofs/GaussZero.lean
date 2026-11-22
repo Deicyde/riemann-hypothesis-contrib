@@ -26,8 +26,8 @@ def theta {ι : Type} (e : ι → I → ℂ) (a : ι → ℂ) (n : I → ℤ) (y
 
 def emb {K : Type} [Field K] (φ : I → K →+* ℂ) (α : K) : I → ℂ := fun i => φ i α
 
-def ulog {K : Type} [Field K] [NumberField K] (φ : I → K →+* ℂ) (u : (𝓞 K)ˣ) : I → ℝ :=
-  fun i => Real.log (‖φ i ((u : 𝓞 K) : K)‖ ^ 2)
+def ulog {K : Type} [Field K] [NumberField K] (φ : I → K →+* ℂ) (u : (𝓞 K)ˣ) : I → ℝ := fun i =>
+  Real.log (‖φ i ((u : 𝓞 K) : K)‖ ^ 2)
 
 theorem hmon_zero {n : ℤ} (hn : n ≠ 0) : hmon n 0 = 0 := by
   unfold hmon

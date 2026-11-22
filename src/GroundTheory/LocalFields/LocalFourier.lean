@@ -22,28 +22,29 @@ def selfDualMeasure (ψ : AddChar K Circle) : Measure K :=
   ((residueCard K : ℝ≥0) ^ ((addCharConductor ψ : ℝ) / 2)) • haarIntegers K
 
 omit [MeasurableSpace K] [BorelSpace K] in
-theorem selfDualMeasure_coeff_ne_zero (ψ : AddChar K Circle) :
-    ((residueCard K : ℝ≥0) ^ ((addCharConductor ψ : ℝ) / 2)) ≠ 0 :=
+theorem selfDualMeasure_coeff_ne_zero (ψ : AddChar K Circle)
+    : ((residueCard K : ℝ≥0) ^ ((addCharConductor ψ : ℝ) / 2)) ≠ 0 :=
   (NNReal.rpow_pos (zero_lt_one.trans one_lt_residueCard_nnreal)).ne'
 
 instance (ψ : AddChar K Circle) : (selfDualMeasure ψ).IsAddHaarMeasure := by
   unfold selfDualMeasure
   exact IsAddHaarMeasure.nnreal_smul (haarIntegers K) (selfDualMeasure_coeff_ne_zero ψ)
 
-theorem selfDualMeasure_integers (ψ : AddChar K Circle) :
-    selfDualMeasure ψ (𝒪[K] : Set K) = ((residueCard K : ℝ≥0) ^ ((addCharConductor ψ : ℝ) / 2) : ℝ≥0) := by
+theorem selfDualMeasure_integers (ψ : AddChar K Circle)
+    : selfDualMeasure ψ (𝒪[K] : Set K)
+      = ((residueCard K : ℝ≥0) ^ ((addCharConductor ψ : ℝ) / 2) : ℝ≥0) := by
   rw [selfDualMeasure, Measure.smul_apply, haarIntegers_integers, ENNReal.smul_def, smul_eq_mul,
     mul_one]
 
-theorem selfDualMeasure_real_valBall_zero (ψ : AddChar K Circle) :
-    (selfDualMeasure ψ).real (valBall K 0) = (residueCard K : ℝ) ^ ((addCharConductor ψ : ℝ) / 2) := by
+theorem selfDualMeasure_real_valBall_zero (ψ : AddChar K Circle)
+    : (selfDualMeasure ψ).real (valBall K 0)
+      = (residueCard K : ℝ) ^ ((addCharConductor ψ : ℝ) / 2) := by
   rw [measureReal_def, coe_valBall_zero, selfDualMeasure_integers, ENNReal.coe_toReal,
     NNReal.coe_rpow, NNReal.coe_natCast]
 
-
 omit [MeasurableSpace K] [BorelSpace K] in
-theorem inversion_const_eq_one_iff (n : ℤ) {r : ℝ} (hr : 0 ≤ r) :
-    (residueCard K : ℝ) ^ (-n) * r ^ 2 = 1 ↔ r = (residueCard K : ℝ) ^ ((n : ℝ) / 2) := by
+theorem inversion_const_eq_one_iff (n : ℤ) {r : ℝ} (hr : 0 ≤ r)
+    : (residueCard K : ℝ) ^ (-n) * r ^ 2 = 1 ↔ r = (residueCard K : ℝ) ^ ((n : ℝ) / 2) := by
   have hq : (0 : ℝ) < residueCard K := by exact_mod_cast zero_lt_one.trans one_lt_residueCard
   have hsq : ((residueCard K : ℝ) ^ ((n : ℝ) / 2)) ^ 2 = (residueCard K : ℝ) ^ n := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul hq.le, ← Real.rpow_intCast]
@@ -62,15 +63,14 @@ theorem inversion_const_eq_one_iff (n : ℤ) {r : ℝ} (hr : 0 ≤ r) :
   · intro h
     rw [h, hsq, ← zpow_add₀ hq.ne', neg_add_cancel, zpow_zero]
 
-
 variable {ψ : AddChar K Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
 include hψ hψ1
 
-theorem localFourier_localFourier_selfDual {f : K → ℂ} (hf : f ∈ schwartzBruhat K) (x : K) :
-    localFourier (selfDualMeasure ψ) ψ (localFourier (selfDualMeasure ψ) ψ f) x = f (-x) := by
+theorem localFourier_localFourier_selfDual {f : K → ℂ} (hf : f ∈ schwartzBruhat K) (x : K)
+    : localFourier (selfDualMeasure ψ) ψ (localFourier (selfDualMeasure ψ) ψ f) x = f (-x) := by
   rw [localFourier_localFourier _ hψ hψ1 hf x, selfDualMeasure_real_valBall_zero,
-    (inversion_const_eq_one_iff (K := K) (addCharConductor ψ) (Real.rpow_nonneg (Nat.cast_nonneg _) _)).mpr
-      rfl]
+    (inversion_const_eq_one_iff (K := K) (addCharConductor ψ)
+      (Real.rpow_nonneg (Nat.cast_nonneg _) _)).mpr rfl]
   simp
 
 end SelfDual
@@ -102,11 +102,9 @@ theorem range_units_val : Set.range (Units.val : Kˣ → K) = {0}ᶜ := by
   · intro hx
     exact ⟨Units.mk0 x hx, rfl⟩
 
-
 omit [MeasurableSpace K] [BorelSpace K] in
 theorem isOpenEmbedding_units_val : IsOpenEmbedding (Units.val : Kˣ → K) :=
   ⟨Units.isEmbedding_val₀, by rw [range_units_val]; exact isOpen_compl_singleton⟩
-
 
 variable (K) in
 def multHaarConst : ℝ≥0∞ := (1 - ((residueCard K : ℝ≥0∞))⁻¹)⁻¹
@@ -123,7 +121,6 @@ omit [MeasurableSpace K] [BorelSpace K] in
 theorem multHaarConst_ne_top : multHaarConst K ≠ ∞ :=
   ENNReal.inv_ne_top.mpr one_sub_inv_residueCard_ne_zero
 
-
 variable (K) in
 def multHaar : Measure Kˣ :=
   Measure.comap Units.val
@@ -132,22 +129,22 @@ def multHaar : Measure Kˣ :=
 theorem measurable_modulus_inv : Measurable fun x : K => ((modulus x : ℝ≥0∞))⁻¹ :=
   measurable_modulus.coe_nnreal_ennreal.inv
 
-theorem multHaar_apply (s : Set Kˣ) :
-    multHaar K s =
-      multHaarConst K * ∫⁻ x in Units.val '' s, ((modulus x : ℝ≥0∞))⁻¹ ∂(haarIntegers K) := by
+theorem multHaar_apply (s : Set Kˣ)
+    : multHaar K s
+      = multHaarConst K * ∫⁻ x in Units.val '' s, ((modulus x : ℝ≥0∞))⁻¹ ∂(haarIntegers K) := by
   rw [multHaar, measurableEmbedding_units_val.comap_apply, Measure.smul_apply, withDensity_apply',
     smul_eq_mul]
 
-theorem integral_multHaar {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : K → E) :
-    ∫ u, f u ∂(multHaar K) =
-      (multHaarConst K).toReal • ∫ x in {0}ᶜ, ((modulus x : ℝ))⁻¹ • f x ∂(haarIntegers K) := by
+theorem integral_multHaar {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : K → E)
+    : ∫ u, f u ∂(multHaar K)
+      = (multHaarConst K).toReal • ∫ x in {0}ᶜ, ((modulus x : ℝ))⁻¹ • f x ∂(haarIntegers K) := by
   rw [← measurableEmbedding_units_val.integral_map, multHaar,
     measurableEmbedding_units_val.map_comap, range_units_val, Measure.restrict_smul,
     integral_smul_measure,
     setIntegral_withDensity_eq_setIntegral_toReal_smul measurable_modulus_inv
       (ae_restrict_of_forall_mem (measurableSet_singleton 0).compl fun x hx =>
-        ENNReal.inv_lt_top.mpr (ENNReal.coe_pos.mpr (modulus_pos hx))) f
-      (measurableSet_singleton 0).compl]
+        ENNReal.inv_lt_top.mpr (ENNReal.coe_pos.mpr (modulus_pos hx)))
+      f (measurableSet_singleton 0).compl]
   congr 1
   refine setIntegral_congr_fun (measurableSet_singleton 0).compl fun x _ => ?_
   simp [ENNReal.toReal_inv]
@@ -161,8 +158,9 @@ instance : (multHaar K).IsMulLeftInvariant := by
     exact (measurable_const_mul (a : K)).comp measurableEmbedding_units_val.measurable
   rw [Measure.map_apply hmeas hs, multHaar_apply, multHaar_apply]
   congr 1
-  have himg : Units.val '' ((fun u => a * u) ⁻¹' s) =
-      (fun x : K => (a : K) * x) ⁻¹' (Units.val '' s) := by
+  have himg
+      : Units.val '' ((fun u => a * u) ⁻¹' s)
+        = (fun x : K => (a : K) * x) ⁻¹' (Units.val '' s) := by
     ext x
     constructor
     · rintro ⟨u, hu, rfl⟩
@@ -178,32 +176,37 @@ instance : (multHaar K).IsMulLeftInvariant := by
   have hm0 : (modulus (a : K) : ℝ≥0∞) ≠ 0 := ENNReal.coe_ne_zero.mpr (modulus_ne_zero ha0)
   have hmt : (modulus (a : K) : ℝ≥0∞) ≠ ∞ := ENNReal.coe_ne_top
   rw [← lintegral_indicator (hS.preimage (measurable_const_mul _)), ← lintegral_indicator hS]
-  have hpt : ∀ x, ((fun x : K => (a : K) * x) ⁻¹' (Units.val '' s)).indicator
-      (fun x => ((modulus x : ℝ≥0∞))⁻¹) x =
-      (Units.val '' s).indicator (fun y => ((modulus y : ℝ≥0∞))⁻¹) ((a : K) * x) *
-        (modulus (a : K) : ℝ≥0∞) := by
+  have hpt
+      : ∀ x,
+        ((fun x : K => (a : K) * x) ⁻¹' (Units.val '' s)).indicator
+            (fun x => ((modulus x : ℝ≥0∞))⁻¹)
+            x
+          = (Units.val '' s).indicator (fun y => ((modulus y : ℝ≥0∞))⁻¹) ((a : K) * x)
+            * (modulus (a : K) : ℝ≥0∞) := by
     intro x
     by_cases hx : (a : K) * x ∈ Units.val '' s
     · rw [Set.indicator_of_mem (show x ∈ (fun x : K => (a : K) * x) ⁻¹' (Units.val '' s) from hx),
         Set.indicator_of_mem hx, modulus_mul, ENNReal.coe_mul,
         ENNReal.mul_inv (Or.inl hm0) (Or.inl hmt), mul_comm, ← mul_assoc,
         ENNReal.mul_inv_cancel hm0 hmt, one_mul]
-    · rw [Set.indicator_of_notMem
-        (show x ∉ (fun x : K => (a : K) * x) ⁻¹' (Units.val '' s) from hx),
+    · rw [Set.indicator_of_notMem (show x ∉ (fun x : K => (a : K) * x) ⁻¹' (Units.val '' s) from
+          hx),
         Set.indicator_of_notMem hx, zero_mul]
-  calc ∫⁻ x, ((fun x : K => (a : K) * x) ⁻¹' (Units.val '' s)).indicator
-        (fun x => ((modulus x : ℝ≥0∞))⁻¹) x ∂(haarIntegers K)
-      = ∫⁻ x, (Units.val '' s).indicator (fun y => ((modulus y : ℝ≥0∞))⁻¹) ((a : K) * x) *
-          (modulus (a : K) : ℝ≥0∞) ∂(haarIntegers K) := lintegral_congr hpt
-    _ = ((modulus (a : K) : ℝ≥0∞))⁻¹ * ∫⁻ y, (Units.val '' s).indicator
+  calc
+    ∫⁻ x, ((fun x : K => (a : K) * x) ⁻¹' (Units.val '' s)).indicator
+     (fun x => ((modulus x : ℝ≥0∞))⁻¹) x ∂(haarIntegers K)
+        = ∫⁻ x, (Units.val '' s).indicator (fun y => ((modulus y : ℝ≥0∞))⁻¹) ((a : K) * x) *
+            (modulus (a : K) : ℝ≥0∞) ∂(haarIntegers K) :=
+      lintegral_congr hpt
+    _ = ((modulus (a : K) : ℝ≥0∞))⁻¹
+        * ∫⁻ y, (Units.val '' s).indicator
           (fun y => ((modulus y : ℝ≥0∞))⁻¹) y * (modulus (a : K) : ℝ≥0∞) ∂(haarIntegers K) :=
-        lintegral_comp_mul_left (haarIntegers K) ha0
-          (fun y => (Units.val '' s).indicator (fun y => ((modulus y : ℝ≥0∞))⁻¹) y *
-            (modulus (a : K) : ℝ≥0∞))
+      lintegral_comp_mul_left (haarIntegers K) ha0 (fun y =>
+        (Units.val '' s).indicator (fun y => ((modulus y : ℝ≥0∞))⁻¹) y * (modulus (a : K) : ℝ≥0∞))
     _ = ∫⁻ y, (Units.val '' s).indicator (fun y => ((modulus y : ℝ≥0∞))⁻¹) y
           ∂(haarIntegers K) := by
-        rw [lintegral_mul_const' _ _ hmt, mul_comm _ (modulus (a : K) : ℝ≥0∞), ← mul_assoc,
-          ENNReal.inv_mul_cancel hm0 hmt, one_mul]
+      rw [lintegral_mul_const' _ _ hmt, mul_comm _ (modulus (a : K) : ℝ≥0∞), ← mul_assoc,
+        ENNReal.inv_mul_cancel hm0 hmt, one_mul]
 
 instance : IsFiniteMeasureOnCompacts (multHaar K) := by
   constructor
@@ -213,17 +216,19 @@ instance : IsFiniteMeasureOnCompacts (multHaar K) := by
   rcases C.eq_empty_or_nonempty with rfl | hne
   · simp
   have hC' : IsCompact (Units.val '' C) := hC.image Units.continuous_val
-  obtain ⟨u, -, hmin⟩ := hC.exists_isMinOn hne
-    (continuous_modulus.comp Units.continuous_val).continuousOn
+  obtain ⟨u, -, hmin⟩ :=
+    hC.exists_isMinOn hne (continuous_modulus.comp Units.continuous_val).continuousOn
   have hδ : modulus (u : K) ≠ 0 := modulus_ne_zero u.ne_zero
-  calc ∫⁻ x in Units.val '' C, ((modulus x : ℝ≥0∞))⁻¹ ∂(haarIntegers K)
-      ≤ ∫⁻ x in Units.val '' C, ((modulus (u : K) : ℝ≥0∞))⁻¹ ∂(haarIntegers K) := by
-        refine setLIntegral_mono' hC'.isClosed.measurableSet ?_
-        rintro _ ⟨v, hv, rfl⟩
-        exact ENNReal.inv_le_inv.mpr (ENNReal.coe_le_coe.mpr (hmin hv))
+  calc
+    ∫⁻ x in Units.val '' C, ((modulus x : ℝ≥0∞))⁻¹ ∂(haarIntegers K)
+        ≤ ∫⁻ x in Units.val '' C, ((modulus (u : K) : ℝ≥0∞))⁻¹ ∂(haarIntegers K) := by
+      refine setLIntegral_mono' hC'.isClosed.measurableSet ?_
+      rintro _ ⟨v, hv, rfl⟩
+      exact ENNReal.inv_le_inv.mpr (ENNReal.coe_le_coe.mpr (hmin hv))
     _ = ((modulus (u : K) : ℝ≥0∞))⁻¹ * haarIntegers K (Units.val '' C) := setLIntegral_const _ _
-    _ < ∞ := ENNReal.mul_lt_top (ENNReal.inv_lt_top.mpr (ENNReal.coe_pos.mpr
-        (pos_iff_ne_zero.mpr hδ))) hC'.measure_lt_top
+    _ < ∞ :=
+      ENNReal.mul_lt_top (ENNReal.inv_lt_top.mpr (ENNReal.coe_pos.mpr (pos_iff_ne_zero.mpr hδ)))
+        hC'.measure_lt_top
 
 instance : IsOpenPosMeasure (multHaar K) := by
   constructor
@@ -242,11 +247,10 @@ instance : IsOpenPosMeasure (multHaar K) := by
 
 instance : (multHaar K).IsHaarMeasure where
 
-theorem multHaar_unitFiltrationUnits_zero :
-    multHaar K (unitFiltrationUnits K 0 : Set Kˣ) = 1 := by
+theorem multHaar_unitFiltrationUnits_zero : multHaar K (unitFiltrationUnits K 0 : Set Kˣ) = 1 := by
   rw [multHaar_apply]
-  have himg : Units.val '' (unitFiltrationUnits K 0 : Set Kˣ) =
-      (valBall K 0 : Set K) \ valBall K 1 := by
+  have himg
+      : Units.val '' (unitFiltrationUnits K 0 : Set Kˣ) = (valBall K 0 : Set K) \ valBall K 1 := by
     ext x
     constructor
     · rintro ⟨u, hu, rfl⟩

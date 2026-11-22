@@ -12,25 +12,20 @@ section Filtration
 
 variable {G : Type*} [Group G]
 
-@[to_additive AddFiltrationCauchy
-]
+@[to_additive AddFiltrationCauchy]
 def FiltrationCauchy (F : ℕ → Subgroup G) (x : ℕ → G) : Prop :=
   ∀ N, ∃ M, ∀ m ≥ M, ∀ n ≥ M, x n / x m ∈ F N
 
-@[to_additive AddFiltrationTendsto
-]
+@[to_additive AddFiltrationTendsto]
 def FiltrationTendsto (F : ℕ → Subgroup G) (x : ℕ → G) (y : G) : Prop :=
   ∀ N, ∃ M, ∀ n ≥ M, x n / y ∈ F N
 
-@[to_additive AddFiltrationComplete
-]
+@[to_additive AddFiltrationComplete]
 def FiltrationComplete (F : ℕ → Subgroup G) : Prop :=
   ∀ x : ℕ → G, FiltrationCauchy F x → ∃ y, FiltrationTendsto F x y
 
-@[to_additive AddFiltrationSeparated
-]
-def FiltrationSeparated (F : ℕ → Subgroup G) : Prop :=
-  ∀ g : G, (∀ n, g ∈ F n) → g = 1
+@[to_additive AddFiltrationSeparated]
+def FiltrationSeparated (F : ℕ → Subgroup G) : Prop := ∀ g : G, (∀ n, g ∈ F n) → g = 1
 
 end Filtration
 
@@ -38,21 +33,22 @@ section Surjectivity
 
 variable {G H : Type*} [Group G] [Group H]
 
-@[to_additive map_eq_of_graded_surjective_add
-]
-theorem map_eq_of_graded_surjective {F : ℕ → Subgroup G} {E : ℕ → Subgroup H}
-    (hF : Antitone F) (hE : Antitone E) (hG : FiltrationComplete F)
-    (hH : FiltrationSeparated E) (f : G →* H) {φ : ℕ → ℕ} (hφ : Tendsto φ atTop atTop)
+@[to_additive map_eq_of_graded_surjective_add]
+theorem map_eq_of_graded_surjective
+    {F : ℕ → Subgroup G} {E : ℕ → Subgroup H}
+    (hF : Antitone F) (hE : Antitone E) (hG : FiltrationComplete F) (hH : FiltrationSeparated E)
+    (f : G →* H)
+    {φ : ℕ → ℕ} (hφ : Tendsto φ atTop atTop)
     (k : ℕ) (hmap : ∀ n, k ≤ n → ∀ g ∈ F n, f g ∈ E (φ n))
-    (hgr : ∀ n, k ≤ n → ∀ h ∈ E (φ n), ∃ g ∈ F n, h / f g ∈ E (φ (n + 1))) :
-    (F k).map f = E (φ k) := by
+    (hgr : ∀ n, k ≤ n → ∀ h ∈ E (φ n), ∃ g ∈ F n, h / f g ∈ E (φ (n + 1)))
+    : (F k).map f = E (φ k) := by
   apply le_antisymm
   · rintro _ ⟨g, hg, rfl⟩
     exact hmap k le_rfl g hg
   intro h hh
   rw [Subgroup.mem_map]
-  have hs : ∀ (n : ℕ) (a : H), ∃ g : G,
-      k ≤ n → a ∈ E (φ n) → g ∈ F n ∧ a / f g ∈ E (φ (n + 1)) := by
+  have hs
+      : ∀ (n : ℕ) (a : H), ∃ g : G, k ≤ n → a ∈ E (φ n) → g ∈ F n ∧ a / f g ∈ E (φ (n + 1)) := by
     intro n a
     by_cases hc : k ≤ n ∧ a ∈ E (φ n)
     · obtain ⟨g, hg1, hg2⟩ := hgr n hc.1 a hc.2
@@ -132,17 +128,17 @@ theorem map_eq_of_graded_surjective {F : ℕ → Subgroup G} {E : ℕ → Subgro
         (hmap _ (le_max_right _ _) _ (hM (max M N0) (le_max_left _ _)))
   exact (div_eq_one.mp h1).symm
 
-@[to_additive surjective_of_graded_surjective_add
-]
-theorem surjective_of_graded_surjective {F : ℕ → Subgroup G} {E : ℕ → Subgroup H}
-    (hF : Antitone F) (hE : Antitone E) (hG : FiltrationComplete F)
-    (hH : FiltrationSeparated E) (f : G →* H) {φ : ℕ → ℕ} (hφ : Tendsto φ atTop atTop)
+@[to_additive surjective_of_graded_surjective_add]
+theorem surjective_of_graded_surjective
+    {F : ℕ → Subgroup G} {E : ℕ → Subgroup H}
+    (hF : Antitone F) (hE : Antitone E) (hG : FiltrationComplete F) (hH : FiltrationSeparated E)
+    (f : G →* H)
+    {φ : ℕ → ℕ} (hφ : Tendsto φ atTop atTop)
     (hF0 : F 0 = ⊤) (hE0 : E (φ 0) = ⊤) (hmap : ∀ n, ∀ g ∈ F n, f g ∈ E (φ n))
-    (hgr : ∀ n, ∀ h ∈ E (φ n), ∃ g ∈ F n, h / f g ∈ E (φ (n + 1))) :
-    Function.Surjective f := by
+    (hgr : ∀ n, ∀ h ∈ E (φ n), ∃ g ∈ F n, h / f g ∈ E (φ (n + 1)))
+    : Function.Surjective f := by
   intro h
-  have e := map_eq_of_graded_surjective hF hE hG hH f hφ 0 (fun n _ => hmap n)
-    (fun n _ => hgr n)
+  have e := map_eq_of_graded_surjective hF hE hG hH f hφ 0 (fun n _ => hmap n) (fun n _ => hgr n)
   have hh : h ∈ E (φ 0) := by rw [hE0]; exact Subgroup.mem_top h
   rw [← e, hF0] at hh
   obtain ⟨g, -, rfl⟩ := hh

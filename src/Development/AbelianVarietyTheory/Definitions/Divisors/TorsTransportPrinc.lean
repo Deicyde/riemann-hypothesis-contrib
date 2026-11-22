@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsValued
 noncomputable section
 
 open NumberField IsDedekindDomain GlobalTheory.CMVal
-open GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds (betaBound_vp c_vp cE_vp a0 n_vp)
-open GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport (IsConjWt upIdele IsInvIdealOf IsLatOf)
+open GlobalTheory.IndefiniteRowSideFullHecke.ClassZetaValuationBounds
+  (betaBound_vp c_vp cE_vp a0 n_vp)
+open GlobalTheory.IndefiniteRowSideFullHecke.LatticeNormTransport
+  (IsConjWt upIdele IsInvIdealOf IsLatOf)
 open GlobalTheory.ToricTransport (coordIn)
 open scoped nonZeroDivisors
 
@@ -19,8 +21,9 @@ namespace GlobalTheory.LatVal.Model
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem exists_isLatOf (d : ℕ) (δ : K) (ι : K →+* ℂ) (h2 : Module.finrank ℚ K = 2) (hd : 0 < d) (hδ : δ ^ 2 = -(d : K)) :
-    ∃ Λ : PeriodPair, IsLatOf ι 1 Λ := by
+theorem exists_isLatOf
+    (d : ℕ) (δ : K) (ι : K →+* ℂ) (h2 : Module.finrank ℚ K = 2) (hd : 0 < d) (hδ : δ ^ 2 = -(d : K))
+    : ∃ Λ : PeriodPair, IsLatOf ι 1 Λ := by
   have hc : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 K)) = Fintype.card (Fin 2) := by
     rw [← Module.finrank_eq_card_chooseBasisIndex, RingOfIntegers.rank, h2]; simp
   let e := Fintype.equivOfCardEq hc
@@ -46,11 +49,12 @@ theorem exists_isLatOf (d : ℕ) (δ : K) (ι : K →+* ℂ) (h2 : Module.finran
       have hd' : (0 : ℝ) < d := by exact_mod_cast hd
       have : u ^ 2 ≤ 0 := by nlinarith [sq_nonneg w, sq_nonneg u]
       exact pow_eq_zero_iff (two_ne_zero) |>.1 (le_antisymm this (sq_nonneg u))
-    have k1 := key (s * q - t * p) (s * q' - t * p') (by
-      push_cast
-      have : ((s : ℂ) * q' - t * p') = ((s : ℂ) * q' - t * p') * 1 := by ring
-      rw [this, h1, h3]
-      linear_combination (q * p' - p * q' : ℂ) * h)
+    have k1 :=
+      key (s * q - t * p) (s * q' - t * p') (by
+        push_cast
+        have : ((s : ℂ) * q' - t * p') = ((s : ℂ) * q' - t * p') * 1 := by ring
+        rw [this, h1, h3]
+        linear_combination (q * p' - p * q' : ℂ) * h)
     have k1' : (s : ℂ) * q - t * p = 0 := by exact_mod_cast k1
     have hb0 : ι (B 0) ≠ 0 := by simpa using B.ne_zero 0
     have hb1 : ι (B 1) ≠ 0 := by simpa using B.ne_zero 1
@@ -59,7 +63,8 @@ theorem exists_isLatOf (d : ℕ) (δ : K) (ι : K →+* ℂ) (h2 : Module.finran
     exact ⟨by exact_mod_cast hs, by exact_mod_cast ht⟩
   refine ⟨⟨ι (B 0), ι (B 1), hind⟩, ?_⟩
   ext z
-  simp only [SetLike.mem_coe, PeriodPair.mem_lattice, Set.mem_image, FractionalIdeal.mem_coe, FractionalIdeal.mem_one_iff]
+  simp only [SetLike.mem_coe, PeriodPair.mem_lattice, Set.mem_image, FractionalIdeal.mem_coe,
+    FractionalIdeal.mem_one_iff]
   constructor
   · rintro ⟨m, n, rfl⟩
     exact ⟨_, ⟨m * b 0 + n * b 1, rfl⟩, by simp [hB]⟩

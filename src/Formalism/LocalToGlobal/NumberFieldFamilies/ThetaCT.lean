@@ -10,7 +10,9 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompa
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct ContDiff
 
 namespace Formalism.L2.Fam.ThC
@@ -31,7 +33,8 @@ theorem countable_primes : Countable (HeightOneSpectrum (𝓞 F)) := by
   have h : Function.Surjective fun s : Finset (𝓞 F) => Ideal.span (s : Set (𝓞 F)) := fun I =>
     (IsNoetherian.noetherian I)
   have := h.countable
-  exact Function.Injective.countable (f := HeightOneSpectrum.asIdeal) fun _ _ e => HeightOneSpectrum.ext e
+  exact Function.Injective.countable (f := HeightOneSpectrum.asIdeal) fun _ _ e =>
+    HeightOneSpectrum.ext e
 
 theorem sc_Fv (v : HeightOneSpectrum (𝓞 F)) : SecondCountableTopology (v.adicCompletion F) := by
   have := countable_F F
@@ -42,18 +45,31 @@ theorem sc_Fv (v : HeightOneSpectrum (𝓞 F)) : SecondCountableTopology (v.adic
 theorem sc_Af : SecondCountableTopology (FiniteAdeleRing (𝓞 F) F) := by
   have := countable_primes F
   have := sc_Fv F
-  have ho : ∀ v : HeightOneSpectrum (𝓞 F), IsOpen (v.adicCompletionIntegers F : Set (v.adicCompletion F)) :=
-    fun v => Valued.isOpen_valuationSubring _
-  have hS : ∀ T : Finset (HeightOneSpectrum (𝓞 F)), Filter.cofinite ≤ Filter.principal ((T : Set (HeightOneSpectrum (𝓞 F)))ᶜ) := fun T =>
+  have ho
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        IsOpen (v.adicCompletionIntegers F : Set (v.adicCompletion F)) := fun v =>
+    Valued.isOpen_valuationSubring _
+  have hS
+      : ∀ T : Finset (HeightOneSpectrum (𝓞 F)),
+        Filter.cofinite ≤ Filter.principal ((T : Set (HeightOneSpectrum (𝓞 F)))ᶜ) := fun T =>
     Filter.le_principal_iff.2 T.finite_toSet.compl_mem_cofinite
-  have he := fun T : Finset (HeightOneSpectrum (𝓞 F)) => RestrictedProduct.isOpenEmbedding_inclusion_principal ho (hS T)
-  have hU : ∀ T : Finset (HeightOneSpectrum (𝓞 F)), SecondCountableTopology (Set.range (RestrictedProduct.inclusion
-      (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F) (fun v => (v.adicCompletionIntegers F : Set _)) (hS T))) :=
-    fun T => by
-      have := (RestrictedProduct.isEmbedding_coe_of_principal (R := fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
-        (A := fun v => (v.adicCompletionIntegers F : Set _)) (S := (T : Set (HeightOneSpectrum (𝓞 F)))ᶜ)).secondCountableTopology
-      exact (he T).isEmbedding.toHomeomorph.symm.secondCountableTopology
-  refine @TopologicalSpace.secondCountableTopology_of_countable_cover _ _ _ _ _ hU (fun T => (he T).isOpen_range) ?_
+  have he := fun T : Finset (HeightOneSpectrum (𝓞 F)) =>
+    RestrictedProduct.isOpenEmbedding_inclusion_principal ho (hS T)
+  have hU
+      : ∀ T : Finset (HeightOneSpectrum (𝓞 F)),
+        SecondCountableTopology (Set.range (RestrictedProduct.inclusion
+          (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
+          (fun v => (v.adicCompletionIntegers F : Set _))
+          (hS T))) := fun T => by
+    have :=
+      (RestrictedProduct.isEmbedding_coe_of_principal
+        (R := fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
+        (A := fun v => (v.adicCompletionIntegers F : Set _))
+        (S := (T : Set (HeightOneSpectrum (𝓞 F)))ᶜ)).secondCountableTopology
+    exact (he T).isEmbedding.toHomeomorph.symm.secondCountableTopology
+  refine @TopologicalSpace.secondCountableTopology_of_countable_cover _ _ _ _ _ hU
+    (fun T => (he T).isOpen_range)
+    ?_
   refine Set.eq_univ_of_forall fun x => Set.mem_iUnion.2 ?_
   have hx := Filter.eventually_cofinite.1 x.2
   refine ⟨hx.toFinset, ⟨x.1, Filter.eventually_principal.2 fun v hv => ?_⟩, rfl⟩

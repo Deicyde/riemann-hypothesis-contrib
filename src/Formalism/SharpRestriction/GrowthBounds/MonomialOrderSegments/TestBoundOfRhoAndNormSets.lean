@@ -17,38 +17,44 @@ namespace TwistData
 
 variable {K : Type} [Field K] (D : TwistData K)
 
-theorem Lam_smul (p : ℕ) (F : MvPolynomial (D.OL × Fin D.r) K) (a : K) (Z : MvPolynomial (D.ML × Fin D.r) K) :
-    D.abelian₂ p F (a • Z) = a * D.abelian₂ p F Z := by
+theorem Lam_smul
+    (p : ℕ) (F : MvPolynomial (D.OL × Fin D.r) K) (a : K) (Z : MvPolynomial (D.ML × Fin D.r) K)
+    : D.abelian₂ p F (a • Z) = a * D.abelian₂ p F Z := by
   unfold abelian₂; simp only [gaAct_eq_dg, map_smul, fock_smul_right]
 
-theorem Lam_monomial (p : ℕ) (F : MvPolynomial (D.OL × Fin D.r) K) (ζ : D.EM) (c : K) :
-    D.abelian₂ p F (monomial ζ c) =
-      F.coeff (D.phE p ζ) * (D.ga (D.phE p ζ) * c) * (fact (D.phE p ζ) : K) := by
+theorem Lam_monomial (p : ℕ) (F : MvPolynomial (D.OL × Fin D.r) K) (ζ : D.EM) (c : K)
+    : D.abelian₂ p F (monomial ζ c)
+      = F.coeff (D.phE p ζ) * (D.ga (D.phE p ζ) * c) * (fact (D.phE p ζ) : K) := by
   unfold abelian₂; rw [ph_monomial, gaAct_eq_dg, dg_monomial, fock_monomial_right]
 
-theorem ph_eq_sum (p : ℕ) (Z : MvPolynomial (D.ML × Fin D.r) K) :
-    D.ph p Z = ∑ ζ ∈ Z.support, monomial (D.phE p ζ) (Z.coeff ζ) := by
+theorem ph_eq_sum (p : ℕ) (Z : MvPolynomial (D.ML × Fin D.r) K)
+    : D.ph p Z = ∑ ζ ∈ Z.support, monomial (D.phE p ζ) (Z.coeff ζ) := by
   conv_lhs => rw [Z.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   exact Finset.sum_congr rfl fun ζ _ => D.ph_monomial p ζ _
 
-theorem monomial_mem_PolK {L : Type} {r : ℕ} (d : L → ℕ) (α : L × Fin r →₀ ℕ) (c : K)
-    (h : ∀ i, ldeg α i = d i) : monomial α c ∈ PolK K r d := by
+theorem monomial_mem_PolK
+    {L : Type} {r : ℕ} (d : L → ℕ) (α : L × Fin r →₀ ℕ) (c : K) (h : ∀ i, ldeg α i = d i)
+    : monomial α c ∈ PolK K r d := by
   classical
   rw [mem_PolK_iff]
   intro β hβ
   have := support_monomial_subset hβ
   rw [Finset.mem_singleton] at this
-  rw [this]; exact h
+  rw [this]
+  exact h
 
-theorem ph_mem_PolK (p : ℕ) {Z : MvPolynomial (D.ML × Fin D.r) K} (hZ : D.Good p Z) :
-    D.ph p Z ∈ PolK K D.r D.dO := by
+theorem ph_mem_PolK (p : ℕ) {Z : MvPolynomial (D.ML × Fin D.r) K} (hZ : D.Good p Z)
+    : D.ph p Z ∈ PolK K D.r D.dO := by
   rw [ph_eq_sum]
   exact Submodule.sum_mem _ fun ζ hζ => monomial_mem_PolK _ _ _ (D.ldeg_phE p ζ (hZ ζ hζ))
 
-theorem cge_ph (v : AddValuation K (WithTop ℚ)) (p : ℕ) {a : ℝ} {Z : MvPolynomial (D.ML × Fin D.r) K}
-    (hZ : cge v a Z) : cge v a (D.ph p Z) := by
+theorem cge_ph
+    (v : AddValuation K (WithTop ℚ))
+    (p : ℕ)
+    {a : ℝ} {Z : MvPolynomial (D.ML × Fin D.r) K} (hZ : cge v a Z)
+    : cge v a (D.ph p Z) := by
   rw [ph_eq_sum]
   exact cge_sum v _ _ fun ζ _ => cge_monomial v _ (hZ ζ)
 
@@ -90,13 +96,16 @@ variable {K : Type} [Field K] [CharZero K] {v : AddValuation K (WithTop ℚ)} {p
 theorem stepBC_of (hB : StepB K v p C0) (hC : StepC K v p) : StepBC K v p C0 := by
   intro hD D hV hc F hF hF0
   obtain ⟨Gt, hGt, hval, hle⟩ := hB hD D hV hc F hF hF0
-  obtain ⟨Z, hZi, hZg, hZph, hZv⟩ := hC hD D hV.1 hV.2.1 (fun j m => D.thl j m - 6 * D.c) Gt hGt hval
+  obtain ⟨Z, hZi, hZg, hZph, hZv⟩ :=
+    hC hD D hV.1 hV.2.1 (fun j m => D.thl j m - 6 * D.c) Gt hGt hval
   refine ⟨Z, hZi, hZg, hZv, ?_⟩
   unfold TwistData.abelian₂
-  rw [hZph]; exact hle
+  rw [hZph]
+  exact hle
 
-theorem plane_gram_theorem_of_combined_lemmas (h1 : 1 ≤ C0) (hBC : StepBC K v p C0) (hDEF : StepDEF K v p C0) :
-    LiftBoundUniform K v p C0 := by
+theorem plane_gram_theorem_of_combined_lemmas
+    (h1 : 1 ≤ C0) (hBC : StepBC K v p C0) (hDEF : StepDEF K v p C0)
+    : LiftBoundUniform K v p C0 := by
   intro hD D hV hH hc F hF hF0
   obtain ⟨Z, hZi, hZg, hZy, hZl⟩ := hBC hD D hV hc F hF hF0
   obtain ⟨Om, N2, hN2, hOi, hOg, hOc, hOy, hOl⟩ := hDEF hD D hV hH hc F hF hF0
@@ -123,38 +132,53 @@ theorem plane_gram_theorem_of_combined_lemmas (h1 : 1 ≤ C0) (hBC : StepBC K v 
   · intro α hα; simp at hα
   · intro α; simp [vR]
   · intro α hα
-    exact ⟨(hG α hα).2.2.1, fun t => by
-      have := (hG α hα).2.2.2.1 t
-      simp only [ldeg] at this
-      rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum]
-      exact this⟩
+    exact ⟨
+      (hG α hα).2.2.1,
+      fun t => by
+        have := (hG α hα).2.2.2.1 t
+        simp only [ldeg] at this
+        rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum]
+        exact this
+    ⟩
   · intro α hα; simp at hα
   · rw [add_zero, ← bge_iff]
-    have h2 := bge_of_cge hD (D.ph_mem_PolK p hG) (D.cge_ph v p ((cge_zero_iff_Integral v _).mpr hGi))
+    have h2 :=
+      bge_of_cge hD (D.ph_mem_PolK p hG) (D.cge_ph v p ((cge_zero_iff_Integral v _).mpr hGi))
     refine bge_mono v ?_ h2
     have h3 := kapL_le_kap' hp hr D.dO
     have h4 : D.n0 v = vN v (∏ i : D.OL, (D.dO i).factorial) / 2 := rfl
     have h5 : D.kapD p = kap p D.r D.dO := rfl
-    rw [h4, h5]; linarith
+    rw [h4, h5]
+    linarith
   · rw [add_zero]
-    have e1 : fock F (D.gaAct (D.ph p (((p : K) ^ N2) • Om Z))) = (p : K) ^ N2 * D.abelian₂ p F (Om Z) :=
+    have e1
+        : fock F (D.gaAct (D.ph p (((p : K) ^ N2) • Om Z)))
+          = (p : K) ^ N2 * D.abelian₂ p F (Om Z) :=
       D.Lam_smul p F _ _
-    have e2 : D.abelian₂ p F (Om Z) = D.abelian₂ p F Z + (D.abelian₂ p F (Om Z) - D.abelian₂ p F Z) := by ring
+    have e2
+        : D.abelian₂ p F (Om Z)
+          = D.abelian₂ p F Z + (D.abelian₂ p F (Om Z) - D.abelian₂ p F Z) := by
+      ring
     have h6 : vle v (D.n0 v + D.Dl p C0 + 1) (D.abelian₂ p F (Om Z)) := by
       rw [e2]
       exact vle_add_of_lt v hZl (hOl Z hZi hZg) (by linarith)
     have h7 := vle_pow_p hD N2 h6
     rw [e1]
-    have h8 : vR v ((p : K) ^ N2 * D.abelian₂ p F (Om Z)) ≤ ((D.n0 v + D.Dl p C0 + 1 + N2 : ℝ) : WithTop ℝ) := h7
-    calc vR v ((p : K) ^ N2 * D.abelian₂ p F (Om Z)) + ((-D.n0 v + D.kapD p : ℝ) : WithTop ℝ)
-        ≤ ((D.n0 v + D.Dl p C0 + 1 + N2 : ℝ) : WithTop ℝ) + ((-D.n0 v + D.kapD p : ℝ) : WithTop ℝ) := by
-          gcongr
-      _ = ((D.n0 v + D.Dl p C0 + 1 + N2 + (-D.n0 v + D.kapD p) : ℝ) : WithTop ℝ) := by
-          rw [← WithTop.coe_add]
+    have h8
+        : vR v ((p : K) ^ N2 * D.abelian₂ p F (Om Z))
+          ≤ ((D.n0 v + D.Dl p C0 + 1 + N2 : ℝ) : WithTop ℝ) :=
+      h7
+    calc
+      vR v ((p : K) ^ N2 * D.abelian₂ p F (Om Z)) + ((- D.n0 v + D.kapD p : ℝ) : WithTop ℝ)
+          ≤ ((D.n0 v + D.Dl p C0 + 1 + N2 : ℝ) : WithTop ℝ)
+            + ((- D.n0 v + D.kapD p : ℝ) : WithTop ℝ) := by
+        gcongr
+      _ = ((D.n0 v + D.Dl p C0 + 1 + N2 + (- D.n0 v + D.kapD p) : ℝ) : WithTop ℝ) := by
+        rw [← WithTop.coe_add]
       _ ≤ ((D.E p C0 2 + 2 * D.kapD p : ℝ) : WithTop ℝ) := by
-          rw [WithTop.coe_le_coe]
-          unfold TwistData.E
-          linarith
+        rw [WithTop.coe_le_coe]
+        unfold TwistData.E
+        linarith
 
 end Top
 

@@ -14,19 +14,20 @@ namespace GlobalTheory.JR.NonNorm
 
 open ValuativeRel GroundTheory.LocalField IntermediateField
 
-theorem not_two_dvd_ord_norm (F K L : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] [Field K] [Algebra F K] [FiniteDimensional F K]
-    [Field L] [Algebra K L] (h2 : Module.finrank K L = 2) (ζ : L)
-    (hζ : IsPrimitiveRoot ζ (Nat.card 𝓀[F] ^ 2 - 1)) (htop : K⟮ζ⟯ = ⊤) (s : K) (hs0 : s ≠ 0)
-    (hs : ¬ ∃ y : L, Algebra.norm K y = s) : ¬ (2 : ℤ) ∣ ord (Algebra.norm F s) := by
+theorem not_two_dvd_ord_norm
+    (F K L : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    [Field K] [Algebra F K] [FiniteDimensional F K] [Field L] [Algebra K L]
+    (h2 : Module.finrank K L = 2)
+    (ζ : L) (hζ : IsPrimitiveRoot ζ (Nat.card 𝓀[F] ^ 2 - 1)) (htop : K⟮ζ⟯ = ⊤)
+    (s : K) (hs0 : s ≠ 0) (hs : ¬ ∃ y : L, Algebra.norm K y = s)
+    : ¬ (2 : ℤ) ∣ ord (Algebra.norm F s) := by
   haveI : FiniteDimensional K L := Module.finite_of_finrank_pos (by omega)
   obtain ⟨vK, tK, hK, eK⟩ := exists_isNonarchimedeanLocalField_valuativeExtension F K
   obtain ⟨vL, tL, hL, eL⟩ := exists_isNonarchimedeanLocalField_valuativeExtension K L
-  have hm : ((Nat.card 𝓀[F] ^ 2 - 1 : ℕ) : 𝓀[K]) ≠ 0 :=
-    by
-      have hmF : ((Nat.card 𝓀[F] ^ 2 - 1 : ℕ) : 𝓀[F]) ≠ 0 :=
-        natCast_card_pow_sub_one_ne_zero (K := F) two_ne_zero
-      simpa using (map_ne_zero (algebraMap (𝓀[F]) (𝓀[K]))).2 hmF
+  have hm : ((Nat.card 𝓀[F] ^ 2 - 1 : ℕ) : 𝓀[K]) ≠ 0 := by
+    have hmF : ((Nat.card 𝓀[F] ^ 2 - 1 : ℕ) : 𝓀[F]) ≠ 0 :=
+      natCast_card_pow_sub_one_ne_zero (K := F) two_ne_zero
+    simpa using (map_ne_zero (algebraMap (𝓀[F]) (𝓀[K]))).2 hmF
   haveI : IsUnramified K L := ⟨ramificationIndex_eq_one_of_adjoin_eq_top hζ hm htop⟩
   have hodd : ¬ (2 : ℤ) ∣ ord s := by
     intro hd
@@ -35,7 +36,8 @@ theorem not_two_dvd_ord_norm (F K L : Type) [Field F] [ValuativeRel F] [Topologi
     exact hs ⟨y, congrArg Units.val hy⟩
   have hf : ¬ 2 ∣ ((IsLocalRing.maximalIdeal 𝒪[K]).inertiaDeg (𝒪[F])) := by
     rintro ⟨j, hj⟩
-    have hcard : Nat.card 𝓀[K] = Nat.card 𝓀[F] ^ ((IsLocalRing.maximalIdeal 𝒪[K]).inertiaDeg (𝒪[F])) := by
+    have hcard
+        : Nat.card 𝓀[K] = Nat.card 𝓀[F] ^ ((IsLocalRing.maximalIdeal 𝒪[K]).inertiaDeg (𝒪[F])) := by
       rw [residueDegree_eq_finrank]
       exact Module.natCard_eq_pow_finrank
     obtain ⟨z, hz⟩ := exists_isPrimitiveRoot_card_residueField_sub_one (L := K)
@@ -60,25 +62,32 @@ theorem not_two_dvd_ord_norm (F K L : Type) [Field F] [ValuativeRel F] [Topologi
   · exact hf (by exact_mod_cast h)
   · exact hodd h
 
-@[reducible] noncomputable def normRel (F : Type) [NormedField F] [IsUltrametricDist F] : ValuativeRel F :=
+@[reducible]
+noncomputable def normRel (F : Type) [NormedField F] [IsUltrametricDist F] : ValuativeRel F :=
   ValuativeRel.ofValuation (NormedField.valuation (K := F))
 
-theorem isLocalField (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F] :
-    letI := normRel F;
-    IsNonarchimedeanLocalField F := by
+theorem isLocalField
+    (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F]
+    : letI := normRel F
+      IsNonarchimedeanLocalField F := by
   letI := normRel F
   have hc : (NormedField.valuation (K := F)).Compatible := Valuation.Compatible.ofValuation _
-  refine { toIsValuativeTopology := ?_, toLocallyCompactSpace := inferInstance, toIsNontrivial := ?_ }
+  refine {
+    toIsValuativeTopology := ?_
+    toLocallyCompactSpace := inferInstance
+    toIsNontrivial := ?_
+  }
   · exact IsValuativeTopology.of_mem_nhds_zero_iff_vle (NormedField.valuation (K := F))
       (fun {s} => (NormedField.toValued (K := F)).is_topological_valuation s)
   · rw [isNontrivial_iff_isNontrivial (NormedField.valuation (K := F))]
     infer_instance
 
-theorem ord_eq_of_norm_eq (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F]
-    (x y : F) (h : ‖x‖ = ‖y‖) :
-    letI := normRel F;
-    haveI := isLocalField F;
-    ord x = ord y := by
+theorem ord_eq_of_norm_eq
+    (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F]
+    (x y : F) (h : ‖x‖ = ‖y‖)
+    : letI := normRel F
+      haveI := isLocalField F
+      ord x = ord y := by
   letI := normRel F
   haveI := isLocalField F
   have h1 : x ≤ᵥ y := h.le
@@ -87,7 +96,10 @@ theorem ord_eq_of_norm_eq (F : Type) [NontriviallyNormedField F] [IsUltrametricD
   unfold ord
   rw [normalizedValuation_eq_iff.2 (le_antisymm h1 h2)]
 
-theorem etaK_eq_neg_one : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E), IsField A.K → IsField A.L → ∀ s : A.Kˣ, (¬ ∃ y : A.L, A.NL y = s) → A.etaK s = -1 := by
+theorem etaK_eq_neg_one
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E),
+      IsField A.K → IsField A.L → ∀ s : A.Kˣ, (¬ ∃ y : A.L, A.NL y = s) → A.etaK s = -1 := by
   intro F E _ _ _ _ hU A hK hL s hs
   haveI := hU.ultraF
   haveI := hU.ultraE
@@ -101,12 +113,24 @@ theorem etaK_eq_neg_one : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivi
   haveI : ValuativeExtension F E := ⟨fun {a b} => by
     change ‖algebraMap F E a‖ ≤ ‖algebraMap F E b‖ ↔ ‖a‖ ≤ ‖b‖
     rw [norm_algebraMap', norm_algebraMap']⟩
-  have he : (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation E))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation F))) = 1 := by
+  have he
+      : (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            E)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation F)))
+        = 1 := by
     obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[E]
     obtain ⟨x, hx⟩ := hU.unram (π : E)
     have h1 := ord_eq_of_norm_eq E (π : E) (algebraMap F E x) (by rw [norm_algebraMap', hx])
     rw [ord_uniformizer hπ, ord_algebraMap] at h1
-    have h2 : ((_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation E))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation F))) : ℤ) ∣ 1 := ⟨_, h1⟩
+    have h2
+        : ((_root_.Ideal.ramificationIdx
+              (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer
+                (_root_.ValuativeRel.valuation E)))
+              (_root_.Valuation.integer (_root_.ValuativeRel.valuation F)))
+            : ℤ)
+          ∣ 1 :=
+      ⟨_, h1⟩
     exact Nat.dvd_one.1 (by exact_mod_cast h2)
   obtain ⟨ζ, hζ, htop⟩ := exists_isPrimitiveRoot_adjoin_eq_top_of_unramified F E he
   have hcard : Nat.card 𝓀[E] = Nat.card 𝓀[F] ^ 2 := by

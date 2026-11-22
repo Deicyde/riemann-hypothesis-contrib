@@ -13,8 +13,12 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExis
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top
-open GroundTheory.Heights₂.Heights.NumbersDVR (pointIdeal segreVec IsFlagFrame IsFlagPair SameGenericFibre IsModelOver divCycle)
+open AlgebraicGeometry CategoryTheory NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top
+open GroundTheory.Heights₂.Heights.NumbersDVR
+  (pointIdeal segreVec IsFlagFrame IsFlagPair SameGenericFibre IsModelOver divCycle)
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles (mseg fnField)
 open Limits MonoidalCategory CartesianMonoidalCategory MonObj
 open GlobalTheory.CompanionTheory.Ar.Num.FamEx GlobalTheory.CompanionTheory.Ar.BT
@@ -42,17 +46,21 @@ def zp (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) [Fact p.Prime] : Subring �
     rintro _ ⟨a, b, hb, rfl⟩
     exact ⟨-a, b, hb, by push_cast; rw [neg_div]⟩
 
-theorem mem_range_zp (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) [Fact p.Prime] (x : Ω) :
-    x ∈ (algebraMap (zp Ω p) Ω).range ↔ ∃ (a : ℤ) (b : ℕ), ¬ p ∣ b ∧ x = (a : Ω) / (b : Ω) := by
+theorem mem_range_zp (Ω : Type) [Field Ω] [CharZero Ω] (p : ℕ) [Fact p.Prime] (x : Ω)
+    : x ∈ (algebraMap (zp Ω p) Ω).range ↔ ∃ (a : ℤ) (b : ℕ), ¬ p ∣ b ∧ x = (a : Ω) / (b : Ω) := by
   constructor
   · rintro ⟨z, rfl⟩
     exact z.2
   · intro hx
     exact ⟨⟨x, hx⟩, rfl⟩
 
-theorem mem_adjoin_of_range_le {o o' : Type} [CommRing o] [CommRing o'] {Ω : Type} [Field Ω] [Algebra o Ω]
-    [Algebra o' Ω] (hr : ∀ a : o, algebraMap o Ω a ∈ (algebraMap o' Ω).range) (T : Set Ω)
-    {w : Ω} (hw : w ∈ Algebra.adjoin o T) : w ∈ Algebra.adjoin o' T := by
+theorem mem_adjoin_of_range_le
+    {o o' : Type} [CommRing o] [CommRing o']
+    {Ω : Type} [Field Ω] [Algebra o Ω] [Algebra o' Ω]
+    (hr : ∀ a : o, algebraMap o Ω a ∈ (algebraMap o' Ω).range)
+    (T : Set Ω)
+    {w : Ω} (hw : w ∈ Algebra.adjoin o T)
+    : w ∈ Algebra.adjoin o' T := by
   induction hw using Algebra.adjoin_induction with
   | mem w hw => exact Algebra.subset_adjoin hw
   | algebraMap r =>
@@ -62,13 +70,23 @@ theorem mem_adjoin_of_range_le {o o' : Type} [CommRing o] [CommRing o'] {Ω : Ty
   | add _ _ _ _ h1 h2 => exact add_mem h1 h2
   | mul _ _ _ _ h1 h2 => exact mul_mem h1 h2
 
-theorem mem_adjoin_of_int (o : Type) [CommRing o] {Ω : Type} [Field Ω] [Algebra o Ω] (T : Set Ω)
-    {w : Ω} (hw : w ∈ Algebra.adjoin ℤ T) : w ∈ Algebra.adjoin o T :=
-  mem_adjoin_of_range_le (o := ℤ) (o' := o) (fun n : ℤ => ⟨((n : ℤ) : o), by rw [map_intCast, eq_intCast]⟩) T hw
+theorem mem_adjoin_of_int
+    (o : Type) [CommRing o]
+    {Ω : Type} [Field Ω] [Algebra o Ω]
+    (T : Set Ω)
+    {w : Ω} (hw : w ∈ Algebra.adjoin ℤ T)
+    : w ∈ Algebra.adjoin o T :=
+  mem_adjoin_of_range_le (o := ℤ) (o' := o)
+    (fun n : ℤ => ⟨((n : ℤ) : o), by rw [map_intCast, eq_intCast]⟩)
+    T hw
 
-theorem isUnit_natCast {A O : Type} [CommRing A] [CommRing O] [Algebra A O]
-    (m : Ideal A) [m.IsPrime] [IsLocalization.AtPrime O m] (p : ℕ) [Fact p.Prime] (hpm : (p : A) ∈ m) (b : ℕ)
-    (hb : ¬ p ∣ b) : IsUnit (b : O) := by
+theorem isUnit_natCast
+    {A O : Type} [CommRing A] [CommRing O] [Algebra A O]
+    (m : Ideal A) [m.IsPrime] [IsLocalization.AtPrime O m]
+    (p : ℕ) [Fact p.Prime]
+    (hpm : (p : A) ∈ m)
+    (b : ℕ) (hb : ¬ p ∣ b)
+    : IsUnit (b : O) := by
   have hbm : (b : A) ∉ m := by
     intro hbm
     have hcop : IsCoprime (b : ℤ) (p : ℤ) :=
@@ -82,10 +100,13 @@ theorem isUnit_natCast {A O : Type} [CommRing A] [CommRing O] [Algebra A O]
   have := IsLocalization.map_units O (⟨(b : A), hbm⟩ : m.primeCompl)
   simpa using this
 
-theorem exists_denom {o A O Ω : Type} [CommRing o] [CommRing A] [CommRing O] [Field Ω] [Algebra o Ω] [Algebra A Ω]
-    [Algebra A O] [Algebra O Ω] [IsScalarTower A O Ω] (M : Submonoid A) [IsLocalization M O] (T : Set Ω)
-    (hA : ∀ a : A, algebraMap A Ω a ∈ Algebra.adjoin o T) {w : Ω} (hw : w ∈ Algebra.adjoin O T) :
-    ∃ s : M, w * algebraMap A Ω s ∈ Algebra.adjoin o T := by
+theorem exists_denom
+    {o A O Ω : Type} [CommRing o] [CommRing A] [CommRing O] [Field Ω] [Algebra o Ω] [Algebra A Ω]
+    [Algebra A O] [Algebra O Ω] [IsScalarTower A O Ω]
+    (M : Submonoid A) [IsLocalization M O]
+    (T : Set Ω) (hA : ∀ a : A, algebraMap A Ω a ∈ Algebra.adjoin o T)
+    {w : Ω} (hw : w ∈ Algebra.adjoin O T)
+    : ∃ s : M, w * algebraMap A Ω s ∈ Algebra.adjoin o T := by
   induction hw using Algebra.adjoin_induction with
   | mem x hx => exact ⟨1, by simpa using Algebra.subset_adjoin hx⟩
   | algebraMap r =>
@@ -97,8 +118,8 @@ theorem exists_denom {o A O Ω : Type} [CommRing o] [CommRing A] [CommRing O] [F
     obtain ⟨b, hx⟩ := hx
     obtain ⟨b', hy⟩ := hy
     refine ⟨b * b', ?_⟩
-    have : (x + y) * algebraMap A Ω ((b * b' : M) : A) =
-        x * algebraMap A Ω b * algebraMap A Ω b' + y * algebraMap A Ω b' * algebraMap A Ω b := by
+    have : (x + y) * algebraMap A Ω ((b * b' : M) : A)
+        = x * algebraMap A Ω b * algebraMap A Ω b' + y * algebraMap A Ω b' * algebraMap A Ω b := by
       rw [Submonoid.coe_mul, map_mul]; ring
     rw [this]
     exact add_mem (mul_mem hx (hA _)) (mul_mem hy (hA _))
@@ -106,14 +127,19 @@ theorem exists_denom {o A O Ω : Type} [CommRing o] [CommRing A] [CommRing O] [F
     obtain ⟨b, hx⟩ := hx
     obtain ⟨b', hy⟩ := hy
     refine ⟨b * b', ?_⟩
-    have : (x * y) * algebraMap A Ω ((b * b' : M) : A) = x * algebraMap A Ω b * (y * algebraMap A Ω b') := by
+    have : (x * y) * algebraMap A Ω ((b * b' : M) : A)
+        = x * algebraMap A Ω b * (y * algebraMap A Ω b') := by
       rw [Submonoid.coe_mul, map_mul]; ring
     rw [this]
     exact mul_mem hx hy
 
-theorem isIntegrallyClosed_of_denom {o O Ω : Type} [CommRing o] [CommRing O] [Field Ω] [Algebra o Ω] [Algebra O Ω]
-    (B : Subalgebra o Ω) (B' : Subalgebra O Ω) [IsIntegrallyClosed B] (hle : ∀ w ∈ B, w ∈ B')
-    (hden : ∀ w ∈ B', ∃ s ∈ B, (∃ t ∈ B', s * t = 1) ∧ w * s ∈ B) : IsIntegrallyClosed B' := by
+theorem isIntegrallyClosed_of_denom
+    {o O Ω : Type} [CommRing o] [CommRing O] [Field Ω] [Algebra o Ω] [Algebra O Ω]
+    (B : Subalgebra o Ω)
+    (B' : Subalgebra O Ω)
+    [IsIntegrallyClosed B]
+    (hle : ∀ w ∈ B, w ∈ B') (hden : ∀ w ∈ B', ∃ s ∈ B, (∃ t ∈ B', s * t = 1) ∧ w * s ∈ B)
+    : IsIntegrallyClosed B' := by
   let ψ : B →+* B' := (algebraMap B Ω).codRestrict _ fun s => hle _ s.2
   letI : Algebra B B' := ψ.toAlgebra
   let M : Submonoid B := (IsUnit.submonoid B').comap ψ
@@ -135,12 +161,35 @@ theorem isIntegrallyClosed_of_denom {o O Ω : Type} [CommRing o] [CommRing O] [F
 end PositivityTheory.Xgn.PackingFacts
 
 open PositivityTheory.Xgn.PackingFacts in
-theorem PositivityTheory.Xgn.torsion_packing_facts : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O₀ : Type) [CommRing O₀] (β : O₀ →+* c.F) (Y : Model Xo c β) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] [DecidableEq K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y) (d : ℕ), IsArithVar (mCoordIdeal y) (d + 1) → ∀ (p : ℕ) [Fact p.Prime], p ∈ S → ∀ (A : Type) [CommRing A] [Algebra A Ω] [IsIntegralClosure A ℤ Ω] (m : Ideal A) [m.IsPrime], (p : A) ∈ m → ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra A O] [IsLocalization.AtPrime O m] [Algebra O Ω] [IsScalarTower A O Ω] (c' : ∀ k, J k), mseg y c' ≠ 0 → CharZero Ω ∧ IsNoetherianRing (CR O y c') ∧ IsIntegrallyClosed (CR O y c') ∧ IsFractionRing (CR O y c') Ω ∧ ∃ x : Spec (CommRingCat.of (CR O y c')) ⟶ 𝔐.X, spMap (algebraMap (CR O y c') Ω) ≫ x = 𝔐.ξ := by
-  intro E _ _ _ H D l Xo c O₀ _ β Y S Ω _ K _ _ J _ y 𝔐 d hV p _ hpS A _ _ _ m _ hpm O _ _ _ _ _ _ _ c' hc'
+theorem PositivityTheory.Xgn.torsion_packing_facts
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O₀ : Type) [CommRing O₀] (β : O₀ →+* c.F)
+        (Y : Model Xo c β) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K]
+        [DecidableEq K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω)
+        (𝔐 : HodgeCpt Y S y) (d : ℕ),
+      IsArithVar (mCoordIdeal y) (d + 1)
+        → ∀ (p : ℕ) [Fact p.Prime],
+          p ∈ S
+            → ∀ (A : Type) [CommRing A] [Algebra A Ω] [IsIntegralClosure A ℤ Ω] (m : Ideal A)
+                [m.IsPrime],
+              (p : A) ∈ m
+                → ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra A O]
+                    [IsLocalization.AtPrime O m] [Algebra O Ω] [IsScalarTower A O Ω]
+                    (c' : ∀ k, J k),
+                  mseg y c' ≠ 0
+                    → CharZero Ω ∧ IsNoetherianRing (CR O y c') ∧ IsIntegrallyClosed (CR O y c')
+                      ∧ IsFractionRing (CR O y c') Ω
+                      ∧ ∃ x : Spec (CommRingCat.of (CR O y c')) ⟶ 𝔐.X,
+                        spMap (algebraMap (CR O y c') Ω) ≫ x = 𝔐.ξ := by
+  intro E _ _ _ H D l Xo c O₀ _ β Y S Ω _ K _ _ J _ y 𝔐 d hV p _ hpS A _ _ _ m _ hpm O _ _ _ _ _ _ _
+    c' hc'
   haveI hch : CharZero Ω := GlobalTheory.CompanionTheory.Ar.Num.ConstClosure.charZero_of_isArithVar hV
-  obtain ⟨-, -, -, -, -, -, hchart⟩ := GlobalTheory.T.hodge_tate_free_integral_models E H D l Xo c O₀ β Y S Ω K J y 𝔐 p hpS (zp Ω p) (mem_range_zp Ω p)
+  obtain ⟨-, -, -, -, -, -, hchart⟩ :=
+    GlobalTheory.T.hodge_tate_free_integral_models E H D l Xo c O₀ β Y S Ω K J y 𝔐 p hpS (zp Ω p)
+      (mem_range_zp Ω p)
   obtain ⟨-, hic, hfr, x₀, hx₀, -⟩ := hchart c' hc'
-  obtain ⟨-, -, -, hconst, -⟩ := GlobalTheory.T.arith_variety_coord_ideal E H D l Xo c O₀ β Y S Ω K J y 𝔐 d hV A
+  obtain ⟨-, -, -, hconst, -⟩ :=
+    GlobalTheory.T.arith_variety_coord_ideal E H D l Xo c O₀ β Y S Ω K J y 𝔐 d hV A
   have eO := PositivityTheory.HtPt.Hcptgen.chartRing_mseg (o := O) y c' hc'
   have eo := PositivityTheory.HtPt.Hcptgen.chartRing_mseg (o := zp Ω p) y c' hc'
   have eZ := PositivityTheory.HtPt.Hcptgen.chartRing_mseg (o := ℤ) y c' hc'
@@ -156,8 +205,9 @@ theorem PositivityTheory.Xgn.torsion_packing_facts : ∀ (E : Type) [Field E] [N
   have hle : ∀ w ∈ chartRing (zp Ω p) (mseg y) c', w ∈ CR O y c' := by
     intro w hw
     exact eO.ge (mem_adjoin_of_range_le hr _ (eo.le hw))
-  have hA : ∀ a : A, algebraMap A Ω a ∈
-      Algebra.adjoin (zp Ω p) (Set.range fun j => mseg y j / mseg y c') := by
+  have hA
+      : ∀ a : A,
+        algebraMap A Ω a ∈ Algebra.adjoin (zp Ω p) (Set.range fun j => mseg y j / mseg y c') := by
     intro a
     have h1 : algebraMap A Ω a ∈ chartRing ℤ (mseg y) c' := hconst c' hc' a
     rw [eZ] at h1
@@ -168,10 +218,16 @@ theorem PositivityTheory.Xgn.torsion_packing_facts : ∀ (E : Type) [Field E] [N
       rw [Set.Finite.coe_toFinset]
       exact eO.symm
     exact Algebra.FiniteType.isNoetherianRing O _
-  · refine isIntegrallyClosed_of_denom (chartRing (zp Ω p) (mseg y) c') (CR O y c') hle fun w hw => ?_
+  · refine isIntegrallyClosed_of_denom (chartRing (zp Ω p) (mseg y) c') (CR O y c') hle fun w hw =>
+      ?_
     obtain ⟨s, hs⟩ := exists_denom m.primeCompl _ hA (eO.le hw)
     have hu := IsLocalization.map_units O s
-    refine ⟨algebraMap A Ω s, eo.ge (hA _), ⟨algebraMap O Ω ↑hu.unit⁻¹, Subalgebra.algebraMap_mem _ _, ?_⟩, eo.ge hs⟩
+    refine ⟨
+      algebraMap A Ω s,
+      eo.ge (hA _),
+      ⟨algebraMap O Ω ↑hu.unit⁻¹, Subalgebra.algebraMap_mem _ _, ?_⟩,
+      eo.ge hs
+    ⟩
     rw [IsScalarTower.algebraMap_apply A O Ω, ← map_mul, hu.mul_val_inv, map_one]
   · refine IsFractionRing.of_field _ _ fun a => ?_
     obtain ⟨g, h, -, e⟩ := IsFractionRing.div_surjective (A := chartRing (zp Ω p) (mseg y) c') a
@@ -179,7 +235,8 @@ theorem PositivityTheory.Xgn.torsion_packing_facts : ∀ (E : Type) [Field E] [N
   · let ψ : chartRing (zp Ω p) (mseg y) c' →+* CR O y c' :=
       (algebraMap (chartRing (zp Ω p) (mseg y) c') Ω).codRestrict _ fun s => hle _ s.2
     refine ⟨spMap ψ ≫ x₀, ?_⟩
-    have e : spMap (algebraMap (CR O y c') Ω) ≫ spMap ψ = spMap ((algebraMap (CR O y c') Ω).comp ψ) :=
+    have e
+        : spMap (algebraMap (CR O y c') Ω) ≫ spMap ψ = spMap ((algebraMap (CR O y c') Ω).comp ψ) :=
       (Spec.map_comp _ _).symm
     rw [← Category.assoc, e]
     exact hx₀

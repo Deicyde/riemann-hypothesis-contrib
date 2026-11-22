@@ -6,13 +6,20 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.FiniteHo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.KeyEven
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open Classical
 
-theorem GlobalTheory.KeyEven.fractionRing_norm_one_unit : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (C : Type) [NormedField C] [Algebra (FractionRing V) C], CExt V (IsLocalRing.maximalIdeal V) C → ∀ a : FractionRing V, ‖algebraMap (FractionRing V) C a‖ = 1 → ∃ u : Vˣ, a = algebraMap V (FractionRing V) u := by
+theorem GlobalTheory.KeyEven.fractionRing_norm_one_unit
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (C : Type) [NormedField C]
+        [Algebra (FractionRing V) C],
+      CExt V (IsLocalRing.maximalIdeal V) C
+        → ∀ a : FractionRing V,
+          ‖algebraMap (FractionRing V) C a‖ = 1
+            → ∃ u : Vˣ, a = algebraMap V (FractionRing V) u := by
   intro V _ _ _ C _ _ hC a ha
   have key : ∀ x : V, ‖algebraMap (FractionRing V) C (algebraMap V _ x)‖ = 1 → IsUnit x := by
     intro x hx
@@ -31,7 +38,8 @@ theorem GlobalTheory.KeyEven.fractionRing_norm_one_unit : ∀ (V : Type) [CommRi
     have ha0 : a ≠ 0 := by
       rintro rfl
       simp at ha
-    have h1 : algebraMap V (FractionRing V) (↑hu.unit⁻¹ : V) * algebraMap V (FractionRing V) x = 1 := by
+    have h1
+        : algebraMap V (FractionRing V) (↑hu.unit⁻¹ : V) * algebraMap V (FractionRing V) x = 1 := by
       rw [← map_mul]
       have : (↑hu.unit⁻¹ : V) * x = 1 := by
         have := hu.unit.inv_mul

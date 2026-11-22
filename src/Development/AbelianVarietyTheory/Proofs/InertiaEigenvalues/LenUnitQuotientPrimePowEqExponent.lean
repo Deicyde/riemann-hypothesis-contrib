@@ -6,16 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemSpan
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.SpanRing
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.SpanRing
 
 namespace GlobalTheory.LenUnitPow
 
-variable (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+variable
+  (l : ℕ) [Fact l.Prime]
+  {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
 
-
-variable (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] in
+variable
+  (l : ℕ) [Fact l.Prime]
+  {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] in
 theorem _root_.GlobalTheory.LenUnitPow.natCast_ne_zero : (l : O) ≠ 0 := by
   intro h
   have hker : (RingHom.ker (algebraMap ℤ_[l] O)).IsMaximal := by
@@ -31,9 +35,10 @@ theorem _root_.GlobalTheory.LenUnitPow.natCast_ne_zero : (l : O) ≠ 0 := by
     rwa [← RingHom.ker_eq_comap_bot]
   exact IsDiscreteValuationRing.not_a_field O (IsLocalRing.eq_maximalIdeal hbot).symm
 
-
-variable (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] in
+variable
+  (l : ℕ) [Fact l.Prime]
+  {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] in
 theorem _root_.GlobalTheory.LenUnitPow.natCast_not_isUnit : ¬ IsUnit (l : O) := by
   intro h
   have hm : (Ideal.comap (algebraMap ℤ_[l] O) (IsLocalRing.maximalIdeal O)).IsMaximal :=

@@ -15,15 +15,21 @@ namespace PI.SelfDualLoc.W
 
 open PI.SelfDualLoc
 
-def hvec {E : Type} [Field E] {n m : ℕ} (σ : E →+* E) (J : Matrix (Fin n) (Fin n) E)
-    (x : Fin m → Fin n → E) : (Fin n → E) →ₗ[E] (Fin m → E) where
+def hvec
+    {E : Type} [Field E]
+    {n m : ℕ}
+    (σ : E →+* E) (J : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E)
+    : (Fin n → E) →ₗ[E] (Fin m → E) where
   toFun y := fun i => hform σ J (x i) y
   map_add' y y' := by ext i; simp [hform_add_right]
   map_smul' c y := by ext i; simp [hform_smul_right]
 
-theorem hvec_apply {E : Type} [Field E] {n m : ℕ} (σ : E →+* E) (J : Matrix (Fin n) (Fin n) E)
-    (x : Fin m → Fin n → E) (y : Fin n → E) (i : Fin m) :
-    hvec σ J x y i = hform σ J (x i) y := rfl
+theorem hvec_apply
+    {E : Type} [Field E]
+    {n m : ℕ}
+    (σ : E →+* E) (J : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E) (y : Fin n → E) (i : Fin m)
+    : hvec σ J x y i = hform σ J (x i) y :=
+  rfl
 
 theorem spanTop_of (hN : Nondeg) : SpanTop := by
   intro F E _ _ _ _ _ n σ J Lb T hfin hdual hT
@@ -32,8 +38,8 @@ theorem spanTop_of (hN : Nondeg) : SpanTop := by
     have h := Submodule.finrank_lt hne
     rwa [Module.finrank_fin_fun] at h
   let b := Module.finBasis E (Submodule.span E (Lb : Set (Fin n → E)))
-  let x : Fin (Module.finrank E (Submodule.span E (Lb : Set (Fin n → E)))) → Fin n → E :=
-    fun i => (b i : Fin n → E)
+  let x : Fin (Module.finrank E (Submodule.span E (Lb : Set (Fin n → E)))) → Fin n → E := fun i =>
+    (b i : Fin n → E)
   have hker : LinearMap.ker (hvec (σ : E →+* E) J x) ≠ ⊥ := by
     intro hbot
     have h1 := LinearMap.finrank_range_add_finrank_ker (hvec (σ : E →+* E) J x)

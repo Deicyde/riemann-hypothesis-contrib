@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsDescent
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -53,8 +55,10 @@ private lemma exists_mem_range_lift_of_isGaloisCover {X Y : Scheme.{0}} {π : X 
     _ = q x := by rw [e]
     _ = p := hq
 
-theorem locTransitive_of_isGaloisCover {X Y : Scheme.{0}} {π : X ⟶ Y} {Ga : Type} [Group Ga]
-    {ρ : Ga → (X ⟶ X)} (h : IsGaloisCover Ga ρ π) : LocTransitive ρ π := by
+theorem locTransitive_of_isGaloisCover
+    {X Y : Scheme.{0}} {π : X ⟶ Y} {Ga : Type} [Group Ga]
+    {ρ : Ga → (X ⟶ X)} (h : IsGaloisCover Ga ρ π)
+    : LocTransitive ρ π := by
   intro Z g₁ g₂ hg z
   let φ : Z ⟶ pullback π π := pullback.lift g₁ g₂ hg
   obtain ⟨c, hc⟩ := exists_mem_range_lift_of_isGaloisCover h (φ z)
@@ -80,19 +84,28 @@ theorem locTransitive_of_isGaloisCover {X Y : Scheme.{0}} {π : X ⟶ Y} {Ga : T
     exact e.symm
   rw [h1, h2]
 
-theorem exists_descent_of_isGaloisCover :
-    ∀ (X Y : Scheme.{0}) (π : X ⟶ Y) (Ga : Type) [Group Ga] (ρ : Ga → (X ⟶ X)) (L : LB X), IsGaloisCover Ga ρ π → L.IsLB → ∀ u : ∀ a, LB.Gen (LB.LinComb L (K := Fin 2) ![𝟙 X, ρ a] ![1, -1]), (∀ a, (u a).IsGen) → (∀ a c, LB.Gen.Corr L _ _ _ _ (u (a * c)) (LB.mulGen L _ _ _ _ (u a) (LB.pullGen L _ _ (u c) (ρ a)))) → ∃ M : LB Y, M.IsLB ∧ LBIso L (M.pull π) := by
+theorem exists_descent_of_isGaloisCover
+    : ∀ (X Y : Scheme.{0}) (π : X ⟶ Y) (Ga : Type) [Group Ga] (ρ : Ga → (X ⟶ X)) (L : LB X),
+      IsGaloisCover Ga ρ π → L.IsLB
+        → ∀ u : ∀ a, LB.Gen (LB.LinComb L (K := Fin 2) ![𝟙 X, ρ a] ![1, -1]),
+          (∀ a, (u a).IsGen)
+            → (∀ a c,
+              LB.Gen.Corr L _ _ _ _ (u (a * c))
+                (LB.mulGen L _ _ _ _ (u a) (LB.pullGen L _ _ (u c) (ρ a))))
+            → ∃ M : LB Y, M.IsLB ∧ LBIso L (M.pull π) := by
   intro X Y π Ga _ ρ L hG hL u hu hc
   have : Finite Ga := hG.finite
   have : IsFinite π := hG.fin
   have : Etale π := hG.etale
   have : Surjective π := hG.onto
-  have hfree : ∀ (k : Type) [Field k] [IsAlgClosed k] (r : Sp k ⟶ X),
-      Function.Injective fun c => r ≫ ρ c := by
+  have hfree
+      : ∀ (k : Type) [Field k] [IsAlgClosed k] (r : Sp k ⟶ X),
+        Function.Injective fun c => r ≫ ρ c := by
     intro k _ _ r a b hab
     obtain ⟨d, -, hd⟩ := hG.fibre k r (r ≫ ρ a) (by rw [Category.assoc, hG.inv])
     exact (hd a rfl).trans (hd b hab.symm).symm
-  exact exists_descent_of_galois hL hG.one (fun a c => (hG.mul a c).symm) hG.inv
-    (locTransitive_of_isGaloisCover hG) hfree hu hc
+  exact exists_descent_of_galois hL hG.one
+    (fun a c => (hG.mul a c).symm)
+    hG.inv (locTransitive_of_isGaloisCover hG) hfree hu hc
 
 end GlobalTheory.LinDescent

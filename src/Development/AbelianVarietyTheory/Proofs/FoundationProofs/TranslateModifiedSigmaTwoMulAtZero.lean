@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.NormNatCa
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -19,8 +21,9 @@ namespace GlobalTheory.SigmaDuplication
 
 open Filter Topology
 
-theorem sgStar_two_mul {Λ : AddSubgroup ℂ} (hΛ : GlobalTheory.EvenTheta.IsLat Λ) {P : ℂ} (hP : P ∉ Λ) :
-    sgStar Λ (2 * P) = -(wpD Λ P) * sgStar Λ P ^ 4 := by
+theorem sgStar_two_mul
+    {Λ : AddSubgroup ℂ} (hΛ : GlobalTheory.EvenTheta.IsLat Λ) {P : ℂ} (hP : P ∉ Λ)
+    : sgStar Λ (2 * P) = -(wpD Λ P) * sgStar Λ P ^ 4 := by
   obtain ⟨⟨hdiff, hd0, -, -⟩, hzero, -, hwp, -⟩ := GlobalTheory.OddTheta.sgStar_laws Λ hΛ
   obtain ⟨L, hL⟩ := GlobalTheory.OddTheta.exists_periodPair Λ hΛ
   have h0 : sgStar Λ 0 = 0 := (hzero 0).2 (zero_mem Λ)
@@ -36,8 +39,9 @@ theorem sgStar_two_mul {Λ : AddSubgroup ℂ} (hΛ : GlobalTheory.EvenTheta.IsLa
     (hdiff (P - P)).hasDerivAt.comp P ((hasDerivAt_id' P).const_sub P)
   have hS := (hdiff P).hasDerivAt.pow 2
   have hG := (hwpd.sub_const (wpF Λ P)).mul (hS.const_mul (sgStar Λ P ^ 2))
-  have hev : (fun v => sgStar Λ (P + v) * sgStar Λ (P - v)) =ᶠ[𝓝 P]
-      (fun v => (wpF Λ v - wpF Λ P) * (sgStar Λ P ^ 2 * sgStar Λ v ^ 2)) := by
+  have hev
+      : (fun v => sgStar Λ (P + v) * sgStar Λ (P - v)) =ᶠ[𝓝 P]
+        (fun v => (wpF Λ v - wpF Λ P) * (sgStar Λ P ^ 2 * sgStar Λ v ^ 2)) := by
     have hne : sgStar Λ P ≠ 0 := fun h => hP ((hzero P).1 h)
     filter_upwards [(hdiff.continuous.continuousAt (x := P)).eventually_ne hne] with v hv
     have hvΛ : v ∉ Λ := fun hm => hv ((hzero v).2 hm)
@@ -47,8 +51,10 @@ theorem sgStar_two_mul {Λ : AddSubgroup ℂ} (hΛ : GlobalTheory.EvenTheta.IsLa
   rw [two_mul]
   linear_combination -huniq
 
-theorem U1_two_mul_at_zero_eq_neg_wpD_mul_pow_four : ∀ (Λ : AddSubgroup ℂ), GlobalTheory.EvenTheta.IsLat Λ → ∀ P : ℂ, P ∉ Λ →
-    U1 Λ (2 * P) (sgStar Λ) 0 = -(wpD Λ P) * U1 Λ P (sgStar Λ) 0 ^ 4 := by
+theorem U1_two_mul_at_zero_eq_neg_wpD_mul_pow_four
+    : ∀ (Λ : AddSubgroup ℂ),
+      GlobalTheory.EvenTheta.IsLat Λ
+        → ∀ P : ℂ, P ∉ Λ → U1 Λ (2 * P) (sgStar Λ) 0 = -(wpD Λ P) * U1 Λ P (sgStar Λ) 0 ^ 4 := by
   intro Λ hΛ P hP
   show sgStar Λ (0 + 2 * P) * Complex.exp _ = -(wpD Λ P) * (sgStar Λ (0 + P) * Complex.exp _) ^ 4
   rw [zero_add, zero_add, sgStar_two_mul hΛ hP, mul_pow, ← Complex.exp_nat_mul, mul_assoc]

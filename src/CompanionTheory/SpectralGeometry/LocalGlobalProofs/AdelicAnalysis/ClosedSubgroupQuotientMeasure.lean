@@ -10,19 +10,27 @@ open scoped ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW
 
-noncomputable def closedEmbeddingRangeEquiv {G G₁ : Type} [Group G] [TopologicalSpace G]
-    [Group G₁] [TopologicalSpace G₁] (ι : G₁ →* G) (hι : IsClosedEmbedding ι) :
-    G₁ ≃ₜ* ι.range :=
+noncomputable def closedEmbeddingRangeEquiv
+    {G G₁ : Type} [Group G] [TopologicalSpace G] [Group G₁] [TopologicalSpace G₁]
+    (ι : G₁ →* G) (hι : IsClosedEmbedding ι)
+    : G₁ ≃ₜ* ι.range :=
   have hemb : IsEmbedding ι.rangeRestrict :=
     IsEmbedding.of_comp (hι.continuous.subtype_mk _) continuous_subtype_val hι.isEmbedding
-  { MulEquiv.ofBijective ι.rangeRestrict
-      ⟨hemb.injective, ι.rangeRestrict_surjective⟩ with
+  {
+    MulEquiv.ofBijective ι.rangeRestrict ⟨hemb.injective, ι.rangeRestrict_surjective⟩ with
     continuous_toFun := hemb.continuous
-    continuous_invFun :=
-      (hemb.toHomeomorphOfSurjective ι.rangeRestrict_surjective).symm.continuous }
+    continuous_invFun := (hemb.toHomeomorphOfSurjective ι.rangeRestrict_surjective).symm.continuous
+  }
 
-theorem exists_weight_mass_one_right_coset :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (G₁ : Type) [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁] [LocallyCompactSpace G₁] [SecondCountableTopology G₁] [MeasurableSpace G₁] [BorelSpace G₁] (ι : G₁ →* G), IsClosedEmbedding ι → ∀ (μ₁ : Measure G₁) [μ₁.IsHaarMeasure] [μ₁.IsMulRightInvariant], ∃ w : G → ℝ≥0∞, Measurable w ∧ ∀ g, ∫⁻ u, w (ι u * g) ∂μ₁ = 1 := by
+theorem exists_weight_mass_one_right_coset
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+        (G₁ : Type) [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁]
+        [LocallyCompactSpace G₁] [SecondCountableTopology G₁] [MeasurableSpace G₁] [BorelSpace G₁]
+        (ι : G₁ →* G),
+      IsClosedEmbedding ι
+        → ∀ (μ₁ : Measure G₁) [μ₁.IsHaarMeasure] [μ₁.IsMulRightInvariant], ∃ w : G → ℝ≥0∞,
+          Measurable w ∧ ∀ g, ∫⁻ u, w (ι u * g) ∂μ₁ = 1 := by
   intro G _ _ _ _ _ _ _ _ G₁ _ _ _ _ _ _ _ ι hι μ₁ _ _
   have hclosed : IsClosed ((ι.range : Subgroup G) : Set G) := by
     rw [MonoidHom.coe_range]; exact hι.isClosed_range

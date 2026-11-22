@@ -33,23 +33,30 @@ theorem ext_top (S : SOp d) (w : Fin (S.ord + 1) → Fin d) : ext S (S.ord + 1) 
   unfold ext
   rw [dite_eq_right (lt_irrefl _)]
 
-theorem ext_contDiffOn (S : SOp d) {O : Set (Fin d → ℝ)} (hS : ∀ i w, ContDiffOn ℝ ∞ (S.a i w) O) (n : ℕ)
-    (w : Fin n → Fin d) : ContDiffOn ℝ ∞ (ext S n w) O := by
+theorem ext_contDiffOn
+    (S : SOp d)
+    {O : Set (Fin d → ℝ)} (hS : ∀ i w, ContDiffOn ℝ ∞ (S.a i w) O)
+    (n : ℕ) (w : Fin n → Fin d)
+    : ContDiffOn ℝ ∞ (ext S n w) O := by
   unfold ext
   split_ifs with h
   · exact hS _ _
   · exact contDiffOn_const
 
-theorem app_eq (S : SOp d) (u : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    S.app u x = ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d, ext S n w x * pdc (List.ofFn w) u x := by
-  rw [← Fin.sum_univ_eq_sum_range (fun n => ∑ w : Fin n → Fin d, ext S n w x * pdc (List.ofFn w) u x)]
-  unfold SOp.app
-  refine Finset.sum_congr rfl fun k _ => ?_
-  simp only [ext_fin]
+theorem app_eq (S : SOp d) (u : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ)
+    : S.app u x
+      = ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d, ext S n w x * pdc (List.ofFn w) u x :=
+  by
+    rw [← Fin.sum_univ_eq_sum_range (fun n =>
+      ∑ w : Fin n → Fin d, ext S n w x * pdc (List.ofFn w) u x)]
+    unfold SOp.app
+    refine Finset.sum_congr rfl fun k _ => ?_
+    simp only [ext_fin]
 
-theorem pdc_contDiffOn {O : Set (Fin d → ℝ)} (hO : IsOpen O) {u : (Fin d → ℝ) → ℂ} {m : ℕ}
-    (hu : ContDiffOn ℝ (m : WithTop ℕ∞) u O) :
-    ∀ (l : List (Fin d)) (k : ℕ), l.length + k ≤ m → ContDiffOn ℝ (k : WithTop ℕ∞) (pdc l u) O
+theorem pdc_contDiffOn
+    {O : Set (Fin d → ℝ)} (hO : IsOpen O)
+    {u : (Fin d → ℝ) → ℂ} {m : ℕ} (hu : ContDiffOn ℝ (m : WithTop ℕ∞) u O)
+    : ∀ (l : List (Fin d)) (k : ℕ), l.length + k ≤ m → ContDiffOn ℝ (k : WithTop ℕ∞) (pdc l u) O
   | [], k, h => hu.of_le (by exact_mod_cast (show k ≤ m by simpa using h))
   | i :: l, k, h => by
     have ih := pdc_contDiffOn hO hu l (k + 1) (by simp at h; omega)
@@ -58,13 +65,16 @@ theorem pdc_contDiffOn {O : Set (Fin d → ℝ)} (hO : IsOpen O) {u : (Fin d →
     show ContDiffOn ℝ (k : WithTop ℕ∞) (fun x => fderiv ℝ (pdc l u) x (Pi.single i 1)) O
     exact h1.clm_apply contDiffOn_const
 
-theorem pdc_diffAt {O : Set (Fin d → ℝ)} (hO : IsOpen O) {u : (Fin d → ℝ) → ℂ} {m : ℕ}
-    (hu : ContDiffOn ℝ (m : WithTop ℕ∞) u O) (l : List (Fin d)) (hl : l.length + 1 ≤ m) {x : Fin d → ℝ}
-    (hx : x ∈ O) : DifferentiableAt ℝ (pdc l u) x :=
+theorem pdc_diffAt
+    {O : Set (Fin d → ℝ)} (hO : IsOpen O)
+    {u : (Fin d → ℝ) → ℂ} {m : ℕ} (hu : ContDiffOn ℝ (m : WithTop ℕ∞) u O)
+    (l : List (Fin d)) (hl : l.length + 1 ≤ m)
+    {x : Fin d → ℝ} (hx : x ∈ O)
+    : DifferentiableAt ℝ (pdc l u) x :=
   ((pdc_contDiffOn hO hu l 1 hl).differentiableOn (by norm_num)).differentiableAt (hO.mem_nhds hx)
 
-theorem fderiv_apply_sum (f : (Fin d → ℝ) → ℂ) (x v : Fin d → ℝ) :
-    fderiv ℝ f x v = ∑ i, (v i : ℂ) * fderiv ℝ f x (Pi.single i 1) := by
+theorem fderiv_apply_sum (f : (Fin d → ℝ) → ℂ) (x v : Fin d → ℝ)
+    : fderiv ℝ f x v = ∑ i, (v i : ℂ) * fderiv ℝ f x (Pi.single i 1) := by
   conv_lhs => rw [← Finset.univ_sum_single v]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -76,12 +86,13 @@ theorem fderiv_apply_sum (f : (Fin d → ℝ) → ℂ) (x v : Fin d → ℝ) :
     · simp [h]
   rw [this, map_smul, Complex.real_smul]
 
-theorem sum_fin_succ_fun {n : ℕ} (g : (Fin (n + 1) → Fin d) → ℂ) :
-    ∑ w, g w = ∑ i : Fin d, ∑ w : Fin n → Fin d, g (Fin.cons i w) := by
+theorem sum_fin_succ_fun {n : ℕ} (g : (Fin (n + 1) → Fin d) → ℂ)
+    : ∑ w, g w = ∑ i : Fin d, ∑ w : Fin n → Fin d, g (Fin.cons i w) := by
   rw [← (Fin.consEquiv (fun _ : Fin (n + 1) => Fin d)).sum_comp g, Fintype.sum_prod_type]
   rfl
 
-def cD (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) (n : ℕ) (w : Fin n → Fin d) (x : Fin d → ℝ) : ℂ :=
+def cD (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) (n : ℕ) (w : Fin n → Fin d) (x : Fin d → ℝ)
+    : ℂ :=
   fderiv ℝ (ext S n w) x (V x)
 
 def cE (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) : (n : ℕ) → (Fin n → Fin d) → (Fin d → ℝ) → ℂ
@@ -91,16 +102,20 @@ def cE (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) : (n : ℕ) → (Fi
 def fieldOp (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) : SOp d :=
   ⟨S.ord + 1, fun k w x => cD S V k w x + cE S V k w x⟩
 
-theorem cD_top (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) (w : Fin (S.ord + 1) → Fin d) (x : Fin d → ℝ) :
-    cD S V (S.ord + 1) w x = 0 := by
+theorem cD_top
+    (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) (w : Fin (S.ord + 1) → Fin d) (x : Fin d → ℝ)
+    : cD S V (S.ord + 1) w x = 0 := by
   simp [cD, ext_top]
 
-theorem fieldOp_app (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) (u : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    (fieldOp S V).app u x = ∑ n ∈ Finset.range (S.ord + 1 + 1),
-      ∑ w : Fin n → Fin d, (cD S V n w x + cE S V n w x) * pdc (List.ofFn w) u x := by
+theorem fieldOp_app
+    (S : SOp d) (V : (Fin d → ℝ) → (Fin d → ℝ)) (u : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ)
+    : (fieldOp S V).app u x
+      = ∑ n ∈ Finset.range (S.ord + 1 + 1),
+        ∑ w : Fin n → Fin d, (cD S V n w x + cE S V n w x) * pdc (List.ofFn w) u x := by
   unfold SOp.app fieldOp
   exact Fin.sum_univ_eq_sum_range
-    (fun n => ∑ w : Fin n → Fin d, (cD S V n w x + cE S V n w x) * pdc (List.ofFn w) u x) (S.ord + 1 + 1)
+    (fun n => ∑ w : Fin n → Fin d, (cD S V n w x + cE S V n w x) * pdc (List.ofFn w) u x)
+    (S.ord + 1 + 1)
 
 end SymbolOperatorExtension
 
@@ -119,21 +134,27 @@ theorem symbol_operator_field_holds : SOpField := by
           simpa [Function.comp_def] using this
         exact (ext_contDiffOn S hS n _).mul hv
   · intro u hu x hx
-    have hdiff : ∀ n ∈ Finset.range (S.ord + 1), ∀ w : Fin n → Fin d,
-        DifferentiableAt ℝ (ext S n w) x ∧ DifferentiableAt ℝ (pdc (List.ofFn w) u) x := by
+    have hdiff
+        : ∀ n ∈ Finset.range (S.ord + 1), ∀ w : Fin n → Fin d,
+          DifferentiableAt ℝ (ext S n w) x ∧ DifferentiableAt ℝ (pdc (List.ofFn w) u) x := by
       intro n hn w
-      refine ⟨((ext_contDiffOn S hS n w).differentiableOn (by simp)).differentiableAt (hO.mem_nhds hx),
-        pdc_diffAt hO hu _ ?_ hx⟩
+      refine ⟨
+        ((ext_contDiffOn S hS n w).differentiableOn (by simp)).differentiableAt (hO.mem_nhds hx),
+        pdc_diffAt hO hu _ ?_ hx
+      ⟩
       have := Finset.mem_range.mp hn
       simp only [List.length_ofFn]
       omega
-    have key : ∀ n ∈ Finset.range (S.ord + 1),
-        fderiv ℝ (fun y => ∑ w : Fin n → Fin d, ext S n w y * pdc (List.ofFn w) u y) x (V x) =
-          ∑ w : Fin n → Fin d, (cD S V n w x * pdc (List.ofFn w) u x +
-            ∑ i, ext S n w x * ((V x i : ℝ) : ℂ) * pdc (i :: List.ofFn w) u x) := by
+    have key
+        : ∀ n ∈ Finset.range (S.ord + 1),
+          fderiv ℝ (fun y => ∑ w : Fin n → Fin d, ext S n w y * pdc (List.ofFn w) u y) x (V x)
+            = ∑ w : Fin n → Fin d, (cD S V n w x * pdc (List.ofFn w) u x +
+                ∑ i, ext S n w x * ((V x i : ℝ) : ℂ) * pdc (i :: List.ofFn w) u x) := by
       intro n hn
-      rw [fderiv_fun_sum (A := fun w y => ext S n w y * pdc (List.ofFn w) u y)
-        (fun w _ => (hdiff n hn w).1.mul (hdiff n hn w).2), ContinuousLinearMap.sum_apply]
+      rw [fderiv_fun_sum
+          (A := fun w y => ext S n w y * pdc (List.ofFn w) u y)
+          (fun w _ => (hdiff n hn w).1.mul (hdiff n hn w).2),
+        ContinuousLinearMap.sum_apply]
       refine Finset.sum_congr rfl fun w _ => ?_
       rw [fderiv_fun_mul (hdiff n hn w).1 (hdiff n hn w).2, ContinuousLinearMap.add_apply,
         ContinuousLinearMap.smul_apply, ContinuousLinearMap.smul_apply, smul_eq_mul, smul_eq_mul,
@@ -143,28 +164,44 @@ theorem symbol_operator_field_holds : SOpField := by
       · refine Finset.sum_congr rfl fun i _ => ?_
         rw [mul_assoc]
         rfl
-    have hR : fderiv ℝ (S.app u) x (V x) = ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d,
-        (cD S V n w x * pdc (List.ofFn w) u x +
-          ∑ i, ext S n w x * ((V x i : ℝ) : ℂ) * pdc (i :: List.ofFn w) u x) := by
-      have hSu : S.app u = fun y => ∑ n ∈ Finset.range (S.ord + 1),
-          ∑ w : Fin n → Fin d, ext S n w y * pdc (List.ofFn w) u y := funext (app_eq S u)
-      rw [hSu, fderiv_fun_sum (A := fun n y => ∑ w : Fin n → Fin d, ext S n w y * pdc (List.ofFn w) u y)
-        (fun n hn => DifferentiableAt.fun_sum (A := fun w y => ext S n w y * pdc (List.ofFn w) u y) fun w _ =>
-        (hdiff n hn w).1.mul (hdiff n hn w).2), ContinuousLinearMap.sum_apply]
+    have hR
+        : fderiv ℝ (S.app u) x (V x)
+          = ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d,
+            (cD S V n w x * pdc (List.ofFn w) u x +
+              ∑ i, ext S n w x * ((V x i : ℝ) : ℂ) * pdc (i :: List.ofFn w) u x) := by
+      have hSu
+          : S.app u
+            = fun y =>
+              ∑ n ∈ Finset.range (S.ord + 1),
+                ∑ w : Fin n → Fin d, ext S n w y * pdc (List.ofFn w) u y :=
+        funext (app_eq S u)
+      rw [hSu,
+        fderiv_fun_sum
+          (A := fun n y => ∑ w : Fin n → Fin d, ext S n w y * pdc (List.ofFn w) u y)
+          (fun n hn =>
+            DifferentiableAt.fun_sum
+              (A := fun w y => ext S n w y * pdc (List.ofFn w) u y)
+              fun w _ => (hdiff n hn w).1.mul (hdiff n hn w).2),
+        ContinuousLinearMap.sum_apply]
       exact Finset.sum_congr rfl key
-    have hsplit : ∀ n, ∑ w : Fin n → Fin d, (cD S V n w x + cE S V n w x) * pdc (List.ofFn w) u x =
-        ∑ w : Fin n → Fin d, cD S V n w x * pdc (List.ofFn w) u x +
-          ∑ w : Fin n → Fin d, cE S V n w x * pdc (List.ofFn w) u x := by
+    have hsplit
+        : ∀ n,
+          ∑ w : Fin n → Fin d, (cD S V n w x + cE S V n w x) * pdc (List.ofFn w) u x
+            = ∑ w : Fin n → Fin d, cD S V n w x * pdc (List.ofFn w) u x
+              + ∑ w : Fin n → Fin d, cE S V n w x * pdc (List.ofFn w) u x := by
       intro n
       rw [← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun w _ => add_mul _ _ _
-    have hD : ∑ n ∈ Finset.range (S.ord + 1 + 1), ∑ w : Fin n → Fin d, cD S V n w x * pdc (List.ofFn w) u x =
-        ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d, cD S V n w x * pdc (List.ofFn w) u x := by
-      rw [Finset.sum_range_succ]
-      simp [cD_top]
-    have hE : ∑ n ∈ Finset.range (S.ord + 1 + 1), ∑ w : Fin n → Fin d, cE S V n w x * pdc (List.ofFn w) u x =
-        ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d,
-          ∑ i, ext S n w x * ((V x i : ℝ) : ℂ) * pdc (i :: List.ofFn w) u x := by
+    have hD
+        : ∑ n ∈ Finset.range (S.ord + 1 + 1), ∑ w : Fin n → Fin d, cD S V n w x * pdc (List.ofFn w) u x
+          = ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d, cD S V n w x * pdc (List.ofFn w) u x :=
+      by
+        rw [Finset.sum_range_succ]
+        simp [cD_top]
+    have hE
+        : ∑ n ∈ Finset.range (S.ord + 1 + 1), ∑ w : Fin n → Fin d, cE S V n w x * pdc (List.ofFn w) u x
+          = ∑ n ∈ Finset.range (S.ord + 1), ∑ w : Fin n → Fin d,
+              ∑ i, ext S n w x * ((V x i : ℝ) : ℂ) * pdc (i :: List.ofFn w) u x := by
       rw [Finset.sum_range_succ']
       simp only [cE, zero_mul, Finset.sum_const_zero, add_zero]
       refine Finset.sum_congr rfl fun n _ => ?_

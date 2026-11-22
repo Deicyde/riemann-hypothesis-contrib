@@ -12,12 +12,16 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.CommutingEndomorphi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop
+  GlobalTheory.BigOn GlobalTheory.BigOn.Exp
 
 namespace GlobalTheory.BigOn.Exp.TwAdmProof
 
-theorem not_mem_sq_of_eWL {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) (w : HeightOneSpectrum (𝓞 E))
-    (hv : (p : 𝓞 E) ∈ w.asIdeal) (he : eWL E w = 1) : (p : 𝓞 E) ∉ w.asIdeal ^ 2 := by
+theorem not_mem_sq_of_eWL
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime)
+    (w : HeightOneSpectrum (𝓞 E)) (hv : (p : 𝓞 E) ∈ w.asIdeal) (he : eWL E w = 1)
+    : (p : 𝓞 E) ∉ w.asIdeal ^ 2 := by
   obtain ⟨P, hP, hP0⟩ := w
   have he' : P.ramificationIdx ℤ = 1 := he
   have hmax : (Ideal.span {(p : ℤ)}).IsMaximal :=
@@ -41,17 +45,23 @@ namespace GlobalTheory.BigOn.Exp.TwAdmProof
 
 variable {D : D7}
 
-theorem not_mem_of_dvd (P : PlE D.host) (he : eWL D.host.E P = 1) {p : ℕ} (hp : p.Prime)
-    (h : p ∣ D.host.QS * D.host.q * D.host.d) : (p : 𝓞 D.host.E) ∉ P.asIdeal := fun hv =>
+theorem not_mem_of_dvd
+    (P : PlE D.host) (he : eWL D.host.E P = 1)
+    {p : ℕ} (hp : p.Prime) (h : p ∣ D.host.QS * D.host.q * D.host.d)
+    : (p : 𝓞 D.host.E) ∉ P.asIdeal := fun hv =>
   not_mem_sq_of_eWL hp P hv he (UpperTheory.Ram.mem_sq_of_dvd_condN D.host hp h _ P.isPrime hv)
 
-theorem two_not_mem (P : PlE D.host) (he : eWL D.host.E P = 1) : ((2 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal :=
-  not_mem_of_dvd P he Nat.prime_two ((((dvd_pow_self 2 (by omega)).trans D.host.tower_dvd).mul_right _).mul_right _)
+theorem two_not_mem (P : PlE D.host) (he : eWL D.host.E P = 1)
+    : ((2 : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal :=
+  not_mem_of_dvd P he Nat.prime_two
+    ((((dvd_pow_self 2 (by omega)).trans D.host.tower_dvd).mul_right _).mul_right _)
 
-theorem d_not_mem (P : PlE D.host) (he : eWL D.host.E P = 1) : ((D.host.d : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal :=
+theorem d_not_mem (P : PlE D.host) (he : eWL D.host.E P = 1)
+    : ((D.host.d : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal :=
   not_mem_of_dvd P he D.host.hyp.2.1 (dvd_mul_left _ _)
 
-theorem q_not_mem (P : PlE D.host) (he : eWL D.host.E P = 1) : ((D.host.q : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal :=
+theorem q_not_mem (P : PlE D.host) (he : eWL D.host.E P = 1)
+    : ((D.host.q : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal :=
   not_mem_of_dvd P he D.host.hyp.1 ((dvd_mul_left _ _).mul_right _)
 
 end GlobalTheory.BigOn.Exp.TwAdmProof
@@ -60,8 +70,9 @@ namespace GlobalTheory.BigOn.Exp.TwAdmProof
 
 variable {D : D7}
 
-theorem exists_splitK_of (P : PlE D.host) (h1 : P.asIdeal.inertiaDeg ℤ = 1) (he : eWL D.host.E P = 1) :
-    ∃ p : ℕ, p.Prime ∧ Odd p ∧ D.host.cls p = .splitK ∧ ((p : 𝓞 D.host.E) ∈ P.asIdeal) := by
+theorem exists_splitK_of
+    (P : PlE D.host) (h1 : P.asIdeal.inertiaDeg ℤ = 1) (he : eWL D.host.E P = 1)
+    : ∃ p : ℕ, p.Prime ∧ Odd p ∧ D.host.cls p = .splitK ∧ ((p : 𝓞 D.host.E) ∈ P.asIdeal) := by
   have hp := GlobalTheory.TwistDet.prime_normV h1
   have hmem : ((Formalism.ConjugateSelfDual.normV P : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := by
     have h2 : Ideal.absNorm P.asIdeal = Formalism.ConjugateSelfDual.normV P := by
@@ -69,12 +80,16 @@ theorem exists_splitK_of (P : PlE D.host) (h1 : P.asIdeal.inertiaDeg ℤ = 1) (h
     exact h2 ▸ Ideal.absNorm_mem P.asIdeal
   have hodd : Odd (Formalism.ConjugateSelfDual.normV P) := by
     refine hp.eq_two_or_odd'.resolve_left fun e => two_not_mem P he ?_
-    rw [e] at hmem; exact hmem
-  refine GlobalTheory.TwistDet.exists_splitK h1 he hodd (fun h => q_not_mem P he h) (fun h => d_not_mem P he h)
+    rw [e] at hmem
+    exact hmem
+  refine GlobalTheory.TwistDet.exists_splitK h1 he hodd
+    (fun h => q_not_mem P he h)
+    (fun h => d_not_mem P he h)
 
-theorem psiAt_comp {Γ Γ' A : Type} [Group Γ] [Group Γ'] [CommGroup A] (b : Bool) (ψ : Γ →* A) (f : Γ' →* Γ) :
-    (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b ψ).comp f = Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (ψ.comp f) := by
+theorem psiAt_comp
+    {Γ Γ' A : Type} [Group Γ] [Group Γ'] [CommGroup A] (b : Bool) (ψ : Γ →* A) (f : Γ' →* Γ)
+    : (Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b ψ).comp f
+      = Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (ψ.comp f) := by
   cases b <;> simp [Formalism.MainNotions.BlochKatoReduction.Gen.psiAt, MonoidHom.inv_comp]
 
 end GlobalTheory.BigOn.Exp.TwAdmProof
-

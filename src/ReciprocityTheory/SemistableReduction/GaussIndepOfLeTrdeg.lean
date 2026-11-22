@@ -8,8 +8,9 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open MvPolynomial
 
-private theorem exists_transcendenceBasis_subset_adjoin_range {E C : Type} [Field E] [Field C] [Algebra E C] {σ : Type}
-    (tb : σ → C) : ∃ t ⊆ ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))),
+private theorem exists_transcendenceBasis_subset_adjoin_range
+    {E C : Type} [Field E] [Field C] [Algebra E C] {σ : Type} (tb : σ → C)
+    : ∃ t ⊆ ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))),
       IsTranscendenceBasis E (Subtype.val : t → Algebra.adjoin E (Set.range tb)) := by
   have htop : Algebra.adjoin E ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))) = ⊤ :=
     Algebra.adjoin_adjoin_coe_preimage
@@ -23,19 +24,22 @@ private theorem exists_transcendenceBasis_subset_adjoin_range {E C : Type} [Fiel
     exact isAlgebraic_algebraMap (⟨a, ha⟩ : Algebra.adjoin E _)⟩
   exact exists_isTranscendenceBasis_subset (R := E) _
 
-theorem gauss_trdeg_adjoin_le {E C : Type} [Field E] [Field C] [Algebra E C] {σ : Type}
-    (tb : σ → C) : Algebra.trdeg E (Algebra.adjoin E (Set.range tb)) ≤ Cardinal.mk σ := by
+theorem gauss_trdeg_adjoin_le {E C : Type} [Field E] [Field C] [Algebra E C] {σ : Type} (tb : σ → C)
+    : Algebra.trdeg E (Algebra.adjoin E (Set.range tb)) ≤ Cardinal.mk σ := by
   obtain ⟨t, hts, hb⟩ := exists_transcendenceBasis_subset_adjoin_range (E := E) tb
   rw [← hb.cardinalMk_eq_trdeg]
-  calc Cardinal.mk t ≤ Cardinal.mk ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))) :=
-        Cardinal.mk_le_mk_of_subset hts
+  calc
+    Cardinal.mk t ≤ Cardinal.mk ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))) :=
+      Cardinal.mk_le_mk_of_subset hts
     _ ≤ Cardinal.mk (Set.range tb) := Cardinal.mk_preimage_of_injective _ _ Subtype.val_injective
     _ ≤ Cardinal.mk σ := Cardinal.mk_range_le
 
-theorem gauss_card_le_trdeg_add {F E C : Type} [Field F] [Field E] [Field C] [Algebra F E] [Algebra E C]
-    [Algebra F C] [IsScalarTower F E C] {σ τ : Type} (tb : σ → C) (ub : τ → C)
-    (hu : AlgebraicIndependent F ub) (hmem : ∀ j, ub j ∈ Algebra.adjoin E (Set.range tb)) :
-    Cardinal.mk τ ≤ Algebra.trdeg F E + Algebra.trdeg E (Algebra.adjoin E (Set.range tb)) := by
+theorem gauss_card_le_trdeg_add
+    {F E C : Type}
+    [Field F] [Field E] [Field C] [Algebra F E] [Algebra E C] [Algebra F C] [IsScalarTower F E C]
+    {σ τ : Type} (tb : σ → C) (ub : τ → C) (hu : AlgebraicIndependent F ub)
+    (hmem : ∀ j, ub j ∈ Algebra.adjoin E (Set.range tb))
+    : Cardinal.mk τ ≤ Algebra.trdeg F E + Algebra.trdeg E (Algebra.adjoin E (Set.range tb)) := by
   haveI : FaithfulSMul F E :=
     (faithfulSMul_iff_algebraMap_injective F E).mpr (algebraMap F E).injective
   haveI : FaithfulSMul E (Algebra.adjoin E (Set.range tb)) :=
@@ -45,17 +49,22 @@ theorem gauss_card_le_trdeg_add {F E C : Type} [Field F] [Field E] [Field C] [Al
     AlgebraicIndependent.of_comp ((Algebra.adjoin E (Set.range tb)).val.restrictScalars F) hu
   exact hu'.cardinalMk_le_trdeg
 
-theorem gauss_indep_of_le_trdeg {E C : Type} [Field E] [Field C] [Algebra E C] {σ : Type}
-    [Finite σ] (tb : σ → C)
-    (h : Cardinal.mk σ ≤ Algebra.trdeg E (Algebra.adjoin E (Set.range tb))) :
-    AlgebraicIndependent E tb := by
+theorem gauss_indep_of_le_trdeg
+    {E C : Type} [Field E] [Field C] [Algebra E C]
+    {σ : Type} [Finite σ]
+    (tb : σ → C) (h : Cardinal.mk σ ≤ Algebra.trdeg E (Algebra.adjoin E (Set.range tb)))
+    : AlgebraicIndependent E tb := by
   classical
   obtain ⟨t, hts, hb⟩ := exists_transcendenceBasis_subset_adjoin_range (E := E) tb
   have ht := hb.cardinalMk_eq_trdeg
-  have h1 : Cardinal.mk t ≤ Cardinal.mk ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))) :=
+  have h1
+      : Cardinal.mk t
+        ≤ Cardinal.mk ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))) :=
     Cardinal.mk_le_mk_of_subset hts
-  have h2 : Cardinal.mk ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb))) ≤
-      Cardinal.mk (Set.range tb) := Cardinal.mk_preimage_of_injective _ _ Subtype.val_injective
+  have h2
+      : Cardinal.mk ((↑) ⁻¹' Set.range tb : Set (Algebra.adjoin E (Set.range tb)))
+        ≤ Cardinal.mk (Set.range tb) :=
+    Cardinal.mk_preimage_of_injective _ _ Subtype.val_injective
   have h3 : Cardinal.mk (Set.range tb) ≤ Cardinal.mk σ := Cardinal.mk_range_le
   have hσt : Cardinal.mk σ ≤ Cardinal.mk t := ht ▸ h
 
@@ -85,8 +94,9 @@ theorem gauss_indep_of_le_trdeg {E C : Type} [Field E] [Field C] [Algebra E C] {
     exact hb.1
   exact hg.map' (f := (Algebra.adjoin E (Set.range tb)).val) Subtype.val_injective
 
-theorem gauss_card_arith {a b : Cardinal} {s d : ℕ} (h : ((s + d : ℕ) : Cardinal) ≤ a + b)
-    (ha : a ≤ d) (hb : b ≤ s) : a = d ∧ b = s := by
+theorem gauss_card_arith
+    {a b : Cardinal} {s d : ℕ} (h : ((s + d : ℕ) : Cardinal) ≤ a + b) (ha : a ≤ d) (hb : b ≤ s)
+    : a = d ∧ b = s := by
   obtain ⟨a', rfl⟩ := Cardinal.lt_aleph0.1 (ha.trans_lt Cardinal.natCast_lt_aleph0)
   obtain ⟨b', rfl⟩ := Cardinal.lt_aleph0.1 (hb.trans_lt Cardinal.natCast_lt_aleph0)
   have h' : s + d ≤ a' + b' := by exact_mod_cast h
@@ -96,9 +106,11 @@ theorem gauss_card_arith {a b : Cardinal} {s d : ℕ} (h : ((s + d : ℕ) : Card
   · exact_mod_cast (by omega : a' = d)
   · exact_mod_cast (by omega : b' = s)
 
-theorem gauss_aeval_mem {B C : Type} [CommRing B] [CommRing C] [Algebra B C] {σ : Type}
-    (g : σ → C) (P : MvPolynomial σ B) (R : Subring C)
-    (hc : ∀ α, algebraMap B C (P.coeff α) ∈ R) (hg : ∀ s, g s ∈ R) : aeval g P ∈ R := by
+theorem gauss_aeval_mem
+    {B C : Type} [CommRing B] [CommRing C] [Algebra B C]
+    {σ : Type} (g : σ → C) (P : MvPolynomial σ B)
+    (R : Subring C) (hc : ∀ α, algebraMap B C (P.coeff α) ∈ R) (hg : ∀ s, g s ∈ R)
+    : aeval g P ∈ R := by
   rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq]
   exact R.sum_mem fun α _ => R.mul_mem (hc α) (R.prod_mem fun i _ => R.pow_mem (hg i) _)
 

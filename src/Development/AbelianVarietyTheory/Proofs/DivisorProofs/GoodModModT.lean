@@ -14,9 +14,12 @@ noncomputable section
 
 open NumberField MeasureTheory IsDedekindDomain UniqueFactorizationMonoid
 open scoped Classical Pointwise
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum Formalism.IndefR.Links
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
-open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum
 open GlobalTheory.SqTop (modT)
 open GlobalTheory.BottomIPData (sfB)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl Lat IsFockVec IsSphOff volQ)
@@ -31,8 +34,9 @@ namespace GlobalTheory.NormRatio
 variable {D : D7}
 
 def GoodMod (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (Sf : Finset (FinPl D)) : Prop :=
-  𝔪 ≠ ⊥ ∧ 𝔪 ⊔ D.host.conj • 𝔪 = ⊤ ∧ IsCoprime 𝔪 (Ideal.span {((D.host.QS * D.host.q : ℕ) : 𝓞 D.host.E)}) ∧
-    ∀ v, v ∈ Sf ↔ ∃ w : HeightOneSpectrum (𝓞 D.host.E), 𝔪 ≤ w.asIdeal ∧ w.under (𝓞 D.host.F) = v
+  𝔪 ≠ ⊥ ∧ 𝔪 ⊔ D.host.conj • 𝔪 = ⊤
+    ∧ IsCoprime 𝔪 (Ideal.span {((D.host.QS * D.host.q : ℕ) : 𝓞 D.host.E)})
+    ∧ ∀ v, v ∈ Sf ↔ ∃ w : HeightOneSpectrum (𝓞 D.host.E), 𝔪 ≤ w.asIdeal ∧ w.under (𝓞 D.host.F) = v
 
 abbrev stdLat (V : HSp D) : Lat V := Formalism.MainNotions.StandardLatticesGL3.stdL D V.rank
 
@@ -44,17 +48,27 @@ def locIdx (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (a a' : ℕ) : ℝ :=
   ∏ w ∈ (normalizedFactors 𝔪).toFinset, blockIdx (Ideal.absNorm w : ℝ) ((normalizedFactors 𝔪).count w) a a'
 
 def vacNorm (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ t0 : ℂ) (a d : ℕ) : ℝ :=
-  Formalism.MainNotions.StandardLatticesGL3.nrm1Sq (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ) (Formalism.MainNotions.GL3Theta.th0 (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ) t0) ^ (Formalism.MainNotions.TaylorLogMetric.fF D * a * d)
+  Formalism.MainNotions.StandardLatticesGL3.nrm1Sq
+      (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ)
+      (Formalism.MainNotions.GL3Theta.th0 (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ) t0)
+    ^ (Formalism.MainNotions.TaylorLogMetric.fF D * a * d)
 
 def mass (D : D7) (N : ℕ) : ℂ := ∑ᶠ x : Cls D N (intG D N), ((gam D (intG D N) x.out : ℂ))⁻¹
 
 def fockSum (D : D7) (a d : ℕ) (n : D.what₂.Tau → ℕ) : ℂ :=
   ∑ T : Tup D a d n, GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.fockIp (minorPol D T) (minorPol D T)
 
-theorem goodMod_modT {T : Type} {L : LevCh D T} {sc : Consts} {μ₀ : T} (hL : L.Is μ₀) (hpq : Nat.Coprime D.host.pde (D.host.QS * D.host.q))
-    (hpq' : Nat.Coprime D.host.pde' (D.host.QS * D.host.q)) (G : GridData L sc) (t : T) : GoodMod D (modT G t) (sfB G t) := by
-  refine ⟨GlobalTheory.FunObj.StdDatum.TwBig.modT_ne_bot G t, GlobalTheory.SqTop.modT_sup_conj hL G t,
-    GlobalTheory.BotPairSmallTw.modT_isCoprime_two_q hL hpq hpq' G t, fun v => ?_⟩
+theorem goodMod_modT
+    {T : Type} {L : LevCh D T} {sc : Consts} {μ₀ : T} (hL : L.Is μ₀)
+    (hpq : Nat.Coprime D.host.pde (D.host.QS * D.host.q))
+    (hpq' : Nat.Coprime D.host.pde' (D.host.QS * D.host.q)) (G : GridData L sc) (t : T)
+    : GoodMod D (modT G t) (sfB G t) := by
+  refine ⟨
+    GlobalTheory.FunObj.StdDatum.TwBig.modT_ne_bot G t,
+    GlobalTheory.SqTop.modT_sup_conj hL G t,
+    GlobalTheory.BotPairSmallTw.modT_isCoprime_two_q hL hpq hpq' G t,
+    fun v => ?_
+  ⟩
   have key : ∀ w : HeightOneSpectrum (𝓞 D.host.E), modT G t ≤ w.asIdeal ↔ w ∈ locPl G t := by
     intro w
     have hp := w.isPrime

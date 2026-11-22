@@ -7,6 +7,7 @@ public import Formalism.FlagUnipotentLattices.MinkowskiFactorialBounds.ColonCoun
 
 namespace Formalism.HermitianLatticeCounting.Final.S6
 
-theorem dualIndex : Formalism.HermitianLatticeCounting.S6.DualIndex := Formalism.HermitianLatticeCounting.P.dual_lattice_index
+theorem dualIndex : Formalism.HermitianLatticeCounting.S6.DualIndex :=
+  Formalism.HermitianLatticeCounting.P.dual_lattice_index
 
 end Formalism.HermitianLatticeCounting.Final.S6

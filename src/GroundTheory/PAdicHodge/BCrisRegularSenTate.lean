@@ -16,8 +16,10 @@ open Module
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-theorem mem_inertiaGal_of_forall_unramifiedClosure {K : IntermediateField ℚ_[p] (PadicAlgCl p)}
-    {σ : Gal(PadicAlgCl p/K)} (hσ : ∀ u ∈ unramifiedClosure p, σ u = u) : σ ∈ inertiaGal K := by
+theorem mem_inertiaGal_of_forall_unramifiedClosure
+    {K : IntermediateField ℚ_[p] (PadicAlgCl p)} {σ : Gal(PadicAlgCl p/K)}
+    (hσ : ∀ u ∈ unramifiedClosure p, σ u = u)
+    : σ ∈ inertiaGal K := by
   intro y hy
   have hc : ‖(y : ℂ_[p])‖ ≤ 1 := by rwa [PadicComplex.norm_extends]
   obtain ⟨k, hk⟩ := eventually_approx_pow hc 1
@@ -48,7 +50,8 @@ theorem mem_inertiaGal_of_forall_unramifiedClosure {K : IntermediateField ℚ_[p
   obtain ⟨r, hr⟩ := exists_add_pow_prime_pow_eq hp.out a b k
   have hr' := congrArg (fun z : normInteger (PadicAlgCl p) => (z : PadicAlgCl p)) hr
   simp only [Subring.coe_pow, Subring.coe_add, Subring.coe_mul, Subring.coe_natCast, a, b,
-    sub_add_cancel] at hr'
+      sub_add_cancel]
+    at hr'
   have e : (σ y - y) ^ n = (σ y ^ n - y ^ n) - (p : PadicAlgCl p) * (σ y - y) * y * r := by
     rw [hn, hr']
     ring
@@ -56,8 +59,8 @@ theorem mem_inertiaGal_of_forall_unramifiedClosure {K : IntermediateField ℚ_[p
   have hlt : ‖σ y - y‖ ^ n < 1 := by
     rw [← norm_pow, e]
     refine (norm_sub_le_max_of_ultrametric (σ y ^ n - y ^ n)
-      ((p : PadicAlgCl p) * (σ y - y) * y * r)).trans_lt (max_lt (hσn.trans_lt
-      norm_natCast_p_algCl_lt_one) ?_)
+        ((p : PadicAlgCl p) * (σ y - y) * y * r)).trans_lt
+      (max_lt (hσn.trans_lt norm_natCast_p_algCl_lt_one) ?_)
     rw [norm_mul, norm_mul, norm_mul]
     rw [mul_assoc, mul_assoc]
     refine lt_of_le_of_lt (mul_le_of_le_one_right (norm_nonneg (p : PadicAlgCl p)) ?_)
@@ -69,9 +72,14 @@ namespace ACris
 
 theorem senTateCharacters : SenTateCharacters p := by
   intro K _ η hη x hx0 hx
-  have hfin := finite_image_inertiaGal_of_invariant_padic K η⁻¹
-    (show Continuous fun σ => (η σ)⁻¹ from hη.inv) ⟨x, hx0, fun σ => by
-      rw [hx σ, ← mul_assoc, ← map_mul, MonoidHom.inv_apply, Units.inv_mul, map_one, one_mul]⟩
+  have hfin :=
+    finite_image_inertiaGal_of_invariant_padic K η⁻¹ (show Continuous fun σ => (η σ)⁻¹ from hη.inv)
+      ⟨
+        x,
+        hx0,
+        fun σ => by
+          rw [hx σ, ← mul_assoc, ← map_mul, MonoidHom.inv_apply, Units.inv_mul, map_one, one_mul]
+      ⟩
   refine (hfin.image (·⁻¹)).subset ?_
   rintro _ ⟨σ, hσ, rfl⟩
   exact ⟨η⁻¹ σ, ⟨σ, mem_inertiaGal_of_forall_unramifiedClosure hσ, rfl⟩, by simp⟩

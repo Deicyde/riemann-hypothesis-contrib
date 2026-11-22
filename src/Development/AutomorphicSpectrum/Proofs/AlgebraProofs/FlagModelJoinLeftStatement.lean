@@ -6,6 +6,6 @@ public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.ExSu
 
 @[expose] public section
 
-theorem _root_.GlobalTheory.T.flag_model_join_left :
-    GroundTheory.Heights₂.Heights.NumbersDVR.FlagModelJoinLeftAlt.Statement :=
+theorem _root_.GlobalTheory.T.flag_model_join_left
+    : GroundTheory.Heights₂.Heights.NumbersDVR.FlagModelJoinLeftAlt.Statement :=
   GlobalTheory.CompanionTheory.Ar.Num.FlagModelJoinLeft.main

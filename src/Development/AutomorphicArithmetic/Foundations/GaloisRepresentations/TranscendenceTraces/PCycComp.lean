@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
 open Classical in
 private lemma cyc_eq_sum {S Y : Scheme.{0}} (c : Corr S Y) (Ω : Type) [Field Ω] [IsAlgClosed Ω]
@@ -17,8 +18,7 @@ private lemma cyc_eq_sum {S Y : Scheme.{0}} (c : Corr S Y) (Ω : Type) [Field Ω
   show (∑ᶠ (z : gp Ω ⟶ c.Z) (_ : z ∈ {z : gp Ω ⟶ c.Z | z ≫ c.p = x ∧ z ≫ c.f = y}), c.w Ω z) = _
   rw [hs, finsum_mem_coe_finset]
 
-theorem UpperTheory.Gal.TranscendenceTraces.cycComp_of :
-    FibFin → CycComp := by
+theorem UpperTheory.Gal.TranscendenceTraces.cycComp_of : FibFin → CycComp := by
   classical
   intro hF S Y X c d e a b pb hp hf hw Ω _ _ x y
   haveI := c.fin
@@ -30,11 +30,11 @@ theorem UpperTheory.Gal.TranscendenceTraces.cycComp_of :
   have hBm : ∀ t u, u ∈ B t ↔ u ≫ d.p = t := fun t u => by simp [B, fib]
   let E := (hF e.p Ω x).toFinset
   have hEm : ∀ z, z ∈ E ↔ z ≫ e.p = x := fun z => by simp [E, fib]
-  have hR : (∑ᶠ t : gp Ω ⟶ Y, c.cyc Ω x t * d.cyc Ω t y) =
-      ∑ s ∈ A, c.w Ω s * d.cyc Ω (s ≫ c.f) y := by
+  have hR
+      : (∑ᶠ t : gp Ω ⟶ Y, c.cyc Ω x t * d.cyc Ω t y) = ∑ s ∈ A, c.w Ω s * d.cyc Ω (s ≫ c.f) y := by
     rw [finsum_eq_sum_of_support_subset (s := A.image (· ≫ c.f))]
     · rw [← Finset.sum_fiberwise_of_maps_to (s := A) (t := A.image (· ≫ c.f)) (g := (· ≫ c.f))
-          (fun s hs => Finset.mem_image_of_mem _ hs)]
+        (fun s hs => Finset.mem_image_of_mem _ hs)]
       refine Finset.sum_congr rfl fun t _ => ?_
       rw [cyc_eq_sum c Ω x t A hAm, Finset.sum_mul]
       refine Finset.sum_congr rfl fun s hs => ?_
@@ -45,8 +45,10 @@ theorem UpperTheory.Gal.TranscendenceTraces.cycComp_of :
       apply ht
       rw [cyc_eq_sum c Ω x t A hAm, Finset.sum_eq_zero, zero_mul]
       intro s hs
-      exact absurd (Finset.mem_coe.2 (Finset.mem_image.2
-        ⟨s, (Finset.mem_filter.1 hs).1, (Finset.mem_filter.1 hs).2⟩)) hn
+      exact absurd
+        (Finset.mem_coe.2 (Finset.mem_image.2
+          ⟨s, (Finset.mem_filter.1 hs).1, (Finset.mem_filter.1 hs).2⟩))
+        hn
   have hmaps : ∀ z ∈ E.filter (fun z => z ≫ e.f = y), z ≫ b ∈ A := by
     intro z hz
     rw [hAm, Category.assoc, ← hp]
@@ -54,8 +56,10 @@ theorem UpperTheory.Gal.TranscendenceTraces.cycComp_of :
   rw [hR, cyc_eq_sum e Ω x y E hEm, ← Finset.sum_fiberwise_of_maps_to hmaps]
   refine Finset.sum_congr rfl fun s hs => ?_
   rw [cyc_eq_sum d Ω (s ≫ c.f) y (B (s ≫ c.f)) (hBm _), Finset.mul_sum]
-  refine Finset.sum_bij' (fun z _ => z ≫ a)
-    (fun u hu => pb.lift u s ((hBm _ u).1 (Finset.mem_filter.1 hu).1)) ?_ ?_ ?_ ?_ ?_
+  refine Finset.sum_bij'
+    (fun z _ => z ≫ a)
+    (fun u hu => pb.lift u s ((hBm _ u).1 (Finset.mem_filter.1 hu).1))
+    ?_ ?_ ?_ ?_ ?_
   · intro z hz
     simp only [Finset.mem_filter, hEm, hBm] at hz ⊢
     refine ⟨?_, ?_⟩

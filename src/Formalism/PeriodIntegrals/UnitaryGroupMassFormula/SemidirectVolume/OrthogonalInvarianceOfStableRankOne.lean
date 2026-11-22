@@ -17,6 +17,7 @@ theorem orthogonal_invariance_of_stable_rank_one (h1 : AdeleStableRankOne) : Ort
 theorem unipotent_modulus_of_stable_rank_one (h1 : AdeleStableRankOne) : VMod :=
   vMod_of (orthogonal_invariance_of_stable_rank_one h1) trace_basis_holds trace_gram_nondegenerate
 
-theorem unipotent_modulus_holds : VMod := unipotent_modulus_of_stable_rank_one PI.VolSemiDirect.W.SR.stable_rank_one_adeles
+theorem unipotent_modulus_holds : VMod :=
+  unipotent_modulus_of_stable_rank_one PI.VolSemiDirect.W.SR.stable_rank_one_adeles
 
 end PI.VolSemiDirect.W.Cj

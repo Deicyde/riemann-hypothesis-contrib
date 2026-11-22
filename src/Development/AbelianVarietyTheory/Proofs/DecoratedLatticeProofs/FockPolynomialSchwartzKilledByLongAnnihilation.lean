@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.SiegelWeil₂.S
 @[expose] public section
 
 open scoped Matrix NNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.Core.Rk.SWLaw GlobalTheory.Core.Rk.SW GlobalTheory.StdUnn
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.Core.Rk.SWLaw GlobalTheory.Core.Rk.SW GlobalTheory.StdUnn
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (RealMat IsFockVec)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -25,8 +28,11 @@ open MvPolynomial
 
 variable {D : D7}
 
-theorem hasDerivAt_eval_line {σ : Type} [Fintype σ] [DecidableEq σ] (p : MvPolynomial σ ℂ) (v c : σ → ℂ) (t : ℝ) :
-    HasDerivAt (fun t : ℝ => eval (v + (t : ℂ) • c) p) (∑ k, c k * eval (v + (t : ℂ) • c) (pderiv k p)) t := by
+theorem hasDerivAt_eval_line
+    {σ : Type} [Fintype σ] [DecidableEq σ] (p : MvPolynomial σ ℂ) (v c : σ → ℂ) (t : ℝ)
+    : HasDerivAt
+      (fun t : ℝ => eval (v + (t : ℂ) • c) p)
+      (∑ k, c k * eval (v + (t : ℂ) • c) (pderiv k p)) t := by
   have hl : ∀ k, HasDerivAt (fun t : ℝ => (v + (t : ℂ) • c) k) (c k) t := fun k => by
     have := ((Complex.ofRealCLM.hasDerivAt (x := t)).mul_const (c k)).const_add (v k)
     simpa [Complex.ofRealCLM_apply] using this
@@ -36,10 +42,14 @@ theorem hasDerivAt_eval_line {σ : Type} [Fintype σ] [DecidableEq σ] (p : MvPo
     simp only [map_add (f := _), mul_add, Finset.sum_add_distrib]
     exact hp.add hq
   | mul_X p k hp =>
-    simp only [map_mul, eval_X, Derivation.leibniz, pderiv_X, smul_eq_mul, map_add (f := _), mul_add]
+    simp only [map_mul, eval_X, Derivation.leibniz, pderiv_X, smul_eq_mul, map_add (f := _),
+      mul_add]
     have h := hp.mul (hl k)
     refine h.congr_deriv ?_
-    have hs : ∀ j, eval (v + (t : ℂ) • c) (Pi.single (M := fun _ : σ => MvPolynomial σ ℂ) j 1 k) = if j = k then 1 else 0 := by
+    have hs
+        : ∀ j,
+          eval (v + (t : ℂ) • c) (Pi.single (M := fun _ : σ => MvPolynomial σ ℂ) j 1 k)
+            = if j = k then 1 else 0 := by
       intro j
       by_cases hj : j = k
       · subst hj; simp
@@ -55,29 +65,40 @@ theorem hasDerivAt_eval_line {σ : Type} [Fintype σ] [DecidableEq σ] (p : MvPo
 
 section Line
 
-variable (V : HSp D) {n : ℕ} (l : D.what₂.Tau → ℝ) (s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ)
-
+variable
+  (V : HSp D) {n : ℕ} (l : D.what₂.Tau → ℝ) (s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ)
 
 open Classical in
-def dirAt {m : ℕ} (τ : D.what₂.Tau) (X : Matrix (Fin m) (Fin n) ℂ) : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ :=
-  fun τ' => if τ' = τ then X else 0
+def dirAt {m : ℕ} (τ : D.what₂.Tau) (X : Matrix (Fin m) (Fin n) ℂ)
+    : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ := fun τ' =>
+  if τ' = τ then X else 0
 
-theorem hasDerivAt_gauss (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) (z : D.what₂.Tau → Matrix (Fin V.rank) (Fin n) ℂ)
-    (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ) :
-    HasDerivAt (fun t : ℝ => gauss V l s (z + (t : ℂ) • dirAt τ X)) (-(linF V l s τ X (z τ)) * gauss V l s z) 0 := by
+theorem hasDerivAt_gauss
+    (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) (z : D.what₂.Tau → Matrix (Fin V.rank) (Fin n) ℂ)
+    (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ)
+    : HasDerivAt
+      (fun t : ℝ => gauss V l s (z + (t : ℂ) • dirAt τ X))
+      (-(linF V l s τ X (z τ)) * gauss V l s z) 0 := by
   set Y := dirAt τ X with hY
   set M : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ := fun τ' => gramAt D V τ' * s τ' with hMdef
   set a : D.what₂.Tau → ℂ := fun τ' => Matrix.trace ((z τ')ᴴ * M τ' * z τ') with ha
   set b : D.what₂.Tau → ℂ := fun τ' => Matrix.trace ((Y τ')ᴴ * M τ' * z τ') + Matrix.trace ((z τ')ᴴ * M τ' * Y τ') with hb
   set d : D.what₂.Tau → ℂ := fun τ' => Matrix.trace ((Y τ')ᴴ * M τ' * Y τ') with hd
-  have key : ∀ τ' (t : ℝ), Matrix.trace ((z τ' + (t : ℂ) • Y τ')ᴴ * M τ' * (z τ' + (t : ℂ) • Y τ')) =
-      a τ' + (t : ℂ) * b τ' + (t : ℂ) * (t : ℂ) * d τ' := by
+  have key
+      : ∀ τ' (t : ℝ),
+        Matrix.trace ((z τ' + (t : ℂ) • Y τ')ᴴ * M τ' * (z τ' + (t : ℂ) • Y τ'))
+          = a τ' + (t : ℂ) * b τ' + (t : ℂ) * (t : ℂ) * d τ' := by
     intro τ' t
-    simp only [ha, hb, hd, Matrix.conjTranspose_add, Matrix.conjTranspose_smul, Complex.star_def, Complex.conj_ofReal,
-      Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, Matrix.trace_add, Matrix.trace_smul, smul_eq_mul]
+    simp only [ha, hb, hd, Matrix.conjTranspose_add, Matrix.conjTranspose_smul, Complex.star_def,
+      Complex.conj_ofReal, Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul,
+      Matrix.trace_add, Matrix.trace_smul, smul_eq_mul]
     ring
-  have hfun : (fun t : ℝ => gauss V l s (z + (t : ℂ) • Y)) =
-      fun t : ℝ => Complex.exp (-(2 * Real.pi) * ∑ τ', ((|l τ'| : ℝ) : ℂ) * (a τ' + (t : ℂ) * b τ' + (t : ℂ) * (t : ℂ) * d τ')) := by
+  have hfun
+      : (fun t : ℝ => gauss V l s (z + (t : ℂ) • Y))
+        = fun t : ℝ =>
+          Complex.exp
+            (-(2 * Real.pi)
+              * ∑ τ', ((|l τ'| : ℝ) : ℂ) * (a τ' + (t : ℂ) * b τ' + (t : ℂ) * (t : ℂ) * d τ')) := by
     funext t
     unfold gauss
     congr 2
@@ -87,10 +108,15 @@ theorem hasDerivAt_gauss (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) (z : 
   have ho : HasDerivAt (fun t : ℝ => (t : ℂ)) 1 0 := by
     have := (hasDerivAt_id (0 : ℝ)).ofReal_comp
     simpa using this
-  have hterm : ∀ τ' ∈ (Finset.univ : Finset D.what₂.Tau), HasDerivAt
-      (fun t : ℝ => ((|l τ'| : ℝ) : ℂ) * (a τ' + (t : ℂ) * b τ' + (t : ℂ) * (t : ℂ) * d τ')) (((|l τ'| : ℝ) : ℂ) * b τ') 0 := by
+  have hterm
+      : ∀ τ' ∈ (Finset.univ : Finset D.what₂.Tau),
+        HasDerivAt
+          (fun t : ℝ => ((|l τ'| : ℝ) : ℂ) * (a τ' + (t : ℂ) * b τ' + (t : ℂ) * (t : ℂ) * d τ'))
+          (((|l τ'| : ℝ) : ℂ) * b τ') 0 := by
     intro τ' _
-    have h := (((ho.mul_const (b τ')).const_add (a τ')).add ((ho.mul ho).mul_const (d τ'))).const_mul ((|l τ'| : ℝ) : ℂ)
+    have h :=
+      (((ho.mul_const (b τ')).const_add (a τ')).add ((ho.mul ho).mul_const (d τ'))).const_mul
+        ((|l τ'| : ℝ) : ℂ)
     refine h.congr_deriv ?_
     simp
   have hsum := (HasDerivAt.fun_sum hterm).const_mul (-(2 * Real.pi : ℂ))
@@ -110,7 +136,8 @@ theorem hasDerivAt_gauss (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) (z : 
     simp only [hb, hY, dirAt, if_true, hMdef]
     congr 1
     rw [← Complex.star_def, ← Matrix.trace_conjTranspose]
-    rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, (hM τ).eq, Matrix.conjTranspose_conjTranspose]
+    rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, (hM τ).eq,
+      Matrix.conjTranspose_conjTranspose]
     simp only [Matrix.mul_assoc]
   rw [hbτ]
   unfold linF
@@ -119,21 +146,28 @@ theorem hasDerivAt_gauss (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) (z : 
 
 variable {θ : InfFam D}
 
-theorem compAt_add' (τ : D.what₂.Tau) {m : ℕ} (x y : Mx D m n) :
-    compAt θ τ (x + y) = compAt θ τ x + compAt θ τ y := by
+theorem compAt_add' (τ : D.what₂.Tau) {m : ℕ} (x y : Mx D m n)
+    : compAt θ τ (x + y) = compAt θ τ x + compAt θ τ y := by
   ext i j
   simp only [compAt, Matrix.map_apply, Matrix.add_apply]
   rw [map_add (infPart D), map_add (θ τ)]
 
-theorem compAt_add_lineAt (hθ : IsInfFam θ) {m : ℕ} (x : Mx D m n) (τ : D.what₂.Tau) (X : Matrix (Fin m) (Fin n) ℂ) (t : ℝ) :
-    (fun τ' => compAt θ τ' (x + lineAt θ τ X t)) = (fun τ' => compAt θ τ' x) + (t : ℂ) • dirAt τ X := by
+theorem compAt_add_lineAt
+    (hθ : IsInfFam θ)
+    {m : ℕ} (x : Mx D m n)
+    (τ : D.what₂.Tau) (X : Matrix (Fin m) (Fin n) ℂ) (t : ℝ)
+    : (fun τ' => compAt θ τ' (x + lineAt θ τ X t))
+      = (fun τ' => compAt θ τ' x) + (t : ℂ) • dirAt τ X := by
   funext τ'
   rw [compAt_add', (GlobalTheory.OrientedHeis.isLineAt_lineAt hθ τ X).2.2 t τ']
   simp only [Pi.add_apply, Pi.smul_apply, dirAt]
   split_ifs <;> simp
 
-theorem finPart_add_lineAt (hθ : IsInfFam θ) {m : ℕ} (x : Mx D m n) (τ : D.what₂.Tau) (X : Matrix (Fin m) (Fin n) ℂ) (t : ℝ) :
-    (fun i j => finPart D ((x + lineAt θ τ X t) i j)) = fun i j => finPart D (x i j) := by
+theorem finPart_add_lineAt
+    (hθ : IsInfFam θ)
+    {m : ℕ} (x : Mx D m n)
+    (τ : D.what₂.Tau) (X : Matrix (Fin m) (Fin n) ℂ) (t : ℝ)
+    : (fun i j => finPart D ((x + lineAt θ τ X t) i j)) = fun i j => finPart D (x i j) := by
   funext i j
   have h := congrFun (congrFun ((GlobalTheory.OrientedHeis.isLineAt_lineAt hθ τ X).2.1 t) i) j
   simp only [Matrix.map_apply, Matrix.zero_apply] at h
@@ -143,69 +177,91 @@ end Line
 
 section Span
 
-variable {θ : InfFam D} (V : HSp D) {n : ℕ} (l : D.what₂.Tau → ℝ) (s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ)
+variable
+  {θ : InfFam D}
+  (V : HSp D)
+  {n : ℕ}
+  (l : D.what₂.Tau → ℝ) (s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ)
 
-def ptOf {m : ℕ} (z : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ) : D.what₂.Tau × Fin m × Fin n × Bool → ℂ :=
-  fun k => if k.2.2.2 then conj (z k.1 k.2.1 k.2.2.1) else z k.1 k.2.1 k.2.2.1
+def ptOf {m : ℕ} (z : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ)
+    : D.what₂.Tau × Fin m × Fin n × Bool → ℂ := fun k =>
+  if k.2.2.2 then conj (z k.1 k.2.1 k.2.2.1) else z k.1 k.2.1 k.2.2.1
 
-theorem evalPoly_eq {m : ℕ} (p : MvPolynomial (D.what₂.Tau × Fin m × Fin n × Bool) ℂ)
-    (z : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ) : evalPoly p z = eval (ptOf z) p := rfl
+theorem evalPoly_eq
+    {m : ℕ} (p : MvPolynomial (D.what₂.Tau × Fin m × Fin n × Bool) ℂ)
+    (z : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ)
+    : evalPoly p z = eval (ptOf z) p :=
+  rfl
 
-theorem ptOf_add_smul {m : ℕ} (z Y : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ) (t : ℝ) :
-    ptOf (z + (t : ℂ) • Y) = ptOf z + (t : ℂ) • ptOf Y := by
+theorem ptOf_add_smul {m : ℕ} (z Y : D.what₂.Tau → Matrix (Fin m) (Fin n) ℂ) (t : ℝ)
+    : ptOf (z + (t : ℂ) • Y) = ptOf z + (t : ℂ) • ptOf Y := by
   funext k
   simp only [ptOf, Pi.add_apply, Pi.smul_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
   split_ifs <;> simp [Complex.conj_ofReal]
 
-
 variable (θ) in
-def gen (e : D.what₂.Tau × Fin V.rank × Fin n × Bool →₀ ℕ) (g : (Fin V.rank → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ) :
-    Mx D V.rank n → ℂ :=
-  fun x => evalPoly (monomial e 1) (fun τ => compAt θ τ x) * gauss V l s (fun τ => compAt θ τ x) *
-    g (fun i j => finPart D (x i j))
-
+def gen
+    (e : D.what₂.Tau × Fin V.rank × Fin n × Bool →₀ ℕ)
+    (g : (Fin V.rank → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ)
+    : Mx D V.rank n → ℂ := fun x =>
+  evalPoly (monomial e 1) (fun τ => compAt θ τ x) * gauss V l s (fun τ => compAt θ τ x)
+    * g (fun i j => finPart D (x i j))
 
 variable (θ n) in
 def lowDeg (N : ℕ) : Submodule ℂ (Mx D V.rank n → ℂ) :=
   Submodule.span ℂ {φ | ∃ e g, Finsupp.degree e < N ∧ φ = gen θ V l s e g}
 
 open Classical in
-theorem hasDerivAt_gen (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian)
-    (e : D.what₂.Tau × Fin V.rank × Fin n × Bool →₀ ℕ) (g : (Fin V.rank → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ)
-    (x : Mx D V.rank n) (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ) :
-    HasDerivAt (fun t : ℝ => gen θ V l s e g (x + lineAt θ τ X t))
-      ((∑ k, ptOf (dirAt τ X) k * eval (ptOf (fun τ' => compAt θ τ' x)) (pderiv k (monomial e 1))) *
-        gauss V l s (fun τ' => compAt θ τ' x) * g (fun i j => finPart D (x i j)) -
-        linF V l s τ X (compAt θ τ x) * gen θ V l s e g x) 0 := by
-  have hfun : (fun t : ℝ => gen θ V l s e g (x + lineAt θ τ X t)) = fun t : ℝ =>
-      eval (ptOf (fun τ' => compAt θ τ' x) + (t : ℂ) • ptOf (dirAt τ X)) (monomial e 1) *
-        gauss V l s ((fun τ' => compAt θ τ' x) + (t : ℂ) • dirAt τ X) * g (fun i j => finPart D (x i j)) := by
+theorem hasDerivAt_gen
+    (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian)
+    (e : D.what₂.Tau × Fin V.rank × Fin n × Bool →₀ ℕ)
+    (g : (Fin V.rank → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ) (x : Mx D V.rank n)
+    (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ)
+    : HasDerivAt
+      (fun t : ℝ => gen θ V l s e g (x + lineAt θ τ X t))
+      ((∑ k, ptOf (dirAt τ X) k * eval (ptOf (fun τ' => compAt θ τ' x)) (pderiv k (monomial e 1)))
+          * gauss V l s (fun τ' => compAt θ τ' x) * g (fun i j => finPart D (x i j))
+        - linF V l s τ X (compAt θ τ x) * gen θ V l s e g x)
+      0 := by
+  have hfun
+      : (fun t : ℝ => gen θ V l s e g (x + lineAt θ τ X t))
+        = fun t : ℝ =>
+          eval (ptOf (fun τ' => compAt θ τ' x) + (t : ℂ) • ptOf (dirAt τ X)) (monomial e 1)
+            * gauss V l s ((fun τ' => compAt θ τ' x) + (t : ℂ) • dirAt τ X)
+            * g (fun i j => finPart D (x i j)) := by
     funext t
     simp only [gen]
     rw [compAt_add_lineAt hθ, finPart_add_lineAt hθ, evalPoly_eq, ptOf_add_smul]
   rw [hfun]
-  have h := ((hasDerivAt_eval_line (monomial e 1) (ptOf (fun τ' => compAt θ τ' x)) (ptOf (dirAt τ X)) 0).mul
-    (hasDerivAt_gauss V l s hM (fun τ' => compAt θ τ' x) τ X)).mul_const (g (fun i j => finPart D (x i j)))
+  have h :=
+    ((hasDerivAt_eval_line (monomial e 1) (ptOf (fun τ' => compAt θ τ' x)) (ptOf (dirAt τ X)) 0).mul
+        (hasDerivAt_gauss V l s hM (fun τ' => compAt θ τ' x) τ X)).mul_const
+      (g (fun i j => finPart D (x i j)))
   refine h.congr_deriv ?_
   simp only [gen, evalPoly_eq, Complex.ofReal_zero, zero_smul, add_zero]
   ring
 
 open Classical in
-theorem annS_gen (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian)
-    (e : D.what₂.Tau × Fin V.rank × Fin n × Bool →₀ ℕ) (g : (Fin V.rank → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ)
-    (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ) :
-    annS V l s θ τ X (gen θ V l s e g) =
-      ∑ k, (ptOf (dirAt τ X) k * (e k : ℂ)) • gen θ V l s (e - Finsupp.single k 1) g := by
+theorem annS_gen
+    (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian)
+    (e : D.what₂.Tau × Fin V.rank × Fin n × Bool →₀ ℕ)
+    (g : (Fin V.rank → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ) (τ : D.what₂.Tau)
+    (X : Matrix (Fin V.rank) (Fin n) ℂ)
+    : annS V l s θ τ X (gen θ V l s e g)
+      = ∑ k, (ptOf (dirAt τ X) k * (e k : ℂ)) • gen θ V l s (e - Finsupp.single k 1) g := by
   funext x
   unfold annS
-  rw [(hasDerivAt_gen V l s hθ hM e g x τ X).deriv, sub_add_cancel, Finset.sum_apply, Finset.sum_mul, Finset.sum_mul]
+  rw [(hasDerivAt_gen V l s hθ hM e g x τ X).deriv, sub_add_cancel, Finset.sum_apply,
+    Finset.sum_mul, Finset.sum_mul]
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [Pi.smul_apply, smul_eq_mul, gen, evalPoly_eq, pderiv_monomial, eval_monomial]
   ring
 
-theorem differentiableAt_of_mem (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) {N : ℕ}
-    {φ : Mx D V.rank n → ℂ} (hφ : φ ∈ lowDeg θ V n l s N) (x : Mx D V.rank n) (τ : D.what₂.Tau)
-    (X : Matrix (Fin V.rank) (Fin n) ℂ) : DifferentiableAt ℝ (fun t : ℝ => φ (x + lineAt θ τ X t)) 0 := by
+theorem differentiableAt_of_mem
+    (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian)
+    {N : ℕ} {φ : Mx D V.rank n → ℂ} (hφ : φ ∈ lowDeg θ V n l s N)
+    (x : Mx D V.rank n) (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ)
+    : DifferentiableAt ℝ (fun t : ℝ => φ (x + lineAt θ τ X t)) 0 := by
   induction hφ using Submodule.span_induction with
   | mem φ h =>
     obtain ⟨e, g, -, rfl⟩ := h
@@ -214,8 +270,9 @@ theorem differentiableAt_of_mem (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ
   | add a b _ _ ha hb => exact ha.add hb
   | smul c a _ ha => exact ha.const_mul c
 
-theorem degree_sub_single_lt {σ : Type} {N : ℕ} (e : σ →₀ ℕ) (k : σ) (he : Finsupp.degree e < N + 1) (hk : e k ≠ 0) :
-    Finsupp.degree (e - Finsupp.single k 1) < N := by
+theorem degree_sub_single_lt
+    {σ : Type} {N : ℕ} (e : σ →₀ ℕ) (k : σ) (he : Finsupp.degree e < N + 1) (hk : e k ≠ 0)
+    : Finsupp.degree (e - Finsupp.single k 1) < N := by
   have h1 : Finsupp.single k 1 ≤ e := by
     rw [Finsupp.single_le_iff]
     omega
@@ -225,9 +282,11 @@ theorem degree_sub_single_lt {σ : Type} {N : ℕ} (e : σ →₀ ℕ) (k : σ) 
     rw [map_add (f := _), Finsupp.degree_single]
   omega
 
-theorem annS_mem (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) {N : ℕ}
-    {φ : Mx D V.rank n → ℂ} (hφ : φ ∈ lowDeg θ V n l s (N + 1)) (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ) :
-    annS V l s θ τ X φ ∈ lowDeg θ V n l s N := by
+theorem annS_mem
+    (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian)
+    {N : ℕ} {φ : Mx D V.rank n → ℂ} (hφ : φ ∈ lowDeg θ V n l s (N + 1))
+    (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin n) ℂ)
+    : annS V l s θ τ X φ ∈ lowDeg θ V n l s N := by
   induction hφ using Submodule.span_induction with
   | mem φ h =>
     obtain ⟨e, g, he, rfl⟩ := h
@@ -236,7 +295,8 @@ theorem annS_mem (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHerm
     by_cases hk : e k = 0
     · rw [hk, Nat.cast_zero, mul_zero, zero_smul]
       exact Submodule.zero_mem _
-    · exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, g, degree_sub_single_lt e k he hk, rfl⟩)
+    · exact Submodule.smul_mem _ _
+        (Submodule.subset_span ⟨_, g, degree_sub_single_lt e k he hk, rfl⟩)
   | zero =>
     have : annS V l s θ τ X (0 : Mx D V.rank n → ℂ) = 0 := by
       funext x
@@ -247,7 +307,8 @@ theorem annS_mem (hθ : IsInfFam θ) (hM : ∀ τ, (gramAt D V τ * s τ).IsHerm
     have : annS V l s θ τ X (a + b) = annS V l s θ τ X a + annS V l s θ τ X b := by
       funext x
       simp only [annS, Pi.add_apply]
-      rw [deriv_fun_add (differentiableAt_of_mem V l s hθ hM ha' x τ X) (differentiableAt_of_mem V l s hθ hM hb' x τ X)]
+      rw [deriv_fun_add (differentiableAt_of_mem V l s hθ hM ha' x τ X)
+        (differentiableAt_of_mem V l s hθ hM hb' x τ X)]
       ring
     rw [this]
     exact Submodule.add_mem _ ha hb
@@ -266,13 +327,17 @@ theorem lowDeg_mono {N M : ℕ} (h : N ≤ M) : lowDeg θ V n l s N ≤ lowDeg �
 theorem lowDeg_zero : lowDeg θ V n l s 0 = ⊥ :=
   Submodule.span_eq_bot.2 fun _ ⟨_, _, he, _⟩ => absurd he (Nat.not_lt_zero _)
 
-theorem exists_lowDeg {φ : Mx D V.rank n → ℂ} (hφ : φ ∈ fockA θ V n l s) : ∃ N, φ ∈ lowDeg θ V n l s N := by
+theorem exists_lowDeg {φ : Mx D V.rank n → ℂ} (hφ : φ ∈ fockA θ V n l s)
+    : ∃ N, φ ∈ lowDeg θ V n l s N := by
   induction hφ using Submodule.span_induction with
   | mem φ h =>
     obtain ⟨p, g, -, rfl⟩ := h
     refine ⟨p.totalDegree + 1, ?_⟩
-    have hsum : (fun x : Mx D V.rank n => evalPoly p (fun τ => compAt θ τ x) * gauss V l s (fun τ => compAt θ τ x) *
-        g (fun i j => finPart D (x i j))) = ∑ e ∈ p.support, AddMonoidAlgebra.coeff p e • gen θ V l s e g := by
+    have hsum
+        : (fun x : Mx D V.rank n =>
+            evalPoly p (fun τ => compAt θ τ x) * gauss V l s (fun τ => compAt θ τ x)
+              * g (fun i j => finPart D (x i j)))
+          = ∑ e ∈ p.support, AddMonoidAlgebra.coeff p e • gen θ V l s e g := by
       funext x
       rw [Finset.sum_apply]
       simp only [gen, Pi.smul_apply, smul_eq_mul, evalPoly_eq]
@@ -283,27 +348,41 @@ theorem exists_lowDeg {φ : Mx D V.rank n → ℂ} (hφ : φ ∈ fockA θ V n l 
       rw [eval_monomial, eval_monomial]
       ring
     rw [hsum]
-    exact Submodule.sum_mem _ fun e he => Submodule.smul_mem _ _
-      (Submodule.subset_span ⟨e, g, Nat.lt_succ_of_le (le_totalDegree he), rfl⟩)
-  | zero => exact ⟨0, Submodule.zero_mem _⟩
+    exact Submodule.sum_mem _ fun e he =>
+      Submodule.smul_mem _ _
+        (Submodule.subset_span ⟨e, g, Nat.lt_succ_of_le (le_totalDegree he), rfl⟩)
+  | zero =>
+    exact ⟨0, Submodule.zero_mem _⟩
   | add a b _ _ ha hb =>
     obtain ⟨N, hN⟩ := ha
     obtain ⟨M, hM⟩ := hb
-    exact ⟨max N M, Submodule.add_mem _ (lowDeg_mono V l s (le_max_left N M) hN) (lowDeg_mono V l s (le_max_right N M) hM)⟩
+    exact ⟨
+      max N M,
+      Submodule.add_mem _ (lowDeg_mono V l s (le_max_left N M) hN)
+        (lowDeg_mono V l s (le_max_right N M) hM)
+    ⟩
   | smul c a _ ha =>
     obtain ⟨N, hN⟩ := ha
     exact ⟨N, Submodule.smul_mem _ _ hN⟩
 
 end Span
 
-
 open scoped ComplexOrder in
-theorem fockA_killed_by_annS : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀ (V : HSp D) (n : ℕ) (l : D.what₂.Tau → ℝ) (s : RealMat V), (∀ τ, IsCartanInv (gramAt D V τ) (s τ)) → ∀ φ ∈ fockA θ V n l s, ∃ N : ℕ, ∀ L : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin n) ℂ), L.length = N → L.foldr (fun q g => annS V l s θ q.1 q.2 g) φ = 0 := by
+theorem fockA_killed_by_annS
+    : ∀ (D : D7) (θ : InfFam D),
+      IsInfFam θ
+        → ∀ (V : HSp D) (n : ℕ) (l : D.what₂.Tau → ℝ) (s : RealMat V),
+          (∀ τ, IsCartanInv (gramAt D V τ) (s τ))
+            → ∀ φ ∈ fockA θ V n l s, ∃ N : ℕ,
+              ∀ L : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin n) ℂ),
+                L.length = N → L.foldr (fun q g => annS V l s θ q.1 q.2 g) φ = 0 := by
   intro D θ hθ V n l s hs φ hφ
   have hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian := fun τ => (hs τ).2.2.isHermitian
   obtain ⟨N, hN⟩ := exists_lowDeg V l s hφ
-  have key : ∀ (L : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin n) ℂ)) (M : ℕ), φ ∈ lowDeg θ V n l s (L.length + M) →
-      L.foldr (fun q g => annS V l s θ q.1 q.2 g) φ ∈ lowDeg θ V n l s M := by
+  have key
+      : ∀ (L : List (D.what₂.Tau × Matrix (Fin V.rank) (Fin n) ℂ)) (M : ℕ),
+        φ ∈ lowDeg θ V n l s (L.length + M)
+          → L.foldr (fun q g => annS V l s θ q.1 q.2 g) φ ∈ lowDeg θ V n l s M := by
     intro L
     induction L with
     | nil => intro M h; simpa using h

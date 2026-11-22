@@ -15,8 +15,8 @@ open Filter Topology Matrix
 
 noncomputable section
 
-private theorem differentiable_update_pow (e k : ℕ) :
-    Differentiable ℂ (fun s : Fin (e + 1) → ℂ => Function.update s 0 (s 0 ^ k)) := by
+private theorem differentiable_update_pow (e k : ℕ)
+    : Differentiable ℂ (fun s : Fin (e + 1) → ℂ => Function.update s 0 (s 0 ^ k)) := by
   rw [differentiable_pi]
   intro i
   by_cases hi : i = 0
@@ -26,11 +26,11 @@ private theorem differentiable_update_pow (e k : ℕ) :
   · simp only [Function.update_of_ne hi]
     fun_prop
 
-theorem PuncturedCoverCycles.proof (hCov : FibreSectionsCovering.Statement)
-    (hCyc : FiniteCoverPuncturedPolydisc.Statement) : PuncturedCoverCycles.Statement := by
+theorem PuncturedCoverCycles.proof
+    (hCov : FibreSectionsCovering.Statement) (hCyc : FiniteCoverPuncturedPolydisc.Statement)
+    : PuncturedCoverCycles.Statement := by
   intro n e N A c r X hr hc0 hXP hfib hsec
-  have hX : Set.MapsTo (fun x => A *ᵥ x) X (Metric.ball c r ∩ {t | t 0 ≠ 0}) :=
-    fun x hx => hXP x hx
+  have hX : Set.MapsTo (fun x => A *ᵥ x) X (Metric.ball c r ∩ {t | t 0 ≠ 0}) := fun x hx => hXP x hx
   have hcov := hCov n e N A _ X hX (fun y hy => hfib y hy.1 hy.2) hsec
   have hfib' : ∀ z, (hX.restrict ⁻¹' {z}).encard = N := by
     intro z
@@ -48,10 +48,11 @@ theorem PuncturedCoverCycles.proof (hCov : FibreSectionsCovering.Statement)
   classical
   let Ψ : Fin m → (Fin (e + 1) → ℂ) → Fin n → ℂ := fun b t =>
     if h : t ∈ Metric.ball c δ ∩ {t | t 0 ≠ 0} then (ψ b ⟨t, h⟩ : Fin n → ℂ) else 0
-  have hΨ : ∀ b t (h : t ∈ Metric.ball c δ ∩ {t | t 0 ≠ 0}), Ψ b t = ψ b ⟨t, h⟩ :=
-    fun b t h => dif_pos h
-  have hAΨ : ∀ b t (h : t ∈ Metric.ball c δ ∩ {t | t 0 ≠ 0}),
-      A *ᵥ Ψ b t = Function.update t 0 (t 0 ^ ord b) := by
+  have hΨ : ∀ b t (h : t ∈ Metric.ball c δ ∩ {t | t 0 ≠ 0}), Ψ b t = ψ b ⟨t, h⟩ := fun b t h =>
+    dif_pos h
+  have hAΨ
+      : ∀ b t (h : t ∈ Metric.ball c δ ∩ {t | t 0 ≠ 0}),
+        A *ᵥ Ψ b t = Function.update t 0 (t 0 ^ ord b) := by
     intro b t h
     rw [hΨ b t h]
     exact hA b ⟨t, h⟩

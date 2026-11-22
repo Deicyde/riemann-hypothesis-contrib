@@ -36,12 +36,13 @@ theorem norm_add_le_of_le {a b : Om l} {r : ℝ} (ha : ‖a‖ ≤ r) (hb : ‖b
 theorem norm_sub_le_one {a b : Om l} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) : ‖a - b‖ ≤ 1 :=
   (norm_sub_le_max' a b).trans (max_le ha hb)
 
-theorem norm_sum_le_of_le {ι : Type*} (s : Finset ι) (f : ι → Om l) {r : ℝ} (hr : 0 ≤ r)
-    (h : ∀ i ∈ s, ‖f i‖ ≤ r) : ‖∑ i ∈ s, f i‖ ≤ r :=
+theorem norm_sum_le_of_le
+    {ι : Type*} (s : Finset ι) (f : ι → Om l) {r : ℝ} (hr : 0 ≤ r) (h : ∀ i ∈ s, ‖f i‖ ≤ r)
+    : ‖∑ i ∈ s, f i‖ ≤ r :=
   IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hr h
 
-theorem norm_pow_sub_pow_le {u v : Om l} (hu : ‖u‖ ≤ 1) (hv : ‖v‖ ≤ 1) (a : ℕ) :
-    ‖u ^ a - v ^ a‖ ≤ ‖u - v‖ := by
+theorem norm_pow_sub_pow_le {u v : Om l} (hu : ‖u‖ ≤ 1) (hv : ‖v‖ ≤ 1) (a : ℕ)
+    : ‖u ^ a - v ^ a‖ ≤ ‖u - v‖ := by
   induction a with
   | zero => simp
   | succ a ih =>
@@ -49,19 +50,23 @@ theorem norm_pow_sub_pow_le {u v : Om l} (hu : ‖u‖ ≤ 1) (hv : ‖v‖ ≤ 
     rw [this]
     refine norm_add_le_of_le ?_ ?_
     · rw [norm_mul]; exact (mul_le_of_le_one_left (norm_nonneg _) hu).trans ih
-    · rw [norm_mul, norm_pow]; exact mul_le_of_le_one_left (norm_nonneg _) (pow_le_one₀ (norm_nonneg _) hv)
+    · rw [norm_mul, norm_pow]
+      exact mul_le_of_le_one_left (norm_nonneg _) (pow_le_one₀ (norm_nonneg _) hv)
 
-theorem exists_generator (E : IntermediateField ℚ_[l] (Om l)) [FiniteDimensional ℚ_[l] E] :
-    ∃ x ∈ E, ‖x‖ ≤ 1 ∧ ∀ z ∈ E, ‖z‖ ≤ 1 → ∃ p : ℤ_[l][X], aeval x p = z := by
+theorem exists_generator (E : IntermediateField ℚ_[l] (Om l)) [FiniteDimensional ℚ_[l] E]
+    : ∃ x ∈ E, ‖x‖ ≤ 1 ∧ ∀ z ∈ E, ‖z‖ ≤ 1 → ∃ p : ℤ_[l][X], aeval x p = z := by
   haveI := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.cl_faithful ℤ_[l] ℚ_[l] E
   haveI := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.cl_isLocalHom ℤ_[l] E
   have : Finite (IsLocalRing.ResidueField ℤ_[l]) :=
     Finite.of_equiv _ (PadicInt.residueField (p := l)).toEquiv.symm
   obtain ⟨θ, hθ⟩ : ∃ θ : integralClosure ℤ_[l] E, Algebra.adjoin ℤ_[l] {θ} = ⊤ :=
     Formalism.L2.Pj.AvAlg.exists_adjoin_eq_top (FaithfulSMul.algebraMap_injective _ _)
-  refine ⟨((θ : E) : Om l), (θ : E).2, (mem_integralClosure_padicInt_iff E _).1 θ.2, fun z hz hn => ?_⟩
-  have hm : (⟨⟨z, hz⟩, (mem_integralClosure_padicInt_iff E _).2 hn⟩ : integralClosure ℤ_[l] E) ∈
-      Algebra.adjoin ℤ_[l] {θ} := by rw [hθ]; trivial
+  refine
+    ⟨((θ : E) : Om l), (θ : E).2, (mem_integralClosure_padicInt_iff E _).1 θ.2, fun z hz hn => ?_⟩
+  have hm
+      : (⟨⟨z, hz⟩, (mem_integralClosure_padicInt_iff E _).2 hn⟩ : integralClosure ℤ_[l] E)
+        ∈ Algebra.adjoin ℤ_[l] {θ} := by
+    rw [hθ]; trivial
   rw [Algebra.adjoin_singleton_eq_range_aeval] at hm
   obtain ⟨p, hp⟩ := hm
   refine ⟨p, ?_⟩
@@ -90,13 +95,15 @@ theorem X_mem_intPoly : (X : (Om l)[X]) ∈ intPoly l := by
   rw [mem_intPoly]; intro n; rw [coeff_X]; split_ifs <;> simp
 
 theorem map_mem_intPoly (p : ℤ_[l][X]) : p.map (algebraMap ℤ_[l] (Om l)) ∈ intPoly l := by
-  rw [mem_intPoly]; intro n
+  rw [mem_intPoly]
+  intro n
   rw [coeff_map, ← isIntegral_padicInt_iff_norm_le_one]
   exact isIntegral_algebraMap
 
-theorem norm_eval_le_prod {ι : Type*} (T : Finset ι) (r : ι → Om l) (hinj : Set.InjOn r T)
-    (hr : ∀ k ∈ T, ‖r k‖ ≤ 1) {x : Om l} (hx : ‖x‖ ≤ 1) :
-    ∀ Q ∈ intPoly l, (∀ k ∈ T, Q.eval (r k) = 0) → ‖Q.eval x‖ ≤ ∏ k ∈ T, ‖x - r k‖ := by
+theorem norm_eval_le_prod
+    {ι : Type*} (T : Finset ι) (r : ι → Om l) (hinj : Set.InjOn r T) (hr : ∀ k ∈ T, ‖r k‖ ≤ 1)
+    {x : Om l} (hx : ‖x‖ ≤ 1)
+    : ∀ Q ∈ intPoly l, (∀ k ∈ T, Q.eval (r k) = 0) → ‖Q.eval x‖ ≤ ∏ k ∈ T, ‖x - r k‖ := by
   classical
   induction T using Finset.induction_on with
   | empty =>
@@ -112,16 +119,21 @@ theorem norm_eval_le_prod {ι : Type*} (T : Finset ι) (r : ι → Om l) (hinj :
       ⟨r a, (isIntegral_padicInt_iff_norm_le_one _).2 (hr a (Finset.mem_insert_self _ _))⟩
     have h0 : Q₀.IsRoot a₀ := by
       have := hroot a (Finset.mem_insert_self _ _)
-      rw [coe_mapRingHom, show r a = algebraMap _ (Om l) a₀ from rfl, eval_map, eval₂_at_apply] at this
+      rw [coe_mapRingHom, show r a = algebraMap _ (Om l) a₀ from rfl, eval_map, eval₂_at_apply]
+        at this
       exact Subtype.ext this
     obtain ⟨Q₁, rfl⟩ := dvd_iff_isRoot.2 h0
-    have he : ∀ z, eval z (mapRingHom (algebraMap (integralClosure ℤ_[l] (Om l)) (Om l))
-        ((X - C a₀) * Q₁)) = (z - r a) * eval z (Q₁.map (algebraMap _ (Om l))) := by
+    have he
+        : ∀ z,
+          eval z (mapRingHom (algebraMap (integralClosure ℤ_[l] (Om l)) (Om l)) ((X - C a₀) * Q₁))
+            = (z - r a) * eval z (Q₁.map (algebraMap _ (Om l))) := by
       intro z
       simp [a₀]
     rw [he, Finset.prod_insert ha, norm_mul]
     refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
-    refine ih (hinj.mono (by simp)) (fun k hk => hr k (Finset.mem_insert_of_mem hk)) _ ⟨Q₁, rfl⟩
+    refine ih (hinj.mono (by simp))
+      (fun k hk => hr k (Finset.mem_insert_of_mem hk))
+      _ ⟨Q₁, rfl⟩
       fun k hk => ?_
     have := hroot k (Finset.mem_insert_of_mem hk)
     rw [he] at this
@@ -129,20 +141,24 @@ theorem norm_eval_le_prod {ι : Type*} (T : Finset ι) (r : ι → Om l) (hinj :
     have := hinj (by simp [hk]) (by simp) (sub_eq_zero.1 h)
     exact this ▸ hk
 
-theorem exists_power_sum {ι : Type*} [DecidableEq ι] (S : Finset ι) (r : ι → Om l)
-    (hr : ∀ s ∈ S, ‖r s‖ ≤ 1) {s₀ : ι} (h₀ : s₀ ∈ S) :
-    ∃ k : ℕ, ∏ t ∈ S.erase s₀, ‖r s₀ - r t‖ ≤ ‖∑ s ∈ S, r s ^ k‖ := by
+theorem exists_power_sum
+    {ι : Type*} [DecidableEq ι]
+    (S : Finset ι) (r : ι → Om l) (hr : ∀ s ∈ S, ‖r s‖ ≤ 1)
+    {s₀ : ι} (h₀ : s₀ ∈ S)
+    : ∃ k : ℕ, ∏ t ∈ S.erase s₀, ‖r s₀ - r t‖ ≤ ‖∑ s ∈ S, r s ^ k‖ := by
   set P : (Om l)[X] := ∏ t ∈ S.erase s₀, (X - C (r t)) with hP
-  have hPi : P ∈ intPoly l := prod_mem fun t ht =>
-    sub_mem X_mem_intPoly (C_mem_intPoly (hr t (Finset.mem_of_mem_erase ht)))
+  have hPi : P ∈ intPoly l :=
+    prod_mem fun t ht => sub_mem X_mem_intPoly (C_mem_intPoly (hr t (Finset.mem_of_mem_erase ht)))
   have h1 : ∑ s ∈ S, P.eval (r s) = ∏ t ∈ S.erase s₀, (r s₀ - r t) := by
     rw [Finset.sum_eq_single_of_mem s₀ h₀]
     · simp [hP, eval_prod]
     · intro s hs hne
       rw [hP, eval_prod]
       exact Finset.prod_eq_zero (Finset.mem_erase.2 ⟨hne, hs⟩) (by simp)
-  obtain ⟨k, -, hk⟩ := Finset.exists_max_image (Finset.range (P.natDegree + 1))
-    (fun k => ‖∑ s ∈ S, r s ^ k‖) ⟨0, by simp⟩
+  obtain ⟨k, -, hk⟩ :=
+    Finset.exists_max_image (Finset.range (P.natDegree + 1))
+      (fun k => ‖∑ s ∈ S, r s ^ k‖)
+      ⟨0, by simp⟩
   refine ⟨k, ?_⟩
   rw [← norm_prod, ← h1]
   simp_rw [eval_eq_sum_range]
@@ -155,8 +171,8 @@ theorem norm_root {ζ : Om l} {n : ℕ} (hn : n ≠ 0) (h : ζ ^ n = 1) : ‖ζ�
   have : ‖ζ‖ ^ n = 1 := by rw [← norm_pow, h, norm_one]
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn).1 this
 
-theorem norm_move_le (K : FinExt l) {τ : GQ l} (hτ : τ ∈ Gj K 1) (i : ℕ) (hi : 1 ≤ i) :
-    ∀ ζ : Om l, IsPrimitiveRoot ζ (l ^ i) → ∀ z ∈ Ks K i, ‖z‖ ≤ 1 → ‖τ z - z‖ ≤ ‖τ ζ - ζ‖ := by
+theorem norm_move_le (K : FinExt l) {τ : GQ l} (hτ : τ ∈ Gj K 1) (i : ℕ) (hi : 1 ≤ i)
+    : ∀ ζ : Om l, IsPrimitiveRoot ζ (l ^ i) → ∀ z ∈ Ks K i, ‖z‖ ≤ 1 → ‖τ z - z‖ ≤ ‖τ ζ - ζ‖ := by
   have hl : l.Prime := Fact.out
   induction i, hi using Nat.le_induction with
   | base =>
@@ -165,16 +181,16 @@ theorem norm_move_le (K : FinExt l) {τ : GQ l} (hτ : τ ∈ Gj K 1) (i : ℕ) 
     simp [this]
   | succ i hi ih =>
     intro ζ hζ z hz hn
-    obtain ⟨y, hy, rfl⟩ := (GlobalTheory.T.integers_eq_sum_zeta_pow_unique l K (i + 1) (by omega) ζ hζ).1 z hz hn
+    obtain ⟨y, hy, rfl⟩ :=
+      (GlobalTheory.T.integers_eq_sum_zeta_pow_unique l K (i + 1) (by omega) ζ hζ).1 z hz hn
     have hζ1 : ‖ζ‖ ≤ 1 := (norm_root (pow_ne_zero _ hl.ne_zero) hζ.pow_eq_one).le
     have hτ1 : ‖τ ζ‖ ≤ 1 := by rwa [norm_gal]
-    have hζ' : IsPrimitiveRoot (ζ ^ l) (l ^ i) :=
-      hζ.pow (pow_pos hl.pos _) (by ring)
+    have hζ' : IsPrimitiveRoot (ζ ^ l) (l ^ i) := hζ.pow (pow_pos hl.pos _) (by ring)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, ← Finset.sum_sub_distrib]
     refine norm_sum_le_of_le _ _ (norm_nonneg _) fun a _ => ?_
-    have : τ (ζ ^ (a : ℕ) * y a) - ζ ^ (a : ℕ) * y a =
-        τ ζ ^ (a : ℕ) * (τ (y a) - y a) + y a * (τ ζ ^ (a : ℕ) - ζ ^ (a : ℕ)) := by
+    have : τ (ζ ^ (a : ℕ) * y a) - ζ ^ (a : ℕ) * y a
+        = τ ζ ^ (a : ℕ) * (τ (y a) - y a) + y a * (τ ζ ^ (a : ℕ) - ζ ^ (a : ℕ)) := by
       rw [map_mul, map_pow]; ring
     rw [this]
     refine norm_add_le_of_le ?_ ?_
@@ -186,8 +202,8 @@ theorem norm_move_le (K : FinExt l) {τ : GQ l} (hτ : τ ∈ Gj K 1) (i : ℕ) 
     · rw [norm_mul]
       exact (mul_le_of_le_one_left (norm_nonneg _) (hy a).2).trans (norm_pow_sub_pow_le hτ1 hζ1 _)
 
-theorem exists_gal_pow (K : FinExt l) (i m : ℕ) {ζ : Om l} (hζ : ζ ^ l ^ i = 1) :
-    ∃ τ ∈ Gj K 1, τ ζ = ζ ^ (1 + l * m) := by
+theorem exists_gal_pow (K : FinExt l) (i m : ℕ) {ζ : Om l} (hζ : ζ ^ l ^ i = 1)
+    : ∃ τ ∈ Gj K 1, τ ζ = ζ ^ (1 + l * m) := by
   have hl : l.Prime := Fact.out
   obtain ⟨χ, hχ⟩ := exists_isCyc l
   have hlt : ‖((l * m : ℕ) : ℚ_[l])‖ ≤ (l : ℝ) ^ (-((1 : ℕ) : ℤ)) := by
@@ -200,7 +216,8 @@ theorem exists_gal_pow (K : FinExt l) (i m : ℕ) {ζ : Om l} (hζ : ζ ^ l ^ i 
       max_eq_left (hlt.trans hlt1.le)]
     rw [norm_one]
     exact (hlt.trans_lt hlt1).ne'
-  obtain ⟨g, hg, hgu⟩ := (GlobalTheory.T.finrank_cyclotomicExt_and_cyclotomicChar_surjective l K).2 χ hχ _ hu
+  obtain ⟨g, hg, hgu⟩ :=
+    (GlobalTheory.T.finrank_cyclotomicExt_and_cyclotomicChar_surjective l K).2 χ hχ _ hu
   refine ⟨g, (((cyc_basic l χ hχ).2.2 K g hg).1 1).2 ?_, ?_⟩
   · rw [hgu, Nat.cast_add, Nat.cast_one, add_sub_cancel_left]
     exact hlt
@@ -213,8 +230,8 @@ theorem exists_gal_pow (K : FinExt l) (i m : ℕ) {ζ : Om l} (hζ : ζ ^ l ^ i 
     have hmod : a ≡ 1 + l * m [MOD l ^ i] := (Nat.modEq_iff_dvd).2 (by simpa using hd)
     rw [pow_eq_pow_mod a hζ, pow_eq_pow_mod (1 + l * m) hζ, hmod]
 
-theorem prod_norm_one_sub {ω : Om l} {n : ℕ} (hn : 0 < n) (hω : IsPrimitiveRoot ω n) :
-    ∏ k ∈ Finset.range (n - 1), ‖1 - ω ^ (k + 1)‖ = ‖(n : Om l)‖ := by
+theorem prod_norm_one_sub {ω : Om l} {n : ℕ} (hn : 0 < n) (hω : IsPrimitiveRoot ω n)
+    : ∏ k ∈ Finset.range (n - 1), ‖1 - ω ^ (k + 1)‖ = ‖(n : Om l)‖ := by
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
   rw [← norm_prod, Nat.add_sub_cancel, hω.prod_one_sub_pow_eq_order]
   simp
@@ -237,15 +254,18 @@ theorem norm_l_le (j : ℕ) : ∀ η : Om l, η ^ l ^ j = 1 → η ≠ 1 → ‖
       obtain ⟨m, hm⟩ : ∃ m, l - 1 = m + 1 := ⟨l - 2, by have := hl.two_le; omega⟩
       rw [hm, Finset.prod_range_succ]
       refine (mul_le_of_le_one_left (norm_nonneg _) ?_).trans (hb _)
-      exact Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun k _ =>
-        (hb _).trans (norm_sub_le_one (by simp) hη)
+      exact Finset.prod_le_one₀
+        (fun _ _ => norm_nonneg _)
+        fun k _ => (hb _).trans (norm_sub_le_one (by simp) hη)
     · exact (ih (η ^ l) (by rw [← pow_mul, ← h]; ring) h2).trans (hb _)
 
-theorem prod_lift_le (F E : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l))
-    (hS : ∀ s ∈ S, s ∈ F.fixingSubgroup)
+theorem prod_lift_le
+    (F E : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l)) (hS : ∀ s ∈ S, s ∈ F.fixingSubgroup)
     (hu : ∀ h ∈ F.fixingSubgroup, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ E.fixingSubgroup)
-    {x : Om l} (hxE : x ∈ E) (hx : ‖x‖ ≤ 1) (τ : GQ l) {ρ : ℝ} (hρ : 0 ≤ ρ)
-    (hτ : ∀ z ∈ F, ‖z‖ ≤ 1 → ‖τ z - z‖ ≤ ρ) : ∏ s ∈ S, ‖x - τ (s x)‖ ≤ ρ := by
+    {x : Om l} (hxE : x ∈ E) (hx : ‖x‖ ≤ 1)
+    (τ : GQ l)
+    {ρ : ℝ} (hρ : 0 ≤ ρ) (hτ : ∀ z ∈ F, ‖z‖ ≤ 1 → ‖τ z - z‖ ≤ ρ)
+    : ∏ s ∈ S, ‖x - τ (s x)‖ ≤ ρ := by
   classical
   have hfix : ∀ s t : GQ l, s⁻¹ * t ∈ E.fixingSubgroup → t x = s x := by
     intro s t h
@@ -253,8 +273,8 @@ theorem prod_lift_le (F E : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l)
     have h2 := congrArg s this
     simpa using h2
   set f : (Om l)[X] := ∏ s ∈ S, (X - C (s x)) with hf
-  have hfi : f ∈ intPoly l := prod_mem fun t _ =>
-    sub_mem X_mem_intPoly (C_mem_intPoly (by rwa [norm_gal]))
+  have hfi : f ∈ intPoly l :=
+    prod_mem fun t _ => sub_mem X_mem_intPoly (C_mem_intPoly (by rwa [norm_gal]))
   have hmap : ∀ g : GQ l, f.map (g : Om l →+* Om l) = ∏ s ∈ S, (X - C (g (s x))) := by
     intro g
     simp [hf, Polynomial.map_prod]
@@ -307,9 +327,13 @@ theorem finite_orbit (y : Om l) : (Set.range fun g : GQ l => g y).Finite := by
   change aeval ((g : Om l →ₐ[ℚ_[l]] Om l) y) _ = 0
   rw [aeval_algHom_apply, minpoly.aeval, map_zero]
 
-theorem exists_lower_bound {y : Om l} (hy : ‖y‖ ≤ 1) : ∃ c : ℝ, 0 < c ∧
-    ∀ (x : Om l) (p : ℤ_[l][X]), ‖x‖ ≤ 1 → aeval x p = y → ∀ (T : Finset ℕ) (g : ℕ → GQ l),
-      Set.InjOn (fun k => g k x) T → (∀ k ∈ T, g k y ≠ y) → c ≤ ∏ k ∈ T, ‖x - g k x‖ := by
+theorem exists_lower_bound {y : Om l} (hy : ‖y‖ ≤ 1)
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ (x : Om l) (p : ℤ_[l][X]),
+          ‖x‖ ≤ 1 → aeval x p = y
+            → ∀ (T : Finset ℕ) (g : ℕ → GQ l),
+              Set.InjOn (fun k => g k x) T → (∀ k ∈ T, g k y ≠ y) → c ≤ ∏ k ∈ T, ‖x - g k x‖ := by
   classical
   set R := (finite_orbit y).toFinset with hR
   refine ⟨∏ r ∈ R.erase y, ‖y - r‖, Finset.prod_pos fun r hr => ?_, ?_⟩
@@ -319,8 +343,13 @@ theorem exists_lower_bound {y : Om l} (hy : ‖y‖ ≤ 1) : ∃ c : ℝ, 0 < c 
   have hev : ∀ z, Q.eval z = ∏ r ∈ R.erase y, (aeval z p - r) := by
     intro z
     simp [hQ, eval_prod, eval_map_algebraMap]
-  have := norm_eval_le_prod T (fun k => g k x) hinj (fun k _ => by rwa [norm_gal]) hx Q
-    (prod_mem fun r hr => sub_mem (map_mem_intPoly p) (C_mem_intPoly ?_)) fun k hk => ?_
+  have :=
+    norm_eval_le_prod T
+      (fun k => g k x)
+      hinj
+      (fun k _ => by rwa [norm_gal])
+      hx Q (prod_mem fun r hr => sub_mem (map_mem_intPoly p) (C_mem_intPoly ?_))
+      fun k hk => ?_
   · rwa [hev, hp, norm_prod] at this
   · have := Finset.mem_of_mem_erase hr
     rw [hR, Set.Finite.mem_toFinset] at this
@@ -341,11 +370,14 @@ theorem norm_l_pos : 0 < ‖(l : Om l)‖ :=
 theorem mem_Ks (K : FinExt l) {i : ℕ} {ζ : Om l} (h : ζ ^ l ^ i = 1) : ζ ∈ Ks K i :=
   (le_sup_right : _ ≤ Ks K i) (IntermediateField.subset_adjoin _ _ h)
 
-theorem exists_moved (K : FinExt l) {y : Om l} (hy : ‖y‖ ≤ 1) (n : ℕ) {δ : ℝ} (hδ0 : 0 ≤ δ)
-    (hδ : δ < 1) : ∃ i₀ : ℕ, ∀ i ≥ i₀, ∀ (E : IntermediateField ℚ_[l] (Om l))
-      [FiniteDimensional ℚ_[l] E], Ks K i ≤ E → y ∈ E → ∀ S : Finset (GQ l), S.card ≤ n →
-      (∀ s ∈ S, s ∈ Gj K i) → (∀ h ∈ Gj K i, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ E.fixingSubgroup) →
-      ∃ x ∈ E, ‖x‖ ≤ 1 ∧ ∀ σ ∈ Gj K i, σ y ≠ y → δ ≤ ‖x - σ x‖ := by
+theorem exists_moved
+    (K : FinExt l) {y : Om l} (hy : ‖y‖ ≤ 1) (n : ℕ) {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ : δ < 1)
+    : ∃ i₀ : ℕ, ∀ i ≥ i₀, ∀ (E : IntermediateField ℚ_[l] (Om l)) [FiniteDimensional ℚ_[l] E],
+      Ks K i ≤ E → y ∈ E
+        → ∀ S : Finset (GQ l),
+          S.card ≤ n → (∀ s ∈ S, s ∈ Gj K i)
+            → (∀ h ∈ Gj K i, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ E.fixingSubgroup)
+            → ∃ x ∈ E, ‖x‖ ≤ 1 ∧ ∀ σ ∈ Gj K i, σ y ≠ y → δ ≤ ‖x - σ x‖ := by
   have hl : l.Prime := Fact.out
   obtain ⟨c, hc0, hc⟩ := exists_lower_bound hy
   obtain ⟨N₀, hN₀⟩ := exists_pow_lt_of_lt_one (norm_l_pos (l := l)) hδ
@@ -368,8 +400,10 @@ theorem exists_moved (K : FinExt l) {y : Om l} (hy : ‖y‖ ≤ 1) (n : ℕ) {�
   have hSne : S.Nonempty := by
     obtain ⟨s, ⟨hs, -⟩, -⟩ := hu 1 (one_mem _)
     exact ⟨s, hs⟩
-  have key : ∀ k : ℕ, ∃ g : GQ l, k ∈ Finset.range (l ^ j - 1) →
-      g y ≠ y ∧ g ζ = ζ * (ζ ^ l) ^ (k + 1) ∧ ‖x - g x‖ ^ N ≤ ‖1 - (ζ ^ l) ^ (k + 1)‖ := by
+  have key
+      : ∀ k : ℕ, ∃ g : GQ l,
+        k ∈ Finset.range (l ^ j - 1)
+          → g y ≠ y ∧ g ζ = ζ * (ζ ^ l) ^ (k + 1) ∧ ‖x - g x‖ ^ N ≤ ‖1 - (ζ ^ l) ^ (k + 1)‖ := by
     intro k
     by_cases hk : k ∈ Finset.range (l ^ j - 1)
     swap
@@ -379,8 +413,9 @@ theorem exists_moved (K : FinExt l) {y : Om l} (hy : ‖y‖ ≤ 1) (n : ℕ) {�
     have hτζ' : τ ζ = ζ * (ζ ^ l) ^ (k + 1) := by rw [hτζ]; ring
     have hnorm : ‖τ ζ - ζ‖ = ‖1 - (ζ ^ l) ^ (k + 1)‖ := by
       rw [hτζ', norm_sub_rev, ← mul_one_sub, norm_mul, hζ1, one_mul]
-    have hprod := prod_lift_le (Ks K (j + 1)) E S hS hu hxE hx τ (norm_nonneg _)
-      (norm_move_le K hτ (j + 1) (by omega) ζ hζ)
+    have hprod :=
+      prod_lift_le (Ks K (j + 1)) E S hS hu hxE hx τ (norm_nonneg _)
+        (norm_move_le K hτ (j + 1) (by omega) ζ hζ)
     rw [hnorm] at hprod
     obtain ⟨s, hs, hmin⟩ := Finset.exists_min_image S (fun s => ‖x - τ (s x)‖) hSne
     have hle1 : ‖x - τ (s x)‖ ≤ 1 := norm_sub_le_one hx (by rwa [norm_gal, norm_gal])
@@ -447,8 +482,8 @@ theorem finite_Ks (K : FinExt l) (i : ℕ) : FiniteDimensional ℚ_[l] (Ks K i) 
     fun x _ => Algebra.IsIntegral.isIntegral x
   exact IntermediateField.finiteDimensional_sup _ _
 
-theorem exists_primitive (L : FinExt l) : ∃ y ∈ L.1, ‖y‖ ≤ 1 ∧
-    ∀ g : GQ l, g y = y → g ∈ L.1.fixingSubgroup := by
+theorem exists_primitive (L : FinExt l)
+    : ∃ y ∈ L.1, ‖y‖ ≤ 1 ∧ ∀ g : GQ l, g y = y → g ∈ L.1.fixingSubgroup := by
   haveI := L.2
   obtain ⟨x, hxL, hx, hgen⟩ := exists_generator L.1
   refine ⟨x, hxL, hx, fun g hg => (IntermediateField.mem_fixingSubgroup_iff _ _).2 fun z hz => ?_⟩
@@ -462,9 +497,14 @@ theorem exists_primitive (L : FinExt l) : ∃ y ∈ L.1, ‖y‖ ≤ 1 ∧
 
 end DiffSmall
 
-
 open DiffSmall in
-theorem exists_trace_norm_ge : ∀ (l : ℕ) [Fact l.Prime] (K L' : FinExt l) (ε : ℝ), 0 < ε → ∃ i₀ : ℕ, ∀ i ≥ i₀, ∀ S : Finset (GQ l), (∀ s ∈ S, s ∈ Gj K i) → (∀ h ∈ Gj K i, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ (L'.1 ⊔ Ks K i).fixingSubgroup) → ∃ b : Om l, b ∈ L'.1 ⊔ Ks K i ∧ ‖b‖ ≤ 1 ∧ 1 - ε ≤ ‖∑ s ∈ S, s b‖ := by
+theorem exists_trace_norm_ge
+    : ∀ (l : ℕ) [Fact l.Prime] (K L' : FinExt l) (ε : ℝ),
+      0 < ε
+        → ∃ i₀ : ℕ, ∀ i ≥ i₀, ∀ S : Finset (GQ l),
+          (∀ s ∈ S, s ∈ Gj K i)
+            → (∀ h ∈ Gj K i, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ (L'.1 ⊔ Ks K i).fixingSubgroup)
+            → ∃ b : Om l, b ∈ L'.1 ⊔ Ks K i ∧ ‖b‖ ≤ 1 ∧ 1 - ε ≤ ‖∑ s ∈ S, s b‖ := by
   classical
   intro l _ K L' ε hε
   obtain ⟨y, hyL, hy, hyg⟩ := exists_primitive L'
@@ -494,8 +534,8 @@ theorem exists_trace_norm_ge : ∀ (l : ℕ) [Fact l.Prime] (K L' : FinExt l) (�
       have h' : s y = t y := h
       rw [AlgEquiv.mul_apply, ← h']
       simp
-  obtain ⟨x, hxE, hx, hmove⟩ := hi₀ i hi (L'.1 ⊔ Ks K i) le_sup_right
-    ((le_sup_left : L'.1 ≤ _) hyL) S hcard hS hu
+  obtain ⟨x, hxE, hx, hmove⟩ :=
+    hi₀ i hi (L'.1 ⊔ Ks K i) le_sup_right ((le_sup_left : L'.1 ≤ _) hyL) S hcard hS hu
   obtain ⟨s₀, ⟨h₀, -⟩, -⟩ := hu 1 (one_mem _)
   obtain ⟨k, hk⟩ := exists_power_sum S (fun s => s x) (fun s _ => by rwa [norm_gal]) h₀
   refine ⟨x ^ k, pow_mem hxE k, by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hx, ?_⟩
@@ -506,8 +546,9 @@ theorem exists_trace_norm_ge : ∀ (l : ℕ) [Fact l.Prime] (K L' : FinExt l) (�
   rw [← Finset.prod_const]
   refine Finset.prod_le_prod₀ (fun _ _ => by linarith) fun t ht => ?_
   have ht' := Finset.mem_of_mem_erase ht
-  have := hmove (s₀⁻¹ * t) (mul_mem (inv_mem (hS s₀ h₀)) (hS t ht'))
-    fun h => Finset.ne_of_mem_erase ht (hsep s₀ h₀ t ht' h).symm
+  have :=
+    hmove (s₀⁻¹ * t) (mul_mem (inv_mem (hS s₀ h₀)) (hS t ht')) fun h =>
+      Finset.ne_of_mem_erase ht (hsep s₀ h₀ t ht' h).symm
   rw [← norm_gal s₀] at this
   simpa using this
 

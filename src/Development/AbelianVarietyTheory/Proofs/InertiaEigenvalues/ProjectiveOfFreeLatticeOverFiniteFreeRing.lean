@@ -6,23 +6,30 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem projective_compHom_of_free_of_finite_free :
-    ∀ (Z S A D : Type) [CommRing Z] [CommRing S] [CommRing A] [AddCommGroup D] [Module A D] (z : Z →+* S) (a : S →+* A) (N : Submodule A D) (q : ℕ) (x : Fin q → D), (∀ y, y ∈ N ↔ ∃ s : Fin q → S, y = ∑ i, a (s i) • x i) → (∀ s : Fin q → S, ∑ i, a (s i) • x i = 0 → s = 0) → (∃ (d : ℕ) (w : Fin d → S), ∀ y : S, ∃! c : Fin d → Z, y = ∑ i, z (c i) * w i) → @Module.Projective Z _ ↥N _ (Module.compHom _ (a.comp z)) := by
+theorem projective_compHom_of_free_of_finite_free
+    : ∀ (Z S A D : Type) [CommRing Z] [CommRing S] [CommRing A] [AddCommGroup D] [Module A D]
+        (z : Z →+* S) (a : S →+* A) (N : Submodule A D) (q : ℕ) (x : Fin q → D),
+      (∀ y, y ∈ N ↔ ∃ s : Fin q → S, y = ∑ i, a (s i) • x i)
+        → (∀ s : Fin q → S, ∑ i, a (s i) • x i = 0 → s = 0)
+        → (∃ (d : ℕ) (w : Fin d → S), ∀ y : S, ∃! c : Fin d → Z, y = ∑ i, z (c i) * w i)
+        → @Module.Projective Z _ ↥N _ (Module.compHom _ (a.comp z)) := by
   intro Z S A D _ _ _ _ _ z a N q x hN hli ⟨d, w, hw⟩
   letI : Module Z N := Module.compHom _ (a.comp z)
   have hsm : ∀ (r : Z) (n : N), ((r • n : N) : D) = a (z r) • (n : D) := fun _ _ => rfl
-  let f : (Fin q → Fin d → Z) →ₗ[Z] N :=
-    { toFun := fun c => ⟨∑ i, a (∑ m, z (c i m) * w m) • x i, (hN _).2 ⟨_, rfl⟩⟩
-      map_add' := fun c c' => by
-        apply Subtype.ext
-        simp [add_mul, Finset.sum_add_distrib, add_smul]
-      map_smul' := fun r c => by
-        apply Subtype.ext
-        rw [hsm]
-        simp only [Pi.smul_apply, smul_eq_mul, map_mul, RingHom.id_apply, Finset.smul_sum,
-          smul_smul, mul_assoc, ← Finset.mul_sum] }
+  let f : (Fin q → Fin d → Z) →ₗ[Z] N := {
+    toFun := fun c => ⟨∑ i, a (∑ m, z (c i m) * w m) • x i, (hN _).2 ⟨_, rfl⟩⟩
+    map_add' := fun c c' => by
+      apply Subtype.ext
+      simp [add_mul, Finset.sum_add_distrib, add_smul]
+    map_smul' := fun r c => by
+      apply Subtype.ext
+      rw [hsm]
+      simp only [Pi.smul_apply, smul_eq_mul, map_mul, RingHom.id_apply, Finset.smul_sum, smul_smul,
+        mul_assoc, ← Finset.mul_sum]
+  }
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro c hc
     have h1 := hli (fun i => ∑ m, z (c i m) * w m) (congrArg Subtype.val hc)
     funext i

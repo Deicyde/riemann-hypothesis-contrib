@@ -20,30 +20,30 @@ private lemma evalExact {C : Type 1} [Category.{0} C] (S : ShortComplex (Coef C)
 
 end UpperTheory.Ru.crystallineComparison
 
-theorem UpperTheory.Ru.crystallineComparison.quotAdd :
-    UpperTheory.Ru.crystallineComparison.QuotAdd := by
+theorem UpperTheory.Ru.crystallineComparison.quotAdd
+    : UpperTheory.Ru.crystallineComparison.QuotAdd := by
   intro C _ Pa S hS h1 h2 A T hT
   have ex := fun B => UpperTheory.Ru.crystallineComparison.evalExact S hS B
-  have natf : ∀ (i : T.ι) (z : S.X₁.obj A),
-      (S.f.app (T.B i)).hom ((S.X₁.map (T.f i)).hom z) =
-        (S.X₂.map (T.f i)).hom ((S.f.app A).hom z) := by
+  have natf
+      : ∀ (i : T.ι) (z : S.X₁.obj A),
+        (S.f.app (T.B i)).hom ((S.X₁.map (T.f i)).hom z)
+          = (S.X₂.map (T.f i)).hom ((S.f.app A).hom z) := by
     intro i z
     have := congrArg (fun φ => φ.hom z) (S.f.naturality (T.f i))
     simpa using this
-  have natg : ∀ (i : T.ι) (y : S.X₂.obj A),
-      (S.g.app (T.B i)).hom ((S.X₂.map (T.f i)).hom y) =
-        (S.X₃.map (T.f i)).hom ((S.g.app A).hom y) := by
+  have natg
+      : ∀ (i : T.ι) (y : S.X₂.obj A),
+        (S.g.app (T.B i)).hom ((S.X₂.map (T.f i)).hom y)
+          = (S.X₃.map (T.f i)).hom ((S.g.app A).hom y) := by
     intro i y
     have := congrArg (fun φ => φ.hom y) (S.g.naturality (T.f i))
     simpa using this
   have inj0 : ∀ x : S.X₃.obj A, (∀ i, (S.X₃.map (T.f i)).hom x = 0) → x = 0 := by
     intro x hx
     obtain ⟨y, rfl⟩ := (ex A).2.2 x
-    have hz : ∀ i, ∃ z : S.X₁.obj (T.B i),
-        (S.f.app (T.B i)).hom z = (S.X₂.map (T.f i)).hom y := by
+    have hz : ∀ i, ∃ z : S.X₁.obj (T.B i), (S.f.app (T.B i)).hom z = (S.X₂.map (T.f i)).hom y := by
       intro i
-      have : (S.g.app (T.B i)).hom ((S.X₂.map (T.f i)).hom y) = 0 := by
-        rw [natg]; exact hx i
+      have : (S.g.app (T.B i)).hom ((S.X₂.map (T.f i)).hom y) = 0 := by rw [natg]; exact hx i
       exact ((ex (T.B i)).1 _).1 this
     choose z hz using hz
     obtain ⟨w, hw⟩ := (h1 A T hT).2 z
@@ -64,8 +64,8 @@ theorem UpperTheory.Ru.crystallineComparison.quotAdd :
     simp only at this
     rw [map_sub, this, sub_self]
   · intro v
-    have hy : ∀ i, ∃ y : S.X₂.obj (T.B i), (S.g.app (T.B i)).hom y = v i :=
-      fun i => (ex (T.B i)).2.2 (v i)
+    have hy : ∀ i, ∃ y : S.X₂.obj (T.B i), (S.g.app (T.B i)).hom y = v i := fun i =>
+      (ex (T.B i)).2.2 (v i)
     choose y hy using hy
     obtain ⟨w, hw⟩ := (h2 A T hT).2 y
     refine ⟨(S.g.app A).hom w, ?_⟩

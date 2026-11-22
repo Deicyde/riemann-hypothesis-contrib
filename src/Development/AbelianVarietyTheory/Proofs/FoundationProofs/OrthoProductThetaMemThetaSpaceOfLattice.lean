@@ -6,27 +6,42 @@ public import Formalism.PairingDivisors.StatementH
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.ProdTheta
 
-theorem coordB_add (D : D7) (T : Tor D) {N N' r : ℕ} (b : Fin r → Matrix (Fin N') (Fin N) D.host.E) (k : Fin r)
-    (z x : VC D N N') : coordB D T b k (z + x) = coordB D T b k z + coordB D T b k x := by
+theorem coordB_add
+    (D : D7) (T : Tor D)
+    {N N' r : ℕ} (b : Fin r → Matrix (Fin N') (Fin N) D.host.E) (k : Fin r) (z x : VC D N N')
+    : coordB D T b k (z + x) = coordB D T b k z + coordB D T b k x := by
   simp only [coordB, Pi.add_apply, add_mul, Finset.sum_add_distrib]
 
-theorem coordB_differentiable (D : D7) (T : Tor D) {N N' r : ℕ} (b : Fin r → Matrix (Fin N') (Fin N) D.host.E)
-    (k : Fin r) : Differentiable ℂ (coordB D T b k) := by
+theorem coordB_differentiable
+    (D : D7) (T : Tor D) {N N' r : ℕ} (b : Fin r → Matrix (Fin N') (Fin N) D.host.E) (k : Fin r)
+    : Differentiable ℂ (coordB D T b k) := by
   unfold coordB
   fun_prop
 
-theorem neg_one_zpow_sum {ι : Type} (s : Finset ι) (m : ι → ℤ) :
-    (-1 : ℂ) ^ (∑ k ∈ s, m k) = ∏ k ∈ s, (-1 : ℂ) ^ m k := by
+theorem neg_one_zpow_sum {ι : Type} (s : Finset ι) (m : ι → ℤ)
+    : (-1 : ℂ) ^ (∑ k ∈ s, m k) = ∏ k ∈ s, (-1 : ℂ) ^ m k := by
   induction s using Finset.induction_on with
   | empty => simp
-  | insert a s ha ih => rw [Finset.sum_insert ha, Finset.prod_insert ha, zpow_add₀ (by norm_num), ih]
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.prod_insert ha, zpow_add₀ (by norm_num), ih]
 
-theorem pullB_mem_ThSp : ∀ (D : D7) (T : Tor D) (N N' r : ℕ) (b : Fin r → Matrix (Fin N') (Fin N) D.host.E) (g : ℂ → ℂ), (∀ z w : VC D N N', ∑ τ, ∑ i, ∑ j, z τ i j * (starRingEnd ℂ) (w τ i j) = ∑ k, coordB D T b k z * (starRingEnd ℂ) (coordB D T b k w)) → (∀ x : VC D N N', x ∈ LaB D T b ↔ ∀ k, coordB D T b k x ∈ T.abelian₂) → Differentiable ℂ g → (∀ ω ∈ T.abelian₂, ∃ m : ℤ, q1 D T.abelian₂ ω = m ∧ ∀ z, (-1 : ℂ) ^ m * U1 T.abelian₂ ω g z = g z) → pullB D T b g ∈ ThSp D T (LaB D T b) := by
+theorem pullB_mem_ThSp
+    : ∀ (D : D7) (T : Tor D) (N N' r : ℕ) (b : Fin r → Matrix (Fin N') (Fin N) D.host.E)
+        (g : ℂ → ℂ),
+      (∀ z w : VC D N N',
+          ∑ τ, ∑ i, ∑ j, z τ i j * (starRingEnd ℂ) (w τ i j)
+            = ∑ k, coordB D T b k z * (starRingEnd ℂ) (coordB D T b k w))
+        → (∀ x : VC D N N', x ∈ LaB D T b ↔ ∀ k, coordB D T b k x ∈ T.abelian₂) → Differentiable ℂ g
+        → (∀ ω ∈ T.abelian₂, ∃ m : ℤ,
+          q1 D T.abelian₂ ω = m ∧ ∀ z, (-1 : ℂ) ^ m * U1 T.abelian₂ ω g z = g z)
+        → pullB D T b g ∈ ThSp D T (LaB D T b) := by
   intro D T N N' r b g hP hL hg hq
   refine ⟨?_, ?_⟩
   · unfold pullB
@@ -43,12 +58,15 @@ theorem pullB_mem_ThSp : ∀ (D : D7) (T : Tor D) (N N' r : ℕ) (b : Fin r → 
     have hal : al D T x = ∏ k, (-1 : ℂ) ^ m k := by
       unfold al
       rw [hre, round_intCast, neg_one_zpow_sum]
-    have hUU : U D T x (pullB D T b g) z = ∏ k, U1 T.abelian₂ (coordB D T b k x) g (coordB D T b k z) := by
+    have hUU
+        : U D T x (pullB D T b g) z
+          = ∏ k, U1 T.abelian₂ (coordB D T b k x) g (coordB D T b k z) := by
       unfold U U1 pullB Hf
       rw [Finset.prod_mul_distrib, ← Complex.exp_sum, hP, hP]
       simp only [coordB_add]
       congr 2
-      rw [Finset.sum_div, Finset.sum_div, Finset.mul_sum, Finset.mul_sum, Finset.sum_div, ← Finset.sum_sub_distrib]
+      rw [Finset.sum_div, Finset.sum_div, Finset.mul_sum, Finset.mul_sum, Finset.sum_div,
+        ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
       ring
     rw [hal, hUU, ← Finset.prod_mul_distrib]

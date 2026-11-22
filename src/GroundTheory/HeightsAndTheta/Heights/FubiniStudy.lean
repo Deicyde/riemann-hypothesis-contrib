@@ -40,20 +40,24 @@ lemma measurable_fsVolumeDensity (i : Fin (N + 1)) :
   unfold normSqSum
   fun_prop
 
-theorem lintegral_fsVolumeDensity (i : Fin (N + 1)) :
-    ∫⁻ z, ENNReal.ofReal (fsVolumeDensity i z) = 1 := by
+theorem lintegral_fsVolumeDensity (i : Fin (N + 1))
+    : ∫⁻ z, ENNReal.ofReal (fsVolumeDensity i z) = 1 := by
   have h := lintegral_pi_complex_monomial 0 N (fun _ => 0) 1 one_pos
-  simp only [mul_zero, pow_zero, Finset.prod_const_one, Finset.sum_const_zero, zero_add,
-    add_zero, Nat.factorial_zero, Nat.cast_one, mul_one, one_pow, div_one] at h
-  have hpt : ∀ z : Fin N → ℂ, ENNReal.ofReal (fsVolumeDensity i z) =
-      ENNReal.ofReal (N.factorial / Real.pi ^ N) *
-        ENNReal.ofReal (1 / (1 + ∑ j, ‖z j‖ ^ 2) ^ (N + 1)) := by
+  simp only [mul_zero, pow_zero, Finset.prod_const_one, Finset.sum_const_zero, zero_add, add_zero,
+      Nat.factorial_zero, Nat.cast_one, mul_one, one_pow, div_one]
+    at h
+  have hpt
+      : ∀ z : Fin N → ℂ,
+        ENNReal.ofReal (fsVolumeDensity i z)
+          = ENNReal.ofReal (N.factorial / Real.pi ^ N)
+            * ENNReal.ofReal (1 / (1 + ∑ j, ‖z j‖ ^ 2) ^ (N + 1)) := by
     intro z
     rw [← ENNReal.ofReal_mul (by positivity), fsVolumeDensity_eq]
     congr 1
     rw [normSqSum]
     field_simp
-  rw [lintegral_congr hpt, lintegral_const_mul _ (by fun_prop), h, ← ENNReal.ofReal_mul (by positivity)]
+  rw [lintegral_congr hpt, lintegral_const_mul _ (by fun_prop), h,
+    ← ENNReal.ofReal_mul (by positivity)]
   have hpi := Real.pi_pos
   have hN : (N.factorial : ℝ) ≠ 0 := by positivity
   rw [show (N.factorial : ℝ) / Real.pi ^ N * (Real.pi ^ N / N.factorial) = 1 by field_simp]
@@ -69,30 +73,30 @@ instance (N : ℕ) : IsProbabilityMeasure (fsMeasure N) := ⟨fsMeasure_univ⟩
 def fsNormPoly (n : ℕ) (P : MvPolynomial (Fin (N + 1)) ℂ) (x : CP N) : ℝ :=
   ‖eval x.rep P‖ / norm2 x.rep ^ n
 
-theorem fsNormPoly_mk {n : ℕ} {P : MvPolynomial (Fin (N + 1)) ℂ} (hP : P.IsHomogeneous n)
-    (v : Fin (N + 1) → ℂ) (hv : v ≠ 0) :
-    fsNormPoly n P (Projectivization.mk ℂ v hv) = ‖eval v P‖ / norm2 v ^ n := by
+theorem fsNormPoly_mk
+    {n : ℕ} {P : MvPolynomial (Fin (N + 1)) ℂ} (hP : P.IsHomogeneous n)
+    (v : Fin (N + 1) → ℂ) (hv : v ≠ 0)
+    : fsNormPoly n P (Projectivization.mk ℂ v hv) = ‖eval v P‖ / norm2 v ^ n := by
   obtain ⟨a, ha⟩ := Projectivization.exists_smul_eq_mk_rep ℂ v hv
   rw [fsNormPoly, ← ha, Units.smul_def]
-  have he : eval ((a : ℂ) • v) P = (a : ℂ) ^ n * eval v P :=
-    evalAt_smul (RingHom.id ℂ) hP (a : ℂ) v
+  have he : eval ((a : ℂ) • v) P = (a : ℂ) ^ n * eval v P := evalAt_smul (RingHom.id ℂ) hP (a : ℂ) v
   have hn : 0 < norm2 v := euclideanNorm_pos hv
   have ha0 : 0 < ‖(a : ℂ)‖ := norm_pos_iff.mpr a.ne_zero
   rw [he, norm_mul, norm_pow, euclideanNorm_smul, mul_pow]
   field_simp
 
-theorem continuous_fsNormPoly {n : ℕ} {P : MvPolynomial (Fin (N + 1)) ℂ} (hP : P.IsHomogeneous n) :
-    Continuous (fsNormPoly (N := N) n P) := by
+theorem continuous_fsNormPoly {n : ℕ} {P : MvPolynomial (Fin (N + 1)) ℂ} (hP : P.IsHomogeneous n)
+    : Continuous (fsNormPoly (N := N) n P) := by
   rw [ProjTopology.continuous_iff]
-  have : fsNormPoly (N := N) n P ∘ Projectivization.mk' ℂ =
-      fun v : {v : Fin (N + 1) → ℂ // v ≠ 0} => ‖eval v.1 P‖ / norm2 v.1 ^ n := by
+  have : fsNormPoly (N := N) n P ∘ Projectivization.mk' ℂ
+      = fun v : {v : Fin (N + 1) → ℂ // v ≠ 0} => ‖eval v.1 P‖ / norm2 v.1 ^ n := by
     funext ⟨v, hv⟩; exact fsNormPoly_mk hP v hv
   rw [this]
   have hc : Continuous fun v : Fin (N + 1) → ℂ => norm2 v :=
     Real.continuous_sqrt.comp (continuous_finsetSum _ fun j _ =>
       (continuous_norm.comp (continuous_apply j)).pow 2)
-  refine Continuous.div ?_ ((hc.comp continuous_subtype_val).pow n)
-    fun v => (pow_pos (euclideanNorm_pos v.2) n).ne'
+  refine Continuous.div ?_ ((hc.comp continuous_subtype_val).pow n) fun v =>
+    (pow_pos (euclideanNorm_pos v.2) n).ne'
   exact continuous_norm.comp ((MvPolynomial.continuous_eval P).comp continuous_subtype_val)
 
 def sectionL2NormSq (n : ℕ) (P : MvPolynomial (Fin (N + 1)) ℂ) : ℝ :=
@@ -122,23 +126,29 @@ lemma fsNormPoly_monomial_sq_chartInv (a : Fin (N + 1) →₀ ℕ) (z : Fin N �
   refine Finset.prod_congr rfl fun j _ => ?_
   rw [← pow_mul, mul_comm]
 
-theorem fubiniStudy_l2Norm_monomial_sq (a : Fin (N + 1) →₀ ℕ) :
-    l2Norm (N := N) a.degree (monomial a (1 : ℂ)) ^ 2 =
-      (∏ i, ((a i).factorial : ℝ)) * N.factorial / (a.degree + N).factorial := by
+theorem fubiniStudy_l2Norm_monomial_sq (a : Fin (N + 1) →₀ ℕ)
+    : l2Norm (N := N) a.degree (monomial a (1 : ℂ)) ^ 2
+      = (∏ i, ((a i).factorial : ℝ)) * N.factorial / (a.degree + N).factorial := by
   have hdeg : a.degree = a 0 + ∑ j : Fin N, a j.succ := by
     rw [Finsupp.degree_eq_sum, Fin.sum_univ_succ]
-  have hfm : AEStronglyMeasurable (fun x : CP N => fsNormPoly a.degree (monomial a (1 : ℂ)) x ^ 2)
+  have hfm : AEStronglyMeasurable
+      (fun x : CP N => fsNormPoly a.degree (monomial a (1 : ℂ)) x ^ 2)
       (Measure.map (chartInv 0) (fsChartMeasure (N := N) 0)) :=
     ((continuous_fsNormPoly (isHomogeneous_monomial (1 : ℂ) rfl)).pow 2).aestronglyMeasurable
-  rw [fubiniStudy_l2Norm_sq_eq, sectionL2NormSq, fsMeasure, integral_map (measurable_chartInv 0).aemeasurable hfm,
-    fsChartMeasure]
-  have hd : (fun z => ENNReal.ofReal (fsVolumeDensity (N := N) 0 z)) =
-      fun z => (((fsVolumeDensity (N := N) 0 z).toNNReal : NNReal) : ENNReal) := rfl
+  rw [fubiniStudy_l2Norm_sq_eq, sectionL2NormSq, fsMeasure,
+    integral_map (measurable_chartInv 0).aemeasurable hfm, fsChartMeasure]
+  have hd
+      : (fun z => ENNReal.ofReal (fsVolumeDensity (N := N) 0 z))
+        = fun z => (((fsVolumeDensity (N := N) 0 z).toNNReal : NNReal) : ENNReal) :=
+    rfl
   rw [hd, integral_withDensity_eq_integral_smul (measurable_fsVolumeDensity 0).real_toNNReal]
-  have hpt : ∀ z : Fin N → ℂ, (fsVolumeDensity (N := N) 0 z).toNNReal •
-      fsNormPoly a.degree (monomial a (1 : ℂ)) (chartInv 0 z) ^ 2 =
-      (N.factorial / Real.pi ^ N) * ((∏ j, ‖z j‖ ^ (2 * a j.succ)) /
-        (1 + ∑ j, ‖z j‖ ^ 2) ^ (∑ j : Fin N, a j.succ + N + 1 + a 0)) := by
+  have hpt
+      : ∀ z : Fin N → ℂ,
+        (fsVolumeDensity (N := N) 0 z).toNNReal
+            • fsNormPoly a.degree (monomial a (1 : ℂ)) (chartInv 0 z) ^ 2
+          = (N.factorial / Real.pi ^ N)
+            * ((∏ j, ‖z j‖ ^ (2 * a j.succ))
+              / (1 + ∑ j, ‖z j‖ ^ 2) ^ (∑ j : Fin N, a j.succ + N + 1 + a 0)) := by
     intro z
     rw [NNReal.smul_def, Real.coe_toNNReal _ (fsVolumeDensity_pos 0 z).le, smul_eq_mul,
       fsNormPoly_monomial_sq_chartInv, fsVolumeDensity_eq, normSqSum,
@@ -148,8 +158,8 @@ theorem fubiniStudy_l2Norm_monomial_sq (a : Fin (N + 1) →₀ ℕ) :
     field_simp
     ring
   rw [integral_congr_ae (Filter.Eventually.of_forall hpt), integral_const_mul,
-    (integral_pi_complex_monomial (a 0) N (fun j => a j.succ) 1 one_pos).2,
-    Fin.prod_univ_succ, show ∑ j : Fin N, a j.succ + N + a 0 = a.degree + N by rw [hdeg]; ring]
+    (integral_pi_complex_monomial (a 0) N (fun j => a j.succ) 1 one_pos).2, Fin.prod_univ_succ,
+    show ∑ j : Fin N, a j.succ + N + a 0 = a.degree + N by rw [hdeg]; ring]
   have hpi := Real.pi_pos
   have hf : ((a.degree + N).factorial : ℝ) ≠ 0 := by positivity
   simp only [one_pow, div_one]

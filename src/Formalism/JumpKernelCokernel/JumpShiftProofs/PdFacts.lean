@@ -12,14 +12,14 @@ open Polynomial
 
 variable {O : Type} [CommRing O] {V : Type} [AddCommGroup V] [Module O V]
 
-theorem decomp (d : Module.End O V) (P : O[X]) (v : V) :
-    aeval d P v = P.eval 0 • v + aeval d P.divX (d v) := by
+theorem decomp (d : Module.End O V) (P : O[X]) (v : V)
+    : aeval d P v = P.eval 0 • v + aeval d P.divX (d v) := by
   conv_lhs => rw [← Polynomial.divX_mul_X_add P]
   rw [map_add (f := _), map_mul, aeval_X, aeval_C, LinearMap.add_apply, Module.End.mul_apply,
     Module.algebraMap_end_apply, ← Polynomial.coeff_zero_eq_eval_zero, add_comm]
 
-theorem aeval_mem (d : Module.End O V) (M : Submodule O V) (hM : M.map d ≤ M) :
-    ∀ (Q : O[X]) (v : V), v ∈ M → aeval d Q v ∈ M := by
+theorem aeval_mem (d : Module.End O V) (M : Submodule O V) (hM : M.map d ≤ M)
+    : ∀ (Q : O[X]) (v : V), v ∈ M → aeval d Q v ∈ M := by
   have hd : ∀ v ∈ M, d v ∈ M := fun v hv => hM (Submodule.mem_map_of_mem hv)
   have hpow : ∀ (n : ℕ) (v : V), v ∈ M → (d ^ n) v ∈ M := by
     intro n
@@ -43,7 +43,8 @@ theorem aeval_mem (d : Module.End O V) (M : Submodule O V) (hM : M.map d ≤ M) 
 end Formalism.KernelCokernelLengths.PolynomialDegreeLemmas
 
 open Polynomial Formalism.KernelCokernelLengths.PolynomialDegreeLemmas in
-theorem Formalism.KernelCokernelLengths.polynomial_degree_facts : Formalism.KernelCokernelLengths.PdFacts := by
+theorem Formalism.KernelCokernelLengths.polynomial_degree_facts
+    : Formalism.KernelCokernelLengths.PdFacts := by
   intro O _ V _ _ d P M hM
   refine ⟨fun h0 => ?_, fun h0 u hu => ?_⟩
   · have ha : ∀ v : V, d (aeval d P v) = 0 := by

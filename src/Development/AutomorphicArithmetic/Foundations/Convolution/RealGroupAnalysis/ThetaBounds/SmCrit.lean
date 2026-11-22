@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical ContDiff
 
@@ -39,15 +41,17 @@ private theorem contDiffOn_invL : ContDiffOn ℝ ∞ (invL (E := E)) (invSet E 2
   refine (hdet.mul (hadj i j).contDiffOn).congr fun x _ => ?_
   simp [invL, Matrix.inv_def]
 
-private theorem chart_eq (Φ : GL (Fin 2) (A E) → ℂ) (g : GL (Fin 2) (A E)) (u : GL (Fin 2) (Cinf E)) :
-    chart Φ g = chart Φ (g * infGL E 2 u) ∘ lmul (toL (u⁻¹).val) := by
+private theorem chart_eq (Φ : GL (Fin 2) (A E) → ℂ) (g : GL (Fin 2) (A E)) (u : GL (Fin 2) (Cinf E))
+    : chart Φ g = chart Φ (g * infGL E 2 u) ∘ lmul (toL (u⁻¹).val) := by
   rw [← chart_mul, mul_assoc, ← map_mul, mul_inv_cancel, map_one, mul_one]
 
-private theorem fd {Φ : GL (Fin 2) (A E) → ℂ} {T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ)}
-    (h : ∀ g, DifferentiableAt ℝ (chart Φ g) (oneL E 2) ∧ ∀ X, fderiv ℝ (chart Φ g) (oneL E 2) X = T X g)
-    (g : GL (Fin 2) (A E)) (u : GL (Fin 2) (Cinf E)) :
-    DifferentiableAt ℝ (chart Φ g) (toL u.val) ∧
-      ∀ Z, fderiv ℝ (chart Φ g) (toL u.val) Z = T (lmul (toL (u⁻¹).val) Z) (g * infGL E 2 u) := by
+private theorem fd
+    {Φ : GL (Fin 2) (A E) → ℂ} {T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ)}
+    (h : ∀ g,
+      DifferentiableAt ℝ (chart Φ g) (oneL E 2) ∧ ∀ X, fderiv ℝ (chart Φ g) (oneL E 2) X = T X g)
+    (g : GL (Fin 2) (A E)) (u : GL (Fin 2) (Cinf E))
+    : DifferentiableAt ℝ (chart Φ g) (toL u.val)
+      ∧ ∀ Z, fderiv ℝ (chart Φ g) (toL u.val) Z = T (lmul (toL (u⁻¹).val) Z) (g * infGL E 2 u) := by
   have e1 : lmul (toL (u⁻¹).val) (toL u.val) = oneL E 2 := u.inv_mul
   have hd : DifferentiableAt ℝ (chart Φ (g * infGL E 2 u)) (lmul (toL (u⁻¹).val) (toL u.val)) := by
     rw [e1]; exact (h _).1
@@ -58,25 +62,36 @@ private theorem fd {Φ : GL (Fin 2) (A E) → ℂ} {T : Lie E 2 →ₗ[ℝ] (GL 
     ContinuousLinearMap.fderiv]
   exact (h _).2 _
 
-private theorem diffOn {Φ : GL (Fin 2) (A E) → ℂ} {T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ)}
-    (h : ∀ g, DifferentiableAt ℝ (chart Φ g) (oneL E 2) ∧ ∀ X, fderiv ℝ (chart Φ g) (oneL E 2) X = T X g)
-    (g : GL (Fin 2) (A E)) : DifferentiableOn ℝ (chart Φ g) (invSet E 2) := by
+private theorem diffOn
+    {Φ : GL (Fin 2) (A E) → ℂ} {T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ)}
+    (h : ∀ g,
+      DifferentiableAt ℝ (chart Φ g) (oneL E 2) ∧ ∀ X, fderiv ℝ (chart Φ g) (oneL E 2) X = T X g)
+    (g : GL (Fin 2) (A E))
+    : DifferentiableOn ℝ (chart Φ g) (invSet E 2) := by
   intro x hx
   obtain ⟨u, hu⟩ := id hx
   obtain rfl : x = toL u.val := hu.symm
   exact (fd h g u).1.differentiableWithinAt
 
-private theorem T_apply (T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ)) (b : Module.Basis (Fin (Module.finrank ℝ (Lie E 2))) ℝ (Lie E 2))
-    (Y : Lie E 2) (h : GL (Fin 2) (A E)) : T Y h = ∑ j, (b.repr Y j) • T (b j) h := by
+private theorem T_apply
+    (T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ))
+    (b : Module.Basis (Fin (Module.finrank ℝ (Lie E 2))) ℝ (Lie E 2)) (Y : Lie E 2)
+    (h : GL (Fin 2) (A E))
+    : T Y h = ∑ j, (b.repr Y j) • T (b j) h := by
   conv_lhs => rw [← b.sum_repr Y]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finset.sum_apply]
   simp only [map_smul, Pi.smul_apply]
 
-private theorem smN (S : Submodule ℂ (GL (Fin 2) (A E) → ℂ))
-    (hS : ∀ Φ ∈ S, ∃ T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ), (∀ X, T X ∈ S) ∧
-      ∀ g, DifferentiableAt ℝ (chart Φ g) (oneL E 2) ∧ ∀ X, fderiv ℝ (chart Φ g) (oneL E 2) X = T X g)
-    (n : ℕ) : ∀ Φ ∈ S, ∀ g, ContDiffOn ℝ n (chart Φ g) (invSet E 2) := by
+private theorem smN
+    (S : Submodule ℂ (GL (Fin 2) (A E) → ℂ))
+    (hS : ∀ Φ ∈ S, ∃ T : Lie E 2 →ₗ[ℝ] (GL (Fin 2) (A E) → ℂ),
+      (∀ X, T X ∈ S)
+        ∧ ∀ g,
+          DifferentiableAt ℝ (chart Φ g) (oneL E 2)
+            ∧ ∀ X, fderiv ℝ (chart Φ g) (oneL E 2) X = T X g)
+    (n : ℕ)
+    : ∀ Φ ∈ S, ∀ g, ContDiffOn ℝ n (chart Φ g) (invSet E 2) := by
   induction n with
   | zero =>
     intro Φ hΦ g
@@ -92,10 +107,14 @@ private theorem smN (S : Submodule ℂ (GL (Fin 2) (A E) → ℂ))
     let b := Module.finBasis ℝ (Lie E 2)
     have hinv : ContDiffOn ℝ n (invL (E := E)) (invSet E 2) :=
       contDiffOn_invL.of_le (by exact_mod_cast le_top)
-    have key : ContDiffOn ℝ n (fun x => ∑ j, (b.repr (rmul Z (invL x)) j) • chart (T (b j)) g x) (invSet E 2) :=
-      ContDiffOn.sum fun j _ => ContDiffOn.smul
-        ((LinearMap.toContinuousLinearMap (b.coord j)).contDiff.comp_contDiffOn
-          ((rmul Z).contDiff.comp_contDiffOn hinv)) (ih _ (hT _) g)
+    have key : ContDiffOn ℝ n
+        (fun x => ∑ j, (b.repr (rmul Z (invL x)) j) • chart (T (b j)) g x)
+        (invSet E 2) :=
+      ContDiffOn.sum fun j _ =>
+        ContDiffOn.smul
+          ((LinearMap.toContinuousLinearMap (b.coord j)).contDiff.comp_contDiffOn
+            ((rmul Z).contDiff.comp_contDiffOn hinv))
+          (ih _ (hT _) g)
     refine key.congr fun x hx => ?_
     obtain ⟨u, hu⟩ := id hx
     obtain rfl : x = toL u.val := hu.symm
@@ -106,8 +125,8 @@ private theorem smN (S : Submodule ℂ (GL (Fin 2) (A E) → ℂ))
 
 end UpperTheory.ConvolutionTheory.R2.Ff
 
-theorem UpperTheory.ConvolutionTheory.R2.Ff.smCrit :
-    ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E], SmCrit E := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.smCrit
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E], SmCrit E := by
   intro E _ _ _ S hc hd Φ hΦ g
   refine contDiffOn_infty.2 fun n => smN S (fun Φ hΦ => ?_) n Φ hΦ g
   obtain ⟨T, hT, h⟩ := hd Φ hΦ

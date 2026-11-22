@@ -9,8 +9,9 @@ namespace GlobalTheory
 open IsLocalRing
 
 open IsLocalRing in
-theorem _root_.GlobalTheory.preTilt_isLocalRing : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsLocalRing O]
-    [Fact ¬IsUnit (p : O)], IsLocalRing (PreTilt O p) := by
+theorem _root_.GlobalTheory.preTilt_isLocalRing
+    : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [IsLocalRing O] [Fact ¬ IsUnit (p : O)],
+      IsLocalRing (PreTilt O p) := by
   intro p _ O _ _ _
   haveI : IsLocalRing (ModP O p) :=
     IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective

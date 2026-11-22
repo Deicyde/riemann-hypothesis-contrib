@@ -14,7 +14,6 @@ section Affine
 
 variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-
 omit [NormedSpace ℂ V] in
 lemma exists_mem_four_of_open_dense {U : Set V} (ho : IsOpen U) (hd : Dense U)
     (e₁ e₂ e₃ e₄ : V ≃ₜ V) : ∃ x, e₁ x ∈ U ∧ e₂ x ∈ U ∧ e₃ x ∈ U ∧ e₄ x ∈ U := by
@@ -125,9 +124,14 @@ lemma fderiv_sec_add (Y : GT ι) {θ : EuclideanSpace ℂ ι → ℂ} (hθ : θ 
   simp [hA]
   ring
 
-theorem level_three_separates_tangents {ι : Type} [Fintype ι] (Y : GT ι) (θ : EuclideanSpace ℂ ι → ℂ) (hθ : θ ∈ Y.Sec 1) (h0 : θ ≠ 0)
+theorem level_three_separates_tangents
+    {ι : Type} [Fintype ι]
+    (Y : GT ι) (θ : EuclideanSpace ℂ ι → ℂ) (hθ : θ ∈ Y.Sec 1) (h0 : θ ≠ 0)
     (c₀ : ℂ) (c : EuclideanSpace ℂ ι)
-    (h : ∀ a b, c₀ * (θ a * θ b * θ (-a - b)) + fderiv ℂ (fun v => θ (v + a) * θ (v + b) * θ (v - a - b)) 0 c = 0) : c = 0 ∧ c₀ = 0 := by
+    (h : ∀ a b,
+      c₀ * (θ a * θ b * θ (-a - b)) + fderiv ℂ (fun v => θ (v + a) * θ (v + b) * θ (v - a - b)) 0 c
+        = 0)
+    : c = 0 ∧ c₀ = 0 := by
   have hd : Differentiable ℂ θ := hθ.1
   have han : AnalyticOnNhd ℂ θ Set.univ := fun x _ =>
     SCV.analyticAt_of_differentiableOn (s := Set.univ) hd.differentiableOn univ_mem
@@ -141,14 +145,17 @@ theorem level_three_separates_tangents {ι : Type} [Fintype ι] (Y : GT ι) (θ 
     filter_upwards [isClosed_closure.isOpen_compl.mem_nhds hx] with y hy
     by_contra hy'
     exact hy (subset_closure hy')
-  have hder : ∀ a b, fderiv ℂ (fun v => θ (v + a) * θ (v + b) * θ (v - a - b)) 0 c =
-      fderiv ℂ θ a c * θ b * θ (-a - b) + θ a * fderiv ℂ θ b c * θ (-a - b)
-        + θ a * θ b * fderiv ℂ θ (-a - b) c := by
+  have hder
+      : ∀ a b,
+        fderiv ℂ (fun v => θ (v + a) * θ (v + b) * θ (v - a - b)) 0 c
+          = fderiv ℂ θ a c * θ b * θ (-a - b) + θ a * fderiv ℂ θ b c * θ (-a - b)
+            + θ a * θ b * fderiv ℂ θ (-a - b) c := by
     intro a b
     have ht : ∀ x, HasFDerivAt (fun v => θ (v + x)) (fderiv ℂ θ x) 0 := fun x =>
       (hasFDerivAt_comp_add_right x).2 (by simpa using (hd x).hasFDerivAt)
-    have e : (fun v => θ (v + a) * θ (v + b) * θ (v - a - b)) =
-        ((fun v => θ (v + a)) * fun v => θ (v + b)) * fun v => θ (v + (-a - b)) := by
+    have e
+        : (fun v => θ (v + a) * θ (v + b) * θ (v - a - b))
+          = ((fun v => θ (v + a)) * fun v => θ (v + b)) * fun v => θ (v + (-a - b)) := by
       funext v
       simp only [Pi.mul_apply]
       congr 2
@@ -190,13 +197,14 @@ theorem level_three_separates_tangents {ι : Type} [Fintype ι] (Y : GT ι) (θ 
     linear_combination this
   have hH : ∀ v w : EuclideanSpace ℂ ι, Hf v w = inner ℂ w v := fun v w => by
     simp [Hf, PiLp.inner_apply]
-  let M : EuclideanSpace ℂ ι →ₗ[ℝ] ℂ :=
-    { toFun := fun v => Real.pi * inner ℂ v c
-      map_add' := fun x y => by rw [inner_add_left]; ring
-      map_smul' := fun r x => by
-        rw [RCLike.real_smul_eq_coe_smul (K := ℂ), inner_smul_left]
-        simp
-        ring }
+  let M : EuclideanSpace ℂ ι →ₗ[ℝ] ℂ := {
+    toFun := fun v => Real.pi * inner ℂ v c
+    map_add' := fun x y => by rw [inner_add_left]; ring
+    map_smul' := fun r x => by
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ), inner_smul_left]
+      simp
+      ring
+  }
   have hM : (L : EuclideanSpace ℂ ι →ₗ[ℂ] ℂ).restrictScalars ℝ = M := by
     refine Y.b.ext fun i => ?_
     have := hlat (Y.b i) (Submodule.subset_span ⟨i, rfl⟩)
@@ -210,8 +218,9 @@ theorem level_three_separates_tangents {ι : Type} [Fintype ι] (Y : GT ι) (θ 
     have h3 : (2 * I * Real.pi : ℂ) ≠ 0 := by simp [Real.pi_ne_zero]
     exact inner_self_eq_zero.1 ((mul_eq_zero.1 h2).resolve_left h3)
   refine ⟨hc, ?_⟩
-  obtain ⟨d, hd1, hd2, -⟩ := exists_mem_four_of_open_dense ho hden (Homeomorph.refl _)
-    (Homeomorph.subLeft (-a₀)) (Homeomorph.refl _) (Homeomorph.refl _)
+  obtain ⟨d, hd1, hd2, -⟩ :=
+    exists_mem_four_of_open_dense ho hden (Homeomorph.refl _) (Homeomorph.subLeft (-a₀))
+      (Homeomorph.refl _) (Homeomorph.refl _)
   have := hf a₀ ha₀ d hd1 hd2
   simpa [hfdef, hc] using this
 

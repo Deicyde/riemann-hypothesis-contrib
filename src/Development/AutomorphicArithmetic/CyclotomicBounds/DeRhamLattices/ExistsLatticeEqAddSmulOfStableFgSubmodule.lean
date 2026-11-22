@@ -5,17 +5,22 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.DeRhamLattices.
 
 @[expose] public section
 
-open Formalism Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations TensorProduct UpperTheory.KN
+open Formalism Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct UpperTheory.KN
 
-theorem _root_.UpperTheory.KN.exists_lattice_eq_add_smul_of_stable_fg_submodule :
-    ∀ {G O LL V : Type} [Group G] [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field LL] [Algebra O LL] [IsFractionRing O LL]
-      [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V] (ρ : Representation LL G V)
-      (Λ : Lattice (O := O) ρ) (A : Submodule O V), A.FG → (∀ g, ∀ a ∈ A, ρ g a ∈ A) → ∀ μ : O, μ ≠ 0 →
-      ∃ L : Lattice (O := O) ρ, ∀ v, v ∈ L.T ↔ ∃ a ∈ A, ∃ u ∈ Λ.T, v = a + μ • u := by
+theorem _root_.UpperTheory.KN.exists_lattice_eq_add_smul_of_stable_fg_submodule
+    : ∀ {G O LL V : Type} [Group G] [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field LL]
+        [Algebra O LL] [IsFractionRing O LL] [AddCommGroup V] [Module LL V] [Module O V]
+        [IsScalarTower O LL V] (ρ : Representation LL G V) (Λ : Lattice (O := O) ρ)
+        (A : Submodule O V),
+      A.FG → (∀ g, ∀ a ∈ A, ρ g a ∈ A)
+        → ∀ μ : O,
+          μ ≠ 0 → ∃ L : Lattice (O := O) ρ, ∀ v, v ∈ L.T ↔ ∃ a ∈ A, ∃ u ∈ Λ.T, v = a + μ • u := by
   intro G O LL V _ _ _ _ _ _ _ _ _ _ _ ρ Λ A hA hst μ hμ
   have hinj : Function.Injective (algebraMap O LL) := IsFractionRing.injective O LL
-  have hmem : ∀ v, v ∈ A ⊔ Λ.T.map (μ • (LinearMap.id : V →ₗ[O] V)) ↔
-      ∃ a ∈ A, ∃ u ∈ Λ.T, v = a + μ • u := by
+  have hmem
+      : ∀ v,
+        v ∈ A ⊔ Λ.T.map (μ • (LinearMap.id : V →ₗ[O] V)) ↔ ∃ a ∈ A, ∃ u ∈ Λ.T, v = a + μ • u := by
     intro v
     rw [Submodule.mem_sup]
     constructor
@@ -45,4 +50,5 @@ theorem _root_.UpperTheory.KN.exists_lattice_eq_add_smul_of_stable_fg_submodule 
     have : u = (algebraMap O LL μ)⁻¹ • (μ • u) := by
       rw [← algebraMap_smul LL μ u, smul_smul, inv_mul_cancel₀ hne, one_smul]
     rw [this]
-    exact Submodule.smul_mem _ _ (Submodule.subset_span ((hmem _).2 ⟨0, A.zero_mem, u, hu, by simp⟩))
+    exact Submodule.smul_mem _ _
+      (Submodule.subset_span ((hmem _).2 ⟨0, A.zero_mem, u, hu, by simp⟩))

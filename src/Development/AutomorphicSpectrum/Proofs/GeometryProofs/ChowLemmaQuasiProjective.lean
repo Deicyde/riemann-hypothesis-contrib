@@ -10,38 +10,48 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.CompanionTheory.Ar.Approx
 
-theorem exists_lift_of_isDominant {D Y V A : Scheme.{0}} [IsReduced Y] (σ : D ⟶ Y) [IsDominant σ]
-    (r : Y ⟶ V) (k : A ⟶ V) [IsClosedImmersion k] (a : D ⟶ A) (h : σ ≫ r = a ≫ k) :
-    ∃ φ : Y ⟶ A, φ ≫ k = r := by
+theorem exists_lift_of_isDominant
+    {D Y V A : Scheme.{0}} [IsReduced Y]
+    (σ : D ⟶ Y) [IsDominant σ]
+    (r : Y ⟶ V)
+    (k : A ⟶ V) [IsClosedImmersion k]
+    (a : D ⟶ A) (h : σ ≫ r = a ≫ k)
+    : ∃ φ : Y ⟶ A, φ ≫ k = r := by
   have hl : pullback.lift σ a h ≫ pullback.fst r k = σ := pullback.lift_fst _ _ _
   have : IsDominant (pullback.lift σ a h ≫ pullback.fst r k) := by rw [hl]; infer_instance
   have : IsDominant (pullback.fst r k) := IsDominant.of_comp (pullback.lift σ a h) _
   have : Surjective (pullback.fst r k) :=
     surjective_of_isDominant_of_isClosed_range _ (pullback.fst r k).isClosedEmbedding.isClosed_range
   have : IsIso (pullback.fst r k) := isIso_of_isClosedImmersion_of_surjective _
-  exact ⟨inv (pullback.fst r k) ≫ pullback.snd r k, by
-    rw [Category.assoc, ← pullback.condition, IsIso.inv_hom_id_assoc]⟩
+  exact ⟨
+    inv (pullback.fst r k) ≫ pullback.snd r k,
+    by rw [Category.assoc, ← pullback.condition, IsIso.inv_hom_id_assoc]
+  ⟩
 
-theorem isClosedImmersion_morphismRestrict {S X B X' T D : Scheme.{0}} (f : X ⟶ S) [IsSeparated f]
-    (u : B ⟶ S) [IsReduced X'] (π : X' ⟶ X) (b : X' ⟶ B) (hπb : π ≫ f = b ≫ u)
-    [IsClosedImmersion (pullback.lift π b hπb)] (A : X.Opens) (O : B.Opens) (τ : T ⟶ S)
-    (ρ : O.toScheme ⟶ T) (hρ : ρ ≫ τ = O.ι ≫ u) (k : A.toScheme ⟶ T) [IsClosedImmersion k]
-    (hk : k ≫ τ = A.ι ≫ f) (σ : D ⟶ (b ⁻¹ᵁ O).toScheme) [IsDominant σ] (a : D ⟶ A.toScheme)
-    (h₁ : σ ≫ b ∣_ O ≫ ρ = a ≫ k) (h₂ : a ≫ A.ι = σ ≫ (b ⁻¹ᵁ O).ι ≫ π) :
-    IsClosedImmersion (b ∣_ O) := by
+theorem isClosedImmersion_morphismRestrict
+    {S X B X' T D : Scheme.{0}} (f : X ⟶ S) [IsSeparated f]
+    (u : B ⟶ S)
+    [IsReduced X']
+    (π : X' ⟶ X) (b : X' ⟶ B) (hπb : π ≫ f = b ≫ u) [IsClosedImmersion (pullback.lift π b hπb)]
+    (A : X.Opens)
+    (O : B.Opens) (τ : T ⟶ S) (ρ : O.toScheme ⟶ T) (hρ : ρ ≫ τ = O.ι ≫ u)
+    (k : A.toScheme ⟶ T) [IsClosedImmersion k]
+    (hk : k ≫ τ = A.ι ≫ f)
+    (σ : D ⟶ (b ⁻¹ᵁ O).toScheme) [IsDominant σ]
+    (a : D ⟶ A.toScheme) (h₁ : σ ≫ b ∣_ O ≫ ρ = a ≫ k) (h₂ : a ≫ A.ι = σ ≫ (b ⁻¹ᵁ O).ι ≫ π)
+    : IsClosedImmersion (b ∣_ O) := by
   obtain ⟨φ, hφ⟩ := exists_lift_of_isDominant σ (b ∣_ O ≫ ρ) k a h₁
-  have hσφ : σ ≫ φ = a := by
-    rw [← cancel_mono k, Category.assoc, hφ, h₁]
+  have hσφ : σ ≫ φ = a := by rw [← cancel_mono k, Category.assoc, hφ, h₁]
   have hφι : φ ≫ A.ι = (b ⁻¹ᵁ O).ι ≫ π := by
     refine ext_of_isDominant_of_isSeparated f ?_ σ ?_
-    · rw [Category.assoc, Category.assoc, ← hk, reassoc_of% hφ, hρ, morphismRestrict_ι_assoc,
-        hπb]
+    · rw [Category.assoc, Category.assoc, ← hk, reassoc_of% hφ, hρ, morphismRestrict_ι_assoc, hπb]
     · rw [reassoc_of% hσφ, h₂]
   have hc : (pullback.snd ρ k ≫ A.ι) ≫ f = (pullback.fst ρ k ≫ O.ι) ≫ u := by
     rw [Category.assoc, Category.assoc, ← hk, ← hρ, pullback.condition_assoc]
@@ -57,11 +67,11 @@ theorem isClosedImmersion_morphismRestrict {S X B X' T D : Scheme.{0}} (f : X �
   have hw : (b ⁻¹ᵁ O).ι ≫ pullback.lift π b hπb = m ≫ c := by
     refine pullback.hom_ext ?_ ?_
     · rw [Category.assoc, Category.assoc, pullback.lift_fst, c₁, reassoc_of% m₂, hφι]
-    · rw [Category.assoc, Category.assoc, pullback.lift_snd, c₂, reassoc_of% m₁,
-        morphismRestrict_ι]
+    · rw [Category.assoc, Category.assoc, pullback.lift_snd, c₂, reassoc_of% m₁, morphismRestrict_ι]
   have sq : IsPullback (b ⁻¹ᵁ O).ι m (pullback.lift π b hπb) c := by
-    have hr : ∀ {Z : Scheme.{0}} (x : Z ⟶ X') (y : Z ⟶ pullback ρ k),
-        x ≫ pullback.lift π b hπb = y ≫ c → Set.range x ⊆ Set.range (b ⁻¹ᵁ O).ι := by
+    have hr
+        : ∀ {Z : Scheme.{0}} (x : Z ⟶ X') (y : Z ⟶ pullback ρ k),
+          x ≫ pullback.lift π b hπb = y ≫ c → Set.range x ⊆ Set.range (b ⁻¹ᵁ O).ι := by
       intro Z x y e
       have e' : x ≫ b = (y ≫ pullback.fst ρ k) ≫ O.ι := by
         have := congr($e ≫ pullback.snd f u)
@@ -71,9 +81,14 @@ theorem isClosedImmersion_morphismRestrict {S X B X' T D : Scheme.{0}} (f : X �
       change (x ≫ b) z ∈ O
       rw [e']
       exact ((y ≫ pullback.fst ρ k) z).2
-    refine ⟨⟨hw⟩, ⟨PullbackCone.IsLimit.mk hw
-      (fun s ↦ IsOpenImmersion.lift (b ⁻¹ᵁ O).ι s.fst (hr _ _ s.condition)) (fun s ↦ ?_)
-      (fun s ↦ ?_) (fun s n h₃ _ ↦ ?_)⟩⟩
+    refine ⟨
+      ⟨hw⟩,
+      ⟨PullbackCone.IsLimit.mk hw
+        (fun s ↦ IsOpenImmersion.lift (b ⁻¹ᵁ O).ι s.fst (hr _ _ s.condition))
+        (fun s ↦ ?_)
+        (fun s ↦ ?_)
+        (fun s n h₃ _ ↦ ?_)⟩
+    ⟩
     · exact IsOpenImmersion.lift_fac _ _ _
     · rw [← cancel_mono c, Category.assoc, ← hw, IsOpenImmersion.lift_fac_assoc, s.condition]
     · rw [← cancel_mono (b ⁻¹ᵁ O).ι, IsOpenImmersion.lift_fac, h₃]
@@ -81,7 +96,10 @@ theorem isClosedImmersion_morphismRestrict {S X B X' T D : Scheme.{0}} (f : X �
   rw [← m₁]
   infer_instance
 
-theorem exists_isProper_surjective_isQProjOver : ∀ (k : Type) [CommRing k] [IsNoetherianRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k), IsSeparated p → LocallyOfFiniteType p → QuasiCompact p → ∃ (X' : Scheme.{0}) (π : X' ⟶ X), IsProper π ∧ Surjective π ∧ IsQProjOver (π ≫ p) := by
+theorem exists_isProper_surjective_isQProjOver
+    : ∀ (k : Type) [CommRing k] [IsNoetherianRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k),
+      IsSeparated p → LocallyOfFiniteType p → QuasiCompact p
+        → ∃ (X' : Scheme.{0}) (π : X' ⟶ X), IsProper π ∧ Surjective π ∧ IsQProjOver (π ≫ p) := by
   intro R _ _ X _ f _ _ _
   classical
   have : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace f
@@ -90,29 +108,41 @@ theorem exists_isProper_surjective_isQProjOver : ∀ (k : Type) [CommRing k] [Is
     obtain ⟨A, h₁, h₂, -⟩ := exists_isAffineOpen_mem_and_subset (x := y) (U := ⊤) trivial
     exact ⟨A, h₁, h₂⟩
   choose A₀ hA₀ hyA using hA
-  obtain ⟨T, hT⟩ := isCompact_univ.elim_finite_subcover (fun y ↦ (A₀ y : Set X))
-    (fun y ↦ (A₀ y).isOpen) (fun y _ ↦ Set.mem_iUnion.2 ⟨y, hyA y⟩)
+  obtain ⟨T, hT⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun y ↦ (A₀ y : Set X))
+      (fun y ↦ (A₀ y).isOpen)
+      (fun y _ ↦ Set.mem_iUnion.2 ⟨y, hyA y⟩)
   let A : T → X.Opens := fun i ↦ A₀ i
   have hcov : ∀ y : X, ∃ i : T, y ∈ A i := fun y ↦ by
     obtain ⟨i, hi, h⟩ := Set.mem_iUnion₂.1 (hT (Set.mem_univ y))
     exact ⟨⟨i, hi⟩, h⟩
-  have hP := fun i : T ↦ (have : IsAffine (A i).toScheme := hA₀ i
-    (isAmpleLB_of_isAffine (LB.isLB_triv (A i).toScheme)).isQProjOver ((A i).ι ≫ f))
+  have hP := fun i : T ↦
+    (have : IsAffine (A i).toScheme := hA₀ i
+     (isAmpleLB_of_isAffine (LB.isLB_triv (A i).toScheme)).isQProjOver ((A i).ι ≫ f))
   choose N j hj _ hjt using hP
   let U : X.Opens := Finset.univ.inf A
   have hUA : ∀ i, U ≤ A i := fun i ↦ Finset.inf_le (Finset.mem_univ i)
   have hU : genericPoint X ∈ U := by
     have : ∀ i, genericPoint X ∈ A i := fun i ↦
       ((genericPoint_spec X).mem_open_set_iff (A i).isOpen).2 ⟨i, trivial, hyA i⟩
-    refine Finset.inf_induction (p := fun V : X.Opens ↦ genericPoint X ∈ V) trivial
-      (fun _ h _ h' ↦ ⟨h, h'⟩) fun i _ ↦ this i
+    refine Finset.inf_induction
+      (p := fun V : X.Opens ↦ genericPoint X ∈ V)
+      trivial
+      (fun _ h _ h' ↦ ⟨h, h'⟩)
+      fun i _ ↦ this i
   have hps : ∀ n, IsProjOver (PSpace.str R n) := fun n ↦ ⟨n, 𝟙 _, inferInstance, Category.id_comp _⟩
-  obtain ⟨P, s, p, hP, hp, hu⟩ := ProjFinProd.exists_isProjOver_finite_prod R T (Sp R) (𝟙 _)
-    (fun i ↦ PSpace R (N i)) (fun i ↦ PSpace.str R (N i))
-    ((isAmpleLB_of_isAffine (LB.isLB_triv (Sp R))).isProjOver (𝟙 _)) (fun i ↦ hps _)
+  obtain ⟨P, s, p, hP, hp, hu⟩ :=
+    ProjFinProd.exists_isProjOver_finite_prod R T (Sp R) (𝟙 _)
+      (fun i ↦ PSpace R (N i))
+      (fun i ↦ PSpace.str R (N i))
+      ((isAmpleLB_of_isAffine (LB.isLB_triv (Sp R))).isProjOver (𝟙 _))
+      (fun i ↦ hps _)
   rw [Category.comp_id] at hP hp
-  obtain ⟨h, ⟨hs, hh⟩, -⟩ := hu U.toScheme (U.ι ≫ f) (fun i ↦ X.homOfLE (hUA i) ≫ j i)
-    (fun i ↦ by rw [Category.assoc, hjt, X.homOfLE_ι_assoc, Category.comp_id])
+  obtain ⟨h, ⟨hs, hh⟩, -⟩ :=
+    hu U.toScheme (U.ι ≫ f)
+      (fun i ↦ X.homOfLE (hUA i) ≫ j i)
+      (fun i ↦ by rw [Category.assoc, hjt, X.homOfLE_ι_assoc, Category.comp_id])
   have : IsProper s := ((isProjOver_iff_isProper_and_exists_isAmpleLB s).1 hP).1
   let g : U.toScheme ⟶ pullback f s := pullback.lift U.ι h hs.symm
   have g₁ : g ≫ pullback.fst f s = U.ι := pullback.lift_fst _ _ _
@@ -127,8 +157,7 @@ theorem exists_isProper_surjective_isQProjOver : ∀ (k : Type) [CommRing k] [Is
   let q : g.image ⟶ P := g.imageι ≫ pullback.snd f s
   have hπ : g.toImage ≫ π = U.ι := by rw [g.toImage_imageι_assoc, g₁]
   have hq : g.toImage ≫ q = h := by rw [g.toImage_imageι_assoc, g₂]
-  have hπq : π ≫ f = q ≫ s := by
-    rw [Category.assoc, Category.assoc, pullback.condition]
+  have hπq : π ≫ f = q ≫ s := by rw [Category.assoc, Category.assoc, pullback.condition]
   have key : ∀ i, (π ⁻¹ᵁ A i).ι ≫ q ≫ p i = π ∣_ A i ≫ j i := by
     intro i
     obtain ⟨σ, _, e₁, e₂⟩ := GlobalTheory.ChowLemma.exists_dominant_lift π (hUA i) g.toImage hπ
@@ -198,24 +227,33 @@ theorem exists_isProper_surjective_isQProjOver : ∀ (k : Type) [CommRing k] [Is
       (IsOpenImmersion.lift (q' ⁻¹ᵁ O i).ι g.toImage hr) (X.homOfLE (hUA i)) ?_ ?_
     · rw [morphismRestrict_ι_assoc, Category.assoc, hp]
     · rw [Scheme.Hom.liftCoborder_ι_assoc, hjt]
-    · rw [← cancel_mono (V i).ι, Category.assoc, Category.assoc, Category.assoc,
-        morphismRestrict_ι, Scheme.Hom.liftCoborder_ι, morphismRestrict_ι_assoc, reassoc_of% hσ,
-        reassoc_of% hq', reassoc_of% hq, hh]
+    · rw [← cancel_mono (V i).ι, Category.assoc, Category.assoc, Category.assoc, morphismRestrict_ι,
+        Scheme.Hom.liftCoborder_ι, morphismRestrict_ι_assoc, reassoc_of% hσ, reassoc_of% hq',
+        reassoc_of% hq, hh]
     · rw [X.homOfLE_ι, reassoc_of% hσ, hπ]
   have : IsClosedImmersion q' :=
     IsZariskiLocalAtTarget.of_iSup_eq_top (P := @IsClosedImmersion) O hO hloc
   have : IsImmersion q := by rw [← hq']; infer_instance
   have : IsProper π := by infer_instance
-  have : IsDominant U.ι := ⟨by
-    rw [DenseRange, Scheme.Opens.range_ι]
-    exact U.isOpen.dense ⟨_, hU⟩⟩
+  have : IsDominant U.ι :=
+    ⟨by
+      rw [DenseRange, Scheme.Opens.range_ι]
+      exact U.isOpen.dense ⟨_, hU⟩⟩
   have : IsDominant (g.toImage ≫ π) := by rw [hπ]; infer_instance
   have : IsDominant π := IsDominant.of_comp g.toImage π
   have : QuasiCompact (q ≫ s) := by rw [← hπq]; infer_instance
   have : QuasiCompact q := QuasiCompact.of_comp q s
   obtain ⟨n, i₀, hi₀, e₀⟩ := hP
-  exact ⟨g.image, π, inferInstance,
-    surjective_of_isDominant_of_isClosed_range π π.isClosedMap.isClosed_range, n, q ≫ i₀,
-    inferInstance, inferInstance, by rw [Category.assoc, e₀, hπq]⟩
+  exact ⟨
+    g.image,
+    π,
+    inferInstance,
+    surjective_of_isDominant_of_isClosed_range π π.isClosedMap.isClosed_range,
+    n,
+    q ≫ i₀,
+    inferInstance,
+    inferInstance,
+    by rw [Category.assoc, e₀, hπq]
+  ⟩
 
 end GlobalTheory.CompanionTheory.Ar.Approx

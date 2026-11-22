@@ -14,7 +14,8 @@ open scoped Topology
 
 namespace GlobalTheory.RealCoordCusp
 
-theorem normSq_det_UJ {n : ℕ} {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε) : Complex.normSq (uMat g).det = 1 := by
+theorem normSq_det_UJ {n : ℕ} {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε)
+    : Complex.normSq (uMat g).det = 1 := by
   have hg : (uMat g)ᴴ * Formalism.REAL.Jm ε * uMat g = Formalism.REAL.Jm ε := g.2
   have hJ : (Formalism.REAL.Jm ε).det ≠ 0 := by
     intro h
@@ -24,7 +25,8 @@ theorem normSq_det_UJ {n : ℕ} {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε)
   have h1 := congrArg Matrix.det hg
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose] at h1
   have h2 : star (uMat g).det * (uMat g).det = 1 := by
-    have : (star (uMat g).det * (uMat g).det - 1) * (Formalism.REAL.Jm ε).det = 0 := by linear_combination h1
+    have : (star (uMat g).det * (uMat g).det - 1) * (Formalism.REAL.Jm ε).det = 0 := by
+      linear_combination h1
     rcases mul_eq_zero.1 this with h | h
     · linear_combination h
     · exact absurd h hJ
@@ -36,10 +38,13 @@ variable (I : AutInst)
 
 abbrev Idx : Type := Σ _ : Fin I.n, Module.Free.ChooseBasisIndex ℤ (𝓞 I.E)
 
-def cBasis : Module.Basis (Σ _ : InfinitePlace I.F, Σ _ : Fin I.n, Fin 2) ℝ (InfinitePlace I.F → Fin I.n → ℂ) :=
+def cBasis
+    : Module.Basis (Σ _ : InfinitePlace I.F, Σ _ : Fin I.n, Fin 2) ℝ
+      (InfinitePlace I.F → Fin I.n → ℂ) :=
   Pi.basis fun _ => Pi.basis fun _ => Complex.basisOneI
 
-theorem card_eq : Fintype.card (Σ _ : InfinitePlace I.F, Σ _ : Fin I.n, Fin 2) = Fintype.card (Idx I) := by
+theorem card_eq
+    : Fintype.card (Σ _ : InfinitePlace I.F, Σ _ : Fin I.n, Fin 2) = Fintype.card (Idx I) := by
   simp only [Fintype.card_sigma, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul,
     Formalism.L2.SG.Pf.Tau.card_infinite_places, Formalism.L2.SG.Pf.Tau.card_integral_basis]
   ring
@@ -64,13 +69,17 @@ variable (I : AutInst)
 
 def bQ : Module.Basis (Idx I) ℚ (Fin I.n → I.E) := Pi.basis fun _ => integralBasis I.E
 
-def eB : Fin (Fintype.card (Idx I)) → Fin I.n → I.E := fun k => bQ I ((Fintype.equivFin (Idx I)).symm k)
+def eB : Fin (Fintype.card (Idx I)) → Fin I.n → I.E := fun k =>
+  bQ I ((Fintype.equivFin (Idx I)).symm k)
 
 theorem bQ_apply (p : Idx I) : bQ I p = Pi.single p.1 (integralBasis I.E p.2) := by
   simp [bQ, Pi.basis_apply]
 
 theorem eB_isZBasis : IsZBasis I (eB I) := by
-  refine ⟨((bQ I).linearIndependent.comp _ (Fintype.equivFin (Idx I)).symm.injective).restrict_scalars' ℤ, ?_⟩
+  refine ⟨
+    ((bQ I).linearIndependent.comp _ (Fintype.equivFin (Idx I)).symm.injective).restrict_scalars' ℤ,
+    ?_
+  ⟩
   intro u
   constructor
   · intro hu
@@ -102,7 +111,8 @@ variable (I : AutInst)
 def bm (y : I.Ginf) : (InfinitePlace I.F → Fin I.n → ℂ) →ₗ[ℝ] (InfinitePlace I.F → Fin I.n → ℂ) :=
   LinearMap.pi fun v => ((Matrix.toLin' (uMat (y v)⁻¹)).restrictScalars ℝ).comp (LinearMap.proj v)
 
-theorem vec_eq (y : I.Ginf) (u : Fin I.n → I.E) : GlobalTheory.CuspGeo.vec I y u = bm I y (GlobalTheory.CuspGeo.vec I 1 u) := by
+theorem vec_eq (y : I.Ginf) (u : Fin I.n → I.E)
+    : GlobalTheory.CuspGeo.vec I y u = bm I y (GlobalTheory.CuspGeo.vec I 1 u) := by
   funext v
   have h1 : uMat (1 : Formalism.REAL.UJ (I.ε v)) = 1 := by simp [uMat]
   simp [GlobalTheory.CuspGeo.vec, bm, h1]
@@ -113,18 +123,24 @@ theorem det_bm (y : I.Ginf) : LinearMap.det (bm I y) = 1 := by
   rw [LinearMap.det_restrictScalars, LinearMap.det_toLin', Algebra.norm_complex_apply]
   exact normSq_det_UJ _
 
-theorem gm_eq {N : ℕ} (ρ : (InfinitePlace I.F → Fin I.n → ℂ) ≃ₗ[ℝ] (Fin N → ℝ)) (y : I.Ginf)
-    (e : Fin N → Fin I.n → I.E) :
-    gm I ρ y e = LinearMap.toMatrix' (ρ.toLinearMap ∘ₗ bm I y ∘ₗ ρ.symm.toLinearMap) * gm I ρ 1 e := by
+theorem gm_eq
+    {N : ℕ} (ρ : (InfinitePlace I.F → Fin I.n → ℂ) ≃ₗ[ℝ] (Fin N → ℝ))
+    (y : I.Ginf) (e : Fin N → Fin I.n → I.E)
+    : gm I ρ y e
+      = LinearMap.toMatrix' (ρ.toLinearMap ∘ₗ bm I y ∘ₗ ρ.symm.toLinearMap) * gm I ρ 1 e := by
   ext i j
   rw [Matrix.mul_apply]
-  change ρ (GlobalTheory.CuspGeo.vec I y (e j)) i = (LinearMap.toMatrix' (ρ.toLinearMap ∘ₗ bm I y ∘ₗ ρ.symm.toLinearMap) *ᵥ
-    (fun k => ρ (GlobalTheory.CuspGeo.vec I 1 (e j)) k)) i
+  change ρ (GlobalTheory.CuspGeo.vec I y (e j)) i
+    = (LinearMap.toMatrix' (ρ.toLinearMap ∘ₗ bm I y ∘ₗ ρ.symm.toLinearMap)
+        *ᵥ (fun k => ρ (GlobalTheory.CuspGeo.vec I 1 (e j)) k))
+      i
   rw [LinearMap.toMatrix'_mulVec]
   simp [vec_eq I y]
 
-theorem det_gm {N : ℕ} (ρ : (InfinitePlace I.F → Fin I.n → ℂ) ≃ₗ[ℝ] (Fin N → ℝ)) (y : I.Ginf)
-    (e : Fin N → Fin I.n → I.E) : (gm I ρ y e).det = (gm I ρ 1 e).det := by
+theorem det_gm
+    {N : ℕ} (ρ : (InfinitePlace I.F → Fin I.n → ℂ) ≃ₗ[ℝ] (Fin N → ℝ))
+    (y : I.Ginf) (e : Fin N → Fin I.n → I.E)
+    : (gm I ρ y e).det = (gm I ρ 1 e).det := by
   rw [gm_eq, Matrix.det_mul, LinearMap.det_toMatrix', LinearMap.det_conj, det_bm, one_mul]
 
 end GlobalTheory.RealCoordCusp
@@ -146,7 +162,8 @@ theorem qm_injective : Function.Injective (qm I) := by
   funext v
   have h0 := congrFun h v
   simp only [qm, LinearMap.pi_apply, LinearMap.coe_comp, Function.comp_apply, LinearMap.coe_proj,
-    Function.eval, LinearMap.coe_restrictScalars, Matrix.toLin'_apply] at h0
+      Function.eval, LinearMap.coe_restrictScalars, Matrix.toLin'_apply]
+    at h0
   have hu : IsUnit (I.P v).det := (Matrix.isUnit_iff_isUnit_det _).1 (I.P_unit v)
   have h2 := congrArg (fun w => I.P v *ᵥ w) h0
   simp only [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hu, Matrix.one_mulVec] at h2
@@ -157,11 +174,13 @@ theorem sw_injective : Function.Injective (sw I) := by
   funext q
   exact congrFun (congrFun h q.2) q.1
 
-theorem vec_one_bQ (p : Idx I) :
-    GlobalTheory.CuspGeo.vec I 1 (bQ I p) = qm I (sw I (Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n p)) := by
+theorem vec_one_bQ (p : Idx I)
+    : GlobalTheory.CuspGeo.vec I 1 (bQ I p)
+      = qm I (sw I (Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n p)) := by
   funext v
   have h1 : uMat (1 : Formalism.REAL.UJ (I.ε v)) = 1 := by simp [uMat]
-  have h2 : (fun i => I.φ v (bQ I p i)) = sw I (Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n p) v := by
+  have h2
+      : (fun i => I.φ v (bQ I p i)) = sw I (Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n p) v := by
     funext i
     rw [bQ_apply, Pi.single_apply]
     change _ = Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n p (i, v)
@@ -177,27 +196,40 @@ theorem det_gm_one_ne : (gm I (rho I) 1 (eB I)).det ≠ 0 := by
   have hli : LinearIndependent ℝ (fun j => (gm I (rho I) 1 (eB I))ᵀ j) := by
     have hf : LinearMap.ker ((rho I).toLinearMap ∘ₗ qm I ∘ₗ sw I) = ⊥ :=
       LinearMap.ker_eq_bot.2 ((rho I).injective.comp ((qm_injective I).comp (sw_injective I)))
-    have h := ((Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n).linearIndependent.map' _ hf).comp _
-      (Fintype.equivFin (Idx I)).symm.injective
-    have heq : (fun j => (gm I (rho I) 1 (eB I))ᵀ j) =
-        ((⇑((rho I).toLinearMap ∘ₗ qm I ∘ₗ sw I) ∘ ⇑(Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n)) ∘
-          ⇑(Fintype.equivFin (Idx I)).symm) := by
+    have h :=
+      ((Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n).linearIndependent.map' _ hf).comp _
+        (Fintype.equivFin (Idx I)).symm.injective
+    have heq
+        : (fun j => (gm I (rho I) 1 (eB I))ᵀ j)
+          = ((⇑((rho I).toLinearMap ∘ₗ qm I ∘ₗ sw I)
+              ∘ ⇑(Formalism.L2.SG.Pf.Tau.placeCoordsBasis I I.n))
+            ∘ ⇑(Fintype.equivFin (Idx I)).symm) := by
       funext j
       funext i
-      simp only [Matrix.transpose_apply, gm, Matrix.of_apply, Function.comp_apply, LinearMap.coe_comp,
-        LinearEquiv.coe_coe]
+      simp only [Matrix.transpose_apply, gm, Matrix.of_apply, Function.comp_apply,
+        LinearMap.coe_comp, LinearEquiv.coe_coe]
       rw [eB, vec_one_bQ]
     rw [heq]
     exact h
-  exact ((Matrix.isUnit_iff_isUnit_det _).1 (Matrix.linearIndependent_cols_iff_isUnit.1 hli)).ne_zero
+  exact ((Matrix.isUnit_iff_isUnit_det _).1
+    (Matrix.linearIndependent_cols_iff_isUnit.1 hli)).ne_zero
 
 end GlobalTheory.RealCoordCusp
 
-
 open GlobalTheory.RealCoordCusp in
-theorem GlobalTheory.CuspGeo.covolume_const : ∀ I : AutInst, ∃ (N : ℕ) (e : Fin N → Fin I.n → I.E)
-    (ρ : (InfinitePlace I.F → Fin I.n → ℂ) ≃ₗ[ℝ] (Fin N → ℝ)) (d : ℝ),
-    0 < d ∧ IsZBasis I e ∧ IsRealCoord I ρ ∧ ∀ y : I.Ginf, |(gm I ρ y e).det| = d := by
+theorem GlobalTheory.CuspGeo.covolume_const
+    : ∀ I : AutInst,
+      ∃ (N : ℕ) (e : Fin N → Fin I.n → I.E)
+          (ρ : (InfinitePlace I.F → Fin I.n → ℂ) ≃ₗ[ℝ] (Fin N → ℝ)) (d : ℝ),
+        0 < d ∧ IsZBasis I e ∧ IsRealCoord I ρ ∧ ∀ y : I.Ginf, |(gm I ρ y e).det| = d := by
   intro I
-  refine ⟨_, eB I, rho I, |(gm I (rho I) 1 (eB I)).det|, abs_pos.2 (det_gm_one_ne I), eB_isZBasis I,
-    rho_isRealCoord I, fun y => by rw [det_gm]⟩
+  refine ⟨
+    _,
+    eB I,
+    rho I,
+    |(gm I (rho I) 1 (eB I)).det|,
+    abs_pos.2 (det_gm_one_ne I),
+    eB_isZBasis I,
+    rho_isRealCoord I,
+    fun y => by rw [det_gm]
+  ⟩

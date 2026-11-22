@@ -13,9 +13,11 @@ open MvPolynomial
 
 noncomputable section
 
-theorem pderiv_aeval_eq_sum {F K : Type*} [CommRing F] [CommRing K] [Algebra F K]
-    {σ τ : Type*} [Fintype σ] (ψ : σ → MvPolynomial τ K) (i : τ) (g : MvPolynomial σ F) :
-    pderiv i (aeval ψ g) = ∑ j, aeval ψ (pderiv j g) * pderiv i (ψ j) := by
+theorem pderiv_aeval_eq_sum
+    {F K : Type*} [CommRing F] [CommRing K] [Algebra F K]
+    {σ τ : Type*} [Fintype σ]
+    (ψ : σ → MvPolynomial τ K) (i : τ) (g : MvPolynomial σ F)
+    : pderiv i (aeval ψ g) = ∑ j, aeval ψ (pderiv j g) * pderiv i (ψ j) := by
   classical
   induction g using MvPolynomial.induction_on with
   | C a => simp [MvPolynomial.algebraMap_apply]
@@ -31,22 +33,25 @@ theorem pderiv_aeval_eq_sum {F K : Type*} [CommRing F] [CommRing K] [Algebra F K
       · simp
     · refine Finset.sum_congr rfl fun b _ => by ring
 
-theorem pderiv_genSubst {K : Type*} [CommRing K] {n k : ℕ} (ζ c : Fin n → K) (i : Fin k) (m : Fin n)
-    (j : Fin k × Fin n) :
-    pderiv (i, m) (genSubst ζ c j) =
-      (if j = (i, m) then 1 else 0) - (if j.1 = i then C (ζ m) * C (c j.2) else 0) := by
+theorem pderiv_genSubst
+    {K : Type*} [CommRing K] {n k : ℕ} (ζ c : Fin n → K) (i : Fin k) (m : Fin n) (j : Fin k × Fin n)
+    : pderiv (i, m) (genSubst ζ c j)
+      = (if j = (i, m) then 1 else 0) - (if j.1 = i then C (ζ m) * C (c j.2) else 0) := by
   classical
   obtain ⟨j₁, j₂⟩ := j
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [genSubst, map_sub, Derivation.leibniz, smul_eq_mul, pderiv_C, mul_zero, zero_add,
-    map_sum, pderiv_X, Pi.single_apply, mul_zero]
+      map_sum, pderiv_X, Pi.single_apply, mul_zero]
   by_cases h : j₁ = i
   · subst h
     simp [Prod.ext_iff, eq_comm, mul_comm]
   · simp [Prod.ext_iff, h]
 
-theorem not_dvd_pderiv_of_degreeOf_pos {F σ : Type*} [Field F] [CharZero F] {g : MvPolynomial σ F}
-    (hg : g ≠ 0) {i : σ} (hi : 0 < degreeOf i g) : ¬ g ∣ pderiv i g := by
+theorem not_dvd_pderiv_of_degreeOf_pos
+    {F σ : Type*} [Field F] [CharZero F]
+    {g : MvPolynomial σ F} (hg : g ≠ 0)
+    {i : σ} (hi : 0 < degreeOf i g)
+    : ¬ g ∣ pderiv i g := by
   classical
   rintro ⟨q, hq⟩
   have hlt : degreeOf i (pderiv i g) < degreeOf i g := by
@@ -71,27 +76,29 @@ theorem not_dvd_pderiv_of_degreeOf_pos {F σ : Type*} [Field F] [CharZero F] {g 
   rw [hq, degreeOf_mul_eq hg (right_ne_zero_of_mul (hq ▸ hne))] at hlt
   omega
 
-theorem ChowFormBirational.proof (h₁ : IncidenceGeneric.Statement)
-    (h₂ : ChowFormMultiHomog.Statement) : ChowFormBirational.Statement := by
+theorem ChowFormBirational.proof
+    (h₁ : IncidenceGeneric.Statement) (h₂ : ChowFormMultiHomog.Statement)
+    : ChowFormBirational.Statement := by
   intro F _ _ n k P g c hP hg hc
   have := hP.isPrime
   classical
-
   have hmem : ∀ h, h ∈ incIdeal P (k + 1) ↔ g ∣ h := by
     intro h
     rw [← hg.2 h, incIdeal]
     simp only [Submodule.mem_iInf, RingHom.mem_ker]
-  have hg0 : aeval (genSubst (genPt P) c) g = 0 :=
-    (h₁ F n (k + 1) P c hc g).1 ((hmem g).2 dvd_rfl)
+  have hg0 : aeval (genSubst (genPt P) c) g = 0 := (h₁ F n (k + 1) P c hc g).1 ((hmem g).2 dvd_rfl)
 
-  have hA : ∀ m, aeval (genSubst (genPt P) c) (pderiv (0, m) g) =
-      C (genPt P m) * ∑ l, aeval (genSubst (genPt P) c) (pderiv (0, l) g) * C (c l) := by
+  have hA
+      : ∀ m,
+        aeval (genSubst (genPt P) c) (pderiv (0, m) g)
+          = C (genPt P m) * ∑ l, aeval (genSubst (genPt P) c) (pderiv (0, l) g) * C (c l) := by
     intro m
     have h := pderiv_aeval_eq_sum (genSubst (genPt P) c) (0, m) g
     rw [hg0, map_zero] at h
     simp only [pderiv_genSubst, mul_sub, Finset.sum_sub_distrib, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, Fintype.sum_prod_type, Fin.sum_univ_succ,
-      Fin.succ_ne_zero, if_false, Finset.sum_const_zero, add_zero] at h
+        Finset.sum_ite_eq', Finset.mem_univ, if_true, Fintype.sum_prod_type, Fin.sum_univ_succ,
+        Fin.succ_ne_zero, if_false, Finset.sum_const_zero, add_zero]
+      at h
     rw [eq_comm, sub_eq_zero] at h
     rw [h, Finset.mul_sum]
     exact Finset.sum_congr rfl fun l _ => by ring
@@ -114,8 +121,9 @@ theorem ChowFormBirational.proof (h₁ : IncidenceGeneric.Statement)
     ⟨_, hA⟩
   have hdeg : 0 < degreeOf (0, l) g := lt_of_lt_of_le hl (monomial_le_degreeOf _ hs)
   refine ⟨Pi.single l 1, ?_, fun m => ?_⟩
-  · have hsum : (∑ l', C ((Pi.single l (1 : F) : Fin n → F) l') * pderiv (0, l') g) =
-        pderiv (0, l) g := by
+  · have hsum
+        : (∑ l', C ((Pi.single l (1 : F) : Fin n → F) l') * pderiv (0, l') g)
+          = pderiv (0, l) g := by
       rw [Finset.sum_eq_single l]
       · simp
       · intro b _ hb; simp [hb]
@@ -123,10 +131,10 @@ theorem ChowFormBirational.proof (h₁ : IncidenceGeneric.Statement)
     rw [hsum, hmem]
     exact not_dvd_pderiv_of_degreeOf_pos hg.1 hdeg
   set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [map_sum, map_mul, aeval_C, MvPolynomial.algebraMap_apply, hρ]
-      simp only [Finset.sum_mul, Finset.mul_sum]
-      refine Finset.sum_congr rfl fun l' _ => ?_
-      ring
+  · simp only [map_sum, map_mul, aeval_C, MvPolynomial.algebraMap_apply, hρ]
+    simp only [Finset.sum_mul, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun l' _ => ?_
+    ring
 
 end
 

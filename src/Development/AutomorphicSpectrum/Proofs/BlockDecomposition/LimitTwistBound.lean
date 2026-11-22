@@ -6,7 +6,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TraceEop
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.UnitaryBC MeasureTheory PositivityTheory.S2.Clozel
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.UnitaryBC
+  MeasureTheory PositivityTheory.S2.Clozel
 
 noncomputable section
 
@@ -21,17 +22,21 @@ theorem eq_zero_of_exp_mul_eq_one {c : ℂ} (h : ∀ t : ℝ, Complex.exp (c * t
   have h3 := h1.unique (hasDerivAt_const (0 : ℝ) (1 : ℂ))
   simpa using h3
 
-theorem total_trace_eq_zero {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ}
-    {V : Submodule ℂ (Sm E N)} {m : (E →+* ℂ) → Multiset ℂ} (hV : IsDiscrete V)
-    (hm : ∀ τ, HasInfCharGL V τ (m τ)) : ∑ τ, (m τ).sum = 0 := by
+theorem total_trace_eq_zero
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {N : ℕ} {V : Submodule ℂ (Sm E N)} {m : (E →+* ℂ) → Multiset ℂ}
+    (hV : IsDiscrete V) (hm : ∀ τ, HasInfCharGL V τ (m τ))
+    : ∑ τ, (m τ).sum = 0 := by
   obtain ⟨φ, hφ, hφ0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hV.ne_bot
   obtain ⟨g, hg⟩ : ∃ g, φ.1 g ≠ 0 := by
     by_contra hcon
     push_neg at hcon
     exact hφ0 (Subtype.ext (funext hcon))
   have hlie : lie E N (oneL E N) φ = (∑ τ, (m τ).sum) • φ := by
-    rw [GlobalTheory.CompanionTheory.ClozelLie.lie_oneL_eq_sum_Eop, LinearMap.sum_apply, Finset.sum_smul]
-    exact Finset.sum_congr rfl fun τ _ => GlobalTheory.CompanionTheory.CentEig.trace_Eop_eq_of_hasInfCharGL (hm τ) φ hφ
+    rw [GlobalTheory.CompanionTheory.ClozelLie.lie_oneL_eq_sum_Eop, LinearMap.sum_apply,
+      Finset.sum_smul]
+    exact Finset.sum_congr rfl fun τ _ =>
+      GlobalTheory.CompanionTheory.CentEig.trace_Eop_eq_of_hasInfCharGL (hm τ) φ hφ
   refine eq_zero_of_exp_mul_eq_one fun t => ?_
   have h1 := GlobalTheory.CompanionTheory.Clozel.eigen_along_splitCentre E N φ _ hlie t g
   rw [(hV.sqInt φ hφ).1 t g] at h1

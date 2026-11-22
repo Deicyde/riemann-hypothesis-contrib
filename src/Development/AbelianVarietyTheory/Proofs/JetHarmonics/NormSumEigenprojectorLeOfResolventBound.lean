@@ -27,18 +27,17 @@ private lemma circleIntegral_finset_sum_of_continuousOn {E ι : Type*} [NormedAd
     simp only [Finset.sum_insert ha]
     rw [circleIntegral.integral_add (ha'.circleIntegrable hR) (hsum.circleIntegrable hR), ih hs]
 
-
 open Finset Complex in
 open scoped InnerProductSpace in
-theorem _root_.GlobalTheory.norm_sum_eigenprojector_le_of_resolvent_bound :
-    ∀ (H κ : Type) [NormedAddCommGroup H] [NormedSpace ℂ H] [Fintype κ] [DecidableEq κ]
-    (VV : Submodule ℂ H) (T : H →ₗ[ℂ] H) (p : κ → H →ₗ[ℂ] H) (lam : κ → ℂ) (In : Finset κ)
-    (c : ℂ) (R Mc : ℝ), FiniteDimensional ℂ VV → 0 < R → 0 ≤ Mc →
-    (∀ x ∈ VV, ∑ i, p i x = x) →
-    (∀ i, ∀ x ∈ VV, p i x ∈ VV ∧ T (p i x) = lam i • p i x) →
-    (∀ i ∈ In, ‖lam i - c‖ < R) → (∀ i, i ∉ In → R < ‖lam i - c‖) →
-    (∀ ζ : ℂ, ‖ζ - c‖ = R → ∀ x ∈ VV, ‖x‖ ≤ Mc * ‖ζ • x - T x‖) →
-    ∀ x ∈ VV, ‖∑ i ∈ In, p i x‖ ≤ R * Mc * ‖x‖ := by
+theorem _root_.GlobalTheory.norm_sum_eigenprojector_le_of_resolvent_bound
+    : ∀ (H κ : Type) [NormedAddCommGroup H] [NormedSpace ℂ H] [Fintype κ] [DecidableEq κ]
+        (VV : Submodule ℂ H) (T : H →ₗ[ℂ] H) (p : κ → H →ₗ[ℂ] H) (lam : κ → ℂ) (In : Finset κ)
+        (c : ℂ) (R Mc : ℝ),
+      FiniteDimensional ℂ VV → 0 < R → 0 ≤ Mc → (∀ x ∈ VV, ∑ i, p i x = x)
+        → (∀ i, ∀ x ∈ VV, p i x ∈ VV ∧ T (p i x) = lam i • p i x) → (∀ i ∈ In, ‖lam i - c‖ < R)
+        → (∀ i, i ∉ In → R < ‖lam i - c‖)
+        → (∀ ζ : ℂ, ‖ζ - c‖ = R → ∀ x ∈ VV, ‖x‖ ≤ Mc * ‖ζ • x - T x‖)
+        → ∀ x ∈ VV, ‖∑ i ∈ In, p i x‖ ≤ R * Mc * ‖x‖ := by
   intro H κ _ _ _ _ VV T p lam In c R Mc hfin hR hMc hsum hp hin hout hres x hx
   haveI : FiniteDimensional ℂ VV := hfin
   haveI : CompleteSpace VV := FiniteDimensional.complete ℂ VV
@@ -56,8 +55,7 @@ theorem _root_.GlobalTheory.norm_sum_eigenprojector_le_of_resolvent_bound :
 
   have hF : ∀ ζ ∈ Metric.sphere c R, ‖F ζ‖ ≤ Mc * ‖x‖ := by
     intro ζ hζ
-    have hcoe : ((F ζ : VV) : H) = ∑ i, (ζ - lam i)⁻¹ • p i x := by
-      simp [F, v]
+    have hcoe : ((F ζ : VV) : H) = ∑ i, (ζ - lam i)⁻¹ • p i x := by simp [F, v]
     have key : ζ • ((F ζ : VV) : H) - T ((F ζ : VV) : H) = x := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [hcoe, map_sum, Finset.smul_sum, ← Finset.sum_sub_distrib]
@@ -71,8 +69,8 @@ theorem _root_.GlobalTheory.norm_sum_eigenprojector_le_of_resolvent_bound :
     rw [key] at this
     simpa [Submodule.coe_norm] using this
 
-  have hval : ∀ i, (∮ z in C(c, R), (z - lam i)⁻¹) =
-      if i ∈ In then 2 * (Real.pi : ℂ) * I else 0 := by
+  have hval
+      : ∀ i, (∮ z in C(c, R), (z - lam i)⁻¹) = if i ∈ In then 2 * (Real.pi : ℂ) * I else 0 := by
     intro i
     by_cases hi : i ∈ In
     · rw [if_pos hi]
@@ -83,15 +81,15 @@ theorem _root_.GlobalTheory.norm_sum_eigenprojector_le_of_resolvent_bound :
         rw [sub_eq_zero] at h
         rw [mem_closedBall_iff_norm, h] at hz
         exact absurd (hout i hi) (not_lt.mpr hz)
-      refine circleIntegral_eq_zero_of_differentiable_on_off_countable hR.le
-        Set.countable_empty ?_ ?_
+      refine circleIntegral_eq_zero_of_differentiable_on_off_countable hR.le Set.countable_empty ?_
+        ?_
       · exact (continuousOn_id.sub continuousOn_const).inv₀ hoff
       · intro z hz
-        exact (differentiableAt_id.sub_const _).inv
-          (hoff z (Metric.ball_subset_closedBall hz.1))
+        exact (differentiableAt_id.sub_const _).inv (hoff z (Metric.ball_subset_closedBall hz.1))
   have hint : (∮ z in C(c, R), F z) = (2 * (Real.pi : ℂ) * I) • ∑ i ∈ In, v i := by
-    have hcont : ∀ i ∈ (Finset.univ : Finset κ),
-        ContinuousOn (fun z : ℂ => (z - lam i)⁻¹ • v i) (Metric.sphere c R) := by
+    have hcont
+        : ∀ i ∈ (Finset.univ : Finset κ),
+          ContinuousOn (fun z : ℂ => (z - lam i)⁻¹ • v i) (Metric.sphere c R) := by
       intro i _
       exact ((continuousOn_id.sub continuousOn_const).inv₀ fun z hz => hne i z hz).smul
         continuousOn_const
@@ -101,8 +99,7 @@ theorem _root_.GlobalTheory.norm_sum_eigenprojector_le_of_resolvent_bound :
     rw [Finset.sum_ite_mem, Finset.univ_inter, Finset.smul_sum]
   have hbound := circleIntegral.norm_integral_le_of_norm_le_const hR.le hF
   rw [hint, norm_smul] at hbound
-  have hnorm : ‖(2 * (Real.pi : ℂ) * I)‖ = 2 * Real.pi := by
-    simp [Real.pi_pos.le]
+  have hnorm : ‖(2 * (Real.pi : ℂ) * I)‖ = 2 * Real.pi := by simp [Real.pi_pos.le]
   rw [hnorm] at hbound
   have hS : ‖∑ i ∈ In, p i x‖ = ‖∑ i ∈ In, v i‖ := by
     have hc : ((∑ i ∈ In, v i : VV) : H) = ∑ i ∈ In, p i x := by simp [v]

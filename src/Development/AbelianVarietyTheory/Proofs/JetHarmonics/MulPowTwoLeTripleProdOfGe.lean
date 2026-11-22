@@ -311,16 +311,22 @@ lemma add_step' [DecidableEq K] {W : Affine K} {M : ℝ} (h₁ : ‖W.a₁‖ �
   refine le_of_eq_of_le (congrArg norm ?_) this
   ring
 
-theorem norm_x_le_one [DecidableEq K] {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1) (h₂ : ‖W.a₂‖ ≤ 1)
-    (h₃ : ‖W.a₃‖ ≤ 1) (h₄ : ‖W.a₄‖ ≤ 1) (h₆ : ‖W.a₆‖ ≤ 1) (N : ℕ) (x y : K)
-    (h : W.Nonsingular x y) (hN : ‖(N : K)‖ = 1)
-    (h0 : N • (Affine.Point.some x y h) = 0) : ‖x‖ ≤ 1 := by
+theorem norm_x_le_one
+    [DecidableEq K]
+    {W : Affine K}
+    (h₁ : ‖W.a₁‖ ≤ 1) (h₂ : ‖W.a₂‖ ≤ 1) (h₃ : ‖W.a₃‖ ≤ 1) (h₄ : ‖W.a₄‖ ≤ 1) (h₆ : ‖W.a₆‖ ≤ 1)
+    (N : ℕ)
+    (x y : K) (h : W.Nonsingular x y)
+    (hN : ‖(N : K)‖ = 1) (h0 : N • (Affine.Point.some x y h) = 0)
+    : ‖x‖ ≤ 1 := by
   by_contra hx
   push Not at hx
   have M0 : 0 ≤ ‖x‖⁻¹ := by positivity
   have hP : Near ‖x‖ (Affine.Point.some x y h) := le_refl _
-  have key : ∀ k : ℕ, Near ‖x‖ (k • Affine.Point.some x y h) ∧
-      ‖param (k • Affine.Point.some x y h) - (k : K) * (x / y)‖ ≤ ‖x‖⁻¹ := by
+  have key
+      : ∀ k : ℕ,
+        Near ‖x‖ (k • Affine.Point.some x y h)
+          ∧ ‖param (k • Affine.Point.some x y h) - (k : K) * (x / y)‖ ≤ ‖x‖⁻¹ := by
     intro k
     induction k with
     | zero =>
@@ -337,8 +343,8 @@ theorem norm_x_le_one [DecidableEq K] {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1)
       ring
   have h1 := (key N).2
   rw [h0] at h1
-  simp only [Affine.Point.zero_def, param, zero_sub, norm_neg, norm_mul, hN, one_mul,
-    norm_div] at h1
+  simp only [Affine.Point.zero_def, param, zero_sub, norm_neg, norm_mul, hN, one_mul, norm_div]
+    at h1
   have hy := norm_y_sq' h₁ h₂ h₃ h₄ h₆ hx ((Affine.equation_iff _ _).1 h.1)
   have x0 : 0 < ‖x‖ := by linarith
   have y0 : 0 < ‖y‖ := by
@@ -353,11 +359,13 @@ theorem norm_x_le_one [DecidableEq K] {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1)
   have : ‖x‖ ^ 3 * 1 < ‖x‖ ^ 3 * ‖x‖ := by gcongr
   nlinarith
 
-theorem norm_x_sub_eq_one {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1) (h₂ : ‖W.a₂‖ ≤ 1)
-    (h₃ : ‖W.a₃‖ ≤ 1) (h₄ : ‖W.a₄‖ ≤ 1) (h₆ : ‖W.a₆‖ ≤ 1) (hΔ : ‖W.Δ‖ = 1) {x₁ x₂ y₁ y₂ : K}
-    (k₁ : W.Equation x₁ y₁) (k₂ : W.Equation x₂ y₂) (hx : x₁ ≠ x₂) (i₁ : ‖x₁‖ ≤ 1) (i₂ : ‖x₂‖ ≤ 1)
-    (i₃ : ‖W.addX x₁ x₂ ((y₁ - y₂) / (x₁ - x₂))‖ ≤ 1)
-    (i₄ : ‖W.addX x₁ x₂ ((y₁ - W.negY x₂ y₂) / (x₁ - x₂))‖ ≤ 1) : ‖x₁ - x₂‖ = 1 := by
+theorem norm_x_sub_eq_one
+    {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1) (h₂ : ‖W.a₂‖ ≤ 1) (h₃ : ‖W.a₃‖ ≤ 1) (h₄ : ‖W.a₄‖ ≤ 1)
+    (h₆ : ‖W.a₆‖ ≤ 1) (hΔ : ‖W.Δ‖ = 1)
+    {x₁ x₂ y₁ y₂ : K} (k₁ : W.Equation x₁ y₁) (k₂ : W.Equation x₂ y₂) (hx : x₁ ≠ x₂) (i₁ : ‖x₁‖ ≤ 1)
+    (i₂ : ‖x₂‖ ≤ 1) (i₃ : ‖W.addX x₁ x₂ ((y₁ - y₂) / (x₁ - x₂))‖ ≤ 1)
+    (i₄ : ‖W.addX x₁ x₂ ((y₁ - W.negY x₂ y₂) / (x₁ - x₂))‖ ≤ 1)
+    : ‖x₁ - x₂‖ = 1 := by
   have m₁ : W.a₁ ∈ intRing K := h₁
   have m₂ : W.a₂ ∈ intRing K := h₂
   have j₁ : x₁ ∈ intRing K := i₁
@@ -377,10 +385,13 @@ theorem norm_x_sub_eq_one {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1) (h₂ : ‖
   have md : x₁ - x₂ ∈ intRing K := sub_mem j₁ j₂
   obtain ⟨α, mα, eα⟩ : ∃ α ∈ intRing K, W.a₃ + x₁ * W.a₁ + 2 * y₁ = (x₁ - x₂) * α :=
     ⟨l + l' + W.a₁, add_mem (add_mem l₃ l₄) m₁, by linear_combination -e₃ - e₄⟩
-  obtain ⟨β, mβ, eβ⟩ : ∃ β ∈ intRing K,
-      W.a₄ + 2 * x₁ * W.a₂ - y₁ * W.a₁ + 3 * x₁ ^ 2 = (x₁ - x₂) * β := by
-    refine ⟨l * l' + x₁ + x₁ + x₂ + W.a₂,
-      add_mem (add_mem (add_mem (add_mem (mul_mem l₃ l₄) j₁) j₁) j₂) m₂, mul_left_cancel₀ hd ?_⟩
+  obtain ⟨β, mβ, eβ⟩
+      : ∃ β ∈ intRing K, W.a₄ + 2 * x₁ * W.a₂ - y₁ * W.a₁ + 3 * x₁ ^ 2 = (x₁ - x₂) * β := by
+    refine ⟨
+      l * l' + x₁ + x₁ + x₂ + W.a₂,
+      add_mem (add_mem (add_mem (add_mem (mul_mem l₃ l₄) j₁) j₁) j₂) m₂,
+      mul_left_cancel₀ hd ?_
+    ⟩
     linear_combination k₂ - k₁ - l' * (x₁ - x₂) * e₃ - (y₁ - y₂) * e₄
   let V : WeierstrassCurve K := ⟨W.a₁, W.a₂ + 3 * x₁, (x₁ - x₂) * α, (x₁ - x₂) * β, 0⟩
   have hV : (⟨1, x₁, 0, y₁⟩ : VariableChange K) • W = V := by
@@ -394,10 +405,15 @@ theorem norm_x_sub_eq_one {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1) (h₂ : ‖
   have hΔ' : V.Δ = W.Δ := by rw [← hV, variableChange_Δ]; simp
   refine le_antisymm md ?_
   have ma : W.a₂ + 3 * x₁ ∈ intRing K := add_mem m₂ (mul_mem norm_three_le j₁)
-  have e : V.Δ = (x₁ - x₂) * ((x₁ - x₂) * (-(W.a₁ ^ 2 + 4 * (W.a₂ + 3 * x₁)) ^ 2 *
-      (-(W.a₁ * α * β) + (W.a₂ + 3 * x₁) * α ^ 2 - β ^ 2) -
-      8 * (x₁ - x₂) * (2 * β + W.a₁ * α) ^ 3 - 27 * (x₁ - x₂) ^ 2 * α ^ 4 +
-      9 * (W.a₁ ^ 2 + 4 * (W.a₂ + 3 * x₁)) * (2 * β + W.a₁ * α) * (x₁ - x₂) * α ^ 2)) := by
+  have e
+      : V.Δ
+        = (x₁ - x₂)
+          * ((x₁ - x₂)
+            * (- (W.a₁ ^ 2 + 4 * (W.a₂ + 3 * x₁)) ^ 2
+                * (-(W.a₁ * α * β) + (W.a₂ + 3 * x₁) * α ^ 2 - β ^ 2)
+              - 8 * (x₁ - x₂) * (2 * β + W.a₁ * α) ^ 3 - 27 * (x₁ - x₂) ^ 2 * α ^ 4
+              + 9 * (W.a₁ ^ 2 + 4 * (W.a₂ + 3 * x₁)) * (2 * β + W.a₁ * α) * (x₁ - x₂)
+                * α ^ 2)) := by
     simp only [V, Δ, b₂, b₄, b₆, b₈]
     ring
   rw [← hΔ, ← hΔ', e]
@@ -406,29 +422,36 @@ theorem norm_x_sub_eq_one {W : Affine K} (h₁ : ‖W.a₁‖ ≤ 1) (h₂ : ‖
   generalize x₁ - x₂ = d at md
   have mb : W.a₁ ^ 2 + 4 * a ∈ intRing K := add_mem (pow_mem m₁ _) (mul_mem (ofNat_mem _ _) ma)
   have mc : 2 * β + W.a₁ * α ∈ intRing K := add_mem (mul_mem (ofNat_mem _ _) mβ) (mul_mem m₁ mα)
-  exact mul_mem md (add_mem (sub_mem (sub_mem (mul_mem (neg_mem (pow_mem mb _))
-    (sub_mem (add_mem (neg_mem (mul_mem (mul_mem m₁ mα) mβ)) (mul_mem ma (pow_mem mα _)))
-      (pow_mem mβ _))) (mul_mem (mul_mem (ofNat_mem _ _) md) (pow_mem mc _)))
-    (mul_mem (mul_mem (ofNat_mem _ _) (pow_mem md _)) (pow_mem mα _)))
-    (mul_mem (mul_mem (mul_mem (mul_mem (ofNat_mem _ _) mb) mc) md) (pow_mem mα _)))
+  exact mul_mem md
+    (add_mem
+      (sub_mem
+        (sub_mem
+          (mul_mem (neg_mem (pow_mem mb _))
+            (sub_mem (add_mem (neg_mem (mul_mem (mul_mem m₁ mα) mβ)) (mul_mem ma (pow_mem mα _)))
+              (pow_mem mβ _)))
+          (mul_mem (mul_mem (ofNat_mem _ _) md) (pow_mem mc _)))
+        (mul_mem (mul_mem (ofNat_mem _ _) (pow_mem md _)) (pow_mem mα _)))
+      (mul_mem (mul_mem (mul_mem (mul_mem (ofNat_mem _ _) mb) mc) md) (pow_mem mα _)))
 
 end General
 
-
 open Classical in
-theorem torsion_integral_and_distinct (q : ℕ) [Fact q.Prime] (M : Mdl q) (N : ℕ) (hM : M.Ok)
-    (hN : Nat.Coprime N q) :
-    (∀ p : ℂ, (N : ℂ) * p ∈ M.L.lattice → p ∉ M.L.lattice → ‖M.ι (M.x p)‖ ≤ 1) ∧
-    ∀ p p' : ℂ, (N : ℂ) * p ∈ M.L.lattice → (N : ℂ) * p' ∈ M.L.lattice → p ∉ M.L.lattice →
-      p' ∉ M.L.lattice → p + p' ∉ M.L.lattice → p - p' ∉ M.L.lattice →
-      ‖M.ι (M.x p) - M.ι (M.x p')‖ = 1 := by
+theorem torsion_integral_and_distinct
+    (q : ℕ) [Fact q.Prime] (M : Mdl q) (N : ℕ) (hM : M.Ok) (hN : Nat.Coprime N q)
+    : (∀ p : ℂ, (N : ℂ) * p ∈ M.L.lattice → p ∉ M.L.lattice → ‖M.ι (M.x p)‖ ≤ 1)
+      ∧ ∀ p p' : ℂ,
+        (N : ℂ) * p ∈ M.L.lattice → (N : ℂ) * p' ∈ M.L.lattice → p ∉ M.L.lattice → p' ∉ M.L.lattice
+          → p + p' ∉ M.L.lattice → p - p' ∉ M.L.lattice
+          → ‖M.ι (M.x p) - M.ι (M.x p')‖ = 1 := by
   obtain ⟨φ, -, hker, hφ⟩ := Mdl.exists_pointHom q M hM
   obtain ⟨-, h₁, h₂, h₃, h₄, h₆, hΔ, -, -⟩ := hM
   have hNn : ‖(N : ℂ_[q])‖ = 1 := by
     rw [← map_natCast (algebraMap ℚ_[q] ℂ_[q]), norm_algebraMap']
     exact Padic.norm_natCast_eq_one_iff.2 hN.symm
-  have int : ∀ (p : ℂ) (x y : ℂ_[q]) (h), (N : ℂ) * p ∈ M.L.lattice →
-      φ p = Affine.Point.some x y h → ‖x‖ ≤ 1 := fun p x y h hp e => by
+  have int
+      : ∀ (p : ℂ) (x y : ℂ_[q]) (h),
+        (N : ℂ) * p ∈ M.L.lattice → φ p = Affine.Point.some x y h
+          → ‖x‖ ≤ 1 := fun p x y h hp e => by
     refine norm_x_le_one (W := M.W.toAffine) h₁ h₂ h₃ h₄ h₆ N x y h hNn ?_
     rw [← e, ← map_nsmul, hker, nsmul_eq_mul]
     exact hp

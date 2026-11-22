@@ -22,7 +22,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CarriesI
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
 open scoped ContDiff
 
@@ -32,14 +33,18 @@ section Tree
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-def indFin {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s)) : Submodule ℂ (Sm E (r + s)) :=
+def indFin {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s))
+    : Submodule ℂ (Sm E (r + s)) :=
   Submodule.span ℂ {φ | MemInd2 U₁ U₂ φ ∧ φ ∈ finVec (cptRep E (r + s))}
 
-theorem indFin_le {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s)) : indFin U₁ U₂ ≤ indSpan U₁ U₂ :=
+theorem indFin_le {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s))
+    : indFin U₁ U₂ ≤ indSpan U₁ U₂ :=
   Submodule.span_mono fun _ h => h.1
 
-theorem memInd2_of_indSpan {r s : ℕ} {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
-    (h : φ ∈ indSpan U₁ U₂) : MemInd2 U₁ U₂ φ := by
+theorem memInd2_of_indSpan
+    {r s : ℕ} {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
+    (h : φ ∈ indSpan U₁ U₂)
+    : MemInd2 U₁ U₂ φ := by
   induction h using Submodule.span_induction with
   | mem x hx => exact hx
   | zero => exact ⟨fun _ _ => rfl, fun _ _ => zero_mem _⟩
@@ -52,20 +57,26 @@ theorem memInd2_of_indSpan {r s : ℕ} {U₁ : Submodule ℂ (Sm E r)} {U₂ : S
     change c * x.1 _ = c * x.1 g
     rw [hx.1]
 
-theorem finVec_of_indFin {r s : ℕ} {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
-    (h : φ ∈ indFin U₁ U₂) : φ ∈ finVec (cptRep E (r + s)) :=
+theorem finVec_of_indFin
+    {r s : ℕ} {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
+    (h : φ ∈ indFin U₁ U₂)
+    : φ ∈ finVec (cptRep E (r + s)) :=
   (Submodule.span_le (s := {x | MemInd2 U₁ U₂ x ∧ x ∈ finVec (cptRep E (r + s))})
-    (p := finVec (cptRep E (r + s)))).2
-    (fun x (hx : MemInd2 U₁ U₂ x ∧ x ∈ finVec (cptRep E (r + s))) => hx.2) h
+      (p := finVec (cptRep E (r + s)))).2
+    (fun x (hx : MemInd2 U₁ U₂ x ∧ x ∈ finVec (cptRep E (r + s))) => hx.2)
+    h
 
-theorem mem_indFin {r s : ℕ} {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
-    (h₁ : MemInd2 U₁ U₂ φ) (h₂ : φ ∈ finVec (cptRep E (r + s))) : φ ∈ indFin U₁ U₂ :=
+theorem mem_indFin
+    {r s : ℕ} {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
+    (h₁ : MemInd2 U₁ U₂ φ) (h₂ : φ ∈ finVec (cptRep E (r + s)))
+    : φ ∈ indFin U₁ U₂ :=
   Submodule.subset_span ⟨h₁, h₂⟩
 
-theorem finStable_indFin {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s)) :
-    FinStable (indFin U₁ U₂) := by
+theorem finStable_indFin {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s))
+    : FinStable (indFin U₁ U₂) := by
   intro g φ hφ
-  refine mem_indFin (memInd2_of_indSpan (GlobalTheory.T.finStable_induced_span U₁ U₂ g φ (indFin_le _ _ hφ))) ?_
+  refine mem_indFin
+    (memInd2_of_indSpan (GlobalTheory.T.finStable_induced_span U₁ U₂ g φ (indFin_le _ _ hφ))) ?_
   have h1 := finVec_rt (finVec_of_indFin hφ) 1 g
   have e : rt E (r + s) (cf (r + s) 1 g) φ = act (.fin g) φ := by
     refine Subtype.ext (funext fun x => ?_)
@@ -73,7 +84,8 @@ theorem finStable_indFin {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Sub
     rfl
   rwa [e] at h1
 
-theorem mul_mem_Sm {N : ℕ} {e f : GA E N → ℂ} (he : e ∈ Sm E N) (hf : f ∈ Sm E N) : (fun x => e x * f x) ∈ Sm E N := by
+theorem mul_mem_Sm {N : ℕ} {e f : GA E N → ℂ} (he : e ∈ Sm E N) (hf : f ∈ Sm E N)
+    : (fun x => e x * f x) ∈ Sm E N := by
   intro g
   refine ((he g).mul (hf g)).congr fun x hx => ?_
   have hx' : IsUnit (Matrix.of x) := hx
@@ -84,23 +96,29 @@ def mulOp {N : ℕ} {e : GA E N → ℂ} (he : e ∈ Sm E N) : Sm E N →ₗ[ℂ
   map_add' φ ψ := Subtype.ext (funext fun x => mul_add _ _ _)
   map_smul' c φ := Subtype.ext (funext fun x => mul_left_comm _ _ _)
 
-theorem carries_indFin {r s : ℕ} (e₁ : GA E r → ℂ) (e₂ : GA E s → ℂ) (U₁ U₁' : Submodule ℂ (Sm E r))
-    (U₂ U₂' : Submodule ℂ (Sm E s)) (h₁ : FlatFn e₁) (h₂ : FlatFn e₂) (a₁ : FinStable U₁) (a₁' : FinStable U₁')
-    (a₂ : FinStable U₂) (a₂' : FinStable U₂') (c₁ : Carries e₁ U₁ U₁') (c₂ : Carries e₂ U₂ U₂') :
-    Carries (nodeFn e₁ e₂) (indFin U₁ U₂) (indFin U₁' U₂') := by
+theorem carries_indFin
+    {r s : ℕ} (e₁ : GA E r → ℂ) (e₂ : GA E s → ℂ) (U₁ U₁' : Submodule ℂ (Sm E r))
+    (U₂ U₂' : Submodule ℂ (Sm E s)) (h₁ : FlatFn e₁) (h₂ : FlatFn e₂) (a₁ : FinStable U₁)
+    (a₁' : FinStable U₁') (a₂ : FinStable U₂) (a₂' : FinStable U₂') (c₁ : Carries e₁ U₁ U₁')
+    (c₂ : Carries e₂ U₂ U₂')
+    : Carries (nodeFn e₁ e₂) (indFin U₁ U₂) (indFin U₁' U₂') := by
   intro φ hφ
-  obtain ⟨φ', h', he⟩ := GlobalTheory.T.carries_induced_node e₁ e₂ U₁ U₁' U₂ U₂' h₁ h₂ a₁ a₁' a₂ a₂' c₁ c₂ φ (indFin_le _ _ hφ)
+  obtain ⟨φ', h', he⟩ :=
+    GlobalTheory.T.carries_induced_node e₁ e₂ U₁ U₁' U₂ U₂' h₁ h₂ a₁ a₁' a₂ a₂' c₁ c₂ φ
+      (indFin_le _ _ hφ)
   refine ⟨φ', mem_indFin (memInd2_of_indSpan h') ?_, he⟩
   have hF := GlobalTheory.T.flat_node_function e₁ e₂ h₁ h₂
-  have hv : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun k => cptRep E (r + s) k φ)) := finVec_of_indFin hφ
+  have hv : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun k => cptRep E (r + s) k φ)) :=
+    finVec_of_indFin hφ
   refine Submodule.finiteDimensional_of_le
-    (S₂ := (Submodule.span ℂ (Set.range fun k => cptRep E (r + s) k φ)).map (mulOp hF.sm)) (Submodule.span_le.2 ?_)
+    (S₂ := (Submodule.span ℂ (Set.range fun k => cptRep E (r + s) k φ)).map (mulOp hF.sm))
+    (Submodule.span_le.2 ?_)
   rintro _ ⟨k, rfl⟩
   refine ⟨cptRep E (r + s) k φ, Submodule.subset_span ⟨k, rfl⟩, Subtype.ext (funext fun x => ?_)⟩
   have e0 : x * infGL E (r + s) (Unitary.toUnits k) = x * cf (r + s) k 1 := by
     rw [cf, map_one, mul_one]
-  change nodeFn e₁ e₂ x * φ.1 (x * infGL E (r + s) (Unitary.toUnits k)) =
-    φ'.1 (x * infGL E (r + s) (Unitary.toUnits k))
+  change nodeFn e₁ e₂ x * φ.1 (x * infGL E (r + s) (Unitary.toUnits k))
+    = φ'.1 (x * infGL E (r + s) (Unitary.toUnits k))
   rw [he, e0, hF.rinv x k 1 (one_mem _)]
 
 theorem fd_rank_zero (U : Submodule ℂ (Sm E 0)) : FiniteDimensional ℂ U := by
@@ -109,9 +127,11 @@ theorem fd_rank_zero (U : Submodule ℂ (Sm E 0)) : FiniteDimensional ℂ U := b
   infer_instance
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem strip_node_inv {r s : ℕ} (a : Tr E r) (b : Tr E s) : ∀ {N : ℕ} (u : Tr E N), N = r + s →
-    HEq u.strip (Tr.node a.strip b.strip) → ∃ (u₁ : Tr E r) (u₂ : Tr E s), HEq u (Tr.node u₁ u₂) ∧
-      u₁.strip = a.strip ∧ u₂.strip = b.strip := by
+theorem strip_node_inv {r s : ℕ} (a : Tr E r) (b : Tr E s)
+    : ∀ {N : ℕ} (u : Tr E N),
+      N = r + s → HEq u.strip (Tr.node a.strip b.strip)
+        → ∃ (u₁ : Tr E r) (u₂ : Tr E s),
+          HEq u (Tr.node u₁ u₂) ∧ u₁.strip = a.strip ∧ u₂.strip = b.strip := by
   intro N u
   cases u with
   | leaf V z =>
@@ -124,14 +144,19 @@ theorem strip_node_inv {r s : ℕ} (a : Tr E r) (b : Tr E s) : ∀ {N : ℕ} (u 
     subst hr hs
     exact ⟨u₁, u₂, HEq.rfl, eq_of_heq h₁, eq_of_heq h₂⟩
 
-theorem strip_node {r s : ℕ} (a : Tr E r) (b : Tr E s) (u : Tr E (r + s)) (h : u.strip = (Tr.node a b).strip) :
-    ∃ (u₁ : Tr E r) (u₂ : Tr E s), u = Tr.node u₁ u₂ ∧ u₁.strip = a.strip ∧ u₂.strip = b.strip := by
+theorem strip_node
+    {r s : ℕ} (a : Tr E r) (b : Tr E s) (u : Tr E (r + s)) (h : u.strip = (Tr.node a b).strip)
+    : ∃ (u₁ : Tr E r) (u₂ : Tr E s),
+      u = Tr.node u₁ u₂ ∧ u₁.strip = a.strip ∧ u₂.strip = b.strip := by
   obtain ⟨u₁, u₂, h1, h2, h3⟩ := strip_node_inv a b u rfl (heq_of_eq h)
   exact ⟨u₁, u₂, eq_of_heq h1, h2, h3⟩
 
-theorem strip_leaf {N : ℕ} (V : Submodule ℂ (Sm E N)) (z : ℂ) (u : Tr E N) (h : u.strip = (Tr.leaf V z).strip) :
-    ∃ z', u = Tr.leaf V z' := by
-  have key : ∀ {M : ℕ} (u : Tr E M), ∀ (hM : M = N), HEq u.strip (Tr.leaf V (0 : ℂ)) → ∃ z', HEq u (Tr.leaf V z') := by
+theorem strip_leaf
+    {N : ℕ} (V : Submodule ℂ (Sm E N)) (z : ℂ) (u : Tr E N) (h : u.strip = (Tr.leaf V z).strip)
+    : ∃ z', u = Tr.leaf V z' := by
+  have key
+      : ∀ {M : ℕ} (u : Tr E M), ∀ (hM : M = N),
+        HEq u.strip (Tr.leaf V (0 : ℂ)) → ∃ z', HEq u (Tr.leaf V z') := by
     intro M u
     cases u with
     | leaf V' z' =>
@@ -165,8 +190,8 @@ theorem disc_of_good {N : ℕ} (s : Tr E N) : s.Good → s.Disc := by
 theorem space_leaf {N : ℕ} (V : Submodule ℂ (Sm E N)) (z : ℂ) : (Tr.leaf V z).space = tw V z := by
   rw [Tr.space]
 
-theorem space_node {r s : ℕ} (a : Tr E r) (b : Tr E s) :
-    (Tr.node a b).space = indFin (tw a.space ((s : ℂ) / 2)) (tw b.space (-(r : ℂ) / 2)) := by
+theorem space_node {r s : ℕ} (a : Tr E r) (b : Tr E s)
+    : (Tr.node a b).space = indFin (tw a.space ((s : ℂ) / 2)) (tw b.space (-(r : ℂ) / 2)) := by
   rw [Tr.space]
   rfl
 
@@ -184,8 +209,11 @@ theorem treestable {N : ℕ} (t : Tr E N) : t.Disc → FinStable t.space := by
     rw [space_node]
     exact finStable_indFin _ _
 
-theorem treefd {N : ℕ} (t : Tr E N) : t.Disc → ∀ (K : Subgroup (GL (Fin N) (Af E))) (W : Submodule ℂ (Kinf E N → ℂ)),
-    IsOpen (K : Set (GL (Fin N) (Af E))) → FiniteDimensional ℂ W → FiniteDimensional ℂ (typed t.space K W) := by
+theorem treefd {N : ℕ} (t : Tr E N)
+    : t.Disc
+      → ∀ (K : Subgroup (GL (Fin N) (Af E))) (W : Submodule ℂ (Kinf E N → ℂ)),
+        IsOpen (K : Set (GL (Fin N) (Af E))) → FiniteDimensional ℂ W
+          → FiniteDimensional ℂ (typed t.space K W) := by
   induction t with
   | leaf V z =>
     intro ht
@@ -194,7 +222,8 @@ theorem treefd {N : ℕ} (t : Tr E N) : t.Disc → ∀ (K : Subgroup (GL (Fin N)
     rcases ht with ⟨rfl, -, -⟩ | ht
     · intro K W _ _
       exact fd_rank_zero _
-    · exact GlobalTheory.T.finiteDimensional_typed_extension V z fun K W hK hW => GlobalTheory.T.finiteDimensional_typed_discrete V K W ht.2 hK hW
+    · exact GlobalTheory.T.finiteDimensional_typed_extension V z fun K W hK hW =>
+        GlobalTheory.T.finiteDimensional_typed_discrete V K W ht.2 hK hW
   | @node r' s' a b iha ihb =>
     intro ht
     simp only [Tr.Disc] at ht
@@ -202,12 +231,14 @@ theorem treefd {N : ℕ} (t : Tr E N) : t.Disc → ∀ (K : Subgroup (GL (Fin N)
     intro K W hK hW
     haveI := GlobalTheory.T.finiteDimensional_typed_node (tw a.space ((s' : ℂ) / 2)) (tw b.space (-(r' : ℂ) / 2)) (GlobalTheory.T.finiteDimensional_typed_extension _ _ (iha ht.1))
       (GlobalTheory.T.finiteDimensional_typed_extension _ _ (ihb ht.2)) K W hK hW
-    have hle : typed (indFin (tw a.space ((s' : ℂ) / 2)) (tw b.space (-(r' : ℂ) / 2))) K W ≤
-        typed (indSpan (tw a.space ((s' : ℂ) / 2)) (tw b.space (-(r' : ℂ) / 2))) K W :=
+    have hle
+        : typed (indFin (tw a.space ((s' : ℂ) / 2)) (tw b.space (-(r' : ℂ) / 2))) K W
+          ≤ typed (indSpan (tw a.space ((s' : ℂ) / 2)) (tw b.space (-(r' : ℂ) / 2))) K W :=
       inf_le_inf_right _ (indFin_le _ _)
     exact Submodule.finiteDimensional_of_le hle
 
-theorem twists_length {N : ℕ} (s : Tr E N) : ∀ (t : Tr E N), t.strip = s.strip → t.twists.length = s.twists.length := by
+theorem twists_length {N : ℕ} (s : Tr E N)
+    : ∀ (t : Tr E N), t.strip = s.strip → t.twists.length = s.twists.length := by
   induction s with
   | leaf V z =>
     intro t h
@@ -218,16 +249,24 @@ theorem twists_length {N : ℕ} (s : Tr E N) : ∀ (t : Tr E N), t.strip = s.str
     obtain ⟨u₁, u₂, rfl, h1, h2⟩ := strip_node a b t h
     simp only [Tr.twists, List.length_append, iha _ h1, ihb _ h2]
 
-theorem treeflat {N : ℕ} (s : Tr E N) : ∀ (t : ℕ → Tr E N), s.Disc → (∀ k, (t k).Disc) → (∀ k, (t k).strip = s.strip) →
-    (∀ i, Tendsto (fun k => ((t k).twists.getD i 0)) atTop (𝓝 (s.twists.getD i 0))) →
-    ∃ e : ℕ → GA E N → ℂ, (∀ k, FlatFn (e k)) ∧ (∀ k, Carries (e k) (t k).space s.space) ∧
-      ∀ x, Tendsto (fun k => e k x) atTop (𝓝 1) := by
+theorem treeflat {N : ℕ} (s : Tr E N)
+    : ∀ (t : ℕ → Tr E N),
+      s.Disc → (∀ k, (t k).Disc) → (∀ k, (t k).strip = s.strip)
+        → (∀ i, Tendsto (fun k => ((t k).twists.getD i 0)) atTop (𝓝 (s.twists.getD i 0)))
+        → ∃ e : ℕ → GA E N → ℂ,
+          (∀ k, FlatFn (e k)) ∧ (∀ k, Carries (e k) (t k).space s.space)
+            ∧ ∀ x, Tendsto (fun k => e k x) atTop (𝓝 1) := by
   induction s with
   | @leaf M V z =>
     intro t _ _ hst hz
     choose zk hzk using fun k => strip_leaf V z (t k) (hst k)
     obtain rfl : t = fun k => Tr.leaf V (zk k) := funext hzk
-    refine ⟨fun k => absFn M (z - zk k), fun k => GlobalTheory.T.flat_absolute_character M _, fun k => ?_, fun x => ?_⟩
+    refine ⟨
+      fun k => absFn M (z - zk k),
+      fun k => GlobalTheory.T.flat_absolute_character M _,
+      fun k => ?_,
+      fun x => ?_
+    ⟩
     · simp only [space_leaf]
       exact GlobalTheory.T.carries_twist_absolute_character V (zk k) z
     · refine GlobalTheory.T.tendsto_absolute_character_one M x _ ?_
@@ -266,11 +305,20 @@ theorem treeflat {N : ℕ} (s : Tr E N) : ∀ (t : ℕ → Tr E N), s.Disc → (
       simp only [Nat.add_sub_cancel_left]
     obtain ⟨e₁, he₁, hc₁, hl₁'⟩ := iha u₁ hs.1 hd₁ h1 hz₁
     obtain ⟨e₂, he₂, hc₂, hl₂'⟩ := ihb u₂ hs.2 hd₂ h2 hz₂
-    refine ⟨fun k => nodeFn (e₁ k) (e₂ k), fun k => GlobalTheory.T.flat_node_function _ _ (he₁ k) (he₂ k), fun k => ?_, fun x => ?_⟩
+    refine ⟨
+      fun k => nodeFn (e₁ k) (e₂ k),
+      fun k => GlobalTheory.T.flat_node_function _ _ (he₁ k) (he₂ k),
+      fun k => ?_,
+      fun x => ?_
+    ⟩
     · rw [space_node, space_node]
-      exact carries_indFin _ _ _ _ _ _ (he₁ k) (he₂ k) (GlobalTheory.T.finStable_twist _ _ (treestable _ (hd₁ k)))
-        (GlobalTheory.T.finStable_twist _ _ (treestable _ hs.1)) (GlobalTheory.T.finStable_twist _ _ (treestable _ (hd₂ k)))
-        (GlobalTheory.T.finStable_twist _ _ (treestable _ hs.2)) (GlobalTheory.T.carries_twist _ _ _ _ (hc₁ k)) (GlobalTheory.T.carries_twist _ _ _ _ (hc₂ k))
+      exact carries_indFin _ _ _ _ _ _ (he₁ k) (he₂ k)
+        (GlobalTheory.T.finStable_twist _ _ (treestable _ (hd₁ k)))
+        (GlobalTheory.T.finStable_twist _ _ (treestable _ hs.1))
+        (GlobalTheory.T.finStable_twist _ _ (treestable _ (hd₂ k)))
+        (GlobalTheory.T.finStable_twist _ _ (treestable _ hs.2))
+        (GlobalTheory.T.carries_twist _ _ _ _ (hc₁ k))
+        (GlobalTheory.T.carries_twist _ _ _ _ (hc₂ k))
     · have h3 := (hl₁' (leviOf x).1).mul (hl₂' (leviOf x).2)
       rw [one_mul] at h3
       exact h3
@@ -278,8 +326,8 @@ theorem treeflat {N : ℕ} (s : Tr E N) : ∀ (t : ℕ → Tr E N), s.Disc → (
 end Tree
 
 theorem limVec : PositivityTheory.Rg.BcB.SpectralAccumulation.LimVec := by
-  intro _ E _ _ _ a b ι _ t₁ t₂ s₁ s₂ K₁ K₂ W₁ W₂ C lam lam₀ f hK₁ hK₂ hW₁ hW₂ _hC hs₁ hs₂ hd₁ hd₂ hst₁ hst₂ hz₁ hz₂
-    hf0 hfm hfT hfe hlam
+  intro _ E _ _ _ a b ι _ t₁ t₂ s₁ s₂ K₁ K₂ W₁ W₂ C lam lam₀ f hK₁ hK₂ hW₁ hW₂ _hC hs₁ hs₂ hd₁ hd₂
+    hst₁ hst₂ hz₁ hz₂ hf0 hfm hfT hfe hlam
   have hD₁ : s₁.Disc := disc_of_good s₁ hs₁
   have hD₂ : s₂.Disc := disc_of_good s₂ hs₂
   obtain ⟨e₁, he₁, hc₁, hl₁⟩ := treeflat s₁ t₁ hD₁ hd₁ hst₁ hz₁
@@ -295,7 +343,8 @@ theorem limVec : PositivityTheory.Rg.BcB.SpectralAccumulation.LimVec := by
   let EE : ℕ → H E a b → ℂ := fun k x => e₁ k x.1 * e₂ k x.2
   have hEne : ∀ k x, EE k x ≠ 0 := fun k x => mul_ne_zero ((he₁ k).ne _) ((he₂ k).ne _)
   have hmem : ∀ k i, (fun x => EE k x * f k i x) ∈ X := fun k i =>
-    GlobalTheory.T.pair_space_carries_flat (e₁ k) (e₂ k) _ _ _ _ K₁ K₂ W₁ W₂ _ (he₁ k) (he₂ k) (hc₁ k) (hc₂ k) (hfm k i) (hfT k i)
+    GlobalTheory.T.pair_space_carries_flat (e₁ k) (e₂ k) _ _ _ _ K₁ K₂ W₁ W₂ _ (he₁ k) (he₂ k)
+      (hc₁ k) (hc₂ k) (hfm k i) (hfT k i)
   let gM : ℕ → (ι → X) := fun k i => ⟨_, hmem k i⟩
   have hne : ∀ k, gM k ≠ 0 := by
     intro k h
@@ -328,10 +377,14 @@ theorem limVec : PositivityTheory.Rg.BcB.SpectralAccumulation.LimVec := by
     refine tendsto_nhds_unique (hft i _) ((hft i x).congr fun k => ?_)
     rw [(hfT _ i).1 u₁ hu₁ u₂ hu₂ x]
   · funext i x
-    have hA : Tendsto (fun k => heckeAct h (fun j y => c k * f (φ k) j y) i x) atTop (𝓝 (heckeAct h F i x)) := by
+    have hA : Tendsto
+        (fun k => heckeAct h (fun j y => c k * f (φ k) j y) i x)
+        atTop (𝓝 (heckeAct h F i x)) := by
       simp only [heckeAct, Finsupp.sum]
       exact tendsto_finsetSum _ fun j _ => tendsto_finsetSum _ fun g _ => (hft j _).const_mul _
-    have hB : ∀ k, heckeAct h (fun j y => c k * f (φ k) j y) i x = lam (φ k) h * (c k * f (φ k) i x) := by
+    have hB
+        : ∀ k,
+          heckeAct h (fun j y => c k * f (φ k) j y) i x = lam (φ k) h * (c k * f (φ k) i x) := by
       intro k
       have h1 : heckeAct h (f (φ k)) i x = lam (φ k) h * f (φ k) i x :=
         congrFun (congrFun (hfe (φ k) h hh) i) x

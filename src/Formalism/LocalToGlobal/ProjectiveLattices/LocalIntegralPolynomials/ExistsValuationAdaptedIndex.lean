@@ -42,14 +42,16 @@ def intPoly (σ : Type) (W : Subring Ω) : Subring (MvPolynomial σ Ω) where
     rw [coeff_neg]
     exact W.neg_mem (hP e)
 
-theorem C_mem_intPoly {σ : Type} {W : Subring Ω} {a : Ω} (ha : a ∈ W) : (C a : MvPolynomial σ Ω) ∈ intPoly σ W := by
+theorem C_mem_intPoly {σ : Type} {W : Subring Ω} {a : Ω} (ha : a ∈ W)
+    : (C a : MvPolynomial σ Ω) ∈ intPoly σ W := by
   intro e
   classical
   rw [coeff_C]
   split_ifs
   exacts [ha, W.zero_mem]
 
-theorem X_mem_intPoly {σ : Type} {W : Subring Ω} (s : σ) : (X s : MvPolynomial σ Ω) ∈ intPoly σ W := by
+theorem X_mem_intPoly {σ : Type} {W : Subring Ω} (s : σ)
+    : (X s : MvPolynomial σ Ω) ∈ intPoly σ W := by
   intro e
   classical
   rw [coeff_X']

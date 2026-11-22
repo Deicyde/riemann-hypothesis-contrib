@@ -18,11 +18,16 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section loc
 
-variable {k r : ℕ} {E₁ E₂ : Type*} [NormedAddCommGroup E₁] [NormedSpace ℂ E₁] [NormedAddCommGroup E₂] [NormedSpace ℂ E₂]
+variable
+  {k r : ℕ} {E₁ E₂ : Type*}
+  [NormedAddCommGroup E₁] [NormedSpace ℂ E₁] [NormedAddCommGroup E₂] [NormedSpace ℂ E₂]
 
-theorem dop_rdV_local {X : B.Mat k r} (hX : B.inLie k r X) {U : Set (B.Mat k r)} (hU : IsOpen U)
-    {f f' : B.Mat k r → E₁} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x) {g : B.Mat k r} (hg : g ∈ U)
-    (hgG : g ∈ B.GV k r) : Formalism.REAL.RdV X f g = Formalism.REAL.RdV X f' g := by
+theorem dop_rdV_local
+    {X : B.Mat k r} (hX : B.inLie k r X)
+    {U : Set (B.Mat k r)} (hU : IsOpen U)
+    {f f' : B.Mat k r → E₁} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x)
+    {g : B.Mat k r} (hg : g ∈ U) (hgG : g ∈ B.GV k r)
+    : Formalism.REAL.RdV X f g = Formalism.REAL.RdV X f' g := by
   show deriv (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) 0 =
     deriv (fun t : ℝ => f' (g * NormedSpace.exp ((t : ℂ) • X))) 0
   apply Filter.EventuallyEq.deriv_eq
@@ -36,9 +41,11 @@ theorem dop_rdV_local {X : B.Mat k r} (hX : B.inLie k r X) {U : Set (B.Mat k r)}
   filter_upwards [hev] with t ht
   exact he _ ht (Formalism.FourierDecayAlt.P.B5.curve_mem hgG hX t)
 
-theorem dop_rw_local (w : List (B.Mat k r)) (hw : ∀ X ∈ w, B.inLie k r X) {U : Set (B.Mat k r)} (hU : IsOpen U)
-    {f f' : B.Mat k r → E₁} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x) :
-    ∀ x ∈ U, x ∈ B.GV k r → B.Rw w f x = B.Rw w f' x := by
+theorem dop_rw_local
+    (w : List (B.Mat k r)) (hw : ∀ X ∈ w, B.inLie k r X)
+    {U : Set (B.Mat k r)} (hU : IsOpen U)
+    {f f' : B.Mat k r → E₁} (he : ∀ x ∈ U, x ∈ B.GV k r → f x = f' x)
+    : ∀ x ∈ U, x ∈ B.GV k r → B.Rw w f x = B.Rw w f' x := by
   induction w with
   | nil => exact he
   | cons X w ih =>
@@ -53,49 +60,68 @@ theorem dop_rw_zero : ∀ v : List (B.Mat k r), B.Rw v (0 : B.Mat k r → E₁) 
     funext g
     simp [Formalism.REAL.RdV]
 
-theorem dop_ckOn_ap {UU : Set (B.Mat k r)} {a : B.Mat k r → (E₁ →L[ℂ] E₂)} {Φ : B.Mat k r → E₁}
-    (ha : B.CkOn ⊤ UU a) (hΦ : B.CkOn ⊤ UU Φ) : B.CkOn ⊤ UU (fun g => a g (Φ g)) := by
+theorem dop_ckOn_ap
+    {UU : Set (B.Mat k r)} {a : B.Mat k r → (E₁ →L[ℂ] E₂)} {Φ : B.Mat k r → E₁}
+    (ha : B.CkOn ⊤ UU a) (hΦ : B.CkOn ⊤ UU Φ)
+    : B.CkOn ⊤ UU (fun g => a g (Φ g)) := by
   intro g₀ hg₀
   obtain ⟨U, a', hU, hgU, hc, hff⟩ := ha g₀ hg₀
   obtain ⟨U₂, Φ', hU₂, hgU₂, hc₂, hff₂⟩ := hΦ g₀ hg₀
-  refine ⟨U ∩ U₂, fun g => a' g (Φ' g), hU.inter hU₂, ⟨hgU, hgU₂⟩, ?_,
-    fun g hg hgG => by simp only [hff g hg.1 hgG, hff₂ g hg.2 hgG]⟩
+  refine ⟨
+    U ∩ U₂,
+    fun g => a' g (Φ' g),
+    hU.inter hU₂,
+    ⟨hgU, hgU₂⟩,
+    ?_,
+    fun g hg hgG => by simp only [hff g hg.1 hgG, hff₂ g hg.2 hgG]
+  ⟩
   have h1 : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
-      (fun g => ContinuousLinearMap.restrictScalarsL ℂ E₁ E₂ ℝ ℝ (a' g)) (U ∩ U₂) :=
+      (fun g => ContinuousLinearMap.restrictScalarsL ℂ E₁ E₂ ℝ ℝ (a' g))
+      (U ∩ U₂) :=
     (ContinuousLinearMap.restrictScalarsL ℂ E₁ E₂ ℝ ℝ).contDiff.comp_contDiffOn
       (hc.mono Set.inter_subset_left)
   exact h1.clm_apply (hc₂.mono Set.inter_subset_right)
 
-theorem dop_ckOn_Rw {UU : Set (B.Mat k r)} {w : List (B.Mat k r)} (hw : ∀ X ∈ w, B.inLie k r X)
-    {f : B.Mat k r → E₁} (hf : B.CkOn ⊤ UU f) : B.CkOn ⊤ UU (B.Rw w f) := by
+theorem dop_ckOn_Rw
+    {UU : Set (B.Mat k r)} {w : List (B.Mat k r)} (hw : ∀ X ∈ w, B.inLie k r X)
+    {f : B.Mat k r → E₁} (hf : B.CkOn ⊤ UU f)
+    : B.CkOn ⊤ UU (B.Rw w f) := by
   rw [← Formalism.FourierDecayAlt.P.BetaSesquilinearity.Dw_wR]
-  apply Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_Dw (fun x hx => Formalism.FourierDecayAlt.P.BetaSesquilinearity.lie_LR (u := []) (by simp) hw x
-    (by simpa [Formalism.FourierDecayAlt.P.BetaSesquilinearity.wL] using hx))
-  have e : ((⊤ : ℕ∞) + ((Formalism.FourierDecayAlt.P.BetaSesquilinearity.wR w).length : ℕ∞)) = ⊤ := top_add _
-  rw [e]; exact hf
+  apply Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_Dw (fun x hx =>
+    Formalism.FourierDecayAlt.P.BetaSesquilinearity.lie_LR (u := []) (by simp) hw x
+      (by simpa [Formalism.FourierDecayAlt.P.BetaSesquilinearity.wL] using hx))
+  have e : ((⊤ : ℕ∞) + ((Formalism.FourierDecayAlt.P.BetaSesquilinearity.wR w).length : ℕ∞)) = ⊤ :=
+    top_add _
+  rw [e]
+  exact hf
 
 end loc
 
 section op
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem dop_ckOn_opApply {UU : Set (B.Mat k r)} {J : B.Mat k r → (Wq →L[ℂ] Wp)} (hJ : B.CkOn ⊤ UU J) :
-    ∀ Θ : B.DiffOp k r Wp Wq, (∀ T ∈ Θ, B.CkOn ⊤ UU T.coef) → B.CkOn ⊤ UU (B.opApply Θ J)
+theorem dop_ckOn_opApply {UU : Set (B.Mat k r)} {J : B.Mat k r → (Wq →L[ℂ] Wp)} (hJ : B.CkOn ⊤ UU J)
+    : ∀ Θ : B.DiffOp k r Wp Wq, (∀ T ∈ Θ, B.CkOn ⊤ UU T.coef) → B.CkOn ⊤ UU (B.opApply Θ J)
   | [], _ => by
     have e : B.opApply ([] : B.DiffOp k r Wp Wq) J = fun _ => 0 := by funext g; simp [B.opApply]
-    rw [e]; exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_zero
+    rw [e]
+    exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_zero
   | T :: Θ, h => by
     have e : B.opApply (T :: Θ) J = fun g => T.coef g (B.Rw T.word J g) + B.opApply Θ J g := by
       funext g; simp [B.opApply]
     rw [e]
-    exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_add (dop_ckOn_ap (h T (by simp)) (dop_ckOn_Rw T.word_lie hJ))
+    exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_add
+      (dop_ckOn_ap (h T (by simp)) (dop_ckOn_Rw T.word_lie hJ))
       (dop_ckOn_opApply hJ Θ (fun T' hT' => h T' (by simp [hT'])))
 
-theorem dop_opApply_zero (Θ : B.DiffOp k r Wp Wq) {O : Set (B.Mat k r)} (hO : IsOpen O)
-    {J : B.Mat k r → (Wq →L[ℂ] Wp)} (hJ : ∀ g ∈ O, g ∈ B.GV k r → J g = 0) :
-    ∀ g ∈ O, g ∈ B.GV k r → B.opApply Θ J g = 0 := by
+theorem dop_opApply_zero
+    (Θ : B.DiffOp k r Wp Wq)
+    {O : Set (B.Mat k r)} (hO : IsOpen O)
+    {J : B.Mat k r → (Wq →L[ℂ] Wp)} (hJ : ∀ g ∈ O, g ∈ B.GV k r → J g = 0)
+    : ∀ g ∈ O, g ∈ B.GV k r → B.opApply Θ J g = 0 := by
   intro g hg hgG
   unfold B.opApply
   apply List.sum_eq_zero
@@ -112,8 +138,9 @@ theorem diff_operator_in_class_CC : DopCC := by
   set Bs := p.T.base with hBs
   obtain ⟨hXs, ⟨R, hR⟩, ⟨ε, hε, hXε⟩⟩ := hX
   set O : Set (B.Mat P.k P.r) := {g | R < B.gN g} ∪ {g | Gf P.k P.r Bs.z Bs.z' g < ε} with hOdef
-  have hO : IsOpen O := (isOpen_lt continuous_const Formalism.FourierDecayAlt.P.B6.gN_continuous).union
-    (isOpen_lt (Formalism.FourierDecayAlt.P.PositiveOrbitOpen.gf_cont _ _) continuous_const)
+  have hO : IsOpen O :=
+    (isOpen_lt continuous_const Formalism.FourierDecayAlt.P.B6.gN_continuous).union
+      (isOpen_lt (Formalism.FourierDecayAlt.P.PositiveOrbitOpen.gf_cont _ _) continuous_const)
   have hX0 : ∀ g ∈ O, g ∈ B.GV P.k P.r → X g = 0 := by
     intro g hg hgG
     by_contra hne
@@ -126,24 +153,26 @@ theorem diff_operator_in_class_CC : DopCC := by
     intro g₀ hg₀
     by_cases hgO : g₀ ∈ O
     · exact ⟨O, 0, hO, hgO, contDiffOn_const, fun g hg hgG => hY0 g hg hgG⟩
-    · have hG : ε ≤ Gf P.k P.r Bs.z Bs.z' g₀ := by
-        by_contra h; exact hgO (Or.inr (not_le.1 h))
-      have hdom : g₀ ∈ C6.domL Bs ∅ := ⟨hg₀, lt_of_lt_of_le hε hG, fun l hl => absurd hl (Finset.notMem_empty l)⟩
+    · have hG : ε ≤ Gf P.k P.r Bs.z Bs.z' g₀ := by by_contra h; exact hgO (Or.inr (not_le.1 h))
+      have hdom : g₀ ∈ C6.domL Bs ∅ :=
+        ⟨hg₀, lt_of_lt_of_le hε hG, fun l hl => absurd hl (Finset.notMem_empty l)⟩
       have hXd : B.CkOn ⊤ (C6.domL Bs ∅) X := fun g hg => hXs g hg.1
       exact dop_ckOn_opApply hXd Dop (fun T hT => (hDD.1 T hT).1) g₀ hdom
   refine ⟨Y, fun g hg hG => ?_, fun A => ?_⟩
   · exact (hΘ X g ⟨hg, hG, fun l hl => absurd hl (Finset.notMem_empty l)⟩).symm
-  ·
-    set K : Set (B.Mat P.k P.r) := B.GV P.k P.r ∩ ({g | B.gN g ≤ R} ∩ {g | ε ≤ Gf P.k P.r Bs.z Bs.z' g}) with hKdef
-    have hK : IsCompact K := (Formalism.FourierDecayAlt.P.PBE.isCompact_gN_le P.k P.r R).of_isClosed_subset
-      (Formalism.FourierDecayAlt.P.B5.GV_closed.inter ((isClosed_le Formalism.FourierDecayAlt.P.B6.gN_continuous continuous_const).inter
-        (isClosed_le continuous_const (Formalism.FourierDecayAlt.P.PositiveOrbitOpen.gf_cont _ _))))
-      (fun g hg => hg.2.1)
+  · set K : Set (B.Mat P.k P.r) := B.GV P.k P.r ∩ ({g | B.gN g ≤ R} ∩ {g | ε ≤ Gf P.k P.r Bs.z Bs.z' g}) with hKdef
+    have hK : IsCompact K :=
+      (Formalism.FourierDecayAlt.P.PBE.isCompact_gN_le P.k P.r R).of_isClosed_subset
+        (Formalism.FourierDecayAlt.P.B5.GV_closed.inter
+          ((isClosed_le Formalism.FourierDecayAlt.P.B6.gN_continuous continuous_const).inter
+            (isClosed_le continuous_const
+              (Formalism.FourierDecayAlt.P.PositiveOrbitOpen.gf_cont _ _))))
+        (fun g hg => hg.2.1)
     have hYc : ContinuousOn Y (B.GV P.k P.r) := Formalism.FourierDecayAlt.P.B5.ckOn_continuousOn hYs
     have hfc : ContinuousOn (fun g => B.gN g ^ A * ‖Y g‖) K := by
       refine ContinuousOn.mul ?_ ((hYc.mono Set.inter_subset_left).norm)
-      exact (Formalism.FourierDecayAlt.P.B6.gN_continuous.continuousOn).rpow_const
-        (fun g hg => Or.inl (ne_of_gt (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_pos hg.1)))
+      exact (Formalism.FourierDecayAlt.P.B6.gN_continuous.continuousOn).rpow_const (fun g hg =>
+        Or.inl (ne_of_gt (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_pos hg.1)))
     obtain ⟨C, hC⟩ := hK.exists_bound_of_continuousOn hfc
     refine ⟨max C 0, ⟨?_, ?_⟩⟩
     · intro g₀ hg₀
@@ -152,21 +181,27 @@ theorem diff_operator_in_class_CC : DopCC := by
     · intro u v _ _ huv g hg
       have hu : u = [] := List.eq_nil_of_length_eq_zero (by omega)
       have hv : v = [] := List.eq_nil_of_length_eq_zero (by omega)
-      subst hu; subst hv
+      subst hu
+      subst hv
       show B.gN g ^ A * ‖Y g‖ ≤ max C 0
       by_cases hgK : g ∈ K
       · have := hC g hgK
-        rw [Real.norm_of_nonneg (mul_nonneg (Real.rpow_nonneg (le_of_lt (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_pos hg)) _)
-          (norm_nonneg _))] at this
+        rw [Real.norm_of_nonneg (mul_nonneg
+            (Real.rpow_nonneg (le_of_lt (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_pos hg))
+              _)
+            (norm_nonneg _))]
+          at this
         exact le_trans this (le_max_left _ _)
       · have hgO : g ∈ O := by
           by_contra hgO
           apply hgK
           refine ⟨hg, ?_, ?_⟩
           · show B.gN g ≤ R
-            by_contra h; exact hgO (Or.inl (not_le.1 h))
+            by_contra h
+            exact hgO (Or.inl (not_le.1 h))
           · show ε ≤ Gf P.k P.r Bs.z Bs.z' g
-            by_contra h; exact hgO (Or.inr (not_le.1 h))
+            by_contra h
+            exact hgO (Or.inr (not_le.1 h))
         rw [hY0 g hgO hg, norm_zero, mul_zero]
         exact le_max_right _ _
 

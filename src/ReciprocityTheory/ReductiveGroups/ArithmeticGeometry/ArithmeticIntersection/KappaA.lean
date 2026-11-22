@@ -9,9 +9,9 @@ open scoped Pointwise
 
 namespace ReciprocityTheory.ChartRestriction.G.AI
 
-theorem cone_preimage (L : E3 ≃ₗᵢ[ℝ] E3) (s : Set S2) :
-    Ioo (0 : ℝ) 1 • ((↑) '' ((fun n : S2 => (⟨L n, by simp⟩ : S2)) ⁻¹' s) : Set E3) =
-      L ⁻¹' (Ioo (0 : ℝ) 1 • ((↑) '' s : Set E3)) := by
+theorem cone_preimage (L : E3 ≃ₗᵢ[ℝ] E3) (s : Set S2)
+    : Ioo (0 : ℝ) 1 • ((↑) '' ((fun n : S2 => (⟨L n, by simp⟩ : S2)) ⁻¹' s) : Set E3)
+      = L ⁻¹' (Ioo (0 : ℝ) 1 • ((↑) '' s : Set E3)) := by
   ext x
   simp only [Set.mem_preimage, Set.mem_smul, Set.mem_image]
   constructor
@@ -26,11 +26,13 @@ theorem cone_preimage (L : E3 ≃ₗᵢ[ℝ] E3) (s : Set S2) :
       rw [← hx]
       simp
 
-theorem measurable_sphereMap (L : E3 ≃ₗᵢ[ℝ] E3) :
-    Measurable (fun n : S2 => (⟨L n, by simp⟩ : S2)) := ((L.continuous.comp continuous_subtype_val).subtype_mk _).measurable
+theorem measurable_sphereMap (L : E3 ≃ₗᵢ[ℝ] E3)
+    : Measurable (fun n : S2 => (⟨L n, by simp⟩ : S2)) :=
+  ((L.continuous.comp continuous_subtype_val).subtype_mk _).measurable
 
-theorem toSphere_measurePreserving (L : E3 ≃ₗᵢ[ℝ] E3) :
-    MeasurePreserving (fun n : S2 => (⟨L n, by simp⟩ : S2))
+theorem toSphere_measurePreserving (L : E3 ≃ₗᵢ[ℝ] E3)
+    : MeasurePreserving
+      (fun n : S2 => (⟨L n, by simp⟩ : S2))
       (volume : Measure E3).toSphere (volume : Measure E3).toSphere := by
   refine ⟨measurable_sphereMap L, ?_⟩
   ext s hs

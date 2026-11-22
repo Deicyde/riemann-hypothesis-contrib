@@ -4,11 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuL
 
 @[expose] public section
 
-open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
+open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th
+  UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
 
-private theorem UpperTheory.V.Th.Nm.roots_norm_le {l : ℕ} [Fact l.Prime] {n : ℕ}
-    (Z : Matrix (Fin n) (Fin n) (Qbar l)) (hZ : IntM Z) (a : Qbar l) (ha : Z.charpoly.IsRoot a) :
-    ‖a‖ ≤ 1 := by
+private theorem UpperTheory.V.Th.Nm.roots_norm_le
+    {l : ℕ} [Fact l.Prime]
+    {n : ℕ} (Z : Matrix (Fin n) (Fin n) (Qbar l)) (hZ : IntM Z)
+    (a : Qbar l) (ha : Z.charpoly.IsRoot a)
+    : ‖a‖ ≤ 1 := by
   classical
   have hdet : (Matrix.scalar (Fin n) a - Z).det = 0 := by
     rw [← Matrix.eval_charpoly]
@@ -29,8 +33,9 @@ private theorem UpperTheory.V.Th.Nm.roots_norm_le {l : ℕ} [Fact l.Prime] {n : 
     exact norm_le_zero_iff.1 hj
   have heq : a * v i = ∑ j, Z i j * v j := by
     have hvi' := congrFun hv i
-    simp only [Matrix.sub_mulVec, Pi.sub_apply, Matrix.scalar_apply, Matrix.mulVec_diagonal, Pi.zero_apply,
-      sub_eq_zero] at hvi'
+    simp only [Matrix.sub_mulVec, Pi.sub_apply, Matrix.scalar_apply, Matrix.mulVec_diagonal,
+        Pi.zero_apply, sub_eq_zero]
+      at hvi'
     rw [hvi']
     rfl
   have hle : ‖a‖ * ‖v i‖ ≤ 1 * ‖v i‖ := by
@@ -38,21 +43,25 @@ private theorem UpperTheory.V.Th.Nm.roots_norm_le {l : ℕ} [Fact l.Prime] {n : 
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _)
     intro j _
     rw [norm_mul]
-    exact (mul_le_mul (hZ i j) (hi j (Finset.mem_univ j)) (norm_nonneg _) zero_le_one).trans_eq (one_mul _)
+    exact (mul_le_mul (hZ i j) (hi j (Finset.mem_univ j)) (norm_nonneg _) zero_le_one).trans_eq
+      (one_mul _)
   exact le_of_mul_le_mul_right hle (norm_pos_iff.2 hvi)
 
-theorem UpperTheory.V.Th.Nm.roots :
-    ∀ {l : ℕ} [Fact l.Prime] {n : ℕ} (Z : Matrix (Fin n) (Fin n) (Qbar l)), IntM Z → Z.charpoly.Separable → ∃ al : Fin n → Qbar l, Function.Injective al ∧ (∀ i, ‖al i‖ ≤ 1) ∧ Z.charpoly = ∏ i, (Polynomial.X - Polynomial.C (al i)) := by
+theorem UpperTheory.V.Th.Nm.roots
+    : ∀ {l : ℕ} [Fact l.Prime] {n : ℕ} (Z : Matrix (Fin n) (Fin n) (Qbar l)),
+      IntM Z → Z.charpoly.Separable
+        → ∃ al : Fin n → Qbar l,
+          Function.Injective al ∧ (∀ i, ‖al i‖ ≤ 1)
+            ∧ Z.charpoly = ∏ i, (Polynomial.X - Polynomial.C (al i)) := by
   intro l _ n Z hZ hsep
   classical
   set p := Z.charpoly with hp
   set s := p.roots.toFinset with hs
   have hnd : p.roots.Nodup := Polynomial.nodup_roots hsep
-  have hval : s.val = p.roots := by
-    rw [hs, Multiset.toFinset_val, Multiset.dedup_eq_self.2 hnd]
+  have hval : s.val = p.roots := by rw [hs, Multiset.toFinset_val, Multiset.dedup_eq_self.2 hnd]
   have hcard : s.card = n := by
-    rw [← Finset.card_val, hval, IsAlgClosed.card_roots_eq_natDegree, hp, Matrix.charpoly_natDegree_eq_dim,
-      Fintype.card_fin]
+    rw [← Finset.card_val, hval, IsAlgClosed.card_roots_eq_natDegree, hp,
+      Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
   let e : Fin n ≃ s := (finCongr hcard.symm).trans s.equivFin.symm
   refine ⟨fun i => (e i : Qbar l), ?_, ?_, ?_⟩
   · intro i j hij

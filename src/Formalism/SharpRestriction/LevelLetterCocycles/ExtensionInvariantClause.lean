@@ -10,46 +10,59 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot35.ExtCPf
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.LiftingTheory
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.LiftingTheory
 
 section Core
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {RA RW : Type} [CommRing RA] [CommRing RW] [Algebra O RA] [Algebra O RW]
-    {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {RA RW : Type}
+  [CommRing RA] [CommRing RW] [Algebra O RA] [Algebra O RW]
+  {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
 
-theorem smulO_mem (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (c : O) {x : W.DD T}
-    (hx : x ∈ W.N T) : c • x ∈ W.N T := by
+theorem smulO_mem
+    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (c : O) {x : W.DD T} (hx : x ∈ W.N T)
+    : c • x ∈ W.N T := by
   rw [← algebraMap_smul (LetA O n) c x]
   exact (W.N T).smul_mem _ hx
 
-theorem map_smulO (W : LocWach PD LL O v n) {T T' : LocLat G Qp LL O} (f : LatHom T.L T'.L)
-    (c : O) (x : W.DD T) : W.map f (c • x) = c • W.map f x := by
+theorem map_smulO
+    (W : LocWach PD LL O v n) {T T' : LocLat G Qp LL O} (f : LatHom T.L T'.L) (c : O) (x : W.DD T)
+    : W.map f (c • x) = c • W.map f x := by
   first
   | exact (W.map f).map_smul_of_tower c x
   | exact LinearMap.map_smul_of_tower (W.map f) c x
-  | (rw [← algebraMap_smul (LetA O n) c x, ← algebraMap_smul (LetA O n) c (W.map f x)]
-     exact (W.map f).map_smul _ x)
+  | (
+      rw [← algebraMap_smul (LetA O n) c x, ← algebraMap_smul (LetA O n) c (W.map f x)]
+      exact (W.map f).map_smul _ x
+    )
   | simp
 
-theorem pull_cocycle (W : LocWach PD LL O v n) {T Tp : LocLat G Qp LL O} (ι : LatHom T.L Tp.L)
-    (hinj : Function.Injective (W.map ι)) (g : W.Gam) (x : W.DD Tp) (y z : W.DD T)
-    (hy : W.map ι y = W.φD Tp x - x) (hz : W.map ι z = W.γD Tp g x - x) :
-    (W.γD T g y - y) - (W.φD T z - z) = 0 := by
+theorem pull_cocycle
+    (W : LocWach PD LL O v n)
+    {T Tp : LocLat G Qp LL O} (ι : LatHom T.L Tp.L) (hinj : Function.Injective (W.map ι))
+    (g : W.Gam) (x : W.DD Tp) (y z : W.DD T)
+    (hy : W.map ι y = W.φD Tp x - x) (hz : W.map ι z = W.γD Tp g x - x)
+    : (W.γD T g y - y) - (W.φD T z - z) = 0 := by
   have hφ : ∀ w, W.map ι (W.φD T w) = W.φD Tp (W.map ι w) := fun w => W.map_φ ι w
   have hγ : ∀ w, W.map ι (W.γD T g w) = W.γD Tp g (W.map ι w) := fun w => W.map_γ ι g w
   apply hinj
   simp only [map_sub, map_zero, hφ, hγ, hy, hz, W.φγ_comm]
   abel
 
-theorem coreExt_of (W : LocWach PD LL O v n) (E : EtTie W RA RW inclR φR gR πA)
-    (h8 : Formalism.MainNotions.DeltaInvariantLattices.WachMaxJumpBound W) (hH : Formalism.MainNotions.ElementDenominator.coreHerrExt W) : coreExt W := by
+theorem coreExt_of
+    (W : LocWach PD LL O v n) (E : EtTie W RA RW inclR φR gR πA)
+    (h8 : Formalism.MainNotions.DeltaInvariantLattices.WachMaxJumpBound W)
+    (hH : Formalism.MainNotions.ElementDenominator.coreHerrExt W)
+    : coreExt W := by
   unfold Formalism.MainNotions.LiftingTheory.coreExt
   intro T Tp ι π Mi hi hT hTp hJ c hc hext k hk
   unfold Formalism.MainNotions.LiftingTheory.InImgA at hk
@@ -76,8 +89,8 @@ theorem coreExt_of (W : LocWach PD LL O v n) (E : EtTie W RA RW inclR φR gR πA
     have hrange : ∀ b : ↥Tp.L.T, p0 b ∈ LinearMap.range ι' := by
       intro b
       have h0 : π' (p0 b) = 0 := by
-        rw [show p0 b = b - s (π' b) from rfl, map_sub,
-          ← LinearMap.comp_apply π' s, hs, LinearMap.id_apply, sub_self]
+        rw [show p0 b = b - s (π' b) from rfl, map_sub, ← LinearMap.comp_apply π' s, hs,
+          LinearMap.id_apply, sub_self]
       obtain ⟨y0, hy0⟩ := (hex _).1 (congrArg Subtype.val h0)
       have hyT : y0 ∈ T.L.T := hsat y0 (by rw [hy0]; exact (p0 b).2)
       exact ⟨⟨y0, hyT⟩, Subtype.ext hy0⟩
@@ -104,7 +117,8 @@ theorem coreExt_of (W : LocWach PD LL O v n) (E : EtTie W RA RW inclR φR gR πA
       have h3 : r ∘ₗ ι' = LinearMap.id := LinearMap.ext hr
       have h4 := congrArg (fun f => f t0) (congrArg (LinearMap.lTensor RW) h3)
       simpa only [LinearMap.lTensor_comp, LinearMap.comp_apply, LinearMap.lTensor_id,
-        LinearMap.id_apply] using h4
+          LinearMap.id_apply]
+        using h4
     intro x1 x2 h12
     apply E.jD_inj T
     apply hL.injective
@@ -115,15 +129,16 @@ theorem coreExt_of (W : LocWach PD LL O v n) (E : EtTie W RA RW inclR φR gR πA
   have hx' : ((u⁻¹ : Oˣ) : O) • x ∈ W.N Tp := smulO_mem W Tp _ hx
   have hx'e : W.map π (((u⁻¹ : Oˣ) : O) • x) = (((u⁻¹ : Oˣ) : O) * ((PD.p : ℕ) : O) ^ k) • e := by
     rw [map_smulO, hxe, smul_smul]
-  have hJ' : Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T Mi hi := fun τ i hτ => hJ i τ hτ
+  have hJ' : Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T Mi hi := fun τ i hτ =>
+    hJ i τ hτ
   unfold Formalism.MainNotions.DeltaInvariantLattices.WachMaxJumpBound at h8
   have h8' := h8 T Mi hi hT hJ'
   unfold Formalism.MainNotions.DeltaInvariantLattices.p8 at h8'
   obtain ⟨⟨y, hy, hy'⟩, ⟨z, hz, hz'⟩⟩ := h8' Tp ι π hses hTp e he hφe hγe _ hx' _ hx'e
   have hcoc : (y, z) ∈ W.divisibleCocycles T := by
     have h0 := pull_cocycle W ι hinj W.gam _ y z hy' hz'
-    simp only [LocWach.divisibleCocycles, herrCocycles, LinearMap.mem_ker, LinearMap.coprod_apply, LinearMap.sub_apply,
-      LinearMap.neg_apply, LinearMap.id_apply]
+    simp only [LocWach.divisibleCocycles, herrCocycles, LinearMap.mem_ker, LinearMap.coprod_apply,
+      LinearMap.sub_apply, LinearMap.neg_apply, LinearMap.id_apply]
     rw [← sub_eq_add_neg]
     exact h0
   refine ⟨y, z, hcoc, ?_, ?_, ?_⟩
@@ -137,19 +152,24 @@ theorem coreExt_of (W : LocWach PD LL O v n) (E : EtTie W RA RW inclR φR gR πA
       unfold Formalism.MainNotions.DeltaInvariantLattices.mx Mmax
       apply ciSup_le
       intro i
-      calc Mi i = Mi ((i.val : ℕ) : ZMod n) := by rw [ZMod.natCast_zmod_val]
-        _ ≤ _ := Finset.le_sup (f := fun k : ℕ => Mi (k : ZMod n)) (Finset.mem_range.2 (ZMod.val_lt i))
+      calc
+        Mi i
+          = Mi ((i.val : ℕ) : ZMod n) := by rw [ZMod.natCast_zmod_val]
+        _ ≤ _ :=
+          Finset.le_sup (f := fun k : ℕ => Mi (k : ZMod n)) (Finset.mem_range.2 (ZMod.val_lt i))
     rw [← Nat.sub_add_cancel hle, pow_add, mul_smul]
     exact (W.N T).smul_mem _ hy2
   · obtain ⟨z', hz'N, hzz⟩ := hz
     exact ⟨z', hz'N, hzz.symm⟩
   · rw [hu _ _ hx'e y z hcoc hy' hz', ← mul_assoc, Units.mul_inv, one_mul]
 
-theorem coreExtΔ_of (W : LocWach PD LL O v n)
-    (E : EtTie W RA RW inclR φR gR πA)
+theorem coreExtΔ_of
+    (W : LocWach PD LL O v n) (E : EtTie W RA RW inclR φR gR πA)
     (hdex : W.DelF.card = PD.p - 1 → ∃ d : O, d * (W.DelF.card : O) = 1)
-    (h8 : Formalism.MainNotions.DeltaInvariantLattices.WachMaxJumpBound W) (h9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) (hH : Formalism.MainNotions.ElementDenominator.coreHerrExtΔ W) :
-    coreExtΔ W := by
+    (h8 : Formalism.MainNotions.DeltaInvariantLattices.WachMaxJumpBound W)
+    (h9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (hH : Formalism.MainNotions.ElementDenominator.coreHerrExtΔ W)
+    : coreExtΔ W := by
   have := liftb_neZero W
   intro hA T Tp ι π Mi hi cT cTp hJ c hc hExt k hImg
   have hs : W.s = 1 := hA.2.1
@@ -167,8 +187,9 @@ theorem coreExtΔ_of (W : LocWach PD LL O v n)
     rw [lifta_avg_map, hxe]
     exact lifta_avg_fix W W.one d hd _ (fun δ _ => by rw [LinearMap.map_smul, hγe])
   have hx'N : ((u⁻¹ : Oˣ) : O) • lifta_avg W Tp d x ∈ W.NΔ Tp := (W.NΔ Tp).smul_mem _ hxb
-  have hmap : W.map π (((u⁻¹ : Oˣ) : O) • lifta_avg W Tp d x) =
-      (((u⁻¹ : Oˣ) : O) * ((PD.p : ℕ) : O) ^ k) • e := by
+  have hmap
+      : W.map π (((u⁻¹ : Oˣ) : O) • lifta_avg W Tp d x)
+        = (((u⁻¹ : Oˣ) : O) * ((PD.p : ℕ) : O) ^ k) • e := by
     rw [map_smulO, hmb, smul_smul]
   generalize ((u⁻¹ : Oˣ) : O) • lifta_avg W Tp d x = x' at hx'N hmap
   have h8T := h8 T Mi hi cT (liftb_jl W T Mi hi hJ)
@@ -198,8 +219,7 @@ theorem coreExtΔ_of (W : LocWach PD LL O v n)
     have hzN : z ∈ W.N T := by
       rw [← hzz]
       exact (W.N T).smul_mem _ hz₁
-    exact lifta_interN W T h9r h9m z ⟨hzN, hzΔ⟩
-      ⟨z₁, hz₁, by rw [← hzz, ← lifta_X_eq W hs]; rfl⟩
+    exact lifta_interN W T h9r h9m z ⟨hzN, hzΔ⟩ ⟨z₁, hz₁, by rw [← hzz, ← lifta_X_eq W hs]; rfl⟩
   · rw [hu x' _ hx'N.2 hmap y z hZ hyι hzι', ← mul_assoc, Units.mul_inv, one_mul]
 
 end Core
@@ -210,15 +230,15 @@ namespace Formalism.MainNotions.UnusedSlot35
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
 
-theorem extension_clause (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) :
-    Formalism.MainNotions.UnusedSlot35.ExtensionClassTheorem D HW F := by
+theorem extension_clause (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
+    : Formalism.MainNotions.UnusedSlot35.ExtensionClassTheorem D HW F := by
   intro hadm
   obtain ⟨-, h8, hU⟩ := hadm
   intro l _ K s LL h
   exact ExtCPf.coreExt_of _ ((F l).E K s LL h).tie (h8 l K s LL h) (hU l K s LL h).1
 
-theorem extension_invariant_clause (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) :
-    Formalism.MainNotions.UnusedSlot35.InvariantCocycleClassTheorem D HW F := by
+theorem extension_invariant_clause (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
+    : Formalism.MainNotions.UnusedSlot35.InvariantCocycleClassTheorem D HW F := by
   intro hadm
   obtain ⟨-, h8, h9, -, hU⟩ := hadm
   intro l _ K s LL h

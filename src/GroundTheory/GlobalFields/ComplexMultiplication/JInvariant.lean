@@ -33,8 +33,8 @@ def latticeOfTau (τ : ℍ) : PeriodPair where
 @[simp] lemma latticeOfTau_ω₁ (τ : ℍ) : (latticeOfTau τ).ω₁ = τ := rfl
 @[simp] lemma latticeOfTau_ω₂ (τ : ℍ) : (latticeOfTau τ).ω₂ = 1 := rfl
 
-theorem G_latticeOfTau {k : ℕ} (hk : 3 ≤ k) (τ : ℍ) :
-    (latticeOfTau τ).G k = 2 * riemannZeta k * E hk τ := by
+theorem G_latticeOfTau {k : ℕ} (hk : 3 ≤ k) (τ : ℍ)
+    : (latticeOfTau τ).G k = 2 * riemannZeta k * E hk τ := by
   have hE : E hk τ = (1 / 2 : ℂ) * eisensteinSeries (N := 1) 0 k τ := rfl
   have h1 : (latticeOfTau τ).G k = ∑' v : Fin 2 → ℤ, eisSummand k v τ := by
     rw [PeriodPair.G, ← (latticeOfTau τ).latticeEquivProd.symm.toEquiv.tsum_eq,
@@ -68,14 +68,14 @@ theorem g₃_latticeOfTau (τ : ℍ) : (latticeOfTau τ).g₃ = 8 / 27 * π ^ 6 
 
 def modularJ (τ : ℍ) : ℂ := E₄ τ ^ 3 / ModularForm.discriminant τ
 
-theorem discr_latticeOfTau (τ : ℍ) :
-    discr (latticeOfTau τ) = (2 * π) ^ 12 * ModularForm.discriminant τ := by
+theorem discr_latticeOfTau (τ : ℍ)
+    : discr (latticeOfTau τ) = (2 * π) ^ 12 * ModularForm.discriminant τ := by
   have h := ModularForm.discriminant_eq_E₄_cube_sub_E₆_sq τ
   rw [discr, g₂_latticeOfTau, g₃_latticeOfTau, h]
   ring
 
-theorem weierstrassCurve_latticeOfTau_j (τ : ℍ) :
-    (weierstrassCurve (latticeOfTau τ)).j = modularJ τ := by
+theorem weierstrassCurve_latticeOfTau_j (τ : ℍ)
+    : (weierstrassCurve (latticeOfTau τ)).j = modularJ τ := by
   have hΔ := ModularForm.discriminant_ne_zero τ
   have hπ : (π : ℂ) ≠ 0 := ofReal_ne_zero.2 Real.pi_ne_zero
   rw [weierstrassCurve_j, discr_latticeOfTau, g₂_latticeOfTau, modularJ]

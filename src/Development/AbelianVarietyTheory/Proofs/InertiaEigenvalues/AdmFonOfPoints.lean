@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Crystal
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 
 namespace GlobalTheory.HubFon
 
@@ -22,15 +24,17 @@ theorem g_ne_q_d (D : D7) (k : Fin 2) : D.host.g k ≠ D.host.q ∧ D.host.g k �
   constructor
   · intro h
     have h1 : D.host.g k % D.host.q = 1 := by
-      rw [← Nat.mod_mod_of_dvd _ (show D.host.q ∣ D.host.QS * D.host.q * D.host.d from
-        ⟨D.host.QS * D.host.d, by ring⟩), hc]
+      rw [← Nat.mod_mod_of_dvd _
+          (show D.host.q ∣ D.host.QS * D.host.q * D.host.d from ⟨D.host.QS * D.host.d, by ring⟩),
+        hc]
       exact Nat.mod_eq_of_lt (by omega)
     rw [h, Nat.mod_self] at h1
     omega
   · intro h
     have h1 : D.host.g k % D.host.d = 1 := by
-      rw [← Nat.mod_mod_of_dvd _ (show D.host.d ∣ D.host.QS * D.host.q * D.host.d from
-        ⟨D.host.QS * D.host.q, by ring⟩), hc]
+      rw [← Nat.mod_mod_of_dvd _
+          (show D.host.d ∣ D.host.QS * D.host.q * D.host.d from ⟨D.host.QS * D.host.q, by ring⟩),
+        hc]
       exact Nat.mod_eq_of_lt (by omega)
     rw [h, Nat.mod_self] at h1
     omega

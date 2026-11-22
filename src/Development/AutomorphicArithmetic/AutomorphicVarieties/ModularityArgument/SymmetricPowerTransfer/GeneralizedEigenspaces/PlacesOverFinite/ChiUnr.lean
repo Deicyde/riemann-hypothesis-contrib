@@ -5,12 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Sd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base
+  UpperTheory.V.Af UpperTheory.V.Sd
 
 namespace UpperTheory.V.Z.Sym.Pl
 
-private theorem root_one {l : ℕ} [Fact l.Prime] {x : Qbar l} {n : ℕ} (hn : ¬ l ∣ n) (hx : x ^ n = 1)
-    (h : ‖x - 1‖ < 1) : x = 1 := by
+private theorem root_one
+    {l : ℕ} [Fact l.Prime] {x : Qbar l} {n : ℕ} (hn : ¬ l ∣ n) (hx : x ^ n = 1) (h : ‖x - 1‖ < 1)
+    : x = 1 := by
   have hn0 : n ≠ 0 := fun h0 => hn (h0 ▸ dvd_zero l)
   have hnorm : ‖x‖ = 1 := by
     have h1 : ‖x‖ ^ n = 1 := by rw [← norm_pow, hx, norm_one]
@@ -26,12 +29,13 @@ private theorem root_one {l : ℕ} [Fact l.Prime] {x : Qbar l} {n : ℕ} (hn : �
       rw [norm_mul, norm_pow, hnorm, one_pow, one_mul]
       exact h
   have hnn : ‖(n : Qbar l)‖ = 1 := by
-    have h1 : ‖(n : ℚ_[l])‖ = 1 := Padic.norm_natCast_eq_one_iff.2 ((Nat.Prime.coprime_iff_not_dvd Fact.out).2 hn)
+    have h1 : ‖(n : ℚ_[l])‖ = 1 :=
+      Padic.norm_natCast_eq_one_iff.2 ((Nat.Prime.coprime_iff_not_dvd Fact.out).2 hn)
     have h2 : ((n : ℕ) : Qbar l) = algebraMap ℚ_[l] (Qbar l) (n : ℚ_[l]) := by simp
     rw [h2, PadicAlgCl.norm_extends, h1]
   have hS : ∑ i ∈ Finset.range n, x ^ i ≠ 0 := by
     intro h0
-    have e : (n : Qbar l) = -∑ i ∈ Finset.range n, (x ^ i - 1) := by
+    have e : (n : Qbar l) = - ∑ i ∈ Finset.range n, (x ^ i - 1) := by
       rw [Finset.sum_sub_distrib, h0]; simp
     have hlt : ∀ m : ℕ, ‖∑ i ∈ Finset.range m, (x ^ i - 1)‖ < 1 := by
       intro m
@@ -42,13 +46,15 @@ private theorem root_one {l : ℕ} [Fact l.Prime] {x : Qbar l} {n : ℕ} (hn : �
         exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ih (hpow m))
     rw [e, norm_neg] at hnn
     exact (hlt n).ne hnn
-  have : (x - 1) * ∑ i ∈ Finset.range n, x ^ i = 0 := by
-    rw [mul_geom_sum, hx, sub_self]
+  have : (x - 1) * ∑ i ∈ Finset.range n, x ^ i = 0 := by rw [mul_geom_sum, hx, sub_self]
   exact sub_eq_zero.1 ((mul_eq_zero.1 this).resolve_right hS)
 
-private theorem cyc_one (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
-    (A : ValuationSubring Ω) (hA : ¬ A.valuation (l : Ω) < 1) {σ : G ℚ Ω} (hσ : σ ∈ Ine (F := ℚ) A) :
-    cycZ ℚ Ω l σ = 1 := by
+private theorem cyc_one
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (A : ValuationSubring Ω) (hA : ¬ A.valuation (l : Ω) < 1)
+    {σ : G ℚ Ω} (hσ : σ ∈ Ine (F := ℚ) A)
+    : cycZ ℚ Ω l σ = 1 := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero⟩
   show cyclotomicCharacter Ω l σ.toRingEquiv = 1
@@ -69,7 +75,8 @@ theorem chiUnr : ChiUnr := by
   intro Ω _ _ _ l _ c N _ e ψ χ' j hord hcong M hM L _ _ _ A hA s hs
   have hv : ¬ A.valuation (l : Ω) < 1 ∧ ¬ A.valuation (N : Ω) < 1 := by
     obtain ⟨k, rfl⟩ := hM
-    have hn : ∀ n : ℕ, A.valuation (n : Ω) ≤ 1 := fun n => (A.valuation_le_one_iff _).2 (natCast_mem A n)
+    have hn : ∀ n : ℕ, A.valuation (n : Ω) ≤ 1 := fun n =>
+      (A.valuation_le_one_iff _).2 (natCast_mem A n)
     rw [Nat.cast_mul, Nat.cast_mul, map_mul, map_mul] at hA
     refine ⟨fun h => hA ?_, fun h => hA ?_⟩
     · exact mul_lt_one_of_lt_of_le (mul_lt_one_of_lt_of_le h (hn N)) (hn k)
@@ -88,7 +95,8 @@ theorem chiUnr : ChiUnr := by
   rw [MonoidHom.mul_apply, MonoidHom.pow_apply, hcyc, one_pow, one_mul, hP] at h
   have h' : ‖((χ' σ : (Qbar l)ˣ) : Qbar l) - 1‖ < 1 := h
   have ho : ((χ' σ : (Qbar l)ˣ) : Qbar l) ^ orderOf χ' = 1 := by
-    rw [← Units.val_pow_eq_pow_val, ← MonoidHom.pow_apply, pow_orderOf_eq_one, MonoidHom.one_apply, Units.val_one]
+    rw [← Units.val_pow_eq_pow_val, ← MonoidHom.pow_apply, pow_orderOf_eq_one, MonoidHom.one_apply,
+      Units.val_one]
   exact Units.ext (root_one hord ho h')
 
 end UpperTheory.V.Z.Sym.Pl

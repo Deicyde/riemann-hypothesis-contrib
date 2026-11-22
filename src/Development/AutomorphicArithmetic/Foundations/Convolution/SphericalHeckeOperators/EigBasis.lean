@@ -4,7 +4,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Spherica
 
 @[expose] public section
 
-open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
+open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical
+  GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
 
 private def eigCone (n : ℕ) : AddSubmonoid (Fin n → ℤ) where
   carrier := {a | Antitone a}
@@ -54,13 +55,17 @@ private lemma eigChar_inj {n : ℕ} : Function.Injective (eigChar (n := n)) := b
   rw [monomialChar_add, monomialChar_add, H p hp, eig_mc_single, eig_mc_single] at h1
   exact Units.ext (mul_right_cancel₀ (eig_mc_ne _ _) h1)
 
-theorem UpperTheory.ConvolutionTheory.H.eigBasis :
-    ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V], Module.finrank ℂ V ≤ n.factorial →
-      ∀ θ : (Fin n → ℤ) → Module.End ℂ V, θ 0 = 1 → (∀ a b, Antitone a → Antitone b → θ (a + b) = θ a * θ b) →
-      ∀ (u : V) (ℓ : Module.Dual ℂ V) (z : Fin n → ℂˣ) (c : Equiv.Perm (Fin n) → ℂ), Function.Injective z → (∀ σ, c σ ≠ 0) →
-      (∀ a, Antitone a → ℓ (θ a u) = ∑ σ, c σ * monomialChar a (z ∘ σ)) →
-      ∃ v : Module.Basis (Equiv.Perm (Fin n)) ℂ V, (∀ σ a, Antitone a → θ a (v σ) = monomialChar a (z ∘ σ) • v σ) ∧ (∀ σ, ℓ (v σ) = 1) ∧
-        u = ∑ σ, c σ • v σ := by
+theorem UpperTheory.ConvolutionTheory.H.eigBasis
+    : ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V],
+      Module.finrank ℂ V ≤ n.factorial
+        → ∀ θ : (Fin n → ℤ) → Module.End ℂ V,
+          θ 0 = 1 → (∀ a b, Antitone a → Antitone b → θ (a + b) = θ a * θ b)
+            → ∀ (u : V) (ℓ : Module.Dual ℂ V) (z : Fin n → ℂˣ) (c : Equiv.Perm (Fin n) → ℂ),
+              Function.Injective z → (∀ σ, c σ ≠ 0)
+                → (∀ a, Antitone a → ℓ (θ a u) = ∑ σ, c σ * monomialChar a (z ∘ σ))
+                → ∃ v : Module.Basis (Equiv.Perm (Fin n)) ℂ V,
+                  (∀ σ a, Antitone a → θ a (v σ) = monomialChar a (z ∘ σ) • v σ)
+                    ∧ (∀ σ, ℓ (v σ) = 1) ∧ u = ∑ σ, c σ • v σ := by
   intro n V _ _ _ hdim θ h0 hadd u ℓ z c hz hc hu
   classical
   let χ : Equiv.Perm (Fin n) → Multiplicative (eigCone n) → ℂ := fun σ => eigChar (z ∘ σ)
@@ -106,17 +111,18 @@ theorem UpperTheory.ConvolutionTheory.H.eigBasis :
   choose v hv using hex
   have hlc : LinearIndependent ℂ (Φ ∘ v) := by
     have : Φ ∘ v = χ := funext hv
-    rw [this]; exact hli
+    rw [this]
+    exact hli
   have hlv : LinearIndependent ℂ v := LinearIndependent.of_comp Φ hlc
   have hcard : Fintype.card (Equiv.Perm (Fin n)) = Module.finrank ℂ V := by
     refine le_antisymm hlv.fintype_card_le_finrank ?_
     rw [Fintype.card_perm, Fintype.card_fin]
     exact hdim
   let B := basisOfLinearIndependentOfCardEqFinrank hlv hcard
-  have hB : ∀ σ, B σ = v σ := fun σ => by
-    simp [B, coe_basisOfLinearIndependentOfCardEqFinrank]
+  have hB : ∀ σ, B σ = v σ := fun σ => by simp [B, coe_basisOfLinearIndependentOfCardEqFinrank]
   have hΦinj : Function.Injective Φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     rw [← B.sum_repr x] at hx ⊢
     set_option synthInstance.maxHeartbeats 100000 in
@@ -139,4 +145,4 @@ theorem UpperTheory.ConvolutionTheory.H.eigBasis :
     funext a
     rw [hΦ, hu _ a.toAdd.2]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hB, hv, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hχ]
+    simp only [map_sum, map_smul, hB, hv, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hχ]

@@ -7,14 +7,19 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory
 
-theorem eis_U_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
-    (ha : ∀ x : ℤ, (l : ℤ) ∣ x → a x = 0) (hb : ∀ y, b (l * y) = t * b y) (n : ℕ) (hn : n ≠ 0) :
-    eis j c a b (l * n) = t * eis j c a b n := by
+theorem eis_U_pair
+    (j l : ℕ)
+    (c t : ℂ)
+    (a b : ℤ → ℂ)
+    (hl : l.Prime) (ha : ∀ x : ℤ, (l : ℤ) ∣ x → a x = 0) (hb : ∀ y, b (l * y) = t * b y)
+    (n : ℕ) (hn : n ≠ 0)
+    : eis j c a b (l * n) = t * eis j c a b n := by
   have hl0 : l ≠ 0 := hl.ne_zero
   have hln : l * n ≠ 0 := mul_ne_zero hl0 hn
   simp only [eis, hln, hn, if_false]
@@ -24,7 +29,8 @@ theorem eis_U_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
   · intro p hp _
     rw [Nat.mem_divisorsAntidiagonal] at hp ⊢
     refine ⟨?_, hln⟩
-    rw [← hp.1]; ring
+    rw [← hp.1]
+    ring
   · intro p _ _ q _ _ h
     simp only [Prod.mk.injEq] at h
     exact Prod.ext h.1 (Nat.eq_of_mul_eq_mul_left hl.pos h.2)
@@ -33,7 +39,8 @@ theorem eis_U_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
     have h1 : ¬ l ∣ q.1 := by
       intro hd
       apply hne
-      rw [ha q.1 (by exact_mod_cast hd)]; ring
+      rw [ha q.1 (by exact_mod_cast hd)]
+      ring
     have h2 : l ∣ q.2 := by
       have : l ∣ q.1 * q.2 := by rw [hq.1]; exact dvd_mul_right _ _
       exact (hl.dvd_mul.mp this).resolve_left h1
@@ -55,11 +62,17 @@ theorem eis_U_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
   · intro p _ _
     simp only
     push_cast
-    rw [hb]; ring
+    rw [hb]
+    ring
 
-theorem eis_V_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
-    (ha : ∀ x, a (l * x) = t * a x) (n : ℕ) (hn : n ≠ 0) :
-    eis j c (fun x => if (l : ℤ) ∣ x then a x else 0) b n = t * (l : ℂ) ^ (j - 1) * Vo l (eis j c a b) n := by
+theorem eis_V_pair
+    (j l : ℕ)
+    (c t : ℂ)
+    (a b : ℤ → ℂ)
+    (hl : l.Prime) (ha : ∀ x, a (l * x) = t * a x)
+    (n : ℕ) (hn : n ≠ 0)
+    : eis j c (fun x => if (l : ℤ) ∣ x then a x else 0) b n
+      = t * (l : ℂ) ^ (j - 1) * Vo l (eis j c a b) n := by
   have hl0 : l ≠ 0 := hl.ne_zero
   by_cases hd : l ∣ n
   · obtain ⟨m, rfl⟩ := hd
@@ -72,7 +85,8 @@ theorem eis_V_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
     · intro p hp _
       rw [Nat.mem_divisorsAntidiagonal] at hp ⊢
       refine ⟨?_, hn⟩
-      rw [← hp.1]; ring
+      rw [← hp.1]
+      ring
     · intro p _ _ q _ _ h
       simp only [Prod.mk.injEq] at h
       exact Prod.ext (Nat.eq_of_mul_eq_mul_left hl.pos h.1) h.2
@@ -106,7 +120,8 @@ theorem eis_V_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
       have hdv : (l : ℤ) ∣ ((l * p.1 : ℕ) : ℤ) := by push_cast; exact dvd_mul_right _ _
       simp only [hdv, if_true]
       push_cast
-      rw [ha, mul_pow]; ring
+      rw [ha, mul_pow]
+      ring
   · have h0 : Vo l (eis j c a b) n = 0 := by simp [Vo, hd]
     rw [h0, mul_zero]
     simp only [eis, hn, if_false]
@@ -116,11 +131,21 @@ theorem eis_V_pair (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) (hl : l.Prime)
       intro h
       apply hd
       have h' : l ∣ q.1 := by exact_mod_cast h
-      rw [← hq.1]; exact dvd_mul_of_dvd_left h' _
+      rw [← hq.1]
+      exact dvd_mul_of_dvd_left h' _
     simp [this]
 
-theorem eis_U_V (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ) : l.Prime → ((∀ x : ℤ, (l : ℤ) ∣ x → a x = 0) → (∀ y, b (l * y) = t * b y) → ∀ n, n ≠ 0 → eis j c a b (l * n) = t * eis j c a b n) ∧ (1 ≤ j → (∀ x, a (l * x) = t * a x) → ∀ n, n ≠ 0 → eis j c (fun x => if (l : ℤ) ∣ x then a x else 0) b n = t * (l : ℂ) ^ (j - 1) * Vo l (eis j c a b) n) :=
-  fun hl => ⟨fun ha hb n hn => eis_U_pair j l c t a b hl ha hb n hn,
-    fun _ ha n hn => eis_V_pair j l c t a b hl ha n hn⟩
+theorem eis_U_V (j l : ℕ) (c t : ℂ) (a b : ℤ → ℂ)
+    : l.Prime
+      → ((∀ x : ℤ, (l : ℤ) ∣ x → a x = 0) → (∀ y, b (l * y) = t * b y)
+          → ∀ n, n ≠ 0 → eis j c a b (l * n) = t * eis j c a b n)
+        ∧ (1 ≤ j → (∀ x, a (l * x) = t * a x)
+          → ∀ n,
+            n ≠ 0
+              → eis j c (fun x => if (l : ℤ) ∣ x then a x else 0) b n
+                = t * (l : ℂ) ^ (j - 1) * Vo l (eis j c a b) n) := fun hl => ⟨
+  fun ha hb n hn => eis_U_pair j l c t a b hl ha hb n hn,
+  fun _ ha n hn => eis_V_pair j l c t a b hl ha n hn
+⟩
 
 end GlobalTheory

@@ -5,8 +5,10 @@ public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 set_option autoImplicit false
 
@@ -14,12 +16,14 @@ namespace GlobalTheory.HSShortDiv
 
 variable {F : Type} [Field F] {D N : ℕ}
 
-noncomputable def lastSubst (l₀ : Fin N → F) : Fin (D + 1) × Fin N → MvPolynomial (Fin (D + 1) × Fin N) F :=
-  fun p => if p.1 = Fin.last D then C (l₀ p.2) else X p
+noncomputable def lastSubst (l₀ : Fin N → F)
+    : Fin (D + 1) × Fin N → MvPolynomial (Fin (D + 1) × Fin N) F := fun p =>
+  if p.1 = Fin.last D then C (l₀ p.2) else X p
 
-theorem eval_aeval_lastSubst (l₀ : Fin N → F) (x : Fin (D + 1) × Fin N → F)
-    (f : MvPolynomial (Fin (D + 1) × Fin N) F) :
-    eval x (aeval (lastSubst l₀) f) = eval (fun p => if p.1 = Fin.last D then l₀ p.2 else x p) f := by
+theorem eval_aeval_lastSubst
+    (l₀ : Fin N → F) (x : Fin (D + 1) × Fin N → F) (f : MvPolynomial (Fin (D + 1) × Fin N) F)
+    : eval x (aeval (lastSubst l₀) f)
+      = eval (fun p => if p.1 = Fin.last D then l₀ p.2 else x p) f := by
   induction f using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _)]
@@ -27,17 +31,19 @@ theorem eval_aeval_lastSubst (l₀ : Fin N → F) (x : Fin (D + 1) × Fin N → 
     simp only [map_mul, hp, aeval_X, eval_X, lastSubst]
     split_ifs <;> simp
 
-theorem replace_eq_join (l : Fin N → F) (x : Fin (D + 1) × Fin N → F) :
-    (fun p : Fin (D + 1) × Fin N => if p.1 = Fin.last D then l p.2 else x p) =
-      join (fun i j => x (i.castSucc, j)) l := by
+theorem replace_eq_join (l : Fin N → F) (x : Fin (D + 1) × Fin N → F)
+    : (fun p : Fin (D + 1) × Fin N => if p.1 = Fin.last D then l p.2 else x p)
+      = join (fun i j => x (i.castSucc, j)) l := by
   funext ⟨i, j⟩
   induction i using Fin.lastCases with
   | last => simp [join]
   | cast i => simp [join, Fin.castSucc_ne_last]
 
-theorem eval_last_zero {δ : ℕ} (hδ : 1 ≤ δ) (f : MvPolynomial (Fin (D + 1) × Fin N) F)
-    (hf : IsMultiHomogeneous (fun _ => δ) f) (x : Fin (D + 1) × Fin N → F) :
-    eval (fun p => if p.1 = Fin.last D then 0 else x p) f = 0 := by
+theorem eval_last_zero
+    {δ : ℕ} (hδ : 1 ≤ δ)
+    (f : MvPolynomial (Fin (D + 1) × Fin N) F) (hf : IsMultiHomogeneous (fun _ => δ) f)
+    (x : Fin (D + 1) × Fin N → F)
+    : eval (fun p => if p.1 = Fin.last D then 0 else x p) f = 0 := by
   rw [eval_eq']
   refine Finset.sum_eq_zero fun d hd => ?_
   have hs := hf d hd (Fin.last D)
@@ -46,13 +52,15 @@ theorem eval_last_zero {δ : ℕ} (hδ : 1 ≤ δ) (f : MvPolynomial (Fin (D + 1
   refine mul_eq_zero_of_right _ (Finset.prod_eq_zero (i := (Fin.last D, j)) (Finset.mem_univ _) ?_)
   simp [zero_pow hj]
 
-theorem pow_dvd_of_specialisations (F : Type) [Field F] [CharZero F] (D N δ b : ℕ) (f G : MvPolynomial (Fin (D + 1) × Fin N) F)
-    (Q : MvPolynomial (Fin D × Fin N) F) (hδ : 1 ≤ δ) (hf : IsMultiHomogeneous (fun _ => δ) f)
-    (hirr : Irreducible f) (hQ : Q ≠ 0)
-    (hG : ∀ s : Fin D → Fin N → F, eval (fun p => s p.1 p.2) Q ≠ 0 → ∃ (E : Type) (_ : Field E)
-      (_ : Algebra F E) (γ : E), ∀ l : Fin N → F,
-        algebraMap F E (eval (join s l) G) = γ * algebraMap F E (eval (join s l) f) ^ b) :
-    f ^ b ∣ G := by
+theorem pow_dvd_of_specialisations
+    (F : Type) [Field F] [CharZero F]
+    (D N δ b : ℕ) (f G : MvPolynomial (Fin (D + 1) × Fin N) F) (Q : MvPolynomial (Fin D × Fin N) F)
+    (hδ : 1 ≤ δ) (hf : IsMultiHomogeneous (fun _ => δ) f) (hirr : Irreducible f) (hQ : Q ≠ 0)
+    (hG : ∀ s : Fin D → Fin N → F,
+      eval (fun p => s p.1 p.2) Q ≠ 0
+        → ∃ (E : Type) (_ : Field E) (_ : Algebra F E) (γ : E), ∀ l : Fin N → F,
+          algebraMap F E (eval (join s l) G) = γ * algebraMap F E (eval (join s l) f) ^ b)
+    : f ^ b ∣ G := by
   haveI : Infinite F := Infinite.of_injective Nat.cast Nat.cast_injective
   have hf0 : f ≠ 0 := hirr.ne_zero
 
@@ -83,8 +91,7 @@ theorem pow_dvd_of_specialisations (F : Type) [Field F] [CharZero F] (D N δ b :
       split_ifs with h
       · rw [← h]
       · rfl
-    have hQx : eval x Q' = eval (fun p => s p.1 p.2) Q := by
-      rw [hQ', eval_rename]; rfl
+    have hQx : eval x Q' = eval (fun p => s p.1 p.2) Q := by rw [hQ', eval_rename]; rfl
     simp only [map_mul, map_sub, map_pow, map_zero]
     by_cases hq : eval (fun p => s p.1 p.2) Q = 0
     · rw [hQx, hq, zero_mul]
@@ -93,7 +100,8 @@ theorem pow_dvd_of_specialisations (F : Type) [Field F] [CharZero F] (D N δ b :
       have h2 := hγ l₀
       rw [← hx] at h1
       have hgx : eval x g = eval (join s l₀) f := by rw [hg, eval_aeval_lastSubst, replace_eq_join]
-      have hGx : eval x G₀ = eval (join s l₀) G := by rw [hG₀, eval_aeval_lastSubst, replace_eq_join]
+      have hGx : eval x G₀ = eval (join s l₀) G := by
+        rw [hG₀, eval_aeval_lastSubst, replace_eq_join]
       rw [hgx, hGx]
       have : eval x G * eval (join s l₀) f ^ b - eval x f ^ b * eval (join s l₀) G = 0 := by
         apply (algebraMap F E).injective
@@ -112,7 +120,8 @@ theorem pow_dvd_of_specialisations (F : Type) [Field F] [CharZero F] (D N δ b :
       have := congrArg (eval x₀) h0
       rw [hg, eval_aeval_lastSubst, map_zero] at this
       apply hx₀
-      have hpt : (fun p : Fin (D + 1) × Fin N => if p.1 = Fin.last D then l₀ p.2 else x₀ p) = x₀ := by
+      have hpt
+          : (fun p : Fin (D + 1) × Fin N => if p.1 = Fin.last D then l₀ p.2 else x₀ p) = x₀ := by
         funext p
         split_ifs with hp1
         · rw [hl₀]; simp only; rw [← hp1]
@@ -124,8 +133,15 @@ theorem pow_dvd_of_specialisations (F : Type) [Field F] [CharZero F] (D N δ b :
     intro x
     have e1 : eval x g = eval (fun p => if p.1 = Fin.last D then 0 else x p) g := by
       rw [hg, eval_aeval_lastSubst, eval_aeval_lastSubst]
-      have hpt : (fun p : Fin (D + 1) × Fin N => if p.1 = Fin.last D then l₀ p.2 else x p) =
-          (fun p => if p.1 = Fin.last D then l₀ p.2 else if p.1 = Fin.last D then 0 else x p) := by
+      have hpt
+          : (fun p : Fin (D + 1) × Fin N => if p.1 = Fin.last D then l₀ p.2 else x p)
+            = (fun p =>
+              if p.1 = Fin.last D then
+                l₀ p.2
+              else if p.1 = Fin.last D then
+                0
+              else
+                x p) := by
         funext p
         split_ifs <;> rfl
       rw [hpt]

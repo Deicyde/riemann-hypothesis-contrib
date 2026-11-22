@@ -16,7 +16,8 @@ noncomputable section
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
   CartesianMonoidalCategory MonObj TensorProduct NumberField
 open scoped nonZeroDivisors
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CechPic
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CechPic
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -28,8 +29,10 @@ variable {S : Scheme.{0}} (A : Over S) [GrpObj A] [IsCommMonObj A]
 
 variable {A}
 
-theorem cls_pull_lam {L : LB A.left} (hL : L.IsLB) {T : Over S} (x y : T ⟶ A)
-    (h : ((abelian₂ A L).pull (lift x y).left).IsLB) : cls _ h = lam (cls L hL) x y := by
+theorem cls_pull_lam
+    {L : LB A.left} (hL : L.IsLB)
+    {T : Over S} (x y : T ⟶ A) (h : ((abelian₂ A L).pull (lift x y).left).IsLB)
+    : cls _ h = lam (cls L hL) x y := by
   rw [cls_pull (L := abelian₂ A L) (LB.isLB_linComb hL _ _) _ h]
   erw [cls_cube_two hL (fst A A) (snd A A)]
   rw [pull_lam, lift_fst, lift_snd]

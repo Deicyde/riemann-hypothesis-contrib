@@ -13,8 +13,9 @@ namespace PI.RhsWLim.W
 
 open PI.RhsWLim
 
-attribute [local instance] Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace
-  Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
+attribute [local instance]
+  Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace Matrix.linftyOpNormedRing
+  Matrix.linftyOpNormedAlgebra
 
 variable {k r : ℕ}
 
@@ -31,11 +32,13 @@ def opGenLin (k r : ℕ) : TrE k →ₗ[ℝ] Mat k r where
   map_add' q q' := by
     ext i j
     simp only [opGen, Matrix.add_apply]
-    split_ifs <;> simp [opBeta_add, star_add]; ring
+    split_ifs <;> simp [opBeta_add, star_add]
+    ring
   map_smul' c q := by
     ext i j
     simp only [opGen, Matrix.smul_apply, RingHom.id_apply]
-    split_ifs <;> simp [opBeta_smul, Complex.real_smul, star_mul', Complex.conj_ofReal]; ring
+    split_ifs <;> simp [opBeta_smul, Complex.real_smul, star_mul', Complex.conj_ofReal]
+    ring
 
 def opGenL (k r : ℕ) : TrE k →L[ℝ] Mat k r := LinearMap.toContinuousLinearMap (opGenLin k r)
 
@@ -44,10 +47,11 @@ def opGenL (k r : ℕ) : TrE k →L[ℝ] Mat k r := LinearMap.toContinuousLinear
 lemma opGen_zero : opGen k r (0 : TrE k) = 0 := (opGenLin k r).map_zero
 
 def mvL (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) : Mat k r →L[ℝ] (Fin (2 * r + k + 1) → ℂ) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun M => M *ᵥ v
-      map_add' := fun M N => Matrix.add_mulVec M N v
-      map_smul' := fun c M => by simp [Matrix.smul_mulVec] }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun M => M *ᵥ v
+    map_add' := fun M N => Matrix.add_mulVec M N v
+    map_smul' := fun c M => by simp [Matrix.smul_mulVec]
+  }
 
 @[simp] lemma mvL_apply (v : Fin (2 * r + k + 1) → ℂ) (M : Mat k r) : mvL k r v M = M *ᵥ v := rfl
 
@@ -93,14 +97,17 @@ lemma dpsi_apply (T' : ℝ) (q : TrE k) (i : Fin (2 * r + k + 1)) :
   simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.one_apply, opGenL_apply, mvL_apply]
   exact mulVec_base T' _ i
 
-def dgn (T' : ℝ) : Option (Fin k × Bool) → ℝ := fun o => match o with
+def dgn (T' : ℝ) : Option (Fin k × Bool) → ℝ := fun o =>
+  match o with
   | none => 1
   | some _ => Real.sqrt T' / Real.sqrt 2
 
-def DL (k : ℕ) (T' : ℝ) : TrE k →L[ℝ] TrE k := LinearMap.toContinuousLinearMap
-  { toFun := fun q => (WithLp.equiv 2 (Option (Fin k × Bool) → ℝ)).symm (fun o => dgn T' o * q o)
+def DL (k : ℕ) (T' : ℝ) : TrE k →L[ℝ] TrE k :=
+  LinearMap.toContinuousLinearMap {
+    toFun := fun q => (WithLp.equiv 2 (Option (Fin k × Bool) → ℝ)).symm (fun o => dgn T' o * q o)
     map_add' := fun q q' => by ext o; simp [mul_add]
-    map_smul' := fun c q => by ext o; simp; ring }
+    map_smul' := fun c q => by ext o; simp; ring
+  }
 
 @[simp] lemma DL_apply (T' : ℝ) (q : TrE k) (o : Option (Fin k × Bool)) : DL k T' q o = dgn T' o * q o := rfl
 
@@ -145,14 +152,19 @@ theorem phiT_contDiffAt (T' : ℝ) (hT : 0 < T') : ContDiffAt ℝ 1 (phiT k r T'
   rcases o with _ | ⟨a, b⟩
   · have hlog : ContDiffAt ℝ 1 Complex.log (psiV k r T' 0 (wI k r (Fin.last k))) := by
       rw [psiV_last_zero]
-      exact (Complex.contDiffAt_log (Complex.ofReal_mem_slitPlane.2 (Real.sqrt_pos.2 hT))).restrict_scalars ℝ
-    have := Complex.imCLM.contDiff.contDiffAt.comp (0 : TrE k)
-      (hlog.comp (0 : TrE k) ((ContinuousLinearMap.proj (R := ℝ) (wI k r (Fin.last k))).contDiff.contDiffAt.comp
-        (0 : TrE k) hp))
+      exact (Complex.contDiffAt_log (Complex.ofReal_mem_slitPlane.2 (Real.sqrt_pos.2
+        hT))).restrict_scalars ℝ
+    have :=
+      Complex.imCLM.contDiff.contDiffAt.comp (0 : TrE k)
+        (hlog.comp (0 : TrE k)
+          ((ContinuousLinearMap.proj (R := ℝ) (wI k r (Fin.last k))).contDiff.contDiffAt.comp
+            (0 : TrE k) hp))
     refine this.congr_of_eventuallyEq (Filter.Eventually.of_forall fun q => ?_)
     exact phiT_coord_c T' q
-  · have hj := (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin (2 * r + k + 1) => ℂ)
-      (wI k r a.castSucc)).contDiff.contDiffAt.comp (0 : TrE k) hp
+  · have hj :=
+      (ContinuousLinearMap.proj (R := ℝ)
+        (φ := fun _ : Fin (2 * r + k + 1) => ℂ)
+        (wI k r a.castSucc)).contDiff.contDiffAt.comp (0 : TrE k) hp
     cases b
     · exact Complex.reCLM.contDiff.contDiffAt.comp (0 : TrE k) hj
     · exact Complex.imCLM.contDiff.contDiffAt.comp (0 : TrE k) hj
@@ -165,36 +177,44 @@ theorem phiT_strict (T' : ℝ) (hT : 0 < T') : HasStrictFDerivAt (phiT k r T') (
       Complex.ofReal_mem_slitPlane.2 (Real.sqrt_pos.2 hT)
     have hlog := ((Complex.hasStrictDerivAt_log hs).hasStrictFDerivAt).restrictScalars ℝ
     rw [← psiV_last_zero (k := k) (r := r)] at hlog
-    have H := Complex.imCLM.hasStrictFDerivAt.comp (0 : TrE k)
-      (hlog.comp (0 : TrE k) ((ContinuousLinearMap.proj (R := ℝ) (wI k r (Fin.last k))).hasStrictFDerivAt.comp
-        (0 : TrE k) hp))
-    have hf : (fun x => phiT k r T' x none) =
-        Complex.imCLM ∘ Complex.log ∘ (fun f : Fin (2 * r + k + 1) → ℂ => f (wI k r (Fin.last k))) ∘ psiV k r T' := by
+    have H :=
+      Complex.imCLM.hasStrictFDerivAt.comp (0 : TrE k)
+        (hlog.comp (0 : TrE k)
+          ((ContinuousLinearMap.proj (R := ℝ) (wI k r (Fin.last k))).hasStrictFDerivAt.comp
+            (0 : TrE k) hp))
+    have hf
+        : (fun x => phiT k r T' x none)
+          = Complex.imCLM ∘ Complex.log
+            ∘ (fun f : Fin (2 * r + k + 1) → ℂ => f (wI k r (Fin.last k))) ∘ psiV k r T' := by
       funext x; exact phiT_coord_c T' x
     rw [hf]
     refine H.congr_fderiv (ContinuousLinearMap.ext fun q => ?_)
     have hsq : (Real.sqrt T' : ℂ) ≠ 0 := by rw [Complex.ofReal_ne_zero]; positivity
     simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.coe_restrictScalars',
-      ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply, ContinuousLinearMap.proj_apply,
-      opGenL_apply, mvL_apply, mulVec_base, opGen_c, psiV_last_zero, Complex.imCLM_apply, PiLp.proj_apply,
-      DL_apply, dgn, one_mul, smul_eq_mul]
-    have : (Real.sqrt T' : ℂ) * ((q none : ℂ) * Complex.I) * (Real.sqrt T' : ℂ)⁻¹ = (q none : ℂ) * Complex.I := by
+      ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply,
+      ContinuousLinearMap.proj_apply, opGenL_apply, mvL_apply, mulVec_base, opGen_c, psiV_last_zero,
+      Complex.imCLM_apply, PiLp.proj_apply, DL_apply, dgn, one_mul, smul_eq_mul]
+    have : (Real.sqrt T' : ℂ) * ((q none : ℂ) * Complex.I) * (Real.sqrt T' : ℂ)⁻¹
+        = (q none : ℂ) * Complex.I := by
       field_simp
-    rw [ContinuousLinearMap.toSpanSingleton_apply, smul_eq_mul, this]; simp
-  · have Hj := (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin (2 * r + k + 1) => ℂ)
-      (wI k r a.castSucc)).hasStrictFDerivAt.comp (0 : TrE k) hp
+    rw [ContinuousLinearMap.toSpanSingleton_apply, smul_eq_mul, this]
+    simp
+  · have Hj :=
+      (ContinuousLinearMap.proj (R := ℝ)
+        (φ := fun _ : Fin (2 * r + k + 1) => ℂ)
+        (wI k r a.castSucc)).hasStrictFDerivAt.comp (0 : TrE k) hp
     cases b
     · have H := Complex.reCLM.hasStrictFDerivAt.comp (0 : TrE k) Hj
       refine H.congr_fderiv (ContinuousLinearMap.ext fun q => ?_)
-      simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, dpsi_apply, opGen_y,
-        beta_re_im, Complex.reCLM_apply, PiLp.proj_apply, DL_apply, dgn]
+      simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, dpsi_apply,
+        opGen_y, beta_re_im, Complex.reCLM_apply, PiLp.proj_apply, DL_apply, dgn]
       change ((opGen k r q *ᵥ opBase k r T') (wI k r a.castSucc)).re = _
       rw [mulVec_base, opGen_y, beta_re_im]
       simp
     · have H := Complex.imCLM.hasStrictFDerivAt.comp (0 : TrE k) Hj
       refine H.congr_fderiv (ContinuousLinearMap.ext fun q => ?_)
-      simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, dpsi_apply, opGen_y,
-        beta_re_im, Complex.imCLM_apply, PiLp.proj_apply, DL_apply, dgn]
+      simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, dpsi_apply,
+        opGen_y, beta_re_im, Complex.imCLM_apply, PiLp.proj_apply, DL_apply, dgn]
       change ((opGen k r q *ᵥ opBase k r T') (wI k r a.castSucc)).im = _
       rw [mulVec_base, opGen_y, beta_re_im]
       simp

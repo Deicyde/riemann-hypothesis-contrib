@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Swarm
 
-theorem DoubleCech.proof : GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization.DoubleCech.Statement :=
+theorem DoubleCech.proof
+    : GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization.DoubleCech.Statement :=
   GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization.DoubleCech.proof
     GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization.Staircase.proof
     GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization.CellDSq.proof

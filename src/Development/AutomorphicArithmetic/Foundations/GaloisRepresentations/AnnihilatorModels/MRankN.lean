@@ -8,15 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharZeroOfIs
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.rankN_of :
-    WVal → RankN := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.rankN_of : WVal → RankN := by
   intro hW p _ D O _ _ _ _ f b N r w _ hS M V _ _ _ _ hp x W
   obtain ⟨ρ, -, -, hρ3, -⟩ := hW p D O b N M w V x
   have hpO : (p : O) ∈ IsLocalRing.maximalIdeal O := hS.pmem
@@ -25,7 +27,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.rankN_of :
     haveI : CharP (FractionRing V) (ringChar (FractionRing V)) := ringChar.charP _
     rcases CharP.char_is_prime_or_zero (FractionRing V) (ringChar (FractionRing V)) with hq | hq
     · exfalso
-      have hqK : ((ringChar (FractionRing V) : ℕ) : FractionRing V) = 0 := ringChar.Nat.cast_ringChar
+      have hqK : ((ringChar (FractionRing V) : ℕ) : FractionRing V) = 0 :=
+        ringChar.Nat.cast_ringChar
       have hqV : ((ringChar (FractionRing V) : ℕ) : V) = 0 := by
         apply IsFractionRing.injective V (FractionRing V)
         rw [map_natCast, map_zero]
@@ -55,11 +58,14 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.rankN_of :
     have := hS.norm
     rw [h, Ideal.absNorm_bot] at this
     exact hpf this.symm
-  have hcard := CharZeroCount.card_killedBy_charZero p D O b N M.X M.s M.univ w hw (FractionRing V)
-    (spMap (algebraMap V (FractionRing V)) ≫ x)
-  let Φ : {g : Over.mk x ⟶ M.univ.A // KilledBy M.univ w g} →
-      {h : Over.mk (spMap (algebraMap V (FractionRing V)) ≫ x) ⟶ M.univ.A // KilledBy M.univ w h} :=
-    fun g => ⟨ρ g.1, (hρ3 g.1).1 g.2⟩
+  have hcard :=
+    CharZeroCount.card_killedBy_charZero p D O b N M.X M.s M.univ w hw (FractionRing V)
+      (spMap (algebraMap V (FractionRing V)) ≫ x)
+  let Φ
+      : {g : Over.mk x ⟶ M.univ.A // KilledBy M.univ w g}
+        → {h : Over.mk (spMap (algebraMap V (FractionRing V)) ≫ x) ⟶ M.univ.A
+          // KilledBy M.univ w h} := fun g =>
+    ⟨ρ g.1, (hρ3 g.1).1 g.2⟩
   have hΦ : Function.Bijective Φ := by
     constructor
     · rintro ⟨g₁, hg₁⟩ ⟨g₂, hg₂⟩ he
@@ -67,8 +73,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.rankN_of :
     · rintro ⟨h, hh⟩
       refine ⟨⟨ρ.symm h, (hρ3 _).2 (by simpa using hh)⟩, ?_⟩
       exact Subtype.ext (by simp [Φ])
-  let Ψ : W.H → {g : Over.mk x ⟶ M.univ.A // KilledBy M.univ w g} :=
-    fun h => ⟨W.pt h, (W.range _).1 ⟨h, rfl⟩⟩
+  let Ψ : W.H → {g : Over.mk x ⟶ M.univ.A // KilledBy M.univ w g} := fun h =>
+    ⟨W.pt h, (W.range _).1 ⟨h, rfl⟩⟩
   have hΨ : Function.Bijective Ψ := by
     constructor
     · intro a c hac

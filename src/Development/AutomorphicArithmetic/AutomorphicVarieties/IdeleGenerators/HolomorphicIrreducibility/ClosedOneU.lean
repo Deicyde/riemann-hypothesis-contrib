@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V
+  UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd
 
 section SlopeTestRemainingChoices
 
@@ -33,7 +35,8 @@ private def oneU (l : ℕ) [Fact l.Prime] : Subgroup (Qbar l)ˣ where
   carrier := {x | ‖(x : Qbar l) - 1‖ < 1}
   one_mem' := by simp
   mul_mem' {a b} ha hb := by
-    have e : ((a * b : (Qbar l)ˣ) : Qbar l) - 1 = a * (b - 1) + (a - 1) := by rw [Units.val_mul]; ring
+    have e : ((a * b : (Qbar l)ˣ) : Qbar l) - 1 = a * (b - 1) + (a - 1) := by
+      rw [Units.val_mul]; ring
     show ‖_‖ < 1
     rw [e]
     refine add_lt ?_ ha
@@ -52,16 +55,17 @@ variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
 
 omit [NumberField F] in
 private theorem cyc_mem (s : G F Ω) : cycBar F Ω l s ^ (l - 1) ∈ oneU l := by
-  have e : ((cycBar F Ω l s ^ (l - 1) : (Qbar l)ˣ) : Qbar l) - 1 =
-      algebraMap ℚ_[l] (Qbar l) ((((cycZ F Ω l s : ℤ_[l]) ^ (l - 1) - 1 : ℤ_[l])) : ℚ_[l]) := by
+  have e
+      : ((cycBar F Ω l s ^ (l - 1) : (Qbar l)ˣ) : Qbar l) - 1
+        = algebraMap ℚ_[l] (Qbar l) ((((cycZ F Ω l s : ℤ_[l]) ^ (l - 1) - 1 : ℤ_[l])) : ℚ_[l]) := by
     rw [Units.val_pow_eq_pow_val]
     change (algebraMap ℚ_[l] (Qbar l) ((cycZ F Ω l s : ℤ_[l]) : ℚ_[l])) ^ _ - 1 = _
     simp
   show ‖_‖ < 1
   rw [e, norm_algebraMap']
   change ‖(cycZ F Ω l s : ℤ_[l]) ^ (l - 1) - 1‖ < 1
-  rw [← PadicInt.mem_nonunits, ← IsLocalRing.mem_maximalIdeal, ← PadicInt.ker_toZMod, RingHom.mem_ker, map_sub, map_pow,
-    map_one, ZMod.pow_card_sub_one_eq_one, sub_self]
+  rw [← PadicInt.mem_nonunits, ← IsLocalRing.mem_maximalIdeal, ← PadicInt.ker_toZMod,
+    RingHom.mem_ker, map_sub, map_pow, map_one, ZMod.pow_card_sub_one_eq_one, sub_self]
   exact ((cycZ F Ω l s).isUnit.map _).ne_zero
 
 end SlopeTestRemainingChoices

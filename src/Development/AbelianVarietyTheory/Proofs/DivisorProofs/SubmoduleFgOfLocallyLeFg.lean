@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem submodule_fg_of_locally_le_fg {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
-    [IsNoetherianRing R] (M : Submodule R A) (s : Set R) (hs : Ideal.span s = ⊤)
+theorem submodule_fg_of_locally_le_fg
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A] [IsNoetherianRing R]
+    (M : Submodule R A) (s : Set R) (hs : Ideal.span s = ⊤)
     (hE : ∀ g ∈ s, ∃ E : Finset A, ∀ b ∈ M, ∃ m : ℕ,
-      algebraMap R A g ^ m * b ∈ Submodule.span R (E : Set A)) : M.FG := by
+      algebraMap R A g ^ m * b ∈ Submodule.span R (E : Set A))
+    : M.FG := by
   classical
   obtain ⟨s0, hs0s, hs0⟩ := (Ideal.span_eq_top_iff_finite s).1 hs
   choose! E hEm using hE
@@ -23,8 +25,7 @@ theorem submodule_fg_of_locally_le_fg {R A : Type} [CommRing R] [CommRing A] [Al
   refine ⟨m, ?_⟩
   have hle : Submodule.span R (E g.1 : Set A) ≤ Submodule.span R T :=
     Submodule.span_mono (Set.subset_biUnion_of_mem (u := fun g => (E g : Set A)) g.2)
-  have : (g.1 ^ m) • b = algebraMap R A g.1 ^ m * b := by
-    rw [Algebra.smul_def, map_pow]
+  have : (g.1 ^ m) • b = algebraMap R A g.1 ^ m * b := by rw [Algebra.smul_def, map_pow]
   rw [this]
   exact hle hm
 

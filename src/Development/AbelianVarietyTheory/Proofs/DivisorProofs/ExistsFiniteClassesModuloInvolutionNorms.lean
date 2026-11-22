@@ -15,10 +15,11 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem finite_heightOneSpectrum_containing_finset_nat (K : Type) [Field K] [NumberField K] (S : Finset ℕ) :
-    {P : HeightOneSpectrum (𝓞 K) | ∃ ℓ ∈ S, ℓ ≠ 0 ∧ (ℓ : 𝓞 K) ∈ P.asIdeal}.Finite := by
-  have : {P : HeightOneSpectrum (𝓞 K) | ∃ ℓ ∈ S, ℓ ≠ 0 ∧ (ℓ : 𝓞 K) ∈ P.asIdeal} ⊆
-      ⋃ ℓ ∈ S.filter (· ≠ 0), {P | P.asIdeal ∣ Ideal.span {(ℓ : 𝓞 K)}} := by
+private theorem finite_heightOneSpectrum_containing_finset_nat
+    (K : Type) [Field K] [NumberField K] (S : Finset ℕ)
+    : {P : HeightOneSpectrum (𝓞 K) | ∃ ℓ ∈ S, ℓ ≠ 0 ∧ (ℓ : 𝓞 K) ∈ P.asIdeal}.Finite := by
+  have : {P : HeightOneSpectrum (𝓞 K) | ∃ ℓ ∈ S, ℓ ≠ 0 ∧ (ℓ : 𝓞 K) ∈ P.asIdeal}
+      ⊆ ⋃ ℓ ∈ S.filter (· ≠ 0), {P | P.asIdeal ∣ Ideal.span {(ℓ : 𝓞 K)}} := by
     rintro P ⟨ℓ, hS, h0, hP⟩
     simp only [Set.mem_iUnion, Set.mem_setOf_eq, Finset.mem_filter]
     exact ⟨ℓ, ⟨hS, h0⟩, Ideal.dvd_span_singleton.2 hP⟩
@@ -31,9 +32,9 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem exists_finset_submodule_eq_add_two_smul {M : Type*} [AddCommGroup M]
-    [Module.Finite ℤ M] (N : Submodule ℤ M) :
-    ∃ V : Finset M, (∀ v ∈ V, v ∈ N) ∧ ∀ h ∈ N, ∃ v ∈ V, ∃ w ∈ N, h = v + 2 • w := by
+private theorem exists_finset_submodule_eq_add_two_smul
+    {M : Type*} [AddCommGroup M] [Module.Finite ℤ M] (N : Submodule ℤ M)
+    : ∃ V : Finset M, (∀ v ∈ V, v ∈ N) ∧ ∀ h ∈ N, ∃ v ∈ V, ∃ w ∈ N, h = v + 2 • w := by
   classical
   haveI := isNoetherian_of_isNoetherianRing_of_finite ℤ M
   haveI : Module.Finite ℤ N := Module.IsNoetherian.finite ℤ N
@@ -57,7 +58,8 @@ private theorem exists_finset_submodule_eq_add_two_smul {M : Type*} [AddCommGrou
     obtain ⟨w, hw⟩ := hq
     refine ⟨_, Finset.mem_image_of_mem _ (Finset.mem_univ q), -(w : M), N.neg_mem w.2, ?_⟩
     have := congrArg (fun z : N => (z : M)) hw
-    simp only [LinearMap.smul_apply, LinearMap.id_apply, Submodule.coe_smul, Submodule.coe_sub] at this
+    simp only [LinearMap.smul_apply, LinearMap.id_apply, Submodule.coe_smul, Submodule.coe_sub]
+      at this
     have h2 : (2 : ℕ) • (w : M) = (2 : ℤ) • (w : M) := by rw [two_smul, two_smul]
     rw [smul_neg, h2, this]
     abel
@@ -66,12 +68,14 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem exists_finset_fixedUnit_eq_mul_fixed_sq (K : Type) [Field K] [NumberField K]
-    (τ : K ≃+* K) : ∃ V : Finset K, ∀ u ∈ _root_.GlobalTheory.UnitSq.fixedUnits K τ, ∃ v ∈ V, ∃ w : K,
+private theorem exists_finset_fixedUnit_eq_mul_fixed_sq
+    (K : Type) [Field K] [NumberField K] (τ : K ≃+* K)
+    : ∃ V : Finset K, ∀ u ∈ _root_.GlobalTheory.UnitSq.fixedUnits K τ, ∃ v ∈ V, ∃ w : K,
       w ≠ 0 ∧ τ w = w ∧ ((u : 𝓞 K) : K) = v * w ^ 2 := by
   classical
-  obtain ⟨V, -, hV⟩ := exists_finset_submodule_eq_add_two_smul (M := Additive (𝓞 K)ˣ)
-    (AddSubgroup.toIntSubmodule (_root_.GlobalTheory.UnitSq.fixedUnits K τ).toAddSubgroup)
+  obtain ⟨V, -, hV⟩ :=
+    exists_finset_submodule_eq_add_two_smul (M := Additive (𝓞 K)ˣ)
+      (AddSubgroup.toIntSubmodule (_root_.GlobalTheory.UnitSq.fixedUnits K τ).toAddSubgroup)
   refine ⟨V.image fun v => (((Additive.toMul v : (𝓞 K)ˣ) : 𝓞 K) : K), fun u hu => ?_⟩
   obtain ⟨v, hv, w, hw, huv⟩ := hV (Additive.ofMul u) hu
   refine ⟨_, Finset.mem_image_of_mem _ hv, (((Additive.toMul w : (𝓞 K)ˣ) : 𝓞 K) : K), ?_, hw, ?_⟩
@@ -86,20 +90,23 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem ord_apply_involution_eq_ord_primeMap {K : Type} [Field K] [NumberField K] (τ : K ≃+* K)
-    (hτ : ∀ x, τ (τ x) = x) (P : HeightOneSpectrum (𝓞 K)) (x : K) :
-    _root_.GlobalTheory.FixNormCls.ord P (τ x) =
-      _root_.GlobalTheory.FixNormCls.ord (_root_.GlobalTheory.FixNormCls.primeMap τ P) x := by
-  have h := _root_.GlobalTheory.FixNormCls.ord_primeMap τ
-    (_root_.GlobalTheory.FixNormCls.primeMap τ P) x
+private theorem ord_apply_involution_eq_ord_primeMap
+    {K : Type} [Field K] [NumberField K]
+    (τ : K ≃+* K) (hτ : ∀ x, τ (τ x) = x)
+    (P : HeightOneSpectrum (𝓞 K)) (x : K)
+    : _root_.GlobalTheory.FixNormCls.ord P (τ x)
+      = _root_.GlobalTheory.FixNormCls.ord (_root_.GlobalTheory.FixNormCls.primeMap τ P) x := by
+  have h :=
+    _root_.GlobalTheory.FixNormCls.ord_primeMap τ (_root_.GlobalTheory.FixNormCls.primeMap τ P) x
   rwa [_root_.GlobalTheory.FixNormCls.primeMap_primeMap τ hτ] at h
 
 open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem exists_nat_prime_mem_heightOneSpectrum (K : Type) [Field K] [NumberField K] (P : HeightOneSpectrum (𝓞 K)) :
-    ∃ ℓ : ℕ, ℓ.Prime ∧ (ℓ : 𝓞 K) ∈ P.asIdeal := by
+private theorem exists_nat_prime_mem_heightOneSpectrum
+    (K : Type) [Field K] [NumberField K] (P : HeightOneSpectrum (𝓞 K))
+    : ∃ ℓ : ℕ, ℓ.Prime ∧ (ℓ : 𝓞 K) ∈ P.asIdeal := by
   haveI : P.asIdeal.IsMaximal := P.isMaximal
   letI : Field (𝓞 K ⧸ P.asIdeal) := Ideal.Quotient.field _
   haveI : Finite (𝓞 K ⧸ P.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ P.ne_bot
@@ -114,9 +121,10 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem ord_eq_zero_of_not_mem_of_ne_zero {K : Type} [Field K] [NumberField K]
-    (P : HeightOneSpectrum (𝓞 K)) (z : 𝓞 K) (h0 : z ≠ 0) (hz : z ∉ P.asIdeal) :
-    _root_.GlobalTheory.FixNormCls.ord P (z : K) = 0 := by
+private theorem ord_eq_zero_of_not_mem_of_ne_zero
+    {K : Type} [Field K] [NumberField K]
+    (P : HeightOneSpectrum (𝓞 K)) (z : 𝓞 K) (h0 : z ≠ 0) (hz : z ∉ P.asIdeal)
+    : _root_.GlobalTheory.FixNormCls.ord P (z : K) = 0 := by
   classical
   unfold _root_.GlobalTheory.FixNormCls.ord
   rw [← FractionalIdeal.coeIdeal_span_singleton]
@@ -136,9 +144,11 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem natCast_not_mem_of_prime_mem_not_dvd {K : Type} [Field K] [NumberField K]
-    (P : HeightOneSpectrum (𝓞 K)) {ℓ d : ℕ} (hℓ : ℓ.Prime) (hP : (ℓ : 𝓞 K) ∈ P.asIdeal)
-    (hd : ¬ ℓ ∣ d) : (d : 𝓞 K) ∉ P.asIdeal := by
+private theorem natCast_not_mem_of_prime_mem_not_dvd
+    {K : Type} [Field K] [NumberField K]
+    (P : HeightOneSpectrum (𝓞 K))
+    {ℓ d : ℕ} (hℓ : ℓ.Prime) (hP : (ℓ : 𝓞 K) ∈ P.asIdeal) (hd : ¬ ℓ ∣ d)
+    : (d : 𝓞 K) ∉ P.asIdeal := by
   intro hdP
   have hcop : IsCoprime (ℓ : ℤ) (d : ℤ) :=
     Nat.isCoprime_iff_coprime.2 ((Nat.Prime.coprime_iff_not_dvd hℓ).2 hd)
@@ -153,9 +163,9 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem ord_nonneg_of_isIntegral' {K : Type} [Field K] [NumberField K]
-    (P : HeightOneSpectrum (𝓞 K)) {z : K} (hz : IsIntegral ℤ z) :
-    0 ≤ _root_.GlobalTheory.FixNormCls.ord P z := by
+private theorem ord_nonneg_of_isIntegral'
+    {K : Type} [Field K] [NumberField K] (P : HeightOneSpectrum (𝓞 K)) {z : K} (hz : IsIntegral ℤ z)
+    : 0 ≤ _root_.GlobalTheory.FixNormCls.ord P z := by
   obtain ⟨w, rfl⟩ : ∃ w : 𝓞 K, (w : K) = z := ⟨⟨z, hz⟩, rfl⟩
   unfold _root_.GlobalTheory.FixNormCls.ord
   rw [← FractionalIdeal.coeIdeal_span_singleton]
@@ -165,63 +175,76 @@ open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem ord_eq_ord_add_ord_primeMap_of_isIntegral_mul {K : Type} [Field K] [NumberField K] (τ : K ≃+* K)
-    (hτ : ∀ x, τ (τ x) = x) (P : HeightOneSpectrum (𝓞 K)) {ℓ : ℕ} (hℓ : ℓ.Prime)
-    (hP : (ℓ : 𝓞 K) ∈ P.asIdeal) {a b x y : K} (ha0 : a ≠ 0) (hb : b ≠ 0)
-    (hax : a = x * (b * τ b)) (hby : b * τ b = y * a) {d : ℕ} (hd : ¬ ℓ ∣ d)
-    (hdx : IsIntegral ℤ ((d : K) * x)) (hdy : IsIntegral ℤ ((d : K) * y)) :
-    _root_.GlobalTheory.FixNormCls.ord P a = _root_.GlobalTheory.FixNormCls.ord P b +
-      _root_.GlobalTheory.FixNormCls.ord (_root_.GlobalTheory.FixNormCls.primeMap τ P) b := by
+private theorem ord_eq_ord_add_ord_primeMap_of_isIntegral_mul
+    {K : Type} [Field K] [NumberField K]
+    (τ : K ≃+* K) (hτ : ∀ x, τ (τ x) = x)
+    (P : HeightOneSpectrum (𝓞 K))
+    {ℓ : ℕ} (hℓ : ℓ.Prime) (hP : (ℓ : 𝓞 K) ∈ P.asIdeal)
+    {a b x y : K} (ha0 : a ≠ 0) (hb : b ≠ 0) (hax : a = x * (b * τ b)) (hby : b * τ b = y * a)
+    {d : ℕ} (hd : ¬ ℓ ∣ d) (hdx : IsIntegral ℤ ((d : K) * x)) (hdy : IsIntegral ℤ ((d : K) * y))
+    : _root_.GlobalTheory.FixNormCls.ord P a
+      = _root_.GlobalTheory.FixNormCls.ord P b
+        + _root_.GlobalTheory.FixNormCls.ord (_root_.GlobalTheory.FixNormCls.primeMap τ P) b := by
   have hτb : τ b ≠ 0 := by simpa using hb
   have hN : b * τ b ≠ 0 := mul_ne_zero hb hτb
   have hx0 : x ≠ 0 := by rintro rfl; simp at hax; exact ha0 hax
   have hy0 : y ≠ 0 := by rintro rfl; rw [zero_mul] at hby; exact hN hby
-  have hxy : x * y = 1 := by
-    exact mul_right_cancel₀ ha0 (by rw [one_mul, mul_assoc, ← hby, ← hax])
+  have hxy : x * y = 1 := by exact mul_right_cancel₀ ha0 (by rw [one_mul, mul_assoc, ← hby, ← hax])
   have hd0 : d ≠ 0 := by rintro rfl; exact hd (dvd_zero ℓ)
   have hdK : (d : K) ≠ 0 := by exact_mod_cast hd0
   have hord_d : _root_.GlobalTheory.FixNormCls.ord P (d : K) = 0 := by
-    have h := ord_eq_zero_of_not_mem_of_ne_zero P (d : 𝓞 K) (by exact_mod_cast hd0)
-      (natCast_not_mem_of_prime_mem_not_dvd P hℓ hP hd)
+    have h :=
+      ord_eq_zero_of_not_mem_of_ne_zero P (d : 𝓞 K) (by exact_mod_cast hd0)
+        (natCast_not_mem_of_prime_mem_not_dvd P hℓ hP hd)
     simpa using h
   have h1 := ord_nonneg_of_isIntegral' P hdx
   have h2 := ord_nonneg_of_isIntegral' P hdy
   rw [_root_.GlobalTheory.FixNormCls.ord_mul P hdK hx0, hord_d] at h1
   rw [_root_.GlobalTheory.FixNormCls.ord_mul P hdK hy0, hord_d] at h2
-  have h3 : _root_.GlobalTheory.FixNormCls.ord P x + _root_.GlobalTheory.FixNormCls.ord P y = 0 := by
-    rw [← _root_.GlobalTheory.FixNormCls.ord_mul P hx0 hy0, hxy, _root_.GlobalTheory.FixNormCls.ord_one]
-  rw [hax, _root_.GlobalTheory.FixNormCls.ord_mul P hx0 hN, _root_.GlobalTheory.FixNormCls.ord_mul P hb hτb,
-    ord_apply_involution_eq_ord_primeMap τ hτ]
+  have h3
+      : _root_.GlobalTheory.FixNormCls.ord P x + _root_.GlobalTheory.FixNormCls.ord P y = 0 := by
+    rw [← _root_.GlobalTheory.FixNormCls.ord_mul P hx0 hy0, hxy,
+      _root_.GlobalTheory.FixNormCls.ord_one]
+  rw [hax, _root_.GlobalTheory.FixNormCls.ord_mul P hx0 hN,
+    _root_.GlobalTheory.FixNormCls.ord_mul P hb hτb, ord_apply_involution_eq_ord_primeMap τ hτ]
   omega
 
 open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-private theorem exists_unit_eq_of_forall_ord_eq_zero {K : Type} [Field K] [NumberField K] {x : K} (hx : x ≠ 0)
-    (h : ∀ P : HeightOneSpectrum (𝓞 K), _root_.GlobalTheory.FixNormCls.ord P x = 0) :
-    ∃ u : (𝓞 K)ˣ, ((u : 𝓞 K) : K) = x := by
+private theorem exists_unit_eq_of_forall_ord_eq_zero
+    {K : Type} [Field K] [NumberField K]
+    {x : K}
+    (hx : x ≠ 0) (h : ∀ P : HeightOneSpectrum (𝓞 K), _root_.GlobalTheory.FixNormCls.ord P x = 0)
+    : ∃ u : (𝓞 K)ˣ, ((u : 𝓞 K) : K) = x := by
   have hI : FractionalIdeal.spanSingleton (𝓞 K)⁰ x ≠ 0 := by
     rwa [Ne, FractionalIdeal.spanSingleton_eq_zero_iff]
   have key := FractionalIdeal.finprod_heightOneSpectrum_factorization' (K := K) hI
-  have h' : ∀ P : HeightOneSpectrum (𝓞 K),
-      FractionalIdeal.count K P (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) = 0 := h
+  have h'
+      : ∀ P : HeightOneSpectrum (𝓞 K),
+        FractionalIdeal.count K P (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) = 0 :=
+    h
   simp only [h', zpow_zero, finprod_one] at key
   rw [← FractionalIdeal.spanSingleton_one, FractionalIdeal.spanSingleton_eq_spanSingleton] at key
   obtain ⟨z, hz⟩ := key
   exact ⟨z, by simpa [Units.smul_def, Algebra.smul_def] using hz⟩
 
-
 open NumberField IsDedekindDomain in
 open scoped Classical nonZeroDivisors in
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Classical nonZeroDivisors in
-theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type) [Field K] [NumberField K]
-    (τ : K ≃+* K), (∀ x, τ (τ x) = x) → ∀ S : Finset ℕ,
-    ∃ M : Finset K, ∀ a : K, a ≠ 0 → τ a = a →
-    (∀ ℓ : ℕ, ℓ.Prime → ℓ ∉ S → ∃ (b x y : K), b ≠ 0 ∧ a = x * (b * τ b) ∧ b * τ b = y * a ∧
-      ∃ d : ℕ, ¬ ℓ ∣ d ∧ IsIntegral ℤ ((d : K) * x) ∧ IsIntegral ℤ ((d : K) * y)) →
-    ∃ m ∈ M, ∃ e : K, e ≠ 0 ∧ a = e * m * τ e := by
+theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms
+    : ∀ (K : Type) [Field K] [NumberField K] (τ : K ≃+* K),
+      (∀ x, τ (τ x) = x)
+        → ∀ S : Finset ℕ, ∃ M : Finset K, ∀ a : K,
+          a ≠ 0 → τ a = a
+            → (∀ ℓ : ℕ,
+              ℓ.Prime → ℓ ∉ S
+                → ∃ (b x y : K),
+                  b ≠ 0 ∧ a = x * (b * τ b) ∧ b * τ b = y * a
+                    ∧ ∃ d : ℕ, ¬ ℓ ∣ d ∧ IsIntegral ℤ ((d : K) * x) ∧ IsIntegral ℤ ((d : K) * y))
+            → ∃ m ∈ M, ∃ e : K, e ≠ 0 ∧ a = e * m * τ e := by
   intro K _ _ τ hτ S
   classical
   have hσσ := _root_.GlobalTheory.FixNormCls.primeMap_primeMap τ hτ
@@ -232,13 +255,14 @@ theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type
     fun c => ClassGroup.induction K (fun I => ⟨I, rfl⟩) c
   choose rep hrep using hrep
   let prof : ClassGroup (𝓞 K) × Finset (HeightOneSpectrum (𝓞 K)) → HeightOneSpectrum (𝓞 K) → ℤ :=
-    fun κ P => (if P ∈ κ.2 then 1 else 0) +
-      FractionalIdeal.count K P (rep κ.1 : FractionalIdeal (𝓞 K)⁰ K) +
-      FractionalIdeal.count K (_root_.GlobalTheory.FixNormCls.primeMap τ P) (rep κ.1 : FractionalIdeal (𝓞 K)⁰ K)
-  let good : ClassGroup (𝓞 K) × Finset (HeightOneSpectrum (𝓞 K)) → K → Prop :=
-    fun κ c => c ≠ 0 ∧ τ c = c ∧ ∀ P, _root_.GlobalTheory.FixNormCls.ord P c = prof κ P
-  let rep2 : ClassGroup (𝓞 K) × Finset (HeightOneSpectrum (𝓞 K)) → K :=
-    fun κ => if h : ∃ c, good κ c then h.choose else 1
+    fun κ P =>
+      (if P ∈ κ.2 then 1 else 0) + FractionalIdeal.count K P (rep κ.1 : FractionalIdeal (𝓞 K)⁰ K)
+        + FractionalIdeal.count K (_root_.GlobalTheory.FixNormCls.primeMap τ P)
+          (rep κ.1 : FractionalIdeal (𝓞 K)⁰ K)
+  let good : ClassGroup (𝓞 K) × Finset (HeightOneSpectrum (𝓞 K)) → K → Prop := fun κ c =>
+    c ≠ 0 ∧ τ c = c ∧ ∀ P, _root_.GlobalTheory.FixNormCls.ord P c = prof κ P
+  let rep2 : ClassGroup (𝓞 K) × Finset (HeightOneSpectrum (𝓞 K)) → K := fun κ =>
+    if h : ∃ c, good κ c then h.choose else 1
   have hrep2 : ∀ κ c, good κ c → good κ (rep2 κ) := fun κ c hc => by
     have h : ∃ c, good κ c := ⟨c, hc⟩
     dsimp only [rep2]
@@ -247,31 +271,53 @@ theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type
   obtain ⟨V, hV⟩ := exists_finset_fixedUnit_eq_mul_fixed_sq K τ
   refine ⟨(((Finset.univ ×ˢ T.powerset).image rep2) ×ˢ V).image (fun p => p.1 * p.2), ?_⟩
   intro a ha0 hτa hloc
-  have hσa : ∀ P, _root_.GlobalTheory.FixNormCls.ord (_root_.GlobalTheory.FixNormCls.primeMap τ P) a =
-      _root_.GlobalTheory.FixNormCls.ord P a := by
+  have hσa
+      : ∀ P,
+        _root_.GlobalTheory.FixNormCls.ord (_root_.GlobalTheory.FixNormCls.primeMap τ P) a
+          = _root_.GlobalTheory.FixNormCls.ord P a := by
     intro P; rw [← ord_apply_involution_eq_ord_primeMap τ hτ, hτa]
-  have hsplit : ∀ P, P ∉ T → _root_.GlobalTheory.FixNormCls.primeMap τ P = P →
-      _root_.GlobalTheory.FixNormCls.ord P a % 2 = 0 := by
+  have hsplit
+      : ∀ P,
+        P ∉ T → _root_.GlobalTheory.FixNormCls.primeMap τ P = P
+          → _root_.GlobalTheory.FixNormCls.ord P a % 2 = 0 := by
     intro P hP hfix
     obtain ⟨ℓ, hℓ, hℓP⟩ := exists_nat_prime_mem_heightOneSpectrum K P
-    have hℓS : ℓ ∉ S := fun hS => hP (by
-      rw [hT, Set.Finite.mem_toFinset]; exact ⟨ℓ, hS, hℓ.ne_zero, hℓP⟩)
+    have hℓS : ℓ ∉ S := fun hS =>
+      hP (by rw [hT, Set.Finite.mem_toFinset]; exact ⟨ℓ, hS, hℓ.ne_zero, hℓP⟩)
     obtain ⟨b, x, y, hb, hax, hby, d, hd, hdx, hdy⟩ := hloc ℓ hℓ hℓS
     rw [ord_eq_ord_add_ord_primeMap_of_isIntegral_mul τ hτ P hℓ hℓP ha0 hb hax hby hd hdx hdy, hfix]
     omega
   let k : HeightOneSpectrum (𝓞 K) → ℤ := fun P =>
-    if _root_.GlobalTheory.FixNormCls.primeMap τ P = P then _root_.GlobalTheory.FixNormCls.ord P a / 2
-    else if P < _root_.GlobalTheory.FixNormCls.primeMap τ P then _root_.GlobalTheory.FixNormCls.ord P a else 0
-  have hk : ∀ P, k P + k (_root_.GlobalTheory.FixNormCls.primeMap τ P) = _root_.GlobalTheory.FixNormCls.ord P a -
-      (if _root_.GlobalTheory.FixNormCls.primeMap τ P = P then _root_.GlobalTheory.FixNormCls.ord P a % 2 else 0) := by
+    if _root_.GlobalTheory.FixNormCls.primeMap τ P = P then
+      _root_.GlobalTheory.FixNormCls.ord P a / 2
+    else if P < _root_.GlobalTheory.FixNormCls.primeMap τ P then
+      _root_.GlobalTheory.FixNormCls.ord P a
+    else
+      0
+  have hk
+      : ∀ P,
+        k P + k (_root_.GlobalTheory.FixNormCls.primeMap τ P)
+          = _root_.GlobalTheory.FixNormCls.ord P a
+            - (if _root_.GlobalTheory.FixNormCls.primeMap τ P = P then
+                 _root_.GlobalTheory.FixNormCls.ord P a % 2
+               else
+                 0) := by
     intro P
     by_cases hfix : _root_.GlobalTheory.FixNormCls.primeMap τ P = P
     · simp only [k, hfix, if_true]; omega
-    · have e1 : k P = if P < _root_.GlobalTheory.FixNormCls.primeMap τ P then
-          _root_.GlobalTheory.FixNormCls.ord P a else 0 := by
+    · have e1
+          : k P
+            = if P < _root_.GlobalTheory.FixNormCls.primeMap τ P then
+                _root_.GlobalTheory.FixNormCls.ord P a
+              else
+                0 := by
         simp only [k]; rw [if_neg hfix]
-      have e2 : k (_root_.GlobalTheory.FixNormCls.primeMap τ P) = if _root_.GlobalTheory.FixNormCls.primeMap τ P < P then
-          _root_.GlobalTheory.FixNormCls.ord P a else 0 := by
+      have e2
+          : k (_root_.GlobalTheory.FixNormCls.primeMap τ P)
+            = if _root_.GlobalTheory.FixNormCls.primeMap τ P < P then
+                _root_.GlobalTheory.FixNormCls.ord P a
+              else
+                0 := by
         simp only [k, hσσ, hσa]; rw [if_neg fun h => hfix h.symm]
       rw [e1, e2, if_neg hfix, sub_zero]
       rcases lt_trichotomy P (_root_.GlobalTheory.FixNormCls.primeMap τ P) with h | h | h
@@ -285,8 +331,9 @@ theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type
     simp [k, hP']
   set J : FractionalIdeal (𝓞 K)⁰ K :=
     ∏ᶠ P : HeightOneSpectrum (𝓞 K), (P.asIdeal : FractionalIdeal (𝓞 K)⁰ K) ^ k P with hJ
-  have hJ0 : J ≠ 0 := finprod_ne_zero fun P => zpow_ne_zero _ (by
-    rw [Ne, FractionalIdeal.coeIdeal_eq_zero]; exact P.ne_bot)
+  have hJ0 : J ≠ 0 :=
+    finprod_ne_zero fun P =>
+      zpow_ne_zero _ (by rw [Ne, FractionalIdeal.coeIdeal_eq_zero]; exact P.ne_bot)
   have hJcount : ∀ P, FractionalIdeal.count K P J = k P := fun P =>
     FractionalIdeal.count_finprod K P k hkfin
   set c0 := ClassGroup.mk K (Units.mk0 J hJ0) with hc0def
@@ -302,8 +349,10 @@ theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type
     rintro rfl
     rw [FractionalIdeal.spanSingleton_zero] at he'
     exact mul_ne_zero hJ0 (inv_ne_zero hI0) he'.symm
-  have heord : ∀ P, _root_.GlobalTheory.FixNormCls.ord P e =
-      k P - FractionalIdeal.count K P (I : FractionalIdeal (𝓞 K)⁰ K) := by
+  have heord
+      : ∀ P,
+        _root_.GlobalTheory.FixNormCls.ord P e
+          = k P - FractionalIdeal.count K P (I : FractionalIdeal (𝓞 K)⁰ K) := by
     intro P
     show FractionalIdeal.count K P (FractionalIdeal.spanSingleton (𝓞 K)⁰ e) = _
     rw [he', FractionalIdeal.count_mul K P hJ0 (inv_ne_zero hI0), FractionalIdeal.count_inv,
@@ -317,8 +366,12 @@ theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type
     _root_.GlobalTheory.FixNormCls.ord P a % 2 = 1) with hRset
   have hgood : good (c0, Rset) c := by
     refine ⟨hc0, hτc, fun P => ?_⟩
-    have hr : (if P ∈ Rset then (1 : ℤ) else 0) =
-        (if _root_.GlobalTheory.FixNormCls.primeMap τ P = P then _root_.GlobalTheory.FixNormCls.ord P a % 2 else 0) := by
+    have hr
+        : (if P ∈ Rset then (1 : ℤ) else 0)
+          = (if _root_.GlobalTheory.FixNormCls.primeMap τ P = P then
+               _root_.GlobalTheory.FixNormCls.ord P a % 2
+             else
+               0) := by
       by_cases hfix : _root_.GlobalTheory.FixNormCls.primeMap τ P = P
       · rw [if_pos hfix]
         by_cases hPT : P ∈ T
@@ -333,7 +386,8 @@ theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type
       FractionalIdeal.count K P (I : FractionalIdeal (𝓞 K)⁰ K) +
       FractionalIdeal.count K (_root_.GlobalTheory.FixNormCls.primeMap τ P) (I : FractionalIdeal (𝓞 K)⁰ K)
     rw [hc, _root_.GlobalTheory.FixNormCls.ord_div P ha0 (mul_ne_zero he0 hτe0),
-      _root_.GlobalTheory.FixNormCls.ord_mul P he0 hτe0, ord_apply_involution_eq_ord_primeMap τ hτ, heord, heord, hr]
+      _root_.GlobalTheory.FixNormCls.ord_mul P he0 hτe0, ord_apply_involution_eq_ord_primeMap τ hτ,
+      heord, heord, hr]
     linarith
   obtain ⟨hc10, hτc1, hc1ord⟩ := hrep2 _ _ hgood
   set c1 := rep2 (c0, Rset) with hc1def
@@ -345,10 +399,25 @@ theorem _root_.GlobalTheory.FixNormField.fixed_classes_mod_norms : ∀ (K : Type
     show τ ((u : 𝓞 K) : K) = ((u : 𝓞 K) : K)
     rw [hu, map_div₀, hτc, hτc1]
   obtain ⟨v, hvV, w, hw0, hτw, huvw⟩ := hV u hufix
-  refine ⟨c1 * v, Finset.mem_image.2 ⟨(c1, v), Finset.mem_product.2
-    ⟨Finset.mem_image.2 ⟨(c0, Rset), Finset.mem_product.2 ⟨Finset.mem_univ _,
-      Finset.mem_powerset.2 (Finset.filter_subset _ _)⟩, rfl⟩, hvV⟩, rfl⟩,
-    e * w, mul_ne_zero he0 hw0, ?_⟩
+  refine ⟨
+    c1 * v,
+    Finset.mem_image.2 ⟨
+      (c1, v),
+      Finset.mem_product.2 ⟨
+        Finset.mem_image.2 ⟨
+          (c0, Rset),
+          Finset.mem_product.2
+            ⟨Finset.mem_univ _, Finset.mem_powerset.2 (Finset.filter_subset _ _)⟩,
+          rfl
+        ⟩,
+        hvV
+      ⟩,
+      rfl
+    ⟩,
+    e * w,
+    mul_ne_zero he0 hw0,
+    ?_
+  ⟩
   rw [hu] at huvw
   have hcv : c = c1 * (v * w ^ 2) := by rw [← huvw]; field_simp
   have hac : a = c * (e * τ e) := by rw [hc]; field_simp

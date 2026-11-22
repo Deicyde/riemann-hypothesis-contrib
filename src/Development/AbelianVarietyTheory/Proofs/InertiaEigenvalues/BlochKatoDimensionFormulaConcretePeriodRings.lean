@@ -12,13 +12,15 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Fontain
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.BlochKatoTied
 
-theorem blochKatoDim_of_tied : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
-    LocTied l P AI → ∀ (K LL : FinExt l) [Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1)],
-    BlochKatoDim (P.PD K) ↥LL.1 := by
+theorem blochKatoDim_of_tied
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (K LL : FinExt l) [Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1)], BlochKatoDim (P.PD K) ↥LL.1 := by
   intro l _ P AI hT K LL _
   refine GlobalTheory.blochKatoDim_of_bkADim_of_fontCore l P K LL ?_
     (GlobalTheory.Per.FontaineTied.fontCore_all_of_tied l P AI hT K)

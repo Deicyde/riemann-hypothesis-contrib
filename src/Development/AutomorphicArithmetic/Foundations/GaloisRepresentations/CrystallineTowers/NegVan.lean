@@ -4,10 +4,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.Seam
+open CategoryTheory Limits CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+  UpperTheory.Gal.Seam
 
-private theorem H_subsingleton_of_neg (R : Type) [CommRing R] (E : Spc) (F : Shv R) {n : ℤ} (hn : n < 0) :
-    Subsingleton (H R E F n) := by
+private theorem H_subsingleton_of_neg
+    (R : Type) [CommRing R] (E : Spc) (F : Shv R) {n : ℤ} (hn : n < 0)
+    : Subsingleton (H R E F n) := by
   haveI hK : ((chains R).obj E).IsStrictlyLE 0 :=
     (inferInstance : CochainComplex.IsStrictlyLE (((chainsN R).obj E).extend ComplexShape.embeddingDownNat) 0)
   haveI hL : (res R F).IsStrictlyGE 0 := by
@@ -28,8 +30,7 @@ private theorem H_subsingleton_of_neg (R : Type) [CommRing R] (E : Spc) (F : Shv
   apply Subtype.ext
   rw [hz x.1, hz y.1]
 
-theorem UpperTheory.Gal.Seam.negVan :
-    NegVan := by
+theorem UpperTheory.Gal.Seam.negVan : NegVan := by
   intro l _ X n hn
   haveI : ∀ k : ℕ, Subsingleton (HtL l k (sch.obj X) n 0) := fun k =>
     H_subsingleton_of_neg (ZMod (l ^ k)) (sch.obj X) (tw (l ^ k) 0) hn

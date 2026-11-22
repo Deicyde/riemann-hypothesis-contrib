@@ -18,10 +18,12 @@ namespace UnitLogPartition
 
 open NumberField.Units NumberField.Units.dirichletUnitTheorem NumberField.InfinitePlace
 
-theorem exists_nonneg_hasSum_lattice_translates (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V]
-    [FiniteDimensional ℝ V] (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L] :
-    ∃ η : V → ℝ, ContDiff ℝ ∞ η ∧ HasCompactSupport η ∧ (∀ z, 0 ≤ η z) ∧
-      ∀ y, HasSum (fun l : L => η (y + l)) 1 := by
+theorem exists_nonneg_hasSum_lattice_translates
+    (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L]
+    : ∃ η : V → ℝ,
+      ContDiff ℝ ∞ η ∧ HasCompactSupport η ∧ (∀ z, 0 ≤ η z)
+        ∧ ∀ y, HasSum (fun l : L => η (y + l)) 1 := by
   obtain ⟨R, hR, hcov⟩ := GlobalTheory.exists_radius_lattice_translate_norm_le V L
   let b : ContDiffBump (0 : V) := ⟨R, R + 1, hR, by linarith⟩
   have hφc : HasCompactSupport (b : V → ℝ) := b.hasCompactSupport
@@ -41,13 +43,18 @@ theorem exists_nonneg_hasSum_lattice_translates (V : Type) [NormedAddCommGroup V
   have hSpos : ∀ z, 0 < S z := by
     intro z
     obtain ⟨l, hl⟩ := hcov z
-    have h1 := single_le_finsum (f := fun l : L => b (z + l)) l (hlf.point_finite z)
-      (fun l => b.nonneg)
+    have h1 :=
+      single_le_finsum (f := fun l : L => b (z + l)) l (hlf.point_finite z) (fun l => b.nonneg)
     have h2 : b (z + l) = 1 := b.one_of_mem_closedBall (by simpa using hl)
     simp only [h2] at h1
     exact lt_of_lt_of_le one_pos h1
-  refine ⟨fun z => b z / S z, hφs.div hSs fun z => (hSpos z).ne', ?_,
-    fun z => div_nonneg b.nonneg (hSpos z).le, fun y => ?_⟩
+  refine ⟨
+    fun z => b z / S z,
+    hφs.div hSs fun z => (hSpos z).ne',
+    ?_,
+    fun z => div_nonneg b.nonneg (hSpos z).le,
+    fun y => ?_
+  ⟩
   · simp only [div_eq_mul_inv]
     exact hφc.mul_right
   · simp only [hSp]
@@ -61,14 +68,15 @@ theorem exists_nonneg_hasSum_lattice_translates (V : Type) [NormedAddCommGroup V
 
 variable {K : Type} [Field K] [NumberField K] {I : Type} [Fintype I] {φ : I → K →+* ℂ}
 
-def idx (hφ : GlobalTheory.CMVal.IsCMType φ) (w : InfinitePlace K) : I := (hφ w.embedding).exists.choose
+def idx (hφ : GlobalTheory.CMVal.IsCMType φ) (w : InfinitePlace K) : I :=
+  (hφ w.embedding).exists.choose
 
-theorem idx_spec (hφ : GlobalTheory.CMVal.IsCMType φ) (w : InfinitePlace K) :
-    w.embedding = φ (idx hφ w) ∨ w.embedding = ComplexEmbedding.conjugate (φ (idx hφ w)) :=
+theorem idx_spec (hφ : GlobalTheory.CMVal.IsCMType φ) (w : InfinitePlace K)
+    : w.embedding = φ (idx hφ w) ∨ w.embedding = ComplexEmbedding.conjugate (φ (idx hφ w)) :=
   (hφ w.embedding).exists.choose_spec
 
-theorem apply_eq_norm (hφ : GlobalTheory.CMVal.IsCMType φ) (w : InfinitePlace K) (x : K) :
-    w x = ‖φ (idx hφ w) x‖ := by
+theorem apply_eq_norm (hφ : GlobalTheory.CMVal.IsCMType φ) (w : InfinitePlace K) (x : K)
+    : w x = ‖φ (idx hφ w) x‖ := by
   rcases idx_spec hφ w with h | h
   · rw [← norm_embedding_eq, h]
   · rw [← norm_embedding_eq, h, ComplexEmbedding.conjugate_coe_eq, Complex.norm_conj]
@@ -77,24 +85,30 @@ theorem idx_surjective (hφ : GlobalTheory.CMVal.IsCMType φ) (i : I) : ∃ w, i
   refine ⟨InfinitePlace.mk (φ i), ?_⟩
   exact (hφ (InfinitePlace.mk (φ i)).embedding).unique (idx_spec hφ _) (embedding_mk_eq (φ i))
 
-theorem ulog_idx [_root_.NumberField.IsTotallyComplex K] (hφ : GlobalTheory.CMVal.IsCMType φ) (u : (𝓞 K)ˣ) (w : InfinitePlace K) :
-    GlobalTheory.HeckeTheta.ulog φ u (idx hφ w) = w.mult * Real.log (w (u : K)) := by
+theorem ulog_idx
+    [_root_.NumberField.IsTotallyComplex K]
+    (hφ : GlobalTheory.CMVal.IsCMType φ) (u : (𝓞 K)ˣ) (w : InfinitePlace K)
+    : GlobalTheory.HeckeTheta.ulog φ u (idx hφ w) = w.mult * Real.log (w (u : K)) := by
   unfold GlobalTheory.HeckeTheta.ulog
   rw [(IsTotallyComplex.isComplex w).mult_eq_two, ← apply_eq_norm hφ, Real.log_pow]
 
-theorem sum_ulog_idx [_root_.NumberField.IsTotallyComplex K] (hφ : GlobalTheory.CMVal.IsCMType φ) (u : (𝓞 K)ˣ) :
-    ∑ w : InfinitePlace K, GlobalTheory.HeckeTheta.ulog φ u (idx hφ w) = 0 := by
+theorem sum_ulog_idx
+    [_root_.NumberField.IsTotallyComplex K] (hφ : GlobalTheory.CMVal.IsCMType φ) (u : (𝓞 K)ˣ)
+    : ∑ w : InfinitePlace K, GlobalTheory.HeckeTheta.ulog φ u (idx hφ w) = 0 := by
   simp only [ulog_idx hφ]
   exact sum_mult_mul_log u
 
 def mean (hφ : GlobalTheory.CMVal.IsCMType φ) (y : I → ℝ) : ℝ :=
   (∑ w : InfinitePlace K, y (idx hφ w)) / Fintype.card (InfinitePlace K)
 
-def proj (hφ : GlobalTheory.CMVal.IsCMType φ) (y : I → ℝ) : logSpace K :=
-  fun w => y (idx hφ w.1) - mean hφ y
+def proj (hφ : GlobalTheory.CMVal.IsCMType φ) (y : I → ℝ) : logSpace K := fun w =>
+  y (idx hφ w.1) - mean hφ y
 
-theorem proj_add_ulog [_root_.NumberField.IsTotallyComplex K] (hφ : GlobalTheory.CMVal.IsCMType φ) (y : I → ℝ) (u : (𝓞 K)ˣ) :
-    proj hφ (y + GlobalTheory.HeckeTheta.ulog φ u) = proj hφ y + logEmbedding K (Additive.ofMul u) := by
+theorem proj_add_ulog
+    [_root_.NumberField.IsTotallyComplex K]
+    (hφ : GlobalTheory.CMVal.IsCMType φ) (y : I → ℝ) (u : (𝓞 K)ˣ)
+    : proj hφ (y + GlobalTheory.HeckeTheta.ulog φ u)
+      = proj hφ y + logEmbedding K (Additive.ofMul u) := by
   funext w
   have hm : mean hφ (y + GlobalTheory.HeckeTheta.ulog φ u) = mean hφ y := by
     unfold mean
@@ -108,13 +122,20 @@ theorem continuous_proj (hφ : GlobalTheory.CMVal.IsCMType φ) : Continuous (pro
 
 end UnitLogPartition
 
-
-open NumberField.Units NumberField.Units.dirichletUnitTheorem NumberField.InfinitePlace UnitLogPartition in
-theorem exists_measurable_nonneg_hasSum_ulog_translates : ∀ (K : Type) [Field K] [NumberField K]
-    [NumberField.IsTotallyComplex K] (I : Type) [Fintype I] (φ : I → K →+* ℂ), GlobalTheory.CMVal.IsCMType φ →
-    ∃ p : (I → ℝ) → ℝ, Measurable p ∧ (∀ y, 0 ≤ p y) ∧
-      (∀ y, HasSum (fun u : (NumberField.RingOfIntegers K)ˣ => p (y + GlobalTheory.HeckeTheta.ulog φ u)) 1) ∧
-      ∃ R : ℝ, ∀ y, p y ≠ 0 → ∀ i j, y i - y j ≤ R := by
+open NumberField.Units NumberField.Units.dirichletUnitTheorem NumberField.InfinitePlace
+  UnitLogPartition in
+theorem exists_measurable_nonneg_hasSum_ulog_translates
+    : ∀ (K : Type) [Field K] [NumberField K] [NumberField.IsTotallyComplex K] (I : Type) [Fintype I]
+        (φ : I → K →+* ℂ),
+      GlobalTheory.CMVal.IsCMType φ
+        → ∃ p : (I → ℝ) → ℝ,
+          Measurable p ∧ (∀ y, 0 ≤ p y)
+            ∧ (∀ y,
+              HasSum
+                (fun u : (NumberField.RingOfIntegers K)ˣ =>
+                  p (y + GlobalTheory.HeckeTheta.ulog φ u))
+                1)
+            ∧ ∃ R : ℝ, ∀ y, p y ≠ 0 → ∀ i j, y i - y j ≤ R := by
   classical
   intro K _ _ _ I _ φ hφ
   obtain ⟨η, hη, hc, h0, hs⟩ := exists_nonneg_hasSum_lattice_translates (logSpace K) (unitLattice K)
@@ -123,7 +144,8 @@ theorem exists_measurable_nonneg_hasSum_ulog_translates : ∀ (K : Type) [Field 
   · intro y
     exact div_nonneg (h0 _) (Nat.cast_nonneg _)
   · intro y
-    have h1 := ((Additive.ofMul.trans (logEmbeddingEquiv K).toEquiv).hasSum_iff).mpr (hs (proj hφ y))
+    have h1 :=
+      ((Additive.ofMul.trans (logEmbeddingEquiv K).toEquiv).hasSum_iff).mpr (hs (proj hφ y))
     have h2 := GlobalTheory.UnitPartition.hasSum_quot (torsion K) _ _ h1
     convert h2 using 2 with u
     beta_reduce

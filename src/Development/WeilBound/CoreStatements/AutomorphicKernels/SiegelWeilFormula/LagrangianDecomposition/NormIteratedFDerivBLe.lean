@@ -11,35 +11,45 @@ open MeasureTheory Set Filter Topology
 
 namespace PositivityTheory.SiegelWeilFormula.Ald.PCI
 
-variable {W : Type} [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W] {κ' κ'' : Type} [Fintype κ']
-  [Fintype κ'']
+variable
+  {W : Type} [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W]
+  {κ' κ'' : Type} [Fintype κ'] [Fintype κ'']
 
-theorem contDiff_Θ (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) :
-    ContDiff ℝ ∞ (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) :=
+theorem contDiff_Θ (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ)
+    : ContDiff ℝ ∞ (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) :=
   (h.smooth ⊤).comp contDiff_Ain
 
-theorem norm_pder_le (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) (m : ℕ) (x : κ' ⊕ κ'' → W) {s : ℝ} (hs : |s| ≤ 1) :
-    ‖pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)‖ ≤ ‖iteratedFDeriv ℝ m h (Ain s x)‖ := by
-  have e : pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)
-      = iteratedFDeriv ℝ m (⇑h ∘ ⇑(Ain s : (κ' ⊕ κ'' → W) →L[ℝ] (κ' ⊕ κ'' → W))) x := rfl
+theorem norm_pder_le
+    (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) (m : ℕ) (x : κ' ⊕ κ'' → W) {s : ℝ} (hs : |s| ≤ 1)
+    : ‖pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)‖
+      ≤ ‖iteratedFDeriv ℝ m h (Ain s x)‖ := by
+  have e
+      : pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)
+        = iteratedFDeriv ℝ m (⇑h ∘ ⇑(Ain s : (κ' ⊕ κ'' → W) →L[ℝ] (κ' ⊕ κ'' → W))) x :=
+    rfl
   rw [e, (Ain s).iteratedFDeriv_comp_right (h.smooth ⊤) x (by exact_mod_cast le_top)]
   refine (ContinuousMultilinearMap.norm_compContinuousLinearMap_le _ _).trans ?_
   have hp : ∏ _i : Fin m, ‖(Ain s : (κ' ⊕ κ'' → W) →L[ℝ] (κ' ⊕ κ'' → W))‖ ≤ 1 :=
     Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) (fun _ _ => norm_Ain_le hs)
-  calc _ ≤ ‖iteratedFDeriv ℝ m h (Ain s x)‖ * 1 := mul_le_mul_of_nonneg_left hp (norm_nonneg _)
+  calc
+    _ ≤ ‖iteratedFDeriv ℝ m h (Ain s x)‖ * 1 := mul_le_mul_of_nonneg_left hp (norm_nonneg _)
     _ = _ := mul_one _
 
-theorem near_bound (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) {R : ℝ} (hR : 0 ≤ R) (k m : ℕ) (x : κ' ⊕ κ'' → W)
-    (hx : ‖x ∘ Sum.inr‖ ≤ R) :
-    ‖x‖ ^ k * ‖iteratedFDeriv ℝ m (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖ ≤
-      SchwartzMap.seminorm ℝ k m h + R ^ k * SchwartzMap.seminorm ℝ 0 m h := by
+theorem near_bound
+    (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ)
+    {R : ℝ} (hR : 0 ≤ R)
+    (k m : ℕ)
+    (x : κ' ⊕ κ'' → W) (hx : ‖x ∘ Sum.inr‖ ≤ R)
+    : ‖x‖ ^ k * ‖iteratedFDeriv ℝ m (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖
+      ≤ SchwartzMap.seminorm ℝ k m h + R ^ k * SchwartzMap.seminorm ℝ 0 m h := by
   have hc : ContDiff ℝ ∞ (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) := contDiff_Θ h
   rw [show iteratedFDeriv ℝ m (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x
-      = ∫ s in Ioc (0 : ℝ) 1, pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)
-      from iteratedFDeriv_integral hc m x]
-  have hpt : ∀ s ∈ Ioc (0 : ℝ) 1,
-      ‖(‖x‖ ^ k) • pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)‖ ≤
-        SchwartzMap.seminorm ℝ k m h + R ^ k * SchwartzMap.seminorm ℝ 0 m h := by
+      = ∫ s in Ioc (0 : ℝ) 1, pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s) from
+    iteratedFDeriv_integral hc m x]
+  have hpt
+      : ∀ s ∈ Ioc (0 : ℝ) 1,
+        ‖(‖x‖ ^ k) • pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)‖
+          ≤ SchwartzMap.seminorm ℝ k m h + R ^ k * SchwartzMap.seminorm ℝ 0 m h := by
     intro s hs
     have hs' : |s| ≤ 1 := by
       rw [abs_of_pos hs.1]
@@ -57,18 +67,22 @@ theorem near_bound (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) {R : ℝ} (hR : 0 
       · rw [max_eq_left hle] at h2
         have : ‖x‖ ^ k ≤ ‖Ain s x‖ ^ k := pow_le_pow_left₀ (norm_nonneg _) h2 k
         linarith [pow_nonneg hR k]
-    calc ‖x‖ ^ k * ‖pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)‖
-        ≤ (‖Ain s x‖ ^ k + R ^ k) * ‖iteratedFDeriv ℝ m h (Ain s x)‖ :=
-          mul_le_mul hxk h1 (norm_nonneg _) (by positivity)
-      _ = ‖Ain s x‖ ^ k * ‖iteratedFDeriv ℝ m h (Ain s x)‖ +
-            R ^ k * ‖iteratedFDeriv ℝ m h (Ain s x)‖ := by ring
+    calc
+      ‖x‖ ^ k * ‖pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)‖
+          ≤ (‖Ain s x‖ ^ k + R ^ k) * ‖iteratedFDeriv ℝ m h (Ain s x)‖ :=
+        mul_le_mul hxk h1 (norm_nonneg _) (by positivity)
+      _ = ‖Ain s x‖ ^ k * ‖iteratedFDeriv ℝ m h (Ain s x)‖
+          + R ^ k * ‖iteratedFDeriv ℝ m h (Ain s x)‖ := by
+        ring
       _ ≤ _ := add_le_add hA (mul_le_mul_of_nonneg_left hB (by positivity))
   have hI := norm_setIntegral_le_of_norm_le_const (μ := volume) measure_Ioc_lt_top hpt
   rw [integral_smul, norm_smul, Real.norm_of_nonneg (by positivity)] at hI
   simpa using hI
 
-theorem norm_iteratedFDeriv_B_le (β : (κ'' → W) → ℝ) (hβ : ContDiff ℝ ∞ β) (i : ℕ) (x : κ' ⊕ κ'' → W) :
-    ‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖ ≤ ‖iteratedFDeriv ℝ i β (x ∘ Sum.inr)‖ := by
+theorem norm_iteratedFDeriv_B_le
+    (β : (κ'' → W) → ℝ) (hβ : ContDiff ℝ ∞ β) (i : ℕ) (x : κ' ⊕ κ'' → W)
+    : ‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖
+      ≤ ‖iteratedFDeriv ℝ i β (x ∘ Sum.inr)‖ := by
   let L : (κ' ⊕ κ'' → W) →L[ℝ] (κ'' → W) :=
     ContinuousLinearMap.pi fun j => ContinuousLinearMap.proj (Sum.inr j)
   have hL : ‖L‖ ≤ 1 := by
@@ -82,13 +96,15 @@ theorem norm_iteratedFDeriv_B_le (β : (κ'' → W) → ℝ) (hβ : ContDiff ℝ
     L.iteratedFDeriv_comp_right hβ x (by exact_mod_cast le_top)]
   refine (ContinuousMultilinearMap.norm_compContinuousLinearMap_le _ _).trans ?_
   have hp : ∏ _j : Fin i, ‖L‖ ≤ 1 := Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) (fun _ _ => hL)
-  calc _ ≤ ‖iteratedFDeriv ℝ i β (L x)‖ * 1 := mul_le_mul_of_nonneg_left hp (norm_nonneg _)
+  calc
+    _ ≤ ‖iteratedFDeriv ℝ i β (L x)‖ * 1 := mul_le_mul_of_nonneg_left hp (norm_nonneg _)
     _ = _ := mul_one _
 
-private theorem differentiable_integral_Ioc_of_contDiff {V E : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
-    [FiniteDimensional ℝ V] [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-    (G : V × ℝ → E) (hG : ContDiff ℝ 1 G) :
-    Differentiable ℝ (fun x => ∫ s in Ioc (0 : ℝ) 1, G (x, s)) := by
+private theorem differentiable_integral_Ioc_of_contDiff
+    {V E : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    (G : V × ℝ → E) (hG : ContDiff ℝ 1 G)
+    : Differentiable ℝ (fun x => ∫ s in Ioc (0 : ℝ) 1, G (x, s)) := by
   intro x₀
   have hK : IsCompact (Metric.closedBall x₀ 1 ×ˢ Icc (0 : ℝ) 1) :=
     (isCompact_closedBall x₀ 1).prod isCompact_Icc
@@ -113,24 +129,29 @@ private theorem differentiable_integral_Ioc_of_contDiff {V E : Type} [NormedAddC
     refine (ContinuousLinearMap.opNorm_comp_le _ _).trans ?_
     exact mul_le_mul_of_nonneg_right (hC _ ⟨hx, Ioc_subset_Icc_self hs⟩) (norm_nonneg _)
   · exact (continuous_const.integrableOn_Icc).mono_set Ioc_subset_Icc_self
-  · exact Filter.Eventually.of_forall fun s x _ =>
-      (hd (x, s)).comp x (hasFDerivAt_prodMk_left x s)
+  · exact Filter.Eventually.of_forall fun s x _ => (hd (x, s)).comp x (hasFDerivAt_prodMk_left x s)
 
-theorem near_schwartz (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) (β : (κ'' → W) → ℝ) (hβ : ContDiff ℝ ∞ β)
-    (hβc : HasCompactSupport β) :
-    ∃ g : SchwartzMap (κ' ⊕ κ'' → W) ℂ, ∀ x, g x = (β (x ∘ Sum.inr) : ℂ) * ∫ s in Ioc (0 : ℝ) 1, h (Ain s x) := by
+theorem near_schwartz
+    (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ)
+    (β : (κ'' → W) → ℝ) (hβ : ContDiff ℝ ∞ β) (hβc : HasCompactSupport β)
+    : ∃ g : SchwartzMap (κ' ⊕ κ'' → W) ℂ, ∀ x,
+      g x = (β (x ∘ Sum.inr) : ℂ) * ∫ s in Ioc (0 : ℝ) 1, h (Ain s x) := by
   have hc : ContDiff ℝ ∞ (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) := contDiff_Θ h
-  have hIF : ∀ m x, iteratedFDeriv ℝ m (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x
-      = ∫ s in Ioc (0 : ℝ) 1, pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s) :=
+  have hIF
+      : ∀ m x,
+        iteratedFDeriv ℝ m (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x
+          = ∫ s in Ioc (0 : ℝ) 1, pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s) :=
     fun m x => iteratedFDeriv_integral hc m x
   have hF : ContDiff ℝ ∞ (fun y : κ' ⊕ κ'' → W => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) := by
     refine contDiff_of_differentiable_iteratedFDeriv fun m _ => ?_
-    rw [show iteratedFDeriv ℝ m (fun y : κ' ⊕ κ'' → W => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) =
-        fun x => ∫ s in Ioc (0 : ℝ) 1,
-          pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s)
-      from funext (hIF m)]
+    rw [show iteratedFDeriv ℝ m (fun y : κ' ⊕ κ'' → W => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y))
+        = fun x =>
+          ∫ s in Ioc (0 : ℝ) 1,
+            pder m (fun p : (κ' ⊕ κ'' → W) × ℝ => h (Ain p.2 p.1)) (x, s) from
+      funext (hIF m)]
     set_option synthInstance.maxSize 256 in
-    exact differentiable_integral_Ioc_of_contDiff _ ((contDiff_pder m hc).of_le (by exact_mod_cast le_top))
+    exact differentiable_integral_Ioc_of_contDiff _
+      ((contDiff_pder m hc).of_le (by exact_mod_cast le_top))
   have hB : ContDiff ℝ ∞ (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) := by
     have hL : ContDiff ℝ ∞ (fun y : κ' ⊕ κ'' → W => y ∘ Sum.inr) :=
       contDiff_pi.2 fun j => by
@@ -148,19 +169,26 @@ theorem near_schwartz (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) (β : (κ'' →
       (hβc.iteratedFDeriv i)
   choose M hM using hM
   have hM0 : ∀ i, 0 ≤ M i := fun i => (norm_nonneg _).trans (hM i 0)
-  refine ⟨⟨fun x => (β (x ∘ Sum.inr) : ℂ) * ∫ s in Ioc (0 : ℝ) 1, h (Ain s x), hB.mul hF, ?_⟩,
-    fun x => rfl⟩
+  refine ⟨
+    ⟨fun x => (β (x ∘ Sum.inr) : ℂ) * ∫ s in Ioc (0 : ℝ) 1, h (Ain s x), hB.mul hF, ?_⟩,
+    fun x => rfl
+  ⟩
   intro k n
-  refine ⟨∑ i ∈ Finset.range (n + 1), (n.choose i : ℝ) * (M i * (SchwartzMap.seminorm ℝ k (n - i) h +
-      (max R0 0) ^ k * SchwartzMap.seminorm ℝ 0 (n - i) h)), fun x => ?_⟩
+  refine ⟨
+    ∑ i ∈ Finset.range (n + 1), (n.choose i : ℝ) * (M i * (SchwartzMap.seminorm ℝ k (n - i) h +
+      (max R0 0) ^ k * SchwartzMap.seminorm ℝ 0 (n - i) h)),
+    fun x => ?_
+  ⟩
   have hmul := norm_iteratedFDeriv_mul_le hB hF x (n := n) (by exact_mod_cast le_top)
   refine (mul_le_mul_of_nonneg_left hmul (by positivity)).trans ?_
   rw [Finset.mul_sum]
   refine Finset.sum_le_sum fun i _ => ?_
-  have key : ‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖ *
-      (‖x‖ ^ k * ‖iteratedFDeriv ℝ (n - i) (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖) ≤
-      M i * (SchwartzMap.seminorm ℝ k (n - i) h +
-        (max R0 0) ^ k * SchwartzMap.seminorm ℝ 0 (n - i) h) := by
+  have key
+      : ‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖
+          * (‖x‖ ^ k * ‖iteratedFDeriv ℝ (n - i) (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖)
+        ≤ M i
+          * (SchwartzMap.seminorm ℝ k (n - i) h
+            + (max R0 0) ^ k * SchwartzMap.seminorm ℝ 0 (n - i) h) := by
     have h3 := norm_iteratedFDeriv_B_le β hβ i x
     by_cases hx : x ∘ Sum.inr ∈ tsupport β
     · exact mul_le_mul (h3.trans (hM i _)) (near_bound h hR k (n - i) x (hsupp _ hx))
@@ -171,15 +199,18 @@ theorem near_schwartz (h : SchwartzMap (κ' ⊕ κ'' → W) ℂ) (β : (κ'' →
       have hz : ‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖ = 0 :=
         le_antisymm h3 (norm_nonneg _)
       rw [hz, zero_mul]
-      exact mul_nonneg (hM0 i) (add_nonneg (apply_nonneg _ _)
-        (mul_nonneg (pow_nonneg hR k) (apply_nonneg _ _)))
-  calc ‖x‖ ^ k * ((n.choose i : ℝ) *
-        ‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖ *
-        ‖iteratedFDeriv ℝ (n - i) (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖)
-      = (n.choose i : ℝ) *
-        (‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖ *
-        (‖x‖ ^ k * ‖iteratedFDeriv ℝ (n - i) (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖)) := by
-        ring
+      exact mul_nonneg (hM0 i)
+        (add_nonneg (apply_nonneg _ _) (mul_nonneg (pow_nonneg hR k) (apply_nonneg _ _)))
+  calc
+    ‖x‖ ^ k
+          * ((n.choose i : ℝ)
+            * ‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖
+            * ‖iteratedFDeriv ℝ (n - i) (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖)
+        = (n.choose i : ℝ)
+          * (‖iteratedFDeriv ℝ i (fun y : κ' ⊕ κ'' → W => (β (y ∘ Sum.inr) : ℂ)) x‖
+            * (‖x‖ ^ k
+              * ‖iteratedFDeriv ℝ (n - i) (fun y => ∫ s in Ioc (0 : ℝ) 1, h (Ain s y)) x‖)) := by
+      ring
     _ ≤ _ := mul_le_mul_of_nonneg_left key (by positivity)
 
 end PositivityTheory.SiegelWeilFormula.Ald.PCI

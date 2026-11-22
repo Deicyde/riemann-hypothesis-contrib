@@ -11,9 +11,12 @@ open Matrix GlobalTheory.KZ GlobalTheory.KZ.ES
 
 namespace GlobalTheory
 
-theorem isPGroup_coatom_normal_index_eq {p : ℕ} [hp : Fact p.Prime] {P : Type*} [Group P]
-    [Finite P] (hP : IsPGroup p P) (K : Subgroup P) (hK : IsCoatom K) :
-    K.Normal ∧ K.index = p := by
+theorem isPGroup_coatom_normal_index_eq
+    {p : ℕ} [hp : Fact p.Prime]
+    {P : Type*} [Group P] [Finite P]
+    (hP : IsPGroup p P)
+    (K : Subgroup P) (hK : IsCoatom K)
+    : K.Normal ∧ K.index = p := by
   have hnil : Group.IsNilpotent P := hP.isNilpotent
   have hN : K.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom K Group.normalizerCondition_of_isNilpotent hK
@@ -51,26 +54,35 @@ theorem isPGroup_coatom_normal_index_eq {p : ℕ} [hp : Fact p.Prime] {P : Type*
     have : y ∈ (Subgroup.zpowers x).comap (QuotientGroup.mk' K) := by
       rw [htop]; exact Subgroup.mem_top _
     exact this
-  have hcard : Nat.card (P ⧸ K) = p := by
-    rw [← hx, ← Nat.card_zpowers, hz, Subgroup.card_top]
+  have hcard : Nat.card (P ⧸ K) = p := by rw [← hx, ← Nat.card_zpowers, hz, Subgroup.card_top]
   exact ⟨hN, by rw [Subgroup.index_eq_card, hcard]⟩
 
-theorem valuationSubring_galois_stable_of_kummer : ∀ (l : ℕ), l.Prime → ∀ (F L : Type) [Field F] [Field L] [Algebra F L] [FiniteDimensional F L] [IsGalois F L], IsPGroup l (L ≃ₐ[F] L) → (∃ ζ : F, IsPrimitiveRoot ζ l) → ∀ W : ValuationSubring L, (∀ θ : L, θ ≠ 0 → θ ^ l ∈ (algebraMap F L).range → ∀ τ : L ≃ₐ[F] L, ∀ x ∈ IntermediateField.adjoin F {θ}, τ x ∈ W ↔ x ∈ W) → ∀ (τ : L ≃ₐ[F] L) (x : L), τ x ∈ W ↔ x ∈ W := by
+theorem valuationSubring_galois_stable_of_kummer
+    : ∀ (l : ℕ),
+      l.Prime
+        → ∀ (F L : Type) [Field F] [Field L] [Algebra F L] [FiniteDimensional F L] [IsGalois F L],
+          IsPGroup l (L ≃ₐ[F] L) → (∃ ζ : F, IsPrimitiveRoot ζ l)
+            → ∀ W : ValuationSubring L,
+              (∀ θ : L,
+                  θ ≠ 0 → θ ^ l ∈ (algebraMap F L).range
+                    → ∀ τ : L ≃ₐ[F] L, ∀ x ∈ IntermediateField.adjoin F {θ}, τ x ∈ W ↔ x ∈ W)
+                → ∀ (τ : L ≃ₐ[F] L) (x : L), τ x ∈ W ↔ x ∈ W := by
   intro l hl F L _ _ _ _ _ hP hζ W hW
   classical
   haveI : Fact l.Prime := ⟨hl⟩
-  let D : Subgroup (L ≃ₐ[F] L) :=
-    { carrier := {σ | ∀ x, σ x ∈ W ↔ x ∈ W}
-      mul_mem' := by
-        intro a b ha hb x
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
-        rw [AlgEquiv.mul_apply, ha, hb]
-      one_mem' := by intro x; simp
-      inv_mem' := by
-        intro a ha x
-        simp only [Set.mem_setOf_eq] at ha ⊢
-        rw [← ha (a⁻¹ x)]
-        simp }
+  let D : Subgroup (L ≃ₐ[F] L) := {
+    carrier := {σ | ∀ x, σ x ∈ W ↔ x ∈ W}
+    mul_mem' := by
+      intro a b ha hb x
+      simp only [Set.mem_setOf_eq] at ha hb ⊢
+      rw [AlgEquiv.mul_apply, ha, hb]
+    one_mem' := by intro x; simp
+    inv_mem' := by
+      intro a ha x
+      simp only [Set.mem_setOf_eq] at ha ⊢
+      rw [← ha (a⁻¹ x)]
+      simp
+  }
   suffices hD : D = ⊤ by
     intro τ x
     have hτ : τ ∈ D := hD ▸ Subgroup.mem_top τ
@@ -80,9 +92,12 @@ theorem valuationSubring_galois_stable_of_kummer : ∀ (l : ℕ), l.Prime → �
   obtain ⟨hHn, hHi⟩ := isPGroup_coatom_normal_index_eq hP H hH
   haveI : IsGalois F (IntermediateField.fixedField H) := IsGalois.of_fixedField_normal_subgroup H
   have hfr : Module.finrank F (IntermediateField.fixedField H) = l := by
-    have h1 := (letI : Module.Free (IntermediateField.fixedField H) L := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank F (IntermediateField.fixedField H) L)
+    have h1 :=
+      (letI : Module.Free (IntermediateField.fixedField H) L := Module.Free.of_divisionRing _ _
+       Module.finrank_mul_finrank F (IntermediateField.fixedField H) L)
     rw [IntermediateField.finrank_fixedField_eq_card, ← IsGalois.card_aut_eq_finrank F L,
-      ← H.card_mul_index, hHi, mul_comm (Nat.card H)] at h1
+        ← H.card_mul_index, hHi, mul_comm (Nat.card H)]
+      at h1
     exact Nat.eq_of_mul_eq_mul_right Nat.card_pos h1
   haveI : IsCyclic (IntermediateField.fixedField H ≃ₐ[F] IntermediateField.fixedField H) :=
     isCyclic_of_prime_card (p := l) (by rw [IsGalois.card_aut_eq_finrank, hfr])
@@ -96,8 +111,10 @@ theorem valuationSubring_galois_stable_of_kummer : ∀ (l : ℕ), l.Prime → �
     rintro rfl
     have h1 : (⊤ : IntermediateField F (IntermediateField.fixedField H)) = ⊥ := by
       rw [← hα]; exact IntermediateField.adjoin_simple_eq_bot_iff.2 (zero_mem _)
-    have h2 := congrArg
-      (fun E : IntermediateField F (IntermediateField.fixedField H) => Module.finrank F E) h1
+    have h2 :=
+      congrArg
+        (fun E : IntermediateField F (IntermediateField.fixedField H) => Module.finrank F E)
+        h1
     simp only [IntermediateField.finrank_top', IntermediateField.finrank_bot] at h2
     exact hl.one_lt.ne' (hfr ▸ h2)
   have hθ0 : (α : L) ≠ 0 := fun h => hα0 (Subtype.ext h)
@@ -113,8 +130,9 @@ theorem valuationSubring_galois_stable_of_kummer : ∀ (l : ℕ), l.Prime → �
   obtain ⟨τ, hτ⟩ : ∃ τ, τ ∉ H := by
     by_contra h
     exact hH.1 (eq_top_iff.2 fun g _ => by_contra fun hg => h ⟨g, hg⟩)
-  obtain ⟨σ, hσ⟩ := GlobalTheory.T.exists_galois_conj_valuationSubring_same_trace (IntermediateField.fixedField H) L W (W.comap (τ : L →+* L))
-    (fun a => (hW α hθ0 hθl τ a (hKθ a a.2)).symm)
+  obtain ⟨σ, hσ⟩ :=
+    GlobalTheory.T.exists_galois_conj_valuationSubring_same_trace (IntermediateField.fixedField H) L
+      W (W.comap (τ : L →+* L)) (fun a => (hW α hθ0 hθl τ a (hKθ a a.2)).symm)
   have hη : σ.restrictScalars F ∈ H := by
     refine (IntermediateField.fixingSubgroup_fixedField H).le ?_
     rw [IntermediateField.mem_fixingSubgroup_iff]

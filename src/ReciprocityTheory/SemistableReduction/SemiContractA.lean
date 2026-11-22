@@ -9,9 +9,12 @@ namespace ReciprocityTheory.MultiplicativeHeights
 open Matrix
 open scoped ComplexOrder
 
-theorem sc_schur_posDef {k m : Type*} [Fintype k] [Fintype m] [DecidableEq k]
-    {A : Matrix k k ℂ} (B : Matrix k m ℂ) (D : Matrix m m ℂ) (hA : A.PosDef)
-    (h : (fromBlocks A B Bᴴ D).PosDef) : (D - Bᴴ * A⁻¹ * B).PosDef := by
+theorem sc_schur_posDef
+    {k m : Type*} [Fintype k] [Fintype m] [DecidableEq k]
+    {A : Matrix k k ℂ}
+    (B : Matrix k m ℂ) (D : Matrix m m ℂ)
+    (hA : A.PosDef) (h : (fromBlocks A B Bᴴ D).PosDef)
+    : (D - Bᴴ * A⁻¹ * B).PosDef := by
   classical
   have hAu : IsUnit A.det := isUnit_iff_ne_zero.mpr hA.det_pos.ne'
   obtain ⟨N, hN⟩ : ∃ N : Matrix (k ⊕ m) m ℂ, N = fromRows (-(A⁻¹ * B)) 1 := ⟨_, rfl⟩

@@ -69,8 +69,9 @@ private lemma key {n : ℕ} (t : ℝ) (ht0 : 0 ≤ t) (ht1 : t < 1) (hM : MeanVa
         rfl
     _ = _ := by rw [integral_const_mul, hz]
 
-theorem UpperTheory.Gal.Gen.halfInt_pf :
-    UpperTheory.Gal.Gen.WtPos → UpperTheory.Gal.Gen.MeanVal → UpperTheory.Gal.Gen.DensCont → UpperTheory.Gal.Gen.HalfInt := by
+theorem UpperTheory.Gal.Gen.halfInt_pf
+    : UpperTheory.Gal.Gen.WtPos → UpperTheory.Gal.Gen.MeanVal → UpperTheory.Gal.Gen.DensCont
+      → UpperTheory.Gal.Gen.HalfInt := by
   intro hW hM hD n t ht0 ht1 l hl
   haveI : IsProbabilityMeasure (volume : Measure UnitAddCircle) := ⟨UnitAddCircle.measure_univ⟩
   by_cases h0 : l = 0
@@ -78,7 +79,9 @@ theorem UpperTheory.Gal.Gen.halfInt_pf :
     rw [key t ht0 ht1 hM hD (0 : Fin n → ℤ) 0 0 (by simp)]
     simp [monomialChar_zero]
   · obtain ⟨c, hc⟩ := hW n l hl h0
-    have hm : ∑ i : Fin n, l i * (c - ((i : ℕ) : ℤ)) = ((∑ i : Fin n, l i * (c - ((i : ℕ) : ℤ))).toNat : ℤ) :=
+    have hm
+        : ∑ i : Fin n, l i * (c - ((i : ℕ) : ℤ))
+          = ((∑ i : Fin n, l i * (c - ((i : ℕ) : ℤ))).toNat : ℤ) :=
       (Int.toNat_of_nonneg hc.le).symm
     rw [key t ht0 ht1 hM hD l c _ hm]
     have hne : (∑ i : Fin n, l i * (c - ((i : ℕ) : ℤ))).toNat ≠ 0 := by omega

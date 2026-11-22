@@ -23,8 +23,9 @@ theorem genSemi_of (hHaar : GenHaarSub) : GenSemi := by
   haveI : SigmaFinite μH := hσH
   have hmul : Measurable (fun p : G × G => p.1 * p.2) := measurable_fst.mul measurable_snd
 
-  have hNH : (N : Set G) * (H : Set G) =
-      (fun p : G × G => p.1 * p.2) '' ((N : Set G) ×ˢ (H : Set G)) := by
+  have hNH
+      : (N : Set G) * (H : Set G)
+        = (fun p : G × G => p.1 * p.2) '' ((N : Set G) ×ˢ (H : Set G)) := by
     ext x
     constructor
     · rintro ⟨a, ha, b, hb, rfl⟩
@@ -33,8 +34,8 @@ theorem genSemi_of (hHaar : GenHaarSub) : GenSemi := by
       exact ⟨a, ha, b, hb, rfl⟩
   have hmeasNH : MeasurableSet ((N : Set G) * (H : Set G)) := by
     rw [hNH]
-    obtain ⟨K, hK, hKU⟩ := (isSigmaCompact_univ.of_isClosed_subset (hN.prod hH)
-      (Set.subset_univ _)).image continuous_mul
+    obtain ⟨K, hK, hKU⟩ :=
+      (isSigmaCompact_univ.of_isClosed_subset (hN.prod hH) (Set.subset_univ _)).image continuous_mul
     rw [← hKU]
     exact MeasurableSet.iUnion fun n => (hK n).measurableSet
 
@@ -63,9 +64,10 @@ theorem genSemi_of (hHaar : GenHaarSub) : GenSemi := by
     have hgH : μH.map (fun y : G => h0 * y) = μH := htH h0 hh0
     have hPM : Measurable (Prod.map (fun x : G => n0 * (h0 * x * h0⁻¹)) (fun y : G => h0 * y)) :=
       hf.prodMap hg
-    have hcomp : (fun x : G => n0 * h0 * x) ∘ (fun p : G × G => p.1 * p.2) =
-        (fun p : G × G => p.1 * p.2) ∘
-          Prod.map (fun x : G => n0 * (h0 * x * h0⁻¹)) (fun y : G => h0 * y) := by
+    have hcomp
+        : (fun x : G => n0 * h0 * x) ∘ (fun p : G × G => p.1 * p.2)
+          = (fun p : G × G => p.1 * p.2)
+            ∘ Prod.map (fun x : G => n0 * (h0 * x * h0⁻¹)) (fun y : G => h0 * y) := by
       funext p
       simp only [Function.comp_apply, Prod.map_fst, Prod.map_snd]
       group
@@ -79,7 +81,9 @@ theorem genSemi_of (hHaar : GenHaarSub) : GenSemi := by
       show (1 : G) * 1 ∈ U
       rwa [one_mul]
     obtain ⟨u, v, hu, hv, h1u, h1v, huv⟩ := isOpen_prod_iff.mp hUo 1 1 h11
-    calc (0 : ℝ≥0∞) < μN u * μH v := ENNReal.mul_pos (hposN u hu h1u).ne' (hposH v hv h1v).ne'
+    calc
+      (0 : ℝ≥0∞)
+        < μN u * μH v := ENNReal.mul_pos (hposN u hu h1u).ne' (hposH v hv h1v).ne'
       _ = (μN.prod μH) (u ×ˢ v) := (Measure.prod_prod u v).symm
       _ ≤ _ := measure_mono huv
   · intro C hC
@@ -96,8 +100,10 @@ theorem genSemi_of (hHaar : GenHaarSub) : GenSemi := by
     have hPfin : (μN.prod μH) P < ⊤ := by
       refine lt_of_le_of_lt (measure_mono hPbox) ?_
       rw [Measure.prod_prod]
-      exact ENNReal.mul_lt_top (hfinN _ (hK.image continuous_fst)) (hfinH _ (hK.image continuous_snd))
-    calc (μN.prod μH) ((fun p : G × G => p.1 * p.2) ⁻¹' C)
+      exact ENNReal.mul_lt_top (hfinN _ (hK.image continuous_fst))
+        (hfinH _ (hK.image continuous_snd))
+    calc
+      (μN.prod μH) ((fun p : G × G => p.1 * p.2) ⁻¹' C)
         ≤ (μN.prod μH) (P ∪ ((N : Set G) ×ˢ (H : Set G))ᶜ) := measure_mono hsub
       _ ≤ (μN.prod μH) P + (μN.prod μH) ((N : Set G) ×ˢ (H : Set G))ᶜ := measure_union_le _ _
       _ < ⊤ := by rw [hprodc, add_zero]; exact hPfin

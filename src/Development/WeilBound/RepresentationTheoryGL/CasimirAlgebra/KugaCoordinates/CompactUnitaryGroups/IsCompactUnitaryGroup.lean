@@ -11,19 +11,23 @@ open scoped Classical
 
 namespace PositivityTheory.Rg.Cz.J
 
-theorem coord_eq {E : Type} [Field E] (τ : E →+* ℂ) (c : Cinf E) :
-    coord τ c = if (InfinitePlace.mk τ).embedding = τ then c (InfinitePlace.mk τ)
-      else starRingEnd ℂ (c (InfinitePlace.mk τ)) := by
+theorem coord_eq {E : Type} [Field E] (τ : E →+* ℂ) (c : Cinf E)
+    : coord τ c
+      = if (InfinitePlace.mk τ).embedding = τ then
+          c (InfinitePlace.mk τ)
+        else
+          starRingEnd ℂ (c (InfinitePlace.mk τ)) := by
   delta GlobalTheory.CuspRep.coord
   split_ifs <;> rfl
 
-theorem coord_star {E : Type} [Field E] (τ : E →+* ℂ) (c : Cinf E) :
-    coord τ (star c) = star (coord τ c) := by
+theorem coord_star {E : Type} [Field E] (τ : E →+* ℂ) (c : Cinf E)
+    : coord τ (star c) = star (coord τ c) := by
   rw [coord_eq, coord_eq]
   split_ifs <;> simp [Pi.star_apply]
 
-theorem coord_conjugate {E : Type} [Field E] [_root_.NumberField.IsTotallyComplex E] (τ : E →+* ℂ) (c : Cinf E) :
-    coord (ComplexEmbedding.conjugate τ) c = star (coord τ c) := by
+theorem coord_conjugate
+    {E : Type} [Field E] [_root_.NumberField.IsTotallyComplex E] (τ : E →+* ℂ) (c : Cinf E)
+    : coord (ComplexEmbedding.conjugate τ) c = star (coord τ c) := by
   have hne : ComplexEmbedding.conjugate τ ≠ τ := by
     intro h
     have hc := IsTotallyComplex.isComplex (InfinitePlace.mk τ)
@@ -39,13 +43,20 @@ theorem coord_conjugate {E : Type} [Field E] [_root_.NumberField.IsTotallyComple
     · exact absurd h h2
     · exact absurd h h1
 
-theorem coord_embedding {E : Type} [Field E] (w : InfinitePlace E) (c : Cinf E) :
-    coord w.embedding c = c w := by
+theorem coord_embedding {E : Type} [Field E] (w : InfinitePlace E) (c : Cinf E)
+    : coord w.embedding c = c w := by
   rw [coord_eq, InfinitePlace.mk_embedding, if_pos rfl]
 
-theorem continuous_coord {E : Type} [Field E] (τ : E →+* ℂ) : Continuous (coord τ : Cinf E → ℂ) := by
-  have e : (coord τ : Cinf E → ℂ) = fun c => if (InfinitePlace.mk τ).embedding = τ then
-      c (InfinitePlace.mk τ) else starRingEnd ℂ (c (InfinitePlace.mk τ)) := funext (coord_eq τ)
+theorem continuous_coord {E : Type} [Field E] (τ : E →+* ℂ)
+    : Continuous (coord τ : Cinf E → ℂ) := by
+  have e
+      : (coord τ : Cinf E → ℂ)
+        = fun c =>
+          if (InfinitePlace.mk τ).embedding = τ then
+            c (InfinitePlace.mk τ)
+          else
+            starRingEnd ℂ (c (InfinitePlace.mk τ)) :=
+    funext (coord_eq τ)
   rw [e]
   by_cases h : (InfinitePlace.mk τ).embedding = τ
   · simp only [if_pos h]
@@ -53,13 +64,15 @@ theorem continuous_coord {E : Type} [Field E] (τ : E →+* ℂ) : Continuous (c
   · simp only [if_neg h]
     exact Complex.continuous_conj.comp (continuous_apply _)
 
-theorem isCompact_unitaryGroup (E : Type) [Field E] (a : ℕ) :
-    IsCompact (Matrix.unitaryGroup (Fin a) (Cinf E) : Set (Matrix (Fin a) (Fin a) (Cinf E))) := by
-  have hK : IsCompact ((Set.univ.pi fun _ : Fin a => Set.univ.pi fun _ : Fin a =>
-      Set.univ.pi fun _ : InfinitePlace E => Metric.closedBall (0 : ℂ) 1) :
-        Set (Matrix (Fin a) (Fin a) (Cinf E))) :=
-    isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_univ_pi fun _ =>
-      isCompact_closedBall 0 1
+theorem isCompact_unitaryGroup (E : Type) [Field E] (a : ℕ)
+    : IsCompact (Matrix.unitaryGroup (Fin a) (Cinf E) : Set (Matrix (Fin a) (Fin a) (Cinf E))) := by
+  have hK : IsCompact
+      ((Set.univ.pi fun _ : Fin a =>
+          Set.univ.pi fun _ : Fin a =>
+            Set.univ.pi fun _ : InfinitePlace E => Metric.closedBall (0 : ℂ) 1)
+        : Set (Matrix (Fin a) (Fin a) (Cinf E))) :=
+    isCompact_univ_pi fun _ =>
+      isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall 0 1
   refine IsCompact.of_isClosed_subset hK ?_ ?_
   · have h1 : IsClosed {M : Matrix (Fin a) (Fin a) (Cinf E) | M * star M = 1} :=
       isClosed_eq (continuous_id.mul continuous_star) continuous_const
@@ -67,12 +80,14 @@ theorem isCompact_unitaryGroup (E : Type) [Field E] (a : ℕ) :
     ext M
     exact Matrix.mem_unitaryGroup_iff
   · intro M hM i _ j _ w _
-    have hw : (Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix M ∈
-        Matrix.unitaryGroup (Fin a) ℂ := by
+    have hw
+        : (Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix M
+          ∈ Matrix.unitaryGroup (Fin a) ℂ := by
       have hM' : M * star M = 1 := Matrix.mem_unitaryGroup_iff.1 hM
       rw [Matrix.mem_unitaryGroup_iff]
-      have hs : (Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix (star M) =
-          star ((Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix M) := by
+      have hs
+          : (Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix (star M)
+            = star ((Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix M) := by
         ext i' j'
         simp [Matrix.star_apply]
       rw [← hs, ← map_mul, hM', map_one]

@@ -7,22 +7,27 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.LiftSLMap
 @[expose] public section
 
 open scoped MatrixGroups Matrix
-open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois UpperTheory.Kd.L
+open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois
+  UpperTheory.Kd.L
 
-private theorem exists_finite_residue_reps_mod_natCast (M K : ℕ) (hK : K ∣ M) (L γ : SL(2, ℤ))
-    (h : Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) L =
-      Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ) (i j : Fin 2) :
-    ((L i j : ℤ) : ZMod K) = ((γ i j : ℤ) : ZMod K) := by
+private theorem exists_finite_residue_reps_mod_natCast
+    (M K : ℕ) (hK : K ∣ M)
+    (L γ : SL(2, ℤ))
+    (h : Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) L
+      = Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ)
+    (i j : Fin 2)
+    : ((L i j : ℤ) : ZMod K) = ((γ i j : ℤ) : ZMod K) := by
   have h1 : ((L i j : ℤ) : ZMod M) = ((γ i j : ℤ) : ZMod M) :=
     congrArg (fun g : SL(2, ZMod M) => g i j) h
   have h2 := congrArg (ZMod.castHom hK (ZMod K)) h1
   simpa only [map_intCast] using h2
 
-private theorem exists_mem_mul_or_neg_mul_symm (M : ℕ) (a b : ℕ) : Tm M (a + b) = Tm M a * Tm M b := by
+private theorem exists_mem_mul_or_neg_mul_symm (M : ℕ) (a b : ℕ)
+    : Tm M (a + b) = Tm M a * Tm M b := by
   simp only [Tm, pow_add, map_mul]
 
-private theorem tm_apply_eq_cast_upper_unipotent (M k : ℕ) (i j : Fin 2) :
-    (Tm M k) i j = (((!![1, (k : ℤ); 0, 1] : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : ZMod M) := by
+private theorem tm_apply_eq_cast_upper_unipotent (M k : ℕ) (i j : Fin 2)
+    : (Tm M k) i j = (((!![1, (k : ℤ); 0, 1] : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : ZMod M) := by
   rw [← ModularGroup.coe_T_zpow, zpow_natCast]
   rfl
 
@@ -35,15 +40,17 @@ private theorem tm_mod_eq (M : ℕ) (k : ℕ) : Tm M (k % M) = Tm M k := by
   conv_rhs => rw [← Nat.mod_add_div k M]
   rw [exists_mem_mul_or_neg_mul_symm, exists_mem_mul_or_neg_mul_trans, mul_one]
 
-private theorem eq_of_tm_eq_of_lt (M : ℕ) (a b : ℕ) (ha : a < M) (hb : b < M) (h : Tm M a = Tm M b) : a = b := by
+private theorem eq_of_tm_eq_of_lt (M : ℕ) (a b : ℕ) (ha : a < M) (hb : b < M) (h : Tm M a = Tm M b)
+    : a = b := by
   have h1 := congrArg (fun g : SL(2, ZMod M) => g 0 1) h
   simp only [tm_apply_eq_cast_upper_unipotent] at h1
   simp at h1
   rw [ZMod.natCast_eq_natCast_iff'] at h1
   rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at h1
 
-private theorem tm_mem_map_gam (N l M : ℕ) (k : ℕ) :
-    Tm M k ∈ Subgroup.map (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M))) (Gam N l) := by
+private theorem tm_mem_map_gam (N l M : ℕ) (k : ℕ)
+    : Tm M k
+      ∈ Subgroup.map (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M))) (Gam N l) := by
   refine Subgroup.mem_map_of_mem _ (Subgroup.pow_mem _ ?_ k)
   refine Subgroup.mem_inf.2 ⟨?_, ?_⟩
   · rw [CongruenceSubgroup.Gamma1_mem]
@@ -51,16 +58,23 @@ private theorem tm_mem_map_gam (N l M : ℕ) (k : ℕ) :
   · rw [CongruenceSubgroup.Gamma0_mem]
     simp [ModularGroup.coe_T]
 
-private theorem liftSL_mem_gam_and_map_eq_of_mem_gs (N l M : ℕ) [NeZero M] (hM : N * l ∣ M) (γ : SL(2, ZMod M)) (hγ : γ ∈ Gs N l M) :
-    liftSL M γ ∈ Gam N l ∧ Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) (liftSL M γ) = γ := by
-  have hγ' : γ ∈ Subgroup.map (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M))) (Gam N l) := by
+private theorem liftSL_mem_gam_and_map_eq_of_mem_gs
+    (N l M : ℕ) [NeZero M] (hM : N * l ∣ M) (γ : SL(2, ZMod M)) (hγ : γ ∈ Gs N l M)
+    : liftSL M γ ∈ Gam N l
+      ∧ Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) (liftSL M γ) = γ := by
+  have hγ'
+      : γ ∈ Subgroup.map (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M))) (Gam N l) := by
     simpa [Gs] using hγ
   obtain ⟨γ', hg', rfl⟩ := Subgroup.mem_map.1 hγ'
-  have hL : Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) (liftSL M
-      (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ')) =
-      Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ' :=
-    Classical.epsilon_spec (p := fun g => Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) g =
-      Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ') ⟨γ', rfl⟩
+  have hL
+      : Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M))
+          (liftSL M (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ'))
+        = Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ' :=
+    Classical.epsilon_spec
+      (p := fun g =>
+        Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) g
+          = Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) γ')
+      ⟨γ', rfl⟩
   refine ⟨?_, hL⟩
   have eN := exists_finite_residue_reps_mod_natCast M N (dvd_trans (dvd_mul_right N l) hM) _ _ hL
   have el := exists_finite_residue_reps_mod_natCast M l (dvd_trans (dvd_mul_left l N) hM) _ _ hL
@@ -73,8 +87,18 @@ private theorem liftSL_mem_gam_and_map_eq_of_mem_gs (N l M : ℕ) [NeZero M] (hM
     rw [el]
     exact h0
 
-theorem UpperTheory.Kd.L.reps :
-    ∀ (l : ℕ) [Fact l.Prime] (N : ℕ) [NeZero N] (c d : ℕ) (gm : (ZMod l)ˣ → SL(2, ℤ)), Par l N c d gm → ∀ (M : ℕ) [NeZero M], N * l ∣ M → (∃ R, IsReps N l M R) ∧ ∀ γ ∈ Gs N l M, ∀ r₀, Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) (liftSL M γ) = γ ∧ gm r₀ * liftSL M γ ∈ CongruenceSubgroup.Gamma0 N ∧ ((en (gm r₀ * liftSL M γ) 0 0 : ℤ) : ZMod N) = ((en (gm 1) 0 0 : ℤ) : ZMod N) ∧ ¬ (l : ℤ) ∣ en (gm r₀ * liftSL M γ) 0 0 ∧ ¬ (l : ℤ) ∣ en (gm r₀ * liftSL M γ) 1 0 := by
+theorem UpperTheory.Kd.L.reps
+    : ∀ (l : ℕ) [Fact l.Prime] (N : ℕ) [NeZero N] (c d : ℕ) (gm : (ZMod l)ˣ → SL(2, ℤ)),
+      Par l N c d gm
+        → ∀ (M : ℕ) [NeZero M],
+          N * l ∣ M
+            → (∃ R, IsReps N l M R)
+              ∧ ∀ γ ∈ Gs N l M, ∀ r₀,
+                Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)) (liftSL M γ) = γ
+                  ∧ gm r₀ * liftSL M γ ∈ CongruenceSubgroup.Gamma0 N
+                  ∧ ((en (gm r₀ * liftSL M γ) 0 0 : ℤ) : ZMod N) = ((en (gm 1) 0 0 : ℤ) : ZMod N)
+                  ∧ ¬ (l : ℤ) ∣ en (gm r₀ * liftSL M γ) 0 0
+                  ∧ ¬ (l : ℤ) ∣ en (gm r₀ * liftSL M γ) 1 0 := by
   intro l _ N _ c d gm hP M _ hM
   classical
   refine ⟨?_, ?_⟩
@@ -88,7 +112,11 @@ theorem UpperTheory.Kd.L.reps :
       ext y
       constructor
       · rintro ⟨k, rfl⟩
-        exact ⟨j + k, show γ * Tm M (j + k) = γ * Tm M j * Tm M k by rw [mul_assoc, ← exists_mem_mul_or_neg_mul_symm]⟩
+        exact ⟨
+          j + k,
+          show γ * Tm M (j + k) = γ * Tm M j * Tm M k by
+            rw [mul_assoc, ← exists_mem_mul_or_neg_mul_symm]
+        ⟩
       · rintro ⟨k, rfl⟩
         refine ⟨k + (M - 1) * j, ?_⟩
         have hM1 : j + (k + (M - 1) * j) = k + M * j := by
@@ -97,12 +125,17 @@ theorem UpperTheory.Kd.L.reps :
           simp only [Nat.add_sub_cancel]
           ring
         show γ * Tm M j * Tm M (k + (M - 1) * j) = γ * Tm M k
-        rw [mul_assoc, ← exists_mem_mul_or_neg_mul_symm, hM1, exists_mem_mul_or_neg_mul_symm, exists_mem_mul_or_neg_mul_trans, mul_one]
+        rw [mul_assoc, ← exists_mem_mul_or_neg_mul_symm, hM1, exists_mem_mul_or_neg_mul_symm,
+          exists_mem_mul_or_neg_mul_trans, mul_one]
     have rep_eq : ∀ γ x, x ∈ orb γ → rep x = rep γ := by
       intro γ x hx
       simp only [rep]
       rw [orb_eq γ x hx]
-    have hGs : ∀ γ, γ ∈ Gs N l M ↔ γ ∈ Subgroup.map (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M))) (Gam N l) := by
+    have hGs
+        : ∀ γ,
+          γ ∈ Gs N l M
+            ↔ γ ∈ Subgroup.map (Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod M)))
+              (Gam N l) := by
       intro γ
       simp [Gs]
     refine ⟨(Gs N l M).image rep, ?_, ?_⟩
@@ -128,8 +161,7 @@ theorem UpperTheory.Kd.L.reps :
           exact ⟨k', hγr.symm⟩
         have hr1 : rep γ = rep γ1 := rep_eq γ1 γ hin1
         have hT : Tm M k' = Tm M (k % M) := by
-          have e : rep γ1 * Tm M k' = rep γ1 * Tm M (k % M) := by
-            rw [← hγr, tm_mod_eq, ← hr1, hk]
+          have e : rep γ1 * Tm M k' = rep γ1 * Tm M (k % M) := by rw [← hγr, tm_mod_eq, ← hr1, hk]
           exact mul_left_cancel e
         have := eq_of_tm_eq_of_lt M k' (k % M) hk' (Nat.mod_lt _ (NeZero.pos M)) hT
         simp only [Prod.mk.injEq]

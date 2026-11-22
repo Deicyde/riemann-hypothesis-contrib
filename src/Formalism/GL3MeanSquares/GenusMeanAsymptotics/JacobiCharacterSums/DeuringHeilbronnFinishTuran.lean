@@ -26,18 +26,27 @@ theorem deuring_heilbronn_finish_turan : DHFinish2Of := by
   obtain ⟨c₁, hc₁pos, hc₁Z, hc₁20⟩ : ∃ c : ℝ, 0 < c ∧ c ≤ cZ / 4 ∧ c ≤ 1 / 20 :=
     ⟨min (cZ / 4) (1 / 20), lt_min (by linarith) (by norm_num), min_le_left _ _, min_le_right _ _⟩
   have hrr : 16 < TuranPowerSumBounds.rr a := TuranPowerSumBounds.rr_gt a
-  obtain ⟨c₂, hc₂pos, hc₂k, hc₂t, hc₂K⟩ : ∃ c : ℝ, 0 < c ∧
-      c ≤ TuranPowerSumBounds.kap a (Real.log (max CT 1)) / (25 * CF) ∧
-      c ≤ TuranPowerSumBounds.th a / (2 * Real.exp 1 * CP * TuranPowerSumBounds.rr a) ∧
-      c * (2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1)) ≤ cZ := by
+  obtain ⟨c₂, hc₂pos, hc₂k, hc₂t, hc₂K⟩
+      : ∃ c : ℝ,
+        0 < c ∧ c ≤ TuranPowerSumBounds.kap a (Real.log (max CT 1)) / (25 * CF)
+          ∧ c ≤ TuranPowerSumBounds.th a / (2 * Real.exp 1 * CP * TuranPowerSumBounds.rr a)
+          ∧ c * (2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1)) ≤ cZ := by
     have hk := div_pos (TuranPowerSumBounds.kap_pos a ha _ hD0) (by positivity : (0 : ℝ) < 25 * CF)
-    have ht := div_pos (TuranPowerSumBounds.th_pos a) (by positivity : (0 : ℝ) < 2 * Real.exp 1 * CP * TuranPowerSumBounds.rr a)
-    have hq : (0 : ℝ) < 2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1) := by positivity
-    refine ⟨min (min (TuranPowerSumBounds.kap a (Real.log (max CT 1)) / (25 * CF))
-      (TuranPowerSumBounds.th a / (2 * Real.exp 1 * CP * TuranPowerSumBounds.rr a)))
-      (cZ / (2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1))),
+    have ht :=
+      div_pos (TuranPowerSumBounds.th_pos a)
+        (by positivity : (0 : ℝ) < 2 * Real.exp 1 * CP * TuranPowerSumBounds.rr a)
+    have hq : (0 : ℝ) < 2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1) := by
+      positivity
+    refine ⟨
+      min
+        (min (TuranPowerSumBounds.kap a (Real.log (max CT 1)) / (25 * CF))
+          (TuranPowerSumBounds.th a / (2 * Real.exp 1 * CP * TuranPowerSumBounds.rr a)))
+        (cZ / (2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1))),
       lt_min (lt_min hk ht) (div_pos hcZ hq),
-      (min_le_left _ _).trans (min_le_left _ _), (min_le_left _ _).trans (min_le_right _ _), ?_⟩
+      (min_le_left _ _).trans (min_le_left _ _),
+      (min_le_left _ _).trans (min_le_right _ _),
+      ?_
+    ⟩
     rw [← le_div_iff₀ hq]
     exact min_le_right _ _
   have hc0pos : 0 < TuranPowerSumBounds.c0 a := by
@@ -82,39 +91,46 @@ theorem deuring_heilbronn_finish_turan : DHFinish2Of := by
     have hT4 : (4 : ℝ) ≤ T ^ 2 := by nlinarith
     have h3 : 3 * (M : ℝ) ≤ ((M : ℝ) * T) ^ 2 := by
       nlinarith [mul_le_mul_of_nonneg_left hT4 (sq_nonneg (M : ℝ))]
-    calc Real.log (3 * (M : ℝ)) ≤ Real.log (((M : ℝ) * T) ^ 2) :=
-          Real.log_le_log (by linarith) h3
+    calc
+      Real.log (3 * (M : ℝ))
+        ≤ Real.log (((M : ℝ) * T) ^ 2) := Real.log_le_log (by linarith) h3
       _ = 2 * Real.log ((M : ℝ) * T) := by
-          rw [Real.log_pow]
-          push_cast
-          ring
+        rw [Real.log_pow]
+        push_cast
+        ring
   have hℓM : Real.log (3 * (M : ℝ)) ^ 2 / (M : ℝ) ≤ 32 * (1 - β₁) / cS := by
     rw [div_le_div_iff₀ hMpos hcS]
     have hls := TuranPowerSumBounds.log_sq_bound (M : ℝ) (by linarith)
-    calc Real.log (3 * (M : ℝ)) ^ 2 * cS ≤ 32 * √(M : ℝ) * cS :=
-          mul_le_mul_of_nonneg_right hls hcS.le
-      _ ≤ 32 * √(M : ℝ) * ((1 - β₁) * √(M : ℝ)) :=
-          mul_le_mul_of_nonneg_left hcs (by positivity)
+    calc
+      Real.log (3 * (M : ℝ)) ^ 2 * cS
+        ≤ 32 * √(M : ℝ) * cS := mul_le_mul_of_nonneg_right hls hcS.le
+      _ ≤ 32 * √(M : ℝ) * ((1 - β₁) * √(M : ℝ)) := mul_le_mul_of_nonneg_left hcs (by positivity)
       _ = 32 * (1 - β₁) * (M : ℝ) := by linear_combination (32 * (1 - β₁)) * hmm
   rw [div_le_iff₀ hLpos]
   by_contra hcon
   push_neg at hcon
-  have hKK0 : TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁ <
-      Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3)) := by
+  have hKK0
+      : TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁
+        < Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3)) := by
     by_contra h
     push_neg at h
-    have h1 : c₂ * Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3)) ≤
-        c₂ * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1) :=
-      mul_le_mul_of_nonneg_left (by linarith [le_abs_self (TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁)])
+    have h1
+        : c₂ * Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3))
+          ≤ c₂ * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1) :=
+      mul_le_mul_of_nonneg_left
+        (by linarith [le_abs_self (TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁)])
         hc₂pos.le
     have h3 : c₂ * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1) ≤ cZ / 2 := by
-      have e : c₂ * (2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1)) =
-          2 * (c₂ * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1)) := by ring
+      have e
+          : c₂ * (2 * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1))
+            = 2 * (c₂ * (|TuranPowerSumBounds.K0 a (Real.log (max CT 1)) CP cZ cS c₁| + 1)) := by
+        ring
       linarith
     linarith
   have hpos : 0 < c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3) := by positivity
-  have hexp : (1 - β₁) * Real.log ((M : ℝ) * T) ^ 3 =
-      c₁ * Real.exp (-Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3))) := by
+  have hexp
+      : (1 - β₁) * Real.log ((M : ℝ) * T) ^ 3
+        = c₁ * Real.exp (- Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3))) := by
     rw [Real.exp_neg, Real.exp_log hpos]
     field_simp
   have hρre : (22 / 25 : ℝ) ≤ ρ.re := by linarith
@@ -123,17 +139,17 @@ theorem deuring_heilbronn_finish_turan : DHFinish2Of := by
       rw [div_le_iff₀ hLpos]
       nlinarith
     linarith
-  obtain ⟨N, w, hwre, hwex, hwsum, hwj⟩ := hF M χ₁ χ β₁ T (1 - ρ.re) ρ hM hT hsq hne1 hL hβ20 hβ1
-    hρ hρre hIm hne hη (by linarith)
+  obtain ⟨N, w, hwre, hwex, hwsum, hwj⟩ :=
+    hF M χ₁ χ β₁ T (1 - ρ.re) ρ hM hT hsq hne1 hL hβ20 hβ1 hρ hρre hIm hne hη (by linarith)
   have hβP : 1 - 1 / Real.log (3 * (M : ℝ)) ≤ β₁ := by
     have : c₁ / Real.log ((M : ℝ) * T) ≤ 1 / Real.log (3 * (M : ℝ)) := by
       rw [div_le_div_iff₀ hLpos hℓpos]
       nlinarith
     linarith
-  refine TuranPowerSumBounds.core2 CT a hCT ha hT2 CF CP cZ cS c₁ c₂ hCF hCP hcZ hcS hc₁pos hc₁Z hc₂pos hc₂k hc₂t
-    (Real.log ((M : ℝ) * T)) (Real.log (3 * (M : ℝ))) (1 - β₁) (1 - ρ.re) (M : ℝ)
-    (Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3)))
-    hL1 hℓ0 hℓL hlam hηZ hηc0 hcon hMpos hℓM hexp hKK0 N w hwre hwex hwsum ?_
+  refine TuranPowerSumBounds.core2 CT a hCT ha hT2 CF CP cZ cS c₁ c₂ hCF hCP hcZ hcS hc₁pos hc₁Z
+    hc₂pos hc₂k hc₂t (Real.log ((M : ℝ) * T)) (Real.log (3 * (M : ℝ))) (1 - β₁) (1 - ρ.re) (M : ℝ)
+    (Real.log (c₁ / ((1 - β₁) * Real.log ((M : ℝ) * T) ^ 3))) hL1 hℓ0 hℓL hlam hηZ hηc0 hcon hMpos
+    hℓM hexp hKK0 N w hwre hwex hwsum ?_
   intro j hj
   obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
   have h1 := hwj (i + 1) hj
@@ -141,13 +157,16 @@ theorem deuring_heilbronn_finish_turan : DHFinish2Of := by
   simp only [Nat.add_sub_cancel] at h1 ⊢
   have e1 : (1 + (1 - ρ.re)) - 1 = 1 - ρ.re := by ring
   rw [e1] at h2
-  have hA : CP * (1 - β₁) * Real.log (3 * (M : ℝ)) ^ 2 * ((i : ℝ) + 2) ^ 2 / (1 - ρ.re) ^ (i + 2) =
-      CP * (1 - β₁) * Real.log (3 * (M : ℝ)) ^ 2 * (((i + 1 : ℕ) : ℝ) + 1) ^ 2 /
-        (1 - ρ.re) ^ (i + 1 + 1) := by
+  have hA
+      : CP * (1 - β₁) * Real.log (3 * (M : ℝ)) ^ 2 * ((i : ℝ) + 2) ^ 2 / (1 - ρ.re) ^ (i + 2)
+        = CP * (1 - β₁) * Real.log (3 * (M : ℝ)) ^ 2 * (((i + 1 : ℕ) : ℝ) + 1) ^ 2
+          / (1 - ρ.re) ^ (i + 1 + 1) := by
     push_cast
     ring_nf
-  have hC : CP * ((i : ℝ) + 2) * Real.log (3 * (M : ℝ)) ^ 2 / ((M : ℝ) * (1 - ρ.re) ^ (i + 1)) =
-      CP * (((i + 1 : ℕ) : ℝ) + 1) * Real.log (3 * (M : ℝ)) ^ 2 / ((M : ℝ) * (1 - ρ.re) ^ (i + 1)) := by
+  have hC
+      : CP * ((i : ℝ) + 2) * Real.log (3 * (M : ℝ)) ^ 2 / ((M : ℝ) * (1 - ρ.re) ^ (i + 1))
+        = CP * (((i + 1 : ℕ) : ℝ) + 1) * Real.log (3 * (M : ℝ)) ^ 2
+          / ((M : ℝ) * (1 - ρ.re) ^ (i + 1)) := by
     push_cast
     ring_nf
   rw [hA, hC] at h2

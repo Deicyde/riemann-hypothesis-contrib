@@ -16,15 +16,18 @@ noncomputable section
 
 universe u v
 
-theorem SerreFinite.proof (hExact : CechExact.Statement.{u, max u v})
-    (hTop : CechTop.Statement.{u, max u v}) (hFree : SerreFree.Statement.{u, max u v})
-    (hPres : GradedPres.Statement.{u, v}) (hLift : GradedULift.Statement.{u, v})
-    (hRet : CohomRetract.Statement.{u, v, max u v}) : SerreFinite.Statement.{u, v} := by
+theorem SerreFinite.proof
+    (hExact : CechExact.Statement.{u, max u v}) (hTop : CechTop.Statement.{u, max u v})
+    (hFree : SerreFree.Statement.{u, max u v}) (hPres : GradedPres.Statement.{u, v})
+    (hLift : GradedULift.Statement.{u, v}) (hRet : CohomRetract.Statement.{u, v, max u v})
+    : SerreFinite.Statement.{u, v} := by
   intro S _ _ N
 
-  have key : ∀ (k : ℕ) (M : Type (max u v)) [AddCommGroup M] [Module (Poly S N) M] [Module S M]
-      [IsScalarTower S (Poly S N) M] (𝓜 : GradedPMod S N M), Module.Finite (Poly S N) M →
-      ∀ i, N + 1 ≤ i + k → ∀ c : ℤ, Module.Finite S (cohom 𝓜 i c) := by
+  have key
+      : ∀ (k : ℕ) (M : Type (max u v)) [AddCommGroup M] [Module (Poly S N) M] [Module S M]
+          [IsScalarTower S (Poly S N) M] (𝓜 : GradedPMod S N M),
+        Module.Finite (Poly S N) M
+          → ∀ i, N + 1 ≤ i + k → ∀ c : ℤ, Module.Finite S (cohom 𝓜 i c) := by
     intro k
     induction k with
     | zero =>

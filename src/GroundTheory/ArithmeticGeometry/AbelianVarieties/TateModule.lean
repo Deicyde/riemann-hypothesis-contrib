@@ -44,8 +44,10 @@ end Basis
 
 section Curve
 
-variable {F : Type*} [Field F] [IsSepClosed F] [DecidableEq F] (W : WeierstrassCurve F)
-  [W.IsElliptic] (ℓ : ℕ) [hℓ : Fact ℓ.Prime]
+variable
+  {F : Type*} [Field F] [IsSepClosed F] [DecidableEq F]
+  (W : WeierstrassCurve F) [W.IsElliptic]
+  (ℓ : ℕ) [hℓ : Fact ℓ.Prime]
 
 end Curve
 
@@ -65,7 +67,9 @@ section Galois
 
 universe u
 
-variable (K L : Type u) [Field K] [Field L] [Algebra K L] [DecidableEq L] (W : WeierstrassCurve K)
+variable
+  (K L : Type u) [Field K] [Field L] [Algebra K L] [DecidableEq L]
+  (W : WeierstrassCurve K)
   (ℓ : ℕ) [hℓ : Fact ℓ.Prime]
 
 end Galois

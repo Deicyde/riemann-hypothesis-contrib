@@ -13,8 +13,7 @@ section FIwasawaFinal
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem fIwasawa_ordL_mul (x y : L) (hx : x ≠ 0) (hy : y ≠ 0) :
-    ordL (x * y) = ordL x + ordL y := by
+theorem fIwasawa_ordL_mul (x y : L) (hx : x ≠ 0) (hy : y ≠ 0) : ordL (x * y) = ordL x + ordL y := by
   have hx' : Valued.v x ≠ 0 := (Valuation.ne_zero_iff _).mpr hx
   have hy' : Valued.v y ≠ 0 := (Valuation.ne_zero_iff _).mpr hy
   have hxy' : Valued.v (x * y) ≠ 0 := by rw [map_mul]; exact mul_ne_zero hx' hy'
@@ -26,13 +25,15 @@ theorem fIwasawa_ordL_mul (x y : L) (hx : x ≠ 0) (hy : y ≠ 0) :
   rw [key, toAdd_mul]
   ring
 
-theorem fIwasawa_ordL_unit (x y : L) (hx : Valued.v x ≤ 1) (hy : Valued.v y ≤ 1)
-    (hxy : y * x = 1) : ordL x = 0 := by
+theorem fIwasawa_ordL_unit (x y : L) (hx : Valued.v x ≤ 1) (hy : Valued.v y ≤ 1) (hxy : y * x = 1)
+    : ordL x = 0 := by
   have h1 : Valued.v y * Valued.v x = 1 := by
     have := congrArg Valued.v hxy
     rwa [map_mul, map_one] at this
   have hge : 1 ≤ Valued.v x :=
-    calc (1 : WithZero (Multiplicative ℤ)) = Valued.v y * Valued.v x := h1.symm
+    calc
+      (1 : WithZero (Multiplicative ℤ))
+        = Valued.v y * Valued.v x := h1.symm
       _ ≤ 1 * Valued.v x := by gcongr
       _ = Valued.v x := one_mul _
   have hv : Valued.v x = 1 := le_antisymm hx hge
@@ -69,15 +70,19 @@ private lemma GL_blockTriangular_diag_ne_zero (g : GL (Fin n) L)
   rw [Matrix.det_of_upperTriangular hg] at hdet
   exact Finset.prod_ne_zero_iff.mp hdet i (Finset.mem_univ _)
 
-theorem fIwasawa_chi_mul (hα : ∀ i, α i ≠ 0) (hq : (q : ℂ) ≠ 0) (b c : GU σ n)
-    (hb : ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id)
-    (hc : ((c : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id) :
-    chiDeltaU q α (b * c) = chiDeltaU q α b * chiDeltaU q α c := by
+theorem fIwasawa_chi_mul
+    (hα : ∀ i, α i ≠ 0) (hq : (q : ℂ) ≠ 0)
+    (b c : GU σ n) (hb : ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id)
+    (hc : ((c : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id)
+    : chiDeltaU q α (b * c) = chiDeltaU q α b * chiDeltaU q α c := by
   have hdb := GL_blockTriangular_diag_ne_zero (b : GL (Fin n) L) hb
   have hdc := GL_blockTriangular_diag_ne_zero (c : GL (Fin n) L) hc
-  have hbc : ∀ i : Fin n, (((b * c : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i =
-      ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i * ((c : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i :=
-    fun i => blockTriangular_mul_diag _ _ hb hc i
+  have hbc
+      : ∀ i : Fin n,
+        (((b * c : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i
+          = ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i
+            * ((c : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i := fun i =>
+    blockTriangular_mul_diag _ _ hb hc i
   unfold Formalism.UG.chiDeltaU
   rw [← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl (fun i _ => ?_)
@@ -104,16 +109,18 @@ private lemma KU_entries_valuation_le_one (g : GU σ n) (hg : g ∈ KU σ n) (i 
   · exact (Valuation.mem_integer_iff _ _).mp
       (((g'⁻¹ : GL (Fin n) (intL L)) : Matrix (Fin n) (Fin n) (intL L)) i j).2
 
-theorem fIwasawa_chi_int (b : GU σ n)
-    (hb : ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id) (hk : b ∈ KU σ n) :
-    chiDeltaU q α b = 1 := by
+theorem fIwasawa_chi_int
+    (b : GU σ n)
+    (hb : ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id) (hk : b ∈ KU σ n)
+    : chiDeltaU q α b = 1 := by
   have hbinv := GL_inv_blockTriangular (b : GL (Fin n) L) hb
   unfold Formalism.UG.chiDeltaU
   apply Finset.prod_eq_one
   intro i _
   split_ifs with h
   · have h0 : ordL (((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) ⟨i.val, h⟩ ⟨i.val, h⟩) = 0 := by
-      apply fIwasawa_ordL_unit _ ((((b : GL (Fin n) L)⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) ⟨i.val, h⟩ ⟨i.val, h⟩)
+      apply fIwasawa_ordL_unit _
+        ((((b : GL (Fin n) L)⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) ⟨i.val, h⟩ ⟨i.val, h⟩)
         (KU_entries_valuation_le_one σ b hk _ _).1 (KU_entries_valuation_le_one σ b hk _ _).2
       rw [← blockTriangular_mul_diag _ _ hbinv hb, Units.inv_mul]
       exact Matrix.one_apply_eq _
@@ -121,30 +128,35 @@ theorem fIwasawa_chi_int (b : GU σ n)
     simp
   · rfl
 
-theorem fIwasawa_iwasawa (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
-    (g : GU σ n) : ∃ b k : GU σ n, IsBorelU b ∧ k ∈ KU σ n ∧ g = b * k := by
+theorem fIwasawa_iwasawa
+    (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n)
+    : ∃ b k : GU σ n, IsBorelU b ∧ k ∈ KU σ n ∧ g = b * k := by
   obtain ⟨k, hk, hup⟩ := fIwasawa_upper σ hσ hσv _ (fIwasawa_mem_un σ g⁻¹)
   have hkG : fIwasawaMk σ k hk.1 ∈ KU σ n := fIwasawa_mk_mem_K σ hσv k hk.1 hk.2
   refine ⟨(fIwasawaMk σ k hk.1 * g⁻¹)⁻¹, fIwasawaMk σ k hk.1, ?_, hkG, by group⟩
-  have h1 : (((fIwasawaMk σ k hk.1 * g⁻¹ : GU σ n) : GL (Fin n) L) :
-      Matrix (Fin n) (Fin n) L).BlockTriangular id := by
+  have h1
+      : (((fIwasawaMk σ k hk.1 * g⁻¹ : GU σ n) : GL (Fin n) L)
+        : Matrix (Fin n) (Fin n) L).BlockTriangular id := by
     rw [Subgroup.coe_mul, Units.val_mul, fIwasawa_mk_val]; exact hup
   have h2 := spherical_upper_inv _ h1
   rw [← Subgroup.coe_inv] at h2
   exact (spherical_upper_iff _).2 h2
 
-theorem fIwasawa_wd (hα : ∀ i, α i ≠ 0) (hq : (q : ℂ) ≠ 0) (b b' k k' : GU σ n)
-    (hb : ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id)
-    (hb' : ((b' : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id)
-    (hk : k ∈ KU σ n) (hk' : k' ∈ KU σ n) (h : b * k = b' * k') :
-    chiDeltaU q α b = chiDeltaU q α b' := by
+theorem fIwasawa_wd
+    (hα : ∀ i, α i ≠ 0) (hq : (q : ℂ) ≠ 0)
+    (b b' k k' : GU σ n) (hb : ((b : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id)
+    (hb' : ((b' : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id) (hk : k ∈ KU σ n)
+    (hk' : k' ∈ KU σ n) (h : b * k = b' * k')
+    : chiDeltaU q α b = chiDeltaU q α b' := by
   have hc_eq : b = b' * (k' * k⁻¹) := by
-    calc b = b * k * k⁻¹ := by group
+    calc
+      b = b * k * k⁻¹ := by group
       _ = b' * k' * k⁻¹ := by rw [h]
       _ = b' * (k' * k⁻¹) := by group
   have hkk : k' * k⁻¹ ∈ KU σ n := (KU σ n).mul_mem hk' ((KU σ n).inv_mem hk)
   have hc_eq2 : k' * k⁻¹ = b'⁻¹ * b := by rw [hc_eq]; group
-  have htri : (((k' * k⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id := by
+  have htri
+      : (((k' * k⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id := by
     rw [hc_eq2]
     exact Matrix.BlockTriangular.mul (GL_inv_blockTriangular (b' : GL (Fin n) L) hb') hb
   rw [hc_eq, fIwasawa_chi_mul σ q α hα hq b' (k' * k⁻¹) hb' htri,
@@ -157,8 +169,9 @@ theorem exists_spherical_function_unitary : Formalism.UG.SphericalExistsU := by
   obtain ⟨hσ, hσv, -, -, -, hq2, -⟩ := hU
   have hq : (q : ℂ) ≠ 0 := by exact_mod_cast (show q ≠ 0 by omega)
   choose B K hB hK hBK using fIwasawa_iwasawa (n := n) σ hσ hσv
-  have htri : ∀ g : GU σ n, IsBorelU g →
-      (((g : GL (Fin n) L)) : Matrix (Fin n) (Fin n) L).BlockTriangular id := by
+  have htri
+      : ∀ g : GU σ n,
+        IsBorelU g → (((g : GL (Fin n) L)) : Matrix (Fin n) (Fin n) L).BlockTriangular id := by
     intro g hg i j hij
     exact hg i j hij
   have h1tri : (((1 : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id :=
@@ -168,12 +181,13 @@ theorem exists_spherical_function_unitary : Formalism.UG.SphericalExistsU := by
     have e : b * g * k = (b * B g) * (K g * k) := by
       conv_lhs => rw [hBK g]
       simp only [mul_assoc]
-    have hbB : (((b * B g : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id :=
+    have hbB
+        : (((b * B g : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).BlockTriangular id :=
       Matrix.BlockTriangular.mul (htri b hb) (htri _ (hB g))
     have hKk : K g * k ∈ KU σ n := (KU σ n).mul_mem (hK g) hk
     show chiDeltaU q α (B (b * g * k)) = chiDeltaU q α b * chiDeltaU q α (B g)
-    rw [fIwasawa_wd σ q α hα hq (B (b * g * k)) (b * B g) (K (b * g * k)) (K g * k)
-      (htri _ (hB _)) hbB (hK _) hKk (by rw [← hBK, e])]
+    rw [fIwasawa_wd σ q α hα hq (B (b * g * k)) (b * B g) (K (b * g * k)) (K g * k) (htri _ (hB _))
+      hbB (hK _) hKk (by rw [← hBK, e])]
     exact fIwasawa_chi_mul σ q α hα hq b (B g) (htri b hb) (htri _ (hB g))
   · show chiDeltaU q α (B 1) = 1
     rw [fIwasawa_wd σ q α hα hq (B 1) 1 (K 1) 1 (htri _ (hB 1)) h1tri (hK 1) (KU σ n).one_mem

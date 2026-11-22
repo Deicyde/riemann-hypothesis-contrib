@@ -7,18 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.I
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity GlobalTheory.HermitianPreEigenvalues Polynomial Module
+open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity
+  GlobalTheory.HermitianPreEigenvalues Polynomial Module
 
 namespace GlobalTheory
 
-theorem finrank_addValuationInteger_submodule_eq_finrank_span : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ))
-    (N : ℕ) (X : Submodule (Int0 v) (Fin N → Int0 v)), Module.Finite (Int0 v) X →
-    finrank (Int0 v) X = finrank C (Submodule.span C ((fun (x : Fin N → Int0 v) (i : Fin N) =>
-      (x i : C)) '' (X : Set (Fin N → Int0 v)))) := by
+theorem finrank_addValuationInteger_submodule_eq_finrank_span
+    : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (N : ℕ)
+        (X : Submodule (Int0 v) (Fin N → Int0 v)),
+      Module.Finite (Int0 v) X
+        → finrank (Int0 v) X
+          = finrank C
+            (Submodule.span C
+              ((fun (x : Fin N → Int0 v) (i : Fin N) => (x i : C))
+                '' (X : Set (Fin N → Int0 v)))) := by
   intro C _ v N X hX
   let ι : (Fin N → Int0 v) →ₗ[Int0 v] (Fin N → C) := (Algebra.linearMap (Int0 v) C).compLeft (Fin N)
-  have hι : Function.Injective ι := by
-    intro x y h; funext i; exact Subtype.ext (congrFun h i)
+  have hι : Function.Injective ι := by intro x y h; funext i; exact Subtype.ext (congrFun h i)
   let L : X →ₗ[Int0 v] (Fin N → C) := ι ∘ₗ X.subtype
   have hL : Function.Injective L := hι.comp Subtype.val_injective
   have hInt : v.toValuation.Integers (Int0 v) := by
@@ -37,8 +42,10 @@ theorem finrank_addValuationInteger_submodule_eq_finrank_span : ∀ (C : Type) [
   have hli : LinearIndependent (Int0 v) (L ∘ b) :=
     b.linearIndependent.map' L (LinearMap.ker_eq_bot.mpr hL)
   have hliC : LinearIndependent C (L ∘ b) := (LinearIndependent.iff_fractionRing (Int0 v) C).mp hli
-  have hspan : Submodule.span C ((fun (x : Fin N → Int0 v) (i : Fin N) => (x i : C)) ''
-      (X : Set (Fin N → Int0 v))) = Submodule.span C (Set.range (L ∘ b)) := by
+  have hspan
+      : Submodule.span C
+          ((fun (x : Fin N → Int0 v) (i : Fin N) => (x i : C)) '' (X : Set (Fin N → Int0 v)))
+        = Submodule.span C (Set.range (L ∘ b)) := by
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨x, hx, rfl⟩

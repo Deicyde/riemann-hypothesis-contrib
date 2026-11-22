@@ -10,33 +10,51 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.G3
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
-private theorem mem_iff_lemma {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] (b : ι → V) (v : V) :
-    v ∈ spanS S b ↔ ∃ c : ι → K, (∀ i, c i ∈ S) ∧ v = ∑ i, c i • b i := Iff.rfl
+private theorem mem_iff_lemma
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {ι : Type} [Fintype ι]
+    (b : ι → V) (v : V)
+    : v ∈ spanS S b ↔ ∃ c : ι → K, (∀ i, c i ∈ S) ∧ v = ∑ i, c i • b i :=
+  Iff.rfl
 
-private theorem smul_mem_lemma_2 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] {g : ι → V} {a : K} (ha : a ∈ S)
-    {v : V} (hv : v ∈ spanS S g) : a • v ∈ spanS S g := by
+private theorem smul_mem_lemma_2
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {ι : Type} [Fintype ι]
+    {g : ι → V} {a : K} (ha : a ∈ S)
+    {v : V} (hv : v ∈ spanS S g)
+    : a • v ∈ spanS S g := by
   rw [mem_iff_lemma] at hv ⊢
   obtain ⟨d, hd, rfl⟩ := hv
   exact ⟨fun i => a * d i, fun i => S.mul_mem ha (hd i), by simp [Finset.smul_sum, mul_smul]⟩
 
-private theorem spanS_le_lemma_3 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι] {f : κ → V}
-    {g : ι → V} (hfg : ∀ k, f k ∈ spanS S g) {v : V} (hv : v ∈ spanS S f) : v ∈ spanS S g := by
+private theorem spanS_le_lemma_3
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι]
+    {f : κ → V} {g : ι → V} (hfg : ∀ k, f k ∈ spanS S g)
+    {v : V} (hv : v ∈ spanS S f)
+    : v ∈ spanS S g := by
   rw [mem_iff_lemma] at hv
   obtain ⟨c, hc, rfl⟩ := hv
   exact AddSubgroup.sum_mem _ fun k _ => smul_mem_lemma_2 (hc k) (hfg k)
 
-private theorem mem_span_lemma_4 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] {g : ι → V} {v : V}
-    (hv : v ∈ spanS S g) : v ∈ Submodule.span K (Set.range g) := by
+private theorem mem_span_lemma_4
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {ι : Type} [Fintype ι]
+    {g : ι → V} {v : V} (hv : v ∈ spanS S g)
+    : v ∈ Submodule.span K (Set.range g) := by
   rw [mem_iff_lemma] at hv
   obtain ⟨c, -, rfl⟩ := hv
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-private theorem spans_eq_lemma_5 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι] {f : κ → V}
-    {g : ι → V} (h1 : ∀ k, f k ∈ spanS S g) (h2 : ∀ i, g i ∈ spanS S f) :
-    Submodule.span K (Set.range f) = Submodule.span K (Set.range g) ∧
-      ∀ v, v ∈ spanS S f ↔ v ∈ spanS S g := by
+private theorem spans_eq_lemma_5
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {κ ι : Type} [Fintype κ] [Fintype ι]
+    {f : κ → V} {g : ι → V} (h1 : ∀ k, f k ∈ spanS S g) (h2 : ∀ i, g i ∈ spanS S f)
+    : Submodule.span K (Set.range f) = Submodule.span K (Set.range g)
+      ∧ ∀ v, v ∈ spanS S f ↔ v ∈ spanS S g := by
   refine ⟨le_antisymm ?_ ?_, fun v => ⟨spanS_le_lemma_3 h1, spanS_le_lemma_3 h2⟩⟩
   · rw [Submodule.span_le]
     rintro _ ⟨k, rfl⟩
@@ -45,9 +63,11 @@ private theorem spans_eq_lemma_5 {K V : Type} [Field K] [StarRing K] [AddCommGro
     rintro _ ⟨i, rfl⟩
     exact mem_span_lemma_4 (h2 i)
 
-private theorem linInd_lemma_6 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} {f : ι → V} (ho : ∀ i j, i ≠ j → h (f i) (f j) = 0)
-    (hn : ∀ i, h (f i) (f i) ≠ 0) : LinearIndependent K f := by
+private theorem linInd_lemma_6
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} {f : ι → V}
+    (ho : ∀ i j, i ≠ j → h (f i) (f j) = 0) (hn : ∀ i, h (f i) (f i) ≠ 0)
+    : LinearIndependent K f := by
   rw [linearIndependent_iff']
   intro s g hg i hi
   have h1 := congrArg (h (f i)) hg
@@ -60,10 +80,12 @@ private theorem linInd_lemma_6 {K V : Type} [Field K] [StarRing K] [AddCommGroup
   · intro h'
     exact absurd hi h'
 
-private theorem form_sum_lemma_7 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι] {b : ι → V}
-    (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0) (a c : ι → K) :
-    h (∑ i, a i • b i) (∑ j, c j • b j) = ∑ i, star (a i) * c i * h (b i) (b i) := by
+private theorem form_sum_lemma_7
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι]
+    {b : ι → V} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0)
+    (a c : ι → K)
+    : h (∑ i, a i • b i) (∑ j, c j • b j) = ∑ i, star (a i) * c i * h (b i) (b i) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -76,8 +98,11 @@ private theorem form_sum_lemma_7 {K V : Type} [Field K] [StarRing K] [AddCommGro
   · intro h'
     exact absurd (Finset.mem_univ i) h'
 
-private theorem mem_self_lemma_9 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] {S : Subring K} {ι : Type} [Fintype ι] [DecidableEq ι] (b : ι → V) (i : ι) :
-    b i ∈ spanS S b := by
+private theorem mem_self_lemma_9
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : ι → V) (i : ι)
+    : b i ∈ spanS S b := by
   refine (mem_iff_lemma b (b i)).2 ⟨fun j => if j = i then 1 else 0, fun j => ?_, ?_⟩
   · dsimp only
     split_ifs
@@ -85,13 +110,13 @@ private theorem mem_self_lemma_9 {K V : Type} [Field K] [StarRing K] [AddCommGro
     · exact S.zero_mem
   · simp [ite_smul]
 
-private theorem isSD_lemma_8 {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
-    {S : Subring K} (hS : IsHermSemilocal S) {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι]
-    [DecidableEq ι] {b : ι → V} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0)
-    (hu : ∀ i, IsUnitIn S (h (b i) (b i))) :
-    IsSD S h (Submodule.span K (Set.range b)) (spanS S b) := by
-  refine ⟨⟨fun _ hm => mem_span_lemma_4 hm, fun _ ha _ hm => smul_mem_lemma_2 ha hm,
-    ?_, ?_⟩, ?_⟩
+private theorem isSD_lemma_8
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
+    {S : Subring K} (hS : IsHermSemilocal S)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {ι : Type} [Fintype ι] [DecidableEq ι]
+    {b : ι → V} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0) (hu : ∀ i, IsUnitIn S (h (b i) (b i)))
+    : IsSD S h (Submodule.span K (Set.range b)) (spanS S b) := by
+  refine ⟨⟨fun _ hm => mem_span_lemma_4 hm, fun _ ha _ hm => smul_mem_lemma_2 ha hm, ?_, ?_⟩, ?_⟩
   · intro x hx y hy
     rw [mem_iff_lemma] at hx hy
     obtain ⟨a, ha, rfl⟩ := hx
@@ -124,17 +149,24 @@ private theorem isSD_lemma_8 {K V : Type} [Field K] [StarRing K] [AddCommGroup V
     · intro h'
       exact absurd (Finset.mem_univ i) h'
 
-theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    {S : Subring K} {π : K} {h : V →ₗ⋆[K] V →ₗ[K] K} (hS : IsHermSemilocal S) (hπ : IsUnif S π)
-    (hs : h.IsSymm) (hd : ∀ x, h x x = 0 → x = 0) {ι : Type} [Fintype ι] [DecidableEq ι] {b : ι → V}
-    {e : ι → ℕ} {i₀ : ι} (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0)
-    (hu : ∀ i, IsUnitIn S (h (b i) (b i) * (π ^ e i)⁻¹)) (x : ι → K) (hx : ∀ i, x i ∈ S)
-    (hX : IsUnitIn S (h (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i)
-      (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i) * (π ^ e i₀)⁻¹)) :
-    ∃ c : ι → V, (∀ i j, i ≠ j → h (c i) (c j) = 0) ∧ (∀ i, IsUnitIn S (h (c i) (c i) * (π ^ e i)⁻¹)) ∧
-      c i₀ = ∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i ∧ (∀ k, e k ≠ e i₀ → c k = b k) ∧
-      Submodule.span K (Set.range c) = Submodule.span K (Set.range b) ∧
-      ∀ v, v ∈ spanS S c ↔ v ∈ spanS S b := by
+theorem uni_part
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    {S : Subring K} {π : K} {h : V →ₗ⋆[K] V →ₗ[K] K}
+    (hS : IsHermSemilocal S) (hπ : IsUnif S π) (hs : h.IsSymm) (hd : ∀ x, h x x = 0 → x = 0)
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {b : ι → V} {e : ι → ℕ} {i₀ : ι}
+    (ho : ∀ i j, i ≠ j → h (b i) (b j) = 0) (hu : ∀ i, IsUnitIn S (h (b i) (b i) * (π ^ e i)⁻¹))
+    (x : ι → K) (hx : ∀ i, x i ∈ S)
+    (hX : IsUnitIn S
+      (h (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i)
+          (∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i)
+        * (π ^ e i₀)⁻¹))
+    : ∃ c : ι → V,
+      (∀ i j, i ≠ j → h (c i) (c j) = 0) ∧ (∀ i, IsUnitIn S (h (c i) (c i) * (π ^ e i)⁻¹))
+        ∧ c i₀ = ∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i
+        ∧ (∀ k, e k ≠ e i₀ → c k = b k)
+        ∧ Submodule.span K (Set.range c) = Submodule.span K (Set.range b)
+        ∧ ∀ v, v ∈ spanS S c ↔ v ∈ spanS S b := by
   set Xs := ∑ i ∈ Finset.univ.filter (fun i => e i = e i₀), x i • b i with hXs
   have hπ0 : π ≠ 0 := hπ.ne
   have hp0 : π ^ e i₀ ≠ 0 := pow_ne_zero _ hπ0
@@ -144,8 +176,9 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
     rw [← starRingEnd_apply]
     exact hs.eq v w
   have hpstar : star ((π ^ e i₀)⁻¹) = (π ^ e i₀)⁻¹ := by rw [star_inv₀, star_pow, hπ.fix]
-  have hs' : h'.IsSymm := LinearMap.IsSymm.mk fun v w => by
-    rw [hh', hh', starRingEnd_apply, star_mul, hstar, hpstar, mul_comm]
+  have hs' : h'.IsSymm :=
+    LinearMap.IsSymm.mk fun v w => by
+      rw [hh', hh', starRingEnd_apply, star_mul, hstar, hpstar, mul_comm]
   have hz : ∀ v w, h' v w = 0 → h v w = 0 := fun v w hvw => by
     rw [hh'] at hvw
     exact (mul_eq_zero.1 hvw).resolve_left (inv_ne_zero hp0)
@@ -169,9 +202,9 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
   have hXX : h' Xs Xs ≠ 0 := hXu'.1
   have hX0 : Xs ≠ 0 := fun h0 => hXX (by rw [h0, map_zero])
   have hXW : Xs ∈ Submodule.span K (Set.range bP) := mem_span_lemma_4 hXL
-  obtain ⟨k, f, hof, huf, hspf, hspanf⟩ := sd_basis hS hπ hs' hd' _
-    (cutW h' (Submodule.span K (Set.range bP)) Xs) (cutM h' (spanS S bP) Xs) le_rfl
-    (hSD.cut hXL hXu')
+  obtain ⟨k, f, hof, huf, hspf, hspanf⟩ :=
+    sd_basis hS hπ hs' hd' _ (cutW h' (Submodule.span K (Set.range bP)) Xs)
+      (cutM h' (spanS S bP) Xs) le_rfl (hSD.cut hXL hXu')
   have hinf : K ∙ Xs ⊓ cutW h' (Submodule.span K (Set.range bP)) Xs = ⊥ := by
     rw [eq_bot_iff]
     intro v hv
@@ -182,24 +215,28 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
     rw [map_smul, smul_eq_mul] at ht
     rw [(mul_eq_zero.1 ht).resolve_right hXX, zero_smul]
     exact Submodule.zero_mem _
-  have e1 := Submodule.finrank_sup_add_finrank_inf_eq (K ∙ Xs)
-    (cutW h' (Submodule.span K (Set.range bP)) Xs)
+  have e1 :=
+    Submodule.finrank_sup_add_finrank_inf_eq (K ∙ Xs) (cutW h' (Submodule.span K (Set.range bP)) Xs)
   rw [sup_cutW hXW hXX, hinf, finrank_bot, finrank_span_singleton hX0, ← hspanf,
-    finrank_span_eq_card (linInd_lemma_6 hof (fun j => (huf j).1)),
-    finrank_span_eq_card (linInd_lemma_6 hoP (fun p => (huP p).1)), Fintype.card_fin] at e1
+      finrank_span_eq_card (linInd_lemma_6 hof (fun j => (huf j).1)),
+      finrank_span_eq_card (linInd_lemma_6 hoP (fun p => (huP p).1)), Fintype.card_fin]
+    at e1
   set p₀ : {i // e i = e i₀} := ⟨i₀, rfl⟩ with hp₀
   have hQ : Fintype.card {p : {i // e i = e i₀} // p ≠ p₀} = k := by
     rw [Fintype.card_subtype, Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _),
       Finset.card_univ]
     omega
   let σ := Fintype.equivFinOfCardEq hQ
-  obtain ⟨gP, hg0, hgq⟩ : ∃ gP : {i // e i = e i₀} → V, gP p₀ = Xs ∧
-      ∀ q : {p : {i // e i = e i₀} // p ≠ p₀}, gP q.1 = f (σ q) :=
+  obtain ⟨gP, hg0, hgq⟩
+      : ∃ gP : {i // e i = e i₀} → V,
+        gP p₀ = Xs ∧ ∀ q : {p : {i // e i = e i₀} // p ≠ p₀}, gP q.1 = f (σ q) :=
     ⟨fun p => if hp : p = p₀ then Xs else f (σ ⟨p, hp⟩), dif_pos rfl, fun q => dif_neg q.2⟩
-  obtain ⟨c, hcP, hcn⟩ : ∃ c : ι → V, (∀ p : {i // e i = e i₀}, c p = gP p) ∧
-      ∀ i, e i ≠ e i₀ → c i = b i :=
-    ⟨fun i => if hi : e i = e i₀ then gP ⟨i, hi⟩ else b i, fun p => dif_pos p.2,
-      fun i hi => dif_neg hi⟩
+  obtain ⟨c, hcP, hcn⟩
+      : ∃ c : ι → V, (∀ p : {i // e i = e i₀}, c p = gP p) ∧ ∀ i, e i ≠ e i₀ → c i = b i := ⟨
+    fun i => if hi : e i = e i₀ then gP ⟨i, hi⟩ else b i,
+    fun p => dif_pos p.2,
+    fun i hi => dif_neg hi
+  ⟩
   have hc0 : c i₀ = Xs := (hcP p₀).trans hg0
   have hXf : ∀ j, h Xs (f j) = 0 := fun j => by
     have hm : f j ∈ cutW h' (Submodule.span K (Set.range bP)) Xs := by
@@ -227,8 +264,8 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
       exact hXL
     · rw [show gP p = f (σ ⟨p, hp⟩) from hgq ⟨p, hp⟩]
       exact hfL _
-  have hperp : ∀ w ∈ Submodule.span K (Set.range bP), ∀ j, e j ≠ e i₀ →
-      h w (b j) = 0 ∧ h (b j) w = 0 := by
+  have hperp
+      : ∀ w ∈ Submodule.span K (Set.range bP), ∀ j, e j ≠ e i₀ → h w (b j) = 0 ∧ h (b j) w = 0 := by
     intro w hw j hj
     obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hw
     have hne : ∀ p : {i // e i = e i₀}, (p : ι) ≠ j := fun p hq => hj (hq ▸ p.2)
@@ -238,9 +275,8 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
         exact Finset.sum_eq_zero fun p _ => by
           rw [map_smulₛₗ, LinearMap.smul_apply, hbP, ho _ _ (hne p), smul_zero]
     set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum]
-        exact Finset.sum_eq_zero fun p _ => by
-          rw [map_smul, hbP, ho _ _ (hne p).symm, smul_zero]
+    · rw [map_sum]
+      exact Finset.sum_eq_zero fun p _ => by rw [map_smul, hbP, ho _ _ (hne p).symm, smul_zero]
   have hoc : ∀ i j, i ≠ j → h (c i) (c j) = 0 := by
     intro i j hij
     by_cases hi : e i = e i₀
@@ -285,8 +321,10 @@ theorem uni_part {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K 
         rwa [hbP] at hm
       have hr := (hspf _).2 (proj_mem hSD.toIsLatIn hXL hXu' hbi)
       have ha : h' Xs (b i) * (h' Xs Xs)⁻¹ ∈ S := S.mul_mem (hSD.int _ hXL _ hbi) hXu'.2.2
-      have key : b i = (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs
-          + (b i - (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs) := by abel
+      have key
+          : b i
+            = (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs + (b i - (h' Xs (b i) * (h' Xs Xs)⁻¹) • Xs) := by
+        abel
       rw [key]
       refine add_mem (smul_mem_lemma_2 ha ?_) (spanS_le_lemma_3 hfc hr)
       rw [← hc0]

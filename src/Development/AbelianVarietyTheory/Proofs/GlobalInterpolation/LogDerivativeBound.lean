@@ -77,7 +77,16 @@ lemma term_nonneg {q : ℕ} (χ : DirichletCharacter ℂ q) (σ t : ℝ) (n : �
     nlinarith [mul_nonneg hc hcomb]
   · simp [MulChar.map_nonunit _ hu]
 
-theorem three_four_one : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (σ t : ℝ), 1 < σ → 0 ≤ -(3 * (deriv (LFunction (1 : DirichletCharacter ℂ q)) σ / LFunction (1 : DirichletCharacter ℂ q) σ).re + 4 * (deriv (LFunction χ) (σ + t * I) / LFunction χ (σ + t * I)).re + (deriv (LFunction (χ ^ 2)) (σ + 2 * t * I) / LFunction (χ ^ 2) (σ + 2 * t * I)).re) := by
+theorem three_four_one
+    : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (σ t : ℝ),
+      1 < σ
+        → 0
+          ≤ -(3
+              * (deriv (LFunction (1 : DirichletCharacter ℂ q)) σ
+                / LFunction (1 : DirichletCharacter ℂ q) σ).re
+            + 4 * (deriv (LFunction χ) (σ + t * I) / LFunction χ (σ + t * I)).re
+            + (deriv (LFunction (χ ^ 2)) (σ + 2 * t * I)
+              / LFunction (χ ^ 2) (σ + 2 * t * I)).re) := by
   intro q _ χ σ t hσ
   have h1 := neg_logDeriv_eq (1 : DirichletCharacter ℂ q) (s := (σ : ℂ)) (by simpa using hσ)
   have h2 := neg_logDeriv_eq χ (s := (σ : ℂ) + t * I) (by simpa using hσ)

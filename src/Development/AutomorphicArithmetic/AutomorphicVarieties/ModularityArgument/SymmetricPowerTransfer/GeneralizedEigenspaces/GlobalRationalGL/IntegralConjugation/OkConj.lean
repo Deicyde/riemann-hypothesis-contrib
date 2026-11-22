@@ -8,31 +8,38 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
-open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
+open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+  UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 open UpperTheory.V.W (Plc Lp)
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace UpperTheory.V.Z.Sym.Dict.Br
 
-private theorem cof_val (F : Type) [Field F] [NumberField F] (a : F) (ha : a ≠ 0) :
-    ∀ᶠ v : Pl F in Filter.cofinite, v.valuation F a = 1 := by
+private theorem cof_val (F : Type) [Field F] [NumberField F] (a : F) (ha : a ≠ 0)
+    : ∀ᶠ v : Pl F in Filter.cofinite, v.valuation F a = 1 := by
   have h1 := HeightOneSpectrum.Support.finite (𝓞 F) a
   have h2 := HeightOneSpectrum.Support.finite (𝓞 F) a⁻¹
-  have h3 : ((HeightOneSpectrum.Support (𝓞 F) a) ∪ (HeightOneSpectrum.Support (𝓞 F) a⁻¹))ᶜ ∈ Filter.cofinite (α := Pl F) := by
+  have h3
+      : ((HeightOneSpectrum.Support (𝓞 F) a) ∪ (HeightOneSpectrum.Support (𝓞 F) a⁻¹))ᶜ
+        ∈ Filter.cofinite (α := Pl F) := by
     rw [Filter.mem_cofinite, compl_compl]
     exact h1.union h2
   filter_upwards [h3] with v hv
-  simp only [Set.mem_compl_iff, Set.mem_union, not_or, HeightOneSpectrum.Support, Set.mem_setOf_eq, not_lt] at hv
+  simp only [Set.mem_compl_iff, Set.mem_union, not_or, HeightOneSpectrum.Support, Set.mem_setOf_eq,
+      not_lt]
+    at hv
   apply le_antisymm hv.1
   have := hv.2
   rw [map_inv₀] at this
   have h0 : v.valuation F a ≠ 0 := by simpa using ha
   exact (inv_le_one₀ (zero_lt_iff.2 h0)).1 this
 
-private theorem unit_of_val (F : Type) [Field F] [NumberField F] (v : Pl F) (a : F) (h : v.valuation F a = 1) :
-    ∃ u : (Ov v)ˣ, algebraMap (Ov v) (Kv v) u = cv v a := by
+private theorem unit_of_val
+    (F : Type) [Field F] [NumberField F] (v : Pl F) (a : F) (h : v.valuation F a = 1)
+    : ∃ u : (Ov v)ˣ, algebraMap (Ov v) (Kv v) u = cv v a := by
   have h1 : Valued.v (cv v a) = 1 := by
     rw [← h]
     exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v a
@@ -45,17 +52,21 @@ private theorem unit_of_val (F : Type) [Field F] [NumberField F] (v : Pl F) (a :
   · exact Subtype.ext (mul_inv_cancel₀ h0)
   · exact Subtype.ext (inv_mul_cancel₀ h0)
 
-private theorem conj_cmp {A A' : Type} [CommRing A] [CommRing A'] (ρ : A →+* A') (c : A)
-    (Y G : GL (Fin 2) A) (P Q R : GL (Fin 2) A')
-    (hP : (P : Matrix (Fin 2) (Fin 2) A') = (((Y⁻¹ * G * Y : GL (Fin 2) A)) : Matrix (Fin 2) (Fin 2) A).map ρ)
+private theorem conj_cmp
+    {A A' : Type} [CommRing A] [CommRing A']
+    (ρ : A →+* A') (c : A) (Y G : GL (Fin 2) A) (P Q R : GL (Fin 2) A')
+    (hP : (P : Matrix (Fin 2) (Fin 2) A')
+      = (((Y⁻¹ * G * Y : GL (Fin 2) A)) : Matrix (Fin 2) (Fin 2) A).map ρ)
     (hQ : (Q : Matrix (Fin 2) (Fin 2) A') = (G : Matrix (Fin 2) (Fin 2) A).map ρ)
-    (hR : (R : Matrix (Fin 2) (Fin 2) A') = (c • (Y : Matrix (Fin 2) (Fin 2) A)).map ρ) :
-    P = R⁻¹ * Q * R := by
+    (hR : (R : Matrix (Fin 2) (Fin 2) A') = (c • (Y : Matrix (Fin 2) (Fin 2) A)).map ρ)
+    : P = R⁻¹ * Q * R := by
   have key : R * P = Q * R := by
     apply Units.ext
     rw [Units.val_mul, Units.val_mul, hP, hQ, hR, ← Matrix.map_mul, ← Matrix.map_mul]
     congr 1
-    have : (Y : Matrix (Fin 2) (Fin 2) A) * ((Y⁻¹ * G * Y : GL (Fin 2) A) : Matrix (Fin 2) (Fin 2) A) = (G : Matrix (Fin 2) (Fin 2) A) * (Y : Matrix (Fin 2) (Fin 2) A) := by
+    have : (Y : Matrix (Fin 2) (Fin 2) A)
+          * ((Y⁻¹ * G * Y : GL (Fin 2) A) : Matrix (Fin 2) (Fin 2) A)
+        = (G : Matrix (Fin 2) (Fin 2) A) * (Y : Matrix (Fin 2) (Fin 2) A) := by
       rw [← Units.val_mul, ← Units.val_mul]
       congr 1
       group
@@ -64,8 +75,12 @@ private theorem conj_cmp {A A' : Type} [CommRing A] [CommRing A'] (ρ : A →+* 
 
 end UpperTheory.V.Z.Sym.Dict.Br
 
-theorem UpperTheory.V.Z.Sym.Dict.Br.okConj :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (B : Bridge L), ∀ x ∈ finU (E := L) (n := 2), ∃ y : DA B.Δ, (∀ v, (∀ w, un w = v → cLoc w x = 1) → y.1 v = 1) ∧ ∀ g : SA B.Δ, ∃ g' : SA B.Δ, (g' : DA B.Δ) = y⁻¹ * g * y ∧ (B.bS g' : UA L 2) = x⁻¹ * B.bS g * x := by
+theorem UpperTheory.V.Z.Sym.Dict.Br.okConj
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (B : Bridge L),
+      ∀ x ∈ finU (E := L) (n := 2), ∃ y : DA B.Δ,
+        (∀ v, (∀ w, un w = v → cLoc w x = 1) → y.1 v = 1)
+          ∧ ∀ g : SA B.Δ, ∃ g' : SA B.Δ,
+            (g' : DA B.Δ) = y⁻¹ * g * y ∧ (B.bS g' : UA L 2) = x⁻¹ * B.bS g * x := by
   intro L _ _ _ B x hx
   obtain ⟨X, hXu, hXi, hXw⟩ := adSurj L B.toRingBr 2 x
   have hΔ : B.Δ ≠ 0 := by
@@ -75,7 +90,8 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.okConj :
     have h1 : B.e QuadraticAlgebra.omega * B.e QuadraticAlgebra.omega = 0 := by
       rw [← map_mul, hω, map_zero]
     have h2 : B.e QuadraticAlgebra.omega = 0 := mul_self_eq_zero.1 h1
-    have h3 : (QuadraticAlgebra.omega : Lsq (Lp L) B.Δ) = 0 := (map_eq_zero_iff _ B.e.injective).1 h2
+    have h3 : (QuadraticAlgebra.omega : Lsq (Lp L) B.Δ) = 0 :=
+      (map_eq_zero_iff _ B.e.injective).1 h2
     simpa using congrArg QuadraticAlgebra.im h3
   have h2F : (2 : Lp L) ≠ 0 := two_ne_zero
   have h2 : ∀ v : Pl (Lp L), (2 : Kv v) ≠ 0 := by
@@ -130,7 +146,8 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.okConj :
     apply hext
     · intro w
       rw [map_mul, map_mul, map_inv]
-      apply conj_cmp (B.ρ _ w rfl) (c (un w) : Lsq (Kv (un w)) (cv (un w) B.Δ)) ((Y (un w) : DX _) : GL (Fin 2) _) (((g : DA B.Δ).1 (un w) : DX _) : GL (Fin 2) _)
+      apply conj_cmp (B.ρ _ w rfl) (c (un w) : Lsq (Kv (un w)) (cv (un w) B.Δ))
+        ((Y (un w) : DX _) : GL (Fin 2) _) (((g : DA B.Δ).1 (un w) : DX _) : GL (Fin 2) _)
       · exact B.bS_loc _ w
       · exact B.bS_loc _ w
       · rw [← hYc]

@@ -38,8 +38,8 @@ theorem xIsWp (W : WeierstrassCurve K) : XIsWp (wpReg W) (logSer W) (xS W) (W.b�
     PowerSeries.coe_substAlgHom hl, h]
   ring
 
-theorem subst_wTr (W : WeierstrassCurve K) (xP yP : K) :
-    PowerSeries.subst (logSer W) (wTr W xP yP) = xPlus W xP yP + PowerSeries.C (W.b₂ / 12) := by
+theorem subst_wTr (W : WeierstrassCurve K) (xP yP : K)
+    : PowerSeries.subst (logSer W) (wTr W xP yP) = xPlus W xP yP + PowerSeries.C (W.b₂ / 12) := by
   have h := logPair W
   have hl : PowerSeries.HasSubst (logSer W) := PowerSeries.HasSubst.of_constantCoeff_zero' h.1
   unfold wTr
@@ -90,13 +90,23 @@ theorem curveEndoAll_of (hD : CurveSecondLogDerivative) : CurveEndoAll := by
     (odd_phi_is_phi K (wpReg W) (logSer W) s2 hlp.1 hlp.2.1).2
   have hFr : Frame R (logSer W) (expSer W) (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) :=
     ⟨hlp, hFG, hPh.1⟩
-  have hall := endoAllFromData K R hR (wpReg W) s2 (logSer W) (expSer W)
-    (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) (xS W) (W.b₂ / 12) hFr hF1 hPh hwp hA O τ hτ hstar
-    hself h2 h2O hsum Dn hDn (by
-      intro α hα
-      obtain ⟨ι, hι, neg, xP, yP, hE, hx, hy, hN, ha, ha', hc, hs⟩ := hdata α hα
-      exact ⟨ι, hι, neg, xP, fun P => wTr W (xP P) (yP P), fun P => xPlus W (xP P) (yP P),
-        curveEndoR_of hD K R W hW ι neg xP yP (τ α) (τ (star α)) hE hx hy hN ha ha' hc, hs⟩)
+  have hall :=
+    endoAllFromData K R hR (wpReg W) s2 (logSer W) (expSer W)
+      (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) (xS W) (W.b₂ / 12) hFr hF1 hPh hwp hA O τ hτ
+      hstar hself h2 h2O hsum Dn hDn
+      (by
+        intro α hα
+        obtain ⟨ι, hι, neg, xP, yP, hE, hx, hy, hN, ha, ha', hc, hs⟩ := hdata α hα
+        exact ⟨
+          ι,
+          hι,
+          neg,
+          xP,
+          fun P => wTr W (xP P) (yP P),
+          fun P => xPlus W (xP P) (yP P),
+          curveEndoR_of hD K R W hW ι neg xP yP (τ α) (τ (star α)) hE hx hy hN ha ha' hc,
+          hs
+        ⟩)
   refine ⟨fun α => ⟨(hall α).1, (hall α).2.1, (hall α).2.2, ?_⟩, ?_⟩
   · exact jetAdj K R (logSer W) (expSer W) _ (τ α) (τ (star α)) hlp hPh.1 (hall α).2.2
   · have hm := (hall (-1)).2.1
@@ -107,8 +117,10 @@ theorem curve_second_log_derivative_holds : CurveSecondLogDerivative := by
   intro K _ _ W xP yP hP
   exact Formalism.L2.Th1.A.plusZCleared.{0} K W xP yP hP
 
-theorem curve_real_multiplication_series : CurveEndoR := curveEndoR_of curve_second_log_derivative_holds
+theorem curve_real_multiplication_series : CurveEndoR :=
+  curveEndoR_of curve_second_log_derivative_holds
 
-theorem curve_all_endomorphism_series : CurveEndoAll := curveEndoAll_of curve_second_log_derivative_holds
+theorem curve_all_endomorphism_series : CurveEndoAll :=
+  curveEndoAll_of curve_second_log_derivative_holds
 
 end Formalism.L2.Th1.C

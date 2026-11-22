@@ -9,14 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueH
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT ReciprocityTheory.ChartRestriction.G.Semi
 
 namespace GlobalTheory.CompanionTheory.Ar.BT
 
-theorem locallyQuasiFinite_pow_semiAbelian :
-    ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G], IsSemiAbelian G → ∀ N : ℕ, 1 ≤ N →
-      LocallyQuasiFinite ((𝟙 G) ^ N).left := by
+theorem locallyQuasiFinite_pow_semiAbelian
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G],
+      IsSemiAbelian G → ∀ N : ℕ, 1 ≤ N → LocallyQuasiFinite ((𝟙 G) ^ N).left := by
   intro S G _ hG N hN
   have := hG.comm
   have := hG.smooth
@@ -27,8 +28,8 @@ theorem locallyQuasiFinite_pow_semiAbelian :
   have : LocallyOfFiniteType ((𝟙 G) ^ N).left := locallyOfFiniteType_of_comp _ G.hom
   have : QuasiCompact (((𝟙 G) ^ N).left ≫ G.hom) := by rw [Over.w]; infer_instance
   have : QuasiCompact ((𝟙 G) ^ N).left := QuasiCompact.of_comp _ G.hom
-  refine GlobalTheory.locallyQuasiFinite_of_finite_geometric_ker S G G _ hm inferInstance inferInstance
-    fun Ω _ _ t => ?_
+  refine GlobalTheory.locallyQuasiFinite_of_finite_geometric_ker S G G _ hm inferInstance
+    inferInstance fun Ω _ _ t => ?_
   simp only [MonObj.comp_pow, Category.comp_id]
   exact GlobalTheory.HomExt.finite_torsion_points hG t hN
 

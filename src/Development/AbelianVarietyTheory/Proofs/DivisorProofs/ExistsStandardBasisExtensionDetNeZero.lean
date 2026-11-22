@@ -9,9 +9,11 @@ open Module Submodule
 namespace GlobalTheory
 
 theorem extend_linearIndependent_rows_by_standard_basis
-    {K : Type} [Field K] {J : Type} [Fintype J] {n : ℕ} (v : J → Fin n → K) :
-    LinearIndependent K v → ∃ e : J → Fin n, Function.Injective e ∧
-      (Matrix.of (Function.extend e v (fun i => Pi.single i (1 : K)))).det ≠ 0 := by
+    {K : Type} [Field K] {J : Type} [Fintype J] {n : ℕ} (v : J → Fin n → K)
+    : LinearIndependent K v
+      → ∃ e : J → Fin n,
+        Function.Injective e
+          ∧ (Matrix.of (Function.extend e v (fun i => Pi.single i (1 : K)))).det ≠ 0 := by
   intro hv
   set std : Fin n → (Fin n → K) := fun i => Pi.single i (1 : K) with hstd
   set W : Submodule K (Fin n → K) := span K (Set.range v) with hWdef
@@ -62,7 +64,8 @@ theorem extend_linearIndependent_rows_by_standard_basis
       rw [← Submodule.map_mkQ_eq_top, Submodule.map_span, ← Set.range_comp]
       have : (W.mkQ ∘ std ∘ a) = (W.mkQ ∘ std) ∘ a := rfl
       rw [← Function.comp_assoc] at *
-      rw [hspan, Set.range_comp, ← Submodule.map_span, hstdspan, Submodule.map_top, LinearMap.range_eq_top]
+      rw [hspan, Set.range_comp, ← Submodule.map_span, hstdspan, Submodule.map_top,
+        LinearMap.range_eq_top]
       exact W.mkQ_surjective
     exact eq_top_iff.mpr (htop ▸ sup_le hWle hAle)
   have hlin : LinearIndependent K f := by

@@ -96,43 +96,52 @@ variable (M L : X.Modules) (s : Γ(L, ⊤))
 
 def tensorSection : (preMod X).obj M ⟶ (preMod X).obj M ⊗ (preMod X).obj L :=
   PresheafOfModules.homMk
-    { app := fun U => AddCommGrpCat.ofHom
-        { toFun := fun m => (m : ((preMod X).obj M).obj U) ⊗ₜ
-            resM ((preMod X).obj L) (le_top : U.unop ≤ ⊤) s
+    {
+      app := fun U =>
+        AddCommGrpCat.ofHom {
+          toFun := fun m =>
+            (m : ((preMod X).obj M).obj U) ⊗ₜ resM ((preMod X).obj L) (le_top : U.unop ≤ ⊤) s
           map_zero' := zero_tmul _ _
-          map_add' := fun a b => add_tmul _ _ _ }
+          map_add' := fun a b => add_tmul _ _ _
+        }
       naturality := fun U V g => by
         ext m
-        change (((preMod X).obj M).map g m) ⊗ₜ resM ((preMod X).obj L) (le_top : V.unop ≤ ⊤) s =
-          (((preMod X).obj M).map g m) ⊗ₜ ((preMod X).obj L).map g
-            (resM ((preMod X).obj L) (le_top : U.unop ≤ ⊤) s)
+        change (((preMod X).obj M).map g m) ⊗ₜ resM ((preMod X).obj L) (le_top : V.unop ≤ ⊤) s
+          = (((preMod X).obj M).map g m)
+            ⊗ₜ ((preMod X).obj L).map g (resM ((preMod X).obj L) (le_top : U.unop ≤ ⊤) s)
         congr 1
-        change ((preMod X).obj L).map (homOfLE (le_top : V.unop ≤ ⊤)).op s =
-          ((preMod X).obj L).map g (((preMod X).obj L).map (homOfLE (le_top : U.unop ≤ ⊤)).op s)
-        exact PresheafOfModules.map_comp_apply ((preMod X).obj L) (homOfLE (le_top : U.unop ≤ ⊤)).op g s }
+        change ((preMod X).obj L).map (homOfLE (le_top : V.unop ≤ ⊤)).op s
+          = ((preMod X).obj L).map g (((preMod X).obj L).map (homOfLE (le_top : U.unop ≤ ⊤)).op s)
+        exact PresheafOfModules.map_comp_apply ((preMod X).obj L) (homOfLE (le_top : U.unop ≤ ⊤)).op
+          g s
+    }
     (fun _ _ _ => rfl)
 
-def mulSection : M ⟶ M ⊗ L :=
-  homOfPreMod (tensorSection M L s ≫ tensorToSheaf M L)
+def mulSection : M ⟶ M ⊗ L := homOfPreMod (tensorSection M L s ≫ tensorToSheaf M L)
 
 lemma preMod_map_mulSection :
     (preMod X).map (mulSection M L s) = tensorSection M L s ≫ tensorToSheaf M L :=
   preMod_map_homOfPreMod _
 
-theorem bijective_mulSection_app {W : X.Opens}
-    (hs : IsBasisOn ((preMod X).obj L) W (resM ((preMod X).obj L) le_top s)) :
-    ∀ V ≤ W, Function.Bijective ((mulSection M L s).app V) := by
+theorem bijective_mulSection_app
+    {W : X.Opens} (hs : IsBasisOn ((preMod X).obj L) W (resM ((preMod X).obj L) le_top s))
+    : ∀ V ≤ W, Function.Bijective ((mulSection M L s).app V) := by
   refine bijective_app_of_factor _ (tensorSection M L s) (tensorToSheaf M L) (W_tensorToSheaf M L)
     (preMod_map_mulSection M L s) ?_
   intro V hV
-  have e0 : resM ((preMod X).obj L) hV (resM ((preMod X).obj L) le_top s) =
-      resM ((preMod X).obj L) (le_top : V ≤ ⊤) s := resM_resM _ le_top hV s
+  have e0
+      : resM ((preMod X).obj L) hV (resM ((preMod X).obj L) le_top s)
+        = resM ((preMod X).obj L) (le_top : V ≤ ⊤) s :=
+    resM_resM _ le_top hV s
   let R := X.sheaf.obj.obj (op V)
   let e : R ≃ₗ[R] ((preMod X).obj L).obj (op V) :=
-    LinearEquiv.ofBijective (LinearMap.toSpanSingleton R _
-      (resM ((preMod X).obj L) hV (resM ((preMod X).obj L) le_top s))) (hs V hV)
-  let E := (TensorProduct.rid R (((preMod X).obj M).obj (op V))).symm ≪≫ₗ
-    e.lTensor (((preMod X).obj M).obj (op V))
+    LinearEquiv.ofBijective
+      (LinearMap.toSpanSingleton R _
+        (resM ((preMod X).obj L) hV (resM ((preMod X).obj L) le_top s)))
+      (hs V hV)
+  let E :=
+    (TensorProduct.rid R (((preMod X).obj M).obj (op V))).symm
+      ≪≫ₗ e.lTensor (((preMod X).obj M).obj (op V))
   have hE : ∀ m, E m = (tensorSection M L s).app (op V) m := by
     intro m
     change m ⊗ₜ e 1 = m ⊗ₜ resM ((preMod X).obj L) (le_top : V ≤ ⊤) s

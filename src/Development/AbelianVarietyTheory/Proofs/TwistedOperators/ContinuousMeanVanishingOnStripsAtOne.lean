@@ -11,27 +11,52 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Uni
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Asc
 
 namespace GlobalTheory.StripVanish
 
-
 set_option maxHeartbeats 1000000 in
-theorem mean_eq_zero_of_strips : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf.Vol W) (R K : Subgroup (GA D W)), IsClosed (R : Set (GA D W)) → (∀ a ∈ GinfC W, ∀ b ∈ GfC W, a * b ∈ R → a ∈ R ∧ b ∈ R) → K ≤ GfC W → IsCompact (K : Set (GA D W)) → IsOpen ((K.subgroupOf (GfC W) : Subgroup (GfC W)) : Set (GfC W)) → ∀ (μR : Measure R), μR.IsHaarMeasure → μR.IsInvInvariant → ∀ (𝓡 : Set R) (𝓑 : Set (GA D W)), IsFundamentalDomain ((GQ W ⊓ R).subgroupOf R) 𝓡 μR → IsFundamentalDomain (GQ W ⊓ R : Subgroup (GA D W)) 𝓑 vW.μ → ∀ f : GA D W → ℂ, Measurable f → (∀ γ ∈ GQ W ⊓ R, ∀ g, f (γ * g) = f g) → IntegrableOn f 𝓑 vW.μ → (∀ h, IntegrableOn (fun r : R => f (r * h)) 𝓡 μR) → (Continuous fun h => ∫ r in 𝓡, f ((r : GA D W) * h) ∂μR) → (∀ k ∈ K, ∀ g, f (g * k) = f g) → (∀ h, f h ≠ 0 → ∃ r ∈ R, ∃ a ∈ GinfC W, ∃ k ∈ K, h = r * a * k) → (∀ C : Set (GA D W), IsCompact C → C ⊆ GinfC W → MeasurableSet (strip W R C) ∧ ∫ h in 𝓑 ∩ strip W R C, f h ∂vW.μ = 0) → ∫ r in 𝓡, f r ∂μR = 0 := by
-  intro D W vW R K hRc hsplit hKf hKc hKo μR hμR hμRinv 𝓡 𝓑 h𝓡 h𝓑 f hfm hfl hfi hfiR hTc hfK hsupp hstrip
+theorem mean_eq_zero_of_strips
+    : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf.Vol W) (R K : Subgroup (GA D W)),
+      IsClosed (R : Set (GA D W)) → (∀ a ∈ GinfC W, ∀ b ∈ GfC W, a * b ∈ R → a ∈ R ∧ b ∈ R)
+        → K ≤ GfC W → IsCompact (K : Set (GA D W))
+        → IsOpen ((K.subgroupOf (GfC W) : Subgroup (GfC W)) : Set (GfC W))
+        → ∀ (μR : Measure R),
+          μR.IsHaarMeasure → μR.IsInvInvariant
+            → ∀ (𝓡 : Set R) (𝓑 : Set (GA D W)),
+              IsFundamentalDomain ((GQ W ⊓ R).subgroupOf R) 𝓡 μR
+                → IsFundamentalDomain (GQ W ⊓ R : Subgroup (GA D W)) 𝓑 vW.μ
+                → ∀ f : GA D W → ℂ,
+                  Measurable f → (∀ γ ∈ GQ W ⊓ R, ∀ g, f (γ * g) = f g) → IntegrableOn f 𝓑 vW.μ
+                    → (∀ h, IntegrableOn (fun r : R => f (r * h)) 𝓡 μR)
+                    → (Continuous fun h => ∫ r in 𝓡, f ((r : GA D W) * h) ∂μR)
+                    → (∀ k ∈ K, ∀ g, f (g * k) = f g)
+                    → (∀ h, f h ≠ 0 → ∃ r ∈ R, ∃ a ∈ GinfC W, ∃ k ∈ K, h = r * a * k)
+                    → (∀ C : Set (GA D W),
+                      IsCompact C → C ⊆ GinfC W
+                        → MeasurableSet (strip W R C) ∧ ∫ h in 𝓑 ∩ strip W R C, f h ∂vW.μ = 0)
+                    → ∫ r in 𝓡, f r ∂μR = 0 := by
+  intro D W vW R K hRc hsplit hKf hKc hKo μR hμR hμRinv 𝓡 𝓑 h𝓡 h𝓑 f hfm hfl hfi hfiR hTc hfK hsupp
+    hstrip
   haveI := vW.haar
   haveI : LocallyCompactSpace R := hRc.locallyCompactSpace
   haveI : μR.IsMulRightInvariant := by rw [← Measure.inv_eq_self μR]; infer_instance
   obtain ⟨hinfC, -, hcomm, ⟨e, he⟩, -⟩ := GlobalTheory.AdelicSplit.adelic_split D W
   obtain ⟨hΓc, hΓd, -⟩ :=
-    GlobalTheory.RationalSubgroupFund.countable_discrete_exists_fundamentalDomain D W (GQ W ⊓ R) inf_le_left
+    GlobalTheory.RationalSubgroupFund.countable_discrete_exists_fundamentalDomain D W (GQ W ⊓ R)
+      inf_le_left
   set T : GA D W → ℂ := fun h => ∫ r in 𝓡, f ((r : GA D W) * h) ∂μR with hTdef
-  have hQ := GlobalTheory.quot_fubini_mean (GA D W) vW.μ R (GQ W ⊓ R) inf_le_right hRc hΓc hΓd μR hμR 𝓡 𝓑 h𝓡 h𝓑 f hfm
-    hfl hfi hfiR
+  have hQ :=
+    GlobalTheory.quot_fubini_mean (GA D W) vW.μ R (GQ W ⊓ R) inf_le_right hRc hΓc hΓd μR hμR 𝓡 𝓑 h𝓡
+      h𝓑 f hfm hfl hfi hfiR
   have hTl : ∀ s ∈ R, ∀ x, T (s * x) = T x := fun s hs x => hQ.left hs x
   have hTr : ∀ k ∈ K, ∀ x, T (x * k) = T x := by
     intro k hk x
@@ -65,7 +90,9 @@ theorem mean_eq_zero_of_strips : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf
     have e1 : c⁻¹ * (k * b⁻¹) = (k * b⁻¹) * c⁻¹ := hcomm _ hc' _ hkb
     have hmem : (a * c⁻¹) * (k * b⁻¹) ∈ R := by
       have : (a * c⁻¹) * (k * b⁻¹) = q⁻¹ * r := by
-        calc (a * c⁻¹) * (k * b⁻¹) = a * (k * b⁻¹) * c⁻¹ := by rw [mul_assoc, e1, ← mul_assoc]
+        calc
+          (a * c⁻¹) * (k * b⁻¹)
+            = a * (k * b⁻¹) * c⁻¹ := by rw [mul_assoc, e1, ← mul_assoc]
           _ = q⁻¹ * (q * a * k) * b⁻¹ * c⁻¹ := by group
           _ = q⁻¹ * (r * c * b) * b⁻¹ * c⁻¹ := by rw [hx']
           _ = q⁻¹ * r := by group
@@ -73,16 +100,20 @@ theorem mean_eq_zero_of_strips : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf
       exact R.mul_mem (R.inv_mem hq) hr
     obtain ⟨hacR, -⟩ := hsplit _ hac _ hkb hmem
     refine ⟨c, hc, ?_⟩
-    calc T (r * c * b) = T (q * (a * k)) := by rw [hx', mul_assoc]
+    calc
+      T (r * c * b)
+        = T (q * (a * k)) := by rw [hx', mul_assoc]
       _ = T a := by rw [hTl q hq, hTr k hk]
       _ = T ((a * c⁻¹) * c) := by group
       _ = T c := hTl _ hacR c
 
   set U : Set (GA D W) := {h | (1 : ℝ) / 2 < (T h / T 1).re} with hUdef
-  have hUo : IsOpen U := isOpen_lt continuous_const (Complex.continuous_re.comp (hTc.div_const (T 1)))
+  have hUo : IsOpen U :=
+    isOpen_lt continuous_const (Complex.continuous_re.comp (hTc.div_const (T 1)))
   have h1U : (1 : GA D W) ∈ U := by
     show (1 : ℝ) / 2 < (T 1 / T 1).re
-    rw [div_self hT1]; norm_num
+    rw [div_self hT1]
+    norm_num
   haveI : LocallyCompactSpace (GinfC W) := hinfC.locallyCompactSpace
   have hU'o : IsOpen ((Subtype.val : GinfC W → GA D W) ⁻¹' U) := hUo.preimage continuous_subtype_val
   obtain ⟨C', hC'n, hC'U, hC'c⟩ :=
@@ -97,7 +128,8 @@ theorem mean_eq_zero_of_strips : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf
     constructor
     · rintro ⟨r, hr, c, hc, b, hb, hx⟩
       refine ⟨s⁻¹ * r, R.mul_mem (R.inv_mem hs) hr, c, hc, b, hb, ?_⟩
-      rw [show x = s⁻¹ * (s * x) by group, hx]; group
+      rw [show x = s⁻¹ * (s * x) by group, hx]
+      group
     · rintro ⟨r, hr, c, hc, b, hb, rfl⟩
       exact ⟨s * r, R.mul_mem hs hr, c, hc, b, hb, by group⟩
 
@@ -107,23 +139,27 @@ theorem mean_eq_zero_of_strips : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf
     · rw [Set.indicator_of_mem hg, Set.indicator_of_mem ((hSinv γ hγ.2 g).2 hg), hfl γ hγ g]
     · rw [Set.indicator_of_notMem hg, Set.indicator_of_notMem (mt (hSinv γ hγ.2 g).1 hg)]
   have hfSi : ∀ h, IntegrableOn (fun r : R => S.indicator f ((r : GA D W) * h)) 𝓡 μR := by
-      intro h
-      by_cases hh : h ∈ S
-      · have : (fun r : R => S.indicator f ((r : GA D W) * h)) = fun r : R => f ((r : GA D W) * h) :=
-          funext fun r => Set.indicator_of_mem ((hSinv _ r.2 h).2 hh) _
-        rw [this]; exact hfiR h
-      · have : (fun r : R => S.indicator f ((r : GA D W) * h)) = fun _ => 0 :=
-          funext fun r => by simp [Set.indicator_apply, hSinv _ r.2 h, hh]
-        rw [this]; exact integrableOn_zero
-  have hQS := GlobalTheory.quot_fubini_mean (GA D W) vW.μ R (GQ W ⊓ R) inf_le_right hRc hΓc hΓd μR hμR 𝓡 𝓑 h𝓡 h𝓑
-    (S.indicator f) (hfm.indicator hSm) hfSl (hfi.indicator hSm) hfSi
+    intro h
+    by_cases hh : h ∈ S
+    · have : (fun r : R => S.indicator f ((r : GA D W) * h)) = fun r : R => f ((r : GA D W) * h) :=
+        funext fun r => Set.indicator_of_mem ((hSinv _ r.2 h).2 hh) _
+      rw [this]
+      exact hfiR h
+    · have : (fun r : R => S.indicator f ((r : GA D W) * h)) = fun _ => 0 :=
+        funext fun r => by simp [Set.indicator_apply, hSinv _ r.2 h, hh]
+      rw [this]
+      exact integrableOn_zero
+  have hQS :=
+    GlobalTheory.quot_fubini_mean (GA D W) vW.μ R (GQ W ⊓ R) inf_le_right hRc hΓc hΓd μR hμR 𝓡 𝓑 h𝓡
+      h𝓑 (S.indicator f) (hfm.indicator hSm) hfSl (hfi.indicator hSm) hfSi
   have hQS' : IsQuotIntL1 μR vW.μ (S.indicator T) 0 := by
     have e1 : (fun h => ∫ r in 𝓡, S.indicator f ((r : GA D W) * h) ∂μR) = S.indicator T := by
       funext h
       by_cases hh : h ∈ S
       · rw [Set.indicator_of_mem hh]
         simp only [hTdef]
-        congr 1; funext r
+        congr 1
+        funext r
         exact Set.indicator_of_mem ((hSinv _ r.2 h).2 hh) _
       · simp [Set.indicator_apply, hSinv _ (Subtype.property _) h, hh]
     have e2 : ∫ g in 𝓑, S.indicator f g ∂vW.μ = 0 := by rw [setIntegral_indicator hSm, hS0]
@@ -132,7 +168,10 @@ theorem mean_eq_zero_of_strips : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf
   obtain ⟨β, -, hβ⟩ := GlobalTheory.Tw.exists_isCosetCutoff (μT := μR) hRc
   obtain ⟨hβi, hβ0⟩ := hQS'.cutoff hβ
 
-  have hre : ∀ x, 0 ≤ (S.indicator T x / T 1).re ∧ (x ∈ S → T x ≠ 0 → (1 : ℝ) / 2 < (S.indicator T x / T 1).re) := by
+  have hre
+      : ∀ x,
+        0 ≤ (S.indicator T x / T 1).re
+          ∧ (x ∈ S → T x ≠ 0 → (1 : ℝ) / 2 < (S.indicator T x / T 1).re) := by
     intro x
     by_cases hxS : x ∈ S
     · rw [Set.indicator_of_mem hxS]
@@ -187,7 +226,10 @@ theorem mean_eq_zero_of_strips : ∀ (D : D7) (W : HSp D) (vW : GlobalTheory.Unf
       · have : ∀ t : R, g ((t : GA D W) * x) = 0 := fun t => by
           simp [hgdef, Set.indicator_of_notMem (mt (hAinv _ t.2 x).1 hxA)]
         simp [this, Set.indicator_of_notMem hxA]
-    rw [e1, lintegral_lintegral_swap (f := fun x (t : R) => g ((t : GA D W) * x)) (hgm.comp hmul).aemeasurable]
+    rw [e1,
+      lintegral_lintegral_swap
+        (f := fun x (t : R) => g ((t : GA D W) * x))
+        (hgm.comp hmul).aemeasurable]
     have e2 : ∀ t : R, ∫⁻ x, g ((t : GA D W) * x) ∂vW.μ = 0 := fun t => by
       rw [lintegral_mul_left_eq_self, hg0]
     simp [e2]

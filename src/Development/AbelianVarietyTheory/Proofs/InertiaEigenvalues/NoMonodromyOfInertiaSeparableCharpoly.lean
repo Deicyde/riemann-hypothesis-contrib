@@ -5,13 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsAttac
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Polynomial Formalism.L2.Host GlobalTheory.Pst GlobalTheory.GalOfCusp GlobalTheory.TripleLocal GlobalTheory.TypeLeaf
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Polynomial
+  Formalism.L2.Host GlobalTheory.Pst GlobalTheory.GalOfCusp GlobalTheory.TripleLocal
+  GlobalTheory.TypeLeaf
 
 namespace GlobalTheory.WeilDeligne
 
-theorem eq_zero_of_commute_of_separable {V : Type*} [AddCommGroup V] [Module ℂ V]
-    [FiniteDimensional ℂ V] {f N : Module.End ℂ V} (hf : f.charpoly.Separable)
-    (hc : Commute f N) (hN : IsNilpotent N) : N = 0 := by
+theorem eq_zero_of_commute_of_separable
+    {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    {f N : Module.End ℂ V} (hf : f.charpoly.Separable) (hc : Commute f N) (hN : IsNilpotent N)
+    : N = 0 := by
   obtain ⟨k, hk⟩ := hN
 
   have hline : ∀ μ : ℂ, ∀ v ∈ f.maxGenEigenspace μ, N v = 0 := by
@@ -42,13 +46,18 @@ theorem eq_zero_of_commute_of_separable {V : Type*} [AddCommGroup V] [Module ℂ
   ext v
   have hv : v ∈ ⨆ μ, f.maxGenEigenspace μ := by
     rw [Module.End.iSup_maxGenEigenspace_eq_top]; trivial
-  exact Submodule.iSup_induction _ (motive := fun v => N v = 0) hv hline (map_zero N)
+  exact Submodule.iSup_induction _
+    (motive := fun v => N v = 0)
+    hv hline (map_zero N)
     (fun x y hx hy => by rw [map_add (f := _), hx, hy, add_zero])
 
 end GlobalTheory.WeilDeligne
 
-theorem GlobalTheory.WeilDeligne.WD.noMonodromy_of_inertia_separable_charpoly (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (x : GlobalTheory.WeilDeligne.WD h) :
-    ∀ σ ∈ Ine (F := E) A, (x.inePol σ).Separable → x.mono0 := by
+theorem GlobalTheory.WeilDeligne.WD.noMonodromy_of_inertia_separable_charpoly
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E))
+    (h : IsPlaceOver A w) (x : GlobalTheory.WeilDeligne.WD h)
+    : ∀ σ ∈ Ine (F := E) A, (x.inePol σ).Separable → x.mono0 := by
   intro σ hσ
   induction x using Quotient.inductionOn with
   | h a =>

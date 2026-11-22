@@ -10,17 +10,21 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
 
 noncomputable section
 
-theorem TwoBlockFnField.ratio_mem {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] (x : Ix κ → Ω)
-    (p q : Ix κ) : x p / x q ∈ blockFnField (ι := GlobalTheory κ) x :=
+theorem TwoBlockFnField.ratio_mem
+    {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] (x : Ix κ → Ω) (p q : Ix κ)
+    : x p / x q ∈ blockFnField (ι := GlobalTheory κ) x :=
   IntermediateField.subset_adjoin ℚ _ ⟨p, q, Subsingleton.elim _ _, rfl⟩
 
-theorem TwoBlockFnField.matAct_le {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] (x : Ix κ → Ω)
-    (A : Matrix (Ix κ) (Ix κ) ℚ) :
-    blockFnField (ι := GlobalTheory κ) (matAct A x) ≤ blockFnField (ι := GlobalTheory κ) x := by
+theorem TwoBlockFnField.matAct_le
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {κ : Type} [Fintype κ]
+    (x : Ix κ → Ω) (A : Matrix (Ix κ) (Ix κ) ℚ)
+    : blockFnField (ι := GlobalTheory κ) (matAct A x) ≤ blockFnField (ι := GlobalTheory κ) x := by
   rw [blockFnField, IntermediateField.adjoin_le_iff]
   rintro t ⟨p, q, -, rfl⟩
   by_cases h0 : ∀ j, x j = 0
@@ -40,9 +44,12 @@ theorem TwoBlockFnField.matAct_le {Ω : Type} [Field Ω] [CharZero Ω] {κ : Typ
     rw [this]
     exact div_mem (key p) (key q)
 
-theorem TwoBlockFnField.matAct_eq {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] (x : Ix κ → Ω)
-    (B : Matrix (Ix κ) (Ix κ) ℚ) (hB : IsInvMat B) :
-    blockFnField (ι := GlobalTheory κ) (matAct B x) = blockFnField (ι := GlobalTheory κ) x := by
+theorem TwoBlockFnField.matAct_eq
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {κ : Type} [Fintype κ]
+    (x : Ix κ → Ω)
+    (B : Matrix (Ix κ) (Ix κ) ℚ) (hB : IsInvMat B)
+    : blockFnField (ι := GlobalTheory κ) (matAct B x) = blockFnField (ι := GlobalTheory κ) x := by
   classical
   obtain ⟨B', -, h⟩ := isInvMat_mul hB
   refine le_antisymm (TwoBlockFnField.matAct_le x B) ?_
@@ -67,7 +74,8 @@ theorem TwoBlockFnField.proof : TwoBlockFnField.Statement := by
       exact TwoBlockFnField.ratio_mem (matAct B x) ⟨(), i⟩ ⟨(), j⟩
   · refine IntermediateField.adjoin_le_iff.mpr ?_
     rintro t ⟨⟨u, i⟩, ⟨u', j⟩, -, rfl⟩
-    cases u; cases u'
+    cases u
+    cases u'
     refine IntermediateField.subset_adjoin ℚ _ ⟨⟨0, i⟩, ⟨0, j⟩, rfl, ?_⟩
     simp [pair]
 

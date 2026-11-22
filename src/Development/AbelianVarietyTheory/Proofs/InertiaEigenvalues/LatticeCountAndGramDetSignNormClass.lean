@@ -32,8 +32,12 @@ variable {K : UQ}
 
 open Polynomial in
 variable {O : Type} [CommRing O] {A : Type} [CommRing A] [Algebra O A] in
-private theorem isLat_mulLat_unit {E : Type} [Field E] [Algebra E A] (u : Aˣ) (L : Submodule O A)
-    (hL : _root_.GlobalTheory.UnitLemma.IsLat O E L) : _root_.GlobalTheory.UnitLemma.IsLat O E (_root_.GlobalTheory.UnitLemma.mulLat O (u : A) L) := by
+private theorem isLat_mulLat_unit
+    {E : Type} [Field E] [Algebra E A]
+    (u : Aˣ)
+    (L : Submodule O A) (hL : _root_.GlobalTheory.UnitLemma.IsLat O E L)
+    : _root_.GlobalTheory.UnitLemma.IsLat O E
+      (_root_.GlobalTheory.UnitLemma.mulLat O (u : A) L) := by
   unfold _root_.GlobalTheory.UnitLemma.IsLat at hL ⊢
   refine ⟨?_, ?_⟩
   · unfold _root_.GlobalTheory.UnitLemma.mulLat
@@ -47,19 +51,22 @@ private theorem isLat_mulLat_unit {E : Type} [Field E] [Algebra E A] (u : Aˣ) (
 
 open Polynomial in
 variable {O : Type} [CommRing O] {A : Type} [CommRing A] [Algebra O A] in
-private theorem forall_mem_mulLat_unit_iff (u : Aˣ) (L : Submodule O A) (P : A → Prop) :
-    (∀ z ∈ _root_.GlobalTheory.UnitLemma.mulLat O (u : A) L, P z) ↔ ∀ z ∈ L, P (u * z) := by
+private theorem forall_mem_mulLat_unit_iff (u : Aˣ) (L : Submodule O A) (P : A → Prop)
+    : (∀ z ∈ _root_.GlobalTheory.UnitLemma.mulLat O (u : A) L, P z) ↔ ∀ z ∈ L, P (u * z) := by
   constructor
   · intro h z hz
-    exact h _ ((_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat u L _).mpr (by rwa [Units.inv_mul_cancel_left]))
+    exact h _
+      ((_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat u L _).mpr
+        (by rwa [Units.inv_mul_cancel_left]))
   · intro h z hz
     have := h _ ((_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat u L z).mp hz)
     rwa [Units.mul_inv_cancel_left] at this
 
 open Polynomial in
 variable {K : _root_.GlobalTheory.UnitLemma.UQ} in
-private theorem herm_mul_unit_sigma (B : _root_.GlobalTheory.UnitLemma.InvAlg K) (x : B.A) (u : B.Aˣ) (a b : B.A) :
-    B.herm (x * (u * B.σ (u : B.A))) a b = B.herm x (u * a) (u * b) := by
+private theorem herm_mul_unit_sigma
+    (B : _root_.GlobalTheory.UnitLemma.InvAlg K) (x : B.A) (u : B.Aˣ) (a b : B.A)
+    : B.herm (x * (u * B.σ (u : B.A))) a b = B.herm x (u * a) (u * b) := by
   unfold _root_.GlobalTheory.UnitLemma.InvAlg.herm
   simp only [map_mul]
   congr 1
@@ -67,15 +74,19 @@ private theorem herm_mul_unit_sigma (B : _root_.GlobalTheory.UnitLemma.InvAlg K)
 
 open Polynomial in
 variable {K : _root_.GlobalTheory.UnitLemma.UQ} in
-private theorem mem_X_mul_unit_sigma_iff (B : _root_.GlobalTheory.UnitLemma.InvAlg K) (x : B.A) (u : B.Aˣ)
-    (L : Submodule K.O B.A) :
-    L ∈ B.X (x * (u * B.σ (u : B.A))) ↔ _root_.GlobalTheory.UnitLemma.mulLat K.O (u : B.A) L ∈ B.X x := by
+private theorem mem_X_mul_unit_sigma_iff
+    (B : _root_.GlobalTheory.UnitLemma.InvAlg K) (x : B.A) (u : B.Aˣ) (L : Submodule K.O B.A)
+    : L ∈ B.X (x * (u * B.σ (u : B.A)))
+      ↔ _root_.GlobalTheory.UnitLemma.mulLat K.O (u : B.A) L ∈ B.X x := by
   unfold _root_.GlobalTheory.UnitLemma.InvAlg.X
   simp only [Set.mem_setOf_eq]
   refine and_congr ?_ (and_congr ?_ ?_)
   · refine ⟨isLat_mulLat_unit u L, fun h => ?_⟩
     have := isLat_mulLat_unit (u⁻¹) _ h
-    have hL : _root_.GlobalTheory.UnitLemma.mulLat K.O ((u⁻¹ : B.Aˣ) : B.A) (_root_.GlobalTheory.UnitLemma.mulLat K.O (u : B.A) L) = L :=
+    have hL
+        : _root_.GlobalTheory.UnitLemma.mulLat K.O ((u⁻¹ : B.Aˣ) : B.A)
+            (_root_.GlobalTheory.UnitLemma.mulLat K.O (u : B.A) L)
+          = L :=
       (_root_.GlobalTheory.UnitLemma.NormClass.mulLatEquiv u).left_inv L
     rwa [hL] at this
   · rw [forall_mem_mulLat_unit_iff]
@@ -85,26 +96,30 @@ private theorem mem_X_mul_unit_sigma_iff (B : _root_.GlobalTheory.UnitLemma.InvA
       exact h z hz
     · intro h z hz
       have := h z hz
-      rwa [_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat, mul_left_comm, Units.inv_mul_cancel_left] at this
+      rwa [_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat, mul_left_comm, Units.inv_mul_cancel_left]
+        at this
   · constructor
     · intro h w
       rw [_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat, h, forall_mem_mulLat_unit_iff]
       simp only [herm_mul_unit_sigma, Units.mul_inv_cancel_left]
     · intro h w
       have := h (u * w)
-      rw [_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat, Units.inv_mul_cancel_left, forall_mem_mulLat_unit_iff] at this
+      rw [_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat, Units.inv_mul_cancel_left,
+          forall_mem_mulLat_unit_iff]
+        at this
       rw [this]
       simp only [herm_mul_unit_sigma]
 
 open Polynomial in
 variable {O : Type} [CommRing O] {A : Type} [CommRing A] [Algebra O A] in
-private theorem mulLat_unit_comm (u t : Aˣ) (L : Submodule O A) :
-    _root_.GlobalTheory.UnitLemma.mulLat O (u : A) (_root_.GlobalTheory.UnitLemma.mulLat O (t : A) L) =
-      _root_.GlobalTheory.UnitLemma.mulLat O (t : A) (_root_.GlobalTheory.UnitLemma.mulLat O (u : A) L) := by
+private theorem mulLat_unit_comm (u t : Aˣ) (L : Submodule O A)
+    : _root_.GlobalTheory.UnitLemma.mulLat O (u : A)
+        (_root_.GlobalTheory.UnitLemma.mulLat O (t : A) L)
+      = _root_.GlobalTheory.UnitLemma.mulLat O (t : A)
+        (_root_.GlobalTheory.UnitLemma.mulLat O (u : A) L) := by
   ext y
   simp only [_root_.GlobalTheory.UnitLemma.Orbit.mem_mulLat]
   rw [mul_left_comm]
-
 
 open Polynomial in
 variable {K : _root_.GlobalTheory.UnitLemma.UQ} in

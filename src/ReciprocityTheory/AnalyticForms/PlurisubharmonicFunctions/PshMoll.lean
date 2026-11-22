@@ -306,8 +306,7 @@ theorem polyMaxLogConvex_thm : PolyMaxLogConvexStatement := by
   · have h0U : closedBall z 0 ⊆ U := (closedBall_subset_closedBall hR0.le).trans hR
     refine tendsto_order.2 ⟨fun a ha => ?_, fun a ha => ?_⟩
     · filter_upwards [self_mem_nhdsWithin, nhdsWithin_le_nhds (Iio_mem_nhds hR0)] with t ht htR
-      have hsub : closedBall z t ⊆ U :=
-        (closedBall_subset_closedBall (le_of_lt htR)).trans hR
+      have hsub : closedBall z t ⊆ U := (closedBall_subset_closedBall (le_of_lt htR)).trans hR
       have := le_polyMax hφ.1 hsub (mem_closedBall_self (le_of_lt ht))
       linarith
     · obtain ⟨δ, hδ, -, hδ'⟩ := polyMax_usc hU hφ.1 le_rfl h0U (sub_pos.2 ha)
@@ -331,8 +330,7 @@ theorem mollify_thm : MollifyStatement := by
   · filter_upwards [self_mem_nhdsWithin, nhdsWithin_le_nhds (Iio_mem_nhds hR0)] with ε hε hεR
     exact ((mollify_main ρ hU hφ hε).2.2.2 z (hsh ε hε hεR)).2
 
-theorem mollification_second_order : MollificationSecondOrder :=
-  mollificationSecondOrder_holds
+theorem mollification_second_order : MollificationSecondOrder := mollificationSecondOrder_holds
 
 end
 

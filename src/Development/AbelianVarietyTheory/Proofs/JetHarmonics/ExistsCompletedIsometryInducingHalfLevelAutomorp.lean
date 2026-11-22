@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModNOfDvdModu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory Formalism.BasicNotions
+  Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff SABMap)
 open GlobalTheory.FormTies
 open scoped TensorProduct
@@ -30,13 +32,16 @@ theorem bar_bar (a : 𝓞 E) : H.bar (H.bar a) = a := by
   apply RingOfIntegers.ext
   rw [H.bar_eq, H.bar_eq, IsCMField.complexConj_apply_apply]
 
-theorem modN_smul_of_mem (l : Level H) {c : 𝓞 E} (hc : c ∈ Ideal.span {(l.M : 𝓞 E)}) (x : D.La) :
-    D.ModN l.M (c • x) := by
+theorem modN_smul_of_mem (l : Level H) {c : 𝓞 E} (hc : c ∈ Ideal.span {(l.M : 𝓞 E)}) (x : D.La)
+    : D.ModN l.M (c • x) := by
   obtain ⟨d, rfl⟩ := Ideal.mem_span_singleton'.1 hc
   exact ⟨d • x, by rw [_root_.mul_comm, mul_smul, Nat.cast_smul_eq_nsmul]⟩
 
-theorem modN_smul_of_mem_smul (l : Level H) {c : 𝓞 E} (hc : c ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E)) {x : D.La}
-    (hx : x ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La)) : D.ModN l.M (c • x) := by
+theorem modN_smul_of_mem_smul
+    (l : Level H)
+    {c : 𝓞 E} (hc : c ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E))
+    {x : D.La} (hx : x ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La))
+    : D.ModN l.M (c • x) := by
   refine Submodule.smul_induction_on hx (fun r hr y _ => ?_) fun y z hy hz => ?_
   · rw [← mul_smul]
     refine modN_smul_of_mem D l ?_ y
@@ -44,8 +49,8 @@ theorem modN_smul_of_mem_smul (l : Level H) {c : 𝓞 E} (hc : c ∈ l.Mb.map (H
     exact Ideal.mul_mem_mul hr hc
   · rw [smul_add]; exact modN_add hy hz
 
-theorem mem_of_modN (l : Level H) {x : D.La} (hx : D.ModN l.M x) :
-    x ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La) := by
+theorem mem_of_modN (l : Level H) {x : D.La} (hx : D.ModN l.M x)
+    : x ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La) := by
   obtain ⟨b, rfl⟩ := hx
   rw [← Nat.cast_smul_eq_nsmul (𝓞 E)]
   refine Submodule.smul_mem_smul ?_ Submodule.mem_top
@@ -58,12 +63,14 @@ theorem dvd_form_right {n : ℕ} (a : D.La) {x : D.La} (hx : D.ModN n x) : (n : 
   obtain ⟨b, rfl⟩ := hx
   exact ⟨D.EF a b, by rw [map_nsmul, nsmul_eq_mul]⟩
 
-theorem exists_isometry_mod (l : Level H) (γ : LaMod D l ≃ₗ[𝓞 E] LaMod D l) :
-    ∃ F : D.La →ₗ[𝓞 E] D.La, IsSimMod D l.M F 1 ∧
-      ∀ x, F x - liftLa γ x ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La) := by
-  obtain ⟨e', he', e, he, hee⟩ := Submodule.mem_sup.1
-    (show (1 : 𝓞 E) ∈ l.Mb ⊔ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) by rw [l.coprime]; trivial)
-  have hbe' : H.bar e' ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := Ideal.mem_map_of_mem (H.bar : 𝓞 E →+* 𝓞 E) he'
+theorem exists_isometry_mod (l : Level H) (γ : LaMod D l ≃ₗ[𝓞 E] LaMod D l)
+    : ∃ F : D.La →ₗ[𝓞 E] D.La,
+      IsSimMod D l.M F 1 ∧ ∀ x, F x - liftLa γ x ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La) := by
+  obtain ⟨e', he', e, he, hee⟩ :=
+    Submodule.mem_sup.1 (show (1 : 𝓞 E) ∈ l.Mb ⊔ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) by
+      rw [l.coprime]; trivial)
+  have hbe' : H.bar e' ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) :=
+    Ideal.mem_map_of_mem (H.bar : 𝓞 E →+* 𝓞 E) he'
   have hbe : H.bar e ∈ l.Mb := by
     have h2 := Ideal.mem_map_of_mem (H.bar : 𝓞 E →+* 𝓞 E) he
     have h3 : (H.bar : 𝓞 E →+* 𝓞 E).comp (H.bar : 𝓞 E →+* 𝓞 E) = RingHom.id _ := RingHom.ext bar_bar
@@ -80,9 +87,14 @@ theorem exists_isometry_mod (l : Level H) (γ : LaMod D l ≃ₗ[𝓞 E] LaMod D
       have h1 := liftLa_spec γ.symm (f b)
       rw [hf, liftLa_spec γ b, LinearEquiv.symm_apply_apply] at h1
       exact h1)
-  obtain ⟨h, hh⟩ := exists_rep D (fun a b => D.EF a (g b)) (fun a a' b => by simp)
-    (fun a b b' => by simp) (fun c a b => by rw [g.map_smul, D.adj])
-  have key : ∀ a b, (l.M : ℤ) ∣ D.EF (e' • h a) (e • f b) - D.EF a ((H.bar e' * e) • b) := fun a b => by
+  obtain ⟨h, hh⟩ :=
+    exists_rep D
+      (fun a b => D.EF a (g b))
+      (fun a a' b => by simp)
+      (fun a b b' => by simp)
+      (fun c a b => by rw [g.map_smul, D.adj])
+  have key
+      : ∀ a b, (l.M : ℤ) ∣ D.EF (e' • h a) (e • f b) - D.EF a ((H.bar e' * e) • b) := fun a b => by
     rw [D.adj, hh, g.map_smul, g.map_smul, ← map_sub, mul_smul, ← smul_sub, ← smul_sub, smul_comm]
     exact dvd_form_right D a (modN_smul_of_mem_smul D l he (Submodule.smul_mem _ _ (hgf b)))
   refine ⟨e • f + e' • h, ⟨isCoprime_one_left, fun a b => ?_⟩, fun x => ?_⟩
@@ -94,8 +106,10 @@ theorem exists_isometry_mod (l : Level H) (γ : LaMod D l ≃ₗ[𝓞 E] LaMod D
     have k4 : (l.M : ℤ) ∣ D.EF (e' • h a) (e' • h b) := by
       rw [D.adj, ← mul_smul]; exact dvd_form_right D _ (modN_smul_of_mem D l m2 _)
     have k5 := dvd_form_right D a (modN_smul_of_mem D l (Ideal.add_mem _ m1 m2) b)
-    have k6 : D.EF a b = D.EF a ((H.bar e * e + H.bar e' * e') • b) + D.EF a ((H.bar e' * e) • b) +
-        D.EF a ((e' * H.bar e) • b) := by
+    have k6
+        : D.EF a b
+          = D.EF a ((H.bar e * e + H.bar e' * e') • b) + D.EF a ((H.bar e' * e) • b)
+            + D.EF a ((e' * H.bar e) • b) := by
       rw [← map_add (f := _), ← map_add (f := _), ← add_smul, ← add_smul]
       have : H.bar e * e + H.bar e' * e' + H.bar e' * e + e' * H.bar e = 1 := by
         linear_combination (e' + e) * hb1 + hee
@@ -107,13 +121,15 @@ theorem exists_isometry_mod (l : Level H) (γ : LaMod D l ≃ₗ[𝓞 E] LaMod D
   · have : (e • f + e' • h) x - f x = e' • (h x - f x) := by
       have h1 : e = 1 - e' := by linear_combination hee
       simp only [LinearMap.add_apply, LinearMap.smul_apply]
-      rw [h1, sub_smul, one_smul, smul_sub]; abel
+      rw [h1, sub_smul, one_smul, smul_sub]
+      abel
     rw [this]
     exact Submodule.smul_mem_smul he' Submodule.mem_top
 
-theorem exists_tower {M : ℕ} (hM : 0 < M) {F : D.La →ₗ[𝓞 E] D.La} (hF : IsSimMod D M F 1) :
-    ∃ s : ℕ → D.La →ₗ[𝓞 E] D.La, s 0 = F ∧ (∀ k, IsSimMod D (M ^ (k + 1)) (s k) 1) ∧
-      ∀ a i j, a ∣ M ^ (i + 1) → a ∣ M ^ (j + 1) → ∀ x, D.ModN a (s i x - s j x) := by
+theorem exists_tower {M : ℕ} (hM : 0 < M) {F : D.La →ₗ[𝓞 E] D.La} (hF : IsSimMod D M F 1)
+    : ∃ s : ℕ → D.La →ₗ[𝓞 E] D.La,
+      s 0 = F ∧ (∀ k, IsSimMod D (M ^ (k + 1)) (s k) 1)
+        ∧ ∀ a i j, a ∣ M ^ (i + 1) → a ∣ M ^ (j + 1) → ∀ x, D.ModN a (s i x - s j x) := by
   let T : ℕ → Type := fun k => {x : D.La →ₗ[𝓞 E] D.La // IsSimMod D (M ^ (k + 1)) x 1}
   have hstep : ∀ k (x : T k), ∃ y : T (k + 1), ∀ a, D.ModN (M ^ (k + 1)) (y.1 a - x.1 a) := by
     intro k x
@@ -128,14 +144,16 @@ theorem exists_tower {M : ℕ} (hM : 0 < M) {F : D.La →ₗ[𝓞 E] D.La} (hF :
     induction j, hkj using Nat.le_induction with
     | base => exact fun a => ⟨0, by simp⟩
     | succ j hkj ih =>
-      exact fun a => modN_trans D (modN_of_dvd_modulus D (pow_dvd_pow M (by omega)) (hnx j (s j) a)) (ih a)
+      exact fun a =>
+        modN_trans D (modN_of_dvd_modulus D (pow_dvd_pow M (by omega)) (hnx j (s j) a)) (ih a)
   refine ⟨fun k => (s k).1, rfl, fun k => (s k).2, fun a i j hi hj x => ?_⟩
   rcases le_total i j with h | h
   · have := modN_neg (modN_of_dvd_modulus D hi (hs i j h x))
     rwa [neg_sub] at this
   · exact modN_of_dvd_modulus D hj (hs j i h x)
 
-theorem exists_split (M n : ℕ) : ∃ a b k : ℕ, 0 < n → n = a * b ∧ a ∣ M ^ (k + 1) ∧ Nat.Coprime b M := by
+theorem exists_split (M n : ℕ)
+    : ∃ a b k : ℕ, 0 < n → n = a * b ∧ a ∣ M ^ (k + 1) ∧ Nat.Coprime b M := by
   induction n using induction_on_primes with
   | zero => exact ⟨0, 0, 0, fun h => absurd h (lt_irrefl 0)⟩
   | one => exact ⟨1, 1, 0, fun _ => by simp⟩
@@ -149,10 +167,12 @@ theorem exists_split (M n : ℕ) : ∃ a b k : ℕ, 0 < n → n = a * b ∧ a �
       exact Nat.mul_dvd_mul hpM h2
     · refine ⟨a, p * b, k, fun hn => ?_⟩
       obtain ⟨h1, h2, h3⟩ := h (Nat.pos_of_mul_pos_left hn)
-      exact ⟨by rw [h1]; ring, h2, Nat.Coprime.mul_left ((Nat.Prime.coprime_iff_not_dvd hp).2 hpM) h3⟩
+      exact
+        ⟨by rw [h1]; ring, h2, Nat.Coprime.mul_left ((Nat.Prime.coprime_iff_not_dvd hp).2 hpM) h3⟩
 
-theorem modN_mul_of_coprime {a b : ℕ} (hab : Nat.Coprime a b) {x : D.La} (ha : D.ModN a x) (hb : D.ModN b x) :
-    D.ModN (a * b) x := by
+theorem modN_mul_of_coprime
+    {a b : ℕ} (hab : Nat.Coprime a b) {x : D.La} (ha : D.ModN a x) (hb : D.ModN b x)
+    : D.ModN (a * b) x := by
   obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.2 hab
   obtain ⟨y, hy⟩ := ha
   obtain ⟨z, hz⟩ := hb
@@ -165,26 +185,34 @@ theorem modN_mul_of_coprime {a b : ℕ} (hab : Nat.Coprime a b) {x : D.La} (ha :
   push_cast
   congr 2 <;> ring
 
-theorem exists_glue {a b : ℕ} (hab : Nat.Coprime a b) (s : D.La →ₗ[𝓞 E] D.La) :
-    ∃ F : D.La →ₗ[𝓞 E] D.La, (∀ x, D.ModN a (F x - s x)) ∧ ∀ x, D.ModN b (F x - x) := by
+theorem exists_glue {a b : ℕ} (hab : Nat.Coprime a b) (s : D.La →ₗ[𝓞 E] D.La)
+    : ∃ F : D.La →ₗ[𝓞 E] D.La, (∀ x, D.ModN a (F x - s x)) ∧ ∀ x, D.ModN b (F x - x) := by
   obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.2 hab
-  refine ⟨(v * b) • s + (u * a) • LinearMap.id, fun x => ⟨u • (x - s x), ?_⟩, fun x => ⟨v • (s x - x), ?_⟩⟩
+  refine ⟨
+    (v * b) • s + (u * a) • LinearMap.id,
+    fun x => ⟨u • (x - s x), ?_⟩,
+    fun x => ⟨v • (s x - x), ?_⟩
+  ⟩
   · have h : v * (b : ℤ) = 1 - a * u := by linear_combination huv
     simp only [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.id_apply]
-    rw [h, ← natCast_zsmul, ← mul_smul, _root_.mul_comm u, sub_smul, smul_sub, one_smul]; abel
+    rw [h, ← natCast_zsmul, ← mul_smul, _root_.mul_comm u, sub_smul, smul_sub, one_smul]
+    abel
   · have h : u * (a : ℤ) = 1 - b * v := by linear_combination huv
     simp only [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.id_apply]
-    rw [h, ← natCast_zsmul, ← mul_smul, _root_.mul_comm v, sub_smul, smul_sub, one_smul]; abel
+    rw [h, ← natCast_zsmul, ← mul_smul, _root_.mul_comm v, sub_smul, smul_sub, one_smul]
+    abel
 
-theorem exists_sim_trivial_away {M : ℕ} (hM : 0 < M) {F : D.La →ₗ[𝓞 E] D.La} (hF : IsSimMod D M F 1) :
-    ∃ g : Sim D, (∀ n, g.ν n = 1) ∧ (∀ x, D.ModN M (g.f M x - F x)) ∧
-      ∀ N : ℕ, 0 < N → Nat.Coprime N M → ∀ x, D.ModN N (g.f N x - x) := by
+theorem exists_sim_trivial_away {M : ℕ} (hM : 0 < M) {F : D.La →ₗ[𝓞 E] D.La} (hF : IsSimMod D M F 1)
+    : ∃ g : Sim D,
+      (∀ n, g.ν n = 1) ∧ (∀ x, D.ModN M (g.f M x - F x))
+        ∧ ∀ N : ℕ, 0 < N → Nat.Coprime N M → ∀ x, D.ModN N (g.f N x - x) := by
   obtain ⟨s, hs0, hs1, hs2⟩ := exists_tower D hM hF
   choose a b k habk using exists_split M
   have hcop : ∀ {x y j : ℕ}, x ∣ M ^ (j + 1) → Nat.Coprime y M → Nat.Coprime x y := fun h1 h2 =>
     Nat.Coprime.coprime_dvd_left h1 (Nat.Coprime.pow_left _ h2.symm)
-  have hex : ∀ n, ∃ G : D.La →ₗ[𝓞 E] D.La, 0 < n →
-      (∀ x, D.ModN (a n) (G x - s (k n) x)) ∧ ∀ x, D.ModN (b n) (G x - x) := fun n => by
+  have hex
+      : ∀ n, ∃ G : D.La →ₗ[𝓞 E] D.La,
+        0 < n → (∀ x, D.ModN (a n) (G x - s (k n) x)) ∧ ∀ x, D.ModN (b n) (G x - x) := fun n => by
     by_cases hn : 0 < n
     · obtain ⟨G, hG⟩ := exists_glue D (hcop (habk n hn).2.1 (habk n hn).2.2) (s (k n))
       exact ⟨G, fun _ => hG⟩
@@ -213,8 +241,18 @@ theorem exists_sim_trivial_away {M : ℕ} (hM : 0 < M) {F : D.La →ₗ[𝓞 E] 
       rwa [sub_add_sub_cancel] at this
     · rw [_root_.one_mul]
       exact dvd_form_sub ((hG n hn).2 x) ((hG n hn).2 y)
-  refine ⟨⟨G, fun _ => 1, fun n m hn hm x => ?_, fun n hn => SimLift.exists_inv D hn (hsim n hn),
-    fun n hn => (hsim n hn).2⟩, fun _ => rfl, fun x => ?_, fun N hN hNM x => hB N hN N dvd_rfl hNM x⟩
+  refine ⟨
+    ⟨
+      G,
+      fun _ => 1,
+      fun n m hn hm x => ?_,
+      fun n hn => SimLift.exists_inv D hn (hsim n hn),
+      fun n hn => (hsim n hn).2
+    ⟩,
+    fun _ => rfl,
+    fun x => ?_,
+    fun N hN hNM x => hB N hN N dvd_rfl hNM x
+  ⟩
   · obtain ⟨h1, h2, h3⟩ := habk n hn
     have hnm := Nat.mul_pos hn hm
     have ha : a n ∣ n := Dvd.intro _ h1.symm
@@ -227,7 +265,16 @@ theorem exists_sim_trivial_away {M : ℕ} (hM : 0 < M) {F : D.La →ₗ[𝓞 E] 
   · rw [← hs0]
     exact hA M hM M 0 dvd_rfl (by simp) x
 
-theorem exists_isometry_inducing : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (γ : LaMod Dw l ≃ₗ[𝓞 E] LaMod Dw l), ∃ g : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sim Dw, (∀ n, g.ν n = 1) ∧ (∀ x, (l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).mkQ (g.f l.M x) = γ ((l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).mkQ x)) ∧ ∀ N : ℕ, 0 < N → Nat.Coprime N l.M → ∀ x, Dw.ModN N (g.f N x - x) := by
+theorem exists_isometry_inducing
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (γ : LaMod Dw l ≃ₗ[𝓞 E] LaMod Dw l),
+      ∃ g : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sim Dw,
+        (∀ n, g.ν n = 1)
+          ∧ (∀ x,
+            (l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).mkQ (g.f l.M x)
+              = γ ((l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).mkQ x))
+          ∧ ∀ N : ℕ, 0 < N → Nat.Coprime N l.M → ∀ x, Dw.ModN N (g.f N x - x) := by
   intro E _ _ _ H D l γ
   obtain ⟨F, hF, hFγ⟩ := exists_isometry_mod D l γ
   obtain ⟨g, h1, h2, h3⟩ := exists_sim_trivial_away D (by have := l.three_le; omega) hF

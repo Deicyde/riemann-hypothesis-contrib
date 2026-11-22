@@ -25,8 +25,8 @@ theorem diffStep_zero_right (b : K → ℤ) : diffStep b (0 : (K → ℤ) → �
   funext m
   simp [diffStep]
 
-theorem foldr_diffStep_eq_zero_of_mem (l : List (K → ℤ)) (hl : (0 : K → ℤ) ∈ l)
-    (h : (K → ℤ) → ℤ) : l.foldr diffStep h = 0 := by
+theorem foldr_diffStep_eq_zero_of_mem (l : List (K → ℤ)) (hl : (0 : K → ℤ) ∈ l) (h : (K → ℤ) → ℤ)
+    : l.foldr diffStep h = 0 := by
   induction l with
   | nil => simp at hl
   | cons a t ih =>
@@ -36,27 +36,29 @@ theorem foldr_diffStep_eq_zero_of_mem (l : List (K → ℤ)) (hl : (0 : K → �
     · rw [ih ht]
       exact diffStep_zero_right a
 
-theorem mixedDiff_coord_zero {n : ℕ} (bs : Fin n → K → ℤ) (i : Fin n) (hi : bs i = 0)
-    (h : (K → ℤ) → ℤ) : mixedDiff bs h = 0 :=
+theorem mixedDiff_coord_zero
+    {n : ℕ} (bs : Fin n → K → ℤ) (i : Fin n) (hi : bs i = 0) (h : (K → ℤ) → ℤ)
+    : mixedDiff bs h = 0 :=
   foldr_diffStep_eq_zero_of_mem _ (List.mem_ofFn.mpr ⟨i, hi⟩) h
 
-theorem diffStep_eventually_zero {b : K → ℤ} {h : (K → ℤ) → ℤ}
-    (hh : ∀ᶠ m in atTop, h m = 0) : ∀ᶠ m in atTop, diffStep b h m = 0 := by
+theorem diffStep_eventually_zero {b : K → ℤ} {h : (K → ℤ) → ℤ} (hh : ∀ᶠ m in atTop, h m = 0)
+    : ∀ᶠ m in atTop, diffStep b h m = 0 := by
   have hs : ∀ᶠ m in atTop, h (m + -b) = 0 :=
     (tendsto_atTop_add_const_right atTop (-b) tendsto_id).eventually hh
   filter_upwards [hh, hs] with m h1 h2
   simp only [diffStep, h1, ← sub_eq_add_neg] at h2 ⊢
   rw [h2, sub_zero]
 
-theorem mixedDiff_eventually_zero {n : ℕ} (bs : Fin n → K → ℤ) {h : (K → ℤ) → ℤ}
-    (hh : ∀ᶠ m in atTop, h m = 0) : ∀ᶠ m in atTop, mixedDiff bs h m = 0 := by
+theorem mixedDiff_eventually_zero
+    {n : ℕ} (bs : Fin n → K → ℤ) {h : (K → ℤ) → ℤ} (hh : ∀ᶠ m in atTop, h m = 0)
+    : ∀ᶠ m in atTop, mixedDiff bs h m = 0 := by
   unfold mixedDiff
   induction List.ofFn bs with
   | nil => simpa using hh
   | cons a t ih => exact diffStep_eventually_zero ih
 
-theorem eventualValue_eq_zero {f : (K → ℤ) → ℤ} (hf : ∀ᶠ m in atTop, f m = 0) :
-    eventualValue f = 0 := by
+theorem eventualValue_eq_zero {f : (K → ℤ) → ℤ} (hf : ∀ᶠ m in atTop, f m = 0)
+    : eventualValue f = 0 := by
   unfold eventualValue
   have hex : ∃ c, ∀ᶠ m in atTop, f m = c := ⟨0, hf⟩
   rw [dite_eq_left hex]
@@ -65,8 +67,9 @@ theorem eventualValue_eq_zero {f : (K → ℤ) → ℤ} (hf : ∀ᶠ m in atTop,
 
 end
 
-theorem exists_nat_of_le_of_lt {x : WithBot (WithTop ℤ)} {t n : ℕ}
-    (h1 : (t : WithBot (WithTop ℤ)) ≤ x) (h2 : x < n) : ∃ d : ℕ, x = d := by
+theorem exists_nat_of_le_of_lt
+    {x : WithBot (WithTop ℤ)} {t n : ℕ} (h1 : (t : WithBot (WithTop ℤ)) ≤ x) (h2 : x < n)
+    : ∃ d : ℕ, x = d := by
   rw [← WithBot.coe_natCast, ← WithTop.coe_natCast] at h1 h2
   induction x using WithBot.recBotCoe with
   | bot => exact absurd h1 (not_le.mpr (WithBot.bot_lt_coe _))
@@ -78,9 +81,10 @@ theorem exists_nat_of_le_of_lt {x : WithBot (WithTop ℤ)} {t n : ℕ}
       refine ⟨z.toNat, ?_⟩
       rw [← WithBot.coe_natCast, ← WithTop.coe_natCast, Int.toNat_of_nonneg (by omega)]
 
-theorem IntNumZeroSlot.proof (h₁ : MixedDiffConst.Statement.{u})
-    (h₂ : HilbEventuallyPoly.Statement.{u}) (h₃ : HilbDegreeBound.Statement.{u}) :
-    IntNumZeroSlot.Statement.{u} := by
+theorem IntNumZeroSlot.proof
+    (h₁ : MixedDiffConst.Statement.{u}) (h₂ : HilbEventuallyPoly.Statement.{u})
+    (h₃ : HilbDegreeBound.Statement.{u})
+    : IntNumZeroSlot.Statement.{u} := by
   intro F _ K _ _ ι _ I
   refine ⟨fun n bs i hi => ?_, fun hI n bs hn => ?_⟩
   · unfold intNum

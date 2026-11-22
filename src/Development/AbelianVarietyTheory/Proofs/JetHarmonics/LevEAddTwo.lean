@@ -132,37 +132,47 @@ private lemma isWeight_shift_of_glRel {M : Type} [AddCommGroup M] [Module ℂ M]
   · subst hb; simp [ha, sub_smul]; abel
   · simp [ha, hb]
 
-
 open Finset in
 open scoped InnerProductSpace in
-theorem _root_.GlobalTheory.lev_E_add_two : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (j : ℕ) (w : M), _root_.Formalism.REAL.GlRel E → _root_.Formalism.REAL.IsUnitary ε E → _root_.BranchingSupport.Lev ε E μ j w → ∀ a b, _root_.BranchingSupport.Lev ε E μ (j + 2) (E a b w) := by
+theorem _root_.GlobalTheory.lev_E_add_two
+    : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (j : ℕ) (w : M),
+      _root_.Formalism.REAL.GlRel E → _root_.Formalism.REAL.IsUnitary ε E
+        → _root_.BranchingSupport.Lev ε E μ j w
+        → ∀ a b, _root_.BranchingSupport.Lev ε E μ (j + 2) (E a b w) := by
   intro M _ _ n ε E μ j w hG hU hw a b
   unfold _root_.BranchingSupport.Lev _root_.BranchingSupport.WtNear at hw ⊢
   obtain ⟨hC, hS⟩ := hw
   refine ⟨?_, ?_⟩
   · have hK := _root_.Formalism.REAL.isUnitary_kUnit ε E hU
-    have h := _root_.GlobalTheory.TensOp.casKLe_tensor_operator M n ε E M (Fin n × Fin n) E (fun i => E i.1 i.2)
-      _root_.GlobalTheory.CasKAdjoint.adMat _ (8 * n) hK hK (by positivity) (by positivity)
-      (fun a b _ => adMat_conjTranspose_eq_adMat_swap a b)
-      (sum_eq_sign_norm_sq_adMat_mulVec_le ε)
-      (fun a b _ k v => by
-        have hs := sum_adMat_apply_second_index_smul a b (fun i => E i.1 i.2 v) k
-        simp only at hs ⊢
-        rw [hs]
-        have h := LinearMap.congr_fun (hG a b k.1 k.2) v
-        simp only [LinearMap.sub_apply, Module.End.mul_apply, ite_apply, LinearMap.zero_apply,
-          @eq_comm _ b k.1] at h
-        rw [sub_eq_iff_eq_add'] at h
-        rw [h]
-        split_ifs <;> simp)
-      w hC (a, b)
+    have h :=
+      _root_.GlobalTheory.TensOp.casKLe_tensor_operator M n ε E M (Fin n × Fin n) E
+        (fun i => E i.1 i.2)
+        _root_.GlobalTheory.CasKAdjoint.adMat _ (8 * n) hK hK (by positivity) (by positivity)
+        (fun a b _ => adMat_conjTranspose_eq_adMat_swap a b)
+        (sum_eq_sign_norm_sq_adMat_mulVec_le ε)
+        (fun a b _ k v => by
+          have hs := sum_adMat_apply_second_index_smul a b (fun i => E i.1 i.2 v) k
+          simp only at hs ⊢
+          rw [hs]
+          have h := LinearMap.congr_fun (hG a b k.1 k.2) v
+          simp only [LinearMap.sub_apply, Module.End.mul_apply, ite_apply, LinearMap.zero_apply,
+              @eq_comm _ b k.1]
+            at h
+          rw [sub_eq_iff_eq_add'] at h
+          rw [h]
+          split_ifs <;> simp)
+        w hC (a, b)
     convert h using 1
     push_cast
     ring
   · rw [← Submodule.mem_comap]
     refine Submodule.span_le.2 ?_ hS
     rintro x ⟨ω, hd, hx⟩
-    exact Submodule.subset_span ⟨_, (sum_abs_shifted_weight_sub_le_add_two ω _ a b).trans (by push_cast; linarith),
-      isWeight_shift_of_glRel hG hx a b⟩
+    exact Submodule.subset_span ⟨
+      _,
+      (sum_abs_shifted_weight_sub_le_add_two ω _ a b).trans (by push_cast; linarith),
+      isWeight_shift_of_glRel hG hx a b
+    ⟩
 
 end GlobalTheory

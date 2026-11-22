@@ -14,8 +14,8 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-def lfockq_mat {r : ℕ} (a b : Fin r) (t : ℂ) : Matrix (Fin r) (Fin r) ℂ :=
-  fun c d => (if c = d then 1 else 0) + (if c = b ∧ d = a then t else 0)
+def lfockq_mat {r : ℕ} (a b : Fin r) (t : ℂ) : Matrix (Fin r) (Fin r) ℂ := fun c d =>
+  (if c = d then 1 else 0) + (if c = b ∧ d = a then t else 0)
 
 lemma lfockq_mat_conjTranspose {r : ℕ} (a b : Fin r) (t : ℂ) :
     (lfockq_mat a b t).conjTranspose = lfockq_mat b a (star t) := by

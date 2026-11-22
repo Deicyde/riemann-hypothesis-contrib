@@ -14,10 +14,12 @@ namespace GlobalTheory.FrameDet
 
 open GlobalTheory.BorelAlg
 
-theorem exists_lower {K : Type} [Field K] {n : ℕ} (x y : Matrix (Fin n) (Fin n) K) (l : Fin n) (hl : ∀ i, i ≤ l)
-    (hx : x.det ≠ 0) (h : ∀ i, i ≠ l → y i = x i) :
-    ∃ b : Matrix (Fin n) (Fin n) K, y = b * x ∧ (∀ i j, i < j → b i j = 0) ∧ (∀ i, i ≠ l → b i i = 1) ∧
-      b.det = b l l := by
+theorem exists_lower
+    {K : Type} [Field K]
+    {n : ℕ} (x y : Matrix (Fin n) (Fin n) K) (l : Fin n) (hl : ∀ i, i ≤ l) (hx : x.det ≠ 0)
+    (h : ∀ i, i ≠ l → y i = x i)
+    : ∃ b : Matrix (Fin n) (Fin n) K,
+      y = b * x ∧ (∀ i j, i < j → b i j = 0) ∧ (∀ i, i ≠ l → b i i = 1) ∧ b.det = b l l := by
   have hrow : ∀ i, i ≠ l → ∀ j, (y * x⁻¹) i j = (1 : Matrix _ _ K) i j := by
     intro i hi j
     rw [← Matrix.mul_nonsing_inv _ hx.isUnit]
@@ -30,20 +32,35 @@ theorem exists_lower {K : Type} [Field K] {n : ℕ} (x y : Matrix (Fin n) (Fin n
     · intro i _ hi; rw [hrow i hi, Matrix.one_apply_eq]
     · simp
 
-theorem det_dvd_of_equivariant : ∀ (K : Type) [Field K] [Infinite K] (B : Type) [Fintype B] [DecidableEq B] (m : B → ℕ) (P : MvPolynomial (FrVar m) K) (a : ∀ b, Fin (m b) → ℕ), (∀ (X : ∀ b, Matrix (Fin (m b)) (Fin (m b)) K) (b : B) (t : Matrix (Fin (m b)) (Fin (m b)) K), (∀ b', (X b').det ≠ 0) → t.det ≠ 0 → t.BlockTriangular id → evalFr P (Function.update X b (X b * t)) = (∏ i, t i i ^ (a b i)) * evalFr P X) → ∀ b : B, (∀ i, 1 ≤ a b i) → ∃ Q : MvPolynomial (FrVar m) K, P = (Matrix.of fun i k : Fin (m b) => (MvPolynomial.X ⟨b, (k, i)⟩ : MvPolynomial (FrVar m) K)).det * Q := by
+theorem det_dvd_of_equivariant
+    : ∀ (K : Type) [Field K] [Infinite K] (B : Type) [Fintype B] [DecidableEq B] (m : B → ℕ)
+        (P : MvPolynomial (FrVar m) K) (a : ∀ b, Fin (m b) → ℕ),
+      (∀ (X : ∀ b, Matrix (Fin (m b)) (Fin (m b)) K) (b : B) (t : Matrix (Fin (m b)) (Fin (m b)) K),
+          (∀ b', (X b').det ≠ 0) → t.det ≠ 0 → t.BlockTriangular id
+            → evalFr P (Function.update X b (X b * t)) = (∏ i, t i i ^ (a b i)) * evalFr P X)
+        → ∀ b : B,
+          (∀ i, 1 ≤ a b i)
+            → ∃ Q : MvPolynomial (FrVar m) K,
+              P = (Matrix.of fun i k : Fin (m b) =>
+                  (MvPolynomial.X ⟨b, (k, i)⟩ : MvPolynomial (FrVar m) K)).det
+                * Q := by
   intro K _ _ B _ _ m P a hP τ₀ ha
-  have hT : (Matrix.of fun i k : Fin (m τ₀) => (MvPolynomial.X ⟨τ₀, (k, i)⟩ : MvPolynomial (FrVar m) K)).det =
-      (gen m K τ₀).det := by
+  have hT
+      : (Matrix.of fun i k : Fin (m τ₀) =>
+          (MvPolynomial.X ⟨τ₀, (k, i)⟩ : MvPolynomial (FrVar m) K)).det
+        = (gen m K τ₀).det := by
     rw [← Matrix.det_transpose]; rfl
   rw [hT]
   change (gen m K τ₀).det ∣ P
   by_cases h0 : m τ₀ = 0
   · haveI : IsEmpty (Fin (m τ₀)) := by rw [h0]; infer_instance
-    rw [Matrix.det_isEmpty]; exact one_dvd _
+    rw [Matrix.det_isEmpty]
+    exact one_dvd _
   let l : Fin (m τ₀) := ⟨m τ₀ - 1, by omega⟩
   have hl : ∀ i, i ≤ l := fun i => by
     have := i.2
-    simp only [Fin.le_def, l]; omega
+    simp only [Fin.le_def, l]
+    omega
   obtain ⟨hM0, hrel⟩ := minor_isRelPrime' (R := K) _ (inj_block m τ₀) l hl
   change ((gen m K τ₀).updateRow l (Pi.single l 1)).det ≠ 0 at hM0
   change IsRelPrime ((gen m K τ₀).updateRow l (Pi.single l 1)).det (gen m K τ₀).det at hrel
@@ -67,8 +84,7 @@ theorem det_dvd_of_equivariant : ∀ (K : Type) [Field K] [Infinite K] (B : Type
     have hxd : ∀ τ, (x τ).det = g (x₀ τ).det := fun τ => (RingHom.map_det _ _).symm
     have hyd : ∀ τ, (y τ).det = g (gen m K τ).det := fun τ => (RingHom.map_det _ _).symm
     have hxM : (x τ₀).det = g M.det := by rw [hxd]; simp [x₀]
-    have hz' : (∏ τ, g (gen m K τ).det) * g M.det ≠ 0 := by
-      rw [← map_prod, ← map_mul]; exact hz
+    have hz' : (∏ τ, g (gen m K τ).det) * g M.det ≠ 0 := by rw [← map_prod, ← map_mul]; exact hz
     have hy : ∀ τ, (y τ).det ≠ 0 := fun τ =>
       hyd τ ▸ Finset.prod_ne_zero_iff.1 (left_ne_zero_of_mul hz') τ (Finset.mem_univ _)
     have hne : ∀ τ, τ ≠ τ₀ → y τ = x τ := fun τ h => by simp [x, y, x₀, h]
@@ -80,12 +96,16 @@ theorem det_dvd_of_equivariant : ∀ (K : Type) [Field K] [Infinite K] (B : Type
       ext j; simp [x, y, x₀, M, Matrix.updateRow_ne h]
     obtain ⟨b, hxy, hb, hb1, hdet⟩ := exists_lower (x τ₀) (y τ₀) l hl (hx τ₀) hl'
     have hs : (y τ₀).det = b l l * (x τ₀).det := by rw [← hdet, ← Matrix.det_mul, ← hxy]
-    have key := hP (fun τ => (x τ).transpose) τ₀ b.transpose
-      (fun τ => by rw [Matrix.det_transpose]; exact hx τ)
-      (by rw [Matrix.det_transpose, hdet]; exact left_ne_zero_of_mul (hs ▸ hy τ₀))
-      (fun i j hij => hb j i hij)
-    have e0 : Function.update (fun τ => (x τ).transpose) τ₀ ((x τ₀).transpose * b.transpose) =
-        fun τ => (y τ).transpose := by
+    have key :=
+      hP
+        (fun τ => (x τ).transpose)
+        τ₀ b.transpose
+        (fun τ => by rw [Matrix.det_transpose]; exact hx τ)
+        (by rw [Matrix.det_transpose, hdet]; exact left_ne_zero_of_mul (hs ▸ hy τ₀))
+        (fun i j hij => hb j i hij)
+    have e0
+        : Function.update (fun τ => (x τ).transpose) τ₀ ((x τ₀).transpose * b.transpose)
+          = fun τ => (y τ).transpose := by
       funext τ
       by_cases h : τ = τ₀
       · subst h; rw [Function.update_self, ← Matrix.transpose_mul, ← hxy]
@@ -96,11 +116,12 @@ theorem det_dvd_of_equivariant : ∀ (K : Type) [Field K] [Infinite K] (B : Type
       funext v
       simp [y, g, gen]
     have e2 : evalFr P (fun τ => (x τ).transpose) = g P₀ := by
-      have : (eval (fun v : FrVar m => (x v.1).transpose v.2.2 v.2.1) : MvPolynomial (Lt m) K →+* K) =
-          g.comp (eval₂Hom C (fun p : Lt m => x₀ p.1 p.2.1 p.2.2)) := by
+      have : (eval (fun v : FrVar m => (x v.1).transpose v.2.2 v.2.1) : MvPolynomial (Lt m) K →+* K)
+          = g.comp (eval₂Hom C (fun p : Lt m => x₀ p.1 p.2.1 p.2.2)) := by
         ext <;> simp [x, g]
       unfold evalFr
-      rw [this]; rfl
+      rw [this]
+      rfl
     have hc : (∏ i, b.transpose i i ^ a τ₀ i) = b l l ^ a τ₀ l := by
       rw [Finset.prod_eq_single l]
       · rfl

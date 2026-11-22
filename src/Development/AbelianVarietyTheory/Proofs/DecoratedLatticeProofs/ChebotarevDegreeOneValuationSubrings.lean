@@ -13,7 +13,8 @@ namespace GlobalTheory
 
 theorem chebOmSt_holds : ReciprocityTheory.ChartRestriction.L1.ChebOmSt := by
   intro E Ω _ _ _ _ _ S hS H hn ho _ σ
-  obtain ⟨v, hv, hd, -, B, hB, -, φ, hφ, hφσ⟩ := GlobalTheory.Published.cheb_holds E Ω H ho hn σ hS.toFinset
+  obtain ⟨v, hv, hd, -, B, hB, -, φ, hφ, hφσ⟩ :=
+    GlobalTheory.Published.cheb_holds E Ω H ho hn σ hS.toFinset
   refine ⟨B, v, φ, ?_, by simpa using hv, ?_, ?_, ?_⟩
   · intro x
     rw [ValuationSubring.mem_nonunits_iff]

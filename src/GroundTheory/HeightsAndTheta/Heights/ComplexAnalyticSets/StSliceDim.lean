@@ -15,10 +15,10 @@ noncomputable section
 
 def SliceDim.Statement : Prop :=
   ∀ (n e : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (ℓ : Fin n → ℂ),
-    IsProjPrime J → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = ((e + 1 : ℕ) : WithBot ℕ∞) →
-    linForm ℓ ∉ J →
-      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (J ⊔ Ideal.span {linForm ℓ - 1})) =
-        ((e : ℕ) : WithBot ℕ∞)
+    IsProjPrime J → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = ((e + 1 : ℕ) : WithBot ℕ∞)
+      → linForm ℓ ∉ J
+      → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (J ⊔ Ideal.span {linForm ℓ - 1}))
+        = ((e : ℕ) : WithBot ℕ∞)
 
 end
 

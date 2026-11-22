@@ -38,7 +38,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HasSatake
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -50,9 +51,11 @@ section Generic
 
 variable {G : Type} [Group G]
 
-theorem twRel_equiv (θ : G →* G) : Equivalence fun x y : G => ∃ g, y = g⁻¹ * x * θ g :=
-  ⟨fun x => ⟨1, by simp⟩, fun ⟨g, h⟩ => ⟨g⁻¹, by rw [h, map_inv]; group⟩,
-    fun ⟨g, h⟩ ⟨k, h'⟩ => ⟨g * k, by rw [h', h, map_mul]; group⟩⟩
+theorem twRel_equiv (θ : G →* G) : Equivalence fun x y : G => ∃ g, y = g⁻¹ * x * θ g := ⟨
+  fun x => ⟨1, by simp⟩,
+  fun ⟨g, h⟩ => ⟨g⁻¹, by rw [h, map_inv]; group⟩,
+  fun ⟨g, h⟩ ⟨k, h'⟩ => ⟨g * k, by rw [h', h, map_mul]; group⟩
+⟩
 
 def cls (θ : G →* G) (x : G) : TwCl θ := Quot.mk _ x
 
@@ -70,8 +73,8 @@ section Local
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem charpoly_twConj (n : ℕ) (w : Pl E) (g y : GLw n w) :
-    (nrmL n w (g⁻¹ * y * thL n w g)).val.charpoly = (nrmL n w y).val.charpoly := by
+theorem charpoly_twConj (n : ℕ) (w : Pl E) (g y : GLw n w)
+    : (nrmL n w (g⁻¹ * y * thL n w g)).val.charpoly = (nrmL n w y).val.charpoly := by
   rw [nrmL_twConj, Units.val_mul, Units.val_mul, Matrix.coe_units_inv, Matrix.charpoly_units_conj']
 
 end Local

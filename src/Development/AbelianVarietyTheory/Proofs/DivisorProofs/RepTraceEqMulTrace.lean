@@ -9,11 +9,14 @@ open NumberField
 namespace GlobalTheory
 namespace RepTrace
 
-theorem isUnit_of_ne_zero {E : Type} [Field E] [NumberField E] {P : Type} [CommRing P] [Algebra ℚ P]
-    (g : 𝓞 E →+* P) (b : 𝓞 E) (hb : b ≠ 0) : IsUnit (g b) := by
+theorem isUnit_of_ne_zero
+    {E : Type} [Field E] [NumberField E]
+    {P : Type} [CommRing P] [Algebra ℚ P]
+    (g : 𝓞 E →+* P)
+    (b : 𝓞 E) (hb : b ≠ 0)
+    : IsUnit (g b) := by
   have hI : Ideal.span {b} ≠ ⊥ := by simpa using hb
-  have hn : Ideal.absNorm (Ideal.span {b}) ≠ 0 := by
-    rwa [Ne, Ideal.absNorm_eq_zero_iff]
+  have hn : Ideal.absNorm (Ideal.span {b}) ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton.1 (Ideal.absNorm_mem (Ideal.span {b}))
   set n := Ideal.absNorm (Ideal.span {b})
   have hu : IsUnit (g b * g c) := by
@@ -23,21 +26,28 @@ theorem isUnit_of_ne_zero {E : Type} [Field E] [NumberField E] {P : Type} [CommR
     exact (isUnit_iff_ne_zero.2 (by exact_mod_cast hn : (n : ℚ) ≠ 0)).map _
   exact isUnit_of_mul_isUnit_left hu
 
-theorem trace_lsmul_restrictScalars {K L V : Type} [Field K] [Field L] [Algebra K L] [FiniteDimensional K L]
-    [AddCommGroup V] [Module K V] [Module L V] [IsScalarTower K L V] [FiniteDimensional L V] (a : L) :
-    LinearMap.trace K V ((LinearMap.lsmul L V a).restrictScalars K) =
-      (Module.finrank L V : K) * Algebra.trace K L a := by
+theorem trace_lsmul_restrictScalars
+    {K L V : Type} [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [AddCommGroup V]
+    [Module K V] [Module L V] [IsScalarTower K L V] [FiniteDimensional L V]
+    (a : L)
+    : LinearMap.trace K V ((LinearMap.lsmul L V a).restrictScalars K)
+      = (Module.finrank L V : K) * Algebra.trace K L a := by
   classical
   let b := Module.finBasis L V
   let c := Module.finBasis K L
   rw [LinearMap.trace_eq_matrix_trace K (c.smulTower b), Algebra.trace_eq_matrix_trace c]
-  simp [Matrix.trace, LinearMap.toMatrix_apply, Fintype.sum_prod_type, Algebra.leftMulMatrix_eq_repr_mul,
-    Module.Basis.smulTower_repr_mk, smul_smul, Finsupp.single_apply, Finset.mul_sum, mul_comm]
+  simp [Matrix.trace, LinearMap.toMatrix_apply, Fintype.sum_prod_type,
+    Algebra.leftMulMatrix_eq_repr_mul, Module.Basis.smulTower_repr_mk, smul_smul,
+    Finsupp.single_apply, Finset.mul_sum, mul_comm]
 
 end RepTrace
 
-theorem repTrace_eq_mul_trace {E : Type} [Field E] [NumberField E] {r : ℕ} (ρ : 𝓞 E →+* Matrix (Fin r) (Fin r) ℤ) (s : ℕ)
-    (hr : r = s * Module.finrank ℚ E) (a : 𝓞 E) : (ρ a).trace = s * Algebra.trace ℤ (𝓞 E) a := by
+theorem repTrace_eq_mul_trace
+    {E : Type} [Field E] [NumberField E]
+    {r : ℕ} (ρ : 𝓞 E →+* Matrix (Fin r) (Fin r) ℤ)
+    (s : ℕ) (hr : r = s * Module.finrank ℚ E)
+    (a : 𝓞 E)
+    : (ρ a).trace = s * Algebra.trace ℤ (𝓞 E) a := by
   classical
   let g : 𝓞 E →+* Module.End ℚ (Fin r → ℚ) :=
     (Matrix.toLinAlgEquiv' : Matrix (Fin r) (Fin r) ℚ ≃ₐ[ℚ] _).toRingEquiv.toRingHom.comp
@@ -54,7 +64,8 @@ theorem repTrace_eq_mul_trace {E : Type} [Field E] [NumberField E] {r : ℕ} (ρ
       (IsLocalization.lift (M := nonZeroDivisors (𝓞 E)) (S := E) (g := g')
         (fun y => RepTrace.isUnit_of_ne_zero g' y (nonZeroDivisors.ne_zero y.2)))
   letI : Module E (Fin r → ℚ) := Module.compHom (Fin r → ℚ) φ
-  have hφq : φ.comp (algebraMap ℚ E) = algebraMap ℚ (Module.End ℚ (Fin r → ℚ)) := Subsingleton.elim _ _
+  have hφq : φ.comp (algebraMap ℚ E) = algebraMap ℚ (Module.End ℚ (Fin r → ℚ)) :=
+    Subsingleton.elim _ _
   haveI : IsScalarTower ℚ E (Fin r → ℚ) := ⟨fun q x v => by
     change φ (q • x) v = q • φ x v
     rw [Algebra.smul_def, map_mul, Module.End.mul_apply]

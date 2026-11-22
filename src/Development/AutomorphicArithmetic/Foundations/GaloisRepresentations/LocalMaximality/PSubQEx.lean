@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system.SubquotientExact
@@ -16,9 +17,11 @@ private def eps (e : Fin d ↪o κ) (b : Finset κ) (j : Fin d) : ℤ := (-1) ^ 
 
 private def psi (e : Fin d ↪o κ) (b : Finset κ) (L : Finset (Fin d)) : ℤ := ∏ j ∈ L, eps e b j
 
-private def emb (e : Fin d ↪o κ) (b : Finset κ) (L : Finset (Fin d)) : Finset κ := b ∪ L.map e.toEmbedding
+private def emb (e : Fin d ↪o κ) (b : Finset κ) (L : Finset (Fin d)) : Finset κ :=
+  b ∪ L.map e.toEmbedding
 
-private def pre (e : Fin d ↪o κ) (s : Finset κ) : Finset (Fin d) := Finset.univ.filter fun j => e j ∈ s
+private def pre (e : Fin d ↪o κ) (s : Finset κ) : Finset (Fin d) :=
+  Finset.univ.filter fun j => e j ∈ s
 
 private lemma eps_sq (e : Fin d ↪o κ) (b : Finset κ) (j : Fin d) : eps e b j * eps e b j = 1 := by
   simp [eps, ← mul_pow]
@@ -165,8 +168,7 @@ private lemma mem_C {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ 
 end UpperTheory.Gal.productCup_of_system.SubquotientExact
 
 open UpperTheory.Gal.productCup_of_system.SubquotientExact in
-theorem UpperTheory.Gal.productCup_of_system.subQEx_of :
-    RS → WdBasic → SubQEx := by
+theorem UpperTheory.Gal.productCup_of_system.subQEx_of : RS → WdBasic → SubQEx := by
   intro _ _ S E _ _ _ _ act κ _ _ M r d e hK n m hm c hc hL hz
   have hcs : ∀ s, (s.card : ℤ) ≠ n → c s = 0 := fun s hs => by
     have := (mem_C _ _ _ _).1 hc s
@@ -177,8 +179,9 @@ theorem UpperTheory.Gal.productCup_of_system.subQEx_of :
     · exact this
     · rw [(Submodule.mem_bot ℂ).1 this]; exact M.zero_mem
 
-  have hex : ∀ b : Finset κ, ∃ Y ∈ (kos act M fun j => r (e j)).C (m - 1), (∀ j, e j ∉ b) →
-      wd (fun j => act (r (e j))) Y = fun L => psi e b L • c (emb e b L) := by
+  have hex
+      : ∀ b : Finset κ, ∃ Y ∈ (kos act M fun j => r (e j)).C (m - 1),
+        (∀ j, e j ∉ b) → wd (fun j => act (r (e j))) Y = fun L => psi e b L • c (emb e b L) := by
     intro b
     by_cases hb : ∀ j, e j ∉ b
     · have hcol : (fun L => psi e b L • c (emb e b L)) ∈ (kos act M fun j => r (e j)).Z m := by
@@ -206,8 +209,13 @@ theorem UpperTheory.Gal.productCup_of_system.subQEx_of :
     · exact this
     · rw [(Submodule.mem_bot ℂ).1 this]; exact M.zero_mem
   let y : Finset κ → E := fun s =>
-    if ((s \ img e).card : ℤ) = n - m then psi e (s \ img e) (pre e s) • Y (s \ img e) (pre e s) else 0
-  have hy : ∀ b (hb : ∀ j, e j ∉ b) L, y (emb e b L) = if (b.card : ℤ) = n - m then psi e b L • Y b L else 0 := by
+    if ((s \ img e).card : ℤ) = n - m then
+      psi e (s \ img e) (pre e s) • Y (s \ img e) (pre e s)
+    else
+      0
+  have hy
+      : ∀ b (hb : ∀ j, e j ∉ b) L,
+        y (emb e b L) = if (b.card : ℤ) = n - m then psi e b L • Y b L else 0 := by
     intro b hb L
     simp only [y, sdiff_emb e hb, pre_emb e hb]
   refine ⟨y, (mem_C _ _ _ _).2 fun s => ?_, fun s hs => ?_, ?_⟩
@@ -217,8 +225,7 @@ theorem UpperTheory.Gal.productCup_of_system.subQEx_of :
     split_ifs with h1 h2 h2
     · exact zsmul_mem (hYM _ _) _
     · exact M.zero_mem
-    · have : ((pre e s).card : ℤ) ≠ m - 1 := by
-        intro h; apply h1; push_cast; omega
+    · have : ((pre e s).card : ℤ) ≠ m - 1 := by intro h; apply h1; push_cast; omega
       simp [hYz _ _ this]
     · exact Submodule.zero_mem _
   · rw [← emb_pre e s] at hs ⊢
@@ -229,17 +236,22 @@ theorem UpperTheory.Gal.productCup_of_system.subQEx_of :
   · funext s
     obtain ⟨b, L, hb, rfl⟩ : ∃ b L, (∀ j, e j ∉ b) ∧ s = emb e b L :=
       ⟨_, _, sdiff_ok e s, (emb_pre e s).symm⟩
-    have hk : wd (fun j => act (r (e j))) (fun L' => psi e b L' • y (emb e b L')) L =
-        psi e b L • wd (wOn (img e) fun l => act (r l)) y (emb e b L) := key (fun l => act (r l)) e hb y L
-    have hcancel : ∀ (L' : Finset (Fin d)) (v : E), psi e b L' • psi e b L' • v = v := fun L' v => by
+    have hk
+        : wd (fun j => act (r (e j))) (fun L' => psi e b L' • y (emb e b L')) L
+          = psi e b L • wd (wOn (img e) fun l => act (r l)) y (emb e b L) :=
+      key (fun l => act (r l)) e hb y L
+    have hcancel
+        : ∀ (L' : Finset (Fin d)) (v : E), psi e b L' • psi e b L' • v = v := fun L' v => by
       rw [smul_smul, psi_sq, one_smul]
     by_cases hn : (b.card : ℤ) = n - m
     · have h1 : (fun L' => psi e b L' • y (emb e b L')) = Y b := by
         funext L'
         rw [hy b hb, if_pos hn, hcancel]
       rw [h1, hYd b hb] at hk
-      calc wd (wOn (img e) fun l => act (r l)) y (emb e b L)
-          = psi e b L • psi e b L • wd (wOn (img e) fun l => act (r l)) y (emb e b L) := (hcancel _ _).symm
+      calc
+        wd (wOn (img e) fun l => act (r l)) y (emb e b L)
+            = psi e b L • psi e b L • wd (wOn (img e) fun l => act (r l)) y (emb e b L) :=
+          (hcancel _ _).symm
         _ = psi e b L • psi e b L • c (emb e b L) := by rw [← hk]
         _ = c (emb e b L) := hcancel _ _
     · have h1 : (fun L' => psi e b L' • y (emb e b L')) = 0 := by

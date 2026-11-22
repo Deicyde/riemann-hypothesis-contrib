@@ -15,13 +15,16 @@ public import Development.WeilBound.CoreStatements.FlagImmersions.RootModelNefFi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
-open GroundTheory.Heights₂.Heights.LowerBoundFree (ComponentData ComponentSetting degMu ArLimExists slX)
+open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open GroundTheory.Heights₂.Heights.LowerBoundFree
+  (ComponentData ComponentSetting degMu ArLimExists slX)
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-theorem rootModel_nefFib_zero_one_of_nonneg :
-    ∀ (Ψ : Type) [Fintype Ψ] (N : ℕ) (M : RootModel Ψ N), (∀ k, 0 ≤ M.A.a k) → M.NefFib 0 1 :=
+theorem rootModel_nefFib_zero_one_of_nonneg
+    : ∀ (Ψ : Type) [Fintype Ψ] (N : ℕ) (M : RootModel Ψ N), (∀ k, 0 ≤ M.A.a k) → M.NefFib 0 1 :=
   @RootFieldNumerics.root_model_nef_fibres_base
 
 end GlobalTheory.CompanionTheory.Ar.Top

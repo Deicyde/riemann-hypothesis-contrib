@@ -19,8 +19,8 @@ def blkWt : (Σ k, ι k) → (K →₀ ℕ) := fun p => Finsupp.single p.1 1
 
 def oneK : K →₀ ℕ := Finsupp.equivFunOnFinite.symm (fun _ => 1)
 
-theorem weight_blkWt_apply (m : (Σ k, ι k) →₀ ℕ) (k : K) :
-    Finsupp.weight (blkWt (ι := ι)) m k = ∑ i, m ⟨k, i⟩ := by
+theorem weight_blkWt_apply (m : (Σ k, ι k) →₀ ℕ) (k : K)
+    : Finsupp.weight (blkWt (ι := ι)) m k = ∑ i, m ⟨k, i⟩ := by
   classical
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finsupp.finsetSum_apply,
     Fintype.sum_sigma]
@@ -32,8 +32,8 @@ theorem weight_blkWt_apply (m : (Σ k, ι k) →₀ ℕ) (k : K) :
   · refine Finset.sum_congr rfl fun i _ => ?_
     simp [blkWt]
 
-theorem isWeightedHomogeneous_qmap (f : MRing ι) (a : K → ℕ) (hf : IsMultiHomog f a) :
-    IsWeightedHomogeneous (blkWt (ι := ι)) (qmap f) (Finsupp.equivFunOnFinite.symm a) := by
+theorem isWeightedHomogeneous_qmap (f : MRing ι) (a : K → ℕ) (hf : IsMultiHomog f a)
+    : IsWeightedHomogeneous (blkWt (ι := ι)) (qmap f) (Finsupp.equivFunOnFinite.symm a) := by
   intro d hd
   have hd' : d ∈ f.support := by
     rw [MvPolynomial.mem_support_iff]
@@ -44,8 +44,8 @@ theorem isWeightedHomogeneous_qmap (f : MRing ι) (a : K → ℕ) (hf : IsMultiH
   rw [weight_blkWt_apply, hf d hd' k]
   simp
 
-theorem qIdeal_isHomogeneous (P : Ideal (MRing ι)) (hP : IsMultiHomogIdeal P) :
-    (qIdeal P).IsHomogeneous (weightedHomogeneousSubmodule ℚ (blkWt (ι := ι))) := by
+theorem qIdeal_isHomogeneous (P : Ideal (MRing ι)) (hP : IsMultiHomogIdeal P)
+    : (qIdeal P).IsHomogeneous (weightedHomogeneousSubmodule ℚ (blkWt (ι := ι))) := by
   obtain ⟨S, hS, rfl⟩ := hP
   rw [qIdeal, Ideal.map_span]
   apply Ideal.homogeneous_span
@@ -55,11 +55,13 @@ theorem qIdeal_isHomogeneous (P : Ideal (MRing ι)) (hP : IsMultiHomogIdeal P) :
 
 def segMon (i : (k : K) → ι k) : MvPolynomial (Σ k, ι k) ℚ := ∏ k, X ⟨k, i k⟩
 
-theorem segMon_isWeightedHomogeneous (i : (k : K) → ι k) :
-    IsWeightedHomogeneous (blkWt (ι := ι)) (segMon i) oneK := by
-  have h := IsWeightedHomogeneous.prod Finset.univ
-    (fun k => (X ⟨k, i k⟩ : MvPolynomial (Σ k, ι k) ℚ)) (fun k => blkWt (ι := ι) ⟨k, i k⟩)
-    (fun k _ => isWeightedHomogeneous_X ℚ _ _)
+theorem segMon_isWeightedHomogeneous (i : (k : K) → ι k)
+    : IsWeightedHomogeneous (blkWt (ι := ι)) (segMon i) oneK := by
+  have h :=
+    IsWeightedHomogeneous.prod Finset.univ
+      (fun k => (X ⟨k, i k⟩ : MvPolynomial (Σ k, ι k) ℚ))
+      (fun k => blkWt (ι := ι) ⟨k, i k⟩)
+      (fun k _ => isWeightedHomogeneous_X ℚ _ _)
   have e : (∑ k ∈ Finset.univ, blkWt (ι := ι) ⟨k, i k⟩) = oneK := by
     ext k
     rw [Finsupp.finsetSum_apply]
@@ -68,33 +70,38 @@ theorem segMon_isWeightedHomogeneous (i : (k : K) → ι k) :
   rw [e] at h
   exact h
 
-private theorem aeval_of_isWeightedHomogeneous_blkWt {E : Type*} (w' : E → (K →₀ ℕ))
-    (yt : E → MvPolynomial (Σ k, ι k) ℚ)
-    (hy : ∀ e, IsWeightedHomogeneous (blkWt (ι := ι)) (yt e) (w' e)) (n : E →₀ ℕ) (c : ℚ) :
-    IsWeightedHomogeneous (blkWt (ι := ι)) (aeval yt (monomial n c)) (Finsupp.weight w' n) := by
+private theorem aeval_of_isWeightedHomogeneous_blkWt
+    {E : Type*} (w' : E → (K →₀ ℕ)) (yt : E → MvPolynomial (Σ k, ι k) ℚ)
+    (hy : ∀ e, IsWeightedHomogeneous (blkWt (ι := ι)) (yt e) (w' e)) (n : E →₀ ℕ)
+    (c : ℚ)
+    : IsWeightedHomogeneous (blkWt (ι := ι)) (aeval yt (monomial n c)) (Finsupp.weight w' n) := by
   classical
   rw [aeval_monomial, Finsupp.weight_apply, Finsupp.sum, Finsupp.prod]
-  have h0 : IsWeightedHomogeneous (blkWt (ι := ι))
-      (algebraMap ℚ (MvPolynomial (Σ k, ι k) ℚ) c) 0 := by
+  have h0
+      : IsWeightedHomogeneous (blkWt (ι := ι)) (algebraMap ℚ (MvPolynomial (Σ k, ι k) ℚ) c) 0 := by
     rw [MvPolynomial.algebraMap_eq]
     exact isWeightedHomogeneous_C _ _
-  have h1 := h0.mul (IsWeightedHomogeneous.prod n.support (fun e => yt e ^ n e)
-    (fun e => n e • w' e) (fun e _ => (hy e).pow (n e)))
+  have h1 :=
+    h0.mul (IsWeightedHomogeneous.prod n.support
+      (fun e => yt e ^ n e)
+      (fun e => n e • w' e)
+      (fun e _ => (hy e).pow (n e)))
   simpa using h1
 
-theorem component_aeval {E : Type*} (w' : E → (K →₀ ℕ))
-    (yt : E → MvPolynomial (Σ k, ι k) ℚ)
+theorem component_aeval
+    {E : Type*} (w' : E → (K →₀ ℕ)) (yt : E → MvPolynomial (Σ k, ι k) ℚ)
     (hy : ∀ e, IsWeightedHomogeneous (blkWt (ι := ι)) (yt e) (w' e)) (H : MvPolynomial E ℚ)
-    (δ : K →₀ ℕ) :
-    weightedHomogeneousComponent (blkWt (ι := ι)) δ (aeval yt H) =
-      aeval yt (weightedHomogeneousComponent w' δ H) := by
+    (δ : K →₀ ℕ)
+    : weightedHomogeneousComponent (blkWt (ι := ι)) δ (aeval yt H)
+      = aeval yt (weightedHomogeneousComponent w' δ H) := by
   induction H using MvPolynomial.induction_on' with
   | monomial n c =>
     by_cases h : Finsupp.weight w' n = δ
     · subst h
       rw [(aeval_of_isWeightedHomogeneous_blkWt w' yt hy n c).weightedHomogeneousComponent_same,
         (isWeightedHomogeneous_monomial w' n c rfl).weightedHomogeneousComponent_same]
-    · rw [(aeval_of_isWeightedHomogeneous_blkWt w' yt hy n c).weightedHomogeneousComponent_ne δ (Ne.symm h),
+    · rw [(aeval_of_isWeightedHomogeneous_blkWt w' yt hy n c).weightedHomogeneousComponent_ne δ
+          (Ne.symm h),
         (isWeightedHomogeneous_monomial w' n c rfl).weightedHomogeneousComponent_ne δ (Ne.symm h),
         map_zero]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -104,9 +111,9 @@ variable (k0 : K)
 def sWt (r : ℕ) : Fin r ⊕ {k // k ≠ k0} → (K →₀ ℕ) :=
   Sum.elim (fun _ => oneK) (fun k' => Finsupp.single k'.1 1)
 
-theorem weight_sWt_apply {r : ℕ} (n : (Fin r ⊕ {k // k ≠ k0}) →₀ ℕ) (k : K) :
-    Finsupp.weight (sWt k0 r) n k =
-      (∑ j, n (Sum.inl j)) + (if h : k = k0 then 0 else n (Sum.inr ⟨k, h⟩)) := by
+theorem weight_sWt_apply {r : ℕ} (n : (Fin r ⊕ {k // k ≠ k0}) →₀ ℕ) (k : K)
+    : Finsupp.weight (sWt k0 r) n k
+      = (∑ j, n (Sum.inl j)) + (if h : k = k0 then 0 else n (Sum.inr ⟨k, h⟩)) := by
   classical
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finsupp.finsetSum_apply,
     Fintype.sum_sum_type]
@@ -125,24 +132,29 @@ theorem weight_sWt_apply {r : ℕ} (n : (Fin r ⊕ {k // k ≠ k0}) →₀ ℕ) 
         simp [sWt, Finsupp.single_apply, this]
       · simp
 
-theorem inr_eq_of_weight_eq {r : ℕ} {n n0 : (Fin r ⊕ {k // k ≠ k0}) →₀ ℕ}
-    (h : Finsupp.weight (sWt k0 r) n = Finsupp.weight (sWt k0 r) n0) (k' : {k // k ≠ k0}) :
-    n (Sum.inr k') = n0 (Sum.inr k') := by
+theorem inr_eq_of_weight_eq
+    {r : ℕ} {n n0 : (Fin r ⊕ {k // k ≠ k0}) →₀ ℕ}
+    (h : Finsupp.weight (sWt k0 r) n = Finsupp.weight (sWt k0 r) n0)
+    (k' : {k // k ≠ k0})
+    : n (Sum.inr k') = n0 (Sum.inr k') := by
   have h0 : Finsupp.weight (sWt k0 r) n k0 = Finsupp.weight (sWt k0 r) n0 k0 := by rw [h]
   have h1 : Finsupp.weight (sWt k0 r) n k'.1 = Finsupp.weight (sWt k0 r) n0 k'.1 := by rw [h]
   rw [weight_sWt_apply, weight_sWt_apply, dite_eq_left rfl, dite_eq_left rfl] at h0
-  rw [weight_sWt_apply, weight_sWt_apply, dite_eq_right k'.2, dite_eq_right k'.2, Subtype.coe_eta] at h1
+  rw [weight_sWt_apply, weight_sWt_apply, dite_eq_right k'.2, dite_eq_right k'.2, Subtype.coe_eta]
+    at h1
   omega
 
-theorem aeval_sumElim_factor {S : Type*} [CommRing S] [Algebra ℚ S] {r : ℕ}
-    {H : MvPolynomial (Fin r ⊕ {k // k ≠ k0}) ℚ} {δ : K →₀ ℕ}
-    (hH : IsWeightedHomogeneous (sWt k0 r) H δ) {n0 : (Fin r ⊕ {k // k ≠ k0}) →₀ ℕ}
-    (hn0 : n0 ∈ H.support) (a : Fin r → S) (b : {k // k ≠ k0} → S) :
-    aeval (Sum.elim a b) H = (∏ k', b k' ^ n0 (Sum.inr k')) * aeval (Sum.elim a 1) H := by
+theorem aeval_sumElim_factor
+    {S : Type*} [CommRing S] [Algebra ℚ S]
+    {r : ℕ} {H : MvPolynomial (Fin r ⊕ {k // k ≠ k0}) ℚ} {δ : K →₀ ℕ}
+    (hH : IsWeightedHomogeneous (sWt k0 r) H δ)
+    {n0 : (Fin r ⊕ {k // k ≠ k0}) →₀ ℕ} (hn0 : n0 ∈ H.support)
+    (a : Fin r → S) (b : {k // k ≠ k0} → S)
+    : aeval (Sum.elim a b) H = (∏ k', b k' ^ n0 (Sum.inr k')) * aeval (Sum.elim a 1) H := by
   classical
   have hw : ∀ n ∈ H.support, ∀ k', n (Sum.inr k') = n0 (Sum.inr k') := fun n hn k' =>
-    inr_eq_of_weight_eq k0
-      ((hH (mem_support_iff.mp hn)).trans (hH (mem_support_iff.mp hn0)).symm) k'
+    inr_eq_of_weight_eq k0 ((hH (mem_support_iff.mp hn)).trans (hH (mem_support_iff.mp hn0)).symm)
+      k'
   rw [aeval_def, aeval_def, eval₂_eq', eval₂_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun n hn => ?_
   rw [Fintype.prod_sum_type, Fintype.prod_sum_type]

@@ -16,14 +16,15 @@ noncomputable section
 
 def RegFixedBallMass.Statement : Prop :=
   ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (A : Matrix (Fin (d + 1)) (Fin n) ℂ)
-    (u : Fin n → ℂ) (R : ℝ),
-    J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ) → IsFiniteProjection J A →
-    linForm u ∉ J →
-      ∃ M : ℝ, ∀ ε ∈ Set.Ioc (0 : ℝ) 1,
+      (u : Fin n → ℂ) (R : ℝ),
+    J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ) → IsFiniteProjection J A
+      → linForm u ∉ J
+      → ∃ M : ℝ, ∀ ε ∈ Set.Ioc (0 : ℝ) 1,
         Integrable (chartDens J A ((Metric.closedBall 0 R).indicator fun _ => 1)
-            (vecCons (logReg u ε) fun _ => euclPot)) ∧
-          ∫ y, chartDens J A ((Metric.closedBall 0 R).indicator fun _ => 1)
-            (vecCons (logReg u ε) fun _ => euclPot) y ≤ M
+            (vecCons (logReg u ε) fun _ => euclPot))
+          ∧ ∫ y, chartDens J A ((Metric.closedBall 0 R).indicator fun _ => 1)
+              (vecCons (logReg u ε) fun _ => euclPot) y
+            ≤ M
 
 end
 

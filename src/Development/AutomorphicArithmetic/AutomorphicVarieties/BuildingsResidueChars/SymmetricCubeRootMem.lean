@@ -5,11 +5,13 @@ public import Mathlib.FieldTheory.Galois.Infinite
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
-open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
+open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd
+  UpperTheory.V.Sd.S3
 
-theorem UpperTheory.symmetric_cube_root_mem :
-    UpperTheory.V.Sd.S3.RootMem := by
+theorem UpperTheory.symmetric_cube_root_mem : UpperTheory.V.Sd.S3.RootMem := by
   intro l _ E a b c d x ha hb hc hd hb1 had hx hrel
   have hn : ∀ (σ : Qbar l ≃ₐ[ℚ_[l]] Qbar l) (y : Qbar l), ‖σ y‖ = ‖y‖ := by
     intro σ y
@@ -30,7 +32,9 @@ theorem UpperTheory.symmetric_cube_root_mem :
   have hlt : ‖a - d‖ < 1 := by
     rw [← norm_neg, neg_sub, ← heq, norm_mul]
     have hxy : ‖x + σ x‖ ≤ 1 := (IsUltrametricDist.norm_add_le_max x (σ x)).trans (max_le hx hyn)
-    calc ‖b‖ * ‖x + σ x‖ ≤ ‖b‖ * 1 := mul_le_mul_of_nonneg_left hxy (norm_nonneg _)
+    calc
+      ‖b‖ * ‖x + σ x‖
+        ≤ ‖b‖ * 1 := mul_le_mul_of_nonneg_left hxy (norm_nonneg _)
       _ < 1 := by rw [mul_one]; exact hb1
   rw [had] at hlt
   exact lt_irrefl _ hlt

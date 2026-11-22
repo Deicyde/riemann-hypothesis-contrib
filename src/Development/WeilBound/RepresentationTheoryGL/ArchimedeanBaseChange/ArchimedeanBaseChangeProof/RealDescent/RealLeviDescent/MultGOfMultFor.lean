@@ -12,6 +12,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RealKTyp
 namespace PositivityTheory.RgBcC.RealD
 
 theorem multG_of_multFor (hM : MultFor) : MultG :=
-  multG_of GlobalTheory.T.real_compression hM adm_least_holds GlobalTheory.T.real_first_nilpotent GlobalTheory.T.cone_no_second_weights GlobalTheory.T.real_model_exists GlobalTheory.T.real_k_types_in_cone
+  multG_of GlobalTheory.T.real_compression hM adm_least_holds GlobalTheory.T.real_first_nilpotent
+    GlobalTheory.T.cone_no_second_weights GlobalTheory.T.real_model_exists
+    GlobalTheory.T.real_k_types_in_cone
 
 end PositivityTheory.RgBcC.RealD

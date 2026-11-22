@@ -8,7 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LamGe
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -76,8 +80,8 @@ lemma negb_lt_v (i : Fin (R.k - 1)) (j : Fin R.m) : -P.b j < P.v i := by
 
 def entry : Fin (R.k - 1) ⊕ Fin R.m ⊕ (Fin R.m × Fin R.t) → ℚ
   | .inl i => P.v i
-  | .inr (.inl i) => -P.b i
-  | .inr (.inr (i, a)) => -P.e i + ((R.t : ℚ) - 1) / 2 - ((a : ℕ) : ℚ)
+  | .inr (.inl i) => - P.b i
+  | .inr (.inr (i, a)) => - P.e i + ((R.t : ℚ) - 1) / 2 - ((a : ℕ) : ℚ)
 
 lemma fin_bounds (a : Fin R.t) : (0 : ℚ) ≤ ((a : ℕ) : ℚ) ∧ ((a : ℕ) : ℚ) + 1 ≤ R.t :=
   ⟨by positivity, by exact_mod_cast a.2⟩
@@ -215,10 +219,15 @@ theorem lamLForced (D : D7) : Bridge.LamLForced D := by
     obtain ⟨e, he⟩ := (D.hc τ).e_int ⟨j - 1, hj⟩
     choose v hv using (D.hc τ).v_int
     choose b hb using (D.hc τ).b_int
-    let W : IndefiniteWeightData.WeightData :=
-      { k := D.R.k, m := D.R.m, t := D.R.t, j := j, e := e
-        v := fun n => if h : n - 2 < D.R.k - 1 then v ⟨n - 2, h⟩ else 0
-        b := fun n => if h : n - 1 < D.R.m then b ⟨n - 1, h⟩ else 0 }
+    let W : IndefiniteWeightData.WeightData := {
+      k := D.R.k
+      m := D.R.m
+      t := D.R.t
+      j := j
+      e := e
+      v := fun n => if h : n - 2 < D.R.k - 1 then v ⟨n - 2, h⟩ else 0
+      b := fun n => if h : n - 1 < D.R.m then b ⟨n - 1, h⟩ else 0
+    }
     have hWv : ∀ (n : ℕ) (h : n - 2 < D.R.k - 1), (W.v n : ℚ) = (D.hc τ).v ⟨n - 2, h⟩ := by
       intro n h
       simp only [W, dif_pos h, hv]
@@ -233,7 +242,8 @@ theorem lamLForced (D : D7) : Bridge.LamLForced D := by
         exact (D.hc τ).gap_be _
       · have hlt' : j < D.R.m := hlt
         rw [hWe, hWb (W.j + 1) hlt']
-        have := eb (D.hc τ) (i := ⟨j - 1, hj⟩) (j := ⟨j, hlt'⟩) (by rw [Fin.lt_def]; simp only; omega)
+        have :=
+          eb (D.hc τ) (i := ⟨j - 1, hj⟩) (j := ⟨j, hlt'⟩) (by rw [Fin.lt_def]; simp only; omega)
         change ((D.R.t : ℚ) + 3) / 2 ≤ (D.hc τ).b ⟨j, hlt'⟩ - _
         linarith
     have hH : W.Hyp := by
@@ -275,8 +285,19 @@ theorem lamLForced (D : D7) : Bridge.LamLForced D := by
       | succ d ih =>
         intro hd
         exact (hdom (i + d + 1) (by omega) (by omega)).trans (ih (by omega))
-    refine ⟨⟨z, ?_⟩, ⟨hj1, hj⟩, W, rfl, rfl, rfl, rfl, hWe, fun a => hWv (a + 2) a.2,
-      fun a => hWb (a + 1) a.2, fun i => (hz i).symm⟩
+    refine ⟨
+      ⟨z, ?_⟩,
+      ⟨hj1, hj⟩,
+      W,
+      rfl,
+      rfl,
+      rfl,
+      rfl,
+      hWe,
+      fun a => hWv (a + 2) a.2,
+      fun a => hWb (a + 1) a.2,
+      fun i => (hz i).symm
+    ⟩
     intro i i' hii
     rw [← Int.cast_le (R := ℚ), ← hz, ← hz]
     obtain ⟨d, hd⟩ := Nat.exists_eq_add_of_le (show (i : ℕ) ≤ i' from hii)
@@ -287,7 +308,7 @@ theorem lamLForced (D : D7) : Bridge.LamLForced D := by
   rw [dif_pos h]
   exact h.choose_spec
 
-theorem lam_forced : ∀ D : D7, Bridge.LamRForced (Ptw D) ∧ Bridge.LamLForced D :=
-  fun D => ⟨lamRForced D, lamLForced D⟩
+theorem lam_forced : ∀ D : D7, Bridge.LamRForced (Ptw D) ∧ Bridge.LamLForced D := fun D =>
+  ⟨lamRForced D, lamLForced D⟩
 
 end GlobalTheory.ForcedWeights

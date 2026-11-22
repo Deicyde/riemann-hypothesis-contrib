@@ -37,8 +37,7 @@ private lemma half_cont {X : Type*} [TopologicalSpace X] {t : ℝ} (ht0 : 0 ≤ 
   rw [norm_one, norm_mul, hnq, mul_one, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg ht0] at h'
   linarith
 
-theorem UpperTheory.Gal.Gen.densCont_pf :
-    UpperTheory.Gal.Gen.DensCont := by
+theorem UpperTheory.Gal.Gen.densCont_pf : UpperTheory.Gal.Gen.DensCont := by
   intro n t ht0 ht1
   have hinvc : ∀ i, Continuous fun θ : Fin n → UnitAddCircle => (((pt θ)⁻¹ i : ℂˣ) : ℂ) := by
     intro i

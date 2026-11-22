@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.PoitouTateD
 
 noncomputable section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global GroundTheory.LocalField
-  ReciprocityTheory.Gal Formalism.ConjugateSelfDual GlobalTheory.Published GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion PositivityTheory.LocalTateOrthogonality.Gcoh
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh GroundTheory.Global
+  GroundTheory.LocalField ReciprocityTheory.Gal Formalism.ConjugateSelfDual GlobalTheory.Published
+  GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion
+  PositivityTheory.LocalTateOrthogonality.Gcoh
 
 namespace PositivityTheory.Lit1.PTN
 
@@ -16,12 +18,13 @@ attribute [local instance 2000] Rep.hV2
 
 set_option maxSynthPendingDepth 1
 
-theorem exists_cocycle_of_dn {k G : Type} [CommRing k] [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] (A : Rep.{0} k G) [IsDiscreteRep A] {R M : Type} [CommRing R]
-    [AddCommGroup M] [Module R M] (rho : Representation R G M) (e : M →+ A.V)
-    (he : ∀ g m, e (rho g m) = A.ρ g (e m)) (f : (Fin 2 → G) → M)
-    (hlc : IsLocallyConstant fun s => e (f s)) (hdn : ∀ s, dn rho 2 f s = 0) :
-    ∃ x : cocycles A 2, ∀ s, cochainOf A (cocycleι A 2 x) s = e (f s) := by
+theorem exists_cocycle_of_dn
+    {k G : Type} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (A : Rep.{0} k G) [IsDiscreteRep A]
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (rho : Representation R G M) (e : M →+ A.V) (he : ∀ g m, e (rho g m) = A.ρ g (e m))
+    (f : (Fin 2 → G) → M) (hlc : IsLocallyConstant fun s => e (f s)) (hdn : ∀ s, dn rho 2 f s = 0)
+    : ∃ x : cocycles A 2, ∀ s, cochainOf A (cocycleι A 2 x) s = e (f s) := by
   have hd0 : (inhomogeneousCochains.d A 2).hom (fun s => e (f s)) = 0 := by
     refine (d_comp_homF rho A e he 2 f).trans ?_
     funext s
@@ -37,7 +40,6 @@ variable {Kf : FiniteSubfield} [NumberField Kf.1] [IsAlgClosure Kf.1 (AlgebraicC
       AlgebraicClosure ((v : HeightOneSpectrum (𝓞 Kf.1)).adicCompletion Kf.1)}
   {v : S} {A : ValuationSubring (AlgebraicClosure ℚ)}
   {ev : (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 Kf.1)).adicCompletion Kf.1) ≃ₐ[(v : HeightOneSpectrum (𝓞 Kf.1)).adicCompletion Kf.1] AlgebraicClosure ((v : HeightOneSpectrum (𝓞 Kf.1)).adicCompletion Kf.1)) ≃* Dec (F := Kf.1) A}
-
 
 set_option maxHeartbeats 1000000 in
 theorem exists_root_of_unity_preimage

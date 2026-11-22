@@ -9,14 +9,14 @@ open CategoryTheory CategoryTheory.Limits DirectSum MvPolynomial TensorProduct G
 
 namespace GlobalTheory
 
-theorem exists_sum_mul_of_mem_span_range_sq {S : Type} [CommRing S] {r : ℕ} (g : Fin r → S)
-    (x : S) (hx : x ∈ Ideal.span (Set.range g) * Ideal.span (Set.range g)) :
-    ∃ b : Fin r → Fin r → S, x = ∑ k, ∑ l, b k l * (g k * g l) := by
-
+theorem exists_sum_mul_of_mem_span_range_sq
+    {S : Type} [CommRing S]
+    {r : ℕ} (g : Fin r → S)
+    (x : S) (hx : x ∈ Ideal.span (Set.range g) * Ideal.span (Set.range g))
+    : ∃ b : Fin r → Fin r → S, x = ∑ k, ∑ l, b k l * (g k * g l) := by
   have hx' : x ∈ Ideal.span (Set.range fun p : Fin r × Fin r => g p.1 * g p.2) := by
     open Pointwise in
-    have hset : Set.range g * Set.range g =
-        Set.range fun p : Fin r × Fin r => g p.1 * g p.2 := by
+    have hset : Set.range g * Set.range g = Set.range fun p : Fin r × Fin r => g p.1 * g p.2 := by
       ext y
       simp [Set.mem_mul]
     open Pointwise in
@@ -26,8 +26,11 @@ theorem exists_sum_mul_of_mem_span_range_sq {S : Type} [CommRing S] {r : ℕ} (g
   rw [← hc, Fintype.sum_prod_type]
   simp only [smul_eq_mul]
 
-theorem exists_witnesses_of_formallySmooth_quotient :
-    ∀ (ι : Type) [Fintype ι] (R : Type) [CommRing R] (r : ℕ) (g : Fin r → MvPolynomial ι R), Algebra.FormallySmooth R (MvPolynomial ι R ⧸ Ideal.span (Set.range g)) → ∃ (a : ι → Fin r → MvPolynomial ι R) (b : Fin r → Fin r → Fin r → MvPolynomial ι R), ∀ j, aeval (fun i => X i + ∑ k, a i k * g k) (g j) = ∑ k, ∑ l, b j k l * (g k * g l) := by
+theorem exists_witnesses_of_formallySmooth_quotient
+    : ∀ (ι : Type) [Fintype ι] (R : Type) [CommRing R] (r : ℕ) (g : Fin r → MvPolynomial ι R),
+      Algebra.FormallySmooth R (MvPolynomial ι R ⧸ Ideal.span (Set.range g))
+        → ∃ (a : ι → Fin r → MvPolynomial ι R) (b : Fin r → Fin r → Fin r → MvPolynomial ι R), ∀ j,
+          aeval (fun i => X i + ∑ k, a i k * g k) (g j) = ∑ k, ∑ l, b j k l * (g k * g l) := by
   intro ι _ R _ r g hs
   set I : Ideal (MvPolynomial ι R) := Ideal.span (Set.range g) with hI
   have hsurj : Function.Surjective (Ideal.Quotient.mkₐ R I) := Ideal.Quotient.mkₐ_surjective R I
@@ -38,8 +41,8 @@ theorem exists_witnesses_of_formallySmooth_quotient :
     rw [RingHom.mem_ker]
     exact Ideal.Quotient.eq_zero_iff_mem
 
-  have hlift : ∀ i : ι, ∃ y : MvPolynomial ι R,
-      Ideal.Quotient.mk _ y = σ (Ideal.Quotient.mkₐ R I (X i)) :=
+  have hlift
+      : ∀ i : ι, ∃ y : MvPolynomial ι R, Ideal.Quotient.mk _ y = σ (Ideal.Quotient.mkₐ R I (X i)) :=
     fun i => Ideal.Quotient.mk_surjective _
   choose y hy using hlift
 
@@ -56,9 +59,10 @@ theorem exists_witnesses_of_formallySmooth_quotient :
     rw [this]
     ring
 
-  have hcomp : (Ideal.Quotient.mkₐ R _).comp
-      (aeval fun i => X i + ∑ k, a i k * g k : MvPolynomial ι R →ₐ[R] MvPolynomial ι R) =
-      σ.comp (Ideal.Quotient.mkₐ R I) := by
+  have hcomp
+      : (Ideal.Quotient.mkₐ R _).comp
+          (aeval fun i => X i + ∑ k, a i k * g k : MvPolynomial ι R →ₐ[R] MvPolynomial ι R)
+        = σ.comp (Ideal.Quotient.mkₐ R I) := by
     apply MvPolynomial.algHom_ext
     intro i
     rw [AlgHom.comp_apply, aeval_X, hy', AlgHom.comp_apply, ← hy i]
@@ -70,7 +74,8 @@ theorem exists_witnesses_of_formallySmooth_quotient :
       Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span ⟨j, rfl⟩)
     have h2 := AlgHom.congr_fun hcomp (g j)
     rw [AlgHom.comp_apply, AlgHom.comp_apply, hgj, map_zero, Ideal.Quotient.mkₐ_eq_mk,
-      Ideal.Quotient.eq_zero_iff_mem, hK, pow_two] at h2
+        Ideal.Quotient.eq_zero_iff_mem, hK, pow_two]
+      at h2
     exact h2
   choose b hb using fun j => exists_sum_mul_of_mem_span_range_sq g _ (hmem j)
   exact ⟨a, b, hb⟩

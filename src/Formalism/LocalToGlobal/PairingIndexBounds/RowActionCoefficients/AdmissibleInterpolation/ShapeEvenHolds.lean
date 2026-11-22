@@ -50,8 +50,10 @@ theorem lt_colH_iff (hν : Antitone ν) (k : ℕ) (t : Fin n) : t.val < colH ν 
 
 end Heights
 
-theorem card_fin_lt (c m : ℕ) (hm : m ≤ c) : (Finset.univ.filter fun k : Fin c => k.val < m).card = m := by
-  have e : (Finset.univ.filter fun k : Fin c => k.val < m).map Fin.valEmbedding = Finset.range m := by
+theorem card_fin_lt (c m : ℕ) (hm : m ≤ c)
+    : (Finset.univ.filter fun k : Fin c => k.val < m).card = m := by
+  have e
+      : (Finset.univ.filter fun k : Fin c => k.val < m).map Fin.valEmbedding = Finset.range m := by
     ext x
     simp only [Finset.mem_map, Finset.mem_filter, Finset.mem_univ, true_and, Fin.valEmbedding_apply,
       Finset.mem_range]
@@ -62,15 +64,17 @@ theorem card_fin_lt (c m : ℕ) (hm : m ≤ c) : (Finset.univ.filter fun k : Fin
       exact ⟨⟨x, by omega⟩, hx, rfl⟩
   rw [← Finset.card_map Fin.valEmbedding, e, Finset.card_range]
 
-theorem kap_antitone {n : ℕ} {μ : Fin n → ℕ} (hμ : Antitone μ) (c : ℕ) : Antitone fun t : Fin n => c - μ t.rev := by
+theorem kap_antitone {n : ℕ} {μ : Fin n → ℕ} (hμ : Antitone μ) (c : ℕ)
+    : Antitone fun t : Fin n => c - μ t.rev := by
   intro s t hst
   exact Nat.sub_le_sub_left (hμ (Fin.rev_le_rev.mpr hst)) c
 
-theorem colH_kap {n : ℕ} {μ : Fin n → ℕ} (c : ℕ) (hc : ∀ t, μ t ≤ c) (k : Fin c) :
-    n - colH μ k.val = colH (fun t : Fin n => c - μ t.rev) (Fin.rev k).val := by
+theorem colH_kap {n : ℕ} {μ : Fin n → ℕ} (c : ℕ) (hc : ∀ t, μ t ≤ c) (k : Fin c)
+    : n - colH μ k.val = colH (fun t : Fin n => c - μ t.rev) (Fin.rev k).val := by
   simp only [colH]
-  have e1 : (Finset.univ.filter fun t : Fin n => (Fin.rev k).val < c - μ t.rev).card =
-      (Finset.univ.filter fun s : Fin n => ¬ k.val < μ s).card := by
+  have e1
+      : (Finset.univ.filter fun t : Fin n => (Fin.rev k).val < c - μ t.rev).card
+        = (Finset.univ.filter fun s : Fin n => ¬ k.val < μ s).card := by
     refine Finset.card_bij (fun t _ => t.rev) ?_ ?_ ?_
     · intro t ht
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Fin.val_rev] at ht ⊢
@@ -85,27 +89,35 @@ theorem colH_kap {n : ℕ} {μ : Fin n → ℕ} (c : ℕ) (hc : ∀ t, μ t ≤ 
       have := hc s
       have := k.isLt
       omega
-  have hsub : (Finset.univ.filter fun s : Fin n => k.val < μ s) ⊆ Finset.univ := Finset.subset_univ _
+  have hsub : (Finset.univ.filter fun s : Fin n => k.val < μ s) ⊆ Finset.univ :=
+    Finset.subset_univ _
   have h2 := Finset.card_sdiff_add_card_eq_card hsub
-  have h3 : (Finset.univ.filter fun s : Fin n => ¬ k.val < μ s) =
-      Finset.univ \ (Finset.univ.filter fun s : Fin n => k.val < μ s) := by
+  have h3
+      : (Finset.univ.filter fun s : Fin n => ¬ k.val < μ s)
+        = Finset.univ \ (Finset.univ.filter fun s : Fin n => k.val < μ s) := by
     ext s
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_sdiff]
   rw [Finset.card_univ, Fintype.card_fin] at h2
   rw [h3] at e1
   omega
 
-theorem card_ge_eq {n K K' : ℕ} (sz : Fin K → ℕ) (sz' : Fin K' → ℕ) (hsz : ∀ k, sz k ≤ n) (hsz' : ∀ k, sz' k ≤ n)
-    (h : (shapeDeg sz : Fin n → ℕ) = shapeDeg sz') (l : ℕ) (hl : 0 < l) :
-    (Finset.univ.filter fun k => l ≤ sz k).card = (Finset.univ.filter fun k => l ≤ sz' k).card := by
+theorem card_ge_eq
+    {n K K' : ℕ} (sz : Fin K → ℕ) (sz' : Fin K' → ℕ) (hsz : ∀ k, sz k ≤ n) (hsz' : ∀ k, sz' k ≤ n)
+    (h : (shapeDeg sz : Fin n → ℕ) = shapeDeg sz')
+    (l : ℕ) (hl : 0 < l)
+    : (Finset.univ.filter fun k => l ≤ sz k).card
+      = (Finset.univ.filter fun k => l ≤ sz' k).card := by
   by_cases hln : l ≤ n
   · have e := congrFun h ⟨l - 1, by omega⟩
     simp only [shapeDeg] at e
-    have e1 : (Finset.univ.filter fun k => l ≤ sz k) = (Finset.univ.filter fun k => l - 1 < sz k) := by
+    have e1
+        : (Finset.univ.filter fun k => l ≤ sz k) = (Finset.univ.filter fun k => l - 1 < sz k) := by
       ext k
       simp only [Finset.mem_filter, Finset.mem_univ, true_and]
       constructor <;> intro <;> omega
-    have e2 : (Finset.univ.filter fun k => l ≤ sz' k) = (Finset.univ.filter fun k => l - 1 < sz' k) := by
+    have e2
+        : (Finset.univ.filter fun k => l ≤ sz' k)
+          = (Finset.univ.filter fun k => l - 1 < sz' k) := by
       ext k
       simp only [Finset.mem_filter, Finset.mem_univ, true_and]
       constructor <;> intro <;> omega
@@ -118,40 +130,48 @@ theorem card_ge_eq {n K K' : ℕ} (sz : Fin K → ℕ) (sz' : Fin K' → ℕ) (h
       Finset.filter_eq_empty_iff.mpr fun k _ => by have := hsz' k; omega
     rw [e1, e2, Finset.card_empty, Finset.card_empty]
 
-theorem card_eq_sub {K : ℕ} (sz : Fin K → ℕ) (l : ℕ) :
-    (Finset.univ.filter fun k => sz k = l).card =
-      (Finset.univ.filter fun k => l ≤ sz k).card - (Finset.univ.filter fun k => l + 1 ≤ sz k).card := by
-  have hsub : (Finset.univ.filter fun k => l + 1 ≤ sz k) ⊆ (Finset.univ.filter fun k => l ≤ sz k) := by
+theorem card_eq_sub {K : ℕ} (sz : Fin K → ℕ) (l : ℕ)
+    : (Finset.univ.filter fun k => sz k = l).card
+      = (Finset.univ.filter fun k => l ≤ sz k).card
+        - (Finset.univ.filter fun k => l + 1 ≤ sz k).card := by
+  have hsub
+      : (Finset.univ.filter fun k => l + 1 ≤ sz k) ⊆ (Finset.univ.filter fun k => l ≤ sz k) := by
     intro k
     simp only [Finset.mem_filter, Finset.mem_univ, true_and]
     omega
   have h2 := Finset.card_sdiff_add_card_eq_card hsub
-  have h3 : (Finset.univ.filter fun k => sz k = l) =
-      (Finset.univ.filter fun k => l ≤ sz k) \ (Finset.univ.filter fun k => l + 1 ≤ sz k) := by
+  have h3
+      : (Finset.univ.filter fun k => sz k = l)
+        = (Finset.univ.filter fun k => l ≤ sz k) \ (Finset.univ.filter fun k => l + 1 ≤ sz k) := by
     ext k
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_sdiff]
     constructor <;> intro <;> omega
   rw [h3]
   omega
 
-theorem card_eq_eq {n K K' : ℕ} (sz : Fin K → ℕ) (sz' : Fin K' → ℕ) (hsz : ∀ k, sz k ≤ n) (hsz' : ∀ k, sz' k ≤ n)
-    (h : (shapeDeg sz : Fin n → ℕ) = shapeDeg sz') (l : ℕ) (hl : 0 < l) :
-    Fintype.card {k' // sz' k' = l} = Fintype.card {k // sz k = l} := by
+theorem card_eq_eq
+    {n K K' : ℕ} (sz : Fin K → ℕ) (sz' : Fin K' → ℕ) (hsz : ∀ k, sz k ≤ n) (hsz' : ∀ k, sz' k ≤ n)
+    (h : (shapeDeg sz : Fin n → ℕ) = shapeDeg sz')
+    (l : ℕ) (hl : 0 < l)
+    : Fintype.card {k' // sz' k' = l} = Fintype.card {k // sz k = l} := by
   rw [Fintype.card_subtype, Fintype.card_subtype, card_eq_sub, card_eq_sub,
     card_ge_eq sz sz' hsz hsz' h l hl, card_ge_eq sz sz' hsz hsz' h (l + 1) (Nat.succ_pos l)]
 
-theorem initMinor_cast (B : Type) [CommRing B] {r n s s' : ℕ} (e : s = s') (J : Fin s → Fin r) (hs : s ≤ n)
-    (hs' : s' ≤ n) : initMinor B (n := n) (fun j : Fin s' => J (Fin.cast e.symm j)) hs' = initMinor B J hs := by
+theorem initMinor_cast
+    (B : Type) [CommRing B]
+    {r n s s' : ℕ} (e : s = s') (J : Fin s → Fin r) (hs : s ≤ n) (hs' : s' ≤ n)
+    : initMinor B (n := n) (fun j : Fin s' => J (Fin.cast e.symm j)) hs' = initMinor B J hs := by
   subst e
   rfl
 
-theorem initMinor_zero (B : Type) [CommRing B] {r n : ℕ} (J : Fin 0 → Fin r) (hs : 0 ≤ n) :
-    initMinor B (n := n) J hs = 1 := by
+theorem initMinor_zero (B : Type) [CommRing B] {r n : ℕ} (J : Fin 0 → Fin r) (hs : 0 ≤ n)
+    : initMinor B (n := n) J hs = 1 := by
   rw [initMinor]
   exact Matrix.det_isEmpty
 
-theorem initMinor_eq_one (B : Type) [CommRing B] {r n s : ℕ} (J : Fin s → Fin r) (hs : s ≤ n) (h0 : s = 0) :
-    initMinor B (n := n) J hs = 1 := by
+theorem initMinor_eq_one
+    (B : Type) [CommRing B] {r n s : ℕ} (J : Fin s → Fin r) (hs : s ≤ n) (h0 : s = 0)
+    : initMinor B (n := n) J hs = 1 := by
   subst h0
   exact initMinor_zero B J hs
 
@@ -192,17 +212,19 @@ theorem reorder_holds : Reorder := by
   classical
   have hE : ∀ l, 0 < l → Nonempty ({k' // sz' k' = l} ≃ {k // sz k = l}) := fun l hl =>
     ⟨Fintype.equivOfCardEq (card_eq_eq sz sz' hsz hsz' h l hl)⟩
-  let e : ∀ l, 0 < l → ({k' // sz' k' = l} ≃ {k // sz k = l}) := fun l hl => Classical.choice (hE l hl)
+  let e : ∀ l, 0 < l → ({k' // sz' k' = l} ≃ {k // sz k = l}) := fun l hl =>
+    Classical.choice (hE l hl)
   let I' : ∀ k', Fin (sz' k') → Fin r := fun k' =>
-    if hk : 0 < sz' k' then
-      fun j => I (e (sz' k') hk ⟨k', rfl⟩).1 (Fin.cast (e (sz' k') hk ⟨k', rfl⟩).2.symm j)
-    else fun j => absurd j.2 (by omega)
+    if hk : 0 < sz' k' then fun j =>
+      I (e (sz' k') hk ⟨k', rfl⟩).1 (Fin.cast (e (sz' k') hk ⟨k', rfl⟩).2.symm j)
+    else fun j =>
+      absurd j.2 (by omega)
   refine ⟨I', ?_⟩
   unfold bideterminant
-  have hmaps : ∀ k ∈ (Finset.univ : Finset (Fin K)), sz k ∈ Finset.range (n + 1) :=
-    fun k _ => Finset.mem_range.mpr (Nat.lt_succ_of_le (hsz k))
-  have hmaps' : ∀ k ∈ (Finset.univ : Finset (Fin K')), sz' k ∈ Finset.range (n + 1) :=
-    fun k _ => Finset.mem_range.mpr (Nat.lt_succ_of_le (hsz' k))
+  have hmaps : ∀ k ∈ (Finset.univ : Finset (Fin K)), sz k ∈ Finset.range (n + 1) := fun k _ =>
+    Finset.mem_range.mpr (Nat.lt_succ_of_le (hsz k))
+  have hmaps' : ∀ k ∈ (Finset.univ : Finset (Fin K')), sz' k ∈ Finset.range (n + 1) := fun k _ =>
+    Finset.mem_range.mpr (Nat.lt_succ_of_le (hsz' k))
   rw [← Finset.prod_fiberwise_of_maps_to hmaps, ← Finset.prod_fiberwise_of_maps_to hmaps']
   refine Finset.prod_congr rfl fun l _ => ?_
   rcases Nat.eq_zero_or_pos l with hl | hl
@@ -220,7 +242,9 @@ theorem reorder_holds : Reorder := by
     refine Fintype.prod_equiv (e l hl) _ _ fun x' => ?_
     obtain ⟨k', hk'⟩ := x'
     subst hk'
-    have hI : I' k' = fun j => I (e (sz' k') hl ⟨k', rfl⟩).1 (Fin.cast (e (sz' k') hl ⟨k', rfl⟩).2.symm j) :=
+    have hI
+        : I' k'
+          = fun j => I (e (sz' k') hl ⟨k', rfl⟩).1 (Fin.cast (e (sz' k') hl ⟨k', rfl⟩).2.symm j) :=
       dif_pos hl
     simp only
     rw [hI]

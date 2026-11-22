@@ -13,8 +13,8 @@ open CategoryTheory Limits Opposite AlgebraicGeometry
 
 universe u
 
-noncomputable def sectionLinear {X : Scheme.{u}} {P P' : X.Modules} (θ : P ⟶ P') :
-    Γ(P, ⊤) →ₗ[Γ(X, ⊤)] Γ(P', ⊤) where
+noncomputable def sectionLinear {X : Scheme.{u}} {P P' : X.Modules} (θ : P ⟶ P')
+    : Γ(P, ⊤) →ₗ[Γ(X, ⊤)] Γ(P', ⊤) where
   toFun := θ.app ⊤
   map_add' := map_add _
   map_smul' := Scheme.Modules.Hom.app_smul θ
@@ -24,9 +24,9 @@ noncomputable def sectionLinear {X : Scheme.{u}} {P P' : X.Modules} (θ : P ⟶ 
 
 def IsBaseChangeSection {T U : Scheme.{u}} (g : T ⟶ U) (N : U.Modules) : Prop :=
   ∀ (Q : Type u) [AddCommGroup Q] [Module Γ(T, ⊤) Q] (ψ : Γ(N, ⊤) →+ Q),
-    (∀ (a : Γ(U, ⊤)) (n : Γ(N, ⊤)), ψ (a • n) = g.appTop a • ψ n) →
-    ∃! ψ' : Γ((Scheme.Modules.pullback g).obj N, ⊤) →ₗ[Γ(T, ⊤)] Q,
-      ∀ n, ψ' (pullbackSection g N n) = ψ n
+    (∀ (a : Γ(U, ⊤)) (n : Γ(N, ⊤)), ψ (a • n) = g.appTop a • ψ n)
+      → ∃! ψ' : Γ((Scheme.Modules.pullback g).obj N, ⊤) →ₗ[Γ(T, ⊤)] Q,
+          ∀ n, ψ' (pullbackSection g N n) = ψ n
 
 lemma IsBaseChangeSection.comp {W T U : Scheme.{u}} {f : W ⟶ T} {g : T ⟶ U} {N : U.Modules}
     (hg : IsBaseChangeSection g N)
@@ -76,7 +76,6 @@ lemma bijective_map_of_isIso_counit {C D : Type*} [Category C] [Category D] {F :
     ⟨fun a b h => (cancel_epi _).mp h,
       fun b => ⟨inv (adj.counit.app X) ≫ b, by simp⟩⟩
 
-
 set_option backward.isDefEq.respectTransparency false in
 lemma existsUnique_hom_app_top {A : CommRingCat.{u}} (P P' : (Spec A).Modules)
     [IsIso P.fromTildeΓ] (f : Γ(P, ⊤) →ₗ[Γ(Spec A, ⊤)] Γ(P', ⊤)) :
@@ -113,17 +112,17 @@ lemma exists_modules_linearEquiv (R : CommRingCat.{u}) (Q : Type u) [AddCommGrou
     ⟨(Scheme.ΓSpecIso R).hom t, by simp⟩
   exact e.symm.map_smul r x
 
-noncomputable def pushforwardΓIso {A R : CommRingCat.{u}} (φ : A ⟶ R) :
-    moduleSpecΓFunctor (R := R) ⋙ ModuleCat.restrictScalars φ.hom ≅
-      Scheme.Modules.pushforward (Spec.map φ) ⋙ moduleSpecΓFunctor (R := A) :=
+noncomputable def pushforwardΓIso {A R : CommRingCat.{u}} (φ : A ⟶ R)
+    : moduleSpecΓFunctor (R := R) ⋙ ModuleCat.restrictScalars φ.hom
+      ≅ Scheme.Modules.pushforward (Spec.map φ) ⋙ moduleSpecΓFunctor (R := A) :=
   Iso.symm (Functor.isoWhiskerRight (pushforwardCompModulesSpecToSheafIso φ)
     (TopCat.Sheaf.forget _ _ ⋙ (evaluation _ _).obj (op ⊤)))
 
-noncomputable def pullbackTildeIso {A R : CommRingCat.{u}} (φ : A ⟶ R) :
-    tilde.functor A ⋙ Scheme.Modules.pullback (Spec.map φ) ≅
-      ModuleCat.extendScalars φ.hom ⋙ tilde.functor R :=
+noncomputable def pullbackTildeIso {A R : CommRingCat.{u}} (φ : A ⟶ R)
+    : tilde.functor A ⋙ Scheme.Modules.pullback (Spec.map φ)
+      ≅ ModuleCat.extendScalars φ.hom ⋙ tilde.functor R :=
   ((tilde.adjunction (R := A)).comp
-    (Scheme.Modules.pullbackPushforwardAdjunction (Spec.map φ))).leftAdjointUniq
+      (Scheme.Modules.pullbackPushforwardAdjunction (Spec.map φ))).leftAdjointUniq
     (((ModuleCat.extendRestrictScalarsAdj φ.hom).comp (tilde.adjunction (R := R))).ofNatIsoRight
       (pushforwardΓIso φ))
 
@@ -216,21 +215,26 @@ lemma isQuasicoherent_pullback_of_isIso {T U : Scheme.{u}} (g : T ⟶ U) [IsIso 
   (SheafOfModules.isQuasicoherent T.ringCatSheaf).prop_of_iso
     ((Scheme.Modules.restrictFunctorIsoPullback g).app N) inferInstance
 
-theorem existsUnique_pullbackSection {T U : Scheme.{u}} (g : T ⟶ U) [IsAffine T] [IsAffine U]
-    (N : U.Modules) [N.IsQuasicoherent] (Q : Type u) [AddCommGroup Q] [Module Γ(T, ⊤) Q]
-    (ψ : Γ(N, ⊤) →+ Q) (hψ : ∀ (a : Γ(U, ⊤)) (n : Γ(N, ⊤)), ψ (a • n) = g.appTop a • ψ n) :
-    ∃! ψ' : Γ((Scheme.Modules.pullback g).obj N, ⊤) →ₗ[Γ(T, ⊤)] Q,
-      ∀ n, ψ' (pullbackSection g N n) = ψ n := by
+theorem existsUnique_pullbackSection
+    {T U : Scheme.{u}} (g : T ⟶ U) [IsAffine T] [IsAffine U]
+    (N : U.Modules) [N.IsQuasicoherent]
+    (Q : Type u) [AddCommGroup Q] [Module Γ(T, ⊤) Q]
+    (ψ : Γ(N, ⊤) →+ Q) (hψ : ∀ (a : Γ(U, ⊤)) (n : Γ(N, ⊤)), ψ (a • n) = g.appTop a • ψ n)
+    : ∃! ψ' : Γ((Scheme.Modules.pullback g).obj N, ⊤) →ₗ[Γ(T, ⊤)] Q,
+        ∀ n, ψ' (pullbackSection g N n) = ψ n := by
   obtain ⟨φ, hφ⟩ : ∃ φ, Spec.map φ = T.isoSpec.inv ≫ g ≫ U.isoSpec.hom :=
     ⟨Spec.preimage _, Spec.map_preimage _⟩
   have hg : g = T.isoSpec.hom ≫ Spec.map φ ≫ U.isoSpec.inv := by simp [hφ]
   have key : IsBaseChangeSection g N := by
     rw [hg]
     have := isQuasicoherent_pullback_of_isIso U.isoSpec.inv N
-    have := (isQuasicoherent_iff_isIso_fromTildeΓ
-      ((Scheme.Modules.pullback U.isoSpec.inv).obj N)).mp inferInstance
-    exact IsBaseChangeSection.comp (IsBaseChangeSection.comp (isBaseChangeSection_of_isIso _ N)
-      (isBaseChangeSection_specMap φ _)) (isBaseChangeSection_of_isIso _ _)
+    have :=
+      (isQuasicoherent_iff_isIso_fromTildeΓ ((Scheme.Modules.pullback U.isoSpec.inv).obj N)).mp
+        inferInstance
+    exact IsBaseChangeSection.comp
+      (IsBaseChangeSection.comp (isBaseChangeSection_of_isIso _ N)
+        (isBaseChangeSection_specMap φ _))
+      (isBaseChangeSection_of_isIso _ _)
   exact key Q ψ hψ
 
 end GroundTheory.Arith.Etale

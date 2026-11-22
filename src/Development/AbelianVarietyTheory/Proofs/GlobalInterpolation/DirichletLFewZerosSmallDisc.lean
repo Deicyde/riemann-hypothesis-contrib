@@ -97,23 +97,32 @@ private lemma inv_re_ge_of_norm_sub_le {t r : ℝ} {w : ℂ} (hr : 0 < r) (hw : 
   rw [Complex.inv_re, div_le_div_iff₀ (by positivity) hpos, Complex.normSq_eq_norm_sq]
   nlinarith [mul_le_mul hznorm hznorm (norm_nonneg _) (by positivity : (0 : ℝ) ≤ 2 * r)]
 
-
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 open scoped Classical in
-theorem _root_.GlobalTheory.SmallDiscZeros.few_zeros : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (t r : ℝ), (χ ≠ 1 ∨ 2 ≤ |t|) → 0 < r → r ≤ 1 / 2 → (_root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r).Finite ∧ (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r, (_root_.GlobalTheory.Lin.ord χ w : ℝ)) ≤ C * (1 + r * Real.log (q * (|t| + 2))) := by
+theorem _root_.GlobalTheory.SmallDiscZeros.few_zeros
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (t r : ℝ),
+          (χ ≠ 1 ∨ 2 ≤ |t|) → 0 < r → r ≤ 1 / 2
+            → (_root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r).Finite
+              ∧ (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r, (_root_.GlobalTheory.Lin.ord χ w : ℝ))
+                ≤ C * (1 + r * Real.log (q * (|t| + 2))) := by
   obtain ⟨C, hC, hmain⟩ := _root_.GlobalTheory.LogDerivHigher.main
   refine ⟨6 + 4 * C, by positivity, ?_⟩
   intro q _ χ t r hχt hr hr2
   have hσ1 : 1 < 1 + r := by linarith
   have hσ2 : 1 + r ≤ 2 := by linarith
   have hq : (1 : ℝ) ≤ q := Nat.one_le_cast.mpr (Nat.pos_of_ne_zero (NeZero.ne q))
-  have hL0 : 0 ≤ Real.log (q * (|t| + 2)) :=
-    Real.log_nonneg (by nlinarith [abs_nonneg t])
-  have hTS : _root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r ⊆ _root_.GlobalTheory.Lin.zerosDisc χ (2 + t * I) 3 := by
+  have hL0 : 0 ≤ Real.log (q * (|t| + 2)) := Real.log_nonneg (by nlinarith [abs_nonneg t])
+  have hTS
+      : _root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r
+        ⊆ _root_.GlobalTheory.Lin.zerosDisc χ (2 + t * I) 3 := by
     intro w hw
     simp only [_root_.GlobalTheory.Lin.zerosDisc, Set.mem_setOf_eq] at hw ⊢
     refine ⟨?_, hw.2⟩
-    calc ‖w - (2 + t * I)‖ = ‖(w - (1 + t * I)) - 1‖ := by ring_nf
+    calc
+      ‖w - (2 + t * I)‖
+        = ‖(w - (1 + t * I)) - 1‖ := by ring_nf
       _ ≤ ‖w - (1 + t * I)‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _
       _ ≤ 3 := by rw [norm_one]; linarith [hw.1]
   obtain ⟨hfin, -, hbound⟩ := hmain q χ (1 + r) t 0 hσ1 hσ2
@@ -126,9 +135,11 @@ theorem _root_.GlobalTheory.SmallDiscZeros.few_zeros : ∃ C : ℝ, 0 < C ∧ �
     have hP : (1 : ℂ) / (((1 + r : ℝ) : ℂ) + (0 : ℝ) * I - 1) ^ (0 + 1) = ((1 / r : ℝ) : ℂ) := by
       push_cast; ring
     rw [hP] at hbound₁
-    have hZ₁ : 0 ≤ (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc (1 : DirichletCharacter ℂ 1) (2 + (0 : ℝ) * I) 3,
-        ((_root_.GlobalTheory.Lin.ord (1 : DirichletCharacter ℂ 1) w : ℕ) : ℂ) /
-          (((1 + r : ℝ) : ℂ) + (0 : ℝ) * I - w) ^ (0 + 1)).re := by
+    have hZ₁
+        : 0
+          ≤ (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc (1 : DirichletCharacter ℂ 1) (2 + (0 : ℝ) * I) 3,
+              ((_root_.GlobalTheory.Lin.ord (1 : DirichletCharacter ℂ 1) w : ℕ) : ℂ) /
+                (((1 + r : ℝ) : ℂ) + (0 : ℝ) * I - w) ^ (0 + 1)).re := by
       rw [finsum_mem_eq_finite_toFinset_sum _ hfin₁, Complex.re_sum]
       refine Finset.sum_nonneg fun w hw ↦ ?_
       rw [re_natCast_div_pow_zero_add_one]
@@ -149,19 +160,22 @@ theorem _root_.GlobalTheory.SmallDiscZeros.few_zeros : ∃ C : ℝ, 0 < C ∧ �
     intro X Y W B h
     have hW : W = ((X - Y) + W) - X + Y := by ring
     rw [hW]
-    calc ‖((X - Y) + W) - X + Y‖ ≤ ‖(X - Y) + W‖ + ‖X‖ + ‖Y‖ := by
-          refine (norm_add_le _ _).trans ?_
-          gcongr
-          exact norm_sub_le _ _
+    calc
+      ‖((X - Y) + W) - X + Y‖ ≤ ‖(X - Y) + W‖ + ‖X‖ + ‖Y‖ := by
+        refine (norm_add_le _ _).trans ?_
+        gcongr
+        exact norm_sub_le _ _
       _ ≤ B + ‖X‖ + ‖Y‖ := by linarith
   have hZnorm := key _ _ _ _ hbound
   rw [pow_zero, div_one] at hZnorm
   have hre : (((1 + r : ℝ) : ℂ) + t * I).re = 1 + r := by simp
-  have hA := norm_derSeries_le_tsum_vonMangoldt χ (s := ((1 + r : ℝ) : ℂ) + t * I) (by rw [hre]; exact hσ1)
+  have hA :=
+    norm_derSeries_le_tsum_vonMangoldt χ (s := ((1 + r : ℝ) : ℂ) + t * I) (by rw [hre]; exact hσ1)
   rw [hre] at hA
-  have hZn : ‖∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (2 + t * I) 3,
-      ((_root_.GlobalTheory.Lin.ord χ w : ℕ) : ℂ) / (((1 + r : ℝ) : ℂ) + t * I - w) ^ (0 + 1)‖ ≤
-      C * Real.log (q * (|t| + 2)) + G + 1 := by
+  have hZn
+      : ‖∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (2 + t * I) 3,
+          ((_root_.GlobalTheory.Lin.ord χ w : ℕ) : ℂ) / (((1 + r : ℝ) : ℂ) + t * I - w) ^ (0 + 1)‖
+        ≤ C * Real.log (q * (|t| + 2)) + G + 1 := by
     split_ifs at hZnorm with h1
     · have ht : 2 ≤ |t| := hχt.resolve_left (not_not.mpr h1)
       have him : |t| ≤ ‖((1 + r : ℝ) : ℂ) + t * I - 1‖ := by
@@ -173,25 +187,28 @@ theorem _root_.GlobalTheory.SmallDiscZeros.few_zeros : ∃ C : ℝ, 0 < C ∧ �
       linarith
     · rw [norm_zero] at hZnorm
       linarith
-  have hZre : (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r, (_root_.GlobalTheory.Lin.ord χ w : ℝ)) *
-      (1 / (4 * r)) ≤ (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (2 + t * I) 3,
-      ((_root_.GlobalTheory.Lin.ord χ w : ℕ) : ℂ) / (((1 + r : ℝ) : ℂ) + t * I - w) ^ (0 + 1)).re := by
-    rw [finsum_mem_eq_finite_toFinset_sum _ hTfin, Finset.sum_mul,
-      finsum_mem_eq_finite_toFinset_sum _ hfin, Complex.re_sum]
-    refine (Finset.sum_le_sum fun w hw ↦ ?_).trans
-      (Finset.sum_le_sum_of_subset_of_nonneg (Set.Finite.toFinset_subset_toFinset.mpr hTS)
-        fun w hw _ ↦ ?_)
-    · rw [re_natCast_div_pow_zero_add_one]
-      have hw' := (Set.Finite.mem_toFinset hTfin).mp hw
-      refine mul_le_mul_of_nonneg_left (inv_re_ge_of_norm_sub_le hr ?_ (re_lt_one_of_mem_zerosDisc hw'))
-        (Nat.cast_nonneg _)
-      simp only [_root_.GlobalTheory.Lin.zerosDisc, Set.mem_setOf_eq] at hw'
-      exact hw'.1
-    · rw [re_natCast_div_pow_zero_add_one]
-      have hw' := re_lt_one_of_mem_zerosDisc ((Set.Finite.mem_toFinset hfin).mp hw)
-      refine mul_nonneg (Nat.cast_nonneg _) (inv_re_nonneg_of_re_nonneg ?_)
-      simp
-      linarith
+  have hZre
+      : (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r, (_root_.GlobalTheory.Lin.ord χ w : ℝ))
+          * (1 / (4 * r))
+        ≤ (∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (2 + t * I) 3,
+            ((_root_.GlobalTheory.Lin.ord χ w : ℕ) : ℂ) / (((1 + r : ℝ) : ℂ) + t * I - w) ^ (0 + 1)).re :=
+    by
+      rw [finsum_mem_eq_finite_toFinset_sum _ hTfin, Finset.sum_mul,
+        finsum_mem_eq_finite_toFinset_sum _ hfin, Complex.re_sum]
+      refine (Finset.sum_le_sum fun w hw ↦ ?_).trans
+        (Finset.sum_le_sum_of_subset_of_nonneg (Set.Finite.toFinset_subset_toFinset.mpr hTS)
+          fun w hw _ ↦ ?_)
+      · rw [re_natCast_div_pow_zero_add_one]
+        have hw' := (Set.Finite.mem_toFinset hTfin).mp hw
+        refine mul_le_mul_of_nonneg_left
+          (inv_re_ge_of_norm_sub_le hr ?_ (re_lt_one_of_mem_zerosDisc hw')) (Nat.cast_nonneg _)
+        simp only [_root_.GlobalTheory.Lin.zerosDisc, Set.mem_setOf_eq] at hw'
+        exact hw'.1
+      · rw [re_natCast_div_pow_zero_add_one]
+        have hw' := re_lt_one_of_mem_zerosDisc ((Set.Finite.mem_toFinset hfin).mp hw)
+        refine mul_nonneg (Nat.cast_nonneg _) (inv_re_nonneg_of_re_nonneg ?_)
+        simp
+        linarith
   set N := ∑ᶠ w ∈ _root_.GlobalTheory.Lin.zerosDisc χ (1 + t * I) r, (_root_.GlobalTheory.Lin.ord χ w : ℝ) with hN
   set L := Real.log (q * (|t| + 2)) with hL
   have h1 : N * (1 / (4 * r)) ≤ C * L + G + 1 := hZre.trans ((Complex.re_le_norm _).trans hZn)

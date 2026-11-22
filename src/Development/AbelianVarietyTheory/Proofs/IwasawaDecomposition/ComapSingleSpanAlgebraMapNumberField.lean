@@ -9,11 +9,11 @@ open scoped BigOperators
 
 namespace GlobalTheory
 
-theorem exists_integral_dual_family (E M : Type) [Field E] [NumberField E] [Field M]
-    [NumberField M] [Algebra E M] :
-    ∃ (k : ℕ) (b : Fin k → 𝓞 M) (l : Fin k → M →ₗ[E] E),
-      (∀ j (c : 𝓞 M), ∃ a : 𝓞 E, l j (c : M) = (a : E)) ∧
-      ∀ y : M, y = ∑ j, (b j : M) * algebraMap E M (l j y) := by
+theorem exists_integral_dual_family
+    (E M : Type) [Field E] [NumberField E] [Field M] [NumberField M] [Algebra E M]
+    : ∃ (k : ℕ) (b : Fin k → 𝓞 M) (l : Fin k → M →ₗ[E] E),
+      (∀ j (c : 𝓞 M), ∃ a : 𝓞 E, l j (c : M) = (a : E))
+        ∧ ∀ y : M, y = ∑ j, (b j : M) * algebraMap E M (l j y) := by
   haveI : Module.Finite (𝓞 E) (𝓞 M) := inferInstance
   haveI : Module.Flat (𝓞 E) (𝓞 M) := inferInstance
   haveI : Module.FinitePresentation (𝓞 E) (𝓞 M) := Module.finitePresentation_of_finite _ _
@@ -55,7 +55,8 @@ theorem exists_integral_dual_family (E M : Type) [Field E] [NumberField E] [Fiel
     rw [hl, Algebra.smul_def, map_mul, mul_comm, ← IsScalarTower.algebraMap_apply]
     rfl
   intro y
-  obtain ⟨⟨c, a⟩, ha⟩ := IsLocalizedModule.surj (nonZeroDivisors (𝓞 E))
+  obtain ⟨⟨c, a⟩, ha⟩ :=
+    IsLocalizedModule.surj (nonZeroDivisors (𝓞 E))
       (IsScalarTower.toAlgHom (𝓞 E) (𝓞 M) M).toLinearMap y
   have ha' : ((a : 𝓞 E) : E) • y = (c : M) := by
     have : (a : 𝓞 E) • y = (c : M) := ha
@@ -73,17 +74,22 @@ theorem exists_integral_dual_family (E M : Type) [Field E] [NumberField E] [Fiel
   rw [map_smul, smul_eq_mul, map_mul, Algebra.smul_def]
   ring
 
-theorem comap_single_span_algebraMap (E M : Type) [Field E] [NumberField E] [Field M]
-    [NumberField M] [Algebra E M] (ι : Type) [Fintype ι] [DecidableEq ι] (S : Set (ι → E)) (τ : ι) :
-    (Submodule.span (𝓞 M) ((fun (v : ι → E) (i : ι) => algebraMap E M (v i)) '' S)).comap
-      (LinearMap.single (𝓞 M) (fun _ : ι => M) τ) =
-    Submodule.span (𝓞 M) (algebraMap E M '' ((Submodule.span (𝓞 E) S).comap
-      (LinearMap.single (𝓞 E) (fun _ : ι => E) τ) : Set E)) := by
+theorem comap_single_span_algebraMap
+    (E M : Type) [Field E] [NumberField E] [Field M] [NumberField M] [Algebra E M]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (S : Set (ι → E)) (τ : ι)
+    : (Submodule.span (𝓞 M) ((fun (v : ι → E) (i : ι) => algebraMap E M (v i)) '' S)).comap
+        (LinearMap.single (𝓞 M) (fun _ : ι => M) τ)
+      = Submodule.span (𝓞 M)
+        (algebraMap E M
+          '' ((Submodule.span (𝓞 E) S).comap (LinearMap.single (𝓞 E) (fun _ : ι => E) τ)
+            : Set E)) := by
   apply le_antisymm
   · obtain ⟨k, b, l, hl, hy⟩ := exists_integral_dual_family E M
-    have key : ∀ j, ∀ w ∈ Submodule.span (𝓞 M)
-        ((fun (v : ι → E) (i : ι) => algebraMap E M (v i)) '' S), ∀ c : 𝓞 M,
-        (fun i => l j ((c : M) * w i)) ∈ Submodule.span (𝓞 E) S := by
+    have key
+        : ∀ j, ∀ w ∈ Submodule.span (𝓞 M) ((fun (v : ι → E) (i : ι) => algebraMap E M (v i)) '' S),
+          ∀ c : 𝓞 M,
+            (fun i => l j ((c : M) * w i)) ∈ Submodule.span (𝓞 E) S := by
       intro j w hw
       induction hw using Submodule.span_induction with
       | mem x hx =>
@@ -99,22 +105,25 @@ theorem comap_single_span_algebraMap (E M : Type) [Field E] [NumberField E] [Fie
       | zero =>
         intro c
         have : (fun i => l j ((c : M) * (0 : ι → M) i)) = 0 := by ext i; simp
-        rw [this]; exact Submodule.zero_mem _
+        rw [this]
+        exact Submodule.zero_mem _
       | add x y _ _ hx hy =>
         intro c
-        have : (fun i => l j ((c : M) * (x + y) i)) =
-            (fun i => l j ((c : M) * x i)) + (fun i => l j ((c : M) * y i)) := by
+        have : (fun i => l j ((c : M) * (x + y) i))
+            = (fun i => l j ((c : M) * x i)) + (fun i => l j ((c : M) * y i)) := by
           ext i; simp [mul_add]
-        rw [this]; exact Submodule.add_mem _ (hx c) (hy c)
+        rw [this]
+        exact Submodule.add_mem _ (hx c) (hy c)
       | smul a x _ hx =>
         intro c
-        have : (fun i => l j ((c : M) * (a • x) i)) =
-            (fun i => l j (((c * a : 𝓞 M) : M) * x i)) := by
+        have : (fun i => l j ((c : M) * (a • x) i))
+            = (fun i => l j (((c * a : 𝓞 M) : M) * x i)) := by
           ext i
           congr 1
           rw [Pi.smul_apply, Algebra.smul_def, ← mul_assoc]
           simp
-        rw [this]; exact hx _
+        rw [this]
+        exact hx _
     intro s hs
     rw [hy s]
     refine Submodule.sum_mem _ fun j _ => ?_
@@ -130,26 +139,31 @@ theorem comap_single_span_algebraMap (E M : Type) [Field E] [NumberField E] [Fie
     · simp [h]
   · rw [Submodule.span_le]
     rintro _ ⟨s, hs, rfl⟩
-    have key : ∀ v ∈ Submodule.span (𝓞 E) S, (fun i => algebraMap E M (v i)) ∈
-        Submodule.span (𝓞 M) ((fun (v : ι → E) (i : ι) => algebraMap E M (v i)) '' S) := by
+    have key
+        : ∀ v ∈ Submodule.span (𝓞 E) S,
+          (fun i => algebraMap E M (v i))
+            ∈ Submodule.span (𝓞 M) ((fun (v : ι → E) (i : ι) => algebraMap E M (v i)) '' S) := by
       intro v hv
       induction hv using Submodule.span_induction with
       | mem x hx => exact Submodule.subset_span ⟨x, hx, rfl⟩
       | zero =>
         have : (fun i => algebraMap E M ((0 : ι → E) i)) = 0 := by ext i; simp
-        rw [this]; exact Submodule.zero_mem _
+        rw [this]
+        exact Submodule.zero_mem _
       | add x y _ _ hx hy =>
-        have : (fun i => algebraMap E M ((x + y) i)) =
-            (fun i => algebraMap E M (x i)) + (fun i => algebraMap E M (y i)) := by
+        have : (fun i => algebraMap E M ((x + y) i))
+            = (fun i => algebraMap E M (x i)) + (fun i => algebraMap E M (y i)) := by
           ext i; simp
-        rw [this]; exact Submodule.add_mem _ hx hy
+        rw [this]
+        exact Submodule.add_mem _ hx hy
       | smul a x _ hx =>
-        have : (fun i => algebraMap E M ((a • x) i)) =
-            algebraMap (𝓞 E) (𝓞 M) a • (fun i => algebraMap E M (x i)) := by
+        have : (fun i => algebraMap E M ((a • x) i))
+            = algebraMap (𝓞 E) (𝓞 M) a • (fun i => algebraMap E M (x i)) := by
           ext i
           rw [Pi.smul_apply, Pi.smul_apply, Algebra.smul_def, Algebra.smul_def, map_mul,
             ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
-        rw [this]; exact Submodule.smul_mem _ _ hx
+        rw [this]
+        exact Submodule.smul_mem _ _ hx
     have h2 := key _ hs
     rw [SetLike.mem_coe, Submodule.mem_comap]
     convert h2 using 1

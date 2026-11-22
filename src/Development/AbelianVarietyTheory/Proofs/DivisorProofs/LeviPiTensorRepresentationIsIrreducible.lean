@@ -10,21 +10,26 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Central
 
 @[expose] public section
 
-open CategoryTheory Polynomial Formalism.IrreducibleCountingLemmas.TYPES Formalism.L2.DIV GlobalTheory.HcIrr
+open CategoryTheory Polynomial Formalism.IrreducibleCountingLemmas.TYPES Formalism.L2.DIV
+  GlobalTheory.HcIrr
 
 namespace GlobalTheory.HcIrr
 
 section General
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {V : ι → Type} [∀ i, AddCommGroup (V i)]
-  [∀ i, Module ℂ (V i)]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {V : ι → Type} [∀ i, AddCommGroup (V i)] [∀ i, Module ℂ (V i)]
 
-theorem map_mem_of_position_stable (W : Submodule ℂ (PiTensorProduct ℂ V))
-    (h : ∀ (c : ι) (f : V c →ₗ[ℂ] V c), ∀ x ∈ W, PiTensorProduct.map
-      (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) c f) x ∈ W)
-    (f : ∀ i, V i →ₗ[ℂ] V i) : ∀ x ∈ W, PiTensorProduct.map f x ∈ W := by
-  suffices H : ∀ S : Finset ι, ∀ x ∈ W,
-      PiTensorProduct.map (fun c => if c ∈ S then f c else LinearMap.id) x ∈ W by
+theorem map_mem_of_position_stable
+    (W : Submodule ℂ (PiTensorProduct ℂ V))
+    (h : ∀ (c : ι) (f : V c →ₗ[ℂ] V c), ∀ x ∈ W,
+      PiTensorProduct.map (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) c f) x ∈ W)
+    (f : ∀ i, V i →ₗ[ℂ] V i)
+    : ∀ x ∈ W, PiTensorProduct.map f x ∈ W := by
+  suffices H
+      : ∀ S : Finset ι, ∀ x ∈ W,
+        PiTensorProduct.map (fun c => if c ∈ S then f c else LinearMap.id) x ∈ W by
     intro x hx
     simpa using H Finset.univ x hx
   intro S
@@ -34,9 +39,11 @@ theorem map_mem_of_position_stable (W : Submodule ℂ (PiTensorProduct ℂ V))
     simpa [PiTensorProduct.map_id] using hx
   | insert a S ha ih =>
     intro x hx
-    have e : (fun c => if c ∈ insert a S then f c else (LinearMap.id : V c →ₗ[ℂ] V c)) = fun c =>
-        (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) a (f a)) c ∘ₗ
-          (if c ∈ S then f c else LinearMap.id) := by
+    have e
+        : (fun c => if c ∈ insert a S then f c else (LinearMap.id : V c →ₗ[ℂ] V c))
+          = fun c =>
+            (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) a (f a)) c
+              ∘ₗ (if c ∈ S then f c else LinearMap.id) := by
       funext c
       by_cases hc : c = a
       · subst hc
@@ -45,12 +52,17 @@ theorem map_mem_of_position_stable (W : Submodule ℂ (PiTensorProduct ℂ V))
     rw [e, PiTensorProduct.map_comp]
     exact h a (f a) _ (ih x hx)
 
-theorem position_stable_of_span {c : ι} {G : Type} [Group G] (ρ : Representation ℂ G (V c))
-    (hs : Submodule.span ℂ (Set.range ρ) = ⊤) (W : Submodule ℂ (PiTensorProduct ℂ V))
-    (h : ∀ g : G, ∀ x ∈ W, PiTensorProduct.map
-      (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) c (ρ g)) x ∈ W)
-    (f : V c →ₗ[ℂ] V c) : ∀ x ∈ W, PiTensorProduct.map
-      (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) c f) x ∈ W := by
+theorem position_stable_of_span
+    {c : ι} {G : Type} [Group G]
+    (ρ : Representation ℂ G (V c)) (hs : Submodule.span ℂ (Set.range ρ) = ⊤)
+    (W : Submodule ℂ (PiTensorProduct ℂ V))
+    (h : ∀ g : G, ∀ x ∈ W,
+      PiTensorProduct.map (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) c (ρ g)) x
+        ∈ W)
+    (f : V c →ₗ[ℂ] V c)
+    : ∀ x ∈ W,
+      PiTensorProduct.map (Function.update (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) c f) x
+        ∈ W := by
   have hf : f ∈ Submodule.span ℂ (Set.range ρ) := hs ▸ Submodule.mem_top
   induction hf using Submodule.span_induction with
   | mem f hf =>
@@ -58,8 +70,10 @@ theorem position_stable_of_span {c : ι} {G : Type} [Group G] (ρ : Representati
     exact h g
   | zero =>
     intro x _
-    have := PiTensorProduct.map_update_smul (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c')) c (0 : ℂ)
-      LinearMap.id
+    have :=
+      PiTensorProduct.map_update_smul
+        (fun c' => (LinearMap.id : V c' →ₗ[ℂ] V c'))
+        c (0 : ℂ) LinearMap.id
     rw [zero_smul, zero_smul] at this
     rw [this]
     simp
@@ -72,9 +86,11 @@ theorem position_stable_of_span {c : ι} {G : Type} [Group G] (ρ : Representati
     rw [PiTensorProduct.map_update_smul, LinearMap.smul_apply]
     exact W.smul_mem _ (hu x hx)
 
-theorem eq_bot_or_top_of_map_stable [∀ i, FiniteDimensional ℂ (V i)]
+theorem eq_bot_or_top_of_map_stable
+    [∀ i, FiniteDimensional ℂ (V i)]
     (W : Submodule ℂ (PiTensorProduct ℂ V))
-    (h : ∀ f : ∀ i, V i →ₗ[ℂ] V i, ∀ x ∈ W, PiTensorProduct.map f x ∈ W) : W = ⊥ ∨ W = ⊤ := by
+    (h : ∀ f : ∀ i, V i →ₗ[ℂ] V i, ∀ x ∈ W, PiTensorProduct.map f x ∈ W)
+    : W = ⊥ ∨ W = ⊤ := by
   by_cases hW : W = ⊥
   · exact Or.inl hW
   right
@@ -96,7 +112,8 @@ theorem eq_bot_or_top_of_map_stable [∀ i, FiniteDimensional ℂ (V i)]
       have hq : (∏ c, if p c = I c then (1 : ℂ) else 0) = if p = I then 1 else 0 := by
         rw [Finset.prod_ite_zero]
         simp [funext_iff]
-      rw [LinearMap.smulRight_apply, Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_apply]
+      rw [LinearMap.smulRight_apply, Module.Basis.coord_apply, Module.Basis.repr_self,
+        Finsupp.single_apply]
       simp only [B, Basis.piTensorProduct_apply, PiTensorProduct.map_tprod, hc,
         MultilinearMap.map_smul_univ, RingHom.id_apply, hq]
     have hm := h f x hx
@@ -106,28 +123,34 @@ theorem eq_bot_or_top_of_map_stable [∀ i, FiniteDimensional ℂ (V i)]
   rw [← B.span_eq]
   exact Submodule.span_le.2 (by rintro _ ⟨J, rfl⟩; exact hJ J)
 
-theorem nontrivial_piTensorProduct [∀ i, FiniteDimensional ℂ (V i)] [∀ i, Nontrivial (V i)] :
-    Nontrivial (PiTensorProduct ℂ V) := by
+theorem nontrivial_piTensorProduct [∀ i, FiniteDimensional ℂ (V i)] [∀ i, Nontrivial (V i)]
+    : Nontrivial (PiTensorProduct ℂ V) := by
   let B := Basis.piTensorProduct fun c => Module.finBasis ℂ (V c)
   exact ⟨B fun c => ⟨0, Module.finrank_pos⟩, 0, B.ne_zero _⟩
 
 end General
 
-theorem leviTensor_isIrreducible : ∀ (K : Type) [Field K] [Fintype K] [DecidableEq K] (r s : ℕ)
-    (b : Fin r → Fin s) (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)),
-    (∀ c, Simple (lam c)) → (leviTensor b lam).IsIrreducible := by
+theorem leviTensor_isIrreducible
+    : ∀ (K : Type) [Field K] [Fintype K] [DecidableEq K] (r s : ℕ) (b : Fin r → Fin s)
+        (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)),
+      (∀ c, Simple (lam c)) → (leviTensor b lam).IsIrreducible := by
   intro K _ _ _ r s b lam hs
   have hirr := fun c => GlobalTheory.SerOSys.ZSum.isIrreducible_of_simple (lam c) (hs c)
-  have hspan := fun c => GlobalTheory.ClassFin.span_range_eq_top_of_isIrreducible _ _ (lam c).ρ (hirr c)
+  have hspan := fun c =>
+    GlobalTheory.ClassFin.span_range_eq_top_of_isIrreducible _ _ (lam c).ρ (hirr c)
   haveI : ∀ c, Nontrivial (lam c : Type) := fun c =>
     GlobalTheory.OuterTensor.nontrivial_of_isIrreducible _ (hirr c)
   haveI : Nontrivial (PiTensorProduct ℂ (fun c => (lam c : Type))) := nontrivial_piTensorProduct
   refine { exists_pair_ne := ⟨⊥, ⊤, fun h => ?_⟩, eq_bot_or_eq_top := fun S => ?_ }
-  · exact bot_ne_top (congrArg Subrepresentation.toSubmodule h :
-      (⊥ : Submodule ℂ (PiTensorProduct ℂ (fun c => (lam c : Type)))) = ⊤)
-  have hstable : ∀ (c : Fin s) (f : (lam c : Type) →ₗ[ℂ] (lam c : Type)), ∀ x ∈ S.toSubmodule,
-      PiTensorProduct.map (Function.update
-        (fun c' => (LinearMap.id : (lam c' : Type) →ₗ[ℂ] (lam c' : Type))) c f) x ∈ S.toSubmodule := by
+  · exact bot_ne_top
+      (congrArg Subrepresentation.toSubmodule h
+        : (⊥ : Submodule ℂ (PiTensorProduct ℂ (fun c => (lam c : Type)))) = ⊤)
+  have hstable
+      : ∀ (c : Fin s) (f : (lam c : Type) →ₗ[ℂ] (lam c : Type)), ∀ x ∈ S.toSubmodule,
+        PiTensorProduct.map
+            (Function.update (fun c' => (LinearMap.id : (lam c' : Type) →ₗ[ℂ] (lam c' : Type))) c f)
+            x
+          ∈ S.toSubmodule := by
     intro c
     refine position_stable_of_span (lam c).ρ (hspan c) S.toSubmodule fun g x hx => ?_
     rw [← leviTensor_blockExt b lam c g]

@@ -6,15 +6,24 @@ public import Formalism.LocalToGlobal.Columns.MtHeckeSum
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
+open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
+  GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
 open GlobalTheory.Mem.R3.LiftBrg
 
 namespace GlobalTheory.Mem.UnifConj
 
-theorem conj_unif_isUnif : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (Pb : Formalism.L2.DIV.Pl E) (Ut : Formalism.L2.Col.MhlUnif Pb), Formalism.L2.Col.cO E Ut.π ∈ (Formalism.L2.Col.conjPrime₂ Pb).asIdeal ∧ Formalism.L2.Col.cO E Ut.π ∉ (Formalism.L2.Col.conjPrime₂ Pb).asIdeal ^ 2 := by
+theorem conj_unif_isUnif
+    : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (Pb : Formalism.L2.DIV.Pl E)
+        (Ut : Formalism.L2.Col.MhlUnif Pb),
+      Formalism.L2.Col.cO E Ut.π ∈ (Formalism.L2.Col.conjPrime₂ Pb).asIdeal
+        ∧ Formalism.L2.Col.cO E Ut.π ∉ (Formalism.L2.Col.conjPrime₂ Pb).asIdeal ^ 2 := by
   intro E _ _ _ Pb Ut
   refine ⟨(Formalism.L2.Col.mem_conjP Pb _).2 (by rw [Formalism.L2.Col.cO_cO]; exact Ut.hπ), ?_⟩
   intro h
@@ -26,11 +35,9 @@ theorem conj_unif_isUnif : ∀ {E : Type} [Field E] [NumberField E] [StarRing E]
   have hle : Pb.asIdeal ≤ Pb.asIdeal ^ 2 := by
     intro p hp
     obtain ⟨t, ht⟩ := Ut.hcπ p hp
-    have hcp : Ut.c * p ∈ Pb.asIdeal ^ 2 := by
-      rw [ht]; exact Ideal.mul_mem_right t _ h2
+    have hcp : Ut.c * p ∈ Pb.asIdeal ^ 2 := by rw [ht]; exact Ideal.mul_mem_right t _ h2
     obtain ⟨a, e, he, hae⟩ := Pb.isMaximal.exists_inv Ut.hc
-    have hee : e * e ∈ Pb.asIdeal ^ 2 := by
-      rw [pow_two]; exact Ideal.mul_mem_mul he he
+    have hee : e * e ∈ Pb.asIdeal ^ 2 := by rw [pow_two]; exact Ideal.mul_mem_mul he he
     have hp' : p = a * (a * Ut.c + 2 * e) * (Ut.c * p) + (e * e) * p := by
       linear_combination (-(p) * (a * Ut.c + e + 1)) * hae
     rw [hp']

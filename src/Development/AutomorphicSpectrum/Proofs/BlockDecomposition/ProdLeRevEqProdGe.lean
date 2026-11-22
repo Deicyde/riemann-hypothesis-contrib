@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.FinReversal
 
-theorem prod_filter_le_rev {M : Type*} [CommMonoid M] (h : ℕ) (f : Fin h → M) (j : Fin h) :
-    ∏ a ∈ Finset.univ.filter (fun a => a ≤ j), f (Fin.rev a)
+theorem prod_filter_le_rev {M : Type*} [CommMonoid M] (h : ℕ) (f : Fin h → M) (j : Fin h)
+    : ∏ a ∈ Finset.univ.filter (fun a => a ≤ j), f (Fin.rev a)
       = ∏ i ∈ Finset.univ.filter (fun i => Fin.rev j ≤ i), f i := by
   refine Finset.prod_nbij' Fin.rev Fin.rev ?_ ?_ ?_ ?_ ?_
   · intro a ha

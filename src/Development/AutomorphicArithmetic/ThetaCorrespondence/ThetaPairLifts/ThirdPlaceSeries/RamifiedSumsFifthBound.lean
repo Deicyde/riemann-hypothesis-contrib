@@ -10,7 +10,8 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions NumberField Formalism.L2.Indef Formalism.L2.Indef.Tree GlobalTheory.BigTop GlobalTheory.BigTop.Fun
+open Formalism.BasicNotions Formalism.MainNotions NumberField Formalism.L2.Indef
+  Formalism.L2.Indef.Tree GlobalTheory.BigTop GlobalTheory.BigTop.Fun
 noncomputable section
 namespace GlobalTheory.BigTop.Fun
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -18,27 +19,36 @@ end GlobalTheory.BigTop.Fun
 namespace GlobalTheory.BigTop.Fun
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 theorem rankGapBound_alt : _root_.GlobalTheory.BigTop.Fun.RankGapBound' := by
-  refine ⟨0, fun CF _ => ⟨1, one_pos, fun eps heps heps1 => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩,
-    fun Fm CH hF _ => ?_⟩⟩⟩
+  refine ⟨
+    0,
+    fun CF _ => ⟨
+      1,
+      one_pos,
+      fun eps heps heps1 => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH hF _ => ?_⟩
+    ⟩
+  ⟩
   refine fun _ => ?_
   refine ⟨1, fun C hC => ?_⟩
   obtain ⟨-, heP, hcTO, -, -, -, -, -, hfix⟩ := hF.1
   have hW : PageWin Fm := hF.2.1
   obtain ⟨x2, hx21, hx2⟩ := mul_pow_le_exp_rpow heps (6 * (⌈|Fm.Ct|⌉₊ + 1)) 25
-  refine ⟨max (max (Fm.x1 + 1) ((8 : ℝ) ^ (1 / eps))) (max (max x2 20480) ((2 * C) ^ 2)),
-    fun x hx hx0 i p _ d _ => ?_⟩
+  refine ⟨
+    max (max (Fm.x1 + 1) ((8 : ℝ) ^ (1 / eps))) (max (max x2 20480) ((2 * C) ^ 2)),
+    fun x hx hx0 i p _ d _ => ?_
+  ⟩
   have hxa : Fm.x1 + 1 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hx0
   have hx8 : (8 : ℝ) ^ (1 / eps) ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx0
-  have hxb : x2 ≤ x := le_trans (le_trans (le_max_left _ _) (le_trans (le_max_left _ _) (le_max_right _ _))) hx0
-  have hxc : 20480 ≤ x := le_trans (le_trans (le_max_right _ _) (le_trans (le_max_left _ _) (le_max_right _ _))) hx0
+  have hxb : x2 ≤ x :=
+    le_trans (le_trans (le_max_left _ _) (le_trans (le_max_left _ _) (le_max_right _ _))) hx0
+  have hxc : 20480 ≤ x :=
+    le_trans (le_trans (le_max_right _ _) (le_trans (le_max_left _ _) (le_max_right _ _))) hx0
   have hxC : (2 * C) ^ 2 ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx0
   have hx1 : 1 < x := by linarith
   have hx0' : (0 : ℝ) < x := by linarith
   have h8 : (8 : ℝ) ≤ x ^ (8 * eps) := by
     have e1 : (8 : ℝ) = ((8 : ℝ) ^ (1 / eps)) ^ eps := by
       rw [← Real.rpow_mul (by norm_num), one_div, inv_mul_cancel₀ heps.ne', Real.rpow_one]
-    have e2 : ((8 : ℝ) ^ (1 / eps)) ^ eps ≤ x ^ eps :=
-      Real.rpow_le_rpow (by positivity) hx8 heps.le
+    have e2 : ((8 : ℝ) ^ (1 / eps)) ^ eps ≤ x ^ eps := Real.rpow_le_rpow (by positivity) hx8 heps.le
     have e3 : x ^ eps ≤ x ^ (8 * eps) := Real.rpow_le_rpow_of_exponent_le hx1.le (by linarith)
     linarith
   obtain ⟨⟨hn, -⟩, ⟨-, hm⟩, ⟨-, hk⟩⟩ := hW x hx i
@@ -64,8 +74,12 @@ theorem rankGapBound_alt : _root_.GlobalTheory.BigTop.Fun.RankGapBound' := by
     rw [hf]
     have hx2' : 0 ≤ x ^ 2 := by positivity
     nlinarith
-  have hH1 : leafHypothesesConst d.O := ⟨(Fm.D x i).R.two_le_m, (Fm.D x i).R.m_add_three_le_k, by exact_mod_cast hm4,
-    (Fm.D x i).R.f_le_k⟩
+  have hH1 : leafHypothesesConst d.O := ⟨
+    (Fm.D x i).R.two_le_m,
+    (Fm.D x i).R.m_add_three_le_k,
+    by exact_mod_cast hm4,
+    (Fm.D x i).R.f_le_k
+  ⟩
   have hH7 : LatticeConstantBound d.O p.Z.b := by
     show (FunData.Lc d.O : ℝ) ≤ (Fm.L x i).sc.b
     exact (Lc_le_of_cloud_le d.O (Fm.L x i).Sc (Fm.L x i).Sc_pos.le
@@ -79,14 +93,18 @@ theorem rankGapBound_alt : _root_.GlobalTheory.BigTop.Fun.RankGapBound' := by
     have a3 := (Fm.parT x hx i).nW_lo.1
     have hf : 1 ≤ (Fm.D x i).R.f := by
       have : 0 < (Fm.D x i).R.ord := (Fm.D x i).R.ord_pos
-      unfold Ranks.f Ranks.n; omega
+      unfold Ranks.f Ranks.n
+      omega
     have hr : 1 ≤ (Fm.D x i).R.r := by
       have := (Fm.D x i).R.m_add_three_le_k
-      unfold Ranks.r; omega
+      unfold Ranks.r
+      omega
     have a4 : 1 ≤ (Fm.parT x hx i).nWn :=
       le_trans (Nat.mul_pos (Nat.mul_pos hf hr) (Nat.succ_pos _)) a3
-    have a5 : (Fm.parT x hx i).TO * 1 ≤ (Fm.parT x hx i).TO * (Fm.parT x hx i).nWn := Nat.mul_le_mul_left _ a4
-    have a6 : 1 * (Fm.D x i).R.r ≤ 8 * (Fm.D x i).R.f * (Fm.D x i).R.r := Nat.mul_le_mul_right _ (by omega)
+    have a5 : (Fm.parT x hx i).TO * 1 ≤ (Fm.parT x hx i).TO * (Fm.parT x hx i).nWn :=
+      Nat.mul_le_mul_left _ a4
+    have a6 : 1 * (Fm.D x i).R.r ≤ 8 * (Fm.D x i).R.f * (Fm.D x i).R.r :=
+      Nat.mul_le_mul_right _ (by omega)
     omega
   have hto : x ^ 377 ≤ ((Fm.D x i).R.t : ℝ) := by
     have e1 : Fm.cTO = ((377 : ℕ) : ℝ) := by rw [hcTO, heP]; norm_num
@@ -105,27 +123,29 @@ theorem rankGapBound_alt : _root_.GlobalTheory.BigTop.Fun.RankGapBound' := by
     rwa [Real.rpow_natCast] at e2
   have hmf : (Fm.D x i).R.m ≤ (Fm.D x i).R.f := by
     have := (Fm.D x i).R.m_le_f
-    unfold Ranks.f Ranks.n; omega
+    unfold Ranks.f Ranks.n
+    omega
   have hkt : (Fm.D x i).R.k + (Fm.D x i).R.m + 4 ≤ (Fm.D x i).R.t := by
     have := (Fm.D x i).R.rank_add_five_le
     have := (Fm.D x i).R.m_add_three_le_k
     omega
   have hB := hx2 x hxb
-  obtain ⟨l1, l2⟩ := design_lines_of_ranks x eps (Real.exp (x ^ eps)) (⌈|Fm.Ct|⌉₊ + 1) (Fm.D x i).R.k (Fm.D x i).R.m
-    (Fm.D x i).R.f (Fm.D x i).R.t hxc heps1 (Fm.D x i).R.two_le_m hmf (Fm.D x i).R.f_le_k hkt htc hto hk hB
+  obtain ⟨l1, l2⟩ :=
+    design_lines_of_ranks x eps (Real.exp (x ^ eps)) (⌈|Fm.Ct|⌉₊ + 1) (Fm.D x i).R.k (Fm.D x i).R.m
+      (Fm.D x i).R.f (Fm.D x i).R.t hxc heps1 (Fm.D x i).R.two_le_m hmf (Fm.D x i).R.f_le_k hkt htc
+      hto hk hB
   have hL : 2 * Real.log (2 * C) ≤ Real.log p.Z.b := by
     rw [hb, Real.log_exp]
     have e1 : x ≤ x ^ (6 * (⌈|Fm.Ct|⌉₊ + 1)) := le_self_pow₀ hx1.le (by omega)
     have e2 : x ≤ Real.exp (x ^ eps) := by
       have : 0 ≤ x ^ (6 * (⌈|Fm.Ct|⌉₊ + 1)) := by positivity
       linarith
-    have e3 : Real.log x ≤ x ^ eps := by
-      rw [Real.log_le_iff_le_exp hx0']; exact e2
-    have e4 : 2 * Real.log (2 * C) = Real.log ((2 * C) ^ 2) := by
-      rw [Real.log_pow]; push_cast; ring
+    have e3 : Real.log x ≤ x ^ eps := by rw [Real.log_le_iff_le_exp hx0']; exact e2
+    have e4 : 2 * Real.log (2 * C) = Real.log ((2 * C) ^ 2) := by rw [Real.log_pow]; push_cast; ring
     have e5 : Real.log ((2 * C) ^ 2) ≤ Real.log x := Real.log_le_log (by positivity) hxC
     linarith
-  refine GlobalTheory.SizeLeafCheck.tree_leaf_parameter_arithmetic_of_bounds d.O C p.Z.b hC hH1 hH7 ?_ ?_ hL
+  refine GlobalTheory.SizeLeafCheck.tree_leaf_parameter_arithmetic_of_bounds d.O C p.Z.b hC hH1 hH7
+    ?_ ?_ hL
   · rw [hb]
     exact l1
   · exact l2

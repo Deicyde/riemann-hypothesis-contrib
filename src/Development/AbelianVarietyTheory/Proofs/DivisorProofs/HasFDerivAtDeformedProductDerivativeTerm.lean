@@ -7,16 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DTermOrigin
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.DeformedSum
+open NumberField IsDedekindDomain GlobalTheory.CMVal
+  GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.DeformedSum
 
 namespace GlobalTheory.DeformedSum
 
-theorem hasDerivAt_inv_pow_affine (c a b : ℂ) (n : ℕ) (u : ℂ) (hu : a + u * b ≠ 0) :
-    HasDerivAt (fun t : ℂ => c * (a + t * b)⁻¹ ^ n)
+theorem hasDerivAt_inv_pow_affine (c a b : ℂ) (n : ℕ) (u : ℂ) (hu : a + u * b ≠ 0)
+    : HasDerivAt
+      (fun t : ℂ => c * (a + t * b)⁻¹ ^ n)
       (c * (-(n : ℂ) * b * (a + u * b)⁻¹ ^ (n + 1))) u := by
   have h1 : HasDerivAt (fun t : ℂ => a + t * b) b u := by
     simpa using ((hasDerivAt_id u).mul_const b).const_add a
-  have h2 : HasDerivAt (fun t : ℂ => c * (a + t * b)⁻¹ ^ n)
+  have h2 : HasDerivAt
+      (fun t : ℂ => c * (a + t * b)⁻¹ ^ n)
       (c * (n * (a + u * b)⁻¹ ^ (n - 1) * (-b / (a + u * b) ^ 2))) u :=
     ((h1.inv hu).pow n).const_mul c
   refine h2.congr_deriv ?_
@@ -26,8 +29,12 @@ theorem hasDerivAt_inv_pow_affine (c a b : ℂ) (n : ℕ) (u : ℂ) (hu : a + u 
     push_cast
     ring
 
-theorem defCoord_ne_zero {E : Type} [Field E] [NumberField E] {I : Type} (φ : I → E →+* ℂ) (z : I → ℂ)
-    (hz : z ∈ polydisc I) (x : E) (hx : x ≠ 0) (i : I) : defCoord φ z x i ≠ 0 := by
+theorem defCoord_ne_zero
+    {E : Type} [Field E] [NumberField E]
+    {I : Type} (φ : I → E →+* ℂ) (z : I → ℂ) (hz : z ∈ polydisc I)
+    (x : E) (hx : x ≠ 0)
+    (i : I)
+    : defCoord φ z x i ≠ 0 := by
   intro h
   have hφ : φ i x ≠ 0 := (map_ne_zero (φ i)).mpr hx
   have hpos : 0 < ‖φ i x‖ := norm_pos_iff.mpr hφ
@@ -40,24 +47,38 @@ theorem defCoord_ne_zero {E : Type} [Field E] [NumberField E] {I : Type} (φ : I
   have hlt := mul_lt_of_lt_one_left hpos hz1
   linarith
 
-theorem hasFDerivAt_dTerm : ∀ (E : Type) [Field E] [NumberField E] (I : Type) [Fintype I] [DecidableEq I] (φ : I → E →+* ℂ)
-    (k : ℕ) (m : I → ℕ) (x : E), x ≠ 0 → ∀ z ∈ polydisc I,
-    HasFDerivAt (fun w : I → ℂ => dTerm φ k m w x)
-      (∑ j, dTerm φ k (m + Pi.single j 1) z x • (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : I => ℂ) j)) z := by
+theorem hasFDerivAt_dTerm
+    : ∀ (E : Type) [Field E] [NumberField E] (I : Type) [Fintype I] [DecidableEq I]
+        (φ : I → E →+* ℂ) (k : ℕ) (m : I → ℕ) (x : E),
+      x ≠ 0
+        → ∀ z ∈ polydisc I,
+          HasFDerivAt
+            (fun w : I → ℂ => dTerm φ k m w x)
+            (∑ j, dTerm φ k (m + Pi.single j 1) z x • (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : I => ℂ) j))
+            z := by
   intro E _ _ I _ _ φ k m x hx z hz
   set C : I → ℂ := fun i => ((-1 : ℂ) ^ m i * ∏ j ∈ Finset.range (m i), ((k : ℂ) + j)) *
     (starRingEnd ℂ (φ i x)) ^ m i with hC
-  have hd : ∀ i, HasFDerivAt (fun w : I → ℂ => C i * (defCoord φ w x i)⁻¹ ^ (k + m i))
-      ((C i * (-((k + m i : ℕ) : ℂ) * starRingEnd ℂ (φ i x) * (defCoord φ z x i)⁻¹ ^ (k + m i + 1))) •
-        ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : I => ℂ) i) z := by
+  have hd
+      : ∀ i,
+        HasFDerivAt
+          (fun w : I → ℂ => C i * (defCoord φ w x i)⁻¹ ^ (k + m i))
+          ((C i
+              * (-((k + m i : ℕ) : ℂ) * starRingEnd ℂ (φ i x)
+                * (defCoord φ z x i)⁻¹ ^ (k + m i + 1)))
+            • ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : I => ℂ) i)
+          z := by
     intro i
-    have h1 := hasDerivAt_inv_pow_affine (C i) (φ i x) (starRingEnd ℂ (φ i x)) (k + m i) (z i)
-      (defCoord_ne_zero φ z hz x hx i)
+    have h1 :=
+      hasDerivAt_inv_pow_affine (C i) (φ i x) (starRingEnd ℂ (φ i x)) (k + m i) (z i)
+        (defCoord_ne_zero φ z hz x hx i)
     have h2 := h1.comp_hasFDerivAt z (hasFDerivAt_apply (𝕜 := ℂ) (F' := fun _ : I => ℂ) i z)
     exact h2
   have hprod := HasFDerivAt.finsetProd (u := Finset.univ) (fun i _ => hd i)
-  have hfun : (fun w : I → ℂ => dTerm φ k m w x) =
-      (fun w => ∏ i ∈ Finset.univ, C i * (defCoord φ w x i)⁻¹ ^ (k + m i)) := rfl
+  have hfun
+      : (fun w : I → ℂ => dTerm φ k m w x)
+        = (fun w => ∏ i ∈ Finset.univ, C i * (defCoord φ w x i)⁻¹ ^ (k + m i)) :=
+    rfl
   rw [hfun]
   refine hprod.congr_fderiv ?_
   refine Finset.sum_congr rfl fun j _ => ?_

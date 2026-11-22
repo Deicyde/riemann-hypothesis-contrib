@@ -11,10 +11,12 @@ open scoped Pointwise
 namespace GlobalTheory.LatPair.Det
 
 section
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n : Type} [Fintype n] [DecidableEq n]
 
-theorem det_mem_of_mem_latStab_std {g : GL n k} (hg : g ∈ latStab (stdLat k n)) : g.val.det ∈ 𝒪[k] := by
+theorem det_mem_of_mem_latStab_std {g : GL n k} (hg : g ∈ latStab (stdLat k n))
+    : g.val.det ∈ 𝒪[k] := by
   rw [MulAction.mem_stabilizer_iff] at hg
   have t2 : ∀ v : n → k, v ∈ stdLat k n ↔ ∀ i, v i ∈ 𝒪[k] := by
     intro v
@@ -49,7 +51,8 @@ theorem det_mem_of_mem_latStab_std {g : GL n k} (hg : g ∈ latStab (stdLat k n)
   rw [← hA, ← RingHom.map_det]
   exact (A.det).2
 
-theorem exists_smul_stdLat_eq (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice k] : ∃ h : GL n k, h • stdLat k n = L := by
+theorem exists_smul_stdLat_eq (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice k]
+    : ∃ h : GL n k, h • stdLat k n = L := by
   classical
   letI : Module.Free 𝒪[k] L := Submodule.IsLattice.free k L
   letI : Module.Finite 𝒪[k] L := Submodule.IsLattice.finite k L
@@ -62,7 +65,8 @@ theorem exists_smul_stdLat_eq (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice
   let B' := B.reindex e
   let P := (Pi.basisFun k n).toMatrix B'
   let Q := B'.toMatrix (Pi.basisFun k n)
-  let h : GL n k := ⟨P, Q, Module.Basis.toMatrix_mul_toMatrix_flip _ _, Module.Basis.toMatrix_mul_toMatrix_flip _ _⟩
+  let h : GL n k :=
+    ⟨P, Q, Module.Basis.toMatrix_mul_toMatrix_flip _ _, Module.Basis.toMatrix_mul_toMatrix_flip _ _⟩
   have hB' : ∀ j, B' j = (b (e.symm j) : n → k) := by
     intro j
     simp [B', B]
@@ -96,8 +100,9 @@ theorem exists_smul_stdLat_eq (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice
     refine Finset.sum_congr rfl fun i _ => ?_
     exact algebraMap_smul k (c i) _
 
-theorem det_mem_of_mem_latStab {L : Submodule 𝒪[k] (n → k)} [L.IsFullLattice k] {g : GL n k} (hg : g ∈ latStab L) :
-    ((Matrix.GeneralLinearGroup.det g : kˣ) : k) ∈ 𝒪[k] := by
+theorem det_mem_of_mem_latStab
+    {L : Submodule 𝒪[k] (n → k)} [L.IsFullLattice k] {g : GL n k} (hg : g ∈ latStab L)
+    : ((Matrix.GeneralLinearGroup.det g : kˣ) : k) ∈ 𝒪[k] := by
   obtain ⟨h, rfl⟩ := exists_smul_stdLat_eq L
   have hs : h⁻¹ * g * h ∈ latStab (stdLat k n) := by
     simp only [latStab, MulAction.mem_stabilizer_iff] at hg ⊢
@@ -108,20 +113,27 @@ theorem det_mem_of_mem_latStab {L : Submodule 𝒪[k] (n → k)} [L.IsFullLattic
     rw [map_mul, map_mul, map_inv, mul_comm, ← mul_assoc, mul_inv_cancel, one_mul]
   rwa [hdet] at h1
 
-theorem valuation_det_of_mem_latStab {L : Submodule 𝒪[k] (n → k)} [L.IsFullLattice k] {g : GL n k} (hg : g ∈ latStab L) :
-    valuation k ((Matrix.GeneralLinearGroup.det g : kˣ) : k) = 1 := by
+theorem valuation_det_of_mem_latStab
+    {L : Submodule 𝒪[k] (n → k)} [L.IsFullLattice k] {g : GL n k} (hg : g ∈ latStab L)
+    : valuation k ((Matrix.GeneralLinearGroup.det g : kˣ) : k) = 1 := by
   have h1 := det_mem_of_mem_latStab hg
   have h2 := det_mem_of_mem_latStab (inv_mem hg)
   rw [map_inv, Units.val_inv_eq_inv_val] at h2
   set d : k := ((Matrix.GeneralLinearGroup.det g : kˣ) : k) with hd
   have hd0 : d ≠ 0 := Units.ne_zero _
-  have hu : IsUnit (⟨d, h1⟩ : 𝒪[k]) :=
-    ⟨⟨⟨d, h1⟩, ⟨d⁻¹, h2⟩, Subtype.ext (mul_inv_cancel₀ hd0), Subtype.ext (inv_mul_cancel₀ hd0)⟩, rfl⟩
+  have hu : IsUnit (⟨d, h1⟩ : 𝒪[k]) := ⟨
+    ⟨⟨d, h1⟩, ⟨d⁻¹, h2⟩, Subtype.ext (mul_inv_cancel₀ hd0), Subtype.ext (inv_mul_cancel₀ hd0)⟩,
+    rfl
+  ⟩
   exact ((Valuation.integer.integers (valuation k)).isUnit_iff_valuation_eq_one).1 hu
 
 end
 
-theorem isUnram_det_latStab : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] [DecidableEq n] (L : Submodule 𝒪[k] (n → k)), L.IsFullLattice k → ∀ g ∈ latStab L, ∀ μ : kˣ →* ℂˣ, IsUnram μ → μ (Matrix.GeneralLinearGroup.det g) = 1 := by
+theorem isUnram_det_latStab
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : Type) [Fintype n] [DecidableEq n] (L : Submodule 𝒪[k] (n → k)),
+      L.IsFullLattice k
+        → ∀ g ∈ latStab L, ∀ μ : kˣ →* ℂˣ, IsUnram μ → μ (Matrix.GeneralLinearGroup.det g) = 1 := by
   intro k _ _ _ _ n _ _ L hL g hg μ hμ
   exact hμ _ (valuation_det_of_mem_latStab hg)
 

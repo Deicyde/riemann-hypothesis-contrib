@@ -16,13 +16,25 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh GlobalTheory.EtaAn
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
+  Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh
+  GlobalTheory.EtaAn
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AnVal
 
-theorem neg_log_sqrt_le_of_jbound : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (X : I2.PT E) (dg n : ℕ) (P : I2.Par X dg) (S tableLineDegreeFive cc : ℝ), (Real.pi⁻¹) ^ dg * P.Jbound n ≤ S → p14 E X.r n P.m ≤ tableLineDegreeFive → 8100 * Real.pi * n * (P.m : ℝ) ^ 4 * (I2.dstar (E := E) P.m : ℝ) ^ 4 * I2.RR (E := E) / P.q ≤ cc → -Real.log (Real.sqrt S) ≤ tableLineDegreeFive * dg + cc * P.ph := by
+theorem neg_log_sqrt_le_of_jbound
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (X : I2.PT E) (dg n : ℕ)
+        (P : I2.Par X dg) (S tableLineDegreeFive cc : ℝ),
+      (Real.pi⁻¹) ^ dg * P.Jbound n ≤ S → p14 E X.r n P.m ≤ tableLineDegreeFive
+        → 8100 * Real.pi * n * (P.m : ℝ) ^ 4 * (I2.dstar (E := E) P.m : ℝ) ^ 4 * I2.RR (E := E)
+            / P.q
+          ≤ cc
+        → - Real.log (Real.sqrt S) ≤ tableLineDegreeFive * dg + cc * P.ph := by
   intro E _ _ _ X dg n P S tableLineDegreeFive cc hS hP14 hcc
   have hf : 0 < I2.PT.f E := by
     have h1 := P.hfr
@@ -39,17 +51,26 @@ theorem neg_log_sqrt_le_of_jbound : ∀ (E : Type) [Field E] [NumberField E] [Is
     unfold I2.Par.ph I2.PT.ph
     split_ifs <;> positivity
   have hA : (4 : ℝ)⁻¹ ^ n ≠ 0 := by positivity
-  have hBn : (6 * (2 * (I2.dstar (E := E) P.m : ℝ)) ^ ((I2.dstar (E := E) P.m : ℝ) / 2))⁻¹ ^ n ≠ 0 :=
+  have hBn
+      : (6 * (2 * (I2.dstar (E := E) P.m : ℝ)) ^ ((I2.dstar (E := E) P.m : ℝ) / 2))⁻¹ ^ n ≠ 0 :=
     pow_ne_zero _ (inv_ne_zero h6.ne')
   have hC : (2 : ℝ)⁻¹ ^ ((X.r + 2) * dg) ≠ 0 := by positivity
   have hJpos : 0 < P.Jbound n := by
     unfold I2.Par.Jbound
-    exact mul_pos (mul_pos (mul_pos (pow_pos (by norm_num) _) (pow_pos (inv_pos.2 h6) _))
-      (pow_pos (by norm_num) _)) (Real.exp_pos _)
-  have hJ : Real.log (P.Jbound n) = -(n * Real.log 4) -
-      n * (Real.log 6 + (I2.dstar (E := E) P.m : ℝ) / 2 * Real.log (2 * (I2.dstar (E := E) P.m : ℝ))) -
-      (((X.r + 2) * dg : ℕ) : ℝ) * Real.log 2 -
-      2 * (8100 * Real.pi * n * (P.m : ℝ) ^ 4 * (I2.dstar (E := E) P.m : ℝ) ^ 4 * I2.RR (E := E) / P.q * P.ph) := by
+    exact mul_pos
+      (mul_pos (mul_pos (pow_pos (by norm_num) _) (pow_pos (inv_pos.2 h6) _))
+        (pow_pos (by norm_num) _))
+      (Real.exp_pos _)
+  have hJ
+      : Real.log (P.Jbound n)
+        = -(n * Real.log 4)
+          - n
+            * (Real.log 6
+              + (I2.dstar (E := E) P.m : ℝ) / 2 * Real.log (2 * (I2.dstar (E := E) P.m : ℝ)))
+          - (((X.r + 2) * dg : ℕ) : ℝ) * Real.log 2
+          - 2
+            * (8100 * Real.pi * n * (P.m : ℝ) ^ 4 * (I2.dstar (E := E) P.m : ℝ) ^ 4 * I2.RR (E := E)
+              / P.q * P.ph) := by
     unfold I2.Par.Jbound
     rw [Real.log_mul (mul_ne_zero (mul_ne_zero hA hBn) hC) (Real.exp_pos _).ne',
       Real.log_mul (mul_ne_zero hA hBn) hC, Real.log_mul hA hBn, Real.log_exp, Real.log_pow,
@@ -61,9 +82,13 @@ theorem neg_log_sqrt_le_of_jbound : ∀ (E : Type) [Field E] [NumberField E] [Is
   have h24 : Real.log 24 = Real.log 4 + Real.log 6 := by
     rw [← Real.log_mul (by norm_num) (by norm_num)]; norm_num
   have hl2d : 0 ≤ Real.log (2 * (I2.dstar (E := E) P.m : ℝ)) := Real.log_nonneg (by linarith)
-  have hT : 0 ≤ Real.log 24 + (I2.dstar (E := E) P.m : ℝ) / 2 * Real.log (2 * (I2.dstar (E := E) P.m : ℝ)) := by
+  have hT
+      : 0
+        ≤ Real.log 24
+          + (I2.dstar (E := E) P.m : ℝ) / 2 * Real.log (2 * (I2.dstar (E := E) P.m : ℝ)) := by
     have : 0 < Real.log 24 := Real.log_pos (by norm_num)
-    have : 0 ≤ (I2.dstar (E := E) P.m : ℝ) / 2 * Real.log (2 * (I2.dstar (E := E) P.m : ℝ)) := by positivity
+    have : 0 ≤ (I2.dstar (E := E) P.m : ℝ) / 2 * Real.log (2 * (I2.dstar (E := E) P.m : ℝ)) := by
+      positivity
     linarith
   have hpi : (0 : ℝ) < (Real.pi⁻¹) ^ dg := pow_pos (inv_pos.2 Real.pi_pos) _
   have hpos : 0 < (Real.pi⁻¹) ^ dg * P.Jbound n := mul_pos hpi hJpos

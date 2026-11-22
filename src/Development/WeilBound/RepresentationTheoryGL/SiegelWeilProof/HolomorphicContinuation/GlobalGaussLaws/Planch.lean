@@ -15,18 +15,23 @@ open PositivityTheory.Rg.Sw.Glob.FTD
 
 variable {m n : ℕ}
 
-theorem haar_linR (A : (Fin m → Fin n → ℂ) ≃L[ℝ] V m n) : ∃ c : ℝ, 0 < c ∧ ∀ F : V m n → ℝ, Continuous F →
-    ∫ y : Fin m → Fin n → ℂ, F (A y) = c * ∫ w, F w := by
+theorem haar_linR (A : (Fin m → Fin n → ℂ) ≃L[ℝ] V m n)
+    : ∃ c : ℝ,
+      0 < c ∧ ∀ F : V m n → ℝ, Continuous F → ∫ y : Fin m → Fin n → ℂ, F (A y) = c * ∫ w, F w := by
   have : (volume : Measure (Fin n → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
   have : (volume : Measure (Fin m → Fin n → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
   set μ' : Measure (V m n) := (volume : Measure (Fin m → Fin n → ℂ)).map A with hμ'
   have : μ'.IsAddHaarMeasure := A.isAddHaarMeasure_map volume
   have h := Measure.isAddLeftInvariant_eq_smul μ' volume
-  refine ⟨Measure.addHaarScalarFactor μ' volume, by
-    exact_mod_cast Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure μ' volume, fun F hF => ?_⟩
+  refine ⟨
+    Measure.addHaarScalarFactor μ' volume,
+    by exact_mod_cast Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure μ' volume,
+    fun F hF => ?_
+  ⟩
   have h' : ∫ y, F y ∂μ' = ∫ y, F y ∂(Measure.addHaarScalarFactor μ' volume • volume) :=
     congrArg (fun ν => ∫ y, F y ∂ν) h
-  rw [← integral_map A.continuous.aemeasurable hF.aestronglyMeasurable, ← hμ', h', integral_smul_nnreal_measure]
+  rw [← integral_map A.continuous.aemeasurable hF.aestronglyMeasurable, ← hμ', h',
+    integral_smul_nnreal_measure]
   simp [NNReal.smul_def]
 
 end PositivityTheory.Rg.Sw.Glob.PlanchH

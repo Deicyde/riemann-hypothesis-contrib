@@ -180,22 +180,23 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.GenusMassVolumes
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.StandardLattice Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 theorem genus_class_mass : PI.UJClassMass2.UJClassMass := _root_.unitary_class_mass_hermitian
 
 theorem classMass_of_D7 (D : D7) : ClassMass D := class_mass_of_genus_classes genus_class_mass D
 
-theorem volume_mass_of_genus_rank (D : D7) (n : ℕ) (hT : VolTie D) (hG : GenusMassAt D n) : volumeAtLevelZero D n :=
-  volume_mass_of_class_data D n hT hG (class_number_finite_rank D n) (classMassAt_of D (classMass_of_D7 D) n)
+theorem volume_mass_of_genus_rank (D : D7) (n : ℕ) (hT : VolTie D) (hG : GenusMassAt D n)
+    : volumeAtLevelZero D n :=
+  volume_mass_of_class_data D n hT hG (class_number_finite_rank D n)
+    (classMassAt_of D (classMass_of_D7 D) n)
 
 end Formalism.L2.GlobalTheoryTheory.GenusMassVolumes
 
 namespace Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.ClosedKudlaFamilyStandardLattice
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.StandardLattice
-
-
 
 end Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.ClosedKudlaFamilyStandardLattice
 

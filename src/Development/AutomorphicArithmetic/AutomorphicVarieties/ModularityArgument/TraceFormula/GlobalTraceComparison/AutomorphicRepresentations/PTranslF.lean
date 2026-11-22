@@ -9,20 +9,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjSrcMemOr
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.G8
 
-private theorem conj_of_central {G : Type} [Group G] (a b : G) (h : a⁻¹ * b ∈ Subgroup.center G) (t : G) :
-    b * t * b⁻¹ = a * t * a⁻¹ := by
+private theorem conj_of_central
+    {G : Type} [Group G] (a b : G) (h : a⁻¹ * b ∈ Subgroup.center G) (t : G)
+    : b * t * b⁻¹ = a * t * a⁻¹ := by
   have hc := Subgroup.mem_center_iff.mp h t
-  calc b * t * b⁻¹ = a * ((a⁻¹ * b) * t) * (a⁻¹ * b)⁻¹ * a⁻¹ := by group
+  calc
+    b * t * b⁻¹
+      = a * ((a⁻¹ * b) * t) * (a⁻¹ * b)⁻¹ * a⁻¹ := by group
     _ = a * (t * (a⁻¹ * b)) * (a⁻¹ * b)⁻¹ * a⁻¹ := by rw [hc]
     _ = a * t * a⁻¹ := by group
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.translF_pf :
-    TranslF := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.translF_pf : TranslF := by
   intro E _ _ _ n u hu
   have hz : (ratF E n u)⁻¹ * PhiU n (Af E) ∈ Subgroup.center (GL (Fin n) (Af E)) := by
     have h := GeneralLinearGroup.map_center_le (algebraMap E (Af E)) (translad_central E n u hu)

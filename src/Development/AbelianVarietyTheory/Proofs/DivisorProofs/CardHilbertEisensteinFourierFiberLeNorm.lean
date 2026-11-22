@@ -19,24 +19,26 @@ open FractionalIdeal
 variable {F : Type} [Field F] [NumberField F]
 
 def toIdeal (K : FractionalIdeal (𝓞 F)⁰ F) : Ideal (𝓞 F) :=
-  open Classical in if h : K ≤ 1 then (le_one_iff_exists_coeIdeal.mp h).choose else ⊥
+  open Classical in
+  if h : K ≤ 1 then (le_one_iff_exists_coeIdeal.mp h).choose else ⊥
 
-theorem coe_toIdeal {K : FractionalIdeal (𝓞 F)⁰ F} (h : K ≤ 1) :
-    ((toIdeal K : Ideal (𝓞 F)) : FractionalIdeal (𝓞 F)⁰ F) = K := by
+theorem coe_toIdeal {K : FractionalIdeal (𝓞 F)⁰ F} (h : K ≤ 1)
+    : ((toIdeal K : Ideal (𝓞 F)) : FractionalIdeal (𝓞 F)⁰ F) = K := by
   unfold toIdeal
   rw [dite_eq_left h]
   exact (le_one_iff_exists_coeIdeal.mp h).choose_spec
 
-theorem nrm_nonneg (𝔞 : Frac F) : 0 ≤ nrm 𝔞 := by
-  unfold nrm; exact_mod_cast absNorm_nonneg _
+theorem nrm_nonneg (𝔞 : Frac F) : 0 ≤ nrm 𝔞 := by unfold nrm; exact_mod_cast absNorm_nonneg _
 
 theorem emb_nonempty [IsTotallyReal F] : Nonempty (Emb F) := by
   obtain ⟨φ⟩ : Nonempty (F →+* ℂ) := inferInstance
   exact ⟨(IsTotallyReal.complexEmbedding_isReal φ).embedding⟩
 
-theorem card_le_norm : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔞 𝔟 : Frac F) (ξ : F)
-    (s : Finset (Quotient (qRel 𝔞 𝔟))), (∀ c ∈ s, c.out.1.1 * c.out.1.2 = ξ) →
-    (s.card : ℝ) ≤ |(Algebra.norm ℚ ξ : ℝ)| / (nrm 𝔞 * nrm 𝔟) := by
+theorem card_le_norm
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔞 𝔟 : Frac F) (ξ : F)
+        (s : Finset (Quotient (qRel 𝔞 𝔟))),
+      (∀ c ∈ s, c.out.1.1 * c.out.1.2 = ξ)
+        → (s.card : ℝ) ≤ |(Algebra.norm ℚ ξ : ℝ)| / (nrm 𝔞 * nrm 𝔟) := by
   intro F _ _ _ 𝔞 𝔟 ξ s hs
   classical
   rcases s.eq_empty_or_nonempty with rfl | ⟨c0, hc0⟩
@@ -51,23 +53,30 @@ theorem card_le_norm : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F
     intro h0
     rw [h0, map_zero] at h
     exact lt_irrefl _ h
-  have hle : ∀ c : Quotient (qRel 𝔞 𝔟),
-      spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ ≤ 1 := fun c => by
-    calc _ ≤ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ :=
-          by gcongr; exact spanSingleton_le_iff_mem.mpr c.out.2.1
+  have hle
+      : ∀ c : Quotient (qRel 𝔞 𝔟),
+        spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ ≤ 1 := fun c => by
+    calc
+      _ ≤ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ := by
+        gcongr; exact spanSingleton_le_iff_mem.mpr c.out.2.1
       _ = 1 := mul_inv_cancel₀ hA
-  have hIle : ∀ c ∈ s, spanSingleton (𝓞 F)⁰ ξ * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ ≤
-      spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ := by
+  have hIle
+      : ∀ c ∈ s,
+        spanSingleton (𝓞 F)⁰ ξ * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹
+          ≤ spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ := by
     intro c hc
     have hb : spanSingleton (𝓞 F)⁰ c.out.1.2 * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ ≤ 1 := by
-      calc _ ≤ (𝔟 : FractionalIdeal (𝓞 F)⁰ F) * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ :=
-            by gcongr; exact spanSingleton_le_iff_mem.mpr c.out.2.2.1
+      calc
+        _ ≤ (𝔟 : FractionalIdeal (𝓞 F)⁰ F) * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ := by
+          gcongr; exact spanSingleton_le_iff_mem.mpr c.out.2.2.1
         _ = 1 := mul_inv_cancel₀ hB
     rw [← hs c hc, ← spanSingleton_mul_spanSingleton]
-    calc spanSingleton (𝓞 F)⁰ c.out.1.1 * spanSingleton (𝓞 F)⁰ c.out.1.2 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ *
-          (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ =
-          (spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹) *
-          (spanSingleton (𝓞 F)⁰ c.out.1.2 * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹) := by ring
+    calc
+      spanSingleton (𝓞 F)⁰ c.out.1.1 * spanSingleton (𝓞 F)⁰ c.out.1.2
+            * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹
+          = (spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹)
+            * (spanSingleton (𝓞 F)⁰ c.out.1.2 * (𝔟 : FractionalIdeal (𝓞 F)⁰ F)⁻¹) := by
+        ring
       _ ≤ (spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹) * 1 := by gcongr
       _ = _ := mul_one _
   have hI1 := (hIle c0 hc0).trans (hle c0)
@@ -87,8 +96,9 @@ theorem card_le_norm : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F
     tauto
   have hinj : Set.InjOn f s := by
     intro c hc c' hc' hcc
-    have h1 : spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ =
-        spanSingleton (𝓞 F)⁰ c'.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ := by
+    have h1
+        : spanSingleton (𝓞 F)⁰ c.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹
+          = spanSingleton (𝓞 F)⁰ c'.out.1.1 * (𝔞 : FractionalIdeal (𝓞 F)⁰ F)⁻¹ := by
       rw [← coe_toIdeal (hle c), ← coe_toIdeal (hle c')]
       exact congrArg _ hcc
     have h2 := mul_right_cancel₀ (inv_ne_zero hA) h1
@@ -109,13 +119,17 @@ theorem card_le_norm : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F
     apply Quotient.sound
     refine ⟨u⁻¹, ?_, hb⟩
     rw [inv_inv, ← hu]
-  have key : (FractionalIdeal.absNorm ((I : Ideal (𝓞 F)) : FractionalIdeal (𝓞 F)⁰ F) : ℚ) =
-      |Algebra.norm ℚ ξ| / (FractionalIdeal.absNorm (𝔞 : FractionalIdeal (𝓞 F)⁰ F) *
-        FractionalIdeal.absNorm (𝔟 : FractionalIdeal (𝓞 F)⁰ F)) := by
+  have key
+      : (FractionalIdeal.absNorm ((I : Ideal (𝓞 F)) : FractionalIdeal (𝓞 F)⁰ F) : ℚ)
+        = |Algebra.norm ℚ ξ|
+          / (FractionalIdeal.absNorm (𝔞 : FractionalIdeal (𝓞 F)⁰ F)
+            * FractionalIdeal.absNorm (𝔟 : FractionalIdeal (𝓞 F)⁰ F)) := by
     rw [coe_toIdeal hI1, map_mul, map_mul, map_inv₀, map_inv₀, absNorm_span_singleton]
     ring
   rw [coeIdeal_absNorm] at key
-  calc (s.card : ℝ) = ((s.image f).card : ℝ) := by rw [Finset.card_image_of_injOn hinj]
+  calc
+    (s.card : ℝ)
+      = ((s.image f).card : ℝ) := by rw [Finset.card_image_of_injOn hinj]
     _ ≤ (Ideal.absNorm I : ℝ) := by
       exact_mod_cast GlobalTheory.T.card_divisors_le_absNorm_numberField F I hI0 (s.image f) (by
         intro J hJ

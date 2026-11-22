@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Kum UpperTheory.V.B3
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  UpperTheory.V.Kum UpperTheory.V.B3
 
 private theorem prime_l {l : ℕ} (hl : l.Prime) : Prime ((l : ℕ) : 𝓞 ℚ) := by
   have h : Prime ((l : ℤ)) := Nat.prime_iff_prime_int.mp hl
@@ -18,8 +19,9 @@ private noncomputable def vQ {l : ℕ} (hl : l.Prime) : HeightOneSpectrum (𝓞 
   isPrime := (Ideal.span_singleton_prime (prime_l hl).ne_zero).mpr (prime_l hl)
   ne_bot := by rw [Ne, Ideal.span_singleton_eq_bot]; exact (prime_l hl).ne_zero
 
-private theorem eq_vQ {l : ℕ} (hl : l.Prime) (v : HeightOneSpectrum (𝓞 ℚ)) (h : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal) :
-    v = vQ hl := by
+private theorem eq_vQ
+    {l : ℕ} (hl : l.Prime) (v : HeightOneSpectrum (𝓞 ℚ)) (h : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal)
+    : v = vQ hl := by
   apply HeightOneSpectrum.ext
   symm
   apply Ideal.IsMaximal.eq_of_le (vQ hl).isMaximal v.isPrime.ne_top
@@ -27,8 +29,8 @@ private theorem eq_vQ {l : ℕ} (hl : l.Prime) (v : HeightOneSpectrum (𝓞 ℚ)
   rw [Ideal.span_le, Set.singleton_subset_iff]
   exact h
 
-private theorem exists_prime_mem (v : HeightOneSpectrum (𝓞 ℚ)) :
-    ∃ p : ℕ, p.Prime ∧ ((p : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
+private theorem exists_prime_mem (v : HeightOneSpectrum (𝓞 ℚ))
+    : ∃ p : ℕ, p.Prime ∧ ((p : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
   set J : Ideal ℤ := v.asIdeal.comap (Int.castRingHom (𝓞 ℚ)) with hJ
   have hJp : J.IsPrime := Ideal.IsPrime.comap _
   have hJb : J ≠ ⊥ := by
@@ -50,16 +52,19 @@ private theorem exists_prime_mem (v : HeightOneSpectrum (𝓞 ℚ)) :
     rcases Int.natAbs_eq z with h | h
     · rw [← h]; exact hzJ
     · have : ((z.natAbs : ℤ)) = -z := by omega
-      rw [this]; exact J.neg_mem hzJ
+      rw [this]
+      exact J.neg_mem hzJ
   rw [hJ, Ideal.mem_comap] at hz'
   simpa using hz'
 
-theorem UpperTheory.V.B3.placesQ :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω],
-    (∀ p : ℕ, p.Prime → ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1) ∧
-    (∀ B : ValuationSubring Ω, Ine (F := ℚ) B = ⊥ ∨ ∃ p : ℕ, p.Prime ∧ B.valuation (p : Ω) < 1) ∧
-    ∀ (p : ℕ) (A B : ValuationSubring Ω), p.Prime → A.valuation (p : Ω) < 1 → B.valuation (p : Ω) < 1 →
-      ∃ g : G ℚ Ω, ∀ x ∈ Ine (F := ℚ) B, g⁻¹ * x * g ∈ Ine (F := ℚ) A := by
+theorem UpperTheory.V.B3.placesQ
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω],
+      (∀ p : ℕ, p.Prime → ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1)
+        ∧ (∀ B : ValuationSubring Ω,
+          Ine (F := ℚ) B = ⊥ ∨ ∃ p : ℕ, p.Prime ∧ B.valuation (p : Ω) < 1)
+        ∧ ∀ (p : ℕ) (A B : ValuationSubring Ω),
+          p.Prime → A.valuation (p : Ω) < 1 → B.valuation (p : Ω) < 1
+            → ∃ g : G ℚ Ω, ∀ x ∈ Ine (F := ℚ) B, g⁻¹ * x * g ∈ Ine (F := ℚ) A := by
   intro Ω _ _ _
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have val_top {x : Ω} (h : (⊤ : ValuationSubring Ω).valuation x < 1) : x = 0 := by
@@ -69,8 +74,7 @@ theorem UpperTheory.V.B3.placesQ :
     have h2 := mul_lt_one_of_nonneg_of_lt_one_left zero_le h h1
     rw [← map_mul, mul_inv_cancel₀ hx, map_one] at h2
     exact lt_irrefl _ h2
-  have int_le (A : ValuationSubring Ω) {b : Ω} (hb : IsIntegral ℤ b) :
-      A.valuation b ≤ 1 := by
+  have int_le (A : ValuationSubring Ω) {b : Ω} (hb : IsIntegral ℤ b) : A.valuation b ≤ 1 := by
     have h : IsIntegral A b := hb.tower_top
     obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.1 h
     rw [A.valuation_le_one_iff, ← hy]
@@ -82,8 +86,8 @@ theorem UpperTheory.V.B3.placesQ :
     ext x
     have h := hg.2 x ((ValuationSubring.valuation_le_one_iff _ _).2 (ValuationSubring.mem_top _))
     exact sub_eq_zero.1 (val_top h)
-  have hOver (A : ValuationSubring Ω) (hA : A ≠ ⊤) :
-      ∃ v : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver A v := by
+  have hOver (A : ValuationSubring Ω) (hA : A ≠ ⊤)
+      : ∃ v : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver A v := by
     have hm : ∀ x : 𝓞 ℚ, algebraMap ℚ Ω (x : ℚ) ∈ A := fun x =>
       (A.valuation_le_one_iff _).1 (int_le A (x.isIntegral_coe.map (algebraMap ℚ Ω).toIntAlgHom))
     let f : 𝓞 ℚ →+* A := ((algebraMap ℚ Ω).comp (algebraMap (𝓞 ℚ) ℚ)).codRestrict A hm
@@ -94,7 +98,8 @@ theorem UpperTheory.V.B3.placesQ :
     rw [eq_top_iff]
     intro x _
     have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
-    have h1 : Algebra.IsAlgebraic ℤ ℚ := (IsFractionRing.comap_isAlgebraic_iff (A := ℤ) (K := ℚ) (C := ℚ)).2 inferInstance
+    have h1 : Algebra.IsAlgebraic ℤ ℚ :=
+      (IsFractionRing.comap_isAlgebraic_iff (A := ℤ) (K := ℚ) (C := ℚ)).2 inferInstance
     have h2 : Algebra.IsAlgebraic ℤ Ω := Algebra.IsAlgebraic.trans ℤ ℚ Ω
     obtain ⟨n, hn, hi⟩ := (h2.isAlgebraic x).exists_integral_multiple
     have h3 : ¬ A.valuation (algebraMap ℚ Ω ((n : 𝓞 ℚ) : ℚ)) < 1 := by
@@ -105,13 +110,12 @@ theorem UpperTheory.V.B3.placesQ :
     have h5 := int_le A hi
     rw [zsmul_eq_mul, map_mul, h4, one_mul] at h5
     exact (A.valuation_le_one_iff x).1 h5
-  have hNe (A : ValuationSubring Ω) (N : ℕ) (hN : N ≠ 0)
-      (h : A.valuation (N : Ω) < 1) : A ≠ ⊤ := by
+  have hNe (A : ValuationSubring Ω) (N : ℕ) (hN : N ≠ 0) (h : A.valuation (N : Ω) < 1) : A ≠ ⊤ := by
     intro he
     subst A
     exact hN (Nat.cast_eq_zero.1 (val_top h))
-  have hIff (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 ℚ)) (N : ℕ)
-      (hv : IsPlaceOver A v) : A.valuation (N : Ω) < 1 ↔ ((N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
+  have hIff (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 ℚ)) (N : ℕ) (hv : IsPlaceOver A v)
+      : A.valuation (N : Ω) < 1 ↔ ((N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
     have h := hv (N : 𝓞 ℚ)
     have e : algebraMap ℚ Ω ((N : 𝓞 ℚ) : ℚ) = (N : Ω) := by simp
     rw [← e]

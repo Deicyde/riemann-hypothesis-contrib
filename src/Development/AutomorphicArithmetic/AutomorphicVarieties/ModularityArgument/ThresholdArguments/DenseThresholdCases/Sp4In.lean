@@ -14,7 +14,11 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 namespace UpperTheory.V.Cu
-theorem sp4In_alt (hC : GradeZeroInterpolatingElement.CohomologyHyp) (hF : Published.FerreroWashington) (s2 : _root_.UpperTheory.V.Ws.SeedIIAlt) (s4 : _root_.UpperTheory.V.Cu.SeedIVAlt) (hP : _root_.UpperTheory.V.Ws.PMExAlt) : _root_.UpperTheory.V.Aut.SymplecticFourImageDense :=
+theorem sp4In_alt
+    (hC : GradeZeroInterpolatingElement.CohomologyHyp) (hF : Published.FerreroWashington)
+    (s2 : _root_.UpperTheory.V.Ws.SeedIIAlt) (s4 : _root_.UpperTheory.V.Cu.SeedIVAlt)
+    (hP : _root_.UpperTheory.V.Ws.PMExAlt)
+    : _root_.UpperTheory.V.Aut.SymplecticFourImageDense :=
   _root_.UpperTheory.V.Cu.main4_alt hC hF hFit s2 s4 hP
 end UpperTheory.V.Cu
 end

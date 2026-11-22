@@ -56,17 +56,18 @@ theorem placeOf_eq_iff (x y : φ.GG) : Frame.placeOf x = Frame.placeOf y ↔ x =
     · rfl
     · exact placeOf_cc_mul y
 
-theorem placeOf_letter_eq_iff (τ g : φ.GG) (a b : ℕ) :
-    Frame.placeOf (τ * g ^ a) = Frame.placeOf (τ * g ^ b) ↔ g ^ a = g ^ b ∨ g ^ a = φ.cc * g ^ b := by
+theorem placeOf_letter_eq_iff (τ g : φ.GG) (a b : ℕ)
+    : Frame.placeOf (τ * g ^ a) = Frame.placeOf (τ * g ^ b)
+      ↔ g ^ a = g ^ b ∨ g ^ a = φ.cc * g ^ b := by
   rw [placeOf_eq_iff, mul_left_comm φ.cc τ, mul_left_cancel_iff, mul_left_cancel_iff]
 
-theorem pow_val_add (g : φ.GG) (i : ZMod (orderOf g)) (k : ℕ) :
-    g ^ (i + (k : ZMod (orderOf g))).val = g ^ (i.val + k) := by
+theorem pow_val_add (g : φ.GG) (i : ZMod (orderOf g)) (k : ℕ)
+    : g ^ (i + (k : ZMod (orderOf g))).val = g ^ (i.val + k) := by
   haveI : NeZero (orderOf g) := ⟨(orderOf_pos g).ne'⟩
   rw [ZMod.val_add, ZMod.val_natCast, Nat.add_mod_mod, pow_mod_orderOf]
 
-theorem placeOf_letter_succ_ne (τ g : φ.GG) (h1 : g ≠ 1) (hc : g ≠ φ.cc) (i : ZMod (orderOf g)) :
-    Frame.placeOf (τ * g ^ (i + 1).val) ≠ Frame.placeOf (τ * g ^ i.val) := by
+theorem placeOf_letter_succ_ne (τ g : φ.GG) (h1 : g ≠ 1) (hc : g ≠ φ.cc) (i : ZMod (orderOf g))
+    : Frame.placeOf (τ * g ^ (i + 1).val) ≠ Frame.placeOf (τ * g ^ i.val) := by
   intro heq
   have hv := pow_val_add g i 1
   rw [Nat.cast_one] at hv
@@ -77,15 +78,20 @@ theorem placeOf_letter_succ_ne (τ g : φ.GG) (h1 : g ≠ 1) (hc : g ≠ φ.cc) 
     rw [mul_comm φ.cc] at h
     exact mul_left_cancel h
 
-theorem thick_one_place {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0) (u₀ : φ.A) (τ g : φ.GG)
-    (hord : orderOf (φ.hH g.2) ≤ 4 * L) (a b : ℕ)
-    (ha : ∃ s ∈ T, φ.tau2 (φ.dig s + u₀) = Frame.placeOf (τ * g ^ a))
-    (hb : ∃ s ∈ T, φ.tau2 (φ.dig s + u₀) = Frame.placeOf (τ * g ^ b)) :
-    Frame.placeOf (τ * g ^ a) = Frame.placeOf (τ * g ^ b) := by
+theorem thick_one_place
+    {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0)
+    (u₀ : φ.A)
+    (τ g : φ.GG) (hord : orderOf (φ.hH g.2) ≤ 4 * L)
+    (a b : ℕ) (ha : ∃ s ∈ T, φ.tau2 (φ.dig s + u₀) = Frame.placeOf (τ * g ^ a))
+    (hb : ∃ s ∈ T, φ.tau2 (φ.dig s + u₀) = Frame.placeOf (τ * g ^ b))
+    : Frame.placeOf (τ * g ^ a) = Frame.placeOf (τ * g ^ b) := by
   obtain ⟨s, hs, hsa⟩ := ha
   obtain ⟨s', hs', hsb⟩ := hb
-  have mem : ∀ (n s : ℕ), s ∈ T → φ.tau2 (φ.dig s + u₀) = Frame.placeOf (τ * g ^ n) →
-      φ.dig s + u₀ ∈ {y | (∃ i : ℤ, y = φ.iotaInv τ.2 + i • φ.iotaInv g.2) ∧ φ.InTranslate T u₀ y} := by
+  have mem
+      : ∀ (n s : ℕ),
+        s ∈ T → φ.tau2 (φ.dig s + u₀) = Frame.placeOf (τ * g ^ n)
+          → φ.dig s + u₀
+            ∈ {y | (∃ i : ℤ, y = φ.iotaInv τ.2 + i • φ.iotaInv g.2) ∧ φ.InTranslate T u₀ y} := by
     intro n s hsT hsn
     refine ⟨⟨(n : ℤ), ?_⟩, s, hsT, rfl⟩
     have h2 := congrArg Prod.snd hsn

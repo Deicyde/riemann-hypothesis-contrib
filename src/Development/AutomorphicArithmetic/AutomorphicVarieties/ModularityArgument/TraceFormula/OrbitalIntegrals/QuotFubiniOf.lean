@@ -62,13 +62,15 @@ theorem absComm_of : AbsComm := absComm quotFubini_of quotRight_of finPres_of
 
 theorem untwist_of : Untwist := untwist
 
-theorem twOrbFin_of (h : OrbProper) : TwOrbFin := twOrbFin gLTop_of extCont_of twCent_of h haarComm_of normEx_of quotInt_of quotPos_of
+theorem twOrbFin_of (h : OrbProper) : TwOrbFin :=
+  twOrbFin gLTop_of extCont_of twCent_of h haarComm_of normEx_of quotInt_of quotPos_of
 
 theorem twOrbLin_of (h : OrbProper) : TwOrbLin := twOrbLin (twOrbFin_of h)
 
 theorem orbLin_of (h : OrbProper) : OrbLin := orbLin (twOrbLin_of h) untwist_of
 
-theorem twOrbComm_of (h : OrbProper) : TwOrbComm := twOrbComm gLTop_of extCont_of twCent_of h haarComm_of unimod_of absComm_of
+theorem twOrbComm_of (h : OrbProper) : TwOrbComm :=
+  twOrbComm gLTop_of extCont_of twCent_of h haarComm_of unimod_of absComm_of
 
 theorem orbComm_of (h : OrbProper) : OrbComm := orbComm (twOrbComm_of h) untwist_of
 

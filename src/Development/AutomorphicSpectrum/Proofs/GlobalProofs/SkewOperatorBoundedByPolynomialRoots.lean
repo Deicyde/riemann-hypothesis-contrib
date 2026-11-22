@@ -8,24 +8,28 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.SkewSpec
 
-theorem aeval_intertwine {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
-    (f : A →ₗ[ℂ] B) (SA : Module.End ℂ A) (SB : Module.End ℂ B)
-    (h : ∀ v, f (SA v) = SB (f v)) (p : Polynomial ℂ) (v : A) :
-    f (Polynomial.aeval SA p v) = Polynomial.aeval SB p (f v) := by
+theorem aeval_intertwine
+    {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
+    (f : A →ₗ[ℂ] B) (SA : Module.End ℂ A) (SB : Module.End ℂ B) (h : ∀ v, f (SA v) = SB (f v))
+    (p : Polynomial ℂ) (v : A)
+    : f (Polynomial.aeval SA p v) = Polynomial.aeval SB p (f v) := by
   induction p using Polynomial.induction_on generalizing v with
   | C a => simp [Polynomial.aeval_C, Module.algebraMap_end_apply]
   | add p q hp hq => simp [hp, hq]
   | monomial n a ih =>
-    have hp : Polynomial.C a * Polynomial.X ^ (n + 1) =
-        (Polynomial.C a * Polynomial.X ^ n) * (Polynomial.X : Polynomial ℂ) := by ring
-    rw [hp, map_mul (Polynomial.aeval SA), map_mul (Polynomial.aeval SB), Polynomial.aeval_X, Polynomial.aeval_X,
-      Module.End.mul_apply, Module.End.mul_apply, ih, h]
+    have hp
+        : Polynomial.C a * Polynomial.X ^ (n + 1)
+          = (Polynomial.C a * Polynomial.X ^ n) * (Polynomial.X : Polynomial ℂ) := by
+      ring
+    rw [hp, map_mul (Polynomial.aeval SA), map_mul (Polynomial.aeval SB), Polynomial.aeval_X,
+      Polynomial.aeval_X, Module.End.mul_apply, Module.End.mul_apply, ih, h]
 
-theorem functional_aeval {A : Type} [AddCommGroup A] [Module ℂ A]
+theorem functional_aeval
+    {A : Type} [AddCommGroup A] [Module ℂ A]
     (φ : A → ℂ) (hadd : ∀ a b, φ (a + b) = φ a + φ b) (hsmul : ∀ (c : ℂ) a, φ (c • a) = c * φ a)
-    (S : Module.End ℂ A) (c : ℂ)
-    (h : ∀ v, φ (S v) = c * φ v) (p : Polynomial ℂ) (v : A) :
-    φ (Polynomial.aeval S p v) = p.eval c * φ v := by
+    (S : Module.End ℂ A) (c : ℂ) (h : ∀ v, φ (S v) = c * φ v)
+    (p : Polynomial ℂ) (v : A)
+    : φ (Polynomial.aeval S p v) = p.eval c * φ v := by
   induction p using Polynomial.induction_on generalizing v with
   | C a => simp [Polynomial.aeval_C, Module.algebraMap_end_apply, hsmul]
   | add p q hp hq => simp [hp, hq, hadd, add_mul]
@@ -34,10 +38,13 @@ theorem functional_aeval {A : Type} [AddCommGroup A] [Module ℂ A]
     simp only [Polynomial.eval_mul, Polynomial.eval_X]
     ring
 
-theorem fd_bound {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
-    (S : Module.End ℂ E) (hS : ∀ x y, ⟪S x, y⟫_ℂ = -⟪x, S y⟫_ℂ) (m : Polynomial ℂ) (hm : m ≠ 0)
-    (κ : ℝ) (hκ : 0 ≤ κ) (hr : ∀ r ∈ m.roots, ‖r‖ ≤ κ) (u : E)
-    (hu : Polynomial.aeval S m u = 0) : ‖S u‖ ≤ κ * ‖u‖ := by
+theorem fd_bound
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+    (S : Module.End ℂ E) (hS : ∀ x y, ⟪S x, y⟫_ℂ = - ⟪x, S y⟫_ℂ)
+    (m : Polynomial ℂ) (hm : m ≠ 0)
+    (κ : ℝ) (hκ : 0 ≤ κ) (hr : ∀ r ∈ m.roots, ‖r‖ ≤ κ)
+    (u : E) (hu : Polynomial.aeval S m u = 0)
+    : ‖S u‖ ≤ κ * ‖u‖ := by
   have hA : (Complex.I • S : E →ₗ[ℂ] E).IsSymmetric := by
     intro x y
     simp [inner_smul_left, inner_smul_right, hS]
@@ -58,8 +65,12 @@ theorem fd_bound {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [Fi
     linear_combination h1
   have hc : ∀ i, ⟪b i, u⟫_ℂ = 0 ∨ ‖(μ i : ℂ)‖ ≤ κ := by
     intro i
-    have h1 := functional_aeval (fun v => ⟪b i, v⟫_ℂ) (fun a c => inner_add_right _ _ _)
-      (fun c a => inner_smul_right _ _ _) S _ (hφ i) m u
+    have h1 :=
+      functional_aeval
+        (fun v => ⟪b i, v⟫_ℂ)
+        (fun a c => inner_add_right _ _ _)
+        (fun c a => inner_smul_right _ _ _)
+        S _ (hφ i) m u
     simp only [hu, inner_zero_right] at h1
     rcases mul_eq_zero.mp h1.symm with h2 | h2
     · right
@@ -76,16 +87,20 @@ theorem fd_bound {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [Fi
       gcongr
   exact (pow_le_pow_iff_left₀ (norm_nonneg _) (by positivity) two_ne_zero).mp hsq
 
-theorem norm_le_of_aeval_eq_zero (M H : Type) [AddCommGroup M] [Module ℂ M] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (ι : M →ₗ[ℂ] H) (hι : Function.Injective ι) (T : Module.End ℂ M)
-    (hT : ∀ x y, ⟪ι (T x), ι y⟫_ℂ = -⟪ι x, ι (T y)⟫_ℂ) (m : Polynomial ℂ) (hm : m ≠ 0) (κ : ℝ)
-    (hκ : 0 ≤ κ) (hr : ∀ r ∈ m.roots, ‖r‖ ≤ κ) (x : M) (hx : Polynomial.aeval T m x = 0) :
-    ‖ι (T x)‖ ≤ κ * ‖ι x‖ := by
+theorem norm_le_of_aeval_eq_zero
+    (M H : Type) [AddCommGroup M] [Module ℂ M] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ι : M →ₗ[ℂ] H) (hι : Function.Injective ι)
+    (T : Module.End ℂ M) (hT : ∀ x y, ⟪ι (T x), ι y⟫_ℂ = - ⟪ι x, ι (T y)⟫_ℂ)
+    (m : Polynomial ℂ) (hm : m ≠ 0)
+    (κ : ℝ) (hκ : 0 ≤ κ) (hr : ∀ r ∈ m.roots, ‖r‖ ≤ κ)
+    (x : M) (hx : Polynomial.aeval T m x = 0)
+    : ‖ι (T x)‖ ≤ κ * ‖ι x‖ := by
   classical
-  let L : Polynomial ℂ →ₗ[ℂ] M :=
-    { toFun := fun p => Polynomial.aeval T p x
-      map_add' := fun p q => by simp
-      map_smul' := fun c p => by simp }
+  let L : Polynomial ℂ →ₗ[ℂ] M := {
+    toFun := fun p => Polynomial.aeval T p x
+    map_add' := fun p q => by simp
+    map_smul' := fun c p => by simp
+  }
   have hL : ∀ p, L p = Polynomial.aeval T p x := fun _ => rfl
   let N : Submodule ℂ M := LinearMap.range L
   have hNeq : N = (Polynomial.degreeLT ℂ m.natDegree).map L := by
@@ -117,7 +132,7 @@ theorem norm_le_of_aeval_eq_zero (M H : Type) [AddCommGroup M] [Module ℂ M] [N
   have hSe : ∀ v, S (e v) = e (R v) := fun v => by simp [S]
   have heι : ∀ v : N, ((e v : N.map ι) : H) = ι v := fun v => rfl
   have hRc : ∀ v : N, ((R v : N) : M) = T v := fun v => rfl
-  have hS : ∀ a b, ⟪S a, b⟫_ℂ = -⟪a, S b⟫_ℂ := by
+  have hS : ∀ a b, ⟪S a, b⟫_ℂ = - ⟪a, S b⟫_ℂ := by
     intro a b
     obtain ⟨a', rfl⟩ := e.surjective a
     obtain ⟨b', rfl⟩ := e.surjective b

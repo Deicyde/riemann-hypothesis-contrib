@@ -4,15 +4,15 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.PairedCharacterCondition.TrScale :
-    Prop :=
-    ∀ (K : Type) [inst : Field K] [NumberField K] (V : Type) [inst_2 : AddCommGroup V] [inst_3 : _root_.Module K V]
-      [inst_4 : _root_.Module (NumberField.RingOfIntegers K) V] [IsScalarTower (NumberField.RingOfIntegers K) K V]
+noncomputable def UpperTheory.Reformulated.B.PairedCharacterCondition.TrScale : Prop :=
+  ∀ (K : Type) [inst : Field K] [NumberField K] (V : Type) [inst_2 : AddCommGroup V]
+      [inst_3 : _root_.Module K V] [inst_4 : _root_.Module (NumberField.RingOfIntegers K) V]
+      [IsScalarTower (NumberField.RingOfIntegers K) K V]
       (M : Submodule (NumberField.RingOfIntegers K) V),
-      Submodule.span K (↑M : Set V) = ⊤ → ∀ (f : V), ∃ (m : ℤ), m ≠ (0 : ℤ) ∧ (↑m : K) • f ∈ M
+    Submodule.span K (↑M : Set V) = ⊤ → ∀ (f : V), ∃ (m : ℤ), m ≠ (0 : ℤ) ∧ (↑m : K) • f ∈ M
 
-theorem UpperTheory.Reformulated.B.PairedCharacterCondition.tr_scale :
-    UpperTheory.Reformulated.B.PairedCharacterCondition.TrScale := by
+theorem UpperTheory.Reformulated.B.PairedCharacterCondition.tr_scale
+    : UpperTheory.Reformulated.B.PairedCharacterCondition.TrScale := by
   intro K _ _ V _ _ _ _ M hM f
   have key : ∀ (c : K), IsIntegral ℤ c → ∀ x ∈ M, c • x ∈ M := by
     intro c hc x hx

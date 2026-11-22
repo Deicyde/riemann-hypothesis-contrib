@@ -32,27 +32,39 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsR
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open ReciprocityTheory.Aut Formalism.AUTREP
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL GlobalTheory.SplitRead GlobalTheory.NPin
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL
+  GlobalTheory.SplitRead GlobalTheory.NPin
 
 noncomputable section
 
 namespace GlobalTheory.RefPair
 
-
 set_option maxHeartbeats 1000000 in
-theorem thetaPair_of_hasThetaAt (hBZ : GlobalTheory.Published.BernsteinZelevinskyFiniteness) (D : D7) {μt : D.what₂.Tup} {j : ℕ}
-    (Mr : MtReal D μt j) {rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r} (X : RowMod D rep j) (μ η : HChar D.host.E)
-    (hΘ : HasThetaAt D Mr X μ η) (σ : D.what₂.FT) (S : Submodule ℂ (GAf D.host.E D.R.nV → Mr.wt.W))
-    (hS : NG.IsIrrRep Mr.wt.ρ S)
-    (hPair : ∃ y ∈ D.what₂.isot j σ, ∃ F ∈ (NG.isoTyp Mr.wt.ρ S).comap Mr.real, inner ℂ F (D.what₂.thetaT μt j y) ≠ 0)
-    (s : SplitPlace D.host.E) (π : GlobalTheory.SmGL.IrrRep (GL (Fin (D.R.r + D.R.t)) (s.w.adicCompletion D.host.E)))
+theorem thetaPair_of_hasThetaAt
+    (hBZ : GlobalTheory.Published.BernsteinZelevinskyFiniteness)
+    (D : D7)
+    {μt : D.what₂.Tup} {j : ℕ} (Mr : MtReal D μt j)
+    {rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r} (X : RowMod D rep j)
+    (μ η : HChar D.host.E) (hΘ : HasThetaAt D Mr X μ η)
+    (σ : D.what₂.FT) (S : Submodule ℂ (GAf D.host.E D.R.nV → Mr.wt.W)) (hS : NG.IsIrrRep Mr.wt.ρ S)
+    (hPair : ∃ y ∈ D.what₂.isot j σ, ∃ F ∈ (NG.isoTyp Mr.wt.ρ S).comap Mr.real,
+      inner ℂ F (D.what₂.thetaT μt j y) ≠ 0)
+    (s : SplitPlace D.host.E)
+    (π : GlobalTheory.SmGL.IrrRep (GL (Fin (D.R.r + D.R.t)) (s.w.adicCompletion D.host.E)))
     (τ : GlobalTheory.SmGL.IrrRep (GL (Fin D.R.r) (s.w.adicCompletion D.host.E)))
-    (hπ : IsLocS (n := D.R.nV) S s π) (hτ : IsLocS (rep σ).S s τ) (hU : GlobalTheory.SmGL.IsUnitarisable τ.ρ) :
-    GlobalTheory.ThetaGL.ThetaPair (μ.loc s.w) τ.ρ (GlobalTheory.SmGL.twist π.ρ (GlobalTheory.SmGL.detChar (Fin (D.R.r + D.R.t)) (η.loc s.w))) := by
+    (hπ : IsLocS (n := D.R.nV) S s π) (hτ : IsLocS (rep σ).S s τ)
+    (hU : GlobalTheory.SmGL.IsUnitarisable τ.ρ)
+    : GlobalTheory.ThetaGL.ThetaPair (μ.loc s.w) τ.ρ
+      (GlobalTheory.SmGL.twist π.ρ
+        (GlobalTheory.SmGL.detChar (Fin (D.R.r + D.R.t)) (η.loc s.w))) := by
   obtain ⟨Ω, _, _, ω, Λ, φ₀, hinv, hread, hloc⟩ := hΘ
   obtain ⟨f, hf, F, hF, hne⟩ := hPair
   have hFmem : Mr.real F ∈ NG.AFall D.host.E D.R.nV Mr.wt.ρ := by
@@ -79,18 +91,25 @@ theorem thetaPair_of_hasThetaAt (hBZ : GlobalTheory.Published.BernsteinZelevinsk
   have hspan := GlobalTheory.SpanLoc.main D.host.E D.R.nV Mr.wt S hS s π hπ c hc hci
   let ℓF : ↥(NG.AFall D.host.E D.R.nV Mr.wt.ρ) →+ ℂ :=
     AddMonoidHom.mk' (fun F' => Λ (ι Φ0) F' yp) (by intro a b; simp)
-  obtain ⟨T1, F1, hF1, hℓF1⟩ := GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
-    (fun T => iSup_le fun hT1 => by rintro _ ⟨v, rfl⟩; exact hT1.1 v) ℓF Fp (hspan hFiso) hℓ2
-  obtain ⟨hT1, F2, ⟨a0, ha0⟩, hℓF2⟩ := GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
-    (fun hT1 => by rintro _ ⟨v, rfl⟩; exact hT1.1 v) ℓF F1 hF1 hℓF1
+  obtain ⟨T1, F1, hF1, hℓF1⟩ :=
+    GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
+      (fun T => iSup_le fun hT1 => by rintro _ ⟨v, rfl⟩; exact hT1.1 v)
+      ℓF Fp (hspan hFiso) hℓ2
+  obtain ⟨hT1, F2, ⟨a0, ha0⟩, hℓF2⟩ :=
+    GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
+      (fun hT1 => by rintro _ ⟨v, rfl⟩; exact hT1.1 v)
+      ℓF F1 hF1 hℓF1
 
-  have hyI : (yp : X.A) ∈ Formalism.IndefR.principalLevelFrame.isotIn (D := D) X.ρ X.C (rep σ) := (X.isot σ f).1 hf
+  have hyI : (yp : X.A) ∈ Formalism.IndefR.principalLevelFrame.isotIn (D := D) X.ρ X.C (rep σ) :=
+    (X.isot σ f).1 hf
   unfold Formalism.IndefR.principalLevelFrame.isotIn at hyI
   let ℓy : ↥X.C →+ ℂ := (Λ (ι Φ0) F2).toAddMonoidHom
-  obtain ⟨Φe, y1, hy1, hℓy1⟩ := GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub X.C _
-    (fun Φe => iSup_le fun h => h.2) ℓy yp hyI hℓF2
-  obtain ⟨hΦe, y2, ⟨f2, hf2⟩, hℓy2⟩ := GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub X.C _
-    (fun h => h.2) ℓy y1 hy1 hℓy1
+  obtain ⟨Φe, y1, hy1, hℓy1⟩ :=
+    GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub X.C _
+      (fun Φe => iSup_le fun h => h.2)
+      ℓy yp hyI hℓF2
+  obtain ⟨hΦe, y2, ⟨f2, hf2⟩, hℓy2⟩ :=
+    GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub X.C _ (fun h => h.2) ℓy y1 hy1 hℓy1
   have hΦC : ∀ g : ↥(rep σ).S, Φe g ∈ X.C := fun g => hΦe.2 (LinearMap.mem_range_self _ _)
   have hspan2 := GlobalTheory.FinTypSpanLoc.main D.host.E D.R.r (rep σ) s τ hτ c hc hci
   let ℓ2 : ↥(rep σ).S →+ ℂ :=
@@ -103,25 +122,40 @@ theorem thetaPair_of_hasThetaAt (hBZ : GlobalTheory.Published.BernsteinZelevinsk
   have hℓ2f2 : ℓ2 f2 ≠ 0 := by
     have e : (⟨Φe f2, hΦC f2⟩ : ↥X.C) = y2 := Subtype.ext hf2
     show Λ (ι Φ0) F2 ⟨Φe f2, hΦC f2⟩ ≠ 0
-    rw [e]; exact hℓy2
-  obtain ⟨T2, g1, hg1, hℓg1⟩ := GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
-    (fun T => iSup_le fun hT2 => by rintro _ ⟨v, rfl⟩; exact hT2.1 v) ℓ2 f2 (hspan2 f2.2) hℓ2f2
-  obtain ⟨hT2, g2, ⟨c0, hc0⟩, hℓg2⟩ := GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
-    (fun hT2 => by rintro _ ⟨v, rfl⟩; exact hT2.1 v) ℓ2 g1 hg1 hℓg1
+    rw [e]
+    exact hℓy2
+  obtain ⟨T2, g1, hg1, hℓg1⟩ :=
+    GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
+      (fun T => iSup_le fun hT2 => by rintro _ ⟨v, rfl⟩; exact hT2.1 v)
+      ℓ2 f2 (hspan2 f2.2) hℓ2f2
+  obtain ⟨hT2, g2, ⟨c0, hc0⟩, hℓg2⟩ :=
+    GlobalTheory.PairReadPf.exists_ne_of_mem_iSup_sub _ _
+      (fun hT2 => by rintro _ ⟨v, rfl⟩; exact hT2.1 v)
+      ℓ2 g1 hg1 hℓg1
 
   let T' : π.V →ₗ[ℂ] ↥(NG.AFall D.host.E D.R.nV Mr.wt.ρ) := T1.codRestrict _ hT1.1
   let T'' : τ.V →ₗ[ℂ] ↥X.C := (Φe ∘ₗ T2.codRestrict _ hT2.1).codRestrict X.C (fun v => hΦC _)
-  have hT'eq : ∀ x : GAf D.host.E D.R.nV, TrivOutside {s.v} x → ∀ a,
-      ((T' (π.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV x)) a) :
-        ↥(NG.AFall D.host.E D.R.nV Mr.wt.ρ)) : GAf D.host.E D.R.nV → Mr.wt.W) =
-        NG.rt D.host.E D.R.nV x (T' a : GAf D.host.E D.R.nV → Mr.wt.W) :=
-    fun x hx a => hT1.2 x hx a
-  have hT''eq : ∀ x : GAf D.host.E D.R.r, TrivOutside {s.v} x → ∀ a,
-      ((T'' (τ.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r x)) a) : ↥X.C) : X.A) =
-        X.ρ x (T'' a) := by
+  have hT'eq
+      : ∀ x : GAf D.host.E D.R.nV,
+        TrivOutside {s.v} x
+          → ∀ a,
+            ((T' (π.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV x)) a)
+                  : ↥(NG.AFall D.host.E D.R.nV Mr.wt.ρ))
+                : GAf D.host.E D.R.nV → Mr.wt.W)
+              = NG.rt D.host.E D.R.nV x (T' a : GAf D.host.E D.R.nV → Mr.wt.W) := fun x hx a =>
+    hT1.2 x hx a
+  have hT''eq
+      : ∀ x : GAf D.host.E D.R.r,
+        TrivOutside {s.v} x
+          → ∀ a,
+            ((T'' (τ.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r x)) a) : ↥X.C) : X.A)
+              = X.ρ x (T'' a) := by
     intro x hx a
-    have e : (⟨T2 (τ.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r x)) a), hT2.1 _⟩ : ↥(rep σ).S) =
-        ⟨NG.rt D.host.E D.R.r x (T2 a), (rep σ).stable x _ (hT2.1 a)⟩ := Subtype.ext (hT2.2 x hx a)
+    have e
+        : (⟨T2 (τ.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r x)) a), hT2.1 _⟩
+            : ↥(rep σ).S)
+          = ⟨NG.rt D.host.E D.R.r x (T2 a), (rep σ).stable x _ (hT2.1 a)⟩ :=
+      Subtype.ext (hT2.2 x hx a)
     show Φe ⟨_, _⟩ = X.ρ x (Φe ⟨T2 a, hT2.1 a⟩)
     rw [e]
     exact hΦe.1 x ⟨T2 a, hT2.1 a⟩
@@ -136,28 +170,39 @@ theorem thetaPair_of_hasThetaAt (hBZ : GlobalTheory.Published.BernsteinZelevinsk
     show Λ (ι Φ0) (T' a0) (T'' c0) ≠ 0
     rw [e1, e2]
     exact hℓg2
-  refine GlobalTheory.ThetaRiesz.thetaPair_of_invariant_form _ D.R.r (D.R.r + D.R.t) _ _ (μ.loc s.w) τ.ρ
-    (GlobalTheory.SmGL.twist π.ρ (GlobalTheory.SmGL.detChar (Fin (D.R.r + D.R.t)) (η.loc s.w)))
+  refine GlobalTheory.ThetaRiesz.thetaPair_of_invariant_form _ D.R.r (D.R.r + D.R.t) _ _ (μ.loc s.w)
+    τ.ρ (GlobalTheory.SmGL.twist π.ρ (GlobalTheory.SmGL.detChar (Fin (D.R.r + D.R.t)) (η.loc s.w)))
     ((hBZ _).1 (Fin D.R.r) _ _ τ.smooth τ.irr) hU (GlobalTheory.HeckeComp.smooth_loc μ s.w) b
-    (fun h => hb0 (by rw [h]; rfl)) ?_
+    (fun h => hb0 (by rw [h]; rfl))
+    ?_
   intro g h Φ Φ' hΦ' a c'
-  obtain ⟨xh, hxh, exh⟩ := GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.nV s
-    (Matrix.GeneralLinearGroup.map c.symm.toRingHom h)
-  obtain ⟨xg, hxg, exg⟩ := GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.r s
-    (Matrix.GeneralLinearGroup.map c.symm.toRingHom g)
-  have back : ∀ (n : ℕ) (A : GL (Fin n) (s.w.adicCompletion D.host.E)),
-      Matrix.GeneralLinearGroup.map c.toRingHom (Matrix.GeneralLinearGroup.map c.symm.toRingHom A) = A := by
+  obtain ⟨xh, hxh, exh⟩ :=
+    GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.nV s
+      (Matrix.GeneralLinearGroup.map c.symm.toRingHom h)
+  obtain ⟨xg, hxg, exg⟩ :=
+    GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.r s
+      (Matrix.GeneralLinearGroup.map c.symm.toRingHom g)
+  have back
+      : ∀ (n : ℕ) (A : GL (Fin n) (s.w.adicCompletion D.host.E)),
+        Matrix.GeneralLinearGroup.map c.toRingHom (Matrix.GeneralLinearGroup.map c.symm.toRingHom A)
+          = A := by
     intro n A
     ext k l
     simp
-  have eh : (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV xh) :
-      GL (Fin (D.R.r + D.R.t)) (s.w.adicCompletion D.host.E)) = h := by rw [exh]; exact back _ h
-  have eg : Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r xg) = g := by rw [exg]; exact back _ g
+  have eh
+      : (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV xh)
+          : GL (Fin (D.R.r + D.R.t)) (s.w.adicCompletion D.host.E))
+        = h := by
+    rw [exh]; exact back _ h
+  have eg : Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r xg) = g := by
+    rw [exg]; exact back _ g
   subst eh eg
   have hω := hιeq xh xg hxh hxg Φ Φ' hΦ'
-  have key := hinv xh xg (ι Φ) (T' a) (T' (π.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV xh)) a))
-    (T'' c') (T'' (τ.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r xg)) c'))
-    (hT'eq xh hxh a) (hT''eq xg hxg c')
+  have key :=
+    hinv xh xg (ι Φ) (T' a)
+      (T' (π.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV xh)) a)) (T'' c')
+      (T'' (τ.ρ (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.r xg)) c')) (hT'eq xh hxh a)
+      (hT''eq xg hxg c')
   rw [hω] at key
   show Λ (ι Φ') (T' (GlobalTheory.SmGL.twist π.ρ (GlobalTheory.SmGL.detChar (Fin (D.R.r + D.R.t)) (η.loc s.w)) _ a)) (T'' (τ.ρ _ c')) =
     Λ (ι Φ) (T' a) (T'' c')
@@ -169,8 +214,8 @@ end GlobalTheory.RefPair
 
 namespace GlobalTheory.RefPair
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL GlobalTheory.SplitRead GlobalTheory.NPin
-
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL
+  GlobalTheory.SplitRead GlobalTheory.NPin
 
 end GlobalTheory.RefPair
 

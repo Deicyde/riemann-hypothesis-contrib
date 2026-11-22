@@ -20,7 +20,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MulVe
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting
 open GlobalTheory.RowLev GlobalTheory.RowLev.Inhab IsDedekindDomain Matrix Formalism.UG
 open scoped TensorProduct Classical
 
@@ -40,6 +41,5 @@ theorem mem_mL {m : ℕ} {x : VA I} : x ∈ mL I m ↔ ∃ z ∈ I.Lf, x = (m : 
   | smul a x _ hx =>
     obtain ⟨z, hz, rfl⟩ := hx
     exact ⟨a • z, Submodule.smul_mem _ a hz, smul_comm (a : I.E ⊗[I.F] Af I.F) _ z⟩
-
 
 end GlobalTheory.RowIndex

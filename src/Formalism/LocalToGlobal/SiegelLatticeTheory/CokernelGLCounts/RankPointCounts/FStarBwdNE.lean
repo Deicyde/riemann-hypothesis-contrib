@@ -13,14 +13,18 @@ namespace Formalism.L2.SG.Pf.FrameGlobalPatching.FStar.BwdNA
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] (S : HSpace E)
 
-theorem main (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) (z : S.V) (hzX : z ∈ orth S X)
+theorem main
+    (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
+    (z : S.V) (hzX : z ∈ orth S X)
     (Λ Λ₂ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsLattice E Λ) (hΛ₂ : Submodule.IsLattice E Λ₂)
     (hSD : SD S Λ) (hSD₂ : SD S Λ₂) (hX : ∀ x ∈ X, x ∈ Λ₂ ↔ x ∈ Λ) (hz : z ∈ Λ) (hz₂ : z ∈ Λ₂)
     (hL : ∀ x ∈ Λ₂, x ∈ orth S X → ∃ y ∈ Λ, y - x ∈ X)
     (hL' : ∀ y ∈ Λ, y ∈ orth S X → ∃ x ∈ Λ₂, x ∈ orth S X ∧ y - x ∈ X)
-    (hy : ∃ y ∈ Λ₂, y ∈ orth S X ∧ S.hT y z = 1) (htr : ∃ c : E, IsIntegral ℤ c ∧ c + star c = 1) :
-    ∃ n : S.V ≃ₗ[E] S.V, (∀ a b, S.hT (n a) (n b) = S.hT a b) ∧ (∀ x ∈ X, n x = x) ∧ n z = z ∧
-      (∀ x ∈ orth S X, n x - x ∈ X) ∧ (n : S.V → S.V) '' Λ₂ = Λ := by
+    (hy : ∃ y ∈ Λ₂, y ∈ orth S X ∧ S.hT y z = 1)
+    (htr : ∃ c : E, IsIntegral ℤ c ∧ c + star c = 1)
+    : ∃ n : S.V ≃ₗ[E] S.V,
+      (∀ a b, S.hT (n a) (n b) = S.hT a b) ∧ (∀ x ∈ X, n x = x) ∧ n z = z
+        ∧ (∀ x ∈ orth S X, n x - x ∈ X) ∧ (n : S.V → S.V) '' Λ₂ = Λ := by
   classical
   have hXo := X_le_orth S X hXiso
   obtain ⟨A, hAX, hA0, hAz, hAΛ⟩ :=
@@ -41,7 +45,8 @@ theorem main (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y =
     have hfull₂ : ∀ v : S.V, ∃ d : 𝓞 E, d ≠ 0 ∧ d • v ∈ Λ₂ := by
       intro v
       obtain ⟨s, hs⟩ := hΛ₂.fg
-      obtain ⟨a, ha⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 E)) s (fun x => S.hT x v)
+      obtain ⟨a, ha⟩ :=
+        IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 E)) s (fun x => S.hT x v)
       let P : Submodule (𝓞 E) S.V := {
         carrier := {x | IsIntegral ℤ (((a : 𝓞 E) : E) * S.hT x v)}
         zero_mem' := by simpa using (isIntegral_zero : IsIntegral ℤ (0 : E))
@@ -54,7 +59,8 @@ theorem main (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y =
           have := hc.mul hx
           change IsIntegral ℤ (((a : 𝓞 E) : E) * S.hT (c • x) v)
           rw [oSmul, hT_smulL]
-          convert this using 1 <;> ring }
+          convert this using 1 <;> ring
+      }
       have hsP : (s : Set S.V) ⊆ P := by
         intro x hx
         obtain ⟨b, hb⟩ := ha x hx
@@ -87,9 +93,10 @@ theorem main (X : Submodule E S.V) (hXiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y =
     · intro h
       obtain ⟨l, rfl⟩ : ∃ l, g l = x := ⟨g.symm x, g.apply_symm_apply x⟩
       rw [g.symm_apply_apply] at h
-      have hlo : l ∈ orth S X := (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).2 fun x' hx' => by
-        rw [← hg x' l, hgX x' hx']
-        exact orth_X S hx hx'
+      have hlo : l ∈ orth S X :=
+        (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).2 fun x' hx' => by
+          rw [← hg x' l, hgX x' hx']
+          exact orth_X S hx hx'
       have e : g l = l + A ⟨l, hlo⟩ := hgA ⟨l, hlo⟩
       rw [e]
       exact hAΛ l hlo h

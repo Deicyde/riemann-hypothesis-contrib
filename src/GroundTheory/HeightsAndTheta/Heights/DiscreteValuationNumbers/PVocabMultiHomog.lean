@@ -15,9 +15,11 @@ noncomputable section
 
 universe u
 
-theorem weight_blockWeight_apply {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-    [∀ k, Fintype (ι k)] (m : (Σ k, ι k) →₀ ℕ) (k : K) :
-    Finsupp.weight (blockWeight ι) m k = ∑ i, m ⟨k, i⟩ := by
+theorem weight_blockWeight_apply
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (m : (Σ k, ι k) →₀ ℕ) (k : K)
+    : Finsupp.weight (blockWeight ι) m k = ∑ i, m ⟨k, i⟩ := by
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply, Fintype.sum_sigma]
   simp [blockWeight, Pi.single_apply]
 

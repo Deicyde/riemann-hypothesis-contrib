@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ScalarOfMultO
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId GlobalTheory.Jet
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+  GlobalTheory.Jet
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -82,10 +84,29 @@ lemma inG_conj {ε : Fin n → Bool} {k X : Matrix (Fin n) (Fin n) ℂ} (hk : k 
         rw [hJ, hJ']; simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
     _ = 0 := by rw [hX', Matrix.mul_zero, Matrix.zero_mul]
 
-theorem exists_deriv_Phi_conj : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ), ∃ l : Fin n → Fin n → Matrix (Fin n) (Fin n) ℂ → ℂ, (∀ c d z, d < c → l c d z = 0) ∧ (∀ c d, ContinuousOn (l c d) (Omega n)) ∧ ∀ k ∈ Kset ε, ∀ g ∈ UJset ε, k⁻¹ * g * k ∈ Omega n → ∀ X : Matrix (Fin n) (Fin n) ℂ, inG ε X → HasDerivAt (fun t : ℝ => Phi lam ((k⁻¹ * (g * NormedSpace.exp ((t : ℂ) • X)) * k).map star)) (∑ c, ∑ d, (k⁻¹ * X * k) c d * l c d (k⁻¹ * g * k)) 0 := by
+theorem exists_deriv_Phi_conj
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ),
+      ∃ l : Fin n → Fin n → Matrix (Fin n) (Fin n) ℂ → ℂ,
+        (∀ c d z, d < c → l c d z = 0) ∧ (∀ c d, ContinuousOn (l c d) (Omega n))
+          ∧ ∀ k ∈ Kset ε, ∀ g ∈ UJset ε,
+            k⁻¹ * g * k ∈ Omega n
+              → ∀ X : Matrix (Fin n) (Fin n) ℂ,
+                inG ε X
+                  → HasDerivAt
+                    (fun t : ℝ =>
+                      Phi lam ((k⁻¹ * (g * NormedSpace.exp ((t : ℂ) • X)) * k).map star))
+                    (∑ c, ∑ d, (k⁻¹ * X * k) c d * l c d (k⁻¹ * g * k)) 0 := by
   intro n ε lam
-  refine ⟨fun c d z => if d < c then 0 else
-    -(sgn ε c * sgn ε d) * star (fderiv ℂ (Phi lam) z (z * Matrix.single d c 1)), ?_, ?_, ?_⟩
+  refine ⟨
+    fun c d z =>
+      if d < c then
+        0
+      else
+        -(sgn ε c * sgn ε d) * star (fderiv ℂ (Phi lam) z (z * Matrix.single d c 1)),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro c d z hdc
     simp only [hdc, if_true]
   · intro c d
@@ -95,7 +116,8 @@ theorem exists_deriv_Phi_conj : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n
     · simp only [hdc, if_false]
       have hA : AnalyticOnNhd ℂ (Phi lam) (Omega n) := fun z hz => analyticAt_Phi lam hz
       have hF : ContinuousOn (fderiv ℂ (Phi lam)) (Omega n) := hA.fderiv.continuousOn
-      have hv : ContinuousOn (fun z : Matrix (Fin n) (Fin n) ℂ => z * Matrix.single d c 1) (Omega n) :=
+      have hv
+          : ContinuousOn (fun z : Matrix (Fin n) (Fin n) ℂ => z * Matrix.single d c 1) (Omega n) :=
         (continuous_id.matrix_mul continuous_const).continuousOn
       exact continuousOn_const.mul (hF.clm_apply hv).star
   · intro k hk g hg hw X hX
@@ -109,9 +131,11 @@ theorem exists_deriv_Phi_conj : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n
     let L : Matrix (Fin n) (Fin n) ℂ →L[ℂ] Matrix (Fin n) (Fin n) ℂ :=
       LinearMap.toContinuousLinearMap ((LinearMap.mulLeft ℂ k⁻¹).comp (LinearMap.mulRight ℂ k))
     have hL : ∀ M, L M = k⁻¹ * (M * k) := fun M => rfl
-    have hcurve : HasDerivAt (fun s : ℂ => k⁻¹ * (g * NormedSpace.exp (s • X)) * k)
+    have hcurve : HasDerivAt
+        (fun s : ℂ => k⁻¹ * (g * NormedSpace.exp (s • X)) * k)
         ((k⁻¹ * g * k) * (k⁻¹ * X * k)) 0 := by
-      have h0 := L.hasFDerivAt.comp_hasDerivAt (0 : ℂ) (GlobalTheory.PhiEigenfun.hasDerivAt_curve g X)
+      have h0 :=
+        L.hasFDerivAt.comp_hasDerivAt (0 : ℂ) (GlobalTheory.PhiEigenfun.hasDerivAt_curve g X)
       have hLgX : L (g * X) = (k⁻¹ * g * k) * (k⁻¹ * X * k) := by
         rw [hL, hinv]
         simp only [Matrix.mul_assoc]
@@ -123,14 +147,17 @@ theorem exists_deriv_Phi_conj : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n
       rw [zero_smul, NormedSpace.exp_zero, Matrix.mul_one]
       exact (analyticAt_Phi lam hw).differentiableAt.hasFDerivAt
     have hφ := hP.comp_hasDerivAt (0 : ℂ) hcurve
-    have hφ' : HasDerivAt (fun s : ℂ => Phi lam (k⁻¹ * (g * NormedSpace.exp (s • X)) * k))
+    have hφ' : HasDerivAt
+        (fun s : ℂ => Phi lam (k⁻¹ * (g * NormedSpace.exp (s • X)) * k))
         (fderiv ℂ (Phi lam) (k⁻¹ * g * k) ((k⁻¹ * g * k) * (k⁻¹ * X * k))) ((0 : ℝ) : ℂ) := by
       rw [Complex.ofReal_zero]
       exact hφ
     have hst := hφ'.comp_ofReal.star
 
-    have hexp : ∀ (w Y : Matrix (Fin n) (Fin n) ℂ), fderiv ℂ (Phi lam) w (w * Y) =
-        ∑ c, ∑ d, Y c d * fderiv ℂ (Phi lam) w (w * Matrix.single c d 1) := by
+    have hexp
+        : ∀ (w Y : Matrix (Fin n) (Fin n) ℂ),
+          fderiv ℂ (Phi lam) w (w * Y)
+            = ∑ c, ∑ d, Y c d * fderiv ℂ (Phi lam) w (w * Matrix.single c d 1) := by
       intro w Y
       conv_lhs => rw [Matrix.matrix_eq_sum_single Y]
       set_option synthInstance.maxHeartbeats 100000 in
@@ -139,10 +166,13 @@ theorem exists_deriv_Phi_conj : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n
       have hs : Matrix.single c d (Y c d) = Y c d • Matrix.single c d (1 : ℂ) := by
         rw [Matrix.smul_single, smul_eq_mul, mul_one]
       rw [hs, Matrix.mul_smul, map_smul, smul_eq_mul]
-    have hD0 : ∀ c d : Fin n, d < c → fderiv ℂ (Phi lam) (k⁻¹ * g * k) ((k⁻¹ * g * k) * Matrix.single d c 1) = 0 :=
+    have hD0
+        : ∀ c d : Fin n,
+          d < c → fderiv ℂ (Phi lam) (k⁻¹ * g * k) ((k⁻¹ * g * k) * Matrix.single d c 1) = 0 :=
       fun c d h => fderiv_Phi_single lam hw h
-    have hfun : (fun t : ℝ => Phi lam ((k⁻¹ * (g * NormedSpace.exp ((t : ℂ) • X)) * k).map star)) =
-        fun t : ℝ => star (Phi lam (k⁻¹ * (g * NormedSpace.exp ((t : ℂ) • X)) * k)) := by
+    have hfun
+        : (fun t : ℝ => Phi lam ((k⁻¹ * (g * NormedSpace.exp ((t : ℂ) • X)) * k).map star))
+          = fun t : ℝ => star (Phi lam (k⁻¹ * (g * NormedSpace.exp ((t : ℂ) • X)) * k)) := by
       funext t
       exact GlobalTheory.Dec.FormF.Phi_star lam _
     rw [hfun]

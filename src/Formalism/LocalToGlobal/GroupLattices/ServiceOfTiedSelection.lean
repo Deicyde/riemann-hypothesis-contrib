@@ -11,8 +11,10 @@ namespace Formalism.L2.G.ServT
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk Formalism.L2
 
-theorem closed_imp_class {𝒞 : FamClass} {P Q : ∀ {eps : ℝ}, FamP eps → ℝ → Prop} (hP : Closed 𝒞 P)
-    (h : ∀ {eps : ℝ} (Fm : FamP eps) (CH : ℝ), 𝒞 Fm → P Fm CH → Q Fm CH) : Closed 𝒞 Q := by
+theorem closed_imp_class
+    {𝒞 : FamClass} {P Q : ∀ {eps : ℝ}, FamP eps → ℝ → Prop}
+    (hP : Closed 𝒞 P) (h : ∀ {eps : ℝ} (Fm : FamP eps) (CH : ℝ), 𝒞 Fm → P Fm CH → Q Fm CH)
+    : Closed 𝒞 Q := by
   unfold Closed at hP ⊢
   obtain ⟨ε1, hε1, hP⟩ := hP
   refine ⟨ε1, hε1, fun eps he he1 => ?_⟩

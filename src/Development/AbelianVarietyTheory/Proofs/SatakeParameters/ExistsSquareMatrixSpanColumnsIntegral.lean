@@ -10,12 +10,14 @@ open Matrix
 
 namespace GlobalTheory.Hk3.HoweG
 
-theorem exists_span_fin_of_fg {L : Type} [Field L] (O : ValuationSubring L) (n : ℕ) (N : Submodule O (Fin n → L))
-    (hN : N.FG) : ∃ c : Fin n → Fin n → L, N = Submodule.span O (Set.range c) := by
+theorem exists_span_fin_of_fg
+    {L : Type} [Field L] (O : ValuationSubring L) (n : ℕ) (N : Submodule O (Fin n → L)) (hN : N.FG)
+    : ∃ c : Fin n → Fin n → L, N = Submodule.span O (Set.range c) := by
   classical
   have : Module.Finite O N := Module.Finite.iff_fg.mpr hN
   have : Module.Flat O N :=
-    Module.Flat.flat_iff_torsion_eq_bot_of_isBezout.2 (Submodule.isTorsionFree_iff_torsion_eq_bot.1 inferInstance)
+    Module.Flat.flat_iff_torsion_eq_bot_of_isBezout.2 (Submodule.isTorsionFree_iff_torsion_eq_bot.1
+      inferInstance)
   have : Module.Free O N := Module.free_of_flat_of_isLocalRing
   let k := Module.finrank O N
   let B : Module.Basis (Fin k) O N := Module.finBasis O N
@@ -38,9 +40,13 @@ theorem exists_span_fin_of_fg {L : Type} [Field L] (O : ValuationSubring L) (n :
     · simp [h]
     · simp [h]
 
-theorem mem_span_cols_iff {L : Type} [Field L] (O : ValuationSubring L) {n : ℕ} {ι : Type} [Fintype ι]
-    (M : Matrix (Fin n) ι L) (v : Fin n → L) :
-    v ∈ Submodule.span O (Set.range fun j i => M i j) ↔ ∃ u : ι → L, (∀ i, u i ∈ O) ∧ v = M *ᵥ u := by
+theorem mem_span_cols_iff
+    {L : Type} [Field L]
+    (O : ValuationSubring L)
+    {n : ℕ} {ι : Type} [Fintype ι]
+    (M : Matrix (Fin n) ι L) (v : Fin n → L)
+    : v ∈ Submodule.span O (Set.range fun j i => M i j)
+      ↔ ∃ u : ι → L, (∀ i, u i ∈ O) ∧ v = M *ᵥ u := by
   rw [Submodule.mem_span_range_iff_exists_fun]
   constructor
   · rintro ⟨c, rfl⟩
@@ -54,13 +60,18 @@ theorem mem_span_cols_iff {L : Type} [Field L] (O : ValuationSubring L) {n : ℕ
     simp only [Finset.sum_apply, Pi.smul_apply, Matrix.mulVec, dotProduct]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-theorem exists_square_span_cols : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
-    (M : Matrix (Fin n) ι L), ∃ b : Matrix (Fin n) (Fin n) L, ∀ v : Fin n → L,
-      (∃ u : ι → L, (∀ i, u i ∈ Formalism.UG.intL L) ∧ v = M *ᵥ u) ↔ ∃ t : Fin n → L, (∀ i, t i ∈ Formalism.UG.intL L) ∧ v = b *ᵥ t := by
+theorem exists_square_span_cols
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n : ℕ) (ι : Type) [Fintype ι]
+        [DecidableEq ι] (M : Matrix (Fin n) ι L),
+      ∃ b : Matrix (Fin n) (Fin n) L, ∀ v : Fin n → L,
+        (∃ u : ι → L, (∀ i, u i ∈ Formalism.UG.intL L) ∧ v = M *ᵥ u)
+          ↔ ∃ t : Fin n → L, (∀ i, t i ∈ Formalism.UG.intL L) ∧ v = b *ᵥ t := by
   intro L _ _ n ι _ _ M
-  let O : ValuationSubring L := (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring
-  obtain ⟨c, hc⟩ := exists_span_fin_of_fg O n (Submodule.span O (Set.range fun j i => M i j))
-    (Submodule.fg_span (Set.finite_range _))
+  let O : ValuationSubring L :=
+    (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring
+  obtain ⟨c, hc⟩ :=
+    exists_span_fin_of_fg O n (Submodule.span O (Set.range fun j i => M i j))
+      (Submodule.fg_span (Set.finite_range _))
   refine ⟨Matrix.of fun i j => c j i, fun v => ?_⟩
   have h1 := mem_span_cols_iff O M v
   have h2 := mem_span_cols_iff O (Matrix.of fun i j => c j i) v

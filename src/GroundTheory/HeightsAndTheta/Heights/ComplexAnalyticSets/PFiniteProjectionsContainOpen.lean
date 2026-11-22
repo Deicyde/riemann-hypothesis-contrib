@@ -17,9 +17,10 @@ namespace GroundTheory.Heights₂.Heights.ComplexSets
 
 noncomputable section
 
-theorem FiniteProjectionsContainOpen.proof (h₁ : ConeAvoidsFinite.Statement)
-    (h₂ : FiniteProjHomInjective.Statement) (h₃ : ConeAvoidsOpen.Statement)
-    (h₄ : ConeAvoidsExists.Statement) : FiniteProjectionsContainOpen.Statement := by
+theorem FiniteProjectionsContainOpen.proof
+    (h₁ : ConeAvoidsFinite.Statement) (h₂ : FiniteProjHomInjective.Statement)
+    (h₃ : ConeAvoidsOpen.Statement) (h₄ : ConeAvoidsExists.Statement)
+    : FiniteProjectionsContainOpen.Statement := by
   intro n d J hJ hd
   obtain ⟨A₀, N, hA₀⟩ := h₄ n d J hJ hd
   refine ⟨{A | ConeAvoids J A N}, h₃ n d N J, ⟨A₀, hA₀⟩, fun A hA => ?_⟩

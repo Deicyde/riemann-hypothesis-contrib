@@ -7,12 +7,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY
 
-theorem etale_isLocalHomeomorph : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La] (A : WeightedAtlas n Y ι La), ∀ (U : Set Y) (z : Y → V n), Etale A U z → IsLocalHomeomorph (fun y : U => z y) := by
+theorem etale_isLocalHomeomorph
+    : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
+        [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La]
+        (A : WeightedAtlas n Y ι La),
+      ∀ (U : Set Y) (z : Y → V n),
+        Etale A U z → IsLocalHomeomorph (fun y : U => z y) := by
   intro n Y _ _ _ _ _ ι La _ A U z hE
   apply IsLocalHomeomorph.mk
   intro y
@@ -25,15 +31,15 @@ theorem etale_isLocalHomeomorph : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] 
   have hxS : e y ∈ S := ⟨e.map_source hys, by simp [e.left_inv hys, hyU]⟩
   have hd : DifferentiableOn ℂ (z ∘ e.symm) S := hE.holo i
   have hcd : ContDiffOn ℂ ∞ (z ∘ e.symm) S :=
-    contDiffOn_piLp' 2 (fun k => contDiffOn_of_differentiableOn n _ S hS
-      ((differentiableOn_piLp 2).1 hd k))
+    contDiffOn_piLp' 2
+      (fun k => contDiffOn_of_differentiableOn n _ S hS ((differentiableOn_piLp 2).1 hd k))
   have hca : ContDiffAt ℂ ∞ (z ∘ e.symm) (e y) := hcd.contDiffAt (hS.mem_nhds hxS)
   have hst := hca.hasStrictFDerivAt_fderiv (by simp)
   have hdet : (fderiv ℂ (z ∘ e.symm) (e y)).det ≠ 0 := hE.det_ne i y hyU hys
   let L : V n ≃L[ℂ] V n :=
-    (LinearMap.equivOfDetNeZero ((fderiv ℂ (z ∘ e.symm) (e y)) : V n →ₗ[ℂ] V n) hdet).toContinuousLinearEquiv
-  have hL : ((L : V n →L[ℂ] V n)) = fderiv ℂ (z ∘ e.symm) (e y) := by
-    ext v; rfl
+    (LinearMap.equivOfDetNeZero ((fderiv ℂ (z ∘ e.symm) (e y)) : V n →ₗ[ℂ] V n)
+      hdet).toContinuousLinearEquiv
+  have hL : ((L : V n →L[ℂ] V n)) = fderiv ℂ (z ∘ e.symm) (e y) := by ext v; rfl
   have hst' : HasStrictFDerivAt (z ∘ e.symm) (L : V n →L[ℂ] V n) (e y) := hL ▸ hst
   let h := hst'.toOpenPartialHomeomorph (z ∘ e.symm)
   let P := e.trans (h.restrOpen S hS)

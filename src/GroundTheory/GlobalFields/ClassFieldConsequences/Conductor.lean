@@ -22,9 +22,9 @@ namespace Modulus
 
 variable (𝔪 : Modulus K)
 
-theorem finiteEmbedding_mem_congruenceSubgroup_iff (v : HeightOneSpectrum (𝓞 K))
-    (u : (v.adicCompletion K)ˣ) :
-    finiteEmbedding v u ∈ 𝔪.congruenceSubgroup ↔ u ∈ unitsLevel v (𝔪.exponent v) := by
+theorem finiteEmbedding_mem_congruenceSubgroup_iff
+    (v : HeightOneSpectrum (𝓞 K)) (u : (v.adicCompletion K)ˣ)
+    : finiteEmbedding v u ∈ 𝔪.congruenceSubgroup ↔ u ∈ unitsLevel v (𝔪.exponent v) := by
   constructor
   · intro h
     have := (𝔪.mem_congruenceSubgroup.1 h).1 v
@@ -39,9 +39,9 @@ theorem finiteEmbedding_mem_congruenceSubgroup_iff (v : HeightOneSpectrum (𝓞 
     · rw [infiniteProj_finiteEmbedding, Units.val_one, map_one]
       exact one_pos
 
-theorem infiniteEmbedding_mem_congruenceSubgroup {w : InfinitePlace K}
-    (hw : ∀ w' ∈ 𝔪.real, w'.1 ≠ w) (a : (w.Completion)ˣ) :
-    infiniteEmbedding w a ∈ 𝔪.congruenceSubgroup := by
+theorem infiniteEmbedding_mem_congruenceSubgroup
+    {w : InfinitePlace K} (hw : ∀ w' ∈ 𝔪.real, w'.1 ≠ w) (a : (w.Completion)ˣ)
+    : infiniteEmbedding w a ∈ 𝔪.congruenceSubgroup := by
   refine 𝔪.mem_congruenceSubgroup.2 ⟨fun v ↦ ?_, fun w' hw' ↦ ?_⟩
   · rw [finiteProj_infiniteEmbedding]
     exact one_mem _
@@ -52,8 +52,9 @@ end Modulus
 
 section Conductor
 
-variable (K) (L : Type*) [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
-  [IsMulCommutative (L ≃ₐ[K] L)]
+variable
+  (K) (L : Type*)
+  [Field L] [NumberField L] [Algebra K L] [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
 
 def Modulus.conductor : Modulus K where
   ideal := ∏ᶠ v : HeightOneSpectrum (𝓞 K), v.asIdeal ^ localConductorExponent L v
@@ -64,15 +65,15 @@ variable {K}
 
 namespace Modulus
 
-theorem exponent_conductor (v : HeightOneSpectrum (𝓞 K)) :
-    (conductor K L).exponent v = localConductorExponent L v := by
-  rw [exponent, if_pos (FiniteMultiplicity.of_prime_left v.prime
-    (conductor K L).ideal_ne_bot)]
+theorem exponent_conductor (v : HeightOneSpectrum (𝓞 K))
+    : (conductor K L).exponent v = localConductorExponent L v := by
+  rw [exponent, if_pos (FiniteMultiplicity.of_prime_left v.prime (conductor K L).ideal_ne_bot)]
   exact multiplicity_finprod_asIdeal_pow_eq (finite_support_localConductorExponent L) v
 
-theorem conductor_dvd_iff (𝔪 : Modulus K) :
-    conductor K L ∣ 𝔪 ↔ (∀ v, localConductorExponent L v ≤ 𝔪.exponent v) ∧
-      ∀ w : {w : InfinitePlace K // w.IsReal}, w ∉ 𝔪.real → infiniteLocalSymbol L w.1 = 1 := by
+theorem conductor_dvd_iff (𝔪 : Modulus K)
+    : conductor K L ∣ 𝔪
+      ↔ (∀ v, localConductorExponent L v ≤ 𝔪.exponent v)
+        ∧ ∀ w : {w : InfinitePlace K // w.IsReal}, w ∉ 𝔪.real → infiniteLocalSymbol L w.1 = 1 := by
   rw [dvd_iff, ideal_dvd_ideal_iff]
   simp only [exponent_conductor]
   refine and_congr Iff.rfl ⟨fun h w hw ↦ ?_, fun h w hw ↦ ?_⟩
@@ -81,8 +82,8 @@ theorem conductor_dvd_iff (𝔪 : Modulus K) :
   · by_contra hn
     exact hw (h w hn)
 
-theorem congruenceSubgroup_le_ker_ideleSymbol_iff (𝔪 : Modulus K) :
-    𝔪.congruenceSubgroup ≤ (ideleSymbol K L).ker ↔ conductor K L ∣ 𝔪 := by
+theorem congruenceSubgroup_le_ker_ideleSymbol_iff (𝔪 : Modulus K)
+    : 𝔪.congruenceSubgroup ≤ (ideleSymbol K L).ker ↔ conductor K L ∣ 𝔪 := by
   rw [conductor_dvd_iff]
   constructor
   · intro h
@@ -111,9 +112,9 @@ theorem congruenceSubgroup_le_ker_ideleSymbol_iff (𝔪 : Modulus K) :
       · rw [infiniteLocalSymbol_of_not_isReal L w hw, MonoidHom.one_apply]
     simp only [h1, h2, finprod_one, Finset.prod_const_one, mul_one]
 
-theorem map_congruenceSubgroup_le_range_ideleClassNorm_iff (𝔪 : Modulus K) :
-    𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) ≤ (ideleClassNorm K L).range ↔
-      conductor K L ∣ 𝔪 := by
+theorem map_congruenceSubgroup_le_range_ideleClassNorm_iff (𝔪 : Modulus K)
+    : 𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) ≤ (ideleClassNorm K L).range
+      ↔ conductor K L ∣ 𝔪 := by
   rw [← congruenceSubgroup_le_ker_ideleSymbol_iff, ← ker_reciprocityMap,
     Subgroup.map_le_iff_le_comap]
   exact Iff.rfl
@@ -124,7 +125,9 @@ end Conductor
 
 section RayClassField
 
-variable {K : Type u} [Field K] [NumberField K] {Ω : Type u} [Field Ω] [Algebra K Ω] [IsAlgClosed Ω]
+variable
+  {K : Type u} [Field K] [NumberField K]
+  {Ω : Type u} [Field Ω] [Algebra K Ω] [IsAlgClosed Ω]
   (L : IntermediateField K Ω) [FiniteDimensional K L] [IsAbelianGalois K L]
 
 namespace Modulus

@@ -186,7 +186,7 @@ private lemma euler_product_le_zeta (M : ℕ) (hM : 2 ≤ M) (S : Finset ℕ) (h
     _ ≤ ∑' n : ℕ, invPowMonoidHomReal M n := key
     _ = zetaR M := by simp only [hfv]; exact tsum_inv_pow_eq_zeta_real M hM
 
-private noncomputable def negLogOneSubInvPow (M p : ℕ) : ℝ := -Real.log (1 - ((p : ℝ)⁻¹) ^ M)
+private noncomputable def negLogOneSubInvPow (M p : ℕ) : ℝ := - Real.log (1 - ((p : ℝ)⁻¹) ^ M)
 
 private lemma inv_prime_pow_lt_one (M : ℕ) (hM : 1 ≤ M) (p : ℕ) (hp : p.Prime) : ((p : ℝ)⁻¹) ^ M < 1 := by
   exact inv_prime_pow_lt_one' M hM p hp
@@ -381,13 +381,15 @@ end main
 theorem log_l_value_field_bound : LogLFunctionEulerBound := by
   intro K _ _ _ hK M hM
   have hM2 : 2 ≤ M := by omega
-  have hpos : ∀ P : {P : Ideal (𝓞 K) // P.IsMaximal}, 0 < Formalism.HermitianLatticesTheory.eulerFac K M P.1 :=
-    fun P => (euler_factor_log_bound K hK M (by omega) P.1 P.2).1
-  have habs : Summable
-      (fun P : {P : Ideal (𝓞 K) // P.IsMaximal} => |Real.log (Formalism.HermitianLatticesTheory.eulerFac K M P.1)|) :=
+  have hpos
+      : ∀ P : {P : Ideal (𝓞 K) // P.IsMaximal},
+        0 < Formalism.HermitianLatticesTheory.eulerFac K M P.1 := fun P =>
+    (euler_factor_log_bound K hK M (by omega) P.1 P.2).1
+  have habs : Summable (fun P : {P : Ideal (𝓞 K) // P.IsMaximal} =>
+      |Real.log (Formalism.HermitianLatticesTheory.eulerFac K M P.1)|) :=
     summable_of_sum_le (fun P => abs_nonneg _) (partial_sums_log_euler_factor_le K hK M hM2)
-  have hsum : Summable
-      (fun P : {P : Ideal (𝓞 K) // P.IsMaximal} => Real.log (Formalism.HermitianLatticesTheory.eulerFac K M P.1)) :=
+  have hsum : Summable (fun P : {P : Ideal (𝓞 K) // P.IsMaximal} =>
+      Real.log (Formalism.HermitianLatticesTheory.eulerFac K M P.1)) :=
     habs.of_abs
   refine ⟨Real.multipliable_of_summable_log hpos hsum, ?_, ?_⟩
   · unfold Formalism.HermitianLatticesTheory.lValEta
@@ -395,9 +397,11 @@ theorem log_l_value_field_bound : LogLFunctionEulerBound := by
     exact Real.exp_pos _
   · unfold Formalism.HermitianLatticesTheory.lValEta
     rw [← Real.rexp_tsum_eq_tprod hpos hsum, Real.log_exp]
-    have hn := norm_tsum_le_tsum_norm
-      (f := fun P : {P : Ideal (𝓞 K) // P.IsMaximal} => Real.log (Formalism.HermitianLatticesTheory.eulerFac K M P.1))
-      (by simpa [Real.norm_eq_abs] using habs)
+    have hn :=
+      norm_tsum_le_tsum_norm
+        (f := fun P : {P : Ideal (𝓞 K) // P.IsMaximal} =>
+          Real.log (Formalism.HermitianLatticesTheory.eulerFac K M P.1))
+        (by simpa [Real.norm_eq_abs] using habs)
     simp only [Real.norm_eq_abs] at hn
     exact hn.trans (habs.tsum_le_of_sum_le (partial_sums_log_euler_factor_le K hK M hM2))
 

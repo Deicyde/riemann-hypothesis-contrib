@@ -7,14 +7,18 @@ public import Formalism.HarderNarasimhan.ShiftInvariance
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory.Dec
 
-theorem IsFdegG.dense_span_orbit {G : Type} [MeasurableSpace G] {μ : Measure G} {H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] {σ : G → (H →L[ℂ] H)} {d : ℝ} (h : IsFdegG μ σ d)
-    (w : H) (hw : w ≠ 0) : Dense (Submodule.span ℂ (Set.range fun g => σ g w) : Set H) := by
+theorem IsFdegG.dense_span_orbit
+    {G : Type} [MeasurableSpace G]
+    {μ : Measure G} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    {σ : G → (H →L[ℂ] H)} {d : ℝ} (h : IsFdegG μ σ d)
+    (w : H) (hw : w ≠ 0)
+    : Dense (Submodule.span ℂ (Set.range fun g => σ g w) : Set H) := by
   obtain ⟨hd, hint⟩ := h
   rw [Submodule.dense_iff_topologicalClosure_eq_top, Submodule.topologicalClosure_eq_top_iff,
     Submodule.eq_bot_iff]
@@ -37,7 +41,12 @@ theorem IsFdegG.dense_span_orbit {G : Type} [MeasurableSpace G] {μ : Measure G}
     · exact absurd h1 hd'
   exact inner_self_eq_zero.mp huu
 
-theorem isIrr_and_dense_of_isFdegG : ∀ (G : Type) [MeasurableSpace G] (μ : Measure G) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G → (H →L[ℂ] H)) (d : ℝ), IsFdegG μ σ d → IsIrr σ ∧ ∀ w : H, w ≠ 0 → Dense (Submodule.span ℂ (Set.range fun g => σ g w) : Set H) := by
+theorem isIrr_and_dense_of_isFdegG
+    : ∀ (G : Type) [MeasurableSpace G] (μ : Measure G) (H : Type) [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G → (H →L[ℂ] H)) (d : ℝ),
+      IsFdegG μ σ d
+        → IsIrr σ
+          ∧ ∀ w : H, w ≠ 0 → Dense (Submodule.span ℂ (Set.range fun g => σ g w) : Set H) := by
   intro G _ μ H _ _ _ σ d h
   refine ⟨?_, fun w hw => IsFdegG.dense_span_orbit h w hw⟩
   intro S hS hinv
@@ -50,7 +59,9 @@ theorem isIrr_and_dense_of_isFdegG : ∀ (G : Type) [MeasurableSpace G] (μ : Me
       rw [Submodule.span_le]
       rintro _ ⟨g, rfl⟩
       exact hinv g w hwS
-    have hcl : closure ((Submodule.span ℂ (Set.range fun g => σ g w) : Submodule ℂ H) : Set H) ⊆ (S : Set H) :=
+    have hcl
+        : closure ((Submodule.span ℂ (Set.range fun g => σ g w) : Submodule ℂ H) : Set H)
+          ⊆ (S : Set H) :=
       closure_minimal (fun y hy => hsub hy) hS
     rw [Submodule.eq_top_iff']
     intro x

@@ -12,18 +12,22 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.QuadLift
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RealGal
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL
+  GlobalTheory.RealGal
 open UpperTheory.V.Af (FrobEig algSat RepIso)
 open UpperTheory.V.Af.Bc (res)
 open UpperTheory.Gal.Int.Core
 
-theorem UpperTheory.Gal.Int.Core.downUnr_holds :
-    SphDown .unr := by
+theorem UpperTheory.Gal.Int.Core.downUnr_holds : SphDown .unr := by
   intro E Ω _ _ _ _ _ _ l _ ι a π Q P hP ρ w B hB hQdec hyp hl A h
-  obtain ⟨w', hunder, h', hN⟩ := GlobalTheory.PlaceNormDec.exists_place_normV_eq E Ω Q w A h (hQdec A h)
+  obtain ⟨w', hunder, h', hN⟩ :=
+    GlobalTheory.PlaceNormDec.exists_place_normV_eq E Ω Q w A h (hQdec A h)
   have hB' : (CG.mk P).HasSat w' B := by
     have e := hP.sat w' 1 B (by rw [pow_one, hunder, hN]) (hunder ▸ hB)
     simpa using e

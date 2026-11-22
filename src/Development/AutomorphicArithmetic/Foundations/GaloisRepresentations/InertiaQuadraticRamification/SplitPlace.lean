@@ -12,14 +12,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormPr
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal
 open scoped Pointwise
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-private theorem norm_not_mem_sq {F : Type} [Field F] [NumberField F] (u : HeightOneSpectrum (𝓞 F))
-    (hd : u.asIdeal.inertiaDeg ℤ = 1) (he : u.asIdeal.ramificationIdx ℤ = 1) :
-    ((Ideal.absNorm u.asIdeal : ℕ) : 𝓞 F) ∉ u.asIdeal ^ 2 := by
+private theorem norm_not_mem_sq
+    {F : Type} [Field F] [NumberField F]
+    (u : HeightOneSpectrum (𝓞 F))
+    (hd : u.asIdeal.inertiaDeg ℤ = 1) (he : u.asIdeal.ramificationIdx ℤ = 1)
+    : ((Ideal.absNorm u.asIdeal : ℕ) : 𝓞 F) ∉ u.asIdeal ^ 2 := by
   classical
   have hprime : Nat.Prime (Ideal.absNorm u.asIdeal) :=
     ((GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified F).1 u).2 hd
@@ -28,8 +31,8 @@ private theorem norm_not_mem_sq {F : Type} [Field F] [NumberField F] (u : Height
     rw [Ideal.under_def, Ideal.mem_comap]
     simpa using Ideal.absNorm_mem u.asIdeal
   have hspan : u.asIdeal.under ℤ = Ideal.span {((Ideal.absNorm u.asIdeal : ℕ) : ℤ)} :=
-    ((Int.ideal_span_isMaximal_of_prime (Ideal.absNorm u.asIdeal)).eq_of_le
-      Ideal.IsPrime.ne_top' ((Ideal.span_singleton_le_iff_mem _).2 hmemZ)).symm
+    ((Int.ideal_span_isMaximal_of_prime (Ideal.absNorm u.asIdeal)).eq_of_le Ideal.IsPrime.ne_top'
+      ((Ideal.span_singleton_le_iff_mem _).2 hmemZ)).symm
   have hp0 : u.asIdeal.under ℤ ≠ ⊥ := by
     rw [hspan, Ne, Ideal.span_singleton_eq_bot]
     exact_mod_cast hprime.ne_zero
@@ -42,26 +45,34 @@ private theorem norm_not_mem_sq {F : Type} [Field F] [NumberField F] (u : Height
   rw [hspan, Ideal.map_span, Ideal.span_le, Set.image_singleton, Set.singleton_subset_iff]
   simpa using hmem
 
-private theorem dec_le {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    {N : Subgroup (G F Ω)} (hNo : IsOpen (N : Set (G F Ω))) {B : ValuationSubring Ω}
-    {u : HeightOneSpectrum (𝓞 F)} (hB : IsPlaceOver B u) (hI : Ine (F := F) B ≤ N) {σ : G F Ω}
-    (hσ : IsFrob B (normV u) σ) (hσN : σ ∈ N) : Dec (F := F) B ≤ N := by
+private theorem dec_le
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {N : Subgroup (G F Ω)} (hNo : IsOpen (N : Set (G F Ω)))
+    {B : ValuationSubring Ω} {u : HeightOneSpectrum (𝓞 F)}
+    (hB : IsPlaceOver B u) (hI : Ine (F := F) B ≤ N)
+    {σ : G F Ω} (hσ : IsFrob B (normV u) σ) (hσN : σ ∈ N)
+    : Dec (F := F) B ≤ N := by
   intro d hd
   have h := GlobalTheory.TameQuot.closure_frob_sup_Ine F Ω B u hB ⟨σ, hσ.1⟩ hσ
-  have hc : IsClosed ((N.subgroupOf (Dec (F := F) B) : Subgroup (Dec (F := F) B)) : Set (Dec (F := F) B)) :=
+  have hc : IsClosed
+      ((N.subgroupOf (Dec (F := F) B) : Subgroup (Dec (F := F) B)) : Set (Dec (F := F) B)) :=
     (N.isClosed_of_isOpen hNo).preimage continuous_subtype_val
-  have h2 := Subgroup.topologicalClosure_minimal
-    (Subgroup.zpowers (⟨σ, hσ.1⟩ : Dec (F := F) B) ⊔ (Ine (F := F) B).subgroupOf (Dec (F := F) B))
-    (sup_le (Subgroup.zpowers_le.2 (Subgroup.mem_subgroupOf.2 hσN))
-      (fun x hx => Subgroup.mem_subgroupOf.2 (hI (Subgroup.mem_subgroupOf.1 hx)))) hc
+  have h2 :=
+    Subgroup.topologicalClosure_minimal
+      (Subgroup.zpowers (⟨σ, hσ.1⟩ : Dec (F := F) B) ⊔ (Ine (F := F) B).subgroupOf (Dec (F := F) B))
+      (sup_le (Subgroup.zpowers_le.2 (Subgroup.mem_subgroupOf.2 hσN))
+        (fun x hx => Subgroup.mem_subgroupOf.2 (hI (Subgroup.mem_subgroupOf.1 hx))))
+      hc
   rw [h] at h2
   exact Subgroup.mem_subgroupOf.1 (h2 (Subgroup.mem_top (⟨d, hd⟩ : Dec (F := F) B)))
 
 theorem splitPlace : SplitPlace := by
   intro F Ω _ _ _ _ _ U hU T hT
-  obtain ⟨N, hNn, hNo, -, hNU⟩ := GlobalTheory.T.exists_openNormal_finiteIndex_le_absGaloisGroup Ω F U hU
+  obtain ⟨N, hNn, hNo, -, hNU⟩ :=
+    GlobalTheory.T.exists_openNormal_finiteIndex_le_absGaloisGroup Ω F U hU
   have hc : GlobalTheory.TwSys.Cheb :=
-    GlobalTheory.Published.chebotarevDegreeOne_iff_cheb.1 GlobalTheory.Published.chebotarevDegreeOne'
+    GlobalTheory.Published.chebotarevDegreeOne_iff_cheb.1
+      GlobalTheory.Published.chebotarevDegreeOne'
   unfold GlobalTheory.TwSys.Cheb at hc
   obtain ⟨v, hvA, hd, he, B, hB, hIB, σ, hσ, hσN⟩ := hc F Ω N hNo hNn 1 hT.toFinset
   have hvT : v ∉ T := fun h => hvA (hT.mem_toFinset.2 h)

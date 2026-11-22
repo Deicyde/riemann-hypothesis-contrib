@@ -21,17 +21,28 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 @[expose] public section
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx
 open MeasureTheory GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames
-attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 noncomputable section
 namespace GlobalTheory.RowEx
-theorem twisted_constant_existence : GlobalTheory.Published.HoweDualityReal → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.SquareSt.WeilConvergence → GlobalTheory.SquareSt.LocalMatching → GlobalTheory.SquareSt.ThetaIntegralsAgree → ConstEx := by
+theorem twisted_constant_existence
+    : GlobalTheory.Published.HoweDualityReal
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching
+      → _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.SquareSt.WeilConvergence → GlobalTheory.SquareSt.LocalMatching
+      → GlobalTheory.SquareSt.ThetaIntegralsAgree
+      → ConstEx := by
   intro hw hm h1 h2 h3 h4 h5
   obtain ⟨C1, H1⟩ := _root_.GlobalTheory.T.regularized_integral_small_constant h1 h2 h3 h4 h5
   obtain ⟨C2, H2⟩ := _root_.GlobalTheory.T.twisted_square_identity hw h1 h2 hm h3 h4 h5
@@ -44,11 +55,15 @@ theorem twisted_constant_existence : GlobalTheory.Published.HoweDualityReal → 
   intro G W hW B
   obtain ⟨rm, hrm⟩ := GlobalTheory.RowTest.exists_match_over hS.core.lev hS.core.chain hW
   choose r hr1 hr2 hr3 hr4 using k2 G W hW B rm hrm
-  let rel' : ∀ i j : ℕ, Submodule ℂ (PolRoute G (.grid i (j + 1)) (.grid (i + 1) (j + 1)) (.grid (i + 1) j) ×
-      PolRoute G (.grid i (j + 1)) (.grid i j) (.grid (i + 1) j)) := fun i j =>
+  let rel'
+      : ∀ i j : ℕ,
+        Submodule ℂ
+          (PolRoute G (.grid i (j + 1)) (.grid (i + 1) (j + 1)) (.grid (i + 1) j)
+            × PolRoute G (.grid i (j + 1)) (.grid i j) (.grid (i + 1) j)) := fun i j =>
     if h : i < D.R.m ∧ j < D.R.m then r ⟨i, h.1⟩ ⟨j, h.2⟩ else rm.rel i j
   have e : ∀ i j : Fin D.R.m, rel' i j = r i j := fun i j => dif_pos ⟨i.2, j.2⟩
-  let ρ : RealMatch W := { rm with
+  let ρ : RealMatch W := {
+    rm with
     rel := rel'
     onto_big := fun i j a => by
       by_cases h : i < D.R.m ∧ j < D.R.m
@@ -61,7 +76,8 @@ theorem twisted_constant_existence : GlobalTheory.Published.HoweDualityReal → 
     proper := fun i j => by
       by_cases h : i < D.R.m ∧ j < D.R.m
       · simp only [rel', dif_pos h]; exact hr3 ⟨i, h.1⟩ ⟨j, h.2⟩
-      · simp only [rel', dif_neg h]; exact rm.proper i j }
+      · simp only [rel', dif_neg h]; exact rm.proper i j
+  }
   have hρ : ρ.Over R := hrm
   have hc : ∀ i j t, ∃ c, IsSquareConst W B ρ t i j c := by
     intro i j t
@@ -72,7 +88,8 @@ theorem twisted_constant_existence : GlobalTheory.Published.HoweDualityReal → 
     rw [hJ z₀ hconv₀.2] at hid
     have hI : ∫ u in M.fd _, kerBig W Θ g g₁ u ∂M.ν _ = c * J := by
       apply mul_left_cancel₀ hz₀; rw [hid]; ring
-    rw [hJ z hz.2, hI]; ring
+    rw [hJ z hz.2, hI]
+    ring
   choose c hc using hc
   exact ⟨ρ, fun i j t => c i j t, hρ, fun i j t => hc i j t⟩
 end GlobalTheory.RowEx

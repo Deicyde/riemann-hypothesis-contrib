@@ -10,14 +10,16 @@ def FieldCopy (k : Type) : Type := k
 
 instance FieldCopy.instField (k : Type) [h : Field k] : Field (FieldCopy k) := h
 
-instance FieldCopy.instIsAlgClosed (k : Type) [Field k] [h : IsAlgClosed k] :
-    IsAlgClosed (FieldCopy k) := h
+instance FieldCopy.instIsAlgClosed (k : Type) [Field k] [h : IsAlgClosed k]
+    : IsAlgClosed (FieldCopy k) :=
+  h
 
-theorem exists_ringEquiv_extending_of_ker_le :
-    ∀ (k : Type) [Field k] [IsAlgClosed k], (∀ x : k, x ≠ 0 → ∃ n : ℕ, 1 ≤ n ∧ x ^ n = 1) →
-      ∀ (R : Subring k) (J : Type) (α β : J → k),
-        (∀ p : MvPolynomial J R, MvPolynomial.aeval α p = 0 → MvPolynomial.aeval β p = 0) →
-        ∃ φ : k ≃+* k, (∀ r ∈ R, φ r = r) ∧ ∀ j, φ (α j) = β j := by
+theorem exists_ringEquiv_extending_of_ker_le
+    : ∀ (k : Type) [Field k] [IsAlgClosed k],
+      (∀ x : k, x ≠ 0 → ∃ n : ℕ, 1 ≤ n ∧ x ^ n = 1)
+        → ∀ (R : Subring k) (J : Type) (α β : J → k),
+          (∀ p : MvPolynomial J R, MvPolynomial.aeval α p = 0 → MvPolynomial.aeval β p = 0)
+            → ∃ φ : k ≃+* k, (∀ r ∈ R, φ r = r) ∧ ∀ j, φ (α j) = β j := by
   intro k _ _ hroot R J α β hker
   let eα : MvPolynomial J R →ₐ[R] k := MvPolynomial.aeval α
   let eβ : MvPolynomial J R →ₐ[R] k := MvPolynomial.aeval β
@@ -28,12 +30,15 @@ theorem exists_ringEquiv_extending_of_ker_le :
     apply hker
     have := congrArg Subtype.val hp
     simpa using this
-  let ψ0 : S →ₐ[R] k := (Ideal.Quotient.liftₐ (RingHom.ker eα.rangeRestrict) eβ hle).comp
-    (Ideal.quotientKerAlgEquivOfSurjective (AlgHom.rangeRestrict_surjective eα)).symm.toAlgHom
+  let ψ0 : S →ₐ[R] k :=
+    (Ideal.Quotient.liftₐ (RingHom.ker eα.rangeRestrict) eβ hle).comp
+      (Ideal.quotientKerAlgEquivOfSurjective (AlgHom.rangeRestrict_surjective eα)).symm.toAlgHom
   have hψ0 : ∀ p, ψ0 (eα.rangeRestrict p) = eβ p := by
     intro p
-    have h1 : (Ideal.quotientKerAlgEquivOfSurjective (AlgHom.rangeRestrict_surjective eα)).symm
-        (eα.rangeRestrict p) = Ideal.Quotient.mk _ p := by
+    have h1
+        : (Ideal.quotientKerAlgEquivOfSurjective (AlgHom.rangeRestrict_surjective eα)).symm
+            (eα.rangeRestrict p)
+          = Ideal.Quotient.mk _ p := by
       rw [AlgEquiv.symm_apply_eq]
       rfl
     simp only [ψ0, AlgHom.comp_apply]
@@ -41,7 +46,8 @@ theorem exists_ringEquiv_extending_of_ker_le :
     rfl
   let ψ : S →+* FieldCopy k := ψ0.toRingHom
   have hψinj : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro s hs
     by_contra hne
     have hne' : (s : k) ≠ 0 := fun h => hne (Subtype.ext h)
@@ -68,8 +74,7 @@ theorem exists_ringEquiv_extending_of_ker_le :
       simp [hxn]
   let θ' : k →ₐ[S] FieldCopy k := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let θ : k →+* k := θ'.toRingHom
   have hθS : ∀ s : S, θ (s : k) = ψ0 s := by

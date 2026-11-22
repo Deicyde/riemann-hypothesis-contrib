@@ -10,38 +10,43 @@ open Formalism.L2.FormalSeriesBounds
 
 namespace GlobalTheory.TeichPair
 
-theorem iter_frob {k O : Type} [CommRing k] [CommRing O] {d : ℕ} {l : ℕ} (f : ZMod d → O →+* k)
-    (hf : ∀ a x, f (a + 1) x = f a x ^ l) (a : ZMod d) (x : O) (n : ℕ) : f (a + n) x = f a x ^ l ^ n := by
+theorem iter_frob
+    {k O : Type} [CommRing k] [CommRing O]
+    {d : ℕ} {l : ℕ} (f : ZMod d → O →+* k) (hf : ∀ a x, f (a + 1) x = f a x ^ l) (a : ZMod d)
+    (x : O) (n : ℕ)
+    : f (a + n) x = f a x ^ l ^ n := by
   induction n with
   | zero => simp
   | succ n ih => rw [Nat.cast_succ, ← add_assoc, hf, ih, ← pow_mul, pow_succ]
 
-theorem exists_sep {k O : Type} [CommRing k] [IsDomain k] [CommRing O] {d : ℕ} [NeZero d] {l : ℕ} (hl : 2 ≤ l)
-    (f : ZMod d → O →+* k) (hf : ∀ a x, f (a + 1) x = f a x ^ l)
-    (hsep : ∀ a a', a ≠ a' → ∃ x, f a x ≠ f a' x) :
-    ∃ x, (∀ a, f a x ≠ 0) ∧ Function.Injective fun a => f a x := by
+theorem exists_sep
+    {k O : Type} [CommRing k] [IsDomain k] [CommRing O]
+    {d : ℕ} [NeZero d]
+    {l : ℕ} (hl : 2 ≤ l)
+    (f : ZMod d → O →+* k)
+    (hf : ∀ a x, f (a + 1) x = f a x ^ l) (hsep : ∀ a a', a ≠ a' → ∃ x, f a x ≠ f a' x)
+    : ∃ x, (∀ a, f a x ≠ 0) ∧ Function.Injective fun a => f a x := by
   have hq : 2 ≤ l ^ d := le_trans hl (Nat.le_self_pow (NeZero.ne d) l)
-  have hv : ∀ a x, f a x = f 0 x ^ l ^ a.val := fun a x => by
-    rw [← iter_frob f hf]; simp
-  have hd : ∀ x, f 0 x ^ l ^ d = f 0 x := fun x => by
-    rw [← iter_frob f hf]; simp
+  have hv : ∀ a x, f a x = f 0 x ^ l ^ a.val := fun a x => by rw [← iter_frob f hf]; simp
+  have hd : ∀ x, f 0 x ^ l ^ d = f 0 x := fun x => by rw [← iter_frob f hf]; simp
   obtain ⟨N, hN⟩ : ∃ N, l ^ d = N + 2 := ⟨l ^ d - 2, by omega⟩
   have hu : ∀ x, f 0 x ≠ 0 → f 0 x ^ (N + 1) = 1 := fun x hx => by
     apply mul_right_cancel₀ hx
     rw [← pow_succ, one_mul, show N + 1 + 1 = l ^ d by omega, hd]
-  let H : Subgroup kˣ :=
-    { carrier := {u | ∃ x, f 0 x = u}
-      one_mem' := ⟨1, by simp⟩
-      mul_mem' := by
-        rintro a b ⟨x, hx⟩ ⟨y, hy⟩
-        exact ⟨x * y, by simp [hx, hy]⟩
-      inv_mem' := by
-        rintro a ⟨x, hx⟩
-        refine ⟨x ^ N, ?_⟩
-        have h1 := hu x (by rw [hx]; exact a.ne_zero)
-        rw [map_pow, hx]
-        rw [hx, pow_succ] at h1
-        exact (Units.inv_eq_of_mul_eq_one_left h1).symm }
+  let H : Subgroup kˣ := {
+    carrier := {u | ∃ x, f 0 x = u}
+    one_mem' := ⟨1, by simp⟩
+    mul_mem' := by
+      rintro a b ⟨x, hx⟩ ⟨y, hy⟩
+      exact ⟨x * y, by simp [hx, hy]⟩
+    inv_mem' := by
+      rintro a ⟨x, hx⟩
+      refine ⟨x ^ N, ?_⟩
+      have h1 := hu x (by rw [hx]; exact a.ne_zero)
+      rw [map_pow, hx]
+      rw [hx, pow_succ] at h1
+      exact (Units.inv_eq_of_mul_eq_one_left h1).symm
+  }
   have hH : H ≤ rootsOfUnity (N + 1) k := by
     rintro a ⟨x, hx⟩
     rw [mem_rootsOfUnity', ← hx]
@@ -67,8 +72,8 @@ theorem exists_sep {k O : Type} [CommRing k] [IsDomain k] [CommRing O] {d : ℕ}
       rw [hv a, hv a', hx] at h'
       simpa using h'
     have h3 : w ^ l ^ a.val = w ^ l ^ a'.val := by
-      rw [← hm', ← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, mul_comm m, mul_comm m, zpow_mul, zpow_mul,
-        zpow_natCast, zpow_natCast, h2]
+      rw [← hm', ← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, mul_comm m, mul_comm m,
+        zpow_mul, zpow_mul, zpow_natCast, zpow_natCast, h2]
     have h4 := congrArg Units.val h3
     rw [hv a, hv a']
     simpa [w] using h4
@@ -119,8 +124,9 @@ theorem eq_zero_of_ge {V : VF C} {z : C} (h : ∀ N : ℕ, V.Ge N z) : z = 0 := 
   rw [← ht] at this
   exact absurd (WithTop.coe_le_coe.1 this) (not_le.2 hN)
 
-theorem ge_pow_sub {V : VF C} {w : ℝ} {a b : C} (ha : V.Ge 0 a) (hb : V.Ge 0 b) (h : V.Ge w (a - b)) (m : ℕ) :
-    V.Ge w (a ^ m - b ^ m) := by
+theorem ge_pow_sub
+    {V : VF C} {w : ℝ} {a b : C} (ha : V.Ge 0 a) (hb : V.Ge 0 b) (h : V.Ge w (a - b)) (m : ℕ)
+    : V.Ge w (a ^ m - b ^ m) := by
   induction m with
   | zero => simpa using VF.Ge.zero (V := V) w
   | succ m ih =>
@@ -133,15 +139,21 @@ theorem ge_l_pow (V : VF C) (n : ℕ) : V.Ge n ((V.l : C) ^ n) := by
   | zero => simpa using VF.Ge.one (V := V)
   | succ n ih => rw [pow_succ]; push_cast; exact ih.mul VF.ge_l
 
-theorem exists_seq (V : VF C) (cpl : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
-    {O : Type} [CommRing O] {d : ℕ} [NeZero d] (e : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (e a x))
-    (hfrob : ∀ a x, V.MM (e (a + 1) x - e a x ^ V.l))
+theorem exists_seq
+    (V : VF C)
+    (cpl : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+    {O : Type} [CommRing O]
+    {d : ℕ} [NeZero d]
+    (e : ZMod d → O →+* C)
+    (hint : ∀ a x, V.Ge 0 (e a x)) (hfrob : ∀ a x, V.MM (e (a + 1) x - e a x ^ V.l))
     (hsep : ∀ a a', a ≠ a' → ∃ x, V.v (e a x - e a' x) = 0)
-    (hunr : ∃ ε : O, (∃ y, ε * ε - ε = (V.l : O) * y) ∧ (∀ a, V.MM (e a ε - 1)) ∧
-      ∀ x : O, (∀ a, V.MM (e a x)) → ∃ y, ε * x = (V.l : O) * y) :
-    ∃ (s : ℕ → O) (N : ℕ) (ζ : ZMod d → C), (∀ n, ∃ y, s (n + 1) - s n = (V.l : O) ^ n * y) ∧ V.v (N : C) = 0 ∧
-      (∀ a, ζ a ^ N = 1) ∧ Function.Injective ζ ∧ (∀ a, ζ (a + 1) = ζ a ^ V.l) ∧
-      ∀ a (n : ℕ), V.Ge n (ζ a - e a (s n)) := by
+    (hunr : ∃ ε : O,
+      (∃ y, ε * ε - ε = (V.l : O) * y) ∧ (∀ a, V.MM (e a ε - 1))
+        ∧ ∀ x : O, (∀ a, V.MM (e a x)) → ∃ y, ε * x = (V.l : O) * y)
+    : ∃ (s : ℕ → O) (N : ℕ) (ζ : ZMod d → C),
+      (∀ n, ∃ y, s (n + 1) - s n = (V.l : O) ^ n * y) ∧ V.v (N : C) = 0 ∧ (∀ a, ζ a ^ N = 1)
+        ∧ Function.Injective ζ ∧ (∀ a, ζ (a + 1) = ζ a ^ V.l)
+        ∧ ∀ a (n : ℕ), V.Ge n (ζ a - e a (s n)) := by
   have hl : 2 ≤ V.l := V.l_prime.two_le
   have hq : 2 ≤ V.l ^ d := le_trans hl (Nat.le_self_pow (NeZero.ne d) _)
   obtain ⟨N, hN⟩ : ∃ N, V.l ^ d = N + 2 := ⟨V.l ^ d - 2, by omega⟩
@@ -161,8 +173,7 @@ theorem exists_seq (V : VF C) (cpl : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s 
     exact lt_irrefl _ h2
   obtain ⟨x, hx0, hxi⟩ := exists_sep hl f hf hs
   obtain ⟨ε, ⟨y, hy⟩, hε1, hε⟩ := hunr
-  have hd : ∀ a x, f a x ^ V.l ^ d = f a x := fun a x => by
-    rw [← iter_frob f hf]; simp
+  have hd : ∀ a x, f a x ^ V.l ^ d = f a x := fun a x => by rw [← iter_frob f hf]; simp
   have hfε : ∀ a, f a ε = 1 := fun a => by
     show π _ = 1
     rw [← map_one π, hπ]
@@ -175,13 +186,15 @@ theorem exists_seq (V : VF C) (cpl : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s 
       rw [this, hy]
       exact dvd_add (ih.mul_left _) (dvd_mul_right _ _)
   have hb : (V.l : O) ∣ (ε * x) ^ V.l ^ d - ε * x := by
-    obtain ⟨z, hz⟩ := hε (x ^ V.l ^ d - x) fun a => by
-      have h1 : π (e' a (x ^ V.l ^ d)) = π (e' a x) := by
-        show f a _ = f a _
-        rw [map_pow, hd]
-      rw [map_sub]
-      exact (hπ _ _).1 h1
-    have : (ε * x) ^ V.l ^ d - ε * x = (ε ^ (N + 1 + 1) - ε) * x ^ V.l ^ d + ε * (x ^ V.l ^ d - x) := by
+    obtain ⟨z, hz⟩ :=
+      hε (x ^ V.l ^ d - x) fun a => by
+        have h1 : π (e' a (x ^ V.l ^ d)) = π (e' a x) := by
+          show f a _ = f a _
+          rw [map_pow, hd]
+        rw [map_sub]
+        exact (hπ _ _).1 h1
+    have : (ε * x) ^ V.l ^ d - ε * x
+        = (ε ^ (N + 1 + 1) - ε) * x ^ V.l ^ d + ε * (x ^ V.l ^ d - x) := by
       rw [mul_pow, show N + 1 + 1 = V.l ^ d by omega]; ring
     rw [this, hz]
     exact dvd_add ((hεp _).mul_right _) (dvd_mul_right _ _)
@@ -198,10 +211,13 @@ theorem exists_seq (V : VF C) (cpl : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s 
     refine dvd_trans (pow_dvd_pow _ ?_) h1
     have : 1 ≤ d := Nat.one_le_iff_ne_zero.2 (NeZero.ne d)
     nlinarith
-  have hlim : ∀ a, ∃ z, ∀ n : ℕ, V.Ge n (z - e a (s n)) := fun a => cpl (fun n => e a (s n)) fun n => by
-    obtain ⟨z, hz⟩ := hsc n
-    rw [← map_sub, hz, map_mul, map_pow, map_natCast]
-    simpa using (ge_l_pow V n).mul (hint a z)
+  have hlim : ∀ a, ∃ z, ∀ n : ℕ, V.Ge n (z - e a (s n)) := fun a =>
+    cpl
+      (fun n => e a (s n))
+      fun n => by
+        obtain ⟨z, hz⟩ := hsc n
+        rw [← map_sub, hz, map_mul, map_pow, map_natCast]
+        simpa using (ge_l_pow V n).mul (hint a z)
   choose ζ hζ using hlim
   have hζi : ∀ a, V.Ge 0 (ζ a) := fun a => by
     have := (hζ a 0).add (by simpa using hint a (s 0))

@@ -15,8 +15,7 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.ModelS
 
-theorem one_mem_GLs (n : ℕ) : (1 : Mat n) ∈ GLs n :=
-  unit_mem (1 : Matrix.unitaryGroup (Fin n) ℂ)
+theorem one_mem_GLs (n : ℕ) : (1 : Mat n) ∈ GLs n := unit_mem (1 : Matrix.unitaryGroup (Fin n) ℂ)
 
 theorem ini_injective {n : ℕ} (j : Fin n) : Function.Injective (ini j) :=
   Fin.castLE_injective j.isLt

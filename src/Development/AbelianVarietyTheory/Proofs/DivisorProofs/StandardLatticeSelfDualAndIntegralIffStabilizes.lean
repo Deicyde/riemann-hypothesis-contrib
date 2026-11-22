@@ -11,9 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsBas
 
 open NumberField MeasureTheory IsDedekindDomain UniqueFactorizationMonoid
 open scoped Classical Pointwise
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum Formalism.IndefR.Links
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
-open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum
 open GlobalTheory.SqTop (modT)
 open GlobalTheory.BottomIPData (sfB)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl Lat IsFockVec IsSphOff volQ)
@@ -40,15 +43,17 @@ def intSub (D : D7) : Subring (Af D.host.F ⊗[D.host.F] D.host.E) where
   zero_mem' := (intAE D).zero_mem
   neg_mem' := (intAE D).neg_mem
 
-theorem mem_intAE_iff_swap (z : Af D.host.F ⊗[D.host.F] D.host.E) :
-    z ∈ intAE D ↔ Lev.swapAE D z ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
+theorem mem_intAE_iff_swap (z : Af D.host.F ⊗[D.host.F] D.host.E)
+    : z ∈ intAE D ↔ Lev.swapAE D z ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
   constructor
   · intro hz
     induction hz using AddSubgroup.closure_induction with
     | mem y hy =>
       obtain ⟨a, ha, x, rfl⟩ := hy
-      have e : Lev.swapAE D (a ⊗ₜ[D.host.F] (x : D.host.E)) =
-          ((x : D.host.E) ⊗ₜ[D.host.F] (1 : Af D.host.F)) * ((1 : D.host.E) ⊗ₜ[D.host.F] a) := by
+      have e
+          : Lev.swapAE D (a ⊗ₜ[D.host.F] (x : D.host.E))
+            = ((x : D.host.E) ⊗ₜ[D.host.F] (1 : Af D.host.F))
+              * ((1 : D.host.E) ⊗ₜ[D.host.F] a) := by
         rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]; rfl
       rw [e]
       exact mul_mem (Subring.subset_closure (Or.inl ⟨⟨_, x, rfl⟩, rfl⟩))
@@ -73,14 +78,19 @@ theorem mem_intAE_iff_swap (z : Af D.host.F ⊗[D.host.F] D.host.E) :
     rw [e] at h
     exact h
 
-theorem preserves_iff {R : Type} [CommRing R] (S : Subring R) {n : ℕ} (M M' : Matrix (Fin n) (Fin n) R)
-    (h1 : M * M' = 1) (h2 : M' * M = 1) :
-    (∀ y : Fin n → R, (∀ i, y i ∈ S) ↔ ∀ i, (M *ᵥ y) i ∈ S) ↔ (∀ i j, M i j ∈ S) ∧ ∀ i j, M' i j ∈ S := by
-  have hmv : ∀ (A : Matrix (Fin n) (Fin n) R) (y : Fin n → R), (∀ i j, A i j ∈ S) → (∀ i, y i ∈ S) →
-      ∀ i, (A *ᵥ y) i ∈ S :=
-    fun A y hA hy i => show (∑ j, A i j * y j) ∈ S from Subring.sum_mem _ fun j _ => mul_mem (hA i j) (hy j)
+theorem preserves_iff
+    {R : Type} [CommRing R]
+    (S : Subring R)
+    {n : ℕ} (M M' : Matrix (Fin n) (Fin n) R) (h1 : M * M' = 1) (h2 : M' * M = 1)
+    : (∀ y : Fin n → R, (∀ i, y i ∈ S) ↔ ∀ i, (M *ᵥ y) i ∈ S)
+      ↔ (∀ i j, M i j ∈ S) ∧ ∀ i j, M' i j ∈ S := by
+  have hmv
+      : ∀ (A : Matrix (Fin n) (Fin n) R) (y : Fin n → R),
+        (∀ i j, A i j ∈ S) → (∀ i, y i ∈ S) → ∀ i, (A *ᵥ y) i ∈ S := fun A y hA hy i =>
+    show (∑ j, A i j * y j) ∈ S from Subring.sum_mem _ fun j _ => mul_mem (hA i j) (hy j)
   have hs : ∀ j k : Fin n, (Pi.single j (1 : R) : Fin n → R) k ∈ S := fun j k => by
-    rw [Pi.single_apply]; split_ifs
+    rw [Pi.single_apply]
+    split_ifs
     · exact one_mem _
     · exact zero_mem _
   constructor
@@ -88,16 +98,19 @@ theorem preserves_iff {R : Type} [CommRing R] (S : Subring R) {n : ℕ} (M M' : 
     refine ⟨fun i j => ?_, fun i j => ?_⟩
     · have := (h (Pi.single j 1)).1 (hs j) i
       simpa [Matrix.mulVec_single_one] using this
-    · have hy := (h (M' *ᵥ Pi.single j 1)).2 (by rw [Matrix.mulVec_mulVec, h1, Matrix.one_mulVec]; exact hs j) i
+    · have hy :=
+        (h (M' *ᵥ Pi.single j 1)).2
+          (by rw [Matrix.mulVec_mulVec, h1, Matrix.one_mulVec]; exact hs j) i
       simpa [Matrix.mulVec_single_one] using hy
   · rintro ⟨hM, hM'⟩ y
     refine ⟨hmv M y hM, fun hy => ?_⟩
     have := hmv M' _ hM' hy
     rwa [Matrix.mulVec_mulVec, h2, Matrix.one_mulVec] at this
 
-theorem mem_latHat_stdLat (V : HSp D) (z : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E) :
-    z ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E ((stdLat V : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)) :
-      Set (Fin V.rank → D.host.E)) ↔ ∀ i, z i ∈ intAE D := by
+theorem mem_latHat_stdLat (V : HSp D) (z : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E)
+    : z ∈ Formalism.MainNotions.StandardLattice.latHat D.host.F D.host.E
+        ((stdLat V : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)) : Set (Fin V.rank → D.host.E))
+      ↔ ∀ i, z i ∈ intAE D := by
   classical
   constructor
   · intro hz i
@@ -117,7 +130,8 @@ theorem mem_latHat_stdLat (V : HSp D) (z : Fin V.rank → Af D.host.F ⊗[D.host
     induction this using AddSubgroup.closure_induction with
     | mem y hy =>
       obtain ⟨a, ha, x, rfl⟩ := hy
-      refine AddSubgroup.subset_closure ⟨a, ha, Pi.single i (x : D.host.E), fun j _ => ?_, funext fun j => ?_⟩
+      refine AddSubgroup.subset_closure
+        ⟨a, ha, Pi.single i (x : D.host.E), fun j _ => ?_, funext fun j => ?_⟩
       · by_cases hj : j = i
         · subst hj; rw [Pi.single_eq_same]; exact Submodule.mem_one.2 ⟨x, rfl⟩
         · rw [Pi.single_eq_of_ne hj]; exact zero_mem _
@@ -131,43 +145,62 @@ theorem mem_latHat_stdLat (V : HSp D) (z : Fin V.rank → Af D.host.F ⊗[D.host
 theorem stdLat_eq (V : HSp D) : stdLat V = GlobalTheory.SW.stdL D.host.E V.rank := by
   ext x
   rw [GlobalTheory.SW.Base.mem_stdL]
-  simp only [stdLat, Formalism.MainNotions.StandardLatticesGL3.stdL, Submodule.mem_pi, Set.mem_univ, true_imp_iff, Submodule.mem_one]
+  simp only [stdLat, Formalism.MainNotions.StandardLatticesGL3.stdL, Submodule.mem_pi, Set.mem_univ,
+    true_imp_iff, Submodule.mem_one]
   refine forall_congr' fun i => ?_
   exact ⟨fun ⟨y, hy⟩ => hy ▸ y.2, fun h => ⟨⟨x i, h⟩, rfl⟩⟩
 
 end GlobalTheory.NormRatio.StdLevel
 
-
 open GlobalTheory.NormRatio.StdLevel in
-theorem GlobalTheory.NormRatio.selfDual_and_mem_intG_iff : ∀ {D : D7} (V : HSp D) (n : ℕ) (g : GA D V) (x : Formalism.MainNotions.StandardLatticesGL3.GA D n),
-    V.gram = 1 → V.rank = n → GlobalTheory.BotFormula.IsFinPt V g x →
-    IsSelfDualC V (stdLat V) ∧ (x ∈ intG D n ↔ g ∈ openOff V (stdLat V) ∅) := by
+theorem GlobalTheory.NormRatio.selfDual_and_mem_intG_iff
+    : ∀ {D : D7} (V : HSp D) (n : ℕ) (g : GA D V)
+        (x : Formalism.MainNotions.StandardLatticesGL3.GA D n),
+      V.gram = 1 → V.rank = n → GlobalTheory.BotFormula.IsFinPt V g x
+        → IsSelfDualC V (stdLat V) ∧ (x ∈ intG D n ↔ g ∈ openOff V (stdLat V) ∅) := by
   intro D V n g x hG hn hx
   subst hn
-  have hSD : IsSelfDualC V (stdLat V) := by rw [stdLat_eq]; exact GlobalTheory.Ker.Base.selfDualC_stdL hG
+  have hSD : IsSelfDualC V (stdLat V) := by
+    rw [stdLat_eq]; exact GlobalTheory.Ker.Base.selfDualC_stdL hG
   refine ⟨hSD, ?_⟩
   have hfx := GlobalTheory.BotClassDict.finStd_of_isFinPt V hG hx
   subst hfx
-  have e1 : ∀ (k : GA D V) (i j : Fin V.rank),
-      (((GlobalTheory.BotClassDict.finStd V hG k : Formalism.MainNotions.StandardLatticesGL3.GA D V.rank) : GL (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D)) :
-        Matrix (Fin V.rank) (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D)) i j ∈ Formalism.MainNotions.StandardLatticesGL3.OhE D ↔
-        (finHom V k).1 i j ∈ intAE D := fun k i j => by
-    rw [← GlobalTheory.BotClassDict.toAfE_int_iff, GlobalTheory.BotClassDict.toAfE_finStd, mem_intAE_iff_swap]
-  have hL : GlobalTheory.BotClassDict.finStd V hG g ∈ intG D V.rank ↔
-      (∀ i j, (finHom V g).1 i j ∈ intAE D) ∧ ∀ i j, (finHom V g⁻¹).1 i j ∈ intAE D := by
+  have e1
+      : ∀ (k : GA D V) (i j : Fin V.rank),
+        (((GlobalTheory.BotClassDict.finStd V hG k
+                    : Formalism.MainNotions.StandardLatticesGL3.GA D V.rank)
+                  : GL (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D))
+                : Matrix (Fin V.rank) (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D))
+              i j
+            ∈ Formalism.MainNotions.StandardLatticesGL3.OhE D
+          ↔ (finHom V k).1 i j ∈ intAE D := fun k i j => by
+    rw [← GlobalTheory.BotClassDict.toAfE_int_iff, GlobalTheory.BotClassDict.toAfE_finStd,
+      mem_intAE_iff_swap]
+  have hL
+      : GlobalTheory.BotClassDict.finStd V hG g ∈ intG D V.rank
+        ↔ (∀ i j, (finHom V g).1 i j ∈ intAE D) ∧ ∀ i j, (finHom V g⁻¹).1 i j ∈ intAE D := by
     rw [GlobalTheory.NormSum.mem_intG]
     unfold Formalism.MainNotions.StandardLatticesGL3.IntG
-    have e2 : ((↑(GlobalTheory.BotClassDict.finStd V hG g) : GL (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D))⁻¹ : GL (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D)) =
-        ↑(GlobalTheory.BotClassDict.finStd V hG g⁻¹) := by rw [map_inv, Subgroup.coe_inv]
+    have e2
+        : ((↑(GlobalTheory.BotClassDict.finStd V hG g)
+              : GL (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D))⁻¹
+            : GL (Fin V.rank) (Formalism.MainNotions.StandardLatticesGL3.AE D))
+          = ↑(GlobalTheory.BotClassDict.finStd V hG g⁻¹) := by
+      rw [map_inv, Subgroup.coe_inv]
     rw [e2]
     simp only [e1]
     exact ⟨fun h => ⟨fun i j => (h i j).1, fun i j => (h i j).2⟩, fun h i j => ⟨h.1 i j, h.2 i j⟩⟩
-  have hR : g ∈ openOff V (stdLat V) ∅ ↔
-      ∀ y, (∀ i, y i ∈ intAE D) ↔ ∀ i, ((finHom V g).1 *ᵥ y) i ∈ intAE D := by
-    have e : g ∈ openOff V (stdLat V) ∅ ↔ g ∈ GlobalTheory.AdelicU.levelOpen _ (HSpace.gram V) (stdLat V) := by
+  have hR
+      : g ∈ openOff V (stdLat V) ∅
+        ↔ ∀ y, (∀ i, y i ∈ intAE D) ↔ ∀ i, ((finHom V g).1 *ᵥ y) i ∈ intAE D := by
+    have e
+        : g ∈ openOff V (stdLat V) ∅
+          ↔ g ∈ GlobalTheory.AdelicU.levelOpen _ (HSpace.gram V) (stdLat V) := by
       rw [GlobalTheory.AdelicU.mem_levelOpen]; simp [openOff]
     haveI := hSD.1
-    rw [e, GlobalTheory.AdelicU.mem_levelOpen_iff_latHat _ _ (Submodule.IsLattice.fg D.host.E (stdLat V))]
+    rw [e,
+      GlobalTheory.AdelicU.mem_levelOpen_iff_latHat _ _
+        (Submodule.IsLattice.fg D.host.E (stdLat V))]
     refine forall_congr' fun y => ?_
     rw [mem_latHat_stdLat, mem_latHat_stdLat]
     rfl

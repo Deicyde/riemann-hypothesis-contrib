@@ -9,11 +9,11 @@ open scoped ComplexOrder
 
 namespace GlobalTheory.QRDecomp
 
-
 open Matrix in
 open scoped ComplexOrder in
-theorem _root_.GlobalTheory.QRDecomp.exists_qr (n m : ℕ) (A : Matrix (Fin n) (Fin m) ℂ) (hA : IsUnit (Aᴴ * A).det) :
-    ∃ (Q : Matrix (Fin n) (Fin m) ℂ) (u : Matrix (Fin m) (Fin m) ℂ),
+theorem _root_.GlobalTheory.QRDecomp.exists_qr
+    (n m : ℕ) (A : Matrix (Fin n) (Fin m) ℂ) (hA : IsUnit (Aᴴ * A).det)
+    : ∃ (Q : Matrix (Fin n) (Fin m) ℂ) (u : Matrix (Fin m) (Fin m) ℂ),
       Qᴴ * Q = 1 ∧ u.BlockTriangular id ∧ IsUnit u.det ∧ A = Q * u := by
   classical
   have hinj : Function.Injective A.mulVec := by
@@ -28,8 +28,8 @@ theorem _root_.GlobalTheory.QRDecomp.exists_qr (n m : ℕ) (A : Matrix (Fin n) (
   have hD : diagonal d = L * (Aᴴ * A) * Lᴴ := LDL.diag_eq_lowerInv_conj hS
   have hDpos : (diagonal d).PosDef := by
     rw [hD]
-    exact hS.mul_mul_conjTranspose_same
-      (vecMul_injective_iff_isUnit.mpr ((isUnit_iff_isUnit_det _).mpr hLu))
+    exact hS.mul_mul_conjTranspose_same (vecMul_injective_iff_isUnit.mpr
+      ((isUnit_iff_isUnit_det _).mpr hLu))
   have hd : ∀ i, 0 < d i := fun i => by simpa using hDpos.diag_pos (i := i)
   have hdre : ∀ i, d i = ((d i).re : ℂ) ∧ 0 < (d i).re := fun i => by
     have h := hd i
@@ -46,8 +46,9 @@ theorem _root_.GlobalTheory.QRDecomp.exists_qr (n m : ℕ) (A : Matrix (Fin n) (
     have h : LDL.lowerInv hS j i = 0 := LDL.isLowerTriangular_lowerInv hS hij
     simp [conjTranspose_apply, L, h]
   refine ⟨A * Lᴴ * diagonal (fun i => (r i)⁻¹), diagonal r * (Lᴴ)⁻¹, ?_, ?_, ?_, ?_⟩
-  · have h1 : (A * Lᴴ * diagonal fun i => (r i)⁻¹)ᴴ * (A * Lᴴ * diagonal fun i => (r i)⁻¹)
-        = (diagonal fun i => star (r i)⁻¹) * (L * (Aᴴ * A) * Lᴴ) * diagonal fun i => (r i)⁻¹ := by
+  · have h1
+        : (A * Lᴴ * diagonal fun i => (r i)⁻¹)ᴴ * (A * Lᴴ * diagonal fun i => (r i)⁻¹)
+          = (diagonal fun i => star (r i)⁻¹) * (L * (Aᴴ * A) * Lᴴ) * diagonal fun i => (r i)⁻¹ := by
       simp only [conjTranspose_mul, diagonal_conjTranspose, conjTranspose_conjTranspose,
         Matrix.mul_assoc]
       rfl
@@ -64,8 +65,7 @@ theorem _root_.GlobalTheory.QRDecomp.exists_qr (n m : ℕ) (A : Matrix (Fin n) (
     exact (IsUnit.mk0 _ (Finset.prod_ne_zero_iff.mpr fun i _ => hr0 i)).mul
       (isUnit_nonsing_inv_det _ (isUnit_det_of_invertible Lᴴ))
   · rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc (diagonal _), diagonal_mul_diagonal]
-    have h1 : (fun i => (r i)⁻¹ * r i) = fun _ => (1 : ℂ) :=
-      funext fun i => inv_mul_cancel₀ (hr0 i)
+    have h1 : (fun i => (r i)⁻¹ * r i) = fun _ => (1 : ℂ) := funext fun i => inv_mul_cancel₀ (hr0 i)
     rw [h1, diagonal_one, Matrix.one_mul, mul_inv_of_invertible, Matrix.mul_one]
 
 end GlobalTheory.QRDecomp

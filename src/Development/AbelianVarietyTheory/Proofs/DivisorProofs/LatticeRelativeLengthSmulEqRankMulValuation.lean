@@ -7,28 +7,35 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.I
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity GlobalTheory.HermitianPreEigenvalues Polynomial Module
+open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity
+  GlobalTheory.HermitianPreEigenvalues Polynomial Module
 
 namespace GlobalTheory.ScalLen
 
-theorem relLen_map_lsmul : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (M : Type)
-    [AddCommGroup M] [Module (Int0 v) M], (∀ (c : Int0 v) (x : M), c ≠ 0 → c • x = 0 → x = 0) →
-    ∀ (X : Submodule (Int0 v) M), Module.Finite (Int0 v) X → ∀ (c : Int0 v) (r : ℝ),
-      v (c : C) = r →
-      RelLen v (X.map (LinearMap.lsmul (Int0 v) M c)) X ((finrank (Int0 v) X : ℝ) * r) := by
+theorem relLen_map_lsmul
+    : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (M : Type) [AddCommGroup M]
+        [Module (Int0 v) M],
+      (∀ (c : Int0 v) (x : M), c ≠ 0 → c • x = 0 → x = 0)
+        → ∀ (X : Submodule (Int0 v) M),
+          Module.Finite (Int0 v) X
+            → ∀ (c : Int0 v) (r : ℝ),
+              v (c : C) = r
+                → RelLen v (X.map (LinearMap.lsmul (Int0 v) M c)) X
+                  ((finrank (Int0 v) X : ℝ) * r) := by
   intro C _ v M _ _ htf X hX c r hr
   have hc : c ≠ 0 := by
     rintro rfl
     simp at hr
-  have : Module.IsTorsionFree (Int0 v) X := ⟨fun s hs x y hxy => by
-    have hs0 : s ≠ 0 := hs.ne_zero
-    apply Subtype.ext
-    have h1 : s • ((x : M) - (y : M)) = 0 := by
-      rw [smul_sub]
-      have := congrArg Subtype.val hxy
-      simp only [Submodule.coe_smul] at this
-      rw [this, sub_self]
-    exact sub_eq_zero.1 (htf s _ hs0 h1)⟩
+  have : Module.IsTorsionFree (Int0 v) X :=
+    ⟨fun s hs x y hxy => by
+      have hs0 : s ≠ 0 := hs.ne_zero
+      apply Subtype.ext
+      have h1 : s • ((x : M) - (y : M)) = 0 := by
+        rw [smul_sub]
+        have := congrArg Subtype.val hxy
+        simp only [Submodule.coe_smul] at this
+        rw [this, sub_self]
+      exact sub_eq_zero.1 (htf s _ hs0 h1)⟩
   have : ValuationRing (Int0 v) := by
     have hInt : Int0 v = v.toValuation.integer := by
       ext x
@@ -54,10 +61,10 @@ theorem relLen_map_lsmul : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop
     (LinearEquiv.ofInjective g hg).trans (LinearEquiv.ofEq _ _ hrange)
   unfold GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity.RelLen
   refine ⟨n, b, b.map e, Matrix.diagonal (fun _ => c), fun k => ?_, ?_⟩
-  · simp only [Basis.map_apply, Matrix.diagonal_apply, ite_smul, zero_smul,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  · simp only [Basis.map_apply, Matrix.diagonal_apply, ite_smul, zero_smul, Finset.sum_ite_eq',
+      Finset.mem_univ, if_true]
     rfl
-  · rw [Matrix.det_diagonal, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
-      Subring.coe_pow, AddValuation.map_pow, hr, ← WithTop.coe_nsmul, nsmul_eq_mul]
+  · rw [Matrix.det_diagonal, Finset.prod_const, Finset.card_univ, Fintype.card_fin, Subring.coe_pow,
+      AddValuation.map_pow, hr, ← WithTop.coe_nsmul, nsmul_eq_mul]
 
 end GlobalTheory.ScalLen

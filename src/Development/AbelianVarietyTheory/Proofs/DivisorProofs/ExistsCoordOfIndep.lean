@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsKsFor
 @[expose] public section
 
 open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.BigOn.Exp
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.DIV Formalism.IndefR
+  Formalism.IndefR.Links
 
 set_option autoImplicit false
 
@@ -24,10 +25,12 @@ namespace GlobalTheory.BigOn.Exp
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem exists_coord_of_indep {K V W : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module ℂ W]
+theorem exists_coord_of_indep
+    {K V W : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module ℂ W]
     (e : K →+* ℂ) (rd : V →ₛₗ[e] W)
     (hF : ∀ (n : ℕ) (v : Fin n → V), LinearIndependent K v → LinearIndependent ℂ fun c => rd (v c))
-    {μ : ℂ} {f f' : V} (hf : f ≠ 0) (h : rd f' = μ • rd f) : ∃ u : K, e u = μ := by
+    {μ : ℂ} {f f' : V} (hf : f ≠ 0) (h : rd f' = μ • rd f)
+    : ∃ u : K, e u = μ := by
   have hrf : rd f ≠ 0 := (hF 1 (fun _ => f) (linearIndependent_unique_iff.2 hf)).ne_zero 0
   by_cases hli : LinearIndependent K ![f, f']
   · have h2 := hF 2 _ hli
@@ -35,7 +38,8 @@ theorem exists_coord_of_indep {K V W : Type} [Field K] [AddCommGroup V] [Module 
       convert h2 using 1
       funext c
       fin_cases c <;> rfl
-    have := (LinearIndependent.pair_iff.1 h2') (-μ) 1 (by rw [h, one_smul, neg_smul, neg_add_cancel])
+    have :=
+      (LinearIndependent.pair_iff.1 h2') (-μ) 1 (by rw [h, one_smul, neg_smul, neg_add_cancel])
     exact absurd this.2 one_ne_zero
   · rw [LinearIndependent.pair_iff] at hli
     push_neg at hli
@@ -46,7 +50,9 @@ theorem exists_coord_of_indep {K V W : Type} [Field K] [AddCommGroup V] [Module 
       exact hne ((smul_eq_zero.1 hst).resolve_right hf) ht0
     have hf' : f' = (-(s / t)) • f := by
       have : t • f' = -(s • f) := eq_neg_of_add_eq_zero_right hst
-      calc f' = t⁻¹ • (t • f') := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
+      calc
+        f'
+          = t⁻¹ • (t • f') := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
         _ = _ := by rw [this, smul_neg, smul_smul, ← neg_smul, div_eq_inv_mul]
     refine ⟨-(s / t), ?_⟩
     have h3 : e (-(s / t)) • rd f = μ • rd f := by rw [← h, hf', map_smulₛₗ]

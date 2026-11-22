@@ -110,12 +110,17 @@ private lemma isIso_fst {S : Scheme.{0}} (T : Over S) : IsIso (fst T (Over.mk (�
 end UpperTheory.TwoTorsionInclusion
 
 open UpperTheory.TwoTorsionInclusion in
-theorem UpperTheory.exists_clopRep_trivial :
-    ∀ (S : Scheme.{0}), ∃ (Y : Over S) (U : (Y ⊗ Over.mk (𝟙 S)).left.Opens), UpperTheory.RepresentationRank.Rep (Over.mk (𝟙 S)) Y U ∧ IsFinite Y.hom ∧ Etale Y.hom := by
+theorem UpperTheory.exists_clopRep_trivial
+    : ∀ (S : Scheme.{0}), ∃ (Y : Over S) (U : (Y ⊗ Over.mk (𝟙 S)).left.Opens),
+      UpperTheory.RepresentationRank.Rep (Over.mk (𝟙 S)) Y U ∧ IsFinite Y.hom ∧ Etale Y.hom := by
   intro S
-  refine ⟨Over.mk (cd S), (fst (Over.mk (cd S)) (Over.mk (𝟙 S))).left ⁻¹ᵁ (inc S 1).opensRange,
+  refine ⟨
+    Over.mk (cd S),
+    (fst (Over.mk (cd S)) (Over.mk (𝟙 S))).left ⁻¹ᵁ (inc S 1).opensRange,
     ⟨(isClosed_one S).preimage (Scheme.Hom.continuous _), ?_⟩,
-    (GlobalTheory.FinEt.isSplitOfRank_sigmaDesc S 2).isFinite, (GlobalTheory.FinEt.isSplitOfRank_sigmaDesc S 2).etale⟩
+    (GlobalTheory.FinEt.isSplitOfRank_sigmaDesc S 2).isFinite,
+    (GlobalTheory.FinEt.isSplitOfRank_sigmaDesc S 2).etale
+  ⟩
   intro T V hV
   have hiso : IsIso (fst T (Over.mk (𝟙 S))).left := by
     have := isIso_fst T
@@ -127,10 +132,11 @@ theorem UpperTheory.exists_clopRep_trivial :
   have h2 : ∀ t, φ (inv φ t) = t := fun t ↦ by
     rw [← Scheme.Hom.comp_apply, IsIso.inv_hom_id]
     rfl
-  have hpre : ∀ (y : T ⟶ Over.mk (cd S)) x,
-      x ∈ (y ▷ Over.mk (𝟙 S)).left ⁻¹ᵁ
-        ((fst (Over.mk (cd S)) (Over.mk (𝟙 S))).left ⁻¹ᵁ (inc S 1).opensRange) ↔
-        y.left (φ x) ∈ (inc S 1).opensRange := by
+  have hpre
+      : ∀ (y : T ⟶ Over.mk (cd S)) x,
+        x ∈ (y ▷ Over.mk (𝟙 S)).left
+            ⁻¹ᵁ ((fst (Over.mk (cd S)) (Over.mk (𝟙 S))).left ⁻¹ᵁ (inc S 1).opensRange)
+          ↔ y.left (φ x) ∈ (inc S 1).opensRange := by
     intro y x
     show (fst (Over.mk (cd S)) (Over.mk (𝟙 S))).left ((y ▷ Over.mk (𝟙 S)).left x) ∈
       (inc S 1).opensRange ↔ _
@@ -138,9 +144,12 @@ theorem UpperTheory.exists_clopRep_trivial :
       Scheme.Hom.comp_apply]
   let W : T.left.Opens := (inv φ) ⁻¹ᵁ V
   have hW : IsClosed (W : Set T.left) := hV.preimage (Scheme.Hom.continuous _)
-  have hiff : ∀ y : T ⟶ Over.mk (cd S), (y ▷ Over.mk (𝟙 S)).left ⁻¹ᵁ
-      ((fst (Over.mk (cd S)) (Over.mk (𝟙 S))).left ⁻¹ᵁ (inc S 1).opensRange) = V ↔
-      y.left ⁻¹ᵁ (inc S 1).opensRange = W := by
+  have hiff
+      : ∀ y : T ⟶ Over.mk (cd S),
+        (y ▷ Over.mk (𝟙 S)).left
+              ⁻¹ᵁ ((fst (Over.mk (cd S)) (Over.mk (𝟙 S))).left ⁻¹ᵁ (inc S 1).opensRange)
+            = V
+          ↔ y.left ⁻¹ᵁ (inc S 1).opensRange = W := by
     intro y
     constructor
     · intro h

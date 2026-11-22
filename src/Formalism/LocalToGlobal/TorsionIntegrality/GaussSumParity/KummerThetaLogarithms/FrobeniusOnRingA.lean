@@ -157,8 +157,7 @@ lemma evA_congr (r : MonoidAlgebra ℤ (muSub l)) :
 theorem frobenius_on_ring_a : FrobA := by
   intro l _
   refine ⟨(evA l 1).liftOfSurjective (evA_surj l) ⟨evA l l, evA_ker l⟩, fun ζ hζ => ?_, fun x => ?_⟩
-  · have h1 : evA l 1 (MonoidAlgebra.of ℤ (muSub l) ⟨ζ, hζ⟩) = ζ := by
-      rw [evA_of, pow_one]
+  · have h1 : evA l 1 (MonoidAlgebra.of ℤ (muSub l) ⟨ζ, hζ⟩) = ζ := by rw [evA_of, pow_one]
     conv_lhs => rw [← h1]
     rw [RingHom.liftOfSurjective_comp_apply]
     change evA l l _ = _

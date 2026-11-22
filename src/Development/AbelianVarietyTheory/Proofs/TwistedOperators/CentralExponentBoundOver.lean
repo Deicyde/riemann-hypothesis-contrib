@@ -10,29 +10,34 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.StepData ValuativeRel Matrix Topology Filter
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.StepData ValuativeRel
+  Matrix Topology Filter
 open scoped TensorProduct
 
 namespace GlobalTheory.CentralExponent
 
 section Abstract
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
 
 end Abstract
 
 section Local
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n : Type} [Fintype n] [DecidableEq n]
 
 omit [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem mul_small {γ : (ValueGroupWithZero k)ˣ} {A B : Matrix n n k} (hA : IntM A)
-    (hB : ∀ i j, valuation k (B i j) < γ) (i j : n) : valuation k ((A * B) i j) < γ := by
+theorem mul_small
+    {γ : (ValueGroupWithZero k)ˣ} {A B : Matrix n n k}
+    (hA : IntM A) (hB : ∀ i j, valuation k (B i j) < γ)
+    (i j : n)
+    : valuation k ((A * B) i j) < γ := by
   refine Valuation.map_sum_lt _ γ.ne_zero fun s _ => ?_
   rw [map_mul]
   exact (mul_le_of_le_one_left' (hA i s)).trans_lt (hB s j)
-
 
 variable (n) in
 def cong (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1) : Subgroup (GL n k) where
@@ -53,10 +58,12 @@ def cong (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1) : Subgroup (GL n k) wh
     rw [this]
     exact mul_small (intM_of_mem_KO (KOne_le_KO (inv_mem h1))).neg hg i j
 
-theorem isOpen_cong (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1) :
-    IsOpen (cong (n := n) γ hγ : Set (GL n k)) := by
-  have e : (cong (n := n) γ hγ : Set (GL n k)) = ⋂ i, ⋂ j,
-      (fun g : GL n k => (g.val - 1) i j) ⁻¹' {x | valuation k x < γ} := by
+theorem isOpen_cong (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1)
+    : IsOpen (cong (n := n) γ hγ : Set (GL n k)) := by
+  have e
+      : (cong (n := n) γ hγ : Set (GL n k))
+        = ⋂ i, ⋂ j,
+          (fun g : GL n k => (g.val - 1) i j) ⁻¹' {x | valuation k x < γ} := by
     ext g; simp only [SetLike.mem_coe, Set.mem_iInter]; rfl
   rw [e]
   refine isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => IsOpen.preimage ?_ ?_
@@ -65,19 +72,22 @@ theorem isOpen_cong (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1) :
     rintro _ ⟨y, hy, rfl⟩
     exact Valuation.map_add_lt (valuation k) (g := γ) hx hy
 
-theorem isCompact_cong (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1) :
-    IsCompact (cong (n := n) γ hγ : Set (GL n k)) :=
-  SplitFlip.isCompact_KO.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ (isOpen_cong (n := n) γ hγ))
+theorem isCompact_cong (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1)
+    : IsCompact (cong (n := n) γ hγ : Set (GL n k)) :=
+  SplitFlip.isCompact_KO.of_isClosed_subset
+    (Subgroup.isClosed_of_isOpen _ (isOpen_cong (n := n) γ hγ))
     fun _ hg => KOne_le_KO (mem_KOne.2 fun i j => (hg i j).trans_le hγ)
 
-theorem exists_cong_subset {U : Set (GL n k)} (hU : U ∈ 𝓝 (1 : GL n k)) :
-    ∃ (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1), ∀ g ∈ cong (n := n) γ hγ, g ∈ U := by
+theorem exists_cong_subset {U : Set (GL n k)} (hU : U ∈ 𝓝 (1 : GL n k))
+    : ∃ (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1), ∀ g ∈ cong (n := n) γ hγ, g ∈ U := by
   rw [SplitFlip.isEmbedding_val_GL.nhds_eq_comap] at hU
   obtain ⟨T, hT, hTU⟩ := hU
   have h1 : (fun A : Matrix n n k => A + 1) ⁻¹' T ∈ 𝓝 (0 : Matrix n n k) :=
     (continuous_add_const _).continuousAt.preimage_mem_nhds (by simpa using hT)
-  have h2 : Tendsto (fun p : (ValueGroupWithZero k)ˣ × Matrix n n k =>
-      if ∀ i j, valuation k (p.2 i j) < p.1 then p.2 else 0) (atBot ×ˢ ⊤) (𝓝 0) := by
+  have h2 : Tendsto
+      (fun p : (ValueGroupWithZero k)ˣ × Matrix n n k =>
+        if ∀ i j, valuation k (p.2 i j) < p.1 then p.2 else 0)
+      (atBot ×ˢ ⊤) (𝓝 0) := by
     refine tendsto_pi_nhds.2 fun i => tendsto_pi_nhds.2 fun j => ?_
     rw [Matrix.zero_apply, (IsValuativeTopology.hasBasis_nhds_zero k).tendsto_right_iff]
     intro γ _
@@ -94,10 +104,13 @@ theorem exists_cong_subset {U : Set (GL n k)} (hU : U ∈ 𝓝 (1 : GL n k)) :
 
 variable {a b : Type} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
 
-theorem cong_factor (e : a ⊕ b ≃ n) (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1) :
-    ∀ g ∈ cong (n := n) γ hγ, ∃ x ∈ unipRad k (two e), ∃ c ∈ cong (n := n) γ hγ ⊓ parabLower k (two e), g = x * c := by
+theorem cong_factor (e : a ⊕ b ≃ n) (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1)
+    : ∀ g ∈ cong (n := n) γ hγ, ∃ x ∈ unipRad k (two e),
+      ∃ c ∈ cong (n := n) γ hγ ⊓ parabLower k (two e),
+        g = x * c := by
   intro g hg
-  let M : Matrix n n k := Matrix.of fun i j => if (e.symm j).isLeft then (1 : Matrix n n k) i j else g.val i j
+  let M : Matrix n n k :=
+    Matrix.of fun i j => if (e.symm j).isLeft then (1 : Matrix n n k) i j else g.val i j
   have hM : ∀ i j, valuation k ((M - 1) i j) < γ := fun i j => by
     by_cases h : (e.symm j).isLeft
     · simp [M, h]
@@ -116,9 +129,16 @@ theorem cong_factor (e : a ⊕ b ≃ n) (γ : (ValueGroupWithZero k)ˣ) (hγ : �
       simpa [q] using this
     · rw [Matrix.sub_apply, leviEmb_apply_ne k (two e) _ h, one_apply_ne (by simp [h])]
       simp
-  refine ⟨((⟨p, hpP⟩ * q⁻¹ : parab k (two e)) : GL n k), (coe_mem_unipRad k _).2 ?_, q * (p⁻¹ * g),
-    Subgroup.mem_inf.2 ⟨mul_mem hqK (mul_mem (inv_mem hpK) hg), mul_mem (leviEmb_mem_parabLower k _ _)
-      ((mem_parabLower_two k).2 fun i j => ?_)⟩, by simp [mul_assoc]⟩
+  refine ⟨
+    ((⟨p, hpP⟩ * q⁻¹ : parab k (two e)) : GL n k),
+    (coe_mem_unipRad k _).2 ?_,
+    q * (p⁻¹ * g),
+    Subgroup.mem_inf.2 ⟨
+      mul_mem hqK (mul_mem (inv_mem hpK) hg),
+      mul_mem (leviEmb_mem_parabLower k _ _) ((mem_parabLower_two k).2 fun i j => ?_)
+    ⟩,
+    by simp [mul_assoc]
+  ⟩
   · rw [map_mul, map_inv, leviProj_leviEmb, mul_inv_cancel]
   · have : (p⁻¹ * g).val (e (.inl i)) (e (.inr j)) = (p⁻¹ * p).val (e (.inl i)) (e (.inr j)) := by
       simp only [Units.val_mul, Matrix.mul_apply]
@@ -128,20 +148,24 @@ theorem cong_factor (e : a ⊕ b ≃ n) (γ : (ValueGroupWithZero k)ˣ) (hγ : �
     rw [this, inv_mul_cancel, Units.val_one, one_apply_ne (by simp)]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem val_emb₂_scalar (e : a ⊕ b ≃ n) (z : kˣ) :
-    (emb₂ k e (GeneralLinearGroup.scalar a z, 1)).val =
-      diagonal fun i => if (e.symm i).isLeft then (z : k) else 1 := by
+theorem val_emb₂_scalar (e : a ⊕ b ≃ n) (z : kˣ)
+    : (emb₂ k e (GeneralLinearGroup.scalar a z, 1)).val
+      = diagonal fun i => if (e.symm i).isLeft then (z : k) else 1 := by
   rw [val_emb₂]
   ext i j
   obtain ⟨i, rfl⟩ := e.surjective i
   obtain ⟨j, rfl⟩ := e.surjective j
-  rcases i with i | i <;> rcases j with j | j <;>
-    simp [GeneralLinearGroup.scalar, diagonal_apply, Matrix.one_apply]
+  rcases i with i | i <;> rcases j with j | j
+    <;> simp [GeneralLinearGroup.scalar, diagonal_apply, Matrix.one_apply]
 
-theorem cong_contract (e : a ⊕ b ≃ n) (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1) {z : kˣ}
-    (hz : valuation k (z : k) ≤ 1) : ∀ c ∈ cong (n := n) γ hγ ⊓ parabLower k (two e),
-      (emb₂ k e (GeneralLinearGroup.scalar a z, 1))⁻¹ * c * emb₂ k e (GeneralLinearGroup.scalar a z, 1) ∈
-        cong (n := n) γ hγ ⊓ parabLower k (two e) := by
+theorem cong_contract
+    (e : a ⊕ b ≃ n)
+    (γ : (ValueGroupWithZero k)ˣ) (hγ : γ ≤ 1)
+    {z : kˣ} (hz : valuation k (z : k) ≤ 1)
+    : ∀ c ∈ cong (n := n) γ hγ ⊓ parabLower k (two e),
+      (emb₂ k e (GeneralLinearGroup.scalar a z, 1))⁻¹ * c
+          * emb₂ k e (GeneralLinearGroup.scalar a z, 1)
+        ∈ cong (n := n) γ hγ ⊓ parabLower k (two e) := by
   intro c hcc
   obtain ⟨hc, hc'⟩ := Subgroup.mem_inf.1 hcc
   have hm : emb₂ k e (GeneralLinearGroup.scalar a z, 1) ∈ parabLower k (two e) :=
@@ -156,7 +180,8 @@ theorem cong_contract (e : a ⊕ b ≃ n) (γ : (ValueGroupWithZero k)ˣ) (hγ :
   rcases i with i | i <;> rcases j with j | j
   · simpa [mul_comm, mul_left_comm] using h1
   · simp [(mem_parabLower_two k).1 hc' i j, one_apply]
-  · simp only [Matrix.one_apply, EmbeddingLike.apply_eq_iff_eq, reduceCtorEq, if_false, sub_zero] at h1 ⊢
+  · simp only [Matrix.one_apply, EmbeddingLike.apply_eq_iff_eq, reduceCtorEq, if_false, sub_zero]
+      at h1 ⊢
     simpa using (mul_le_of_le_one_right' hz).trans_lt h1
   · simpa using h1
 
@@ -164,7 +189,8 @@ end Local
 
 section Main
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n a b : Type} [Fintype n] [DecidableEq n] [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
   {V X : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup X] [Module ℂ X]
 

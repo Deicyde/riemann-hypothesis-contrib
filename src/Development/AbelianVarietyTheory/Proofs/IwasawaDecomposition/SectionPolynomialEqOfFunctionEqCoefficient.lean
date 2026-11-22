@@ -13,17 +13,23 @@ public import Formalism.LocalToGlobal.Divisibility.NumbersLemmas
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Col2.PolyId
 
-theorem shiftOf_lamT_succ {R : Ranks} {ι : Type} [Fintype ι] {hc : ι → HCParam R} (C : ColumnChain R ι hc) (i : ℕ)
-    (hi : i < R.m) (τ : ι) : shiftOf (Col2.lamT hc (i + 1)) τ = -C.sDiv i τ := by
+theorem shiftOf_lamT_succ
+    {R : Ranks} {ι : Type} [Fintype ι]
+    {hc : ι → HCParam R} (C : ColumnChain R ι hc)
+    (i : ℕ) (hi : i < R.m)
+    (τ : ι)
+    : shiftOf (Col2.lamT hc (i + 1)) τ = - C.sDiv i τ := by
   have hN : R.N (i + 1) = R.k + (i + 1) * (R.t + 1) := rfl
   have h1 : 1 ≤ (i + 1) * (R.t + 1) := Nat.one_le_iff_ne_zero.mpr (by positivity)
   have hpos : 0 < R.N (i + 1) := by rw [hN]; omega
-  have hk : ¬ (R.N (i + 1) - 1 < R.k) := by rw [hN]; omega
+  have hk : ¬(R.N (i + 1) - 1 < R.k) := by rw [hN]; omega
   have hq : (R.N (i + 1) - 1 - R.k) / (R.t + 1) = i := by
     rw [hN]
     have hm : (i + 1) * (R.t + 1) = i * (R.t + 1) + R.t + 1 := by ring
@@ -33,9 +39,11 @@ theorem shiftOf_lamT_succ {R : Ranks} {ι : Type} [Fintype ι] {hc : ι → HCPa
   obtain ⟨c, hc'⟩ := R.t_odd
   have hcq : (R.t : ℚ) = 2 * c + 1 := by exact_mod_cast hc'
   have e2 : (R.t + 1) / 2 = c + 1 := by omega
-  simp only [shiftOf, DomWeight.detShift, dif_pos hpos, Col2.lamT, Col2.shW, Examples₂.lamOf, dif_pos (show i + 1 ≤ R.m by omega), Examples₂.wtQ, dif_neg hk]
+  simp only [shiftOf, DomWeight.detShift, dif_pos hpos, Col2.lamT, Col2.shW, Examples₂.lamOf,
+    dif_pos (show i + 1 ≤ R.m by omega), Examples₂.wtQ, dif_neg hk]
   simp only [hq, e2]
-  have hw : -wG R ((hc τ).e ⟨i, hi⟩) (i + 1) = ((-C.sDiv i τ + ((i + 1) * (c + 1) : ℕ) : ℤ) : ℚ) := by
+  have hw
+      : - wG R ((hc τ).e ⟨i, hi⟩) (i + 1) = ((- C.sDiv i τ + ((i + 1) * (c + 1) : ℕ) : ℤ) : ℚ) := by
     push_cast
     rw [h2]
     simp only [wG, sExp, Ranks.N, Nat.add_sub_cancel]

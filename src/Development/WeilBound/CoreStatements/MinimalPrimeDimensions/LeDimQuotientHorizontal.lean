@@ -18,14 +18,18 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.ShFam.Pad
+open CategoryTheory AlgebraicGeometry TensorProduct ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.ShFam.Pad
 
 namespace ChowFormHeightComparison₂.CF
 
 attribute [local instance] Algebra.TensorProduct.rightAlgebra in
-theorem le_dim_quotient_horizontal (A : Type) [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
-    (q : Ideal A) [q.IsPrime] (hq : q.height ≤ 1) (hinj : Function.Injective (algebraMap ℤ (A ⧸ q))) {d : ℕ}
-    (hd : Algebra.trdeg ℤ A = d) : (d : WithBot ℕ∞) ≤ ringKrullDim (A ⧸ q) := by
+theorem le_dim_quotient_horizontal
+    (A : Type) [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
+    (q : Ideal A) [q.IsPrime]
+    (hq : q.height ≤ 1) (hinj : Function.Injective (algebraMap ℤ (A ⧸ q)))
+    {d : ℕ} (hd : Algebra.trdeg ℤ A = d)
+    : (d : WithBot ℕ∞) ≤ ringKrullDim (A ⧸ q) := by
   have : FaithfulSMul ℤ (A ⧸ q) := (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
   have : Algebra.FiniteType ℤ (A ⧸ q) :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℤ q) (Ideal.Quotient.mkₐ_surjective ℤ q)
@@ -37,14 +41,15 @@ theorem le_dim_quotient_horizontal (A : Type) [CommRing A] [IsDomain A] [CharZer
   have := IsLocalization.tensorRight (S := A) ℚ (nonZeroDivisors ℤ)
   have := IsLocalization.tensorRight (S := A ⧸ q) ℚ (nonZeroDivisors ℤ)
   have hle : Algebra.algebraMapSubmonoid A (nonZeroDivisors ℤ) ≤ nonZeroDivisors A :=
-    Submonoid.map_le_iff_le_comap.mpr fun x hx ↦ mem_nonZeroDivisors_of_ne_zero
-      (by simpa using nonZeroDivisors.ne_zero hx)
+    Submonoid.map_le_iff_le_comap.mpr fun x hx ↦
+      mem_nonZeroDivisors_of_ne_zero (by simpa using nonZeroDivisors.ne_zero hx)
   have hle' : Algebra.algebraMapSubmonoid (A ⧸ q) (nonZeroDivisors ℤ) ≤ nonZeroDivisors (A ⧸ q) :=
-    Submonoid.map_le_iff_le_comap.mpr fun x hx ↦ mem_nonZeroDivisors_of_ne_zero
-      ((map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hx))
+    Submonoid.map_le_iff_le_comap.mpr fun x hx ↦
+      mem_nonZeroDivisors_of_ne_zero ((map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hx))
   have : IsDomain (ℚ ⊗[ℤ] A) := IsLocalization.isDomain_of_le_nonZeroDivisors _ hle
   have : IsDomain (ℚ ⊗[ℤ] (A ⧸ q)) := IsLocalization.isDomain_of_le_nonZeroDivisors _ hle'
-  let φ : ℚ ⊗[ℤ] A →ₐ[ℚ] ℚ ⊗[ℤ] (A ⧸ q) := Algebra.TensorProduct.map (AlgHom.id ℚ ℚ) (Ideal.Quotient.mkₐ ℤ q)
+  let φ : ℚ ⊗[ℤ] A →ₐ[ℚ] ℚ ⊗[ℤ] (A ⧸ q) :=
+    Algebra.TensorProduct.map (AlgHom.id ℚ ℚ) (Ideal.Quotient.mkₐ ℤ q)
   have hφ : Function.Surjective φ := fun x => by
     induction x using TensorProduct.induction_on with
     | zero => exact ⟨0, map_zero _⟩
@@ -57,13 +62,14 @@ theorem le_dim_quotient_horizontal (A : Type) [CommRing A] [IsDomain A] [CharZer
       exact ⟨x + y, map_add _ _ _⟩
   have : (RingHom.ker φ).IsPrime := by
     set_option synthInstance.maxHeartbeats 200000 in
-      exact RingHom.ker_isPrime _
+    exact RingHom.ker_isPrime _
   have hc : (RingHom.ker φ).comap (algebraMap A (ℚ ⊗[ℤ] A)) = q := by
     ext a
     rw [Ideal.mem_comap, RingHom.mem_ker, ← Ideal.Quotient.eq_zero_iff_mem,
       ← map_eq_zero_iff _ (IsLocalization.injective (ℚ ⊗[ℤ] (A ⧸ q)) hle')]
     exact Iff.rfl
-  have h2 := IsLocalization.height_under (Algebra.algebraMapSubmonoid A (nonZeroDivisors ℤ)) (RingHom.ker φ)
+  have h2 :=
+    IsLocalization.height_under (Algebra.algebraMapSubmonoid A (nonZeroDivisors ℤ)) (RingHom.ker φ)
   replace h2 : q.height = (RingHom.ker φ).height := (congrArg Ideal.height hc).symm.trans h2
   have h3 := height_add_ringKrullDim_quotient_of_finiteType ℚ (RingHom.ker φ)
   have h4 : ringKrullDim ((ℚ ⊗[ℤ] A) ⧸ RingHom.ker φ) = ringKrullDim (ℚ ⊗[ℤ] (A ⧸ q)) :=
@@ -73,9 +79,12 @@ theorem le_dim_quotient_horizontal (A : Type) [CommRing A] [IsDomain A] [CharZer
   refine add_le_add (le_of_eq (by norm_cast)) ?_
   exact_mod_cast hq
 
-theorem le_dim_quotient (A : Type) [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
-    (q : Ideal A) [q.IsPrime] (hmin : ∀ f ∈ q, f ≠ 0 → q ∈ (Ideal.span {f}).minimalPrimes) {d : ℕ}
-    (hd : Algebra.trdeg ℤ A = d) : (d : WithBot ℕ∞) ≤ ringKrullDim (A ⧸ q) := by
+theorem le_dim_quotient
+    (A : Type) [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
+    (q : Ideal A) [q.IsPrime]
+    (hmin : ∀ f ∈ q, f ≠ 0 → q ∈ (Ideal.span {f}).minimalPrimes)
+    {d : ℕ} (hd : Algebra.trdeg ℤ A = d)
+    : (d : WithBot ℕ∞) ≤ ringKrullDim (A ⧸ q) := by
   have : IsNoetherianRing A := Algebra.FiniteType.isNoetherianRing ℤ A
   obtain ⟨l, hl⟩ := CharP.exists (A ⧸ q)
   rcases CharP.char_is_prime_or_zero (A ⧸ q) l with h | rfl
@@ -113,8 +122,8 @@ theorem stDim : StDim := by
   have hX1 : topologicalKrullDim (Set.univ : Set X) = (D + 1 : ℕ) :=
     (topologicalKrullDim_eq_of_isEmbedding Topology.IsEmbedding.id Set.range_id).trans hX.dim_eq
   have hup : topologicalKrullDim (closure ({z} : Set X)) + 1 ≤ (D + 1 : ℕ) :=
-    hX1 ▸ topologicalKrullDim_add_one_le isClosed_closure isClosed_univ
-      fun x hx => ⟨genericPoint X, trivial, hgen, genericPoint_specializes x⟩
+    hX1 ▸ topologicalKrullDim_add_one_le isClosed_closure isClosed_univ fun x hx =>
+      ⟨genericPoint X, trivial, hgen, genericPoint_specializes x⟩
   obtain ⟨N, jN, _, hjN⟩ := hX.isProjOver
   have := isProper_str k N
   have : IsProper p := hjN ▸ inferInstance
@@ -124,7 +133,9 @@ theorem stDim : StDim := by
   have : Flat t := hX.flat
   obtain ⟨A, _, _, instA, _, _, j, _, ⟨a, ha⟩, hjt, hA⟩ := exists_affine_chart_trdeg_eq t z
   obtain rfl : instA = Ring.toIntAlgebra A := Subsingleton.elim _ _
-  have : CharZero A := ⟨fun m n h => Nat.cast_injective (R := ℤ) (FaithfulSMul.algebraMap_injective ℤ A (by simpa using h))⟩
+  have : CharZero A :=
+    ⟨fun m n h =>
+      Nat.cast_injective (R := ℤ) (FaithfulSMul.algebraMap_injective ℤ A (by simpa using h))⟩
   obtain ⟨d, hd⟩ := exists_trdeg_eq_natCast ℤ (A := A)
   have hdimX : topologicalKrullDim X ≤ (d + 1 : ℕ) := by
     refine topologicalKrullDim_le_of_forall_exists_isOpen fun x => ?_
@@ -145,7 +156,8 @@ theorem stDim : StDim := by
     have : ((D + 1 : ℕ) : WithBot ℕ∞) ≤ ((d + 1 : ℕ) : WithBot ℕ∞) := this
     exact Nat.le_of_succ_le_succ (by exact_mod_cast this)
   have : a.asIdeal.IsPrime := a.isPrime
-  have hmin : ∀ f ∈ a.asIdeal, f ≠ 0 → a.asIdeal ∈ (Ideal.span {f}).minimalPrimes := fun f hf hf0 => by
+  have hmin
+      : ∀ f ∈ a.asIdeal, f ≠ 0 → a.asIdeal ∈ (Ideal.span {f}).minimalPrimes := fun f hf hf0 => by
     refine ⟨⟨a.isPrime, (Ideal.span_singleton_le_iff_mem _).2 hf⟩, fun q' hq' hle => ?_⟩
     obtain ⟨hq'p, hlq'⟩ := hq'
     by_contra hne
@@ -161,15 +173,17 @@ theorem stDim : StDim := by
     have h₁ : z < j b' := by
       rw [← ha]
       exact ⟨(hsp b' a).2 hle, fun h => hne ((hsp a b').1 h)⟩
-    have h₂ : j b' < j g := ⟨(hsp g b').2 bot_le, fun h => hbot (le_bot_iff.1 ((hsp b' g).1 h)).symm⟩
+    have h₂ : j b' < j g :=
+      ⟨(hsp g b').2 bot_le, fun h => hbot (le_bot_iff.1 ((hsp b' g).1 h)).symm⟩
     have h₃ := Order.coheight_add_one_le h₁
     have h₄ := Order.coheight_add_one_le h₂
     rw [hcoh] at h₃
     have h₅ : (1 : ℕ∞) + 1 ≤ 1 := (add_le_add_left (le_add_self.trans h₄) 1).trans h₃
     exact absurd h₅ (by decide)
   have hq := le_dim_quotient A a.asIdeal hmin hd
-  have hlow : topologicalKrullDim (Set.range j ∩ closure {j a} : Set X) ≤
-      topologicalKrullDim (closure ({z} : Set X)) := by
+  have hlow
+      : topologicalKrullDim (Set.range j ∩ closure {j a} : Set X)
+        ≤ topologicalKrullDim (closure ({z} : Set X)) := by
     rw [ha]
     exact (Topology.IsEmbedding.inclusion Set.inter_subset_right).isInducing.topologicalKrullDim_le
   rw [topologicalKrullDim_range_inter_closure_eq j a] at hlow

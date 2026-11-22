@@ -11,7 +11,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Gaug
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
 open Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups
 
 namespace Formalism.L2.SG.RowsAbsX
@@ -20,14 +21,18 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {X : HidaSetting D} {Y : Full X} {u u' : D.what₂.Word}
 
-theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
-    (κ : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℕ) (nc : ℝ) (i0 i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
-    (FdN FdN' : Set X.B.I.Ginf) (νq : X.B.I.Ginf → Measure X.B.I.Ginf)
+theorem rowsSum_of_val
+    (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
+    (κ : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℕ)
+    (nc : ℝ) (i0 i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
+    (FdN FdN' : Set X.B.I.Ginf)
+    (νq : X.B.I.Ginf → Measure X.B.I.Ginf)
     (hA : (Y.tO u u').AbsConv)
     (hL : TermOp.LiftOnto X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u'))
     (hAV : Formalism.L2.SG.Pf.RowForm.ClassAbs.AmpValLowerC X Y u u' vR i0 i0' νq)
-    (hAF : PairVal.AutFin D (X.Fu u) (Y.what₂ u)) (hAF' : PairVal.AutFin D (X.Fu u') (Y.what₂ u')) (hnc : 0 < nc) :
-    DataInst.RowsSum vR κ nc (RealObj.VtPt X u u' 1 i0 i0' FdN FdN' νq) := by
+    (hAF : PairVal.AutFin D (X.Fu u) (Y.what₂ u)) (hAF' : PairVal.AutFin D (X.Fu u') (Y.what₂ u'))
+    (hnc : 0 < nc)
+    : DataInst.RowsSum vR κ nc (RealObj.VtPt X u u' 1 i0 i0' FdN FdN' νq) := by
   intro ρ
   obtain ⟨c, hc, hcv⟩ := hAV
   obtain ⟨C, hC⟩ := Formalism.L2.SG.WConst.weightBound_holds X Y u u' hnc
@@ -36,8 +41,10 @@ theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
   have hwm : 0 < Real.sqrt (m * m') := Real.sqrt_pos.2 (mul_pos hm0 hm0')
   have hcw : 0 < c * Real.sqrt (m * m') := mul_pos hc hwm
   let Mm : ℝ := ∑ Λ ∈ Y.what₂ u, |PairVal.massRow D (X.Fu u) (Y.what₂ u) Λ|
-  let τ : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → TermOp.GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u') :=
-    fun t => (hL t).choose
+  let τ
+      : TermDef.Term D u u' (X.Fu u) (Y.what₂ u)
+        → TermOp.GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u') := fun t =>
+    (hL t).choose
   have hτ : ∀ t, (τ t).toTerm = t := fun t => (hL t).choose_spec
   have hτi : Function.Injective τ := fun a b h => by rw [← hτ a, ← hτ b, h]
   let C' : ℝ := max C 0
@@ -53,12 +60,13 @@ theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
     rintro p p' t ⟨-, -, w, hw, ht⟩ ⟨-, -, w', hw', ht'⟩
     obtain rfl := Formalism.L2.SG.RowsAbsX.ptUniq_holds X Y u u' t w w' ht ht'
     exact ptOfList_inj hw hw'
-  refine summable_of_fibre_bound A hAu g hg0 hg _ (fun p => mul_nonneg (norm_nonneg _) (norm_nonneg _)) ?_
+  refine summable_of_fibre_bound A hAu g hg0 hg _
+    (fun p => mul_nonneg (norm_nonneg _) (norm_nonneg _))
+    ?_
   intro p
   have hS0 : 0 ≤ ∑' t : {t // A p t}, g t := tsum_nonneg fun t => hg0 t
   rcases hp : DataInst.ptOfList (D.R.rS + 1) p with _ | w
-  · have h0 : DataInst.rowVec (vR) κ nc ρ p = 0 := by
-      simp [DataInst.rowVec, hp]
+  · have h0 : DataInst.rowVec (vR) κ nc ρ p = 0 := by simp [DataInst.rowVec, hp]
     rw [h0, norm_zero, zero_mul]
     exact hS0
 
@@ -71,16 +79,18 @@ theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
     rfl
   rw [hsum]
   have hgS : Summable (fun t : Sw => g t.1) := hg.comp_injective Subtype.val_injective
-  let f : Sw → ℂ := fun t =>
-    ((Real.sqrt (PairVal.massTerm t.1) : ℝ) : ℂ) * PairVal.cAt (vR) t.1 w
+  let f : Sw → ℂ := fun t => ((Real.sqrt (PairVal.massTerm t.1) : ℝ) : ℂ) * PairVal.cAt (vR) t.1 w
   let Dn : ℝ := Real.sqrt (n0 nc (D.mem u).A.T (D.mem u').A.T w) * DataInst.phi (D.R.rS + 1) p
-  let V : ℝ := ‖PackageTie.hsEmb (RealObj.unscaledOperatorAtPointRepresentative X u u' 1 i0 i0' νq w)‖
+  let V : ℝ :=
+    ‖PackageTie.hsEmb (RealObj.unscaledOperatorAtPointRepresentative X u u' 1 i0 i0' νq w)‖
   let N : ℝ := Real.sqrt (RealObj.nW X u u' w)
   have hrow : DataInst.rowVec (vR) κ nc ρ p = (∑' t : Sw, f t) / (Dn : ℂ) := by
     simp only [DataInst.rowVec, hp]
     rfl
-  have hvt : RealObj.VtPt X u u' 1 i0 i0' FdN FdN' νq p =
-      ((N : ℝ) : ℂ) • PackageTie.hsEmb (RealObj.unscaledOperatorAtPointRepresentative X u u' 1 i0 i0' νq w) := by
+  have hvt
+      : RealObj.VtPt X u u' 1 i0 i0' FdN FdN' νq p
+        = ((N : ℝ) : ℂ) • PackageTie.hsEmb (RealObj.unscaledOperatorAtPointRepresentative X u u' 1
+          i0 i0' νq w) := by
     simp only [RealObj.VtPt, RealObj.ptOfL, hp] <;> rfl
   have hnv : ‖RealObj.VtPt X u u' 1 i0 i0' FdN FdN' νq p‖ = N * V := by
     rw [hvt, norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (Real.sqrt_nonneg _)]
@@ -92,7 +102,8 @@ theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
   by_cases hreal : ∃ γ, RealObj.IsPtRep X u u' w γ
   swap
   · have hV : V = 0 := by
-      have : RealObj.unscaledOperatorAtPointRepresentative X u u' 1 i0 i0' νq w = 0 := by simp [RealObj.unscaledOperatorAtPointRepresentative, hreal]
+      have : RealObj.unscaledOperatorAtPointRepresentative X u u' 1 i0 i0' νq w = 0 := by
+        simp [RealObj.unscaledOperatorAtPointRepresentative, hreal]
       simp only [V, this, map_zero, norm_zero]
     rw [hV, mul_zero, mul_zero]
     exact hgS0
@@ -110,8 +121,8 @@ theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
   have hterm : ∀ t : Sw, ‖f t‖ * (C' * V) ≤ g t.1 := by
     intro t
     have hat : t.1.atPt w := t.2.2.2
-    have huq : ∀ w₁ w₂, t.1.atPt w₁ → t.1.atPt w₂ → w₁ = w₂ :=
-      fun w₁ w₂ h h' => Formalism.L2.SG.RowsAbsX.atPt_uniq _ _ _ t.1.cls w₁ w₂ h h'
+    have huq : ∀ w₁ w₂, t.1.atPt w₁ → t.1.atPt w₂ → w₁ = w₂ := fun w₁ w₂ h h' =>
+      Formalism.L2.SG.RowsAbsX.atPt_uniq _ _ _ t.1.cls w₁ w₂ h h'
     have hpt : PairVal.ptOf t.1 = w := by
       have hrel := Formalism.L2.SG.Pf.FinXP.atPtRelevant_holds D u u' (X.Fu u) (Y.what₂ u) t.1 w hat
       exact huq _ _ (PairVal.ptOf_spec t.1 ⟨w, hat, hrel⟩) hat
@@ -129,20 +140,26 @@ theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
       simp only [f]
       rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (Real.sqrt_nonneg _)]
     have hV0 : 0 ≤ V := norm_nonneg _
-    have hamp0 : 0 ≤ ‖PackageTie.hsEmb (TermOp.ampN (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') (τ t.1))‖ := norm_nonneg _
-    have e3 : ‖PairVal.cAt vR t.1 w‖ * V ≤ ‖(Y.tO u u').vec (τ t.1)‖ / (c * Real.sqrt (m * m')) := by
+    have hamp0
+        : 0 ≤ ‖PackageTie.hsEmb (TermOp.ampN (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') (τ t.1))‖ :=
+      norm_nonneg _
+    have e3
+        : ‖PairVal.cAt vR t.1 w‖ * V ≤ ‖(Y.tO u u').vec (τ t.1)‖ / (c * Real.sqrt (m * m')) := by
       rw [le_div_iff₀ hcw]
-      have k1 : Real.sqrt (m * m') * ‖PackageTie.hsEmb (TermOp.ampN (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') (τ t.1))‖ ≤
-          ‖(Y.tO u u').vec (τ t.1)‖ := (mul_le_mul_of_nonneg_right hwt hamp0).trans h2
+      have k1
+          : Real.sqrt (m * m')
+              * ‖PackageTie.hsEmb (TermOp.ampN (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') (τ t.1))‖
+            ≤ ‖(Y.tO u u').vec (τ t.1)‖ :=
+        (mul_le_mul_of_nonneg_right hwt hamp0).trans h2
       nlinarith [mul_le_mul_of_nonneg_left h1 hwm.le]
-    have e4 : 0 ≤ ‖PairVal.cAt (vR) t.1 w‖ * V :=
-      mul_nonneg (norm_nonneg _) hV0
-    calc ‖f t‖ * (C' * V)
-        = C' * (Real.sqrt (PairVal.massTerm t.1) *
-            (‖PairVal.cAt (vR) t.1 w‖ * V)) := by rw [hf]; ring
+    have e4 : 0 ≤ ‖PairVal.cAt (vR) t.1 w‖ * V := mul_nonneg (norm_nonneg _) hV0
+    calc
+      ‖f t‖ * (C' * V)
+          = C' * (Real.sqrt (PairVal.massTerm t.1) * (‖PairVal.cAt (vR) t.1 w‖ * V)) := by
+        rw [hf]; ring
       _ ≤ C' * (Real.sqrt Mm * (‖(Y.tO u u').vec (τ t.1)‖ / (c * Real.sqrt (m * m')))) := by
-          apply mul_le_mul_of_nonneg_left _ hC'0
-          exact mul_le_mul hm e3 e4 (Real.sqrt_nonneg _)
+        apply mul_le_mul_of_nonneg_left _ hC'0
+        exact mul_le_mul hm e3 e4 (Real.sqrt_nonneg _)
       _ = g t.1 := by simp only [g, K0]; ring
 
   have hlhs : ‖∑' t : Sw, f t‖ / |Dn| * (N * V) ≤ ‖∑' t : Sw, f t‖ * (C' * V) := by
@@ -151,19 +168,20 @@ theorem rowsSum_of_val (vR : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℝ)
       exact mul_nonneg (norm_nonneg _) (mul_nonneg hC'0 (norm_nonneg _))
     · rw [div_mul_eq_mul_div, div_le_iff₀ hD]
       have : N * V ≤ C' * |Dn| * V := mul_le_mul_of_nonneg_right hNC (norm_nonneg _)
-      calc ‖∑' t : Sw, f t‖ * (N * V) ≤ ‖∑' t : Sw, f t‖ * (C' * |Dn| * V) :=
-            mul_le_mul_of_nonneg_left this (norm_nonneg _)
+      calc
+        ‖∑' t : Sw, f t‖ * (N * V)
+          ≤ ‖∑' t : Sw, f t‖ * (C' * |Dn| * V) := mul_le_mul_of_nonneg_left this (norm_nonneg _)
         _ = ‖∑' t : Sw, f t‖ * (C' * V) * |Dn| := by ring
   refine hlhs.trans ?_
   rcases (mul_nonneg hC'0 (norm_nonneg _) : 0 ≤ C' * V).eq_or_lt with hK | hK
   · rw [← hK, mul_zero]
     exact hgS0
-  · have hfb : ∀ t : Sw, ‖f t‖ ≤ g t.1 / (C' * V) := fun t => by
-      rw [le_div_iff₀ hK]; exact hterm t
+  · have hfb : ∀ t : Sw, ‖f t‖ ≤ g t.1 / (C' * V) := fun t => by rw [le_div_iff₀ hK]; exact hterm t
     have hsn : Summable (fun t : Sw => ‖f t‖) :=
       Summable.of_nonneg_of_le (fun _ => norm_nonneg _) hfb (hgS.div_const _)
-    calc ‖∑' t : Sw, f t‖ * (C' * V) ≤ (∑' t : Sw, ‖f t‖) * (C' * V) :=
-          mul_le_mul_of_nonneg_right (norm_tsum_le_tsum_norm hsn) hK.le
+    calc
+      ‖∑' t : Sw, f t‖ * (C' * V) ≤ (∑' t : Sw, ‖f t‖) * (C' * V) :=
+        mul_le_mul_of_nonneg_right (norm_tsum_le_tsum_norm hsn) hK.le
       _ = ∑' t : Sw, ‖f t‖ * (C' * V) := (tsum_mul_right).symm
       _ ≤ ∑' t : Sw, g t.1 := Summable.tsum_le_tsum hterm (hsn.mul_right _) hgS
 

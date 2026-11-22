@@ -21,20 +21,20 @@ theorem EffectiveShift.proof : EffectiveShift.Statement := by
     rw [hP.noTorsion, Ideal.mem_bot] at h'
     exact hϖ.ne_zero h'
 
-  let J : Ideal (MRing ι O) :=
-    { carrier := {u | ∃ v, u * f - v * g ∈ P}
-      add_mem' := by
-        rintro a c ⟨v, hv⟩ ⟨w, hw⟩
-        exact ⟨v + w, by convert P.add_mem hv hw using 1; ring⟩
-      zero_mem' := ⟨0, by simp⟩
-      smul_mem' := by
-        rintro c a ⟨v, hv⟩
-        exact ⟨c * v, by convert P.mul_mem_left c hv using 1; simp only [smul_eq_mul]; ring⟩ }
+  let J : Ideal (MRing ι O) := {
+    carrier := {u | ∃ v, u * f - v * g ∈ P}
+    add_mem' := by
+      rintro a c ⟨v, hv⟩ ⟨w, hw⟩
+      exact ⟨v + w, by convert P.add_mem hv hw using 1; ring⟩
+    zero_mem' := ⟨0, by simp⟩
+    smul_mem' := by
+      rintro c a ⟨v, hv⟩
+      exact ⟨c * v, by convert P.mul_mem_left c hv using 1; simp only [smul_eq_mul]; ring⟩
+  }
   have hJ : ∀ u, u ∈ J ↔ ∃ v, u * f - v * g ∈ P := fun u => Iff.rfl
   have hPJ : P ≤ J := fun p hp => (hJ p).2 ⟨0, by simpa using P.mul_mem_right f hp⟩
 
-  let 𝔞 : Ideal (MRing ι O) :=
-    ∏ k : K, Ideal.span (Set.range fun i : ι k => (X ⟨k, i⟩ : MRing ι O))
+  let 𝔞 : Ideal (MRing ι O) := ∏ k : K, Ideal.span (Set.range fun i : ι k => (X ⟨k, i⟩ : MRing ι O))
   let I : Ideal (MRing ι O) := Ideal.span {(C ϖ : MRing ι O)} * 𝔞
   have hIJ : I ≤ J.radical := by
     rw [Ideal.radical_eq_sInf]
@@ -48,8 +48,8 @@ theorem EffectiveShift.proof : EffectiveShift.Statement := by
         exact hu (hJW ((hJ u).2 ⟨v, huv⟩))
       simp only [IsRelevant, not_forall, not_exists, not_not] at hrel
       obtain ⟨k, hk⟩ := hrel
-      refine Ideal.mul_le_right.trans
-        (Ideal.prod_le_inf.trans ((Finset.inf_le (Finset.mem_univ k)).trans ?_))
+      refine Ideal.mul_le_right.trans (Ideal.prod_le_inf.trans
+        ((Finset.inf_le (Finset.mem_univ k)).trans ?_))
       rw [Ideal.span_le]
       rintro _ ⟨i, rfl⟩
       exact hk i

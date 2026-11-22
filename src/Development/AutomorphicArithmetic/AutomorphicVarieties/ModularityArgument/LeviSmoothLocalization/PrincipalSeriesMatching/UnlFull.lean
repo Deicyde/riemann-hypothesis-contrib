@@ -16,7 +16,8 @@ public import GroundTheory.GlobalFields.TateThesis.RootNumberLocalFinite
 noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.TypeTwo GlobalTheory.ThetaGL GlobalTheory.LocGL
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.TypeTwo
+  GlobalTheory.ThetaGL GlobalTheory.LocGL
 open GlobalTheory.TypeTwo.PowIrrProof
 
 namespace UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
@@ -27,8 +28,10 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 
 private theorem unif_valuation : valuation k (unif k : k) = uniformizer k := by
   obtain ⟨ϖ, hϖ⟩ := GlobalTheory.PrinTwo.NoFix.exists_unif k
-  have hex : ∃ p : kˣ, valuation k (p : k) < 1 ∧
-      ∀ x : k, valuation k x < 1 → valuation k x ≤ valuation k (p : k) := by
+  have hex
+      : ∃ p : kˣ,
+        valuation k (p : k) < 1
+          ∧ ∀ x : k, valuation k x < 1 → valuation k x ≤ valuation k (p : k) := by
     refine ⟨ϖ, ?_, ?_⟩
     · rw [hϖ]
       exact uniformizer_lt_one (R := k)
@@ -44,16 +47,19 @@ private theorem unif_valuation : valuation k (unif k : k) = uniformizer k := by
     rw [hϖ]
     exact uniformizer_lt_one (R := k)
 
-private theorem absPow_neg_one_unif :
-    (((absPow k (-1)) (unif k) : ℂˣ) : ℂ) = (GroundTheory.LocalField.residueCard k : ℂ) := by
+private theorem absPow_neg_one_unif
+    : (((absPow k (-1)) (unif k) : ℂˣ) : ℂ) = (GroundTheory.LocalField.residueCard k : ℂ) := by
   rw [val_absPow, GlobalTheory.LGrp.nabs_eq_zpow, ord_eq_one unif_valuation]
   push_cast
   rw [Complex.cpow_neg_one, zpow_neg_one, inv_inv]
   rfl
 
-private theorem ne_mul_absPow {n : ℕ} (ω : Fin n → kˣ →* ℂˣ) (hω : ∀ i, IsSmoothChar (ω i))
-    (h : Unl (GroundTheory.LocalField.residueCard k) (Finset.univ.val.map fun i => IrrGL.ofChar (ω i) (hω i)))
-    (i j : Fin n) : ω j ≠ ω i * absPow k 1 := by
+private theorem ne_mul_absPow
+    {n : ℕ} (ω : Fin n → kˣ →* ℂˣ) (hω : ∀ i, IsSmoothChar (ω i))
+    (h : Unl (GroundTheory.LocalField.residueCard k)
+      (Finset.univ.val.map fun i => IrrGL.ofChar (ω i) (hω i)))
+    (i j : Fin n)
+    : ω j ≠ ω i * absPow k 1 := by
   intro hj
   have hi : ω i ∈ chars (Finset.univ.val.map fun i => IrrGL.ofChar (ω i) (hω i)) :=
     ⟨hω i, Multiset.mem_map.mpr ⟨i, Finset.mem_univ_val i, rfl⟩⟩
@@ -72,14 +78,16 @@ private theorem ne_mul_absPow {n : ℕ} (ω : Fin n → kˣ →* ℂˣ) (hω : �
   · rw [hq]
     exact absPow_neg_one_unif
 
-private theorem prinSeries_irreducible {n : ℕ} (ω : Fin n → kˣ →* ℂˣ) (hω : ∀ i, IsSmoothChar (ω i))
-    (h : ∀ i j, ω j ≠ ω i * absPow k 1) : (prinSeries ω).IsIrreducible := by
+private theorem prinSeries_irreducible
+    {n : ℕ}
+    (ω : Fin n → kˣ →* ℂˣ) (hω : ∀ i, IsSmoothChar (ω i)) (h : ∀ i j, ω j ≠ ω i * absPow k 1)
+    : (prinSeries ω).IsIrreducible := by
   classical
-  have hd : ∑ a : Fin n, (IrrGL.ofChar (ω a) (hω a)).fst = n := by
-    simp [IrrGL.ofChar]
+  have hd : ∑ a : Fin n, (IrrGL.ofChar (ω a) (hω a)).fst = n := by simp [IrrGL.ofChar]
   have hirr : (prodIrr (fun a => IrrGL.ofChar (ω a) (hω a)) hd).IsIrreducible := by
     refine GlobalTheory.RgGu.Holds.lUnlinkedIrr_holds k n n
-      (fun i => Segment.single (IrrGL.ofChar (ω i) (hω i)) (IrrGL.isCusp_ofChar _ _)) _ hd ?_ ?_
+      (fun i => Segment.single (IrrGL.ofChar (ω i) (hω i)) (IrrGL.isCusp_ofChar _ _))
+      _ hd ?_ ?_
     · intro i j
       apply GlobalTheory.CompanionTheory.BZPair.not_linked_single
       · unfold IrrGL.nu
@@ -96,14 +104,18 @@ private theorem prinSeries_irreducible {n : ℕ} (ω : Fin n → kˣ →* ℂˣ)
   have E1 : (prodIrr (fun a => IrrGL.ofChar (ω a) (hω a)) hd).Equiv
       (multiProd e1 fun a => detRep (Fin 1) (ω a)) :=
     multiProdEquiv e1 (fun a => (equivRep (IrrRep.det (Fin 1) (ω a) (hω a))).symm)
-  obtain ⟨E2⟩ := (Placing.parInd_jac_placing k (Fin n) (Fin n) (fun _ => Fin 1) e1
-    (Equiv.sigmaUnique (Fin n) fun _ => Fin 1) _).1 (piTensor fun a => detRep (Fin 1) (ω a))
-  have hM : (multiProd (Equiv.sigmaUnique (Fin n) fun _ => Fin 1)
-      fun a => detRep (Fin 1) (ω a)).IsIrreducible :=
+  obtain ⟨E2⟩ :=
+    (Placing.parInd_jac_placing k (Fin n) (Fin n)
+      (fun _ => Fin 1)
+      e1 (Equiv.sigmaUnique (Fin n) fun _ => Fin 1) _).1 (piTensor fun a => detRep (Fin 1) (ω a))
+  have hM : (multiProd (Equiv.sigmaUnique (Fin n) fun _ => Fin 1) fun a =>
+      detRep (Fin 1) (ω a)).IsIrreducible :=
     GlobalTheory.Parabolic.isIrreducible_of_equiv (E1.trans E2) hirr
-  have hn {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-      [Module ℂ W] {σ : Representation ℂ G W} {ρ : Representation ℂ G V}
-      (h : IsSubquotient σ ρ) (hW : Nontrivial W) : Nontrivial V := by
+  have hn
+      {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+      {σ : Representation ℂ G W} {ρ : Representation ℂ G V} (h : IsSubquotient σ ρ)
+      (hW : Nontrivial W)
+      : Nontrivial V := by
     letI := hW
     obtain ⟨S, f, hf⟩ := h
     have := hf.nontrivial
@@ -111,10 +123,12 @@ private theorem prinSeries_irreducible {n : ℕ} (ω : Fin n → kˣ →* ℂˣ)
   haveI := hn
     (GlobalTheory.PermPrin.isSubquotient_multiProd_prinSeries (Equiv.sigmaUnique (Fin n) fun _ => Fin 1) ω)
     (nontrivial_of_irreducible hM)
-  have he {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-      [Module ℂ W] {σ : Representation ℂ G W} {ρ : Representation ℂ G V}
-      (h : IsSubquotient σ ρ) [Nontrivial W] (hρ : ρ.IsIrreducible) :
-      Nonempty (ρ.Equiv σ) := by
+  have he
+      {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+      {σ : Representation ℂ G W} {ρ : Representation ℂ G V} (h : IsSubquotient σ ρ)
+      [Nontrivial W]
+      (hρ : ρ.IsIrreducible)
+      : Nonempty (ρ.Equiv σ) := by
     obtain ⟨S, f, hf⟩ := h
     obtain ⟨y, hy⟩ := exists_ne (0 : W)
     obtain ⟨v, rfl⟩ := hf y

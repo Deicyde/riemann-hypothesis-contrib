@@ -8,9 +8,11 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l) {r : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
 
 def offZero {Comp : Type} (X : Comp → Data E r) : Submodule ℂ (FDSec X) where
@@ -19,12 +21,14 @@ def offZero {Comp : Type} (X : Comp → Data E r) : Submodule ℂ (FDSec X) wher
   add_mem' hP hQ k x hx := by simp [hP k x hx, hQ k x hx]
   smul_mem' a P hP k x hx := by simp [hP k x hx]
 
-def holSub0 {Comp : Type} (X : Comp → Data E r) (la : ∀ k, ReciprocityTheory.ChartRestriction.G.FD.Wt (X k).Ψ r) : Submodule ℂ (FDSec X) :=
+def holSub0
+    {Comp : Type}
+    (X : Comp → Data E r) (la : ∀ k, ReciprocityTheory.ChartRestriction.G.FD.Wt (X k).Ψ r)
+    : Submodule ℂ (FDSec X) :=
   holSub X la ⊓ offZero X
 
 variable {Xo c} in
 theorem rdU_mem_offZero {σ : c.F →+* ℂ} (V : Unf Xo c σ r) (f : Rul Xo c) : rdU V f ∈ offZero V.X :=
   fun _ _ hx => dif_neg hx
-
 
 end Formalism.L2.Pj

@@ -12,9 +12,17 @@ theorem etale_evaluation_map_basic_of_components : LateralTheory.EtaleFoundation
   apply LateralTheory.EtaleFoundations.pp_ev_basic_of
 theorem etale_cohomology_evaluation_mk : LateralTheory.EtaleFoundations.pp_ev_mk := by
   apply LateralTheory.EtaleFoundations.pp_ev_mk_of
-theorem etale_cohomology_evaluation_connecting_hom : LateralTheory.EtaleFoundations.pp_ev_delta := by
+theorem etale_cohomology_evaluation_connecting_hom
+    : LateralTheory.EtaleFoundations.pp_ev_delta := by
   apply LateralTheory.EtaleFoundations.pp_ev_delta_of
-theorem etale_torsion_cohomology_operation_spec : LateralTheory.EtaleFoundations.EtaleCochainSemilinearMapOnClasses := by
-  apply LateralTheory.EtaleFoundations.etale_semilinear_cohomology_operation_exists_of_evaluation <;> first | exact etale_evaluation_map_basic_of_components | exact etale_cohomology_evaluation_mk | exact etale_cohomology_evaluation_connecting_hom
-theorem intersectionNumber_baseChange : LateralTheory.EtaleFoundations.EtaleCochainSemilinearMapOnClasses := etale_torsion_cohomology_operation_spec
+theorem etale_torsion_cohomology_operation_spec
+    : LateralTheory.EtaleFoundations.EtaleCochainSemilinearMapOnClasses := by
+  apply LateralTheory.EtaleFoundations.etale_semilinear_cohomology_operation_exists_of_evaluation
+    <;> first
+      | exact etale_evaluation_map_basic_of_components
+      | exact etale_cohomology_evaluation_mk
+      | exact etale_cohomology_evaluation_connecting_hom
+theorem intersectionNumber_baseChange
+    : LateralTheory.EtaleFoundations.EtaleCochainSemilinearMapOnClasses :=
+  etale_torsion_cohomology_operation_spec
 end LateralTheory.Fin.EtaleCochainSemilinearMapOnClasses

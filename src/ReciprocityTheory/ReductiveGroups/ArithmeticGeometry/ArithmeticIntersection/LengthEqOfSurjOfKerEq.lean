@@ -8,40 +8,46 @@ namespace ReciprocityTheory.ChartRestriction.G.AI
 
 universe u
 
-theorem length_eq_of_surj_of_ker_eq {A C M N : Type*} [CommRing A] [AddCommGroup C] [Module A C]
-    [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N] (f : C →ₗ[A] M) (g : C →ₗ[A] N)
-    (hf : Function.Surjective f) (hg : Function.Surjective g)
-    (h : LinearMap.ker f = LinearMap.ker g) : Module.length A M = Module.length A N := ((f.quotKerEquivOfSurjective hf).symm.trans ((Submodule.quotEquivOfEq _ _ h).trans
-      (g.quotKerEquivOfSurjective hg))).length_eq
+theorem length_eq_of_surj_of_ker_eq
+    {A C M N : Type*} [CommRing A] [AddCommGroup C] [Module A C] [AddCommGroup M] [Module A M]
+    [AddCommGroup N] [Module A N]
+    (f : C →ₗ[A] M) (g : C →ₗ[A] N) (hf : Function.Surjective f) (hg : Function.Surjective g)
+    (h : LinearMap.ker f = LinearMap.ker g)
+    : Module.length A M = Module.length A N :=
+  ((f.quotKerEquivOfSurjective hf).symm.trans
+    ((Submodule.quotEquivOfEq _ _ h).trans (g.quotKerEquivOfSurjective hg))).length_eq
 
-theorem mem_ker_lsmul_mk {A : Type u} [CommRing A] (a b x : A) :
-    Ideal.Quotient.mk (Ideal.span {a}) x ∈
-        LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b) ↔ ∃ y, b * x = a * y := by
+theorem mem_ker_lsmul_mk {A : Type u} [CommRing A] (a b x : A)
+    : Ideal.Quotient.mk (Ideal.span {a}) x
+        ∈ LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)
+      ↔ ∃ y, b * x = a * y := by
   rw [LinearMap.mem_ker, LinearMap.lsmul_apply, Algebra.smul_def, Ideal.Quotient.algebraMap_eq,
     ← map_mul, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]
   rfl
 
-theorem length_ker_swap {A : Type u} [CommRing A] [IsDomain A] (a b : A) (ha : a ≠ 0) (hb : b ≠ 0) :
-    Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)) =
-      Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a)) := by
+theorem length_ker_swap {A : Type u} [CommRing A] [IsDomain A] (a b : A) (ha : a ≠ 0) (hb : b ≠ 0)
+    : Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b))
+      = Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a)) := by
   set S : Submodule A (A × A) :=
     LinearMap.ker (b • LinearMap.fst A A A - a • LinearMap.snd A A A) with hSdef
   have hS : ∀ p : A × A, p ∈ S ↔ b * p.1 = a * p.2 := by
     intro p
     rw [hSdef, LinearMap.mem_ker]
     simp [sub_eq_zero]
-  have hf0 : ∀ p : S, (Ideal.span {a}).mkQ (p : A × A).1 ∈
-      LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b) := by
+  have hf0
+      : ∀ p : S,
+        (Ideal.span {a}).mkQ (p : A × A).1
+          ∈ LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b) := by
     intro p
     exact (mem_ker_lsmul_mk a b _).mpr ⟨_, (hS _).mp p.2⟩
-  have hg0 : ∀ p : S, (Ideal.span {b}).mkQ (p : A × A).2 ∈
-      LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a) := by
+  have hg0
+      : ∀ p : S,
+        (Ideal.span {b}).mkQ (p : A × A).2
+          ∈ LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a) := by
     intro p
     exact (mem_ker_lsmul_mk b a _).mpr ⟨(p : A × A).1, ((hS _).mp p.2).symm⟩
-  let f := LinearMap.codRestrict _
-    ((Ideal.span {a}).mkQ ∘ₗ LinearMap.fst A A A ∘ₗ S.subtype) hf0
-  let g := LinearMap.codRestrict _
-    ((Ideal.span {b}).mkQ ∘ₗ LinearMap.snd A A A ∘ₗ S.subtype) hg0
+  let f := LinearMap.codRestrict _ ((Ideal.span {a}).mkQ ∘ₗ LinearMap.fst A A A ∘ₗ S.subtype) hf0
+  let g := LinearMap.codRestrict _ ((Ideal.span {b}).mkQ ∘ₗ LinearMap.snd A A A ∘ₗ S.subtype) hg0
   apply length_eq_of_surj_of_ker_eq f g
   · rintro ⟨k, hk⟩
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective k
@@ -70,9 +76,10 @@ theorem length_ker_swap {A : Type u} [CommRing A] [IsDomain A] (a b : A) (ha : a
       rw [hp']
       ring
 
-theorem length_ne_top_of_killed {A N : Type*} [CommRing A] [AddCommGroup N] [Module A N]
-    [Module.Finite A N] (I : Ideal A) (hI : ∀ r ∈ I, ∀ x : N, r • x = 0)
-    (hfin : Module.length A (A ⧸ I) ≠ ⊤) : Module.length A N ≠ ⊤ := by
+theorem length_ne_top_of_killed
+    {A N : Type*} [CommRing A] [AddCommGroup N] [Module A N] [Module.Finite A N]
+    (I : Ideal A) (hI : ∀ r ∈ I, ∀ x : N, r • x = 0) (hfin : Module.length A (A ⧸ I) ≠ ⊤)
+    : Module.length A N ≠ ⊤ := by
   rw [Module.length_ne_top_iff, isFiniteLength_iff_isNoetherian_isArtinian] at hfin ⊢
   obtain ⟨hN, hA⟩ := hfin
   obtain ⟨n, s, hs⟩ := Module.Finite.exists_fin (R := A) (M := N)
@@ -93,12 +100,13 @@ theorem length_ne_top_of_killed {A N : Type*} [CommRing A] [AddCommGroup N] [Mod
     · intro j _ hj
       simp [Pi.single_eq_of_ne hj]
     · simp
-  exact ⟨isNoetherian_of_surjective Φ (LinearMap.range_eq_top.mpr hΦ),
-    isArtinian_of_surjective _ Φ hΦ⟩
+  exact
+    ⟨isNoetherian_of_surjective Φ (LinearMap.range_eq_top.mpr hΦ), isArtinian_of_surjective _ Φ hΦ⟩
 
-theorem length_ker_ne_top {A : Type u} [CommRing A] [IsDomain A] [IsNoetherianRing A] (a b : A)
-    (ha : a ≠ 0) (hb : b ≠ 0) (hfin : Module.length A (A ⧸ Ideal.span {a, b}) ≠ ⊤) :
-    Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)) ≠ ⊤ := by
+theorem length_ker_ne_top
+    {A : Type u} [CommRing A] [IsDomain A] [IsNoetherianRing A]
+    (a b : A) (ha : a ≠ 0) (hb : b ≠ 0) (hfin : Module.length A (A ⧸ Ideal.span {a, b}) ≠ ⊤)
+    : Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)) ≠ ⊤ := by
   apply length_ne_top_of_killed (Ideal.span {a, b}) _ hfin
   rintro r hr ⟨k, hk⟩
   apply Subtype.ext

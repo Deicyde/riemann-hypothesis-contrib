@@ -29,12 +29,13 @@ theorem cOmega_pos (N : ℕ) : 0 < cOmega N := by
   unfold cOmega
   exact div_pos one_pos (mul_pos (pow_pos two_pos _) hv)
 
-theorem omegaDensity_haarProb (μ : Measure (Formalism.BasicNotions.UpqT N 0)) [μ.IsHaarMeasure] [IsProbabilityMeasure μ] :
-    Formalism.BasicNotions.OmegaDensity μ (ENNReal.ofReal (cOmega N)) :=
+theorem omegaDensity_haarProb
+    (μ : Measure (Formalism.BasicNotions.UpqT N 0)) [μ.IsHaarMeasure] [IsProbabilityMeasure μ]
+    : Formalism.BasicNotions.OmegaDensity μ (ENNReal.ofReal (cOmega N)) :=
   PolarCoordinateComparison.omegaDensity_main μ
 
-theorem omegaDensity_cd (cd : Formalism.BasicNotions.CDHaar) (N : ℕ) :
-    Formalism.BasicNotions.OmegaDensity (cd.cd N 0) (ENNReal.ofReal (cOmega N)) := by
+theorem omegaDensity_cd (cd : Formalism.BasicNotions.CDHaar) (N : ℕ)
+    : Formalism.BasicNotions.OmegaDensity (cd.cd N 0) (ENNReal.ofReal (cOmega N)) := by
   haveI := cd.haar N 0
   haveI := cd.prob N
   exact omegaDensity_haarProb (cd.cd N 0)

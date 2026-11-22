@@ -9,8 +9,8 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC Polynomia
 
 namespace LateralTheory.E.E8.TwSec
 
-theorem twAdj_comap_surj (A : Type) [CommRing A] (q : ℕ) [NeZero q] :
-    Function.Surjective (PrimeSpectrum.comap (algebraMap A (AdjoinRoot (cyclotomic q A)))) := by
+theorem twAdj_comap_surj (A : Type) [CommRing A] (q : ℕ) [NeZero q]
+    : Function.Surjective (PrimeSpectrum.comap (algebraMap A (AdjoinRoot (cyclotomic q A)))) := by
   have hm := cyclotomic.monic q A
   have := Module.Free.of_basis (AdjoinRoot.powerBasis' hm).basis
   have : Module.Finite A (AdjoinRoot (cyclotomic q A)) :=
@@ -27,16 +27,19 @@ theorem twAdj_comap_surj (A : Type) [CommRing A] (q : ℕ) [NeZero q] :
     exact (AdjoinRoot.powerBasisAux' hm).repr.symm.injective.nontrivial
   exact Algebra.IsIntegral.comap_surjective A _ p
 
-theorem twAdj_etale (A : Type) [CommRing A] (q : ℕ) (hq : IsUnit (q : A)) :
-    Algebra.Etale A (AdjoinRoot (cyclotomic q A)) := by
+theorem twAdj_etale (A : Type) [CommRing A] (q : ℕ) (hq : IsUnit (q : A))
+    : Algebra.Etale A (AdjoinRoot (cyclotomic q A)) := by
   have hsep : (cyclotomic q A).Separable :=
-    (separable_X_pow_sub_C_unit (1 : Aˣ) hq).of_dvd (by simpa using cyclotomic.dvd_X_pow_sub_one q A)
+    (separable_X_pow_sub_C_unit (1 : Aˣ) hq).of_dvd
+      (by simpa using cyclotomic.dvd_X_pow_sub_one q A)
   obtain ⟨a, b, hab⟩ := hsep
-  let P : StandardEtalePair A := ⟨cyclotomic q A, cyclotomic.monic q A, 1,
-    ⟨b, a, 0, by rw [pow_zero, ← hab]; ring⟩⟩
-  let e1 : P.Ring ≃ₐ[A] Localization.Away (AdjoinRoot.mk (cyclotomic q A) 1) := P.equivAwayAdjoinRoot
-  let e2 : AdjoinRoot (cyclotomic q A) ≃ₐ[AdjoinRoot (cyclotomic q A)]
-      Localization.Away (AdjoinRoot.mk (cyclotomic q A) 1) :=
+  let P : StandardEtalePair A :=
+    ⟨cyclotomic q A, cyclotomic.monic q A, 1, ⟨b, a, 0, by rw [pow_zero, ← hab]; ring⟩⟩
+  let e1 : P.Ring ≃ₐ[A] Localization.Away (AdjoinRoot.mk (cyclotomic q A) 1) :=
+    P.equivAwayAdjoinRoot
+  let e2
+      : AdjoinRoot (cyclotomic q A) ≃ₐ[AdjoinRoot (cyclotomic q A)]
+        Localization.Away (AdjoinRoot.mk (cyclotomic q A) 1) :=
     IsLocalization.atUnit _ _ (AdjoinRoot.mk (cyclotomic q A) 1) (by rw [map_one]; exact isUnit_one)
   have := Algebra.IsStandardEtale.of_equiv (e1.trans (e2.symm.restrictScalars A))
   infer_instance

@@ -14,8 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Bes
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SeeSaw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.SeeSaw
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -23,11 +27,15 @@ noncomputable section
 
 namespace GlobalTheory.SeeSaw.VanMany
 
-theorem quot_lin {G : Type} [Group G] [MeasurableSpace G] {R : Subgroup G} {μR : Measure R} {μG : Measure G} {I : Type}
-    [Fintype I] (α : I → ℂ) (f : I → G → ℂ) (z : I → ℂ) (h : ∀ i, IsQuotIntL1 μR μG (f i) (z i)) :
-    IsQuotIntL1 μR μG (fun x => ∑ i, α i * f i x) (∑ i, α i * z i) := by
+theorem quot_lin
+    {G : Type} [Group G] [MeasurableSpace G]
+    {R : Subgroup G} {μR : Measure R} {μG : Measure G} {I : Type} [Fintype I]
+    (α : I → ℂ)
+    (f : I → G → ℂ) (z : I → ℂ) (h : ∀ i, IsQuotIntL1 μR μG (f i) (z i))
+    : IsQuotIntL1 μR μG (fun x => ∑ i, α i * f i x) (∑ i, α i * z i) := by
   classical
-  have key : ∀ S : Finset I, IsQuotIntL1 μR μG (fun x => ∑ i ∈ S, α i * f i x) (∑ i ∈ S, α i * z i) := by
+  have key
+      : ∀ S : Finset I, IsQuotIntL1 μR μG (fun x => ∑ i ∈ S, α i * f i x) (∑ i ∈ S, α i * z i) := by
     intro S
     induction S using Finset.induction_on with
     | empty =>
@@ -35,42 +43,79 @@ theorem quot_lin {G : Type} [Group G] [MeasurableSpace G] {R : Subgroup G} {μR 
       exact IsQuotIntL1.zero
     | insert i S hi ih =>
       have := ((h i).smul (α i)).add ih
-      have e : (fun x => ∑ j ∈ insert i S, α j * f j x) = α i • f i + (fun x => ∑ j ∈ S, α j * f j x) := by
+      have e
+          : (fun x => ∑ j ∈ insert i S, α j * f j x)
+            = α i • f i + (fun x => ∑ j ∈ S, α j * f j x) := by
         funext x
         simp [Finset.sum_insert hi]
       rw [e, Finset.sum_insert hi]
       exact this
   exact key Finset.univ
 
-theorem iteratedQuotientIntegral_finite_linearCombination {G₁ G₂ : Type} [Group G₁] [MeasurableSpace G₁] [TopologicalSpace G₁] [Group G₂] [MeasurableSpace G₂]
-    [TopologicalSpace G₂] {R₁ : Subgroup G₁} {R₂ : Subgroup G₂} (ρ₁ : Measure R₁) (μ₁ : Measure G₁) (ρ₂ : Measure R₂)
-    (μ₂ : Measure G₂) {I : Type} [Fintype I] (α : I → ℂ) (f : I → G₁ → G₂ → ℂ) (v : I → ℂ)
-    (h : ∀ i, Iter2 ρ₁ μ₁ ρ₂ μ₂ (f i) (v i)) :
-    Iter2 ρ₁ μ₁ ρ₂ μ₂ (fun q₁ q₂ => ∑ i, α i * f i q₁ q₂) (∑ i, α i * v i) := by
+theorem iteratedQuotientIntegral_finite_linearCombination
+    {G₁ G₂ : Type} [Group G₁] [MeasurableSpace G₁] [TopologicalSpace G₁] [Group G₂]
+    [MeasurableSpace G₂] [TopologicalSpace G₂]
+    {R₁ : Subgroup G₁} {R₂ : Subgroup G₂} (ρ₁ : Measure R₁)
+    (μ₁ : Measure G₁) (ρ₂ : Measure R₂) (μ₂ : Measure G₂)
+    {I : Type} [Fintype I]
+    (α : I → ℂ)
+    (f : I → G₁ → G₂ → ℂ) (v : I → ℂ) (h : ∀ i, Iter2 ρ₁ μ₁ ρ₂ μ₂ (f i) (v i))
+    : Iter2 ρ₁ μ₁ ρ₂ μ₂ (fun q₁ q₂ => ∑ i, α i * f i q₁ q₂) (∑ i, α i * v i) := by
   choose g hg1 hg2 using h
-  exact ⟨fun q => ∑ i, α i * g i q, quot_lin α g v hg1, fun q => quot_lin α (fun i => f i q) (fun i => g i q) fun i => hg2 i q⟩
+  exact ⟨
+    fun q => ∑ i, α i * g i q,
+    quot_lin α g v hg1,
+    fun q => quot_lin α (fun i => f i q) (fun i => g i q) fun i => hg2 i q
+  ⟩
 
-theorem invsupp : ∀ (D : D7) (c : Comm D) (t : Tup c), t.Is → ∀ j σ (h : j + 2 * (σ + 1) + 2 = D.R.m) P₁ P₂ (φ : t.Ch j → GA D (c.X j) → ℂ) (f : GA D (c.V (j + 1 + 1)) → ℂ) (K₁ : Subgroup (GA D (c.V (j + 1)))) (T₁ : Finset (GA D (c.V (j + 1)))), (∀ k ∈ K₁, ∃ a : ℂ, a ≠ 0 ∧ t.om j (1, k) (t.pt j P₁) = a⁻¹ • t.pt j P₁ ∧ t.om (j + 1) (k, 1) (t.pt (j + 1) P₂) = a • t.pt (j + 1) P₂) → (∀ α, ∀ g ∈ (t.e j α).support, ∀ h₁, flatBF (t.sBF j (σ + 1) h) (t.om j (g, h₁) (t.pt j P₁)) ≠ 0 → ∃ q ∈ T₁, InCell (jacGrp (c.jac j (σ + 1) h).d) q K₁ h₁) → (∀ h₁, ∀ k ∈ K₁, t.integrand j σ h P₁ P₂ φ f (h₁ * k) = t.integrand j σ h P₁ P₂ φ f h₁) ∧ (∀ h₁, t.integrand j σ h P₁ P₂ φ f h₁ ≠ 0 → ∃ q ∈ T₁, InCell (jacGrp (c.jac j (σ + 1) h).d) q K₁ h₁) := by
+theorem invsupp
+    : ∀ (D : D7) (c : Comm D) (t : Tup c),
+      t.Is
+        → ∀ j σ (h : j + 2 * (σ + 1) + 2 = D.R.m) P₁ P₂ (φ : t.Ch j → GA D (c.X j) → ℂ)
+            (f : GA D (c.V (j + 1 + 1)) → ℂ) (K₁ : Subgroup (GA D (c.V (j + 1))))
+            (T₁ : Finset (GA D (c.V (j + 1)))),
+          (∀ k ∈ K₁, ∃ a : ℂ,
+              a ≠ 0 ∧ t.om j (1, k) (t.pt j P₁) = a⁻¹ • t.pt j P₁
+                ∧ t.om (j + 1) (k, 1) (t.pt (j + 1) P₂) = a • t.pt (j + 1) P₂)
+            → (∀ α, ∀ g ∈ (t.e j α).support, ∀ h₁,
+              flatBF (t.sBF j (σ + 1) h) (t.om j (g, h₁) (t.pt j P₁)) ≠ 0
+                → ∃ q ∈ T₁, InCell (jacGrp (c.jac j (σ + 1) h).d) q K₁ h₁)
+            → (∀ h₁, ∀ k ∈ K₁,
+                t.integrand j σ h P₁ P₂ φ f (h₁ * k) = t.integrand j σ h P₁ P₂ φ f h₁)
+              ∧ (∀ h₁,
+                t.integrand j σ h P₁ P₂ φ f h₁ ≠ 0
+                  → ∃ q ∈ T₁, InCell (jacGrp (c.jac j (σ + 1) h).d) q K₁ h₁) := by
   intro D c t ht j σ h P₁ P₂ φ f K₁ T₁ hlaw hsupp
   obtain ⟨hs1om, -⟩ := ht.sBF j (σ + 1) h
   obtain ⟨hs2om, -⟩ := ht.sFB j σ h
-  have HH := fun φ' => GlobalTheory.HandHom.hand_hom D c.ψ σ _ _ _ (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) φ'
+  have HH := fun φ' =>
+    GlobalTheory.HandHom.hand_hom D c.ψ σ _ _ _ (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h)
+      (c.vL j σ h) φ'
   have per0 : ∀ f', (c.B (j + 1 + 1) σ (idx_step h)).per c.ψ 0 f' = 0 := by
     intro f'
     have := (HH (fun _ => 0)).2.2 0 1 0 f'
     simpa using this
   refine ⟨fun h₁ k hk => ?_, fun h₁ hne => ?_⟩
   · obtain ⟨a, ha, h1, h2⟩ := hlaw k hk
-    have key : ∀ α g h₂, Chain.hand (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) (t.pt j P₁)
-        (t.pt (j + 1) P₂) (φ α) g (h₁ * k) h₂ = Chain.hand (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h)
-        (t.pt j P₁) (t.pt (j + 1) P₂) (φ α) g h₁ h₂ := by
+    have key
+        : ∀ α g h₂,
+          Chain.hand (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) (t.pt j P₁)
+              (t.pt (j + 1) P₂) (φ α) g (h₁ * k) h₂
+            = Chain.hand (t.sBF j (σ + 1) h) (t.sFB j σ h) (c.lnk j σ h) (c.vL j σ h) (t.pt j P₁)
+              (t.pt (j + 1) P₂) (φ α) g h₁ h₂ := by
       intro α g h₂
       simp only [Chain.hand]
-      have m1 : (t.sBF j (σ + 1) h).om (g, h₁ * k) (t.pt j P₁) = a⁻¹ • (t.sBF j (σ + 1) h).om (g, h₁) (t.pt j P₁) := by
+      have m1
+          : (t.sBF j (σ + 1) h).om (g, h₁ * k) (t.pt j P₁)
+            = a⁻¹ • (t.sBF j (σ + 1) h).om (g, h₁) (t.pt j P₁) := by
         have hm : ((g, h₁ * k) : GA D (c.V j) × GA D (c.V (j + 1))) = (g, h₁) * (1, k) := by simp
         rw [hm, map_mul, Module.End.mul_apply, hs1om, h1, map_smul]
-      have m2 : (t.sFB j σ h).om (h₁ * k, h₂) (t.pt (j + 1) P₂) = a • (t.sFB j σ h).om (h₁, h₂) (t.pt (j + 1) P₂) := by
-        have hm : ((h₁ * k, h₂) : GA D (c.V (j + 1)) × GA D (c.V (j + 1 + 1))) = (h₁, h₂) * (k, 1) := by simp
+      have m2
+          : (t.sFB j σ h).om (h₁ * k, h₂) (t.pt (j + 1) P₂)
+            = a • (t.sFB j σ h).om (h₁, h₂) (t.pt (j + 1) P₂) := by
+        have hm
+            : ((h₁ * k, h₂) : GA D (c.V (j + 1)) × GA D (c.V (j + 1 + 1))) = (h₁, h₂) * (k, 1) := by
+          simp
         rw [hm, map_mul, Module.End.mul_apply, hs2om, h2, map_smul]
       rw [m1, m2, (HH (φ α)).1, inv_mul_cancel₀ ha, one_smul]
     funext h₂

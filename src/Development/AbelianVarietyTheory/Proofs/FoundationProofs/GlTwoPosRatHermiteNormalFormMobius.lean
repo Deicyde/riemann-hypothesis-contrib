@@ -55,8 +55,11 @@ end GlobalTheory.HermFN
 
 namespace GlobalTheory.HermFN
 
-theorem hermite (g : GQ) : ∃ n : ℕ, 0 < n ∧ ∀ γ₀ : SL(2, ℤ), ∃ (γ : SL(2, ℤ)) (a d : ℕ) (b : ℤ), a * d = n ∧
-    ∀ τ : ℍ, mob g ((γ₀ • τ : ℍ) : ℂ) = mob (ofSL γ) (((a : ℂ) * τ + b) / d) := by
+theorem hermite (g : GQ)
+    : ∃ n : ℕ,
+      0 < n
+        ∧ ∀ γ₀ : SL(2, ℤ), ∃ (γ : SL(2, ℤ)) (a d : ℕ) (b : ℤ),
+          a * d = n ∧ ∀ τ : ℍ, mob g ((γ₀ • τ : ℍ) : ℂ) = mob (ofSL γ) (((a : ℂ) * τ + b) / d) := by
   obtain ⟨N, hN, hm⟩ := common_den g
   choose m hm using hm
   have hdetg : 0 < ent g 0 0 * ent g 1 1 - ent g 0 1 * ent g 1 0 := by
@@ -79,11 +82,10 @@ theorem hermite (g : GQ) : ∃ n : ℕ, 0 < n ∧ ∀ γ₀ : SL(2, ℤ), ∃ (�
   set q : ℤ := m 0 0 * γ₀ 0 1 + m 0 1 * γ₀ 1 1 with hq_def
   set s : ℤ := m 1 0 * γ₀ 0 1 + m 1 1 * γ₀ 1 1 with hs_def
   have hps : p * s - q * r = nI := by
-    rw [hp_def, hr_def, hq_def, hs_def, hnI]; linear_combination (m 0 0 * m 1 1 - m 0 1 * m 1 0) * hdet0
-  have hpr : p ≠ 0 ∨ r ≠ 0 := by
-    by_contra h; push_neg at h; rw [h.1, h.2] at hps; omega
-  have hrs : r ≠ 0 ∨ s ≠ 0 := by
-    by_contra h; push_neg at h; rw [h.1, h.2] at hps; omega
+    rw [hp_def, hr_def, hq_def, hs_def, hnI]
+    linear_combination (m 0 0 * m 1 1 - m 0 1 * m 1 0) * hdet0
+  have hpr : p ≠ 0 ∨ r ≠ 0 := by by_contra h; push_neg at h; rw [h.1, h.2] at hps; omega
+  have hrs : r ≠ 0 ∨ s ≠ 0 := by by_contra h; push_neg at h; rw [h.1, h.2] at hps; omega
   set a : ℕ := Int.gcd p r with ha_def
   have ha : 0 < a := Int.gcd_pos_iff.mpr hpr
   set p' : ℤ := p / a
@@ -96,8 +98,7 @@ theorem hermite (g : GQ) : ∃ n : ℕ, 0 < n ∧ ∀ γ₀ : SL(2, ℤ), ∃ (�
     have := γ.2; rw [Matrix.det_fin_two, h0, h1] at this; linear_combination this
   set b : ℤ := γ 1 1 * q - γ 0 1 * s with hb_def
   set dd : ℤ := p' * s - r' * q with hdd_def
-  have had : (a : ℤ) * dd = nI := by
-    rw [hdd_def, ← hps]; linear_combination (-s) * hp + q * hr
+  have had : (a : ℤ) * dd = nI := by rw [hdd_def, ← hps]; linear_combination (-s) * hp + q * hr
   have hd : 0 < dd := by
     have : (0 : ℤ) < a := by exact_mod_cast ha
     nlinarith
@@ -114,12 +115,16 @@ theorem hermite (g : GQ) : ∃ n : ℕ, 0 < n ∧ ∀ γ₀ : SL(2, ℤ), ∃ (�
     have hd0 : (dd : ℂ) ≠ 0 := by exact_mod_cast hd.ne'
     have hc : ∀ i j, ((ent g i j : ℚ) : ℂ) = (m i j : ℂ) / N := by
       intro i j
-      have : ent g i j = (m i j : ℚ) / N := by
-        rw [← hm i j]; field_simp
-      rw [this]; push_cast; rfl
+      have : ent g i j = (m i j : ℚ) / N := by rw [← hm i j]; field_simp
+      rw [this]
+      push_cast
+      rfl
     have hD0 : ((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ) ≠ 0 := by
       apply lin_ne_zero _ _ _ hz
-      by_contra h; push_neg at h; rw [h.1, h.2] at hdet0; simp at hdet0
+      by_contra h
+      push_neg at h
+      rw [h.1, h.2] at hdet0
+      simp at hdet0
     have hRS : (r : ℂ) * τ + s ≠ 0 := lin_ne_zero r s _ hz hrs
     have hpC : (p : ℂ) = a * p' := by exact_mod_cast hp
     have hrC : (r : ℂ) = a * r' := by exact_mod_cast hr
@@ -127,19 +132,38 @@ theorem hermite (g : GQ) : ∃ n : ℕ, 0 < n ∧ ∀ γ₀ : SL(2, ℤ), ∃ (�
     have hs'C : (r' : ℂ) * b + γ 1 1 * dd = s := by exact_mod_cast hs'
     rw [UpperHalfPlane.coe_specialLinearGroup_apply, hdC]
     simp only [mob, hc, algebraMap_int_eq, eq_intCast, Complex.ofReal_intCast]
-    have eL : ((m 0 0 : ℂ) / N * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ)) / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) + (m 0 1 : ℂ) / N) /
-        ((m 1 0 : ℂ) / N * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ)) / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) + (m 1 1 : ℂ) / N)
-        = ((p : ℂ) * τ + q) / ((r : ℂ) * τ + s) := by
-      have e1 : (m 0 0 : ℂ) / N * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ)) / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) + (m 0 1 : ℂ) / N
-          = ((p : ℂ) * τ + q) / (N * (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) := by
+    have eL
+        : ((m 0 0 : ℂ) / N
+                * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ))
+                  / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ)))
+              + (m 0 1 : ℂ) / N)
+            / ((m 1 0 : ℂ) / N
+                * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ))
+                  / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ)))
+              + (m 1 1 : ℂ) / N)
+          = ((p : ℂ) * τ + q) / ((r : ℂ) * τ + s) := by
+      have e1
+          : (m 0 0 : ℂ) / N
+                * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ))
+                  / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ)))
+              + (m 0 1 : ℂ) / N
+            = ((p : ℂ) * τ + q) / (N * (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) := by
         exact left_step (m 0 0) (m 0 1) (γ₀ 0 0) (γ₀ 0 1) (γ₀ 1 0) (γ₀ 1 1) N τ hNC hD0
-      have e2 : (m 1 0 : ℂ) / N * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ)) / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) + (m 1 1 : ℂ) / N
-          = ((r : ℂ) * τ + s) / (N * (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) := by
+      have e2
+          : (m 1 0 : ℂ) / N
+                * ((((γ₀ 0 0 : ℤ) : ℂ) * τ + ((γ₀ 0 1 : ℤ) : ℂ))
+                  / (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ)))
+              + (m 1 1 : ℂ) / N
+            = ((r : ℂ) * τ + s) / (N * (((γ₀ 1 0 : ℤ) : ℂ) * τ + ((γ₀ 1 1 : ℤ) : ℂ))) := by
         exact left_step (m 1 0) (m 1 1) (γ₀ 0 0) (γ₀ 0 1) (γ₀ 1 0) (γ₀ 1 1) N τ hNC hD0
       rw [e1, e2, div_div_div_cancel_right₀ (mul_ne_zero hNC hD0)]
-    have eR : ((γ 0 0 : ℤ) : ℂ) * (((a : ℂ) * τ + b) / dd) + ((γ 0 1 : ℤ) : ℂ) = ((p : ℂ) * τ + q) / dd := by
+    have eR
+        : ((γ 0 0 : ℤ) : ℂ) * (((a : ℂ) * τ + b) / dd) + ((γ 0 1 : ℤ) : ℂ)
+          = ((p : ℂ) * τ + q) / dd := by
       rw [h0]; exact upper_step p p' (γ 0 1) b dd q a τ hd0 hpC hq'C
-    have eR2 : ((γ 1 0 : ℤ) : ℂ) * (((a : ℂ) * τ + b) / dd) + ((γ 1 1 : ℤ) : ℂ) = ((r : ℂ) * τ + s) / dd := by
+    have eR2
+        : ((γ 1 0 : ℤ) : ℂ) * (((a : ℂ) * τ + b) / dd) + ((γ 1 1 : ℤ) : ℂ)
+          = ((r : ℂ) * τ + s) / dd := by
       rw [h1]; exact upper_step r r' (γ 1 1) b dd s a τ hd0 hrC hs'C
     have hofSL : ∀ i j, ((ent (ofSL γ) i j : ℚ) : ℂ) = ((γ i j : ℤ) : ℂ) := by
       intro i j; show (((γ i j : ℤ) : ℚ) : ℂ) = _; push_cast; rfl

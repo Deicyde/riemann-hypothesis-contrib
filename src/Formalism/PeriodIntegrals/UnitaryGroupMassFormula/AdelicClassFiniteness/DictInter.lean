@@ -15,14 +15,13 @@ namespace DictInter
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
 def tau (w : E) : E ⊗[F] Af F →ₗ[F] Af F :=
-  (TensorProduct.lid F (Af F)).toLinearMap ∘ₗ
-    TensorProduct.map ((Algebra.trace F E) ∘ₗ LinearMap.mulLeft F w) LinearMap.id
+  (TensorProduct.lid F (Af F)).toLinearMap
+    ∘ₗ TensorProduct.map ((Algebra.trace F E) ∘ₗ LinearMap.mulLeft F w) LinearMap.id
 
 lemma tau_tmul (w e : E) (a : Af F) : tau w (e ⊗ₜ[F] a) = Algebra.trace F E (w * e) • a := by
   first
     | simp [tau]
     | rfl
-
 
 variable (F E) in
 def dualSet : Set E := {w | ∀ a : 𝓞 E, Algebra.trace F E (w * (a : E)) ∈ (algebraMap (𝓞 F) F).range}
@@ -73,8 +72,8 @@ lemma of_algebraMap_mem_intAd (f : F) (h : algebraMap F (Af F) f ∈ Formalism.U
     | rwa [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation'] at hv
     | rwa [IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation] at hv
 
-def tSet (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] :
-    Set (E ⊗[F] Af F) :=
+def tSet (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    : Set (E ⊗[F] Af F) :=
   {r | ∀ w ∈ dualSet F E, tau w r ∈ Formalism.UG.intAd F}
 
 lemma one_mem_tSet : (1 : E ⊗[F] Af F) ∈ tSet F E := by
@@ -89,11 +88,12 @@ lemma one_mem_tSet : (1 : E ⊗[F] Af F) ∈ tSet F E := by
   rw [hx']
   exact algebraMap_mem_intAd x
 
-private theorem mul_algebraMap_mem_dualSet {w : E} (hw : w ∈ dualSet F E) (a : 𝓞 E) :
-    w * algebraMap (𝓞 E) E a ∈ dualSet F E := by
+private theorem mul_algebraMap_mem_dualSet {w : E} (hw : w ∈ dualSet F E) (a : 𝓞 E)
+    : w * algebraMap (𝓞 E) E a ∈ dualSet F E := by
   show ∀ b : 𝓞 E, Algebra.trace F E (w * algebraMap (𝓞 E) E a * (b : E)) ∈ (algebraMap (𝓞 F) F).range
   intro b
-  have h := (show ∀ b : 𝓞 E, Algebra.trace F E (w * (b : E)) ∈ (algebraMap (𝓞 F) F).range from hw) (a * b)
+  have h :=
+    (show ∀ b : 𝓞 E, Algebra.trace F E (w * (b : E)) ∈ (algebraMap (𝓞 F) F).range from hw) (a * b)
   rw [mul_assoc]
   exact h
 
@@ -155,14 +155,16 @@ theorem dual_intersection : DInter := by
     intro w hw
     apply of_algebraMap_mem_intAd
     rw [← tau_incl]
-    exact (show ∀ w ∈ dualSet F E, tau w (Formalism.UG.inclE (F := F) (Af F) e) ∈ Formalism.UG.intAd F from ht) w hw
+    exact (show ∀ w ∈ dualSet F E,
+          tau w (Formalism.UG.inclE (F := F) (Af F) e) ∈ Formalism.UG.intAd F from
+        ht)
+      w hw
   have h1 : (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := one_ne_zero
   have hd : FractionalIdeal.dual (𝓞 F) F (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
-    first
-      | exact FractionalIdeal.dual_ne_zero (𝓞 F) F h1
-      | exact FractionalIdeal.dual_ne_zero h1
-  have hmem : e ∈ FractionalIdeal.dual (𝓞 F) F
-      (FractionalIdeal.dual (𝓞 F) F (1 : FractionalIdeal (𝓞 E)⁰ E)) := by
+    first | exact FractionalIdeal.dual_ne_zero (𝓞 F) F h1 | exact FractionalIdeal.dual_ne_zero h1
+  have hmem
+      : e ∈ FractionalIdeal.dual (𝓞 F) F
+        (FractionalIdeal.dual (𝓞 F) F (1 : FractionalIdeal (𝓞 E)⁰ E)) := by
     rw [FractionalIdeal.mem_dual hd]
     intro a ha
     rw [FractionalIdeal.mem_dual h1] at ha

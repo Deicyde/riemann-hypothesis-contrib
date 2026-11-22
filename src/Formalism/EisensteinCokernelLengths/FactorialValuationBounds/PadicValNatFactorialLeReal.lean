@@ -181,16 +181,19 @@ theorem gapG_proof : GapG := by
     intro j hj1 hj2
     have := Finset.mem_Icc.mp (h1 hj1)
     rcases Finset.mem_union.mp (h2 hj2) with h | h <;> have := Finset.mem_Icc.mp h <;> omega
-  have hassoc : ∀ i ∈ R₁, ∀ j ∈ R₁ ∪ R₂, i ≠ j →
-      Associated (c i - c j) ((ℓ : ℤ_[ℓ]) ^ padicValInt ℓ (i - j)) := by
+  have hassoc
+      : ∀ i ∈ R₁, ∀ j ∈ R₁ ∪ R₂,
+        i ≠ j → Associated (c i - c j) ((ℓ : ℤ_[ℓ]) ^ padicValInt ℓ (i - j)) := by
     intro i _ j _ hij
     obtain ⟨hne, hv⟩ := hc i j hij
     rw [← hv]
     exact assoc_pow_valuation hne
   have hI := Formalism.LIFT.lift_LagrangeIdealInt ℓ ℤ_[ℓ] R₁ R₂ c hdisj hassoc
   have hkill := kill_of_mem_span T _ _ _ x hI hx1 hx2
-  have hle : (R₁.sup fun i => (∑ j ∈ R₂, padicValInt ℓ (i - j)) +
-      ∑ j ∈ R₁.erase i, padicValInt ℓ (i - j)) ≤ E := by
+  have hle
+      : (R₁.sup fun i =>
+          (∑ j ∈ R₂, padicValInt ℓ (i - j)) + ∑ j ∈ R₁.erase i, padicValInt ℓ (i - j))
+        ≤ E := by
     apply Finset.sup_le
     intro j₀ hj₀
     have := (gap_bound ℓ a S η b R₁ R₂ hab h1 h2 j₀ hj₀).trans hE
@@ -229,36 +232,47 @@ theorem rRVal_proof : RRVal := by
   refine ⟨hp, ?_⟩
   rw [hval, Finset.sum_congr rfl hv,
     ← Finset.sum_filter_add_sum_filter_not J (fun j => 1 - (η : ℤ) ≤ j ∧ j ≤ η + a), Nat.cast_add]
-  have hA := Formalism.WindowSums.arc_WindowSum ℓ (1 - (η : ℤ)) (a + 2 * η) (η + a)
-    (J.filter fun j => 1 - (η : ℤ) ≤ j ∧ j ≤ η + a)
-    (by
-      intro j hj
-      simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
-      rw [Finset.mem_Ico]; push_cast; omega)
-    (by
-      intro hj
-      simp only [hJ, Finset.mem_filter, Finset.mem_erase] at hj
-      exact hj.1.1 rfl)
-    (by
-      intro j hj
-      simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
-      rw [abs_le]; push_cast; constructor <;> omega)
-  have hB := Formalism.WindowSums.arc_WindowSum ℓ (1 - ((b : ℤ) + S)) (a + S) (b + S)
-    (J.filter fun j => ¬ (1 - (η : ℤ) ≤ j ∧ j ≤ η + a))
-    (by
-      intro j hj
-      simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
-      rw [Finset.mem_Ico]; push_cast; omega)
-    (by
-      intro hj
-      simp only [hJ, Finset.mem_filter, Finset.mem_erase] at hj
-      exact hj.1.1 rfl)
-    (by
-      intro j hj
-      simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
-      rw [abs_le]; push_cast; constructor <;> omega)
-  have hsum : ((a + 2 * η : ℕ) : ℝ) / ((ℓ : ℝ) - 1) + ((a + S : ℕ) : ℝ) / ((ℓ : ℝ) - 1) =
-      ((2 * a + 2 * η + S : ℕ) : ℝ) / ((ℓ : ℝ) - 1) := by
+  have hA :=
+    Formalism.WindowSums.arc_WindowSum ℓ (1 - (η : ℤ)) (a + 2 * η) (η + a)
+      (J.filter fun j => 1 - (η : ℤ) ≤ j ∧ j ≤ η + a)
+      (by
+        intro j hj
+        simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
+        rw [Finset.mem_Ico]
+        push_cast
+        omega)
+      (by
+        intro hj
+        simp only [hJ, Finset.mem_filter, Finset.mem_erase] at hj
+        exact hj.1.1 rfl)
+      (by
+        intro j hj
+        simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
+        rw [abs_le]
+        push_cast
+        constructor <;> omega)
+  have hB :=
+    Formalism.WindowSums.arc_WindowSum ℓ (1 - ((b : ℤ) + S)) (a + S) (b + S)
+      (J.filter fun j => ¬(1 - (η : ℤ) ≤ j ∧ j ≤ η + a))
+      (by
+        intro j hj
+        simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
+        rw [Finset.mem_Ico]
+        push_cast
+        omega)
+      (by
+        intro hj
+        simp only [hJ, Finset.mem_filter, Finset.mem_erase] at hj
+        exact hj.1.1 rfl)
+      (by
+        intro j hj
+        simp only [hJ, Finset.mem_filter, Finset.mem_erase, Finset.mem_union, Finset.mem_Icc] at hj
+        rw [abs_le]
+        push_cast
+        constructor <;> omega)
+  have hsum
+      : ((a + 2 * η : ℕ) : ℝ) / ((ℓ : ℝ) - 1) + ((a + S : ℕ) : ℝ) / ((ℓ : ℝ) - 1)
+        = ((2 * a + 2 * η + S : ℕ) : ℝ) / ((ℓ : ℝ) - 1) := by
     rw [← add_div]
     congr 1
     push_cast

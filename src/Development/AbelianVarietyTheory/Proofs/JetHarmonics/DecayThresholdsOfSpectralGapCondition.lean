@@ -6,17 +6,22 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory
 
-theorem thresholds_of_gapOK : ∀ (k r : ℕ) (h : ℝ), GapOK k r h →
-    JF.TransportedAlt k r (aOf r h - 1) 0 ∧ B.AB k r ≤ aOf r h - 1 ∧ AG k r < (aOf r h - 1) / 2 ∧ 0 < aOf r h - 1 := by
+theorem thresholds_of_gapOK
+    : ∀ (k r : ℕ) (h : ℝ),
+      GapOK k r h
+        → JF.TransportedAlt k r (aOf r h - 1) 0 ∧ B.AB k r ≤ aOf r h - 1
+          ∧ AG k r < (aOf r h - 1) / 2 ∧ 0 < aOf r h - 1 := by
   intro k r h hg
   obtain ⟨hk, -, -, h4⟩ := hg
   have hAG : 0 ≤ AG k r := by unfold AG; positivity
-  have hA : 9 * ((r : ℝ) + 1) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + 3 * AG k r + 2 ≤ aOf r h - 1 := by linarith
+  have hA : 9 * ((r : ℝ) + 1) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + 3 * AG k r + 2 ≤ aOf r h - 1 := by
+    linarith
   have hN : 0 ≤ 9 * ((r : ℝ) + 1) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 := by positivity
   refine ⟨?_, ?_, ?_, ?_⟩
   · unfold JF.TransportedAlt

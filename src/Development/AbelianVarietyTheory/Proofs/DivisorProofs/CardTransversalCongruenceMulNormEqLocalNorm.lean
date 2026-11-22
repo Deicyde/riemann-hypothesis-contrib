@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RelIndexBloc
 
 open NumberField MeasureTheory IsDedekindDomain UniqueFactorizationMonoid
 open scoped Classical Pointwise
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum Formalism.IndefR.Links
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
-open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum
 open GlobalTheory.SqTop (modT)
 open GlobalTheory.BottomIPData (sfB)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl Lat IsFockVec IsSphOff volQ)
@@ -23,21 +26,27 @@ open GlobalTheory.NormRatio
 
 namespace GlobalTheory.NormRatio
 
-theorem card_transversal_mul : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)), 𝔪 ≠ ⊥ → 𝔪 ⊔ D.host.conj • 𝔪 = ⊤ → ∀ (a a' : ℕ) (R : Finset (Formalism.MainNotions.StandardLatticesGL3.GA D a)),
-  (∀ r ∈ R, r ∈ intG D a) → (∀ k ∈ intG D a, ∃! r, r ∈ R ∧ CongOne D 𝔪 (r⁻¹ * k)) →
-    (R.card : ℝ) * ((Ideal.absNorm 𝔪 : ℝ) ^ (a * (a + a')))⁻¹ = locNorm D 𝔪 a a' := by
+theorem card_transversal_mul
+    : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)),
+      𝔪 ≠ ⊥ → 𝔪 ⊔ D.host.conj • 𝔪 = ⊤
+        → ∀ (a a' : ℕ) (R : Finset (Formalism.MainNotions.StandardLatticesGL3.GA D a)),
+          (∀ r ∈ R, r ∈ intG D a) → (∀ k ∈ intG D a, ∃! r, r ∈ R ∧ CongOne D 𝔪 (r⁻¹ * k))
+            → (R.card : ℝ) * ((Ideal.absNorm 𝔪 : ℝ) ^ (a * (a + a')))⁻¹ = locNorm D 𝔪 a a' := by
   intro D 𝔪 h𝔪 hcop a a' R hR hRu
   obtain ⟨ρ, hρ⟩ := GlobalTheory.T.exists_reduction_maxLevel_unitary_mod_ideal D 𝔪 h𝔪 a
 
-  have hker : ∀ k : ↥(intG D a), ρ k = 1 ↔ CongOne D 𝔪 (k : Formalism.MainNotions.StandardLatticesGL3.GA D a) := by
+  have hker
+      : ∀ k : ↥(intG D a),
+        ρ k = 1 ↔ CongOne D 𝔪 (k : Formalism.MainNotions.StandardLatticesGL3.GA D a) := by
     intro k
     constructor
     · intro h i j
-      have h1 := (hρ k i j (((1 : Matrix (Fin a) (Fin a) (𝓞 D.host.E)) i j))).1 (by
-        rw [h]
-        by_cases hij : i = j
-        · subst hij; simp
-        · simp [Matrix.one_apply_ne hij])
+      have h1 :=
+        (hρ k i j (((1 : Matrix (Fin a) (Fin a) (𝓞 D.host.E)) i j))).1 (by
+          rw [h]
+          by_cases hij : i = j
+          · subst hij; simp
+          · simp [Matrix.one_apply_ne hij])
       by_cases hij : i = j
       · subst hij; simpa [Matrix.sub_apply] using h1
       · simpa [Matrix.sub_apply, Matrix.one_apply_ne hij] using h1
@@ -56,10 +65,13 @@ theorem card_transversal_mul : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)), 𝔪
     intro g'
     choose g hg using fun i j => Ideal.Quotient.mk_surjective (I := 𝔪)
       (((g' : GL (Fin a) (𝓞 D.host.E ⧸ 𝔪)) : Matrix (Fin a) (Fin a) (𝓞 D.host.E ⧸ 𝔪)) i j)
-    have hgm : (Matrix.of g).map (Ideal.Quotient.mk 𝔪) =
-        ((g' : GL (Fin a) (𝓞 D.host.E ⧸ 𝔪)) : Matrix (Fin a) (Fin a) (𝓞 D.host.E ⧸ 𝔪)) := by
+    have hgm
+        : (Matrix.of g).map (Ideal.Quotient.mk 𝔪)
+          = ((g' : GL (Fin a) (𝓞 D.host.E ⧸ 𝔪)) : Matrix (Fin a) (Fin a) (𝓞 D.host.E ⧸ 𝔪)) := by
       ext i j; simp [hg]
-    obtain ⟨k, hk, hk'⟩ := GlobalTheory.T.exists_maxLevel_unitary_congr_mod_ideal D 𝔪 h𝔪 hcop a (Matrix.of g) (by rw [hgm]; exact Matrix.isUnits_det_units g')
+    obtain ⟨k, hk, hk'⟩ :=
+      GlobalTheory.T.exists_maxLevel_unitary_congr_mod_ideal D 𝔪 h𝔪 hcop a (Matrix.of g)
+        (by rw [hgm]; exact Matrix.isUnits_det_units g')
     simp only [Matrix.of_apply] at hk'
     refine ⟨⟨k, hk⟩, ?_⟩
     apply Units.ext
@@ -87,7 +99,8 @@ theorem card_transversal_mul : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)), 𝔪
       exact (inv_mul_eq_one.1 h1)
   have hcard : R.card = Nat.card (GL (Fin a) (𝓞 D.host.E ⧸ 𝔪)) := by
     rw [← Nat.card_eq_finsetCard, Nat.card_congr (Equiv.ofBijective f hf)]
-  rw [hcard, GlobalTheory.T.card_GL_ringOfIntegers_quotient_prod_factors _ 𝔪 h𝔪 a, GlobalTheory.StdLoc.absNorm_eq_prod h𝔪, ← Finset.prod_pow, ← Finset.prod_inv_distrib,
+  rw [hcard, GlobalTheory.T.card_GL_ringOfIntegers_quotient_prod_factors _ 𝔪 h𝔪 a,
+    GlobalTheory.StdLoc.absNorm_eq_prod h𝔪, ← Finset.prod_pow, ← Finset.prod_inv_distrib,
     ← Finset.prod_mul_distrib, locNorm]
   refine Finset.prod_congr rfl fun w hw => ?_
   have hq : (Ideal.absNorm w : ℝ) ≠ 0 := by
@@ -98,7 +111,8 @@ theorem card_transversal_mul : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)), 𝔪
   set c := (normalizedFactors 𝔪).count w
   have e : (q ^ c) ^ (a * (a + a')) = q ^ (c * a ^ 2) * q ^ (c * a * a') := by
     rw [← pow_mul, ← pow_add]; congr 1; ring
-  rw [e, mul_inv, ← mul_assoc, mul_comm (q ^ (c * a ^ 2)) _, mul_assoc, mul_assoc, mul_inv_cancel_left₀ (pow_ne_zero _ hq)]
+  rw [e, mul_inv, ← mul_assoc, mul_comm (q ^ (c * a ^ 2)) _, mul_assoc, mul_assoc,
+    mul_inv_cancel_left₀ (pow_ne_zero _ hq)]
   ring
 
 end GlobalTheory.NormRatio

@@ -22,8 +22,11 @@ def IsUniTri {R : Type} [CommRing R] (M : Matrix (Fin r) (Fin r) R) : Prop :=
 
 variable {r}
 
-theorem mul_diag_of_tri {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R} (hM : M.BlockTriangular id)
-    (hN : N.BlockTriangular id) (a : Fin r) : (M * N) a a = M a a * N a a := by
+theorem mul_diag_of_tri
+    {R : Type} [CommRing R]
+    {M N : Matrix (Fin r) (Fin r) R} (hM : M.BlockTriangular id) (hN : N.BlockTriangular id)
+    (a : Fin r)
+    : (M * N) a a = M a a * N a a := by
   rw [Matrix.mul_apply, Finset.sum_eq_single a]
   · intro j _ hj
     rcases lt_or_gt_of_ne hj with h | h
@@ -32,12 +35,14 @@ theorem mul_diag_of_tri {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R}
   · intro h
     exact absurd (Finset.mem_univ a) h
 
-theorem IsUniTri.mul {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R} (hM : IsUniTri r M)
-    (hN : IsUniTri r N) : IsUniTri r (M * N) :=
+theorem IsUniTri.mul
+    {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R} (hM : IsUniTri r M) (hN : IsUniTri r N)
+    : IsUniTri r (M * N) :=
   ⟨hM.1.mul hN.1, fun a => by rw [mul_diag_of_tri hM.1 hN.1, hM.2, hN.2, one_mul]⟩
 
-theorem IsUniTri.inv {R : Type} [CommRing R] {M : Matrix (Fin r) (Fin r) R} [Invertible M] (hM : IsUniTri r M) :
-    IsUniTri r M⁻¹ := by
+theorem IsUniTri.inv
+    {R : Type} [CommRing R] {M : Matrix (Fin r) (Fin r) R} [Invertible M] (hM : IsUniTri r M)
+    : IsUniTri r M⁻¹ := by
   have hi := Matrix.blockTriangular_inv_of_blockTriangular hM.1
   refine ⟨hi, fun a => ?_⟩
   have h := mul_diag_of_tri hM.1 hi a
@@ -47,23 +52,27 @@ theorem IsUniTri.inv {R : Type} [CommRing R] {M : Matrix (Fin r) (Fin r) R} [Inv
 variable (r)
 
 def Uup : Subgroup (GProd p r) where
-  carrier := {g | ∀ x, IsUniTri r ((g x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x)))}
+  carrier :=
+    {g | ∀ x, IsUniTri r ((g x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x)))}
   one_mem' := fun x => ⟨Matrix.blockTriangular_one, fun a => by simp⟩
   mul_mem' := by
     intro g h hg hh x
     simpa using (hg x).mul (hh x)
   inv_mem' := by
     intro g hg x
-    have e : (((g⁻¹ : GProd p r) x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x))) =
-        ((g x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x)))⁻¹ := by
+    have e
+        : (((g⁻¹ : GProd p r) x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x)))
+          = ((g x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x)))⁻¹ := by
       simp [Matrix.coe_units_inv]
     rw [e]
     exact (hg x).inv
 
 variable {p r}
 
-theorem mem_Uup {g : GProd p r} : g ∈ Uup p r ↔
-    ∀ x, IsUniTri r ((g x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x))) := Iff.rfl
+theorem mem_Uup {g : GProd p r}
+    : g ∈ Uup p r
+      ↔ ∀ x, IsUniTri r ((g x : GL (Fin r) (ZMod (p x))) : Matrix (Fin r) (Fin r) (ZMod (p x))) :=
+  Iff.rfl
 
 variable (r)
 
@@ -72,8 +81,11 @@ def supSum {R : Type} [CommRing R] (M : Matrix (Fin r) (Fin r) R) : R :=
 
 variable {r}
 
-theorem mul_sup {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R} (hM : IsUniTri r M) (hN : IsUniTri r N)
-    {a b : Fin r} (h : (b : ℕ) = a + 1) : (M * N) a b = M a b + N a b := by
+theorem mul_sup
+    {R : Type} [CommRing R]
+    {M N : Matrix (Fin r) (Fin r) R} (hM : IsUniTri r M) (hN : IsUniTri r N)
+    {a b : Fin r} (h : (b : ℕ) = a + 1)
+    : (M * N) a b = M a b + N a b := by
   have hab : a ≠ b := by
     intro e
     rw [e] at h
@@ -94,8 +106,9 @@ theorem mul_sup {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R} (hM : I
   · intro h
     exact absurd (Finset.mem_univ b) h
 
-theorem supSum_mul {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R} (hM : IsUniTri r M) (hN : IsUniTri r N) :
-    supSum r (M * N) = supSum r M + supSum r N := by
+theorem supSum_mul
+    {R : Type} [CommRing R] {M N : Matrix (Fin r) (Fin r) R} (hM : IsUniTri r M) (hN : IsUniTri r N)
+    : supSum r (M * N) = supSum r M + supSum r N := by
   simp only [supSum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   split_ifs with h
@@ -129,10 +142,12 @@ def psiStd {K : Type} [Field K] (θ : ∀ x, Multiplicative (ZMod (p x)) →* K�
     simpa using supSum_mul (u.2 x) (v.2 x)
 
 def IsStdGeneric {K : Type} [Field K] {S : Subgroup (GProd p r)} (ψ : S →* Kˣ) : Prop :=
-  ∃ θ : ∀ x, Multiplicative (ZMod (p x)) →* Kˣ, (2 ≤ r → ∀ x, θ x ≠ 1) ∧ ∀ u : S, ψ u = stdVal p r θ u
+  ∃ θ : ∀ x, Multiplicative (ZMod (p x)) →* Kˣ,
+    (2 ≤ r → ∀ x, θ x ≠ 1) ∧ ∀ u : S, ψ u = stdVal p r θ u
 
-theorem char_one_ne {K : Type} [Field K] {q : ℕ} [NeZero q] (θ : Multiplicative (ZMod q) →* Kˣ) (hθ : θ ≠ 1) :
-    θ (Multiplicative.ofAdd 1) ≠ 1 := by
+theorem char_one_ne
+    {K : Type} [Field K] {q : ℕ} [NeZero q] (θ : Multiplicative (ZMod q) →* Kˣ) (hθ : θ ≠ 1)
+    : θ (Multiplicative.ofAdd 1) ≠ 1 := by
   intro h
   apply hθ
   refine MonoidHom.ext fun x => ?_
@@ -191,12 +206,13 @@ theorem supSum_tv {R : Type} [CommRing R] (hr : 2 ≤ r) (c : R) : supSum r (tv 
     exact absurd (Finset.mem_univ _) h
 
 def tvAt [DecidableEq ι] (hr : 2 ≤ r) (x : ι) : GProd p r :=
-  Pi.mulSingle x (Matrix.SpecialLinearGroup.toGL
-    ⟨tv hr (1 : ZMod (p x)), Matrix.det_transvection_of_ne _ _ (by simp [Fin.ext_iff]) 1⟩)
+  Pi.mulSingle x
+    (Matrix.SpecialLinearGroup.toGL
+      ⟨tv hr (1 : ZMod (p x)), Matrix.det_transvection_of_ne _ _ (by simp [Fin.ext_iff]) 1⟩)
 
-theorem tvAt_apply [DecidableEq ι] (hr : 2 ≤ r) (x y : ι) :
-    ((tvAt (p := p) hr x y : GL (Fin r) (ZMod (p y))) : Matrix (Fin r) (Fin r) (ZMod (p y))) =
-      if y = x then tv hr 1 else 1 := by
+theorem tvAt_apply [DecidableEq ι] (hr : 2 ≤ r) (x y : ι)
+    : ((tvAt (p := p) hr x y : GL (Fin r) (ZMod (p y))) : Matrix (Fin r) (Fin r) (ZMod (p y)))
+      = if y = x then tv hr 1 else 1 := by
   unfold tvAt
   by_cases h : y = x
   · subst h
@@ -213,8 +229,11 @@ theorem tvAt_mem [DecidableEq ι] (hr : 2 ≤ r) (x : ι) : tvAt (p := p) hr x �
   · exact tv_uniTri hr 1
   · exact ⟨Matrix.blockTriangular_one, fun a => by simp⟩
 
-theorem stdVal_tvAt [DecidableEq ι] {K : Type} [Field K] (θ : ∀ x, Multiplicative (ZMod (p x)) →* Kˣ)
-    (hr : 2 ≤ r) (x : ι) : stdVal p r θ (tvAt hr x) = θ x (Multiplicative.ofAdd 1) := by
+theorem stdVal_tvAt
+    [DecidableEq ι]
+    {K : Type} [Field K]
+    (θ : ∀ x, Multiplicative (ZMod (p x)) →* Kˣ) (hr : 2 ≤ r) (x : ι)
+    : stdVal p r θ (tvAt hr x) = θ x (Multiplicative.ofAdd 1) := by
   simp only [stdVal]
   rw [Finset.prod_eq_single x]
   · rw [tvAt_apply, if_pos rfl, supSum_tv]
@@ -233,10 +252,15 @@ variable (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
 
 local notation3 "L⁺" => maximalRealSubfield L
 
-def TypeSpF (K : Type) [Field K] {W : Type} [AddCommGroup W] [Module K W] (ρ : Representation K (GQ L n) W)
-    (J : Subgroup (GAf L n)) (χ : J →* Kˣ) : Submodule K (GAf L n → W) where
-  carrier := {f | (∀ (γ : GQ L n) (g : GAf L n), f ((γ : GAf L n) * g) = ρ γ (f g)) ∧
-    ∀ (κ : J) (g : GAf L n), f (g * (κ : GAf L n)) = ((χ κ : Kˣ) : K) • f g}
+def TypeSpF
+    (K : Type) [Field K]
+    {W : Type} [AddCommGroup W] [Module K W]
+    (ρ : Representation K (GQ L n) W)
+    (J : Subgroup (GAf L n)) (χ : J →* Kˣ)
+    : Submodule K (GAf L n → W) where
+  carrier :=
+    {f | (∀ (γ : GQ L n) (g : GAf L n), f ((γ : GAf L n) * g) = ρ γ (f g)) ∧
+      ∀ (κ : J) (g : GAf L n), f (g * (κ : GAf L n)) = ((χ κ : Kˣ) : K) • f g}
   zero_mem' := ⟨fun γ g => by simp, fun κ g => by simp⟩
   add_mem' := by
     rintro f f' ⟨h1, h2⟩ ⟨h1', h2'⟩
@@ -247,8 +271,9 @@ def TypeSpF (K : Type) [Field K] {W : Type} [AddCommGroup W] [Module K W] (ρ : 
 
 variable {L n}
 
-def HypOutsideF {K : Type} [Field K] (J : Subgroup (GAf L n)) (χ : J →* Kˣ) (B : Set (HeightOneSpectrum (𝓞 L⁺))) :
-    Prop :=
+def HypOutsideF
+    {K : Type} [Field K] (J : Subgroup (GAf L n)) (χ : J →* Kˣ) (B : Set (HeightOneSpectrum (𝓞 L⁺)))
+    : Prop :=
   ∀ κ : GAf L n, TrivOutside (L := L) Bᶜ κ → (κ ∈ J ↔ κ ∈ Umax L n) ∧ ∀ h : κ ∈ J, χ ⟨κ, h⟩ = 1
 
 end Forms
@@ -261,15 +286,21 @@ variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
 local notation3 "L⁺" => maximalRealSubfield L
 
-def InParah (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ) (x : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) : Prop :=
-  (∀ a b, x a b ∈ v.adicCompletionIntegers L⁺) ∧ ∀ a b : Fin n, r ≤ (a : ℕ) → (b : ℕ) < r → Valued.v (x a b) < 1
+def InParah
+    (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ) (x : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺))
+    : Prop :=
+  (∀ a b, x a b ∈ v.adicCompletionIntegers L⁺)
+    ∧ ∀ a b : Fin n, r ≤ (a : ℕ) → (b : ℕ) < r → Valued.v (x a b) < 1
 
-def InLevG (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ) (x : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) : Prop :=
-  InParah v r x ∧ ∀ a b : Fin n, (a : ℕ) < r → (b : ℕ) < r →
-    (b < a → Valued.v (x a b) < 1) ∧ (a = b → Valued.v (x a b - 1) < 1)
+def InLevG (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ) (x : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺))
+    : Prop :=
+  InParah v r x
+    ∧ ∀ a b : Fin n,
+      (a : ℕ) < r → (b : ℕ) < r
+        → (b < a → Valued.v (x a b) < 1) ∧ (a = b → Valued.v (x a b - 1) < 1)
 
-theorem inParah_one (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ) :
-    InParah v r (1 : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) := by
+theorem inParah_one (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ)
+    : InParah v r (1 : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) := by
   refine ⟨fun a b => ?_, fun a b ha hb => ?_⟩
   · rw [Matrix.one_apply]
     split_ifs
@@ -278,8 +309,8 @@ theorem inParah_one (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ) :
   · rw [Matrix.one_apply_ne (by intro h; rw [h] at ha; omega), map_zero]
     exact zero_lt_one
 
-theorem inLevG_one (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ) :
-    InLevG v r (1 : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) := by
+theorem inLevG_one (v : HeightOneSpectrum (𝓞 L⁺)) (r : ℕ)
+    : InLevG v r (1 : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) := by
   refine ⟨inParah_one v r, fun a b _ _ => ⟨fun hba => ?_, fun hab => ?_⟩⟩
   · rw [Matrix.one_apply_ne (ne_of_gt hba), map_zero]
     exact zero_lt_one
@@ -292,39 +323,46 @@ def detT (r : ℕ) {R : Type} [CommRing R] (x : Matrix (Fin n) (Fin n) R) : R :=
 def topR {r : ℕ} (h : r ≤ n) {R : Type} (x : Matrix (Fin n) (Fin n) R) : Matrix (Fin r) (Fin r) R :=
   x.submatrix (Fin.castLE h) (Fin.castLE h)
 
-
 open scoped Classical in
 open Classical in
-def intLift (v : HeightOneSpectrum (𝓞 L⁺)) (y : v.adicCompletion L⁺) : v.adicCompletionIntegers L⁺ :=
+def intLift (v : HeightOneSpectrum (𝓞 L⁺)) (y : v.adicCompletion L⁺)
+    : v.adicCompletionIntegers L⁺ :=
   if h : y ∈ v.adicCompletionIntegers L⁺ then ⟨y, h⟩ else 0
 
-def redMat (v : HeightOneSpectrum (𝓞 L⁺)) {ι R : Type} [CommRing R] (red : v.adicCompletionIntegers L⁺ →+* R)
-    (x : Matrix ι ι (v.adicCompletion L⁺)) : Matrix ι ι R :=
-  fun a b => red (intLift v (x a b))
-
+def redMat
+    (v : HeightOneSpectrum (𝓞 L⁺))
+    {ι R : Type} [CommRing R]
+    (red : v.adicCompletionIntegers L⁺ →+* R) (x : Matrix ι ι (v.adicCompletion L⁺))
+    : Matrix ι ι R := fun a b =>
+  red (intLift v (x a b))
 
 open scoped Classical in
 open Classical in
 def glOf {ι R : Type} [Fintype ι] [DecidableEq ι] [CommRing R] (M : Matrix ι ι R) : GL ι R :=
   if h : IsUnit M.det then M.nonsingInvUnit h else 1
 
-theorem glOf_val {ι R : Type} [Fintype ι] [DecidableEq ι] [CommRing R] (M : Matrix ι ι R) (h : IsUnit M.det) :
-    ((glOf M : GL ι R) : Matrix ι ι R) = M := by
+theorem glOf_val
+    {ι R : Type} [Fintype ι] [DecidableEq ι] [CommRing R] (M : Matrix ι ι R) (h : IsUnit M.det)
+    : ((glOf M : GL ι R) : Matrix ι ι R) = M := by
   unfold glOf
   rw [dite_eq_left h]
   rfl
 
-
 variable (L n) in
-def IsAlgWeightF (K : Type) [Field K] {W : Type} [AddCommGroup W] [Module K W] (ρ : Representation K (GQ L n) W) : Prop :=
-  FiniteDimensional K W ∧
-  ∃ (ι : Type) (_ : Fintype ι) (_ : DecidableEq ι) (b : Module.Basis ι K W) (κ : Type) (_ : Fintype κ)
-    (e : Module.Basis κ ℚ L) (P : ι → ι → MvPolynomial (κ × Fin n × Fin n) K),
-    ∀ (γ : GQ L n) (γ₀ : GL (Fin n) L),
-      (((γ : GAf L n) : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) =
-        (γ₀ : Matrix (Fin n) (Fin n) L).map (Algebra.TensorProduct.includeLeftRingHom) →
-      LinearMap.toMatrix b b (ρ γ) = fun i j =>
-        MvPolynomial.eval (fun p => ((e.repr ((γ₀ : Matrix (Fin n) (Fin n) L) p.2.1 p.2.2) p.1 : ℚ) : K)) (P i j)
+def IsAlgWeightF
+    (K : Type) [Field K] {W : Type} [AddCommGroup W] [Module K W] (ρ : Representation K (GQ L n) W)
+    : Prop :=
+  FiniteDimensional K W
+    ∧ ∃ (ι : Type) (_ : Fintype ι) (_ : DecidableEq ι) (b : Module.Basis ι K W) (κ : Type)
+        (_ : Fintype κ) (e : Module.Basis κ ℚ L) (P : ι → ι → MvPolynomial (κ × Fin n × Fin n) K),
+      ∀ (γ : GQ L n) (γ₀ : GL (Fin n) L),
+        (((γ : GAf L n) : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L))
+            = (γ₀ : Matrix (Fin n) (Fin n) L).map (Algebra.TensorProduct.includeLeftRingHom)
+          → LinearMap.toMatrix b b (ρ γ)
+            = fun i j =>
+              MvPolynomial.eval
+                (fun p => ((e.repr ((γ₀ : Matrix (Fin n) (Fin n) L) p.2.1 p.2.2) p.1 : ℚ) : K))
+                (P i j)
 
 end Local
 

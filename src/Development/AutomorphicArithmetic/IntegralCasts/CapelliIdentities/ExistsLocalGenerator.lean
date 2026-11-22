@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.ExistsLocalGenerator.exists_local_generator :
-    ∀ {B : Type} [inst : CommRing B] [IsDedekindDomain B] (I p : Ideal B) [hp : p.IsPrime],
-      ∃ π ∈ I, ∃ s ∉ p, ∀ x ∈ I, s * x ∈ Ideal.span {π} := by
+theorem UpperTheory.Reformulated.B.ExistsLocalGenerator.exists_local_generator
+    : ∀ {B : Type} [inst : CommRing B] [IsDedekindDomain B] (I p : Ideal B) [hp : p.IsPrime],
+      ∃ π ∈ I, ∃ s ∉ p, ∀ x ∈ I,
+        s * x ∈ Ideal.span {π} := by
   intro B _ _ I p hp
   by_cases hI : I = ⊥
   · refine ⟨0, I.zero_mem, 1, (Ideal.ne_top_iff_one p).mp hp.ne_top, fun x hx => ?_⟩

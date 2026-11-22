@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocCl
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -19,8 +22,9 @@ variable {Ef : Type} [Field Ef] [NumberField Ef] [StarRing Ef] {H : HSpace Ef} {
 theorem Xa_le_X (F : FlagG H r T) (a : ℕ) : F.Xa a ≤ F.X :=
   Submodule.span_mono (Set.image_subset_range _ _)
 
-theorem orth_of_mem_X (F : FlagG H r T) {w : H.V} (hw : ∀ a, H.hT (F.e a) w = 0)
-    {u : H.V} (hu : u ∈ F.X) : H.hT u w = 0 := by
+theorem orth_of_mem_X
+    (F : FlagG H r T) {w : H.V} (hw : ∀ a, H.hT (F.e a) w = 0) {u : H.V} (hu : u ∈ F.X)
+    : H.hT u w = 0 := by
   unfold FlagG.X at hu
   induction hu using Submodule.span_induction with
   | mem v hv => obtain ⟨a, rfl⟩ := hv; exact hw a
@@ -36,8 +40,8 @@ theorem iso_X (F : FlagG H r T) {x y : H.V} (hx : x ∈ F.X) (hy : y ∈ F.X) : 
     exact F.e_iso a b
   exact hle hy
 
-theorem span_eq (F : FlagG H r T) (e' : Fin r → H.V) (h : ∀ a, e' a - F.e a ∈ F.Xa a.val) :
-    Submodule.span Ef (Set.range e') = F.X := by
+theorem span_eq (F : FlagG H r T) (e' : Fin r → H.V) (h : ∀ a, e' a - F.e a ∈ F.Xa a.val)
+    : Submodule.span Ef (Set.range e') = F.X := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨a, rfl⟩
@@ -62,8 +66,8 @@ theorem span_eq (F : FlagG H r T) (e' : Fin r → H.V) (h : ∀ a, e' a - F.e a 
     rintro _ ⟨a, rfl⟩
     exact key (a.val + 1) a (Nat.lt_succ_self _)
 
-theorem indep (F : FlagG H r T) (e' : Fin r → H.V) (h : ∀ a, e' a - F.e a ∈ F.Xa a.val) :
-    LinearIndependent Ef e' := by
+theorem indep (F : FlagG H r T) (e' : Fin r → H.V) (h : ∀ a, e' a - F.e a ∈ F.Xa a.val)
+    : LinearIndependent Ef e' := by
   rw [linearIndependent_iff_card_eq_finrank_span, Set.finrank, span_eq F e' h, FlagG.X,
     finrank_span_eq_card F.e_indep]
 
@@ -71,8 +75,10 @@ theorem herm_zero {u v : H.V} (h : H.hT u v = 0) : H.hT v u = 0 := by
   have h2 := H.herm.eq u v
   rw [← h2, h, map_zero]
 
-def change (F : FlagG H r T) (e' : Fin r → H.V) (x : H.V) (h : ∀ a, e' a - F.e a ∈ F.Xa a.val)
-    (hx : x ∈ F.X) : FlagG H r T where
+def change
+    (F : FlagG H r T) (e' : Fin r → H.V) (x : H.V)
+    (h : ∀ a, e' a - F.e a ∈ F.Xa a.val) (hx : x ∈ F.X)
+    : FlagG H r T where
   e := e'
   z := F.z + x
   e_indep := indep F e' h
@@ -89,11 +95,17 @@ def change (F : FlagG H r T) (e' : Fin r → H.V) (x : H.V) (h : ∀ a, e' a - F
     simp only [map_add (f := _), LinearMap.add_apply, h1, h2, iso_X F hx hx, F.z_norm]
     ring
 
-theorem change_X (F : FlagG H r T) (e' : Fin r → H.V) (x : H.V) (h : ∀ a, e' a - F.e a ∈ F.Xa a.val)
-    (hx : x ∈ F.X) : (change F e' x h hx).X = F.X :=
+theorem change_X
+    (F : FlagG H r T) (e' : Fin r → H.V) (x : H.V)
+    (h : ∀ a, e' a - F.e a ∈ F.Xa a.val) (hx : x ∈ F.X)
+    : (change F e' x h hx).X = F.X :=
   span_eq F e' h
 
-theorem mkflag : ∀ (D : D7) (T : D.host.E) (G : FlagG (VS D) D.R.rS T) (e' : Fin D.R.rS → (VS D).V) (x : (VS D).V), (∀ a, e' a - G.e a ∈ G.Xa a.val) → x ∈ G.X → ∃ G' : FlagG (VS D) D.R.rS T, G'.e = e' ∧ G'.z = G.z + x ∧ G'.X = G.X := by
+theorem mkflag
+    : ∀ (D : D7) (T : D.host.E) (G : FlagG (VS D) D.R.rS T) (e' : Fin D.R.rS → (VS D).V)
+        (x : (VS D).V),
+      (∀ a, e' a - G.e a ∈ G.Xa a.val) → x ∈ G.X
+        → ∃ G' : FlagG (VS D) D.R.rS T, G'.e = e' ∧ G'.z = G.z + x ∧ G'.X = G.X := by
   intro D T G e' x h hx
   exact ⟨change G e' x h hx, rfl, rfl, change_X G e' x h hx⟩
 

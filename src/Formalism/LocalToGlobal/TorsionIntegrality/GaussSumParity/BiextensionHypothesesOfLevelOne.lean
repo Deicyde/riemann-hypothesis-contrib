@@ -29,15 +29,20 @@ theorem pairRules : PairRules := PairRules_of expSpec ipLemma
 theorem torusTil : TorusTil := torus_tilde
 theorem mean_second_biextension_condition : MeanTorusInvariant := second_mean_condition
 theorem mean_third_biextension_condition : MeanNoLowBidegreeTerms := third_mean_condition
-theorem torus_sum_coboundary_condition : TorusSumCoboundaryCondition := fourth_condition_of_pairing_rules pairRules substTil shiftIP letterShift
-theorem biextension_hypotheses_of_level_one : MeanBiextensionHypothesesOfCocycle := biextension_hypotheses_of_conditions torus_sum_coboundary_condition torusTil teichSigma mean_second_biextension_condition mean_third_biextension_condition
+theorem torus_sum_coboundary_condition : TorusSumCoboundaryCondition :=
+  fourth_condition_of_pairing_rules pairRules substTil shiftIP letterShift
+theorem biextension_hypotheses_of_level_one : MeanBiextensionHypothesesOfCocycle :=
+  biextension_hypotheses_of_conditions torus_sum_coboundary_condition torusTil teichSigma
+    mean_second_biextension_condition mean_third_biextension_condition
 theorem dualExpand : DualExpand := dual_expansion
-theorem tilInvariantL : TilInvariantL := TilInvariantL_of pairRules substTil torusTil teichSigma shiftIP ipClosure dualExpand frobSq
+theorem tilInvariantL : TilInvariantL :=
+  TilInvariantL_of pairRules substTil torusTil teichSigma shiftIP ipClosure dualExpand frobSq
 theorem meanSimeqL : MeanSimeqL := MeanSimeqL_of tilInvariantL
 theorem beTilXY : BeTilXY := BeTilXY_of expSpec
 theorem bMinus1 : BMinus1 := BMinus1_of' expSpec
 theorem meanSimeq : MeanSimeq := MeanSimeq_of' meanSimeqL beTilXY letterShift
-theorem biextension_points_integral : BiextensionPointsIntegral := biextension_points_of_exp_spec expSpec meanSimeqL
+theorem biextension_points_integral : BiextensionPointsIntegral :=
+  biextension_points_of_exp_spec expSpec meanSimeqL
 theorem b0 : B0 := biextension_of_exp_spec expSpec biextension_points_integral
 theorem oneLetterHalf : OneLetterHalf := OneLetterHalf_of meanSimeqL
 

@@ -16,40 +16,43 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem ex_mul_eq {y : Mat n} (hy : IsUnit y) (X : Mat n) (t : ℝ) :
-    ex X t * y = y * ex (y⁻¹ * X * y) t := by
+theorem ex_mul_eq {y : Mat n} (hy : IsUnit y) (X : Mat n) (t : ℝ)
+    : ex X t * y = y * ex (y⁻¹ * X * y) t := by
   have hd : IsUnit y.det := (Matrix.isUnit_iff_isUnit_det y).1 hy
   have h1 : (t : ℂ) • (y⁻¹ * X * y) = y⁻¹ * ((t : ℂ) • X) * y := by
     simp [Matrix.mul_smul, Matrix.smul_mul]
   unfold ex
-  rw [h1, Matrix.exp_conj' _ _ hy, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hd,
-    Matrix.one_mul]
+  rw [h1, Matrix.exp_conj' _ _ hy, ← Matrix.mul_assoc, ← Matrix.mul_assoc,
+    Matrix.mul_nonsing_inv _ hd, Matrix.one_mul]
 
-theorem lie_conj {Hm y X : Mat n} (hy : IsUnit y) (hyH : yᴴ * Hm * y = Hm) (hX : Lie Hm X) :
-    Lie Hm (y⁻¹ * X * y) := by
+theorem lie_conj {Hm y X : Mat n} (hy : IsUnit y) (hyH : yᴴ * Hm * y = Hm) (hX : Lie Hm X)
+    : Lie Hm (y⁻¹ * X * y) := by
   have hd : IsUnit y.det := (Matrix.isUnit_iff_isUnit_det y).1 hy
   have h1 : y * y⁻¹ = 1 := Matrix.mul_nonsing_inv _ hd
   have h2 : Hm * y⁻¹ = yᴴ * Hm := by
-    calc Hm * y⁻¹ = yᴴ * Hm * y * y⁻¹ := by rw [hyH]
+    calc
+      Hm * y⁻¹
+        = yᴴ * Hm * y * y⁻¹ := by rw [hyH]
       _ = yᴴ * Hm := by rw [Matrix.mul_assoc, h1, Matrix.mul_one]
   have h3 : y⁻¹ᴴ * Hm = Hm * y := by
-    calc y⁻¹ᴴ * Hm = y⁻¹ᴴ * (yᴴ * Hm * y) := by rw [hyH]
+    calc
+      y⁻¹ᴴ * Hm
+        = y⁻¹ᴴ * (yᴴ * Hm * y) := by rw [hyH]
       _ = (y * y⁻¹)ᴴ * (Hm * y) := by rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
       _ = Hm * y := by rw [h1]; simp
   unfold Lie at hX ⊢
-  calc (y⁻¹ * X * y)ᴴ * Hm + Hm * (y⁻¹ * X * y)
-      = yᴴ * Xᴴ * (y⁻¹ᴴ * Hm) + (Hm * y⁻¹) * X * y := by
-        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+  calc
+    (y⁻¹ * X * y)ᴴ * Hm + Hm * (y⁻¹ * X * y) = yᴴ * Xᴴ * (y⁻¹ᴴ * Hm) + (Hm * y⁻¹) * X * y := by
+      simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
     _ = yᴴ * (Xᴴ * Hm + Hm * X) * y := by
-        rw [h2, h3]; simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
+      rw [h2, h3]; simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
     _ = 0 := by rw [hX]; simp
 
 theorem dsAd : DsAd := by
   intro n Hm H _ _ _ σ hσ y hy W hW
   have hyu : IsUnit y := by
     have hyH : yᴴ * Hm * y = Hm := hy
-    have h1 : (Hm * yᴴ * Hm) * y = 1 := by
-      rw [Matrix.mul_assoc Hm, Matrix.mul_assoc Hm, hyH, hσ.sq]
+    have h1 : (Hm * yᴴ * Hm) * y = 1 := by rw [Matrix.mul_assoc Hm, Matrix.mul_assoc Hm, hyH, hσ.sq]
     exact (Matrix.isUnit_iff_isUnit_det y).2 (Matrix.isUnit_det_of_left_inverse h1)
   have hyH : yᴴ * Hm * y = Hm := hy
   have hL : ∀ W, LieWd Hm W → LieWd Hm (W.map fun X => y⁻¹ * X * y) := by

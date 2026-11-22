@@ -115,25 +115,29 @@ section Struct
 
 variable {K : Type} [Field K] {ν r0 r1 : ℕ} [NeZero ν]
 
-theorem struct (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ)
-    (hts : ∀ s, Fin (colN s) → ℕ) (hp : ∀ s c, hts s c ≤ r0) (I : ∀ s c, Fin (hts s c) → Fin r1)
-    (Y : ZMod (2 * ν) × Fin r0 × Fin r0 → K) :
-    ∃ (C : ℕ) (ξ : ZMod (2 * ν) → Fin r0 → K) (e : TpV ν r1 → ℕ) (l : Fin C → ℕ)
-      (sf : Fin C → ZMod (2 * ν)) (T : ∀ c, Fin (l c) → Fin r0 → K)
-      (I' : ∀ c, Fin (l c) → Fin r1),
+theorem struct
+    (TT : Finset (ZMod (2 * ν)))
+    (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
+    (hp : ∀ s c, hts s c ≤ r0) (I : ∀ s c, Fin (hts s c) → Fin r1)
+    (Y : ZMod (2 * ν) × Fin r0 × Fin r0 → K)
+    : ∃ (C : ℕ) (ξ : ZMod (2 * ν) → Fin r0 → K) (e : TpV ν r1 → ℕ) (l : Fin C → ℕ)
+        (sf : Fin C → ZMod (2 * ν)) (T : ∀ c, Fin (l c) → Fin r0 → K)
+        (I' : ∀ c, Fin (l c) → Fin r1),
       (∏ s : ZMod (2 * ν), minorProd
         (fun (i : Fin r0) (b : Fin r1) =>
           (∑ a : Fin r0, MvPolynomial.C (Y (s, i, a)) * MvPolynomial.X (s, a, b) :
-            MvPolynomial (ZV ν r0 r1) K)) (hts s) (hp s) (I s)) = entryOp ξ e l sf T I' ∧
-      (∀ s a, ∃ y, ξ s a = Y y) ∧ (∀ c i a, ∃ y, T c i a = Y y) ∧
-      alN e = alG TT colN hts ∧ capN sf = capG TT colN hts ∧ lsN l sf = lsG TT colN hts ∧
-      ∀ (J : Finset (Fin r1)) (i : ℕ), 1 ≤ i →
-        (∑ x : TpV ν r1, (if (x.1.val % 2 = 0 ∧ x.2 ∉ J) ∨ (x.1.val % 2 = 1 ∧ x.2 ∈ J)
-            then e x else 0) +
-          ∑ c, (if (sf c).val % 2 = 1 then ((univ.image (I' c)) ∩ J).card else 0)) ≤
-        ∑ s : ZMod (2 * ν), ∑ c : Fin (colN s),
-          (if s.val % 2 = 0 then min (hts s c) i - ((univ.image (I s c)) ∩ J).card
-          else ((univ.image (I s c)) ∩ J).card) := by
+            MvPolynomial (ZV ν r0 r1) K)) (hts s) (hp s) (I s))
+          = entryOp ξ e l sf T I'
+        ∧ (∀ s a, ∃ y, ξ s a = Y y) ∧ (∀ c i a, ∃ y, T c i a = Y y) ∧ alN e = alG TT colN hts
+        ∧ capN sf = capG TT colN hts ∧ lsN l sf = lsG TT colN hts
+        ∧ ∀ (J : Finset (Fin r1)) (i : ℕ),
+          1 ≤ i
+            → (∑ x : TpV ν r1, (if (x.1.val % 2 = 0 ∧ x.2 ∉ J) ∨ (x.1.val % 2 = 1 ∧ x.2 ∈ J)
+                  then e x else 0)
+                + ∑ c, (if (sf c).val % 2 = 1 then ((univ.image (I' c)) ∩ J).card else 0))
+              ≤ ∑ s : ZMod (2 * ν), ∑ c : Fin (colN s),
+                  (if s.val % 2 = 0 then min (hts s c) i - ((univ.image (I s c)) ∩ J).card
+                  else ((univ.image (I s c)) ∩ J).card) := by
   classical
   let A := Σ s, Fin (colN s)
   let top : A → Prop := fun x => x.1 ∈ TT ∧ hts x.1 x.2 = 1
@@ -142,10 +146,12 @@ theorem struct (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ)
     minorAt x.1 (fun i a => Y (x.1, ⟨i.val, lt_of_lt_of_le i.isLt (hp x.1 x.2)⟩, a)) (I x.1 x.2)
   let g : {x : A // top x} → TpV ν r1 := fun x =>
     (x.1.1, I x.1.1 x.1.2 ⟨0, by rw [x.2.2]; exact one_pos⟩)
-  obtain ⟨C, e, l, sf, T, I', hop, he, hl, hT⟩ := entry_exists ξ g
-    (fun x : {x : A // ¬ top x} => x.1.1) (fun x => hts x.1.1 x.1.2)
-    (fun x i a => Y (x.1.1, ⟨i.val, lt_of_lt_of_le i.isLt (hp x.1.1 x.1.2)⟩, a))
-    (fun x => I x.1.1 x.1.2)
+  obtain ⟨C, e, l, sf, T, I', hop, he, hl, hT⟩ :=
+    entry_exists ξ g
+      (fun x : {x : A // ¬ top x} => x.1.1)
+      (fun x => hts x.1.1 x.1.2)
+      (fun x i a => Y (x.1.1, ⟨i.val, lt_of_lt_of_le i.isLt (hp x.1.1 x.1.2)⟩, a))
+      (fun x => I x.1.1 x.1.2)
   have hal : ∀ s, alN e s = ∑ c : Fin (colN s), if top ⟨s, c⟩ then 1 else 0 := by
     intro s
     rw [← sum_sub_sigma colN top (fun _ => 1) s]
@@ -188,8 +194,10 @@ theorem struct (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ)
   · funext s
     rw [hal, halG]
   · funext s
-    have h : (∑ c : Fin (colN s), if top ⟨s, c⟩ then 1 else 0) +
-        (∑ c : Fin (colN s), if ¬ top ⟨s, c⟩ then 1 else 0) = colN s := by
+    have h
+        : (∑ c : Fin (colN s), if top ⟨s, c⟩ then 1 else 0)
+            + (∑ c : Fin (colN s), if ¬ top ⟨s, c⟩ then 1 else 0)
+          = colN s := by
       rw [← Finset.sum_add_distrib]
       trans ∑ _c : Fin (colN s), 1
       · refine Finset.sum_congr rfl fun c _ => ?_
@@ -200,8 +208,10 @@ theorem struct (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ)
     unfold capG
     omega
   · funext s
-    have h : (∑ c : Fin (colN s), if top ⟨s, c⟩ then 1 else 0) +
-        (∑ c : Fin (colN s), if ¬ top ⟨s, c⟩ then hts s c else 0) = ∑ c, hts s c := by
+    have h
+        : (∑ c : Fin (colN s), if top ⟨s, c⟩ then 1 else 0)
+            + (∑ c : Fin (colN s), if ¬ top ⟨s, c⟩ then hts s c else 0)
+          = ∑ c, hts s c := by
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun c _ => ?_
       by_cases hc : top ⟨s, c⟩
@@ -212,18 +222,25 @@ theorem struct (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ)
     unfold lsG
     omega
   · intro J i hi
-    have e1 : ∑ x : TpV ν r1, (if (x.1.val % 2 = 0 ∧ x.2 ∉ J) ∨ (x.1.val % 2 = 1 ∧ x.2 ∈ J)
-        then e x else 0) = ∑ x : {x : A // top x},
-          if ((g x).1.val % 2 = 0 ∧ (g x).2 ∉ J) ∨ ((g x).1.val % 2 = 1 ∧ (g x).2 ∈ J)
-            then 1 else 0 := by
-      rw [← he (fun y => if (y.1.val % 2 = 0 ∧ y.2 ∉ J) ∨ (y.1.val % 2 = 1 ∧ y.2 ∈ J)
-        then 1 else 0)]
+    have e1
+        : ∑ x : TpV ν r1, (if (x.1.val % 2 = 0 ∧ x.2 ∉ J) ∨ (x.1.val % 2 = 1 ∧ x.2 ∈ J)
+            then e x else 0)
+          = ∑ x : {x : A // top x},
+            if ((g x).1.val % 2 = 0 ∧ (g x).2 ∉ J) ∨ ((g x).1.val % 2 = 1 ∧ (g x).2 ∈ J)
+              then 1 else 0 := by
+      rw [← he (fun y =>
+        if (y.1.val % 2 = 0 ∧ y.2 ∉ J) ∨ (y.1.val % 2 = 1 ∧ y.2 ∈ J) then
+          1
+        else
+          0)]
       refine Finset.sum_congr rfl fun y _ => ?_
       split_ifs <;> simp
     rw [e1, hl (fun s _ Ih => if s.val % 2 = 1 then ((univ.image Ih) ∩ J).card else 0)]
     let W : A → ℕ := fun x =>
-      if x.1.val % 2 = 0 then min (hts x.1 x.2) i - ((univ.image (I x.1 x.2)) ∩ J).card
-      else ((univ.image (I x.1 x.2)) ∩ J).card
+      if x.1.val % 2 = 0 then
+        min (hts x.1 x.2) i - ((univ.image (I x.1 x.2)) ∩ J).card
+      else
+        ((univ.image (I x.1 x.2)) ∩ J).card
     have e2 := Fintype.sum_subtype_add_sum_subtype top W
     rw [Fintype.sum_sigma] at e2
     refine le_trans ?_ (le_of_eq e2)

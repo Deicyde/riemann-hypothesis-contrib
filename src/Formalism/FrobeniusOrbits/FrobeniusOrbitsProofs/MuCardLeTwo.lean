@@ -20,9 +20,11 @@ namespace Mu
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem mu_le_ram (p : ℕ) [hp : Fact p.Prime] (Q : Ideal (𝓞 L)) [Q.IsPrime]
-    [Q.LiesOver (span {(p : ℤ)})] (k : ℕ) (hk : ((p : ℤ) : 𝓞 L) ∈ Q ^ k) :
-    k ≤ Q.ramificationIdx ℤ := by
+theorem mu_le_ram
+    (p : ℕ) [hp : Fact p.Prime]
+    (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})]
+    (k : ℕ) (hk : ((p : ℤ) : 𝓞 L) ∈ Q ^ k)
+    : k ≤ Q.ramificationIdx ℤ := by
   have hmap : Ideal.map (algebraMap ℤ (𝓞 L)) (span {(p : ℤ)}) = span {((p : ℤ) : 𝓞 L)} := by
     rw [Ideal.map_span, Set.image_singleton, algebraMap_int_eq, eq_intCast]
   have hne0 : ((p : ℤ) : 𝓞 L) ≠ 0 := by
@@ -41,21 +43,23 @@ theorem mu_le_ram (p : ℕ) [hp : Fact p.Prime] (Q : Ideal (𝓞 L)) [Q.IsPrime]
     rw [Ideal.isUnit_iff]
     exact Ideal.IsPrime.ne_top ‹_›
   first
-    | exact (FiniteMultiplicity.of_not_isUnit hQ hne).le_multiplicity_of_pow_dvd hdvd
-    | exact (multiplicity_finite_of_not_isUnit hQ hne).le_multiplicity_of_pow_dvd hdvd
-    | exact ((pow_dvd_iff_le_multiplicity (FiniteMultiplicity.of_not_isUnit hQ hne)).mp hdvd)
+  | exact (FiniteMultiplicity.of_not_isUnit hQ hne).le_multiplicity_of_pow_dvd hdvd
+  | exact (multiplicity_finite_of_not_isUnit hQ hne).le_multiplicity_of_pow_dvd hdvd
+  | exact ((pow_dvd_iff_le_multiplicity (FiniteMultiplicity.of_not_isUnit hQ hne)).mp hdvd)
 
-theorem mu_mem_pow (p : ℕ) [hp : Fact p.Prime] (Q : Ideal (𝓞 L)) [Q.IsPrime]
-    [Q.LiesOver (span {(p : ℤ)})] (η : L) (hη : IsPrimitiveRoot η p) :
-    ((p : ℤ) : 𝓞 L) ∈ Q ^ (p - 1) := by
+theorem mu_mem_pow
+    (p : ℕ) [hp : Fact p.Prime]
+    (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})]
+    (η : L) (hη : IsPrimitiveRoot η p)
+    : ((p : ℤ) : 𝓞 L) ∈ Q ^ (p - 1) := by
   have hp0 : 0 < p := hp.out.pos
   have hint : IsIntegral ℤ η := hη.isIntegral hp0
   let η' : 𝓞 L := ⟨η, hint⟩
   have hmapη : algebraMap (𝓞 L) L η' = η := rfl
   have hinj : Function.Injective (algebraMap (𝓞 L) L) := by
     first
-      | exact FaithfulSMul.algebraMap_injective (𝓞 L) L
-      | exact NumberField.RingOfIntegers.coe_injective
+    | exact FaithfulSMul.algebraMap_injective (𝓞 L) L
+    | exact NumberField.RingOfIntegers.coe_injective
   have hη' : IsPrimitiveRoot η' p := by
     refine ⟨hinj ?_, fun l hl => hη.dvd_of_pow_eq_one l ?_⟩
     · rw [map_pow, hmapη, map_one]
@@ -76,9 +80,9 @@ theorem mu_mem_pow (p : ℕ) [hp : Fact p.Prime] (Q : Ideal (𝓞 L)) [Q.IsPrime
   rw [hprod] at hmemQ
   obtain ⟨μ0, hμ0mem, hμ0Q⟩ : ∃ μ ∈ primitiveRoots p (𝓞 L), 1 - μ ∈ Q := by
     first
-      | exact Ideal.IsPrime.prod_mem_iff.mp hmemQ
-      | exact (Ideal.IsPrime.prod_mem_iff_exists_mem ‹Q.IsPrime›).mp hmemQ
-      | exact (Ideal.IsPrime.prod_mem_iff ‹Q.IsPrime›).1 hmemQ
+    | exact Ideal.IsPrime.prod_mem_iff.mp hmemQ
+    | exact (Ideal.IsPrime.prod_mem_iff_exists_mem ‹Q.IsPrime›).mp hmemQ
+    | exact (Ideal.IsPrime.prod_mem_iff ‹Q.IsPrime›).1 hmemQ
   have hall : ∀ μ ∈ primitiveRoots p (𝓞 L), 1 - μ ∈ Q := by
     intro μ hμ
     have hμ0p : IsPrimitiveRoot μ0 p := (mem_primitiveRoots hp0).mp hμ0mem
@@ -95,20 +99,29 @@ theorem mu_mem_pow (p : ℕ) [hp : Fact p.Prime] (Q : Ideal (𝓞 L)) [Q.IsPrime
   rw [Finset.prod_const, IsPrimitiveRoot.card_primitiveRoots hη', Nat.totient_prime hp.out] at h2
   exact h2
 
-theorem mu_card_le_two {G : Type*} [One G] (f : Gal(L/ℚ) → G) (hinj : Function.Injective f)
-    (t : G) (H : Subgroup Gal(L/ℚ)) (hH : ∀ ρ ∈ H, f ρ = 1 ∨ f ρ = t) : Nat.card H ≤ 2 := by
+theorem mu_card_le_two
+    {G : Type*} [One G]
+    (f : Gal(L/ℚ) → G) (hinj : Function.Injective f)
+    (t : G) (H : Subgroup Gal(L/ℚ)) (hH : ∀ ρ ∈ H, f ρ = 1 ∨ f ρ = t)
+    : Nat.card H ≤ 2 := by
   classical
   let g : H → ({1, t} : Set G) := fun ρ => ⟨f ρ, by rcases hH ρ ρ.2 with h | h <;> simp [h]⟩
   have hg : Function.Injective g := fun x y hxy => Subtype.ext (hinj (congrArg Subtype.val hxy))
-  calc Nat.card H ≤ Nat.card ({1, t} : Set G) := Nat.card_le_card_of_injective g hg
-    _ = ({1, t} : Set G).ncard := by first | exact Nat.card_coe_set_eq _ | exact Set.Nat.card_coe_set_eq _
+  calc
+    Nat.card H
+      ≤ Nat.card ({1, t} : Set G) := Nat.card_le_card_of_injective g hg
+    _ = ({1, t} : Set G).ncard := by
+      first | exact Nat.card_coe_set_eq _ | exact Set.Nat.card_coe_set_eq _
     _ ≤ 2 := (Set.ncard_insert_le 1 {t}).trans (by simp)
 
 variable {e q d : ℕ} {ζ a b : L}
 
-theorem mu_ram_bound (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : ℕ)
-    [Fact p.Prime] (hp2 : p ≠ 2) (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})] :
-    Q.ramificationIdx ℤ ≤ 2 ∧ (p ≠ q → p ≠ d → Q.ramificationIdx ℤ ≤ 1) := by
+theorem mu_ram_bound
+    (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b)
+    (p : ℕ) [Fact p.Prime]
+    (hp2 : p ≠ 2)
+    (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})]
+    : Q.ramificationIdx ℤ ≤ 2 ∧ (p ≠ q → p ≠ d → Q.ramificationIdx ℤ ≤ 1) := by
   obtain ⟨hGal, -, -, hbij⟩ := Formalism.FrobeniusOrbits.Galois.layer_galois hqd h
   haveI := hGal
   rw [← Formalism.TwoAdicCyclotomicDecomposition.odd_card L p Q]
@@ -116,7 +129,8 @@ theorem mu_ram_bound (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : �
   have key : p ≠ q → p ≠ d → Nat.card (Q.inertia Gal(L/ℚ)) ≤ 1 := by
     intro hpq hpd
     obtain ⟨⟨σ, hσ⟩, hiff⟩ :=
-      Formalism.TwoAdicCyclotomicDecomposition.layerFrob (e + 2) q d (by omega) hqd L ζ a b h p hp2 hpq hpd Q
+      Formalism.TwoAdicCyclotomicDecomposition.layerFrob (e + 2) q d (by omega) hqd L ζ a b h p hp2
+        hpq hpd Q
     have hρ1 : ∀ ρ ∈ Q.inertia Gal(L/ℚ), ρ = 1 := by
       intro ρ hρ
       have hf := Formalism.FrobeniusOrbits.Frob.frob_mul_inertia Q ρ σ hρ hσ
@@ -126,9 +140,7 @@ theorem mu_ram_bound (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : �
         Prod.ext (Units.ext (A.1.trans B.1.symm))
           (Prod.ext (Units.ext (A.2.1.trans B.2.1.symm)) (Units.ext (A.2.2.trans B.2.2.symm)))
       have h3 := hinjF heq
-      first
-        | exact mul_eq_right.mp h3
-        | exact mul_left_eq_self.mp h3
+      first | exact mul_eq_right.mp h3 | exact mul_left_eq_self.mp h3
     have hsub : Subsingleton (Q.inertia Gal(L/ℚ)) := by
       constructor
       rintro ⟨ρ, hρ⟩ ⟨ρ', hρ'⟩
@@ -138,12 +150,14 @@ theorem mu_ram_bound (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : �
       subst e2
       rfl
     first
-      | exact Nat.card_le_one_iff_subsingleton.mpr hsub
-      | exact Finite.card_le_one_iff_subsingleton.mpr hsub
-  have tame := Formalism.TwoAdicCyclotomicDecomposition.layerInertiaTame (e + 2) q d (by omega) hqd L ζ a b h
-  have two_of : ∀ t : GalL (e + 2), t ^ 2 = 1 →
-      (∀ ρ ∈ Q.inertia Gal(L/ℚ), galMap h.1 a b ρ ∈ Subgroup.zpowers t) →
-      Nat.card (Q.inertia Gal(L/ℚ)) ≤ 2 := by
+    | exact Nat.card_le_one_iff_subsingleton.mpr hsub
+    | exact Finite.card_le_one_iff_subsingleton.mpr hsub
+  have tame :=
+    Formalism.TwoAdicCyclotomicDecomposition.layerInertiaTame (e + 2) q d (by omega) hqd L ζ a b h
+  have two_of
+      : ∀ t : GalL (e + 2),
+        t ^ 2 = 1 → (∀ ρ ∈ Q.inertia Gal(L/ℚ), galMap h.1 a b ρ ∈ Subgroup.zpowers t)
+          → Nat.card (Q.inertia Gal(L/ℚ)) ≤ 2 := by
     intro t ht hmem
     refine mu_card_le_two (galMap h.1 a b) hinjF t _ ?_
     intro ρ hρ
@@ -156,16 +170,17 @@ theorem mu_ram_bound (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : �
   refine ⟨?_, fun hpq hpd => key hpq hpd⟩
   by_cases hpq : p = q
   · subst hpq
-    exact two_of ((1, -1, 1) : GalL (e + 2)) (by simp [sq])
-      (fun ρ hρ => (tame.1 Q ρ).1 hρ)
+    exact two_of ((1, -1, 1) : GalL (e + 2)) (by simp [sq]) (fun ρ hρ => (tame.1 Q ρ).1 hρ)
   · by_cases hpd : p = d
     · subst hpd
-      exact two_of ((1, 1, -1) : GalL (e + 2)) (by simp [sq])
-        (fun ρ hρ => (tame.2 Q ρ).1 hρ)
+      exact two_of ((1, 1, -1) : GalL (e + 2)) (by simp [sq]) (fun ρ hρ => (tame.2 Q ρ).1 hρ)
     · exact (key hpq hpd).trans (by norm_num)
 
-theorem mu_no_odd (hq : HostHyp q d) (hq3 : q ≠ 3) (h : IsLayer (e + 2) q d ζ a b) (p : ℕ)
-    (hp : p.Prime) (hp2 : p ≠ 2) (η : L) (hη : IsPrimitiveRoot η p) : False := by
+theorem mu_no_odd
+    (hq : HostHyp q d) (hq3 : q ≠ 3) (h : IsLayer (e + 2) q d ζ a b)
+    (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2)
+    (η : L) (hη : IsPrimitiveRoot η p)
+    : False := by
   haveI : Fact p.Prime := ⟨hp⟩
   haveI : (span {(p : ℤ)} : Ideal ℤ).IsMaximal := Int.ideal_span_isMaximal_of_prime p
   obtain ⟨Q, hQmax, hQover⟩ :=
@@ -186,17 +201,22 @@ theorem mu_no_odd (hq : HostHyp q d) (hq3 : q ≠ 3) (h : IsLayer (e + 2) q d ζ
   have := h3.2 hpq hpd
   omega
 
-theorem mu_no_four (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (y : L)
-    (hyE : y ∈ hostE ζ a b) (hy : IsPrimitiveRoot y 4) : False := by
-  have hfix : Galois.tau0 hqd h y = y := (Formalism.FrobeniusOrbits.Galois.mem_hostE_iff hqd h y).mp hyE
+theorem mu_no_four
+    (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b)
+    (y : L) (hyE : y ∈ hostE ζ a b) (hy : IsPrimitiveRoot y 4)
+    : False := by
+  have hfix : Galois.tau0 hqd h y = y :=
+    (Formalism.FrobeniusOrbits.Galois.mem_hostE_iff hqd h y).mp hyE
   have hζ := h.1
   have hτζ : Galois.tau0 hqd h ζ = ζ⁻¹ := by
     have hg := Formalism.FrobeniusOrbits.Galois.galMap_zeta_inversion hqd h
     have hau : hζ.autToPow ℚ (Galois.tau0 hqd h) = -1 := congrArg Prod.fst hg
-    have hspec : ζ ^ ((hζ.autToPow ℚ (Galois.tau0 hqd h) : ZMod (2 ^ (e + 2))).val) = Galois.tau0 hqd h ζ := by
+    have hspec
+        : ζ ^ ((hζ.autToPow ℚ (Galois.tau0 hqd h) : ZMod (2 ^ (e + 2))).val)
+          = Galois.tau0 hqd h ζ := by
       first
-        | exact hζ.autToPow_spec ℚ (Galois.tau0 hqd h)
-        | exact hζ.autToPow_spec (Galois.tau0 hqd h)
+      | exact hζ.autToPow_spec ℚ (Galois.tau0 hqd h)
+      | exact hζ.autToPow_spec (Galois.tau0 hqd h)
     rw [← hspec, hau]
     set v := (((-1 : (ZMod (2 ^ (e + 2)))ˣ) : ZMod (2 ^ (e + 2)))).val with hvdef
     have hz : ((v + 1 : ℕ) : ZMod (2 ^ (e + 2))) = 0 := by
@@ -204,9 +224,9 @@ theorem mu_no_four (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (y : L)
       simp
     have hv : 2 ^ (e + 2) ∣ v + 1 := by
       first
-        | exact (ZMod.natCast_zmod_eq_zero_iff_dvd _ _).mp hz
-        | exact (ZMod.natCast_eq_zero_iff _ _).mp hz
-        | exact (ZMod.natCast_self_eq_zero_iff _ _).mp hz
+      | exact (ZMod.natCast_zmod_eq_zero_iff_dvd _ _).mp hz
+      | exact (ZMod.natCast_eq_zero_iff _ _).mp hz
+      | exact (ZMod.natCast_self_eq_zero_iff _ _).mp hz
     have h1 := (hζ.pow_eq_one_iff_dvd _).mpr hv
     rw [pow_succ] at h1
     exact eq_inv_of_mul_eq_one_left h1
@@ -214,8 +234,7 @@ theorem mu_no_four (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (y : L)
     rw [show 2 ^ (e + 2) = 4 * 2 ^ e by ring, pow_mul, hy.pow_eq_one, one_pow]
   haveI : NeZero (2 ^ (e + 2)) := ⟨by positivity⟩
   obtain ⟨j, -, hj⟩ := hζ.eq_pow_of_pow_eq_one hyN
-  have hτy : Galois.tau0 hqd h y = y⁻¹ := by
-    rw [← hj, map_pow, hτζ, inv_pow]
+  have hτy : Galois.tau0 hqd h y = y⁻¹ := by rw [← hj, map_pow, hτζ, inv_pow]
   rw [hτy] at hfix
   have hy0 : y ≠ 0 := hy.ne_zero (by norm_num)
   have hy2 : y ^ 2 = 1 := by
@@ -246,8 +265,8 @@ theorem hostMu : HostMu := by
           congr 1
           omega
         have hy := IsPrimitiveRoot.pow hn0 hxo hsplit
-        exact mu_no_four hq.toHypOdd h ((x ^ (2 ^ (k - 2)) : hostE ζ a b) : L)
-          (x ^ (2 ^ (k - 2))).2 (hcoe _ _ hy)
+        exact mu_no_four hq.toHypOdd h ((x ^ (2 ^ (k - 2)) : hostE ζ a b) : L) (x ^ (2 ^ (k - 2))).2
+          (hcoe _ _ hy)
       · have hd : orderOf x ∣ 2 := by
           rw [hk]
           exact (pow_dvd_pow 2 (by omega : k ≤ 1)).trans (by norm_num)

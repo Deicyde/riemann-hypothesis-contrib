@@ -11,7 +11,8 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.ExistsRootOfK
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField UpperTheory.Et.Sel LateralTheory.E.E4
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField
+  UpperTheory.Et.Sel LateralTheory.E.E4
 open scoped TensorProduct
 
 namespace UpperTheory.PicRigid
@@ -108,6 +109,24 @@ private lemma main (hA : LateralTheory.KummerTheory.AlgExt) : Hyps → ∀ (q : 
 
 end UpperTheory.PicRigid
 
-theorem UpperTheory.baseChange_curve_functionField_comp_of_normal :
-    Hyps → ∀ (q : ℕ) [NeZero q] (k L : Type) [Field k] [IsAlgClosed k] [Field L] [IsAlgClosed L] [Algebra k L], IsUnit (q : k) → ∀ {C : Scheme.{0}} [IsIntegral C] (c : C ⟶ Sp k), IsCurve c → ∀ {X : Scheme.{0}} [IsIntegral X] (u : X ⟶ C) (x : X ⟶ Sp L), IsPullback u x c (Spec.map (CommRingCat.ofHom (algebraMap k L))) → (∀ y : X, IsIntegrallyClosed (X.presheaf.stalk y)) → ∀ φ : C.functionField →+* X.functionField, Spec.map (CommRingCat.ofHom φ) ≫ (C.fromSpecStalk (genericPoint C)) = (X.fromSpecStalk (genericPoint X)) ≫ u → ∀ F : (X.functionField)ˣ, (∀ y : X, ∃ (u : (X.presheaf.stalk y)ˣ) (h : (X.functionField)ˣ), (F : X.functionField) = algebraMap (X.presheaf.stalk y) X.functionField u * (h : X.functionField) ^ q) → ∃ (f : (C.functionField)ˣ) (h : (X.functionField)ˣ), (F : X.functionField) = φ f * (h : X.functionField) ^ q :=
+theorem UpperTheory.baseChange_curve_functionField_comp_of_normal
+    : Hyps
+      → ∀ (q : ℕ) [NeZero q] (k L : Type) [Field k] [IsAlgClosed k] [Field L] [IsAlgClosed L]
+          [Algebra k L],
+        IsUnit (q : k)
+          → ∀ {C : Scheme.{0}} [IsIntegral C] (c : C ⟶ Sp k),
+            IsCurve c
+              → ∀ {X : Scheme.{0}} [IsIntegral X] (u : X ⟶ C) (x : X ⟶ Sp L),
+                IsPullback u x c (Spec.map (CommRingCat.ofHom (algebraMap k L)))
+                  → (∀ y : X, IsIntegrallyClosed (X.presheaf.stalk y))
+                  → ∀ φ : C.functionField →+* X.functionField,
+                    Spec.map (CommRingCat.ofHom φ) ≫ (C.fromSpecStalk (genericPoint C))
+                        = (X.fromSpecStalk (genericPoint X)) ≫ u
+                      → ∀ F : (X.functionField)ˣ,
+                        (∀ y : X, ∃ (u : (X.presheaf.stalk y)ˣ) (h : (X.functionField)ˣ),
+                            (F : X.functionField)
+                              = algebraMap (X.presheaf.stalk y) X.functionField u
+                                * (h : X.functionField) ^ q)
+                          → ∃ (f : (C.functionField)ˣ) (h : (X.functionField)ˣ),
+                            (F : X.functionField) = φ f * (h : X.functionField) ^ q :=
   UpperTheory.PicRigid.main LateralTheory.Fin.AlgExt.intersectionNumber_baseChange

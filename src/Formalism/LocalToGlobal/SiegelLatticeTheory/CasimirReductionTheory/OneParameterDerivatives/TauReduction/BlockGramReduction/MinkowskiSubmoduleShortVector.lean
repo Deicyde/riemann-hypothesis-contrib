@@ -16,35 +16,37 @@ namespace Formalism.L2.SG.Pf.Tau
 
 open Size Formalism.MainNotions.S
 
-def t8C (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E) :
-    Matrix (Fin I.n) (Fin j) ℂ :=
+def t8C (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E)
+    : Matrix (Fin I.n) (Fin j) ℂ :=
   (uMat (x.1 v)⁻¹ * (I.P v)⁻¹) * (Matrix.of fun i k => b k i).map (I.φ v)
 
-theorem coord_linear_comb (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : ℕ}
-    (b : Fin j → Fin I.n → I.E) (a : Fin j → I.E) :
-    coordV I x v (∑ k, a k • b k) = t8C I x v b *ᵥ fun k => I.φ v (a k) := by
+theorem coord_linear_comb
+    (I : AutInst) (x : I.GA) (v : InfinitePlace I.F)
+    {j : ℕ} (b : Fin j → Fin I.n → I.E) (a : Fin j → I.E)
+    : coordV I x v (∑ k, a k • b k) = t8C I x v b *ᵥ fun k => I.φ v (a k) := by
   unfold coordV t8C
-  have hw : (fun i => I.φ v ((∑ k, a k • b k) i)) =
-      (Matrix.of fun i k => b k i).map (I.φ v) *ᵥ fun k => I.φ v (a k) := by
+  have hw
+      : (fun i => I.φ v ((∑ k, a k • b k) i))
+        = (Matrix.of fun i k => b k i).map (I.φ v) *ᵥ fun k => I.φ v (a k) := by
     funext i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mulVec, dotProduct, Finset.sum_apply, map_sum, mul_comm]
+    simp [Matrix.mulVec, dotProduct, Finset.sum_apply, map_sum, mul_comm]
   rw [hw, Matrix.mulVec_mulVec]
 
-theorem gramV_eq_conjTranspose_t8C_mul_t8C (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E) :
-    gramV I x v b = (t8C I x v b)ᴴ * t8C I x v b := by
+theorem gramV_eq_conjTranspose_t8C_mul_t8C
+    (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E)
+    : gramV I x v b = (t8C I x v b)ᴴ * t8C I x v b := by
   have hc : ∀ a i, coordV I x v (b a) i = t8C I x v b i a := by
     intro a i
-    first
-      | rfl
-      | (unfold coordV t8C; simp [Matrix.mulVec, dotProduct, Matrix.mul_apply])
+    first | rfl | (unfold coordV t8C; simp [Matrix.mulVec, dotProduct, Matrix.mul_apply])
   unfold gramV
   ext a c
   simp only [hc, Matrix.mul_apply, Matrix.conjTranspose_apply]
 
-theorem coord_matrix_mulVec_injective (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : ℕ}
-    (b : Fin j → Fin I.n → I.E) (hb : LinearIndependent I.E b) :
-    Function.Injective (t8C I x v b).mulVec := by
+theorem coord_matrix_mulVec_injective
+    (I : AutInst) (x : I.GA) (v : InfinitePlace I.F)
+    {j : ℕ} (b : Fin j → Fin I.n → I.E) (hb : LinearIndependent I.E b)
+    : Function.Injective (t8C I x v b).mulVec := by
   set A : Matrix (Fin I.n) (Fin I.n) ℂ := uMat (x.1 v)⁻¹ * (I.P v)⁻¹ with hA
   set Bm : Matrix (Fin I.n) (Fin j) I.E := Matrix.of fun i a => b a i with hBm
   have hB : Function.Injective Bm.mulVec := by
@@ -65,33 +67,44 @@ theorem coord_matrix_mulVec_injective (I : AutInst) (x : I.GA) (v : InfinitePlac
   apply Matrix.mulVec_injective_iff_isUnit.2 hAu
   simpa only [t8C, Matrix.mulVec_mulVec] using h
 
-def linearCombinationOfRows {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E) : (Fin j → E) →+ (Fin n → E) where
+def linearCombinationOfRows {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E)
+    : (Fin j → E) →+ (Fin n → E) where
   toFun a := ∑ k, a k • b k
   map_zero' := by simp
   map_add' a a' := by simp [add_smul, Finset.sum_add_distrib]
 
-theorem linearComb_apply {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E) (a : Fin j → E) :
-    linearCombinationOfRows b a = ∑ k, a k • b k := rfl
+theorem linearComb_apply {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E) (a : Fin j → E)
+    : linearCombinationOfRows b a = ∑ k, a k • b k :=
+  rfl
 
-theorem linear_comb_injective {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E) (hb : LinearIndependent E b) :
-    Function.Injective (linearCombinationOfRows b) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem linear_comb_injective
+    {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E) (hb : LinearIndependent E b)
+    : Function.Injective (linearCombinationOfRows b) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   rw [linearComb_apply] at ha
   funext k
   exact Fintype.linearIndependent_iff.mp hb a ha k
 
-theorem linearComb_single {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E) (k : Fin j) (c : E) :
-    linearCombinationOfRows b (Pi.single k c) = c • b k := by
+theorem linearComb_single {n j : ℕ} {E : Type} [Field E] (b : Fin j → Fin n → E) (k : Fin j) (c : E)
+    : linearCombinationOfRows b (Pi.single k c) = c • b k := by
   rw [linearComb_apply]
   simp [Pi.single_apply, ite_smul]
 
-theorem short_vector_sublattice (I : AutInst) (h1 : LatticeFinitelyGenerated) (h2 : ExistsBoundedBasis) (x : I.GA) (s : Sub I x) (C : ℝ)
-    (hC : ∀ (L : Submodule ℤ (EuclideanSpace ℝ (Fin (2 * I.f * s.j)))) [DiscreteTopology L] [IsZLattice ℝ L],
-      ∃ u ∈ L, u ≠ 0 ∧ ‖u‖ ^ 2 ≤ C * ZLattice.covolume L ^ ((2 : ℝ) / ((2 * I.f * s.j : ℕ) : ℝ))) :
-    ∃ u ∈ s.B, u ≠ 0 ∧ ∑ v, ∑ i, ‖coordV I x v u i‖ ^ 2 ≤
-      C * t8K I s.j ^ ((2 : ℝ) / ((2 * I.f * s.j : ℕ) : ℝ)) * size I s ^ 2 := by
-
+theorem short_vector_sublattice
+    (I : AutInst)
+    (h1 : LatticeFinitelyGenerated) (h2 : ExistsBoundedBasis)
+    (x : I.GA) (s : Sub I x)
+    (C : ℝ)
+    (hC : ∀ (L : Submodule ℤ (EuclideanSpace ℝ (Fin (2 * I.f * s.j)))) [DiscreteTopology L]
+        [IsZLattice ℝ L],
+      ∃ u ∈ L,
+        u ≠ 0 ∧ ‖u‖ ^ 2 ≤ C * ZLattice.covolume L ^ ((2 : ℝ) / ((2 * I.f * s.j : ℕ) : ℝ)))
+    : ∃ u ∈ s.B,
+      u ≠ 0
+        ∧ ∑ v, ∑ i, ‖coordV I x v u i‖ ^ 2
+          ≤ C * t8K I s.j ^ ((2 : ℝ) / ((2 * I.f * s.j : ℕ) : ℝ)) * size I s ^ 2 := by
   choose R hR hRdet using fun v => gram_factor_invertible (t8C I x v s.b) (coord_matrix_mulVec_injective I x v s.b s.b_ind)
   have hgram : ∀ v, (gramV I x v s.b).det.re = Complex.normSq (R v).det := by
     intro v
@@ -113,8 +126,9 @@ theorem short_vector_sublattice (I : AutInst) (h1 : LatticeFinitelyGenerated) (h
   have hlinj : Function.Injective lin := linear_comb_injective s.b s.b_ind
   set Bp : AddSubgroup (Fin s.j → I.E) := s.B.toAddSubgroup.comap lin with hBp
   set Op : AddSubgroup (Fin s.j → I.E) := (t8O I s.j).toAddSubgroup with hOp
-  have hgen : ∀ p : Σ _ : Fin s.j, Free.ChooseBasisIndex ℤ (𝓞 I.E),
-      lin (Pi.single p.1 (integralBasis I.E p.2)) = (RingOfIntegers.basis I.E p.2) • s.b p.1 := by
+  have hgen
+      : ∀ p : Σ _ : Fin s.j, Free.ChooseBasisIndex ℤ (𝓞 I.E),
+        lin (Pi.single p.1 (integralBasis I.E p.2)) = (RingOfIntegers.basis I.E p.2) • s.b p.1 := by
     intro p
     rw [hlin, linearComb_single, integralBasis_apply, algebraMap_smul]
   have hOB : Op ≤ Bp := by
@@ -180,7 +194,8 @@ theorem short_vector_sublattice (I : AutInst) (h1 : LatticeFinitelyGenerated) (h
   have hNR : ((N : ℝ))⁻¹ ≠ 0 := inv_ne_zero (Nat.cast_ne_zero.2 hN0.ne')
   set β' := (blockBasis R hRdet').isUnitSMul (w := fun _ => ((N : ℝ))⁻¹) (fun _ => isUnit_iff_ne_zero.2 hNR)
     with hβ'
-  have hsub : (L₂ : Set (EuclideanSpace ℝ (Fin (2 * I.f * s.j)))) ⊆ Submodule.span ℤ (Set.range β') := by
+  have hsub
+      : (L₂ : Set (EuclideanSpace ℝ (Fin (2 * I.f * s.j)))) ⊆ Submodule.span ℤ (Set.range β') := by
     intro w hw
     have hw' : w ∈ L₂.toAddSubgroup := hw
     rw [hL₂'] at hw'
@@ -196,17 +211,21 @@ theorem short_vector_sublattice (I : AutInst) (h1 : LatticeFinitelyGenerated) (h
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 hNw
     refine (Submodule.mem_span_range_iff_exists_fun ℤ).2 ⟨c, ?_⟩
     simp only [hβ', Basis.isUnitSMul_apply]
-    have e : ∀ p, c p • ((N : ℝ)⁻¹ • blockBasis R hRdet' p) = (N : ℝ)⁻¹ • (c p • blockBasis R hRdet' p) :=
+    have e
+        : ∀ p,
+          c p • ((N : ℝ)⁻¹ • blockBasis R hRdet' p) = (N : ℝ)⁻¹ • (c p • blockBasis R hRdet' p) :=
       fun p => smul_comm _ _ _
     simp only [e, ← Finset.smul_sum, hc]
     rw [← Nat.cast_smul_eq_nsmul ℝ, inv_smul_smul₀ (Nat.cast_ne_zero.2 hN0.ne')]
   have : DiscreteTopology L₂ :=
-    DiscreteTopology.of_subset (inferInstance : DiscreteTopology (Submodule.span ℤ (Set.range β'))) hsub
-  have : IsZLattice ℝ L₂ := ⟨by
-    rw [eq_top_iff, ← (blockBasis R hRdet').span_eq]
-    refine Submodule.span_mono ?_
-    rintro _ ⟨p, rfl⟩
-    exact h12 (Submodule.subset_span ⟨p, rfl⟩)⟩
+    DiscreteTopology.of_subset (inferInstance : DiscreteTopology (Submodule.span ℤ (Set.range β')))
+      hsub
+  have : IsZLattice ℝ L₂ :=
+    ⟨by
+      rw [eq_top_iff, ← (blockBasis R hRdet').span_eq]
+      refine Submodule.span_mono ?_
+      rintro _ ⟨p, rfl⟩
+      exact h12 (Submodule.subset_span ⟨p, rfl⟩)⟩
 
   have hcov := ZLattice.covolume_div_covolume_eq_relIndex' L₁ L₂ h12
   rw [hrel2, covolume_blockBasis] at hcov
@@ -241,31 +260,44 @@ theorem short_vector_sublattice (I : AutInst) (h1 : LatticeFinitelyGenerated) (h
       exact (norm_sq_eq_of_gram_eq _ _ (hR v) _).symm
     rw [← hnorm]
     refine hwb.trans (le_of_eq ?_)
-    rw [hcov2, Real.mul_rpow (integral_covolume_pos I s.j).le hht0, size, ← Real.rpow_mul_natCast hht0]
+    rw [hcov2, Real.mul_rpow (integral_covolume_pos I s.j).le hht0, size,
+      ← Real.rpow_mul_natCast hht0]
     have hf : (0 : ℝ) < I.f := by
       have : 0 < Fintype.card (InfinitePlace I.F) := Fintype.card_pos
       rw [card_infinite_places] at this
       exact_mod_cast this
     have hj : (0 : ℝ) < s.j := by exact_mod_cast s.j_pos
-    have e : (1 : ℝ) / (2 * (I.f : ℝ) * (s.j : ℝ)) * ((2 : ℕ) : ℝ) = (2 : ℝ) / ((2 * I.f * s.j : ℕ) : ℝ) := by
+    have e
+        : (1 : ℝ) / (2 * (I.f : ℝ) * (s.j : ℝ)) * ((2 : ℕ) : ℝ)
+          = (2 : ℝ) / ((2 * I.f * s.j : ℕ) : ℝ) := by
       push_cast
       field_simp
     rw [e]
     ring
 
-theorem minkowski_submodule_short_vector (h1 : LatticeFinitelyGenerated) (h2 : ExistsBoundedBasis) (h8m : MinkowskiFirstTheorem) : MinkowskiSubmodule := by
+theorem minkowski_submodule_short_vector
+    (h1 : LatticeFinitelyGenerated) (h2 : ExistsBoundedBasis) (h8m : MinkowskiFirstTheorem)
+    : MinkowskiSubmodule := by
   intro I
   let cj : ℕ → ℝ := fun j =>
-    if h : 1 ≤ 2 * I.f * j then (h8m _ h).choose * t8K I j ^ ((2 : ℝ) / ((2 * I.f * j : ℕ) : ℝ)) else 0
+    if h : 1 ≤ 2 * I.f * j then
+      (h8m _ h).choose * t8K I j ^ ((2 : ℝ) / ((2 * I.f * j : ℕ) : ℝ))
+    else
+      0
   have hcj : ∀ j, 0 ≤ cj j := by
     intro j
     simp only [cj]
     split_ifs with h
-    · exact mul_nonneg (h8m _ h).choose_spec.1.le (Real.rpow_nonneg (integral_covolume_pos I j).le _)
+    · exact mul_nonneg (h8m _ h).choose_spec.1.le
+        (Real.rpow_nonneg (integral_covolume_pos I j).le _)
     · exact le_rfl
-  refine ⟨1 + ∑ j ∈ Finset.range (I.n + 1), cj j, by
-    have := Finset.sum_nonneg fun j (_ : j ∈ Finset.range (I.n + 1)) => hcj j
-    linarith, ?_⟩
+  refine ⟨
+    1 + ∑ j ∈ Finset.range (I.n + 1), cj j,
+    by
+      have := Finset.sum_nonneg fun j (_ : j ∈ Finset.range (I.n + 1)) => hcj j
+      linarith,
+    ?_
+  ⟩
   intro x s
   have hd : 1 ≤ 2 * I.f * s.j := by
     have : 0 < Fintype.card (InfinitePlace I.F) := Fintype.card_pos
@@ -274,13 +306,15 @@ theorem minkowski_submodule_short_vector (h1 : LatticeFinitelyGenerated) (h2 : E
     have : 1 ≤ I.f * s.j := Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (by omega) (by omega))
     rw [Nat.mul_assoc]
     omega
-  obtain ⟨u, hu, hu0, hub⟩ := short_vector_sublattice I h1 h2 x s (h8m _ hd).choose (fun L _ _ => (h8m _ hd).choose_spec.2 L)
+  obtain ⟨u, hu, hu0, hub⟩ :=
+    short_vector_sublattice I h1 h2 x s (h8m _ hd).choose (fun L _ _ => (h8m _ hd).choose_spec.2 L)
   refine ⟨u, hu, hu0, hub.trans ?_⟩
   have hjn : s.j ≤ I.n := by
     have := s.b_ind.fintype_card_le_finrank
     simpa using this
   have hle : cj s.j ≤ 1 + ∑ j ∈ Finset.range (I.n + 1), cj j := by
-    have := Finset.single_le_sum (f := cj) (fun j _ => hcj j) (Finset.mem_range.2 (Nat.lt_succ_of_le hjn))
+    have :=
+      Finset.single_le_sum (f := cj) (fun j _ => hcj j) (Finset.mem_range.2 (Nat.lt_succ_of_le hjn))
     linarith
   have hcs : cj s.j = (h8m _ hd).choose * t8K I s.j ^ ((2 : ℝ) / ((2 * I.f * s.j : ℕ) : ℝ)) := by
     simp only [cj, dif_pos hd]

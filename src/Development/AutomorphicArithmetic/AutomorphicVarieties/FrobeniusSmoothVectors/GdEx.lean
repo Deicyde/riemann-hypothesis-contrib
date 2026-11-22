@@ -7,10 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV
+  UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
 
-theorem UpperTheory.V.Fr.gd_ex :
-    GC.Hypotheses₂ → GdFrameEx := by
+theorem UpperTheory.V.Fr.gd_ex : GC.Hypotheses₂ → GdFrameEx := by
   intro hP Ω _ _ _ K _ _ _ _ l _ c _ N _ e ψ D B hB
   have hG := gen_gd Ω K l c N e ψ D B hB
   obtain ⟨Q, hQ, hS⟩ := seed_cl Ω l c _ _ _ B _ _ hG

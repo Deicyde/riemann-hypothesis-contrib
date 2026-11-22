@@ -6,14 +6,19 @@ public import Mathlib
 
 namespace GlobalTheory.SpanOrbitTop
 
-theorem span_orbit_eq_top {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ G V) (hπ : Representation.IsIrreducible π) {v : V} (hv : v ≠ 0) :
-    Submodule.span ℂ (Set.range fun g : G ↦ π g v) = ⊤ := by
-  have hinv : ∀ (h : G) ⦃x : V⦄, x ∈ Submodule.span ℂ (Set.range fun g : G ↦ π g v) →
-      π h x ∈ Submodule.span ℂ (Set.range fun g : G ↦ π g v) := by
+theorem span_orbit_eq_top
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ G V) (hπ : Representation.IsIrreducible π)
+    {v : V} (hv : v ≠ 0)
+    : Submodule.span ℂ (Set.range fun g : G ↦ π g v) = ⊤ := by
+  have hinv
+      : ∀ (h : G) ⦃x : V⦄,
+        x ∈ Submodule.span ℂ (Set.range fun g : G ↦ π g v)
+          → π h x ∈ Submodule.span ℂ (Set.range fun g : G ↦ π g v) := by
     intro h x hx
-    have hle : (Submodule.span ℂ (Set.range fun g : G ↦ π g v)).map (π h) ≤
-        Submodule.span ℂ (Set.range fun g : G ↦ π g v) := by
+    have hle
+        : (Submodule.span ℂ (Set.range fun g : G ↦ π g v)).map (π h)
+          ≤ Submodule.span ℂ (Set.range fun g : G ↦ π g v) := by
       rw [Submodule.map_span_le]
       rintro _ ⟨g, rfl⟩
       exact Submodule.subset_span ⟨h * g, by simp [map_mul]⟩

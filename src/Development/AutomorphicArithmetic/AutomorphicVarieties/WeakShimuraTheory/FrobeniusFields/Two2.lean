@@ -6,18 +6,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.two2 :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ (X : Set2 D) (T : Tower D), X.On T → ∀ k₀ : IntermediateField ℚ Ω, Module.finrank ℚ k₀ = 2 → IsTotallyReal k₀ → k₀.fixingSubgroup = X.φ.ker → T.Two := by
+theorem UpperTheory.V.Ws.two2
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ (X : Set2 D) (T : Tower D),
+          X.On T
+            → ∀ k₀ : IntermediateField ℚ Ω,
+              Module.finrank ℚ k₀ = 2 → IsTotallyReal k₀ → k₀.fixingSubgroup = X.φ.ker → T.Two := by
   intro Ω _ _ _ l hl c D hD X T hOn k₀ hk hr hfix
   obtain ⟨hne, -, -, -, -, -, hrb, -, -⟩ := barFacts D hD
   obtain ⟨-, -, -, -, haw⟩ := away D hD
-  have hH : ∀ g : G T.F Ω, Raw.bar D.Psi (resQ T.F g) = ((X.φ (resQ T.F g) : ℤ) : ResidueField c.O) := fun g =>
-    (X.mem_H.1 (hOn.1 ▸ resQ_mem T.F g)).1
+  have hH
+      : ∀ g : G T.F Ω, Raw.bar D.Psi (resQ T.F g) = ((X.φ (resQ T.F g) : ℤ) : ResidueField c.O) :=
+    fun g => (X.mem_H.1 (hOn.1 ▸ resQ_mem T.F g)).1
   have hps : ∀ g : G T.F Ω, T.rb wPs g = ((X.φ (resQ T.F g) : ℤ) : ResidueField c.O) := fun g => by
     rw [hrb, hH]
-    rcases Int.units_eq_one_or (X.φ (resQ T.F g)) with h | h <;> rw [h] <;> cases T.pr <;> simp [wPs]
+    rcases Int.units_eq_one_or (X.φ (resQ T.F g)) with h | h <;> rw [h] <;> cases T.pr
+      <;> simp [wPs]
   have hal : ∀ g : G T.F Ω, T.rb wAl g = Raw.bar D.ξ (resQ T.F g) := fun g => by
     rw [hrb]
     cases T.pr <;> simp [wAl]
@@ -30,18 +40,31 @@ theorem UpperTheory.V.Ws.two2 :
         exact absurd (by simpa using h') hne
       · intro h'
         exact absurd h' (by decide)
-  have key : ∀ q ∈ D.S, ∀ A : ValuationSubring Ω, A.valuation (q : Ω) < 1 → ∀ g ∈ Dec (F := ℚ) A,
-      Raw.bar D.Psi g = 1 → X.κ g = 1 → ∃ s : G T.F Ω, resQ T.F s = g := fun q hq A hA g hg h1 h2 => by
+  have key
+      : ∀ q ∈ D.S, ∀ A : ValuationSubring Ω,
+        A.valuation (q : Ω) < 1
+          → ∀ g ∈ Dec (F := ℚ) A,
+            Raw.bar D.Psi g = 1 → X.κ g = 1
+              → ∃ s : G T.F Ω, resQ T.F s = g := fun q hq A hA g hg h1 h2 => by
     have a : X.φ g = 1 := X.hφ.split q hq A hA hg
     have b : X.η g = 1 := X.hη.split q (Finset.mem_insert_of_mem hq) A hA hg
-    have d : X.η' g = 1 := X.hη'.split q (Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hq)) A hA hg
+    have d : X.η' g = 1 :=
+      X.hη'.split q (Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hq)) A hA hg
     refine exists_resQ ?_
     rw [hOn.1, X.mem_H]
     refine ⟨?_, b.trans d.symm, h2⟩
     rw [h1, a]
     simp
-  refine ⟨fun g => ?_, fun A g hg => ?_, fun A hA g hg => ?_, ⟨k₀, hk, hr, fun p hp A hA => ?_, fun g => ?_⟩,
-    X.ord, X.xi, fun A hA => ?_, fun A hA => ?_⟩
+  refine ⟨
+    fun g => ?_,
+    fun A g hg => ?_,
+    fun A hA g hg => ?_,
+    ⟨k₀, hk, hr, fun p hp A hA => ?_, fun g => ?_⟩,
+    X.ord,
+    X.xi,
+    fun A hA => ?_,
+    fun A hA => ?_
+  ⟩
   · rw [hps]
     rcases Int.units_eq_one_or (X.φ (resQ T.F g)) with h | h <;> rw [h] <;> simp
   · have hg' := (resQ_Ine T.F A g).1 hg

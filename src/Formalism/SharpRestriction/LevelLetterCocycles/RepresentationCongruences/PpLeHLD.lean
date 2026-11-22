@@ -8,28 +8,30 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.FrobeniusPowerSeries.DYB
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
 variable [FiniteDimensional Qp LL]
 
 variable (W : LocWach PD LL O v n)
 
-theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T) :
-    W.φD T (a • x) = W.φA a • W.φD T x := by
+theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T)
+    : W.φD T (a • x) = W.φA a • W.φD T x := by
   rw [← algebraMap_smul W.EE a x, W.φD_smul, W.φE_ext, algebraMap_smul]
   rfl
 
-theorem γ_smulA (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T) :
-    W.γ T (a • x) = W.γA W.gam a • W.γ T x := by
+theorem γ_smulA (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T)
+    : W.γ T (a • x) = W.γA W.gam a • W.γ T x := by
   show W.γD T W.gam (a • x) = W.γA W.gam a • W.γD T W.gam x
   rw [← algebraMap_smul W.EE a x, W.γD_smul, W.γE_ext, algebraMap_smul]
   rfl
@@ -87,8 +89,11 @@ theorem Pp_le_HLD (T : LocLat G Qp LL O) (c : ZMod n) : Pp W T c 1 ≤ HLD W T (
     linear_combination a * hid (c + 1)
   · rw [hsl, ← W.φγ_comm, hxD δ hδ, ha δ hδ]
 
-theorem Pp_smul (T : LocLat G Qp LL O) (c : ZMod n) {a : LetA O n} (ha : a ∈ W.AΔ) {y : W.DD T}
-    (hy : y ∈ Pp W T c 1) : a • y ∈ Pp W T c 1 := by
+theorem Pp_smul
+    (T : LocLat G Qp LL O) (c : ZMod n)
+    {a : LetA O n} (ha : a ∈ W.AΔ)
+    {y : W.DD T} (hy : y ∈ Pp W T c 1)
+    : a • y ∈ Pp W T c 1 := by
   unfold Pp at hy ⊢
   induction hy using AddSubgroup.closure_induction with
   | mem z hz =>
@@ -99,8 +104,10 @@ theorem Pp_smul (T : LocLat G Qp LL O) (c : ZMod n) {a : LetA O n} (ha : a ∈ W
   | add u w _ _ hu hw => rw [smul_add]; exact add_mem hu hw
   | neg u _ hu => rw [smul_neg]; exact neg_mem hu
 
-theorem InNΔi_γ (T : LocLat G Qp LL O) (c : ZMod n) {x : W.DD T}
-    (hx : Formalism.MainNotions.LiftingTheory.InNΔi W T c x) : Formalism.MainNotions.LiftingTheory.InNΔi W T c (W.γ T x) := by
+theorem InNΔi_γ
+    (T : LocLat G Qp LL O) (c : ZMod n)
+    {x : W.DD T} (hx : Formalism.MainNotions.LiftingTheory.InNΔi W T c x)
+    : Formalism.MainNotions.LiftingTheory.InNΔi W T c (W.γ T x) := by
   obtain ⟨h1, h2⟩ := hx
   obtain ⟨hN, hD⟩ : x ∈ W.N T ∧ ∀ δ ∈ W.DelF, W.γD T δ x = x := h1
   have hsl : ∀ δ (a : LetA O n) (z : W.DD T), W.γD T δ (a • z) = W.γA δ a • W.γD T δ z := by
@@ -125,8 +132,8 @@ theorem InNΔi_γ (T : LocLat G Qp LL O) (c : ZMod n) {x : W.DD T}
     simp only [LinearMap.smul_apply, LinearMap.id_apply]
     rw [hsl, hγE]
 
-theorem Pp_γ (T : LocLat G Qp LL O) (c : ZMod n) {y : W.DD T} (hy : y ∈ Pp W T c 1) :
-    W.γ T y ∈ Pp W T c 1 := by
+theorem Pp_γ (T : LocLat G Qp LL O) (c : ZMod n) {y : W.DD T} (hy : y ∈ Pp W T c 1)
+    : W.γ T y ∈ Pp W T c 1 := by
   have hsl : ∀ δ (a : LetA O n) (z : W.DD T), W.γD T δ (a • z) = W.γA δ a • W.γD T δ z := by
     intro δ a z
     rw [← algebraMap_smul W.EE a z, W.γD_smul, W.γE_ext, algebraMap_smul]
@@ -152,9 +159,11 @@ theorem Pp_γ (T : LocLat G Qp LL O) (c : ZMod n) {y : W.DD T} (hy : y ∈ Pp W 
   | add u w _ _ hu hw => rw [map_add (f := _)]; exact add_mem hu hw
   | neg u _ hu => rw [map_neg]; exact neg_mem hu
 
-theorem Pp_qpow (T : LocLat G Qp LL O) (c : ZMod n) (k : ℕ)
-    (hq : ∀ x, Formalism.MainNotions.LiftingTheory.InNΔi W T c x → qA W ^ k • W.φD T x ∈ W.N T) {y : W.DD T}
-    (hy : y ∈ Pp W T c 1) : qA W ^ k • y ∈ W.NΔ T := by
+theorem Pp_qpow
+    (T : LocLat G Qp LL O) (c : ZMod n) (k : ℕ)
+    (hq : ∀ x, Formalism.MainNotions.LiftingTheory.InNΔi W T c x → qA W ^ k • W.φD T x ∈ W.N T)
+    {y : W.DD T} (hy : y ∈ Pp W T c 1)
+    : qA W ^ k • y ∈ W.NΔ T := by
   have hsl : ∀ δ (a : LetA O n) (z : W.DD T), W.γD T δ (a • z) = W.γA δ a • W.γD T δ z := by
     intro δ a z
     rw [← algebraMap_smul W.EE a z, W.γD_smul, W.γE_ext, algebraMap_smul]
@@ -180,12 +189,17 @@ theorem Pp_qpow (T : LocLat G Qp LL O) (c : ZMod n) (k : ℕ)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_add (f := _), map_sub, map_one, map_natCast, map_sum]
     congr 1
-    have hm : ∀ δ' : W.Gam, W.γ₀ δ (W.γ₀ δ' (1 + PowerSeries.X)) = W.γ₀ (δ * δ') (1 + PowerSeries.X) :=
-      fun δ' => by rw [map_mul, AlgHom.mul_apply]
+    have hm
+        : ∀ δ' : W.Gam,
+          W.γ₀ δ (W.γ₀ δ' (1 + PowerSeries.X)) = W.γ₀ (δ * δ') (1 + PowerSeries.X) := fun δ' => by
+      rw [map_mul, AlgHom.mul_apply]
     simp only [hm]
-    exact Finset.sum_nbij' (δ * ·) (δ⁻¹ * ·) (fun a ha => htor δ a hδ ha)
-      (fun a ha => htor _ a (hinv δ hδ) ha) (fun a _ => inv_mul_cancel_left δ a)
-      (fun a _ => mul_inv_cancel_left δ a) (fun a _ => rfl)
+    exact Finset.sum_nbij' (δ * ·) (δ⁻¹ * ·)
+      (fun a ha => htor δ a hδ ha)
+      (fun a ha => htor _ a (hinv δ hδ) ha)
+      (fun a _ => inv_mul_cancel_left δ a)
+      (fun a _ => mul_inv_cancel_left δ a)
+      (fun a _ => rfl)
   have hqΔ : ∀ δ ∈ W.DelF, W.γA δ (qA W) = qA W := by
     intro δ hδ
     unfold qA lA

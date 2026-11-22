@@ -9,8 +9,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.AdelicCMFields.Unitar
 
 open UpperTheory.ConvolutionTheory.R
 
-theorem UpperTheory.ConvolutionTheory.R.twoParts :
-    ClassChar → Count → NormCharPow → TwoParts := by
+theorem UpperTheory.ConvolutionTheory.R.twoParts : ClassChar → Count → NormCharPow → TwoParts := by
   classical
   intro hC hCount hN K M _ _ _ _ _ _ _ _ hp n π ι _ m P hn hm hι hW
   obtain ⟨η, hη⟩ := hC K M hp

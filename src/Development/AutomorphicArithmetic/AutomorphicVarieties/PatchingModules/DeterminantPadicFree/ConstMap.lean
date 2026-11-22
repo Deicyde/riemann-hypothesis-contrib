@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.Det.constMap :
-    ∀ {K K' : Type} [Field K] [Finite K] [Field K'] (j : PowerSeries K →+* PowerSeries K'), ∃ ι : K →+* K', ∀ a, j (PowerSeries.C a) = PowerSeries.C (ι a) := by
+theorem UpperTheory.V.Pa.Det.constMap
+    : ∀ {K K' : Type} [Field K] [Finite K] [Field K'] (j : PowerSeries K →+* PowerSeries K'),
+      ∃ ι : K →+* K', ∀ a,
+        j (PowerSeries.C a) = PowerSeries.C (ι a) := by
   intro K K' _ _ _ j
   classical
   haveI := Fintype.ofFinite K
@@ -17,7 +19,9 @@ theorem UpperTheory.V.Pa.Det.constMap :
   haveI : Fact p.Prime := ⟨hp⟩
   set e : K →+* PowerSeries K' := j.comp PowerSeries.C
   haveI : CharP (PowerSeries K') p := charP_of_injective_ringHom e.injective p
-  have key : ∀ f : PowerSeries K', f ^ (p ^ (n : ℕ)) = f → f = PowerSeries.C (PowerSeries.constantCoeff f) := by
+  have key
+      : ∀ f : PowerSeries K',
+        f ^ (p ^ (n : ℕ)) = f → f = PowerSeries.C (PowerSeries.constantCoeff f) := by
     intro f hf
     set c := PowerSeries.constantCoeff f with hcdef
     have hc : c ^ (p ^ (n : ℕ)) = c := by

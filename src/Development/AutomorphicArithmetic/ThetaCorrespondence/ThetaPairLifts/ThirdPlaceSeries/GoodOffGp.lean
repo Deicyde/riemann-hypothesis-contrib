@@ -13,13 +13,19 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace GlobalTheory.OffBad
-theorem good_off_gp_alt (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (X : GlobalTheory.NJoin.RealAt D P.cf P.C P.tp)
-    (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)) (hG : GlobalTheory.Hk3.Good X.R (X.tupT (D.nd.mu i)) w) :
-    (∀ k : Fin 2, w ∉ placesOver D.host.E (D.host.g k)) ∧
-      w ∉ placesOver D.host.E (if D.nd.l i = D.host.pde then D.host.pde' else D.host.pde) := by
+theorem good_off_gp_alt
+    (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
+    (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D)
+    (X : GlobalTheory.NJoin.RealAt D P.cf P.C P.tp) (i : D.nd.Loc)
+    (w : HeightOneSpectrum (𝓞 D.host.E)) (hG : GlobalTheory.Hk3.Good X.R (X.tupT (D.nd.mu i)) w)
+    : (∀ k : Fin 2, w ∉ placesOver D.host.E (D.host.g k))
+      ∧ w ∉ placesOver D.host.E (if D.nd.l i = D.host.pde then D.host.pde' else D.host.pde) := by
   have hlev := X.recR.base.lev
   have hmu : D.nd.mu i = D.what₂.muAt (D.nd.w i) := by
     rcases D.what₂.muAt_or (D.nd.w i) with h | h
@@ -54,21 +60,42 @@ theorem good_off_gp_alt (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (
       have h3 : (δ.loc w x * ψ.loc w x) ^ (D.nd.l i ^ a) = 1 := by rw [h1, one_pow]
       rwa [mul_pow, h2, mul_one] at h3
     have hl : (D.nd.l i).Prime := (D.nd.lPrime i).out
-    have h3 : 3 = D.nd.l i := (Nat.prime_dvd_prime_iff_eq Nat.prime_three hl).1
-      (Nat.prime_three.dvd_of_dvd_pow (dvd_trans (by norm_num) h15))
-    have h5 : 5 = D.nd.l i := (Nat.prime_dvd_prime_iff_eq (by norm_num) hl).1
-      ((show (5 : ℕ).Prime by norm_num).dvd_of_dvd_pow (dvd_trans (by norm_num) h15))
+    have h3 : 3 = D.nd.l i :=
+      (Nat.prime_dvd_prime_iff_eq Nat.prime_three hl).1
+        (Nat.prime_three.dvd_of_dvd_pow (dvd_trans (by norm_num) h15))
+    have h5 : 5 = D.nd.l i :=
+      (Nat.prime_dvd_prime_iff_eq (by norm_num) hl).1
+        ((show (5 : ℕ).Prime by norm_num).dvd_of_dvd_pow (dvd_trans (by norm_num) h15))
     omega
   have hng : ∀ k : Fin 2, w ∉ placesOver D.host.E (D.host.g k) := by
     intro k hw
     have hs : GlobalTheory.Mem.Chr.SplitsC D.host.E (D.host.g k) := D.nd.g_split k
-    rcases (GlobalTheory.BigOn.Inhab.overP_iff (D.host.g_prime k) hs (X.R.C.P.pb_over k) w).1 hw with h | ⟨w', h, hc⟩
+    rcases (GlobalTheory.BigOn.Inhab.overP_iff (D.host.g_prime k) hs (X.R.C.P.pb_over k) w).1 hw
+      with h | ⟨w', h, hc⟩
     · exact (hG w (Or.inl ((hlev.Pg w).2 ⟨k, GlobalTheory.BigOn.Inhab.mem_aboveK.1 h⟩))).1 rfl
     · exact (hG w' (Or.inl ((hlev.Pg w').2 ⟨k, GlobalTheory.BigOn.Inhab.mem_aboveK.1 h⟩))).2 hc
   exact ⟨hng, hnp⟩
 end GlobalTheory.OffBad
 namespace GlobalTheory.OffBad
-theorem offbad_alt : GlobalTheory.Published.AutomorphicFormsFiniteGL → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D), ∀ (X : GlobalTheory.NJoin.RealAt D P.cf P.C P.tp) (_ : GlobalTheory.NJoin.Agree X P.M P.rep), _root_.Formalism.MainNotions.SumRepresentations.provisionFortyOne D → _root_.Formalism.MainNotions.SumRepresentations.adm7_alt D → Formalism.MainNotions.SumRepresentations.tieLab D → ∀ (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)), GlobalTheory.Hk3.Good X.R (X.tupT (D.nd.mu i)) w → Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) (w.under (𝓞 D.host.F)) → ∃ sp : SplitPlace D.host.E, sp.w = w ∧ (∀ κ : GAf D.host.E D.R.nV, TrivOutside {sp.v} κ → (κ ∈ (P.M.loc i).J ↔ κ ∈ Umax D.host.E D.R.nV) ∧ ∀ hκ : κ ∈ (P.M.loc i).J, (P.M.loc i).χ ⟨κ, hκ⟩ = 1) := by
+theorem offbad_alt
+    : GlobalTheory.Published.AutomorphicFormsFiniteGL
+      → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
+          (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D),
+        ∀ (X : GlobalTheory.NJoin.RealAt D P.cf P.C P.tp)
+            (_ : GlobalTheory.NJoin.Agree X P.M P.rep),
+          _root_.Formalism.MainNotions.SumRepresentations.provisionFortyOne D
+            → _root_.Formalism.MainNotions.SumRepresentations.adm7_alt D
+            → Formalism.MainNotions.SumRepresentations.tieLab D
+            → ∀ (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)),
+              GlobalTheory.Hk3.Good X.R (X.tupT (D.nd.mu i)) w
+                → Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E)
+                  (w.under (𝓞 D.host.F))
+                → ∃ sp : SplitPlace D.host.E,
+                  sp.w = w
+                    ∧ (∀ κ : GAf D.host.E D.R.nV,
+                      TrivOutside {sp.v} κ
+                        → (κ ∈ (P.M.loc i).J ↔ κ ∈ Umax D.host.E D.R.nV)
+                          ∧ ∀ hκ : κ ∈ (P.M.loc i).J, (P.M.loc i).χ ⟨κ, hκ⟩ = 1) := by
   intro _ hL D P X hA h41 _ htl i w hG hsplit
   obtain ⟨sp, hsp⟩ := splitPlace_of_isSplitPl D w (isSplitPl_of_isSplit D w hsplit)
   obtain ⟨hng, hnp⟩ := _root_.GlobalTheory.OffBad.good_off_gp_alt hL D P X i w hG
@@ -78,17 +105,22 @@ theorem offbad_alt : GlobalTheory.Published.AutomorphicFormsFiniteGL → ∀ (hL
     rintro ⟨w', hover, hw'⟩
     have hp : ∀ p : ℕ, w' ∈ placesOver D.host.E p → w ∈ placesOver D.host.E p := by
       intro p hp
-      have h1 : algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E) (p : 𝓞 (maximalRealSubfield D.host.E)) ∈
-          w'.asIdeal := by rw [map_natCast]; exact hp
-      have h2 : (p : 𝓞 (maximalRealSubfield D.host.E)) ∈ sp.v.asIdeal := by
-        rw [← hover]; exact h1
-      have h3 : algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E) (p : 𝓞 (maximalRealSubfield D.host.E)) ∈
-          sp.w.asIdeal := by
+      have h1
+          : algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)
+              (p : 𝓞 (maximalRealSubfield D.host.E))
+            ∈ w'.asIdeal := by
+        rw [map_natCast]; exact hp
+      have h2 : (p : 𝓞 (maximalRealSubfield D.host.E)) ∈ sp.v.asIdeal := by rw [← hover]; exact h1
+      have h3
+          : algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)
+              (p : 𝓞 (maximalRealSubfield D.host.E))
+            ∈ sp.w.asIdeal := by
         rw [← Ideal.mem_comap, sp.w_under]; exact h2
       rw [map_natCast, hsp] at h3
       exact h3
     rcases hw' with hQ' | ⟨kk, hg⟩ | hpd
-    · rcases GlobalTheory.SplitConjPlace.eq_or_eq_conjPlE sp.w w' (hover.trans sp.w_under.symm) with e | e
+    · rcases GlobalTheory.SplitConjPlace.eq_or_eq_conjPlE sp.w w' (hover.trans sp.w_under.symm) with
+        e | e
       · rw [e, hsp] at hQ'
         exact hQ hQ'
       · apply hQ
@@ -99,7 +131,8 @@ theorem offbad_alt : GlobalTheory.Published.AutomorphicFormsFiniteGL → ∀ (hL
         rw [GlobalTheory.SplitConjPlace.mem_conjPlE]
         have hy : IsCMField.ringOfIntegersComplexConj D.host.E x = y := by
           apply RingOfIntegers.ext
-          rw [IsCMField.coe_ringOfIntegersComplexConj, hxy, GlobalTheory.HeckeScalarAll.host_conj_eq']
+          rw [IsCMField.coe_ringOfIntegersComplexConj, hxy,
+            GlobalTheory.HeckeScalarAll.host_conj_eq']
         rw [← hy]
     · exact hng kk (hp _ hg)
     · exact hnp (hp _ hpd)

@@ -5,7 +5,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OfE
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology Filter PositivityTheory.Rg.Base1 GroundTheory.Global GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology Filter PositivityTheory.Rg.Base1 GroundTheory.Global
+  GlobalTheory.CompanionTheory.SW.RankOneSiegelWeil
 open GroundTheory.Global.AdeleBaseChange
 open scoped TensorProduct ENNReal NNReal Matrix Classical NumberField.AdeleRing
 
@@ -17,13 +19,14 @@ section
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem map_involution_eq {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+theorem map_involution_eq
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
     [LocallyCompactSpace G] [MeasurableSpace G] [BorelSpace G]
-    (e : G ≃ₜ+ G) (he2 : ∀ x, e (e x) = x) (ν : Measure G) [ν.IsAddHaarMeasure] [SecondCountableTopology G] :
-    ν.map e = ν := by
+    (e : G ≃ₜ+ G) (he2 : ∀ x, e (e x) = x)
+    (ν : Measure G) [ν.IsAddHaarMeasure] [SecondCountableTopology G]
+    : ν.map e = ν := by
   haveI : (ν.map e).IsAddHaarMeasure := ContinuousAddEquiv.isAddHaarMeasure_map ν e
-  obtain ⟨b, hb⟩ : ∃ b : ℝ≥0, ν.map e = b • ν :=
-    ⟨_, Measure.isAddLeftInvariant_eq_smul (ν.map e) ν⟩
+  obtain ⟨b, hb⟩ : ∃ b : ℝ≥0, ν.map e = b • ν := ⟨_, Measure.isAddLeftInvariant_eq_smul (ν.map e) ν⟩
   have he : Measurable e := e.continuous.measurable
   have h2 : ν.map (e ∘ e) = (b * b) • ν := by
     rw [← Measure.map_map he he, hb, Measure.map_smul _ he.aemeasurable, hb, smul_smul]
@@ -47,12 +50,14 @@ def conjA (σ : E →ₐ[F] E) : 𝔸[E] →+* 𝔸[E] :=
   (GroundTheory.BlockD.ThmBHecke.adeleEquiv F E).toRingEquiv.toRingHom.comp
     ((sigR (AF F) σ).comp (GroundTheory.BlockD.ThmBHecke.adeleEquiv F E).symm.toRingEquiv.toRingHom)
 
-theorem conjA_apply (σ : E →ₐ[F] E) (y : 𝔸[E]) :
-    conjA σ y = GroundTheory.BlockD.ThmBHecke.adeleEquiv F E
-      (sigR (AF F) σ ((GroundTheory.BlockD.ThmBHecke.adeleEquiv F E).symm y)) := rfl
+theorem conjA_apply (σ : E →ₐ[F] E) (y : 𝔸[E])
+    : conjA σ y
+      = GroundTheory.BlockD.ThmBHecke.adeleEquiv F E
+        (sigR (AF F) σ ((GroundTheory.BlockD.ThmBHecke.adeleEquiv F E).symm y)) :=
+  rfl
 
-theorem sig_sig {σ : E →ₐ[F] E} (hσ : ∀ x, σ (σ x) = x) (z : AF F ⊗[F] E) :
-    sigR (AF F) σ (sigR (AF F) σ z) = z := by
+theorem sig_sig {σ : E →ₐ[F] E} (hσ : ∀ x, σ (σ x) = x) (z : AF F ⊗[F] E)
+    : sigR (AF F) σ (sigR (AF F) σ z) = z := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul a b => simp [sigR, hσ]
@@ -69,23 +74,28 @@ theorem sigma_sigma {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ) (x : E) : σ (σ
 def conjE {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ) : 𝔸[E] ≃ₜ+ 𝔸[E] where
   toFun := conjA σ
   invFun := conjA σ
-  left_inv y := by
-    simp [conjA_apply, sig_sig (sigma_sigma hcm)]
-  right_inv y := by
-    simp [conjA_apply, sig_sig (sigma_sigma hcm)]
+  left_inv y := by simp [conjA_apply, sig_sig (sigma_sigma hcm)]
+  right_inv y := by simp [conjA_apply, sig_sig (sigma_sigma hcm)]
   map_add' := map_add _
-  continuous_toFun := GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv.comp
-    ((continuous_sig hcm).comp GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv_symm)
-  continuous_invFun := GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv.comp
-    ((continuous_sig hcm).comp GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv_symm)
+  continuous_toFun :=
+    GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv.comp ((continuous_sig hcm).comp
+      GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv_symm)
+  continuous_invFun :=
+    GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv.comp ((continuous_sig hcm).comp
+      GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv_symm)
 
 end
 
-theorem ideleModule_conj : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ x : (AF F ⊗[F] E)ˣ,
-    (IdeleGroup.ideleModule E (GroundTheory.BlockD.ThmBHecke.ideleEquiv F E
-        (Units.map (sigR (AF F) σ).toMonoidHom x)) : ℝ) =
-      (IdeleGroup.ideleModule E (GroundTheory.BlockD.ThmBHecke.ideleEquiv F E x) : ℝ) := by
+theorem ideleModule_conj
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ x : (AF F ⊗[F] E)ˣ,
+          (IdeleGroup.ideleModule E
+                (GroundTheory.BlockD.ThmBHecke.ideleEquiv F E
+                  (Units.map (sigR (AF F) σ).toMonoidHom x))
+              : ℝ)
+            = (IdeleGroup.ideleModule E (GroundTheory.BlockD.ThmBHecke.ideleEquiv F E x) : ℝ) := by
   intro F E _ _ _ _ _ σ hcm x
   letI : MeasurableSpace 𝔸[E] := measurableSpace_adeleRing E
   set a := GroundTheory.BlockD.ThmBHecke.ideleEquiv F E x with ha
@@ -99,14 +109,15 @@ theorem ideleModule_conj : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
       GroundTheory.BlockD.ThmBHecke.coe_ideleEquiv, AlgEquiv.symm_apply_apply]
     rfl
   have key : ∀ y : 𝔸[E], a' • y = e (a • e y) := fun y => by
-    rw [Units.smul_def, Units.smul_def, smul_eq_mul, smul_eq_mul, hcoe (_ * _), map_mul, ← hcoe, ← hcoe,
-      hinv, hea]
+    rw [Units.smul_def, Units.smul_def, smul_eq_mul, smul_eq_mul, hcoe (_ * _), map_mul, ← hcoe,
+      ← hcoe, hinv, hea]
   have hmeas : Measurable e := e.continuous.measurable
   have hm : Measurable (fun y : 𝔸[E] => a • y) := (Homeomorph.smul a).continuous.measurable
   have hνe : ν.map e = ν := map_involution_eq e hinv ν
   have hfun : (fun y : 𝔸[E] => a' • y) = e ∘ (fun y => a • y) ∘ e := funext key
-  have h1 : ν.map (fun y : 𝔸[E] => a' • y) =
-      ENNReal.ofReal ((IdeleGroup.ideleModule E a : ℝ))⁻¹ • ν := by
+  have h1
+      : ν.map (fun y : 𝔸[E] => a' • y)
+        = ENNReal.ofReal ((IdeleGroup.ideleModule E a : ℝ))⁻¹ • ν := by
     rw [hfun, ← Measure.map_map hmeas (hm.comp hmeas), ← Measure.map_map hm hmeas, hνe, hν,
       map_smul_adeleMeasure, Measure.map_smul _ hmeas.aemeasurable, ← hν, hνe]
   have h2 := map_smul_adeleMeasure (K := E) a'
@@ -117,8 +128,9 @@ theorem ideleModule_conj : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
   have h3 := congrArg (fun m : Measure 𝔸[E] => m K) h2
   simp only [Measure.smul_apply, smul_eq_mul] at h3
   have h4 := (ENNReal.mul_left_inj hpos hfin).1 h3
-  have h5 := (ENNReal.ofReal_eq_ofReal_iff (inv_nonneg.2 (IdeleGroup.ideleModule E a).2.le)
-    (inv_nonneg.2 (IdeleGroup.ideleModule E a').2.le)).1 h4
+  have h5 :=
+    (ENNReal.ofReal_eq_ofReal_iff (inv_nonneg.2 (IdeleGroup.ideleModule E a).2.le)
+      (inv_nonneg.2 (IdeleGroup.ideleModule E a').2.le)).1 h4
   exact (inv_injective h5).symm
 
 end GlobalTheory.CompanionTheory.SW.ModConj

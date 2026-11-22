@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private noncomputable def tchU (n : ℕ) (O : Type) [CommRing O] (i : Fin n) : (MvPowerSeries (Fin n) O)ˣ :=
+private noncomputable def tchU (n : ℕ) (O : Type) [CommRing O] (i : Fin n)
+    : (MvPowerSeries (Fin n) O)ˣ :=
   (show IsUnit (1 + MvPowerSeries.X i : MvPowerSeries (Fin n) O) from
     MvPowerSeries.isUnit_iff_constantCoeff.2 (by simp)).unit
 
@@ -45,24 +46,33 @@ private lemma tch_poly (n : ℕ) (R : Type) [CommRing R] {X : Type} (s : Finset 
     exact hkj (he hk hj hh)
   · intro h; exact absurd hj h
 
-theorem UpperTheory.V.Alg.tchar :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X], ∃ (n : ℕ) (t : Multiplicative X →* (MvPowerSeries (Fin n) O)ˣ), (∀ j, constantCoeff (t j : MvPowerSeries (Fin n) O) = 1) ∧
-      ∀ (R : Type) [CommRing R] [Algebra O R] (s : Finset X) (x : X → R),
-        ∑ j ∈ s, MvPowerSeries.map (algebraMap O R) (t (Multiplicative.ofAdd j) : MvPowerSeries (Fin n) O) * C (x j) = 0 → ∀ j ∈ s, x j = 0 := by
+theorem UpperTheory.V.Alg.tchar
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
+        [Module.Finite ℤ X],
+      ∃ (n : ℕ) (t : Multiplicative X →* (MvPowerSeries (Fin n) O)ˣ),
+        (∀ j, constantCoeff (t j : MvPowerSeries (Fin n) O) = 1)
+          ∧ ∀ (R : Type) [CommRing R] [Algebra O R] (s : Finset X) (x : X → R),
+            ∑ j ∈ s, MvPowerSeries.map (algebraMap O R) (t (Multiplicative.ofAdd j) : MvPowerSeries (Fin n) O) * C (x j)
+                = 0
+              → ∀ j ∈ s, x j = 0 := by
   intro O _ _ X _ _ _
   classical
   let n := Module.finrank ℤ X
   let b : Module.Basis (Fin n) ℤ X := Module.finBasis ℤ X
-  let t : Multiplicative X →* (MvPowerSeries (Fin n) O)ˣ :=
-    { toFun := fun j => ∏ i, tchU n O i ^ (b.repr j.toAdd i)
-      map_one' := by simp
-      map_mul' := by
-        intro a c
-        simp [zpow_add, Finset.prod_mul_distrib] }
+  let t : Multiplicative X →* (MvPowerSeries (Fin n) O)ˣ := {
+    toFun := fun j => ∏ i, tchU n O i ^ (b.repr j.toAdd i)
+    map_one' := by simp
+    map_mul' := by
+      intro a c
+      simp [zpow_add, Finset.prod_mul_distrib]
+  }
   have ht : ∀ j : X, t (Multiplicative.ofAdd j) = ∏ i, tchU n O i ^ (b.repr j i) := fun j => rfl
   refine ⟨n, t, ?_, ?_⟩
   · intro j
-    have h1 : ∀ i, Units.map (constantCoeff : MvPowerSeries (Fin n) O →+* O).toMonoidHom (tchU n O i) = 1 := by
+    have h1
+        : ∀ i,
+          Units.map (constantCoeff : MvPowerSeries (Fin n) O →+* O).toMonoidHom (tchU n O i)
+            = 1 := by
       intro i
       ext
       simp [tchU_val]
@@ -77,7 +87,10 @@ theorem UpperTheory.V.Alg.tchar :
     have hN : ∀ j ∈ s, ∀ i, 0 ≤ b.repr j i + N := by
       intro j hj i
       have h1 : (b.repr j i).natAbs ≤ ∑ i, (b.repr j i).natAbs :=
-        Finset.single_le_sum (f := fun i => (b.repr j i).natAbs) (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)
+        Finset.single_le_sum
+          (f := fun i => (b.repr j i).natAbs)
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_univ i)
       have h2 : ∑ i, (b.repr j i).natAbs ≤ N :=
         Finset.single_le_sum (f := fun j => ∑ i, (b.repr j i).natAbs) (fun _ _ => Nat.zero_le _) hj
       omega
@@ -92,8 +105,13 @@ theorem UpperTheory.V.Alg.tchar :
       have := hN j hj i
       have := hN k hk i
       omega
-    · have h1 := congrArg (fun y => MvPowerSeries.map (algebraMap O R)
-        ((∏ i, tchU n O i ^ (N : ℤ) : (MvPowerSeries (Fin n) O)ˣ) : MvPowerSeries (Fin n) O) * y) h
+    · have h1 :=
+        congrArg
+          (fun y =>
+            MvPowerSeries.map (algebraMap O R)
+                ((∏ i, tchU n O i ^ (N : ℤ) : (MvPowerSeries (Fin n) O)ˣ) : MvPowerSeries (Fin n) O)
+              * y)
+          h
       simp only [mul_zero] at h1
       rw [Finset.mul_sum] at h1
       rw [← h1]

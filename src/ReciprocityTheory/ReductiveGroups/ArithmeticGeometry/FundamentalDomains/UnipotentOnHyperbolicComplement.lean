@@ -45,8 +45,8 @@ def hL (y : Fin r → ℂ) : (Fin r → ℂ) →ₗ[ℂ] ℂ where
     simp only [smul_eq_mul, RingHom.id_apply]
     exact hC_smul_left τ G c v y
 
-def rz (φ : (Fin r → ℂ) →ₗ[ℂ] ℂ) : Fin r → ℂ :=
-  fun b => conj (((G.map τ)⁻¹).mulVec (fun a => φ (fun j => if a = j then 1 else 0)) b)
+def rz (φ : (Fin r → ℂ) →ₗ[ℂ] ℂ) : Fin r → ℂ := fun b =>
+  conj (((G.map τ)⁻¹).mulVec (fun a => φ (fun j => if a = j then 1 else 0)) b)
 
 lemma rz_spec (hG : (G.map τ).det ≠ 0) (φ : (Fin r → ℂ) →ₗ[ℂ] ℂ) (v : Fin r → ℂ) :
     hermC τ G v (rz τ G φ) = φ v := by
@@ -211,8 +211,8 @@ def d2pi : (Fin r → ℂ) →ₗ[ℂ] (Fin r → ℂ) :=
 def d2z : Fin r → ℂ := rz τ.1 X.Gm ((X.d2q x τ e) • (δ ∘ₗ X.d2pi x τ e))
 
 def d2nL : (Fin r → ℂ) →ₗ[ℂ] (Fin r → ℂ) :=
-  LinearMap.id + (δ ∘ₗ X.d2pi x τ e - (δ (X.d2z x τ e δ) / 2) • X.d2b x τ e).smulRight e -
-    (X.d2b x τ e).smulRight (X.d2z x τ e δ)
+  LinearMap.id + (δ ∘ₗ X.d2pi x τ e - (δ (X.d2z x τ e δ) / 2) • X.d2b x τ e).smulRight e
+    - (X.d2b x τ e).smulRight (X.d2z x τ e δ)
 
 def d2n : Matrix (Fin r) (Fin r) ℂ := LinearMap.toMatrix' (X.d2nL x τ e δ)
 

@@ -16,51 +16,52 @@ noncomputable section
 
 namespace FiniteSubfield
 
-def ideleClassNorm {F E : FiniteSubfield} (h : F ≤ E) :
-    IdeleClassGroup E.1 →* IdeleClassGroup F.1 :=
+def ideleClassNorm {F E : FiniteSubfield} (h : F ≤ E)
+    : IdeleClassGroup E.1 →* IdeleClassGroup F.1 :=
   letI := algebraOfLE h
   GroundTheory.Global.ideleClassNorm F.1 E.1
 
-def galoisClosure (F : FiniteSubfield) : FiniteSubfield :=
-  ⟨normalClosure ℚ F.1 ℚ̄, inferInstance⟩
+def galoisClosure (F : FiniteSubfield) : FiniteSubfield := ⟨normalClosure ℚ F.1 ℚ̄, inferInstance⟩
 
 theorem le_galoisClosure (F : FiniteSubfield) : F ≤ galoisClosure F :=
   show F.1 ≤ normalClosure ℚ F.1 ℚ̄ from IntermediateField.le_normalClosure F.1
 
-instance (F : FiniteSubfield) : IsGalois ℚ (galoisClosure F).1 :=
-  IsGalois.normalClosure ℚ F.1 ℚ̄
+instance (F : FiniteSubfield) : IsGalois ℚ (galoisClosure F).1 := IsGalois.normalClosure ℚ F.1 ℚ̄
 
-theorem index_fixingSubgroup (F : FiniteSubfield) :
-    F.1.fixingSubgroup.index = Module.finrank ℚ F.1 :=
+theorem index_fixingSubgroup (F : FiniteSubfield)
+    : F.1.fixingSubgroup.index = Module.finrank ℚ F.1 :=
   (IntermediateField.finrank_eq_fixingSubgroup_index (E' := ℚ̄) F.1).symm
 
 instance (F : FiniteSubfield) : F.1.fixingSubgroup.FiniteIndex :=
   ⟨by rw [index_fixingSubgroup]; exact Module.finrank_pos.ne'⟩
 
-theorem relIndex_fixingSubgroup {F E : FiniteSubfield} (h : F ≤ E) :
-    letI := algebraOfLE h
-    E.1.fixingSubgroup.relIndex F.1.fixingSubgroup = Module.finrank F.1 E.1 := by
+theorem relIndex_fixingSubgroup {F E : FiniteSubfield} (h : F ≤ E)
+    : letI := algebraOfLE h
+      E.1.fixingSubgroup.relIndex F.1.fixingSubgroup = Module.finrank F.1 E.1 := by
   let := algebraOfLE h
   have : IsScalarTower ℚ F.1 E.1 := IsScalarTower.of_algebraMap_eq' (Subsingleton.elim _ _)
   have : Module.Free F.1 E.1 := Module.Free.of_divisionRing _ _
   have : FiniteDimensional F.1 E.1 := FiniteDimensional.right ℚ F.1 E.1
-  have h1 := Subgroup.relIndex_mul_index
-    (IntermediateField.fixingSubgroup_le (show F.1 ≤ E.1 from h))
+  have h1 :=
+    Subgroup.relIndex_mul_index (IntermediateField.fixingSubgroup_le (show F.1 ≤ E.1 from h))
   rw [index_fixingSubgroup, index_fixingSubgroup, ← Module.finrank_mul_finrank ℚ F.1 E.1,
-    mul_comm (Module.finrank ℚ F.1)] at h1
+      mul_comm (Module.finrank ℚ F.1)]
+    at h1
   exact Nat.eq_of_mul_eq_mul_right Module.finrank_pos h1
 
-theorem fixingSubgroup_fixedField_openSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) :
-    (fixedField (U : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄))).fixingSubgroup = U :=
+theorem fixingSubgroup_fixedField_openSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄))
+    : (fixedField (U : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄))).fixingSubgroup = U :=
   InfiniteGalois.fixingSubgroup_fixedField ⟨U.toSubgroup, U.isClosed⟩
 
-def ofOpenSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) : FiniteSubfield :=
-  ⟨fixedField (U : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)), (InfiniteGalois.isOpen_iff_finite _).1 (by
+def ofOpenSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) : FiniteSubfield := ⟨
+  fixedField (U : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)),
+  (InfiniteGalois.isOpen_iff_finite _).1 (by
     rw [fixingSubgroup_fixedField_openSubgroup]
-    exact U.isOpen)⟩
+    exact U.isOpen)
+⟩
 
-theorem fixingSubgroup_ofOpenSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) :
-    (ofOpenSubgroup U).1.fixingSubgroup = U :=
+theorem fixingSubgroup_ofOpenSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄))
+    : (ofOpenSubgroup U).1.fixingSubgroup = U :=
   fixingSubgroup_fixedField_openSubgroup U
 
 end FiniteSubfield
@@ -69,13 +70,14 @@ namespace IdeleClassLimit
 
 open FiniteSubfield
 
-theorem smul_of_eq_of_ideleClassEquiv {M : FiniteSubfield} (σ : ℚ̄ ≃ₐ[ℚ] ℚ̄) (τ : M.1 ≃+* M.1)
-    (h : ∀ x : M.1, σ x = τ x) (c : IdeleClassGroup M.1) :
-    σ • of M c = of M (ideleClassEquiv τ c) :=
+theorem smul_of_eq_of_ideleClassEquiv
+    {M : FiniteSubfield} (σ : ℚ̄ ≃ₐ[ℚ] ℚ̄) (τ : M.1 ≃+* M.1) (h : ∀ x : M.1, σ x = τ x)
+    (c : IdeleClassGroup M.1)
+    : σ • of M c = of M (ideleClassEquiv τ c) :=
   (smul_of σ M c).trans (of_ideleClassEquiv_congr _ _ h c)
 
-theorem fixedModule_fixingSubgroup (F : FiniteSubfield) :
-    fixedModule IdeleClassLimit F.1.fixingSubgroup = (of F).range := by
+theorem fixedModule_fixingSubgroup (F : FiniteSubfield)
+    : fixedModule IdeleClassLimit F.1.fixingSubgroup = (of F).range := by
   apply le_antisymm
   · intro z hz
     obtain ⟨E, c, rfl⟩ := exists_of z
@@ -87,8 +89,9 @@ theorem fixedModule_fixingSubgroup (F : FiniteSubfield) :
     let := algebraOfLE hFM
     have : IsScalarTower ℚ F.1 M.1 := IsScalarTower.of_algebraMap_eq' (Subsingleton.elim _ _)
     have : IsGalois F.1 M.1 := IsGalois.tower_top_of_isGalois ℚ F.1 M.1
-    have hfix : ∀ σ : M.1 ≃ₐ[F.1] M.1, σ • FiniteSubfield.ideleClassMap hEM c =
-        FiniteSubfield.ideleClassMap hEM c := by
+    have hfix
+        : ∀ σ : M.1 ≃ₐ[F.1] M.1,
+          σ • FiniteSubfield.ideleClassMap hEM c = FiniteSubfield.ideleClassMap hEM c := by
       intro σ
       let σ' : ℚ̄ ≃ₐ[ℚ] ℚ̄ := (σ.restrictScalars ℚ).liftNormal ℚ̄
       have hσ' : ∀ x : M.1, σ' x = σ x := fun x ↦ (σ.restrictScalars ℚ).liftNormal_commutes ℚ̄ x
@@ -108,24 +111,24 @@ theorem fixedModule_fixingSubgroup (F : FiniteSubfield) :
   · rintro _ ⟨c, rfl⟩ σ hσ
     exact smul_of_eq_of_mem_fixingSubgroup hσ c
 
-theorem fixedModule_openSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) :
-    fixedModule IdeleClassLimit (U : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) = (of (ofOpenSubgroup U)).range := by
+theorem fixedModule_openSubgroup (U : OpenSubgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄))
+    : fixedModule IdeleClassLimit (U : Subgroup (ℚ̄ ≃ₐ[ℚ] ℚ̄)) = (of (ofOpenSubgroup U)).range := by
   have h := fixedModule_fixingSubgroup (ofOpenSubgroup U)
   rwa [fixingSubgroup_ofOpenSubgroup] at h
 
-def fixedEquiv (F : FiniteSubfield) :
-    IdeleClassGroup F.1 ≃* fixedModule IdeleClassLimit F.1.fixingSubgroup :=
+def fixedEquiv (F : FiniteSubfield)
+    : IdeleClassGroup F.1 ≃* fixedModule IdeleClassLimit F.1.fixingSubgroup :=
   (MonoidHom.ofInjective (of_injective F)).trans
     (MulEquiv.subgroupCongr (fixedModule_fixingSubgroup F).symm)
 
 @[simp]
-theorem coe_fixedEquiv (F : FiniteSubfield) (c : IdeleClassGroup F.1) :
-    (fixedEquiv F c : IdeleClassLimit) = of F c :=
+theorem coe_fixedEquiv (F : FiniteSubfield) (c : IdeleClassGroup F.1)
+    : (fixedEquiv F c : IdeleClassLimit) = of F c :=
   rfl
 
-theorem norm_fixedEquiv {F E : FiniteSubfield} (h : F ≤ E) (c : IdeleClassGroup E.1) :
-    norm IdeleClassLimit F.1.fixingSubgroup E.1.fixingSubgroup (fixedEquiv E c) =
-      fixedEquiv F (FiniteSubfield.ideleClassNorm h c) := by
+theorem norm_fixedEquiv {F E : FiniteSubfield} (h : F ≤ E) (c : IdeleClassGroup E.1)
+    : norm IdeleClassLimit F.1.fixingSubgroup E.1.fixingSubgroup (fixedEquiv E c)
+      = fixedEquiv F (FiniteSubfield.ideleClassNorm h c) := by
   classical
   set K := F.1.fixingSubgroup
   set L := E.1.fixingSubgroup
@@ -139,15 +142,16 @@ theorem norm_fixedEquiv {F E : FiniteSubfield} (h : F ≤ E) (c : IdeleClassGrou
   let ι := K ⧸ L.subgroupOf K
   let _ : Fintype ι := Fintype.ofFinite ι
   let ρ : ι → (M.1 ≃ₐ[F.1] M.1) := fun q ↦
-    AlgEquiv.ofRingEquiv (f := ((((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄).restrictNormal M.1 : M.1 ≃ₐ[ℚ] M.1) :
-      M.1 ≃+* M.1)) (fun x ↦ by
+    AlgEquiv.ofRingEquiv
+      (f := ((((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄).restrictNormal M.1 : M.1 ≃ₐ[ℚ] M.1) : M.1 ≃+* M.1))
+      (fun x ↦ by
         apply Subtype.ext
-        have h1 := AlgEquiv.restrictNormal_commutes ((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄) M.1
-          (algebraMap F.1 M.1 x)
+        have h1 :=
+          AlgEquiv.restrictNormal_commutes ((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄) M.1 (algebraMap F.1 M.1 x)
         refine h1.trans ?_
         exact (IntermediateField.mem_fixingSubgroup_iff F.1 _).1 (q.out : K).2 x x.2)
-  have hρ : ∀ (q : ι) (x : M.1), ((ρ q x : M.1) : ℚ̄) = ((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄) x :=
-    fun q x ↦ AlgEquiv.restrictNormal_commutes ((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄) M.1 x
+  have hρ : ∀ (q : ι) (x : M.1), ((ρ q x : M.1) : ℚ̄) = ((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄) x := fun q x ↦
+    AlgEquiv.restrictNormal_commutes ((q.out : K) : ℚ̄ ≃ₐ[ℚ] ℚ̄) M.1 x
   have hinj : Function.Injective fun q ↦
       (ρ q : M.1 →ₐ[F.1] M.1).comp (IsScalarTower.toAlgHom F.1 E.1 M.1) := by
     intro q q' hqq'
@@ -163,8 +167,10 @@ theorem norm_fixedEquiv {F E : FiniteSubfield} (h : F ≤ E) (c : IdeleClassGrou
   have hcard : Fintype.card ι = Module.finrank F.1 E.1 := by
     rw [← relIndex_fixingSubgroup h, ← Nat.card_eq_fintype_card]
     rfl
-  have hq : ∀ q : ι, cosetSMul IdeleClassLimit K L (fixedEquiv E c) q =
-      of M (ρ q • FiniteSubfield.ideleClassMap hEM c) := by
+  have hq
+      : ∀ q : ι,
+        cosetSMul IdeleClassLimit K L (fixedEquiv E c) q
+          = of M (ρ q • FiniteSubfield.ideleClassMap hEM c) := by
     intro q
     conv_lhs => rw [← QuotientGroup.out_eq' q]
     rw [cosetSMul_mk, coe_fixedEquiv, ← of_ideleClassMap hEM c,

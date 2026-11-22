@@ -13,10 +13,13 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSE
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.P Formalism.FourierDecayAlt.P.QrD Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P5.Kfp
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.P
+  Formalism.FourierDecayAlt.P.QrD Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P5.Kfp
 
-theorem rdsXi_kappa_inv_aeval {T A : Type} [Fintype T] [Ring A] [Algebra ℂ A] (κ : (T → ℂ) →ₐ[ℂ] A) (f : T → ℂ) :
-    ∃ p : Polynomial ℂ, κ (fun ρ => (f ρ)⁻¹) = Polynomial.aeval (κ f) p := by
+theorem rdsXi_kappa_inv_aeval
+    {T A : Type} [Fintype T] [Ring A] [Algebra ℂ A] (κ : (T → ℂ) →ₐ[ℂ] A) (f : T → ℂ)
+    : ∃ p : Polynomial ℂ, κ (fun ρ => (f ρ)⁻¹) = Polynomial.aeval (κ f) p := by
   classical
   set N : Finset ℂ := Finset.univ.image f
   set p : Polynomial ℂ := Lagrange.interpolate N id (fun v => v⁻¹)
@@ -36,7 +39,8 @@ theorem rdsXi_kappa_inv_aeval {T A : Type} [Fintype T] [Ring A] [Algebra ℂ A] 
 
 theorem spectral_xi_test : RDSXiTest := by
   intro Wp Wq _ _ _ _ _ _ P z z' π π' X μ L st l0 D hD _ _ _ _ _ _ _ Y hYr hYi Ψ hΨ
-  obtain ⟨κ, hx, hxi, -⟩ := xKappaOfNF normal_form_actual kappaFibrePos Wp Wq P z z' π π' X μ L st l0 hD
+  obtain ⟨κ, hx, hxi, -⟩ :=
+    xKappaOfNF normal_form_actual kappaFibrePos Wp Wq P z z' π π' X μ L st l0 hD
   have hD' := hD
   obtain ⟨hPl, -, hL, hQQ, -, -, -, hst⟩ := hD'
   obtain ⟨p, hp⟩ := rdsXi_kappa_inv_aeval κ (fun ρ => M.x0 P l0 ρ Y)
@@ -67,12 +71,17 @@ theorem spectral_xi_test : RDSXiTest := by
     have hT' : 0 < Tz P.k P.r z' := by rw [hTz']; exact hP.T'_pos
     obtain ⟨Bs, -, -, hB1, -⟩ := LieAlgebraWeightVectors.geom_package hz hz' hT hT' hg hG.ne'
     set C : Module.End ℂ Wq := M.sgn P l0 • qdet (EB π' Bs) (Y + ((P.k : ℂ) - 2) / 2) with hCdef
-    have hact : ∀ (Φ : RadSp P.k P.r z z' π π') (v : Wq),
-        (((M.sgn P l0 • (X.fn 5 * X.t Y 1 1)) Φ : RadSp P.k P.r z z' π π') : Fn P.k P.r (Wq →L[ℂ] Wp)) c g v =
-          (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g (C v) := by
+    have hact
+        : ∀ (Φ : RadSp P.k P.r z z' π π') (v : Wq),
+          (((M.sgn P l0 • (X.fn 5 * X.t Y 1 1)) Φ : RadSp P.k P.r z z' π π')
+                : Fn P.k P.r (Wq →L[ℂ] Wp))
+              c g v
+            = (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g (C v) := by
       intro Φ v
-      rw [LinearMap.smul_apply, Submodule.coe_smul, Pi.smul_apply, Pi.smul_apply, ContinuousLinearMap.smul_apply,
-        diagonal_transfer_action X hz hz' hπ'.2.1 hπ'.2.2.1 hxD Bs hB1 Y Φ v, hCdef, LinearMap.smul_apply, map_smul]
+      rw [LinearMap.smul_apply, Submodule.coe_smul, Pi.smul_apply, Pi.smul_apply,
+        ContinuousLinearMap.smul_apply,
+        diagonal_transfer_action X hz hz' hπ'.2.1 hπ'.2.2.1 hxD Bs hB1 Y Φ v, hCdef,
+        LinearMap.smul_apply, map_smul]
     have h0 : (Ψ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g = 0 := hK0 (c, g) hxK
     ext v
     rw [hxi1]
@@ -86,7 +95,9 @@ theorem spectral_xi_test : RDSXiTest := by
     have e : star (st.xi Y) * st.x Y = 1 := by
       have := congrArg star u
       rwa [star_mul, hst.x_star Y hYr, star_one] at this
-    calc star (st.xi Y) = star (st.xi Y) * (st.x Y * st.xi Y) := by rw [u, mul_one]
+    calc
+      star (st.xi Y)
+        = star (st.xi Y) * (st.x Y * st.xi Y) := by rw [u, mul_one]
       _ = st.xi Y := by rw [← mul_assoc, e, one_mul]
   have e2 : (st.xi Y).2.unop = (st.xi Y).1 := by
     have := congrArg Prod.fst hstar

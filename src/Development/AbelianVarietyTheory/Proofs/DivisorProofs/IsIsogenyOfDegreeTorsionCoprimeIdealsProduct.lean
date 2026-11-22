@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.C
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped NumberField CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -16,22 +18,31 @@ noncomputable section
 
 namespace GlobalTheory.IwLevel.CoprimeTors
 
-theorem isIsogDeg_of_coprime : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (O : Type) [CommRing O]
-    (ρ : ReciprocityTheory.ChartRestriction.G.Out.RingAct A O) (𝔞 𝔟 : Ideal O), 𝔞 ⊔ 𝔟 = ⊤ →
-    ∀ (K₁ K₂ K₃ : Over S) (i₁ : K₁ ⟶ A) (i₂ : K₂ ⟶ A) (i₃ : K₃ ⟶ A), Mono i₁ → Mono i₂ → Mono i₃ →
-    (∀ (T : Over S) (x : T ⟶ A), GlobalTheory.IwLevel.InSub i₁ x ↔ GlobalTheory.IwLevel.KilledBy ρ 𝔞 x) →
-    (∀ (T : Over S) (x : T ⟶ A), GlobalTheory.IwLevel.InSub i₂ x ↔ GlobalTheory.IwLevel.KilledBy ρ 𝔟 x) →
-    (∀ (T : Over S) (x : T ⟶ A), GlobalTheory.IwLevel.InSub i₃ x ↔ GlobalTheory.IwLevel.KilledBy ρ (𝔞 * 𝔟) x) →
-    ∀ (d e : ℕ), 0 < e → GlobalTheory.IwLevel.IsIsogDeg (toUnit K₃) (d * e) → GlobalTheory.IwLevel.IsIsogDeg (toUnit K₂) e →
-    GlobalTheory.IwLevel.IsIsogDeg (toUnit K₁) d := by
+theorem isIsogDeg_of_coprime
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (O : Type) [CommRing O]
+        (ρ : ReciprocityTheory.ChartRestriction.G.Out.RingAct A O) (𝔞 𝔟 : Ideal O),
+      𝔞 ⊔ 𝔟 = ⊤
+        → ∀ (K₁ K₂ K₃ : Over S) (i₁ : K₁ ⟶ A) (i₂ : K₂ ⟶ A) (i₃ : K₃ ⟶ A),
+          Mono i₁ → Mono i₂ → Mono i₃
+            → (∀ (T : Over S) (x : T ⟶ A),
+              GlobalTheory.IwLevel.InSub i₁ x ↔ GlobalTheory.IwLevel.KilledBy ρ 𝔞 x)
+            → (∀ (T : Over S) (x : T ⟶ A),
+              GlobalTheory.IwLevel.InSub i₂ x ↔ GlobalTheory.IwLevel.KilledBy ρ 𝔟 x)
+            → (∀ (T : Over S) (x : T ⟶ A),
+              GlobalTheory.IwLevel.InSub i₃ x ↔ GlobalTheory.IwLevel.KilledBy ρ (𝔞 * 𝔟) x)
+            → ∀ (d e : ℕ),
+              0 < e → GlobalTheory.IwLevel.IsIsogDeg (toUnit K₃) (d * e)
+                → GlobalTheory.IwLevel.IsIsogDeg (toUnit K₂) e
+                → GlobalTheory.IwLevel.IsIsogDeg (toUnit K₁) d := by
   intro S A _ _ O _ ρ 𝔞 𝔟 hab K₁ K₂ K₃ i₁ i₂ i₃ _ _ _ h₁ h₂ h₃ d e he hK₃ hK₂
   have h1mem : (1 : O) ∈ 𝔞 ⊔ 𝔟 := hab ▸ Submodule.mem_top
   obtain ⟨u, hu, v, hv, huv⟩ := Submodule.mem_sup.1 h1mem
   have k₁ : ∀ a ∈ 𝔞, i₁ ≫ ρ.act a = 1 := fun a ha => (h₁ K₁ i₁).1 ⟨𝟙 _, Category.id_comp _⟩ a ha
   have k₂ : ∀ a ∈ 𝔟, i₂ ≫ ρ.act a = 1 := fun a ha => (h₂ K₂ i₂).1 ⟨𝟙 _, Category.id_comp _⟩ a ha
   have k₃ : ∀ a ∈ 𝔞 * 𝔟, i₃ ≫ ρ.act a = 1 := fun a ha => (h₃ K₃ i₃).1 ⟨𝟙 _, Category.id_comp _⟩ a ha
-  have hadd : ∀ {T : Over S} (x : T ⟶ A) (a b : O),
-      x ≫ ρ.act (a + b) = (x ≫ ρ.act a) * (x ≫ ρ.act b) := fun x a b => by
+  have hadd
+      : ∀ {T : Over S} (x : T ⟶ A) (a b : O),
+        x ≫ ρ.act (a + b) = (x ≫ ρ.act a) * (x ≫ ρ.act b) := fun x a b => by
     rw [ρ.map_add]; exact MonObj.comp_mul x _ _
   have hone : ∀ {T : Over S} (x : T ⟶ A), x ≫ ρ.act 1 = x := fun x => by
     rw [ρ.map_one, Category.comp_id]
@@ -43,7 +54,8 @@ theorem isIsogDeg_of_coprime : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsC
     have := hadd i₂ u v
     rw [huv, hone, k₂ v hv, _root_.mul_one] at this
     exact this.symm
-  have hm : GlobalTheory.IwLevel.KilledBy ρ (𝔞 * 𝔟) ((fst K₁ K₂ ≫ i₁) * (snd K₁ K₂ ≫ i₂)) := fun c hc => by
+  have hm : GlobalTheory.IwLevel.KilledBy ρ (𝔞 * 𝔟)
+      ((fst K₁ K₂ ≫ i₁) * (snd K₁ K₂ ≫ i₂)) := fun c hc => by
     have := ρ.hom c
     have hc₁ : c ∈ 𝔞 := Ideal.mul_le_left (I := 𝔞) (J := 𝔟) hc
     have hc₂ : c ∈ 𝔟 := Ideal.mul_le_right (I := 𝔞) (J := 𝔟) hc
@@ -72,13 +84,23 @@ theorem isIsogDeg_of_coprime : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsC
   have hP : GlobalTheory.IwLevel.IsIsogDeg (toUnit (K₁ ⊗ K₂)) (d * e) := by
     rw [toUnit_unique (toUnit (K₁ ⊗ K₂)) (m ≫ toUnit K₃), ← _root_.one_mul (d * e)]
     exact (GlobalTheory.IwLevel.IsIsogDeg.of_isIso m).comp hK₃
-  have hpb : IsPullback (fst K₁ K₂) (snd K₁ K₂) (toUnit K₁) (toUnit K₂) :=
-    ⟨⟨toUnit_unique _ _⟩, ⟨PullbackCone.IsLimit.mk _ (fun c ↦ lift c.fst c.snd) (fun _ ↦ lift_fst _ _)
-      (fun _ ↦ lift_snd _ _) fun c m h₁ h₂ ↦ by ext <;> simp [h₁, h₂]⟩⟩
-  have hfst : GlobalTheory.IwLevel.IsIsogDeg (fst K₁ K₂) e := hK₂.of_isPullback (hpb.flip.map (Over.forget S))
+  have hpb : IsPullback (fst K₁ K₂) (snd K₁ K₂) (toUnit K₁) (toUnit K₂) := ⟨
+    ⟨toUnit_unique _ _⟩,
+    ⟨PullbackCone.IsLimit.mk _
+      (fun c ↦ lift c.fst c.snd)
+      (fun _ ↦ lift_fst _ _)
+      (fun _ ↦ lift_snd _ _)
+      fun c m h₁ h₂ ↦ by ext <;> simp [h₁, h₂]⟩
+  ⟩
+  have hfst : GlobalTheory.IwLevel.IsIsogDeg (fst K₁ K₂) e :=
+    hK₂.of_isPullback (hpb.flip.map (Over.forget S))
   have hcomp : fst K₁ K₂ ≫ toUnit K₁ = toUnit (K₁ ⊗ K₂) := toUnit_unique _ _
-  have := hfst.fin; have := hfst.flat; have := hfst.surj
-  have := hP.fin; have := hP.flat; have := hP.surj
+  have := hfst.fin
+  have := hfst.flat
+  have := hfst.surj
+  have := hP.fin
+  have := hP.flat
+  have := hP.surj
 
   obtain ⟨t, -⟩ := (h₂ K₁ (1 : K₁ ⟶ A)).2 fun b _ => by have := ρ.hom b; exact MonObj.one_comp _
   let s : K₁ ⟶ K₁ ⊗ K₂ := lift (𝟙 K₁) t
@@ -89,13 +111,15 @@ theorem isIsogDeg_of_coprime : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsC
   have : IsFinite s.left := IsFinite.of_comp s.left (fst K₁ K₂).left
   have hsu : s ≫ toUnit (K₁ ⊗ K₂) = toUnit K₁ := toUnit_unique _ _
   have hfin : IsFinite (toUnit K₁).left := by rw [← hsu, Over.comp_left]; infer_instance
-  have : Flat ((fst K₁ K₂).left ≫ (toUnit K₁).left) := by rw [← Over.comp_left, hcomp]; infer_instance
+  have : Flat ((fst K₁ K₂).left ≫ (toUnit K₁).left) := by
+    rw [← Over.comp_left, hcomp]; infer_instance
   have hflat : Flat (toUnit K₁).left := flat_of_comp_of_flat_of_surjective (fst K₁ K₂).left _
   have : Surjective ((fst K₁ K₂).left ≫ (toUnit K₁).left) := by
     rw [← Over.comp_left, hcomp]; infer_instance
   have hsurj : Surjective (toUnit K₁).left := Surjective.of_comp (fst K₁ K₂).left _
   refine ⟨hfin, hflat, hsurj, fun y => ?_⟩
-  have h := GlobalTheory.FinrankComp.finrank_comp_of_const (fst K₁ K₂).left (toUnit K₁).left e hfst.rank y
+  have h :=
+    GlobalTheory.FinrankComp.finrank_comp_of_const (fst K₁ K₂).left (toUnit K₁).left e hfst.rank y
   rw [← Over.comp_left, hcomp, hP.rank, mul_comm d e] at h
   exact (Nat.eq_of_mul_eq_mul_left he h).symm
 

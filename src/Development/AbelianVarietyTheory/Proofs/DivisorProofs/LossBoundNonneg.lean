@@ -14,7 +14,8 @@ noncomputable section
 
 namespace GlobalTheory.LossItemsCompare
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.HCEntries
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G
+  GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.HCEntries
 
 section Programme
 

@@ -31,10 +31,10 @@ private lemma hahnSeries_coeff_algebraMap_mul (c : Ω) (x : HahnSeries ℚ Ω) (
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.Quot.intC_const_mul {X : _root_.GlobalTheory.KZ.Tower Ω ε}
-    {V : ValuationSubring Ω} {c : Ω} (hc : c ∈ V) {f : X.K}
-    (hf : _root_.GlobalTheory.KZ.ES.IntC X V f) :
-    _root_.GlobalTheory.KZ.ES.IntC X V (algebraMap Ω X.K c * f) := by
+theorem _root_.GlobalTheory.KZ.ES.Quot.intC_const_mul
+    {X : _root_.GlobalTheory.KZ.Tower Ω ε} {V : ValuationSubring Ω} {c : Ω} (hc : c ∈ V)
+    {f : X.K} (hf : _root_.GlobalTheory.KZ.ES.IntC X V f)
+    : _root_.GlobalTheory.KZ.ES.IntC X V (algebraMap Ω X.K c * f) := by
   intro r
   rw [map_mul, AlgHom.commutes, hahnSeries_coeff_algebraMap_mul]
   exact V.mul_mem _ _ hc (hf r)
@@ -42,10 +42,10 @@ theorem _root_.GlobalTheory.KZ.ES.Quot.intC_const_mul {X : _root_.GlobalTheory.K
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.Quot.intC_add {X : _root_.GlobalTheory.KZ.Tower Ω ε}
-    {V : ValuationSubring Ω} {f g : X.K}
-    (hf : _root_.GlobalTheory.KZ.ES.IntC X V f) (hg : _root_.GlobalTheory.KZ.ES.IntC X V g) :
-    _root_.GlobalTheory.KZ.ES.IntC X V (f + g) := by
+theorem _root_.GlobalTheory.KZ.ES.Quot.intC_add
+    {X : _root_.GlobalTheory.KZ.Tower Ω ε} {V : ValuationSubring Ω} {f g : X.K}
+    (hf : _root_.GlobalTheory.KZ.ES.IntC X V f) (hg : _root_.GlobalTheory.KZ.ES.IntC X V g)
+    : _root_.GlobalTheory.KZ.ES.IntC X V (f + g) := by
   intro r
   rw [map_add (f := _), HahnSeries.coeff_add]
   exact V.add_mem _ _ (hf r) (hg r)
@@ -53,10 +53,10 @@ theorem _root_.GlobalTheory.KZ.ES.Quot.intC_add {X : _root_.GlobalTheory.KZ.Towe
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.Quot.intC_mul {X : _root_.GlobalTheory.KZ.Tower Ω ε}
-    {V : ValuationSubring Ω} {f g : X.K}
-    (hf : _root_.GlobalTheory.KZ.ES.IntC X V f) (hg : _root_.GlobalTheory.KZ.ES.IntC X V g) :
-    _root_.GlobalTheory.KZ.ES.IntC X V (f * g) := by
+theorem _root_.GlobalTheory.KZ.ES.Quot.intC_mul
+    {X : _root_.GlobalTheory.KZ.Tower Ω ε} {V : ValuationSubring Ω} {f g : X.K}
+    (hf : _root_.GlobalTheory.KZ.ES.IntC X V f) (hg : _root_.GlobalTheory.KZ.ES.IntC X V g)
+    : _root_.GlobalTheory.KZ.ES.IntC X V (f * g) := by
   intro r
   rw [map_mul, HahnSeries.coeff_mul]
   exact V.toSubring.sum_mem fun ij _ => V.mul_mem _ _ (hf _) (hg _)
@@ -64,8 +64,9 @@ theorem _root_.GlobalTheory.KZ.ES.Quot.intC_mul {X : _root_.GlobalTheory.KZ.Towe
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.Quot.intC_one {X : _root_.GlobalTheory.KZ.Tower Ω ε}
-    {V : ValuationSubring Ω} : _root_.GlobalTheory.KZ.ES.IntC X V 1 := by
+theorem _root_.GlobalTheory.KZ.ES.Quot.intC_one
+    {X : _root_.GlobalTheory.KZ.Tower Ω ε} {V : ValuationSubring Ω}
+    : _root_.GlobalTheory.KZ.ES.IntC X V 1 := by
   intro r
   rw [map_one, HahnSeries.coeff_one]
   split_ifs
@@ -404,11 +405,30 @@ private lemma exists_prim_mul_of_mem_bddRing {X : _root_.GlobalTheory.KZ.Tower �
       map_one]
   · rw [← mul_assoc, ← map_mul, mul_inv_cancel₀ hr0, map_one, one_mul]
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.Quot.quot_prim : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : _root_.GlobalTheory.KZ.Tower Ω ε), (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ _root_.GlobalTheory.KZ.Hs ∧ X.an X.jK = (φ : _root_.GlobalTheory.KZ.Mero)) → ∀ (l M₀ : ℕ), l.Prime → 0 < M₀ → ∃ S : Finset ℕ, ∀ q : ℕ, q.Prime → q ∉ S → ∀ V : ValuationSubring Ω, ((q : ℕ) : Ω) ∈ V.nonunits → ∀ (k : ℕ) (f : X.K), f ≠ 0 → _root_.GlobalTheory.KZ.ES.Lev X (M₀ * l ^ k) f → ∃ (M' : ℕ) (a b : X.K) (c : Ω), 0 < M' ∧ Nat.Coprime q M' ∧ M₀ * l ^ k ∣ M' ∧ _root_.GlobalTheory.KZ.ES.Lev X M' a ∧ _root_.GlobalTheory.KZ.ES.Lev X M' b ∧ _root_.GlobalTheory.KZ.ES.Prim X V a ∧ _root_.GlobalTheory.KZ.ES.Prim X V b ∧ c ≠ 0 ∧ f * b = algebraMap Ω X.K c * a := by
+theorem _root_.GlobalTheory.KZ.ES.Quot.quot_prim
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ)
+        (X : _root_.GlobalTheory.KZ.Tower Ω ε),
+      (∃ φ : ℂ → ℂ,
+          DifferentiableOn ℂ φ _root_.GlobalTheory.KZ.Hs
+            ∧ X.an X.jK = (φ : _root_.GlobalTheory.KZ.Mero))
+        → ∀ (l M₀ : ℕ),
+          l.Prime → 0 < M₀
+            → ∃ S : Finset ℕ, ∀ q : ℕ,
+              q.Prime → q ∉ S
+                → ∀ V : ValuationSubring Ω,
+                  ((q : ℕ) : Ω) ∈ V.nonunits
+                    → ∀ (k : ℕ) (f : X.K),
+                      f ≠ 0 → _root_.GlobalTheory.KZ.ES.Lev X (M₀ * l ^ k) f
+                        → ∃ (M' : ℕ) (a b : X.K) (c : Ω),
+                          0 < M' ∧ Nat.Coprime q M' ∧ M₀ * l ^ k ∣ M'
+                            ∧ _root_.GlobalTheory.KZ.ES.Lev X M' a
+                            ∧ _root_.GlobalTheory.KZ.ES.Lev X M' b
+                            ∧ _root_.GlobalTheory.KZ.ES.Prim X V a
+                            ∧ _root_.GlobalTheory.KZ.ES.Prim X V b ∧ c ≠ 0
+                            ∧ f * b = algebraMap Ω X.K c * a := by
   intro Ω _ _ _ ε X hj l M₀ hl hM₀
   obtain ⟨S, hS⟩ := exists_finset_lev_mem_closure_bddRing X hj hl hM₀
   refine ⟨S ∪ (2 * M₀ * l).primeFactors, fun q hq hqS V hqV k f hf0 hf => ?_⟩
@@ -431,13 +451,27 @@ theorem _root_.GlobalTheory.KZ.ES.Quot.quot_prim : ∀ {Ω : Type} [Field Ω] [A
     exact mul_ne_zero hf0 hz0
   obtain ⟨α, a, hα, ha, hpa, rfl⟩ := exists_prim_mul_of_mem_bddRing hq hqV hy hy0
   obtain ⟨β, b, hβ, hb, hpb, rfl⟩ := exists_prim_mul_of_mem_bddRing hq hqV hz hz0
-  refine ⟨(2 * M₀ * l) ^ (k + 2), a, b, β⁻¹ * α, by positivity, Nat.Coprime.pow_right _ hcop,
-    ?_, ha, hb, hpa, hpb, mul_ne_zero (inv_ne_zero hβ) hα, ?_⟩
+  refine ⟨
+    (2 * M₀ * l) ^ (k + 2),
+    a,
+    b,
+    β⁻¹ * α,
+    by positivity,
+    Nat.Coprime.pow_right _ hcop,
+    ?_,
+    ha,
+    hb,
+    hpa,
+    hpb,
+    mul_ne_zero (inv_ne_zero hβ) hα,
+    ?_
+  ⟩
   · rw [pow_add, mul_comm ((2 * M₀ * l) ^ k)]
     exact mul_dvd_mul (dvd_pow ⟨2 * l, by ring⟩ two_ne_zero)
       (pow_dvd_pow_of_dvd (dvd_mul_left l _) k)
-  · calc f * b = algebraMap Ω X.K β⁻¹ * (f * (algebraMap Ω X.K β * b)) := by
-          rw [mul_left_comm f, ← mul_assoc, ← map_mul, inv_mul_cancel₀ hβ, map_one, one_mul]
+  · calc
+      f * b = algebraMap Ω X.K β⁻¹ * (f * (algebraMap Ω X.K β * b)) := by
+        rw [mul_left_comm f, ← mul_assoc, ← map_mul, inv_mul_cancel₀ hβ, map_one, one_mul]
       _ = algebraMap Ω X.K (β⁻¹ * α) * a := by rw [hfz, map_mul, mul_assoc]
 
 end GlobalTheory.KZ.ES.Quot

@@ -13,21 +13,25 @@ open scoped Formalism.Per
 
 variable {l : ℕ} [Fact l.Prime]
 
-def toCompanionTheory {eB : Per.Bcris l ≃+* Per6.Bcris l} {eD : Per.BdR l ≃+* Per6.BdR l} {eP : Per.BdRp l ≃+* Per6.BdRp l}
-    (h : Compat l eB eD eP) {P : LocPrime l} {AI : LocAinf l P} (T : LocTied l P AI) : LocTied6 l P AI := by
-  refine
-    { eB := T.eB.trans eB
-      eD := T.eD.trans eD
-      zB := fun z => ?_
-      zD := fun z => ?_
-      om := fun x => ?_
-      actB := fun g b => ?_
-      actD := fun g b => ?_
-      frob := fun b => ?_
-      incl := ?_
-      fil := fun K a x => ?_
-      t := ?_
-      ιA := fun a => ?_ }
+def toCompanionTheory
+    {eB : Per.Bcris l ≃+* Per6.Bcris l} {eD : Per.BdR l ≃+* Per6.BdR l}
+    {eP : Per.BdRp l ≃+* Per6.BdRp l} (h : Compat l eB eD eP)
+    {P : LocPrime l} {AI : LocAinf l P} (T : LocTied l P AI)
+    : LocTied6 l P AI := by
+  refine {
+    eB := T.eB.trans eB
+    eD := T.eD.trans eD
+    zB := fun z => ?_
+    zD := fun z => ?_
+    om := fun x => ?_
+    actB := fun g b => ?_
+    actD := fun g b => ?_
+    frob := fun b => ?_
+    incl := ?_
+    fil := fun K a x => ?_
+    t := ?_
+    ιA := fun a => ?_
+  }
   · rw [RingEquiv.trans_apply, T.zB z, h.zB z]
   · rw [RingEquiv.trans_apply, T.zD z, h.zD z]
   · obtain ⟨y, hy, hθ⟩ := T.om x
@@ -45,8 +49,8 @@ def toCompanionTheory {eB : Per.Bcris l ≃+* Per6.Bcris l} {eD : Per.BdR l ≃+
     exact ⟨eP y, (h.log AI y).1 hy, by rw [RingEquiv.trans_apply, he, h.alg y]⟩
   · rw [RingEquiv.trans_apply, T.ιA a, h.aB a]
 
-theorem locTied6_of_cmp (hC : Cmp l) (P : LocPrime l) (AI : LocAinf l P) :
-    Nonempty (LocTied l P AI) → Nonempty (LocTied6 l P AI) := by
+theorem locTied6_of_cmp (hC : Cmp l) (P : LocPrime l) (AI : LocAinf l P)
+    : Nonempty (LocTied l P AI) → Nonempty (LocTied6 l P AI) := by
   rintro ⟨T⟩
   obtain ⟨eB, eD, eP, h⟩ := hC
   exact ⟨toCompanionTheory h T⟩

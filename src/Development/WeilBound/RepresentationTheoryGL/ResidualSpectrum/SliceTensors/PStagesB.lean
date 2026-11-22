@@ -8,7 +8,8 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.ResidualSp
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Formalism.L2.Host
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin
 
 namespace PositivityTheory.Rg.Rs.InductionInStages
 
@@ -30,8 +31,10 @@ theorem eq_absC {ν : HChar E} {x : ℝ} (h : ν.IsAbsPow x) : ν = Model.absC E
   PositivityTheory.RSHS.ProjectionSandwichLength.eq_of_isAbsPow h (isAbsPow_absC x)
 
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem chiDet_leviEmb {c N : ℕ} {n : Fin c → ℕ} (h : ∑ i, n i = N) (χ : HChar E) (m : ∀ i, GA E (n i)) :
-    ((chiDet N χ (leviEmb (Ad E) (stdBlocks n h) m) : ℂˣ) : ℂ) = ∏ i, ((chiDet (n i) χ (m i) : ℂˣ) : ℂ) := by
+theorem chiDet_leviEmb
+    {c N : ℕ} {n : Fin c → ℕ} (h : ∑ i, n i = N) (χ : HChar E) (m : ∀ i, GA E (n i))
+    : ((chiDet N χ (leviEmb (Ad E) (stdBlocks n h) m) : ℂˣ) : ℂ)
+      = ∏ i, ((chiDet (n i) χ (m i) : ℂˣ) : ℂ) := by
   classical
   have hp : leviEmb (Ad E) (stdBlocks n h) m ∈ parab (Ad E) (stdBlocks n h) := by
     apply mem_parab_iff.2
@@ -47,13 +50,17 @@ theorem chiDet_leviEmb {c N : ℕ} {n : Fin c → ℕ} (h : ∑ i, n i = N) (χ 
   rw [hd, map_prod, Units.coe_prod]
   rfl
 
-theorem tensorForms_mulChi {c : ℕ} {n : Fin c → ℕ} (π : ∀ i, CuspSub E (n i)) (χ : HChar E)
-    {G : (∀ i, GA E (n i)) → ℂ} (hG : G ∈ tensorForms π) :
-    (fun m => G m * ∏ i, ((chiDet (n i) χ (m i) : ℂˣ) : ℂ)) ∈ tensorForms (fun i => (π i).twist χ) := by
+theorem tensorForms_mulChi
+    {c : ℕ} {n : Fin c → ℕ} (π : ∀ i, CuspSub E (n i))
+    (χ : HChar E)
+    {G : (∀ i, GA E (n i)) → ℂ} (hG : G ∈ tensorForms π)
+    : (fun m => G m * ∏ i, ((chiDet (n i) χ (m i) : ℂˣ) : ℂ))
+      ∈ tensorForms (fun i => (π i).twist χ) := by
   induction hG using Submodule.span_induction with
   | mem F hF =>
     obtain ⟨φ, rfl⟩ := hF
-    refine Submodule.subset_span ⟨fun i => ⟨mulChi (n i) χ (φ i).1, ⟨(φ i).1, (φ i).2, rfl⟩⟩, funext fun m => ?_⟩
+    refine Submodule.subset_span
+      ⟨fun i => ⟨mulChi (n i) χ (φ i).1, ⟨(φ i).1, (φ i).2, rfl⟩⟩, funext fun m => ?_⟩
     simp only [mulChi_apply, Finset.prod_mul_distrib]
   | zero =>
     convert zero_mem (tensorForms fun i => (π i).twist χ) using 1 <;> funext m <;> simp
@@ -66,18 +73,22 @@ theorem tensorForms_mulChi {c : ℕ} {n : Fin c → ℕ} (π : ∀ i, CuspSub E 
     funext m
     simp [mul_assoc]
 
-theorem tensorForms_append {d₁ d₂ a : ℕ} (π : Fin (d₁ + d₂) → CuspSub E a) {G₁ : (Fin d₁ → GA E a) → ℂ}
-    {G₂ : (Fin d₂ → GA E a) → ℂ} (h₁ : G₁ ∈ tensorForms (n := fun _ => a) (fun b => π (Fin.castAdd d₂ b)))
-    (h₂ : G₂ ∈ tensorForms (n := fun _ => a) (fun b => π (Fin.natAdd d₁ b))) :
-    (fun m : Fin (d₁ + d₂) → GA E a => G₁ (fun b => m (Fin.castAdd d₂ b)) * G₂ (fun b => m (Fin.natAdd d₁ b))) ∈
-      tensorForms (n := fun _ => a) π := by
+theorem tensorForms_append
+    {d₁ d₂ a : ℕ} (π : Fin (d₁ + d₂) → CuspSub E a)
+    {G₁ : (Fin d₁ → GA E a) → ℂ} {G₂ : (Fin d₂ → GA E a) → ℂ}
+    (h₁ : G₁ ∈ tensorForms (n := fun _ => a) (fun b => π (Fin.castAdd d₂ b)))
+    (h₂ : G₂ ∈ tensorForms (n := fun _ => a) (fun b => π (Fin.natAdd d₁ b)))
+    : (fun m : Fin (d₁ + d₂) → GA E a =>
+        G₁ (fun b => m (Fin.castAdd d₂ b)) * G₂ (fun b => m (Fin.natAdd d₁ b)))
+      ∈ tensorForms (n := fun _ => a) π := by
   induction h₁ using Submodule.span_induction with
   | mem F hF =>
     obtain ⟨φ₁, rfl⟩ := hF
     induction h₂ using Submodule.span_induction with
     | mem F hF =>
       obtain ⟨φ₂, rfl⟩ := hF
-      refine Submodule.subset_span ⟨Fin.addCases (motive := fun i => ↥(π i).V) φ₁ φ₂, funext fun m => ?_⟩
+      refine Submodule.subset_span
+        ⟨Fin.addCases (motive := fun i => ↥(π i).V) φ₁ φ₂, funext fun m => ?_⟩
       simp only [Fin.prod_univ_add, Fin.addCases_left, Fin.addCases_right]
     | zero =>
       convert zero_mem (tensorForms (n := fun _ => a) π) using 1 <;> funext m <;> simp

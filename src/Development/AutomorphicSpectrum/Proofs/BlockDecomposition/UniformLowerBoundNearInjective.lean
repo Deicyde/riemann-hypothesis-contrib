@@ -10,14 +10,13 @@ open scoped ENNReal NNReal Topology
 namespace GlobalTheory.CompanionTheory.RealCoordinates
 
 theorem eventually_lower_bound_of_tendsto_injective
-    (X P : Type) [AddCommGroup X] [TopologicalSpace X] [TopologicalSpace P] (N : ℕ)
-    (e : X ≃+ (Fin N → ℝ)) (he : Continuous e) (hes : Continuous e.symm) (c : P)
-    (A : P → X →+ X) (hA : ∀ s, Continuous (A s))
+    (X P : Type) [AddCommGroup X] [TopologicalSpace X] [TopologicalSpace P]
+    (N : ℕ) (e : X ≃+ (Fin N → ℝ)) (he : Continuous e) (hes : Continuous e.symm)
+    (c : P) (A : P → X →+ X) (hA : ∀ s, Continuous (A s))
     (hlim : ∀ x, Filter.Tendsto (fun s => A s x) (nhds c) (nhds (A c x)))
-    (hinj : Function.Injective (A c)) :
-    ∃ δ : ℝ, 0 < δ ∧ ∀ᶠ s in nhds c, ∀ x, δ * ‖e x‖ ≤ ‖e (A s x)‖ := by
+    (hinj : Function.Injective (A c))
+    : ∃ δ : ℝ, 0 < δ ∧ ∀ᶠ s in nhds c, ∀ x, δ * ‖e x‖ ≤ ‖e (A s x)‖ := by
   classical
-
   let f : P → (Fin N → ℝ) →+ (Fin N → ℝ) := fun s =>
     e.toAddMonoidHom.comp ((A s).comp e.symm.toAddMonoidHom)
   have hf : ∀ s, Continuous (f s) := fun s => he.comp ((hA s).comp hes)
@@ -32,8 +31,8 @@ theorem eventually_lower_bound_of_tendsto_injective
       simpa [L, f] using h
     simpa using congrArg e (hinj h')
 
-  obtain ⟨K, hK, hKL⟩ := (L c : (Fin N → ℝ) →ₗ[ℝ] (Fin N → ℝ)).exists_antilipschitzWith
-    (LinearMap.ker_eq_bot.mpr hLc)
+  obtain ⟨K, hK, hKL⟩ :=
+    (L c : (Fin N → ℝ) →ₗ[ℝ] (Fin N → ℝ)).exists_antilipschitzWith (LinearMap.ker_eq_bot.mpr hLc)
   have hKpos : (0 : ℝ) < K := hK
   set δ : ℝ := 1 / (2 * K) with hδ
   have hδpos : 0 < δ := by positivity
@@ -69,20 +68,23 @@ theorem eventually_lower_bound_of_tendsto_injective
         simp only [map_sum, map_smul, smul_sub, Finset.sum_sub_distrib]
       rfl
     rw [hy]
-    calc ‖∑ i, (e x) i • (L s (b i) - L c (b i))‖
+    calc
+      ‖∑ i, (e x) i • (L s (b i) - L c (b i))‖
         ≤ ∑ i, ‖(e x) i • (L s (b i) - L c (b i))‖ := norm_sum_le _ _
       _ ≤ ∑ _i : Fin N, ‖e x‖ * ε := by
-          apply Finset.sum_le_sum
-          intro i _
-          rw [norm_smul]
-          exact mul_le_mul (norm_le_pi_norm (e x) i) (hs i).le (norm_nonneg _) (norm_nonneg _)
+        apply Finset.sum_le_sum
+        intro i _
+        rw [norm_smul]
+        exact mul_le_mul (norm_le_pi_norm (e x) i) (hs i).le (norm_nonneg _) (norm_nonneg _)
       _ = (N : ℝ) * ε * ‖e x‖ := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-          ring
+        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+        ring
       _ ≤ δ * ‖e x‖ := mul_le_mul_of_nonneg_right hNε (norm_nonneg _)
   have hc := hlow (e x)
   have htri : ‖L c (e x)‖ ≤ ‖L s (e x)‖ + ‖L s (e x) - L c (e x)‖ := by
-    calc ‖L c (e x)‖ = ‖L s (e x) - (L s (e x) - L c (e x))‖ := by rw [sub_sub_cancel]
+    calc
+      ‖L c (e x)‖
+        = ‖L s (e x) - (L s (e x) - L c (e x))‖ := by rw [sub_sub_cancel]
       _ ≤ ‖L s (e x)‖ + ‖L s (e x) - L c (e x)‖ := norm_sub_le _ _
   nlinarith [norm_nonneg (e x)]
 

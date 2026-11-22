@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-private theorem pq_iff (l : ℕ) (G : Type) [Group G] (N : Subgroup G) [N.Normal] :
-    IsPGroup l (G ⧸ N) ↔ ∀ g : G, ∃ k : ℕ, g ^ l ^ k ∈ N := by
+private theorem pq_iff (l : ℕ) (G : Type) [Group G] (N : Subgroup G) [N.Normal]
+    : IsPGroup l (G ⧸ N) ↔ ∀ g : G, ∃ k : ℕ, g ^ l ^ k ∈ N := by
   refine ⟨fun h g => ?_, fun h x => ?_⟩
   · obtain ⟨k, hk⟩ := h (g : G ⧸ N)
     exact ⟨k, by rwa [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at hk⟩
@@ -17,14 +17,19 @@ private theorem pq_iff (l : ℕ) (G : Type) [Group G] (N : Subgroup G) [N.Normal
     obtain ⟨k, hk⟩ := h g
     exact ⟨k, by rwa [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]⟩
 
-private theorem res_map (l : ℕ) (G : Type) [Group G] [TopologicalSpace G] (f : G →* G)
-    (hf : Continuous f) {x : G} (hx : x ∈ proLRes l G) : f x ∈ proLRes l G := by
+private theorem res_map
+    (l : ℕ)
+    (G : Type) [Group G] [TopologicalSpace G]
+    (f : G →* G) (hf : Continuous f)
+    {x : G} (hx : x ∈ proLRes l G)
+    : f x ∈ proLRes l G := by
   rw [mem_proLRes] at hx ⊢
   intro N hN
-  let M : OpenNormalSubgroup G :=
-    { toSubgroup := (N.toOpenSubgroup : Subgroup G).comap f
-      isOpen' := N.toOpenSubgroup.isOpen.preimage hf
-      isNormal' := Subgroup.Normal.comap inferInstance f }
+  let M : OpenNormalSubgroup G := {
+    toSubgroup := (N.toOpenSubgroup : Subgroup G).comap f
+    isOpen' := N.toOpenSubgroup.isOpen.preimage hf
+    isNormal' := Subgroup.Normal.comap inferInstance f
+  }
   have hM : IsPGroup l (G ⧸ (M.toOpenSubgroup : Subgroup G)) := by
     rw [pq_iff] at hN ⊢
     intro g
@@ -33,9 +38,12 @@ private theorem res_map (l : ℕ) (G : Type) [Group G] [TopologicalSpace G] (f :
   have := hx M hM
   simpa [M] using this
 
-private theorem res_pow (l : ℕ) (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [CompactSpace G] (K : Subgroup G) (hK : IsOpen (K : Set G)) (h : proLRes l G ≤ K) (g : G) :
-    ∃ k : ℕ, g ^ l ^ k ∈ K := by
+private theorem res_pow
+    (l : ℕ)
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    (K : Subgroup G) (hK : IsOpen (K : Set G)) (h : proLRes l G ≤ K)
+    (g : G)
+    : ∃ k : ℕ, g ^ l ^ k ∈ K := by
   classical
   let ι := {N : OpenNormalSubgroup G // IsPGroup l (G ⧸ (N.toOpenSubgroup : Subgroup G))}
   let t : ι → Set G := fun i => ((i.1.toOpenSubgroup : Subgroup G) : Set G)
@@ -65,10 +73,13 @@ private theorem res_pow (l : ℕ) (G : Type) [Group G] [TopologicalSpace G] [IsT
   rw [heq, pow_mul]
   exact Subgroup.pow_mem _ (hkf i) _
 
-theorem UpperTheory.V.AlgebraTools.proLResOf_normal :
-    ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] (H : Subgroup G) [H.Normal], IsClosed (H : Set G) →
-      (proLResOf l H).Normal ∧ IsClosed (proLResOf l H : Set G) ∧ proLResOf l H ≤ H ∧
-      ∀ (O : OpenNormalSubgroup G), proLResOf l H ≤ O.toSubgroup → ∀ h ∈ H, ∃ k : ℕ, h ^ l ^ k ∈ O.toSubgroup := by
+theorem UpperTheory.V.AlgebraTools.proLResOf_normal
+    : ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [CompactSpace G] [TotallyDisconnectedSpace G] (H : Subgroup G) [H.Normal],
+      IsClosed (H : Set G)
+        → (proLResOf l H).Normal ∧ IsClosed (proLResOf l H : Set G) ∧ proLResOf l H ≤ H
+          ∧ ∀ (O : OpenNormalSubgroup G),
+            proLResOf l H ≤ O.toSubgroup → ∀ h ∈ H, ∃ k : ℕ, h ^ l ^ k ∈ O.toSubgroup := by
   intro l _ G _ _ _ _ _ H _ hH
   have : CompactSpace H := isCompact_iff_compactSpace.mp hH.isCompact
   refine ⟨?_, ?_, ?_, ?_⟩

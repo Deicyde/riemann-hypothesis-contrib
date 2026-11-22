@@ -22,16 +22,16 @@ variable {R : Type*} [CommRing R]
 def scaleCoeffs (W : WeierstrassCurve R) (a : R) : WeierstrassCurve R :=
   ⟨a * W.a₁, a ^ 2 * W.a₂, a ^ 3 * W.a₃, a ^ 4 * W.a₄, a ^ 6 * W.a₆⟩
 
-theorem map_scaleCoeffs {S : Type*} [CommRing S] (f : R →+* S) (W : WeierstrassCurve R) (a : R) :
-    (scaleCoeffs W a).map f = scaleCoeffs (W.map f) (f a) := by
+theorem map_scaleCoeffs {S : Type*} [CommRing S] (f : R →+* S) (W : WeierstrassCurve R) (a : R)
+    : (scaleCoeffs W a).map f = scaleCoeffs (W.map f) (f a) := by
   ext <;> simp [scaleCoeffs]
 
-def scaleVariableChange {F : Type*} [Field F] {c : F} (hc : c ≠ 0) :
-    WeierstrassCurve.VariableChange F :=
+def scaleVariableChange {F : Type*} [Field F] {c : F} (hc : c ≠ 0)
+    : WeierstrassCurve.VariableChange F :=
   ⟨(Units.mk0 c hc)⁻¹, 0, 0, 0⟩
 
-theorem scaleVariableChange_smul {F : Type*} [Field F] (W : WeierstrassCurve F) {c : F}
-    (hc : c ≠ 0) : scaleVariableChange hc • W = scaleCoeffs W c := by
+theorem scaleVariableChange_smul {F : Type*} [Field F] (W : WeierstrassCurve F) {c : F} (hc : c ≠ 0)
+    : scaleVariableChange hc • W = scaleCoeffs W c := by
   ext <;> simp [scaleVariableChange, scaleCoeffs, WeierstrassCurve.variableChange_a₁,
     WeierstrassCurve.variableChange_a₂, WeierstrassCurve.variableChange_a₃,
     WeierstrassCurve.variableChange_a₄, WeierstrassCurve.variableChange_a₆]
@@ -40,20 +40,22 @@ end Scale
 
 section Torsion
 
-variable {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
-  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] (W : WeierstrassCurve 𝒪)
+variable
+  {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
+  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
+  (W : WeierstrassCurve 𝒪)
   [(W.map (algebraMap 𝒪 K)).IsElliptic] [DecidableEq K] [DecidableEq (ResidueField 𝒪)]
 
 local notation "ι" => algebraMap 𝒪 K
 local notation "ρ" => residue 𝒪
 
-theorem nsmul_ne_zero_of_notMem_range {n : ℕ} (hn : (n : ResidueField 𝒪) ≠ 0) {X Y : K}
-    (h : (curveK K W).Nonsingular X Y) (hX : X ∉ Set.range ι) :
-    n • WeierstrassCurve.Affine.Point.some _ _ h ≠ 0 := by
+theorem nsmul_ne_zero_of_notMem_range
+    {n : ℕ} (hn : (n : ResidueField 𝒪) ≠ 0)
+    {X Y : K} (h : (curveK K W).Nonsingular X Y) (hX : X ∉ Set.range ι)
+    : n • WeierstrassCurve.Affine.Point.some _ _ h ≠ 0 := by
   intro hnP
   have hι := IsFractionRing.injective 𝒪 K
-  obtain ⟨z, w, v, hzm, hz0, -, -, hwv, hvu, hρv, hXz, hYw⟩ :=
-    exists_zw_of_notMem_range K W h.1 hX
+  obtain ⟨z, w, v, hzm, hz0, -, -, hwv, hvu, hρv, hXz, hYw⟩ := exists_zw_of_notMem_range K W h.1 hX
   have hzK : ι z ≠ 0 := (map_ne_zero_iff _ hι).2 hz0
   set W' := scaleCoeffs W z with hW'
   have hC : scaleVariableChange hzK • W.map ι = W'.map ι := by
@@ -84,7 +86,7 @@ theorem nsmul_ne_zero_of_notMem_range {n : ℕ} (hn : (n : ResidueField 𝒪) �
 
   have hρz : ρ z = 0 := residue_eq_zero_of_mem hzm
   have h1 : (W'.map ρ).a₁ = -2 * 0 := by simp [hW', scaleCoeffs, hρz]
-  have h2 : (W'.map ρ).a₂ = -0 ^ 2 := by simp [hW', scaleCoeffs, hρz]
+  have h2 : (W'.map ρ).a₂ = - 0 ^ 2 := by simp [hW', scaleCoeffs, hρz]
   have h3 : (W'.map ρ).a₃ = 0 := by simp [hW', scaleCoeffs, hρz]
   have h4 : (W'.map ρ).a₄ = 0 := by simp [hW', scaleCoeffs, hρz]
   have h6 : (W'.map ρ).a₆ = 0 := by simp [hW', scaleCoeffs, hρz]
@@ -118,25 +120,28 @@ end Torsion
 
 section Good
 
-variable {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
-  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] (W : WeierstrassCurve 𝒪)
-  [W.IsElliptic] [DecidableEq K] [DecidableEq (ResidueField 𝒪)]
+variable
+  {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
+  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
+  (W : WeierstrassCurve 𝒪) [W.IsElliptic] [DecidableEq K] [DecidableEq (ResidueField 𝒪)]
 
-theorem eq_zero_of_nsmul_eq_zero_of_reducePoint_eq_zero {n : ℕ}
-    (hn : (n : ResidueField 𝒪) ≠ 0) {P : (curveK K W).Point} (hnP : n • P = 0)
-    (hP : reducePoint K W P = 0) : P = 0 := by
+theorem eq_zero_of_nsmul_eq_zero_of_reducePoint_eq_zero
+    {n : ℕ} (hn : (n : ResidueField 𝒪) ≠ 0)
+    {P : (curveK K W).Point} (hnP : n • P = 0) (hP : reducePoint K W P = 0)
+    : P = 0 := by
   rcases point_cases K W P with rfl | ⟨X, Y, h, rfl, hX⟩ | ⟨x, y, h, rfl⟩
   · rfl
   · exact absurd hnP (nsmul_ne_zero_of_notMem_range K W hn h hX)
   · rw [reducePoint_some_integral K W h (nonsingular_residue_of_isElliptic K W h.1)] at hP
     exact absurd hP (WeierstrassCurve.Affine.Point.some_ne_zero _)
 
-theorem eq_of_reductionHom_eq_of_nsmul {n : ℕ} (hn : (n : ResidueField 𝒪) ≠ 0)
-    {P Q : (curveK K W).Point} (hP : n • P = 0) (hQ : n • Q = 0)
-    (h : reductionHom K W P = reductionHom K W Q) : P = Q :=
+theorem eq_of_reductionHom_eq_of_nsmul
+    {n : ℕ} (hn : (n : ResidueField 𝒪) ≠ 0)
+    {P Q : (curveK K W).Point}
+    (hP : n • P = 0) (hQ : n • Q = 0) (h : reductionHom K W P = reductionHom K W Q)
+    : P = Q :=
   sub_eq_zero.1 (eq_zero_of_nsmul_eq_zero_of_reducePoint_eq_zero K W hn
-    (by rw [nsmul_sub, hP, hQ, sub_zero])
-    (by rw [← reductionHom_apply, map_sub, h, sub_self]))
+    (by rw [nsmul_sub, hP, hQ, sub_zero]) (by rw [← reductionHom_apply, map_sub, h, sub_self]))
 
 end Good
 
@@ -144,8 +149,10 @@ section Localization
 
 open IsDedekindDomain
 
-variable {R : Type*} [CommRing R] [IsDedekindDomain R] {F : Type*} [Field F] [Algebra R F]
-  [IsFractionRing R F] (v : HeightOneSpectrum R)
+variable
+  {R : Type*} [CommRing R] [IsDedekindDomain R]
+  {F : Type*} [Field F] [Algebra R F] [IsFractionRing R F]
+  (v : HeightOneSpectrum R)
 
 end Localization
 
@@ -153,9 +160,10 @@ section NumberField
 
 open NumberField IsDedekindDomain
 
-variable {F : Type*} [Field F] [NumberField F] (𝔮 : HeightOneSpectrum (𝓞 F))
-  (W : WeierstrassCurve (𝔮.valuationSubringAtPrime F)) [W.IsElliptic] [DecidableEq F]
-  [DecidableEq (ResidueField (𝔮.valuationSubringAtPrime F))]
+variable
+  {F : Type*} [Field F] [NumberField F]
+  (𝔮 : HeightOneSpectrum (𝓞 F)) (W : WeierstrassCurve (𝔮.valuationSubringAtPrime F))
+  [W.IsElliptic] [DecidableEq F] [DecidableEq (ResidueField (𝔮.valuationSubringAtPrime F))]
 
 end NumberField
 

@@ -17,8 +17,8 @@ section Helpers
 
 variable {D : ℕ}
 
-theorem fderiv_cplx (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
-    fderiv ℝ (cplx v) z = Complex.ofRealCLM.comp (fderiv ℝ v z) := by
+theorem fderiv_cplx (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : fderiv ℝ (cplx v) z = Complex.ofRealCLM.comp (fderiv ℝ v z) := by
   by_cases h : DifferentiableAt ℝ v z
   · exact (Complex.ofRealCLM.hasFDerivAt.comp z h.hasFDerivAt).fderiv
   · have h' : ¬ DifferentiableAt ℝ (cplx v) z := by
@@ -30,28 +30,32 @@ theorem fderiv_cplx (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
     rw [fderiv_zero_of_not_differentiableAt h, fderiv_zero_of_not_differentiableAt h']
     simp
 
-theorem dz_cplx (j : Fin D) (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
-    dz j (cplx v) z = ((fderiv ℝ v z (Pi.single j 1) : ℂ) -
-      Complex.I * (fderiv ℝ v z (Complex.I • Pi.single j 1) : ℂ)) / 2 := by
+theorem dz_cplx (j : Fin D) (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : dz j (cplx v) z
+      = ((fderiv ℝ v z (Pi.single j 1) : ℂ)
+          - Complex.I * (fderiv ℝ v z (Complex.I • Pi.single j 1) : ℂ))
+        / 2 := by
   simp only [dz, fderiv_cplx, ContinuousLinearMap.comp_apply, Complex.ofRealCLM_apply]
 
-theorem dzb_cplx (j : Fin D) (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
-    dzb j (cplx v) z = ((fderiv ℝ v z (Pi.single j 1) : ℂ) +
-      Complex.I * (fderiv ℝ v z (Complex.I • Pi.single j 1) : ℂ)) / 2 := by
+theorem dzb_cplx (j : Fin D) (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : dzb j (cplx v) z
+      = ((fderiv ℝ v z (Pi.single j 1) : ℂ)
+          + Complex.I * (fderiv ℝ v z (Complex.I • Pi.single j 1) : ℂ))
+        / 2 := by
   simp only [dzb, fderiv_cplx, ContinuousLinearMap.comp_apply, Complex.ofRealCLM_apply]
 
-theorem dzb_cplx_eq_star (j : Fin D) (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
-    dzb j (cplx v) z = star (dz j (cplx v) z) := by
+theorem dzb_cplx_eq_star (j : Fin D) (v : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : dzb j (cplx v) z = star (dz j (cplx v) z) := by
   rw [dz_cplx, dzb_cplx]
   apply Complex.ext <;> simp
 
-theorem gradMat_eq_vecMulVec (v w : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
-    gradMat v w z = vecMulVec (fun j => dz j (cplx v) z) (star fun k => dz k (cplx w) z) := by
+theorem gradMat_eq_vecMulVec (v w : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : gradMat v w z = vecMulVec (fun j => dz j (cplx v) z) (star fun k => dz k (cplx w) z) := by
   ext j k
   simp [gradMat, vecMulVec_apply, dzb_cplx_eq_star]
 
-theorem gradMat_swap (v w : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
-    gradMat w v z = (gradMat v w z)ᴴ := by
+theorem gradMat_swap (v w : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : gradMat w v z = (gradMat v w z)ᴴ := by
   rw [gradMat_eq_vecMulVec, gradMat_eq_vecMulVec, conjTranspose_vecMulVec, star_star]
 
 end Helpers
@@ -60,14 +64,14 @@ section Levi
 
 variable {e : ℕ}
 
-theorem leviC_add_snd (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] ℝ) (a b b' : Fin e → ℂ) :
-    leviC H a (b + b') = leviC H a b + leviC H a b' := by
+theorem leviC_add_snd (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] ℝ) (a b b' : Fin e → ℂ)
+    : leviC H a (b + b') = leviC H a b + leviC H a b' := by
   simp only [leviC, smul_add, map_add (f := _)]
   push_cast
   ring
 
-theorem leviC_smul_snd (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] ℝ) (c : ℂ) (a b : Fin e → ℂ) :
-    leviC H a (c • b) = star c * leviC H a b := by
+theorem leviC_smul_snd (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] ℝ) (c : ℂ) (a b : Fin e → ℂ)
+    : leviC H a (c • b) = star c * leviC H a b := by
   have h1 : c • b = c.re • b + c.im • (Complex.I • b) := by
     ext k
     simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Complex.real_smul]
@@ -83,8 +87,8 @@ theorem leviC_smul_snd (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] 
   simp only [map_add (f := _), map_sub, map_smul, smul_eq_mul]
   apply Complex.ext <;> simp <;> ring
 
-theorem sum_leviC_mul (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] ℝ) (a x : Fin e → ℂ) :
-    ∑ j, leviC H a (Pi.single j 1) * x j = leviC H a (star x) := by
+theorem sum_leviC_mul (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] ℝ) (a x : Fin e → ℂ)
+    : ∑ j, leviC H a (Pi.single j 1) * x j = leviC H a (star x) := by
   have hx : star x = ∑ j, star (x j) • (Pi.single j 1 : Fin e → ℂ) := by
     conv_lhs => rw [← Finset.univ_sum_single (star x)]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -101,20 +105,21 @@ theorem sum_leviC_mul (H : (Fin e → ℂ) →L[ℝ] (Fin e → ℂ) →L[ℝ] �
   simp only [ℓ, AddMonoidHom.mk'_apply, leviC_smul_snd, star_star]
   ring
 
-theorem hessC_isHermitian_of_symm (φ : (Fin e → ℂ) → ℝ) (z : Fin e → ℂ)
-    (h : IsSymmSndFDerivAt ℝ φ z) : (hessC φ z).IsHermitian := by
+theorem hessC_isHermitian_of_symm
+    (φ : (Fin e → ℂ) → ℝ) (z : Fin e → ℂ) (h : IsSymmSndFDerivAt ℝ φ z)
+    : (hessC φ z).IsHermitian := by
   ext i j
   simp only [conjTranspose_apply, hessC_eq_leviC, leviC]
   rw [h (Pi.single j 1) (Pi.single i 1), h (Complex.I • Pi.single j 1) (Complex.I • Pi.single i 1),
     h (Pi.single j 1) (Complex.I • Pi.single i 1), h (Complex.I • Pi.single j 1) (Pi.single i 1)]
   apply Complex.ext <;> simp
 
-theorem hessC_posSemidef_of_levi (φ : (Fin e → ℂ) → ℝ) (z : Fin e → ℂ) (h2 : ContDiffAt ℝ 2 φ z)
-    (hl : ∀ ξ, 0 ≤ levi φ z ξ) : (hessC φ z).PosSemidef := by
+theorem hessC_posSemidef_of_levi
+    (φ : (Fin e → ℂ) → ℝ) (z : Fin e → ℂ) (h2 : ContDiffAt ℝ 2 φ z) (hl : ∀ ξ, 0 ≤ levi φ z ξ)
+    : (hessC φ z).PosSemidef := by
   have hs : IsSymmSndFDerivAt ℝ φ z := h2.isSymmSndFDerivAt (by simp)
   refine PosSemidef.of_dotProduct_mulVec_nonneg (hessC_isHermitian_of_symm φ z hs) fun x => ?_
-  have key : star x ⬝ᵥ (hessC φ z *ᵥ x) =
-      leviC (fderiv ℝ (fderiv ℝ φ) z) (star x) (star x) := by
+  have key : star x ⬝ᵥ (hessC φ z *ᵥ x) = leviC (fderiv ℝ (fderiv ℝ φ) z) (star x) (star x) := by
     simp only [dotProduct, mulVec, hessC_eq_leviC, sum_leviC_mul]
     exact sum_mul_leviC _ (star x) (star x)
   rw [key, Complex.nonneg_iff]
@@ -131,12 +136,14 @@ section MatrixLemmas
 
 variable {n : ℕ}
 
-theorem re_mdisc_cons_conjTranspose (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
-    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (hB : ∀ i, (B i).IsHermitian) :
-    (mdisc (Fin.cons Aᴴ B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re =
-      (mdisc (Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re := by
-  have h : (Fin.cons Aᴴ B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) =
-      fun k => ((Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) k)ᴴ := by
+theorem re_mdisc_cons_conjTranspose
+    (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (hB : ∀ i, (B i).IsHermitian)
+    : (mdisc (Fin.cons Aᴴ B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re
+      = (mdisc (Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re := by
+  have h
+      : (Fin.cons Aᴴ B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+        = fun k => ((Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) k)ᴴ := by
     funext k
     refine Fin.cases ?_ (fun i => ?_) k
     · simp
@@ -144,11 +151,12 @@ theorem re_mdisc_cons_conjTranspose (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
   rw [h, ← star_mdisc]
   simp
 
-theorem mdisc_cons_smul_add (c c' : ℂ) (A A' : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
-    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) :
-    mdisc (Fin.cons (c • A + c' • A') B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) =
-      c * mdisc (Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) +
-        c' * mdisc (Fin.cons A' B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) := by
+theorem mdisc_cons_smul_add
+    (c c' : ℂ) (A A' : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+    : mdisc (Fin.cons (c • A + c' • A') B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+      = c * mdisc (Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+        + c' * mdisc (Fin.cons A' B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) := by
   rw [mdisc_cons_eq_sum, mdisc_cons_eq_sum, mdisc_cons_eq_sum, Finset.mul_sum, Finset.mul_sum,
     ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -157,30 +165,39 @@ theorem mdisc_cons_smul_add (c c' : ℂ) (A A' : Matrix (Fin (n + 1)) (Fin (n + 
   simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
   ring
 
-theorem mdisc_cons_smul_fst (c : ℂ) (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
-    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) :
-    mdisc (Fin.cons (c • A) B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) =
-      c * mdisc (Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) := by
+theorem mdisc_cons_smul_fst
+    (c : ℂ) (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+    : mdisc (Fin.cons (c • A) B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+      = c * mdisc (Fin.cons A B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) := by
   have := mdisc_cons_smul_add c 0 A A B
   simpa using this
 
-theorem re_mdisc_cons_vecMulVec_nonneg (a : Fin (n + 1) → ℂ)
-    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (hB : ∀ i, (B i).PosSemidef) :
-    0 ≤ (mdisc (Fin.cons (vecMulVec a (star a)) B :
-      Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re := by
+theorem re_mdisc_cons_vecMulVec_nonneg
+    (a : Fin (n + 1) → ℂ)
+    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (hB : ∀ i, (B i).PosSemidef)
+    : 0
+      ≤ (mdisc
+        (Fin.cons (vecMulVec a (star a)) B
+          : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re := by
   refine (mdisc_nonneg_of_posSemidef _ fun k => ?_).2
   refine Fin.cases ?_ (fun i => ?_) k
   · simpa using posSemidef_vecMulVec_self_star a
   · simpa using hB i
 
-theorem re_mdisc_cons_cs (a b : Fin (n + 1) → ℂ)
-    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (hB : ∀ i, (B i).PosSemidef) :
-    (mdisc (Fin.cons (vecMulVec a (star b)) B :
-        Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re ^ 2 ≤
-      (mdisc (Fin.cons (vecMulVec a (star a)) B :
-        Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re *
-      (mdisc (Fin.cons (vecMulVec b (star b)) B :
-        Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re := by
+theorem re_mdisc_cons_cs
+    (a b : Fin (n + 1) → ℂ)
+    (B : Fin n → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (hB : ∀ i, (B i).PosSemidef)
+    : (mdisc
+          (Fin.cons (vecMulVec a (star b)) B
+            : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re
+        ^ 2
+      ≤ (mdisc
+          (Fin.cons (vecMulVec a (star a)) B
+            : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re
+        * (mdisc
+          (Fin.cons (vecMulVec b (star b)) B
+            : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).re := by
   set S : (Fin (n + 1) → ℂ) → (Fin (n + 1) → ℂ) → ℂ := fun x y =>
     mdisc (Fin.cons (vecMulVec x (star y)) B : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
     with hS
@@ -190,9 +207,11 @@ theorem re_mdisc_cons_cs (a b : Fin (n + 1) → ℂ)
   have hq : ∀ t : ℝ, 0 ≤ (S b b).re * (t * t) + (2 * (S a b).re) * t + (S a a).re := by
     intro t
     have h := re_mdisc_cons_vecMulVec_nonneg (a + (t : ℂ) • b) B hB
-    have key : mdisc (Fin.cons (vecMulVec (a + (t : ℂ) • b) (star (a + (t : ℂ) • b))) B :
-        Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) =
-        S a a + (t : ℂ) * (S a b + S b a) + ((t * t : ℝ) : ℂ) * S b b := by
+    have key
+        : mdisc
+            (Fin.cons (vecMulVec (a + (t : ℂ) • b) (star (a + (t : ℂ) • b))) B
+              : Fin (n + 1) → Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+          = S a a + (t : ℂ) * (S a b + S b a) + ((t * t : ℝ) : ℂ) * S b b := by
       simp only [hS, mdisc_cons_eq_sum, vecMulVec_apply, Finset.mul_sum, mul_add,
         ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
@@ -215,21 +234,24 @@ section Statements
 
 variable {n : ℕ}
 
-theorem dz_cplx_mul {D : ℕ} (j : Fin D) (f g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
-    (hf : DifferentiableAt ℝ f z) (hg : DifferentiableAt ℝ g z) :
-    dz j (cplx fun y => f y * g y) z = (f z : ℂ) * dz j (cplx g) z + (g z : ℂ) * dz j (cplx f) z := by
-  rw [dz_cplx, dz_cplx, dz_cplx, HasFDerivAt.fderiv (f := fun y => f y * g y) (hf.hasFDerivAt.mul hg.hasFDerivAt)]
-  simp only [_root_.add_apply, FunLike.coe_smul, Pi.smul_apply,
-    smul_eq_mul]
+theorem dz_cplx_mul
+    {D : ℕ} (j : Fin D) (f g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) (hf : DifferentiableAt ℝ f z)
+    (hg : DifferentiableAt ℝ g z)
+    : dz j (cplx fun y => f y * g y) z
+      = (f z : ℂ) * dz j (cplx g) z + (g z : ℂ) * dz j (cplx f) z := by
+  rw [dz_cplx, dz_cplx, dz_cplx,
+    HasFDerivAt.fderiv (f := fun y => f y * g y) (hf.hasFDerivAt.mul hg.hasFDerivAt)]
+  simp only [_root_.add_apply, FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
   push_cast
   ring
 
-theorem fderiv_sq_half {D : ℕ} (g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
-    (hg : DifferentiableAt ℝ g z) :
-    fderiv ℝ (fun y => g y ^ 2 / 2) z = g z • fderiv ℝ g z := by
+theorem fderiv_sq_half {D : ℕ} (g : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) (hg : DifferentiableAt ℝ g z)
+    : fderiv ℝ (fun y => g y ^ 2 / 2) z = g z • fderiv ℝ g z := by
   have he : (fun y => g y ^ 2 / 2) = fun y => (1 / 2 : ℝ) * (g y * g y) := by funext y; ring
-  rw [he, HasFDerivAt.fderiv (f := fun y => (1 / 2 : ℝ) * (g y * g y))
-    ((hg.hasFDerivAt.mul hg.hasFDerivAt).const_mul (1 / 2 : ℝ))]
+  rw [he,
+    HasFDerivAt.fderiv
+      (f := fun y => (1 / 2 : ℝ) * (g y * g y))
+      ((hg.hasFDerivAt.mul hg.hasFDerivAt).const_mul (1 / 2 : ℝ))]
   ext u
   simp
   ring
@@ -237,8 +259,7 @@ theorem fderiv_sq_half {D : ℕ} (g : (Fin D → ℂ) → ℝ) (z : Fin D → �
 theorem gradDensSymm_thm : GradDensSymmStatement := by
   intro n φ v w U hU hφ z hz
   have hB : ∀ i, (hessC (φ i) z).IsHermitian := fun i =>
-    hessC_isHermitian_of_symm _ _
-      (((hφ i).contDiffAt (hU.mem_nhds hz)).isSymmSndFDerivAt (by simp))
+    hessC_isHermitian_of_symm _ _ (((hφ i).contDiffAt (hU.mem_nhds hz)).isSymmSndFDerivAt (by simp))
   unfold gradDens
   rw [gradMat_swap v w z, re_mdisc_cons_conjTranspose _ _ hB]
 
@@ -257,13 +278,15 @@ theorem hessCDz_thm : HessCDzStatement := by
     (h2.fderiv_right (m := 1) (by norm_num)).differentiableAt one_ne_zero
   have hc := fun c : Fin D → ℂ =>
     Complex.ofRealCLM.hasFDerivAt.comp z (hL.hasFDerivAt.clm_apply (hasFDerivAt_const c z))
-  have hg := ((hc (Pi.single k 1)).add
-    ((hc (Complex.I • Pi.single k 1)).const_mul Complex.I)).const_mul (1 / 2 : ℂ)
-  have hd := hg.congr_of_eventuallyEq (f₁ := dzb k (cplx v))
-    (Filter.Eventually.of_forall fun y => by
-      rw [dzb_cplx]
-      simp only [Pi.add_apply, Function.comp_apply, Complex.ofRealCLM_apply]
-      ring)
+  have hg :=
+    ((hc (Pi.single k 1)).add ((hc (Complex.I • Pi.single k 1)).const_mul Complex.I)).const_mul
+      (1 / 2 : ℂ)
+  have hd :=
+    hg.congr_of_eventuallyEq (f₁ := dzb k (cplx v))
+      (Filter.Eventually.of_forall fun y => by
+        rw [dzb_cplx]
+        simp only [Pi.add_apply, Function.comp_apply, Complex.ofRealCLM_apply]
+        ring)
   rw [dz, hd.fderiv]
   simp only [hessC_eq_leviC, leviC]
   simp
@@ -283,8 +306,9 @@ theorem gradDensCauchySchwarz_thm : GradDensCauchySchwarzStatement := by
 theorem gradDensLeibniz_thm : GradDensLeibnizStatement := by
   intro n φ f g w z hf hg
   constructor
-  · have hM : gradMat (fun y => f y * g y) w z =
-        (f z : ℂ) • gradMat g w z + (g z : ℂ) • gradMat f w z := by
+  · have hM
+        : gradMat (fun y => f y * g y) w z
+          = (f z : ℂ) • gradMat g w z + (g z : ℂ) • gradMat f w z := by
       ext j k
       simp only [gradMat, dz_cplx_mul j f g z hf hg, Matrix.add_apply, Matrix.smul_apply,
         smul_eq_mul]

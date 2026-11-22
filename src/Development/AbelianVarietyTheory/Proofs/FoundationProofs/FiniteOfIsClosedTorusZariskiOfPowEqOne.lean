@@ -12,8 +12,9 @@ section Constructible
 
 variable {Y Z : Type*} [TopologicalSpace Y] [TopologicalSpace Z]
 
-theorem interior_frontier_preimage_of_isConstructible {f : Y → Z} (hf : Continuous f)
-    {C : Set Z} (hC : IsConstructible C) : interior (frontier (f ⁻¹' C)) = ∅ := by
+theorem interior_frontier_preimage_of_isConstructible
+    {f : Y → Z} (hf : Continuous f) {C : Set Z} (hC : IsConstructible C)
+    : interior (frontier (f ⁻¹' C)) = ∅ := by
   induction hC using IsConstructible.empty_union_induction with
   | open_retrocompact U hU _ =>
     rw [← frontier_compl]
@@ -28,19 +29,21 @@ theorem interior_frontier_preimage_of_isConstructible {f : Y → Z} (hf : Contin
     exact Set.eq_empty_of_subset_empty (h2 ▸ interior_mono h1)
   | compl s _ hs => rw [Set.preimage_compl, frontier_compl, hs]
 
-theorem dense_interior_of_interior_frontier_eq_empty {S : Set Y} (hS : Dense S)
-    (h : interior (frontier S) = ∅) : Dense (interior S) := by
-  have h1 : frontier S = (interior S)ᶜ := by
-    rw [frontier, hS.closure_eq, Set.compl_eq_univ_diff]
+theorem dense_interior_of_interior_frontier_eq_empty
+    {S : Set Y} (hS : Dense S) (h : interior (frontier S) = ∅)
+    : Dense (interior S) := by
+  have h1 : frontier S = (interior S)ᶜ := by rw [frontier, hS.closure_eq, Set.compl_eq_univ_diff]
   rwa [h1, interior_eq_empty_iff_dense_compl, compl_compl] at h
 
-theorem exists_isOpen_inter_closure_subset_of_isConstructible {f : Y → Z} (hf : Continuous f)
-    {C : Set Z} (hC : IsConstructible C) :
-    ∃ V : Set Y, IsOpen V ∧ V ∩ closure (f ⁻¹' C) ⊆ f ⁻¹' C ∧
-      closure (V ∩ closure (f ⁻¹' C)) = closure (f ⁻¹' C) := by
+theorem exists_isOpen_inter_closure_subset_of_isConstructible
+    {f : Y → Z} (hf : Continuous f) {C : Set Z} (hC : IsConstructible C)
+    : ∃ V : Set Y,
+      IsOpen V ∧ V ∩ closure (f ⁻¹' C) ⊆ f ⁻¹' C
+        ∧ closure (V ∩ closure (f ⁻¹' C)) = closure (f ⁻¹' C) := by
   set S := f ⁻¹' C with hS
-  have h1 := interior_frontier_preimage_of_isConstructible
-    (hf.comp (continuous_subtype_val (p := fun y => y ∈ closure S))) hC
+  have h1 :=
+    interior_frontier_preimage_of_isConstructible
+      (hf.comp (continuous_subtype_val (p := fun y => y ∈ closure S))) hC
   rw [Set.preimage_comp, ← hS] at h1
   have hd : Dense ((↑) ⁻¹' S : Set (closure S)) := by
     rw [Subtype.dense_iff]
@@ -48,8 +51,7 @@ theorem exists_isOpen_inter_closure_subset_of_isConstructible {f : Y → Z} (hf 
     intro y hy
     exact ⟨⟨y, subset_closure hy⟩, hy, rfl⟩
   have h2 := dense_interior_of_interior_frontier_eq_empty hd h1
-  obtain ⟨V, hV, hVe⟩ := isOpen_induced_iff.1
-    (isOpen_interior (s := ((↑) ⁻¹' S : Set (closure S))))
+  obtain ⟨V, hV, hVe⟩ := isOpen_induced_iff.1 (isOpen_interior (s := ((↑) ⁻¹' S : Set (closure S))))
   refine ⟨V, hV, ?_, ?_⟩
   · rintro y ⟨hyV, hyS⟩
     have : (⟨y, hyS⟩ : closure S) ∈ interior ((↑) ⁻¹' S : Set (closure S)) := hVe ▸ hyV
@@ -60,24 +62,28 @@ theorem exists_isOpen_inter_closure_subset_of_isConstructible {f : Y → Z} (hf 
 
 variable {G : Type*} [Group G] [TopologicalSpace G] [SeparatelyContinuousMul G] [ContinuousInv G]
 
-theorem isClosed_subgroup_of_isOpen_inter_closure_subset (H : Subgroup G) {V : Set G}
-    (hV : IsOpen V) (hVH : V ∩ closure (H : Set G) ⊆ H) (hne : (V ∩ closure (H : Set G)).Nonempty) :
-    IsClosed (H : Set G) := by
+theorem isClosed_subgroup_of_isOpen_inter_closure_subset
+    (H : Subgroup G)
+    {V : Set G}
+    (hV : IsOpen V) (hVH : V ∩ closure (H : Set G) ⊆ H) (hne : (V ∩ closure (H : Set G)).Nonempty)
+    : IsClosed (H : Set G) := by
   obtain ⟨u, huV, huK⟩ := hne
   have huH : u ∈ H := hVH ⟨huV, huK⟩
   have hmul : ∀ g ∈ closure (H : Set G), ∀ h ∈ H, g * h ∈ closure (H : Set G) := fun g hg h hh =>
     map_mem_closure (f := fun x => x * h) (continuous_mul_const h) hg fun x hx => H.mul_mem hx hh
   refine isClosed_of_closure_subset fun g hg => ?_
-  have hg' : g⁻¹ ∈ closure (H : Set G) :=
-    map_mem_closure continuous_inv hg fun x hx => H.inv_mem hx
-  obtain ⟨h, hhV, hhH⟩ := mem_closure_iff.1 (hmul _ hg' u huH) ((fun y => g * y) ⁻¹' V)
-    (hV.preimage (continuous_const_mul g)) (by simpa using huV)
+  have hg' : g⁻¹ ∈ closure (H : Set G) := map_mem_closure continuous_inv hg fun x hx => H.inv_mem hx
+  obtain ⟨h, hhV, hhH⟩ :=
+    mem_closure_iff.1 (hmul _ hg' u huH) ((fun y => g * y) ⁻¹' V)
+      (hV.preimage (continuous_const_mul g)) (by simpa using huV)
   have : g * h ∈ H := hVH ⟨hhV, hmul g hg h hhH⟩
   simpa using H.mul_mem this (H.inv_mem hhH)
 
-theorem isClosed_subgroup_of_eq_preimage_isConstructible (H : Subgroup G) {f : G → Z}
-    (hf : Continuous f) {C : Set Z} (hC : IsConstructible C) (hH : (H : Set G) = f ⁻¹' C) :
-    IsClosed (H : Set G) := by
+theorem isClosed_subgroup_of_eq_preimage_isConstructible
+    (H : Subgroup G)
+    {f : G → Z} (hf : Continuous f)
+    {C : Set Z} (hC : IsConstructible C) (hH : (H : Set G) = f ⁻¹' C)
+    : IsClosed (H : Set G) := by
   obtain ⟨V, hV, h1, h2⟩ := exists_isOpen_inter_closure_subset_of_isConstructible hf hC
   rw [← hH] at h1 h2
   refine isClosed_subgroup_of_isOpen_inter_closure_subset H hV h1 ?_
@@ -90,9 +96,11 @@ section Characters
 
 variable {X H : Type*} [MulOneClass H]
 
-theorem sum_eq_zero_of_factorsThrough_characters {R : Type*} [CommRing R] [IsDomain R]
+theorem sum_eq_zero_of_factorsThrough_characters
+    {R : Type*} [CommRing R] [IsDomain R]
     (χ : X → (H →* R)) (f : X →₀ R) (hf : ∀ s : H, f.sum (fun x a => a * χ x s) = 0)
-    (c : X → R) (hc : ∀ x y, χ x = χ y → c x = c y) : f.sum (fun x a => a * c x) = 0 := by
+    (c : X → R) (hc : ∀ x y, χ x = χ y → c x = c y)
+    : f.sum (fun x a => a * c x) = 0 := by
   classical
   have h0 : Finsupp.mapDomain χ f = 0 := by
     refine linearIndependent_iff.1 (linearIndependent_monoidHom H R) _ ?_
@@ -117,16 +125,18 @@ variable {R : Type*} [CommRing R] {X : Type*} [AddCommGroup X]
 noncomputable def torusEval (t : Multiplicative X →* Rˣ) : AddMonoidAlgebra R X →ₐ[R] R :=
   AddMonoidAlgebra.lift R R X ((Units.coeHom R).comp t)
 
-@[simp] theorem torusEval_single (t : Multiplicative X →* Rˣ) (x : X) (a : R) :
-    torusEval t (single x a) = a * t (Multiplicative.ofAdd x) := by
+@[simp]
+theorem torusEval_single (t : Multiplicative X →* Rˣ) (x : X) (a : R)
+    : torusEval t (single x a) = a * t (Multiplicative.ofAdd x) := by
   simp [torusEval]
 
-theorem torusEval_apply (t : Multiplicative X →* Rˣ) (f : AddMonoidAlgebra R X) :
-    torusEval t f = f.coeff.sum fun x a => a * t (Multiplicative.ofAdd x) := by
+theorem torusEval_apply (t : Multiplicative X →* Rˣ) (f : AddMonoidAlgebra R X)
+    : torusEval t f = f.coeff.sum fun x a => a * t (Multiplicative.ofAdd x) := by
   simp [torusEval, lift_apply]
 
-theorem torusEval_bijective :
-    Function.Bijective (torusEval : (Multiplicative X →* Rˣ) → (AddMonoidAlgebra R X →ₐ[R] R)) := by
+theorem torusEval_bijective
+    : Function.Bijective
+      (torusEval : (Multiplicative X →* Rˣ) → (AddMonoidAlgebra R X →ₐ[R] R)) := by
   constructor
   · intro s t h
     refine MonoidHom.ext fun x => Units.ext ?_
@@ -142,26 +152,29 @@ def torusChar (x : X) : (Multiplicative X →* Rˣ) →* R where
   map_one' := by simp
   map_mul' s t := by simp
 
-@[simp] theorem torusChar_apply (x : X) (t : Multiplicative X →* Rˣ) :
-    torusChar x t = t (Multiplicative.ofAdd x) := rfl
+@[simp]
+theorem torusChar_apply (x : X) (t : Multiplicative X →* Rˣ)
+    : torusChar x t = t (Multiplicative.ofAdd x) :=
+  rfl
 
 variable [IsDomain R]
 
 noncomputable def torusPrime (t : Multiplicative X →* Rˣ) : PrimeSpectrum (AddMonoidAlgebra R X) :=
   PrimeSpectrum.comap (torusEval t).toRingHom ⟨⊥, Ideal.isPrime_bot⟩
 
-@[simp] theorem mem_torusPrime (t : Multiplicative X →* Rˣ) (f : AddMonoidAlgebra R X) :
-    f ∈ (torusPrime t).asIdeal ↔ torusEval t f = 0 := by
+@[simp]
+theorem mem_torusPrime (t : Multiplicative X →* Rˣ) (f : AddMonoidAlgebra R X)
+    : f ∈ (torusPrime t).asIdeal ↔ torusEval t f = 0 := by
   simp [torusPrime]
 
-
 variable (R X) in
-@[reducible] noncomputable def torusZariski : TopologicalSpace (Multiplicative X →* Rˣ) :=
+@[reducible]
+noncomputable def torusZariski : TopologicalSpace (Multiplicative X →* Rˣ) :=
   TopologicalSpace.induced torusPrime inferInstance
 
-theorem isClosed_torusZariski_iff (H : Set (Multiplicative X →* Rˣ)) :
-    IsClosed[torusZariski R X] H ↔
-      ∃ S : Set (AddMonoidAlgebra R X), ∀ t, t ∈ H ↔ ∀ f ∈ S, torusEval t f = 0 := by
+theorem isClosed_torusZariski_iff (H : Set (Multiplicative X →* Rˣ))
+    : IsClosed[torusZariski R X] H
+      ↔ ∃ S : Set (AddMonoidAlgebra R X), ∀ t, t ∈ H ↔ ∀ f ∈ S, torusEval t f = 0 := by
   rw [isClosed_induced_iff]
   constructor
   · rintro ⟨Z, hZ, rfl⟩
@@ -172,30 +185,38 @@ theorem isClosed_torusZariski_iff (H : Set (Multiplicative X →* Rˣ)) :
     ext t
     simp [Set.subset_def, hS]
 
-theorem torusEval_eq_zero_of_forall_char (H : Subgroup (Multiplicative X →* Rˣ))
-    {f : AddMonoidAlgebra R X} (hf : ∀ s ∈ H, torusEval s f = 0) {t : Multiplicative X →* Rˣ}
-    (ht : ∀ x : Multiplicative X, (∀ s ∈ H, s x = 1) → t x = 1) : torusEval t f = 0 := by
+theorem torusEval_eq_zero_of_forall_char
+    (H : Subgroup (Multiplicative X →* Rˣ))
+    {f : AddMonoidAlgebra R X} (hf : ∀ s ∈ H, torusEval s f = 0)
+    {t : Multiplicative X →* Rˣ} (ht : ∀ x : Multiplicative X, (∀ s ∈ H, s x = 1) → t x = 1)
+    : torusEval t f = 0 := by
   rw [torusEval_apply]
   refine sum_eq_zero_of_factorsThrough_characters
-    (fun x => (torusChar x).comp H.subtype) f.coeff (fun s => ?_) _ fun x y hxy => ?_
+    (fun x => (torusChar x).comp H.subtype)
+    f.coeff
+    (fun s => ?_)
+    _
+    fun x y hxy => ?_
   · rw [← hf s s.2, torusEval_apply]
     rfl
-  · have := ht (Multiplicative.ofAdd x * (Multiplicative.ofAdd y)⁻¹) fun s hs => by
-      have h := DFunLike.congr_fun hxy ⟨s, hs⟩
-      rw [map_mul, map_inv, mul_inv_eq_one]
-      exact Units.ext h
+  · have :=
+      ht (Multiplicative.ofAdd x * (Multiplicative.ofAdd y)⁻¹) fun s hs => by
+        have h := DFunLike.congr_fun hxy ⟨s, hs⟩
+        rw [map_mul, map_inv, mul_inv_eq_one]
+        exact Units.ext h
     rw [map_mul, map_inv, mul_inv_eq_one] at this
     rw [this]
 
-theorem mem_of_isClosed_torusZariski {H : Subgroup (Multiplicative X →* Rˣ)}
+theorem mem_of_isClosed_torusZariski
+    {H : Subgroup (Multiplicative X →* Rˣ)}
     (hH : IsClosed[torusZariski R X] (H : Set (Multiplicative X →* Rˣ)))
-    {t : Multiplicative X →* Rˣ}
-    (ht : ∀ x : Multiplicative X, (∀ s ∈ H, s x = 1) → t x = 1) : t ∈ H := by
+    {t : Multiplicative X →* Rˣ} (ht : ∀ x : Multiplicative X, (∀ s ∈ H, s x = 1) → t x = 1)
+    : t ∈ H := by
   obtain ⟨S, hS⟩ := (isClosed_torusZariski_iff _).1 hH
   exact (hS t).2 fun f hf => torusEval_eq_zero_of_forall_char H (fun s hs => (hS s).1 hs f hf) ht
 
-theorem finite_setOf_pow_eq_one_torus [Module.Finite ℤ X] {m : ℕ} (hm : m ≠ 0) :
-    {s : Multiplicative X →* Rˣ | s ^ m = 1}.Finite := by
+theorem finite_setOf_pow_eq_one_torus [Module.Finite ℤ X] {m : ℕ} (hm : m ≠ 0)
+    : {s : Multiplicative X →* Rˣ | s ^ m = 1}.Finite := by
   haveI : NeZero m := ⟨hm⟩
   haveI : AddGroup.FG X := Module.Finite.iff_addGroup_fg.1 inferInstance
   obtain ⟨T, hT⟩ := Group.exists_of_isMulFG (Multiplicative X)
@@ -205,15 +226,20 @@ theorem finite_setOf_pow_eq_one_torus [Module.Finite ℤ X] {m : ℕ} (hm : m �
   refine MonoidHom.eq_of_eqOn_dense hT fun x hx => ?_
   exact congrArg Subtype.val (congrFun h ⟨x, hx⟩)
 
-theorem exists_zpow_eq_one_of_isClosed_torusZariski [Module.Finite ℤ X] {n : ℕ} [NeZero n]
-    [HasEnoughRootsOfUnity R n] {H : Subgroup (Multiplicative X →* Rˣ)}
+theorem exists_zpow_eq_one_of_isClosed_torusZariski
+    [Module.Finite ℤ X]
+    {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity R n]
+    {H : Subgroup (Multiplicative X →* Rˣ)}
     (hH : IsClosed[torusZariski R X] (H : Set (Multiplicative X →* Rˣ)))
-    (hn : ∀ s ∈ H, s ^ n = 1 → s = 1) : ∃ r : ℤ, (n : ℤ) ∣ r - 1 ∧ ∀ s ∈ H, s ^ r = 1 := by
-  let K : Submodule ℤ X := AddSubgroup.toIntSubmodule
-    { carrier := {x | ∀ s ∈ H, s (Multiplicative.ofAdd x) = 1}
+    (hn : ∀ s ∈ H, s ^ n = 1 → s = 1)
+    : ∃ r : ℤ, (n : ℤ) ∣ r - 1 ∧ ∀ s ∈ H, s ^ r = 1 := by
+  let K : Submodule ℤ X :=
+    AddSubgroup.toIntSubmodule {
+      carrier := {x | ∀ s ∈ H, s (Multiplicative.ofAdd x) = 1}
       add_mem' := fun {a b} ha hb s hs => by rw [ofAdd_add, map_mul, ha s hs, hb s hs, mul_one]
       zero_mem' := fun s _ => map_one s
-      neg_mem' := fun {a} ha s hs => by rw [ofAdd_neg, map_inv, ha s hs, inv_one] }
+      neg_mem' := fun {a} ha s hs => by rw [ofAdd_neg, map_inv, ha s hs, inv_one]
+    }
   have hK : ∀ x, x ∈ K ↔ ∀ s ∈ H, s (Multiplicative.ofAdd x) = 1 := fun x => Iff.rfl
   let N : Submodule ℤ X := K ⊔ Ideal.span {(n : ℤ)} • ⊤
   have hnN : ∀ x : X, (n : ℤ) • x ∈ N := fun x =>
@@ -233,30 +259,37 @@ theorem exists_zpow_eq_one_of_isClosed_torusZariski [Module.Finite ℤ X] {n : �
       ⟨⟨n, mem_nonZeroDivisors_of_ne_zero (Nat.cast_ne_zero.2 (NeZero.ne n))⟩, hnQ q⟩
     haveI : HasEnoughRootsOfUnity R (Monoid.exponent (Multiplicative (X ⧸ N))) :=
       HasEnoughRootsOfUnity.of_dvd R (Monoid.exponent_dvd_of_forall_pow_eq_one hnQ')
-    obtain ⟨φ, hφ⟩ := CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity
-      (Multiplicative (X ⧸ N)) R (a := Multiplicative.ofAdd (N.mkQ x))
-      (by simpa using hx)
+    obtain ⟨φ, hφ⟩ :=
+      CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (Multiplicative (X ⧸ N)) R
+        (a := Multiplicative.ofAdd (N.mkQ x)) (by simpa using hx)
     let t : Multiplicative X →* Rˣ := φ.comp (AddMonoidHom.toMultiplicative N.mkQ.toAddMonoidHom)
     have ht : ∀ y, t y = φ (Multiplicative.ofAdd (N.mkQ y.toAdd)) := fun y => rfl
-    have htH : t ∈ H := mem_of_isClosed_torusZariski hH fun y hy => by
-      have : N.mkQ y.toAdd = 0 := by
-        rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-        exact Submodule.mem_sup_left ((hK _).2 hy)
-      rw [ht, this, ofAdd_zero, map_one]
-    have ht1 : t = 1 := hn t htH (MonoidHom.ext fun y => by
-      rw [MonoidHom.pow_apply, ht, ← map_pow, hnQ', map_one, MonoidHom.one_apply])
+    have htH : t ∈ H :=
+      mem_of_isClosed_torusZariski hH fun y hy => by
+        have : N.mkQ y.toAdd = 0 := by
+          rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+          exact Submodule.mem_sup_left ((hK _).2 hy)
+        rw [ht, this, ofAdd_zero, map_one]
+    have ht1 : t = 1 :=
+      hn t htH
+        (MonoidHom.ext fun y => by
+          rw [MonoidHom.pow_apply, ht, ← map_pow, hnQ', map_one, MonoidHom.one_apply])
     exact hφ (by simpa [ht] using DFunLike.congr_fun ht1 (Multiplicative.ofAdd x))
-  obtain ⟨r, hr, hrK⟩ := Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup
-    (I := Ideal.span {(n : ℤ)}) (N := K) (N' := ⊤) (P := ⊤) Module.Finite.fg_top le_rfl hN
+  obtain ⟨r, hr, hrK⟩ :=
+    Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup (I := Ideal.span {(n : ℤ)}) (N := K)
+      (N' := ⊤) (P := ⊤) Module.Finite.fg_top le_rfl hN
   refine ⟨r, Ideal.mem_span_singleton.1 hr, fun s hs => MonoidHom.ext fun y => ?_⟩
   have := (hK _).1 (hrK (Submodule.smul_mem_pointwise_smul y.toAdd r ⊤ trivial)) s hs
   rw [ofAdd_zsmul, map_zpow] at this
   exact this
 
-theorem finite_of_isClosed_torusZariski_of_pow_eq_one [Module.Finite ℤ X] {n : ℕ} (h2 : 2 ≤ n)
-    [HasEnoughRootsOfUnity R n] {H : Subgroup (Multiplicative X →* Rˣ)}
+theorem finite_of_isClosed_torusZariski_of_pow_eq_one
+    [Module.Finite ℤ X]
+    {n : ℕ} (h2 : 2 ≤ n) [HasEnoughRootsOfUnity R n]
+    {H : Subgroup (Multiplicative X →* Rˣ)}
     (hH : IsClosed[torusZariski R X] (H : Set (Multiplicative X →* Rˣ)))
-    (hn : ∀ s ∈ H, s ^ n = 1 → s = 1) : Finite H ∧ (Nat.card H).Coprime n := by
+    (hn : ∀ s ∈ H, s ^ n = 1 → s = 1)
+    : Finite H ∧ (Nat.card H).Coprime n := by
   haveI : NeZero n := ⟨by omega⟩
   obtain ⟨r, hr, hrH⟩ := exists_zpow_eq_one_of_isClosed_torusZariski hH hn
   have hr0 : r.natAbs ≠ 0 := by
@@ -264,10 +297,12 @@ theorem finite_of_isClosed_torusZariski_of_pow_eq_one [Module.Finite ℤ X] {n :
     rintro rfl
     have := Int.natAbs_dvd_natAbs.2 hr
     simp only [Int.natAbs_natCast, zero_sub, Int.reduceNeg, Int.natAbs_neg, Int.natAbs_one,
-      Nat.dvd_one] at this
+        Nat.dvd_one]
+      at this
     omega
-  have hfin : Finite H := (finite_setOf_pow_eq_one_torus (R := R) (X := X) hr0).subset
-    (t := (H : Set (Multiplicative X →* Rˣ))) fun s hs => pow_natAbs_eq_one.2 (hrH s hs)
+  have hfin : Finite H :=
+    (finite_setOf_pow_eq_one_torus (R := R) (X := X) hr0).subset
+      (t := (H : Set (Multiplicative X →* Rˣ))) fun s hs => pow_natAbs_eq_one.2 (hrH s hs)
   refine ⟨hfin, Nat.coprime_of_dvd fun p hp hpH hpn => ?_⟩
   haveI := Fact.mk hp
   obtain ⟨s, hs⟩ := exists_prime_orderOf_dvd_card' p hpH
@@ -276,7 +311,6 @@ theorem finite_of_isClosed_torusZariski_of_pow_eq_one [Module.Finite ℤ X] {n :
   rw [h3, orderOf_one] at hs
   exact hp.one_lt.ne hs
 
-
 end Torus
 
 section Coordinates
@@ -284,7 +318,6 @@ section Coordinates
 open AddMonoidAlgebra
 
 variable {R : Type*} [CommRing R] {X : Type*} [AddCommGroup X] {ι : Type*}
-
 
 end Coordinates
 

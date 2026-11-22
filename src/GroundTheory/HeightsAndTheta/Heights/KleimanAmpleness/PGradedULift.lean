@@ -32,17 +32,27 @@ theorem GradedULift.proof : GradedULift.Statement.{u, v} := by
         rfl
       rw [h1, h0.2]
       exact (Submodule.orderIsoMapComap e).map_top
-  let 𝓜' : GradedPMod S N (ULift.{u} M) :=
-    { piece := pc
-      isInternal := hint
-      smul_mem := by
-        intro d c p m hp hm
-        obtain ⟨x, hx, rfl⟩ := hm
-        refine ⟨p • x, 𝓜.smul_mem d c p x hp hx, ?_⟩
-        rfl }
-  refine ⟨ULift.{u} M, inferInstance, inferInstance, inferInstance, inferInstance, 𝓜',
+  let 𝓜' : GradedPMod S N (ULift.{u} M) := {
+    piece := pc
+    isInternal := hint
+    smul_mem := by
+      intro d c p m hp hm
+      obtain ⟨x, hx, rfl⟩ := hm
+      refine ⟨p • x, 𝓜.smul_mem d c p x hp hx, ?_⟩
+      rfl
+  }
+  refine ⟨
+    ULift.{u} M,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    𝓜',
     ⟨eP.toLinearMap, fun c m hm => ⟨m, hm, rfl⟩⟩,
-    ⟨eP.symm.toLinearMap, fun c m hm => ?_⟩, fun m => rfl, fun m => rfl⟩
+    ⟨eP.symm.toLinearMap, fun c m hm => ?_⟩,
+    fun m => rfl,
+    fun m => rfl
+  ⟩
   obtain ⟨x, hx, rfl⟩ := hm
   exact hx
 

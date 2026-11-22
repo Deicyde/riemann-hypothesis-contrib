@@ -10,8 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IwahoriRegul
 
 @[expose] public section
 
-theorem UpperTheory.Gal.Spc.cuspIrr_kFinite_rep_eq_centralCuspForm :
-    UpperTheory.Gal.Spc.AdmCusp := by
+theorem UpperTheory.Gal.Spc.cuspIrr_kFinite_rep_eq_centralCuspForm
+    : UpperTheory.Gal.Spc.AdmCusp := by
   intro X _ k _ _ _ _ _ _ _ n Ty hJo hJc hker hcusp f hf h hh
   have hform : ∀ g, f (Ty.L.loc g * h) = UpperTheory.Gal.W2.Seed.tyFn Ty.J Ty.ψ g * f h := by
     intro g
@@ -25,12 +25,13 @@ theorem UpperTheory.Gal.Spc.cuspIrr_kFinite_rep_eq_centralCuspForm :
       have hmem := hf.2.1 _ hne
       rwa [map_mul, Ty.L.pr_loc, hh, mul_one] at hmem
   have hTC : GlobalTheory.Block5c.TypeCusp := GlobalTheory.typeFunction_constantTerm_eq_zero
-  have hT := hTC k (Fin n) Ty.J hJo hJc Ty.ψ hker
-    (fun a b e ha hb u hu h₀ =>
-      UpperTheory.Gal.Spc.typeSlice k n Ty.J hJo hJc Ty.ψ hker hcusp a b e ha hb u hu h₀)
-    (UpperTheory.Gal.W2.Seed.tyFn Ty.J Ty.ψ)
-    (fun g hg => by simp [UpperTheory.Gal.W2.Seed.tyFn, hg])
-    (fun g hg => by simp [UpperTheory.Gal.W2.Seed.tyFn, hg])
+  have hT :=
+    hTC k (Fin n) Ty.J hJo hJc Ty.ψ hker
+      (fun a b e ha hb u hu h₀ =>
+        UpperTheory.Gal.Spc.typeSlice k n Ty.J hJo hJc Ty.ψ hker hcusp a b e ha hb u hu h₀)
+      (UpperTheory.Gal.W2.Seed.tyFn Ty.J Ty.ψ)
+      (fun g hg => by simp [UpperTheory.Gal.W2.Seed.tyFn, hg])
+      (fun g hg => by simp [UpperTheory.Gal.W2.Seed.tyFn, hg])
   intro a b ε ha hb μ hμ u hu g₀ h₀
   have hz := hT.2.2.2 a b ε ha hb μ hμ u hu g₀ h₀
   simp_rw [hform]

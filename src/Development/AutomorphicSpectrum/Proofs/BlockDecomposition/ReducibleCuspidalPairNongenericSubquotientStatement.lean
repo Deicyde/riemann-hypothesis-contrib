@@ -11,9 +11,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZSeg GlobalTheory.BZMir Zc
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.reducible_cuspidal_pair_nongeneric_subquotient : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
-    WhitRankIrr k → ∀ (ψ : AddChar k Circle), Continuous ψ → ψ ≠ 1 →
-    ∀ (x y : IrrGL (k := k)) (N : ℕ) (hd : ∑ a, (![x, y] a).1 = N), x.IsCusp → y.IsCusp →
-      ¬ (prodIrr ![x, y] hd).IsIrreducible →
-      ∃ τ : IrrRep (GL (Fin N) k), IsSubquotient τ.ρ (prodIrr ![x, y] hd) ∧ ¬ IsGenericFor ψ τ.ρ := by
-  first | exact @GlobalTheory.CompanionTheory.CuspPair.exists_nongeneric_subquotient | exact GlobalTheory.CompanionTheory.CuspPair.exists_nongeneric_subquotient | (intros; apply GlobalTheory.CompanionTheory.CuspPair.exists_nongeneric_subquotient <;> assumption)
+theorem _root_.GlobalTheory.T.reducible_cuspidal_pair_nongeneric_subquotient
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      WhitRankIrr k
+        → ∀ (ψ : AddChar k Circle),
+          Continuous ψ → ψ ≠ 1
+            → ∀ (x y : IrrGL (k := k)) (N : ℕ) (hd : ∑ a, (![x, y] a).1 = N),
+              x.IsCusp → y.IsCusp → ¬(prodIrr ![x, y] hd).IsIrreducible
+                → ∃ τ : IrrRep (GL (Fin N) k),
+                  IsSubquotient τ.ρ (prodIrr ![x, y] hd) ∧ ¬ IsGenericFor ψ τ.ρ := by
+  first
+  | exact @GlobalTheory.CompanionTheory.CuspPair.exists_nongeneric_subquotient
+  | exact GlobalTheory.CompanionTheory.CuspPair.exists_nongeneric_subquotient
+  | (
+      intros
+      apply GlobalTheory.CompanionTheory.CuspPair.exists_nongeneric_subquotient <;> assumption
+    )

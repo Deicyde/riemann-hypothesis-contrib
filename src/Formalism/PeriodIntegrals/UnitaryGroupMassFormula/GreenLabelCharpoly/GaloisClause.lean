@@ -14,32 +14,40 @@ namespace PI.GreenLabelMapW
 
 variable {K : Type} [Field K] [Fintype K] [DecidableEq K]
 
-theorem galois_clause (Cv : LabelConv K) (hC : CuspParam K Cv) (d : ℕ) (α : ℂ ≃+* ℂ) (a : ℕ)
+theorem galois_clause
+    (Cv : LabelConv K) (hC : CuspParam K Cv)
+    (d : ℕ) (α : ℂ ≃+* ℂ) (a : ℕ)
     (hα : ∀ ζ : ℂ, ζ ^ (∏ e ∈ Finset.Icc 1 d, (q K ^ e - 1)) = 1 → α ζ = ζ ^ a)
-    (τ τ' : FDRep ℂ (GL (Fin d) K)) (hd : 1 ≤ d) (hs : Simple τ) (hc : IsCuspidal K τ)
-    (hs' : Simple τ') (hc' : IsCuspidal K τ')
-    (htr : ∀ γ, LinearMap.trace ℂ τ' (τ'.ρ γ) = α (LinearMap.trace ℂ τ (τ.ρ γ))) :
-    rootsBar K (greenLab Cv d τ') = (rootsBar K (greenLab Cv d τ)).map (· ^ a) := by
+    (τ τ' : FDRep ℂ (GL (Fin d) K))
+    (hd : 1 ≤ d) (hs : Simple τ) (hc : IsCuspidal K τ) (hs' : Simple τ') (hc' : IsCuspidal K τ')
+    (htr : ∀ γ, LinearMap.trace ℂ τ' (τ'.ρ γ) = α (LinearMap.trace ℂ τ (τ.ρ γ)))
+    : rootsBar K (greenLab Cv d τ') = (rootsBar K (greenLab Cv d τ)).map (· ^ a) := by
   obtain ⟨hm, hi, hX, hdeg, hval⟩ := greenLab_spec Cv hC hd hs hc
   rw [Fintype.card_fin] at hdeg
-  obtain ⟨w, hw⟩ := IsAlgClosed.exists_aeval_eq_zero (AlgebraicClosure K) (greenLab Cv d τ)
-    (by rw [degree_eq_natDegree hm.ne_zero, hdeg]; exact_mod_cast (show d ≠ 0 by omega))
-  have hunit : ∀ r, aeval r (greenLab Cv d τ) = 0 →
-      Cv.ι r ^ (∏ e ∈ Finset.Icc 1 d, (q K ^ e - 1)) = 1 := by
+  obtain ⟨w, hw⟩ :=
+    IsAlgClosed.exists_aeval_eq_zero (AlgebraicClosure K) (greenLab Cv d τ)
+      (by rw [degree_eq_natDegree hm.ne_zero, hdeg]; exact_mod_cast (show d ≠ 0 by omega))
+  have hunit
+      : ∀ r,
+        aeval r (greenLab Cv d τ) = 0 → Cv.ι r ^ (∏ e ∈ Finset.Icc 1 d, (q K ^ e - 1)) = 1 := by
     intro r hr
     have h1 := root_pow_card hm hi hX hr
     rw [hdeg] at h1
     obtain ⟨k, hk⟩ : (q K ^ d - 1) ∣ ∏ e ∈ Finset.Icc 1 d, (q K ^ e - 1) :=
       Finset.dvd_prod_of_mem (fun e => q K ^ e - 1) (Finset.mem_Icc.2 ⟨hd, le_rfl⟩)
     rw [hk, pow_mul, ← map_pow, h1, map_one, one_pow]
-  have hinj : ∀ r₁ r₂ : AlgebraicClosure K, aeval r₁ (greenLab Cv d τ) = 0 →
-      aeval r₂ (greenLab Cv d τ) = 0 → r₁ ^ a = r₂ ^ a → r₁ = r₂ := by
+  have hinj
+      : ∀ r₁ r₂ : AlgebraicClosure K,
+        aeval r₁ (greenLab Cv d τ) = 0 → aeval r₂ (greenLab Cv d τ) = 0 → r₁ ^ a = r₂ ^ a
+          → r₁ = r₂ := by
     intro r₁ r₂ h₁ h₂ h
     apply Cv.ι_inj r₁ r₂ (root_ne_zero hm hi hX h₁) (root_ne_zero hm hi hX h₂)
     apply α.injective
     rw [hα _ (hunit r₁ h₁), hα _ (hunit r₂ h₂), ← map_pow, ← map_pow, h]
-  have hf : ∀ (σ : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) (x : AlgebraicClosure K),
-      (σ x) ^ a = σ (x ^ a) := fun σ x => (map_pow σ x a).symm
+  have hf
+      : ∀ (σ : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) (x : AlgebraicClosure K),
+        (σ x) ^ a = σ (x ^ a) := fun σ x =>
+    (map_pow σ x a).symm
   have hint : IsIntegral K (w ^ a) := Algebra.IsIntegral.isIntegral _
   have hlab : HasCuspLabel Cv τ' (minpoly K (w ^ a)) := by
     refine ⟨minpoly.monic hint, minpoly.irreducible hint, ?_, ?_, ?_⟩
@@ -56,7 +64,8 @@ theorem galois_clause (Cv : LabelConv K) (hC : CuspParam K Cv) (d : ℕ) (α : �
         rw [htr γ, hval r hr γ hγ z hz m hm', map_mul, map_pow, map_neg, map_one, map_sum]
       congr 1
       refine Finset.sum_congr rfl fun i _ => ?_
-      have hu : (Cv.ι r ^ (m * Fintype.card K ^ i)) ^ (∏ e ∈ Finset.Icc 1 d, (q K ^ e - 1)) = 1 := by
+      have hu
+          : (Cv.ι r ^ (m * Fintype.card K ^ i)) ^ (∏ e ∈ Finset.Icc 1 d, (q K ^ e - 1)) = 1 := by
         rw [pow_right_comm, hunit r hr, one_pow]
       rw [hα _ hu, map_pow, ← pow_mul, ← pow_mul]
       congr 1
@@ -64,19 +73,25 @@ theorem galois_clause (Cv : LabelConv K) (hC : CuspParam K Cv) (d : ℕ) (α : �
   rw [greenLab_eq Cv hC hd hs' hc' hlab]
   exact aroots_eq_map hm hi hw (fun x => x ^ a) hf hinj
 
-theorem dual_clause (Cv : LabelConv K) (hC : CuspParam K Cv) (d : ℕ)
-    (τ τ' : FDRep ℂ (GL (Fin d) K)) (hd : 1 ≤ d) (hs : Simple τ) (hc : IsCuspidal K τ)
-    (hs' : Simple τ') (hc' : IsCuspidal K τ')
-    (htr : ∀ γ, LinearMap.trace ℂ τ' (τ'.ρ γ) = LinearMap.trace ℂ τ (τ.ρ γ⁻¹)) :
-    rootsBar K (greenLab Cv d τ') = (rootsBar K (greenLab Cv d τ)).map (·⁻¹) := by
+theorem dual_clause
+    (Cv : LabelConv K) (hC : CuspParam K Cv)
+    (d : ℕ) (τ τ' : FDRep ℂ (GL (Fin d) K))
+    (hd : 1 ≤ d) (hs : Simple τ) (hc : IsCuspidal K τ) (hs' : Simple τ') (hc' : IsCuspidal K τ')
+    (htr : ∀ γ, LinearMap.trace ℂ τ' (τ'.ρ γ) = LinearMap.trace ℂ τ (τ.ρ γ⁻¹))
+    : rootsBar K (greenLab Cv d τ') = (rootsBar K (greenLab Cv d τ)).map (·⁻¹) := by
   obtain ⟨hm, hi, hX, hdeg0, hval⟩ := greenLab_spec Cv hC hd hs hc
   have hdeg : (greenLab Cv d τ).natDegree = d := by rw [hdeg0, Fintype.card_fin]
-  obtain ⟨w, hw⟩ := IsAlgClosed.exists_aeval_eq_zero (AlgebraicClosure K) (greenLab Cv d τ)
-    (by rw [degree_eq_natDegree hm.ne_zero, hdeg]; exact_mod_cast (show d ≠ 0 by omega))
-  have hf : ∀ (σ : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) (x : AlgebraicClosure K),
-      (σ x)⁻¹ = σ x⁻¹ := fun σ x => (map_inv₀ σ x).symm
-  have hinj : ∀ r₁ r₂ : AlgebraicClosure K, aeval r₁ (greenLab Cv d τ) = 0 →
-      aeval r₂ (greenLab Cv d τ) = 0 → r₁⁻¹ = r₂⁻¹ → r₁ = r₂ := fun _ _ _ _ h => inv_injective h
+  obtain ⟨w, hw⟩ :=
+    IsAlgClosed.exists_aeval_eq_zero (AlgebraicClosure K) (greenLab Cv d τ)
+      (by rw [degree_eq_natDegree hm.ne_zero, hdeg]; exact_mod_cast (show d ≠ 0 by omega))
+  have hf
+      : ∀ (σ : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) (x : AlgebraicClosure K),
+        (σ x)⁻¹ = σ x⁻¹ := fun σ x =>
+    (map_inv₀ σ x).symm
+  have hinj
+      : ∀ r₁ r₂ : AlgebraicClosure K,
+        aeval r₁ (greenLab Cv d τ) = 0 → aeval r₂ (greenLab Cv d τ) = 0 → r₁⁻¹ = r₂⁻¹ → r₁ = r₂ :=
+    fun _ _ _ _ h => inv_injective h
   have hint : IsIntegral K w⁻¹ := Algebra.IsIntegral.isIntegral _
   have hlab : HasCuspLabel Cv τ' (minpoly K w⁻¹) := by
     refine ⟨minpoly.monic hint, minpoly.irreducible hint, ?_, ?_, ?_⟩
@@ -93,8 +108,9 @@ theorem dual_clause (Cv : LabelConv K) (hC : CuspParam K Cv) (d : ℕ)
       have hn := card_pow_sub_one_pos (K := K) hD
       have hgen := gen_pow Cv hD
       have hz0 : z ≠ 0 := by rw [← hm']; exact pow_ne_zero _ (gen_ne_zero Cv hD)
-      have hzi : Cv.gen (Fintype.card (Fin d)) ^
-          (m * (Fintype.card K ^ Fintype.card (Fin d) - 1 - 1)) = z⁻¹ := by
+      have hzi
+          : Cv.gen (Fintype.card (Fin d)) ^ (m * (Fintype.card K ^ Fintype.card (Fin d) - 1 - 1))
+            = z⁻¹ := by
         apply eq_inv_of_mul_eq_one_left
         rw [← hm', ← pow_add, ← mul_add_one, Nat.sub_add_cancel hn, mul_comm, pow_mul, hgen,
           one_pow]

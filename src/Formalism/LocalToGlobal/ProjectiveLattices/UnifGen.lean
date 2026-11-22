@@ -8,24 +8,29 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 section Gen
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem scal_mul {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (a b : S) (i : (PPx x).ι) :
-    scal x (a * b) i = scal x a i * scal x b i := by
+theorem scal_mul {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (a b : S) (i : (PPx x).ι)
+    : scal x (a * b) i = scal x a i * scal x b i := by
   simp [scal, ReciprocityTheory.ChartRestriction.G.Out.liftFun, map_mul]
 
 theorem scal_one {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) (i : (PPx x).ι) : scal x 1 i = 1 := by
   simp [scal, ReciprocityTheory.ChartRestriction.G.Out.liftFun, map_one]
 
-theorem gen_unit {S : Type} [CommRing S] {x : Sp S ⟶ Xo.X} (s s' : LB.Sec (PPx x))
+theorem gen_unit
+    {S : Type} [CommRing S]
+    {x : Sp S ⟶ Xo.X} (s s' : LB.Sec (PPx x))
     (hs : ∀ s'' : LB.Sec (PPx x), ∃! a : S, ∀ i, s''.f i = scal x a i * s.f i)
-    (hs' : ∀ s'' : LB.Sec (PPx x), ∃! a : S, ∀ i, s''.f i = scal x a i * s'.f i) :
-    ∃ u : Sˣ, ∀ i, s'.f i = scal x (u : S) i * s.f i := by
+    (hs' : ∀ s'' : LB.Sec (PPx x), ∃! a : S, ∀ i, s''.f i = scal x a i * s'.f i)
+    : ∃ u : Sˣ, ∀ i, s'.f i = scal x (u : S) i * s.f i := by
   obtain ⟨a, ha, -⟩ := hs s'
   obtain ⟨b, hb, -⟩ := hs' s
   obtain ⟨c1, -, hc1⟩ := hs s

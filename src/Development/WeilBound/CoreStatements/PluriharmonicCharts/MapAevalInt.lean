@@ -9,12 +9,18 @@ public import Development.WeilBound.CoreStatements.PluriharmonicCharts.IsBlockMa
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq
 
-theorem PositivityTheory.Xgp.c_algsq.LC.map_aeval_int {σ S T : Type} [CommRing S] [CommRing T] {_ : Algebra ℤ S} {_ : Algebra ℤ T}
-    (θ : S →+* T) (w : σ → S) (f : MvPolynomial σ ℤ) : θ (aeval w f) = aeval (fun q => θ (w q)) f := by
+theorem PositivityTheory.Xgp.c_algsq.LC.map_aeval_int
+    {σ S T : Type} [CommRing S] [CommRing T] {_ : Algebra ℤ S} {_ : Algebra ℤ T}
+    (θ : S →+* T) (w : σ → S) (f : MvPolynomial σ ℤ)
+    : θ (aeval w f) = aeval (fun q => θ (w q)) f := by
   induction f using MvPolynomial.induction_on with
   | C a => rw [aeval_C, aeval_C, eq_intCast, eq_intCast, map_intCast]
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _)]

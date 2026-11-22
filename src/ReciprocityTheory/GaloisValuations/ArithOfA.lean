@@ -21,14 +21,15 @@ def locDegree (v : HeightOneSpectrum (𝓞 F)) : ℕ :=
 
 theorem isMaximal_span_prime (l : ℕ) [hl : Fact l.Prime] : (Ideal.span {(l : ℤ)}).IsMaximal := by
   first
-    | exact PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hl.out).irreducible
-    | exact Ideal.IsPrime.isMaximal
-        ((Ideal.span_singleton_prime (by exact_mod_cast hl.out.ne_zero)).2
-          (Nat.prime_iff_prime_int.mp hl.out))
-        (by simp [hl.out.ne_zero])
+  | exact PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp
+      hl.out).irreducible
+  | exact Ideal.IsPrime.isMaximal
+      ((Ideal.span_singleton_prime (by exact_mod_cast hl.out.ne_zero)).2
+        (Nat.prime_iff_prime_int.mp hl.out))
+      (by simp [hl.out.ne_zero])
 
-theorem liesOver_span_iff (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 F)) [P.IsPrime] :
-    P.LiesOver (Ideal.span {(l : ℤ)}) ↔ ((l : ℕ) : 𝓞 F) ∈ P := by
+theorem liesOver_span_iff (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 F)) [P.IsPrime]
+    : P.LiesOver (Ideal.span {(l : ℤ)}) ↔ ((l : ℕ) : 𝓞 F) ∈ P := by
   constructor
   · intro h
     have hmem : ((l : ℤ)) ∈ P.under ℤ := by
@@ -43,9 +44,10 @@ theorem liesOver_span_iff (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 F)) [P.IsPri
     show algebraMap ℤ (𝓞 F) (l : ℤ) ∈ P
     simpa using h
 
-theorem sum_locDegree (l : ℕ) [Fact l.Prime] (T : Finset (HeightOneSpectrum (𝓞 F)))
-    (hT : ∀ v, v ∈ T ↔ ((l : ℕ) : 𝓞 F) ∈ v.asIdeal) :
-    ∑ v ∈ T, locDegree v = Module.finrank ℚ F := by
+theorem sum_locDegree
+    (l : ℕ) [Fact l.Prime]
+    (T : Finset (HeightOneSpectrum (𝓞 F))) (hT : ∀ v, v ∈ T ↔ ((l : ℕ) : 𝓞 F) ∈ v.asIdeal)
+    : ∑ v ∈ T, locDegree v = Module.finrank ℚ F := by
   haveI := isMaximal_span_prime l
   have hl0 : (l : ℤ) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
   have hp0 : Ideal.span {(l : ℤ)} ≠ ⊥ := by
@@ -86,8 +88,8 @@ section conj
 
 variable {F Ω : Type*} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
 
-theorem smul_valuation_le_one_iff (γ : G F Ω) (A : ValuationSubring Ω) (y : Ω) :
-    (γ • A).valuation y ≤ 1 ↔ A.valuation ((γ⁻¹ : G F Ω) y) ≤ 1 := by
+theorem smul_valuation_le_one_iff (γ : G F Ω) (A : ValuationSubring Ω) (y : Ω)
+    : (γ • A).valuation y ≤ 1 ↔ A.valuation ((γ⁻¹ : G F Ω) y) ≤ 1 := by
   rw [ValuationSubring.valuation_le_one_iff, ValuationSubring.valuation_le_one_iff,
     ValuationSubring.mem_smul_pointwise_iff_exists]
   constructor
@@ -97,16 +99,17 @@ theorem smul_valuation_le_one_iff (γ : G F Ω) (A : ValuationSubring Ω) (y : �
   · intro h
     exact ⟨γ⁻¹ • y, h, smul_inv_smul γ y⟩
 
-private theorem smul_valuationSubring_valuation_lt_one_iff (γ : G F Ω) (A : ValuationSubring Ω) (y : Ω) :
-    (γ • A).valuation y < 1 ↔ A.valuation ((γ⁻¹ : G F Ω) y) < 1 := by
+private theorem smul_valuationSubring_valuation_lt_one_iff
+    (γ : G F Ω) (A : ValuationSubring Ω) (y : Ω)
+    : (γ • A).valuation y < 1 ↔ A.valuation ((γ⁻¹ : G F Ω) y) < 1 := by
   by_cases hy : y = 0
   · simp [hy]
   · have hy' : (γ⁻¹ : G F Ω) y ≠ 0 := (map_ne_zero (γ⁻¹ : G F Ω)).2 hy
     rw [Valuation.val_lt_one_iff _ hy, Valuation.val_lt_one_iff _ hy', ← not_le, ← not_le,
       smul_valuation_le_one_iff, map_inv₀]
 
-theorem conj_mem_Ine_smul {A : ValuationSubring Ω} {γ σ : G F Ω} (hσ : σ ∈ Ine (F := F) A) :
-    γ * σ * γ⁻¹ ∈ Ine (F := F) (γ • A) := by
+theorem conj_mem_Ine_smul {A : ValuationSubring Ω} {γ σ : G F Ω} (hσ : σ ∈ Ine (F := F) A)
+    : γ * σ * γ⁻¹ ∈ Ine (F := F) (γ • A) := by
   obtain ⟨hσ1, hσ2⟩ := hσ
   show γ * σ * γ⁻¹ ∈ Inertia (F := F) (γ • A)
   refine ⟨?_, fun x hx => ?_⟩
@@ -115,8 +118,7 @@ theorem conj_mem_Ine_smul {A : ValuationSubring Ω} {γ σ : G F Ω} (hσ : σ �
     rw [mul_smul, mul_smul, inv_smul_smul, h1]
   · rw [smul_valuation_le_one_iff] at hx
     rw [smul_valuationSubring_valuation_lt_one_iff]
-    have e : (γ⁻¹ : G F Ω) ((γ * σ * γ⁻¹) x - x) =
-        σ ((γ⁻¹ : G F Ω) x) - (γ⁻¹ : G F Ω) x := by
+    have e : (γ⁻¹ : G F Ω) ((γ * σ * γ⁻¹) x - x) = σ ((γ⁻¹ : G F Ω) x) - (γ⁻¹ : G F Ω) x := by
       rw [map_sub]
       congr 1
       show (γ⁻¹ : G F Ω) (γ (σ ((γ⁻¹ : G F Ω) x))) = σ ((γ⁻¹ : G F Ω) x)

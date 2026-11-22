@@ -8,5 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PlacesT
 
 open Formalism.BasicNotions
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.flatMapsSatisfyFlatLaws_finitePlaces : ∀ D : D7, GlobalTheory.FinPl.FlatLaws D := by
-  first | exact @GlobalTheory.FinPl.flatLaws_all | exact GlobalTheory.FinPl.flatLaws_all | (intros; apply GlobalTheory.FinPl.flatLaws_all <;> assumption)
+theorem _root_.GlobalTheory.T.flatMapsSatisfyFlatLaws_finitePlaces
+    : ∀ D : D7, GlobalTheory.FinPl.FlatLaws D := by
+  first
+  | exact @GlobalTheory.FinPl.flatLaws_all
+  | exact GlobalTheory.FinPl.flatLaws_all
+  | (intros; apply GlobalTheory.FinPl.flatLaws_all <;> assumption)

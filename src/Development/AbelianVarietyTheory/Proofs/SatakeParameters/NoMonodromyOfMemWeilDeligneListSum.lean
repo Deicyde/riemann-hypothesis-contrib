@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.WeilRepEq
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
 open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -24,10 +25,12 @@ noncomputable section
 
 namespace GlobalTheory.UnlinkedMono
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
   {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
 
-theorem noMonodromy_of_mem_weilDeligneListSum : ∀ (l : List (WD h)), (sumList l).mono0 → ∀ y ∈ l, y.mono0
+theorem noMonodromy_of_mem_weilDeligneListSum
+    : ∀ (l : List (WD h)), (sumList l).mono0 → ∀ y ∈ l, y.mono0
   | [], _, y, hy => by simp at hy
   | z :: l, H, y, hy => by
     have hsum := (WD.monomial_sum_iff z (sumList l)).mp H
@@ -35,12 +38,13 @@ theorem noMonodromy_of_mem_weilDeligneListSum : ∀ (l : List (WD h)), (sumList 
     · exact hsum.1
     · exact noMonodromy_of_mem_weilDeligneListSum l hsum.2 y hy
 
-theorem lpTw_one_ne (x : WD h) (hx : 0 < x.lpDim) : x.lpTw 1 ≠ x := GlobalTheory.WeilDeligne.WD.lpTw_one_ne x hx
+theorem lpTw_one_ne (x : WD h) (hx : 0 < x.lpDim) : x.lpTw 1 ≠ x :=
+  GlobalTheory.WeilDeligne.WD.lpTw_one_ne x hx
 
 section
-variable {V V' W W' : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-  [AddCommGroup V'] [Module ℂ V'] [FiniteDimensional ℂ V']
-  [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+variable
+  {V V' W W' : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [AddCommGroup V']
+  [Module ℂ V'] [FiniteDimensional ℂ V'] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
   [AddCommGroup W'] [Module ℂ W'] [FiniteDimensional ℂ W']
 
 end

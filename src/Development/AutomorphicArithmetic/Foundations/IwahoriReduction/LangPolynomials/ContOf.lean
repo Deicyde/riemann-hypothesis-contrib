@@ -6,17 +6,24 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Lan
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
-private theorem cg_mono {l : ℕ} [Fact l.Prime] {n N : ℕ} (h : n ≤ N) {a b : Qbar l} (hc : Cg N a b) : Cg n a b := by
+private theorem cg_mono {l : ℕ} [Fact l.Prime] {n N : ℕ} (h : n ≤ N) {a b : Qbar l} (hc : Cg N a b)
+    : Cg n a b := by
   unfold Cg at *
   refine hc.trans ?_
   rw [norm_pow, norm_pow]
   exact pow_le_pow_of_le_one (norm_nonneg _) (IsUltrametricDist.norm_natCast_le_one _ _) h
 
-private theorem cg_down {Ω : Type} [Field Ω] [Algebra ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {A : ValuationSubring Ω}
-    {Z : Sy Ω l} (hZ : IwI c A Z) {s : G ℚ Ω} (hs : s ∈ Ine (F := ℚ) A) (n r : ℕ) :
-    ∀ d, (∀ x, Cg n (Z (r + d) s x) 0) → ∀ x, Cg n (Z r s x) 0 := by
+private theorem cg_down
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    {c : Coef l} {A : ValuationSubring Ω} {Z : Sy Ω l} (hZ : IwI c A Z)
+    {s : G ℚ Ω} (hs : s ∈ Ine (F := ℚ) A)
+    (n r : ℕ)
+    : ∀ d, (∀ x, Cg n (Z (r + d) s x) 0) → ∀ x, Cg n (Z r s x) 0 := by
   intro d
   induction d with
   | zero => intro h; simpa using h
@@ -33,8 +40,8 @@ private theorem cg_down {Ω : Type} [Field Ω] [Algebra ℚ Ω] {l : ℕ} [Fact 
     rw [sub_zero] at this
     exact this
 
-private theorem unit_lift (l : ℕ) [Fact l.Prime] (m : ℕ) (hm : 1 ≤ m) (x : (ZMod (l ^ m))ˣ) :
-    ∃ u : ℤ_[l]ˣ, PadicInt.toZModPow m (u : ℤ_[l]) = x := by
+private theorem unit_lift (l : ℕ) [Fact l.Prime] (m : ℕ) (hm : 1 ≤ m) (x : (ZMod (l ^ m))ˣ)
+    : ∃ u : ℤ_[l]ˣ, PadicInt.toZModPow m (u : ℤ_[l]) = x := by
   haveI : NeZero (l ^ m) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
   haveI : Fact (1 < l ^ m) := ⟨Nat.one_lt_pow (by omega) (Fact.out : l.Prime).one_lt⟩
   have hsurj : Function.Surjective (PadicInt.toZModPow (p := l) m) := by
@@ -44,8 +51,7 @@ private theorem unit_lift (l : ℕ) [Fact l.Prime] (m : ℕ) (hm : 1 ≤ m) (x :
   obtain ⟨u, hu⟩ := IsLocalRing.surjective_units_map_of_local_ringHom _ hsurj hsurj.isLocalHom x
   exact ⟨u, congrArg Units.val hu⟩
 
-theorem UpperTheory.Kd.C7.pContOf :
-    UpperTheory.Kd.C7.SContOf := by
+theorem UpperTheory.Kd.C7.pContOf : UpperTheory.Kd.C7.SContOf := by
   unfold UpperTheory.Kd.C7.SContOf
   intro l _ hl2 Ω _ _ _ A hA c β ζ hζ Z hZ hP
   obtain ⟨c₀, m₀, hP⟩ := hP
@@ -97,8 +103,8 @@ theorem UpperTheory.Kd.C7.pContOf :
     unfold UpperTheory.Kd.C7.Hm at hconjH'
     have hs'I := (Subgroup.mem_inf.mp hconjH').1
     have hs'k : cycMod ℚ Ω l m (tt y * s * (tt y)⁻¹) = 1 := (Subgroup.mem_inf.mp hconjH').2
-    have hs'fix : ∀ o : Option (Fin β.d),
-        (tt y * s * (tt y)⁻¹) (o.elim (ζ N) w) = o.elim (ζ N) w := by
+    have hs'fix
+        : ∀ o : Option (Fin β.d), (tt y * s * (tt y)⁻¹) (o.elim (ζ N) w) = o.elim (ζ N) w := by
       intro o
       have h := hfix (y, o)
       rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, h, ← AlgEquiv.mul_apply, mul_inv_cancel,

@@ -7,18 +7,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.X1.defEx :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (Φ : Fr O Γ) (l : ℕ) [Fact l.Prime] {Λ : Type} [CommRing Λ] [IsDomain Λ] [IsDiscreteValuationRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ] [Finite (ResidueField Λ)] (a : O →+* Λ), Φ.Std l a → ∀ c : PD Φ.ι Γ (ResidueField Λ), Φ.IsRes ((residue Λ).comp a) c → Φ.noMu.Std l a ∧ Φ.noMu.IsRes ((residue Λ).comp a) c ∧ ∃ (R : Type) (_ : CommRing R) (_ : Algebra Λ R) (_ : IsCO Λ R) (P : PD Φ.ι Γ R), Φ.noMu.IsDef a c P := by
+theorem UpperTheory.V.Ws.X1.defEx
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (Φ : Fr O Γ) (l : ℕ) [Fact l.Prime] {Λ : Type}
+        [CommRing Λ] [IsDomain Λ] [IsDiscreteValuationRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ]
+        [Finite (ResidueField Λ)] (a : O →+* Λ),
+      Φ.Std l a
+        → ∀ c : PD Φ.ι Γ (ResidueField Λ),
+          Φ.IsRes ((residue Λ).comp a) c
+            → Φ.noMu.Std l a ∧ Φ.noMu.IsRes ((residue Λ).comp a) c
+              ∧ ∃ (R : Type) (_ : CommRing R) (_ : Algebra Λ R) (_ : IsCO Λ R) (P : PD Φ.ι Γ R),
+                Φ.noMu.IsDef a c P := by
   intro O Γ _ _ _ _ _ _ Φ l _ Λ _ _ _ _ _ a hS c hc
   haveI : IsCO Λ (ResidueField Λ) := (co_res Λ).1
   have hok : Φ.noMu.Ok ((residue Λ).comp a) :=
     ⟨hS.ok.mul, hS.ok.kill, hS.ok.dist, hS.ok.two, hS.ok.lc⟩
   have hS' : Φ.noMu.Std l a :=
     ⟨hok, hS.char, hS.cont, hS.phi, hS.closed, hS.phiv, fun _ _ hs => hs.elim⟩
-  have hpair : ∀ {R : Type} [CommRing R] (b : O →+* R) (P : PD Φ.ι Γ R), Φ.IsPair b P → Φ.noMu.IsPair b P :=
-    fun b P h => ⟨h.mult, h.kill, h.nrm, h.low, h.flag, fun _ _ hs => hs.elim⟩
+  have hpair
+      : ∀ {R : Type} [CommRing R] (b : O →+* R) (P : PD Φ.ι Γ R),
+        Φ.IsPair b P → Φ.noMu.IsPair b P := fun b P h =>
+    ⟨h.mult, h.kill, h.nrm, h.low, h.flag, fun _ _ hs => hs.elim⟩
   have hc' : Φ.noMu.IsRes ((residue Λ).comp a) c :=
     ⟨hpair _ c hc.pair, ⟨hc.res.diag, hc.res.char, hc.res.shape⟩, hc.cont⟩
   refine ⟨hS', hc', ?_⟩

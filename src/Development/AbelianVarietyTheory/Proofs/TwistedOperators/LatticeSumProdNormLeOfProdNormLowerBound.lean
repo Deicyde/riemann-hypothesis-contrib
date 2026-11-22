@@ -226,12 +226,14 @@ end GlobalTheory.ProdNormSum
 
 namespace GlobalTheory.ProdNormSum
 
-theorem lattice_sum_le : ∀ (ι : Type) [Fintype ι] [Nonempty ι] (n : ℕ)
-    (Λ : AddSubgroup (ι → EuclideanSpace ℂ (Fin n))) (R : ℝ), 1 ≤ n → 1 < R →
-    (∀ w ∈ Λ, w ≠ 0 → R ≤ ∏ τ, ‖w τ‖) → ∀ s : Finset (ι → EuclideanSpace ℂ (Fin n)),
-    (∀ w ∈ s, w ∈ Λ ∧ w ≠ 0) →
-    ∑ w ∈ s, ∏ τ, (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹ ≤
-      Real.exp ((6 * n + 9) * Fintype.card ι) / R := by
+theorem lattice_sum_le
+    : ∀ (ι : Type) [Fintype ι] [Nonempty ι] (n : ℕ) (Λ : AddSubgroup (ι → EuclideanSpace ℂ (Fin n)))
+        (R : ℝ),
+      1 ≤ n → 1 < R → (∀ w ∈ Λ, w ≠ 0 → R ≤ ∏ τ, ‖w τ‖)
+        → ∀ s : Finset (ι → EuclideanSpace ℂ (Fin n)),
+          (∀ w ∈ s, w ∈ Λ ∧ w ≠ 0)
+            → ∑ w ∈ s, ∏ τ, (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹
+              ≤ Real.exp ((6 * n + 9) * Fintype.card ι) / R := by
   intro ι _ _ n Λ R hn hR hΛ s hs
   classical
   have hR0 : 0 < R := by linarith
@@ -250,12 +252,16 @@ theorem lattice_sum_le : ∀ (ι : Type) [Fintype ι] [Nonempty ι] (n : ℕ)
   set d := Fintype.card ι with hd
   set K : ℝ := (3 : ℝ) ^ (2 * n + 5) with hK
 
-  have hterm : ∀ w ∈ s, ∏ τ, (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹ ≤
-      K ^ d * (∏ τ, ((1 + ‖w τ‖) ^ (2 * n + 4))⁻¹) * R⁻¹ := by
+  have hterm
+      : ∀ w ∈ s,
+        ∏ τ, (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹
+          ≤ K ^ d * (∏ τ, ((1 + ‖w τ‖) ^ (2 * n + 4))⁻¹) * R⁻¹ := by
     intro w hw
     have hx : ∀ τ, 0 < 1 + ‖w τ‖ := fun τ => by positivity
-    have e : ∀ τ, (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹ =
-        K * ((1 + ‖w τ‖) ^ (2 * n + 4))⁻¹ * (1 + ‖w τ‖)⁻¹ := by
+    have e
+        : ∀ τ,
+          (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹
+            = K * ((1 + ‖w τ‖) ^ (2 * n + 4))⁻¹ * (1 + ‖w τ‖)⁻¹ := by
       intro τ
       have := (hx τ).ne'
       rw [hK, div_pow, pow_succ]
@@ -267,14 +273,13 @@ theorem lattice_sum_le : ∀ (ι : Type) [Fintype ι] [Nonempty ι] (n : ℕ)
     have h2 : ∏ τ, ‖w τ‖ ≤ ∏ τ, (1 + ‖w τ‖) :=
       Finset.prod_le_prod₀ (fun τ _ => norm_nonneg _) fun τ _ => by linarith
     exact inv_anti₀ hR0 (h1.trans h2)
-  calc ∑ w ∈ s, ∏ τ, (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹
+  calc
+    ∑ w ∈ s, ∏ τ, (((1 + ‖w τ‖) / 3) ^ (2 * n + 5))⁻¹
       ≤ ∑ w ∈ s, K ^ d * (∏ τ, ((1 + ‖w τ‖) ^ (2 * n + 4))⁻¹) * R⁻¹ := Finset.sum_le_sum hterm
     _ = K ^ d * (∑ w ∈ s, ∏ τ, ((1 + ‖w τ‖) ^ (2 * n + 4))⁻¹) * R⁻¹ := by
       rw [← Finset.sum_mul, ← Finset.mul_sum]
-    _ ≤ K ^ d * ((3 / 2) ^ (2 * n + 4) * ((n : ℝ) / 2 * 4 ^ n)) ^ d * R⁻¹ := by
-      gcongr
-    _ = (K * ((3 / 2) ^ (2 * n + 4) * ((n : ℝ) / 2 * 4 ^ n))) ^ d * R⁻¹ := by
-      rw [mul_pow K]
+    _ ≤ K ^ d * ((3 / 2) ^ (2 * n + 4) * ((n : ℝ) / 2 * 4 ^ n)) ^ d * R⁻¹ := by gcongr
+    _ = (K * ((3 / 2) ^ (2 * n + 4) * ((n : ℝ) / 2 * 4 ^ n))) ^ d * R⁻¹ := by rw [mul_pow K]
     _ ≤ Real.exp (6 * n + 9) ^ d * R⁻¹ := by
       gcongr
       exact const_le_exp n

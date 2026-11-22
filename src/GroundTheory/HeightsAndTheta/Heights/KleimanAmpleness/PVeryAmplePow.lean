@@ -18,13 +18,13 @@ universe u w
 
 namespace VeryAmplePow
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 def mono {r j : ℕ} (h : Fin (r + 1) → Ω) (w : Fin j → Fin (r + 1)) : Ω := ∏ t, h (w t)
 
-theorem range_mono {r j : ℕ} (h : Fin (r + 1) → Ω) :
-    Set.range (mono (j := j) h) = Set.range h ^ j := by
+theorem range_mono {r j : ℕ} (h : Fin (r + 1) → Ω)
+    : Set.range (mono (j := j) h) = Set.range h ^ j := by
   ext a
   rw [Set.mem_pow_iff_prod]
   constructor
@@ -34,23 +34,27 @@ theorem range_mono {r j : ℕ} (h : Fin (r + 1) → Ω) :
     choose w hw using hf
     exact ⟨w, by simp only [mono, hw]⟩
 
-theorem mono_mem {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) → Ω}
-    (hH : ∀ l I, h l ∈ H.sub I) (w : Fin j → Fin (r + 1)) (I : Chart x) :
-    mono h w ∈ H.sub I ^ j := by
+theorem mono_mem
+    {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) → Ω}
+    (hH : ∀ l I, h l ∈ H.sub I) (w : Fin j → Fin (r + 1))
+    (I : Chart x)
+    : mono h w ∈ H.sub I ^ j := by
   rw [Submodule.pow_eq_span_pow_set]
   exact Submodule.subset_span (Set.mem_pow_iff_prod.mpr ⟨fun t => h (w t), fun t => hH _ I, rfl⟩)
 
-theorem mono_succ {r j : ℕ} (h : Fin (r + 1) → Ω) (w : Fin (j + 1) → Fin (r + 1)) :
-    mono h w = h (w 0) * mono h (Fin.tail w) := by
+theorem mono_succ {r j : ℕ} (h : Fin (r + 1) → Ω) (w : Fin (j + 1) → Fin (r + 1))
+    : mono h w = h (w 0) * mono h (Fin.tail w) := by
   simp only [mono, Fin.prod_univ_succ, Fin.tail]
 
-theorem mono_cons {r j : ℕ} (h : Fin (r + 1) → Ω) (v : Fin (r + 1)) (t : Fin j → Fin (r + 1)) :
-    mono h (Fin.cons v t : Fin (j + 1) → Fin (r + 1)) = h v * mono h t := by
+theorem mono_cons {r j : ℕ} (h : Fin (r + 1) → Ω) (v : Fin (r + 1)) (t : Fin j → Fin (r + 1))
+    : mono h (Fin.cons v t : Fin (j + 1) → Fin (r + 1)) = h v * mono h t := by
   simp only [mono, Fin.prod_univ_succ, Fin.cons_zero, Fin.cons_succ]
 
-theorem ampleChart_le {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) → Ω}
-    (hH : ∀ l I, h l ∈ H.sub I) (w : Fin (j + 1) → Fin (r + 1)) (I : Chart x) :
-    ampleChart H 1 (h (w 0)) I ⊆ ampleChart (H.pow (j + 1)) 1 (mono h w) I := by
+theorem ampleChart_le
+    {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) → Ω}
+    (hH : ∀ l I, h l ∈ H.sub I) (w : Fin (j + 1) → Fin (r + 1))
+    (I : Chart x)
+    : ampleChart H 1 (h (w 0)) I ⊆ ampleChart (H.pow (j + 1)) 1 (mono h w) I := by
   rintro a ⟨n, hn⟩
   refine ⟨n, ?_⟩
   rw [SubSystem.pow_sub, one_mul] at hn
@@ -58,12 +62,13 @@ theorem ampleChart_le {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) → Ω
     show (j + 1) * n = n + j * n by ring, pow_add, pow_mul]
   exact Submodule.mul_mem_mul hn (Submodule.pow_mem_pow _ (mono_mem hH _ I) n)
 
-theorem isVeryAmpleBy_mono {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) → Ω}
-    (hv : IsVeryAmpleBy H h) {m : ℕ} (E : (Fin (j + 1) → Fin (r + 1)) ≃ Fin (m + 1)) :
-    IsVeryAmpleBy (H.pow (j + 1)) (fun k => mono h (E.symm k)) := by
+theorem isVeryAmpleBy_mono
+    {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) → Ω} (hv : IsVeryAmpleBy H h)
+    {m : ℕ} (E : (Fin (j + 1) → Fin (r + 1)) ≃ Fin (m + 1))
+    : IsVeryAmpleBy (H.pow (j + 1)) (fun k => mono h (E.symm k)) := by
   have hH : ∀ l I, h l ∈ H.sub I := fun l I => (Submodule.mem_iInf _).mp (hv.mem_secs l) I
-  have hgen : ∀ k w', mono h w' / mono h (E.symm k) ∈
-      ampleBase (S := S) (fun k => mono h (E.symm k)) k :=
+  have hgen
+      : ∀ k w', mono h w' / mono h (E.symm k) ∈ ampleBase (S := S) (fun k => mono h (E.symm k)) k :=
     fun k w' => Algebra.subset_adjoin ⟨E w', by simp⟩
   refine ⟨fun k => ?_, fun I => ?_, fun k hk => ?_, fun k hk => ?_⟩
   · exact (Submodule.mem_iInf _).mpr fun I => by
@@ -82,40 +87,55 @@ theorem isVeryAmpleBy_mono {H : SubSystem S x Ω} {r j : ℕ} {h : Fin (r + 1) �
       rwa [SubSystem.pow_sub, SubSystem.pow_sub, one_mul, ← pow_mul] at hn
     choose nI hnI using hI
     classical
-    have hn0 : ∀ I, a * mono h (E.symm k) ^ (∑ I', nI I') ∈ H.sub I ^ ((j + 1) * ∑ I', nI I') :=
-      fun I => by
-        obtain ⟨d, hd⟩ : ∃ d, ∑ I', nI I' = nI I + d :=
-          ⟨_, (Nat.add_sub_cancel' (Finset.single_le_sum (fun _ _ => Nat.zero_le _)
-            (Finset.mem_univ I))).symm⟩
-        rw [hd, pow_add, ← mul_assoc, mul_add, pow_add]
-        exact Submodule.mul_mem_mul (hnI I)
-          (by rw [pow_mul]; exact Submodule.pow_mem_pow _ (mono_mem hH _ I) d)
-    have hb : a * (mono h (E.symm k) / h (E.symm k 0) ^ (j + 1)) ^ (∑ I', nI I') ∈
-        ampleRing H 1 (h (E.symm k 0)) := Set.mem_iInter.mpr fun I => ⟨(j + 1) * ∑ I', nI I', by
-      rw [SubSystem.pow_sub, one_mul]
-      have : a * (mono h (E.symm k) / h (E.symm k 0) ^ (j + 1)) ^ (∑ I', nI I') *
-          h (E.symm k 0) ^ ((j + 1) * ∑ I', nI I') = a * mono h (E.symm k) ^ (∑ I', nI I') := by
-        rw [pow_mul, div_pow, mul_assoc, div_mul_cancel₀ _ (pow_ne_zero _ (pow_ne_zero _ hl))]
-      rw [this]
-      exact hn0 I⟩
-    have hbase : ampleBase (S := S) h (E.symm k 0) ≤
-        ampleBase (S := S) (fun k => mono h (E.symm k)) k := by
+    have hn0
+        : ∀ I,
+          a * mono h (E.symm k) ^ (∑ I', nI I') ∈ H.sub I ^ ((j + 1) * ∑ I', nI I') := fun I => by
+      obtain ⟨d, hd⟩ : ∃ d, ∑ I', nI I' = nI I + d := ⟨
+        _,
+        (Nat.add_sub_cancel'
+          (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ I))).symm
+      ⟩
+      rw [hd, pow_add, ← mul_assoc, mul_add, pow_add]
+      exact Submodule.mul_mem_mul (hnI I)
+        (by rw [pow_mul]; exact Submodule.pow_mem_pow _ (mono_mem hH _ I) d)
+    have hb
+        : a * (mono h (E.symm k) / h (E.symm k 0) ^ (j + 1)) ^ (∑ I', nI I')
+          ∈ ampleRing H 1 (h (E.symm k 0)) :=
+      Set.mem_iInter.mpr fun I => ⟨
+        (j + 1) * ∑ I', nI I',
+        by
+          rw [SubSystem.pow_sub, one_mul]
+          have : a * (mono h (E.symm k) / h (E.symm k 0) ^ (j + 1)) ^ (∑ I', nI I')
+                * h (E.symm k 0) ^ ((j + 1) * ∑ I', nI I')
+              = a * mono h (E.symm k) ^ (∑ I', nI I') := by
+            rw [pow_mul, div_pow, mul_assoc, div_mul_cancel₀ _ (pow_ne_zero _ (pow_ne_zero _ hl))]
+          rw [this]
+          exact hn0 I
+      ⟩
+    have hbase
+        : ampleBase (S := S) h (E.symm k 0)
+          ≤ ampleBase (S := S) (fun k => mono h (E.symm k)) k := by
       refine Algebra.adjoin_le ?_
       rintro _ ⟨v, rfl⟩
-      have : h v / h (E.symm k 0) =
-          mono h (Fin.cons v (Fin.tail (E.symm k)) : Fin (j + 1) → Fin (r + 1)) / mono h (E.symm k) := by
+      have : h v / h (E.symm k 0)
+          = mono h (Fin.cons v (Fin.tail (E.symm k)) : Fin (j + 1) → Fin (r + 1))
+            / mono h (E.symm k) := by
         rw [mono_cons, mono_succ h (E.symm k), mul_div_mul_right _ _ hq]
       change h v / h (E.symm k 0) ∈ _
       rw [this]
       exact hgen k _
-    have hinv : h (E.symm k 0) ^ (j + 1) / mono h (E.symm k) ∈
-        ampleBase (S := S) (fun k => mono h (E.symm k)) k := by
-      have : h (E.symm k 0) ^ (j + 1) = mono h (fun _ => E.symm k 0 : Fin (j + 1) → Fin (r + 1)) := by
+    have hinv
+        : h (E.symm k 0) ^ (j + 1) / mono h (E.symm k)
+          ∈ ampleBase (S := S) (fun k => mono h (E.symm k)) k := by
+      have : h (E.symm k 0) ^ (j + 1)
+          = mono h (fun _ => E.symm k 0 : Fin (j + 1) → Fin (r + 1)) := by
         simp [mono, Finset.prod_const]
       rw [this]
       exact hgen k _
-    have ha' : a = a * (mono h (E.symm k) / h (E.symm k 0) ^ (j + 1)) ^ (∑ I', nI I') *
-        (h (E.symm k 0) ^ (j + 1) / mono h (E.symm k)) ^ (∑ I', nI I') := by
+    have ha'
+        : a
+          = a * (mono h (E.symm k) / h (E.symm k 0) ^ (j + 1)) ^ (∑ I', nI I')
+            * (h (E.symm k 0) ^ (j + 1) / mono h (E.symm k)) ^ (∑ I', nI I') := by
       rw [mul_assoc, ← mul_pow, div_mul_div_cancel₀ (pow_ne_zero _ hl),
         div_self (by rw [mono_succ]; exact hk'), one_pow, mul_one]
     rw [ha']

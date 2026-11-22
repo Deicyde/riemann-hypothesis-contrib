@@ -26,8 +26,6 @@ structure IsAffVariety (J : Ideal (MvPolynomial (Fin n) ℂ)) (d : ℕ) : Prop w
   isPrime : J.IsPrime
   dim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d
 
-
-
 section Inhabitants
 
 end Inhabitants

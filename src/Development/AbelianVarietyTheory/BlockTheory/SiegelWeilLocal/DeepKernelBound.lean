@@ -23,16 +23,14 @@ def radRh (B : RowsAut) (q : ℕ) (τ : ℝ) : ℝ :=
 
 def DeepKernelBound : Prop :=
   ∀ (Cg : ℝ) (n₀ : ℕ) (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (p q : ℕ) (b : ℝ)
-    (c : InfinitePlace B.I.F → ℝ) (x : B.I.GA),
-    0 ≤ Cg → 8 ≤ n₀ → 1 ≤ q → CountHyp B Cg n₀ d p q b →
-    (∀ v, IsGauge (B.I.ε v) (c v)) →
-    least B.I x < tauStar B q b →
-    (kern B.I (phe B d) x x).re ≤
-      (2 * radRh B q (least B.I x) * Real.sqrt B.I.f *
-            stepBe B.I.n b (8 * q * dimN B + dimN B)) ^ (16 * q * dimN B) *
-        (6 * stepBe B.I.n b (8 * q * dimN B + dimN B)) ^ dimN B *
-        Real.exp B.I.f *
-        (17 * Real.sqrt B.I.n / least B.I x ^ 2) ^ (2 * dimN B) *
-        (B.D : ℝ) * (∏ v, c v) / (B.μf (B.I.Kg B.g)).toReal
+      (c : InfinitePlace B.I.F → ℝ) (x : B.I.GA),
+    0 ≤ Cg → 8 ≤ n₀ → 1 ≤ q → CountHyp B Cg n₀ d p q b → (∀ v, IsGauge (B.I.ε v) (c v))
+      → least B.I x < tauStar B q b
+      → (kern B.I (phe B d) x x).re
+        ≤ (2 * radRh B q (least B.I x) * Real.sqrt B.I.f * stepBe B.I.n b (8 * q * dimN B + dimN B))
+            ^ (16 * q * dimN B)
+          * (6 * stepBe B.I.n b (8 * q * dimN B + dimN B)) ^ dimN B * Real.exp B.I.f
+          * (17 * Real.sqrt B.I.n / least B.I x ^ 2) ^ (2 * dimN B) * (B.D : ℝ) * (∏ v, c v)
+          / (B.μf (B.I.Kg B.g)).toReal
 
 end GlobalTheory.IndefiniteRowSideFullHecke.DeepKernelRadiusBound

@@ -5,22 +5,28 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsSmoothVect
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.HolDict
 
-private theorem eq_diagonal_of_lower_upper_zero {n : ℕ} (b : Mt n) (hlow : ∀ a c : Fin n, c < a → b a c = 0)
-    (hup : ∀ a c : Fin n, a < c → b a c = 0) : b = diagonal fun a => b a a := by
+private theorem eq_diagonal_of_lower_upper_zero
+    {n : ℕ}
+    (b : Mt n) (hlow : ∀ a c : Fin n, c < a → b a c = 0) (hup : ∀ a c : Fin n, a < c → b a c = 0)
+    : b = diagonal fun a => b a a := by
   ext i j
   rcases lt_trichotomy i j with hij | rfl | hij
   · rw [hup i j hij, diagonal_apply_ne _ (ne_of_lt hij)]
   · rw [diagonal_apply_eq]
   · rw [hlow i j hij, diagonal_apply_ne _ (ne_of_gt hij)]
 
-private theorem eq_exp_arg_mul_I_of_star_mul_self_eq_one (z : ℂ) (hz : star z * z = 1) :
-    z = Complex.exp ((Complex.arg z : ℂ) * Complex.I) := by
+private theorem eq_exp_arg_mul_I_of_star_mul_self_eq_one (z : ℂ) (hz : star z * z = 1)
+    : z = Complex.exp ((Complex.arg z : ℂ) * Complex.I) := by
   have hn : Complex.normSq z = 1 := by
     have h1 : (Complex.normSq z : ℂ) = 1 := (Complex.normSq_eq_conj_mul_self).trans hz
     exact_mod_cast h1
@@ -32,9 +38,10 @@ private theorem eq_exp_arg_mul_I_of_star_mul_self_eq_one (z : ℂ) (hz : star z 
   rw [habs, Complex.ofReal_one, one_mul] at key
   exact key.symm
 
-theorem diag_of_upT_of_preserves {n : ℕ} (d : Fin n → ℂ) (hd : ∀ a, d a * d a = 1) (b : Mt n) (hb : UpT b)
-    (h : bᴴ * diagonal d * b = diagonal d) :
-    ∃ s : Fin n → ℝ, b = diagonal fun a => Complex.exp ((s a : ℂ) * Complex.I) := by
+theorem diag_of_upT_of_preserves
+    {n : ℕ} (d : Fin n → ℂ) (hd : ∀ a, d a * d a = 1) (b : Mt n) (hb : UpT b)
+    (h : bᴴ * diagonal d * b = diagonal d)
+    : ∃ s : Fin n → ℝ, b = diagonal fun a => Complex.exp ((s a : ℂ) * Complex.I) := by
   classical
   have hDD : diagonal d * diagonal d = 1 := by
     rw [diagonal_mul_diagonal, ← diagonal_one]
@@ -75,13 +82,19 @@ theorem diag_of_upT_of_preserves {n : ℕ} (d : Fin n → ℂ) (hd : ∀ a, d a 
     have h2 : d a * (star (b a a) * b a a) = d a * 1 := by linear_combination h1
     exact mul_left_cancel₀ (hdne a) h2
   refine ⟨fun a => Complex.arg (b a a), ?_⟩
-  calc b = diagonal fun a => b a a := hdiag
+  calc
+    b = diagonal fun a => b a a := hdiag
     _ = _ := by
       congr 1
       funext a
       exact eq_exp_arg_mul_I_of_star_mul_self_eq_one _ (hu a)
 
-theorem diag_of_upT_unitary : ∀ (n : ℕ) (Hm : Mt n) (q : ℕ) (x₀ : Mt n), OrthFr Hm q x₀ → ∀ b : Mt n, UpT b → x₀ * b * x₀⁻¹ ∈ Formalism.QuantumDeterminants.UH Hm → ∃ s : Fin n → ℝ, b = diagonal fun a => Complex.exp ((s a : ℂ) * Complex.I) := by
+theorem diag_of_upT_unitary
+    : ∀ (n : ℕ) (Hm : Mt n) (q : ℕ) (x₀ : Mt n),
+      OrthFr Hm q x₀
+        → ∀ b : Mt n,
+          UpT b → x₀ * b * x₀⁻¹ ∈ Formalism.QuantumDeterminants.UH Hm
+            → ∃ s : Fin n → ℝ, b = diagonal fun a => Complex.exp ((s a : ℂ) * Complex.I) := by
   intro n Hm q x₀ hx b hb hu
   obtain ⟨-, hx⟩ := hx
   set d : Fin n → ℂ := fun a : Fin n => -((ReciprocityTheory.ChartRestriction.G.FD.sgn q (a : ℕ) : ℝ) : ℂ) with hd_def
@@ -103,7 +116,9 @@ theorem diag_of_upT_unitary : ∀ (n : ℕ) (Hm : Mt n) (q : ℕ) (x₀ : Mt n),
     rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul _ (Ne.isUnit hdet), Matrix.mul_one]
 
   have key : bᴴ * diagonal d * b = diagonal d := by
-    calc bᴴ * diagonal d * b = bᴴ * (x₀ᴴ * Hm * x₀) * b := by rw [hx]
+    calc
+      bᴴ * diagonal d * b
+        = bᴴ * (x₀ᴴ * Hm * x₀) * b := by rw [hx]
       _ = (x₀ * b)ᴴ * Hm * (x₀ * b) := by rw [conjTranspose_mul]; simp only [Matrix.mul_assoc]
       _ = (x₀ * b * x₀⁻¹ * x₀)ᴴ * Hm * (x₀ * b * x₀⁻¹ * x₀) := by rw [hcx]
       _ = x₀ᴴ * ((x₀ * b * x₀⁻¹)ᴴ * Hm * (x₀ * b * x₀⁻¹)) * x₀ := by

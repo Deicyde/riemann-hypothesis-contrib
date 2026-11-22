@@ -13,24 +13,51 @@ noncomputable section
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.ZH
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ThetaGerm
 
-theorem associated_gs_down {X Y Z : Scheme.{0}} (L : LB X) (σ : Y ⟶ X) (ρ : X ⟶ Y) (e : ρ ≫ σ = 𝟙 X) (n : ℤ)
-    (b : (LB.LinComb L (K := Fin 1) (fun _ => σ) (fun _ => n)).Sec) (r : Z ⟶ X) (z : Z) (j : PUnit → L.ι)
-    (hj : r z ∈ LB.wchart L (fun _ : PUnit => 𝟙 X) j) {J : (Z ⟶ X) → L.ι} (hJ : Good L z J) :
-    Associated (gs r z (LB.wchart L (fun _ : PUnit => 𝟙 X) j) ((PowSec.down L σ ρ e n b).f j))
+theorem associated_gs_down
+    {X Y Z : Scheme.{0}} (L : LB X) (σ : Y ⟶ X) (ρ : X ⟶ Y) (e : ρ ≫ σ = 𝟙 X)
+    (n : ℤ) (b : (LB.LinComb L (K := Fin 1) (fun _ => σ) (fun _ => n)).Sec)
+    (r : Z ⟶ X) (z : Z) (j : PUnit → L.ι) (hj : r z ∈ LB.wchart L (fun _ : PUnit => 𝟙 X) j)
+    {J : (Z ⟶ X) → L.ι} (hJ : Good L z J)
+    : Associated (gs r z (LB.wchart L (fun _ : PUnit => 𝟙 X) j) ((PowSec.down L σ ρ e n b).f j))
       (sval b (r ≫ ρ) z J) := by
   have hle := (PowSec.chart_eq L σ ρ e j).le
-  have h₁ : gs r z (LB.wchart L (fun _ : PUnit => 𝟙 X) j) ((PowSec.down L σ ρ e n b).f j) =
-      gs (r ≫ ρ) z (LB.wchart L (fun _ : Fin 1 => σ) (fun _ => j PUnit.unit)) (b.f (fun _ => j PUnit.unit)) :=
+  have h₁
+      : gs r z (LB.wchart L (fun _ : PUnit => 𝟙 X) j) ((PowSec.down L σ ρ e n b).f j)
+        = gs (r ≫ ρ) z (LB.wchart L (fun _ : Fin 1 => σ) (fun _ => j PUnit.unit))
+          (b.f (fun _ => j PUnit.unit)) :=
     (gs_res r z hle hj _).trans (gs_pull r ρ z _ (hle hj) _)
-  rw [h₁, sec_trans b (r ≫ ρ) z (j := fun _ => j PUnit.unit) (hle hj) (hJ.mem (fun _ : Fin 1 => σ) (r ≫ ρ))]
+  rw [h₁,
+    sec_trans b (r ≫ ρ) z
+      (j := fun _ => j PUnit.unit)
+      (hle hj) (hJ.mem (fun _ : Fin 1 => σ) (r ≫ ρ))]
   exact associated_unit_mul_left _ _ (Units.isUnit _)
 
-theorem germ_origin : Out.Laws → ∀ (K : Type) [Field K] [IsAlgClosed K] (P : Out.PolAV (Sp K)) (N m : ℕ) (J : Type) (x : J → ((Out.baseOver (Sp K)) ⟶ P.A)) (th : LB.Sec (Out.LPow P.A P.L 1 (Out.baseOver (Sp K)))) (t : J → LB.Sec (Out.LPow P.A P.L N (Out.baseOver (Sp K)))) (ρ : P.A.left ⟶ ((Out.baseOver (Sp K)) ⊗ P.A).left) (e : ρ ≫ (snd (Out.baseOver (Sp K)) P.A).left = 𝟙 P.A.left) (a : J), Out.IsGenSec P.A P.L 1 th → IsThetaFamily P N m x th t → x a = 1 → (∃ l, (PowSec.down P.L (snd (Out.baseOver (Sp K)) P.A).left ρ e ((1 : ℕ) : ℤ) (th)).f l ≠ 0) ∧ (∀ (y : P.A.left) k l, y ∈ (lbPow P.L N).U k → (Out.mulA P.A m).left y ∈ (lbPow P.L 1).U l → Associated (gs (𝟙 P.A.left) y ((lbPow P.L N).U k) ((PowSec.down P.L (snd (Out.baseOver (Sp K)) P.A).left ρ e ((N : ℕ) : ℤ) (t a)).f k)) (gs (Out.mulA P.A m).left y ((lbPow P.L 1).U l) ((PowSec.down P.L (snd (Out.baseOver (Sp K)) P.A).left ρ e ((1 : ℕ) : ℤ) (th)).f l))) := by
+theorem germ_origin
+    : Out.Laws
+      → ∀ (K : Type) [Field K] [IsAlgClosed K] (P : Out.PolAV (Sp K)) (N m : ℕ) (J : Type)
+          (x : J → ((Out.baseOver (Sp K)) ⟶ P.A))
+          (th : LB.Sec (Out.LPow P.A P.L 1 (Out.baseOver (Sp K))))
+          (t : J → LB.Sec (Out.LPow P.A P.L N (Out.baseOver (Sp K))))
+          (ρ : P.A.left ⟶ ((Out.baseOver (Sp K)) ⊗ P.A).left)
+          (e : ρ ≫ (snd (Out.baseOver (Sp K)) P.A).left = 𝟙 P.A.left) (a : J),
+        Out.IsGenSec P.A P.L 1 th → IsThetaFamily P N m x th t → x a = 1
+          → (∃ l,
+              (PowSec.down P.L (snd (Out.baseOver (Sp K)) P.A).left ρ e ((1 : ℕ) : ℤ) (th)).f l ≠ 0)
+            ∧ (∀ (y : P.A.left) k l,
+              y ∈ (lbPow P.L N).U k → (Out.mulA P.A m).left y ∈ (lbPow P.L 1).U l
+                → Associated
+                  (gs (𝟙 P.A.left) y ((lbPow P.L N).U k)
+                    ((PowSec.down P.L (snd (Out.baseOver (Sp K)) P.A).left ρ e ((N : ℕ) : ℤ)
+                      (t a)).f k))
+                  (gs (Out.mulA P.A m).left y ((lbPow P.L 1).U l)
+                    ((PowSec.down P.L (snd (Out.baseOver (Sp K)) P.A).left ρ e ((1 : ℕ) : ℤ) (th)).f
+                      l))) := by
   intro hLaw K _ _ P N m J x th t ρ e a hth H hx
   let π : P.A ⟶ Out.baseOver (Sp K) := Over.homMk P.A.hom (Category.comp_id _)
   let ρ' : P.A ⟶ Out.baseOver (Sp K) ⊗ P.A := lift π (𝟙 _)
@@ -40,10 +67,11 @@ theorem germ_origin : Out.Laws → ∀ (K : Type) [Field K] [IsAlgClosed K] (P :
     congrArg (fun q => q.left) (lift_fst _ _ : ρ' ≫ _ = _)
   have ρ₃ : (snd (Out.baseOver (Sp K)) P.A).left ≫ ρ'.left = 𝟙 _ := by
     apply pullback.hom_ext
-    · exact (Category.assoc _ _ _).trans ((congrArg (_ ≫ ·) ρ₁).trans (pullback.condition.symm.trans
-        ((Category.comp_id _).trans (Category.id_comp _).symm)))
-    · exact (Category.assoc _ _ _).trans ((congrArg (_ ≫ ·) ρ₂).trans
-        ((Category.comp_id _).trans (Category.id_comp _).symm))
+    · exact (Category.assoc _ _ _).trans
+        ((congrArg (_ ≫ ·) ρ₁).trans
+          (pullback.condition.symm.trans ((Category.comp_id _).trans (Category.id_comp _).symm)))
+    · exact (Category.assoc _ _ _).trans
+        ((congrArg (_ ≫ ·) ρ₂).trans ((Category.comp_id _).trans (Category.id_comp _).symm))
   obtain rfl : ρ = ρ'.left := by
     rw [← Category.comp_id ρ, ← ρ₃, ← Category.assoc, e, Category.id_comp]
   haveI : IsIso ρ'.left := ⟨_, ρ₂, ρ₃⟩
@@ -81,7 +109,8 @@ theorem germ_origin : Out.Laws → ∀ (K : Type) [Field K] [IsAlgClosed K] (P :
     rw [Category.id_comp] at a₁
     rw [e₁] at a₂
     refine a₁.trans (Associated.trans ?_ a₂.symm)
-    exact (Associated.of_eq b₁).trans ((associated_unit_mul_left _ _ (Units.isUnit _)).trans
-      (associated_unit_mul_left _ _ (Units.isUnit _)))
+    exact (Associated.of_eq b₁).trans
+      ((associated_unit_mul_left _ _ (Units.isUnit _)).trans
+        (associated_unit_mul_left _ _ (Units.isUnit _)))
 
 end GlobalTheory.ThetaGerm

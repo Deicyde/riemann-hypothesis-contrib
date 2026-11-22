@@ -5,12 +5,15 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafVanBPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite Polynomial IsLocalRing GlobalTheory.EtC LateralTheory.E.E4
+open CategoryTheory Limits AlgebraicGeometry Opposite Polynomial IsLocalRing GlobalTheory.EtC
+  LateralTheory.E.E4
 
 namespace LateralTheory.E.LeafClosedSHPosPf
 
-theorem hens_of_surj {A B : Type} [CommRing A] [CommRing B] [HenselianLocalRing A] [Nontrivial B]
-    (φ : A →+* B) (hφ : Function.Surjective φ) : HenselianLocalRing B := by
+theorem hens_of_surj
+    {A B : Type} [CommRing A] [CommRing B] [HenselianLocalRing A] [Nontrivial B]
+    (φ : A →+* B) (hφ : Function.Surjective φ)
+    : HenselianLocalRing B := by
   have := IsLocalHom.of_surjective φ hφ
   have : IsLocalRing B := IsLocalRing.of_surjective φ hφ
   refine { is_henselian := ?_ }
@@ -33,9 +36,12 @@ theorem hens_of_surj {A B : Type} [CommRing A] [CommRing B] [HenselianLocalRing 
   · rw [← map_sub]
     exact (mem_maximalIdeal _).2 (fun hu => (mem_maximalIdeal _).1 ham (IsUnit.of_map φ _ hu))
 
-theorem sepClosed_of_surj {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B]
-    (φ : A →+* B) [IsLocalHom φ] (hφ : Function.Surjective φ) [IsSepClosed (ResidueField A)] :
-    IsSepClosed (ResidueField B) := by
+theorem sepClosed_of_surj
+    {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B]
+    (φ : A →+* B) [IsLocalHom φ]
+    (hφ : Function.Surjective φ)
+    [IsSepClosed (ResidueField A)]
+    : IsSepClosed (ResidueField B) := by
   have hs : Function.Surjective (ResidueField.map φ) := by
     intro y
     obtain ⟨b, rfl⟩ := residue_surjective y
@@ -48,19 +54,30 @@ theorem sepClosed_of_surj {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A]
   have h2 := (IsSepClosed.splits_of_separable _ h1).map (e : ResidueField A →+* ResidueField B)
   rw [Polynomial.map_map] at h2
   convert h2
-  ext x; simp
+  ext x
+  simp
 
-theorem sub_of_iso {X Y : Scheme.{0}} (e : X ≅ Y) (R : Type) [CommRing R] (F : Shv R) (n : ℤ)
-    (h : Subsingleton (H R (sch.obj Y) F n)) : Subsingleton (H R (sch.obj X) F n) := by
+theorem sub_of_iso
+    {X Y : Scheme.{0}} (e : X ≅ Y)
+    (R : Type) [CommRing R]
+    (F : Shv R) (n : ℤ) (h : Subsingleton (H R (sch.obj Y) F n))
+    : Subsingleton (H R (sch.obj X) F n) := by
   refine ⟨fun x y => ?_⟩
-  have key : ∀ z : H R (sch.obj X) F n,
-      z = pull R (sch.map e.hom) F n (pull R (sch.map e.inv) F n z) := by
+  have key
+      : ∀ z : H R (sch.obj X) F n,
+        z = pull R (sch.map e.hom) F n (pull R (sch.map e.inv) F n z) := by
     intro z
-    rw [← pull_comp, ← CategoryTheory.Functor.map_comp, e.hom_inv_id, CategoryTheory.Functor.map_id, pull_id]
+    rw [← pull_comp, ← CategoryTheory.Functor.map_comp, e.hom_inv_id, CategoryTheory.Functor.map_id,
+      pull_id]
   rw [key x, key y, Subsingleton.elim (pull R (sch.map e.inv) F n x) (pull R (sch.map e.inv) F n y)]
 
-theorem sub_of_empty (hy : Hyps) (R : Type) [CommRing R] (F : Shv R) (W : Scheme.{0}) [IsEmpty W] (n : ℤ)
-    (hn : 0 < n) : Subsingleton (H R (sch.obj W) F n) := by
+theorem sub_of_empty
+    (hy : Hyps)
+    (R : Type) [CommRing R]
+    (F : Shv R)
+    (W : Scheme.{0}) [IsEmpty W]
+    (n : ℤ) (hn : 0 < n)
+    : Subsingleton (H R (sch.obj W) F n) := by
   have a5 : A5 := hy.2.2.2.2.1
   suffices h : ∀ x : H R (sch.obj W) F n, x = 0 from ⟨fun a b => by rw [h a, h b]⟩
   intro x
@@ -78,8 +95,8 @@ theorem LeafClosedSHPos_of : LateralTheory.E.LeafVanBPf.LeafClosedSHPos := by
   obtain ⟨hAff, hsurj⟩ := IsClosedImmersion.isAffine_surjective_of_isAffine ι'
   let B : Type := Γ(W', ⊤)
   let ψ : A →+* B := (ι'.appTop).hom.comp (Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom
-  have hψ : Function.Surjective ψ := hsurj.comp
-    (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of A)).inv).2
+  have hψ : Function.Surjective ψ :=
+    hsurj.comp (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of A)).inv).2
   have : Nontrivial B := by
     by_contra hB
     rw [not_nontrivial_iff_subsingleton] at hB
@@ -89,7 +106,9 @@ theorem LeafClosedSHPos_of : LateralTheory.E.LeafVanBPf.LeafClosedSHPos := by
   have := IsLocalHom.of_surjective ψ hψ
   have hHB : HenselianLocalRing B := hens_of_surj ψ hψ
   have hSB : SH B := ⟨hHB, sepClosed_of_surj ψ hψ⟩
-  have h2 := LateralTheory.E.LeafVanBPf.heightFunctionalStatement_of_pairingProperties hy (ZMod q) B hSB (tw q i) n hn
+  have h2 :=
+    LateralTheory.E.LeafVanBPf.heightFunctionalStatement_of_pairingProperties hy (ZMod q) B hSB
+      (tw q i) n hn
   exact sub_of_iso W'.isoSpec (ZMod q) (tw q i) n h2
 
 end LateralTheory.E.LeafClosedSHPosPf

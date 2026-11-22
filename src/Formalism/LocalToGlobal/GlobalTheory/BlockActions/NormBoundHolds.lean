@@ -7,6 +7,7 @@ public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.SymmetricClauses
 
 namespace Formalism.L2.GlobalTheoryTheory.Br
 
-theorem norm_bound_holds : NormBoundAtInfinity := norm_bound_of_injective_stable class_injective_holds stabiliser_bijective_holds
+theorem norm_bound_holds : NormBoundAtInfinity :=
+  norm_bound_of_injective_stable class_injective_holds stabiliser_bijective_holds
 
 end Formalism.L2.GlobalTheoryTheory.Br

@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
@@ -23,10 +25,12 @@ private lemma map_quotient_mk_proper_of_le_jacobson {B : Type} [CommRing B] (J �
   rw [hx'] at hu
   exact h (Ideal.eq_top_of_isUnit_mem _ hx hu)
 
-theorem faithfullyFlat_quotientMap_of_map_ne_top {A B : Type} [CommRing A] [CommRing B] (f : A →+* B)
-    (𝔞 : Ideal A) (𝔟 : Ideal B) (hle : 𝔞 ≤ 𝔟.comap f) (hJ : 𝔟 ≤ Ideal.jacobson ⊥)
-    (hfl : (Ideal.quotientMap 𝔟 f hle).Flat) (hm : ∀ 𝔪 : Ideal A, 𝔪.IsMaximal → 𝔪.map f ≠ ⊤) :
-    (Ideal.quotientMap 𝔟 f hle).FaithfullyFlat := by
+theorem faithfullyFlat_quotientMap_of_map_ne_top
+    {A B : Type} [CommRing A] [CommRing B]
+    (f : A →+* B) (𝔞 : Ideal A) (𝔟 : Ideal B) (hle : 𝔞 ≤ 𝔟.comap f)
+    (hJ : 𝔟 ≤ Ideal.jacobson ⊥) (hfl : (Ideal.quotientMap 𝔟 f hle).Flat)
+    (hm : ∀ 𝔪 : Ideal A, 𝔪.IsMaximal → 𝔪.map f ≠ ⊤)
+    : (Ideal.quotientMap 𝔟 f hle).FaithfullyFlat := by
   letI : Algebra (A ⧸ 𝔞) (B ⧸ 𝔟) := (Ideal.quotientMap 𝔟 f hle).toAlgebra
   have hfl' : Module.Flat (A ⧸ 𝔞) (B ⧸ 𝔟) := hfl
   show Module.FaithfullyFlat (A ⧸ 𝔞) (B ⧸ 𝔟)
@@ -41,18 +45,19 @@ theorem faithfullyFlat_quotientMap_of_map_ne_top {A B : Type} [CommRing A] [Comm
     exact htop
   exact map_quotient_mk_proper_of_le_jacobson _ _ hJ (hm 𝔪 hmax) key
 
-theorem cover_of_stable_of_map_ne_top : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (B C : Obj l R)
-    (h : Hom B C), Stable h → (∀ 𝔪 : Ideal B.A, 𝔪.IsMaximal → 𝔪.map h.f ≠ ⊤) → Cover h := by
+theorem cover_of_stable_of_map_ne_top
+    : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (B C : Obj l R) (h : Hom B C),
+      Stable h → (∀ 𝔪 : Ideal B.A, 𝔪.IsMaximal → 𝔪.map h.f ≠ ⊤) → Cover h := by
   intro l _ R _ B C h hs hm
   refine ⟨hs, fun m => ?_⟩
   rcases m with _ | m
-  ·
-    haveI : Subsingleton (B.A ⧸ adI B ^ 0) := Ideal.Quotient.subsingleton_iff.2 (by simp)
+  · haveI : Subsingleton (B.A ⧸ adI B ^ 0) := Ideal.Quotient.subsingleton_iff.2 (by simp)
     rw [RingHom.FaithfullyFlat.iff_flat_and_comap_surjective]
     exact ⟨hs.flat 0, fun p => isEmptyElim p⟩
   · haveI := C.complete
     have hJ : adI C ^ (m + 1) ≤ Ideal.jacobson ⊥ :=
       (Ideal.pow_le_self (Nat.succ_ne_zero m)).trans (IsAdicComplete.le_jacobson_bot (adI C))
-    exact faithfullyFlat_quotientMap_of_map_ne_top h.f _ _ (adI_pow_le h (m + 1)) hJ (hs.flat (m + 1)) hm
+    exact faithfullyFlat_quotientMap_of_map_ne_top h.f _ _ (adI_pow_le h (m + 1)) hJ
+      (hs.flat (m + 1)) hm
 
 end GlobalTheory.BSP

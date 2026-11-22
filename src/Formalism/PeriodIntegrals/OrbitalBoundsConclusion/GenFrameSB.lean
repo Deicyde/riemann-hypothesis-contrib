@@ -7,4 +7,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MonomialFrameSpa
 
 @[expose] public section
 
-theorem coeffNormLE_iff_spanNormLE_of_hasCompl : CutKW.KWsb := GenFrameSpan.genFrameSB_of_span GenFrameSpan.stepSpan
+theorem coeffNormLE_iff_spanNormLE_of_hasCompl : CutKW.KWsb :=
+  GenFrameSpan.genFrameSB_of_span GenFrameSpan.stepSpan

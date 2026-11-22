@@ -6,12 +6,13 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CompletionDegree
 
 namespace PI.CompDegEF
 
-open IsDedekindDomain NumberField Module Formalism.BasicNotions Formalism.BasicNotions.Loc Polynomial
+open IsDedekindDomain NumberField Module Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Polynomial
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-theorem algebraMap_padicInt_injective (K : FinExt l) :
-    Function.Injective (algebraMap ℤ_[l] ↥K.1) := by
+theorem algebraMap_padicInt_injective (K : FinExt l)
+    : Function.Injective (algebraMap ℤ_[l] ↥K.1) := by
   rw [IsScalarTower.algebraMap_eq ℤ_[l] ℚ_[l] ↥K.1]
   exact (algebraMap ℚ_[l] ↥K.1).injective.comp (IsFractionRing.injective ℤ_[l] ℚ_[l])
 
@@ -24,17 +25,17 @@ instance isTorsionFree_finExt (K : FinExt l) : Module.IsTorsionFree ℤ_[l] ↥K
     simp only [Algebra.smul_def] at h
     exact mul_left_cancel₀ hr0 h
 
-private theorem spectralValue_le_one_iff_norm_coeff_le_one (P : ℚ_[l][X]) (hP : P.Monic) :
-    spectralValue P ≤ 1 ↔ ∀ n, ‖P.coeff n‖ ≤ 1 := by
+private theorem spectralValue_le_one_iff_norm_coeff_le_one (P : ℚ_[l][X]) (hP : P.Monic)
+    : spectralValue P ≤ 1 ↔ ∀ n, ‖P.coeff n‖ ≤ 1 := by
   constructor
   · intro h n
     by_cases hn : n < P.natDegree
-    · have ht : spectralValueTerms P n ≤ 1 :=
-        (le_ciSup (spectralValueTerms_bddAbove P) n).trans h
+    · have ht : spectralValueTerms P n ≤ 1 := (le_ciSup (spectralValueTerms_bddAbove P) n).trans h
       rw [spectralValueTerms, if_pos hn] at ht
       have hexp : (0 : ℝ) < 1 / ((P.natDegree : ℝ) - n) := by
         have : (n : ℝ) < P.natDegree := by exact_mod_cast hn
-        apply div_pos one_pos; linarith
+        apply div_pos one_pos
+        linarith
       by_contra hc
       push_neg at hc
       exact absurd ht (not_le.mpr (Real.one_lt_rpow hc hexp))
@@ -54,8 +55,8 @@ private theorem spectralValue_le_one_iff_norm_coeff_le_one (P : ℚ_[l][X]) (hP 
 theorem norm_le_one_iff_isIntegral (z : Om l) : ‖z‖ ≤ 1 ↔ IsIntegral ℤ_[l] z := by
   have hzQ : IsIntegral ℚ_[l] z := by
     first
-      | exact Algebra.IsIntegral.isIntegral z
-      | exact (Algebra.IsAlgebraic.isAlgebraic z).isIntegral
+    | exact Algebra.IsIntegral.isIntegral z
+    | exact (Algebra.IsAlgebraic.isAlgebraic z).isIntegral
   have hnorm : ‖z‖ = spectralValue (minpoly ℚ_[l] z) := rfl
   rw [hnorm, spectralValue_le_one_iff_norm_coeff_le_one _ (minpoly.monic hzQ)]
   constructor
@@ -72,17 +73,17 @@ theorem norm_le_one_iff_isIntegral (z : Om l) : ‖z‖ ≤ 1 ↔ IsIntegral ℤ
     rw [minpoly.isIntegrallyClosed_eq_field_fractions' ℚ_[l] hz, Polynomial.coeff_map]
     exact PadicInt.norm_le_one _
 
-theorem mem_integralClosure_iff_mem_ball (K : FinExt l) (x : ↥K.1) :
-    x ∈ integralClosure ℤ_[l] ↥K.1 ↔ x ∈ ball K := by
+theorem mem_integralClosure_iff_mem_ball (K : FinExt l) (x : ↥K.1)
+    : x ∈ integralClosure ℤ_[l] ↥K.1 ↔ x ∈ ball K := by
   rw [mem_integralClosure_iff]
   show IsIntegral ℤ_[l] x ↔ ‖((x : ↥K.1) : Om l)‖ ≤ 1
   rw [norm_le_one_iff_isIntegral]
   first
-    | exact (isIntegral_algebraMap_iff (A := ↥K.1) (B := Om l) ).symm
-    | exact (isIntegral_algHom_iff ((K.1.val).restrictScalars ℤ_[l]) K.1.val.injective).symm
+  | exact (isIntegral_algebraMap_iff (A := ↥K.1) (B := Om l)).symm
+  | exact (isIntegral_algHom_iff ((K.1.val).restrictScalars ℤ_[l]) K.1.val.injective).symm
 
-theorem card_quot_l {C : Type} [CommRing C] [Algebra ℤ_[l] C] {n : ℕ} (b : Basis (Fin n) ℤ_[l] C) :
-    Nat.card (C ⧸ Ideal.span {((l : ℕ) : C)}) = l ^ n := by
+theorem card_quot_l {C : Type} [CommRing C] [Algebra ℤ_[l] C] {n : ℕ} (b : Basis (Fin n) ℤ_[l] C)
+    : Nat.card (C ⧸ Ideal.span {((l : ℕ) : C)}) = l ^ n := by
   let f : C →+ (Fin n → ZMod l) :=
     AddMonoidHom.pi fun i =>
       (PadicInt.toZMod : ℤ_[l] →+* ZMod l).toAddMonoidHom.comp (b.coord i).toAddMonoidHom
@@ -118,8 +119,7 @@ theorem card_quot_l {C : Type} [CommRing C] [Algebra ℤ_[l] C] {n : ℕ} (b : B
       conv_rhs => rw [← b.sum_repr x]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hd, smul_smul]
-  have hcard : Nat.card (C ⧸ Ideal.span {((l : ℕ) : C)}) = Nat.card (C ⧸ f.ker) := by
-    rw [← hk]; rfl
+  have hcard : Nat.card (C ⧸ Ideal.span {((l : ℕ) : C)}) = Nat.card (C ⧸ f.ker) := by rw [← hk]; rfl
   rw [hcard, Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective f hsurj).toEquiv]
   rw [Nat.card_fun, Nat.card_zmod, Nat.card_eq_fintype_card, Fintype.card_fin]
 
@@ -127,13 +127,14 @@ theorem ballCard : BallCard := by
   intro l _ K
   haveI : FiniteDimensional ℚ_[l] ↥K.1 := K.2
   let S := integralClosure ℤ_[l] ↥K.1
-  let e : ↥(ball K) ≃+* ↥S :=
-    { toFun := fun x => ⟨x.1, (mem_integralClosure_iff_mem_ball K x.1).mpr x.2⟩
-      invFun := fun y => ⟨y.1, (mem_integralClosure_iff_mem_ball K y.1).mp y.2⟩
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl
-      map_mul' := fun _ _ => Subtype.ext rfl
-      map_add' := fun _ _ => Subtype.ext rfl }
+  let e : ↥(ball K) ≃+* ↥S := {
+    toFun := fun x => ⟨x.1, (mem_integralClosure_iff_mem_ball K x.1).mpr x.2⟩
+    invFun := fun y => ⟨y.1, (mem_integralClosure_iff_mem_ball K y.1).mp y.2⟩
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+    map_mul' := fun _ _ => Subtype.ext rfl
+    map_add' := fun _ _ => Subtype.ext rfl
+  }
   have hIJ : Ideal.span {((l : ℕ) : ↥S)} = (Ideal.span {((l : ℕ) : ↥(ball K))}).map e := by
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
   rw [Nat.card_congr (Ideal.quotientEquiv _ _ e hIJ).toEquiv]

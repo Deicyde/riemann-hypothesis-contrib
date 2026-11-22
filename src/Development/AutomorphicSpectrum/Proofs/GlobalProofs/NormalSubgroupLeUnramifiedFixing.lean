@@ -7,12 +7,12 @@ public import GroundTheory.ProfiniteCohomology.ContinuousCochains
 
 @[expose] public section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal
+  Formalism.ConjugateSelfDual
 
 namespace GlobalTheory.CompanionTheory.GlobalFiniteness
 
 variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-
 
 omit [NumberField F] [Algebra F Ω] [Field F] in
 theorem mem_of_isIntegral_int (A : ValuationSubring Ω) {y : Ω} (hy : IsIntegral ℤ y) : y ∈ A := by
@@ -31,22 +31,27 @@ noncomputable def cutPrime (A : ValuationSubring Ω) (M : IntermediateField F Ω
 instance (A : ValuationSubring Ω) (M : IntermediateField F Ω) : (cutPrime A M).IsPrime :=
   Ideal.comap_isPrime _ _
 
-theorem mem_cutPrime_iff (A : ValuationSubring Ω) (M : IntermediateField F Ω) (z : 𝓞 M) :
-    z ∈ cutPrime A M ↔ A.valuation ((z : M) : Ω) < 1 := by
+theorem mem_cutPrime_iff (A : ValuationSubring Ω) (M : IntermediateField F Ω) (z : 𝓞 M)
+    : z ∈ cutPrime A M ↔ A.valuation ((z : M) : Ω) < 1 := by
   rw [cutPrime, Ideal.mem_comap, ValuationSubring.valuation_lt_one_iff]
   rfl
 
-theorem cutPrime_liesOver {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)}
-    (hA : IsPlaceOver A v) (M : IntermediateField F Ω) : (cutPrime A M).LiesOver v.asIdeal := by
+theorem cutPrime_liesOver
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A v)
+    (M : IntermediateField F Ω)
+    : (cutPrime A M).LiesOver v.asIdeal := by
   constructor
   ext x
   rw [Ideal.under_def, Ideal.mem_comap, mem_cutPrime_iff, ← hA x]
   rfl
 
-theorem inertia_apply_eq [IsGalois F Ω] {S : Set (HeightOneSpectrum (𝓞 F))}
-    {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S) {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
-    {σ : G F Ω} (hσ : σ ∈ Inertia (F := F) A) {x : Ω} (hx : x ∈ maxUnramifiedOutside F Ω S) :
-    σ x = x := by
+theorem inertia_apply_eq
+    [IsGalois F Ω]
+    {S : Set (HeightOneSpectrum (𝓞 F))} {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
+    {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
+    {σ : G F Ω} (hσ : σ ∈ Inertia (F := F) A)
+    {x : Ω} (hx : x ∈ maxUnramifiedOutside F Ω S)
+    : σ x = x := by
   classical
   haveI hM : IsGalois F (maxUnramifiedOutside F Ω S) := isGalois_maxUnramifiedOutside S
   haveI : FiniteDimensional F (IntermediateField.adjoin F ({x} : Set Ω)) :=
@@ -56,7 +61,9 @@ theorem inertia_apply_eq [IsGalois F Ω] {S : Set (HeightOneSpectrum (𝓞 F))}
   haveI : Normal F E := normalClosure.normal F (IntermediateField.adjoin F ({x} : Set Ω)) Ω
   haveI : Algebra.IsSeparable F E := Algebra.IsSeparable.of_algHom F Ω E.val
   haveI : IsGalois F E := ⟨⟩
-  have hxE : x ∈ E := IntermediateField.le_normalClosure (IntermediateField.adjoin F ({x} : Set Ω)) (IntermediateField.mem_adjoin_simple_self F x)
+  have hxE : x ∈ E :=
+    IntermediateField.le_normalClosure (IntermediateField.adjoin F ({x} : Set Ω))
+      (IntermediateField.mem_adjoin_simple_self F x)
   have hEM : E ≤ maxUnramifiedOutside F Ω S := by
     rw [hE, IntermediateField.normalClosure_le_iff_of_normal]
     exact IntermediateField.adjoin_simple_le_iff.2 hx
@@ -94,16 +101,18 @@ theorem inertia_apply_eq [IsGalois F Ω] {S : Set (HeightOneSpectrum (𝓞 F))}
   rw [← hσ', hσ'1] at h1
   exact h1.symm
 
-theorem NS_le_fixingSubgroup : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] (S : Set (HeightOneSpectrum (𝓞 F))),
-    NS Ω S ≤ (maxUnramifiedOutside F Ω S).fixingSubgroup := by
+theorem NS_le_fixingSubgroup
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (S : Set (HeightOneSpectrum (𝓞 F))),
+      NS Ω S ≤ (maxUnramifiedOutside F Ω S).fixingSubgroup := by
   intro F Ω _ _ _ _ _ S
   haveI : IsGalois F Ω := ⟨⟩
   haveI hM : IsGalois F (maxUnramifiedOutside F Ω S) := isGalois_maxUnramifiedOutside S
   haveI : (maxUnramifiedOutside F Ω S).fixingSubgroup.Normal :=
     (InfiniteGalois.normal_iff_isGalois _).2 hM
-  have hsub : (⋃ v ∈ Sᶜ, ⋃ A ∈ {A : ValuationSubring Ω | IsPlaceOver A v}, Inertia (F := F) A) ⊆
-      ((maxUnramifiedOutside F Ω S).fixingSubgroup : Set (G F Ω)) := by
+  have hsub
+      : (⋃ v ∈ Sᶜ, ⋃ A ∈ {A : ValuationSubring Ω | IsPlaceOver A v}, Inertia (F := F) A)
+        ⊆ ((maxUnramifiedOutside F Ω S).fixingSubgroup : Set (G F Ω)) := by
     intro σ hσ
     simp only [Set.mem_iUnion] at hσ
     obtain ⟨v, hv, A, hA, hσA⟩ := hσ

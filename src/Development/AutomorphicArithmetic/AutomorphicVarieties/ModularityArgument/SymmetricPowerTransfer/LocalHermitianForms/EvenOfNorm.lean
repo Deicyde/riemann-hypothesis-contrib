@@ -8,7 +8,8 @@ namespace UpperTheory.V.Z.Sym.Loc
 
 open IsLocalRing Polynomial QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ : K}
+variable
+  {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ : K}
 
 theorem IsLoc.char_ne (L : IsLoc O Δ) : ringChar (ResidueField O) ≠ 2 := by
   intro h
@@ -28,13 +29,15 @@ theorem IsLoc.nm_unit (L : IsLoc O Δ) (ε u : Oˣ) : ∃ a b : O, a ^ 2 - ε * 
     omega
   have hε0 : residue O (ε : O) ≠ 0 := (ε.isUnit.map (residue O)).ne_zero
   have hu0 : residue O (u : O) ≠ 0 := (u.isUnit.map (residue O)).ne_zero
-  obtain ⟨a', b', hroot⟩ := FiniteField.exists_root_sum_quadratic
-    (f := X ^ 2 - C (residue O (u : O))) (g := C (-residue O (ε : O)) * X ^ 2)
-    (degree_X_pow_sub_C (by norm_num) _) (degree_C_mul_X_pow 2 (neg_ne_zero.2 hε0)) hodd
+  obtain ⟨a', b', hroot⟩ :=
+    FiniteField.exists_root_sum_quadratic (f := X ^ 2 - C (residue O (u : O)))
+      (g := C (- residue O (ε : O)) * X ^ 2) (degree_X_pow_sub_C (by norm_num) _)
+      (degree_C_mul_X_pow 2 (neg_ne_zero.2 hε0)) hodd
   obtain ⟨a0, rfl⟩ := residue_surjective a'
   obtain ⟨b0, rfl⟩ := residue_surjective b'
   have hab : residue O (a0 ^ 2 - u - ε * b0 ^ 2) = 0 := by
-    simp only [eval_sub, eval_add, eval_mul, eval_pow, eval_X, eval_C, map_sub, map_mul, map_pow] at hroot ⊢
+    simp only [eval_sub, eval_add, eval_mul, eval_pow, eval_X, eval_C, map_sub, map_mul, map_pow]
+      at hroot ⊢
     linear_combination hroot
   by_cases ha : residue O a0 = 0
   · have hb : IsUnit b0 := by
@@ -43,25 +46,29 @@ theorem IsLoc.nm_unit (L : IsLoc O Δ) (ε u : Oˣ) : ∃ a b : O, a ^ 2 - ε * 
       apply hu0
       simp only [map_sub, map_mul, map_pow, ha, hb] at hab
       linear_combination -hab
-    obtain ⟨r, hr, -⟩ := sqrtO O K Δ L ((a0 ^ 2 - u) * ↑ε⁻¹) b0 hb (by
-      rw [← residue_eq_zero_iff]
-      have e1 : (a0 ^ 2 - u) * ↑ε⁻¹ - b0 ^ 2 = (a0 ^ 2 - u - ε * b0 ^ 2) * ↑ε⁻¹ := by
-        have := ε.mul_inv
-        linear_combination b0 ^ 2 * this
-      rw [e1, map_mul, hab, zero_mul])
+    obtain ⟨r, hr, -⟩ :=
+      sqrtO O K Δ L ((a0 ^ 2 - u) * ↑ε⁻¹) b0 hb (by
+        rw [← residue_eq_zero_iff]
+        have e1 : (a0 ^ 2 - u) * ↑ε⁻¹ - b0 ^ 2 = (a0 ^ 2 - u - ε * b0 ^ 2) * ↑ε⁻¹ := by
+          have := ε.mul_inv
+          linear_combination b0 ^ 2 * this
+        rw [e1, map_mul, hab, zero_mul])
     refine ⟨a0, r, ?_⟩
     rw [hr]
     have := ε.mul_inv
     linear_combination (-(a0 ^ 2 - u)) * this
   · have ha' : IsUnit a0 := (residue_ne_zero_iff_isUnit a0).1 ha
-    obtain ⟨r, hr, -⟩ := sqrtO O K Δ L (u + ε * b0 ^ 2) a0 ha' (by
-      rw [← residue_eq_zero_iff]
-      have e1 : (u : O) + ε * b0 ^ 2 - a0 ^ 2 = -(a0 ^ 2 - u - ε * b0 ^ 2) := by ring
-      rw [e1, map_neg, hab, neg_zero])
+    obtain ⟨r, hr, -⟩ :=
+      sqrtO O K Δ L (u + ε * b0 ^ 2) a0 ha' (by
+        rw [← residue_eq_zero_iff]
+        have e1 : (u : O) + ε * b0 ^ 2 - a0 ^ 2 = -(a0 ^ 2 - u - ε * b0 ^ 2) := by ring
+        rw [e1, map_neg, hab, neg_zero])
     exact ⟨r, b0, by rw [hr]; ring⟩
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [Algebra O K] in
-theorem nm_symm {x y : K} (hx : x ≠ 0) (h2 : (2 : K) ≠ 0) (h : ∃ a b : K, a ^ 2 - x * b ^ 2 = y) (hy : y ≠ 0) : ∃ a b : K, a ^ 2 - y * b ^ 2 = x := by
+theorem nm_symm
+    {x y : K} (hx : x ≠ 0) (h2 : (2 : K) ≠ 0) (h : ∃ a b : K, a ^ 2 - x * b ^ 2 = y) (hy : y ≠ 0)
+    : ∃ a b : K, a ^ 2 - y * b ^ 2 = x := by
   obtain ⟨a, b, hab⟩ := h
   by_cases hb : b = 0
   · subst hb
@@ -79,8 +86,9 @@ theorem nm_symm {x y : K} (hx : x ≠ 0) (h2 : (2 : K) ≠ 0) (h : ∃ a b : K, 
     field_simp
     ring
 
-private theorem isUnit_sq_sub_mul_sq_of_not_isSquare_residue (ε : O) (hε : ¬ IsSquare (residue O ε)) (x y : O)
-    (h : IsUnit x ∨ IsUnit y) : IsUnit (x ^ 2 - ε * y ^ 2) := by
+private theorem isUnit_sq_sub_mul_sq_of_not_isSquare_residue
+    (ε : O) (hε : ¬ IsSquare (residue O ε)) (x y : O) (h : IsUnit x ∨ IsUnit y)
+    : IsUnit (x ^ 2 - ε * y ^ 2) := by
   rw [← residue_ne_zero_iff_isUnit]
   intro h0
   simp only [map_sub, map_mul, map_pow] at h0
@@ -97,8 +105,9 @@ private theorem isUnit_sq_sub_mul_sq_of_not_isSquare_residue (ε : O) (hε : ¬ 
     rw [div_mul_div_comm, eq_div_iff (mul_ne_zero hy hy)]
     linear_combination -h0
 
-private theorem exists_common_pow_factor_coprime_units {π : O} (hπ : Irreducible π) (x y : O) (h : x ≠ 0 ∨ y ≠ 0) :
-    ∃ (k : ℕ) (x' y' : O), x = π ^ k * x' ∧ y = π ^ k * y' ∧ (IsUnit x' ∨ IsUnit y') := by
+private theorem exists_common_pow_factor_coprime_units
+    {π : O} (hπ : Irreducible π) (x y : O) (h : x ≠ 0 ∨ y ≠ 0)
+    : ∃ (k : ℕ) (x' y' : O), x = π ^ k * x' ∧ y = π ^ k * y' ∧ (IsUnit x' ∨ IsUnit y') := by
   by_cases hx : x = 0
   · have hy : y ≠ 0 := by tauto
     obtain ⟨n, v, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hy hπ
@@ -114,8 +123,9 @@ private theorem exists_common_pow_factor_coprime_units {π : O} (hπ : Irreducib
   · obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hnm
     exact ⟨n, u * π ^ d, v, by ring, by ring, Or.inr v.isUnit⟩
 
-private theorem not_isSquare_residue_of_not_isSquare (L : IsLoc O Δ) (ε : Oˣ) (hε : ¬ IsSquare (algebraMap O K ε)) :
-    ¬ IsSquare (residue O (ε : O)) := by
+private theorem not_isSquare_residue_of_not_isSquare
+    (L : IsLoc O Δ) (ε : Oˣ) (hε : ¬ IsSquare (algebraMap O K ε))
+    : ¬ IsSquare (residue O (ε : O)) := by
   rintro ⟨c, hc⟩
   obtain ⟨r₀, rfl⟩ := residue_surjective c
   have hε0 : residue O (ε : O) ≠ 0 := (ε.isUnit.map (residue O)).ne_zero
@@ -124,13 +134,16 @@ private theorem not_isSquare_residue_of_not_isSquare (L : IsLoc O Δ) (ε : Oˣ)
     intro h0
     rw [h0, mul_zero] at hc
     exact hε0 hc
-  obtain ⟨r, hr, -⟩ := sqrtO O K Δ L ε r₀ hr₀ (by
-    rw [← residue_eq_zero_iff, map_sub, map_pow, hc, sq, sub_self])
+  obtain ⟨r, hr, -⟩ :=
+    sqrtO O K Δ L ε r₀ hr₀ (by rw [← residue_eq_zero_iff, map_sub, map_pow, hc, sq, sub_self])
   apply hε
   exact ⟨algebraMap O K r, by rw [← map_mul, ← sq, hr]⟩
 
-theorem IsLoc.even_of_norm (L : IsLoc O Δ) (ε : Oˣ) (hε : ¬ IsSquare (algebraMap O K ε)) {a b : K}
-    (h : a ^ 2 - algebraMap O K ε * b ^ 2 ≠ 0) : EvenVal O (a ^ 2 - algebraMap O K ε * b ^ 2) := by
+theorem IsLoc.even_of_norm
+    (L : IsLoc O Δ)
+    (ε : Oˣ) (hε : ¬ IsSquare (algebraMap O K ε))
+    {a b : K} (h : a ^ 2 - algebraMap O K ε * b ^ 2 ≠ 0)
+    : EvenVal O (a ^ 2 - algebraMap O K ε * b ^ 2) := by
   haveI := L.frac
   have hres := not_isSquare_residue_of_not_isSquare L ε hε
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible O
@@ -138,9 +151,10 @@ theorem IsLoc.even_of_norm (L : IsLoc O Δ) (ε : Oˣ) (hε : ¬ IsSquare (algeb
   obtain ⟨y1, z2, hz2, rfl⟩ := IsFractionRing.div_surjective (A := O) b
   have hz1' : algebraMap O K z1 ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hz1
   have hz2' : algebraMap O K z2 ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hz2
-  have heq : (algebraMap O K x1 / algebraMap O K z1) ^ 2
-      - algebraMap O K ε * (algebraMap O K y1 / algebraMap O K z2) ^ 2
-      = algebraMap O K ((x1 * z2) ^ 2 - ε * (y1 * z1) ^ 2) / (algebraMap O K (z1 * z2)) ^ 2 := by
+  have heq
+      : (algebraMap O K x1 / algebraMap O K z1) ^ 2
+          - algebraMap O K ε * (algebraMap O K y1 / algebraMap O K z2) ^ 2
+        = algebraMap O K ((x1 * z2) ^ 2 - ε * (y1 * z1) ^ 2) / (algebraMap O K (z1 * z2)) ^ 2 := by
     simp only [map_sub, map_mul, map_pow]
     field_simp
   rw [heq] at h ⊢
@@ -158,13 +172,18 @@ theorem IsLoc.even_of_norm (L : IsLoc O Δ) (ε : Oˣ) (hε : ¬ IsSquare (algeb
   have hzz : algebraMap O K (z1 * z2) ≠ 0 := by
     rw [map_mul]
     exact mul_ne_zero hz1' hz2'
-  refine ⟨hw.unit, algebraMap O K π ^ k / algebraMap O K (z1 * z2),
-    div_ne_zero (pow_ne_zero _ hπ0) hzz, ?_⟩
+  refine ⟨
+    hw.unit,
+    algebraMap O K π ^ k / algebraMap O K (z1 * z2),
+    div_ne_zero (pow_ne_zero _ hπ0) hzz,
+    ?_
+  ⟩
   rw [hx, hy, IsUnit.unit_spec]
   simp only [map_sub, map_mul, map_pow]
   field_simp
 
-theorem IsLoc.not_even (L : IsLoc O Δ) {p : O} (hp : Irreducible p) : ¬ EvenVal O (algebraMap O K p) := by
+theorem IsLoc.not_even (L : IsLoc O Δ) {p : O} (hp : Irreducible p)
+    : ¬ EvenVal O (algebraMap O K p) := by
   haveI := L.frac
   rintro ⟨u, s, hs, he⟩
   obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := O) s

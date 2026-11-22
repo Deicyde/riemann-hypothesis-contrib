@@ -18,7 +18,8 @@ theorem t7 : InfimumContinuousFamily := by
   have hinf_nonneg : ∀ x, 0 ≤ ⨅ s, g x s := fun x => by
     haveI := hne x
     exact le_ciInf fun s => hpos x s
-  have key : ∀ x y (r : ℝ), 0 ≤ r → (∀ s, ∃ s', g y s' ≤ r * g x s) → (⨅ s, g y s) ≤ r * ⨅ s, g x s := by
+  have key
+      : ∀ x y (r : ℝ), 0 ≤ r → (∀ s, ∃ s', g y s' ≤ r * g x s) → (⨅ s, g y s) ≤ r * ⨅ s, g x s := by
     intro x y r hr h
     haveI := hne x
     rw [Real.mul_iInf_of_nonneg hr]

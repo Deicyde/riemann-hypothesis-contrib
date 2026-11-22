@@ -14,16 +14,17 @@ open scoped ContDiff
 
 noncomputable section
 
-def logDistSq {n : ℕ} (x : Fin n → ℂ) (z : Fin n → ℂ) : ℝ :=
-  Real.log (euclPot (z - x))
+def logDistSq {n : ℕ} (x : Fin n → ℂ) (z : Fin n → ℂ) : ℝ := Real.log (euclPot (z - x))
 
 def RegLogDensNonneg.Statement : Prop :=
   ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (A : Matrix (Fin (d + 1)) (Fin n) ℂ)
-    (u : Fin n → ℂ) (ε : ℝ) (x z : Fin n → ℂ) (s : (Fin (d + 1) → ℂ) → Fin n → ℂ),
-    0 < ε → z ≠ x → IsSheetAt J A z s →
-      0 ≤ ReciprocityTheory.AnForm.maDens
-        (fun k => (vecCons (logReg u ε) fun _ => logDistSq x : Fin (d + 1) → (Fin n → ℂ) → ℝ) k ∘ s)
-        (A *ᵥ z)
+      (u : Fin n → ℂ) (ε : ℝ) (x z : Fin n → ℂ) (s : (Fin (d + 1) → ℂ) → Fin n → ℂ),
+    0 < ε → z ≠ x → IsSheetAt J A z s
+      → 0
+        ≤ ReciprocityTheory.AnForm.maDens
+          (fun k =>
+            (vecCons (logReg u ε) fun _ => logDistSq x : Fin (d + 1) → (Fin n → ℂ) → ℝ) k ∘ s)
+          (A *ᵥ z)
 
 end
 

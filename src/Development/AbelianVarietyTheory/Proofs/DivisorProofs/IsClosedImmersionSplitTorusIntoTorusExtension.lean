@@ -24,19 +24,22 @@ public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.PowO
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
-open GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraMaps (torus lieMap lieAdd LieCongr IsLieLinear lieCoord)
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open GlobalTheory.IndefiniteRowSideFullHecke.LieAlgebraMaps
+  (torus lieMap lieAdd LieCongr IsLieLinear lieCoord)
 
 namespace GlobalTheory.TorusFieldCrit
 
-theorem exists_prime_hom_of_not_surjective {X : Type} [AddCommGroup X] {r : ℕ}
-    (M : X →+ (Fin r → ℤ)) (hM : ¬ Function.Surjective M) :
-    ∃ p : ℕ, p.Prime ∧ ∃ φ : (Fin r → ℤ) →+ ZMod p, φ ≠ 0 ∧ φ.comp M = 0 := by
+theorem exists_prime_hom_of_not_surjective
+    {X : Type} [AddCommGroup X] {r : ℕ} (M : X →+ (Fin r → ℤ)) (hM : ¬ Function.Surjective M)
+    : ∃ p : ℕ, p.Prime ∧ ∃ φ : (Fin r → ℤ) →+ ZMod p, φ ≠ 0 ∧ φ.comp M = 0 := by
   obtain ⟨y, hy⟩ := not_forall.1 hM
   have hQ : Nontrivial ((Fin r → ℤ) ⧸ M.range) :=
     ⟨⟨(y : (Fin r → ℤ) ⧸ M.range), 0, fun h => hy ((QuotientAddGroup.eq_zero_iff y).1 h)⟩⟩
   haveI : AddGroup.FG ((Fin r → ℤ) ⧸ M.range) := inferInstance
-  obtain ⟨n, κ, _, p, hp, e, ⟨f⟩⟩ := AddCommGroup.equiv_free_prod_directSum_zmod ((Fin r → ℤ) ⧸ M.range)
+  obtain ⟨n, κ, _, p, hp, e, ⟨f⟩⟩ :=
+    AddCommGroup.equiv_free_prod_directSum_zmod ((Fin r → ℤ) ⧸ M.range)
   suffices h : ∃ q, q.Prime ∧ ∃ ψ : ((Fin r → ℤ) ⧸ M.range) →+ ZMod q, Function.Surjective ψ by
     obtain ⟨q, hq, ψ, hψ⟩ := h
     haveI := Fact.mk hq
@@ -50,8 +53,14 @@ theorem exists_prime_hom_of_not_surjective {X : Type} [AddCommGroup X] {r : ℕ}
     · ext x
       simp [(QuotientAddGroup.eq_zero_iff _).2 (AddMonoidHom.mem_range.2 ⟨x, rfl⟩)]
   by_cases hn : 0 < n
-  · refine ⟨2, Nat.prime_two, ((Int.castAddHom (ZMod 2)).comp
-        ((Finsupp.applyAddHom (⟨0, hn⟩ : Fin n)).comp (AddMonoidHom.fst _ _))).comp f.toAddMonoidHom, ?_⟩
+  · refine ⟨
+      2,
+      Nat.prime_two,
+      ((Int.castAddHom (ZMod 2)).comp
+          ((Finsupp.applyAddHom (⟨0, hn⟩ : Fin n)).comp (AddMonoidHom.fst _ _))).comp
+        f.toAddMonoidHom,
+      ?_
+    ⟩
     intro z
     obtain ⟨k, rfl⟩ := ZMod.intCast_surjective z
     refine ⟨f.symm (Finsupp.single ⟨0, hn⟩ k, 0), ?_⟩
@@ -70,26 +79,40 @@ theorem exists_prime_hom_of_not_surjective {X : Type} [AddCommGroup X] {r : ℕ}
       rw [key (f a), key (f b)]
     classical
     haveI := Fact.mk (hp i)
-    refine ⟨p i, hp i, ((ZMod.castHom (dvd_pow_self (p i) hi) (ZMod (p i))).toAddMonoidHom.comp
-      ((DirectSum.component ℤ κ (fun j => ZMod (p j ^ e j)) i).toAddMonoidHom.comp
-        (AddMonoidHom.snd _ _))).comp f.toAddMonoidHom, ?_⟩
+    refine ⟨
+      p i,
+      hp i,
+      ((ZMod.castHom (dvd_pow_self (p i) hi) (ZMod (p i))).toAddMonoidHom.comp
+        ((DirectSum.component ℤ κ (fun j => ZMod (p j ^ e j)) i).toAddMonoidHom.comp
+          (AddMonoidHom.snd _ _))).comp f.toAddMonoidHom,
+      ?_
+    ⟩
     intro z
     obtain ⟨k, rfl⟩ := ZMod.intCast_surjective z
     refine ⟨f.symm (0, DirectSum.lof ℤ κ (fun j => ZMod (p j ^ e j)) i (k : ZMod (p i ^ e i))), ?_⟩
     simp only [AddMonoidHom.coe_comp, Function.comp_apply, AddEquiv.coe_toAddMonoidHom,
       AddEquiv.apply_symm_apply, AddMonoidHom.coe_snd, LinearMap.toAddMonoidHom_coe,
-      DirectSum.component.lof_self, RingHom.toAddMonoidHom_eq_coe, AddMonoidHom.coe_coe, ZMod.castHom_apply]
+      DirectSum.component.lof_self, RingHom.toAddMonoidHom_eq_coe, AddMonoidHom.coe_coe,
+      ZMod.castHom_apply]
     exact ZMod.cast_intCast (dvd_pow_self (p i) hi) k
 
-theorem isClosedImmersion_of_torusExtension (Ω : Type) [Field Ω] (H : Over (Spec (CommRingCat.of Ω)))
-    [GrpObj H] (E : TorusExtension H) (r : ℕ) (v : splitTorus (Spec (CommRingCat.of Ω)) (Fin r → ℤ) ⟶ H)
-    (hv : IsMonHom v)
-    (hker : ∀ (p : ℕ), p.Prime → ∀ φ : (Fin r → ℤ) →+ ZMod p, φ ≠ 0 →
-      GlobalTheory.SplitTorus.torusMap (Spec (CommRingCat.of Ω)) φ ≫ v ≠ 1) :
-    IsClosedImmersion v.left := by
-  letI := E.addCommGroup; letI := E.grpB
-  haveI := E.free; haveI := E.finite
-  haveI := E.i_hom; haveI := E.q_hom; haveI := E.isAbelian.proper
+theorem isClosedImmersion_of_torusExtension
+    (Ω : Type) [Field Ω]
+    (H : Over (Spec (CommRingCat.of Ω))) [GrpObj H]
+    (E : TorusExtension H)
+    (r : ℕ) (v : splitTorus (Spec (CommRingCat.of Ω)) (Fin r → ℤ) ⟶ H) (hv : IsMonHom v)
+    (hker : ∀ (p : ℕ),
+      p.Prime
+        → ∀ φ : (Fin r → ℤ) →+ ZMod p,
+          φ ≠ 0 → GlobalTheory.SplitTorus.torusMap (Spec (CommRingCat.of Ω)) φ ≫ v ≠ 1)
+    : IsClosedImmersion v.left := by
+  letI := E.addCommGroup
+  letI := E.grpB
+  haveI := E.free
+  haveI := E.finite
+  haveI := E.i_hom
+  haveI := E.q_hom
+  haveI := E.isAbelian.proper
   haveI : ConnectedSpace (Spec (CommRingCat.of Ω)) := GlobalTheory.SplitTorus.connectedSpace_of_isLocalRing Ω
   have h1 : v ≫ E.q = toUnit _ ≫ η[E.B] :=
     GlobalTheory.splitTorus_hom_proper_trivial_local Ω (Fin r → ℤ) E.B (v ≫ E.q) inferInstance
@@ -102,11 +125,15 @@ theorem isClosedImmersion_of_torusExtension (Ω : Type) [Field Ω] (H : Over (Sp
   obtain ⟨M, hM⟩ := GlobalTheory.SplitTorus.exists_eq_torusMap w
   by_cases hs : Function.Surjective M
   · have hdiag : w = GlobalTheory.Diag.diagMap _ M := by
-      rw [hM]; symm
-      exact (GlobalTheory.SplitTorus.eq_torusMap_iff _ M).2 fun b => GlobalTheory.Diag.diagMap_chi _ M b
+      rw [hM]
+      symm
+      exact (GlobalTheory.SplitTorus.eq_torusMap_iff _ M).2 fun b =>
+        GlobalTheory.Diag.diagMap_chi _ M b
     have hη : IsClosedImmersion (η[E.B] : 𝟙_ _ ⟶ E.B).left :=
-      GlobalTheory.isClosedImmersion_of_section_of_isSeparated E.B.hom _ (by simpa using Over.w η[E.B])
-    have hpb : IsPullback E.i.left (toUnit _ : splitTorus _ E.X ⟶ 𝟙_ _).left E.q.left (η[E.B] : 𝟙_ _ ⟶ E.B).left :=
+      GlobalTheory.isClosedImmersion_of_section_of_isSeparated E.B.hom _
+        (by simpa using Over.w η[E.B])
+    have hpb : IsPullback E.i.left (toUnit _ : splitTorus _ E.X ⟶ 𝟙_ _).left E.q.left
+        (η[E.B] : 𝟙_ _ ⟶ E.B).left :=
       E.isKernel.map (Over.forget _)
     have hi : IsClosedImmersion E.i.left :=
       MorphismProperty.of_isPullback (P := @IsClosedImmersion) hpb.flip hη
@@ -116,7 +143,7 @@ theorem isClosedImmersion_of_torusExtension (Ω : Type) [Field Ω] (H : Over (Sp
   · exfalso
     obtain ⟨p, hp, φ, hφ, hφM⟩ := exists_prime_hom_of_not_surjective M hs
     apply hker p hp φ hφ
-    rw [← hw, hM, ← Category.assoc, ← GlobalTheory.SplitTorus.torusMap_comp, hφM, GlobalTheory.SplitTorus.torusMap_zero,
-      MonObj.one_comp]
+    rw [← hw, hM, ← Category.assoc, ← GlobalTheory.SplitTorus.torusMap_comp, hφM,
+      GlobalTheory.SplitTorus.torusMap_zero, MonObj.one_comp]
 
 end GlobalTheory.TorusFieldCrit

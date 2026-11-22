@@ -13,12 +13,14 @@ open scoped MatrixGroups
 
 namespace GlobalTheory.KZ.H3
 
-private theorem ent_gamma {K d : ℕ} (hd : d ∣ K) {δ : SL(2, ℤ)} (h : δ ∈ CongruenceSubgroup.Gamma K)
-    (i j : Fin 2) :
-    (((δ : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : ZMod d) = (((1 : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : ZMod d) := by
+private theorem ent_gamma
+    {K d : ℕ} (hd : d ∣ K) {δ : SL(2, ℤ)} (h : δ ∈ CongruenceSubgroup.Gamma K) (i j : Fin 2)
+    : (((δ : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : ZMod d)
+      = (((1 : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : ZMod d) := by
   rw [CongruenceSubgroup.Gamma_mem] at h
   obtain ⟨h00, h01, h10, h11⟩ := h
-  have key : ∀ x : ℤ, ∀ y : ZMod K, (x : ZMod K) = y → (x : ZMod d) = ZMod.castHom hd (ZMod d) y := by
+  have key
+      : ∀ x : ℤ, ∀ y : ZMod K, (x : ZMod K) = y → (x : ZMod d) = ZMod.castHom hd (ZMod d) y := by
     intro x y hxy; rw [← hxy, map_intCast]
   fin_cases i <;> fin_cases j
   · have := key _ _ h00; rw [map_one] at this; simpa using this
@@ -26,8 +28,8 @@ private theorem ent_gamma {K d : ℕ} (hd : d ∣ K) {δ : SL(2, ℤ)} (h : δ �
   · simpa using key _ _ h10
   · have := key _ _ h11; rw [map_one] at this; simpa using this
 
-private theorem gamma_le {K d : ℕ} (hd : d ∣ K) {δ : SL(2, ℤ)} (h : δ ∈ CongruenceSubgroup.Gamma K) :
-    δ ∈ CongruenceSubgroup.Gamma d := by
+private theorem gamma_le {K d : ℕ} (hd : d ∣ K) {δ : SL(2, ℤ)} (h : δ ∈ CongruenceSubgroup.Gamma K)
+    : δ ∈ CongruenceSubgroup.Gamma d := by
   rw [CongruenceSubgroup.Gamma_mem]
   have e := ent_gamma hd h
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -36,10 +38,14 @@ private theorem gamma_le {K d : ℕ} (hd : d ∣ K) {δ : SL(2, ℤ)} (h : δ �
   · simpa using e 1 0
   · simpa using e 1 1
 
-theorem adj_of_near : ∀ (N l w n : ℕ), 0 < N → l.Prime → l ≠ 2 → ¬ l ∣ N → Odd w →
-    ∀ z z' : SL(2, ℤ) → MvPolynomial (Fin 2) (ZMod (l ^ n)), IsCoc w (Gam N l) z → IsCoc w (Gam N l) z' →
-    Near z z' → ∃ p : MvPolynomial (Fin 2) (ZMod (l ^ n)), p.IsHomogeneous w ∧
-      ∀ γ ∈ Gam N l, z γ - z' γ = slP (γ : Matrix (Fin 2) (Fin 2) ℤ) p - p := by
+theorem adj_of_near
+    : ∀ (N l w n : ℕ),
+      0 < N → l.Prime → l ≠ 2 → ¬ l ∣ N → Odd w
+        → ∀ z z' : SL(2, ℤ) → MvPolynomial (Fin 2) (ZMod (l ^ n)),
+          IsCoc w (Gam N l) z → IsCoc w (Gam N l) z' → Near z z'
+            → ∃ p : MvPolynomial (Fin 2) (ZMod (l ^ n)),
+              p.IsHomogeneous w
+                ∧ ∀ γ ∈ Gam N l, z γ - z' γ = slP (γ : Matrix (Fin 2) (Fin 2) ℤ) p - p := by
   intro N l w n hN hl hl2 hlN hw z z' hz hz' hnear
   obtain ⟨M', hM', hM'eq⟩ := hnear
   obtain ⟨e, M, hlM, hMe⟩ := Nat.exists_eq_pow_mul_and_not_dvd hM'.ne' l hl.one_lt.ne'
@@ -48,8 +54,10 @@ theorem adj_of_near : ∀ (N l w n : ℕ), 0 < N → l.Prime → l ≠ 2 → ¬ 
     · subst h; simp at hMe; omega
     · exact h
   set a := max e n
-  obtain ⟨c, hcG, hcomm, hcmod⟩ := GlobalTheory.T.exists_scalar_gamma1CapGamma0_mod_level N l a M hN hl hl2 hlN hM hlM
-  obtain ⟨L1, L2, L3, -, -, L6, L7⟩ := GlobalTheory.T.twoVarPolySubstMatrix_basic_laws (ZMod (l ^ n))
+  obtain ⟨c, hcG, hcomm, hcmod⟩ :=
+    GlobalTheory.T.exists_scalar_gamma1CapGamma0_mod_level N l a M hN hl hl2 hlN hM hlM
+  obtain ⟨L1, L2, L3, -, -, L6, L7⟩ :=
+    GlobalTheory.T.twoVarPolySubstMatrix_basic_laws (ZMod (l ^ n))
   let R := ZMod (l ^ n)
   let V := MvPolynomial (Fin 2) R
   let G := ↥(Gam N l)
@@ -89,7 +97,10 @@ theorem adj_of_near : ∀ (N l w n : ℕ), 0 < N → l.Prime → l ≠ 2 → ¬ 
   have hc1 : ∀ v ∈ S, ρ c' v = -v := by
     intro v hv
     simp only [ρ, AlgHom.toLinearMap_apply, c']
-    have hent : ∀ i j, (((c : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : R) = (((-1 : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : R) := by
+    have hent
+        : ∀ i j,
+          (((c : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : R)
+            = (((-1 : Matrix (Fin 2) (Fin 2) ℤ) i j : ℤ) : R) := by
       intro i j
       have h1 := congrArg (ZMod.castHom (pow_dvd_pow l (le_max_right e n)) R) (hcmod i j)
       rw [map_intCast] at h1
@@ -117,7 +128,9 @@ theorem adj_of_near : ∀ (N l w n : ℕ), 0 < N → l.Prime → l ≠ 2 → ¬ 
     rw [Subgroup.mem_subgroupOf] at hδ
     simp only [zz]
     rw [hM'eq _ (gamma_le hM'K hδ), sub_self]
-  obtain ⟨p, hpS, hp⟩ := GlobalTheory.T.cocycle_isCoboundary_of_neg_central_element G R V ρ hρmul hρone h2 S hS Δ hΔn hΔ c' hc1 hc2 zz hzS hzc hzΔ
+  obtain ⟨p, hpS, hp⟩ :=
+    GlobalTheory.T.cocycle_isCoboundary_of_neg_central_element G R V ρ hρmul hρone h2 S hS Δ hΔn hΔ
+      c' hc1 hc2 zz hzS hzc hzΔ
   refine ⟨p, hpS, fun γ hγ => ?_⟩
   exact hp ⟨γ, hγ⟩
 

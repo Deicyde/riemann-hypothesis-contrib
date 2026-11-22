@@ -11,31 +11,35 @@ open Classical
 
 namespace Formalism.MainNotions.UnusedSlot80.UGen
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80.KL
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80.KL
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR}
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
 
 local notation "ιE" => algebraMap (LetA O n) W.EE
 local notation "aev" => Polynomial.aeval (AlgHom.toLinearMap (W.γE W.gam) : Module.End O W.EE)
 
-theorem numI_upd (H : ℕ → ℕ) (e s : ℕ) (hs : s < e) (x : ℤ) :
-    numI W e (Function.update (fun t => -((H t : ℕ) : ℤ)) s x) = ps W s ^ x.toNat := by
+theorem numI_upd (H : ℕ → ℕ) (e s : ℕ) (hs : s < e) (x : ℤ)
+    : numI W e (Function.update (fun t => -((H t : ℕ) : ℤ)) s x) = ps W s ^ x.toNat := by
   unfold numI
   rw [← Finset.mul_prod_erase _ _ (Finset.mem_range.2 hs), Function.update_self]
   rw [Finset.prod_eq_one fun t ht => by
-    rw [Function.update_of_ne (Finset.ne_of_mem_erase ht)]
-    rw [show (-((H t : ℕ) : ℤ)).toNat = 0 by omega, pow_zero], mul_one]
+      rw [Function.update_of_ne (Finset.ne_of_mem_erase ht)]
+      rw [show (-((H t : ℕ) : ℤ)).toNat = 0 by omega, pow_zero],
+    mul_one]
 
-theorem denI_upd (H : ℕ → ℕ) (e s : ℕ) (hs : s < e) (x : ℤ) :
-    denI W e (Function.update (fun t => -((H t : ℕ) : ℤ)) s x) =
-      ps W s ^ (-x).toNat * ∏ t ∈ (Finset.range e).erase s, ps W t ^ H t := by
+theorem denI_upd (H : ℕ → ℕ) (e s : ℕ) (hs : s < e) (x : ℤ)
+    : denI W e (Function.update (fun t => -((H t : ℕ) : ℤ)) s x)
+      = ps W s ^ (-x).toNat * ∏ t ∈ (Finset.range e).erase s, ps W t ^ H t := by
   unfold denI
   rw [← Finset.mul_prod_erase _ _ (Finset.mem_range.2 hs), Function.update_self]
   congr 1
@@ -45,39 +49,47 @@ theorem denI_upd (H : ℕ → ℕ) (e s : ℕ) (hs : s < e) (x : ℤ) :
 theorem aev_fixed (P : Polynomial O) : ∀ z : W.EE, W.γE W.gam z = z → aev P z = P.eval 1 • z := by
   induction P using Polynomial.induction_on with
   | C c => intro z _; simp [Polynomial.aeval_C, Module.algebraMap_end_apply]
-  | add p q hp hq => intro z hz; rw [map_add (f := _), LinearMap.add_apply, hp z hz, hq z hz,
-      Polynomial.eval_add, add_smul]
+  | add p q hp hq =>
+    intro z hz
+    rw [map_add (f := _), LinearMap.add_apply, hp z hz, hq z hz, Polynomial.eval_add, add_smul]
   | monomial k c ih =>
     intro z hz
     rw [pow_succ, ← mul_assoc, Polynomial.aeval_mul, mul_apply_eq_comp, Polynomial.aeval_X,
       AlgHom.toLinearMap_apply, hz, ih z hz]
     simp
 
-theorem γE_const (a : ZMod n) (x : O) :
-    W.γE W.gam (ιE (letE a) * algebraMap O W.EE x) = ιE (letE a) * algebraMap O W.EE x := by
+theorem γE_const (a : ZMod n) (x : O)
+    : W.γE W.gam (ιE (letE a) * algebraMap O W.EE x) = ιE (letE a) * algebraMap O W.EE x := by
   rw [map_mul, W.γE_ext, AlgHom.commutes]
   congr 2
   exact Formalism.MainNotions.UnusedSlot80.KL.γA_letE W W.gam a
 
-theorem lE_eq (κ : ℕ) : lE W κ = algebraMap O W.EE (((PD.p : ℕ) : O) ^ κ) := by
-  simp [lE]
+theorem lE_eq (κ : ℕ) : lE W κ = algebraMap O W.EE (((PD.p : ℕ) : O) ^ κ) := by simp [lE]
 
 def InvLevAt (s : ℕ) : Prop :=
-  Formalism.MainNotions.LiftingTheory.CaseA W → 5 ≤ PD.p → ∀ (a : ZMod n) (T : Finset ℕ) (e : ℕ → ℕ), s ∉ T →
-    ∀ f : W.EE, InFr W a 1 (∏ t ∈ T, ps W t ^ e t) f →
-    (∃ κ : ℕ, InFr W a (ps W s) (∏ t ∈ T, ps W t ^ e t) (lE W κ * (W.γE W.gam f - f))) →
-    ∃ (κ : ℕ) (x : O), InFr W a (ps W s) (∏ t ∈ T, ps W t ^ e t)
-      (lE W κ * f - algebraMap (LetA O n) W.EE (letE a) * algebraMap O W.EE x)
+  Formalism.MainNotions.LiftingTheory.CaseA W → 5 ≤ PD.p
+    → ∀ (a : ZMod n) (T : Finset ℕ) (e : ℕ → ℕ),
+      s ∉ T
+        → ∀ f : W.EE,
+          InFr W a 1 (∏ t ∈ T, ps W t ^ e t) f
+            → (∃ κ : ℕ, InFr W a (ps W s) (∏ t ∈ T, ps W t ^ e t) (lE W κ * (W.γE W.gam f - f)))
+            → ∃ (κ : ℕ) (x : O),
+              InFr W a (ps W s) (∏ t ∈ T, ps W t ^ e t)
+                (lE W κ * f - algebraMap (LetA O n) W.EE (letE a) * algebraMap O W.EE x)
 
-theorem invLevAt_of (h : CutU.InvLevCore W) (s : ℕ) : InvLevAt W s :=
-  fun hCA h5 a T e hs f hf hγ => h hCA h5 a s T e hs f hf hγ
+theorem invLevAt_of (h : CutU.InvLevCore W) (s : ℕ) : InvLevAt W s := fun hCA h5 a T e hs f hf hγ =>
+  h hCA h5 a s T e hs f hf hγ
 
-theorem lev_const (hKL : KillerLevCore W) (hS : PsStable W)
-    (hCA : Formalism.MainNotions.LiftingTheory.CaseA W) (h5 : 5 ≤ PD.p) (a : ZMod n) (ell : ℕ) (H : ℕ → ℕ) (M : ℕ)
-    (hM : ∀ s < ell, H s ≤ M) (y : W.EE) (hy : InId W a ell (fun t => -((H t : ℕ) : ℤ)) y)
-    (s : ℕ) (hs : s < ell) (hInv : InvLevAt W s) :
-    ∃ (κ : ℕ) (x : O), InId W a ell (Function.update (fun t => -((H t : ℕ) : ℤ)) s (H s))
-      (lE W κ * PPγ W ell (Finset.Ico (-(M : ℤ)) M) y - ιE (letE a) * algebraMap O W.EE x) := by
+theorem lev_const
+    (hKL : KillerLevCore W) (hS : PsStable W) (hCA : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (h5 : 5 ≤ PD.p)
+    (a : ZMod n)
+    (ell : ℕ) (H : ℕ → ℕ) (M : ℕ) (hM : ∀ s < ell, H s ≤ M)
+    (y : W.EE) (hy : InId W a ell (fun t => -((H t : ℕ) : ℤ)) y)
+    (s : ℕ) (hs : s < ell) (hInv : InvLevAt W s)
+    : ∃ (κ : ℕ) (x : O),
+      InId W a ell (Function.update (fun t => -((H t : ℕ) : ℤ)) s (H s))
+        (lE W κ * PPγ W ell (Finset.Ico (-(M : ℤ)) M) y - ιE (letE a) * algebraMap O W.EE x) := by
   set α0 : ℕ → ℤ := fun t => -((H t : ℕ) : ℤ) with hα0
   set JS : Finset ℤ := Finset.Ico (-(M : ℤ)) M with hJS
   set Fp : ℤ → Polynomial O := fun i => Polynomial.X ^ (PD.p ^ ell) -
@@ -124,7 +136,9 @@ theorem lev_const (hKL : KillerLevCore W) (hS : PsStable W)
   have hGm : InId W a ell α1 Gg := inId_aeval W hS _ y₂ h₁
   obtain ⟨κ₂, h₂⟩ := (hK a α1 s hs y₂ h₁).2.2 1
   have e2 : α1 s = 0 := by rw [hα1, Function.update_self]
-  have hF0 : (∏ i ∈ Finset.Ico (α1 s) (α1 s + ((1 : ℕ) : ℤ)), Fp i) = Polynomial.X ^ (PD.p ^ ell) - 1 := by
+  have hF0
+      : (∏ i ∈ Finset.Ico (α1 s) (α1 s + ((1 : ℕ) : ℤ)), Fp i)
+        = Polynomial.X ^ (PD.p ^ ell) - 1 := by
     have hI : Finset.Ico (0 : ℤ) (0 + ((1 : ℕ) : ℤ)) = {0} := by ext i; simp; omega
     rw [e2, hI, Finset.prod_singleton]
     simp [hFp]

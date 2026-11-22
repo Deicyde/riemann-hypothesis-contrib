@@ -6,12 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevOpMemFixe
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
-open GlobalTheory.BCT GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.L2.Host Formalism.UG Formalism.BasicNotions
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.BCT GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  Formalism.L2.Host Formalism.UG Formalism.BasicNotions
 
-private theorem lv_commute {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
-    [Module ℂ V] (ρ : Representation ℂ G V) (H : Subgroup G) (hH : IsOpen (H : Set G)) (f : G → ℂ)
-    (hf : HasCompactSupport f) (T : Module.End ℂ V) (hT : ∀ a, Commute T (ρ a)) : Commute T (Lv ρ H f) := by
+private theorem lv_commute
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    (H : Subgroup G) (hH : IsOpen (H : Set G))
+    (f : G → ℂ) (hf : HasCompactSupport f)
+    (T : Module.End ℂ V) (hT : ∀ a, Commute T (ρ a))
+    : Commute T (Lv ρ H f) := by
   have hs := GlobalTheory.TwTrLevel.finite_supp H hH f hf
   have hsupp : (Function.support fun q : G ⧸ H =>
       f q.out • (ρ q.out ∘ₗ (LinearMap.id : V →ₗ[ℂ] V))).Finite :=
@@ -22,8 +28,7 @@ private theorem lv_commute {G V : Type} [Group G] [TopologicalSpace G] [IsTopolo
   rw [LinearMap.comp_id]
   exact hT _
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.locComm_pf :
-    SlotBasic → LevTop → LocComm := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.locComm_pf : SlotBasic → LevTop → LocComm := by
   intro hSF _ E _ _ _ n S Z N hSec _ hG i hi f hf
   obtain ⟨-, -, hloc, hind, -⟩ := hSF E n S hSec
   have hmem : ∀ c, c ∈ Lev S N ↔ ∀ k, Sl S k → qw n k.1 k.2 c ∈ N k.1 := by
@@ -49,14 +54,18 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.locComm_pf :
     have hc' : c' ∈ Lev S N := hcc ▸ mul_mem (inv_mem (hjw _ ha)) hc
     have hq : qw n i.1 i.2 c' = 1 := by
       rw [hcc, map_mul, map_inv, (hloc i.1 i.2).2.2.1, inv_mul_cancel]
-    have hc2 : c = jw n i.1 i.2 (qw n i.1 i.2 c) * c' := by
-      rw [hcc, mul_inv_cancel_left]
+    have hc2 : c = jw n i.1 i.2 (qw n i.1 i.2 c) * c' := by rw [hcc, mul_inv_cancel_left]
     have hL : Commute (finRep E n c') (Lw N i.1 i.2 f) :=
       lv_commute (rw' n i.1 i.2) (N i.1) hopen f hf.1 _ fun a =>
         (((hloc i.1 i.2).2.2.2 a c' hq).map (finRep E n)).symm
     have hfix : Lw N i.1 i.2 f y ∈ fixed (rw' n i.1 i.2) (N i.1) :=
-      GlobalTheory.TwTrLevel.levOp_mem_fixed (rw' n i.1 i.2) (MonoidHom.id _) (fun _ => rfl) LinearMap.id
-        (fun _ => rfl) (N i.1) (N i.1) hopen (fun _ h => h) f hf y h1
+      GlobalTheory.TwTrLevel.levOp_mem_fixed (rw' n i.1 i.2) (MonoidHom.id _)
+        (fun _ => rfl)
+        LinearMap.id
+        (fun _ => rfl)
+        (N i.1) (N i.1) hopen
+        (fun _ h => h)
+        f hf y h1
     have e : finRep E n c' (Lw N i.1 i.2 f y) = Lw N i.1 i.2 f y := by
       have h2 := LinearMap.congr_fun hL.eq y
       rw [Module.End.mul_apply, Module.End.mul_apply, hy' c' hc'] at h2

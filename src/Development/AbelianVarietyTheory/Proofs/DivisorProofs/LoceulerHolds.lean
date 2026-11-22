@@ -9,6 +9,7 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.CardH1EqCardH0
 
 namespace GlobalTheory.Laid
 
-theorem loceuler_holds : ReciprocityTheory.Gal.LocalEulerChar := GlobalTheory.CompanionTheory.Hypotheses₂.LocalEuler.localEulerChar_holds
+theorem loceuler_holds : ReciprocityTheory.Gal.LocalEulerChar :=
+  GlobalTheory.CompanionTheory.Hypotheses₂.LocalEuler.localEulerChar_holds
 
 end GlobalTheory.Laid

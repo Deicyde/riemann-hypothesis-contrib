@@ -29,8 +29,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.SimilitudeI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyKa
@@ -119,17 +121,28 @@ theorem det_ne_zero : Out.Laws → ∀ (K : Type) [Field K] [IsAlgClosed K] (x :
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← Finset.sum_mul, ← map_sum, show ∑ I, c I * Q I I' = 0 from congrFun hcQ I', map_zero, zero_mul]
 
-theorem exists_coords_pow (laws : Out.Laws) (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (x : KeyIn R)
-    (m : ℕ) (hm : 1 ≤ m) (b : Fin (m ^ x.P.g) → RR x m) (hb : IsBasis x b) (n : ℕ)
-    (s : LB.Sec (LB.LinComb x.P.L (K := Fin n) (fun c => (Out.powPr x.P.A c).left) (fun _ => (m : ℤ)))) :
-    ∃ q : (Fin n → Fin (m ^ x.P.g)) → R, ∀ (Z : Scheme.{0}) (r : Z ⟶ (Out.powObj x.P.A n).left) (z : Z) J,
-      Good x.P.L z J → sval s r z J = ∑ I, gs r z ⊤ (cst (Out.powObj x.P.A n).hom ⊤ (q I)) *
-        ∏ c, gs (r ≫ (Out.powPr x.P.A c).left) z (x.P.L.U (J (r ≫ (Out.powPr x.P.A c).left)))
-          ((b (I c)).f (J (r ≫ (Out.powPr x.P.A c).left))) := by
-  refine GlobalTheory.T.boxProducts_span_external_powers_of_boxSpan R x.P.A x.P.L m _ b x.P.isLB (fun T => ?_) n s
-  refine GlobalTheory.T.pullbackSectionsSpanTwisted_of_indep_span _ _ _ _ _ _ b _ _ x.P.isLB (GlobalTheory.T.pullbackSections_basis_of_affine_opens _ _ _ _ _ _ b _ _ ?_)
-  refine GlobalTheory.T.pullbackSections_basis_affine_baseChange_of_affine R _ x.P.A.hom x.P.L _ _ b (fun R' _ f => ?_) _ _ T.hom _ _
-    (IsPullback.of_hasPullback x.P.A.hom T.hom)
+theorem exists_coords_pow
+    (laws : Out.Laws)
+    (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    (x : KeyIn R) (m : ℕ) (hm : 1 ≤ m) (b : Fin (m ^ x.P.g) → RR x m) (hb : IsBasis x b)
+    (n : ℕ)
+    (s : LB.Sec
+      (LB.LinComb x.P.L (K := Fin n) (fun c => (Out.powPr x.P.A c).left) (fun _ => (m : ℤ))))
+    : ∃ q : (Fin n → Fin (m ^ x.P.g)) → R,
+      ∀ (Z : Scheme.{0}) (r : Z ⟶ (Out.powObj x.P.A n).left) (z : Z) J,
+        Good x.P.L z J
+          → sval s r z J
+            = ∑ I, gs r z ⊤ (cst (Out.powObj x.P.A n).hom ⊤ (q I)) *
+              ∏ c, gs (r ≫ (Out.powPr x.P.A c).left) z (x.P.L.U (J (r ≫ (Out.powPr x.P.A c).left)))
+                ((b (I c)).f (J (r ≫ (Out.powPr x.P.A c).left))) := by
+  refine GlobalTheory.T.boxProducts_span_external_powers_of_boxSpan R x.P.A x.P.L m _ b x.P.isLB
+    (fun T => ?_)
+    n s
+  refine GlobalTheory.T.pullbackSectionsSpanTwisted_of_indep_span _ _ _ _ _ _ b _ _ x.P.isLB
+    (GlobalTheory.T.pullbackSections_basis_of_affine_opens _ _ _ _ _ _ b _ _ ?_)
+  refine GlobalTheory.T.pullbackSections_basis_affine_baseChange_of_affine R _ x.P.A.hom x.P.L _ _ b
+    (fun R' _ f => ?_)
+    _ _ T.hom _ _ (IsPullback.of_hasPullback x.P.A.hom T.hom)
   obtain ⟨x', hx'⟩ := GlobalTheory.KeyPow.keyIn_baseChange laws.polBaseChange R R' x f
   obtain ⟨h₁, h₂⟩ := GlobalTheory.KeyVia.main R R' x x' f
   obtain ⟨φ, w, hv⟩ := h₁.1 hx'
@@ -137,8 +150,14 @@ theorem exists_coords_pow (laws : Out.Laws) (R : Type) [CommRing R] [IsLocalRing
   have hP : IsPullback φ x'.P.A.hom x.P.A.hom (spMap f) := by
     obtain ⟨he, hg, F, ⟨hP, -⟩, -⟩ := hv
     exact hP
-  exact ⟨_, x'.P.A.hom, φ, hP, GlobalTheory.T.basisBaseChange_relativeBasis_pulledBackSections R R' x x' f φ w m _ b b' hv hb'
-    ((GlobalTheory.KeyBasis.main laws R x m hm).2 b hb R' f x' φ w b' hv hb')⟩
+  exact ⟨
+    _,
+    x'.P.A.hom,
+    φ,
+    hP,
+    GlobalTheory.T.basisBaseChange_relativeBasis_pulledBackSections R R' x x' f φ w m _ b b' hv hb'
+      ((GlobalTheory.KeyBasis.main laws R x m hm).2 b hb R' f x' φ w b' hv hb')
+  ⟩
 
 theorem exists_l2Val : Out.Laws → ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsPrincipalIdealRing R] (x : KeyIn R) (m : ℕ) (al : Matrix (Fin 4) (Fin 4) ℤ) (b : Fin (m ^ x.P.g) → RR x m) (ξ : (Fin 4 → Fin (m ^ x.P.g)) → Fin 4 → Pt x), IsUnit (m : R) → al.transpose * al = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ) → IsBasis x b → (∀ I I', I ≠ I' → ∀ p : Sp R, ∃ r, (ξ I r).left p ≠ (ξ I' r).left p) → (∀ I c, (List.ofFn fun r : Fin 4 => ξ I r ^ al r c).prod = 1) → ∃ lam, IsSquareDeterminantComparison x m al b lam := by
   intro laws R _ _ _ _ x m al b ξ hm hal hb hξ hk

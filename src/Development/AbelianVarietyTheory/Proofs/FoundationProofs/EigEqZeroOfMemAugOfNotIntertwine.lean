@@ -11,9 +11,11 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Glo
 
 namespace GlobalTheory.PsType
 
-theorem translate_mem_aug_of_not_intertwine {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V)
-    (J : Set G) (θ : G → ℂ) (u : V) (hu : IsEig π J θ u) (y j : G) (hj : j ∈ J) (hc : y * j * y⁻¹ ∈ J)
-    (hne : θ j ≠ θ (y * j * y⁻¹)) : π y u ∈ aug π J θ := by
+theorem translate_mem_aug_of_not_intertwine
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ G V) (J : Set G) (θ : G → ℂ) (u : V) (hu : IsEig π J θ u)
+    (y j : G) (hj : j ∈ J) (hc : y * j * y⁻¹ ∈ J) (hne : θ j ≠ θ (y * j * y⁻¹))
+    : π y u ∈ aug π J θ := by
   have h1 : π (y * j * y⁻¹) (π y u) = θ j • π y u := by
     have : π (y * j * y⁻¹) (π y u) = π y (π j u) := by
       rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]
@@ -24,18 +26,25 @@ theorem translate_mem_aug_of_not_intertwine {G V : Type} [Group G] [AddCommGroup
     exact ⟨_, hc, π y u, by rw [h1, sub_smul]⟩
   exact (Submodule.smul_mem_iff _ (sub_ne_zero.mpr hne)).mp h2
 
-theorem eig_eq_zero_of_mem_aug_of_not_intertwine : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V), IsSmooth π → ∀ (J N : Set G) (θ : G → ℂ), Datum J θ →
-    Datum N (fun _ => 1) → (∀ y ∈ N, (y ∈ J ∧ θ y = 1) ∨ ∃ j ∈ J, y * j * y⁻¹ ∈ J ∧ θ j ≠ θ (y * j * y⁻¹)) →
-    ∀ u ∈ aug π N (fun _ => 1), IsEig π J θ u → u = 0 := by
+theorem eig_eq_zero_of_mem_aug_of_not_intertwine
+    : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (π : Representation ℂ G V),
+      IsSmooth π
+        → ∀ (J N : Set G) (θ : G → ℂ),
+          Datum J θ → Datum N (fun _ => 1)
+            → (∀ y ∈ N, (y ∈ J ∧ θ y = 1) ∨ ∃ j ∈ J, y * j * y⁻¹ ∈ J ∧ θ j ≠ θ (y * j * y⁻¹))
+            → ∀ u ∈ aug π N (fun _ => 1), IsEig π J θ u → u = 0 := by
   intro G V _ _ _ _ _ π hπ J N θ hJ hN hy u hu he
   classical
-  obtain ⟨R, h1, hR, hs⟩ := GlobalTheory.T.character_average_twistedSpan_eq_zero G V π hπ N _ hN u hu
+  obtain ⟨R, h1, hR, hs⟩ :=
+    GlobalTheory.T.character_average_twistedSpan_eq_zero G V π hπ N _ hN u hu
   simp only [inv_one, one_smul] at hs
-  refine (GlobalTheory.T.characterEigenspace_isCompl_principalSeriesTwistedSpan G V π hπ J θ hJ).1 u ?_ he
+  refine (GlobalTheory.T.characterEigenspace_isCompl_principalSeriesTwistedSpan G V π hπ J θ hJ).1 u
+    ?_ he
   rw [← Finset.sum_filter_add_sum_filter_not R (fun y => y ∈ J ∧ θ y = 1)] at hs
-  have hA : ∑ y ∈ R.filter (fun y => y ∈ J ∧ θ y = 1), π y u
-      = ((R.filter (fun y => y ∈ J ∧ θ y = 1)).card : ℂ) • u := by
+  have hA
+      : ∑ y ∈ R.filter (fun y => y ∈ J ∧ θ y = 1), π y u
+        = ((R.filter (fun y => y ∈ J ∧ θ y = 1)).card : ℂ) • u := by
     rw [Finset.sum_congr rfl (g := fun _ => u), Finset.sum_const, Nat.cast_smul_eq_nsmul]
     intro y hy'
     obtain ⟨_, a, b⟩ := Finset.mem_filter.mp hy'

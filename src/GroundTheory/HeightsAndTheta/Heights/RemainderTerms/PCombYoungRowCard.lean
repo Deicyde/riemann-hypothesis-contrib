@@ -29,8 +29,7 @@ theorem CombYoungRowCard.proof : CombYoungRowCard.Statement := by
     have hmem : ((i, c) : Fin m × ℕ) ∈ youngCells lam := by
       unfold youngCells
       refine mem_filter.2 ⟨mem_product.2 ⟨mem_univ _, mem_range.2 ?_⟩, hc'⟩
-      exact lt_of_lt_of_le hc'
-        (Finset.single_le_sum (fun j _ => Nat.zero_le (lam j)) (mem_univ i))
+      exact lt_of_lt_of_le hc' (Finset.single_le_sum (fun j _ => Nat.zero_le (lam j)) (mem_univ i))
     exact ⟨⟨(i, c), hmem⟩, mem_filter.2 ⟨mem_univ _, rfl⟩, rfl⟩
 
 end GroundTheory.Heights₂.Heights.RestTerms

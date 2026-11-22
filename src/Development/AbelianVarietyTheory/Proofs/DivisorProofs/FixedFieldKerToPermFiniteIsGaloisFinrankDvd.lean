@@ -8,12 +8,12 @@ open IntermediateField
 
 namespace GlobalTheory
 
-theorem fixedField_ker_toPerm_finite_isGalois_finrank_dvd (Ω K : Type) [Field Ω] [Field K]
-    [Algebra Ω K] [IsAlgClosure Ω K] [CharZero Ω] (n : ℕ)
-    (φ : (K ≃ₐ[Ω] K) →* Equiv.Perm (Fin n)) :
-    FiniteDimensional Ω (IntermediateField.fixedField φ.ker) ∧
-      IsGalois Ω (IntermediateField.fixedField φ.ker) ∧
-      Module.finrank Ω (IntermediateField.fixedField φ.ker) ∣ n.factorial := by
+theorem fixedField_ker_toPerm_finite_isGalois_finrank_dvd
+    (Ω K : Type) [Field Ω] [Field K] [Algebra Ω K] [IsAlgClosure Ω K] [CharZero Ω]
+    (n : ℕ) (φ : (K ≃ₐ[Ω] K) →* Equiv.Perm (Fin n))
+    : FiniteDimensional Ω (IntermediateField.fixedField φ.ker)
+      ∧ IsGalois Ω (IntermediateField.fixedField φ.ker)
+      ∧ Module.finrank Ω (IntermediateField.fixedField φ.ker) ∣ n.factorial := by
   haveI : Algebra.IsAlgebraic Ω K := IsAlgClosure.isAlgebraic
   haveI : Normal Ω K := IsAlgClosure.normal Ω K
   haveI : IsGalois Ω K := ⟨⟩
@@ -23,8 +23,7 @@ theorem fixedField_ker_toPerm_finite_isGalois_finrank_dvd (Ω K : Type) [Field �
     rw [Subgroup.index_ker]
     have h := Subgroup.card_subgroup_dvd_card φ.range
     rwa [Nat.card_perm, Nat.card_fin] at h
-  have hF : E.fixingSubgroup.index ∣ n.factorial :=
-    (Subgroup.index_dvd_of_le hHF).trans hker
+  have hF : E.fixingSubgroup.index ∣ n.factorial := (Subgroup.index_dvd_of_le hHF).trans hker
   haveI : E.fixingSubgroup.FiniteIndex :=
     ⟨fun h => (Nat.factorial_pos n).ne' (Nat.eq_zero_of_zero_dvd (h ▸ hF))⟩
   have hopen : IsOpen (E.fixingSubgroup : Set (K ≃ₐ[Ω] K)) :=
@@ -40,7 +39,9 @@ theorem fixedField_ker_toPerm_finite_isGalois_finrank_dvd (Ω K : Type) [Field �
       intro h hh
       have hc : g * h * g⁻¹ ∈ φ.ker := (MonoidHom.normal_ker φ).conj_mem h hh g
       have := hx _ hc
-      calc h (g⁻¹ x) = g⁻¹ ((g * h * g⁻¹) x) := by simp [AlgEquiv.mul_apply]
+      calc
+        h (g⁻¹ x)
+          = g⁻¹ ((g * h * g⁻¹) x) := by simp [AlgEquiv.mul_apply]
         _ = g⁻¹ x := by rw [this]
     have h2 := hσ _ hx'
     simp only [AlgEquiv.mul_apply]

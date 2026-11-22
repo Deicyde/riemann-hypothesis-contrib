@@ -16,12 +16,14 @@ noncomputable section
 
 namespace GlobalTheory.SecGlue.Cocycle
 
-theorem spMap_comp_spMap {A B C : Type} [CommRing A] [CommRing B] [CommRing C]
-    (a : A →+* B) (b : B →+* C) : spMap b ≫ spMap a = spMap (b.comp a) := by
+theorem spMap_comp_spMap
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (a : A →+* B) (b : B →+* C)
+    : spMap b ≫ spMap a = spMap (b.comp a) := by
   rw [← Spec.map_comp]; rfl
 
-theorem awayMap_surjective {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+* R₀)
-    (hπ : Function.Surjective π) (r : R) : Function.Surjective (Localization.awayMap π r) := by
+theorem awayMap_surjective
+    {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+* R₀) (hπ : Function.Surjective π) (r : R)
+    : Function.Surjective (Localization.awayMap π r) := by
   intro y
   obtain ⟨⟨a, ⟨_, m, rfl⟩⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers (π r)) y
   obtain ⟨b, rfl⟩ := hπ a
@@ -31,9 +33,9 @@ theorem awayMap_surjective {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R 
   ext
   simp
 
-theorem ker_awayMap_le {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+* R₀) (r : R) :
-    RingHom.ker (Localization.awayMap π r) ≤
-      (RingHom.ker π).map (algebraMap R (Localization.Away r)) := by
+theorem ker_awayMap_le {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+* R₀) (r : R)
+    : RingHom.ker (Localization.awayMap π r)
+      ≤ (RingHom.ker π).map (algebraMap R (Localization.Away r)) := by
   intro x hx
   obtain ⟨⟨a, ⟨_, m, rfl⟩⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers r) x
   rw [RingHom.mem_ker] at hx
@@ -45,19 +47,21 @@ theorem ker_awayMap_le {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+
   rw [RingHom.mem_ker, map_mul, map_pow]
   exact hp
 
-theorem ker_awayMap_sq {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+* R₀)
-    (h2 : RingHom.ker π ^ 2 = ⊥) (r : R) :
-    RingHom.ker (Localization.awayMap π r) ^ 2 = ⊥ := by
+theorem ker_awayMap_sq
+    {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+* R₀) (h2 : RingHom.ker π ^ 2 = ⊥) (r : R)
+    : RingHom.ker (Localization.awayMap π r) ^ 2 = ⊥ := by
   refine le_bot_iff.1 ((Ideal.pow_right_mono (ker_awayMap_le π r) 2).trans ?_)
   rw [← Ideal.map_pow, h2, Ideal.map_bot]
 
-theorem isCombIn_restrict_chart {Y : Scheme.{0}} {V V' : Y.Opens} (hV : IsAffineOpen V)
-    (hV' : IsAffineOpen V') {S T S' : Type} [CommRing S] [CommRing T] [CommRing S']
-    (q : S →+* T) (hq : Function.Surjective q) (h2 : RingHom.ker q ^ 2 = ⊥) (g : S →+* S')
-    {ι : Type} [Fintype ι] (u c : Sp S ⟶ Y) (w : ι → (Sp S ⟶ Y)) (a : ι → S)
-    (hw : ∀ i, spMap q ≫ w i = spMap q ≫ u) (hC : IsCombIn V u c w a)
-    (hu : (spMap g ≫ u) ⁻¹ᵁ V' = ⊤) :
-    IsCombIn V' (spMap g ≫ u) (spMap g ≫ c) (fun i => spMap g ≫ w i) (fun i => g (a i)) := by
+theorem isCombIn_restrict_chart
+    {Y : Scheme.{0}} {V V' : Y.Opens} (hV : IsAffineOpen V) (hV' : IsAffineOpen V')
+    {S T S' : Type} [CommRing S] [CommRing T] [CommRing S']
+    (q : S →+* T) (hq : Function.Surjective q) (h2 : RingHom.ker q ^ 2 = ⊥)
+    (g : S →+* S')
+    {ι : Type} [Fintype ι]
+    (u c : Sp S ⟶ Y) (w : ι → (Sp S ⟶ Y)) (a : ι → S) (hw : ∀ i, spMap q ≫ w i = spMap q ≫ u)
+    (hC : IsCombIn V u c w a) (hu : (spMap g ≫ u) ⁻¹ᵁ V' = ⊤)
+    : IsCombIn V' (spMap g ≫ u) (spMap g ≫ c) (fun i => spMap g ≫ w i) (fun i => g (a i)) := by
   let J : Ideal S' := (RingHom.ker q).map g
   have hle : RingHom.ker q ≤ RingHom.ker ((Ideal.Quotient.mk J).comp g) := by
     intro x hx
@@ -65,30 +69,42 @@ theorem isCombIn_restrict_chart {Y : Scheme.{0}} {V V' : Y.Opens} (hV : IsAffine
     exact Ideal.mem_map_of_mem g hx
   let g' : T →+* S' ⧸ J := RingHom.liftOfSurjective q hq ⟨(Ideal.Quotient.mk J).comp g, hle⟩
   have hg' : g'.comp q = (Ideal.Quotient.mk J).comp g := RingHom.liftOfSurjective_comp q hq _
-  refine GlobalTheory.T.isAffineCombination_independent_of_chart Y V V' hV hV' S' (S' ⧸ J) (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
-    ?_ ι _ _ _ _ (fun i => ?_) (isCombIn_spMap_comp Y V S S' g ι u c w a hC) hu
+  refine GlobalTheory.T.isAffineCombination_independent_of_chart Y V V' hV hV' S' (S' ⧸ J)
+    (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective ?_ ι _ _ _ _
+    (fun i => ?_)
+    (isCombIn_spMap_comp Y V S S' g ι u c w a hC) hu
   · rw [Ideal.mk_ker, ← Ideal.map_pow, h2, Ideal.map_bot]
   · rw [← Category.assoc, ← Category.assoc, spMap_comp_spMap, ← hg', ← spMap_comp_spMap,
       Category.assoc, Category.assoc, hw i]
 
-theorem eq_of_cocycle {Y : Scheme.{0}} {W : Y.Opens} (hW : IsAffineOpen W) {S : Type} [CommRing S]
-    {κ : Type} [Fintype κ] (u u' c c' : Sp S ⟶ Y) (w w' : κ → (Sp S ⟶ Y)) (a b : κ → S)
+theorem eq_of_cocycle
+    {Y : Scheme.{0}} {W : Y.Opens} (hW : IsAffineOpen W)
+    {S : Type} [CommRing S]
+    {κ : Type} [Fintype κ]
+    (u u' c c' : Sp S ⟶ Y) (w w' : κ → (Sp S ⟶ Y)) (a b : κ → S)
     (hab : ∑ k, a k * b k = 1) (h : IsCombIn W u c w a) (h' : IsCombIn W u' c' w' a)
-    (hco : ∀ k, IsCombIn W u' (w k) ![w' k, u] ![1, 1 - b k]) : c = c' := by
+    (hco : ∀ k, IsCombIn W u' (w k) ![w' k, u] ![1, 1 - b k])
+    : c = c' := by
   obtain ⟨hu, hc, hw, e⟩ := h
   obtain ⟨hu', hc', hw', e'⟩ := h'
   refine eq_of_chartHom_eq hW c c' hc hc' fun x => ?_
-  have key : ∀ k, chartHom W (w k) (hw k) x - chartHom W u hu x =
-      (chartHom W (w' k) (hw' k) x - chartHom W u' hu' x) -
-        b k * (chartHom W u hu x - chartHom W u' hu' x) := by
+  have key
+      : ∀ k,
+        chartHom W (w k) (hw k) x - chartHom W u hu x
+          = (chartHom W (w' k) (hw' k) x - chartHom W u' hu' x)
+            - b k * (chartHom W u hu x - chartHom W u' hu' x) := by
     intro k
     obtain ⟨_, _, _, e''⟩ := hco k
     have := e'' x
     rw [Fin.sum_univ_two] at this
-    have this' : chartHom W (w k) (hw k) x = chartHom W u' hu' x +
-        (1 * (chartHom W (w' k) (hw' k) x - chartHom W u' hu' x) +
-          (1 - b k) * (chartHom W u hu x - chartHom W u' hu' x)) := this
-    rw [this']; ring
+    have this'
+        : chartHom W (w k) (hw k) x
+          = chartHom W u' hu' x
+            + (1 * (chartHom W (w' k) (hw' k) x - chartHom W u' hu' x)
+              + (1 - b k) * (chartHom W u hu x - chartHom W u' hu' x)) :=
+      this
+    rw [this']
+    ring
   rw [e x, e' x]
   simp only [key, mul_sub (a _) (_ - _), Finset.sum_sub_distrib, ← mul_assoc, ← Finset.sum_mul, hab]
   ring

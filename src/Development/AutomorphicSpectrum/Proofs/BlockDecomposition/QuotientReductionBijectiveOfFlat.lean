@@ -10,14 +10,17 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison CrystallineSemistableComparison.Ls CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.LsG
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison
+  CrystallineSemistableComparison.Ls CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Pb.LsG
 
 namespace GlobalTheory.CompanionTheory.QredFlat
 
 variable {W : Type} [CommRing W]
 
-theorem mem_lp {l : ℕ} {M : Type 1} [AddCommGroup M] [Module W M] {n : ℕ} {x : M} :
-    x ∈ lpow (W := W) l M n ↔ ∃ y : M, ((l : W) ^ n) • y = x := Iff.rfl
+theorem mem_lp {l : ℕ} {M : Type 1} [AddCommGroup M] [Module W M] {n : ℕ} {x : M}
+    : x ∈ lpow (W := W) l M n ↔ ∃ y : M, ((l : W) ^ n) • y = x :=
+  Iff.rfl
 
 theorem B_ker (D : Cx.{1} W) (n : ℕ) (v : D.X n) (hv : v ∈ D.B n) : D.d n v = 0 := by
   cases n with
@@ -28,12 +31,18 @@ theorem B_ker (D : Cx.{1} W) (n : ℕ) (v : D.X n) (hv : v ∈ D.B n) : D.d n v 
     obtain ⟨g, rfl⟩ := hv
     exact D.dd n g
 
-theorem exact_quo (D : Cx.{1} W) (l m : ℕ) (hF : FlatL l m D)
-    (hE : ∀ n (x : D.X n), D.d n x = 0 → x ∈ D.B n) :
-    ∀ n c, c ≤ m → ∀ x : D.X n, D.d n x ∈ lpow (W := W) l (D.X (n + 1)) c →
-      ∃ u : D.X n, ∃ v ∈ D.B n, x = ((l : W) ^ c) • u + v := by
-  have key : ∀ n c, c ≤ m → ∀ x : D.X n, D.d n x ∈ lpow (W := W) l (D.X (n + 1)) c →
-      D.d n (((l : W) ^ (m - c)) • x) = 0 := by
+theorem exact_quo
+    (D : Cx.{1} W) (l m : ℕ) (hF : FlatL l m D) (hE : ∀ n (x : D.X n), D.d n x = 0 → x ∈ D.B n)
+    : ∀ n c,
+      c ≤ m
+        → ∀ x : D.X n,
+          D.d n x ∈ lpow (W := W) l (D.X (n + 1)) c
+            → ∃ u : D.X n, ∃ v ∈ D.B n, x = ((l : W) ^ c) • u + v := by
+  have key
+      : ∀ n c,
+        c ≤ m
+          → ∀ x : D.X n,
+            D.d n x ∈ lpow (W := W) l (D.X (n + 1)) c → D.d n (((l : W) ^ (m - c)) • x) = 0 := by
     intro n c hc x hx
     obtain ⟨y, hy⟩ := mem_lp.1 hx
     rw [map_smul, ← hy, smul_smul, ← pow_add, Nat.sub_add_cancel hc]
@@ -52,8 +61,7 @@ theorem exact_quo (D : Cx.{1} W) (l m : ℕ) (hF : FlatL l m D)
     obtain ⟨u, v, hv, e⟩ := ih (m - c) (Nat.sub_le _ _) w (by rw [hw']; exact mem_lp.2 ⟨x, rfl⟩)
     have hd : D.d n w = ((l : W) ^ (m - c)) • D.d n u := by
       rw [e, map_add (f := _), B_ker D n v hv, add_zero, map_smul]
-    have h1 : ((l : W) ^ (m - c)) • (x - D.d n u) = 0 := by
-      rw [smul_sub, ← hw', hd, sub_self]
+    have h1 : ((l : W) ^ (m - c)) • (x - D.d n u) = 0 := by rw [smul_sub, ← hw', hd, sub_self]
     obtain ⟨t, ht⟩ := mem_lp.1 ((hF (n + 1)).2 c (m - c) (by omega) _ h1)
     exact ⟨t, D.d n u, ⟨u, rfl⟩, by rw [ht]; abel⟩
 
@@ -80,7 +88,8 @@ theorem d_shD (L : Cx.{1} W) (n : ℕ) (y : Sh L n) : L.d n (shD L n y) = 0 := b
   | zero => exact map_zero _
   | succ n => exact L.dd n y
 
-theorem B_shD (L : Cx.{1} W) (n : ℕ) (y : L.X n) (hy : y ∈ L.B n) : ∃ t : Sh L n, sdL L n t = y := by
+theorem B_shD (L : Cx.{1} W) (n : ℕ) (y : L.X n) (hy : y ∈ L.B n)
+    : ∃ t : Sh L n, sdL L n t = y := by
   cases n with
   | zero => exact ⟨PUnit.unit, (show y = 0 from hy).symm⟩
   | succ n =>
@@ -91,8 +100,9 @@ def gf {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) (n : ℕ) : K.X n →ₗ
 
 def cone {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) : Cx.{1} W where
   X n := K.X n × Sh L n
-  d n := LinearMap.prod ((K.d n) ∘ₗ LinearMap.fst W _ _)
-    (((gf f n) ∘ₗ LinearMap.fst W _ _) - (shD L n) ∘ₗ LinearMap.snd W _ _)
+  d n :=
+    LinearMap.prod ((K.d n) ∘ₗ LinearMap.fst W _ _)
+      (((gf f n) ∘ₗ LinearMap.fst W _ _) - (shD L n) ∘ₗ LinearMap.snd W _ _)
   dd n x := by
     refine Prod.ext (K.dd n x.1) ?_
     change gf f (n + 1) (K.d n x.1) - shD L (n + 1) (gf f n x.1 - shD L n x.2) = 0
@@ -107,8 +117,10 @@ theorem shD_B (L : Cx.{1} W) (n : ℕ) (y : Sh L n) : sdL L n y ∈ L.B n := by
   | zero => exact Submodule.zero_mem _
   | succ n => exact ⟨y, rfl⟩
 
-theorem cone_B_fst {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) (n : ℕ) (v : (cone f).X n)
-    (hv : v ∈ (cone f).B n) : v.1 ∈ K.B n := by
+theorem cone_B_fst
+    {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W))
+    (n : ℕ) (v : (cone f).X n) (hv : v ∈ (cone f).B n)
+    : v.1 ∈ K.B n := by
   cases n with
   | zero =>
     have h : v = 0 := hv
@@ -118,15 +130,17 @@ theorem cone_B_fst {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) (n : ℕ) (v
     obtain ⟨g, rfl⟩ := hv
     exact ⟨g.1, rfl⟩
 
-theorem flat_sh {L : Cx.{1} W} {l m : ℕ} (hL : FlatL l m L) (n : ℕ) :
-    (∀ y : Sh L n, ((l : W) ^ m) • y = 0) ∧
-      ∀ a b, a + b = m → ∀ y : Sh L n, ((l : W) ^ b) • y = 0 → ∃ t : Sh L n, ((l : W) ^ a) • t = y := by
+theorem flat_sh {L : Cx.{1} W} {l m : ℕ} (hL : FlatL l m L) (n : ℕ)
+    : (∀ y : Sh L n, ((l : W) ^ m) • y = 0)
+      ∧ ∀ a b,
+        a + b = m → ∀ y : Sh L n, ((l : W) ^ b) • y = 0 → ∃ t : Sh L n, ((l : W) ^ a) • t = y := by
   cases n with
   | zero => exact ⟨fun _ => rfl, fun _ _ _ y _ => ⟨0, rfl⟩⟩
   | succ n => exact ⟨(hL n).1, fun a b h y hy => mem_lp.1 ((hL n).2 a b h y hy)⟩
 
-theorem flat_cone {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) {l m : ℕ} (hK : FlatL l m K)
-    (hL : FlatL l m L) : FlatL l m (cone f) := by
+theorem flat_cone
+    {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) {l m : ℕ} (hK : FlatL l m K) (hL : FlatL l m L)
+    : FlatL l m (cone f) := by
   intro i
   refine ⟨fun x => Prod.ext ((hK i).1 x.1) ((flat_sh hL i).1 x.2), fun a b h x hx => ?_⟩
   have h1 : ((l : W) ^ b) • x.1 = 0 := congrArg Prod.fst hx
@@ -135,17 +149,19 @@ theorem flat_cone {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) {l m : ℕ} (
   obtain ⟨t, ht⟩ := (flat_sh hL i).2 a b h _ h2
   exact mem_lp.2 ⟨(s, t), Prod.ext hs ht⟩
 
-theorem cone_exact {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W))
-    (hb : ∀ j, Function.Bijective (f.mapH j)) (n : ℕ) (x : (cone f).X n) (hx : (cone f).d n x = 0) :
-    x ∈ (cone f).B n := by
+theorem cone_exact
+    {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W)) (hb : ∀ j, Function.Bijective (f.mapH j))
+    (n : ℕ) (x : (cone f).X n) (hx : (cone f).d n x = 0)
+    : x ∈ (cone f).B n := by
   obtain ⟨x1, x2⟩ := x
   have h1 : K.d n x1 = 0 := congrArg Prod.fst hx
   have h2 : gf f n x1 - shD L n x2 = 0 := congrArg Prod.snd hx
   have h2' : f.f n x1 = sdL L n x2 := sub_eq_zero.1 h2
-  have h3 : f.mapH n (K.cls x1 h1) = 0 := (Submodule.Quotient.mk_eq_zero ((L.B n).submoduleOf (L.Z n))).2 (by
-    change f.f n x1 ∈ L.B n
-    rw [h2']
-    exact shD_B L n x2)
+  have h3 : f.mapH n (K.cls x1 h1) = 0 :=
+    (Submodule.Quotient.mk_eq_zero ((L.B n).submoduleOf (L.Z n))).2 (by
+      change f.f n x1 ∈ L.B n
+      rw [h2']
+      exact shD_B L n x2)
   have h4 : x1 ∈ K.B n :=
     (Submodule.Quotient.mk_eq_zero ((K.B n).submoduleOf (K.Z n))).1
       ((injective_iff_map_eq_zero _).1 (hb n).1 _ h3)
@@ -158,8 +174,7 @@ theorem cone_exact {K L : Cx.{1} W} (f : Cx.Hom K L (RingHom.id W))
     obtain ⟨w, hw⟩ := h4
     have hw' : K.d n w = x1 := hw
     have h2'' : f.f (n + 1) x1 = L.d n x2 := h2'
-    have h5 : L.d n (x2 - f.f n w) = 0 := by
-      rw [map_sub, f.comm, hw', h2'', sub_self]
+    have h5 : L.d n (x2 - f.f n w) = 0 := by rw [map_sub, f.comm, hw', h2'', sub_self]
     obtain ⟨c, hc⟩ := (hb n).2 (L.cls _ h5)
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ c
     have h6 : f.f n z.1 - (x2 - f.f n w) ∈ L.B n :=
@@ -179,20 +194,22 @@ variable {l : ℕ}
 theorem prj_surj (L : Cx.{1} W) (n i : ℕ) : Function.Surjective ((prj l L n).f i) :=
   Submodule.mkQ_surjective _
 
-theorem prj_zero (L : Cx.{1} W) (n i : ℕ) (x : L.X i) :
-    (prj l L n).f i x = 0 ↔ x ∈ lpow (W := W) l (L.X i) n :=
+theorem prj_zero (L : Cx.{1} W) (n i : ℕ) (x : L.X i)
+    : (prj l L n).f i x = 0 ↔ x ∈ lpow (W := W) l (L.X i) n :=
   Submodule.Quotient.mk_eq_zero _
 
-theorem redg_prj (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (i : ℕ) (y : L.X i) :
-    (redg l L h).f i ((prj l L m).f i y) = (prj l L b).f i y := rfl
+theorem redg_prj (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (i : ℕ) (y : L.X i)
+    : (redg l L h).f i ((prj l L m).f i y) = (prj l L b).f i y :=
+  rfl
 
-theorem redg_surj (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (i : ℕ) : Function.Surjective ((redg l L h).f i) := by
+theorem redg_surj (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (i : ℕ)
+    : Function.Surjective ((redg l L h).f i) := by
   intro z
   obtain ⟨y, rfl⟩ := prj_surj (l := l) L b i z
   exact ⟨(prj l L m).f i y, rfl⟩
 
-theorem redg_zero (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (i : ℕ) (w : (quo l L m).X i) :
-    (redg l L h).f i w = 0 ↔ w ∈ lpow (W := W) l ((quo l L m).X i) b := by
+theorem redg_zero (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (i : ℕ) (w : (quo l L m).X i)
+    : (redg l L h).f i w = 0 ↔ w ∈ lpow (W := W) l ((quo l L m).X i) b := by
   obtain ⟨y, rfl⟩ := prj_surj (l := l) L m i w
   constructor
   · intro hw
@@ -222,7 +239,8 @@ theorem flat_quo {L : Cx.{1} W} {m : ℕ} (hL : FlatL l (m + 1) L) : FlatL l m (
     rw [smul_add, smul_smul, ← pow_succ, hs]
     abel
 
-theorem prj_B (K : Cx.{1} W) (b j : ℕ) (v : K.X j) (hv : v ∈ K.B j) : (prj l K b).f j v ∈ (quo l K b).B j := by
+theorem prj_B (K : Cx.{1} W) (b j : ℕ) (v : K.X j) (hv : v ∈ K.B j)
+    : (prj l K b).f j v ∈ (quo l K b).B j := by
   cases j with
   | zero =>
     have h : v = 0 := hv
@@ -232,9 +250,12 @@ theorem prj_B (K : Cx.{1} W) (b j : ℕ) (v : K.X j) (hv : v ∈ K.B j) : (prj l
     obtain ⟨g, rfl⟩ := hv
     exact ⟨(prj l K b).f j g, (prj l K b).comm j g⟩
 
-theorem redg_B (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (j : ℕ) (w : (quo l L m).X j)
-    (hw : (redg l L h).f j w ∈ (quo l L b).B j) :
-    ∃ t : Sh (quo l L m) j, ∃ s : (quo l L m).X j, ((l : W) ^ b) • s = w - sdL (quo l L m) j t := by
+theorem redg_B
+    (L : Cx.{1} W)
+    {b m : ℕ} (h : b ≤ m)
+    (j : ℕ) (w : (quo l L m).X j) (hw : (redg l L h).f j w ∈ (quo l L b).B j)
+    : ∃ t : Sh (quo l L m) j, ∃ s : (quo l L m).X j,
+      ((l : W) ^ b) • s = w - sdL (quo l L m) j t := by
   cases j with
   | zero =>
     obtain ⟨s, hs⟩ := mem_lp.1 ((redg_zero L h 0 w).1 hw)
@@ -248,22 +269,22 @@ theorem redg_B (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (j : ℕ) (w : (quo l L 
     obtain ⟨s, hs⟩ := mem_lp.1 ((redg_zero L h (j + 1) _).1 h0)
     exact ⟨g', s, hs⟩
 
-theorem redg_shD (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (j : ℕ) (t : Sh (quo l L m) j) :
-    (redg l L h).f j (sdL (quo l L m) j t) ∈ (quo l L b).B j := by
+theorem redg_shD (L : Cx.{1} W) {b m : ℕ} (h : b ≤ m) (j : ℕ) (t : Sh (quo l L m) j)
+    : (redg l L h).f j (sdL (quo l L m) j t) ∈ (quo l L b).B j := by
   cases j with
   | zero =>
     have e : sdL (quo l L m) 0 t = 0 := rfl
     rw [e, map_zero]
     exact Submodule.zero_mem _
-  | succ j =>
-    exact ⟨(redg l L h).f j t, (redg l L h).comm j t⟩
+  | succ j => exact ⟨(redg l L h).f j t, (redg l L h).comm j t⟩
 
 end Main
 
-theorem qred_bij : ∀ (W : Type) [CommRing W] (l : ℕ) (K L : Cx.{1} W) (m : ℕ)
-    (f : Cx.Hom K (quo l L m) (RingHom.id W)), FlatL l m K → FlatL l (m + 1) L →
-    (∀ j, Function.Bijective (f.mapH j)) →
-    ∀ b (h : b ≤ m) j, Function.Bijective ((qred l f h).mapH j) := by
+theorem qred_bij
+    : ∀ (W : Type) [CommRing W] (l : ℕ) (K L : Cx.{1} W) (m : ℕ)
+        (f : Cx.Hom K (quo l L m) (RingHom.id W)),
+      FlatL l m K → FlatL l (m + 1) L → (∀ j, Function.Bijective (f.mapH j))
+        → ∀ b (h : b ≤ m) j, Function.Bijective ((qred l f h).mapH j) := by
   intro W _ l K L m f hK hL hf b h j
   have E := exact_quo (cone f) l m (flat_cone f hK (flat_quo hL)) (cone_exact f hf)
   refine ⟨(injective_iff_map_eq_zero _).2 fun u hu => ?_, fun u => ?_⟩
@@ -294,8 +315,9 @@ theorem qred_bij : ∀ (W : Type) [CommRing W] (l : ℕ) (K L : Cx.{1} W) (m : �
     have hdw : (quo l L m).d j w ∈ lpow (W := W) l ((quo l L m).X (j + 1)) b :=
       (redg_zero L h _ _).1 (by rw [← (redg l L h).comm, hw]; exact hz)
     obtain ⟨p, hp⟩ := mem_lp.1 hdw
-    have hdc : (cone f).d (j + 1) ((0, w) : K.X (j + 1) × Sh (quo l L m) (j + 1)) ∈
-        lpow (W := W) l ((cone f).X (j + 1 + 1)) b := by
+    have hdc
+        : (cone f).d (j + 1) ((0, w) : K.X (j + 1) × Sh (quo l L m) (j + 1))
+          ∈ lpow (W := W) l ((cone f).X (j + 1 + 1)) b := by
       refine mem_lp.2 ⟨(0, -p), Prod.ext ?_ ?_⟩
       · change ((l : W) ^ b) • (0 : K.X (j + 1 + 1)) = K.d (j + 1) 0
         rw [smul_zero, map_zero]
@@ -307,13 +329,21 @@ theorem qred_bij : ∀ (W : Type) [CommRing W] (l : ℕ) (K L : Cx.{1} W) (m : �
     have e2 : w = ((l : W) ^ b) • u2 + (f.f j g1 - sdL (quo l L m) j g2) := congrArg Prod.snd e
     have hc : (quo l K b).d j ((prj l K b).f j g1) = 0 := by
       rw [(prj l K b).comm]
-      exact (prj_zero K b _ _).2 ⟨-u1, by
-        change ((l : W) ^ b) • (-u1) = K.d j g1
-        rw [smul_neg]
-        exact neg_eq_of_add_eq_zero_right e1.symm⟩
-    refine ⟨(quo l K b).cls _ hc, (Submodule.Quotient.eq (((quo l L b).B j).submoduleOf ((quo l L b).Z j))).2 ?_⟩
+      exact (prj_zero K b _ _).2 ⟨
+        -u1,
+        by
+          change ((l : W) ^ b) • (-u1) = K.d j g1
+          rw [smul_neg]
+          exact neg_eq_of_add_eq_zero_right e1.symm
+      ⟩
+    refine ⟨
+      (quo l K b).cls _ hc,
+      (Submodule.Quotient.eq (((quo l L b).B j).submoduleOf ((quo l L b).Z j))).2 ?_
+    ⟩
     change (qred l f h).f j ((prj l K b).f j g1) - z.1 ∈ (quo l L b).B j
-    have e3 : (qred l f h).f j ((prj l K b).f j g1) - z.1 = (redg l L h).f j (sdL (quo l L m) j g2) := by
+    have e3
+        : (qred l f h).f j ((prj l K b).f j g1) - z.1
+          = (redg l L h).f j (sdL (quo l L m) j g2) := by
       have e4 : (redg l L h).f j (((l : W) ^ b) • u2) = 0 := (redg_zero L h j _).2 ⟨u2, rfl⟩
       have e5 : (qred l f h).f j ((prj l K b).f j g1) = (redg l L h).f j (f.f j g1) := rfl
       rw [← hw, e2, map_add (f := _), e4, zero_add, map_sub, e5]

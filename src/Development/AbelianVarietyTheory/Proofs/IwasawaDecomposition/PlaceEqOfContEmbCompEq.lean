@@ -5,17 +5,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
 
 namespace GlobalTheory.HeckeGal
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.HeckeGal.norm_lt_one_of_contEmb {E : Type} [Field E] [NumberField E]
+theorem _root_.GlobalTheory.HeckeGal.norm_lt_one_of_contEmb
+    {E : Type} [Field E] [NumberField E]
     {l : ℕ} [Fact l.Prime]
-    (v : HeightOneSpectrum (𝓞 E)) (j : v.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l) (hj : Continuous j)
-    (a : 𝓞 E) (ha : a ∈ v.asIdeal) :
-    ‖j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E a))‖ < 1 := by
+    (v : HeightOneSpectrum (𝓞 E))
+    (j : v.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l) (hj : Continuous j)
+    (a : 𝓞 E) (ha : a ∈ v.asIdeal)
+    : ‖j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E a))‖ < 1 := by
   set x := algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E a) with hx
   have hx1 : ‖x‖ < 1 := by
     rw [hx, Valued.toNormedField.norm_lt_one_iff]
@@ -34,14 +36,14 @@ theorem _root_.GlobalTheory.HeckeGal.norm_lt_one_of_contEmb {E : Type} [Field E]
   rw [norm_pow] at hn
   exact absurd hn (not_lt.mpr (one_le_pow₀ hge))
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.HeckeGal.place_eq_of_contEmb_comp_eq :
-    ∀ (E : Type) [Field E] [NumberField E] (l : ℕ) [Fact l.Prime] (v v' : HeightOneSpectrum (𝓞 E))
-      (j : v.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l) (j' : v'.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l),
-      Continuous j → Continuous j' →
-      j.comp (algebraMap E (v.adicCompletion E)) = j'.comp (algebraMap E (v'.adicCompletion E)) →
-      v = v' := by
+theorem _root_.GlobalTheory.HeckeGal.place_eq_of_contEmb_comp_eq
+    : ∀ (E : Type) [Field E] [NumberField E] (l : ℕ) [Fact l.Prime] (v v' : HeightOneSpectrum (𝓞 E))
+        (j : v.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l)
+        (j' : v'.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l),
+      Continuous j → Continuous j'
+        → j.comp (algebraMap E (v.adicCompletion E)) = j'.comp (algebraMap E (v'.adicCompletion E))
+        → v = v' := by
   intro E _ _ l _ v v' j j' hj hj' hcomp
   by_contra hne
   have hideal : v.asIdeal ≠ v'.asIdeal := fun h => hne (HeightOneSpectrum.ext h)
@@ -49,16 +51,19 @@ theorem _root_.GlobalTheory.HeckeGal.place_eq_of_contEmb_comp_eq :
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp (htop ▸ Submodule.mem_top : (1 : 𝓞 E) ∈ _)
   have hna := _root_.GlobalTheory.HeckeGal.norm_lt_one_of_contEmb v j hj a ha
   have hnb := _root_.GlobalTheory.HeckeGal.norm_lt_one_of_contEmb v' j' hj' b hb
-  have hb' : j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E b)) =
-      j' (algebraMap E (v'.adicCompletion E) (algebraMap (𝓞 E) E b)) :=
+  have hb'
+      : j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E b))
+        = j' (algebraMap E (v'.adicCompletion E) (algebraMap (𝓞 E) E b)) :=
     RingHom.congr_fun hcomp _
   rw [← hb'] at hnb
-  have hsum : j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E a)) +
-      j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E b)) = 1 := by
+  have hsum
+      : j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E a))
+          + j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E b))
+        = 1 := by
     rw [← map_add (f := _), ← map_add (f := _), ← map_add (f := _), hab, map_one, map_one, map_one]
-  have hle := IsUltrametricDist.norm_add_le_max
-    (j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E a)))
-    (j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E b)))
+  have hle :=
+    IsUltrametricDist.norm_add_le_max (j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E a)))
+      (j (algebraMap E (v.adicCompletion E) (algebraMap (𝓞 E) E b)))
   rw [hsum, norm_one] at hle
   exact absurd (hle.trans_lt (max_lt hna hnb)) (lt_irrefl 1)
 

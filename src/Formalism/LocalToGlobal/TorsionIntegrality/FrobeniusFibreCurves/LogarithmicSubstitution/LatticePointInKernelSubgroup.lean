@@ -67,8 +67,10 @@ theorem unit_sq (b : ℤ_[2]) (hb : ‖b‖ = 1) : ‖1 - b ^ 2‖ ≤ 4⁻¹ :=
     have e : 1 - b ^ 2 = -(2 * 2 * (c * (c + 1))) := by
       have : b = 1 + 2 * c := by
         have hc' : b - 1 = 2 * c := by simpa using hc
-        rw [← hc']; ring
-      rw [this]; ring
+        rw [← hc']
+        ring
+      rw [this]
+      ring
     rw [e, norm_neg, norm_mul, norm_mul, h2]
     have := PadicInt.norm_le_one (c * (c + 1))
     nlinarith [norm_nonneg (c * (c + 1))]
@@ -77,8 +79,9 @@ theorem unit_sq' (b : ℤ_[2]) (hb : ‖b‖ = 1) : ‖1 - (((b : ℚ_[2]) : ℂ
   have e : 1 - (((b : ℚ_[2]) : ℂ_[2])) ^ 2 = ((((1 - b ^ 2 : ℤ_[2]) : ℚ_[2])) : ℂ_[2]) := by
     have : (((1 - b ^ 2 : ℤ_[2]) : ℚ_[2])) = 1 - (b : ℚ_[2]) ^ 2 := by push_cast; ring
     rw [this]
-    exact (by simp : algebraMap ℚ_[2] ℂ_[2] (1 - (b : ℚ_[2]) ^ 2)
-      = 1 - (algebraMap ℚ_[2] ℂ_[2] (b : ℚ_[2])) ^ 2).symm
+    exact (by simp
+      : algebraMap ℚ_[2] ℂ_[2] (1 - (b : ℚ_[2]) ^ 2)
+        = 1 - (algebraMap ℚ_[2] ℂ_[2] (b : ℚ_[2])) ^ 2).symm
   rw [e, norm_coe]
   exact unit_sq b hb
 
@@ -86,12 +89,13 @@ section Pts
 
 variable {L : PeriodPair} {ι : ℂ ≃+* ℂ_[2]} {W : WeierstrassCurve ℂ_[2]}
 
-theorem mem_kernel_subgroup_iff_norm (hU : Unif 2 L ι W) (t : ℂ) (ht : t ∉ L.lattice) :
-    InFormalGroupPoints (ptW 2 L ι W t) ↔ 1 < ‖ι (L.weierstrassP t) - W.b₂ / 12‖ := by
+theorem mem_kernel_subgroup_iff_norm (hU : Unif 2 L ι W) (t : ℂ) (ht : t ∉ L.lattice)
+    : InFormalGroupPoints (ptW 2 L ι W t) ↔ 1 < ‖ι (L.weierstrassP t) - W.b₂ / 12‖ := by
   rw [Formalism.L2.Th1.E.AnaSysW.ptW_notMem hU t ht]
   exact Iff.rfl
 
-theorem lattice_point_in_kernel_subgroup (hU : Unif 2 L ι W) (t : ℂ) (ht : t ∈ L.lattice) : InFormalGroupPoints (ptW 2 L ι W t) := by
+theorem lattice_point_in_kernel_subgroup (hU : Unif 2 L ι W) (t : ℂ) (ht : t ∈ L.lattice)
+    : InFormalGroupPoints (ptW 2 L ι W t) := by
   rw [(Formalism.L2.Th1.E.ptWZero 2 L ι W hU t).2 ht]
   trivial
 
@@ -102,15 +106,18 @@ theorem ptW_neg (hU : Unif 2 L ι W) (t : ℂ) : ptW 2 L ι W (-t) = - ptW 2 L �
   exact (Formalism.L2.Th1.E.ptWZero 2 L ι W hU 0).2 L.lattice.zero_mem
 
 open Classical in
-theorem kernel_subgroup_add_mem (hU : Unif 2 L ι W) (hW : IntCurve W) (s t : ℂ) (hs : InFormalGroupPoints (ptW 2 L ι W s))
-    (ht : InFormalGroupPoints (ptW 2 L ι W t)) : InFormalGroupPoints (ptW 2 L ι W (s + t)) := by
+theorem kernel_subgroup_add_mem
+    (hU : Unif 2 L ι W) (hW : IntCurve W)
+    (s t : ℂ) (hs : InFormalGroupPoints (ptW 2 L ι W s)) (ht : InFormalGroupPoints (ptW 2 L ι W t))
+    : InFormalGroupPoints (ptW 2 L ι W (s + t)) := by
   obtain ⟨a1, a2, a3, a4, a6, hΔ⟩ := hW
   rw [Formalism.L2.Th1.E.ptWAdd 2 L ι W hU]
   exact (Formalism.ELL.formal_group_points_subgroup.{0} ℂ_[2] W ⟨a1, a2, a3, a4, a6⟩ hΔ _ _ hs ht).1
 
 open Classical in
-theorem kernel_subgroup_neg_mem (hU : Unif 2 L ι W) (hW : IntCurve W) (t : ℂ) (ht : InFormalGroupPoints (ptW 2 L ι W t)) :
-    InFormalGroupPoints (ptW 2 L ι W (-t)) := by
+theorem kernel_subgroup_neg_mem
+    (hU : Unif 2 L ι W) (hW : IntCurve W) (t : ℂ) (ht : InFormalGroupPoints (ptW 2 L ι W t))
+    : InFormalGroupPoints (ptW 2 L ι W (-t)) := by
   obtain ⟨a1, a2, a3, a4, a6, hΔ⟩ := hW
   rw [ptW_neg hU]
   exact (Formalism.ELL.formal_group_points_subgroup.{0} ℂ_[2] W ⟨a1, a2, a3, a4, a6⟩ hΔ _ _ ht ht).2
@@ -119,7 +126,8 @@ theorem norm_b2_div_twelve_le_four (hW : IntCurve W) : ‖W.b₂ / 12‖ ≤ 4 :
   obtain ⟨a1, a2, -⟩ := hW
   have h4 : ‖(4 : ℂ_[2])‖ ≤ 1 := by
     have e : (4 : ℂ_[2]) = 2 * 2 := by norm_num
-    rw [e, norm_mul, norm_two]; norm_num
+    rw [e, norm_mul, norm_two]
+    norm_num
   have hb : ‖W.b₂‖ ≤ 1 := by
     unfold WeierstrassCurve.b₂
     rw [pow_two]
@@ -140,7 +148,8 @@ theorem kernel_stable_of_integral_kernel (hK : KernelIntegral) : KernelStableUnd
   have hiso := Formalism.L2.Th1.F.isogenyP L α S hα hmul hS t hαt
   have hP : ∀ P ∈ S, ‖ι (L.weierstrassP P) - W.b₂ / 12‖ ≤ 1 := by
     intro P hPS
-    exact not_lt.1 (mt (mem_kernel_subgroup_iff_norm hU P (hS.1 P hPS).2).2 (hK' P (hS.1 P hPS).1 (hS.1 P hPS).2))
+    exact not_lt.1 (mt (mem_kernel_subgroup_iff_norm hU P (hS.1 P hPS).2).2
+      (hK' P (hS.1 P hPS).1 (hS.1 P hPS).2))
   have htP : ∀ P ∈ S, ‖ι (L.weierstrassP (t + P)) - W.b₂ / 12‖ ≤ 1 := by
     intro P hPS
     have hn : ¬ InFormalGroupPoints (ptW 2 L ι W (t + P)) := by
@@ -159,10 +168,11 @@ theorem kernel_stable_of_integral_kernel (hK : KernelIntegral) : KernelStableUnd
   rw [mem_kernel_subgroup_iff_norm hU _ htL] at ht
   by_contra hle
   rw [not_lt] at hle
-  have hB : ‖(((b : ℚ_[2]) : ℂ_[2]))‖ ≤ 1 := by
-    rw [norm_coe]; exact le_of_eq hnb
-  have hsum : ‖∑ P ∈ S, ((ι (L.weierstrassP (t + P)) - W.b₂ / 12) -
-      (ι (L.weierstrassP P) - W.b₂ / 12))‖ ≤ 1 :=
+  have hB : ‖(((b : ℚ_[2]) : ℂ_[2]))‖ ≤ 1 := by rw [norm_coe]; exact le_of_eq hnb
+  have hsum
+      : ‖∑ P ∈ S, ((ι (L.weierstrassP (t + P)) - W.b₂ / 12) -
+          (ι (L.weierstrassP P) - W.b₂ / 12))‖
+        ≤ 1 :=
     IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one
       (fun P hPS => nle_sub (htP P hPS) (hP P hPS))
   have hc : ‖(1 - (((b : ℚ_[2]) : ℂ_[2])) ^ 2) * (W.b₂ / 12)‖ ≤ 1 := by
@@ -170,14 +180,16 @@ theorem kernel_stable_of_integral_kernel (hK : KernelIntegral) : KernelStableUnd
     have h1 := unit_sq' b hnb
     have h2 := norm_b2_div_twelve_le_four hW
     nlinarith [norm_nonneg (1 - (((b : ℚ_[2]) : ℂ_[2])) ^ 2), norm_nonneg (W.b₂ / 12)]
-  have e : ι (L.weierstrassP t) - W.b₂ / 12 =
-      (((b : ℚ_[2]) : ℂ_[2])) ^ 2 * (ι (L.weierstrassP (α * t)) - W.b₂ / 12)
-        - (1 - (((b : ℚ_[2]) : ℂ_[2])) ^ 2) * (W.b₂ / 12)
-        - ∑ P ∈ S, ((ι (L.weierstrassP (t + P)) - W.b₂ / 12) -
-            (ι (L.weierstrassP P) - W.b₂ / 12)) := by
-    have e2 : ∑ P ∈ S, ((ι (L.weierstrassP (t + P)) - W.b₂ / 12) -
-        (ι (L.weierstrassP P) - W.b₂ / 12)) =
-        ∑ P ∈ S, (ι (L.weierstrassP (t + P)) - ι (L.weierstrassP P)) :=
+  have e
+      : ι (L.weierstrassP t) - W.b₂ / 12
+        = (((b : ℚ_[2]) : ℂ_[2])) ^ 2 * (ι (L.weierstrassP (α * t)) - W.b₂ / 12)
+          - (1 - (((b : ℚ_[2]) : ℂ_[2])) ^ 2) * (W.b₂ / 12)
+          - ∑ P ∈ S, ((ι (L.weierstrassP (t + P)) - W.b₂ / 12) -
+              (ι (L.weierstrassP P) - W.b₂ / 12)) := by
+    have e2
+        : ∑ P ∈ S, ((ι (L.weierstrassP (t + P)) - W.b₂ / 12) -
+            (ι (L.weierstrassP P) - W.b₂ / 12))
+          = ∑ P ∈ S, (ι (L.weierstrassP (t + P)) - ι (L.weierstrassP P)) :=
       Finset.sum_congr rfl (fun P _ => by ring)
     rw [e2]
     linear_combination -h
@@ -185,15 +197,17 @@ theorem kernel_stable_of_integral_kernel (hK : KernelIntegral) : KernelStableUnd
   have : ‖(((b : ℚ_[2]) : ℂ_[2])) ^ 2 * (ι (L.weierstrassP (α * t)) - W.b₂ / 12)
         - (1 - (((b : ℚ_[2]) : ℂ_[2])) ^ 2) * (W.b₂ / 12)
         - ∑ P ∈ S, ((ι (L.weierstrassP (t + P)) - W.b₂ / 12) -
-            (ι (L.weierstrassP P) - W.b₂ / 12))‖ ≤ 1 := by
+            (ι (L.weierstrassP P) - W.b₂ / 12))‖
+      ≤ 1 := by
     refine nle_sub (nle_sub (nle_mul ?_ hle) hc) hsum
     rw [pow_two]
     exact nle_mul hB hB
   exact absurd ht (not_lt.2 this)
 
 open Classical in
-theorem PointsTwoFinal_of (hK : KernelIntegral) (hS : KernelStableUnderMultiplier) (hU2 : TwoTorsionKernelUnique) :
-    PointsTwoFinal := by
+theorem PointsTwoFinal_of
+    (hK : KernelIntegral) (hS : KernelStableUnderMultiplier) (hU2 : TwoTorsionKernelUnique)
+    : PointsTwoFinal := by
   intro L ι W hU hW ha1 α ω₀ b b' hα hmul hb hb' hnb hnb' hω hc
   have hK' := hK L ι W hU hW ha1 α b hα hmul hb hnb
   have hS' := hS L ι W hU hW ha1 α b hα hmul hb hnb
@@ -202,8 +216,7 @@ theorem PointsTwoFinal_of (hK : KernelIntegral) (hS : KernelStableUnderMultiplie
   obtain ⟨tr, n, htr, hn, -⟩ := Formalism.L2.Th1.F.mulStableIntegral L α hmul
   have hcm : MulStable L (conj α) := by
     intro ω hω'
-    have e : conj α * ω = tr • ω - α * ω := by
-      rw [zsmul_eq_mul, ← htr]; ring
+    have e : conj α * ω = tr • ω - α * ω := by rw [zsmul_eq_mul, ← htr]; ring
     rw [e]
     exact sub_mem (zsmul_mem hω' _) (hmul ω hω')
   have h2n : (2 : ℤ) ∣ n := by
@@ -237,7 +250,8 @@ theorem PointsTwoFinal_of (hK : KernelIntegral) (hS : KernelStableUnderMultiplie
   have ht0 : ω₀ / 2 ∉ L.lattice := fun h => hc (hcm _ h)
   have h2t0 : 2 * (ω₀ / 2) ∈ L.lattice := by
     have : 2 * (ω₀ / 2) = ω₀ := by ring
-    rw [this]; exact hω
+    rw [this]
+    exact hω
   have first : ¬ InFormalGroupPoints (ptW 2 L ι W (ω₀ / 2)) := by
     intro H
     have h1 := hS' _ H
@@ -245,13 +259,17 @@ theorem PointsTwoFinal_of (hK : KernelIntegral) (hS : KernelStableUnderMultiplie
     have d1 : ptW 2 L ι W (α * (ω₀ / 2)) + ptW 2 L ι W (α * (ω₀ / 2)) = 0 := by
       rw [← hadd, hzero]
       have : α * (ω₀ / 2) + α * (ω₀ / 2) = α * ω₀ := by ring
-      rw [this]; exact hmul _ hω
+      rw [this]
+      exact hmul _ hω
     have d2 : ptW 2 L ι W (ω₀ / 2) + ptW 2 L ι W (ω₀ / 2) = 0 := by
       rw [← hadd, hzero]
       have : ω₀ / 2 + ω₀ / 2 = ω₀ := by ring
-      rw [this]; exact hω
-    have heq := (hU2 ℂ_[2] W hW norm_two ha1 (ptW 2 L ι W (α * (ω₀ / 2))) (ptW 2 L ι W (ω₀ / 2))
-      (fun h => h2 ((hzero _).1 h)) d1 h1).2 (fun h => ht0 ((hzero _).1 h)) d2 H
+      rw [this]
+      exact hω
+    have heq :=
+      (hU2 ℂ_[2] W hW norm_two ha1 (ptW 2 L ι W (α * (ω₀ / 2))) (ptW 2 L ι W (ω₀ / 2))
+        (fun h => h2 ((hzero _).1 h))
+        d1 h1).2 (fun h => ht0 ((hzero _).1 h)) d2 H
     have hd : α * (ω₀ / 2) - ω₀ / 2 ∈ L.lattice := by
       rw [← hzero, sub_eq_add_neg, hadd, ptW_neg hU, heq, add_neg_cancel]
     apply hc
@@ -264,7 +282,8 @@ theorem PointsTwoFinal_of (hK : KernelIntegral) (hS : KernelStableUnderMultiplie
     apply first
     have e : ω₀ / 2 = α * Q + -(α * Q - ω₀ / 2) := by ring
     rw [e]
-    exact kernel_subgroup_add_mem hU hW _ _ (hS' _ H) (kernel_subgroup_neg_mem hU hW _ (lattice_point_in_kernel_subgroup hU _ hQ))
+    exact kernel_subgroup_add_mem hU hW _ _ (hS' _ H)
+      (kernel_subgroup_neg_mem hU hW _ (lattice_point_in_kernel_subgroup hU _ hQ))
   · intro z hz h2z
     apply hc
     have e : conj α * (ω₀ / 2) = conj α * (α * z) - conj α * (α * z - ω₀ / 2) := by ring
@@ -277,8 +296,9 @@ theorem Th0TwoFinal_of (hP : PointsTwoFinal) : ThetaZeroAtTwo := by
   have ht0 : ω₀ / 2 ∉ L.lattice := fun h => p1 (lattice_point_in_kernel_subgroup hU _ h)
   have hx : ‖px W (ptW 2 L ι W (ω₀ / 2))‖ ≤ 1 := Half.norm_x_le_one_of_not_in_kernel _ p1
   have hI : Formalism.L2.Th1.A.IntModel W := ⟨hW.1, hW.2.1, hW.2.2.1, hW.2.2.2.1, hW.2.2.2.2.1⟩
-  obtain ⟨q1, q2⟩ := th0TwoAnalytic L ι W hU hI α ω₀ b b' hα hmul hω ht0 hb hb' hnb hnb' p3 hx
-    (fun z hz => Half.norm_x_le_one_of_not_in_kernel _ (p2 z hz))
+  obtain ⟨q1, q2⟩ :=
+    th0TwoAnalytic L ι W hU hI α ω₀ b b' hα hmul hω ht0 hb hb' hnb hnb' p3 hx
+      (fun z hz => Half.norm_x_le_one_of_not_in_kernel _ (p2 z hz))
   exact ⟨q1, q2, Formalism.L2.Th1.E.shiftAnalyticW 2 L ι W hU hW ω₀ hω ht0 hx q2⟩
 
 end Formalism.L2.Th1.B.KFin

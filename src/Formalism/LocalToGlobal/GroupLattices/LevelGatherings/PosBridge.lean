@@ -29,8 +29,8 @@ theorem embLL_mem_alg (D : D7) (z : D.what₂.LL) : D.what₂.embLL z ∈ algebr
   rw [mem_algebraicClosure_iff]
   exact (Algebra.IsAlgebraic.isAlgebraic z).algHom D.what₂.embLL.toRatAlgHom
 
-theorem emb_conj_pow (D : D7) (g : D.R.GG) (s : ℕ) (x : D.host.E) :
-    D.host.emb (g * D.R.cc ^ s) x = D.host.emb g (if s % 2 = 1 then D.host.conj x else x) := by
+theorem emb_conj_pow (D : D7) (g : D.R.GG) (s : ℕ) (x : D.host.E)
+    : D.host.emb (g * D.R.cc ^ s) x = D.host.emb g (if s % 2 = 1 then D.host.conj x else x) := by
   rw [emb_mul, cc_pow]
   split_ifs
   · rfl

@@ -23,9 +23,10 @@ open MeasureTheory Filter Topology Matrix
 open ReciprocityTheory.ChartRestriction.G.Geo (ptsIntegralAt)
 open ComplexSets
 
-theorem PtsIntegralSegreChartProj.proof (hFin : SegreChartProjFinite.Statement)
-    (hZero : SegreChartZeroSet.Statement) (hAbs : SegreChartAbsIntegrable.Statement)
-    (hSum : PtsSegreChartFibreSum.Statement) : PtsIntegralSegreChartProj.Statement := by
+theorem PtsIntegralSegreChartProj.proof
+    (hFin : SegreChartProjFinite.Statement) (hZero : SegreChartZeroSet.Statement)
+    (hAbs : SegreChartAbsIntegrable.Statement) (hSum : PtsSegreChartFibreSum.Statement)
+    : PtsIntegralSegreChartProj.Statement := by
   intro K _ _ ι _ P e m σ i L g Ψ G Φ hP hL hg hΨ hΨ0 hgerm
   set A := chartProjMatrix σ Ψ
   set G' := chartWeight σ i g with hG'
@@ -39,8 +40,9 @@ theorem PtsIntegralSegreChartProj.proof (hFin : SegreChartProjFinite.Statement)
     exact fun q hq => hx q ((mem_segreChartComponents.1 hJ).1.2 hq)
   have hprime : ∀ J ∈ segreChartComponents P σ i, J.IsPrime := fun J hJ =>
     (mem_segreChartComponents.1 hJ).1.1
-  have hdim : ∀ J ∈ segreChartComponents P σ i,
-      ringKrullDim (MvPolynomial (Fin m) ℂ ⧸ J) = ((e + 1 : ℕ) : WithBot ℕ∞) := fun J hJ =>
+  have hdim
+      : ∀ J ∈ segreChartComponents P σ i,
+        ringKrullDim (MvPolynomial (Fin m) ℂ ⧸ J) = ((e + 1 : ℕ) : WithBot ℕ∞) := fun J hJ =>
     SegreChartDim.proof K ι P (e + 1) m σ i hP J hJ
   have hfin : ∀ J ∈ segreChartComponents P σ i, IsFiniteProjection J A :=
     hFin K ι P (e + 1) m σ i Ψ hP hΨ hΨ0
@@ -51,15 +53,19 @@ theorem PtsIntegralSegreChartProj.proof (hFin : SegreChartProjFinite.Statement)
     hAbs K ι P (e + 1) m σ i L g hP hL hg J hJ A (hfin J hJ)
   have hint : ∀ J ∈ segreChartComponents P σ i, Integrable (chartDens J A G' Φ') := by
     intro J hJ
-    refine (habs J hJ).mono' (SheetSumMeasurable.full m (e + 1) J A G' Φ' (hprime J hJ) (hdim J hJ)
-      (hfin J hJ) hmeas (hsm J hJ)).1.aestronglyMeasurable (Eventually.of_forall fun y => ?_)
+    refine (habs J hJ).mono'
+      (SheetSumMeasurable.full m (e + 1) J A G' Φ' (hprime J hJ) (hdim J hJ) (hfin J hJ) hmeas
+        (hsm J hJ)).1.aestronglyMeasurable
+      (Eventually.of_forall fun y => ?_)
     rw [Real.norm_eq_abs]
     unfold chartDens chartAbsDens sheetSum
-    refine (abs_finsum_mem_le_finsum_mem_abs _ _).trans (le_of_eq (finsum_mem_congr rfl fun x _ => ?_))
+    refine (abs_finsum_mem_le_finsum_mem_abs _ _).trans
+      (le_of_eq (finsum_mem_congr rfl fun x _ => ?_))
     split_ifs <;> simp
 
-  have hcong : ∀ J ∈ segreChartComponents P σ i, ∀ A₁ : Matrix (Fin (e + 1)) (Fin m) ℂ,
-      chartDens J A₁ G Φ = chartDens J A₁ G' Φ' := by
+  have hcong
+      : ∀ J ∈ segreChartComponents P σ i, ∀ A₁ : Matrix (Fin (e + 1)) (Fin m) ℂ,
+        chartDens J A₁ G Φ = chartDens J A₁ G' Φ' := by
     intro J hJ A₁
     funext y
     unfold chartDens sheetSum
@@ -77,10 +83,12 @@ theorem PtsIntegralSegreChartProj.proof (hFin : SegreChartProjFinite.Statement)
       beta_reduce
       rw [hG]
       congr 1
-      exact ReciprocityTheory.AnForm.M.maDens_congr_eventuallyEq fun k => ((hgerm x hxS).2 k).comp_tendsto hcont
+      exact ReciprocityTheory.AnForm.M.maDens_congr_eventuallyEq fun k =>
+        ((hgerm x hxS).2 k).comp_tendsto hcont
     · rfl
 
-  have hvar : ∀ J ∈ segreChartComponents P σ i, varInt J (e + 1) G Φ = ∫ y, chartDens J A G' Φ' y := by
+  have hvar
+      : ∀ J ∈ segreChartComponents P σ i, varInt J (e + 1) G Φ = ∫ y, chartDens J A G' Φ' y := by
     intro J hJ
     have hex : ∃ A₁ : Matrix (Fin (e + 1)) (Fin m) ℂ, IsFiniteProjection J A₁ := ⟨A, hfin J hJ⟩
     rw [varInt, dite_eq_left hex, chartInt, hcong J hJ]

@@ -13,15 +13,17 @@ set_option autoImplicit false
 
 namespace GlobalTheory.PDivGroup
 
-theorem mulP_flat : ∀ (p : ℕ) (R : Type) [CommRing R] (G : _root_.GlobalTheory.PDivGroup p R) (n : ℕ),
-    RingHom.Flat ((G.mulP n : G.A n →ₐ[R] G.A (n + 1)) : G.A n →+* G.A (n + 1)) := by
+theorem mulP_flat
+    : ∀ (p : ℕ) (R : Type) [CommRing R] (G : _root_.GlobalTheory.PDivGroup p R) (n : ℕ),
+      RingHom.Flat ((G.mulP n : G.A n →ₐ[R] G.A (n + 1)) : G.A n →+* G.A (n + 1)) := by
   intro p R _ G n
   obtain ⟨hassoc, hcounit, hsurj⟩ := G.transl_free n
-  obtain ⟨-, -, hff, -⟩ := GlobalTheory.HopfQuot.finite_faithfullyFlat_ker (G.transl n) hassoc hcounit hsurj
+  obtain ⟨-, -, hff, -⟩ :=
+    GlobalTheory.HopfQuot.finite_faithfullyFlat_ker (G.transl n) hassoc hcounit hsurj
   set B₀ := AlgHom.equalizer (G.transl n)
     (Algebra.TensorProduct.includeLeft : G.A (n + 1) →ₐ[R] G.A (n + 1) ⊗[R] G.A 1) with hB₀
-  let f : G.A n →ₐ[R] B₀ := AlgHom.codRestrict (G.mulP n : G.A n →ₐ[R] G.A (n + 1)) B₀
-    (fun a => by
+  let f : G.A n →ₐ[R] B₀ :=
+    AlgHom.codRestrict (G.mulP n : G.A n →ₐ[R] G.A (n + 1)) B₀ (fun a => by
       show G.transl n (G.mulP n a) = G.mulP n a ⊗ₜ[R] 1
       exact G.transl_mulP n a)
   have hf : Function.Bijective f := by

@@ -6,13 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N UpperTheory.V UpperTheory.V.Sd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N UpperTheory.V UpperTheory.V.Sd
 
-theorem UpperTheory.V.Z.Win.Birth.potOrd :
-    UpperTheory.V.Z.Win.Birth.PotOrd := by
+theorem UpperTheory.V.Z.Win.Birth.potOrd : UpperTheory.V.Z.Win.Birth.PotOrd := by
   intro F Ω _ _ _ _ _ l _ n r m ψ κ hm H v hv
   have hp : UpperTheory.V.Z.Win.PotUnl r v := by
-    refine UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.potOfFlag F Ω l n r m hm v hv fun A hA => ?_
+    refine UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.potOfFlag F Ω l n r m hm v hv fun A hA =>
+      ?_
     have hAl : A.valuation (l : Ω) < 1 := by
       have h1 := (hA ((l : ℕ) : 𝓞 F)).2 hv
       simpa only [map_natCast] using h1

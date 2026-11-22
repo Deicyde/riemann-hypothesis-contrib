@@ -25,7 +25,8 @@ theorem invEndInt : InvEndInt := inverse_endo_integral_holds
 theorem adjUnitNorm : AdjUnitNorm := adjoint_unit_norm_holds
 theorem ramifiedShape : RamifiedShape := ramified_shape_holds
 theorem curveNegNorm : CurveNegNorm := curve_neg_norm_holds
-theorem weierstrass_biadditive_mod_equiv : WeierstrassBiadditiveModEquiv := curve_formal_first_level_holds
+theorem weierstrass_biadditive_mod_equiv : WeierstrassBiadditiveModEquiv :=
+  curve_formal_first_level_holds
 theorem curveRamified : CurveRamified := CurveRamified_of_shape ramifiedShape adjUnitNorm invEndInt
 
 theorem eigenSplit : EigenSplit := eigen_split_holds

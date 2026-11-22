@@ -15,15 +15,19 @@ open NumberField MeasureTheory GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 namespace RD
 
 variable {d : SD σ} (R : RD d) (w : InfinitePlace F)
 
-theorem ok_of_conj (hT : TAll) {y y' : GR d.n} {x₁ x₂ : d.G} {A₁ A₂ A' : d.LF → d.LF} {B₁ B₂ : d.MF → d.MF}
+theorem ok_of_conj
+    (hT : TAll)
+    {y y' : GR d.n} {x₁ x₂ : d.G} {A₁ A₂ A' : d.LF → d.LF} {B₁ B₂ : d.MF → d.MF}
     (h₁ : R.StepOK w x₁ A₁ B₁) (h₂ : R.StepOK w x₂ A₂ B₂) (h' : R.StepOK w (R.ι w y') A' id)
-    (hy : R.ι w y = x₁ * R.ι w y' * x₂) (h1 : x₁ * x₂ = 1) : R.OkY w y := by
+    (hy : R.ι w y = x₁ * R.ι w y' * x₂) (h1 : x₁ * x₂ = 1)
+    : R.OkY w y := by
   have hsch := d.om_sch
   have hc := R.step_comp w hsch (R.step_comp w hsch h₁ h') h₂
   have h0 := R.step_comp w hsch h₁ h₂
@@ -102,8 +106,8 @@ theorem ok_of_conj (hT : TAll) {y y' : GR d.n} {x₁ x₂ : d.G} {A₁ A₂ A' :
 
 end RD
 
-theorem herm_smul_one' {n : ℕ} (t : ℝ) :
-    ((t : ℂ) • (1 : Matrix (Fin n) (Fin n) ℂ))ᴴ = (t : ℂ) • (1 : Matrix (Fin n) (Fin n) ℂ) := by
+theorem herm_smul_one' {n : ℕ} (t : ℝ)
+    : ((t : ℂ) • (1 : Matrix (Fin n) (Fin n) ℂ))ᴴ = (t : ℂ) • (1 : Matrix (Fin n) (Fin n) ℂ) := by
   rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_one, Complex.star_def, Complex.conj_ofReal]
 
 theorem locOpEx_of (hT : TAll) (hA : AuxiliaryPrimeFunction) : LocOpEx := by
@@ -114,19 +118,26 @@ theorem locOpEx_of (hT : TAll) (hA : AuxiliaryPrimeFunction) : LocOpEx := by
   obtain ⟨C, s, B, -, hW⟩ := R.stepW w hT hA ε w₀ hw₀
   have okN : ∀ (y : GR d.n) (b : Matrix (Fin d.n) (Fin d.n) ℂ), bᴴ = b → mR y = nU b → R.OkY w y :=
     fun y b hb hy => R.ok_of_step w (R.stepN w hT y b hb hy)
-  have okM : ∀ (y : GR d.n) (a : Matrix (Fin d.n) (Fin d.n) ℂ), IsUnit a.det → mR y = Glob.mM a → R.OkY w y := by
+  have okM
+      : ∀ (y : GR d.n) (a : Matrix (Fin d.n) (Fin d.n) ℂ),
+        IsUnit a.det → mR y = Glob.mM a → R.OkY w y := by
     intro y a ha hy
     obtain ⟨c, -, hc⟩ := R.stepM w hT y a ha hy
     exact R.ok_of_step w hc
-  have okB : ∀ (y : GR d.n) (c : Matrix (Fin d.n) (Fin d.n) ℂ), cᴴ = c → mR y = Glob.nbar c → R.OkY w y := by
+  have okB
+      : ∀ (y : GR d.n) (c : Matrix (Fin d.n) (Fin d.n) ℂ),
+        cᴴ = c → mR y = Glob.nbar c → R.OkY w y := by
     intro y c hc hy
     obtain ⟨y', x, hx, hy', hrel⟩ := R.nbar_conj' w hw₀ y c hc hy
     have hW3 := R.step_comp w hsch (R.step_comp w hsch hW hW) hW
     exact R.ok_of_conj w hT hW3 hW (R.stepN w hT y' x hx hy') hrel (RD.w_four hw₀)
-  obtain ⟨y1, y2, y3, y4, hy, ⟨t, ht⟩, ⟨c, hc, hc2⟩, ⟨a, ha, ha2⟩, ⟨b, hb, hb2⟩⟩ := PositivityTheory.Rg.Sw.Glob.decomp d.n y
+  obtain ⟨y1, y2, y3, y4, hy, ⟨t, ht⟩, ⟨c, hc, hc2⟩, ⟨a, ha, ha2⟩, ⟨b, hb, hb2⟩⟩ :=
+    PositivityTheory.Rg.Sw.Glob.decomp d.n y
   rw [hy]
-  exact R.ok_mul w hsch (R.ok_mul w hsch (R.ok_mul w hsch (okN y1 _ (herm_smul_one' t) ht) (okB y2 c hc hc2))
-    (okM y3 a ha ha2)) (okN y4 b hb hb2)
+  exact R.ok_mul w hsch
+    (R.ok_mul w hsch (R.ok_mul w hsch (okN y1 _ (herm_smul_one' t) ht) (okB y2 c hc hc2))
+      (okM y3 a ha ha2))
+    (okN y4 b hb hb2)
 
 end PositivityTheory.SiegelWeilFormula
 

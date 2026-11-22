@@ -4,12 +4,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-private theorem fEt_comp_iso {Y X X' : Scheme.{0}} (f : Y ⟶ X) (i : X ⟶ X') [IsIso i] (d : ℕ) (hf : FEt f d) :
-    FEt (f ≫ i) d := by
+private theorem fEt_comp_iso
+    {Y X X' : Scheme.{0}} (f : Y ⟶ X) (i : X ⟶ X') [IsIso i] (d : ℕ) (hf : FEt f d)
+    : FEt (f ≫ i) d := by
   obtain ⟨h1, h2, h3⟩ := hf
   haveI := h1
   haveI := h2
@@ -25,8 +27,7 @@ private theorem fEt_comp_iso {Y X X' : Scheme.{0}} (f : Y ⟶ X) (i : X ⟶ X') 
     rw [← Category.assoc, h]
     simp
 
-theorem UpperTheory.Gal.G3.pLiesGen :
-    LiesGen := by
+theorem UpperTheory.Gal.G3.pLiesGen : LiesGen := by
   intro k L O _ _ _ _ H θ C g D s t hst m hL
   obtain ⟨-, κ0, h0, h1, hF⟩ := hL
   have hq : κ0 ≫ s ≫ C.p = (H.s g ≫ H.q) ≫ gen O k := by
@@ -58,13 +59,15 @@ theorem UpperTheory.Gal.G3.pLiesGen :
     have c1 := congrArg (· ≫ pullback.fst C.p (gen O k)) c0
     have c2 := congrArg (· ≫ pullback.snd C.p (gen O k)) c0
     simp only [piK, bcMap, Category.assoc, pullback.lift_fst, pullback.lift_snd,
-      pullback.lift_fst_assoc, pullback.lift_snd_assoc] at c1 c2
-    have w3 : pullback.fst (piK C) (bcMap (gen O k) s rfl) ≫ C.π
-        = (pullback.snd (piK C) (bcMap (gen O k) s rfl) ≫ pullback.fst (s ≫ C.p) (gen O k)) ≫ s := by
+        pullback.lift_fst_assoc, pullback.lift_snd_assoc]
+      at c1 c2
+    have w3
+        : pullback.fst (piK C) (bcMap (gen O k) s rfl) ≫ C.π
+          = (pullback.snd (piK C) (bcMap (gen O k) s rfl) ≫ pullback.fst (s ≫ C.p) (gen O k))
+            ≫ s := by
       rw [Category.assoc]
       exact c1
-    let j : pullback (piK C) (bcMap (gen O k) s rfl) ⟶ pullback C.π s :=
-      pullback.lift _ _ w3
+    let j : pullback (piK C) (bcMap (gen O k) s rfl) ⟶ pullback C.π s := pullback.lift _ _ w3
     haveI : IsIso i := by
       refine ⟨⟨j, ?_, ?_⟩⟩
       · apply pullback.hom_ext

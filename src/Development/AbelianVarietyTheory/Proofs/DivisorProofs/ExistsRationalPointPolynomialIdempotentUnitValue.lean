@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsCoo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct
 open Filter Topology
 
@@ -15,11 +17,12 @@ noncomputable section
 
 namespace GlobalTheory.DenseAvoid
 
-theorem finite_maximal_not_mem {F B E K : Type} [Field F] [CommRing B] [Algebra F B] [Field E] [Algebra F E]
+theorem finite_maximal_not_mem
+    {F B E K : Type} [Field F] [CommRing B] [Algebra F B] [Field E] [Algebra F E]
     [FiniteDimensional F E] [CommRing K] [Algebra F K] [IsArtinianRing K]
-    (ρ : B →ₐ[F] K) (hρ : Function.Surjective ρ) (f : B) (hf : f * f = f)
-    (hk : ∀ x, ρ x = 0 → f * x = 0) :
-    {m : Ideal (B ⊗[F] E) | m.IsMaximal ∧ algebraMap B (B ⊗[F] E) f ∉ m}.Finite := by
+    (ρ : B →ₐ[F] K) (hρ : Function.Surjective ρ)
+    (f : B) (hf : f * f = f) (hk : ∀ x, ρ x = 0 → f * x = 0)
+    : {m : Ideal (B ⊗[F] E) | m.IsMaximal ∧ algebraMap B (B ⊗[F] E) f ∉ m}.Finite := by
   classical
   let Φ : B ⊗[F] E →+* K ⊗[F] E := (Algebra.TensorProduct.map ρ (AlgHom.id F E)).toRingHom
   have hΦ : Function.Surjective Φ :=
@@ -43,7 +46,8 @@ theorem finite_maximal_not_mem {F B E K : Type} [Field F] [CommRing B] [Algebra 
         Algebra.TensorProduct.tmul_mul_tmul, hx', TensorProduct.zero_tmul]
     have e2 : x ⊗ₜ[F] (1 : E) = (1 - algebraMap B (B ⊗[F] E) f) * (x ⊗ₜ[F] (1 : E)) := by
       rw [sub_mul, one_mul, e1, sub_zero]
-    rw [e2]; exact m.mul_mem_right _ h1
+    rw [e2]
+    exact m.mul_mem_right _ h1
   have hc : Ideal.comap Φ (m.map Φ) = m := by
     rw [Ideal.comap_map_of_surjective' Φ hΦ, sup_eq_left.2 hker]
   refine ⟨m.map Φ, ?_, hc⟩
@@ -59,48 +63,62 @@ open GlobalTheory.LocalGlobalChar
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem eps_eq_sum (S : Finset (HeightOneSpectrum (𝓞 F))) :
-    eps S = pairA F 1 0 + ∑ v ∈ S, pairA F 0 (ind {v}) := by
+theorem eps_eq_sum (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : eps S = pairA F 1 0 + ∑ v ∈ S, pairA F 0 (ind {v}) := by
   classical
-  have hext : ∀ a b : AF F, fstA F a = fstA F b → sndA F a = sndA F b → a = b := fun a b h1 h2 => Prod.ext h1 h2
+  have hext : ∀ a b : AF F, fstA F a = fstA F b → sndA F a = sndA F b → a = b := fun a b h1 h2 =>
+    Prod.ext h1 h2
   refine hext _ _ ?_ (fin_ext fun u => ?_)
   set_option synthInstance.maxHeartbeats 100000 in
     · rw [map_add (f := _), map_sum]
       change (1 : Ainf F) = 1 + ∑ v ∈ S, (0 : Ainf F)
       rw [Finset.sum_const_zero, add_zero]
   set_option synthInstance.maxHeartbeats 100000 in
-    · rw [map_add (f := _), map_sum, map_add (f := _), map_sum]
-      change evalV F u (ind S) = evalV F u 0 + ∑ v ∈ S, evalV F u (ind {v})
-      simp_rw [ev_ind, Finset.mem_singleton, map_zero, zero_add]
-      rw [Finset.sum_ite_eq]
+  · rw [map_add (f := _), map_sum, map_add (f := _), map_sum]
+    change evalV F u (ind S) = evalV F u 0 + ∑ v ∈ S, evalV F u (ind {v})
+    simp_rw [ev_ind, Finset.mem_singleton, map_zero, zero_add]
+    rw [Finset.sum_ite_eq]
 
 variable {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E]
 
-theorem finite_maximal_not_mem_eps (S : Finset (HeightOneSpectrum (𝓞 F))) :
-    {m : Ideal (AF F ⊗[F] E) | m.IsMaximal ∧ algebraMap (AF F) (AF F ⊗[F] E) (eps S) ∉ m}.Finite := by
+theorem finite_maximal_not_mem_eps (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : {m : Ideal (AF F ⊗[F] E) | m.IsMaximal ∧ algebraMap (AF F) (AF F ⊗[F] E) (eps S) ∉ m}.Finite := by
   classical
   haveI : IsArtinianRing (Ainf F) := inferInstanceAs (IsArtinianRing ((w : InfinitePlace F) → w.Completion))
-  have hinf := finite_maximal_not_mem (E := E) (fstA F) (fun y => ⟨pairA F y 0, rfl⟩) (pairA F 1 0)
-    (Prod.ext (mul_one _) (mul_zero _)) (fun x hx => Prod.ext (by
-      change (1 : Ainf F) * x.1 = 0
-      rw [one_mul]; exact hx) (zero_mul _))
-  have hfin : ∀ v : HeightOneSpectrum (𝓞 F),
-      {m : Ideal (AF F ⊗[F] E) | m.IsMaximal ∧ algebraMap (AF F) (AF F ⊗[F] E) (pairA F 0 (ind {v})) ∉ m}.Finite :=
-    fun v => finite_maximal_not_mem (E := E) ((evalV F v).comp (sndA F))
-      (fun y => ⟨pairA F 0 (singleV F v y), GlobalTheory.SplitCoord.evalV_single v y⟩) (pairA F 0 (ind {v}))
-      (pl_mul_self v) (fun x hx => Prod.ext (zero_mul _) (fin_ext fun u => by
-        change evalV F u (ind {v} * x.2) = evalV F u 0
-        rw [map_mul, ev_ind, map_zero]
-        split_ifs with h
-        · rw [Finset.mem_singleton] at h
-          subst h
-          change evalV F u x.2 = 0 at hx
-          rw [hx, mul_zero]
-        · exact zero_mul _))
+  have hinf :=
+    finite_maximal_not_mem (E := E) (fstA F)
+      (fun y => ⟨pairA F y 0, rfl⟩)
+      (pairA F 1 0) (Prod.ext (mul_one _) (mul_zero _))
+      (fun x hx =>
+        Prod.ext
+          (by
+            change (1 : Ainf F) * x.1 = 0
+            rw [one_mul]
+            exact hx)
+          (zero_mul _))
+  have hfin
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        {m : Ideal (AF F ⊗[F] E) | m.IsMaximal ∧ algebraMap (AF F) (AF F ⊗[F] E) (pairA F 0 (ind {v})) ∉ m}.Finite :=
+    fun v =>
+      finite_maximal_not_mem (E := E) ((evalV F v).comp (sndA F))
+        (fun y => ⟨pairA F 0 (singleV F v y), GlobalTheory.SplitCoord.evalV_single v y⟩)
+        (pairA F 0 (ind {v})) (pl_mul_self v)
+        (fun x hx =>
+          Prod.ext (zero_mul _)
+            (fin_ext fun u => by
+              change evalV F u (ind {v} * x.2) = evalV F u 0
+              rw [map_mul, ev_ind, map_zero]
+              split_ifs with h
+              · rw [Finset.mem_singleton] at h
+                subst h
+                change evalV F u x.2 = 0 at hx
+                rw [hx, mul_zero]
+              · exact zero_mul _))
   refine (hinf.union (S.finite_toSet.biUnion fun v _ => hfin v)).subset ?_
   rintro m ⟨hm, hem⟩
   by_contra hn
-  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_iUnion, not_or, not_and, not_not, not_exists] at hn
+  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_iUnion, not_or, not_and, not_not, not_exists]
+    at hn
   apply hem
   set_option synthInstance.maxHeartbeats 100000 in
     rw [eps_eq_sum, map_add (f := _), map_sum]
@@ -108,9 +126,17 @@ theorem finite_maximal_not_mem_eps (S : Finset (HeightOneSpectrum (𝓞 F))) :
 
 end GlobalTheory.DenseAvoid
 
-
 open GlobalTheory.DenseAvoid in
-theorem GlobalTheory.DenseAvoid.exists_unit_eval : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (S : Finset (HeightOneSpectrum (𝓞 F))) (ψ : Polynomial (AE F E)), (∀ (Ω : Type) [Field Ω] (φ : AE F E →+* Ω), φ (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)) = 1 → ψ.map φ ≠ 0) → ∃ t : F, IsUnit (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S) * ψ.eval (algebraMap F (AE F E) t) + (1 - algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S))) := by
+theorem GlobalTheory.DenseAvoid.exists_unit_eval
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (S : Finset (HeightOneSpectrum (𝓞 F))) (ψ : Polynomial (AE F E)),
+      (∀ (Ω : Type) [Field Ω] (φ : AE F E →+* Ω),
+          φ (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)) = 1 → ψ.map φ ≠ 0)
+        → ∃ t : F,
+          IsUnit
+            (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)
+                * ψ.eval (algebraMap F (AE F E) t)
+              + (1 - algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S))) := by
   intro F E _ _ _ _ _ S ψ hψ
   classical
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
@@ -121,8 +147,9 @@ theorem GlobalTheory.DenseAvoid.exists_unit_eval : ∀ (F E : Type) [Field F] [N
     have h0 : e * (1 - e) ∈ m := by rw [mul_sub, mul_one, he, sub_self]; exact m.zero_mem
     exact (hm.mem_or_mem h0).resolve_left hem
   have hM := finite_maximal_not_mem_eps (E := E) S
-  let bad : Set F := ⋃ m ∈ {m : Ideal (AE F E) | m.IsMaximal ∧ e ∉ m},
-    {t : F | Ideal.Quotient.mk m (ψ.eval (algebraMap F (AE F E) t)) = 0}
+  let bad : Set F :=
+    ⋃ m ∈ {m : Ideal (AE F E) | m.IsMaximal ∧ e ∉ m},
+      {t : F | Ideal.Quotient.mk m (ψ.eval (algebraMap F (AE F E) t)) = 0}
   have hbad : bad.Finite := by
     refine hM.biUnion fun m hm => ?_
     haveI := hm.1

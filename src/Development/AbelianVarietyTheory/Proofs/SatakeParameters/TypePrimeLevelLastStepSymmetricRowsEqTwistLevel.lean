@@ -6,12 +6,14 @@ public import Formalism.LocalToGlobal.KernelLattices.TopPin
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem.Col2
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem.Col2
 
 namespace GlobalTheory
 
-theorem levGTop_rPsymF_eq_twLt : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m), X.Ok → Pr.Ok → Ch.Ok →
-    levGTop Ch (rPsymF Ch) = twLt Ch R.m := by
+theorem levGTop_rPsymF_eq_twLt
+    : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m),
+      X.Ok → Pr.Ok → Ch.Ok → levGTop Ch (rPsymF Ch) = twLt Ch R.m := by
   intro X Pr R Ch _ _ _
   funext w
   rw [levGTop_PsymF]

@@ -128,12 +128,11 @@ private lemma opF_comp (s₁ s₂ : B.Tw) {f₁ f₂ : G → ℂ} (h₁ : s₁.I
 
 end UpperTheory.V.Z.Sym.Tf
 
-theorem UpperTheory.V.Z.Sym.Tf.rMul :
-    UpperTheory.V.Z.Sym.Tf.RMul := by
+theorem UpperTheory.V.Z.Sym.Tf.rMul : UpperTheory.V.Z.Sym.Tf.RMul := by
   intro Γ G V _ _ _ _ B s₁ s₂ f₁ f₂ h₁ h₂
   have ht := UpperTheory.V.Z.Sym.Tf.conv_test s₁ s₂ h₁ h₂
   refine ⟨ht, LinearMap.ext fun φ => Subtype.ext ?_⟩
-  rw [Module.End.mul_apply, UpperTheory.V.Z.Sym.Tf.rSpec _ _ _ B s₁ f₁ h₁, UpperTheory.V.Z.Sym.Tf.rSpec _ _ _ B s₂ f₂ h₂,
-    UpperTheory.V.Z.Sym.Tf.rSpec _ _ _ B _ _ ht]
+  rw [Module.End.mul_apply, UpperTheory.V.Z.Sym.Tf.rSpec _ _ _ B s₁ f₁ h₁,
+    UpperTheory.V.Z.Sym.Tf.rSpec _ _ _ B s₂ f₂ h₂, UpperTheory.V.Z.Sym.Tf.rSpec _ _ _ B _ _ ht]
   funext g
   exact UpperTheory.V.Z.Sym.Tf.opF_comp s₁ s₂ h₁ h₂ φ g

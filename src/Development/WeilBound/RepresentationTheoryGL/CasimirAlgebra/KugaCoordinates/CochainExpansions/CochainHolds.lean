@@ -17,13 +17,17 @@ open PositivityTheory.Rg.Cz
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 variable {M : Type} [AddCommGroup M] [Module ℂ M] [Module ℝ M] [IsScalarTower ℝ ℂ M] {q N : ℕ}
 
-def hY (τ : E →+* ℂ) (j i : Fin a) (z : ℂ) : Herm E a :=
-  ⟨Matrix.single j i (atEmb τ z) + star (Matrix.single j i (atEmb τ z)), IsSelfAdjoint.add_star_self _⟩
+def hY (τ : E →+* ℂ) (j i : Fin a) (z : ℂ) : Herm E a := ⟨
+  Matrix.single j i (atEmb τ z) + star (Matrix.single j i (atEmb τ z)),
+  IsSelfAdjoint.add_star_self _
+⟩
 
 omit [NumberField E] in
-theorem hY_ent [_root_.NumberField.IsTotallyComplex E] (τ τ' : E →+* ℂ) (h : τ' ≠ barE E τ) (j i j' i' : Fin a) :
-    coord τ' ((hY τ j i (1 / 2)).1 j' i') - Complex.I * coord τ' ((hY τ j i (Complex.I / 2)).1 j' i') =
-      if τ' = τ ∧ j' = j ∧ i' = i then 1 else 0 := by
+theorem hY_ent
+    [_root_.NumberField.IsTotallyComplex E] (τ τ' : E →+* ℂ) (h : τ' ≠ barE E τ) (j i j' i' : Fin a)
+    : coord τ' ((hY τ j i (1 / 2)).1 j' i')
+        - Complex.I * coord τ' ((hY τ j i (Complex.I / 2)).1 j' i')
+      = if τ' = τ ∧ j' = j ∧ i' = i then 1 else 0 := by
   have hc : ∀ z, coord τ' (atEmb τ z) = if τ' = τ then z else 0 := fun z => by
     by_cases h1 : τ' = τ
     · subst τ'
@@ -38,9 +42,11 @@ theorem hY_ent [_root_.NumberField.IsTotallyComplex E] (τ τ' : E →+* ℂ) (h
       by_cases h3 : (InfinitePlace.mk τ').embedding = τ'
       · rw [if_pos h3]; simp [hp]
       · rw [if_neg h3]; simp [hp]
-  have he : ∀ z, coord τ' ((hY τ j i z).1 j' i') =
-      (if j = j' ∧ i = i' then coord τ' (atEmb τ z) else 0) +
-        (if j = i' ∧ i = j' then star (coord τ' (atEmb τ z)) else 0) := by
+  have he
+      : ∀ z,
+        coord τ' ((hY τ j i z).1 j' i')
+          = (if j = j' ∧ i = i' then coord τ' (atEmb τ z) else 0)
+            + (if j = i' ∧ i = j' then star (coord τ' (atEmb τ z)) else 0) := by
     intro z
     simp only [hY, Matrix.add_apply, Matrix.star_apply, Matrix.single_apply]
     rw [map_add (f := _)]
@@ -62,8 +68,11 @@ theorem hY_ent [_root_.NumberField.IsTotallyComplex E] (τ τ' : E →+* ℂ) (h
     · simp only [if_neg hp, if_neg hq]; simp
   · simp [h1]
 
-theorem om_ne [_root_.NumberField.IsTotallyComplex E] (tl : Fin N → (E →+* ℂ)) (η : TV a M (Fin q ⊕ (Fin N ⊕ Fin N)))
-    (h1 : ∀ k k', tl k ≠ barE E (tl k')) (h3 : altPair tl η ≠ 0) : om tl η ≠ 0 := by
+theorem om_ne
+    [_root_.NumberField.IsTotallyComplex E]
+    (tl : Fin N → (E →+* ℂ)) (η : TV a M (Fin q ⊕ (Fin N ⊕ Fin N)))
+    (h1 : ∀ k k', tl k ≠ barE E (tl k')) (h3 : altPair tl η ≠ 0)
+    : om tl η ≠ 0 := by
   intro h0
   apply h3
   funext J
@@ -75,43 +84,74 @@ theorem om_ne [_root_.NumberField.IsTotallyComplex E] (tl : Fin N → (E →+* �
   have hz : cEv (fun v => om tl η v I) A B = 0 := by
     simp only [h0, AlternatingMap.zero_apply, Pi.zero_apply]
     exact cEv_zero (V := M) A B
-  have e2 : ∀ A B : Fin N → Herm E a, cEv (fun v => mm tl η v I) A B = ∑ x : Fin N → Fin a, ∑ y : Fin N → Fin a,
-      (∏ k, (coord (tl k) ((A k).1 (y k) (x k)) - Complex.I * coord (tl k) ((B k).1 (y k) (x k)))) •
-        η (Sum.elim I (Sum.elim x y)) := fun A B => by
-    have := cEv_prod2 (V := M) (fun x y k (h : Herm E a) => coord (tl k) (h.1 (y k) (x k)))
-      (fun x y => η (Sum.elim I (Sum.elim x y))) A B
-    rw [show (fun v => mm tl η v I) = fun v => ∑ x : Fin N → Fin a, ∑ y : Fin N → Fin a,
-      (∏ k, (fun x y k (h : Herm E a) => coord (tl k) (h.1 (y k) (x k))) x y k (v k)) •
-        (fun x y => η (Sum.elim I (Sum.elim x y))) x y from funext fun v => mm_apply tl η v I]
+  have e2
+      : ∀ A B : Fin N → Herm E a,
+        cEv (fun v => mm tl η v I) A B
+          = ∑ x : Fin N → Fin a, ∑ y : Fin N → Fin a,
+            (∏ k, (coord (tl k) ((A k).1 (y k) (x k)) - Complex.I * coord (tl k) ((B k).1 (y k) (x k)))) •
+              η (Sum.elim I (Sum.elim x y)) := fun A B => by
+    have :=
+      cEv_prod2 (V := M)
+        (fun x y k (h : Herm E a) => coord (tl k) (h.1 (y k) (x k)))
+        (fun x y => η (Sum.elim I (Sum.elim x y)))
+        A B
+    rw [show (fun v => mm tl η v I)
+        = fun v =>
+          ∑ x : Fin N → Fin a, ∑ y : Fin N → Fin a,
+            (∏ k, (fun x y k (h : Herm E a) => coord (tl k) (h.1 (y k) (x k))) x y k (v k)) •
+              (fun x y => η (Sum.elim I (Sum.elim x y))) x y from
+      funext fun v => mm_apply tl η v I]
     exact this
-  have e3 : ∀ σ : Equiv.Perm (Fin N), cEv (fun v => mm tl η (fun i => v (σ i)) I) A B =
-      if ∀ k, tl k = tl (σ k) then η (Sum.elim I (Sum.elim (fun k => P (σ k)) (fun k => Q (σ k)))) else 0 := by
+  have e3
+      : ∀ σ : Equiv.Perm (Fin N),
+        cEv (fun v => mm tl η (fun i => v (σ i)) I) A B
+          = if ∀ k, tl k = tl (σ k) then
+              η (Sum.elim I (Sum.elim (fun k => P (σ k)) (fun k => Q (σ k))))
+            else
+              0 := by
     intro σ
     rw [cEv_perm (V := M) (fun v => mm tl η v I), e2]
-    have hp : ∀ x y : Fin N → Fin a, (∏ k, (coord (tl k) ((A (σ k)).1 (y k) (x k)) -
-        Complex.I * coord (tl k) ((B (σ k)).1 (y k) (x k)))) =
-        if (∀ k, tl k = tl (σ k)) ∧ x = (fun k => P (σ k)) ∧ y = (fun k => Q (σ k)) then 1 else 0 := by
+    have hp
+        : ∀ x y : Fin N → Fin a,
+          (∏ k, (coord (tl k) ((A (σ k)).1 (y k) (x k)) -
+            Complex.I * coord (tl k) ((B (σ k)).1 (y k) (x k))))
+            = if (∀ k, tl k = tl (σ k)) ∧ x = (fun k => P (σ k)) ∧ y = (fun k => Q (σ k)) then
+                1
+              else
+                0 := by
       intro x y
-      rw [Finset.prod_congr rfl fun k _ => hY_ent (tl (σ k)) (tl k) (h1 k (σ k)) (Q (σ k)) (P (σ k)) (y k) (x k),
+      rw [Finset.prod_congr rfl fun k _ =>
+          hY_ent (tl (σ k)) (tl k) (h1 k (σ k)) (Q (σ k)) (P (σ k)) (y k) (x k),
         Finset.prod_boole]
       congr 1
       simp only [Finset.mem_univ, true_implies, funext_iff]
-      exact propext ⟨fun h => ⟨fun k => (h k).1, fun k => (h k).2.2, fun k => (h k).2.1⟩,
-        fun ⟨h1, h2, h3⟩ k => ⟨h1 k, h3 k, h2 k⟩⟩
+      exact propext ⟨
+        fun h => ⟨fun k => (h k).1, fun k => (h k).2.2, fun k => (h k).2.1⟩,
+        fun ⟨h1, h2, h3⟩ k => ⟨h1 k, h3 k, h2 k⟩
+      ⟩
     simp only [hp, ite_and, ite_smul, one_smul, zero_smul]
     by_cases hσ : ∀ k, tl k = tl (σ k)
     · simp only [eq_true hσ, if_true]
-      rw [Fintype.sum_eq_single (fun k => P (σ k)) (fun x hx => by simp only [if_neg hx, Finset.sum_const_zero])]
+      rw [Fintype.sum_eq_single
+        (fun k => P (σ k))
+        (fun x hx => by simp only [if_neg hx, Finset.sum_const_zero])]
       rw [Fintype.sum_eq_single (fun k => Q (σ k)) (fun y hy => by simp only [if_neg hy, ite_self])]
       simp only [if_true]
     · simp only [eq_false hσ, if_false, Finset.sum_const_zero]
-  have hJ : ∀ σ : Equiv.Perm (Fin N), J ∘ dbl σ = Sum.elim I (Sum.elim (fun k => P (σ k)) (fun k => Q (σ k))) := by
+  have hJ
+      : ∀ σ : Equiv.Perm (Fin N),
+        J ∘ dbl σ = Sum.elim I (Sum.elim (fun k => P (σ k)) (fun k => Q (σ k))) := by
     intro σ
     funext x
     rcases x with x | x | x <;> rfl
   symm
-  rw [Pi.zero_apply, ← hz, show (fun v => om tl η v I) = fun v => ∑ σ : Equiv.Perm (Fin N),
-    ((Equiv.Perm.sign σ : ℤ)) • mm tl η (fun i => v (σ i)) I from funext fun v => om_apply tl η v I, cEv_sum (V := M)]
+  rw [Pi.zero_apply, ← hz,
+    show (fun v => om tl η v I)
+        = fun v =>
+          ∑ σ : Equiv.Perm (Fin N),
+            ((Equiv.Perm.sign σ : ℤ)) • mm tl η (fun i => v (σ i)) I from
+      funext fun v => om_apply tl η v I,
+    cEv_sum (V := M)]
   rw [altPair, LinearMap.sum_apply, Finset.sum_apply, colG, Finset.sum_filter]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [e3 σ]

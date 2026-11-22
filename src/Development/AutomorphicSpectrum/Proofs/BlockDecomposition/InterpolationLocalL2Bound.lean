@@ -9,16 +9,15 @@ open MeasureTheory
 
 namespace GlobalTheory.CompanionTheory.InterpLoc
 
-theorem exists_finset_separating {Y : Type} (Ψ : Submodule ℂ (Y → ℂ)) [FiniteDimensional ℂ Ψ] :
-    ∃ t : Finset Y, ∀ ψ ∈ Ψ, (∀ y ∈ t, ψ y = 0) → ψ = 0 := by
+theorem exists_finset_separating {Y : Type} (Ψ : Submodule ℂ (Y → ℂ)) [FiniteDimensional ℂ Ψ]
+    : ∃ t : Finset Y, ∀ ψ ∈ Ψ, (∀ y ∈ t, ψ y = 0) → ψ = 0 := by
   classical
-  let K : Finset Y → Submodule ℂ (Y → ℂ) := fun t =>
-    { carrier := {ψ | ψ ∈ Ψ ∧ ∀ y ∈ t, ψ y = 0}
-      add_mem' := fun {a b} ha hb =>
-        ⟨Ψ.add_mem ha.1 hb.1, fun y hy => by simp [ha.2 y hy, hb.2 y hy]⟩
-      zero_mem' := ⟨Ψ.zero_mem, fun _ _ => rfl⟩
-      smul_mem' := fun c a ha =>
-        ⟨Ψ.smul_mem c ha.1, fun y hy => by simp [ha.2 y hy]⟩ }
+  let K : Finset Y → Submodule ℂ (Y → ℂ) := fun t => {
+    carrier := {ψ | ψ ∈ Ψ ∧ ∀ y ∈ t, ψ y = 0}
+    add_mem' := fun {a b} ha hb => ⟨Ψ.add_mem ha.1 hb.1, fun y hy => by simp [ha.2 y hy, hb.2 y hy]⟩
+    zero_mem' := ⟨Ψ.zero_mem, fun _ _ => rfl⟩
+    smul_mem' := fun c a ha => ⟨Ψ.smul_mem c ha.1, fun y hy => by simp [ha.2 y hy]⟩
+  }
   have hKle : ∀ t, K t ≤ Ψ := fun t _ h => h.1
   haveI : ∀ t, FiniteDimensional ℂ (K t) := fun t => Submodule.finiteDimensional_of_le (hKle t)
   let f : Finset Y → ℕ := fun t => Module.finrank ℂ (K t)
@@ -39,25 +38,29 @@ theorem exists_finset_separating {Y : Type} (Ψ : Submodule ℂ (Y → ℂ)) [Fi
   have h2 : f t ≤ f (insert y t) := Function.argmin_le f _
   omega
 
-theorem bound_of_injective {Y : Type} [MeasurableSpace Y] (μ : Measure Y)
+theorem bound_of_injective
+    {Y : Type} [MeasurableSpace Y]
+    (μ : Measure Y)
     (Ψ : Submodule ℂ (Y → ℂ)) [FiniteDimensional ℂ Ψ]
-    (hm : ∀ ψ ∈ Ψ, MemLp ψ 2 μ) (hinj : ∀ ψ ∈ Ψ, ψ =ᵐ[μ] 0 → ψ = 0) (y₀ : Y) :
-    ∃ C : NNReal, ∀ ψ ∈ Ψ, ‖ψ y₀‖ₑ ^ 2 ≤ C * ∫⁻ y, ‖ψ y‖ₑ ^ 2 ∂μ := by
-  let T : Ψ →ₗ[ℂ] Lp ℂ 2 μ :=
-    { toFun := fun ψ => (hm ψ.1 ψ.2).toLp ψ.1
-      map_add' := fun a b => MemLp.toLp_add (hm a.1 a.2) (hm b.1 b.2)
-      map_smul' := fun c a => MemLp.toLp_const_smul c (hm a.1 a.2) }
+    (hm : ∀ ψ ∈ Ψ, MemLp ψ 2 μ) (hinj : ∀ ψ ∈ Ψ, ψ =ᵐ[μ] 0 → ψ = 0) (y₀ : Y)
+    : ∃ C : NNReal, ∀ ψ ∈ Ψ, ‖ψ y₀‖ₑ ^ 2 ≤ C * ∫⁻ y, ‖ψ y‖ₑ ^ 2 ∂μ := by
+  let T : Ψ →ₗ[ℂ] Lp ℂ 2 μ := {
+    toFun := fun ψ => (hm ψ.1 ψ.2).toLp ψ.1
+    map_add' := fun a b => MemLp.toLp_add (hm a.1 a.2) (hm b.1 b.2)
+    map_smul' := fun c a => MemLp.toLp_const_smul c (hm a.1 a.2)
+  }
   have hker : LinearMap.ker T = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro ψ hψ
-    have h0 : ψ.1 =ᵐ[μ] 0 := (MemLp.toLp_eq_toLp_iff (hm ψ.1 ψ.2) MemLp.zero).1 (by
-      rw [MemLp.toLp_zero]; exact hψ)
+    have h0 : ψ.1 =ᵐ[μ] 0 :=
+      (MemLp.toLp_eq_toLp_iff (hm ψ.1 ψ.2) MemLp.zero).1 (by rw [MemLp.toLp_zero]; exact hψ)
     exact Subtype.ext (hinj ψ.1 ψ.2 h0)
   obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective T hker
-  let ev : Ψ →ₗ[ℂ] ℂ :=
-    { toFun := fun ψ => ψ.1 y₀
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let ev : Ψ →ₗ[ℂ] ℂ := {
+    toFun := fun ψ => ψ.1 y₀
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   let ℓ : LinearMap.range T →ₗ[ℂ] ℂ := (ev ∘ₗ g).domRestrict (LinearMap.range T)
   let L : LinearMap.range T →L[ℂ] ℂ := ⟨ℓ, LinearMap.continuous_of_finiteDimensional ℓ⟩
   refine ⟨‖L‖₊ ^ 2, fun ψ hψ => ?_⟩
@@ -65,7 +68,8 @@ theorem bound_of_injective {Y : Type} [MeasurableSpace Y] (μ : Measure Y)
   have hL : L ⟨T p, LinearMap.mem_range_self T p⟩ = ψ y₀ := by
     change ev (g (T p)) = ψ y₀
     have : g (T p) = p := LinearMap.congr_fun hg p
-    rw [this]; rfl
+    rw [this]
+    rfl
   have hb : ‖ψ y₀‖₊ ≤ ‖L‖₊ * ‖T p‖₊ := by
     rw [← hL]
     exact L.le_opNNNorm _
@@ -75,10 +79,13 @@ theorem bound_of_injective {Y : Type} [MeasurableSpace Y] (μ : Measure Y)
     simp only [enorm_eq_nnnorm]
     exact_mod_cast hb
   have hsq : eLpNorm ψ 2 μ ^ 2 = ∫⁻ y, ‖ψ y‖ₑ ^ 2 ∂μ := by
-    have := eLpNorm_nnreal_pow_eq_lintegral (f := ψ) (μ := μ) (p := 2) (by norm_num)
-      (hm ψ hψ).aestronglyMeasurable
+    have :=
+      eLpNorm_nnreal_pow_eq_lintegral (f := ψ) (μ := μ) (p := 2) (by norm_num)
+        (hm ψ hψ).aestronglyMeasurable
     simpa using this
-  calc ‖ψ y₀‖ₑ ^ 2 ≤ ((‖L‖₊ : ENNReal) * eLpNorm ψ 2 μ) ^ 2 := by gcongr
+  calc
+    ‖ψ y₀‖ₑ ^ 2
+      ≤ ((‖L‖₊ : ENNReal) * eLpNorm ψ 2 μ) ^ 2 := by gcongr
     _ = ((‖L‖₊ ^ 2 : NNReal) : ENNReal) * ∫⁻ y, ‖ψ y‖ₑ ^ 2 ∂μ := by
       rw [mul_pow, hsq]; push_cast; rfl
 
@@ -109,10 +116,9 @@ theorem interpolation_local_L2_bound : PositivityTheory.Rg.BcB.E.E3.Interpolatio
     intro ψ hψ h0
     refine ht ψ hψ fun y hy => ?_
     have hsub : interior (N y) ⊆ Ω := interior_subset.trans (Set.subset_biUnion_of_mem (u := N) hy)
-    have h1 : ψ =ᵐ[ν.restrict (interior (N y))] 0 :=
-      ae_mono (Measure.restrict_mono hsub le_rfl) h0
-    have h2 := Measure.eqOn_open_of_ae_eq h1 isOpen_interior (hc ψ hψ).continuousOn
-      continuousOn_const
+    have h1 : ψ =ᵐ[ν.restrict (interior (N y))] 0 := ae_mono (Measure.restrict_mono hsub le_rfl) h0
+    have h2 :=
+      Measure.eqOn_open_of_ae_eq h1 isOpen_interior (hc ψ hψ).continuousOn continuousOn_const
     exact h2 (mem_interior_iff_mem_nhds.2 (hNn y))
   obtain ⟨C, hC⟩ := bound_of_injective (ν.restrict Ω) Ψ hm hinj y₀
   exact ⟨C, fun x => hC (F x) (Submodule.subset_span ⟨x, rfl⟩)⟩

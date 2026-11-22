@@ -5,12 +5,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AlmostNor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
 open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Published
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
 
-theorem UpperTheory.imaginary_generator :
-    UpperTheory.V.Af.Cr.ImagGen := by
+theorem UpperTheory.imaginary_generator : UpperTheory.V.Af.Cr.ImagGen := by
   intro K _ _ _ h
   haveI : Algebra.IsQuadraticExtension ℚ K := ⟨h⟩
   obtain ⟨d, e, -, h0, h1⟩ := GlobalTheory.QuadSymbol.AlmostNorm.exists_basis_sq ℚ K

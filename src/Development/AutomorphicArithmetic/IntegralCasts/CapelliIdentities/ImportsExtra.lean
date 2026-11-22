@@ -4,29 +4,30 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DYga2.main.{u_1} :
-    ∀ {E : Type u_1} [inst : NormedAddCommGroup E] [inst_1 : NormedSpace ℝ E] [FiniteDimensional ℝ E]
-      [inst_3 : MeasurableSpace E] [BorelSpace E] (μ : MeasureTheory.Measure E) [μ.IsAddHaarMeasure] {A : ℕ},
-      Module.finrank ℝ E < A →
-        (0 : ℕ) < Module.finrank ℝ E →
-          ∃ (c : ℝ),
-            (0 : ℝ) ≤ c ∧
-              ∀ (η : ℝ),
-                (0 : ℝ) < η →
-                  ∀ (F : Finset E),
-                    (∀ y ∈ F, ∀ y' ∈ F, y ≠ y' → η ≤ ‖y - y'‖ ^ Module.finrank ℝ E) →
-                      ∑ y ∈ F, (((1 : ℝ) + ‖y‖) ^ A)⁻¹ ≤ c * ((1 : ℝ) + η⁻¹) := by
+theorem UpperTheory.Reformulated.B.DYga2.main.{u_1}
+    : ∀ {E : Type u_1} [inst : NormedAddCommGroup E] [inst_1 : NormedSpace ℝ E]
+        [FiniteDimensional ℝ E] [inst_3 : MeasurableSpace E] [BorelSpace E]
+        (μ : MeasureTheory.Measure E) [μ.IsAddHaarMeasure] {A : ℕ},
+      Module.finrank ℝ E < A → (0 : ℕ) < Module.finrank ℝ E
+        → ∃ (c : ℝ),
+          (0 : ℝ) ≤ c
+            ∧ ∀ (η : ℝ),
+              (0 : ℝ) < η
+                → ∀ (F : Finset E),
+                  (∀ y ∈ F, ∀ y' ∈ F, y ≠ y' → η ≤ ‖y - y'‖ ^ Module.finrank ℝ E)
+                    → ∑ y ∈ F, (((1 : ℝ) + ‖y‖) ^ A)⁻¹ ≤ c * ((1 : ℝ) + η⁻¹) := by
   intro E _ _ _ _ _ μ _ A hA hd
   set d := Module.finrank ℝ E with hd_def
 
   set w : E → ℝ := fun x => ((1 + ‖x‖) ^ A)⁻¹ with hw
   have hwpos : ∀ x, 0 < w x := fun x => by
-    have : (0:ℝ) < 1 + ‖x‖ := by positivity
-    simp only [hw]; positivity
+    have : (0 : ℝ) < 1 + ‖x‖ := by positivity
+    simp only [hw]
+    positivity
   have hint : MeasureTheory.Integrable w μ := by
-    have h := integrable_one_add_norm (E := E) (μ := μ) (r := (A:ℝ)) (by exact_mod_cast hA)
+    have h := integrable_one_add_norm (E := E) (μ := μ) (r := (A : ℝ)) (by exact_mod_cast hA)
     refine h.congr (Filter.Eventually.of_forall fun x => ?_)
-    have : (0:ℝ) < 1 + ‖x‖ := by positivity
+    have : (0 : ℝ) < 1 + ‖x‖ := by positivity
     simp only [hw]
     rw [Real.rpow_neg this.le, Real.rpow_natCast]
   set I : ℝ := ∫ x, w x ∂μ with hI
@@ -38,7 +39,7 @@ theorem UpperTheory.Reformulated.B.DYga2.main.{u_1} :
     · exact MeasureTheory.measure_ball_lt_top.ne
   refine ⟨2 ^ A * I / V * 2 ^ d, by positivity, ?_⟩
   intro η hη F hF
-  have hdR : (d:ℝ) ≠ 0 := by exact_mod_cast hd.ne'
+  have hdR : (d : ℝ) ≠ 0 := by exact_mod_cast hd.ne'
   set r : ℝ := η ^ ((d:ℝ)⁻¹) with hr
   have hrpos : 0 < r := Real.rpow_pos_of_pos hη _
   have hrd : r ^ d = η := by
@@ -55,13 +56,13 @@ theorem UpperTheory.Reformulated.B.DYga2.main.{u_1} :
     rcases le_total (r / 2) 1 with h | h
     · have : s = r / 2 := min_eq_left h
       rw [this, div_pow, hrd]
-      have h2 : (2:ℝ) ^ d ≠ 0 := by positivity
-      have : η / 2 ^ d * (2 ^ d * (1 + η⁻¹)) = η + 1 := by
-        field_simp
-      rw [this]; linarith
+      have h2 : (2 : ℝ) ^ d ≠ 0 := by positivity
+      have : η / 2 ^ d * (2 ^ d * (1 + η⁻¹)) = η + 1 := by field_simp
+      rw [this]
+      linarith
     · have : s = 1 := min_eq_right h
       rw [this, one_pow, one_mul]
-      have : (1:ℝ) ≤ 2 ^ d := one_le_pow₀ (by norm_num)
+      have : (1 : ℝ) ≤ 2 ^ d := one_le_pow₀ (by norm_num)
       nlinarith
 
   have hball : ∀ y : E, μ.real (Metric.ball y s) = s ^ d * V := by
@@ -81,8 +82,8 @@ theorem UpperTheory.Reformulated.B.DYga2.main.{u_1} :
     have hle : 1 + ‖x‖ ≤ 2 * (1 + ‖y‖) := by
       have := norm_nonneg y
       linarith
-    have hx0 : (0:ℝ) < 1 + ‖x‖ := by positivity
-    have hy0 : (0:ℝ) < 1 + ‖y‖ := by positivity
+    have hx0 : (0 : ℝ) < 1 + ‖x‖ := by positivity
+    have hy0 : (0 : ℝ) < 1 + ‖y‖ := by positivity
     have hp : (1 + ‖x‖) ^ A ≤ 2 ^ A * (1 + ‖y‖) ^ A := by
       rw [← mul_pow]; exact pow_le_pow_left₀ hx0.le hle A
     simp only [hw]
@@ -91,9 +92,11 @@ theorem UpperTheory.Reformulated.B.DYga2.main.{u_1} :
 
   have hone : ∀ y : E, (2 ^ A)⁻¹ * w y * (s ^ d * V) ≤ ∫ x in Metric.ball y s, w x ∂μ := by
     intro y
-    have := MeasureTheory.setIntegral_ge_of_const_le_real (μ := μ) (f := w) (c := (2 ^ A)⁻¹ * w y)
-      (s := Metric.ball y s) Metric.isOpen_ball.measurableSet MeasureTheory.measure_ball_lt_top.ne
-      (fun x hx => hcomp y x hx) hint.integrableOn
+    have :=
+      MeasureTheory.setIntegral_ge_of_const_le_real (μ := μ) (f := w) (c := (2 ^ A)⁻¹ * w y)
+        (s := Metric.ball y s) Metric.isOpen_ball.measurableSet MeasureTheory.measure_ball_lt_top.ne
+        (fun x hx => hcomp y x hx)
+        hint.integrableOn
     rw [hball] at this
     exact this
 
@@ -107,7 +110,9 @@ theorem UpperTheory.Reformulated.B.DYga2.main.{u_1} :
     rw [dist_eq_norm]
     linarith
   have hsum : ∑ y ∈ F, ∫ x in Metric.ball y s, w x ∂μ ≤ I := by
-    rw [← MeasureTheory.integral_biUnion_finset F (fun y _ => Metric.isOpen_ball.measurableSet) hdisj
+    rw [← MeasureTheory.integral_biUnion_finset F
+      (fun y _ => Metric.isOpen_ball.measurableSet)
+      hdisj
       (fun y _ => hint.integrableOn)]
     exact MeasureTheory.setIntegral_le_integral hint
       (Filter.Eventually.of_forall fun x => (hwpos x).le)
@@ -115,22 +120,25 @@ theorem UpperTheory.Reformulated.B.DYga2.main.{u_1} :
     refine le_trans ?_ hsum
     rw [Finset.mul_sum]
     refine Finset.sum_le_sum fun y _ => ?_
-    calc _ = (2 ^ A)⁻¹ * w y * (s ^ d * V) := by ring
+    calc
+      _ = (2 ^ A)⁻¹ * w y * (s ^ d * V) := by ring
       _ ≤ _ := hone y
   have hS0 : 0 ≤ ∑ y ∈ F, w y := Finset.sum_nonneg fun y _ => (hwpos y).le
   have hsd : 0 < s ^ d := by positivity
   have hfin : ∑ y ∈ F, w y ≤ 2 ^ A * I / V * (1 / s ^ d) := by
-    have h2 : (0:ℝ) < 2 ^ A := by positivity
+    have h2 : (0 : ℝ) < 2 ^ A := by positivity
     rw [show 2 ^ A * I / V * (1 / s ^ d) = (2 ^ A * I) / (s ^ d * V) by field_simp]
     rw [le_div_iff₀ (by positivity)]
     have := mul_le_mul_of_nonneg_left htot h2.le
-    calc _ = 2 ^ A * ((2 ^ A)⁻¹ * (s ^ d * V) * ∑ y ∈ F, w y) := by field_simp
+    calc
+      _ = 2 ^ A * ((2 ^ A)⁻¹ * (s ^ d * V) * ∑ y ∈ F, w y) := by field_simp
       _ ≤ _ := this
   have hinv : 1 / s ^ d ≤ 2 ^ d * (1 + η⁻¹) := by
     rw [div_le_iff₀ hsd]
     linarith [hkey, mul_comm (s ^ d) (2 ^ d * (1 + η⁻¹))]
-  calc ∑ y ∈ F, ((1 + ‖y‖) ^ A)⁻¹ = ∑ y ∈ F, w y := rfl
+  calc
+    ∑ y ∈ F, ((1 + ‖y‖) ^ A)⁻¹
+      = ∑ y ∈ F, w y := rfl
     _ ≤ 2 ^ A * I / V * (1 / s ^ d) := hfin
-    _ ≤ 2 ^ A * I / V * (2 ^ d * (1 + η⁻¹)) :=
-        mul_le_mul_of_nonneg_left hinv (by positivity)
+    _ ≤ 2 ^ A * I / V * (2 ^ d * (1 + η⁻¹)) := mul_le_mul_of_nonneg_left hinv (by positivity)
     _ = 2 ^ A * I / V * 2 ^ d * (1 + η⁻¹) := by ring

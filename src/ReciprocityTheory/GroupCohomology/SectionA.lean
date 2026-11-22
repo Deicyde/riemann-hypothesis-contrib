@@ -21,10 +21,10 @@ def rel (K N : Subgroup G) [hN : N.Normal] : Setoid G where
     trans := by
       rintro x y z ⟨k, hk, n, hn, rfl⟩ ⟨k', hk', n', hn', rfl⟩
       refine ⟨k' * k, K.mul_mem hk' hk, k⁻¹ * n' * k * n, N.mul_mem ?_ hn, by group⟩
-      simpa using hN.conj_mem n' hn' k⁻¹ }
+      simpa using hN.conj_mem n' hn' k⁻¹
+  }
 
-noncomputable def rep (K N : Subgroup G) [N.Normal] (x : G) : G :=
-  (Quotient.mk (rel K N) x).out
+noncomputable def rep (K N : Subgroup G) [N.Normal] (x : G) : G := (Quotient.mk (rel K N) x).out
 
 lemma rep_eq (K N : Subgroup G) [N.Normal] {x y : G} (h : (rel K N) x y) : rep K N x = rep K N y := by
   unfold rep
@@ -53,8 +53,8 @@ lemma tr_closed (K N : Subgroup G) [N.Normal] (hN : IsOpen (N : Set G)) : IsClos
   simp
 
 def admitted (U : Subgroup G) (p : Subgroup G × Set G) : Prop :=
-  p.1 ≤ U ∧ IsClosed p.2 ∧ (∀ k ∈ p.1, ∀ s ∈ p.2, k * s ∈ p.2) ∧
-  (∀ a ∈ p.2, ∀ b ∈ p.2, a * b⁻¹ ∈ U → a * b⁻¹ ∈ p.1) ∧ ∀ g, ∃ a ∈ p.2, a * g⁻¹ ∈ U
+  p.1 ≤ U ∧ IsClosed p.2 ∧ (∀ k ∈ p.1, ∀ s ∈ p.2, k * s ∈ p.2)
+    ∧ (∀ a ∈ p.2, ∀ b ∈ p.2, a * b⁻¹ ∈ U → a * b⁻¹ ∈ p.1) ∧ ∀ g, ∃ a ∈ p.2, a * g⁻¹ ∈ U
 
 lemma adm_of_section_mem (U K : Subgroup G) (S : Set G) (h : admitted U (K, S)) (N : Subgroup G) [N.Normal]
     (hN : IsOpen (N : Set G)) : admitted U (K ⊓ N, S ∩ tr K N) := by
@@ -118,16 +118,22 @@ lemma admissible_chain_inf [CompactSpace G] (U : Subgroup G) (hU : IsClosed (U :
       obtain ⟨a, haS, hag⟩ := (hc p.1 p.2).2.2.2.2 g
       exact ⟨a, haS, hag⟩
 
-theorem core [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] (U : Subgroup G)
-    (hU : IsClosed (U : Set G)) : ∃ t : G → G, Continuous t ∧ (∀ g, t g * g⁻¹ ∈ U) ∧
-      ∀ g h, g * h⁻¹ ∈ U → t g = t h := by
+theorem core
+    [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
+    (U : Subgroup G) (hU : IsClosed (U : Set G))
+    : ∃ t : G → G, Continuous t ∧ (∀ g, t g * g⁻¹ ∈ U) ∧ ∀ g h, g * h⁻¹ ∈ U → t g = t h := by
   classical
-  have hchain : ∀ c ⊆ {p : (Subgroup G × Set G)ᵒᵈ | admitted U (OrderDual.ofDual p)},
-      IsChain (· ≤ ·) c → ∀ y ∈ c, ∃ ub ∈ {p : (Subgroup G × Set G)ᵒᵈ | admitted U (OrderDual.ofDual p)},
-        ∀ z ∈ c, z ≤ ub := by
+  have hchain
+      : ∀ c ⊆ {p : (Subgroup G × Set G)ᵒᵈ | admitted U (OrderDual.ofDual p)},
+        IsChain (· ≤ ·) c
+          → ∀ y ∈ c, ∃ ub ∈ {p : (Subgroup G × Set G)ᵒᵈ | admitted U (OrderDual.ofDual p)}, ∀ z ∈ c,
+            z ≤ ub := by
     intro c hcs hc y hy
-    refine ⟨OrderDual.toDual (⨅ p ∈ OrderDual.toDual ⁻¹' c, p.1, ⋂ p ∈ OrderDual.toDual ⁻¹' c, p.2),
-      admissible_chain_inf U hU _ (fun p hp => hcs hp) ?_ (OrderDual.ofDual y) hy, ?_⟩
+    refine ⟨
+      OrderDual.toDual (⨅ p ∈ OrderDual.toDual ⁻¹' c, p.1, ⋂ p ∈ OrderDual.toDual ⁻¹' c, p.2),
+      admissible_chain_inf U hU _ (fun p hp => hcs hp) ?_ (OrderDual.ofDual y) hy,
+      ?_
+    ⟩
     · intro p hp q hq
       by_cases hpq : p = q
       · exact Or.inl (le_of_eq hpq)
@@ -135,12 +141,17 @@ theorem core [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] (U : Subg
         · exact Or.inr h
         · exact Or.inl h
     · intro z hz
-      exact Prod.le_def.2 ⟨iInf₂_le (OrderDual.ofDual z) hz,
-        Set.iInter₂_subset (OrderDual.ofDual z) hz⟩
-  have hstart : OrderDual.toDual ((U, Set.univ) : Subgroup G × Set G) ∈
-      {p : (Subgroup G × Set G)ᵒᵈ | admitted U (OrderDual.ofDual p)} :=
-    ⟨le_rfl, isClosed_univ, fun _ _ _ _ => Set.mem_univ _, fun _ _ _ _ h => h,
-      fun g => ⟨g, Set.mem_univ _, by simp⟩⟩
+      exact Prod.le_def.2
+        ⟨iInf₂_le (OrderDual.ofDual z) hz, Set.iInter₂_subset (OrderDual.ofDual z) hz⟩
+  have hstart
+      : OrderDual.toDual ((U, Set.univ) : Subgroup G × Set G)
+        ∈ {p : (Subgroup G × Set G)ᵒᵈ | admitted U (OrderDual.ofDual p)} := ⟨
+    le_rfl,
+    isClosed_univ,
+    fun _ _ _ _ => Set.mem_univ _,
+    fun _ _ _ _ h => h,
+    fun g => ⟨g, Set.mem_univ _, by simp⟩
+  ⟩
   obtain ⟨m, -, hm⟩ := zorn_le_nonempty₀ _ hchain _ hstart
   have hA : admitted U (OrderDual.ofDual m) := hm.1
   set K := (OrderDual.ofDual m).1 with hKdef
@@ -148,11 +159,14 @@ theorem core [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] (U : Subg
   have hK1 : ∀ k ∈ K, k = 1 := by
     intro k hk
     by_contra hne
-    obtain ⟨N, hN⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
-      (isOpen_compl_singleton : IsOpen ({k}ᶜ : Set G)) (Set.mem_compl_singleton_iff.2 (Ne.symm hne))
+    obtain ⟨N, hN⟩ :=
+      ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
+        (isOpen_compl_singleton : IsOpen ({k}ᶜ : Set G))
+        (Set.mem_compl_singleton_iff.2 (Ne.symm hne))
     have hstep := adm_of_section_mem U K S hA N.toSubgroup N.isOpen'
-    have hle := hm.2 (y := OrderDual.toDual (K ⊓ N.toSubgroup, S ∩ tr K N.toSubgroup)) hstep
-      (Prod.le_def.2 ⟨inf_le_left, Set.inter_subset_left⟩)
+    have hle :=
+      hm.2 (y := OrderDual.toDual (K ⊓ N.toSubgroup, S ∩ tr K N.toSubgroup)) hstep
+        (Prod.le_def.2 ⟨inf_le_left, Set.inter_subset_left⟩)
     have hkN : k ∈ N.toSubgroup := ((Prod.le_def.1 hle).1 hk).2
     exact hN hkN rfl
   have hex : ∀ g, ∃ a ∈ S, a * g⁻¹ ∈ U := hA.2.2.2.2

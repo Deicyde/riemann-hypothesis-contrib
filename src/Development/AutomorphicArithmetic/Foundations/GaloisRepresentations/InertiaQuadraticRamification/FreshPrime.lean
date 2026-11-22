@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
 private lemma normV_pos' {F : Type} [Field F] [NumberField F] (t : HeightOneSpectrum (𝓞 F)) : 0 < normV t := by
@@ -23,8 +24,8 @@ private lemma normV_mem' {F : Type} [Field F] [NumberField F] (t : HeightOneSpec
   rw [h]
   exact Ideal.absNorm_mem _
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.freshPrime :
-    SplitPlace → RootMod → FreshPrime := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.freshPrime
+    : SplitPlace → RootMod → FreshPrime := by
   intro hS hR
   unfold SplitPlace at hS
   unfold RootMod at hR
@@ -34,8 +35,8 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.freshPrime :
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   haveI : NeZero (((2 * n : ℕ)) : Ω) := ⟨by exact_mod_cast (by omega : 2 * n ≠ 0)⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (2 * n)
-  have hroot : ∀ t : HeightOneSpectrum (𝓞 F), ∃ x : Ω, x ^ n = (normV t : Ω) :=
-    fun t => IsAlgClosed.exists_pow_nat_eq _ hn
+  have hroot : ∀ t : HeightOneSpectrum (𝓞 F), ∃ x : Ω, x ^ n = (normV t : Ω) := fun t =>
+    IsAlgClosed.exists_pow_nat_eq _ hn
   choose y hy using hroot
   set S : Set Ω := insert ζ (y '' T) with hSeq
   haveI : Finite S := (Set.Finite.insert ζ (hT.image y)).to_subtype
@@ -70,14 +71,26 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.freshPrime :
     exact Ideal.mul_mem_right _ _ hpu
   obtain ⟨A, hA⟩ := exists_isPlaceOver Ω u
   have hDA : ∀ x ∈ S, ∀ g ∈ Dec A, (g : Ω → Ω) x = x := fun x hx g hg => hfix g (hdec A hA hg) x hx
-  refine ⟨u, fun h => huB (Or.inl (Or.inl h)), hp, hpu, hpu2,
-    fun A' hA' => le_trans (hdec A' hA') inf_le_left, ?_, ?_⟩
-  · refine (hR F Ω A u hA (normV u) hp rfl ζ (2 * n) (by omega) (hDA ζ (Set.mem_insert _ _))).2 hζ ?_
+  refine ⟨
+    u,
+    fun h => huB (Or.inl (Or.inl h)),
+    hp,
+    hpu,
+    hpu2,
+    fun A' hA' => le_trans (hdec A' hA') inf_le_left,
+    ?_,
+    ?_
+  ⟩
+  · refine (hR F Ω A u hA (normV u) hp rfl ζ (2 * n) (by omega) (hDA ζ (Set.mem_insert _ _))).2 hζ
+      ?_
     intro h2
     exact huB (Or.inr (hdvd_mem _ h2))
   · intro t ht
-    refine ⟨?_, (hR F Ω A u hA (normV u) hp rfl (y t) n hn
-      (hDA (y t) (Set.mem_insert_of_mem _ ⟨t, ht, rfl⟩))).1 (normV t) (hy t)⟩
+    refine ⟨
+      ?_,
+      (hR F Ω A u hA (normV u) hp rfl (y t) n hn
+        (hDA (y t) (Set.mem_insert_of_mem _ ⟨t, ht, rfl⟩))).1 (normV t) (hy t)
+    ⟩
     intro hut
     by_cases hd : normV u ∣ normV t
     · exact huB (Or.inl (Or.inr (Set.mem_biUnion ht (hdvd_mem _ hd))))
@@ -88,5 +101,6 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.freshPrime :
       push_cast at hg'
       have h1 : (1 : 𝓞 F) ∈ t.asIdeal := by
         rw [hg']
-        exact t.asIdeal.add_mem (Ideal.mul_mem_right _ _ hut) (Ideal.mul_mem_right _ _ (normV_mem' t))
+        exact t.asIdeal.add_mem (Ideal.mul_mem_right _ _ hut)
+          (Ideal.mul_mem_right _ _ (normV_mem' t))
       exact t.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h1)

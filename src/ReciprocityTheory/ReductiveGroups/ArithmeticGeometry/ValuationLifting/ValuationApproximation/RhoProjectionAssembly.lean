@@ -10,9 +10,10 @@ namespace ReciprocityTheory.ChartRestriction.G.Lift.VA
 
 open WithZero
 
-theorem disc (M ε : WithZero (Multiplicative ℤ)) (hε : ε ≠ 0) :
-    ∃ m : ℕ, 1 ≤ m ∧ ∀ m', m ≤ m' → ∀ g h : WithZero (Multiplicative ℤ),
-      g < 1 → h ≤ M → g ^ m' * h < ε := by
+theorem disc (M ε : WithZero (Multiplicative ℤ)) (hε : ε ≠ 0)
+    : ∃ m : ℕ,
+      1 ≤ m
+        ∧ ∀ m', m ≤ m' → ∀ g h : WithZero (Multiplicative ℤ), g < 1 → h ≤ M → g ^ m' * h < ε := by
   obtain ⟨e, rfl⟩ : ∃ e : ℤ, ε = exp e := ⟨log ε, (exp_log hε).symm⟩
   obtain ⟨a, ha⟩ : ∃ a : ℤ, M ≤ exp a := by
     rcases eq_or_ne M 0 with rfl | hM
@@ -27,21 +28,23 @@ theorem disc (M ε : WithZero (Multiplicative ℤ)) (hε : ε ≠ 0) :
       rw [← exp_zero, exp_lt_exp] at hg
       rw [exp_le_exp]
       omega
-    calc g ^ m' * h ≤ exp (-1) ^ m' * exp a :=
-          mul_le_mul' (pow_le_pow_left' hg1 m') (hh.trans ha)
+    calc
+      g ^ m' * h
+        ≤ exp (-1) ^ m' * exp a := mul_le_mul' (pow_le_pow_left' hg1 m') (hh.trans ha)
       _ = exp (-(m' : ℤ) + a) := by
-          rw [← exp_nsmul, ← exp_add]
-          congr 1
-          rw [smul_neg, nsmul_eq_mul, mul_one]
+        rw [← exp_nsmul, ← exp_add]
+        congr 1
+        rw [smul_neg, nsmul_eq_mul, mul_one]
       _ < exp e := by
-          rw [exp_lt_exp]
-          omega
+        rw [exp_lt_exp]
+        omega
 
 section
 variable {Ω : Type} [Field Ω]
 
-theorem val_frac_of_one_lt (v : Valuation Ω (WithZero (Multiplicative ℤ))) (y : Ω) (hy : 1 < v y)
-    (m : ℕ) (hm : 1 ≤ m) : v (y ^ m / (1 + y ^ m)) = 1 := by
+theorem val_frac_of_one_lt
+    (v : Valuation Ω (WithZero (Multiplicative ℤ))) (y : Ω) (hy : 1 < v y) (m : ℕ) (hm : 1 ≤ m)
+    : v (y ^ m / (1 + y ^ m)) = 1 := by
   have h1 : 1 < v (y ^ m) := by
     rw [map_pow]
     exact one_lt_pow' hy (by omega)
@@ -50,17 +53,19 @@ theorem val_frac_of_one_lt (v : Valuation Ω (WithZero (Multiplicative ℤ))) (y
   have h3 : v (y ^ m) ≠ 0 := ne_of_gt (lt_trans zero_lt_one h1)
   rw [map_div₀, h2, div_self h3]
 
-theorem val_frac_of_lt_one (v : Valuation Ω (WithZero (Multiplicative ℤ))) (y : Ω) (hy : v y < 1)
-    (m : ℕ) (hm : 1 ≤ m) : v (y ^ m / (1 + y ^ m)) = v y ^ m := by
+theorem val_frac_of_lt_one
+    (v : Valuation Ω (WithZero (Multiplicative ℤ))) (y : Ω) (hy : v y < 1) (m : ℕ) (hm : 1 ≤ m)
+    : v (y ^ m / (1 + y ^ m)) = v y ^ m := by
   have h1 : v (y ^ m) < 1 := by
     rw [map_pow]
     exact pow_lt_one' hy (by omega)
-  have h2 : v (1 + y ^ m) = v 1 :=
-    Valuation.map_add_eq_of_lt_left v (by rw [map_one]; exact h1)
+  have h2 : v (1 + y ^ m) = v 1 := Valuation.map_add_eq_of_lt_left v (by rw [map_one]; exact h1)
   rw [map_div₀, h2, map_one, div_one, map_pow]
 
-theorem upgrade (v w : Valuation Ω (WithZero (Multiplicative ℤ))) (π : Ω) (hπ : v π = exp (1 : ℤ))
-    (u : Ω) (hu : 1 ≤ v u) (hu' : w u < 1) : ∃ x, 1 < v x ∧ w x < 1 := by
+theorem upgrade
+    (v w : Valuation Ω (WithZero (Multiplicative ℤ))) (π : Ω) (hπ : v π = exp (1 : ℤ))
+    (u : Ω) (hu : 1 ≤ v u) (hu' : w u < 1)
+    : ∃ x, 1 < v x ∧ w x < 1 := by
   obtain ⟨m, -, hm⟩ := disc (w π) 1 one_ne_zero
   refine ⟨u ^ m * π, ?_, ?_⟩
   · rw [map_mul, map_pow, hπ]
@@ -74,7 +79,7 @@ end
 theorem pair_separation : PairSep := by
   intro Ω _ ι _ v h1 h2 i j hij
   choose π hπ using h1
-  have hex : ∃ x, ¬ (v i x ≤ 1 ↔ v j x ≤ 1) := by
+  have hex : ∃ x, ¬(v i x ≤ 1 ↔ v j x ≤ 1) := by
     by_contra hc
     push Not at hc
     exact h2 i j hij (Valuation.isEquiv_of_val_le_one hc)
@@ -95,9 +100,9 @@ theorem pair_separation : PairSep := by
     have hjx : v j x ≤ 1 := by
       by_contra h
       exact hx (iff_of_false hix h)
-    obtain ⟨y, hy1, hy2⟩ := upgrade (v j) (v i) (π j) (hπ j) x⁻¹
-      (by rw [map_inv₀]; exact (one_le_inv₀ hj0).mpr hjx)
-      (by rw [map_inv₀]; exact (inv_lt_one₀ hi0).mpr hix')
+    obtain ⟨y, hy1, hy2⟩ :=
+      upgrade (v j) (v i) (π j) (hπ j) x⁻¹ (by rw [map_inv₀]; exact (one_le_inv₀ hj0).mpr hjx)
+        (by rw [map_inv₀]; exact (inv_lt_one₀ hi0).mpr hix')
     have hy0 : y ≠ 0 := by
       rintro rfl
       rw [map_zero] at hy1
@@ -127,8 +132,8 @@ theorem large_small_separation : LargeSmall := by
       obtain ⟨y, hy1, hyS⟩ := IH hiS'
       obtain ⟨w, hw1, hw2⟩ := hpair i k (Ne.symm hki)
       obtain ⟨m, hm1, hm⟩ := disc (Finset.univ.sup fun j => v j w) 1 one_ne_zero
-      have hwM : ∀ j, v j w ≤ Finset.univ.sup fun j => v j w :=
-        fun j => Finset.le_sup (f := fun j => v j w) (Finset.mem_univ j)
+      have hwM : ∀ j, v j w ≤ Finset.univ.sup fun j => v j w := fun j =>
+        Finset.le_sup (f := fun j => v j w) (Finset.mem_univ j)
       by_cases hky : v k y ≤ 1
       · refine ⟨y ^ m * w, ?_, ?_⟩
         · rw [map_mul, map_pow]
@@ -190,6 +195,7 @@ theorem rho_projection_assembly : Assembly := by
     have hik : k ≠ i := fun h => (Finset.mem_erase.mp hi).1 h.symm
     rw [map_mul]
     exact (lt_mul_inv_iff₀ (ht0 i k)).mp (hz2 i k hik)
-  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ k), Valuation.map_add_eq_of_lt_left _ (hmain ▸ hrest), hmain]
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ k),
+    Valuation.map_add_eq_of_lt_left _ (hmain ▸ hrest), hmain]
 
 end ReciprocityTheory.ChartRestriction.G.Lift.VA

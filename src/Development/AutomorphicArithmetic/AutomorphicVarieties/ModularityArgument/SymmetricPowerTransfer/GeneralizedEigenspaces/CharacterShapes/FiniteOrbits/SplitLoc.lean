@@ -17,9 +17,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MeasurePr
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL Formalism.BasicNotions UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL Formalism.BasicNotions UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 open UpperTheory.V.W (Plc Lp)
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -27,9 +30,11 @@ section
 open GlobalTheory.SplitWeil
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-private theorem split_loc (O : Type) [CommRing O] [Algebra O k] (hO : IsInts k O) (h2 : (2 : k) ≠ 0) {Δ s : k}
-    (hs : s * s = Δ) (hs0 : s ≠ 0) (x : DX Δ) (hx : x ∈ KD Δ O) :
-    ∃ t ∈ SU Δ, eD hs (t⁻¹ * x) ∈ (Lev.iw k).J 2 := by
+private theorem split_loc
+    (O : Type) [CommRing O] [Algebra O k]
+    (hO : IsInts k O) (h2 : (2 : k) ≠ 0)
+    {Δ s : k} (hs : s * s = Δ) (hs0 : s ≠ 0) (x : DX Δ) (hx : x ∈ KD Δ O)
+    : ∃ t ∈ SU Δ, eD hs (t⁻¹ * x) ∈ (Lev.iw k).J 2 := by
   obtain ⟨hbij, hKO, -, -, hdet, -⟩ := eD_facts k O hO h2 Δ s hs hs0
   have hxK : eD hs x ∈ KO k (Fin 2) := by
     have hx' : x ∈ Subgroup.comap (eD hs) (KO k (Fin 2)) := by
@@ -44,9 +49,11 @@ private theorem split_loc (O : Type) [CommRing O] [Algebra O k] (hO : IsInts k O
   refine ⟨t, ?_, ?_⟩
   · rw [SU, MonoidHom.mem_ker]
     apply Units.ext
-    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, Matrix.GeneralLinearGroup.val_det_apply, Units.val_one]
-    rw [show (↑(↑t : GL (Fin 2) (Lsq k Δ)) : Matrix (Fin 2) (Fin 2) (Lsq k Δ)) = Glob.mt t from rfl, (hdet t).1, ht,
-      ← Matrix.GeneralLinearGroup.val_det_apply, map_mul, map_inv, hd, mul_inv_cancel, Units.val_one, map_one]
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, Matrix.GeneralLinearGroup.val_det_apply,
+      Units.val_one]
+    rw [show (↑(↑t : GL (Fin 2) (Lsq k Δ)) : Matrix (Fin 2) (Fin 2) (Lsq k Δ)) = Glob.mt t from rfl,
+      (hdet t).1, ht, ← Matrix.GeneralLinearGroup.val_det_apply, map_mul, map_inv, hd,
+      mul_inv_cancel, Units.val_one, map_one]
   · rw [map_mul, map_inv, ht, mul_inv_rev, inv_inv, inv_mul_cancel_right]
     apply Lev.dg_mem
     intro i
@@ -57,13 +64,13 @@ private theorem split_loc (O : Type) [CommRing O] [Algebra O k] (hO : IsInts k O
 
 end
 
-private theorem eD_congr {K : Type} [Field K] {Δ s s' : K} (h : s * s = Δ) (h' : s' * s' = Δ) (e : s = s') (x : DX Δ) :
-    eD h x = eD h' x := by
+private theorem eD_congr
+    {K : Type} [Field K] {Δ s s' : K} (h : s * s = Δ) (h' : s' * s' = Δ) (e : s = s') (x : DX Δ)
+    : eD h x = eD h' x := by
   subst e
   rfl
 
-theorem UpperTheory.V.Z.Sym.So.kNon :
-    UpperTheory.V.Z.Sym.So.KNon := by
+theorem UpperTheory.V.Z.Sym.So.kNon : UpperTheory.V.Z.Sym.So.KNon := by
   intro F _ _ Δ A hA A₀ hA₀ hE V _ _ ch C hC Y hY hoff φ hφ hφ0
   classical
   obtain ⟨-, -, hloc, -, hU2⟩ := datOk F Δ A hA
@@ -75,9 +82,11 @@ theorem UpperTheory.V.Z.Sym.So.kNon :
     exact hφ0 (funext h)
   obtain ⟨γ, s, hs, y, hy, u, hu, rfl⟩ := hY.2 g
   have hu₀ := (hU2₀ u).1 hu
-  have hspl : ∀ v (h : v ∈ A.Sg ∧ v ∉ A₀.Sg), ∃ r ∈ SU ((cv v) Δ),
-      eD (A.hs v h.1) (r⁻¹ * u.1 v) ∈ (Lev.iw (Kv v)).J 2 := fun v h =>
-    split_loc (Ov v) (hloc v h.1).1 (hloc v h.1).2.1 (A.hs v h.1) (hloc v h.1).2.2.1 (u.1 v) (hu₀.2 v h.2)
+  have hspl
+      : ∀ v (h : v ∈ A.Sg ∧ v ∉ A₀.Sg), ∃ r ∈ SU ((cv v) Δ),
+        eD (A.hs v h.1) (r⁻¹ * u.1 v) ∈ (Lev.iw (Kv v)).J 2 := fun v h =>
+    split_loc (Ov v) (hloc v h.1).1 (hloc v h.1).2.1 (A.hs v h.1) (hloc v h.1).2.2.1 (u.1 v)
+      (hu₀.2 v h.2)
   let tf : (v : Pl F) → ↥(DX ((cv v) Δ)) := fun v =>
     if h : v ∈ A.Sg ∧ v ∉ A₀.Sg then (hspl v h).choose else 1
   have htf : tf ∈ RP (fun v => ↥(DX ((cv v) Δ))) (fun v => KD ((cv v) Δ) (Ov v)) := by
@@ -86,7 +95,7 @@ theorem UpperTheory.V.Z.Sym.So.kNon :
     intro v hv
     by_contra h
     apply hv
-    have hn : ¬ (v ∈ A.Sg ∧ v ∉ A₀.Sg) := fun h' => h h'.1
+    have hn : ¬(v ∈ A.Sg ∧ v ∉ A₀.Sg) := fun h' => h h'.1
     simp only [tf, dif_neg hn]
     exact one_mem _
   let t : DA Δ := ⟨tf, htf⟩
@@ -112,7 +121,7 @@ theorem UpperTheory.V.Z.Sym.So.kNon :
     refine (hU2 _).2 ⟨fun v hv => ?_, fun v hv => ?_⟩
     · show eD (A.hs v hv) ((tf v)⁻¹ * u.1 v) ∈ (A.V v).J 2
       by_cases h0 : v ∈ A₀.Sg
-      · have hn : ¬ (v ∈ A.Sg ∧ v ∉ A₀.Sg) := fun h => h.2 h0
+      · have hn : ¬(v ∈ A.Sg ∧ v ∉ A₀.Sg) := fun h => h.2 h0
         simp only [tf, dif_neg hn, inv_one, one_mul]
         rw [eD_congr (A.hs v hv) (A₀.hs v h0) (hE.s v h0), hE.V v h0]
         exact hu₀.1 v h0
@@ -121,14 +130,16 @@ theorem UpperTheory.V.Z.Sym.So.kNon :
         rw [hE.iw v hv h0]
         exact (hspl v hp).choose_spec.2
     · show (tf v)⁻¹ * u.1 v ∈ KD ((cv v) Δ) (Ov v)
-      have hn : ¬ (v ∈ A.Sg ∧ v ∉ A₀.Sg) := fun h => hv h.1
+      have hn : ¬(v ∈ A.Sg ∧ v ∉ A₀.Sg) := fun h => hv h.1
       simp only [tf, dif_neg hn, inv_one, one_mul]
       exact hu₀.2 v (fun h0 => hv (hE.sub h0))
   refine ⟨y, hy, ⟨s * t, mul_mem hs htS⟩, ?_⟩
   intro h0
   apply hg
   have hsy : s * y * u = s * t * y * (t⁻¹ * u) := by
-    calc s * y * u = s * (y * t) * (t⁻¹ * u) := by group
+    calc
+      s * y * u
+        = s * (y * t) * (t⁻¹ * u) := by group
       _ = s * (t * y) * (t⁻¹ * u) := by rw [← hcomm]
       _ = s * t * y * (t⁻¹ * u) := by group
   rw [show C.ι γ * s * y * u = C.ι γ * (s * y * u) by group, hφ.1 γ (s * y * u), hsy, hinv _ hj]

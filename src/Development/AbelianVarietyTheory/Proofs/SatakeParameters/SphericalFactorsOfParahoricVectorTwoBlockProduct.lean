@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCu
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.ThetaGL GlobalTheory.TameIwahori ValuativeRel
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead
+  GlobalTheory.ThetaGL GlobalTheory.TameIwahori ValuativeRel
 open scoped TensorProduct
 
 noncomputable section
@@ -73,18 +74,21 @@ end Contract
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem valuation_det_of_mem_KO {n : Type} [Fintype n] [DecidableEq n] {g : GL n k}
-    (hg : g ∈ KO k n) : valuation k ((GeneralLinearGroup.det g : kˣ) : k) = 1 := by
+theorem valuation_det_of_mem_KO
+    {n : Type} [Fintype n] [DecidableEq n] {g : GL n k} (hg : g ∈ KO k n)
+    : valuation k ((GeneralLinearGroup.det g : kˣ) : k) = 1 := by
   obtain ⟨g, rfl⟩ := hg
-  have h1 : ((GeneralLinearGroup.det (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g) : kˣ) : k) =
-      algebraMap 𝒪[k] k (GeneralLinearGroup.det g : 𝒪[k]ˣ) :=
+  have h1
+      : ((GeneralLinearGroup.det (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g) : kˣ) : k)
+        = algebraMap 𝒪[k] k (GeneralLinearGroup.det g : 𝒪[k]ˣ) :=
     ((algebraMap 𝒪[k] k).map_det _).symm
   rw [h1]
   exact (Valuation.integer.integers (valuation k)).one_of_isUnit (Units.isUnit _)
 
-theorem emb₂_mem_KO {r t : ℕ} {m₁ : GL (Fin r) k} {m₂ : GL (Fin t) k} (h₁ : m₁ ∈ KO k (Fin r))
-    (h₂ : m₂ ∈ KO k (Fin t)) :
-    emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂) ∈ KO k (Fin (r + t)) := by
+theorem emb₂_mem_KO
+    {r t : ℕ} {m₁ : GL (Fin r) k} {m₂ : GL (Fin t) k}
+    (h₁ : m₁ ∈ KO k (Fin r)) (h₂ : m₂ ∈ KO k (Fin t))
+    : emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂) ∈ KO k (Fin (r + t)) := by
   obtain ⟨g₁, rfl⟩ := h₁
   obtain ⟨g₂, rfl⟩ := h₂
   refine ⟨emb₂ 𝒪[k] (stdSum (rfl : r + t = r + t)) (g₁, g₂), ?_⟩
@@ -92,31 +96,46 @@ theorem emb₂_mem_KO {r t : ℕ} {m₁ : GL (Fin r) k} {m₂ : GL (Fin t) k} (h
   obtain ⟨i, rfl⟩ := (stdSum (rfl : r + t = r + t)).surjective i
   obtain ⟨j, rfl⟩ := (stdSum (rfl : r + t = r + t)).surjective j
   have hv := val_emb₂ 𝒪[k] (stdSum (rfl : r + t = r + t)) (g₁, g₂)
-  have hw := val_emb₂ k (stdSum (rfl : r + t = r + t)) (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g₁, GeneralLinearGroup.map (algebraMap 𝒪[k] k) g₂)
+  have hw :=
+    val_emb₂ k (stdSum (rfl : r + t = r + t))
+      (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g₁, GeneralLinearGroup.map (algebraMap 𝒪[k] k) g₂)
   show algebraMap 𝒪[k] k ((emb₂ 𝒪[k] (stdSum (rfl : r + t = r + t)) (g₁, g₂)).val _ _) = _
   rw [hv, hw]
   rcases i with i | i <;> rcases j with j | j <;> simp [GeneralLinearGroup.map]
 
-theorem extTensor_apply_eq {r t : ℕ} {χ : kˣ →* ℂˣ} {V W : Type} [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] {σ₁ : Representation ℂ (GL (Fin r) k) V}
-    {σ₂ : Representation ℂ (GL (Fin t) k) W} {f : _} (hf : IsParahoricVec χ (prod₂ σ₁ σ₂) f)
-    {m₁ : GL (Fin r) k} {m₂ : GL (Fin t) k} (h₁ : m₁ ∈ KO k (Fin r)) (h₂ : m₂ ∈ KO k (Fin t)) :
-    extTensor σ₁ σ₂ (m₁, m₂) (f.1.1 1) = (χ (GeneralLinearGroup.det m₂) : ℂ) • f.1.1 1 := by
+theorem extTensor_apply_eq
+    {r t : ℕ} {χ : kˣ →* ℂˣ} {V W : Type}
+    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {σ₁ : Representation ℂ (GL (Fin r) k) V} {σ₂ : Representation ℂ (GL (Fin t) k) W} {f : _}
+    (hf : IsParahoricVec χ (prod₂ σ₁ σ₂) f)
+    {m₁ : GL (Fin r) k} {m₂ : GL (Fin t) k} (h₁ : m₁ ∈ KO k (Fin r)) (h₂ : m₂ ∈ KO k (Fin t))
+    : extTensor σ₁ σ₂ (m₁, m₂) (f.1.1 1) = (χ (GeneralLinearGroup.det m₂) : ℂ) • f.1.1 1 := by
   have hmem := emb₂_mem_KO h₁ h₂
   have hv := val_emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)
-  have hll : ∀ (i : Fin t) (j : Fin r),
-      valuation k ((emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val (Fin.natAdd r i) (Fin.castAdd t j)) < 1 := by
+  have hll
+      : ∀ (i : Fin t) (j : Fin r),
+        valuation k
+            ((emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val (Fin.natAdd r i)
+              (Fin.castAdd t j))
+          < 1 := by
     intro i j
-    have h0 : (emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val (Fin.natAdd r i) (Fin.castAdd t j) = 0 := by
+    have h0
+        : (emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val (Fin.natAdd r i) (Fin.castAdd t j)
+          = 0 := by
       have hi : Fin.natAdd r i = (stdSum (rfl : r + t = r + t)) (Sum.inr i) := by ext; simp
       have hj : Fin.castAdd t j = (stdSum (rfl : r + t = r + t)) (Sum.inl j) := by ext; simp
       rw [hv, hi, hj]
       simp
     rw [h0, map_zero]
     exact zero_lt_one
-  have hdet : ((GeneralLinearGroup.det m₂ : kˣ) : k) =
-      ((emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val.submatrix (Fin.natAdd r) (Fin.natAdd r)).det := by
-    have hs : (emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val.submatrix (Fin.natAdd r) (Fin.natAdd r) = m₂.val := by
+  have hdet
+      : ((GeneralLinearGroup.det m₂ : kˣ) : k)
+        = ((emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val.submatrix (Fin.natAdd r)
+          (Fin.natAdd r)).det := by
+    have hs
+        : (emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)).val.submatrix (Fin.natAdd r)
+            (Fin.natAdd r)
+          = m₂.val := by
       ext i j
       have hi : Fin.natAdd r i = (stdSum (rfl : r + t = r + t)) (Sum.inr i) := by ext; simp
       have hj : Fin.natAdd r j = (stdSum (rfl : r + t = r + t)) (Sum.inr j) := by ext; simp
@@ -125,15 +144,20 @@ theorem extTensor_apply_eq {r t : ℕ} {χ : kˣ →* ℂˣ} {V W : Type} [AddCo
     rw [hs]
     rfl
   have H := congrArg (fun F => F.1.1 (1 : GL (Fin (r + t)) k)) (hf _ hmem hll _ hdet)
-  let p : parab k (two (stdSum (rfl : r + t = r + t))) := ⟨leviEmb k (two (stdSum (rfl : r + t = r + t))) (leviTwo k (Fin r) (Fin t) (m₁, m₂)),
-    leviEmb_mem_parab k (two (stdSum (rfl : r + t = r + t))) _⟩
-  have H2 := parInd_law (two (stdSum (rfl : r + t = r + t)))
-    ((extTensor σ₁ σ₂).comp (leviTwo k (Fin r) (Fin t)).symm.toMonoidHom) f p 1
+  let p : parab k (two (stdSum (rfl : r + t = r + t))) := ⟨
+    leviEmb k (two (stdSum (rfl : r + t = r + t))) (leviTwo k (Fin r) (Fin t) (m₁, m₂)),
+    leviEmb_mem_parab k (two (stdSum (rfl : r + t = r + t))) _
+  ⟩
+  have H2 :=
+    parInd_law (two (stdSum (rfl : r + t = r + t)))
+      ((extTensor σ₁ σ₂).comp (leviTwo k (Fin r) (Fin t)).symm.toMonoidHom) f p 1
   have hδ : (deltaHalf k (Two (Fin r) (Fin t)) (leviTwo k (Fin r) (Fin t) (m₁, m₂)) : ℂ) = 1 := by
     rw [deltaHalf_two, isUnram_absPow k _ _ (valuation_det_of_mem_KO h₁),
       isUnram_absPow k _ _ (valuation_det_of_mem_KO h₂), mul_one, Units.val_one]
   rw [leviProj_leviEmb, hδ, one_smul] at H2
-  have E1 : f.1.1 ((p : GL (Fin (r + t)) k) * 1) = f.1.1 (1 * emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)) := by
+  have E1
+      : f.1.1 ((p : GL (Fin (r + t)) k) * 1)
+        = f.1.1 (1 * emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)) := by
     rw [mul_one, one_mul]; rfl
   rw [E1] at H2
   change f.1.1 (1 * emb₂ k (stdSum (rfl : r + t = r + t)) (m₁, m₂)) = (χ _ : ℂ) • f.1.1 1 at H
@@ -141,11 +165,13 @@ theorem extTensor_apply_eq {r t : ℕ} {χ : kˣ →* ℂˣ} {V W : Type} [AddCo
   rw [H2]
   simp
 
-theorem isSpherical_of_isParahoricVec : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (r t : ℕ) (χ : kˣ →* ℂˣ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (W : Type) [AddCommGroup W] [Module ℂ W] (σ₁ : Representation ℂ (GL (Fin r) k) V)
-    (σ₂ : Representation ℂ (GL (Fin t) k) W) (f : _), IsParahoricVec χ (prod₂ σ₁ σ₂) f →
-    f.1.1 1 ≠ 0 → IsSpherical σ₁ ∧ IsSpherical (twist σ₂ (detChar (Fin t) χ⁻¹)) := by
+theorem isSpherical_of_isParahoricVec
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (r t : ℕ) (χ : kˣ →* ℂˣ) (V : Type) [AddCommGroup V] [Module ℂ V] (W : Type)
+        [AddCommGroup W] [Module ℂ W] (σ₁ : Representation ℂ (GL (Fin r) k) V)
+        (σ₂ : Representation ℂ (GL (Fin t) k) W) (f : _),
+      IsParahoricVec χ (prod₂ σ₁ σ₂) f → f.1.1 1 ≠ 0
+        → IsSpherical σ₁ ∧ IsSpherical (twist σ₂ (detChar (Fin t) χ⁻¹)) := by
   intro k _ _ _ _ r t χ V _ _ W _ _ σ₁ σ₂ f hf h0
   constructor
   · obtain ⟨φ, hφ⟩ := exists_rid_ne_zero h0

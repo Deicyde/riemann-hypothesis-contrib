@@ -44,17 +44,17 @@ def BoxAll (Q C τ Y X : ℝ) (f : ℕ → ℂ) (M : ℕ) : Prop :=
 
 def primePairSetFirst (z : ℝ) : Finset ℕ := PPset 8 3 (Real.exp z)
 
-
 open Classical in
 def primeSetTwoBounds (z z' : ℝ) (q : ℕ) : Finset ℕ :=
-  (Icc 1 ⌊Real.exp z'⌋₊).filter fun d => d.Prime ∧ d % 16 = 7 ∧ oddM z q ∣ d + 1 ∧ Real.exp z' ^ (1 / 2 : ℝ) < (d : ℝ)
+  (Icc 1 ⌊Real.exp z'⌋₊).filter fun d =>
+    d.Prime ∧ d % 16 = 7 ∧ oddM z q ∣ d + 1 ∧ Real.exp z' ^ (1 / 2 : ℝ) < (d : ℝ)
 
 def GoodQ (N₀ : ℕ) (C τ Y X z : ℝ) (q : ℕ) : Prop :=
   ∀ ξ : DirichletCharacter ℂ N₀, BoxAll (N₀ * Real.exp z) C τ Y X (fun n => ξ n * J q n) (N₀ * q)
 
 def GoodD (N₀ : ℕ) (C τ Y X z z' : ℝ) (q d : ℕ) : Prop :=
-  ∀ ξ : DirichletCharacter ℂ N₀, ∀ a : ℕ, a ≤ 1 →
-    BoxAll (N₀ * Real.exp (z + z')) C τ Y X (fun n => ξ n * J q n ^ a * J d n) (N₀ * q * d)
+  ∀ ξ : DirichletCharacter ℂ N₀, ∀ a : ℕ,
+    a ≤ 1 → BoxAll (N₀ * Real.exp (z + z')) C τ Y X (fun n => ξ n * J q n ^ a * J d n) (N₀ * q * d)
 
 structure Rows (z z' : ℝ) (q d : ℕ) : Prop where
   q_prime : q.Prime
@@ -68,9 +68,9 @@ structure Rows (z z' : ℝ) (q d : ℕ) : Prop where
   q_lt_d : q < d
   d_class : ∀ p : ℕ, p.Prime → p ≠ 2 → ((p : ℝ) ≤ z ∨ p = q) → (d + 1) % p = 0
 
-
 open Classical in
-def G0 {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (y : ℝ) : ℂ := if χ = 1 then ((G1 y : ℝ) : ℂ) else Gchi χ y
+def G0 {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (y : ℝ) : ℂ :=
+  if χ = 1 then ((G1 y : ℝ) : ℂ) else Gchi χ y
 
 def NoExc (c : ℝ) {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) : Prop :=
   ∀ β : ℝ, 1 - c < β → β < 1 → DirichletCharacter.LFunction χ β ≠ 0

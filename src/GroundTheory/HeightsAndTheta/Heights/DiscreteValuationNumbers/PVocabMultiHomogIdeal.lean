@@ -13,15 +13,15 @@ open MvPolynomial
 
 universe u
 
-theorem VocabMultiHomogIdeal.proof (h1 : VocabMultiHomog.Statement.{u}) :
-    VocabMultiHomogIdeal.Statement.{u} := by
+theorem VocabMultiHomogIdeal.proof (h1 : VocabMultiHomog.Statement.{u})
+    : VocabMultiHomogIdeal.Statement.{u} := by
   intro R _ K _ _ ι _ P
   let := weightedGradedAlgebra R (blockWeight ι)
   constructor
   · rintro ⟨S, hS, rfl⟩
     have hhom : (Ideal.span S).IsHomogeneous (weightedHomogeneousSubmodule R (blockWeight ι)) := by
-      refine Ideal.homogeneous_span (weightedHomogeneousSubmodule R (blockWeight ι)) S
-        fun x hx => ?_
+      refine Ideal.homogeneous_span (weightedHomogeneousSubmodule R (blockWeight ι)) S fun x hx =>
+        ?_
       obtain ⟨a, ha⟩ := hS x hx
       exact ⟨a, (mem_weightedHomogeneousSubmodule _ _ _ _).2 ((h1 R K ι x a).1 ha)⟩
     intro f hf b

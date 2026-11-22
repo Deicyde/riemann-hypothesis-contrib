@@ -26,12 +26,10 @@ theorem t_BoxSumLattice : BoxSumLattice := by
   have hC1 : 0 < max |C₀| 1 := lt_of_lt_of_le one_pos (le_max_right _ _)
   have hwl : ∀ (w : InfinitePlace E) (l : E), 0 ≤ w l := by
     intro w l
-    first
-    | exact w.nonneg l
-    | exact apply_nonneg w l
-    | exact w.1.nonneg l
-  have hfac : ∀ (z : InfinitePlace E → ℝ) (l : E) (w : InfinitePlace E), 0 ≤ z w →
-      0 ≤ min 1 ((z w / w l) ^ K) := fun z l w hz =>
+    first | exact w.nonneg l | exact apply_nonneg w l | exact w.1.nonneg l
+  have hfac
+      : ∀ (z : InfinitePlace E → ℝ) (l : E) (w : InfinitePlace E),
+        0 ≤ z w → 0 ≤ min 1 ((z w / w l) ^ K) := fun z l w hz =>
     le_min zero_le_one (pow_nonneg (div_nonneg hz (hwl w l)) K)
   have hnonneg : ∀ l, 0 ≤ prof x K l := by
     intro l
@@ -41,8 +39,10 @@ theorem t_BoxSumLattice : BoxSumLattice := by
     have h1 : 0 < a ^ ((K : ℝ) - 5 / 2) := Real.rpow_pos_of_pos hapos _
     have h2 : 0 < Θ ^ (-((K : ℝ) - 5 / 2)) := Real.rpow_pos_of_pos hΘpos _
     exact mul_pos h1 h2
-  have hep : 0 ≤ (max |C₀| 1 * a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) ^
-      Fintype.card (InfinitePlace E) := by
+  have hep
+      : 0
+        ≤ (max |C₀| 1 * a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))
+          ^ Fintype.card (InfinitePlace E) := by
     rw [mul_assoc]
     exact pow_nonneg (mul_pos hC1 hZpos).le _
   unfold TA.LatSum
@@ -85,45 +85,40 @@ theorem t_BoxSumLattice : BoxSumLattice := by
     rw [hprody, hT, mul_comm, ← div_div, div_self hNpos.ne', one_div, ← inv_pow, inv_div]
   have hS' : ∀ l ∈ S, l ∈ aa ∧ l ≠ 0 := fun l hl => ⟨hL l (hS l hl).1, (hS l hl).2⟩
   have h2 : 2 < Θ / a := by
-    first
-    | (rw [lt_div_iff₀ hapos]; linarith)
-    | (rw [lt_div_iff hapos]; linarith)
+    first | (rw [lt_div_iff₀ hapos]; linarith) | (rw [lt_div_iff hapos]; linarith)
   have h3 : (3 : ℝ) ≤ K := by exact_mod_cast hK
   have hB := hC₀ E aa haa y (Θ / a) K hypos h2 h3 heq S hS'
   have hZ : (Θ / a) ^ (-((K : ℝ) - 5 / 2)) = a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)) := by
     rw [Real.div_rpow hΘpos.le hapos.le, Real.rpow_neg hapos.le, div_inv_eq_mul, mul_comm]
-  calc ∑ l ∈ S, prof x K l
-      ≤ ∑ l ∈ S, ∏ w, min 1 ((y w / w l) ^ (K : ℝ)) := by
-        apply Finset.sum_le_sum
-        intro l _
-        simp only [prof]
-        apply Finset.prod_le_prod₀ (fun w _ => hfac x l w (hx w))
-        intro w _
-        rw [Real.rpow_natCast]
-        apply min_le_min_left
-        have hd : x w / w l ≤ y w / w l := by
-          rw [div_eq_mul_inv, div_eq_mul_inv]
-          exact mul_le_mul_of_nonneg_right (hxy w) (inv_nonneg.mpr (hwl w l))
-        have hd0 : 0 ≤ x w / w l := div_nonneg (hx w) (hwl w l)
-        first
-        | exact pow_le_pow_left hd0 hd K
-        | exact pow_le_pow_left₀ hd0 hd K
+  calc
+    ∑ l ∈ S, prof x K l ≤ ∑ l ∈ S, ∏ w, min 1 ((y w / w l) ^ (K : ℝ)) := by
+      apply Finset.sum_le_sum
+      intro l _
+      simp only [prof]
+      apply Finset.prod_le_prod₀ (fun w _ => hfac x l w (hx w))
+      intro w _
+      rw [Real.rpow_natCast]
+      apply min_le_min_left
+      have hd : x w / w l ≤ y w / w l := by
+        rw [div_eq_mul_inv, div_eq_mul_inv]
+        exact mul_le_mul_of_nonneg_right (hxy w) (inv_nonneg.mpr (hwl w l))
+      have hd0 : 0 ≤ x w / w l := div_nonneg (hx w) (hwl w l)
+      first | exact pow_le_pow_left hd0 hd K | exact pow_le_pow_left₀ hd0 hd K
     _ ≤ (C₀ * (Θ / a) ^ (-((K : ℝ) - 5 / 2))) ^ n := hB
     _ ≤ (max |C₀| 1 * a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) ^ n := by
-        rw [hZ, mul_assoc (max |C₀| 1)]
-        have hle : |C₀| * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) ≤
-            max |C₀| 1 * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) :=
-          mul_le_mul_of_nonneg_right (le_max_left _ _) hZpos.le
-        have h0 : 0 ≤ |C₀| * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) :=
-          mul_nonneg (abs_nonneg _) hZpos.le
-        calc (C₀ * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n
-            ≤ |(C₀ * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n| := le_abs_self _
-          _ = (|C₀| * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n := by
-              rw [abs_pow, abs_mul, abs_of_pos hZpos]
-          _ ≤ _ := by
-              first
-              | exact pow_le_pow_left h0 hle n
-              | exact pow_le_pow_left₀ h0 hle n
+      rw [hZ, mul_assoc (max |C₀| 1)]
+      have hle
+          : |C₀| * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))
+            ≤ max |C₀| 1 * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) :=
+        mul_le_mul_of_nonneg_right (le_max_left _ _) hZpos.le
+      have h0 : 0 ≤ |C₀| * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2))) :=
+        mul_nonneg (abs_nonneg _) hZpos.le
+      calc
+        (C₀ * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n
+          ≤ |(C₀ * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n| := le_abs_self _
+        _ = (|C₀| * (a ^ ((K : ℝ) - 5 / 2) * Θ ^ (-((K : ℝ) - 5 / 2)))) ^ n := by
+          rw [abs_pow, abs_mul, abs_of_pos hZpos]
+        _ ≤ _ := by first | exact pow_le_pow_left h0 hle n | exact pow_le_pow_left₀ h0 hle n
 
 theorem t_LatticeSumsJoint : LatticeSumsJoint := by
   intro hBS
@@ -133,11 +128,14 @@ theorem t_LatticeSumsJoint : LatticeSumsJoint := by
   have hcard : Fintype.card (InfinitePlace E) = D.f := by
     rw [← Fintype.card_congr e, Fintype.card_fin]
   have hΘ0 : 0 < Θ := by linarith
-  have key : ∀ (aa : FractionalIdeal (𝓞 E)⁰ E) (large₂ : AddSubgroup E) (z : Fin D.f → ℝ) (c : ℝ),
-      aa ≠ 0 → (∀ l ∈ large₂, l ∈ aa) → (∀ v, 0 ≤ z v) → 0 ≤ c → c ≤ a →
-      ∏ v, z v ≤ (c / Θ) ^ D.f * √(FractionalIdeal.absNorm aa : ℝ) →
-      ∀ L : Finset E, (∀ l ∈ L, l ∈ large₂ ∧ l ≠ 0) →
-        ∑ l ∈ L, D.maj z l ≤ (C * a ^ ((D.K : ℝ) - 5 / 2) * Θ ^ (-((D.K : ℝ) - 5 / 2))) ^ D.f := by
+  have key
+      : ∀ (aa : FractionalIdeal (𝓞 E)⁰ E) (large₂ : AddSubgroup E) (z : Fin D.f → ℝ) (c : ℝ),
+        aa ≠ 0 → (∀ l ∈ large₂, l ∈ aa) → (∀ v, 0 ≤ z v) → 0 ≤ c → c ≤ a
+          → ∏ v, z v ≤ (c / Θ) ^ D.f * √(FractionalIdeal.absNorm aa : ℝ)
+          → ∀ L : Finset E,
+            (∀ l ∈ L, l ∈ large₂ ∧ l ≠ 0)
+              → ∑ l ∈ L, D.maj z l
+                ≤ (C * a ^ ((D.K : ℝ) - 5 / 2) * Θ ^ (-((D.K : ℝ) - 5 / 2))) ^ D.f := by
     intro aa large₂ z c haa hLg hz hc hca hprod L hL
     have hre : ∏ w, z (e.symm w) = ∏ v, z v := Fintype.prod_equiv e.symm _ _ (fun w => rfl)
     have hcd : c / Θ ≤ a / Θ := by
@@ -147,16 +145,19 @@ theorem t_LatticeSumsJoint : LatticeSumsJoint := by
       first
       | exact pow_le_pow_left (div_nonneg hc hΘ0.le) hcd _
       | exact pow_le_pow_left₀ (div_nonneg hc hΘ0.le) hcd _
-    have hprod' : ∏ w, z (e.symm w) ≤
-        (a / Θ) ^ Fintype.card (InfinitePlace E) * √(FractionalIdeal.absNorm aa : ℝ) := by
+    have hprod'
+        : ∏ w, z (e.symm w)
+          ≤ (a / Θ) ^ Fintype.card (InfinitePlace E) * √(FractionalIdeal.absNorm aa : ℝ) := by
       rw [hre, hcard]
       exact hprod.trans (mul_le_mul_of_nonneg_right hle (Real.sqrt_nonneg _))
-    have hLS0 := hC E aa large₂ (fun w => z (e.symm w)) D.K Θ a haa hLg (fun w => hz _) hK ha hΘ hprod'
+    have hLS0 :=
+      hC E aa large₂ (fun w => z (e.symm w)) D.K Θ a haa hLg (fun w => hz _) hK ha hΘ hprod'
     unfold TA.LatSum at hLS0
     have hLS := hLS0.2 L hL
     rw [hcard] at hLS
-    calc ∑ l ∈ L, D.maj z l = ∑ l ∈ L, prof (fun w => z (e.symm w)) D.K l :=
-          Finset.sum_congr rfl (fun l _ => t_MajIsProf E W D e hP z l)
+    calc
+      ∑ l ∈ L, D.maj z l = ∑ l ∈ L, prof (fun w => z (e.symm w)) D.K l :=
+        Finset.sum_congr rfl (fun l _ => t_MajIsProf E W D e hP z l)
       _ ≤ _ := hLS
   unfold IdealSizes at hI
   unfold TB.Data.LatticeSums
@@ -272,7 +273,8 @@ theorem mext {y z : euclidean.mixedSpace E} (h : ∀ w, y.snd w = z.snd w) : y =
   | (rcases y with ⟨y⟩; rcases z with ⟨z⟩; exact congrArg (WithLp.toLp 2) (Prod.ext h1 h2))
 
 def phiL : CV E ≃ₗ[ℝ] euclidean.mixedSpace E where
-  toFun x := WithLp.toLp 2 (0, WithLp.toLp 2 (fun w : {w : InfinitePlace E // w.IsComplex} => x w.1))
+  toFun x :=
+    WithLp.toLp 2 (0, WithLp.toLp 2 (fun w : {w : InfinitePlace E // w.IsComplex} => x w.1))
   invFun y := WithLp.toLp 2 (fun w : InfinitePlace E => y.snd ⟨w, isC E w⟩)
   map_add' x y := mext fun w => by simp
   map_smul' c x := mext fun w => by simp
@@ -298,7 +300,8 @@ theorem ee_mp : MeasurePreserving (ee E) := by
   first
   | exact (euclidean.volumePreserving_toMixed E).comp (phi E).measurePreserving
   | exact euclidean.volumePreserving_toMixed.comp (phi E).measurePreserving
-  | exact (euclidean.volumePreserving_toMixed E).comp (LinearIsometryEquiv.measurePreserving (phi E))
+  | exact (euclidean.volumePreserving_toMixed E).comp
+      (LinearIsometryEquiv.measurePreserving (phi E))
 
 theorem ee_cemb (t : E) : ee E (cemb E t) = mixedEmbedding E t := by
   ext w
@@ -309,8 +312,8 @@ theorem ee_semb (c : ℝ) (t : E) : ee E (semb E c t) = c • mixedEmbedding E t
   have h : semb E c t = c • cemb E t := rfl
   rw [h, map_smul, ee_cemb]
 
-theorem eLat_eq (L : Submodule ℤ E) (c : ℝ) :
-    eLat E L c = ZLattice.comap ℝ (S6.frameLat E L c) (ee E).toLinearMap := by
+theorem eLat_eq (L : Submodule ℤ E) (c : ℝ)
+    : eLat E L c = ZLattice.comap ℝ (S6.frameLat E L c) (ee E).toLinearMap := by
   ext v
   simp only [eLat, S6.frameLat, ZLattice.comap, Submodule.mem_map, Submodule.mem_comap]
   constructor

@@ -9,12 +9,12 @@ open scoped NNReal ENNReal
 
 namespace GlobalTheory.CompanionTheory.TopGroup
 
-theorem homeomorph_prod_of_closed_complements :
-    ∀ (Q : Type) [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [LocallyCompactSpace Q]
-      [T2Space Q] [SecondCountableTopology Q] (N M : Subgroup Q),
-      IsClosed (N : Set Q) → IsClosed (M : Set Q) → (∀ q, ∃ n ∈ N, ∃ m ∈ M, q = n * m) →
-      (∀ x, x ∈ N → x ∈ M → x = 1) →
-      ∃ Φ : (N × M) ≃ₜ Q, ∀ p, Φ p = (p.1 : Q) * (p.2 : Q) := by
+theorem homeomorph_prod_of_closed_complements
+    : ∀ (Q : Type) [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [LocallyCompactSpace Q]
+        [T2Space Q] [SecondCountableTopology Q] (N M : Subgroup Q),
+      IsClosed (N : Set Q) → IsClosed (M : Set Q) → (∀ q, ∃ n ∈ N, ∃ m ∈ M, q = n * m)
+        → (∀ x, x ∈ N → x ∈ M → x = 1)
+        → ∃ Φ : (N × M) ≃ₜ Q, ∀ p, Φ p = (p.1 : Q) * (p.2 : Q) := by
   intro Q _ _ _ _ _ _ N M hN hM hprod hint
   haveI : LocallyCompactSpace N := hN.isClosedEmbedding_subtypeVal.locallyCompactSpace
   haveI : LocallyCompactSpace M := hM.isClosedEmbedding_subtypeVal.locallyCompactSpace
@@ -75,7 +75,6 @@ theorem homeomorph_prod_of_closed_complements :
   have hsurj : Function.Surjective f := fun q => by
     obtain ⟨n, hn, m, hm, rfl⟩ := hprod q
     exact ⟨(⟨n, hn⟩, ⟨m, hm⟩), rfl⟩
-  exact ⟨(Equiv.ofBijective f ⟨hinj, hsurj⟩).toHomeomorphOfContinuousOpen hcont hopen,
-    fun _ => rfl⟩
+  exact ⟨(Equiv.ofBijective f ⟨hinj, hsurj⟩).toHomeomorphOfContinuousOpen hcont hopen, fun _ => rfl⟩
 
 end GlobalTheory.CompanionTheory.TopGroup

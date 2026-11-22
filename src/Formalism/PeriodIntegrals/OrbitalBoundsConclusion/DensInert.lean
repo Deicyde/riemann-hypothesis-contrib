@@ -12,5 +12,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InertDensity.Iso
 @[expose] public section
 
 theorem density_exact_inert : Formalism.L2.SG.DensExact.DensExactInert :=
-  DensInertW.densExactInert_of DensInertW.hermitianDiagonalization DensInertW.repCountCongruenceInvariant
-    DensInertW.anisotropic_valuation_peel DensInertW.isotropic_valuation_peel DensInertW.quadraticDifferenceArith
+  DensInertW.densExactInert_of DensInertW.hermitianDiagonalization
+    DensInertW.repCountCongruenceInvariant DensInertW.anisotropic_valuation_peel
+    DensInertW.isotropic_valuation_peel DensInertW.quadraticDifferenceArith

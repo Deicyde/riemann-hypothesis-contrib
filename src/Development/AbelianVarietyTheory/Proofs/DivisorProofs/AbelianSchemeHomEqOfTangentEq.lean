@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MapEqZeroOfC
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory MonoidalCategory CartesianMonoidalCategory MonObj
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
@@ -16,13 +18,19 @@ namespace GlobalTheory.LieFaithful
 
 open IsLocalRing
 
-theorem exists_lift_stalk {X : Scheme.{0}} (x : X) {D : CommRingCat.{0}} [IsLocalRing D] (f : Spec D ⟶ X)
-    (h : f (closedPoint D) = x) : ∃ ρ : X.presheaf.stalk x ⟶ D, Spec.map ρ ≫ X.fromSpecStalk x = f := by
+theorem exists_lift_stalk
+    {X : Scheme.{0}} (x : X)
+    {D : CommRingCat.{0}} [IsLocalRing D]
+    (f : Spec D ⟶ X) (h : f (closedPoint D) = x)
+    : ∃ ρ : X.presheaf.stalk x ⟶ D, Spec.map ρ ≫ X.fromSpecStalk x = f := by
   subst h
   exact ⟨Scheme.stalkClosedPointTo f, Scheme.Spec_stalkClosedPointTo_fromSpecStalk f⟩
 
-theorem stalk_hom_ext {X : Scheme.{0}} (x : X) {D : CommRingCat.{0}} (ρ ρ' : X.presheaf.stalk x ⟶ D)
-    (h : Spec.map ρ ≫ X.fromSpecStalk x = Spec.map ρ' ≫ X.fromSpecStalk x) : ρ = ρ' :=
+theorem stalk_hom_ext
+    {X : Scheme.{0}} (x : X)
+    {D : CommRingCat.{0}} (ρ ρ' : X.presheaf.stalk x ⟶ D)
+    (h : Spec.map ρ ≫ X.fromSpecStalk x = Spec.map ρ' ≫ X.fromSpecStalk x)
+    : ρ = ρ' :=
   Spec.map_injective ((cancel_mono _).1 h)
 
 variable {k : Type} [Field k]
@@ -66,7 +74,8 @@ def germEv : Germ G →ₐ[k] k where
   toRingHom := (germEv0 G).hom
   commutes' a := congrArg (fun φ => φ.hom a) (germConst_germEv0 G)
 
-def tanPt (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k) : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ G :=
+def tanPt (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k)
+    : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ G :=
   Over.homMk (Spec.map (CommRingCat.ofHom (tanHom (germEv G) lam).toRingHom) ≫ germMap G) (by
     dsimp
     rw [Category.assoc, ← spec_germConst, Category.comp_id, ← Spec.map_comp]
@@ -74,16 +83,19 @@ def tanPt (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k) : overAt (𝟙 
     ext a : 2
     exact (tanHom (germEv G) lam).commutes a)
 
-theorem tanPt_left (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k) : (tanPt G lam).left =
-    Spec.map (CommRingCat.ofHom (tanHom (germEv G) lam).toRingHom) ≫ germMap G := rfl
+theorem tanPt_left (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k)
+    : (tanPt G lam).left
+      = Spec.map (CommRingCat.ofHom (tanHom (germEv G) lam).toRingHom) ≫ germMap G :=
+  rfl
 
-theorem one_left_dual : (1 : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ G).left =
-    Spec.map (germEv0 G ≫ CommRingCat.ofHom (algebraMap k (DualNumber k))) ≫ germMap G := by
+theorem one_left_dual
+    : (1 : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ G).left
+      = Spec.map (germEv0 G ≫ CommRingCat.ofHom (algebraMap k (DualNumber k))) ≫ germMap G := by
   rw [one_left, Spec.map_comp, Category.assoc, spec_germEv0]
   simp
 
-theorem smT_zero_tanPt (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k) :
-    smT (𝟙 (Sp k)) 0 (tanPt G lam) = 1 := by
+theorem smT_zero_tanPt (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k)
+    : smT (𝟙 (Sp k)) 0 (tanPt G lam) = 1 := by
   apply Over.OverMorphism.ext
   rw [smT_left, tanPt_left, one_left_dual, ← Category.assoc, ← Spec.map_comp]
   congr 2
@@ -95,8 +107,8 @@ theorem smT_zero_tanPt (lam : (RingHom.ker (germEv G)).Cotangent →ₗ[k] k) :
 
 end One
 
-theorem exists_germHom {G H : Over (Sp k)} [GrpObj G] [GrpObj H] (g : G ⟶ H) (hg : η[G] ≫ g = η[H]) :
-    ∃ ψ : Germ H ⟶ Germ G, Spec.map ψ ≫ germMap H = germMap G ≫ g.left := by
+theorem exists_germHom {G H : Over (Sp k)} [GrpObj G] [GrpObj H] (g : G ⟶ H) (hg : η[G] ≫ g = η[H])
+    : ∃ ψ : Germ H ⟶ Germ G, Spec.map ψ ≫ germMap H = germMap G ≫ g.left := by
   refine exists_lift_stalk _ _ ?_
   have h : unitSec G ≫ g.left = unitSec H := congrArg (fun φ => φ.left) hg
   have h1 : germMap G (closedPoint (Germ G)) = origin G := Scheme.fromSpecStalk_closedPoint
@@ -106,17 +118,21 @@ theorem exists_germHom {G H : Over (Sp k)} [GrpObj G] [GrpObj H] (g : G ⟶ H) (
 
 attribute [local instance] germAlg
 
-theorem germ_doubling {G : Over (Sp k)} [GrpObj G] (φ : Germ G ⟶ Germ G)
-    (hφ : Spec.map φ ≫ germMap G = germMap G ≫ (𝟙 G * 𝟙 G : G ⟶ G).left) (x : Germ G)
-    (hx : x ∈ maximalIdeal (Germ G)) : φ.hom x - 2 * x ∈ maximalIdeal (Germ G) ^ 2 := by
+theorem germ_doubling
+    {G : Over (Sp k)} [GrpObj G]
+    (φ : Germ G ⟶ Germ G) (hφ : Spec.map φ ≫ germMap G = germMap G ≫ (𝟙 G * 𝟙 G : G ⟶ G).left)
+    (x : Germ G) (hx : x ∈ maximalIdeal (Germ G))
+    : φ.hom x - 2 * x ∈ maximalIdeal (Germ G) ^ 2 := by
   rw [← ker_eq_maximalIdeal_of_algHom (germEv G)] at hx ⊢
   refine mem_sq_of_tanHom_eq_zero _ _ fun lam => ?_
   have h1 : tanPt G lam ≫ (𝟙 G * 𝟙 G : G ⟶ G) = smT (𝟙 (Sp k)) 2 (tanPt G lam) := by
-    rw [MonObj.comp_mul, Category.comp_id, ← one_add_one_eq_two, smT_add _ _ (smT_zero_tanPt G lam), smT_unit]
+    rw [MonObj.comp_mul, Category.comp_id, ← one_add_one_eq_two, smT_add _ _ (smT_zero_tanPt G lam),
+      smT_unit]
   have h2 := congrArg (fun φ => φ.left) h1
   simp only [Over.comp_left] at h2
-  rw [smT_left, tanPt_left, Category.assoc, ← hφ, ← Category.assoc, ← Category.assoc, ← Spec.map_comp,
-    ← Spec.map_comp] at h2
+  rw [smT_left, tanPt_left, Category.assoc, ← hφ, ← Category.assoc, ← Category.assoc,
+      ← Spec.map_comp, ← Spec.map_comp]
+    at h2
   have h3 := congrArg (fun ρ => ρ.hom x) (stalk_hom_ext _ _ _ h2)
   change tanHom (germEv G) lam (φ.hom x) = epsMul 2 (tanHom (germEv G) lam x) at h3
   have h0 : germEv G x = 0 := hx
@@ -125,10 +141,12 @@ theorem germ_doubling {G : Over (Sp k)} [GrpObj G] (φ : Germ G ⟶ Germ G)
   · simp [epsMul, tanHom_fst, h0]
   · simp [epsMul, two_mul]
 
-theorem germ_sq_of_tan {G H : Over (Sp k)} [GrpObj G] [GrpObj H] (g : G ⟶ H) (ψ : Germ H ⟶ Germ G)
-    (hψ : Spec.map ψ ≫ germMap H = germMap G ≫ g.left)
-    (hg : ∀ v : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ G, smT (𝟙 (Sp k)) 0 v = 1 → v ≫ g = 1) (x : Germ H)
-    (hx : x ∈ maximalIdeal (Germ H)) : ψ.hom x ∈ maximalIdeal (Germ G) ^ 2 := by
+theorem germ_sq_of_tan
+    {G H : Over (Sp k)} [GrpObj G] [GrpObj H]
+    (g : G ⟶ H) (ψ : Germ H ⟶ Germ G) (hψ : Spec.map ψ ≫ germMap H = germMap G ≫ g.left)
+    (hg : ∀ v : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ G, smT (𝟙 (Sp k)) 0 v = 1 → v ≫ g = 1)
+    (x : Germ H) (hx : x ∈ maximalIdeal (Germ H))
+    : ψ.hom x ∈ maximalIdeal (Germ G) ^ 2 := by
   rw [← ker_eq_maximalIdeal_of_algHom (germEv H)] at hx
   rw [← ker_eq_maximalIdeal_of_algHom (germEv G)]
   refine mem_sq_of_tanHom_eq_zero _ _ fun lam => ?_
@@ -140,10 +158,11 @@ theorem germ_sq_of_tan {G H : Over (Sp k)} [GrpObj G] [GrpObj H] (g : G ⟶ H) (
   have h0 : germEv H x = 0 := hx
   rw [h3, h0, map_zero]
 
-theorem germMap_comp_eq_one {G H : Over (Sp k)} [GrpObj G] [GrpObj H] (g : G ⟶ H) (ψ : Germ H ⟶ Germ G)
-    (hψ : Spec.map ψ ≫ germMap H = germMap G ≫ g.left)
-    (h0 : ∀ x ∈ maximalIdeal (Germ H), ψ.hom x = 0) :
-    germMap G ≫ g.left = germMap G ≫ (1 : G ⟶ H).left := by
+theorem germMap_comp_eq_one
+    {G H : Over (Sp k)} [GrpObj G] [GrpObj H]
+    (g : G ⟶ H) (ψ : Germ H ⟶ Germ G) (hψ : Spec.map ψ ≫ germMap H = germMap G ≫ g.left)
+    (h0 : ∀ x ∈ maximalIdeal (Germ H), ψ.hom x = 0)
+    : germMap G ≫ g.left = germMap G ≫ (1 : G ⟶ H).left := by
   have hc : germConst H ≫ ψ = germConst G := by
     apply Spec.map_injective
     rw [Spec.map_comp, spec_germConst, spec_germConst, ← Category.assoc, hψ, Category.assoc, Over.w]
@@ -156,9 +175,16 @@ theorem germMap_comp_eq_one {G H : Over (Sp k)} [GrpObj G] [GrpObj H] (g : G ⟶
     rw [map_sub, sub_eq_zero] at h2
     rw [h2]
     exact congrArg (fun ρ => ρ.hom (germEv H x)) hc
-  rw [← hψ, he, Spec.map_comp, Category.assoc, spec_germEv0, spec_germConst, one_left, Category.assoc]
+  rw [← hψ, he, Spec.map_comp, Category.assoc, spec_germEv0, spec_germConst, one_left,
+    Category.assoc]
 
-theorem hom_eq_of_tangent_eq : ∀ (k : Type) [Field k] [CharZero k] (A B : Over (Sp k)) [GrpObj A] [IsCommMonObj A] [GrpObj B] [IsCommMonObj B], IsAbelianScheme A → IsAbelianScheme B → ∀ (f f' : A ⟶ B) [IsMonHom f] [IsMonHom f'], (∀ v : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ A, smT (𝟙 (Sp k)) 0 v = 1 → v ≫ f = v ≫ f') → f = f' := by
+theorem hom_eq_of_tangent_eq
+    : ∀ (k : Type) [Field k] [CharZero k] (A B : Over (Sp k)) [GrpObj A] [IsCommMonObj A] [GrpObj B]
+        [IsCommMonObj B],
+      IsAbelianScheme A → IsAbelianScheme B
+        → ∀ (f f' : A ⟶ B) [IsMonHom f] [IsMonHom f'],
+          (∀ v : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ A, smT (𝟙 (Sp k)) 0 v = 1 → v ≫ f = v ≫ f')
+            → f = f' := by
   intro k _ _ A B _ _ _ _ hA hB f f' _ _ h
   have hint := GlobalTheory.isIntegral_left_of_isAbelianScheme_field A hA
   have := hA.proper
@@ -167,8 +193,11 @@ theorem hom_eq_of_tangent_eq : ∀ (k : Type) [Field k] [CharZero k] (A B : Over
   let g : A ⟶ B := f * f'⁻¹
   have hu : IsMonHom g := by
     simp only [g]
-    rw [Hom.mul_def, Hom.inv_def]; infer_instance
-  have hg : ∀ v : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ A, smT (𝟙 (Sp k)) 0 v = 1 → v ≫ g = 1 := fun v hv => by
+    rw [Hom.mul_def, Hom.inv_def]
+    infer_instance
+  have hg
+      : ∀ v : overAt (𝟙 (Sp k)) (DualNumber k) ⟶ A,
+        smT (𝟙 (Sp k)) 0 v = 1 → v ≫ g = 1 := fun v hv => by
     simp only [g]
     rw [MonObj.comp_mul, GrpObj.comp_inv, h v hv, mul_inv_cancel]
   have h2 : ∀ (G : Over (Sp k)) [GrpObj G], η[G] ≫ (𝟙 G * 𝟙 G : G ⟶ G) = η[G] := fun G _ => by
@@ -185,17 +214,20 @@ theorem hom_eq_of_tangent_eq : ∀ (k : Type) [Field k] [CharZero k] (A B : Over
     apply stalk_hom_ext
     rw [Spec.map_comp, Spec.map_comp, Category.assoc, Category.assoc, hφB, hψ, ← Category.assoc, hψ,
       ← Category.assoc, hφA, Category.assoc, Category.assoc, hcomm']
-  have h0 := map_eq_zero_of_commute_doubling (k := k) (maximalIdeal (Germ B)) φA.hom φB.hom ψ.hom
-    (fun x => congrArg (fun ρ => ρ.hom x) hc) (germ_sq_of_tan g ψ hψ hg) (germ_doubling φA hφA)
-    (germ_doubling φB hφB)
+  have h0 :=
+    map_eq_zero_of_commute_doubling (k := k) (maximalIdeal (Germ B)) φA.hom φB.hom ψ.hom
+      (fun x => congrArg (fun ρ => ρ.hom x) hc)
+      (germ_sq_of_tan g ψ hψ hg) (germ_doubling φA hφA) (germ_doubling φB hφB)
   have h3 := germMap_comp_eq_one g ψ hψ h0
-  have : IsDominant (germMap A) := ⟨by
-    refine dense_iff_closure_eq.2 (top_unique ((genericPoint_spec A.left).def.ge.trans
-      (closure_mono (Set.singleton_subset_iff.2 ?_))))
-    rw [Scheme.range_fromSpecStalk]
-    exact genericPoint_specializes _⟩
-  have h4 : g = 1 := Over.OverMorphism.ext
-    (ext_of_isDominant_of_isSeparated B.hom ((Over.w _).trans (Over.w _).symm) (germMap A) h3)
+  have : IsDominant (germMap A) :=
+    ⟨by
+      refine dense_iff_closure_eq.2 (top_unique ((genericPoint_spec A.left).def.ge.trans
+        (closure_mono (Set.singleton_subset_iff.2 ?_))))
+      rw [Scheme.range_fromSpecStalk]
+      exact genericPoint_specializes _⟩
+  have h4 : g = 1 :=
+    Over.OverMorphism.ext (ext_of_isDominant_of_isSeparated B.hom ((Over.w _).trans (Over.w _).symm)
+      (germMap A) h3)
   exact mul_inv_eq_one.1 h4
 
 end GlobalTheory.LieFaithful

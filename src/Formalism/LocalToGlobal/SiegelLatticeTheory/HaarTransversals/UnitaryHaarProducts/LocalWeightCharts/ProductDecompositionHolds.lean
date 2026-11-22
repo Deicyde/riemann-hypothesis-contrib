@@ -48,10 +48,12 @@ lemma mulP_meas : Measurable (mulP : Mt k r × Mt k r → Mt k r) := by
     exact continuous_finsetSum _ fun l _ => by fun_prop
   exact hc.measurable
 
-theorem s_closed (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z) :
-    IsClosed (Sset k r z : Set (Mx k r)) := by
-  have hE : IsClosedEmbedding (Grp.val : Grp (UH (Hpk k r) : Set (Mx k r)) uh_clsub → Mx k r) := Grp.emb
-  let A : Set (Grp (UH (Hpk k r) : Set (Mx k r)) uh_clsub) := Grp.val ⁻¹' (UWset k r z : Set (Mx k r))
+theorem s_closed (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+    : IsClosed (Sset k r z : Set (Mx k r)) := by
+  have hE : IsClosedEmbedding (Grp.val : Grp (UH (Hpk k r) : Set (Mx k r)) uh_clsub → Mx k r) :=
+    Grp.emb
+  let A : Set (Grp (UH (Hpk k r) : Set (Mx k r)) uh_clsub) :=
+    Grp.val ⁻¹' (UWset k r z : Set (Mx k r))
   let B : Set (Grp (UH (Hpk k r) : Set (Mx k r)) uh_clsub) := Grp.val ⁻¹' (Nset k r : Set (Mx k r))
   have hA : IsCompact A := hE.isCompact_preimage (compactW z hz hT)
   have hB : IsClosed B := n_closed.preimage hE.continuous
@@ -66,17 +68,25 @@ theorem s_closed (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < T
   rw [← himg]
   exact hE.isClosedMap _ hAB
 
-theorem s_clsub (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
-    (hconj : ∀ h ∈ UWset k r z, ∀ m ∈ Nset k r, h⁻¹ * m * h ∈ Nset k r) :
-    ClSub (Sset k r z : Set (Mx k r)) := by
+theorem s_clsub
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+    (hconj : ∀ h ∈ UWset k r z, ∀ m ∈ Nset k r, h⁻¹ * m * h ∈ Nset k r)
+    : ClSub (Sset k r z : Set (Mx k r)) := by
   have hW := uw_clsub (k := k) (r := r) z
   have hN := n_clsub (k := k) (r := r)
   refine ⟨⟨1, hW.one_mem, 1, hN.one_mem, (Matrix.mul_one 1).symm⟩, ?_, ?_, ?_, s_closed z hz hT⟩
   · rintro _ ⟨h, hh, m, hm, rfl⟩ _ ⟨h', hh', m', hm', rfl⟩
-    refine ⟨h * h', hW.mul_mem _ hh _ hh', h'⁻¹ * m * h' * m', hN.mul_mem _ (hconj h' hh' m hm) _ hm', ?_⟩
+    refine ⟨
+      h * h',
+      hW.mul_mem _ hh _ hh',
+      h'⁻¹ * m * h' * m',
+      hN.mul_mem _ (hconj h' hh' m hm) _ hm',
+      ?_
+    ⟩
     have e : h' * h'⁻¹ = 1 := Matrix.mul_nonsing_inv h' (hW.unit h' hh')
-    calc h * m * (h' * m') = h * (h' * h'⁻¹) * m * h' * m' := by
-          rw [e]; simp only [Matrix.mul_assoc, Matrix.mul_one]
+    calc
+      h * m * (h' * m')
+        = h * (h' * h'⁻¹) * m * h' * m' := by rw [e]; simp only [Matrix.mul_assoc, Matrix.mul_one]
       _ = h * h' * (h'⁻¹ * m * h' * m') := by simp only [Matrix.mul_assoc]
   · rintro _ ⟨h, hh, m, hm, rfl⟩
     have hi := hW.inv_mem h hh
@@ -85,31 +95,35 @@ theorem s_clsub (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz
     · have := hconj h⁻¹ hi m⁻¹ (hN.inv_mem m hm)
       rwa [Matrix.nonsing_inv_nonsing_inv h hu] at this
     · rw [Matrix.mul_inv_rev]
-      calc m⁻¹ * h⁻¹ = (h⁻¹ * h) * m⁻¹ * h⁻¹ := by rw [Matrix.nonsing_inv_mul h hu, Matrix.one_mul]
+      calc
+        m⁻¹ * h⁻¹
+          = (h⁻¹ * h) * m⁻¹ * h⁻¹ := by rw [Matrix.nonsing_inv_mul h hu, Matrix.one_mul]
         _ = h⁻¹ * (h * m⁻¹ * h⁻¹) := by simp only [Matrix.mul_assoc]
   · rintro _ ⟨h, hh, m, hm, rfl⟩
     rw [Matrix.det_mul]
     exact (hW.unit h hh).mul (hN.unit m hm)
 
-theorem prod_haar (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+theorem prod_haar
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
     (hconj : ∀ h ∈ UWset k r z, ∀ m ∈ Nset k r, h⁻¹ * m * h ∈ Nset k r)
     (μW μN : Measure (Mt k r)) (hW : IsHaarOn (UWset k r z) μW) (hN : IsHaarOn (Nset k r) μN)
-    [IsFiniteMeasure μW] (hNc : ∀ K : Set (Mt k r), IsCompact K → μN K < ⊤) :
-    IsHaarOn (Sset k r z) ((μW.prod μN).map mulP) := by
+    [IsFiniteMeasure μW]
+    (hNc : ∀ K : Set (Mt k r), IsCompact K → μN K < ⊤)
+    : IsHaarOn (Sset k r z) ((μW.prod μN).map mulP) := by
   obtain ⟨hσW, hW0, hWc, hWl⟩ := hW
   obtain ⟨hσN, hN0, hNcc, hNl⟩ := hN
   have hSc := s_clsub z hz hT hconj
   have hm := mulP_meas (k := k) (r := r)
   have aeW : ∀ᵐ p ∂(μW.prod μN), (Matrix.of p.1 : Mx k r) ∈ UWset k r z := by
     rw [ae_iff]
-    have : {p : Mt k r × Mt k r | ¬ (Matrix.of p.1 : Mx k r) ∈ UWset k r z} =
-        {x : Mt k r | Matrix.of x ∉ UWset k r z} ×ˢ Set.univ := by
+    have : {p : Mt k r × Mt k r | ¬ (Matrix.of p.1 : Mx k r) ∈ UWset k r z}
+        = {x : Mt k r | Matrix.of x ∉ UWset k r z} ×ˢ Set.univ := by
       ext p; exact ⟨fun h => ⟨h, trivial⟩, fun h => h.1⟩
     rw [this, Measure.prod_prod, hWc, zero_mul]
   have aeN : ∀ᵐ p ∂(μW.prod μN), (Matrix.of p.2 : Mx k r) ∈ Nset k r := by
     rw [ae_iff]
-    have : {p : Mt k r × Mt k r | ¬ (Matrix.of p.2 : Mx k r) ∈ Nset k r} =
-        Set.univ ×ˢ {x : Mt k r | Matrix.of x ∉ Nset k r} := by
+    have : {p : Mt k r × Mt k r | ¬ (Matrix.of p.2 : Mx k r) ∈ Nset k r}
+        = Set.univ ×ˢ {x : Mt k r | Matrix.of x ∉ Nset k r} := by
       ext p; exact ⟨fun h => ⟨trivial, h⟩, fun h => h.2⟩
     rw [this, Measure.prod_prod, hNcc, mul_zero]
 
@@ -119,8 +133,9 @@ theorem prod_haar (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < 
     let f : Mt k r × Mt k r → Mt k r := fun q => (jinv (Matrix.of q.1) * Matrix.of q.2 : Mx k r)
     have hf : Continuous f := (jinv_cont.comp continuous_fst).matrix_mul continuous_snd
     have hK' : IsCompact (f '' ((UWset k r z : Set (Mt k r)) ×ˢ K)) := (hUWc.prod hK).image hf
-    have hsub : (mulP ⁻¹' K : Set (Mt k r × Mt k r)) ≤ᵐ[μW.prod μN]
-        (Set.univ ×ˢ (f '' ((UWset k r z : Set (Mt k r)) ×ˢ K))) := by
+    have hsub
+        : (mulP ⁻¹' K : Set (Mt k r × Mt k r)) ≤ᵐ[μW.prod μN]
+          (Set.univ ×ˢ (f '' ((UWset k r z : Set (Mt k r)) ×ˢ K))) := by
       filter_upwards [aeW] with p h1 hp
       refine ⟨trivial, ⟨(p.1, mulP p), ⟨h1, hp⟩, ?_⟩⟩
       show jinv (Matrix.of p.1) * (Matrix.of p.1 * Matrix.of p.2) = Matrix.of p.2
@@ -149,7 +164,8 @@ theorem prod_haar (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < 
       exact hp ⟨Matrix.of p.1, h1, Matrix.of p.2, h2, rfl⟩
     exact measure_mono_null (fun p hp => not_not_intro hp) (ae_iff.mp hae)
 
-  have leftW : ∀ h₀ ∈ UWset k r z, ((μW.prod μN).map mulP).map (lmulM h₀) = (μW.prod μN).map mulP := by
+  have leftW
+      : ∀ h₀ ∈ UWset k r z, ((μW.prod μN).map mulP).map (lmulM h₀) = (μW.prod μN).map mulP := by
     intro h₀ hh₀
     rw [Measure.map_map (lmul_meas h₀) hm]
     have e : (lmulM h₀ ∘ mulP : Mt k r × Mt k r → Mt k r) = mulP ∘ Prod.map (lmulM h₀) id := by
@@ -178,17 +194,19 @@ theorem prod_haar (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < 
         rw [← jinv_eq hin.1]; exact hconj _ hin _ hm₀
       exact hNl _ hc
     have hT := MeasurePreserving.skew_product (MeasurePreserving.id μW) hgm hg
-    have hae : (lmulM m₀ ∘ mulP : Mt k r × Mt k r → Mt k r) =ᵐ[μW.prod μN]
-        mulP ∘ (fun p : Mt k r × Mt k r => (id p.1, g p.1 p.2)) := by
+    have hae
+        : (lmulM m₀ ∘ mulP : Mt k r × Mt k r → Mt k r) =ᵐ[μW.prod μN]
+          mulP ∘ (fun p : Mt k r × Mt k r => (id p.1, g p.1 p.2)) := by
       filter_upwards [aeW] with p h1
       show m₀ * (Matrix.of p.1 * Matrix.of p.2) =
         Matrix.of p.1 * ((jinv (Matrix.of p.1) * m₀ * Matrix.of p.1) * Matrix.of p.2)
       have e := mul_jinv h1.1
-      calc m₀ * (Matrix.of p.1 * Matrix.of p.2)
-          = (Matrix.of p.1 * jinv (Matrix.of p.1)) * m₀ * Matrix.of p.1 * Matrix.of p.2 := by
-            rw [e, Matrix.one_mul, Matrix.mul_assoc]
+      calc
+        m₀ * (Matrix.of p.1 * Matrix.of p.2)
+            = (Matrix.of p.1 * jinv (Matrix.of p.1)) * m₀ * Matrix.of p.1 * Matrix.of p.2 := by
+          rw [e, Matrix.one_mul, Matrix.mul_assoc]
         _ = Matrix.of p.1 * ((jinv (Matrix.of p.1) * m₀ * Matrix.of p.1) * Matrix.of p.2) := by
-            simp only [Matrix.mul_assoc]
+          simp only [Matrix.mul_assoc]
     rw [Measure.map_congr hae, ← Measure.map_map hm hT.measurable, hT.map_eq]
   refine ⟨sigma_of_compact _ hfc, hρ0, hconc, ?_⟩
   rintro _ ⟨h₀, hh₀, m₀, hm₀, rfl⟩
@@ -196,11 +214,13 @@ theorem prod_haar (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < 
     funext x; exact Matrix.mul_assoc h₀ m₀ (Matrix.of x)
   rw [e, ← Measure.map_map (lmul_meas h₀) (lmul_meas m₀), leftN m₀ hm₀, leftW h₀ hh₀]
 
-theorem sprod_main (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+theorem sprod_main
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
     (hconj : ∀ h ∈ UWset k r z, ∀ m ∈ Nset k r, h⁻¹ * m * h ∈ Nset k r)
     (μW μN μS : Measure (Mt k r)) (hW : IsHaarOn (UWset k r z) μW) (hN : IsHaarOn (Nset k r) μN)
-    [IsFiniteMeasure μW] (hNc : ∀ K : Set (Mt k r), IsCompact K → μN K < ⊤) (hS : IsHaarOn (Sset k r z) μS) :
-    ∃ cS : ℝ≥0∞, cS ≠ 0 ∧ cS ≠ ⊤ ∧ (μW.prod μN).map mulP = cS • μS := by
+    [IsFiniteMeasure μW]
+    (hNc : ∀ K : Set (Mt k r), IsCompact K → μN K < ⊤) (hS : IsHaarOn (Sset k r z) μS)
+    : ∃ cS : ℝ≥0∞, cS ≠ 0 ∧ cS ≠ ⊤ ∧ (μW.prod μN).map mulP = cS • μS := by
   have hSc := s_clsub z hz hT hconj
   obtain ⟨c1, h10, h1t, e1⟩ := haar_unique _ hSc _ (prod_haar z hz hT hconj μW μN hW hN hNc)
   obtain ⟨c2, h20, h2t, e2⟩ := haar_unique _ hSc _ hS

@@ -49,7 +49,8 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PolPull
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZH ReciprocityTheory.ChartRestriction.G.Out Classical
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -59,18 +60,22 @@ namespace GlobalTheory.ZH.GoodOut
 
 open GlobalTheory.Points
 
-theorem exists_hom_ker {R : Type} [CommRing R] (z : PrimeSpectrum R) :
-    ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (f : R →+* K), ∀ t, f t = 0 ↔ t ∈ z.asIdeal :=
-  ⟨AlgebraicClosure z.asIdeal.ResidueField, inferInstance, inferInstance,
-    (algebraMap z.asIdeal.ResidueField _).comp (algebraMap R z.asIdeal.ResidueField), fun _ =>
+theorem exists_hom_ker {R : Type} [CommRing R] (z : PrimeSpectrum R)
+    : ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (f : R →+* K), ∀ t,
+      f t = 0 ↔ t ∈ z.asIdeal := ⟨
+  AlgebraicClosure z.asIdeal.ResidueField,
+  inferInstance,
+  inferInstance,
+  (algebraMap z.asIdeal.ResidueField _).comp (algebraMap R z.asIdeal.ResidueField),
+  fun _ =>
     (map_eq_zero_iff (algebraMap z.asIdeal.ResidueField _) (RingHom.injective _)).trans
-      Ideal.algebraMap_residueField_eq_zero⟩
+      Ideal.algebraMap_residueField_eq_zero
+⟩
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {S : ThetaSys o Ω}
 
-
-theorem exists_th_notMem (hL : Laws) (hL₂ : Laws2) (ρ : S.Real) (z : PrimeSpectrum S.R) (a : S.Gam) :
-    ∃ c : S.Gam, ρ.n • c = 0 ∧ (⟨S.th (a + c), S.th_mem _⟩ : S.R) ∉ z.asIdeal := by
+theorem exists_th_notMem (hL : Laws) (hL₂ : Laws2) (ρ : S.Real) (z : PrimeSpectrum S.R) (a : S.Gam)
+    : ∃ c : S.Gam, ρ.n • c = 0 ∧ (⟨S.th (a + c), S.th_mem _⟩ : S.R) ∉ z.asIdeal := by
   obtain ⟨K, _, _, f, hf⟩ := exists_hom_ker z
   let x : Sp K ⟶ Sp S.R := spMap f
   obtain ⟨j, hj, hr⟩ := ρ.r_eq
@@ -83,17 +88,23 @@ theorem exists_th_notMem (hL : Laws) (hL₂ : Laws2) (ρ : S.Real) (z : PrimeSpe
     rw [map_natCast, hM, Nat.cast_mul] at h
     exact left_ne_zero_of_mul h
   obtain ⟨θ, hθ, hv⟩ := UnitTheta.exists_sec_of_baseOver S.R ρ.P ρ.th₁
-  obtain ⟨y₀, hy₀, e₀⟩ := ThetaFibre.exists_mem_nonzeroLocus_fibre hL₂.secBaseChangeAny S.R ρ.P ρ.th₁ ρ.th₁_basis
-    (x (IsLocalRing.closedPoint K))
+  obtain ⟨y₀, hy₀, e₀⟩ :=
+    ThetaFibre.exists_mem_nonzeroLocus_fibre hL₂.secBaseChangeAny S.R ρ.P ρ.th₁ ρ.th₁_basis
+      (x (IsLocalRing.closedPoint K))
   let u : Over.mk x ⟶ baseOver (Sp S.R) := Over.homMk x (by simp)
-  obtain ⟨y, hy, H⟩ := UnitTheta.exists_good_point_of_sec hL.polBaseChange hL.goodPt _ ρ.P θ K x ρ.n
-    ρ.n_prime.two_le hn ⟨_, hθ y₀ hy₀, _, e₀.symm⟩ (u ≫ ρ.pt a)
+  obtain ⟨y, hy, H⟩ :=
+    UnitTheta.exists_good_point_of_sec hL.polBaseChange hL.goodPt _ ρ.P θ K x ρ.n ρ.n_prime.two_le
+      hn ⟨_, hθ y₀ hy₀, _, e₀.symm⟩ (u ≫ ρ.pt a)
   have := ρ.P.isAb.comm
   obtain ⟨h0, hsm⟩ := ThetaReal.pt_nsmul ρ.pt ρ.pt_add
   obtain ⟨c, hc, -⟩ := ρ.pt_bij K x y (by rw [hM, pow_mul, hy, one_pow])
   obtain ⟨a₀, -, uniq⟩ := ρ.pt_bij K x 1 (one_pow _)
-  refine ⟨c, (uniq _ (by beta_reduce; rw [hsm, MonObj.comp_pow, hc, hy])).trans
-    (uniq _ (by beta_reduce; rw [h0, MonObj.comp_one])).symm, fun h => ?_⟩
+  refine ⟨
+    c,
+    (uniq _ (by beta_reduce; rw [hsm, MonObj.comp_pow, hc, hy])).trans
+      (uniq _ (by beta_reduce; rw [h0, MonObj.comp_one])).symm,
+    fun h => ?_
+  ⟩
   have e : (u ≫ ρ.pt a * y).left = spMap f ≫ (ρ.pt (a + c)).left := by
     rw [← hc, ρ.pt_add]
     exact congrArg CommaMorphism.left (MonObj.comp_mul u _ _).symm
@@ -106,7 +117,8 @@ theorem exists_th_notMem (hL : Laws) (hL₂ : Laws2) (ρ : S.Real) (z : PrimeSpe
 
 section Comb
 
-variable {X Z : Scheme.{0}} (p : X ⟶ Z) {B : LB X} {J : Type} [Fintype J] (s : J → B.Sec) (W : Z.Opens)
+variable
+  {X Z : Scheme.{0}} (p : X ⟶ Z) {B : LB X} {J : Type} [Fintype J] (s : J → B.Sec) (W : Z.Opens)
 
 variable [DecidableEq J] (b c : Matrix J J Γ(Z, W)) (hc : c * b = 1)
 include hc
@@ -121,13 +133,11 @@ end Transfer
 
 variable (ρ : S.Real) (c : CubicalStr ρ.P.A ⟨ρ.P.L, ρ.rig, ρ.P.isLB, ρ.rig_gen⟩)
 
-
 section Support
 
 include ρ
 
 end Support
-
 
 end GlobalTheory.ZH.GoodOut
 

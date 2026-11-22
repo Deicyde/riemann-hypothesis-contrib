@@ -17,12 +17,13 @@ open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH (mIdealOver)
 
 def SegreFibreIdeal.Statement : Prop :=
   ∀ (O : Type) [CommRing O] (Ω : Type) [Field Ω] [Algebra O Ω] (F : Type) [Field F] (φ : O →+* F)
-    (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (y : (Σ k, ι k) → Ω),
-    segreRels ι F ⊆ ((mIdealOver O (segreJoin y)).map (MvPolynomial.map φ) : Set _) ∧
-    (mIdealOver O y).map (MvPolynomial.map φ) ≤
-      ((mIdealOver O (segreJoin y)).map (MvPolynomial.map φ)).comap (segreIncl ι F) ∧
-    ∀ W : Ideal (MRing ι F), (mIdealOver O y).map (MvPolynomial.map φ) ≤ W →
-      (mIdealOver O (segreJoin y)).map (MvPolynomial.map φ) ≤ segreLift ι F W
+      (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+      (y : (Σ k, ι k) → Ω),
+    segreRels ι F ⊆ ((mIdealOver O (segreJoin y)).map (MvPolynomial.map φ) : Set _)
+      ∧ (mIdealOver O y).map (MvPolynomial.map φ)
+        ≤ ((mIdealOver O (segreJoin y)).map (MvPolynomial.map φ)).comap (segreIncl ι F)
+      ∧ ∀ W : Ideal (MRing ι F),
+        (mIdealOver O y).map (MvPolynomial.map φ) ≤ W
+          → (mIdealOver O (segreJoin y)).map (MvPolynomial.map φ) ≤ segreLift ι F W
 
 end GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization

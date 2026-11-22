@@ -11,26 +11,27 @@ open PositivityTheory.Rg.SwEis
 
 namespace GlobalTheory.CompanionTheory.PolyDenominator
 
-theorem exists_pow_mul (B : ℂ → ℂ) (hB : Differentiable ℂ B) (hz : ∃ z, B z ≠ 0) (a : ℂ) :
-    ∃ (k : ℕ) (v : ℂ → ℂ), Differentiable ℂ v ∧ v a ≠ 0 ∧ ∀ z, B z = (z - a) ^ k * v z :=
+theorem exists_pow_mul (B : ℂ → ℂ) (hB : Differentiable ℂ B) (hz : ∃ z, B z ≠ 0) (a : ℂ)
+    : ∃ (k : ℕ) (v : ℂ → ℂ), Differentiable ℂ v ∧ v a ≠ 0 ∧ ∀ z, B z = (z - a) ^ k * v z :=
   _root_.UpperTheory.Reformulated.B.GaloisBoundFirst.main B hB hz a
 
-theorem finite_zeros (B : ℂ → ℂ) (hB : Differentiable ℂ B) (hz : ∃ z, B z ≠ 0) {Q : Set ℂ} (hQ : IsCompact Q) :
-    {z | z ∈ Q ∧ B z = 0}.Finite := by
+theorem finite_zeros
+    (B : ℂ → ℂ) (hB : Differentiable ℂ B) (hz : ∃ z, B z ≠ 0) {Q : Set ℂ} (hQ : IsCompact Q)
+    : {z | z ∈ Q ∧ B z = 0}.Finite := by
   obtain ⟨z₀, hz₀⟩ := hz
   have han : AnalyticOnNhd ℂ B univ := fun x _ => hB.analyticAt x
   by_contra hinf
   have hinf' : ({z | z ∈ Q ∧ B z = 0} : Set ℂ).Infinite := hinf
   obtain ⟨x, hxQ, hacc⟩ := hinf'.exists_accPt_of_subset_isCompact hQ (fun z hz => hz.1)
-  have hfreq : ∃ᶠ z in 𝓝[≠] x, B z = 0 :=
-    (accPt_iff_frequently_nhdsNE.1 hacc).mono fun z hz => hz.2
-  exact hz₀ (han.eqOn_zero_of_preconnected_of_frequently_eq_zero isPreconnected_univ
-    (mem_univ x) hfreq (mem_univ z₀))
+  have hfreq : ∃ᶠ z in 𝓝[≠] x, B z = 0 := (accPt_iff_frequently_nhdsNE.1 hacc).mono fun z hz => hz.2
+  exact hz₀ (han.eqOn_zero_of_preconnected_of_frequently_eq_zero isPreconnected_univ (mem_univ x)
+    hfreq (mem_univ z₀))
 
-theorem factor_of_finset {Q : Set ℂ} (F : Finset ℂ) :
-    ∀ B : ℂ → ℂ, Differentiable ℂ B → (∃ z, B z ≠ 0) → (∀ z ∈ Q, B z = 0 → z ∈ F) →
-      ∃ (d : Polynomial ℂ) (u : ℂ → ℂ), d ≠ 0 ∧ Differentiable ℂ u ∧
-        (∀ z, B z = d.eval z * u z) ∧ ∀ z ∈ Q, u z ≠ 0 := by
+theorem factor_of_finset {Q : Set ℂ} (F : Finset ℂ)
+    : ∀ B : ℂ → ℂ,
+      Differentiable ℂ B → (∃ z, B z ≠ 0) → (∀ z ∈ Q, B z = 0 → z ∈ F)
+        → ∃ (d : Polynomial ℂ) (u : ℂ → ℂ),
+          d ≠ 0 ∧ Differentiable ℂ u ∧ (∀ z, B z = d.eval z * u z) ∧ ∀ z ∈ Q, u z ≠ 0 := by
   classical
   induction F using Finset.induction_on with
   | empty =>
@@ -40,20 +41,29 @@ theorem factor_of_finset {Q : Set ℂ} (F : Finset ℂ) :
   | insert a F _ ih =>
     intro B hB hz hF
     obtain ⟨k, v, hv, hva, hBv⟩ := exists_pow_mul B hB hz a
-    obtain ⟨d, u, hd, hu, hvu, huQ⟩ := ih v hv ⟨a, hva⟩ (by
-      intro z hzQ h0
-      have hza : z ≠ a := fun h => hva (h ▸ h0)
-      have hBz : B z = 0 := by rw [hBv, h0, mul_zero]
-      exact (Finset.mem_insert.1 (hF z hzQ hBz)).resolve_left hza)
-    refine ⟨(Polynomial.X - Polynomial.C a) ^ k * d, u,
-      mul_ne_zero (pow_ne_zero _ (Polynomial.X_sub_C_ne_zero a)) hd, hu, fun z => ?_, huQ⟩
+    obtain ⟨d, u, hd, hu, hvu, huQ⟩ :=
+      ih v hv ⟨a, hva⟩ (by
+        intro z hzQ h0
+        have hza : z ≠ a := fun h => hva (h ▸ h0)
+        have hBz : B z = 0 := by rw [hBv, h0, mul_zero]
+        exact (Finset.mem_insert.1 (hF z hzQ hBz)).resolve_left hza)
+    refine ⟨
+      (Polynomial.X - Polynomial.C a) ^ k * d,
+      u,
+      mul_ne_zero (pow_ne_zero _ (Polynomial.X_sub_C_ne_zero a)) hd,
+      hu,
+      fun z => ?_,
+      huQ
+    ⟩
     rw [hBv, hvu]
     simp [mul_assoc]
 
-theorem exists_poly_factor (A : ℂ → ℂ) (hA : Differentiable ℂ A) (hz : ∃ z, A z ≠ 0) {Q : Set ℂ} (hQ : IsCompact Q) :
-    ∃ (d : Polynomial ℂ) (u : ℂ → ℂ), d ≠ 0 ∧ Differentiable ℂ u ∧
-      (∀ z, A z = d.eval z * u z) ∧ ∀ z ∈ Q, u z ≠ 0 :=
-  factor_of_finset (finite_zeros A hA hz hQ).toFinset A hA hz fun z hzQ h0 => by simpa using And.intro hzQ h0
+theorem exists_poly_factor
+    (A : ℂ → ℂ) (hA : Differentiable ℂ A) (hz : ∃ z, A z ≠ 0) {Q : Set ℂ} (hQ : IsCompact Q)
+    : ∃ (d : Polynomial ℂ) (u : ℂ → ℂ),
+      d ≠ 0 ∧ Differentiable ℂ u ∧ (∀ z, A z = d.eval z * u z) ∧ ∀ z ∈ Q, u z ≠ 0 :=
+  factor_of_finset (finite_zeros A hA hz hQ).toFinset A hA hz fun z hzQ h0 => by
+    simpa using And.intro hzQ h0
 
 theorem glue : Glue := by
   classical
@@ -71,12 +81,12 @@ theorem glue : Glue := by
       ((isOpen_lt Complex.continuous_re continuous_const).inter
         ((isOpen_lt continuous_const Complex.continuous_im).inter
           (isOpen_lt Complex.continuous_im continuous_const)))
-  have hUo : IsOpen U := hPo.union
-    ((isOpen_lt continuous_const Complex.continuous_re).inter
+  have hUo : IsOpen U :=
+    hPo.union ((isOpen_lt continuous_const Complex.continuous_re).inter
       ((isOpen_lt continuous_const Complex.continuous_im).inter
         (isOpen_lt Complex.continuous_im continuous_const)))
-  have hWQ : ∀ z ∈ W, u z ≠ 0 := fun z hz => huQ z (Complex.mem_reProdIm.2
-    ⟨⟨hz.1.le, hz.2.1.le⟩, ⟨hz.2.2.1.le, hz.2.2.2.le⟩⟩)
+  have hWQ : ∀ z ∈ W, u z ≠ 0 := fun z hz =>
+    huQ z (Complex.mem_reProdIm.2 ⟨⟨hz.1.le, hz.2.1.le⟩, ⟨hz.2.2.1.le, hz.2.2.2.le⟩⟩)
   have hUPW : ∀ z ∈ U, z ∈ P ∨ z ∈ W := by
     rintro z (h | ⟨h1, h2, h3⟩)
     · exact Or.inl h
@@ -107,13 +117,15 @@ theorem glue : Glue := by
       simp only [P, mem_setOf_eq, Complex.add_re, Complex.ofReal_re]
       exact lt_add_of_lt_of_nonneg h ht
     · right
-      simp only [mem_setOf_eq, Complex.add_re, Complex.add_im, Complex.ofReal_re, Complex.ofReal_im, add_zero]
+      simp only [mem_setOf_eq, Complex.add_re, Complex.add_im, Complex.ofReal_re, Complex.ofReal_im,
+        add_zero]
       exact ⟨lt_add_of_lt_of_nonneg h1 ht, h2, h3⟩
   · by_cases h : R < s₀.re
     · exact Or.inl h
     · refine Or.inr ⟨?_, ?_, ?_⟩
       · have := min_le_left s₀.re R
-        rw [ha]; linarith
+        rw [ha]
+        linarith
       · rw [hc]; linarith
       · rw [hc]; linarith
   · intro x z hz

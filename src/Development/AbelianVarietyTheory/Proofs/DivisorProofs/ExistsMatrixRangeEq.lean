@@ -6,14 +6,15 @@ public import Mathlib
 
 namespace GlobalTheory.MatrixRangeExistence
 
-theorem exists_matrix_range_eq {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    (n : ℕ) (ϖ : O) (N : Submodule O (Fin n → O)) (hϖ : ϖ ≠ 0)
-    (hN : ∀ y : Fin n → O, (fun a : Fin n => ϖ * y a) ∈ N) :
-    ∃ A : Matrix (Fin n) (Fin n) O,
+theorem exists_matrix_range_eq
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (n : ℕ)
+    (ϖ : O) (N : Submodule O (Fin n → O))
+    (hϖ : ϖ ≠ 0) (hN : ∀ y : Fin n → O, (fun a : Fin n => ϖ * y a) ∈ N)
+    : ∃ A : Matrix (Fin n) (Fin n) O,
       (∀ x : Fin n → O, x ∈ N ↔ ∃ u : Fin n → O, Matrix.mulVec A u = x) ∧ Matrix.det A ≠ 0 := by
   classical
-  let f : (Fin n → O) →ₗ[O] N :=
-    LinearMap.codRestrict N (ϖ • LinearMap.id) (fun y => hN y)
+  let f : (Fin n → O) →ₗ[O] N := LinearMap.codRestrict N (ϖ • LinearMap.id) (fun y => hN y)
   have hf : Function.Injective f := by
     intro y z h
     have h' : ϖ • y = ϖ • z := congrArg Subtype.val h
@@ -41,9 +42,10 @@ theorem exists_matrix_range_eq {O : Type} [CommRing O] [IsDomain O] [IsDiscreteV
       rw [hA]
       exact Subtype.property _
   refine ⟨A, key, ?_⟩
-  have hcol : ∀ j : Fin n, ∃ u : Fin n → O,
-      Matrix.mulVec A u = fun a => ϖ * (Pi.single j (1 : O) : Fin n → O) a :=
-    fun j => (key _).1 (hN _)
+  have hcol
+      : ∀ j : Fin n, ∃ u : Fin n → O,
+        Matrix.mulVec A u = fun a => ϖ * (Pi.single j (1 : O) : Fin n → O) a := fun j =>
+    (key _).1 (hN _)
   choose U hU using hcol
   have hmul : A * (Matrix.of fun i j => U j i) = ϖ • (1 : Matrix (Fin n) (Fin n) O) := by
     ext i j

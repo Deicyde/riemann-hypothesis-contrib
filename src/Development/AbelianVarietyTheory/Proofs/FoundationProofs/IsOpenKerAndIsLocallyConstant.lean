@@ -6,11 +6,13 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.FinalTheo
 
 namespace GlobalTheory.OpenKernelLocallyConstant
 
-theorem isOpen_ker_and_isLocallyConstant {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-    (C : Type) [Group C] (N : ℕ) (ψ : Formalism.ConjugateSelfDual.G ℚ Ω →* C) (hN : N ≠ 0)
-    (hψ : UpperTheory.V.Af.KillsMu N ψ) :
-    IsOpen (↑(MonoidHom.ker ψ) : Set (Formalism.ConjugateSelfDual.G ℚ Ω)) ∧
-      IsLocallyConstant (⇑ψ : Formalism.ConjugateSelfDual.G ℚ Ω → C) := by
+theorem isOpen_ker_and_isLocallyConstant
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (C : Type) [Group C]
+    (N : ℕ) (ψ : Formalism.ConjugateSelfDual.G ℚ Ω →* C)
+    (hN : N ≠ 0) (hψ : UpperTheory.V.Af.KillsMu N ψ)
+    : IsOpen (↑(MonoidHom.ker ψ) : Set (Formalism.ConjugateSelfDual.G ℚ Ω))
+      ∧ IsLocallyConstant (⇑ψ : Formalism.ConjugateSelfDual.G ℚ Ω → C) := by
   classical
   have hopen : IsOpen (↑(MonoidHom.ker ψ) : Set (Formalism.ConjugateSelfDual.G ℚ Ω)) := by
     have halg : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
@@ -34,8 +36,12 @@ theorem isOpen_ker_and_isLocallyConstant {Ω : Type} [Field Ω] [Algebra ℚ Ω]
   refine ⟨hopen, ?_⟩
   rw [IsLocallyConstant.iff_exists_open]
   intro x
-  refine ⟨(fun y => x⁻¹ * y) ⁻¹' (MonoidHom.ker ψ : Set (Formalism.ConjugateSelfDual.G ℚ Ω)),
-    hopen.preimage (continuous_const.mul continuous_id), by simp, ?_⟩
+  refine ⟨
+    (fun y => x⁻¹ * y) ⁻¹' (MonoidHom.ker ψ : Set (Formalism.ConjugateSelfDual.G ℚ Ω)),
+    hopen.preimage (continuous_const.mul continuous_id),
+    by simp,
+    ?_
+  ⟩
   intro y hy
   have h : ψ (x⁻¹ * y) = 1 := hy
   rw [map_mul, map_inv, inv_mul_eq_one] at h

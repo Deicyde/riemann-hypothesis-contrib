@@ -6,11 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem ringHom_extends_algHom_of_span_of_finrank_eq :
-    ∀ (O : Type) [Ring O] [Module.Free ℤ O] [Module.Finite ℤ O] (A : Type) [Ring A] [Algebra ℂ A]
-      [FiniteDimensional ℂ A] (B : Type) [Ring B] [Algebra ℂ B] (φ : O →+* A) (ρ : O →+* B),
-      Submodule.span ℂ (Set.range φ) = ⊤ → Module.finrank ℂ A = Module.finrank ℤ O →
-      ∃ σ : A →ₐ[ℂ] B, ∀ x, σ (φ x) = ρ x := by
+theorem ringHom_extends_algHom_of_span_of_finrank_eq
+    : ∀ (O : Type) [Ring O] [Module.Free ℤ O] [Module.Finite ℤ O] (A : Type) [Ring A] [Algebra ℂ A]
+        [FiniteDimensional ℂ A] (B : Type) [Ring B] [Algebra ℂ B] (φ : O →+* A) (ρ : O →+* B),
+      Submodule.span ℂ (Set.range φ) = ⊤ → Module.finrank ℂ A = Module.finrank ℤ O
+        → ∃ σ : A →ₐ[ℂ] B, ∀ x, σ (φ x) = ρ x := by
   intro O _ _ _ A _ _ _ B _ _ φ ρ hspan hdim
   classical
   let b := Module.Free.chooseBasis ℤ O
@@ -37,8 +37,10 @@ theorem ringHom_extends_algHom_of_span_of_finrank_eq :
     rw [← hbA]
     exact bA.constr_basis ℂ _ i
   have hLφ : ∀ x, L (φ x) = ρ x := by
-    have h : (L.restrictScalars ℤ).comp φ.toAddMonoidHom.toIntLinearMap
-        = ρ.toAddMonoidHom.toIntLinearMap := b.ext (fun i => hLb i)
+    have h
+        : (L.restrictScalars ℤ).comp φ.toAddMonoidHom.toIntLinearMap
+          = ρ.toAddMonoidHom.toIntLinearMap :=
+      b.ext (fun i => hLb i)
     intro x
     exact LinearMap.congr_fun h x
   have hmul : ∀ u w : A, L (u * w) = L u * L w := by
@@ -48,9 +50,8 @@ theorem ringHom_extends_algHom_of_span_of_finrank_eq :
       rw [← map_mul, hLφ, hLφ, hLφ, map_mul]
     intro u w
     exact LinearMap.congr_fun₂ h u w
-  have hone : L 1 = 1 := by
-    rw [← map_one φ, hLφ, map_one]
-  exact ⟨AlgHom.ofLinearMap L hone hmul, fun x => by
-    simp only [AlgHom.ofLinearMap_apply]; exact hLφ x⟩
+  have hone : L 1 = 1 := by rw [← map_one φ, hLφ, map_one]
+  exact
+    ⟨AlgHom.ofLinearMap L hone hmul, fun x => by simp only [AlgHom.ofLinearMap_apply]; exact hLφ x⟩
 
 end GlobalTheory

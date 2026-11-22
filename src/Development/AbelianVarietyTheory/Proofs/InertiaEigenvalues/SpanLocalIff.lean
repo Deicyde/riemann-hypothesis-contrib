@@ -11,16 +11,21 @@ open IsDedekindDomain NumberField
 
 namespace GlobalTheory.LocalSpanCriterion
 
-theorem span_local_iff {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V]
-    [Module (RingOfIntegers K) V] (w : HeightOneSpectrum (RingOfIntegers K))
+theorem span_local_iff
+    {K : Type} [Field K] [NumberField K]
+    {V : Type} [AddCommGroup V] [Module (RingOfIntegers K) V]
+    (w : HeightOneSpectrum (RingOfIntegers K))
     [Module (Formalism.L2.Col.Ow w) V] [IsScalarTower (RingOfIntegers K) (Formalism.L2.Col.Ow w) V]
-    (T : Set V) (x : V) :
-    x ∈ Submodule.span (Formalism.L2.Col.Ow w) T ↔
-      x ∈ Formalism.HermitianLatticesTheory.localization₂ (HeightOneSpectrum.asIdeal w)
+    (T : Set V) (x : V)
+    : x ∈ Submodule.span (Formalism.L2.Col.Ow w) T
+      ↔ x ∈ Formalism.HermitianLatticesTheory.localization₂ (HeightOneSpectrum.asIdeal w)
         (Submodule.span (RingOfIntegers K) T) := by
-  have hmem : ∀ y : V, y ∈ Formalism.HermitianLatticesTheory.localization₂ (HeightOneSpectrum.asIdeal w)
-        (Submodule.span (RingOfIntegers K) T) ↔
-      ∃ s ∈ w.asIdeal.primeCompl, s • y ∈ Submodule.span (RingOfIntegers K) T := fun y => Iff.rfl
+  have hmem
+      : ∀ y : V,
+        y ∈ Formalism.HermitianLatticesTheory.localization₂ (HeightOneSpectrum.asIdeal w)
+            (Submodule.span (RingOfIntegers K) T)
+          ↔ ∃ s ∈ w.asIdeal.primeCompl, s • y ∈ Submodule.span (RingOfIntegers K) T := fun y =>
+    Iff.rfl
   rw [hmem]
   constructor
   · intro hx
@@ -39,9 +44,11 @@ theorem span_local_iff {K : Type} [Field K] [NumberField K] {V : Type} [AddCommG
       obtain ⟨s, hs, hsy⟩ := hy
       obtain ⟨⟨r, t⟩, hrt⟩ := IsLocalization.mk'_surjective w.asIdeal.primeCompl a
       refine ⟨s * t, w.asIdeal.primeCompl.mul_mem hs t.2, ?_⟩
-      have hspec : (IsLocalization.mk' (Formalism.L2.Col.Ow w) r t) *
-          algebraMap (RingOfIntegers K) (Formalism.L2.Col.Ow w) (t : RingOfIntegers K) =
-          algebraMap (RingOfIntegers K) (Formalism.L2.Col.Ow w) r := IsLocalization.mk'_spec _ r t
+      have hspec
+          : (IsLocalization.mk' (Formalism.L2.Col.Ow w) r t)
+              * algebraMap (RingOfIntegers K) (Formalism.L2.Col.Ow w) (t : RingOfIntegers K)
+            = algebraMap (RingOfIntegers K) (Formalism.L2.Col.Ow w) r :=
+        IsLocalization.mk'_spec _ r t
       simp only at hrt
       rw [hrt] at hspec
       have e : (s * (t : RingOfIntegers K)) • (a • y) = r • (s • y) := by

@@ -11,16 +11,29 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FlatInteg
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest Formalism.IndefR.WeilFull GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  Formalism.IndefR.WeilFull GlobalTheory.RowClaim
 open MeasureTheory GlobalTheory.SplitFlip GlobalTheory.SplitWeil
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open ValuativeRel Formalism.L2.Host
 
 namespace GlobalTheory.CosetVanish
 
-theorem integral_coset_singular_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] {A' : Type} [Fintype A'] [DecidableEq A'] (μ : Measure (GL A' k)) [μ.IsMulLeftInvariant] (ν : kˣ →* ℂˣ) (z : ℂ), ¬ IsUnram ν → ∀ (c : kˣ) (x : Matrix A' A' k), x.det = 0 → ∫ g in {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)}, (ν (gdet g) : ℂ) * apow (gdet g) z ∂μ = 0 := by
+theorem integral_coset_singular_eq_zero
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] {A' : Type} [Fintype A'] [DecidableEq A']
+        (μ : Measure (GL A' k)) [μ.IsMulLeftInvariant] (ν : kˣ →* ℂˣ) (z : ℂ),
+      ¬ IsUnram ν
+        → ∀ (c : kˣ) (x : Matrix A' A' k),
+          x.det = 0
+            → ∫ g in {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)}, (ν (gdet g) : ℂ) * apow (gdet g) z ∂μ
+              = 0 := by
   intro k _ _ _ _ _ _ A' _ _ μ _ ν z hν c x hx
   classical
   obtain ⟨u, hu1, hνu⟩ : ∃ u : kˣ, valuation k (u : k) = 1 ∧ ν u ≠ 1 := by
@@ -28,8 +41,7 @@ theorem integral_coset_singular_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel
     push_neg at h
     exact hν fun y hy => h y hy
   obtain ⟨w0, hw0, hw0x⟩ := (Matrix.exists_vecMul_eq_zero_iff (M := x)).2 hx
-  obtain ⟨j, hj⟩ : ∃ j, w0 j ≠ 0 := by
-    by_contra h; push_neg at h; exact hw0 (funext h)
+  obtain ⟨j, hj⟩ : ∃ j, w0 j ≠ 0 := by by_contra h; push_neg at h; exact hw0 (funext h)
   haveI : Nonempty A' := ⟨j⟩
   obtain ⟨i₀, hi₀⟩ := Finite.exists_max (fun i => valuation k (w0 i))
   have hwi₀ : w0 i₀ ≠ 0 := by
@@ -43,8 +55,9 @@ theorem integral_coset_singular_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel
     intro i
     simp only [w, Pi.smul_apply, smul_eq_mul, map_mul, map_inv₀]
     have hpos : valuation k (w0 i₀) ≠ 0 := by simpa using hwi₀
-    calc (valuation k (w0 i₀))⁻¹ * valuation k (w0 i) ≤ (valuation k (w0 i₀))⁻¹ * valuation k (w0 i₀) :=
-          by gcongr; exact hi₀ i
+    calc
+      (valuation k (w0 i₀))⁻¹ * valuation k (w0 i)
+        ≤ (valuation k (w0 i₀))⁻¹ * valuation k (w0 i₀) := by gcongr; exact hi₀ i
       _ = 1 := inv_mul_cancel₀ hpos
   have hwx : ∀ j, ∑ l, w l * x l j = 0 := by
     intro j
@@ -60,17 +73,16 @@ theorem integral_coset_singular_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel
       refine ((valuation k).map_sub _ _).trans ?_
       simp [hu1]
     · simp [e, Pi.single_eq_of_ne h]
-  have hwe : ∑ l, w l * e l = (u : k) - 1 := by
-    simp [e, Pi.single_apply, hwi]
+  have hwe : ∑ l, w l * e l = (u : k) - 1 := by simp [e, Pi.single_apply, hwi]
   set M : Matrix A' A' k := 1 + Matrix.vecMulVec e w with hMdef
   have hMdet : M.det = u := by
     rw [hMdef, Matrix.vecMulVec_eq Unit, Matrix.det_one_add_replicateCol_mul_replicateRow]
     simp only [dotProduct]
-    rw [hwe]; ring
+    rw [hwe]
+    ring
   have hMne : M.det ≠ 0 := by rw [hMdet]; exact u.ne_zero
   set m : GL A' k := Matrix.GeneralLinearGroup.mkOfDetNeZero M hMne with hmdef
-  have hmdet : gdet m = u := by
-    ext; simp [gdet, Matrix.GeneralLinearGroup.val_det_apply, m, hMdet]
+  have hmdet : gdet m = u := by ext; simp [gdet, Matrix.GeneralLinearGroup.val_det_apply, m, hMdet]
   have hmval : (m : Matrix A' A' k) = M := rfl
   have hMG : ∀ (G : Matrix A' A' k) i j, (M * G) i j = G i j + e i * ∑ l, w l * G l j := by
     intro G i j
@@ -79,15 +91,19 @@ theorem integral_coset_singular_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel
   have hsum : ∀ (G : Matrix A' A' k) j, ∑ l, w l * G l j = ∑ l, w l * (G l j - x l j) := by
     intro G j
     simp only [mul_sub, Finset.sum_sub_distrib, hwx, sub_zero]
-  have hkey : ∀ g : GL A' k, (m * g ∈ {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)}) ↔
-      g ∈ {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)} := by
+  have hkey
+      : ∀ g : GL A' k,
+        (m * g ∈ {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)})
+          ↔ g ∈ {g : GL A' k | ∀ i j, valuation k (g.val i j - x i j) ≤ valuation k (c : k)} := by
     intro g
     simp only [Set.mem_setOf_eq, Units.val_mul, hmval, hMG]
     constructor
     · intro h i j
       set s := ∑ l, w l * (g.val l j) with hs
       have h2 : ∑ l, w l * ((g.val l j + e l * s) - x l j) = (u : k) * s := by
-        have : ∀ l, w l * ((g.val l j + e l * s) - x l j) = w l * (g.val l j - x l j) + (w l * e l) * s := by
+        have : ∀ l,
+            w l * ((g.val l j + e l * s) - x l j)
+              = w l * (g.val l j - x l j) + (w l * e l) * s := by
           intro l; ring
         simp only [this, Finset.sum_add_distrib, ← Finset.sum_mul, hwe, ← hsum, ← hs]
         ring
@@ -109,7 +125,9 @@ theorem integral_coset_singular_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel
         refine (valuation k).map_sum_le fun l _ => ?_
         rw [map_mul]
         exact (mul_le_of_le_one_left' (hwint l)).trans (h l j)
-      have : g.val i j + e i * (∑ l, w l * g.val l j) - x i j = (g.val i j - x i j) + e i * (∑ l, w l * g.val l j) := by ring
+      have : g.val i j + e i * (∑ l, w l * g.val l j) - x i j
+          = (g.val i j - x i j) + e i * (∑ l, w l * g.val l j) := by
+        ring
       rw [this]
       refine (valuation k).map_add_le (h i j) ?_
       rw [map_mul]
@@ -123,13 +141,13 @@ theorem integral_coset_singular_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel
     rw [hmdet, apow_mul, apow_of_valuation_eq_one hu1, Units.val_mul]
     ring
   have hmp : MeasurePreserving (fun g => m * g) μ μ := measurePreserving_mul_left μ m
-  have hemb : MeasurableEmbedding (fun g => m * g) := (MeasurableEquiv.mulLeft m).measurableEmbedding
+  have hemb : MeasurableEmbedding (fun g => m * g) :=
+    (MeasurableEquiv.mulLeft m).measurableEmbedding
   have h1 := hmp.setIntegral_preimage_emb hemb χ S
   rw [hpre] at h1
   simp only [hχm, integral_const_mul] at h1
   change ∫ g in S, χ g ∂μ = 0
-  have hne : (ν u : ℂ) ≠ 1 := by
-    intro h; exact hνu (Units.ext h)
+  have hne : (ν u : ℂ) ≠ 1 := by intro h; exact hνu (Units.ext h)
   have h3 : ((ν u : ℂ) - 1) * ∫ g in S, χ g ∂μ = 0 := by rw [sub_mul, h1, one_mul, sub_self]
   exact (mul_eq_zero.1 h3).resolve_left (sub_ne_zero.2 hne)
 

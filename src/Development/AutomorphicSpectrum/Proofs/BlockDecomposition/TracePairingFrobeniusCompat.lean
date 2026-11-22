@@ -9,25 +9,33 @@ open TensorProduct CrystallineSemistableComparison.Pb.Psi
 
 namespace GlobalTheory.CompanionTheory.FrobPairing
 
-theorem T_phi_expand {W A C₀ : Type} [CommRing W] [CommRing A] [CommRing C₀] [Algebra W A]
-    {K₀ : Type} [Field K₀] [Algebra W K₀] {L : Type 1} [AddCommGroup L] [Module W L]
+theorem T_phi_expand
+    {W A C₀ : Type} [CommRing W] [CommRing A] [CommRing C₀] [Algebra W A]
+    {K₀ : Type} [Field K₀] [Algebra W K₀]
+    {L : Type 1} [AddCommGroup L] [Module W L]
     (c : A →+* C₀) (k : K₀ →+* C₀) (hk : ∀ w : W, k (algebraMap W K₀ w) = c (algebraMap W A w))
-    {F : W →+* W} (φA : A →+* A) (φC : C₀ →+* C₀) (φL : L →ₛₗ[F] L) (fr : K₀ →+* K₀)
-    (φD : K₀ ⊗[W] L →+ K₀ ⊗[W] L) (hD : ∀ x y, φD (x ⊗ₜ y) = fr x ⊗ₜ φL y)
+    {F : W →+* W}
+    (φA : A →+* A)
+    (φC : C₀ →+* C₀)
+    (φL : L →ₛₗ[F] L) (fr : K₀ →+* K₀) (φD : K₀ ⊗[W] L →+ K₀ ⊗[W] L)
+    (hD : ∀ x y, φD (x ⊗ₜ y) = fr x ⊗ₜ φL y)
     (pT : A ⊗[W] L →+ A ⊗[W] L) (hT : ∀ a y, pT (a ⊗ₜ y) = φA a ⊗ₜ φL y)
     (hφ : ∀ a, φC (c a) = c (φA a)) (hφk : ∀ x, φC (k x) = k (fr x))
-    {m : ℕ} (b : Module.Basis (Fin m) K₀ (K₀ ⊗[W] L)) (f : Module.Dual K₀ (K₀ ⊗[W] L))
-    (z : A ⊗[W] L) :
-    T c k hk f (pT z) = ∑ s, φC (T c k hk (b.coord s) z) * k (f (φD (b s))) := by
+    {m : ℕ} (b : Module.Basis (Fin m) K₀ (K₀ ⊗[W] L))
+    (f : Module.Dual K₀ (K₀ ⊗[W] L)) (z : A ⊗[W] L)
+    : T c k hk f (pT z) = ∑ s, φC (T c k hk (b.coord s) z) * k (f (φD (b s))) := by
   have hsmul : ∀ (x : K₀) (v : K₀ ⊗[W] L), φD (x • v) = fr x • φD v := by
     intro x v
     induction v using TensorProduct.induction_on with
     | zero => simp
     | tmul x' y =>
-      rw [TensorProduct.smul_tmul', hD, hD, smul_eq_mul, map_mul, TensorProduct.smul_tmul', smul_eq_mul]
+      rw [TensorProduct.smul_tmul', hD, hD, smul_eq_mul, map_mul, TensorProduct.smul_tmul',
+        smul_eq_mul]
     | add v₁ v₂ h₁ h₂ => rw [smul_add, map_add (f := _), map_add (f := _), h₁, h₂, smul_add]
-  have hTt : ∀ (g : Module.Dual K₀ (K₀ ⊗[W] L)) (a : A) (y : L),
-      T c k hk g (a ⊗ₜ y) = c a * k (g (1 ⊗ₜ y)) := fun g a y => rfl
+  have hTt
+      : ∀ (g : Module.Dual K₀ (K₀ ⊗[W] L)) (a : A) (y : L),
+        T c k hk g (a ⊗ₜ y) = c a * k (g (1 ⊗ₜ y)) := fun g a y =>
+    rfl
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul a y =>

@@ -12,7 +12,8 @@ open scoped Classical
 
 namespace PI.ScalarPairDr.W
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef
 
 section D7
 
@@ -23,8 +24,9 @@ theorem ddS_ne_zero (D : D7) : ddS D ≠ 0 := by
   rw [Ne, FractionalIdeal.coeIdeal_eq_zero]
   exact Ideal.map_ne_bot_of_ne_bot differentIdeal_ne_bot
 
-theorem exists_ne_zero_mem (D : D7) (j : ℤ) :
-    ∃ x : D.host.E, x ≠ 0 ∧ x ∈ (ddS D ^ j : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
+theorem exists_ne_zero_mem (D : D7) (j : ℤ)
+    : ∃ x : D.host.E,
+      x ≠ 0 ∧ x ∈ (ddS D ^ j : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
   have h : ddS D ^ j ≠ 0 := zpow_ne_zero j (ddS_ne_zero D)
   by_contra hne
   push_neg at hne
@@ -34,8 +36,8 @@ theorem exists_ne_zero_mem (D : D7) (j : ℤ) :
   by_contra hx0
   exact hne x hx0 hx
 
-theorem X_le_spanE_XS (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) :
-    F0.X ≤ spanE (VS D) (XS D F0) := by
+theorem X_le_spanE_XS (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
+    : F0.X ≤ spanE (VS D) (XS D F0) := by
   unfold FlagG.X spanE
   rw [Submodule.span_le]
   rintro _ ⟨a, rfl⟩
@@ -43,7 +45,8 @@ theorem X_le_spanE_XS (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) :
   have hmem : x • F0.e a ∈ (XS D F0 : Set (VS D).V) := by
     unfold XS
     exact Submodule.subset_span ⟨a, x, hx, rfl⟩
-  have h2 : x • F0.e a ∈ Submodule.span D.host.E (XS D F0 : Set (VS D).V) := Submodule.subset_span hmem
+  have h2 : x • F0.e a ∈ Submodule.span D.host.E (XS D F0 : Set (VS D).V) :=
+    Submodule.subset_span hmem
   have h3 := Submodule.smul_mem _ x⁻¹ h2
   rwa [smul_smul, inv_mul_cancel₀ hx0, one_smul] at h3
 

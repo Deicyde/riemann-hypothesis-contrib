@@ -10,11 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.base :
-    ∀ (G X Y : Type) [Group G] [MulAction G X] (M : Rep ℤ G) (e : permRep G X ⟶ M)
-      (d : (Y →₀ ℤ) →ₗ[ℤ] (X →₀ ℤ)) (A b : ℕ), Function.Surjective e.hom → Function.Exact d e.hom →
-      OrbLe G X A → 1 ≤ b → (∀ y, l1 (d (Finsupp.single y 1)) ≤ b) →
-      TorsLe (groupHomology M 0) (b ^ A) := by
+theorem UpperTheory.V.KH.base
+    : ∀ (G X Y : Type) [Group G] [MulAction G X] (M : Rep ℤ G) (e : permRep G X ⟶ M)
+        (d : (Y →₀ ℤ) →ₗ[ℤ] (X →₀ ℤ)) (A b : ℕ),
+      Function.Surjective e.hom → Function.Exact d e.hom → OrbLe G X A → 1 ≤ b
+        → (∀ y, l1 (d (Finsupp.single y 1)) ≤ b)
+        → TorsLe (groupHomology M 0) (b ^ A) := by
   intro G X Y _ _ M e d A b hsurj hex hA hb hd
   set S : Set (X →₀ ℤ) := Set.range (fun y => d (Finsupp.single y 1)) with hS
   have hspan : Submodule.span ℤ S = LinearMap.range d := by

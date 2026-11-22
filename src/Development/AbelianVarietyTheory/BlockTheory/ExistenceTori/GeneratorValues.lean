@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out IsLocalRing
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -21,26 +22,26 @@ variable {R : Type} [CommRing R] [IsDomain R]
 def genVal {M : LB (TK R).left} (t : LB.Gen M) (j : M.ι) (h : ⊤ ≤ M.U j) : (FractionRing R)ˣ :=
   Units.map (Scheme.ΓSpecIso (CommRingCat.of (FractionRing R))).hom.hom.toMonoidHom (res h (t.s j))
 
-def IsIntChart (D : DegPre R) (x : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ D.P.A) (i : D.P.L.ι) :
-    Prop :=
+def IsIntChart (D : DegPre R) (x : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ D.P.A) (i : D.P.L.ι)
+    : Prop :=
   ⊤ ≤ x.left ⁻¹ᵁ D.P.L.U i
 
 def IsPsiCoord (D : DegPre R) (χ : D.X) (x : (FractionRing R)ˣ) : Prop :=
-  ∃ (j : PUnit → D.P.L.ι) (h : ⊤ ≤ (LB.LinComb D.P.L (K := PUnit) (fun _ => D.xK χ)
-      (fun _ => -1)).U j), IsIntChart D (D.c χ) (j PUnit.unit) ∧ x = genVal (D.psi χ) j h
+  ∃ (j : PUnit → D.P.L.ι)
+      (h : ⊤ ≤ (LB.LinComb D.P.L (K := PUnit) (fun _ => D.xK χ) (fun _ => -1)).U j),
+    IsIntChart D (D.c χ) (j PUnit.unit) ∧ x = genVal (D.psi χ) j h
 
 def IsTauCoord (D : DegPre R) (a b : D.X) (x : (FractionRing R)ˣ) : Prop :=
   ∃ (j : ((PUnit ⊕ PUnit) ⊕ PUnit) ⊕ PUnit → D.P.L.ι) (h : ⊤ ≤ _),
-    IsIntChart D (D.c (a + b)) (j (.inl (.inl (.inl PUnit.unit)))) ∧
-    IsIntChart D (D.c a) (j (.inl (.inl (.inr PUnit.unit)))) ∧
-    IsIntChart D (D.c b) (j (.inl (.inr PUnit.unit))) ∧
-    IsIntChart D η[D.P.A] (j (.inr PUnit.unit)) ∧ x = genVal (D.tau a b) j h
+    IsIntChart D (D.c (a + b)) (j (.inl (.inl (.inl PUnit.unit))))
+      ∧ IsIntChart D (D.c a) (j (.inl (.inl (.inr PUnit.unit))))
+      ∧ IsIntChart D (D.c b) (j (.inl (.inr PUnit.unit)))
+      ∧ IsIntChart D η[D.P.A] (j (.inr PUnit.unit)) ∧ x = genVal (D.tau a b) j h
 
 lemma xK_eq (D : DegPre R) (χ : D.X) : D.xK χ = jK R ≫ (D.c χ).left := rfl
 
 theorem exists_isPsiCoord [IsLocalRing R] (D : DegPre R) (χ : D.X) : ∃ x, IsPsiCoord D χ x := by
-  have hc : (D.c χ).left (closedPoint R) ∈ ⨆ i, D.P.L.U i := by
-    rw [D.P.isLB.cover]; trivial
+  have hc : (D.c χ).left (closedPoint R) ∈ ⨆ i, D.P.L.U i := by rw [D.P.isLB.cover]; trivial
   obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 hc
   have ht : IsIntChart D (D.c χ) i :=
     ((closedPoint_mem_iff (R := R) ((D.c χ).left ⁻¹ᵁ D.P.L.U i)).1 hi).ge
@@ -66,9 +67,10 @@ lemma pull_val {X : Scheme.{0}} {S T : CommRingCat.{0}} (φ : S ⟶ T) (c : Spec
   erw [Scheme.Hom.appLE_comp_appLE]
   rfl
 
-theorem IsPsiCoord.unique {D : DegPre R} {χ : D.X} {x x' : (FractionRing R)ˣ}
-    (hx : IsPsiCoord D χ x) (hx' : IsPsiCoord D χ x') :
-    ∃ u : Rˣ, x = Units.map (algebraMap R (FractionRing R)).toMonoidHom u * x' := by
+theorem IsPsiCoord.unique
+    {D : DegPre R} {χ : D.X} {x x' : (FractionRing R)ˣ}
+    (hx : IsPsiCoord D χ x) (hx' : IsPsiCoord D χ x')
+    : ∃ u : Rˣ, x = Units.map (algebraMap R (FractionRing R)).toMonoidHom u * x' := by
   obtain ⟨j, h, hj, rfl⟩ := hx
   obtain ⟨j', h', hj', rfl⟩ := hx'
   have key := congrArg (res (le_inf h h')) (D.psi_gen χ j j')
@@ -77,10 +79,15 @@ theorem IsPsiCoord.unique {D : DegPre R} {χ : D.X} {x x' : (FractionRing R)ˣ}
     le_inf hj hj'
   have hK : ⊤ ≤ (jK R ≫ (D.c χ).left) ⁻¹ᵁ (D.P.L.U (j PUnit.unit) ⊓ D.P.L.U (j' PUnit.unit)) :=
     fun y _ => hjj (Set.mem_univ (jK R y))
-  refine ⟨(Units.map (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom.toMonoidHom
-    (res hjj (pullU (D.c χ).left _ (D.P.L.g _ _))))⁻¹, ?_⟩
-  have hg : res (le_inf h h') ((LB.LinComb D.P.L (K := PUnit) (fun _ => ptK (D.c χ))
-      (fun _ => -1)).g j j') = (res hK (pullU (jK R ≫ (D.c χ).left) _ (D.P.L.g _ _)))⁻¹ := by
+  refine ⟨
+    (Units.map (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom.toMonoidHom
+      (res hjj (pullU (D.c χ).left _ (D.P.L.g _ _))))⁻¹,
+    ?_
+  ⟩
+  have hg
+      : res (le_inf h h')
+          ((LB.LinComb D.P.L (K := PUnit) (fun _ => ptK (D.c χ)) (fun _ => -1)).g j j')
+        = (res hK (pullU (jK R ≫ (D.c χ).left) _ (D.P.L.g _ _)))⁻¹ := by
     simp only [LB.LinComb, Finset.univ_unique, Finset.prod_singleton, zpow_neg, zpow_one]
     refine (MonoidHom.map_inv _ _).trans (congrArg Inv.inv ?_)
     exact res_res _ _ _
@@ -116,19 +123,23 @@ lemma valuation_ne_zero (x : (FractionRing R)ˣ) :
   (Valuation.ne_zero_iff _).2 x.ne_zero
 
 def ord_vw : LatticeVal R ℤ where
-  toFun x := - WithZero.log ((IsDiscreteValuationRing.maximalIdeal R).valuation (FractionRing R) x.val)
+  toFun x :=
+    - WithZero.log ((IsDiscreteValuationRing.maximalIdeal R).valuation (FractionRing R) x.val)
   map_mul x y := by
     rw [Units.val_mul, map_mul, WithZero.log_mul (valuation_ne_zero R x) (valuation_ne_zero R y),
       neg_add]
   map_unit u := by
     have : (IsDiscreteValuationRing.maximalIdeal R).valuation (FractionRing R)
-        (algebraMap R (FractionRing R) u) = 1 := by
+          (algebraMap R (FractionRing R) u)
+        = 1 := by
       erw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
         IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff]
       exact fun h => (mem_maximalIdeal _).1 h u.isUnit
     change - WithZero.log ((IsDiscreteValuationRing.maximalIdeal R).valuation (FractionRing R)
-        (algebraMap R (FractionRing R) u)) = 0
-    rw [this]; simp
+        (algebraMap R (FractionRing R) u))
+      = 0
+    rw [this]
+    simp
 
 end DVR
 
@@ -145,10 +156,11 @@ section DVR
 
 variable [IsDiscreteValuationRing R]
 
-theorem ord_vw_uniformiser {ϖ : R} (h0 : ϖ ≠ 0) (h : maximalIdeal R = Ideal.span {ϖ}) :
-    (ord_vw R).toFun (toUnitK ϖ h0) = 1 := by
+theorem ord_vw_uniformiser {ϖ : R} (h0 : ϖ ≠ 0) (h : maximalIdeal R = Ideal.span {ϖ})
+    : (ord_vw R).toFun (toUnitK ϖ h0) = 1 := by
   change - WithZero.log ((IsDiscreteValuationRing.maximalIdeal R).valuation (FractionRing R)
-        (algebraMap R (FractionRing R) ϖ)) = 1
+      (algebraMap R (FractionRing R) ϖ))
+    = 1
   erw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
     IsDedekindDomain.HeightOneSpectrum.intValuation_singleton _ h0 h]
   simp
@@ -162,7 +174,6 @@ section Normed
 variable [IsLocalRing R] {F : Type} [NormedField F]
 
 variable {φ : FractionRing R →+* F}
-
 
 end Normed
 

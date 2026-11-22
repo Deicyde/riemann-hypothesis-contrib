@@ -14,17 +14,16 @@ open Formalism.L2.Col
 
 namespace GlobalTheory.Mem.DatLaws
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.Mem.DatLaws.dat_ok : ∀ (B : _root_.GlobalTheory.Mem.Base)
-    (X : _root_.GlobalTheory.Mem.PreX B.toPre)
-    (Ch : _root_.Formalism.L2.Col.Chars B.fields (B.primes X) B.R.m),
-    Ch.Ok → Ch.FromHecke B.wts B.embLL →
-      (B.dat X Ch).Ok := by
+theorem _root_.GlobalTheory.Mem.DatLaws.dat_ok
+    : ∀ (B : _root_.GlobalTheory.Mem.Base) (X : _root_.GlobalTheory.Mem.PreX B.toPre)
+        (Ch : _root_.Formalism.L2.Col.Chars B.fields (B.primes X) B.R.m),
+      Ch.Ok → Ch.FromHecke B.wts B.embLL → (B.dat X Ch).Ok := by
   intro B X Ch hCh hH
   constructor
   case fields => exact _root_.GlobalTheory.Mem.FieldsLaws.fields_ok B
-  case fieldsConditions => exact (_root_.GlobalTheory.Mem.FieldsLaws.fields_satisfy_definite_laws B).1
+  case fieldsConditions =>
+    exact (_root_.GlobalTheory.Mem.FieldsLaws.fields_satisfy_definite_laws B).1
   case embeddingStarConj => exact _root_.GlobalTheory.Mem.Base.baseData_embedding_conj B X Ch
   case f_eq => exact (_root_.GlobalTheory.Mem.FieldsLaws.fields_satisfy_definite_laws B).2
   case primes => exact (_root_.GlobalTheory.BasePrimes.primes_ok B X).1

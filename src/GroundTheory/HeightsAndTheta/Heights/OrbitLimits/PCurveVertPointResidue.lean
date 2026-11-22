@@ -22,26 +22,25 @@ namespace CurveVerticalPointResidue
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-
 omit [Fintype K] in
-theorem isMultiHomog_sub' {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f - g) a := by
+theorem isMultiHomog_sub'
+    {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f - g) a := by
   classical
   intro m hm k
   rcases Finset.mem_union.mp (MvPolynomial.support_sub _ f g hm) with h | h
   · exact hf m h k
   · exact hg m h k
 
-
 omit [Fintype K] in
-theorem isMultiHomog_add' {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f + g) a := by
+theorem isMultiHomog_add'
+    {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f + g) a := by
   classical
   intro m hm k
   rcases Finset.mem_union.mp (MvPolynomial.support_add hm) with h | h
   · exact hf m h k
   · exact hg m h k
-
 
 omit [Fintype K] in
 theorem isMultiHomog_C' (a : ℤ) : IsMultiHomog (C a : MRing ι) 0 := by
@@ -53,9 +52,11 @@ theorem isMultiHomog_C' (a : ℤ) : IsMultiHomog (C a : MRing ι) 0 := by
   subst this
   simp
 
-theorem exists_homog {S : Type*} [CommRing S] (χ : MRing ι →+* S) (c : ∀ k, ι k)
-    (hχ : ∀ k, χ (X ⟨k, c k⟩) = 1) (f : MRing ι) :
-    ∃ (n : K → ℕ) (G : MRing ι), IsMultiHomog G n ∧ χ G = χ f := by
+theorem exists_homog
+    {S : Type*} [CommRing S]
+    (χ : MRing ι →+* S) (c : ∀ k, ι k) (hχ : ∀ k, χ (X ⟨k, c k⟩) = 1)
+    (f : MRing ι)
+    : ∃ (n : K → ℕ) (G : MRing ι), IsMultiHomog G n ∧ χ G = χ f := by
   classical
   have hχp : ∀ n : K → ℕ, χ (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k) = 1 := fun n => by
     simp [map_prod, hχ]
@@ -64,20 +65,30 @@ theorem exists_homog {S : Type*} [CommRing S] (χ : MRing ι →+* S) (c : ∀ k
   | add p q hp hq =>
     obtain ⟨n₁, G₁, h₁, e₁⟩ := hp
     obtain ⟨n₂, G₂, h₂, e₂⟩ := hq
-    refine ⟨n₁ + n₂, G₁ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₂ k + G₂ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₁ k,
-      isMultiHomog_add' (isMultiHomog_mul h₁ (isMultiHomog_coordProd c n₂)) ?_, ?_⟩
+    refine ⟨
+      n₁ + n₂,
+      G₁ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₂ k + G₂ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₁ k,
+      isMultiHomog_add' (isMultiHomog_mul h₁ (isMultiHomog_coordProd c n₂)) ?_,
+      ?_
+    ⟩
     · rw [add_comm n₁]
       exact isMultiHomog_mul h₂ (isMultiHomog_coordProd c n₁)
     · rw [map_add (f := _), map_mul, map_mul, hχp, hχp, mul_one, mul_one, e₁, e₂, map_add (f := _)]
   | mul_X p i hp =>
     obtain ⟨n, G, h, e⟩ := hp
-    exact ⟨n + Pi.single i.1 1, G * X i, isMultiHomog_mul h (isMultiHomog_X i.1 i.2), by
-      rw [map_mul, map_mul, e]⟩
+    exact ⟨
+      n + Pi.single i.1 1,
+      G * X i,
+      isMultiHomog_mul h (isMultiHomog_X i.1 i.2),
+      by rw [map_mul, map_mul, e]
+    ⟩
 
-theorem exists_homog_mem {S : Type*} [CommRing S] (χ : MRing ι →+* S) (c : ∀ k, ι k)
-    (hχ : ∀ k, χ (X ⟨k, c k⟩) = 1) {W : Ideal (MRing ι)} (hW : IsMultiHomogIdeal W)
-    {f : MRing ι} (hf : f ∈ W) :
-    ∃ (n : K → ℕ) (G : MRing ι), G ∈ W ∧ IsMultiHomog G n ∧ χ G = χ f := by
+theorem exists_homog_mem
+    {S : Type*} [CommRing S]
+    (χ : MRing ι →+* S) (c : ∀ k, ι k) (hχ : ∀ k, χ (X ⟨k, c k⟩) = 1)
+    {W : Ideal (MRing ι)} (hW : IsMultiHomogIdeal W)
+    {f : MRing ι} (hf : f ∈ W)
+    : ∃ (n : K → ℕ) (G : MRing ι), G ∈ W ∧ IsMultiHomog G n ∧ χ G = χ f := by
   classical
   have hχp : ∀ n : K → ℕ, χ (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k) = 1 := fun n => by
     simp [map_prod, hχ]
@@ -86,13 +97,18 @@ theorem exists_homog_mem {S : Type*} [CommRing S] (χ : MRing ι →+* S) (c : �
   | mem x hx =>
     obtain ⟨a, ha⟩ := hSg x hx
     exact ⟨a, x, Ideal.subset_span hx, ha, rfl⟩
-  | zero => exact ⟨0, 0, zero_mem _, fun m hm => absurd hm (by simp), rfl⟩
+  | zero =>
+    exact ⟨0, 0, zero_mem _, fun m hm => absurd hm (by simp), rfl⟩
   | add x z _ _ hx hz =>
     obtain ⟨n₁, G₁, hG₁, h₁, e₁⟩ := hx
     obtain ⟨n₂, G₂, hG₂, h₂, e₂⟩ := hz
-    refine ⟨n₁ + n₂, G₁ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₂ k + G₂ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₁ k,
+    refine ⟨
+      n₁ + n₂,
+      G₁ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₂ k + G₂ * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n₁ k,
       add_mem (Ideal.mul_mem_right _ _ hG₁) (Ideal.mul_mem_right _ _ hG₂),
-      isMultiHomog_add' (isMultiHomog_mul h₁ (isMultiHomog_coordProd c n₂)) ?_, ?_⟩
+      isMultiHomog_add' (isMultiHomog_mul h₁ (isMultiHomog_coordProd c n₂)) ?_,
+      ?_
+    ⟩
     · rw [add_comm n₁]
       exact isMultiHomog_mul h₂ (isMultiHomog_coordProd c n₁)
     · rw [map_add (f := _), map_mul, map_mul, hχp, hχp, mul_one, mul_one, e₁, e₂, map_add (f := _)]
@@ -102,18 +118,20 @@ theorem exists_homog_mem {S : Type*} [CommRing S] (χ : MRing ι →+* S) (c : �
     refine ⟨m + n, A * G, Ideal.mul_mem_left _ _ hG, isMultiHomog_mul hA h, ?_⟩
     rw [smul_eq_mul, map_mul, map_mul, eA, e]
 
-theorem aeval_div {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
-    (G : MRing ι) (n : K → ℕ) (hG : IsMultiHomog G n) :
-    aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = aeval y G * (∏ k, y ⟨k, c k⟩ ^ n k)⁻¹ := by
+theorem aeval_div
+    {Ω : Type} [Field Ω]
+    (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
+    (G : MRing ι) (n : K → ℕ) (hG : IsMultiHomog G n)
+    : aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = aeval y G * (∏ k, y ⟨k, c k⟩ ^ n k)⁻¹ := by
   classical
   rw [aeval_def, aeval_def, eval₂_eq, eval₂_eq, Finset.sum_mul]
   refine Finset.sum_congr rfl fun m hm => ?_
   rw [mul_assoc]
   congr 1
-  rw [Finset.prod_subset (Finset.subset_univ m.support) (fun p _ hp => by
-      rw [Finsupp.notMem_support_iff.mp hp, pow_zero]),
-    Finset.prod_subset (Finset.subset_univ m.support) (fun p _ hp => by
-      rw [Finsupp.notMem_support_iff.mp hp, pow_zero])]
+  rw [Finset.prod_subset (Finset.subset_univ m.support)
+      (fun p _ hp => by rw [Finsupp.notMem_support_iff.mp hp, pow_zero]),
+    Finset.prod_subset (Finset.subset_univ m.support)
+      (fun p _ hp => by rw [Finsupp.notMem_support_iff.mp hp, pow_zero])]
   have hden : ∏ p : (Σ k, ι k), y ⟨p.1, c p.1⟩ ^ m p = ∏ k, y ⟨k, c k⟩ ^ n k := by
     rw [Fintype.prod_sigma]
     refine Finset.prod_congr rfl fun k _ => ?_
@@ -124,10 +142,9 @@ theorem aeval_div {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (c : ∀ k, �
 
 end CurveVerticalPointResidue
 
-
 open CurveVerticalPointResidue in
-theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
-    CurveVertPointResidue.Statement := by
+theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement)
+    : CurveVertPointResidue.Statement := by
   intro K _ ι _ Ω _ y s d hP hs hsP W hW
   classical
   obtain ⟨-, ⟨hPp, hPh, -⟩, -, hPdim⟩ := id hP
@@ -140,8 +157,8 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
   have hdim : ringKrullDim (MRing ι ⧸ W) = ((0 + Fintype.card K : ℕ) : WithBot ℕ∞) := by
     have h1 := dim_quot_minimal_add_one (mCoordIdeal y) W s hsP hWmin
     rw [hPdim] at h1
-    exact withBot_eq_of_add_one
-      (by rw [h1, show 1 + Fintype.card K = 0 + Fintype.card K + 1 by omega])
+    exact withBot_eq_of_add_one (by
+      rw [h1, show 1 + Fintype.card K = 0 + Fintype.card K + 1 by omega])
   have hvert : ¬ IsHorizontal W :=
     IndefiniteRowSideFullHecke.HeightsSet.CurveDivVertical.full K ι _ s d hP hs hsP W ⟨hWmin, hWrel⟩
   have : Fact (charOf W).Prime := ⟨charOf_prime hWp hvert⟩
@@ -150,7 +167,8 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
     have : ((charOf W : ℕ) : ℤ) ∈ W.comap (C : ℤ →+* MRing ι) := by
       unfold charOf
       rw [Int.natCast_natAbs]
-      rcases abs_choice (Submodule.IsPrincipal.generator (W.comap (C : ℤ →+* MRing ι))) with h | h <;> rw [h]
+      rcases abs_choice (Submodule.IsPrincipal.generator (W.comap (C : ℤ →+* MRing ι))) with h | h
+        <;> rw [h]
       · exact hgen
       · exact neg_mem hgen
     exact Ideal.mem_comap.mp this
@@ -161,12 +179,14 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
   have hgeo : ∀ b, geoNum 0 W b = ((Module.length ℤ (MRing ι ⧸ J)).toNat : ℤ) := by
     intro b
     rw [geoNum, dite_eq_left hWrel]
-  obtain ⟨hF, hFin, hcard⟩ := Inter.regularityLocalResidue_holds.chart_field_card hWmh hcW hdim (charOf W) hp
+  obtain ⟨hF, hFin, hcard⟩ :=
+    Inter.regularityLocalResidue_holds.chart_field_card hWmh hcW hdim (charOf W) hp
   letI : Field (MRing ι ⧸ J) := hF.toField
   have hyc : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k => ne_zero_of_X_notMem fun h => hcW k (hPW h)
   have hD : ∀ n : K → ℕ, (∏ k, y ⟨k, c k⟩ ^ n k) ≠ 0 := fun n =>
     Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hyc k)
-  have haevalD : ∀ n : K → ℕ, aeval y (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k) = ∏ k, y ⟨k, c k⟩ ^ n k := by
+  have haevalD
+      : ∀ n : K → ℕ, aeval y (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k) = ∏ k, y ⟨k, c k⟩ ^ n k := by
     intro n
     simp [map_prod]
 
@@ -191,7 +211,8 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
       have h := hspan hd
       rw [RingHom.mem_ker, map_sub, hf, sub_zero, hφform G n hG] at h
       exact (mul_eq_zero.mp h).resolve_right (inv_ne_zero (hD n))
-    have hGJ : G ∈ J := Ideal.mem_sup_left (hPW (LowerBoundFree.mem_mCoordIdeal_of_aeval_eq_zero y hG hG0))
+    have hGJ : G ∈ J :=
+      Ideal.mem_sup_left (hPW (LowerBoundFree.mem_mCoordIdeal_of_aeval_eq_zero y hG hG0))
     simpa using sub_mem hGJ (Ideal.mem_sup_right hd : G - f ∈ J)
 
   have hB : ∀ b : curveRing y, ∃ f, φ f = b := by
@@ -218,8 +239,8 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
     show ψ (incl b) = _
     rw [h']
     exact hψ f _
-  have hΘmul : ∀ (b₁ b₂ : curveRing y) g, (b₁ : Ω) * φ g = b₂ →
-      Θ b₁ * Ideal.Quotient.mk J g = Θ b₂ := by
+  have hΘmul
+      : ∀ (b₁ b₂ : curveRing y) g, (b₁ : Ω) * φ g = b₂ → Θ b₁ * Ideal.Quotient.mk J g = Θ b₂ := by
     intro b₁ b₂ g h
     obtain ⟨f, hf⟩ := hB b₁
     rw [hΘ b₁ f hf, hΘ b₂ (f * g) (by rw [map_mul, hf, h]), map_mul]
@@ -227,7 +248,8 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
   have : Finite (MRing ι ⧸ J) := hFin
   have hFF : IsField Θ.range := Finite.isDomain_to_isField _
   have hmax : (RingHom.ker Θ).IsMaximal :=
-    Ideal.Quotient.maximal_of_isField _ (MulEquiv.isField hFF (RingHom.quotientKerEquivRange Θ).toMulEquiv)
+    Ideal.Quotient.maximal_of_isField _
+      (MulEquiv.isField hFF (RingHom.quotientKerEquivRange Θ).toMulEquiv)
 
   obtain ⟨t, hyt, hrat⟩ := hC K ι Ω y hP (RingHom.ker Θ) hmax
   have hgen : ∀ u : Σ k, ι k, Ideal.Quotient.mk J (X u) ∈ Θ.range := by
@@ -252,8 +274,8 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
     have hx : Θ (bu * ac) ≠ 0 := by
       rw [map_mul]
       exact mul_ne_zero hbu' hac
-    obtain ⟨w, hw⟩ := hFF.mul_inv_cancel (a := ⟨Θ (bu * ac), bu * ac, rfl⟩)
-      (fun h => hx (congrArg Subtype.val h))
+    obtain ⟨w, hw⟩ :=
+      hFF.mul_inv_cancel (a := ⟨Θ (bu * ac), bu * ac, rfl⟩) (fun h => hx (congrArg Subtype.val h))
     have hw' : Θ (bu * ac) * (w : MRing ι ⧸ J) = 1 := congrArg Subtype.val hw
     have h2 : Ideal.Quotient.mk J (X ⟨k, u⟩) = Θ (au * bc) * w := by
       rw [← key, mul_comm (Θ (bu * ac)), mul_assoc, hw', mul_one]
@@ -285,19 +307,27 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
       obtain ⟨n, G, hGW, hG, hφG⟩ := exists_homog_mem φ c hφc hWmh hw
       have h1 : (b : Ω) = aeval y G * (∏ k, y ⟨k, c k⟩ ^ n k)⁻¹ := by
         rw [← hφform G n hG, hφG, ← hf, map_add (f := _), hspan hz, add_zero]
-      refine Ideal.subset_span ⟨n, G, ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k, hG, isMultiHomog_coordProd c n, hGW,
-        coordProd_not_mem hWp c hcW n, ?_⟩
+      refine Ideal.subset_span ⟨
+        n,
+        G,
+        ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k,
+        hG,
+        isMultiHomog_coordProd c n,
+        hGW,
+        coordProd_not_mem hWp c hcW n,
+        ?_
+      ⟩
       rw [h1, haevalD, mul_assoc, inv_mul_cancel₀ (hD n), mul_one]
     · refine Ideal.span_le.mpr ?_
       rintro b ⟨n, g, h, hg, hh, hgW, hhW, hbgh⟩
       rw [SetLike.mem_coe, RingHom.mem_ker]
       obtain ⟨f, hf⟩ := hB b
-      have hid : (b : Ω) * φ h = φ g := by
-        rw [hφform h _ hh, hφform g _ hg, ← mul_assoc, hbgh]
+      have hid : (b : Ω) * φ h = φ g := by rw [hφform h _ hh, hφform g _ hg, ← mul_assoc, hbgh]
       rw [hΘ b f hf]
       have h1 : Ideal.Quotient.mk J f * Ideal.Quotient.mk J h = 0 := by
         rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem]
-        have h3 : f * h - g ∈ J := hker (by rw [RingHom.mem_ker, map_sub, map_mul, hf, hid, sub_self])
+        have h3 : f * h - g ∈ J :=
+          hker (by rw [RingHom.mem_ker, map_sub, map_mul, hf, hid, sub_self])
         simpa using add_mem h3 (Ideal.mem_sup_left hgW : g ∈ J)
       have h2 : Ideal.Quotient.mk J h ≠ 0 := by
         rw [Ne, Ideal.Quotient.eq_zero_iff_mem]
@@ -305,8 +335,9 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
         obtain ⟨w, hw, z, hz, hwz⟩ := Submodule.mem_sup.mp hJh
         obtain ⟨n', G, hGW, hG, hφG⟩ := exists_homog_mem φ c hφc hWmh hw
         have e1 : φ G = φ h := by rw [hφG, ← hwz, map_add (f := _), hspan hz, add_zero]
-        have hmem : G * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k - h * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n' k ∈
-            mCoordIdeal y := by
+        have hmem
+            : G * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k - h * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n' k
+              ∈ mCoordIdeal y := by
           refine LowerBoundFree.mem_mCoordIdeal_of_aeval_eq_zero y (d := n' + n)
             (isMultiHomog_sub' (isMultiHomog_mul hG (isMultiHomog_coordProd c n)) ?_) ?_
           · rw [add_comm n']
@@ -318,7 +349,8 @@ theorem CurveVertPointResidue.proof (hC : CurveClosedPointChart.Statement) :
             field_simp at e1
             linear_combination e1
         have h4 : h * ∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n' k ∈ W := by
-          have h5 := sub_mem (Ideal.mul_mem_right (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k) W hGW) (hPW hmem)
+          have h5 :=
+            sub_mem (Ideal.mul_mem_right (∏ k, (X ⟨k, c k⟩ : MRing ι) ^ n k) W hGW) (hPW hmem)
           simpa using h5
         rcases hWp.mem_or_mem h4 with h3 | h3
         · exact hhW h3

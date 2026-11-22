@@ -12,10 +12,12 @@ open Matrix
 
 namespace PI.ScMuExists.UnitaryGroupMassFormula
 
-theorem gram_entry (I : Formalism.MainNotions.S.AutInst) (v : NumberField.InfinitePlace I.F) {r : ℕ}
-    (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) (j k : Fin r ⊕ Fin r ⊕ Unit) :
-    ((instBmat I v e f z)ᴴ * Formalism.REAL.Jm (I.ε v) * instBmat I v e f z) j k =
-      hJ (I.ε v) (rv I v (instFvec e f z j)) (rv I v (instFvec e f z k)) := by
+theorem gram_entry
+    (I : Formalism.MainNotions.S.AutInst) (v : NumberField.InfinitePlace I.F)
+    {r : ℕ} (e f : Fin r → Fin I.n → I.E)
+    (z : Fin I.n → I.E) (j k : Fin r ⊕ Fin r ⊕ Unit)
+    : ((instBmat I v e f z)ᴴ * Formalism.REAL.Jm (I.ε v) * instBmat I v e f z) j k
+      = hJ (I.ε v) (rv I v (instFvec e f z j)) (rv I v (instFvec e f z k)) := by
   unfold instBmat hJ
   rw [Matrix.mul_assoc]
   simp [Matrix.mul_apply, dotProduct, mulVec, Finset.mul_sum]
@@ -29,8 +31,9 @@ theorem frame_gram_instance : InstFrameGram := by
     congr 1
     funext a
     by_cases h : I.ε v a <;> simp [h]
-  have hH : ((instBmat I v e f z)ᴴ * Formalism.REAL.Jm (I.ε v) * instBmat I v e f z)ᴴ =
-      (instBmat I v e f z)ᴴ * Formalism.REAL.Jm (I.ε v) * instBmat I v e f z := by
+  have hH
+      : ((instBmat I v e f z)ᴴ * Formalism.REAL.Jm (I.ε v) * instBmat I v e f z)ᴴ
+        = (instBmat I v e f z)ᴴ * Formalism.REAL.Jm (I.ε v) * instBmat I v e f z := by
     simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hJH, Matrix.mul_assoc]
   have hent := gram_entry I v e f z
   generalize (instBmat I v e f z)ᴴ * Formalism.REAL.Jm (I.ε v) * instBmat I v e f z = G at hH hent ⊢
@@ -40,12 +43,12 @@ theorem frame_gram_instance : InstFrameGram := by
     rw [Matrix.conjTranspose_apply] at hjk
     exact hjk.symm
   have h1 : ∀ a b, G (Sum.inl a) (Sum.inl b) = 0 := fun a b => by rw [hent]; exact hee a b
-  have h3 : ∀ a b, G (Sum.inl a) (Sum.inr (Sum.inl b)) = if a = b then 1 else 0 :=
-    fun a b => by rw [hent]; exact hef a b
-  have h4 : ∀ a (u : Unit), G (Sum.inl a) (Sum.inr (Sum.inr u)) = 0 :=
-    fun a u => by rw [hent]; exact (hz a).1
-  have h5 : ∀ a (u : Unit), G (Sum.inr (Sum.inl a)) (Sum.inr (Sum.inr u)) = 0 :=
-    fun a u => by rw [hent]; exact (hz a).2
+  have h3 : ∀ a b, G (Sum.inl a) (Sum.inr (Sum.inl b)) = if a = b then 1 else 0 := fun a b => by
+    rw [hent]; exact hef a b
+  have h4 : ∀ a (u : Unit), G (Sum.inl a) (Sum.inr (Sum.inr u)) = 0 := fun a u => by
+    rw [hent]; exact (hz a).1
+  have h5 : ∀ a (u : Unit), G (Sum.inr (Sum.inl a)) (Sum.inr (Sum.inr u)) = 0 := fun a u => by
+    rw [hent]; exact (hz a).2
   have h3' : ∀ a b, G (Sum.inr (Sum.inl a)) (Sum.inl b) = if b = a then 1 else 0 := by
     intro a b
     rw [hS, h3]
@@ -74,7 +77,8 @@ theorem frame_gram_instance : InstFrameGram := by
       intro u
       have := congrFun hw (Sum.inr (Sum.inr u))
       simp only [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, h4', h5', zero_mul,
-        Finset.sum_const_zero, zero_add, Pi.zero_apply] at this
+          Finset.sum_const_zero, zero_add, Pi.zero_apply]
+        at this
       rw [Fintype.sum_unique] at this
       rcases (mul_eq_zero.mp this) with h | h
       · exact absurd h (h6 _ _)

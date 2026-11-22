@@ -17,8 +17,7 @@ section Incl
 
 variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G)
 
-noncomputable def barInclF (n : ℕ) :
-    free k S (Fin n → S) ⟶ res S.subtype (free k G (Fin n → G)) :=
+noncomputable def barInclF (n : ℕ) : free k S (Fin n → S) ⟶ res S.subtype (free k G (Fin n → G)) :=
   freeLift k S (res S.subtype (free k G (Fin n → G)))
     (fun v => Finsupp.single (S.subtype ∘ v) (MonoidAlgebra.single (1 : G) (1 : k)))
 
@@ -50,10 +49,9 @@ lemma barInclF_comm (j : ℕ) :
   rw [barInclF_single, OneMemClass.coe_one]
   exact congrArg (fun v => Finsupp.single v _) (contractNth_subtype S i x)
 
-
 set_option backward.isDefEq.respectTransparency false in
-noncomputable def barIncl :
-    (barResolution k S).complex ⟶ (resBarResolution (k := k) S).complex where
+noncomputable def barIncl
+    : (barResolution k S).complex ⟶ (resBarResolution (k := k) S).complex where
   f n := barInclF S n
   comm' i j hij := by
     obtain rfl : i = j + 1 := hij.symm
@@ -64,7 +62,6 @@ noncomputable def barIncl :
       (barComplex k S).d (j + 1) j ≫ barInclF S j
     rw [barComplex.d_def, barComplex.d_def]
     exact h
-
 
 set_option backward.isDefEq.respectTransparency false in
 lemma barIncl_π : barIncl (k := k) S ≫ (resBarResolution (k := k) S).π = (barResolution k S).π := by
@@ -77,11 +74,12 @@ lemma barIncl_π : barIncl (k := k) S ≫ (resBarResolution (k := k) S).π = (ba
   erw [barResolution_π_f_zero_single (k := k) (G := G)]
   erw [barResolution_π_f_zero_single (k := k) (G := S)]
 
-noncomputable def barInclHomotopy :
-    Homotopy ((barHomotopyEquiv (k := k) S).inv ≫ barIncl S) (𝟙 _) :=
+noncomputable def barInclHomotopy
+    : Homotopy ((barHomotopyEquiv (k := k) S).inv ≫ barIncl S) (𝟙 _) :=
   ProjectiveResolution.liftHomotopy (𝟙 _) _ _
-    (by rw [Category.assoc, barIncl_π, barHomotopyEquiv, ProjectiveResolution.homotopyEquiv_inv_π,
-      CategoryTheory.Functor.map_id, Category.comp_id])
+    (by
+      rw [Category.assoc, barIncl_π, barHomotopyEquiv, ProjectiveResolution.homotopyEquiv_inv_π,
+        CategoryTheory.Functor.map_id, Category.comp_id])
     (by rw [CategoryTheory.Functor.map_id, Category.comp_id, Category.id_comp])
 
 end Incl
@@ -90,20 +88,20 @@ section Key
 
 variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G)
 
-
 set_option backward.isDefEq.respectTransparency false in
-noncomputable def resHomComplex (A : Rep.{u} k G) :
-    (barComplex k G).linearYonedaObj k A ⟶
-      (resBarResolution (k := k) S).complex.linearYonedaObj k (res S.subtype A) where
-  f n := ModuleCat.ofHom
-    { toFun := fun f => (resFunctor S.subtype).map f
+noncomputable def resHomComplex (A : Rep.{u} k G)
+    : (barComplex k G).linearYonedaObj k A
+      ⟶ (resBarResolution (k := k) S).complex.linearYonedaObj k (res S.subtype A) where
+  f n :=
+    ModuleCat.ofHom {
+      toFun := fun f => (resFunctor S.subtype).map f
       map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+      map_smul' := fun _ _ => rfl
+    }
   comm' i j hij := by
     ext f
     simp [resBarResolution, Functor.mapProjectiveResolution]
     rfl
-
 
 set_option backward.isDefEq.respectTransparency false in
 lemma freeLift_cochainsMap_subtype (A : Rep.{u} k G) (n : ℕ) (y : (Fin n → G) → A) :
@@ -116,7 +114,6 @@ lemma freeLift_cochainsMap_subtype (A : Rep.{u} k G) (n : ℕ) (y : (Fin n → G
   exact (show (freeLift k G A y).hom (Finsupp.single (Subtype.val ∘ w) (MonoidAlgebra.single 1 1)) =
     y (Subtype.val ∘ w) by simp).symm
 
-
 set_option backward.isDefEq.respectTransparency false in
 lemma cochainsMap_subtype_comp_iso (A : Rep.{u} k G) :
     cochainsMap S.subtype (𝟙 (res S.subtype A)) ≫ (inhomogeneousCochainsIso (res S.subtype A)).hom =
@@ -124,7 +121,6 @@ lemma cochainsMap_subtype_comp_iso (A : Rep.{u} k G) :
         linearYonedaObjMap (barIncl (k := k) S) (res S.subtype A) := by
   ext n y : 3
   exact freeLift_cochainsMap_subtype S A n y
-
 
 set_option backward.isDefEq.respectTransparency false in
 lemma iso_resHomComplex_adj_iso (A : Rep.{u} k G) :
@@ -144,40 +140,44 @@ lemma iso_resHomComplex_adj_iso (A : Rep.{u} k G) :
     (Finsupp.single v (MonoidAlgebra.single 1 1))) = _
   simp
 
-theorem homologyMap_cochainsMap_unit (A : Rep.{u} k G) (n : ℕ) :
-    HomologicalComplex.homologyMap (cochainsMap (MonoidHom.id G)
-        ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A)) n =
-      groupCohomology.map S.subtype (𝟙 (res S.subtype A)) n ≫
-        HomologicalComplex.homologyMap (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom n := by
-  have H := ((linearYonedaObjHomotopy (R := k) (barInclHomotopy (k := k) S)
-    (res S.subtype A)).compRight
-      ((linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom ≫
-        (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv)).compLeft
-    ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A)
-  have e1 : ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A) ≫
-      linearYonedaObjMap ((barHomotopyEquiv (k := k) S).inv ≫ barIncl S) (res S.subtype A) ≫
-        (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom ≫
-          (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv =
-      cochainsMap S.subtype (𝟙 (res S.subtype A)) ≫
-        (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom := by
-    calc _ = ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A ≫
-            linearYonedaObjMap (barIncl (k := k) S) (res S.subtype A)) ≫
-          linearYonedaObjMap (barHomotopyEquiv (k := k) S).inv (res S.subtype A) ≫
-            (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom ≫
-              (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv := by
-          rw [linearYonedaObjMap_comp]; simp only [Category.assoc]
-      _ = (cochainsMap S.subtype (𝟙 (res S.subtype A)) ≫
-            (inhomogeneousCochainsIso (res S.subtype A)).hom) ≫
-          linearYonedaObjMap (barHomotopyEquiv (k := k) S).inv (res S.subtype A) ≫
-            (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom ≫
-              (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv :=
-          congrArg (· ≫ _) (cochainsMap_subtype_comp_iso S A).symm
+theorem homologyMap_cochainsMap_unit (A : Rep.{u} k G) (n : ℕ)
+    : HomologicalComplex.homologyMap
+        (cochainsMap (MonoidHom.id G) ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A)) n
+      = groupCohomology.map S.subtype (𝟙 (res S.subtype A)) n ≫ HomologicalComplex.homologyMap
+        (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom n := by
+  have H :=
+    ((linearYonedaObjHomotopy (R := k) (barInclHomotopy (k := k) S) (res S.subtype A)).compRight
+        ((linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom
+          ≫ (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv)).compLeft
+      ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A)
+  have e1
+      : ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A)
+          ≫ linearYonedaObjMap ((barHomotopyEquiv (k := k) S).inv ≫ barIncl S) (res S.subtype A)
+          ≫ (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom
+          ≫ (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv
+        = cochainsMap S.subtype (𝟙 (res S.subtype A))
+          ≫ (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom := by
+    calc
+      _ = ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A
+            ≫ linearYonedaObjMap (barIncl (k := k) S) (res S.subtype A))
+          ≫ linearYonedaObjMap (barHomotopyEquiv (k := k) S).inv (res S.subtype A)
+          ≫ (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom
+          ≫ (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv := by
+        rw [linearYonedaObjMap_comp]; simp only [Category.assoc]
+      _ = (cochainsMap S.subtype (𝟙 (res S.subtype A))
+            ≫ (inhomogeneousCochainsIso (res S.subtype A)).hom)
+          ≫ linearYonedaObjMap (barHomotopyEquiv (k := k) S).inv (res S.subtype A)
+          ≫ (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom
+          ≫ (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv :=
+        congrArg (· ≫ _) (cochainsMap_subtype_comp_iso S A).symm
       _ = _ := by simp only [Category.assoc]; rfl
-  have e2 : ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A) ≫
-      linearYonedaObjMap (𝟙 _) (res S.subtype A) ≫
-        (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom ≫
-          (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv =
-      cochainsMap (MonoidHom.id G) ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A) := by
+  have e2
+      : ((inhomogeneousCochainsIso A).hom ≫ resHomComplex S A)
+          ≫ linearYonedaObjMap (𝟙 _) (res S.subtype A)
+          ≫ (linearYonedaObjResProjectiveResolutionIso (barResolution k G) (res S.subtype A)).hom
+          ≫ (inhomogeneousCochainsIso (coind S.subtype (res S.subtype A))).inv
+        = cochainsMap (MonoidHom.id G)
+          ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A) := by
     rw [linearYonedaObjMap_id, Category.id_comp, Category.assoc]
     exact iso_resHomComplex_adj_iso S A
   rw [← e2, ← H.homologyMap_eq, e1, HomologicalComplex.homologyMap_comp]
@@ -195,30 +195,33 @@ lemma comp_cancel_of_isos {C : Type*} [Category C] {X X' Y Y' Z Z' : C} (pG : X 
 
 variable {k G : Type u} [CommRing k] [Group G] [Fintype G] (S : Subgroup G) [Fintype S]
 
-theorem tateRes_comp_isoGroupCohomology (n : ℕ) [NeZero n] (A : Rep.{u} k G) :
-    (tateRes S n).app A ≫ (TateCohomology.isoGroupCohomology n).hom.app (res S.subtype A) =
-      (TateCohomology.isoGroupCohomology n).hom.app A ≫
-        groupCohomology.map S.subtype (𝟙 (res S.subtype A)) n := by
-  have h1 : HomologicalComplex.homologyMap
-      (tateComplex.map ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A)) n =
-      ((tateComplexConnectData A).homologyIsoPos n n rfl).hom ≫
-        HomologicalComplex.homologyMap (cochainsMap (MonoidHom.id G)
-          ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A)) n ≫
-        ((tateComplexConnectData (coind S.subtype (res S.subtype A) : Rep.{u} k G)).homologyIsoPos
-          n n rfl).inv :=
+theorem tateRes_comp_isoGroupCohomology (n : ℕ) [NeZero n] (A : Rep.{u} k G)
+    : (tateRes S n).app A ≫ (TateCohomology.isoGroupCohomology n).hom.app (res S.subtype A)
+      = (TateCohomology.isoGroupCohomology n).hom.app A
+        ≫ groupCohomology.map S.subtype (𝟙 (res S.subtype A)) n := by
+  have h1
+      : HomologicalComplex.homologyMap
+          (tateComplex.map ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A)) n
+        = ((tateComplexConnectData A).homologyIsoPos n n rfl).hom
+          ≫ HomologicalComplex.homologyMap
+            (cochainsMap (MonoidHom.id G) ((Rep.resCoindAdjunction.{u, u} k S.subtype).unit.app A))
+            n
+          ≫ ((tateComplexConnectData
+            (coind S.subtype (res S.subtype A) : Rep.{u} k G)).homologyIsoPos n n rfl).inv :=
     CochainComplex.ConnectData.homologyMap_map_of_eq_succ _ _ _ _ _ n n rfl
   have h2 : HomologicalComplex.homologyMap (tateShapiroMap S (res S.subtype A)) n = _ :=
-    CochainComplex.ConnectData.homologyMap_map_of_eq_succ
-    (tateComplexConnectData (res S.subtype A))
-    (tateComplexConnectData (coind S.subtype (res S.subtype A) : Rep.{u} k G))
-    (groupHomology.chainsMap S.subtype (toResCoind S (res S.subtype A)))
-    (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom (shapiro_comm_zero S (res S.subtype A))
-    n n rfl
+    CochainComplex.ConnectData.homologyMap_map_of_eq_succ (tateComplexConnectData (res S.subtype A))
+      (tateComplexConnectData (coind S.subtype (res S.subtype A) : Rep.{u} k G))
+      (groupHomology.chainsMap S.subtype (toResCoind S (res S.subtype A)))
+      (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom (shapiro_comm_zero S (res S.subtype A))
+      n n rfl
   have hb := homologyMap_tateShapiroMap_comp_tateCoindIso_hom S (res S.subtype A) n
-  have h2' : HomologicalComplex.homologyMap (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom n =
-      ((tateComplexConnectData (res S.subtype A)).homologyIsoPos n n rfl).inv ≫
-        HomologicalComplex.homologyMap (tateShapiroMap S (res S.subtype A)) n ≫
-          ((tateComplexConnectData (coind S.subtype (res S.subtype A) : Rep.{u} k G)).homologyIsoPos n n rfl).hom := by
+  have h2'
+      : HomologicalComplex.homologyMap (shapiroCochainsHomotopyEquiv S (res S.subtype A)).hom n
+        = ((tateComplexConnectData (res S.subtype A)).homologyIsoPos n n rfl).inv
+          ≫ HomologicalComplex.homologyMap (tateShapiroMap S (res S.subtype A)) n
+          ≫ ((tateComplexConnectData
+            (coind S.subtype (res S.subtype A) : Rep.{u} k G)).homologyIsoPos n n rfl).hom := by
     rw [h2]; simp
   rw [tateRes_app, Category.assoc]
   show HomologicalComplex.homologyMap

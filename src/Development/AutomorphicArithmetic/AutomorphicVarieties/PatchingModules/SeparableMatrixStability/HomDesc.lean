@@ -4,10 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.hom_desc :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (A A' B B' : Glob l L) (a : A.Hom A') (b : B.Hom B') (h : A.Hom B), a.p.ker ≤ (b.p.comp h.p).ker → ∃ h' : A'.Hom B', ∀ x, h'.p (a.p x) = b.p (h.p x) := by
+theorem UpperTheory.V.Pa.hom_desc
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (A A' B B' : Glob l L) (a : A.Hom A') (b : B.Hom B')
+        (h : A.Hom B),
+      a.p.ker ≤ (b.p.comp h.p).ker → ∃ h' : A'.Hom B', ∀ x, h'.p (a.p x) = b.p (h.p x) := by
   intro l _ L A A' B B' a b h hk
   have hT1 : T1Space A'.Γ := by
     refine ⟨fun x => ?_⟩
@@ -17,12 +20,12 @@ theorem UpperTheory.V.Pa.hom_desc :
       h2.eq_singleton_of_mem (subset_closure (Set.mem_singleton x))
     exact closure_eq_iff_isClosed.mp h3
   have hT2 : T2Space A'.Γ := inferInstance
-  let q : A'.Γ →* B'.Γ := a.p.liftOfRightInverse (Function.surjInv a.surj)
-    (Function.rightInverse_surjInv a.surj) ⟨b.p.comp h.p, hk⟩
+  let q : A'.Γ →* B'.Γ :=
+    a.p.liftOfRightInverse (Function.surjInv a.surj) (Function.rightInverse_surjInv a.surj)
+      ⟨b.p.comp h.p, hk⟩
   have hq : ∀ x, q (a.p x) = b.p (h.p x) := fun x =>
     a.p.liftOfRightInverse_comp_apply _ _ ⟨b.p.comp h.p, hk⟩ x
-  have hquot : Topology.IsQuotientMap a.p :=
-    a.cont.isClosedMap.isQuotientMap a.cont a.surj
+  have hquot : Topology.IsQuotientMap a.p := a.cont.isClosedMap.isQuotientMap a.cont a.surj
   refine ⟨⟨q, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, hq⟩
   · rw [hquot.continuous_iff]
     have : (q : A'.Γ → B'.Γ) ∘ a.p = fun x => b.p (h.p x) := funext hq

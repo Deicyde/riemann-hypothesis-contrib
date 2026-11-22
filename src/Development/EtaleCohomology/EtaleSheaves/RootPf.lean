@@ -40,7 +40,8 @@ theorem Root_of : LateralTheory.E.ChartSurjCut.Root := by
   have hqU : ∀ U : Z.Opens, IsUnit (q : Γ(Z, U)) := fun U => unit_sec q A p hq U
   obtain ⟨x⟩ := (inferInstance : Nonempty Z)
   have : Nonempty (⊤ : Z.Opens) := ⟨⟨x, trivial⟩⟩
-  have hq0 : NeZero q := ⟨by rintro rfl; exact not_isUnit_zero (M₀ := Γ(Z, ⊤)) (by simpa using hqU ⊤)⟩
+  have hq0 : NeZero q :=
+    ⟨by rintro rfl; exact not_isUnit_zero (M₀ := Γ(Z, ⊤)) (by simpa using hqU ⊤)⟩
   have hbasis : ∀ {U : Z.Opens} {y : Z}, y ∈ U → ∃ U' ∈ Z.affineOpens, y ∈ U' ∧ U' ≤ U :=
     TopologicalSpace.Opens.isBasis_iff_nbhd.mp Z.isBasis_affineOpens
   have haff : ∀ y : Z, ∃ U : Z.Opens, IsAffineOpen U ∧ y ∈ U := by
@@ -59,7 +60,8 @@ theorem Root_of : LateralTheory.E.ChartSurjCut.Root := by
   have hex : ∀ i : ι, ∃ s : Γ(Z, U i), (Z.germToFunctionField (U i)).hom s = ζ := fun i =>
     @local_root Z hI hA q hq0 hqU ζ hζ i.1 i.2.1 i.2.2
   let sf : ∀ i : ι, Γ(Z, U i) := fun i => Classical.choose (hex i)
-  have hsf : ∀ i : ι, (Z.germToFunctionField (U i)).hom (sf i) = ζ := fun i => Classical.choose_spec (hex i)
+  have hsf : ∀ i : ι, (Z.germToFunctionField (U i)).hom (sf i) = ζ := fun i =>
+    Classical.choose_spec (hex i)
   have hcov : (⊤ : Z.Opens) ≤ iSup U := by
     intro y _
     obtain ⟨V, hV, hy⟩ := haff y
@@ -67,11 +69,14 @@ theorem Root_of : LateralTheory.E.ChartSurjCut.Root := by
   have hcomp : TopCat.Presheaf.IsCompatible Z.sheaf.1 U sf := by
     intro i j
     have : Nonempty (U i ⊓ U j : Z.Opens) := by
-      obtain ⟨y, hy⟩ := nonempty_preirreducible_inter (U i).isOpen (U j).isOpen
-        (by obtain ⟨⟨y, hy⟩⟩ := i.2.2; exact ⟨y, hy⟩) (by obtain ⟨⟨y, hy⟩⟩ := j.2.2; exact ⟨y, hy⟩)
+      obtain ⟨y, hy⟩ :=
+        nonempty_preirreducible_inter (U i).isOpen (U j).isOpen
+          (by obtain ⟨⟨y, hy⟩⟩ := i.2.2; exact ⟨y, hy⟩)
+          (by obtain ⟨⟨y, hy⟩⟩ := j.2.2; exact ⟨y, hy⟩)
       exact ⟨⟨y, hy⟩⟩
     apply Z.germToFunctionField_injective (U i ⊓ U j)
-    change Z.presheaf.germ _ _ _ (Z.presheaf.map _ (sf i)) = Z.presheaf.germ _ _ _ (Z.presheaf.map _ (sf j))
+    change Z.presheaf.germ _ _ _ (Z.presheaf.map _ (sf i))
+      = Z.presheaf.germ _ _ _ (Z.presheaf.map _ (sf j))
     rw [TopCat.Presheaf.germ_res_apply, TopCat.Presheaf.germ_res_apply]
     exact (hsf i).trans (hsf j).symm
   obtain ⟨s0, hs, -⟩ := Z.sheaf.existsUnique_gluing' U ⊤ (fun i => homOfLE le_top) hcov sf hcomp

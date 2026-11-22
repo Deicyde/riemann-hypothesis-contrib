@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
 open scoped TensorProduct
 
 namespace GlobalTheory.HTFaith
@@ -169,10 +171,15 @@ lemma integral (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (c : 
 
 end GlobalTheory.HTFaith
 
-theorem GlobalTheory.HTFaith.faithful : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (x : D.O), (∀ y : D.La, x • y = 0) → x = 0 := by
+theorem GlobalTheory.HTFaith.faithful
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (x : D.O),
+      (∀ y : D.La, x • y = 0) → x = 0 := by
   intro p _ D x hx
   classical
-  haveI := D.freeO; haveI := D.finO; haveI := D.freeLa; haveI := D.finLa
+  haveI := D.freeO
+  haveI := D.finO
+  haveI := D.freeLa
+  haveI := D.finLa
   by_contra hne
   obtain ⟨k, x', rfl, hx'⟩ := GlobalTheory.HTFaith.saturate p D.O x hne
   have hp0 : (p : ℤ) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
@@ -187,7 +194,8 @@ theorem GlobalTheory.HTFaith.faithful : ∀ (p : ℕ) [Fact p.Prime] (D : Global
   have hπ : ∀ r, π ((p : ℤ) • r) = 0 := by
     intro r
     rw [zsmul_eq_mul]
-    exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _))
+    exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mul_mem_right _ _
+      (Ideal.mem_span_singleton_self _))
   let Φ : D.O →+* Matrix (Fin D.m) (Fin D.m) ((𝓞 D.F ⊗[ℤ] ℤ_[p]) ⧸ J) :=
     π.mapMatrix.comp (φ.toRingHom.comp Algebra.TensorProduct.includeLeftRingHom)
   have hΦ : ∀ a, Φ a = (φ (a ⊗ₜ 1)).map π := fun a => rfl
@@ -213,7 +221,8 @@ theorem GlobalTheory.HTFaith.faithful : ∀ (p : ℕ) [Fact p.Prime] (D : Global
     have h1 : φ (a ⊗ₜ 1) = Matrix.of B - (p : ℤ) • φ z := by
       rw [← map_zsmul, ← φ.apply_symm_apply (Matrix.of B), hz, map_add (f := _)]; abel
     ext i j
-    rw [hΦ, h1, Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, map_sub, hπ, sub_zero, Matrix.of_apply]
+    rw [hΦ, h1, Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, map_sub, hπ, sub_zero,
+      Matrix.of_apply]
     exact hB i j
   have hsurjF : ∀ r : (𝓞 D.F ⊗[ℤ] ℤ_[p]) ⧸ J, ∃ c : 𝓞 D.F, π (c ⊗ₜ 1) = r := by
     intro r
@@ -234,14 +243,16 @@ theorem GlobalTheory.HTFaith.faithful : ∀ (p : ℕ) [Fact p.Prime] (D : Global
   let y := ∑ k, E k i * x' * E j k
   have hy : Φ y = Matrix.scalar _ (Φ x' i j) := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [y, map_sum, map_mul, hE, Matrix.single_mul_mul_single, _root_.one_mul, _root_.mul_one]
+      simp only [y, map_sum, map_mul, hE, Matrix.single_mul_mul_single, _root_.one_mul,
+        _root_.mul_one]
     ext a b
     rw [Matrix.sum_apply]
     by_cases hab : a = b
     · subst hab
       rw [Finset.sum_eq_single a (fun k _ hk => by simp [Matrix.single_apply, hk]) (by simp)]
       simp [Matrix.single_apply]
-    · rw [Finset.sum_eq_zero (fun k _ => by simp [Matrix.single_apply]; intro h1 h2; exact absurd (h1.symm.trans h2) hab)]
+    · rw [Finset.sum_eq_zero (fun k _ => by
+        simp [Matrix.single_apply]; intro h1 h2; exact absurd (h1.symm.trans h2) hab)]
       simp [Matrix.scalar_apply, Matrix.diagonal_apply, hab]
   obtain ⟨c, hc⟩ := hsurjF (Φ x' i j)
   have h0 : Φ (y - algebraMap _ _ c) = 0 := by rw [map_sub, hy, hscal, hc, sub_self]

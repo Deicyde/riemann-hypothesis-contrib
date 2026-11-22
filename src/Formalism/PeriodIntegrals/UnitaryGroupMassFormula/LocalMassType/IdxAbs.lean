@@ -10,18 +10,22 @@ namespace PI.LocMassTypW
 
 open MeasureTheory
 
-theorem idx_abs {G V : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
-    [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V]
-    (μ : Measure G) [μ.IsMulLeftInvariant] (ν : Measure V) [ν.IsAddLeftInvariant]
-    (K : Subgroup G) (hK : MeasurableSet (K : Set G)) (B : AddSubgroup V)
-    (hB : MeasurableSet (B : Set V)) [Countable (V ⧸ B)] (N : Set G) (C : Set V) (φ : G → V)
-    (hNK : ∀ x ∈ N, ∀ k ∈ K, x * k ∈ N) (hCB : ∀ u ∈ C, ∀ b ∈ B, u + b ∈ C)
-    (hφ : ∀ x ∈ N, φ x ∈ C) (hco : ∀ x ∈ N, ∀ y ∈ N, x⁻¹ * y ∈ K ↔ -φ x + φ y ∈ B)
-    (hsur : ∀ u ∈ C, ∃ x ∈ N, -φ x + u ∈ B) :
-    μ N * ν B = μ K * ν C := by
+theorem idx_abs
+    {G V : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G] [AddCommGroup V]
+    [MeasurableSpace V] [MeasurableAdd V]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (ν : Measure V) [ν.IsAddLeftInvariant]
+    (K : Subgroup G) (hK : MeasurableSet (K : Set G))
+    (B : AddSubgroup V) (hB : MeasurableSet (B : Set V)) [Countable (V ⧸ B)]
+    (N : Set G) (C : Set V) (φ : G → V)
+    (hNK : ∀ x ∈ N, ∀ k ∈ K, x * k ∈ N) (hCB : ∀ u ∈ C, ∀ b ∈ B, u + b ∈ C) (hφ : ∀ x ∈ N, φ x ∈ C)
+    (hco : ∀ x ∈ N, ∀ y ∈ N, x⁻¹ * y ∈ K ↔ - φ x + φ y ∈ B) (hsur : ∀ u ∈ C, ∃ x ∈ N, - φ x + u ∈ B)
+    : μ N * ν B = μ K * ν C := by
   classical
-  have hI : ∀ q : {q : V ⧸ B | ∃ x ∈ N, (QuotientAddGroup.mk (φ x) : V ⧸ B) = q},
-      ∃ x ∈ N, (QuotientAddGroup.mk (φ x) : V ⧸ B) = q := fun q => q.2
+  have hI
+      : ∀ q : {q : V ⧸ B | ∃ x ∈ N, (QuotientAddGroup.mk (φ x) : V ⧸ B) = q}, ∃ x ∈ N,
+        (QuotientAddGroup.mk (φ x) : V ⧸ B) = q := fun q =>
+    q.2
   choose x hxN hxq using hI
   have hmk : ∀ a b : V, -a + b ∈ B ↔ (QuotientAddGroup.mk a : V ⧸ B) = QuotientAddGroup.mk b :=
     fun a b => QuotientAddGroup.eq.symm
@@ -48,7 +52,8 @@ theorem idx_abs {G V : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
     · rintro ⟨q, hq⟩
       have hc := hNK _ (hxN q) _ hq
       simpa using hc
-  have hdC : Pairwise (Function.onFun Disjoint fun q => (fun v => -φ (x q) + v) ⁻¹' (B : Set V)) := by
+  have hdC
+      : Pairwise (Function.onFun Disjoint fun q => (fun v => - φ (x q) + v) ⁻¹' (B : Set V)) := by
     intro q q' hqq
     rw [Function.onFun, Set.disjoint_left]
     intro v h1 h2
@@ -56,7 +61,8 @@ theorem idx_abs {G V : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
     apply Subtype.ext
     simp only [Set.mem_preimage, SetLike.mem_coe, hmk] at h1 h2
     rw [← hxq q, ← hxq q', h1, h2]
-  have hdN : Pairwise (Function.onFun Disjoint fun q => (fun y => (x q)⁻¹ * y) ⁻¹' (K : Set G)) := by
+  have hdN
+      : Pairwise (Function.onFun Disjoint fun q => (fun y => (x q)⁻¹ * y) ⁻¹' (K : Set G)) := by
     intro q q' hqq
     rw [Function.onFun, Set.disjoint_left]
     intro y h1 h2

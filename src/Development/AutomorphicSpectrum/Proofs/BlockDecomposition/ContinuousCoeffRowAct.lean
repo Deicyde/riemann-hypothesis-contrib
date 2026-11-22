@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChartUnipote
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.BCT.TrKer
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.BCT.TrKer
 open scoped Classical TensorProduct Topology
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -14,30 +16,37 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WInfCont
 
-theorem continuous_coeff_rowAct {r m : ℕ} (f : MvPolynomial (Fin r × Fin m) ℂ) :
-    ∀ s : (Fin r × Fin m) →₀ ℕ, Continuous fun M : Matrix (Fin r) (Fin r) ℂ =>
-      AddMonoidAlgebra.coeff (Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M f) s := by
+theorem continuous_coeff_rowAct {r m : ℕ} (f : MvPolynomial (Fin r × Fin m) ℂ)
+    : ∀ s : (Fin r × Fin m) →₀ ℕ,
+      Continuous fun M : Matrix (Fin r) (Fin r) ℂ =>
+        AddMonoidAlgebra.coeff (Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M f) s := by
   induction f using MvPolynomial.induction_on with
   | C a =>
     intro s
     simpa [MvPolynomial.algebraMap_eq] using
-      (continuous_const : Continuous fun _ : Matrix (Fin r) (Fin r) ℂ => AddMonoidAlgebra.coeff (MvPolynomial.C a) s)
+      (continuous_const : Continuous fun _ : Matrix (Fin r) (Fin r) ℂ =>
+        AddMonoidAlgebra.coeff (MvPolynomial.C a) s)
   | add p q hp hq =>
     intro s
     simp only [map_add (f := _), MvPolynomial.coeff_add]
     exact (hp s).add (hq s)
   | mul_X p v hp =>
     intro s
-    have key : ∀ M : Matrix (Fin r) (Fin r) ℂ, AddMonoidAlgebra.coeff (Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M (p * MvPolynomial.X v)) s =
-        ∑ b : Fin r, M v.1 b * (if (b, v.2) ∈ s.support then
-          AddMonoidAlgebra.coeff (Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M p) (s - Finsupp.single (b, v.2) 1) else 0) := by
-      intro M
-      have hX : Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M (MvPolynomial.X v) =
-          ∑ b : Fin r, MvPolynomial.C (M v.1 b) * MvPolynomial.X (b, v.2) := by
-        simp [Formalism.GradedWeylDivisibility.rowAct, MvPolynomial.aeval_X]
-      rw [map_mul, hX, Finset.mul_sum, MvPolynomial.coeff_sum]
-      refine Finset.sum_congr rfl fun b _ => ?_
-      rw [mul_left_comm, MvPolynomial.coeff_C_mul, MvPolynomial.coeff_mul_X']
+    have key
+        : ∀ M : Matrix (Fin r) (Fin r) ℂ,
+          AddMonoidAlgebra.coeff
+              (Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M (p * MvPolynomial.X v)) s
+            = ∑ b : Fin r, M v.1 b * (if (b, v.2) ∈ s.support then
+                AddMonoidAlgebra.coeff (Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M p) (s - Finsupp.single (b, v.2) 1) else 0) :=
+      by
+        intro M
+        have hX
+            : Formalism.GradedWeylDivisibility.rowAct ℂ (n := m) M (MvPolynomial.X v)
+              = ∑ b : Fin r, MvPolynomial.C (M v.1 b) * MvPolynomial.X (b, v.2) := by
+          simp [Formalism.GradedWeylDivisibility.rowAct, MvPolynomial.aeval_X]
+        rw [map_mul, hX, Finset.mul_sum, MvPolynomial.coeff_sum]
+        refine Finset.sum_congr rfl fun b _ => ?_
+        rw [mul_left_comm, MvPolynomial.coeff_C_mul, MvPolynomial.coeff_mul_X']
     simp only [key]
     refine continuous_finsetSum _ fun b _ => ?_
     refine ((continuous_id.matrix_elem v.1 b)).mul ?_
@@ -46,27 +55,30 @@ theorem continuous_coeff_rowAct {r m : ℕ} (f : MvPolynomial (Fin r × Fin m) �
     · exact continuous_const
 
 theorem continuous_detPow (n : ℕ) (c : ℤ) : Continuous fun g : GL (Fin n) ℂ => detPow ℂ n g c := by
-  have h0 : Continuous (Matrix.detMonoidHom : Matrix (Fin n) (Fin n) ℂ →* ℂ) := continuous_id.matrix_det
+  have h0 : Continuous (Matrix.detMonoidHom : Matrix (Fin n) (Fin n) ℂ →* ℂ) :=
+    continuous_id.matrix_det
   have h1 : Continuous (Matrix.GeneralLinearGroup.det : GL (Fin n) ℂ →* ℂˣ) :=
     Continuous.units_map _ h0
   exact Units.continuous_val.comp (h1.zpow c)
 
-theorem continuous_coeff_sqAct {n : ℕ} (lam : DomWeight n) (f : MvPolynomial (Fin n × Fin n) ℂ)
-    (s : (Fin n × Fin n) →₀ ℕ) :
-    Continuous fun g : GL (Fin n) ℂ => AddMonoidAlgebra.coeff (sqAct ℂ n lam g f) s := by
+theorem continuous_coeff_sqAct
+    {n : ℕ} (lam : DomWeight n) (f : MvPolynomial (Fin n × Fin n) ℂ) (s : (Fin n × Fin n) →₀ ℕ)
+    : Continuous fun g : GL (Fin n) ℂ => AddMonoidAlgebra.coeff (sqAct ℂ n lam g f) s := by
   simp only [sqAct, MvPolynomial.coeff_smul, smul_eq_mul]
   exact (continuous_detPow n _).mul
     ((continuous_coeff_rowAct f s).comp Units.continuous_val.matrix_transpose)
 
-theorem exists_finset_factor {σ : Type} (W : Submodule ℂ (MvPolynomial σ ℂ)) [FiniteDimensional ℂ W]
-    (φ : Module.Dual ℂ W) : ∃ (S : Finset (σ →₀ ℕ)) (c : S → ℂ),
-      ∀ p : W, φ p = ∑ s : S, c s * AddMonoidAlgebra.coeff p.1 s.1 := by
+theorem exists_finset_factor
+    {σ : Type} (W : Submodule ℂ (MvPolynomial σ ℂ)) [FiniteDimensional ℂ W] (φ : Module.Dual ℂ W)
+    : ∃ (S : Finset (σ →₀ ℕ)) (c : S → ℂ), ∀ p : W,
+      φ p = ∑ s : S, c s * AddMonoidAlgebra.coeff p.1 s.1 := by
   let b := Module.finBasis ℂ W
   let S : Finset (σ →₀ ℕ) := Finset.univ.biUnion fun i => (b i : MvPolynomial σ ℂ).support
-  let L : W →ₗ[ℂ] (S → ℂ) :=
-    { toFun := fun p s => AddMonoidAlgebra.coeff p.1 s.1
-      map_add' := fun p q => by funext s; simp
-      map_smul' := fun a p => by funext s; simp }
+  let L : W →ₗ[ℂ] (S → ℂ) := {
+    toFun := fun p s => AddMonoidAlgebra.coeff p.1 s.1
+    map_add' := fun p q => by funext s; simp
+    map_smul' := fun a p => by funext s; simp
+  }
   have hL : LinearMap.ker L = ⊥ := by
     refine LinearMap.ker_eq_bot'.2 fun p hp => ?_
     apply Subtype.ext
@@ -93,9 +105,9 @@ theorem exists_finset_factor {σ : Type} (W : Submodule ℂ (MvPolynomial σ ℂ
   rw [smul_eq_mul, mul_comm]
   rfl
 
-theorem continuous_sqRep_coeff {n : ℕ} (lam : DomWeight n) (f : nablaSq ℂ n lam)
-    (φ : Module.Dual ℂ (nablaSq ℂ n lam)) :
-    Continuous fun g : GL (Fin n) ℂ => φ (GlobalTheory.Branching.sqRep ℂ n lam g f) := by
+theorem continuous_sqRep_coeff
+    {n : ℕ} (lam : DomWeight n) (f : nablaSq ℂ n lam) (φ : Module.Dual ℂ (nablaSq ℂ n lam))
+    : Continuous fun g : GL (Fin n) ℂ => φ (GlobalTheory.Branching.sqRep ℂ n lam g f) := by
   obtain ⟨S, c, h⟩ := exists_finset_factor (nablaSq ℂ n lam) φ
   simp only [h]
   exact continuous_finsetSum _ fun s _ => continuous_const.mul (continuous_coeff_sqAct lam f.1 s.1)

@@ -9,27 +9,33 @@ namespace PI.Mk
 
 open Polynomial Matrix
 
-theorem charpoly_dvd_of_pow_eq_one {R : Type*} [CommRing R] {N : ℕ} (A : Matrix (Fin N) (Fin N) R)
-    (n : ℕ) (h : A ^ n = 1) : A.charpoly ∣ (X ^ n - 1 : R[X]) ^ N := by
+theorem charpoly_dvd_of_pow_eq_one
+    {R : Type*} [CommRing R] {N : ℕ} (A : Matrix (Fin N) (Fin N) R) (n : ℕ) (h : A ^ n = 1)
+    : A.charpoly ∣ (X ^ n - 1 : R[X]) ^ N := by
   have hcomm : Commute (scalar (Fin N) (X : R[X])) ((C : R →+* R[X]).mapMatrix A) :=
     scalar_commute (r := (X : R[X])) (fun r' => Commute.all _ r') _
   have hMn : ((C : R →+* R[X]).mapMatrix A) ^ n = 1 := by rw [← map_pow, h, map_one]
-  have key : (∑ i ∈ Finset.range n, scalar (Fin N) (X : R[X]) ^ i *
-      ((C : R →+* R[X]).mapMatrix A) ^ (n - 1 - i)) *
-      (scalar (Fin N) (X : R[X]) - (C : R →+* R[X]).mapMatrix A)
-      = scalar (Fin N) ((X : R[X]) ^ n - 1) := by
+  have key
+      : (∑ i ∈ Finset.range n, scalar (Fin N) (X : R[X]) ^ i *
+          ((C : R →+* R[X]).mapMatrix A) ^ (n - 1 - i))
+          * (scalar (Fin N) (X : R[X]) - (C : R →+* R[X]).mapMatrix A)
+        = scalar (Fin N) ((X : R[X]) ^ n - 1) := by
     rw [hcomm.geom_sum₂_mul, hMn, map_sub, map_pow, map_one]
   have hs : ∀ c : R[X], (scalar (Fin N) c).det = c ^ N := by
     intro c
     rw [scalar_apply, det_diagonal, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-  refine Dvd.intro_left (∑ i ∈ Finset.range n, scalar (Fin N) (X : R[X]) ^ i *
-      ((C : R →+* R[X]).mapMatrix A) ^ (n - 1 - i)).det ?_
+  refine Dvd.intro_left
+    (∑ i ∈ Finset.range n, scalar (Fin N) (X : R[X]) ^ i *
+      ((C : R →+* R[X]).mapMatrix A) ^ (n - 1 - i)).det
+    ?_
   rw [← hs ((X : R[X]) ^ n - 1), ← key, det_mul]
   rfl
 
 def Good (ℓ : ℕ) (p : ℚ[X]) : Prop :=
-  p.Monic ∧ ∃ y : ℕ, (ℓ - 1) * y ≤ p.natDegree ∧
-    -p.nextCoeff = (p.natDegree : ℚ) - (ℓ : ℚ) * (y : ℚ) ∧ (y = 0 → p = (X - 1) ^ p.natDegree)
+  p.Monic
+    ∧ ∃ y : ℕ,
+      (ℓ - 1) * y ≤ p.natDegree ∧ -p.nextCoeff = (p.natDegree : ℚ) - (ℓ : ℚ) * (y : ℚ)
+        ∧ (y = 0 → p = (X - 1) ^ p.natDegree)
 
 theorem good_one (ℓ : ℕ) : Good ℓ 1 :=
   ⟨monic_one, 0, by simp, by simp [nextCoeff], fun _ => by simp⟩
@@ -47,8 +53,8 @@ theorem good_mul (ℓ : ℕ) (p q : ℚ[X]) (hp : Good ℓ p) (hq : Good ℓ q) 
     rw [hdeg, pow_add]
     conv_lhs => rw [hy3 hy, hz3 hz]
 
-theorem nextCoeff_X_pow_sub_one (n : ℕ) (hn : 0 < n) :
-    (X ^ n - 1 : ℚ[X]).nextCoeff = if n = 1 then -1 else 0 := by
+theorem nextCoeff_X_pow_sub_one (n : ℕ) (hn : 0 < n)
+    : (X ^ n - 1 : ℚ[X]).nextCoeff = if n = 1 then -1 else 0 := by
   have hdeg : (X ^ n - 1 : ℚ[X]).natDegree = n := by
     simpa using natDegree_X_pow_sub_C (R := ℚ) (n := n) (a := 1)
   rw [nextCoeff_of_natDegree_pos (by rw [hdeg]; exact hn), hdeg]
@@ -64,8 +70,8 @@ theorem good_cyclotomic_one (ℓ : ℕ) : Good ℓ (cyclotomic 1 ℚ) := by
   · rw [natDegree_X_sub_C, nextCoeff_X_sub_C]; simp
   · rw [natDegree_X_sub_C, pow_one, C_1]
 
-theorem good_cyclotomic_succ (ℓ : ℕ) (hℓ : ℓ.Prime) (j : ℕ) :
-    Good ℓ (cyclotomic (ℓ ^ (j + 1)) ℚ) := by
+theorem good_cyclotomic_succ (ℓ : ℕ) (hℓ : ℓ.Prime) (j : ℕ)
+    : Good ℓ (cyclotomic (ℓ ^ (j + 1)) ℚ) := by
   have := Fact.mk hℓ
   have h2 : 2 ≤ ℓ := hℓ.two_le
   have hmon : (cyclotomic (ℓ ^ (j + 1)) ℚ).Monic := cyclotomic.monic _ ℚ
@@ -73,10 +79,10 @@ theorem good_cyclotomic_succ (ℓ : ℕ) (hℓ : ℓ.Prime) (j : ℕ) :
     rw [natDegree_cyclotomic, Nat.totient_prime_pow_succ hℓ]
   have hm1 : ((X : ℚ[X]) ^ ℓ ^ j - 1).Monic := by
     simpa using monic_X_pow_sub_C (1 : ℚ) (pow_pos hℓ.pos j).ne'
-  have hnc := congrArg nextCoeff
-    (cyclotomic_prime_pow_mul_X_pow_sub_one (R := ℚ) (p := ℓ) (k := j))
+  have hnc := congrArg nextCoeff (cyclotomic_prime_pow_mul_X_pow_sub_one (R := ℚ) (p := ℓ) (k := j))
   rw [hmon.nextCoeff_mul hm1, nextCoeff_X_pow_sub_one _ (pow_pos hℓ.pos j),
-    nextCoeff_X_pow_sub_one _ (pow_pos hℓ.pos (j + 1))] at hnc
+      nextCoeff_X_pow_sub_one _ (pow_pos hℓ.pos (j + 1))]
+    at hnc
   have hne : ℓ ^ (j + 1) ≠ 1 := (Nat.one_lt_pow (by omega) hℓ.one_lt).ne'
   rw [if_neg hne] at hnc
   rcases j with _ | k
@@ -85,14 +91,17 @@ theorem good_cyclotomic_succ (ℓ : ℕ) (hℓ : ℓ.Prime) (j : ℕ) :
     · rw [hdeg]; simp
     · have hc : (((ℓ ^ 0 * (ℓ - 1) : ℕ)) : ℚ) = (ℓ : ℚ) - 1 := by
         rw [pow_zero, one_mul, Nat.cast_sub (by omega), Nat.cast_one]
-      rw [hdeg, hc]; push_cast; linarith
+      rw [hdeg, hc]
+      push_cast
+      linarith
   · have hne' : ℓ ^ (k + 1) ≠ 1 := (Nat.one_lt_pow (by omega) hℓ.one_lt).ne'
     rw [if_neg hne'] at hnc
     have hz : nextCoeff (cyclotomic (ℓ ^ (k + 1 + 1)) ℚ) = 0 := by linarith
     refine ⟨hmon, ℓ ^ k * (ℓ - 1), ?_, ?_, ?_⟩
     · rw [hdeg]
-      calc (ℓ - 1) * (ℓ ^ k * (ℓ - 1)) ≤ ℓ * (ℓ ^ k * (ℓ - 1)) :=
-            Nat.mul_le_mul_right _ (Nat.sub_le ℓ 1)
+      calc
+        (ℓ - 1) * (ℓ ^ k * (ℓ - 1))
+          ≤ ℓ * (ℓ ^ k * (ℓ - 1)) := Nat.mul_le_mul_right _ (Nat.sub_le ℓ 1)
         _ = ℓ ^ (k + 1) * (ℓ - 1) := by ring
     · rw [hdeg, hz]; push_cast; ring
     · intro h
@@ -103,10 +112,14 @@ theorem good_cyclotomic (ℓ : ℕ) (hℓ : ℓ.Prime) (j : ℕ) : Good ℓ (cyc
   · rw [pow_zero]; exact good_cyclotomic_one ℓ
   · exact good_cyclotomic_succ ℓ hℓ j
 
-theorem good_of_dvd (ℓ : ℕ) (hℓ : ℓ.Prime) (a M : ℕ) (p : ℚ[X]) (hp : p.Monic)
-    (hd : p ∣ (X ^ (ℓ ^ a) - 1 : ℚ[X]) ^ M) : Good ℓ p := by
-  suffices H : ∀ n : ℕ, ∀ q : ℚ[X], q.natDegree = n → q.Monic →
-      q ∣ (X ^ (ℓ ^ a) - 1 : ℚ[X]) ^ M → Good ℓ q from H _ p rfl hp hd
+theorem good_of_dvd
+    (ℓ : ℕ) (hℓ : ℓ.Prime)
+    (a M : ℕ) (p : ℚ[X]) (hp : p.Monic) (hd : p ∣ (X ^ (ℓ ^ a) - 1 : ℚ[X]) ^ M)
+    : Good ℓ p := by
+  suffices H
+      : ∀ n : ℕ, ∀ q : ℚ[X],
+        q.natDegree = n → q.Monic → q ∣ (X ^ (ℓ ^ a) - 1 : ℚ[X]) ^ M → Good ℓ q from
+    H _ p rfl hp hd
   intro n
   refine Nat.strong_induction_on n ?_
   intro n ih q hqn hq hqd
@@ -123,8 +136,9 @@ theorem good_of_dvd (ℓ : ℕ) (hℓ : ℓ.Prime) (a M : ℕ) (p : ℚ[X]) (hp 
   obtain ⟨s, rfl⟩ := (hr.dvd_symm hirr hdr).trans hrq
   have hcm : (cyclotomic (ℓ ^ i) ℚ).Monic := cyclotomic.monic _ ℚ
   have hs : s.Monic := hcm.of_mul_monic_left hq
-  have hdeg : (cyclotomic (ℓ ^ i) ℚ * s).natDegree =
-      (cyclotomic (ℓ ^ i) ℚ).natDegree + s.natDegree := hcm.natDegree_mul hs
+  have hdeg
+      : (cyclotomic (ℓ ^ i) ℚ * s).natDegree = (cyclotomic (ℓ ^ i) ℚ).natDegree + s.natDegree :=
+    hcm.natDegree_mul hs
   have hpos : 0 < (cyclotomic (ℓ ^ i) ℚ).natDegree := by
     rw [natDegree_cyclotomic]
     exact Nat.totient_pos.2 (pow_pos hℓ.pos i)
@@ -132,12 +146,15 @@ theorem good_of_dvd (ℓ : ℕ) (hℓ : ℓ.Prime) (a M : ℕ) (p : ℚ[X]) (hp 
   · exact good_cyclotomic ℓ hℓ i
   · exact ih s.natDegree (by omega) s rfl hs ((Dvd.intro_left _ rfl).trans hqd)
 
-theorem eq_one_of_unipotent {N : ℕ} (A : Matrix (Fin N) (Fin N) ℚ) (n : ℕ) (hn : 0 < n)
-    (h : A ^ n = 1) (hu : (A - 1) ^ N = 0) : A = 1 := by
-  obtain ⟨S, hSdef⟩ : ∃ S : Matrix (Fin N) (Fin N) ℚ, S = ∑ i ∈ Finset.range n, A ^ i :=
+theorem eq_one_of_unipotent
+    {N : ℕ} (A : Matrix (Fin N) (Fin N) ℚ)
+    (n : ℕ) (hn : 0 < n) (h : A ^ n = 1)
+    (hu : (A - 1) ^ N = 0)
+    : A = 1 := by
+  obtain ⟨S, hSdef⟩ : ∃ S : Matrix (Fin N) (Fin N) ℚ, S = ∑ i ∈ Finset.range n, A ^ i := ⟨_, rfl⟩
+  obtain ⟨T, hTdef⟩
+      : ∃ T : Matrix (Fin N) (Fin N) ℚ, T = ∑ i ∈ Finset.range n, ∑ j ∈ Finset.range i, A ^ j :=
     ⟨_, rfl⟩
-  obtain ⟨T, hTdef⟩ : ∃ T : Matrix (Fin N) (Fin N) ℚ,
-      T = ∑ i ∈ Finset.range n, ∑ j ∈ Finset.range i, A ^ j := ⟨_, rfl⟩
   have hSB : S * (A - 1) = 0 := by rw [hSdef, geom_sum_mul, h, sub_self]
   have hST : S = (n : Matrix (Fin N) (Fin N) ℚ) + T * (A - 1) := by
     rw [hSdef, hTdef, Finset.sum_mul]
@@ -160,25 +177,21 @@ theorem eq_one_of_unipotent {N : ℕ} (A : Matrix (Fin N) (Fin N) ℚ) (n : ℕ)
 theorem traceStep : TraceStep := by
   intro N ℓ a hℓ g hg
   have h2 : 2 ≤ ℓ := hℓ.two_le
-  obtain ⟨A, hA⟩ : ∃ A : Matrix (Fin N) (Fin N) ℚ, A = (Int.castRingHom ℚ).mapMatrix g :=
-    ⟨_, rfl⟩
+  obtain ⟨A, hA⟩ : ∃ A : Matrix (Fin N) (Fin N) ℚ, A = (Int.castRingHom ℚ).mapMatrix g := ⟨_, rfl⟩
   have hAn : A ^ (ℓ ^ a) = 1 := by rw [hA, ← map_pow, hg, map_one]
   have hdvd := charpoly_dvd_of_pow_eq_one A _ hAn
-  obtain ⟨y, hy1, hy2, hy3⟩ :=
-    (good_of_dvd ℓ hℓ a N A.charpoly (charpoly_monic A) hdvd).2
-  have hdeg : A.charpoly.natDegree = N := by
-    rw [charpoly_natDegree_eq_dim, Fintype.card_fin]
+  obtain ⟨y, hy1, hy2, hy3⟩ := (good_of_dvd ℓ hℓ a N A.charpoly (charpoly_monic A) hdvd).2
+  have hdeg : A.charpoly.natDegree = N := by rw [charpoly_natDegree_eq_dim, Fintype.card_fin]
   have htr : A.trace = -A.charpoly.nextCoeff := by
     rcases Nat.eq_zero_or_pos N with hN | hN
     · subst hN
       simp [Matrix.trace, nextCoeff]
     · have : Nonempty (Fin N) := ⟨⟨0, hN⟩⟩
-      rw [trace_eq_neg_charpoly_coeff, nextCoeff_of_natDegree_pos (by rw [hdeg]; exact hN),
-        hdeg, Fintype.card_fin]
+      rw [trace_eq_neg_charpoly_coeff, nextCoeff_of_natDegree_pos (by rw [hdeg]; exact hN), hdeg,
+        Fintype.card_fin]
   have htrg : A.trace = ((g.trace : ℤ) : ℚ) := by
     rw [hA]; simp [Matrix.trace, Matrix.diag, RingHom.mapMatrix_apply]
-  have hT : ((g.trace : ℤ) : ℚ) = (N : ℚ) - (ℓ : ℚ) * (y : ℚ) := by
-    rw [← htrg, htr, hy2, hdeg]
+  have hT : ((g.trace : ℤ) : ℚ) = (N : ℚ) - (ℓ : ℚ) * (y : ℚ) := by rw [← htrg, htr, hy2, hdeg]
   refine ⟨y, ?_, by exact_mod_cast hT, ?_⟩
   · rw [hdeg] at hy1
     exact (Nat.le_div_iff_mul_le (by omega)).2 (by rw [mul_comm]; exact hy1)

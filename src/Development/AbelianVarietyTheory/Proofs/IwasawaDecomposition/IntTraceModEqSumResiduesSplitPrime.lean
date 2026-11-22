@@ -12,19 +12,23 @@ namespace GlobalTheory.SplitTrace
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem absNorm_span_natCast (p : ℕ) :
-    Ideal.absNorm (Ideal.span {(p : 𝓞 K)}) = p ^ Module.finrank ℚ K := by
+theorem absNorm_span_natCast (p : ℕ)
+    : Ideal.absNorm (Ideal.span {(p : 𝓞 K)}) = p ^ Module.finrank ℚ K := by
   rw [Ideal.absNorm_span_singleton, show ((p : 𝓞 K)) = algebraMap ℤ (𝓞 K) (p : ℤ) by simp,
     Algebra.norm_algebraMap, RingOfIntegers.rank, Int.natAbs_pow, Int.natAbs_natCast]
 
-theorem split_of_card (p : ℕ) (hp : p.Prime) {ι : Type} [Fintype ι] (e : ι → HeightOneSpectrum (𝓞 K))
+theorem split_of_card
+    (p : ℕ) (hp : p.Prime)
+    {ι : Type} [Fintype ι]
+    (e : ι → HeightOneSpectrum (𝓞 K))
     (he : Function.Injective e) (hmem : ∀ i, (p : 𝓞 K) ∈ (e i).asIdeal)
-    (hcard : Fintype.card ι = Module.finrank ℚ K) :
-    (∀ i, Ideal.absNorm (e i).asIdeal = p) ∧ Ideal.span {(p : 𝓞 K)} = ⨅ i, (e i).asIdeal := by
+    (hcard : Fintype.card ι = Module.finrank ℚ K)
+    : (∀ i, Ideal.absNorm (e i).asIdeal = p) ∧ Ideal.span {(p : 𝓞 K)} = ⨅ i, (e i).asIdeal := by
   classical
   set n := Module.finrank ℚ K
-  have hcop : ∀ i ∈ (Finset.univ : Finset ι), ∀ j ∈ (Finset.univ : Finset ι), i ≠ j →
-      IsCoprime (e i).asIdeal (e j).asIdeal := fun i _ j _ hij =>
+  have hcop
+      : ∀ i ∈ (Finset.univ : Finset ι), ∀ j ∈ (Finset.univ : Finset ι),
+        i ≠ j → IsCoprime (e i).asIdeal (e j).asIdeal := fun i _ j _ hij =>
     HeightOneSpectrum.isCoprime_of_ne _ _ (fun h => hij (he h))
   have hJ : ∏ i, (e i).asIdeal = ⨅ i, (e i).asIdeal := by
     rw [Ideal.prod_eq_iInf_of_pairwise_isCoprime hcop]; simp
@@ -64,10 +68,13 @@ theorem split_of_card (p : ℕ) (hp : p.Prime) {ι : Type} [Fintype ι] (e : ι 
     exact Nat.eq_of_mul_eq_mul_left hpn (by rw [mul_one]; exact h.symm)
   rw [hL, Ideal.absNorm_eq_one_iff.1 hnL, Ideal.mul_top]
 
-theorem trace_pi {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
+theorem trace_pi
+    {R : Type} [CommRing R]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
     (A : ι → Type) [∀ i, CommRing (A i)] [∀ i, Algebra R (A i)] [∀ i, Module.Free R (A i)]
-    [∀ i, Module.Finite R (A i)] (z : ∀ i, A i) :
-    Algebra.trace R (∀ i, A i) z = ∑ i, Algebra.trace R (A i) (z i) := by
+    [∀ i, Module.Finite R (A i)]
+    (z : ∀ i, A i)
+    : Algebra.trace R (∀ i, A i) z = ∑ i, Algebra.trace R (A i) (z i) := by
   classical
   let b := fun i => Module.Free.chooseBasis R (A i)
   rw [Algebra.trace_eq_matrix_trace (Pi.basis b), Matrix.trace, Fintype.sum_sigma]
@@ -76,12 +83,22 @@ theorem trace_pi {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq �
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [Matrix.diag_apply, Algebra.leftMulMatrix_eq_repr_mul, Pi.basis_apply, Pi.basis_repr]
   rw [show z * Pi.single i (b i k) = Pi.single i (z i * b i k) by
-    funext j; by_cases h : j = i
+    funext j
+    by_cases h : j = i
     · subst h; simp
     · simp [h]]
   simp
 
-theorem intTrace_modEq_sum : ∀ {K : Type} [Field K] [NumberField K] (p : ℕ), p.Prime → ∀ {ι : Type} [Fintype ι] (e : ι → HeightOneSpectrum (𝓞 K)), Function.Injective e → (∀ W : HeightOneSpectrum (𝓞 K), (p : 𝓞 K) ∈ W.asIdeal ↔ ∃ i, e i = W) → Fintype.card ι = Module.finrank ℚ K → ∀ (x : 𝓞 K) (b : ι → ℤ), (∀ i, x - (b i : 𝓞 K) ∈ (e i).asIdeal) → ((Algebra.intTrace ℤ (𝓞 K) x : ℤ) : ZMod p) = ∑ i, (b i : ZMod p) := by
+theorem intTrace_modEq_sum
+    : ∀ {K : Type} [Field K] [NumberField K] (p : ℕ),
+      p.Prime
+        → ∀ {ι : Type} [Fintype ι] (e : ι → HeightOneSpectrum (𝓞 K)),
+          Function.Injective e
+            → (∀ W : HeightOneSpectrum (𝓞 K), (p : 𝓞 K) ∈ W.asIdeal ↔ ∃ i, e i = W)
+            → Fintype.card ι = Module.finrank ℚ K
+            → ∀ (x : 𝓞 K) (b : ι → ℤ),
+              (∀ i, x - (b i : 𝓞 K) ∈ (e i).asIdeal)
+                → ((Algebra.intTrace ℤ (𝓞 K) x : ℤ) : ZMod p) = ∑ i, (b i : ZMod p) := by
   intro K _ _ p hp ι _ e he hW hcard x b hxb
   classical
   have hmem : ∀ i, (p : 𝓞 K) ∈ (e i).asIdeal := fun i => (hW (e i)).2 ⟨i, rfl⟩
@@ -99,12 +116,15 @@ theorem intTrace_modEq_sum : ∀ {K : Type} [Field K] [NumberField K] (p : ℕ),
   letI : ∀ i, Field (𝓞 K ⧸ (e i).asIdeal) := fun i => Ideal.Quotient.field _
   have hcop : Pairwise (Function.onFun IsCoprime fun i => (e i).asIdeal) := fun i j hij =>
     HeightOneSpectrum.isCoprime_of_ne _ _ (fun h => hij (he h))
-  let φ : (𝓞 K ⧸ Ideal.map (algebraMap ℤ (𝓞 K)) P) ≃ₐ[ℤ ⧸ P] (∀ i, 𝓞 K ⧸ (e i).asIdeal) :=
-    { __ := (Ideal.quotEquivOfEq hmap).trans (Ideal.quotientInfRingEquivPiQuotient _ hcop),
-      commutes' := Quotient.ind fun _ ↦ rfl }
+  let φ : (𝓞 K ⧸ Ideal.map (algebraMap ℤ (𝓞 K)) P) ≃ₐ[ℤ ⧸ P] (∀ i, 𝓞 K ⧸ (e i).asIdeal) := {
+    __ := (Ideal.quotEquivOfEq hmap).trans (Ideal.quotientInfRingEquivPiQuotient _ hcop)
+    commutes' := Quotient.ind fun _ ↦ rfl
+  }
   have hφ : φ (Ideal.Quotient.mk _ x) = fun i => Ideal.Quotient.mk (e i).asIdeal x := rfl
-  have hx1 : ∀ i, Ideal.Quotient.mk (e i).asIdeal x =
-      algebraMap (ℤ ⧸ P) (𝓞 K ⧸ (e i).asIdeal) (Ideal.Quotient.mk P (b i)) := fun i => by
+  have hx1
+      : ∀ i,
+        Ideal.Quotient.mk (e i).asIdeal x
+          = algebraMap (ℤ ⧸ P) (𝓞 K ⧸ (e i).asIdeal) (Ideal.Quotient.mk P (b i)) := fun i => by
     rw [Ideal.Quotient.eq.mpr (hxb i)]
     show _ = Ideal.Quotient.mk (e i).asIdeal (algebraMap ℤ (𝓞 K) (b i))
     rw [algebraMap_int_eq, eq_intCast]
@@ -117,10 +137,11 @@ theorem intTrace_modEq_sum : ∀ {K : Type} [Field K] [NumberField K] (p : ℕ),
     rw [hcardP, hcardv] at h
     exact (Nat.pow_right_injective hp.two_le (h.symm.trans (pow_one p).symm))
   have key : Ideal.Quotient.mk P (Algebra.intTrace ℤ (𝓞 K) x) = Ideal.Quotient.mk P (∑ i, b i) := by
-    rw [← Algebra.trace_quotient_eq_of_isDedekindDomain, ← Algebra.trace_eq_of_algEquiv φ, hφ, trace_pi]
+    rw [← Algebra.trace_quotient_eq_of_isDedekindDomain, ← Algebra.trace_eq_of_algEquiv φ, hφ,
+      trace_pi]
     simp_rw [hx1, Algebra.trace_algebraMap, hfr, one_smul]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+    rw [map_sum]
   rw [Ideal.Quotient.eq, hPdef, Ideal.mem_span_singleton] at key
   rw [← Int.cast_sum, ZMod.intCast_eq_intCast_iff_dvd_sub]
   obtain ⟨m, hm⟩ := key

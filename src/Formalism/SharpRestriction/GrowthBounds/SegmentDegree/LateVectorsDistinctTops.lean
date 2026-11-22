@@ -10,7 +10,8 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 theorem late_vectors_distinct_tops : LateVectorsDistinctLeadingTerms := by
   intro p n' r K _ _ _ X hX j x hx
@@ -19,7 +20,9 @@ theorem late_vectors_distinct_tops : LateVectorsDistinctLeadingTerms := by
   have hn : (0 : ℤ) < n' := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne n')
   have hstep : ∀ t : ℤ, ∀ i < r, ∀ i' < r, X.F.fr t i < X.F.fr (t + 1) i' := by
     intro t i hi i' hi'
-    calc X.F.fr t i ≤ X.F.fr t (r - 1) := bk_fr_le hX.valid t i (r - 1) (by omega) (by omega)
+    calc
+      X.F.fr t i
+        ≤ X.F.fr t (r - 1) := bk_fr_le hX.valid t i (r - 1) (by omega) (by omega)
       _ < X.F.fr (t + 1) 0 := hnext t
       _ ≤ X.F.fr (t + 1) i' := fr_zero_le hX.valid (t + 1) i' hi'
   have hlt' : ∀ t : ℤ, ∀ k : ℕ, ∀ i < r, ∀ i' < r, X.F.fr t i < X.F.fr (t + 1 + k) i' := by
@@ -56,12 +59,15 @@ theorem late_vectors_distinct_tops : LateVectorsDistinctLeadingTerms := by
     exact Finset.mem_sort _
   have hsort : (evL X.F j x).Pairwise (· < ·) := by
     rw [evL, ← hS]
-    exact ((Finset.pairwise_sort S _).and (Finset.sort_nodup S _)).imp (fun h => lt_of_le_of_ne h.1 h.2)
+    exact ((Finset.pairwise_sort S _).and (Finset.sort_nodup S _)).imp
+      (fun h => lt_of_le_of_ne h.1 h.2)
   have hlen : (evL X.F j x).length = S.card := by
     rw [evL, ← hS]
     exact Finset.length_sort _
-  have hfrS : ∀ t : ℤ, ∀ i < r, X.F.fr (j - 1) 0 ≤ X.F.fr t i → X.F.fr t i ≤ X.F.fr j (r - 1) →
-      X.F.fr t i < x → X.F.fr t i ∈ S := by
+  have hfrS
+      : ∀ t : ℤ, ∀ i < r,
+        X.F.fr (j - 1) 0 ≤ X.F.fr t i → X.F.fr t i ≤ X.F.fr j (r - 1) → X.F.fr t i < x
+          → X.F.fr t i ∈ S := by
     intro t i hi h1 h2 h3
     rw [hS]
     simp only [Finset.mem_filter, Frames.letters, Finset.mem_Icc]
@@ -78,7 +84,8 @@ theorem late_vectors_distinct_tops : LateVectorsDistinctLeadingTerms := by
       obtain ⟨i, hi, rfl⟩ := hz
       have hA : X.F.fr (j - 1) i ≤ X.F.fr (j - 1) (r - 1) :=
         bk_fr_le hX.valid _ i (r - 1) (by omega) (by omega)
-      have hB : X.F.fr (j - 1) i < X.F.fr j (r - 1) := hlt (j - 1) j (by omega) i hi (r - 1) (by omega)
+      have hB : X.F.fr (j - 1) i < X.F.fr j (r - 1) :=
+        hlt (j - 1) j (by omega) i hi (r - 1) (by omega)
       exact hfrS _ i hi (fr_zero_le hX.valid _ i hi) hB.le (lt_of_le_of_lt hA hxW)
     have hinj' : Set.InjOn (fun i => X.F.fr (j - 1) i) ↑(Finset.range r) := by
       intro a ha b hb h
@@ -97,8 +104,10 @@ theorem late_vectors_distinct_tops : LateVectorsDistinctLeadingTerms := by
     intro k hk
     rw [hget k hk]
     exact (hmem _).1 (List.getElem_mem _)
-  have hbound : ∀ k, l.length - r ≤ k → k < l.length →
-      l.getD (l.length - r) 0 ≤ l.getD k 0 ∧ l.getD k 0 < l.getD (l.length - r) 0 + n' := by
+  have hbound
+      : ∀ k,
+        l.length - r ≤ k → k < l.length
+          → l.getD (l.length - r) 0 ≤ l.getD k 0 ∧ l.getD k 0 < l.getD (l.length - r) 0 + n' := by
     intro k hk1 hk2
     refine ⟨?_, ?_⟩
     · rcases eq_or_lt_of_le hk1 with h | h
@@ -124,7 +133,9 @@ theorem late_vectors_distinct_tops : LateVectorsDistinctLeadingTerms := by
         have e1 := Int.mul_ediv_add_emod (X.F.fr 0 i - y1) (n' : ℤ)
         have e2 := Int.emod_nonneg (X.F.fr 0 i - y1) (ne_of_gt hn)
         have e3 := Int.emod_lt_of_pos (X.F.fr 0 i - y1) hn
-        have e4 : (-((X.F.fr 0 i - y1) / n')) * (n' : ℤ) = -((n' : ℤ) * ((X.F.fr 0 i - y1) / n')) := by ring
+        have e4
+            : (-((X.F.fr 0 i - y1) / n')) * (n' : ℤ) = -((n' : ℤ) * ((X.F.fr 0 i - y1) / n')) := by
+          ring
         constructor <;> linarith
       obtain ⟨T, hT⟩ : ∃ T : Finset ℤ, T = S.filter (fun s => y1 ≤ s) := ⟨_, rfl⟩
       have hTcard : T.card ≤ r := by
@@ -163,15 +174,18 @@ theorem late_vectors_distinct_tops : LateVectorsDistinctLeadingTerms := by
           obtain ⟨hw1, hw2⟩ := hwr i hi
           exact ⟨hfrS _ i hi (by linarith) (by linarith) (by linarith), hw1⟩
       have hc := Finset.card_le_card hUsub
-      rw [Finset.card_insert_of_notMem hznot, Finset.card_image_of_injOn hwinj, Finset.card_range] at hc
+      rw [Finset.card_insert_of_notMem hznot, Finset.card_image_of_injOn hwinj, Finset.card_range]
+        at hc
       omega
   intro a b hab
   simp only at hab
   have ha := hbound (l.length - r + a) (by omega) (by omega)
   have hb := hbound (l.length - r + b) (by omega) (by omega)
-  have he := posOf_injOn (l.getD (l.length - r) 0 - 1)
-    (show l.getD (l.length - r + a) 0 ∈ Set.Ioc _ _ from ⟨by linarith [ha.1], by linarith [ha.2]⟩)
-    (show l.getD (l.length - r + b) 0 ∈ Set.Ioc _ _ from ⟨by linarith [hb.1], by linarith [hb.2]⟩) hab
+  have he :=
+    posOf_injOn (l.getD (l.length - r) 0 - 1)
+      (show l.getD (l.length - r + a) 0 ∈ Set.Ioc _ _ from ⟨by linarith [ha.1], by linarith [ha.2]⟩)
+      (show l.getD (l.length - r + b) 0 ∈ Set.Ioc _ _ from ⟨by linarith [hb.1], by linarith [hb.2]⟩)
+      hab
   have hia : l.length - r + (a : ℕ) < l.length := by omega
   have hib : l.length - r + (b : ℕ) < l.length := by omega
   rw [hget _ hia, hget _ hib] at he

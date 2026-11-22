@@ -11,17 +11,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BernsteinZel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.GenericLDatum
 
-theorem exists_unlinked_isL : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
-    (x : IrrGL (k := k)), IsGeneric x.rep →
-    ∃ (c : ℕ) (Δ : Fin c → Segment k), (∀ i j, i ≠ j → ¬ (Δ i).Linked (Δ j)) ∧
-      IsL ((List.ofFn Δ : List (Segment k)) : Multiset (Segment k)) x.rep := by
+theorem exists_unlinked_isL
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [CharZero k] (x : IrrGL (k := k)),
+      IsGeneric x.rep
+        → ∃ (c : ℕ) (Δ : Fin c → Segment k),
+          (∀ i j, i ≠ j → ¬ (Δ i).Linked (Δ j))
+            ∧ IsL ((List.ofFn Δ : List (Segment k)) : Multiset (Segment k)) x.rep := by
   intro k _ _ _ _ _ x hg
   obtain ⟨c, Δ, y, hd, hun, hL, ⟨e⟩⟩ :=
     GlobalTheory.genericUnlinkedGL_outright k x.1 _ x.rep x.2.rep.smooth x.2.rep.irr hg

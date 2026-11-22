@@ -22,7 +22,8 @@ def Cg (V : VF C) (δ : ℝ) (x y : C) : Prop := V.Ge δ (x - y)
 private theorem ge_add_lemma {w : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge w b) : V.Ge w (a + b) :=
   le_trans (le_min ha hb) (V.v.map_add a b)
 
-private theorem ge_mul_lemma_2 {w w' : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge w' b) : V.Ge (w + w') (a * b) := by
+private theorem ge_mul_lemma_2 {w w' : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge w' b)
+    : V.Ge (w + w') (a * b) := by
   unfold VF.Ge at *
   rw [AddValuation.map_mul, WithTop.coe_add]
   exact add_le_add ha hb
@@ -44,8 +45,9 @@ private theorem ge_zero_lemma_6 (w : ℝ) : V.Ge w (0 : C) := by
   rw [AddValuation.map_zero]
   exact le_top
 
-private theorem ge_sum_lemma_7 {ι : Type} (s : Finset ι) {f : ι → C} {w : ℝ} (h : ∀ i ∈ s, V.Ge w (f i)) :
-    V.Ge w (∑ i ∈ s, f i) := by
+private theorem ge_sum_lemma_7
+    {ι : Type} (s : Finset ι) {f : ι → C} {w : ℝ} (h : ∀ i ∈ s, V.Ge w (f i))
+    : V.Ge w (∑ i ∈ s, f i) := by
   revert h
   refine Finset.induction_on s ?_ ?_
   · intro _
@@ -53,7 +55,8 @@ private theorem ge_sum_lemma_7 {ι : Type} (s : Finset ι) {f : ι → C} {w : �
     exact ge_zero_lemma_6 w
   · intro a s ha ih h
     rw [Finset.sum_insert ha]
-    exact ge_add_lemma (h a (Finset.mem_insert_self a s)) (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    exact ge_add_lemma (h a (Finset.mem_insert_self a s))
+      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
 private theorem ge0_pow_lemma_8 {a : C} (ha : V.Ge 0 a) (n : ℕ) : V.Ge 0 (a ^ n) := by
   induction n with
@@ -88,19 +91,21 @@ theorem Cg.trans {δ : ℝ} {x y z : C} (h1 : Cg V δ x y) (h2 : Cg V δ y z) : 
 theorem Cg.mono {δ δ' : ℝ} {x y : C} (h : Cg V δ x y) (hd : δ' ≤ δ) : Cg V δ' x y := by
   exact ge_mono_lemma_3 h hd
 
-theorem valuation_ge_mul_of_nonneg {w : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge 0 b) : V.Ge w (a * b) := by
+theorem valuation_ge_mul_of_nonneg {w : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge 0 b)
+    : V.Ge w (a * b) := by
   have h := ge_mul_lemma_2 ha hb
   rwa [add_zero] at h
 
-theorem Cg.mul {δ : ℝ} {x x' y y' : C} (hx : V.Ge 0 x) (hy' : V.Ge 0 y') (h1 : Cg V δ x x') (h2 : Cg V δ y y') :
-    Cg V δ (x * y) (x' * y') := by
+theorem Cg.mul
+    {δ : ℝ} {x x' y y' : C} (hx : V.Ge 0 x) (hy' : V.Ge 0 y') (h1 : Cg V δ x x') (h2 : Cg V δ y y')
+    : Cg V δ (x * y) (x' * y') := by
   unfold Cg at *
   have e : x * y - x' * y' = (y - y') * x + (x - x') * y' := by ring
   rw [e]
   exact ge_add_lemma (valuation_ge_mul_of_nonneg h2 hx) (valuation_ge_mul_of_nonneg h1 hy')
 
-theorem Cg.pow {δ : ℝ} {x x' : C} (hx : V.Ge 0 x) (hx' : V.Ge 0 x') (h : Cg V δ x x') (n : ℕ) :
-    Cg V δ (x ^ n) (x' ^ n) := by
+theorem Cg.pow {δ : ℝ} {x x' : C} (hx : V.Ge 0 x) (hx' : V.Ge 0 x') (h : Cg V δ x x') (n : ℕ)
+    : Cg V δ (x ^ n) (x' ^ n) := by
   induction n with
   | zero =>
     simp only [pow_zero]
@@ -109,13 +114,14 @@ theorem Cg.pow {δ : ℝ} {x x' : C} (hx : V.Ge 0 x) (hx' : V.Ge 0 x') (h : Cg V
     rw [pow_succ, pow_succ]
     exact Cg.mul (ge0_pow_lemma_8 hx n) hx' ih h
 
-theorem Cg.sum {ι : Type} (s : Finset ι) {f g : ι → C} {δ : ℝ} (h : ∀ i ∈ s, Cg V δ (f i) (g i)) :
-    Cg V δ (∑ i ∈ s, f i) (∑ i ∈ s, g i) := by
+theorem Cg.sum {ι : Type} (s : Finset ι) {f g : ι → C} {δ : ℝ} (h : ∀ i ∈ s, Cg V δ (f i) (g i))
+    : Cg V δ (∑ i ∈ s, f i) (∑ i ∈ s, g i) := by
   unfold Cg
   rw [← Finset.sum_sub_distrib]
   exact ge_sum_lemma_7 s h
 
-theorem ge_prod {ι : Type} (s : Finset ι) {f : ι → C} (h : ∀ i ∈ s, V.Ge 0 (f i)) : V.Ge 0 (∏ i ∈ s, f i) := by
+theorem ge_prod {ι : Type} (s : Finset ι) {f : ι → C} (h : ∀ i ∈ s, V.Ge 0 (f i))
+    : V.Ge 0 (∏ i ∈ s, f i) := by
   revert h
   refine Finset.induction_on s ?_ ?_
   · intro _
@@ -123,10 +129,14 @@ theorem ge_prod {ι : Type} (s : Finset ι) {f : ι → C} (h : ∀ i ∈ s, V.G
     exact ge_one_lemma_5
   · intro a s ha ih h
     rw [Finset.prod_insert ha]
-    exact valuation_ge_mul_of_nonneg (h a (Finset.mem_insert_self a s)) (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    exact valuation_ge_mul_of_nonneg (h a (Finset.mem_insert_self a s))
+      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem Cg.prod {ι : Type} (s : Finset ι) {f g : ι → C} (hf : ∀ i ∈ s, V.Ge 0 (f i)) (hg : ∀ i ∈ s, V.Ge 0 (g i))
-    {δ : ℝ} (h : ∀ i ∈ s, Cg V δ (f i) (g i)) : Cg V δ (∏ i ∈ s, f i) (∏ i ∈ s, g i) := by
+theorem Cg.prod
+    {ι : Type} (s : Finset ι)
+    {f g : ι → C} (hf : ∀ i ∈ s, V.Ge 0 (f i)) (hg : ∀ i ∈ s, V.Ge 0 (g i))
+    {δ : ℝ} (h : ∀ i ∈ s, Cg V δ (f i) (g i))
+    : Cg V δ (∏ i ∈ s, f i) (∏ i ∈ s, g i) := by
   revert hf hg h
   refine Finset.induction_on s ?_ ?_
   · intro _ _ _
@@ -134,9 +144,11 @@ theorem Cg.prod {ι : Type} (s : Finset ι) {f g : ι → C} (hf : ∀ i ∈ s, 
     exact Cg.refl δ 1
   · intro a s ha ih hf hg h
     rw [Finset.prod_insert ha, Finset.prod_insert ha]
-    exact Cg.mul (hf a (Finset.mem_insert_self a s)) (ge_prod s fun i hi => hg i (Finset.mem_insert_of_mem hi))
-      (h a (Finset.mem_insert_self a s))
-      (ih (fun i hi => hf i (Finset.mem_insert_of_mem hi)) (fun i hi => hg i (Finset.mem_insert_of_mem hi))
+    exact Cg.mul (hf a (Finset.mem_insert_self a s))
+      (ge_prod s fun i hi => hg i (Finset.mem_insert_of_mem hi)) (h a (Finset.mem_insert_self a s))
+      (ih
+        (fun i hi => hf i (Finset.mem_insert_of_mem hi))
+        (fun i hi => hg i (Finset.mem_insert_of_mem hi))
         (fun i hi => h i (Finset.mem_insert_of_mem hi)))
 
 theorem ne_zero_of_v {x : C} (hx : V.v x = 0) : x ≠ 0 := by
@@ -167,13 +179,15 @@ theorem ge_of_mul_unit {δ : ℝ} {u y : C} (hu : V.v u = 0) (h : V.Ge δ (y * u
   unfold VF.Ge at *
   rwa [AddValuation.map_mul, hu, add_zero] at h
 
-theorem Cg.inv {δ : ℝ} {x x' : C} (hx : V.v x = 0) (hx' : V.v x' = 0) (h : Cg V δ x x') : Cg V δ x⁻¹ x'⁻¹ := by
+theorem Cg.inv {δ : ℝ} {x x' : C} (hx : V.v x = 0) (hx' : V.v x' = 0) (h : Cg V δ x x')
+    : Cg V δ x⁻¹ x'⁻¹ := by
   have hne := ne_zero_of_v hx
   have hne' := ne_zero_of_v hx'
   have e : x⁻¹ - x'⁻¹ = (x' - x) * (x⁻¹ * x'⁻¹) := by field_simp <;> ring
   unfold Cg
   rw [e]
-  exact valuation_ge_mul_of_nonneg (Cg.symm h) (valuation_nonneg_of_zero (v_mul (v_inv hx) (v_inv hx')))
+  exact valuation_ge_mul_of_nonneg (Cg.symm h)
+    (valuation_nonneg_of_zero (v_mul (v_inv hx) (v_inv hx')))
 
 theorem exists_ge_of_mm {x : C} (h : V.MM x) : ∃ δ : ℝ, 0 < δ ∧ V.Ge δ x := by
   by_cases ht : V.v x = ⊤
@@ -188,8 +202,8 @@ theorem exists_ge_of_mm {x : C} (h : V.MM x) : ∃ δ : ℝ, 0 < δ ∧ V.Ge δ 
     unfold VF.Ge
     rw [← hr]
 
-theorem exists_ge_of_mm_fin {ι : Type} [Fintype ι] (f : ι → C) (h : ∀ i, V.MM (f i)) :
-    ∃ δ : ℝ, 0 < δ ∧ δ ≤ 1 ∧ ∀ i, V.Ge δ (f i) := by
+theorem exists_ge_of_mm_fin {ι : Type} [Fintype ι] (f : ι → C) (h : ∀ i, V.MM (f i))
+    : ∃ δ : ℝ, 0 < δ ∧ δ ≤ 1 ∧ ∀ i, V.Ge δ (f i) := by
   choose δs hpos hge using fun i => exists_ge_of_mm (h i)
   refine ⟨Finset.univ.fold min 1 δs, ?_, ?_, fun i => ?_⟩
   · exact (Finset.lt_fold_min _).2 ⟨one_pos, fun i _ => hpos i⟩
@@ -216,8 +230,8 @@ theorem ge_natCast' (n : ℕ) : V.Ge 0 (n : C) := by
     rw [Nat.cast_succ]
     exact ge_add_lemma ih ge_one_lemma_5
 
-theorem cg_one_pow_l {δ : ℝ} (hδ : 0 < δ) {e : C} (h : Cg V δ e 1) :
-    Cg V (δ + min δ 1) (e ^ V.l) 1 := by
+theorem cg_one_pow_l {δ : ℝ} (hδ : 0 < δ) {e : C} (h : Cg V δ e 1)
+    : Cg V (δ + min δ 1) (e ^ V.l) 1 := by
   obtain ⟨t, rfl⟩ : ∃ t, e = t + 1 := ⟨e - 1, by ring⟩
   unfold Cg at *
   rw [add_sub_cancel_right] at h
@@ -245,8 +259,8 @@ theorem cg_one_pow_l {δ : ℝ} (hδ : 0 < δ) {e : C} (h : Cg V δ e 1) :
     have h5 : min δ 1 ≤ δ := min_le_left _ _
     nlinarith
 
-theorem cg_one_pow_lk {δ : ℝ} (hδ : 0 < δ) {e : C} (h : Cg V δ e 1) (k : ℕ) :
-    Cg V (δ + k * min δ 1) (e ^ (V.l ^ k)) 1 := by
+theorem cg_one_pow_lk {δ : ℝ} (hδ : 0 < δ) {e : C} (h : Cg V δ e 1) (k : ℕ)
+    : Cg V (δ + k * min δ 1) (e ^ (V.l ^ k)) 1 := by
   induction k with
   | zero => simpa using h
   | succ k ih =>
@@ -262,8 +276,9 @@ theorem cg_one_pow_lk {δ : ℝ} (hδ : 0 < δ) {e : C} (h : Cg V δ e 1) (k : �
     push_cast
     linarith
 
-theorem tendsto_pow_lk {δ : ℝ} (hδ : 0 < δ) {e ε : C} (_he : V.Ge 0 e) (hε : ε = 0 ∨ ε = 1) (h : Cg V δ e ε) :
-    ∀ K : ℝ, ∃ k0 : ℕ, ∀ k ≥ k0, V.Ge K (ε - e ^ (V.l ^ k)) := by
+theorem tendsto_pow_lk
+    {δ : ℝ} (hδ : 0 < δ) {e ε : C} (_he : V.Ge 0 e) (hε : ε = 0 ∨ ε = 1) (h : Cg V δ e ε)
+    : ∀ K : ℝ, ∃ k0 : ℕ, ∀ k ≥ k0, V.Ge K (ε - e ^ (V.l ^ k)) := by
   have hlt : ∀ k : ℕ, k < V.l ^ k := by
     intro k
     induction k with
@@ -285,7 +300,9 @@ theorem tendsto_pow_lk {δ : ℝ} (hδ : 0 < δ) {e ε : C} (_he : V.Ge 0 e) (h�
     apply ge_mono_lemma_3 (ge_pow_mul he (V.l ^ k))
     have h1 : (k : ℝ) < ((V.l ^ k : ℕ) : ℝ) := by exact_mod_cast hlt k
     have h2 : K / δ < ((V.l ^ k : ℕ) : ℝ) := by
-      calc K / δ < k0 := hk0
+      calc
+        K / δ
+          < k0 := hk0
         _ ≤ k := by exact_mod_cast hk
         _ < _ := h1
     rw [div_lt_iff₀ hδ] at h2
@@ -314,7 +331,9 @@ theorem mm_mul_int {a b : C} (ha : V.MM a) (hb : V.Ge 0 b) : V.MM (a * b) := by
   unfold VF.Ge at hb
   rw [AddValuation.map_mul]
   have hb' : (0 : WithTop ℝ) ≤ V.v b := by simpa using hb
-  calc (0 : WithTop ℝ) < V.v a := ha
+  calc
+    (0 : WithTop ℝ)
+      < V.v a := ha
     _ = V.v a + 0 := (add_zero _).symm
     _ ≤ V.v a + V.v b := add_le_add le_rfl hb'
 
@@ -333,9 +352,12 @@ theorem mm_pow {a : C} (ha : V.MM a) (hi : V.Ge 0 a) {n : ℕ} (hn : n ≠ 0) : 
 
 variable {O : Type} [CommRing O] {d : ℕ} [NeZero d]
 
-theorem frob_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (x : O) {δ : ℝ}
-    (hδ : ∀ b : ZMod d, V.Ge δ (em (b + 1) x - em b x ^ V.l)) (b : ZMod d) (s : ℕ) :
-    Cg V δ (em b x ^ (V.l ^ s)) (em (b + s) x) := by
+theorem frob_cg
+    (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
+    (x : O)
+    {δ : ℝ} (hδ : ∀ b : ZMod d, V.Ge δ (em (b + 1) x - em b x ^ V.l))
+    (b : ZMod d) (s : ℕ)
+    : Cg V δ (em b x ^ (V.l ^ s)) (em (b + s) x) := by
   induction s with
   | zero =>
     simp only [pow_zero, pow_one, Nat.cast_zero, add_zero]
@@ -347,9 +369,13 @@ theorem frob_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (x
     rw [pow_succ, pow_mul, Nat.cast_succ, ← add_assoc]
     exact h1.trans h2
 
-theorem units_of_sep (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (x : O) {δ : ℝ} (hδ0 : 0 < δ)
-    (hδ : ∀ b : ZMod d, V.Ge δ (em (b + 1) x - em b x ^ V.l)) (b1 b2 : ZMod d)
-    (h12 : V.v (em b1 x - em b2 x) = 0) (b : ZMod d) : V.v (em b x) = 0 := by
+theorem units_of_sep
+    (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
+    (x : O)
+    {δ : ℝ} (hδ0 : 0 < δ) (hδ : ∀ b : ZMod d, V.Ge δ (em (b + 1) x - em b x ^ V.l))
+    (b1 b2 : ZMod d) (h12 : V.v (em b1 x - em b2 x) = 0)
+    (b : ZMod d)
+    : V.v (em b x) = 0 := by
   by_contra hne
   have h0 : V.Ge 0 (em b x) := hint b x
   have hpos : V.MM (em b x) := by
@@ -361,8 +387,9 @@ theorem units_of_sep (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x
     induction s with
     | zero => simpa using hpos
     | succ s ih =>
-      have e : em (b + ((s + 1 : ℕ) : ZMod d)) x =
-          (em (b + s + 1) x - em (b + s) x ^ V.l) + em (b + s) x ^ V.l := by
+      have e
+          : em (b + ((s + 1 : ℕ) : ZMod d)) x
+            = (em (b + s + 1) x - em (b + s) x ^ V.l) + em (b + s) x ^ V.l := by
         rw [Nat.cast_succ, ← add_assoc]
         ring
       rw [e]
@@ -395,7 +422,10 @@ theorem Cg.neg {δ : ℝ} {x y : C} (h : Cg V δ x y) : Cg V δ (-x) (-y) := by
 
 def TT (d : ℕ) [NeZero d] : Finset (ZMod d × ZMod d) := Finset.univ.filter fun t => t.1 ≠ t.2
 
-def fac (V : VF C) (em : ZMod d → O →+* C) (xs : ZMod d × ZMod d → O) (a b : ZMod d) (s : ℕ) (t : ZMod d × ZMod d) : C :=
+def fac
+    (V : VF C) (em : ZMod d → O →+* C) (xs : ZMod d × ZMod d → O) (a b : ZMod d) (s : ℕ)
+    (t : ZMod d × ZMod d)
+    : C :=
   -(∑ j ∈ Finset.range (V.l ^ d - 1), (em b (xs t) * (em a (xs t))⁻¹ ^ (V.l ^ s)) ^ j)
 
 theorem ge_l_pow_d : V.Ge 1 ((V.l : C) ^ d) := by
@@ -407,18 +437,23 @@ theorem ge_l_pow_d : V.Ge 1 ((V.l : C) ^ d) := by
 theorem cast_q : ((V.l ^ d - 1 : ℕ) : C) = (V.l : C) ^ d - 1 := by
   rw [Nat.cast_sub (Nat.one_le_pow _ _ V.l_prime.pos), Nat.cast_pow, Nat.cast_one]
 
-theorem entry_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (xs : ZMod d × ZMod d → O) {δ : ℝ} (hδ0 : 0 < δ) (hδ1 : δ ≤ 1)
-    (hfrob : ∀ t b, V.Ge δ (em (b + 1) (xs t) - em b (xs t) ^ V.l))
+theorem entry_cg
+    (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
+    (xs : ZMod d × ZMod d → O)
+    {δ : ℝ}
+    (hδ0 : 0 < δ) (hδ1 : δ ≤ 1) (hfrob : ∀ t b, V.Ge δ (em (b + 1) (xs t) - em b (xs t) ^ V.l))
     (hsep : ∀ t : ZMod d × ZMod d, t.1 ≠ t.2 → V.v (em t.1 (xs t) - em t.2 (xs t)) = 0)
-    (a b : ZMod d) (s : ℕ) :
-    V.Ge 0 (∏ t ∈ TT d, fac V em xs a b s t) ∧
-      Cg V δ (∏ t ∈ TT d, fac V em xs a b s t) (if b = a + (s : ZMod d) then 1 else 0) := by
+    (a b : ZMod d) (s : ℕ)
+    : V.Ge 0 (∏ t ∈ TT d, fac V em xs a b s t)
+      ∧ Cg V δ (∏ t ∈ TT d, fac V em xs a b s t) (if b = a + (s : ZMod d) then 1 else 0) := by
   have hunit : ∀ t ∈ TT d, ∀ c : ZMod d, V.v (em c (xs t)) = 0 := by
     intro t ht c
     have ht' : t.1 ≠ t.2 := (Finset.mem_filter.1 ht).2
     exact units_of_sep em hint (xs t) hδ0 (hfrob t) t.1 t.2 (hsep t ht') c
-  have hK : ∀ t ∈ TT d, Cg V δ (em b (xs t) * (em a (xs t))⁻¹ ^ (V.l ^ s))
-      (em b (xs t) * (em (a + (s : ZMod d)) (xs t))⁻¹) := by
+  have hK
+      : ∀ t ∈ TT d,
+        Cg V δ (em b (xs t) * (em a (xs t))⁻¹ ^ (V.l ^ s))
+          (em b (xs t) * (em (a + (s : ZMod d)) (xs t))⁻¹) := by
     intro t ht
     have hu := hunit t ht
     have h1 : Cg V δ ((em a (xs t)) ^ (V.l ^ s)) (em (a + (s : ZMod d)) (xs t)) :=
@@ -428,7 +463,8 @@ theorem entry_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (
     rw [inv_pow]
     exact Cg.mul (hint b (xs t)) (valuation_nonneg_of_zero (v_inv (hu _))) (Cg.refl δ _) h2
   have hKint : ∀ t ∈ TT d, V.Ge 0 (em b (xs t) * (em a (xs t))⁻¹ ^ (V.l ^ s)) := fun t ht =>
-    valuation_ge_mul_of_nonneg (hint b (xs t)) (ge0_pow_lemma_8 (valuation_nonneg_of_zero (v_inv (hunit t ht a))) _)
+    valuation_ge_mul_of_nonneg (hint b (xs t))
+      (ge0_pow_lemma_8 (valuation_nonneg_of_zero (v_inv (hunit t ht a))) _)
   have hfac_int : ∀ t ∈ TT d, V.Ge 0 (fac V em xs a b s t) := by
     intro t ht
     unfold fac
@@ -446,7 +482,8 @@ theorem entry_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (
         exact mul_inv_cancel₀ (ne_zero_of_v (hu _))
       have hK1 := hK t ht
       rw [hr] at hK1
-      have hs : Cg V δ (∑ j ∈ Finset.range (V.l ^ d - 1), (em b (xs t) * (em a (xs t))⁻¹ ^ (V.l ^ s)) ^ j)
+      have hs : Cg V δ
+          (∑ j ∈ Finset.range (V.l ^ d - 1), (em b (xs t) * (em a (xs t))⁻¹ ^ (V.l ^ s)) ^ j)
           (∑ j ∈ Finset.range (V.l ^ d - 1), (1 : C) ^ j) :=
         Cg.sum _ fun j _ => Cg.pow (hKint t ht) ge_one_lemma_5 hK1 j
       simp only [one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one] at hs
@@ -466,8 +503,9 @@ theorem entry_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (
       have h1 := frob_cg em hint (xs t0) (hfrob t0) c d
       rw [ZMod.natCast_self, add_zero] at h1
       have hpos : 1 ≤ V.l ^ d := Nat.one_le_pow _ _ V.l_prime.pos
-      have e : (em c (xs t0)) ^ (V.l ^ d) - em c (xs t0) =
-          em c (xs t0) * ((em c (xs t0)) ^ (V.l ^ d - 1) - 1) := by
+      have e
+          : (em c (xs t0)) ^ (V.l ^ d) - em c (xs t0)
+            = em c (xs t0) * ((em c (xs t0)) ^ (V.l ^ d - 1) - 1) := by
         conv_lhs => rw [show V.l ^ d = (V.l ^ d - 1) + 1 by omega, pow_succ]
         ring
       unfold Cg at h1 ⊢
@@ -486,10 +524,14 @@ theorem entry_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (
       rwa [mul_one] at h3
     have hne := ne_zero_of_v (hu (a + (s : ZMod d)))
     have hr1 : V.v (r - 1) = 0 := by
-      have e : r - 1 = (em b (xs t0) - em (a + (s : ZMod d)) (xs t0)) * (em (a + (s : ZMod d)) (xs t0))⁻¹ := by
+      have e
+          : r - 1
+            = (em b (xs t0) - em (a + (s : ZMod d)) (xs t0))
+              * (em (a + (s : ZMod d)) (xs t0))⁻¹ := by
         rw [← hr, sub_mul, mul_inv_cancel₀ hne]
       rw [e, AddValuation.map_mul, hsep t0 hb, v_inv (hu _), add_zero]
-    have hrint : V.Ge 0 r := valuation_nonneg_of_zero (by rw [← hr, AddValuation.map_mul, hu b, v_inv (hu _), add_zero])
+    have hrint : V.Ge 0 r :=
+      valuation_nonneg_of_zero (by rw [← hr, AddValuation.map_mul, hu b, v_inv (hu _), add_zero])
     have hgs : V.Ge δ (∑ j ∈ Finset.range (V.l ^ d - 1), r ^ j) := by
       have h1 : V.Ge δ ((∑ j ∈ Finset.range (V.l ^ d - 1), r ^ j) * (r - 1)) := by
         rw [geom_sum_mul]
@@ -502,7 +544,8 @@ theorem entry_cg (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x)) (
       exact ge_neg_lemma_4 h3
     unfold Cg
     rw [sub_zero, ← Finset.mul_prod_erase (TT d) (fun t => fac V em xs a b s t) ht0]
-    exact valuation_ge_mul_of_nonneg hfac0 (ge_prod _ fun t ht => hfac_int t (Finset.mem_of_mem_erase ht))
+    exact valuation_ge_mul_of_nonneg hfac0
+      (ge_prod _ fun t ht => hfac_int t (Finset.mem_of_mem_erase ht))
 
 end IndAr
 
@@ -510,8 +553,9 @@ namespace IndAr
 
 variable {C : Type} [Field C] {V : VF C} {O : Type} [CommRing O] {d : ℕ} [NeZero d]
 
-theorem ind_gen (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
-    (hfr : ∀ a x, V.MM (em (a + 1) x - em a x ^ V.l))
+theorem ind_gen
+    (em : ZMod d → O →+* C)
+    (hint : ∀ a x, V.Ge 0 (em a x)) (hfr : ∀ a x, V.MM (em (a + 1) x - em a x ^ V.l))
     (hsp : ∀ a a' : ZMod d, a ≠ a' → ∃ x, V.v (em a x - em a' x) = 0)
     (N : Type) (ty : N → ZMod d) (M : Set (ℕ → N → C))
     (h1 : 1 ∈ M) (hadd : ∀ m m', m ∈ M → m' ∈ M → m + m' ∈ M) (hneg : ∀ m, m ∈ M → -m ∈ M)
@@ -519,7 +563,8 @@ theorem ind_gen (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
     (hteich : ∀ c : C, V.Ge 0 c → (fun s (_ : N) => c ^ (V.l ^ s)) ∈ M)
     (hact : ∀ α : O, (fun (_ : ℕ) n => em (ty n) α) ∈ M)
     (hlim : ∀ (m : ℕ → ℕ → N → C) (m' : ℕ → N → C), (∀ k, m k ∈ M) → VLim V m m' → m' ∈ M)
-    (a : ZMod d) : (fun (s : ℕ) (n : N) => if ty n = a + (s : ZMod d) then (1 : C) else 0) ∈ M := by
+    (a : ZMod d)
+    : (fun (s : ℕ) (n : N) => if ty n = a + (s : ZMod d) then (1 : C) else 0) ∈ M := by
   have hsp' : ∀ t : ZMod d × ZMod d, ∃ x : O, t.1 ≠ t.2 → V.v (em t.1 x - em t.2 x) = 0 := by
     intro t
     by_cases h : t.1 = t.2
@@ -527,9 +572,10 @@ theorem ind_gen (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
     · obtain ⟨x, hx⟩ := hsp t.1 t.2 h
       exact ⟨x, fun _ => hx⟩
   choose xs hxs using hsp'
-  obtain ⟨δ, hδ0, hδ1, hδ⟩ := exists_ge_of_mm_fin
-    (fun q : (ZMod d × ZMod d) × ZMod d => em (q.2 + 1) (xs q.1) - em q.2 (xs q.1) ^ V.l)
-    (fun q => hfr _ _)
+  obtain ⟨δ, hδ0, hδ1, hδ⟩ :=
+    exists_ge_of_mm_fin
+      (fun q : (ZMod d × ZMod d) × ZMod d => em (q.2 + 1) (xs q.1) - em q.2 (xs q.1) ^ V.l)
+      (fun q => hfr _ _)
   have hfrob : ∀ t b, V.Ge δ (em (b + 1) (xs t) - em b (xs t) ^ V.l) := fun t b => hδ (t, b)
   have h0 : (0 : ℕ → N → C) ∈ M := by
     have h2 := hadd 1 (-1) h1 (hneg 1 h1)
@@ -551,9 +597,11 @@ theorem ind_gen (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
       exact h0
     · intro j s hj ih hf
       rw [Finset.sum_insert hj]
-      exact hadd _ _ (hf j (Finset.mem_insert_self j s)) (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
-  have hprodM : ∀ (s : Finset (ZMod d × ZMod d)) (f : ZMod d × ZMod d → ℕ → N → C),
-      (∀ i ∈ s, f i ∈ M) → (∏ i ∈ s, f i) ∈ M := by
+      exact hadd _ _ (hf j (Finset.mem_insert_self j s))
+        (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
+  have hprodM
+      : ∀ (s : Finset (ZMod d × ZMod d)) (f : ZMod d × ZMod d → ℕ → N → C),
+        (∀ i ∈ s, f i ∈ M) → (∏ i ∈ s, f i) ∈ M := by
     intro s f
     refine Finset.induction_on s ?_ ?_
     · intro _
@@ -561,15 +609,19 @@ theorem ind_gen (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
       exact h1
     · intro j s hj ih hf
       rw [Finset.prod_insert hj]
-      exact hmul _ _ (hf j (Finset.mem_insert_self j s)) (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
+      exact hmul _ _ (hf j (Finset.mem_insert_self j s))
+        (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
   let mfac : ZMod d × ZMod d → ℕ → N → C := fun t s n => fac V em xs a (ty n) s t
   have hmfac : ∀ t ∈ TT d, mfac t ∈ M := by
     intro t ht
     have ht' : t.1 ≠ t.2 := (Finset.mem_filter.1 ht).2
-    have hu : V.v (em a (xs t)) = 0 := units_of_sep em hint (xs t) hδ0 (hfrob t) t.1 t.2 (hxs t ht') a
-    have e : mfac t = -(∑ j ∈ Finset.range (V.l ^ d - 1),
-        ((fun (_ : ℕ) (n : N) => em (ty n) (xs t)) *
-          (fun (s : ℕ) (_ : N) => ((em a (xs t))⁻¹) ^ (V.l ^ s))) ^ j) := by
+    have hu : V.v (em a (xs t)) = 0 :=
+      units_of_sep em hint (xs t) hδ0 (hfrob t) t.1 t.2 (hxs t ht') a
+    have e
+        : mfac t
+          = -(∑ j ∈ Finset.range (V.l ^ d - 1),
+               ((fun (_ : ℕ) (n : N) => em (ty n) (xs t)) *
+                 (fun (s : ℕ) (_ : N) => ((em a (xs t))⁻¹) ^ (V.l ^ s))) ^ j) := by
       funext s n
       simp only [mfac, fac, Pi.neg_apply, Finset.sum_apply, Pi.pow_apply, Pi.mul_apply]
     rw [e]
@@ -586,8 +638,9 @@ theorem ind_gen (em : ZMod d → O →+* C) (hint : ∀ a x, V.Ge 0 (em a x))
   refine hlim (fun k => P ^ (V.l ^ k)) _ (fun k => hpowM P hP _) ?_
   intro K s n
   obtain ⟨hint0, hcg⟩ := entry_cg em hint xs hδ0 hδ1 hfrob hxs a (ty n) s
-  have hε : (if ty n = a + (s : ZMod d) then (1 : C) else 0) = 0 ∨
-      (if ty n = a + (s : ZMod d) then (1 : C) else 0) = 1 := by
+  have hε
+      : (if ty n = a + (s : ZMod d) then (1 : C) else 0) = 0
+        ∨ (if ty n = a + (s : ZMod d) then (1 : C) else 0) = 1 := by
     split_ifs <;> simp
   obtain ⟨k0, hk0⟩ := tendsto_pow_lk hδ0 hint0 hε hcg K
   refine ⟨k0, fun k hk => ?_⟩

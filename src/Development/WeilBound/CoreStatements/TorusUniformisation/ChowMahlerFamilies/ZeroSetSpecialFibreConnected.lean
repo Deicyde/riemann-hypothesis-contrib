@@ -9,17 +9,21 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProperCohomology.
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Flat
 
 namespace PositivityTheory.Xgn.SpecialFibreConnected
 
-theorem mem_range_of_isIntegral {O Ω : Type} [CommRing O] [IsDomain O] [IsIntegrallyClosed O] [Field Ω]
-    [Algebra O Ω] (hinj : Function.Injective (algebraMap O Ω)) (hc : ConstClosed O Ω) (a : Ω)
-    (ha : IsIntegral O a) : ∃ o : O, algebraMap O Ω o = a := by
+theorem mem_range_of_isIntegral
+    {O Ω : Type} [CommRing O] [IsDomain O] [IsIntegrallyClosed O] [Field Ω] [Algebra O Ω]
+    (hinj : Function.Injective (algebraMap O Ω)) (hc : ConstClosed O Ω)
+    (a : Ω) (ha : IsIntegral O a)
+    : ∃ o : O, algebraMap O Ω o = a := by
   obtain ⟨x, y, hy, e⟩ := hc a ha.isAlgebraic
-  let ι : FractionRing O →ₐ[O] Ω :=
-    { IsFractionRing.lift (K := FractionRing O) hinj with
-      commutes' := fun o => IsFractionRing.lift_algebraMap hinj o }
+  let ι : FractionRing O →ₐ[O] Ω := {
+    IsFractionRing.lift (K := FractionRing O) hinj with
+    commutes' := fun o => IsFractionRing.lift_algebraMap hinj o
+  }
   have hy' : algebraMap O Ω y ≠ 0 := fun h => hy (hinj (by rw [h, map_zero]))
   have e' : ι (algebraMap O (FractionRing O) x / algebraMap O (FractionRing O) y) = a := by
     rw [map_div₀, ι.commutes, ι.commutes, ← e, mul_div_cancel_right₀ _ hy']
@@ -29,10 +33,13 @@ theorem mem_range_of_isIntegral {O Ω : Type} [CommRing O] [IsDomain O] [IsInteg
   obtain ⟨o, ho⟩ := IsIntegrallyClosed.isIntegral_iff.1 hi
   exact ⟨o, by rw [← e', ← ho, ι.commutes]⟩
 
-theorem appTop_injective {Z : Scheme.{0}} [IsReduced Z] {Ω : Type} [Field Ω]
-    (η : Spec (CommRingCat.of Ω) ⟶ Z) (h : ∀ q : Z, η (IsLocalRing.closedPoint Ω) ⤳ q) :
-    Function.Injective η.appTop.hom := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem appTop_injective
+    {Z : Scheme.{0}} [IsReduced Z]
+    {Ω : Type} [Field Ω]
+    (η : Spec (CommRingCat.of Ω) ⟶ Z) (h : ∀ q : Z, η (IsLocalRing.closedPoint Ω) ⤳ q)
+    : Function.Injective η.appTop.hom := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro t ht
   rw [← basicOpen_eq_bot_iff, eq_bot_iff]
   intro q hq
@@ -44,19 +51,24 @@ theorem appTop_injective {Z : Scheme.{0}} [IsReduced Z] {Ω : Type} [Field Ω]
   rw [h3, Scheme.basicOpen_zero] at h2
   exact h2.elim
 
-theorem bijective_const {Z : Scheme.{0}} [IsReduced Z] {Ω : Type} [Field Ω]
+theorem bijective_const
+    {Z : Scheme.{0}} [IsReduced Z]
+    {Ω : Type} [Field Ω]
     (η : Spec (CommRingCat.of Ω) ⟶ Z) (h : ∀ q : Z, η (IsLocalRing.closedPoint Ω) ⤳ q)
     {O : Type} [CommRing O] [IsDomain O] [IsIntegrallyClosed O] [Algebra O Ω]
-    (f : Z ⟶ Spec (CommRingCat.of O)) [IsProper f] (hinj : Function.Injective (algebraMap O Ω))
-    (hf : η ≫ f = Spec.map (CommRingCat.ofHom (algebraMap O Ω))) (hc : ConstClosed O Ω) :
-    Function.Bijective (f.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom) := by
+    (f : Z ⟶ Spec (CommRingCat.of O)) [IsProper f]
+    (hinj : Function.Injective (algebraMap O Ω))
+    (hf : η ≫ f = Spec.map (CommRingCat.ofHom (algebraMap O Ω))) (hc : ConstClosed O Ω)
+    : Function.Bijective (f.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom) := by
   let ψ : O →+* Γ(Z, ⊤) := f.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom
   let φ : Γ(Z, ⊤) →+* Ω := (Scheme.ΓSpecIso (CommRingCat.of Ω)).hom.hom.comp η.appTop.hom
   have hφ : Function.Injective φ :=
-    (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of Ω)).hom).1.comp (appTop_injective η h)
+    (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of Ω)).hom).1.comp
+      (appTop_injective η h)
   have hcomp : φ.comp ψ = algebraMap O Ω := by
-    have : (Scheme.ΓSpecIso (CommRingCat.of O)).inv ≫ f.appTop ≫ η.appTop ≫
-        (Scheme.ΓSpecIso (CommRingCat.of Ω)).hom = CommRingCat.ofHom (algebraMap O Ω) := by
+    have : (Scheme.ΓSpecIso (CommRingCat.of O)).inv ≫ f.appTop ≫ η.appTop
+          ≫ (Scheme.ΓSpecIso (CommRingCat.of Ω)).hom
+        = CommRingCat.ofHom (algebraMap O Ω) := by
       rw [← Scheme.Hom.comp_appTop_assoc, hf, Scheme.ΓSpecIso_naturality, Iso.inv_hom_id_assoc]
     exact congrArg (fun q => q.hom) this
   have hψ : ψ.IsIntegral :=
@@ -76,13 +88,13 @@ theorem bijective_const {Z : Scheme.{0}} [IsReduced Z] {Ω : Type} [Field Ω]
     rw [← ho, ← hcomp]
     rfl
 
-
 attribute [local instance] GroundTheory.Arith.SchemeCoh.algebraOfOver in
 open GroundTheory.Arith.SchemeCoh in
-theorem isConnected_closed {Z : Scheme.{0}} {O : Type} [CommRing O] [IsNoetherianRing O] [IsLocalRing O]
+theorem isConnected_closed
+    {Z : Scheme.{0}} {O : Type} [CommRing O] [IsNoetherianRing O] [IsLocalRing O]
     (f : Z ⟶ Spec (CommRingCat.of O)) [IsProper f]
-    (h : Function.Bijective (f.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom)) :
-    _root_.IsConnected (f ⁻¹' {IsLocalRing.closedPoint O}) := by
+    (h : Function.Bijective (f.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom))
+    : _root_.IsConnected (f ⁻¹' {IsLocalRing.closedPoint O}) := by
   letI : Z.Over (Spec (.of O)) := ⟨f⟩
   have : IsProper (Z ↘ Spec (.of O)) := (inferInstance : IsProper f)
   exact isConnected_closedFibre_of_surj (A := O) (X := Z) h
@@ -91,7 +103,13 @@ theorem isConnected_closed {Z : Scheme.{0}} {O : Type} [CommRing O] [IsNoetheria
 end PositivityTheory.Xgn.SpecialFibreConnected
 
 open PositivityTheory.Xgn.SpecialFibreConnected in
-theorem PositivityTheory.Xgn.zero_set_special_fibre_connected : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O Ω] (s : X ⟶ Spec (CommRingCat.of O)) [IsProper s] (ϖ : O), Irreducible ϖ → Function.Injective (algebraMap O Ω) → ξ ≫ s = Spec.map (CommRingCat.ofHom (algebraMap O Ω)) → IsCptGen ξ → ConstClosed O Ω → _root_.IsConnected (zeroSet ξ (algebraMap O Ω ϖ)) := by
+theorem PositivityTheory.Xgn.zero_set_special_fibre_connected
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (O : Type)
+        [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O Ω]
+        (s : X ⟶ Spec (CommRingCat.of O)) [IsProper s] (ϖ : O),
+      Irreducible ϖ → Function.Injective (algebraMap O Ω)
+        → ξ ≫ s = Spec.map (CommRingCat.ofHom (algebraMap O Ω)) → IsCptGen ξ → ConstClosed O Ω
+        → _root_.IsConnected (zeroSet ξ (algebraMap O Ω ϖ)) := by
   intro X Ω _ ξ O _ _ _ _ s _ ϖ hϖ hinj hs hg hc
   haveI : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian s
   obtain ⟨U, hU, hcl, hint⟩ := cpt_open_integral X Ω ξ hg
@@ -122,8 +140,9 @@ theorem PositivityTheory.Xgn.zero_set_special_fibre_connected : ∀ (X : Scheme.
       change ϖ ∈ IsLocalRing.maximalIdeal O
       rw [hmax]
       exact Ideal.mem_span_singleton_self ϖ
-  have key : ∀ (q : X) (h : genPt ξ ⤳ q),
-      ¬ unitAt ξ ⟨q, h⟩ (algebraMap O Ω ϖ) ↔ s q = IsLocalRing.closedPoint O := fun q h => by
+  have key
+      : ∀ (q : X) (h : genPt ξ ⤳ q),
+        ¬ unitAt ξ ⟨q, h⟩ (algebraMap O Ω ϖ) ↔ s q = IsLocalRing.closedPoint O := fun q h => by
     rw [(ConstReg.regular_const X Ω ξ O s hs ⟨q, h⟩ ϖ).2 hg, not_not]
     exact hm _
   convert hconn using 1

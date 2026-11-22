@@ -43,21 +43,26 @@ namespace GlobalTheory.SWAbsGrowth
 section Local
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain GlobalTheory.AdelicU GlobalTheory.Doubling Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain GlobalTheory.AdelicU GlobalTheory.Doubling
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.UG (bc)
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem absNorm_le_sq {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v ⊗[F] E) :
-    ‖Algebra.norm (Fv F v) x‖₊ ≤ absFin F v x ^ 2 := by
+theorem absNorm_le_sq
+    {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v ⊗[F] E)
+    : ‖Algebra.norm (Fv F v) x‖₊ ≤ absFin F v x ^ 2 := by
   have hN := GlobalTheory.Doubling.algebraMap_norm_eq hσ (R := Fv F v) x
-  have e1 : absFin F v (algebraMap (Fv F v) (Fv F v ⊗[F] E) (Algebra.norm (Fv F v) x)) =
-      ‖Algebra.norm (Fv F v) x‖₊ := by
+  have e1
+      : absFin F v (algebraMap (Fv F v) (Fv F v ⊗[F] E) (Algebra.norm (Fv F v) x))
+        = ‖Algebra.norm (Fv F v) x‖₊ := by
     rw [Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
     exact absFin_tmul_one F v _
   have hs : absFin F v (sigR (Fv F v) σ x) ≤ absFin F v x := by
     refine (absFin_le_iff F v).2 fun τ => ?_
-    have e2 : ∀ w, finEmb F v τ (sigR (Fv F v) σ w) = finEmb F v ((τ : E →ₐ[F] FvBar F v).comp σ) w := by
+    have e2
+        : ∀ w,
+          finEmb F v τ (sigR (Fv F v) σ w) = finEmb F v ((τ : E →ₐ[F] FvBar F v).comp σ) w := by
       intro w
       induction w using TensorProduct.induction_on with
       | zero => simp
@@ -68,9 +73,11 @@ theorem absNorm_le_sq {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (v : HeightOne
   rw [← e1, hN, sq]
   exact (absFin_mul_le F v _ _).trans (mul_le_mul' le_rfl hs)
 
-theorem entry_le_opNorm {n : Type} [Fintype n] [DecidableEq n] (y : Matrix n n ℂ) (i j : n) : ‖y i j‖₊ ≤ opNorm y := by
+theorem entry_le_opNorm {n : Type} [Fintype n] [DecidableEq n] (y : Matrix n n ℂ) (i j : n)
+    : ‖y i j‖₊ ≤ opNorm y := by
   have h1 := (Matrix.toEuclideanCLM (n := n) (𝕜 := ℂ) y).le_opNNNorm (EuclideanSpace.single j 1)
-  have h2 := PiLp.norm_apply_le (Matrix.toEuclideanCLM (n := n) (𝕜 := ℂ) y (EuclideanSpace.single j 1)) i
+  have h2 :=
+    PiLp.norm_apply_le (Matrix.toEuclideanCLM (n := n) (𝕜 := ℂ) y (EuclideanSpace.single j 1)) i
   have h3 : (Matrix.toEuclideanCLM (n := n) (𝕜 := ℂ) y (EuclideanSpace.single j 1)) i = y i j := by
     change ∑ k, y i k * (EuclideanSpace.single j (1 : ℂ)) k = _
     simp
@@ -78,12 +85,12 @@ theorem entry_le_opNorm {n : Type} [Fintype n] [DecidableEq n] (y : Matrix n n �
   rw [PiLp.nnnorm_single, nnnorm_one, mul_one] at h1
   exact (show ‖y i j‖₊ ≤ _ from h2).trans h1
 
-theorem absE_le_heightGL {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (n : ℕ) :
-    ∃ C : ℝ≥0, ∀ (x : GL (Fin (n + n)) (AF F ⊗[F] E)) (u : (AF F ⊗[F] E)ˣ),
+theorem absE_le_heightGL {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (n : ℕ)
+    : ∃ C : ℝ≥0, ∀ (x : GL (Fin (n + n)) (AF F ⊗[F] E)) (u : (AF F ⊗[F] E)ˣ),
       u.1 = (leviMat finSumFinEquiv x.1).det → absE F E u ≤ C * heightGL F x ^ (2 * n) := by
   refine ⟨∏ _w : InfinitePlace F, ((n.factorial : ℝ≥0) * 2 ^ n) ^ 2, fun x u hu => ?_⟩
-  rw [absE_apply, heightGL, mul_pow _ _ (2 * n), ← mul_assoc, ← Finset.prod_pow, ← Finset.prod_mul_distrib,
-    finprod_pow (finite_mulSupport_htFin F x)]
+  rw [absE_apply, heightGL, mul_pow _ _ (2 * n), ← mul_assoc, ← Finset.prod_pow,
+    ← Finset.prod_mul_distrib, finprod_pow (finite_mulSupport_htFin F x)]
   refine mul_le_mul' (Finset.prod_le_prod' fun w _ => ?_)
     (finprod_le_finprod' (finite_mulSupport_absEv u) ?_ fun v => ?_)
   · obtain ⟨τ⟩ : Nonempty (EmbOver E w) := inferInstance
@@ -93,15 +100,17 @@ theorem absE_le_heightGL {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (n : ℕ) :
     have hent : ∀ i j, ‖infEmb τ (compInf F E w (x.1 i j))‖₊ ≤ H := fun i j =>
       (entry_le_opNorm ((x.1.map (compInf F E w)).map (infEmb τ)) i j).trans
         (((normInf_le_iff F w).1 le_rfl τ).trans (le_htOf (normInf F w) (bc (compInf F E w) x)))
-    have e : infEmb τ (unitInf F E w u).1 =
-        (leviMat finSumFinEquiv ((x.1.map (compInf F E w)).map (infEmb τ))).det := by
-      rw [leviMat_map, leviMat_map, ← RingHom.mapMatrix_apply, ← RingHom.mapMatrix_apply, ← RingHom.map_det,
-        ← RingHom.map_det, ← hu]
+    have e
+        : infEmb τ (unitInf F E w u).1
+          = (leviMat finSumFinEquiv ((x.1.map (compInf F E w)).map (infEmb τ))).det := by
+      rw [leviMat_map, leviMat_map, ← RingHom.mapMatrix_apply, ← RingHom.mapMatrix_apply,
+        ← RingHom.map_det, ← RingHom.map_det, ← hu]
       rfl
     rw [e, Matrix.det_apply]
-    refine (nnnorm_sum_le _ _).trans ((Finset.sum_le_card_nsmul _ _ ((2 * H) ^ n) fun s _ => ?_).trans (le_of_eq ?_))
-    · have : ‖Equiv.Perm.sign s • ∏ i, leviMat finSumFinEquiv ((x.1.map (compInf F E w)).map (infEmb τ)) (s i) i‖₊ =
-          ∏ i, ‖leviMat finSumFinEquiv ((x.1.map (compInf F E w)).map (infEmb τ)) (s i) i‖₊ := by
+    refine (nnnorm_sum_le _ _).trans
+      ((Finset.sum_le_card_nsmul _ _ ((2 * H) ^ n) fun s _ => ?_).trans (le_of_eq ?_))
+    · have : ‖Equiv.Perm.sign s • ∏ i, leviMat finSumFinEquiv ((x.1.map (compInf F E w)).map (infEmb τ)) (s i) i‖₊
+          = ∏ i, ‖leviMat finSumFinEquiv ((x.1.map (compInf F E w)).map (infEmb τ)) (s i) i‖₊ := by
         rw [← nnnorm_prod]
         rcases Int.units_eq_one_or (Equiv.Perm.sign s) with h | h <;> simp [h]
       rw [this]
@@ -114,17 +123,23 @@ theorem absE_le_heightGL {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (n : ℕ) :
       rw [leviMat_map, ← RingHom.mapMatrix_apply, ← RingHom.map_det, ← hu]
       rfl
     rw [absEv_apply, e, mul_comm 2 n, pow_mul]
-    refine (absNorm_le_sq hσ v _).trans (pow_le_pow_left' ((GlobalTheory.Core.Rk.HgtFin.absFin_det_le v _).trans
-      (pow_le_pow_left' ((normFin_le_iff F v).2 fun i j => ?_) n)) 2)
-    have hent : ∀ i j, absFin F v ((x.1.map (compFin F E v)) i j) ≤ htFin F v (bc (compFin F E v) x) := fun i j =>
-      (absFin_le_normFin F v _ i j).trans (le_htOf (normFin F v) (bc (compFin F E v) x))
+    refine (absNorm_le_sq hσ v _).trans
+      (pow_le_pow_left'
+        ((GlobalTheory.Core.Rk.HgtFin.absFin_det_le v _).trans
+          (pow_le_pow_left' ((normFin_le_iff F v).2 fun i j => ?_) n))
+        2)
+    have hent
+        : ∀ i j, absFin F v ((x.1.map (compFin F E v)) i j) ≤ htFin F v (bc (compFin F E v) x) :=
+      fun i j => (absFin_le_normFin F v _ i j).trans (le_htOf (normFin F v) (bc (compFin F E v) x))
     exact (absFin_add_le F v _ _).trans (max_le (hent _ _) (hent _ _))
 
 end Local
 
 section Global
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum MeasureTheory
 open GlobalTheory.AdelicU GlobalTheory.Doubling
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (swSec sZero delta)
 open scoped NNReal
@@ -132,9 +147,12 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem hgt_mul_le (A : HSp D) (a : GL (Fin A.rank) (AE D)) (ha : IsMaj A a) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ x y : GA D (dblSp A),
-      (hgt A a (x * y) : ℝ) ≤ hgt A a x * (C * GlobalTheory.Grow.height (dblSp A) y ^ (2 * A.rank)) := by
+theorem hgt_mul_le (A : HSp D) (a : GL (Fin A.rank) (AE D)) (ha : IsMaj A a)
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ x y : GA D (dblSp A),
+          (hgt A a (x * y) : ℝ)
+            ≤ hgt A a x * (C * GlobalTheory.Grow.height (dblSp A) y ^ (2 * A.rank)) := by
   haveI := t2Space_adeleRing' (F := D.host.F)
   have hI := GlobalTheory.Core.Rk.IP.hasIwasawa_Khat D A a ha
   have hK := isCompact_Khat A a
@@ -152,43 +170,59 @@ theorem hgt_mul_le (A : HSp D) (a : GL (Fin A.rank) (AE D)) (ha : IsMaj A a) :
     have := hC (Formalism.L2.Theta.matHom (dblSp A) p') (aP A p') rfl
     unfold GlobalTheory.Grow.height
     exact_mod_cast this
-  have h3 : GlobalTheory.Grow.height (dblSp A) p' ≤ B * B * GlobalTheory.Grow.height (dblSp A) y := by
+  have h3
+      : GlobalTheory.Grow.height (dblSp A) p' ≤ B * B * GlobalTheory.Grow.height (dblSp A) y := by
     have e' : (p' : GA D (dblSp A)) = k * y * k'⁻¹ := by rw [e, mul_inv_cancel_right]
     have hy := (GlobalTheory.Grow.height_pos _ y).le
-    calc _ = GlobalTheory.Grow.height (dblSp A) (k * y * k'⁻¹) := by rw [e']
-      _ ≤ GlobalTheory.Grow.height (dblSp A) k * GlobalTheory.Grow.height (dblSp A) y * GlobalTheory.Grow.height (dblSp A) k'⁻¹ :=
+    calc
+      _ = GlobalTheory.Grow.height (dblSp A) (k * y * k'⁻¹) := by rw [e']
+      _ ≤ GlobalTheory.Grow.height (dblSp A) k * GlobalTheory.Grow.height (dblSp A) y
+          * GlobalTheory.Grow.height (dblSp A) k'⁻¹ :=
         (GlobalTheory.Grow.height_mul_le _ _ _).trans
-          (mul_le_mul_of_nonneg_right (GlobalTheory.Grow.height_mul_le _ _ _) (GlobalTheory.Grow.height_pos _ _).le)
+          (mul_le_mul_of_nonneg_right (GlobalTheory.Grow.height_mul_le _ _ _)
+            (GlobalTheory.Grow.height_pos _ _).le)
       _ ≤ B * GlobalTheory.Grow.height (dblSp A) y * B :=
-        mul_le_mul (mul_le_mul_of_nonneg_right (hB k hk) hy) (hB _ (inv_mem hk')) (GlobalTheory.Grow.height_pos _ _).le
-          (by positivity)
+        mul_le_mul (mul_le_mul_of_nonneg_right (hB k hk) hy) (hB _ (inv_mem hk'))
+          (GlobalTheory.Grow.height_pos _ _).le (by positivity)
       _ = _ := by ring
   rw [mul_assoc, ← mul_pow]
-  exact h2.trans (mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (GlobalTheory.Grow.height_pos _ _).le h3 _) C.coe_nonneg)
+  exact h2.trans (mul_le_mul_of_nonneg_left
+    (pow_le_pow_left₀ (GlobalTheory.Grow.height_pos _ _).le h3 _) C.coe_nonneg)
 
-theorem norm_swSec_le {ψ : AddChar (AF D.host.F) ℂ} {A B : HSp D} {χ : (AE D)ˣ →* Circle}
-    {omh : GA D (dblSp A) × GA D B →* Module.End ℂ (WO (dblSp A) B → ℂ)} (hω : IsWeilDatumO ψ (dblSp A) B 1 χ omh)
-    {ν : Measure (WO A B)} {𝓕 : Set (WO A B)} (hν : IsCovolOne (ratL B A) ν 𝓕) {φ : WO (dblSp A) B → ℂ}
-    (hφ : IsThetaFunO ψ (dblSp A) B φ) (a : GL (Fin A.rank) (AE D)) (ha : IsMaj A a) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ x, ‖swSec A B omh ν 𝓕 φ x‖ ≤ C * (hgt A a x : ℝ) ^ ((B.rank : ℝ) / 2) := by
+theorem norm_swSec_le
+    {ψ : AddChar (AF D.host.F) ℂ} {A B : HSp D} {χ : (AE D)ˣ →* Circle}
+    {omh : GA D (dblSp A) × GA D B →* Module.End ℂ (WO (dblSp A) B → ℂ)}
+    (hω : IsWeilDatumO ψ (dblSp A) B 1 χ omh)
+    {ν : Measure (WO A B)} {𝓕 : Set (WO A B)} (hν : IsCovolOne (ratL B A) ν 𝓕)
+    {φ : WO (dblSp A) B → ℂ} (hφ : IsThetaFunO ψ (dblSp A) B φ)
+    (a : GL (Fin A.rank) (AE D)) (ha : IsMaj A a)
+    : ∃ C : ℝ, 0 ≤ C ∧ ∀ x, ‖swSec A B omh ν 𝓕 φ x‖ ≤ C * (hgt A a x : ℝ) ^ ((B.rank : ℝ) / 2) := by
   have hI := GlobalTheory.Core.Rk.IP.hasIwasawa_Khat D A a ha
   have hc := (GlobalTheory.Core.Rk.IP.swSec_integrable_continuous D ψ A B χ omh hω ν 𝓕 hν φ hφ).2
   obtain ⟨C, hC⟩ := (isCompact_Khat A a).exists_bound_of_continuousOn hc.continuousOn
   refine ⟨C, (norm_nonneg _).trans (hC 1 (one_mem _)), fun x => ?_⟩
   obtain ⟨p, k, hk, rfl⟩ := hI x
   have ex : (sZero A B + (A.rank : ℂ) / 2).re = (B.rank : ℝ) / 2 := by
-    simp only [sZero, Complex.add_re, Complex.div_ofNat_re, Complex.sub_re, Complex.natCast_re]; ring
-  rw [GlobalTheory.Core.Rk.SWLaw.swSec_law GlobalTheory.weilRepresentationUnitaryPair D ψ A B χ omh hω ν 𝓕 hν φ hφ p k, norm_mul, norm_mul, Circle.norm_coe,
-    one_mul, norm_npow (hom_pos _ _), ex, hgt_mul A a p hk, mul_comm]
+    simp only [sZero, Complex.add_re, Complex.div_ofNat_re, Complex.sub_re, Complex.natCast_re]
+    ring
+  rw [GlobalTheory.Core.Rk.SWLaw.swSec_law GlobalTheory.weilRepresentationUnitaryPair D ψ A B χ omh
+      hω ν 𝓕 hν φ hφ p k,
+    norm_mul, norm_mul, Circle.norm_coe, one_mul, norm_npow (hom_pos _ _), ex, hgt_mul A a p hk,
+    mul_comm]
   exact mul_le_mul_of_nonneg_right (hC k hk) (by positivity)
 
-theorem tsum_swSec_le {ψ : AddChar (AF D.host.F) ℂ} {A B : HSp D} {χ : (AE D)ˣ →* Circle}
-    {omh : GA D (dblSp A) × GA D B →* Module.End ℂ (WO (dblSp A) B → ℂ)} (hω : IsWeilDatumO ψ (dblSp A) B 1 χ omh)
-    (hb : 2 * A.rank < B.rank)
-    {ν : Measure (WO A B)} {𝓕 : Set (WO A B)} (hν : IsCovolOne (ratL B A) ν 𝓕) {φ : WO (dblSp A) B → ℂ}
-    (hφ : IsThetaFunO ψ (dblSp A) B φ) :
-    ∃ (M : ℕ) (C : ℝ), 0 ≤ C ∧ ∀ y, ∑' q : GlobalTheory.Eis.SiegelCosets A,
-      ‖swSec A B omh ν 𝓕 φ ((q.out : GQ (dblSp A)) * y)‖ₑ ≤ ENNReal.ofReal (C * GlobalTheory.Grow.height (dblSp A) y ^ M) := by
+theorem tsum_swSec_le
+    {ψ : AddChar (AF D.host.F) ℂ} {A B : HSp D} {χ : (AE D)ˣ →* Circle}
+    {omh : GA D (dblSp A) × GA D B →* Module.End ℂ (WO (dblSp A) B → ℂ)}
+    (hω : IsWeilDatumO ψ (dblSp A) B 1 χ omh) (hb : 2 * A.rank < B.rank)
+    {ν : Measure (WO A B)} {𝓕 : Set (WO A B)} (hν : IsCovolOne (ratL B A) ν 𝓕)
+    {φ : WO (dblSp A) B → ℂ} (hφ : IsThetaFunO ψ (dblSp A) B φ)
+    : ∃ (M : ℕ) (C : ℝ),
+      0 ≤ C
+        ∧ ∀ y,
+          ∑' q : GlobalTheory.Eis.SiegelCosets A,
+              ‖swSec A B omh ν 𝓕 φ ((q.out : GQ (dblSp A)) * y)‖ₑ
+            ≤ ENNReal.ofReal (C * GlobalTheory.Grow.height (dblSp A) y ^ M) := by
   obtain ⟨a, ha⟩ := exists_isMaj A
   have hI := GlobalTheory.Core.Rk.IP.hasIwasawa_Khat D A a ha
   obtain ⟨C₁, hC₁, h₁⟩ := norm_swSec_le hω hν hφ a ha
@@ -205,37 +239,46 @@ theorem tsum_swSec_le {ψ : AddChar (AF D.host.F) ℂ} {A B : HSp D} {χ : (AE D
   have hc0 : 0 ≤ c := by positivity
   have hone : 1 ≤ max C₂ 1 * H ^ (2 * A.rank) :=
     one_le_mul_of_one_le_of_one_le (le_max_right _ _) (one_le_pow₀ hH1)
-  have hq : ∀ x : GA D (dblSp A), ‖swSec A B omh ν 𝓕 φ (x * y)‖ ≤ c * (hgt A a x : ℝ) ^ ((B.rank : ℝ) / 2) := by
+  have hq
+      : ∀ x : GA D (dblSp A),
+        ‖swSec A B omh ν 𝓕 φ (x * y)‖ ≤ c * (hgt A a x : ℝ) ^ ((B.rank : ℝ) / 2) := by
     intro x
     refine (h₁ _).trans ?_
     rw [hc, mul_assoc]
     refine mul_le_mul_of_nonneg_left ?_ hC₁
     have h3 : (hgt A a (x * y) : ℝ) ≤ hgt A a x * (max C₂ 1 * H ^ (2 * A.rank)) :=
-      (h₂ x y).trans (mul_le_mul_of_nonneg_left
-        (mul_le_mul_of_nonneg_right (le_max_left _ _) (by positivity)) (NNReal.coe_nonneg _))
+      (h₂ x y).trans
+        (mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right (le_max_left _ _) (by positivity))
+          (NNReal.coe_nonneg _))
     refine (Real.rpow_le_rpow (NNReal.coe_nonneg _) h3 (by positivity)).trans ?_
     rw [Real.mul_rpow (NNReal.coe_nonneg _) (by positivity), mul_comm]
     refine mul_le_mul_of_nonneg_right ?_ (by positivity)
     rw [← Real.rpow_natCast _ B.rank]
-    exact Real.rpow_le_rpow_of_exponent_le hone (by linarith [(Nat.cast_nonneg B.rank : (0 : ℝ) ≤ _)])
-  calc _ ≤ ∑' q : GlobalTheory.Eis.SiegelCosets A,
+    exact Real.rpow_le_rpow_of_exponent_le hone
+      (by linarith [(Nat.cast_nonneg B.rank : (0 : ℝ) ≤ _)])
+  calc
+    _ ≤ ∑' q : GlobalTheory.Eis.SiegelCosets A,
         ENNReal.ofReal (c * (hgt A a (q.out : GQ (dblSp A)) : ℝ) ^ ((B.rank : ℝ) / 2)) :=
-        ENNReal.tsum_le_tsum fun q => by
-          rw [← ofReal_norm]
-          exact ENNReal.ofReal_le_ofReal (hq _)
+      ENNReal.tsum_le_tsum fun q => by
+        rw [← ofReal_norm]
+        exact ENNReal.ofReal_le_ofReal (hq _)
     _ = ENNReal.ofReal (c * S) := by
-        rw [← ENNReal.ofReal_tsum_of_nonneg (fun _ => by positivity) (hs.mul_left c), tsum_mul_left]
+      rw [← ENNReal.ofReal_tsum_of_nonneg (fun _ => by positivity) (hs.mul_left c), tsum_mul_left]
     _ = _ := by
-        congr 1
-        rw [hc, mul_pow, ← pow_mul]; ring
+      congr 1
+      rw [hc, mul_pow, ← pow_mul]
+      ring
 
 end Global
 
 section Main
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift

@@ -19,12 +19,12 @@ def SchConcatExponent.rotateFun (r a : ℕ) (p : Fin (r + a)) : Fin (r + a) :=
 def SchConcatExponent.rotateInv (r a : ℕ) (q : Fin (r + a)) : Fin (r + a) :=
   if h : (q : ℕ) < r then ⟨q + a, by omega⟩ else ⟨q - r, by have := q.isLt; omega⟩
 
-theorem SchConcatExponent.rotateFun_val (r a : ℕ) (p : Fin (r + a)) :
-    (SchConcatExponent.rotateFun r a p : ℕ) = if (p : ℕ) < a then r + p else p - a := by
+theorem SchConcatExponent.rotateFun_val (r a : ℕ) (p : Fin (r + a))
+    : (SchConcatExponent.rotateFun r a p : ℕ) = if (p : ℕ) < a then r + p else p - a := by
   unfold SchConcatExponent.rotateFun; split <;> rfl
 
-theorem SchConcatExponent.rotateInv_val (r a : ℕ) (q : Fin (r + a)) :
-    (SchConcatExponent.rotateInv r a q : ℕ) = if (q : ℕ) < r then q + a else q - r := by
+theorem SchConcatExponent.rotateInv_val (r a : ℕ) (q : Fin (r + a))
+    : (SchConcatExponent.rotateInv r a q : ℕ) = if (q : ℕ) < r then q + a else q - r := by
   unfold SchConcatExponent.rotateInv; split <;> rfl
 
 def SchConcatExponent.rotate (r a : ℕ) : Equiv.Perm (Fin (r + a)) where
@@ -64,7 +64,7 @@ theorem SchConcatExponent.proof : SchConcatExponent.Statement := by
       rw [← hq]; exact SchConcatExponent.rotateFun_val r a p
     simp only [Schur.padPartition, smallBlockOf]
     by_cases h : (p : ℕ) < a
-    · have hn : ¬ ((q : ℕ) < r) := by rw [hv, if_pos h]; omega
+    · have hn : ¬((q : ℕ) < r) := by rw [hv, if_pos h]; omega
       rw [dite_eq_left h, dite_eq_right hn]
       simp only [Sum.elim_inr]
       rw [hv, if_pos h]

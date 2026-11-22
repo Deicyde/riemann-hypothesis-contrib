@@ -8,12 +8,14 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.Is
 open MeasureTheory Filter UpperTheory.Lit.Cusp
 open scoped Topology Pointwise
 
-theorem UpperTheory.Lit.Cusp.isBand_of_compact :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-      [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (N : Set G) (a : ℝ → G) (H : G → ℝ)
-      (ν : Measure G) [IsFiniteMeasureOnCompacts ν], ν Nᶜ = 0 → (∀ m ∈ N, ν.map (fun x => m * x) = ν) →
-      IsRay N a H → ∀ ψ : G → ℂ, Continuous ψ → HasCompactSupport ψ →
-        IsBand N H (fun g => ∫ m, ψ (g * m) ∂ν) ∧ ∀ g, Integrable (fun m => ψ (g * m)) ν := by
+theorem UpperTheory.Lit.Cusp.isBand_of_compact
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (N : Set G)
+        (a : ℝ → G) (H : G → ℝ) (ν : Measure G) [IsFiniteMeasureOnCompacts ν],
+      ν Nᶜ = 0 → (∀ m ∈ N, ν.map (fun x => m * x) = ν) → IsRay N a H
+        → ∀ ψ : G → ℂ,
+          Continuous ψ → HasCompactSupport ψ
+            → IsBand N H (fun g => ∫ m, ψ (g * m) ∂ν) ∧ ∀ g, Integrable (fun m => ψ (g * m)) ν := by
   intro G _ _ _ _ _ _ _ _ N a H ν _ hN hinv hray ψ hψ hc
   have hint : ∀ g, Integrable (fun m => ψ (g * m)) ν := fun g =>
     (hψ.comp (continuous_const.mul continuous_id)).integrable_of_hasCompactSupport
@@ -23,10 +25,13 @@ theorem UpperTheory.Lit.Cusp.isBand_of_compact :
     intro g₀
     obtain ⟨U, hU, hUn⟩ := exists_compact_mem_nhds g₀
     have hk : IsCompact (U⁻¹ * tsupport ψ) := hU.inv.mul hc
-    have h := continuousOn_integral_of_compact_support (μ := ν) (f := fun g m => ψ (g * m)) (s := U) hk
-      (hψ.comp (continuous_fst.mul continuous_snd)).continuousOn (fun p x hp hx => by
-        by_contra hne
-        exact hx ⟨p⁻¹, Set.inv_mem_inv.2 hp, p * x, subset_tsupport ψ hne, by simp⟩)
+    have h :=
+      continuousOn_integral_of_compact_support (μ := ν)
+        (f := fun g m => ψ (g * m))
+        (s := U) hk (hψ.comp (continuous_fst.mul continuous_snd)).continuousOn
+        (fun p x hp hx => by
+          by_contra hne
+          exact hx ⟨p⁻¹, Set.inv_mem_inv.2 hp, p * x, subset_tsupport ψ hne, by simp⟩)
     exact h.continuousAt hUn
   have hI : ∀ g, ∀ m ∈ N, (∫ x, ψ (g * m * x) ∂ν) = ∫ x, ψ (g * x) ∂ν := by
     intro g m hm

@@ -27,8 +27,12 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DeltaPos
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.SiegelND.Integ.Hua
@@ -38,37 +42,50 @@ namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl
 open GlobalTheory.CompanionTheory.SW.Core GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Dec
 
 set_option maxHeartbeats 1000000 in
-theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-    IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J →
-    ∀ (n : ℕ) (ψ : AddChar (AF F) ℂ), IsCharAF F ψ →
-    ∀ μ : Measure (Fin n → Fin M → Af F ⊗[F] E), μ.IsAddHaarMeasure →
-    ∀ Q : (Fin n → Fin M → Af F ⊗[F] E) → ℂ, IsSB Q →
-    ∃ (C : ℝ) (t : F), t ≠ 0 ∧ ∀ c : hermE σ n,
-      ‖starLoc (Af F) σ J (psiFin F ψ) μ Q (hermIn (Af F) σ n c)‖ ≤
-        C * (delta (t • c).1 : ℝ) ^ (-((M : ℝ) / 2)) := by
+theorem finite_bound
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
+          IsHermND σ J
+            → ∀ (n : ℕ) (ψ : AddChar (AF F) ℂ),
+              IsCharAF F ψ
+                → ∀ μ : Measure (Fin n → Fin M → Af F ⊗[F] E),
+                  μ.IsAddHaarMeasure
+                    → ∀ Q : (Fin n → Fin M → Af F ⊗[F] E) → ℂ,
+                      IsSB Q
+                        → ∃ (C : ℝ) (t : F),
+                          t ≠ 0
+                            ∧ ∀ c : hermE σ n,
+                              ‖starLoc (Af F) σ J (psiFin F ψ) μ Q (hermIn (Af F) σ n c)‖
+                                ≤ C * (delta (t • c).1 : ℝ) ^ (-((M : ℝ) / 2)) := by
   intro F E _ _ _ _ _ σ hCM M J hJ n ψ hψ μ hμ Q hQ
   classical
   obtain ⟨hA1, hA2, hA3, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   haveI : LocallyCompactSpace (Af F) := hA1
   haveI : SecondCountableTopology (Af F) := hA2
   haveI : T2Space (Af F) := hA3
-  obtain ⟨hT1, hT2, hT3, hT4, -, -, -, hT8, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hCM (Af F)
+  obtain ⟨hT1, hT2, hT3, hT4, -, -, -, hT8, -⟩ :=
+    GlobalTheory.T.tensor_locally_compact_ring F E σ hCM (Af F)
   haveI : IsTopologicalRing (Af F ⊗[F] E) := hT1
   haveI : SecondCountableTopology (Af F ⊗[F] E) := hT3
   haveI : T2Space (Af F ⊗[F] E) := hT4
   haveI : BorelSpace (Fin n → Fin M → Af F ⊗[F] E) := hT8 n M
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
-  obtain ⟨d, ⟨b⟩⟩ : ∃ d : ℕ, Nonempty (Module.Basis (Fin d) F E) :=
-    ⟨_, ⟨Module.finBasis F E⟩⟩
-  obtain ⟨N, hN, hNU⟩ := GlobalTheory.T.lattice_levels_neighbourhood_basis F E σ hCM d b n M _ (invariant_mem_nhds hQ.1 hQ.2)
+  obtain ⟨d, ⟨b⟩⟩ : ∃ d : ℕ, Nonempty (Module.Basis (Fin d) F E) := ⟨_, ⟨Module.finBasis F E⟩⟩
+  obtain ⟨N, hN, hNU⟩ :=
+    GlobalTheory.T.lattice_levels_neighbourhood_basis F E σ hCM d b n M _
+      (invariant_mem_nhds hQ.1 hQ.2)
   obtain ⟨hLo, hLc⟩ := GlobalTheory.T.lattice_level_open_compact F E σ hCM d b n M N hN
   set L := latN b n M N with hL
   obtain ⟨s, hs⟩ := eq_sum_cosets hQ.2 L hLo (fun x l hl => hNU hl x)
   obtain ⟨D, hD, hDc⟩ := GlobalTheory.T.trace_dual_denominator_bounded F
-  obtain ⟨t₁, ht₁, htest⟩ := GlobalTheory.T.rational_character_kernel_scaling F E σ hCM d b ψ hψ N hN D hD hDc
+  obtain ⟨t₁, ht₁, htest⟩ :=
+    GlobalTheory.T.rational_character_kernel_scaling F E σ hCM d b ψ hψ N hN D hD hDc
   obtain ⟨s₂, hs₂, hrat⟩ := GlobalTheory.T.rational_tuple_in_lattice_level F E d b M J n N hN
   have hs₂F : ((s₂ : ℕ) : F) ≠ 0 := Nat.cast_ne_zero.2 hs₂.ne'
-  refine ⟨(∑ a ∈ s, ‖Q a‖) * (μ (L : Set _)).toReal, t₁ * (s₂ : F), mul_ne_zero ht₁ hs₂F, fun c => ?_⟩
+  refine
+    ⟨(∑ a ∈ s, ‖Q a‖) * (μ (L : Set _)).toReal, t₁ * (s₂ : F), mul_ne_zero ht₁ hs₂F, fun c => ?_⟩
   set t : F := t₁ * (s₂ : F) with ht
   set bc := hermIn (Af F) σ n c with hbc
   obtain ⟨hp1, hp2, hp3⟩ := GlobalTheory.T.phase_continuous_unitary F E σ hCM M J n ψ hψ bc
@@ -80,9 +97,12 @@ theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   have hSL : S ⊆ L := fun y hy => hy.1
   have hSfin : μ S ≠ ⊤ := ne_top_of_le_ne_top hLfin (measure_mono hSL)
 
-  have hbd : ‖starLoc (Af F) σ J (psiFin F ψ) μ Q bc‖ ≤
-      (∑ a ∈ s, ‖Q a‖) * √((μ (L : Set _)).toReal * (μ S).toReal) := by
-    have hw := GlobalTheory.T.gauss_sum_quadratic_character_bound _ μ L hLc hLo q B hp1 hp2 (GlobalTheory.T.phase_cocycle_bimultiplicative F E σ hCM M J hJ n ψ hψ bc) hq1 hq2
+  have hbd
+      : ‖starLoc (Af F) σ J (psiFin F ψ) μ Q bc‖
+        ≤ (∑ a ∈ s, ‖Q a‖) * √((μ (L : Set _)).toReal * (μ S).toReal) := by
+    have hw :=
+      GlobalTheory.T.gauss_sum_quadratic_character_bound _ μ L hLc hLo q B hp1 hp2
+        (GlobalTheory.T.phase_cocycle_bimultiplicative F E σ hCM M J hJ n ψ hψ bc) hq1 hq2
     exact GlobalTheory.T.gauss_sum_finite_average_bound _ μ L hLc hLo q hp1 hp2 _ hw Q s hs
 
   have hSm : MeasurableSet S := by
@@ -107,19 +127,27 @@ theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   haveI := Fintype.ofFinite ((Fin n → 𝓞 E) ⧸ Kc c')
 
   have hcount : ((delta c' ^ M : ℕ) : ℝ≥0∞) * μ S ≤ μ (L : Set _) := by
-    have h := GlobalTheory.T.disjoint_translates_volume_bound _ μ L S hSm hSL (Fin M → (Fin n → 𝓞 E) ⧸ Kc c')
-      (fun φ => ratTuple J s₂ fun i => (φ i).out) (fun φ => hrat _) ?_
+    have h :=
+      GlobalTheory.T.disjoint_translates_volume_bound _ μ L S hSm hSL
+        (Fin M → (Fin n → 𝓞 E) ⧸ Kc c')
+        (fun φ => ratTuple J s₂ fun i => (φ i).out)
+        (fun φ => hrat _)
+        ?_
     · have hc : Fintype.card (Fin M → (Fin n → 𝓞 E) ⧸ Kc c') = delta c' ^ M := by
         rw [Fintype.card_fun, Fintype.card_fin, ← Nat.card_eq_fintype_card]
         rfl
       rwa [hc] at h
     · intro φ φ' u v hu hv huv
       funext i₀
-      have hρ : ratTuple (F := F) J s₂ (fun i => (φ i).out - (φ' i).out) = ratTuple J s₂ (fun i => (φ i).out) - ratTuple J s₂ (fun i => (φ' i).out) := by
+      have hρ
+          : ratTuple (F := F) J s₂ (fun i => (φ i).out - (φ' i).out)
+            = ratTuple J s₂ (fun i => (φ i).out) - ratTuple J s₂ (fun i => (φ' i).out) := by
         funext a j
         simp only [ratTuple, Pi.sub_apply, map_sub]
-        rw [show (fun i => algebraMap (𝓞 E) E ((φ i).out a) - algebraMap (𝓞 E) E ((φ' i).out a)) =
-          (fun i => algebraMap (𝓞 E) E ((φ i).out a)) - (fun i => algebraMap (𝓞 E) E ((φ' i).out a)) from rfl,
+        rw [show (fun i => algebraMap (𝓞 E) E ((φ i).out a) - algebraMap (𝓞 E) E ((φ' i).out a))
+              = (fun i => algebraMap (𝓞 E) E ((φ i).out a))
+                - (fun i => algebraMap (𝓞 E) E ((φ' i).out a)) from
+            rfl,
           Matrix.mulVec_sub]
         simp [mul_sub]
       have hmem : ∀ l ∈ L, B l (ratTuple J s₂ fun i => (φ i).out - (φ' i).out) = 1 := by
@@ -131,20 +159,29 @@ theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
         exact hdiff u hu v hv l hl
       have hK : (φ i₀).out - (φ' i₀).out ∈ Kc c' := by
         intro c₀
-        have hx := htest ((s₂ : E) * ∑ a, c.1 a c₀ *
-          algebraMap (𝓞 E) E (((φ i₀).out - (φ' i₀).out) a)) (fun x hx => by
-            have h1 := hmem (fun a i => if a = c₀ ∧ i = i₀ then x else 0) (by
-              intro a i
-              by_cases h : a = c₀ ∧ i = i₀
-              · simpa [h] using hx
-              · simp only [h, if_false]
-                exact (latN b n M N).zero_mem a i)
-            rw [hB, hbc, GlobalTheory.T.pairing_on_rational_tuple_formula F E σ M J hJ n (psiFin F ψ) c c₀ i₀ x s₂ _] at h1
-            exact h1)
+        have hx :=
+          htest
+            ((s₂ : E)
+              * ∑ a, c.1 a c₀ *
+                algebraMap (𝓞 E) E (((φ i₀).out - (φ' i₀).out) a))
+            (fun x hx => by
+              have h1 :=
+                hmem (fun a i => if a = c₀ ∧ i = i₀ then x else 0) (by
+                  intro a i
+                  by_cases h : a = c₀ ∧ i = i₀
+                  · simpa [h] using hx
+                  · simp only [h, if_false]
+                    exact (latN b n M N).zero_mem a i)
+              rw [hB, hbc,
+                  GlobalTheory.T.pairing_on_rational_tuple_formula F E σ M J hJ n (psiFin F ψ) c c₀
+                    i₀ x s₂ _]
+                at h1
+              exact h1)
         obtain ⟨o, ho⟩ := hx
         refine ⟨o, ?_⟩
         rw [ho]
-        simp only [Matrix.mulVec, dotProduct, hc', Matrix.map_apply, Finset.smul_sum, Finset.mul_sum]
+        simp only [Matrix.mulVec, dotProduct, hc', Matrix.map_apply, Finset.smul_sum,
+          Finset.mul_sum]
         refine Finset.sum_congr rfl fun a _ => ?_
         have h3 : σ (c.1 c₀ a) = c.1 a c₀ := c.2 a c₀
         rw [show σ ((t • c).1 c₀ a) = t • c.1 a c₀ from by
@@ -152,7 +189,9 @@ theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
           rw [Algebra.smul_def, map_mul, AlgHom.commutes, h3, ← Algebra.smul_def]]
         simp only [ht, Algebra.smul_def, map_mul, map_natCast]
         ring
-      have h5 : (QuotientAddGroup.mk (φ' i₀).out : (Fin n → 𝓞 E) ⧸ Kc c') = QuotientAddGroup.mk (φ i₀).out :=
+      have h5
+          : (QuotientAddGroup.mk (φ' i₀).out : (Fin n → 𝓞 E) ⧸ Kc c')
+            = QuotientAddGroup.mk (φ i₀).out :=
         QuotientAddGroup.eq.2 (by rw [neg_add_eq_sub]; exact hK)
       rw [QuotientAddGroup.out_eq', QuotientAddGroup.out_eq'] at h5
       exact h5.symm
@@ -170,7 +209,8 @@ theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   set w : ℝ := (delta c' : ℝ) ^ (-((M : ℝ) / 2)) with hw
   have hw0 : 0 ≤ w := Real.rpow_nonneg hδpos.le _
   have hw2 : w ^ 2 * (delta c' : ℝ) ^ M = 1 := by
-    rw [hw, ← Real.rpow_natCast _ 2, ← Real.rpow_mul hδpos.le, ← Real.rpow_natCast _ M, ← Real.rpow_add hδpos]
+    rw [hw, ← Real.rpow_natCast _ 2, ← Real.rpow_mul hδpos.le, ← Real.rpow_natCast _ M,
+      ← Real.rpow_add hδpos]
     have : -((M : ℝ) / 2) * ((2 : ℕ) : ℝ) + (M : ℝ) = 0 := by push_cast; ring
     rw [this, Real.rpow_zero]
   have hsq : √(A * Sr) ≤ A * w := by
@@ -179,11 +219,14 @@ theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
     have h2 : Sr ≤ w ^ 2 * A := by
       rw [h1]
       exact mul_le_mul_of_nonneg_left hreal (sq_nonneg _)
-    calc A * Sr ≤ A * (w ^ 2 * A) := mul_le_mul_of_nonneg_left h2 hA0
+    calc
+      A * Sr
+        ≤ A * (w ^ 2 * A) := mul_le_mul_of_nonneg_left h2 hA0
       _ = (A * w) ^ 2 := by ring
-  calc _ ≤ (∑ a ∈ s, ‖Q a‖) * √(A * Sr) := hbd
+  calc
+    _ ≤ (∑ a ∈ s, ‖Q a‖) * √(A * Sr) := hbd
     _ ≤ (∑ a ∈ s, ‖Q a‖) * (A * w) :=
-        mul_le_mul_of_nonneg_left hsq (Finset.sum_nonneg fun _ _ => norm_nonneg _)
+      mul_le_mul_of_nonneg_left hsq (Finset.sum_nonneg fun _ _ => norm_nonneg _)
     _ = _ := by ring
 
 end GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl

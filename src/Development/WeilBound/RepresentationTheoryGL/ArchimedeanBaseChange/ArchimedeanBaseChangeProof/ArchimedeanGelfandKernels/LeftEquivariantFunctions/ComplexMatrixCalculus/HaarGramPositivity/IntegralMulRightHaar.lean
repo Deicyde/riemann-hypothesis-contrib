@@ -27,8 +27,8 @@ instance instSCMat : SecondCountableTopology (Mat n) :=
 instance instSCUK : SecondCountableTopology (UK n) :=
   TopologicalSpace.Subtype.secondCountableTopology ((unitary (Mat n)) : Set (Mat n))
 
-theorem map_mul_right_haar (g : UK n) :
-    (Measure.haar : Measure (UK n)).map (· * g) = Measure.haar := by
+theorem map_mul_right_haar (g : UK n)
+    : (Measure.haar : Measure (UK n)).map (· * g) = Measure.haar := by
   set μ : Measure (UK n) := Measure.haar
   set ν : Measure (UK n) := μ.map (· * g)
   haveI : ν.IsHaarMeasure := Measure.isHaarMeasure_map_mul_right μ g
@@ -49,10 +49,12 @@ theorem map_mul_right_haar (g : UK n) :
     exact_mod_cast h2
   rw [hsm, hc, one_smul]
 
-theorem integral_mul_right_haar {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : UK n → E) (g : UK n) :
-    ∫ x, f (x * g) ∂(Measure.haar : Measure (UK n)) = ∫ x, f x ∂(Measure.haar : Measure (UK n)) := by
-  have hmp : MeasurePreserving (MeasurableEquiv.mulRight g)
-      (Measure.haar : Measure (UK n)) Measure.haar :=
+theorem integral_mul_right_haar
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : UK n → E) (g : UK n)
+    : ∫ x, f (x * g) ∂(Measure.haar : Measure (UK n))
+      = ∫ x, f x ∂(Measure.haar : Measure (UK n)) := by
+  have hmp : MeasurePreserving (MeasurableEquiv.mulRight g) (Measure.haar : Measure (UK n))
+      Measure.haar :=
     ⟨measurable_mul_const g, map_mul_right_haar g⟩
   exact hmp.integral_comp' f
 

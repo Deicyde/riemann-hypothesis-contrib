@@ -10,26 +10,36 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PowFixedO
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.RecOne GlobalTheory.AlmostEt
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.RecOne GlobalTheory.AlmostEt
 open scoped Matrix NNReal
 
 namespace GlobalTheory.RecOne
 
 open Polynomial IsLocalRing
 
-theorem exists_residue_pow_pow_eq (l : ℕ) [Fact l.Prime] {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-    (A : ValuationSubring Ω) (hl1 : A.valuation (l : Ω) < 1) (xA : A) :
-    ∃ N : ℕ, 0 < N ∧ residue A xA ^ (l ^ N) = residue A xA := by
+theorem exists_residue_pow_pow_eq
+    (l : ℕ) [Fact l.Prime]
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (A : ValuationSubring Ω) (hl1 : A.valuation (l : Ω) < 1) (xA : A)
+    : ∃ N : ℕ, 0 < N ∧ residue A xA ^ (l ^ N) = residue A xA := by
   first
   | exact @_root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed
   | exact _root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed
   | (apply _root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed <;> assumption)
   | (intros; apply _root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.ResiduePowerFixed.residue_pow_fixed ..)
 
-theorem fixA_eq_pow_add_mul : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-    (A : ValuationSubring Ω), OverL l A → ∀ a : fixA A, ∃ (b : fixA A) (z : A), (a : A) = (b : A) ^ l + (l : A) * z := by
+theorem fixA_eq_pow_add_mul
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+        (A : ValuationSubring Ω),
+      OverL l A → ∀ a : fixA A, ∃ (b : fixA A) (z : A), (a : A) = (b : A) ^ l + (l : A) * z := by
   intro l _ Ω _ _ _ A hO a
   have hl : l.Prime := Fact.out
   haveI : CharZero Ω := algebraRat.charZero Ω
@@ -55,7 +65,9 @@ theorem fixA_eq_pow_add_mul : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω
   have hvl0 : A.valuation (l : Ω) ≠ 0 := (_root_.map_ne_zero _).2 hl0
   by_cases hc0 : (cA : Ω) = 0
   · exact ⟨0, by rw [mul_zero]; exact Subtype.ext hc0⟩
-  obtain ⟨k, hk⟩ := GlobalTheory.InertiaFixedValue.valuation_eq_zpow_of_ine_fixed l Ω A hO (cA : Ω) hc0 (mem_fixA.1 hcfix)
+  obtain ⟨k, hk⟩ :=
+    GlobalTheory.InertiaFixedValue.valuation_eq_zpow_of_ine_fixed l Ω A hO (cA : Ω) hc0
+      (mem_fixA.1 hcfix)
   obtain ⟨n, rfl | rfl⟩ := Int.eq_nat_or_neg k
   · rw [zpow_natCast] at hk
     rcases Nat.eq_zero_or_pos n with rfl | hn

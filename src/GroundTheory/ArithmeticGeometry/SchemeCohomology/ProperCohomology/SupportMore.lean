@@ -122,8 +122,9 @@ lemma H_eq_zero_of_isZero {F : X.Modules} (hF : IsZero F) {p : ℕ}
   rw [← Abelian.Ext.comp_mk₀_id x, hF'.eq_of_src (𝟙 _) 0, Abelian.Ext.mk₀_zero,
     Abelian.Ext.comp_zero]
 
-theorem FiniteH.of_isZero (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)] {F : X.Modules}
-    (hF : IsZero F) : FiniteH.{w'} A F := fun p =>
+theorem FiniteH.of_isZero
+    (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)] {F : X.Modules} (hF : IsZero F)
+    : FiniteH.{w'} A F := fun p =>
   have : Subsingleton (Sheaf.H.{w'} (modulesAb F) p) :=
     ⟨fun x y => (H_eq_zero_of_isZero hF x).trans (H_eq_zero_of_isZero hF y).symm⟩
   Module.Finite.of_finite

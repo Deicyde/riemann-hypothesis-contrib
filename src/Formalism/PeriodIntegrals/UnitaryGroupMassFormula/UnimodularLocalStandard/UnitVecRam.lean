@@ -34,19 +34,24 @@ theorem unitVecRam : UnitVecRam := by
   have hn0 : n0 ≠ 0 := by
     intro h
     apply H_self_ne m (cmL a b d ha hd lam hlam) hz₀ne
-    rw [e0, h]; simp
+    rw [e0, h]
+    simp
   let P : ℕ → Prop := fun j => SatMem d Λ (((2 * cmTheta b d - b)⁻¹) ^ j • z₀)
   have hbound : ∀ j, P j → j ≤ n0.natAbs := by
     intro j hj
     obtain ⟨p, q, hq, e⟩ := sat_norm hOK hΛ hθ hl hj
-    have eH : stdH (cmL a b d ha hd lam hlam) m (((2 * cmTheta b d - b)⁻¹) ^ j • z₀) (((2 * cmTheta b d - b)⁻¹) ^ j • z₀)
-        = ((d : ℂ)⁻¹) ^ j * stdH (cmL a b d ha hd lam hlam) m z₀ z₀ := by
-      rw [LinearMap.map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul, smul_eq_mul, map_pow,
-        ← mul_assoc, ← mul_pow, hππ]
+    have eH
+        : stdH (cmL a b d ha hd lam hlam) m (((2 * cmTheta b d - b)⁻¹) ^ j • z₀)
+            (((2 * cmTheta b d - b)⁻¹) ^ j • z₀)
+          = ((d : ℂ)⁻¹) ^ j * stdH (cmL a b d ha hd lam hlam) m z₀ z₀ := by
+      rw [LinearMap.map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul, smul_eq_mul,
+        map_pow, ← mul_assoc, ← mul_pow, hππ]
     rw [eH, e0] at e
-    have e' : repKappa a b d ha hd lam hlam * ((p : ℂ) / q) =
-        repKappa a b d ha hd lam hlam * ((n0 : ℂ) / ((s0 : ℂ) * (d : ℂ) ^ j)) := by
-      calc _ = repKappa a b d ha hd lam hlam * p / q := by ring
+    have e'
+        : repKappa a b d ha hd lam hlam * ((p : ℂ) / q)
+          = repKappa a b d ha hd lam hlam * ((n0 : ℂ) / ((s0 : ℂ) * (d : ℂ) ^ j)) := by
+      calc
+        _ = repKappa a b d ha hd lam hlam * p / q := by ring
         _ = _ := e.symm
         _ = _ := by ring
     have e'' := mul_left_cancel₀ hκ0 e'
@@ -54,7 +59,8 @@ theorem unitVecRam : UnitVecRam := by
     have hZ : p * (s0 * (d : ℤ) ^ j) = n0 * q := by exact_mod_cast e''
     have hdj : (d : ℤ) ^ j ∣ n0 := by
       have h' : (d : ℤ) ^ j ∣ n0 * q := ⟨p * s0, by rw [← hZ]; ring⟩
-      have hcop : IsCoprime ((d : ℤ) ^ j) q := IsCoprime.pow_left ((Prime.coprime_iff_not_dvd hdp).mpr hq)
+      have hcop : IsCoprime ((d : ℤ) ^ j) q :=
+        IsCoprime.pow_left ((Prime.coprime_iff_not_dvd hdp).mpr hq)
       exact hcop.dvd_of_dvd_mul_right h'
     have hle : d ^ j ≤ n0.natAbs := by
       have := Int.natAbs_dvd_natAbs.mpr hdj
@@ -80,9 +86,11 @@ theorem unitVecRam : UnitVecRam := by
   obtain ⟨s, hs, hsx⟩ := hPJ
   have hs' : ¬ (d : ℤ) ∣ (s : ℤ) := fun h => hs (by exact_mod_cast h)
 
-  obtain ⟨y, hy, n, c₂, hny, hdn⟩ : ∃ y ∈ Λ, ∃ n c₂ : ℤ,
-      stdH (cmL a b d ha hd lam hlam) m (s • xh) y = repKappa a b d ha hd lam hlam * ((n : ℂ) - c₂ * conj (cmTheta b d)) ∧
-      ¬ (d : ℤ) ∣ 2 * n - c₂ * b := by
+  obtain ⟨y, hy, n, c₂, hny, hdn⟩
+      : ∃ y ∈ Λ, ∃ n c₂ : ℤ,
+        stdH (cmL a b d ha hd lam hlam) m (s • xh) y
+            = repKappa a b d ha hd lam hlam * ((n : ℂ) - c₂ * conj (cmTheta b d))
+          ∧ ¬ (d : ℤ) ∣ 2 * n - c₂ * b := by
     by_contra hcon
     push_neg at hcon
     apply hnot
@@ -105,7 +113,10 @@ theorem unitVecRam : UnitVecRam := by
     rcases hx with rfl | ⟨p, q, hp, hq, e⟩
     · simpa [y'] using hyz
     · obtain ⟨n2, c3, s2, hs2, e2⟩ := sat_pair hOK hΛ hθ hl hyz hxs
-      have hμ : μ = (((q * n2 : ℤ) : ℂ) - ((q * c3 : ℤ) : ℂ) * conj (cmTheta b d)) / ((s2 * p : ℤ) : ℂ) := by
+      have hμ
+          : μ
+            = (((q * n2 : ℤ) : ℂ) - ((q * c3 : ℤ) : ℂ) * conj (cmTheta b d))
+              / ((s2 * p : ℤ) : ℂ) := by
         have hp0 := nz hp
         have hq0 := nz hq
         have hs20 := nz hs2
@@ -115,22 +126,26 @@ theorem unitVecRam : UnitVecRam := by
       refine rep_sat_sub d Λ hl hyz ?_
       rw [hμ]
       exact rep_sat_elt d Λ hl hθ hxs _ _ _ (not_dvd_mul' hl hs2 hp)
-  have hy'T : ∀ j ∈ T, y' j = 0 := by
-    intro j hj; simp [y', yz, zT, hj, hxT j hj]
+  have hy'T : ∀ j ∈ T, y' j = 0 := by intro j hj; simp [y', yz, zT, hj, hxT j hj]
   have hy'x : stdH (cmL a b d ha hd lam hlam) m y' x = 0 := by
     rcases hx with rfl | ⟨p, q, hp, hq, e⟩
     · simp
     · have hxx : stdH (cmL a b d ha hd lam hlam) m x x ≠ 0 := by
         rw [e]; exact div_ne_zero (mul_ne_zero hκ0 (nz hp)) (nz hq)
-      rw [hy'def, map_sub, LinearMap.sub_apply, LinearMap.map_smul, LinearMap.smul_apply, smul_eq_mul, hμdef,
-        div_mul_cancel₀ _ hxx, sub_self]
-  have hxhy' : stdH (cmL a b d ha hd lam hlam) m xh y' = stdH (cmL a b d ha hd lam hlam) m xh y := by
-    rw [hy'def, map_sub, (stdH (cmL a b d ha hd lam hlam) m xh).map_smulₛₗ μ x, hxhx, smul_zero, sub_zero]
+      rw [hy'def, map_sub, LinearMap.sub_apply, LinearMap.map_smul, LinearMap.smul_apply,
+        smul_eq_mul, hμdef, div_mul_cancel₀ _ hxx, sub_self]
+  have hxhy'
+      : stdH (cmL a b d ha hd lam hlam) m xh y' = stdH (cmL a b d ha hd lam hlam) m xh y := by
+    rw [hy'def, map_sub, (stdH (cmL a b d ha hd lam hlam) m xh).map_smulₛₗ μ x, hxhx, smul_zero,
+      sub_zero]
     exact rep_H_zT a b d ha hd lam hlam m T hxhT
   have hsc : (s : ℂ) ≠ 0 := by exact_mod_cast nz hs'
-  have hxhy : stdH (cmL a b d ha hd lam hlam) m xh y =
-      repKappa a b d ha hd lam hlam * ((n : ℂ) - c₂ * conj (cmTheta b d)) / s := by
-    have e3 : stdH (cmL a b d ha hd lam hlam) m (s • xh) y = (s : ℂ) * stdH (cmL a b d ha hd lam hlam) m xh y := by
+  have hxhy
+      : stdH (cmL a b d ha hd lam hlam) m xh y
+        = repKappa a b d ha hd lam hlam * ((n : ℂ) - c₂ * conj (cmTheta b d)) / s := by
+    have e3
+        : stdH (cmL a b d ha hd lam hlam) m (s • xh) y
+          = (s : ℂ) * stdH (cmL a b d ha hd lam hlam) m xh y := by
       rw [← Nat.cast_smul_eq_nsmul ℂ, LinearMap.map_smul, LinearMap.smul_apply, smul_eq_mul]
     rw [hny] at e3
     rw [eq_div_iff hsc]
@@ -143,22 +158,32 @@ theorem unitVecRam : UnitVecRam := by
     · refine ⟨xh + y', rep_sat_add d Λ hl hxhs hy's, ?_, ?_, ?_⟩
       · intro j hj; simp [hxhT j hj, hy'T j hj]
       · rw [map_add (f := _), LinearMap.add_apply, hxhx, hy'x, add_zero]
-      · refine ⟨p1 * q2 * s + p2 * q1 * s + (2 * n - c₂ * b) * q1 * q2, q1 * q2 * s, ?_,
-          not_dvd_mul' hl (not_dvd_mul' hl hq1 hq2) hs', ?_⟩
+      · refine ⟨
+          p1 * q2 * s + p2 * q1 * s + (2 * n - c₂ * b) * q1 * q2,
+          q1 * q2 * s,
+          ?_,
+          not_dvd_mul' hl (not_dvd_mul' hl hq1 hq2) hs',
+          ?_
+        ⟩
         · intro hdv
-          have e4 : (2 * n - c₂ * b) * q1 * q2 =
-              (p1 * q2 * s + p2 * q1 * s + (2 * n - c₂ * b) * q1 * q2) - (p1 * q2 * s + p2 * q1 * s) := by ring
+          have e4
+              : (2 * n - c₂ * b) * q1 * q2
+                = (p1 * q2 * s + p2 * q1 * s + (2 * n - c₂ * b) * q1 * q2)
+                  - (p1 * q2 * s + p2 * q1 * s) := by
+            ring
           have : (d : ℤ) ∣ (2 * n - c₂ * b) * q1 * q2 := by
             rw [e4]
-            exact dvd_sub hdv (dvd_add ((hp1.mul_right _).mul_right _) ((hp2.mul_right _).mul_right _))
+            exact dvd_sub hdv
+              (dvd_add ((hp1.mul_right _).mul_right _) ((hp2.mul_right _).mul_right _))
           exact not_dvd_mul' hl (not_dvd_mul' hl hdn hq1) hq2 this
-        · have hyx : stdH (cmL a b d ha hd lam hlam) m y' xh =
-              repKappa a b d ha hd lam hlam * ((n : ℂ) - c₂ * cmTheta b d) / s := by
+        · have hyx
+              : stdH (cmL a b d ha hd lam hlam) m y' xh
+                = repKappa a b d ha hd lam hlam * ((n : ℂ) - c₂ * cmTheta b d) / s := by
             rw [← rep_H_conj (cmL a b d ha hd lam hlam) m xh y', hxhy', hxhy]
             simp only [map_div₀, map_mul, map_sub, map_intCast, map_natCast, Complex.conj_conj,
               kappa_real a b d ha hd lam hlam]
-          rw [map_add (stdH (cmL a b d ha hd lam hlam) m) xh y', LinearMap.add_apply, map_add (f := _), map_add (f := _), e1, e2, hxhy',
-            hxhy, hyx]
+          rw [map_add (stdH (cmL a b d ha hd lam hlam) m) xh y', LinearMap.add_apply,
+            map_add (f := _), map_add (f := _), e1, e2, hxhy', hxhy, hyx]
           have htb := rep_theta_add_conj b d
           have hA : (q1 : ℂ) * (q1 : ℂ)⁻¹ = 1 := mul_inv_cancel₀ (nz hq1)
           have hB : (q2 : ℂ) * (q2 : ℂ)⁻¹ = 1 := mul_inv_cancel₀ (nz hq2)

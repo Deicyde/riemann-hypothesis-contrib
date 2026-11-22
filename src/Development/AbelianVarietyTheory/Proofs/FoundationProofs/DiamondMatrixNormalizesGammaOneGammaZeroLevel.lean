@@ -10,8 +10,9 @@ open scoped Manifold
 
 namespace GlobalTheory.HeckeFamilyMatrices
 
-theorem diam_conj_mem (N l : ℕ) (d : ZMod N) (σ : SL(2, ℤ)) (hσ : IsDiam N l d σ) (γ : SL(2, ℤ))
-    (hγ : γ ∈ Lev N l) : σ * γ * σ⁻¹ ∈ Lev N l := by
+theorem diam_conj_mem
+    (N l : ℕ) (d : ZMod N) (σ : SL(2, ℤ)) (hσ : IsDiam N l d σ) (γ : SL(2, ℤ)) (hγ : γ ∈ Lev N l)
+    : σ * γ * σ⁻¹ ∈ Lev N l := by
   obtain ⟨hσ0, -⟩ := hσ
   rw [Lev, Subgroup.mem_inf] at hγ ⊢
   obtain ⟨hγ1, hγ0⟩ := hγ
@@ -28,11 +29,15 @@ theorem diam_conj_mem (N l : ℕ) (d : ZMod N) (σ : SL(2, ℤ)) (hσ : IsDiam N
     obtain ⟨h00, h11, h10⟩ := hγ1
     have hdet := σ.2
     rw [Matrix.det_fin_two] at hdet
-    have hdet' : ((σ 0 0 : ℤ) : ZMod N) * ((σ 1 1 : ℤ) : ZMod N) - ((σ 0 1 : ℤ) : ZMod N) * ((σ 1 0 : ℤ) : ZMod N) = 1 := by
+    have hdet'
+        : ((σ 0 0 : ℤ) : ZMod N) * ((σ 1 1 : ℤ) : ZMod N)
+            - ((σ 0 1 : ℤ) : ZMod N) * ((σ 1 0 : ℤ) : ZMod N)
+          = 1 := by
       exact_mod_cast congrArg (Int.cast : ℤ → ZMod N) hdet
-    simp only [Matrix.SpecialLinearGroup.coe_mul, Matrix.SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two,
-      Matrix.mul_apply, Fin.sum_univ_two, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-      Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one, Int.cast_add, Int.cast_mul, Int.cast_neg]
+    simp only [Matrix.SpecialLinearGroup.coe_mul, Matrix.SpecialLinearGroup.coe_inv,
+      Matrix.adjugate_fin_two, Matrix.mul_apply, Fin.sum_univ_two, Matrix.of_apply,
+      Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val',
+      Matrix.cons_val_fin_one, Int.cast_add, Int.cast_mul, Int.cast_neg]
     set a : ZMod N := ((σ 0 0 : ℤ) : ZMod N)
     set b : ZMod N := ((σ 0 1 : ℤ) : ZMod N)
     set c : ZMod N := ((σ 1 0 : ℤ) : ZMod N)
@@ -48,8 +53,9 @@ theorem diam_conj_mem (N l : ℕ) (d : ZMod N) (σ : SL(2, ℤ)) (hσ : IsDiam N
   · exact (CongruenceSubgroup.Gamma0 l).mul_mem ((CongruenceSubgroup.Gamma0 l).mul_mem hσl hγ0)
       ((CongruenceSubgroup.Gamma0 l).inv_mem hσl)
 
-theorem diam_normalises_lev : ∀ (N l : ℕ) (d : ZMod N) (σ : SL(2, ℤ)), IsDiam N l d σ →
-    ∀ γ : Lev N l, ∃ γ' : Lev N l, mat σ * mat γ = mat γ' * mat σ := by
+theorem diam_normalises_lev
+    : ∀ (N l : ℕ) (d : ZMod N) (σ : SL(2, ℤ)),
+      IsDiam N l d σ → ∀ γ : Lev N l, ∃ γ' : Lev N l, mat σ * mat γ = mat γ' * mat σ := by
   intro N l d σ hσ γ
   refine ⟨⟨σ * (γ : SL(2, ℤ)) * σ⁻¹, diam_conj_mem N l d σ hσ γ γ.2⟩, ?_⟩
   simp only [mat, ← Matrix.SpecialLinearGroup.coe_mul, inv_mul_cancel_right]

@@ -16,7 +16,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ContDiffMatri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open Formalism.REAL GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -24,8 +26,8 @@ open GlobalTheory.KFourier MeasureTheory
 
 namespace GlobalTheory
 
-theorem hs_toMK_sub_one {n : ℕ} (ε : Fin n → Bool) (k : KG ε) :
-    Formalism.REAL.hs (toMK k - 1) = 2 * (n : ℝ) - 2 * (Matrix.trace (toMK k)).re := by
+theorem hs_toMK_sub_one {n : ℕ} (ε : Fin n → Bool) (k : KG ε)
+    : Formalism.REAL.hs (toMK k - 1) = 2 * (n : ℝ) - 2 * (Matrix.trace (toMK k)).re := by
   have hu : star (toMK k) * toMK k = 1 := Unitary.star_mul_self_of_mem k.2.1
   have hcol : ∀ j, ∑ i, ‖toMK k i j‖ ^ 2 = (1 : ℝ) := by
     intro j
@@ -35,8 +37,10 @@ theorem hs_toMK_sub_one {n : ℕ} (ε : Fin n → Bool) (k : KG ε) :
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Matrix.star_apply, Complex.star_def, Complex.conj_mul']
     norm_cast
-  have hentry : ∀ i j, ‖(toMK k - 1) i j‖ ^ 2 =
-      ‖toMK k i j‖ ^ 2 + (if i = j then 1 - 2 * (toMK k i j).re else 0) := by
+  have hentry
+      : ∀ i j,
+        ‖(toMK k - 1) i j‖ ^ 2
+          = ‖toMK k i j‖ ^ 2 + (if i = j then 1 - 2 * (toMK k i j).re else 0) := by
     intro i j
     by_cases hij : i = j
     · subst hij

@@ -10,7 +10,15 @@ open GlobalTheory.JR GlobalTheory.JR.WeilQuad Matrix MeasureTheory Filter Topolo
 
 namespace GlobalTheory.JR.WeilQuad
 
-theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ) (x : A.K) (μ : Measure A.L), IsStdChar ψ → μ.IsAddHaarMeasure → ∀ (t : A.K) (M D : AddSubgroup A.L), IsOpen (M : Set A.L) → IsCompact (M : Set A.L) → IsOpen (D : Set A.L) → IsCompact (D : Set A.L) → (∀ m ∈ M, A.psiK ψ (t * x * A.NL m) = 1) → (D : Set A.L) = {y : A.L | ∀ m ∈ M, A.kerL ψ (t * x) y m = 1} → IsStableGauss A ψ x μ t (gaussInt A ψ x μ t (D : Set A.L)) := by
+theorem gaussInt_stable_of_dual
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ) (x : A.K) (μ : Measure A.L),
+      IsStdChar ψ → μ.IsAddHaarMeasure
+        → ∀ (t : A.K) (M D : AddSubgroup A.L),
+          IsOpen (M : Set A.L) → IsCompact (M : Set A.L) → IsOpen (D : Set A.L)
+            → IsCompact (D : Set A.L) → (∀ m ∈ M, A.psiK ψ (t * x * A.NL m) = 1)
+            → (D : Set A.L) = {y : A.L | ∀ m ∈ M, A.kerL ψ (t * x) y m = 1}
+            → IsStableGauss A ψ x μ t (gaussInt A ψ x μ t (D : Set A.L)) := by
   intro F E _ _ _ _ hU A ψ x μ hψ hμ t M D hMo hMc hDo hDc hN hD
   obtain ⟨⟨bas⟩, hinj, hNL, hTr, -⟩ := Et.quadratic_structure F E A
   haveI : Module.Finite A.K A.L := Module.Finite.of_basis bas
@@ -20,7 +28,8 @@ theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [
   have hpsi : ∀ u v : A.K, A.psiK ψ (u + v) = A.psiK ψ u * A.psiK ψ v := by
     intro u v
     simp only [Et.psiK, map_add (f := _), AddChar.map_add_eq_mul]
-  have hNadd : ∀ y m : A.L, A.NL (y + m) = A.NL y + Algebra.trace A.K A.L (star y * m) + A.NL m := by
+  have hNadd
+      : ∀ y m : A.L, A.NL (y + m) = A.NL y + Algebra.trace A.K A.L (star y * m) + A.NL m := by
     intro y m
     apply hinj
     simp only [map_add (f := _), hNL, hTr, star_add, star_mul, star_star]
@@ -31,7 +40,9 @@ theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [
     simp only [hg, Et.kerL, ← hpsi, hNadd]
     congr 1
     ring
-  have hkadd : ∀ y y' m : A.L, A.kerL ψ (t * x) (y + y') m = A.kerL ψ (t * x) y m * A.kerL ψ (t * x) y' m := by
+  have hkadd
+      : ∀ y y' m : A.L,
+        A.kerL ψ (t * x) (y + y') m = A.kerL ψ (t * x) y m * A.kerL ψ (t * x) y' m := by
     intro y y' m
     simp only [Et.kerL, ← hpsi, star_add, add_mul, map_add (f := _), mul_add]
   have hmemD : ∀ y, y ∈ D ↔ ∀ m ∈ M, A.kerL ψ (t * x) y m = 1 := fun y => Set.ext_iff.1 hD y
@@ -51,20 +62,30 @@ theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [
     have c1 : Continuous (fun m : A.L => Algebra.trace A.K A.L (star y * m)) :=
       IsModuleTopology.continuous_of_linearMap
         (((Algebra.trace A.K A.L).comp (LinearMap.mulLeft A.K (star y))).restrictScalars F)
-    have c2 : Continuous (fun m : A.L => Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))) :=
-      (IsModuleTopology.continuous_of_linearMap (Algebra.trace F A.K)).comp (continuous_const.mul c1)
-    have hU0 : {m : A.L | m ∈ M ∧ ‖Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))‖ ≤ 1} ∈ 𝓝 (0 : A.L) := by
+    have c2 : Continuous (fun m : A.L =>
+        Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))) :=
+      (IsModuleTopology.continuous_of_linearMap (Algebra.trace F A.K)).comp
+        (continuous_const.mul c1)
+    have hU0
+        : {m : A.L | m ∈ M ∧ ‖Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))‖ ≤ 1}
+          ∈ 𝓝 (0 : A.L) := by
       have hM : (M : Set A.L) ∈ 𝓝 (0 : A.L) := hMo.mem_nhds M.zero_mem
-      have h0 : Metric.closedBall (0 : F) 1 ∈ 𝓝 (Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * (0 : A.L)))) := by
+      have h0
+          : Metric.closedBall (0 : F) 1
+            ∈ 𝓝 (Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * (0 : A.L)))) := by
         simp only [mul_zero, map_zero]
         exact Metric.closedBall_mem_nhds 0 one_pos
-      have hbound : {m : A.L | ‖Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))‖ ≤ 1} ∈ 𝓝 (0 : A.L) :=
+      have hbound
+          : {m : A.L | ‖Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))‖ ≤ 1}
+            ∈ 𝓝 (0 : A.L) :=
         Filter.mem_of_superset ((c2.continuousAt (x := (0 : A.L))).preimage_mem_nhds h0)
-        (fun m hm => (show ‖Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))‖ ≤ 1 by
-          simpa [Metric.mem_closedBall, dist_zero_right] using hm))
+          (fun m hm =>
+            (show ‖Algebra.trace F A.K (t * x * Algebra.trace A.K A.L (star y * m))‖ ≤ 1 by
+              simpa [Metric.mem_closedBall, dist_zero_right] using hm))
       filter_upwards [hM, hbound] with m hmM hmBound
       exact ⟨hmM, hmBound⟩
-    have hU1 := (continuous_sub_right y).continuousAt.preimage_mem_nhds (by rw [sub_self]; exact hU0)
+    have hU1 :=
+      (continuous_sub_right y).continuousAt.preimage_mem_nhds (by rw [sub_self]; exact hU0)
     refine ContinuousAt.congr (f := fun _ => g y) continuousAt_const ?_
     filter_upwards [hU1] with z hz
     show g y = g z
@@ -76,7 +97,8 @@ theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [
 
   refine ⟨D, hDo, hDc, fun Λ hΛo hΛc hDΛ => ?_⟩
   have hmeas : ∀ S : Set A.L, IsOpen S → MeasurableSet S := fun S hS => hS.measurableSet
-  have hint : IntegrableOn g (Λ : Set A.L) μ := hgc.continuousOn.integrableOn_compact' hΛc (hmeas _ hΛo)
+  have hint : IntegrableOn g (Λ : Set A.L) μ :=
+    hgc.continuousOn.integrableOn_compact' hΛc (hmeas _ hΛo)
   have hsplit : (Λ : Set A.L) = (D : Set A.L) ∪ ((Λ : Set A.L) \ (D : Set A.L)) :=
     (Set.union_diff_cancel (show (D : Set A.L) ⊆ Λ from hDΛ)).symm
 
@@ -109,14 +131,19 @@ theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [
       ring
     have hpre : (fun y => m₀ + y) ⁻¹' (S q) = S q := by
       ext y
-      simp only [hS, Set.mem_preimage, Set.mem_inter_iff, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
-      have e1 : m₀ + y ∈ Λ ↔ y ∈ Λ := ⟨fun h => by simpa using Λ.sub_mem h (hDΛ hm₀D), fun h => Λ.add_mem (hDΛ hm₀D) h⟩
-      have e2 : m₀ + y ∈ D ↔ y ∈ D := ⟨fun h => by simpa using D.sub_mem h hm₀D, fun h => D.add_mem hm₀D h⟩
+      simp only [hS, Set.mem_preimage, Set.mem_inter_iff, Set.mem_diff, SetLike.mem_coe,
+        Set.mem_singleton_iff]
+      have e1 : m₀ + y ∈ Λ ↔ y ∈ Λ :=
+        ⟨fun h => by simpa using Λ.sub_mem h (hDΛ hm₀D), fun h => Λ.add_mem (hDΛ hm₀D) h⟩
+      have e2 : m₀ + y ∈ D ↔ y ∈ D :=
+        ⟨fun h => by simpa using D.sub_mem h hm₀D, fun h => D.add_mem hm₀D h⟩
       have e3 : (QuotientAddGroup.mk (m₀ + y) : A.L ⧸ D) = QuotientAddGroup.mk y := by
         rw [QuotientAddGroup.eq]
         simpa using D.neg_mem hm₀D
       rw [e1, e2, e3]
-    have htr := (measurePreserving_add_left μ m₀).setIntegral_preimage_emb (measurableEmbedding_addLeft m₀) g (S q)
+    have htr :=
+      (measurePreserving_add_left μ m₀).setIntegral_preimage_emb (measurableEmbedding_addLeft m₀) g
+        (S q)
     rw [hpre] at htr
     have h2 : ∫ y in S q, g (m₀ + y) ∂μ = A.kerL ψ (t * x) y₀ m₀ * ∫ y in S q, g y ∂μ := by
       rw [← integral_const_mul]
@@ -128,8 +155,8 @@ theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [
     (hΛc.image hmk).finite_of_discrete
   have hunion : ((Λ : Set A.L) \ (D : Set A.L)) = ⋃ q ∈ hfin.toFinset, S q := by
     ext y
-    simp only [hS, Set.mem_iUnion, Set.Finite.mem_toFinset, Set.mem_image, Set.mem_inter_iff, Set.mem_preimage,
-      Set.mem_singleton_iff, exists_prop]
+    simp only [hS, Set.mem_iUnion, Set.Finite.mem_toFinset, Set.mem_image, Set.mem_inter_iff,
+      Set.mem_preimage, Set.mem_singleton_iff, exists_prop]
     constructor
     · intro hy
       exact ⟨_, ⟨y, hy.1, rfl⟩, hy, rfl⟩
@@ -145,7 +172,9 @@ theorem gaussInt_stable_of_dual : ∀ (F E : Type) [NontriviallyNormedField F] [
       exact hq ((Set.mem_singleton_iff.1 h1).symm.trans (Set.mem_singleton_iff.1 h2))
     · exact fun q _ => hint.mono_set (fun y hy => hy.1.1)
   show ∫ y in (Λ : Set A.L), g y ∂μ = ∫ y in (D : Set A.L), g y ∂μ
-  rw [hsplit, setIntegral_union Set.disjoint_sdiff_right ((hmeas _ hΛo).diff (hmeas _ hDo))
-    (hint.mono_set hDΛ) (hint.mono_set Set.diff_subset), hrest, add_zero]
+  rw [hsplit,
+    setIntegral_union Set.disjoint_sdiff_right ((hmeas _ hΛo).diff (hmeas _ hDo))
+      (hint.mono_set hDΛ) (hint.mono_set Set.diff_subset),
+    hrest, add_zero]
 
 end GlobalTheory.JR.WeilQuad

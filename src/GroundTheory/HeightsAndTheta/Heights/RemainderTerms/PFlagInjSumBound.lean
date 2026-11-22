@@ -11,9 +11,9 @@ namespace GroundTheory.Heights₂.Heights
 
 namespace RestTerms
 
-theorem FlagInjSumBound.finset_sum_bound (S : Finset ℕ) :
-    ∑ i ∈ Finset.range S.card, i ≤ ∑ x ∈ S, x ∧
-      (∑ x ∈ S, x = ∑ i ∈ Finset.range S.card, i → S ⊆ Finset.range S.card) := by
+theorem FlagInjSumBound.finset_sum_bound (S : Finset ℕ)
+    : ∑ i ∈ Finset.range S.card, i ≤ ∑ x ∈ S, x
+      ∧ (∑ x ∈ S, x = ∑ i ∈ Finset.range S.card, i → S ⊆ Finset.range S.card) := by
   induction S using Finset.induction_on_max with
   | empty => simp
   | insert m S' hlt ih =>
@@ -36,8 +36,7 @@ theorem FlagInjSumBound.proof : FlagInjSumBound.Statement := by
   set S := Finset.univ.image g with hSdef
   have hcard : S.card = N := by
     rw [hSdef, Finset.card_image_of_injective _ hg, Finset.card_univ, Fintype.card_fin]
-  have hsum : ∑ i, g i = ∑ x ∈ S, x := by
-    rw [hSdef, Finset.sum_image (fun i _ j _ h => hg h)]
+  have hsum : ∑ i, g i = ∑ x ∈ S, x := by rw [hSdef, Finset.sum_image (fun i _ j _ h => hg h)]
   obtain ⟨h₁, h₂⟩ := FlagInjSumBound.finset_sum_bound S
   rw [hcard, Finset.sum_range_id] at h₁ h₂
   rw [hsum]

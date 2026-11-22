@@ -11,20 +11,23 @@ open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalC
 
 namespace GlobalTheory.CompanionTheory.Ggeo
 
-theorem exists_smoothOfRelativeDimension_of_geometricallyConnected :
-    ∀ (X : Scheme.{0}) [ConnectedSpace X] (G : Over X) [GrpObj G], Smooth G.hom →
-      GeometricallyConnected G.hom → ∃ g : ℕ, SmoothOfRelativeDimension g G.hom := by
+theorem exists_smoothOfRelativeDimension_of_geometricallyConnected
+    : ∀ (X : Scheme.{0}) [ConnectedSpace X] (G : Over X) [GrpObj G],
+      Smooth G.hom → GeometricallyConnected G.hom → ∃ g : ℕ, SmoothOfRelativeDimension g G.hom := by
   intro X _ G _ hs hc
   haveI : Smooth G.hom := hs
-  obtain ⟨d, W, hxW, hW⟩ : ∃ (d : G.left → ℕ) (W : G.left → G.left.Opens), (∀ x, x ∈ W x) ∧
-      ∀ x, SmoothOfRelativeDimension (d x) ((W x).ι ≫ G.hom) := by
+  obtain ⟨d, W, hxW, hW⟩
+      : ∃ (d : G.left → ℕ) (W : G.left → G.left.Opens),
+        (∀ x, x ∈ W x) ∧ ∀ x, SmoothOfRelativeDimension (d x) ((W x).ι ≫ G.hom) := by
     choose d W hxW hW using fun x => ReciprocityTheory.ChartRestriction.G.H1.exists_dim G.hom x
     exact ⟨d, W, hxW, hW⟩
-  have hres : ∀ (x : G.left) (V : G.left.Opens), V ≤ W x →
-      SmoothOfRelativeDimension (d x) (V.ι ≫ G.hom) := by
+  have hres
+      : ∀ (x : G.left) (V : G.left.Opens),
+        V ≤ W x → SmoothOfRelativeDimension (d x) (V.ι ≫ G.hom) := by
     intro x V hV
-    have h := HasRingHomProperty.comp_of_isOpenImmersion (@SmoothOfRelativeDimension (d x))
-      (G.left.homOfLE hV) ((W x).ι ≫ G.hom) (hW x)
+    have h :=
+      HasRingHomProperty.comp_of_isOpenImmersion (@SmoothOfRelativeDimension (d x))
+        (G.left.homOfLE hV) ((W x).ι ≫ G.hom) (hW x)
     rwa [← Category.assoc, Scheme.homOfLE_ι] at h
   have hd : IsLocallyConstant d := by
     rw [IsLocallyConstant.iff_exists_open]
@@ -49,8 +52,8 @@ theorem exists_smoothOfRelativeDimension_of_geometricallyConnected :
     have h1 : d x = d (e (G.hom x)) :=
       hd.apply_eq_of_isPreconnected (hfib (G.hom x)) rfl (he (G.hom x))
     have h2 : d (e (G.hom x)) = d (e s₀) :=
-      (hd.comp_continuous (Scheme.Hom.continuous e)).apply_eq_of_isPreconnected
-        isPreconnected_univ trivial trivial
+      (hd.comp_continuous (Scheme.Hom.continuous e)).apply_eq_of_isPreconnected isPreconnected_univ
+        trivial trivial
     exact h1.trans h2
   refine ⟨d (e s₀), ?_⟩
   haveI : IsZariskiLocalAtSource (@SmoothOfRelativeDimension (d (e s₀))) :=

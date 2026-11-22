@@ -8,9 +8,11 @@ public import Formalism.PolynomialDimension.WeylDim
 
 namespace GlobalTheory.KroneckerIdentity
 
-theorem kron_identity {T : Type} [Fintype T] [DecidableEq T] {J : T → Type}
-    [∀ t, Fintype (J t)] [∀ t, DecidableEq (J t)] {R : Type} [CommRing R] :
-    (GlobalTheory.DefPt.kron fun (t : T) ↦ (1 : Matrix (J t) (J t) R))
+theorem kron_identity
+    {T : Type} [Fintype T] [DecidableEq T]
+    {J : T → Type} [∀ t, Fintype (J t)] [∀ t, DecidableEq (J t)]
+    {R : Type} [CommRing R]
+    : (GlobalTheory.DefPt.kron fun (t : T) ↦ (1 : Matrix (J t) (J t) R))
       = (1 : Matrix ((t : T) → J t) ((t : T) → J t) R) := by
   ext I I'
   simp only [GlobalTheory.DefPt.kron, Matrix.of_apply, Matrix.one_apply]

@@ -11,8 +11,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory.EtC
 
-theorem eqv_of_isIso {R : Type} [CommRing R] {E E' : Spc} (f : E ⟶ E') [IsIso f] (F : Shv R) :
-    Eqv R f F := by
+theorem eqv_of_isIso {R : Type} [CommRing R] {E E' : Spc} (f : E ⟶ E') [IsIso f] (F : Shv R)
+    : Eqv R f F := by
   intro n
   refine Function.bijective_iff_has_inverse.mpr ⟨pull R (inv f) F n, ?_, ?_⟩
   · intro x
@@ -20,7 +20,8 @@ theorem eqv_of_isIso {R : Type} [CommRing R] {E E' : Spc} (f : E ⟶ E') [IsIso 
   · intro x
     rw [← pull_comp, IsIso.hom_inv_id, pull_id]
 
-theorem hInv_of_subsingleton : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], Subsingleton A → HInv q A := by
+theorem hInv_of_subsingleton
+    : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], Subsingleton A → HInv q A := by
   intro q _ A _ hA i
   have hb : Function.Bijective (Polynomial.C : A →+* Polynomial A) :=
     ⟨fun x y _ => Subsingleton.elim x y, fun y => ⟨0, Subsingleton.elim _ _⟩⟩

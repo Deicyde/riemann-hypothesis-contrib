@@ -13,12 +13,15 @@ theorem tz_isUnit_ι (X : Scheme.{0}) (f : Γ(X, ⊤)) : IsUnit ((X.basicOpen f)
   have h := RingedSpace.isUnit_res_basicOpen X.toRingedSpace f
   rw [Scheme.Opens.ι_appTop]
   have e1 : (X.basicOpen f).ι ''ᵁ ⊤ = X.basicOpen f := by simp
-  have key : ∀ (W : X.Opens) (_ : W = X.basicOpen f) (hle : W ≤ ⊤), IsUnit ((X.presheaf.map (homOfLE hle).op).hom f) := by
+  have key
+      : ∀ (W : X.Opens) (_ : W = X.basicOpen f) (hle : W ≤ ⊤),
+        IsUnit ((X.presheaf.map (homOfLE hle).op).hom f) := by
     rintro W rfl hle
     exact h
   exact key _ e1 _
 
-theorem tz_idem_one {A : Type} [CommRing A] {x : A} (h : IsIdempotentElem x) (hu : IsUnit x) : x = 1 := by
+theorem tz_idem_one {A : Type} [CommRing A] {x : A} (h : IsIdempotentElem x) (hu : IsUnit x)
+    : x = 1 := by
   obtain ⟨u, rfl⟩ := hu
   have := congrArg (· * ((u⁻¹ : Aˣ) : A)) h.eq
   simpa [mul_assoc] using this
@@ -31,8 +34,11 @@ theorem splitLoc : SplitLoc := by
     rw [TopologicalSpace.Opens.mem_iSup]
     by_contra hx
     push Not at hx
-    have hm : ∀ i, U.presheaf.germ ⊤ x trivial (e i) ∈ IsLocalRing.maximalIdeal (U.presheaf.stalk x) := fun i =>
-      (IsLocalRing.mem_maximalIdeal _).2 (mem_nonunits_iff.2 ((Scheme.mem_basicOpen_top _ _ x).not.1 (hx i)))
+    have hm
+        : ∀ i, U.presheaf.germ ⊤ x trivial (e i) ∈ IsLocalRing.maximalIdeal (U.presheaf.stalk x) :=
+      fun i =>
+        (IsLocalRing.mem_maximalIdeal _).2
+          (mem_nonunits_iff.2 ((Scheme.mem_basicOpen_top _ _ x).not.1 (hx i)))
     have hsum := Ideal.sum_mem (IsLocalRing.maximalIdeal _) (t := Finset.univ) (fun i _ => hm i)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← map_sum, hs, map_one] at hsum
@@ -46,9 +52,12 @@ theorem splitLoc : SplitLoc := by
     have h1 : (W j).ι.appTop.hom (e i) = 1 := tz_idem_one ((he j).map _) (tz_isUnit_ι U (e j))
     simp only [Scheme.Hom.comp_appTop, CommRingCat.hom_comp, RingHom.comp_apply]
     change h.appTop.hom ((W j).ι.appTop.hom (e j)) = 1
-    rw [h1]; exact map_one _
+    rw [h1]
+    exact map_one _
 
-theorem TwZero_of_split (hTw : LateralTheory.EtaleFoundations.CongruenceLocalDecomposition.TwLoc) (hS : PrimSplit) : TwZero :=
+theorem TwZero_of_split
+    (hTw : LateralTheory.EtaleFoundations.CongruenceLocalDecomposition.TwLoc) (hS : PrimSplit)
+    : TwZero :=
   TwZero_of hTw hS splitLoc
 
 end LateralTheory.EtaleTrace

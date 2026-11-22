@@ -18,25 +18,30 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.NormChar
 
 open MeasureTheory NumberField IsDedekindDomain Filter
 open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep Formalism.L2.Host Formalism.ConjugateSelfDual
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep
+  Formalism.L2.Host Formalism.ConjugateSelfDual
 open UpperTheory.V.Published UpperTheory.CBC PositivityTheory.RgJS
 
 section SlopeTestRemainingChoices
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  [_root_.NumberField.IsTotallyComplex F] [_root_.NumberField.IsTotallyComplex E] {n : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  [_root_.NumberField.IsTotallyComplex F] [_root_.NumberField.IsTotallyComplex E]
+  {n : ℕ}
 
-private theorem bc_tw {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : IsPow χ s) (h' : IsPow χ' s)
-    (π : CuspSub F n) (P : CuspSub E n) (H : WeakBC (Cusp.cx π).sat (Cusp.cx P).sat) :
-    WeakBC (Cusp.cx (π.twist χ)).sat (Cusp.cx (P.twist χ')).sat := by
+private theorem bc_tw
+    {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : IsPow χ s) (h' : IsPow χ' s)
+    (π : CuspSub F n) (P : CuspSub E n) (H : WeakBC (Cusp.cx π).sat (Cusp.cx P).sat)
+    : WeakBC (Cusp.cx (π.twist χ)).sat (Cusp.cx (P.twist χ')).sat := by
   refine Filter.Eventually.mono H fun w hw f hf => ?_
   obtain ⟨B, hB, hB'⟩ := hw f hf
   have hf' : Ideal.absNorm w.asIdeal = Ideal.absNorm (w.under (𝓞 F)).asIdeal ^ f := by
     simpa only [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply] using hf
   have hv : χ'.val w = χ.val (w.under (𝓞 F)) ^ f := by
     apply Units.ext
-    rw [Units.val_pow_eq_pow_val, (Sph.powSat F χ s h _).2, (Sph.powSat E χ' s h' w).2, hf', Nat.cast_pow,
-      ← Complex.cpow_nat_mul, Complex.natCast_cpow_natCast_mul]
+    rw [Units.val_pow_eq_pow_val, (Sph.powSat F χ s h _).2, (Sph.powSat E χ' s h' w).2, hf',
+      Nat.cast_pow, ← Complex.cpow_nat_mul, Complex.natCast_cpow_natCast_mul]
   refine ⟨B.map (· * χ.val (w.under (𝓞 F))), ?_, ?_⟩
   · have := satake_twist_holds F n (CG.mk π) χ _ B (Sph.powSat F χ s h _).1 hB
     rwa [CG.twist_mk] at this
@@ -46,9 +51,13 @@ private theorem bc_tw {χ : HChar F} {χ' : HChar E} {s : ℂ} (h : IsPow χ s) 
     convert this using 1
     simp [Multiset.map_map, hv, mul_pow]
 
-private theorem same_sat [IsGalois F E] (hp : (Module.finrank F E).Prime) (π : CuspSub F n) {sat sat' : Pl E → Multiset ℂˣ → Prop}
-    (H : WeakBC (CG.mk π).HasSat sat) (H' : WeakBC (CG.mk π).HasSat sat') :
-    ∀ᶠ w : Pl E in cofinite, ∃ B, sat w B ∧ sat' w B := by
+private theorem same_sat
+    [IsGalois F E]
+    (hp : (Module.finrank F E).Prime)
+    (π : CuspSub F n)
+    {sat sat' : Pl E → Multiset ℂˣ → Prop}
+    (H : WeakBC (CG.mk π).HasSat sat) (H' : WeakBC (CG.mk π).HasSat sat')
+    : ∀ᶠ w : Pl E in cofinite, ∃ B, sat w B ∧ sat' w B := by
   have hN := (places F E hp).2.2.2.2.1
   filter_upwards [H, H'] with w a b
   have hn : normV w = normV (w.under (𝓞 F)) ^ resDeg F w := by
@@ -60,8 +69,7 @@ private theorem same_sat [IsGalois F E] (hp : (Module.finrank F E).Prime) (π : 
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.Sph.norm :
-    UpperTheory.ConvolutionTheory.Sph.Norm := by
+theorem UpperTheory.ConvolutionTheory.Sph.norm : UpperTheory.ConvolutionTheory.Sph.Norm := by
   intro F E _ _ _ _ _ _ _ _ σ hσ hp n hn μE _ μF _ π P hW
   obtain ⟨χ, ⟨s, hχ⟩, V, hV⟩ := Dp.exTwist F n μF π hn
   obtain ⟨hex, -⟩ := powTwist F E

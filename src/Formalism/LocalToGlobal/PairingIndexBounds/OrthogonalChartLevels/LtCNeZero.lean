@@ -12,7 +12,8 @@ open Formalism.L2.G.Pend Formalism.MainNotions.FormalGroupSystem
 
 variable {p : ℕ} [Fact p.Prime]
 
-def ltC (g : Formalism.MainNotions.GL3Theta.G1 p) (hLT : LTIso g) : ℂ_[p] := ((g.C.u : ℂ_[p]) * wToC p ((epOf hLT : (Formalism.L2.G.Pend.WW p)ˣ) : Formalism.L2.G.Pend.WW p))⁻¹
+def ltC (g : Formalism.MainNotions.GL3Theta.G1 p) (hLT : LTIso g) : ℂ_[p] :=
+  ((g.C.u : ℂ_[p]) * wToC p ((epOf hLT : (Formalism.L2.G.Pend.WW p)ˣ) : Formalism.L2.G.Pend.WW p))⁻¹
 
 theorem ltC_ne_zero (g : Formalism.MainNotions.GL3Theta.G1 p) (hLT : LTIso g) : ltC g hLT ≠ 0 := by
   unfold ltC

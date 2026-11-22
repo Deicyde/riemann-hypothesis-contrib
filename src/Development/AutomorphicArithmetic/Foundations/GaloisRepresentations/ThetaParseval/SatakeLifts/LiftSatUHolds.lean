@@ -26,11 +26,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 namespace UpperTheory.Gal.TP.Loc
 
 theorem liftIso_holds : LiftIso :=
-  liftIso_of (pairOfLift leftSmooth keepsSB modelDict separates) srcGood contraIrr (contraUnit contraIrr)
+  liftIso_of (pairOfLift leftSmooth keepsSB modelDict separates) srcGood contraIrr
+    (contraUnit contraIrr)
 
 theorem liftSat_holds : LiftSat :=
-  liftSat_of liftIso_holds srcGood contraIrr (contraUnit contraIrr) (satContra (contraUnit contraIrr)) satTwist satInvT satDet
-    satProd segInv
+  liftSat_of liftIso_holds srcGood contraIrr (contraUnit contraIrr)
+    (satContra (contraUnit contraIrr)) satTwist satInvT satDet satProd segInv
 
 theorem pairSat_holds : PairSat :=
   pairSat liftSat_holds pullGood contraIrr (contraUnit contraIrr) (satContra (contraUnit contraIrr))

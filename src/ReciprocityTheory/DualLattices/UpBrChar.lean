@@ -12,17 +12,22 @@ open Matrix
 
 namespace ReciprocityTheory.PGsh.Up
 
-def omTr {R : Type} [CommRing R] {g N : ℕ} (M : Matrix (Fin g) (Fin N) R) (s : ℕ) (hs : s ≤ g) :
-    Submodule R (Fin s → R) :=
+def omTr {R : Type} [CommRing R] {g N : ℕ} (M : Matrix (Fin g) (Fin N) R) (s : ℕ) (hs : s ≤ g)
+    : Submodule R (Fin s → R) :=
   Submodule.span R (Set.range fun b : Fin N => fun a : Fin s => M (Fin.castLE hs a) b)
 
 def CharStatement : Prop :=
   ∀ (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
-    v.Integers R → ∀ (g N : ℕ) (M : Matrix (Fin g) (Fin N) R) (c : R), c ≠ 0 →
-    (∀ s (hs : s ≤ g), ∀ w : Fin s → R, c • w ∈ omTr M s hs) →
-    ∃ ι : Fin g → Fin N, Function.Injective ι ∧ ∀ s (hs : s ≤ g),
-      Submodule.span R (Set.range fun b : Fin s => fun a : Fin s => M (Fin.castLE hs a) (ι (Fin.castLE hs b)))
-        = omTr M s hs
+    v.Integers R
+      → ∀ (g N : ℕ) (M : Matrix (Fin g) (Fin N) R) (c : R),
+        c ≠ 0 → (∀ s (hs : s ≤ g), ∀ w : Fin s → R, c • w ∈ omTr M s hs)
+          → ∃ ι : Fin g → Fin N,
+            Function.Injective ι
+              ∧ ∀ s (hs : s ≤ g),
+                Submodule.span R
+                    (Set.range fun b : Fin s => fun a : Fin s =>
+                      M (Fin.castLE hs a) (ι (Fin.castLE hs b)))
+                  = omTr M s hs
 
 section Char
 
@@ -228,15 +233,23 @@ theorem charThm : CharStatement := by
   obtain ⟨ι, hinj, h⟩ := char_ind hv M c hc hspan g le_rfl
   exact ⟨ι, hinj, fun s hs => h s hs⟩
 
-theorem char_len (hv : v.Integers R) {g N : ℕ} (M : Matrix (Fin g) (Fin N) R) (ι : Fin g → Fin N)
+theorem char_len
+    (hv : v.Integers R)
+    {g N : ℕ} (M : Matrix (Fin g) (Fin N) R) (ι : Fin g → Fin N)
     (s : ℕ) (hs : s ≤ g)
-    (hι : Submodule.span R (Set.range fun b : Fin s => fun a : Fin s =>
-      M (Fin.castLE hs a) (ι (Fin.castLE hs b))) = omTr M s hs) :
-    HasLen v R ((Fin s → R) ⧸ omTr M s hs)
-      (v (algebraMap R C (Matrix.of fun a b : Fin s => M (Fin.castLE hs a) (ι (Fin.castLE hs b))).det)) := by
-  have h := hasLen_coker_det' v R hv (Fin s) (Matrix.of fun a b : Fin s => M (Fin.castLE hs a) (ι (Fin.castLE hs b)))
-  have hr : LinearMap.range (Matrix.of fun a b : Fin s => M (Fin.castLE hs a)
-      (ι (Fin.castLE hs b))).mulVecLin = omTr M s hs := by
+    (hι : Submodule.span R
+        (Set.range fun b : Fin s => fun a : Fin s => M (Fin.castLE hs a) (ι (Fin.castLE hs b)))
+      = omTr M s hs)
+    : HasLen v R ((Fin s → R) ⧸ omTr M s hs)
+      (v (algebraMap R C
+        (Matrix.of fun a b : Fin s => M (Fin.castLE hs a) (ι (Fin.castLE hs b))).det)) := by
+  have h :=
+    hasLen_coker_det' v R hv (Fin s)
+      (Matrix.of fun a b : Fin s => M (Fin.castLE hs a) (ι (Fin.castLE hs b)))
+  have hr
+      : LinearMap.range (Matrix.of fun a b : Fin s =>
+          M (Fin.castLE hs a) (ι (Fin.castLE hs b))).mulVecLin
+        = omTr M s hs := by
     rw [Matrix.range_mulVecLin, ← hι]
     rfl
   rw [hr] at h

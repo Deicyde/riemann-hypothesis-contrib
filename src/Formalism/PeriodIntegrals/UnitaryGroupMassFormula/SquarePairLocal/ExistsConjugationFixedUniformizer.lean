@@ -18,10 +18,10 @@ theorem cj_cj (x : 𝓞 E) : cj E (cj E x) = x := by
   apply RingOfIntegers.ext
   rw [cj_coe, cj_coe, star_star]
 
-theorem exists_conjugation_fixed_uniformizer (hE : PI.IsCMUnram E) (Q : Ideal (𝓞 E)) (hQ : Q.IsMaximal)
-    (hc : Q.comap (cj E) = Q) : ∃ ϖ : 𝓞 E, cj E ϖ = ϖ ∧ ϖ ∈ Q ∧ ϖ ∉ Q ^ 2 := by
-  have hcQ : ∀ y ∈ Q, cj E y ∈ Q := fun y hy => by
-    rw [← Ideal.mem_comap, hc]; exact hy
+theorem exists_conjugation_fixed_uniformizer
+    (hE : PI.IsCMUnram E) (Q : Ideal (𝓞 E)) (hQ : Q.IsMaximal) (hc : Q.comap (cj E) = Q)
+    : ∃ ϖ : 𝓞 E, cj E ϖ = ϖ ∧ ϖ ∈ Q ∧ ϖ ∉ Q ^ 2 := by
+  have hcQ : ∀ y ∈ Q, cj E y ∈ Q := fun y hy => by rw [← Ideal.mem_comap, hc]; exact hy
   have hQ0 : Q ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hQ (RingOfIntegers.not_isField E)
   have hlt : Q ^ 2 < Q := by
     have := @Ideal.pow_succ_lt_pow _ _ _ Q hQ.isPrime hQ0 1
@@ -33,8 +33,7 @@ theorem exists_conjugation_fixed_uniformizer (hE : PI.IsCMUnram E) (Q : Ideal (�
     rw [cj_coe]
     exact ht
   subst htc
-  have hrad : (Q ^ 2).radical = Q := by
-    rw [Ideal.radical_pow _ two_ne_zero, hQ.isPrime.radical]
+  have hrad : (Q ^ 2).radical = Q := by rw [Ideal.radical_pow _ two_ne_zero, hQ.isPrime.radical]
   have hprim : ∀ y, (θ - cj E θ) * y ∈ Q ^ 2 → y ∈ Q ^ 2 := by
     intro y hy
     have hP : (Q ^ 2).IsPrimary := Ideal.isPrimary_of_isMaximal_radical (by rw [hrad]; exact hQ)

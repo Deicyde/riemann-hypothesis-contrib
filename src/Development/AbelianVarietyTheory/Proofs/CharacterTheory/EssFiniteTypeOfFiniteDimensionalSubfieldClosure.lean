@@ -10,10 +10,11 @@ namespace GlobalTheory
 open Matrix Polynomial
 open scoped BigOperators
 
-theorem essFiniteType_of_finiteDimensional_subfield_closure {o Om : Type*} [CommRing o]
-    [IsDomain o] [Field Om] [Algebra o Om] [FaithfulSMul o Om] {T : Set Om} (hT : T.Finite)
-    (h : FiniteDimensional (Subfield.closure (Set.range (algebraMap o Om) ∪ T)) Om) :
-    Algebra.EssFiniteType o Om := by
+theorem essFiniteType_of_finiteDimensional_subfield_closure
+    {o Om : Type*} [CommRing o] [IsDomain o] [Field Om] [Algebra o Om] [FaithfulSMul o Om]
+    {T : Set Om}
+    (hT : T.Finite) (h : FiniteDimensional (Subfield.closure (Set.range (algebraMap o Om) ∪ T)) Om)
+    : Algebra.EssFiniteType o Om := by
   let K := FractionRing o
   letI : Algebra K Om := FractionRing.liftAlgebra o Om
   haveI : Algebra.EssFiniteType o K := .of_isLocalization K (nonZeroDivisors o)

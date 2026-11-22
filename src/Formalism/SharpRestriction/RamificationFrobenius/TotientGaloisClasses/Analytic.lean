@@ -16,12 +16,11 @@ def logDerivativeAtOne {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) : �
   deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1
 
 def G (y : ℝ) : ℝ :=
-  (∑ n ∈ Finset.Icc 1 ⌊y⌋₊, abelian₂ n * max (y / n - 1) 0) -
-    y * (Real.log y - 1 - Real.eulerMascheroniConstant)
+  (∑ n ∈ Finset.Icc 1 ⌊y⌋₊, abelian₂ n * max (y / n - 1) 0)
+    - y * (Real.log y - 1 - Real.eulerMascheroniConstant)
 
 def sumLamChi {N : ℕ} (χ : DirichletCharacter ℂ N) (y : ℝ) : ℂ :=
   ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, (abelian₂ n : ℂ) * χ (n : ZMod N) * ((max (y / n - 1) 0 : ℝ) : ℂ)
-
 
 open Classical in
 def gChi {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (y : ℝ) : ℂ :=
@@ -30,21 +29,26 @@ def gChi {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (y : ℝ) : ℂ :=
 def Induces {N : ℕ} (χ : DirichletCharacter ℂ N) (f : ℕ → ℂ) (M : ℕ) : Prop :=
   χ.IsPrimitive ∧ ∀ a : ℕ, a.Coprime M → χ (a : ZMod N) = f a
 
-private theorem pchar_ext_of_N_eq_of_heq (ψ ψ' : PChar) (hN : ψ.N = ψ'.N) (hχ : HEq ψ.χ ψ'.χ) : ψ = ψ' := by
+private theorem pchar_ext_of_N_eq_of_heq (ψ ψ' : PChar) (hN : ψ.N = ψ'.N) (hχ : HEq ψ.χ ψ'.χ)
+    : ψ = ψ' := by
   cases ψ
   cases ψ'
   cases hN
   cases hχ
   rfl
 
-private theorem heq_of_changeLevel_eq_of_level_eq {N N' L : ℕ} [NeZero L] (χ : DirichletCharacter ℂ N)
-    (χ' : DirichletCharacter ℂ N') (d1 : N ∣ L) (d2 : N' ∣ L) (hNN : N = N')
-    (heq : DirichletCharacter.changeLevel d1 χ = DirichletCharacter.changeLevel d2 χ') : HEq χ χ' := by
+private theorem heq_of_changeLevel_eq_of_level_eq
+    {N N' L : ℕ} [NeZero L]
+    (χ : DirichletCharacter ℂ N) (χ' : DirichletCharacter ℂ N') (d1 : N ∣ L) (d2 : N' ∣ L)
+    (hNN : N = N')
+    (heq : DirichletCharacter.changeLevel d1 χ = DirichletCharacter.changeLevel d2 χ')
+    : HEq χ χ' := by
   subst hNN
   exact heq_of_eq (DirichletCharacter.changeLevel_injective d1 heq)
 
-theorem Induces.unique {ψ ψ' : PChar} {f : ℕ → ℂ} {M : ℕ} (hM : M ≠ 0) (h : Induces ψ.χ f M) (h' : Induces ψ'.χ f M) :
-    ψ = ψ' := by
+theorem Induces.unique
+    {ψ ψ' : PChar} {f : ℕ → ℂ} {M : ℕ} (hM : M ≠ 0) (h : Induces ψ.χ f M) (h' : Induces ψ'.χ f M)
+    : ψ = ψ' := by
   haveI := ψ.ne
   haveI := ψ'.ne
   have hN0 : ψ.N ≠ 0 := NeZero.ne _
@@ -55,8 +59,10 @@ theorem Induces.unique {ψ ψ' : PChar} {f : ℕ → ℂ} {M : ℕ} (hM : M ≠ 
   have heq : DirichletCharacter.changeLevel d1 ψ.χ = DirichletCharacter.changeLevel d2 ψ'.χ := by
     apply MulChar.ext
     intro u
-    rw [DirichletCharacter.changeLevel_eq_cast_of_dvd, DirichletCharacter.changeLevel_eq_cast_of_dvd]
-    have hcop : (u : ZMod (ψ.N * ψ'.N * M)).val.Coprime (ψ.N * ψ'.N * M) := ZMod.val_coe_unit_coprime u
+    rw [DirichletCharacter.changeLevel_eq_cast_of_dvd,
+      DirichletCharacter.changeLevel_eq_cast_of_dvd]
+    have hcop : (u : ZMod (ψ.N * ψ'.N * M)).val.Coprime (ψ.N * ψ'.N * M) :=
+      ZMod.val_coe_unit_coprime u
     have hcM : (u : ZMod (ψ.N * ψ'.N * M)).val.Coprime M :=
       Nat.Coprime.coprime_dvd_right (dvd_mul_left M (ψ.N * ψ'.N)) hcop
     rw [ZMod.cast_eq_val, ZMod.cast_eq_val, h.2 _ hcM, h'.2 _ hcM]
@@ -64,13 +70,15 @@ theorem Induces.unique {ψ ψ' : PChar} {f : ℕ → ℂ} {M : ℕ} (hM : M ≠ 
     have e1 := DirichletCharacter.conductor_changeLevel ψ.χ d1
     have e2 := DirichletCharacter.conductor_changeLevel ψ'.χ d2
     rw [heq, e2] at e1
-    calc ψ.N = ψ.χ.conductor := ((DirichletCharacter.isPrimitive_def ψ.χ).mp ψ.prim).symm
+    calc
+      ψ.N
+        = ψ.χ.conductor := ((DirichletCharacter.isPrimitive_def ψ.χ).mp ψ.prim).symm
       _ = ψ'.χ.conductor := e1.symm
       _ = ψ'.N := (DirichletCharacter.isPrimitive_def ψ'.χ).mp ψ'.prim
   exact pchar_ext_of_N_eq_of_heq ψ ψ' hc (heq_of_changeLevel_eq_of_level_eq ψ.χ ψ'.χ d1 d2 hc heq)
 
-theorem induces_of {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) :
-    Induces (PChar.of χ).χ (fun a => χ (a : ZMod N)) N := by
+theorem induces_of {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N)
+    : Induces (PChar.of χ).χ (fun a => χ (a : ZMod N)) N := by
   refine ⟨DirichletCharacter.primitiveCharacter_isPrimitive χ, fun a ha => ?_⟩
   show χ.primitiveCharacter (a : ZMod χ.conductor) = χ (a : ZMod N)
   have hu : ((ZMod.unitOfCoprime a ha : (ZMod N)ˣ) : ZMod N) = (a : ZMod N) :=
@@ -105,12 +113,12 @@ def dir (θ : φ.Char) : DirichletCharacter ℂ H.condN := MulChar.ofUnitHom (θ
 
 def dirAt (θ : φ.Char) (a : ℕ) : ℂ := H.dir θ (a : ZMod H.condN)
 
-def IsPrimOf (θ : φ.Char) {N : ℕ} (χ : DirichletCharacter ℂ N) : Prop := An.Induces χ (H.dirAt θ) H.condN
+def IsPrimOf (θ : φ.Char) {N : ℕ} (χ : DirichletCharacter ℂ N) : Prop :=
+  An.Induces χ (H.dirAt θ) H.condN
 
 def prim (θ : φ.Char) : PChar := PChar.of (H.dir θ)
 
-theorem isPrimOf_prim (θ : φ.Char) : H.IsPrimOf θ (H.prim θ).χ :=
-  An.induces_of (H.dir θ)
+theorem isPrimOf_prim (θ : φ.Char) : H.IsPrimOf θ (H.prim θ).χ := An.induces_of (H.dir θ)
 
 theorem isPrimOf_iff (θ : φ.Char) (ψ : PChar) : H.IsPrimOf θ ψ.χ ↔ ψ = H.prim θ := by
   constructor
@@ -140,12 +148,14 @@ def Bounded (S : Finset PChar) : Set φ.Char := {θ | (θ ∈ φ.Xp ∧ ¬ H.Kep
 def KeptInXp (S : Finset PChar) : Prop := ∀ ψ ∈ S, ∃ θ ∈ φ.Xp, H.IsPrimOf θ ψ.χ
 
 def ChebyshevCharacterBound (x eps c : ℝ) : Prop :=
-  ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), H.IsCharE χ →
-    ∀ y : ℝ, Real.exp (x ^ (eps / 3)) / 3 ≤ y → ‖An.gChi χ y‖ ≤ y * Real.exp (-(c * x ^ (eps / 8)))
+  ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+    H.IsCharE χ
+      → ∀ y : ℝ,
+        Real.exp (x ^ (eps / 3)) / 3 ≤ y → ‖An.gChi χ y‖ ≤ y * Real.exp (-(c * x ^ (eps / 8)))
 
 def BoundedCharsPointwise (S : Finset PChar) (x eps : ℝ) : Prop :=
-  ∀ θ ∈ H.Bounded S, ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), H.IsPrimOf θ χ →
-    ‖An.gChi χ x‖ ≤ x ^ ((1 : ℝ) / 2 + eps)
+  ∀ θ ∈ H.Bounded S, ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+    H.IsPrimOf θ χ → ‖An.gChi χ x‖ ≤ x ^ ((1 : ℝ) / 2 + eps)
 
 def ExceptionalCharacterKept (S : Finset PChar) (psK : Option PChar) : Prop :=
   (∀ ψ, psK = some ψ → H.IsPrimOf φ.psC ψ.χ) ∧ (psK = none → ¬ H.Kept S φ.psC)

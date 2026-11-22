@@ -132,14 +132,15 @@ private lemma exists_binary_form_eq_unit {O : Type*} [CommRing O] [IsLocalRing O
     exact ⟨r₀, -c * β * ω, by
       linear_combination (-c * ω) * hβ + (c * ω ^ 2) * hw + (-c * (w * ω + 1) + c * ω) * hω⟩
 
-
 open NumberField IsDedekindDomain in
 open scoped Quaternion Topology in
-theorem _root_.GlobalTheory.QSA.IntRep.exists_nrm_eq_one_re_eq : ∀ (F : Type) [Field F] [NumberField F] (a b : F), a ≠ 0 → b ≠ 0 →
-    ∀ᶠ v in (Filter.cofinite : Filter (HeightOneSpectrum (𝓞 F))), ∀ t ∈ v.adicCompletionIntegers F,
-      ∃ u : ℍ[v.adicCompletion F, algebraMap F (v.adicCompletion F) a, algebraMap F (v.adicCompletion F) b],
-        _root_.GlobalTheory.QSA.nrm u = 1 ∧ u.re = t ∧ u.imI ∈ v.adicCompletionIntegers F ∧ u.imJ ∈ v.adicCompletionIntegers F ∧
-          u.imK ∈ v.adicCompletionIntegers F := by
+theorem _root_.GlobalTheory.QSA.IntRep.exists_nrm_eq_one_re_eq
+    : ∀ (F : Type) [Field F] [NumberField F] (a b : F),
+      a ≠ 0 → b ≠ 0
+        → ∀ᶠ v in (Filter.cofinite : Filter (HeightOneSpectrum (𝓞 F))), ∀ t ∈ v.adicCompletionIntegers F,
+            ∃ u : ℍ[v.adicCompletion F, algebraMap F (v.adicCompletion F) a, algebraMap F (v.adicCompletion F) b],
+              _root_.GlobalTheory.QSA.nrm u = 1 ∧ u.re = t ∧ u.imI ∈ v.adicCompletionIntegers F ∧ u.imJ ∈ v.adicCompletionIntegers F ∧
+                u.imK ∈ v.adicCompletionIntegers F := by
   intro F _ _ a b ha hb
   obtain ⟨α, d, hd, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 F) a
   obtain ⟨β, e, he, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 F) b
@@ -150,8 +151,9 @@ theorem _root_.GlobalTheory.QSA.IntRep.exists_nrm_eq_one_re_eq : ∀ (F : Type) 
   have hx0 : α * d * β * e * 2 ≠ 0 := by
     have : (2 : 𝓞 F) ≠ 0 := two_ne_zero
     positivity
-  refine Filter.eventually_cofinite.2 ((Ideal.finite_factors (I := Ideal.span {α * d * β * e * 2})
-    (by simpa using hx0)).subset fun v hv => ?_)
+  refine Filter.eventually_cofinite.2
+    ((Ideal.finite_factors (I := Ideal.span {α * d * β * e * 2}) (by simpa using hx0)).subset
+      fun v hv => ?_)
   rw [Set.mem_setOf_eq, Ideal.dvd_span_singleton]
   by_contra hx
   apply hv
@@ -165,15 +167,15 @@ theorem _root_.GlobalTheory.QSA.IntRep.exists_nrm_eq_one_re_eq : ∀ (F : Type) 
     algebraMap (𝓞 F) (v.adicCompletionIntegers F) α * ↑hD.unit⁻¹ with ha'_def
   set b' : v.adicCompletionIntegers F :=
     algebraMap (𝓞 F) (v.adicCompletionIntegers F) β * ↑hE.unit⁻¹ with hb'_def
-  have ha'K : (a' : v.adicCompletion F) =
-      algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F α / algebraMap (𝓞 F) F d) := by
-    rw [map_div₀, ha'_def, MulMemClass.coe_mul,
-      coe_adicCompletionIntegers_inv v hD.mul_val_inv]
+  have ha'K
+      : (a' : v.adicCompletion F)
+        = algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F α / algebraMap (𝓞 F) F d) := by
+    rw [map_div₀, ha'_def, MulMemClass.coe_mul, coe_adicCompletionIntegers_inv v hD.mul_val_inv]
     rfl
-  have hb'K : (b' : v.adicCompletion F) =
-      algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F β / algebraMap (𝓞 F) F e) := by
-    rw [map_div₀, hb'_def, MulMemClass.coe_mul,
-      coe_adicCompletionIntegers_inv v hE.mul_val_inv]
+  have hb'K
+      : (b' : v.adicCompletion F)
+        = algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F β / algebraMap (𝓞 F) F e) := by
+    rw [map_div₀, hb'_def, MulMemClass.coe_mul, coe_adicCompletionIntegers_inv v hE.mul_val_inv]
     rfl
   have ha'u : IsUnit a' := hA.mul (hD.unit⁻¹).isUnit
   have hb'u : IsUnit b' := hB.mul (hE.unit⁻¹).isUnit
@@ -186,13 +188,16 @@ theorem _root_.GlobalTheory.QSA.IntRep.exists_nrm_eq_one_re_eq : ∀ (F : Type) 
     · exact ⟨0, by simpa using hc⟩
     · refine ⟨1, ?_⟩
       rw [← IsLocalRing.residue_ne_zero_iff_isUnit, not_not] at hc
-      rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_add (f := _), hc, zero_add, one_pow, mul_one]
+      rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_add (f := _), hc, zero_add, one_pow,
+        mul_one]
       exact (IsLocalRing.residue_ne_zero_iff_isUnit _).2 (ha'u.mul hb'u)
-  obtain ⟨r, s, hrs⟩ := exists_binary_form_eq_unit 0 (b' * ai) ((T ^ 2 - 1 + a' * b' * z ^ 2) * ai)
-    (by
-      rw [show (0 : v.adicCompletionIntegers F) ^ 2 - 4 * (b' * ai) = -(2 * 2 * (b' * ai)) by ring]
-      exact ((h2.mul h2).mul (hb'u.mul (ha'u.unit⁻¹).isUnit)).neg)
-    (hz.mul (ha'u.unit⁻¹).isUnit)
+  obtain ⟨r, s, hrs⟩ :=
+    exists_binary_form_eq_unit 0 (b' * ai) ((T ^ 2 - 1 + a' * b' * z ^ 2) * ai)
+      (by
+        rw [show (0 : v.adicCompletionIntegers F) ^ 2 - 4 * (b' * ai) = -(2 * 2 * (b' * ai)) by
+          ring]
+        exact ((h2.mul h2).mul (hb'u.mul (ha'u.unit⁻¹).isUnit)).neg)
+      (hz.mul (ha'u.unit⁻¹).isUnit)
   have hO : T ^ 2 - a' * r ^ 2 - b' * s ^ 2 + a' * b' * z ^ 2 = 1 := by
     linear_combination (-a') * hrs + (b' * s ^ 2 - (T ^ 2 - 1) - a' * b' * z ^ 2) * hai
   refine ⟨⟨t, r, s, z⟩, ?_, rfl, r.2, s.2, z.2⟩

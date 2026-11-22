@@ -11,7 +11,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.ListSumInequalities
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.Ux10 Formalism.FourierDecayAlt.P.SmoothnessOrderArithmetic
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.Ux10
+  Formalism.FourierDecayAlt.P.SmoothnessOrderArithmetic
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

@@ -22,8 +22,9 @@ variable {p : ℕ} [Fact p.Prime]
 noncomputable def intRing (p : ℕ) [Fact p.Prime] : Subring ℂ_[p] :=
   _root_.UpperTheory.Reformulated.B.PadicComplexRingOfIntegers.intRing p
 
-theorem integral_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) :
-    IntegralMv F ↔ ∃ G : MvPowerSeries σ (intRing p), MvPowerSeries.map (intRing p).subtype G = F := by
+theorem integral_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p])
+    : IntegralMv F
+      ↔ ∃ G : MvPowerSeries σ (intRing p), MvPowerSeries.map (intRing p).subtype G = F := by
   constructor
   · intro h
     refine ⟨fun e => ⟨MvPowerSeries.coeff e F, h e⟩, ?_⟩
@@ -33,8 +34,9 @@ theorem integral_iff {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) :
     rw [MvPowerSeries.coeff_map]
     exact (MvPowerSeries.coeff e G).2
 
-theorem integral_mul {σ : Type*} {F G : MvPowerSeries σ ℂ_[p]} (hF : IntegralMv F) (hG : IntegralMv G) :
-    IntegralMv (F * G) := by
+theorem integral_mul
+    {σ : Type*} {F G : MvPowerSeries σ ℂ_[p]} (hF : IntegralMv F) (hG : IntegralMv G)
+    : IntegralMv (F * G) := by
   obtain ⟨F', rfl⟩ := (integral_iff F).1 hF
   obtain ⟨G', rfl⟩ := (integral_iff G).1 hG
   exact (integral_iff _).2 ⟨F' * G', map_mul _ _ _⟩
@@ -42,14 +44,16 @@ theorem integral_mul {σ : Type*} {F G : MvPowerSeries σ ℂ_[p]} (hF : Integra
 theorem integral_one {σ : Type*} : IntegralMv (1 : MvPowerSeries σ ℂ_[p]) :=
   (integral_iff _).2 ⟨1, map_one _⟩
 
-theorem constantCoeff_lift {σ : Type*} (G : MvPowerSeries σ (intRing p)) :
-    ((MvPowerSeries.constantCoeff G : intRing p) : ℂ_[p]) =
-      MvPowerSeries.constantCoeff (MvPowerSeries.map (intRing p).subtype G) := by
+theorem constantCoeff_lift {σ : Type*} (G : MvPowerSeries σ (intRing p))
+    : ((MvPowerSeries.constantCoeff G : intRing p) : ℂ_[p])
+      = MvPowerSeries.constantCoeff (MvPowerSeries.map (intRing p).subtype G) := by
   rw [MvPowerSeries.constantCoeff_map]
   rfl
 
-theorem integral_of_mul_eq_one {σ : Type*} {W V : MvPowerSeries σ ℂ_[p]} (hW : IntegralMv W)
-    (h1 : MvPowerSeries.constantCoeff W = 1) (hWV : W * V = 1) : IntegralMv V := by
+theorem integral_of_mul_eq_one
+    {σ : Type*} {W V : MvPowerSeries σ ℂ_[p]}
+    (hW : IntegralMv W) (h1 : MvPowerSeries.constantCoeff W = 1) (hWV : W * V = 1)
+    : IntegralMv V := by
   obtain ⟨W', rfl⟩ := (integral_iff W).1 hW
   have hc : MvPowerSeries.constantCoeff W' = 1 := by
     apply Subtype.ext
@@ -58,13 +62,17 @@ theorem integral_of_mul_eq_one {σ : Type*} {W V : MvPowerSeries σ ℂ_[p]} (hW
   have hu : IsUnit W' := MvPowerSeries.isUnit_iff_constantCoeff.2 (by rw [hc]; exact isUnit_one)
   obtain ⟨U, hU⟩ : ∃ U, W' * U = 1 := ⟨↑hu.unit⁻¹, hu.mul_val_inv⟩
   refine (integral_iff V).2 ⟨U, ?_⟩
-  have h2 : MvPowerSeries.map (intRing p).subtype W' * MvPowerSeries.map (intRing p).subtype U = 1 := by
+  have h2
+      : MvPowerSeries.map (intRing p).subtype W' * MvPowerSeries.map (intRing p).subtype U = 1 := by
     rw [← map_mul, hU, map_one]
   linear_combination V * h2 - (MvPowerSeries.map (intRing p).subtype U) * hWV
 
-theorem integral_subst {σ τ : Type*} [Finite σ] (a : σ → MvPowerSeries τ ℂ_[p])
+theorem integral_subst
+    {σ τ : Type*} [Finite σ]
+    (a : σ → MvPowerSeries τ ℂ_[p])
     (ha0 : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (haI : ∀ i, IntegralMv (a i))
-    {f : MvPowerSeries σ ℂ_[p]} (hf : IntegralMv f) : IntegralMv (MvPowerSeries.subst a f) := by
+    {f : MvPowerSeries σ ℂ_[p]} (hf : IntegralMv f)
+    : IntegralMv (MvPowerSeries.subst a f) := by
   choose a' ha' using fun i => (integral_iff (a i)).1 (haI i)
   obtain ⟨f', rfl⟩ := (integral_iff f).1 hf
   have h0 : ∀ i, MvPowerSeries.constantCoeff (a' i) = 0 := by
@@ -77,9 +85,9 @@ theorem integral_subst {σ τ : Type*} [Finite σ] (a : σ → MvPowerSeries τ 
   rw [MvPowerSeries.map_subst hs]
   simp only [ha']
 
-theorem coeff_pow_eq_zero {σ R : Type*} [CommRing R] {F : MvPowerSeries σ R}
-    (hF : MvPowerSeries.constantCoeff F = 0) :
-    ∀ (d : ℕ) (α : σ →₀ ℕ), Finsupp.degree α < d → MvPowerSeries.coeff α (F ^ d) = 0 := by
+theorem coeff_pow_eq_zero
+    {σ R : Type*} [CommRing R] {F : MvPowerSeries σ R} (hF : MvPowerSeries.constantCoeff F = 0)
+    : ∀ (d : ℕ) (α : σ →₀ ℕ), Finsupp.degree α < d → MvPowerSeries.coeff α (F ^ d) = 0 := by
   intro d
   induction d with
   | zero => intro α h; omega
@@ -98,20 +106,20 @@ theorem coeff_pow_eq_zero {σ R : Type*} [CommRing R] {F : MvPowerSeries σ R}
         rw [← hβγ, map_add (f := _)]
       rw [ih γ (by omega), mul_zero]
 
-theorem coeff_expMv {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) (α : σ →₀ ℕ) :
-    MvPowerSeries.coeff α (expMv F) =
-      ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1), MvPowerSeries.coeff α (F ^ n) / (n.factorial : ℂ_[p]) :=
+theorem coeff_expMv {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) (α : σ →₀ ℕ)
+    : MvPowerSeries.coeff α (expMv F)
+      = ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1), MvPowerSeries.coeff α (F ^ n) / (n.factorial : ℂ_[p]) :=
   rfl
 
 theorem sum_eq_degree {σ : Type*} (α : σ →₀ ℕ) : (α.sum fun _ k => k) = Finsupp.degree α := rfl
 
-theorem constantCoeff_expMv {σ : Type*} (F : MvPowerSeries σ ℂ_[p]) :
-    MvPowerSeries.constantCoeff (expMv F) = 1 := by
+theorem constantCoeff_expMv {σ : Type*} (F : MvPowerSeries σ ℂ_[p])
+    : MvPowerSeries.constantCoeff (expMv F) = 1 := by
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, coeff_expMv]
   simp
 
-theorem expMv_eq {σ : Type*} {F : MvPowerSeries σ ℂ_[p]} (hF : MvPowerSeries.constantCoeff F = 0) :
-    expMv F = PowerSeries.subst F (PowerSeries.exp ℂ_[p]) := by
+theorem expMv_eq {σ : Type*} {F : MvPowerSeries σ ℂ_[p]} (hF : MvPowerSeries.constantCoeff F = 0)
+    : expMv F = PowerSeries.subst F (PowerSeries.exp ℂ_[p]) := by
   ext α
   rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero hF),
     finsum_eq_sum_of_support_subset (s := Finset.range ((α.sum fun _ k => k) + 1)), coeff_expMv]
@@ -126,11 +134,12 @@ theorem expMv_eq {σ : Type*} {F : MvPowerSeries σ ℂ_[p]} (hF : MvPowerSeries
     apply hd
     rw [coeff_pow_eq_zero hF d α (by rw [← sum_eq_degree]; omega), smul_zero]
 
-theorem exp_X0_add_X1 :
-    PowerSeries.subst (MvPowerSeries.X 0 + MvPowerSeries.X 1 : MvPowerSeries (Fin 2) ℂ_[p])
-        (PowerSeries.exp ℂ_[p]) =
-      PowerSeries.subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) ℂ_[p]) (PowerSeries.exp ℂ_[p]) *
-        PowerSeries.subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) ℂ_[p]) (PowerSeries.exp ℂ_[p]) := by
+theorem exp_X0_add_X1
+    : PowerSeries.subst (MvPowerSeries.X 0 + MvPowerSeries.X 1 : MvPowerSeries (Fin 2) ℂ_[p])
+        (PowerSeries.exp ℂ_[p])
+      = PowerSeries.subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) ℂ_[p]) (PowerSeries.exp ℂ_[p])
+        * PowerSeries.subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) ℂ_[p])
+          (PowerSeries.exp ℂ_[p]) := by
   ext e
   rw [PowerSeries.coeff_subst_X_zero_add_X_one, PowerSeries.coeff_subst_X_zero_subst_mul_X_one]
   simp only [PowerSeries.coeff_exp, map_div₀, map_one, map_natCast]
@@ -140,32 +149,40 @@ theorem exp_X0_add_X1 :
   have h3 : ((e 0 + e 1).factorial : ℂ_[p]) ≠ 0 := by exact_mod_cast (Nat.factorial_ne_zero _)
   field_simp
 
-theorem subst_exp {σ τ : Type*} {b : σ → MvPowerSeries τ ℂ_[p]} (hb : MvPowerSeries.HasSubst b)
-    {a : MvPowerSeries σ ℂ_[p]} (ha : MvPowerSeries.constantCoeff a = 0) :
-    MvPowerSeries.subst b (PowerSeries.subst a (PowerSeries.exp ℂ_[p])) =
-      PowerSeries.subst (MvPowerSeries.subst b a) (PowerSeries.exp ℂ_[p]) := by
+theorem subst_exp
+    {σ τ : Type*} {b : σ → MvPowerSeries τ ℂ_[p]} (hb : MvPowerSeries.HasSubst b)
+    {a : MvPowerSeries σ ℂ_[p]} (ha : MvPowerSeries.constantCoeff a = 0)
+    : MvPowerSeries.subst b (PowerSeries.subst a (PowerSeries.exp ℂ_[p]))
+      = PowerSeries.subst (MvPowerSeries.subst b a) (PowerSeries.exp ℂ_[p]) := by
   rw [PowerSeries.subst_def, PowerSeries.subst_def,
     MvPowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.of_constantCoeff_zero ha).const hb]
 
-theorem exp_add {σ : Type*} {F G : MvPowerSeries σ ℂ_[p]} (hF : MvPowerSeries.constantCoeff F = 0)
-    (hG : MvPowerSeries.constantCoeff G = 0) :
-    PowerSeries.subst (F + G) (PowerSeries.exp ℂ_[p]) =
-      PowerSeries.subst F (PowerSeries.exp ℂ_[p]) * PowerSeries.subst G (PowerSeries.exp ℂ_[p]) := by
+theorem exp_add
+    {σ : Type*} {F G : MvPowerSeries σ ℂ_[p]}
+    (hF : MvPowerSeries.constantCoeff F = 0) (hG : MvPowerSeries.constantCoeff G = 0)
+    : PowerSeries.subst (F + G) (PowerSeries.exp ℂ_[p])
+      = PowerSeries.subst F (PowerSeries.exp ℂ_[p])
+        * PowerSeries.subst G (PowerSeries.exp ℂ_[p]) := by
   have hb : MvPowerSeries.HasSubst ![F, G] :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by fin_cases i <;> simp [hF, hG])
   have h0 : MvPowerSeries.subst ![F, G] (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) ℂ_[p]) = F := by
     rw [MvPowerSeries.subst_X hb]; rfl
   have h1 : MvPowerSeries.subst ![F, G] (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) ℂ_[p]) = G := by
     rw [MvPowerSeries.subst_X hb]; rfl
-  have h01 : MvPowerSeries.subst ![F, G] (MvPowerSeries.X 0 + MvPowerSeries.X 1 : MvPowerSeries (Fin 2) ℂ_[p]) =
-      F + G := by
+  have h01
+      : MvPowerSeries.subst ![F, G]
+          (MvPowerSeries.X 0 + MvPowerSeries.X 1 : MvPowerSeries (Fin 2) ℂ_[p])
+        = F + G := by
     rw [MvPowerSeries.subst_add hb, h0, h1]
   rw [← h01, ← subst_exp hb (by simp), exp_X0_add_X1, MvPowerSeries.subst_mul hb,
     subst_exp hb (by simp), subst_exp hb (by simp), h0, h1]
 
-theorem expMv_add {σ : Type*} {F G : MvPowerSeries σ ℂ_[p]} (hF : MvPowerSeries.constantCoeff F = 0)
-    (hG : MvPowerSeries.constantCoeff G = 0) : expMv (F + G) = expMv F * expMv G := by
-  rw [expMv_eq (by rw [map_add (f := _), hF, hG, add_zero]), expMv_eq hF, expMv_eq hG, exp_add hF hG]
+theorem expMv_add
+    {σ : Type*} {F G : MvPowerSeries σ ℂ_[p]}
+    (hF : MvPowerSeries.constantCoeff F = 0) (hG : MvPowerSeries.constantCoeff G = 0)
+    : expMv (F + G) = expMv F * expMv G := by
+  rw [expMv_eq (by rw [map_add (f := _), hF, hG, add_zero]), expMv_eq hF, expMv_eq hG,
+    exp_add hF hG]
 
 theorem expMv_zero {σ : Type*} : expMv (0 : MvPowerSeries σ ℂ_[p]) = 1 := by
   have h := expMv_add (F := (0 : MvPowerSeries σ ℂ_[p])) (G := 0) (map_zero _) (map_zero _)
@@ -188,15 +205,15 @@ theorem simeq_symm {σ : Type*} {f g : MvPowerSeries σ ℂ_[p]} (h : Simeq f g)
   refine ⟨h0', integral_of_mul_eq_one hI (constantCoeff_expMv _) ?_⟩
   rw [← expMv_add h0 h0', show f - g + (g - f) = 0 by ring, expMv_zero]
 
-theorem simeq_trans {σ : Type*} {f g h : MvPowerSeries σ ℂ_[p]} (h1 : Simeq f g) (h2 : Simeq g h) :
-    Simeq f h := by
+theorem simeq_trans {σ : Type*} {f g h : MvPowerSeries σ ℂ_[p]} (h1 : Simeq f g) (h2 : Simeq g h)
+    : Simeq f h := by
   have e : f - h = (f - g) + (g - h) := by ring
   refine ⟨by rw [e, map_add (f := _), h1.1, h2.1, add_zero], ?_⟩
   rw [e, expMv_add h1.1 h2.1]
   exact integral_mul h1.2 h2.2
 
-theorem simeq_add {σ : Type*} {f g h k : MvPowerSeries σ ℂ_[p]} (h1 : Simeq f g) (h2 : Simeq h k) :
-    Simeq (f + h) (g + k) := by
+theorem simeq_add {σ : Type*} {f g h k : MvPowerSeries σ ℂ_[p]} (h1 : Simeq f g) (h2 : Simeq h k)
+    : Simeq (f + h) (g + k) := by
   have e : f + h - (g + k) = (f - g) + (h - k) := by ring
   refine ⟨by rw [e, map_add (f := _), h1.1, h2.1, add_zero], ?_⟩
   rw [e, expMv_add h1.1 h2.1]
@@ -210,10 +227,12 @@ theorem simeq_neg {σ : Type*} {f g : MvPowerSeries σ ℂ_[p]} (h : Simeq f g) 
 theorem simeq_iff_sub {σ : Type*} {f g : MvPowerSeries σ ℂ_[p]} : Simeq f g ↔ Simeq (f - g) 0 := by
   simp only [Simeq, sub_zero]
 
-theorem simeq_subst {σ τ : Type*} [Finite σ] (a : σ → MvPowerSeries τ ℂ_[p])
+theorem simeq_subst
+    {σ τ : Type*} [Finite σ]
+    (a : σ → MvPowerSeries τ ℂ_[p])
     (ha0 : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (haI : ∀ i, IntegralMv (a i))
-    {f g : MvPowerSeries σ ℂ_[p]} (h : Simeq f g) :
-    Simeq (MvPowerSeries.subst a f) (MvPowerSeries.subst a g) := by
+    {f g : MvPowerSeries σ ℂ_[p]} (h : Simeq f g)
+    : Simeq (MvPowerSeries.subst a f) (MvPowerSeries.subst a g) := by
   have hs : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha0
   unfold Simeq
   rw [← MvPowerSeries.subst_sub hs]
@@ -223,18 +242,25 @@ theorem simeq_subst {σ τ : Type*} [Finite σ] (a : σ → MvPowerSeries τ ℂ
   rw [expMv_eq h0, ← subst_exp hs h.1, ← expMv_eq h.1]
   exact integral_subst a ha0 haI h.2
 
-theorem tendsto_coeff_mul {σ : Type*} {F G : ℕ → MvPowerSeries σ ℂ_[p]} {f g : MvPowerSeries σ ℂ_[p]}
+theorem tendsto_coeff_mul
+    {σ : Type*} {F G : ℕ → MvPowerSeries σ ℂ_[p]} {f g : MvPowerSeries σ ℂ_[p]}
     (hF : ∀ e, Tendsto (fun k => MvPowerSeries.coeff e (F k)) atTop (𝓝 (MvPowerSeries.coeff e f)))
     (hG : ∀ e, Tendsto (fun k => MvPowerSeries.coeff e (G k)) atTop (𝓝 (MvPowerSeries.coeff e g)))
-    (e : σ →₀ ℕ) :
-    Tendsto (fun k => MvPowerSeries.coeff e (F k * G k)) atTop (𝓝 (MvPowerSeries.coeff e (f * g))) := by
+    (e : σ →₀ ℕ)
+    : Tendsto
+      (fun k => MvPowerSeries.coeff e (F k * G k))
+      atTop (𝓝 (MvPowerSeries.coeff e (f * g))) := by
   simp only [MvPowerSeries.coeff_mul]
   exact tendsto_finsetSum _ fun i _ => (hF i.1).mul (hG i.2)
 
-theorem tendsto_coeff_pow {σ : Type*} {F : ℕ → MvPowerSeries σ ℂ_[p]} {f : MvPowerSeries σ ℂ_[p]}
+theorem tendsto_coeff_pow
+    {σ : Type*} {F : ℕ → MvPowerSeries σ ℂ_[p]} {f : MvPowerSeries σ ℂ_[p]}
     (hF : ∀ e, Tendsto (fun k => MvPowerSeries.coeff e (F k)) atTop (𝓝 (MvPowerSeries.coeff e f)))
-    (n : ℕ) :
-    ∀ e, Tendsto (fun k => MvPowerSeries.coeff e (F k ^ n)) atTop (𝓝 (MvPowerSeries.coeff e (f ^ n))) := by
+    (n : ℕ)
+    : ∀ e,
+      Tendsto
+        (fun k => MvPowerSeries.coeff e (F k ^ n))
+        atTop (𝓝 (MvPowerSeries.coeff e (f ^ n))) := by
   induction n with
   | zero => intro e; simp only [pow_zero]; exact tendsto_const_nhds
   | succ n ih => intro e; simp only [pow_succ]; exact tendsto_coeff_mul ih hF e
@@ -268,8 +294,9 @@ theorem norm_units_closed_form : CalcClosed := by
       have := (h k).2 α
       rw [sub_zero] at this
       exact this
-    have ht : Tendsto (fun k => MvPowerSeries.coeff α (expMv (F k))) atTop
-        (𝓝 (MvPowerSeries.coeff α (expMv f))) := by
+    have ht : Tendsto
+        (fun k => MvPowerSeries.coeff α (expMv (F k)))
+        atTop (𝓝 (MvPowerSeries.coeff α (expMv f))) := by
       simp only [coeff_expMv]
       exact tendsto_finsetSum _ fun n _ => (tendsto_coeff_pow hF n α).div_const _
     show ‖MvPowerSeries.coeff α (expMv (f - 0))‖ ≤ 1
@@ -307,10 +334,13 @@ theorem norm_units_zp_scaling : CalcZpScale := by
       rw [map_add (f := _), map_one]
       ring
   obtain ⟨u, hu⟩ := natCast_dense_p_adic p n
-  have hlim := (norm_units_closed_form p σ (fun k => MvPowerSeries.C (u k : ℂ_[p]) * (f - g))
-    (MvPowerSeries.C (zc n) * (f - g)) (fun e => by
-      simp only [MvPowerSeries.coeff_C_mul]
-      exact hu.mul_const _)).1 (fun k => hm (u k))
+  have hlim :=
+    (norm_units_closed_form p σ
+      (fun k => MvPowerSeries.C (u k : ℂ_[p]) * (f - g))
+      (MvPowerSeries.C (zc n) * (f - g))
+      (fun e => by
+        simp only [MvPowerSeries.coeff_C_mul]
+        exact hu.mul_const _)).1 (fun k => hm (u k))
   rw [simeq_iff_sub, ← mul_sub]
   exact hlim
 

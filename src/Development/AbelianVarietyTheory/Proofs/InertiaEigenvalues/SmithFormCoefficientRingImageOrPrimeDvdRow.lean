@@ -10,17 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Integra
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.SmithOE
 
-theorem pid_dichotomy {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] (d : ℕ)
-    (P : Matrix (Fin d) (Fin d) O) :
-    ∃ U W : Matrix (Fin d) (Fin d) O, W * U = 1 ∧ U * W = 1 ∧
-      ∀ j, (∃ w : Fin d → O, (fun i => U i j) = P *ᵥ w) ∨ (∀ k, ¬ IsUnit ((W * P) j k)) := by
+theorem pid_dichotomy
+    {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
+    (d : ℕ) (P : Matrix (Fin d) (Fin d) O)
+    : ∃ U W : Matrix (Fin d) (Fin d) O,
+      W * U = 1 ∧ U * W = 1
+        ∧ ∀ j, (∃ w : Fin d → O, (fun i => U i j) = P *ᵥ w) ∨ (∀ k, ¬ IsUnit ((W * P) j k)) := by
   classical
   obtain ⟨n, snf⟩ := (LinearMap.range (Matrix.mulVecLin P)).smithNormalForm (Pi.basisFun O (Fin d))
   set U : Matrix (Fin d) (Fin d) O := (Pi.basisFun O (Fin d)).toMatrix snf.bM with hUdef
@@ -68,14 +73,30 @@ end GlobalTheory.SmithOE
 
 namespace GlobalTheory.SmithOE
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K), IsDiscreteValuationRing ↥bk.OE → ∀ (d' : ℕ) (P : Matrix (Fin d') (Fin d') (WCb l)), (∀ i j, P i j ∈ bk.OE) → ∃ U Uinv : Matrix (Fin d') (Fin d') (WCb l), (∀ i j, U i j ∈ bk.OE) ∧ (∀ i j, Uinv i j ∈ bk.OE) ∧ Uinv * U = 1 ∧ U * Uinv = 1 ∧ ∀ j, (∃ w : Fin d' → WCb l, (fun i => U i j) = P *ᵥ w) ∨ (∀ k, (l : WCb l) ∣ (Uinv * P) j k) := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
+      IsDiscreteValuationRing ↥bk.OE
+        → ∀ (d' : ℕ) (P : Matrix (Fin d') (Fin d') (WCb l)),
+          (∀ i j, P i j ∈ bk.OE)
+            → ∃ U Uinv : Matrix (Fin d') (Fin d') (WCb l),
+              (∀ i j, U i j ∈ bk.OE) ∧ (∀ i j, Uinv i j ∈ bk.OE) ∧ Uinv * U = 1 ∧ U * Uinv = 1
+                ∧ ∀ j,
+                  (∃ w : Fin d' → WCb l, (fun i => U i j) = P *ᵥ w)
+                    ∨ (∀ k, (l : WCb l) ∣ (Uinv * P) j k) := by
   intro l _ K bk _ d' P hP
   have hfac := (GlobalTheory.OEDvr.main l K bk).2.2.2.1
   let P' : Matrix (Fin d') (Fin d') ↥bk.OE := Matrix.of fun i j => ⟨P i j, hP i j⟩
   obtain ⟨U', W', hWU, hUW, hdich⟩ := pid_dichotomy d' P'
   have hP'map : P'.map bk.OE.subtype = P := by ext; rfl
-  refine ⟨U'.map bk.OE.subtype, W'.map bk.OE.subtype, fun i j => (U' i j).2, fun i j => (W' i j).2,
-    ?_, ?_, fun j => ?_⟩
+  refine ⟨
+    U'.map bk.OE.subtype,
+    W'.map bk.OE.subtype,
+    fun i j => (U' i j).2,
+    fun i j => (W' i j).2,
+    ?_,
+    ?_,
+    fun j => ?_
+  ⟩
   · rw [← Matrix.map_mul, hWU, Matrix.map_one _ (map_zero _) (map_one _)]
   · rw [← Matrix.map_mul, hUW, Matrix.map_one _ (map_zero _) (map_one _)]
   · rcases hdich j with ⟨w, hw⟩ | hnu
@@ -103,7 +124,6 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K), IsDiscre
         refine isUnit_iff_exists_inv.2 ⟨⟨v', hv'⟩, Subtype.ext ?_⟩
         change (x : WCb l) * v' = 1
         rw [hxe, pow_zero, one_mul, hvv]
-      | succ m =>
-        exact ⟨(l : WCb l) ^ m * v, by rw [hxe, pow_succ]; ring⟩
+      | succ m => exact ⟨(l : WCb l) ^ m * v, by rw [hxe, pow_succ]; ring⟩
 
 end GlobalTheory.SmithOE

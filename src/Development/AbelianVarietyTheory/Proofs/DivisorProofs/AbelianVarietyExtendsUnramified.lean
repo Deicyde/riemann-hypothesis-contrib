@@ -9,31 +9,35 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FlatOfIsS
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.UnramifiedClosure
 
-theorem injective_of_map_maximalIdeal {R W : Type} [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Algebra R W]
-    (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W) :
-    Function.Injective (algebraMap R W) := by
+theorem injective_of_map_maximalIdeal
+    {R W : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing W] [IsDomain W]
+    [IsDiscreteValuationRing W] [Algebra R W]
+    (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W)
+    : Function.Injective (algebraMap R W) := by
   rw [RingHom.injective_iff_ker_eq_bot]
   by_contra hne
   have hp : (RingHom.ker (algebraMap R W)).IsPrime := RingHom.ker_isPrime _
-  have hm : RingHom.ker (algebraMap R W) = maximalIdeal R := IsLocalRing.eq_maximalIdeal (hp.isMaximal hne)
+  have hm : RingHom.ker (algebraMap R W) = maximalIdeal R :=
+    IsLocalRing.eq_maximalIdeal (hp.isMaximal hne)
   apply IsDiscreteValuationRing.not_a_field W
   rw [← h, ← hm]
   exact (Ideal.map_eq_bot_iff_le_ker _).2 le_rfl
 
-variable (R K W K' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K]
-  [Algebra R K] [IsFractionRing R K] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
-  [Field K'] [Algebra W K'] [IsFractionRing W K'] [Algebra R W] [Algebra K K'] [Algebra R K']
+variable
+  (R K W K' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+  [IsFractionRing R K] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field K']
+  [Algebra W K'] [IsFractionRing W K'] [Algebra R W] [Algebra K K'] [Algebra R K']
   [IsScalarTower R W K'] [IsScalarTower R K K']
 
-theorem isLocalization (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W) :
-    IsLocalization (Algebra.algebraMapSubmonoid W (nonZeroDivisors R)) K' := by
+theorem isLocalization (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W)
+    : IsLocalization (Algebra.algebraMapSubmonoid W (nonZeroDivisors R)) K' := by
   have hinj := injective_of_map_maximalIdeal h
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible R
   have hϖW : Irreducible (algebraMap R W ϖ) := by
@@ -50,8 +54,18 @@ theorem isLocalization (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal
     obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := W) z
     have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
     obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hy0 hϖW
-    refine ⟨⟨x * ↑u⁻¹, ⟨algebraMap R W (ϖ ^ n), ϖ ^ n,
-      mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _ hϖ.ne_zero), rfl⟩⟩, ?_⟩
+    refine ⟨
+      ⟨
+        x * ↑u⁻¹,
+        ⟨
+          algebraMap R W (ϖ ^ n),
+          ϖ ^ n,
+          mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _ hϖ.ne_zero),
+          rfl
+        ⟩
+      ⟩,
+      ?_
+    ⟩
     have hu : algebraMap W K' ↑u * algebraMap W K' ↑u⁻¹ = 1 := by
       rw [← map_mul, Units.mul_inv, map_one]
     have hp : algebraMap W K' (algebraMap R W ϖ) ≠ 0 := by
@@ -64,25 +78,26 @@ theorem isLocalization (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal
   · intro x y hxy
     exact ⟨1, by simpa using IsFractionRing.injective W K' hxy⟩
 
-theorem isPushout (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W) :
-    Algebra.IsPushout R K W K' := by
+theorem isPushout (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W)
+    : Algebra.IsPushout R K W K' := by
   haveI := isLocalization R W K' h
   constructor
   exact (isLocalizedModule_iff_isBaseChange (nonZeroDivisors R) K _).1
     (isLocalizedModule_iff_isLocalization.2 this)
 
-theorem isPullback_spec (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W) :
-    IsPullback (spMap (algebraMap K K')) (spMap (algebraMap W K')) (spMap (algebraMap R K))
+theorem isPullback_spec (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W)
+    : IsPullback (spMap (algebraMap K K')) (spMap (algebraMap W K')) (spMap (algebraMap R K))
       (spMap (algebraMap R W)) := by
   haveI := isPushout R K W K' h
   exact isPullback_SpecMap_of_isPushout _ _ _ _ (CommRingCat.isPushout_of_isPushout R K W K')
 
-theorem flat_spec (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W) :
-    Flat (spMap (algebraMap R W)) := by
+theorem flat_spec (h : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W)
+    : Flat (spMap (algebraMap R W)) := by
   have hinj := injective_of_map_maximalIdeal h
   rw [HasRingHomProperty.Spec_iff (P := @Flat)]
-  refine GlobalTheory.ringHom_flat_of_injective_of_isUnit (algebraMap R W) (algebraMap W (FractionRing W))
-    (IsFractionRing.injective W (FractionRing W)) fun t ht => IsUnit.mk0 _ ?_
+  refine GlobalTheory.ringHom_flat_of_injective_of_isUnit (algebraMap R W)
+    (algebraMap W (FractionRing W)) (IsFractionRing.injective W (FractionRing W))
+    fun t ht => IsUnit.mk0 _ ?_
   rw [ne_eq, IsFractionRing.to_map_eq_zero_iff]
   exact fun h0 => ht (hinj (by rw [h0, map_zero]))
 
@@ -90,8 +105,9 @@ end GlobalTheory.UnramifiedClosure
 
 namespace GlobalTheory.UnramifiedClosure
 
-theorem schDom_spMap {A B : Type} [CommRing A] [CommRing B] [IsReduced A] (φ : A →+* B)
-    (hφ : Function.Injective φ) : IsSchemeTheoreticallyDominant (spMap φ) := by
+theorem schDom_spMap
+    {A B : Type} [CommRing A] [CommRing B] [IsReduced A] (φ : A →+* B) (hφ : Function.Injective φ)
+    : IsSchemeTheoreticallyDominant (spMap φ) := by
   haveI : IsDominant (spMap φ) := by
     rw [isDominant_iff]
     show DenseRange (PrimeSpectrum.comap φ)
@@ -103,8 +119,34 @@ theorem schDom_spMap {A B : Type} [CommRing A] [CommRing B] [IsReduced A] (φ : 
 end GlobalTheory.UnramifiedClosure
 
 open GlobalTheory.UnramifiedClosure in
-theorem GlobalTheory.UnramifiedClosure.closure_baseChange : ∀ (R K W K' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K] [IsFractionRing R K] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field K'] [Algebra W K'] [IsFractionRing W K'] [Algebra R W] [Algebra K K'] [Algebra R K'] [IsScalarTower R W K'] [IsScalarTower R K K'], (maximalIdeal R).map (algebraMap R W) = maximalIdeal W → ∀ (P : Over (Sp R)), QuasiSeparated P.hom → ∀ (A : Over (Sp K)), QuasiCompact A.hom → ∀ (G : Over (Sp W)), QuasiCompact G.hom → Flat G.hom → ∀ (e : (Over.pullback (spMap (algebraMap W K'))).obj G ≅ (Over.pullback (spMap (algebraMap K K'))).obj A) (iA : A.left ⟶ P.left) (hA : iA ≫ P.hom = A.hom ≫ spMap (algebraMap R K)), IsClosedImmersion (pullback.lift iA A.hom hA) → ∀ (iG : G.left ⟶ P.left) (hG : iG ≫ P.hom = G.hom ≫ spMap (algebraMap R W)), IsClosedImmersion (pullback.lift iG G.hom hG) → e.hom.left ≫ pullback.fst A.hom (spMap (algebraMap K K')) ≫ iA = pullback.fst G.hom (spMap (algebraMap W K')) ≫ iG → ∃ (X : Over (Sp R)) (a : A.left ⟶ X.left) (g : G.left ⟶ X.left), IsPullback a A.hom X.hom (spMap (algebraMap R K)) ∧ IsPullback g G.hom X.hom (spMap (algebraMap R W)) ∧ e.hom.left ≫ pullback.fst A.hom (spMap (algebraMap K K')) ≫ a = pullback.fst G.hom (spMap (algebraMap W K')) ≫ g := by
-  intro R K W K' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hm P hP A hAq G hGq hGf e iA hA hcA iG hG hcG hcomp
+theorem GlobalTheory.UnramifiedClosure.closure_baseChange
+    : ∀ (R K W K' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K]
+        [Algebra R K] [IsFractionRing R K] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
+        [Field K'] [Algebra W K'] [IsFractionRing W K'] [Algebra R W] [Algebra K K'] [Algebra R K']
+        [IsScalarTower R W K'] [IsScalarTower R K K'],
+      (maximalIdeal R).map (algebraMap R W) = maximalIdeal W
+        → ∀ (P : Over (Sp R)),
+          QuasiSeparated P.hom
+            → ∀ (A : Over (Sp K)),
+              QuasiCompact A.hom
+                → ∀ (G : Over (Sp W)),
+                  QuasiCompact G.hom → Flat G.hom
+                    → ∀ (e : (Over.pullback (spMap (algebraMap W K'))).obj G
+                        ≅ (Over.pullback (spMap (algebraMap K K'))).obj A)
+                        (iA : A.left ⟶ P.left) (hA : iA ≫ P.hom = A.hom ≫ spMap (algebraMap R K)),
+                      IsClosedImmersion (pullback.lift iA A.hom hA)
+                        → ∀ (iG : G.left ⟶ P.left)
+                            (hG : iG ≫ P.hom = G.hom ≫ spMap (algebraMap R W)),
+                          IsClosedImmersion (pullback.lift iG G.hom hG)
+                            → e.hom.left ≫ pullback.fst A.hom (spMap (algebraMap K K')) ≫ iA
+                              = pullback.fst G.hom (spMap (algebraMap W K')) ≫ iG
+                            → ∃ (X : Over (Sp R)) (a : A.left ⟶ X.left) (g : G.left ⟶ X.left),
+                              IsPullback a A.hom X.hom (spMap (algebraMap R K))
+                                ∧ IsPullback g G.hom X.hom (spMap (algebraMap R W))
+                                ∧ e.hom.left ≫ pullback.fst A.hom (spMap (algebraMap K K')) ≫ a
+                                  = pullback.fst G.hom (spMap (algebraMap W K')) ≫ g := by
+  intro R K W K' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hm P hP A hAq G hGq hGf e iA hA hcA iG hG hcG
+    hcomp
 
   have hjp : IsPreimmersion (spMap (algebraMap R K)) :=
     IsPreimmersion.of_isLocalization (nonZeroDivisors R)
@@ -116,7 +158,8 @@ theorem GlobalTheory.UnramifiedClosure.closure_baseChange : ∀ (R K W K' : Type
   have hqc : QuasiCompact iA := by
     have : QuasiCompact (iA ≫ P.hom) := by rw [hA]; infer_instance
     exact QuasiCompact.of_comp iA P.hom
-  have hdom : IsSchemeTheoreticallyDominant iA.toImage := GlobalTheory.isSchemeTheoreticallyDominant_toImage iA
+  have hdom : IsSchemeTheoreticallyDominant iA.toImage :=
+    GlobalTheory.isSchemeTheoreticallyDominant_toImage iA
   let X : Over (Sp R) := Over.mk (iA.imageι ≫ P.hom)
   have hXh : X.hom = iA.imageι ≫ P.hom := rfl
   have hXa : iA.toImage ≫ X.hom = A.hom ≫ spMap (algebraMap R K) := by
@@ -128,7 +171,8 @@ theorem GlobalTheory.UnramifiedClosure.closure_baseChange : ∀ (R K W K' : Type
   let mK : pullback X.hom (spMap (algebraMap R K)) ⟶ pullback P.hom (spMap (algebraMap R K)) :=
     pullback.map _ _ _ _ iA.imageι (𝟙 _) (𝟙 _) (Category.comp_id _) (by simp)
   have hmK : IsClosedImmersion mK :=
-    MorphismProperty.pullbackMap (P := @IsClosedImmersion.{0}) inferInstance inferInstance rfl (by simp)
+    MorphismProperty.pullbackMap (P := @IsClosedImmersion.{0}) inferInstance inferInstance rfl
+      (by simp)
   have htm : t ≫ mK = pullback.lift iA A.hom hA := by
     apply pullback.hom_ext
     · rw [Category.assoc, pullback.lift_fst, pullback.lift_fst_assoc, pullback.lift_fst,
@@ -151,16 +195,19 @@ theorem GlobalTheory.UnramifiedClosure.closure_baseChange : ∀ (R K W K' : Type
   let mW : pullback X.hom (spMap (algebraMap R W)) ⟶ pullback P.hom (spMap (algebraMap R W)) :=
     pullback.map _ _ _ _ iA.imageι (𝟙 _) (𝟙 _) (Category.comp_id _) (by simp)
   have hmW : IsClosedImmersion mW :=
-    MorphismProperty.pullbackMap (P := @IsClosedImmersion.{0}) inferInstance inferInstance rfl (by simp)
-  let n : pullback (A.hom ≫ spMap (algebraMap R K)) (spMap (algebraMap R W)) ⟶
-      pullback X.hom (spMap (algebraMap R W)) :=
+    MorphismProperty.pullbackMap (P := @IsClosedImmersion.{0}) inferInstance inferInstance rfl
+      (by simp)
+  let n
+      : pullback (A.hom ≫ spMap (algebraMap R K)) (spMap (algebraMap R W))
+        ⟶ pullback X.hom (spMap (algebraMap R W)) :=
     pullback.map _ _ _ _ iA.toImage (𝟙 _) (𝟙 _) (by rw [Category.comp_id, hXa]) (by simp)
   have hL : IsPullback (pullback.fst (A.hom ≫ spMap (algebraMap R K)) (spMap (algebraMap R W))) n
       iA.toImage (pullback.fst X.hom (spMap (algebraMap R W))) := by
     refine IsPullback.of_bot ?_ (pullback.lift_fst _ _ _).symm
       (IsPullback.of_hasPullback X.hom (spMap (algebraMap R W)))
-    have h1 : n ≫ pullback.snd X.hom (spMap (algebraMap R W)) =
-        pullback.snd (A.hom ≫ spMap (algebraMap R K)) (spMap (algebraMap R W)) := by
+    have h1
+        : n ≫ pullback.snd X.hom (spMap (algebraMap R W))
+          = pullback.snd (A.hom ≫ spMap (algebraMap R K)) (spMap (algebraMap R W)) := by
       rw [pullback.lift_snd, Category.comp_id]
     rw [h1, hXa]
     exact IsPullback.of_hasPullback _ _
@@ -174,8 +221,10 @@ theorem GlobalTheory.UnramifiedClosure.closure_baseChange : ∀ (R K W K' : Type
     e.hom.left ≫ hAK.isoPullback.hom ≫ n
   have hv : IsSchemeTheoreticallyDominant v := inferInstance
   let cG : G.left ⟶ pullback P.hom (spMap (algebraMap R W)) := pullback.lift iG G.hom hG
-  have hes : e.hom.left ≫ pullback.snd A.hom (spMap (algebraMap K K')) =
-      pullback.snd G.hom (spMap (algebraMap W K')) := Over.w e.hom
+  have hes
+      : e.hom.left ≫ pullback.snd A.hom (spMap (algebraMap K K'))
+        = pullback.snd G.hom (spMap (algebraMap W K')) :=
+    Over.w e.hom
   have hcomm : pullback.fst G.hom (spMap (algebraMap W K')) ≫ cG = v ≫ mW := by
     apply pullback.hom_ext
     · rw [Category.assoc, pullback.lift_fst, ← hcomp]
@@ -208,8 +257,10 @@ theorem GlobalTheory.UnramifiedClosure.closure_baseChange : ∀ (R K W K' : Type
       (asIso ψ) rfl hψs
   refine ⟨X, iA.toImage, ψ ≫ pullback.fst X.hom (spMap (algebraMap R W)), hIa, hIg, ?_⟩
   rw [← cancel_mono iA.imageι]
-  have h3 : pullback.fst X.hom (spMap (algebraMap R W)) ≫ iA.imageι =
-      mW ≫ pullback.fst P.hom (spMap (algebraMap R W)) := (pullback.lift_fst _ _ _).symm
+  have h3
+      : pullback.fst X.hom (spMap (algebraMap R W)) ≫ iA.imageι
+        = mW ≫ pullback.fst P.hom (spMap (algebraMap R W)) :=
+    (pullback.lift_fst _ _ _).symm
   simp only [Category.assoc]
   simp only [h3, ← Category.assoc, hψ, Scheme.Hom.toImage_imageι]
   simpa only [Category.assoc, cG, pullback.lift_fst] using hcomp

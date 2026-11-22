@@ -16,28 +16,34 @@ section Perm
 
 variable {R : Type} [CommRing R] {n : Type} [Fintype n] [DecidableEq n]
 
-theorem permMatrix_apply' (σ : Equiv.Perm n) (i j : n) :
-    (σ.permMatrix R) i j = if σ i = j then 1 else 0 := by
+theorem permMatrix_apply' (σ : Equiv.Perm n) (i j : n)
+    : (σ.permMatrix R) i j = if σ i = j then 1 else 0 := by
   simp [Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, Equiv.toPEquiv_apply]
 
-theorem permMatrix_mul_apply (σ τ : Equiv.Perm n) (i j : n) :
-    (σ.permMatrix R * τ.permMatrix R) i j = if τ (σ i) = j then 1 else 0 := by
+theorem permMatrix_mul_apply (σ τ : Equiv.Perm n) (i j : n)
+    : (σ.permMatrix R * τ.permMatrix R) i j = if τ (σ i) = j then 1 else 0 := by
   simp only [Matrix.mul_apply, permMatrix_apply', ite_mul, one_mul, zero_mul]
   rw [Finset.sum_ite_eq]
   simp
 
-def permU (σ : Equiv.Perm n) : GL n R :=
-  ⟨σ.permMatrix R, σ⁻¹.permMatrix R, by
+def permU (σ : Equiv.Perm n) : GL n R := ⟨
+  σ.permMatrix R,
+  σ⁻¹.permMatrix R,
+  by
     ext i j
     rw [permMatrix_mul_apply, Matrix.one_apply]
-    simp, by
+    simp,
+  by
     ext i j
     rw [permMatrix_mul_apply, Matrix.one_apply]
-    simp⟩
+    simp
+⟩
 
 theorem permU_coe (σ : Equiv.Perm n) : ((permU σ : GL n R) : Matrix n n R) = σ.permMatrix R := rfl
 
-theorem permU_inv_coe (σ : Equiv.Perm n) : (((permU σ)⁻¹ : GL n R) : Matrix n n R) = σ⁻¹.permMatrix R := rfl
+theorem permU_inv_coe (σ : Equiv.Perm n)
+    : (((permU σ)⁻¹ : GL n R) : Matrix n n R) = σ⁻¹.permMatrix R :=
+  rfl
 
 end Perm
 
@@ -45,19 +51,22 @@ section Basic
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem qel_coe (N : ℕ) (π : 𝓞 L) (hπ : π ≠ 0) :
-    ((qel L N π hπ : GK L N) : Matrix (Fin N) (Fin N) L) =
-      diagonal fun i : Fin N => if (i : ℕ) = 0 then (π : L) else 1 := rfl
+theorem qel_coe (N : ℕ) (π : 𝓞 L) (hπ : π ≠ 0)
+    : ((qel L N π hπ : GK L N) : Matrix (Fin N) (Fin N) L)
+      = diagonal fun i : Fin N => if (i : ℕ) = 0 then (π : L) else 1 :=
+  rfl
 
-theorem toK_coe (N : ℕ) (γ : Gm L N) (i j : Fin N) :
-    ((toK L N γ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) i j =
-      algebraMap (𝓞 L) L ((γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j) := rfl
+theorem toK_coe (N : ℕ) (γ : Gm L N) (i j : Fin N)
+    : ((toK L N γ : GL (Fin N) L) : Matrix (Fin N) (Fin N) L) i j
+      = algebraMap (𝓞 L) L ((γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j) :=
+  rfl
 
 theorem algebraMap_inj : Function.Injective (algebraMap (𝓞 L) L) :=
   FaithfulSMul.algebraMap_injective (𝓞 L) L
 
-theorem mem_Gq_iff' (N : ℕ) (π : 𝓞 L) (hπ : π ≠ 0) (γ : Gm L N) :
-    γ ∈ Gq (toK L N) (qel L N π hπ) ↔ ∃ δ : Gm L N, toK L N δ * qel L N π hπ = qel L N π hπ * toK L N γ := by
+theorem mem_Gq_iff' (N : ℕ) (π : 𝓞 L) (hπ : π ≠ 0) (γ : Gm L N)
+    : γ ∈ Gq (toK L N) (qel L N π hπ)
+      ↔ ∃ δ : Gm L N, toK L N δ * qel L N π hπ = qel L N π hπ * toK L N γ := by
   constructor
   · intro h
     obtain ⟨x, ⟨δ, rfl⟩, hx⟩ := Subgroup.mem_map.1 (Subgroup.mem_comap.1 h)
@@ -72,37 +81,47 @@ theorem mem_Gq_iff' (N : ℕ) (π : 𝓞 L) (hπ : π ≠ 0) (γ : Gm L N) :
     rw [MulAut.conj_apply, inv_inv, mul_assoc, h]
     group
 
-theorem mem_Gq_iff (N : ℕ) (π : 𝓞 L) (hπ : π ≠ 0) (γ : Gm L N) :
-    γ ∈ Gq (toK L N) (qel L N π hπ) ↔
-      ∀ i j : Fin N, (j : ℕ) = 0 → (i : ℕ) ≠ 0 → (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j ∈ Ideal.span {π} := by
+theorem mem_Gq_iff (N : ℕ) (π : 𝓞 L) (hπ : π ≠ 0) (γ : Gm L N)
+    : γ ∈ Gq (toK L N) (qel L N π hπ)
+      ↔ ∀ i j : Fin N,
+        (j : ℕ) = 0 → (i : ℕ) ≠ 0 → (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j ∈ Ideal.span {π} := by
   rw [mem_Gq_iff']
   constructor
   · rintro ⟨δ, h⟩ i j hj hi
     have e := congrArg (fun g : GL (Fin N) L => (g : Matrix (Fin N) (Fin N) L) i j) h
     simp only [Units.val_mul, qel_coe, Matrix.mul_diagonal, Matrix.diagonal_mul, hj, hi, if_true,
-      if_false, toK_coe, one_mul] at e
+        if_false, toK_coe, one_mul]
+      at e
     rw [Ideal.mem_span_singleton']
     refine ⟨(δ : Matrix (Fin N) (Fin N) (𝓞 L)) i j, algebraMap_inj ?_⟩
     rw [map_mul]
     exact e
   · intro h
-    have hd : ∀ i j : Fin N, (j : ℕ) = 0 ∧ (i : ℕ) ≠ 0 →
-        ∃ a : 𝓞 L, a * π = (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j := fun i j hij =>
-      Ideal.mem_span_singleton'.1 (h i j hij.1 hij.2)
-    let M : Matrix (Fin N) (Fin N) (𝓞 L) := Matrix.of fun i j =>
-      if hij : (j : ℕ) = 0 ∧ (i : ℕ) ≠ 0 then Classical.choose (hd i j hij)
-      else if (i : ℕ) = 0 ∧ (j : ℕ) ≠ 0 then π * (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j
-      else (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j
-    have hM : M.map (algebraMap (𝓞 L) L) * diagonal (fun i : Fin N => if (i : ℕ) = 0 then (π : L) else 1) =
-        diagonal (fun i : Fin N => if (i : ℕ) = 0 then (π : L) else 1) *
-          (γ : Matrix (Fin N) (Fin N) (𝓞 L)).map (algebraMap (𝓞 L) L) := by
+    have hd
+        : ∀ i j : Fin N,
+          (j : ℕ) = 0 ∧ (i : ℕ) ≠ 0 → ∃ a : 𝓞 L, a * π = (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j :=
+      fun i j hij => Ideal.mem_span_singleton'.1 (h i j hij.1 hij.2)
+    let M : Matrix (Fin N) (Fin N) (𝓞 L) :=
+      Matrix.of fun i j =>
+        if hij : (j : ℕ) = 0 ∧ (i : ℕ) ≠ 0 then
+          Classical.choose (hd i j hij)
+        else if (i : ℕ) = 0 ∧ (j : ℕ) ≠ 0 then
+          π * (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j
+        else
+          (γ : Matrix (Fin N) (Fin N) (𝓞 L)) i j
+    have hM
+        : M.map (algebraMap (𝓞 L) L)
+            * diagonal (fun i : Fin N => if (i : ℕ) = 0 then (π : L) else 1)
+          = diagonal (fun i : Fin N => if (i : ℕ) = 0 then (π : L) else 1)
+            * (γ : Matrix (Fin N) (Fin N) (𝓞 L)).map (algebraMap (𝓞 L) L) := by
       ext i j
       simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.map_apply, M, Matrix.of_apply]
       by_cases hj : (j : ℕ) = 0 <;> by_cases hi : (i : ℕ) = 0
       · rw [dite_eq_right (by tauto), if_neg (by tauto), if_pos hj, if_pos hi, mul_comm]
       · rw [dite_eq_left ⟨hj, hi⟩, if_pos hj, if_neg hi, one_mul]
         have hs := Classical.choose_spec (hd i j ⟨hj, hi⟩)
-        calc _ = algebraMap (𝓞 L) L (Classical.choose (hd i j ⟨hj, hi⟩) * π) := by rw [map_mul]
+        calc
+          _ = algebraMap (𝓞 L) L (Classical.choose (hd i j ⟨hj, hi⟩) * π) := by rw [map_mul]
           _ = _ := by rw [hs]
       · rw [dite_eq_right (by tauto), if_pos ⟨hi, hj⟩, if_neg hj, if_pos hi, mul_one, map_mul]
       · rw [dite_eq_right (by tauto), if_neg (by tauto), if_neg hj, if_neg hi, mul_one, one_mul]
@@ -139,16 +158,18 @@ theorem span_isMaximal {π : 𝓞 L} (hπ : Prime π) : (Ideal.span {π} : Ideal
 theorem one_not_mem_span {π : 𝓞 L} (hπ : Prime π) : (1 : 𝓞 L) ∉ Ideal.span {π} := fun h =>
   (span_isMaximal hπ).ne_top ((Ideal.eq_top_iff_one _).2 h)
 
-theorem finite_cosets (N : ℕ) (π : 𝓞 L) (hπ : Prime π) :
-    Finite (Quotient (QuotientGroup.rightRel (Gq (toK L N) (qel L N π hπ.ne_zero)))) := by
+theorem finite_cosets (N : ℕ) (π : 𝓞 L) (hπ : Prime π)
+    : Finite (Quotient (QuotientGroup.rightRel (Gq (toK L N) (qel L N π hπ.ne_zero)))) := by
   haveI := span_isMaximal hπ
   rcases N with _ | N
   · haveI : Subsingleton (Gm L 0) := ⟨fun a b => Units.ext (Matrix.ext fun i => i.elim0)⟩
     haveI : Finite (Gm L 0) := Finite.of_subsingleton
     exact Quotient.finite _
-  · let f : Quotient (QuotientGroup.rightRel (Gq (toK L (N + 1)) (qel L (N + 1) π hπ.ne_zero))) →
-        (Fin (N + 1) → 𝓞 L ⧸ Ideal.span {π}) := fun x l =>
-      Ideal.Quotient.mk _ (((x.out⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0)
+  · let f
+        : Quotient (QuotientGroup.rightRel (Gq (toK L (N + 1)) (qel L (N + 1) π hπ.ne_zero)))
+          → (Fin (N + 1) → 𝓞 L ⧸ Ideal.span {π}) := fun x l =>
+      Ideal.Quotient.mk _
+        (((x.out⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0)
     refine Finite.of_injective f fun x y hxy => ?_
     rw [← Quotient.out_eq x, ← Quotient.out_eq y]
     apply Quotient.sound
@@ -159,21 +180,26 @@ theorem finite_cosets (N : ℕ) (π : 𝓞 L) (hπ : Prime π) :
     subst hj'
     set a := x.out
     set b := y.out
-    have e1 : ∑ l, (b : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) i l *
-        ((b⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0 = 0 := by
+    have e1
+        : ∑ l, (b : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) i l *
+            ((b⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0
+          = 0 := by
       have := congrFun (congrFun (Units.mul_inv b) i) 0
       rw [Matrix.mul_apply] at this
       rw [this, Matrix.one_apply, if_neg]
       exact fun h => hi (by rw [h]; rfl)
-    have hmem : ∀ l, ((a⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0 -
-        ((b⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0 ∈ Ideal.span {π} := fun l =>
+    have hmem
+        : ∀ l,
+          ((a⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0
+              - ((b⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0
+            ∈ Ideal.span {π} := fun l =>
       Ideal.Quotient.eq.1 (congrFun hxy l)
     rw [Units.val_mul, Matrix.mul_apply]
     have : ∑ l, (b : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) i l *
-        ((a⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0 =
-        ∑ l, (b : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) i l *
-        (((a⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0 -
-          ((b⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0) := by
+          ((a⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0
+        = ∑ l, (b : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) i l *
+          (((a⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0 -
+            ((b⁻¹ : Gm L (N + 1)) : Matrix (Fin (N + 1)) (Fin (N + 1)) (𝓞 L)) l 0) := by
       simp only [mul_sub, Finset.sum_sub_distrib, e1, sub_zero]
     rw [this]
     exact Ideal.sum_mem _ fun l _ => Ideal.mul_mem_left _ _ (hmem l)
@@ -185,7 +211,9 @@ theorem pIndex : PIndex := by
   rw [Subgroup.index, ← Nat.card_congr (QuotientGroup.quotientRightRelEquivQuotientLeftRel _)]
   rcases N with _ | N
   · exact Nat.zero_le _
-  let g : Fin (N + 1) → Quotient (QuotientGroup.rightRel (Gq (toK L (N + 1)) (qel L (N + 1) π hπ.ne_zero))) :=
+  let g
+      : Fin (N + 1)
+        → Quotient (QuotientGroup.rightRel (Gq (toK L (N + 1)) (qel L (N + 1) π hπ.ne_zero))) :=
     fun j => Quotient.mk _ (permU (Equiv.swap 0 j))
   have hg : Function.Injective g := by
     intro j k hjk
@@ -247,15 +275,17 @@ section Low
 
 variable {R : Type} [CommRing R]
 
-theorem exists_clear (n : ℕ) (hn : 1 ≤ n) (I : Ideal R) (hI : I.IsMaximal) (v : Fin n → R)
-    (a : Fin n) (ha : v a ∉ I) :
-    ∃ c' : GL (Fin n) R, ∀ i : Fin n, (i : ℕ) ≠ 0 → ((c' : Matrix (Fin n) (Fin n) R) *ᵥ v) i ∈ I := by
+theorem exists_clear
+    (n : ℕ) (hn : 1 ≤ n) (I : Ideal R) (hI : I.IsMaximal) (v : Fin n → R) (a : Fin n) (ha : v a ∉ I)
+    : ∃ c' : GL (Fin n) R, ∀ i : Fin n,
+      (i : ℕ) ≠ 0 → ((c' : Matrix (Fin n) (Fin n) R) *ᵥ v) i ∈ I := by
   let z : Fin n := ⟨0, hn⟩
   let σ : Equiv.Perm (Fin n) := Equiv.swap z a
   let W : Fin n → R := v ∘ σ
   have hW : W z ∉ I := by simpa [W, σ] using ha
   obtain ⟨s, t, ht, hst⟩ := hI.exists_inv hW
-  let Nm : Matrix (Fin n) (Fin n) R := Matrix.of fun i j => if (j : ℕ) = 0 ∧ (i : ℕ) ≠ 0 then s * W i else 0
+  let Nm : Matrix (Fin n) (Fin n) R :=
+    Matrix.of fun i j => if (j : ℕ) = 0 ∧ (i : ℕ) ≠ 0 then s * W i else 0
   have hNN : Nm * Nm = 0 := by
     ext i j
     simp only [Matrix.mul_apply, Nm, Matrix.of_apply, Matrix.zero_apply]
@@ -272,8 +302,7 @@ theorem exists_clear (n : ℕ) (hn : 1 ≤ n) (I : Ideal R) (hI : I.IsMaximal) (
     rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h <;> simp [h]
   refine ⟨⟨M, M⁻¹, Matrix.mul_nonsing_inv M hM, Matrix.nonsing_inv_mul M hM⟩, fun i hi => ?_⟩
   show (M *ᵥ v) i ∈ I
-  have e : M *ᵥ v = U *ᵥ W := by
-    rw [← Matrix.mulVec_mulVec, Matrix.permMatrix_mulVec]
+  have e : M *ᵥ v = U *ᵥ W := by rw [← Matrix.mulVec_mulVec, Matrix.permMatrix_mulVec]
   rw [e]
   have e3 : (Nm *ᵥ W) i = s * W i * W z := by
     simp only [Matrix.mulVec, dotProduct, Nm, Matrix.of_apply]
@@ -301,8 +330,10 @@ theorem pLow : PLow := by
   have hex : ∃ a, v a ∉ Ideal.span {π} := by
     by_contra hcon
     push Not at hcon
-    have hall : ∀ l : Fin (n + r),
-        ((c⁻¹ : Gm L (n + r)) : Matrix (Fin (n + r)) (Fin (n + r)) (𝓞 L)) l z0 ∈ Ideal.span {π} := by
+    have hall
+        : ∀ l : Fin (n + r),
+          ((c⁻¹ : Gm L (n + r)) : Matrix (Fin (n + r)) (Fin (n + r)) (𝓞 L)) l z0
+            ∈ Ideal.span {π} := by
       intro l
       refine Fin.addCases (fun a => ?_) (fun b => ?_) l
       · exact hcon a
@@ -323,12 +354,14 @@ theorem pLow : PLow := by
   cases i using Fin.addCases with
   | left i' =>
     have hi' : (i' : ℕ) ≠ 0 := by simpa using hi
-    have e : ∑ b : Fin r, (stab (𝓞 L) n (n + r) (Nat.le_add_right n r) c' : Matrix (Fin (n + r)) (Fin (n + r)) (𝓞 L))
-        (Fin.castAdd r i') (Fin.natAdd n b) *
-        ((c⁻¹ : Gm L (n + r)) : Matrix (Fin (n + r)) (Fin (n + r)) (𝓞 L)) (Fin.natAdd n b) z0 = 0 := by
+    have e
+        : ∑ b : Fin r, (stab (𝓞 L) n (n + r) (Nat.le_add_right n r) c' : Matrix (Fin (n + r)) (Fin (n + r)) (𝓞 L))
+            (Fin.castAdd r i') (Fin.natAdd n b) *
+            ((c⁻¹ : Gm L (n + r)) : Matrix (Fin (n + r)) (Fin (n + r)) (𝓞 L)) (Fin.natAdd n b) z0
+          = 0 := by
       refine Finset.sum_eq_zero fun b _ => ?_
-      rw [stab_apply, dite_eq_right (by simp), if_neg (fun h => by have := congrArg Fin.val h; simp at this; omega),
-        zero_mul]
+      rw [stab_apply, dite_eq_right (by simp),
+        if_neg (fun h => by have := congrArg Fin.val h; simp at this; omega), zero_mul]
     rw [e, add_zero]
     have := hc' i' hi'
     simp only [Matrix.mulVec, dotProduct] at this
@@ -337,8 +370,8 @@ theorem pLow : PLow := by
     rfl
   | right i' =>
     refine Ideal.add_mem _ (Ideal.sum_mem _ fun b _ => ?_) (Ideal.sum_mem _ fun b _ => ?_)
-    · rw [stab_apply, dite_eq_right (by simp), if_neg (fun h => by have := congrArg Fin.val h; simp at this; omega),
-        zero_mul]
+    · rw [stab_apply, dite_eq_right (by simp),
+        if_neg (fun h => by have := congrArg Fin.val h; simp at this; omega), zero_mul]
       exact Submodule.zero_mem _
     · exact Ideal.mul_mem_left _ _ (hc b)
 

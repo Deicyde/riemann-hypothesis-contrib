@@ -7,19 +7,21 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsLatInt
 
 noncomputable section
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.TorCard
 
-theorem torsion_exact_bound {R A B C : Type*} [CommRing R] [AddCommGroup A] [AddCommGroup B]
-    [AddCommGroup C] [Module R A] [Module R B] [Module R C] (I : Ideal R)
-    (f : A →ₗ[R] B) (g : B →ₗ[R] C) (hf : Function.Injective f)
-    (hfg : ∀ b, g b = 0 → ∃ a, f a = b)
-    [Finite {x : A // ∀ a ∈ I, a • x = 0}] [Finite {x : C // ∀ a ∈ I, a • x = 0}] :
-    Finite {x : B // ∀ a ∈ I, a • x = 0} ∧
-      Nat.card {x : B // ∀ a ∈ I, a • x = 0} ≤
-        Nat.card {x : A // ∀ a ∈ I, a • x = 0} * Nat.card {x : C // ∀ a ∈ I, a • x = 0} := by
+theorem torsion_exact_bound
+    {R A B C : Type*} [CommRing R] [AddCommGroup A] [AddCommGroup B] [AddCommGroup C] [Module R A]
+    [Module R B] [Module R C]
+    (I : Ideal R)
+    (f : A →ₗ[R] B) (g : B →ₗ[R] C) (hf : Function.Injective f) (hfg : ∀ b, g b = 0 → ∃ a, f a = b)
+    [Finite {x : A // ∀ a ∈ I, a • x = 0}] [Finite {x : C // ∀ a ∈ I, a • x = 0}]
+    : Finite {x : B // ∀ a ∈ I, a • x = 0}
+      ∧ Nat.card {x : B // ∀ a ∈ I, a • x = 0}
+        ≤ Nat.card {x : A // ∀ a ∈ I, a • x = 0} * Nat.card {x : C // ∀ a ∈ I, a • x = 0} := by
   classical
   let TB := {x : B // ∀ a ∈ I, a • x = 0}
   let TA := {x : A // ∀ a ∈ I, a • x = 0}
@@ -53,13 +55,15 @@ theorem torsion_exact_bound {R A B C : Type*} [CommRing R] [AddCommGroup A] [Add
     rw [e1, hkf b', e2] at e3
     exact Subtype.ext (sub_left_injective e3).symm
   refine ⟨Finite.of_injective Φ hΦ, ?_⟩
-  calc Nat.card TB ≤ Nat.card (TA × TC) := Nat.card_le_card_of_injective Φ hΦ
+  calc
+    Nat.card TB
+      ≤ Nat.card (TA × TC) := Nat.card_le_card_of_injective Φ hΦ
     _ = _ := Nat.card_prod _ _
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem exists_smul_mem {m : ℕ} {L : Submodule (𝓞 K) (Fin m → K)} (hL : IsLat L)
-    (v : Fin m → K) : ∃ t : 𝓞 K, t ≠ 0 ∧ t • v ∈ L := by
+theorem exists_smul_mem {m : ℕ} {L : Submodule (𝓞 K) (Fin m → K)} (hL : IsLat L) (v : Fin m → K)
+    : ∃ t : 𝓞 K, t ≠ 0 ∧ t • v ∈ L := by
   have hv : v ∈ Submodule.span K (L : Set (Fin m → K)) := by rw [hL.2]; trivial
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
@@ -76,8 +80,7 @@ theorem exists_smul_mem {m : ℕ} {L : Submodule (𝓞 K) (Fin m → K)} (hL : I
     obtain ⟨t, ht, htx⟩ := hx
     obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 K) c
     have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
-    have hbK : algebraMap (𝓞 K) K b ≠ 0 := by
-      simpa using hb0
+    have hbK : algebraMap (𝓞 K) K b ≠ 0 := by simpa using hb0
     refine ⟨b * t, mul_ne_zero hb0 ht, ?_⟩
     have e : (b * t) • ((algebraMap (𝓞 K) K a / algebraMap (𝓞 K) K b) • x) = a • (t • x) := by
       ext i
@@ -87,10 +90,9 @@ theorem exists_smul_mem {m : ℕ} {L : Submodule (𝓞 K) (Fin m → K)} (hL : I
     rw [e]
     exact L.smul_mem _ htx
 
-theorem rank_one (𝔠 : Submodule (𝓞 K) K) (hfg : 𝔠.FG) (h0 : 𝔠 ≠ ⊥)
-    (𝔞 : Ideal (𝓞 K)) (h𝔞 : 𝔞 ≠ ⊥) :
-    Finite {x : K ⧸ 𝔠 // ∀ a ∈ 𝔞, a • x = 0} ∧
-      Nat.card {x : K ⧸ 𝔠 // ∀ a ∈ 𝔞, a • x = 0} ≤ Ideal.absNorm 𝔞 := by
+theorem rank_one (𝔠 : Submodule (𝓞 K) K) (hfg : 𝔠.FG) (h0 : 𝔠 ≠ ⊥) (𝔞 : Ideal (𝓞 K)) (h𝔞 : 𝔞 ≠ ⊥)
+    : Finite {x : K ⧸ 𝔠 // ∀ a ∈ 𝔞, a • x = 0}
+      ∧ Nat.card {x : K ⧸ 𝔠 // ∀ a ∈ 𝔞, a • x = 0} ≤ Ideal.absNorm 𝔞 := by
   classical
   obtain ⟨d, hd, hdi⟩ := FractionalIdeal.isFractional_of_fg (S := (𝓞 K)⁰) hfg
   have hd0 : d ≠ 0 := nonZeroDivisors.ne_zero hd
@@ -99,32 +101,33 @@ theorem rank_one (𝔠 : Submodule (𝓞 K) K) (hfg : 𝔠.FG) (h0 : 𝔠 ≠ �
   set e : 𝓞 K := d * a₀ with he
   have he0 : e ≠ 0 := mul_ne_zero hd0 ha₀0
   have heK : algebraMap (𝓞 K) K e ≠ 0 := by simpa using he0
-  let J : Ideal (𝓞 K) :=
-    { carrier := {o | ∀ a ∈ 𝔞, a • (algebraMap (𝓞 K) K o / algebraMap (𝓞 K) K e) ∈ 𝔠}
-      add_mem' := by
-        intro x y hx hy a ha
-        have := 𝔠.add_mem (hx a ha) (hy a ha)
-        rw [map_add (f := _), add_div, smul_add]
-        exact this
-      zero_mem' := by
-        intro a _
-        simp
-      smul_mem' := by
-        intro c x hx a ha
-        have := 𝔠.smul_mem c (hx a ha)
-        have e1 : a • (algebraMap (𝓞 K) K (c • x) / algebraMap (𝓞 K) K e) =
-            c • a • (algebraMap (𝓞 K) K x / algebraMap (𝓞 K) K e) := by
-          rw [smul_eq_mul]
-          simp only [Algebra.smul_def, map_mul]
-          ring
-        rw [e1]
-        exact this }
+  let J : Ideal (𝓞 K) := {
+    carrier := {o | ∀ a ∈ 𝔞, a • (algebraMap (𝓞 K) K o / algebraMap (𝓞 K) K e) ∈ 𝔠}
+    add_mem' := by
+      intro x y hx hy a ha
+      have := 𝔠.add_mem (hx a ha) (hy a ha)
+      rw [map_add (f := _), add_div, smul_add]
+      exact this
+    zero_mem' := by
+      intro a _
+      simp
+    smul_mem' := by
+      intro c x hx a ha
+      have := 𝔠.smul_mem c (hx a ha)
+      have e1
+          : a • (algebraMap (𝓞 K) K (c • x) / algebraMap (𝓞 K) K e)
+            = c • a • (algebraMap (𝓞 K) K x / algebraMap (𝓞 K) K e) := by
+        rw [smul_eq_mul]
+        simp only [Algebra.smul_def, map_mul]
+        ring
+      rw [e1]
+      exact this
+  }
   have hJmem : ∀ o, o ∈ J ↔ ∀ a ∈ 𝔞, a • (algebraMap (𝓞 K) K o / algebraMap (𝓞 K) K e) ∈ 𝔠 :=
     fun _ => Iff.rfl
   have hJ0 : J ≠ ⊥ := by
     obtain ⟨o, ho⟩ := hdi c₀ hc₀
-    have ho' : algebraMap (𝓞 K) K o = algebraMap (𝓞 K) K d * c₀ := by
-      rw [ho, Algebra.smul_def]
+    have ho' : algebraMap (𝓞 K) K o = algebraMap (𝓞 K) K d * c₀ := by rw [ho, Algebra.smul_def]
     have hdK : algebraMap (𝓞 K) K d ≠ 0 := by simpa using hd0
     have ho0 : o ≠ 0 := by
       intro h
@@ -154,10 +157,8 @@ theorem rank_one (𝔠 : Submodule (𝓞 K) K) (hfg : 𝔠.FG) (h0 : 𝔠 ≠ �
 
   have hle : (𝔞 * J) ≤ J := Ideal.mul_le_right
   have hleA : (𝔞 * J).toAddSubgroup ≤ J.toAddSubgroup := hle
-  have hNJ : Ideal.absNorm J ≠ 0 := by
-    simpa [Ideal.absNorm_eq_zero_iff] using hJ0
-  have hN𝔞 : Ideal.absNorm 𝔞 ≠ 0 := by
-    simpa [Ideal.absNorm_eq_zero_iff] using h𝔞
+  have hNJ : Ideal.absNorm J ≠ 0 := by simpa [Ideal.absNorm_eq_zero_iff] using hJ0
+  have hN𝔞 : Ideal.absNorm 𝔞 ≠ 0 := by simpa [Ideal.absNorm_eq_zero_iff] using h𝔞
   have hidx : (𝔞 * J).toAddSubgroup.relIndex J.toAddSubgroup = Ideal.absNorm 𝔞 := by
     have h1 := AddSubgroup.relIndex_mul_index hleA
     have h2 : ∀ I : Ideal (𝓞 K), I.toAddSubgroup.index = Ideal.absNorm I := by
@@ -174,8 +175,9 @@ theorem rank_one (𝔠 : Submodule (𝓞 K) K) (hfg : 𝔠.FG) (h0 : 𝔠 ≠ �
     exact hN𝔞
   have hQcard : Nat.card Q = Ideal.absNorm 𝔞 := hidx
 
-  have hrep : ∀ t : {x : K ⧸ 𝔠 // ∀ a ∈ 𝔞, a • x = 0}, ∃ o : ↥J.toAddSubgroup,
-      Submodule.Quotient.mk (algebraMap (𝓞 K) K o.1 / algebraMap (𝓞 K) K e) = t.1 := by
+  have hrep
+      : ∀ t : {x : K ⧸ 𝔠 // ∀ a ∈ 𝔞, a • x = 0}, ∃ o : ↥J.toAddSubgroup,
+        Submodule.Quotient.mk (algebraMap (𝓞 K) K o.1 / algebraMap (𝓞 K) K e) = t.1 := by
     rintro ⟨t, ht⟩
     obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ t
     have hx : ∀ a ∈ 𝔞, a • x ∈ 𝔠 := by
@@ -208,11 +210,11 @@ theorem rank_one (𝔠 : Submodule (𝓞 K) K) (hfg : 𝔠.FG) (h0 : 𝔠 ≠ �
     simp
     ring
   refine ⟨Finite.of_injective ψ hψ, ?_⟩
-  calc _ ≤ Nat.card Q := Nat.card_le_card_of_injective ψ hψ
+  calc
+    _ ≤ Nat.card Q := Nat.card_le_card_of_injective ψ hψ
     _ = _ := hQcard
 
-def ins (K : Type) [Field K] [NumberField K] (m : ℕ) :
-    (Fin m → K) →ₗ[𝓞 K] (Fin (m + 1) → K) where
+def ins (K : Type) [Field K] [NumberField K] (m : ℕ) : (Fin m → K) →ₗ[𝓞 K] (Fin (m + 1) → K) where
   toFun x := Fin.cons 0 x
   map_add' x y := by
     ext i
@@ -229,8 +231,8 @@ theorem ins_injective (m : ℕ) : Function.Injective (ins K m) := by
   ext j
   exact congrFun h j.succ
 
-theorem isLat_comap_ins {m : ℕ} {L : Submodule (𝓞 K) (Fin (m + 1) → K)} (hL : IsLat L) :
-    IsLat (L.comap (ins K m)) := by
+theorem isLat_comap_ins {m : ℕ} {L : Submodule (𝓞 K) (Fin (m + 1) → K)} (hL : IsLat L)
+    : IsLat (L.comap (ins K m)) := by
   refine ⟨?_, ?_⟩
   · haveI : IsNoetherian (𝓞 K) L := isNoetherian_of_fg_of_noetherian L hL.1
     have h1 : (L.comap (ins K m)).map (ins K m) ≤ L := Submodule.map_comap_le _ _
@@ -250,23 +252,23 @@ theorem isLat_comap_ins {m : ℕ} {L : Submodule (𝓞 K) (Fin (m + 1) → K)} (
     rw [e]
     exact Submodule.smul_mem _ _ (Submodule.subset_span hmem)
 
-theorem map_hd_ne_bot {m : ℕ} {L : Submodule (𝓞 K) (Fin (m + 1) → K)} (hL : IsLat L) :
-    L.map (hd K m) ≠ ⊥ := by
+theorem map_hd_ne_bot {m : ℕ} {L : Submodule (𝓞 K) (Fin (m + 1) → K)} (hL : IsLat L)
+    : L.map (hd K m) ≠ ⊥ := by
   obtain ⟨t, ht, htv⟩ := exists_smul_mem hL (Pi.single 0 1)
   intro h
   have h1 : hd K m (t • Pi.single 0 1) ∈ L.map (hd K m) := Submodule.mem_map_of_mem htv
   rw [h, Submodule.mem_bot] at h1
   have h2 : algebraMap (𝓞 K) K t = 0 := by
-    have h3 : hd K m (t • Pi.single 0 1) = t • (1 : K) := by
-      simp [hd]
+    have h3 : hd K m (t • Pi.single 0 1) = t • (1 : K) := by simp [hd]
     rw [h3, Algebra.smul_def, mul_one] at h1
     exact h1
   exact ht (by simpa using h2)
 
-theorem torsion_card_le_by_rank (𝔞 : Ideal (𝓞 K)) (h𝔞 : 𝔞 ≠ ⊥) (m : ℕ) :
-    ∀ L : Submodule (𝓞 K) (Fin m → K), IsLat L →
-      Finite {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0} ∧
-        Nat.card {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0} ≤ Ideal.absNorm 𝔞 ^ m := by
+theorem torsion_card_le_by_rank (𝔞 : Ideal (𝓞 K)) (h𝔞 : 𝔞 ≠ ⊥) (m : ℕ)
+    : ∀ L : Submodule (𝓞 K) (Fin m → K),
+      IsLat L
+        → Finite {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0}
+          ∧ Nat.card {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0} ≤ Ideal.absNorm 𝔞 ^ m := by
   induction m with
   | zero =>
     intro L _
@@ -313,10 +315,13 @@ theorem torsion_card_le_by_rank (𝔞 : Ideal (𝓞 K)) (h𝔞 : 𝔞 ≠ ⊥) (
     rw [pow_succ]
     exact Nat.mul_le_mul cA cC
 
-theorem tor_card : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ)
-    (L : Submodule (𝓞 K) (Fin m → K)), IsLat L → ∀ 𝔞 : Ideal (𝓞 K), 𝔞 ≠ ⊥ →
-      Finite {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0} ∧
-        Nat.card {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0} ≤ Ideal.absNorm 𝔞 ^ m :=
+theorem tor_card
+    : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ) (L : Submodule (𝓞 K) (Fin m → K)),
+      IsLat L
+        → ∀ 𝔞 : Ideal (𝓞 K),
+          𝔞 ≠ ⊥
+            → Finite {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0}
+              ∧ Nat.card {x : (Fin m → K) ⧸ L // ∀ a ∈ 𝔞, a • x = 0} ≤ Ideal.absNorm 𝔞 ^ m :=
   fun _ _ _ m L hL 𝔞 h𝔞 => torsion_card_le_by_rank 𝔞 h𝔞 m L hL
 
 end GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.TorCard

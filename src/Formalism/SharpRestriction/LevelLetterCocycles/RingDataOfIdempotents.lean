@@ -10,16 +10,21 @@ open Formalism.BasicNotions
 
 namespace Formalism.MainNotions.N.RepresentationBoundsCohomology
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module Matrix Formalism.RepresentationBoundsCohomology.ringDataObjects Formalism.TruncatedSeriesCounting.TruncatedSeriesCountingIdentities Formalism.NG
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module Matrix
+  Formalism.RepresentationBoundsCohomology.ringDataObjects
+  Formalism.TruncatedSeriesCounting.TruncatedSeriesCountingIdentities Formalism.NG
 
 def blockZeroEquiv (r t : ℕ) : Fin r ≃ {a : Fin (r + t) // blkG r t a = 0} where
   toFun a := ⟨Fin.castAdd t a, blkG_castAdd r t a⟩
-  invFun y := ⟨(y.1 : ℕ), by
-    have h := y.2
-    unfold blkG at h
-    split_ifs at h with h1
-    · exact h1
-    · exact absurd h (by simp [Fin.ext_iff])⟩
+  invFun y := ⟨
+    (y.1 : ℕ),
+    by
+      have h := y.2
+      unfold blkG at h
+      split_ifs at h with h1
+      · exact h1
+      · exact absurd h (by simp [Fin.ext_iff])
+  ⟩
   left_inv a := by
     ext
     rfl
@@ -28,11 +33,12 @@ def blockZeroEquiv (r t : ℕ) : Fin r ≃ {a : Fin (r + t) // blkG r t a = 0} w
     ext
     rfl
 
-theorem absIrr_block {k G : Type} [Field k] {r t : ℕ} (M : G → Matrix (Fin (r + t)) (Fin (r + t)) k)
-    (ρb : G → Matrix (Fin r) (Fin r) k)
+theorem absIrr_block
+    {k G : Type} [Field k]
+    {r t : ℕ} (M : G → Matrix (Fin (r + t)) (Fin (r + t)) k) (ρb : G → Matrix (Fin r) (Fin r) k)
     (h : ∀ g a b, M g (Fin.castAdd t a) (Fin.castAdd t b) = ρb g a b)
-    (hs : Submodule.span k (Set.range ρb) = ⊤) :
-    AbsIrr (fun g => (M g).toSquareBlock (blkG r t) 0) := by
+    (hs : Submodule.span k (Set.range ρb) = ⊤)
+    : AbsIrr (fun g => (M g).toSquareBlock (blkG r t) 0) := by
   apply absIrr_of_span
   intro a b
   let L := Matrix.reindexLinearEquiv k k (blockZeroEquiv r t) (blockZeroEquiv r t)
@@ -56,21 +62,26 @@ theorem absIrr_block {k G : Type} [Field k] {r t : ℕ} (M : G → Matrix (Fin (
   rintro _ ⟨_, ⟨g, rfl⟩, rfl⟩
   exact ⟨g, (hL g).symm⟩
 
-variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) {i : N.Loc}
-  (r : N.X i → (GE N →* GL (Fin R.nV) (N.O i)))
+variable
+  {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂)
+  {i : N.Loc} (r : N.X i → (GE N →* GL (Fin R.nV) (N.O i)))
   (ρ : N.X i → (GE N →* GL (Fin R.r) (N.O i))) (π : N.X i)
 
 theorem one_le_letterBlockLength (R : Ranks) : 1 ≤ R.t := by
   have h := R.rank_add_five_le
   omega
 
-theorem absIrr_of_res (hN : NormAt N r ρ π)
-    (hres : Submodule.span (kk N i)
-      (Set.range (mapM (IsLocalRing.residue (N.O i)) (rhoO N i ρ π))) = ⊤) :
-    AbsIrr (fun g => ((repX N r g π).toSquareBlock (blk R) 0).map (IsLocalRing.residue (N.O i))) :=
-  absIrr_block (r := R.r) (t := R.t) (fun g => (rO N i r π g).map (IsLocalRing.residue (N.O i)))
+theorem absIrr_of_res
+    (hN : NormAt N r ρ π)
+    (hres
+      : Submodule.span (kk N i) (Set.range (mapM (IsLocalRing.residue (N.O i)) (rhoO N i ρ π))) = ⊤)
+    : AbsIrr (fun g =>
+      ((repX N r g π).toSquareBlock (blk R) 0).map (IsLocalRing.residue (N.O i))) :=
+  absIrr_block (r := R.r) (t := R.t)
+    (fun g => (rO N i r π g).map (IsLocalRing.residue (N.O i)))
     (fun g => mapM (IsLocalRing.residue (N.O i)) (rhoO N i ρ π) g)
-    (fun g a b => congrArg (IsLocalRing.residue (N.O i)) (hN.2.2 g a b)) hres
+    (fun g a b => congrArg (IsLocalRing.residue (N.O i)) (hN.2.2 g a b))
+    hres
 
 end Formalism.MainNotions.N.RepresentationBoundsCohomology
 

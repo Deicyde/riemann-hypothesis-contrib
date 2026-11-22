@@ -8,16 +8,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 open Module
 
 section
-variable {K M : Type} [Field K] [IsAlgClosed K] [AddCommGroup M] [Module K M] [FiniteDimensional K M]
+variable
+  {K M : Type} [Field K] [IsAlgClosed K] [AddCommGroup M] [Module K M] [FiniteDimensional K M]
 
 omit [IsAlgClosed K] in
-private theorem finrank_map_lt (U : Submodule K M) (S : Module.End K M) (v : M) (hv : v ∈ U) (hv0 : v ≠ 0)
-    (hS : S v = 0) : finrank K (U.map S) < finrank K U := by
+private theorem finrank_map_lt
+    (U : Submodule K M) (S : Module.End K M) (v : M) (hv : v ∈ U) (hv0 : v ≠ 0) (hS : S v = 0)
+    : finrank K (U.map S) < finrank K U := by
   have h1 := LinearMap.finrank_range_add_finrank_ker (S.domRestrict U)
   rw [LinearMap.range_domRestrict] at h1
-  have h2 : LinearMap.ker (S.domRestrict U) ≠ ⊥ := (Submodule.ne_bot_iff _).mpr
-    ⟨⟨v, hv⟩, by simpa using hS, fun h => hv0 (congrArg Subtype.val h)⟩
-  have h3 : finrank K (LinearMap.ker (S.domRestrict U)) ≠ 0 := fun h => h2 (Submodule.finrank_eq_zero.mp h)
+  have h2 : LinearMap.ker (S.domRestrict U) ≠ ⊥ :=
+    (Submodule.ne_bot_iff _).mpr ⟨⟨v, hv⟩, by simpa using hS, fun h => hv0 (congrArg Subtype.val h)⟩
+  have h3 : finrank K (LinearMap.ker (S.domRestrict U)) ≠ 0 := fun h =>
+    h2 (Submodule.finrank_eq_zero.mp h)
   omega
 
 end
@@ -60,9 +63,12 @@ private def bdd {I : Type} (V : Submodule K (I → K)) : Submodule K V where
       exact hv n
 
 omit [IsUltrametricDist K] in
-private theorem eig_le_one {I : Type} {V : Submodule K (I → K)} (T : Module.End K V)
-    (hT : ∀ v : V, (∀ n, ‖v.1 n‖ ≤ 1) → ∀ n, ‖(T v).1 n‖ ≤ 1) (v : V) (hv0 : v ≠ 0) (hv : ∀ n, ‖v.1 n‖ ≤ 1)
-    (c : K) (hc : T v = c • v) : ‖c‖ ≤ 1 := by
+private theorem eig_le_one
+    {I : Type} {V : Submodule K (I → K)}
+    (T : Module.End K V) (hT : ∀ v : V, (∀ n, ‖v.1 n‖ ≤ 1) → ∀ n, ‖(T v).1 n‖ ≤ 1) (v : V)
+    (hv0 : v ≠ 0) (hv : ∀ n, ‖v.1 n‖ ≤ 1)
+    (c : K) (hc : T v = c • v)
+    : ‖c‖ ≤ 1 := by
   by_contra h
   push Not at h
   have hk : ∀ k : ℕ, ∀ n, ‖(c ^ k • v).1 n‖ ≤ 1 := by
@@ -85,13 +91,19 @@ private theorem eig_le_one {I : Type} {V : Submodule K (I → K)} (T : Module.En
   rw [inv_mul_cancel₀ hpos.ne'] at h3
   linarith
 
-private theorem main [IsAlgClosed K] {I J : Type} (V : Submodule K (I → K)) [FiniteDimensional K V]
+private theorem main
+    [IsAlgClosed K]
+    {I J : Type} (V : Submodule K (I → K)) [FiniteDimensional K V]
     (T : J → Module.End K V) (hc : ∀ i j, T i * T j = T j * T i)
     (h1 : ∀ j (v : V), (∀ n, ‖v.1 n‖ ≤ 1) → ∀ n, ‖(T j v).1 n‖ ≤ 1)
-    (h2 : ∀ j (v : V), (∀ n, ‖v.1 n‖ < 1) → ∀ n, ‖(T j v).1 n‖ < 1) (a : J → K) (ha : ∀ j, ‖a j‖ ≤ 1) :
-    ∀ (d : ℕ) (U : Submodule K V), finrank K U = d → U ≤ bdd V → (∀ j, ∀ x ∈ U, T j x ∈ U) →
-      ∀ f ∈ U, (∀ n, ‖f.1 n‖ ≤ 1) → (∃ n, ‖f.1 n‖ = 1) → (∀ j n, ‖(T j f).1 n - a j * f.1 n‖ < 1) →
-      ∃ (h : V) (b : J → K), h ≠ 0 ∧ (∀ n, ‖h.1 n‖ ≤ 1) ∧ (∀ j, T j h = b j • h) ∧ ∀ j, ‖b j - a j‖ < 1 := by
+    (h2 : ∀ j (v : V), (∀ n, ‖v.1 n‖ < 1) → ∀ n, ‖(T j v).1 n‖ < 1)
+    (a : J → K) (ha : ∀ j, ‖a j‖ ≤ 1)
+    : ∀ (d : ℕ) (U : Submodule K V),
+      finrank K U = d → U ≤ bdd V → (∀ j, ∀ x ∈ U, T j x ∈ U)
+        → ∀ f ∈ U,
+          (∀ n, ‖f.1 n‖ ≤ 1) → (∃ n, ‖f.1 n‖ = 1) → (∀ j n, ‖(T j f).1 n - a j * f.1 n‖ < 1)
+            → ∃ (h : V) (b : J → K),
+              h ≠ 0 ∧ (∀ n, ‖h.1 n‖ ≤ 1) ∧ (∀ j, T j h = b j • h) ∧ ∀ j, ‖b j - a j‖ < 1 := by
   intro d
   induction d using Nat.strong_induction_on with
   | _ d ih =>
@@ -127,8 +139,8 @@ private theorem main [IsAlgClosed K] {I J : Type} (V : Submodule K (I → K)) [F
         rw [hS]
         exact U.sub_mem (hT j x hx) (U.smul_mem c hx)
       have hSn : ∀ (x : V) n, (S x).1 n = (T j x).1 n - c * x.1 n := fun x n => by rw [hS]; simp
-      refine ih _ (hd ▸ finrank_map_lt U S v hv hv0 (by rw [hS, hcv, sub_self])) (U.map S) rfl (hle.trans hb) ?_
-        (S f) ⟨f, hfU, rfl⟩ ?_ ?_ ?_
+      refine ih _ (hd ▸ finrank_map_lt U S v hv hv0 (by rw [hS, hcv, sub_self])) (U.map S) rfl
+        (hle.trans hb) ?_ (S f) ⟨f, hfU, rfl⟩ ?_ ?_ ?_
       · rintro i _ ⟨x, hx, rfl⟩
         exact ⟨T i x, hT i x hx, (hcomm i x).symm⟩
       · intro n
@@ -159,10 +171,10 @@ private theorem main [IsAlgClosed K] {I J : Type} (V : Submodule K (I → K)) [F
 
 end
 
-theorem UpperTheory.V.Sd.delSerre :
-    UpperTheory.V.Sd.DelSerre := by
+theorem UpperTheory.V.Sd.delSerre : UpperTheory.V.Sd.DelSerre := by
   intro l _ I J V hV T hc h1 h2 f a hf hf1 ha hfa
-  refine main V T hc h1 h2 a ha _ (bdd V) rfl le_rfl ?_ f ⟨1, one_ne_zero, by simpa using hf⟩ hf hf1 hfa
+  refine main V T hc h1 h2 a ha _ (bdd V) rfl le_rfl ?_ f ⟨1, one_ne_zero, by simpa using hf⟩ hf hf1
+    hfa
   rintro j x ⟨c, hc0, hx⟩
   refine ⟨c, hc0, ?_⟩
   rw [← map_smul]

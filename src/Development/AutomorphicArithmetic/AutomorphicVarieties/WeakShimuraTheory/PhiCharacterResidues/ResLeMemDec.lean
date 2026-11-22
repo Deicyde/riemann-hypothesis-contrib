@@ -5,17 +5,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-private theorem adic_mul {Γ R : Type} [TopologicalSpace Γ] [CommRing R] {I : Ideal R} {f g : Γ → R}
-    (hf : AdicCont I f) (hg : AdicCont I g) : AdicCont I fun x => f x * g x := by
+private theorem adic_mul
+    {Γ R : Type} [TopologicalSpace Γ] [CommRing R]
+    {I : Ideal R} {f g : Γ → R} (hf : AdicCont I f) (hg : AdicCont I g)
+    : AdicCont I fun x => f x * g x := by
   intro N
   convert (hf N).mul (hg N) using 1
   funext x
   exact map_mul _ _ _
 
-private theorem adic_pow {Γ R : Type} [TopologicalSpace Γ] [CommRing R] {I : Ideal R} {f : Γ → R}
-    (hf : AdicCont I f) (n : ℕ) : AdicCont I fun x => f x ^ n := by
+private theorem adic_pow
+    {Γ R : Type} [TopologicalSpace Γ] [CommRing R]
+    {I : Ideal R} {f : Γ → R} (hf : AdicCont I f)
+    (n : ℕ)
+    : AdicCont I fun x => f x ^ n := by
   induction n with
   | zero =>
     intro N
@@ -25,9 +32,11 @@ private theorem adic_pow {Γ R : Type} [TopologicalSpace Γ] [CommRing R] {I : I
     simp only [pow_succ]
     exact adic_mul ih hf
 
-private theorem adic_alg {Γ O R : Type} [TopologicalSpace Γ] [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R]
-    [IsCO O R] {f : Γ → O} (hf : AdicCont (maximalIdeal O) f) :
-    AdicCont (maximalIdeal R) fun x => algebraMap O R (f x) := by
+private theorem adic_alg
+    {Γ O R : Type}
+    [TopologicalSpace Γ] [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
+    {f : Γ → O} (hf : AdicCont (maximalIdeal O) f)
+    : AdicCont (maximalIdeal R) fun x => algebraMap O R (f x) := by
   have hloc : IsLocalHom (algebraMap O R) := IsCO.isLocalHom
   intro N
   have hN : (maximalIdeal O) ^ N ≤ Ideal.comap (algebraMap O R) ((maximalIdeal R) ^ N) := by
@@ -36,36 +45,46 @@ private theorem adic_alg {Γ O R : Type} [TopologicalSpace Γ] [CommRing O] [IsL
     rw [Ideal.map_le_iff_le_comap]
     intro a ha
     exact map_nonunit (algebraMap O R) a ha
-  have := (hf N).comp (Ideal.Quotient.lift ((maximalIdeal O) ^ N)
-    ((Ideal.Quotient.mk ((maximalIdeal R) ^ N)).comp (algebraMap O R))
-    (fun a ha => Ideal.Quotient.eq_zero_iff_mem.mpr (hN ha)))
+  have :=
+    (hf N).comp
+      (Ideal.Quotient.lift ((maximalIdeal O) ^ N)
+        ((Ideal.Quotient.mk ((maximalIdeal R) ^ N)).comp (algebraMap O R))
+        (fun a ha => Ideal.Quotient.eq_zero_iff_mem.mpr (hN ha)))
   convert this using 1
   funext g
   simp only [Function.comp_apply, Ideal.Quotient.lift_mk, RingHom.coe_comp]
 
-private theorem resLe_mem_Dec {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {F L : IntermediateField ℚ Ω}
-    (h : F ≤ L) {A A' : ValuationSubring Ω} (e : A = A') (g : Dec (F := L) A) : resLe h g ∈ Dec (F := F) A' := by
+private theorem resLe_mem_Dec
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {F L : IntermediateField ℚ Ω} (h : F ≤ L)
+    {A A' : ValuationSubring Ω} (e : A = A') (g : Dec (F := L) A)
+    : resLe h g ∈ Dec (F := F) A' := by
   subst e
   exact g.2
 
-theorem UpperTheory.V.Ws.phiIsPsi :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (K : Link T c' h) (X : Space (T.fr ∅) (inc h)) (n : ℕ), ∀ (ψ : ∀ v : W.Vl l T.L, Fin 4 → Dec (F := T.L) (K.s.A v) →* X.Bˣ), K.IsPsiT X n ψ → ∀ v i, K.r.IsPsi v i (ψ v i) := by
+theorem UpperTheory.V.Ws.phiIsPsi
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (K : Link T c' h)
+        (X : Space (T.fr ∅) (inc h)) (n : ℕ),
+      ∀ (ψ : ∀ v : W.Vl l T.L, Fin 4 → Dec (F := T.L) (K.s.A v) →* X.Bˣ),
+        K.IsPsiT X n ψ → ∀ v i, K.r.IsPsi v i (ψ v i) := by
   intro Ω _ _ _ l _ c D T c' h K X n ψ hψ v i
   change W.Vl l T.L at v
-  have hmem : ∀ g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))),
-      resLe T.F_le (g : G T.L Ω) ∈ (T.fr ∅).Gv (K.e v) :=
-    fun g => resLe_mem_Dec T.F_le (K.hA v) g
+  have hmem
+      : ∀ g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))),
+        resLe T.F_le (g : G T.L Ω) ∈ (T.fr ∅).Gv (K.e v) := fun g =>
+    resLe_mem_Dec T.F_le (K.hA v) g
   refine ⟨?_, ?_, ?_⟩
-  · have hsc : AdicCont (maximalIdeal X.B)
-        fun g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))) => algebraMap c'.O X.B (K.sc n g) := by
+  · have hsc : AdicCont (maximalIdeal X.B) fun g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))) =>
+        algebraMap c'.O X.B (K.sc n g) := by
       have h0 : AdicCont (maximalIdeal c'.O) fun g : G T.L Ω => K.sc n g :=
         adic_mul K.κ_cont (adic_pow K.β_cont n)
       have h1 : AdicCont (maximalIdeal c'.O)
-          fun g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))) => K.sc n g :=
-        fun N => (h0 N).comp_continuous continuous_subtype_val
+          fun g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))) => K.sc n g := fun N =>
+        (h0 N).comp_continuous continuous_subtype_val
       exact adic_alg h1
-    have hX : AdicCont (maximalIdeal X.B)
-        fun g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))) => X.ψ (K.e v) i (resLe T.F_le g) := by
+    have hX : AdicCont (maximalIdeal X.B) fun g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))) =>
+        X.ψ (K.e v) i (resLe T.F_le g) := by
       intro N
       have hc : Continuous fun g : Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L))) =>
           (⟨resLe T.F_le g, hmem g⟩ : (T.fr ∅).Gv (K.e v)) :=
@@ -88,14 +107,13 @@ theorem UpperTheory.V.Ws.phiIsPsi :
     have hβ : K.β g.1.1 = 1 := MonoidHom.mem_ker.mp (K.β_t (MonoidHom.mem_ker.mpr ht))
     have hmu : resLe T.F_le g.1.1 ∈ (T.fr ∅).Mu (K.e v) :=
       phiMu ((resLe T.F_le).comp (Dec (F := T.L) (K.s.A (v : W.Plc (W.Lp T.L)))).subtype)
-        ((continuous_resLe T.F_le).comp continuous_subtype_val)
-        (Dec (F := T.F) (T.pl (K.e v))) hmem g.1 g.2
+        ((continuous_resLe T.F_le).comp continuous_subtype_val) (Dec (F := T.F) (T.pl (K.e v))) hmem
+        g.1 g.2
     have hψ1 : X.ψ (K.e v) i (resLe T.F_le g.1.1) = 1 := by
       apply X.inj
       rw [X.ψ_map _ _ _ (hmem g.1), map_one]
       exact X.pair.mu (K.e v) _ hmu i
-    have hsc1 : K.sc n g.1.1 = 1 := by
-      simp [Link.sc, hκ, hβ]
+    have hsc1 : K.sc n g.1.1 = 1 := by simp [Link.sc, hκ, hβ]
     have hth : ((K.r.th v i g : c'.Oˣ) : c'.O) = 1 := by
       have := congrArg (fun f => ((f g : c'.Oˣ) : c'.O)) (K.th v i)
       simpa using this

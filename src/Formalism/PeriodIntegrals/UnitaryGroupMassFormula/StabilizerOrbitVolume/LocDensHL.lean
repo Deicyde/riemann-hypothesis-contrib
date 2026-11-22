@@ -12,10 +12,13 @@ namespace PI.VolStabSW
 namespace LatFactsW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  {d : ℕ} (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  {d : ℕ} (b : Module.Basis (Fin d) F E)
+  (v : HeightOneSpectrum (𝓞 F))
 
 instance contSMul_herm (σ : E →ₐ[F] E) (a : ℕ) : ContinuousSMul (Fv F v) (HermR (Fv F v) σ a) := by
   refine ⟨continuous_induced_rng.2 ?_⟩
@@ -26,6 +29,7 @@ instance contSMul_herm (σ : E →ₐ[F] E) (a : ℕ) : ContinuousSMul (Fv F v) 
 end LatFactsW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW LatFactsW
+open NumberField IsDedekindDomain Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW LatFactsW
 
 end PI.VolStabSW

@@ -8,16 +8,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open Formalism.BasicNotions Formalism.BasicNotions.Loc
 open scoped Matrix
 
 namespace GlobalTheory
 
-theorem hasWeight_neg_of_pow_cyc_inertia : ∀ (l : ℕ) [Fact l.Prime] (κ : GQ l →* (Qbar l)ˣ),
-    Continuous (fun σ => (κ σ : Qbar l)) → ∀ (e m : ℕ), 1 ≤ m →
-    (∀ σ ∈ Loc.Iq l, (κ σ * Loc.cycA l l (Qbar l) σ ^ (e : ℤ)) ^ m = 1) →
-    Loc.HasWeight (MonoidHom.id (GQ l)) κ (-(e : ℤ)) := by
+theorem hasWeight_neg_of_pow_cyc_inertia
+    : ∀ (l : ℕ) [Fact l.Prime] (κ : GQ l →* (Qbar l)ˣ),
+      Continuous (fun σ => (κ σ : Qbar l))
+        → ∀ (e m : ℕ),
+          1 ≤ m → (∀ σ ∈ Loc.Iq l, (κ σ * Loc.cycA l l (Qbar l) σ ^ (e : ℤ)) ^ m = 1)
+            → Loc.HasWeight (MonoidHom.id (GQ l)) κ (-(e : ℤ)) := by
   intro l _ κ hκ e m hm h
   have hcyc : Continuous (Loc.cyc l l) := cyclotomicCharacter.continuous l ℚ_[l] (Om l)
   have ha : Continuous (algebraMap ℤ_[l] (Qbar l)) := by
@@ -36,12 +40,13 @@ theorem hasWeight_neg_of_pow_cyc_inertia : ∀ (l : ℕ) [Fact l.Prime] (κ : GQ
   have hf1 : f 1 = 1 := by simp [hf_def]
   have hm0 : 0 < m := hm
   have hfin : ({z : Qbar l | z ^ m = 1} \ {1}).Finite := by
-    refine Set.Finite.subset (Multiset.finite_toSet (Polynomial.nthRoots m (1 : Qbar l))) fun z hz => ?_
+    refine Set.Finite.subset (Multiset.finite_toSet (Polynomial.nthRoots m (1 : Qbar l)))
+      fun z hz => ?_
     exact (Polynomial.mem_nthRoots hm0).2 hz.1
   have ho : IsOpen (f ⁻¹' ({z : Qbar l | z ^ m = 1} \ {1})ᶜ) :=
     hfin.isClosed.isOpen_compl.preimage hf
-  obtain ⟨U, hU⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one ho
-    (fun hx => hx.2 hf1)
+  obtain ⟨U, hU⟩ :=
+    ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one ho (fun hx => hx.2 hf1)
   refine ⟨U.toOpenSubgroup.toSubgroup, U.toOpenSubgroup.isOpen, fun g hg hgI => ?_⟩
   have hgI' : g ∈ Loc.Iq l := hgI
   have hpow : f g ^ m = 1 := by

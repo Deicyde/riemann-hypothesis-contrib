@@ -13,16 +13,21 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.NormChar
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open Formalism.L2.Host UpperTheory.V.Published UpperTheory.CBC
 open scoped Classical
 open UpperTheory.Gal.InertialTypesAlt.G
 
-theorem UpperTheory.Gal.InertialTypesAlt.G.fibTrace :
-    UpperTheory.Gal.InertialTypesAlt.G.FibTrace := by
-  intro F E _ _ _ _ _ _ _ _ σ hσ hp n hn μE _ μF _ π P V Λ t hC hAt hW V₀ Λ₀ t₀ hS hAt₀ hΛ ht v _ m τ τ₀ hτ hO f z hf hz
+theorem UpperTheory.Gal.InertialTypesAlt.G.fibTrace
+    : UpperTheory.Gal.InertialTypesAlt.G.FibTrace := by
+  intro F E _ _ _ _ _ _ _ _ σ hσ hp n hn μE _ μF _ π P V Λ t hC hAt hW V₀ Λ₀ t₀ hS hAt₀ hΛ ht v _ m
+    τ τ₀ hτ hO f z hf hz
   obtain ⟨π₀, hπ₀, -⟩ := Dp.exCusp F n μF V₀ hS
   obtain ⟨-, -, hcl, -⟩ := T.carryLift F E σ hσ hp n hn μE μF
   have hl := hcl π₀ P V₀ V Λ₀ t₀ Λ t hπ₀ hC hAt₀ hAt hΛ ht

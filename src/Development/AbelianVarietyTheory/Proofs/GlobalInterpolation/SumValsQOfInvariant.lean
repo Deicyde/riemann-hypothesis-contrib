@@ -10,21 +10,28 @@ open NumberField IsDedekindDomain Formalism.L2.Col
 
 namespace GlobalTheory
 
-theorem sum_range_mul_of_periodic {K : Type} [Field K] (g : ℕ → K) (N : ℕ)
-    (hg : ∀ i, g (N + i) = g i) (k : ℕ) :
-    ∑ i ∈ Finset.range (N * k), g i = (k : K) * ∑ i ∈ Finset.range N, g i := by
+theorem sum_range_mul_of_periodic
+    {K : Type} [Field K] (g : ℕ → K) (N : ℕ) (hg : ∀ i, g (N + i) = g i) (k : ℕ)
+    : ∑ i ∈ Finset.range (N * k), g i = (k : K) * ∑ i ∈ Finset.range N, g i := by
   first
   | exact @_root_.GlobalTheory.PeriodicSumShift.sum_range_mul_of_periodic
   | exact _root_.GlobalTheory.PeriodicSumShift.sum_range_mul_of_periodic
   | (apply _root_.GlobalTheory.PeriodicSumShift.sum_range_mul_of_periodic <;> assumption)
   | (intros; apply _root_.GlobalTheory.PeriodicSumShift.sum_range_mul_of_periodic <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PeriodicSumShift.sum_range_mul_of_periodic <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.PeriodicSumShift.sum_range_mul_of_periodic
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PeriodicSumShift.sum_range_mul_of_periodic ..)
 
-theorem sum_valsQ_of_invariant (E : Type) [Field E] [NumberField E]
-    (P : HeightOneSpectrum (𝓞 E)) (K : Type) [Field K] (f : E → K) (B₀ : ℕ)
-    (hf : ∀ a u, IntAt P u → f (a + (qOf P : E) ^ B₀ * u) = f a) (A B : ℕ) (hB : B₀ ≤ B) :
-    ∑ a ∈ LocE.valsQ E (qOf P) A B, f a
+theorem sum_valsQ_of_invariant
+    (E : Type) [Field E] [NumberField E]
+    (P : HeightOneSpectrum (𝓞 E))
+    (K : Type) [Field K]
+    (f : E → K) (B₀ : ℕ) (hf : ∀ a u, IntAt P u → f (a + (qOf P : E) ^ B₀ * u) = f a)
+    (A B : ℕ) (hB : B₀ ≤ B)
+    : ∑ a ∈ LocE.valsQ E (qOf P) A B, f a
       = (qOf P : K) ^ (B - B₀) * ∑ a ∈ LocE.valsQ E (qOf P) A B₀, f a := by
   classical
   have hq : (qOf P : E) ≠ 0 := by
@@ -33,8 +40,10 @@ theorem sum_valsQ_of_invariant (E : Type) [Field E] [NumberField E]
       rw [Ne, Ideal.absNorm_eq_zero_iff]
       exact P.ne_bot
     exact_mod_cast this
-  have key : ∀ C : ℕ, ∑ a ∈ LocE.valsQ E (qOf P) A C, f a
-      = ∑ i ∈ Finset.range (qOf P ^ (A + C)), f ((i : E) / (qOf P : E) ^ A) := by
+  have key
+      : ∀ C : ℕ,
+        ∑ a ∈ LocE.valsQ E (qOf P) A C, f a
+          = ∑ i ∈ Finset.range (qOf P ^ (A + C)), f ((i : E) / (qOf P : E) ^ A) := by
     intro C
     unfold LocE.valsQ
     rw [Finset.sum_image]

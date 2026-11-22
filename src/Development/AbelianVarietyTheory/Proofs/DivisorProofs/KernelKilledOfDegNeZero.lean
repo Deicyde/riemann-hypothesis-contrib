@@ -15,8 +15,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsogenyFlatF
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -27,10 +29,14 @@ namespace GlobalTheory.AV.KerInv
 
 variable {K : Type} [Field K]
 
-theorem eq_one_of_coprime {A B : AbVar K} (f : A ⟶ B) (hf : IsIsogeny f) (m : ℕ) (hm : 0 < m)
-    (hcop : Nat.Coprime m (deg f)) {T : Over (Sp K)} (x : T ⟶ A.X)
-    (hx : x ≫ f.hom = 1) (hxm : x ^ m = 1) : x = 1 := by
-  obtain ⟨C, q, i, hq, hi, hqi⟩ := GlobalTheory.T.exists_factorisation_through_abelianSubvariety K A (prod B A) (prodLift f ((m : ℤ) • 𝟙 A))
+theorem eq_one_of_coprime
+    {A B : AbVar K} (f : A ⟶ B) (hf : IsIsogeny f)
+    (m : ℕ) (hm : 0 < m) (hcop : Nat.Coprime m (deg f))
+    {T : Over (Sp K)} (x : T ⟶ A.X) (hx : x ≫ f.hom = 1) (hxm : x ^ m = 1)
+    : x = 1 := by
+  obtain ⟨C, q, i, hq, hi, hqi⟩ :=
+    GlobalTheory.T.exists_factorisation_through_abelianSubvariety K A (prod B A)
+      (prodLift f ((m : ℤ) • 𝟙 A))
   have h1 : q ≫ (i ≫ prodFst B A) = f := by
     rw [← Category.assoc, hqi]
     apply Subtype.ext
@@ -44,16 +50,18 @@ theorem eq_one_of_coprime {A B : AbVar K} (f : A ⟶ B) (hf : IsIsogeny f) (m : 
   have hfin : Finite (ptMap f).ker := (isFinite_iff_finite_ker K A B f).1 hf.1
   have hqfin : IsFinite q.hom.left := by
     rw [isFinite_iff_finite_ker]
-    refine Finite.of_injective (β := (ptMap f).ker)
-      (fun y => ⟨y.1, ?_⟩) (by intro y z h; simp only [Subtype.mk.injEq] at h; exact Subtype.ext h)
+    refine Finite.of_injective (β := (ptMap f).ker) (fun y => ⟨y.1, ?_⟩) (by
+      intro y z h; simp only [Subtype.mk.injEq] at h; exact Subtype.ext h)
     have hy : y.1 ≫ q.hom = 1 := y.2
     rw [MonoidHom.mem_ker, ptMap_apply, ← h1, comp_hom, ← Category.assoc, hy, one_comp]
-  have hAC : A.dim = C.dim := le_antisymm ((DimLe.dim_le K A C q).1 hqfin) ((DimLe.dim_le K A C q).2 hq)
+  have hAC : A.dim = C.dim :=
+    le_antisymm ((DimLe.dim_le K A C q).1 hqfin) ((DimLe.dim_le K A C q).2 hq)
   have hAB : A.dim = B.dim := (isogeny_flat_finrank K A B f hf).1
   have hd1 := (isIsogeny_comp_iff_and_deg_comp K A C B q (i ≫ prodFst B A) hAC (hAC ▸ hAB)).2
   rw [h1] at hd1
   have hd2 := (isIsogeny_comp_iff_and_deg_comp K A C A q (i ≫ prodSnd B A) hAC hAC.symm).2
-  rw [h2, (MulIsogeny.mul_isogeny K A (m : ℤ) (by exact_mod_cast hm.ne')).2, Int.natAbs_natCast] at hd2
+  rw [h2, (MulIsogeny.mul_isogeny K A (m : ℤ) (by exact_mod_cast hm.ne')).2, Int.natAbs_natCast]
+    at hd2
   have hq1 : deg q = 1 := by
     have a : deg q ∣ deg f := ⟨_, hd1⟩
     have b : deg q ∣ m ^ (2 * A.dim) := ⟨_, hd2⟩
@@ -83,14 +91,14 @@ theorem eq_one_of_coprime {A B : AbVar K} (f : A ⟶ B) (hf : IsIsogeny f) (m : 
     have := congrArg Over.Hom.left hyi
     simp only [Over.comp_left] at this
     exact (cancel_mono i.hom.left).1 this
-  have hqq : q.hom ≫ (inv q).hom = 𝟙 A.X := by
-    rw [← comp_hom, IsIso.hom_inv_id, id_hom]
-  calc x = (x ≫ q.hom) ≫ (inv q).hom := by rw [Category.assoc, hqq, Category.comp_id]
+  have hqq : q.hom ≫ (inv q).hom = 𝟙 A.X := by rw [← comp_hom, IsIso.hom_inv_id, id_hom]
+  calc
+    x = (x ≫ q.hom) ≫ (inv q).hom := by rw [Category.assoc, hqq, Category.comp_id]
     _ = 1 := by rw [hy, MonObj.one_comp]
 
-theorem kernel_killed_of_deg_ne_zero (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (hf : IsIsogeny f)
-    (hd : ((deg f : ℕ) : K) ≠ 0) :
-    ∃ n : ℕ, (n : K) ≠ 0 ∧ ∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ≫ f.hom = 1 → x ^ n = 1 := by
+theorem kernel_killed_of_deg_ne_zero
+    (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (hf : IsIsogeny f) (hd : ((deg f : ℕ) : K) ≠ 0)
+    : ∃ n : ℕ, (n : K) ≠ 0 ∧ ∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ≫ f.hom = 1 → x ^ n = 1 := by
   obtain ⟨n0, hn0, hkill⟩ := KerKill.kernel_killed K A B f hf.1
   obtain ⟨p, hp⟩ := CharP.exists K
   rcases CharP.char_is_prime_or_zero K p with hpp | hp0

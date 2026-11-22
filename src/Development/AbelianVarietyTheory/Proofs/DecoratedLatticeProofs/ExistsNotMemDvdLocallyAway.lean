@@ -9,12 +9,13 @@ open NumberField IsDedekindDomain Formalism.L2.Ker
 
 namespace GlobalTheory
 
-theorem exists_not_mem_dvd_locally_away (E : Type) [Field E] [NumberField E]
-    (Q : HeightOneSpectrum (𝓞 E)) (r : 𝓞 E) (hr : r ≠ 0) :
-    ∃ t : 𝓞 E, t ∉ Q.asIdeal ∧ ∀ Q' : HeightOneSpectrum (𝓞 E), Q' ≠ Q →
-      ∃ w : 𝓞 E, w ∉ Q'.asIdeal ∧ ∃ z : 𝓞 E, w * t = r * z := by
-  have hI : Ideal.span {r} ≠ ⊥ := by
-    rwa [Ne, Ideal.span_singleton_eq_bot]
+theorem exists_not_mem_dvd_locally_away
+    (E : Type) [Field E] [NumberField E] (Q : HeightOneSpectrum (𝓞 E)) (r : 𝓞 E) (hr : r ≠ 0)
+    : ∃ t : 𝓞 E,
+      t ∉ Q.asIdeal
+        ∧ ∀ Q' : HeightOneSpectrum (𝓞 E),
+          Q' ≠ Q → ∃ w : 𝓞 E, w ∉ Q'.asIdeal ∧ ∃ z : 𝓞 E, w * t = r * z := by
+  have hI : Ideal.span {r} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
   have hnu : ¬ IsUnit Q.asIdeal := fun h => Q.isPrime.ne_top (Ideal.isUnit_iff.1 h)
   obtain ⟨J, hJ, hnd⟩ := (FiniteMultiplicity.of_not_isUnit hnu hI).exists_eq_pow_mul_and_not_dvd
   set m := multiplicity Q.asIdeal (Ideal.span {r})
@@ -28,8 +29,7 @@ theorem exists_not_mem_dvd_locally_away (E : Type) [Field E] [NumberField E]
     exact hQ' (HeightOneSpectrum.ext h2.symm)
   obtain ⟨w, hwm, hwQ'⟩ := Set.not_subset.1 hnle
   refine ⟨w, hwQ', ?_⟩
-  have hmem : w * t ∈ Ideal.span {r} := by
-    rw [hJ]; exact Ideal.mul_mem_mul hwm htJ
+  have hmem : w * t ∈ Ideal.span {r} := by rw [hJ]; exact Ideal.mul_mem_mul hwm htJ
   obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 hmem
   exact ⟨z, by rw [← hz, mul_comm]⟩
 

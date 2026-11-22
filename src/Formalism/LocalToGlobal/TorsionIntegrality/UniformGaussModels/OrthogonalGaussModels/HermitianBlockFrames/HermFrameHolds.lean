@@ -10,6 +10,7 @@ public import Formalism.LocalToGlobal.TorsionIntegrality.UniformGaussModels.Orth
 namespace Formalism.L2.Th1.Top.FrP
 
 theorem hermFrame_holds : HermFrame :=
-  UnitaryGroupMassFormula.HermFrame.hermFrame_of_locCore UnitaryGroupMassFormula.HermFrame.Loc.local_core'
+  UnitaryGroupMassFormula.HermFrame.hermFrame_of_locCore
+    UnitaryGroupMassFormula.HermFrame.Loc.local_core'
 
 end Formalism.L2.Th1.Top.FrP

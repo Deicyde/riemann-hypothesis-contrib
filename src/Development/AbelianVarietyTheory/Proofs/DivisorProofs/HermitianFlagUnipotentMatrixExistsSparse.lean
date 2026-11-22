@@ -8,24 +8,32 @@ open scoped ComplexOrder
 
 namespace GlobalTheory
 
-theorem isotropic_unipotent_column_relations : ∀ (n r : ℕ) (J : Matrix (Fin n) (Fin n) ℂ) (X : Matrix (Fin n) (Fin r) ℂ), X.conjTranspose * J * X = 0 →
-    ∀ (l d : ℕ) (h : l + d ≤ r) (u : Matrix (Fin n) (Fin n) ℂ) (A : Matrix (Fin l) (Fin d) ℂ),
-      let X₁ : Matrix (Fin n) (Fin l) ℂ := X.submatrix id fun j => ⟨j.val, by omega⟩
-      let Xb : Matrix (Fin n) (Fin d) ℂ := X.submatrix id fun j => ⟨l + j.val, by omega⟩
-      let X₂ : Matrix (Fin n) (Fin (l + d)) ℂ := X.submatrix id fun j => ⟨j.val, by omega⟩
-      u * X₁ = X₁ → u * Xb = Xb + X₁ * A →
-      (∀ v : Fin n → ℂ, Matrix.mulVec (X₂.conjTranspose * J) v = 0 →
-        ∃ (w : Fin (l + d) → ℂ) (a : Fin l → ℂ), Matrix.mulVec u v - v = Matrix.mulVec X₂ w + Matrix.mulVec X₁ a) →
-      ∃ N : Matrix (Fin r) (Fin r) ℂ, u * X = X + X * N ∧
-        (∀ i j, N i j ≠ 0 → (i.val < l ∧ l ≤ j.val) ∨ (i.val < l + d ∧ l + d ≤ j.val)) ∧
-        (∀ v : Fin n → ℂ, (∀ i : Fin r, i.val < l + d → Matrix.mulVec (X.conjTranspose * J) v i = 0) →
-          ∃ w : Fin r → ℂ, (∀ i, w i ≠ 0 → i.val < l + d) ∧ Matrix.mulVec u v - v = Matrix.mulVec X w) := by
+theorem isotropic_unipotent_column_relations
+    : ∀ (n r : ℕ) (J : Matrix (Fin n) (Fin n) ℂ) (X : Matrix (Fin n) (Fin r) ℂ),
+      X.conjTranspose * J * X = 0
+        → ∀ (l d : ℕ) (h : l + d ≤ r) (u : Matrix (Fin n) (Fin n) ℂ) (A : Matrix (Fin l) (Fin d) ℂ),
+          let X₁ : Matrix (Fin n) (Fin l) ℂ := X.submatrix id fun j => ⟨j.val, by omega⟩
+          let Xb : Matrix (Fin n) (Fin d) ℂ := X.submatrix id fun j => ⟨l + j.val, by omega⟩
+          let X₂ : Matrix (Fin n) (Fin (l + d)) ℂ := X.submatrix id fun j => ⟨j.val, by omega⟩
+          u * X₁ = X₁ → u * Xb = Xb + X₁ * A
+            → (∀ v : Fin n → ℂ,
+              Matrix.mulVec (X₂.conjTranspose * J) v = 0
+                → ∃ (w : Fin (l + d) → ℂ) (a : Fin l → ℂ),
+                  Matrix.mulVec u v - v = Matrix.mulVec X₂ w + Matrix.mulVec X₁ a)
+            → ∃ N : Matrix (Fin r) (Fin r) ℂ,
+              u * X = X + X * N
+                ∧ (∀ i j, N i j ≠ 0 → (i.val < l ∧ l ≤ j.val) ∨ (i.val < l + d ∧ l + d ≤ j.val))
+                ∧ (∀ v : Fin n → ℂ,
+                  (∀ i : Fin r, i.val < l + d → Matrix.mulVec (X.conjTranspose * J) v i = 0)
+                    → ∃ w : Fin r → ℂ,
+                      (∀ i, w i ≠ 0 → i.val < l + d)
+                        ∧ Matrix.mulVec u v - v = Matrix.mulVec X w) := by
   intro n r J X hX l d h u A X₁ Xb X₂ h1 hb hperp
   classical
-
-  have hext : ∀ (m : ℕ) (hm : m ≤ r) (a : Fin m → ℂ),
-      Matrix.mulVec X (fun i : Fin r => if hi : i.val < m then a ⟨i.val, hi⟩ else 0) =
-        Matrix.mulVec (X.submatrix id fun j : Fin m => (⟨j.val, by omega⟩ : Fin r)) a := by
+  have hext
+      : ∀ (m : ℕ) (hm : m ≤ r) (a : Fin m → ℂ),
+        Matrix.mulVec X (fun i : Fin r => if hi : i.val < m then a ⟨i.val, hi⟩ else 0)
+          = Matrix.mulVec (X.submatrix id fun j : Fin m => (⟨j.val, by omega⟩ : Fin r)) a := by
     intro m hm a
     funext k
     simp only [Matrix.mulVec, dotProduct, Matrix.submatrix_apply, id]
@@ -40,21 +48,29 @@ theorem isotropic_unipotent_column_relations : ∀ (n r : ℕ) (J : Matrix (Fin 
       simp [this]
     · intro j
       simp
-  have he1 : ∀ a : Fin l → ℂ, Matrix.mulVec X (fun i : Fin r => if hi : i.val < l then a ⟨i.val, hi⟩ else 0) =
-      Matrix.mulVec X₁ a := fun a => hext l (by omega) a
-  have he2 : ∀ a : Fin (l + d) → ℂ, Matrix.mulVec X (fun i : Fin r => if hi : i.val < l + d then a ⟨i.val, hi⟩ else 0) =
-      Matrix.mulVec X₂ a := fun a => hext (l + d) h a
-  have hcol : ∀ (v : Fin n → ℂ) (i : Fin (l + d)),
-      Matrix.mulVec (X₂.conjTranspose * J) v i =
-        Matrix.mulVec (X.conjTranspose * J) v ⟨i.val, by omega⟩ := by
+  have he1
+      : ∀ a : Fin l → ℂ,
+        Matrix.mulVec X (fun i : Fin r => if hi : i.val < l then a ⟨i.val, hi⟩ else 0)
+          = Matrix.mulVec X₁ a := fun a =>
+    hext l (by omega) a
+  have he2
+      : ∀ a : Fin (l + d) → ℂ,
+        Matrix.mulVec X (fun i : Fin r => if hi : i.val < l + d then a ⟨i.val, hi⟩ else 0)
+          = Matrix.mulVec X₂ a := fun a =>
+    hext (l + d) h a
+  have hcol
+      : ∀ (v : Fin n → ℂ) (i : Fin (l + d)),
+        Matrix.mulVec (X₂.conjTranspose * J) v i
+          = Matrix.mulVec (X.conjTranspose * J) v ⟨i.val, by omega⟩ := by
     intro v i
     rfl
   have hXc : ∀ (i j : Fin r), Matrix.mulVec (X.conjTranspose * J) (fun k => X k j) i = 0 := by
     intro i j
     exact congrFun (congrFun hX i) j
-  have key : ∀ j : Fin r, ∃ c : Fin r → ℂ,
-      (∀ i, c i ≠ 0 → (i.val < l ∧ l ≤ j.val) ∨ (i.val < l + d ∧ l + d ≤ j.val)) ∧
-      Matrix.mulVec u (fun k => X k j) = (fun k => X k j) + Matrix.mulVec X c := by
+  have key
+      : ∀ j : Fin r, ∃ c : Fin r → ℂ,
+        (∀ i, c i ≠ 0 → (i.val < l ∧ l ≤ j.val) ∨ (i.val < l + d ∧ l + d ≤ j.val))
+          ∧ Matrix.mulVec u (fun k => X k j) = (fun k => X k j) + Matrix.mulVec X c := by
     intro j
     by_cases hj1 : j.val < l
     · refine ⟨0, fun i hi => absurd rfl hi, ?_⟩
@@ -74,15 +90,20 @@ theorem isotropic_unipotent_column_relations : ∀ (n r : ℕ) (J : Matrix (Fin 
         funext k
         have := congrFun (congrFun hb k) ⟨j.val - l, by omega⟩
         have hjj : (⟨l + (j.val - l), by omega⟩ : Fin r) = j := Fin.ext (by simp; omega)
-        simp only [Matrix.mul_apply, Matrix.add_apply, Xb, X₁, Matrix.submatrix_apply, id, hjj] at this
+        simp only [Matrix.mul_apply, Matrix.add_apply, Xb, X₁, Matrix.submatrix_apply, id, hjj]
+          at this
         simpa [Matrix.mulVec, dotProduct, Matrix.mul_apply, X₁] using this
     · have hz : Matrix.mulVec (X₂.conjTranspose * J) (fun k => X k j) = 0 := by
         funext i
         rw [hcol]
         exact hXc _ _
       obtain ⟨w, a, hwa⟩ := hperp _ hz
-      refine ⟨(fun i : Fin r => if hi : i.val < l + d then w ⟨i.val, hi⟩ else 0) +
-          (fun i : Fin r => if hi : i.val < l then a ⟨i.val, hi⟩ else 0), ?_, ?_⟩
+      refine ⟨
+        (fun i : Fin r => if hi : i.val < l + d then w ⟨i.val, hi⟩ else 0)
+          + (fun i : Fin r => if hi : i.val < l then a ⟨i.val, hi⟩ else 0),
+        ?_,
+        ?_
+      ⟩
       · intro i hi
         right
         refine ⟨?_, by omega⟩
@@ -104,8 +125,12 @@ theorem isotropic_unipotent_column_relations : ∀ (n r : ℕ) (J : Matrix (Fin 
       rw [hcol]
       exact hv _ (by simp)
     obtain ⟨w, a, hwa⟩ := hperp v hz
-    refine ⟨(fun i : Fin r => if hi : i.val < l + d then w ⟨i.val, hi⟩ else 0) +
-        (fun i : Fin r => if hi : i.val < l then a ⟨i.val, hi⟩ else 0), ?_, ?_⟩
+    refine ⟨
+      (fun i : Fin r => if hi : i.val < l + d then w ⟨i.val, hi⟩ else 0)
+        + (fun i : Fin r => if hi : i.val < l then a ⟨i.val, hi⟩ else 0),
+      ?_,
+      ?_
+    ⟩
     · intro i hi
       by_contra hc
       have hc' : ¬ i.val < l := by omega

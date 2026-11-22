@@ -16,13 +16,15 @@ variable {l : ℕ} [Fact l.Prime]
 section Mod
 variable {M : Type*} [AddCommGroup M] [Module ℤ_[l] M]
 
-theorem lsmul_eq {N : Type*} [AddCommGroup N] [Module ℤ_[l] N] (n : ℕ) (y : N) :
-    (l : ℤ_[l]) ^ n • y = l ^ n • y := by
+theorem lsmul_eq {N : Type*} [AddCommGroup N] [Module ℤ_[l] N] (n : ℕ) (y : N)
+    : (l : ℤ_[l]) ^ n • y = l ^ n • y := by
   rw [← Nat.cast_pow, Nat.cast_smul_eq_nsmul]
 
-theorem pow_of_smul {N : Type*} [AddCommGroup N] [Module ℤ_[l] N] {c : ℤ_[l]} (hc : c ≠ 0) {y : N}
-    (h : c • y = 0) : ∃ n : ℕ, (l : ℤ_[l]) ^ n • y = 0 := by
-  obtain ⟨u, v, hu⟩ : ∃ (u : ℤ_[l]ˣ) (v : ℕ), c = u * (l : ℤ_[l]) ^ v := ⟨_, _, PadicInt.unitCoeff_spec hc⟩
+theorem pow_of_smul
+    {N : Type*} [AddCommGroup N] [Module ℤ_[l] N] {c : ℤ_[l]} (hc : c ≠ 0) {y : N} (h : c • y = 0)
+    : ∃ n : ℕ, (l : ℤ_[l]) ^ n • y = 0 := by
+  obtain ⟨u, v, hu⟩ : ∃ (u : ℤ_[l]ˣ) (v : ℕ), c = u * (l : ℤ_[l]) ^ v :=
+    ⟨_, _, PadicInt.unitCoeff_spec hc⟩
   subst hu
   refine ⟨v, ?_⟩
   have h2 : ((u⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) * (u * (l : ℤ_[l]) ^ v) = (l : ℤ_[l]) ^ v := by
@@ -31,9 +33,11 @@ theorem pow_of_smul {N : Type*} [AddCommGroup N] [Module ℤ_[l] N] {c : ℤ_[l]
 
 theorem l_ne_zero : (l : ℤ_[l]) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
 
-theorem tors_of_forall [Module.Finite ℤ_[l] M] (x : M)
-    (h : ∀ k : ℕ, ∃ w t : M, (∃ n : ℕ, (l : ℤ_[l]) ^ n • t = 0) ∧ x = (l : ℤ_[l]) ^ k • w + t) :
-    ∃ n : ℕ, (l : ℤ_[l]) ^ n • x = 0 := by
+theorem tors_of_forall
+    [Module.Finite ℤ_[l] M]
+    (x : M)
+    (h : ∀ k : ℕ, ∃ w t : M, (∃ n : ℕ, (l : ℤ_[l]) ^ n • t = 0) ∧ x = (l : ℤ_[l]) ^ k • w + t)
+    : ∃ n : ℕ, (l : ℤ_[l]) ^ n • x = 0 := by
   set T := Submodule.torsion' ℤ_[l] M (Submonoid.powers (l : ℤ_[l]))
   have hI : (Ideal.span {(l : ℤ_[l])}) ≠ ⊤ := by
     rw [Ne, Ideal.span_singleton_eq_top, PadicInt.isUnit_iff, PadicInt.norm_p]
@@ -51,12 +55,14 @@ theorem tors_of_forall [Module.Finite ℤ_[l] M] (x : M)
     refine Submodule.smul_mem_smul ?_ Submodule.mem_top
     rw [Ideal.span_singleton_pow]
     exact Ideal.mem_span_singleton_self _
-  rw [Submodule.mem_bot, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_torsion'_iff] at hx
+  rw [Submodule.mem_bot, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero,
+      Submodule.mem_torsion'_iff]
+    at hx
   obtain ⟨⟨a, n, rfl⟩, ha⟩ := hx
   exact ⟨n, ha⟩
 
-theorem cyclic_tors (g : M) (hg : ∀ x : M, ∃ c : ℤ_[l], x = c • g) :
-    ∃ N : ℕ, ∀ t : M, (∃ n : ℕ, (l : ℤ_[l]) ^ n • t = 0) → (l : ℤ_[l]) ^ N • t = 0 := by
+theorem cyclic_tors (g : M) (hg : ∀ x : M, ∃ c : ℤ_[l], x = c • g)
+    : ∃ N : ℕ, ∀ t : M, (∃ n : ℕ, (l : ℤ_[l]) ^ n • t = 0) → (l : ℤ_[l]) ^ N • t = 0 := by
   by_cases h0 : ∃ n : ℕ, (l : ℤ_[l]) ^ n • g = 0
   · obtain ⟨N, hN⟩ := h0
     refine ⟨N, fun t _ => ?_⟩
@@ -74,21 +80,25 @@ theorem cyclic_tors (g : M) (hg : ∀ x : M, ∃ c : ℤ_[l], x = c • g) :
     · exact absurd (pow_of_smul hc hn) h0
 
 theorem isLoc : IsLocalizedModule (nonZeroDivisors ℤ_[l]) (TensorProduct.mk ℤ_[l] ℚ_[l] M 1) :=
-  (isLocalizedModule_iff_isBaseChange (nonZeroDivisors ℤ_[l]) ℚ_[l] _).mpr (TensorProduct.isBaseChange ℤ_[l] M ℚ_[l])
+  (isLocalizedModule_iff_isBaseChange (nonZeroDivisors ℤ_[l]) ℚ_[l] _).mpr
+    (TensorProduct.isBaseChange ℤ_[l] M ℚ_[l])
 
 theorem tmul_surj (v : ℚ_[l] ⊗[ℤ_[l]] M) : ∃ (c : ℚ_[l]) (x : M), v = c ⊗ₜ x := by
   have hL := isLoc (l := l) (M := M)
-  obtain ⟨⟨x, s⟩, hv⟩ := IsLocalizedModule.mk'_surjective (nonZeroDivisors ℤ_[l]) (TensorProduct.mk ℤ_[l] ℚ_[l] M 1) v
+  obtain ⟨⟨x, s⟩, hv⟩ :=
+    IsLocalizedModule.mk'_surjective (nonZeroDivisors ℤ_[l]) (TensorProduct.mk ℤ_[l] ℚ_[l] M 1) v
   refine ⟨(algebraMap ℤ_[l] ℚ_[l] s)⁻¹, x, ?_⟩
   rw [← hv]
   simp only [Function.uncurry_apply_pair]
-  rw [IsLocalizedModule.mk'_eq_iff, TensorProduct.mk_apply, Submonoid.smul_def, TensorProduct.smul_tmul',
-    Algebra.smul_def, mul_inv_cancel₀]
+  rw [IsLocalizedModule.mk'_eq_iff, TensorProduct.mk_apply, Submonoid.smul_def,
+    TensorProduct.smul_tmul', Algebra.smul_def, mul_inv_cancel₀]
   exact IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors s.2
 
 theorem tmul_eq_zero (x : M) : (1 : ℚ_[l]) ⊗ₜ[ℤ_[l]] x = 0 ↔ ∃ n : ℕ, (l : ℤ_[l]) ^ n • x = 0 := by
   have hL := isLoc (l := l) (M := M)
-  have e := IsLocalizedModule.eq_zero_iff (nonZeroDivisors ℤ_[l]) (TensorProduct.mk ℤ_[l] ℚ_[l] M 1) (m := x)
+  have e :=
+    IsLocalizedModule.eq_zero_iff (nonZeroDivisors ℤ_[l]) (TensorProduct.mk ℤ_[l] ℚ_[l] M 1)
+      (m := x)
   rw [TensorProduct.mk_apply] at e
   rw [e]
   constructor
@@ -101,8 +111,10 @@ theorem fd [Module.Finite ℤ_[l] M] : FiniteDimensional ℚ_[l] (ℚ_[l] ⊗[�
 
 end Mod
 
-theorem span_dual {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (F : Set (Module.Dual K V)) (h : ∀ v, (∀ f ∈ F, f v = 0) → v = 0) : Submodule.span K F = ⊤ := by
+theorem span_dual
+    {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (F : Set (Module.Dual K V)) (h : ∀ v, (∀ f ∈ F, f v = 0) → v = 0)
+    : Submodule.span K F = ⊤ := by
   set W := Submodule.span K F
   have h1 : W.dualCoannihilator = ⊥ := by
     rw [eq_bot_iff]
@@ -113,11 +125,13 @@ theorem span_dual {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteD
   rw [h1, Submodule.dualAnnihilator_bot] at this
   exact this.symm
 
-theorem pair_tors {A B C : ℕ → Type*} [∀ k, AddCommGroup (A k)] [∀ k, Module ℤ_[l] (A k)]
-    [∀ k, AddCommGroup (B k)] [∀ k, Module ℤ_[l] (B k)] [∀ k, AddCommGroup (C k)] [∀ k, Module ℤ_[l] (C k)]
+theorem pair_tors
+    {A B C : ℕ → Type*}
+    [∀ k, AddCommGroup (A k)] [∀ k, Module ℤ_[l] (A k)] [∀ k, AddCommGroup (B k)]
+    [∀ k, Module ℤ_[l] (B k)] [∀ k, AddCommGroup (C k)] [∀ k, Module ℤ_[l] (C k)]
     {ρA : ∀ m n, A m →+ A n} {ρB : ∀ m n, B m →+ B n} {ρC : ∀ m n, C m →+ C n}
-    {SA : Submodule ℤ_[l] (∀ k, A k)} {SB : Submodule ℤ_[l] (∀ k, B k)} {SC : Submodule ℤ_[l] (∀ k, C k)}
-    (hA : IsSys l A ρA) (hB : IsSys l B ρB) (hC : IsSys l C ρC)
+    {SA : Submodule ℤ_[l] (∀ k, A k)} {SB : Submodule ℤ_[l] (∀ k, B k)}
+    {SC : Submodule ℤ_[l] (∀ k, C k)} (hA : IsSys l A ρA) (hB : IsSys l B ρB) (hC : IsSys l C ρC)
     (hSA : ∀ x, x ∈ SA ↔ ∀ k, ρA (k + 1) k (x (k + 1)) = x k)
     (hSB : ∀ x, x ∈ SB ↔ ∀ k, ρB (k + 1) k (x (k + 1)) = x k)
     (hSC : ∀ x, x ∈ SC ↔ ∀ k, ρC (k + 1) k (x (k + 1)) = x k)
@@ -125,15 +139,16 @@ theorem pair_tors {A B C : ℕ → Type*} [∀ k, AddCommGroup (A k)] [∀ k, Mo
     (hμ : ∀ m n (a : A m) (b : B m), n ≤ m → ρC m n (μ m a b) = μ n (ρA m n a) (ρB m n b))
     (hnd : ∀ k (a : A k), (∀ b, μ k a b = 0) → a = 0)
     (hcyc : ∃ g ∈ SC, ∀ z ∈ SC, ∃ c : ℤ_[l], z = c • g)
-    {x : ∀ k, A k} (hx : x ∈ SA)
-    (h : ∀ y ∈ SB, ∃ n : ℕ, (l : ℤ_[l]) ^ n • (fun k => μ k (x k) (y k)) = 0) :
-    ∃ n : ℕ, (l : ℤ_[l]) ^ n • x = 0 := by
+    {x : ∀ k, A k}
+    (hx : x ∈ SA) (h : ∀ y ∈ SB, ∃ n : ℕ, (l : ℤ_[l]) ^ n • (fun k => μ k (x k) (y k)) = 0)
+    : ∃ n : ℕ, (l : ℤ_[l]) ^ n • x = 0 := by
   classical
   have := hA.finite hSA
   obtain ⟨g, hgS, hg⟩ := hcyc
-  obtain ⟨N, hN⟩ := cyclic_tors (M := SC) ⟨g, hgS⟩ (fun z => by
-    obtain ⟨c, hc⟩ := hg z z.2
-    exact ⟨c, Subtype.ext (by simpa using hc)⟩)
+  obtain ⟨N, hN⟩ :=
+    cyclic_tors (M := SC) ⟨g, hgS⟩ (fun z => by
+      obtain ⟨c, hc⟩ := hg z z.2
+      exact ⟨c, Subtype.ext (by simpa using hc)⟩)
   have hN' : ∀ z ∈ SC, (∃ n : ℕ, (l : ℤ_[l]) ^ n • z = 0) → (l : ℤ_[l]) ^ N • z = 0 := by
     rintro z hz ⟨n, hn⟩
     have := hN ⟨z, hz⟩ ⟨n, Subtype.ext (by simpa using hn)⟩
@@ -152,8 +167,9 @@ theorem pair_tors {A B C : ℕ → Type*} [∀ k, AddCommGroup (A k)] [∀ k, Mo
     simp only [Pi.smul_apply, Pi.zero_apply] at h2
     rw [hx'def, Pi.smul_apply, lsmul_eq, map_nsmul, AddMonoidHom.nsmul_apply, ← lsmul_eq]
     exact h2
-  have key : ∀ k : ℕ, ∃ w t : SA, (∃ n : ℕ, (l : ℤ_[l]) ^ n • t = 0) ∧
-      (⟨x', hx'⟩ : SA) = (l : ℤ_[l]) ^ k • w + t := by
+  have key
+      : ∀ k : ℕ, ∃ w t : SA,
+        (∃ n : ℕ, (l : ℤ_[l]) ^ n • t = 0) ∧ (⟨x', hx'⟩ : SA) = (l : ℤ_[l]) ^ k • w + t := by
     intro k
     obtain ⟨a, ha⟩ := hB.ml hSB k
     have hz : l ^ a • x' (k + a) = 0 := by

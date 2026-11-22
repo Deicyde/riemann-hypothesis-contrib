@@ -9,17 +9,23 @@ public import GroundTheory.AutomorphicForms.DixmierMalliavin
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
 open scoped ContDiff
 
-theorem UpperTheory.exists_finite_basis_leftInvariant_compactSupport :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] (V : Subgroup G),
-        IsOpen (V : Set G) → IsCompact (V : Set G) → ∀ S : Set G, IsCompact S →
-        ∃ (m : ℕ) (b : Fin m → G) (e : Fin m → CompactlySupportedContinuousMap G ℂ),
-          (∀ j, ∀ v ∈ V, ∀ h, e j (v * h) = e j h) ∧
-          ∀ f : G → ℂ, (∀ v ∈ V, ∀ h, f (v * h) = f h) → (∀ h, h ∉ S → f h = 0) →
-            ∀ h, f h = ∑ j, e j h * f (b j) := by
+theorem UpperTheory.exists_finite_basis_leftInvariant_compactSupport
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        (V : Subgroup G),
+      IsOpen (V : Set G) → IsCompact (V : Set G)
+        → ∀ S : Set G,
+          IsCompact S
+            → ∃ (m : ℕ) (b : Fin m → G) (e : Fin m → CompactlySupportedContinuousMap G ℂ),
+              (∀ j, ∀ v ∈ V, ∀ h, e j (v * h) = e j h)
+                ∧ ∀ f : G → ℂ,
+                  (∀ v ∈ V, ∀ h, f (v * h) = f h) → (∀ h, h ∉ S → f h = 0)
+                    → ∀ h, f h = ∑ j, e j h * f (b j) := by
   intro G _ _ _ _ V hVo hVc S hS
   classical
   have hVcl : IsClosed (V : Set G) := Subgroup.isClosed_of_isOpen V hVo
@@ -28,10 +34,8 @@ theorem UpperTheory.exists_finite_basis_leftInvariant_compactSupport :
   have hWpre : ∀ b, W b = (fun h : G => b * h⁻¹) ⁻¹' (V : Set G) := fun b => rfl
   have hcont : ∀ b : G, Continuous (fun h : G => b * h⁻¹) := fun b =>
     continuous_const.mul continuous_inv
-  have hWo : ∀ b, IsOpen (W b) := fun b => by
-    rw [hWpre]; exact hVo.preimage (hcont b)
-  have hWcl : ∀ b, IsClosed (W b) := fun b => by
-    rw [hWpre]; exact hVcl.preimage (hcont b)
+  have hWo : ∀ b, IsOpen (W b) := fun b => by rw [hWpre]; exact hVo.preimage (hcont b)
+  have hWcl : ∀ b, IsClosed (W b) := fun b => by rw [hWpre]; exact hVcl.preimage (hcont b)
   have hWself : ∀ b, b ∈ W b := fun b => by
     show b * b⁻¹ ∈ V
     simpa using V.one_mem
@@ -45,12 +49,13 @@ theorem UpperTheory.exists_finite_basis_leftInvariant_compactSupport :
     rw [this]
     exact V.mul_mem_cancel_right (V.inv_mem hv)
 
-  let E : G → CompactlySupportedContinuousMap G ℂ := fun b =>
-    { toFun := (W b).indicator (fun _ => (1 : ℂ))
-      continuous_toFun := (IsClopen.continuous_indicator ⟨hWcl b, hWo b⟩ continuous_const)
-      hasCompactSupport' := by
-        refine HasCompactSupport.intro (hKc b) (fun x hx => ?_)
-        exact Set.indicator_of_notMem (fun hxW => hx (hWK b hxW)) _ }
+  let E : G → CompactlySupportedContinuousMap G ℂ := fun b => {
+    toFun := (W b).indicator (fun _ => (1 : ℂ))
+    continuous_toFun := (IsClopen.continuous_indicator ⟨hWcl b, hWo b⟩ continuous_const)
+    hasCompactSupport' := by
+      refine HasCompactSupport.intro (hKc b) (fun x hx => ?_)
+      exact Set.indicator_of_notMem (fun hxW => hx (hWK b hxW)) _
+  }
   have hE : ∀ b h, E b h = (W b).indicator (fun _ => (1 : ℂ)) h := fun _ _ => rfl
 
   let q : G → Quotient (QuotientGroup.rightRel V) := fun h => Quotient.mk _ h
@@ -76,8 +81,7 @@ theorem UpperTheory.exists_finite_basis_leftInvariant_compactSupport :
       simpa using this.symm
     by_cases hT : q h ∈ T
     · let j0 : Fin T.card := ε ⟨q h, hT⟩
-      have hj0 : q (b j0) = q h := by
-        rw [hqb]; simp [j0]
+      have hj0 : q (b j0) = q h := by rw [hqb]; simp [j0]
       have hmem : h ∈ W (b j0) := (hq _ _).1 hj0.symm
       rw [Finset.sum_eq_single j0]
       · rw [hE, Set.indicator_of_mem hmem, one_mul]
@@ -98,6 +102,5 @@ theorem UpperTheory.exists_finite_basis_leftInvariant_compactSupport :
       rw [hfS h hhS]
       symm
       refine Finset.sum_eq_zero (fun j _ => ?_)
-      have hnot : h ∉ W (b j) := fun hm => hT (by
-        rw [(hq _ _).2 hm, hqb]; exact (ε.symm j).2)
+      have hnot : h ∉ W (b j) := fun hm => hT (by rw [(hq _ _).2 hm, hqb]; exact (ε.symm j).2)
       rw [hE, Set.indicator_of_notMem hnot, zero_mul]

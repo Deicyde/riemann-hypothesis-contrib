@@ -15,36 +15,39 @@ namespace GlobalTheory.MomDual
 
 variable {g : ℕ}
 
-theorem hf_add_left (Hm : Matrix (Fin g) (Fin g) ℂ) (z z' w : Fin g → ℂ) :
-    hf Hm (z + z') w = hf Hm z w + hf Hm z' w := by
+theorem hf_add_left (Hm : Matrix (Fin g) (Fin g) ℂ) (z z' w : Fin g → ℂ)
+    : hf Hm (z + z') w = hf Hm z w + hf Hm z' w := by
   simp only [hf, Pi.add_apply, add_mul, Finset.sum_add_distrib]
 
-theorem hf_sub_left (Hm : Matrix (Fin g) (Fin g) ℂ) (z z' w : Fin g → ℂ) :
-    hf Hm (z - z') w = hf Hm z w - hf Hm z' w := by
+theorem hf_sub_left (Hm : Matrix (Fin g) (Fin g) ℂ) (z z' w : Fin g → ℂ)
+    : hf Hm (z - z') w = hf Hm z w - hf Hm z' w := by
   simp only [hf, Pi.sub_apply, sub_mul, Finset.sum_sub_distrib]
 
-theorem hf_smul_left (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (z w : Fin g → ℂ) :
-    hf Hm (c • z) w = c * hf Hm z w := by
+theorem hf_smul_left (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (z w : Fin g → ℂ)
+    : hf Hm (c • z) w = c * hf Hm z w := by
   simp only [hf, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, mul_assoc]
 
-theorem hf_zero_left (Hm : Matrix (Fin g) (Fin g) ℂ) (w : Fin g → ℂ) : hf Hm 0 w = 0 := by
-  simp [hf]
+theorem hf_zero_left (Hm : Matrix (Fin g) (Fin g) ℂ) (w : Fin g → ℂ) : hf Hm 0 w = 0 := by simp [hf]
 
-theorem hf_sum_left (Hm : Matrix (Fin g) (Fin g) ℂ) {ι : Type*} (t : Finset ι) (c : ι → ℂ) (v : ι → Fin g → ℂ)
-    (w : Fin g → ℂ) : hf Hm (∑ k ∈ t, c k • v k) w = ∑ k ∈ t, c k * hf Hm (v k) w := by
+theorem hf_sum_left
+    (Hm : Matrix (Fin g) (Fin g) ℂ)
+    {ι : Type*} (t : Finset ι) (c : ι → ℂ) (v : ι → Fin g → ℂ)
+    (w : Fin g → ℂ)
+    : hf Hm (∑ k ∈ t, c k • v k) w = ∑ k ∈ t, c k * hf Hm (v k) w := by
   classical
   induction t using Finset.induction_on with
   | empty => simp [hf_zero_left]
-  | insert a t ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, hf_add_left, hf_smul_left, ih]
+  | insert a t ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, hf_add_left, hf_smul_left, ih]
 
-theorem hf_smul_right (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (z w : Fin g → ℂ) :
-    hf Hm z (c • w) = conj c * hf Hm z w := by
+theorem hf_smul_right (Hm : Matrix (Fin g) (Fin g) ℂ) (c : ℂ) (z w : Fin g → ℂ)
+    : hf Hm z (c • w) = conj c * hf Hm z w := by
   simp only [hf, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hf_conj {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian) (z w : Fin g → ℂ) :
-    hf Hm w z = conj (hf Hm z w) := by
+theorem hf_conj {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian) (z w : Fin g → ℂ)
+    : hf Hm w z = conj (hf Hm z w) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [hf, map_sum, map_mul, Complex.conj_conj]
   rw [Finset.sum_comm]
@@ -52,9 +55,11 @@ theorem hf_conj {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian) (z w : F
   have h : Hm j i = conj (Hm i j) := by
     have := congrFun (congrFun hH j) i
     simpa [Matrix.conjTranspose_apply] using this.symm
-  rw [h]; ring
+  rw [h]
+  ring
 
-theorem hf_self_ne {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.PosDef) {z : Fin g → ℂ} (hz : z ≠ 0) : hf Hm z z ≠ 0 := by
+theorem hf_self_ne {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.PosDef) {z : Fin g → ℂ} (hz : z ≠ 0)
+    : hf Hm z z ≠ 0 := by
   have hx : star z ≠ 0 := by simpa using hz
   have h := hH.dotProduct_mulVec_pos hx
   have e : dotProduct (star (star z)) (Hm.mulVec (star z)) = hf Hm z z := by
@@ -62,17 +67,21 @@ theorem hf_self_ne {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.PosDef) {z : Fin g
   rw [e] at h
   exact h.ne'
 
-theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : ℕ) (b : Fin r → Fin g → ℂ), S.Ok → S.NNBasis q b →
-    ∃ (s : ℕ) (c : Fin r → Fin g → ℂ), Nat.Coprime s q ∧ (∀ j, c j ∈ S.La) ∧
-      (∀ i j, beta S.d S.Hm (c j) (b i) = if i = j then (s : ℂ) else 0) ∧
-      ∀ x ∈ S.La, (s : ℂ) • x = ∑ j, beta S.d S.Hm x (b j) • c j := by
+theorem dual_basis
+    : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : ℕ) (b : Fin r → Fin g → ℂ),
+      S.Ok → S.NNBasis q b
+        → ∃ (s : ℕ) (c : Fin r → Fin g → ℂ),
+          Nat.Coprime s q ∧ (∀ j, c j ∈ S.La)
+            ∧ (∀ i j, beta S.d S.Hm (c j) (b i) = if i = j then (s : ℂ) else 0)
+            ∧ ∀ x ∈ S.La, (s : ℂ) • x = ∑ j, beta S.d S.Hm x (b j) • c j := by
   intro q _ g S r b hS hb
   obtain ⟨hdp, -, hpos, hdisc, hspan, hw0, -, hdual⟩ := hS
   obtain ⟨hbL, hgen, hind⟩ := hb
   obtain ⟨ρ, hρ⟩ : ∃ ρ : ℝ, ρ = Real.sqrt S.d / 2 := ⟨_, rfl⟩
   have hρ0 : ρ ≠ 0 := by
-    have : (0:ℝ) < S.d := by exact_mod_cast hdp.pos
-    rw [hρ]; positivity
+    have : (0 : ℝ) < S.d := by exact_mod_cast hdp.pos
+    rw [hρ]
+    positivity
   have hρc : (ρ : ℂ) ≠ 0 := by exact_mod_cast hρ0
   have hbeta : ∀ z w, beta S.d S.Hm z w = (ρ : ℂ) * hf S.Hm z w := fun z w => by rw [hρ]; rfl
   have hw0im : (w0 S.d).im = ρ := by simp [w0, rtd, hρ]
@@ -90,7 +99,9 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
     simp_rw [← smul_smul]
     rw [← Finset.smul_sum, ← he, smul_smul, inv_mul_cancel₀ hs0, one_smul]
   have htop : (⊤ : Submodule ℂ (Fin g → ℂ)) ≤ Submodule.span ℂ (Set.range b) := by
-    have h1 : Submodule.span ℝ (S.La : Set (Fin g → ℂ)) ≤ (Submodule.span ℂ (Set.range b)).restrictScalars ℝ := by
+    have h1
+        : Submodule.span ℝ (S.La : Set (Fin g → ℂ))
+          ≤ (Submodule.span ℂ (Set.range b)).restrictScalars ℝ := by
       rw [Submodule.span_le]
       intro x hx
       obtain ⟨μ, rfl⟩ := hmemspan x hx
@@ -105,13 +116,18 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
     rw [ZLattice.rank ℝ S.La]
     simp [Module.finrank_pi_fintype, Complex.finrank_real_complex]
     ring
-  have hli2 : LinearIndependent ℤ (fun p : Fin r ⊕ Fin r => (⟨Sum.elim (fun i => b i) (fun i => w0 S.d • b i) p,
-      by rcases p with i | i; exacts [hbL i, hw0 _ (hbL i)]⟩ : S.La)) := by
+  have hli2 : LinearIndependent ℤ (fun p : Fin r ⊕ Fin r =>
+      (⟨
+         Sum.elim (fun i => b i) (fun i => w0 S.d • b i) p,
+         by rcases p with i | i; exacts [hbL i, hw0 _ (hbL i)]
+       ⟩
+        : S.La)) := by
     rw [Fintype.linearIndependent_iff]
     intro n hn
     have hn' := congrArg Subtype.val hn
-    simp only [Fintype.sum_sum_type, Submodule.coe_add, Submodule.coe_sum, Submodule.coe_smul, Sum.elim_inl,
-      Sum.elim_inr, Submodule.coe_zero] at hn'
+    simp only [Fintype.sum_sum_type, Submodule.coe_add, Submodule.coe_sum, Submodule.coe_smul,
+        Sum.elim_inl, Sum.elim_inr, Submodule.coe_zero]
+      at hn'
     have key : ∑ i, ((n (Sum.inl i) : ℂ) + (n (Sum.inr i) : ℂ) * w0 S.d) • b i = 0 := by
       rw [← hn']
       simp only [add_smul, mul_smul, Finset.sum_add_distrib, Int.cast_smul_eq_zsmul]
@@ -120,7 +136,8 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
       have := congrArg Complex.im (hc i); simpa [hw0im, hρ0] using this
     have hl : ∀ i, n (Sum.inl i) = 0 := fun i => by
       have := hc i; simp only [hm i, Int.cast_zero, zero_mul, add_zero] at this; exact_mod_cast this
-    rintro (i | i); exacts [hl i, hm i]
+    rintro (i | i)
+    exacts [hl i, hm i]
   have hrg : r ≤ g := by
     have := hli2.fintype_card_le_finrank
     simp only [Fintype.card_sum, Fintype.card_fin, hrk] at this
@@ -139,7 +156,8 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
   obtain ⟨A, hAdef⟩ : ∃ A : Matrix (Fin r) (Fin r) ℂ, A = fun i j => hf S.Hm (b i) (b j) := ⟨_, rfl⟩
   have hvm : ∀ w : Fin r → ℂ, ∀ i, Matrix.vecMul w A i = hf S.Hm (∑ k, w k • b k) (b i) := by
     intro w i
-    rw [hf_sum_left, hAdef]; rfl
+    rw [hf_sum_left, hAdef]
+    rfl
   have hA : IsUnit A := by
     rw [← Matrix.vecMul_injective_iff_isUnit]
     intro u v huv
@@ -147,11 +165,14 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
       apply L0
       intro i
       have huv' : Matrix.vecMul u A = Matrix.vecMul v A := huv
-      rw [← hvm, Matrix.sub_vecMul, huv', sub_self]; rfl
+      rw [← hvm, Matrix.sub_vecMul, huv', sub_self]
+      rfl
     have := Fintype.linearIndependent_iff.mp hlin (u - v) h0
-    funext i; exact sub_eq_zero.mp (this i)
+    funext i
+    exact sub_eq_zero.mp (this i)
   have hinv : A⁻¹ * A = 1 := Matrix.nonsing_inv_mul A ((Matrix.isUnit_iff_isUnit_det A).mp hA)
-  obtain ⟨bs, hbsdef⟩ : ∃ bs : Fin r → Fin g → ℂ, bs = fun j => ∑ k, ((ρ : ℂ)⁻¹ * A⁻¹ j k) • b k := ⟨_, rfl⟩
+  obtain ⟨bs, hbsdef⟩ : ∃ bs : Fin r → Fin g → ℂ, bs = fun j => ∑ k, ((ρ : ℂ)⁻¹ * A⁻¹ j k) • b k :=
+    ⟨_, rfl⟩
   have hbs : ∀ j i, (ρ : ℂ) * hf S.Hm (bs j) (b i) = if j = i then 1 else 0 := by
     intro j i
     rw [hbsdef]
@@ -167,7 +188,9 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
     intro j i
     rw [hconj, ← Complex.conj_ofReal ρ, ← map_mul, hbs]
     split_ifs <;> simp
-  have hOKint : ∀ (c : Fin r → ℂ), (∀ i, c i ∈ OK S.d) → ∀ j, ∃ z : ℤ, (hf S.Hm (∑ i, c i • b i) (bs j)).im = z := by
+  have hOKint
+      : ∀ (c : Fin r → ℂ),
+        (∀ i, c i ∈ OK S.d) → ∀ j, ∃ z : ℤ, (hf S.Hm (∑ i, c i • b i) (bs j)).im = z := by
     intro c hc j
     have e : (ρ : ℂ) * hf S.Hm (∑ i, c i • b i) (bs j) = c j := by
       rw [hf_sum_left, Finset.mul_sum]
@@ -175,9 +198,9 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
       simp
     obtain ⟨v, hv⟩ := hOKim _ (hc j)
     refine ⟨v, ?_⟩
-    have h2 : hf S.Hm (∑ i, c i • b i) (bs j) = c j / (ρ : ℂ) := by
-      rw [← e]; field_simp
-    rw [h2, Complex.div_ofReal_im, hv]; field_simp
+    have h2 : hf S.Hm (∑ i, c i • b i) (bs j) = c j / (ρ : ℂ) := by rw [← e]; field_simp
+    rw [h2, Complex.div_ofReal_im, hv]
+    field_simp
 
   have okAdd : ∀ a a', a ∈ OK S.d → a' ∈ OK S.d → a + a' ∈ OK S.d := by
     rintro _ _ ⟨u, v, rfl⟩ ⟨u', v', rfl⟩; exact ⟨u + u', v + v', by push_cast; ring⟩
@@ -191,7 +214,8 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
   have P0 : P 0 := ⟨0, fun _ => ok0, by simp⟩
   have Pz : ∀ (n : ℤ) y, P y → P ((n : ℂ) • y) := by
     rintro n _ ⟨c, hc, rfl⟩
-    exact ⟨fun i => (n : ℂ) * c i, fun i => okMul n _ (hc i), by rw [Finset.smul_sum]; simp [smul_smul]⟩
+    exact
+      ⟨fun i => (n : ℂ) * c i, fun i => okMul n _ (hc i), by rw [Finset.smul_sum]; simp [smul_smul]⟩
 
   haveI : Module.Finite ℤ S.La := ZLattice.module_finite ℝ S.La
   haveI : Module.Free ℤ S.La := ZLattice.module_free ℝ S.La
@@ -201,17 +225,22 @@ theorem dual_basis : ∀ (q : ℕ) [Fact q.Prime] (g : ℕ) (S : Setup g) (r : �
   choose sI hsI cI hcI heqI using fun k : ι => hgen _ (eB k).2
   obtain ⟨s, hs⟩ : ∃ s : ℕ, s = ∏ k, sI k := ⟨_, rfl⟩
   have hsq : Nat.Coprime s q := hs ▸ Nat.Coprime.prod_left fun k _ => hsI k
-  have hsk : ∀ k, (s : ℂ) • ((eB k : S.La) : Fin g → ℂ) =
-      (((∏ l ∈ Finset.univ.erase k, sI l : ℕ) : ℤ) : ℂ) • ∑ i, cI k i • b i := by
+  have hsk
+      : ∀ k,
+        (s : ℂ) • ((eB k : S.La) : Fin g → ℂ)
+          = (((∏ l ∈ Finset.univ.erase k, sI l : ℕ) : ℤ) : ℂ) • ∑ i, cI k i • b i := by
     intro k
     rw [← heqI k, smul_smul, hs, ← Finset.prod_erase_mul _ _ (Finset.mem_univ k)]
-    congr 1; push_cast; ring
+    congr 1
+    push_cast
+    ring
   have hP : ∀ x ∈ S.La, P ((s : ℂ) • x) := by
     intro x hx
     have hx' : x = ∑ k, ((eB.repr ⟨x, hx⟩ k : ℤ) : ℂ) • ((eB k : S.La) : Fin g → ℂ) := by
       have h := congrArg Subtype.val (eB.sum_repr ⟨x, hx⟩)
       simp only [Submodule.coe_sum, Submodule.coe_smul] at h
-      calc x = ∑ k, eB.repr ⟨x, hx⟩ k • ((eB k : S.La) : Fin g → ℂ) := h.symm
+      calc
+        x = ∑ k, eB.repr ⟨x, hx⟩ k • ((eB k : S.La) : Fin g → ℂ) := h.symm
         _ = _ := Finset.sum_congr rfl fun k _ => (Int.cast_smul_eq_zsmul ℂ _ _).symm
     rw [hx', Finset.smul_sum]
     apply Finset.sum_induction _ P Padd P0

@@ -10,15 +10,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsOpenO
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.StableLat
 
-theorem exists_lattice : ∀ {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G] {Qp LL O : Type} [Field Qp] [TopologicalSpace Qp] [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL], GoodO (Qp := Qp) LL O → ∀ (A : GRep G Qp LL O), Nonempty (Lattice (O := O) A.ρ) := by
+theorem exists_lattice
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G] {Qp LL O : Type} [Field Qp]
+        [TopologicalSpace Qp] [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O]
+        [Algebra O LL],
+      GoodO (Qp := Qp) LL O → ∀ (A : GRep G Qp LL O), Nonempty (Lattice (O := O) A.ρ) := by
   intro G _ _ _ Qp LL O _ _ _ _ _ _ _ hO A
   classical
   obtain ⟨⟨hDom, hDVR, hFrac⟩, -, -, hTop, hOpen⟩ := hO
-  haveI := hDom; haveI := hDVR; haveI := hFrac; haveI := hTop
+  haveI := hDom
+  haveI := hDVR
+  haveI := hFrac
+  haveI := hTop
   have hinj : Function.Injective (algebraMap O LL) := IsFractionRing.injective O LL
 
   let e := Module.finBasis LL A.V
@@ -32,8 +40,8 @@ theorem exists_lattice : ∀ {G : Type} [Group G] [TopologicalSpace G] [CompactS
 
   have hcov : ∀ x : A.V, ∃ b : nonZeroDivisors O, (b : O) • x ∈ T₀ := by
     intro x
-    obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors O) Finset.univ
-      (fun i => e.repr x i)
+    obtain ⟨b, hb⟩ :=
+      IsLocalization.exist_integer_multiples (nonZeroDivisors O) Finset.univ (fun i => e.repr x i)
     refine ⟨b, ?_⟩
     have hx : (b : O) • x = ∑ i, (b : O) • (e.repr x i • e i) := by
       rw [← Finset.smul_sum, e.sum_repr]
@@ -51,11 +59,11 @@ theorem exists_lattice : ∀ {G : Type} [Group G] [TopologicalSpace G] [CompactS
     have : (fun x : A.V => (b : O) • x) = fun x => algebraMap O LL b • x := by
       funext x; rw [algebraMap_smul]
     exact hT₀open.preimage (this ▸ continuous_const_smul _)
-  obtain ⟨t, ht⟩ := hC.elim_finite_subcover U hU (fun x _ => by
-    obtain ⟨b, hb⟩ := hcov x; exact Set.mem_iUnion.2 ⟨b, hb⟩)
+  obtain ⟨t, ht⟩ :=
+    hC.elim_finite_subcover U hU
+      (fun x _ => by obtain ⟨b, hb⟩ := hcov x; exact Set.mem_iUnion.2 ⟨b, hb⟩)
   let b : O := ∏ c ∈ t, (c : O)
-  have hb0 : b ∈ nonZeroDivisors O := by
-    simpa [b] using (∏ c ∈ t, c).2
+  have hb0 : b ∈ nonZeroDivisors O := by simpa [b] using (∏ c ∈ t, c).2
   have hbC : ∀ y ∈ C, b • y ∈ T₀ := by
     intro y hy
     obtain ⟨c, hct, hc⟩ := Set.mem_iUnion₂.1 (ht hy)
@@ -84,8 +92,7 @@ theorem exists_lattice : ∀ {G : Type} [Group G] [TopologicalSpace G] [CompactS
     exact nonZeroDivisors.ne_zero hb0 (hinj (by rw [h, map_zero]))
   have hf : Function.Injective f := by
     intro x y hxy
-    have : algebraMap O LL b • x = algebraMap O LL b • y := by
-      simpa [f, algebraMap_smul] using hxy
+    have : algebraMap O LL b • x = algebraMap O LL b • y := by simpa [f, algebraMap_smul] using hxy
     exact smul_right_injective A.V hbne this
   have hfT : T.map f ≤ T₀ := by
     rw [Submodule.map_le_iff_le_comap]

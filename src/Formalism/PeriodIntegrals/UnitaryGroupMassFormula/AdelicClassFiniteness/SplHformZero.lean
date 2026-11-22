@@ -14,26 +14,33 @@ namespace PIW.AdelClassFin
 open Formalism.UG NumberField
 open scoped Matrix
 
-theorem spl_ker {E : Type} [Field E] [StarRing E] {m k : ℕ} (J : Matrix (Fin m) (Fin m) E)
-    (V : Matrix (Fin m) (Fin k) E)
-    (hΓ : (cT (starRingEnd E) V * J * V).det ≠ 0) (w : Fin m → E) :
-    (cT (starRingEnd E) V * J) *ᵥ (w - V *ᵥ ((cT (starRingEnd E) V * J * V)⁻¹ *ᵥ
-      ((cT (starRingEnd E) V * J) *ᵥ w))) = 0 := by
+theorem spl_ker
+    {E : Type} [Field E] [StarRing E]
+    {m k : ℕ} (J : Matrix (Fin m) (Fin m) E) (V : Matrix (Fin m) (Fin k) E)
+    (hΓ : (cT (starRingEnd E) V * J * V).det ≠ 0) (w : Fin m → E)
+    : (cT (starRingEnd E) V * J)
+        *ᵥ (w - V *ᵥ ((cT (starRingEnd E) V * J * V)⁻¹ *ᵥ ((cT (starRingEnd E) V * J) *ᵥ w)))
+      = 0 := by
   simp [Matrix.mulVec_sub, Matrix.mulVec_mulVec, ← Matrix.mul_assoc,
     Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hΓ)]
 
-theorem spl_cross {E : Type} [Field E] [StarRing E] {m k n : ℕ} (J : Matrix (Fin m) (Fin m) E)
-    (V : Matrix (Fin m) (Fin k) E) (U : Matrix (Fin m) (Fin n) E) (h : cT (starRingEnd E) V * J * U = 0)
-    (c : Fin k → E) (w : Fin n → E) : hform (starRingEnd E) J (V *ᵥ c) (U *ᵥ w) = 0 := by
-  have e1 : ∀ x y : Fin m → E,
-      hform (starRingEnd E) J x y = (fun i => starRingEnd E (x i)) ⬝ᵥ (J *ᵥ y) := by
+theorem spl_cross
+    {E : Type} [Field E] [StarRing E]
+    {m k n : ℕ}
+    (J : Matrix (Fin m) (Fin m) E) (V : Matrix (Fin m) (Fin k) E) (U : Matrix (Fin m) (Fin n) E)
+    (h : cT (starRingEnd E) V * J * U = 0) (c : Fin k → E) (w : Fin n → E)
+    : hform (starRingEnd E) J (V *ᵥ c) (U *ᵥ w) = 0 := by
+  have e1
+      : ∀ x y : Fin m → E,
+        hform (starRingEnd E) J x y = (fun i => starRingEnd E (x i)) ⬝ᵥ (J *ᵥ y) := by
     intro x y
     simp only [hform, dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc]
-  have e2 : (fun i => starRingEnd E ((V *ᵥ c) i)) =
-      (V.map (starRingEnd E)) *ᵥ (fun k => starRingEnd E (c k)) := by
+  have e2
+      : (fun i => starRingEnd E ((V *ᵥ c) i))
+        = (V.map (starRingEnd E)) *ᵥ (fun k => starRingEnd E (c k)) := by
     funext i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
+    simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
   have h' : (V.map (starRingEnd E))ᵀ * J * U = 0 := h
   rw [e1, e2, dotProduct_comm, Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, dotProduct_comm]
   simp only [Matrix.mulVec_mulVec, ← Matrix.mul_assoc, h', Matrix.zero_mulVec, dotProduct_zero]
@@ -53,8 +60,10 @@ theorem spLat : SpLat := by
       simp [Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
     rw [e]
     exact Submodule.sum_mem _ fun i _ => hR _ (hV i) _ (hc i)
-  have dec : ∀ z ∈ M, ∃ c : Fin k → E, (∀ i, c i ∈ (algebraMap (𝓞 E) E).range) ∧ ∃ y : Fin n → E,
-      U *ᵥ y ∈ M ∧ (D : E) • z = V *ᵥ c + U *ᵥ y := by
+  have dec
+      : ∀ z ∈ M, ∃ c : Fin k → E,
+        (∀ i, c i ∈ (algebraMap (𝓞 E) E).range)
+          ∧ ∃ y : Fin n → E, U *ᵥ y ∈ M ∧ (D : E) • z = V *ᵥ c + U *ᵥ y := by
     intro z hz
     set c := (cT (starRingEnd E) V * J * V)⁻¹ *ᵥ ((cT (starRingEnd E) V * J) *ᵥ ((D : E) • z)) with hc
     have hci : ∀ i, c i ∈ (algebraMap (𝓞 E) E).range := by
@@ -82,19 +91,18 @@ theorem spLat : SpLat := by
     obtain ⟨y, hy⟩ := hsurj _ (spl_ker J V hΓ w)
     exact ⟨_, y, by rw [hy]; abel⟩
   refine ⟨⟨?_, ?_, ?_, ?_, ?_, ?_⟩, dec⟩
-  ·
-    have hcc : cT (starRingEnd E) (cT (starRingEnd E) U) = U := by
+  · have hcc : cT (starRingEnd E) (cT (starRingEnd E) U) = U := by
       ext i j
       simp [cT]
     unfold IsHerm at hH ⊢
     rw [cT_mul, cT_mul, hH, hcc, Matrix.mul_assoc]
-  ·
-    intro h0
+  · intro h0
     obtain ⟨a, ha0, ha⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr h0
     have orth : ∀ w, hform (starRingEnd E) J w (U *ᵥ a) = 0 := by
       intro w
       obtain ⟨c, y, rfl⟩ := hsplit w
-      rw [hform_add_left, spl_cross J V U hVJU, zero_add, hform_mulVec, hform_eq, ha, dotProduct_zero]
+      rw [hform_add_left, spl_cross J V U hVJU, zero_add, hform_mulVec, hform_eq, ha,
+        dotProduct_zero]
     have hJa : J *ᵥ (U *ᵥ a) = 0 := by
       ext i
       rw [← hform_single_left]
@@ -103,21 +111,26 @@ theorem spLat : SpLat := by
       by_contra hne
       exact hdet (Matrix.exists_mulVec_eq_zero_iff.mp ⟨_, hne, hJa⟩)
     exact ha0 (hU (by rw [hUa, Matrix.mulVec_zero]))
-  ·
-    refine Submodule.fg_of_fg_map_injective (f := (Matrix.mulVecLin U).restrictScalars (𝓞 E))
-      (fun a b h => hU h) ?_
+  · refine Submodule.fg_of_fg_map_injective (f := (Matrix.mulVecLin U).restrictScalars (𝓞 E))
+      (fun a b h => hU h)
+      ?_
     exact Submodule.FG.of_le hfg (Submodule.map_comap_le _ _)
-  ·
-    set W : Submodule E (Fin m → E) := LinearMap.range (Matrix.mulVecLin V) ⊔
+  · set W : Submodule E (Fin m → E) := LinearMap.range (Matrix.mulVecLin V) ⊔
       (Submodule.span E (M.comap ((Matrix.mulVecLin U).restrictScalars (𝓞 E)) : Set (Fin n → E))).map
         (Matrix.mulVecLin U) with hW
     have hMW : Submodule.span E (M : Set (Fin m → E)) ≤ W := by
       rw [Submodule.span_le]
       intro z hz
       obtain ⟨c, -, y, hyM, hz'⟩ := dec z hz
-      refine Submodule.mem_sup.mpr ⟨V *ᵥ ((D : E)⁻¹ • c), ⟨_, rfl⟩, U *ᵥ ((D : E)⁻¹ • y),
-        Submodule.mem_map_of_mem (Submodule.smul_mem _ _ (Submodule.subset_span hyM)), ?_⟩
-      rw [Matrix.mulVec_smul, Matrix.mulVec_smul, ← smul_add, ← hz', smul_smul, inv_mul_cancel₀ hD0, one_smul]
+      refine Submodule.mem_sup.mpr ⟨
+        V *ᵥ ((D : E)⁻¹ • c),
+        ⟨_, rfl⟩,
+        U *ᵥ ((D : E)⁻¹ • y),
+        Submodule.mem_map_of_mem (Submodule.smul_mem _ _ (Submodule.subset_span hyM)),
+        ?_
+      ⟩
+      rw [Matrix.mulVec_smul, Matrix.mulVec_smul, ← smul_add, ← hz', smul_smul, inv_mul_cancel₀ hD0,
+        one_smul]
     rw [hsp, top_le_iff] at hMW
     rw [Submodule.eq_top_iff']
     intro y0
@@ -138,17 +151,16 @@ theorem spLat : SpLat := by
     have : y = y0 := hU hab
     rw [← this]
     exact hy
-  ·
-    intro x hx y hy
+  · intro x hx y hy
     rw [← hform_mulVec]
     exact hint _ hx _ hy
-  ·
-    intro w hw
+  · intro w hw
     have h1 : (d : E) • ((D : E) • (U *ᵥ w)) ∈ M := by
       refine hdual _ fun z hz => ?_
       obtain ⟨c, -, y, hyM, hz'⟩ := dec z hz
-      have e : hform (starRingEnd E) J z ((D : E) • (U *ᵥ w)) =
-          hform (starRingEnd E) J ((D : E) • z) (U *ᵥ w) := by
+      have e
+          : hform (starRingEnd E) J z ((D : E) • (U *ᵥ w))
+            = hform (starRingEnd E) J ((D : E) • z) (U *ᵥ w) := by
         have h1 := hform_smul J 1 (D : E) z (U *ᵥ w)
         have h2 := hform_smul J (D : E) 1 z (U *ᵥ w)
         rw [one_smul] at h1 h2

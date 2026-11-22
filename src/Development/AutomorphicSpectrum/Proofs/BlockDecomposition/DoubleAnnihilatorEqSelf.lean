@@ -7,9 +7,9 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ContinuousComp
 
 namespace GlobalTheory.CompanionTheory.FiniteDuality
 
-private theorem card_dual_zmod_le_card' (n : ℕ) [NeZero n] (M : Type) [AddCommGroup M]
-    [Module (ZMod n) M] [Finite M] :
-    Nat.card (M →ₗ[ZMod n] ZMod n) ≤ Nat.card M := by
+private theorem card_dual_zmod_le_card'
+    (n : ℕ) [NeZero n] (M : Type) [AddCommGroup M] [Module (ZMod n) M] [Finite M]
+    : Nat.card (M →ₗ[ZMod n] ZMod n) ≤ Nat.card M := by
   classical
   have := Fintype.ofFinite M
   let φ : (M →ₗ[ZMod n] ZMod n) → AddChar M ℂ := fun f =>
@@ -20,24 +20,29 @@ private theorem card_dual_zmod_le_card' (n : ℕ) [NeZero n] (M : Type) [AddComm
     have hx := congrArg (fun ψ : AddChar M ℂ => ψ x) h
     have hx' : Circle.coeHom (ZMod.toCircle (f x)) = Circle.coeHom (ZMod.toCircle (g x)) := hx
     exact ZMod.injective_toCircle (Circle.ext hx')
-  calc Nat.card (M →ₗ[ZMod n] ZMod n) ≤ Nat.card (AddChar M ℂ) :=
-        Nat.card_le_card_of_injective φ hφ
-    _ = Nat.card M := by
-        rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, AddChar.card_eq]
+  calc
+    Nat.card (M →ₗ[ZMod n] ZMod n)
+      ≤ Nat.card (AddChar M ℂ) := Nat.card_le_card_of_injective φ hφ
+    _ = Nat.card M := by rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, AddChar.card_eq]
 
-private theorem card_le_of_injective_pairing_zmod (n : ℕ) [NeZero n] (Z W : Type) [AddCommGroup Z]
-    [Module (ZMod n) Z] [AddCommGroup W] [Module (ZMod n) W] [Finite W]
-    (g : Z →ₗ[ZMod n] W →ₗ[ZMod n] ZMod n) (hg : Function.Injective g) :
-    Nat.card Z ≤ Nat.card W := by
+private theorem card_le_of_injective_pairing_zmod
+    (n : ℕ) [NeZero n]
+    (Z W : Type)
+    [AddCommGroup Z] [Module (ZMod n) Z] [AddCommGroup W] [Module (ZMod n) W] [Finite W]
+    (g : Z →ₗ[ZMod n] W →ₗ[ZMod n] ZMod n) (hg : Function.Injective g)
+    : Nat.card Z ≤ Nat.card W := by
   have : Finite (W →ₗ[ZMod n] ZMod n) :=
     Finite.of_injective (fun f : W →ₗ[ZMod n] ZMod n => (f : W → ZMod n)) DFunLike.coe_injective
   exact (Nat.card_le_card_of_injective g hg).trans (card_dual_zmod_le_card' n W)
 
-theorem double_annihilator (n : ℕ) [NeZero n] (X Y : Type) [AddCommGroup X] [Module (ZMod n) X]
-    [Finite X] [AddCommGroup Y] [Module (ZMod n) Y] [Finite Y]
-    (B : Y →ₗ[ZMod n] X →ₗ[ZMod n] ZMod n) (hB : Function.Injective B)
-    (hB' : Function.Injective B.flip) (U : Submodule (ZMod n) X) :
-    (⨅ y ∈ (⨅ x ∈ U, LinearMap.ker (B.flip x)), LinearMap.ker (B y)) = U := by
+theorem double_annihilator
+    (n : ℕ) [NeZero n]
+    (X Y : Type)
+    [AddCommGroup X] [Module (ZMod n) X] [Finite X] [AddCommGroup Y] [Module (ZMod n) Y] [Finite Y]
+    (B : Y →ₗ[ZMod n] X →ₗ[ZMod n] ZMod n)
+    (hB : Function.Injective B) (hB' : Function.Injective B.flip)
+    (U : Submodule (ZMod n) X)
+    : (⨅ y ∈ (⨅ x ∈ U, LinearMap.ker (B.flip x)), LinearMap.ker (B y)) = U := by
   set A : Submodule (ZMod n) Y := ⨅ x ∈ U, LinearMap.ker (B.flip x) with hAdef
   set W : Submodule (ZMod n) X := ⨅ y ∈ A, LinearMap.ker (B y) with hWdef
   have memA : ∀ y, y ∈ A ↔ ∀ x ∈ U, B y x = 0 := by
@@ -75,7 +80,8 @@ theorem double_annihilator (n : ℕ) [NeZero n] (X Y : Type) [AddCommGroup X] [M
     simp [f2, (memW w).1 w.2 y hy]
   let P2 : (Y ⧸ A) →ₗ[ZMod n] W →ₗ[ZMod n] ZMod n := A.liftQ f2 hA2
   have hP2 : Function.Injective P2.flip := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro w hw
     have hz : B.flip (w : X) = 0 := by
       ext y
@@ -87,7 +93,7 @@ theorem double_annihilator (n : ℕ) [NeZero n] (X Y : Type) [AddCommGroup X] [M
   have c1 : Nat.card (Y ⧸ A) ≤ Nat.card U := card_le_of_injective_pairing_zmod n _ _ P1 hP1
   have c2 : Nat.card W ≤ Nat.card (Y ⧸ A) := card_le_of_injective_pairing_zmod n _ _ P2.flip hP2
   have hle : Nat.card (W.toAddSubgroup) ≤ Nat.card (U.toAddSubgroup) := c2.trans c1
-  exact (Submodule.toAddSubgroup_injective
-    (AddSubgroup.eq_of_le_of_card_ge (show U.toAddSubgroup ≤ W.toAddSubgroup from hUW) hle)).symm
+  exact (Submodule.toAddSubgroup_injective (AddSubgroup.eq_of_le_of_card_ge
+    (show U.toAddSubgroup ≤ W.toAddSubgroup from hUW) hle)).symm
 
 end GlobalTheory.CompanionTheory.FiniteDuality

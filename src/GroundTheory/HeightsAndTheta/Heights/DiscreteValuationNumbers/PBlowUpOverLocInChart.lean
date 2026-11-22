@@ -23,8 +23,8 @@ section Graded
 
 variable {R : Type*} [CommRing R] {κ : Type*} [DecidableEq κ] {E : κ → Type*}
 
-theorem weight_blockWeight (d : (Σ o, E o) →₀ ℕ) :
-    Finsupp.weight (blockWeight E) d = ⇑(d.mapDomain Sigma.fst) := by
+theorem weight_blockWeight (d : (Σ o, E o) →₀ ℕ)
+    : Finsupp.weight (blockWeight E) d = ⇑(d.mapDomain Sigma.fst) := by
   induction d using Finsupp.induction_linear with
   | zero => funext o; simp
   | add x y hx hy => rw [map_add (f := _), hx, hy, Finsupp.mapDomain_add, Finsupp.coe_add]
@@ -35,22 +35,26 @@ theorem weight_blockWeight (d : (Σ o, E o) →₀ ℕ) :
     · subst h; simp [blockWeight]
     · simp [blockWeight, Pi.single_apply, Ne.symm h]
 
-theorem coeff_eval₂_C_mul_X_fst {B : Type*} [CommRing B] (f : R →+* B) (a : (Σ o, E o) → B)
-    (p : MvPolynomial (Σ o, E o) R) (e : κ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (eval₂ (C.comp f) (fun v => C (a v) * X v.1) p) e =
-      eval₂ f a (weightedHomogeneousComponent (blockWeight E) ⇑e p) := by
+theorem coeff_eval₂_C_mul_X_fst
+    {B : Type*} [CommRing B]
+    (f : R →+* B) (a : (Σ o, E o) → B) (p : MvPolynomial (Σ o, E o) R) (e : κ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (eval₂ (C.comp f) (fun v => C (a v) * X v.1) p) e
+      = eval₂ f a (weightedHomogeneousComponent (blockWeight E) ⇑e p) := by
   classical
   induction p using MvPolynomial.induction_on' with
   | monomial d c =>
-    have hX : (monomial (d.mapDomain Sigma.fst) (1 : B) : MvPolynomial κ B) =
-        d.prod fun v n => (X v.1 : MvPolynomial κ B) ^ n := by
+    have hX
+        : (monomial (d.mapDomain Sigma.fst) (1 : B) : MvPolynomial κ B)
+          = d.prod fun v n => (X v.1 : MvPolynomial κ B) ^ n := by
       rw [← rename_monomial, monomial_eq, C_1, one_mul, map_finsuppProd]
       simp [rename_X]
-    have hC : (C (d.prod fun v n => a v ^ n) : MvPolynomial κ B) = d.prod fun v n => C (a v) ^ n := by
+    have hC
+        : (C (d.prod fun v n => a v ^ n) : MvPolynomial κ B) = d.prod fun v n => C (a v) ^ n := by
       rw [map_finsuppProd]
       simp
-    have h : eval₂ (C.comp f) (fun v => C (a v) * X v.1) (monomial d c) =
-        C (eval₂ f a (monomial d c)) * monomial (d.mapDomain Sigma.fst) 1 := by
+    have h
+        : eval₂ (C.comp f) (fun v => C (a v) * X v.1) (monomial d c)
+          = C (eval₂ f a (monomial d c)) * monomial (d.mapDomain Sigma.fst) 1 := by
       rw [eval₂_monomial, eval₂_monomial, hX, map_mul, hC]
       simp only [mul_pow, Finsupp.prod_mul, RingHom.coe_comp, Function.comp_apply]
       ring
@@ -61,11 +65,13 @@ theorem coeff_eval₂_C_mul_X_fst {B : Type*} [CommRing B] (f : R →+* B) (a : 
     · rw [if_neg hd, if_neg (fun h => hd (DFunLike.coe_injective h)), mul_zero, eval₂_zero]
   | add p q hp hq => simp only [eval₂_add, map_add (f := _), MvPolynomial.coeff_add, hp, hq]
 
-theorem eval₂_C_mul_X_fst_of_homog [Fintype κ] {B : Type*} [CommRing B] (f : R →+* B)
-    (a : (Σ o, E o) → B) {p : MvPolynomial (Σ o, E o) R} {b : κ → ℕ}
-    (hp : IsWeightedHomogeneous (blockWeight E) p b) :
-    eval₂ (C.comp f) (fun v => C (a v) * X v.1) p =
-      monomial (Finsupp.equivFunOnFinite.symm b) (eval₂ f a p) := by
+theorem eval₂_C_mul_X_fst_of_homog
+    [Fintype κ]
+    {B : Type*} [CommRing B]
+    (f : R →+* B) (a : (Σ o, E o) → B)
+    {p : MvPolynomial (Σ o, E o) R} {b : κ → ℕ} (hp : IsWeightedHomogeneous (blockWeight E) p b)
+    : eval₂ (C.comp f) (fun v => C (a v) * X v.1) p
+      = monomial (Finsupp.equivFunOnFinite.symm b) (eval₂ f a p) := by
   classical
   ext e
   rw [coeff_eval₂_C_mul_X_fst, coeff_monomial]
@@ -77,12 +83,15 @@ theorem eval₂_C_mul_X_fst_of_homog [Fintype κ] {B : Type*} [CommRing B] (f : 
   · have : Finsupp.equivFunOnFinite.symm b ≠ e := fun h => he (by rw [← h]; simp)
     rw [if_neg this, hp.weightedHomogeneousComponent_ne _ he, eval₂_zero]
 
-theorem eval₂_mul_fst_of_homog [Fintype κ] {B : Type*} [CommRing B] (f : R →+* B)
-    (x : (Σ o, E o) → B) (s : κ → B) {p : MvPolynomial (Σ o, E o) R} {b : κ → ℕ}
-    (hp : IsWeightedHomogeneous (blockWeight E) p b) :
-    eval₂ f (fun v => x v * s v.1) p = eval₂ f x p * ∏ o, s o ^ b o := by
-  have h1 : eval₂ f (fun v => x v * s v.1) p =
-      eval s (eval₂ (C.comp f) (fun v => C (x v) * X v.1) p) := by
+theorem eval₂_mul_fst_of_homog
+    [Fintype κ]
+    {B : Type*} [CommRing B]
+    (f : R →+* B) (x : (Σ o, E o) → B) (s : κ → B)
+    {p : MvPolynomial (Σ o, E o) R} {b : κ → ℕ} (hp : IsWeightedHomogeneous (blockWeight E) p b)
+    : eval₂ f (fun v => x v * s v.1) p = eval₂ f x p * ∏ o, s o ^ b o := by
+  have h1
+      : eval₂ f (fun v => x v * s v.1) p
+        = eval s (eval₂ (C.comp f) (fun v => C (x v) * X v.1) p) := by
     rw [eval, eval₂_comp_left]
     congr 1
     · ext r
@@ -99,25 +108,28 @@ section Lift
 
 variable {K : Type} [DecidableEq K] {ι : K → Type} {J : Type} {R : Type*} [CommRing R]
 
-theorem component_liftForm (g : MRing ι R) (c : K → ℕ) :
-    weightedHomogeneousComponent (blockWeight (extIdx ι J)) (liftMDeg c) (liftForm g) =
-      liftForm (weightedHomogeneousComponent (blockWeight ι) c g) := by
+theorem component_liftForm (g : MRing ι R) (c : K → ℕ)
+    : weightedHomogeneousComponent (blockWeight (extIdx ι J)) (liftMDeg c) (liftForm g)
+      = liftForm (weightedHomogeneousComponent (blockWeight ι) c g) := by
   classical
-  have key : ∀ a : (Σ k, ι k) →₀ ℕ,
-      Finsupp.weight (blockWeight (extIdx ι J))
-        (a.mapDomain fun v : Σ k, ι k => (⟨some v.1, v.2⟩ : Σ o, extIdx ι J o)) =
-      liftMDeg (Finsupp.weight (blockWeight ι) a) := by
+  have key
+      : ∀ a : (Σ k, ι k) →₀ ℕ,
+        Finsupp.weight (blockWeight (extIdx ι J))
+            (a.mapDomain fun v : Σ k, ι k => (⟨some v.1, v.2⟩ : Σ o, extIdx ι J o))
+          = liftMDeg (Finsupp.weight (blockWeight ι) a) := by
     intro a
     induction a using Finsupp.induction_linear with
     | zero => funext o; cases o <;> simp [liftMDeg]
     | add x y hx hy =>
       rw [Finsupp.mapDomain_add, map_add (f := _), map_add (f := _), hx, hy]
-      funext o; cases o <;> simp [liftMDeg]
+      funext o
+      cases o <;> simp [liftMDeg]
     | single v n =>
       rw [Finsupp.mapDomain_single, Finsupp.weight_single, Finsupp.weight_single]
-      funext o; cases o <;> simp [liftMDeg, blockWeight, Pi.single_apply]
-  have inj : ∀ y z : K → ℕ, liftMDeg y = liftMDeg z ↔ y = z :=
-    fun y z => ⟨fun h => funext fun k => congrFun h (some k), fun h => h ▸ rfl⟩
+      funext o
+      cases o <;> simp [liftMDeg, blockWeight, Pi.single_apply]
+  have inj : ∀ y z : K → ℕ, liftMDeg y = liftMDeg z ↔ y = z := fun y z =>
+    ⟨fun h => funext fun k => congrFun h (some k), fun h => h ▸ rfl⟩
   induction g using MvPolynomial.induction_on' with
   | monomial d r =>
     simp only [liftForm, rename_monomial]
@@ -131,7 +143,6 @@ end Lift
 
 end BlowUpOverLocInChart
 
-
 set_option maxHeartbeats 1600000 in
 open BlowUpOverLocInChart in
 theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
@@ -141,12 +152,18 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
   have hev : ∀ g, ev g = algebraMap (MRing ι R ⧸ P) L (Ideal.Quotient.mk P g) := fun _ => rfl
   have hne : ∀ g, g ∉ W → ev g ≠ 0 := fun g hg =>
     HomLocRingMem.algebraMap_mk_ne_zero P (fun h => hg (hPW h))
-  obtain ⟨Cr, hCr⟩ : ∃ Cr : Subring L, Cr = Subring.closure ((homLocRing P W : Set L) ∪ Set.range fun k =>
-      algebraMap (MRing ι R ⧸ P) L (Ideal.Quotient.mk P (u k)) /
-        algebraMap (MRing ι R ⧸ P) L (Ideal.Quotient.mk P (u j))) := ⟨_, rfl⟩
+  obtain ⟨Cr, hCr⟩
+      : ∃ Cr : Subring L,
+        Cr
+          = Subring.closure
+            ((homLocRing P W : Set L) ∪ Set.range fun k =>
+              algebraMap (MRing ι R ⧸ P) L (Ideal.Quotient.mk P (u k))
+                / algebraMap (MRing ι R ⧸ P) L (Ideal.Quotient.mk P (u j))) :=
+    ⟨_, rfl⟩
   rw [← hCr]
-  have hgen : ∀ (c : K → ℕ) (x y : MRing ι R), IsMultiHomog x c → IsMultiHomog y c → y ∉ W →
-      ev x / ev y ∈ Cr := fun c x y hx hy hyW => by
+  have hgen
+      : ∀ (c : K → ℕ) (x y : MRing ι R),
+        IsMultiHomog x c → IsMultiHomog y c → y ∉ W → ev x / ev y ∈ Cr := fun c x y hx hy hyW => by
     rw [hCr]
     exact Subring.subset_closure (Or.inl (Subring.subset_closure ⟨c, x, y, hx, hy, hyW, rfl⟩))
   have hrange : ∀ l, ev (u l) / ev (u j) ∈ Cr := fun l => by
@@ -157,19 +174,20 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
   intro f hf
   by_contra hfC
 
-  let 𝔇 : Ideal Cr :=
-    { carrier := {d | (d : L) * f ∈ Cr}
-      add_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_setOf_eq, Subring.coe_add, add_mul] at ha hb ⊢
-        exact Cr.add_mem ha hb
-      zero_mem' := by
-        simp only [Set.mem_setOf_eq, ZeroMemClass.coe_zero, zero_mul]
-        exact Cr.zero_mem
-      smul_mem' := by
-        intro c d hd
-        simp only [Set.mem_setOf_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at hd ⊢
-        exact Cr.mul_mem c.2 hd }
+  let 𝔇 : Ideal Cr := {
+    carrier := {d | (d : L) * f ∈ Cr}
+    add_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_setOf_eq, Subring.coe_add, add_mul] at ha hb ⊢
+      exact Cr.add_mem ha hb
+    zero_mem' := by
+      simp only [Set.mem_setOf_eq, ZeroMemClass.coe_zero, zero_mul]
+      exact Cr.zero_mem
+    smul_mem' := by
+      intro c d hd
+      simp only [Set.mem_setOf_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at hd ⊢
+      exact Cr.mul_mem c.2 hd
+  }
   have h𝔇 : 𝔇 ≠ ⊤ := by
     intro h
     have h1 : (1 : Cr) ∈ 𝔇 := by rw [h]; trivial
@@ -189,32 +207,42 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
   have haL : ∀ v, aL v ∈ Cr := by
     rintro ⟨o, l⟩
     cases o with
-    | none =>
-      simpa [aL, x, Dinv, blowUpAtOne, div_eq_mul_inv] using hrange l
+    | none => simpa [aL, x, Dinv, blowUpAtOne, div_eq_mul_inv] using hrange l
     | some k =>
-      have h := hgen (blockWeight ι ⟨k, l⟩) (X ⟨k, l⟩) (X ⟨k, i k⟩) (isWeightedHomogeneous_X R _ _)
-        (isWeightedHomogeneous_X R _ _) (hi k)
+      have h :=
+        hgen (blockWeight ι ⟨k, l⟩) (X ⟨k, l⟩) (X ⟨k, i k⟩) (isWeightedHomogeneous_X R _ _)
+          (isWeightedHomogeneous_X R _ _) (hi k)
       simpa [aL, x, Dinv, blowUpAtOne, div_eq_mul_inv] using h
-  obtain ⟨aC, haC⟩ : ∃ aC : (Σ o, extIdx ι J o) → Cr, ∀ v, (aC v : L) = aL v := ⟨fun v => ⟨aL v, haL v⟩, fun _ => rfl⟩
+  obtain ⟨aC, haC⟩ : ∃ aC : (Σ o, extIdx ι J o) → Cr, ∀ v, (aC v : L) = aL v :=
+    ⟨fun v => ⟨aL v, haL v⟩, fun _ => rfl⟩
   have hcst : ∀ r : R, ev (C r) ∈ Cr := fun r => by
     have h := hgen 0 (C r) 1 (isWeightedHomogeneous_C _ _) (isWeightedHomogeneous_one _ _) h1W
     simpa using h
   obtain ⟨fC, hfCv⟩ : ∃ fC : R →+* Cr, ∀ r, (fC r : L) = ev (C r) :=
     ⟨(ev.comp C).codRestrict Cr hcst, fun _ => rfl⟩
-  obtain ⟨ψ, hψ⟩ : ∃ ψ : MvPolynomial (Σ o, extIdx ι J o) R →+* MvPolynomial (Option K) Cr,
-      ψ = eval₂Hom (C.comp fC) fun v => C (aC v) * X v.1 := ⟨_, rfl⟩
-  obtain ⟨Q, hQdef⟩ : ∃ Q : Ideal (MRing (extIdx ι J) R),
-      Q = RingHom.ker ((MvPolynomial.map (Ideal.Quotient.mk 𝔮)).comp ψ) := ⟨_, rfl⟩
-  have memQ : ∀ F, F ∈ Q ↔ ∀ e : Option K →₀ ℕ,
-      eval₂ fC aC (weightedHomogeneousComponent (blockWeight (extIdx ι J)) ⇑e F) ∈ 𝔮 := by
+  obtain ⟨ψ, hψ⟩
+      : ∃ ψ : MvPolynomial (Σ o, extIdx ι J o) R →+* MvPolynomial (Option K) Cr,
+        ψ = eval₂Hom (C.comp fC) fun v => C (aC v) * X v.1 :=
+    ⟨_, rfl⟩
+  obtain ⟨Q, hQdef⟩
+      : ∃ Q : Ideal (MRing (extIdx ι J) R),
+        Q = RingHom.ker ((MvPolynomial.map (Ideal.Quotient.mk 𝔮)).comp ψ) :=
+    ⟨_, rfl⟩
+  have memQ
+      : ∀ F,
+        F ∈ Q
+          ↔ ∀ e : Option K →₀ ℕ,
+            eval₂ fC aC (weightedHomogeneousComponent (blockWeight (extIdx ι J)) ⇑e F) ∈ 𝔮 := by
     intro F
-    simp only [hQdef, hψ, RingHom.mem_ker, RingHom.comp_apply, MvPolynomial.ext_iff, coeff_map, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply,
-      Ideal.Quotient.eq_zero_iff_mem, coe_eval₂Hom, coeff_eval₂_C_mul_X_fst]
+    simp only [hQdef, hψ, RingHom.mem_ker, RingHom.comp_apply, MvPolynomial.ext_iff, coeff_map,
+      AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply, Ideal.Quotient.eq_zero_iff_mem, coe_eval₂Hom,
+      coeff_eval₂_C_mul_X_fst]
 
   have hσ : ∀ F, eval₂ (ev.comp C) x F = algebraMap (MRing ι R ⧸ P) L (blowUpEval P u F) := by
     intro F
-    have h : (eval₂Hom (ev.comp C) x : MRing (extIdx ι J) R →+* L) =
-        (algebraMap (MRing ι R ⧸ P) L).comp (blowUpEval P u) := by
+    have h
+        : (eval₂Hom (ev.comp C) x : MRing (extIdx ι J) R →+* L)
+          = (algebraMap (MRing ι R ⧸ P) L).comp (blowUpEval P u) := by
       apply MvPolynomial.ringHom_ext
       · intro r
         simp [ev, blowUpEval]
@@ -222,8 +250,11 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
       · rintro ⟨o, l⟩
         cases o <;> simp [x, ev, blowUpEval, blowUpAtOne, blowUpSubst]
     exact DFunLike.congr_fun h F
-  have hval : ∀ (F : MRing (extIdx ι J) R) (b : Option K → ℕ), IsMultiHomog F b →
-      ((eval₂ fC aC F : Cr) : L) = algebraMap (MRing ι R ⧸ P) L (blowUpEval P u F) * ∏ o, Dinv o ^ b o := by
+  have hval
+      : ∀ (F : MRing (extIdx ι J) R) (b : Option K → ℕ),
+        IsMultiHomog F b
+          → ((eval₂ fC aC F : Cr) : L)
+            = algebraMap (MRing ι R ⧸ P) L (blowUpEval P u F) * ∏ o, Dinv o ^ b o := by
     intro F b hF
     have e1 : ((eval₂ fC aC F : Cr) : L) = eval₂ (ev.comp C) aL F := by
       have h := eval₂_comp_left Cr.subtype fC aC F
@@ -235,8 +266,10 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
       · funext v
         simp [haC]
     rw [e1, eval₂_mul_fst_of_homog (ev.comp C) x Dinv hF, hσ]
-  have hcomp : ∀ (F : MRing (extIdx ι J) R) (b : Option K → ℕ) (e : Option K →₀ ℕ), IsMultiHomog F b →
-      eval₂ fC aC F ∈ 𝔮 → eval₂ fC aC (weightedHomogeneousComponent (blockWeight (extIdx ι J)) ⇑e F) ∈ 𝔮 := by
+  have hcomp
+      : ∀ (F : MRing (extIdx ι J) R) (b : Option K → ℕ) (e : Option K →₀ ℕ),
+        IsMultiHomog F b → eval₂ fC aC F ∈ 𝔮
+          → eval₂ fC aC (weightedHomogeneousComponent (blockWeight (extIdx ι J)) ⇑e F) ∈ 𝔮 := by
     intro F b e hF h
     rw [weightedHomogeneousComponent_of_mem ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr hF)]
     split_ifs
@@ -253,12 +286,16 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
     have := hF (Finsupp.equivFunOnFinite.symm b)
     rwa [Finsupp.coe_equivFunOnFinite_symm] at this
   have hQr : IsRelevant Q := by
-    have hXnot : ∀ (o : Option K) (l : extIdx ι J o), aL ⟨o, l⟩ = 1 → (X ⟨o, l⟩ : MRing (extIdx ι J) R) ∉ Q := by
+    have hXnot
+        : ∀ (o : Option K) (l : extIdx ι J o),
+          aL ⟨o, l⟩ = 1 → (X ⟨o, l⟩ : MRing (extIdx ι J) R) ∉ Q := by
       intro o l h1 hmem
       rw [hQdef, RingHom.mem_ker, RingHom.comp_apply] at hmem
       simp only [hψ, coe_eval₂Hom, eval₂_X, map_mul, map_C, map_X] at hmem
       have h2 := congrArg (AddMonoidAlgebra.coeff · (Finsupp.single o 1)) hmem
-      simp only [coeff_C_mul, coeff_X, coeff_X', if_true, mul_one, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply] at h2
+      simp only [coeff_C_mul, coeff_X, coeff_X', if_true, mul_one, AddMonoidAlgebra.coeff_zero,
+          Finsupp.zero_apply]
+        at h2
       rw [Ideal.Quotient.eq_zero_iff_mem] at h2
       have h1' : aC ⟨o, l⟩ = 1 := Subtype.ext (by rw [haC]; exact h1)
       rw [h1'] at h2
@@ -281,7 +318,8 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
     have h0 : eval₂ fC aC (weightedHomogeneousComponent (blockWeight (extIdx ι J)) ⇑e F) = 0 := by
       apply Subtype.ext
       rw [hval _ _ (weightedHomogeneousComponent_isWeightedHomogeneous _ _)]
-      have hz : blowUpEval P u (weightedHomogeneousComponent (blockWeight (extIdx ι J)) ⇑e F) = 0 := by
+      have hz
+          : blowUpEval P u (weightedHomogeneousComponent (blockWeight (extIdx ι J)) ⇑e F) = 0 := by
         rw [blowUpOf, RingHom.mem_ker] at hFe
         show Polynomial.eval 1 (aeval (blowUpSubst P u) _) = 0
         rw [hFe, Polynomial.eval_zero]
@@ -319,8 +357,10 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
       have h1 : ev gc ≠ 0 := hne _ hc
       have h2 : ∏ k, ev (X ⟨k, i k⟩) ^ c k ≠ 0 :=
         Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hXne k)
-      calc _ = (ev gc * (ev gc)⁻¹) * ((∏ k, ev (X ⟨k, i k⟩) ^ c k) * (∏ k, ev (X ⟨k, i k⟩) ^ c k)⁻¹) := by
-            ring
+      calc
+        _ = (ev gc * (ev gc)⁻¹)
+            * ((∏ k, ev (X ⟨k, i k⟩) ^ c k) * (∏ k, ev (X ⟨k, i k⟩) ^ c k)⁻¹) := by
+          ring
         _ = 1 := by rw [mul_inv_cancel₀ h1, mul_inv_cancel₀ h2, one_mul]
     exact h𝔮.ne_top ((Ideal.eq_top_iff_one _).mpr (hunit ▸ 𝔮.mul_mem_right _ hmem))
 
@@ -338,16 +378,21 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
       have hG0 : algebraMap (MRing ι R ⧸ P) L (blowUpEval P u G) ≠ 0 := by
         intro h0
         apply hd
-        have : eval₂ fC aC G = 0 := Subtype.ext (by rw [hval G b hG, h0, zero_mul, ZeroMemClass.coe_zero])
+        have : eval₂ fC aC G = 0 :=
+          Subtype.ext (by rw [hval G b hG, h0, zero_mul, ZeroMemClass.coe_zero])
         rw [this]
         exact 𝔮.zero_mem
-      have e2 : ((eval₂ fC aC G : Cr) : L) *
-          (algebraMap (MRing ι R ⧸ P) L (blowUpEval P u F) / algebraMap (MRing ι R ⧸ P) L (blowUpEval P u G)) =
-          ((eval₂ fC aC F : Cr) : L) := by
+      have e2
+          : ((eval₂ fC aC G : Cr) : L)
+              * (algebraMap (MRing ι R ⧸ P) L (blowUpEval P u F)
+                / algebraMap (MRing ι R ⧸ P) L (blowUpEval P u G))
+            = ((eval₂ fC aC F : Cr) : L) := by
         rw [hval G b hG, hval F b hF]
         generalize algebraMap (MRing ι R ⧸ P) L (blowUpEval P u G) = g at hG0 ⊢
-        calc _ = algebraMap (MRing ι R ⧸ P) L (blowUpEval P u F) * (∏ o, Dinv o ^ b o) * (g * g⁻¹) := by
-              ring
+        calc
+          _ = algebraMap (MRing ι R ⧸ P) L (blowUpEval P u F) * (∏ o, Dinv o ^ b o)
+              * (g * g⁻¹) := by
+            ring
           _ = _ := by rw [mul_inv_cancel₀ hG0, mul_one]
       rw [e2]
       exact (eval₂ fC aC F).2
@@ -355,7 +400,8 @@ theorem BlowUpOverLocInChart.proof : BlowUpOverLocInChart.Statement.{u} := by
     · exact ⟨1, fun h => h𝔮.ne_top ((Ideal.eq_top_iff_one _).mpr h), by simpa using Cr.one_mem⟩
     · rintro a b - - ⟨d₁, h₁, e₁⟩ ⟨d₂, h₂, e₂⟩
       refine ⟨d₁ * d₂, fun h => (h𝔮p.mem_or_mem h).elim h₁ h₂, ?_⟩
-      have : ((d₁ * d₂ : Cr) : L) * (a + b) = (d₂ : L) * ((d₁ : L) * a) + (d₁ : L) * ((d₂ : L) * b) := by
+      have : ((d₁ * d₂ : Cr) : L) * (a + b)
+          = (d₂ : L) * ((d₁ : L) * a) + (d₁ : L) * ((d₂ : L) * b) := by
         push_cast
         ring
       rw [this]

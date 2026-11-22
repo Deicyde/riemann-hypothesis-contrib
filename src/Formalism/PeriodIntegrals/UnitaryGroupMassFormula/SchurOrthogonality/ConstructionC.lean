@@ -50,13 +50,15 @@ private lemma normFock_self_re_nonneg_and_real {N : ℕ} (lam : DomWeight N) (p 
 theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
   intro N lam μ hμ s hs
   set V : Submodule ℂ (MvPolynomial (Fin N × Fin N) ℂ) := nablaSq ℂ N lam with hV
-  have hstab : ∀ (g : Matrix (Fin N) (Fin N) ℂ) (f : MvPolynomial (Fin N × Fin N) ℂ), f ∈ V →
-      Formalism.GradedWeylDivisibility.rowAct ℂ g f ∈ V :=
-    fun g f hf => Formalism.GradedWeylDivisibility.dualWeylRowStable ℂ N N lam.natW g f hf
+  have hstab
+      : ∀ (g : Matrix (Fin N) (Fin N) ℂ) (f : MvPolynomial (Fin N × Fin N) ℂ),
+        f ∈ V → Formalism.GradedWeylDivisibility.rowAct ℂ g f ∈ V := fun g f hf =>
+    Formalism.GradedWeylDivisibility.dualWeylRowStable ℂ N N lam.natW g f hf
   have anti : Antitone lam.natW := fun a b hab => by
     have := lam.anti hab
     exact Int.toNat_le_toNat (by omega)
-  have he : extremal ℂ N lam ∈ V := Formalism.GradedWeylDivisibility.hwMem ℂ N N le_rfl lam.natW anti
+  have he : extremal ℂ N lam ∈ V :=
+    Formalism.GradedWeylDivisibility.hwMem ℂ N N le_rfl lam.natW anti
   have he0 : extremal ℂ N lam ≠ 0 := Formalism.GradedWeylDivisibility.hwNe ℂ N N le_rfl lam.natW
   haveI : FiniteDimensional ℂ V := by
     obtain ⟨bb, ⟨-, hspan, -⟩, -⟩ := Formalism.GradedWeylDivisibility.sSBasis ℂ N N lam.natW
@@ -88,25 +90,37 @@ theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
         exact normFock_self_ne_zero lam (x : MvPolynomial (Fin N × Fin N) ℂ) (fun h0 => hne (Subtype.ext h0)) hx }
   letI : NormedAddCommGroup V := @InnerProductSpace.Core.toNormedAddCommGroup ℂ V _ _ _ core
   letI : InnerProductSpace ℂ V := InnerProductSpace.ofCore core.toCore
-  have hin : ∀ x y : V, @inner ℂ V _ x y = normFock lam (y : MvPolynomial (Fin N × Fin N) ℂ) x := fun _ _ => rfl
+  have hin : ∀ x y : V, @inner ℂ V _ x y = normFock lam (y : MvPolynomial (Fin N × Fin N) ℂ) x :=
+    fun _ _ => rfl
   let b := stdOrthonormalBasis ℂ V
-  let rv : Matrix (Fin N) (Fin N) ℂ → V → V := fun g x => ⟨Formalism.GradedWeylDivisibility.rowAct ℂ g x, hstab g x x.2⟩
-  have hrv : ∀ g (x : V), (rv g x : MvPolynomial (Fin N × Fin N) ℂ) = Formalism.GradedWeylDivisibility.rowAct ℂ g x := fun _ _ => rfl
-  have hunit : ∀ u ∈ Matrix.unitaryGroup (Fin N) ℂ, ∀ f : MvPolynomial (Fin N × Fin N) ℂ,
-      Formalism.GradedWeylDivisibility.rowAct ℂ u (Formalism.GradedWeylDivisibility.rowAct ℂ u.conjTranspose f) = f := by
+  let rv : Matrix (Fin N) (Fin N) ℂ → V → V := fun g x =>
+    ⟨Formalism.GradedWeylDivisibility.rowAct ℂ g x, hstab g x x.2⟩
+  have hrv
+      : ∀ g (x : V),
+        (rv g x : MvPolynomial (Fin N × Fin N) ℂ) = Formalism.GradedWeylDivisibility.rowAct ℂ g x :=
+    fun _ _ => rfl
+  have hunit
+      : ∀ u ∈ Matrix.unitaryGroup (Fin N) ℂ, ∀ f : MvPolynomial (Fin N × Fin N) ℂ,
+        Formalism.GradedWeylDivisibility.rowAct ℂ u
+            (Formalism.GradedWeylDivisibility.rowAct ℂ u.conjTranspose f)
+          = f := by
     intro u hu f
-    rw [cr_rowAct_rowAct, ← Matrix.star_eq_conjTranspose, Matrix.mem_unitaryGroup_iff'.mp hu, cr_rowAct_one]
+    rw [cr_rowAct_rowAct, ← Matrix.star_eq_conjTranspose, Matrix.mem_unitaryGroup_iff'.mp hu,
+      cr_rowAct_one]
 
-  let T : V →ₗ[ℂ] V := ∑ i, ((Alin hμ (b i : MvPolynomial (Fin N × Fin N) ℂ)).comp V.subtype).smulRight (b i)
+  let T : V →ₗ[ℂ] V :=
+    ∑ i, ((Alin hμ (b i : MvPolynomial (Fin N × Fin N) ℂ)).comp V.subtype).smulRight (b i)
   have hTapp : ∀ x : V, T x = ∑ i, Aform μ (x : MvPolynomial (Fin N × Fin N) ℂ) (b i) • b i := by
     intro x
     simp only [T]
     rw [LinearMap.sum_apply]
-    simp only [LinearMap.smulRight_apply, LinearMap.comp_apply, Submodule.subtype_apply, ci_Alin_apply]
+    simp only [LinearMap.smulRight_apply, LinearMap.comp_apply, Submodule.subtype_apply,
+      ci_Alin_apply]
   have hT : ∀ x w : V, @inner ℂ V _ (T x) w = Aform μ (w : MvPolynomial (Fin N × Fin N) ℂ) x := by
     intro x w
-    have hw : (w : MvPolynomial (Fin N × Fin N) ℂ) =
-        ∑ i, @inner ℂ V _ (b i) w • (b i : MvPolynomial (Fin N × Fin N) ℂ) := by
+    have hw
+        : (w : MvPolynomial (Fin N × Fin N) ℂ)
+          = ∑ i, @inner ℂ V _ (b i) w • (b i : MvPolynomial (Fin N × Fin N) ℂ) := by
       conv_lhs => rw [← b.sum_repr' w]
       simp only [Submodule.coe_sum, Submodule.coe_smul]
     rw [hTapp, sum_inner, hw, aform_sum_smul_left hμ]
@@ -117,12 +131,18 @@ theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
     intro u hu x
     refine ext_inner_right ℂ fun w => ?_
     have e1 : @inner ℂ V _ (rv u (T x)) w = @inner ℂ V _ (T x) (rv u.conjTranspose w) := by
-      rw [hin, hin, hrv, hrv, cf_herm lam ((Formalism.GradedWeylDivisibility.rowAct ℂ u) (T x : MvPolynomial (Fin N × Fin N) ℂ)) w, cf_adj,
-        ← cf_herm]
-    rw [hT, e1, hT, hrv, ← ci_invariant hμ u hu (Formalism.GradedWeylDivisibility.rowAct ℂ u.conjTranspose w) x, hunit u hu]
+      rw [hin, hin, hrv, hrv,
+        cf_herm lam
+          ((Formalism.GradedWeylDivisibility.rowAct ℂ u) (T x : MvPolynomial (Fin N × Fin N) ℂ)) w,
+        cf_adj, ← cf_herm]
+    rw [hT, e1, hT, hrv,
+      ← ci_invariant hμ u hu (Formalism.GradedWeylDivisibility.rowAct ℂ u.conjTranspose w) x,
+      hunit u hu]
   obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue T
   obtain ⟨v0, hv0⟩ := hc.exists_hasEigenvector
-  have hkey : ∀ y : V, T y = c • y → ∀ g : Matrix (Fin N) (Fin N) ℂ, IsUnit g.det → T (rv g y) = c • rv g y := by
+  have hkey
+      : ∀ y : V,
+        T y = c • y → ∀ g : Matrix (Fin N) (Fin N) ℂ, IsUnit g.det → T (rv g y) = c • rv g y := by
     intro y hy g hg
     set z : V := T (rv g y) - c • rv g y with hz
     let ℓ : V →ₗ[ℂ] ℂ := (innerₛₗ ℂ z).comp (T - c • LinearMap.id)
@@ -146,8 +166,7 @@ theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
     rw [← sub_eq_zero]
     exact inner_self_eq_zero.mp hzz
   let K := LinearMap.ker (T - c • LinearMap.id)
-  have hK : ∀ y : V, y ∈ K ↔ T y = c • y := fun y => by
-    simp [K, sub_eq_zero]
+  have hK : ∀ y : V, y ∈ K ↔ T y = c • y := fun y => by simp [K, sub_eq_zero]
   let W : Submodule ℂ (MvPolynomial (Fin N × Fin N) ℂ) := K.map V.subtype
   have hWle : W ≤ nablaSq ℂ N lam := Submodule.map_subtype_le V K
   have hWinv : ∀ (g : GL (Fin N) ℂ), ∀ f ∈ W, sqAct ℂ N lam g f ∈ W := by
@@ -155,8 +174,8 @@ theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
     obtain ⟨y, hy, rfl⟩ := hf
     have hg : IsUnit ((g : Matrix (Fin N) (Fin N) ℂ).transpose).det := by
       rw [Matrix.det_transpose]; exact Matrix.isUnits_det_units g
-    refine W.smul_mem _ ⟨rv (g : Matrix (Fin N) (Fin N) ℂ).transpose y, (hK _).mpr
-      (hkey y ((hK y).mp hy) _ hg), rfl⟩
+    refine W.smul_mem _
+      ⟨rv (g : Matrix (Fin N) (Fin N) ℂ).transpose y, (hK _).mpr (hkey y ((hK y).mp hy) _ hg), rfl⟩
   have hWne : W ≠ ⊥ := by
     intro h0
     have : (v0 : MvPolynomial (Fin N × Fin N) ℂ) ∈ W := ⟨v0, (hK v0).mpr hv0.apply_eq_smul, rfl⟩
@@ -170,13 +189,17 @@ theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
       obtain ⟨y', hy', hyy⟩ := this
       rw [← (Subtype.ext hyy : y' = y)]
       exact (hK y').mp hy'
-  have hAB : ∀ x w : V, Aform μ (w : MvPolynomial (Fin N × Fin N) ℂ) x =
-      (starRingEnd ℂ) c * normFock lam (w : MvPolynomial (Fin N × Fin N) ℂ) x := by
+  have hAB
+      : ∀ x w : V,
+        Aform μ (w : MvPolynomial (Fin N × Fin N) ℂ) x
+          = (starRingEnd ℂ) c * normFock lam (w : MvPolynomial (Fin N × Fin N) ℂ) x := by
     intro x w
     rw [← hT, hall, inner_smul_left, hin]
 
-  have hsum1 : ∀ x ∈ Matrix.unitaryGroup (Fin N) ℂ,
-      ∑ i, evalM x (b i : MvPolynomial (Fin N × Fin N) ℂ) * star (evalM x (b i : MvPolynomial (Fin N × Fin N) ℂ)) = 1 := by
+  have hsum1
+      : ∀ x ∈ Matrix.unitaryGroup (Fin N) ℂ,
+        ∑ i, evalM x (b i : MvPolynomial (Fin N × Fin N) ℂ) * star (evalM x (b i : MvPolynomial (Fin N × Fin N) ℂ))
+          = 1 := by
     intro x hx
     let y : V := rv x.conjTranspose ⟨_, he⟩
     have hev : ∀ i, evalM x (b i : MvPolynomial (Fin N × Fin N) ℂ) = @inner ℂ V _ y (b i) := by
@@ -205,7 +228,8 @@ theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
         rw [inner_self_eq_norm_sq_to_K, b.orthonormal.1 i]; simp
       rw [this, mul_one]
     simp only [hdiag, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] at htrace
-    rw [mul_comm]; exact htrace
+    rw [mul_comm]
+    exact htrace
   have hss : normFock lam s s = (Module.finrank ℂ V : ℂ) * Aform μ s s := by
     rw [show s = ((⟨s, hs⟩ : V) : MvPolynomial (Fin N × Fin N) ℂ) from rfl, hAB, ← mul_assoc,
       mul_comm (Module.finrank ℂ V : ℂ), hcd, one_mul]
@@ -214,8 +238,7 @@ theorem schurOrth_of (h : PI.HwIrred) (hA : EvalOne) : SchurOrth := by
     refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
     simp only
     rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
-  have hdim : Module.finrank ℂ (delSq ℂ N lam) = Module.finrank ℂ V := by
-    rw [hV, (h N lam).1]
+  have hdim : Module.finrank ℂ (delSq ℂ N lam) = Module.finrank ℂ V := by rw [hV, (h N lam).1]
   rw [hss, hint, hdim, ← Complex.ofReal_natCast, ← Complex.ofReal_mul, Complex.ofReal_re]
 
 end PI.WSF

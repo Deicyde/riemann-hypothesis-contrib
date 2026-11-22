@@ -8,9 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DualInfin
 open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.AlgRepEndIrreducible
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgRepEndIrreducible.expSub :
-    ∀ (d d' : ℕ) (S : Subalgebra ℂ (Matrix (Fin d) (Fin d) ℂ × Matrix (Fin d') (Fin d') ℂ))
-      (A : Matrix (Fin d) (Fin d) ℂ) (B : Matrix (Fin d') (Fin d') ℂ), (A, B) ∈ S → (NormedSpace.exp A, NormedSpace.exp B) ∈ S := by
+theorem UpperTheory.V.AlgRepEndIrreducible.expSub
+    : ∀ (d d' : ℕ) (S : Subalgebra ℂ (Matrix (Fin d) (Fin d) ℂ × Matrix (Fin d') (Fin d') ℂ))
+        (A : Matrix (Fin d) (Fin d) ℂ) (B : Matrix (Fin d') (Fin d') ℂ),
+      (A, B) ∈ S → (NormedSpace.exp A, NormedSpace.exp B) ∈ S := by
   intro d d' S A B h
   have hc : IsClosed (S : Set (Matrix (Fin d) (Fin d) ℂ × Matrix (Fin d') (Fin d') ℂ)) :=
     Submodule.closed_of_finiteDimensional (Subalgebra.toSubmodule S)

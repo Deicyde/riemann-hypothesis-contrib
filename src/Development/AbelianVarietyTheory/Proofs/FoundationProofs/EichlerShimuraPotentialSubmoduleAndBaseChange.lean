@@ -12,7 +12,16 @@ open scoped MatrixGroups TensorProduct
 
 namespace GlobalTheory.KZ
 
-theorem pot_triv_lin : ∀ (R : Type) [CommRing R] (w : ℕ) (Γ : Subgroup SL(2, ℤ)), (∀ F G, F ∈ Pot R w Γ → G ∈ Pot R w Γ → F + G ∈ Pot R w Γ) ∧ (0 ∈ Pot R w Γ) ∧ (∀ (c : R) F, F ∈ Pot R w Γ → c • F ∈ Pot R w Γ) ∧ (∀ F G, F ∈ Triv R w Γ → G ∈ Triv R w Γ → F + G ∈ Triv R w Γ) ∧ (∀ (c : R) F, F ∈ Triv R w Γ → c • F ∈ Triv R w Γ) ∧ (∀ (S : Type) [CommRing S] (f : R →+* S) F, F ∈ Pot R w Γ → (fun z => MvPolynomial.map f (F z)) ∈ Pot S w Γ) ∧ (∀ (S : Type) [CommRing S] (f : R →+* S) F, F ∈ Triv R w Γ → (fun z => MvPolynomial.map f (F z)) ∈ Triv S w Γ) := by
+theorem pot_triv_lin
+    : ∀ (R : Type) [CommRing R] (w : ℕ) (Γ : Subgroup SL(2, ℤ)),
+      (∀ F G, F ∈ Pot R w Γ → G ∈ Pot R w Γ → F + G ∈ Pot R w Γ) ∧ (0 ∈ Pot R w Γ)
+        ∧ (∀ (c : R) F, F ∈ Pot R w Γ → c • F ∈ Pot R w Γ)
+        ∧ (∀ F G, F ∈ Triv R w Γ → G ∈ Triv R w Γ → F + G ∈ Triv R w Γ)
+        ∧ (∀ (c : R) F, F ∈ Triv R w Γ → c • F ∈ Triv R w Γ)
+        ∧ (∀ (S : Type) [CommRing S] (f : R →+* S) F,
+          F ∈ Pot R w Γ → (fun z => MvPolynomial.map f (F z)) ∈ Pot S w Γ)
+        ∧ (∀ (S : Type) [CommRing S] (f : R →+* S) F,
+          F ∈ Triv R w Γ → (fun z => MvPolynomial.map f (F z)) ∈ Triv S w Γ) := by
   intro R _ w Γ
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · rintro F G ⟨hF, hF'⟩ ⟨hG, hG'⟩
@@ -21,7 +30,8 @@ theorem pot_triv_lin : ∀ (R : Type) [CommRing R] (w : ℕ) (Γ : Subgroup SL(2
     obtain ⟨q, hq⟩ := hG' γ hγ
     refine ⟨p + q, fun z hz => ?_⟩
     simp only [Pi.add_apply, map_add (f := _)]
-    rw [← hp z hz, ← hq z hz]; abel
+    rw [← hp z hz, ← hq z hz]
+    abel
   · refine ⟨fun z => MvPolynomial.isHomogeneous_zero _ _ _, fun γ _ => ⟨0, fun z _ => ?_⟩⟩
     simp
   · rintro c F ⟨hF, hF'⟩
@@ -46,7 +56,8 @@ theorem pot_triv_lin : ∀ (R : Type) [CommRing R] (w : ℕ) (Γ : Subgroup SL(2
     refine ⟨MvPolynomial.map f p, fun z hz => ?_⟩
     rw [← (polySlash_laws R).2.2.2.2.1 S f, ← map_sub, hp z hz]
   · rintro S _ f F ⟨ψ, p, hψ, hp⟩
-    refine ⟨fun z => MvPolynomial.map f (ψ z), MvPolynomial.map f p, fun γ hγ z hz => ?_, fun z hz => ?_⟩
+    refine
+      ⟨fun z => MvPolynomial.map f (ψ z), MvPolynomial.map f p, fun γ hγ z hz => ?_, fun z hz => ?_⟩
     · simp only
       rw [← (polySlash_laws R).2.2.2.2.1 S f, hψ γ hγ z hz]
     · simp only [hp z hz, map_add (f := _)]

@@ -11,7 +11,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory.HilbAff
 
-theorem good_xI : ∀ (A B C : Type) [CommRing A] [CommRing B] [Algebra A B] [CommRing C] [Algebra A C] (J : Ideal (C ⊗[A] B)) {r : ℕ} (v : Fin r → B), LinearIndependent C (fun k => Ideal.Quotient.mk J ((1 : C) ⊗ₜ[A] v k)) → Submodule.span C (Set.range (fun k => Ideal.Quotient.mk J ((1 : C) ⊗ₜ[A] v k))) = ⊤ → GlobalTheory.HilbAff.Good A B r (Spec.map (CommRingCat.ofHom (algebraMap A C))) (GlobalTheory.HilbAff.xI A B C J) := by
+theorem good_xI
+    : ∀ (A B C : Type) [CommRing A] [CommRing B] [Algebra A B] [CommRing C] [Algebra A C]
+        (J : Ideal (C ⊗[A] B)) {r : ℕ} (v : Fin r → B),
+      LinearIndependent C (fun k => Ideal.Quotient.mk J ((1 : C) ⊗ₜ[A] v k))
+        → Submodule.span C (Set.range (fun k => Ideal.Quotient.mk J ((1 : C) ⊗ₜ[A] v k))) = ⊤
+        → GlobalTheory.HilbAff.Good A B r (Spec.map (CommRingCat.ofHom (algebraMap A C)))
+          (GlobalTheory.HilbAff.xI A B C J) := by
   intro A B C _ _ _ _ _ J r v hli hsp
   let bas : Module.Basis (Fin r) C ((C ⊗[A] B) ⧸ J) := Module.Basis.mk hli hsp.ge
   haveI : Module.Free C ((C ⊗[A] B) ⧸ J) := Module.Free.of_basis bas
@@ -22,9 +28,12 @@ theorem good_xI : ∀ (A B C : Type) [CommRing A] [CommRing B] [Algebra A B] [Co
   haveI : IsClosedImmersion (Spec.map (CommRingCat.ofHom ((Ideal.Quotient.mk J).comp
       (Algebra.TensorProduct.comm A B C).toRingHom))) :=
     IsClosedImmersion.spec_of_surjective _ hsurj
-  have hsnd : (Spec.map (CommRingCat.ofHom ((Ideal.Quotient.mk J).comp
-      (Algebra.TensorProduct.comm A B C).toRingHom)) ≫ (pullbackSpecIso A B C).inv) ≫
-      pullback.snd _ _ = Spec.map (CommRingCat.ofHom (algebraMap C ((C ⊗[A] B) ⧸ J))) := by
+  have hsnd
+      : (Spec.map (CommRingCat.ofHom ((Ideal.Quotient.mk J).comp
+              (Algebra.TensorProduct.comm A B C).toRingHom))
+            ≫ (pullbackSpecIso A B C).inv)
+          ≫ pullback.snd _ _
+        = Spec.map (CommRingCat.ofHom (algebraMap C ((C ⊗[A] B) ⧸ J))) := by
     rw [Category.assoc, pullbackSpecIso_inv_snd, ← Spec.map_comp, ← CommRingCat.ofHom_comp]
     congr 2
   refine good_ker A B r _ _ ?_ ?_ ?_

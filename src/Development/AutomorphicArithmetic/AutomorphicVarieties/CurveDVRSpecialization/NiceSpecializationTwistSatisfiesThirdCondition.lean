@@ -68,9 +68,11 @@ private lemma sub_eq {κ : Type} (M : Matrix (Fin 3) (Fin 3) κ) :
   ext i j
   fin_cases i <;> fin_cases j <;> rfl
 
-private def cornerHom {G κ : Type} [Group G] [Field κ] (r : G →* GL (Fin 3) κ)
-    (hb : ∀ g, gm r g 0 1 = 0 ∧ gm r g 1 0 = 0 ∧ gm r g 1 2 = 0 ∧ gm r g 2 1 = 0) :
-    G →* Matrix (Fin 2) (Fin 2) κ where
+private def cornerHom
+    {G κ : Type} [Group G] [Field κ]
+    (r : G →* GL (Fin 3) κ)
+    (hb : ∀ g, gm r g 0 1 = 0 ∧ gm r g 1 0 = 0 ∧ gm r g 1 2 = 0 ∧ gm r g 2 1 = 0)
+    : G →* Matrix (Fin 2) (Fin 2) κ where
   toFun g := (gm r g).submatrix ![0, 2] ![0, 2]
   map_one' := by
     rw [sub_eq]
@@ -82,10 +84,14 @@ private def cornerHom {G κ : Type} [Group G] [Field κ] (r : G →* GL (Fin 3) 
     simp only [gm] at a1 a2 a3 a4 b1 b2 b3 b4
     rw [sub_eq, sub_eq, sub_eq]
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [gm, Matrix.mul_apply, Fin.sum_univ_three, Fin.sum_univ_two, *]
+    fin_cases i <;> fin_cases j
+      <;> simp [gm, Matrix.mul_apply, Fin.sum_univ_three, Fin.sum_univ_two, *]
 
-private def midHom {G κ : Type} [Group G] [Field κ] (r : G →* GL (Fin 3) κ)
-    (hb : ∀ g, gm r g 0 1 = 0 ∧ gm r g 1 0 = 0 ∧ gm r g 1 2 = 0 ∧ gm r g 2 1 = 0) : G →* κ where
+private def midHom
+    {G κ : Type} [Group G] [Field κ]
+    (r : G →* GL (Fin 3) κ)
+    (hb : ∀ g, gm r g 0 1 = 0 ∧ gm r g 1 0 = 0 ∧ gm r g 1 2 = 0 ∧ gm r g 2 1 = 0)
+    : G →* κ where
   toFun g := gm r g 1 1
   map_one' := by simp [gm]
   map_mul' g h := by
@@ -165,8 +171,16 @@ private lemma charpoly_flag {H k : Type} [Group H] [CommRing k] {n : ℕ} (r : H
 
 end UpperTheory.V.Pr
 
-theorem UpperTheory.V.Pr.nice_specialization_twist_satisfies_third_condition :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [UpperTheory.V.Fr.IsCoef l O] [Algebra ℤ_[l] O] (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (n : ℕ) (T : UpperTheory.V.Pr.Setup F n) (x : Ideal T.S.A) (L : T.S.Loc x) (y : UpperTheory.V.W.Point T.r) (j : L.R →ₐ[O] y.A), IsLocalHom j → UpperTheory.V.Pr.Nice L.ρ (RingHom.ker j) → UpperTheory.V.W.mat y.ρ = T.K.tw (L.ρ.map (j : L.R →+* y.A)) → y.ψ = T.K.twψ (L.ρ.map (j : L.R →+* y.A)) → y.N3 := by
+theorem UpperTheory.V.Pr.nice_specialization_twist_satisfies_third_condition
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [UpperTheory.V.Fr.IsCoef l O] [Algebra ℤ_[l] O]
+        (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (n : ℕ)
+        (T : UpperTheory.V.Pr.Setup F n) (x : Ideal T.S.A) (L : T.S.Loc x)
+        (y : UpperTheory.V.W.Point T.r) (j : L.R →ₐ[O] y.A),
+      IsLocalHom j → UpperTheory.V.Pr.Nice L.ρ (RingHom.ker j)
+        → UpperTheory.V.W.mat y.ρ = T.K.tw (L.ρ.map (j : L.R →+* y.A))
+        → y.ψ = T.K.twψ (L.ρ.map (j : L.R →+* y.A))
+        → y.N3 := by
   intro l _ O _ _ _ _ _ F n T x L y j hj hnice hρ hψ U hU hne
   haveI : CompactSpace T.G.G₀ :=
     isCompact_iff_compactSpace.1 (Subgroup.isClosed_of_isOpen _ T.G.η_open).isCompact
@@ -174,20 +188,33 @@ theorem UpperTheory.V.Pr.nice_specialization_twist_satisfies_third_condition :
   have hr : ∀ g, gm r g = (W.mat y.ρF g).map (algebraMap y.Fr y.Fb) := fun g => rfl
   have hc : LinClosed (gm r) :=
     linClosedOfAdic T.G.G₀ y.A y.Fb ((algebraMap y.Fr y.Fb).comp (algebraMap y.A y.Fr))
-      ((algebraMap y.Fr y.Fb).injective.comp (IsFractionRing.injective y.A y.Fr)) n (fun g => W.mat y.ρ g) y.cont
+      ((algebraMap y.Fr y.Fb).injective.comp (IsFractionRing.injective y.A y.Fr)) n
+      (fun g => W.mat y.ρ g)
+      y.cont
   obtain ⟨v⟩ : Nonempty T.G.Vl := by
     rw [T.K.e.nonempty_congr]
     by_contra h
     rw [not_nonempty_iff] at h
     have := T.big.1
     simp [Fr.Frame.d] at this
-  have hsep : ∀ V : Subgroup T.G.G₀, IsOpen (V : Set T.G.G₀) → ∃ u ∈ V ⊓ T.G.G', ∃ α : Fin n → y.Fbˣ, FreeRatios α ∧
-      (gm r u).charpoly = ∏ i, (X - C ((α i : y.Fbˣ) : y.Fb)) := by
+  have hsep
+      : ∀ V : Subgroup T.G.G₀,
+        IsOpen (V : Set T.G.G₀)
+          → ∃ u ∈ V ⊓ T.G.G', ∃ α : Fin n → y.Fbˣ,
+            FreeRatios α ∧ (gm r u).charpoly = ∏ i, (X - C ((α i : y.Fbˣ) : y.Fb)) := by
     intro V hV
     obtain ⟨g, hg, hfree⟩ := niceSep l O F n T x L y j hj hnice hρ hψ V hV v
-    refine ⟨_, hg, fun i => Units.map (algebraMap y.Fr y.Fb).toMonoidHom
-      (Units.map (algebraMap y.A y.Fr).toMonoidHom (y.ψ v i g)), fun a b hab m hm h => hfree a b hab m hm ?_, ?_⟩
-    · refine Units.map_injective (f := (algebraMap y.Fr y.Fb).toMonoidHom) (algebraMap y.Fr y.Fb).injective ?_
+    refine ⟨
+      _,
+      hg,
+      fun i =>
+        Units.map (algebraMap y.Fr y.Fb).toMonoidHom
+          (Units.map (algebraMap y.A y.Fr).toMonoidHom (y.ψ v i g)),
+      fun a b hab m hm h => hfree a b hab m hm ?_,
+      ?_
+    ⟩
+    · refine Units.map_injective (f := (algebraMap y.Fr y.Fb).toMonoidHom)
+        (algebraMap y.Fr y.Fb).injective ?_
       rw [map_pow, map_pow]
       exact h
     · have h1 : (W.mat y.ρF (T.G.φ v g)).charpoly = _ := charpoly_flag _ _ (y.flag v) g
@@ -211,7 +238,8 @@ theorem UpperTheory.V.Pr.nice_specialization_twist_satisfies_third_condition :
       show algebraMap y.Fr y.Fb (algebraMap y.A y.Fr (W.mat y.ρ g a b)) = 0
       rw [h2, map_zero, map_zero]
     exact cosetE T.G.G' r hc
-      (fun g => ⟨hz g 0 1 (by decide), hz g 1 0 (by decide), hz g 1 2 (by decide), hz g 2 1 (by decide)⟩)
+      (fun g =>
+        ⟨hz g 0 1 (by decide), hz g 1 0 (by decide), hz g 1 2 (by decide), hz g 2 1 (by decide)⟩)
       (niceIrrE l O F T x L y j hj hnice hρ hψ ⟨hnice.off, rfl, hE⟩) hsep U hU hne
   · exact cosetI (by rcases T.n23 with h | h <;> omega) T.G.G' r hc
       (niceIrr l O F n T x L y j hj hnice hρ hψ ⟨hnice.off, fun h3 h => hE ⟨h3, h⟩⟩) hsep U hU hne

@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1
 
 universe u v w
 
@@ -30,8 +31,11 @@ theorem ChartFiniteIrrel.proof : ChartFiniteIrrel.Statement.{u, v, w} := by
     obtain ⟨k, hk⟩ := h
     exact weighted_le_of_irrel (e := fun _ => 1) hk le_rfl hx
   obtain ⟨N, hN⟩ := Ideal.exists_pow_le_of_le_radical_of_fg hMrad (IsNoetherian.noetherian M)
-  have hA : ∀ t, N ≤ t → weightedHomogeneousSubmodule F (mw (ι := ι)) (fun _ => t) ≤
-      (V ⊔ Ideal.span {f}).restrictScalars F := fun t ht _ hh =>
+  have hA
+      : ∀ t,
+        N ≤ t
+          → weightedHomogeneousSubmodule F (mw (ι := ι)) (fun _ => t)
+            ≤ (V ⊔ Ideal.span {f}).restrictScalars F := fun t ht _ hh =>
     hN (Ideal.pow_le_pow_right ht (ChartFiniteIrrel.weighted_le_pow t hh))
   have hVh : V.IsHomogeneous (weightedHomogeneousSubmodule F (mw (ι := ι))) := by
     obtain ⟨S₀, hS₀, rfl⟩ := hV
@@ -42,15 +46,24 @@ theorem ChartFiniteIrrel.proof : ChartFiniteIrrel.Statement.{u, v, w} := by
     (weightedHomogeneousSubmodule F (mw (ι := ι)) (fun _ => t)).map π
   have hmono : ∀ t, B t ≤ B (t + 1) := by
     rintro t _ ⟨h, hh, rfl⟩
-    refine ⟨h * ∏ k, (X ⟨k, i k⟩ : MRingOver F ι) ^ (fun _ : K => 1) k,
-      SetLike.mul_mem_graded hh (mem_weighted_of_isMultiHomog (isMultiHomog_coordProd i _)), ?_⟩
+    refine ⟨
+      h * ∏ k, (X ⟨k, i k⟩ : MRingOver F ι) ^ (fun _ : K => 1) k,
+      SetLike.mul_mem_graded hh (mem_weighted_of_isMultiHomog (isMultiHomog_coordProd i _)),
+      ?_
+    ⟩
     simp [π, map_prod, mk_chartIdeal_X_self]
   have hstep : ∀ t, N ≤ t + 1 → B (t + 1) ≤ (B t).map (LinearMap.mulLeft F (π f)) := by
     rintro t ht _ ⟨h, hh, rfl⟩
-    have h2 : h ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) (fun _ => t + 1) ⊓
-        (V ⊔ Ideal.span {f}).restrictScalars F := ⟨hh, hA _ ht hh⟩
-    rw [sup_span_inf_eq' hVh (mem_weighted_of_isMultiHomog hf) (d := fun _ => t + 1) (fun _ => Nat.le_add_left 1 t),
-      show ((fun _ : K => t + 1) - fun _ => 1) = fun _ => t from funext fun _ => by simp] at h2
+    have h2
+        : h
+          ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) (fun _ => t + 1)
+            ⊓ (V ⊔ Ideal.span {f}).restrictScalars F :=
+      ⟨hh, hA _ ht hh⟩
+    rw [sup_span_inf_eq' hVh (mem_weighted_of_isMultiHomog hf)
+          (d := fun _ => t + 1)
+          (fun _ => Nat.le_add_left 1 t),
+        show ((fun _ : K => t + 1) - fun _ => 1) = fun _ => t from funext fun _ => by simp]
+      at h2
     obtain ⟨v, ⟨-, hv⟩, _, ⟨g, hg, rfl⟩, rfl⟩ := Submodule.mem_sup.mp h2
     refine ⟨π g, ⟨g, hg, rfl⟩, ?_⟩
     have hv0 : Ideal.Quotient.mk (chartIdeal V i) v = 0 :=
@@ -67,8 +80,10 @@ theorem ChartFiniteIrrel.proof : ChartFiniteIrrel.Statement.{u, v, w} := by
     refine eq_top_iff.mpr fun a _ => ?_
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective a
     obtain ⟨e₀, he₀⟩ := exists_homog_chart V i b
-    obtain ⟨b', hb', hbb⟩ := he₀ (fun _ => N + ∑ k, e₀ k) fun k =>
-      le_add_left (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ k))
+    obtain ⟨b', hb', hbb⟩ :=
+      he₀
+        (fun _ => N + ∑ k, e₀ k)
+        fun k => le_add_left (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ k))
     rw [← hconst _ (Nat.le_add_right _ _)]
     exact ⟨b', hb', hbb⟩
   rw [Module.finite_def, ← htop]

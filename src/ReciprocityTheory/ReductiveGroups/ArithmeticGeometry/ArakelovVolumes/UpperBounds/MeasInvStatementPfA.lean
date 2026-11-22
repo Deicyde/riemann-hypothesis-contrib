@@ -10,9 +10,11 @@ open Matrix
 
 noncomputable section
 
-theorem det_of_key {m α : Type*} [Fintype m] [DecidableEq m] [LinearOrder α] {R : Type*} [CommRing R]
-    (M : Matrix m m R) (κ : m → α) (hκ : Function.Injective κ)
-    (h : ∀ i j, κ i < κ j → M i j = 0) : M.det = ∏ i, M i i := by
+theorem det_of_key
+    {m α : Type*} [Fintype m] [DecidableEq m] [LinearOrder α]
+    {R : Type*} [CommRing R]
+    (M : Matrix m m R) (κ : m → α) (hκ : Function.Injective κ) (h : ∀ i j, κ i < κ j → M i j = 0)
+    : M.det = ∏ i, M i i := by
   letI : LinearOrder m := LinearOrder.lift' (fun i => OrderDual.toDual (κ i))
     (fun a b hab => hκ (OrderDual.toDual.injective hab))
   exact Matrix.det_of_upperTriangular (fun i j hij => h i j hij)
@@ -57,8 +59,8 @@ def luD (w : Ix ι r → ℂ) : (Ix ι r → ℂ) →ₗ[ℂ] (Ix ι r → ℂ) 
     ring
   map_smul' c h := by
     funext i
-    simp only [sl_smul, up_smul, Matrix.smul_mul, Matrix.mul_smul, Matrix.add_apply, Matrix.smul_apply,
-      smul_eq_mul, Pi.smul_apply, RingHom.id_apply]
+    simp only [sl_smul, up_smul, Matrix.smul_mul, Matrix.mul_smul, Matrix.add_apply,
+      Matrix.smul_apply, smul_eq_mul, Pi.smul_apply, RingHom.id_apply]
     ring
 
 def key (e : ι ≃ Fin (Fintype.card ι)) (i : Ix ι r) : ℕ ×ₗ (ℕ ×ₗ Fin (Fintype.card ι)) :=
@@ -144,10 +146,11 @@ lemma toMatrix_luD_diag (w : Ix ι r → ℂ) (i : Ix ι r) :
   simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
   split_ifs <;> simp
 
-theorem det_luD (w : Ix ι r → ℂ) :
-    LinearMap.det (luD w) = ∏ i : Ix ι r, if i.2.2 < i.2.1 then w (i.1, i.2.2, i.2.2) else 1 := by
-  rw [← LinearMap.det_toMatrix', det_of_key _ (key (r := r) (Fintype.equivFin ι))
-    (key_injective _) (fun i j h => toMatrix_luD_zero _ w i j h)]
+theorem det_luD (w : Ix ι r → ℂ)
+    : LinearMap.det (luD w) = ∏ i : Ix ι r, if i.2.2 < i.2.1 then w (i.1, i.2.2, i.2.2) else 1 := by
+  rw [← LinearMap.det_toMatrix',
+    det_of_key _ (key (r := r) (Fintype.equivFin ι)) (key_injective _)
+      (fun i j h => toMatrix_luD_zero _ w i j h)]
   exact Finset.prod_congr rfl fun i _ => toMatrix_luD_diag w i
 
 def luD' (w : Ix ι r → ℂ) : (Ix ι r → ℂ) →L[ℝ] (Ix ι r → ℂ) :=
@@ -192,26 +195,29 @@ lemma hasFDerivAt_entry2 (w : Ix ι r → ℂ) (τ : ι) (k b : Fin r) :
 theorem hasFDerivAt_lu (w : Ix ι r → ℂ) : HasFDerivAt lu (luD' w) w := by
   rw [hasFDerivAt_pi']
   rintro ⟨τ, a, b⟩
-  have hf : (fun v : Ix ι r → ℂ => lu v (τ, a, b)) =
-      fun v => ∑ k, (1 + sl v τ) a k * up v τ k b := by
+  have hf
+      : (fun v : Ix ι r → ℂ => lu v (τ, a, b)) = fun v => ∑ k, (1 + sl v τ) a k * up v τ k b := by
     funext v
     simp only [lu, Matrix.mul_apply]
   rw [hf]
-  have hd := HasFDerivAt.sum (u := Finset.univ)
-    (fun k _ => (hasFDerivAt_entry1 w τ a k).mul (hasFDerivAt_entry2 w τ k b))
+  have hd :=
+    HasFDerivAt.sum (u := Finset.univ)
+      (fun k _ => (hasFDerivAt_entry1 w τ a k).mul (hasFDerivAt_entry2 w τ k b))
   convert (preTransparency := .reducible) hd using 1
   · funext v
     simp only [Finset.sum_apply, Pi.mul_apply]
   · apply ContinuousLinearMap.ext
     intro h
-    rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, ContinuousLinearMap.sum_apply]
+    rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply,
+      ContinuousLinearMap.sum_apply]
     change luD w h (τ, a, b) = _
     rw [luD_apply, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     by_cases hka : k < a <;> by_cases hbk : b < k <;> simp [hka, hbk, sl, up] <;> ring
 
-theorem det_luD' (w : Ix ι r → ℂ) :
-    (luD' w).det = Complex.normSq (∏ i : Ix ι r, if i.2.2 < i.2.1 then w (i.1, i.2.2, i.2.2) else 1) := by
+theorem det_luD' (w : Ix ι r → ℂ)
+    : (luD' w).det
+      = Complex.normSq (∏ i : Ix ι r, if i.2.2 < i.2.1 then w (i.1, i.2.2, i.2.2) else 1) := by
   rw [← det_luD w, ← Algebra.norm_complex_apply]
   show LinearMap.det ((luD w).restrictScalars ℝ) = _
   exact LinearMap.det_restrictScalars

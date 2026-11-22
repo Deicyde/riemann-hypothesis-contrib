@@ -12,18 +12,25 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Coeffic
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.GoodCoeff
 
-theorem exists_finset_pow_torsion : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ k : ℕ, ∃ Es : Finset (LL ⧸ LinearMap.range (Algebra.linearMap O LL)), ∀ e, ((l : ℕ) : O) ^ k • e = 0 → e ∈ Es := by
+theorem exists_finset_pow_torsion
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+        (O : Type) [CommRing O] [Algebra O LL],
+      GoodO (Qp := ℚ_[l]) LL O
+        → ∀ k : ℕ, ∃ Es : Finset (LL ⧸ LinearMap.range (Algebra.linearMap O LL)), ∀ e,
+          ((l : ℕ) : O) ^ k • e = 0 → e ∈ Es := by
   intro l _ LL _ _ _ O _ _ hG k
   classical
   haveI hfin : Finite (O ⧸ Ideal.span {((l : ℕ) : O) ^ k}) :=
     (good_coeff_integers l LL O hG).2.2.1 k
   have hl : (l : LL) ≠ 0 := by
-    have := (algebraMap ℚ_[l] LL).injective.ne
-      (show (l : ℚ_[l]) ≠ 0 from Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
+    have :=
+      (algebraMap ℚ_[l] LL).injective.ne
+        (show (l : ℚ_[l]) ≠ 0 from Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
     simpa using this
   have hlk : (l : LL) ^ k ≠ 0 := pow_ne_zero _ hl
   let f : O ⧸ Ideal.span {((l : ℕ) : O) ^ k} → LL ⧸ LinearMap.range (Algebra.linearMap O LL) :=
@@ -35,8 +42,9 @@ theorem exists_finset_pow_torsion : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Fi
   obtain ⟨a, ha⟩ := he
   rw [Algebra.linearMap_apply, Algebra.smul_def, map_pow, map_natCast] at ha
   refine ⟨Ideal.Quotient.mk _ a, ?_⟩
-  have h1 : (Ideal.Quotient.mk (Ideal.span {((l : ℕ) : O) ^ k}) a).out - a ∈
-      Ideal.span {((l : ℕ) : O) ^ k} :=
+  have h1
+      : (Ideal.Quotient.mk (Ideal.span {((l : ℕ) : O) ^ k}) a).out - a
+        ∈ Ideal.span {((l : ℕ) : O) ^ k} :=
     Ideal.Quotient.eq.1 (Ideal.Quotient.mk_out _)
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 h1
   have hc' := congrArg (algebraMap O LL) hc

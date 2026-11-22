@@ -13,16 +13,18 @@ open MvPolynomial
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-
 open scoped Classical in
-theorem isHomogeneous_of_isMultiHomogIdeal' {K : Type*} [DecidableEq K] {ι : K → Type*}
-    {R : Type*} [CommRing R] {I : Ideal (MRing ι R)} (hI : IsMultiHomogIdeal I) :
-    (by
+theorem isHomogeneous_of_isMultiHomogIdeal'
+    {K : Type*} [DecidableEq K]
+    {ι : K → Type*} {R : Type*} [CommRing R]
+    {I : Ideal (MRing ι R)} (hI : IsMultiHomogIdeal I)
+    : (by
       classical
       exact I.IsHomogeneous (weightedHomogeneousSubmodule R (blockWeight ι))) := by
   classical
-  have e : I = Ideal.span
-      {g | ∃ f ∈ I, ∃ b, g = weightedHomogeneousComponent (blockWeight ι) b f} := by
+  have e
+      : I
+        = Ideal.span {g | ∃ f ∈ I, ∃ b, g = weightedHomogeneousComponent (blockWeight ι) b f} := by
     apply le_antisymm
     · intro f hf
       rw [← sum_weightedHomogeneousComponent (blockWeight ι) f,

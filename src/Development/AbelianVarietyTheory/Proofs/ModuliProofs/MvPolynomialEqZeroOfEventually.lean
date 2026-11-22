@@ -13,17 +13,17 @@ open Filter Topology
 
 namespace GlobalTheory.CountableFibres
 
-
 open Filter Topology in
-theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [NormedAddCommGroup F] [NormedSpace ℂ F] [FiniteDimensional ℂ E] [FiniteDimensional ℂ F]
-    {U : Set E} (hU : IsOpen U) (hne : U.Nonempty) {f : E → F}
-    (hf : ∀ z ∈ U, ContDiffAt ℂ 1 f z) (hc : ∀ z ∈ U, {z' ∈ U | f z' = f z}.Countable) :
-    ∃ z ∈ U, Function.Injective (fderiv ℂ f z) := by
+theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv
+    {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup F] [NormedSpace ℂ F]
+    [FiniteDimensional ℂ E] [FiniteDimensional ℂ F]
+    {U : Set E} (hU : IsOpen U) (hne : U.Nonempty)
+    {f : E → F} (hf : ∀ z ∈ U, ContDiffAt ℂ 1 f z) (hc : ∀ z ∈ U, {z' ∈ U | f z' = f z}.Countable)
+    : ∃ z ∈ U, Function.Injective (fderiv ℂ f z) := by
   haveI := FiniteDimensional.complete ℂ E
   set rk : E → ℕ := fun z => Module.finrank ℂ (LinearMap.range (fderiv ℂ f z : E →ₗ[ℂ] F))
-  have hbdd : BddAbove (rk '' U) := ⟨Module.finrank ℂ F, by
-    rintro _ ⟨z, -, rfl⟩; exact Submodule.finrank_le _⟩
+  have hbdd : BddAbove (rk '' U) :=
+    ⟨Module.finrank ℂ F, by rintro _ ⟨z, -, rfl⟩; exact Submodule.finrank_le _⟩
   obtain ⟨z₀, hz₀, hr⟩ : sSup (rk '' U) ∈ rk '' U := Nat.sSup_mem (hne.image _) hbdd
   have hmax : ∀ z ∈ U, rk z ≤ rk z₀ := fun z hz => hr ▸ le_csSup hbdd ⟨z, hz, rfl⟩
   refine ⟨z₀, hz₀, ?_⟩
@@ -54,7 +54,8 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
   have hunit : ∀ᶠ z in 𝓝 z₀, IsUnit ((P.comp (fderiv ℂ f z)).comp R) :=
     hΦ.eventually (Units.isOpen.mem_nhds (by
       show IsUnit ((P.comp L).comp R)
-      rw [hΦ₀]; exact isUnit_one))
+      rw [hΦ₀]
+      exact isUnit_one))
   have hW : Module.finrank ℂ W = rk z₀ := rfl
   have hker : ∀ᶠ z in 𝓝 z₀, ∀ v, P (fderiv ℂ f z v) = 0 → fderiv ℂ f z v = 0 := by
     filter_upwards [hunit, hU.mem_nhds hz₀] with z hz hzU
@@ -65,13 +66,14 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
       refine ⟨R (b w), ?_⟩
       have := congrArg (fun φ : W →L[ℂ] W => φ w) hb
       simpa using this
-    have h1 := LinearMap.finrank_range_add_finrank_ker
-      ((P.comp (fderiv ℂ f z) : E →L[ℂ] W) : E →ₗ[ℂ] W)
+    have h1 :=
+      LinearMap.finrank_range_add_finrank_ker ((P.comp (fderiv ℂ f z) : E →L[ℂ] W) : E →ₗ[ℂ] W)
     have h2 := LinearMap.finrank_range_add_finrank_ker (fderiv ℂ f z : E →ₗ[ℂ] F)
     rw [hran, finrank_top, hW] at h1
     have h3 := hmax z hzU
-    have hle : LinearMap.ker (fderiv ℂ f z : E →ₗ[ℂ] F) ≤
-        LinearMap.ker ((P.comp (fderiv ℂ f z) : E →L[ℂ] W) : E →ₗ[ℂ] W) := fun v hv => by
+    have hle
+        : LinearMap.ker (fderiv ℂ f z : E →ₗ[ℂ] F)
+          ≤ LinearMap.ker ((P.comp (fderiv ℂ f z) : E →L[ℂ] W) : E →ₗ[ℂ] W) := fun v hv => by
       simp only [LinearMap.mem_ker, ContinuousLinearMap.coe_coe] at hv ⊢
       simp [hv]
     have heq := Submodule.eq_of_le_of_finrank_le hle (by simp only [rk] at h1 h3; omega)
@@ -104,7 +106,8 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
       (Classical.choose hcc).comp_hasStrictFDerivAt ((hasStrictFDerivAt_id z₀).sub_const z₀)
     range_leftDeriv := hsurj
     range_rightDeriv := LinearMap.range_eq_of_proj (Classical.choose_spec hcc)
-    isCompl_ker := LinearMap.isCompl_of_proj (Classical.choose_spec hcc) }
+    isCompl_ker := LinearMap.isCompl_of_proj (Classical.choose_spec hcc)
+  }
   set Ψ := D.toOpenPartialHomeomorph
   set ψ : K → E := fun t => Ψ.symm (P (f z₀), t)
   have hp : D.prodFun D.pt = (P (f z₀), 0) := by
@@ -121,8 +124,7 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
     exact h
   have htend : Tendsto (fun t : K => (P (f z₀), t)) (𝓝 0) (𝓝 (P (f z₀), 0)) :=
     tendsto_const_nhds.prodMk_nhds tendsto_id
-  have hψc : ContinuousAt ψ 0 :=
-    (Ψ.continuousAt_symm htarget).comp htend
+  have hψc : ContinuousAt ψ 0 := (Ψ.continuousAt_symm htarget).comp htend
   have hinv' : ∀ᶠ t in 𝓝 (0 : K), Ψ (ψ t) = (P (f z₀), t) := by
     have h := Ψ.open_target.mem_nhds htarget
     filter_upwards [htend h] with t ht
@@ -132,11 +134,9 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
     have h := congrArg Prod.fst ht
     rw [D.toOpenPartialHomeomorph_apply] at h
     exact h
-  have hinv : ∀ᶠ t in 𝓝 (0 : K), (Ψ (ψ t)).2 = t :=
-    hinv'.mono fun _ ht => congrArg Prod.snd ht
+  have hinv : ∀ᶠ t in 𝓝 (0 : K), (Ψ (ψ t)).2 = t := hinv'.mono fun _ ht => congrArg Prod.snd ht
   have hdiff : ∀ᶠ t in 𝓝 (0 : K), DifferentiableAt ℂ ψ t := by
-    have hl : ContDiffAt ℂ 1 D.leftFun D.pt :=
-      (P.contDiff.contDiffAt).comp z₀ (hf z₀ hz₀)
+    have hl : ContDiffAt ℂ 1 D.leftFun D.pt := (P.contDiff.contDiffAt).comp z₀ (hf z₀ hz₀)
     have hr : ContDiffAt ℂ 1 D.rightFun D.pt := by
       show ContDiffAt ℂ 1 (fun x => (Classical.choose hcc) (x - z₀)) z₀
       exact ((Classical.choose hcc).contDiff.comp (contDiff_id.sub contDiff_const)).contDiffAt
@@ -147,11 +147,13 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
     have hcd := (D.contDiffAt_implicitFunction hl hr one_ne_zero).eventually (by simp)
     rw [hp] at hcd
     filter_upwards [htend.eventually hcd] with t ht
-    simpa only [Function.comp_def, Function.uncurry, ImplicitFunctionData.implicitFunction_apply, ψ, Ψ] using
-      (ht.differentiableAt one_ne_zero).comp t
+    simpa only [Function.comp_def, Function.uncurry, ImplicitFunctionData.implicitFunction_apply, ψ,
+        Ψ]
+      using (ht.differentiableAt one_ne_zero).comp t
         ((differentiableAt_const _).prodMk differentiableAt_id)
-  have hnear : ∀ᶠ t in 𝓝 (0 : K), ψ t ∈ U ∧
-      (∀ v, P (fderiv ℂ f (ψ t) v) = 0 → fderiv ℂ f (ψ t) v = 0) := by
+  have hnear
+      : ∀ᶠ t in 𝓝 (0 : K), ψ t ∈ U ∧
+        (∀ v, P (fderiv ℂ f (ψ t) v) = 0 → fderiv ℂ f (ψ t) v = 0) := by
     have h := (hU.eventually_mem hz₀).and hker
     rw [← hψ0] at h
     exact hψc.eventually h
@@ -165,8 +167,9 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
       Filter.mem_of_superset (Metric.isOpen_ball.mem_nhds ht) fun s hs => (hball s hs).1
     have hcomp : HasFDerivAt (fun s => f (ψ s)) ((fderiv ℂ f (ψ t)).comp (fderiv ℂ ψ t)) t :=
       hft.hasFDerivAt.comp t hdt.hasFDerivAt
-    have hcompP : HasFDerivAt (fun s => P (f (ψ s)))
-        (P.comp ((fderiv ℂ f (ψ t)).comp (fderiv ℂ ψ t))) t := P.hasFDerivAt.comp t hcomp
+    have hcompP
+        : HasFDerivAt (fun s => P (f (ψ s))) (P.comp ((fderiv ℂ f (ψ t)).comp (fderiv ℂ ψ t))) t :=
+      P.hasFDerivAt.comp t hcomp
     have hzero : HasFDerivAt (fun s => P (f (ψ s))) (0 : K →L[ℂ] W) t :=
       (hasFDerivAt_const (P (f z₀)) t).congr_of_eventuallyEq hloc
     have h0 := hcompP.unique hzero
@@ -180,31 +183,37 @@ theorem _root_.GlobalTheory.CountableFibres.exists_injective_fderiv {E F : Type}
     have hdon : DifferentiableOn ℂ (fun s => f (ψ s)) S := fun s hs =>
       (((hf _ (hball s hs).2.2.2.1).differentiableAt one_ne_zero).comp s
         (hball s hs).2.2.1).differentiableWithinAt
-    have := Metric.isOpen_ball.is_const_of_fderiv_eq_zero (convex_ball (0 : K) ε).isPreconnected
-      hdon (fun s hs => hderiv s hs) ht (Metric.mem_ball_self hε)
+    have :=
+      Metric.isOpen_ball.is_const_of_fderiv_eq_zero (convex_ball (0 : K) ε).isPreconnected hdon
+        (fun s hs => hderiv s hs)
+        ht (Metric.mem_ball_self hε)
     rwa [hψ0] at this
   have hcount : S.Countable := by
-    refine Set.MapsTo.countable_of_injOn (f := ψ) (t := {z' ∈ U | f z' = f z₀}) (fun t ht => ⟨(hball t ht).2.2.2.1, hconst t ht⟩)
+    refine Set.MapsTo.countable_of_injOn (f := ψ) (t := {z' ∈ U | f z' = f z₀})
+      (fun t ht => ⟨(hball t ht).2.2.2.1, hconst t ht⟩)
       ?_ (hc z₀ hz₀)
     intro s hs t ht hst
     rw [← (hball s hs).2.1, ← (hball t ht).2.1]
     simp only [ψ] at hst ⊢
     rw [hst]
-  obtain ⟨x, hx, hxS⟩ := (hcount.dense_compl ℂ).inter_open_nonempty S Metric.isOpen_ball
-    ⟨0, Metric.mem_ball_self hε⟩
+  obtain ⟨x, hx, hxS⟩ :=
+    (hcount.dense_compl ℂ).inter_open_nonempty S Metric.isOpen_ball ⟨0, Metric.mem_ball_self hε⟩
   exact hxS hx
 
-
 open Filter Topology in
-theorem _root_.GlobalTheory.CountableFibres.exists_independent_ratios :
-    ∀ (d : ℕ) (I : Type) [Finite I] (B : Set (Fin d → ℂ)) (θ : (Fin d → ℂ) → I → ℂ), IsOpen B →
-      IsPreconnected B → B.Nonempty → (∀ a, DifferentiableOn ℂ (fun z => θ z a) B) →
-      (∀ z ∈ B, θ z ≠ 0 ∧ {z' ∈ B | ∃ c : ℂ, θ z' = c • θ z}.Countable) →
-      ∃ (a₀ : I) (a : Fin d → I), (∃ z ∈ B, θ z a₀ ≠ 0) ∧ ∀ F : MvPolynomial (Fin d) ℂ,
-        (∀ z ∈ B, θ z a₀ ≠ 0 → MvPolynomial.eval (fun i => θ z (a i) / θ z a₀) F = 0) → F = 0 := by
+theorem _root_.GlobalTheory.CountableFibres.exists_independent_ratios
+    : ∀ (d : ℕ) (I : Type) [Finite I] (B : Set (Fin d → ℂ)) (θ : (Fin d → ℂ) → I → ℂ),
+      IsOpen B → IsPreconnected B → B.Nonempty → (∀ a, DifferentiableOn ℂ (fun z => θ z a) B)
+        → (∀ z ∈ B, θ z ≠ 0 ∧ {z' ∈ B | ∃ c : ℂ, θ z' = c • θ z}.Countable)
+        → ∃ (a₀ : I) (a : Fin d → I),
+          (∃ z ∈ B, θ z a₀ ≠ 0)
+            ∧ ∀ F : MvPolynomial (Fin d) ℂ,
+              (∀ z ∈ B, θ z a₀ ≠ 0 → MvPolynomial.eval (fun i => θ z (a i) / θ z a₀) F = 0)
+                → F = 0 := by
   intro d I _ B θ hB _ hBne hdiff hfib
   haveI := Fintype.ofFinite I
-  have hO : _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement := _root_.ReciprocityTheory.AnForm.Osgood.osgood
+  have hO : _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement :=
+    _root_.ReciprocityTheory.AnForm.Osgood.osgood
   unfold _root_.ReciprocityTheory.AnForm.Osgood.OsgoodStatement at hO
   have hAn : ∀ a, AnalyticOnNhd ℂ (fun z => θ z a) B := fun a => hO d B _ hB (hdiff a)
   obtain ⟨z₁, hz₁⟩ := hBne
@@ -231,7 +240,8 @@ theorem _root_.GlobalTheory.CountableFibres.exists_independent_ratios :
     rw [Pi.smul_apply, smul_eq_mul]
     field_simp at h ⊢
     linear_combination h
-  obtain ⟨z₂, hz₂, hinj⟩ := _root_.GlobalTheory.CountableFibres.exists_injective_fderiv hUo ⟨z₁, hz₁, ha₀⟩ hρ hρc
+  obtain ⟨z₂, hz₂, hinj⟩ :=
+    _root_.GlobalTheory.CountableFibres.exists_injective_fderiv hUo ⟨z₁, hz₁, ha₀⟩ hρ hρc
   set D := fderiv ℂ ρ z₂
 
   set v : I → Module.Dual ℂ (Fin d → ℂ) := fun b => (LinearMap.proj b).comp (D : (Fin d → ℂ) →ₗ[ℂ] I → ℂ)
@@ -266,8 +276,9 @@ theorem _root_.GlobalTheory.CountableFibres.exists_independent_ratios :
   set π : (I → ℂ) →L[ℂ] Fin d → ℂ := ContinuousLinearMap.pi fun i => ContinuousLinearMap.proj (a i)
   have hG : HasStrictFDerivAt (fun z => π (ρ z)) (π.comp D) z₂ :=
     π.hasStrictFDerivAt.comp z₂ ((hρ z₂ hz₂).hasStrictFDerivAt_fderiv one_ne_zero)
-  have hsurj : LinearMap.range ((π.comp D : (Fin d → ℂ) →L[ℂ] Fin d → ℂ) :
-      (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ) = ⊤ := by
+  have hsurj
+      : LinearMap.range ((π.comp D : (Fin d → ℂ) →L[ℂ] Fin d → ℂ) : (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ)
+        = ⊤ := by
     rw [LinearMap.range_eq_top, ← LinearMap.injective_iff_surjective, ← LinearMap.ker_eq_bot,
       Submodule.eq_bot_iff]
     intro y hy
@@ -280,11 +291,14 @@ theorem _root_.GlobalTheory.CountableFibres.exists_independent_ratios :
     exact Filter.image_mem_map (hUo.mem_nhds hz₂)
   obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.1 hN
   have hinf : ∀ i, (Metric.ball (π (ρ z₂) i) ε).Infinite := fun i hfin => by
-    obtain ⟨x, hx, hxc⟩ := (hfin.countable.dense_compl ℝ).inter_open_nonempty _ Metric.isOpen_ball
-      ⟨_, Metric.mem_ball_self hε⟩
+    obtain ⟨x, hx, hxc⟩ :=
+      (hfin.countable.dense_compl ℝ).inter_open_nonempty _ Metric.isOpen_ball
+        ⟨_, Metric.mem_ball_self hε⟩
     exact hxc hx
   choose S hS hScard using fun i => (hinf i).exists_subset_card_eq (MvPolynomial.degreeOf i F + 1)
-  refine MvPolynomial.eq_zero_of_eval_zero_at_prod_finset F S (fun i => by rw [hScard i]; omega) fun x hx => ?_
+  refine MvPolynomial.eq_zero_of_eval_zero_at_prod_finset F S
+    (fun i => by rw [hScard i]; omega)
+    fun x hx => ?_
   have hxb : x ∈ Metric.ball (π (ρ z₂)) ε := by
     rw [ball_pi _ hε]
     exact fun i _ => hS i (hx i)

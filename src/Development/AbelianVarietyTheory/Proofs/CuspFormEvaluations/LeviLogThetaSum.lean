@@ -16,20 +16,27 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.Exists
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.I2 ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.I2
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
 open scoped ContDiff
 
 namespace GlobalTheory.ThetaSumLevi
 
 open ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y Topology Filter
 
-theorem levi_lower {n : ℕ} {ι : Type} (s : Finset ι) {g : ι → V n → ℂ} {D : V n → ℂ}
-    {φ : V n → ℝ} {z : V n} (c d : ℝ) (hg : ∀ t, ContDiffAt ℂ 2 (g t) z) (hD : ContDiffAt ℂ 2 D z)
-    (hD0 : D z ≠ 0) (hφ : ContDiffAt ℝ 2 φ z) (hpos : 0 < ∑ t ∈ s, Complex.normSq (g t z))
-    (ξ : Fin n → ℂ) :
-    -(c * (leviV n (fun w => ((φ w : ℝ) : ℂ)) z ξ).re) ≤
-      (leviV n (fun w => ((Real.log (∑ t ∈ s, Complex.normSq (g t w)) +
-        ((c * Real.log (Complex.normSq (D w)) + d) + (-c) * φ w) : ℝ) : ℂ)) z ξ).re := by
+theorem levi_lower
+    {n : ℕ} {ι : Type} (s : Finset ι)
+    {g : ι → V n → ℂ} {D : V n → ℂ} {φ : V n → ℝ} {z : V n}
+    (c d : ℝ) (hg : ∀ t, ContDiffAt ℂ 2 (g t) z) (hD : ContDiffAt ℂ 2 D z) (hD0 : D z ≠ 0)
+    (hφ : ContDiffAt ℝ 2 φ z) (hpos : 0 < ∑ t ∈ s, Complex.normSq (g t z)) (ξ : Fin n → ℂ)
+    : -(c * (leviV n (fun w => ((φ w : ℝ) : ℂ)) z ξ).re)
+      ≤ (leviV n
+        (fun w =>
+          ((Real.log (∑ t ∈ s, Complex.normSq (g t w))
+                + ((c * Real.log (Complex.normSq (D w)) + d) + (-c) * φ w)
+              : ℝ)
+            : ℂ))
+        z ξ).re := by
   have hS : ContDiffAt ℝ 2 (fun w => Real.log (∑ t ∈ s, Complex.normSq (g t w))) z :=
     (ContDiffAt.sum fun t _ => contDiffAt_normSq_comp (hg t)).log hpos.ne'
   have hL : ContDiffAt ℝ 2 (fun w => Real.log (Complex.normSq (D w))) z :=
@@ -37,16 +44,23 @@ theorem levi_lower {n : ℕ} {ι : Type} (s : Finset ι) {g : ι → V n → ℂ
   have hL' : ContDiffAt ℝ 2 (fun w => c * Real.log (Complex.normSq (D w)) + d) z :=
     (contDiffAt_const.mul hL).add contDiffAt_const
   have hφ' : ContDiffAt ℝ 2 (fun w => (-c) * φ w) z := contDiffAt_const.mul hφ
-  have e : ∀ w, ∑ t ∈ s, Complex.normSq (g t w) =
-      ∑ i : Fin s.card, Complex.normSq (g (s.equivFin.symm i) w) := fun w => by
+  have e
+      : ∀ w,
+        ∑ t ∈ s, Complex.normSq (g t w)
+          = ∑ i : Fin s.card, Complex.normSq (g (s.equivFin.symm i) w) := fun w => by
     rw [← Finset.sum_coe_sort s]
     exact (s.equivFin.symm.sum_comp fun t => Complex.normSq (g t w)).symm
-  have h0 := leviV_log_sum_nonneg (u := fun (i : Fin s.card) w => Complex.normSq (g (s.equivFin.symm i) w))
-    (x := z) (fun i => contDiffAt_normSq_comp (hg _)) (fun i => logPshAt_normSq (hg _))
-    (by rw [← e]; exact hpos) ξ
+  have h0 :=
+    leviV_log_sum_nonneg
+      (u := fun (i : Fin s.card) w => Complex.normSq (g (s.equivFin.symm i) w))
+      (x := z)
+      (fun i => contDiffAt_normSq_comp (hg _))
+      (fun i => logPshAt_normSq (hg _))
+      (by rw [← e]; exact hpos) ξ
   simp only [← e] at h0
-  rw [LocalMaximumSecondDerivative.leviV_ofReal_add hS (hL'.add hφ'), LocalMaximumSecondDerivative.leviV_ofReal_add hL' hφ',
-    leviV_const_mul hL, leviV_log_normSq hD hD0, LocalMaximumSecondDerivative.leviV_ofReal_const_mul _ hφ]
+  rw [LocalMaximumSecondDerivative.leviV_ofReal_add hS (hL'.add hφ'),
+    LocalMaximumSecondDerivative.leviV_ofReal_add hL' hφ', leviV_const_mul hL,
+    leviV_log_normSq hD hD0, LocalMaximumSecondDerivative.leviV_ofReal_const_mul _ hφ]
   simp only [mul_zero, zero_add, Complex.add_re, Complex.re_ofReal_mul]
   linarith
 

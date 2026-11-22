@@ -9,12 +9,16 @@ open CategoryTheory Limits AlgebraicGeometry Opposite
 
 namespace LateralTheory.E.Gluing₂
 
-theorem orth {S : Type} [CommRing S] : ∀ (n : ℕ) (ε : Fin n → S), (∀ j, IsIdempotentElem (ε j)) →
-    ∃ ε' : Fin n → S, OrthogonalIdempotents ε' ∧ (∀ j, ∃ c, ε' j = ε j * c) ∧
-      ∑ j, ε' j = 1 - ∏ j, (1 - ε j) := by
+theorem orth {S : Type} [CommRing S]
+    : ∀ (n : ℕ) (ε : Fin n → S),
+      (∀ j, IsIdempotentElem (ε j))
+        → ∃ ε' : Fin n → S,
+          OrthogonalIdempotents ε' ∧ (∀ j, ∃ c, ε' j = ε j * c)
+            ∧ ∑ j, ε' j = 1 - ∏ j, (1 - ε j) := by
   intro n
   induction n with
-  | zero => intro ε _; exact ⟨fun _ => 0, ⟨fun i => i.elim0, fun i => i.elim0⟩, fun i => i.elim0, by simp⟩
+  | zero =>
+    intro ε _; exact ⟨fun _ => 0, ⟨fun i => i.elim0, fun i => i.elim0⟩, fun i => i.elim0, by simp⟩
   | succ n ih =>
     intro ε hε
     obtain ⟨ε₀, ho, hd, hs⟩ := ih (fun j => ε j.succ) (fun j => hε j.succ)
@@ -42,7 +46,9 @@ theorem orth {S : Type} [CommRing S] : ∀ (n : ℕ) (ε : Fin n → S), (∀ j,
         | succ k =>
           simp only [Fin.cons_succ]
           have hik' : i ≠ k := fun h => hik (by rw [h])
-          calc (1 - ε 0) * ε₀ i * ((1 - ε 0) * ε₀ k) = ((1 - ε 0) * (1 - ε 0)) * (ε₀ i * ε₀ k) := by ring
+          calc
+            (1 - ε 0) * ε₀ i * ((1 - ε 0) * ε₀ k)
+              = ((1 - ε 0) * (1 - ε 0)) * (ε₀ i * ε₀ k) := by ring
             _ = 0 := by rw [ho.ortho hik', mul_zero]
     · intro i
       refine Fin.cases ⟨1, by simp⟩ (fun j => ?_) i
@@ -66,12 +72,15 @@ theorem glue : LateralTheory.E.FinEtSectionPf.Glue := by
     have : ∃ j, e j ∉ q.asIdeal := by
       by_contra hall
       push_neg at hall
-      exact q.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 (he.complete ▸ Ideal.sum_mem _ fun j _ => hall j))
+      exact q.isPrime.ne_top ((Ideal.eq_top_iff_one _).2
+        (he.complete ▸ Ideal.sum_mem _ fun j _ => hall j))
     obtain ⟨j, hj⟩ := this
     have hq' : q ∈ Set.range (PrimeSpectrum.comap (algebraMap C (Localization.Away (e j)))) := by
       rw [PrimeSpectrum.localization_away_comap_range (Localization.Away (e j)) (e j)]; exact hj
     obtain ⟨q', rfl⟩ := hq'
-    have hmem : (⟨J, hJ⟩ : PrimeSpectrum S) ∈ (PrimeSpectrum.basicOpen (ε j) : Set (PrimeSpectrum S)) := by
+    have hmem
+        : (⟨J, hJ⟩ : PrimeSpectrum S)
+          ∈ (PrimeSpectrum.basicOpen (ε j) : Set (PrimeSpectrum S)) := by
       rw [← hr j]; exact ⟨q', by rw [PrimeSpectrum.comap_comp_apply, hq]⟩
     have hεj : ε j ∉ J := hmem
     have h1 : 1 - ε j ∈ J := by
@@ -84,11 +93,12 @@ theorem glue : LateralTheory.E.FinEtSectionPf.Glue := by
   have hunit : ∀ j, IsUnit (Ideal.Quotient.mk (Ideal.span {1 - ε' j}) (ε j)) := by
     intro j
     refine isUnit_iff_exists_inv.2 ⟨Ideal.Quotient.mk _ (c j), ?_⟩
-    rw [← (Ideal.Quotient.mk (Ideal.span {1 - ε' j})).map_mul, ← hc j, ← (Ideal.Quotient.mk (Ideal.span {1 - ε' j})).map_one, Ideal.Quotient.eq]
+    rw [← (Ideal.Quotient.mk (Ideal.span {1 - ε' j})).map_mul, ← hc j,
+      ← (Ideal.Quotient.mk (Ideal.span {1 - ε' j})).map_one, Ideal.Quotient.eq]
     have hm := (Ideal.span {1 - ε' j}).neg_mem (Ideal.mem_span_singleton_self (1 - ε' j))
     rwa [neg_sub] at hm
-  let L : ∀ j, Localization.Away (ε j) →+* S ⧸ Ideal.span {1 - ε' j} :=
-    fun j => IsLocalization.Away.lift (ε j) (hunit j)
+  let L : ∀ j, Localization.Away (ε j) →+* S ⧸ Ideal.span {1 - ε' j} := fun j =>
+    IsLocalization.Away.lift (ε j) (hunit j)
   let Φ : C →+* (∀ j, S ⧸ Ideal.span {1 - ε' j}) :=
     RingHom.pi fun j => ((L j).comp (h j)).comp (algebraMap C (Localization.Away (e j)))
   let E := RingEquiv.ofBijective _ hco.bijective_pi
@@ -105,6 +115,8 @@ theorem glue : LateralTheory.E.FinEtSectionPf.Glue := by
     MonoidHom.coe_coe, RingHom.coe_comp, Function.comp_apply, hΦ]
   simp
 
-theorem Glue_of (_hL : LateralTheory.E.t_E1Cut.EtLift) (_hA : LateralTheory.E.t_E1Cut.EtAIC) : LateralTheory.E.FinEtSectionPf.Glue := glue
+theorem Glue_of (_hL : LateralTheory.E.t_E1Cut.EtLift) (_hA : LateralTheory.E.t_E1Cut.EtAIC)
+    : LateralTheory.E.FinEtSectionPf.Glue :=
+  glue
 
 end LateralTheory.E.Gluing₂

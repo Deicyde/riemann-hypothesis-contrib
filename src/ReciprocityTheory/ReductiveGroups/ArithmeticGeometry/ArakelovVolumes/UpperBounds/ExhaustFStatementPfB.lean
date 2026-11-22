@@ -13,14 +13,17 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDef) {e : Fin r → ℂ}
-    (he : e ≠ 0) (hperp : ∀ b, hermC τ.1 X.Gm e (X.colP x τ b) = 0) :
-    (hermC τ.1 X.Gm e e).re < 0 := by
+theorem neg_of_perp'
+    {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDef)
+    {e : Fin r → ℂ} (he : e ≠ 0) (hperp : ∀ b, hermC τ.1 X.Gm e (X.colP x τ b) = 0)
+    : (hermC τ.1 X.Gm e e).re < 0 := by
   classical
   obtain ⟨P, hPdet, hPgram⟩ := X.signature τ
   have hG := X.Gm_herm
-  have hg : ∀ a b, hermC τ.1 X.Gm (FD.col P a) (FD.col P b) =
-      Matrix.diagonal (fun a : Fin r => ((sgn X.p0 a : ℝ) : ℂ)) a b := fun a b => by
+  have hg
+      : ∀ a b,
+        hermC τ.1 X.Gm (FD.col P a) (FD.col P b)
+          = Matrix.diagonal (fun a : Fin r => ((sgn X.p0 a : ℝ) : ℂ)) a b := fun a b => by
     rw [← hPgram]; rfl
   have hPu : IsUnit P.det := isUnit_iff_ne_zero.2 hPdet
   have hcoord : ∀ u : Fin r → ℂ, ∑ a, (P⁻¹ *ᵥ u) a • FD.col P a = u := by
@@ -32,8 +35,10 @@ theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDe
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, FD.col, Matrix.mulVec, dotProduct]
     refine Finset.sum_congr rfl fun a _ => ?_
     ring
-  have hquad : ∀ y : Fin r → ℂ, hermC τ.1 X.Gm (∑ a, y a • FD.col P a) (∑ b, y b • FD.col P b) =
-      ∑ a, y a * conj (y a) * ((sgn X.p0 a : ℝ) : ℂ) := by
+  have hquad
+      : ∀ y : Fin r → ℂ,
+        hermC τ.1 X.Gm (∑ a, y a • FD.col P a) (∑ b, y b • FD.col P b)
+          = ∑ a, y a * conj (y a) * ((sgn X.p0 a : ℝ) : ℂ) := by
     intro y
     rw [hermC_sum_left]
     refine Finset.sum_congr rfl fun a _ => ?_
@@ -43,8 +48,8 @@ theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDe
     ring
   by_contra hcon
   push_neg at hcon
-  let Q : Matrix (Fin r) (Option (Fin X.p0)) ℂ :=
-    fun k o => Option.elim o (e k) (fun b => X.colP x τ b k)
+  let Q : Matrix (Fin r) (Option (Fin X.p0)) ℂ := fun k o =>
+    Option.elim o (e k) (fun b => X.colP x τ b k)
   let R : Matrix (Fin X.p0) (Option (Fin X.p0)) ℂ := (P⁻¹ * Q).submatrix (Fin.castLE X.p0_le) id
   have hker : LinearMap.ker (Matrix.mulVecLin R) ≠ ⊥ := by
     apply LinearMap.ker_ne_bot_of_finrank_lt
@@ -59,8 +64,9 @@ theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDe
     congr 1
     · exact Finset.sum_congr rfl fun b _ => mul_comm _ _
     · exact mul_comm _ _
-  have hy0 : ∀ a : Fin X.p0,
-      (P⁻¹ *ᵥ (∑ b, z (some b) • X.colP x τ b + z none • e)) (Fin.castLE X.p0_le a) = 0 := by
+  have hy0
+      : ∀ a : Fin X.p0,
+        (P⁻¹ *ᵥ (∑ b, z (some b) • X.colP x τ b + z none • e)) (Fin.castLE X.p0_le a) = 0 := by
     intro a
     have h3 : ((P⁻¹ * Q) *ᵥ z) (Fin.castLE X.p0_le a) = 0 := congrFun hz a
     rwa [← Matrix.mulVec_mulVec, hQv] at h3
@@ -68,14 +74,14 @@ theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDe
   set v : Fin r → ℂ := w + z none • e with hvdef
   set y : Fin r → ℂ := P⁻¹ *ᵥ v with hydef
   have hvP : v = ∑ k, y k • FD.col P k := (hcoord v).symm
-  have hsg : ∀ k, y k * conj (y k) * ((sgn X.p0 k : ℝ) : ℂ) =
-      -((Complex.normSq (y k) : ℝ) : ℂ) := by
+  have hsg
+      : ∀ k, y k * conj (y k) * ((sgn X.p0 k : ℝ) : ℂ) = -((Complex.normSq (y k) : ℝ) : ℂ) := by
     intro k
     by_cases hk : (k : ℕ) < X.p0
     · have : y k = 0 := hy0 ⟨k, hk⟩
       simp [this]
     · simp [sgn, hk, Complex.mul_conj]
-  have hvv1 : hermC τ.1 X.Gm v v = -∑ k, ((Complex.normSq (y k) : ℝ) : ℂ) := by
+  have hvv1 : hermC τ.1 X.Gm v v = - ∑ k, ((Complex.normSq (y k) : ℝ) : ℂ) := by
     rw [hvP, hquad]
     simp only [hsg, Finset.sum_neg_distrib]
   have hwe : hermC τ.1 X.Gm w e = 0 := by
@@ -86,30 +92,30 @@ theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDe
     rw [hwdef, hermC_sum_right]
     refine Finset.sum_eq_zero fun b _ => ?_
     rw [hermC_smul_right, hperp b, mul_zero]
-  have hvv2 : hermC τ.1 X.Gm v v =
-      hermC τ.1 X.Gm w w + z none * conj (z none) * hermC τ.1 X.Gm e e := by
+  have hvv2
+      : hermC τ.1 X.Gm v v = hermC τ.1 X.Gm w w + z none * conj (z none) * hermC τ.1 X.Gm e e := by
     rw [hvdef]
     simp only [hermC_add_left, hermC_add_right, hermC_smul_left, hermC_smul_right, hwe, hew]
     ring
-  have hwq : hermC τ.1 X.Gm w w =
-      ∑ a, ∑ b, z (some a) * X.gramPos x τ a b * conj (z (some b)) := by
+  have hwq : hermC τ.1 X.Gm w w = ∑ a, ∑ b, z (some a) * X.gramPos x τ a b * conj (z (some b)) := by
     rw [hwdef, hermC_sum_left]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [hermC_smul_left, hermC_sum_right, Finset.mul_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [hermC_smul_right, Data.gramPos_apply]
     ring
-  have hre : (hermC τ.1 X.Gm v v).re =
-      (hermC τ.1 X.Gm w w).re + Complex.normSq (z none) * (hermC τ.1 X.Gm e e).re := by
+  have hre
+      : (hermC τ.1 X.Gm v v).re
+        = (hermC τ.1 X.Gm w w).re + Complex.normSq (z none) * (hermC τ.1 X.Gm e e).re := by
     rw [hvv2, Complex.mul_conj, Complex.add_re, Complex.re_ofReal_mul]
-  have hre2 : (hermC τ.1 X.Gm v v).re = -∑ k, Complex.normSq (y k) := by
-    rw [hvv1]; simp
+  have hre2 : (hermC τ.1 X.Gm v v).re = - ∑ k, Complex.normSq (y k) := by rw [hvv1]; simp
   have hww : 0 ≤ (hermC τ.1 X.Gm w w).re := by
     by_cases hz1 : (fun b => z (some b)) = 0
     · have hw0 : w = 0 := by
         rw [hwdef]
         simp [show ∀ b, z (some b) = 0 from fun b => congrFun hz1 b]
-      rw [hw0]; simp [hermC]
+      rw [hw0]
+      simp [hermC]
     · rw [hwq]; exact (quad_re_pos hA hz1).le
   have hnn : 0 ≤ (hermC τ.1 X.Gm v v).re := by
     rw [hre]; exact add_nonneg hww (mul_nonneg (Complex.normSq_nonneg _) hcon)
@@ -119,11 +125,11 @@ theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDe
       rw [hre2] at hnn
       linarith
     intro k
-    have := (Finset.sum_eq_zero_iff_of_nonneg (fun k _ => Complex.normSq_nonneg (y k))).1 hs k
-      (Finset.mem_univ _)
+    have :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun k _ => Complex.normSq_nonneg (y k))).1 hs k
+        (Finset.mem_univ _)
     exact Complex.normSq_eq_zero.1 this
-  have hv0 : v = 0 := by
-    rw [hvP]; simp [hy]
+  have hv0 : v = 0 := by rw [hvP]; simp [hy]
   have hzs : (fun b => z (some b)) = 0 := by
     by_contra hz1
     have h1 := quad_re_pos hA hz1
@@ -144,9 +150,11 @@ theorem neg_of_perp' {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDe
   | none => exact ht0
   | some b => exact congrFun hzs b
 
-theorem psgn_dmin_gt {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0)
-    (hA : (X.gramPos x τ).PosDef) (k : ℕ) (hk : X.p0 + k ≤ r) (i : Fin (r + 1))
-    (hik : (i : ℕ) = X.p0 + k) : 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := by
+theorem psgn_dmin_gt
+    {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0) (hA : (X.gramPos x τ).PosDef)
+    (k : ℕ) (hk : X.p0 + k ≤ r)
+    (i : Fin (r + 1)) (hik : (i : ℕ) = X.p0 + k)
+    : 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := by
   classical
   have hG := X.Gm_herm
   let gr : Fin k → Fin r := fun j => ⟨X.p0 + j, by have := j.isLt; omega⟩
@@ -178,7 +186,7 @@ theorem psgn_dmin_gt {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0
     show hermC τ.1 X.Gm (d j + ∑ a, (-α j a) • X.colP x τ a) (X.colP x τ b) = 0
     rw [hermC_add_left, hermC_sum_left]
     simp only [hermC_smul_left]
-    have h1 : ∑ a, -α j a * hermC τ.1 X.Gm (X.colP x τ a) (X.colP x τ b) = -(α * A) j b := by
+    have h1 : ∑ a, -α j a * hermC τ.1 X.Gm (X.colP x τ a) (X.colP x τ b) = - (α * A) j b := by
       rw [Matrix.mul_apply, ← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [hAab]
@@ -199,9 +207,10 @@ theorem psgn_dmin_gt {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0
       congr 1
       exact Finset.sum_congr rfl fun a _ => neg_mul _ _
     rw [Matrix.sub_apply, h2, h3]
-  have hSH : (D - α * B).IsHermitian := Matrix.IsHermitian.ext fun j l => by
-    rw [hSw, hSw]
-    exact hermC_conj τ.1 hG _ _
+  have hSH : (D - α * B).IsHermitian :=
+    Matrix.IsHermitian.ext fun j l => by
+      rw [hSw, hSw]
+      exact hermC_conj τ.1 hG _ _
   have hli0 : LinearIndependent ℂ (fun m => FD.col (mat x τ) m) :=
     Matrix.linearIndependent_cols_of_det_ne_zero hdet
   have hg : Function.Injective (Sum.elim (Fin.castLE X.p0_le) gr) := by
@@ -225,10 +234,10 @@ theorem psgn_dmin_gt {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0
   have hS : (-(D - α * B)).PosDef := by
     refine Matrix.PosDef.of_dotProduct_mulVec_pos hSH.neg fun xv hxv => ?_
     set W : Fin r → ℂ := ∑ j, conj (xv j) • wv j with hWdef
-    have hq : star xv ⬝ᵥ ((-(D - α * B)) *ᵥ xv) = -hermC τ.1 X.Gm W W := by
+    have hq : star xv ⬝ᵥ ((-(D - α * B)) *ᵥ xv) = - hermC τ.1 X.Gm W W := by
       rw [hWdef, hermC_sum_left]
-      simp only [hermC_smul_left, hermC_sum_right, hermC_smul_right, Complex.conj_conj,
-        dotProduct, Matrix.mulVec, Matrix.neg_apply, hSw, Pi.star_apply, Finset.mul_sum]
+      simp only [hermC_smul_left, hermC_sum_right, hermC_smul_right, Complex.conj_conj, dotProduct,
+        Matrix.mulVec, Matrix.neg_apply, hSw, Pi.star_apply, Finset.mul_sum]
       rw [← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [← Finset.sum_neg_distrib]
@@ -249,16 +258,17 @@ theorem psgn_dmin_gt {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0
           Finset.smul_sum, smul_smul, Finset.sum_smul]
         rw [add_comm, Finset.sum_comm]
         rfl
-      have h0 : ∑ s, coef s • ((fun m => FD.col (mat x τ) m) ∘ Sum.elim (Fin.castLE X.p0_le) gr) s
-          = 0 := hsum.trans hW
+      have h0
+          : ∑ s, coef s • ((fun m => FD.col (mat x τ) m) ∘ Sum.elim (Fin.castLE X.p0_le) gr) s
+            = 0 :=
+        hsum.trans hW
       have hcoef := Fintype.linearIndependent_iff.1 hli coef h0
       apply hxv
       funext j
       have := hcoef (Sum.inr j)
       simpa [coef] using this
     have hneg := neg_of_perp' X τ hA hW0 hWc
-    have him : (hermC τ.1 X.Gm W W).im = 0 :=
-      Complex.conj_eq_iff_im.1 (hermC_conj τ.1 hG W W)
+    have him : (hermC τ.1 X.Gm W W).im = 0 := Complex.conj_eq_iff_im.1 (hermC_conj τ.1 hG W W)
     rw [hq, Complex.lt_def]
     constructor
     · simp only [Complex.zero_re, Complex.neg_re]
@@ -269,8 +279,9 @@ theorem psgn_dmin_gt {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0
     rw [Matrix.det_neg, Fintype.card_fin, ← mul_assoc, ← mul_pow]
     norm_num
   rw [hdetS, hik, OrthonormalChartBounds.psgn_add]
-  have hz : A.det * ((-1) ^ k * (-(D - α * B)).det) =
-      (((-1 : ℝ) ^ k : ℝ) : ℂ) * (A.det * (-(D - α * B)).det) := by
+  have hz
+      : A.det * ((-1) ^ k * (-(D - α * B)).det)
+        = (((-1 : ℝ) ^ k : ℝ) : ℂ) * (A.det * (-(D - α * B)).det) := by
     push_cast
     ring
   have hre : 0 < (A.det * (-(D - α * B)).det).re := by
@@ -282,21 +293,24 @@ theorem psgn_dmin_gt {x : Frame X.Ψ r} (τ : X.Ψ) (hdet : (mat x τ).det ≠ 0
   rw [hz, Complex.re_ofReal_mul, ← mul_assoc, h1, one_mul]
   exact hre
 
-theorem psgn_dmin_le {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDef) (i : Fin (r + 1))
-    (hip : (i : ℕ) ≤ X.p0) : 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := by
+theorem psgn_dmin_le
+    {x : Frame X.Ψ r} (τ : X.Ψ) (hA : (X.gramPos x τ).PosDef)
+    (i : Fin (r + 1)) (hip : (i : ℕ) ≤ X.p0)
+    : 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := by
   rw [psgn_eq_one hip, one_mul]
   have hsub : ((X.gramPos x τ).submatrix (Fin.castLE hip) (Fin.castLE hip)).PosDef :=
     hA.submatrix (Fin.castLE_injective hip)
-  have heq : dmin X.Gm x τ i =
-      ((X.gramPos x τ).submatrix (Fin.castLE hip) (Fin.castLE hip)).det := by
+  have heq
+      : dmin X.Gm x τ i = ((X.gramPos x τ).submatrix (Fin.castLE hip) (Fin.castLE hip)).det := by
     unfold dmin lminor Data.gramPos
     rw [Matrix.submatrix_submatrix]
     rfl
   rw [heq]
   exact OrthonormalChartBounds.pos_re_of_posDef hsub
 
-theorem mem_dom_of_gramPos {x : Frame X.Ψ r}
-    (h : ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧ (X.gramPos x τ).PosDef) : x ∈ X.dom := by
+theorem mem_dom_of_gramPos
+    {x : Frame X.Ψ r} (h : ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧ (X.gramPos x τ).PosDef)
+    : x ∈ X.dom := by
   rw [Data.mem_dom_iff]
   intro τ
   refine ⟨(h τ).1, fun i => ?_⟩

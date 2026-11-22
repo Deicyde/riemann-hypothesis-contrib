@@ -12,13 +12,15 @@ open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
 
 namespace Qx1
 
-theorem model_level_multiplier (P : M.Par) (L : R.LevelData (M.A P) P.r) (hL : M.IsModelLevel P L) (Y : ℂ) :
-    L.m0 Y = M.m0A P Y := by
+theorem model_level_multiplier
+    (P : M.Par) (L : R.LevelData (M.A P) P.r) (hL : M.IsModelLevel P L) (Y : ℂ)
+    : L.m0 Y = M.m0A P Y := by
   obtain ⟨-, -, -, -, -, -, hz, -, -, -, -, hGGi, -, hnabs, -⟩ := hL
   simp only [R.LevelData.m0, M.m0A, hz, hGGi, hnabs]
 
-theorem model_level_lowering (P : M.Par) (L : R.LevelData (M.A P) P.r) (hL : M.IsModelLevel P L) (Y : ℂ) :
-    L.l0 Y = M.l0A P Y := by
+theorem model_level_lowering
+    (P : M.Par) (L : R.LevelData (M.A P) P.r) (hL : M.IsModelLevel P L) (Y : ℂ)
+    : L.l0 Y = M.l0A P Y := by
   obtain ⟨-, -, -, -, -, -, -, -, hzb, -, -, hGGi, hnab, -, -⟩ := hL
   simp only [R.LevelData.l0, M.l0A, hzb, hGGi, hnab]
 

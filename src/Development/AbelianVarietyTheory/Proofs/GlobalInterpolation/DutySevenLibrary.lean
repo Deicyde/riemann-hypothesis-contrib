@@ -14,10 +14,16 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Weight
 
 namespace GlobalTheory.EX.DQ
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk GlobalTheory.EX GlobalTheory.Fc
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk GlobalTheory.EX
+  GlobalTheory.Fc
 
-theorem duty_seven_library : ∀ (eps : ℝ) (Fm : FamP eps), DQ.Duty7 Fm → Formalism.MainNotions.PageFix Fm ∧ Formalism.MainNotions.PageWin Fm ∧
-    Formalism.MainNotions.DIV.Align.SmallFirstModulusBelowScale Fm ∧ Formalism.MainNotions.TameDistinctF Fm ∧ Formalism.MainNotions.ChosenWall Fm ∧ DQ.TupUsedF Fm ∧ DQ.TwAllF Fm := by
+theorem duty_seven_library
+    : ∀ (eps : ℝ) (Fm : FamP eps),
+      DQ.Duty7 Fm
+        → Formalism.MainNotions.PageFix Fm ∧ Formalism.MainNotions.PageWin Fm
+          ∧ Formalism.MainNotions.DIV.Align.SmallFirstModulusBelowScale Fm
+          ∧ Formalism.MainNotions.TameDistinctF Fm ∧ Formalism.MainNotions.ChosenWall Fm
+          ∧ DQ.TupUsedF Fm ∧ DQ.TwAllF Fm := by
   intro eps Fm h
   obtain ⟨a, b, c, d, e, f, g⟩ := h
   refine ⟨a, b, fun x hx i => (c x hx i).2.2.2.2.1, ?_, ⟨Fm.x1 + 1, fun x hx i => ?_⟩, f, g⟩

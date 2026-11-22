@@ -22,15 +22,18 @@ variable {G : Subgroup 𝔸ˣ} {𝔤 : Submodule ℝ 𝔸} {h : IsExpLieAlgebra 
 
 section Scalar
 
-variable [CompactSpace K] {L : Type*} [Group L] [TopologicalSpace L] [IsTopologicalGroup L]
-  [LocallyCompactSpace L] [T2Space L] [TotallyDisconnectedSpace L] {V : Type*} [AddCommGroup V]
-  [Module ℂ V]
+variable
+  [CompactSpace K]
+  {L : Type*} [Group L] [TopologicalSpace L] [IsTopologicalGroup L] [LocallyCompactSpace L]
+  [T2Space L] [TotallyDisconnectedSpace L]
+  {V : Type*} [AddCommGroup V] [Module ℂ V]
 
-theorem exists_eq_smul_one (Mx : GKLModule h K L V) (hirr : Mx.IsIrreducible)
+theorem exists_eq_smul_one
+    (Mx : GKLModule h K L V) (hirr : Mx.IsIrreducible)
     (T : Module.End ℂ V) (hρ : ∀ X, Mx.gk.ρ X * T = T * Mx.gk.ρ X)
     (hσ : ∀ k, Mx.gk.σ k * T = T * Mx.gk.σ k) (hτ : ∀ g, Mx.τ g * T = T * Mx.τ g)
-    (hfin : ∀ v : V, ∃ F : Submodule ℂ V, FiniteDimensional ℂ F ∧ v ∈ F ∧ ∀ w ∈ F, T w ∈ F) :
-    ∃ c : ℂ, T = c • 1 := by
+    (hfin : ∀ v : V, ∃ F : Submodule ℂ V, FiniteDimensional ℂ F ∧ v ∈ F ∧ ∀ w ∈ F, T w ∈ F)
+    : ∃ c : ℂ, T = c • 1 := by
   have : IsSimpleOrder (Subrepresentation Mx.fullRep) := hirr
   have hnt : Nontrivial V := by
     by_contra hV
@@ -49,13 +52,15 @@ theorem exists_eq_smul_one (Mx : GKLModule h K L V) (hirr : Mx.IsIrreducible)
     rintro ⟨a, g⟩
     show Mx.gk.rep a * Mx.τ g * T = T * (Mx.gk.rep a * Mx.τ g)
     rw [mul_assoc, hτ, ← mul_assoc, Mx.gk.rep_comm hρ hσ a, mul_assoc]
-  let Y : Subrepresentation Mx.fullRep :=
-    ⟨LinearMap.ker (T - c • 1), fun p x hx => by
-      simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply,
-        Module.End.one_apply] at hx ⊢
+  let Y : Subrepresentation Mx.fullRep := ⟨
+    LinearMap.ker (T - c • 1),
+    fun p x hx => by
+      simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply]
+        at hx ⊢
       have e := congrArg (fun f : Module.End ℂ V => f x) (hcomm p)
       simp only [Module.End.mul_apply] at e
-      rw [← e, ← map_smul, ← map_sub, hx, map_zero]⟩
+      rw [← e, ← map_smul, ← map_sub, hx, map_zero]
+  ⟩
   have hwT : T (w : V) = c • (w : V) := congrArg Subtype.val hw.apply_eq_smul
   have hw0 : (w : V) ≠ 0 := fun h0 => hw.2 (Subtype.ext h0)
   rcases IsSimpleOrder.eq_bot_or_eq_top Y with hY | hY
@@ -76,12 +81,12 @@ section Casimir
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] {ι : Type*} [Fintype ι]
 
-noncomputable def casimirOp (M : h.GKModule K V) (b : Module.Basis ι ℝ h.lieSubalgebra) (ε : ι → ℝ) :
-    Module.End ℂ V :=
+noncomputable def casimirOp (M : h.GKModule K V) (b : Module.Basis ι ℝ h.lieSubalgebra) (ε : ι → ℝ)
+    : Module.End ℂ V :=
   ∑ i, ε i • (M.ρ (b i) * M.ρ (b i))
 
-theorem σ_mul_ρ (M : h.GKModule K V) (k : K) (Y : h.lieSubalgebra) :
-    M.σ k * M.ρ Y = M.ρ (h.AdLie (k : G) Y) * M.σ k :=
+theorem σ_mul_ρ (M : h.GKModule K V) (k : K) (Y : h.lieSubalgebra)
+    : M.σ k * M.ρ Y = M.ρ (h.AdLie (k : G) Y) * M.σ k :=
   LinearMap.ext fun v => M.map_ρ k (h.ofLie Y) v
 
 theorem AdLie_AdLie_inv (g : G) (Y : h.lieSubalgebra) : h.AdLie g (h.AdLie g⁻¹ Y) = Y := by
@@ -91,12 +96,15 @@ theorem AdLie_AdLie_inv (g : G) (Y : h.lieSubalgebra) : h.AdLie g (h.AdLie g⁻�
   rw [e]
   rfl
 
-theorem σ_mul_casimirOp [DecidableEq ι] (M : h.GKModule K V)
+theorem σ_mul_casimirOp
+    [DecidableEq ι]
+    (M : h.GKModule K V)
     {B : LinearMap.BilinForm ℝ h.lieSubalgebra} {b : Module.Basis ι ℝ h.lieSubalgebra} {ε : ι → ℝ}
     (hε : ∀ i, ε i * ε i = 1) (horth : ∀ i j, B (b i) (b j) = if i = j then ε i else 0)
     (hsymm : ∀ X Y, B X Y = B Y X)
-    (hAd : ∀ k : K, ∀ X Y, B (h.AdLie (k : G) X) (h.AdLie (k : G) Y) = B X Y) (k : K) :
-    M.σ k * casimirOp M b ε = casimirOp M b ε * M.σ k := by
+    (hAd : ∀ k : K, ∀ X Y, B (h.AdLie (k : G) X) (h.AdLie (k : G) Y) = B X Y)
+    (k : K)
+    : M.σ k * casimirOp M b ε = casimirOp M b ε * M.σ k := by
   set A := h.AdLie (k : G)
   set f : ι → h.lieSubalgebra := fun i => A (b i) with hf
 
@@ -136,25 +144,29 @@ theorem σ_mul_casimirOp [DecidableEq ι] (M : h.GKModule K V)
     unfold casimirOp
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Finset.sum_comm]
-    have e : ∀ l, ∑ i, (ε i * (ε j * B (b j) (f i) * (ε l * B (b l) (f i)))) •
-        (M.ρ (b j) * M.ρ (b l)) = (if j = l then ε j else 0) • (M.ρ (b j) * M.ρ (b l)) := by
+    have e
+        : ∀ l,
+          ∑ i, (ε i * (ε j * B (b j) (f i) * (ε l * B (b l) (f i)))) •
+              (M.ρ (b j) * M.ρ (b l))
+            = (if j = l then ε j else 0) • (M.ρ (b j) * M.ρ (b l)) := by
       intro l
       rw [← Finset.sum_smul]
       congr 1
       have := hsum j l
       rw [horth] at this
-      calc ∑ i, ε i * (ε j * B (b j) (f i) * (ε l * B (b l) (f i)))
-          = ε l * ε j * ∑ i, ε i * B (b j) (f i) * B (b l) (f i) := by
-            rw [Finset.mul_sum]
-            refine Finset.sum_congr rfl fun i _ => ?_
-            ring
+      calc
+        ∑ i, ε i * (ε j * B (b j) (f i) * (ε l * B (b l) (f i)))
+            = ε l * ε j * ∑ i, ε i * B (b j) (f i) * B (b l) (f i) := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun i _ => ?_
+          ring
         _ = if j = l then ε j else 0 := by
-            rw [this]
-            split_ifs with hjl
-            · subst hjl
-              have := hε j
-              linear_combination (ε j) * this
-            · ring
+          rw [this]
+          split_ifs with hjl
+          · subst hjl
+            have := hε j
+            linear_combination (ε j) * this
+          · ring
     rw [Finset.sum_congr rfl fun l _ => e l]
     simp
   conv_rhs => rw [← hcas]
@@ -169,9 +181,12 @@ section KType
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V]
 
-theorem ρ_mem_of_stable (M : h.GKModule K V) {F : Submodule ℂ V}
-    (hF : ∀ k, ∀ v ∈ F, M.σ k v ∈ F) {Z : h.lieSubalgebra}
-    (hZ : ∀ t : ℝ, h.expG (t • h.ofLie Z) ∈ K) {v : V} (hv : v ∈ F) : M.ρ Z v ∈ F := by
+theorem ρ_mem_of_stable
+    (M : h.GKModule K V)
+    {F : Submodule ℂ V} (hF : ∀ k, ∀ v ∈ F, M.σ k v ∈ F)
+    {Z : h.lieSubalgebra} (hZ : ∀ t : ℝ, h.expG (t • h.ofLie Z) ∈ K)
+    {v : V} (hv : v ∈ F)
+    : M.ρ Z v ∈ F := by
   by_contra hnot
   obtain ⟨ψ, hψ, hψF⟩ := Submodule.exists_dual_map_eq_bot_of_notMem hnot inferInstance
   have hd := M.hasDerivAt_coeff (h.ofLie Z) hZ ψ v
@@ -183,11 +198,13 @@ theorem ρ_mem_of_stable (M : h.GKModule K V) {F : Submodule ℂ V}
   rw [h0] at hd
   exact hψ (hd.unique (hasDerivAt_const (0 : ℝ) (0 : ℂ)))
 
-theorem map_ρ_of_equivariant (M : h.GKModule K V) {F : Submodule ℂ V}
-    (hF : ∀ k, ∀ v ∈ F, M.σ k v ∈ F) (f : F →ₗ[ℂ] V)
-    (hf : ∀ k (v : F), f ⟨M.σ k v, hF k v v.2⟩ = M.σ k (f v)) {Z : h.lieSubalgebra}
-    (hZ : ∀ t : ℝ, h.expG (t • h.ofLie Z) ∈ K) (v : F) (hv : M.ρ Z v ∈ F) :
-    f ⟨M.ρ Z v, hv⟩ = M.ρ Z (f v) := by
+theorem map_ρ_of_equivariant
+    (M : h.GKModule K V)
+    {F : Submodule ℂ V} (hF : ∀ k, ∀ v ∈ F, M.σ k v ∈ F) (f : F →ₗ[ℂ] V)
+    (hf : ∀ k (v : F), f ⟨M.σ k v, hF k v v.2⟩ = M.σ k (f v))
+    {Z : h.lieSubalgebra} (hZ : ∀ t : ℝ, h.expG (t • h.ofLie Z) ∈ K)
+    (v : F) (hv : M.ρ Z v ∈ F)
+    : f ⟨M.ρ Z v, hv⟩ = M.ρ Z (f v) := by
   rw [← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
   intro ψ
   rw [map_sub, sub_eq_zero]
@@ -195,8 +212,9 @@ theorem map_ρ_of_equivariant (M : h.GKModule K V) {F : Submodule ℂ V}
   have e : ∀ w : F, ψ' w = ψ (f w) := fun w => congrArg (fun g => g w) hψ'
   have h1 := M.hasDerivAt_coeff (h.ofLie Z) hZ ψ' v
   have h2 := M.hasDerivAt_coeff (h.ofLie Z) hZ ψ (f v)
-  have e2 : (fun t : ℝ => ψ' (M.σ ⟨h.expG (t • h.ofLie Z), hZ t⟩ v)) =
-      fun t => ψ (M.σ ⟨h.expG (t • h.ofLie Z), hZ t⟩ (f v)) := by
+  have e2
+      : (fun t : ℝ => ψ' (M.σ ⟨h.expG (t • h.ofLie Z), hZ t⟩ v))
+        = fun t => ψ (M.σ ⟨h.expG (t • h.ofLie Z), hZ t⟩ (f v)) := by
     funext t
     rw [← hf ⟨h.expG (t • h.ofLie Z), hZ t⟩ v]
     exact e ⟨_, _⟩
@@ -205,8 +223,8 @@ theorem map_ρ_of_equivariant (M : h.GKModule K V) {F : Submodule ℂ V}
   rw [← e ⟨_, hv⟩]
   exact this
 
-def toSub (M : h.GKModule K V) (m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule) :
-    Submodule ℂ V where
+def toSub (M : h.GKModule K V) (m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule)
+    : Submodule ℂ V where
   carrier := {v | M.σ.asModuleEquiv.symm v ∈ m}
   add_mem' {x y} hx hy := by
     show M.σ.asModuleEquiv.symm (x + y) ∈ m
@@ -221,16 +239,20 @@ def toSub (M : h.GKModule K V) (m : Submodule (MonoidAlgebra ℂ K) M.σ.asModul
     rw [Representation.asModuleEquiv_symm_map_smul]
     exact m.smul_mem _ hx
 
-theorem mem_toSub (M : h.GKModule K V) {m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule} {v : V} :
-    v ∈ toSub M m ↔ M.σ.asModuleEquiv.symm v ∈ m := Iff.rfl
+theorem mem_toSub (M : h.GKModule K V) {m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule} {v : V}
+    : v ∈ toSub M m ↔ M.σ.asModuleEquiv.symm v ∈ m :=
+  Iff.rfl
 
-theorem σ_mem_toSub (M : h.GKModule K V) (m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule) (k : K)
-    {v : V} (hv : v ∈ toSub M m) : M.σ k v ∈ toSub M m := by
+theorem σ_mem_toSub
+    (M : h.GKModule K V) (m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule)
+    (k : K)
+    {v : V} (hv : v ∈ toSub M m)
+    : M.σ k v ∈ toSub M m := by
   rw [mem_toSub, Representation.asModuleEquiv_symm_map_rho]
   exact m.smul_mem _ hv
 
-def ofStable (M : h.GKModule K V) (O : Submodule ℂ V) (hO : ∀ k, ∀ v ∈ O, M.σ k v ∈ O) :
-    Submodule (MonoidAlgebra ℂ K) M.σ.asModule where
+def ofStable (M : h.GKModule K V) (O : Submodule ℂ V) (hO : ∀ k, ∀ v ∈ O, M.σ k v ∈ O)
+    : Submodule (MonoidAlgebra ℂ K) M.σ.asModule where
   carrier := {x | M.σ.asModuleEquiv x ∈ O}
   add_mem' {x y} hx hy := by
     show M.σ.asModuleEquiv (x + y) ∈ O
@@ -257,48 +279,59 @@ def ofStable (M : h.GKModule K V) (O : Submodule ℂ V) (hO : ∀ k, ∀ v ∈ O
       rw [map_smul]
       exact O.smul_mem r ha
 
-theorem mem_ofStable (M : h.GKModule K V) (O : Submodule ℂ V) (hO : ∀ k, ∀ v ∈ O, M.σ k v ∈ O)
-    {x : M.σ.asModule} : x ∈ ofStable M O hO ↔ M.σ.asModuleEquiv x ∈ O := Iff.rfl
+theorem mem_ofStable
+    (M : h.GKModule K V) (O : Submodule ℂ V) (hO : ∀ k, ∀ v ∈ O, M.σ k v ∈ O) {x : M.σ.asModule}
+    : x ∈ ofStable M O hO ↔ M.σ.asModuleEquiv x ∈ O :=
+  Iff.rfl
 
-theorem sumSq_mem_of_stable (M : h.GKModule K V) {ι : Type*} [Fintype ι]
-    (Z : ι → h.lieSubalgebra) (hZ : ∀ i (t : ℝ), h.expG (t • h.ofLie (Z i)) ∈ K) {F : Submodule ℂ V}
-    (hF : ∀ k, ∀ v ∈ F, M.σ k v ∈ F) {v : V} (hv : v ∈ F) :
-    (∑ i, M.ρ (Z i) * M.ρ (Z i)) v ∈ F := by
+theorem sumSq_mem_of_stable
+    (M : h.GKModule K V)
+    {ι : Type*} [Fintype ι]
+    (Z : ι → h.lieSubalgebra) (hZ : ∀ i (t : ℝ), h.expG (t • h.ofLie (Z i)) ∈ K)
+    {F : Submodule ℂ V} (hF : ∀ k, ∀ v ∈ F, M.σ k v ∈ F)
+    {v : V} (hv : v ∈ F)
+    : (∑ i, M.ρ (Z i) * M.ρ (Z i)) v ∈ F := by
   rw [LinearMap.sum_apply]
-  exact Submodule.sum_mem _ fun i _ =>
-    ρ_mem_of_stable M hF (hZ i) (ρ_mem_of_stable M hF (hZ i) hv)
+  exact Submodule.sum_mem _ fun i _ => ρ_mem_of_stable M hF (hZ i) (ρ_mem_of_stable M hF (hZ i) hv)
 
-theorem aeval_eq_zero_of_equiv (M : h.GKModule K V) {ι : Type*} [Fintype ι]
+theorem aeval_eq_zero_of_equiv
+    (M : h.GKModule K V)
+    {ι : Type*} [Fintype ι]
     (Z : ι → h.lieSubalgebra) (hZ : ∀ i (t : ℝ), h.expG (t • h.ofLie (Z i)) ∈ K)
     {S m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule} (g : m ≃ₗ[MonoidAlgebra ℂ K] S)
-    (q : Polynomial ℂ)
-    (hq : ∀ v ∈ toSub M S, Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q v = 0)
-    {x : M.σ.asModule} (hx : x ∈ m) :
-    Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q (M.σ.asModuleEquiv x) = 0 := by
+    (q : Polynomial ℂ) (hq : ∀ v ∈ toSub M S, Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q v = 0)
+    {x : M.σ.asModule} (hx : x ∈ m)
+    : Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q (M.σ.asModuleEquiv x) = 0 := by
   have hFs : ∀ k, ∀ v ∈ toSub M S, M.σ k v ∈ toSub M S := fun k v hv => σ_mem_toSub M S k hv
-  have hCF : ∀ v ∈ toSub M S, (∑ i, M.ρ (Z i) * M.ρ (Z i)) v ∈ toSub M S :=
-    fun v hv => sumSq_mem_of_stable M Z hZ hFs hv
-  let fm : toSub M S →ₗ[ℂ] V :=
-    { toFun := fun w => M.σ.asModuleEquiv (g.symm ⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ : m)
-      map_add' := fun w w' => by
-        have e : (⟨M.σ.asModuleEquiv.symm ((w + w' : toSub M S) : V), (w + w').2⟩ : S) =
-            ⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ + ⟨M.σ.asModuleEquiv.symm (w' : V), w'.2⟩ :=
-          Subtype.ext (map_add _ _ _)
-        rw [e, map_add (f := _), Submodule.coe_add, map_add (f := _)]
-      map_smul' := fun a w => by
-        have e : (⟨M.σ.asModuleEquiv.symm ((a • w : toSub M S) : V), (a • w).2⟩ : S) =
-            a • (⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ : S) :=
-          Subtype.ext (map_smul _ _ _)
-        have e2 : g.symm (a • (⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ : S)) =
-            a • g.symm ⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ := by
-          rw [← algebraMap_smul (MonoidAlgebra ℂ K) a, map_smul, algebraMap_smul]
-        rw [e, e2, Submodule.coe_smul_of_tower, map_smul]
-        rfl }
+  have hCF : ∀ v ∈ toSub M S, (∑ i, M.ρ (Z i) * M.ρ (Z i)) v ∈ toSub M S := fun v hv =>
+    sumSq_mem_of_stable M Z hZ hFs hv
+  let fm : toSub M S →ₗ[ℂ] V := {
+    toFun := fun w => M.σ.asModuleEquiv (g.symm ⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ : m)
+    map_add' := fun w w' => by
+      have e
+          : (⟨M.σ.asModuleEquiv.symm ((w + w' : toSub M S) : V), (w + w').2⟩ : S)
+            = ⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ + ⟨M.σ.asModuleEquiv.symm (w' : V), w'.2⟩ :=
+        Subtype.ext (map_add _ _ _)
+      rw [e, map_add (f := _), Submodule.coe_add, map_add (f := _)]
+    map_smul' := fun a w => by
+      have e
+          : (⟨M.σ.asModuleEquiv.symm ((a • w : toSub M S) : V), (a • w).2⟩ : S)
+            = a • (⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ : S) :=
+        Subtype.ext (map_smul _ _ _)
+      have e2
+          : g.symm (a • (⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ : S))
+            = a • g.symm ⟨M.σ.asModuleEquiv.symm (w : V), w.2⟩ := by
+        rw [← algebraMap_smul (MonoidAlgebra ℂ K) a, map_smul, algebraMap_smul]
+      rw [e, e2, Submodule.coe_smul_of_tower, map_smul]
+      rfl
+  }
   have hfm : ∀ k (v : toSub M S), fm ⟨M.σ k v, hFs k v v.2⟩ = M.σ k (fm v) := by
     intro k v
-    have e : (⟨M.σ.asModuleEquiv.symm (M.σ k v), hFs k v v.2⟩ : S) =
-        MonoidAlgebra.of ℂ K k • (⟨M.σ.asModuleEquiv.symm (v : V), v.2⟩ : S) :=
-      Subtype.ext (by rw [Submodule.coe_smul]; exact Representation.asModuleEquiv_symm_map_rho _ _ _)
+    have e
+        : (⟨M.σ.asModuleEquiv.symm (M.σ k v), hFs k v v.2⟩ : S)
+          = MonoidAlgebra.of ℂ K k • (⟨M.σ.asModuleEquiv.symm (v : V), v.2⟩ : S) :=
+      Subtype.ext (by
+        rw [Submodule.coe_smul]; exact Representation.asModuleEquiv_symm_map_rho _ _ _)
     show M.σ.asModuleEquiv (g.symm ⟨M.σ.asModuleEquiv.symm (M.σ k v), _⟩ : m) = _
     rw [e, map_smul, Submodule.coe_smul, Representation.asModuleEquiv_map_smul,
       Representation.asAlgebraHom_of]
@@ -306,8 +339,10 @@ theorem aeval_eq_zero_of_equiv (M : h.GKModule K V) {ι : Type*} [Fintype ι]
   set A : Module.End ℂ (toSub M S) := LinearMap.restrict _ hCF with hA
   have hAC : ∀ w : toSub M S, fm (A w) = (∑ i, M.ρ (Z i) * M.ρ (Z i)) (fm w) := by
     intro w
-    have e : A w = ∑ i, (⟨M.ρ (Z i) (M.ρ (Z i) w),
-        ρ_mem_of_stable M hFs (hZ i) (ρ_mem_of_stable M hFs (hZ i) w.2)⟩ : toSub M S) := by
+    have e
+        : A w
+          = ∑ i, (⟨M.ρ (Z i) (M.ρ (Z i) w),
+            ρ_mem_of_stable M hFs (hZ i) (ρ_mem_of_stable M hFs (hZ i) w.2)⟩ : toSub M S) := by
       apply Subtype.ext
       rw [Submodule.coe_sum]
       show (∑ i, M.ρ (Z i) * M.ρ (Z i)) (w : V) = _
@@ -319,8 +354,10 @@ theorem aeval_eq_zero_of_equiv (M : h.GKModule K V) {ι : Type*} [Fintype ι]
     rw [Module.End.mul_apply]
     rw [map_ρ_of_equivariant M hFs fm hfm (hZ i) ⟨_, ρ_mem_of_stable M hFs (hZ i) w.2⟩,
       map_ρ_of_equivariant M hFs fm hfm (hZ i) w]
-  have hAsub : ∀ w : toSub M S, ((Polynomial.aeval A q w : toSub M S) : V) =
-      Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q (w : V) :=
+  have hAsub
+      : ∀ w : toSub M S,
+        ((Polynomial.aeval A q w : toSub M S) : V)
+          = Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q (w : V) :=
     AutomorphicForm.map_aeval_apply_of_intertwine (toSub M S).subtype (fun _ => rfl) q
   set y : S := g ⟨x, hx⟩ with hy
   have hyF : M.σ.asModuleEquiv (y : M.σ.asModule) ∈ toSub M S := by
@@ -332,15 +369,15 @@ theorem aeval_eq_zero_of_equiv (M : h.GKModule K V) {ι : Type*} [Fintype ι]
     have e : (⟨M.σ.asModuleEquiv.symm (M.σ.asModuleEquiv (y : M.σ.asModule)), hyF⟩ : S) = y :=
       Subtype.ext (LinearEquiv.symm_apply_apply _ _)
     rw [e, hy, LinearEquiv.symm_apply_apply]
-  have h0 : Polynomial.aeval A q ⟨_, hyF⟩ = 0 :=
-    Subtype.ext ((hAsub _).trans (hq _ hyF))
+  have h0 : Polynomial.aeval A q ⟨_, hyF⟩ = 0 := Subtype.ext ((hAsub _).trans (hq _ hyF))
   have h3 := AutomorphicForm.map_aeval_apply_of_intertwine fm hAC q ⟨_, hyF⟩
   rw [h0, map_zero, hfy] at h3
   exact h3.symm
 
-theorem finiteDimensional_toSub_of_isSimpleModule (M : h.GKModule K V)
-    {S : Submodule (MonoidAlgebra ℂ K) M.σ.asModule} (hS : IsSimpleModule (MonoidAlgebra ℂ K) S) :
-    FiniteDimensional ℂ (toSub M S) ∧ Nontrivial (toSub M S) := by
+theorem finiteDimensional_toSub_of_isSimpleModule
+    (M : h.GKModule K V)
+    {S : Submodule (MonoidAlgebra ℂ K) M.σ.asModule} (hS : IsSimpleModule (MonoidAlgebra ℂ K) S)
+    : FiniteDimensional ℂ (toSub M S) ∧ Nontrivial (toSub M S) := by
   have hSnt : Nontrivial S := IsSimpleModule.nontrivial (MonoidAlgebra ℂ K) S
   obtain ⟨s₀, hs₀⟩ := exists_ne (0 : S)
   set O := Submodule.span ℂ (range fun k : K => M.σ k (M.σ.asModuleEquiv (s₀ : M.σ.asModule)))
@@ -367,8 +404,7 @@ theorem finiteDimensional_toSub_of_isSimpleModule (M : h.GKModule K V)
       exact hs₀ (Subtype.ext hmem)
     · rw [← h1]
       exact inf_le_left
-  have hFO : toSub M S ≤ O := fun v hv => by
-    exact (mem_ofStable M O hOs).1 (hSN hv)
+  have hFO : toSub M S ≤ O := fun v hv => by exact (mem_ofStable M O hOs).1 (hSN hv)
   refine ⟨Submodule.finiteDimensional_of_le hFO, ?_⟩
   have hs₀F : M.σ.asModuleEquiv (s₀ : M.σ.asModule) ∈ toSub M S := by
     rw [mem_toSub, LinearEquiv.symm_apply_apply]
@@ -379,38 +415,49 @@ theorem finiteDimensional_toSub_of_isSimpleModule (M : h.GKModule K V)
   rw [Submodule.coe_zero]
   exact M.σ.asModuleEquiv.injective (h0.trans (map_zero _).symm)
 
-theorem exists_aeval_eq_zero_of_mem_isotypic (M : h.GKModule K V) {ι : Type*} [Fintype ι]
+theorem exists_aeval_eq_zero_of_mem_isotypic
+    (M : h.GKModule K V)
+    {ι : Type*} [Fintype ι]
     (Z : ι → h.lieSubalgebra) (hZ : ∀ i (t : ℝ), h.expG (t • h.ofLie (Z i)) ∈ K)
     {c : Submodule (MonoidAlgebra ℂ K) M.σ.asModule}
-    (hc : c ∈ isotypicComponents (MonoidAlgebra ℂ K) M.σ.asModule) :
-    ∃ q : Polynomial ℂ, q.Monic ∧ 0 < q.natDegree ∧
-      ∀ v : V, M.σ.asModuleEquiv.symm v ∈ c →
-        Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q v = 0 := by
+    (hc : c ∈ isotypicComponents (MonoidAlgebra ℂ K) M.σ.asModule)
+    : ∃ q : Polynomial ℂ,
+      q.Monic ∧ 0 < q.natDegree
+        ∧ ∀ v : V,
+          M.σ.asModuleEquiv.symm v ∈ c → Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) q v = 0 := by
   obtain ⟨S, hS, rfl⟩ := hc
   obtain ⟨hFfin, hFnt⟩ := finiteDimensional_toSub_of_isSimpleModule M hS
   have hFs : ∀ k, ∀ v ∈ toSub M S, M.σ k v ∈ toSub M S := fun k v hv => σ_mem_toSub M S k hv
-  have hCF : ∀ v ∈ toSub M S, (∑ i, M.ρ (Z i) * M.ρ (Z i)) v ∈ toSub M S :=
-    fun v hv => sumSq_mem_of_stable M Z hZ hFs hv
+  have hCF : ∀ v ∈ toSub M S, (∑ i, M.ρ (Z i) * M.ρ (Z i)) v ∈ toSub M S := fun v hv =>
+    sumSq_mem_of_stable M Z hZ hFs hv
   let A : Module.End ℂ (toSub M S) := LinearMap.restrict _ hCF
   refine ⟨A.charpoly, LinearMap.charpoly_monic A, ?_, ?_⟩
   · rw [LinearMap.charpoly_natDegree]
     exact Module.finrank_pos
   have hvanF : ∀ v ∈ toSub M S, Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) A.charpoly v = 0 := by
     intro v hv
-    have := AutomorphicForm.map_aeval_apply_of_intertwine (toSub M S).subtype (A := A)
-      (B := ∑ i, M.ρ (Z i) * M.ρ (Z i)) (fun _ => rfl) A.charpoly ⟨v, hv⟩
+    have :=
+      AutomorphicForm.map_aeval_apply_of_intertwine (toSub M S).subtype (A := A)
+        (B := ∑ i, M.ρ (Z i) * M.ρ (Z i))
+        (fun _ => rfl)
+        A.charpoly ⟨v, hv⟩
     rw [LinearMap.aeval_self_charpoly, LinearMap.zero_apply, map_zero] at this
     exact this.symm
   intro v hv
-  have hv' : M.σ.asModuleEquiv.symm v ∈ ⨆ m : {m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule |
-      Nonempty (m ≃ₗ[MonoidAlgebra ℂ K] S)}, m.1 := by
+  have hv'
+      : M.σ.asModuleEquiv.symm v
+        ∈ ⨆ m : {m : Submodule (MonoidAlgebra ℂ K) M.σ.asModule |
+          Nonempty (m ≃ₗ[MonoidAlgebra ℂ K] S)}, m.1 := by
     rw [← sSup_eq_iSup']
     exact hv
-  have key := Submodule.iSup_induction _ (motive := fun x =>
-    Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) A.charpoly (M.σ.asModuleEquiv x) = 0) hv'
-    (fun m x hx => aeval_eq_zero_of_equiv M Z hZ m.2.some A.charpoly hvanF hx)
-    (by rw [map_zero, map_zero])
-    (fun x y hx hy => by rw [map_add (f := _), map_add (f := _), hx, hy, add_zero])
+  have key :=
+    Submodule.iSup_induction _
+      (motive := fun x =>
+        Polynomial.aeval (∑ i, M.ρ (Z i) * M.ρ (Z i)) A.charpoly (M.σ.asModuleEquiv x) = 0)
+      hv'
+      (fun m x hx => aeval_eq_zero_of_equiv M Z hZ m.2.some A.charpoly hvanF hx)
+      (by rw [map_zero, map_zero])
+      (fun x y hx hy => by rw [map_add (f := _), map_add (f := _), hx, hy, add_zero])
   rwa [LinearEquiv.apply_symm_apply] at key
 
 end KType

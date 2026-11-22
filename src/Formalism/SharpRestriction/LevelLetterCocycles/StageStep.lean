@@ -13,9 +13,9 @@ namespace Formalism.MainNotions.UnusedSlot80.CrA
 variable {K : Type*} [Field K] {d : ℕ}
 
 def PiLocalization₂ (G : ℤ → Submodule K (Fin d → K)) (hi u : ℤ) : Prop :=
-  ∃ (S : Set (Fin d → K)) (ℓ : (Fin d → K) → ℤ), LinearIndepOn K id S ∧
-    (∀ x ∈ S, x ∈ G (ℓ x) ∧ u ≤ ℓ x ∧ ℓ x ≤ hi) ∧ S ⊆ G u ∧
-    ∀ u', u ≤ u' → u' ≤ hi → G u' ≤ Submodule.span K {x | x ∈ S ∧ u' ≤ ℓ x}
+  ∃ (S : Set (Fin d → K)) (ℓ : (Fin d → K) → ℤ),
+    LinearIndepOn K id S ∧ (∀ x ∈ S, x ∈ G (ℓ x) ∧ u ≤ ℓ x ∧ ℓ x ≤ hi) ∧ S ⊆ G u
+      ∧ ∀ u', u ≤ u' → u' ≤ hi → G u' ≤ Submodule.span K {x | x ∈ S ∧ u' ≤ ℓ x}
 
 theorem stage_top (G : ℤ → Submodule K (Fin d → K)) (hi : ℤ) : PiLocalization₂ G hi hi := by
   unfold PiLocalization₂
@@ -27,8 +27,10 @@ theorem stage_top (G : ℤ → Submodule K (Fin d → K)) (hi : ℤ) : PiLocaliz
   rw [hspan, Submodule.span_eq]
   rwa [← le_antisymm h2 h1]
 
-theorem stage_step (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (hi u : ℤ) (hu : u < hi)
-    (h : PiLocalization₂ G hi (u + 1)) : PiLocalization₂ G hi u := by
+theorem stage_step
+    (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G)
+    (hi u : ℤ) (hu : u < hi) (h : PiLocalization₂ G hi (u + 1))
+    : PiLocalization₂ G hi u := by
   unfold PiLocalization₂ at h ⊢
   obtain ⟨S, ℓ, hli, hmem, hSG, hspan⟩ := h
   have hSu : S ⊆ (G u : Set (Fin d → K)) := fun x hx => hG (by omega : u ≤ u + 1) (hSG hx)
@@ -58,8 +60,8 @@ theorem stage_step (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (hi
       rintro x ⟨hxS, hx⟩
       exact ⟨hSb hxS, by simpa [hxS] using hx⟩
 
-theorem stage_all (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (hi : ℤ) :
-    ∀ u ≤ hi, PiLocalization₂ G hi u := by
+theorem stage_all (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (hi : ℤ)
+    : ∀ u ≤ hi, PiLocalization₂ G hi u := by
   have key : ∀ k : ℕ, PiLocalization₂ G hi (hi - k) := by
     intro k
     induction k with
@@ -73,12 +75,12 @@ theorem stage_all (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (hi 
   have h := key (hi - u).toNat
   rwa [Int.toNat_of_nonneg (by omega), sub_sub_cancel] at h
 
-theorem adapted (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (lo hi : ℤ) (hlh : lo ≤ hi)
-    (hlo : G lo = ⊤) :
-    ∃ (I : ℕ) (P : Fin I → Fin d → K) (Q : Fin I → Fin d → K) (h : Fin I → ℤ),
-      (∀ c : Fin d → K, c = ∑ i, (∑ m, Q i m * c m) • P i) ∧
-      (∀ i, P i ∈ G (h i)) ∧ (∀ i, lo ≤ h i ∧ h i ≤ hi) ∧
-      ∀ u : ℤ, u ≤ hi → ∀ c ∈ G u, ∀ i, h i < u → ∑ m, Q i m * c m = 0 := by
+theorem adapted
+    (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (lo hi : ℤ) (hlh : lo ≤ hi) (hlo : G lo = ⊤)
+    : ∃ (I : ℕ) (P : Fin I → Fin d → K) (Q : Fin I → Fin d → K) (h : Fin I → ℤ),
+      (∀ c : Fin d → K, c = ∑ i, (∑ m, Q i m * c m) • P i) ∧ (∀ i, P i ∈ G (h i))
+        ∧ (∀ i, lo ≤ h i ∧ h i ≤ hi)
+        ∧ ∀ u : ℤ, u ≤ hi → ∀ c ∈ G u, ∀ i, h i < u → ∑ m, Q i m * c m = 0 := by
   obtain ⟨S, ℓ, hli, hmem, _, hspan⟩ := stage_all G hG hi lo hlh
   have hfin : S.Finite := LinearIndependent.set_finite_of_isNoetherian hli
   have := hfin.fintype
@@ -104,8 +106,16 @@ theorem adapted (G : ℤ → Submodule K (Fin d → K)) (hG : Antitone G) (lo hi
         simp
       · simp [hj]
     rw [hs, map_smul, Finsupp.smul_apply, smul_eq_mul, mul_comm]
-  refine ⟨Fintype.card S, fun i => B i, fun i m => B.repr (Pi.single m 1) i, fun i => ℓ (B i),
-    ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    Fintype.card S,
+    fun i => B i,
+    fun i m => B.repr (Pi.single m 1) i,
+    fun i => ℓ (B i),
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro c
     simp only [hQ]
     exact (B.sum_repr c).symm

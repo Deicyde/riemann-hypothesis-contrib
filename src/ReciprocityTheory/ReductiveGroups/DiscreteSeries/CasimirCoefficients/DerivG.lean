@@ -20,15 +20,21 @@ variable {n : ℕ}
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem hasDerivAt_Gint {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ)
-    {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) (k : KG ε) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y)
-    (γ : ℝ → KG ε) (hγ : ∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Y)) :
-    HasDerivAt (fun t => Gint T μ x (k * γ t))
+theorem hasDerivAt_Gint
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
+    (μ : Fin n → ℤ)
+    {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef)
+    (k : KG ε)
+    {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y)
+    (γ : ℝ → KG ε) (hγ : ∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Y))
+    : HasDerivAt
+      (fun t => Gint T μ x (k * γ t))
       (fderiv ℂ (PhiM μ) (toMK k⁻¹ * x * toMK k)
-          (toMK k⁻¹ * x * toMK k * Y - Y * (toMK k⁻¹ * x * toMK k)) •
-          (T.op k * projW T * T.op k⁻¹) +
-        PhiM μ (toMK k⁻¹ * x * toMK k) •
-          (T.op k * (T.dτ Y * projW T - projW T * T.dτ Y) * T.op k⁻¹)) 0 := by
+            (toMK k⁻¹ * x * toMK k * Y - Y * (toMK k⁻¹ * x * toMK k))
+          • (T.op k * projW T * T.op k⁻¹)
+        + PhiM μ (toMK k⁻¹ * x * toMK k)
+          • (T.op k * (T.dτ Y * projW T - projW T * T.dτ Y) * T.op k⁻¹))
+      0 := by
   have hm : ∀ a b : KG ε, toMK (a * b) = toMK a * toMK b := by
     intro a b
     simp [toMK, toM]
@@ -52,7 +58,9 @@ theorem hasDerivAt_Gint {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε
   have hst' : toMK k * star (toMK k) = 1 := Matrix.mem_unitaryGroup_iff.1 hk2.1
   have hkinv : toMK k⁻¹ = (toMK k)ᴴ := by
     rw [← Matrix.star_eq_conjTranspose]
-    calc toMK k⁻¹ = toMK k⁻¹ * (toMK k * star (toMK k)) := by rw [hst', mul_one]
+    calc
+      toMK k⁻¹
+        = toMK k⁻¹ * (toMK k * star (toMK k)) := by rw [hst', mul_one]
       _ = (toMK k⁻¹ * toMK k) * star (toMK k) := by rw [mul_assoc]
       _ = star (toMK k) := by rw [hi, one_mul]
   have hinjk : Function.Injective (toMK k).mulVec := by
@@ -70,24 +78,30 @@ theorem hasDerivAt_Gint {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε
       NormedSpace.exp_zero]
   have hinvγ : ∀ t : ℝ, toMK (γ t)⁻¹ = NormedSpace.exp (-((t : ℂ) • Y)) := by
     intro t
-    calc toMK (γ t)⁻¹
-        = toMK (γ t)⁻¹ * (NormedSpace.exp ((t : ℂ) • Y) * NormedSpace.exp (-((t : ℂ) • Y))) := by
-          rw [hexp, mul_one]
-      _ = (toMK (γ t)⁻¹ * toMK (γ t)) * NormedSpace.exp (-((t : ℂ) • Y)) := by
-          rw [hγ t, mul_assoc]
+    calc
+      toMK (γ t)⁻¹
+          = toMK (γ t)⁻¹ * (NormedSpace.exp ((t : ℂ) • Y) * NormedSpace.exp (-((t : ℂ) • Y))) := by
+        rw [hexp, mul_one]
+      _ = (toMK (γ t)⁻¹ * toMK (γ t)) * NormedSpace.exp (-((t : ℂ) • Y)) := by rw [hγ t, mul_assoc]
       _ = _ := by rw [hi, one_mul]
-  have hf : ∀ t : ℝ, toMK (k * γ t)⁻¹ * x * toMK (k * γ t) =
-      NormedSpace.exp (-((t : ℂ) • Y)) * (toMK k⁻¹ * x * toMK k) * NormedSpace.exp ((t : ℂ) • Y) := by
+  have hf
+      : ∀ t : ℝ,
+        toMK (k * γ t)⁻¹ * x * toMK (k * γ t)
+          = NormedSpace.exp (-((t : ℂ) • Y)) * (toMK k⁻¹ * x * toMK k)
+            * NormedSpace.exp ((t : ℂ) • Y) := by
     intro t
     rw [_root_.mul_inv_rev, hm, hm, hinvγ, hγ]
     simp only [mul_assoc]
   have hQe : ∀ t : ℝ, T.op (1 * (γ t)⁻¹) * T.op k⁻¹ = T.op (k * γ t)⁻¹ := by
     intro t
     rw [one_mul, _root_.mul_inv_rev, hop]
-  have hfun : (fun t : ℝ => Gint T μ x (k * γ t)) = fun t : ℝ =>
-      PhiM μ (NormedSpace.exp (-((t : ℂ) • Y)) * (toMK k⁻¹ * x * toMK k) *
-        NormedSpace.exp ((t : ℂ) • Y)) •
-        (T.op (k * γ t) * projW T * (T.op (1 * (γ t)⁻¹) * T.op k⁻¹)) := by
+  have hfun
+      : (fun t : ℝ => Gint T μ x (k * γ t))
+        = fun t : ℝ =>
+          PhiM μ
+              (NormedSpace.exp (-((t : ℂ) • Y)) * (toMK k⁻¹ * x * toMK k)
+                * NormedSpace.exp ((t : ℂ) • Y))
+            • (T.op (k * γ t) * projW T * (T.op (1 * (γ t)⁻¹) * T.op k⁻¹)) := by
     funext t
     simp only [Gint]
     rw [hf t, hQe t]
@@ -98,13 +112,19 @@ theorem hasDerivAt_Gint {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε
     exact hinvγ t
   have hQ := (hasDerivAt_op T 1 (inK_neg hY) (fun s : ℝ => (γ s)⁻¹) hδ).mul_const (T.op k⁻¹)
   have hM := (hP.mul_const (projW T)).mul hQ
-  have hφ : HasDerivAt (fun t : ℝ => PhiM μ (NormedSpace.exp (-((t : ℂ) • Y)) *
-      (toMK k⁻¹ * x * toMK k) * NormedSpace.exp ((t : ℂ) • Y)))
+  have hφ : HasDerivAt
+      (fun t : ℝ =>
+        PhiM μ
+          (NormedSpace.exp (-((t : ℂ) • Y)) * (toMK k⁻¹ * x * toMK k)
+            * NormedSpace.exp ((t : ℂ) • Y)))
       (fderiv ℂ (PhiM μ) (toMK k⁻¹ * x * toMK k)
-        (toMK k⁻¹ * x * toMK k * Y - Y * (toMK k⁻¹ * x * toMK k))) 0 := by
+        (toMK k⁻¹ * x * toMK k * Y - Y * (toMK k⁻¹ * x * toMK k)))
+      0 := by
     have hd := ((phiM_differentiableOn μ).differentiableAt (isOpen_omega.mem_nhds hzP)).hasFDerivAt
-    have h0 : toMK k⁻¹ * x * toMK k = NormedSpace.exp (-(((0 : ℝ) : ℂ) • Y)) *
-        (toMK k⁻¹ * x * toMK k) * NormedSpace.exp (((0 : ℝ) : ℂ) • Y) := by
+    have h0
+        : toMK k⁻¹ * x * toMK k
+          = NormedSpace.exp (-(((0 : ℝ) : ℂ) • Y)) * (toMK k⁻¹ * x * toMK k)
+            * NormedSpace.exp (((0 : ℝ) : ℂ) • Y) := by
       simp
     exact (hd.restrictScalars ℝ).comp_hasDerivAt_of_eq (0 : ℝ) (dga_path Y _) h0
   have hop1' : T.op 1 = 1 := by simp [KType.op]

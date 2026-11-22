@@ -15,21 +15,25 @@ section General
 
 variable {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
 
-theorem twKer_subQuot {ρ : Representation ℂ G V} (A B : Subrepresentation ρ) (U : Subgroup G) (χ : U →* ℂˣ) :
-    twKer (subQuot A B) U χ =
-      (twKer A.toRepresentation U χ).map (B.toSubmodule.comap A.toSubmodule.subtype).mkQ := by
-  have key : ∀ (g : G) (v : A.toSubmodule),
-      (subQuot A B) g ((B.toSubmodule.comap A.toSubmodule.subtype).mkQ v) =
-        (B.toSubmodule.comap A.toSubmodule.subtype).mkQ (A.toRepresentation g v) := fun _ _ => rfl
+theorem twKer_subQuot
+    {ρ : Representation ℂ G V} (A B : Subrepresentation ρ) (U : Subgroup G) (χ : U →* ℂˣ)
+    : twKer (subQuot A B) U χ
+      = (twKer A.toRepresentation U χ).map (B.toSubmodule.comap A.toSubmodule.subtype).mkQ := by
+  have key
+      : ∀ (g : G) (v : A.toSubmodule),
+        (subQuot A B) g ((B.toSubmodule.comap A.toSubmodule.subtype).mkQ v)
+          = (B.toSubmodule.comap A.toSubmodule.subtype).mkQ (A.toRepresentation g v) := fun _ _ =>
+    rfl
   unfold twKer
   apply le_antisymm
   · refine Submodule.span_le.2 ?_
     rintro _ ⟨n, w, rfl⟩
     obtain ⟨v, rfl⟩ := (B.toSubmodule.comap A.toSubmodule.subtype).mkQ_surjective w
-    have h : (subQuot A B) n ((B.toSubmodule.comap A.toSubmodule.subtype).mkQ v) -
-          ((χ n : ℂˣ) : ℂ) • (B.toSubmodule.comap A.toSubmodule.subtype).mkQ v =
-        (B.toSubmodule.comap A.toSubmodule.subtype).mkQ
-          (A.toRepresentation n v - ((χ n : ℂˣ) : ℂ) • v) := by
+    have h
+        : (subQuot A B) n ((B.toSubmodule.comap A.toSubmodule.subtype).mkQ v)
+            - ((χ n : ℂˣ) : ℂ) • (B.toSubmodule.comap A.toSubmodule.subtype).mkQ v
+          = (B.toSubmodule.comap A.toSubmodule.subtype).mkQ
+            (A.toRepresentation n v - ((χ n : ℂˣ) : ℂ) • v) := by
       rw [key, map_sub, map_smul]
     rw [h]
     exact Submodule.mem_map_of_mem (Submodule.subset_span ⟨n, v, rfl⟩)
@@ -39,8 +43,11 @@ theorem twKer_subQuot {ρ : Representation ℂ G V} (A B : Subrepresentation ρ)
     rw [SetLike.mem_coe, Submodule.mem_comap, map_sub, map_smul, ← key]
     exact Submodule.subset_span ⟨n, _, rfl⟩
 
-theorem coe_mem_twKer {ρ : Representation ℂ G V} (A : Subrepresentation ρ) (U : Subgroup G) (χ : U →* ℂˣ)
-    {x : A.toSubmodule} (hx : x ∈ twKer A.toRepresentation U χ) : (x : V) ∈ twKer ρ U χ := by
+theorem coe_mem_twKer
+    {ρ : Representation ℂ G V} (A : Subrepresentation ρ)
+    (U : Subgroup G) (χ : U →* ℂˣ)
+    {x : A.toSubmodule} (hx : x ∈ twKer A.toRepresentation U χ)
+    : (x : V) ∈ twKer ρ U χ := by
   have h : twKer A.toRepresentation U χ ≤ (twKer ρ U χ).comap A.toSubmodule.subtype := by
     unfold twKer
     refine Submodule.span_le.2 ?_
@@ -50,7 +57,18 @@ theorem coe_mem_twKer {ρ : Representation ℂ G V} (A : Subrepresentation ρ) (
 
 end General
 
-theorem isGenericFor_subQuot_iff : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle), Continuous ψ → ∀ (N : ℕ) {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL (Fin N) k) V), IsSmooth ρ → ∀ A B : Subrepresentation ρ, B ≤ A → (IsGenericFor ψ (subQuot A B) ↔ ¬ A.toSubmodule ≤ B.toSubmodule ⊔ twKer ρ (unipB k (Fin N)) (whitChar ψ N)) := by
+theorem isGenericFor_subQuot_iff
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle),
+      Continuous ψ
+        → ∀ (N : ℕ) {V : Type} [AddCommGroup V] [Module ℂ V]
+            (ρ : Representation ℂ (GL (Fin N) k) V),
+          IsSmooth ρ
+            → ∀ A B : Subrepresentation ρ,
+              B ≤ A
+                → (IsGenericFor ψ (subQuot A B)
+                  ↔ ¬ A.toSubmodule
+                    ≤ B.toSubmodule ⊔ twKer ρ (unipB k (Fin N)) (whitChar ψ N)) := by
   intro k _ _ _ _ ψ hψ N V _ _ ρ hρ A B hBA
   have hsm : IsSmooth A.toRepresentation := by
     intro v
@@ -62,8 +80,10 @@ theorem isGenericFor_subQuot_iff : ∀ (k : Type) [Field k] [ValuativeRel k] [To
   rw [Submodule.Quotient.nontrivial_iff, twKer_subQuot, Ne, Submodule.map_mkQ_eq_top]
   refine not_congr ⟨fun h => ?_, fun h => ?_⟩
   · intro v hv
-    have hmem : (⟨v, hv⟩ : A.toSubmodule) ∈ B.toSubmodule.comap A.toSubmodule.subtype ⊔
-        twKer A.toRepresentation (unipB k (Fin N)) (whitChar ψ N) := by
+    have hmem
+        : (⟨v, hv⟩ : A.toSubmodule)
+          ∈ B.toSubmodule.comap A.toSubmodule.subtype
+            ⊔ twKer A.toRepresentation (unipB k (Fin N)) (whitChar ψ N) := by
       rw [h]
       exact Submodule.mem_top
     obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.1 hmem
@@ -78,9 +98,12 @@ theorem isGenericFor_subQuot_iff : ∀ (k : Type) [Field k] [ValuativeRel k] [To
       have hz2 : z = (a : V) - y := by rw [← hyz]; abel
       rw [hz2]
       exact A.toSubmodule.sub_mem a.2 hyA
-    have hz' : (⟨z, hzA⟩ : A.toSubmodule) ∈ twKer A.toRepresentation (unipB k (Fin N)) (whitChar ψ N) :=
-      GlobalTheory.CompanionTheory.PRep.WhitExact.twKer_whitChar_reflect k ψ hψ N A.toRepresentation ρ hsm hρ
-        A.toSubmodule.subtype A.toSubmodule.injective_subtype (fun _ _ => rfl) _ hz
+    have hz'
+        : (⟨z, hzA⟩ : A.toSubmodule) ∈ twKer A.toRepresentation (unipB k (Fin N)) (whitChar ψ N) :=
+      GlobalTheory.CompanionTheory.PRep.WhitExact.twKer_whitChar_reflect k ψ hψ N A.toRepresentation
+        ρ hsm hρ A.toSubmodule.subtype A.toSubmodule.injective_subtype
+        (fun _ _ => rfl)
+        _ hz
     have ha : a = ⟨y, hyA⟩ + ⟨z, hzA⟩ := Subtype.ext hyz.symm
     rw [ha]
     exact Submodule.add_mem_sup hy hz'

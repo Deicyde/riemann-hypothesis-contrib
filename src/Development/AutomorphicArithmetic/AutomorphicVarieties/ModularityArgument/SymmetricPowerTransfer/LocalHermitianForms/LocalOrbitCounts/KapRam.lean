@@ -10,9 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem inv_norm {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ τ : K} (L : IsLoc O Δ)
-    {c : K} {d m : EL Δ τ} (h : IsDat c d m) : ∀ t ∈ NE τ, ∀ x : Kˣ,
-    lcount O c d (((t * x : Kˣ) : K) • m) = lcount O c d ((x : K) • m) := fun t ht x => by
+private theorem inv_norm
+    {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    {Δ τ : K} (L : IsLoc O Δ)
+    {c : K} {d m : EL Δ τ} (h : IsDat c d m)
+    : ∀ t ∈ NE τ, ∀ x : Kˣ,
+      lcount O c d (((t * x : Kˣ) : K) • m) = lcount O c d ((x : K) • m) := fun t ht x => by
   rw [Units.val_mul, mul_smul]
   exact lcountNorm O K Δ τ L c d _ (datSmul K Δ τ c d m h x) t ht
 
@@ -33,8 +36,7 @@ theorem UpperTheory.V.Z.Sym.Loc.kapRam : UpperTheory.V.Z.Sym.Loc.KapRam := by
     refine ⟨hp.unit, 1, one_ne_zero, ?_⟩
     simp [map_add (f := _), map_ofNat]
   obtain ⟨v, hv⟩ := hu
-  have hv' : algebraMap O K (v : O) = 2 - algebraMap O K a := by
-    rw [hv, map_sub, map_ofNat]
+  have hv' : algebraMap O K (v : O) = 2 - algebraMap O K a := by rw [hv, map_sub, map_ofNat]
   have hex : ∃ u : Oˣ, algebraMap O K ↑u = 2 - algebraMap O K a := ⟨v, hv'⟩
   refine ⟨hex, ?_⟩
   have hD : ¬ EvenVal O (algebraMap O K a ^ 2 - 4) := by
@@ -48,14 +50,19 @@ theorem UpperTheory.V.Z.Sym.Loc.kapRam : UpperTheory.V.Z.Sym.Loc.KapRam := by
     linear_combination (-(algebraMap O K ((v⁻¹ : Oˣ) : O))) * hus + (-(2 + algebraMap O K a)) * hw
   have hreg := h.reg
   obtain ⟨ε, hε⟩ := ramUnit O K Δ L _ hreg hD
-  have hinv : ∀ t ∈ NE (algebraMap O K a), ∀ x : Kˣ,
-      lcount O c d (((t * x : Kˣ) : K) • m) = lcount O c d ((x : K) • m) :=
-    fun t ht x => inv_norm L h t ht x
+  have hinv
+      : ∀ t ∈ NE (algebraMap O K a), ∀ x : Kˣ,
+        lcount O c d (((t * x : Kˣ) : K) • m) = lcount O c d ((x : K) • m) := fun t ht x =>
+    inv_norm L h t ht x
   have hg : ((Units.map (algebraMap O K : O →* K) ε : Kˣ) : K) = algebraMap O K ε := rfl
-  obtain ⟨_, h2', _⟩ := sumShift O K Δ _ L hreg (fun y : Kˣ => lcount O c d ((y : K) • m)) hinv
-    (Units.map (algebraMap O K : O →* K) ε)
-  have hshift : ∀ x : Kˣ, lcount O c d (((x * Units.map (algebraMap O K : O →* K) ε : Kˣ) : K) • m)
-      = lcount O c d ((x : K) • m) := by
+  obtain ⟨_, h2', _⟩ :=
+    sumShift O K Δ _ L hreg
+      (fun y : Kˣ => lcount O c d ((y : K) • m))
+      hinv (Units.map (algebraMap O K : O →* K) ε)
+  have hshift
+      : ∀ x : Kˣ,
+        lcount O c d (((x * Units.map (algebraMap O K : O →* K) ε : Kˣ) : K) • m)
+          = lcount O c d ((x : K) • m) := by
     intro x
     rw [Units.val_mul, hg, mul_comm, mul_smul]
     exact splitM O K Δ _ L c d _ (datSmul K Δ _ c d m h x) ⟨a, rfl⟩ hex ε

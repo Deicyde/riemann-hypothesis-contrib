@@ -9,16 +9,23 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.ineMap :
-    ∀ (k K H : Type) [Field k] [NumberField k] [Field K] [NumberField K] [Field H] [NumberField H] [Algebra k K] [Algebra K H] [Algebra k H] [IsScalarTower k K H] [IsGalois k K] [IsGalois k H] (w : HeightOneSpectrum (𝓞 H)), (w.asIdeal.inertia Gal(H/k)).map (resTo k K H) = (w.asIdeal.under (𝓞 K)).inertia Gal(K/k) := by
+theorem UpperTheory.V.CF.ineMap
+    : ∀ (k K H : Type) [Field k] [NumberField k] [Field K] [NumberField K] [Field H] [NumberField H]
+        [Algebra k K] [Algebra K H] [Algebra k H] [IsScalarTower k K H] [IsGalois k K]
+        [IsGalois k H] (w : HeightOneSpectrum (𝓞 H)),
+      (w.asIdeal.inertia Gal(H/k)).map (resTo k K H)
+        = (w.asIdeal.under (𝓞 K)).inertia Gal(K/k) := by
   intro k K H _ _ _ _ _ _ _ _ _ _ _ _ w
   haveI : IsGalois K H := IsGalois.tower_top_of_isGalois k K H
-  have comm : ∀ (σ : Gal(H/k)) (x : 𝓞 K),
-      algebraMap (𝓞 K) (𝓞 H) (resTo k K H σ • x) = σ • algebraMap (𝓞 K) (𝓞 H) x := by
+  have comm
+      : ∀ (σ : Gal(H/k)) (x : 𝓞 K),
+        algebraMap (𝓞 K) (𝓞 H) (resTo k K H σ • x) = σ • algebraMap (𝓞 K) (𝓞 H) x := by
     intro σ x
     apply FaithfulSMul.algebraMap_injective (𝓞 H) H
-    have e1 : algebraMap (𝓞 H) H (σ • algebraMap (𝓞 K) (𝓞 H) x) =
-        σ • algebraMap (𝓞 H) H (algebraMap (𝓞 K) (𝓞 H) x) := algebraMap.smul' _ _ _
+    have e1
+        : algebraMap (𝓞 H) H (σ • algebraMap (𝓞 K) (𝓞 H) x)
+          = σ • algebraMap (𝓞 H) H (algebraMap (𝓞 K) (𝓞 H) x) :=
+      algebraMap.smul' _ _ _
     have e2 : algebraMap (𝓞 K) K (resTo k K H σ • x) = resTo k K H σ • algebraMap (𝓞 K) K x :=
       algebraMap.smul' _ _ _
     rw [e1, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply,
@@ -27,8 +34,10 @@ theorem UpperTheory.V.CF.ineMap :
   have comm2 : ∀ (τ : Gal(H/K)) (y : 𝓞 H), (τ.restrictScalars k) • y = τ • y := by
     intro τ y
     apply FaithfulSMul.algebraMap_injective (𝓞 H) H
-    have e1 : algebraMap (𝓞 H) H ((τ.restrictScalars k) • y) =
-        (τ.restrictScalars k) • algebraMap (𝓞 H) H y := algebraMap.smul' _ _ _
+    have e1
+        : algebraMap (𝓞 H) H ((τ.restrictScalars k) • y)
+          = (τ.restrictScalars k) • algebraMap (𝓞 H) H y :=
+      algebraMap.smul' _ _ _
     have e2 : algebraMap (𝓞 H) H (τ • y) = τ • algebraMap (𝓞 H) H y := algebraMap.smul' _ _ _
     rw [e1, e2]
     rfl
@@ -55,12 +64,16 @@ theorem UpperTheory.V.CF.ineMap :
   let f : (P.inertia Gal(H/k)) →* Gal(K/k) := (resTo k K H).comp (Subgroup.subtype _)
   have hrange : f.range = (P.inertia Gal(H/k)).map (resTo k K H) := by
     rw [MonoidHom.range_comp, Subgroup.range_subtype]
-  let g : (P.inertia Gal(H/K)) →* (P.inertia Gal(H/k)) :=
-    { toFun := fun τ => ⟨(τ.1.restrictScalars k), fun y => by
+  let g : (P.inertia Gal(H/K)) →* (P.inertia Gal(H/k)) := {
+    toFun := fun τ => ⟨
+      (τ.1.restrictScalars k),
+      fun y => by
         rw [comm2]
-        exact τ.2 y⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl }
+        exact τ.2 y
+    ⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
   have hker : f.ker ≤ g.range := by
     intro σ hσ
     have hfix : ∀ c : K, σ.1 (algebraMap K H c) = algebraMap K H c := by
@@ -76,10 +89,13 @@ theorem UpperTheory.V.CF.ineMap :
       have h4 := σ.2 y
       rw [← comm2] at *
       exact h4
-    exact ⟨⟨τ, hτ⟩, by
-      apply Subtype.ext
-      ext z
-      rfl⟩
+    exact ⟨
+      ⟨τ, hτ⟩,
+      by
+        apply Subtype.ext
+        ext z
+        rfl
+    ⟩
   have hcardker : Nat.card f.ker ≤ Nat.card (P.inertia Gal(H/K)) :=
     (Subgroup.card_le_of_le hker).trans
       (Nat.card_le_card_of_surjective g.rangeRestrict g.rangeRestrict_surjective)

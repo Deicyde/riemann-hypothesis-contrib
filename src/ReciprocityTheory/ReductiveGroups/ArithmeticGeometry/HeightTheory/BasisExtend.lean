@@ -11,8 +11,9 @@ variable {L E : Type} [Field L] [Field E] [Algebra L E] {σ : Type}
 
 noncomputable def liftY : FractionRing (MvPolynomial σ L) →+* FractionRing (MvPolynomial σ E) :=
   IsFractionRing.lift (A := MvPolynomial σ L)
-    (g := (algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))).comp
-      (MvPolynomial.map (algebraMap L E)))
+    (g :=
+      (algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))).comp
+        (MvPolynomial.map (algebraMap L E)))
     ((IsFractionRing.injective (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))).comp
       (MvPolynomial.map_injective _ (algebraMap L E).injective))
 

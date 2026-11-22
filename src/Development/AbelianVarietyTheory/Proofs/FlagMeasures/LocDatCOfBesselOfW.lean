@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.InstFactDecLo
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf
 
 namespace GlobalTheory.TypeAsm
 
@@ -24,12 +25,15 @@ theorem locDatC_of_besselOfW (hBW : Formalism.L2.SG.LocWSOf.BesselOfW) : LocDatC
   haveI : Fact Formalism.FourierDecayAlt.ThreeDimData.DecLow := ⟨GlobalTheory.DecTransport.decLow_main⟩
   intro D X hne hG hT
   obtain ⟨C⟩ := Formalism.L2.SG.Pf.choiceExists X 1 one_pos
-  have hB : WuBessel C := Formalism.L2.SG.Pf.wuBesselOfLoc_all C hG hBW
-    (Formalism.L2.SG.Pf.LocF.locFactor_holds hG C) (fun τ => Formalism.L2.SG.Pf.dsTr C τ)
-    (fun τ => Formalism.L2.SG.Pf.haarTr C τ) (fun u τ => Formalism.L2.SG.Pf.colsTypeTr C u τ)
+  have hB : WuBessel C :=
+    Formalism.L2.SG.Pf.wuBesselOfLoc_all C hG hBW (Formalism.L2.SG.Pf.LocF.locFactor_holds hG C)
+      (fun τ => Formalism.L2.SG.Pf.dsTr C τ)
+      (fun τ => Formalism.L2.SG.Pf.haarTr C τ)
+      (fun u τ => Formalism.L2.SG.Pf.colsTypeTr C u τ)
   refine ⟨C, hB, Formalism.L2.SG.Pf.LocF.locFactor_holds hG C, fun u τ => ⟨?_, ?_⟩⟩
-  · exact goodW_of C u u τ (Formalism.L2.SG.Pf.colsTypeTr C u τ) (Formalism.L2.SG.Pf.colsTypeTr C u τ)
-      (Formalism.L2.SG.Pf.zTr C u τ) (Formalism.L2.SG.Pf.zTr C u τ) (Formalism.L2.SG.Pf.haarTr C τ)
+  · exact goodW_of C u u τ (Formalism.L2.SG.Pf.colsTypeTr C u τ)
+      (Formalism.L2.SG.Pf.colsTypeTr C u τ) (Formalism.L2.SG.Pf.zTr C u τ)
+      (Formalism.L2.SG.Pf.zTr C u τ) (Formalism.L2.SG.Pf.haarTr C τ)
   · exact goodS_of _ u u τ (Formalism.L2.SG.Pf.goodSRest_all hG hT _ u u τ)
 
 end GlobalTheory.TypeAsm

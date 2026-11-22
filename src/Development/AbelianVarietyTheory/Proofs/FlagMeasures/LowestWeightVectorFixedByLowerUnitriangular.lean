@@ -237,7 +237,18 @@ lemma nil_inv_mul {ε : Fin n → Bool} {N : Matrix (Fin n) (Fin n) ℂ} (hN : N
     obtain ⟨_, hN2⟩ := id hN
     rw [mul_assoc, hN2, ← mul_assoc, hiJ, mul_assoc]
 
-theorem lowest_fixed : ∀ (n : ℕ) (ε : Fin n → Bool) (abelian₂ : Fin n → ℝ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] (τ : Matrix (Fin n) (Fin n) ℂ → (W →L[ℂ] W)) (w : W), Formalism.QuantumDeterminants.IsCRepOn (GlobalTheory.Dec.KC ε) τ → DifferentiableAt ℂ (fun y : Fin n → Fin n → ℂ => τ (Matrix.of y)) (fun i j => (1 : Matrix (Fin n) (Fin n) ℂ) i j) → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) τ (-abelian₂) w → (∀ (μ : Fin n → ℝ) (v : W), v ≠ 0 → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) τ (-μ) v → Formalism.MainNotions.S.CDom ε μ abelian₂) → ∀ y ∈ GlobalTheory.Dec.KC ε, Formalism.MainNotions.S.IsLoUni y → τ y w = w := by
+theorem lowest_fixed
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (abelian₂ : Fin n → ℝ) (W : Type) [NormedAddCommGroup W]
+        [InnerProductSpace ℂ W] (τ : Matrix (Fin n) (Fin n) ℂ → (W →L[ℂ] W)) (w : W),
+      Formalism.QuantumDeterminants.IsCRepOn (GlobalTheory.Dec.KC ε) τ
+        → DifferentiableAt ℂ
+          (fun y : Fin n → Fin n → ℂ => τ (Matrix.of y))
+          (fun i j => (1 : Matrix (Fin n) (Fin n) ℂ) i j)
+        → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) τ (-abelian₂) w
+        → (∀ (μ : Fin n → ℝ) (v : W),
+          v ≠ 0 → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) τ (-μ) v
+            → Formalism.MainNotions.S.CDom ε μ abelian₂)
+        → ∀ y ∈ GlobalTheory.Dec.KC ε, Formalism.MainNotions.S.IsLoUni y → τ y w = w := by
   intro n ε abelian₂ W _ _ τ w hτ hdiff hw hlow y hy hyL
   obtain ⟨hτ1, hτ2⟩ := id hτ
   obtain ⟨D, hD⟩ := exists_deriv τ hdiff
@@ -268,20 +279,22 @@ theorem lowest_fixed : ∀ (n : ℕ) (ε : Fin n → Bool) (abelian₂ : Fin n �
     have hAmem : A ∈ KC ε := one_add_mem hNil s
     have hfac : ∀ u : ℂ, 1 + u • N = A * (1 + (u - s) • M) := by
       intro u
-      rw [mul_add, mul_one, hM, mul_smul_comm, ← mul_assoc, Matrix.mul_nonsing_inv _ hdet, one_mul, hA,
-        add_assoc, ← add_smul, add_sub_cancel]
+      rw [mul_add, mul_one, hM, mul_smul_comm, ← mul_assoc, Matrix.mul_nonsing_inv _ hdet, one_mul,
+        hA, add_assoc, ← add_smul, add_sub_cancel]
     have hM0 : HasDerivAt (fun h : ℂ => τ (1 + h • M) w) 0 (s - s) := by
       rw [sub_self, ← deriv_nil hE hMN]
       exact hD M w
     have hsh : HasDerivAt (fun u : ℂ => u - s) 1 s := (hasDerivAt_id s).sub_const s
-    have hc2 := (τ A).hasFDerivAt.comp_hasDerivAt s (HasDerivAt.scomp (h := fun u : ℂ => u - s) s hM0 hsh)
+    have hc2 :=
+      (τ A).hasFDerivAt.comp_hasDerivAt s (HasDerivAt.scomp (h := fun u : ℂ => u - s) s hM0 hsh)
     rw [smul_zero, map_zero] at hc2
     refine hc2.congr_of_eventuallyEq (Filter.Eventually.of_forall fun u => ?_)
     simp only [Function.comp_apply]
     rw [hfac u, hτ2 _ hAmem _ (one_add_mem hMN _), ContinuousLinearMap.comp_apply]
   have hconst : (fun u : ℂ => τ (1 + u • N) w) 1 = (fun u : ℂ => τ (1 + u • N) w) 0 :=
     is_const_of_deriv_eq_zero (by intro s; exact (hderiv s).differentiableAt)
-      (fun s => (hderiv s).deriv) 1 0
+      (fun s => (hderiv s).deriv)
+      1 0
   simp only [one_smul, zero_smul, add_zero] at hconst
   rw [hyN, hconst, hτ1, ContinuousLinearMap.one_apply]
 

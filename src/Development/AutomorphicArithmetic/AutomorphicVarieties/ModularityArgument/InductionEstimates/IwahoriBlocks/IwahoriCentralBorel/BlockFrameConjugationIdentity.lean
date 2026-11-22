@@ -9,9 +9,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
@@ -54,9 +58,16 @@ private lemma lev_exists (K : Type) [Field K] [NumberField K] (n : ℕ) :
 
 end UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.zMem :
-    ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ₂)) (κ : Measure (archCompact K (2 + 2))) (e : archCompact K (2 + 2) → ℂ), IdemA κ e → (∀ S φ, φ ∈ Zs τ₁ τ₂ κ e S ↔ IsZ τ₁ τ₂ κ e S φ) ∧
-      ∀ {r : ℕ} (w : Fin r → Pl K) (ι : GS (2 + 2) w →* FA K (2 + 2)), Function.Injective w → IsEmb w ι → ∀ φ ∈ Zs τ₁ τ₂ κ e (im w), IsOpen {g | rS ι g φ = φ} ∧ ∀ g, rS ι g φ ∈ Zs τ₁ τ₂ κ e (im w) := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.zMem
+    : ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+        (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (τ₁ τ₂ : Submodule ℂ (L2 μ₂))
+        (κ : Measure (archCompact K (2 + 2))) (e : archCompact K (2 + 2) → ℂ),
+      IdemA κ e
+        → (∀ S φ, φ ∈ Zs τ₁ τ₂ κ e S ↔ IsZ τ₁ τ₂ κ e S φ)
+          ∧ ∀ {r : ℕ} (w : Fin r → Pl K) (ι : GS (2 + 2) w →* FA K (2 + 2)),
+            Function.Injective w → IsEmb w ι
+              → ∀ φ ∈ Zs τ₁ τ₂ κ e (im w),
+                IsOpen {g | rS ι g φ = φ} ∧ ∀ g, rS ι g φ ∈ Zs τ₁ τ₂ κ e (im w) := by
   intro K _ _ _ μ₂ _ τ₁ τ₂ κ e he
   obtain ⟨⟨sec0, secLin⟩, secFlat, -, secT⟩ := secTr μ₂ τ₁ τ₂ κ e he
   have hZero : ∀ S, IsZ τ₁ τ₂ κ e S 0 := by
@@ -65,12 +76,19 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.zMem :
     refine ⟨0, sec0, fun g => by simp, ⟨U, hU, fun u _ g => rfl⟩, ?_⟩
     funext x
     simp [flat]
-  have hComb : ∀ S φ φ' (c : ℂ), IsZ τ₁ τ₂ κ e S φ → IsZ τ₁ τ₂ κ e S φ' → IsZ τ₁ τ₂ κ e S (φ + c • φ') := by
+  have hComb
+      : ∀ S φ φ' (c : ℂ),
+        IsZ τ₁ τ₂ κ e S φ → IsZ τ₁ τ₂ κ e S φ' → IsZ τ₁ τ₂ κ e S (φ + c • φ') := by
     rintro S _ _ c ⟨f, hf, ha, ⟨U, hU, hx⟩, rfl⟩ ⟨f', hf', ha', ⟨U', hU', hx'⟩, rfl⟩
     obtain ⟨-, hL, -, hA, hC, -⟩ := levLaws (K := K) (2 + 2) S
     obtain ⟨hLev, hEq⟩ := hL U U' hU hU'
-    refine ⟨f + c • f', secLin f f' hf hf' c, fixA_comb he hC hA hf.cont hf'.cont c ha ha',
-      ⟨_, hLev, ?_⟩, (flat_comb f f' c).symm⟩
+    refine ⟨
+      f + c • f',
+      secLin f f' hf hf' c,
+      fixA_comb he hC hA hf.cont hf'.cont c ha ha',
+      ⟨_, hLev, ?_⟩,
+      (flat_comb f f' c).symm
+    ⟩
     rw [hEq]
     intro u hu g
     simp only [Pi.add_apply, Pi.smul_apply, hx u hu.1 g, hx' u hu.2 g]
@@ -94,20 +112,22 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.zMem :
   refine ⟨?_, fun g => ?_⟩
   · have hcι : Continuous ι := ((embEx (K := K) (2 + 2) w hw).2 ι hι).1
     have hO : IsOpen (ι ⁻¹' (levOn (im w) U : Set (FA K (2 + 2)))) := (L₁ U hU).1.2.preimage hcι
-    let T : Subgroup (GS (2 + 2) w) :=
-      { carrier := {g | rS ι g (flat 0 f) = flat 0 f}
-        mul_mem' := by
-          intro a b ha hb
-          simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-          rw [hb, ha]
-        one_mem' := by simp
-        inv_mem' := by
-          intro a ha
-          simp only [Set.mem_setOf_eq] at *
-          conv_lhs => rw [← ha]
-          rw [← Module.End.mul_apply, ← map_mul]
-          simp }
-    refine T.isOpen_of_mem_nhds (g := 1) (Filter.mem_of_superset (hO.mem_nhds (by simp [one_mem])) ?_)
+    let T : Subgroup (GS (2 + 2) w) := {
+      carrier := {g | rS ι g (flat 0 f) = flat 0 f}
+      mul_mem' := by
+        intro a b ha hb
+        simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+        rw [hb, ha]
+      one_mem' := by simp
+      inv_mem' := by
+        intro a ha
+        simp only [Set.mem_setOf_eq] at *
+        conv_lhs => rw [← ha]
+        rw [← Module.End.mul_apply, ← map_mul]
+        simp
+    }
+    refine T.isOpen_of_mem_nhds (g := 1)
+      (Filter.mem_of_superset (hO.mem_nhds (by simp [one_mem])) ?_)
     intro g hg
     show rS ι g (flat 0 f) = flat 0 f
     funext x

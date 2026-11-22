@@ -27,16 +27,35 @@ def topE : glG E a ≃ₜ* GL (Fin a) (Cinf E) where
   continuous_toFun := continuous_subtype_val
   continuous_invFun := continuous_id.subtype_mk _
 
-theorem exists_alpha : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ), ∀ (L : Subgroup (GL (Fin a) (Af E))), IsOpen (L : Set (GL (Fin a) (Af E))) → ∀ W : Submodule ℂ (Kinf E a → ℂ), FiniteDimensional ℂ W → ∀ X : Set (Module.End ℂ (Sm E a) → ℂ), X.Finite → ∀ N : ℕ, ∀ [MeasurableSpace (GL (Fin a) (Cinf E))] [BorelSpace (GL (Fin a) (Cinf E))] (μ : Measure (GL (Fin a) (Cinf E))), μ.IsHaarMeasure → ∃ α : GL (Fin a) (Cinf E) → ℂ, Continuous α ∧ HasCompactSupport α ∧ ∀ φ ∈ GlobalTheory.HCF.formsGL E a L W X N, ∀ g, ∫ y, φ.1 (g * infGL E a y) * α y ∂μ = φ.1 g := by
+theorem exists_alpha
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
+      ∀ (L : Subgroup (GL (Fin a) (Af E))),
+        IsOpen (L : Set (GL (Fin a) (Af E)))
+          → ∀ W : Submodule ℂ (Kinf E a → ℂ),
+            FiniteDimensional ℂ W
+              → ∀ X : Set (Module.End ℂ (Sm E a) → ℂ),
+                X.Finite
+                  → ∀ N : ℕ,
+                    ∀ [MeasurableSpace (GL (Fin a) (Cinf E))] [BorelSpace (GL (Fin a) (Cinf E))]
+                        (μ : Measure (GL (Fin a) (Cinf E))),
+                      μ.IsHaarMeasure
+                        → ∃ α : GL (Fin a) (Cinf E) → ℂ,
+                          Continuous α ∧ HasCompactSupport α
+                            ∧ ∀ φ ∈ GlobalTheory.HCF.formsGL E a L W X N, ∀ g,
+                              ∫ y, φ.1 (g * infGL E a y) * α y ∂μ = φ.1 g := by
   intro E _ _ _ a L _ W hW X hX N _ _ μ hμ
-  obtain ⟨p, hp0, hp⟩ := GlobalTheory.T.exists_laplacianPolynomial_kills_harishChandraFinite E a L W hW X hX N
-  obtain ⟨d, b, P, hPm, -, hP⟩ := GlobalTheory.T.laplacianPolynomialKernel_of_polynomial_laplacian E a p hp0
+  obtain ⟨p, hp0, hp⟩ :=
+    GlobalTheory.T.exists_laplacianPolynomial_kills_harishChandraFinite E a L W hW X hX N
+  obtain ⟨d, b, P, hPm, -, hP⟩ :=
+    GlobalTheory.T.laplacianPolynomialKernel_of_polynomial_laplacian E a p hp0
   let e := topE E a
   letI : MeasurableSpace (glG E a) := borel _
   haveI : BorelSpace (glG E a) := ⟨rfl⟩
   let μ' : Measure (glG E a) := μ.map e.symm
   have hH : μ'.IsHaarMeasure := e.symm.isHaarMeasure_map μ
-  obtain ⟨α', -, hc, hs, hα⟩ := @GlobalTheory.T.exists_smooth_convolution_eq_derivative (Matrix (Fin a) (Fin a) (Cinf E)) _ _ _ _ (glG E a) (glL E a) (glH E a) d b P hPm _ (by exact ⟨rfl⟩) μ' (by exact hH) []
+  obtain ⟨α', -, hc, hs, hα⟩ :=
+    @GlobalTheory.T.exists_smooth_convolution_eq_derivative (Matrix (Fin a) (Fin a) (Cinf E)) _ _ _
+      _ (glG E a) (glL E a) (glH E a) d b P hPm _ (by exact ⟨rfl⟩) μ' (by exact hH) []
   refine ⟨α' ∘ e.symm, ?_, ?_, fun φ hφ g => ?_⟩
   · exact hc.comp e.symm.continuous
   · exact hs.comp_homeomorph e.symm.toHomeomorph

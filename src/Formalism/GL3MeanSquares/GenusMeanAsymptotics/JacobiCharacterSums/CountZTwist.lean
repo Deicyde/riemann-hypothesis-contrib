@@ -40,24 +40,28 @@ theorem pair_twist_bound : PairTwistOf := by
   set f : ℕ → ℂ := fun n => (n : ℂ) ^ (-w) with hf
   have hGs : ∀ k, ‖∑ i ∈ range k, g i‖ ≤ m := fun k => hPS p p' hp hp' hne k
   have hm0 : 0 ≤ m := by positivity
-  have hrw : ∑ n ∈ Ioc U (2 * U), cv p n * (starRingEnd ℂ) (cv p' n) * (n : ℂ) ^ (-w) =
-      ∑ n ∈ Ioc U (2 * U), f n • g n := by
+  have hrw
+      : ∑ n ∈ Ioc U (2 * U), cv p n * (starRingEnd ℂ) (cv p' n) * (n : ℂ) ^ (-w)
+        = ∑ n ∈ Ioc U (2 * U), f n • g n := by
     refine sum_congr rfl (fun n _ => ?_); simp only [hf, hg, smul_eq_mul]; ring
   rw [hrw, Finset.sum_Ioc_by_parts f g (by omega : U < 2 * U)]
   have hb1 : ‖f (2 * U) • ∑ i ∈ range (2 * U + 1), g i‖ ≤ m := by
     rw [smul_eq_mul, norm_mul]
-    calc ‖f (2 * U)‖ * ‖∑ i ∈ range (2 * U + 1), g i‖ ≤ 1 * m :=
-          mul_le_mul (norm_cpow_neg_le_one (by omega) hw.le) (hGs _) (norm_nonneg _) zero_le_one
+    calc
+      ‖f (2 * U)‖ * ‖∑ i ∈ range (2 * U + 1), g i‖ ≤ 1 * m :=
+        mul_le_mul (norm_cpow_neg_le_one (by omega) hw.le) (hGs _) (norm_nonneg _) zero_le_one
       _ = m := one_mul m
   have hb2 : ‖f (U + 1) • ∑ i ∈ range (U + 1), g i‖ ≤ m := by
     rw [smul_eq_mul, norm_mul]
-    calc ‖f (U + 1)‖ * ‖∑ i ∈ range (U + 1), g i‖ ≤ 1 * m :=
-          mul_le_mul (norm_cpow_neg_le_one (by omega) hw.le) (hGs _) (norm_nonneg _) zero_le_one
+    calc
+      ‖f (U + 1)‖ * ‖∑ i ∈ range (U + 1), g i‖ ≤ 1 * m :=
+        mul_le_mul (norm_cpow_neg_le_one (by omega) hw.le) (hGs _) (norm_nonneg _) zero_le_one
       _ = m := one_mul m
   have hb3 : ‖∑ i ∈ Ioc U (2 * U - 1), (f (i + 1) - f i) • ∑ k ∈ range (i + 1), g k‖ ≤ m * ‖w‖ := by
     refine (norm_sum_le _ _).trans ?_
-    have hterm : ∀ i ∈ Ioc U (2 * U - 1),
-        ‖(f (i + 1) - f i) • ∑ k ∈ range (i + 1), g k‖ ≤ ‖w‖ / U * m := by
+    have hterm
+        : ∀ i ∈ Ioc U (2 * U - 1),
+          ‖(f (i + 1) - f i) • ∑ k ∈ range (i + 1), g k‖ ≤ ‖w‖ / U * m := by
       intro i hi
       rw [smul_eq_mul, norm_mul]
       have hi' : U ≤ i := by have := (mem_Ioc.1 hi).1; omega
@@ -66,14 +70,16 @@ theorem pair_twist_bound : PairTwistOf := by
     rw [sum_const, Nat.card_Ioc, nsmul_eq_mul]
     have hU0 : (0 : ℝ) < U := by exact_mod_cast hU
     have hcnt : ((2 * U - 1 - U : ℕ) : ℝ) ≤ U := by exact_mod_cast (by omega : 2 * U - 1 - U ≤ U)
-    calc ((2 * U - 1 - U : ℕ) : ℝ) * (‖w‖ / U * m) ≤ U * (‖w‖ / U * m) :=
-          mul_le_mul_of_nonneg_right hcnt (by positivity)
+    calc
+      ((2 * U - 1 - U : ℕ) : ℝ) * (‖w‖ / U * m)
+        ≤ U * (‖w‖ / U * m) := mul_le_mul_of_nonneg_right hcnt (by positivity)
       _ = m * ‖w‖ := by field_simp
-  calc ‖f (2 * U) • ∑ i ∈ range (2 * U + 1), g i - f (U + 1) • ∑ i ∈ range (U + 1), g i -
-        ∑ i ∈ Ioc U (2 * U - 1), (f (i + 1) - f i) • ∑ k ∈ range (i + 1), g k‖
-      ≤ m + m + m * ‖w‖ := by
-        refine (norm_sub_le _ _).trans ?_
-        refine add_le_add ((norm_sub_le _ _).trans (add_le_add hb1 hb2)) hb3
+  calc
+    ‖f (2 * U) • ∑ i ∈ range (2 * U + 1), g i - f (U + 1) • ∑ i ∈ range (U + 1), g i -
+     ∑ i ∈ Ioc U (2 * U - 1), (f (i + 1) - f i) • ∑ k ∈ range (i + 1), g k‖
+        ≤ m + m + m * ‖w‖ := by
+      refine (norm_sub_le _ _).trans ?_
+      refine add_le_add ((norm_sub_le _ _).trans (add_le_add hb1 hb2)) hb3
     _ ≤ 2 * m * (1 + ‖w‖) := by nlinarith [norm_nonneg w]
 
 end Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD

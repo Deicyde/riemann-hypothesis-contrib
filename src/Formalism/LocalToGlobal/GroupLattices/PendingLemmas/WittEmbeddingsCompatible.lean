@@ -48,8 +48,9 @@ theorem OcC_val (x : ℂ_[p]) : x ∈ OcC p ∨ x⁻¹ ∈ OcC p := by
 
 theorem norm_p_pos : 0 < ‖(p : ℂ_[p])‖ := norm_pos_iff.2 (Nat.cast_ne_zero.2 hp.out.ne_zero)
 
-theorem OcC_rank1 (x : ℂ_[p]) (hx : x ≠ 0) :
-    (∃ n : ℕ, (p : ℂ_[p]) ^ n / x ∈ OcC p) ∧ (x⁻¹ ∉ OcC p → ∃ n : ℕ, x ^ n / (p : ℂ_[p]) ∈ OcC p) := by
+theorem OcC_rank1 (x : ℂ_[p]) (hx : x ≠ 0)
+    : (∃ n : ℕ, (p : ℂ_[p]) ^ n / x ∈ OcC p)
+      ∧ (x⁻¹ ∉ OcC p → ∃ n : ℕ, x ^ n / (p : ℂ_[p]) ∈ OcC p) := by
   have hx0 : 0 < ‖x‖ := norm_pos_iff.2 hx
   constructor
   · obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one hx0 (norm_p_lt_one (p := p))
@@ -72,7 +73,8 @@ theorem OcC_rank1 (x : ℂ_[p]) (hx : x ≠ 0) :
 
 section Emb
 
-variable {O Kf : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+variable
+  {O Kf : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
   (i : Kf →+* ℂ_[p]) (hi : ∀ x : O, ‖i (algebraMap O Kf x)‖ ≤ 1)
 
 include hi
@@ -83,7 +85,9 @@ theorem norm_unit (u : Oˣ) : ‖i (algebraMap O Kf (u : O))‖ = 1 := by
     rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
   have h2 := congrArg norm h1
   rw [norm_mul, norm_one] at h2
-  calc (1 : ℝ) = ‖i (algebraMap O Kf (u : O))‖ * ‖i (algebraMap O Kf ((u⁻¹ : Oˣ) : O))‖ := h2.symm
+  calc
+    (1 : ℝ)
+      = ‖i (algebraMap O Kf (u : O))‖ * ‖i (algebraMap O Kf ((u⁻¹ : Oˣ) : O))‖ := h2.symm
     _ ≤ ‖i (algebraMap O Kf (u : O))‖ * 1 := mul_le_mul_of_nonneg_left (hi _) (norm_nonneg _)
     _ = _ := mul_one _
 
@@ -111,7 +115,8 @@ theorem norm_nonunit {y : O} (hy : ¬ IsUnit y) : ‖i (algebraMap O Kf y)‖ < 
   rw [map_mul, map_mul, norm_mul]
   exact lt_of_le_of_lt (mul_le_of_le_one_right (norm_nonneg _) (hi z)) hϖ1
 
-theorem norm_le_one_iff [IsFractionRing O Kf] (x : Kf) : ‖i x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap O Kf) := by
+theorem norm_le_one_iff [IsFractionRing O Kf] (x : Kf)
+    : ‖i x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap O Kf) := by
   constructor
   · intro hx
     rcases ValuationRing.isInteger_or_isInteger O x with ⟨y, hy⟩ | ⟨y, hy⟩
@@ -139,14 +144,16 @@ structure CEmb (G : GAtP p) where
   iK : G.Kf →+* ℂ_[p]
   int : ∀ x : G.O, ‖iK (algebraMap G.O G.Kf x)‖ ≤ 1
 
-theorem CEmb.mem_iff {X : Sys p} (E : CEmb X.G) [IsFractionRing X.G.O X.G.Kf] (x : X.G.Kf) :
-    E.iK x ∈ OcC p ↔ x ∈ X.intK := by
+theorem CEmb.mem_iff {X : Sys p} (E : CEmb X.G) [IsFractionRing X.G.O X.G.Kf] (x : X.G.Kf)
+    : E.iK x ∈ OcC p ↔ x ∈ X.intK := by
   rw [mem_OcC, norm_le_one_iff E.iK E.int]
   rfl
 
 section Conc
 
-variable {n : ℕ} (f : K0 p →+* ℂ_[p]) (hf : ∀ x : WW p, ‖f (algebraMap (WW p) (K0 p) x)‖ ≤ 1)
+variable
+  {n : ℕ}
+  (f : K0 p →+* ℂ_[p]) (hf : ∀ x : WW p, ‖f (algebraMap (WW p) (K0 p) x)‖ ≤ 1)
   (L : IntermediateField (KO p n) (Om p n)) [FiniteDimensional (KO p n) L]
 
 def embLC : L →+* ℂ_[p] := (iC f).comp (gL L)

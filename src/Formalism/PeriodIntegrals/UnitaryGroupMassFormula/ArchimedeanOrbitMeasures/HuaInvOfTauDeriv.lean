@@ -14,22 +14,24 @@ section MatDet
 
 variable {n : Type} [Fintype n] [DecidableEq n]
 
-theorem det_mulRight_mat (B : Matrix n n ℂ) :
-    LinearMap.det (LinearMap.mulRight ℂ B : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ) =
-      B.det ^ Fintype.card n := by
+theorem det_mulRight_mat (B : Matrix n n ℂ)
+    : LinearMap.det (LinearMap.mulRight ℂ B : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ)
+      = B.det ^ Fintype.card n := by
   classical
-  let e : Matrix n n ℂ ≃ₗ[ℂ] (n → n → ℂ) :=
-    { toFun := fun X i j => X i j
-      invFun := fun v => Matrix.of v
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+  let e : Matrix n n ℂ ≃ₗ[ℂ] (n → n → ℂ) := {
+    toFun := fun X i j => X i j
+    invFun := fun v => Matrix.of v
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
   let g : (n → n → ℂ) →ₗ[ℂ] (n → n → ℂ) :=
     LinearMap.pi fun i => (Matrix.toLin' Bᵀ).comp (LinearMap.proj i)
-  have key : (LinearMap.mulRight ℂ B : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ) =
-      (e.symm : (n → n → ℂ) →ₗ[ℂ] Matrix n n ℂ).comp
-        (g.comp (e.symm.symm : Matrix n n ℂ →ₗ[ℂ] (n → n → ℂ))) := by
+  have key
+      : (LinearMap.mulRight ℂ B : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ)
+        = (e.symm : (n → n → ℂ) →ₗ[ℂ] Matrix n n ℂ).comp
+          (g.comp (e.symm.symm : Matrix n n ℂ →ₗ[ℂ] (n → n → ℂ))) := by
     refine LinearMap.ext fun X => ?_
     refine Matrix.ext fun i j => ?_
     rw [LinearMap.mulRight_apply, Matrix.mul_apply]
@@ -38,15 +40,16 @@ theorem det_mulRight_mat (B : Matrix n n ℂ) :
   rw [key, LinearMap.det_conj, LinearMap.det_pi]
   simp [LinearMap.det_toLin', Matrix.det_transpose]
 
-theorem det_mulLeft_mat (A : Matrix n n ℂ) :
-    LinearMap.det (LinearMap.mulLeft ℂ A : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ) =
-      A.det ^ Fintype.card n := by
+theorem det_mulLeft_mat (A : Matrix n n ℂ)
+    : LinearMap.det (LinearMap.mulLeft ℂ A : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ)
+      = A.det ^ Fintype.card n := by
   classical
   let e : Matrix n n ℂ ≃ₗ[ℂ] Matrix n n ℂ := Matrix.transposeLinearEquiv n n ℂ ℂ
-  have key : (LinearMap.mulLeft ℂ A : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ) =
-      (e : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ).comp
-        ((LinearMap.mulRight ℂ Aᵀ : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ).comp
-          (e.symm : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ)) := by
+  have key
+      : (LinearMap.mulLeft ℂ A : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ)
+        = (e : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ).comp
+          ((LinearMap.mulRight ℂ Aᵀ : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ).comp
+            (e.symm : Matrix n n ℂ →ₗ[ℂ] Matrix n n ℂ)) := by
     refine LinearMap.ext fun X => ?_
     simp [e, Matrix.transpose_mul]
   rw [key, LinearMap.det_conj, det_mulRight_mat, Matrix.det_transpose]
@@ -74,8 +77,7 @@ theorem sigJ_smul (c : ℂ) (W : Mat) : sigJ (c • W) = star c • sigJ W := by
 theorem sigJ_sigJ (W : Mat) : sigJ (sigJ W) = W := by
   have hJ : (HcS.UG.Jpq P Q)ᴴ = HcS.UG.Jpq P Q := by
     simp [HcS.UG.Jpq, Matrix.fromBlocks_conjTranspose]
-  have hJJ : HcS.UG.Jpq P Q * HcS.UG.Jpq P Q = 1 := by
-    simpa using Jpq_mul_mul (P := P) (Q := Q) 1
+  have hJJ : HcS.UG.Jpq P Q * HcS.UG.Jpq P Q = 1 := by simpa using Jpq_mul_mul (P := P) (Q := Q) 1
   simp only [sigJ, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hJ,
     Matrix.mul_assoc, Jpq_mul_mul, hJJ, Matrix.mul_one]
 
@@ -89,9 +91,10 @@ theorem mem_lieU_iff_sigJ (X : Mat) : X ∈ lieU P Q ↔ sigJ X = -X := by
     have e1 : HcS.UG.Jpq P Q * (Xᴴ * HcS.UG.Jpq P Q) = -X := by
       rw [← Matrix.mul_assoc]
       exact h
-    calc Xᴴ * HcS.UG.Jpq P Q + HcS.UG.Jpq P Q * X
-        = HcS.UG.Jpq P Q * (HcS.UG.Jpq P Q * (Xᴴ * HcS.UG.Jpq P Q)) + HcS.UG.Jpq P Q * X := by
-          rw [Jpq_mul_mul]
+    calc
+      Xᴴ * HcS.UG.Jpq P Q + HcS.UG.Jpq P Q * X
+          = HcS.UG.Jpq P Q * (HcS.UG.Jpq P Q * (Xᴴ * HcS.UG.Jpq P Q)) + HcS.UG.Jpq P Q * X := by
+        rw [Jpq_mul_mul]
       _ = 0 := by rw [e1, Matrix.mul_neg, neg_add_cancel]
 
 def cplx : (lieU P Q × lieU P Q) →ₗ[ℝ] Mat where
@@ -103,25 +106,28 @@ def cplx : (lieU P Q × lieU P Q) →ₗ[ℝ] Mat where
     simp only [Prod.smul_fst, Prod.smul_snd, Submodule.coe_smul, RingHom.id_apply, smul_add]
     rw [smul_comm c Complex.I]
 
-theorem cplx_apply (p : lieU P Q × lieU P Q) :
-    cplx p = ((p.1 : lieU P Q) : Mat) + Complex.I • ((p.2 : lieU P Q) : Mat) := rfl
+theorem cplx_apply (p : lieU P Q × lieU P Q)
+    : cplx p = ((p.1 : lieU P Q) : Mat) + Complex.I • ((p.2 : lieU P Q) : Mat) :=
+  rfl
 
 theorem cplx_injective : Function.Injective (cplx (P := P) (Q := Q)) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   rintro ⟨⟨Y, hY⟩, ⟨Z, hZ⟩⟩ h
   have h1 : Y + Complex.I • Z = 0 := h
   have hY' : sigJ Y = -Y := (mem_lieU_iff_sigJ Y).1 hY
   have hZ' : sigJ Z = -Z := (mem_lieU_iff_sigJ Z).1 hZ
   have hs : star Complex.I = -Complex.I := by simp [Complex.star_def]
   have h2 : -Y + Complex.I • Z = 0 := by
-    have h3 : sigJ (Y + Complex.I • Z) = 0 := by
-      rw [h1]; simp [sigJ]
+    have h3 : sigJ (Y + Complex.I • Z) = 0 := by rw [h1]; simp [sigJ]
     rw [sigJ_add, sigJ_smul, hY', hZ', hs, neg_smul_neg] at h3
     exact h3
   have hY0 : Y = 0 := by
     have h4 : (2 : ℂ) • Y = 0 := by
       rw [two_smul]
-      calc Y + Y = (Y + Complex.I • Z) - (-Y + Complex.I • Z) := by abel
+      calc
+        Y + Y
+          = (Y + Complex.I • Z) - (-Y + Complex.I • Z) := by abel
         _ = 0 := by rw [h1, h2, sub_zero]
     exact (smul_eq_zero.1 h4).resolve_left two_ne_zero
   have hZ0 : Z = 0 := by
@@ -168,10 +174,12 @@ theorem det_ayb : DetAYB := by
   have hM : LinearMap.det M = (A.det * B.det) ^ (P + Q) := by
     rw [LinearMap.det_comp, det_mulLeft_mat, det_mulRight_mat, mul_pow, Fintype.card_sum,
       Fintype.card_fin, Fintype.card_fin]
-  have key : ((cplxE (P := P) (Q := Q) : (lieU P Q × lieU P Q) →ₗ[ℝ] _).comp
-      ((L.prodMap L).comp ((cplxE (P := P) (Q := Q)).symm :
-        Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ →ₗ[ℝ] (lieU P Q × lieU P Q)))) =
-      M.restrictScalars ℝ := by
+  have key
+      : ((cplxE (P := P) (Q := Q) : (lieU P Q × lieU P Q) →ₗ[ℝ] _).comp
+          ((L.prodMap L).comp
+            ((cplxE (P := P) (Q := Q)).symm
+              : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ →ₗ[ℝ] (lieU P Q × lieU P Q))))
+        = M.restrictScalars ℝ := by
     refine LinearMap.ext fun W => ?_
     obtain ⟨p, rfl⟩ := (cplxE (P := P) (Q := Q)).surjective W
     show cplxE ((L.prodMap L) ((cplxE (P := P) (Q := Q)).symm (cplxE p))) = A * (cplxE p * B)
@@ -180,8 +188,8 @@ theorem det_ayb : DetAYB := by
         Complex.I • ((L p.2 : lieU P Q) : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) =
       A * ((((p.1 : lieU P Q) : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) +
         Complex.I • ((p.2 : lieU P Q) : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)) * B)
-    rw [hL, hL, Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul,
-      Matrix.mul_assoc, Matrix.mul_assoc]
+    rw [hL, hL, Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_assoc,
+      Matrix.mul_assoc]
   have h2 : LinearMap.det (L.prodMap L) = Algebra.norm ℝ (LinearMap.det M) := by
     rw [← LinearMap.det_conj (L.prodMap L) (cplxE (P := P) (Q := Q)), key,
       LinearMap.det_restrictScalars]

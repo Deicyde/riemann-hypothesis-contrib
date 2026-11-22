@@ -9,11 +9,13 @@ open Formalism.ConjugateSelfDual Formalism.MainNotions.N Polynomial
 
 namespace GlobalTheory
 
-theorem matrix_system_nonzero_solution_descends {k L Γ : Type} [Field k] [Field L] (f : k →+* L)
+theorem matrix_system_nonzero_solution_descends
+    {k L Γ : Type} [Field k] [Field L]
+    (f : k →+* L)
     {a b c : ℕ} (A : Γ → Matrix (Fin a) (Fin a) k) (B : Γ → Matrix (Fin b) (Fin b) k)
-    (Q : Matrix (Fin c) (Fin a) k) (C : Matrix (Fin a) (Fin b) L) :
-    C ≠ 0 → (∀ g, (A g).map f * C = C * (B g).map f) → Q.map f * C = 0 →
-      ∃ X : Matrix (Fin a) (Fin b) k, X ≠ 0 ∧ (∀ g, A g * X = X * B g) ∧ Q * X = 0 := by
+    (Q : Matrix (Fin c) (Fin a) k) (C : Matrix (Fin a) (Fin b) L)
+    : C ≠ 0 → (∀ g, (A g).map f * C = C * (B g).map f) → Q.map f * C = 0
+      → ∃ X : Matrix (Fin a) (Fin b) k, X ≠ 0 ∧ (∀ g, A g * X = X * B g) ∧ Q * X = 0 := by
   intro hC hAB hQ
   letI := f.toAlgebra
   obtain ⟨i₀, j₀, hij⟩ : ∃ i j, C i j ≠ 0 := by
@@ -40,11 +42,11 @@ theorem matrix_system_nonzero_solution_descends {k L Γ : Type} [Field k] [Field
     ext i j
     have := congrArg φ (congrFun (congrFun (hAB g) i) j)
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [Matrix.mul_apply, Matrix.map_apply, map_sum, key, key'] using this
+    simpa only [Matrix.mul_apply, Matrix.map_apply, map_sum, key, key'] using this
   · ext i j
     have := congrArg φ (congrFun (congrFun hQ i) j)
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [Matrix.mul_apply, Matrix.map_apply, map_sum, key, Matrix.zero_apply, map_zero]
-      using this
+    simpa only [Matrix.mul_apply, Matrix.map_apply, map_sum, key, Matrix.zero_apply, map_zero] using
+      this
 
 end GlobalTheory

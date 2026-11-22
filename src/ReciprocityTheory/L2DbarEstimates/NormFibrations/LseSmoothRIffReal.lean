@@ -18,19 +18,22 @@ theorem lse_two_le_infty : (2 : WithTop ℕ∞) ≤ ∞ := by
   | simp
   | decide
 
-theorem lse_smoothR_iff_real {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (f : M → ℝ) :
-    SmoothR n z f ↔ ∀ e : OpenPartialHomeomorph M (V n), IsChart n z e →
-      ContDiffOn ℝ ∞ (f ∘ e.symm) e.target := by
+theorem lse_smoothR_iff_real {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (f : M → ℝ)
+    : SmoothR n z f
+      ↔ ∀ e : OpenPartialHomeomorph M (V n),
+        IsChart n z e → ContDiffOn ℝ ∞ (f ∘ e.symm) e.target := by
   unfold SmoothR Smooth
   refine forall_congr' fun e => imp_congr_right fun _ => ⟨fun h => ?_, fun h => ?_⟩
   · have h1 := Complex.reCLM.contDiff.comp_contDiffOn h
     simpa [Function.comp_def, Complex.reCLM_apply] using h1
   · exact Complex.ofRealCLM.contDiff.comp_contDiffOn h
 
-private theorem chart_symm_apply_eventually_eq {M : Type*} [TopologicalSpace M] {n : ℕ} {z : M → V n}
-    (hz : IsLocalHomeomorph z) {e e' : OpenPartialHomeomorph M (V n)} (he : IsChart n z e)
-    (he' : IsChart n z e') {x : M} (hx : x ∈ e.source) (hx' : x ∈ e'.source) :
-    ∀ᶠ w in 𝓝 (z x), e.symm w = e'.symm w := by
+private theorem chart_symm_apply_eventually_eq
+    {M : Type*} [TopologicalSpace M]
+    {n : ℕ} {z : M → V n} (hz : IsLocalHomeomorph z)
+    {e e' : OpenPartialHomeomorph M (V n)} (he : IsChart n z e) (he' : IsChart n z e')
+    {x : M} (hx : x ∈ e.source) (hx' : x ∈ e'.source)
+    : ∀ᶠ w in 𝓝 (z x), e.symm w = e'.symm w := by
   obtain ⟨f, hxf, hzf⟩ := hz x
   have hzx : z x = e x := he hx
   have hzx' : z x = e' x := he' hx'
@@ -51,14 +54,19 @@ private theorem chart_symm_apply_eventually_eq {M : Type*} [TopologicalSpace M] 
   filter_upwards [h1, h2, h3, h4] with w hw1 hw2 hw3 hw4
   have k1 : f (e.symm w) = w := by rw [← hzf, he (e.map_target hw3), e.right_inv hw3]
   have k2 : f (e'.symm w) = w := by rw [← hzf, he' (e'.map_target hw4), e'.right_inv hw4]
-  calc e.symm w = f.symm (f (e.symm w)) := (f.left_inv hw1).symm
+  calc
+    e.symm w
+      = f.symm (f (e.symm w)) := (f.left_inv hw1).symm
     _ = f.symm (f (e'.symm w)) := by rw [k1, k2]
     _ = e'.symm w := f.left_inv hw2
 
-private theorem d_eq_wd_of_isLocalHomeomorph_chart {M : Type*} [TopologicalSpace M] {n : ℕ} {z : M → V n}
-    (hz : IsLocalHomeomorph z) {e : OpenPartialHomeomorph M (V n)} (he : IsChart n z e)
-    {x : M} (hx : x ∈ e.source) (j : Fin n) (g : M → ℂ) :
-    d n z j g x = wd n j (g ∘ e.symm) (z x) := by
+private theorem d_eq_wd_of_isLocalHomeomorph_chart
+    {M : Type*} [TopologicalSpace M]
+    {n : ℕ} {z : M → V n} (hz : IsLocalHomeomorph z)
+    {e : OpenPartialHomeomorph M (V n)} (he : IsChart n z e)
+    {x : M} (hx : x ∈ e.source)
+    (j : Fin n) (g : M → ℂ)
+    : d n z j g x = wd n j (g ∘ e.symm) (z x) := by
   have h : ∃ e : OpenPartialHomeomorph M (V n), IsChart n z e ∧ x ∈ e.source := ⟨e, he, hx⟩
   unfold d
   rw [dite_eq_left h]
@@ -67,10 +75,13 @@ private theorem d_eq_wd_of_isLocalHomeomorph_chart {M : Type*} [TopologicalSpace
     with w hw
   simp only [Function.comp_apply, hw]
 
-private theorem db_eq_wdb_of_isLocalHomeomorph_chart {M : Type*} [TopologicalSpace M] {n : ℕ} {z : M → V n}
-    (hz : IsLocalHomeomorph z) {e : OpenPartialHomeomorph M (V n)} (he : IsChart n z e)
-    {x : M} (hx : x ∈ e.source) (j : Fin n) (g : M → ℂ) :
-    db n z j g x = wdb n j (g ∘ e.symm) (z x) := by
+private theorem db_eq_wdb_of_isLocalHomeomorph_chart
+    {M : Type*} [TopologicalSpace M]
+    {n : ℕ} {z : M → V n} (hz : IsLocalHomeomorph z)
+    {e : OpenPartialHomeomorph M (V n)} (he : IsChart n z e)
+    {x : M} (hx : x ∈ e.source)
+    (j : Fin n) (g : M → ℂ)
+    : db n z j g x = wdb n j (g ∘ e.symm) (z x) := by
   have h : ∃ e : OpenPartialHomeomorph M (V n), IsChart n z e ∧ x ∈ e.source := ⟨e, he, hx⟩
   unfold db
   rw [dite_eq_left h]
@@ -79,21 +90,25 @@ private theorem db_eq_wdb_of_isLocalHomeomorph_chart {M : Type*} [TopologicalSpa
     with w hw
   simp only [Function.comp_apply, hw]
 
-private theorem levi_eq_leviV_comp_chart_symm {M : Type*} [TopologicalSpace M] {n : ℕ} {z : M → V n}
-    (hz : IsLocalHomeomorph z) {e : OpenPartialHomeomorph M (V n)} (he : IsChart n z e)
-    {x : M} (hx : x ∈ e.source) (ph : M → ℝ) (ξ : Fin n → ℂ) :
-    Levi n z ph x ξ = leviV n (fun y => ((ph (e.symm y) : ℝ) : ℂ)) (z x) ξ := by
+private theorem levi_eq_leviV_comp_chart_symm
+    {M : Type*} [TopologicalSpace M]
+    {n : ℕ} {z : M → V n} (hz : IsLocalHomeomorph z)
+    {e : OpenPartialHomeomorph M (V n)} (he : IsChart n z e)
+    {x : M} (hx : x ∈ e.source)
+    (ph : M → ℝ) (ξ : Fin n → ℂ)
+    : Levi n z ph x ξ = leviV n (fun y => ((ph (e.symm y) : ℝ) : ℂ)) (z x) ξ := by
   unfold Levi leviV
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
   have hzx : z x = e x := he hx
   have hnh : ∀ᶠ w in 𝓝 (z x), w ∈ e.target := by
     rw [hzx]
     exact e.open_target.mem_nhds (e.map_source hx)
-  have hev : (db n z k fun y => (ph y : ℂ)) ∘ e.symm =ᶠ[𝓝 (z x)]
-      wdb n k (fun y => ((ph (e.symm y) : ℝ) : ℂ)) := by
+  have hev
+      : (db n z k fun y => (ph y : ℂ)) ∘ e.symm =ᶠ[𝓝 (z x)]
+        wdb n k (fun y => ((ph (e.symm y) : ℝ) : ℂ)) := by
     filter_upwards [hnh] with w hw
-    rw [Function.comp_apply, db_eq_wdb_of_isLocalHomeomorph_chart hz he (e.map_target hw) k, he (e.map_target hw),
-      e.right_inv hw]
+    rw [Function.comp_apply, db_eq_wdb_of_isLocalHomeomorph_chart hz he (e.map_target hw) k,
+      he (e.map_target hw), e.right_inv hw]
     try rfl
   rw [d_eq_wd_of_isLocalHomeomorph_chart hz he hx, wd_congr hev]
 
@@ -103,18 +118,20 @@ theorem lse (n : ℕ) (M : Type*) [TopologicalSpace M] : LSEStatement n M := by
     intro x
     obtain ⟨f, hxf, hzf⟩ := hz x
     exact ⟨f, fun y _ => by rw [hzf], hxf⟩
-  have hsm : ∀ e : OpenPartialHomeomorph M (V n), IsChart n z e →
-      ContDiffOn ℝ ∞ (fun v => Real.log (∑ i, Real.exp (ph i (e.symm v)) +
-        ∑ j, ‖g j (e.symm v)‖ ^ 2)) e.target := by
+  have hsm
+      : ∀ e : OpenPartialHomeomorph M (V n),
+        IsChart n z e
+          → ContDiffOn ℝ ∞
+            (fun v => Real.log (∑ i, Real.exp (ph i (e.symm v)) + ∑ j, ‖g j (e.symm v)‖ ^ 2))
+            e.target := by
     intro e he
-    have h1 : ∀ i, ContDiffOn ℝ ∞ (fun v => ph i (e.symm v)) e.target :=
-      fun i => (lse_smoothR_iff_real n z (ph i)).mp (hph i) e he
-    have h2 : ∀ j, ContDiffOn ℝ ∞ (fun v => g j (e.symm v)) e.target :=
-      fun j => by
-        have hgd : DifferentiableOn ℂ (fun v => g j (e.symm v)) e.target := hg j e he
-        have hgc : ContDiffOn ℂ ∞ (fun v => g j (e.symm v)) e.target := by
-          exact C.holo_contDiffOn_complex e.open_target hgd
-        exact hgc.restrict_scalars ℝ
+    have h1 : ∀ i, ContDiffOn ℝ ∞ (fun v => ph i (e.symm v)) e.target := fun i =>
+      (lse_smoothR_iff_real n z (ph i)).mp (hph i) e he
+    have h2 : ∀ j, ContDiffOn ℝ ∞ (fun v => g j (e.symm v)) e.target := fun j => by
+      have hgd : DifferentiableOn ℂ (fun v => g j (e.symm v)) e.target := hg j e he
+      have hgc : ContDiffOn ℂ ∞ (fun v => g j (e.symm v)) e.target := by
+        exact C.holo_contDiffOn_complex e.open_target hgd
+      exact hgc.restrict_scalars ℝ
     refine ContDiffOn.log ?_ fun v _ => (hpos (e.symm v)).ne'
     exact (ContDiffOn.sum fun i _ => (h1 i).exp).add (ContDiffOn.sum fun j _ => (h2 j).norm_sq ℝ)
   refine ⟨(lse_smoothR_iff_real n z _).mpr fun e he => hsm e he, fun x ξ => ?_⟩
@@ -130,20 +147,28 @@ theorem lse (n : ℕ) (M : Type*) [TopologicalSpace M] : LSEStatement n M := by
   have hmem : z x ∈ e.target := by
     rw [hzx]
     exact e.map_source hx
-  have hA : ∀ i, (∃ φ : V n → ℝ, ContDiffOn ℝ 2 φ e.target ∧ LeviNonnegOn n φ e.target ∧
-        ∀ y ∈ e.target, u i y = Real.exp (φ y)) ∨
-      (∃ g' : V n → ℂ, ContDiffOn ℂ 2 g' e.target ∧
-        ∀ y ∈ e.target, u i y = Complex.normSq (g' y)) := by
+  have hA
+      : ∀ i,
+        (∃ φ : V n → ℝ,
+            ContDiffOn ℝ 2 φ e.target ∧ LeviNonnegOn n φ e.target
+              ∧ ∀ y ∈ e.target, u i y = Real.exp (φ y))
+          ∨ (∃ g' : V n → ℂ,
+            ContDiffOn ℂ 2 g' e.target ∧ ∀ y ∈ e.target, u i y = Complex.normSq (g' y)) := by
     intro i
     induction i using Fin.addCases with
     | left i =>
       left
-      refine ⟨fun y => ph i (e.symm y),
-        ((lse_smoothR_iff_real n z (ph i)).mp (hph i) e he).of_le lse_two_le_infty, ?_,
-        fun y _ => by simp [hu]⟩
+      refine ⟨
+        fun y => ph i (e.symm y),
+        ((lse_smoothR_iff_real n z (ph i)).mp (hph i) e he).of_le lse_two_le_infty,
+        ?_,
+        fun y _ => by simp [hu]
+      ⟩
       intro y hy ζ
       have h := hL i (e.symm y) ζ
-      rw [levi_eq_leviV_comp_chart_symm hz he (e.map_target hy), he (e.map_target hy), e.right_inv hy] at h
+      rw [levi_eq_leviV_comp_chart_symm hz he (e.map_target hy), he (e.map_target hy),
+          e.right_inv hy]
+        at h
       exact h
     | right j =>
       right
@@ -161,9 +186,12 @@ theorem lse (n : ℕ) (M : Type*) [TopologicalSpace M] : LSEStatement n M := by
     rw [hsum]
     exact hpos (e.symm y)
   have key := lseV n (p + q) e.target u e.open_target hA hB (z x) hmem ξ
-  have e1 : leviV n (fun y => ((Real.log (∑ i, u i y) : ℝ) : ℂ)) (z x) ξ =
-      leviV n (fun y => ((Real.log (∑ i, Real.exp (ph i (e.symm y)) +
-        ∑ j, ‖g j (e.symm y)‖ ^ 2) : ℝ) : ℂ)) (z x) ξ := by
+  have e1
+      : leviV n (fun y => ((Real.log (∑ i, u i y) : ℝ) : ℂ)) (z x) ξ
+        = leviV n
+          (fun y =>
+            ((Real.log (∑ i, Real.exp (ph i (e.symm y)) + ∑ j, ‖g j (e.symm y)‖ ^ 2) : ℝ) : ℂ))
+          (z x) ξ := by
     congr 1
     funext y
     rw [hsum]

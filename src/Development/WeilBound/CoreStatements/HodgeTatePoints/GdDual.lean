@@ -11,16 +11,17 @@ noncomputable section
 
 namespace PositivityTheory.HtPt.Gd
 
-variable {C : Type} [Field C] {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
-  [IsAlgClosed C] [CharZero C]
-  {E : Type} [Field E] [NumberField E] {c : E ≃+* E} {κ : O} {N : ℕ}
-  {V : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
+variable
+  {C : Type} [Field C]
+  {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C] [IsAlgClosed C] [CharZero C]
+  {E : Type} [Field E] [NumberField E]
+  {c : E ≃+* E} {κ : O} {N : ℕ} {V : Type}
+  [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
   {Ω : Type} [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
 
-
 omit [IsAlgClosed C] [CharZero C] in
-theorem proj_ht_mem (P : HTPoint C O c κ N V Ω) (τ : E →+* C) {y : V} (hy : y ∈ P.T) :
-    eigProj P.ρΩ τ (P.ht y) ∈ P.omHT τ := by
+theorem proj_ht_mem (P : HTPoint C O c κ N V Ω) (τ : E →+* C) {y : V} (hy : y ∈ P.T)
+    : eigProj P.ρΩ τ (P.ht y) ∈ P.omHT τ := by
   exact ⟨P.ht y, ⟨y, hy, rfl⟩, rfl⟩
 
 omit [IsAlgClosed C] [CharZero C] in
@@ -30,19 +31,26 @@ private theorem htPoint_e_antisymm (P : HTPoint C O c κ N V Ω) (x y : V) : P.e
   linear_combination h
 
 omit [IsAlgClosed C] [CharZero C] in
-private theorem htPoint_eq_zero_of_e_left_eq_zero (P : HTPoint C O c κ N V Ω) {x : V} (h : ∀ y, P.e x y = 0) : x = 0 :=
+private theorem htPoint_eq_zero_of_e_left_eq_zero
+    (P : HTPoint C O c κ N V Ω) {x : V} (h : ∀ y, P.e x y = 0)
+    : x = 0 :=
   P.nondeg x (fun z => by rw [htPoint_e_antisymm P z x, h z, neg_zero])
 
 omit [IsAlgClosed C] [CharZero C] in
-private theorem htPoint_exists_basis_rho_t_span (P : HTPoint C O c κ N V Ω) :
-    ∃ B : Basis (Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E)) C V,
-      (∀ q, B q = P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) ∧
-      P.T = Submodule.span O (Set.range fun q : Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E) =>
-        P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) := by
+private theorem htPoint_exists_basis_rho_t_span (P : HTPoint C O c κ N V Ω)
+    : ∃ B : Basis (Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E)) C V,
+      (∀ q, B q = P.ρ (RingOfIntegers.basis E q.2) (P.t q.1))
+        ∧ P.T
+          = Submodule.span O
+            (Set.range fun q : Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E) =>
+              P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) := by
   have hfree : IsFreeOn P.ρ P.T P.t := P.free
   obtain ⟨hli, hspan, hT⟩ := hfree
-  have hsp : ⊤ ≤ Submodule.span C (Set.range fun q : Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E) =>
-      P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) := by
+  have hsp
+      : ⊤
+        ≤ Submodule.span C
+          (Set.range fun q : Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E) =>
+            P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) := by
     rw [← hspan]
     apply Submodule.span_le.mpr
     intro y hy
@@ -51,8 +59,8 @@ private theorem htPoint_exists_basis_rho_t_span (P : HTPoint C O c κ N V Ω) :
   exact ⟨Basis.mk hli hsp, fun q => Basis.mk_apply hli hsp q, hT⟩
 
 omit [IsAlgClosed C] [CharZero C] in
-private theorem htPoint_exists_linearMap_ext_of_T (P : HTPoint C O c κ N V Ω) (g : P.T →ₗ[O] O) :
-    ∃ ℓ : V →ₗ[C] C, ∀ y (hy : y ∈ P.T), ℓ y = algebraMap O C (g ⟨y, hy⟩) := by
+private theorem htPoint_exists_linearMap_ext_of_T (P : HTPoint C O c κ N V Ω) (g : P.T →ₗ[O] O)
+    : ∃ ℓ : V →ₗ[C] C, ∀ y (hy : y ∈ P.T), ℓ y = algebraMap O C (g ⟨y, hy⟩) := by
   obtain ⟨B, hB, hT⟩ := htPoint_exists_basis_rho_t_span P
   have hbT : ∀ q, B q ∈ P.T := by
     intro q
@@ -60,8 +68,11 @@ private theorem htPoint_exists_linearMap_ext_of_T (P : HTPoint C O c κ N V Ω) 
     exact Submodule.subset_span ⟨q, rfl⟩
   refine ⟨B.constr C (fun q => algebraMap O C (g ⟨B q, hbT q⟩)), ?_⟩
   intro y hy
-  have hy' : y ∈ Submodule.span O (Set.range fun q : Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E) =>
-      P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) := hT ▸ hy
+  have hy'
+      : y ∈ Submodule.span O
+        (Set.range fun q : Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E) =>
+          P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) :=
+    hT ▸ hy
   revert hy
   induction hy' using Submodule.span_induction with
   | mem x hx =>
@@ -85,12 +96,12 @@ private theorem htPoint_exists_linearMap_ext_of_T (P : HTPoint C O c κ N V Ω) 
     intro hy
     have hxT : x ∈ P.T := hT ▸ hx
     have : (⟨a • x, hy⟩ : P.T) = a • ⟨x, hxT⟩ := rfl
-    rw [this, ← algebraMap_smul C a x, LinearMap.map_smul, LinearMap.map_smul, ihx hxT,
-      smul_eq_mul, smul_eq_mul, map_mul]
+    rw [this, ← algebraMap_smul C a x, LinearMap.map_smul, LinearMap.map_smul, ihx hxT, smul_eq_mul,
+      smul_eq_mul, map_mul]
 
 omit [IsAlgClosed C] [CharZero C] in
-private theorem htPoint_exists_e_left_eq_linearMap (P : HTPoint C O c κ N V Ω) (ℓ : V →ₗ[C] C) :
-    ∃ w : V, ∀ y, P.e w y = ℓ y := by
+private theorem htPoint_exists_e_left_eq_linearMap (P : HTPoint C O c κ N V Ω) (ℓ : V →ₗ[C] C)
+    : ∃ w : V, ∀ y, P.e w y = ℓ y := by
   obtain ⟨B, -, -⟩ := htPoint_exists_basis_rho_t_span P
   haveI : FiniteDimensional C V := Module.Finite.of_basis B
   have hinj : Function.Injective P.e := by
@@ -98,15 +109,17 @@ private theorem htPoint_exists_e_left_eq_linearMap (P : HTPoint C O c κ N V Ω)
     intro x hx
     exact htPoint_eq_zero_of_e_left_eq_zero P (fun y => by rw [hx, LinearMap.zero_apply])
   have hsurj : Function.Surjective P.e :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).mp hinj
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).mp
+      hinj
   obtain ⟨w, hw⟩ := hsurj ℓ
   exact ⟨w, fun y => by rw [hw]⟩
 
-
 omit [IsAlgClosed C] [CharZero C] in
-private theorem htPoint_exists_smul_mem_T (hv : v.Integers O) (P : HTPoint C O c κ N V Ω) (y : V) :
-    ∃ s : O, algebraMap O C s ≠ 0 ∧ s • y ∈ P.T := by
-  have hsc : ∀ a : C, ∃ s : O, algebraMap O C s ≠ 0 ∧ ∃ u : O, algebraMap O C u = algebraMap O C s * a := by
+private theorem htPoint_exists_smul_mem_T (hv : v.Integers O) (P : HTPoint C O c κ N V Ω) (y : V)
+    : ∃ s : O, algebraMap O C s ≠ 0 ∧ s • y ∈ P.T := by
+  have hsc
+      : ∀ a : C, ∃ s : O,
+        algebraMap O C s ≠ 0 ∧ ∃ u : O, algebraMap O C u = algebraMap O C s * a := by
     intro a
     by_cases ha : v a ≤ 1
     · obtain ⟨u, hu⟩ := hv.exists_of_le_one ha
@@ -145,8 +158,8 @@ private theorem htPoint_exists_smul_mem_T (hv : v.Integers O) (P : HTPoint C O c
     exact P.T.smul_mem u hsx
 
 omit [IsAlgClosed C] [CharZero C] in
-private theorem htPoint_rho_mem_T (P : HTPoint C O c κ N V Ω) (a : 𝓞 E) {z : V} (hz : z ∈ P.T) :
-    P.ρ a z ∈ P.T := by
+private theorem htPoint_rho_mem_T (P : HTPoint C O c κ N V Ω) (a : 𝓞 E) {z : V} (hz : z ∈ P.T)
+    : P.ρ a z ∈ P.T := by
   obtain ⟨B, -, hT⟩ := htPoint_exists_basis_rho_t_span P
   rw [hT] at hz ⊢
   set S := Submodule.span O (Set.range fun q : Fin N × Module.Free.ChooseBasisIndex ℤ (𝓞 E) =>
@@ -185,9 +198,10 @@ private theorem htPoint_rho_mem_T (P : HTPoint C O c κ N V Ω) (a : 𝓞 E) {z 
     rw [LinearMap.map_smul_of_tower]
     exact S.smul_mem o hx
 
-theorem exists_alt_bis (hv : v.Integers O) (hc : ∀ x, c (c x) = x) (P : HTPoint C O c κ N V Ω) (σ : E →+* C)
-    (f : P.omHT (σ.comp c.toRingHom) →ₗ[O] O) :
-    ∃ w ∈ P.W' σ, ∀ y (hy : y ∈ P.T),
+theorem exists_alt_bis
+    (hv : v.Integers O) (hc : ∀ x, c (c x) = x)
+    (P : HTPoint C O c κ N V Ω) (σ : E →+* C) (f : P.omHT (σ.comp c.toRingHom) →ₗ[O] O)
+    : ∃ w ∈ P.W' σ, ∀ y (hy : y ∈ P.T),
       P.e w y = algebraMap O C (f ⟨_, proj_ht_mem P (σ.comp c.toRingHom) hy⟩) := by
   let K : P.T →ₗ[O] P.omHT (σ.comp c.toRingHom) :=
     LinearMap.codRestrict (P.omHT (σ.comp c.toRingHom))
@@ -218,21 +232,25 @@ theorem exists_alt_bis (hv : v.Integers O) (hc : ∀ x, c (c x) = x) (P : HTPoin
       have h := (NumberField.RingOfIntegers.isIntegral_coe a).map σ.toIntAlgHom
       exact h.tower_top
     exact hv.exists_of_le_one (hv.mem_of_integral hint)
-  have hρ : ∀ (a : 𝓞 E) (y : V),
-      ℓ (P.ρ (RingOfIntegers.mapRingEquiv c a) y) = σ (a : E) * ℓ y := by
+  have hρ : ∀ (a : 𝓞 E) (y : V), ℓ (P.ρ (RingOfIntegers.mapRingEquiv c a) y) = σ (a : E) * ℓ y := by
     intro a y
     obtain ⟨u, hu⟩ := hσu a
-    have hT1 : ∀ z (hz : z ∈ P.T),
-        ℓ (P.ρ (RingOfIntegers.mapRingEquiv c a) z) = σ (a : E) * ℓ z := by
+    have hT1
+        : ∀ z (hz : z ∈ P.T), ℓ (P.ρ (RingOfIntegers.mapRingEquiv c a) z) = σ (a : E) * ℓ z := by
       intro z hz
       have hz' := htPoint_rho_mem_T P (RingOfIntegers.mapRingEquiv c a) hz
       have hK2 : K ⟨_, hz'⟩ = u • K ⟨z, hz⟩ := by
         apply Subtype.ext
-        have e3 := LinearMap.congr_fun
-          ((ProjEig.eigProj_mul_rho_comm P.ρΩ (σ.comp c.toRingHom) (RingOfIntegers.mapRingEquiv c a)).trans
-            (ProjEig.rho_mul_eigProj P.ρΩ (σ.comp c.toRingHom) (RingOfIntegers.mapRingEquiv c a))) (P.ht z)
+        have e3 :=
+          LinearMap.congr_fun
+            ((ProjEig.eigProj_mul_rho_comm P.ρΩ (σ.comp c.toRingHom)
+                (RingOfIntegers.mapRingEquiv c a)).trans
+              (ProjEig.rho_mul_eigProj P.ρΩ (σ.comp c.toRingHom) (RingOfIntegers.mapRingEquiv c a)))
+            (P.ht z)
         rw [Module.End.mul_apply, LinearMap.smul_apply] at e3
-        have e4 : (σ.comp c.toRingHom) ((RingOfIntegers.mapRingEquiv c a : 𝓞 E) : E) = algebraMap O C u := by
+        have e4
+            : (σ.comp c.toRingHom) ((RingOfIntegers.mapRingEquiv c a : 𝓞 E) : E)
+              = algebraMap O C u := by
           rw [hu]
           simp [hc]
         rw [Submodule.coe_smul, hK, hK, P.ht_lin, e3, e4, algebraMap_smul]

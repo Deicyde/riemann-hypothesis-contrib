@@ -8,7 +8,8 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.UnramBridgeHolds
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions
+  Formalism.MainNotions.StandardLattice
 open scoped TensorProduct
 
 noncomputable section
@@ -21,19 +22,18 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 attribute [local instance] IsCMField.starRing
 open GlobalTheory.SelfDualGenus
 
-def sw (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))) :
-    E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E) ≃+* LocAlg v :=
+def sw (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
+    : E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E) ≃+* LocAlg v :=
   (Algebra.TensorProduct.comm (maximalRealSubfield E) E
     (v.adicCompletion (maximalRealSubfield E))).toRingEquiv
 
 variable (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
 
-theorem mem_intV_iff (z : E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E)) :
-    z ∈ intV E v ↔ sw v z ∈ locOrder v := by
+theorem mem_intV_iff (z : E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E))
+    : z ∈ intV E v ↔ sw v z ∈ locOrder v := by
   constructor
   · intro hz
-    refine (Subring.closure_le
-      (t := (locOrder v).toSubring.comap (sw v).toRingHom)).2 ?_ hz
+    refine (Subring.closure_le (t := (locOrder v).toSubring.comap (sw v).toRingHom)).2 ?_ hz
     rintro _ (⟨⟨_, x, rfl⟩, rfl⟩ | ⟨a, rfl⟩)
     · exact locEmb_mem_locOrder v x
     · exact (locOrder v).algebraMap_mem ⟨a.1, a.2⟩
@@ -44,24 +44,27 @@ theorem mem_intV_iff (z : E ⊗[maximalRealSubfield E] v.adicCompletion (maximal
       | mem x hx =>
         obtain ⟨a, rfl⟩ := hx
         exact Subring.subset_closure (Or.inl ⟨⟨a, a, rfl⟩, rfl⟩)
-      | algebraMap r => exact Subring.subset_closure (Or.inr ⟨⟨r.1, r.2⟩, rfl⟩)
+      | algebraMap r =>
+        exact Subring.subset_closure (Or.inr ⟨⟨r.1, r.2⟩, rfl⟩)
       | add x y _ _ hx hy =>
         rw [map_add (sw v).symm]
         exact add_mem hx hy
       | mul x y _ _ hx hy => rw [map_mul]; exact mul_mem hx hy
     simpa using key _ hz
 
-theorem mem_latS_iff {r : ℕ} (N : Submodule (𝓞 E) (Fin r → E))
-    (x : Fin r → E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E)) :
-    x ∈ latS (F := maximalRealSubfield E) (v.adicCompletion (maximalRealSubfield E)) (intV E v) N ↔
-      (fun i => sw v (x i)) ∈ locLattice v N := by
+theorem mem_latS_iff
+    {r : ℕ} (N : Submodule (𝓞 E) (Fin r → E))
+    (x : Fin r → E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E))
+    : x ∈ latS (F := maximalRealSubfield E) (v.adicCompletion (maximalRealSubfield E)) (intV E v) N
+      ↔ (fun i => sw v (x i)) ∈ locLattice v N := by
   constructor
   · intro hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨y, hy, rfl⟩ := hx
       exact Submodule.subset_span ⟨y, hy, rfl⟩
-    | zero => simp only [Pi.zero_apply, map_zero]; exact (locLattice v N).zero_mem
+    | zero =>
+      simp only [Pi.zero_apply, map_zero]; exact (locLattice v N).zero_mem
     | add x y _ _ hx hy =>
       have := add_mem hx hy
       convert this using 1
@@ -73,15 +76,17 @@ theorem mem_latS_iff {r : ℕ} (N : Submodule (𝓞 E) (Fin r → E))
       funext i
       exact map_mul (sw v) _ _
   · intro hx
-    have key : ∀ y ∈ locLattice v N, (fun i => (sw v).symm (y i)) ∈
-        latS (F := maximalRealSubfield E) (v.adicCompletion (maximalRealSubfield E))
-          (intV E v) N := by
+    have key
+        : ∀ y ∈ locLattice v N,
+          (fun i => (sw v).symm (y i)) ∈ latS (F := maximalRealSubfield E)
+            (v.adicCompletion (maximalRealSubfield E)) (intV E v) N := by
       intro y hy
       induction hy using Submodule.span_induction with
       | mem x hx =>
         obtain ⟨y, hy, rfl⟩ := hx
         exact Submodule.subset_span ⟨y, hy, rfl⟩
-      | zero => simp only [Pi.zero_apply, map_zero]; exact Submodule.zero_mem _
+      | zero =>
+        simp only [Pi.zero_apply, map_zero]; exact Submodule.zero_mem _
       | add x y _ _ hx hy =>
         have := add_mem hx hy
         convert this using 1
@@ -97,15 +102,17 @@ theorem mem_latS_iff {r : ℕ} (N : Submodule (𝓞 E) (Fin r → E))
         exact map_mul (sw v).symm _ _
     simpa using key _ hx
 
-theorem sw_sigR (hc : CMData (maximalRealSubfield E) E)
-    (z : E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E)) :
-    sw v (Formalism.UG.sigR hc.sig (v.adicCompletion (maximalRealSubfield E)) z) = locConj v (sw v z) := by
+theorem sw_sigR
+    (hc : CMData (maximalRealSubfield E) E)
+    (z : E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E))
+    : sw v (Formalism.UG.sigR hc.sig (v.adicCompletion (maximalRealSubfield E)) z)
+      = locConj v (sw v z) := by
   induction z using TensorProduct.inductionOn with
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
   | tmul a e => rfl
 
-theorem unramified (hc : CMData (maximalRealSubfield E) E) :
-    Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E) :=
+theorem unramified (hc : CMData (maximalRealSubfield E) E)
+    : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E) :=
   Formalism.L2.Pj.unramBridge_holds E fun P hP => by
     obtain ⟨θ, t, e1, e2⟩ := hc.cmUnram.2.2 P hP
     refine ⟨θ, ?_⟩
@@ -113,44 +120,53 @@ theorem unramified (hc : CMData (maximalRealSubfield E) E) :
       RingOfIntegers.ext e1.symm
     rwa [this]
 
-theorem exists_frame_cm (hc : CMData (maximalRealSubfield E) E) {r : ℕ}
-    (J : Matrix (Fin r) (Fin r) E) (hJ : IsHerm (hc.sig : E →+* E) J) (hd : IsUnit J.det)
+theorem exists_frame_cm
+    (hc : CMData (maximalRealSubfield E) E)
+    {r : ℕ} (J : Matrix (Fin r) (Fin r) E) (hJ : IsHerm (hc.sig : E →+* E) J) (hd : IsUnit J.det)
     (N : Submodule (𝓞 E) (Fin r → E))
-    (hN : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualStabiliserIndex.IsSelfDualLat (hc.sig : E →+* E) J N) :
-    ∃ b : GL (Fin r) (E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E)),
-      cT (Formalism.UG.sigR hc.sig (v.adicCompletion (maximalRealSubfield E))) b.1 *
-        J.map (inclE (F := maximalRealSubfield E) (v.adicCompletion (maximalRealSubfield E))) *
-          b.1 = 1 ∧
-      ∀ x, x ∈ latS (F := maximalRealSubfield E) (v.adicCompletion (maximalRealSubfield E))
-        (intV E v) N ↔ ∀ i, ((b⁻¹).1 *ᵥ x) i ∈ intV E v := by
+    (hN : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualStabiliserIndex.IsSelfDualLat
+      (hc.sig : E →+* E) J N)
+    : ∃ b : GL (Fin r) (E ⊗[maximalRealSubfield E] v.adicCompletion (maximalRealSubfield E)),
+      cT (Formalism.UG.sigR hc.sig (v.adicCompletion (maximalRealSubfield E))) b.1
+            * J.map (inclE (F := maximalRealSubfield E) (v.adicCompletion (maximalRealSubfield E)))
+            * b.1
+          = 1
+        ∧ ∀ x,
+          x ∈ latS (F := maximalRealSubfield E) (v.adicCompletion (maximalRealSubfield E))
+              (intV E v) N
+            ↔ ∀ i, ((b⁻¹).1 *ᵥ x) i ∈ intV E v := by
   have := unramified hc
-  have hG : ∀ a b, ReciprocityTheory.ChartRestriction.G.FD.cc (Jᵀ a b) = Jᵀ b a :=
-    fun a b => congrFun (congrFun hJ a) b
-  have hd' : Jᵀ.det ≠ 0 := by
-    rw [Matrix.det_transpose]; exact hd.ne_zero
-  have hh : ∀ x y, ReciprocityTheory.ChartRestriction.G.FD.herm Jᵀ x y = hform (hc.sig : E →+* E) J y x := by
+  have hG : ∀ a b, ReciprocityTheory.ChartRestriction.G.FD.cc (Jᵀ a b) = Jᵀ b a := fun a b =>
+    congrFun (congrFun hJ a) b
+  have hd' : Jᵀ.det ≠ 0 := by rw [Matrix.det_transpose]; exact hd.ne_zero
+  have hh
+      : ∀ x y,
+        ReciprocityTheory.ChartRestriction.G.FD.herm Jᵀ x y = hform (hc.sig : E →+* E) J y x := by
     intro x y
     unfold ReciprocityTheory.ChartRestriction.G.FD.herm hform
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-    change x j * J i j * ReciprocityTheory.ChartRestriction.G.FD.cc (y i) = ReciprocityTheory.ChartRestriction.G.FD.cc (y i) * J i j * x j
+    change x j * J i j * ReciprocityTheory.ChartRestriction.G.FD.cc (y i)
+      = ReciprocityTheory.ChartRestriction.G.FD.cc (y i) * J i j * x j
     ring
   have hint : ∀ a : E, a ∈ (algebraMap (𝓞 E) E).range ↔ IsIntegral ℤ a := by
     intro a
     constructor
     · rintro ⟨b, rfl⟩; exact b.isIntegral_coe
     · intro h; exact ⟨⟨a, h⟩, rfl⟩
-  have hsd : ∀ x, x ∈ N ↔ ∀ y ∈ N, IsIntegral ℤ (ReciprocityTheory.ChartRestriction.G.FD.herm Jᵀ x y) := by
+  have hsd
+      : ∀ x,
+        x ∈ N ↔ ∀ y ∈ N, IsIntegral ℤ (ReciprocityTheory.ChartRestriction.G.FD.herm Jᵀ x y) := by
     intro x
     have : x ∈ dualSet (hc.sig : E →+* E) J N ↔ x ∈ N := by rw [hN.2.2]; rfl
     rw [← this]
     simp only [hh, ← hint]
     rfl
-  obtain ⟨h, h1, h2⟩ := exists_orthonormal_frame hG hd'
-    ⟨Module.Finite.iff_fg.1 hN.1, hN.2.1⟩ hsd v
+  obtain ⟨h, h1, h2⟩ := exists_orthonormal_frame hG hd' ⟨Module.Finite.iff_fg.1 hN.1, hN.2.1⟩ hsd v
   have h3 := congrArg Matrix.transpose h1
   rw [Matrix.transpose_mul, Matrix.transpose_mul, Matrix.transpose_transpose, ← Matrix.mul_assoc,
-    Matrix.transpose_one] at h3
+      Matrix.transpose_one]
+    at h3
   have hb : ∀ g : GL (Fin r) (LocAlg v), (bc (sw v).symm.toRingHom g).1.map (sw v) = g.1 := by
     intro g
     ext i j
@@ -172,16 +188,19 @@ theorem exists_frame_cm (hc : CMData (maximalRealSubfield E) E) {r : ℕ}
 
 end CM
 
-theorem exists_frame : ∀ (D : D7) (N : Submodule (𝓞 D.host.E) (Fin D.R.k → D.host.E))
-    (v : HeightOneSpectrum (𝓞 D.host.F)),
-    letI := D.host.cmStar
-    GlobalTheory.IndefiniteRowSideFullHecke.SelfDualStabiliserIndex.IsSelfDualLat
-      (D.sp.cm.sig : D.host.E →+* D.host.E) D.sp.gram0 N →
-    ∃ b : GL (Fin D.R.k) (D.host.E ⊗[D.host.F] v.adicCompletion D.host.F),
-      cT (Formalism.UG.sigR D.sp.cm.sig (v.adicCompletion D.host.F)) b.1 *
-        D.sp.gram0.map (inclE (F := D.host.F) (v.adicCompletion D.host.F)) * b.1 = 1 ∧
-      ∀ x, x ∈ latS (F := D.host.F) (v.adicCompletion D.host.F) (intV D.host.E v) N ↔
-        ∀ i, ((b⁻¹).1 *ᵥ x) i ∈ intV D.host.E v := by
+theorem exists_frame
+    : ∀ (D : D7) (N : Submodule (𝓞 D.host.E) (Fin D.R.k → D.host.E))
+        (v : HeightOneSpectrum (𝓞 D.host.F)),
+      letI := D.host.cmStar
+      GlobalTheory.IndefiniteRowSideFullHecke.SelfDualStabiliserIndex.IsSelfDualLat
+          (D.sp.cm.sig : D.host.E →+* D.host.E) D.sp.gram0 N
+        → ∃ b : GL (Fin D.R.k) (D.host.E ⊗[D.host.F] v.adicCompletion D.host.F),
+          cT (Formalism.UG.sigR D.sp.cm.sig (v.adicCompletion D.host.F)) b.1
+                * D.sp.gram0.map (inclE (F := D.host.F) (v.adicCompletion D.host.F)) * b.1
+              = 1
+            ∧ ∀ x,
+              x ∈ latS (F := D.host.F) (v.adicCompletion D.host.F) (intV D.host.E v) N
+                ↔ ∀ i, ((b⁻¹).1 *ᵥ x) i ∈ intV D.host.E v := by
   intro D N v hN
   letI := D.host.cmStar
   haveI : IsCMField D.host.E := D.host.isCMField_hostE

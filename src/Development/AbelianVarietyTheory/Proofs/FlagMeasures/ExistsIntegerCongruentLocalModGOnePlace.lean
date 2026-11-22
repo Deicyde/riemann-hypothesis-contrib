@@ -11,7 +11,10 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CongrLoc
@@ -126,7 +129,16 @@ private lemma exists_intValuation_sub_one_le_and_le_elsewhere (D : D7) (p : PlF 
     · rw [IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff.2 hqs]
       exact q.intValuation_le_one _
 
-theorem exists_int_congr_gS : ∀ (D : D7) (p : PlF D) (c : (D.s.atP p).Ep), c ∈ (D.s.atP p).O → ∃ a : 𝓞 D.host.E, (∃ o ∈ (D.s.atP p).O, (D.s.atP p).ιE (a : D.host.E) - c = (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o) ∧ ∀ p' : PlF D, p' ≠ p → ∃ o ∈ (D.s.atP p').O, (D.s.atP p').ιE (a : D.host.E) = (D.s.atP p').ιE ((gS D : ℕ) : D.host.E) * o := by
+theorem exists_int_congr_gS
+    : ∀ (D : D7) (p : PlF D) (c : (D.s.atP p).Ep),
+      c ∈ (D.s.atP p).O
+        → ∃ a : 𝓞 D.host.E,
+          (∃ o ∈ (D.s.atP p).O,
+              (D.s.atP p).ιE (a : D.host.E) - c = (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o)
+            ∧ ∀ p' : PlF D,
+              p' ≠ p
+                → ∃ o ∈ (D.s.atP p').O,
+                  (D.s.atP p').ιE (a : D.host.E) = (D.s.atP p').ιE ((gS D : ℕ) : D.host.E) * o := by
   intro D p c hc
   classical
   have hg0 : ((gS D : ℕ) : D.host.E) ≠ 0 := Formalism.L2.SG.Pf.StabIntSh.gS_ne
@@ -144,8 +156,11 @@ theorem exists_int_congr_gS : ∀ (D : D7) (p : PlF D) (c : (D.s.atP p).Ep), c �
 
   obtain ⟨t, ht₁, ht₂⟩ := exists_intValuation_sub_one_le_and_le_elsewhere D p r hr0
   set a : D.host.E := algebraMap D.host.F D.host.E (t : D.host.F) * b₀ with ha
-  have hιa : ∀ q : PlF D, (D.s.atP q).ιE a =
-      algebraMap (D.s.atP q).Fp (D.s.atP q).Ep ((D.s.atP q).ιF (t : D.host.F)) * (D.s.atP q).ιE b₀ := by
+  have hιa
+      : ∀ q : PlF D,
+        (D.s.atP q).ιE a
+          = algebraMap (D.s.atP q).Fp (D.s.atP q).Ep ((D.s.atP q).ιF (t : D.host.F))
+            * (D.s.atP q).ιE b₀ := by
     intro q
     rw [ha, map_mul, (D.s.atP q).compat]
   have hG : ∀ q : PlF D, (D.s.atP q).ιE ((gS D : ℕ) : D.host.E) ∈ (D.s.atP q).O := by
@@ -153,25 +168,33 @@ theorem exists_int_congr_gS : ∀ (D : D7) (p : PlF D) (c : (D.s.atP p).Ep), c �
     rw [map_natCast]
     exact natCast_mem _ _
   have hb₀ : (D.s.atP p).ιE b₀ ∈ (D.s.atP p).O := by
-    have : (D.s.atP p).ιE b₀ = c - (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o₀ := by
-      rw [← h₀]; ring
+    have : (D.s.atP p).ιE b₀ = c - (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o₀ := by rw [← h₀]; ring
     rw [this]
     exact sub_mem hc (mul_mem (hG p) ho₀)
-  have hdb : ∀ q : PlF D, (D.s.atP q).ιE ((d : ℤ) • b₀) ∈ (D.s.atP q).O :=
-    fun q => Formalism.L2.SG.Pf.StabIntSh.lg_iota_int q ⟨(d : ℤ) • b₀, hdint⟩
+  have hdb : ∀ q : PlF D, (D.s.atP q).ιE ((d : ℤ) • b₀) ∈ (D.s.atP q).O := fun q =>
+    Formalism.L2.SG.Pf.StabIntSh.lg_iota_int q ⟨(d : ℤ) • b₀, hdint⟩
 
-  have hp : ∃ o ∈ (D.s.atP p).O, (D.s.atP p).ιE a - c = (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o := by
-    have hle : p.valuation D.host.F ((t : D.host.F) - 1) ≤ p.valuation D.host.F ((gS D : ℕ) : D.host.F) := by
+  have hp
+      : ∃ o ∈ (D.s.atP p).O, (D.s.atP p).ιE a - c = (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o := by
+    have hle
+        : p.valuation D.host.F ((t : D.host.F) - 1)
+          ≤ p.valuation D.host.F ((gS D : ℕ) : D.host.F) := by
       have e1 : ((t : D.host.F) - 1) = algebraMap (𝓞 D.host.F) D.host.F (t - 1) := by simp
-      have e2 : ((gS D : ℕ) : D.host.F) = algebraMap (𝓞 D.host.F) D.host.F ((gS D : ℕ) : 𝓞 D.host.F) := by simp
+      have e2
+          : ((gS D : ℕ) : D.host.F)
+            = algebraMap (𝓞 D.host.F) D.host.F ((gS D : ℕ) : 𝓞 D.host.F) := by
+        simp
       rw [e1, e2, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
         IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
       refine ht₁.trans ?_
       rw [hr, map_mul]
       exact mul_le_of_le_one_right' (p.intValuation_le_one _)
     obtain ⟨β, hβ, hβe⟩ := exists_integer_mul_eq_of_valuation_le D p _ _ (by exact_mod_cast hgN) hle
-    refine ⟨algebraMap (D.s.atP p).Fp (D.s.atP p).Ep β * (D.s.atP p).ιE b₀ - o₀,
-      sub_mem (mul_mem (algebraMap_mem_O_of_mem_integer' D p β hβ) hb₀) ho₀, ?_⟩
+    refine ⟨
+      algebraMap (D.s.atP p).Fp (D.s.atP p).Ep β * (D.s.atP p).ιE b₀ - o₀,
+      sub_mem (mul_mem (algebraMap_mem_O_of_mem_integer' D p β hβ) hb₀) ho₀,
+      ?_
+    ⟩
     have ht : (D.s.atP p).ιF (t : D.host.F) = (D.s.atP p).ιF ((gS D : ℕ) : D.host.F) * β + 1 := by
       rw [← hβe, map_sub, map_one]; ring
     rw [hιa p, ht, map_add (f := _), map_mul, map_one, map_natCast, map_natCast, map_natCast]
@@ -180,12 +203,17 @@ theorem exists_int_congr_gS : ∀ (D : D7) (p : PlF D) (c : (D.s.atP p).Ep), c �
     rw [this]
     ring
 
-  have hq : ∀ q : PlF D, q ≠ p →
-      ∃ o ∈ (D.s.atP q).O, (D.s.atP q).ιE a = (D.s.atP q).ιE ((gS D : ℕ) : D.host.E) * o := by
+  have hq
+      : ∀ q : PlF D,
+        q ≠ p
+          → ∃ o ∈ (D.s.atP q).O, (D.s.atP q).ιE a = (D.s.atP q).ιE ((gS D : ℕ) : D.host.E) * o := by
     intro q hqp
-    have hle : q.valuation D.host.F (t : D.host.F) ≤
-        q.valuation D.host.F (((gS D : ℕ) : D.host.F) * ((d : ℤ) : D.host.F)) := by
-      have e1 : (((gS D : ℕ) : D.host.F) * ((d : ℤ) : D.host.F)) = algebraMap (𝓞 D.host.F) D.host.F r := by
+    have hle
+        : q.valuation D.host.F (t : D.host.F)
+          ≤ q.valuation D.host.F (((gS D : ℕ) : D.host.F) * ((d : ℤ) : D.host.F)) := by
+      have e1
+          : (((gS D : ℕ) : D.host.F) * ((d : ℤ) : D.host.F))
+            = algebraMap (𝓞 D.host.F) D.host.F r := by
         simp [hr]
       rw [e1, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
         IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
@@ -193,8 +221,11 @@ theorem exists_int_congr_gS : ∀ (D : D7) (p : PlF D) (c : (D.s.atP p).Ep), c �
     have hne : (((gS D : ℕ) : D.host.F) * ((d : ℤ) : D.host.F)) ≠ 0 :=
       mul_ne_zero (by exact_mod_cast hgN) (by exact_mod_cast hd0)
     obtain ⟨β, hβ, hβe⟩ := exists_integer_mul_eq_of_valuation_le D q _ _ hne hle
-    refine ⟨algebraMap (D.s.atP q).Fp (D.s.atP q).Ep β * (D.s.atP q).ιE ((d : ℤ) • b₀),
-      mul_mem (algebraMap_mem_O_of_mem_integer' D q β hβ) (hdb q), ?_⟩
+    refine ⟨
+      algebraMap (D.s.atP q).Fp (D.s.atP q).Ep β * (D.s.atP q).ιE ((d : ℤ) • b₀),
+      mul_mem (algebraMap_mem_O_of_mem_integer' D q β hβ) (hdb q),
+      ?_
+    ⟩
     rw [hιa q, hβe, zsmul_eq_mul]
     simp only [map_mul, map_intCast, map_natCast]
     ring
@@ -204,8 +235,7 @@ theorem exists_int_congr_gS : ∀ (D : D7) (p : PlF D) (c : (D.s.atP p).Ep), c �
     by_cases hqp : q = p
     · subst hqp
       obtain ⟨o, ho, he⟩ := hp
-      have : (D.s.atP q).ιE a = c + (D.s.atP q).ιE ((gS D : ℕ) : D.host.E) * o := by
-        rw [← he]; ring
+      have : (D.s.atP q).ιE a = c + (D.s.atP q).ιE ((gS D : ℕ) : D.host.E) * o := by rw [← he]; ring
       rw [this]
       exact add_mem hc (mul_mem (hG q) ho)
     · obtain ⟨o, ho, he⟩ := hq q hqp

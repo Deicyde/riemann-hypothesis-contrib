@@ -8,8 +8,8 @@ namespace ReciprocityTheory.L2DbarEstimates.E
 
 open scoped ComplexConjugate
 
-theorem norm_sq_le_split (A B : ℂ) (ep : ℝ) (hep : 0 < ep) :
-    ‖A‖ ^ 2 ≤ (1 + ep) * ‖A + B‖ ^ 2 + (1 + 1 / ep) * ‖B‖ ^ 2 := by
+theorem norm_sq_le_split (A B : ℂ) (ep : ℝ) (hep : 0 < ep)
+    : ‖A‖ ^ 2 ≤ (1 + ep) * ‖A + B‖ ^ 2 + (1 + 1 / ep) * ‖B‖ ^ 2 := by
   have h1 : ‖A‖ ≤ ‖A + B‖ + ‖B‖ := by
     have := norm_sub_le (A + B) B
     simpa using this
@@ -27,8 +27,8 @@ theorem norm_sq_le_split (A B : ℂ) (ep : ℝ) (hep : 0 < ep) :
   have h2 : ‖A‖ ^ 2 ≤ (x + y) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) h1 2
   nlinarith [h2, key]
 
-theorem norm_sum_mul_sq_le {n : ℕ} (a c : Fin n → ℂ) :
-    ‖∑ j, a j * c j‖ ^ 2 ≤ (∑ j, ‖c j‖ ^ 2) * ∑ j, ‖a j‖ ^ 2 := by
+theorem norm_sum_mul_sq_le {n : ℕ} (a c : Fin n → ℂ)
+    : ‖∑ j, a j * c j‖ ^ 2 ≤ (∑ j, ‖c j‖ ^ 2) * ∑ j, ‖a j‖ ^ 2 := by
   have h1 : ‖∑ j, a j * c j‖ ≤ ∑ j, ‖c j‖ * ‖a j‖ := by
     refine (norm_sum_le _ _).trans (le_of_eq ?_)
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -37,18 +37,18 @@ theorem norm_sum_mul_sq_le {n : ℕ} (a c : Fin n → ℂ) :
     Finset.sum_mul_sq_le_sq_mul_sq _ _ _
   exact (pow_le_pow_left₀ (norm_nonneg _) h1 2).trans h2
 
-theorem norm_sum_sq_eq {n : ℕ} (a : Fin n → ℂ) :
-    ‖∑ j, a j‖ ^ 2 = (∑ j, ∑ k, a j * conj (a k)).re := by
+theorem norm_sum_sq_eq {n : ℕ} (a : Fin n → ℂ)
+    : ‖∑ j, a j‖ ^ 2 = (∑ j, ∑ k, a j * conj (a k)).re := by
   have h : (∑ j, ∑ k, a j * conj (a k)) = (∑ j, a j) * conj (∑ j, a j) := by
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_mul_sum]
+    rw [map_sum, Finset.sum_mul_sum]
   rw [h, Complex.mul_conj, Complex.ofReal_re, Complex.normSq_eq_norm_sq]
 
-theorem half_sum_norm_sub_sq {n : ℕ} (a : Fin n → Fin n → ℂ) :
-    (∑ j, ∑ k, ‖a j k - a k j‖ ^ 2) / 2 =
-      ∑ j, ∑ k, ‖a k j‖ ^ 2 - (∑ j, ∑ k, a k j * conj (a j k)).re := by
-  have h : ∀ j k, ‖a j k - a k j‖ ^ 2 =
-      ‖a j k‖ ^ 2 + ‖a k j‖ ^ 2 - 2 * (a j k * conj (a k j)).re := by
+theorem half_sum_norm_sub_sq {n : ℕ} (a : Fin n → Fin n → ℂ)
+    : (∑ j, ∑ k, ‖a j k - a k j‖ ^ 2) / 2
+      = ∑ j, ∑ k, ‖a k j‖ ^ 2 - (∑ j, ∑ k, a k j * conj (a j k)).re := by
+  have h
+      : ∀ j k, ‖a j k - a k j‖ ^ 2 = ‖a j k‖ ^ 2 + ‖a k j‖ ^ 2 - 2 * (a j k * conj (a k j)).re := by
     intro j k
     rw [← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq,
       Complex.normSq_sub]

@@ -8,45 +8,60 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.AnalyticVectors.U
 
 noncomputable section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob
+  GlobalTheory.TypeSum
 open scoped InnerProductSpace
 
 namespace PositivityTheory.CW.KFiniteInclusion
 
-variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Mx n → (H →L[ℂ] H)}
 
-def incl (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ) :
-    kfin ε σ →ₗ[ℂ] ReciprocityTheory.ChartRestriction.DS.smD ε σ where
+def incl (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ)
+    : kfin ε σ →ₗ[ℂ] ReciprocityTheory.ChartRestriction.DS.smD ε σ where
   toFun v := ⟨v, hK v v.2⟩
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem incl_val (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ) (v : kfin ε σ) :
-    ((incl hK v : ReciprocityTheory.ChartRestriction.DS.smD ε σ) : H) = v := rfl
+theorem incl_val
+    (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ) (v : kfin ε σ)
+    : ((incl hK v : ReciprocityTheory.ChartRestriction.DS.smD ε σ) : H) = v :=
+  rfl
 
-theorem incl_inj (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ) {v w : kfin ε σ}
-    (h : incl hK v = incl hK w) : v = w := by
+theorem incl_inj
+    (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ)
+    {v w : kfin ε σ} (h : incl hK v = incl hK w)
+    : v = w := by
   have h' := congrArg Subtype.val h
   exact Subtype.ext h'
 
-def Eop (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ)
-    (h2 : ∀ a b, ∀ v ∈ CompanionTheory.D.gk.HC.KF ε σ, ReciprocityTheory.ChartRestriction.DS.smE ε σ a b v ∈ CompanionTheory.D.gk.HC.KF ε σ)
-    (a b : Fin n) : Module.End ℂ (kfin ε σ) :=
+def Eop
+    (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ)
+    (h2 : ∀ a b, ∀ v ∈ CompanionTheory.D.gk.HC.KF ε σ,
+      ReciprocityTheory.ChartRestriction.DS.smE ε σ a b v ∈ CompanionTheory.D.gk.HC.KF ε σ)
+    (a b : Fin n)
+    : Module.End ℂ (kfin ε σ) :=
   let op := (ReciprocityTheory.ChartRestriction.DS.smE ε σ a b).comp (incl hK)
-  ((ReciprocityTheory.ChartRestriction.DS.smD ε σ).subtype.comp op).codRestrict (kfin ε σ)
-    fun v => h2 a b (incl hK v) v.2
+  ((ReciprocityTheory.ChartRestriction.DS.smD ε σ).subtype.comp op).codRestrict (kfin ε σ) fun v =>
+    h2 a b (incl hK v) v.2
 
-variable (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ)
-    (h2 : ∀ a b, ∀ v ∈ CompanionTheory.D.gk.HC.KF ε σ, ReciprocityTheory.ChartRestriction.DS.smE ε σ a b v ∈ CompanionTheory.D.gk.HC.KF ε σ)
+variable
+  (hK : ∀ v : H, IsKFin ε σ v → v ∈ ReciprocityTheory.ChartRestriction.DS.smD ε σ)
+  (h2 : ∀ a b, ∀ v ∈ CompanionTheory.D.gk.HC.KF ε σ,
+    ReciprocityTheory.ChartRestriction.DS.smE ε σ a b v ∈ CompanionTheory.D.gk.HC.KF ε σ)
 
-theorem incl_E (a b : Fin n) (v : kfin ε σ) :
-    incl hK (Eop hK h2 a b v) = ReciprocityTheory.ChartRestriction.DS.smE ε σ a b (incl hK v) := Subtype.ext rfl
+theorem incl_E (a b : Fin n) (v : kfin ε σ)
+    : incl hK (Eop hK h2 a b v) = ReciprocityTheory.ChartRestriction.DS.smE ε σ a b (incl hK v) :=
+  Subtype.ext rfl
 
-theorem incl_actM (X : Mx n) (v : kfin ε σ) :
-    incl hK (ReciprocityTheory.ChartRestriction.DS.actM (Eop hK h2) X v) = ReciprocityTheory.ChartRestriction.DS.actM (ReciprocityTheory.ChartRestriction.DS.smE ε σ) X (incl hK v) := by
+theorem incl_actM (X : Mx n) (v : kfin ε σ)
+    : incl hK (ReciprocityTheory.ChartRestriction.DS.actM (Eop hK h2) X v)
+      = ReciprocityTheory.ChartRestriction.DS.actM (ReciprocityTheory.ChartRestriction.DS.smE ε σ) X
+        (incl hK v) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ReciprocityTheory.ChartRestriction.DS.actM, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, incl_E]
+  simp only [ReciprocityTheory.ChartRestriction.DS.actM, LinearMap.sum_apply, LinearMap.smul_apply,
+    map_sum, map_smul, incl_E]
 
 end PositivityTheory.CW.KFiniteInclusion
 
@@ -62,8 +77,12 @@ theorem c1 : C1 := by
   refine ⟨Eop hK h2, ?_, ?_, ?_, ?_⟩
   · intro X hX v
     have h := ReciprocityTheory.ChartRestriction.DS.dS_eq_actM hD (X := X) hX (incl hK v)
-    have e1 : ((ReciprocityTheory.ChartRestriction.DS.actM (Eop hK h2) X v : kfin ε σ) : H) =
-        ((ReciprocityTheory.ChartRestriction.DS.actM (ReciprocityTheory.ChartRestriction.DS.smE ε σ) X (incl hK v) : ReciprocityTheory.ChartRestriction.DS.smD ε σ) : H) := by
+    have e1
+        : ((ReciprocityTheory.ChartRestriction.DS.actM (Eop hK h2) X v : kfin ε σ) : H)
+          = ((ReciprocityTheory.ChartRestriction.DS.actM
+                (ReciprocityTheory.ChartRestriction.DS.smE ε σ) X (incl hK v)
+              : ReciprocityTheory.ChartRestriction.DS.smD ε σ)
+            : H) := by
       rw [← incl_actM hK h2 X v]
       rfl
     rw [e1, ← h]
@@ -81,7 +100,9 @@ theorem c1 : C1 := by
     exact h
   · intro N hN
     set M := N.map (incl hK) with hM
-    have hMK : (M : Set (ReciprocityTheory.ChartRestriction.DS.smD ε σ)) ⊆ CompanionTheory.D.gk.HC.KF ε σ := by
+    have hMK
+        : (M : Set (ReciprocityTheory.ChartRestriction.DS.smD ε σ))
+          ⊆ CompanionTheory.D.gk.HC.KF ε σ := by
       rintro _ ⟨w, -, rfl⟩
       exact w.2
     have hMst : ∀ a b, ∀ v ∈ M, ReciprocityTheory.ChartRestriction.DS.smE ε σ a b v ∈ M := by
@@ -96,7 +117,8 @@ theorem c1 : C1 := by
       exact incl_inj hK (this.trans (map_zero _).symm)
     · right
       refine eq_top_iff.2 fun x _ => ?_
-      have : incl hK x ∈ (M : Set (ReciprocityTheory.ChartRestriction.DS.smD ε σ)) := by rw [h]; exact x.2
+      have : incl hK x ∈ (M : Set (ReciprocityTheory.ChartRestriction.DS.smD ε σ)) := by
+        rw [h]; exact x.2
       obtain ⟨w, hw, e⟩ := this
       rwa [← incl_inj hK e]
 

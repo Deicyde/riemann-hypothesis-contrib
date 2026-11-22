@@ -41,8 +41,8 @@ lemma budget_top (K r i s c m : ℕ) (hsi : s ≤ i) (hi : i ≤ r + 1)
   (budget_step K r i s c m hsi hi hc hm).trans (Nat.mul_le_mul_left _ (Nat.sub_le _ _))
 
 theorem oneLevel_of_steps : OneLevelOfSteps := by
-  intro hSplit hSchur hDiag hOne hMulti E W _ D ep C₄ hG hKer hW hA2 hA13 hEW hP hEL hEB hLat hep
-    h4 hv0 hv1 T ε hε σ i hi1 hi hσ w hw
+  intro hSplit hSchur hDiag hOne hMulti E W _ D ep C₄ hG hKer hW hA2 hA13 hEW hP hEL hEB hLat hep h4
+    hv0 hv1 T ε hε σ i hi1 hi hσ w hw
   have hwW : w ∈ D.Wall := (Finset.mem_filter.1 hw).1
   have hwc : D.cnt w ≤ 4 * D.K * (D.r + 1 - i) := (Finset.mem_filter.1 hw).2
   have hwt : 0 < D.wt w := hW w
@@ -50,21 +50,27 @@ theorem oneLevel_of_steps : OneLevelOfSteps := by
   have ha0 : 0 ≤ 3 ^ D.f * ep := by positivity
   have hb0 : 0 ≤ 2 ^ D.f * ep := by positivity
 
-  have hS : ∀ s, 1 ≤ s → s ≤ i → ∀ M : ℝ,
-      (∀ w' ∈ D.Wb (D.cnt w + D.K), D.Dg T ε i s w' ≤ M) →
-      D.Sf ε i w (Xs T i s) / D.wt w ≤ (1 + 3 ^ D.f * ep) * M := by
+  have hS
+      : ∀ s,
+        1 ≤ s → s ≤ i
+          → ∀ M : ℝ,
+            (∀ w' ∈ D.Wb (D.cnt w + D.K), D.Dg T ε i s w' ≤ M)
+              → D.Sf ε i w (Xs T i s) / D.wt w ≤ (1 + 3 ^ D.f * ep) * M := by
     intro s hs hsi M hM
     have hN : D.cnt w + D.K ≤ D.Ntop := by
       have := budget_top D.K D.r i s (D.cnt w) 1 hsi hi hwc (by omega)
       simpa [Data.Ntop] using this
     have h := hSchur E W D ep hG hKer hW hA2 hEL hLat T ε hε i s hs hsi hi w hwW hN M hM
     have h2 := hM w (Finset.mem_filter.2 ⟨hwW, Nat.le_add_right _ _⟩)
-    calc D.Sf ε i w (Xs T i s) / D.wt w ≤ D.Dg T ε i s w + 3 ^ D.f * ep * M := h
+    calc
+      D.Sf ε i w (Xs T i s) / D.wt w
+        ≤ D.Dg T ε i s w + 3 ^ D.f * ep * M := h
       _ ≤ M + 3 ^ D.f * ep * M := by linarith
       _ = (1 + 3 ^ D.f * ep) * M := by ring
 
-  have h1 : D.Sf ε i w (Xs T i 1) / D.wt w ≤
-      (1 + 3 ^ D.f * ep) * ((1 + D.e i) * ((1 + 2 ^ D.f * ep) * σ (i - 1) ^ 2)) := by
+  have h1
+      : D.Sf ε i w (Xs T i 1) / D.wt w
+        ≤ (1 + 3 ^ D.f * ep) * ((1 + D.e i) * ((1 + 2 ^ D.f * ep) * σ (i - 1) ^ 2)) := by
     apply hS 1 le_rfl hi1
     intro w' hw'
     have hw'W : w' ∈ D.Wall := (Finset.mem_filter.1 hw').1
@@ -77,26 +83,34 @@ theorem oneLevel_of_steps : OneLevelOfSteps := by
       budget_top D.K D.r i 1 (D.cnt w) 2 hi1 hi hwc (by omega)
     have hB : D.cnt w + 2 * D.K ≤ 4 * D.K * (D.r + 1 - (i - 1)) :=
       budget_step D.K D.r i 1 (D.cnt w) 2 hi1 hi hwc (by omega)
-    have hN : D.cnt w' + D.K ≤ D.Ntop := by
-      simp only [Data.Ntop]; omega
-    have hlow : ∀ w'' ∈ D.Wb (D.cnt w' + D.K),
-        D.N0 ε (i - 1) w'' (T.X (i - 1)) (D.Kr (i - 1)) ≤ σ (i - 1) ^ 2 := by
+    have hN : D.cnt w' + D.K ≤ D.Ntop := by simp only [Data.Ntop]; omega
+    have hlow
+        : ∀ w'' ∈ D.Wb (D.cnt w' + D.K),
+          D.N0 ε (i - 1) w'' (T.X (i - 1)) (D.Kr (i - 1)) ≤ σ (i - 1) ^ 2 := by
       intro w'' hw''
       refine (hσ (i - 1) (by omega)).2 w'' (Finset.mem_filter.2 ⟨(Finset.mem_filter.1 hw'').1, ?_⟩)
       have := (Finset.mem_filter.1 hw'').2
-      simp only [Data.budget]; omega
-    have ho := hOne E W D ep hG hKer hW hA13 hEW hP hLat T ε hε i hi1 hi w' hw'W hN R hR2
-      (σ (i - 1) ^ 2) hlow
+      simp only [Data.budget]
+      omega
+    have ho :=
+      hOne E W D ep hG hKer hW hA13 hEW hP hLat T ε hε i hi1 hi w' hw'W hN R hR2 (σ (i - 1) ^ 2)
+        hlow
     have hw0 := hlow w' (Finset.mem_filter.2 ⟨hw'W, Nat.le_add_right _ _⟩)
-    calc D.Dg T ε i 1 w' ≤ _ := hd
+    calc
+      D.Dg T ε i 1 w'
+        ≤ _ := hd
       _ ≤ _ := ho
       _ ≤ (1 + D.e i) * (σ (i - 1) ^ 2 + 2 ^ D.f * ep * σ (i - 1) ^ 2) :=
-          mul_le_mul_of_nonneg_left (by linarith) (by linarith)
+        mul_le_mul_of_nonneg_left (by linarith) (by linarith)
       _ = (1 + D.e i) * ((1 + 2 ^ D.f * ep) * σ (i - 1) ^ 2) := by ring
 
-  have h2 : ∀ s, 2 ≤ s → s ≤ i → D.Sf ε i w (Xs T i s) / D.wt w ≤
-      (1 + 3 ^ D.f * ep) * (C₄ ^ (D.f * s) * (∏ s' ∈ Ico 1 s, D.vol (i - s + 1) s') *
-        ((1 + D.e i) * σ (i - s) ^ 2)) := by
+  have h2
+      : ∀ s,
+        2 ≤ s → s ≤ i
+          → D.Sf ε i w (Xs T i s) / D.wt w
+            ≤ (1 + 3 ^ D.f * ep)
+              * (C₄ ^ (D.f * s) * (∏ s' ∈ Ico 1 s, D.vol (i - s + 1) s')
+                * ((1 + D.e i) * σ (i - s) ^ 2)) := by
     intro s hs hsi
     apply hS s (by omega) hsi
     intro w' hw'
@@ -109,16 +123,18 @@ theorem oneLevel_of_steps : OneLevelOfSteps := by
     have hB : D.cnt w + (s + 2) * D.K ≤ 4 * D.K * (D.r + 1 - (i - s)) :=
       budget_step D.K D.r i s (D.cnt w) (s + 2) hsi hi hwc (by omega)
     have hsK : (s + 2) * D.K = D.K + (s + 1) * D.K := by ring
-    have hN : D.cnt w' + (s + 1) * D.K ≤ D.Ntop := by
-      simp only [Data.Ntop]; omega
-    have hlow : ∀ w'' ∈ D.Wb (D.cnt w' + (s + 1) * D.K),
-        D.N0 ε (i - s) w'' (T.X (i - s)) (D.Kr (i - s)) ≤ σ (i - s) ^ 2 := by
+    have hN : D.cnt w' + (s + 1) * D.K ≤ D.Ntop := by simp only [Data.Ntop]; omega
+    have hlow
+        : ∀ w'' ∈ D.Wb (D.cnt w' + (s + 1) * D.K),
+          D.N0 ε (i - s) w'' (T.X (i - s)) (D.Kr (i - s)) ≤ σ (i - s) ^ 2 := by
       intro w'' hw''
       refine (hσ (i - s) (by omega)).2 w'' (Finset.mem_filter.2 ⟨(Finset.mem_filter.1 hw'').1, ?_⟩)
       have := (Finset.mem_filter.1 hw'').2
-      simp only [Data.budget]; omega
-    have hm := hMulti E W D C₄ hG hKer hW hA13 hEB h4 hv0 T ε hε i s hs hsi hi w' hw'W hN
-      (hv1 _ _ (by omega) (by omega) (by omega)) R hR2 (σ (i - s) ^ 2) hlow
+      simp only [Data.budget]
+      omega
+    have hm :=
+      hMulti E W D C₄ hG hKer hW hA13 hEB h4 hv0 T ε hε i s hs hsi hi w' hw'W hN
+        (hv1 _ _ (by omega) (by omega) (by omega)) R hR2 (σ (i - s) ^ 2) hlow
     exact hd.trans hm
 
   have hsplit := hSplit E W D hG hKer T ε hε i hi1 w
@@ -134,8 +150,9 @@ theorem oneLevel_of_steps : OneLevelOfSteps := by
   apply add_le_add
   · have hσ0 : 0 ≤ σ (i - 1) := (hσ (i - 1) (by omega)).1
     refine (Real.sqrt_le_sqrt h1).trans (le_of_eq ?_)
-    have : (1 + 3 ^ D.f * ep) * ((1 + D.e i) * ((1 + 2 ^ D.f * ep) * σ (i - 1) ^ 2)) =
-        (1 + 3 ^ D.f * ep) * (1 + 2 ^ D.f * ep) * (1 + D.e i) * σ (i - 1) ^ 2 := by ring
+    have : (1 + 3 ^ D.f * ep) * ((1 + D.e i) * ((1 + 2 ^ D.f * ep) * σ (i - 1) ^ 2))
+        = (1 + 3 ^ D.f * ep) * (1 + 2 ^ D.f * ep) * (1 + D.e i) * σ (i - 1) ^ 2 := by
+      ring
     rw [this, Real.sqrt_mul' _ (sq_nonneg _), Real.sqrt_sq hσ0,
       Real.sqrt_mul' _ (by linarith : 0 ≤ 1 + D.e i)]
   · apply Finset.sum_le_sum
@@ -143,10 +160,12 @@ theorem oneLevel_of_steps : OneLevelOfSteps := by
     rw [Finset.mem_Icc] at hs
     have hσ0 : 0 ≤ σ (i - s) := (hσ (i - s) (by omega)).1
     refine (Real.sqrt_le_sqrt (h2 s hs.1 hs.2)).trans (le_of_eq ?_)
-    have : (1 + 3 ^ D.f * ep) * (C₄ ^ (D.f * s) * (∏ s' ∈ Ico 1 s, D.vol (i - s + 1) s') *
-        ((1 + D.e i) * σ (i - s) ^ 2)) =
-        (1 + 3 ^ D.f * ep) * (1 + D.e i) * C₄ ^ (D.f * s) *
-          (∏ s' ∈ Ico 1 s, D.vol (i - s + 1) s') * σ (i - s) ^ 2 := by ring
+    have : (1 + 3 ^ D.f * ep)
+          * (C₄ ^ (D.f * s) * (∏ s' ∈ Ico 1 s, D.vol (i - s + 1) s')
+            * ((1 + D.e i) * σ (i - s) ^ 2))
+        = (1 + 3 ^ D.f * ep) * (1 + D.e i) * C₄ ^ (D.f * s) * (∏ s' ∈ Ico 1 s, D.vol (i - s + 1) s')
+          * σ (i - s) ^ 2 := by
+      ring
     rw [this, Real.sqrt_mul' _ (sq_nonneg _), Real.sqrt_sq hσ0]
 
 lemma coef (D : Data E W) (Θ C₄ C₀ a e : ℝ) (hΘ : 1 ≤ Θ) (h4 : 1 ≤ C₄) (h0 : 2 * C₄ ≤ C₀)
@@ -227,8 +246,8 @@ theorem X0 (T : Tower E) : T.X 0 = {[]} := by
   · rintro rfl
     simp [level]
 
-theorem Q0 (D : Data E W) (T : Tower E) (ε : ℝ) (w : W) :
-    D.Q T ε 0 w = (D.gram ε 0 w [] []).re / D.wt w := by
+theorem Q0 (D : Data E W) (T : Tower E) (ε : ℝ) (w : W)
+    : D.Q T ε 0 w = (D.gram ε 0 w [] []).re / D.wt w := by
   simp [Data.Q, Data.Sf, X0, D.K0]
 
 lemma gram_diag (D : Data E W) (hG : D.GramPSD) (ε : ℝ) (hε : 0 < ε) (i : ℕ) (w : W) (p : Pt E) :
@@ -242,6 +261,7 @@ end Formalism.FourierDecayAlt.P.OneLevelCoefficients
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem levelInequalityOfSteps : Formalism.FourierDecayAlt.TB.OneLevelOfSteps := OneLevelCoefficients.oneLevel_of_steps
+theorem levelInequalityOfSteps : Formalism.FourierDecayAlt.TB.OneLevelOfSteps :=
+  OneLevelCoefficients.oneLevel_of_steps
 
 end Formalism.FourierDecayAlt.P

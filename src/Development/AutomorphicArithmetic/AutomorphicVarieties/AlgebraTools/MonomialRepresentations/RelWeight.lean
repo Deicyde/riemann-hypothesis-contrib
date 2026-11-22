@@ -6,9 +6,11 @@ public import Mathlib
 
 open Polynomial Matrix
 
-theorem UpperTheory.V.AlgebraTools.relWeight :
-    ∀ (A : Type) [CommGroup A] (ι : Type) [Fintype ι] (a : ι → A), (∀ i j, i ≠ j → ¬ IsOfFinOrder (a i / a j)) →
-      ∃ w : ι → ℤ, Function.Injective w ∧ ∀ m : ι → ℤ, ∏ i, a i ^ m i = 1 → ∑ i, m i * w i = 0 := by
+theorem UpperTheory.V.AlgebraTools.relWeight
+    : ∀ (A : Type) [CommGroup A] (ι : Type) [Fintype ι] (a : ι → A),
+      (∀ i j, i ≠ j → ¬ IsOfFinOrder (a i / a j))
+        → ∃ w : ι → ℤ,
+          Function.Injective w ∧ ∀ m : ι → ℤ, ∏ i, a i ^ m i = 1 → ∑ i, m i * w i = 0 := by
   intro A _ ι _ a ha
   classical
   obtain ⟨P, hP⟩ : ∃ P : (ι → ℤ) → A, ∀ m, P m = ∏ i, a i ^ m i := ⟨_, fun _ => rfl⟩
@@ -33,18 +35,19 @@ theorem UpperTheory.V.AlgebraTools.relWeight :
     · intro j _ hj
       simp [Pi.single_eq_of_ne hj]
     · simp
-  let L : Submodule ℤ (ι → ℤ) :=
-    { carrier := {m | ∃ k : ℤ, k ≠ 0 ∧ P (k • m) = 1}
-      add_mem' := by
-        rintro m n ⟨k, hk, hm⟩ ⟨l, hl, hn⟩
-        refine ⟨k * l, mul_ne_zero hk hl, ?_⟩
-        have e1 : P ((k * l) • m) = 1 := by rw [mul_comm, mul_smul, hPsmul, hm, _root_.one_zpow]
-        have e2 : P ((k * l) • n) = 1 := by rw [mul_smul, hPsmul, hn, _root_.one_zpow]
-        rw [smul_add, hPadd, e1, e2, one_mul]
-      zero_mem' := ⟨1, one_ne_zero, by simp [hP]⟩
-      smul_mem' := by
-        rintro c m ⟨k, hk, hm⟩
-        exact ⟨k, hk, by rw [smul_comm, hPsmul, hm, _root_.one_zpow]⟩ }
+  let L : Submodule ℤ (ι → ℤ) := {
+    carrier := {m | ∃ k : ℤ, k ≠ 0 ∧ P (k • m) = 1}
+    add_mem' := by
+      rintro m n ⟨k, hk, hm⟩ ⟨l, hl, hn⟩
+      refine ⟨k * l, mul_ne_zero hk hl, ?_⟩
+      have e1 : P ((k * l) • m) = 1 := by rw [mul_comm, mul_smul, hPsmul, hm, _root_.one_zpow]
+      have e2 : P ((k * l) • n) = 1 := by rw [mul_smul, hPsmul, hn, _root_.one_zpow]
+      rw [smul_add, hPadd, e1, e2, one_mul]
+    zero_mem' := ⟨1, one_ne_zero, by simp [hP]⟩
+    smul_mem' := by
+      rintro c m ⟨k, hk, hm⟩
+      exact ⟨k, hk, by rw [smul_comm, hPsmul, hm, _root_.one_zpow]⟩
+  }
   haveI : Module.IsTorsionFree ℤ ((ι → ℤ) ⧸ L) :=
     Module.IsTorsionFree.of_smul_eq_zero fun r x hx => by
       obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective L x
@@ -69,8 +72,8 @@ theorem UpperTheory.V.AlgebraTools.relWeight :
     by_contra hno
     push_neg at hno
     let s : Finset (ι × ι) := Finset.univ.filter fun x => x.1 ≠ x.2
-    let p : ι × ι → Submodule ℤ (Module.Dual ℤ ((ι → ℤ) ⧸ L)) :=
-      fun x => LinearMap.ker (Module.Dual.eval ℤ _ (q x.1 - q x.2))
+    let p : ι × ι → Submodule ℤ (Module.Dual ℤ ((ι → ℤ) ⧸ L)) := fun x =>
+      LinearMap.ker (Module.Dual.eval ℤ _ (q x.1 - q x.2))
     have hc : ⋃ x ∈ s, (p x : Set (Module.Dual ℤ ((ι → ℤ) ⧸ L))) = Set.univ := by
       apply Set.eq_univ_of_forall
       intro f
@@ -101,6 +104,8 @@ theorem UpperTheory.V.AlgebraTools.relWeight :
       rw [← hm0]
       conv_rhs => rw [hsum]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [q, map_sum, LinearMap.map_smul]
-    calc ∑ i, m i * f (q i) = f (∑ i, m i • q i) := by simp [map_sum]
+      simp only [q, map_sum, LinearMap.map_smul]
+    calc
+      ∑ i, m i * f (q i)
+        = f (∑ i, m i • q i) := by simp [map_sum]
       _ = 0 := by rw [h3, map_zero]

@@ -19,9 +19,10 @@ private lemma exists_sub_iota_mem_of_sub_involution_mem (A : Type) [CommRing A] 
   obtain ⟨a, ha⟩ := Ideal.pi_quotient_surjective hcop fun M => Ideal.Quotient.mk M.asIdeal (y M)
   exact ⟨a, fun M => Ideal.Quotient.eq.mp (ha M)⟩
 
-theorem exists_isUnit_add (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (m : ℕ)
-    (x : Fin (m + 1) → A) (hx : ∃ c : Fin (m + 1) → A, ∑ i, c i * x i = 1) :
-    ∃ a : Fin m → A, IsUnit (x 0 + ∑ k, a k * x k.succ) := by
+theorem exists_isUnit_add
+    (A : Type) [CommRing A] [Finite (MaximalSpectrum A)]
+    (m : ℕ) (x : Fin (m + 1) → A) (hx : ∃ c : Fin (m + 1) → A, ∑ i, c i * x i = 1)
+    : ∃ a : Fin m → A, IsUnit (x 0 + ∑ k, a k * x k.succ) := by
   classical
   have hnot : ∀ M : MaximalSpectrum A, x 0 ∈ M.asIdeal → ∃ k : Fin m, x k.succ ∉ M.asIdeal := by
     intro M h0
@@ -47,8 +48,9 @@ theorem exists_isUnit_add (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (
       simp [Finset.sum_ite_eq]
     have hin : x 0 + ∑ k, (a k - y k M) * x k.succ ∈ M.asIdeal :=
       M.asIdeal.add_mem h0 (Ideal.sum_mem _ fun k _ => Ideal.mul_mem_right _ _ (ha k M))
-    have e : x (kM M h0).succ =
-        (x 0 + ∑ k, a k * x k.succ) - (x 0 + ∑ k, (a k - y k M) * x k.succ) := by
+    have e
+        : x (kM M h0).succ
+          = (x 0 + ∑ k, a k * x k.succ) - (x 0 + ∑ k, (a k - y k M) * x k.succ) := by
       rw [← hy]
       simp only [sub_mul, Finset.sum_sub_distrib]
       ring
@@ -59,19 +61,31 @@ theorem exists_isUnit_add (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (
       simpa [y, h0] using ha k M
     simpa using M.asIdeal.sub_mem huM hs
 
-theorem exists_invertible_first_column :
-    ∀ (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (m : ℕ) (x : Fin (m + 1) → A),
-      (∃ c : Fin (m + 1) → A, ∑ i, c i * x i = 1) →
-      ∃ g : Matrix (Fin (m + 1)) (Fin (m + 1)) A, IsUnit g.det ∧ ∀ i, g i 0 = x i := by
+theorem exists_invertible_first_column
+    : ∀ (A : Type) [CommRing A] [Finite (MaximalSpectrum A)] (m : ℕ) (x : Fin (m + 1) → A),
+      (∃ c : Fin (m + 1) → A, ∑ i, c i * x i = 1)
+        → ∃ g : Matrix (Fin (m + 1)) (Fin (m + 1)) A, IsUnit g.det ∧ ∀ i, g i 0 = x i := by
   intro A _ _ m x hx
   classical
   obtain ⟨a, ha⟩ := exists_isUnit_add A m x hx
   set u := x 0 + ∑ k, a k * x k.succ with hu
   let b : Fin (m + 1) → A := Fin.cons 0 a
   let E : Matrix (Fin (m + 1)) (Fin (m + 1)) A :=
-    Matrix.of fun i j => if i = j then 1 else if i = 0 then -b j else 0
+    Matrix.of fun i j =>
+      if i = j then
+        1
+      else if i = 0 then
+        - b j
+      else
+        0
   let D : Matrix (Fin (m + 1)) (Fin (m + 1)) A :=
-    Matrix.of fun i j => if j = 0 then (if i = 0 then u else x i) else if i = j then 1 else 0
+    Matrix.of fun i j =>
+      if j = 0 then
+        (if i = 0 then u else x i)
+      else if i = j then
+        1
+      else
+        0
   have hE : E.det = 1 := by
     rw [Matrix.det_of_isUpperTriangular]
     · exact Finset.prod_eq_one fun i _ => by simp [E]

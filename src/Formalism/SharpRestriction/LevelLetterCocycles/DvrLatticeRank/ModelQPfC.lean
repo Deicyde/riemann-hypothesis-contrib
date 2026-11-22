@@ -8,38 +8,51 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34.MQ
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc PowerSeries
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  PowerSeries
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
 
-theorem unit_comp (w : (LetA O n)ˣ) (i : ZMod n) :
-    (w : LetA O n) i * ((w⁻¹ : (LetA O n)ˣ) : LetA O n) i = 1 := by
+theorem unit_comp (w : (LetA O n)ˣ) (i : ZMod n)
+    : (w : LetA O n) i * ((w⁻¹ : (LetA O n)ˣ) : LetA O n) i = 1 := by
   exact congrFun (Units.mul_inv w) i
 
-theorem π_at (s' : ℕ) (π' : LetA O n) (w₁ : (LetA O n)ˣ) (hπ : π' = w₁ * (letπ : LetA O n) ^ s') (i : ZMod n) :
-    π' i = (w₁ : LetA O n) i * PowerSeries.X ^ s' := by
+theorem π_at
+    (s' : ℕ) (π' : LetA O n) (w₁ : (LetA O n)ˣ) (hπ : π' = w₁ * (letπ : LetA O n) ^ s') (i : ZMod n)
+    : π' i = (w₁ : LetA O n) i * PowerSeries.X ^ s' := by
   rw [hπ]
   rfl
 
-theorem hlet_of [IsDomain O] (s' : ℕ) (hs : 1 ≤ s') (π' : LetA O n) (w₁ : (LetA O n)ˣ)
-    (hπ : π' = w₁ * (letπ : LetA O n) ^ s') (hπΔ : π' ∈ W.AΔ) (hπu : IsUnit (algebraMap (LetA O n) W.EE π'))
-    (c : ZMod n) :
-    ∀ a : O, a ≠ 0 → ∀ u : W.EE,
-      (∃ g ∈ W.AΔ, algebraMap (LetA O n) W.EE π' * u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g)) →
-      (∃ g ∈ W.AΔ, a • u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g)) →
-      ∃ g ∈ W.AΔ, u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g) := by
+theorem hlet_of
+    [IsDomain O]
+    (s' : ℕ) (hs : 1 ≤ s')
+    (π' : LetA O n) (w₁ : (LetA O n)ˣ) (hπ : π' = w₁ * (letπ : LetA O n) ^ s')
+    (hπΔ : π' ∈ W.AΔ) (hπu : IsUnit (algebraMap (LetA O n) W.EE π')) (c : ZMod n)
+    : ∀ a : O,
+      a ≠ 0
+        → ∀ u : W.EE,
+          (∃ g ∈ W.AΔ,
+              algebraMap (LetA O n) W.EE π' * u
+                = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g))
+            → (∃ g ∈ W.AΔ, a • u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g))
+            → ∃ g ∈ W.AΔ, u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g) := by
   rintro a ha u ⟨g, hg, hgu⟩ ⟨h, hh, hhu⟩
-  have hA : π' * ((letE c : LetA O n) * h) = algebraMap O (LetA O n) a * ((letE c : LetA O n) * g) := by
+  have hA
+      : π' * ((letE c : LetA O n) * h) = algebraMap O (LetA O n) a * ((letE c : LetA O n) * g) := by
     apply W.EE_inj
-    calc algebraMap (LetA O n) W.EE (π' * ((letE c : LetA O n) * h))
-        = algebraMap (LetA O n) W.EE π' * algebraMap (LetA O n) W.EE ((letE c : LetA O n) * h) := map_mul _ _ _
+    calc
+      algebraMap (LetA O n) W.EE (π' * ((letE c : LetA O n) * h))
+          = algebraMap (LetA O n) W.EE π' * algebraMap (LetA O n) W.EE ((letE c : LetA O n) * h) :=
+        map_mul _ _ _
       _ = algebraMap (LetA O n) W.EE π' * (a • u) := by rw [hhu]
       _ = a • (algebraMap (LetA O n) W.EE π' * u) := by rw [mul_smul_comm]
       _ = a • algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g) := by rw [hgu]
@@ -54,7 +67,8 @@ theorem hlet_of [IsDomain O] (s' : ℕ) (hs : 1 ≤ s') (π' : LetA O n) (w₁ :
     intro m hm
     have h1 := congrArg (PowerSeries.coeff m) hc
     rw [π_at s' π' w₁ hπ c, mul_comm ((w₁ : LetA O n) c), mul_assoc, PowerSeries.coeff_X_pow_mul',
-      if_neg (by omega), map_smul, smul_eq_mul] at h1
+        if_neg (by omega), map_smul, smul_eq_mul]
+      at h1
     exact (mul_eq_zero.mp h1.symm).resolve_left ha
   obtain ⟨G', hG'⟩ := hdvd
   set g' : LetA O n := (letE c : LetA O n) * (fun _ => ((w₁⁻¹ : (LetA O n)ˣ) : LetA O n) c * G') with hg'
@@ -87,7 +101,9 @@ theorem hlet_of [IsDomain O] (s' : ℕ) (hs : 1 ≤ s') (π' : LetA O n) (w₁ :
     show ∀ δ ∈ W.DelF, W.γA δ g' = g'
     intro δ hδ
     apply hcancel
-    calc π' * W.γA δ g' = W.γA δ π' * W.γA δ g' := by rw [hπΔ' δ hδ]
+    calc
+      π' * W.γA δ g'
+        = W.γA δ π' * W.γA δ g' := by rw [hπΔ' δ hδ]
       _ = W.γA δ (π' * g') := (map_mul _ _ _).symm
       _ = W.γA δ ((letE c : LetA O n) * g) := by rw [hπg']
       _ = (letE c : LetA O n) * g := hm' δ hδ

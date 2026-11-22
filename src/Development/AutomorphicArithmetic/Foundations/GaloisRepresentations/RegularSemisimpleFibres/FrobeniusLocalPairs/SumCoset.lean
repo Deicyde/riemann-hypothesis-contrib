@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open scoped Classical ENNReal
 
 open PositivityTheory.Rg.Tf.Loc UpperTheory.V.Z.Tf.Orb
@@ -20,16 +21,16 @@ private lemma UpperTheory.Gal.InertialTypesAlt.L.mem_iff_mk {G : Type} [Group G]
   rw [DoubleCoset.out_eq'] at h
   exact h.symm.trans eq_comm
 
-theorem UpperTheory.Gal.InertialTypesAlt.L.sumCoset :
-    UpperTheory.Gal.InertialTypesAlt.L.SumCoset := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.sumCoset
+    : UpperTheory.Gal.InertialTypesAlt.L.SumCoset := by
   intro G _ _ _ _ _ _ _ _ μ hμ K hKo hKc hK1 T hTc hcomm ν hν F hF hFT hFC
   obtain ⟨hsf, hinv, hrinv⟩ := haarComm_holds G T hTc hcomm ν hν
   obtain ⟨ρ, hρ, -⟩ := normEx_holds G ⟨K, hKo, hKc⟩ T hTc ν hν hrinv
   have hInt := quotInt_holds G μ hμ T hTc ν hν hinv F hF hFT hFC ρ hρ
   obtain ⟨C, hC, hFC'⟩ := hFC
   have hFm : Measurable F := hF.measurable
-  have hmk : ∀ h ∈ T, ∀ g : G, DoubleCoset.mk T K (h * g) = DoubleCoset.mk T K g :=
-    fun h hh g => ((@DoubleCoset.eq _ _ T K g (h * g)).2 ⟨h, hh, 1, K.one_mem, by simp⟩).symm
+  have hmk : ∀ h ∈ T, ∀ g : G, DoubleCoset.mk T K (h * g) = DoubleCoset.mk T K g := fun h hh g =>
+    ((@DoubleCoset.eq _ _ T K g (h * g)).2 ⟨h, hh, 1, K.one_mem, by simp⟩).symm
   set Q : Set (DoubleCoset.Quotient (T : Set G) (K : Set G)) :=
     {q | ∃ y ∈ K, F (Quotient.out q * y) ≠ 0} with hQ
   have hkey : ∀ g, F g ≠ 0 → DoubleCoset.mk T K g ∈ Q := by
@@ -43,9 +44,11 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.sumCoset :
     rw [e, hFT t⁻¹ (T.inv_mem ht) g]
     exact hg
   have hfin : Q.Finite := by
-    obtain ⟨s, hs⟩ := hC.elim_finite_subcover (fun c : G => {z : G | c⁻¹ * z ∈ K})
-      (fun c => hKo.preimage (continuous_const_mul c⁻¹))
-      (fun c _ => Set.mem_iUnion.2 ⟨c, by simp [K.one_mem]⟩)
+    obtain ⟨s, hs⟩ :=
+      hC.elim_finite_subcover
+        (fun c : G => {z : G | c⁻¹ * z ∈ K})
+        (fun c => hKo.preimage (continuous_const_mul c⁻¹))
+        (fun c _ => Set.mem_iUnion.2 ⟨c, by simp [K.one_mem]⟩)
     refine (s.finite_toSet.image (DoubleCoset.mk T K)).subset ?_
     rintro q ⟨y, hy, hq⟩
     obtain ⟨t, ht, c, hc, he⟩ := hFC' _ hq
@@ -53,41 +56,52 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.sumCoset :
     refine ⟨i, hi, ?_⟩
     rw [← DoubleCoset.out_eq' q, DoubleCoset.eq]
     refine ⟨t, ht, i⁻¹ * c * y⁻¹, K.mul_mem hci (K.inv_mem hy), ?_⟩
-    calc Quotient.out q = Quotient.out q * y * y⁻¹ := by group
+    calc
+      Quotient.out q
+        = Quotient.out q * y * y⁻¹ := by group
       _ = t * c * y⁻¹ := by rw [he]
       _ = t * i * (i⁻¹ * c * y⁻¹) := by group
   refine ⟨hfin, ?_⟩
-  have hS : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
-      {g | ∃ t ∈ T, ∃ y ∈ K, g = t * Quotient.out q * y} = {g | DoubleCoset.mk T K g = q} :=
+  have hS
+      : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
+        {g | ∃ t ∈ T, ∃ y ∈ K, g = t * Quotient.out q * y} = {g | DoubleCoset.mk T K g = q} :=
     fun q => Set.ext (UpperTheory.Gal.InertialTypesAlt.L.mem_iff_mk T K q)
   simp_rw [hS]
-  have hSo : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
-      IsOpen {g | DoubleCoset.mk T K g = q} := by
+  have hSo
+      : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
+        IsOpen {g | DoubleCoset.mk T K g = q} := by
     intro q
     rw [isOpen_iff_forall_mem_open]
     intro g hg
-    refine ⟨{z | g⁻¹ * z ∈ K}, fun z hz => ?_, hKo.preimage (continuous_const_mul g⁻¹),
-      by simp [K.one_mem]⟩
+    refine ⟨
+      {z | g⁻¹ * z ∈ K},
+      fun z hz => ?_,
+      hKo.preimage (continuous_const_mul g⁻¹),
+      by simp [K.one_mem]
+    ⟩
     show DoubleCoset.mk T K z = q
     rw [← (show DoubleCoset.mk T K g = q from hg), eq_comm, DoubleCoset.eq]
     exact ⟨1, T.one_mem, g⁻¹ * z, hz, by group⟩
-  have hSinv : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G), ∀ h ∈ T, ∀ g : G,
-      {g | DoubleCoset.mk T K g = q}.indicator F (h * g) =
-        {g | DoubleCoset.mk T K g = q}.indicator F g := by
+  have hSinv
+      : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G), ∀ h ∈ T, ∀ g : G,
+        {g | DoubleCoset.mk T K g = q}.indicator F (h * g)
+          = {g | DoubleCoset.mk T K g = q}.indicator F g := by
     intro q h hh g
     simp only [Set.indicator_apply, Set.mem_setOf_eq, hmk h hh g, hFT h hh g]
-  have hq_eq : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
-      quotIntegral μ T ν ({g | DoubleCoset.mk T K g = q}.indicator F) =
-        ∫ g, {g | DoubleCoset.mk T K g = q}.indicator
-          (fun g => F g * ((ρ g).toReal : ℂ)) g ∂μ := by
+  have hq_eq
+      : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
+        quotIntegral μ T ν ({g | DoubleCoset.mk T K g = q}.indicator F)
+          = ∫ g, {g | DoubleCoset.mk T K g = q}.indicator
+              (fun g => F g * ((ρ g).toReal : ℂ)) g ∂μ := by
     intro q
     rw [quotIndep_holds G μ hμ T ν hsf hinv _ (hFm.indicator (hSo q).measurableSet) (hSinv q) ρ hρ]
     congr 1
     funext g
     simp [Set.indicator_apply]
-  have hsupp : (Function.support fun q : DoubleCoset.Quotient (T : Set G) (K : Set G) =>
-      quotIntegral μ T ν ({g | DoubleCoset.mk T K g = q}.indicator F)) ⊆
-        ↑hfin.toFinset := by
+  have hsupp
+      : (Function.support fun q : DoubleCoset.Quotient (T : Set G) (K : Set G) =>
+          quotIntegral μ T ν ({g | DoubleCoset.mk T K g = q}.indicator F))
+        ⊆ ↑hfin.toFinset := by
     intro q hq
     rw [Set.Finite.coe_toFinset]
     by_contra hqQ

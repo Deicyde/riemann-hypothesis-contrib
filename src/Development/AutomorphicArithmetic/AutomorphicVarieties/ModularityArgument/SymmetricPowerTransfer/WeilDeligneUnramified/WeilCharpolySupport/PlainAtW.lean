@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbsPowOfReal
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.PRep
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.PRep
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 
@@ -16,9 +19,11 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 
 namespace UpperTheory.V.Z.Sym.W
 
-private theorem ratios {G : Type*} [CommGroup G] (a p : G) (h1 : p ≠ 1) (h2 : a ≠ p) (h3 : a ≠ p⁻¹)
-    (h4 : a ^ 2 ≠ p) (h5 : a ^ 2 ≠ p⁻¹) (i j : Fin 3) :
-    (![a, 1, a⁻¹] : Fin 3 → G) i ≠ (![a, 1, a⁻¹] : Fin 3 → G) j * p := by
+private theorem ratios
+    {G : Type*} [CommGroup G]
+    (a p : G) (h1 : p ≠ 1) (h2 : a ≠ p) (h3 : a ≠ p⁻¹) (h4 : a ^ 2 ≠ p) (h5 : a ^ 2 ≠ p⁻¹)
+    (i j : Fin 3)
+    : (![a, 1, a⁻¹] : Fin 3 → G) i ≠ (![a, 1, a⁻¹] : Fin 3 → G) j * p := by
   intro e
   fin_cases i <;> fin_cases j <;> simp at e
   · exact h1 e
@@ -32,13 +37,14 @@ private theorem ratios {G : Type*} [CommGroup G] (a p : G) (h1 : p ≠ 1) (h2 : 
   · exact h3 (by simpa using congrArg (·⁻¹) e)
   · exact h1 e
 
-private theorem absOne_ne (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    absPow k 1 ≠ 1 := by
+private theorem absOne_ne
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : absPow k 1 ≠ 1 := by
   intro h
-  have e : absPow k ((1 : ℝ) : ℂ) = absPow k ((0 : ℝ) : ℂ) := by
-    simpa [absPow_zero] using h
+  have e : absPow k ((1 : ℝ) : ℂ) = absPow k ((0 : ℝ) : ℂ) := by simpa [absPow_zero] using h
   obtain ⟨ϖ, hϖ⟩ := GlobalTheory.LocGL.exists_uniformizer k
-  have h1 : nabs k ϖ ≠ 1 := fun e => ValuativeRel.uniformizer_lt_one.ne (hϖ ▸ (nabs_eq_one_iff ϖ).1 e)
+  have h1 : nabs k ϖ ≠ 1 := fun e =>
+    ValuativeRel.uniformizer_lt_one.ne (hϖ ▸ (nabs_eq_one_iff ϖ).1 e)
   have h2 : nabs k ϖ ^ (1 : ℝ) = nabs k ϖ ^ (0 : ℝ) := by
     have hx := GlobalTheory.SmGL.val_absPow_ofReal k 1 ϖ
     have hy := GlobalTheory.SmGL.val_absPow_ofReal k 0 ϖ
@@ -51,8 +57,7 @@ private theorem absOne_ne (k : Type) [Field k] [ValuativeRel k] [TopologicalSpac
 
 end UpperTheory.V.Z.Sym.W
 
-theorem UpperTheory.V.Z.Sym.W.plainAtW :
-    UpperTheory.V.Z.Sym.W.PlainAtW := by
+theorem UpperTheory.V.Z.Sym.W.plainAtW : UpperTheory.V.Z.Sym.W.PlainAtW := by
   intro hL L _ _ _ σ π hσ hl w hw a ha ⟨hs, τ₀, h₀, hq⟩ τ hτ
   have hc := hl.comp w hw τ hτ
   obtain ⟨e⟩ := UpperTheory.building_component_uniqueness L 3 σ hσ w hw _ _ _ _ h₀ hc

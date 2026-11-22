@@ -4,17 +4,21 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.span_linear_independent_base :
-    ∀ {A Ω C E V I : Type} [CommRing A] [Field Ω] [Field C] [AddCommGroup E] [Module Ω E] [AddCommGroup V]
-          [Module C V] [Fintype I] {n : ℕ} (φ : A →+* Ω) (ψ : A →+* C) (κ : E ≃ₗ[Ω] (Fin n → Ω)) (κ' : V ≃ₗ[C] (Fin n → C))
-          (F : I → E), Function.Injective φ → LinearIndependent Ω F →
-          Submodule.span (↥φ.range) {e : E | ∃ a : Fin n → A, κ e = fun i => φ (a i)} =
-            Submodule.span (↥φ.range) (Set.range F) →
-          ∃ y : Module.Basis I C V, ∀ j, ∃ a : Fin n → A, (κ (F j) = fun i => φ (a i)) ∧ κ' (y j) = fun i => ψ (a i) := by
+theorem UpperTheory.span_linear_independent_base
+    : ∀ {A Ω C E V I : Type} [CommRing A] [Field Ω] [Field C] [AddCommGroup E] [Module Ω E]
+        [AddCommGroup V] [Module C V] [Fintype I] {n : ℕ} (φ : A →+* Ω) (ψ : A →+* C)
+        (κ : E ≃ₗ[Ω] (Fin n → Ω)) (κ' : V ≃ₗ[C] (Fin n → C)) (F : I → E),
+      Function.Injective φ → LinearIndependent Ω F
+        → Submodule.span (↥φ.range) {e : E | ∃ a : Fin n → A, κ e = fun i => φ (a i)}
+          = Submodule.span (↥φ.range) (Set.range F)
+        → ∃ y : Module.Basis I C V, ∀ j, ∃ a : Fin n → A,
+          (κ (F j) = fun i => φ (a i)) ∧ κ' (y j) = fun i => ψ (a i) := by
   intro A Ω C E V I _ _ _ _ _ _ _ _ n φ ψ κ κ' F hφ hF hspan
   classical
-  have hlat : ∀ e ∈ Submodule.span (↥φ.range) {e : E | ∃ a : Fin n → A, κ e = fun i => φ (a i)},
-      ∃ a : Fin n → A, κ e = fun i => φ (a i) := by
+  have hlat
+      : ∀ e ∈ Submodule.span (↥φ.range) {e : E | ∃ a : Fin n → A, κ e = fun i => φ (a i)},
+        ∃ a : Fin n → A,
+          κ e = fun i => φ (a i) := by
     intro e he
     induction he using Submodule.span_induction with
     | mem x hx => exact hx
@@ -33,10 +37,12 @@ theorem UpperTheory.span_linear_independent_base :
   have ha : ∀ j, ∃ a : Fin n → A, κ (F j) = fun i => φ (a i) := fun j =>
     hlat _ (hspan ▸ Submodule.subset_span ⟨j, rfl⟩)
   choose a ha using ha
-  have hb : ∀ k : Fin n, ∃ b : I → A, ∀ i, ∑ j, a j i * b j = (1 : Matrix (Fin n) (Fin n) A) i k := by
+  have hb
+      : ∀ k : Fin n, ∃ b : I → A, ∀ i, ∑ j, a j i * b j = (1 : Matrix (Fin n) (Fin n) A) i k := by
     intro k
-    have hk : κ.symm (fun i => φ ((1 : Matrix (Fin n) (Fin n) A) i k)) ∈
-        Submodule.span (↥φ.range) (Set.range F) := by
+    have hk
+        : κ.symm (fun i => φ ((1 : Matrix (Fin n) (Fin n) A) i k))
+          ∈ Submodule.span (↥φ.range) (Set.range F) := by
       rw [← hspan]
       exact Submodule.subset_span ⟨fun i => (1 : Matrix (Fin n) (Fin n) A) i k, by simp⟩
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hk
@@ -72,6 +78,7 @@ theorem UpperTheory.span_linear_independent_base :
     rw [← Matrix.map_mul, hQP, Matrix.map_one _ (map_zero ψ) (map_one ψ)]
   have h2 : P.map ψ * Q.map ψ = 1 := by
     rw [← Matrix.map_mul, hPQ, Matrix.map_one _ (map_zero ψ) (map_one ψ)]
-  refine ⟨(Pi.basisFun C I).map ((Matrix.toLin'OfInv h1 h2).trans κ'.symm), fun j => ⟨a j, ha j, ?_⟩⟩
+  refine
+    ⟨(Pi.basisFun C I).map ((Matrix.toLin'OfInv h1 h2).trans κ'.symm), fun j => ⟨a j, ha j, ?_⟩⟩
   ext i
   simp [Matrix.toLin'OfInv, hP]

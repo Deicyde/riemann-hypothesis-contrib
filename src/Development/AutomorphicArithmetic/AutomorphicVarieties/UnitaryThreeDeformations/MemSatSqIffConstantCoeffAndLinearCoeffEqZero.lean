@@ -48,16 +48,20 @@ private lemma low_degree {σ : Type} (m : σ →₀ ℕ) (hm : m.degree < 2) : m
     obtain ⟨i, hi⟩ := this
     exact Or.inr ⟨i, hi.symm⟩
 
-theorem UpperTheory.mem_satSq_iff_constantCoeff_and_linearCoeff_eq_zero :
-    ∀ (O : Type) [CommRing O] [IsDomain O] (σ : Type) [Fintype σ] (wt : σ → ℤ) (f : FA O wt),
-        f ∈ satSq (x0 O wt) ↔ constantCoeff (ser f) = 0 ∧ ∀ i, coeff (Finsupp.single i 1) (ser f) = 0 := by
+theorem UpperTheory.mem_satSq_iff_constantCoeff_and_linearCoeff_eq_zero
+    : ∀ (O : Type) [CommRing O] [IsDomain O] (σ : Type) [Fintype σ] (wt : σ → ℤ) (f : FA O wt),
+      f ∈ satSq (x0 O wt)
+        ↔ constantCoeff (ser f) = 0 ∧ ∀ i, coeff (Finsupp.single i 1) (ser f) = 0 := by
   intro O _ _ σ _ wt f
   classical
   have hk := (ker_pow O (MvPowerSeries σ O) ℤ (WPres.free O wt) (freeOrigin O wt) 2).1
-  have ho : ∀ g : MvPowerSeries σ O, (WPres.free O wt).origin (freeOrigin O wt) g = constantCoeff g :=
+  have ho
+      : ∀ g : MvPowerSeries σ O, (WPres.free O wt).origin (freeOrigin O wt) g = constantCoeff g :=
     fun g => (WPres.free O wt).origin_π (freeOrigin O wt) g
-  have hiff : ∀ g : FA O wt, g ∈ RingHom.ker (x0 O wt) ^ 2 ↔
-      ser g ∈ RingHom.ker ((WPres.free O wt).origin (freeOrigin O wt)) ^ 2 := fun g => by
+  have hiff
+      : ∀ g : FA O wt,
+        g ∈ RingHom.ker (x0 O wt) ^ 2
+          ↔ ser g ∈ RingHom.ker ((WPres.free O wt).origin (freeOrigin O wt)) ^ 2 := fun g => by
     show g ∈ RingHom.ker ((WPres.free O wt).originA (freeOrigin O wt)) ^ 2 ↔ _
     rw [← hk]
     rfl

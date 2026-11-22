@@ -6,22 +6,28 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
-theorem UpperTheory.ConvolutionTheory.R2.Fo.atLaws :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (w : InfinitePlace F), (∀ t : ℝ, ψ (at1 w t) = Complex.exp (cc * t)) ∧ (∀ t, (at1 w t).2 = 0) ∧ (∀ t, TR.pInf F (at1 w t) = Pi.single w t) ∧
-    (∀ s t, at1 w (s + t) = at1 w s + at1 w t) ∧ at1 w 0 = 0 ∧ (∀ t a, at1 w t * a = at1 w (t * TR.pInf F a w)) ∧
-    (∀ a : A F, a.2 = 0 → a = ∑ w', at1 w' (TR.pInf F a w')) ∧ ∀ t i, finPartPi (Pi.single i (at1 w t) : V4 F) = 0 := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.atLaws
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (w : InfinitePlace F),
+      (∀ t : ℝ, ψ (at1 w t) = Complex.exp (cc * t)) ∧ (∀ t, (at1 w t).2 = 0)
+        ∧ (∀ t, TR.pInf F (at1 w t) = Pi.single w t) ∧ (∀ s t, at1 w (s + t) = at1 w s + at1 w t)
+        ∧ at1 w 0 = 0 ∧ (∀ t a, at1 w t * a = at1 w (t * TR.pInf F a w))
+        ∧ (∀ a : A F, a.2 = 0 → a = ∑ w', at1 w' (TR.pInf F a w'))
+        ∧ ∀ t i, finPartPi (Pi.single i (at1 w t) : V4 F) = 0 := by
   intro F _ _ _ w
-  have hp : ∀ (w' : InfinitePlace F) (t : ℝ), TR.pInf F (at1 w' t) = Pi.single w' t := fun _ t => (TR.infEq F).symm_apply_apply _
+  have hp : ∀ (w' : InfinitePlace F) (t : ℝ), TR.pInf F (at1 w' t) = Pi.single w' t := fun _ t =>
+    (TR.infEq F).symm_apply_apply _
   have h2 : ∀ (w' : InfinitePlace F) (t : ℝ), (at1 w' t).2 = 0 := fun _ t => rfl
   have hfin : ∀ x y : A F, (x + y).2 = x.2 + y.2 := fun _ _ => rfl
   have hmul : ∀ x y : A F, (x * y).2 = x.2 * y.2 := fun _ _ => rfl
   refine ⟨fun t => ?_, h2 w, hp w, fun s t => ?_, ?_, fun t a => ?_, fun a ha => ?_, fun t i => ?_⟩
-  · rw [(UpperTheory.ConvolutionTheory.R2.C.splitA F).2 (at1 w t), hp, h2, AddChar.map_zero_eq_one, Circle.coe_one, mul_one,
-      Finset.prod_eq_single w]
+  · rw [(UpperTheory.ConvolutionTheory.R2.C.splitA F).2 (at1 w t), hp, h2, AddChar.map_zero_eq_one,
+      Circle.coe_one, mul_one, Finset.prod_eq_single w]
     · simp [cc]
     · intro b _ hb
       simp [Pi.single_eq_of_ne hb]
@@ -47,10 +53,10 @@ theorem UpperTheory.ConvolutionTheory.R2.Fo.atLaws :
       rw [h2, hmul, h2, zero_mul]
   · refine TR.ad_ext ?_ ?_
     · set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
-        simp_rw [hp]
-        ext w'
-        simp [Finset.sum_apply, Pi.single_apply]
+      rw [map_sum]
+      simp_rw [hp]
+      ext w'
+      simp [Finset.sum_apply, Pi.single_apply]
     · change a.2 = (∑ w', at1 w' (TR.pInf F a w')).2
       rw [ha]
       have : ∀ s : Finset (InfinitePlace F), (∑ w' ∈ s, at1 w' (TR.pInf F a w')).2 = 0 := by

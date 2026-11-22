@@ -13,8 +13,10 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker
 noncomputable section
 
 open scoped Classical ComplexConjugate
-open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.Pf.UnipB Formalism.L2.SG.Pf.Unip
-open Formalism.L2.SG.Pf Formalism.L2.SG.Pf.Level Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.Vanish Formalism.L2.SG.NonRelPf
+open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Pf.UnipB Formalism.L2.SG.Pf.Unip
+open Formalism.L2.SG.Pf Formalism.L2.SG.Pf.Level Formalism.L2.SG.TermOp
+  Formalism.L2.SG.TermOp.Vanish Formalism.L2.SG.NonRelPf
 
 namespace Formalism.L2.SG.Pf.RelChar
 
@@ -24,8 +26,10 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T : E}
 
-theorem lieN_map (γ : S.V ≃ₗ[E] S.V) (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : FlagG S r T) (Y : S.V →ₗ[E] S.V)
-    (h : (γ.symm.toLinearMap ∘ₗ Y ∘ₗ γ.toLinearMap) ∈ F.LieN) : Y ∈ (mapFlag γ hγ F).LieN := by
+theorem lieN_map
+    (γ : S.V ≃ₗ[E] S.V) (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (F : FlagG S r T) (Y : S.V →ₗ[E] S.V) (h : (γ.symm.toLinearMap ∘ₗ Y ∘ₗ γ.toLinearMap) ∈ F.LieN)
+    : Y ∈ (mapFlag γ hγ F).LieN := by
   have hiso : ∀ x y, S.hT (γ x) (γ y) = S.hT x y := by
     unfold HermitianLatticesTheory.isom at hγ
     exact hγ
@@ -42,7 +46,8 @@ theorem lieN_map (γ : S.V ≃ₗ[E] S.V) (hγ : γ ∈ Formalism.HermitianLatti
   obtain ⟨h0, h1, h2⟩ := h
   refine ⟨?_, ?_, ?_⟩
   · unfold LieU at h0 ⊢
-    simp only [Set.mem_setOf_eq, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply] at h0 ⊢
+    simp only [Set.mem_setOf_eq, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply]
+      at h0 ⊢
     intro x y
     have := h0 (γ.symm x) (γ.symm y)
     simp only [LinearEquiv.apply_symm_apply] at this
@@ -78,8 +83,8 @@ theorem z_mem_perp (F : FlagG S r T) : F.z ∈ perpS S F.X := by
   | add y w _ _ hy hw => simp [hy, hw]
   | smul c y _ hy => simp [hy]
 
-theorem lieN_fvec_mem (F : FlagG S r T) {Z : S.V →ₗ[E] S.V} (hZ : Z ∈ F.LieN) (a : Fin r) :
-    Z (F.fvec a.succ) ∈ F.X := by
+theorem lieN_fvec_mem (F : FlagG S r T) {Z : S.V →ₗ[E] S.V} (hZ : Z ∈ F.LieN) (a : Fin r)
+    : Z (F.fvec a.succ) ∈ F.X := by
   unfold FlagG.LieN at hZ
   obtain ⟨-, h1, h2⟩ := hZ
   have hlt := a.isLt
@@ -103,8 +108,10 @@ theorem lieN_fvec_mem (F : FlagG S r T) {Z : S.V →ₗ[E] S.V} (hZ : Z ∈ F.Li
     rw [he]
     exact h2 _ (z_mem_perp F)
 
-theorem ell_eq_dual (F : FlagG S r T) (fd : Fin r → S.V) (hfd : ∀ a b, S.hT (fd a) (F.e b) = if b = a then 1 else 0)
-    {Z : S.V →ₗ[E] S.V} (hZ : Z ∈ F.LieN) : F.ell Z = ∑ a, S.hT (fd a) (Z (F.fvec a.succ)) := by
+theorem ell_eq_dual
+    (F : FlagG S r T) (fd : Fin r → S.V) (hfd : ∀ a b, S.hT (fd a) (F.e b) = if b = a then 1 else 0)
+    {Z : S.V →ₗ[E] S.V} (hZ : Z ∈ F.LieN)
+    : F.ell Z = ∑ a, S.hT (fd a) (Z (F.fvec a.succ)) := by
   unfold FlagG.ell
   refine Finset.sum_congr rfl fun a _ => ?_
   exact (hT_eq_coefX F (fd a) a (hfd a) (lieN_fvec_mem F hZ a)).symm
@@ -118,19 +125,23 @@ variable {D : D7} (X : HidaSetting D)
 def linOfMat (A : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) : (VS D).V →ₗ[D.host.E] (VS D).V :=
   X.bas.equivFun.symm.toLinearMap ∘ₗ Matrix.toLin' (A.map X.ιE) ∘ₗ X.bas.equivFun.toLinearMap
 
-theorem crd_linOfMat (A : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) (y : (VS D).V) :
-    X.crd (linOfMat X A y) = A *ᵥ X.crd y := by
+theorem crd_linOfMat (A : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) (y : (VS D).V)
+    : X.crd (linOfMat X A y) = A *ᵥ X.crd y := by
   unfold Formalism.L2.SG.HidaSetting.HidaSetting.crd
   unfold crdOf
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← Module.Basis.equivFun_apply, linOfMat, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
-    LinearEquiv.apply_symm_apply, Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+    simp only [← Module.Basis.equivFun_apply, linOfMat, LinearMap.coe_comp, LinearEquiv.coe_coe,
+      Function.comp_apply, LinearEquiv.apply_symm_apply, Matrix.toLin'_apply, Matrix.mulVec,
+      dotProduct, Matrix.map_apply, map_sum, map_mul]
   simp
 
-theorem lieN_of_coord (w : D.what₂.Word) (W : Matrix (Kap X) (Kap X) X.B.I.E) (Z : (VS D).V →ₗ[D.host.E] (VS D).V)
-    (hW : InPat (lvk X) 1 W) (hWs : Wᴴ * JB X = -(JB X * W)) (hZ : ∀ y, X.crd (Z y) = (Bm X * W * Bm' X) *ᵥ X.crd y) :
-    Z ∈ (X.Fu w).LieN := by
+theorem lieN_of_coord
+    (w : D.what₂.Word)
+    (W : Matrix (Kap X) (Kap X) X.B.I.E) (Z : (VS D).V →ₗ[D.host.E] (VS D).V)
+    (hW : InPat (lvk X) 1 W) (hWs : Wᴴ * JB X = -(JB X * W))
+    (hZ : ∀ y, X.crd (Z y) = (Bm X * W * Bm' X) *ᵥ X.crd y)
+    : Z ∈ (X.Fu w).LieN := by
   set A := Bm X * W * Bm' X with hA
   have hdot : ∀ p q : Fin X.B.I.n → X.B.I.E, hE X p q = star p ⬝ᵥ (X.B.I.J *ᵥ q) := by
     intro p q
@@ -140,12 +151,13 @@ theorem lieN_of_coord (w : D.what₂.Word) (W : Matrix (Kap X) (Kap X) X.B.I.E) 
     rw [JB_eq, Matrix.mul_assoc, Bm_mul_Bm', Matrix.mul_one]
   have hAs : Aᴴ * X.B.I.J = -(X.B.I.J * A) := by
     have h1 : (Bm' X)ᴴ * (Bm X)ᴴ = 1 := by rw [← conjTranspose_mul, Bm_mul_Bm', conjTranspose_one]
-    calc Aᴴ * X.B.I.J = (Bm' X)ᴴ * (Wᴴ * ((Bm X)ᴴ * X.B.I.J)) := by
-          rw [hA]; simp only [conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      Aᴴ * X.B.I.J = (Bm' X)ᴴ * (Wᴴ * ((Bm X)ᴴ * X.B.I.J)) := by
+        rw [hA]; simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = (Bm' X)ᴴ * (Wᴴ * JB X) * Bm' X := by rw [hJB]; simp only [Matrix.mul_assoc]
       _ = -((Bm' X)ᴴ * (JB X * W) * Bm' X) := by rw [hWs]; simp [Matrix.mul_neg, Matrix.neg_mul]
       _ = -(((Bm' X)ᴴ * (Bm X)ᴴ) * X.B.I.J * (Bm X * W * Bm' X)) := by
-          rw [JB_eq]; simp only [Matrix.mul_assoc]
+        rw [JB_eq]; simp only [Matrix.mul_assoc]
       _ = -(X.B.I.J * A) := by rw [h1, Matrix.one_mul]
   have hskew : ∀ p q, hE X (A *ᵥ p) q + hE X p (A *ᵥ q) = 0 := by
     intro p q
@@ -165,18 +177,21 @@ theorem lieN_of_coord (w : D.what₂.Word) (W : Matrix (Kap X) (Kap X) X.B.I.E) 
   have he : ∀ a : Fin D.R.rS, Z (X.eX a) ∈ Submodule.span D.host.E (X.eX '' {b | b.1 < a.1}) := by
     intro a
     refine FlagCoordinates.crd_desc X _ _ ?_
-    rw [hZ, show X.crd (X.eX a) = X.eR a from rfl, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hB]
+    rw [hZ, show X.crd (X.eX a) = X.eR a from rfl, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+      hB]
     refine FlagCoordinates.Bm_mulVec_mem X _ _ fun k hk => ?_
     rw [mulVec_single_one]
     refine hW k _ ?_
     rcases k with b | i | b
     · have : ¬ b.1 < a.1 := fun h => hk ⟨b, h, rfl⟩
-      simp only [lvk, Sum.elim_inl]; omega
+      simp only [lvk, Sum.elim_inl]
+      omega
     · simp only [lvk, Sum.elim_inl, Sum.elim_inr]; have := a.2; omega
     · simp only [lvk, Sum.elim_inl, Sum.elim_inr]; have := a.2; have := b.2; omega
   refine ⟨fun x y => ?_, fun a ha1 har x hx => ?_, fun x hx => ?_⟩
   · apply X.ιE.symm.injective
-    rw [map_add (f := _), ← Formalism.L2.SG.NonRelPf.hE_crd X, ← Formalism.L2.SG.NonRelPf.hE_crd X, hZ, hZ, map_zero]
+    rw [map_add (f := _), ← Formalism.L2.SG.NonRelPf.hE_crd X, ← Formalism.L2.SG.NonRelPf.hE_crd X,
+      hZ, hZ, map_zero]
     exact hskew _ _
   · rw [hXf] at hx ⊢
     induction hx using Submodule.span_induction with
@@ -192,7 +207,8 @@ theorem lieN_of_coord (w : D.what₂.Word) (W : Matrix (Kap X) (Kap X) X.B.I.E) 
       intro a
       have hmem : X.eX a ∈ (X.Fu w).X := by
         rw [hXs]; exact Submodule.subset_span ⟨a, Set.mem_univ _, rfl⟩
-      rw [show X.eR a = X.crd (X.eX a) from rfl, Formalism.L2.SG.NonRelPf.hE_crd X, hx _ hmem, map_zero]
+      rw [show X.eR a = X.crd (X.eX a) from rfl, Formalism.L2.SG.NonRelPf.hE_crd X, hx _ hmem,
+        map_zero]
     rw [hXs]
     refine FlagCoordinates.crd_desc X _ _ ?_
     rw [hZ, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Bm'_mulVec]
@@ -206,24 +222,32 @@ theorem lieN_of_coord (w : D.what₂.Word) (W : Matrix (Kap X) (Kap X) X.B.I.E) 
     rcases j with b | i | b
     · rw [hW k _ (by rw [lvk_inl]; have := b.2; omega), zero_mul]
     · rw [hW k _ (by rw [lvk_w]; omega), zero_mul]
-    · rw [show cE X (X.crd x) (Sum.inr (Sum.inr b)) = hE X (X.eR b) (X.crd x) from rfl, hx0 b, mul_zero]
+    · rw [show cE X (X.crd x) (Sum.inr (Sum.inr b)) = hE X (X.eR b) (X.crd x) from rfl, hx0 b,
+        mul_zero]
 
-theorem ell_coord (w : D.what₂.Word) (W : Matrix (Kap X) (Kap X) X.B.I.E) (Z : (VS D).V →ₗ[D.host.E] (VS D).V)
-    (hZ : ∀ y, X.crd (Z y) = (Bm X * W * Bm' X) *ᵥ X.crd y) (v : InfinitePlace X.B.I.F) :
-    Φ X v (∑ a, (VS D).hT (X.fY a) (Z (nxt X.eX (X.zu w) a))) = lamU X w v (W.map (X.B.I.φ v)) := by
+theorem ell_coord
+    (w : D.what₂.Word)
+    (W : Matrix (Kap X) (Kap X) X.B.I.E) (Z : (VS D).V →ₗ[D.host.E] (VS D).V)
+    (hZ : ∀ y, X.crd (Z y) = (Bm X * W * Bm' X) *ᵥ X.crd y)
+    (v : InfinitePlace X.B.I.F)
+    : Φ X v (∑ a, (VS D).hT (X.fY a) (Z (nxt X.eX (X.zu w) a)))
+      = lamU X w v (W.map (X.B.I.φ v)) := by
   rw [Φ_sum]
   unfold lamU
   refine Finset.sum_congr rfl fun a _ => ?_
-  have hM : (X.B.I.P v)⁻¹ * (Bm X * W * Bm' X).map (X.B.I.φ v) * X.B.I.P v =
-      Bv X v * W.map (X.B.I.φ v) * Bv' X v := by
+  have hM
+      : (X.B.I.P v)⁻¹ * (Bm X * W * Bm' X).map (X.B.I.φ v) * X.B.I.P v
+        = Bv X v * W.map (X.B.I.φ v) * Bv' X v := by
     unfold Bv Bv'
     rw [Matrix.map_mul, Matrix.map_mul]
     simp only [Matrix.mul_assoc]
-  have hn : rv X.B.I v (X.crd (nxt X.eX (X.zu w) a)) =
-      nxt (fun b => rv X.B.I v (X.eR b)) (rv X.B.I v (X.zR w)) a := by
+  have hn
+      : rv X.B.I v (X.crd (nxt X.eX (X.zu w) a))
+        = nxt (fun b => rv X.B.I v (X.eR b)) (rv X.B.I v (X.zR w)) a := by
     rw [nxt_map (fun y => rv X.B.I v (X.crd y))]; rfl
   show X.B.I.φ v (X.ιE.symm ((VS D).hT (X.fY a) (Z (nxt X.eX (X.zu w) a)))) = _
-  rw [← Formalism.L2.SG.NonRelPf.hE_crd X, ← Formalism.L2.SG.Pf.Level.hJ_rv, hZ, ← Formalism.L2.SG.Pf.Level.rv_mulVec, hM, hn]
+  rw [← Formalism.L2.SG.NonRelPf.hE_crd X, ← Formalism.L2.SG.Pf.Level.hJ_rv, hZ,
+    ← Formalism.L2.SG.Pf.Level.rv_mulVec, hM, hn]
   rfl
 
 end Coord
@@ -235,11 +259,13 @@ theorem ratVanish_holds : RatVanish := by
   set F' := mapFlag t.lin hiso (X.Fu u') with hF'
   have hfr : t.frame = ⟨F', t.lin (X.Fu u').z⟩ := by
     unfold GTerm.frame mapLF; rw [dite_eq_left hiso]
-  have hRF := (Formalism.L2.SG.Closed.TermFun_holds D u u' (X.Fu u) t.lam ((Yf.rowsOK u).1 t.lam t.mem)).2.2.1
+  have hRF :=
+    (Formalism.L2.SG.Closed.TermFun_holds D u u' (X.Fu u) t.lam ((Yf.rowsOK u).1 t.lam t.mem)).2.2.1
   have hrel0 := (TermDef.isRel_mk D.host.F hRF ⟨t.frame, t.rep.2.2.2.2⟩).1 ht
   have hrel : Relevant D.host.F (X.Fu u) F' := by
     have e : t.frame.fl = F' := by rw [hfr]
-    rw [← e]; exact hrel0
+    rw [← e]
+    exact hrel0
 
   set A := Bm X * Y * Bm' X with hA
   set Yp := Gr X (↑M⁻¹ : Matrix _ _ _) * Y * Gr X (M : Matrix _ _ _) with hYp
@@ -251,12 +277,16 @@ theorem ratVanish_holds : RatVanish := by
     have h := hMc (t.lin.symm w)
     rw [LinearEquiv.apply_symm_apply] at h
     rw [h, Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec]
-  have hconj : (↑M⁻¹ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) * A * (M : Matrix _ _ _) = Bm X * Yp * Bm' X := by
+  have hconj
+      : (↑M⁻¹ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) * A * (M : Matrix _ _ _)
+        = Bm X * Yp * Bm' X := by
     rw [hA, hYp]
     unfold Gr
-    calc (↑M⁻¹ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) * (Bm X * Y * Bm' X) * (M : Matrix _ _ _)
-        = (Bm X * Bm' X) * (↑M⁻¹ : Matrix _ _ _) * (Bm X * Y * Bm' X) * (M : Matrix _ _ _) * (Bm X * Bm' X) := by
-          rw [Bm_mul_Bm', Matrix.one_mul, Matrix.mul_one]
+    calc
+      (↑M⁻¹ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) * (Bm X * Y * Bm' X) * (M : Matrix _ _ _)
+          = (Bm X * Bm' X) * (↑M⁻¹ : Matrix _ _ _) * (Bm X * Y * Bm' X) * (M : Matrix _ _ _)
+            * (Bm X * Bm' X) := by
+        rw [Bm_mul_Bm', Matrix.one_mul, Matrix.mul_one]
       _ = _ := by simp only [Matrix.mul_assoc]
   have hZ2 : ∀ y, X.crd (Z2 y) = (Bm X * Yp * Bm' X) *ᵥ X.crd y := by
     intro y
@@ -274,10 +304,13 @@ theorem ratVanish_holds : RatVanish := by
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [fvec_succ, X.Fu_e, X.flagZVector]
   have hl2 : F'.ell Z1 = ∑ a, (VS D).hT (X.fY a) (Z2 (nxt X.eX (X.zu u') a)) := by
-    rw [ell_eq_dual F' (fun a => t.lin (X.fY a))
+    rw [ell_eq_dual F'
+      (fun a => t.lin (X.fY a))
       (fun a b => by
         show (VS D).hT (t.lin (X.fY a)) (t.lin ((X.Fu u').e b)) = _
-        rw [hisoF, X.Fu_e]; exact hTfe X a b) hL3]
+        rw [hisoF, X.Fu_e]
+        exact hTfe X a b)
+      hL3]
     refine Finset.sum_congr rfl fun a _ => ?_
     have e1 : F'.fvec a.succ = t.lin (nxt X.eX (X.zu u') a) := by
       rw [fvec_succ, nxt_map t.lin, hF']

@@ -14,14 +14,19 @@ namespace ColumnAntisymmetry
 
 variable {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
 
-theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m → ℕ) (hmono : Monotone col)
+theorem split
+    {m : ℕ}
+    (E : Fin n → Fin n → Module.End ℂ M)
+    (col : Fin m → ℕ) (hmono : Monotone col)
     (hc : ∀ i j : Fin m, Commute (xJ E i) (xJ E j))
-    (hP : ∀ i j : Fin m, (i : ℕ) + 1 = j →
-      xJ E j * pm (Equiv.swap i j) = pm (Equiv.swap i j) * xJ E i + 1 ∧
-      ∀ k : Fin m, k ≠ i → k ≠ j → Commute (xJ E k) (pm (Equiv.swap i j)))
-    (i j : Fin m) (hij : (i : ℕ) + 1 = j) (hcol : col i = col j) :
-    ∃ R : Module.End ℂ (TV n M (Fin m)), colD E col = (xJ E i - xJ E j + 1) * R ∧
-      R * pm (Equiv.swap i j) = pm (Equiv.swap i j) * R := by
+    (hP : ∀ i j : Fin m,
+      (i : ℕ) + 1 = j
+        → xJ E j * pm (Equiv.swap i j) = pm (Equiv.swap i j) * xJ E i + 1
+          ∧ ∀ k : Fin m, k ≠ i → k ≠ j → Commute (xJ E k) (pm (Equiv.swap i j)))
+    (i j : Fin m) (hij : (i : ℕ) + 1 = j) (hcol : col i = col j)
+    : ∃ R : Module.End ℂ (TV n M (Fin m)),
+      colD E col = (xJ E i - xJ E j + 1) * R
+        ∧ R * pm (Equiv.swap i j) = pm (Equiv.swap i j) * R := by
   set s : Module.End ℂ (TV n M (Fin m)) := pm (Equiv.swap i j) with hs_def
   have hs2 : s * s = 1 := by rw [hs_def, ← pm_mul, Equiv.swap_mul_self, pm_one]
   obtain ⟨h1, h2⟩ := hP i j hij
@@ -33,10 +38,11 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
     rw [Fin.lt_iff_val_lt_val]
     omega
   have h3 : s * xJ E j = xJ E i * s + 1 := by
-    calc s * xJ E j = s * (xJ E j * s) * s := by simp only [mul_assoc, hs2, mul_one]
+    calc
+      s * xJ E j
+        = s * (xJ E j * s) * s := by simp only [mul_assoc, hs2, mul_one]
       _ = s * (s * xJ E i + 1) * s := by rw [h1]
-      _ = xJ E i * s + 1 := by
-        rw [mul_add, add_mul, ← mul_assoc s s, hs2, one_mul, mul_one, hs2]
+      _ = xJ E i * s + 1 := by rw [mul_add, add_mul, ← mul_assoc s s, hs2, one_mul, mul_one, hs2]
   have e1 : Commute (xJ E i + xJ E j) s := by
     show (xJ E i + xJ E j) * s = s * (xJ E i + xJ E j)
     rw [add_mul, mul_add, h1, h3]
@@ -45,17 +51,14 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
     show xJ E i * xJ E j * s = s * (xJ E i * xJ E j)
     rw [mul_assoc, h1, (hc i j).eq, ← mul_assoc, h3]
     noncomm_ring
-  have hsym : ∀ c, Commute c s → Commute c (xJ E i) →
-      Commute ((xJ E i + c) * (xJ E j + c)) s := by
+  have hsym : ∀ c, Commute c s → Commute c (xJ E i) → Commute ((xJ E i + c) * (xJ E j + c)) s := by
     intro c hcs hci
-    have hexp : (xJ E i + c) * (xJ E j + c) =
-        xJ E i * xJ E j + c * (xJ E i + xJ E j) + c * c := by
+    have hexp : (xJ E i + c) * (xJ E j + c) = xJ E i * xJ E j + c * (xJ E i + xJ E j) + c * c := by
       rw [add_mul, mul_add, mul_add, mul_add, ← hci.eq]
       abel
     rw [hexp]
     exact (e2.add_left (hcs.mul_left e1)).add_left (hcs.mul_left hcs)
-  have hsym2 : ∀ c, Commute c s → Commute c (xJ E i) →
-      Commute ((c - xJ E i) * (c - xJ E j)) s := by
+  have hsym2 : ∀ c, Commute c s → Commute c (xJ E i) → Commute ((c - xJ E i) * (c - xJ E j)) s := by
     intro c hcs hci
     have hh := hsym (-c) hcs.neg_left hci.neg_left
     rwa [show (c - xJ E i) * (c - xJ E j) = (xJ E i + -c) * (xJ E j + -c) by noncomm_ring]
@@ -65,21 +68,27 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
     exact hc k l
   let _ : IsMulCommutative (Algebra.adjoin ℂ S) := Algebra.isMulCommutative_adjoin ℂ hcomm
   let _ : CommRing (Algebra.adjoin ℂ S) :=
-    open scoped IsMulCommutative in inferInstance
+    open scoped IsMulCommutative in
+    inferInstance
   let x' : Fin m → Algebra.adjoin ℂ S := fun k => ⟨xJ E k, Algebra.subset_adjoin ⟨k, rfl⟩⟩
   let F : Fin m → Fin m → Algebra.adjoin ℂ S := fun p q =>
     if p < q ∧ col p = col q then x' p - x' q + 1 else 1
-  have hF : ∀ p q, ((F p q : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) =
-      if p < q ∧ col p = col q then xJ E p - xJ E q + 1 else 1 := by
+  have hF
+      : ∀ p q,
+        ((F p q : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m)))
+          = if p < q ∧ col p = col q then xJ E p - xJ E q + 1 else 1 := by
     intro p q
     simp only [F]
     split_ifs <;> rfl
-  have hcoe_mul : ∀ a b : Algebra.adjoin ℂ S,
-      ((a * b : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) = a * b := fun a b => rfl
+  have hcoe_mul
+      : ∀ a b : Algebra.adjoin ℂ S,
+        ((a * b : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) = a * b := fun a b =>
+    rfl
   have hcoe_one : ((1 : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) = 1 := rfl
-  have hlist : ∀ l : List (Algebra.adjoin ℂ S),
-      ((l.prod : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) =
-        (l.map Subtype.val).prod := by
+  have hlist
+      : ∀ l : List (Algebra.adjoin ℂ S),
+        ((l.prod : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m)))
+          = (l.map Subtype.val).prod := by
     intro l
     induction l with
     | nil => exact hcoe_one
@@ -88,8 +97,9 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
     simp only [colD, ← List.prod_ofFn, hlist, List.map_ofFn, Function.comp_def, hF]
   have hjmem : j ∈ (Finset.univ : Finset (Fin m)).erase i :=
     Finset.mem_erase.mpr ⟨hne.symm, Finset.mem_univ _⟩
-  have hsplit : ∀ g : Fin m → Algebra.adjoin ℂ S,
-      ∏ q, g q = g i * g j * ∏ q ∈ (Finset.univ.erase i).erase j, g q := by
+  have hsplit
+      : ∀ g : Fin m → Algebra.adjoin ℂ S,
+        ∏ q, g q = g i * g j * ∏ q ∈ (Finset.univ.erase i).erase j, g q := by
     intro g
     rw [← Finset.mul_prod_erase Finset.univ g (Finset.mem_univ i),
       ← Finset.mul_prod_erase _ g hjmem, mul_assoc]
@@ -104,31 +114,42 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
     rw [if_neg]
     rintro ⟨h, -⟩
     exact absurd (lt_trans h hlt) (lt_irrefl _)
-  have hPeq : ∏ q, ∏ p, F p q = F i j *
-      ((∏ p ∈ (Finset.univ.erase i).erase j, F p i * F p j) *
-        (∏ q ∈ (Finset.univ.erase i).erase j, F i q * F j q) *
-        ∏ q ∈ (Finset.univ.erase i).erase j, ∏ p ∈ (Finset.univ.erase i).erase j, F p q) := by
+  have hPeq
+      : ∏ q, ∏ p, F p q
+        = F i j
+          * ((∏ p ∈ (Finset.univ.erase i).erase j, F p i * F p j)
+            * (∏ q ∈ (Finset.univ.erase i).erase j, F i q * F j q)
+            * ∏ q ∈ (Finset.univ.erase i).erase j, ∏ p ∈ (Finset.univ.erase i).erase j, F p q) := by
     simp only [hsplit, Fii, Fjj, Fji, one_mul, mul_one, Finset.prod_mul_distrib]
     ring
-  refine ⟨(((∏ p ∈ (Finset.univ.erase i).erase j, F p i * F p j) *
-        (∏ q ∈ (Finset.univ.erase i).erase j, F i q * F j q) *
-        ∏ q ∈ (Finset.univ.erase i).erase j, ∏ p ∈ (Finset.univ.erase i).erase j, F p q :
-          Algebra.adjoin ℂ S) : Module.End ℂ _), ?_, ?_⟩
+  refine ⟨
+    (((∏ p ∈ (Finset.univ.erase i).erase j, F p i * F p j)
+          * (∏ q ∈ (Finset.univ.erase i).erase j, F i q * F j q)
+          * ∏ q ∈ (Finset.univ.erase i).erase j, ∏ p ∈ (Finset.univ.erase i).erase j, F p q
+        : Algebra.adjoin ℂ S)
+      : Module.End ℂ _),
+    ?_,
+    ?_
+  ⟩
   · rw [hcolD, hPeq, hcoe_mul, hF, if_pos ⟨hlt, hcol⟩]
-  · have hmul : ∀ a b : Algebra.adjoin ℂ S,
-        Commute (a : Module.End ℂ (TV n M (Fin m))) s →
-        Commute (b : Module.End ℂ (TV n M (Fin m))) s →
-        Commute ((a * b : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) s := by
+  · have hmul
+        : ∀ a b : Algebra.adjoin ℂ S,
+          Commute (a : Module.End ℂ (TV n M (Fin m))) s
+            → Commute (b : Module.End ℂ (TV n M (Fin m))) s
+            → Commute ((a * b : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) s := by
       intro a b ha hb
       rw [hcoe_mul]
       exact ha.mul_left hb
     have hone : Commute ((1 : Algebra.adjoin ℂ S) : Module.End ℂ (TV n M (Fin m))) s := by
       rw [hcoe_one]
       exact Commute.one_left s
-    have hA : Commute (((∏ p ∈ (Finset.univ.erase i).erase j, F p i * F p j :
-        Algebra.adjoin ℂ S)) : Module.End ℂ (TV n M (Fin m))) s := by
-      refine Finset.prod_induction _ (fun b : Algebra.adjoin ℂ S =>
-        Commute (b : Module.End ℂ (TV n M (Fin m))) s) hmul hone ?_
+    have hA : Commute
+        (((∏ p ∈ (Finset.univ.erase i).erase j, F p i * F p j : Algebra.adjoin ℂ S))
+          : Module.End ℂ (TV n M (Fin m)))
+        s := by
+      refine Finset.prod_induction _
+        (fun b : Algebra.adjoin ℂ S => Commute (b : Module.End ℂ (TV n M (Fin m))) s)
+        hmul hone ?_
       intro p hp
       obtain ⟨hpi, hpj⟩ := hmemO p hp
       have hpi' : (p : ℕ) ≠ i := fun h => hpi (Fin.ext h)
@@ -140,7 +161,7 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
           show xJ E p - xJ E j + 1 = (xJ E p + 1) - xJ E j by abel]
         exact hsym2 _ ((h2 p hpi hpj).add_left (Commute.one_left s))
           ((hc p i).add_left (Commute.one_left _))
-      · have hn : ¬ (p < j ∧ col p = col j) := by
+      · have hn : ¬(p < j ∧ col p = col j) := by
           rintro ⟨h, h'⟩
           apply hq
           refine ⟨?_, h'.trans hcol.symm⟩
@@ -148,10 +169,13 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
           omega
         rw [if_neg hq, if_neg hn, mul_one]
         exact Commute.one_left s
-    have hB : Commute (((∏ q ∈ (Finset.univ.erase i).erase j, F i q * F j q :
-        Algebra.adjoin ℂ S)) : Module.End ℂ (TV n M (Fin m))) s := by
-      refine Finset.prod_induction _ (fun b : Algebra.adjoin ℂ S =>
-        Commute (b : Module.End ℂ (TV n M (Fin m))) s) hmul hone ?_
+    have hB : Commute
+        (((∏ q ∈ (Finset.univ.erase i).erase j, F i q * F j q : Algebra.adjoin ℂ S))
+          : Module.End ℂ (TV n M (Fin m)))
+        s := by
+      refine Finset.prod_induction _
+        (fun b : Algebra.adjoin ℂ S => Commute (b : Module.End ℂ (TV n M (Fin m))) s)
+        hmul hone ?_
       intro q hq
       obtain ⟨hqi, hqj⟩ := hmemO q hq
       have hqj' : (q : ℕ) ≠ j := fun h => hqj (Fin.ext h)
@@ -167,7 +191,7 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
           show xJ E j - xJ E q + 1 = xJ E j + (1 - xJ E q) by abel]
         exact hsym _ ((Commute.one_left s).sub_left (h2 q hqi hqj))
           ((Commute.one_left _).sub_left (hc q i))
-      · have hn : ¬ (j < q ∧ col j = col q) := by
+      · have hn : ¬(j < q ∧ col j = col q) := by
           rintro ⟨h, h'⟩
           apply hq'
           refine ⟨?_, hcol.trans h'⟩
@@ -175,14 +199,19 @@ theorem split {m : ℕ} (E : Fin n → Fin n → Module.End ℂ M) (col : Fin m 
           omega
         rw [if_neg hq', if_neg hn, mul_one]
         exact Commute.one_left s
-    have hC : Commute (((∏ q ∈ (Finset.univ.erase i).erase j,
-        ∏ p ∈ (Finset.univ.erase i).erase j, F p q :
-        Algebra.adjoin ℂ S)) : Module.End ℂ (TV n M (Fin m))) s := by
-      refine Finset.prod_induction _ (fun b : Algebra.adjoin ℂ S =>
-        Commute (b : Module.End ℂ (TV n M (Fin m))) s) hmul hone ?_
+    have hC : Commute
+        (((∏ q ∈ (Finset.univ.erase i).erase j,
+              ∏ p ∈ (Finset.univ.erase i).erase j, F p q
+            : Algebra.adjoin ℂ S))
+          : Module.End ℂ (TV n M (Fin m)))
+        s := by
+      refine Finset.prod_induction _
+        (fun b : Algebra.adjoin ℂ S => Commute (b : Module.End ℂ (TV n M (Fin m))) s)
+        hmul hone ?_
       intro q hq
-      refine Finset.prod_induction _ (fun b : Algebra.adjoin ℂ S =>
-        Commute (b : Module.End ℂ (TV n M (Fin m))) s) hmul hone ?_
+      refine Finset.prod_induction _
+        (fun b : Algebra.adjoin ℂ S => Commute (b : Module.End ℂ (TV n M (Fin m))) s)
+        hmul hone ?_
       intro p hp
       obtain ⟨hqi, hqj⟩ := hmemO q hq
       obtain ⟨hpi, hpj⟩ := hmemO p hp

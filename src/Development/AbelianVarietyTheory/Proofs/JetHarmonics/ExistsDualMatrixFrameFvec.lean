@@ -5,13 +5,17 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.BasicLiftAll
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory GlobalTheory.HatNF
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd
+  Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory
+  GlobalTheory.HatNF
 
 namespace GlobalTheory.HatNF.DualFrame
 
-theorem exists_linearIndependent_extend {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ} (v : Fin n → V)
-    (hv : LinearIndependent ℂ v) (m : ℕ) (hm : n + m ≤ Module.finrank ℂ V) :
-    ∃ w : Fin (n + m) → V, LinearIndependent ℂ w ∧ ∀ j, w (Fin.castAdd m j) = v j := by
+theorem exists_linearIndependent_extend
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {n : ℕ} (v : Fin n → V) (hv : LinearIndependent ℂ v)
+    (m : ℕ) (hm : n + m ≤ Module.finrank ℂ V)
+    : ∃ w : Fin (n + m) → V, LinearIndependent ℂ w ∧ ∀ j, w (Fin.castAdd m j) = v j := by
   induction m with
   | zero => exact ⟨v, hv, fun j => rfl⟩
   | succ m ih =>
@@ -25,14 +29,17 @@ theorem exists_linearIndependent_extend {V : Type} [AddCommGroup V] [Module ℂ 
       omega
     obtain ⟨x, hx⟩ := hx
     refine ⟨Fin.snoc (α := fun _ => V) w x, linearIndependent_finSnoc.mpr ⟨hw, hx⟩, fun j => ?_⟩
-    have hj : (Fin.castAdd (m + 1) j : Fin (n + (m + 1))) = Fin.castSucc (Fin.castAdd m j) := Fin.ext rfl
+    have hj : (Fin.castAdd (m + 1) j : Fin (n + (m + 1))) = Fin.castSucc (Fin.castAdd m j) :=
+      Fin.ext rfl
     rw [hj, Fin.snoc_castSucc, hwv]
 
-theorem linearIndependent_fvec (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z') (h0 : z' ≠ 0) :
-    LinearIndependent ℂ (fvec k r z') := by
+theorem linearIndependent_fvec
+    (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z') (h0 : z' ≠ 0)
+    : LinearIndependent ℂ (fvec k r z') := by
   rw [Fintype.linearIndependent_iff]
   intro g hg
-  have hs : ∀ d, ∑ i : Fin r, g (Fin.castSucc i) * bvec (eI k r i) d + g (Fin.last r) * z' d = 0 := by
+  have hs
+      : ∀ d, ∑ i : Fin r, g (Fin.castSucc i) * bvec (eI k r i) d + g (Fin.last r) * z' d = 0 := by
     intro d
     have := congrFun hg d
     rw [Fin.sum_univ_castSucc] at this
@@ -69,11 +76,15 @@ theorem linearIndependent_fvec (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ) (h
     simp [bvec, hne]
   · simp
 
-theorem exists_dual_matrix (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ)
-    (e : Fin (r + 1 + (r + k)) ≃ Fin (2 * r + k + 1)) (hz : inWb k r z') (hT : 0 < Tz k r z') :
-    ∃ Q : Matrix (Fin (r + 1 + (r + k))) (Fin (r + 1 + (r + k))) ℂ, Q.det ≠ 0 ∧
-      (∀ (i j : Fin (r + 1)), ∑ d, Q (Fin.castAdd (r + k) i) d * fvec k r z' j (e d) = if i = j then 1 else 0) ∧
-      ∀ (i : Fin (r + k)) (j : Fin (r + 1)), ∑ d, Q (Fin.natAdd (r + 1) i) d * fvec k r z' j (e d) = 0 := by
+theorem exists_dual_matrix
+    (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ)
+    (e : Fin (r + 1 + (r + k)) ≃ Fin (2 * r + k + 1)) (hz : inWb k r z') (hT : 0 < Tz k r z')
+    : ∃ Q : Matrix (Fin (r + 1 + (r + k))) (Fin (r + 1 + (r + k))) ℂ,
+      Q.det ≠ 0
+        ∧ (∀ (i j : Fin (r + 1)),
+          ∑ d, Q (Fin.castAdd (r + k) i) d * fvec k r z' j (e d) = if i = j then 1 else 0)
+        ∧ ∀ (i : Fin (r + k)) (j : Fin (r + 1)),
+          ∑ d, Q (Fin.natAdd (r + 1) i) d * fvec k r z' j (e d) = 0 := by
   have hz0 : z' ≠ 0 := by
     rintro rfl
     simp [Tz, herm] at hT
@@ -81,16 +92,18 @@ theorem exists_dual_matrix (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ)
   set u : Fin (r + 1) → Fin (r + 1 + (r + k)) → ℂ := fun j d => fvec k r z' j (e d) with hu
   have hul : LinearIndependent ℂ u :=
     hli.map' (LinearEquiv.funCongrLeft ℂ ℂ e).toLinearMap (LinearEquiv.ker _)
-  obtain ⟨w, hw, hwu⟩ := exists_linearIndependent_extend u hul (r + k)
-    (by rw [Module.finrank_fin_fun])
+  obtain ⟨w, hw, hwu⟩ :=
+    exists_linearIndependent_extend u hul (r + k) (by rw [Module.finrank_fin_fun])
   set A : Matrix (Fin (r + 1 + (r + k))) (Fin (r + 1 + (r + k))) ℂ := Matrix.of w with hA
   have hAu : IsUnit A := Matrix.linearIndependent_rows_iff_isUnit.mp hw
   have hdet : IsUnit A.transpose.det := by
     rw [Matrix.det_transpose]
     exact (Matrix.isUnit_iff_isUnit_det A).mp hAu
   have hQ : (A.transpose)⁻¹ * A.transpose = 1 := Matrix.nonsing_inv_mul _ hdet
-  have hcol : ∀ (i : Fin (r + 1 + (r + k))) (j : Fin (r + 1)),
-      ∑ d, (A.transpose)⁻¹ i d * fvec k r z' j (e d) = if i = Fin.castAdd (r + k) j then 1 else 0 := by
+  have hcol
+      : ∀ (i : Fin (r + 1 + (r + k))) (j : Fin (r + 1)),
+        ∑ d, (A.transpose)⁻¹ i d * fvec k r z' j (e d)
+          = if i = Fin.castAdd (r + k) j then 1 else 0 := by
     intro i j
     have := congrFun (congrFun hQ i) (Fin.castAdd (r + k) j)
     rw [Matrix.mul_apply, Matrix.one_apply] at this

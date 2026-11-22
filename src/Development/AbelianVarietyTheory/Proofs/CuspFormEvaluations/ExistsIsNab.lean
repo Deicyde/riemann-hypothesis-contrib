@@ -13,15 +13,23 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.Exists
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS Pt ev pt comp1 FGLaw)
 open MvPolynomial (X)
 
 namespace GlobalTheory.CanonConn
 
-theorem exists_isNab : Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∃ (_ : StarRing (𝓞 E)) (nab : NabV Xo c), IsNab Xo c nab := by
+theorem exists_isNab
+    : Laws
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+          (l : Level H) (Xo : Moduli Dw l) (c : Coeff l),
+        ∃ (_ : StarRing (𝓞 E)) (nab : NabV Xo c),
+          IsNab Xo c nab := by
   intro hL E _ _ _ H Dw l Xo c
   classical
   letI : StarRing (𝓞 E) := H.starRing
@@ -29,12 +37,14 @@ theorem exists_isNab : Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
   have hC := GlobalTheory.T.exists_biextension_chart_with_germs_framed_point hL E H Dw l Xo c hs
   choose C _hT hg using hC
   choose g hg using hg
-  let val : ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S) (k : ℤ),
-      LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x)) → (Lt1 Dw →₀ ℕ) → S :=
-    fun S _ _ _ y k => match k with
-      | Int.ofNat k => fun F α =>
-          (C S y).B.nabVal S (C S y).h H.w0 k (g S y k F) (C S y).uvec (MvPolynomial.monomial α 1)
-      | Int.negSucc _ => fun _ _ => 0
+  let val
+      : ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S) (k : ℤ),
+        LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x)) → (Lt1 Dw →₀ ℕ)
+          → S := fun S _ _ _ y k =>
+    match k with
+    | Int.ofNat k => fun F α =>
+      (C S y).B.nabVal S (C S y).h H.w0 k (g S y k F) (C S y).uvec (MvPolynomial.monomial α 1)
+    | Int.negSucc _ => fun _ _ => 0
   let nab : NabV Xo c := fun {S} _ _ y k F α =>
     if h : Nonempty (Algebra ℚ S) then @val S _ _ h.some y k F α else 0
   refine ⟨inferInstance, nab, hs, ?_⟩

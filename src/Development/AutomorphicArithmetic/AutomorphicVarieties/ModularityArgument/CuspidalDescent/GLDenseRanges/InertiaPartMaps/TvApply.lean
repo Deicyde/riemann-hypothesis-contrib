@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel GlobalTheory.CuspRep GlobalTheory.LocGL GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.UnitaryBC UpperTheory.V.Hi Matrix
+open ValuativeRel GlobalTheory.CuspRep GlobalTheory.LocGL GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.UnitaryBC UpperTheory.V.Hi Matrix
 
 namespace UpperTheory.V.Z.Desc.V0
 
@@ -14,20 +15,21 @@ section Rank
 
 variable {R : Type} [CommRing R] {n : ℕ}
 
-private theorem vv_sq (y w : Fin n → R) : vecMulVec y w * vecMulVec y w = (w ⬝ᵥ y) • vecMulVec y w := by
+private theorem vv_sq (y w : Fin n → R)
+    : vecMulVec y w * vecMulVec y w = (w ⬝ᵥ y) • vecMulVec y w := by
   ext a b
   simp only [Matrix.mul_apply, Matrix.vecMulVec_apply, Matrix.smul_apply, smul_eq_mul, dotProduct]
   rw [Finset.sum_mul]
   refine Finset.sum_congr rfl (fun x _ => by ring)
 
-private theorem tv_mul (y w : Fin n → R) (c : R) (h : c * (1 + w ⬝ᵥ y) = 1) :
-    (1 + vecMulVec y w) * (1 - c • vecMulVec y w) = 1 := by
+private theorem tv_mul (y w : Fin n → R) (c : R) (h : c * (1 + w ⬝ᵥ y) = 1)
+    : (1 + vecMulVec y w) * (1 - c • vecMulVec y w) = 1 := by
   rw [mul_sub, mul_one, add_mul, one_mul, mul_smul_comm, vv_sq, smul_smul, ← add_smul,
     show c + c * (w ⬝ᵥ y) = c * (1 + w ⬝ᵥ y) by ring, h, one_smul]
   abel
 
-private theorem tv_mul' (y w : Fin n → R) (c : R) (h : c * (1 + w ⬝ᵥ y) = 1) :
-    (1 - c • vecMulVec y w) * (1 + vecMulVec y w) = 1 := by
+private theorem tv_mul' (y w : Fin n → R) (c : R) (h : c * (1 + w ⬝ᵥ y) = 1)
+    : (1 - c • vecMulVec y w) * (1 + vecMulVec y w) = 1 := by
   rw [sub_mul, one_mul, mul_add, mul_one, smul_mul_assoc, vv_sq, smul_smul]
   rw [show (c * (w ⬝ᵥ y)) = c * (1 + w ⬝ᵥ y) - c by ring, h, sub_smul, one_smul]
   abel
@@ -38,8 +40,9 @@ private def tv (y w : Fin n → R) (c : R) (h : c * (1 + w ⬝ᵥ y) = 1) : GL (
   val_inv := tv_mul y w c h
   inv_val := tv_mul' y w c h
 
-private theorem tv_apply (y w : Fin n → R) (c : R) (h : c * (1 + w ⬝ᵥ y) = 1) (a b : Fin n) :
-    (tv y w c h : Matrix (Fin n) (Fin n) R) a b = (1 : Matrix (Fin n) (Fin n) R) a b + y a * w b := by
+private theorem tv_apply (y w : Fin n → R) (c : R) (h : c * (1 + w ⬝ᵥ y) = 1) (a b : Fin n)
+    : (tv y w c h : Matrix (Fin n) (Fin n) R) a b
+      = (1 : Matrix (Fin n) (Fin n) R) a b + y a * w b := by
   simp [tv, vecMulVec_apply]
 
 end Rank
@@ -48,10 +51,13 @@ section Loc
 
 variable {k : Type} [Field k] {n : ℕ}
 
-private theorem chr_of (ψ : AddChar k Circle) (t : Fin n → k) (g : GL (Fin n) k) (y w : Fin n → k) (i c : Fin n)
-    (hg : ∀ a b, (g : Matrix (Fin n) (Fin n) k) a b = (1 : Matrix (Fin n) (Fin n) k) a b + y a * w b)
-    (hy : ∀ a, i < a → y a = 0) (hw : ∀ b, b ≤ i → w b = 0) (hc : (c : ℕ) = i + 1) (hwc : w c = 1) :
-    chr ψ t g = (ψ (t i * y i) : ℂ) := by
+private theorem chr_of
+    (ψ : AddChar k Circle) (t : Fin n → k)
+    (g : GL (Fin n) k) (y w : Fin n → k) (i c : Fin n)
+    (hg
+      : ∀ a b, (g : Matrix (Fin n) (Fin n) k) a b = (1 : Matrix (Fin n) (Fin n) k) a b + y a * w b)
+    (hy : ∀ a, i < a → y a = 0) (hw : ∀ b, b ≤ i → w b = 0) (hc : (c : ℕ) = i + 1) (hwc : w c = 1)
+    : chr ψ t g = (ψ (t i * y i) : ℂ) := by
   simp only [chr]
   congr 2
   have hic : i ≠ c := by
@@ -82,9 +88,12 @@ private theorem chr_of (ψ : AddChar k Circle) (t : Fin n → k) (g : GL (Fin n)
     · rw [hy a h]
       ring
 
-private theorem unip_of (g : GL (Fin n) k) (y w : Fin n → k) (i : Fin n)
-    (hg : ∀ a b, (g : Matrix (Fin n) (Fin n) k) a b = (1 : Matrix (Fin n) (Fin n) k) a b + y a * w b)
-    (hy : ∀ a, i < a → y a = 0) (hw : ∀ b, b ≤ i → w b = 0) : g ∈ unipB k (Fin n) := by
+private theorem unip_of
+    (g : GL (Fin n) k) (y w : Fin n → k) (i : Fin n)
+    (hg
+      : ∀ a b, (g : Matrix (Fin n) (Fin n) k) a b = (1 : Matrix (Fin n) (Fin n) k) a b + y a * w b)
+    (hy : ∀ a, i < a → y a = 0) (hw : ∀ b, b ≤ i → w b = 0)
+    : g ∈ unipB k (Fin n) := by
   rw [mem_unipB]
   refine ⟨fun a b hba => ?_, fun a => ?_⟩
   · rw [hg, Matrix.one_apply_ne hba.ne']
@@ -98,11 +107,20 @@ private theorem unip_of (g : GL (Fin n) k) (y w : Fin n → k) (i : Fin n)
     · simp [hy a ha]
     · simp [hw a (not_lt.1 ha)]
 
-private theorem inv_rows (p : GL (Fin n) k) (i : Fin n)
-    (hp : ∀ a, i < a → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0) ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1) :
-    ∀ a, i < a → ∀ j, j ≤ a →
-      ((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a j = (1 : Matrix (Fin n) (Fin n) k) a j := by
-  have hq : (p : Matrix (Fin n) (Fin n) k) * ((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) = 1 :=
+private theorem inv_rows
+    (p : GL (Fin n) k) (i : Fin n)
+    (hp : ∀ a,
+      i < a
+        → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0)
+          ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1)
+    : ∀ a,
+      i < a
+        → ∀ j,
+          j ≤ a
+            → ((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a j
+              = (1 : Matrix (Fin n) (Fin n) k) a j := by
+  have hq
+      : (p : Matrix (Fin n) (Fin n) k) * ((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) = 1 :=
     Units.mul_inv p
   intro a
   induction h : n - (a : ℕ) using Nat.strong_induction_on generalizing a with
@@ -118,15 +136,19 @@ private theorem inv_rows (p : GL (Fin n) k) (i : Fin n)
       · have hjm : j < m := lt_of_le_of_lt hj hgt
         have h1 := Fin.lt_def.1 hgt
         have h2 := m.isLt
-        rw [ih (n - (m : ℕ)) (by omega) m rfl (lt_trans ha hgt) j hjm.le, Matrix.one_apply_ne (ne_of_gt hjm)]
+        rw [ih (n - (m : ℕ)) (by omega) m rfl (lt_trans ha hgt) j hjm.le,
+          Matrix.one_apply_ne (ne_of_gt hjm)]
         ring
     · simp
 
-private theorem conj_eq (p : GL (Fin n) k) (x : Fin n → k) (c : Fin n) :
-    (p : Matrix (Fin n) (Fin n) k) * (1 + vecMulVec x (Pi.single c 1)) =
-      (1 + vecMulVec ((p : Matrix (Fin n) (Fin n) k) *ᵥ x) (((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) c)) *
-        (p : Matrix (Fin n) (Fin n) k) := by
-  have hrow : ((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) c ᵥ* (p : Matrix (Fin n) (Fin n) k) = Pi.single c 1 := by
+private theorem conj_eq (p : GL (Fin n) k) (x : Fin n → k) (c : Fin n)
+    : (p : Matrix (Fin n) (Fin n) k) * (1 + vecMulVec x (Pi.single c 1))
+      = (1 + vecMulVec ((p : Matrix (Fin n) (Fin n) k) *ᵥ x)
+          (((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) c))
+        * (p : Matrix (Fin n) (Fin n) k) := by
+  have hrow
+      : ((p⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) c ᵥ* (p : Matrix (Fin n) (Fin n) k)
+        = Pi.single c 1 := by
     funext b
     have e := congrFun (congrFun (Units.inv_mul p) c) b
     rw [Matrix.mul_apply] at e
@@ -134,16 +156,19 @@ private theorem conj_eq (p : GL (Fin n) k) (x : Fin n → k) (c : Fin n) :
     rcases eq_or_ne b c with rfl | hb
     · simp
     · simp [hb, Matrix.one_apply_ne hb.symm]
-  rw [Matrix.mul_add, mul_one, Matrix.mul_vecMulVec, Matrix.add_mul, one_mul, Matrix.vecMulVec_mul, hrow]
+  rw [Matrix.mul_add, mul_one, Matrix.mul_vecMulVec, Matrix.add_mul, one_mul, Matrix.vecMulVec_mul,
+    hrow]
 
 end Loc
 
 section Val
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-private theorem lev_lt (ψ : AddChar k Circle) (hψ : Lev1 ψ) (y : k)
-    (h : ∀ s : 𝒪[k], ψ (y * (s : k)) = 1) : valuation k y < 1 := by
+private theorem lev_lt
+    (ψ : AddChar k Circle) (hψ : Lev1 ψ) (y : k) (h : ∀ s : 𝒪[k], ψ (y * (s : k)) = 1)
+    : valuation k y < 1 := by
   by_contra hy
   have hy1 : 1 ≤ valuation k y := not_lt.1 hy
   have hy0 : y ≠ 0 := fun h0 => by
@@ -160,14 +185,21 @@ private theorem lev_lt (ψ : AddChar k Circle) (hψ : Lev1 ψ) (y : k)
     field_simp
   rwa [hyx] at this
 
-private theorem rowStep {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Representation ℂ (GL (Fin n) k) W)
-    (ψ : AddChar k Circle) (t : Fin n → k) (l : W →ₗ[ℂ] ℂ)
-    (hl : ∀ u ∈ unipB k (Fin n), ∀ v, l (τ u v) = chr ψ t u * l v) (v : W)
-    (hv : ∀ u, u ∈ unipB k (Fin n) → u ∈ KO k (Fin n) → τ u v = chr ψ t u • v)
+private theorem rowStep
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (τ : Representation ℂ (GL (Fin n) k) W) (ψ : AddChar k Circle) (t : Fin n → k) (l : W →ₗ[ℂ] ℂ)
+    (hl : ∀ u ∈ unipB k (Fin n), ∀ v, l (τ u v) = chr ψ t u * l v)
+    (v : W) (hv : ∀ u, u ∈ unipB k (Fin n) → u ∈ KO k (Fin n) → τ u v = chr ψ t u • v)
     (p : GL (Fin n) k) (i c : Fin n) (hc : (c : ℕ) = i + 1)
-    (hp : ∀ a, i < a → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0) ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1)
-    (hW : l (τ p v) ≠ 0) (j : Fin n) (hj : j ≤ i) (s : 𝒪[k]) :
-    ψ (t i * ((p : Matrix (Fin n) (Fin n) k) i j * (s : k))) = ψ (t i * (Pi.single j (s : k) : Fin n → k) i) := by
+    (hp : ∀ a,
+      i < a
+        → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0)
+          ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1)
+    (hW : l (τ p v) ≠ 0)
+    (j : Fin n) (hj : j ≤ i)
+    (s : 𝒪[k])
+    : ψ (t i * ((p : Matrix (Fin n) (Fin n) k) i j * (s : k)))
+      = ψ (t i * (Pi.single j (s : k) : Fin n → k) i) := by
   have hci : i < c := by rw [Fin.lt_def, hc]; omega
   have hjc : j ≠ c := fun h => absurd (lt_of_le_of_lt hj hci) (by rw [h]; exact lt_irrefl c)
   set x : Fin n → k := Pi.single j (s : k) with hx
@@ -186,7 +218,8 @@ private theorem rowStep {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Represe
     rw [he, Pi.single_eq_of_ne]
     exact fun h => absurd (lt_of_le_of_lt hb hci) (by rw [h]; exact lt_irrefl c)
   have hu := unip_of (tv x e 1 h0) x e i (tv_apply x e 1 h0) hy hw
-  have hcu := chr_of ψ t (tv x e 1 h0) x e i c (tv_apply x e 1 h0) hy hw hc (by rw [he, Pi.single_eq_same])
+  have hcu :=
+    chr_of ψ t (tv x e 1 h0) x e i c (tv_apply x e 1 h0) hy hw hc (by rw [he, Pi.single_eq_same])
   have hK : tv x e 1 h0 ∈ KO k (Fin n) := by
     have h00 : (1 : 𝒪[k]) * (1 + (Pi.single c 1 : Fin n → 𝒪[k]) ⬝ᵥ (Pi.single j s)) = 1 := by
       have hz : (Pi.single c 1 : Fin n → 𝒪[k]) ⬝ᵥ (Pi.single j s) = 0 := by
@@ -195,7 +228,8 @@ private theorem rowStep {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Represe
         split_ifs with h1 h2
         · exact absurd (h2.symm.trans h1) hjc
         all_goals simp
-      rw [hz]; ring
+      rw [hz]
+      ring
     refine ⟨tv (Pi.single j s) (Pi.single c 1) 1 h00, ?_⟩
     apply Units.ext
     ext a b
@@ -211,7 +245,8 @@ private theorem rowStep {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Represe
     rw [hyv, (hp a ha).1 j (lt_of_le_of_lt hj ha), zero_mul]
   have hw' : ∀ b, b ≤ i → w b = 0 := fun b hb => by
     rw [hwd, hinv c hci b (le_of_lt (lt_of_le_of_lt hb hci))]
-    exact Matrix.one_apply_ne (fun h => absurd (lt_of_le_of_lt hb hci) (by rw [h]; exact lt_irrefl b))
+    exact Matrix.one_apply_ne (fun h =>
+      absurd (lt_of_le_of_lt hb hci) (by rw [h]; exact lt_irrefl b))
   have hwc : w c = 1 := by rw [hwd, hinv c hci c le_rfl, Matrix.one_apply_eq]
   have hdot' : w ⬝ᵥ y = 0 := by
     rw [dotProduct]
@@ -237,11 +272,19 @@ private theorem rowStep {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Represe
   exact eq4
 
 set_option synthInstance.maxHeartbeats 200000 in
-private theorem exists_mem_Kc_rows_unitriangular (p : GL (Fin n) k) (i : Fin n)
-    (hp : ∀ a, i < a → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0) ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1)
-    (hd : ∀ j, j ≤ i → valuation k ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j) < 1) :
-    ∃ κ ∈ Kc k n 1, ∀ a, i ≤ a → (∀ j, j < a → ((p * κ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a j = 0) ∧
-      ((p * κ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a a = 1 := by
+private theorem exists_mem_Kc_rows_unitriangular
+    (p : GL (Fin n) k) (i : Fin n)
+    (hp : ∀ a,
+      i < a
+        → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0)
+          ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1)
+    (hd : ∀ j,
+      j ≤ i
+        → valuation k ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j) < 1)
+    : ∃ κ ∈ Kc k n 1, ∀ a,
+      i ≤ a
+        → (∀ j, j < a → ((p * κ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a j = 0)
+          ∧ ((p * κ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a a = 1 := by
   classical
   set P := (p : Matrix (Fin n) (Fin n) k) with hP
   let d : Fin n → k := fun j => if j ≤ i then P i j - (1 : Matrix (Fin n) (Fin n) k) i j else 0
@@ -268,8 +311,10 @@ private theorem exists_mem_Kc_rows_unitriangular (p : GL (Fin n) k) (i : Fin n)
   have hc : ((u⁻¹ : (𝒪[k])ˣ) : 𝒪[k]) * (1 + d₀ ⬝ᵥ y₀) = 1 := by rw [← hu']; exact u.inv_mul
   let M₀ : GL (Fin n) 𝒪[k] := tv y₀ d₀ _ hc
   let M : GL (Fin n) k := GeneralLinearGroup.map (algebraMap 𝒪[k] k) M₀
-  have hM : ∀ a b, (M : Matrix (Fin n) (Fin n) k) a b =
-      (1 : Matrix (Fin n) (Fin n) k) a b + (Pi.single i (1 : k) : Fin n → k) a * d b := by
+  have hM
+      : ∀ a b,
+        (M : Matrix (Fin n) (Fin n) k) a b
+          = (1 : Matrix (Fin n) (Fin n) k) a b + (Pi.single i (1 : k) : Fin n → k) a * d b := by
     intro a b
     simp only [M, GeneralLinearGroup.map_apply, M₀, tv_apply, map_add (f := _), map_mul]
     congr 1
@@ -330,14 +375,21 @@ private theorem exists_mem_Kc_rows_unitriangular (p : GL (Fin n) k) (i : Fin n)
         exact this
       exact ⟨fun j hj => by rw [hrow]; exact hz j hj, by rw [hrow]; exact h1⟩
 
-private theorem descent {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Representation ℂ (GL (Fin n) k) W)
-    (ψ : AddChar k Circle) (t : Fin n → k) (l : W →ₗ[ℂ] ℂ) (hψ : Lev1 ψ) (ht : ∀ i, valuation k (t i) = 1)
-    (hl : ∀ u ∈ unipB k (Fin n), ∀ v, l (τ u v) = chr ψ t u * l v) (v : W) (hlv : l v = 0)
-    (hfix : ∀ κ ∈ Kc k n 1, τ κ v = v)
-    (hv : ∀ u, u ∈ unipB k (Fin n) → u ∈ KO k (Fin n) → τ u v = chr ψ t u • v) (r : ℕ) :
-    r ≤ n - 1 → ∀ p : GL (Fin n) k,
-      (∀ a : Fin n, r ≤ (a : ℕ) → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0) ∧
-        (p : Matrix (Fin n) (Fin n) k) a a = 1) → l (τ p v) = 0 := by
+private theorem descent
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (τ : Representation ℂ (GL (Fin n) k) W) (ψ : AddChar k Circle) (t : Fin n → k) (l : W →ₗ[ℂ] ℂ)
+    (hψ : Lev1 ψ) (ht : ∀ i, valuation k (t i) = 1)
+    (hl : ∀ u ∈ unipB k (Fin n), ∀ v, l (τ u v) = chr ψ t u * l v)
+    (v : W) (hlv : l v = 0) (hfix : ∀ κ ∈ Kc k n 1, τ κ v = v)
+    (hv : ∀ u, u ∈ unipB k (Fin n) → u ∈ KO k (Fin n) → τ u v = chr ψ t u • v)
+    (r : ℕ)
+    : r ≤ n - 1
+      → ∀ p : GL (Fin n) k,
+        (∀ a : Fin n,
+            r ≤ (a : ℕ)
+              → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0)
+                ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1)
+          → l (τ p v) = 0 := by
   induction r with
   | zero =>
     intro _ p hp
@@ -351,15 +403,31 @@ private theorem descent {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Represe
     have hcn : r + 1 < n := by omega
     let i : Fin n := ⟨r, hrn⟩
     let c : Fin n := ⟨r + 1, hcn⟩
-    have hpi : ∀ a, i < a → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0) ∧
-        (p : Matrix (Fin n) (Fin n) k) a a = 1 := fun a ha => hp a (Fin.lt_def.1 ha)
-    have hd : ∀ j, j ≤ i → valuation k ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j) < 1 := by
+    have hpi
+        : ∀ a,
+          i < a
+            → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0)
+              ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1 := fun a ha =>
+      hp a (Fin.lt_def.1 ha)
+    have hd
+        : ∀ j,
+          j ≤ i
+            → valuation k ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j)
+              < 1 := by
       intro j hj
       have hs := rowStep τ ψ t l hl v hv p i c rfl hpi hW j hj
-      have h2 : ∀ s : 𝒪[k], ψ ((t i * ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j)) * (s : k)) = 1 := by
+      have h2
+          : ∀ s : 𝒪[k],
+            ψ
+                ((t i * ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j))
+                  * (s : k))
+              = 1 := by
         intro s
-        have e : t i * ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j) * (s : k) =
-            t i * ((p : Matrix (Fin n) (Fin n) k) i j * (s : k)) - t i * (Pi.single j (s : k) : Fin n → k) i := by
+        have e
+            : t i * ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j)
+                * (s : k)
+              = t i * ((p : Matrix (Fin n) (Fin n) k) i j * (s : k))
+                - t i * (Pi.single j (s : k) : Fin n → k) i := by
           rw [Pi.single_apply]
           rcases eq_or_ne i j with h | h
           · subst h
@@ -373,8 +441,7 @@ private theorem descent {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Represe
       exact h3
     obtain ⟨κ, hκ, hpk⟩ := exists_mem_Kc_rows_unitriangular p i hpi hd
     apply hW
-    have e : τ (p * κ) v = τ p v := by
-      rw [map_mul, Module.End.mul_apply, hfix κ hκ]
+    have e : τ (p * κ) v = τ p v := by rw [map_mul, Module.End.mul_apply, hfix κ hκ]
     rw [← e]
     exact ih (by omega) (p * κ) (fun a ha => hpk a (Fin.le_def.2 ha))
 
@@ -386,7 +453,8 @@ theorem isoLe : IsoLe := by
   have hfix : ∀ κ ∈ Kc k n 1, τ κ v = v := (Submodule.mem_inf.1 hv).1
   have heig : ∀ u, u ∈ unipB k (Fin n) → u ∈ KO k (Fin n) → τ u v = chr ψ t u • v := by
     intro u h1 h2
-    have h3 := (Submodule.mem_iInf _).1 (Submodule.mem_iInf _ |>.1 (Submodule.mem_inf.1 hv).2 u) ⟨h1, h2⟩
+    have h3 :=
+      (Submodule.mem_iInf _).1 (Submodule.mem_iInf _ |>.1 (Submodule.mem_inf.1 hv).2 u) ⟨h1, h2⟩
     exact Module.End.mem_eigenspace_iff.1 h3
   refine hsep v fun p hp => descent τ ψ t l hψ ht hl v hlv hfix heig (n - 1) le_rfl p fun a ha => ?_
   have hn : (a : ℕ) + 1 = n := by

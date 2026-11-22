@@ -6,8 +6,7 @@ public import Mathlib
 
 namespace CoprimeTimesDvdPowFactorization
 
-private theorem key (g m : ℕ) (hm : 0 < m) :
-    (m / Nat.gcd m (g ^ m)).Coprime g := by
+private theorem key (g m : ℕ) (hm : 0 < m) : (m / Nat.gcd m (g ^ m)).Coprime g := by
   set d := Nat.gcd m (g ^ m) with hd
   have hdpos : 0 < d := Nat.gcd_pos_of_pos_left _ hm
   have hcop : (m / d).Coprime (g ^ m / d) := Nat.coprime_div_gcd_div_gcd hdpos
@@ -34,9 +33,14 @@ private theorem key (g m : ℕ) (hm : 0 < m) :
 
 end CoprimeTimesDvdPowFactorization
 
-theorem UpperTheory.Reformulated.B.ExistsCoprimeMulDvdPow.main :
-    ∀ (g m : ℕ),
-    (0 : ℕ) < m → ∃ (c : ℕ) (d : ℕ), m = c * d ∧ c.Coprime g ∧ d ∣ g ^ m := by
+theorem UpperTheory.Reformulated.B.ExistsCoprimeMulDvdPow.main
+    : ∀ (g m : ℕ), (0 : ℕ) < m → ∃ (c : ℕ) (d : ℕ), m = c * d ∧ c.Coprime g ∧ d ∣ g ^ m := by
   intro g m hm
-  refine ⟨m / Nat.gcd m (g ^ m), Nat.gcd m (g ^ m), ?_, CoprimeTimesDvdPowFactorization.key g m hm, Nat.gcd_dvd_right _ _⟩
+  refine ⟨
+    m / Nat.gcd m (g ^ m),
+    Nat.gcd m (g ^ m),
+    ?_,
+    CoprimeTimesDvdPowFactorization.key g m hm,
+    Nat.gcd_dvd_right _ _
+  ⟩
   exact (Nat.div_mul_cancel (Nat.gcd_dvd_left _ _)).symm

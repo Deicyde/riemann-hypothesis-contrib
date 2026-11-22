@@ -7,10 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteInt
 
 namespace GlobalTheory
 
-private theorem isFractionRing_of_closure_subset_range {Ω S : Type*} [Field Ω] [CommRing S]
-    [Algebra S Ω] {t : Set Ω} (ht : Subfield.closure t = ⊤)
-    (hinj : Function.Injective (algebraMap S Ω)) (hS : t ⊆ Set.range (algebraMap S Ω)) :
-    IsFractionRing S Ω := by
+private theorem isFractionRing_of_closure_subset_range
+    {Ω S : Type*} [Field Ω] [CommRing S] [Algebra S Ω]
+    {t : Set Ω} (ht : Subfield.closure t = ⊤)
+    (hinj : Function.Injective (algebraMap S Ω)) (hS : t ⊆ Set.range (algebraMap S Ω))
+    : IsFractionRing S Ω := by
   have : FaithfulSMul S Ω := (faithfulSMul_iff_algebraMap_injective S Ω).mpr hinj
   refine IsFractionRing.of_field S Ω fun z => ?_
   have hz : z ∈ Subfield.closure t := by rw [ht]; exact Subfield.mem_top z
@@ -21,14 +22,27 @@ private theorem isFractionRing_of_closure_subset_range {Ω S : Type*} [Field Ω]
   obtain ⟨b, rfl⟩ := RingHom.mem_range.mp (hsub hw)
   exact ⟨a, b, rfl⟩
 
-theorem isFractionRing_subring_of_closure_eq_top {Ω : Type*} [Field Ω] {t : Set Ω}
-    (ht : Subfield.closure t = ⊤) (D : Subring Ω) (hD : t ⊆ D) : IsFractionRing D Ω :=
-  by
-    refine isFractionRing_of_closure_subset_range ht Subtype.val_injective fun x hx => ?_
-    exact ⟨⟨x, hD hx⟩, rfl⟩
+theorem isFractionRing_subring_of_closure_eq_top
+    {Ω : Type*} [Field Ω] {t : Set Ω} (ht : Subfield.closure t = ⊤) (D : Subring Ω) (hD : t ⊆ D)
+    : IsFractionRing D Ω := by
+  refine isFractionRing_of_closure_subset_range ht Subtype.val_injective fun x hx => ?_
+  exact ⟨⟨x, hD hx⟩, rfl⟩
 
-theorem exists_normalisation_adjoin_finset_dvr :
-    ∀ (O Ω : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Field Ω] [Algebra O Ω], Function.Injective (algebraMap O Ω) → ∀ (s : Finset Ω), Subfield.closure (Set.range (algebraMap O Ω) ∪ (s : Set Ω)) = ⊤ → ∃ A : Subalgebra O Ω, (s : Set Ω) ⊆ A ∧ Algebra.FiniteType O A ∧ Module.Flat O A ∧ IsIntegrallyClosed A ∧ IsFractionRing A Ω ∧ (∀ D : Subring Ω, IsIntegrallyClosed D → (∀ a, algebraMap O Ω a ∈ D) → (s : Set Ω) ⊆ D → (A : Set Ω) ⊆ D) ∧ ∀ (L : Type) [Field L] (W : ValuationSubring L) (φ : A →+* L), (∀ a, φ (algebraMap O A a) ∈ W) → (∀ (x : A), (x : Ω) ∈ s → φ x ∈ W) → ∀ x, φ x ∈ W := by
+theorem exists_normalisation_adjoin_finset_dvr
+    : ∀ (O Ω : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Field Ω]
+        [Algebra O Ω],
+      Function.Injective (algebraMap O Ω)
+        → ∀ (s : Finset Ω),
+          Subfield.closure (Set.range (algebraMap O Ω) ∪ (s : Set Ω)) = ⊤
+            → ∃ A : Subalgebra O Ω,
+              (s : Set Ω) ⊆ A ∧ Algebra.FiniteType O A ∧ Module.Flat O A ∧ IsIntegrallyClosed A
+                ∧ IsFractionRing A Ω
+                ∧ (∀ D : Subring Ω,
+                  IsIntegrallyClosed D → (∀ a, algebraMap O Ω a ∈ D) → (s : Set Ω) ⊆ D
+                    → (A : Set Ω) ⊆ D)
+                ∧ ∀ (L : Type) [Field L] (W : ValuationSubring L) (φ : A →+* L),
+                  (∀ a, φ (algebraMap O A a) ∈ W) → (∀ (x : A), (x : Ω) ∈ s → φ x ∈ W)
+                    → ∀ x, φ x ∈ W := by
   intro O Ω _ _ _ _ _ _ hinj s hs
   classical
   have : CharZero Ω := charZero_of_injective_algebraMap hinj
@@ -40,7 +54,8 @@ theorem exists_normalisation_adjoin_finset_dvr :
     · exact ⟨⟨_, hOR a⟩, rfl⟩
     · exact ⟨⟨x, hsR hx⟩, rfl⟩
   have : IsFractionRing R Ω := isFractionRing_of_closure_subset_range hs Subtype.val_injective htR
-  have : Algebra.FiniteType O R := (Subalgebra.fg_iff_finiteType R).mp (Subalgebra.fg_adjoin_finset s)
+  have : Algebra.FiniteType O R :=
+    (Subalgebra.fg_iff_finiteType R).mp (Subalgebra.fg_adjoin_finset s)
   have : Algebra.EssFiniteType R Ω := Algebra.EssFiniteType.of_isLocalization Ω (nonZeroDivisors R)
   have hfin : Module.Finite R (integralClosure R Ω) :=
     finite_integralClosure_of_essFiniteType_field (o := O) (R := R) Ω
@@ -50,15 +65,17 @@ theorem exists_normalisation_adjoin_finset_dvr :
     rintro x (⟨a, rfl⟩ | hx)
     · exact ⟨⟨_, hRB _ (hOR a)⟩, rfl⟩
     · exact ⟨⟨x, hRB _ (hsR hx)⟩, rfl⟩
-  have hBfrac : IsFractionRing B Ω := isFractionRing_of_closure_subset_range hs Subtype.val_injective htB
+  have hBfrac : IsFractionRing B Ω :=
+    isFractionRing_of_closure_subset_range hs Subtype.val_injective htB
   have hBic : IsIntegrallyClosed B := by
     refine (isIntegrallyClosed_iff Ω).mpr fun {x} hx => ?_
     have hx' : x ∈ integralClosure B Ω := hx
     rw [hBdef, integralClosure_idem] at hx'
     obtain ⟨y, rfl⟩ := Algebra.mem_bot.mp hx'
     exact ⟨y, rfl⟩
-  have hkey : ∀ (L : Type) [Field L] (W : ValuationSubring L) (φ : B →+* L),
-      (∀ y (hy : y ∈ R), φ (algebraMap R B ⟨y, hy⟩) ∈ W) → ∀ x, φ x ∈ W := by
+  have hkey
+      : ∀ (L : Type) [Field L] (W : ValuationSubring L) (φ : B →+* L),
+        (∀ y (hy : y ∈ R), φ (algebraMap R B ⟨y, hy⟩) ∈ W) → ∀ x, φ x ∈ W := by
     intro L _ W φ hφ x
     let φR : R →+* W := (φ.comp (algebraMap R B)).codRestrict W.toSubring fun r => hφ r.1 r.2
     have hx : IsIntegral W (φ x) :=
@@ -67,7 +84,8 @@ theorem exists_normalisation_adjoin_finset_dvr :
     rw [← hy]
     exact y.2
   refine ⟨B.restrictScalars O, fun x hx => hRB x (hsR hx), ?_, ?_, ?_, hBfrac, ?_, ?_⟩
-  · have hBO : Algebra.FiniteType O B := Algebra.FiniteType.trans (S := R) inferInstance inferInstance
+  · have hBO : Algebra.FiniteType O B :=
+      Algebra.FiniteType.trans (S := R) inferInstance inferInstance
     exact hBO
   · have : Module.IsTorsionFree O (B.restrictScalars O) := by
       refine Module.IsTorsionFree.of_smul_eq_zero fun r m h => ?_
@@ -82,8 +100,9 @@ theorem exists_normalisation_adjoin_finset_dvr :
     have hRD : R.toSubring ≤ D := by
       rw [hRdef, Algebra.adjoin_eq_ring_closure]
       exact Subring.closure_le.mpr (Set.union_subset (by rintro _ ⟨a, rfl⟩; exact hDO a) hDs)
-    have : IsFractionRing D Ω := isFractionRing_subring_of_closure_eq_top hs D
-      (Set.union_subset (by rintro _ ⟨a, rfl⟩; exact hDO a) hDs)
+    have : IsFractionRing D Ω :=
+      isFractionRing_subring_of_closure_eq_top hs D
+        (Set.union_subset (by rintro _ ⟨a, rfl⟩; exact hDO a) hDs)
     have hxi : IsIntegral R x := hx
     have hxD : IsIntegral D x :=
       IsIntegral.map_of_comp_eq (Subring.inclusion hRD : R →+* D) (RingHom.id Ω) (by ext r; rfl) hxi

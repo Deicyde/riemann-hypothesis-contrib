@@ -10,18 +10,20 @@ namespace PI.AprimeInfW
 
 open Topology Filter
 
-theorem exists_local_solution_contDiffAt {V : Type} [AddCommGroup V] [TopologicalSpace V] {N : ℕ}
-    (e : V ≃ₜ (Fin N → ℝ)) (he : ∀ x y, e (x + y) = e x + e y)
+theorem exists_local_solution_contDiffAt
+    {V : Type} [AddCommGroup V] [TopologicalSpace V]
+    {N : ℕ} (e : V ≃ₜ (Fin N → ℝ)) (he : ∀ x y, e (x + y) = e x + e y)
     (B : V → V → V) (hB1 : ∀ x x' y, B (x + x') y = B x y + B x' y)
-    (hB2 : ∀ x y y', B x (y + y') = B x y + B x y')
-    (hBc : Continuous (fun p : V × V => B p.1 p.2))
+    (hB2 : ∀ x y y', B x (y + y') = B x y + B x y') (hBc : Continuous (fun p : V × V => B p.1 p.2))
     (L : V → V) (hL : ∀ x y, L (x + y) = L x + L y) (hLc : Continuous L)
-    (x0 : V) (hD : ∀ u, B x0 u + B u x0 + L u = u + u) :
-    ∃ g : V → V, ContinuousAt g (B x0 x0 + L x0) ∧ g (B x0 x0 + L x0) = x0 ∧
-      (∀ᶠ y in 𝓝 (B x0 x0 + L x0), B (g y) (g y) + L (g y) = y) ∧
-      ContDiffAt ℝ 1 (fun y => e (g (e.symm y))) (e (B x0 x0 + L x0)) ∧
-      HasFDerivAt (fun y => e (g (e.symm y))) ((1 / 2 : ℝ) • ContinuousLinearMap.id ℝ (Fin N → ℝ))
-        (e (B x0 x0 + L x0)) := by
+    (x0 : V) (hD : ∀ u, B x0 u + B u x0 + L u = u + u)
+    : ∃ g : V → V,
+      ContinuousAt g (B x0 x0 + L x0) ∧ g (B x0 x0 + L x0) = x0
+        ∧ (∀ᶠ y in 𝓝 (B x0 x0 + L x0), B (g y) (g y) + L (g y) = y)
+        ∧ ContDiffAt ℝ 1 (fun y => e (g (e.symm y))) (e (B x0 x0 + L x0))
+        ∧ HasFDerivAt
+          (fun y => e (g (e.symm y)))
+          ((1 / 2 : ℝ) • ContinuousLinearMap.id ℝ (Fin N → ℝ)) (e (B x0 x0 + L x0)) := by
   classical
   have hes : ∀ u w, e.symm (u + w) = e.symm u + e.symm w := by
     intro u w
@@ -54,8 +56,10 @@ theorem exists_local_solution_contDiffAt {V : Type} [AddCommGroup V] [Topologica
   let b₂ : (Fin N → ℝ) →ₗ[ℝ] (Fin N → ℝ) →ₗ[ℝ] (Fin N → ℝ) := LinearMap.mk₂ ℝ b hb1 hbs1 hb2 hbs2
   let bL : (Fin N → ℝ) →L[ℝ] (Fin N → ℝ) →L[ℝ] (Fin N → ℝ) :=
     LinearMap.toContinuousLinearMap
-      ((LinearMap.toContinuousLinearMap : ((Fin N → ℝ) →ₗ[ℝ] (Fin N → ℝ)) ≃ₗ[ℝ]
-        ((Fin N → ℝ) →L[ℝ] (Fin N → ℝ))).toLinearMap ∘ₗ b₂)
+      ((LinearMap.toContinuousLinearMap
+          : ((Fin N → ℝ) →ₗ[ℝ] (Fin N → ℝ)) ≃ₗ[ℝ]
+            ((Fin N → ℝ) →L[ℝ] (Fin N → ℝ))).toLinearMap
+        ∘ₗ b₂)
   let lL : (Fin N → ℝ) →L[ℝ] (Fin N → ℝ) := (AddMonoidHom.mk' l hl1).toRealLinearMap hlc
   have hbL : ∀ u w, bL u w = b u w := fun u w => rfl
   have hlL : ∀ u, lL u = l u := fun u => rfl
@@ -81,8 +85,9 @@ theorem exists_local_solution_contDiffAt {V : Type} [AddCommGroup V] [Topologica
     norm_num
   let fe : (Fin N → ℝ) ≃L[ℝ] (Fin N → ℝ) := ContinuousLinearEquiv.equivOfInverse f₁ f₂ h12 h21
   have hFs : HasStrictFDerivAt Ft (fe : (Fin N → ℝ) →L[ℝ] (Fin N → ℝ)) u0 := by
-    have h0 := (bL.hasStrictFDerivAt_of_bilinear (hasStrictFDerivAt_id u0)
-      (hasStrictFDerivAt_id u0)).add lL.hasStrictFDerivAt
+    have h0 :=
+      (bL.hasStrictFDerivAt_of_bilinear (hasStrictFDerivAt_id u0) (hasStrictFDerivAt_id u0)).add
+        lL.hasStrictFDerivAt
     refine h0.congr_fderiv ?_
     ext1 w
     show bL u0 w + bL w u0 + lL w = (fe : (Fin N → ℝ) →L[ℝ] (Fin N → ℝ)) w

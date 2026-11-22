@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDatu
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical Pointwise
 
 noncomputable section
@@ -31,19 +32,21 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 variable {L : LocE F E} {r k : ℕ} (S : Frames L r k)
 
-theorem change (g : Fin (r + 1) → S.V) (K : Subgroup S.GLV)
+theorem change
+    (g : Fin (r + 1) → S.V) (K : Subgroup S.GLV)
     (hon : ∀ n ∈ K, ∃ s : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
       ((∀ i j, j < i → s i j = 0) ∧ ∀ i, s i i = 1) ∧ ∀ j, n (g j) = ∑ i, s i j • g i)
-    (σ a b : S.GLV) (ha : a ∈ K) (hb : b ∈ K) (h : ∀ j, σ (a (g j)) = b (g j)) :
-    ∃ s : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+    (σ a b : S.GLV) (ha : a ∈ K) (hb : b ∈ K) (h : ∀ j, σ (a (g j)) = b (g j))
+    : ∃ s : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
       ((∀ i j, j < i → s i j = 0) ∧ ∀ i, s i i = 1) ∧ ∀ j, σ (g j) = ∑ i, s i j • g i := by
   obtain ⟨u, hu, hu'⟩ := hon _ (K.mul_mem hb (K.inv_mem ha))
   obtain ⟨w, -, hw⟩ := hon _ (K.inv_mem ha)
   refine ⟨u, hu, fun j => ?_⟩
   rw [← hu' j]
-  have e1 : g j = a (a⁻¹ (g j)) := by
-    rw [← LinearEquiv.mul_apply, mul_inv_cancel]; rfl
-  calc σ (g j) = σ (a (∑ i, w i j • g i)) := by rw [← hw j, ← e1]
+  have e1 : g j = a (a⁻¹ (g j)) := by rw [← LinearEquiv.mul_apply, mul_inv_cancel]; rfl
+  calc
+    σ (g j)
+      = σ (a (∑ i, w i j • g i)) := by rw [← hw j, ← e1]
     _ = ∑ i, w i j • b (g i) := by simp only [map_sum, map_smul, h]
     _ = b (a⁻¹ (g j)) := by rw [hw j, map_sum]; simp only [map_smul]
     _ = (b * a⁻¹) (g j) := rfl
@@ -54,13 +57,16 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r k : ℕ}
 
-theorem grp_e {P : FPair H r} {S : Frames M.L r k} (c : Coord P S) (g : V ≃ₗ[E] V) (x : V) :
-    c.grp g (c.e x) = c.e (g x) := by
+theorem grp_e {P : FPair H r} {S : Frames M.L r k} (c : Coord P S) (g : V ≃ₗ[E] V) (x : V)
+    : c.grp g (c.e x) = c.e (g x) := by
   show c.e (g (c.e.symm (c.e x))) = _
   simp
 
-theorem grp_iso {P : FPair H r} {S : Frames M.L r k} (c : Coord P S) (g : V ≃ₗ[E] V) (hg : IsUnitary H g)
-    (x y : S.V) : hf M.L S.Hm (c.grp g x) (c.grp g y) = hf M.L S.Hm x y := by
+theorem grp_iso
+    {P : FPair H r} {S : Frames M.L r k} (c : Coord P S)
+    (g : V ≃ₗ[E] V) (hg : IsUnitary H g)
+    (x y : S.V)
+    : hf M.L S.Hm (c.grp g x) (c.grp g y) = hf M.L S.Hm x y := by
   obtain ⟨a, rfl⟩ := c.e.surjective x
   obtain ⟨b, rfl⟩ := c.e.surjective y
   have e := fun u v => c.h_eq u v
@@ -73,7 +79,14 @@ namespace GlobalTheory.LocOver
 
 open GlobalTheory.HL GlobalTheory.LocOver.OrbitUniq
 
-theorem orbit_over_unique : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ (k : ℕ) (P : FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M) → ∀ (d d' : Datum P) (t : Term V M r), Over P d t → Over P d' t → Datum.Rel d d' := by
+theorem orbit_over_unique
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ),
+          ∀ (k : ℕ) (P : FPair H r),
+            Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M)
+              → ∀ (d d' : Datum P) (t : Term V M r), Over P d t → Over P d' t → Datum.Rel d d' := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hrk hP d d' t h1 h2
   letI := hM.loc
   haveI := hM.char0
@@ -120,10 +133,12 @@ theorem orbit_over_unique : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologic
   set η : S.GLV := st⁻¹ * σ with hη
   have hηf : ∀ j, η (S.f j) = S.f j := fun j => by
     show st⁻¹ (σ (S.f j)) = S.f j
-    rw [hσf, ← hsf, ← LinearEquiv.mul_apply, inv_mul_cancel]; rfl
+    rw [hσf, ← hsf, ← LinearEquiv.mul_apply, inv_mul_cancel]
+    rfl
   have hηf' : ∀ j, η (S.f' j) = S.f' j := fun j => by
     show st⁻¹ (σ (S.f' j)) = S.f' j
-    rw [hσf', ← hsf', ← LinearEquiv.mul_apply, inv_mul_cancel]; rfl
+    rw [hσf', ← hsf', ← LinearEquiv.mul_apply, inv_mul_cancel]
+    rfl
   have fix : ∀ v ∈ S.ME, η v = v := by
     have : S.ME ≤ LinearMap.eqLocus (η : S.V →ₗ[E] S.V) LinearMap.id := by
       refine sup_le (Submodule.span_le.2 ?_) (Submodule.span_le.2 ?_)
@@ -134,8 +149,11 @@ theorem orbit_over_unique : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologic
     exact fun v hv => this hv
   have hσI : σ ∈ isomG M.L S.Hm := hσiso
   have hη0 : η ∈ S.H0 := by
-    refine ⟨(isomG M.L S.Hm).mul_mem ((isomG M.L S.Hm).inv_mem hst.1.1.1) hσI, fun v => ⟨fun h => ?_, fun h => ?_⟩,
-      fun v hv => ?_⟩
+    refine ⟨
+      (isomG M.L S.Hm).mul_mem ((isomG M.L S.Hm).inv_mem hst.1.1.1) hσI,
+      fun v => ⟨fun h => ?_, fun h => ?_⟩,
+      fun v hv => ?_
+    ⟩
     · rwa [η.injective (fix _ h)] at h
     · rw [fix v h]; exact h
     · rw [fix v hv, sub_self]; exact zero_mem _

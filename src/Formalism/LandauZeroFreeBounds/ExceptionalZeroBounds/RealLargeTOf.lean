@@ -58,7 +58,8 @@ theorem realCharZeroFreeLargeHeightOfBounds : RealLargeTOf := by
   obtain ⟨K, hK⟩ : ∃ K : ℝ, K = 4 * max C₁ 0 + 2 * max C₃ 0 + 6 * C₂ := ⟨_, rfl⟩
   have hK0 : 0 ≤ K := by rw [hK]; positivity
   obtain ⟨a, ha⟩ : ∃ a : ℝ, a = min (δ / 2) (min (1 / 10) (1 / (4 * K + 1))) := ⟨_, rfl⟩
-  have ha0 : 0 < a := by rw [ha]; exact lt_min (by positivity) (lt_min (by norm_num) (by positivity))
+  have ha0 : 0 < a := by
+    rw [ha]; exact lt_min (by positivity) (lt_min (by norm_num) (by positivity))
   have ha1 : a ≤ δ / 2 := by rw [ha]; exact min_le_left _ _
   have ha2 : a ≤ 1 / 10 := by rw [ha]; exact (min_le_right _ _).trans (min_le_left _ _)
   have ha3 : a ≤ 1 / (4 * K + 1) := by rw [ha]; exact (min_le_right _ _).trans (min_le_right _ _)
@@ -103,11 +104,9 @@ theorem realCharZeroFreeLargeHeightOfBounds : RealLargeTOf := by
     have : a / L / 8 ≤ 1 / 40 := by linarith
     constructor <;> linarith
   have hterm : ∀ ρ ∈ Z, 0 ≤ (m ρ : ℝ) * (1 / ((σ : ℂ) + s.im * I - ρ)).re := fun ρ hρ =>
-    mul_nonneg (Nat.cast_nonneg _)
-      (re_one_div_sub_zero_pos χ hχ1 ρ ((hZ ρ).mp hρ).2 σ s.im hσ1).le
+    mul_nonneg (Nat.cast_nonneg _) (re_one_div_sub_zero_pos χ hχ1 ρ ((hZ ρ).mp hρ).2 σ s.im hσ1).le
   have hs_term : (1 / ((σ : ℂ) + s.im * I - s)).re = 1 / (σ - s.re) := by
-    have hd : (σ : ℂ) + s.im * I - s = ((σ - s.re : ℝ) : ℂ) := by
-      apply Complex.ext <;> simp
+    have hd : (σ : ℂ) + s.im * I - s = ((σ - s.re : ℝ) : ℂ) := by apply Complex.ext <;> simp
     rw [hd, ← Complex.ofReal_one, ← Complex.ofReal_div, Complex.ofReal_re]
   have hsum : 1 / (σ - s.re) ≤ ∑ ρ ∈ Z, (m ρ : ℝ) * (1 / ((σ : ℂ) + s.im * I - ρ)).re := by
     refine le_trans ?_ (Finset.single_le_sum hterm hsZ)
@@ -145,7 +144,9 @@ theorem realCharZeroFreeLargeHeightOfBounds : RealLargeTOf := by
     rw [div_le_iff₀ hden]
     have e : a / L = a * L / (4 * δ ^ 2) * (4 * (δ ^ 2 / L ^ 2)) := by field_simp
     have hc : 0 ≤ a * L / (4 * δ ^ 2) := by positivity
-    calc a / L = a * L / (4 * δ ^ 2) * (4 * (δ ^ 2 / L ^ 2)) := e
+    calc
+      a / L
+        = a * L / (4 * δ ^ 2) * (4 * (δ ^ 2 / L ^ 2)) := e
       _ ≤ a * L / (4 * δ ^ 2) * ((a / L) ^ 2 + (2 * s.im) ^ 2) := by
         apply mul_le_mul_of_nonneg_left _ hc
         nlinarith [sq_nonneg (a / L)]
@@ -158,12 +159,16 @@ theorem realCharZeroFreeLargeHeightOfBounds : RealLargeTOf := by
   have hC1L : C₁ * L ≤ max C₁ 0 * L := mul_le_mul_of_nonneg_right (le_max_left _ _) hLpos.le
   have hw : 0 < L / a := div_pos hLpos ha0
   have hKL : K * L ≤ L / a / 4 := by
-    calc K * L = K * a * (L / a) := by field_simp
+    calc
+      K * L
+        = K * a * (L / a) := by field_simp
       _ ≤ 1 / 4 * (L / a) := mul_le_mul_of_nonneg_right hKa hw.le
       _ = L / a / 4 := by ring
   have hKL' : K * L = 4 * max C₁ 0 * L + 2 * max C₃ 0 * L + 6 * C₂ * L := by rw [hK]; ring
   have hPw : a * L / (4 * δ ^ 2) ≤ L / a / 16 := by
-    calc a * L / (4 * δ ^ 2) = a ^ 2 / (4 * δ ^ 2) * (L / a) := by field_simp
+    calc
+      a * L / (4 * δ ^ 2)
+        = a ^ 2 / (4 * δ ^ 2) * (L / a) := by field_simp
       _ ≤ 1 / 16 * (L / a) := mul_le_mul_of_nonneg_right hδa hw.le
       _ = L / a / 16 := by ring
   have hC2 : 3 * C₂ ≤ 6 * C₂ * L := by

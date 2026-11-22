@@ -10,21 +10,23 @@ open scoped InnerProductSpace
 
 section WeakAdjLemmas
 
-variable {E H₁ H₂ : Type*} [AddCommGroup E] [Module ℂ E]
-    [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
-    [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
+variable
+  {E H₁ H₂ : Type*} [AddCommGroup E] [Module ℂ E] [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
+  [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
 
-theorem WeakAdj.sub {ι : E →ₗ[ℂ] H₁} {t : E →ₗ[ℂ] H₂} {f f' : H₂} {w w' : H₁}
-    (h : WeakAdj ι t f w) (h' : WeakAdj ι t f' w') : WeakAdj ι t (f - f') (w - w') := by
+theorem WeakAdj.sub
+    {ι : E →ₗ[ℂ] H₁} {t : E →ₗ[ℂ] H₂} {f f' : H₂} {w w' : H₁}
+    (h : WeakAdj ι t f w) (h' : WeakAdj ι t f' w')
+    : WeakAdj ι t (f - f') (w - w') := by
   intro g
   rw [inner_sub_right, inner_sub_right, h g, h' g]
 
 end WeakAdjLemmas
 
-theorem split (E H₁ H₂ : Type*) [AddCommGroup E] [Module ℂ E]
-    [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
-    [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂] :
-    SplitStatement E H₁ H₂ := by
+theorem split
+    (E H₁ H₂ : Type*) [AddCommGroup E] [Module ℂ E] [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
+    [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂]
+    : SplitStatement E H₁ H₂ := by
   intro ι t K hK hrange f w hfw
   haveI : CompleteSpace K := hK.completeSpace_coe
   obtain ⟨f₁, hf₁, f₂, hf₂, rfl⟩ := K.exists_add_mem_mem_orthogonal f

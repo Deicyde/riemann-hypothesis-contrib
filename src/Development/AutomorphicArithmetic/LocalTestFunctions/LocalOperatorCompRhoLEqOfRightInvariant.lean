@@ -11,14 +11,19 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
 open scoped TensorProduct InnerProductSpace ComplexConjugate Pointwise
 
-private theorem map_right_eq_of_CO {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    (m : Measure G) [m.IsHaarMeasure] {J : Subgroup G} (hJ : CO J) {k : G} (hk : k ∈ J) :
-    Measure.map (· * k) m = m := by
+private theorem map_right_eq_of_CO
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (m : Measure G) [m.IsHaarMeasure]
+    {J : Subgroup G} (hJ : CO J)
+    {k : G} (hk : k ∈ J)
+    : Measure.map (· * k) m = m := by
   have hcont : Measurable (· * k : G → G) := (continuous_mul_const k).measurable
   haveI : (Measure.map (· * k) m).IsHaarMeasure := Measure.isHaarMeasure_map_mul_right m k
   have h := Measure.isMulLeftInvariant_eq_smul (Measure.map (· * k) m) m
@@ -31,18 +36,23 @@ private theorem map_right_eq_of_CO {G : Type} [Group G] [TopologicalSpace G] [Is
   have e := congrArg (fun ν : Measure G => ν (J : Set G)) h
   simp only [Measure.map_apply hcont hmeas, hpre, Measure.smul_apply] at e
   have hc : Measure.haarScalarFactor (Measure.map (· * k) m) m = 1 := by
-    have e' : m (J : Set G) = (Measure.haarScalarFactor (Measure.map (· * k) m) m : ENNReal) * m (J : Set G) := by
+    have e'
+        : m (J : Set G)
+          = (Measure.haarScalarFactor (Measure.map (· * k) m) m : ENNReal) * m (J : Set G) := by
       simpa [ENNReal.smul_def] using e
     have : ((Measure.haarScalarFactor (Measure.map (· * k) m) m : NNReal) : ENNReal) = 1 :=
       ((ENNReal.mul_eq_right h0 hT).1 e'.symm)
     exact_mod_cast this
   rw [h, hc, one_smul]
 
-theorem UpperTheory.localOperator_comp_rhoL_eq_of_right_invariant :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (w : Pl K)
-          [MeasurableSpace (Gw n w)] [BorelSpace (Gw n w)] (mw : Measure (Gw n w)) [mw.IsHaarMeasure] (J : Subgroup (Gw n w)), CO J →
-          ∀ (φ : Gw n w → ℂ), (∀ k ∈ J, ∀ x, φ (x * k) = φ x) → ∀ T : LL μ →L[ℂ] LL μ, IsOloc μ w mw φ T →
-          ∀ k ∈ J, T ∘L rhoL μ w k = T := by
+theorem UpperTheory.localOperator_comp_rhoL_eq_of_right_invariant
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n)))
+        [μ.IsHaarMeasure] (w : Pl K) [MeasurableSpace (Gw n w)] [BorelSpace (Gw n w)]
+        (mw : Measure (Gw n w)) [mw.IsHaarMeasure] (J : Subgroup (Gw n w)),
+      CO J
+        → ∀ (φ : Gw n w → ℂ),
+          (∀ k ∈ J, ∀ x, φ (x * k) = φ x)
+            → ∀ T : LL μ →L[ℂ] LL μ, IsOloc μ w mw φ T → ∀ k ∈ J, T ∘L rhoL μ w k = T := by
   intro K _ _ n μ _ w _ _ mw _ J hJ φ hφ T hT k hk
   have hmul : ∀ (g : Gw n w) (v : LL μ), rhoL μ w (g * k) v = rhoL μ w g (rhoL μ w k v) := by
     intro g v

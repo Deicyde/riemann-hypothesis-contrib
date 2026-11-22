@@ -5,8 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open MeasureTheory Set UpperHalfPlane in
-private theorem UpperTheory.V.Af.Rs.volume_open_pos_upper_half_plane (U : Set ℍ) (hU : IsOpen U) (hne : U.Nonempty) :
-    0 < (volume : Measure ℍ) U := by
+private theorem UpperTheory.V.Af.Rs.volume_open_pos_upper_half_plane
+    (U : Set ℍ) (hU : IsOpen U) (hne : U.Nonempty)
+    : 0 < (volume : Measure ℍ) U := by
   rw [pos_iff_ne_zero]
   intro h0
   have hac : (volume.comap UpperHalfPlane.coe : Measure ℍ) ≪ (volume : Measure ℍ) := by
@@ -24,15 +25,13 @@ private theorem UpperTheory.V.Af.Rs.volume_open_pos_upper_half_plane (U : Set �
   exact ((isOpenEmbedding_coe.isOpenMap U hU).measure_pos volume (hne.image _)).ne' h1
 
 open MeasureTheory Set UpperHalfPlane in
-theorem UpperTheory.V.Af.Rs.fdPos :
-    UpperTheory.V.Af.Rs.VolMap → UpperTheory.V.Af.Rs.FdPos := by
+theorem UpperTheory.V.Af.Rs.fdPos : UpperTheory.V.Af.Rs.VolMap → UpperTheory.V.Af.Rs.FdPos := by
   intro _ φ hc h0 hint z hz hpos
   rw [setIntegral_pos_iff_support_of_nonneg_ae (Filter.Eventually.of_forall h0) hint]
   have hV : IsOpen {w : ℍ | 0 < φ w} := isOpen_lt continuous_const hc
   rw [ModularGroup.fd_eq_closure_fdo] at hz
-  have hne : ({w : ℍ | 0 < φ w} ∩ ModularGroup.fdo).Nonempty :=
-    mem_closure_iff.mp hz _ hV hpos
-  refine (UpperTheory.V.Af.Rs.volume_open_pos_upper_half_plane _ (hV.inter ModularGroup.isOpen_fdo) hne).trans_le
-    (measure_mono ?_)
+  have hne : ({w : ℍ | 0 < φ w} ∩ ModularGroup.fdo).Nonempty := mem_closure_iff.mp hz _ hV hpos
+  refine (UpperTheory.V.Af.Rs.volume_open_pos_upper_half_plane _ (hV.inter ModularGroup.isOpen_fdo)
+    hne).trans_le (measure_mono ?_)
   rintro w ⟨hw, hw'⟩
   exact ⟨ne_of_gt hw, ModularGroup.fdo_subset_fd hw'⟩

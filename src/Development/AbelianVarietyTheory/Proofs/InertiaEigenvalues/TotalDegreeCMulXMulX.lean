@@ -15,7 +15,8 @@ def intRing : Subring K where
   carrier := Metric.closedBall 0 1
   mul_mem' {a b} ha hb := by
     simp only [mem_closedBall_zero_iff] at *
-    rw [norm_mul]; exact mul_le_one₀ ha (norm_nonneg _) hb
+    rw [norm_mul]
+    exact mul_le_one₀ ha (norm_nonneg _) hb
   one_mem' := by simp
   add_mem' {a b} ha hb := by
     simp only [mem_closedBall_zero_iff] at *
@@ -46,7 +47,8 @@ instance maxIdeal_isMaximal : (maxIdeal K).IsMaximal := by
   have hx0 : (x : K) ≠ 0 := by intro h; rw [h, norm_zero] at h1; exact zero_ne_one h1
   let y : intRing K := ⟨(x : K)⁻¹, mem_closedBall_zero_iff.2 (by rw [norm_inv, h1, inv_one])⟩
   have hyx : y * x = 1 := Subtype.ext (by simp [y, inv_mul_cancel₀ hx0])
-  rw [← hyx]; exact J.mul_mem_left y hxJ
+  rw [← hyx]
+  exact J.mul_mem_left y hxJ
 
 theorem finite_res [LocallyCompactSpace K] : Finite (intRing K ⧸ maxIdeal K) := by
   haveI : ProperSpace K := ProperSpace.of_locallyCompactSpace K
@@ -55,7 +57,8 @@ theorem finite_res [LocallyCompactSpace K] : Finite (intRing K ⧸ maxIdeal K) :
   have hopen : IsOpen ((maxIdeal K : Set (intRing K))) := by
     have e : ((maxIdeal K : Set (intRing K))) = Subtype.val ⁻¹' Metric.ball (0 : K) 1 := by
       ext x; simp [mem_maxIdeal]
-    rw [e]; exact Metric.isOpen_ball.preimage continuous_subtype_val
+    rw [e]
+    exact Metric.isOpen_ball.preimage continuous_subtype_val
   exact AddSubgroup.quotient_finite_of_isOpen (maxIdeal K).toAddSubgroup hopen
 
 end GlobalTheory.NormUnits
@@ -69,16 +72,18 @@ abbrev Res : Type := intRing K ⧸ maxIdeal K
 
 instance : Field (Res K) := Ideal.Quotient.field _
 
-theorem totalDegree_C_mul_X_mul_X {k : Type} [Field k] (r : k) (i j : Fin 3) :
-    (C r * (X i * X j) : MvPolynomial (Fin 3) k).totalDegree ≤ 2 := by
+theorem totalDegree_C_mul_X_mul_X {k : Type} [Field k] (r : k) (i j : Fin 3)
+    : (C r * (X i * X j) : MvPolynomial (Fin 3) k).totalDegree ≤ 2 := by
   refine (totalDegree_mul _ _).trans ?_
   rw [totalDegree_C, zero_add]
   refine (totalDegree_mul _ _).trans ?_
   simp [totalDegree_X]
 
-theorem exists_point_mod [LocallyCompactSpace K] (s t c : K) (hs : ‖s‖ ≤ 1) (ht : ‖t‖ ≤ 1) (hc : ‖c‖ ≤ 1) :
-    ∃ a b z : K, ‖a‖ ≤ 1 ∧ ‖b‖ ≤ 1 ∧ ‖z‖ ≤ 1 ∧ (‖a‖ = 1 ∨ ‖b‖ = 1 ∨ ‖z‖ = 1) ∧
-      ‖a ^ 2 + s * a * b + t * b ^ 2 - c * z ^ 2‖ < 1 := by
+theorem exists_point_mod
+    [LocallyCompactSpace K] (s t c : K) (hs : ‖s‖ ≤ 1) (ht : ‖t‖ ≤ 1) (hc : ‖c‖ ≤ 1)
+    : ∃ a b z : K,
+      ‖a‖ ≤ 1 ∧ ‖b‖ ≤ 1 ∧ ‖z‖ ≤ 1 ∧ (‖a‖ = 1 ∨ ‖b‖ = 1 ∨ ‖z‖ = 1)
+        ∧ ‖a ^ 2 + s * a * b + t * b ^ 2 - c * z ^ 2‖ < 1 := by
   classical
   haveI := finite_res K
   letI : Fintype (Res K) := Fintype.ofFinite _
@@ -90,15 +95,17 @@ theorem exists_point_mod [LocallyCompactSpace K] (s t c : K) (hs : ‖s‖ ≤ 1
   set p := ringChar k
   haveI : CharP k p := ringChar.charP k
   obtain ⟨n, hpp, -⟩ := FiniteField.card (K := k) p
-  let f : MvPolynomial (Fin 3) k := C 1 * (X 0 * X 0) + C (π S) * (X 0 * X 1) + C (π T) * (X 1 * X 1) +
-    C (-π Cc) * (X 2 * X 2)
+  let f : MvPolynomial (Fin 3) k :=
+    C 1 * (X 0 * X 0) + C (π S) * (X 0 * X 1) + C (π T) * (X 1 * X 1) + C (- π Cc) * (X 2 * X 2)
   have hdeg : f.totalDegree < Fintype.card (Fin 3) := by
     have h1 := totalDegree_C_mul_X_mul_X (1 : k) 0 0
     have h2 := totalDegree_C_mul_X_mul_X (π S) 0 1
     have h3 := totalDegree_C_mul_X_mul_X (π T) 1 1
-    have h4 := totalDegree_C_mul_X_mul_X (-π Cc) 2 2
-    have := (totalDegree_add _ _).trans (max_le ((totalDegree_add _ _).trans (max_le
-      ((totalDegree_add _ _).trans (max_le h1 h2)) h3)) h4)
+    have h4 := totalDegree_C_mul_X_mul_X (- π Cc) 2 2
+    have :=
+      (totalDegree_add _ _).trans
+        (max_le
+          ((totalDegree_add _ _).trans (max_le ((totalDegree_add _ _).trans (max_le h1 h2)) h3)) h4)
     simp only [Fintype.card_fin]
     exact lt_of_le_of_lt this (by norm_num)
   have hdvd := char_dvd_card_solutions p hdeg
@@ -119,7 +126,8 @@ theorem exists_point_mod [LocallyCompactSpace K] (s t c : K) (hs : ‖s‖ ≤ 1
   have hunit : ∀ i, x.1 i ≠ 0 → ‖((l i : intRing K) : K)‖ = 1 := by
     intro i hi
     refine le_antisymm (norm_le_one K _) (not_lt.1 fun h => hi ?_)
-    rw [← hl i]; exact (Ideal.Quotient.eq_zero_iff_mem).2 ((mem_maxIdeal K _).2 h)
+    rw [← hl i]
+    exact (Ideal.Quotient.eq_zero_iff_mem).2 ((mem_maxIdeal K _).2 h)
   refine ⟨l 0, l 1, l 2, norm_le_one K _, norm_le_one K _, norm_le_one K _, ?_, ?_⟩
   · obtain ⟨i, hi⟩ := Function.ne_iff.1 hx0
     fin_cases i
@@ -136,19 +144,19 @@ namespace GlobalTheory.NormUnits
 
 variable (K : Type) [NontriviallyNormedField K] [IsUltrametricDist K]
 
-theorem exists_sqrt_mod [LocallyCompactSpace K] (t : K) (ht : ‖t‖ ≤ 1) (h2 : ‖(2 : K)‖ < 1) :
-    ∃ r : K, ‖r‖ ≤ 1 ∧ ‖r ^ 2 - t‖ < 1 := by
+theorem exists_sqrt_mod [LocallyCompactSpace K] (t : K) (ht : ‖t‖ ≤ 1) (h2 : ‖(2 : K)‖ < 1)
+    : ∃ r : K, ‖r‖ ≤ 1 ∧ ‖r ^ 2 - t‖ < 1 := by
   classical
   haveI := finite_res K
   letI : Fintype (Res K) := Fintype.ofFinite _
   let T : intRing K := ⟨t, mem_closedBall_zero_iff.2 ht⟩
   have h2k : (2 : Res K) = 0 := by
-    have h11 : (((1 + 1 : intRing K)) : K) = 2 := by
-      rw [Subring.coe_add, Subring.coe_one]; norm_num
+    have h11 : (((1 + 1 : intRing K)) : K) = 2 := by rw [Subring.coe_add, Subring.coe_one]; norm_num
     have : (Ideal.Quotient.mk (maxIdeal K) (1 + 1) : Res K) = 0 :=
       (Ideal.Quotient.eq_zero_iff_mem).2 ((mem_maxIdeal K _).2 (by rw [h11]; exact h2))
     rw [map_add (f := _), map_one] at this
-    rw [← one_add_one_eq_two]; exact this
+    rw [← one_add_one_eq_two]
+    exact this
   have hchar : ringChar (Res K) = 2 := by
     have hd : ringChar (Res K) ∣ 2 := ringChar.dvd (by exact_mod_cast h2k)
     rcases (Nat.dvd_prime Nat.prime_two).1 hd with h | h

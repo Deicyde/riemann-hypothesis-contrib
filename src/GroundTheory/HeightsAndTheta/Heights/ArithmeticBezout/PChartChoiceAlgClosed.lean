@@ -17,11 +17,12 @@ namespace ChartChoiceAlgClosed
 
 variable {F : Type} [Field F] {n e : ℕ}
 
-theorem isChowForm_iff_span {P : Ideal (MvPolynomial (Fin n) F)} {k : ℕ}
-    {g : MvPolynomial (Fin k × Fin n) F} :
-    IsChowForm P k g ↔ g ≠ 0 ∧ incIdeal P k = Ideal.span {g} := by
-  have hmem : ∀ G : MvPolynomial (Fin k × Fin n) F,
-      G ∈ incIdeal P k ↔ ∀ v ∈ incidence P k, aeval v G = 0 := fun G => by
+theorem isChowForm_iff_span
+    {P : Ideal (MvPolynomial (Fin n) F)} {k : ℕ} {g : MvPolynomial (Fin k × Fin n) F}
+    : IsChowForm P k g ↔ g ≠ 0 ∧ incIdeal P k = Ideal.span {g} := by
+  have hmem
+      : ∀ G : MvPolynomial (Fin k × Fin n) F,
+        G ∈ incIdeal P k ↔ ∀ v ∈ incidence P k, aeval v G = 0 := fun G => by
     simp [incIdeal, Submodule.mem_iInf, RingHom.mem_ker]
   constructor
   · rintro ⟨h0, h⟩
@@ -35,17 +36,22 @@ theorem isChowForm_iff_span {P : Ideal (MvPolynomial (Fin n) F)} {k : ℕ}
 
 def shiftVar (e n : ℕ) : Fin e × Fin n → Fin (e + 1) × Fin n := fun jm => (jm.1.succ, jm.2)
 
-def splitFirst (F : Type) [Field F] (e n : ℕ) :
-    MvPolynomial (Fin (e + 1) × Fin n) F →ₐ[F] MvPolynomial (Fin n) (MvPolynomial (Fin e × Fin n) F) :=
-  aeval fun ij => Fin.cases (motive := fun _ => MvPolynomial (Fin n) (MvPolynomial (Fin e × Fin n) F))
-    (X ij.2) (fun j => C (X (j, ij.2))) ij.1
+def splitFirst (F : Type) [Field F] (e n : ℕ)
+    : MvPolynomial (Fin (e + 1) × Fin n) F →ₐ[F] MvPolynomial (Fin n) (MvPolynomial (Fin e × Fin n) F) :=
+  aeval fun ij =>
+    Fin.cases
+      (motive := fun _ => MvPolynomial (Fin n) (MvPolynomial (Fin e × Fin n) F))
+      (X ij.2)
+      (fun j => C (X (j, ij.2)))
+      ij.1
 
-def joinFirst (F : Type) [Field F] (e n : ℕ) :
-    MvPolynomial (Fin n) (MvPolynomial (Fin e × Fin n) F) →+* MvPolynomial (Fin (e + 1) × Fin n) F :=
+def joinFirst (F : Type) [Field F] (e n : ℕ)
+    : MvPolynomial (Fin n) (MvPolynomial (Fin e × Fin n) F)
+      →+* MvPolynomial (Fin (e + 1) × Fin n) F :=
   eval₂Hom (rename (shiftVar e n)).toRingHom (fun m => X (0, m))
 
-theorem joinFirst_splitFirst (p : MvPolynomial (Fin (e + 1) × Fin n) F) :
-    joinFirst F e n (splitFirst F e n p) = p := by
+theorem joinFirst_splitFirst (p : MvPolynomial (Fin (e + 1) × Fin n) F)
+    : joinFirst F e n (splitFirst F e n p) = p := by
   have h : (joinFirst F e n).comp (splitFirst F e n).toRingHom = RingHom.id _ := by
     apply MvPolynomial.ringHom_ext
     · intro a
@@ -54,12 +60,12 @@ theorem joinFirst_splitFirst (p : MvPolynomial (Fin (e + 1) × Fin n) F) :
       induction i using Fin.cases <;> simp [joinFirst, splitFirst, shiftVar]
   exact RingHom.congr_fun h p
 
-theorem joinFirst_C (a : MvPolynomial (Fin e × Fin n) F) :
-    joinFirst F e n (C a) = rename (shiftVar e n) a := by
+theorem joinFirst_C (a : MvPolynomial (Fin e × Fin n) F)
+    : joinFirst F e n (C a) = rename (shiftVar e n) a := by
   simp [joinFirst]
 
-theorem specFirst_rename_shiftVar (q : MvPolynomial (Fin e × Fin n) F) :
-    specFirst (rename (shiftVar e n) q) 0 = q := by
+theorem specFirst_rename_shiftVar (q : MvPolynomial (Fin e × Fin n) F)
+    : specFirst (rename (shiftVar e n) q) 0 = q := by
   unfold specFirst
   rw [bind₁_rename]
   have : (specFirstVar (0 : Fin n → F) ∘ shiftVar e n) = X := by
@@ -68,8 +74,9 @@ theorem specFirst_rename_shiftVar (q : MvPolynomial (Fin e × Fin n) F) :
   rw [this, bind₁_X_left]
   rfl
 
-theorem specFirst_zero_of_isMultiHomog {δ : ℕ} (hδ : 1 ≤ δ) {f : MvPolynomial (Fin (e + 1) × Fin n) F}
-    (hf : IsMultiHomog δ f) : specFirst f 0 = 0 := by
+theorem specFirst_zero_of_isMultiHomog
+    {δ : ℕ} (hδ : 1 ≤ δ) {f : MvPolynomial (Fin (e + 1) × Fin n) F} (hf : IsMultiHomog δ f)
+    : specFirst f 0 = 0 := by
   classical
   unfold specFirst
   conv_lhs => rw [f.as_sum]
@@ -92,13 +99,16 @@ theorem specFirst_zero_of_isMultiHomog {δ : ℕ} (hδ : 1 ≤ δ) {f : MvPolyno
   subst h0
   simp [specFirstVar, zero_pow (Finsupp.mem_support_iff.mp hi)]
 
-theorem eval_map_splitFirst (J : Ideal (MvPolynomial (Fin e × Fin n) F)) (t : Fin n → F)
-    (f : MvPolynomial (Fin (e + 1) × Fin n) F) :
-    eval (fun m => Ideal.Quotient.mk J (C (t m))) (map (Ideal.Quotient.mk J) (splitFirst F e n f)) =
-      Ideal.Quotient.mk J (specFirst f t) := by
+theorem eval_map_splitFirst
+    (J : Ideal (MvPolynomial (Fin e × Fin n) F)) (t : Fin n → F)
+    (f : MvPolynomial (Fin (e + 1) × Fin n) F)
+    : eval (fun m => Ideal.Quotient.mk J (C (t m))) (map (Ideal.Quotient.mk J) (splitFirst F e n f))
+      = Ideal.Quotient.mk J (specFirst f t) := by
   rw [eval_map]
-  have h : (eval₂Hom (Ideal.Quotient.mk J) (fun m => Ideal.Quotient.mk J (C (t m)))).comp
-      (splitFirst F e n).toRingHom = (Ideal.Quotient.mk J).comp (bind₁ (specFirstVar t)).toRingHom := by
+  have h
+      : (eval₂Hom (Ideal.Quotient.mk J) (fun m => Ideal.Quotient.mk J (C (t m)))).comp
+          (splitFirst F e n).toRingHom
+        = (Ideal.Quotient.mk J).comp (bind₁ (specFirstVar t)).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro a
       simp [splitFirst, MvPolynomial.algebraMap_eq]
@@ -108,10 +118,10 @@ theorem eval_map_splitFirst (J : Ideal (MvPolynomial (Fin e × Fin n) F)) (t : F
 
 end ChartChoiceAlgClosed
 
-
 open ChartChoiceAlgClosed in
-theorem ChartChoiceAlgClosed.proof (h₁ : IncIdealPrime.Statement) (h₂ : ChowFormMultiHomog.Statement) :
-    ChartChoiceAlgClosed.Statement := by
+theorem ChartChoiceAlgClosed.proof
+    (h₁ : IncIdealPrime.Statement) (h₂ : ChowFormMultiHomog.Statement)
+    : ChartChoiceAlgClosed.Statement := by
   intro F _ _ n e I f q hI hf hq
   classical
   obtain ⟨hf0, hspan⟩ := isChowForm_iff_span.mp hf
@@ -135,7 +145,9 @@ theorem ChartChoiceAlgClosed.proof (h₁ : IncIdealPrime.Statement) (h₂ : Chow
     · have hunit : IsUnit (rename (shiftVar e n) q) := by
         refine isUnit_iff_exists_inv.mpr ⟨h, ?_⟩
         apply mul_left_cancel₀ hf0
-        calc f * (rename (shiftVar e n) q * h) = rename (shiftVar e n) q * (f * h) := by ring
+        calc
+          f * (rename (shiftVar e n) q * h)
+            = rename (shiftVar e n) q * (f * h) := by ring
           _ = f * 1 := by rw [← hh, ← hg, mul_one]
       have := hunit.map (bind₁ (specFirstVar (0 : Fin n → F)))
       have h' : bind₁ (specFirstVar (0 : Fin n → F)) (rename (shiftVar e n) q) = q :=
@@ -150,7 +162,8 @@ theorem ChartChoiceAlgClosed.proof (h₁ : IncIdealPrime.Statement) (h₂ : Chow
     have hmem : splitFirst F e n f ∈ RingHom.ker (map (σ := Fin n) (Ideal.Quotient.mk J)) := by
       rw [RingHom.mem_ker]; exact h0
     rw [MvPolynomial.ker_map, Ideal.mk_ker, hJ, Ideal.map_span, Set.image_singleton,
-      Ideal.mem_span_singleton] at hmem
+        Ideal.mem_span_singleton]
+      at hmem
     apply hndvd
     have := map_dvd (joinFirst F e n) hmem
     rwa [joinFirst_splitFirst, joinFirst_C] at this
@@ -166,7 +179,8 @@ theorem ChartChoiceAlgClosed.proof (h₁ : IncIdealPrime.Statement) (h₂ : Chow
   apply hP0
   refine eq_zero_of_eval_zero_at_prod_finset P
     (fun _ => (Finset.range (P.totalDegree + 1)).image (fun k : ℕ => Ideal.Quotient.mk J (C (g k))))
-    (fun i => ?_) (fun x hx => ?_)
+    (fun i => ?_)
+    (fun x hx => ?_)
   · rw [Finset.card_image_of_injective _ hinj, Finset.card_range]
     exact Nat.lt_succ_of_le (degreeOf_le_totalDegree P i)
   · choose k _ hk using fun i => Finset.mem_image.mp (hx i)

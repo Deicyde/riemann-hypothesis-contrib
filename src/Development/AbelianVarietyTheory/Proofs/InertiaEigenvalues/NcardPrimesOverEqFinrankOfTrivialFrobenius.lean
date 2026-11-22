@@ -8,8 +8,9 @@ open NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory
 
-theorem natCard_le_of_forall_pow_eq_self (F : Type*) [CommRing F] [IsDomain F] [Finite F]
-    (q : ℕ) (hq : 1 < q) (h : ∀ x : F, x ^ q = x) : Nat.card F ≤ q := by
+theorem natCard_le_of_forall_pow_eq_self
+    (F : Type*) [CommRing F] [IsDomain F] [Finite F] (q : ℕ) (hq : 1 < q) (h : ∀ x : F, x ^ q = x)
+    : Nat.card F ≤ q := by
   classical
   haveI := Fintype.ofFinite F
   have hne : (X ^ q - X : F[X]) ≠ 0 := by
@@ -28,22 +29,28 @@ theorem natCard_le_of_forall_pow_eq_self (F : Type*) [CommRing F] [IsDomain F] [
   rw [mem_roots hne]
   simp [h x]
 
-theorem exists_finite_ncard_primesOver_eq_finrank_of_pow_absNorm_sub_mem :
-    ∀ (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
-      [IsGalois K M], ∃ T : Set (HeightOneSpectrum (𝓞 K)), T.Finite ∧
-      ∀ v : HeightOneSpectrum (𝓞 K), v ∉ T →
-        (∀ P ∈ v.asIdeal.primesOver (𝓞 M), ∀ x : 𝓞 M, x ^ Ideal.absNorm v.asIdeal - x ∈ P) →
-        (v.asIdeal.primesOver (𝓞 M)).ncard = Module.finrank K M ∧
-          ∀ P ∈ v.asIdeal.primesOver (𝓞 M), Ideal.absNorm P = Ideal.absNorm v.asIdeal := by
+theorem exists_finite_ncard_primesOver_eq_finrank_of_pow_absNorm_sub_mem
+    : ∀ (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
+        [IsGalois K M],
+      ∃ T : Set (HeightOneSpectrum (𝓞 K)),
+        T.Finite
+          ∧ ∀ v : HeightOneSpectrum (𝓞 K),
+            v ∉ T
+              → (∀ P ∈ v.asIdeal.primesOver (𝓞 M), ∀ x : 𝓞 M, x ^ Ideal.absNorm v.asIdeal - x ∈ P)
+              → (v.asIdeal.primesOver (𝓞 M)).ncard = Module.finrank K M
+                ∧ ∀ P ∈ v.asIdeal.primesOver (𝓞 M), Ideal.absNorm P = Ideal.absNorm v.asIdeal := by
   intro K M _ _ _ _ _ _
   have hD : differentIdeal (𝓞 K) (𝓞 M) ≠ ⊥ := differentIdeal_ne_bot
-  refine ⟨(fun P : HeightOneSpectrum (𝓞 M) => P.under (𝓞 K)) ''
-    {P | P.asIdeal ∣ differentIdeal (𝓞 K) (𝓞 M)}, (Ideal.finite_factors hD).image _, ?_⟩
+  refine ⟨
+    (fun P : HeightOneSpectrum (𝓞 M) => P.under (𝓞 K))
+      '' {P | P.asIdeal ∣ differentIdeal (𝓞 K) (𝓞 M)},
+    (Ideal.finite_factors hD).image _,
+    ?_
+  ⟩
   intro v hv hx
   haveI := v.isPrime
   have hq : 1 < Ideal.absNorm v.asIdeal := by
-    have h0 : Ideal.absNorm v.asIdeal ≠ 0 := by
-      rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
+    have h0 : Ideal.absNorm v.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
     have h1 : Ideal.absNorm v.asIdeal ≠ 1 := by
       rw [Ne, Ideal.absNorm_eq_one_iff]; exact v.isPrime.ne_top
     omega
@@ -63,8 +70,7 @@ theorem exists_finite_ncard_primesOver_eq_finrank_of_pow_absNorm_sub_mem :
     have h := Ideal.absNorm_pow_inertiaDeg v.asIdeal P
     rw [← hN, ← h] at hle
     have hpos : 0 < P.inertiaDeg (𝓞 K) := P.inertiaDeg_pos (𝓞 K)
-    have h2 : P.inertiaDeg (𝓞 K) ≤ 1 := by
-      rw [← Nat.pow_le_pow_iff_right hq, pow_one]; exact hle
+    have h2 : P.inertiaDeg (𝓞 K) ≤ 1 := by rw [← Nat.pow_le_pow_iff_right hq, pow_one]; exact hle
     omega
   have he : ∀ P ∈ v.asIdeal.primesOver (𝓞 M), P.ramificationIdx (𝓞 K) = 1 := by
     intro P hP
@@ -82,11 +88,11 @@ theorem exists_finite_ncard_primesOver_eq_finrank_of_pow_absNorm_sub_mem :
   · obtain ⟨P⟩ := (inferInstance : Nonempty (v.asIdeal.primesOver (𝓞 M)))
     haveI := P.2.1
     haveI := P.2.2
-    have h := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn v.asIdeal (𝓞 M)
-      Gal(M/K)
+    have h := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn v.asIdeal (𝓞 M) Gal(M/K)
     rw [Ideal.ramificationIdxIn_eq_ramificationIdx v.asIdeal P.1 Gal(M/K),
-      Ideal.inertiaDegIn_eq_inertiaDeg v.asIdeal P.1 Gal(M/K), he P.1 P.2, hf P.1 P.2,
-      IsGalois.card_aut_eq_finrank] at h
+        Ideal.inertiaDegIn_eq_inertiaDeg v.asIdeal P.1 Gal(M/K), he P.1 P.2, hf P.1 P.2,
+        IsGalois.card_aut_eq_finrank]
+      at h
     simpa using h
   · haveI := hP.1
     haveI := hP.2

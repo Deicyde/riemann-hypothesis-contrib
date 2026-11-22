@@ -13,16 +13,27 @@ open scoped ENNReal
 
 namespace GlobalTheory.SmGL
 
-theorem exists_open_normalised_subgroup_subset (k : Type) [Field k] [ValuativeRel k]
-    [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] [DecidableEq n] :
-    ∀ U ∈ 𝓝 (1 : GL n k), ∃ J : Subgroup (GL n k), IsOpen (J : Set (GL n k)) ∧
-      (J : Set (GL n k)) ⊆ U ∧ J ≤ KO k n ∧ ∀ x ∈ KO k n, ∀ j ∈ J, x * j * x⁻¹ ∈ J := by
+theorem exists_open_normalised_subgroup_subset
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : Type) [Fintype n] [DecidableEq n]
+    : ∀ U ∈ 𝓝 (1 : GL n k), ∃ J : Subgroup (GL n k),
+      IsOpen (J : Set (GL n k)) ∧ (J : Set (GL n k)) ⊆ U ∧ J ≤ KO k n
+        ∧ ∀ x ∈ KO k n, ∀ j ∈ J, x * j * x⁻¹ ∈ J := by
   intro U hU
   obtain ⟨_, _⟩ := SplitWeil.Model.secondCountable_and_t2_local_field (k := k)
-  have : NonarchimedeanAddGroup k := ⟨fun V hV => by
-    obtain ⟨s, hs⟩ := SplitWeil.exists_cball_subset hV
-    exact ⟨⟨⟨⟨⟨SplitWeil.cball s, SplitWeil.add_mem_cball⟩, by simp [SplitWeil.cball]⟩,
-      SplitWeil.neg_mem_cball⟩, SplitWeil.isOpen_cball s⟩, hs⟩⟩
+  have : NonarchimedeanAddGroup k :=
+    ⟨fun V hV => by
+      obtain ⟨s, hs⟩ := SplitWeil.exists_cball_subset hV
+      exact ⟨
+        ⟨
+          ⟨
+            ⟨⟨SplitWeil.cball s, SplitWeil.add_mem_cball⟩, by simp [SplitWeil.cball]⟩,
+            SplitWeil.neg_mem_cball
+          ⟩,
+          SplitWeil.isOpen_cball s
+        ⟩,
+        hs
+      ⟩⟩
   have : TotallyDisconnectedSpace k := inferInstance
   have : TotallyDisconnectedSpace (Matrix n n k) :=
     inferInstanceAs (TotallyDisconnectedSpace (n → n → k))

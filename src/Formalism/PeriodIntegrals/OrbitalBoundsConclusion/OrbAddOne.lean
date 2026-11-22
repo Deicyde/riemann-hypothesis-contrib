@@ -4,5 +4,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.OrbitJetLogarith
 
 @[expose] public section
 
-theorem PI.OrbAddOne : ∀ (D : Formalism.BasicNotions.D7) (E : PI.OrbJet.Ent D), PI.OrbJet.OrbitsAddAtConjugate E :=
+theorem PI.OrbAddOne
+    : ∀ (D : Formalism.BasicNotions.D7) (E : PI.OrbJet.Ent D), PI.OrbJet.OrbitsAddAtConjugate E :=
   PI.OrbJet.AO.orbitsAddAtConjugate

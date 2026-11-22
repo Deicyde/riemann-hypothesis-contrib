@@ -10,30 +10,43 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.InvMemD
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 open Classical
 
 namespace GlobalTheory.PeriodQuot
 
-theorem iter_mul {R A : Type} [CommSemiring R] [Semiring A] [Algebra R A] (f : A →ₐ[R] A)
-    (j : ℕ) (a b : A) : f^[j] (a * b) = f^[j] a * f^[j] b := by
+theorem iter_mul
+    {R A : Type} [CommSemiring R] [Semiring A] [Algebra R A] (f : A →ₐ[R] A) (j : ℕ) (a b : A)
+    : f^[j] (a * b) = f^[j] a * f^[j] b := by
   induction j with
   | zero => rfl
   | succ j ih => simp only [Function.iterate_succ_apply', ih, map_mul]
 
-theorem iter_one {R A : Type} [CommSemiring R] [Semiring A] [Algebra R A] (f : A →ₐ[R] A)
-    (j : ℕ) : f^[j] (1 : A) = 1 := by
+theorem iter_one {R A : Type} [CommSemiring R] [Semiring A] [Algebra R A] (f : A →ₐ[R] A) (j : ℕ)
+    : f^[j] (1 : A) = 1 := by
   induction j with
   | zero => rfl
   | succ j ih => simp only [Function.iterate_succ_apply', ih, map_one]
 
-theorem iter_natCast_mul {R A : Type} [CommSemiring R] [Semiring A] [Algebra R A] (f : A →ₐ[R] A)
-    (j m q : ℕ) (a : A) : f^[j] ((m : A) ^ q * a) = (m : A) ^ q * f^[j] a := by
+theorem iter_natCast_mul
+    {R A : Type} [CommSemiring R] [Semiring A] [Algebra R A] (f : A →ₐ[R] A) (j m q : ℕ) (a : A)
+    : f^[j] ((m : A) ^ q * a) = (m : A) ^ q * f^[j] a := by
   induction j with
   | zero => rfl
   | succ j ih => simp only [Function.iterate_succ_apply', ih, map_mul, map_pow, map_natCast]
 
-theorem galois_periodRatio_mem_unramified : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → ∀ (K : FinExt l) (x : P.R.B), IsUnit x → (⇑P.φB)^[finrank ℚ_[l] ↥(K0 K)] x = (l : P.R.B) * x → P.ιB x ∈ (P.PD K).Fil 1 → P.ιB x ∉ (P.PD K).Fil 2 → (∀ j : ℕ, 0 < j → j < finrank ℚ_[l] ↥(K0 K) → P.ιB ((⇑P.φB)^[j] x) ∈ (P.PD K).Fil 0 ∧ P.ιB ((⇑P.φB)^[j] x) ∉ (P.PD K).Fil 1) → ∀ g : ↥(GK K), ∃ a : ↥(K0 K), P.actQ (g : GQ l) x = algebraMap ↥(K0 K) P.R.B a * x := by
+theorem galois_periodRatio_mem_unramified
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (K : FinExt l) (x : P.R.B),
+          IsUnit x → (⇑P.φB)^[finrank ℚ_[l] ↥(K0 K)] x = (l : P.R.B) * x → P.ιB x ∈ (P.PD K).Fil 1
+            → P.ιB x ∉ (P.PD K).Fil 2
+            → (∀ j : ℕ,
+              0 < j → j < finrank ℚ_[l] ↥(K0 K)
+                → P.ιB ((⇑P.φB)^[j] x) ∈ (P.PD K).Fil 0 ∧ P.ιB ((⇑P.φB)^[j] x) ∉ (P.PD K).Fil 1)
+            → ∀ g : ↥(GK K), ∃ a : ↥(K0 K),
+              P.actQ (g : GQ l) x = algebraMap ↥(K0 K) P.R.B a * x := by
   intro l _ P AI hT K x hx hn h1 h2 hj g
   obtain ⟨u, rfl⟩ := hx
   set n := finrank ℚ_[l] ↥(K0 K) with hn_def
@@ -48,9 +61,9 @@ theorem galois_periodRatio_mem_unramified : ∀ (l : ℕ) [Fact l.Prime] (P : Lo
     intro b
     have := (P.PD K).φ_comm g b
     rwa [P.PD_φ, P.PD_actB, P.PD_actB, P.PD_φ] at this
-  have hcommj : ∀ j b, (⇑P.φB)^[j] (P.actQ (g : GQ l) b) = P.actQ (g : GQ l) ((⇑P.φB)^[j] b) :=
-    fun j b => (Function.Commute.iterate_left (f := ⇑P.φB) (g := ⇑(P.actQ (g : GQ l)))
-      (fun b => hcomm b) j) b
+  have hcommj
+      : ∀ j b, (⇑P.φB)^[j] (P.actQ (g : GQ l) b) = P.actQ (g : GQ l) ((⇑P.φB)^[j] b) := fun j b =>
+    (Function.Commute.iterate_left (f := ⇑P.φB) (g := ⇑(P.actQ (g : GQ l))) (fun b => hcomm b) j) b
 
   have hlB : IsUnit ((l : ℕ) : P.R.B) := by
     have h0 : ((l : ℕ) : ℚ_[l]) ≠ 0 := Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero
@@ -70,16 +83,18 @@ theorem galois_periodRatio_mem_unramified : ∀ (l : ℕ) [Fact l.Prime] (P : Lo
     | zero => simp
     | succ q ih =>
       rw [Nat.mul_succ, Function.iterate_add_apply, hn,
-        show (l : P.R.B) * (u : P.R.B) = (l : P.R.B) ^ 1 * u by rw [pow_one],
-        iter_natCast_mul, ih, ← mul_assoc, ← pow_add, add_comm 1 q]
-  have hsmul : ∀ (q : ℕ) (z : P.R.B), P.ιB ((l : P.R.B) ^ q * z) =
-      (((l : ↥K.1) ^ q : ↥K.1)) • P.ιB z := by
+        show (l : P.R.B) * (u : P.R.B) = (l : P.R.B) ^ 1 * u by rw [pow_one], iter_natCast_mul, ih,
+        ← mul_assoc, ← pow_add, add_comm 1 q]
+  have hsmul
+      : ∀ (q : ℕ) (z : P.R.B), P.ιB ((l : P.R.B) ^ q * z) = (((l : ↥K.1) ^ q : ↥K.1)) • P.ιB z := by
     intro q z
     rw [map_mul, map_pow, map_natCast, Algebra.smul_def, map_pow, map_natCast]
   have hne : ∀ q : ℕ, ((l : ↥K.1) ^ q : ↥K.1) ≠ 0 := fun q =>
     pow_ne_zero _ (Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero)
-  have hdeg : ∀ j : ℕ, ∃ d : ℤ, P.ιB ((⇑P.φB)^[j] (u : P.R.B)) ∈ (P.PD K).Fil d ∧
-      P.ιB ((⇑P.φB)^[j] (u : P.R.B)) ∉ (P.PD K).Fil (d + 1) := by
+  have hdeg
+      : ∀ j : ℕ, ∃ d : ℤ,
+        P.ιB ((⇑P.φB)^[j] (u : P.R.B)) ∈ (P.PD K).Fil d
+          ∧ P.ιB ((⇑P.φB)^[j] (u : P.R.B)) ∉ (P.PD K).Fil (d + 1) := by
     intro j
     have hj_eq : j = j % n + n * (j / n) := (Nat.mod_add_div j n).symm
     have hw : (⇑P.φB)^[j] (u : P.R.B) = (l : P.R.B) ^ (j / n) * (⇑P.φB)^[j % n] u := by
@@ -111,7 +126,8 @@ theorem galois_periodRatio_mem_unramified : ∀ (l : ℕ) [Fact l.Prime] (P : Lo
     rw [add_neg_cancel] at this
     rw [hc, iter_mul, hcommj, map_mul]
     exact this
-  obtain ⟨a, ha⟩ := GlobalTheory.T.mem_unramified_of_frobenius_iterate_fixed_fil l P AI hT K c hφc hF
+  obtain ⟨a, ha⟩ :=
+    GlobalTheory.T.mem_unramified_of_frobenius_iterate_fixed_fil l P AI hT K c hφc hF
   exact ⟨a, by rw [hcx, ha]⟩
 
 end GlobalTheory.PeriodQuot

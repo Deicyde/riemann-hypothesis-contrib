@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.Star
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Matrix GlobalTheory.FockCompare GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Matrix GlobalTheory.FockCompare
+  GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
 open scoped TensorProduct ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -16,37 +19,44 @@ namespace GlobalTheory.FockCompare.ThetaPeriod
 
 variable {D : D7}
 
-def mulRat (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E) : AF D.host.F →+ WA V W where
+def mulRat (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E)
+    : AF D.host.F →+ WA V W where
   toFun a := Matrix.of fun i j => a ⊗ₜ[D.host.F] γ i j
   map_zero' := by ext i j; exact TensorProduct.zero_tmul _ _
   map_add' x y := by ext i j; exact TensorProduct.add_tmul _ _ _
 
-theorem continuous_mulRat (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E) :
-    Continuous (mulRat V W γ) := by
+theorem continuous_mulRat (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E)
+    : Continuous (mulRat V W γ) := by
   refine continuous_pi fun i => continuous_pi fun j => ?_
-  have e : (fun a : AF D.host.F => mulRat V W γ a i j) =
-      fun a => a • ((1 : AF D.host.F) ⊗ₜ[D.host.F] γ i j : AE D) := by
+  have e
+      : (fun a : AF D.host.F => mulRat V W γ a i j)
+        = fun a => a • ((1 : AF D.host.F) ⊗ₜ[D.host.F] γ i j : AE D) := by
     funext a
-    rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]; rfl
+    rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
+    rfl
   rw [e]
   have : ContinuousSMul (AF D.host.F) (AE D) := IsModuleTopology.toContinuousSMul _ _
-  exact Continuous.smul (M := AF D.host.F) (X := AE D) (f := fun a : AF D.host.F => a) continuous_id continuous_const
+  exact Continuous.smul (M := AF D.host.F) (X := AE D)
+    (f := fun a : AF D.host.F => a)
+    continuous_id continuous_const
 
-theorem mulRat_one (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E) :
-    mulRat V W γ 1 = ratW V W γ := by
+theorem mulRat_one (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E)
+    : mulRat V W γ 1 = ratW V W γ := by
   ext i j; rfl
 
-theorem ratW_nsmul (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E) (N : ℕ) :
-    ratW V W (N • γ) = N • ratW V W γ := by
+theorem ratW_nsmul (V W : HSp D) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E) (N : ℕ)
+    : ratW V W (N • γ) = N • ratW V W γ := by
   ext i j
   exact (incA D).toAddMonoidHom.map_nsmul N (γ i j)
 
-theorem norm_periodic (D : D7) (θ : InfFam D) (σ : (D.what₂.Tau → ℂ) →+ AE D) (h : Chart θ σ)
+theorem norm_periodic
+    (D : D7) (θ : InfFam D) (σ : (D.what₂.Tau → ℂ) →+ AE D) (h : Chart θ σ)
     (ψ : AddChar (AF D.host.F) ℂ) (hψ : ∀ x, ‖ψ x‖ = 1)
-    (hU : ∀ U : AddSubgroup (AF D.host.F), IsOpen (U : Set (AF D.host.F)) →
-      ∃ N : ℕ, 0 < N ∧ pairA D.host.F 0 (N : Af D.host.F) ∈ U)
-    (V W : HSp D) (f : WA V W → ℂ) (hf : IsThetaFun ψ V W f) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E) :
-    ∃ N : ℕ, 0 < N ∧ ∀ w, ‖f (w + iotaW σ V W ((N : ℝ) • piW θ V W (ratW V W γ)))‖ = ‖f w‖ := by
+    (hU : ∀ U : AddSubgroup (AF D.host.F),
+      IsOpen (U : Set (AF D.host.F)) → ∃ N : ℕ, 0 < N ∧ pairA D.host.F 0 (N : Af D.host.F) ∈ U)
+    (V W : HSp D) (f : WA V W → ℂ)
+    (hf : IsThetaFun ψ V W f) (γ : Matrix (Fin V.rank) (Fin W.rank) D.host.E)
+    : ∃ N : ℕ, 0 < N ∧ ∀ w, ‖f (w + iotaW σ V W ((N : ℝ) • piW θ V W (ratW V W γ)))‖ = ‖f w‖ := by
   obtain ⟨U, hUo, hUf⟩ := hf.level
   obtain ⟨N, hN, hmem⟩ := hU (U.comap (mulRat V W γ)) (hUo.preimage (continuous_mulRat V W γ))
   refine ⟨N, hN, fun w => ?_⟩
@@ -72,8 +82,8 @@ theorem norm_periodic (D : D7) (θ : InfFam D) (σ : (D.what₂.Tau → ℂ) →
     show θ τ (infPart D (u i j)) = 0
     rw [this, RingHom.map_zero]
   have hi : iotaW σ V W ((N : ℝ) • piW θ V W (ratW V W γ)) = r := by
-    rw [Nat.cast_smul_eq_nsmul, ← AddMonoidHom.map_nsmul, ← hsum, AddMonoidHom.map_add (f := _), hpu, add_zero,
-      h.iota_pi hr0]
+    rw [Nat.cast_smul_eq_nsmul, ← AddMonoidHom.map_nsmul, ← hsum, AddMonoidHom.map_add (f := _),
+      hpu, add_zero, h.iota_pi hr0]
   have h1 : ∀ x, ‖f (x + u)‖ = ‖f x‖ := fun x => by
     have := congrFun (hUf u hmem hu0) x
     rw [← this, Heisenberg₂, norm_mul, hψ, one_mul]

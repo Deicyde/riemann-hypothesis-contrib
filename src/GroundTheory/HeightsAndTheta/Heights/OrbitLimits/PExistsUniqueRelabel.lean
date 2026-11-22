@@ -12,7 +12,8 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1
 
 namespace ExistsUniqueRelabel
 
@@ -23,27 +24,28 @@ variable {R R' : Type*} [CommRing R] [CommRing R'] (φ : R ≃+* R')
 theorem mem_map_iff (I : Ideal R) (x : R) : φ x ∈ I.map (φ : R →+* R') ↔ x ∈ I := by
   rw [Ideal.map_comap_of_equiv, Ideal.mem_comap, RingEquiv.symm_apply_apply]
 
-theorem map_mem_minimalPrimes {J W : Ideal R} (h : W ∈ J.minimalPrimes) :
-    W.map (φ : R →+* R') ∈ (J.map (φ : R →+* R')).minimalPrimes := by
+theorem map_mem_minimalPrimes {J W : Ideal R} (h : W ∈ J.minimalPrimes)
+    : W.map (φ : R →+* R') ∈ (J.map (φ : R →+* R')).minimalPrimes := by
   rw [Ideal.map_comap_of_equiv, Ideal.map_comap_of_equiv]
   exact Ideal.minimalPrimes_comap_of_surjective (f := (φ.symm : R' →+* R)) φ.symm.surjective h
 
-theorem map_mem_minimalPrimes_iff {J W : Ideal R} :
-    W.map (φ : R →+* R') ∈ (J.map (φ : R →+* R')).minimalPrimes ↔ W ∈ J.minimalPrimes := by
+theorem map_mem_minimalPrimes_iff {J W : Ideal R}
+    : W.map (φ : R →+* R') ∈ (J.map (φ : R →+* R')).minimalPrimes ↔ W ∈ J.minimalPrimes := by
   refine ⟨fun h => ?_, map_mem_minimalPrimes φ⟩
   have := map_mem_minimalPrimes φ.symm h
   rwa [Ideal.map_of_equiv, Ideal.map_of_equiv] at this
 
-theorem ringKrullDim_quot_map (V : Ideal R) :
-    ringKrullDim (R' ⧸ V.map (φ : R →+* R')) = ringKrullDim (R ⧸ V) :=
+theorem ringKrullDim_quot_map (V : Ideal R)
+    : ringKrullDim (R' ⧸ V.map (φ : R →+* R')) = ringKrullDim (R ⧸ V) :=
   (ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv V _ φ rfl)).symm
 
-theorem length_map (V W : Ideal R) [W.IsPrime] [(W.map (φ : R →+* R')).IsPrime] (hVW : V ≤ W)
-    (x : R) :
-    Module.length (Localization.AtPrime (W.map (φ : R →+* R')))
+theorem length_map
+    (V W : Ideal R) [W.IsPrime] [(W.map (φ : R →+* R')).IsPrime] (hVW : V ≤ W) (x : R)
+    : Module.length (Localization.AtPrime (W.map (φ : R →+* R')))
         (LocalizedModule (W.map (φ : R →+* R')).primeCompl
-          (R' ⧸ (V.map (φ : R →+* R') ⊔ Ideal.span {φ x}))) =
-      Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ (V ⊔ Ideal.span {x}))) := by
+          (R' ⧸ (V.map (φ : R →+* R') ⊔ Ideal.span {φ x})))
+      = Module.length (Localization.AtPrime W)
+        (LocalizedModule W.primeCompl (R ⧸ (V ⊔ Ideal.span {x}))) := by
   set V' := V.map (φ : R →+* R')
   set W' := W.map (φ : R →+* R')
   have hVW' : V' ≤ W' := Ideal.map_mono hVW
@@ -53,8 +55,11 @@ theorem length_map (V W : Ideal R) [W.IsPrime] [(W.map (φ : R →+* R')).IsPrim
   letI : Algebra R (Localization.AtPrime (W'.map (Ideal.Quotient.mk V'))) :=
     ((algebraMap R' (Localization.AtPrime (W'.map (Ideal.Quotient.mk V')))).comp
       (φ : R →+* R')).toAlgebra
-  have hal : ∀ r, algebraMap R (Localization.AtPrime (W'.map (Ideal.Quotient.mk V'))) r =
-      algebraMap R' (Localization.AtPrime (W'.map (Ideal.Quotient.mk V'))) (φ r) := fun r => rfl
+  have hal
+      : ∀ r,
+        algebraMap R (Localization.AtPrime (W'.map (Ideal.Quotient.mk V'))) r
+          = algebraMap R' (Localization.AtPrime (W'.map (Ideal.Quotient.mk V'))) (φ r) := fun r =>
+    rfl
   have hS : ∀ s : R', s ∈ W'.primeCompl → φ.symm s ∈ W.primeCompl := by
     intro s hs h
     apply hs
@@ -82,26 +87,16 @@ end RingEquiv
 
 section MRing
 
-variable {F : Type*} [Field F] {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-  {K' : Type*} [Fintype K'] {ι' : K' → Type*} [∀ k, Fintype (ι' k)]
+variable
+  {F : Type*} [Field F]
+  {K : Type*} [Fintype K]
+  {ι : K → Type*} [∀ k, Fintype (ι k)]
+  {K' : Type*} [Fintype K']
+  {ι' : K' → Type*} [∀ k, Fintype (ι' k)]
 
 variable (e : K ≃ K') (σ : (Σ k, ι k) ≃ (Σ k', ι' k')) (hσ : ∀ p, (σ p).1 = e p.1)
 
-
-
-
 include hσ
-
-
-
-
-
-
-
-
-
-
-
 
 end MRing
 

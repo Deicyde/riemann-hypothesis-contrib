@@ -24,19 +24,16 @@ namespace ProjSpace
 
 variable {A B : Type u} [CommRing A] [CommRing B] [Algebra A B] {n : ℕ}
 
-
 variable (A) in
-abbrev cmap :
-    C(ProjectiveSpectrum.top (grading B n), ProjectiveSpectrum.top (grading A n)) :=
+abbrev cmap : C(ProjectiveSpectrum.top (grading B n), ProjectiveSpectrum.top (grading A n)) :=
   ProjectiveSpectrum.comap (gradedMap A B n) (irrelevant_le_map A B n)
-
 
 variable (A) in
 abbrev pt (y : ProjectiveSpectrum (grading B n)) : ProjectiveSpectrum (grading A n) :=
   ProjectiveSpectrum.comapFun (gradedMap A B n) (irrelevant_le_map A B n) y
 
-def locMap (y : ProjectiveSpectrum (grading B n)) :
-    ProjTwist.Loc (grading A n) (pt A y) →+* ProjTwist.Loc (grading B n) y :=
+def locMap (y : ProjectiveSpectrum (grading B n))
+    : ProjTwist.Loc (grading A n) (pt A y) →+* ProjTwist.Loc (grading B n) y :=
   Localization.localRingHom _ _
     (gradedMap A B n : MvPolynomial (Fin (n + 1)) A →+* MvPolynomial (Fin (n + 1)) B) rfl
 
@@ -49,21 +46,31 @@ lemma locMap_mk (y : ProjectiveSpectrum (grading B n)) (r : MvPolynomial (Fin (n
 
 variable (k : ℤ)
 
-def twistPushSec {V : (projectiveSpace A n).Opens} (s : Γ(twistingSheaf (grading A n) k, V)) :
-    Γ(twistingSheaf (grading B n) k, baseChangeMap A B n ⁻¹ᵁ V) :=
-  ProjTwist.mkSection (fun y => locMap y.1 (ProjTwist.val s ⟨pt A y.1, y.2⟩))
-    (by
-      intro y
-      obtain ⟨W, hyW, iW, i, j, hij, r, t, hr, ht, htn, w⟩ :=
-        ProjTwist.isLocallyFraction_val s ⟨pt A y.1, y.2⟩
-      refine ⟨W.comap (cmap (B := B) A), hyW, homOfLE (fun z hz => (leOfHom iW) hz), i, j, hij,
-        gradedMap A B n r, gradedMap A B n t, (gradedMap A B n).2 hr, (gradedMap A B n).2 ht,
-        fun z => htn ⟨pt A z.1, z.2⟩, fun z => ?_⟩
-      have e := w ⟨pt A z.1, z.2⟩
-      change locMap z.1 (ProjTwist.val s ⟨pt A z.1, _⟩) = _
-      change ProjTwist.val s ⟨pt A z.1, _⟩ = _ at e
-      rw [e]
-      exact locMap_mk _ _ _)
+def twistPushSec {V : (projectiveSpace A n).Opens} (s : Γ(twistingSheaf (grading A n) k, V))
+    : Γ(twistingSheaf (grading B n) k, baseChangeMap A B n ⁻¹ᵁ V) :=
+  ProjTwist.mkSection (fun y => locMap y.1 (ProjTwist.val s ⟨pt A y.1, y.2⟩)) (by
+    intro y
+    obtain ⟨W, hyW, iW, i, j, hij, r, t, hr, ht, htn, w⟩ :=
+      ProjTwist.isLocallyFraction_val s ⟨pt A y.1, y.2⟩
+    refine ⟨
+      W.comap (cmap (B := B) A),
+      hyW,
+      homOfLE (fun z hz => (leOfHom iW) hz),
+      i,
+      j,
+      hij,
+      gradedMap A B n r,
+      gradedMap A B n t,
+      (gradedMap A B n).2 hr,
+      (gradedMap A B n).2 ht,
+      fun z => htn ⟨pt A z.1, z.2⟩,
+      fun z => ?_
+    ⟩
+    have e := w ⟨pt A z.1, z.2⟩
+    change locMap z.1 (ProjTwist.val s ⟨pt A z.1, _⟩) = _
+    change ProjTwist.val s ⟨pt A z.1, _⟩ = _ at e
+    rw [e]
+    exact locMap_mk _ _ _)
 
 lemma val_app_apply {V : (projectiveSpace A n).Opens} (t : Γ(projectiveSpace A n, V))
     (y : baseChangeMap A B n ⁻¹ᵁ V) :
@@ -93,22 +100,27 @@ lemma twistPushSec_add {V : (projectiveSpace A n).Opens}
     locMap y.1 (ProjTwist.val s ⟨pt A y.1, y.2⟩) + locMap y.1 (ProjTwist.val s' ⟨pt A y.1, y.2⟩)
   exact map_add _ _ _
 
-def twistToPushforward :
-    twistingSheaf (grading A n) k ⟶
-      (Scheme.Modules.pushforward (baseChangeMap A B n)).obj (twistingSheaf (grading B n) k) :=
-  ⟨{ app V := ModuleCat.ofHom (X := (twistingSheaf (grading A n) k).val.obj V)
-      (Y := ((Scheme.Modules.pushforward (baseChangeMap A B n)).obj
-        (twistingSheaf (grading B n) k)).val.obj V)
-      { toFun := fun s => twistPushSec k (V := V.unop) s
+def twistToPushforward
+    : twistingSheaf (grading A n) k
+      ⟶ (Scheme.Modules.pushforward (baseChangeMap A B n)).obj (twistingSheaf (grading B n) k) := ⟨{
+  app V :=
+    ModuleCat.ofHom (X := (twistingSheaf (grading A n) k).val.obj V)
+      (Y :=
+        ((Scheme.Modules.pushforward (baseChangeMap A B n)).obj
+          (twistingSheaf (grading B n) k)).val.obj V)
+      {
+        toFun := fun s => twistPushSec k (V := V.unop) s
         map_add' := fun s s' => twistPushSec_add k s s'
-        map_smul' := fun t s => twistPushSec_smul k t s }
-     naturality := fun {V V'} i => by
-      ext s
-      exact Subtype.ext (funext fun y => rfl) }⟩
+        map_smul' := fun t s => twistPushSec_smul k t s
+      }
+  naturality := fun {V V'} i => by
+    ext s
+    exact Subtype.ext (funext fun y => rfl)
+}⟩
 
-def pullbackTwistingSheafMap :
-    (Scheme.Modules.pullback (baseChangeMap A B n)).obj (twistingSheaf (grading A n) k) ⟶
-      twistingSheaf (grading B n) k :=
+def pullbackTwistingSheafMap
+    : (Scheme.Modules.pullback (baseChangeMap A B n)).obj (twistingSheaf (grading A n) k)
+      ⟶ twistingSheaf (grading B n) k :=
   ((Scheme.Modules.pullbackPushforwardAdjunction (baseChangeMap A B n)).homEquiv _ _).symm
     (twistToPushforward k)
 
@@ -138,28 +150,32 @@ lemma twistPushSec_upow {u : MvPolynomial (Fin (n + 1)) A} (hu : u ∈ grading A
   · exact map_pow (gradedMap A B n) u _
   · exact Subtype.ext (map_pow (gradedMap A B n) u _)
 
-instance isIso_pullbackTwistingSheafMap :
-    IsIso (pullbackTwistingSheafMap (A := A) (B := B) (n := n) k) := by
+instance isIso_pullbackTwistingSheafMap
+    : IsIso (pullbackTwistingSheafMap (A := A) (B := B) (n := n) k) := by
   apply isIso_of_isBasisOn
   intro y
   obtain ⟨j, hj⟩ := exists_mem_stdOpen_proj ((baseChangeMap A B n).base y)
-  refine ⟨baseChangeMap A B n ⁻¹ᵁ stdOpen A n j, hj,
+  refine ⟨
+    baseChangeMap A B n ⁻¹ᵁ stdOpen A n j,
+    hj,
     pullbackUnitApp (baseChangeMap A B n) _ (stdOpen A n j)
       (ProjTwist.upow (grading A n) (X_mem j) k),
-    isBasisOn_pullbackUnitApp _ (ProjTwist.isBasisOn_upow _ (X_mem j) k), ?_⟩
-  have key : ((preMod _).map (pullbackTwistingSheafMap (B := B) k)).app _
-      (pullbackUnitApp (baseChangeMap A B n) _ (stdOpen A n j)
-        (ProjTwist.upow (grading A n) (X_mem j) k)) =
-      ProjTwist.upow (grading B n) ((gradedMap A B n).2 (X_mem j)) k :=
+    isBasisOn_pullbackUnitApp _ (ProjTwist.isBasisOn_upow _ (X_mem j) k),
+    ?_
+  ⟩
+  have key
+      : ((preMod _).map (pullbackTwistingSheafMap (B := B) k)).app _
+          (pullbackUnitApp (baseChangeMap A B n) _ (stdOpen A n j)
+            (ProjTwist.upow (grading A n) (X_mem j) k))
+        = ProjTwist.upow (grading B n) ((gradedMap A B n).2 (X_mem j)) k :=
     (pullbackTwistingSheafMap_unit k _).trans (twistPushSec_upow k _)
   rw [key]
   exact ProjTwist.isBasisOn_upow _ _ k
 
-
 variable (A B n) in
-def pullbackTwistingSheafIso :
-    (Scheme.Modules.pullback (baseChangeMap A B n)).obj (twistingSheaf (grading A n) k) ≅
-      twistingSheaf (grading B n) k :=
+def pullbackTwistingSheafIso
+    : (Scheme.Modules.pullback (baseChangeMap A B n)).obj (twistingSheaf (grading A n) k)
+      ≅ twistingSheaf (grading B n) k :=
   asIso (pullbackTwistingSheafMap k)
 
 end ProjSpace

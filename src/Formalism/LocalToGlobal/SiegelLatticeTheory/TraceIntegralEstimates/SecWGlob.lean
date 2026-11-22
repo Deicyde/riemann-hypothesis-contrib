@@ -23,15 +23,18 @@ theorem stepSection_holds : Formalism.L2.SG.RealObj.EnergyInst.StepSection := by
   let i0 : Fin D.R.k := ⟨0, hk⟩
   choose w Fw using fun v => Formalism.L2.S.Pv.HaarSubS.frm_at X u v
   choose w' Fw' using fun v => Formalism.L2.S.Pv.HaarSubS.frm_at X u' v
-  have hdim : ∀ v, X.B.I.n = 2 * D.R.rS + 1 + D.R.k := fun v => (ProductExactness.frameLoc_X X u u v).dim
+  have hdim : ∀ v, X.B.I.n = 2 * D.R.rS + 1 + D.R.k := fun v =>
+    (ProductExactness.frameLoc_X X u u v).dim
   have hT : 0 < Tw (D := D) u := ProductExactness.Tw_pos u
   have hT' : 0 < Tw (D := D) u' := ProductExactness.Tw_pos u'
   refine ⟨fun c v => secV (Fw v) (Fw' v) (hdim v) hT hT' hsc i0 (c v), ?_, ?_⟩
-  · exact Measurable.of_eval fun v => (measurable_secV (Fw v) (Fw' v) (hdim v) hT hT' hsc i0).comp
-      (measurable_pi_apply v)
+  · exact Measurable.of_eval fun v =>
+      (measurable_secV (Fw v) (Fw' v) (hdim v) hT hT' hsc i0).comp (measurable_pi_apply v)
   · intro c hc v
     have hcv := hc v
-    have hg := ProductExactness.normSq_last_sub_pos_of_Gv_diagonal_pos (Tw (D := D) u) (Tw (D := D) u') (c v) hcv.2
+    have hg :=
+      ProductExactness.normSq_last_sub_pos_of_Gv_diagonal_pos (Tw (D := D) u) (Tw (D := D) u') (c v)
+        hcv.2
     exact zhat_secV (Fw v) (Fw' v) (hdim v) hT hT' hsc i0 hcv.1 hg
 
 end Formalism.L2.S.Pv.SecW

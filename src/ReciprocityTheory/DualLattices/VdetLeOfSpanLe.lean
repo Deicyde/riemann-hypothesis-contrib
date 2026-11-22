@@ -17,9 +17,12 @@ open ReciprocityTheory.PGsh.L2
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] {v : Valuation C NNReal}
 variable {X : Type} [Fintype X] [DecidableEq X]
 
-theorem vdet_le_of_span_le (hv : v.Integers R) {B B' : Matrix X X C}
-    (hle : Submodule.span R (Set.range fun j x => B x j) ≤
-      Submodule.span R (Set.range fun j x => B' x j)) : v B.det ≤ v B'.det := by
+theorem vdet_le_of_span_le
+    (hv : v.Integers R)
+    {B B' : Matrix X X C}
+    (hle : Submodule.span R (Set.range fun j x => B x j)
+      ≤ Submodule.span R (Set.range fun j x => B' x j))
+    : v B.det ≤ v B'.det := by
   have hcol : ∀ j, ∃ w ∈ intFun (C := C) R X, (fun x => B x j) = B' *ᵥ w := fun j =>
     (mem_spanCols_iff B' _).1 (hle (Submodule.subset_span ⟨j, rfl⟩))
   choose w hw hBw using hcol
@@ -32,11 +35,14 @@ theorem vdet_le_of_span_le (hv : v.Integers R) {B B' : Matrix X X C}
   rw [hBP, Matrix.det_mul, map_mul]
   exact mul_le_of_le_one_right' hle1
 
-theorem span_eq_of_vdet_eq (hv : v.Integers R) {B B' : Matrix X X C} (hB' : IsUnit B'.det)
-    (hle : Submodule.span R (Set.range fun j x => B x j) ≤
-      Submodule.span R (Set.range fun j x => B' x j)) (hdet : v B.det = v B'.det) :
-    Submodule.span R (Set.range fun j x => B x j) =
-      Submodule.span R (Set.range fun j x => B' x j) := by
+theorem span_eq_of_vdet_eq
+    (hv : v.Integers R)
+    {B B' : Matrix X X C} (hB' : IsUnit B'.det)
+    (hle : Submodule.span R (Set.range fun j x => B x j)
+      ≤ Submodule.span R (Set.range fun j x => B' x j))
+    (hdet : v B.det = v B'.det)
+    : Submodule.span R (Set.range fun j x => B x j)
+      = Submodule.span R (Set.range fun j x => B' x j) := by
   refine le_antisymm hle ?_
   have hcol : ∀ j, ∃ w ∈ intFun (C := C) R X, (fun x => B x j) = B' *ᵥ w := fun j =>
     (mem_spanCols_iff B' _).1 (hle (Submodule.subset_span ⟨j, rfl⟩))
@@ -76,15 +82,17 @@ theorem finZ_val [NeZero p] (i : Fin p) : (finZ p i).val = i := ZMod.val_cast_of
 
 theorem sum_val [NeZero p] : ∑ j : ZMod p, j.val = p * (p - 1) / 2 := by
   rw [← Finset.sum_range_id, Finset.sum_range (fun i => i)]
-  exact (Fintype.sum_equiv (finZ p) (fun i : Fin p => (i : ℕ)) (fun j => j.val)
+  exact (Fintype.sum_equiv (finZ p)
+    (fun i : Fin p => (i : ℕ))
+    (fun j => j.val)
     (fun i => (finZ_val i).symm)).symm
 
-theorem vdet_vandermonde [NeZero p] (ω : ZMod p → C)
-    (hω : ∀ a b, a ≠ b → v (ω a - ω b) = 1) :
-    v (Matrix.of fun a j : ZMod p => ω a ^ j.val).det = 1 := by
+theorem vdet_vandermonde [NeZero p] (ω : ZMod p → C) (hω : ∀ a b, a ≠ b → v (ω a - ω b) = 1)
+    : v (Matrix.of fun a j : ZMod p => ω a ^ j.val).det = 1 := by
   rw [← Matrix.det_submatrix_equiv_self (finZ p)]
-  have e : (Matrix.of fun a j : ZMod p => ω a ^ j.val).submatrix (finZ p) (finZ p) =
-      Matrix.vandermonde (ω ∘ finZ p) := by
+  have e
+      : (Matrix.of fun a j : ZMod p => ω a ^ j.val).submatrix (finZ p) (finZ p)
+        = Matrix.vandermonde (ω ∘ finZ p) := by
     ext i j
     simp [Matrix.vandermonde, finZ_val]
   rw [e, Matrix.det_vandermonde, map_prod]
@@ -93,10 +101,11 @@ theorem vdet_vandermonde [NeZero p] (ω : ZMod p → C)
   refine Finset.prod_eq_one fun j hj => ?_
   exact hω _ _ fun h => (ne_of_gt (Finset.mem_Ioi.1 hj)) ((finZ p).injective h)
 
-theorem vdet_pow [NeZero p] (ω : ZMod p → C) (hω : ∀ a b, a ≠ b → v (ω a - ω b) = 1) (c : C) :
-    v (Matrix.of fun a j : ZMod p => (c * ω a) ^ j.val).det = v c ^ (p * (p - 1) / 2) := by
-  have e : (Matrix.of fun a j : ZMod p => (c * ω a) ^ j.val) =
-      Matrix.of fun a j => c ^ j.val * (Matrix.of fun a j : ZMod p => ω a ^ j.val) a j := by
+theorem vdet_pow [NeZero p] (ω : ZMod p → C) (hω : ∀ a b, a ≠ b → v (ω a - ω b) = 1) (c : C)
+    : v (Matrix.of fun a j : ZMod p => (c * ω a) ^ j.val).det = v c ^ (p * (p - 1) / 2) := by
+  have e
+      : (Matrix.of fun a j : ZMod p => (c * ω a) ^ j.val)
+        = Matrix.of fun a j => c ^ j.val * (Matrix.of fun a j : ZMod p => ω a ^ j.val) a j := by
     ext a j
     simp [mul_pow]
   rw [e, Matrix.det_mul_row, map_mul, vdet_vandermonde ω hω, mul_one, map_prod]

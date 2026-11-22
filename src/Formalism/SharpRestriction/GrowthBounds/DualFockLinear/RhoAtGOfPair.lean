@@ -9,13 +9,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.TestSideCounting
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 MvPolynomial
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 MvPolynomial
 
 section At
 
-variable (p n' : ℕ) {W Qq O Kf : Type} [CommRing W] [Field Qq] [Algebra W Qq] [CommRing O] [IsDomain O] [Field Kf]
-  [Algebra O Kf] (ι : Qq →+* Kf) (σ : Qq ≃+* Qq) (w : O) {m : ℕ} (r : ℕ) (TT : Finset (Fin n')) (d : Fin n' → ℕ)
-  (rest lam : Fin n' → Fin (m + 1) → ℤ)
+variable
+  (p n' : ℕ)
+  {W Qq O Kf : Type}
+  [CommRing W] [Field Qq] [Algebra W Qq] [CommRing O] [IsDomain O] [Field Kf] [Algebra O Kf]
+  (ι : Qq →+* Kf) (σ : Qq ≃+* Qq) (w : O)
+  {m : ℕ}
+  (r : ℕ) (TT : Finset (Fin n')) (d : Fin n' → ℕ) (rest lam : Fin n' → Fin (m + 1) → ℤ)
 
 def PairAt (c0 : ℕ) (bK : ℝ) (e : Edge W Qq (m + 1)) (Θ : ↥((Pol (KK O) (ι := Fin n') (m + 1) d).restrictScalars O) ≃ₗ[O] ↥(Vsp Kf (flW (m := m) d))) : Prop :=
   ∃ (κ0 κf : ℕ) (Ψ0 : Module.Dual Kf (Vsp Kf lam) ≃ₗ[Kf] Vsp Kf lam)
@@ -42,12 +47,14 @@ def PairAt (c0 : ℕ) (bK : ℝ) (e : Edge W Qq (m + 1)) (Θ : ↥((Pol (KK O) (
 
 end At
 
-theorem HL_refl {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
-    [Field Qq] [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
-    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O} (h : HidaSetting p n' W Qq O Kf ι σ j w) {m : ℕ}
-    (X : Fin n' → Fin (m + 1) → ℤ) (hd : IsDominant X) (L : Submodule W (Fin (m + 1) → Qq)) (hL : IsLattice W L)
-    (y : Vsp Kf X) (hy : ∀ T ∈ dualLat O Kf (HL (O := O) ι σ X L), T y ∈ Set.range (algebraMap O Kf)) :
-    y ∈ HL (O := O) ι σ X L := by
+theorem HL_refl
+    {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+    [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O} (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    {m : ℕ} (X : Fin n' → Fin (m + 1) → ℤ) (hd : IsDominant X) (L : Submodule W (Fin (m + 1) → Qq))
+    (hL : IsLattice W L) (y : Vsp Kf X)
+    (hy : ∀ T ∈ dualLat O Kf (HL (O := O) ι σ X L), T y ∈ Set.range (algebraMap O Kf))
+    : y ∈ HL (O := O) ι σ X L := by
   obtain ⟨x, hx⟩ := Formalism.L2.G.Model.hlSpans p n' W Qq O Kf ι σ j w h m X hd L hL
   have hc : ∀ i, x.coord i ∈ dualLat O Kf (HL (O := O) ι σ X L) := by
     intro i v hv
@@ -58,7 +65,8 @@ theorem HL_refl {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDis
       by_cases hik : k = i
       · exact ⟨1, by simp [hik]⟩
       · exact ⟨0, by simp [Finsupp.single_apply, hik]⟩
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add a b _ _ ha hb =>
       obtain ⟨a', ha'⟩ := ha
       obtain ⟨b', hb'⟩ := hb
@@ -72,7 +80,6 @@ theorem HL_refl {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDis
   rw [Module.Basis.coord_apply] at ha
   rw [← ha, algebraMap_smul]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
-
 
 set_option maxHeartbeats 1600000 in
 theorem rhoAtG_of_pair (D : Formalism.BasicNotions.D7) {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W]

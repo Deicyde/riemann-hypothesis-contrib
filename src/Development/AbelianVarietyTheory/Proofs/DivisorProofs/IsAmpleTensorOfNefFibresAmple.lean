@@ -15,8 +15,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArithmeticVa
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 open Limits
 
 set_option autoImplicit false
@@ -24,8 +26,8 @@ noncomputable section
 
 namespace GlobalTheory.AmpleNefFibZ
 
-theorem exists_prime_le (P : Ideal ℤ) [P.IsPrime] :
-    ∃ l : ℕ, l.Prime ∧ ∀ r : ℤ, r ∉ Ideal.span {(l : ℤ)} → r ∉ P := by
+theorem exists_prime_le (P : Ideal ℤ) [P.IsPrime]
+    : ∃ l : ℕ, l.Prime ∧ ∀ r : ℤ, r ∉ Ideal.span {(l : ℤ)} → r ∉ P := by
   obtain ⟨M, hM, hPM⟩ := Ideal.exists_le_maximal P (Ideal.IsPrime.ne_top ‹_›)
   set m := Submodule.IsPrincipal.generator M
   have hmM : Ideal.span {m} = M := Submodule.IsPrincipal.span_singleton_generator M
@@ -40,7 +42,9 @@ theorem exists_prime_le (P : Ideal ℤ) [P.IsPrime] :
   rw [← Ideal.mem_span_singleton, hmM]
   exact hPM hrP
 
-theorem isAmpleLB_tens_of_nefFib : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D → ∀ L A : HermLB p, NefFib L → IsAmpleLB A.B → IsAmpleLB (L.tens A).B := by
+theorem isAmpleLB_tens_of_nefFib
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D → ∀ L A : HermLB p, NefFib L → IsAmpleLB A.B → IsAmpleLB (L.tens A).B := by
   intro k _ X _ p D hX L A hL hA
   haveI : Module.Finite ℤ k := hX.finite
   set s : X ⟶ Sp ℤ := p ≫ spMap (Int.castRingHom k) with hs_def
@@ -55,16 +59,21 @@ theorem isAmpleLB_tens_of_nefFib : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) 
   obtain ⟨l, hl, hlP⟩ := @exists_prime_le P.asIdeal P.isPrime
   haveI : Fact l.Prime := ⟨hl⟩
   have F := GlobalTheory.T.isAmple_tensor_nef_ample_finiteFieldFibre k X p D hX L A hL hA l
-  have hFib : Out.RelAmple ((Over.pullback (Spec.map (CommRingCat.ofHom (Int.castRingHom (ZMod l))))).obj (Over.mk s))
-      ((L.tens A).B.pull (pullback.fst s (Spec.map (CommRingCat.ofHom (Int.castRingHom (ZMod l)))))) := by
+  have hFib : Out.RelAmple
+      ((Over.pullback (Spec.map (CommRingCat.ofHom (Int.castRingHom (ZMod l))))).obj (Over.mk s))
+      ((L.tens A).B.pull
+        (pullback.fst s (Spec.map (CommRingCat.ofHom (Int.castRingHom (ZMod l)))))) := by
     haveI : IsProper ((Over.pullback (Spec.map (CommRingCat.ofHom (Int.castRingHom (ZMod l))))).obj (Over.mk s)).hom :=
       inferInstanceAs (IsProper (pullback.snd s _))
     exact (relAmple_iff_isAmpleLB_of_isAffine _ (LB.isLB_pull hM _)).2 F
-  have hfrac : ∀ y : ZMod l, ∃ a b : ℤ, Int.castRingHom (ZMod l) b ≠ 0 ∧
-      y * Int.castRingHom (ZMod l) b = Int.castRingHom (ZMod l) a :=
-    fun y => ⟨(y.val : ℤ), 1, by simp, by simp⟩
-  obtain ⟨r, hr, hA'⟩ := AmpleNear.relAmple_near_fibre ℤ (Over.mk s) (L.tens A).B hX.flat hPB hM (ZMod l)
-    (Int.castRingHom (ZMod l)) hfrac hFib
+  have hfrac
+      : ∀ y : ZMod l, ∃ a b : ℤ,
+        Int.castRingHom (ZMod l) b ≠ 0
+          ∧ y * Int.castRingHom (ZMod l) b = Int.castRingHom (ZMod l) a := fun y =>
+    ⟨(y.val : ℤ), 1, by simp, by simp⟩
+  obtain ⟨r, hr, hA'⟩ :=
+    AmpleNear.relAmple_near_fibre ℤ (Over.mk s) (L.tens A).B hX.flat hPB hM (ZMod l)
+      (Int.castRingHom (ZMod l)) hfrac hFib
   have hrl : r ∉ Ideal.span {(l : ℤ)} := by
     rw [Ideal.mem_span_singleton]
     intro h

@@ -56,7 +56,6 @@ def idx (A B : Submodule (𝓞 E) S.V) : ℕ := Nat.card (A ⧸ B.comap A.subtyp
 
 def nrm (τ : E →+* ℂ) (x : S.V) : ℝ := (τ (S.hT x x)).re
 
-
 omit [NumberField E] in
 def placeProd (X : (E →+* ℂ) → ℝ) : ℝ := Real.sqrt (∏ τ : E →+* ℂ, X τ)
 
@@ -67,8 +66,11 @@ abbrev SplitsCompletely (p : ℕ) : Prop := Formalism.MainNotions.S.SplitsCompl 
 variable (Λ : Submodule (𝓞 E) S.V)
 
 def ModG (g : ℕ) (x : S.V) : Prop :=
-  ∀ P : HeightOneSpectrum (𝓞 E), ((g : 𝓞 E) ∈ P.asIdeal) →
-    x ∈ (haveI := P.isPrime; Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Ideal.span {(g : 𝓞 E)} • Λ))
+  ∀ P : HeightOneSpectrum (𝓞 E),
+    ((g : 𝓞 E) ∈ P.asIdeal)
+      → x
+        ∈ (haveI := P.isPrime
+           Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Ideal.span {(g : 𝓞 E)} • Λ))
 
 def IsAutLam (β : S.V ≃ₗ[E] S.V) : Prop :=
   β ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ Formalism.HermitianLatticesTheory.gmap β Λ = Λ
@@ -100,21 +102,26 @@ def L0sub {T : E} (F : LFlag S r T) : Submodule (𝓞 E) S.V :=
 def IsLift {T : E} (F : LFlag S r T) : Prop := F.fl.z ∈ Λ ∧ F.zt = F.fl.z
 
 def IsFixedConv (g : ℕ) {T : E} (F : LFlag S r T) : Prop :=
-  (∀ P : HeightOneSpectrum (𝓞 E), ∃ c : Fin r → E, (∀ a, c a ≠ 0) ∧
-    (((g : 𝓞 E) ∈ P.asIdeal) → ∀ a, c a = 1) ∧
-    (haveI := P.isPrime; Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F) =
-      Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Submodule.span (𝓞 E) (Set.range fun a => c a • F.fl.e a)))) ∧
-  (∀ c : E, c • F.fl.z ∈ Lsub Λ F → ∃ o : 𝓞 E, (o : E) = c)
+  (∀ P : HeightOneSpectrum (𝓞 E), ∃ c : Fin r → E,
+      (∀ a, c a ≠ 0) ∧ (((g : 𝓞 E) ∈ P.asIdeal) → ∀ a, c a = 1)
+        ∧ (haveI := P.isPrime
+           Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F)
+             = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+               (Submodule.span (𝓞 E) (Set.range fun a => c a • F.fl.e a))))
+    ∧ (∀ c : E, c • F.fl.z ∈ Lsub Λ F → ∃ o : 𝓞 E, (o : E) = c)
 
-abbrev ZhatL {T T' : E} (F : LFlag S r T) (F' : LFlag S r T') :
-    Matrix (Fin (r + 1)) (Fin (r + 1)) E := Formalism.MainNotions.S.Zhat F.fl F'.fl
+abbrev ZhatL {T T' : E} (F : LFlag S r T) (F' : LFlag S r T')
+    : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
+  Formalism.MainNotions.S.Zhat F.fl F'.fl
 
-abbrev Dr {T T' : E} (F : LFlag S r T) (F' : LFlag S r T') : E := Formalism.MainNotions.S.Dl F.fl F'.fl r
+abbrev Dr {T T' : E} (F : LFlag S r T) (F' : LFlag S r T') : E :=
+  Formalism.MainNotions.S.Dl F.fl F'.fl r
 
 abbrev Dr1 {T T' : E} (F : LFlag S r T) (F' : LFlag S r T') : E :=
   Formalism.MainNotions.S.Dl F.fl F'.fl (r + 1)
 
-abbrev Gval {T T' : E} (F : LFlag S r T) (F' : LFlag S r T') : E := Formalism.MainNotions.S.Gflag F.fl F'.fl
+abbrev Gval {T T' : E} (F : LFlag S r T) (F' : LFlag S r T') : E :=
+  Formalism.MainNotions.S.Gflag F.fl F'.fl
 
 section Hyp
 
@@ -137,13 +144,15 @@ def invSh (F : LFlag S r (T : E)) (F' : LFlag S r (T' : E)) (τ : E →+* ℂ) :
 
 end Hyp
 
-def frameAct {n : ℕ} (f : Fin n → S.V) (ξ : Matrix (Fin n) (Fin n) (𝓞 E)) : Fin n → S.V :=
-  fun b => ∑ a, ((ξ a b : 𝓞 E) : E) • f a
+def frameAct {n : ℕ} (f : Fin n → S.V) (ξ : Matrix (Fin n) (Fin n) (𝓞 E)) : Fin n → S.V := fun b =>
+  ∑ a, ((ξ a b : 𝓞 E) : E) • f a
 
-def AdmWit {T T' : E} (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T')
-    (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E)) : Prop :=
-  (∀ a b, b < a → ξ a b = 0) ∧ (∀ a, ξ a a = 1) ∧
-    ∀ b, ModG S Λ g (frame F' b - frameAct (frame F) ξ b)
+def AdmWit
+    {T T' : E}
+    (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E))
+    : Prop :=
+  (∀ a b, b < a → ξ a b = 0) ∧ (∀ a, ξ a a = 1)
+    ∧ ∀ b, ModG S Λ g (frame F' b - frameAct (frame F) ξ b)
 
 def IsAdmissible {T T' : E} (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') : Prop :=
   ∃ ξ, AdmWit Λ g F F' ξ
@@ -160,8 +169,7 @@ def UU (F : LFlag S r T) (F' : LFlag S r T') : Submodule (𝓞 E) S.V :=
 
 def UUE (F : LFlag S r T) (F' : LFlag S r T') : Submodule E S.V := spanE S (UU Λ F F')
 
-def BLat (F : LFlag S r T) (F' : LFlag S r T') : Submodule (𝓞 E) S.V :=
-  Λ ⊓ toO S (UUE Λ F F')
+def BLat (F : LFlag S r T) (F' : LFlag S r T') : Submodule (𝓞 E) S.V := Λ ⊓ toO S (UUE Λ F F')
 
 abbrev BQ (F : LFlag S r T) (F' : LFlag S r T') : Type :=
   BLat Λ F F' ⧸ (UU Λ F F').comap (BLat Λ F F').subtype
@@ -183,8 +191,7 @@ def IotaRel (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') (x : S.V) : Prop :=
   ∃ l ∈ Lrep Λ F, x - l ∈ Xsp F ∧ ∃ l' ∈ Lrep Λ F', x - l' ∈ Xsp F' ∧ l - l' ∈ NgX Λ g F F'
 
 def La (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') : Submodule (𝓞 E) S.V :=
-  Submodule.span (𝓞 E)
-    {x | x ∈ Hp Λ F F' ∧ x ∈ L0sub Λ F ∧ x ∈ L0sub Λ F' ∧ IotaRel Λ g F F' x}
+  Submodule.span (𝓞 E) {x | x ∈ Hp Λ F F' ∧ x ∈ L0sub Λ F ∧ x ∈ L0sub Λ F' ∧ IotaRel Λ g F F' x}
 
 def iIdx (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') : ℕ := idx S (La Λ g F F') (Thp Λ F F')
 
@@ -192,11 +199,9 @@ def NG (F : LFlag S r T) (F' : LFlag S r T') : ℝ := latDet S (UU Λ F F')
 
 def G0 (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') : ℝ := NG Λ F F' / NE (E := E) g ^ (r + 1)
 
-def Ylift (F : LFlag S r T) (F' : LFlag S r T') : Submodule E S.V :=
-  UUE Λ F F' ⊓ orth S (Xplus F)
+def Ylift (F : LFlag S r T) (F' : LFlag S r T') : Submodule E S.V := UUE Λ F F' ⊓ orth S (Xplus F)
 
-def Ylift' (F : LFlag S r T) (F' : LFlag S r T') : Submodule E S.V :=
-  UUE Λ F F' ⊓ orth S (Xplus F')
+def Ylift' (F : LFlag S r T) (F' : LFlag S r T') : Submodule E S.V := UUE Λ F F' ⊓ orth S (Xplus F')
 
 def SgRel (F : LFlag S r T) (F' : LFlag S r T') (y y' : S.V) (al al' : E) : Prop :=
   ∃ x ∈ Xsp F, ∃ x' ∈ Xsp F', y - y' = (al • F.zt + x) + (al' • F'.zt + x')
@@ -211,13 +216,13 @@ def IotaCompat (g : ℕ) : Prop :=
   ∀ x' ∈ Lrep Λ F', ∀ l ∈ Lrep Λ F, (l - x' ∈ NgX Λ g F F' ↔ l - β x' ∈ NgX Λ g F F'')
 
 def IsPair (g : ℕ) : Prop :=
-  IsAutLam S Λ β ∧ (∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) ∧
-    β F'.fl.z = F''.fl.z ∧ IotaCompat Λ F F' F'' β g
+  IsAutLam S Λ β ∧ (∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) ∧ β F'.fl.z = F''.fl.z
+    ∧ IotaCompat Λ F F' F'' β g
 
 def ThPairs : Submodule E (S.V × S.V) :=
-  ((Hp Λ F F').prod (Hp Λ F F'')) ⊓
-    (Xsp F).comap (LinearMap.fst E S.V S.V - LinearMap.snd E S.V S.V) ⊓
-    (Xsp F'').comap ((β : S.V →ₗ[E] S.V) ∘ₗ LinearMap.fst E S.V S.V - LinearMap.snd E S.V S.V)
+  ((Hp Λ F F').prod (Hp Λ F F''))
+    ⊓ (Xsp F).comap (LinearMap.fst E S.V S.V - LinearMap.snd E S.V S.V)
+    ⊓ (Xsp F'').comap ((β : S.V →ₗ[E] S.V) ∘ₗ LinearMap.fst E S.V S.V - LinearMap.snd E S.V S.V)
 
 def Th : Submodule E S.V := (ThPairs Λ F F' F'' β).map (LinearMap.fst E S.V S.V)
 
@@ -243,46 +248,53 @@ def Psi (W : Submodule E S.V) (M : Submodule (𝓞 E) S.V) : Submodule (𝓞 E) 
 def bForm (x' x'' : S.V) : E := S.hT x' x'' - S.hT (β x') x''
 
 def BNondeg : Prop :=
-  (∀ x' ∈ Hp Λ F F', (∀ x'' ∈ Hp Λ F F'', bForm β x' x'' = 0) → x' ∈ Th Λ F F' F'' β) ∧
-  (∀ x'' ∈ Hp Λ F F'', (∀ x' ∈ Hp Λ F F', bForm β x' x'' = 0) → x'' ∈ Th'' Λ F F' F'' β)
+  (∀ x' ∈ Hp Λ F F', (∀ x'' ∈ Hp Λ F F'', bForm β x' x'' = 0) → x' ∈ Th Λ F F' F'' β)
+    ∧ (∀ x'' ∈ Hp Λ F F'', (∀ x' ∈ Hp Λ F F', bForm β x' x'' = 0) → x'' ∈ Th'' Λ F F' F'' β)
 
 def radL : Submodule E S.V :=
-  Hp Λ F F' ⊓ ⨅ x'' ∈ Hp Λ F F'',
-    LinearMap.ker ((S.hT.flip x'') - (S.hT.flip x'').comp (β : S.V →ₗ[E] S.V))
+  Hp Λ F F'
+    ⊓ ⨅ x'' ∈ Hp Λ F F'',
+      LinearMap.ker ((S.hT.flip x'') - (S.hT.flip x'').comp (β : S.V →ₗ[E] S.V))
 
-def radR : Submodule E S.V :=
-  Hp Λ F F'' ⊓ ⨅ x' ∈ Hp Λ F F', LinearMap.ker (S.hT x' - S.hT (β x'))
+def radR : Submodule E S.V := Hp Λ F F'' ⊓ ⨅ x' ∈ Hp Λ F F', LinearMap.ker (S.hT x' - S.hT (β x'))
 
 def IsScalar : Prop :=
   ∀ y1 ∈ Ylift Λ F F', ∀ y2 ∈ Ylift Λ F F'', ∀ y1' ∈ Ylift' Λ F F', ∀ y2'' ∈ Ylift' Λ F F'',
-    y1 - y2 ∈ Xsp F → y2'' - β y1' ∈ Xsp F'' →
-      ∀ al al' : E, SgRel F F' y1 y1' al al' ↔ SgRel F F'' y2 y2'' al al'
+    y1 - y2 ∈ Xsp F → y2'' - β y1' ∈ Xsp F''
+      → ∀ al al' : E, SgRel F F' y1 y1' al al' ↔ SgRel F F'' y2 y2'' al al'
 
 end Pair
 
-def Mplus {T T' : E} (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T')
-    (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E)) : Submodule (𝓞 E) S.V :=
+def Mplus
+    {T T' : E}
+    (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') (ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E))
+    : Submodule (𝓞 E) S.V :=
   Submodule.span (𝓞 E)
-    ((XLam Λ F : Set S.V) ∪ {F.zt} ∪
-      Set.range fun b => ((g : E)⁻¹) • (frame F' b - frameAct (frame F) ξ b))
+    ((XLam Λ F : Set S.V) ∪ {F.zt}
+      ∪ Set.range fun b => ((g : E)⁻¹) • (frame F' b - frameAct (frame F) ξ b))
 
 def IsGeneric {T T' : E} (g : ℕ) (F : LFlag S r T) (F' : LFlag S r T') : Prop :=
-  ∃ ξ, AdmWit Λ g F F' ξ ∧ ∀ P : HeightOneSpectrum (𝓞 E),
-    (((g : 𝓞 E) ∈ P.asIdeal) → (haveI := P.isPrime; Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (BLat Λ F F') =
-      Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Mplus Λ g F F' ξ))) ∧
-    (((g : 𝓞 E) ∉ P.asIdeal) → (haveI := P.isPrime; Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (BLat Λ F F') =
-      Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (UU Λ F F')))
+  ∃ ξ,
+    AdmWit Λ g F F' ξ
+      ∧ ∀ P : HeightOneSpectrum (𝓞 E),
+        (((g : 𝓞 E) ∈ P.asIdeal)
+            → (haveI := P.isPrime
+               Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (BLat Λ F F')
+                 = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Mplus Λ g F F' ξ)))
+          ∧ (((g : 𝓞 E) ∉ P.asIdeal)
+            → (haveI := P.isPrime
+               Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (BLat Λ F F')
+                 = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (UU Λ F F')))
 
 def NLam {T : E} (F : LFlag S r T) : Set (S.V ≃ₗ[E] S.V) :=
   {n | IsAutLam S Λ n ∧ (∀ j, ∀ x ∈ Xflag F (j + 1), n x - x ∈ Xflag F j) ∧
     (∀ x ∈ orth S (Xsp F), n x - x ∈ Xsp F)}
 
-
 omit [NumberField E] [StarRing E] in
 def ZEquiv {n : ℕ} (Z Z₂ : Matrix (Fin n) (Fin n) E) : Prop :=
   ∃ A B : Matrix (Fin n) (Fin n) (𝓞 E),
-    (∀ a b, a < b → A a b = 0) ∧ (∀ a, A a a = 1) ∧ (∀ a b, b < a → B a b = 0) ∧ (∀ a, B a a = 1) ∧
-    Z₂ = A.map (fun x => (x : E)) * Z * B.map (fun x => (x : E))
+    (∀ a b, a < b → A a b = 0) ∧ (∀ a, A a a = 1) ∧ (∀ a b, b < a → B a b = 0) ∧ (∀ a, B a a = 1)
+      ∧ Z₂ = A.map (fun x => (x : E)) * Z * B.map (fun x => (x : E))
 
 end Gen
 
@@ -303,23 +315,22 @@ def gS : ℕ := D.host.g 0 * D.host.g 1
 def Tu (u : D.what₂.Word) : ℕ := (D.mem u).A.T
 
 def PrimeHyp (u : D.what₂.Word) (T' : ℕ) : Prop :=
-  (Tu D u).Prime ∧ 3 ≤ Tu D u ∧ T'.Prime ∧ 3 ≤ T' ∧
-  SplitsCompletely (E := D.host.E) (Tu D u) ∧ SplitsCompletely (E := D.host.E) T' ∧
-  (∀ i, SplitsCompletely (E := D.host.E) (D.host.g i)) ∧
-  Nat.Coprime (gS D) (Tu D u * T') ∧ Tu D u ≡ T' [MOD gS D] ∧
-  (∀ ζ : 𝓞 D.host.E, (∃ n : ℕ, 0 < n ∧ ζ ^ n = 1) →
-    (∃ β : 𝓞 D.host.E, ζ - 1 = (Tu D u : 𝓞 D.host.E) * β) → ζ = 1)
+  (Tu D u).Prime ∧ 3 ≤ Tu D u ∧ T'.Prime ∧ 3 ≤ T' ∧ SplitsCompletely (E := D.host.E) (Tu D u)
+    ∧ SplitsCompletely (E := D.host.E) T' ∧ (∀ i, SplitsCompletely (E := D.host.E) (D.host.g i))
+    ∧ Nat.Coprime (gS D) (Tu D u * T') ∧ Tu D u ≡ T' [MOD gS D]
+    ∧ (∀ ζ : 𝓞 D.host.E,
+      (∃ n : ℕ, 0 < n ∧ ζ ^ n = 1) → (∃ β : 𝓞 D.host.E, ζ - 1 = (Tu D u : 𝓞 D.host.E) * β) → ζ = 1)
 
-def FixedHyp (Λ : Submodule (𝓞 D.host.E) (hS D).V) {T : D.host.E} (F : LFlag (hS D) D.R.rS T) :
-    Prop :=
-  Submodule.IsLattice D.host.E Λ ∧ Formalism.HermitianLatticesTheory.IsUnimodular (hS D).hT Λ ∧ IsLift Λ F ∧
-    IsFixedConv Λ (gS D) F
+def FixedHyp (Λ : Submodule (𝓞 D.host.E) (hS D).V) {T : D.host.E} (F : LFlag (hS D) D.R.rS T)
+    : Prop :=
+  Submodule.IsLattice D.host.E Λ ∧ Formalism.HermitianLatticesTheory.IsUnimodular (hS D).hT Λ
+    ∧ IsLift Λ F ∧ IsFixedConv Λ (gS D) F
 
 def WHyp {T : D.host.E} (F : LFlag (hS D) D.R.rS T) (W : Submodule D.host.E (hS D).V) : Prop :=
   WHypG F W D.R.k
 
-def L0X (Λ : Submodule (𝓞 D.host.E) (hS D).V) {T : D.host.E} (F : LFlag (hS D) D.R.rS T) :
-    Submodule (𝓞 D.host.E) (D.sp.X 0).V :=
+def L0X (Λ : Submodule (𝓞 D.host.E) (hS D).V) {T : D.host.E} (F : LFlag (hS D) D.R.rS T)
+    : Submodule (𝓞 D.host.E) (D.sp.X 0).V :=
   (L0sub Λ F).comap (((D.sp.iXY 0).restrictScalars (𝓞 D.host.E)))
 
 end D7

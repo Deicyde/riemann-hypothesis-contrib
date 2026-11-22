@@ -137,18 +137,23 @@ lemma exists_isometry_memLocalizedAt_single (hkey : KeyRep) (hok : CmOK a b c d)
 theorem stepB_of_key (hkey : KeyRep) : StepB := by
   intro a b c d ha hd lam hlam hok m _ _ Λa hsd hθ h1 h2 l hl
   obtain ⟨x, y, hQ⟩ := exists_good_form hok hl
-  obtain ⟨g, hgI, hg1, hg2, hgT⟩ := exists_isometry_memLocalizedAt_single hkey hok m Λa hsd hθ h1 h2 hl x y hQ Finset.univ
+  obtain ⟨g, hgI, hg1, hg2, hgT⟩ :=
+    exists_isometry_memLocalizedAt_single hkey hok m Λa hsd hθ h1 h2 hl x y hQ Finset.univ
   have hc := comm_img g hg1 hg2 h1 h2
   have hsd' := selfDual_img _ g hgI hsd
-  have hθ' : ∀ z ∈ imgLat (g : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa, cmTheta b d • z ∈ imgLat (g : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa := by
+  have hθ'
+      : ∀ z ∈ imgLat (g : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa,
+        cmTheta b d • z ∈ imgLat (g : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa := by
     intro z hz
     obtain ⟨w, hw, rfl⟩ := (mem_imgLat_iff g Λa z).1 hz
     exact (mem_imgLat_iff g Λa _).2 ⟨_, hθ w hw, map_smul g _ w⟩
-  obtain ⟨n, hln, hn⟩ := sat_std_of_all hok hl x y hQ _ hsd' hθ' (fun j => hgT j (Finset.mem_univ j))
+  obtain ⟨n, hln, hn⟩ :=
+    sat_std_of_all hok hl x y hQ _ hsd' hθ' (fun j => hgT j (Finset.mem_univ j))
   refine ⟨g, hgI, hc.1, ?_, hc.2⟩
   intro hdvd
   have hfi : ((stdLat (cmL a b d ha hd lam hlam) m).addSubgroupOf
-      (imgLat (g : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa)).FiniteIndex := ⟨hc.1⟩
+      (imgLat (g : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa)).FiniteIndex :=
+    ⟨hc.1⟩
   have : Fact l.Prime := ⟨hl⟩
   obtain ⟨q, hq⟩ := exists_prime_addOrderOf_dvd_card' l hdvd
   have hnq : n • q = 0 := by

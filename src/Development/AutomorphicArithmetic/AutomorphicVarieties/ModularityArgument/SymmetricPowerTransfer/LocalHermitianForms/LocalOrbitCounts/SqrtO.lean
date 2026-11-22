@@ -12,12 +12,13 @@ theorem UpperTheory.V.Z.Sym.Loc.sqrtO : UpperTheory.V.Z.Sym.Loc.SqrtO := by
   haveI := IsAdicComplete.henselianRing O (IsLocalRing.maximalIdeal O)
   have hmon : (Polynomial.X ^ 2 - Polynomial.C x : Polynomial O).Monic :=
     Polynomial.monic_X_pow_sub_C x two_ne_zero
-  have h0 : Polynomial.eval r₀ (Polynomial.X ^ 2 - Polynomial.C x) ∈ IsLocalRing.maximalIdeal O := by
+  have h0
+      : Polynomial.eval r₀ (Polynomial.X ^ 2 - Polynomial.C x) ∈ IsLocalRing.maximalIdeal O := by
     rw [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_C]
     have h := (IsLocalRing.maximalIdeal O).neg_mem hx
     rwa [neg_sub] at h
-  have h1 : IsUnit ((Ideal.Quotient.mk (IsLocalRing.maximalIdeal O))
-      (Polynomial.eval r₀ (Polynomial.derivative (Polynomial.X ^ 2 - Polynomial.C x)))) := by
+  have h1 : IsUnit ((Ideal.Quotient.mk (IsLocalRing.maximalIdeal O)) (Polynomial.eval r₀
+      (Polynomial.derivative (Polynomial.X ^ 2 - Polynomial.C x)))) := by
     apply IsUnit.map
     simp
     exact ⟨by simpa [one_add_one_eq_two] using hL.two, hr⟩

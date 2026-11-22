@@ -6,8 +6,12 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Twis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.pAdicMonodromyTheorem_matrixForm : MatThm := by
-  first | exact @GlobalTheory.PMon.matThm_holds | exact GlobalTheory.PMon.matThm_holds | (intros; apply GlobalTheory.PMon.matThm_holds <;> assumption)
+  first
+  | exact @GlobalTheory.PMon.matThm_holds
+  | exact GlobalTheory.PMon.matThm_holds
+  | (intros; apply GlobalTheory.PMon.matThm_holds <;> assumption)

@@ -21,14 +21,16 @@ namespace KernelCokernelKilling
 
 section KillLES
 
-variable {R : Type u} [CommRing R] {A B C : Cx R} {i : Hom A B} {p : Hom B C}
-  {δ : ∀ n, C.H n →ₗ[R] A.H (n + 1)}
+variable
+  {R : Type u} [CommRing R]
+  {A B C : Cx R} {i : Hom A B} {p : Hom B C} {δ : ∀ n, C.H n →ₗ[R] A.H (n + 1)}
 
 end KillLES
 
 section KillRep
 
-variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
 end KillRep
 
@@ -41,7 +43,8 @@ theorem shift_holds : ShiftStatement.{u} := by
   induction n, hn using Nat.le_induction generalizing M with
   | base => exact hN M hM
   | succ n hNn ih =>
-    exact KernelCokernelKilling.shift_step M n (ih (KernelCokernelKilling.shQ M) (KernelCokernelKilling.shQ_tors M hM))
+    exact KernelCokernelKilling.shift_step M n
+      (ih (KernelCokernelKilling.shQ M) (KernelCokernelKilling.shQ_tors M hM))
 
 end
 

@@ -23,12 +23,14 @@ variable (l : ℕ) [Fact l.Prime]
 
 theorem isCrisDR_ι : IsCrisDR l (ι l) := fun x => Loc2.lift_mk₀ _ _ _ x
 
-theorem ι_eq : ι l = PositivityTheory.LocInh.ιCD l := (PositivityTheory.LocInh.isCrisDR_iff _).1 (isCrisDR_ι l)
+theorem ι_eq : ι l = PositivityTheory.LocInh.ιCD l :=
+  (PositivityTheory.LocInh.isCrisDR_iff _).1 (isCrisDR_ι l)
 
 theorem qB_eq : qB l = PositivityTheory.LocInh.qB l :=
-  IsLocalization.ringHom_ext (nonZeroDivisors ℤ_[l]) (RingHom.ext fun z => by
-    rw [RingHom.comp_apply, RingHom.comp_apply, qB, IsLocalization.lift_eq]
-    exact (PositivityTheory.LocInh.qB_coe z).symm)
+  IsLocalization.ringHom_ext (nonZeroDivisors ℤ_[l])
+    (RingHom.ext fun z => by
+      rw [RingHom.comp_apply, RingHom.comp_apply, qB, IsLocalization.lift_eq]
+      exact (PositivityTheory.LocInh.qB_coe z).symm)
 
 theorem ι_cB (y : ACris.ACris ℂ_[l] l) : ι l (cB l y) = iC l y := Loc2.lift_mk₀ _ _ _ y
 
@@ -48,8 +50,8 @@ theorem base_σ_one (l : ℕ) [Fact l.Prime] : σB (1 : GQ l) = RingHom.id _ :=
 theorem base_σ_mul (l : ℕ) [Fact l.Prime] : ∀ g h : GQ l, σB (g * h) = (σB g).comp (σB h) :=
   fun g h => RingHom.ext fun b => PositivityTheory.LocInh.σB_mul g h b
 
-theorem base_φ_σ (l : ℕ) [Fact l.Prime] : ∀ (g : GQ l) x, φ l (σB g x) = σB g (φ l x) :=
-  fun g x => PositivityTheory.LocInh.φB_σB g x
+theorem base_φ_σ (l : ℕ) [Fact l.Prime] : ∀ (g : GQ l) x, φ l (σB g x) = σB g (φ l x) := fun g x =>
+  PositivityTheory.LocInh.φB_σB g x
 
 theorem base_ι_σ (l : ℕ) [Fact l.Prime] : ∀ (g : GQ l) x, ι l (σB g x) = σD g (ι l x) := by
   intro g x; rw [ι_eq]; exact PositivityTheory.LocInh.ιCD_σB g x
@@ -60,7 +62,8 @@ theorem base_φ_q (l : ℕ) [Fact l.Prime] : ∀ q, φ l (qB l q) = qB l q := by
 theorem base_σ_q (l : ℕ) [Fact l.Prime] : ∀ (g : GQ l) q, σB g (qB l q) = qB l q := by
   intro g q
   apply base_ι_inj l
-  rw [base_ι_σ, ι_eq, qB_eq, PositivityTheory.LocInh.ιCD_qB, PositivityTheory.LocInh.σD_oD, AlgEquiv.commutes]
+  rw [base_ι_σ, ι_eq, qB_eq, PositivityTheory.LocInh.ιCD_qB, PositivityTheory.LocInh.σD_oD,
+    AlgEquiv.commutes]
 
 theorem base_ι_q (l : ℕ) [Fact l.Prime] : ∀ q, ι l (qB l q) = qQ l q := by
   intro q; rw [ι_eq, qB_eq]; exact PositivityTheory.LocInh.fund_ιCD_qB q
@@ -69,13 +72,14 @@ theorem period_image_eq (l : ℕ) [Fact l.Prime] : ι l (t l) = tQ l := ι_cB l 
 
 theorem base_t_unit (l : ℕ) [Fact l.Prime] : IsUnit (t l) := Loc2.isUnit_right _ _
 
-theorem frobenius_period_holds (l : ℕ) [Fact l.Prime] : φ l (t l) = (l : B l) * t l := PositivityTheory.LocInh.φB_tB
+theorem frobenius_period_holds (l : ℕ) [Fact l.Prime] : φ l (t l) = (l : B l) * t l :=
+  PositivityTheory.LocInh.φB_tB
 
-theorem galois_period_cyclotomic (l : ℕ) [Fact l.Prime] : ∀ g : GQ l, σB g (t l) = qB l (χ g) * t l := by
+theorem galois_period_cyclotomic (l : ℕ) [Fact l.Prime]
+    : ∀ g : GQ l, σB g (t l) = qB l (χ g) * t l := by
   intro g; rw [qB_eq]; exact PositivityTheory.LocInh.σB_tB g
 
-theorem base_χ_cont (l : ℕ) [Fact l.Prime] : Continuous (χ : GQ l → ℚ_[l]) :=
-  by
+theorem base_χ_cont (l : ℕ) [Fact l.Prime] : Continuous (χ : GQ l → ℚ_[l]) := by
   have h1 : Continuous (fun g : GQ l => ((DeRhamTwist.Twist.chi0 l g : ℤ_[l]ˣ) : ℤ_[l])) :=
     Units.continuous_val.comp (DeRhamTwist.Twist.continuous_cyclotomic_character (l := l))
   have h2 : Continuous (fun x : ℤ_[l] => (x : ℚ_[l])) := by
@@ -102,10 +106,12 @@ theorem base_ι_Bst (l : ℕ) [Fact l.Prime] : ∀ x, ι l x ∈ Bst l := by
     rw [← h1, inv_pow, inv_pow]
     field_simp
   rw [e]
-  have mem : ∀ z ∈ ({((l : BdR l))⁻¹, (tQ l)⁻¹, uQ l} : Set (BdR l)), z ∈ Bst l :=
-    fun z hz => Subring.subset_closure (Or.inr hz)
-  exact Subring.mul_mem _ (Subring.mul_mem _ (Subring.subset_closure (Or.inl ⟨y, rfl⟩))
-    (Subring.pow_mem _ (mem _ (by simp)) _)) (Subring.pow_mem _ (mem _ (by simp)) _)
+  have mem : ∀ z ∈ ({((l : BdR l))⁻¹, (tQ l)⁻¹, uQ l} : Set (BdR l)), z ∈ Bst l := fun z hz =>
+    Subring.subset_closure (Or.inr hz)
+  exact Subring.mul_mem _
+    (Subring.mul_mem _ (Subring.subset_closure (Or.inl ⟨y, rfl⟩))
+      (Subring.pow_mem _ (mem _ (by simp)) _))
+    (Subring.pow_mem _ (mem _ (by simp)) _)
 
 theorem base_u_Bst (l : ℕ) [Fact l.Prime] : uQ l ∈ Bst l :=
   Subring.subset_closure (Or.inr (by simp))
@@ -114,7 +120,8 @@ theorem base_fs_ker (l : ℕ) [Fact l.Prime] : ∀ x, φ l x = x → ι l x ∈ 
   intro x hφ hx
   obtain ⟨z, hz⟩ := RingHom.mem_range.1 hx
   rw [ι_eq] at hz
-  obtain ⟨q, hq⟩ := PositivityTheory.LocInh.fund x hφ ((IsPerfectoidField.mem_fil_zero_iff ℂ_[l] l).2 ⟨z, hz.symm⟩)
+  obtain ⟨q, hq⟩ :=
+    PositivityTheory.LocInh.fund x hφ ((IsPerfectoidField.mem_fil_zero_iff ℂ_[l] l).2 ⟨z, hz.symm⟩)
   exact ⟨q, by rw [qB_eq]; exact hq.symm⟩
 
 theorem base_fs_surj (l : ℕ) [Fact l.Prime] : ∀ z : BdR l, ∃ x, φ l x = x ∧ ι l x - z ∈ Plus l := by

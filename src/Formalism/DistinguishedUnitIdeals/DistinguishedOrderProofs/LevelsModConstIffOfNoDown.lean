@@ -11,17 +11,20 @@ namespace Formalism.ExponentWindows
 
 open PowerSeries
 
-theorem lam_eq_pow_mul {O : Type} [CommRing O] (p : ℕ → PowerSeries O) (H : ℕ → ℕ) (ell s : ℕ)
-    (hs : s < ell) :
-    abelian₂ p H ell = p s ^ H s * ∏ t ∈ (Finset.range ell).erase s, p t ^ H t := by
+theorem lam_eq_pow_mul
+    {O : Type} [CommRing O] (p : ℕ → PowerSeries O) (H : ℕ → ℕ) (ell s : ℕ) (hs : s < ell)
+    : abelian₂ p H ell = p s ^ H s * ∏ t ∈ (Finset.range ell).erase s, p t ^ H t := by
   unfold abelian₂
   rw [← Finset.mul_prod_erase (Finset.range ell) (fun t => p t ^ H t) (Finset.mem_range.mpr hs)]
 
-theorem levelCond_of_sub_pow_smul {O : Type} [CommRing O] {r : ℕ} (ϖ : O) (P : PowerSeries O)
-    (H b : ℕ) (k : Kind) (hk : k ≠ Kind.down) (V : Submodule O (Fin r → O))
-    (y w : Fin r → PowerSeries O) (m : ℕ)
-    (h : LevelCond ϖ P H b k V (C (ϖ ^ m) • y - P ^ H • w)) :
-    LevelCond ϖ P H b k V y := by
+theorem levelCond_of_sub_pow_smul
+    {O : Type} [CommRing O]
+    {r : ℕ}
+    (ϖ : O) (P : PowerSeries O) (H b : ℕ)
+    (k : Kind) (hk : k ≠ Kind.down)
+    (V : Submodule O (Fin r → O)) (y w : Fin r → PowerSeries O) (m : ℕ)
+    (h : LevelCond ϖ P H b k V (C (ϖ ^ m) • y - P ^ H • w))
+    : LevelCond ϖ P H b k V y := by
   cases k with
   | thin =>
     obtain ⟨N, z, hz⟩ := h
@@ -45,8 +48,7 @@ theorem levels_mod_const_iff_of_no_down : MNone := by
     exact levelCond_of_sub_pow_smul ϖ (p s) (H s) (b s) (kind s) (hnd s hs) (V s) y _ k hd
   · intro hNN s hs
     refine ⟨0, 0, ?_⟩
-    have h0 : (cst (0 : Fin r → O) : Fin r → PowerSeries O) = 0 := by
-      funext i; simp [cst]
+    have h0 : (cst (0 : Fin r → O) : Fin r → PowerSeries O) = 0 := by funext i; simp [cst]
     simpa [h0] using hNN s hs
 
 end Formalism.ExponentWindows

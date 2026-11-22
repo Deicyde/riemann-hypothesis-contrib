@@ -7,8 +7,10 @@ public import ReciprocityTheory.AdeleApproximation.AdeleIntA
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
-  IsDedekindDomain NumberField Formalism.IndefR.PHeisFC Formalism.IndefR.Eqv
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+  Formalism.IndefR.PHeisFC Formalism.IndefR.Eqv
 open scoped TensorProduct
 
 set_option synthInstance.maxHeartbeats 160000
@@ -23,12 +25,14 @@ end Gen
 
 variable {D : D7}
 
-theorem AF_ext' {p q : AF D.host.F} (h1 : fstA D.host.F p = fstA D.host.F q) (h2 : sndA D.host.F p = sndA D.host.F q) :
-    p = q :=
+theorem AF_ext'
+    {p q : AF D.host.F}
+    (h1 : fstA D.host.F p = fstA D.host.F q) (h2 : sndA D.host.F p = sndA D.host.F q)
+    : p = q :=
   Prod.ext h1 h2
 
-theorem expand_cE (z : AE D) :
-    z = ∑ k, (cE D.host.F D.host.E z k) ⊗ₜ[D.host.F] (Module.finBasis D.host.F D.host.E k) := by
+theorem expand_cE (z : AE D)
+    : z = ∑ k, (cE D.host.F D.host.E z k) ⊗ₜ[D.host.F] (Module.finBasis D.host.F D.host.E k) := by
   conv_lhs => rw [← (bA D.host.F D.host.E).sum_equivFun z]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
@@ -42,16 +46,19 @@ theorem continuous_Ps {m n : ℕ} : Continuous (Ps (D := D) m n) :=
     (cE D.host.F D.host.E).symm.continuous.comp ((continuous_apply j).comp (continuous_apply i))
 
 def boxB (D : D7) (m n : ℕ) : Set (Mx D m n) :=
-  Ps m n '' Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => Set.pi Set.univ fun _ =>
-    (fun a : Af D.host.F => pairA D.host.F 0 a) '' Ohat D.host.F
+  Ps m n '' Set.pi Set.univ fun _ =>
+    Set.pi Set.univ fun _ =>
+      Set.pi Set.univ fun _ => (fun a : Af D.host.F => pairA D.host.F 0 a) '' Ohat D.host.F
 
 theorem isCompact_boxB (m n : ℕ) : IsCompact (boxB D m n) := by
   have hc : Continuous fun a : Af D.host.F => pairA D.host.F 0 a := by
     unfold pairA; exact continuous_const.prodMk continuous_id
-  exact (isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_univ_pi fun _ =>
-    (isCompact_Ohat D.host.F).image hc).image continuous_Ps
+  exact (isCompact_univ_pi fun _ =>
+    isCompact_univ_pi fun _ =>
+      isCompact_univ_pi fun _ => (isCompact_Ohat D.host.F).image hc).image continuous_Ps
 
-theorem nsmul_pairA (N : ℕ) (a : Af D.host.F) : N • pairA D.host.F 0 a = pairA D.host.F 0 (N • a) := by
+theorem nsmul_pairA (N : ℕ) (a : Af D.host.F)
+    : N • pairA D.host.F 0 a = pairA D.host.F 0 (N • a) := by
   refine AF_ext' ?_ ?_
   · rw [map_nsmul]; show N • (0 : Ainf D.host.F) = 0; exact nsmul_zero N
   · rw [map_nsmul]; rfl

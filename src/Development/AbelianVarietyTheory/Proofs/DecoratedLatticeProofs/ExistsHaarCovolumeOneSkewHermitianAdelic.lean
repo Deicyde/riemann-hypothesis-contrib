@@ -13,7 +13,9 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -39,26 +41,27 @@ theorem skewPart_add (x y : Mx D ρ ρ) : skewPart D ρ (x + y) = skewPart D ρ 
 theorem skewPart_rat {x : Mx D ρ ρ} (hx : x ∈ ratMx D ρ ρ) : skewPart D ρ x ∈ ratMx D ρ ρ := by
   obtain ⟨γ, rfl⟩ := (mem_ratMx).1 hx
   refine (mem_ratMx).2 ⟨(1 / 2 : D.host.E) • (γ - γᴴ), ?_⟩
-  rw [rat_smul, rat_sub, rat_conjTranspose]; rfl
+  rw [rat_smul, rat_sub, rat_conjTranspose]
+  rfl
 
 set_option synthInstance.maxHeartbeats 400000 in
 theorem continuous_skewPart : Continuous (skewPart D ρ) :=
   haveI : IsTopologicalAddGroup (Mx D ρ ρ) := (lattice_Mx D ρ ρ).1
-  show Continuous fun x => half D • (x - adj x) from (continuous_id.sub continuous_adj).const_smul (half D)
+  show Continuous fun x => half D • (x - adj x) from
+    (continuous_id.sub continuous_adj).const_smul (half D)
 
 theorem isClosed_skewA : IsClosed (skewA D ρ : Set (Mx D ρ ρ)) :=
   haveI : T2Space (Mx D ρ ρ) := (lattice_Mx D ρ ρ).2.2.2.1
   isClosed_eq continuous_adj continuous_neg
 
-theorem isCoLat_skew :
-    GlobalTheory.CuspGeneric.IsCoLat ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) := by
+theorem isCoLat_skew
+    : GlobalTheory.CuspGeneric.IsCoLat ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) := by
   obtain ⟨-, -, -, -, i5, K, hK, hKc⟩ := lattice_Mx D ρ ρ
   refine ⟨?_, ?_⟩
   · let φ : (ratMx D ρ ρ).addSubgroupOf (skewA D ρ) → ratMx D ρ ρ := fun q => ⟨q.1.1, q.2⟩
     have hinj : Function.Injective φ := fun a b h =>
       Subtype.ext (Subtype.ext (by simpa [φ] using congrArg Subtype.val h))
-    have hcont : Continuous φ :=
-      ((continuous_subtype_val.comp continuous_subtype_val)).subtype_mk _
+    have hcont : Continuous φ := ((continuous_subtype_val.comp continuous_subtype_val)).subtype_mk _
     exact DiscreteTopology.of_continuous_injective hcont hinj
   · let P : Mx D ρ ρ → skewA D ρ := fun x => ⟨skewPart D ρ x, skewPart_mem x⟩
     have hP : Continuous P := continuous_skewPart.subtype_mk _
@@ -69,7 +72,10 @@ theorem isCoLat_skew :
     change skewPart D ρ (γ + x.1) = skewPart D ρ γ + x.1
     rw [skewPart_add, skewPart_of_mem x.2]
 
-theorem exists_haar_covol_one : ∀ (D : D7) (ρ : ℕ), ∃ (lC : Measure (skewA D ρ)) (𝓒 : Set (skewA D ρ)), lC.IsAddHaarMeasure ∧ SFinite lC ∧ IsAddFundamentalDomain ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) 𝓒 lC ∧ lC 𝓒 = 1 := by
+theorem exists_haar_covol_one
+    : ∀ (D : D7) (ρ : ℕ), ∃ (lC : Measure (skewA D ρ)) (𝓒 : Set (skewA D ρ)),
+      lC.IsAddHaarMeasure ∧ SFinite lC
+        ∧ IsAddFundamentalDomain ((ratMx D ρ ρ).addSubgroupOf (skewA D ρ)) 𝓒 lC ∧ lC 𝓒 = 1 := by
   intro D ρ
   obtain ⟨i1, i2, i3, i4, -, -⟩ := lattice_Mx D ρ ρ
   haveI : IsTopologicalAddGroup (Mx D ρ ρ) := i1

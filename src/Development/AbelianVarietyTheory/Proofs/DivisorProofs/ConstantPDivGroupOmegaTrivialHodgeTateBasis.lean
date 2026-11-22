@@ -10,17 +10,22 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup Coalgebra Bialgebra WithConv
+open CategoryTheory GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup Coalgebra Bialgebra
+  WithConv
 
 namespace GlobalTheory.ConstHT
 
-theorem isIntegrallyClosedIn_of_integers {C : Type} [Field C] {v : Valuation C NNReal} {O : Type}
-    [CommRing O] [Algebra O C] (hv : v.Integers O) : IsIntegrallyClosedIn O C :=
-  isIntegrallyClosedIn_iff.2 ⟨hv.hom_inj, fun h => hv.exists_of_le_one
-    (hv.isIntegral_iff_v_le_one.1 h)⟩
+theorem isIntegrallyClosedIn_of_integers
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    : IsIntegrallyClosedIn O C :=
+  isIntegrallyClosedIn_iff.2
+    ⟨hv.hom_inj, fun h => hv.exists_of_le_one (hv.isIntegral_iff_v_le_one.1 h)⟩
 
-theorem exists_eq_apply_of_algHom {O : Type} [CommRing O] [IsDomain O] {N : ℕ}
-    (f : (Fin N → O) →ₐ[O] O) : ∃ k, ∀ v, f v = v k := by
+theorem exists_eq_apply_of_algHom
+    {O : Type} [CommRing O] [IsDomain O] {N : ℕ} (f : (Fin N → O) →ₐ[O] O)
+    : ∃ k, ∀ v, f v = v k := by
   have hsq : ∀ k, (Pi.single k (1 : O) : Fin N → O) * Pi.single k 1 = Pi.single k 1 := fun k => by
     ext j; by_cases hj : j = k <;> simp [Pi.single_apply, hj]
   have hid : ∀ k, f (Pi.single k 1) = 0 ∨ f (Pi.single k 1) = 1 := fun k =>
@@ -42,13 +47,19 @@ theorem exists_eq_apply_of_algHom {O : Type} [CommRing O] [IsDomain O] {N : ℕ}
   refine ⟨k, fun v => ?_⟩
   have h1 : v * Pi.single k 1 = (v k) • (Pi.single k 1 : Fin N → O) := by
     ext j; by_cases hj : j = k <;> simp [Pi.single_apply, hj]
-  calc f v = f v * f (Pi.single k 1) := by rw [hk, mul_one]
+  calc
+    f v
+      = f v * f (Pi.single k 1) := by rw [hk, mul_one]
     _ = v k := by rw [← map_mul, h1, map_smul, hk, smul_eq_mul, mul_one]
 
-theorem cot_eq_zero_of_equiv {O A : Type} [CommRing O] [IsDomain O] [CommRing A] [Bialgebra O A]
-    {N : ℕ} (e : A ≃ₐ[O] (Fin N → O)) (w : Cot O A) : w = 0 := by
+theorem cot_eq_zero_of_equiv
+    {O A : Type} [CommRing O] [IsDomain O] [CommRing A] [Bialgebra O A]
+    {N : ℕ} (e : A ≃ₐ[O] (Fin N → O))
+    (w : Cot O A)
+    : w = 0 := by
   obtain ⟨a, rfl⟩ := AugCot.d_surjective _ w
-  obtain ⟨k, hk⟩ := exists_eq_apply_of_algHom ((counitAlgHom O A).comp (e.symm : (Fin N → O) →ₐ[O] A))
+  obtain ⟨k, hk⟩ :=
+    exists_eq_apply_of_algHom ((counitAlgHom O A).comp (e.symm : (Fin N → O) →ₐ[O] A))
   have he : ∀ x, counitAlgHom O A x = e x k := fun x => by
     have := hk (e x)
     simpa using this
@@ -56,19 +67,23 @@ theorem cot_eq_zero_of_equiv {O A : Type} [CommRing O] [IsDomain O] [CommRing A]
   set c := e.symm (1 - Pi.single k 1) with hcdef
   have hb : counitAlgHom O A b = 0 := by simp [b]
   have hc : counitAlgHom O A c = 0 := by rw [he]; simp [c]
-  have hbc : b = b * c := e.injective <| funext fun j => by
-    rw [map_mul, Pi.mul_apply]
-    by_cases hj : j = k
-    · subst hj
-      rw [← he, ← he, hb, zero_mul]
-    · simp [c, hj]
+  have hbc : b = b * c :=
+    e.injective <| funext fun j => by
+      rw [map_mul, Pi.mul_apply]
+      by_cases hj : j = k
+      · subst hj
+        rw [← he, ← he, hb, zero_mul]
+      · simp [c, hj]
   have h : AugCot.d (counitAlgHom O A) b = 0 := by
     rw [hbc, AugCot.d_mul, hb, hc, zero_smul, zero_smul, add_zero]
   rwa [hbdef, map_sub, AugCot.d_algebraMap, sub_zero] at h
 
-theorem hodgeTate_smul_val {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] (G : PDivGroup p O)
-    (a : ℤ_[p]) (t : G.Tate) (n : ℕ) :
-    (hodgeTate G (a • t)).1 n = (digit n a : O) • (hodgeTate G t).1 n := by
+theorem hodgeTate_smul_val
+    {p : ℕ} [Fact p.Prime]
+    {O : Type} [CommRing O]
+    (G : PDivGroup p O)
+    (a : ℤ_[p]) (t : G.Tate) (n : ℕ)
+    : (hodgeTate G (a • t)).1 n = (digit n a : O) • (hodgeTate G t).1 n := by
   obtain ⟨c, hc⟩ := pow_dvd_sub_digit n a
   have ha : a = (digit n a : ℤ_[p]) + (p : ℤ_[p]) ^ n * c := by rw [← hc]; ring
   have h2 : (hodgeTate G ((p : ℤ_[p]) ^ n • (c • t))).1 n = 0 := by
@@ -76,7 +91,8 @@ theorem hodgeTate_smul_val {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] (G :
     change (p ^ n) • ((hodgeTate G (c • t)).1 n) = 0
     rw [← Nat.cast_smul_eq_nsmul O, Nat.cast_pow]
     exact G.dual.pow_smul_cot n _
-  have h3 : (hodgeTate G ((digit n a : ℤ_[p]) • t)).1 n = (digit n a : O) • (hodgeTate G t).1 n := by
+  have h3
+      : (hodgeTate G ((digit n a : ℤ_[p]) • t)).1 n = (digit n a : O) • (hodgeTate G t).1 n := by
     rw [Nat.cast_smul_eq_nsmul, map_nsmul, ← Nat.cast_smul_eq_nsmul O]
     rfl
   have e1 : a • t = (digit n a : ℤ_[p]) • t + (p : ℤ_[p]) ^ n • (c • t) := by
@@ -90,14 +106,18 @@ end GlobalTheory.ConstHT
 namespace GlobalTheory.ConstHT
 open GlobalTheory.PDivLat
 
-theorem level_span (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+theorem level_span
+    (p : ℕ) [Fact p.Prime]
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
     (O : Type) [CommRing O] [IsDomain O] [Algebra O C] [IsIntegrallyClosedIn O C]
-    (G : PDivGroup p O) (hG : IsConst G) (h : ℕ) (b : Module.Basis (Fin h) ℤ_[p] G.Tate) (n : ℕ)
-    (w : Cot O (G.dual.A n)) : ∃ c : Fin h → O, ∑ i, c i • (hodgeTate G (b i)).1 n = w := by
+    (G : PDivGroup p O) (hG : IsConst G)
+    (h : ℕ) (b : Module.Basis (Fin h) ℤ_[p] G.Tate)
+    (n : ℕ) (w : Cot O (G.dual.A n))
+    : ∃ c : Fin h → O, ∑ i, c i • (hodgeTate G (b i)).1 n = w := by
   obtain ⟨e⟩ := hG n
   let Lev : (Fin h → O) →ₗ[O] Cot O (G.dual.A n) :=
-    (LinearMap.proj n ∘ₗ G.dual.omegaSub.subtype) ∘ₗ
-      Fintype.linearCombination O (fun i => hodgeTate G (b i))
+    (LinearMap.proj n ∘ₗ G.dual.omegaSub.subtype)
+      ∘ₗ Fintype.linearCombination O (fun i => hodgeTate G (b i))
   have hLev : ∀ c, Lev c = ∑ i, c i • (hodgeTate G (b i)).1 n := fun c => by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Lev, LinearMap.comp_apply, Fintype.linearCombination_apply, map_sum, map_smul]
@@ -115,10 +135,11 @@ theorem level_span (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
     (Pi.basisFun O (Fin (p ^ (n * G.height)))).map e.symm.toLinearEquiv
   let γ : Fin (p ^ (n * G.height)) → (G.A n →ₐ[O] O) := fun k =>
     (Pi.evalAlgHom O (fun _ => O) k).comp (e : G.A n →ₐ[O] _)
-  have hγ : ∀ k, β.coord k = (γ k).toLinearMap := fun k => LinearMap.ext fun x => by
-    simp [β, γ]
-  have hmem : ∀ k, dUnit (R := O) (toConv (γ k).toLinearMap : CartierDual O (G.A n)) ∈
-      LinearMap.range Lev := fun k => by
+  have hγ : ∀ k, β.coord k = (γ k).toLinearMap := fun k => LinearMap.ext fun x => by simp [β, γ]
+  have hmem
+      : ∀ k,
+        dUnit (R := O) (toConv (γ k).toLinearMap : CartierDual O (G.A n))
+          ∈ LinearMap.range Lev := fun k => by
     obtain ⟨t, ht⟩ := G.pt_surjective C n (γ k)
     have := hodgeTate_val t n
     simp only at ht
@@ -147,18 +168,21 @@ end GlobalTheory.ConstHT
 namespace GlobalTheory.ConstHT
 open GlobalTheory.PDivLat
 
-theorem level_indep (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+theorem level_indep
+    (p : ℕ) [Fact p.Prime]
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
     (O : Type) [CommRing O] [IsDomain O] [Algebra O C] [IsIntegrallyClosedIn O C]
-    (G : PDivGroup p O) (hG : IsConst G) (h : ℕ) (b : Module.Basis (Fin h) ℤ_[p] G.Tate) (n : ℕ)
-    (c : Fin h → O) (hc : ∑ i, c i • (hodgeTate G (b i)).1 n = 0) (i : Fin h) :
-    (p : O) ^ n ∣ c i := by
+    (G : PDivGroup p O) (hG : IsConst G)
+    (h : ℕ) (b : Module.Basis (Fin h) ℤ_[p] G.Tate)
+    (n : ℕ) (c : Fin h → O) (hc : ∑ i, c i • (hodgeTate G (b i)).1 n = 0)
+    (i : Fin h)
+    : (p : O) ^ n ∣ c i := by
   obtain ⟨e⟩ := hG n
   let β : Module.Basis (Fin (p ^ (n * G.height))) O (G.A n) :=
     (Pi.basisFun O (Fin (p ^ (n * G.height)))).map e.symm.toLinearEquiv
   let γ : Fin (p ^ (n * G.height)) → (G.A n →ₐ[O] O) := fun k =>
     (Pi.evalAlgHom O (fun _ => O) k).comp (e : G.A n →ₐ[O] _)
-  have hγ : ∀ k, β.coord k = (γ k).toLinearMap := fun k => LinearMap.ext fun x => by
-    simp [β, γ]
+  have hγ : ∀ k, β.coord k = (γ k).toLinearMap := fun k => LinearMap.ext fun x => by simp [β, γ]
   let B : Module.Basis (Fin (p ^ (n * G.height))) O (CartierDual O (G.A n)) :=
     β.dualBasis.map (CartierDual.toDual O (G.A n)).symm
   have hB : ∀ k, B k = toConv (γ k).toLinearMap := fun k => by
@@ -168,10 +192,14 @@ theorem level_indep (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
     obtain ⟨k, hk⟩ := exists_eq_apply_of_algHom (x.comp e.symm.toAlgHom)
     exact ⟨k, AlgHom.ext fun a => by simpa [γ] using hk (e a)⟩
   let Q := O ⧸ Ideal.span {(p : O) ^ n}
-  let g : ZMod (p ^ n) →+ Q := ZMod.lift (p ^ n) ⟨Int.castAddHom Q, by
-    change (((p ^ n : ℕ) : ℤ) : Q) = 0
-    rw [Int.cast_natCast, Nat.cast_pow]
-    exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)⟩
+  let g : ZMod (p ^ n) →+ Q :=
+    ZMod.lift (p ^ n) ⟨
+      Int.castAddHom Q,
+      by
+        change (((p ^ n : ℕ) : ℤ) : Q) = 0
+        rw [Int.cast_natCast, Nat.cast_pow]
+        exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)
+    ⟩
   have hg1 : g 1 = 1 := by
     rw [← Int.cast_one, ZMod.lift_coe]
     simp
@@ -196,8 +224,9 @@ theorem level_indep (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
   have hDpt : ∀ x : G.A n →ₐ[O] O, D (toConv x.toLinearMap) = a x := fun x => by
     obtain ⟨k, rfl⟩ := hall x
     rw [← hB, Module.Basis.constr_basis]
-  have hε : ∀ x : G.A n →ₐ[O] O,
-      counitAlgHom O (CartierDual O (G.A n)) (toConv x.toLinearMap) = 1 := fun x => by
+  have hε
+      : ∀ x : G.A n →ₐ[O] O,
+        counitAlgHom O (CartierDual O (G.A n)) (toConv x.toLinearMap) = 1 := fun x => by
     rw [Bialgebra.counitAlgHom_apply, CartierDual.counit_apply]
     exact map_one x
   have hmul : ∀ x y : G.A n →ₐ[O] O, a (toConv x * toConv y).ofConv = a x + a y := fun x y => by
@@ -208,13 +237,17 @@ theorem level_indep (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
   let M : CartierDual O (G.A n) →ₗ[O] CartierDual O (G.A n) →ₗ[O] Q :=
     (LinearMap.lsmul O Q).compl₁₂ (counitAlgHom O (CartierDual O (G.A n))).toLinearMap D
   have key : (LinearMap.mul O (CartierDual O (G.A n))).compr₂ D = M + M.flip :=
-    B.ext fun k => B.ext fun l => by
-      simp only [LinearMap.compr₂_apply, LinearMap.mul_apply', LinearMap.add_apply,
-        LinearMap.flip_apply, M, LinearMap.compl₁₂_apply, LinearMap.lsmul_apply,
-        AlgHom.toLinearMap_apply, hB, hε, one_smul]
-      rw [← AlgHom.toLinearMap_convMul, hDpt, hDpt, hDpt, hmul, add_comm]
-  have hD : ∀ u v, D (u * v) = counitAlgHom O (CartierDual O (G.A n)) u • D v +
-      counitAlgHom O (CartierDual O (G.A n)) v • D u := fun u v =>
+    B.ext fun k =>
+      B.ext fun l => by
+        simp only [LinearMap.compr₂_apply, LinearMap.mul_apply', LinearMap.add_apply,
+          LinearMap.flip_apply, M, LinearMap.compl₁₂_apply, LinearMap.lsmul_apply,
+          AlgHom.toLinearMap_apply, hB, hε, one_smul]
+        rw [← AlgHom.toLinearMap_convMul, hDpt, hDpt, hDpt, hmul, add_comm]
+  have hD
+      : ∀ u v,
+        D (u * v)
+          = counitAlgHom O (CartierDual O (G.A n)) u • D v
+            + counitAlgHom O (CartierDual O (G.A n)) v • D u := fun u v =>
     LinearMap.congr_fun₂ key u v
   let Dl := AugCot.lift (counitAlgHom O (CartierDual O (G.A n))) D hD
   have hDl : ∀ i', Dl ((hodgeTate G (b i')).1 n) = if i' = i then 1 else 0 := fun i' => by
@@ -239,7 +272,16 @@ end GlobalTheory.ConstHT
 namespace GlobalTheory.ConstHT
 open GlobalTheory.PDivLat
 
-theorem omega_const : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O] [IsLocalRing O], v.Integers O → ∀ G : PDivGroup p O, IsConst G → Subsingleton G.omega ∧ ∀ (h : ℕ) (b : Module.Basis (Fin h) ℤ_[p] G.Tate), Function.Bijective (Fintype.linearCombination O fun i => hodgeTate G (b i)) := by
+theorem omega_const
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O] [IsLocalRing O],
+      v.Integers O
+        → ∀ G : PDivGroup p O,
+          IsConst G
+            → Subsingleton G.omega
+              ∧ ∀ (h : ℕ) (b : Module.Basis (Fin h) ℤ_[p] G.Tate),
+                Function.Bijective (Fintype.linearCombination O fun i => hodgeTate G (b i)) := by
   intro p _ C _ _ _ v O _ _ _ _ _ _ hv G hG
   haveI := isIntegrallyClosedIn_of_integers hv
   refine ⟨⟨fun x y => Subtype.ext (funext fun n => ?_)⟩, fun h b => ?_⟩
@@ -249,11 +291,12 @@ theorem omega_const : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgCl
   have hval : ∀ c n, (Φ c).1 n = ∑ i, c i • (hodgeTate G (b i)).1 n := fun c n => by
     rw [hΦ, Fintype.linearCombination_apply]
     simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply]
-  have hsmod : ∀ (n : ℕ) (x y : O),
-      x ≡ y [SMOD (Ideal.span {(p : O)} ^ n • ⊤ : Submodule O O)] ↔ (p : O) ^ n ∣ x - y :=
-    fun n x y => by
-      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-        Ideal.mem_span_singleton]
+  have hsmod
+      : ∀ (n : ℕ) (x y : O),
+        x ≡ y [SMOD (Ideal.span {(p : O)} ^ n • ⊤ : Submodule O O)]
+          ↔ (p : O) ^ n ∣ x - y := fun n x y => by
+    rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+      Ideal.mem_span_singleton]
   constructor
   · rw [injective_iff_map_eq_zero]
     intro c hc
@@ -271,13 +314,15 @@ theorem omega_const : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgCl
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [map_smul, (hodgeTate G (b i)).2 n])
     have hL : ∀ i, ∃ L : O, ∀ n, (p : O) ^ n ∣ c n i - L := fun i => by
-      obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := Ideal.span {(p : O)}) (fun n => c n i)
-        fun {m n} hmn => by
-          induction n, hmn using Nat.le_induction with
-          | base => exact SModEq.refl _
-          | succ n hmn ih =>
-            exact ih.trans ((hsmod m _ _).2 (dvd_sub_comm.1
-              ((pow_dvd_pow _ hmn).trans (hcompat n i))))
+      obtain ⟨L, hL⟩ :=
+        IsPrecomplete.prec' (I := Ideal.span {(p : O)})
+          (fun n => c n i)
+          fun {m n} hmn => by
+            induction n, hmn using Nat.le_induction with
+            | base => exact SModEq.refl _
+            | succ n hmn ih =>
+              exact ih.trans ((hsmod m _ _).2
+                (dvd_sub_comm.1 ((pow_dvd_pow _ hmn).trans (hcompat n i))))
       exact ⟨L, fun n => (hsmod n _ _).1 (hL n)⟩
     choose L hL using hL
     refine ⟨L, Subtype.ext (funext fun n => ?_)⟩

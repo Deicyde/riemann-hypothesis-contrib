@@ -28,42 +28,51 @@ def equivOfDet (b : Basis ι K E) (A : Matrix ι ι K) (hA : A.det ≠ 0) : E �
   LinearEquiv.ofIsUnitDet (f := Matrix.toLin b b A) (v := b) (v' := b)
     (by rw [LinearMap.toMatrix_toLin]; exact hA.isUnit)
 
-theorem coe_equivOfDet (b : Basis ι K E) (A : Matrix ι ι K) (hA : A.det ≠ 0) :
-    ⇑(equivOfDet b A hA) = Matrix.toLin b b A := rfl
+theorem coe_equivOfDet (b : Basis ι K E) (A : Matrix ι ι K) (hA : A.det ≠ 0)
+    : ⇑(equivOfDet b A hA) = Matrix.toLin b b A :=
+  rfl
 
 variable [MeasurableSpace E] [BorelSpace E]
 
 def ScaleBox (b : Basis ι K E) (μ : Measure E) : Prop :=
   ∀ (i : ι) (a : K) (ha : a ≠ 0),
-    μ (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a)) '' box b 1) =
-      (distribHaarChar K (Units.mk0 a ha) : ℝ≥0∞) * μ (box b 1)
+    μ (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a)) '' box b 1)
+      = (distribHaarChar K (Units.mk0 a ha) : ℝ≥0∞) * μ (box b 1)
 
 def TransvBox (b : Basis ι K E) : Prop :=
-  ∀ t : Matrix.TransvectionStruct ι K, ∃ γ : ι → ValueGroupWithZero K, (∀ i, γ i ≠ 0) ∧
-    Matrix.toLin b b t.toMatrix '' box b γ = box b γ
+  ∀ t : Matrix.TransvectionStruct ι K, ∃ γ : ι → ValueGroupWithZero K,
+    (∀ i, γ i ≠ 0) ∧ Matrix.toLin b b t.toMatrix '' box b γ = box b γ
 
-private theorem measure_toLin_mul_image_of_forall (b : Basis ι K E) (μ : Measure E) (A B : Matrix ι ι K)
+private theorem measure_toLin_mul_image_of_forall
+    (b : Basis ι K E) (μ : Measure E) (A B : Matrix ι ι K)
     (hA : ∀ S : Set E, μ (Matrix.toLin b b A '' S) = ENNReal.ofReal (modF K A.det) * μ S)
     (hB : ∀ S : Set E, μ (Matrix.toLin b b B '' S) = ENNReal.ofReal (modF K B.det) * μ S)
-    (S : Set E) :
-    μ (Matrix.toLin b b (A * B) '' S) = ENNReal.ofReal (modF K (A * B).det) * μ S := by
+    (S : Set E)
+    : μ (Matrix.toLin b b (A * B) '' S) = ENNReal.ofReal (modF K (A * B).det) * μ S := by
   rw [Matrix.toLin_mul b b b, LinearMap.coe_comp, Set.image_comp, hA, hB, Matrix.det_mul, modF_mul,
     ENNReal.ofReal_mul (modF_nonneg' _), mul_assoc]
 
-private theorem measure_toLin_transvection_image (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure]
-    (htrans : TransvBox b) (t : Matrix.TransvectionStruct ι K) (S : Set E) :
-    μ (Matrix.toLin b b t.toMatrix '' S) = ENNReal.ofReal (modF K t.toMatrix.det) * μ S := by
+private theorem measure_toLin_transvection_image
+    (b : Basis ι K E)
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (htrans : TransvBox b) (t : Matrix.TransvectionStruct ι K) (S : Set E)
+    : μ (Matrix.toLin b b t.toMatrix '' S) = ENNReal.ofReal (modF K t.toMatrix.det) * μ S := by
   obtain ⟨γ, hγ, himg⟩ := htrans t
   have hdet : t.toMatrix.det ≠ 0 := by rw [Matrix.TransvectionStruct.det]; exact one_ne_zero
   rw [Matrix.TransvectionStruct.det, modF_one, ENNReal.ofReal_one, one_mul]
-  have h := image_eq_of_box b μ (equivOfDet b t.toMatrix hdet) γ hγ 1
-    (by rw [coe_equivOfDet, himg, one_mul]) S
+  have h :=
+    image_eq_of_box b μ (equivOfDet b t.toMatrix hdet) γ hγ 1
+      (by rw [coe_equivOfDet, himg, one_mul]) S
   rwa [coe_equivOfDet, one_mul] at h
 
-private theorem measure_toLin_diagonal_update_image (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure]
-    (hscale : ScaleBox b μ) (i : ι) (a : K) (ha : a ≠ 0) (S : Set E) :
-    μ (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a)) '' S) =
-      ENNReal.ofReal (modF K (Matrix.diagonal (Function.update (1 : ι → K) i a)).det) * μ S := by
+private theorem measure_toLin_diagonal_update_image
+    (b : Basis ι K E)
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (hscale : ScaleBox b μ) (i : ι)
+    (a : K) (ha : a ≠ 0)
+    (S : Set E)
+    : μ (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a)) '' S)
+      = ENNReal.ofReal (modF K (Matrix.diagonal (Function.update (1 : ι → K) i a)).det) * μ S := by
   have hdetv : (Matrix.diagonal (Function.update (1 : ι → K) i a)).det = a := by
     rw [Matrix.det_diagonal, Finset.prod_update_of_mem (Finset.mem_univ i)]
     simp
@@ -71,18 +80,27 @@ private theorem measure_toLin_diagonal_update_image (b : Basis ι K E) (μ : Mea
     rw [hdetv]
     exact ha
   rw [hdetv, modF_of_ne ha, ENNReal.ofReal_coe_nnreal]
-  have h := image_eq_of_box b μ (equivOfDet b _ hdet) 1 (fun _ => by simp) _
-    (by rw [coe_equivOfDet]; exact hscale i a ha) S
+  have h :=
+    image_eq_of_box b μ (equivOfDet b _ hdet) 1
+      (fun _ => by simp)
+      _ (by rw [coe_equivOfDet]; exact hscale i a ha) S
   rwa [coe_equivOfDet] at h
 
-private theorem measure_toLin_diagonal_image (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure]
-    (hscale : ScaleBox b μ) (D : ι → K) (hD : ∀ i, D i ≠ 0) (S : Set E) :
-    μ (Matrix.toLin b b (Matrix.diagonal D) '' S) =
-      ENNReal.ofReal (modF K (Matrix.diagonal D).det) * μ S := by
+private theorem measure_toLin_diagonal_image
+    (b : Basis ι K E)
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (hscale : ScaleBox b μ)
+    (D : ι → K) (hD : ∀ i, D i ≠ 0)
+    (S : Set E)
+    : μ (Matrix.toLin b b (Matrix.diagonal D) '' S)
+      = ENNReal.ofReal (modF K (Matrix.diagonal D).det) * μ S := by
   classical
-  suffices h : ∀ s : Finset ι, ∀ D : ι → K, (∀ i, D i ≠ 0) → (∀ i ∉ s, D i = 1) → ∀ S : Set E,
-      μ (Matrix.toLin b b (Matrix.diagonal D) '' S) =
-        ENNReal.ofReal (modF K (Matrix.diagonal D).det) * μ S from
+  suffices h
+      : ∀ s : Finset ι, ∀ D : ι → K,
+        (∀ i, D i ≠ 0) → (∀ i ∉ s, D i = 1)
+          → ∀ S : Set E,
+            μ (Matrix.toLin b b (Matrix.diagonal D) '' S)
+              = ENNReal.ofReal (modF K (Matrix.diagonal D).det) * μ S from
     h Finset.univ D hD (fun i hi => absurd (Finset.mem_univ i) hi) S
   intro s
   induction s using Finset.induction_on with
@@ -95,8 +113,10 @@ private theorem measure_toLin_diagonal_image (b : Basis ι K E) (μ : Measure E)
       ENNReal.ofReal_one, one_mul]
   | insert j s hj ih =>
     intro D h0 h1 S
-    have hsplit : Matrix.diagonal D = Matrix.diagonal (Function.update D j 1) *
-        Matrix.diagonal (Function.update 1 j (D j)) := by
+    have hsplit
+        : Matrix.diagonal D
+          = Matrix.diagonal (Function.update D j 1)
+            * Matrix.diagonal (Function.update 1 j (D j)) := by
       rw [Matrix.diagonal_mul_diagonal]
       congr 1
       funext i
@@ -104,7 +124,8 @@ private theorem measure_toLin_diagonal_image (b : Basis ι K E) (μ : Measure E)
       · subst h; simp
       · simp [Function.update_of_ne h]
     rw [hsplit]
-    refine measure_toLin_mul_image_of_forall b μ _ _ (ih _ ?_ ?_) (measure_toLin_diagonal_update_image b μ hscale j (D j) (h0 j)) S
+    refine measure_toLin_mul_image_of_forall b μ _ _ (ih _ ?_ ?_)
+      (measure_toLin_diagonal_update_image b μ hscale j (D j) (h0 j)) S
     · intro i
       by_cases h : i = j
       · subst h; simp
@@ -115,10 +136,13 @@ private theorem measure_toLin_diagonal_image (b : Basis ι K E) (μ : Measure E)
       · rw [Function.update_of_ne h]
         exact h1 i (by simp [h, hi])
 
-theorem image_toLin (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure]
+theorem image_toLin
+    (b : Basis ι K E)
+    (μ : Measure E) [μ.IsAddHaarMeasure]
     (hscale : ScaleBox b μ) (htrans : TransvBox b)
-    (A : Matrix ι ι K) (hA : A.det ≠ 0) (S : Set E) :
-    μ (Matrix.toLin b b A '' S) = ENNReal.ofReal (modF K A.det) * μ S := by
+    (A : Matrix ι ι K) (hA : A.det ≠ 0)
+    (S : Set E)
+    : μ (Matrix.toLin b b A '' S) = ENNReal.ofReal (modF K A.det) * μ S := by
   classical
   revert S
   refine Matrix.diagonal_transvection_induction_of_det_ne_zero
@@ -141,13 +165,15 @@ open HaarBox
 
 theorem haarAlg_of
     (hscale : ∀ (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
-      [IsNonarchimedeanLocalField K] (E : Type) [AddCommGroup E] [Module K E] [TopologicalSpace E]
-      [IsModuleTopology K E] [MeasurableSpace E] [BorelSpace E] (n : ℕ) (b : Basis (Fin n) K E)
-      (μ : Measure E) [μ.IsAddHaarMeasure], ScaleBox b μ)
+        [IsNonarchimedeanLocalField K] (E : Type) [AddCommGroup E] [Module K E] [TopologicalSpace E]
+        [IsModuleTopology K E] [MeasurableSpace E] [BorelSpace E] (n : ℕ) (b : Basis (Fin n) K E)
+        (μ : Measure E) [μ.IsAddHaarMeasure],
+      ScaleBox b μ)
     (htrans : ∀ (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
-      [IsNonarchimedeanLocalField K] (E : Type) [AddCommGroup E] [Module K E] [TopologicalSpace E]
-      [IsModuleTopology K E] (n : ℕ) (b : Basis (Fin n) K E), TransvBox b) :
-    St.HaarAlg := by
+        [IsNonarchimedeanLocalField K] (E : Type) [AddCommGroup E] [Module K E] [TopologicalSpace E]
+        [IsModuleTopology K E] (n : ℕ) (b : Basis (Fin n) K E),
+      TransvBox b)
+    : St.HaarAlg := by
   intro K _ _ _ _ A _ _ _ _ _ _ _ _ μ _ y hy S
   classical
   let b := Module.finBasis K A

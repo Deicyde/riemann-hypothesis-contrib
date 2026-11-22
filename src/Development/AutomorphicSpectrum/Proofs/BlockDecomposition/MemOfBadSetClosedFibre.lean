@@ -9,7 +9,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArtinRee
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 
@@ -61,7 +62,17 @@ lemma basicOpen_of_sub_one_mem {A : Type} [CommRing A] [IsNoetherianRing A] (I :
   rw [← hV.fromSpec_image_basicOpen r]
   exact ⟨p, hrp, hpx⟩
 
-theorem mem_of_badSet_closedFibre : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}} [X.Over (Spec (.of A))] {P : X.Modules}, IsCoherent P → ∀ (Bb : Subobject P), (Bb : X.Modules).IsQuasicoherent → ∀ (K : Set X), IsClosed K → (∀ V : X.Opens, Disjoint (V : Set X) K → secs (Bb ⊔ powSub I P 1) V = Set.univ) → ∀ x ∈ GlobalTheory.CompanionTheory.GE.PSupp.badSet Bb, I ≤ ((X ↘ Spec (.of A)).base x).asIdeal → x ∈ K := by
+theorem mem_of_badSet_closedFibre
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
+        [X.Over (Spec (.of A))] {P : X.Modules},
+      IsCoherent P
+        → ∀ (Bb : Subobject P),
+          (Bb : X.Modules).IsQuasicoherent
+            → ∀ (K : Set X),
+              IsClosed K
+                → (∀ V : X.Opens, Disjoint (V : Set X) K → secs (Bb ⊔ powSub I P 1) V = Set.univ)
+                → ∀ x ∈ GlobalTheory.CompanionTheory.GE.PSupp.badSet Bb,
+                  I ≤ ((X ↘ Spec (.of A)).base x).asIdeal → x ∈ K := by
   intro A _ _ I X _ P hP Bb hBq K hK h x hx hI
   by_contra hxK
   obtain ⟨W, ⟨V, hV, rfl⟩, hxV, hVK⟩ :=
@@ -69,16 +80,19 @@ theorem mem_of_badSet_closedFibre : ∀ {A : Type} [CommRing A] [IsNoetherianRin
   have hV' : IsAffineOpen V := hV
   have hdisj : Disjoint (V : Set X) K := Set.disjoint_left.2 fun y hy hyK => hVK hy hyK
   let J : Ideal Γ(X, V) := Ideal.map (toFunctions (A := A) V) I
-  let N : Submodule Γ(X, V) Γ(P, V) :=
-    { carrier := secs Bb V
-      add_mem' := fun hx hy => GlobalTheory.CompanionTheory.GE.Comb.secs_add hx hy
-      zero_mem' := ⟨0, map_zero _⟩
-      smul_mem' := fun r _ hx => GlobalTheory.CompanionTheory.GE.Comb.secs_smul r hx }
+  let N : Submodule Γ(X, V) Γ(P, V) := {
+    carrier := secs Bb V
+    add_mem' := fun hx hy => GlobalTheory.CompanionTheory.GE.Comb.secs_add hx hy
+    zero_mem' := ⟨0, map_zero _⟩
+    smul_mem' := fun r _ hx => GlobalTheory.CompanionTheory.GE.Comb.secs_smul r hx
+  }
   have hsum : ∀ m : Γ(P, V), ∃ s ∈ N, ∃ t ∈ (J • ⊤ : Submodule Γ(X, V) Γ(P, V)), m = s + t := by
     intro m
     have hm : m ∈ secs (Bb ⊔ powSub I P 1) V := by rw [h V hdisj]; trivial
-    rw [(GlobalTheory.T.quasicoherent_sup_sections hP.1 Bb (powSub I P 1) hBq (GlobalTheory.CompanionTheory.GE.Comb.qc_pow I hP.1 1)).2 V hV',
-      GlobalTheory.T.ideal_power_subobject_sections I P hP.1 1 V hV', pow_one] at hm
+    rw [(GlobalTheory.T.quasicoherent_sup_sections hP.1 Bb (powSub I P 1) hBq
+          (GlobalTheory.CompanionTheory.GE.Comb.qc_pow I hP.1 1)).2 V hV',
+        GlobalTheory.T.ideal_power_subobject_sections I P hP.1 1 V hV', pow_one]
+      at hm
     obtain ⟨s, hs, t, ht, rfl⟩ := hm
     exact ⟨s, hs, t, ht, rfl⟩
   haveI : Module.Finite Γ(X, V) Γ(P, V) := hP.2 V hV'
@@ -111,7 +125,9 @@ theorem mem_of_badSet_closedFibre : ∀ {A : Type} [CommRing A] [IsNoetherianRin
     rw [← hb]
     exact ⟨resF _ (X.basicOpen_le r) b, (resF_app Bb.arrow (X.basicOpen_le r) b).symm⟩
   rw [resF_smul, hm', ← hu, smul_smul, ← pow_succ'] at h3
-  have h4 := GlobalTheory.CompanionTheory.GE.Comb.secs_smul (((u⁻¹ : (Γ(X, X.basicOpen r))ˣ) : Γ(X, X.basicOpen r)) ^ (e + 1)) h3
+  have h4 :=
+    GlobalTheory.CompanionTheory.GE.Comb.secs_smul
+      (((u⁻¹ : (Γ(X, X.basicOpen r))ˣ) : Γ(X, X.basicOpen r)) ^ (e + 1)) h3
   rwa [smul_smul, ← mul_pow, Units.inv_mul, one_pow, one_smul] at h4
 
 end GlobalTheory.CompanionTheory.GE.PSupp

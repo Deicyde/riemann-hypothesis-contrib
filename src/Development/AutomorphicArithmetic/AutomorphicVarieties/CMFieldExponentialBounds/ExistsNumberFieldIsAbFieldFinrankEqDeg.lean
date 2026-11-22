@@ -7,8 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.StmtFields
 
 open NumberField Formalism.HC UpperTheory.Top UpperTheory.V
 
-theorem UpperTheory.V.exists_numberField_isAbField_finrank_eq_deg :
-    ∀ A : AbF, ∃ (L : Type) (_ : Field L) (_ : NumberField L), IsAbField A L ∧ Module.finrank ℚ L = A.deg := by
+theorem UpperTheory.V.exists_numberField_isAbField_finrank_eq_deg
+    : ∀ A : AbF, ∃ (L : Type) (_ : Field L) (_ : NumberField L),
+      IsAbField A L ∧ Module.finrank ℚ L = A.deg := by
   intro A
   haveI : NeZero A.m := ⟨A.pos.ne'⟩
   haveI : NeZero ((A.m : ℚ)) := ⟨by exact_mod_cast A.pos.ne'⟩
@@ -22,13 +23,22 @@ theorem UpperTheory.V.exists_numberField_isAbField_finrank_eq_deg :
   let F := IntermediateField.fixedField G
   refine ⟨F, inferInstance, inferInstance, ?_, ?_⟩
   · have hζ := IsCyclotomicExtension.zeta_spec A.m ℚ (CyclotomicField A.m ℚ)
-    refine ⟨A.m, inferInstance, F.val, IsCyclotomicExtension.zeta A.m ℚ (CyclotomicField A.m ℚ),
-      dvd_rfl, hζ, ?_⟩
+    refine ⟨
+      A.m,
+      inferInstance,
+      F.val,
+      IsCyclotomicExtension.zeta A.m ℚ (CyclotomicField A.m ℚ),
+      dvd_rfl,
+      hζ,
+      ?_
+    ⟩
     intro τ a hτ
     have hspec := IsPrimitiveRoot.autToPow_spec ℚ hζ τ
     have he : ((e τ : (ZMod A.m)ˣ) : ZMod A.m) = a := by
-      have h1 : IsCyclotomicExtension.zeta A.m ℚ (CyclotomicField A.m ℚ) ^ ((e τ : (ZMod A.m)ˣ) : ZMod A.m).val
-          = IsCyclotomicExtension.zeta A.m ℚ (CyclotomicField A.m ℚ) ^ a := by
+      have h1
+          : IsCyclotomicExtension.zeta A.m ℚ (CyclotomicField A.m ℚ)
+              ^ ((e τ : (ZMod A.m)ˣ) : ZMod A.m).val
+            = IsCyclotomicExtension.zeta A.m ℚ (CyclotomicField A.m ℚ) ^ a := by
         rw [← hτ, ← hspec]
         rfl
       have hfin : IsOfFinOrder (IsCyclotomicExtension.zeta A.m ℚ (CyclotomicField A.m ℚ)) :=
@@ -55,8 +65,8 @@ theorem UpperTheory.V.exists_numberField_isAbField_finrank_eq_deg :
     exact hfix.trans hker
   · have h1 := Module.finrank_mul_finrank ℚ F (CyclotomicField A.m ℚ)
     rw [IntermediateField.finrank_fixedField_eq_card,
-      ← IsGalois.card_aut_eq_finrank ℚ (CyclotomicField A.m ℚ),
-      ← Subgroup.index_mul_card G] at h1
+        ← IsGalois.card_aut_eq_finrank ℚ (CyclotomicField A.m ℚ), ← Subgroup.index_mul_card G]
+      at h1
     have hpos : 0 < Nat.card G := Nat.card_pos
     have h2 : Module.finrank ℚ F = G.index := Nat.eq_of_mul_eq_mul_right hpos h1
     rw [h2]

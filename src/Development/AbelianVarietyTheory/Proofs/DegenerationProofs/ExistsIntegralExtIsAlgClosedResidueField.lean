@@ -11,8 +11,8 @@ open Polynomial IsLocalRing
 variable {W Ω : Type} [CommRing W] [Field Ω] [Algebra W Ω]
 
 def Unram (π : W) (R : Subalgebra W Ω) : Prop :=
-  (∀ x ∈ R, IsIntegral W x) ∧ (algebraMap W Ω π)⁻¹ ∉ R ∧
-    ∀ x ∈ R, x ≠ 0 → ∃ (n : ℕ) (u : Ω), u ∈ R ∧ u⁻¹ ∈ R ∧ x = algebraMap W Ω π ^ n * u
+  (∀ x ∈ R, IsIntegral W x) ∧ (algebraMap W Ω π)⁻¹ ∉ R
+    ∧ ∀ x ∈ R, x ≠ 0 → ∃ (n : ℕ) (u : Ω), u ∈ R ∧ u⁻¹ ∈ R ∧ x = algebraMap W Ω π ^ n * u
 
 open Polynomial IsLocalRing in
 variable {W Ω : Type} [CommRing W] [Field Ω] [Algebra W Ω] in
@@ -200,18 +200,19 @@ private lemma eq_pow_mul_unit_of_mem_adjoin [IsLocalRing W] {π : W}
     exact N.mul_mem hvN (memN B)
   · rw [← hg, hgeq, map_mul, map_pow, aeval_C, IsScalarTower.algebraMap_apply W M Ω]
 
-
 open Polynomial IsLocalRing in
 variable {W Ω : Type} [CommRing W] [Field Ω] [Algebra W Ω] in
-theorem _root_.GlobalTheory.ClosedResidueExt.exists_unramified_ext (W : Type) [CommRing W] [IsDomain W]
-    [IsDiscreteValuationRing W] {π : W} (hπ : Irreducible π) :
-    ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
-      (_ : Algebra W R), Function.Injective (algebraMap W R) ∧ Algebra.IsIntegral W R ∧
-        Irreducible (algebraMap W R π) ∧ IsAlgClosed (ResidueField R) := by
+theorem _root_.GlobalTheory.ClosedResidueExt.exists_unramified_ext
+    (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] {π : W} (hπ : Irreducible π)
+    : ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
+        (_ : Algebra W R),
+      Function.Injective (algebraMap W R) ∧ Algebra.IsIntegral W R ∧ Irreducible (algebraMap W R π)
+        ∧ IsAlgClosed (ResidueField R) := by
   let Ω := AlgebraicClosure (FractionRing W)
   have hinj : Function.Injective (algebraMap W Ω) := by
     rw [IsScalarTower.algebraMap_eq W (FractionRing W) Ω]
-    exact (algebraMap (FractionRing W) Ω).injective.comp (IsFractionRing.injective W (FractionRing W))
+    exact (algebraMap (FractionRing W) Ω).injective.comp
+      (IsFractionRing.injective W (FractionRing W))
   have hπu : ¬ IsUnit π := hπ.not_isUnit
   have h0 : _root_.GlobalTheory.ClosedResidueExt.Unram π (⊥ : Subalgebra W Ω) := by
     refine ⟨fun x hx => ?_, fun hx => ?_, fun x hx hx0 => ?_⟩
@@ -241,13 +242,14 @@ theorem _root_.GlobalTheory.ClosedResidueExt.exists_unramified_ext (W : Type) [C
   · intro a b hab
     exact hinj (congrArg Subtype.val hab)
   refine IsAlgClosed.of_exists_root _ fun p hpm hpirr => ?_
-  obtain ⟨q, hq⟩ := Polynomial.map_surjective (IsLocalRing.residue M) IsLocalRing.residue_surjective p
-  obtain ⟨f, hfp, hfnat, hfm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
-    ((Polynomial.mem_lifts p).2 ⟨q, hq⟩) hpm
+  obtain ⟨q, hq⟩ :=
+    Polynomial.map_surjective (IsLocalRing.residue M) IsLocalRing.residue_surjective p
+  obtain ⟨f, hfp, hfnat, hfm⟩ :=
+    Polynomial.lifts_and_natDegree_eq_and_monic ((Polynomial.mem_lifts p).2 ⟨q, hq⟩) hpm
   have hfdeg : f.degree ≠ 0 := by
     rw [Polynomial.degree_eq_natDegree hfm.ne_zero, hfnat]
-    exact_mod_cast (Polynomial.natDegree_pos_iff_degree_pos.2
-      (Polynomial.degree_pos_of_irreducible hpirr)).ne'
+    exact_mod_cast (Polynomial.natDegree_pos_iff_degree_pos.2 (Polynomial.degree_pos_of_irreducible
+      hpirr)).ne'
   obtain ⟨α, hα⟩ := IsAlgClosed.exists_aeval_eq_zero Ω f hfdeg
   have hαi : IsIntegral M α := ⟨f, hfm, hα⟩
   have hNint : ∀ x ∈ (Algebra.adjoin M {α}).restrictScalars W, IsIntegral W x := fun x hx =>
@@ -263,12 +265,22 @@ theorem _root_.GlobalTheory.ClosedResidueExt.exists_unramified_ext (W : Type) [C
     apply hM.2.1
     rw [h, inv_zero]
     exact M.zero_mem
-  have hNU : _root_.GlobalTheory.ClosedResidueExt.Unram π ((Algebra.adjoin M {α}).restrictScalars W) := by
-    refine ⟨hNint, fun hx => ?_, eq_pow_mul_unit_of_mem_adjoin hπu M (IsLocalRing.residue M)
-      IsLocalRing.residue_surjective hker f hfm hirr' α hα hNint⟩
-    have hu := isUnit_one_add_algebraMap_mul_of_not_isUnit hπu _ hNint ⟨-(algebraMap W Ω π)⁻¹, Subalgebra.neg_mem _ hx⟩
-    have hz : (1 + algebraMap W ((Algebra.adjoin M {α}).restrictScalars W) π *
-        ⟨-(algebraMap W Ω π)⁻¹, Subalgebra.neg_mem _ hx⟩ : (Algebra.adjoin M {α}).restrictScalars W) = 0 :=
+  have hNU : _root_.GlobalTheory.ClosedResidueExt.Unram π
+      ((Algebra.adjoin M {α}).restrictScalars W) := by
+    refine ⟨
+      hNint,
+      fun hx => ?_,
+      eq_pow_mul_unit_of_mem_adjoin hπu M (IsLocalRing.residue M) IsLocalRing.residue_surjective
+        hker f hfm hirr' α hα hNint
+    ⟩
+    have hu :=
+      isUnit_one_add_algebraMap_mul_of_not_isUnit hπu _ hNint
+        ⟨-(algebraMap W Ω π)⁻¹, Subalgebra.neg_mem _ hx⟩
+    have hz
+        : (1 + algebraMap W ((Algebra.adjoin M {α}).restrictScalars W) π
+              * ⟨-(algebraMap W Ω π)⁻¹, Subalgebra.neg_mem _ hx⟩
+            : (Algebra.adjoin M {α}).restrictScalars W)
+          = 0 :=
       Subtype.ext (by
         show (1 : Ω) + algebraMap W Ω π * -(algebraMap W Ω π)⁻¹ = 0
         rw [mul_neg, mul_inv_cancel₀ hp0, add_neg_cancel])
@@ -281,21 +293,25 @@ theorem _root_.GlobalTheory.ClosedResidueExt.exists_unramified_ext (W : Type) [C
   refine ⟨IsLocalRing.residue M ⟨α, hαM⟩, ?_⟩
   have hev : Polynomial.eval (⟨α, hαM⟩ : M) f = 0 := by
     have h := hα
-    rw [show α = algebraMap M Ω ⟨α, hαM⟩ from rfl, Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval] at h
+    rw [show α = algebraMap M Ω ⟨α, hαM⟩ from rfl,
+        Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval]
+      at h
     exact Subtype.ext h
   rw [← hfp, Polynomial.eval_map, Polynomial.eval₂_hom, hev, map_zero]
 
-
 open Polynomial IsLocalRing in
 variable {W Ω : Type} [CommRing W] [Field Ω] [Algebra W Ω] in
-theorem _root_.GlobalTheory.ClosedResidueExt.exists_integral_ext_isAlgClosed_residueField : ∀ (W : Type) [CommRing W] [IsDomain W]
-    [IsDiscreteValuationRing W] [IsAdicComplete (IsLocalRing.maximalIdeal W) W] [CharZero W],
-    ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
-      (_ : Algebra W R), Function.Injective (algebraMap W R) ∧ Algebra.IsIntegral W R ∧
-        IsAlgClosed (IsLocalRing.ResidueField R) := by
+theorem _root_.GlobalTheory.ClosedResidueExt.exists_integral_ext_isAlgClosed_residueField
+    : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
+        [IsAdicComplete (IsLocalRing.maximalIdeal W) W] [CharZero W],
+      ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsDiscreteValuationRing R)
+          (_ : Algebra W R),
+        Function.Injective (algebraMap W R) ∧ Algebra.IsIntegral W R
+          ∧ IsAlgClosed (IsLocalRing.ResidueField R) := by
   intro W _ _ _ _ _
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible W
-  obtain ⟨R, i1, i2, i3, i4, h1, h2, _, h4⟩ := _root_.GlobalTheory.ClosedResidueExt.exists_unramified_ext W hπ
+  obtain ⟨R, i1, i2, i3, i4, h1, h2, _, h4⟩ :=
+    _root_.GlobalTheory.ClosedResidueExt.exists_unramified_ext W hπ
   exact ⟨R, i1, i2, i3, i4, h1, h2, h4⟩
 
 end GlobalTheory.ClosedResidueExt

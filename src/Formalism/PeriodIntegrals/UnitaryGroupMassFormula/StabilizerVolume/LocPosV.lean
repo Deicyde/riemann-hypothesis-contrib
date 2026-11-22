@@ -12,8 +12,8 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
-  Filter Topology Set LocPosW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW Filter Topology Set LocPosW
 open scoped TensorProduct ENNReal
 
 theorem locPos_holds : LocPos := by
@@ -45,25 +45,25 @@ theorem locPos_holds : LocPos := by
   have hX1U : LinearIndependent (Fv F v ⊗[F] E) X1 :=
     linIndep_of_isUnit_det (Fv F v) σ J X1
       (by rw [gramR_ratTup]; exact isUnit_det_hermOf (Fv F v) σ _ hT hdet)
-  obtain ⟨N, hN, hd⟩ := gramFilt_of (dxOpen_of secGram_holds) F E σ hσ M J hJ.1 hJ.2 a ha1 (by omega) v
-    _ b X1 hX1U
+  obtain ⟨N, hN, hd⟩ :=
+    gramFilt_of (dxOpen_of secGram_holds) F E σ hσ M J hJ.1 hJ.2 a ha1 (by omega) v _ b X1 hX1U
   obtain ⟨Λ0, hB, hΛ0o, hΛ0c, hsub⟩ := isCOBasis_latSub b v a M N hN
   obtain ⟨Λ, H, D, h0, hΛo, hΛc, hΛa, hHo, hHc, hHb, hD, hyp⟩ :=
     hd X1 (by rw [sub_self]; exact mem_of_mem_nhds hN) Λ0 hB hsub
-  let Nb : Set (HermR (Fv F v) σ a) :=
-    {S | IsUnit (S : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)).det}
+  let Nb : Set (HermR (Fv F v) σ a) := {S | IsUnit (S : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)).det}
   have hNb : Nb ∈ 𝓝 T :=
     (isOpen_unitHerm (Fv F v) (isOpen_units_Fv F v) σ a).mem_nhds
       (isUnit_det_hermOf (Fv F v) σ _ hT hdet)
-  have hval := fibCos μv νv (gramR (Fv F v) σ J) Subtype.val Subtype.val_injective
-    (gramH (Fv F v) σ hσ J hJ.1) (continuous_gramH (Fv F v) σ hσ J hJ.1) (fun _ => rfl)
-    _ Set.univ fibV hfib T Filter.univ_mem Nb hNb
-    (fun X hX => linIndep_of_isUnit_det (Fv F v) σ J X hX) Λ H hΛo hΛc hΛa hHo hHc hHb D hD X1
-    hyp (by rw [hgT, sub_self]; exact zero_mem _)
+  have hval :=
+    fibCos μv νv (gramR (Fv F v) σ J) Subtype.val Subtype.val_injective (gramH (Fv F v) σ hσ J hJ.1)
+      (continuous_gramH (Fv F v) σ hσ J hJ.1)
+      (fun _ => rfl)
+      _ Set.univ fibV hfib T Filter.univ_mem Nb hNb
+      (fun X hX => linIndep_of_isUnit_det (Fv F v) σ J X hX)
+      Λ H hΛo hΛc hΛa hHo hHc hHb D hD X1 hyp (by rw [hgT, sub_self]; exact zero_mem _)
   have hΛ0pos : μv (Λ 0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) ≠ 0 :=
     ((hΛo 0).measure_pos μv ⟨0, zero_mem _⟩).ne'
-  have hΛ0fin : μv (Λ 0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) ≠ ⊤ :=
-    ((hΛc 0).measure_lt_top).ne
+  have hΛ0fin : μv (Λ 0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) ≠ ⊤ := ((hΛc 0).measure_lt_top).ne
   have hH0pos : νv (H 0 : Set (HermR (Fv F v) σ a)) ≠ 0 :=
     ((hHo 0).measure_pos νv ⟨0, zero_mem _⟩).ne'
   have hH0fin : νv (H 0 : Set (HermR (Fv F v) σ a)) ≠ ⊤ := ((hHc 0).measure_lt_top).ne
@@ -71,7 +71,9 @@ theorem locPos_holds : LocPos := by
   have hQcl : IsClosed {x | x - X1 ∈ Λ 0} :=
     (AddSubgroup.isClosed_of_isOpen _ (hΛo 0)).preimage (continuous_id.sub continuous_const)
   have hQc : IsCompact {x | x - X1 ∈ Λ 0} := by
-    have e : {x | x - X1 ∈ Λ 0} = (fun w => w + X1) '' (Λ 0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) := by
+    have e
+        : {x | x - X1 ∈ Λ 0}
+          = (fun w => w + X1) '' (Λ 0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) := by
       ext z
       simp only [mem_ofPred_eq, mem_image, SetLike.mem_coe]
       constructor
@@ -81,12 +83,19 @@ theorem locPos_holds : LocPos := by
         simpa using hw
     rw [e]
     exact (hΛc 0).image (continuous_id.add continuous_const)
-  refine ⟨{x | x - X1 ∈ Λ 0}.indicator 1, ⟨(LocallyConstant.indicator
-    (LocallyConstant.const _ (1 : ℂ)) ⟨hQcl, hQo⟩).isLocallyConstant,
-    HasCompactSupport.intro' hQc hQcl fun Y hY => Set.indicator_of_notMem hY _⟩, ?_⟩
+  refine ⟨
+    {x | x - X1 ∈ Λ 0}.indicator 1,
+    ⟨
+      (LocallyConstant.indicator (LocallyConstant.const _ (1 : ℂ)) ⟨hQcl, hQo⟩).isLocallyConstant,
+      HasCompactSupport.intro' hQc hQcl fun Y hY => Set.indicator_of_notMem hY _
+    ⟩,
+    ?_
+  ⟩
   rw [hval]
-  have hr : 0 < (μv (Λ 0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) /
-      νv (H 0 : Set (HermR (Fv F v) σ a))).toReal :=
+  have hr
+      : 0
+        < (μv (Λ 0 : Set (Fin a → Fin M → Fv F v ⊗[F] E))
+          / νv (H 0 : Set (HermR (Fv F v) σ a))).toReal :=
     ENNReal.toReal_pos (ENNReal.div_pos_iff.2 ⟨hΛ0pos, hH0fin⟩).ne'
       (ENNReal.div_ne_top hΛ0fin hH0pos)
   exact_mod_cast hr.ne'

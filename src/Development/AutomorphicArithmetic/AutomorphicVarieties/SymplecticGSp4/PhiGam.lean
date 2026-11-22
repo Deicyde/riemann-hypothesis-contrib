@@ -5,38 +5,50 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
 namespace UpperTheory.V.GradeZeroInterpolatingElement
 
-private def permR (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ) :
-    Representation R Γ (Γ ⧸ H → R) where
+private def permR (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ)
+    : Representation R Γ (Γ ⧸ H → R) where
   toFun g := LinearMap.funLeft R R fun x => g⁻¹ • x
   map_one' := by ext f x; simp
   map_mul' g h := by ext f x; simp [mul_smul]
 
-private theorem permR_apply (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (f : Γ ⧸ H → R)
-    (x : Γ ⧸ H) : permR R H g f x = f (g⁻¹ • x) := rfl
+private theorem permR_apply
+    (R : Type) [CommRing R]
+    {Γ : Type} [Group Γ]
+    (H : Subgroup Γ)
+    (g : Γ) (f : Γ ⧸ H → R) (x : Γ ⧸ H)
+    : permR R H g f x = f (g⁻¹ • x) :=
+  rfl
 
-private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : Γ ⧸ H) :
-    (x.out)⁻¹ * g * (g⁻¹ • x).out ∈ H := by
+private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : Γ ⧸ H)
+    : (x.out)⁻¹ * g * (g⁻¹ • x).out ∈ H := by
   have h : ((g⁻¹ * x.out : Γ) : Γ ⧸ H) = (((g⁻¹ • x).out : Γ) : Γ ⧸ H) := by
     rw [QuotientGroup.out_eq', ← smul_eq_mul, ← MulAction.Quotient.smul_mk, QuotientGroup.out_eq']
   simpa [mul_assoc] using QuotientGroup.eq.1 h
 
-private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] (n : ℕ)
-    [NeZero n]
-    (h : ∀ (M : Type) [AddCommGroup M] [Module (ZMod n) M] [TopologicalSpace M] [DiscreteTopology M] [Finite M]
-      (ρ : Representation (ZMod n) Γ M), ContAction ρ → Finite (H1 ρ)) : PhiCond Γ n := by
+private theorem phi_condition_of_finite_cohomology
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (n : ℕ) [NeZero n]
+    (h : ∀ (M : Type) [AddCommGroup M] [Module (ZMod n) M] [TopologicalSpace M] [DiscreteTopology M]
+        [Finite M] (ρ : Representation (ZMod n) Γ M),
+      ContAction ρ → Finite (H1 ρ))
+    : PhiCond Γ n := by
   intro H hH
   haveI : DiscreteTopology (Γ ⧸ H) := QuotientGroup.discreteTopology hH
   haveI : Finite (Γ ⧸ H) := finite_of_compact_of_discrete
   letI : TopologicalSpace (ZMod n) := ⊥
   haveI : DiscreteTopology (ZMod n) := ⟨rfl⟩
-  have hs : ∀ x : Γ ⧸ H, Continuous fun g : Γ => g⁻¹ • x := fun x => continuous_inv.smul continuous_const
+  have hs : ∀ x : Γ ⧸ H, Continuous fun g : Γ => g⁻¹ • x := fun x =>
+    continuous_inv.smul continuous_const
   have hc : ContAction (permR (ZMod n) H) := by
     refine continuous_pi fun x => ?_
-    have h1 : Continuous fun p : (Γ ⧸ H → ZMod n) × (Γ ⧸ H) => p.1 p.2 := continuous_of_discreteTopology
+    have h1 : Continuous fun p : (Γ ⧸ H → ZMod n) × (Γ ⧸ H) => p.1 p.2 :=
+      continuous_of_discreteTopology
     exact h1.comp (continuous_snd.prodMk ((hs x).comp continuous_fst))
   haveI h1 := h _ _ hc
   haveI : Finite (Z1 (permR (ZMod n) H)) := by
@@ -49,15 +61,22 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     continuous_of_continuousAt_one φ (by
       rw [ContinuousAt, map_one, nhds_discrete (Multiplicative (ZMod n)), Filter.tendsto_pure]
       exact hφ.mem_nhds φ.ker.one_mem)
-  let c : {φ : H →* Multiplicative (ZMod n) // IsOpen (φ.ker : Set H)} → Z1 (permR (ZMod n) H) := fun φ =>
-    ⟨fun g x => Multiplicative.toAdd (φ.1 ⟨_, sec_mem H g x⟩), by
-      refine ⟨continuous_pi fun x => continuous_toAdd.comp ((hφ φ.1 φ.2).comp (Continuous.subtype_mk ?_ _)), fun g g' => ?_⟩
-      · exact (continuous_const.mul continuous_id).mul
-          ((continuous_of_discreteTopology (f := fun y : Γ ⧸ H => y.out)).comp (hs x))
-      · funext x
-        rw [Pi.add_apply, permR_apply, ← toAdd_mul, ← map_mul]
-        refine congrArg (fun u => Multiplicative.toAdd (φ.1 u)) (Subtype.ext ?_)
-        simp [mul_smul, mul_assoc]⟩
+  let c : {φ : H →* Multiplicative (ZMod n) // IsOpen (φ.ker : Set H)} → Z1 (permR (ZMod n) H) :=
+    fun φ => ⟨
+      fun g x => Multiplicative.toAdd (φ.1 ⟨_, sec_mem H g x⟩),
+      by
+        refine ⟨
+          continuous_pi fun x =>
+            continuous_toAdd.comp ((hφ φ.1 φ.2).comp (Continuous.subtype_mk ?_ _)),
+          fun g g' => ?_
+        ⟩
+        · exact (continuous_const.mul continuous_id).mul
+            ((continuous_of_discreteTopology (f := fun y : Γ ⧸ H => y.out)).comp (hs x))
+        · funext x
+          rw [Pi.add_apply, permR_apply, ← toAdd_mul, ← map_mul]
+          refine congrArg (fun u => Multiplicative.toAdd (φ.1 u)) (Subtype.ext ?_)
+          simp [mul_smul, mul_assoc]
+    ⟩
   refine Finite.of_injective c fun φ φ' e => Subtype.ext (MonoidHom.ext fun u => ?_)
   let x : Γ ⧸ H := ((1 : Γ) : Γ ⧸ H)
   have hx : x.out ∈ H := by
@@ -75,19 +94,22 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
   simp only [c, hu] at this
   exact Multiplicative.toAdd.injective this
 
-private theorem fin_above {n : ℕ} (hn : n ≠ 0) :
-    {v : HeightOneSpectrum (𝓞 ℚ) | ((n : ℕ) : 𝓞 ℚ) ∈ v.asIdeal}.Finite := by
+private theorem fin_above {n : ℕ} (hn : n ≠ 0)
+    : {v : HeightOneSpectrum (𝓞 ℚ) | ((n : ℕ) : 𝓞 ℚ) ∈ v.asIdeal}.Finite := by
   have h0 : Ideal.span {((n : ℕ) : 𝓞 ℚ)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact_mod_cast hn
   refine (Ideal.finite_factors h0).subset fun v hv => ?_
   simp only [Set.mem_setOf_eq] at hv ⊢
-  rw [Ideal.dvd_span_singleton]; exact hv
+  rw [Ideal.dvd_span_singleton]
+  exact hv
 
 end UpperTheory.V.GradeZeroInterpolatingElement
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.phiGam :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → CohomologyHyp → PhiCond D.Gam l := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.phiGam
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good → CohomologyHyp → PhiCond D.Gam l := by
   intro Ω _ _ _ l hl c D hD hP
   haveI : IsGalois ℚ Ω := IsAlgClosure.isGalois ℚ Ω
   have hfin : D.SP.Finite := by

@@ -7,7 +7,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Polynomial CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory Polynomial CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 universe w w' v u v' u' v'' u''
 
 namespace CrystallineSemistableComparison.B
@@ -32,7 +33,16 @@ lemma rc_iso_upTo {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {F F₁ 
 
 end CrystallineSemistableComparison.B
 
-theorem CrystallineSemistableComparison.B.P.ri_calc : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {C' : Type u'} [Category.{v'} C'] {C'' : Type u''} [Category.{v''} C''] (F : C ⥤ ModuleCat.{w} R) (G : C' ⥤ C) (G' : C'' ⥤ C') (s s' : R) (n : ℕ), (RI s n F G → RI s' n (G ⋙ F) G' → RI (s * s') n F (G' ⋙ G)) ∧ (RI s n F G → RI s' n F (G' ⋙ G) → RI (s * s') n (G ⋙ F) G') ∧ (RI s n (G ⋙ F) G' → RI s' n F (G' ⋙ G) → RI (s * s') n F G) ∧ (RI s n F G → RI (s * s') n F G) ∧ (∀ G₁ : C' ⥤ C, (G ≅ G₁) → RI s n F G → RI s n F G₁) ∧ (G.IsEquivalence → RI 1 n F G) ∧ (∀ F₁ : C ⥤ ModuleCat.{w} R, (F ≅ F₁) → RI s n F G → RI s n F₁ G) := by
+theorem CrystallineSemistableComparison.B.P.ri_calc
+    : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {C' : Type u'} [Category.{v'} C']
+        {C'' : Type u''} [Category.{v''} C''] (F : C ⥤ ModuleCat.{w} R) (G : C' ⥤ C) (G' : C'' ⥤ C')
+        (s s' : R) (n : ℕ),
+      (RI s n F G → RI s' n (G ⋙ F) G' → RI (s * s') n F (G' ⋙ G))
+        ∧ (RI s n F G → RI s' n F (G' ⋙ G) → RI (s * s') n (G ⋙ F) G')
+        ∧ (RI s n (G ⋙ F) G' → RI s' n F (G' ⋙ G) → RI (s * s') n F G)
+        ∧ (RI s n F G → RI (s * s') n F G) ∧ (∀ G₁ : C' ⥤ C, (G ≅ G₁) → RI s n F G → RI s n F G₁)
+        ∧ (G.IsEquivalence → RI 1 n F G)
+        ∧ (∀ F₁ : C ⥤ ModuleCat.{w} R, (F ≅ F₁) → RI s n F G → RI s n F₁ G) := by
   intro R _ C _ C' _ C'' _ F G G' s s' n
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro h1 h2 j hj
@@ -48,32 +58,43 @@ theorem CrystallineSemistableComparison.B.P.ri_calc : ∀ {R : Type} [CommRing R
     rw [rc_restrict_comp] at this
     exact (CrystallineSemistableComparison.P.upTo_alg _ _ s s').2.2.1 (h1 j hj) this
   · intro h1 j hj
-    exact (CrystallineSemistableComparison.P.upTo_alg ((Mor.restrict F G).pull j) LinearMap.id s s').2.2.2.1 (h1 j hj)
+    exact (CrystallineSemistableComparison.P.upTo_alg ((Mor.restrict F G).pull j) LinearMap.id s
+      s').2.2.2.1 (h1 j hj)
   · intro G₁ e h1 j hj
-    have hp : (Mor.restrict F G₁).pull j =
-        ((Mor.ofNatTrans (Functor.whiskerRight e.hom F)).pull j).comp ((Mor.restrict F G).pull j) := by
+    have hp
+        : (Mor.restrict F G₁).pull j
+          = ((Mor.ofNatTrans (Functor.whiskerRight e.hom F)).pull j).comp
+            ((Mor.restrict F G).pull j) := by
       rw [← rc_pull_comp]
-      refine LinearMap.ext fun x => CrystallineSemistableComparison.P.prism (Mor.restrict F G₁)
-        ((Mor.restrict F G).comp (Mor.ofNatTrans (Functor.whiskerRight e.hom F))) e.inv ?_ j x
+      refine LinearMap.ext fun x =>
+        CrystallineSemistableComparison.P.prism (Mor.restrict F G₁)
+          ((Mor.restrict F G).comp (Mor.ofNatTrans (Functor.whiskerRight e.hom F))) e.inv ?_ j x
       intro T x
       change (F.map (e.hom.app T)).hom ((F.map (e.inv.app T)).hom x) = x
       rw [← ModuleCat.comp_apply, ← F.map_comp, e.inv_hom_id_app, F.map_id]
       rfl
     rw [hp, ← mul_one s]
-    exact (CrystallineSemistableComparison.P.upTo_alg _ _ s 1).1 (h1 j hj) (rc_iso_upTo (Functor.isoWhiskerRight e F) j)
+    exact (CrystallineSemistableComparison.P.upTo_alg _ _ s 1).1 (h1 j hj)
+      (rc_iso_upTo (Functor.isoWhiskerRight e F) j)
   · intro hG j hj
-    exact ((CrystallineSemistableComparison.P.upTo_alg ((Mor.restrict F G).pull j) LinearMap.id 1 1).2.2.2.2).2
-      (CrystallineSemistableComparison.P.adj F G G.asEquivalence.inverse G.asEquivalence.toAdjunction j)
+    exact ((CrystallineSemistableComparison.P.upTo_alg ((Mor.restrict F G).pull j) LinearMap.id 1
+        1).2.2.2.2).2
+      (CrystallineSemistableComparison.P.adj F G G.asEquivalence.inverse
+        G.asEquivalence.toAdjunction j)
   · intro F₁ e h1 j hj
-    have hp : (Mor.restrict F₁ G).pull j =
-        ((Mor.ofNatTrans (Functor.whiskerLeft G e.hom)).pull j).comp
-          (((Mor.restrict F G).pull j).comp ((Mor.ofNatTrans e.inv).pull j)) := by
+    have hp
+        : (Mor.restrict F₁ G).pull j
+          = ((Mor.ofNatTrans (Functor.whiskerLeft G e.hom)).pull j).comp
+            (((Mor.restrict F G).pull j).comp ((Mor.ofNatTrans e.inv).pull j)) := by
       rw [← rc_pull_comp, ← rc_pull_comp]
-      refine LinearMap.ext fun x => CrystallineSemistableComparison.P.prism (Mor.restrict F₁ G)
-        ((Mor.ofNatTrans e.inv).comp ((Mor.restrict F G).comp (Mor.ofNatTrans (Functor.whiskerLeft G e.hom))))
-        (𝟙 G) ?_ j x
+      refine LinearMap.ext fun x =>
+        CrystallineSemistableComparison.P.prism (Mor.restrict F₁ G)
+          ((Mor.ofNatTrans e.inv).comp
+            ((Mor.restrict F G).comp (Mor.ofNatTrans (Functor.whiskerLeft G e.hom))))
+          (𝟙 G) ?_ j x
       intro T x
-      change (e.hom.app (G.obj T)).hom ((e.inv.app (G.obj T)).hom ((F₁.map (𝟙 (G.obj T))).hom x)) = x
+      change (e.hom.app (G.obj T)).hom ((e.inv.app (G.obj T)).hom ((F₁.map (𝟙 (G.obj T))).hom x))
+        = x
       rw [F₁.map_id, ← ModuleCat.comp_apply, ← ModuleCat.comp_apply, e.inv_hom_id_app]
       rfl
     rw [hp, ← one_mul s, ← mul_one (1 * s)]

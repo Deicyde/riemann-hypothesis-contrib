@@ -4,11 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.trace_eq_sum_re_cm_type :
-    ∀ {E : Type} [Field E] [NumberField E] {Ψ : Type} [Fintype Ψ] (φ : Ψ → (E →+* ℂ)),
-        Function.Injective φ →
-        (∀ s : E →+* ℂ, (∃ τ, φ τ = s) ↔ ¬ ∃ τ, φ τ = (starRingEnd ℂ).comp s) →
-        ∀ x : E, ((Algebra.trace ℚ E x : ℚ) : ℝ) = ∑ τ, 2 * (φ τ x).re := by
+theorem UpperTheory.trace_eq_sum_re_cm_type
+    : ∀ {E : Type} [Field E] [NumberField E] {Ψ : Type} [Fintype Ψ] (φ : Ψ → (E →+* ℂ)),
+      Function.Injective φ → (∀ s : E →+* ℂ, (∃ τ, φ τ = s) ↔ ¬ ∃ τ, φ τ = (starRingEnd ℂ).comp s)
+        → ∀ x : E, ((Algebra.trace ℚ E x : ℚ) : ℝ) = ∑ τ, 2 * (φ τ x).re := by
   intro E _ _ Ψ _ φ hinj h x
   classical
   have hcc : ∀ s : E →+* ℂ, (starRingEnd ℂ).comp ((starRingEnd ℂ).comp s) = s := by
@@ -38,7 +37,8 @@ theorem UpperTheory.trace_eq_sum_re_cm_type :
     rw [h0]
     exact (Fintype.sum_equiv (RingHom.equivRatAlgHom E ℂ) _ _ (fun s => rfl)).symm
   rw [← Fintype.sum_bijective g hg (fun t => g t x) (fun s => s x) (fun _ => rfl),
-    Fintype.sum_sum_type, ← Finset.sum_add_distrib] at h1
+      Fintype.sum_sum_type, ← Finset.sum_add_distrib]
+    at h1
   have h2 := congrArg Complex.re h1
   rw [Complex.ratCast_re, Complex.re_sum] at h2
   rw [h2]

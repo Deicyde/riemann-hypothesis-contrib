@@ -13,8 +13,8 @@ namespace Formalism.UG.P
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem fSatake_nontriv {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : IsUnramInv ϖ σ q) :
-    (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).IsNontrivial := by
+theorem fSatake_nontriv {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : IsUnramInv ϖ σ q)
+    : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).IsNontrivial := by
   obtain ⟨-, -, -, hv, -⟩ := hU
   refine ⟨ϖ, ?_, ?_⟩
   · rw [hv]; exact WithZero.coe_ne_zero
@@ -23,8 +23,9 @@ theorem fSatake_nontriv {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : IsUnramInv ϖ 
     have := WithZero.coe_injective (h1.trans WithZero.coe_one.symm)
     exact absurd (Multiplicative.ofAdd.injective (this.trans ofAdd_zero.symm)) (by norm_num)
 
-theorem isCommensurated_integral_unitary_of_unramified {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : IsUnramInv ϖ σ q) (n : ℕ) :
-    IsCommensurated (KU σ n) := by
+theorem isCommensurated_integral_unitary_of_unramified
+    {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : IsUnramInv ϖ σ q) (n : ℕ)
+    : IsCommensurated (KU σ n) := by
   haveI : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).IsNontrivial :=
     fSatake_nontriv hU
   obtain ⟨-, -, -, hvϖ, -, hq2, hq⟩ := hU
@@ -46,10 +47,16 @@ theorem isCommensurated_integral_unitary_of_unramified {ϖ : L} {σ : L →+* L}
   have hO : intL L = A.toSubring := rfl
   unfold KU
   rw [hO]
-  have hK : intPts A.toSubring.subtype (GU σ n) = GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range := rfl
+  have hK
+      : intPts A.toSubring.subtype (GU σ n)
+        = GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range :=
+    rfl
   rw [hK]
-  have hmap : ((GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range).subgroupOf (GU σ n)).map (MulAut.conj g).toMonoidHom =
-      ((GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range).map (MulAut.conj (g : GL (Fin n) L)).toMonoidHom).subgroupOf (GU σ n) := by
+  have hmap
+      : ((GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range).subgroupOf (GU σ n)).map
+          (MulAut.conj g).toMonoidHom
+        = ((GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range).map
+          (MulAut.conj (g : GL (Fin n) L)).toMonoidHom).subgroupOf (GU σ n) := by
     ext x
     simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf, MulEquiv.coe_toMonoidHom,
       MulAut.conj_apply]
@@ -60,12 +67,16 @@ theorem isCommensurated_integral_unitary_of_unramified {ϖ : L} {σ : L →+* L}
       exact ⟨⟨y, hy.1⟩, hy, Subtype.ext (by simpa using hyx)⟩
   rw [hmap, Subgroup.relIndex_subgroupOf inf_le_left]
   have hPB := glint_princ_relIndex_ne_zero (n := Fin n) A.toSubring (Ideal.span {c * c})
-  have h1 : (princ (n := Fin n) A.toSubring.subtype (Ideal.span {c * c}) ⊓ GU σ n).relIndex
-      (GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range) ≠ 0 := by
+  have h1
+      : (princ (n := Fin n) A.toSubring.subtype (Ideal.span {c * c}) ⊓ GU σ n).relIndex
+          (GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range)
+        ≠ 0 := by
     rw [inf_comm (GU σ n) (bc (n := Fin n) A.toSubring.subtype).range]
     exact Subgroup.relIndex_inter_ne_zero hPB (GU σ n)
-  have hle : princ (n := Fin n) A.toSubring.subtype (Ideal.span {c * c}) ⊓ GU σ n ≤
-      (GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range).map (MulAut.conj (g : GL (Fin n) L)).toMonoidHom := by
+  have hle
+      : princ (n := Fin n) A.toSubring.subtype (Ideal.span {c * c}) ⊓ GU σ n
+        ≤ (GU σ n ⊓ (bc (n := Fin n) A.toSubring.subtype).range).map
+          (MulAut.conj (g : GL (Fin n) L)).toMonoidHom := by
     rintro h ⟨hP, hHh⟩
     obtain ⟨b, hb, hbh⟩ := glint_princ_le_map_conj A.toSubring (g : GL (Fin n) L) c hg1 hg2 hP
     refine ⟨b, ⟨?_, hb⟩, hbh⟩
@@ -76,8 +87,9 @@ theorem isCommensurated_integral_unitary_of_unramified {ϖ : L} {σ : L →+* L}
     exact (GU σ n).mul_mem ((GU σ n).mul_mem ((GU σ n).inv_mem g.2) hHh) g.2
   exact fun hz => h1 (Subgroup.relIndex_eq_zero_of_le_left hle hz)
 
-theorem fSatake_v_eq {x : L} (hx : x ≠ 0) :
-    Valued.v x = ((Multiplicative.ofAdd (-ordL x) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+theorem fSatake_v_eq {x : L} (hx : x ≠ 0)
+    : Valued.v x
+      = ((Multiplicative.ofAdd (- ordL x) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
   have h : Valued.v x ≠ 0 := (Valuation.ne_zero_iff _).2 hx
   unfold ordL
   rw [dite_eq_right h, neg_neg, ofAdd_toAdd, WithZero.coe_unzero]
@@ -102,9 +114,12 @@ theorem fSatake_ord_of_v {x y : L} (h : Valued.v x = Valued.v y) : ordL x = ordL
   unfold ordL
   simp only [h]
 
-theorem fSatake_ord_zpow {ϖ : L}
-    (hϖ : Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
-    (k : ℤ) : ordL (ϖ ^ k) = k := by
+theorem fSatake_ord_zpow
+    {ϖ : L}
+    (hϖ : Valued.v ϖ
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
+    (k : ℤ)
+    : ordL (ϖ ^ k) = k := by
   have h0 : ϖ ≠ 0 := by
     intro h0
     rw [h0, map_zero] at hϖ
@@ -117,7 +132,8 @@ theorem fSatake_ord_zpow {ϖ : L}
 theorem fSatake_ord_nonneg {x : L} (hx : x ≠ 0) (hO : x ∈ intL L) : 0 ≤ ordL x := by
   have h1 : Valued.v x ≤ 1 := hO
   rw [fSatake_v_eq hx, ← WithZero.coe_one, WithZero.coe_le_coe, ← ofAdd_zero,
-    Multiplicative.ofAdd_le] at h1
+      Multiplicative.ofAdd_le]
+    at h1
   linarith
 
 end Formalism.UG.P

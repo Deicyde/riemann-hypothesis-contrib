@@ -9,8 +9,11 @@ open scoped ENNReal Pointwise
 
 namespace GlobalTheory.CompanionTheory.Xa1
 
-theorem map_mul_right_eq_of_mem_compact_subgroup :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G), μ.IsMulLeftInvariant → IsFiniteMeasureOnCompacts μ → ∀ K : Subgroup G, IsCompact (K : Set G) → ∀ k ∈ K, μ.map (fun x => x * k) = μ := by
+theorem map_mul_right_eq_of_mem_compact_subgroup
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G),
+      μ.IsMulLeftInvariant → IsFiniteMeasureOnCompacts μ
+        → ∀ K : Subgroup G, IsCompact (K : Set G) → ∀ k ∈ K, μ.map (fun x => x * k) = μ := by
   intro G _ _ _ _ _ _ _ _ μ hinv hfin K hK k hk
   let ν : Measure G := Measure.haar
   have hmeas : Measurable (fun x : G => x * k) := measurable_mul_const k

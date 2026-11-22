@@ -6,12 +6,14 @@ public import Mathlib
 
 namespace Bl.FirstLemmaH
 
-theorem goal1 :
-  ∀ {A : Type} (W : Submodule.{0, 0} Complex (A → Complex)),
-  FiniteDimensional.{0, 0} Complex (Subtype.{1} fun (x : A → Complex) ↦ Membership.mem.{0, 0} W x) →
-    Exists.{1} fun (S : Finset.{0} A) ↦
-      ∀ (w : A → Complex),
-        Membership.mem.{0, 0} W w → (∀ (a : A), Membership.mem.{0, 0} S a → Eq.{1} (w a) 0) → Eq.{1} w 0 := by
+theorem goal1
+    : ∀ {A : Type} (W : Submodule.{0, 0} Complex (A → Complex)),
+      FiniteDimensional.{0, 0} Complex
+          (Subtype.{1} fun (x : A → Complex) ↦ Membership.mem.{0, 0} W x)
+        → Exists.{1} fun (S : Finset.{0} A) ↦
+          ∀ (w : A → Complex),
+            Membership.mem.{0, 0} W w → (∀ (a : A), Membership.mem.{0, 0} S a → Eq.{1} (w a) 0)
+              → Eq.{1} w 0 := by
   intro A W hW
   classical
   let f : A → Module.Dual Complex W := fun a =>
@@ -22,8 +24,9 @@ theorem goal1 :
   choose g hg using hmem
   refine ⟨s'.attach.image (fun φ => g φ.1 φ.2), ?_⟩
   intro w hw h0
-  have hker : Submodule.span Complex (s' : Set (Module.Dual Complex W)) ≤
-      LinearMap.ker (Module.Dual.eval Complex W ⟨w, hw⟩) := by
+  have hker
+      : Submodule.span Complex (s' : Set (Module.Dual Complex W))
+        ≤ LinearMap.ker (Module.Dual.eval Complex W ⟨w, hw⟩) := by
     rw [Submodule.span_le]
     intro φ hφ
     have e := hg φ hφ

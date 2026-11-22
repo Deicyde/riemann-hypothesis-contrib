@@ -15,7 +15,6 @@ namespace GlobalTheory.RandomTops
 def ex (δ : ℝ) (S : Finset ℕ) (f : Finset ℕ → ℝ) : ℝ :=
   ∑ T ∈ S.powerset, δ ^ T.card * (1 - δ) ^ (S.card - T.card) * f T
 
-
 open Classical in
 def ind (p : Prop) : ℝ := by
   classical
@@ -24,7 +23,7 @@ def ind (p : Prop) : ℝ := by
 theorem ind_pos {p : Prop} (h : p) : ind p = 1 := by
   unfold ind
   rw [if_pos h]
-theorem ind_neg {p : Prop} (h : ¬ p) : ind p = 0 := by
+theorem ind_neg {p : Prop} (h : ¬p) : ind p = 0 := by
   unfold ind
   rw [if_neg h]
 theorem ind_nonneg (p : Prop) : 0 ≤ ind p := by
@@ -38,16 +37,14 @@ theorem ind_le {p : Prop} {x : ℝ} (h0 : 0 ≤ x) (h1 : p → 1 ≤ x) : ind p 
   split_ifs with hp
   · exact h1 hp
   · exact h0
-theorem ind_congr {p q : Prop} (h : p ↔ q) : ind p = ind q := by
-  rw [h]
+theorem ind_congr {p q : Prop} (h : p ↔ q) : ind p = ind q := by rw [h]
 
 variable {δ : ℝ}
 
-theorem ex_empty (f : Finset ℕ → ℝ) : ex δ ∅ f = f ∅ := by
-  simp [ex]
+theorem ex_empty (f : Finset ℕ → ℝ) : ex δ ∅ f = f ∅ := by simp [ex]
 
-theorem ex_insert {a : ℕ} {S : Finset ℕ} (ha : a ∉ S) (f : Finset ℕ → ℝ) :
-    ex δ (insert a S) f = (1 - δ) * ex δ S f + δ * ex δ S (fun T => f (insert a T)) := by
+theorem ex_insert {a : ℕ} {S : Finset ℕ} (ha : a ∉ S) (f : Finset ℕ → ℝ)
+    : ex δ (insert a S) f = (1 - δ) * ex δ S f + δ * ex δ S (fun T => f (insert a T)) := by
   unfold ex
   rw [sum_powerset_insert ha, card_insert_of_notMem ha, mul_sum, mul_sum]
   congr 1
@@ -60,8 +57,8 @@ theorem ex_insert {a : ℕ} {S : Finset ℕ} (ha : a ∉ S) (f : Finset ℕ → 
     rw [card_insert_of_notMem hT', show #S + 1 - (#T + 1) = #S - #T by omega, pow_succ]
     ring
 
-theorem ex_congr {S : Finset ℕ} {f g : Finset ℕ → ℝ} (h : ∀ T ⊆ S, f T = g T) :
-    ex δ S f = ex δ S g := by
+theorem ex_congr {S : Finset ℕ} {f g : Finset ℕ → ℝ} (h : ∀ T ⊆ S, f T = g T)
+    : ex δ S f = ex δ S g := by
   unfold ex
   exact sum_congr rfl fun T hT => by rw [h T (mem_powerset.mp hT)]
 
@@ -70,26 +67,27 @@ theorem ex_const (S : Finset ℕ) (c : ℝ) : ex δ S (fun _ => c) = c := by
   | empty => simp [ex_empty]
   | insert a S ha ih => rw [ex_insert ha, ih]; ring
 
-theorem ex_mul_left (S : Finset ℕ) (c : ℝ) (f : Finset ℕ → ℝ) :
-    ex δ S (fun T => c * f T) = c * ex δ S f := by
+theorem ex_mul_left (S : Finset ℕ) (c : ℝ) (f : Finset ℕ → ℝ)
+    : ex δ S (fun T => c * f T) = c * ex δ S f := by
   unfold ex
   rw [mul_sum]
   exact sum_congr rfl fun _ _ => by ring
 
-theorem ex_sum {ι : Type*} (S : Finset ℕ) (I : Finset ι) (f : ι → Finset ℕ → ℝ) :
-    ex δ S (fun T => ∑ i ∈ I, f i T) = ∑ i ∈ I, ex δ S (f i) := by
+theorem ex_sum {ι : Type*} (S : Finset ℕ) (I : Finset ι) (f : ι → Finset ℕ → ℝ)
+    : ex δ S (fun T => ∑ i ∈ I, f i T) = ∑ i ∈ I, ex δ S (f i) := by
   unfold ex
   simp only [mul_sum]
   rw [sum_comm]
 
-theorem ex_mono (h0 : 0 ≤ δ) (h1 : δ ≤ 1) {S : Finset ℕ} {f g : Finset ℕ → ℝ}
-    (h : ∀ T ⊆ S, f T ≤ g T) : ex δ S f ≤ ex δ S g := by
+theorem ex_mono
+    (h0 : 0 ≤ δ) (h1 : δ ≤ 1) {S : Finset ℕ} {f g : Finset ℕ → ℝ} (h : ∀ T ⊆ S, f T ≤ g T)
+    : ex δ S f ≤ ex δ S g := by
   unfold ex
   refine sum_le_sum fun T hT => mul_le_mul_of_nonneg_left (h T (mem_powerset.mp hT)) ?_
   exact mul_nonneg (pow_nonneg h0 _) (pow_nonneg (by linarith) _)
 
-theorem ex_union {A B : Finset ℕ} (hAB : Disjoint A B) (f : Finset ℕ → ℝ) :
-    ex δ (A ∪ B) f = ex δ A (fun T => ex δ B (fun U => f (T ∪ U))) := by
+theorem ex_union {A B : Finset ℕ} (hAB : Disjoint A B) (f : Finset ℕ → ℝ)
+    : ex δ (A ∪ B) f = ex δ A (fun T => ex δ B (fun U => f (T ∪ U))) := by
   induction A using Finset.induction_on generalizing f with
   | empty => simp [ex_empty]
   | insert a A ha ih =>
@@ -99,13 +97,14 @@ theorem ex_union {A B : Finset ℕ} (hAB : Disjoint A B) (f : Finset ℕ → ℝ
     rw [insert_union, ex_insert haU, ex_insert ha, ih hAB', ih hAB']
     simp only [insert_union]
 
-theorem ex_split {A S : Finset ℕ} (hA : A ⊆ S) (f g : Finset ℕ → ℝ) :
-    ex δ S (fun T => f (T ∩ A) * g (T \ A)) = ex δ A f * ex δ (S \ A) g := by
+theorem ex_split {A S : Finset ℕ} (hA : A ⊆ S) (f g : Finset ℕ → ℝ)
+    : ex δ S (fun T => f (T ∩ A) * g (T \ A)) = ex δ A f * ex δ (S \ A) g := by
   have hd : Disjoint A (S \ A) := disjoint_sdiff
   conv_lhs => rw [← union_sdiff_of_subset hA]
   rw [ex_union hd]
-  have e : ∀ T ⊆ A, ex δ (S \ A) (fun U => f ((T ∪ U) ∩ A) * g ((T ∪ U) \ A)) =
-      f T * ex δ (S \ A) g := by
+  have e
+      : ∀ T ⊆ A,
+        ex δ (S \ A) (fun U => f ((T ∪ U) ∩ A) * g ((T ∪ U) \ A)) = f T * ex δ (S \ A) g := by
     intro T hT
     rw [← ex_mul_left]
     refine ex_congr fun U hU => ?_
@@ -129,16 +128,17 @@ theorem ex_split {A S : Finset ℕ} (hA : A ⊆ S) (f g : Finset ℕ → ℝ) :
   funext T
   ring
 
-theorem ex_restrict {A S : Finset ℕ} (hA : A ⊆ S) (f : Finset ℕ → ℝ) :
-    ex δ S (fun T => f (T ∩ A)) = ex δ A f := by
+theorem ex_restrict {A S : Finset ℕ} (hA : A ⊆ S) (f : Finset ℕ → ℝ)
+    : ex δ S (fun T => f (T ∩ A)) = ex δ A f := by
   have h := ex_split (δ := δ) hA f (fun _ => 1)
   simp only [mul_one, ex_const] at h
   exact h
 
-theorem ex_prod {ι : Type*} (J : Finset ι) (A : ι → Finset ℕ) (g : ι → Finset ℕ → ℝ)
-    (hd : ∀ i ∈ J, ∀ j ∈ J, i ≠ j → Disjoint (A i) (A j)) (S : Finset ℕ)
-    (hS : ∀ j ∈ J, A j ⊆ S) :
-    ex δ S (fun T => ∏ j ∈ J, g j (T ∩ A j)) = ∏ j ∈ J, ex δ (A j) (g j) := by
+theorem ex_prod
+    {ι : Type*} (J : Finset ι) (A : ι → Finset ℕ) (g : ι → Finset ℕ → ℝ)
+    (hd : ∀ i ∈ J, ∀ j ∈ J, i ≠ j → Disjoint (A i) (A j))
+    (S : Finset ℕ) (hS : ∀ j ∈ J, A j ⊆ S)
+    : ex δ S (fun T => ∏ j ∈ J, g j (T ∩ A j)) = ∏ j ∈ J, ex δ (A j) (g j) := by
   classical
   revert hd S
   induction J using Finset.induction_on with
@@ -151,9 +151,11 @@ theorem ex_prod {ι : Type*} (J : Finset ι) (A : ι → Finset ℕ) (g : ι →
       hd i (mem_insert_of_mem hi) k (mem_insert_of_mem hk)
     have hS' : ∀ i ∈ J, A i ⊆ S \ A j := by
       intro i hi x hx
-      exact mem_sdiff.mpr ⟨hS i (mem_insert_of_mem hi) hx, fun hxj => disjoint_left.mp (hdj i hi) hx hxj⟩
-    have e : ∀ T ⊆ S, ∏ i ∈ insert j J, g i (T ∩ A i) =
-        g j (T ∩ A j) * ∏ i ∈ J, g i ((T \ A j) ∩ A i) := by
+      exact mem_sdiff.mpr
+        ⟨hS i (mem_insert_of_mem hi) hx, fun hxj => disjoint_left.mp (hdj i hi) hx hxj⟩
+    have e
+        : ∀ T ⊆ S,
+          ∏ i ∈ insert j J, g i (T ∩ A i) = g j (T ∩ A j) * ∏ i ∈ J, g i ((T \ A j) ∩ A i) := by
       intro T _
       rw [prod_insert hj]
       congr 1
@@ -169,8 +171,7 @@ theorem ex_prod {ι : Type*} (J : Finset ι) (A : ι → Finset ℕ) (g : ι →
     rw [ex_congr e, ex_split (hS j (mem_insert_self j J)) (g j) (fun U => ∏ i ∈ J, g i (U ∩ A i)),
       ih hd' (S \ A j) hS', prod_insert hj]
 
-theorem ex_contains {Q B : Finset ℕ} (hQ : Q ⊆ B) :
-    ex δ B (fun T => ind (Q ⊆ T)) = δ ^ Q.card := by
+theorem ex_contains {Q B : Finset ℕ} (hQ : Q ⊆ B) : ex δ B (fun T => ind (Q ⊆ T)) = δ ^ Q.card := by
   have e : ex δ B (fun T => ind (Q ⊆ T)) = ex δ B (fun T => ind (Q ⊆ T ∩ Q)) :=
     ex_congr fun T _ => ind_congr (by simp [subset_inter_iff])
   rw [e, ex_restrict hQ (fun T => ind (Q ⊆ T))]
@@ -186,27 +187,30 @@ theorem ex_contains {Q B : Finset ℕ} (hQ : Q ⊆ B) :
   · intro h
     exact absurd (mem_powerset_self Q) h
 
-theorem tail_le_choose (h0 : 0 ≤ δ) (h1 : δ ≤ 1) {B : Finset ℕ} {L : ℕ} (hB : B.card ≤ L) (K : ℕ) :
-    ex δ B (fun T => ind (K ≤ T.card)) ≤ (L.choose K : ℝ) * δ ^ K := by
+theorem tail_le_choose (h0 : 0 ≤ δ) (h1 : δ ≤ 1) {B : Finset ℕ} {L : ℕ} (hB : B.card ≤ L) (K : ℕ)
+    : ex δ B (fun T => ind (K ≤ T.card)) ≤ (L.choose K : ℝ) * δ ^ K := by
   have hpt : ∀ T ⊆ B, ind (K ≤ #T) ≤ ∑ Q ∈ B.powersetCard K, ind (Q ⊆ T) := by
     intro T hT
     refine ind_le (sum_nonneg fun _ _ => ind_nonneg _) fun hK => ?_
     obtain ⟨Q, hQT, hQ⟩ := Finset.exists_subset_card_eq hK
     have hQB : Q ∈ B.powersetCard K := mem_powersetCard.mpr ⟨hQT.trans hT, hQ⟩
-    calc (1 : ℝ) = ind (Q ⊆ T) := (ind_pos hQT).symm
+    calc
+      (1 : ℝ)
+        = ind (Q ⊆ T) := (ind_pos hQT).symm
       _ ≤ _ := single_le_sum (f := fun Q => ind (Q ⊆ T)) (fun _ _ => ind_nonneg _) hQB
-  calc ex δ B (fun T => ind (K ≤ #T))
+  calc
+    ex δ B (fun T => ind (K ≤ #T))
       ≤ ex δ B (fun T => ∑ Q ∈ B.powersetCard K, ind (Q ⊆ T)) := ex_mono h0 h1 hpt
-    _ = ∑ Q ∈ B.powersetCard K, ex δ B (fun T => ind (Q ⊆ T)) :=
-      ex_sum _ _ (fun Q T => ind (Q ⊆ T))
-    _ = ∑ Q ∈ B.powersetCard K, δ ^ K := sum_congr rfl fun Q hQ => by
-      rw [ex_contains (mem_powersetCard.mp hQ).1, (mem_powersetCard.mp hQ).2]
+    _ = ∑ Q ∈ B.powersetCard K, ex δ B (fun T => ind (Q ⊆ T)) := ex_sum _ _ (fun Q T => ind (Q ⊆ T))
+    _ = ∑ Q ∈ B.powersetCard K, δ ^ K :=
+      sum_congr rfl fun Q hQ => by
+        rw [ex_contains (mem_powersetCard.mp hQ).1, (mem_powersetCard.mp hQ).2]
     _ = ((#B).choose K : ℝ) * δ ^ K := by rw [sum_const, card_powersetCard, nsmul_eq_mul]
     _ ≤ (L.choose K : ℝ) * δ ^ K :=
       mul_le_mul_of_nonneg_right (by exact_mod_cast Nat.choose_le_choose K hB) (pow_nonneg h0 _)
 
-theorem tail_eq (B : Finset ℕ) (K : ℕ) :
-    ex δ B (fun T => ind (K ≤ T.card)) = binUpper B.card δ K := by
+theorem tail_eq (B : Finset ℕ) (K : ℕ)
+    : ex δ B (fun T => ind (K ≤ T.card)) = binUpper B.card δ K := by
   unfold ex binUpper
   have hs := sum_powerset_apply_card (fun m => δ ^ m * (1 - δ) ^ (#B - m) * ind (K ≤ m)) (x := B)
   rw [hs]
@@ -222,17 +226,18 @@ theorem tail_eq (B : Finset ℕ) (K : ℕ) :
     ring
   · simp
 
-theorem tail_le_binUpper (h0 : 0 ≤ δ) (h1 : δ ≤ 1) {A : Finset ℕ} {G : ℕ} (hA : A.card ≤ G)
-    (K : ℕ) : ex δ A (fun T => ind (K ≤ T.card)) ≤ binUpper G δ K := by
+theorem tail_le_binUpper (h0 : 0 ≤ δ) (h1 : δ ≤ 1) {A : Finset ℕ} {G : ℕ} (hA : A.card ≤ G) (K : ℕ)
+    : ex δ A (fun T => ind (K ≤ T.card)) ≤ binUpper G δ K := by
   obtain ⟨A', hAA', hA'⟩ := Infinite.exists_superset_card_eq A G hA
-  calc ex δ A (fun T => ind (K ≤ #T)) = ex δ A' (fun T => ind (K ≤ #(T ∩ A))) :=
-      (ex_restrict hAA' (fun T => ind (K ≤ #T))).symm
-    _ ≤ ex δ A' (fun T => ind (K ≤ #T)) := ex_mono h0 h1 fun T _ =>
-      ind_le (ind_nonneg _) fun h => (ind_pos (le_trans h (card_le_card inter_subset_left))).ge
+  calc
+    ex δ A (fun T => ind (K ≤ #T))
+      = ex δ A' (fun T => ind (K ≤ #(T ∩ A))) := (ex_restrict hAA' (fun T => ind (K ≤ #T))).symm
+    _ ≤ ex δ A' (fun T => ind (K ≤ #T)) :=
+      ex_mono h0 h1 fun T _ =>
+        ind_le (ind_nonneg _) fun h => (ind_pos (le_trans h (card_le_card inter_subset_left))).ge
     _ = binUpper G δ K := by rw [tail_eq, hA']
 
-def tile (r u s : ℕ) : Finset ℕ :=
-  Finset.Ico (s * ((6 * r + 1) * u)) ((s + 1) * ((6 * r + 1) * u))
+def tile (r u s : ℕ) : Finset ℕ := Finset.Ico (s * ((6 * r + 1) * u)) ((s + 1) * ((6 * r + 1) * u))
 
 theorem cell_subset {r u s c : ℕ} (hc : c ≤ 6 * r + 1) : cell r u s c ⊆ tile r u s := by
   intro x hx
@@ -244,10 +249,12 @@ theorem cell_card {r u s c : ℕ} (hc : 1 ≤ c) : (cell r u s c).card = u := by
   unfold cell
   rw [Nat.card_Ico]
   obtain ⟨c, rfl⟩ : ∃ c', c = c' + 1 := ⟨c - 1, by omega⟩
-  rw [Nat.add_sub_cancel, show (c + 1) * u = c * u + u by ring, ← add_assoc, Nat.add_sub_cancel_left]
+  rw [Nat.add_sub_cancel, show (c + 1) * u = c * u + u by ring, ← add_assoc,
+    Nat.add_sub_cancel_left]
 
-theorem ico_disjoint {a m i j : ℕ} (hij : i ≠ j) :
-    Disjoint (Finset.Ico (a + i * m) (a + (i + 1) * m)) (Finset.Ico (a + j * m) (a + (j + 1) * m)) := by
+theorem ico_disjoint {a m i j : ℕ} (hij : i ≠ j)
+    : Disjoint (Finset.Ico (a + i * m) (a + (i + 1) * m))
+      (Finset.Ico (a + j * m) (a + (j + 1) * m)) := by
   rw [disjoint_left]
   intro x hx hx'
   simp only [mem_Ico] at hx hx'
@@ -271,9 +278,9 @@ theorem ex_isEmpty (C : Finset ℕ) : ex δ C (fun V => ind (V = ∅)) = (1 - δ
   · intro h
     exact absurd (empty_mem_powerset C) h
 
-theorem ex_single_even (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (a u : ℕ) :
-    ((u / 2 : ℕ) : ℝ) * δ * (1 - δ) ^ (u - 1) ≤
-      ex δ (Finset.Ico a (a + u)) (fun V => ind (∃ x, V = {x} ∧ Even x)) := by
+theorem ex_single_even (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (a u : ℕ)
+    : ((u / 2 : ℕ) : ℝ) * δ * (1 - δ) ^ (u - 1)
+      ≤ ex δ (Finset.Ico a (a + u)) (fun V => ind (∃ x, V = {x} ∧ Even x)) := by
   have hIc : #(Ico a (a + u)) = u := by rw [Nat.card_Ico]; omega
   have hinj : Function.Injective (fun k => ({a + a % 2 + 2 * k} : Finset ℕ)) := by
     intro k₁ k₂ h
@@ -281,15 +288,19 @@ theorem ex_single_even (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (a u : ℕ) :
     omega
   have hPc : #((range (u / 2)).image (fun k => ({a + a % 2 + 2 * k} : Finset ℕ))) = u / 2 := by
     rw [card_image_of_injective _ hinj, card_range]
-  have hPsub : (range (u / 2)).image (fun k => ({a + a % 2 + 2 * k} : Finset ℕ)) ⊆ (Ico a (a + u)).powerset := by
+  have hPsub
+      : (range (u / 2)).image (fun k => ({a + a % 2 + 2 * k} : Finset ℕ))
+        ⊆ (Ico a (a + u)).powerset := by
     intro V hV
     rw [mem_image] at hV
     obtain ⟨k, hk, rfl⟩ := hV
     rw [mem_powerset, singleton_subset_iff, mem_Ico]
     rw [mem_range] at hk
     omega
-  have hw : ∀ V ∈ (range (u / 2)).image (fun k => ({a + a % 2 + 2 * k} : Finset ℕ)),
-      δ ^ #V * (1 - δ) ^ (#(Ico a (a + u)) - #V) * ind (∃ x, V = {x} ∧ Even x) = δ * (1 - δ) ^ (u - 1) := by
+  have hw
+      : ∀ V ∈ (range (u / 2)).image (fun k => ({a + a % 2 + 2 * k} : Finset ℕ)),
+        δ ^ #V * (1 - δ) ^ (#(Ico a (a + u)) - #V) * ind (∃ x, V = {x} ∧ Even x)
+          = δ * (1 - δ) ^ (u - 1) := by
     intro V hV
     rw [mem_image] at hV
     obtain ⟨k, _, rfl⟩ := hV
@@ -297,16 +308,18 @@ theorem ex_single_even (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (a u : ℕ) :
     ring
   unfold ex
   beta_reduce
-  calc ((u / 2 : ℕ) : ℝ) * δ * (1 - δ) ^ (u - 1)
-      = ∑ V ∈ (range (u / 2)).image (fun k => ({a + a % 2 + 2 * k} : Finset ℕ)),
-          δ ^ #V * (1 - δ) ^ (#(Ico a (a + u)) - #V) * ind (∃ x, V = {x} ∧ Even x) := by
-        rw [sum_congr rfl hw, sum_const, hPc, nsmul_eq_mul]
-        ring
-    _ ≤ _ := sum_le_sum_of_subset_of_nonneg hPsub fun V _ _ =>
+  calc
+    ((u / 2 : ℕ) : ℝ) * δ * (1 - δ) ^ (u - 1)
+        = ∑ V ∈ (range (u / 2)).image (fun k => ({a + a % 2 + 2 * k} : Finset ℕ)),
+            δ ^ #V * (1 - δ) ^ (#(Ico a (a + u)) - #V) * ind (∃ x, V = {x} ∧ Even x) := by
+      rw [sum_congr rfl hw, sum_const, hPc, nsmul_eq_mul]
+      ring
+    _ ≤ _ :=
+      sum_le_sum_of_subset_of_nonneg hPsub fun V _ _ =>
         mul_nonneg (mul_nonneg (pow_nonneg h0 _) (pow_nonneg (by linarith) _)) (ind_nonneg _)
 
-theorem prod_alternate (a b : ℝ) (m : ℕ) :
-    ∏ c ∈ Finset.range (2 * m + 1), (if Even c then a else b) = a ^ (m + 1) * b ^ m := by
+theorem prod_alternate (a b : ℝ) (m : ℕ)
+    : ∏ c ∈ Finset.range (2 * m + 1), (if Even c then a else b) = a ^ (m + 1) * b ^ m := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -316,11 +329,13 @@ theorem prod_alternate (a b : ℝ) (m : ℕ) :
       if_neg h1, if_pos h2]
     ring
 
-theorem marked_ge (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (r u s : ℕ) :
-    markedBound δ r u ≤ ex δ (tile r u s) (fun T => ind (Marked T r u s)) := by
+theorem marked_ge (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (r u s : ℕ)
+    : markedBound δ r u ≤ ex δ (tile r u s) (fun T => ind (Marked T r u s)) := by
   have hm : 6 * r + 1 = 2 * (3 * r) + 1 := by ring
-  have hcell : ∀ c, cell r u s (c + 1) =
-      Ico (s * ((6 * r + 1) * u) + c * u) (s * ((6 * r + 1) * u) + c * u + u) := by
+  have hcell
+      : ∀ c,
+        cell r u s (c + 1)
+          = Ico (s * ((6 * r + 1) * u) + c * u) (s * ((6 * r + 1) * u) + c * u + u) := by
     intro c
     unfold cell
     rw [Nat.add_sub_cancel]
@@ -329,16 +344,20 @@ theorem marked_ge (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (r u s : ℕ) :
   have hX : 0 ≤ ((u / 2 : ℕ) : ℝ) * δ * (1 - δ) ^ (u - 1) :=
     mul_nonneg (mul_nonneg (Nat.cast_nonneg _) h0) (pow_nonneg (by linarith) _)
   have hP0 : 0 ≤ (1 - δ) ^ u := pow_nonneg (by linarith) _
-  have hind : ∀ (c' : ℕ) (V : Finset ℕ),
-      0 ≤ (if Even c' then ind (V = ∅) else ind (∃ x, V = {x} ∧ Even x)) ∧
-        (if Even c' then ind (V = ∅) else ind (∃ x, V = {x} ∧ Even x)) ≤ 1 := by
+  have hind
+      : ∀ (c' : ℕ) (V : Finset ℕ),
+        0 ≤ (if Even c' then ind (V = ∅) else ind (∃ x, V = {x} ∧ Even x))
+          ∧ (if Even c' then ind (V = ∅) else ind (∃ x, V = {x} ∧ Even x)) ≤ 1 := by
     intro c' V
     split_ifs
     · exact ⟨ind_nonneg _, ind_le_one _⟩
     · exact ⟨ind_nonneg _, ind_le_one _⟩
-  have hpt : ∀ T ⊆ tile r u s, ∏ c' ∈ range (6 * r + 1),
-      (if Even c' then ind (T ∩ cell r u s (c' + 1) = ∅)
-        else ind (∃ x, T ∩ cell r u s (c' + 1) = {x} ∧ Even x)) ≤ ind (Marked T r u s) := by
+  have hpt
+      : ∀ T ⊆ tile r u s,
+        ∏ c' ∈ range (6 * r + 1),
+            (if Even c' then ind (T ∩ cell r u s (c' + 1) = ∅)
+              else ind (∃ x, T ∩ cell r u s (c' + 1) = {x} ∧ Even x))
+          ≤ ind (Marked T r u s) := by
     intro T _
     by_cases hM : Marked T r u s
     · rw [ind_pos hM]
@@ -368,40 +387,45 @@ theorem marked_ge (h0 : 0 ≤ δ) (h1 : δ ≤ 1) (r u s : ℕ) :
         rw [if_neg he] at h
         by_contra hne
         exact h (ind_neg hne)
-  calc markedBound δ r u
-      = ∏ c' ∈ range (6 * r + 1),
-          (if Even c' then (1 - δ) ^ u else ((u / 2 : ℕ) : ℝ) * δ * (1 - δ) ^ (u - 1)) := by
-        unfold markedBound
-        rw [hm, prod_alternate]
+  calc
+    markedBound δ r u
+        = ∏ c' ∈ range (6 * r + 1),
+            (if Even c' then (1 - δ) ^ u else ((u / 2 : ℕ) : ℝ) * δ * (1 - δ) ^ (u - 1)) := by
+      unfold markedBound
+      rw [hm, prod_alternate]
     _ ≤ ∏ c' ∈ range (6 * r + 1), ex δ (cell r u s (c' + 1))
           (fun V => if Even c' then ind (V = ∅) else ind (∃ x, V = {x} ∧ Even x)) := by
-        refine prod_le_prod₀ (fun c' _ => ?_) (fun c' _ => ?_)
-        · split_ifs
-          · exact hP0
-          · exact hX
-        · by_cases he : Even c'
-          · simp only [if_pos he]
-            exact le_of_eq (by rw [ex_isEmpty, cell_card (c := c' + 1) (by omega)])
-          · simp only [if_neg he]
-            rw [hcell]
-            exact ex_single_even h0 h1 _ u
-    _ = ex δ (tile r u s) (fun T => ∏ c' ∈ range (6 * r + 1),
+      refine prod_le_prod₀ (fun c' _ => ?_) (fun c' _ => ?_)
+      · split_ifs
+        · exact hP0
+        · exact hX
+      · by_cases he : Even c'
+        · simp only [if_pos he]
+          exact le_of_eq (by rw [ex_isEmpty, cell_card (c := c' + 1) (by omega)])
+        · simp only [if_neg he]
+          rw [hcell]
+          exact ex_single_even h0 h1 _ u
+    _ = ex δ (tile r u s) (fun T =>
+        ∏ c' ∈ range (6 * r + 1),
           (if Even c' then ind (T ∩ cell r u s (c' + 1) = ∅)
             else ind (∃ x, T ∩ cell r u s (c' + 1) = {x} ∧ Even x))) := by
-        refine (ex_prod (range (6 * r + 1)) (fun c' => cell r u s (c' + 1))
-          (fun c' V => if Even c' then ind (V = ∅) else ind (∃ x, V = {x} ∧ Even x)) ?_ (tile r u s) ?_).symm
-        · intro i _ j _ hij
-          show Disjoint (cell r u s (i + 1)) (cell r u s (j + 1))
-          rw [hcell, hcell]
-          have := ico_disjoint (a := s * ((6 * r + 1) * u)) (m := u) hij
-          convert this using 2 <;> ring
-        · intro c' hc'
-          rw [mem_range] at hc'
-          exact cell_subset (c := c' + 1) (by omega)
+      refine (ex_prod (range (6 * r + 1))
+        (fun c' => cell r u s (c' + 1))
+        (fun c' V => if Even c' then ind (V = ∅) else ind (∃ x, V = {x} ∧ Even x))
+        ?_ (tile r u s) ?_).symm
+      · intro i _ j _ hij
+        show Disjoint (cell r u s (i + 1)) (cell r u s (j + 1))
+        rw [hcell, hcell]
+        have := ico_disjoint (a := s * ((6 * r + 1) * u)) (m := u) hij
+        convert this using 2 <;> ring
+      · intro c' hc'
+        rw [mem_range] at hc'
+        exact cell_subset (c := c' + 1) (by omega)
     _ ≤ _ := ex_mono h0 h1 hpt
 
-theorem marked_congr {T T' : Finset ℕ} {r u s : ℕ} (h : T ∩ tile r u s = T' ∩ tile r u s)
-    (hM : Marked T r u s) : Marked T' r u s := by
+theorem marked_congr
+    {T T' : Finset ℕ} {r u s : ℕ} (h : T ∩ tile r u s = T' ∩ tile r u s) (hM : Marked T r u s)
+    : Marked T' r u s := by
   intro c hc1 hc2
   have hsub := cell_subset (r := r) (u := u) (s := s) hc2
   have e : T ∩ cell r u s c = T' ∩ cell r u s c := by

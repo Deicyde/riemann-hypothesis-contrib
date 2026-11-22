@@ -5,11 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd Matrix
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd Matrix
 open GlobalTheory.CuspRep (finId locGL finGL)
 
-private theorem fin_scalar {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) (x : (w.adicCompletion F)ˣ) :
-    finGL F 2 (locGL F 2 w (GeneralLinearGroup.scalar (Fin 2) x)) = GeneralLinearGroup.scalar (Fin 2) (localIdele F w x) := by
+private theorem fin_scalar
+    {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) (x : (w.adicCompletion F)ˣ)
+    : finGL F 2 (locGL F 2 w (GeneralLinearGroup.scalar (Fin 2) x))
+      = GeneralLinearGroup.scalar (Fin 2) (localIdele F w x) := by
   have h := GlobalTheory.CuspRep.finId_det_locGL w (GeneralLinearGroup.scalar (Fin 1) x)
   rw [locGL, GlobalTheory.CuspRep.cornerGL_scalar] at h ⊢
   rw [finGL, GlobalTheory.CuspRep.cornerGL_scalar]
@@ -21,12 +24,12 @@ private theorem roots (s : ℂ) (p : ℂˣ) : ∃ α β : ℂˣ, (α : ℂ) + β
   obtain ⟨d, hd⟩ := IsAlgClosed.exists_pow_nat_eq (s ^ 2 - 4 * (p : ℂ)) (n := 2) two_pos
   have h : (s + d) / 2 * ((s - d) / 2) = p := by linear_combination (-1 / 4 : ℂ) * hd
   have h0 := h ▸ p.ne_zero
-  refine ⟨Units.mk0 _ (left_ne_zero_of_mul h0), Units.mk0 _ (right_ne_zero_of_mul h0), ?_, Units.ext h⟩
+  refine
+    ⟨Units.mk0 _ (left_ne_zero_of_mul h0), Units.mk0 _ (right_ne_zero_of_mul h0), ?_, Units.ext h⟩
   simp only [Units.val_mk0]
   ring
 
-theorem UpperTheory.V.Af.Nf.satHol :
-    UpperTheory.V.Af.Nf.SatHol := by
+theorem UpperTheory.V.Af.Nf.satHol : UpperTheory.V.Af.Nf.SatHol := by
   intro F _ _ _ k c ω φ hφ h0 w lam hw hU
   have hq : (0 : ℝ) < normV w :=
     Nat.cast_pos.2 (zero_lt_one.trans (by

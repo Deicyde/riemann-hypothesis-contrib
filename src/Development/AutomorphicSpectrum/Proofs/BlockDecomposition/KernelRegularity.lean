@@ -30,14 +30,15 @@ open PositivityTheory.RgBcC PositivityTheory.RgBcC.Fc
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem coe_toC0 {f : ℝ → ℂ} (h₁ : Continuous f) (h₂ : Tendsto f (cocompact ℝ) (𝓝 0)) (y : ℝ) : toC0 f y = f y := by
+theorem coe_toC0 {f : ℝ → ℂ} (h₁ : Continuous f) (h₂ : Tendsto f (cocompact ℝ) (𝓝 0)) (y : ℝ)
+    : toC0 f y = f y := by
   have : Continuous f ∧ Tendsto f (cocompact ℝ) (𝓝 0) := ⟨h₁, h₂⟩
   simp only [toC0]
   rw [dite_eq_left this]
   rfl
 
-theorem adj_rho {n : ℕ} (E : KMod n) [CompleteSpace E.V] (k : Matrix.unitaryGroup (Fin n) ℂ) :
-    ContinuousLinearMap.adjoint (E.ρ k⁻¹) = E.ρ k := by
+theorem adj_rho {n : ℕ} (E : KMod n) [CompleteSpace E.V] (k : Matrix.unitaryGroup (Fin n) ℂ)
+    : ContinuousLinearMap.adjoint (E.ρ k⁻¹) = E.ρ k := by
   have hmul : ∀ v, E.ρ k (E.ρ k⁻¹ v) = v := fun v => by
     have := congrArg (fun L : E.V →L[ℂ] E.V => L v) (E.ρ.map_mul k k⁻¹)
     simpa using this.symm
@@ -53,11 +54,30 @@ theorem adj_rho {n : ℕ} (E : KMod n) [CompleteSpace E.V] (k : Matrix.unitaryGr
   rw [e, e, hmul] at this
   exact this.symm
 
-theorem kerCore_of (hFR : RowExists) (hRM : RowMatrix) (hAS : AdjSmooth) (hRL : RowLeft) (hAF : ActFormula)
-    (hWR : WaveRep) (hWU : WaveUniq) (hPR : PhiRes) (hWI : WaveInt) (hSR : SupportRow) : KerCore := by
+theorem kerCore_of
+    (hFR : RowExists) (hRM : RowMatrix) (hAS : AdjSmooth) (hRL : RowLeft) (hAF : ActFormula)
+    (hWR : WaveRep) (hWU : WaveUniq) (hPR : PhiRes) (hWI : WaveInt) (hSR : SupportRow)
+    : KerCore := by
   intro n _ _ μ _ E g T₀ hb hLg hUn hRC hSG hAE hWS hWC hCS hSO hPW
   haveI : CompleteSpace E.V := FiniteDimensional.complete ℂ E.V
-  obtain ⟨hAbsFC, hAbsCut, hFc, hWv, hCls, hSobOps, hCptSob, hSB, hPres, hConc, hCJ, hFr, hOmF, hIbp, hDD⟩ := id hCS
+  obtain ⟨
+      hAbsFC,
+      hAbsCut,
+      hFc,
+      hWv,
+      hCls,
+      hSobOps,
+      hCptSob,
+      hSB,
+      hPres,
+      hConc,
+      hCJ,
+      hFr,
+      hOmF,
+      hIbp,
+      hDD
+    ⟩ :=
+    id hCS
   obtain ⟨hMrep, Ω, T, hDense, hSym, hEx, hLeft, hOm⟩ :=
     hConc n μ E.V hLg hUn hRC hSG hPres hFr hCls hSobOps hCptSob hOmF hIbp hDD
   obtain ⟨F⟩ := hAbsFC _ _ Ω T hDense hSym hEx hLeft
@@ -70,12 +90,19 @@ theorem kerCore_of (hFR : RowExists) (hRM : RowMatrix) (hAS : AdjSmooth) (hRL : 
     have := hPW1 0
     simp only [pow_zero, one_mul] at this
     exact coe_toC0 this.1 (by simpa using this.2) y
-  have hR : Rapid (toC0 (hg c g)) := fun m =>
-    ⟨toC0 (fun y : ℝ => (y : ℂ) ^ m * hg c g y), fun y => by
-      rw [coe_toC0 (hPW1 m).1 (hPW1 m).2, hC0]⟩
+  have hR : Rapid (toC0 (hg c g)) := fun m => ⟨
+    toC0 (fun y : ℝ => (y : ℂ) ^ m * hg c g y),
+    fun y => by rw [coe_toC0 (hPW1 m).1 (hPW1 m).2, hC0]
+  ⟩
   obtain ⟨A, hA⟩ := hRM n μ E Ω T F c hStd _ (hFR n μ E Ω T F c hStd _ hR)
-  have hWV : ∀ f ∈ CE E, Cpt f → ∀ u, IsWave E u → (∀ x ∈ GLs n, u 0 x = f x) → ∀ f', Sob μ f' → IsSec E f' →
-      cls μ f' = F.Φ (toC0 (hg c g)) (cls μ f) → ∀ x ∈ GLs n, ∫ t, (g t : ℂ) • u t x = f' x := by
+  have hWV
+      : ∀ f ∈ CE E,
+        Cpt f
+          → ∀ u,
+            IsWave E u → (∀ x ∈ GLs n, u 0 x = f x)
+              → ∀ f',
+                Sob μ f' → IsSec E f' → cls μ f' = F.Φ (toC0 (hg c g)) (cls μ f)
+                  → ∀ x ∈ GLs n, ∫ t, (g t : ℂ) • u t x = f' x := by
     intro f hf hcpt u hu h0 f' hs _ hcl x hx
     obtain ⟨N, b, U, hN, hT, hUw, hU0, hUt⟩ := hWR n μ E Ω T F c hStd f hf hcpt
     have huU : ∀ t, u t x = U t x := fun t =>
@@ -96,7 +123,8 @@ theorem kerCore_of (hFR : RowExists) (hRM : RowMatrix) (hAS : AdjSmooth) (hRL : 
       (Matrix.isUnit_det_of_right_inverse (Matrix.mem_unitaryGroup_iff.1 k.2)).ne_zero
     simp only [GLs, Set.mem_setOf_eq, Matrix.det_mul] at hy ⊢
     exact mul_ne_zero hk hy
-  refine ⟨fun y => ContinuousLinearMap.adjoint (A y), hAS _ _ A _ fun v => (hA v).1.1, ⟨R, ?_⟩, ?_, ?_⟩
+  refine
+    ⟨fun y => ContinuousLinearMap.adjoint (A y), hAS _ _ A _ fun v => (hA v).1.1, ⟨R, ?_⟩, ?_, ?_⟩
   · intro y hy hl
     have : A y = 0 := by
       ext v
@@ -119,8 +147,14 @@ theorem kerCore_of (hFR : RowExists) (hRM : RowMatrix) (hAS : AdjSmooth) (hRL : 
 
 theorem kerCore : KerCore :=
   have hLC := GlobalTheory.T.left_translate_commutes GlobalTheory.T.left_translate_sobolev
-  kerCore_of (GlobalTheory.T.kernel_row_exists GlobalTheory.T.rapid_factorization GlobalTheory.T.eigenvalue_adjoint_facts) GlobalTheory.T.kernel_row_matrix GlobalTheory.T.kernel_adjoint_smooth
-    (GlobalTheory.T.kernel_row_left_invariant GlobalTheory.T.left_translate_sobolev hLC) (GlobalTheory.T.kernel_action_formula GlobalTheory.T.left_translate_sobolev hLC) GlobalTheory.T.wave_representation GlobalTheory.T.wave_uniqueness GlobalTheory.T.phi_resolvent_identity
-    GlobalTheory.T.wave_integral_identity GlobalTheory.T.kernel_row_support
+  kerCore_of
+    (GlobalTheory.T.kernel_row_exists GlobalTheory.T.rapid_factorization
+      GlobalTheory.T.eigenvalue_adjoint_facts)
+    GlobalTheory.T.kernel_row_matrix GlobalTheory.T.kernel_adjoint_smooth
+    (GlobalTheory.T.kernel_row_left_invariant GlobalTheory.T.left_translate_sobolev hLC)
+    (GlobalTheory.T.kernel_action_formula GlobalTheory.T.left_translate_sobolev hLC)
+    GlobalTheory.T.wave_representation GlobalTheory.T.wave_uniqueness
+    GlobalTheory.T.phi_resolvent_identity GlobalTheory.T.wave_integral_identity
+    GlobalTheory.T.kernel_row_support
 
 end GlobalTheory.CompanionTheory.KerFc

@@ -5,15 +5,28 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ExistsFinit
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart GlobalTheory.UCanon
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart
+  GlobalTheory.UCanon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.UCanon
 
-theorem eq_of_pow_eq_of_eq_at_closed : ∀ (k : Type) [Field k] (B : Over (Sp (DualNumber k))) [GrpObj B], IsAbelianScheme B → ∀ n : ℕ, (n : k) ≠ 0 → ∀ x x' : 𝟙_ (Over (Sp (DualNumber k))) ⟶ B, x ^ n = x' ^ n → spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ x.left = spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ x'.left → x = x' := by
+theorem eq_of_pow_eq_of_eq_at_closed
+    : ∀ (k : Type) [Field k] (B : Over (Sp (DualNumber k))) [GrpObj B],
+      IsAbelianScheme B
+        → ∀ n : ℕ,
+          (n : k) ≠ 0
+            → ∀ x x' : 𝟙_ (Over (Sp (DualNumber k))) ⟶ B,
+              x ^ n = x' ^ n
+                → spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ x.left
+                  = spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ x'.left
+                → x = x' := by
   intro k _ B _ hB n hn x x' hpow h0
   haveI : IsCommMonObj B := hB.comm
   haveI hloc : IsLocalRing (DualNumber k) := IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => by

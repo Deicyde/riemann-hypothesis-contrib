@@ -7,7 +7,8 @@ public import Formalism.FormalDegreeBessel.FinalG
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
+open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S
+  GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
 open scoped InnerProductSpace ENNReal Nat
 
 noncomputable section
@@ -213,19 +214,28 @@ private lemma equiv_symm_realifyFun_unrealify {m : ℕ} (x : EuclideanSpace ℝ 
   obtain ⟨i, j, b⟩ := p
   cases b <;> simp [_root_.Formalism.MainNotions.S.unrealify, _root_.Formalism.MainNotions.S.realifyFun]
 
-
 open MeasureTheory Matrix Filter Topology in
 open scoped InnerProductSpace ENNReal Nat in
-theorem _root_.GlobalTheory.CellDens.LieN.lieE_Nset : ∀ (k r : ℕ)
-    (x : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool)),
-    (x ∈ _root_.Formalism.MainNotions.S.lieE (_root_.Formalism.QuantumDeterminants.Nset k r) ↔ ((_root_.Formalism.MainNotions.S.unrealify x)ᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r + _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.Formalism.MainNotions.S.unrealify x = 0 ∧
-      ∀ i j : Fin (2 * r + k + 1),
-        _root_.GlobalTheory.CellDens.lev k r j ≤ _root_.GlobalTheory.CellDens.lev k r i →
-          _root_.Formalism.MainNotions.S.unrealify x i j = 0)) ∧
-    (x ∈ _root_.Formalism.MainNotions.S.lieE (_root_.Formalism.QuantumDeterminants.Nset k r) → NormedSpace.exp (_root_.Formalism.MainNotions.S.unrealify x) ∈ _root_.Formalism.QuantumDeterminants.Nset k r) := by
+theorem _root_.GlobalTheory.CellDens.LieN.lieE_Nset
+    : ∀ (k r : ℕ) (x : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool)),
+      (x ∈ _root_.Formalism.MainNotions.S.lieE (_root_.Formalism.QuantumDeterminants.Nset k r)
+          ↔ ((_root_.Formalism.MainNotions.S.unrealify x)ᴴ
+                  * _root_.Formalism.QuantumDeterminants.Hpk k r
+                + _root_.Formalism.QuantumDeterminants.Hpk k r
+                  * _root_.Formalism.MainNotions.S.unrealify x
+              = 0
+            ∧ ∀ i j : Fin (2 * r + k + 1),
+              _root_.GlobalTheory.CellDens.lev k r j ≤ _root_.GlobalTheory.CellDens.lev k r i
+                → _root_.Formalism.MainNotions.S.unrealify x i j = 0))
+        ∧ (x ∈ _root_.Formalism.MainNotions.S.lieE (_root_.Formalism.QuantumDeterminants.Nset k r)
+          → NormedSpace.exp (_root_.Formalism.MainNotions.S.unrealify x)
+            ∈ _root_.Formalism.QuantumDeterminants.Nset k r) := by
   intro k r x
-  have key : ∀ y : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool),
-      y ∈ _root_.Formalism.MainNotions.S.lieE (_root_.Formalism.QuantumDeterminants.Nset k r) ↔ _root_.GlobalTheory.CellDens.LieN.Cond k r (_root_.Formalism.MainNotions.S.unrealify y) := by
+  have key
+      : ∀ y : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool),
+        y ∈ _root_.Formalism.MainNotions.S.lieE (_root_.Formalism.QuantumDeterminants.Nset k r)
+          ↔ _root_.GlobalTheory.CellDens.LieN.Cond k r
+            (_root_.Formalism.MainNotions.S.unrealify y) := by
     intro y
     constructor
     · intro hy
@@ -246,8 +256,11 @@ theorem _root_.GlobalTheory.CellDens.LieN.lieE_Nset : ∀ (k r : ℕ)
         exact lieNCond_smul c _ hz
     · intro hy
       unfold _root_.Formalism.MainNotions.S.lieE
-      refine Submodule.subset_span ⟨_root_.Formalism.MainNotions.S.unrealify y, fun t => exp_mem_Nset_of_lieNCond _
-        (lieNCond_smul t _ hy), ?_⟩
+      refine Submodule.subset_span ⟨
+        _root_.Formalism.MainNotions.S.unrealify y,
+        fun t => exp_mem_Nset_of_lieNCond _ (lieNCond_smul t _ hy),
+        ?_
+      ⟩
       exact equiv_symm_realifyFun_unrealify y
   exact ⟨key x, fun hx => exp_mem_Nset_of_lieNCond _ ((key x).1 hx)⟩
 

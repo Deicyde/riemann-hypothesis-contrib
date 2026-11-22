@@ -7,18 +7,20 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Bij
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory
+  MonObj
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
 open Limits
 
-theorem specQuotIdemCoprod_bij (R : Type) [CommRing R] (e e' : R) (he : IsIdempotentElem e)
-    (hs : e + e' = 1) :
-    Function.Bijective ((Ideal.Quotient.mk (Ideal.span {e})).prod
+theorem specQuotIdemCoprod_bij
+    (R : Type) [CommRing R] (e e' : R) (he : IsIdempotentElem e) (hs : e + e' = 1)
+    : Function.Bijective ((Ideal.Quotient.mk (Ideal.span {e})).prod
       (Ideal.Quotient.mk (Ideal.span {e'}))) := by
   have he' : e' = 1 - e := by rw [← hs]; ring
   have hee : e * e' = 0 := by rw [he', mul_sub, _root_.mul_one, he.eq, sub_self]
@@ -26,12 +28,14 @@ theorem specQuotIdemCoprod_bij (R : Type) [CommRing R] (e e' : R) (he : IsIdempo
   · rw [injective_iff_map_eq_zero]
     intro x hx
     simp only [RingHom.prod_apply, Prod.mk_eq_zero, Ideal.Quotient.eq_zero_iff_mem,
-      Ideal.mem_span_singleton'] at hx
+        Ideal.mem_span_singleton']
+      at hx
     obtain ⟨⟨a, rfl⟩, ⟨b, hb⟩⟩ := hx
     have h1 : a * e * e' = 0 := by rw [_root_.mul_assoc, hee, mul_zero]
-    have h2 : a * e * e = 0 := by
-      rw [← hb, _root_.mul_assoc, mul_comm e' e, hee, mul_zero]
-    calc a * e = a * e * (e + e') := by rw [hs, _root_.mul_one]
+    have h2 : a * e * e = 0 := by rw [← hb, _root_.mul_assoc, mul_comm e' e, hee, mul_zero]
+    calc
+      a * e
+        = a * e * (e + e') := by rw [hs, _root_.mul_one]
       _ = 0 := by rw [mul_add, h1, h2, add_zero]
   · rintro ⟨x, y⟩
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
@@ -44,12 +48,17 @@ theorem specQuotIdemCoprod_bij (R : Type) [CommRing R] (e e' : R) (he : IsIdempo
     · rw [Ideal.Quotient.eq, Ideal.mem_span_singleton']
       exact ⟨a - b, by rw [he']; ring⟩
 
-theorem specQuotIdemCoprod : ∀ (R : Type) [CommRing R] (e e' : R), IsIdempotentElem e → e + e' = 1 → Nonempty (Limits.IsColimit (Limits.BinaryCofan.mk (spMap (Ideal.Quotient.mk (Ideal.span {e}))) (spMap (Ideal.Quotient.mk (Ideal.span {e'}))))) := by
+theorem specQuotIdemCoprod
+    : ∀ (R : Type) [CommRing R] (e e' : R),
+      IsIdempotentElem e → e + e' = 1
+        → Nonempty (Limits.IsColimit (Limits.BinaryCofan.mk
+          (spMap (Ideal.Quotient.mk (Ideal.span {e})))
+          (spMap (Ideal.Quotient.mk (Ideal.span {e'}))))) := by
   intro R _ e e' he hs
   let A := R ⧸ Ideal.span {e}
   let B := R ⧸ Ideal.span {e'}
-  let φ : R →+* A × B := (Ideal.Quotient.mk (Ideal.span {e})).prod
-      (Ideal.Quotient.mk (Ideal.span {e'}))
+  let φ : R →+* A × B :=
+    (Ideal.Quotient.mk (Ideal.span {e})).prod (Ideal.Quotient.mk (Ideal.span {e'}))
   have hφ : Function.Bijective φ := specQuotIdemCoprod_bij R e e' he hs
   let ψ : R ≃+* A × B := RingEquiv.ofBijective φ hφ
   let g : Spec (CommRingCat.of A) ⨿ Spec (CommRingCat.of B) ⟶ Sp R :=
@@ -61,8 +70,8 @@ theorem specQuotIdemCoprod : ∀ (R : Type) [CommRing R] (e e' : R), IsIdempoten
     infer_instance
   haveI : IsIso g := by dsimp only [g]; infer_instance
   let i := asIso g
-  refine ⟨IsColimit.ofIsoColimit (coprodIsCoprod (Spec (CommRingCat.of A)) (Spec (CommRingCat.of B)))
-    (Cocone.ext i ?_)⟩
+  refine ⟨IsColimit.ofIsoColimit
+    (coprodIsCoprod (Spec (CommRingCat.of A)) (Spec (CommRingCat.of B))) (Cocone.ext i ?_)⟩
   rintro ⟨⟨⟩⟩
   · simp only [i, asIso_hom, g]
     show coprod.inl ≫ coprodSpec A B ≫ _ = spMap _

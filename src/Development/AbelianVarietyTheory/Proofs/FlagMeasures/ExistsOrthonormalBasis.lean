@@ -6,7 +6,8 @@ public import Formalism.HarderNarasimhan.ShiftInvariance
 
 @[expose] public section
 
-open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField MeasureTheory Finset
+open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField
+  MeasureTheory Finset
 open scoped InnerProductSpace
 
 namespace GlobalTheory.LieONB
@@ -53,8 +54,8 @@ lemma inG_iff (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) :
   exact ⟨fun h a b => (key a b).1 (h a b), fun h a b => (key a b).2 (h a b)⟩
 
 noncomputable def bas (ε : Fin n → Bool) (a b : Fin n) : Matrix (Fin n) (Fin n) ℂ :=
-  Matrix.single a b ((1 + Complex.I) / 2) +
-    Matrix.single b a (-((sg ε a * sg ε b : ℝ) : ℂ) * ((1 - Complex.I) / 2))
+  Matrix.single a b ((1 + Complex.I) / 2)
+    + Matrix.single b a (-((sg ε a * sg ε b : ℝ) : ℂ) * ((1 - Complex.I) / 2))
 
 lemma bas_re (ε : Fin n → Bool) (a b p q : Fin n) :
     (bas ε a b p q).re = (if a = p ∧ b = q then 1 / 2 else 0) +
@@ -254,16 +255,25 @@ lemma expand (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε
       Complex.one_im, Complex.I_re, Complex.I_im, h1, h2]
     rcases sg_cases ε i with hi | hi <;> rcases sg_cases ε j with hj | hj <;> simp only [hi, hj] <;> ring
 
-theorem exists_orthonormal_basis : ∀ (n : ℕ) (ε : Fin n → Bool), ∃ E : Fin (n ^ 2) → Matrix (Fin n) (Fin n) ℂ, (∀ i, inG ε (E i) ∧ (inK ε (E i) ∨ inP ε (E i))) ∧ (∀ i j, ((E i * (E j)ᴴ).trace).re = if i = j then 1 else 0) ∧ ∀ X, inG ε X → X = ∑ i, ((((X * (E i)ᴴ).trace).re : ℝ) : ℂ) • E i := by
+theorem exists_orthonormal_basis
+    : ∀ (n : ℕ) (ε : Fin n → Bool), ∃ E : Fin (n ^ 2) → Matrix (Fin n) (Fin n) ℂ,
+      (∀ i, inG ε (E i) ∧ (inK ε (E i) ∨ inP ε (E i)))
+        ∧ (∀ i j, ((E i * (E j)ᴴ).trace).re = if i = j then 1 else 0)
+        ∧ ∀ X, inG ε X → X = ∑ i, ((((X * (E i)ᴴ).trace).re : ℝ) : ℂ) • E i := by
   intro n ε
   obtain ⟨e⟩ : Nonempty (Fin (n ^ 2) ≃ Fin n × Fin n) :=
     ⟨(finCongr (pow_two n)).trans finProdFinEquiv.symm⟩
-  refine ⟨fun i => bas ε (e i).1 (e i).2, fun i => ⟨bas_inG ε _ _, bas_type ε _ _⟩,
-    fun i j => ?_, fun X hX => ?_⟩
+  refine ⟨
+    fun i => bas ε (e i).1 (e i).2,
+    fun i => ⟨bas_inG ε _ _, bas_type ε _ _⟩,
+    fun i j => ?_,
+    fun X hX => ?_
+  ⟩
   · show ((bas ε (e i).1 (e i).2 * (bas ε (e j).1 (e j).2)ᴴ).trace).re = if i = j then 1 else 0
     rw [ortho]
     simp only [Prod.mk.eta, EmbeddingLike.apply_eq_iff_eq]
-  · exact (expand ε hX).trans (Equiv.sum_comp e (fun z : Fin n × Fin n =>
-      ((((X * (bas ε z.1 z.2)ᴴ).trace).re : ℝ) : ℂ) • bas ε z.1 z.2)).symm
+  · exact (expand ε hX).trans
+      (Equiv.sum_comp e (fun z : Fin n × Fin n =>
+        ((((X * (bas ε z.1 z.2)ᴴ).trace).re : ℝ) : ℂ) • bas ε z.1 z.2)).symm
 
 end GlobalTheory.LieONB

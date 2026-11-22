@@ -19,82 +19,125 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsA
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC GroundTheory.Global.IdeleGroup Formalism.L2.Host
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host
 open scoped nonZeroDivisors ComplexConjugate
 
 noncomputable section
 namespace GlobalTheory.RSThetaCont
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem mem_bddForms_of_mspanR {π : CuspSub E a} {ω : HChar E} (hω : ω.IsUnitary) (hπ : π.HasCentChar ω) {φ : Sm E a}
-    (hφ : φ ∈ π.V ∨ φ.1 ∈ GlobalTheory.JSW.mspanR π) : φ.1 ∈ GlobalTheory.Petersson.bddForms E a ω := by
+theorem mem_bddForms_of_mspanR
+    {π : CuspSub E a} {ω : HChar E} (hω : ω.IsUnitary) (hπ : π.HasCentChar ω)
+    {φ : Sm E a} (hφ : φ ∈ π.V ∨ φ.1 ∈ GlobalTheory.JSW.mspanR π)
+    : φ.1 ∈ GlobalTheory.Petersson.bddForms E a ω := by
   have hc0 := CuspSub.hasCentral_iff.2 hπ
   have hu : π.IsUnitary := ⟨ω, hω, hc0⟩
-  have hR : φ.1 ∈ GlobalTheory.JSW.mspanR π := hφ.elim (fun h => GlobalTheory.JSW.mem_mspanR_of_mem h) id
-  obtain ⟨ψ, hψ, h⟩ := GlobalTheory.JSW.mspanR_words GlobalTheory.CuspOrth.cuspFormsBounded hu φ.1 hR
+  have hR : φ.1 ∈ GlobalTheory.JSW.mspanR π :=
+    hφ.elim (fun h => GlobalTheory.JSW.mem_mspanR_of_mem h) id
+  obtain ⟨ψ, hψ, h⟩ :=
+    GlobalTheory.JSW.mspanR_words GlobalTheory.CuspOrth.cuspFormsBounded hu φ.1 hR
   have h0 := (h []).2
   rw [GlobalTheory.JSW.word_nil, hψ] at h0
   have hR' : φ.1 ∈ GlobalTheory.JSW.rspan π := (GlobalTheory.JSW.rspan_eq_mspanR π).symm ▸ hR
   have hZ : GlobalTheory.JSW.rspan π ≤ GlobalTheory.JSW.Central.centralFns E a ω := by
-    refine GlobalTheory.JSW.rspan_le (fun ψ hψ z g => hc0.apply hψ z g) (fun F hF h z g => ?_) fun F hF X _ ν _ k γ _ z g => ?_
+    refine GlobalTheory.JSW.rspan_le
+      (fun ψ hψ z g => hc0.apply hψ z g)
+      (fun F hF h z g => ?_)
+      fun F hF X _ ν _ k γ _ z g => ?_
     · change F (GeneralLinearGroup.scalar (Fin a) z * g * h) = _ * F (g * h)
-      rw [mul_assoc]; exact hF z _
-    · change GlobalTheory.JSW.kerInf ν k γ F (GeneralLinearGroup.scalar (Fin a) z * g) = _ * GlobalTheory.JSW.kerInf ν k γ F g
+      rw [mul_assoc]
+      exact hF z _
+    · change GlobalTheory.JSW.kerInf ν k γ F (GeneralLinearGroup.scalar (Fin a) z * g)
+        = _ * GlobalTheory.JSW.kerInf ν k γ F g
       simp only [GlobalTheory.JSW.kerInf, mul_assoc]
       rw [← integral_const_mul]
       congr 1
       funext x
-      rw [hF z]; ring
+      rw [hF z]
+      ring
   exact ⟨h0.cont, GlobalTheory.JSW.rspan_left π hR', hZ hR', h0.bdd⟩
 
-theorem resFn_props {ω ω' : HChar E} (hω : ω.IsUnitary) (hω' : ω'.IsUnitary) {φ φ' : Sm E a}
-    (h : φ.1 ∈ GlobalTheory.Petersson.bddForms E a ω) (h' : φ'.1 ∈ GlobalTheory.Petersson.bddForms E a ω')
-    {ℓ : Fin a} {Φ : (Fin a → Cinf E) → ℂ} (hΦ : GlobalTheory.CuspQuot.IsTest (GlobalTheory.RSTheta.rowSet E ℓ) Φ)
-    (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (η : Fin a → Af E) :
-    Continuous (fun g => GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0) ∧
-    (∃ C : ℝ, ∀ g, ‖GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0‖ ≤ C) ∧
-    (∀ (γ : GL (Fin a) E) (g : GA E a), GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η (ratGL E a γ * g) 0 =
-      GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0) ∧
-    ∀ (z : Neutral.B1.Ideles E) (g : GA E a),
-      GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η (GeneralLinearGroup.scalar (Fin a) z * g) 0 =
-        ((ω.1 z : ℂˣ) : ℂ) * starRingEnd ℂ ((ω'.1 z : ℂˣ) : ℂ) * GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0 := by
-  exact GlobalTheory.T.rankinSelberg_kernel_zero_coeff_two_central_chars E a ω ω' hω hω' φ φ' h h' ℓ Φ hΦ J η
+theorem resFn_props
+    {ω ω' : HChar E} (hω : ω.IsUnitary) (hω' : ω'.IsUnitary)
+    {φ φ' : Sm E a} (h : φ.1 ∈ GlobalTheory.Petersson.bddForms E a ω)
+    (h' : φ'.1 ∈ GlobalTheory.Petersson.bddForms E a ω')
+    {ℓ : Fin a} {Φ : (Fin a → Cinf E) → ℂ}
+    (hΦ : GlobalTheory.CuspQuot.IsTest (GlobalTheory.RSTheta.rowSet E ℓ) Φ)
+    (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (η : Fin a → Af E)
+    : Continuous (fun g => GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0)
+      ∧ (∃ C : ℝ, ∀ g, ‖GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0‖ ≤ C)
+      ∧ (∀ (γ : GL (Fin a) E) (g : GA E a),
+        GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η (ratGL E a γ * g) 0
+          = GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0)
+      ∧ ∀ (z : Neutral.B1.Ideles E) (g : GA E a),
+        GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η (GeneralLinearGroup.scalar (Fin a) z * g) 0
+          = ((ω.1 z : ℂˣ) : ℂ) * starRingEnd ℂ ((ω'.1 z : ℂˣ) : ℂ)
+            * GlobalTheory.RSThetaLow.rsHat ℓ φ.1 φ'.1 Φ J η g 0 := by
+  exact GlobalTheory.T.rankinSelberg_kernel_zero_coeff_two_central_chars E a ω ω' hω hω' φ φ' h h' ℓ
+    Φ hΦ J η
 
-theorem isFundamentalDomain_shell (ha : 0 < a) (μ : Measure (GA E a)) [μ.IsHaarMeasure] {𝓕 : Set (GA E a)}
-    (h𝓕 : IsFundamentalDomain (ratGL E a).range 𝓕 μ) :
-    IsFundamentalDomain (latticeGL E a) (𝓕 ∩ {g | Real.exp (-((a : ℝ) * (Module.finrank ℚ E : ℝ))) <
-      (ideleModule E (GeneralLinearGroup.det g) : ℝ) ∧ (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1}) μ := by
+theorem isFundamentalDomain_shell
+    (ha : 0 < a)
+    (μ : Measure (GA E a)) [μ.IsHaarMeasure]
+    {𝓕 : Set (GA E a)} (h𝓕 : IsFundamentalDomain (ratGL E a).range 𝓕 μ)
+    : IsFundamentalDomain (latticeGL E a)
+      (𝓕
+        ∩ {g | Real.exp (-((a : ℝ) * (Module.finrank ℚ E : ℝ))) <
+          (ideleModule E (GeneralLinearGroup.det g) : ℝ) ∧ (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1})
+      μ := by
   exact GlobalTheory.T.isFundamentalDomain_det_shell_latticeGL E a ha μ 𝓕 h𝓕
 
-theorem differentiable_setIntegral_cpow (μ : Measure (GA E a)) {S : Set (GA E a)} (hSm : NullMeasurableSet S μ) (hS : μ S < ⊤) {c : ℝ} (hc : 0 < c)
-    (hδ : ∀ g ∈ S, c ≤ (ideleModule E (GeneralLinearGroup.det g) : ℝ) ∧ (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1)
-    {F : GA E a → ℂ} (hF : Continuous F) {C : ℝ} (hC : ∀ g, ‖F g‖ ≤ C) :
-    Differentiable ℂ fun s : ℂ => ∫ g in S, F g * ((ideleModule E (GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s - 1) ∂μ := by
+theorem differentiable_setIntegral_cpow
+    (μ : Measure (GA E a))
+    {S : Set (GA E a)} (hSm : NullMeasurableSet S μ) (hS : μ S < ⊤)
+    {c : ℝ} (hc : 0 < c)
+    (hδ : ∀ g ∈ S,
+      c ≤ (ideleModule E (GeneralLinearGroup.det g) : ℝ)
+        ∧ (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1)
+    {F : GA E a → ℂ} (hF : Continuous F)
+    {C : ℝ} (hC : ∀ g, ‖F g‖ ≤ C)
+    : Differentiable ℂ fun s : ℂ =>
+      ∫ g in S, F g * ((ideleModule E (GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s - 1) ∂μ := by
   exact GlobalTheory.T.integral_absDet_cpow_bounded_shell_entire E a μ S hSm hS c hc hδ F hF C hC
 
-theorem integral_low_geometric (ha : 0 < a) (μ : Measure (GA E a)) [μ.IsHaarMeasure] {𝓕 : Set (GA E a)}
-    (h𝓕 : IsFundamentalDomain (ratGL E a).range 𝓕 μ) {F : GA E a → ℂ} (hF : Continuous F) {C : ℝ}
-    (hC : ∀ g, ‖F g‖ ≤ C) (hrat : ∀ (γ : GL (Fin a) E) (g : GA E a), F (ratGL E a γ * g) = F g) {χ : ℂ}
-    (hχ : ‖χ‖ = 1) (hz : ∀ g, F (splitCentre E a 1 * g) = χ * F g) {s : ℂ} (hs : 1 < s.re) :
-    ∫ g in 𝓕 ∩ {g | (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1},
-        F g * ((ideleModule E (GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s - 1) ∂μ =
-      (∫ g in 𝓕 ∩ {g | Real.exp (-((a : ℝ) * (Module.finrank ℚ E : ℝ))) <
-          (ideleModule E (GeneralLinearGroup.det g) : ℝ) ∧ (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1},
-        F g * ((ideleModule E (GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s - 1) ∂μ) /
-      (1 - starRingEnd ℂ χ * Complex.exp (-((((a : ℝ) * (Module.finrank ℚ E : ℝ) : ℝ) : ℂ) * (s - 1)))) := by
-  exact GlobalTheory.T.integral_det_le_one_eq_geometric_series_shells E a ha μ 𝓕 h𝓕 F hF C hC hrat χ hχ hz s hs
+theorem integral_low_geometric
+    (ha : 0 < a)
+    (μ : Measure (GA E a)) [μ.IsHaarMeasure]
+    {𝓕 : Set (GA E a)} (h𝓕 : IsFundamentalDomain (ratGL E a).range 𝓕 μ)
+    {F : GA E a → ℂ} (hF : Continuous F)
+    {C : ℝ} (hC : ∀ g, ‖F g‖ ≤ C)
+    (hrat : ∀ (γ : GL (Fin a) E) (g : GA E a), F (ratGL E a γ * g) = F g)
+    {χ : ℂ} (hχ : ‖χ‖ = 1) (hz : ∀ g, F (splitCentre E a 1 * g) = χ * F g)
+    {s : ℂ} (hs : 1 < s.re)
+    : ∫ g in 𝓕 ∩ {g | (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1},
+          F g * ((ideleModule E (GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s - 1) ∂μ
+      = (∫ g in 𝓕 ∩ {g | Real.exp (-((a : ℝ) * (Module.finrank ℚ E : ℝ))) <
+            (ideleModule E (GeneralLinearGroup.det g) : ℝ) ∧ (ideleModule E (GeneralLinearGroup.det g) : ℝ) ≤ 1},
+          F g * ((ideleModule E (GeneralLinearGroup.det g) : ℝ) : ℂ) ^ (s - 1) ∂μ)
+        / (1
+          - starRingEnd ℂ χ
+            * Complex.exp (-((((a : ℝ) * (Module.finrank ℚ E : ℝ) : ℝ) : ℂ) * (s - 1)))) := by
+  exact GlobalTheory.T.integral_det_le_one_eq_geometric_series_shells E a ha μ 𝓕 h𝓕 F hF C hC hrat χ
+    hχ hz s hs
 
-theorem exists_analytic_ratio {L : ℝ} (hL : 0 < L) (χ : ℂ) (hχ : ‖χ‖ = 1) : ∃ h : ℂ → ℂ,
-    (∀ x : ℝ, 0 < x → AnalyticAt ℂ h (x : ℂ)) ∧
-    (∀ x : ℝ, 1 < x → h (x : ℂ) = ((x : ℂ) - 1) / (1 - χ * Complex.exp (-((L : ℂ) * ((x : ℂ) - 1))))) ∧
-    (χ ≠ 1 → h 1 = 0) := by
+theorem exists_analytic_ratio {L : ℝ} (hL : 0 < L) (χ : ℂ) (hχ : ‖χ‖ = 1)
+    : ∃ h : ℂ → ℂ,
+      (∀ x : ℝ, 0 < x → AnalyticAt ℂ h (x : ℂ))
+        ∧ (∀ x : ℝ,
+          1 < x → h (x : ℂ) = ((x : ℂ) - 1) / (1 - χ * Complex.exp (-((L : ℂ) * ((x : ℂ) - 1)))))
+        ∧ (χ ≠ 1 → h 1 = 0) := by
   exact GlobalTheory.T.exists_analytic_sub_one_div_one_sub_mul_exp L hL χ hχ
 
-theorem setIntegral_eq_zero_of_scalar (μ : Measure (GA E a)) [μ.IsHaarMeasure] {S : Set (GA E a)}
-    (hS : IsFundamentalDomain (latticeGL E a) S μ) {F : GA E a → ℂ} (hinv : ∀ γ ∈ latticeGL E a, ∀ g, F (γ * g) = F g)
-    (z : Neutral.B1.Ideles E) {ν : ℂ} (hν : ν ≠ 1) (hz : ∀ g, F (GeneralLinearGroup.scalar (Fin a) z * g) = ν * F g) :
-    ∫ g in S, F g ∂μ = 0 := by
-  have h1 := GlobalTheory.RSResidue.setIntegral_mul_right hS hinv (GeneralLinearGroup.scalar (Fin a) z)
+theorem setIntegral_eq_zero_of_scalar
+    (μ : Measure (GA E a)) [μ.IsHaarMeasure]
+    {S : Set (GA E a)} (hS : IsFundamentalDomain (latticeGL E a) S μ)
+    {F : GA E a → ℂ} (hinv : ∀ γ ∈ latticeGL E a, ∀ g, F (γ * g) = F g)
+    (z : Neutral.B1.Ideles E)
+    {ν : ℂ} (hν : ν ≠ 1) (hz : ∀ g, F (GeneralLinearGroup.scalar (Fin a) z * g) = ν * F g)
+    : ∫ g in S, F g ∂μ = 0 := by
+  have h1 :=
+    GlobalTheory.RSResidue.setIntegral_mul_right hS hinv (GeneralLinearGroup.scalar (Fin a) z)
   have e : ∀ g, F (g * GeneralLinearGroup.scalar (Fin a) z) = ν * F g := fun g => by
     rw [← hz g]
     congr 1
@@ -102,7 +145,6 @@ theorem setIntegral_eq_zero_of_scalar (μ : Measure (GA E a)) [μ.IsHaarMeasure]
   simp only [e, integral_const_mul] at h1
   have h2 : (ν - 1) * ∫ g in S, F g ∂μ = 0 := by rw [sub_mul, h1, one_mul, sub_self]
   exact (mul_eq_zero.1 h2).resolve_left (sub_ne_zero.2 hν)
-
 
 open GlobalTheory.CuspRep.CuspidalL2GL in
 theorem theta_integral_continuation : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (ℓ : Fin a) (Φ : (Fin a → Cinf E) → ℂ), ContDiff ℝ (⊤ : ℕ∞) Φ → HasCompactSupport Φ → tsupport Φ ⊆ GlobalTheory.RSTheta.rowSet E ℓ → ∀ (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (η : Fin a → Af E) (μ : Measure (GA E a)) [μ.IsHaarMeasure] (𝓕 𝓕' : Set (GA E a)), IsFundamentalDomain (ratGL E a).range 𝓕 μ → IsFundamentalDomain (latticeGL E a) 𝓕' μ → ∃ c : ℂ, ((∀ u, 0 ≤ (Φ u).re ∧ (Φ u).im = 0) → Φ ≠ 0 → c ≠ 0) ∧ ∀ (π π' : CuspSub E a) (ω ω' : HChar E), ω.IsUnitary → ω'.IsUnitary → π.HasCentChar ω → π'.HasCentChar ω' → ∀ φ φ' : Sm E a, (φ ∈ π.V ∨ φ.1 ∈ GlobalTheory.JSW.mspanR π) → (φ' ∈ π'.V ∨ φ'.1 ∈ GlobalTheory.JSW.mspanR π') → ∃ F : ℂ → ℂ, (∀ x : ℝ, 0 < x → AnalyticAt ℂ F (x : ℂ)) ∧ (∀ x : ℝ, 1 < x → F (x : ℂ) = ((x - 1 : ℝ) : ℂ) * ∫ g in 𝓕, (∑' ξ : {ξ : Fin a → E // ξ ≠ 0}, GlobalTheory.RSTheta.rsPsi ℓ φ.1 φ'.1 Φ J η g ((fun j => algebraMap E (Ad E) (ξ.1 j)) ᵥ* g.val)) * ((((ideleModule E (GeneralLinearGroup.det g) : ℝ) ^ (x : ℝ) : ℝ)) : ℂ) ∂μ) ∧ (ω = ω' → F 1 = c * ∫ g in 𝓕', φ.1 g * starRingEnd ℂ (φ'.1 g) ∂μ) ∧ (ω ≠ ω' → F 1 = 0) := by

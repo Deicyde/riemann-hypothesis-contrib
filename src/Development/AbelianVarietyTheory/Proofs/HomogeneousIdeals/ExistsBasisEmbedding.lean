@@ -13,9 +13,9 @@ namespace GlobalTheory.QuadraticZeta
 
 variable {K : Type*} [Field K] [NumberField K] {d : ℕ}
 
-theorem exists_basis_embedding (h2 : finrank ℚ K = 2) (hD : discr K = -d) (σ : K →+* ℂ) :
-    ∃ (b : Basis (Fin 2) ℤ (𝓞 K)) (t : ℤ), b 0 = 1 ∧ 2 * (σ (b 1)).re = t ∧
-      4 * (σ (b 1)).im ^ 2 = d := by
+theorem exists_basis_embedding (h2 : finrank ℚ K = 2) (hD : discr K = -d) (σ : K →+* ℂ)
+    : ∃ (b : Basis (Fin 2) ℤ (𝓞 K)) (t : ℤ),
+      b 0 = 1 ∧ 2 * (σ (b 1)).re = t ∧ 4 * (σ (b 1)).im ^ 2 = d := by
   obtain ⟨b, t, n, h0, hw, hD'⟩ := exists_basis h2
   have hd : (0 : ℝ) < d := by
     have := discr_ne_zero K
@@ -37,8 +37,8 @@ theorem exists_basis_embedding (h2 : finrank ℚ K = 2) (hD : discr K = -d) (σ 
   rw [← h4] at h1 e
   nlinarith
 
-theorem det_mul_im (σ : K →+* ℂ) (b : Basis (Fin 2) ℚ K) (h0 : b 0 = 1) (x y : K) :
-    (b.det ![x, y] : ℝ) * (σ (b 1)).im = (σ y * conj (σ x)).im := by
+theorem det_mul_im (σ : K →+* ℂ) (b : Basis (Fin 2) ℚ K) (h0 : b 0 = 1) (x y : K)
+    : (b.det ![x, y] : ℝ) * (σ (b 1)).im = (σ y * conj (σ x)).im := by
   have hx : ∀ x : K, σ x = (b.repr x 0 : ℝ) + (b.repr x 1 : ℝ) * σ (b 1) := fun x => by
     conv_lhs => rw [← b.sum_repr x]
     simp [h0, Rat.smul_def]
@@ -64,17 +64,19 @@ theorem norm_eq_sq (x : K) : (Algebra.norm ℚ x : ℝ) = ‖σ x‖ ^ 2 := by
   have e1 : b' 1 = b 1 := by simp [b']
   have := det_mul_im σ b' e0 (x * b' 0) (x * b' 1)
   rw [show b'.det ![x * b' 0, x * b' 1] = Algebra.norm ℚ x by
-    rw [Algebra.norm_eq_matrix_det b', Basis.det_apply]
-    congr 1
-    ext i j
-    fin_cases j <;> simp [Algebra.leftMulMatrix_eq_repr_mul, Basis.toMatrix_apply], e0, e1] at this
+        rw [Algebra.norm_eq_matrix_det b', Basis.det_apply]
+        congr 1
+        ext i j
+        fin_cases j <;> simp [Algebra.leftMulMatrix_eq_repr_mul, Basis.toMatrix_apply],
+      e0, e1]
+    at this
   refine mul_right_cancel₀ hi0 (this.trans ?_)
   simp [Complex.sq_norm, Complex.normSq_apply]
   ring
 
-theorem absNorm_mul_sqrt (I : FractionalIdeal (𝓞 K)⁰ K)
-    (bI : Basis (Fin 2) ℤ (I : Submodule (𝓞 K) K)) :
-    (absNorm I : ℝ) * (√d / 2) = |(σ (bI 1) * conj (σ (bI 0))).im| := by
+theorem absNorm_mul_sqrt
+    (I : FractionalIdeal (𝓞 K)⁰ K) (bI : Basis (Fin 2) ℤ (I : Submodule (𝓞 K) K))
+    : (absNorm I : ℝ) * (√d / 2) = |(σ (bI 1) * conj (σ (bI 0))).im| := by
   obtain ⟨b, t, h0, -, hi⟩ := exists_basis_embedding h2 hD σ
   let b' : Basis (Fin 2) ℚ K := b.localizationLocalization ℚ ℤ⁰ K
   have e0 : b' 0 = 1 := by simp [b', h0]
@@ -112,32 +114,47 @@ theorem unit_eq (hd : 4 < d) (u : (𝓞 K)ˣ) : u = 1 ∨ u = -1 := by
   · exact Or.inl (Units.ext (by simpa using h3))
   · exact Or.inr (Units.ext (by simpa using h3))
 
-theorem hasSum_ideal (hd : 4 < d) (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {s S : ℝ} (hs : s ≠ 0)
-    (h : HasSum (fun x : ((𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K) =>
-      (‖σ x‖ ^ 2 / absNorm 𝔞.1) ^ (-s)) S) :
-    HasSum (fun I : Ideal (𝓞 K) => open Classical in
-      if ((I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K).IsPrincipal
-      then 2 * (Ideal.absNorm I : ℝ) ^ (-s) else 0) S := by
-  have hΦ : ∀ x : ((𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K),
-      ∃ I : Ideal (𝓞 K), (I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) = spanSingleton _ (x : K) := by
+theorem hasSum_ideal
+    (hd : 4 < d)
+    (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    {s S : ℝ} (hs : s ≠ 0)
+    (h : HasSum
+      (fun x : ((𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K) =>
+        (‖σ x‖ ^ 2 / absNorm 𝔞.1) ^ (-s))
+      S)
+    : HasSum
+      (fun I : Ideal (𝓞 K) =>
+        open Classical in
+        if ((I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K).IsPrincipal then
+          2 * (Ideal.absNorm I : ℝ) ^ (-s)
+        else
+          0)
+      S := by
+  have hΦ
+      : ∀ x : ((𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K), ∃ I : Ideal (𝓞 K),
+        (I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) = spanSingleton _ (x : K) := by
     intro x
-    obtain ⟨I, hI⟩ := le_one_iff_exists_coeIdeal.1
-      (show spanSingleton (𝓞 K)⁰ (x : K) * (𝔞⁻¹).1 ≤ 1 by
+    obtain ⟨I, hI⟩ :=
+      le_one_iff_exists_coeIdeal.1 (show spanSingleton (𝓞 K)⁰ (x : K) * (𝔞⁻¹).1 ≤ 1 by
         rw [← 𝔞.mul_inv]
         gcongr
         exact spanSingleton_le_iff_mem.2 x.2)
     exact ⟨I, by rw [hI, mul_assoc, 𝔞.inv_mul, mul_one]⟩
   choose Φ hΦ using hΦ
-  have hmem : ∀ x I, x ∈ Φ ⁻¹' {I} ↔
-      (I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) = spanSingleton _ (x : K) := fun x I => by
+  have hmem
+      : ∀ x I,
+        x ∈ Φ ⁻¹' {I}
+          ↔ (I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) = spanSingleton _ (x : K) := fun x I => by
     rw [← hΦ, Units.mul_left_inj, coeIdeal_inj, Set.mem_preimage, Set.mem_singleton_iff, eq_comm]
   have hN : (absNorm 𝔞.1 : ℝ) ≠ 0 := by simp [absNorm_eq_zero_iff]
   refine (h.tsum_fiberwise Φ).congr_fun fun I => ?_
-  have hval : ∀ x : Φ ⁻¹' {I}, (‖σ x.1‖ ^ 2 / absNorm 𝔞.1) ^ (-s)
-      = (Ideal.absNorm I : ℝ) ^ (-s) := fun x => by
+  have hval
+      : ∀ x : Φ ⁻¹' {I},
+        (‖σ x.1‖ ^ 2 / absNorm 𝔞.1) ^ (-s) = (Ideal.absNorm I : ℝ) ^ (-s) := fun x => by
     have := congrArg (fun J => ((absNorm J : ℚ) : ℝ)) ((hmem _ _).1 x.2)
     simp only [map_mul, coeIdeal_absNorm, absNorm_span_singleton, Rat.cast_mul, Rat.cast_abs,
-      Rat.cast_natCast, norm_eq_sq h2 hD σ, abs_pow, abs_norm] at this
+        Rat.cast_natCast, norm_eq_sq h2 hD σ, abs_pow, abs_norm]
+      at this
     rw [← this, mul_div_cancel_right₀ _ hN]
   rw [tsum_congr hval, tsum_const, nsmul_eq_mul]
   rcases eq_or_ne I ⊥ with rfl | hI
@@ -166,15 +183,15 @@ theorem hasSum_ideal (hd : 4 < d) (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {s 
     · simp
     · intro e
       exact hx0 (by simpa [Subtype.ext_iff, CharZero.eq_neg_self_iff] using e)
-  · have : Φ ⁻¹' {I} = ∅ := Set.eq_empty_of_forall_notMem fun y hy =>
-      hP ((isPrincipal_iff _).2 ⟨y, (hmem _ _).1 hy⟩)
+  · have : Φ ⁻¹' {I} = ∅ :=
+      Set.eq_empty_of_forall_notMem fun y hy => hP ((isPrincipal_iff _).2 ⟨y, (hmem _ _).1 hy⟩)
     simp [this]
 
-
 omit h2 hD in
-theorem exists_basis_of_image {𝔞 : FractionalIdeal (𝓞 K)⁰ K} {ω : ℂ} {τ : ℍ} (hω : ω ≠ 0)
-    (h : ∀ z, z ∈ σ '' 𝔞 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z) :
-    ∃ b : Basis (Fin 2) ℤ (𝔞 : Submodule (𝓞 K) K), σ (b 0) = ω * τ ∧ σ (b 1) = ω := by
+theorem exists_basis_of_image
+    {𝔞 : FractionalIdeal (𝓞 K)⁰ K} {ω : ℂ} {τ : ℍ}
+    (hω : ω ≠ 0) (h : ∀ z, z ∈ σ '' 𝔞 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z)
+    : ∃ b : Basis (Fin 2) ℤ (𝔞 : Submodule (𝓞 K) K), σ (b 0) = ω * τ ∧ σ (b 1) = ω := by
   obtain ⟨α, hα, eα⟩ := (h (ω * τ)).2 ⟨1, 0, by simp⟩
   obtain ⟨β, hβ, eβ⟩ := (h ω).2 ⟨0, 1, by simp⟩
   let v : Fin 2 → (𝔞 : Submodule (𝓞 K) K) := ![⟨α, hα⟩, ⟨β, hβ⟩]
@@ -182,8 +199,9 @@ theorem exists_basis_of_image {𝔞 : FractionalIdeal (𝓞 K)⁰ K} {ω : ℂ} 
     rw [LinearIndependent.pair_iff]
     intro m n e
     have e1 := congrArg (fun x : (𝔞 : Submodule (𝓞 K) K) => σ x) e
-    simp only [Submodule.coe_add, Submodule.coe_smul_of_tower, zsmul_eq_mul, map_add (f := _), map_mul,
-      map_intCast, eα, eβ, Submodule.coe_zero, map_zero] at e1
+    simp only [Submodule.coe_add, Submodule.coe_smul_of_tower, zsmul_eq_mul, map_add (f := _),
+        map_mul, map_intCast, eα, eβ, Submodule.coe_zero, map_zero]
+      at e1
     have e2 : (m * τ + n : ℂ) = 0 := mul_left_cancel₀ hω (by linear_combination e1)
     have e3 : m = 0 := by simpa [τ.im_ne_zero] using congrArg Complex.im e2
     exact ⟨e3, by simpa [e3] using e2⟩
@@ -197,35 +215,47 @@ theorem exists_basis_of_image {𝔞 : FractionalIdeal (𝓞 K)⁰ K} {ω : ℂ} 
   exact ⟨Basis.mk hi hs, by simp [v, eα], by simp [v, eβ]⟩
 
 omit h2 hD in
-theorem ne_zero_of_image {𝔞 : FractionalIdeal (𝓞 K)⁰ K} (h0 : 𝔞 ≠ 0) {ω : ℂ} {τ : ℍ}
-    (h : ∀ z, z ∈ σ '' 𝔞 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z) : ω ≠ 0 := by
+theorem ne_zero_of_image
+    {𝔞 : FractionalIdeal (𝓞 K)⁰ K} (h0 : 𝔞 ≠ 0)
+    {ω : ℂ} {τ : ℍ} (h : ∀ z, z ∈ σ '' 𝔞 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z)
+    : ω ≠ 0 := by
   rintro rfl
   refine h0 (eq_zero_iff.2 fun x hx => σ.injective ?_)
   obtain ⟨m, n, e⟩ := (h (σ x)).1 ⟨x, hx, rfl⟩
   simp [← e]
 
-theorem absNorm_eq_of_image {𝔞 : FractionalIdeal (𝓞 K)⁰ K} {ω : ℂ} {τ : ℍ} (hω : ω ≠ 0)
-    (h : ∀ z, z ∈ σ '' 𝔞 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z) :
-    (absNorm 𝔞 : ℝ) = 2 * ‖ω‖ ^ 2 * τ.im / √d := by
+theorem absNorm_eq_of_image
+    {𝔞 : FractionalIdeal (𝓞 K)⁰ K} {ω : ℂ} {τ : ℍ}
+    (hω : ω ≠ 0) (h : ∀ z, z ∈ σ '' 𝔞 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z)
+    : (absNorm 𝔞 : ℝ) = 2 * ‖ω‖ ^ 2 * τ.im / √d := by
   obtain ⟨b, e0, e1⟩ := exists_basis_of_image σ hω h
   have := absNorm_mul_sqrt h2 hD σ 𝔞 b
   have hd := discr_pos h2 hD
   have hy := τ.im_pos
-  rw [e0, e1, show (ω * conj (ω * τ)).im = -(‖ω‖ ^ 2 * τ.im) by
-    simp [Complex.sq_norm, Complex.normSq_apply]; ring, abs_neg,
-    abs_of_nonneg (by positivity)] at this
+  rw [e0, e1,
+      show (ω * conj (ω * τ)).im = -(‖ω‖ ^ 2 * τ.im) by
+        simp [Complex.sq_norm, Complex.normSq_apply]; ring,
+      abs_neg, abs_of_nonneg (by positivity)]
+    at this
   field_simp
   linarith
 
-theorem hasSum_ideal_of_image (hd : 4 < d) (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {ω : ℂ} {τ : ℍ}
-    (h : ∀ z, z ∈ σ '' 𝔞.1 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z) {s : ℝ} (hs : 1 < s)
-    (hE : Summable fun p : {p : ℤ × ℤ // p ≠ 0} =>
-      τ.im ^ s / ‖(p.1.1 * τ + p.1.2 : ℂ)‖ ^ (2 * s)) :
-    HasSum (fun I : Ideal (𝓞 K) => open Classical in
-      if ((I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K).IsPrincipal
-      then 2 * (Ideal.absNorm I : ℝ) ^ (-s) else 0)
-      ((2 / √d) ^ s * ∑' p : {p : ℤ × ℤ // p ≠ 0},
-        τ.im ^ s / ‖(p.1.1 * τ + p.1.2 : ℂ)‖ ^ (2 * s)) := by
+theorem hasSum_ideal_of_image
+    (hd : 4 < d)
+    (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    {ω : ℂ} {τ : ℍ} (h : ∀ z, z ∈ σ '' 𝔞.1 ↔ ∃ m n : ℤ, ω * (m * (τ : ℂ) + n) = z)
+    {s : ℝ} (hs : 1 < s)
+    (hE : Summable fun p : {p : ℤ × ℤ // p ≠ 0} => τ.im ^ s / ‖(p.1.1 * τ + p.1.2 : ℂ)‖ ^ (2 * s))
+    : HasSum
+      (fun I : Ideal (𝓞 K) =>
+        open Classical in
+        if ((I * 𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Submodule (𝓞 K) K).IsPrincipal then
+          2 * (Ideal.absNorm I : ℝ) ^ (-s)
+        else
+          0)
+      ((2 / √d) ^ s
+        * ∑' p : {p : ℤ × ℤ // p ≠ 0},
+          τ.im ^ s / ‖(p.1.1 * τ + p.1.2 : ℂ)‖ ^ (2 * s)) := by
   have hω := ne_zero_of_image σ 𝔞.ne_zero h
   have hd0 := discr_pos h2 hD
   have hy := τ.im_pos
@@ -249,10 +279,10 @@ theorem hasSum_ideal_of_image (hd : 4 < d) (𝔞 : (FractionalIdeal (𝓞 K)⁰ 
     apply hp
     simp [h0, Real.zero_rpow (show -s ≠ 0 by linarith)]
 
-theorem exists_periodPair (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    ∃ L : PeriodPair, (L.lattice : Set ℂ) = σ '' 𝔞.1 := by
-  let b : Basis (Fin 2) ℤ (𝔞.1 : Submodule (𝓞 K) K) := finBasisOfFinrankEq ℤ _
-    ((fractionalIdeal_rank K 𝔞).trans ((RingOfIntegers.rank K).trans h2))
+theorem exists_periodPair (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    : ∃ L : PeriodPair, (L.lattice : Set ℂ) = σ '' 𝔞.1 := by
+  let b : Basis (Fin 2) ℤ (𝔞.1 : Submodule (𝓞 K) K) :=
+    finBasisOfFinrankEq ℤ _ ((fractionalIdeal_rank K 𝔞).trans ((RingOfIntegers.rank K).trans h2))
   have hd0 := discr_pos h2 hD
   have h0 : (σ (b 1) * conj (σ (b 0))).im ≠ 0 := by
     rw [← abs_ne_zero, ← absNorm_mul_sqrt h2 hD σ]

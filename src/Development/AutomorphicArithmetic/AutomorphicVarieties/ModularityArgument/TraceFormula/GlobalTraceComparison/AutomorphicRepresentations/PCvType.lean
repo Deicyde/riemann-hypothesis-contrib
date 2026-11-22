@@ -70,15 +70,17 @@ theorem cvType_pf : DetZero → EvalBasis → CvType := by
     have := hL.1 k⁻¹ (K.inv_mem hk) y
     simp only [map_inv] at this
     simp only [this]
-  · obtain ⟨d, x, w, hw, hs⟩ := hev (Kinf E n) (Kinf E n → ℂ) (fun x => LinearMap.proj x)
-      (fun v hv => funext hv) W hW
+  · obtain ⟨d, x, w, hw, hs⟩ :=
+      hev (Kinf E n) (Kinf E n → ℂ) (fun x => LinearMap.proj x) (fun v hv => funext hv) W hW
     set c : Fin d → ℂ := fun b =>
       ∫ y, φ (((kI E n (x b))⁻¹, 1) * y) * u (ldet y) * f (g * y.1) ∂D.μ with hc
     have key : (fun k : Kinf E n => cvF D.μ φ u f (g * kI E n k)) = ∑ b, c b • w b := by
       funext k
       rw [cv_shift D φ u f g _ ((hdz E n).1 k)]
-      have e : ∀ y : H E n 0, φ (((kI E n k)⁻¹, 1) * y) * u (ldet y) * f (g * y.1) =
-          ∑ b, w b k * (φ (((kI E n (x b))⁻¹, 1) * y) * u (ldet y) * f (g * y.1)) := by
+      have e
+          : ∀ y : H E n 0,
+            φ (((kI E n k)⁻¹, 1) * y) * u (ldet y) * f (g * y.1)
+              = ∑ b, w b k * (φ (((kI E n (x b))⁻¹, 1) * y) * u (ldet y) * f (g * y.1)) := by
         intro y
         have := congrFun (hs _ (hL.2 y)) k
         simp only [LinearMap.proj_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at this

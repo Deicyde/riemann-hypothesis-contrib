@@ -10,8 +10,12 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -20,24 +24,27 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 open GlobalTheory.CompanionTheory.HermPoisson
 
-theorem hermCocompact (D : D7) (r : ℕ) :
-    ∃ K : Set (hermA D r), IsCompact K ∧ ∀ x, ∃ l ∈ ratHerm D r, x - l ∈ K := by
+theorem hermCocompact (D : D7) (r : ℕ)
+    : ∃ K : Set (hermA D r), IsCompact K ∧ ∀ x, ∃ l ∈ ratHerm D r, x - l ∈ K := by
   obtain ⟨-, K, hK, hKx⟩ := GlobalTheory.CompanionTheory.HermVol.isCoLat_herm (D := D) (r := r)
   refine ⟨K, hK, fun x => ?_⟩
   obtain ⟨γ, hγ, h⟩ := hKx x
   refine ⟨-γ, neg_mem hγ, ?_⟩
   rwa [sub_neg_eq_add, add_comm]
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 2000000 in
-theorem hermFourierZero (D : D7) (r : ℕ) (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsCharAF D.host.F ψ)
-    (lam : Measure (hermA D r)) (hH : lam.IsAddHaarMeasure) (𝓖 : Set (hermA D r))
-    (h𝓖 : IsAddFundamentalDomain (ratHerm D r) 𝓖 lam) (φ : hermA D r → ℂ) (hφ : Continuous φ)
-    (hper : ∀ x, ∀ l ∈ ratHerm D r, φ (x + l) = φ x)
+theorem hermFourierZero
+    (D : D7)
+    (r : ℕ)
+    (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsCharAF D.host.F ψ)
+    (lam : Measure (hermA D r)) (hH : lam.IsAddHaarMeasure)
+    (𝓖 : Set (hermA D r)) (h𝓖 : IsAddFundamentalDomain (ratHerm D r) 𝓖 lam)
+    (φ : hermA D r → ℂ) (hφ : Continuous φ) (hper : ∀ x, ∀ l ∈ ratHerm D r, φ (x + l) = φ x)
     (hco : ∀ β : HermE D r,
-      ∫ b in 𝓖, φ b * ψ (-halfTr (Matrix.trace (HMul.hMul (β.1.map (incA D)) b.1 : Mx D r r))) ∂lam = 0) :
-    ∀ x, φ x = 0 := by
+      ∫ b in 𝓖, φ b * ψ (-halfTr (Matrix.trace (HMul.hMul (β.1.map (incA D)) b.1 : Mx D r r))) ∂lam
+        = 0)
+    : ∀ x, φ x = 0 := by
   obtain ⟨i1, i2, i3, i4, -, -⟩ := lattice_Mx D r r
   haveI : IsTopologicalAddGroup (Mx D r r) := i1
   haveI : LocallyCompactSpace (Mx D r r) := i2
@@ -59,8 +66,11 @@ theorem hermFourierZero (D : D7) (r : ℕ) (ψ : AddChar (AF D.host.F) ℂ) (hψ
   haveI := hH
   obtain ⟨K, hK, hc⟩ := hermCocompact D r
   intro x
-  refine GlobalTheory.CompanionTheory.FourierComplete.eq_zero_of_coeffs_vanish (ratHerm D r) lam h𝓖 hK hc (T := ratHerm D r)
-    (fun t b => chi ψ t.1.1 b) (fun t => continuous_chi hψ t.1.1) ?_ ?_ ?_ ?_ ?_ φ hφ hper ?_ x
+  refine GlobalTheory.CompanionTheory.FourierComplete.eq_zero_of_coeffs_vanish (ratHerm D r) lam h𝓖
+    hK hc (T := ratHerm D r)
+    (fun t b => chi ψ t.1.1 b)
+    (fun t => continuous_chi hψ t.1.1)
+    ?_ ?_ ?_ ?_ ?_ φ hφ hper ?_ x
   · intro t y l hl
     show chi ψ t.1.1 (y + l) = chi ψ t.1.1 y
     rw [chi_add_right, chi_rat hψ (hmem t) ⟨l, hl⟩, mul_one]
@@ -80,8 +90,11 @@ theorem hermFourierZero (D : D7) (r : ℕ) (ψ : AddChar (AF D.host.F) ℂ) (hψ
     exact h1
   · intro t
     obtain ⟨β, hβ⟩ := (ofHermE_bijective (D := D) (r := r)).2 t
-    have h1 : ∀ b : hermA D r, chi ψ (-t).1.1 b =
-        ψ (-halfTr (Matrix.trace (HMul.hMul (β.1.map (incA D)) b.1 : Mx D r r))) := fun b => by
+    have h1
+        : ∀ b : hermA D r,
+          chi ψ (-t).1.1 b
+            = ψ (- halfTr (Matrix.trace
+              (HMul.hMul (β.1.map (incA D)) b.1 : Mx D r r))) := fun b => by
       show chi ψ (-t.1.1) b = _
       rw [chi_neg_left, ← hβ, ofHermE_val]
     simp only [h1]

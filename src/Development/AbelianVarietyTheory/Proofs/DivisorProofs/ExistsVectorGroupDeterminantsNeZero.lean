@@ -11,22 +11,24 @@ noncomputable section
 
 namespace GlobalTheory.GenericGroupDet
 
-theorem det_delta_ne_zero (S : Type) [Group S] [Fintype S] [DecidableEq S] (f : S → ℂ)
-    (hf : ∀ h, f h = if h = 1 then 1 else 0) :
-    (Matrix.of fun h g : S => f (h * g)).det ≠ 0 := by
+theorem det_delta_ne_zero
+    (S : Type) [Group S] [Fintype S] [DecidableEq S]
+    (f : S → ℂ) (hf : ∀ h, f h = if h = 1 then 1 else 0)
+    : (Matrix.of fun h g : S => f (h * g)).det ≠ 0 := by
   have : (Matrix.of fun h g : S => f (h * g)) = (Equiv.inv S).permMatrix ℂ := by
     ext h g
     simp [Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, hf, mul_eq_one_iff_inv_eq]
   rw [this, Matrix.det_permutation]
   simp
 
-theorem exists_combination_delta (F V S J : Type) [Field F] [Algebra F ℂ] [AddCommGroup V] [Module F V]
-    [Group S] [Fintype S] [DecidableEq S] [Fintype J]
-    (ev : V →ₗ[F] (S → ℂ)) (r : J → S) (W : Submodule F V) (h1 : ∃ j, r j = 1)
-    (h2 : ∀ v ∈ W, ∀ h, h ∉ Set.range r → ev v h = 0)
-    (h3 : ∀ a : J → ℂ, (∀ v ∈ W, ∑ j, a j * ev v (r j) = 0) → a = 0) :
-    ∃ (n : ℕ) (c : Fin n → ℂ) (w : Fin n → V), (∀ k, w k ∈ W) ∧
-      ∀ h, ∑ k, c k * ev (w k) h = if h = 1 then 1 else 0 := by
+theorem exists_combination_delta
+    (F V S J : Type) [Field F] [Algebra F ℂ] [AddCommGroup V] [Module F V] [Group S] [Fintype S]
+    [DecidableEq S] [Fintype J]
+    (ev : V →ₗ[F] (S → ℂ)) (r : J → S) (W : Submodule F V)
+    (h1 : ∃ j, r j = 1) (h2 : ∀ v ∈ W, ∀ h, h ∉ Set.range r → ev v h = 0)
+    (h3 : ∀ a : J → ℂ, (∀ v ∈ W, ∑ j, a j * ev v (r j) = 0) → a = 0)
+    : ∃ (n : ℕ) (c : Fin n → ℂ) (w : Fin n → V),
+      (∀ k, w k ∈ W) ∧ ∀ h, ∑ k, c k * ev (w k) h = if h = 1 then 1 else 0 := by
   classical
   set s : Set (J → ℂ) := (fun v => fun j => ev v (r j)) '' (W : Set V) with hs
   have htop : Submodule.span ℂ s = ⊤ := by
@@ -35,10 +37,13 @@ theorem exists_combination_delta (F V S J : Type) [Field F] [Algebra F ℂ] [Add
     have hφ : ∀ x : J → ℂ, φ x = ∑ j, x j * φ (fun j' => if j = j' then 1 else 0) := fun x => by
       rw [LinearMap.pi_apply_eq_sum_univ φ x]
       simp [smul_eq_mul]
-    have ha := h3 (fun j => φ (fun j' => if j = j' then 1 else 0)) fun v hv => by
-      have := hle (Submodule.subset_span ⟨v, hv, rfl⟩)
-      rw [LinearMap.mem_ker, hφ] at this
-      simpa [mul_comm] using this
+    have ha :=
+      h3
+        (fun j => φ (fun j' => if j = j' then 1 else 0))
+        fun v hv => by
+          have := hle (Submodule.subset_span ⟨v, hv, rfl⟩)
+          rw [LinearMap.mem_ker, hφ] at this
+          simpa [mul_comm] using this
     apply hφ0
     refine LinearMap.ext fun x => ?_
     rw [hφ x, LinearMap.zero_apply]
@@ -62,20 +67,28 @@ theorem exists_combination_delta (F V S J : Type) [Field F] [Algebra F ℂ] [Add
     rw [if_neg h1']
     exact Finset.sum_eq_zero fun k _ => by rw [h2 _ (hw k) h hr, mul_zero]
 
-theorem exists_vec_det_ne_zero (F : Type) [Field F] [CharZero F] [Algebra F ℂ] (V : Type) [AddCommGroup V] [Module F V]
-    (S : Type) [Group S] [Fintype S] [DecidableEq S] (ι : Type) [Finite ι] (ev : ι → V →ₗ[F] (S → ℂ))
-    (J : ι → Type) [∀ i, Fintype (J i)] (r : ∀ i, J i → S) (W : ι → Submodule F V)
+theorem exists_vec_det_ne_zero
+    (F : Type) [Field F] [CharZero F] [Algebra F ℂ]
+    (V : Type) [AddCommGroup V] [Module F V]
+    (S : Type) [Group S] [Fintype S] [DecidableEq S]
+    (ι : Type) [Finite ι]
+    (ev : ι → V →ₗ[F] (S → ℂ))
+    (J : ι → Type) [∀ i, Fintype (J i)]
+    (r : ∀ i, J i → S) (W : ι → Submodule F V)
     (h1 : ∀ i, ∃ j, r i j = 1) (h2 : ∀ i, ∀ v ∈ W i, ∀ h, h ∉ Set.range (r i) → ev i v h = 0)
-    (h3 : ∀ i (a : J i → ℂ), (∀ v ∈ W i, ∑ j, a j * ev i v (r i j) = 0) → a = 0) :
-    ∃ v : V, ∀ i, (Matrix.of fun h g : S => ev i v (h * g)).det ≠ 0 := by
+    (h3 : ∀ i (a : J i → ℂ), (∀ v ∈ W i, ∑ j, a j * ev i v (r i j) = 0) → a = 0)
+    : ∃ v : V, ∀ i, (Matrix.of fun h g : S => ev i v (h * g)).det ≠ 0 := by
   classical
   have := Fintype.ofFinite ι
   choose n c w hw hcw using fun i => exists_combination_delta F V S (J i) (ev i) (r i) (W i) (h1 i) (h2 i) (h3 i)
   let vec : (Σ i, Fin (n i)) → V := fun p => w p.1 p.2
   let P : ι → MvPolynomial (Σ i, Fin (n i)) ℂ := fun i =>
-    Matrix.det (Matrix.of fun h g : S => ∑ p, MvPolynomial.X p * MvPolynomial.C (ev i (vec p) (h * g)))
-  have hP : ∀ i (x : (Σ i, Fin (n i)) → ℂ), MvPolynomial.eval x (P i) =
-      (Matrix.of fun h g : S => ∑ p, x p * ev i (vec p) (h * g)).det := by
+    Matrix.det (Matrix.of fun h g : S =>
+      ∑ p, MvPolynomial.X p * MvPolynomial.C (ev i (vec p) (h * g)))
+  have hP
+      : ∀ i (x : (Σ i, Fin (n i)) → ℂ),
+        MvPolynomial.eval x (P i)
+          = (Matrix.of fun h g : S => ∑ p, x p * ev i (vec p) (h * g)).det := by
     intro i x
     rw [RingHom.map_det]
     congr 1
@@ -95,11 +108,13 @@ theorem exists_vec_det_ne_zero (F : Type) [Field F] [CharZero F] [Algebra F ℂ]
     rw [← hP, hz, map_zero] at this
     exact this rfl
   have hQ : (∏ i, P i) ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => hPi i
-  obtain ⟨x, hx, hQx⟩ : ∃ x ∈ Set.pi Set.univ (fun _ : (Σ i, Fin (n i)) => Set.range (algebraMap F ℂ)),
-      MvPolynomial.eval x (∏ i, P i) ≠ 0 := by
+  obtain ⟨x, hx, hQx⟩
+      : ∃ x ∈ Set.pi Set.univ (fun _ : (Σ i, Fin (n i)) => Set.range (algebraMap F ℂ)),
+        MvPolynomial.eval x (∏ i, P i) ≠ 0 := by
     by_contra hcon
     push_neg at hcon
-    exact hQ (MvPolynomial.funext_set (fun _ => Set.range (algebraMap F ℂ))
+    exact hQ (MvPolynomial.funext_set
+      (fun _ => Set.range (algebraMap F ℂ))
       (fun _ => Set.infinite_range_of_injective (algebraMap F ℂ).injective)
       fun x hx => by rw [hcon x hx, map_zero])
   choose t ht using fun p => hx p (Set.mem_univ p)
@@ -111,6 +126,6 @@ theorem exists_vec_det_ne_zero (F : Type) [Field F] [CharZero F] [Algebra F ℂ]
   convert hne using 2
   ext h g
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, Finset.sum_apply, Algebra.smul_def, ht]
+  simp [map_sum, Finset.sum_apply, Algebra.smul_def, ht]
 
 end GlobalTheory.GenericGroupDet

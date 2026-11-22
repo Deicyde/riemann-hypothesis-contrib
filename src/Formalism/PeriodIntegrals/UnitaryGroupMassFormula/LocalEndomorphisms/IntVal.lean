@@ -82,8 +82,9 @@ theorem intOfHensel : IntOfHensel := by
   have hℓ1 := hℓ ℓ hprime (by omega)
   have hu : Valued.v ((1 + (N : v.adicCompletion F) * x ^ ℓ) - 1) < 1 := by
     rw [add_sub_cancel_left, map_mul, map_pow, hNv]
-    calc exp (-(m : ℤ)) * Valued.v x ^ ℓ ≤ exp (-(m : ℤ)) * 1 :=
-          by gcongr; exact pow_le_one₀ zero_le hx
+    calc
+      exp (-(m : ℤ)) * Valued.v x ^ ℓ
+        ≤ exp (-(m : ℤ)) * 1 := by gcongr; exact pow_le_one₀ zero_le hx
       _ < 1 := by rw [mul_one, ← exp_zero, exp_lt_exp]; omega
   obtain ⟨z, hz⟩ := hH F v ℓ _ hℓ1 hu
   have hτ : (τ z) ^ ℓ = 1 + (N : v.adicCompletion F) * (τ x) ^ ℓ := by
@@ -100,7 +101,9 @@ theorem valOfInt : ValOfInt := by
     apply le_antisymm (hI F v τ y hy.le)
     have h2 := hI F v τ y⁻¹ (by rw [map_inv₀, hy, inv_one])
     rw [map_inv₀, map_inv₀] at h2
-    calc (1 : ℤᵐ⁰) = Valued.v (τ y) * (Valued.v (τ y))⁻¹ := (mul_inv_cancel₀ ht).symm
+    calc
+      (1 : ℤᵐ⁰)
+        = Valued.v (τ y) * (Valued.v (τ y))⁻¹ := (mul_inv_cancel₀ ht).symm
       _ ≤ Valued.v (τ y) * 1 := by gcongr
       _ = _ := mul_one _
   by_cases hx : x = 0
@@ -111,10 +114,13 @@ theorem valOfInt : ValOfInt := by
   obtain ⟨b, hb⟩ : ∃ b : ℤ, Valued.v (τ x) = exp b := ⟨_, (exp_log htx0).symm⟩
   have hy : Valued.v (x ^ m * (N : v.adicCompletion F) ^ a) = 1 := by
     rw [map_mul, map_pow, map_zpow₀, ha, hNv, ← exp_nsmul, ← exp_zsmul, ← exp_add, ← exp_zero]
-    congr 1; simp; ring
+    congr 1
+    simp
+    ring
   have hτy := h1 _ hy
   rw [map_mul, map_pow, map_zpow₀, map_natCast, map_mul, map_pow, map_zpow₀, hb, hNv, ← exp_nsmul,
-    ← exp_zsmul, ← exp_add, ← exp_zero, exp_inj] at hτy
+      ← exp_zsmul, ← exp_add, ← exp_zero, exp_inj]
+    at hτy
   simp only [nsmul_eq_mul, smul_eq_mul] at hτy
   have hmb : (m : ℤ) * (b - a) = 0 := by linarith
   rcases mul_eq_zero.1 hmb with h | h

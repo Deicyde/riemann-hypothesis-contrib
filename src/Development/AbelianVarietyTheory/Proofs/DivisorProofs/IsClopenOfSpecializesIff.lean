@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFiniteE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel
 open scoped CategoryTheory.Obj TensorProduct
 
 set_option autoImplicit false
@@ -20,8 +22,10 @@ open Set Topology
 
 namespace GlobalTheory.SpecGenClopen
 
-theorem isClosed_of_stable (X : Scheme.{0}) [IsLocallyNoetherian X] (T : Set X)
-    (hs : StableUnderSpecialization T) (hg : StableUnderGeneralization T) : IsClosed T := by
+theorem isClosed_of_stable
+    (X : Scheme.{0}) [IsLocallyNoetherian X]
+    (T : Set X) (hs : StableUnderSpecialization T) (hg : StableUnderGeneralization T)
+    : IsClosed T := by
   rw [← isOpen_compl_iff, isOpen_iff_forall_mem_open]
   intro x hx
   obtain ⟨U, hU, hxU, -⟩ := exists_isAffineOpen_mem_and_subset (X := X) (U := ⊤) (x := x) trivial
@@ -38,24 +42,40 @@ theorem isClosed_of_stable (X : Scheme.{0}) [IsLocallyNoetherian X] (T : Set X)
     exact hs h2 (hg h1 htT)
   have hT' : T' = ⋃ Z ∈ {Z ∈ irreducibleComponents (U : Set X) | (Z ∩ T').Nonempty}, Z := by
     ext t
-    refine ⟨fun ht => Set.mem_biUnion ⟨irreducibleComponent_mem_irreducibleComponents t,
-      ⟨t, mem_irreducibleComponent, ht⟩⟩ mem_irreducibleComponent, fun ht => ?_⟩
+    refine ⟨
+      fun ht =>
+        Set.mem_biUnion
+          ⟨irreducibleComponent_mem_irreducibleComponents t, ⟨t, mem_irreducibleComponent, ht⟩⟩
+          mem_irreducibleComponent,
+      fun ht => ?_
+    ⟩
     obtain ⟨Z, ⟨hZ, hZT⟩, htZ⟩ := Set.mem_iUnion₂.1 ht
     exact key Z hZ.1 hZT htZ
   have hc : IsClosed T' := by
     rw [hT']
-    exact (TopologicalSpace.NoetherianSpace.finite_irreducibleComponents.subset (by exact fun _ h => h.1)).isClosed_biUnion
-      fun Z h => isClosed_of_mem_irreducibleComponents Z h.1
-  refine ⟨Subtype.val '' T'ᶜ, ?_, U.isOpen.isOpenEmbedding_subtypeVal.isOpenMap _ hc.isOpen_compl, ⟨x, hxU⟩, hx, rfl⟩
+    exact (TopologicalSpace.NoetherianSpace.finite_irreducibleComponents.subset (by
+      exact fun _ h => h.1)).isClosed_biUnion fun Z h => isClosed_of_mem_irreducibleComponents Z h.1
+  refine ⟨
+    Subtype.val '' T'ᶜ,
+    ?_,
+    U.isOpen.isOpenEmbedding_subtypeVal.isOpenMap _ hc.isOpen_compl,
+    ⟨x, hxU⟩,
+    hx,
+    rfl
+  ⟩
   rintro _ ⟨t, ht, rfl⟩
   exact ht
 
-theorem isClopen_of_specializes_iff : ∀ (X : Scheme.{0}) [IsLocallyNoetherian X] (Z : Set X),
-    (∀ x y : X, x ⤳ y → (x ∈ Z ↔ y ∈ Z)) → IsClopen Z := by
+theorem isClopen_of_specializes_iff
+    : ∀ (X : Scheme.{0}) [IsLocallyNoetherian X] (Z : Set X),
+      (∀ x y : X, x ⤳ y → (x ∈ Z ↔ y ∈ Z)) → IsClopen Z := by
   intro X _ Z h
   have hs : StableUnderSpecialization Z := fun x y hxy hx => (h x y hxy).1 hx
   have hg : StableUnderGeneralization Z := fun x y hxy hx => (h y x hxy).2 hx
-  exact ⟨isClosed_of_stable X Z hs hg, isClosed_compl_iff.1 (isClosed_of_stable X Zᶜ
-    (stableUnderSpecialization_compl_iff.2 hg) (stableUnderGeneralization_compl_iff.2 hs))⟩
+  exact ⟨
+    isClosed_of_stable X Z hs hg,
+    isClosed_compl_iff.1 (isClosed_of_stable X Zᶜ (stableUnderSpecialization_compl_iff.2 hg)
+      (stableUnderGeneralization_compl_iff.2 hs))
+  ⟩
 
 end GlobalTheory.SpecGenClopen

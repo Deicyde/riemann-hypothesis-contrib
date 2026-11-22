@@ -15,7 +15,6 @@ noncomputable section
 
 universe u
 
-
 set_option maxHeartbeats 400000 in
 theorem ConeVarSurj.proof : ConeVarSurj.Statement.{u} := by
   intro F _ K _ _ ι _ P hP W hW hPW v hv
@@ -30,21 +29,25 @@ theorem ConeVarSurj.proof : ConeVarSurj.Statement.{u} := by
     exact hx
   let U : (K → ℕ) → MRing ι F := fun d => ∏ k, (X ⟨k, v k⟩ : MRing ι F) ^ d k
   have hUh : ∀ d, IsMultiHomog (U d) d := fun d => by
-    have := IsWeightedHomogeneous.prod Finset.univ (fun k => (X ⟨k, v k⟩ : MRing ι F) ^ d k)
-      (fun k => d k • blockWeight ι ⟨k, v k⟩) (fun k _ => (isWeightedHomogeneous_X _ _ _).pow _)
+    have :=
+      IsWeightedHomogeneous.prod Finset.univ
+        (fun k => (X ⟨k, v k⟩ : MRing ι F) ^ d k)
+        (fun k => d k • blockWeight ι ⟨k, v k⟩)
+        (fun k _ => (isWeightedHomogeneous_X _ _ _).pow _)
     have hd : ∑ k, d k • blockWeight ι ⟨k, v k⟩ = d := by
       funext j
       simp [blockWeight, Finset.sum_apply, Pi.single_apply]
     rw [hd] at this
     exact this
-  have hUW : ∀ d, U d ∉ W := fun d =>
-    W.primeCompl.prod_mem fun k _ => W.primeCompl.pow_mem (hv k) _
+  have hUW : ∀ d, U d ∉ W := fun d => W.primeCompl.prod_mem fun k _ => W.primeCompl.pow_mem (hv k) _
   let comp : MRing ι F → (K → ℕ) → MRing ι F := fun h d =>
     weightedHomogeneousComponent (blockWeight ι) d h
-  let c : MRing ι F → (K → ℕ) → degZeroLoc P {W} := fun h d =>
-    ⟨π (comp h d) / π (U d), div_mem_degZeroLoc P {W}
-      (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
-      (hUh d) (fun h' => hUW d (hPW h')) (by rintro _ rfl; exact hUW d)⟩
+  let c : MRing ι F → (K → ℕ) → degZeroLoc P {W} := fun h d => ⟨
+    π (comp h d) / π (U d),
+    div_mem_degZeroLoc P {W} (weightedHomogeneousComponent_isWeightedHomogeneous _ _) (hUh d)
+      (fun h' => hUW d (hPW h'))
+      (by rintro _ rfl; exact hUW d)
+  ⟩
   let D : MRing ι F → Finset (K → ℕ) := fun h => h.support.image (Finsupp.weight (blockWeight ι))
   have hsum : ∀ h, ∑ d ∈ D h, comp h d = h := fun h => by
     rw [← finsum_eq_sum_of_support_subset _ (s := D h) (fun d hd => by
@@ -53,8 +56,10 @@ theorem ConeVarSurj.proof : ConeVarSurj.Statement.{u} := by
     exact sum_weightedHomogeneousComponent (blockWeight ι) h
   let Q : MRing ι F → MvPolynomial K (degZeroLoc P {W}) := fun h =>
     ∑ d ∈ D h, monomial (Finsupp.equivFunOnFinite.symm d) (c h d)
-  have hQ : ∀ h, coneVarMap P W hPW v (Q h) =
-      algebraMap (MRing ι F ⧸ P) (coneLocal P W hPW) (Ideal.Quotient.mk P h) := fun h => by
+  have hQ
+      : ∀ h,
+        coneVarMap P W hPW v (Q h)
+          = algebraMap (MRing ι F ⧸ P) (coneLocal P W hPW) (Ideal.Quotient.mk P h) := fun h => by
     set_option synthInstance.maxHeartbeats 100000 in
       conv_rhs => rw [← hsum h, map_sum, map_sum]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -64,8 +69,8 @@ theorem ConeVarSurj.proof : ConeVarSurj.Statement.{u} := by
     apply Subtype.ext
     simp only [Subalgebra.coe_mul, degZeroLoc.algebraMap_cone_coe, SubmonoidClass.coe_finsetProd,
       SubmonoidClass.coe_pow, Subalgebra.coe_algebraMap, Finsupp.coe_equivFunOnFinite_symm]
-    have hU : ∏ k, algebraMap (MRing ι F ⧸ P) L (Ideal.Quotient.mk P (X ⟨k, v k⟩)) ^ d k =
-        π (U d) := by
+    have hU
+        : ∏ k, algebraMap (MRing ι F ⧸ P) L (Ideal.Quotient.mk P (X ⟨k, v k⟩)) ^ d k = π (U d) := by
       simp [π, U, map_prod, map_pow]
     rw [hU]
     exact div_mul_cancel₀ _ (hπ _ fun h' => hUW d (hPW h'))
@@ -81,9 +86,15 @@ theorem ConeVarSurj.proof : ConeVarSurj.Statement.{u} := by
       simp only [Q, coeff_sum, coeff_monomial, EmbeddingLike.apply_eq_iff_eq]
       rw [Finset.sum_ite_eq', if_pos hdD]
     rw [hcoeff]
-    refine isUnit_iff_exists_inv.mpr ⟨⟨π (U d) / π (comp g d), div_mem_degZeroLoc P {W} (hUh d)
-      (weightedHomogeneousComponent_isWeightedHomogeneous _ _) (fun h' => hdW (hPW h'))
-      (by rintro _ rfl; exact hdW)⟩, Subtype.ext ?_⟩
+    refine isUnit_iff_exists_inv.mpr ⟨
+      ⟨
+        π (U d) / π (comp g d),
+        div_mem_degZeroLoc P {W} (hUh d) (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
+          (fun h' => hdW (hPW h'))
+          (by rintro _ rfl; exact hdW)
+      ⟩,
+      Subtype.ext ?_
+    ⟩
     simp only [c, Subalgebra.coe_mul, Subalgebra.coe_one]
     rw [div_mul_div_cancel₀ (hπ _ fun h' => hUW d (hPW h')), div_self (hπ _ fun h' => hdW (hPW h'))]
   · rw [hQ, hQ, hgs]

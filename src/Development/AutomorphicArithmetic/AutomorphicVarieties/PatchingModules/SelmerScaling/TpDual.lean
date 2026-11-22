@@ -5,18 +5,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem dual_of_univ {R F W : Type} [AddCommGroup R] [Field F] [AddCommGroup W] [Module F W]
-    [Module.Finite F W] (π : R →+ W) (T : Submodule F (R →+ F))
+private theorem dual_of_univ
+    {R F W : Type} [AddCommGroup R] [Field F] [AddCommGroup W] [Module F W] [Module.Finite F W]
+    (π : R →+ W) (T : Submodule F (R →+ F))
     (h1 : ∀ φ : Module.Dual F W, φ.toAddMonoidHom.comp π ∈ T)
-    (h2 : ∀ α ∈ T, ∃ φ : Module.Dual F W, φ.toAddMonoidHom.comp π = α) :
-    Module.Finite F T ∧ (∀ b, (∀ α ∈ T, α b = 0) → π b = 0) ∧
-      ∀ ξ : Module.Dual F T, ∃ w : W, ∀ b, π b = w → ∀ α : T, (α : R →+ F) b = ξ α := by
-  let Φ : Module.Dual F W →ₗ[F] T :=
-    { toFun := fun φ => ⟨φ.toAddMonoidHom.comp π, h1 φ⟩
-      map_add' := fun _ _ => Subtype.ext (by ext; simp)
-      map_smul' := fun _ _ => Subtype.ext (by ext; simp) }
+    (h2 : ∀ α ∈ T, ∃ φ : Module.Dual F W, φ.toAddMonoidHom.comp π = α)
+    : Module.Finite F T ∧ (∀ b, (∀ α ∈ T, α b = 0) → π b = 0)
+      ∧ ∀ ξ : Module.Dual F T, ∃ w : W, ∀ b, π b = w → ∀ α : T, (α : R →+ F) b = ξ α := by
+  let Φ : Module.Dual F W →ₗ[F] T := {
+    toFun := fun φ => ⟨φ.toAddMonoidHom.comp π, h1 φ⟩
+    map_add' := fun _ _ => Subtype.ext (by ext; simp)
+    map_smul' := fun _ _ => Subtype.ext (by ext; simp)
+  }
   have hΦ : Function.Surjective Φ := fun α => by
     obtain ⟨φ, e⟩ := h2 α.1 α.2
     exact ⟨φ, Subtype.ext e⟩
@@ -30,15 +33,20 @@ private theorem dual_of_univ {R F W : Type} [AddCommGroup R] [Field F] [AddCommG
     rw [← this, ← hb]
     rfl
 
-private theorem tp_abs {O R F : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [Field F] [Algebra O R] [IsLocalHom (algebraMap O R)] (r : R →+* F) (hk : RingHom.ker r = maximalIdeal R)
-    (hs : Function.Surjective (r.comp (algebraMap O R))) (I J : Ideal R)
-    (hJ : J = (maximalIdeal O).map (algebraMap O R) ⊔ maximalIdeal R ^ 2 ⊔ I) (hI : I ≤ maximalIdeal R)
-    (hJm : J ≤ maximalIdeal R) (T : Submodule F (R →+ F))
-    (hT : ∀ α, α ∈ T ↔ (∀ b b', α (b * b') = r b * α b' + r b' * α b) ∧ (∀ o, α (algebraMap O R o) = 0) ∧
-      ∀ b ∈ I, α b = 0) :
-    Module.Finite F T ∧ (∀ b ∈ maximalIdeal R, (∀ α ∈ T, α b = 0) → b ∈ J) ∧
-      ∀ ξ : Module.Dual F T, ∃ b ∈ maximalIdeal R, ∀ α : T, (α : R →+ F) b = ξ α := by
+private theorem tp_abs
+    {O R F : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    [Field F] [Algebra O R] [IsLocalHom (algebraMap O R)]
+    (r : R →+* F)
+    (hk : RingHom.ker r = maximalIdeal R) (hs : Function.Surjective (r.comp (algebraMap O R)))
+    (I J : Ideal R) (hJ : J = (maximalIdeal O).map (algebraMap O R) ⊔ maximalIdeal R ^ 2 ⊔ I)
+    (hI : I ≤ maximalIdeal R) (hJm : J ≤ maximalIdeal R)
+    (T : Submodule F (R →+ F))
+    (hT : ∀ α,
+      α ∈ T
+        ↔ (∀ b b', α (b * b') = r b * α b' + r b' * α b) ∧ (∀ o, α (algebraMap O R o) = 0)
+          ∧ ∀ b ∈ I, α b = 0)
+    : Module.Finite F T ∧ (∀ b ∈ maximalIdeal R, (∀ α ∈ T, α b = 0) → b ∈ J)
+      ∧ ∀ ξ : Module.Dual F T, ∃ b ∈ maximalIdeal R, ∀ α : T, (α : R →+ F) b = ξ α := by
   have hm : ∀ b, b ∈ maximalIdeal R ↔ r b = 0 := fun b => by rw [← hk, RingHom.mem_ker]
   have hO : ∀ o : O, algebraMap O R o ∈ maximalIdeal R → algebraMap O R o ∈ J := fun o ho => by
     rw [hJ]
@@ -50,7 +58,8 @@ private theorem tp_abs {O R F : Type} [CommRing O] [IsLocalRing O] [CommRing R] 
   have hdec : ∀ b : R, ∃ o : O, ∃ x ∈ maximalIdeal R, b = algebraMap O R o + x := fun b => by
     obtain ⟨o, ho⟩ := hs (r b)
     refine ⟨o, b - algebraMap O R o, (hm _).2 ?_, by ring⟩
-    rw [map_sub, ← ho]; simp
+    rw [map_sub, ← ho]
+    simp
   let N : Submodule O R := J.restrictScalars O ⊔ 1
   have hNJ : ∀ b ∈ J, N.mkQ b = 0 := fun b hb =>
     (Submodule.Quotient.mk_eq_zero N).2 (Submodule.mem_sup_left hb)
@@ -72,8 +81,9 @@ private theorem tp_abs {O R F : Type} [CommRing O] [IsLocalRing O] [CommRing R] 
   have hder : ∀ b b' : R, N.mkQ (b * b') = r b • N.mkQ b' + r b' • N.mkQ b := fun b b' => by
     obtain ⟨o, x, hx, rfl⟩ := hdec b
     obtain ⟨o', x', hx', rfl⟩ := hdec b'
-    have e : (algebraMap O R o + x) * (algebraMap O R o' + x') =
-        algebraMap O R (o * o') + (o • x' + o' • x) + x * x' := by
+    have e
+        : (algebraMap O R o + x) * (algebraMap O R o' + x')
+          = algebraMap O R (o * o') + (o • x' + o' • x) + x * x' := by
       simp only [Algebra.smul_def, map_mul]; ring
     have e1 : r (algebraMap O R o + x) = (r.comp (algebraMap O R)) o := by
       rw [map_add (f := _), (hm x).1 hx, add_zero]; rfl
@@ -98,40 +108,57 @@ private theorem tp_abs {O R F : Type} [CommRing O] [IsLocalRing O] [CommRing R] 
       rw [hs'] at hx
       rw [smul_eq_mul, hder, (hm x).1 hx, zero_smul, add_zero]
       exact Submodule.smul_mem _ _ (ih trivial)
-  obtain ⟨f1, f2, f3⟩ := dual_of_univ (F := F) N.mkQ.toAddMonoidHom T (fun φ => (hT _).2 ⟨fun b b' => by
-      show φ (N.mkQ (b * b')) = r b * φ (N.mkQ b') + r b' * φ (N.mkQ b)
-      rw [hder, map_add (f := _), map_smul, map_smul, smul_eq_mul, smul_eq_mul], fun o => by
-      show φ (N.mkQ _) = 0
-      rw [hNO, map_zero], fun b hb => by
-      show φ (N.mkQ _) = 0
-      rw [hNJ b (by rw [hJ]; exact Ideal.mem_sup_right hb), map_zero]⟩) (fun α hα => by
-    obtain ⟨a1, a2, a3⟩ := (hT α).1 hα
-    let K : Ideal R :=
-      { carrier := {b | r b = 0 ∧ α b = 0}
-        add_mem' := fun {x y} hx hy => ⟨by rw [map_add (f := _), hx.1, hy.1, add_zero], by rw [map_add (f := _), hx.2, hy.2, add_zero]⟩
-        zero_mem' := ⟨map_zero _, map_zero _⟩
-        smul_mem' := fun c x hx => ⟨by rw [smul_eq_mul, map_mul, hx.1, mul_zero],
-          by rw [smul_eq_mul, a1, hx.1, hx.2]; ring⟩ }
-    have hK : J ≤ K := by
-      rw [hJ]
-      refine sup_le (sup_le (Ideal.map_le_iff_le_comap.2 fun o ho => ⟨(hm _).1 (hJm ?_), a2 o⟩) ?_)
-        fun b hb => ⟨(hm _).1 (hI hb), a3 b hb⟩
-      · rw [hJ]; exact Ideal.mem_sup_left (Ideal.mem_sup_left (Ideal.mem_map_of_mem _ ho))
-      · rw [pow_two]
-        refine Ideal.mul_le.2 fun x hx y hy => ⟨?_, ?_⟩
-        · rw [map_mul, (hm x).1 hx, zero_mul]
-        · rw [a1, (hm x).1 hx, (hm y).1 hy]; ring
-    have hN : ∀ b ∈ N.toAddSubgroup, α b = 0 := fun b hb => by
-      obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 (show b ∈ J.restrictScalars O ⊔ 1 from hb)
-      obtain ⟨o, rfl⟩ := Submodule.mem_one.1 hz
-      rw [map_add (f := _), a2, (hK hy).2, add_zero]
-    let ψ : (R ⧸ N) →+ F := QuotientAddGroup.lift N.toAddSubgroup α hN
-    have hψ : ∀ b, ψ (N.mkQ b) = α b := fun _ => rfl
-    refine ⟨{ toFun := ψ, map_add' := ψ.map_add, map_smul' := fun c w => ?_ }, AddMonoidHom.ext hψ⟩
-    obtain ⟨o, rfl⟩ := hs c
-    obtain ⟨b, rfl⟩ := N.mkQ_surjective w
-    rw [hsm, ← map_smul, hψ, hψ, Algebra.smul_def, a1, a2]
-    simp)
+  obtain ⟨f1, f2, f3⟩ :=
+    dual_of_univ (F := F) N.mkQ.toAddMonoidHom T
+      (fun φ =>
+        (hT _).2 ⟨
+          fun b b' => by
+            show φ (N.mkQ (b * b')) = r b * φ (N.mkQ b') + r b' * φ (N.mkQ b)
+            rw [hder, map_add (f := _), map_smul, map_smul, smul_eq_mul, smul_eq_mul],
+          fun o => by
+            show φ (N.mkQ _) = 0
+            rw [hNO, map_zero],
+          fun b hb => by
+            show φ (N.mkQ _) = 0
+            rw [hNJ b (by rw [hJ]; exact Ideal.mem_sup_right hb), map_zero]
+        ⟩)
+      (fun α hα => by
+        obtain ⟨a1, a2, a3⟩ := (hT α).1 hα
+        let K : Ideal R := {
+          carrier := {b | r b = 0 ∧ α b = 0}
+          add_mem' := fun {x y} hx hy => ⟨
+            by rw [map_add (f := _), hx.1, hy.1, add_zero],
+            by rw [map_add (f := _), hx.2, hy.2, add_zero]
+          ⟩
+          zero_mem' := ⟨map_zero _, map_zero _⟩
+          smul_mem' := fun c x hx => ⟨
+            by rw [smul_eq_mul, map_mul, hx.1, mul_zero],
+            by rw [smul_eq_mul, a1, hx.1, hx.2]; ring
+          ⟩
+        }
+        have hK : J ≤ K := by
+          rw [hJ]
+          refine sup_le
+            (sup_le (Ideal.map_le_iff_le_comap.2 fun o ho => ⟨(hm _).1 (hJm ?_), a2 o⟩) ?_)
+            fun b hb => ⟨(hm _).1 (hI hb), a3 b hb⟩
+          · rw [hJ]; exact Ideal.mem_sup_left (Ideal.mem_sup_left (Ideal.mem_map_of_mem _ ho))
+          · rw [pow_two]
+            refine Ideal.mul_le.2 fun x hx y hy => ⟨?_, ?_⟩
+            · rw [map_mul, (hm x).1 hx, zero_mul]
+            · rw [a1, (hm x).1 hx, (hm y).1 hy]; ring
+        have hN : ∀ b ∈ N.toAddSubgroup, α b = 0 := fun b hb => by
+          obtain ⟨y, hy, z, hz, rfl⟩ :=
+            Submodule.mem_sup.1 (show b ∈ J.restrictScalars O ⊔ 1 from hb)
+          obtain ⟨o, rfl⟩ := Submodule.mem_one.1 hz
+          rw [map_add (f := _), a2, (hK hy).2, add_zero]
+        let ψ : (R ⧸ N) →+ F := QuotientAddGroup.lift N.toAddSubgroup α hN
+        have hψ : ∀ b, ψ (N.mkQ b) = α b := fun _ => rfl
+        refine
+          ⟨{ toFun := ψ, map_add' := ψ.map_add, map_smul' := fun c w => ?_ }, AddMonoidHom.ext hψ⟩
+        obtain ⟨o, rfl⟩ := hs c
+        obtain ⟨b, rfl⟩ := N.mkQ_surjective w
+        rw [hsm, ← map_smul, hψ, hψ, Algebra.smul_def, a1, a2]
+        simp)
   refine ⟨f1, fun b hb h => ?_, fun ξ => ?_⟩
   · have h0 : b ∈ N := (Submodule.Quotient.mk_eq_zero N).1 (f2 b h)
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 (show b ∈ J.restrictScalars O ⊔ 1 from h0)
@@ -143,8 +170,11 @@ private theorem tp_abs {O R F : Type} [CommRing O] [IsLocalRing O] [CommRing R] 
     obtain ⟨b, hb, e⟩ := hsurj w
     exact ⟨b, hb, hw b e⟩
 
-theorem UpperTheory.V.Pa.tpDual :
-    ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l), Module.Finite S.F S.Tp ∧ (∀ b ∈ maximalIdeal S.Bh, (∀ α ∈ S.Tp, α b = 0) → b ∈ S.J2) ∧ ∀ ξ : Module.Dual S.F S.Tp, ∃ b ∈ maximalIdeal S.Bh, ∀ α : S.Tp, (α : S.Bh →+ S.F) b = ξ α := by
+theorem UpperTheory.V.Pa.tpDual
+    : ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l),
+      Module.Finite S.F S.Tp ∧ (∀ b ∈ maximalIdeal S.Bh, (∀ α ∈ S.Tp, α b = 0) → b ∈ S.J2)
+        ∧ ∀ ξ : Module.Dual S.F S.Tp, ∃ b ∈ maximalIdeal S.Bh, ∀ α : S.Tp,
+          (α : S.Bh →+ S.F) b = ξ α := by
   intro l _ S
   haveI : IsNoetherianRing S.Bh := { noetherian := S.d6.noetherian }
   have hI : ired S.U.N ≤ maximalIdeal S.Bh := by

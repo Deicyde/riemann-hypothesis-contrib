@@ -16,9 +16,10 @@ open Formalism.REAL (Tm qminor qdet)
 
 variable {A : Type*} [Ring A] [Algebra ℂ A]
 
-theorem prod_ofFn_sub : ∀ (m : ℕ) (f g : Fin (m + 1) → A) (d : Fin (m + 1)),
-    (∀ j, j ≠ d → f j = g j) → f d = g d + 1 →
-    (List.ofFn f).prod - (List.ofFn g).prod = (List.ofFn (f ∘ d.succAbove)).prod := by
+theorem prod_ofFn_sub
+    : ∀ (m : ℕ) (f g : Fin (m + 1) → A) (d : Fin (m + 1)),
+      (∀ j, j ≠ d → f j = g j) → f d = g d + 1
+        → (List.ofFn f).prod - (List.ofFn g).prod = (List.ofFn (f ∘ d.succAbove)).prod := by
   intro m
   induction m with
   | zero =>
@@ -39,8 +40,13 @@ theorem prod_ofFn_sub : ∀ (m : ℕ) (f g : Fin (m + 1) → A) (d : Fin (m + 1)
       simp [ht, congrFun ht i]
     | succ e =>
       have h0 : f 0 = g 0 := h 0 (Fin.succ_ne_zero e).symm
-      have key := ih (fun i => f i.succ) (fun i => g i.succ) e
-        (fun j hj => h _ (fun hh => hj (Fin.succ_injective _ hh))) hd
+      have key :=
+        ih
+          (fun i => f i.succ)
+          (fun i => g i.succ)
+          e
+          (fun j hj => h _ (fun hh => hj (Fin.succ_injective _ hh)))
+          hd
       rw [← h0, ← mul_sub, key, List.ofFn_succ, List.prod_cons]
       congr 2
       simp [Function.comp_def, Fin.succ_succAbove_succ]
@@ -49,11 +55,12 @@ def colDet {n : ℕ} (E : Fin n → Fin n → A) (c : Fin n → ℂ) : A :=
   ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤˣ) : ℤ) •
     (List.ofFn fun j : Fin n => capEntry E (c j) (σ j) j).prod
 
-theorem Tm_eq_capEntry {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) (a b : Fin n) :
-    Tm E u a b = capEntry E u a b := add_comm _ _
+theorem Tm_eq_capEntry {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) (a b : Fin n)
+    : Tm E u a b = capEntry E u a b :=
+  add_comm _ _
 
-theorem qdet_eq_colDet {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) :
-    qdet E u = colDet E (fun j => u - ((j : ℕ) : ℂ)) := by
+theorem qdet_eq_colDet {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ)
+    : qdet E u = colDet E (fun j => u - ((j : ℕ) : ℂ)) := by
   unfold qdet qminor colDet
   refine sum_congr rfl fun σ _ => ?_
   rw [← zsmul_eq_mul]
@@ -66,12 +73,12 @@ def ins {m : ℕ} (d : Fin (m + 1)) (τ : Equiv.Perm (Fin m)) : Equiv.Perm (Fin 
 theorem ins_self {m : ℕ} (d : Fin (m + 1)) (τ : Equiv.Perm (Fin m)) : ins d τ d = d := by
   simp [ins, Equiv.permCongr_apply]
 
-theorem ins_succAbove {m : ℕ} (d : Fin (m + 1)) (τ : Equiv.Perm (Fin m)) (i : Fin m) :
-    ins d τ (d.succAbove i) = d.succAbove (τ i) := by
+theorem ins_succAbove {m : ℕ} (d : Fin (m + 1)) (τ : Equiv.Perm (Fin m)) (i : Fin m)
+    : ins d τ (d.succAbove i) = d.succAbove (τ i) := by
   simp [ins, Equiv.permCongr_apply]
 
-theorem sign_ins {m : ℕ} (d : Fin (m + 1)) (τ : Equiv.Perm (Fin m)) :
-    Equiv.Perm.sign (ins d τ) = Equiv.Perm.sign τ := by
+theorem sign_ins {m : ℕ} (d : Fin (m + 1)) (τ : Equiv.Perm (Fin m))
+    : Equiv.Perm.sign (ins d τ) = Equiv.Perm.sign τ := by
   simp [ins, Equiv.Perm.decomposeOption_symm_sign]
 
 theorem ins_injective {m : ℕ} (d : Fin (m + 1)) : Function.Injective (ins d) := by
@@ -81,11 +88,10 @@ theorem ins_injective {m : ℕ} (d : Fin (m + 1)) : Function.Injective (ins d) :
   simp only [ins_succAbove] at this
   exact congrArg Fin.val (Fin.succAbove_right_injective this)
 
-theorem exists_ins {m : ℕ} (d : Fin (m + 1)) (σ : Equiv.Perm (Fin (m + 1))) (h : σ d = d) :
-    ∃ τ, ins d τ = σ := by
+theorem exists_ins {m : ℕ} (d : Fin (m + 1)) (σ : Equiv.Perm (Fin (m + 1))) (h : σ d = d)
+    : ∃ τ, ins d τ = σ := by
   set s : Equiv.Perm (Option (Fin m)) := (finSuccEquiv' d).permCongr σ with hs
-  have hnone : s none = none := by
-    simp [hs, Equiv.permCongr_apply, h]
+  have hnone : s none = none := by simp [hs, Equiv.permCongr_apply, h]
   obtain ⟨⟨o, τ⟩, hq⟩ := Equiv.Perm.decomposeOption.symm.surjective s
   have ho : o = none := by
     rw [← hnone, ← hq]
@@ -97,16 +103,22 @@ theorem exists_ins {m : ℕ} (d : Fin (m + 1)) (σ : Equiv.Perm (Fin (m + 1))) (
   ext x
   simp [Equiv.permCongr_apply]
 
-theorem colDet_sub {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (c c' : Fin (m + 1) → ℂ)
-    (d : Fin (m + 1)) (h : ∀ j, j ≠ d → c j = c' j) (hd : c d = c' d + 1) :
-    colDet E c - colDet E c' = ∑ τ : Equiv.Perm (Fin m), ((Equiv.Perm.sign τ : ℤˣ) : ℤ) •
-      (List.ofFn fun i : Fin m =>
-        capEntry E (c (d.succAbove i)) (d.succAbove (τ i)) (d.succAbove i)).prod := by
-  have each : ∀ σ : Equiv.Perm (Fin (m + 1)),
-      ((Equiv.Perm.sign σ : ℤˣ) : ℤ) • (List.ofFn fun j => capEntry E (c j) (σ j) j).prod -
-        ((Equiv.Perm.sign σ : ℤˣ) : ℤ) • (List.ofFn fun j => capEntry E (c' j) (σ j) j).prod =
-      if σ d = d then ((Equiv.Perm.sign σ : ℤˣ) : ℤ) •
-        (List.ofFn ((fun j => capEntry E (c j) (σ j) j) ∘ d.succAbove)).prod else 0 := by
+theorem colDet_sub
+    {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (c c' : Fin (m + 1) → ℂ) (d : Fin (m + 1))
+    (h : ∀ j, j ≠ d → c j = c' j) (hd : c d = c' d + 1)
+    : colDet E c - colDet E c'
+      = ∑ τ : Equiv.Perm (Fin m), ((Equiv.Perm.sign τ : ℤˣ) : ℤ) •
+        (List.ofFn fun i : Fin m =>
+          capEntry E (c (d.succAbove i)) (d.succAbove (τ i)) (d.succAbove i)).prod := by
+  have each
+      : ∀ σ : Equiv.Perm (Fin (m + 1)),
+        ((Equiv.Perm.sign σ : ℤˣ) : ℤ) • (List.ofFn fun j => capEntry E (c j) (σ j) j).prod
+            - ((Equiv.Perm.sign σ : ℤˣ) : ℤ) • (List.ofFn fun j => capEntry E (c' j) (σ j) j).prod
+          = if σ d = d then
+              ((Equiv.Perm.sign σ : ℤˣ) : ℤ)
+                • (List.ofFn ((fun j => capEntry E (c j) (σ j) j) ∘ d.succAbove)).prod
+            else
+              0 := by
     intro σ
     rw [← smul_sub]
     split_ifs with hσ
@@ -142,9 +154,9 @@ theorem colDet_sub {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (c c' : Fin
 def hyb {n : ℕ} (x : ℂ) (k : ℕ) (j : Fin n) : ℂ :=
   if (j : ℕ) < k then x - 1 - ((j : ℕ) : ℂ) else x - ((j : ℕ) : ℂ)
 
-theorem hyb_step {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (x : ℂ) (d : Fin (m + 1)) :
-    colDet E (hyb x (d : ℕ)) - colDet E (hyb x ((d : ℕ) + 1)) =
-      cminor E d.succAbove d.succAbove (x - 1) := by
+theorem hyb_step {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (x : ℂ) (d : Fin (m + 1))
+    : colDet E (hyb x (d : ℕ)) - colDet E (hyb x ((d : ℕ) + 1))
+      = cminor E d.succAbove d.succAbove (x - 1) := by
   rw [colDet_sub E _ _ d]
   · unfold cminor
     refine sum_congr rfl fun τ _ => ?_
@@ -173,8 +185,8 @@ theorem hyb_step {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (x : ℂ) (d 
     rw [if_neg (lt_irrefl _), if_pos (Nat.lt_succ_self _)]
     ring
 
-theorem sum_principal {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (x : ℂ) :
-    ∑ d : Fin (m + 1), cminor E d.succAbove d.succAbove (x - 1) = qdet E x - qdet E (x - 1) := by
+theorem sum_principal {m : ℕ} (E : Fin (m + 1) → Fin (m + 1) → A) (x : ℂ)
+    : ∑ d : Fin (m + 1), cminor E d.succAbove d.succAbove (x - 1) = qdet E x - qdet E (x - 1) := by
   have h0 : qdet E x = colDet E (hyb x 0) := by
     rw [qdet_eq_colDet]
     congr 1

@@ -10,9 +10,11 @@ open Polynomial
 
 namespace GlobalTheory.FractionRingRootRange
 
-theorem root_mem_range {A B : Type} [CommRing A] [Nontrivial A] [CommRing B] [IsDomain B] [Algebra A B]
-    (h : GlobalTheory.EtC.AIC A) (z : B) :
-    ∀ (n : ℕ) (p : A[X]), p.natDegree = n → p.Monic → aeval z p = 0 → ∃ a : A, algebraMap A B a = z := by
+theorem root_mem_range
+    {A B : Type} [CommRing A] [Nontrivial A] [CommRing B] [IsDomain B] [Algebra A B]
+    (h : GlobalTheory.EtC.AIC A) (z : B)
+    : ∀ (n : ℕ) (p : A[X]),
+      p.natDegree = n → p.Monic → aeval z p = 0 → ∃ a : A, algebraMap A B a = z := by
   intro n
   induction n with
   | zero =>
@@ -34,12 +36,14 @@ theorem root_mem_range {A B : Type} [CommRing A] [Nontrivial A] [CommRing B] [Is
     · exact ⟨a, (sub_eq_zero.mp h1).symm⟩
     · exact ih _ hqdeg hqmon h1
 
-theorem isAlgClosed_fractionRing (A : Type) [CommRing A] [IsDomain A] (h : GlobalTheory.EtC.AIC A) :
-    IsAlgClosed (FractionRing A) := by
+theorem isAlgClosed_fractionRing (A : Type) [CommRing A] [IsDomain A] (h : GlobalTheory.EtC.AIC A)
+    : IsAlgClosed (FractionRing A) := by
   refine IsAlgClosed.of_exists_root _ fun p hmon hirr => ?_
   have hdeg : p.degree ≠ 0 := (Polynomial.degree_pos_of_irreducible hirr).ne'
-  obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (p.map (algebraMap (FractionRing A) (AlgebraicClosure (FractionRing A))))
-    (by rwa [degree_map])
+  obtain ⟨z, hz⟩ :=
+    IsAlgClosed.exists_root
+      (p.map (algebraMap (FractionRing A) (AlgebraicClosure (FractionRing A))))
+      (by rwa [degree_map])
   have hpz : aeval z p = 0 := by
     rw [aeval_def, ← eval_map]
     exact hz
@@ -61,21 +65,28 @@ theorem isAlgClosed_fractionRing (A : Type) [CommRing A] [IsDomain A] (h : Globa
     rw [IsScalarTower.algebraMap_apply A (FractionRing A), map_eq_zero] at hx
     exact IsFractionRing.to_map_eq_zero_iff.mp hx
   have hw := integralNormalization_aeval_eq_zero hqz inj
-  have hmon' : (integralNormalization (IsLocalization.integerNormalization (nonZeroDivisors A) p)).Monic := by
+  have hmon' : (integralNormalization (IsLocalization.integerNormalization (nonZeroDivisors A)
+      p)).Monic := by
     exact monic_integralNormalization hq0
   obtain ⟨a, ha⟩ := root_mem_range (B := AlgebraicClosure (FractionRing A)) h _ _ _ rfl hmon' hw
   set c := (IsLocalization.integerNormalization (nonZeroDivisors A) p).leadingCoeff
   have hc : algebraMap A (FractionRing A) c ≠ 0 := by
     rw [Ne, IsFractionRing.to_map_eq_zero_iff]
     exact leadingCoeff_ne_zero.mpr hq0
-  have ha' : algebraMap A (AlgebraicClosure (FractionRing A)) a =
-      algebraMap A (AlgebraicClosure (FractionRing A)) c * z := by
+  have ha'
+      : algebraMap A (AlgebraicClosure (FractionRing A)) a
+        = algebraMap A (AlgebraicClosure (FractionRing A)) c * z := by
     rw [ha]
   refine ⟨algebraMap A (FractionRing A) a / algebraMap A (FractionRing A) c, ?_⟩
-  have hcB : algebraMap (FractionRing A) (AlgebraicClosure (FractionRing A)) (algebraMap A (FractionRing A) c) ≠ 0 :=
+  have hcB
+      : algebraMap (FractionRing A) (AlgebraicClosure (FractionRing A))
+          (algebraMap A (FractionRing A) c)
+        ≠ 0 :=
     (_root_.map_ne_zero _).mpr hc
-  have hx : algebraMap (FractionRing A) (AlgebraicClosure (FractionRing A))
-      (algebraMap A (FractionRing A) a / algebraMap A (FractionRing A) c) = z := by
+  have hx
+      : algebraMap (FractionRing A) (AlgebraicClosure (FractionRing A))
+          (algebraMap A (FractionRing A) a / algebraMap A (FractionRing A) c)
+        = z := by
     rw [map_div₀, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply, ha']
     rw [← IsScalarTower.algebraMap_apply] at hcB
     field_simp

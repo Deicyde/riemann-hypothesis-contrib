@@ -18,14 +18,16 @@ open GroundTheory.PAdicHodge DeRhamPotentiallySemistable.DRPst Matrix
 namespace BaseC
 
 theorem inv_uniq {R : Type*} [CommRing R] {a b c : R} (ha : a * c = 1) (hb : b * c = 1) : a = b :=
-  calc a = a * (b * c) := by rw [hb, mul_one]
+  calc
+    a = a * (b * c) := by rw [hb, mul_one]
     _ = (a * c) * b := by ring
     _ = b := by rw [ha, one_mul]
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem aB_ainfMap (a : WittVector l (PreTilt ↥(PadicComplexInt l) l)) :
-    aB l (ainfMap l a) = Formalism.Per6.aB l a := rfl
+theorem aB_ainfMap (a : WittVector l (PreTilt ↥(PadicComplexInt l) l))
+    : aB l (ainfMap l a) = Formalism.Per6.aB l a :=
+  rfl
 
 theorem aB_injective : Function.Injective (aB l) := by
   intro a b h
@@ -55,21 +57,21 @@ theorem map_u (f : B l →+* B l) : f (u l) = u l := by
   refine inv_uniq (c := (l : B l)) ?_ u_mul
   rw [← map_natCast f l, ← map_mul, u_mul, map_one]
 
-theorem aB_mem (a : AInf ℂ_[l] l) : aB l a ∈ Ainf' l :=
-  Subring.subset_closure (Or.inl ⟨a, rfl⟩)
+theorem aB_mem (a : AInf ℂ_[l] l) : aB l a ∈ Ainf' l := Subring.subset_closure (Or.inl ⟨a, rfl⟩)
 
-theorem u_mem : u l ∈ Ainf' l :=
-  Subring.subset_closure (Or.inr rfl)
+theorem u_mem : u l ∈ Ainf' l := Subring.subset_closure (Or.inr rfl)
 
-theorem map_mem {f : B l →+* B l} (h1 : ∀ a, f (aB l a) ∈ Ainf' l) :
-    ∀ x ∈ Ainf' l, f x ∈ Ainf' l := fun x hx =>
-  (Subring.closure_le (t := (Ainf' l).comap f)).2 (by
-    rintro y (⟨a, rfl⟩ | hy)
-    · exact h1 a
-    · rw [Set.mem_singleton_iff.1 hy]
-      show f (u l) ∈ Ainf' l
-      rw [map_u]
-      exact u_mem) hx
+theorem map_mem {f : B l →+* B l} (h1 : ∀ a, f (aB l a) ∈ Ainf' l)
+    : ∀ x ∈ Ainf' l, f x ∈ Ainf' l := fun x hx =>
+  (Subring.closure_le (t := (Ainf' l).comap f)).2
+    (by
+      rintro y (⟨a, rfl⟩ | hy)
+      · exact h1 a
+      · rw [Set.mem_singleton_iff.1 hy]
+        show f (u l) ∈ Ainf' l
+        rw [map_u]
+        exact u_mem)
+    hx
 
 theorem pow_u (y : B l) (n : ℕ) : y * (l : B l) ^ n * u l ^ n = y := by
   rw [mul_assoc, ← mul_pow, mul_comm (l : B l), u_mul, one_pow, mul_one]
@@ -84,9 +86,11 @@ def rep (l : ℕ) [Fact l.Prime] : Subring (B l) where
     rintro _ _ ⟨a, k, rfl⟩ ⟨b, j, rfl⟩
     refine ⟨a * (l : AInf ℂ_[l] l) ^ j + b * (l : AInf ℂ_[l] l) ^ k, k + j, ?_⟩
     rw [map_add (f := _), map_mul, map_mul, map_pow, map_pow, map_natCast]
-    calc aB l a * u l ^ k + aB l b * u l ^ j =
-        aB l a * (l : B l) ^ j * u l ^ j * u l ^ k + aB l b * (l : B l) ^ k * u l ^ k * u l ^ j := by
-          rw [pow_u, pow_u]
+    calc
+      aB l a * u l ^ k + aB l b * u l ^ j
+          = aB l a * (l : B l) ^ j * u l ^ j * u l ^ k
+            + aB l b * (l : B l) ^ k * u l ^ k * u l ^ j := by
+        rw [pow_u, pow_u]
       _ = _ := by ring
   zero_mem' := ⟨0, 0, by rw [map_zero, zero_mul]⟩
   neg_mem' := by
@@ -94,11 +98,13 @@ def rep (l : ℕ) [Fact l.Prime] : Subring (B l) where
     exact ⟨-a, k, by rw [map_neg, neg_mul]⟩
 
 theorem mem_rep {x : B l} (hx : x ∈ Ainf' l) : ∃ (a : AInf ℂ_[l] l) (k : ℕ), x = aB l a * u l ^ k :=
-  (Subring.closure_le (t := rep l)).2 (by
-    rintro y (⟨a, rfl⟩ | hy)
-    · exact ⟨a, 0, by rw [pow_zero, mul_one]⟩
-    · rw [Set.mem_singleton_iff.1 hy]
-      exact ⟨1, 1, by rw [map_one, one_mul, pow_one]⟩) hx
+  (Subring.closure_le (t := rep l)).2
+    (by
+      rintro y (⟨a, rfl⟩ | hy)
+      · exact ⟨a, 0, by rw [pow_zero, mul_one]⟩
+      · rw [Set.mem_singleton_iff.1 hy]
+        exact ⟨1, 1, by rw [map_one, one_mul, pow_one]⟩)
+    hx
 
 end BaseC
 

@@ -14,8 +14,11 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma.Sandwich
 
-theorem exists_dvd_pow {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (a : O)
-    (ha : a ∈ IsLocalRing.maximalIdeal O) (d : O) (hd : d ≠ 0) : ∃ k : ℕ, d ∣ a ^ k := by
+theorem exists_dvd_pow
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (a : O) (ha : a ∈ IsLocalRing.maximalIdeal O)
+    (d : O) (hd : d ≠ 0)
+    : ∃ k : ℕ, d ∣ a ^ k := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨k, hk⟩ := IsDiscreteValuationRing.associated_pow_irreducible hd hϖ
   refine ⟨k, ?_⟩
@@ -25,10 +28,11 @@ theorem exists_dvd_pow {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuation
     exact Ideal.mem_span_singleton.1 ha
   exact hk.dvd.trans (pow_dvd_pow_of_dvd h1 k)
 
-theorem eventually_pow_mul_mem {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [CommRing A] [Algebra O A] (a : O) (ha : a ∈ IsLocalRing.maximalIdeal O) (S : Submodule O A)
-    (x : A) (d : O) (hd : d ≠ 0) (hx : d • x ∈ S) :
-    ∃ k : ℕ, ∀ n : ℕ, k ≤ n → algebraMap O A a ^ n * x ∈ S := by
+theorem eventually_pow_mul_mem
+    {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
+    (a : O) (ha : a ∈ IsLocalRing.maximalIdeal O)
+    (S : Submodule O A) (x : A) (d : O) (hd : d ≠ 0) (hx : d • x ∈ S)
+    : ∃ k : ℕ, ∀ n : ℕ, k ≤ n → algebraMap O A a ^ n * x ∈ S := by
   obtain ⟨k, c, hc⟩ := exists_dvd_pow a ha d hd
   refine ⟨k, fun n hn => ?_⟩
   have e : algebraMap O A a ^ n * x = (a ^ (n - k) * c) • (d • x) := by
@@ -50,14 +54,19 @@ theorem exists_smul_isIntegral (x : B.A) : ∃ d : K.O, d ≠ 0 ∧ IsIntegral K
   obtain ⟨d, hd, hi⟩ := h'.exists_integral_multiple
   exact ⟨d, hd, hi⟩
 
-theorem exists_smul_mem (L : Submodule K.O B.A) (hL : Submodule.span K.E (L : Set B.A) = ⊤) (x : B.A) :
-    ∃ d : K.O, d ≠ 0 ∧ d • x ∈ L := by
+theorem exists_smul_mem
+    (L : Submodule K.O B.A) (hL : Submodule.span K.E (L : Set B.A) = ⊤) (x : B.A)
+    : ∃ d : K.O, d ≠ 0 ∧ d • x ∈ L := by
   first
   | exact @_root_.GlobalTheory.DenominatorOfSpan.exists_denominator
   | exact _root_.GlobalTheory.DenominatorOfSpan.exists_denominator
   | (apply _root_.GlobalTheory.DenominatorOfSpan.exists_denominator <;> assumption)
   | (intros; apply _root_.GlobalTheory.DenominatorOfSpan.exists_denominator <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.DenominatorOfSpan.exists_denominator <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.DenominatorOfSpan.exists_denominator
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.DenominatorOfSpan.exists_denominator ..)
 
 end GlobalTheory.UnitLemma.Sandwich
@@ -71,18 +80,21 @@ theorem exists_aeval (hP : B.P.Separable) (x : B.A) : ∃ f : K.E[X], x = aeval 
   refine ⟨∑ i, C (e.repr x i) * X ^ (i : ℕ), ?_⟩
   conv_lhs => rw [← e.sum_repr x]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, he, Algebra.smul_def]
+  simp [map_sum, he, Algebra.smul_def]
 
-theorem traceForm_nondegenerate (hP : B.P.Separable) : (Algebra.traceForm K.E B.A).Nondegenerate := by
+theorem traceForm_nondegenerate (hP : B.P.Separable)
+    : (Algebra.traceForm K.E B.A).Nondegenerate := by
   refine ⟨fun w hw => ?_, fun w hw => ?_⟩
   · exact TraceNondeg.eq_zero_of_trace_mul_eq_zero K B hP (exists_aeval B hP) w
       (fun y => by simpa [Algebra.traceForm_apply] using hw y)
   · exact TraceNondeg.eq_zero_of_trace_mul_eq_zero K B hP (exists_aeval B hP) w
       (fun y => by simpa [Algebra.traceForm_apply, mul_comm] using hw y)
 
-theorem integral_sub (hP : B.P.Separable) (a : K.O) (ha : a ∈ IsLocalRing.maximalIdeal K.O)
-    (L : Submodule K.O B.A) (hL : Submodule.span K.E (L : Set B.A) = ⊤) :
-    ∃ m : ℕ, ∀ n, m ≤ n → ∀ y : B.A, IsIntegral K.O y → algebraMap K.O B.A a ^ n * y ∈ L := by
+theorem integral_sub
+    (hP : B.P.Separable)
+    (a : K.O) (ha : a ∈ IsLocalRing.maximalIdeal K.O)
+    (L : Submodule K.O B.A) (hL : Submodule.span K.E (L : Set B.A) = ⊤)
+    : ∃ m : ℕ, ∀ n, m ≤ n → ∀ y : B.A, IsIntegral K.O y → algebraMap K.O B.A a ^ n * y ∈ L := by
   classical
   have hnd := traceForm_nondegenerate B hP
   let b0 := Module.finBasis K.E B.A
@@ -110,12 +122,15 @@ theorem integral_sub (hP : B.P.Separable) (a : K.O) (ha : a ∈ IsLocalRing.maxi
   rw [← ho i, algebraMap_smul, mul_smul_comm]
   exact L.smul_mem _ (hk i n ((Finset.le_sup (Finset.mem_univ i)).trans hn))
 
-theorem sub_integral (a : K.O) (ha : a ∈ IsLocalRing.maximalIdeal K.O) (L : Submodule K.O B.A) (hL : L.FG) :
-    ∃ m : ℕ, ∀ n, m ≤ n → ∀ y ∈ L, IsIntegral K.O (algebraMap K.O B.A a ^ n * y) := by
+theorem sub_integral
+    (a : K.O) (ha : a ∈ IsLocalRing.maximalIdeal K.O) (L : Submodule K.O B.A) (hL : L.FG)
+    : ∃ m : ℕ, ∀ n, m ≤ n → ∀ y ∈ L, IsIntegral K.O (algebraMap K.O B.A a ^ n * y) := by
   classical
   obtain ⟨s, hs⟩ := hL
-  have hk : ∀ x : B.A, ∃ k : ℕ, ∀ n, k ≤ n →
-      algebraMap K.O B.A a ^ n * x ∈ Subalgebra.toSubmodule (integralClosure K.O B.A) := by
+  have hk
+      : ∀ x : B.A, ∃ k : ℕ, ∀ n,
+        k ≤ n
+          → algebraMap K.O B.A a ^ n * x ∈ Subalgebra.toSubmodule (integralClosure K.O B.A) := by
     intro x
     obtain ⟨d, hd, hi⟩ := exists_smul_isIntegral B x
     exact eventually_pow_mul_mem a ha _ x d hd hi
@@ -132,10 +147,17 @@ end GlobalTheory.UnitLemma.Sandwich
 
 namespace GlobalTheory.UnitLemma
 
-theorem lattice_sandwich : ∀ (K : UQ) (B : InvAlg K), B.LieReg → ∀ a : K.O, K.Small a →
-    ∀ L : Submodule K.O B.A, IsLat K.O K.E L → ∃ m : ℕ, ∀ n : ℕ, m ≤ n →
-      (∀ y : B.A, IsIntegral K.O y → algebraMap K.O B.A a ^ n * y ∈ L) ∧
-        ∀ y ∈ L, IsIntegral K.O (algebraMap K.O B.A a ^ n * y) := by
+theorem lattice_sandwich
+    : ∀ (K : UQ) (B : InvAlg K),
+      B.LieReg
+        → ∀ a : K.O,
+          K.Small a
+            → ∀ L : Submodule K.O B.A,
+              IsLat K.O K.E L
+                → ∃ m : ℕ, ∀ n : ℕ,
+                  m ≤ n
+                    → (∀ y : B.A, IsIntegral K.O y → algebraMap K.O B.A a ^ n * y ∈ L)
+                      ∧ ∀ y ∈ L, IsIntegral K.O (algebraMap K.O B.A a ^ n * y) := by
   intro K B hB a ha L hL
   obtain ⟨m₁, h₁⟩ := Sandwich.integral_sub B hB.2 a ha.2.1 L hL.2
   obtain ⟨m₂, h₂⟩ := Sandwich.sub_integral B a ha.2.1 L hL.1

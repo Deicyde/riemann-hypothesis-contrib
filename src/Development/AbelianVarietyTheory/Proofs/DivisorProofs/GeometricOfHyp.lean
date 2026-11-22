@@ -61,7 +61,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DividedWeigh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.CovHt
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.BigTop GlobalTheory.CovHt
 
 set_option autoImplicit false
 set_option synthInstance.maxHeartbeats 400000
@@ -70,7 +73,8 @@ noncomputable section
 
 namespace GlobalTheory.CovHt.GeomBound
 
-theorem strictAnti_of_step {N : ℕ} {f : Fin N → ℤ} (h : ∀ a b : Fin N, (b : ℕ) = a + 1 → f b < f a) : StrictAnti f := by
+theorem strictAnti_of_step {N : ℕ} {f : Fin N → ℤ} (h : ∀ a b : Fin N, (b : ℕ) = a + 1 → f b < f a)
+    : StrictAnti f := by
   rintro ⟨a, ha⟩ ⟨b, hb⟩ hab
   simp only [Fin.mk_lt_mk] at hab
   induction b with
@@ -83,13 +87,19 @@ theorem strictAnti_of_step {N : ℕ} {f : Fin N → ℤ} (h : ∀ a b : Fin N, (
 
 section Point
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
 
-theorem quo_gaps {PP A M : ℝ} (hN : HostNum D L PP A M) (hw : WtNum p i PP) (hi : (i : ℕ) + 1 < D.R.m)
-    (u1 : AllWt.Weight (dat p i)) (hu : Quo p i PP u1) :
-    ∀ τ (a b : Fin ((dat p i).p + (dat p i).q)), (b : ℕ) = a + 1 →
-      (((dimFlag (dat p i) + 3) ^ 2 + 2 * ((dat p i).p + (dat p i).q) : ℕ) : ℤ) ≤ u1 τ a - u1 τ b := by
+theorem quo_gaps
+    {PP A M : ℝ} (hN : HostNum D L PP A M) (hw : WtNum p i PP)
+    (hi : (i : ℕ) + 1 < D.R.m)
+    (u1 : AllWt.Weight (dat p i)) (hu : Quo p i PP u1)
+    : ∀ τ (a b : Fin ((dat p i).p + (dat p i).q)),
+      (b : ℕ) = a + 1
+        → (((dimFlag (dat p i) + 3) ^ 2 + 2 * ((dat p i).p + (dat p i).q) : ℕ) : ℤ)
+          ≤ u1 τ a - u1 τ b := by
   obtain ⟨hsig1, hsig2, hsigr⟩ := hw.sig
   obtain ⟨h0, S, eta, -, -, -, h4T, -, hHyp⟩ := hw.hyp hi
   have hdiv := (quo_iff p i PP h0 S eta u1).1 hu
@@ -113,15 +123,20 @@ theorem quo_gaps {PP A M : ℝ} (hN : HostNum D L PP A M) (hw : WtNum p i PP) (h
     linarith
   have hPP : (4 : ℝ) ≤ PP := hz.trans ((le_self_pow₀ (by linarith) (by norm_num)).trans hN.ppLow)
   have hT : 16 * dimFlag (dat p i) ^ 2 ≤ lenT p i PP := by
-    have h1 : (16 * dimFlag (dat p i) ^ 2 : ℝ) ≤ PP ^ 2 * (dimFlag (dat p i) : ℝ) ^ 2 * (D.R.k : ℝ) / (D.R.m : ℝ) := by
+    have h1
+        : (16 * dimFlag (dat p i) ^ 2 : ℝ)
+          ≤ PP ^ 2 * (dimFlag (dat p i) : ℝ) ^ 2 * (D.R.k : ℝ) / (D.R.m : ℝ) := by
       have c3 : (0 : ℝ) < D.R.m := by exact_mod_cast (by omega : 0 < D.R.m)
       have c4 : (D.R.m : ℝ) ≤ D.R.k := by exact_mod_cast (by omega : D.R.m ≤ D.R.k)
       have c5 : (16 : ℝ) ≤ PP ^ 2 := by nlinarith
       rw [le_div_iff₀ c3]
       have c6 : (0 : ℝ) ≤ (dimFlag (dat p i) : ℝ) ^ 2 := by positivity
-      calc (16 * (dimFlag (dat p i) : ℝ) ^ 2) * D.R.m ≤ (PP ^ 2 * (dimFlag (dat p i) : ℝ) ^ 2) * D.R.m :=
-            mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right c5 c6) c3.le
-        _ ≤ PP ^ 2 * (dimFlag (dat p i) : ℝ) ^ 2 * D.R.k := mul_le_mul_of_nonneg_left c4 (by positivity)
+      calc
+        (16 * (dimFlag (dat p i) : ℝ) ^ 2) * D.R.m
+            ≤ (PP ^ 2 * (dimFlag (dat p i) : ℝ) ^ 2) * D.R.m :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right c5 c6) c3.le
+        _ ≤ PP ^ 2 * (dimFlag (dat p i) : ℝ) ^ 2 * D.R.k :=
+          mul_le_mul_of_nonneg_left c4 (by positivity)
     have h2 := h1.trans (Nat.le_ceil _)
     unfold lenT
     exact_mod_cast h2

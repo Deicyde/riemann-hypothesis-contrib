@@ -7,11 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Explic
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem szRow_Del_TO_gap : SzRow (fun C D L => ((((TOv L.sc : ℕ) : ℝ)) ^ 2 ≤ ((D.s.Del : ℚ) : ℝ)) ∧ ((((TOv L.sc : ℕ) : ℝ) + (D.R.f * D.R.r.choose 2 : ℕ) + 2) * (((TOv L.sc : ℕ) : ℝ) + (D.R.f * D.R.r.choose 2 : ℕ) + 2 + 2 * (D.R.N D.R.m : ℝ)) ≤ ((D.s.Del : ℚ) : ℝ))) := by
+theorem szRow_Del_TO_gap
+    : SzRow (fun C D L =>
+      ((((TOv L.sc : ℕ) : ℝ)) ^ 2 ≤ ((D.s.Del : ℚ) : ℝ))
+        ∧ ((((TOv L.sc : ℕ) : ℝ) + (D.R.f * D.R.r.choose 2 : ℕ) + 2)
+            * (((TOv L.sc : ℕ) : ℝ) + (D.R.f * D.R.r.choose 2 : ℕ) + 2 + 2 * (D.R.N D.R.m : ℝ))
+          ≤ ((D.s.Del : ℚ) : ℝ))) := by
   intro eps he he' C _
   obtain ⟨x0, hx0⟩ := GlobalTheory.T.explicitRanks_basic_bounds_large_scale eps he he'
   refine ⟨805, fun cD hcD => ⟨0, fun ch _ => ⟨max x0 35, fun D L hs hx hV => ?_⟩⟩⟩
@@ -45,8 +51,9 @@ theorem szRow_Del_TO_gap : SzRow (fun C D L => ((((TOv L.sc : ℕ) : ℝ)) ^ 2 �
   · have : ((TOv L.sc : ℕ) : ℝ) ^ 2 ≤ (2 * y) ^ 2 := pow_le_pow_left₀ hT0 (by linarith) 2
     nlinarith
   · refine le_trans ?_ hDel
-    calc _ ≤ (5 * y) * (7 * y) :=
-          mul_le_mul (by linarith) (by linarith) (by positivity) (by positivity)
+    calc
+      _ ≤ (5 * y) * (7 * y) :=
+        mul_le_mul (by linarith) (by linarith) (by positivity) (by positivity)
       _ = 35 * y ^ 2 := by ring
 
 end GlobalTheory.EX

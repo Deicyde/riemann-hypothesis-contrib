@@ -11,12 +11,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 namespace UpperTheory.V.Ws
 
-private theorem lc_ker {H M : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [Group M]
-    (φ : H →* M) (h : IsOpen (φ.ker : Set H)) : IsLocallyConstant φ := by
+private theorem lc_ker
+    {H M : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [Group M]
+    (φ : H →* M) (h : IsOpen (φ.ker : Set H))
+    : IsLocallyConstant φ := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   have ho : IsOpen ((fun y => x⁻¹ * y) ⁻¹' (φ.ker : Set H)) := h.preimage (by fun_prop)
@@ -25,11 +29,16 @@ private theorem lc_ker {H M : Type} [Group H] [TopologicalSpace H] [IsTopologica
   rw [map_mul, map_inv, inv_mul_eq_one] at this
   exact this.symm
 
-private theorem fin_chars (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
-    [hl : Fact l.Prime] (N : ℕ) (hN : N ≠ 0) (K H : Subgroup (G F Ω)) (hK : IsOpen (K : Set (G F Ω)))
-    (hH : IsOpen (H : Set (G F Ω))) (M : Subgroup (G F Ω))
-    (hM : ∀ A : ValuationSubring Ω, ¬ A.valuation (N : Ω) < 1 → ∀ g ∈ Ine (F := F) A, g ∈ K → g ∈ M) :
-    Finite {φ : H →* Multiplicative (ZMod l) // IsOpen (φ.ker : Set H) ∧ ∀ g : H, (g : G F Ω) ∈ M → φ g = 1} := by
+private theorem fin_chars
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (l : ℕ) [hl : Fact l.Prime]
+    (N : ℕ) (hN : N ≠ 0)
+    (K H : Subgroup (G F Ω)) (hK : IsOpen (K : Set (G F Ω))) (hH : IsOpen (H : Set (G F Ω)))
+    (M : Subgroup (G F Ω))
+    (hM : ∀ A : ValuationSubring Ω, ¬ A.valuation (N : Ω) < 1 → ∀ g ∈ Ine (F := F) A, g ∈ K → g ∈ M)
+    : Finite
+      {φ : H →* Multiplicative (ZMod l)
+        // IsOpen (φ.ker : Set H) ∧ ∀ g : H, (g : G F Ω) ∈ M → φ g = 1} := by
   haveI : IsGalois F Ω := {}
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
@@ -58,13 +67,23 @@ private theorem fin_chars (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Al
     have h2 : V.subgroupOf H ≤ e.range := fun x hx => ⟨Kum.toGal E hgal ⟨x, hx⟩, Subtype.ext rfl⟩
     haveI := Subgroup.finiteIndex_of_le h2
     infer_instance
-  refine Finite.of_injective (β := {φ : G E Ω → ZMod l | IsLocallyConstant φ ∧ (∀ a b, φ (a * b) = φ a + φ b) ∧
-      ∀ A : ValuationSubring Ω, ¬ A.valuation (N : Ω) < 1 → ∀ g ∈ Ine (F := E) A, φ g = 0} ×
-      (H ⧸ e.range → Multiplicative (ZMod l)))
-    (fun φ => (⟨fun g => Multiplicative.toAdd (φ.1 (e g)), ((lc_ker φ.1 φ.2.1).comp_continuous he).comp _,
-      fun a b => by simp only [map_mul, toAdd_mul], fun A hA g hg => by
-        show Multiplicative.toAdd (φ.1 (e g)) = 0
-        rw [φ.2.2 (e g) (hM A hA _ ⟨hg.1, hg.2⟩ (hmem g).1.2), toAdd_one]⟩, fun q => φ.1 q.out)) ?_
+  refine Finite.of_injective
+    (β :=
+      {φ : G E Ω → ZMod l | IsLocallyConstant φ ∧ (∀ a b, φ (a * b) = φ a + φ b) ∧
+          ∀ A : ValuationSubring Ω, ¬ A.valuation (N : Ω) < 1 → ∀ g ∈ Ine (F := E) A, φ g = 0}
+        × (H ⧸ e.range → Multiplicative (ZMod l)))
+    (fun φ => (
+      ⟨
+        fun g => Multiplicative.toAdd (φ.1 (e g)),
+        ((lc_ker φ.1 φ.2.1).comp_continuous he).comp _,
+        fun a b => by simp only [map_mul, toAdd_mul],
+        fun A hA g hg => by
+          show Multiplicative.toAdd (φ.1 (e g)) = 0
+          rw [φ.2.2 (e g) (hM A hA _ ⟨hg.1, hg.2⟩ (hmem g).1.2), toAdd_one]
+      ⟩,
+      fun q => φ.1 q.out
+    ))
+    ?_
   intro φ ψ h
   have h1 : ∀ g, φ.1 (e g) = ψ.1 (e g) := fun g =>
     Multiplicative.toAdd.injective (congrFun (congrArg Subtype.val (congrArg Prod.fst h)) g)
@@ -80,11 +99,11 @@ private theorem l_mem {l : ℕ} [Fact l.Prime] (c : Coef l) : (l : c.O) ∈ maxi
   rwa [hval, Ne, IsDiscreteValuationRing.addVal_eq_zero_iff] at h0
 
 private theorem char_res {l : ℕ} [hl : Fact l.Prime] (c : Coef l) : CharP (ResidueField c.O) l :=
-  (CharP.charP_iff_prime_eq_zero hl.out).2 (by
-    rw [← map_natCast (residue c.O), residue_eq_zero_iff]; exact l_mem c)
+  (CharP.charP_iff_prime_eq_zero hl.out).2
+    (by rw [← map_natCast (residue c.O), residue_eq_zero_iff]; exact l_mem c)
 
-private theorem inc_max {l : ℕ} [Fact l.Prime] {c c' : Coef l} (h : c.O ≤ c'.O) :
-    ∀ x ∈ maximalIdeal c.O, inc h x ∈ maximalIdeal c'.O := by
+private theorem inc_max {l : ℕ} [Fact l.Prime] {c c' : Coef l} (h : c.O ≤ c'.O)
+    : ∀ x ∈ maximalIdeal c.O, inc h x ∈ maximalIdeal c'.O := by
   letI : Algebra c.O c'.O := (inc h).toAlgebra
   haveI : IsScalarTower ℤ_[l] c.O c'.O := IsScalarTower.of_algebraMap_eq fun x => rfl
   haveI : Module.Finite ℤ_[l] c'.O := inferInstance
@@ -94,12 +113,21 @@ private theorem inc_max {l : ℕ} [Fact l.Prime] {c c' : Coef l} (h : c.O ≤ c'
   haveI : IsLocalHom (algebraMap c.O c'.O) := Algebra.IsIntegral.isLocalHom _ _
   exact fun x hx => map_nonunit (algebraMap c.O c'.O) x hx
 
-variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [hl : Fact l.Prime] {c : Coef l} {D : Raw Ω c}
+variable
+  {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+  {l : ℕ} [hl : Fact l.Prime]
+  {c : Coef l} {D : Raw Ω c}
 
-private theorem cont_resQ (T : Tower D) : Continuous (resQ T.F) := (Base.galEmbTop ℚ T.F Ω).1.continuous
+private theorem cont_resQ (T : Tower D) : Continuous (resQ T.F) :=
+  (Base.galEmbTop ℚ T.F Ω).1.continuous
 
-private theorem ok_of (hD : D.Good) (T : Tower D) (hT : T.Ok) (W : Finset ℕ) (k : Type) [Field k] (a : c.O →+* k)
-    (ha : ∀ x ∈ maximalIdeal c.O, a x = 0) : (T.fr W).Ok a := by
+private theorem ok_of
+    (hD : D.Good)
+    (T : Tower D) (hT : T.Ok)
+    (W : Finset ℕ)
+    (k : Type) [Field k]
+    (a : c.O →+* k) (ha : ∀ x ∈ maximalIdeal c.O, a x = 0)
+    : (T.fr W).Ok a := by
   obtain ⟨-, -, -, -, -, f6, -, -, -, -, f11, -⟩ := facts D hD
   let j : ResidueField c.O →+* k := Ideal.Quotient.lift _ a ha
   have hj : ∀ x, a x = j (residue c.O x) := fun _ => rfl
@@ -119,16 +147,24 @@ private theorem ok_of (hD : D.Good) (T : Tower D) (hT : T.Ok) (W : Finset ℕ) (
     exact congrArg j h1
   · rw [hj, hj, ← map_sub]
     exact (IsUnit.mk0 _ (sub_ne_zero.2 (hT.dist i i' hi))).map j
-  · have h2 : (2 : ResidueField c.O) ≠ 0 := fun h => hD.l_odd
-      ((Nat.prime_dvd_prime_iff_eq hl.out Nat.prime_two).1 ((CharP.cast_eq_zero_iff (ResidueField c.O) l 2).1 (by exact_mod_cast h)))
+  · have h2 : (2 : ResidueField c.O) ≠ 0 := fun h =>
+      hD.l_odd ((Nat.prime_dvd_prime_iff_eq hl.out Nat.prime_two).1
+        ((CharP.cast_eq_zero_iff (ResidueField c.O) l 2).1 (by exact_mod_cast h)))
     simpa only [map_ofNat] using (IsUnit.mk0 _ h2).map j
   · exact ((f11 (lab T.pr i) 1).comp_continuous (cont_resQ T)).comp
       (Ideal.Quotient.lift _ a fun x hx => ha x (by rwa [pow_one] at hx))
 
 end UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.std :
-    CohomologyHyp → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D), T.Fit → ∀ (W : Finset ℕ) (c' : Coef l) (h : c.O ≤ c'.O), (0 ∉ W → (T.fr W).Std l (inc h)) ∧ ∀ (k : Type) [Field k] (a : c.O →+* k), (∀ x ∈ maximalIdeal c.O, a x = 0) → (T.fr W).Ok a := by
+theorem UpperTheory.V.Ws.std
+    : CohomologyHyp
+      → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+          (D : Raw Ω c) (T : Tower D),
+        T.Fit
+          → ∀ (W : Finset ℕ) (c' : Coef l) (h : c.O ≤ c'.O),
+            (0 ∉ W → (T.fr W).Std l (inc h))
+              ∧ ∀ (k : Type) [Field k] (a : c.O →+* k),
+                (∀ x ∈ maximalIdeal c.O, a x = 0) → (T.fr W).Ok a := by
   intro hP Ω _ _ _ l hl c D T hT W c' h
   have hD : D.Good := hT.2.elim (fun x => x.1.1) fun x => x.1.1
   refine ⟨fun hW => ?_, ok_of hD T hT.1 W⟩
@@ -138,7 +174,8 @@ theorem UpperTheory.V.Ws.std :
   have ok : (T.fr W).Ok ((residue c'.O).comp (inc h)) :=
     ok_of hD T hT.1 W _ _ fun x hx => (residue_eq_zero_iff _).2 (inc_max h x hx)
   haveI := char_res c'
-  refine ⟨ok, char_res c', fun i n => ?_, fun H hH _ => ?_, fun v => isClosed_Dec _, fun v => ?_, ?_⟩
+  refine
+    ⟨ok, char_res c', fun i n => ?_, fun H hH _ => ?_, fun v => isClosed_Dec _, fun v => ?_, ?_⟩
   · exact ((f11 (lab T.pr i) n).comp_continuous (cont_resQ T)).comp
       (Ideal.quotientMap (maximalIdeal c'.O ^ n) (inc h)
         ((Ideal.pow_right_mono (fun x hx => inc_max h x hx) n).trans (Ideal.le_comap_pow _ n)))
@@ -147,10 +184,12 @@ theorem UpperTheory.V.Ws.std :
     · rcases Finset.mem_insert.1 hp with rfl | hp
       · exact hl.out.ne_zero
       · exact fun e => hW (e ▸ hp)
-    · refine Subgroup.le_topologicalClosure _ (Subgroup.subset_normalClosure ⟨A, fun p hp hpA => hA ?_, hg, hg'⟩)
+    · refine Subgroup.le_topologicalClosure _
+        (Subgroup.subset_normalClosure ⟨A, fun p hp hpA => hA ?_, hg, hg'⟩)
       obtain ⟨m, hm⟩ := Finset.dvd_prod_of_mem (fun p : ℕ => p) hp
       rw [hm, Nat.cast_mul, map_mul]
-      exact lt_of_le_of_lt (mul_le_of_le_one_right' ((A.valuation_le_one_iff _).2 (natCast_mem A m))) hpA
+      exact lt_of_le_of_lt
+        (mul_le_of_le_one_right' ((A.valuation_le_one_iff _).2 (natCast_mem A m))) hpA
   · have hA : T.pl v ≠ ⊤ := fun e => by
       have h1 := T.ovl v
       have h0 : (l : Ω) ≠ 0 := Nat.cast_ne_zero.2 hl.out.ne_zero
@@ -161,14 +200,17 @@ theorem UpperTheory.V.Ws.std :
     exact Pa.phiDec hP.loc.lf l T.F Ω _ w hw
   · rintro v s ⟨hs, m, hm⟩
     refine ⟨hs, fun i => ?_⟩
-    let γ : G T.F Ω →* (ResidueField c'.O)ˣ := (Units.map ((residue c'.O).comp (inc h)).toMonoidHom).comp ((T.fr W).χ i)
+    let γ : G T.F Ω →* (ResidueField c'.O)ˣ :=
+      (Units.map ((residue c'.O).comp (inc h)).toMonoidHom).comp ((T.fr W).χ i)
     have ho : IsClosed (γ.ker : Set (G T.F Ω)) := by
       have e : (γ.ker : Set (G T.F Ω)) = {g | ((residue c'.O).comp (inc h)) ((T.fr W).χ i g) = 1} :=
         Set.ext fun g => Units.ext_iff
       rw [e]
       exact (ok.lc i).isClosed_fiber 1
-    have h1 : γ (s ^ l ^ m) = 1 := Subgroup.topologicalClosure_minimal _
-      ((Subgroup.commutator_mono le_top le_top).trans (Abelianization.commutator_subset_ker γ)) ho hm
+    have h1 : γ (s ^ l ^ m) = 1 :=
+      Subgroup.topologicalClosure_minimal _
+        ((Subgroup.commutator_mono le_top le_top).trans (Abelianization.commutator_subset_ker γ)) ho
+        hm
     rw [map_pow] at h1
     have h2 : ((γ s : ResidueField c'.O) - 1) ^ l ^ m = 0 := by
       rw [sub_pow_char_pow, one_pow, ← Units.val_pow_eq_pow_val, h1, Units.val_one, sub_self]

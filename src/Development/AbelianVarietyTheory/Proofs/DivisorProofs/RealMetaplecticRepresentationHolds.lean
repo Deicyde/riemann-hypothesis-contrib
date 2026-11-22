@@ -6,5 +6,6 @@ public import CompanionTheory.ThickeningEstimates.LieGroupReduction.MetaplecticR
 
 @[expose] public section
 
-theorem GlobalTheory.Published.realMetaplecticRepresentation_holds : GlobalTheory.Published.RealMetaplecticRepresentation :=
+theorem GlobalTheory.Published.realMetaplecticRepresentation_holds
+    : GlobalTheory.Published.RealMetaplecticRepresentation :=
   CompanionTheory.ThKR.realMetaplecticRepresentation_holds

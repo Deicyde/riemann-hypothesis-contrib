@@ -11,19 +11,30 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsLoc
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
 
 namespace GlobalTheory.RowLocal
 
-
 open Formalism.IndefR.principalLevelFrame in
-theorem finTyp_fixed_finiteDimensional : ∀ (D : D7) (rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r) (j : ℕ) (X : RowMod D rep j) (σ : D.what₂.FT), Formalism.IndefR.principalLevelFrame.isotIn (D := D) X.ρ X.C (rep σ) ≠ ⊥ → ∀ N : ℕ, 0 < N → FiniteDimensional ℂ ↥(Submodule.span ℂ {f | f ∈ (rep σ).S ∧ ∀ κ, NG.Cong D.host.E D.R.r N κ → NG.rt D.host.E D.R.r κ f = f}) := by
+theorem finTyp_fixed_finiteDimensional
+    : ∀ (D : D7) (rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r) (j : ℕ) (X : RowMod D rep j)
+        (σ : D.what₂.FT),
+      Formalism.IndefR.principalLevelFrame.isotIn (D := D) X.ρ X.C (rep σ) ≠ ⊥
+        → ∀ N : ℕ,
+          0 < N
+            → FiniteDimensional ℂ
+              ↥(Submodule.span ℂ
+                {f | f ∈ (rep σ).S ∧ ∀ κ, NG.Cong D.host.E D.R.r N κ → NG.rt D.host.E D.R.r κ f = f}) := by
   intro D rep j X σ hne N hN
-  obtain ⟨Φ, ⟨hΦe, hΦC⟩, hΦne⟩ : ∃ Φ : (rep σ).S →ₗ[ℂ] X.A,
-      (IsEqvA X.ρ (rep σ) Φ ∧ LinearMap.range Φ ≤ X.C) ∧ LinearMap.range Φ ≠ ⊥ := by
+  obtain ⟨Φ, ⟨hΦe, hΦC⟩, hΦne⟩
+      : ∃ Φ : (rep σ).S →ₗ[ℂ] X.A,
+        (IsEqvA X.ρ (rep σ) Φ ∧ LinearMap.range Φ ≤ X.C) ∧ LinearMap.range Φ ≠ ⊥ := by
     by_contra hcon
     push Not at hcon
     apply hne
@@ -81,7 +92,8 @@ theorem finTyp_fixed_finiteDimensional : ∀ (D : D7) (rep : D.what₂.FT → NG
   let g : F →ₗ[ℂ] T := LinearMap.codRestrict T (Φ ∘ₗ Submodule.inclusion hFS) (fun f => hFT f f.2)
   have hg : Function.Injective g := by
     intro a b hab
-    have h1 : Φ (Submodule.inclusion hFS a) = Φ (Submodule.inclusion hFS b) := congrArg Subtype.val hab
+    have h1 : Φ (Submodule.inclusion hFS a) = Φ (Submodule.inclusion hFS b) :=
+      congrArg Subtype.val hab
     exact Submodule.inclusion_injective hFS (hinj h1)
   exact Module.Finite.of_injective g hg
 
@@ -92,17 +104,26 @@ namespace GlobalTheory.RowLocal
 section Asm
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-theorem isLocS_of_irr (π : NG.FinTyp L n) (s : SplitPlace L) (W : Submodule ℂ (GAf L n → ℂ)) (hWS : W ≤ π.S)
+theorem isLocS_of_irr
+    (π : NG.FinTyp L n) (s : SplitPlace L) (W : Submodule ℂ (GAf L n → ℂ)) (hWS : W ≤ π.S)
     (hW0 : W ≠ ⊥) (hst : ∀ x : GAf L n, TrivOutside {s.v} x → ∀ f ∈ W, NG.rt L n x f ∈ W)
-    (hirr : ∀ W' : Submodule ℂ (GAf L n → ℂ), W' ≤ W →
-      (∀ x : GAf L n, TrivOutside {s.v} x → ∀ f ∈ W', NG.rt L n x f ∈ W') → W' = ⊥ ∨ W' = W) :
-    ∃ τ, IsLocS π.S s τ := by
+    (hirr : ∀ W' : Submodule ℂ (GAf L n → ℂ),
+      W' ≤ W → (∀ x : GAf L n, TrivOutside {s.v} x → ∀ f ∈ W', NG.rt L n x f ∈ W')
+        → W' = ⊥ ∨ W' = W)
+    : ∃ τ, IsLocS π.S s τ := by
   first
   | exact @_root_.GlobalTheory.blockFieldPairProjections.exists_local_component
   | exact _root_.GlobalTheory.blockFieldPairProjections.exists_local_component
   | (apply _root_.GlobalTheory.blockFieldPairProjections.exists_local_component <;> assumption)
-  | (intros; apply _root_.GlobalTheory.blockFieldPairProjections.exists_local_component <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.blockFieldPairProjections.exists_local_component <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.blockFieldPairProjections.exists_local_component <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.blockFieldPairProjections.exists_local_component
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.blockFieldPairProjections.exists_local_component ..)
 
 end Asm
@@ -110,7 +131,10 @@ end GlobalTheory.RowLocal
 
 namespace GlobalTheory.RowLocal
 
-theorem finTyp_exists_isLocS : ∀ (D : D7) (rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r) (j : ℕ) (_ : RowMod D rep j) (σ : D.what₂.FT), D.what₂.isot j σ ≠ ⊥ → ∀ s : SplitPlace D.host.E, ∃ τ, IsLocS (rep σ).S s τ := by
+theorem finTyp_exists_isLocS
+    : ∀ (D : D7) (rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r) (j : ℕ) (_ : RowMod D rep j)
+        (σ : D.what₂.FT),
+      D.what₂.isot j σ ≠ ⊥ → ∀ s : SplitPlace D.host.E, ∃ τ, IsLocS (rep σ).S s τ := by
   intro D rep j X σ hσ s
   have hB00 : X.B 0 0 = 0 := by
     have h := X.lin 0 X.C.zero_mem 0 X.C.zero_mem 0 X.C.zero_mem 1
@@ -125,9 +149,12 @@ theorem finTyp_exists_isLocS : ∀ (D : D7) (rep : D.what₂.FT → NG.FinTyp D.
     have h := X.φ_inner y y
     rw [hmem, hB00] at h
     exact inner_self_eq_zero.1 h
-  obtain ⟨B', hlin, hherm, hpos, hinv⟩ := GlobalTheory.finTyp_invariant_form_of_isotIn D D.R.r X.A X.ρ X.C X.B X.lin X.herm X.pos
-    X.stab X.inv (rep σ) hne
-  obtain ⟨W, hWS, hW0, hst, hirr⟩ := GlobalTheory.T.exists_irreducible_subspace_trivialOutside_splitPlace D.host.E D.R.r (rep σ) B' hlin hherm hpos hinv (finTyp_fixed_finiteDimensional D rep j X σ hne) s
+  obtain ⟨B', hlin, hherm, hpos, hinv⟩ :=
+    GlobalTheory.finTyp_invariant_form_of_isotIn D D.R.r X.A X.ρ X.C X.B X.lin X.herm X.pos X.stab
+      X.inv (rep σ) hne
+  obtain ⟨W, hWS, hW0, hst, hirr⟩ :=
+    GlobalTheory.T.exists_irreducible_subspace_trivialOutside_splitPlace D.host.E D.R.r (rep σ) B'
+      hlin hherm hpos hinv (finTyp_fixed_finiteDimensional D rep j X σ hne) s
   exact isLocS_of_irr (rep σ) s W hWS hW0 hst hirr
 
 end GlobalTheory.RowLocal

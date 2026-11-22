@@ -14,9 +14,11 @@ namespace Formalism.L2.SG.RealObj.SpanPreservation
 
 open Formalism.L2.SG.HidaSetting
 
-theorem span_pres {n r : ℕ} (e : Fin r → Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
-    (hg : ∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1) {y : Fin n → ℂ} (hy : y ∈ spanLt e r) :
-    g *ᵥ y ∈ spanLt e r := by
+theorem span_pres
+    {n r : ℕ} (e : Fin r → Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
+    (hg : ∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1)
+    {y : Fin n → ℂ} (hy : y ∈ spanLt e r)
+    : g *ᵥ y ∈ spanLt e r := by
   have hmono : ∀ a : Fin r, spanLt e a.1 ≤ spanLt e r := fun a =>
     Submodule.span_mono (Set.image_mono fun b (hb : b.1 < a.1) => lt_trans hb a.2)
   have hgen : ∀ a : Fin r, g *ᵥ e a ∈ spanLt e r := by
@@ -31,8 +33,10 @@ theorem span_pres {n r : ℕ} (e : Fin r → Fin n → ℂ) (g : Matrix (Fin n) 
   | add a b _ _ ha hb => rw [Matrix.mulVec_add]; exact add_mem ha hb
   | smul c a _ ha => rw [Matrix.mulVec_smul]; exact Submodule.smul_mem _ _ ha
 
-theorem inN_inv {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g gi : Matrix (Fin n) (Fin n) ℂ)
-    (h1 : gi * g = 1) (hg : InN ε e z g) : InN ε e z gi := by
+theorem inN_inv
+    {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+    (g gi : Matrix (Fin n) (Fin n) ℂ) (h1 : gi * g = 1) (hg : InN ε e z g)
+    : InN ε e z gi := by
   have hS : InS e z gi := Formalism.L2.SG.RealObj.InfCut.inS_inv e z g gi h1 hg.1
   refine ⟨hS, fun y hy => ?_⟩
   have key : (gi - 1) *ᵥ y = -(gi *ᵥ ((g - 1) *ᵥ y)) := by
@@ -42,7 +46,9 @@ theorem inN_inv {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) 
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 
-theorem ninfU_inv (u : D.what₂.Word) {s : X.B.I.Ginf} (hs : s ∈ X.NinfU u) : s⁻¹ ∈ X.NinfU u := fun v =>
-  inN_inv _ _ _ (uMat (s v)) (uMat (s⁻¹ v)) (Formalism.L2.SG.RealObj.InfCut.uMat_inv_mul' (s v)) (hs v)
+theorem ninfU_inv (u : D.what₂.Word) {s : X.B.I.Ginf} (hs : s ∈ X.NinfU u)
+    : s⁻¹ ∈ X.NinfU u := fun v =>
+  inN_inv _ _ _ (uMat (s v)) (uMat (s⁻¹ v)) (Formalism.L2.SG.RealObj.InfCut.uMat_inv_mul' (s v))
+    (hs v)
 
 end Formalism.L2.SG.RealObj.SpanPreservation

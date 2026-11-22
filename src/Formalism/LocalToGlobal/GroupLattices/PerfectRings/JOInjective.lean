@@ -53,12 +53,13 @@ theorem sq_OO [NeZero n] (hp2 : p ≠ 2) (z : ℤ) : ∃ y : OO p n, y ^ 2 = (z 
   push_cast
   rfl
 
-theorem settingStd (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n) :
-    UnramifiedQuadraticSetting p n (WQ p n) (QQ p n) (OO p n) (KO p n) (iota p n) (sig p n) (jO p n) (wU p n) := by
+theorem settingStd (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n)
+    : UnramifiedQuadraticSetting p n (WQ p n) (QQ p n) (OO p n) (KO p n) (iota p n) (sig p n)
+      (jO p n) (wU p n) := by
   have : NeZero n := ⟨by omega⟩
   refine ⟨?_, GatR.om_irreducible (WittVector.irreducible p), ?_, sq_OO p n (by omega)⟩
-  · exact
-    { prime := hp.out
+  · exact {
+      prime := hp.out
       five_le := h5
       two_le := h2
       even := he
@@ -74,11 +75,12 @@ theorem settingStd (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n) :
       ι_comp := fun x => IsFractionRing.lift_algebraMap (inj_WK p n) x
       finite := (Quad.algebraMap_finite _).comp (jW_finite p n)
       complete_O := GatR.isAdicComplete (WittVector.irreducible p) inferInstance
-      w_sq := wU_sq p n }
+      w_sq := wU_sq p n
+    }
   · exact (Quad.card_res _).trans (card_quotient_extRing p n)
 
-theorem setting (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n) :
-    HidaSetting p n (WQ p n) (QQ p n) (OO p n) (KO p n) (iota p n) (sig p n) (jO p n) (wU p n) :=
+theorem setting (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n)
+    : HidaSetting p n (WQ p n) (QQ p n) (OO p n) (KO p n) (iota p n) (sig p n) (jO p n) (wU p n) :=
   (settingStd p n h5 h2 he).1
 
 end Formalism.L2.G

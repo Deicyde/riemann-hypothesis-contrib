@@ -12,9 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Exi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
@@ -33,46 +36,60 @@ def epsUnit (a : k) : (DualNumber k)ˣ where
 theorem epsUnit_add (a b : k) : epsUnit (a + b) = epsUnit a * epsUnit b := by
   ext <;> simp [epsUnit, add_comm]
 
-theorem natur {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (x : R) :
-    (spMap f).appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom x) =
-      (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom (f x) := by
+theorem natur {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (x : R)
+    : (spMap f).appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom x)
+      = (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom (f x) := by
   have := Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom f)
   exact (congrArg (fun g => g.hom x) this).symm
 
 noncomputable def phi (l : X →+ k) : Multiplicative X →* Γ((epsPt (𝟙 (Sp k))).left, ⊤)ˣ :=
-  (Units.map (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).inv.hom.toMonoidHom).comp
-    { toFun := fun χ => epsUnit (l χ.toAdd)
-      map_one' := by ext <;> simp [epsUnit]
-      map_mul' := fun a b => by rw [toAdd_mul, map_add (f := _), epsUnit_add] }
+  (Units.map (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).inv.hom.toMonoidHom).comp {
+    toFun := fun χ => epsUnit (l χ.toAdd)
+    map_one' := by ext <;> simp [epsUnit]
+    map_mul' := fun a b => by rw [toAdd_mul, map_add (f := _), epsUnit_add]
+  }
 
 noncomputable def tanPt (l : X →+ k) : epsPt (𝟙 (Sp k)) ⟶ splitTorus (Sp k) X :=
   (splitTorusPointsEquiv (Sp k) X (epsPt (𝟙 (Sp k)))).symm (phi l)
 
-theorem chV_tanPt (l : X →+ k) (χ : X) :
-    (chV (tanPt l) χ).val = (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).inv.hom
-      (1 + TrivSqZeroExt.inr (l χ)) := by
+theorem chV_tanPt (l : X →+ k) (χ : X)
+    : (chV (tanPt l) χ).val
+      = (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).inv.hom
+        (1 + TrivSqZeroExt.inr (l χ)) := by
   show ((splitTorusPointsEquiv _ _ _) ((splitTorusPointsEquiv _ _ _).symm (phi l))
     (Multiplicative.ofAdd χ)).val = _
   rw [MulEquiv.apply_symm_apply]
   rfl
 
-theorem chV_comp {Z Z' : Over (Sp k)} (j : Z' ⟶ Z) (t : Z ⟶ splitTorus (Sp k) X) (χ : X) :
-    (chV (j ≫ t) χ).val = j.left.appTop.hom (chV t χ).val := by
+theorem chV_comp {Z Z' : Over (Sp k)} (j : Z' ⟶ Z) (t : Z ⟶ splitTorus (Sp k) X) (χ : X)
+    : (chV (j ≫ t) χ).val = j.left.appTop.hom (chV t χ).val := by
   rw [chV_val, chV_val, Over.comp_left, Scheme.Hom.comp_appTop]
   rfl
 
-theorem ext_val {Z : Over (Sp k)} {a b : Z ⟶ splitTorus (Sp k) X}
-    (h : ∀ χ, (chV a χ).val = (chV b χ).val) : a = b :=
+theorem ext_val
+    {Z : Over (Sp k)} {a b : Z ⟶ splitTorus (Sp k) X} (h : ∀ χ, (chV a χ).val = (chV b χ).val)
+    : a = b :=
   TorusOfCharMap.ext_chV fun χ => Units.ext (h χ)
 
 end TorusTangent
 end
 
-
 open TorusTangent in
-theorem splitTorus_tangent_addHom : ∀ (k : Type) [Field k] (X : Type) [AddCommGroup X], ∃ U : (X →+ k) → (epsPt (𝟙 (Sp k)) ⟶ splitTorus (Sp k) X), Function.Injective U ∧ (∀ l, spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ (U l).left = (1 : Over.mk (𝟙 (Sp k)) ⟶ splitTorus (Sp k) X).left) ∧ (∀ l l', U (l + l') = U l * U l') ∧ (∀ (t : k) l, (U ((AddMonoidHom.mulLeft t).comp l)).left = spMap (epsScale t) ≫ (U l).left) ∧ ∀ (τ : splitTorus (Sp k) X ⟶ splitTorus (Sp k) X) (ρ : X →+ X), (∀ χ, chV τ χ = charUnit (Sp k) X (ρ χ)) → ∀ l, U l ≫ τ = U (l.comp ρ) := by
+theorem splitTorus_tangent_addHom
+    : ∀ (k : Type) [Field k] (X : Type) [AddCommGroup X],
+      ∃ U : (X →+ k) → (epsPt (𝟙 (Sp k)) ⟶ splitTorus (Sp k) X),
+        Function.Injective U
+          ∧ (∀ l,
+            spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ (U l).left
+              = (1 : Over.mk (𝟙 (Sp k)) ⟶ splitTorus (Sp k) X).left)
+          ∧ (∀ l l', U (l + l') = U l * U l')
+          ∧ (∀ (t : k) l,
+            (U ((AddMonoidHom.mulLeft t).comp l)).left = spMap (epsScale t) ≫ (U l).left)
+          ∧ ∀ (τ : splitTorus (Sp k) X ⟶ splitTorus (Sp k) X) (ρ : X →+ X),
+            (∀ χ, chV τ χ = charUnit (Sp k) X (ρ χ)) → ∀ l, U l ≫ τ = U (l.comp ρ) := by
   intro k _ X _
-  have hΓ := (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).commRingCatIsoToRingEquiv.symm.injective
+  have hΓ :=
+    (Scheme.ΓSpecIso (CommRingCat.of (DualNumber k))).commRingCatIsoToRingEquiv.symm.injective
   refine ⟨tanPt, ?_, ?_, ?_, ?_, ?_⟩
   · intro l l' h
     ext χ

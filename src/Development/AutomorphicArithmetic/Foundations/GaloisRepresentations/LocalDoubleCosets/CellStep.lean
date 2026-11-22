@@ -5,12 +5,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory
+  UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
 open GroundTheory.Automorphic.Whittaker
 
-theorem UpperTheory.Gal.LocD.cellStep :
-    StabSub → CellStep := by
-  intro hSt X H _ _ _ _ _ _ _ _ _ _ _ _ _ s τ p hp hs hτ hsp hτp hsτ χ hχL D hD hsum U C x₀ hU hC hUC hHU hsU hsx₀ hvan f hf
+theorem UpperTheory.Gal.LocD.cellStep : StabSub → CellStep := by
+  intro hSt X H _ _ _ _ _ _ _ _ _ _ _ _ _ s τ p hp hs hτ hsp hτp hsτ χ hχL D hD hsum U C x₀ hU hC
+    hUC hHU hsU hsx₀ hvan f hf
   obtain ⟨L, hLo, hL1⟩ := hχL
   obtain ⟨L₀, hL₀c, hL₀o, hL₀L, hL₀τ⟩ := hSt H τ p hp hτ hτp L hLo
   have hχL₀ : ∀ l ∈ L₀, χ l = 1 := fun l hl => hL1 l (hL₀L hl)
@@ -19,26 +20,30 @@ theorem UpperTheory.Gal.LocD.cellStep :
     intro g hg
     obtain ⟨h1, -⟩ := hg
     exact h1
-  let e : X ≃ₜ X :=
-    { toFun := s
-      invFun := s^[p - 1]
-      left_inv := fun y => by
-        show s^[p - 1] (s y) = y
-        rw [← Function.iterate_succ_apply s (p - 1) y]
-        exact hsp' y
-      right_inv := fun y => by
-        show s (s^[p - 1] y) = y
-        rw [← Function.iterate_succ_apply' s (p - 1) y]
-        exact hsp' y
-      continuous_toFun := hs
-      continuous_invFun := hs.iterate (p - 1) }
+  let e : X ≃ₜ X := {
+    toFun := s
+    invFun := s^[p - 1]
+    left_inv := fun y => by
+      show s^[p - 1] (s y) = y
+      rw [← Function.iterate_succ_apply s (p - 1) y]
+      exact hsp' y
+    right_inv := fun y => by
+      show s (s^[p - 1] y) = y
+      rw [← Function.iterate_succ_apply' s (p - 1) y]
+      exact hsp' y
+    continuous_toFun := hs
+    continuous_invFun := hs.iterate (p - 1)
+  }
   have hcomp : ∀ g ∈ supportedIn U, g ∘ s ∈ supportedIn U := by
     intro g hg
     obtain ⟨hg1, hsupp⟩ := hg
     rw [GroundTheory.Automorphic.mem_locallyConstantCompactSupport] at hg1
     obtain ⟨hlc, hcs⟩ := hg1
-    refine ⟨GroundTheory.Automorphic.mem_locallyConstantCompactSupport.2
-      ⟨hlc.comp_continuous hs, hcs.comp_homeomorph e⟩, ?_⟩
+    refine ⟨
+      GroundTheory.Automorphic.mem_locallyConstantCompactSupport.2
+        ⟨hlc.comp_continuous hs, hcs.comp_homeomorph e⟩,
+      ?_
+    ⟩
     intro x hx
     exact (hsU x).1 (hsupp hx)
   have hiter : ∀ i, ∀ g ∈ supportedIn U, g ∘ s^[i] ∈ supportedIn U := by
@@ -54,14 +59,21 @@ theorem UpperTheory.Gal.LocD.cellStep :
     exists_lift_orbit_piece hU hC hUC hL₀c hL₀o (y := x₀) (mem_orbit_self x₀)
   have hs_orb : ∀ y ∈ orbit H x₀, s y ∈ orbit H x₀ := by
     rintro _ ⟨h, rfl⟩
-    exact ⟨τ h, by
-      show τ h • x₀ = s (h • x₀)
-      rw [hsτ, hsx₀]⟩
+    exact ⟨
+      τ h,
+      by
+        show τ h • x₀ = s (h • x₀)
+        rw [hsτ, hsx₀]
+    ⟩
   have hs_piece : ∀ z ∈ orbitPiece L₀ x₀, s z ∈ orbitPiece L₀ x₀ := by
     rintro _ ⟨l, hl, rfl⟩
-    exact ⟨τ l, (hL₀τ l).2 hl, by
-      show τ l • x₀ = s (l • x₀)
-      rw [hsτ, hsx₀]⟩
+    exact ⟨
+      τ l,
+      (hL₀τ l).2 hl,
+      by
+        show τ l • x₀ = s (l • x₀)
+        rw [hsτ, hsx₀]
+    ⟩
   have hpiece_iter : ∀ n, ∀ z ∈ orbitPiece L₀ x₀, s^[n] z ∈ orbitPiece L₀ x₀ := by
     intro n
     induction n with
@@ -115,7 +127,7 @@ theorem UpperTheory.Gal.LocD.cellStep :
     ring
   have hmem : f₀ ∈ W ⊔ supportedIn U ⊓ vanishingOn C :=
     Submodule.mem_sup_left (Submodule.mem_inf.mpr ⟨hf₀U, LinearMap.mem_ker.mpr hD0⟩)
-  have hle := supportedIn_le_of_base hU hC hUC hHU χ (W := W) inf_le_left hrel L₀ hL₀c hL₀o
-    hχL₀ f₀ hf₀eq hmem
+  have hle :=
+    supportedIn_le_of_base hU hC hUC hHU χ (W := W) inf_le_left hrel L₀ hL₀c hL₀o hχL₀ f₀ hf₀eq hmem
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp (hle hf)
   rw [map_add (f := _), LinearMap.mem_ker.mp (Submodule.mem_inf.mp ha).2, hvan b hb, add_zero]

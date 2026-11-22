@@ -41,8 +41,8 @@ def conjNormal (g : G) : A ≃* A where
     ext
     simp [mul_assoc]
 
-theorem conjNormal_mul (g h : G) (a : A) :
-    conjNormal A (g * h) a = conjNormal A h (conjNormal A g a) := by
+theorem conjNormal_mul (g h : G) (a : A)
+    : conjNormal A (g * h) a = conjNormal A h (conjNormal A g a) := by
   apply Subtype.ext
   change (g * h)⁻¹ * (a : G) * (g * h) = h⁻¹ * (g⁻¹ * (a : G) * g) * h
   simp [mul_assoc]
@@ -62,16 +62,16 @@ def inertia (θ : A → ℂ) : Subgroup G where
     rw [conjNormal_mul, hh, hg]
   inv_mem' {g} hg := by
     intro a
-    calc θ (conjNormal A g⁻¹ a) = θ (conjNormal A g (conjNormal A g⁻¹ a)) := (hg _).symm
+    calc
+      θ (conjNormal A g⁻¹ a)
+        = θ (conjNormal A g (conjNormal A g⁻¹ a)) := (hg _).symm
       _ = θ a := by rw [← conjNormal_mul, inv_mul_cancel, conjNormal_one]
-
 
 end Conj
 
 section Clifford
 
 variable {G : Type*} [Group G] [Fintype G] {A : Subgroup G} [A.Normal]
-
 
 end Clifford
 

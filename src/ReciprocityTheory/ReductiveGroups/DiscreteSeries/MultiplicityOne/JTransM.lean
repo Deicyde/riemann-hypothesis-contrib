@@ -32,7 +32,8 @@ theorem stTransM (h : UnitaryGroupStructuralFacts) : StTransM := by
     InvGrp.embWb_fix_offW γ _ (InvGrp.bvec_offW j hj)
   have hEifix : ∀ j, ¬ InvGrp.isW k r j → E⁻¹ *ᵥ bvec j = bvec j := fun j hj =>
     InvGrp.embWb_inv_fix_offW hE _ (InvGrp.bvec_offW j hj)
-  have hwl : ¬ InvGrp.isW k r (wI k r (Fin.last k)) → False := fun h => h ⟨by simp [wI], by simp [wI]⟩
+  have hwl : ¬ InvGrp.isW k r (wI k r (Fin.last k)) → False := fun h =>
+    h ⟨by simp [wI], by simp [wI]⟩
   set b := bvec (wI k r (Fin.last k)) with hbdef
   have hs0 : ((Real.sqrt (Tz k r D.z) : ℝ) : ℂ) ≠ 0 := by
     exact_mod_cast (Real.sqrt_pos.mpr D.T_pos).ne'
@@ -43,13 +44,14 @@ theorem stTransM (h : UnitaryGroupStructuralFacts) : StTransM := by
   have hxG : x ∈ GV k r := hG.mul_mem _ (hG.mul_mem _ hEiG _ hy.1) _ hEG
   have hxv : ∀ v, x *ᵥ v = E⁻¹ *ᵥ (y *ᵥ (E *ᵥ v)) := fun v => by
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
-  have hxe : ∀ a : Fin r, x *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ x *ᵥ bvec (esI k r a) = bvec (esI k r a) := by
+  have hxe
+      : ∀ a : Fin r,
+        x *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ x *ᵥ bvec (esI k r a) = bvec (esI k r a) := by
     intro a
     constructor
     · rw [hxv, hEfix _ (InvGrp.not_isW_eI a), (hy.2.1 a).1, hEifix _ (InvGrp.not_isW_eI a)]
     · rw [hxv, hEfix _ (InvGrp.not_isW_esI a), (hy.2.1 a).2, hEifix _ (InvGrp.not_isW_esI a)]
-  have hxl : x *ᵥ b = b := by
-    rw [hxv, hγ.2, Matrix.mulVec_smul, hy.2.2, ← hγ.2, hEE]
+  have hxl : x *ᵥ b = b := by rw [hxv, hγ.2, Matrix.mulVec_smul, hy.2.2, ← hγ.2, hEE]
   have hxeq := TransM.eq_Qm x hxG hxe hxl
   set m := x.submatrix (Subtype.val : {i // TransM.pK k r i} → _) Subtype.val with hmdef
   have hm : mᴴ * m = 1 := TransM.unitary_of_Qm m (hxeq ▸ hxG)
@@ -75,13 +77,15 @@ theorem stTransM (h : UnitaryGroupStructuralFacts) : StTransM := by
     hj ⟨hK.1, by have := hK.2; omega⟩
   have hnotKl : ¬ TransM.pK k r (wI k r (Fin.last k)) := fun hK => by
     have := hK.2; simp [wI] at this
-  refine ⟨E * PU * E⁻¹, ⟨⟨hG.mul_mem _ (hG.mul_mem _ hEG _ hPUG) _ hEiG, fun a => ⟨?_, ?_⟩, ?_⟩, ?_⟩, ?_⟩
+  refine
+    ⟨E * PU * E⁻¹, ⟨⟨hG.mul_mem _ (hG.mul_mem _ hEG _ hPUG) _ hEiG, fun a => ⟨?_, ?_⟩, ?_⟩, ?_⟩, ?_⟩
   · rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hEifix _ (InvGrp.not_isW_eI a),
       TransM.Qm_fix_off U _ (hnotK _ (InvGrp.not_isW_eI a)), hEfix _ (InvGrp.not_isW_eI a)]
   · rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hEifix _ (InvGrp.not_isW_esI a),
       TransM.Qm_fix_off U _ (hnotK _ (InvGrp.not_isW_esI a)), hEfix _ (InvGrp.not_isW_esI a)]
   · conv_lhs => rw [hzE]
-    rw [Matrix.mulVec_smul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hEE, TransM.Qm_fix_off U _ hnotKl, ← hzE]
+    rw [Matrix.mulVec_smul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hEE,
+      TransM.Qm_fix_off U _ hnotKl, ← hzE]
   · show (E * PU * E⁻¹) *ᵥ (E *ᵥ bvec (wI k r 0)) = E *ᵥ bvec (wI k r 0)
     rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hEE, TransM.Qm_fix_vec U _ hUw]
   · have hinv : (E * PU * E⁻¹)⁻¹ = E * TransM.Qm Uᴴ 1 * E⁻¹ := by
@@ -94,7 +98,8 @@ theorem stTransM (h : UnitaryGroupStructuralFacts) : StTransM := by
     apply Matrix.inv_eq_right_inv
     rw [hyx]
     simp only [Matrix.mul_assoc, hc]
-    rw [← Matrix.mul_assoc (x.map (starRingEnd ℂ)) PU, ← Matrix.mul_assoc (x.map (starRingEnd ℂ) * PU) x, hkey,
-      ← Matrix.mul_assoc PU, hPUs', Matrix.one_mul, Matrix.mul_nonsing_inv _ hE]
+    rw [← Matrix.mul_assoc (x.map (starRingEnd ℂ)) PU,
+      ← Matrix.mul_assoc (x.map (starRingEnd ℂ) * PU) x, hkey, ← Matrix.mul_assoc PU, hPUs',
+      Matrix.one_mul, Matrix.mul_nonsing_inv _ hE]
 
 end ReciprocityTheory.ChartRestriction.DS.Mult1

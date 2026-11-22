@@ -34,10 +34,8 @@ theorem muMaxLeMin_of (hP : CovolPos.{u}) (hS : ShortVector.{u}) : MuMaxLeMin.{u
     rw [Real.log_mul hsq.ne' hpow.ne', Real.log_sqrt hk'.le, Real.log_rpow hc] at h
     have e : (1 : ℝ) / (rk N : ℝ) * Real.log (covol N) = Real.log (covol N) / (rk N : ℝ) := by ring
     linarith
-  have h2 : Real.log (rk N : ℝ) ≤ Real.log (rk L : ℝ) :=
-    Real.log_le_log hk' (by exact_mod_cast hkL)
-  have h3 : slope N = -(Real.log (covol N) / (rk N : ℝ)) := by
-    unfold slope deg; ring
+  have h2 : Real.log (rk N : ℝ) ≤ Real.log (rk L : ℝ) := Real.log_le_log hk' (by exact_mod_cast hkL)
+  have h3 : slope N = -(Real.log (covol N) / (rk N : ℝ)) := by unfold slope deg; ring
   rw [h3]
   linarith
 

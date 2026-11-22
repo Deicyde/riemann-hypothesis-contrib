@@ -18,13 +18,15 @@ theorem PolyNonnegAtZero.proof : PolyNonnegAtZero.Statement := by
   obtain ⟨N, hN⟩ := eventually_atTop.1 hev
   let S : Set ℝ := {t | 0 ≤ t ∧ p.eval t ≤ 0}
   have h0S : (0 : ℝ) ∈ S := ⟨le_rfl, h0.le⟩
-  have hbdd : BddAbove S := ⟨N, fun t ht => by
-    by_contra hlt
-    push Not at hlt
-    exact absurd ht.2 (not_le.2 (hN t hlt.le))⟩
+  have hbdd : BddAbove S := ⟨
+    N,
+    fun t ht => by
+      by_contra hlt
+      push Not at hlt
+      exact absurd ht.2 (not_le.2 (hN t hlt.le))
+  ⟩
   have hclosed : IsClosed S :=
-    (isClosed_le continuous_const continuous_id).inter
-      (isClosed_le p.continuous continuous_const)
+    (isClosed_le continuous_const continuous_id).inter (isClosed_le p.continuous continuous_const)
   have ht0S : sSup S ∈ S := hclosed.csSup_mem ⟨0, h0S⟩ hbdd
   obtain ⟨ht0nn, hpt0⟩ := ht0S
   have hpos : ∀ t, sSup S < t → 0 < p.eval t := by

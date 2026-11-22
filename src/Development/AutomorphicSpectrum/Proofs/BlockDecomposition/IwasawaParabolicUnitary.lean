@@ -15,14 +15,19 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.ModelS
 
-theorem exists_Pb_mul_unitary : ∀ (n : ℕ) (lev : Fin n → ℕ), Monotone lev → ∀ g ∈ GLs n,
-    ∃ p ∈ GlobalTheory.CompanionTheory.ModelS.Pb lev, ∃ k : Matrix.unitaryGroup (Fin n) ℂ, g = p * k.1 := by
+theorem exists_Pb_mul_unitary
+    : ∀ (n : ℕ) (lev : Fin n → ℕ),
+      Monotone lev
+        → ∀ g ∈ GLs n, ∃ p ∈ GlobalTheory.CompanionTheory.ModelS.Pb lev,
+          ∃ k : Matrix.unitaryGroup (Fin n) ℂ,
+            g = p * k.1 := by
   intro n lev hlev g hg
   have hdet : g.det ≠ 0 := hg
   have hu : IsUnit gᴴ := by
     rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_conjTranspose]
     exact isUnit_iff_ne_zero.2 (by simpa using hdet)
-  obtain ⟨k, hk, b, hb, ht⟩ := GlobalTheory.CompanionTheory.QR.exists_unitary_mul_blockTriangular gᴴ hu
+  obtain ⟨k, hk, b, hb, ht⟩ :=
+    GlobalTheory.CompanionTheory.QR.exists_unitary_mul_blockTriangular gᴴ hu
   have hg' : g = bᴴ * kᴴ := by
     rw [← Matrix.conjTranspose_mul, ← hb, Matrix.conjTranspose_conjTranspose]
   have hkH : kᴴ ∈ Matrix.unitaryGroup (Fin n) ℂ := by

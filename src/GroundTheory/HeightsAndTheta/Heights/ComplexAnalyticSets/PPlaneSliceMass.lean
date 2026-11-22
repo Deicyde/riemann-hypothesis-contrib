@@ -18,11 +18,14 @@ open scoped ContDiff Matrix
 
 noncomputable section
 
-theorem maDens_congr {D : ℕ} {F G : Fin D → (Fin D → ℂ) → ℝ} {z : Fin D → ℂ}
-    (h : ∀ k, F k =ᶠ[𝓝 z] G k) : ReciprocityTheory.AnForm.maDens F z = ReciprocityTheory.AnForm.maDens G z := by
-  have h2 : ∀ k, fderiv ℝ (fderiv ℝ (F k)) z = fderiv ℝ (fderiv ℝ (G k)) z :=
-    fun k => ((h k).fderiv (𝕜 := ℝ)).fderiv_eq
-  have h3 : (fun k => ReciprocityTheory.AnForm.hessC (F k) z) = fun k => ReciprocityTheory.AnForm.hessC (G k) z := by
+theorem maDens_congr
+    {D : ℕ} {F G : Fin D → (Fin D → ℂ) → ℝ} {z : Fin D → ℂ} (h : ∀ k, F k =ᶠ[𝓝 z] G k)
+    : ReciprocityTheory.AnForm.maDens F z = ReciprocityTheory.AnForm.maDens G z := by
+  have h2 : ∀ k, fderiv ℝ (fderiv ℝ (F k)) z = fderiv ℝ (fderiv ℝ (G k)) z := fun k =>
+    ((h k).fderiv (𝕜 := ℝ)).fderiv_eq
+  have h3
+      : (fun k => ReciprocityTheory.AnForm.hessC (F k) z)
+        = fun k => ReciprocityTheory.AnForm.hessC (G k) z := by
     funext k
     ext i j
     dsimp only [ReciprocityTheory.AnForm.hessC]

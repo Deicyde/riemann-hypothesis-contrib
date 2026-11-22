@@ -19,8 +19,9 @@ section InterNumPointLemmas
 
 variable {k : Type u} [Field k] {Ω : Type w} [Field Ω] [Algebra k Ω] {N : ℕ}
 
-theorem interNumPoint_restrLen_eq_finrank (y : Fin (N + 1) → Ω) {j : Fin (N + 1)} (hyj : y j ≠ 0)
-    (F : SubSystem k y Ω) : restrLen (primeOf (S := k) y) F = Module.finrank k F.secs := by
+theorem interNumPoint_restrLen_eq_finrank
+    (y : Fin (N + 1) → Ω) {j : Fin (N + 1)} (hyj : y j ≠ 0) (F : SubSystem k y Ω)
+    : restrLen (primeOf (S := k) y) F = Module.finrank k F.secs := by
   have hid : ∀ I : Chart y, idealMod (x := y) (primeOf (S := k) y) I = ⊥ := by
     intro I
     refine Submodule.span_eq_bot.mpr ?_
@@ -43,9 +44,9 @@ theorem interNumPoint_restrLen_eq_finrank (y : Fin (N + 1) → Ω) {j : Fin (N +
     (Submodule.quotEquivOfEqBot (⊥ : Submodule k F.secs) rfl).length_eq, Module.length_eq_rank]
   rfl
 
-theorem interNumPoint_interSum_eq (y : Fin (N + 1) → Ω) {j : Fin (N + 1)} (hyj : y j ≠ 0)
-    (L : Fin 0 → SubSystem k y Ω) (c : ℕ) :
-    interSum (primeOf (S := k) y) L c = Module.finrank k (twistSys k y (c : ℤ)).secs := by
+theorem interNumPoint_interSum_eq
+    (y : Fin (N + 1) → Ω) {j : Fin (N + 1)} (hyj : y j ≠ 0) (L : Fin 0 → SubSystem k y Ω) (c : ℕ)
+    : interSum (primeOf (S := k) y) L c = Module.finrank k (twistSys k y (c : ℤ)).secs := by
   have huniv : (Finset.univ : Finset (Finset (Fin 0))) = {∅} := by decide
   have h0 : tensorSub L ∅ = twistSys k y 0 := rfl
   rw [interSum, huniv, Finset.sum_singleton, h0, twistSys_zero_twist,
@@ -54,7 +55,8 @@ theorem interNumPoint_interSum_eq (y : Fin (N + 1) → Ω) {j : Fin (N + 1)} (hy
 
 end InterNumPointLemmas
 
-theorem InterNumPoint.proof (hHP : HilbertPoint.Statement.{u, w}) : InterNumPoint.Statement.{u, w} := by
+theorem InterNumPoint.proof (hHP : HilbertPoint.Statement.{u, w})
+    : InterNumPoint.Statement.{u, w} := by
   intro k _ Ω _ _ N y hsub L
   obtain ⟨_, hdim, hsecs⟩ := hHP k Ω N y hsub
   obtain ⟨j, hj⟩ := hsub.relevant
@@ -63,8 +65,9 @@ theorem InterNumPoint.proof (hHP : HilbertPoint.Statement.{u, w}) : InterNumPoin
     apply hj
     rw [mem_primeOf_of_isHomogeneous y (isHomogeneous_X k j), aeval_X]
     exact h
-  have hev : (fun _ : ℕ => (Module.finrank k (funField (k := k) y) : ℤ)) =ᶠ[atTop]
-      interSum (primeOf (S := k) y) L := by
+  have hev
+      : (fun _ : ℕ => (Module.finrank k (funField (k := k) y) : ℤ)) =ᶠ[atTop]
+        interSum (primeOf (S := k) y) L := by
     filter_upwards [hdim, hsecs] with n hn hs
     rw [interNumPoint_interSum_eq y hyj, hs, hn]
   exact (tendsto_const_nhds.congr' hev).limUnder_eq

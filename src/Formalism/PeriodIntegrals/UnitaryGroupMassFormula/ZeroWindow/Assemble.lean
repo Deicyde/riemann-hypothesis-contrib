@@ -12,8 +12,8 @@ theorem rightChi : RightChi := rightChi_of jensenCount
 
 theorem rightOne : RightOne := rightOne_of jensenCount
 
-theorem zerosWindow_of_transfer (hT : Transfer) :
-    PI.LBoundRight → PI.ZetaBoundRight → PI.LInvRight → PI.ZerosWindow := by
+theorem zerosWindow_of_transfer (hT : Transfer)
+    : PI.LBoundRight → PI.ZetaBoundRight → PI.LInvRight → PI.ZerosWindow := by
   intro hL hZ hI
   obtain ⟨C₁, h₁⟩ := rightChi hL hI
   obtain ⟨C₂, h₂⟩ := rightOne hZ hI
@@ -34,6 +34,10 @@ theorem zerosWindow_of_transfer (hT : Transfer) :
     exact ⟨hf, hs.trans (mul_le_mul_of_nonneg_right (le_max_left _ _) (hlog N t))⟩
   have hw := zerosWindowWith_of _ (rightHalf_of _ _ h₁' h₂') hT
   unfold PI.ZerosWindow
-  exact ⟨_, mul_pos two_pos (lt_of_lt_of_le one_pos (le_trans (le_max_right C₁ 1) (le_max_left _ _))), hw⟩
+  exact ⟨
+    _,
+    mul_pos two_pos (lt_of_lt_of_le one_pos (le_trans (le_max_right C₁ 1) (le_max_left _ _))),
+    hw
+  ⟩
 
 end PI.ZW

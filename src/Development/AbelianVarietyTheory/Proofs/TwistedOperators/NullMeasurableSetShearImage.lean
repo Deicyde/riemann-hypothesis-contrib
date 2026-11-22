@@ -8,8 +8,8 @@ open MeasureTheory
 
 namespace GlobalTheory.UnfoldNormal
 
-def pairGroup {H : Type} [Group H] (Γ N : Subgroup H) (hN : ∀ γ ∈ Γ, ∀ n ∈ N, γ * n * γ⁻¹ ∈ N) :
-    Subgroup (H × H) where
+def pairGroup {H : Type} [Group H] (Γ N : Subgroup H) (hN : ∀ γ ∈ Γ, ∀ n ∈ N, γ * n * γ⁻¹ ∈ N)
+    : Subgroup (H × H) where
   carrier := {p | p.1 ∈ Γ ∧ p.2 ∈ Γ ∧ p.1 * p.2⁻¹ ∈ N}
   mul_mem' := by
     rintro ⟨a, b⟩ ⟨c, d⟩ ⟨ha, hb, hab⟩ ⟨hc, hd, hcd⟩
@@ -33,7 +33,8 @@ end GlobalTheory.UnfoldNormal
 
 namespace GlobalTheory.UnfoldNormal
 
-variable {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [SecondCountableTopology H]
+variable
+  {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [SecondCountableTopology H]
   [MeasurableSpace H] [BorelSpace H]
 
 def shearEquiv : H × H ≃ᵐ H × H where
@@ -46,22 +47,28 @@ def shearEquiv : H × H ≃ᵐ H × H where
 
 theorem shear_eq (N : Subgroup H) : shear N = shearEquiv ∘ Prod.map Subtype.val id := rfl
 
-theorem measurableEmbedding_shear {N : Subgroup H} (hN : IsClosed (N : Set H)) :
-    MeasurableEmbedding (shear N) := by
+theorem measurableEmbedding_shear {N : Subgroup H} (hN : IsClosed (N : Set H))
+    : MeasurableEmbedding (shear N) := by
   rw [shear_eq]
   exact shearEquiv.measurableEmbedding.comp
     ((MeasurableEmbedding.subtype_coe hN.measurableSet).prodMap MeasurableEmbedding.id)
 
-theorem nullMeasurableSet_shear_image {N : Subgroup H} (hN : IsClosed (N : Set H)) (κ : Measure N)
-    (ν : Measure H) {A : Set N} {B : Set H} (hA : NullMeasurableSet A κ) (hB : NullMeasurableSet B ν) :
-    NullMeasurableSet (shear N '' (A ×ˢ B)) ((κ.prod ν).map (shear N)) := by
+theorem nullMeasurableSet_shear_image
+    {N : Subgroup H} (hN : IsClosed (N : Set H)) (κ : Measure N)
+    (ν : Measure H)
+    {A : Set N} {B : Set H} (hA : NullMeasurableSet A κ) (hB : NullMeasurableSet B ν)
+    : NullMeasurableSet (shear N '' (A ×ˢ B)) ((κ.prod ν).map (shear N)) := by
   have he := measurableEmbedding_shear hN
   have hAB : NullMeasurableSet (A ×ˢ B) (κ.prod ν) := hA.prod hB
-  refine (he.measurableSet_image.2 (measurableSet_toMeasurable (κ.prod ν) (A ×ˢ B))).nullMeasurableSet.congr ?_
-  refine (he.ae_map_iff (p := fun y => (y ∈ shear N '' toMeasurable (κ.prod ν) (A ×ˢ B)) ↔
-    (y ∈ shear N '' (A ×ˢ B)))).2 ?_
+  refine (he.measurableSet_image.2 (measurableSet_toMeasurable (κ.prod ν)
+    (A ×ˢ B))).nullMeasurableSet.congr ?_
+  refine (he.ae_map_iff
+    (p := fun y =>
+      (y ∈ shear N '' toMeasurable (κ.prod ν) (A ×ˢ B)) ↔ (y ∈ shear N '' (A ×ˢ B)))).2 ?_
   filter_upwards [hAB.toMeasurable_ae_eq] with x hx
-  have e1 : shear N x ∈ shear N '' toMeasurable (κ.prod ν) (A ×ˢ B) ↔ x ∈ toMeasurable (κ.prod ν) (A ×ˢ B) :=
+  have e1
+      : shear N x ∈ shear N '' toMeasurable (κ.prod ν) (A ×ˢ B)
+        ↔ x ∈ toMeasurable (κ.prod ν) (A ×ˢ B) :=
     he.injective.mem_set_image
   have e2 : shear N x ∈ shear N '' (A ×ˢ B) ↔ x ∈ (A ×ˢ B) := he.injective.mem_set_image
   rw [e1, e2]

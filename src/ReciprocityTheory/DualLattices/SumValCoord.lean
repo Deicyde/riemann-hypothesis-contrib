@@ -13,8 +13,8 @@ namespace ReciprocityTheory.PGsh.Up
 
 theorem sum_val_zmod (p : ℕ) [Fact p.Prime] : ∑ a : ZMod p, a.val = p * (p - 1) / 2 := by
   have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
-  have hinj : Set.InjOn (fun a : ZMod p => a.val) (univ : Finset (ZMod p)) :=
-    fun a _ b _ h => ZMod.val_injective p h
+  have hinj : Set.InjOn (fun a : ZMod p => a.val) (univ : Finset (ZMod p)) := fun a _ b _ h =>
+    ZMod.val_injective p h
   have himg : (univ : Finset (ZMod p)).image (fun a => a.val) = range p := by
     ext i
     simp only [mem_image, mem_univ, true_and, mem_range]
@@ -26,8 +26,8 @@ theorem sum_val_zmod (p : ℕ) [Fact p.Prime] : ∑ a : ZMod p, a.val = p * (p -
   rw [← Finset.sum_range_id, ← himg]
   exact (Finset.sum_image (f := fun i : ℕ => i) hinj).symm
 
-theorem sum_val_coord (p : ℕ) [Fact p.Prime] {ι : Type} [Fintype ι] [DecidableEq ι] (j : ι) :
-    ∑ α : ι → ZMod p, (α j).val = p ^ (Fintype.card ι - 1) * (p * (p - 1) / 2) := by
+theorem sum_val_coord (p : ℕ) [Fact p.Prime] {ι : Type} [Fintype ι] [DecidableEq ι] (j : ι)
+    : ∑ α : ι → ZMod p, (α j).val = p ^ (Fintype.card ι - 1) * (p * (p - 1) / 2) := by
   have h := (Equiv.funSplitAt j (ZMod p)).sum_comp (fun q => q.1.val)
   simp only [Equiv.funSplitAt_apply] at h
   rw [h, Fintype.sum_prod_type]
@@ -39,22 +39,25 @@ theorem sum_val_coord (p : ℕ) [Fact p.Prime] {ι : Type} [Fintype ι] [Decidab
 theorem u5 : MonomialDeterminantStatement := by
   intro p _ C _ v R _ _ hR hp ι _ _ Λ u hΛ hu hc
   have hpne : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
-  obtain ⟨I, hmem⟩ : ∃ I : Ideal R, ∀ r, r ∈ I ↔ v (algebraMap R C r) < 1 :=
-    ⟨{ carrier := {r | v (algebraMap R C r) < 1}
-       add_mem' := by
-         intro a b ha hb
-         show v (algebraMap R C (a + b)) < 1
-         rw [map_add (f := _)]
-         exact lt_of_le_of_lt (v.map_add _ _) (max_lt ha hb)
-       zero_mem' := by
-         show v (algebraMap R C 0) < 1
-         simp
-       smul_mem' := by
-         intro c a ha
-         show v (algebraMap R C (c * a)) < 1
-         rw [map_mul, map_mul]
-         exact lt_of_le_of_lt (mul_le_of_le_one_left (by positivity) (hR.map_le_one c)) ha },
-     fun r => Iff.rfl⟩
+  obtain ⟨I, hmem⟩ : ∃ I : Ideal R, ∀ r, r ∈ I ↔ v (algebraMap R C r) < 1 := ⟨
+    {
+      carrier := {r | v (algebraMap R C r) < 1}
+      add_mem' := by
+        intro a b ha hb
+        show v (algebraMap R C (a + b)) < 1
+        rw [map_add (f := _)]
+        exact lt_of_le_of_lt (v.map_add _ _) (max_lt ha hb)
+      zero_mem' := by
+        show v (algebraMap R C 0) < 1
+        simp
+      smul_mem' := by
+        intro c a ha
+        show v (algebraMap R C (c * a)) < 1
+        rw [map_mul, map_mul]
+        exact lt_of_le_of_lt (mul_le_of_le_one_left (by positivity) (hR.map_le_one c)) ha
+    },
+    fun r => Iff.rfl
+  ⟩
   have hmax : I.IsMaximal := by
     rw [Ideal.isMaximal_iff]
     refine ⟨?_, ?_⟩
@@ -87,18 +90,22 @@ theorem u5 : MonomialDeterminantStatement := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_mul, map_natCast]
     simp only [lam, xc, Matrix.map_apply, ZMod.castHom_apply, ZMod.natCast_val]
-  have hWN : Ideal.Quotient.mk I (Matrix.of fun (x α : ι → ZMod p) => ∏ j, w j x ^ (α j).val).det =
-      (Matrix.of fun (x α : ι → ZMod p) => monF (Λ.map (Ideal.Quotient.mk I)) α x).det := by
+  have hWN
+      : Ideal.Quotient.mk I (Matrix.of fun (x α : ι → ZMod p) => ∏ j, w j x ^ (α j).val).det
+        = (Matrix.of fun (x α : ι → ZMod p) => monF (Λ.map (Ideal.Quotient.mk I)) α x).det := by
     rw [RingHom.map_det, RingHom.mapMatrix_apply]
     congr 1
     ext x α
     simp only [Matrix.map_apply, Matrix.of_apply, map_prod, map_pow, monF, hent]
-  have hWv : v (algebraMap R C (Matrix.of fun (x α : ι → ZMod p) => ∏ j, w j x ^ (α j).val).det) = 1 := by
+  have hWv
+      : v (algebraMap R C (Matrix.of fun (x α : ι → ZMod p) => ∏ j, w j x ^ (α j).val).det)
+        = 1 := by
     refine le_antisymm (hR.map_le_one _) (not_lt.mp fun h => hN ?_)
     rw [← hWN]
     exact Ideal.Quotient.eq_zero_iff_mem.mpr ((hmem _).mpr h)
-  have hdetM : (Matrix.of fun (x α : ι → ZMod p) => ∏ j, u j x ^ (α j).val).det =
-      algebraMap R C (Matrix.of fun (x α : ι → ZMod p) => ∏ j, w j x ^ (α j).val).det := by
+  have hdetM
+      : (Matrix.of fun (x α : ι → ZMod p) => ∏ j, u j x ^ (α j).val).det
+        = algebraMap R C (Matrix.of fun (x α : ι → ZMod p) => ∏ j, w j x ^ (α j).val).det := by
     rw [RingHom.map_det, RingHom.mapMatrix_apply]
     congr 1
     ext x α
@@ -107,9 +114,11 @@ theorem u5 : MonomialDeterminantStatement := by
     rw [hdetM]
     exact hWv
   refine ⟨h1, fun ε => ?_⟩
-  have hscale : (Matrix.of fun (x α : ι → ZMod p) => ∏ j, (ε j * u j x) ^ (α j).val) =
-      Matrix.of fun (x α : ι → ZMod p) =>
-        (∏ j, ε j ^ (α j).val) * (Matrix.of fun (x α : ι → ZMod p) => ∏ j, u j x ^ (α j).val) x α := by
+  have hscale
+      : (Matrix.of fun (x α : ι → ZMod p) => ∏ j, (ε j * u j x) ^ (α j).val)
+        = Matrix.of fun (x α : ι → ZMod p) =>
+          (∏ j, ε j ^ (α j).val)
+            * (Matrix.of fun (x α : ι → ZMod p) => ∏ j, u j x ^ (α j).val) x α := by
     ext x α
     simp only [Matrix.of_apply, mul_pow, Finset.prod_mul_distrib]
   rw [hscale, Matrix.det_mul_row, map_mul, h1, mul_one, Finset.prod_comm, map_prod]

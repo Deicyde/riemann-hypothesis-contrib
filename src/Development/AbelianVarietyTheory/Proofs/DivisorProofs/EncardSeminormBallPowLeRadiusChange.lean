@@ -74,12 +74,13 @@ private lemma encard_mul_encard_le_isBallFam {G : Type} [AddCommGroup G] {Λ : A
         push_cast
         gcongr
 
-
 open Filter Topology in
-theorem _root_.GlobalTheory.VolBr.encard_ball_pow_le : ∀ (G : Type) [AddCommGroup G]
-    (Λ : AddSubgroup G) (B : ℝ → Set G), _root_.GlobalTheory.VolBr.IsBallFam Λ B → ∀ (R : ℝ) (Q e : ℕ),
-    1 ≤ R → 2 * R + 1 ≤ Q → (B R).Finite →
-    (B R).encard ^ e ≤ (B 1).encard ^ e * (B (R * Q ^ e)).encard := by
+theorem _root_.GlobalTheory.VolBr.encard_ball_pow_le
+    : ∀ (G : Type) [AddCommGroup G] (Λ : AddSubgroup G) (B : ℝ → Set G),
+      _root_.GlobalTheory.VolBr.IsBallFam Λ B
+        → ∀ (R : ℝ) (Q e : ℕ),
+          1 ≤ R → 2 * R + 1 ≤ Q → (B R).Finite
+            → (B R).encard ^ e ≤ (B 1).encard ^ e * (B (R * Q ^ e)).encard := by
   intro G _ Λ B hB R Q e hR hQ hfin
   have h1 : (B 1).Finite := hfin.subset (isBallFam_mono hB hR)
   have hQ2 : (2 : ℝ) ≤ Q := by linarith
@@ -116,23 +117,28 @@ theorem _root_.GlobalTheory.VolBr.encard_ball_pow_le : ∀ (G : Type) [AddCommGr
       intro hj
       have hRs : R * s j ≤ R * Q ^ e := by
         refine mul_le_mul_of_nonneg_left ?_ (by linarith)
-        calc s j ≤ (Q : ℝ) ^ j := by linarith [hs_le j]
+        calc
+          s j
+            ≤ (Q : ℝ) ^ j := by linarith [hs_le j]
           _ ≤ (Q : ℝ) ^ e := pow_le_pow_right₀ (by linarith) (by omega)
       have hfs : (B (R * s j)).Finite := hbig.subset (isBallFam_mono hB hRs)
       have hQpos : 0 < Q := by exact_mod_cast (show (0 : ℝ) < Q by linarith)
-      have step := encard_mul_encard_le_isBallFam hB (a := R * s j) (b := R) hQpos (by linarith)
-        hfs hfin h1
+      have step :=
+        encard_mul_encard_le_isBallFam hB (a := R * s j) (b := R) hQpos (by linarith) hfs hfin h1
       have hrad : (Q : ℝ) * (R * s j) + R = R * s (j + 1) := by rw [hs_succ]; ring
       rw [hrad] at step
-      calc (B R).encard ^ (j + 1) = (B R).encard ^ j * (B R).encard := pow_succ _ _
-        _ ≤ (B 1).encard ^ j * (B (R * s j)).encard * (B R).encard := by
-            gcongr; exact ih (by omega)
+      calc
+        (B R).encard ^ (j + 1)
+          = (B R).encard ^ j * (B R).encard := pow_succ _ _
+        _ ≤ (B 1).encard ^ j * (B (R * s j)).encard * (B R).encard := by gcongr; exact ih (by omega)
         _ = (B 1).encard ^ j * ((B (R * s j)).encard * (B R).encard) := mul_assoc _ _ _
         _ ≤ (B 1).encard ^ j * ((B 1).encard * (B (R * s (j + 1))).encard) := by gcongr
         _ = (B 1).encard ^ (j + 1) * (B (R * s (j + 1))).encard := by rw [pow_succ, mul_assoc]
-  calc (B R).encard ^ e ≤ (B 1).encard ^ e * (B (R * s e)).encard := hclaim e le_rfl
+  calc
+    (B R).encard ^ e
+      ≤ (B 1).encard ^ e * (B (R * s e)).encard := hclaim e le_rfl
     _ ≤ (B 1).encard ^ e * (B (R * Q ^ e)).encard := by
-        gcongr
-        exact isBallFam_mono hB (mul_le_mul_of_nonneg_left (by linarith [hs_le e]) (by linarith))
+      gcongr
+      exact isBallFam_mono hB (mul_le_mul_of_nonneg_left (by linarith [hs_le e]) (by linarith))
 
 end GlobalTheory.VolBr

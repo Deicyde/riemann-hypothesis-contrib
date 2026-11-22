@@ -9,22 +9,25 @@ open Finset
 
 namespace Formalism.LatticeBaseChangeAlt
 
-private theorem det_le_one_of_posSemidef_of_diag_eq_one {n : ℕ} (G : Matrix (Fin n) (Fin n) ℝ)
-    (hG : G.PosSemidef) (hd : ∀ j, G j j = 1) : G.det ≤ 1 := by
-  have htr : G.trace = (n : ℝ) := by
-    simp [Matrix.trace, hd]
+private theorem det_le_one_of_posSemidef_of_diag_eq_one
+    {n : ℕ} (G : Matrix (Fin n) (Fin n) ℝ) (hG : G.PosSemidef) (hd : ∀ j, G j j = 1)
+    : G.det ≤ 1 := by
+  have htr : G.trace = (n : ℝ) := by simp [Matrix.trace, hd]
   have hev : ∑ i, hG.1.eigenvalues i = (n : ℝ) := by
     have := hG.1.trace_eq_sum_eigenvalues
     rw [htr] at this
     exact this.symm
-  calc G.det = ∏ i, hG.1.eigenvalues i := hG.1.det_eq_prod_eigenvalues
+  calc
+    G.det
+      = ∏ i, hG.1.eigenvalues i := hG.1.det_eq_prod_eigenvalues
     _ ≤ ∏ i, Real.exp (hG.1.eigenvalues i - 1) :=
-        Finset.prod_le_prod₀ (fun i _ => hG.eigenvalues_nonneg i)
-          (fun i _ => by linarith [Real.add_one_le_exp (hG.1.eigenvalues i - 1)])
+      Finset.prod_le_prod₀
+        (fun i _ => hG.eigenvalues_nonneg i)
+        (fun i _ => by linarith [Real.add_one_le_exp (hG.1.eigenvalues i - 1)])
     _ = Real.exp (∑ i, (hG.1.eigenvalues i - 1)) := (Real.exp_sum _ _).symm
     _ = 1 := by
-        rw [Finset.sum_sub_distrib, hev]
-        simp
+      rw [Finset.sum_sub_distrib, hev]
+      simp
 
 theorem gHadamard : GHadamard := by
   intro n M
@@ -33,8 +36,9 @@ theorem gHadamard : GHadamard := by
   · obtain ⟨j, hj⟩ := hz
     have hcol : ∀ i, M i j = 0 := by
       intro i
-      have := (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => sq_nonneg (M i j))).mp hj i
-        (Finset.mem_univ _)
+      have :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => sq_nonneg (M i j))).mp hj i
+          (Finset.mem_univ _)
       exact pow_eq_zero_iff two_ne_zero |>.mp this
     rw [Matrix.det_eq_zero_of_column_eq_zero j hcol, abs_zero]
     exact Finset.prod_nonneg fun j _ => Real.sqrt_nonneg _
@@ -47,10 +51,9 @@ theorem gHadamard : GHadamard := by
   have hrsq : ∀ j, r j ^ 2 = ∑ i, M i j ^ 2 := fun j => by
     rw [hr]
     exact Real.sq_sqrt (hpos j).le
-  obtain ⟨N, hN⟩ : ∃ N : Matrix (Fin n) (Fin n) ℝ,
-      N = M * Matrix.diagonal (fun j => (r j)⁻¹) := ⟨_, rfl⟩
-  have hNe : ∀ i j, N i j = M i j * (r j)⁻¹ := fun i j => by
-    rw [hN, Matrix.mul_diagonal]
+  obtain ⟨N, hN⟩ : ∃ N : Matrix (Fin n) (Fin n) ℝ, N = M * Matrix.diagonal (fun j => (r j)⁻¹) :=
+    ⟨_, rfl⟩
+  have hNe : ∀ i j, N i j = M i j * (r j)⁻¹ := fun i j => by rw [hN, Matrix.mul_diagonal]
   have hdiag : ∀ j, (N.conjTranspose * N) j j = 1 := by
     intro j
     rw [Matrix.mul_apply]
@@ -70,8 +73,7 @@ theorem gHadamard : GHadamard := by
   have h2 : N.det = M.det / ∏ j, r j := by
     rw [hN, Matrix.det_mul, Matrix.det_diagonal, Finset.prod_inv_distrib, div_eq_mul_inv]
   rw [h2, abs_div, abs_of_pos hP, div_le_one hP] at h1'
-  have h3 : ∏ j, r j = ∏ j, Real.sqrt (∑ i, M i j ^ 2) := by
-    rw [hr]
+  have h3 : ∏ j, r j = ∏ j, Real.sqrt (∑ i, M i j ^ 2) := by rw [hr]
   rw [← h3]
   exact h1'
 

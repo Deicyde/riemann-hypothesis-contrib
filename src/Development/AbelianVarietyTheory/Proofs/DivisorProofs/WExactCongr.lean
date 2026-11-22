@@ -6,24 +6,33 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IndEtOfForal
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.WExactCongr
 
 variable {T : Type 1} [Category.{0} T]
 
-theorem exactAt_iff {N M : T ⥤ AddCommGrpCat.{1}} (ε : N ⟶ M) {X : CosimplicialObject T}
-    (hX : ∀ k, IsIso (ε.app (X.obj k))) (n : ℕ) :
-    ((AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).obj (X ⋙ N)).ExactAt (n + 1) ↔
-    ((AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).obj (X ⋙ M)).ExactAt (n + 1) := by
+theorem exactAt_iff
+    {N M : T ⥤ AddCommGrpCat.{1}} (ε : N ⟶ M)
+    {X : CosimplicialObject T} (hX : ∀ k, IsIso (ε.app (X.obj k)))
+    (n : ℕ)
+    : ((AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).obj (X ⋙ N)).ExactAt
+        (n + 1)
+      ↔ ((AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).obj (X ⋙ M)).ExactAt
+        (n + 1) := by
   haveI : ∀ k, IsIso ((Functor.whiskerLeft X ε).app k) := fun k => hX k
   have hw : IsIso (Functor.whiskerLeft X ε) := NatIso.isIso_of_isIso_app _
-  let e := (AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).mapIso (@asIso _ _ _ _ (Functor.whiskerLeft X ε) hw)
+  let e :=
+    (AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).mapIso
+      (@asIso _ _ _ _ (Functor.whiskerLeft X ε) hw)
   exact ⟨fun h => h.of_iso e, fun h => h.of_iso e.symm⟩
 
-theorem wExact_iff (U : T) (X : CosimplicialObject T) (a : (CosimplicialObject.const T).obj U ⟶ X)
-    (N M : T ⥤ AddCommGrpCat.{1}) (ε : N ⟶ M) (hU : IsIso (ε.app U)) (hX : ∀ k, IsIso (ε.app (X.obj k))) :
-    WExact N a ↔ WExact M a := by
+theorem wExact_iff
+    (U : T) (X : CosimplicialObject T) (a : (CosimplicialObject.const T).obj U ⟶ X)
+    (N M : T ⥤ AddCommGrpCat.{1}) (ε : N ⟶ M)
+    (hU : IsIso (ε.app U)) (hX : ∀ k, IsIso (ε.app (X.obj k)))
+    : WExact N a ↔ WExact M a := by
   have nat : ∀ {P Q : T} (f : P ⟶ Q) (x : N.obj P), M.map f (ε.app P x) = ε.app Q (N.map f x) := by
     intro P Q f x
     exact (ConcreteCategory.congr_hom (ε.naturality f) x).symm
@@ -71,7 +80,8 @@ theorem wExact_iff (U : T) (X : CosimplicialObject T) (a : (CosimplicialObject.c
 
 end GlobalTheory.EtC.WExactCongr
 
-theorem GlobalTheory.EtC.wExact_congr : ∀ (T : Type 1) [Category.{0} T] (U : T) (X : CosimplicialObject T)
-    (a : (CosimplicialObject.const T).obj U ⟶ X) (N M : T ⥤ AddCommGrpCat.{1}) (ε : N ⟶ M),
-    IsIso (ε.app U) → (∀ k, IsIso (ε.app (X.obj k))) → (WExact N a ↔ WExact M a) :=
+theorem GlobalTheory.EtC.wExact_congr
+    : ∀ (T : Type 1) [Category.{0} T] (U : T) (X : CosimplicialObject T)
+        (a : (CosimplicialObject.const T).obj U ⟶ X) (N M : T ⥤ AddCommGrpCat.{1}) (ε : N ⟶ M),
+      IsIso (ε.app U) → (∀ k, IsIso (ε.app (X.obj k))) → (WExact N a ↔ WExact M a) :=
   fun _ _ U X a N M ε hU hX => GlobalTheory.EtC.WExactCongr.wExact_iff U X a N M ε hU hX

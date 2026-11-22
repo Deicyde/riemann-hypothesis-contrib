@@ -13,13 +13,15 @@ noncomputable section
 
 namespace GlobalTheory.DegCnt.ReflectionLatticeMembership
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] {H : HermSpace K V} {r : ℕ} (N : NF H r)
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
+  {H : HermSpace K V} {r : ℕ} (N : NF H r)
 
 def Sg : Submodule K V := N.F.X ⊔ N.F'.X ⊔ N.Ist
 
-theorem line_le {A : Submodule (𝓞 K) K} {v : V} {S : Submodule K V} (hv : v ∈ S) :
-    line A v ≤ rs (𝓞 K) S := by
+theorem line_le {A : Submodule (𝓞 K) K} {v : V} {S : Submodule K V} (hv : v ∈ S)
+    : line A v ≤ rs (𝓞 K) S := by
   rintro _ ⟨a, -, rfl⟩
   simpa using S.smul_mem a hv
 
@@ -35,8 +37,10 @@ theorem normalForm_baseLattice_le_dualSpan_sup_line : N.P0 ≤ rs (𝓞 K) (Sg N
 
 theorem Sg_le_Pi [FiniteDimensional K V] : Sg N ≤ N.Pi := by
   rw [NFGeom.Pi_eq]
-  exact sup_le (sup_le (le_sup_of_le_left (le_sup_left.trans le_sup_left))
-    (le_sup_of_le_left (le_sup_right.trans le_sup_left))) le_sup_right
+  exact sup_le
+    (sup_le (le_sup_of_le_left (le_sup_left.trans le_sup_left))
+      (le_sup_of_le_left (le_sup_right.trans le_sup_left)))
+    le_sup_right
 
 theorem z_mem_Pi [FiniteDimensional K V] : N.F.z ∈ N.Pi := by
   rw [NFGeom.Pi_eq]
@@ -65,23 +69,33 @@ end GlobalTheory.DegCnt.ReflectionLatticeMembership
 
 namespace GlobalTheory.DegCnt
 
-theorem NF.ref_mem_of_mem_Wn : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V), Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ (r : ℕ) (N : GlobalTheory.DegCnt.NF H r) (L : Submodule (𝓞 K) V), N.F.z ∈ L → ∀ v ∈ N.Ref L, v ∈ N.Wn → v ∈ L := by
+theorem NF.ref_mem_of_mem_Wn
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V),
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ (r : ℕ) (N : GlobalTheory.DegCnt.NF H r) (L : Submodule (𝓞 K) V),
+          N.F.z ∈ L → ∀ v ∈ N.Ref L, v ∈ N.Wn → v ∈ L := by
   intro K V _ _ _ _ _ _ _ _ H _ r N L hz v hv hvW
   obtain ⟨p, hp, l, hl, rfl⟩ := Submodule.mem_sup.1 hv
-  obtain ⟨q, hq, m, hm, rfl⟩ := Submodule.mem_sup.1 (ReflectionLatticeMembership.normalForm_baseLattice_le_dualSpan_sup_line N hp)
+  obtain ⟨q, hq, m, hm, rfl⟩ :=
+    Submodule.mem_sup.1 (ReflectionLatticeMembership.normalForm_baseLattice_le_dualSpan_sup_line N
+      hp)
   obtain ⟨γ, hγ, rfl⟩ := hm
   obtain ⟨x, rfl⟩ := Submodule.mem_one.1 hγ
-  have hm' : ((LinearMap.toSpanSingleton K V N.F.z).restrictScalars (𝓞 K)) (algebraMap (𝓞 K) K x) = x • N.F.z := by
+  have hm'
+      : ((LinearMap.toSpanSingleton K V N.F.z).restrictScalars (𝓞 K)) (algebraMap (𝓞 K) K x)
+        = x • N.F.z := by
     simp [algebraMap_smul]
   rw [hm'] at hvW ⊢
   have hmW : x • N.F.z ∈ N.Wn := by
     rw [← algebraMap_smul K x N.F.z]
     exact N.Wn.smul_mem _ (NFGeom.z_mem_Wn N)
   have hlW : l ∈ N.Wn := hl.2
-  have hq0 : q = 0 := ReflectionLatticeMembership.eq_zero N hq (by
-    have h := N.Wn.sub_mem (N.Wn.sub_mem hvW hlW) hmW
-    convert h using 1
-    abel)
+  have hq0 : q = 0 :=
+    ReflectionLatticeMembership.eq_zero N hq (by
+      have h := N.Wn.sub_mem (N.Wn.sub_mem hvW hlW) hmW
+      convert h using 1
+      abel)
   subst hq0
   rw [zero_add]
   exact L.add_mem (L.smul_mem x hz) hl.1

@@ -8,25 +8,35 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZlTower
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
 open scoped Topology PowerSeries.WithPiTopology
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1600000
 namespace GlobalTheory.NL.WkRange
 
-theorem jD_smul_letter {l : ℕ} [Fact l.Prime] {P : LocPrime l} {AI : LocAinf l P} {K : FinExt l} {s : ℕ}
-    {LL : FinExt l} {h : Good K s LL}
+theorem jD_smul_letter
+    {l : ℕ} [Fact l.Prime]
+    {P : LocPrime l} {AI : LocAinf l P} {K : FinExt l} {s : ℕ} {LL : FinExt l} {h : Good K s LL}
     {W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K))}
-    (E : EtSit P AI K s LL h W) (T : Lt K LL) (a : AA K LL) (x : W.DD T) :
-    E.tie.jD T (a • x) = inclR LL (E.tie.io a) • E.tie.jD T x := by
+    (E : EtSit P AI K s LL h W) (T : Lt K LL) (a : AA K LL) (x : W.DD T)
+    : E.tie.jD T (a • x) = inclR LL (E.tie.io a) • E.tie.jD T x := by
   rw [← algebraMap_smul W.EE a x, E.tie.jD_smul, E.tie.ioE_ext]
 
-theorem jD_aN_eq_range : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} {AI : LocAinf l P} {K : FinExt l} {s : ℕ} {LL : FinExt l} {h : Good K s LL} {W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K))} (E : EtSit P AI K s LL h W) (T : Lt K LL), ∃ (r : ℕ) (y : Fin r → TW (RW LL) T), E.tie.jD T '' (aN W T letπ : Set (W.DD T)) = Set.range fun a : Fin r → AA K LL => ∑ i, inclR LL (E.tie.io (a i)) • y i := by
+theorem jD_aN_eq_range
+    : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} {AI : LocAinf l P} {K : FinExt l} {s : ℕ}
+        {LL : FinExt l} {h : Good K s LL}
+        {W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K))}
+        (E : EtSit P AI K s LL h W) (T : Lt K LL),
+      ∃ (r : ℕ) (y : Fin r → TW (RW LL) T),
+        E.tie.jD T '' (aN W T letπ : Set (W.DD T))
+          = Set.range fun a : Fin r → AA K LL => ∑ i, inclR LL (E.tie.io (a i)) • y i := by
   intro l _ P AI K s LL h W E T
   obtain ⟨S, hS⟩ := W.N_fg T
   let n : Fin S.card → W.DD T := fun i => (S.equivFin.symm i : W.DD T)
   have hrange : Set.range n = (S : Set (W.DD T)) := by
-    ext z; constructor
+    ext z
+    constructor
     · rintro ⟨i, rfl⟩; exact (S.equivFin.symm i).2
     · intro hz; exact ⟨S.equivFin ⟨z, hz⟩, by simp [n]⟩
   have hspan : W.N T = Submodule.span (AA K LL) (Set.range n) := by rw [hrange, hS]

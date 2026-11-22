@@ -7,7 +7,11 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcN.F2 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B PositivityTheory.Rg.BcB.F
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+  PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.G8
+  PositivityTheory.Rg.BcN.F2 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B
+  PositivityTheory.Rg.BcB.F
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -22,8 +26,11 @@ theorem matchBadIOf2 : MatchBadIOf2 := by
   intro h2 hI E _ _ _ hU w hw n a b k hab hk K' hK hmem m
   rw [hI E n w K' hK m]
   have hM := h2 E hU w hw n a b k hab hk
-  have hf : lone K' = fun γ => ((K'.relIndex (KL n w) : ℕ) : ℂ) *
-      (({γ : UL n w | γ.1 ∈ congK n w k} : Set (UL n w)).indicator 1 γ) := by
+  have hf
+      : lone K'
+        = fun γ =>
+          ((K'.relIndex (KL n w) : ℕ) : ℂ)
+            * (({γ : UL n w | γ.1 ∈ congK n w k} : Set (UL n w)).indicator 1 γ) := by
     funext γ
     rw [mb_lone_apply]
     by_cases h : γ ∈ K'
@@ -32,7 +39,8 @@ theorem matchBadIOf2 : MatchBadIOf2 := by
     · have h' : γ ∉ ({γ : UL n w | γ.1 ∈ congK n w k} : Set (UL n w)) := fun h' => h ((hmem γ).2 h')
       simp [h, h']
   rw [hf]
-  have hM' : Match n a b w 1 ({γ : UL n w | γ.1 ∈ congK n w k}.indicator 1) (pairIndicatorMatch n a b w k) := by
+  have hM' : Match n a b w 1 ({γ : UL n w | γ.1 ∈ congK n w k}.indicator 1)
+      (pairIndicatorMatch n a b w k) := by
     convert hM using 2
     · rfl
     · unfold pairIndicatorMatch congK

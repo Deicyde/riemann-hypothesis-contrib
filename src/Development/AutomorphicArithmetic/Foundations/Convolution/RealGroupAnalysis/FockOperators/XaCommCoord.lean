@@ -8,7 +8,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
@@ -89,25 +91,38 @@ private lemma Xa_Da_sum (θ : ℂ) (hθ : θ ≠ 0) (x d : Fin 4 → A) :
 
 end Abstract
 
-theorem UpperTheory.ConvolutionTheory.R2.Fo.weylX :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D) (O : Ops F) (τ : E →+* ℂ),
-    (∀ a b c d, O.X D τ a b * O.X D τ c d = O.X D τ c d * O.X D τ a b) ∧ (∀ a b c d, O.DX D τ a b * O.DX D τ c d = O.DX D τ c d * O.DX D τ a b) ∧
-    (∀ a b c d, O.DX D τ a b * O.X D τ c d = O.X D τ c d * O.DX D τ a b + if a = c ∧ b = d then 1 else 0) ∧
-    O.e D.δ (pl F τ) = cc • (O.X D τ 0 1 * O.X D τ 1 0 - O.X D τ 0 0 * O.X D τ 1 1) ∧
-    O.f D.δ (pl F τ) = (-cc⁻¹) • (O.DX D τ 0 1 * O.DX D τ 1 0 - O.DX D τ 0 0 * O.DX D τ 1 1) ∧
-    O.h (pl F τ) = (∑ a, ∑ b, O.X D τ a b * O.DX D τ a b) + 2 := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.weylX
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D)
+        (O : Ops F) (τ : E →+* ℂ),
+      (∀ a b c d, O.X D τ a b * O.X D τ c d = O.X D τ c d * O.X D τ a b)
+        ∧ (∀ a b c d, O.DX D τ a b * O.DX D τ c d = O.DX D τ c d * O.DX D τ a b)
+        ∧ (∀ a b c d,
+          O.DX D τ a b * O.X D τ c d = O.X D τ c d * O.DX D τ a b + if a = c ∧ b = d then 1 else 0)
+        ∧ O.e D.δ (pl F τ) = cc • (O.X D τ 0 1 * O.X D τ 1 0 - O.X D τ 0 0 * O.X D τ 1 1)
+        ∧ O.f D.δ (pl F τ) = (-cc⁻¹) • (O.DX D τ 0 1 * O.DX D τ 1 0 - O.DX D τ 0 0 * O.DX D τ 1 1)
+        ∧ O.h (pl F τ) = (∑ a, ∑ b, O.X D τ a b * O.DX D τ a b) + 2 := by
   intro F E _ _ _ _ _ _ _ D W O τ
   obtain ⟨hsq, -, hθ⟩ := (coordMk F E D).2.1 τ
   have hx : ∀ i j, Commute (O.x (pl F τ) i) (O.x (pl F τ) j) := fun i j => (weyl F O _ _ i j).1
   have hd : ∀ i j, Commute (O.d (pl F τ) i) (O.d (pl F τ) j) := fun i j => dComm F E D W O _ _ i j
-  have hw : ∀ i j, O.d (pl F τ) i * O.x (pl F τ) j = O.x (pl F τ) j * O.d (pl F τ) i + if i = j then 1 else 0 := by
+  have hw
+      : ∀ i j,
+        O.d (pl F τ) i * O.x (pl F τ) j
+          = O.x (pl F τ) j * O.d (pl F τ) i + if i = j then 1 else 0 := by
     intro i j
     simpa using (weyl F O (pl F τ) (pl F τ) i j).2
   have eX : O.X D τ = Xa (τ D.θ) (O.x (pl F τ)) := rfl
   have eD : O.DX D τ = Da (τ D.θ) (O.d (pl F τ)) := rfl
   rw [eX, eD]
-  refine ⟨fun a b c d => Xa_comm _ hx a b c d, fun a b c d => Da_comm _ hd a b c d,
-    fun a b c d => Da_Xa _ hθ hw a b c d, ?_, ?_, ?_⟩
+  refine ⟨
+    fun a b c d => Xa_comm _ hx a b c d,
+    fun a b c d => Da_comm _ hd a b c d,
+    fun a b c d => Da_Xa _ hθ hw a b c d,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Xa_det _ _ hsq hx]; rfl
   · rw [Da_det _ _ hθ hsq hd]; rfl
   · rw [Xa_Da_sum _ hθ]; rfl

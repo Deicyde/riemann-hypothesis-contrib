@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFix
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 
 noncomputable section
@@ -40,10 +42,11 @@ theorem euler_one_add (R : PowerSeries K) : euler (1 + X * R) = X * (R + euler R
     simp
     ring
 
-def inv4 (R : PowerSeries K) : PowerSeries K := PowerSeries.mk fun n => coeff n R / (4 * ((n : K) + 2))
+def inv4 (R : PowerSeries K) : PowerSeries K :=
+  PowerSeries.mk fun n => coeff n R / (4 * ((n : K) + 2))
 
-theorem inverseShiftedEulerOperatorFour_eq_iff [CharZero K] (R S : PowerSeries K) :
-    inv4 S = R ↔ S = 4 * (2 * R + euler R) := by
+theorem inverseShiftedEulerOperatorFour_eq_iff [CharZero K] (R S : PowerSeries K)
+    : inv4 S = R ↔ S = 4 * (2 * R + euler R) := by
   have h4 : (4 : PowerSeries K) = C 4 := (map_ofNat _ 4).symm
   have h2 : (2 : PowerSeries K) = C 2 := (map_ofNat _ 2).symm
   rw [PowerSeries.ext_iff, PowerSeries.ext_iff]
@@ -51,14 +54,15 @@ theorem inverseShiftedEulerOperatorFour_eq_iff [CharZero K] (R S : PowerSeries K
   have hn : (4 * ((n : K) + 2)) ≠ 0 := by
     have : ((n : K) + 2) ≠ 0 := by exact_mod_cast (by omega : n + 2 ≠ 0)
     exact mul_ne_zero (by norm_num) this
-  rw [inv4, coeff_mk, div_eq_iff hn, h4, h2, coeff_C_mul, map_add (f := _), coeff_C_mul, coeff_euler]
+  rw [inv4, coeff_mk, div_eq_iff hn, h4, h2, coeff_C_mul, map_add (f := _), coeff_C_mul,
+    coeff_euler]
   constructor <;> intro h <;> rw [h] <;> ring
 
 def rest (a b : K) (R : PowerSeries K) : PowerSeries K :=
   (euler R - R) ^ 2 - 12 * R ^ 2 - 4 * X * R ^ 3 + C a * X ^ 2 * (1 + X * R) + C b * X ^ 4
 
-theorem contract (a b : K) (n : ℕ) (x y : PowerSeries K) (h : X ^ n ∣ x - y) :
-    X ^ (n + 1) ∣ inv4 (X * rest a b x) - inv4 (X * rest a b y) := by
+theorem contract (a b : K) (n : ℕ) (x y : PowerSeries K) (h : X ^ n ∣ x - y)
+    : X ^ (n + 1) ∣ inv4 (X * rest a b x) - inv4 (X * rest a b y) := by
   have he : X ^ n ∣ euler x - euler y := by
     rw [X_pow_dvd_iff] at h ⊢
     intro m hm
@@ -68,8 +72,11 @@ theorem contract (a b : K) (n : ℕ) (x y : PowerSeries K) (h : X ^ n ∣ x - y)
   obtain ⟨u, hu⟩ := h
   obtain ⟨v, hv⟩ := he
   have hr : X ^ (n + 1) ∣ X * rest a b x - X * rest a b y := by
-    refine ⟨(v - u) * (euler x - x + (euler y - y)) - 12 * u * (x + y)
-      - 4 * X * u * (x ^ 2 + x * y + y ^ 2) + C a * X ^ 3 * u, ?_⟩
+    refine ⟨
+      (v - u) * (euler x - x + (euler y - y)) - 12 * u * (x + y)
+        - 4 * X * u * (x ^ 2 + x * y + y ^ 2) + C a * X ^ 3 * u,
+      ?_
+    ⟩
     unfold rest
     linear_combination X * (euler x - x + (euler y - y)) * hv +
       X * (-(euler x - x + (euler y - y)) - 12 * (x + y)
@@ -80,8 +87,8 @@ theorem contract (a b : K) (n : ℕ) (x y : PowerSeries K) (h : X ^ n ∣ x - y)
   rw [map_sub, sub_eq_zero] at this
   rw [map_sub, inv4, inv4, coeff_mk, coeff_mk, this, sub_self]
 
-theorem isWpSer_iff [CharZero K] (a b : K) (R : PowerSeries K) :
-    IsWpSer a b (1 + X * R) ↔ inv4 (X * rest a b R) = R := by
+theorem isWpSer_iff [CharZero K] (a b : K) (R : PowerSeries K)
+    : IsWpSer a b (1 + X * R) ↔ inv4 (X * rest a b R) = R := by
   rw [inverseShiftedEulerOperatorFour_eq_iff]
   have he := euler_one_add R
   have hX : (X : PowerSeries K) ≠ 0 := X_ne_zero
@@ -101,11 +108,13 @@ theorem eq_one_add {P : PowerSeries K} (h : constantCoeff P = 1) : ∃ R, P = 1 
   obtain ⟨R, hR⟩ : X ∣ P - 1 := by rw [X_dvd_iff]; simp [h]
   exact ⟨R, by linear_combination hR⟩
 
-theorem existsUnique_isWpSer :
-    ∀ (K : Type) [Field K] [CharZero K] (a b : K), ∃! P : PowerSeries K, IsWpSer a b P := by
+theorem existsUnique_isWpSer
+    : ∀ (K : Type) [Field K] [CharZero K] (a b : K), ∃! P : PowerSeries K, IsWpSer a b P := by
   intro K _ _ a b
-  obtain ⟨R, hR⟩ := GlobalTheory.GenusOneDatum.exists_fixed_of_contract
-    (fun R : PowerSeries K => inv4 (X * rest a b R)) (contract a b)
+  obtain ⟨R, hR⟩ :=
+    GlobalTheory.GenusOneDatum.exists_fixed_of_contract
+      (fun R : PowerSeries K => inv4 (X * rest a b R))
+      (contract a b)
   refine ⟨1 + X * R, (isWpSer_iff a b R).2 hR, fun P hP => ?_⟩
   obtain ⟨S, rfl⟩ := eq_one_add hP.1
   have hS := (isWpSer_iff a b S).1 hP

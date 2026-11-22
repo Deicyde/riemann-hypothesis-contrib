@@ -12,7 +12,13 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.StabSe
 
 namespace GlobalTheory.UnfoldingObj
 
-theorem unfolding : ∀ D : Formalism.BasicNotions.D7, GlobalTheory.IndefiniteRowSideFullHecke.LatticeTensorUnfolding.Unfolding D := fun D =>
-  (GlobalTheory.UnfoldingCompare.unfolding_iff D).1 (GlobalTheory.T.unitaryUnfolding_volume_vectorStabilizer GlobalTheory.T.quotientMeasure_integration_formulas_unimodular GlobalTheory.T.adelicUnitaryGroupHaarProperties_proof GlobalTheory.T.stabSelfDualLattice_transitive_on_length D)
+theorem unfolding
+    : ∀ D : Formalism.BasicNotions.D7,
+      GlobalTheory.IndefiniteRowSideFullHecke.LatticeTensorUnfolding.Unfolding D := fun D =>
+  (GlobalTheory.UnfoldingCompare.unfolding_iff D).1
+    (GlobalTheory.T.unitaryUnfolding_volume_vectorStabilizer
+      GlobalTheory.T.quotientMeasure_integration_formulas_unimodular
+      GlobalTheory.T.adelicUnitaryGroupHaarProperties_proof
+      GlobalTheory.T.stabSelfDualLattice_transitive_on_length D)
 
 end GlobalTheory.UnfoldingObj

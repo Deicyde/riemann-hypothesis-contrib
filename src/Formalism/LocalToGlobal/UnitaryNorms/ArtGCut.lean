@@ -10,9 +10,10 @@ open NumberField
 
 namespace Formalism.L2.Host
 
-theorem sqSign_eq_jacobi {q p : ℕ} (hq : q.Prime) (hp : p.Prime) (hq4 : q % 4 = 3) (hp2 : p ≠ 2)
-    (v : (ZMod q)ˣ) (hv : (v : ZMod q) = (p : ZMod q)) :
-    ((sqSign v : ℤˣ) : ℤ) = jacobiSym (-(q : ℤ)) p := by
+theorem sqSign_eq_jacobi
+    {q p : ℕ} (hq : q.Prime) (hp : p.Prime) (hq4 : q % 4 = 3) (hp2 : p ≠ 2) (v : (ZMod q)ˣ)
+    (hv : (v : ZMod q) = (p : ZMod q))
+    : ((sqSign v : ℤˣ) : ℤ) = jacobiSym (-(q : ℤ)) p := by
   haveI := Fact.mk hq
   haveI := Fact.mk hp
   have hpq : p ≠ q := by
@@ -38,11 +39,11 @@ theorem sqSign_eq_jacobi {q p : ℕ} (hq : q.Prime) (hp : p.Prime) (hq4 : q % 4 
     have hp4 : p % 4 = 1 ∨ p % 4 = 3 := by omega
     rcases hp4 with h4 | h4
     · have hp2' : (p / 2) % 2 = 0 := by omega
-      rw [legendreSym.quadratic_reciprocity_one_mod_four h4 hq2,
-        (Nat.even_iff.2 hp2').neg_one_pow, one_mul]
+      rw [legendreSym.quadratic_reciprocity_one_mod_four h4 hq2, (Nat.even_iff.2 hp2').neg_one_pow,
+        one_mul]
     · have hp2' : (p / 2) % 2 = 1 := by omega
-      rw [legendreSym.quadratic_reciprocity_three_mod_four h4 hq4,
-        (Nat.odd_iff.2 hp2').neg_one_pow, neg_one_mul]
+      rw [legendreSym.quadratic_reciprocity_three_mod_four h4 hq4, (Nat.odd_iff.2 hp2').neg_one_pow,
+        neg_one_mul]
   rw [← jacobiSym.legendreSym.to_jacobiSym, key]
   unfold sqSign
   split_ifs with h

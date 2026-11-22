@@ -17,7 +17,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Pol
 noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.CxForm (IsRelAcyclic)
 open GlobalTheory GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
@@ -26,11 +27,13 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AmpleSymModel
 
-def polPull {S : Scheme.{0}} (P : Out.PolAV S) {R : Type} [CommRing R] (f : Sp R ⟶ S) : Out.PolAV (Sp R) :=
+def polPull {S : Scheme.{0}} (P : Out.PolAV S) {R : Type} [CommRing R] (f : Sp R ⟶ S)
+    : Out.PolAV (Sp R) :=
   have h := isGrpPullback_pullback P.A f
   have hL' := pull_isLB P.isLB (pullback.fst P.A.hom f)
   have := P.isAb.proper
-  { A := (Over.pullback f).obj P.A
+  {
+    A := (Over.pullback f).obj P.A
     isAb := isAbelianScheme_pullback_obj f P.A P.isAb
     g := P.g
     smoothDim := (smoothOfRelativeDimension_isStableUnderBaseChange _).of_isPullback h.1 P.smoothDim
@@ -41,6 +44,7 @@ def polPull {S : Scheme.{0}} (P : Out.PolAV S) {R : Type} [CommRing R] (f : Sp R
     ample := AmpleBaseChange.relAmple_of_isPullback P.isLB P.ample h.1
     ktriv := by
       obtain ⟨w, hw⟩ := PolBaseChange.lbIso_refl hL'
-      exact kTriv_pull h P.isLB hL' ((isGen_iff w).1 hw) P.ktriv }
+      exact kTriv_pull h P.isLB hL' ((isGen_iff w).1 hw) P.ktriv
+  }
 
 end GlobalTheory.AmpleSymModel

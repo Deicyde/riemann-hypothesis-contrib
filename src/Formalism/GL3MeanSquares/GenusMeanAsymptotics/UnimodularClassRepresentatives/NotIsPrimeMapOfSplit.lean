@@ -10,21 +10,21 @@ variable {A B : Type*} [CommRing A] [CommRing B] {ι : A →+* B} {σ : B →+* 
 
 theorem surj_of_invol (hσ : ∀ x, σ (σ x) = x) : Function.Surjective σ := fun y => ⟨σ y, hσ y⟩
 
-theorem comap_isMaximal_invol (hσ : ∀ x, σ (σ x) = x) {P : Ideal B} (hP : P.IsMaximal) :
-    (P.comap σ).IsMaximal :=
+theorem comap_isMaximal_invol (hσ : ∀ x, σ (σ x) = x) {P : Ideal B} (hP : P.IsMaximal)
+    : (P.comap σ).IsMaximal :=
   Ideal.comap_isMaximal_of_surjective σ (surj_of_invol hσ)
 
-theorem fix_ι (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι) (a : A) : σ (ι a) = ι a :=
-  (hfix _).2 ⟨a, rfl⟩
+theorem fix_ι (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι) (a : A) : σ (ι a) = ι a := (hfix _).2 ⟨a, rfl⟩
 
-theorem comap_ι_comap (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι) (P : Ideal B) :
-    (P.comap σ).comap ι = P.comap ι := by
+theorem comap_ι_comap (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι) (P : Ideal B)
+    : (P.comap σ).comap ι = P.comap ι := by
   ext a
   simp only [Ideal.mem_comap, fix_ι hfix]
 
-theorem comap_eq_comap_iff (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P Q : Ideal B} (hP : P.IsMaximal) (hQ : Q.IsMaximal) :
-    P.comap ι = Q.comap ι ↔ Q = P ∨ Q = P.comap σ := by
+theorem comap_eq_comap_iff
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P Q : Ideal B} (hP : P.IsMaximal) (hQ : Q.IsMaximal)
+    : P.comap ι = Q.comap ι ↔ Q = P ∨ Q = P.comap σ := by
   constructor
   · intro h
     by_contra hne
@@ -61,12 +61,15 @@ theorem comap_eq_comap_iff (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x 
     · rfl
     · exact (comap_ι_comap hfix P).symm
 
-theorem exists_sub_mem_of_split (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ ≠ P) (b : B) : ∃ a : A, b - ι a ∈ P := by
+theorem exists_sub_mem_of_split
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ ≠ P)
+    (b : B)
+    : ∃ a : A, b - ι a ∈ P := by
   have hP' : (P.comap σ).IsMaximal := comap_isMaximal_invol hσ hP
-  have hsup : P ⊔ P.comap σ = ⊤ := by
-    exact Ideal.IsMaximal.coprime_of_ne hP hP' (Ne.symm hc)
-  obtain ⟨u, hu, v, hv, huv⟩ := Submodule.mem_sup.1 (hsup ▸ Submodule.mem_top : (1 : B) ∈ P ⊔ P.comap σ)
+  have hsup : P ⊔ P.comap σ = ⊤ := by exact Ideal.IsMaximal.coprime_of_ne hP hP' (Ne.symm hc)
+  obtain ⟨u, hu, v, hv, huv⟩ :=
+    Submodule.mem_sup.1 (hsup ▸ Submodule.mem_top : (1 : B) ∈ P ⊔ P.comap σ)
   rw [Ideal.mem_comap] at hv
   have hfx : σ (b * v + σ (b * v)) = b * v + σ (b * v) := by rw [map_add (f := _), hσ, add_comm]
   obtain ⟨a, ha⟩ := (hfix _).1 hfx
@@ -76,9 +79,10 @@ theorem exists_sub_mem_of_split (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x
   rw [this]
   exact P.sub_mem (P.mul_mem_left _ hu) (P.mul_mem_left _ hv)
 
-theorem card_quot_split (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ ≠ P) :
-    Nat.card (A ⧸ P.comap ι) = Nat.card (B ⧸ P) := by
+theorem card_quot_split
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ ≠ P)
+    : Nat.card (A ⧸ P.comap ι) = Nat.card (B ⧸ P) := by
   let f : A ⧸ P.comap ι →+* B ⧸ P := Ideal.quotientMap P ι le_rfl
   have hinj : Function.Injective f := Ideal.quotientMap_injective
   have hsurj : Function.Surjective f := by
@@ -90,13 +94,15 @@ theorem card_quot_split (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔
     simpa using P.neg_mem ha
   exact Nat.card_congr (Equiv.ofBijective f ⟨hinj, hsurj⟩)
 
-theorem not_isPrime_map_of_split (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
-    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ ≠ P) : ¬ ((P.comap ι).map ι).IsPrime := by
+theorem not_isPrime_map_of_split
+    (hσ : ∀ x, σ (σ x) = x) (hfix : ∀ x, σ x = x ↔ x ∈ Set.range ι)
+    {P : Ideal B} (hP : P.IsMaximal) (hc : P.comap σ ≠ P)
+    : ¬((P.comap ι).map ι).IsPrime := by
   intro hpr
   have hP' : (P.comap σ).IsMaximal := comap_isMaximal_invol hσ hP
-  have hsup : P ⊔ P.comap σ = ⊤ := by
-    exact Ideal.IsMaximal.coprime_of_ne hP hP' (Ne.symm hc)
-  obtain ⟨u, hu, v, hv, huv⟩ := Submodule.mem_sup.1 (hsup ▸ Submodule.mem_top : (1 : B) ∈ P ⊔ P.comap σ)
+  have hsup : P ⊔ P.comap σ = ⊤ := by exact Ideal.IsMaximal.coprime_of_ne hP hP' (Ne.symm hc)
+  obtain ⟨u, hu, v, hv, huv⟩ :=
+    Submodule.mem_sup.1 (hsup ▸ Submodule.mem_top : (1 : B) ∈ P ⊔ P.comap σ)
   have hu' : u ∉ P.comap σ := by
     intro h
     exact hP'.ne_top ((Ideal.eq_top_iff_one _).2 (huv ▸ (P.comap σ).add_mem h hv))

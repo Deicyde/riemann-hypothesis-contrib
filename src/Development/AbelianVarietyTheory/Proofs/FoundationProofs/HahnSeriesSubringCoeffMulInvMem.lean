@@ -14,20 +14,27 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.HahnSub
 
-theorem coeff_mul_mem {Ω : Type} [Field Ω] (A : Subring Ω) (h h' : HahnSeries ℚ Ω)
-    (hh : ∀ r, h.coeff r ∈ A) (hh' : ∀ r, h'.coeff r ∈ A) (r : ℚ) : (h * h').coeff r ∈ A := by
+theorem coeff_mul_mem
+    {Ω : Type} [Field Ω]
+    (A : Subring Ω) (h h' : HahnSeries ℚ Ω) (hh : ∀ r, h.coeff r ∈ A) (hh' : ∀ r, h'.coeff r ∈ A)
+    (r : ℚ)
+    : (h * h').coeff r ∈ A := by
   rw [HahnSeries.coeff_mul]
   exact A.sum_mem fun ij _ => A.mul_mem (hh ij.1) (hh' ij.2)
 
-theorem coeff_inv_mem {Ω : Type} [Field Ω] (A : Subring Ω) (h : HahnSeries ℚ Ω)
-    (hh : ∀ r, h.coeff r ∈ A) (hl : h.leadingCoeff⁻¹ ∈ A) (r : ℚ) : (h⁻¹).coeff r ∈ A := by
+theorem coeff_inv_mem
+    {Ω : Type} [Field Ω]
+    (A : Subring Ω) (h : HahnSeries ℚ Ω) (hh : ∀ r, h.coeff r ∈ A) (hl : h.leadingCoeff⁻¹ ∈ A)
+    (r : ℚ)
+    : (h⁻¹).coeff r ∈ A := by
   by_cases h0 : h = 0
   · subst h0
     simp
 
-  let g : HahnSeries ℚ A :=
-    { coeff := fun s => ⟨h.coeff s, hh s⟩
-      isPWO_support' := h.isPWO_support.mono fun s hs e => hs (Subtype.ext e) }
+  let g : HahnSeries ℚ A := {
+    coeff := fun s => ⟨h.coeff s, hh s⟩
+    isPWO_support' := h.isPWO_support.mono fun s hs e => hs (Subtype.ext e)
+  }
   have hg : ∀ s, (g.coeff s : Ω) = h.coeff s := fun s => rfl
   have hg0 : g ≠ 0 := by
     intro e
@@ -65,14 +72,18 @@ theorem coeff_inv_mem {Ω : Type} [Field Ω] (A : Subring Ω) (h : HahnSeries �
     ext s
     rw [HahnSeries.map_coeff, HahnSeries.coeff_one, HahnSeries.coeff_one]
     split_ifs <;> rfl
-  have key : h * v.map f = 1 := by
-    rw [← hgf, ← HahnSeries.map_mul, hv, hone]
+  have key : h * v.map f = 1 := by rw [← hgf, ← HahnSeries.map_mul, hv, hone]
   rw [inv_eq_of_mul_eq_one_right key, HahnSeries.map_coeff]
   exact (v.coeff r).2
 
-theorem coeff_mul_inv_mem : ∀ (Ω : Type) [Field Ω] (A : Subring Ω), (∀ h h' : HahnSeries ℚ Ω, (∀ r, h.coeff r ∈ A) → (∀ r, h'.coeff r ∈ A) → ∀ r, (h * h').coeff r ∈ A) ∧ ∀ h : HahnSeries ℚ Ω, (∀ r, h.coeff r ∈ A) → h.leadingCoeff⁻¹ ∈ A → ∀ r, (h⁻¹).coeff r ∈ A := by
+theorem coeff_mul_inv_mem
+    : ∀ (Ω : Type) [Field Ω] (A : Subring Ω),
+      (∀ h h' : HahnSeries ℚ Ω,
+          (∀ r, h.coeff r ∈ A) → (∀ r, h'.coeff r ∈ A) → ∀ r, (h * h').coeff r ∈ A)
+        ∧ ∀ h : HahnSeries ℚ Ω,
+          (∀ r, h.coeff r ∈ A) → h.leadingCoeff⁻¹ ∈ A → ∀ r, (h⁻¹).coeff r ∈ A := by
   intro Ω _ A
-  exact ⟨fun h h' hh hh' r => coeff_mul_mem A h h' hh hh' r,
-    fun h hh hl r => coeff_inv_mem A h hh hl r⟩
+  exact
+    ⟨fun h h' hh hh' r => coeff_mul_mem A h h' hh hh' r, fun h hh hl r => coeff_inv_mem A h hh hl r⟩
 
 end GlobalTheory.HahnSub

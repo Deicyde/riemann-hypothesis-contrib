@@ -7,13 +7,15 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.Seg
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.Seg
 
 namespace GlobalTheory.CompanionTheory.Segments
 
-theorem exists_coatom_ge_of_hasFiniteLength {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    {P : Representation ℂ G V} (hfl : HasFiniteLength P) (S : Subrepresentation P) (hS : S ≠ ⊤) :
-    ∃ C : Subrepresentation P, IsCoatom C ∧ S ≤ C := by
+theorem exists_coatom_ge_of_hasFiniteLength
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    {P : Representation ℂ G V} (hfl : HasFiniteLength P) (S : Subrepresentation P) (hS : S ≠ ⊤)
+    : ∃ C : Subrepresentation P, IsCoatom C ∧ S ≤ C := by
   obtain ⟨hN, -⟩ := isFiniteLength_iff_isNoetherian_isArtinian.1 hfl
   have : IsCoatomic (Submodule (MonoidAlgebra ℂ G) P.asModule) := inferInstance
   have hc : IsCoatomic (Subrepresentation P) :=
@@ -22,10 +24,13 @@ theorem exists_coatom_ge_of_hasFiniteLength {G V : Type} [Group G] [AddCommGroup
   · exact absurd h hS
   · exact ⟨C, hC, hle⟩
 
-theorem cosocle_quotient_of_quotient : ∀ {G V W X : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-    [Module ℂ W] [AddCommGroup X] [Module ℂ X] (σ : Representation ℂ G W) (P : Representation ℂ G V)
-    (Q : Representation ℂ G X) (hc : IsCosocle σ P) (hfl : HasFiniteLength P) (f : P.IntertwiningMap Q)
-    (hf : Function.Surjective f) (hQ : Nontrivial X), ∃ g : Q.IntertwiningMap σ, Function.Surjective g := by
+theorem cosocle_quotient_of_quotient
+    : ∀ {G V W X : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+        [AddCommGroup X] [Module ℂ X] (σ : Representation ℂ G W) (P : Representation ℂ G V)
+        (Q : Representation ℂ G X) (hc : IsCosocle σ P) (hfl : HasFiniteLength P)
+        (f : P.IntertwiningMap Q) (hf : Function.Surjective f) (hQ : Nontrivial X),
+      ∃ g : Q.IntertwiningMap σ,
+        Function.Surjective g := by
   intro G V W X _ _ _ _ _ _ _ σ P Q hc hfl f hf hQ
   obtain ⟨-, f0, hf0, hco⟩ := hc
   have hne : Representation.IntertwiningMap.ker P Q f ≠ ⊤ := by

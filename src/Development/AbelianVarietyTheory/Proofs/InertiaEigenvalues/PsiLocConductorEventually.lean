@@ -16,12 +16,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WhitMulLocGL
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC GroundTheory.Global.IdeleGroup Formalism.L2.Host GlobalTheory.Published GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.Petersson
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host GlobalTheory.Published
+  GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.Petersson
 open scoped nonZeroDivisors ComplexConjugate
 
 open IsDedekindDomain Formalism.UG GlobalTheory.LFun
 
-theorem GlobalTheory.JSW.psiLoc_conductor_eventually : ∀ (E : Type) [Field E] [NumberField E], ∃ S : Finset (HeightOneSpectrum (𝓞 E)), ∀ w ∉ S, ∀ x : w.adicCompletion E, (∀ y ∈ Ov E w, (GroundTheory.Global.adelicChar _ (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y))) : ℂ) = 1) ↔ x ∈ Ov E w := by
+theorem GlobalTheory.JSW.psiLoc_conductor_eventually
+    : ∀ (E : Type) [Field E] [NumberField E], ∃ S : Finset (HeightOneSpectrum (𝓞 E)), ∀ w ∉ S,
+      ∀ x : w.adicCompletion E,
+        (∀ y ∈ Ov E w,
+            (GroundTheory.Global.adelicChar _
+                  (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y)))
+                : ℂ)
+              = 1)
+          ↔ x ∈ Ov E w := by
   intro E _ _
   classical
   have hD : (differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) ≠ 0 := differentIdeal_ne_bot (A := ℤ)
@@ -31,8 +41,10 @@ theorem GlobalTheory.JSW.psiLoc_conductor_eventually : ∀ (E : Type) [Field E] 
   rw [Ideal.dvd_iff_le] at hw'
   obtain ⟨y, hy, hyw⟩ := SetLike.not_le_iff_exists.mp hw'
   have hval : Valued.v ((algebraMap (𝓞 E) E y : E) : w.adicCompletion E) = 1 := by
-    rw [HeightOneSpectrum.valuedAdicCompletion_eq_valuation', HeightOneSpectrum.valuation_of_algebraMap]
-    exact le_antisymm (w.intValuation_le_one y) (not_lt.mp fun h => hyw ((w.intValuation_lt_one_iff_mem y).mp h))
+    rw [HeightOneSpectrum.valuedAdicCompletion_eq_valuation',
+      HeightOneSpectrum.valuation_of_algebraMap]
+    exact le_antisymm (w.intValuation_le_one y)
+      (not_lt.mp fun h => hyw ((w.intValuation_lt_one_iff_mem y).mp h))
   have key : x ∈ GroundTheory.Global.localInvDifferent w ↔ x ∈ w.adicCompletionIntegers E := by
     refine ⟨fun h => ?_, GroundTheory.Global.mem_localInvDifferent_of_mem⟩
     have h1 := h y hy

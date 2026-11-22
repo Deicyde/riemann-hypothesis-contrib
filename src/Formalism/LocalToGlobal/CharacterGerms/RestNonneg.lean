@@ -32,8 +32,8 @@ attribute [instance] Par.fPl Par.nz
 def IsReps (P : Par) (Z : Finset P.Pl) : Prop :=
   ∀ z' : P.Pl, ∃! p : P.Pl × ZMod P.d, p.1 ∈ Z ∧ P.pos p.1 p.2.val = z'
 
-def alongOrb {X : Type} (P : Par) (z : P.Pl) (W : P.Pl → X) : ZMod P.d → X :=
-  fun s => W (P.pos z s.val)
+def alongOrb {X : Type} (P : Par) (z : P.Pl) (W : P.Pl → X) : ZMod P.d → X := fun s =>
+  W (P.pos z s.val)
 
 structure DegHyp2 (P : Par) (W : P.Pl → ℕ) (T θ0 rest C1 : ℝ) : Prop where
   T_one : 1 ≤ T
@@ -89,8 +89,10 @@ structure PkgPhiC (P : Par) (l : ℕ) (C1 : ℝ) : Type 1 where
   ν : ℝ
   supp : ∀ z s k, gaC z s k ≠ 0 → 1 ≤ k ∧ k ≤ (R.X z).rkF 0 s
   main : ∀ z, gaC z 0 (P.k - 1) = W z
-  rest_eq : rest = ∑ z, ∑ s : ZMod 2, ∑ k ∈ Finset.Icc 1 P.r,
-    (if s = 0 ∧ k = P.k - 1 then (0 : ℝ) else (k : ℝ) * gaC z s k)
+  rest_eq
+    : rest
+      = ∑ z, ∑ s : ZMod 2, ∑ k ∈ Finset.Icc 1 P.r,
+        (if s = 0 ∧ k = P.k - 1 then (0 : ℝ) else (k : ℝ) * gaC z s k)
   what₂ : 8 * P.r * P.f ≤ nW
   deg : DegHyp2 P W T θ0 rest C1
   val : @ValBlocksC R.C R.fC R.V P.Pl _ R.I R.J R.fI R.fJ R.X R.F nW gaC ν
@@ -107,8 +109,14 @@ structure PkgSplit (P : Par) (l : ℕ) (C1 : ℝ) : Type 1 where
   θ0 : ℝ
   rest : ℝ
   ν : ℝ
-  wt : WtHyp P.k P.r Z (fun _ => 0) (fun z => (R.X z).rkF) ga (fun z => alongOrb P z W)
-    (fun _ _ => 0) rest
+  wt
+    : WtHyp P.k P.r Z
+      (fun _ => 0)
+      (fun z => (R.X z).rkF)
+      ga
+      (fun z => alongOrb P z W)
+      (fun _ _ => 0)
+      rest
   what₂ : 4 * P.r * P.f ≤ nW
   deg : DegHyp2 P W T θ0 rest C1
   val : @ValBlocks R.C R.fC R.V P.d _ P.Pl _ R.I R.J R.fI R.fJ R.X R.F Z nW ga ν

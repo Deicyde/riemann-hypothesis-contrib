@@ -16,11 +16,13 @@ section Gen
 variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 variable {A : Type*} [CommRing A] [Algebra O A] {ϖ : O}
 
-private theorem enat_map_natCast_int_eq_top_iff (a : ℕ∞) : a.map (Nat.cast : ℕ → ℤ) = ⊤ ↔ a = ⊤ := by
+private theorem enat_map_natCast_int_eq_top_iff (a : ℕ∞)
+    : a.map (Nat.cast : ℕ → ℤ) = ⊤ ↔ a = ⊤ := by
   cases a <;> simp
 
-theorem eq_zero_of_ord_top [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) {x : A}
-    (hx : ∀ ζ : Pts O A, ord ϖ ζ x = ⊤) : x = 0 := by
+theorem eq_zero_of_ord_top
+    [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) {x : A} (hx : ∀ ζ : Pts O A, ord ϖ ζ x = ⊤)
+    : x = 0 := by
   obtain ⟨n, hn⟩ := h.denom x
   have hy : (⟨ϖ ^ n • x, hn⟩ : ↥(As O A)) = 0 := by
     refine eq_zero_of_localization _ (fun J hJ => ?_)
@@ -35,9 +37,11 @@ theorem eq_zero_of_ord_top [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) �
   rw [Algebra.smul_def, map_pow] at h0
   exact (h.isUnit.pow n).mul_right_eq_zero.mp h0
 
-theorem isUnit_of_ord_ne_top (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A]
-    [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) {x : A} (hx : ∀ ζ : Pts O A, ord ϖ ζ x ≠ ⊤) :
-    IsUnit x := by
+theorem isUnit_of_ord_ne_top
+    (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A] [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif (A := A) ϖ)
+    {x : A} (hx : ∀ ζ : Pts O A, ord ϖ ζ x ≠ ⊤)
+    : IsUnit x := by
   have hnz : x ∈ nonZeroDivisors A := by
     rw [mem_nonZeroDivisors_iff_right]
     intro y hy
@@ -50,8 +54,8 @@ theorem isUnit_of_ord_ne_top (K : Type*) [Field K] [Algebra K A] [FiniteDimensio
   haveI : IsArtinianRing A := IsArtinianRing.of_finite K A
   exact IsArtinianRing.isUnit_of_mem_nonZeroDivisors hnz
 
-theorem exists_param [Finite (Pts O A)] (ζ₀ : Pts O A) [IsDVRAt ζ₀] :
-    ∃ t : ↥(As O A), vL ζ₀ t = 1 ∧ ∀ ζ : Pts O A, ζ ≠ ζ₀ → t ∉ ζ.asIdeal := by
+theorem exists_param [Finite (Pts O A)] (ζ₀ : Pts O A) [IsDVRAt ζ₀]
+    : ∃ t : ↥(As O A), vL ζ₀ t = 1 ∧ ∀ ζ : Pts O A, ζ ≠ ζ₀ → t ∉ ζ.asIdeal := by
   classical
   haveI := Fintype.ofFinite (Pts O A)
   haveI : IsDomain (Loc ζ₀) := IsDVRAt.isDomain
@@ -75,7 +79,9 @@ theorem exists_param [Finite (Pts O A)] (ζ₀ : Pts O A) [IsDVRAt ζ₀] :
     rw [sq] at hx
     refine Submodule.mul_induction_on hx (fun p hp q hq => ?_) (fun x y hx hy => ?_)
     · rw [vL_mul]
-      calc (2 : ℕ∞) = 1 + 1 := by norm_num
+      calc
+        (2 : ℕ∞)
+          = 1 + 1 := by norm_num
         _ ≤ _ := add_le_add (h1 p hp) (h1 q hq)
     · exact le_trans (le_min hx hy) (vL_add (ζ := ζ₀) x y)
   have hcop : ζ₀.asIdeal ^ 2 ⊔ ⨅ ζ ∈ (Finset.univ.filter (· ≠ ζ₀)), ζ.asIdeal = ⊤ := by
@@ -86,7 +92,8 @@ theorem exists_param [Finite (Pts O A)] (ζ₀ : Pts O A) [IsDVRAt ζ₀] :
     have hc : IsCoprime ζ₀.asIdeal ζ.asIdeal :=
       Ideal.isCoprime_iff_sup_eq.mpr (ζ₀.isMaximal.coprime_of_ne ζ.isMaximal hne)
     exact Ideal.isCoprime_iff_sup_eq.mp (hc.pow_left (m := 2))
-  have hone : (1 : ↥(As O A)) ∈ ζ₀.asIdeal ^ 2 ⊔ ⨅ ζ ∈ (Finset.univ.filter (· ≠ ζ₀)), ζ.asIdeal := by
+  have hone
+      : (1 : ↥(As O A)) ∈ ζ₀.asIdeal ^ 2 ⊔ ⨅ ζ ∈ (Finset.univ.filter (· ≠ ζ₀)), ζ.asIdeal := by
     rw [hcop]
     exact Submodule.mem_top
   obtain ⟨i, hi, j, hj, hij⟩ := Submodule.mem_sup.mp hone
@@ -116,12 +123,13 @@ theorem exists_param [Finite (Pts O A)] (ζ₀ : Pts O A) [IsDVRAt ζ₀] :
       exact ζ.asIdeal.add_mem hi' (hjmem ζ hz)
     exact ζ.isMaximal.ne_top ((Ideal.eq_top_iff_one _).mpr this)
 
-
 open scoped Classical in
 open Classical in
-theorem exists_unit_param (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A]
-    [Finite (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) (ζ₀ : Pts O A) :
-    ∃ t : Aˣ, ∀ ζ : Pts O A, ord ϖ ζ (t : A) = (((if ζ = ζ₀ then 1 else 0 : ℤ)) : WithTop ℤ) := by
+theorem exists_unit_param
+    (K : Type*)
+    [Field K] [Algebra K A] [FiniteDimensional K A] [Finite (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif (A := A) ϖ) (ζ₀ : Pts O A)
+    : ∃ t : Aˣ, ∀ ζ : Pts O A, ord ϖ ζ (t : A) = (((if ζ = ζ₀ then 1 else 0 : ℤ)) : WithTop ℤ) := by
   obtain ⟨t, ht1, ht2⟩ := exists_param ζ₀
   have hord : ∀ ζ : Pts O A, ord ϖ ζ (t : A) = (((if ζ = ζ₀ then 1 else 0 : ℤ)) : WithTop ℤ) := by
     intro ζ
@@ -130,35 +138,40 @@ theorem exists_unit_param (K : Type*) [Field K] [Algebra K A] [FiniteDimensional
     · subst hz
       rw [show (⟨(t : A), t.2⟩ : ↥(As O A)) = t from rfl, ht1]
       rfl
-    · rw [show (⟨(t : A), t.2⟩ : ↥(As O A)) = t from rfl, (vL_eq_zero_iff (ζ := ζ) t).mpr (ht2 ζ hz)]
+    · rw [show (⟨(t : A), t.2⟩ : ↥(As O A)) = t from rfl,
+        (vL_eq_zero_iff (ζ := ζ) t).mpr (ht2 ζ hz)]
       rfl
   have hu : IsUnit (t : A) :=
     isUnit_of_ord_ne_top K h (fun ζ => by rw [hord]; exact WithTop.coe_ne_top)
   exact ⟨hu.unit, fun ζ => by rw [hu.unit_spec]; exact hord ζ⟩
 
-private theorem ordZ_one (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] : ordZ ϖ ζ (1 : A) = 0 := by
+private theorem ordZ_one (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ]
+    : ordZ ϖ ζ (1 : A) = 0 := by
   have := coe_ordZ (ζ := ζ) h (one_mem (nonZeroDivisors A))
   rw [ord_one (ζ := ζ) h] at this
   exact_mod_cast this
 
-private theorem ordZ_units_mul (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] (v w : Aˣ) :
-    ordZ ϖ ζ ((v : A) * w) = ordZ ϖ ζ v + ordZ ϖ ζ w := by
+private theorem ordZ_units_mul (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] (v w : Aˣ)
+    : ordZ ϖ ζ ((v : A) * w) = ordZ ϖ ζ v + ordZ ϖ ζ w := by
   have hv := coe_ordZ (ζ := ζ) h v.isUnit.mem_nonZeroDivisors
   have hw := coe_ordZ (ζ := ζ) h w.isUnit.mem_nonZeroDivisors
   have hvw := coe_ordZ (ζ := ζ) h (v * w).isUnit.mem_nonZeroDivisors
   rw [Units.val_mul, ord_mul (ζ := ζ) h, ← hv, ← hw] at hvw
   exact_mod_cast hvw
 
-theorem exists_unit_ord (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A]
-    [Finite (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) (d : Pts O A → ℤ) :
-    ∃ u : Aˣ, ∀ ζ : Pts O A, ord ϖ ζ (u : A) = ((d ζ : ℤ) : WithTop ℤ) := by
+theorem exists_unit_ord
+    (K : Type*)
+    [Field K] [Algebra K A] [FiniteDimensional K A] [Finite (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif (A := A) ϖ) (d : Pts O A → ℤ)
+    : ∃ u : Aˣ, ∀ ζ : Pts O A, ord ϖ ζ (u : A) = ((d ζ : ℤ) : WithTop ℤ) := by
   classical
   haveI := Fintype.ofFinite (Pts O A)
   choose t ht using exists_unit_param K h
-  let φ : Pts O A → Aˣ →* Multiplicative ℤ := fun ζ =>
-    { toFun := fun v => Multiplicative.ofAdd (ordZ ϖ ζ (v : A))
-      map_one' := by simp only [Units.val_one, ordZ_one h ζ]; rfl
-      map_mul' := fun v w => by simp only [Units.val_mul, ordZ_units_mul h ζ v w]; rfl }
+  let φ : Pts O A → Aˣ →* Multiplicative ℤ := fun ζ => {
+    toFun := fun v => Multiplicative.ofAdd (ordZ ϖ ζ (v : A))
+    map_one' := by simp only [Units.val_one, ordZ_one h ζ]; rfl
+    map_mul' := fun v w => by simp only [Units.val_mul, ordZ_units_mul h ζ v w]; rfl
+  }
   refine ⟨∏ ζ', t ζ' ^ d ζ', fun ζ => ?_⟩
   have e2 : ∀ ζ', Multiplicative.toAdd (φ ζ (t ζ')) = if ζ = ζ' then 1 else 0 := by
     intro ζ'
@@ -167,15 +180,17 @@ theorem exists_unit_ord (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K
     rw [ht ζ' ζ] at this
     exact_mod_cast this
   have hz : ordZ ϖ ζ ((∏ ζ', t ζ' ^ d ζ' : Aˣ) : A) = d ζ := by
-    have e1 : Multiplicative.toAdd (φ ζ (∏ ζ', t ζ' ^ d ζ')) =
-        ordZ ϖ ζ ((∏ ζ', t ζ' ^ d ζ' : Aˣ) : A) := rfl
+    have e1
+        : Multiplicative.toAdd (φ ζ (∏ ζ', t ζ' ^ d ζ'))
+          = ordZ ϖ ζ ((∏ ζ', t ζ' ^ d ζ' : Aˣ) : A) :=
+      rfl
     rw [← e1, map_prod, toAdd_prod]
-    simp only [map_zpow, toAdd_zpow, e2, smul_eq_mul, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    simp only [map_zpow, toAdd_zpow, e2, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
+      Finset.mem_univ, if_true]
   rw [← coe_ordZ (ζ := ζ) h (Units.isUnit _).mem_nonZeroDivisors, hz]
 
-theorem ord_sub_one_nonneg_iff (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] (x : ↥(As O A)) :
-    0 ≤ ord ϖ ζ (x : A) + ((-1 : ℤ) : WithTop ℤ) ↔ x ∈ ζ.asIdeal := by
+theorem ord_sub_one_nonneg_iff (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt ζ] (x : ↥(As O A))
+    : 0 ≤ ord ϖ ζ (x : A) + ((-1 : ℤ) : WithTop ℤ) ↔ x ∈ ζ.asIdeal := by
   rw [ord_of_mem (ζ := ζ) h x.2]
   have e := vL_eq_zero_iff (ζ := ζ) x
   rw [← not_not (a := x ∈ ζ.asIdeal), ← e]
@@ -187,18 +202,19 @@ theorem ord_sub_one_nonneg_iff (h : IsUnif (A := A) ϖ) (ζ : Pts O A) [IsDVRAt 
     simp only [ENat.map_coe, ← WithTop.coe_add, WithTop.coe_nonneg, Nat.cast_eq_zero]
     constructor <;> intro hh <;> omega
 
-theorem length_quot_add {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
-    {N P Q : Submodule R M} (h1 : N ≤ P) (h2 : P ≤ Q) :
-    Module.length R (↥Q ⧸ N.comap Q.subtype) =
-      Module.length R (↥P ⧸ N.comap P.subtype) + Module.length R (↥Q ⧸ P.comap Q.subtype) := by
+theorem length_quot_add
+    {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
+    {N P Q : Submodule R M} (h1 : N ≤ P) (h2 : P ≤ Q)
+    : Module.length R (↥Q ⧸ N.comap Q.subtype)
+      = Module.length R (↥P ⧸ N.comap P.subtype) + Module.length R (↥Q ⧸ P.comap Q.subtype) := by
   have hle1 : N.comap P.subtype ≤ (N.comap Q.subtype).comap (Submodule.inclusion h2) := by
     intro x hx
     simpa using hx
   have hle2 : N.comap Q.subtype ≤ (P.comap Q.subtype).comap LinearMap.id := by
     intro x hx
     exact h1 hx
-  refine Module.length_eq_add_of_exact
-    (Submodule.mapQ _ _ (Submodule.inclusion h2) hle1) (Submodule.mapQ _ _ LinearMap.id hle2) ?_ ?_ ?_
+  refine Module.length_eq_add_of_exact (Submodule.mapQ _ _ (Submodule.inclusion h2) hle1)
+    (Submodule.mapQ _ _ LinearMap.id hle2) ?_ ?_ ?_
   · intro x y hxy
     obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective _ x
     obtain ⟨y, rfl⟩ := Submodule.mkQ_surjective _ y
@@ -221,12 +237,14 @@ theorem length_quot_add {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
       rw [Submodule.mkQ_apply, Submodule.mapQ_apply, Submodule.Quotient.eq] at hx
       have h3 := h1 hx
       simp only [Submodule.mem_comap, Submodule.subtype_apply, Submodule.coe_sub,
-        Submodule.coe_inclusion] at h3
+          Submodule.coe_inclusion]
+        at h3
       have h4 := P.sub_mem p.2 h3
       simpa using h4
 
-theorem length_zero_of_le {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
-    {N P : Submodule R M} (h : P ≤ N) : Module.length R (↥P ⧸ N.comap P.subtype) = 0 := by
+theorem length_zero_of_le
+    {R M : Type*} [Ring R] [AddCommGroup M] [Module R M] {N P : Submodule R M} (h : P ≤ N)
+    : Module.length R (↥P ⧸ N.comap P.subtype) = 0 := by
   rw [Module.length_eq_zero_iff]
   refine ⟨fun a b => ?_⟩
   obtain ⟨a, rfl⟩ := Submodule.mkQ_surjective _ a
@@ -234,10 +252,9 @@ theorem length_zero_of_le {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
   rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
   exact h (a - b).2
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-theorem length_residue (hfin : Module.Finite O ↥(As O A)) (ζ : Pts O A) :
-    Module.length O (↥(As O A) ⧸ ζ.asIdeal) = (fdeg ζ : ℕ∞) := by
+theorem length_residue (hfin : Module.Finite O ↥(As O A)) (ζ : Pts O A)
+    : Module.length O (↥(As O A) ⧸ ζ.asIdeal) = (fdeg ζ : ℕ∞) := by
   classical
   haveI : ζ.asIdeal.IsMaximal := ζ.isMaximal
   haveI : ζ.asIdeal.LiesOver (IsLocalRing.maximalIdeal O) := ⟨(comap_eq_maximalIdeal ζ).symm⟩
@@ -253,41 +270,47 @@ theorem length_residue (hfin : Module.Finite O ↥(As O A)) (ζ : Pts O A) :
   let b := Module.finBasis (O ⧸ IsLocalRing.maximalIdeal O) (↥(As O A) ⧸ ζ.asIdeal)
   let eqv := b.equivFun.restrictScalars O
   have h1 : Module.length O (O ⧸ IsLocalRing.maximalIdeal O) = 1 :=
-    Module.length_eq_one_iff.mpr (isSimpleModule_iff_isCoatom.mpr
-      (Ideal.isMaximal_def.mp (IsLocalRing.maximalIdeal.isMaximal O)))
-  rw [hf, eqv.length_eq, Module.length_pi, h1, mul_one, ENat.card_eq_coe_fintype_card, Fintype.card_fin]
+    Module.length_eq_one_iff.mpr (isSimpleModule_iff_isCoatom.mpr (Ideal.isMaximal_def.mp
+      (IsLocalRing.maximalIdeal.isMaximal O)))
+  rw [hf, eqv.length_eq, Module.length_pi, h1, mul_one, ENat.card_eq_coe_fintype_card,
+    Fintype.card_fin]
 
 variable {V : Type*} [AddCommGroup V] [Module A V] [Module O V] [IsScalarTower O A V] {e : V}
 
-theorem ballO_mono [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) (he : IsGen (A := A) e)
-    {c c' : Pts O A → ℤ} (hc : ∀ ζ, c ζ ≤ c' ζ) : ballO ϖ e c ≤ ballO ϖ e c' := fun v hv => ball_mono h he hc hv
-
+theorem ballO_mono
+    [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif (A := A) ϖ) (he : IsGen (A := A) e)
+    {c c' : Pts O A → ℤ} (hc : ∀ ζ, c ζ ≤ c' ζ)
+    : ballO ϖ e c ≤ ballO ϖ e c' := fun v hv =>
+  ball_mono h he hc hv
 
 open scoped Classical in
 open Classical in
-theorem length_step (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A]
-    [Finite (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ) (hfin : Module.Finite O ↥(As O A))
-    (he : IsGen (A := A) e) (c d : Pts O A → ℤ) (ζ₀ : Pts O A)
-    (hd : ∀ ζ, d ζ = c ζ + if ζ = ζ₀ then 1 else 0) :
-    Module.length O (↥(ballO ϖ e d) ⧸ (ballO ϖ e c).comap (ballO ϖ e d).subtype) = fdeg ζ₀ := by
+theorem length_step
+    (K : Type*)
+    [Field K] [Algebra K A] [FiniteDimensional K A] [Finite (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif (A := A) ϖ) (hfin : Module.Finite O ↥(As O A)) (he : IsGen (A := A) e)
+    (c d : Pts O A → ℤ) (ζ₀ : Pts O A) (hd : ∀ ζ, d ζ = c ζ + if ζ = ζ₀ then 1 else 0)
+    : Module.length O (↥(ballO ϖ e d) ⧸ (ballO ϖ e c).comap (ballO ϖ e d).subtype) = fdeg ζ₀ := by
   classical
-  obtain ⟨w, hw⟩ := exists_unit_ord K h (fun ζ => -d ζ)
+  obtain ⟨w, hw⟩ := exists_unit_ord K h (fun ζ => - d ζ)
   have hwi : ∀ ζ, ord ϖ ζ ((w⁻¹ : Aˣ) : A) = ((d ζ : ℤ) : WithTop ℤ) := by
     intro ζ
     have e := ord_units_add_inv (ζ := ζ) h w
-    obtain ⟨k, hk⟩ := WithTop.ne_top_iff_exists.mp
-      (ord_ne_top (ζ := ζ) h (w⁻¹).isUnit.mem_nonZeroDivisors)
+    obtain ⟨k, hk⟩ :=
+      WithTop.ne_top_iff_exists.mp (ord_ne_top (ζ := ζ) h (w⁻¹).isUnit.mem_nonZeroDivisors)
     rw [← hk, hw ζ] at e
     rw [← hk]
-    have e' : -d ζ + k = 0 := by exact_mod_cast e
+    have e' : - d ζ + k = 0 := by exact_mod_cast e
     congr 1
     omega
-  have hov : ∀ (c' : Pts O A → ℤ) (b : ↥(As O A)) (ζ : Pts O A),
-      ordV ϖ ζ e c' (((b : A) * w) • e) = ord ϖ ζ (b : A) + ((c' ζ - d ζ : ℤ) : WithTop ℤ) := by
+  have hov
+      : ∀ (c' : Pts O A → ℤ) (b : ↥(As O A)) (ζ : Pts O A),
+        ordV ϖ ζ e c' (((b : A) * w) • e) = ord ϖ ζ (b : A) + ((c' ζ - d ζ : ℤ) : WithTop ℤ) := by
     intro c' b ζ
     simp only [ordV]
     rw [coord_smul_gen he, ord_mul (ζ := ζ) h, hw ζ, add_assoc, ← WithTop.coe_add]
-    rw [show -d ζ + c' ζ = c' ζ - d ζ by ring]
+    rw [show - d ζ + c' ζ = c' ζ - d ζ by ring]
   have hmemd : ∀ b : ↥(As O A), ((b : A) * w) • e ∈ ballO ϖ e d := by
     intro b
     show ((b : A) * w) • e ∈ ball ϖ e d
@@ -295,20 +318,22 @@ theorem length_step (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A]
     intro ζ
     rw [hov, sub_self, WithTop.coe_zero, add_zero]
     exact ord_nonneg (ζ := ζ) h b.2
-  let f : ↥(As O A) →ₗ[O] ↥(ballO ϖ e d) :=
-    { toFun := fun b => ⟨((b : A) * w) • e, hmemd b⟩
-      map_add' := fun x y => by
-        apply Subtype.ext
-        simp only [Subalgebra.coe_add, add_mul, add_smul, Submodule.coe_add]
-      map_smul' := fun r x => by
-        apply Subtype.ext
-        simp only [Subalgebra.coe_smul, RingHom.id_apply, Submodule.coe_smul, smul_mul_assoc,
-          smul_assoc] }
+  let f : ↥(As O A) →ₗ[O] ↥(ballO ϖ e d) := {
+    toFun := fun b => ⟨((b : A) * w) • e, hmemd b⟩
+    map_add' := fun x y => by
+      apply Subtype.ext
+      simp only [Subalgebra.coe_add, add_mul, add_smul, Submodule.coe_add]
+    map_smul' := fun r x => by
+      apply Subtype.ext
+      simp only [Subalgebra.coe_smul, RingHom.id_apply, Submodule.coe_smul, smul_mul_assoc,
+        smul_assoc]
+  }
   let G := ((ballO ϖ e c).comap (ballO ϖ e d).subtype).mkQ ∘ₗ f
   have hsurj : Function.Surjective G := by
     intro y
     obtain ⟨v, rfl⟩ := Submodule.mkQ_surjective _ y
-    have hv : ∀ ζ : Pts O A, 0 ≤ ordV ϖ ζ e d (v : V) := (mem_ball_iff (c := d) (h := h) (he := he) (v := (v : V))).mp v.2
+    have hv : ∀ ζ : Pts O A, 0 ≤ ordV ϖ ζ e d (v : V) :=
+      (mem_ball_iff (c := d) (h := h) (he := he) (v := (v : V))).mp v.2
     have hb : (coord e (v : V) : A) * ((w⁻¹ : Aˣ) : A) ∈ As O A := by
       rw [mem_As_iff h]
       intro ζ
@@ -341,18 +366,20 @@ theorem length_step (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A]
         exact (ord_sub_one_nonneg_iff h ζ b).mpr hb
       · rw [if_neg hz, show c ζ - (c ζ + 0) = (0 : ℤ) by ring, WithTop.coe_zero, add_zero]
         exact ord_nonneg (ζ := ζ) h b.2
-  rw [← (G.quotKerEquivOfSurjective hsurj).length_eq,
-    (Submodule.quotEquivOfEq _ _ hker).length_eq,
+  rw [← (G.quotKerEquivOfSurjective hsurj).length_eq, (Submodule.quotEquivOfEq _ _ hker).length_eq,
     (Submodule.Quotient.restrictScalarsEquiv O ζ₀.asIdeal).length_eq]
   exact length_residue hfin ζ₀
 
-theorem length_ball_quotient_eq_sum_mul_fdeg (K : Type*) [Field K] [Algebra K A] [FiniteDimensional K A]
-    [Fintype (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif (A := A) ϖ)
-    (hfin : Module.Finite O ↥(As O A)) (he : IsGen (A := A) e) :
-    ∀ (n : ℕ) (c : Pts O A → ℤ) (m : Pts O A → ℕ), ∑ ζ, m ζ = n →
-      Module.length O (↥(ballO ϖ e (fun ζ => c ζ + m ζ)) ⧸
-          (ballO ϖ e c).comap (ballO ϖ e (fun ζ => c ζ + m ζ)).subtype) =
-        ((∑ ζ, m ζ * fdeg ζ : ℕ) : ℕ∞) := by
+theorem length_ball_quotient_eq_sum_mul_fdeg
+    (K : Type*)
+    [Field K] [Algebra K A] [FiniteDimensional K A] [Fintype (Pts O A)] [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif (A := A) ϖ) (hfin : Module.Finite O ↥(As O A)) (he : IsGen (A := A) e)
+    : ∀ (n : ℕ) (c : Pts O A → ℤ) (m : Pts O A → ℕ),
+      ∑ ζ, m ζ = n
+        → Module.length O
+            (↥(ballO ϖ e (fun ζ => c ζ + m ζ)) ⧸
+              (ballO ϖ e c).comap (ballO ϖ e (fun ζ => c ζ + m ζ)).subtype)
+          = ((∑ ζ, m ζ * fdeg ζ : ℕ) : ℕ∞) := by
   classical
   intro n
   induction n with
@@ -384,12 +411,15 @@ theorem length_ball_quotient_eq_sum_mul_fdeg (K : Type*) [Field K] [Algebra K A]
     have hle1 : ballO ϖ e c ≤ ballO ϖ e (fun ζ => c ζ + (m' ζ : ℤ)) :=
       ballO_mono h he (fun ζ => le_add_of_nonneg_right (Nat.cast_nonneg _))
     have hle2 : ballO ϖ e (fun ζ => c ζ + (m' ζ : ℤ)) ≤ ballO ϖ e (fun ζ => c ζ + (m ζ : ℤ)) :=
-      ballO_mono h he (fun ζ => show c ζ + (m' ζ : ℤ) ≤ c ζ + (m ζ : ℤ) by
-        have h5 : (m' ζ : ℤ) ≤ (m ζ : ℤ) :=
-          Nat.cast_le.mpr (le_trans (Nat.le_add_right _ _) (hmm ζ).symm.le)
-        linarith)
-    have hd : ∀ ζ, (fun ζ => c ζ + (m ζ : ℤ)) ζ =
-        (fun ζ => c ζ + (m' ζ : ℤ)) ζ + if ζ = ζ₀ then 1 else 0 := by
+      ballO_mono h he (fun ζ =>
+        show c ζ + (m' ζ : ℤ) ≤ c ζ + (m ζ : ℤ) by
+          have h5 : (m' ζ : ℤ) ≤ (m ζ : ℤ) :=
+            Nat.cast_le.mpr (le_trans (Nat.le_add_right _ _) (hmm ζ).symm.le)
+          linarith)
+    have hd
+        : ∀ ζ,
+          (fun ζ => c ζ + (m ζ : ℤ)) ζ
+            = (fun ζ => c ζ + (m' ζ : ℤ)) ζ + if ζ = ζ₀ then 1 else 0 := by
       intro ζ
       beta_reduce
       rw [hmm ζ]

@@ -13,9 +13,9 @@ namespace GlobalTheory
 
 open NumberField in
 open scoped nonZeroDivisors in
-private theorem one_mem_colon_one_smul_of_fg {E : Type} [Field E] [NumberField E]
-    (A : Submodule (𝓞 E) E) (hA : A.FG) (h1 : (1 : E) ∈ A) :
-    (1 : E) ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)) • A := by
+private theorem one_mem_colon_one_smul_of_fg
+    {E : Type} [Field E] [NumberField E] (A : Submodule (𝓞 E) E) (hA : A.FG) (h1 : (1 : E) ∈ A)
+    : (1 : E) ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)) • A := by
   set Af : FractionalIdeal (𝓞 E)⁰ E := ⟨A, FractionalIdeal.isFractional_of_fg hA⟩ with hAf
   have hne : Af ≠ 0 := by
     intro h
@@ -41,15 +41,14 @@ private theorem one_mem_colon_one_smul_of_fg {E : Type} [Field E] [NumberField E
   rw [mul_comm, ← Algebra.smul_def]
   exact Submodule.smul_mem_smul hi ha
 
-
 open NumberField in
 open scoped nonZeroDivisors in
-theorem _root_.GlobalTheory.colon_one_span_image_eq_map {E K : Type} [Field E] [NumberField E] [Field K]
-    [NumberField K]
+theorem _root_.GlobalTheory.colon_one_span_image_eq_map
+    {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K]
     (τ : 𝓞 E →+* 𝓞 K) (τE : E →+* K) (hτ : ∀ x : 𝓞 E, τE x = ((τ x : 𝓞 K) : K))
-    (A : Submodule (𝓞 E) E) (hA : A.FG) (h1 : (1 : E) ∈ A) :
-    (1 : Submodule (𝓞 K) K).colon (Submodule.span (𝓞 K) (τE '' A) : Set K) =
-      ((1 : Submodule (𝓞 E) E).colon (A : Set E)).map τ := by
+    (A : Submodule (𝓞 E) E) (hA : A.FG) (h1 : (1 : E) ∈ A)
+    : (1 : Submodule (𝓞 K) K).colon (Submodule.span (𝓞 K) (τE '' A) : Set K)
+      = ((1 : Submodule (𝓞 E) E).colon (A : Set E)).map τ := by
   have key := one_mem_colon_one_smul_of_fg A hA h1
   apply le_antisymm
   · intro r hr
@@ -59,12 +58,17 @@ theorem _root_.GlobalTheory.colon_one_span_image_eq_map {E K : Type} [Field E] [
       obtain ⟨u, hu⟩ := Submodule.mem_one.mp (hr _ (Submodule.subset_span ⟨a, ha, rfl⟩))
       rw [Algebra.smul_def] at hu
       exact ⟨u, hu⟩
-    have hP : ∀ x ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)) • A,
-        ∃ t ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)).map τ, (t : K) = (r : K) * τE x := by
+    have hP
+        : ∀ x ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)) • A,
+          ∃ t ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)).map τ,
+            (t : K) = (r : K) * τE x := by
       intro x hx
       refine Submodule.smul_induction_on
-        (p := fun x => ∃ t ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)).map τ,
-          (t : K) = (r : K) * τE x) hx (fun i hi a ha => ?_) ?_
+        (p := fun x =>
+          ∃ t ∈ ((1 : Submodule (𝓞 E) E).colon (A : Set E)).map τ, (t : K) = (r : K) * τE x)
+        hx
+        (fun i hi a ha => ?_)
+        ?_
       · obtain ⟨u, hu⟩ := hb a ha
         refine ⟨τ i * u, Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem τ hi), ?_⟩
         rw [Algebra.smul_def, map_mul]

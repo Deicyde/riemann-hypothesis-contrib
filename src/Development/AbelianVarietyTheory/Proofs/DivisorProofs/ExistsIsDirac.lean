@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Exists
 
 noncomputable section
 open NumberField MeasureTheory Matrix Topology
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspQuot GlobalTheory.AutGrowth.ApproxId GlobalTheory.GLFin
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep
+  GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspQuot GlobalTheory.AutGrowth.ApproxId
+  GlobalTheory.GLFin
 open scoped ContDiff
 
 namespace GlobalTheory.GLFin.Inhab
@@ -27,13 +29,13 @@ theorem contDiffOn_invL : ContDiffOn ℝ ∞ (fun x : Lie E a => toL (Matrix.of 
     LinearMap.toContinuousLinearMap (LinearMap.id : Lie E a →ₗ[ℝ] Lie E a)
   intro x hx
   have hu : IsUnit (S x) := hx
-  have h1 : ContDiffAt ℝ ∞ Ring.inverse (S x) := by simpa using contDiffAt_ringInverse ℝ (n := ∞) hu.unit
-  have h2 := (T.contDiff.contDiffAt.comp x (h1.comp x S.contDiff.contDiffAt)).contDiffWithinAt (s := invSet E a)
+  have h1 : ContDiffAt ℝ ∞ Ring.inverse (S x) := by
+    simpa using contDiffAt_ringInverse ℝ (n := ∞) hu.unit
+  have h2 :=
+    (T.contDiff.contDiffAt.comp x (h1.comp x S.contDiff.contDiffAt)).contDiffWithinAt
+      (s := invSet E a)
   refine h2.congr (fun y _ => ?_) ?_ <;> exact congrArg toL (Matrix.nonsing_inv_eq_ringInverse _)
 end
-
-
-
 
 end GlobalTheory.GLFin.Inhab
 end

@@ -7,19 +7,34 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.GenUIsGenFam
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory NumberField Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.FMX GlobalTheory.CompanionTheory.Ar.FlagBun GlobalTheory.CompanionTheory.Ar.PB.FMX.GenFl
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB
+  GlobalTheory.CompanionTheory.Ar.PB.FMX GlobalTheory.CompanionTheory.Ar.FlagBun
+  GlobalTheory.CompanionTheory.Ar.PB.FMX.GenFl
 
 namespace PositivityTheory.Xgp.c_fm_exists_flags_pullmap
 
-theorem flagStep_comp {G M N : Type} [Field G] [AddCommGroup M] [Module G M] [AddCommGroup N] [Module G N]
-    (T : M →ₗ[G] N) {r : ℕ} (b : Fin r → M) (i : ℕ) :
-    flagStep G (fun k => T (b k)) i = (flagStep G b i).map T := by
+theorem flagStep_comp
+    {G M N : Type} [Field G] [AddCommGroup M] [Module G M] [AddCommGroup N] [Module G N]
+    (T : M →ₗ[G] N)
+    {r : ℕ} (b : Fin r → M)
+    (i : ℕ)
+    : flagStep G (fun k => T (b k)) i = (flagStep G b i).map T := by
   simp only [flagStep, Submodule.map_span, Set.image_image]
 
 end PositivityTheory.Xgp.c_fm_exists_flags_pullmap
 
-theorem PositivityTheory.Xgp.t_c_fm_exists_flags_pullmap : ∀ (X X' : Scheme.{0}) (Ω G : Type) [Field Ω] [Field G] [Algebra Ω G] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (ξ' : Spec (CommRingCat.of G) ⟶ X') (f : X' ⟶ X) (E E₁ : Type) [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] (ι : E →ₗ[Ω] E₁) (π : E₁ →ₗ[Ω] E) (L : Lat ξ E) (r : ℕ) (c : Fin r → E) (u : Matrix (Fin r) (Fin r) G), π ∘ₗ ι = LinearMap.id → ((L.map ι).pull ξ' f (TensorProduct.mk Ω G E₁ 1).toAddMonoidHom).IsFlagVBOn Set.univ (fun k => ∑ l, u l k • TensorProduct.mk Ω G E₁ 1 (ι (c l))) → (L.pull ξ' f (TensorProduct.mk Ω G E 1).toAddMonoidHom).IsFlagVBOn Set.univ (fun k => ∑ l, u l k • TensorProduct.mk Ω G E 1 (c l)) := by
+theorem PositivityTheory.Xgp.t_c_fm_exists_flags_pullmap
+    : ∀ (X X' : Scheme.{0}) (Ω G : Type) [Field Ω] [Field G] [Algebra Ω G]
+        (ξ : Spec (CommRingCat.of Ω) ⟶ X) (ξ' : Spec (CommRingCat.of G) ⟶ X') (f : X' ⟶ X)
+        (E E₁ : Type) [AddCommGroup E] [Module Ω E] [AddCommGroup E₁] [Module Ω E₁] (ι : E →ₗ[Ω] E₁)
+        (π : E₁ →ₗ[Ω] E) (L : Lat ξ E) (r : ℕ) (c : Fin r → E) (u : Matrix (Fin r) (Fin r) G),
+      π ∘ₗ ι = LinearMap.id
+        → ((L.map ι).pull ξ' f (TensorProduct.mk Ω G E₁ 1).toAddMonoidHom).IsFlagVBOn Set.univ
+          (fun k => ∑ l, u l k • TensorProduct.mk Ω G E₁ 1 (ι (c l)))
+        → (L.pull ξ' f (TensorProduct.mk Ω G E 1).toAddMonoidHom).IsFlagVBOn Set.univ
+          (fun k => ∑ l, u l k • TensorProduct.mk Ω G E 1 (c l)) := by
   intro X X' Ω G _ _ _ ξ ξ' f E E₁ _ _ _ _ ι π L r c u hπ hfl p hp
   obtain ⟨U, hU, b, hb, hfr⟩ := hfl p hp
   let T := π.baseChange G
@@ -33,8 +48,9 @@ theorem PositivityTheory.Xgp.t_c_fm_exists_flags_pullmap : ∀ (X X' : Scheme.{0
     intro k
     have h1 : b k ∈ flagStep G b r := Submodule.subset_span ⟨k, k.2, rfl⟩
     rw [hb] at h1
-    have h2 : flagStep G (fun k => ∑ l, u l k • TensorProduct.mk Ω G E₁ 1 (ι (c l))) r ≤
-        LinearMap.eqLocus (T' ∘ₗ T) LinearMap.id := by
+    have h2
+        : flagStep G (fun k => ∑ l, u l k • TensorProduct.mk Ω G E₁ 1 (ι (c l))) r
+          ≤ LinearMap.eqLocus (T' ∘ₗ T) LinearMap.id := by
       refine Submodule.span_le.2 ?_
       rintro _ ⟨m, -, rfl⟩
       refine Submodule.sum_mem _ fun l _ => Submodule.smul_mem _ _ ?_
@@ -44,7 +60,7 @@ theorem PositivityTheory.Xgp.t_c_fm_exists_flags_pullmap : ∀ (X X' : Scheme.{0
   refine ⟨U, hU, fun k => T (b k), fun i => ?_, fun q hq hqU => ?_⟩
   · rw [c_fm_exists_flags_pullmap.flagStep_comp, hb, ← c_fm_exists_flags_pullmap.flagStep_comp]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hT]
+    simp only [map_sum, map_smul, hT]
   · obtain ⟨hli, hsp⟩ := hfr q hq hqU
     refine ⟨LinearIndependent.of_comp T' ?_, ?_⟩
     · have : (T' ∘ fun k => T (b k)) = b := funext hbk

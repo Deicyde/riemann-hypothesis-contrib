@@ -10,23 +10,37 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 noncomputable section
 namespace GlobalTheory.HeightCounting
 set_option maxHeartbeats 4000000 in
 set_option synthInstance.maxHeartbeats 400000 in
-theorem locBr_of_autSpec_alt : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb) (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D) (C : NChoice D) (tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E), ∀ (big : D.what₂.places.Pl → Finset ℂ) (X : LocNd (lay0 D)) (T : LocTw X) (Sp : NdSpec A.pl M C big X T), ∀ (Y : LocAut X) (Cb : LocBC Y), _root_.GlobalTheory.HeightCounting.AutomorphicSpecialisation A M tup Sp.iq Y Cb → ∃ Br : LocBr Y, Br.nbr = Sp.nbr := by
+theorem locBr_of_autSpec_alt
+    : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb)
+        (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D)
+        (C : NChoice D) (tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E),
+      ∀ (big : D.what₂.places.Pl → Finset ℂ) (X : LocNd (lay0 D)) (T : LocTw X)
+          (Sp : NdSpec A.pl M C big X T),
+        ∀ (Y : LocAut X) (Cb : LocBC Y),
+          _root_.GlobalTheory.HeightCounting.AutomorphicSpecialisation A M tup Sp.iq Y Cb
+            → ∃ Br : LocBr Y, Br.nbr = Sp.nbr := by
   intro D cf jE A M C tup big X T Sp Y Cb hA
   refine ⟨⟨Sp.nbr, Sp.nbr_ind, Sp.self_good, ?_⟩, rfl⟩
   intro i w hw
-  have hφ : ∀ x : X.nd.O i, iotaOQ X.nd Y.naut i x =
-      (((Sp.nbr i w hw).toLL x : ↥(Sp.nbr i w hw).LL.1) : Loc.Om (X.nd.l i)) := by
+  have hφ
+      : ∀ x : X.nd.O i,
+        iotaOQ X.nd Y.naut i x
+          = (((Sp.nbr i w hw).toLL x : ↥(Sp.nbr i w hw).LL.1) : Loc.Om (X.nd.l i)) := by
     intro x
     show Y.naut.iotaQ i (algebraMap _ _ x) = _
     rw [hA.iotaQ i]
     exact Sp.nbr_iq i w hw x
-  have hL := A.wd.loc (X.nd.l i) (Y.naut.iotaQC i) w hw (X.nd.O i) (Sp.nbr i w hw) (Sp.nbr_ind i w hw)
-    (iotaOQ X.nd Y.naut i) hφ
+  have hL :=
+    A.wd.loc (X.nd.l i) (Y.naut.iotaQC i) w hw (X.nd.O i) (Sp.nbr i w hw) (Sp.nbr_ind i w hw)
+      (iotaOQ X.nd Y.naut i) hφ
   refine ⟨hφ, ?_, ?_⟩
   · intro m ρ hρ
     obtain ⟨h1, h2, h3, h4⟩ := hL.1 m ρ hρ

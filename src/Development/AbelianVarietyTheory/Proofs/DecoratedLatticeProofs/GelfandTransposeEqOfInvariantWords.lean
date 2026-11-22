@@ -16,8 +16,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSmo
 noncomputable section
 
 open scoped Matrix NNReal TensorProduct Classical
-open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.Eis GlobalTheory.MixModel GlobalTheory.RegSW GlobalTheory.RegSch
+open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.Eis GlobalTheory.MixModel GlobalTheory.RegSW GlobalTheory.RegSch
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (swSec sZero IsKFinVec)
 open GlobalTheory.Core.Rk.SW (sch)
@@ -32,11 +35,14 @@ section Alg
 
 variable {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ}
 
-theorem gelfA_conj (G : Fin n → Fin n → A) (P Q : Matrix (Fin n) (Fin n) ℂ) (hQP : Q * P = 1) (k : ℕ) :
-    gelfA (fun a b => ∑ c, ∑ d, (P a c * Q d b) • G c d) k = gelfA G k := by
+theorem gelfA_conj
+    (G : Fin n → Fin n → A) (P Q : Matrix (Fin n) (Fin n) ℂ) (hQP : Q * P = 1) (k : ℕ)
+    : gelfA (fun a b => ∑ c, ∑ d, (P a c * Q d b) • G c d) k = gelfA G k := by
   have hPQ : P * Q = 1 := mul_eq_one_comm.1 hQP
   let φ : Matrix (Fin n) (Fin n) ℂ →+* Matrix (Fin n) (Fin n) A := (algebraMap ℂ A).mapMatrix
-  have hc : ∀ (M : Matrix (Fin n) (Fin n) A) a b, (φ P * M * φ Q) a b = ∑ c, ∑ d, (P a c * Q d b) • M c d := by
+  have hc
+      : ∀ (M : Matrix (Fin n) (Fin n) A) a b,
+        (φ P * M * φ Q) a b = ∑ c, ∑ d, (P a c * Q d b) • M c d := by
     intro M a b
     simp only [Matrix.mul_apply, φ, RingHom.mapMatrix_apply, Matrix.map_apply, Finset.sum_mul]
     rw [Finset.sum_comm]
@@ -60,22 +66,27 @@ theorem gelfA_conj (G : Fin n → Fin n → A) (P Q : Matrix (Fin n) (Fin n) ℂ
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [Finset.sum_comm]
-  have : ∀ d, ∑ a, (P a c * Q d a) • (Matrix.of G ^ (k + 1)) c d = (Q * P) d c • (Matrix.of G ^ (k + 1)) c d := by
+  have : ∀ d,
+      ∑ a, (P a c * Q d a) • (Matrix.of G ^ (k + 1)) c d
+        = (Q * P) d c • (Matrix.of G ^ (k + 1)) c d := by
     intro d
     rw [← Finset.sum_smul, Matrix.mul_apply]
     simp only [mul_comm]
   simp [this, hQP, Matrix.one_apply]
 
-theorem gelfA_swap (E : Fin n → Fin n → A) (k : ℕ) :
-    gelfA (fun a b => E b a) k = ∑ idx : Fin (k + 1) → Fin n,
-      (List.ofFn fun a : Fin (k + 1) => E (idx a) (idx (a + 1))).reverse.prod := by
+theorem gelfA_swap (E : Fin n → Fin n → A) (k : ℕ)
+    : gelfA (fun a b => E b a) k
+      = ∑ idx : Fin (k + 1) → Fin n,
+        (List.ofFn fun a : Fin (k + 1) => E (idx a) (idx (a + 1))).reverse.prod := by
   rw [gelfA]
-  refine (Fintype.sum_equiv ((Equiv.neg (Fin (k + 1))).arrowCongr (Equiv.refl _)) _ _ fun idx => ?_).symm
+  refine (Fintype.sum_equiv ((Equiv.neg (Fin (k + 1))).arrowCongr (Equiv.refl _)) _ _ fun idx =>
+    ?_).symm
   congr 1
   have h : ∀ a : Fin (k + 1), a.rev + 1 = -a := fun a => by
-    have : a.rev + a = Fin.last k := Fin.ext (by
-      have := a.2
-      rw [Fin.val_add, Fin.val_rev, Fin.val_last, Nat.mod_eq_of_lt] <;> omega)
+    have : a.rev + a = Fin.last k :=
+      Fin.ext (by
+        have := a.2
+        rw [Fin.val_add, Fin.val_rev, Fin.val_last, Nat.mod_eq_of_lt] <;> omega)
     rw [eq_neg_iff_add_eq_zero, add_right_comm, this, Fin.last_add_one]
   have h' : ∀ a : Fin (k + 1), a.rev = -(a + 1) := fun a => by
     rw [neg_add, ← h, add_neg_cancel_right]
@@ -93,41 +104,52 @@ theorem gelfA_swap (E : Fin n → Fin n → A) (k : ℕ) :
   rw [h, h']
   rfl
 
-theorem prod_ofFn_neg : ∀ (m : ℕ) (g : Fin m → A),
-    (List.ofFn fun a => -g a).prod = (-1 : ℂ) ^ m • (List.ofFn g).prod
+theorem prod_ofFn_neg
+    : ∀ (m : ℕ) (g : Fin m → A), (List.ofFn fun a => - g a).prod = (-1 : ℂ) ^ m • (List.ofFn g).prod
   | 0, _ => by simp
   | m + 1, g => by
-    rw [List.ofFn_succ, List.ofFn_succ, List.prod_cons, List.prod_cons, prod_ofFn_neg m fun a => g a.succ, pow_succ]
+    rw [List.ofFn_succ, List.ofFn_succ, List.prod_cons, List.prod_cons,
+      prod_ofFn_neg m fun a => g a.succ, pow_succ]
     simp
 
-theorem sum_words (φ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] A) (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M.det) (k : ℕ) :
-    ∑ idx : Fin (k + 1) → Fin n,
-      (List.ofFn fun a : Fin (k + 1) => φ (-(M * (Matrix.single (idx a) (idx (a + 1)) 1)ᵀ * M⁻¹))).prod =
-    (-1 : ℂ) ^ (k + 1) • ∑ idx : Fin (k + 1) → Fin n,
-      (List.ofFn fun a : Fin (k + 1) => φ (Matrix.single (idx a) (idx (a + 1)) 1)).reverse.prod := by
-  have e : ∀ a b, φ (M * (Matrix.single a b 1)ᵀ * M⁻¹) = ∑ c, ∑ d, (M⁻¹ a c * M d b) • φ (Matrix.single d c 1) := by
-    intro a b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← map_smul, ← map_sum]
-    congr 1
-    rw [Matrix.matrix_eq_sum_single (M * _ * _), Finset.sum_comm]
-    refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
-    rw [Matrix.smul_single, smul_eq_mul, mul_one]
-    congr 1
-    simp [Matrix.mul_apply, Matrix.single, ite_and, mul_comm]
-  rw [← gelfA_swap (fun a b => φ (Matrix.single a b 1)),
-    ← gelfA_conj _ M⁻¹ M (Matrix.mul_nonsing_inv M hM), gelfA, Finset.smul_sum]
-  refine Finset.sum_congr rfl fun idx _ => ?_
-  simp only [map_neg, e]
-  exact prod_ofFn_neg _ _
+theorem sum_words
+    (φ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] A)
+    (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M.det)
+    (k : ℕ)
+    : ∑ idx : Fin (k + 1) → Fin n,
+        (List.ofFn fun a : Fin (k + 1) => φ (-(M * (Matrix.single (idx a) (idx (a + 1)) 1)ᵀ * M⁻¹))).prod
+      = (-1 : ℂ) ^ (k + 1)
+        • ∑ idx : Fin (k + 1) → Fin n,
+          (List.ofFn fun a : Fin (k + 1) => φ (Matrix.single (idx a) (idx (a + 1)) 1)).reverse.prod :=
+  by
+    have e
+        : ∀ a b,
+          φ (M * (Matrix.single a b 1)ᵀ * M⁻¹)
+            = ∑ c, ∑ d, (M⁻¹ a c * M d b) • φ (Matrix.single d c 1) := by
+      intro a b
+      set_option synthInstance.maxHeartbeats 100000 in
+        simp only [← map_smul, ← map_sum]
+      congr 1
+      rw [Matrix.matrix_eq_sum_single (M * _ * _), Finset.sum_comm]
+      refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
+      rw [Matrix.smul_single, smul_eq_mul, mul_one]
+      congr 1
+      simp [Matrix.mul_apply, Matrix.single, ite_and, mul_comm]
+    rw [← gelfA_swap (fun a b => φ (Matrix.single a b 1)),
+      ← gelfA_conj _ M⁻¹ M (Matrix.mul_nonsing_inv M hM), gelfA, Finset.smul_sum]
+    refine Finset.sum_congr rfl fun idx _ => ?_
+    simp only [map_neg, e]
+    exact prod_ofFn_neg _ _
 
 end Alg
 
 open GlobalTheory.Mem.RealTranslate (derEnd)
 
-theorem wordDer_eq {D : D7} {θ : InfFam D} (hθ : IsInfFam θ) {V : HSp D} (τ : D.what₂.Tau)
-    (w : List (Matrix (Fin V.rank) (Fin V.rank) ℂ)) (f : SmFun θ V) :
-    wordDer θ V τ w f.1 = ((w.map (derEnd hθ τ)).prod f).1 := by
+theorem wordDer_eq
+    {D : D7} {θ : InfFam D} (hθ : IsInfFam θ)
+    {V : HSp D}
+    (τ : D.what₂.Tau) (w : List (Matrix (Fin V.rank) (Fin V.rank) ℂ)) (f : SmFun θ V)
+    : wordDer θ V τ w f.1 = ((w.map (derEnd hθ τ)).prod f).1 := by
   induction w with
   | nil => rfl
   | cons Z w ih =>

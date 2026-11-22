@@ -176,18 +176,42 @@ lemma int_dvd {n : ℕ} {a : ℤ} (h : (q : ℤ_[q]) ^ n ∣ (a : ℤ_[q])) : (q
 
 end GlobalTheory.MomOne.OKArith
 
-
 open GlobalTheory.MomOne.OKArith in
-theorem GlobalTheory.MomOne.okArith : ∀ (d q : ℕ) [Fact q.Prime] (ι : ℂ ≃+* ℂ_[q]), d.Prime → d % 16 = 7 → Split d q → (InOK d 1 ∧ InOK d (wK d) ∧ ∀ α β, InOK d α → InOK d β → InOK d (α + β) ∧ InOK d (α * β) ∧ InOK d (-α) ∧ InOK d (conj α)) ∧ (∀ α, InOK d α → (∃ a : ℤ_[q], ι α = zc a) ∧ (∃ N : ℕ, (N : ℂ) = α * conj α) ∧ α ∈ algebraicClosure ℚ ℂ) ∧ (∀ (α : ℂ) (n : ℕ), InOK d α → ‖ι α‖ ≤ (q : ℝ) ^ (-(n : ℤ)) → ‖ι (conj α)‖ ≤ (q : ℝ) ^ (-(n : ℤ)) → InOK d (α / (q : ℂ) ^ n)) ∧ (∀ m s : ℕ, Nat.Coprime s q → ∃ e, InOK d e ∧ ‖ι ((s : ℂ) * e) - 1‖ ≤ (q : ℝ) ^ (-(m : ℤ)) ∧ ‖ι (conj e)‖ ≤ (q : ℝ) ^ (-(m : ℤ))) ∧ (∀ n : ℕ, ∃ α, InOK d α ∧ ‖ι α‖ ≤ (q : ℝ) ^ (-(n : ℤ)) ∧ ¬ InOK d (α / 2)) ∧ (∀ x y, InOK d x → InOK d y → ∃ k : ℤ, (h1 d x y).im = k) ∧ ¬ q ∣ d := by
+theorem GlobalTheory.MomOne.okArith
+    : ∀ (d q : ℕ) [Fact q.Prime] (ι : ℂ ≃+* ℂ_[q]),
+      d.Prime → d % 16 = 7 → Split d q
+        → (InOK d 1 ∧ InOK d (wK d)
+            ∧ ∀ α β,
+              InOK d α → InOK d β → InOK d (α + β) ∧ InOK d (α * β) ∧ InOK d (-α) ∧ InOK d (conj α))
+          ∧ (∀ α,
+            InOK d α
+              → (∃ a : ℤ_[q], ι α = zc a) ∧ (∃ N : ℕ, (N : ℂ) = α * conj α)
+                ∧ α ∈ algebraicClosure ℚ ℂ)
+          ∧ (∀ (α : ℂ) (n : ℕ),
+            InOK d α → ‖ι α‖ ≤ (q : ℝ) ^ (-(n : ℤ)) → ‖ι (conj α)‖ ≤ (q : ℝ) ^ (-(n : ℤ))
+              → InOK d (α / (q : ℂ) ^ n))
+          ∧ (∀ m s : ℕ,
+            Nat.Coprime s q
+              → ∃ e,
+                InOK d e ∧ ‖ι ((s : ℂ) * e) - 1‖ ≤ (q : ℝ) ^ (-(m : ℤ))
+                  ∧ ‖ι (conj e)‖ ≤ (q : ℝ) ^ (-(m : ℤ)))
+          ∧ (∀ n : ℕ, ∃ α, InOK d α ∧ ‖ι α‖ ≤ (q : ℝ) ^ (-(n : ℤ)) ∧ ¬ InOK d (α / 2))
+          ∧ (∀ x y, InOK d x → InOK d y → ∃ k : ℤ, (h1 d x y).im = k) ∧ ¬ q ∣ d := by
   intro d q hq ι hd h16 hs
   obtain ⟨k, hk⟩ : ∃ k, 4 * k = d + 1 := ⟨(d + 1) / 4, by omega⟩
   obtain ⟨r, hr, hu⟩ := exists_r hk hs ι
-  have e1 : ∀ u v : ℤ, ι ((u : ℂ) + v * wK d) = zcHom q (u + v * r) := by
-    intro u v; simp [hr]
+  have e1 : ∀ u v : ℤ, ι ((u : ℂ) + v * wK d) = zcHom q (u + v * r) := by intro u v; simp [hr]
   have e2 : ∀ u v : ℤ, ι (conj ((u : ℂ) + v * wK d)) = zcHom q (u + v * (1 - r)) := by
     intro u v; rw [conj_el]; simp [hr]
-  refine ⟨⟨⟨1, 0, by simp⟩, ⟨0, 1, by simp⟩, fun α β ha hb => ⟨?_, in_mul hk ha hb, ?_, in_conj ha⟩⟩,
-    ?_, ?_, ?_, ?_, ?_, not_dvd hs⟩
+  refine ⟨
+    ⟨⟨1, 0, by simp⟩, ⟨0, 1, by simp⟩, fun α β ha hb => ⟨?_, in_mul hk ha hb, ?_, in_conj ha⟩⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    not_dvd hs
+  ⟩
   · obtain ⟨u, v, rfl⟩ := ha
     obtain ⟨u', v', rfl⟩ := hb
     exact ⟨u + u', v + v', by push_cast; ring⟩
@@ -260,7 +284,9 @@ theorem GlobalTheory.MomOne.okArith : ∀ (d q : ℕ) [Fact q.Prime] (ι : ℂ �
           have : (q : ℤ_[q]) = 2 := by
             have := congrArg (Nat.cast : ℕ → ℤ_[q]) h2
             simpa using this
-          rw [this]; push_cast; ring
+          rw [this]
+          push_cast
+          ring
         have h7 := dvd_sub h6 h5
         rw [sub_sub_cancel] at h7
         exact PadicInt.prime_p.not_dvd_one h7
@@ -268,8 +294,9 @@ theorem GlobalTheory.MomOne.okArith : ∀ (d q : ℕ) [Fact q.Prime] (ι : ℂ �
       · have : ι ((q : ℂ) ^ n) = zcHom q (q ^ n) := by simp
         rw [this, norm_le_iff]
       · rintro ⟨a, b, hab⟩
-        have h4 : ((q ^ n : ℤ) : ℂ) + ((0 : ℤ) : ℂ) * wK d
-            = ((2 * a : ℤ) : ℂ) + ((2 * b : ℤ) : ℂ) * wK d := by
+        have h4
+            : ((q ^ n : ℤ) : ℂ) + ((0 : ℤ) : ℂ) * wK d
+              = ((2 * a : ℤ) : ℂ) + ((2 * b : ℤ) : ℂ) * wK d := by
           push_cast; linear_combination 2 * hab
         have h5 := (coord_unique hd.pos h4).1
         have h6 : (2 : ℕ) ∣ q ^ n := by

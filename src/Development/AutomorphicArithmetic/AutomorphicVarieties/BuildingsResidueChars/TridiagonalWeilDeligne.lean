@@ -11,17 +11,21 @@ open Module
 
 namespace UpperTheory
 
-private theorem tri_mul_diag {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℂ) (hA : ∀ i j, j < i → A i j = 0)
-    (hB : ∀ i j, j < i → B i j = 0) (i : Fin n) : (A * B) i i = A i i * B i i := by
+private theorem tri_mul_diag
+    {n : ℕ} (A B : Matrix (Fin n) (Fin n) ℂ) (hA : ∀ i j, j < i → A i j = 0)
+    (hB : ∀ i j, j < i → B i j = 0) (i : Fin n)
+    : (A * B) i i = A i i * B i i := by
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_single i (fun k _ hk => ?_) (fun h => absurd (Finset.mem_univ i) h)
   rcases lt_or_gt_of_ne hk with h | h
   · rw [hA i k h, zero_mul]
   · rw [hB k i h, mul_zero]
 
-private theorem tri_avg {G : Type} [Group G] [Finite G] {n : ℕ} (R : G →* Matrix (Fin n) (Fin n) ℂ)
-    (hR : ∀ g i j, j < i → R g i j = 0) :
-    ∃ P : Matrix (Fin n) (Fin n) ℂ, IsUnit P.det ∧ ∀ g, R g * P = P * Matrix.diagonal (fun i => R g i i) := by
+private theorem tri_avg
+    {G : Type} [Group G] [Finite G]
+    {n : ℕ} (R : G →* Matrix (Fin n) (Fin n) ℂ) (hR : ∀ g i j, j < i → R g i j = 0)
+    : ∃ P : Matrix (Fin n) (Fin n) ℂ,
+      IsUnit P.det ∧ ∀ g, R g * P = P * Matrix.diagonal (fun i => R g i i) := by
   classical
   letI := Fintype.ofFinite G
   have hm : ∀ g h i, R (g * h) i i = R g i i * R h i i := fun g h i => by
@@ -43,7 +47,8 @@ private theorem tri_avg {G : Type} [Group G] [Finite G] {n : ℕ} (R : G →* Ma
       rw [Matrix.mul_diagonal, hR h i j hij, zero_mul]
   · rw [Finset.mul_sum, Finset.sum_mul]
     refine Fintype.sum_equiv (Equiv.mulLeft g) _ _ fun h => ?_
-    rw [Equiv.coe_mulLeft, Matrix.mul_assoc, Matrix.diagonal_mul_diagonal, map_mul, Matrix.mul_assoc]
+    rw [Equiv.coe_mulLeft, Matrix.mul_assoc, Matrix.diagonal_mul_diagonal, map_mul,
+      Matrix.mul_assoc]
     congr 3
     funext i
     rw [← hm]
@@ -63,9 +68,11 @@ theorem tridiagonal_weil_deligne : UpperTheory.V.Af.Wd.TriDiag := by
   let R : G →* Matrix (Fin n) (Fin n) ℂ :=
     ((LinearMap.toMatrixAlgEquiv b).toMulEquiv.toMonoidHom.comp (Units.coeHom _)).comp G.subtype
   have hRs : ∀ s, R (ρ.toHomUnits.rangeRestrict s) = LinearMap.toMatrix b b (ρ s) := fun s => rfl
-  obtain ⟨P, hP, hRP⟩ := tri_avg R (fun g i j hij => by
-    obtain ⟨s, rfl⟩ := ρ.toHomUnits.rangeRestrict_surjective g
-    rw [hRs]; exact (hb s).1 i j hij)
+  obtain ⟨P, hP, hRP⟩ :=
+    tri_avg R (fun g i j hij => by
+      obtain ⟨s, rfl⟩ := ρ.toHomUnits.rangeRestrict_surjective g
+      rw [hRs]
+      exact (hb s).1 i j hij)
   let e := Matrix.toLinearEquiv b P hP
   have he : ∀ x, e x = Matrix.toLin b b P x := fun x => rfl
   refine ⟨b.map e, fun s => ?_⟩

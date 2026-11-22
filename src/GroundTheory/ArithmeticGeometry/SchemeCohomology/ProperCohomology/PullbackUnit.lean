@@ -57,19 +57,21 @@ section Section
 
 variable {T U : Scheme.{u}}
 
-theorem bijective_pullbackSection_of_surjective (g : T ⟶ U) [IsAffine T] [IsAffine U]
-    (N : U.Modules) [N.IsQuasicoherent] (hg : Function.Surjective g.appTop)
-    (hker : ∀ a : Γ(U, ⊤), g.appTop a = 0 → ∀ n : Γ(N, ⊤), a • n = 0) :
-    Function.Bijective (Etale.pullbackSection g N) := by
+theorem bijective_pullbackSection_of_surjective
+    (g : T ⟶ U)
+    [IsAffine T] [IsAffine U]
+    (N : U.Modules) [N.IsQuasicoherent]
+    (hg : Function.Surjective g.appTop)
+    (hker : ∀ a : Γ(U, ⊤), g.appTop a = 0 → ∀ n : Γ(N, ⊤), a • n = 0)
+    : Function.Bijective (Etale.pullbackSection g N) := by
   constructor
   · let K := RingHom.ker g.appTop.hom
-    have hM : Module.IsTorsionBySet Γ(U, ⊤) Γ(N, ⊤) (K : Set Γ(U, ⊤)) :=
-      fun n a => hker a.1 a.2 n
+    have hM : Module.IsTorsionBySet Γ(U, ⊤) Γ(N, ⊤) (K : Set Γ(U, ⊤)) := fun n a => hker a.1 a.2 n
     let _ : Module (Γ(U, ⊤) ⧸ K) Γ(N, ⊤) := hM.module
     let e := RingHom.quotientKerEquivOfSurjective (f := g.appTop.hom) hg
     let _ : Module Γ(T, ⊤) Γ(N, ⊤) := Module.compHom _ e.symm.toRingHom
-    obtain ⟨ψ', hψ', -⟩ := Etale.existsUnique_pullbackSection g N Γ(N, ⊤) (AddMonoidHom.id _)
-      (fun a n => by
+    obtain ⟨ψ', hψ', -⟩ :=
+      Etale.existsUnique_pullbackSection g N Γ(N, ⊤) (AddMonoidHom.id _) (fun a n => by
         change a • n = e.symm (g.appTop a) • n
         have he : e.symm (g.appTop a) = Ideal.Quotient.mk K a :=
           e.symm_apply_eq.2 (RingHom.quotientKerEquivOfSurjective_apply_mk hg a).symm
@@ -81,11 +83,11 @@ theorem bijective_pullbackSection_of_surjective (g : T ⟶ U) [IsAffine T] [IsAf
     let P := Γ((Scheme.Modules.pullback g).obj N, ⊤)
     let L : Submodule Γ(T, ⊤) P := Submodule.span Γ(T, ⊤) (Set.range (Etale.pullbackSection g N))
     have hL : L = ⊤ := by
-      obtain ⟨ψ', -, huniq⟩ := Etale.existsUnique_pullbackSection g N (P ⧸ L) 0
-        (fun a n => by simp)
+      obtain ⟨ψ', -, huniq⟩ := Etale.existsUnique_pullbackSection g N (P ⧸ L) 0 (fun a n => by simp)
       have h0 : (0 : P →ₗ[Γ(T, ⊤)] (P ⧸ L)) = ψ' := huniq 0 (fun n => by simp)
-      have h1 : L.mkQ = ψ' := huniq L.mkQ (fun n => by
-        simpa using (Submodule.Quotient.mk_eq_zero L).2 (Submodule.subset_span ⟨n, rfl⟩))
+      have h1 : L.mkQ = ψ' :=
+        huniq L.mkQ (fun n => by
+          simpa using (Submodule.Quotient.mk_eq_zero L).2 (Submodule.subset_span ⟨n, rfl⟩))
       rw [eq_top_iff]
       intro q _
       have := LinearMap.congr_fun (h1.trans h0.symm) q
@@ -151,11 +153,12 @@ section Unit
 
 variable {X Y : Scheme.{u}}
 
-theorem bijective_pullbackUnitApp_of_isClosedImmersion (ψ : Y ⟶ X) (F : X.Modules)
-    [F.IsQuasicoherent] {V : X.Opens} (hV : IsAffineOpen V) [IsClosedImmersion (ψ ∣_ V)]
-    (hkill : ∀ a : Γ(X, V.ι ''ᵁ ⊤), ψ.app (V.ι ''ᵁ ⊤) a = 0 →
-      ∀ m : Γ(F, V.ι ''ᵁ ⊤), a • m = 0) :
-    Function.Bijective (Etale.pullbackUnitApp ψ F V) := by
+theorem bijective_pullbackUnitApp_of_isClosedImmersion
+    (ψ : Y ⟶ X)
+    (F : X.Modules) [F.IsQuasicoherent]
+    {V : X.Opens} (hV : IsAffineOpen V) [IsClosedImmersion (ψ ∣_ V)]
+    (hkill : ∀ a : Γ(X, V.ι ''ᵁ ⊤), ψ.app (V.ι ''ᵁ ⊤) a = 0 → ∀ m : Γ(F, V.ι ''ᵁ ⊤), a • m = 0)
+    : Function.Bijective (Etale.pullbackUnitApp ψ F V) := by
   rw [← bijective_pullbackUnitApp_comp_left_iff (ψ ⁻¹ᵁ V).ι ψ F V (by simp),
     ← morphismRestrict_ι ψ V, bijective_pullbackUnitApp_comp_right_iff (ψ ∣_ V) V.ι F V (by simp),
     bijective_pullbackUnitApp_congr _ _ (Scheme.Opens.ι_preimage_self V)]
@@ -168,14 +171,17 @@ theorem bijective_pullbackUnitApp_of_isClosedImmersion (ψ : Y ⟶ X) (F : X.Mod
 
   have ha' : ψ.app (V.ι ''ᵁ ⊤) a = 0 := by
     rw [morphismRestrict_appTop] at ha
-    have hinj := (ConcreteCategory.bijective_of_isIso
-      (Y.presheaf.map (eqToHom (image_morphismRestrict_preimage ψ V ⊤)).op)).1
+    have hinj :=
+      (ConcreteCategory.bijective_of_isIso (Y.presheaf.map (eqToHom (image_morphismRestrict_preimage
+        ψ V ⊤)).op)).1
     exact hinj (by rw [map_zero]; exact ha)
   have key : ∀ n' : Γ(F.restrict V.ι, ⊤), a • n' = 0 := fun n' => by
     have hi := ConcreteCategory.bijective_of_isIso (F.restrictAppIso V.ι ⊤).hom
     apply hi.1
-    have hs := congrArg (fun φ : Γ(F.restrict V.ι, ⊤) ⟶ Γ(F, V.ι ''ᵁ ⊤) => φ n')
-      (Scheme.Modules.smul_restrictAppIso_hom V.ι F ⊤ a)
+    have hs :=
+      congrArg
+        (fun φ : Γ(F.restrict V.ι, ⊤) ⟶ Γ(F, V.ι ''ᵁ ⊤) => φ n')
+        (Scheme.Modules.smul_restrictAppIso_hom V.ι F ⊤ a)
     simp only [ConcreteCategory.comp_apply, Scheme.Opens.ι_appIso, Iso.refl_inv] at hs
     change (F.restrictAppIso V.ι ⊤).hom (a • n') = _
     rw [map_zero]
@@ -186,12 +192,14 @@ theorem bijective_pullbackUnitApp_of_isClosedImmersion (ψ : Y ⟶ X) (F : X.Mod
     rfl
   rw [h1, ← Scheme.Modules.Hom.app_smul, key, map_zero]
 
-theorem bijective_unit_app_of_le (ψ : Y ⟶ X) (F : X.Modules) [F.IsQuasicoherent] (W : X.Opens)
-    [IsClosedImmersion (ψ ∣_ W)]
-    (hkill : ∀ V : X.Opens, IsAffineOpen V → V ≤ W → ∀ a : Γ(X, V), ψ.app V a = 0 →
-      ∀ m : Γ(F, V), a • m = 0) :
-    ∀ V ≤ W, Function.Bijective
-      (((Scheme.Modules.pullbackPushforwardAdjunction ψ).unit.app F).app V) := by
+theorem bijective_unit_app_of_le
+    (ψ : Y ⟶ X)
+    (F : X.Modules) [F.IsQuasicoherent]
+    (W : X.Opens) [IsClosedImmersion (ψ ∣_ W)]
+    (hkill : ∀ V : X.Opens,
+      IsAffineOpen V → V ≤ W → ∀ a : Γ(X, V), ψ.app V a = 0 → ∀ m : Γ(F, V), a • m = 0)
+    : ∀ V ≤ W,
+      Function.Bijective (((Scheme.Modules.pullbackPushforwardAdjunction ψ).unit.app F).app V) := by
   refine bijective_app_of_bijective_app_affine _ W fun V hV hVW => ?_
   have hE : W.ι ''ᵁ (W.ι ⁻¹ᵁ V) = V := by
     rw [Scheme.Hom.image_preimage_eq_opensRange_inf, Scheme.Opens.opensRange_ι]

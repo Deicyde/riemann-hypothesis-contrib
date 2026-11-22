@@ -9,8 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory GlobalTheory GlobalTheory.CM
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  GlobalTheory GlobalTheory.CM
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -18,10 +21,15 @@ namespace GlobalTheory.CM.PureHom
 
 open PureTriple
 
-theorem exists_prod_act_comp_eq_one_of_pure : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (ρ : ℂ) (A B : PAT H (Sp ℂ)) (p q : ℕ), ρ ^ 2 = -(H.d : ℂ) →
-    HasType H A.t.act ρ 1 0 → HasType H B.t.act ρ p q → ∀ (n : ℕ), p + q < n → ∀ ψ : Fin n → (A.t.G ⟶ B.t.G),
-    (∀ i, Serre.IsLinearHom A.t.act B.t.act (ψ i)) →
-    ∃ x : Fin n → 𝓞 E, x ≠ 0 ∧ ∏ i, (A.t.act.act (x i) ≫ ψ i) = 1 := by
+theorem exists_prod_act_comp_eq_one_of_pure
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (ρ : ℂ) (A B : PAT H (Sp ℂ))
+        (p q : ℕ),
+      ρ ^ 2 = -(H.d : ℂ) → HasType H A.t.act ρ 1 0 → HasType H B.t.act ρ p q
+        → ∀ (n : ℕ),
+          p + q < n
+            → ∀ ψ : Fin n → (A.t.G ⟶ B.t.G),
+              (∀ i, Serre.IsLinearHom A.t.act B.t.act (ψ i))
+                → ∃ x : Fin n → 𝓞 E, x ≠ 0 ∧ ∏ i, (A.t.act.act (x i) ≫ ψ i) = 1 := by
   intro E _ _ _ H ρ A B p q hρ hA hB n hn ψ hψ
   have hT : ThetaUnifAV := thetaUnifAV_all
   have hL : Out.Laws := abelianSchemeLaws_all.1
@@ -32,28 +40,43 @@ theorem exists_prod_act_comp_eq_one_of_pure : ∀ (E : Type) [Field E] [NumberFi
   simp only [RingHom.id_apply] at hdA hdB
   have hsq : ∀ τ : 𝓞 E →+* ℂ, τ H.rt ^ 2 = -(H.d : ℂ) := fun τ => by
     rw [← map_pow, H.rt_sq, map_neg, map_natCast]
-  have key : ∀ (T : PAT H (Sp ℂ)) (a b : ℕ), (∀ τ : 𝓞 E →+* ℂ, (τ H.rt = ρ → LieMult T.t.act (𝟙 (Sp ℂ)) τ a) ∧
-      (τ H.rt ≠ ρ → LieMult T.t.act (𝟙 (Sp ℂ)) τ b)) → ∃ a' b' : ℕ, a' + b' = a + b ∧
-      ∀ τ : 𝓞 E →+* ℂ, (τ H.rt = H.rt0 → LieMult T.t.act (𝟙 (Sp ℂ)) τ a') ∧
-        (τ H.rt ≠ H.rt0 → LieMult T.t.act (𝟙 (Sp ℂ)) τ b') := by
+  have key
+      : ∀ (T : PAT H (Sp ℂ)) (a b : ℕ),
+        (∀ τ : 𝓞 E →+* ℂ,
+            (τ H.rt = ρ → LieMult T.t.act (𝟙 (Sp ℂ)) τ a)
+              ∧ (τ H.rt ≠ ρ → LieMult T.t.act (𝟙 (Sp ℂ)) τ b))
+          → ∃ a' b' : ℕ,
+            a' + b' = a + b
+              ∧ ∀ τ : 𝓞 E →+* ℂ,
+                (τ H.rt = H.rt0 → LieMult T.t.act (𝟙 (Sp ℂ)) τ a')
+                  ∧ (τ H.rt ≠ H.rt0 → LieMult T.t.act (𝟙 (Sp ℂ)) τ b') := by
     intro T a b hd
     by_cases h0 : ρ = H.rt0
     · exact ⟨a, b, rfl, h0 ▸ hd⟩
     · have h1 := (sq_eq_sq_iff_eq_or_eq_neg.1 (hρ.trans H.sqrt_neg_disc_sq.symm)).resolve_left h0
       have h2 : ∀ τ : 𝓞 E →+* ℂ, τ H.rt ≠ H.rt0 → τ H.rt = ρ := fun τ h =>
-        ((sq_eq_sq_iff_eq_or_eq_neg.1 ((hsq τ).trans H.sqrt_neg_disc_sq.symm)).resolve_left h).trans h1.symm
-      exact ⟨b, a, add_comm b a, fun τ => ⟨fun h => (hd τ).2 fun h' => h0 (h'.symm.trans h),
-        fun h => (hd τ).1 (h2 τ h)⟩⟩
+        ((sq_eq_sq_iff_eq_or_eq_neg.1 ((hsq τ).trans H.sqrt_neg_disc_sq.symm)).resolve_left h).trans
+          h1.symm
+      exact ⟨
+        b,
+        a,
+        add_comm b a,
+        fun τ => ⟨fun h => (hd τ).2 fun h' => h0 (h'.symm.trans h), fun h => (hd τ).1 (h2 τ h)⟩
+      ⟩
   obtain ⟨pA, qA, hpqA, hdetA⟩ := key A 1 0 hdA
   obtain ⟨pB, qB, hpqB, hdetB⟩ := key B p q hdB
   obtain ⟨gA, tyA, htyA⟩ := AllClasses.exists_isTypeFn H pA qA
   obtain ⟨gB, tyB, htyB⟩ := AllClasses.exists_isTypeFn H pB qB
   obtain ⟨uA, HA, χA, -, hAH, -⟩ := PureType.exists_isThetaUnif hT A.pol
   obtain ⟨uB, HB, χB, -, hBH, -⟩ := PureType.exists_isThetaUnif hT B.pol
-  obtain ⟨DA, PeA, FA, hpA, hqA, hPA, hFA, -, hactA⟩ := exists_datum_period hT hL A htyA hdetA uA hAH
-  obtain ⟨DB, PeB, FB, hpB, hqB, hPB, hFB, -, hactB⟩ := exists_datum_period hT hL B htyB hdetB uB hBH
-  obtain ⟨-, -, -, -, -, hA2, -⟩ := GlobalTheory.AHWeil.tangent_and_weil_of_isAH hT A.pol _ uA HA χA hAH
-  obtain ⟨-, -, -, -, hB1, hB2, -⟩ := GlobalTheory.AHWeil.tangent_and_weil_of_isAH hT B.pol _ uB HB χB hBH
+  obtain ⟨DA, PeA, FA, hpA, hqA, hPA, hFA, -, hactA⟩ :=
+    exists_datum_period hT hL A htyA hdetA uA hAH
+  obtain ⟨DB, PeB, FB, hpB, hqB, hPB, hFB, -, hactB⟩ :=
+    exists_datum_period hT hL B htyB hdetB uB hBH
+  obtain ⟨-, -, -, -, -, hA2, -⟩ :=
+    GlobalTheory.AHWeil.tangent_and_weil_of_isAH hT A.pol _ uA HA χA hAH
+  obtain ⟨-, -, -, -, hB1, hB2, -⟩ :=
+    GlobalTheory.AHWeil.tangent_and_weil_of_isAH hT B.pol _ uB HB χB hBH
   choose Ψ hΨ hΨΛ using fun i => (HomLinear.exists_linear_of_isMonHom A.t.G B.t.G A.ab B.ab _ _ _ _ uA uB hB1 hB2
     (ψ i) (hψ i).isMonHom).imp fun _ h => And.intro h.1 h.2.1
   let GA : 𝓞 E → (Fin A.pol.g → ℂ) →ₗ[ℂ] (Fin A.pol.g → ℂ) := fun s =>
@@ -89,18 +112,20 @@ theorem exists_prod_act_comp_eq_one_of_pure : ∀ (E : Type) [Field E] [NumberFi
     have e : diagMul tyB (r : E) (FB.symm z) = 0 := by
       have := congrArg FB.symm hz
       simpa [GB] using this
-    have e' : FB.symm z = 0 := funext fun k => by
-      have := congrFun e k
-      simp only [diagMul, LinearMap.coe_mk, AddHom.coe_mk, Pi.zero_apply, mul_eq_zero] at this
-      exact this.resolve_left ((map_ne_zero (tyB k)).2 hr')
+    have e' : FB.symm z = 0 :=
+      funext fun k => by
+        have := congrFun e k
+        simp only [diagMul, LinearMap.coe_mk, AddHom.coe_mk, Pi.zero_apply, mul_eq_zero] at this
+        exact this.resolve_left ((map_ne_zero (tyB k)).2 hr')
     simpa using congrArg FB e'
   have hcomm : ∀ i s z, Ψ i (GA s z) = GB s (Ψ i z) := by
     intro i s z
     haveI := (hψ i).isMonHom
     haveI := A.t.act.hom s
-    have e := linear_lift_unique uA uB hA2 hB1 (A.t.act.act s ≫ ψ i) (F := Ψ i ∘ₗ GA s) (F' := GB s ∘ₗ Ψ i)
-      (fun z => by rw [LinearMap.comp_apply, hΨ, hGA, Category.assoc])
-      (fun z => by rw [LinearMap.comp_apply, hGB, hΨ, (hψ i).comm, Category.assoc])
+    have e :=
+      linear_lift_unique uA uB hA2 hB1 (A.t.act.act s ≫ ψ i) (F := Ψ i ∘ₗ GA s) (F' := GB s ∘ₗ Ψ i)
+        (fun z => by rw [LinearMap.comp_apply, hΨ, hGA, Category.assoc])
+        (fun z => by rw [LinearMap.comp_apply, hGB, hΨ, (hψ i).comm, Category.assoc])
     exact LinearMap.congr_fun e z
   have := DA.fin
   have := DA.proj
@@ -126,9 +151,10 @@ theorem exists_prod_act_comp_eq_one_of_pure : ∀ (E : Type) [Field E] [NumberFi
     simp only [Θ, LinearMap.sum_apply, LinearMap.comp_apply]
   have hΘa : Θ (FA (PeA a)) = 0 := by
     rw [hΘ]
-    calc ∑ i, Ψ i (GA (x i) (FA (PeA a))) = ∑ i, FB (PeB (x i • b i)) := by
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [hcomm, hb, hGPB]
+    calc
+      ∑ i, Ψ i (GA (x i) (FA (PeA a))) = ∑ i, FB (PeB (x i • b i)) := by
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [hcomm, hb, hGPB]
       _ = 0 := by rw [← map_sum, ← map_sum, hx, map_zero, map_zero]
   have hΘc : ∀ s z, Θ (GA s z) = GB s (Θ z) := fun s z => by
     set_option synthInstance.maxHeartbeats 100000 in
@@ -141,7 +167,8 @@ theorem exists_prod_act_comp_eq_one_of_pure : ∀ (E : Type) [Field E] [NumberFi
     rw [← hΘc, hGPA, e, ← hGPA, hΘc, hΘa, map_zero]
   have hΘ0 : Θ.restrictScalars ℝ = 0 := by
     refine LinearMap.ext_on uA.full fun z hz => ?_
-    obtain ⟨a', ha'⟩ := AddMonoidHom.mem_range.1 ((hFA (FA.symm z)).1 (by rwa [FA.apply_symm_apply]))
+    obtain ⟨a', ha'⟩ :=
+      AddMonoidHom.mem_range.1 ((hFA (FA.symm z)).1 (by rwa [FA.apply_symm_apply]))
     have ez : z = FA (PeA a') := by rw [ha', FA.apply_symm_apply]
     rw [ez]
     exact hΘl a'
@@ -151,13 +178,16 @@ theorem exists_prod_act_comp_eq_one_of_pure : ∀ (E : Type) [Field E] [NumberFi
   have hr : IsReduced A.t.G.left := isReduced_of_smooth_complex _ A.t.G.hom hs
   refine ComplexPoints.over_hom_ext_of_complexPoints fun y => ?_
   obtain ⟨z, rfl⟩ := uA.ex_onto y
-  have hpr : ∀ s : Finset (Fin n), uA.ex z ≫ ∏ i ∈ s, (A.t.act.act (x i) ≫ ψ i) =
-      uB.ex (∑ i ∈ s, Ψ i (GA (x i) z)) := by
+  have hpr
+      : ∀ s : Finset (Fin n),
+        uA.ex z ≫ ∏ i ∈ s, (A.t.act.act (x i) ≫ ψ i) = uB.ex (∑ i ∈ s, Ψ i (GA (x i) z)) := by
     intro s
     induction s using Finset.induction_on with
-    | empty => rw [Finset.prod_empty, Finset.sum_empty, comp_one]; exact ((uB.ker 0).2 uB.Λ.zero_mem).symm
+    | empty =>
+      rw [Finset.prod_empty, Finset.sum_empty, comp_one]; exact ((uB.ker 0).2 uB.Λ.zero_mem).symm
     | insert j s hj ih =>
-      rw [Finset.prod_insert hj, Finset.sum_insert hj, comp_mul, ih, uB.ex_add, hΨ, hGA, Category.assoc]
+      rw [Finset.prod_insert hj, Finset.sum_insert hj, comp_mul, ih, uB.ex_add, hΨ, hGA,
+        Category.assoc]
   rw [hpr, ← hΘ, hΘz, comp_one]
   exact (uB.ker 0).2 uB.Λ.zero_mem
 

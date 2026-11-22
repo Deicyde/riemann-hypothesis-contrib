@@ -4,11 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open UpperTheory.V.Z.Mult UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
-open Formalism.L2.Host GlobalTheory.BCT GlobalTheory.UnitaryBC GlobalTheory.LFun Formalism.UG Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.PRep
+open UpperTheory.V.Z.Mult UpperTheory.V.Z.Tf.GlobalTraceComparison
+  UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
+open Formalism.L2.Host GlobalTheory.BCT GlobalTheory.UnitaryBC GlobalTheory.LFun Formalism.UG
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.PRep
 
-theorem UpperTheory.V.Z.Mult.lcLev :
-    UpperTheory.V.Z.Mult.LcLev := by
+theorem UpperTheory.V.Z.Mult.lcLev : UpperTheory.V.Z.Mult.LcLev := by
   intro E _ _ _ n w hw f hf
   obtain ⟨K', hKo, hKle, hK⟩ := hf
   have hU : UL n w = ⊤ := if_pos hw

@@ -6,13 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N ValuativeRel
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N ValuativeRel
 open GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem exists_zpow_eq_ringEquiv_on_roots_of_unity {K : Type*} [Field K] (M : ℕ) (hM : 1 ≤ M) (σ : K ≃+* K) :
-    ∃ m : ℤ, ∀ x : K, x ^ M = 1 → σ x = x ^ m := by
+private theorem exists_zpow_eq_ringEquiv_on_roots_of_unity
+    {K : Type*} [Field K] (M : ℕ) (hM : 1 ≤ M) (σ : K ≃+* K)
+    : ∃ m : ℤ, ∀ x : K, x ^ M = 1 → σ x = x ^ m := by
   haveI : NeZero M := ⟨by omega⟩
   obtain ⟨m, hm⟩ := MonoidHom.map_cyclic ((σ.toMulEquiv.restrictRootsOfUnity M).toMonoidHom)
   refine ⟨m, fun x hx => ?_⟩
@@ -23,8 +25,12 @@ private theorem exists_zpow_eq_ringEquiv_on_roots_of_unity {K : Type*} [Field K]
   have := congrArg (fun y : rootsOfUnity M K => ((y : Kˣ) : K)) (hm g)
   simpa [g] using this
 
-private theorem commutator_fixes_root_of_unity {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω] (M : ℕ) (hM : 1 ≤ M)
-    (σ τ : Ω ≃ₐ[F] Ω) (ζ : Ω) (hζ : ζ ^ M = 1) : (σ * τ * σ⁻¹ * τ⁻¹) ζ = ζ := by
+private theorem commutator_fixes_root_of_unity
+    {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
+    (M : ℕ) (hM : 1 ≤ M)
+    (σ τ : Ω ≃ₐ[F] Ω)
+    (ζ : Ω) (hζ : ζ ^ M = 1)
+    : (σ * τ * σ⁻¹ * τ⁻¹) ζ = ζ := by
   obtain ⟨a, ha⟩ := exists_zpow_eq_ringEquiv_on_roots_of_unity M hM σ.toRingEquiv
   obtain ⟨b, hb⟩ := exists_zpow_eq_ringEquiv_on_roots_of_unity M hM τ.toRingEquiv
   have ha' : ∀ x : Ω, x ^ M = 1 → σ x = x ^ a := ha
@@ -38,11 +44,16 @@ private theorem commutator_fixes_root_of_unity {F Ω : Type*} [Field F] [Field �
   rw [key]
   simp
 
-theorem UpperTheory.irreducible_weilDeligne_tame_level_eq_character :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w) (M : ℕ), 1 ≤ M →
-    ∀ (m : ℕ) (b : WDRep h (Fin m → ℂ)), b.ρ.IsIrreducible →
-    (∀ s : ↥(Ine (F := F) A), (∀ ζ : Ω, ζ ^ M = 1 → (s : G F Ω) ζ = ζ) → b.ρ (ineIncl h s) = 1) →
-    ∃ (ξ : Weil h →* ℂˣ) (hξ : IsSmooth ξ), WD.mk b = WD.lpOfChar h ξ hξ ∧ ∀ σ, b.ρ σ = 1 → ξ σ = 1 := by
+theorem UpperTheory.irreducible_weilDeligne_tame_level_eq_character
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w) (M : ℕ),
+      1 ≤ M
+        → ∀ (m : ℕ) (b : WDRep h (Fin m → ℂ)),
+          b.ρ.IsIrreducible
+            → (∀ s : ↥(Ine (F := F) A),
+              (∀ ζ : Ω, ζ ^ M = 1 → (s : G F Ω) ζ = ζ) → b.ρ (ineIncl h s) = 1)
+            → ∃ (ξ : Weil h →* ℂˣ) (hξ : IsSmooth ξ),
+              WD.mk b = WD.lpOfChar h ξ hξ ∧ ∀ σ, b.ρ σ = 1 → ξ σ = 1 := by
   intro F Ω _ _ _ _ _ w A h M hM m b hirr hine
   haveI := hirr
   have hcomm : ∀ σ τ : Weil h, b.ρ σ * b.ρ τ = b.ρ τ * b.ρ σ := by
@@ -57,22 +68,27 @@ theorem UpperTheory.irreducible_weilDeligne_tame_level_eq_character :
       apply hine
       intro ζ hζ
       show ((σ * τ * σ⁻¹ * τ⁻¹ : Weil h) : G F Ω) ζ = ζ
-      simpa only [Subgroup.coe_mul, Subgroup.coe_inv] using commutator_fixes_root_of_unity M hM (σ : G F Ω) τ ζ hζ
+      simpa only [Subgroup.coe_mul, Subgroup.coe_inv] using
+        commutator_fixes_root_of_unity M hM (σ : G F Ω) τ ζ hζ
     have hst : σ * τ = (σ * τ * σ⁻¹ * τ⁻¹) * (τ * σ) := by group
     rw [← map_mul, hst, map_mul, hρc, one_mul, map_mul]
   have hnt : Nontrivial (Fin m → ℂ) := by
     by_contra hn
     rw [not_nontrivial_iff_subsingleton] at hn
-    exact (bot_ne_top : (⊥ : Subrepresentation b.ρ) ≠ ⊤) (Subrepresentation.ext (Subsingleton.elim _ _))
+    exact (bot_ne_top : (⊥ : Subrepresentation b.ρ) ≠ ⊤) (Subrepresentation.ext (Subsingleton.elim _
+      _))
   have hscal : ∀ τ : Weil h, ∃ c : ℂ, ∀ v, b.ρ τ v = c • v := by
     intro τ
     obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue (b.ρ τ)
     refine ⟨c, ?_⟩
-    let S : Subrepresentation b.ρ := ⟨Module.End.eigenspace (b.ρ τ) c, fun g v hv => by
-      rw [Module.End.mem_eigenspace_iff] at hv ⊢
-      have := congrArg (fun f => f v) (hcomm τ g)
-      simp only [Module.End.mul_apply] at this
-      rw [this, hv, map_smul]⟩
+    let S : Subrepresentation b.ρ := ⟨
+      Module.End.eigenspace (b.ρ τ) c,
+      fun g v hv => by
+        rw [Module.End.mem_eigenspace_iff] at hv ⊢
+        have := congrArg (fun f => f v) (hcomm τ g)
+        simp only [Module.End.mul_apply] at this
+        rw [this, hv, map_smul]
+    ⟩
     rcases eq_bot_or_eq_top S with hS | hS
     · exfalso
       obtain ⟨v, hv⟩ := hc.exists_hasEigenvector
@@ -86,10 +102,13 @@ theorem UpperTheory.irreducible_weilDeligne_tame_level_eq_character :
       exact Module.End.mem_eigenspace_iff.1 hvS
   obtain ⟨v0, hv0⟩ := exists_ne (0 : Fin m → ℂ)
   have hspan : Submodule.span ℂ {v0} = ⊤ := by
-    let S : Subrepresentation b.ρ := ⟨Submodule.span ℂ {v0}, fun g v hv => by
-      obtain ⟨c, hc⟩ := hscal g
-      rw [hc]
-      exact Submodule.smul_mem _ _ hv⟩
+    let S : Subrepresentation b.ρ := ⟨
+      Submodule.span ℂ {v0},
+      fun g v hv => by
+        obtain ⟨c, hc⟩ := hscal g
+        rw [hc]
+        exact Submodule.smul_mem _ _ hv
+    ⟩
     rcases eq_bot_or_eq_top S with hS | hS
     · exfalso
       have hvS : v0 ∈ S.toSubmodule := Submodule.subset_span rfl
@@ -120,17 +139,18 @@ theorem UpperTheory.irreducible_weilDeligne_tame_level_eq_character :
     rw [hEnd (b.ρ σ) v1, h0, zero_smul, map_zero] at hinv
     have := congrFun hinv 0
     simp [v1] at this
-  let ξ : Weil h →* ℂˣ :=
-    { toFun := fun σ => Units.mk0 _ (hne σ)
-      map_one' := by
-        ext
-        simp [v1]
-      map_mul' := by
-        intro σ τ
-        ext
-        simp only [Units.val_mk0, Units.val_mul, map_mul, Module.End.mul_apply]
-        rw [hEnd (b.ρ σ) (b.ρ τ v1)]
-        simp }
+  let ξ : Weil h →* ℂˣ := {
+    toFun := fun σ => Units.mk0 _ (hne σ)
+    map_one' := by
+      ext
+      simp [v1]
+    map_mul' := by
+      intro σ τ
+      ext
+      simp only [Units.val_mk0, Units.val_mul, map_mul, Module.End.mul_apply]
+      rw [hEnd (b.ρ σ) (b.ρ τ v1)]
+      simp
+  }
   have hξ1 : ∀ σ, ξ σ = 1 ↔ b.ρ σ = 1 := by
     intro σ
     constructor
@@ -143,8 +163,7 @@ theorem UpperTheory.irreducible_weilDeligne_tame_level_eq_character :
     · intro hσ
       ext
       simp [ξ, hσ, v1]
-  have hsm : IsSmooth ξ := by
-    simpa only [IsSmooth, hξ1] using b.smooth
+  have hsm : IsSmooth ξ := by simpa only [IsSmooth, hξ1] using b.smooth
   have hN : b.N = 0 := by
     obtain ⟨k, hk⟩ := b.nilpotent
     set c := b.N v1 0 with hc

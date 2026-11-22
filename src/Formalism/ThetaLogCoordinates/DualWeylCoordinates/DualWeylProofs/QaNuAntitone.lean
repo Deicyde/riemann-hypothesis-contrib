@@ -96,7 +96,9 @@ lemma qa_of_cum {n : ℕ} (m m' : Fin n × Fin n →₀ ℕ) (h : ∀ a p, qa_S 
 
 def qa_g {n : ℕ} [NeZero n] (m : Fin n × Fin n →₀ ℕ) (k : ℤ) (p : Fin n) : Fin n :=
   if h : (univ.filter fun a : Fin n => (qa_S m a p : ℤ) < k).card < n then
-    ⟨(univ.filter fun a : Fin n => (qa_S m a p : ℤ) < k).card, h⟩ else lastIdx n
+    ⟨(univ.filter fun a : Fin n => (qa_S m a p : ℤ) < k).card, h⟩
+  else
+    lastIdx n
 
 lemma qa_g_le_iff {n : ℕ} [NeZero n] (m : Fin n × Fin n →₀ ℕ) (k : ℤ) (p : Fin n)
     (hk : k ≤ (∑ b : Fin n, m (b, p) : ℕ)) (a : Fin n) : qa_g m k p ≤ a ↔ k ≤ qa_S m a p := by
@@ -256,8 +258,11 @@ lemma qa_fill_exp {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu) 
   rw [this, Int.card_Ioc]
   simp
 
-theorem qa_exp_surj {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu) (m : Fin n × Fin n →₀ ℕ)
-    (hm : m ∈ Formalism.GradedWeylDivisibility.ssIdx n n (qa_nu mu)) : ∃ I : TIdx mu, StdT I ∧ qa_exp I = m := by
+theorem qa_exp_surj
+    {n : ℕ} [NeZero n]
+    {mu : Fin n → ℤ} (hmu : Dominant mu)
+    (m : Fin n × Fin n →₀ ℕ) (hm : m ∈ Formalism.GradedWeylDivisibility.ssIdx n n (qa_nu mu))
+    : ∃ I : TIdx mu, StdT I ∧ qa_exp I = m := by
   obtain ⟨I, hI⟩ := qa_fill_exists hmu m hm.1 hm.2
   exact ⟨I, qa_fill_std hmu m hm.2 I hI, qa_fill_exp hmu m hm.2 I hI⟩
 

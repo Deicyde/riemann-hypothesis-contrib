@@ -13,24 +13,29 @@ open NumberField Complex
 
 noncomputable section
 
-private theorem sum_inner_ob_smul_e {ι : Type} [Fintype ι]
-    (K : Submodule ℝ (EuclideanSpace ℂ ι)) (a : EuclideanSpace ℂ ι)
-    (ha : a ∈ K) : ∑ i, (inner ℝ ((Col.ob K) i) (⟨a, ha⟩ : K)) • (Col.e K i) = a := by
+private theorem sum_inner_ob_smul_e
+    {ι : Type} [Fintype ι]
+    (K : Submodule ℝ (EuclideanSpace ℂ ι)) (a : EuclideanSpace ℂ ι) (ha : a ∈ K)
+    : ∑ i, (inner ℝ ((Col.ob K) i) (⟨a, ha⟩ : K)) • (Col.e K i) = a := by
   have h := congrArg (fun w : K => (w : EuclideanSpace ℂ ι)) ((Col.ob K).sum_repr' ⟨a, ha⟩)
   simp only [Submodule.coe_sum, Submodule.coe_smul] at h
   exact h
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {X : PT E} {DF : ℕ} {P : Par X DF}
-  {I : Submodule ℤ (Vsp X.dim)}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {X : PT E} {DF : ℕ} {P : Par X DF} {I : Submodule ℤ (Vsp X.dim)}
 
-theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : PropAStatement)
-    (hS : GSupStatement) (hI : IsSplit P I) (c : ℕ) (hc : c ≤ DF) (σ : E →+* ℂ)
+theorem cab_core
+    (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : PropAStatement) (hS : GSupStatement)
+    (hI : IsSplit P I)
+    (c : ℕ) (hc : c ≤ DF)
+    (σ : E →+* ℂ)
     (ξ : Vsp X.dim) (hξ1 : ‖ξ‖ = 1) (hξI : ∀ a ∈ I, Hf ξ a = 0)
- :
-    ∃ s' ∈ X.Sec P.q 1,
-      (∀ xs : Fin c → Vsp X.dim, (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1) →
-        ‖d1 s' c xs - (c.factorial : ℂ) * ∏ k, Hf (xs k) ξ‖ ≤ P.eps1 * c.factorial) ∧
-      P.K6⁻¹ * X.l2 P.q s' ≤ (c.factorial : ℝ) ^ 2 := by
+    : ∃ s' ∈ X.Sec P.q 1,
+      (∀ xs : Fin c → Vsp X.dim,
+          (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1)
+            → ‖d1 s' c xs - (c.factorial : ℂ) * ∏ k, Hf (xs k) ξ‖ ≤ P.eps1 * c.factorial)
+        ∧ P.K6⁻¹ * X.l2 P.q s' ≤ (c.factorial : ℝ) ^ 2 := by
   classical
   have hK := Col.hK_of hI
   set η := Col.wmap (IR I) ξ with hη
@@ -41,8 +46,7 @@ theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : Pro
   have hR0sq := P.hR0
   have hR0ne : P.R0 ≠ 0 := by intro h; rw [h] at hR0sq; norm_num at hR0sq
   have hR0pos : 0 < |P.R0| := abs_pos.mpr hR0ne
-  have hlat : ∀ γ ∈ lat (Col.YB hI hP P.q).b, γ ≠ 0 →
-      |P.R0| ≤ Real.sqrt (P.q * Real.pi) * ‖γ‖ := by
+  have hlat : ∀ γ ∈ lat (Col.YB hI hP P.q).b, γ ≠ 0 → |P.R0| ≤ Real.sqrt (P.q * Real.pi) * ‖γ‖ := by
     intro γ hγ hne
     have hl : γ ∈ Col.GB X I := by rw [← Col.lat_bB hI hP]; exact hγ
     obtain ⟨x, hx, rfl⟩ := Col.mem_GB.1 hl
@@ -86,8 +90,8 @@ theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : Pro
         conv_rhs => rw [← sum_inner_ob_smul_e (IR I) x hxK]
         simp only [Col.p1]
         refine Finset.sum_congr rfl fun k _ => ?_
-        have hzk : Col.z (IR I) k x =
-            ((inner ℝ ((Col.ob (IR I)) k) (⟨x, hxK⟩ : IR I) : ℝ) : ℂ) := by
+        have hzk
+            : Col.z (IR I) k x = ((inner ℝ ((Col.ob (IR I)) k) (⟨x, hxK⟩ : IR I) : ℝ) : ℂ) := by
           apply Complex.ext
           · simp only [Complex.ofReal_re, Submodule.coe_inner]
             simp [Col.z, Col.e, Hf, real_inner_eq_re_inner, PiLp.inner_apply, mul_comm]
@@ -112,17 +116,23 @@ theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : Pro
       have hpi : (1 : ℝ) ≤ Real.pi := by linarith [Real.pi_gt_three]
       have hc : 1 ≤ Real.pi * PT.f E * RR (E := E) ^ 3 :=
         one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le hpi hf1) hRR3
-      rw [Par.th, th, ← Real.sqrt_mul (show (0 : ℝ) ≤ P.q * Real.pi by positivity), ← Real.sqrt_sq_eq_abs]
+      rw [Par.th, th, ← Real.sqrt_mul (show (0 : ℝ) ≤ P.q * Real.pi by positivity),
+        ← Real.sqrt_sq_eq_abs]
       apply Real.sqrt_le_sqrt
-      have heq : (P.q : ℝ) * Real.pi * (PT.f E * P.R0 ^ 2 * RR (E := E) ^ 3 / P.q) =
-          (Real.pi * PT.f E * RR (E := E) ^ 3) * P.R0 ^ 2 := by
+      have heq
+          : (P.q : ℝ) * Real.pi * (PT.f E * P.R0 ^ 2 * RR (E := E) ^ 3 / P.q)
+            = (Real.pi * PT.f E * RR (E := E) ^ 3) * P.R0 ^ 2 := by
         first | (field_simp; ring) | field_simp
       rw [heq]
       exact le_mul_of_one_le_left (sq_nonneg _) hc
-    calc |P.R0| ≤ Real.sqrt (P.q * Real.pi) * P.th := hth
+    calc
+      |P.R0|
+        ≤ Real.sqrt (P.q * Real.pi) * P.th := hth
       _ ≤ Real.sqrt (P.q * Real.pi) * ‖Col.wmap (IR I) x‖ := by
         gcongr
-        calc P.th ≤ Metric.infDist x (IR I) := ht
+        calc
+          P.th
+            ≤ Metric.infDist x (IR I) := ht
           _ ≤ dist x (Col.p1 (IR I) x) := Metric.infDist_le_dist_of_mem hp1
           _ = ‖Col.wmap (IR I) x‖ := by rw [dist_eq_norm, hnorm]
   have hGle : Col.gB (IR I) ≤ X.gA := cab_gB_le (IR I)
@@ -130,11 +140,16 @@ theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : Pro
   have hcD : (c : ℝ) ≤ DF := by exact_mod_cast hc
   have h90 : 90 * ((Fintype.card (Fin (Col.gB (IR I))) : ℝ) + c) ≤ |P.R0| ^ 2 := by
     rw [sq_abs, Fintype.card_fin]; nlinarith [hR0sq.2]
-  obtain ⟨β, hβ, hjet, hl2⟩ := hA (Fin (Col.gB (IR I))) (Col.YB hI hP P.q) P.q c |P.R0| P.hq (Col.YB_coc hI hP P.q) hR0pos hlat
-    (by rw [sq_abs]; exact hR0sq.1) h90 (cabPoly η c) (cabPoly_deg η c)
+  obtain ⟨β, hβ, hjet, hl2⟩ :=
+    hA (Fin (Col.gB (IR I))) (Col.YB hI hP P.q) P.q c |P.R0| P.hq (Col.YB_coc hI hP P.q) hR0pos hlat
+      (by rw [sq_abs]; exact hR0sq.1) h90 (cabPoly η c) (cabPoly_deg η c)
   have hJ := cab_J_le η hη1 c P.q P.hq
   rw [Fintype.card_fin] at hJ
-  have hl2' : (Col.YB hI hP P.q).l2 P.q β ≤ 6 * (c.factorial * (2 / (P.q * Real.pi)) ^ c * (2 / P.q) ^ Fintype.card (Fin (Col.gB (IR I)))) := by
+  have hl2'
+      : (Col.YB hI hP P.q).l2 P.q β
+        ≤ 6
+          * (c.factorial * (2 / (P.q * Real.pi)) ^ c
+            * (2 / P.q) ^ Fintype.card (Fin (Col.gB (IR I)))) := by
     rw [Fintype.card_fin]; linarith
   have h90' : 90 * (Fintype.card (Fin (Col.gB (IR I))) : ℝ) ≤ |P.R0| ^ 2 := by
     have : (0 : ℝ) ≤ 90 * c := by positivity
@@ -149,20 +164,27 @@ theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : Pro
   have hB0 : 0 ≤ B := Real.sqrt_nonneg _
   have hBβ : ∀ t, ‖β t‖ ^ 2 * Real.exp (-(P.q * Real.pi) * ‖t‖ ^ 2) ≤ B ^ 2 := by
     intro t; rw [hBdef, Real.sq_sqrt hBsq0]; exact hsup t
-  have hT2 : ∀ c' v, ‖Col.Tc X I P.q β c' v‖ ≤ B * Real.exp (P.q * Real.pi * ‖v‖ ^ 2 / 2) *
-      Real.exp (-(P.q * Real.pi * ‖Col.uc (IR I) v - Col.uc (IR I) (cabOut c' : Vsp X.dim)‖ ^ 2)) := by
+  have hT2
+      : ∀ c' v,
+        ‖Col.Tc X I P.q β c' v‖
+          ≤ B * Real.exp (P.q * Real.pi * ‖v‖ ^ 2 / 2)
+            * Real.exp (-(P.q * Real.pi
+              * ‖Col.uc (IR I) v - Col.uc (IR I) (cabOut c' : Vsp X.dim)‖ ^ 2)) := by
     intro c' v
     have := Col.norm_Tc_le hI hB0 hBβ c' v
     rw [Col.uQ_out] at this
     refine this.trans (le_of_eq ?_)
-    rw [show cabOut c' = Quotient.out c' from rfl]; ring_nf
+    rw [show cabOut c' = Quotient.out c' from rfl]
+    ring_nf
   set s' : (Fin 1 → Vsp X.dim) → ℂ := Col.colS X I P.q β with hs'
   have hs'mem : s' ∈ X.Sec P.q 1 := Col.colS_mem hI hP hGT hB0 hBβ hβ
   have hsPd : Differentiable ℂ (Col.sP X I P.q β) := by
     have h1 : Differentiable ℂ s' := hs'mem.1
-    let D : Vsp X.dim →L[ℂ] (Fin 1 → Vsp X.dim) := ContinuousLinearMap.pi fun _ => ContinuousLinearMap.id ℂ _
+    let D : Vsp X.dim →L[ℂ] (Fin 1 → Vsp X.dim) :=
+      ContinuousLinearMap.pi fun _ => ContinuousLinearMap.id ℂ _
     have : Col.sP X I P.q β = s' ∘ D := by funext v; rfl
-    rw [this]; exact h1.comp D.differentiable
+    rw [this]
+    exact h1.comp D.differentiable
   refine ⟨s', hs'mem, ?_, ?_⟩
   · intro xs hxs
     set F0 := Col.F0 I P.q β with hF0
@@ -173,27 +195,33 @@ theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : Pro
     have hd1 : d1 s' c xs = iteratedFDeriv ℂ c (Col.sP X I P.q β) 0 xs :=
       iteratedFDeriv_single_column (contDiff_of_differentiable_fd hsPd c) xs
     have hmain : iteratedFDeriv ℂ c F0 0 xs = (c.factorial : ℂ) * ∏ k, Hf (xs k) ξ :=
-      cab_main hK σ hξI β hβ.1 hjet F0 hF0d (fun v hv => zeroModeLift_on_part hI P.q β σ v hv) xs
+      cab_main hK σ hξI β hβ.1 hjet F0 hF0d
+        (fun v hv => zeroModeLift_on_part hI P.q β σ v hv)
+        xs
         (fun k => (hxs k).1)
-    have hadd : iteratedFDeriv ℂ c (Col.sP X I P.q β) 0 xs =
-        iteratedFDeriv ℂ c F0 0 xs + iteratedFDeriv ℂ c R 0 xs := by
-      rw [hsplit, iteratedFDeriv_add_apply (contDiff_of_differentiable_fd hF0d c).contDiffAt
-        (contDiff_of_differentiable_fd hRd c).contDiffAt]
+    have hadd
+        : iteratedFDeriv ℂ c (Col.sP X I P.q β) 0 xs
+          = iteratedFDeriv ℂ c F0 0 xs + iteratedFDeriv ℂ c R 0 xs := by
+      rw [hsplit,
+        iteratedFDeriv_add_apply (contDiff_of_differentiable_fd hF0d c).contDiffAt
+          (contDiff_of_differentiable_fd hRd c).contDiffAt]
       rfl
     rw [hd1, hadd, hmain, add_sub_cancel_left]
     obtain ⟨g', hg', hs, hle⟩ := cab_sum_nz hP hGT hI
     have hbd := cab_R hI hP hGT hβ B hB0 (Col.summable_Tc hI hP hGT hB0 hBβ) hT2
     have htd := cab_tail_deriv R hRd c xs (fun k => (hxs k).2.le) P.q hq0 B hB0 _ hs hbd
     refine htd.trans ?_
-    have hstep : B * ((P.q : ℝ) * (c + 1)) ^ ((c : ℝ) / 2) * Real.exp (5 * Real.pi * c / 2) *
-        ∑' a : cabNZ X I, Real.exp (-(Real.pi / 2 * P.q *
-          ‖Col.uc (IR I) (cabOut (a : Col.Qc X I) : Vsp X.dim)‖ ^ 2)) ≤
-        B * ((P.q : ℝ) * (c + 1)) ^ ((c : ℝ) / 2) * Real.exp (5 * Real.pi * c / 2) *
-          (2 * 9 ^ g' * Real.exp (-(Real.pi / 2 * t0 (E := E) P.q P.R0))) := by
+    have hstep
+        : B * ((P.q : ℝ) * (c + 1)) ^ ((c : ℝ) / 2) * Real.exp (5 * Real.pi * c / 2)
+            * ∑' a : cabNZ X I, Real.exp (-(Real.pi / 2 * P.q *
+                ‖Col.uc (IR I) (cabOut (a : Col.Qc X I) : Vsp X.dim)‖ ^ 2))
+          ≤ B * ((P.q : ℝ) * (c + 1)) ^ ((c : ℝ) / 2) * Real.exp (5 * Real.pi * c / 2)
+            * (2 * 9 ^ g' * Real.exp (-(Real.pi / 2 * t0 (E := E) P.q P.R0))) := by
       gcongr
     refine hstep.trans ?_
-    have hnum := cab_numeric c (Col.gB (IR I)) X.gA g' (dstar (E := E) P.m) P.q (t0 (E := E) P.q P.R0) hq2 hGle hg'
-      (threshold_ge_log_bound P hc) (threshold_ge_rank_log_two P)
+    have hnum :=
+      cab_numeric c (Col.gB (IR I)) X.gA g' (dstar (E := E) P.m) P.q (t0 (E := E) P.q P.R0) hq2 hGle
+        hg' (threshold_ge_log_bound P hc) (threshold_ge_rank_log_two P)
     refine hnum.trans (le_of_eq ?_)
     simp only [Par.eps1]
   · have h4 := Col.l2_colS_le_four_mul hI hP hGT hβ hB0 hBβ
@@ -202,7 +230,8 @@ theorem cab_core (hP : Ext.PackingCount) (hGT : Ext.GaussianTailBound) (hA : Pro
       have := hl2'; rw [Fintype.card_fin] at this; nlinarith
     have hK6 := twentyfour_le_constant P
     have hf1 : (1 : ℝ) ≤ (c.factorial : ℝ) ^ 2 := by
-      have : (1 : ℝ) ≤ c.factorial := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (Nat.factorial_ne_zero c)
+      have : (1 : ℝ) ≤ c.factorial := by
+        exact_mod_cast Nat.one_le_iff_ne_zero.mpr (Nat.factorial_ne_zero c)
       nlinarith
     have hK6p : 0 < P.K6 := by linarith
     rw [inv_mul_le_iff₀ hK6p]

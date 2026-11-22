@@ -7,7 +7,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 noncomputable section
 
@@ -15,13 +16,16 @@ namespace GlobalTheory.CompanionTheory.PrimAlgProof
 
 open Polynomial
 
-theorem exists_universal (q : ℕ) [NeZero q] :
-    ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (ξ : R), IsPrimitiveRoot ξ q ∧
-      ∀ (A : Type) [CommRing A] (z : A), aeval z (cyclotomic q ℤ) = 0 →
-        ∃ φ : R →+* A, φ ξ = z := by
+theorem exists_universal (q : ℕ) [NeZero q]
+    : ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (ξ : R),
+      IsPrimitiveRoot ξ q
+        ∧ ∀ (A : Type) [CommRing A] (z : A),
+          aeval z (cyclotomic q ℤ) = 0 → ∃ φ : R →+* A, φ ξ = z := by
   have hq : 0 < q := Nat.pos_of_ne_zero (NeZero.ne q)
-  have hlift : ∀ (A : Type) [CommRing A] (z : A), aeval z (cyclotomic q ℤ) = 0 →
-      ∃ φ : AdjoinRoot (cyclotomic q ℤ) →+* A, φ (AdjoinRoot.root _) = z := by
+  have hlift
+      : ∀ (A : Type) [CommRing A] (z : A),
+        aeval z (cyclotomic q ℤ) = 0
+          → ∃ φ : AdjoinRoot (cyclotomic q ℤ) →+* A, φ (AdjoinRoot.root _) = z := by
     intro A _ z hz
     have h : (cyclotomic q ℤ).eval₂ (Int.castRingHom A) z = 0 := by
       rw [aeval_def] at hz
@@ -30,12 +34,13 @@ theorem exists_universal (q : ℕ) [NeZero q] :
   haveI hdom : IsDomain (AdjoinRoot (cyclotomic q ℤ)) :=
     AdjoinRoot.isDomain_of_prime (cyclotomic.irreducible hq).prime
   refine ⟨AdjoinRoot (cyclotomic q ℤ), inferInstance, hdom, AdjoinRoot.root _, ?_, hlift⟩
-  obtain ⟨ψ, hψ⟩ := hlift ℂ (Complex.exp (2 * Real.pi * Complex.I / q)) (by
-    have hp := Complex.isPrimitiveRoot_exp q (NeZero.ne q)
-    have : IsRoot (cyclotomic q ℂ) (Complex.exp (2 * Real.pi * Complex.I / q)) :=
-      (isRoot_cyclotomic_iff).2 hp
-    rw [aeval_def, eval₂_eq_eval_map, map_cyclotomic]
-    exact this)
+  obtain ⟨ψ, hψ⟩ :=
+    hlift ℂ (Complex.exp (2 * Real.pi * Complex.I / q)) (by
+      have hp := Complex.isPrimitiveRoot_exp q (NeZero.ne q)
+      have : IsRoot (cyclotomic q ℂ) (Complex.exp (2 * Real.pi * Complex.I / q)) :=
+        (isRoot_cyclotomic_iff).2 hp
+      rw [aeval_def, eval₂_eq_eval_map, map_cyclotomic]
+      exact this)
   haveI : NeZero ((q : ℕ) : AdjoinRoot (cyclotomic q ℤ)) := ⟨fun h0 => by
     have := congrArg ψ h0
     rw [map_natCast, map_zero] at this
@@ -45,9 +50,9 @@ theorem exists_universal (q : ℕ) [NeZero q] :
   rw [eval₂_eq_eval_map, map_cyclotomic] at h
   exact h
 
-theorem X_pow_sub_one_eq {R : Type} [CommRing R] [IsDomain R] (q : ℕ) [NeZero q] {ξ : R}
-    (hξ : IsPrimitiveRoot ξ q) :
-    (X ^ q - 1 : R[X]) = ∏ a : ZMod q, (X - C (ξ ^ a.val)) := by
+theorem X_pow_sub_one_eq
+    {R : Type} [CommRing R] [IsDomain R] (q : ℕ) [NeZero q] {ξ : R} (hξ : IsPrimitiveRoot ξ q)
+    : (X ^ q - 1 : R[X]) = ∏ a : ZMod q, (X - C (ξ ^ a.val)) := by
   have hq : 0 < q := Nat.pos_of_ne_zero (NeZero.ne q)
   rw [X_pow_sub_one_eq_prod hq hξ]
   symm
@@ -64,9 +69,9 @@ theorem X_pow_sub_one_eq {R : Type} [CommRing R] [IsDomain R] (q : ℕ) [NeZero 
   · intro a _
     rfl
 
-theorem cyclotomic_eq {R : Type} [CommRing R] [IsDomain R] (q : ℕ) [NeZero q] {ξ : R}
-    (hξ : IsPrimitiveRoot ξ q) :
-    cyclotomic q R = ∏ a : (ZMod q)ˣ, (X - C (ξ ^ (a : ZMod q).val)) := by
+theorem cyclotomic_eq
+    {R : Type} [CommRing R] [IsDomain R] (q : ℕ) [NeZero q] {ξ : R} (hξ : IsPrimitiveRoot ξ q)
+    : cyclotomic q R = ∏ a : (ZMod q)ˣ, (X - C (ξ ^ (a : ZMod q).val)) := by
   have hq : 0 < q := Nat.pos_of_ne_zero (NeZero.ne q)
   rw [cyclotomic_eq_prod_X_sub_primitiveRoots hξ]
   symm
@@ -86,9 +91,13 @@ theorem cyclotomic_eq {R : Type} [CommRing R] [IsDomain R] (q : ℕ) [NeZero q] 
   · intro a _
     rfl
 
-theorem isUnit_one_sub_pow {R A : Type} [CommRing R] [IsDomain R] [CommRing A] (n : ℕ) {ξ : R}
-    (hξ : IsPrimitiveRoot ξ (n + 1)) (φ : R →+* A) (hu : IsUnit ((n + 1 : ℕ) : A))
-    (k : ℕ) (hk : k < n) : IsUnit (1 - φ ξ ^ (k + 1)) := by
+theorem isUnit_one_sub_pow
+    {R A : Type} [CommRing R] [IsDomain R] [CommRing A]
+    (n : ℕ)
+    {ξ : R} (hξ : IsPrimitiveRoot ξ (n + 1))
+    (φ : R →+* A) (hu : IsUnit ((n + 1 : ℕ) : A))
+    (k : ℕ) (hk : k < n)
+    : IsUnit (1 - φ ξ ^ (k + 1)) := by
   have h := congrArg φ hξ.prod_one_sub_pow_eq_order
   rw [map_prod] at h
   have hn : φ ((n : R) + 1) = ((n + 1 : ℕ) : A) := by simp

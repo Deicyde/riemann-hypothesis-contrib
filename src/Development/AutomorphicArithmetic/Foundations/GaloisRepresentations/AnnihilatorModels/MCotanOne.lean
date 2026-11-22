@@ -5,16 +5,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-private theorem tangent_of_form {κ B : Type} [Field κ] [CommRing B] [Algebra κ B] (ε : B →ₐ[κ] κ)
-    (d : B →ₗ[κ] κ) (h1 : d 1 = 0) (h2 : ∀ x ∈ RingHom.ker ε.toRingHom ^ 2, d x = 0) :
-    ∃ v : B →ₐ[κ] DualNumber κ, (TrivSqZeroExt.fstHom κ κ κ).comp v = ε ∧ ∀ x, (v x).snd = d x := by
+private theorem tangent_of_form
+    {κ B : Type} [Field κ] [CommRing B] [Algebra κ B]
+    (ε : B →ₐ[κ] κ) (d : B →ₗ[κ] κ) (h1 : d 1 = 0) (h2 : ∀ x ∈ RingHom.ker ε.toRingHom ^ 2, d x = 0)
+    : ∃ v : B →ₐ[κ] DualNumber κ,
+      (TrivSqZeroExt.fstHom κ κ κ).comp v = ε ∧ ∀ x, (v x).snd = d x := by
   have hmem : ∀ x, x - algebraMap κ B (ε x) ∈ RingHom.ker ε.toRingHom := by
     intro x
     rw [RingHom.mem_ker]
@@ -22,26 +27,30 @@ private theorem tangent_of_form {κ B : Type} [Field κ] [CommRing B] [Algebra �
     rw [map_sub, AlgHom.commutes, Algebra.algebraMap_self, RingHom.id_apply, sub_self]
   have key : ∀ x y, d (x * y) = ε x * d y + ε y * d x := by
     intro x y
-    have hm : (x - algebraMap κ B (ε x)) * (y - algebraMap κ B (ε y)) ∈
-        RingHom.ker ε.toRingHom ^ 2 := by
+    have hm
+        : (x - algebraMap κ B (ε x)) * (y - algebraMap κ B (ε y))
+          ∈ RingHom.ker ε.toRingHom ^ 2 := by
       rw [pow_two]
       exact Ideal.mul_mem_mul (hmem x) (hmem y)
     have hz := h2 _ hm
-    have e : x * y = (x - algebraMap κ B (ε x)) * (y - algebraMap κ B (ε y)) + ε y • x
-        + ε x • y - (ε x * ε y) • (1 : B) := by
+    have e
+        : x * y
+          = (x - algebraMap κ B (ε x)) * (y - algebraMap κ B (ε y)) + ε y • x + ε x • y
+            - (ε x * ε y) • (1 : B) := by
       simp only [Algebra.smul_def, map_mul, mul_one]
       ring
     rw [e, map_sub, map_add (f := _), map_add (f := _), hz, map_smul, map_smul, map_smul, h1]
     simp only [smul_eq_mul]
     ring
-  let f : B →ₗ[κ] DualNumber κ :=
-    { toFun := fun x => TrivSqZeroExt.inl (ε x) + TrivSqZeroExt.inr (d x)
-      map_add' := by
-        intro x y
-        ext <;> simp <;> ring
-      map_smul' := by
-        intro a x
-        ext <;> simp }
+  let f : B →ₗ[κ] DualNumber κ := {
+    toFun := fun x => TrivSqZeroExt.inl (ε x) + TrivSqZeroExt.inr (d x)
+    map_add' := by
+      intro x y
+      ext <;> simp <;> ring
+    map_smul' := by
+      intro a x
+      ext <;> simp
+  }
   have hf : ∀ x, f x = TrivSqZeroExt.inl (ε x) + TrivSqZeroExt.inr (d x) := fun _ => rfl
   refine ⟨AlgHom.ofLinearMap f ?_ ?_, ?_, ?_⟩
   · rw [hf]
@@ -54,8 +63,7 @@ private theorem tangent_of_form {κ B : Type} [Field κ] [CommRing B] [Algebra �
   · intro x
     simp [hf]
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.cotanOne_of :
-    CotanOne := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.cotanOne_of : CotanOne := by
   intro κ B _ _ _ ε v₀ hall
   classical
   let m := RingHom.ker ε.toRingHom
@@ -76,8 +84,7 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.cotanOne_of :
       obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.1 hw
       have hz' : z ∈ m ^ 2 := hz
       have hzm : z ∈ m := Ideal.pow_le_self two_ne_zero hz'
-      have e1 : ε y = ε z + a * ε 1 := by
-        rw [← hzw, map_add (f := _), map_smul, smul_eq_mul]
+      have e1 : ε y = ε z + a * ε 1 := by rw [← hzw, map_add (f := _), map_smul, smul_eq_mul]
       have hεy : ε y = 0 := hy
       have hεz : ε z = 0 := hzm
       simp only [hεy, hεz, _root_.map_one, zero_add] at e1

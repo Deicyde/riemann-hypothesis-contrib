@@ -13,14 +13,16 @@ namespace ReciprocityTheory.ChartRestriction.DS.Lap.LemK.DualRepresentationRever
 
 open ReciprocityTheory.ChartRestriction.DS
 
-variable {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {D : Submodule ℂ H}
-  {ε : Fin n → Bool}
+variable
+  {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {D : Submodule ℂ H} {ε : Fin n → Bool}
 
-def sdd (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (g : Matrix (Fin n) (Fin n) ℂ) : Cj H →L[ℂ] Cj H :=
+def sdd (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (g : Matrix (Fin n) (Fin n) ℂ)
+    : Cj H →L[ℂ] Cj H :=
   opCj (σ (sub g))
 
-theorem urep_sdd {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : IsURepOn (UJset ε) σ) :
-    IsURepOn (UJset (ε ∘ Fin.rev)) (sdd σ) := by
+theorem urep_sdd {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : IsURepOn (UJset ε) σ)
+    : IsURepOn (UJset (ε ∘ Fin.rev)) (sdd σ) := by
   obtain ⟨⟨h1, hm⟩, hn, hc⟩ := hσ
   refine ⟨⟨?_, ?_⟩, ?_, ?_⟩
   · unfold sdd; rw [sub_one, h1]; rfl
@@ -31,18 +33,19 @@ theorem urep_sdd {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : Is
       continuous_id.matrix_submatrix _ _
     exact (hc (ofCj v)).comp hcs.continuousOn (fun g hg => inUJ_sub hg)
 
-theorem smul_ofD (c : ℂ) (u : D) : c • ofD u = ofD (conj c • u) := by
-  rw [ofD_smul]; simp
+theorem smul_ofD (c : ℂ) (u : D) : c • ofD u = ofD (conj c • u) := by rw [ofD_smul]; simp
 
-theorem sum_rev_swap {M : Type*} [AddCommMonoid M] (F : Fin n → Fin n → M) :
-    ∑ a, ∑ b, F a b = ∑ a, ∑ b, F (Fin.rev b) (Fin.rev a) := by
+theorem sum_rev_swap {M : Type*} [AddCommMonoid M] (F : Fin n → Fin n → M)
+    : ∑ a, ∑ b, F a b = ∑ a, ∑ b, F (Fin.rev b) (Fin.rev a) := by
   rw [Finset.sum_comm, ← Equiv.sum_comp Fin.revPerm]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [← Equiv.sum_comp Fin.revPerm]
   rfl
 
-theorem actM_Edd {E : Fin n → Fin n → Module.End ℂ D} {X : Matrix (Fin n) (Fin n) ℂ}
-    (hX : inG (ε ∘ Fin.rev) X) (u : D) : actM (Edd ε E) X (ofD u) = ofD (actM E (sub X) u) := by
+theorem actM_Edd
+    {E : Fin n → Fin n → Module.End ℂ D} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG (ε ∘ Fin.rev) X)
+    (u : D)
+    : actM (Edd ε E) X (ofD u) = ofD (actM E (sub X) u) := by
   unfold actM
   simp only [LinearMap.sum_apply, LinearMap.smul_apply, Edd_ofD, smul_ofD, ofD_sum]
   rw [sum_rev_swap]
@@ -66,8 +69,10 @@ def toCjR : H →L[ℝ] Cj H where
   map_smul' r x := (real_smul_cj r (toCj x)).symm
   cont := continuous_id
 
-theorem derived_sdd {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {E : Fin n → Fin n → Module.End ℂ D}
-    (hD : IsDerivedOn ε σ D E) : IsDerivedOn (ε ∘ Fin.rev) (sdd σ) (cjSub D) (Edd ε E) := by
+theorem derived_sdd
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {E : Fin n → Fin n → Module.End ℂ D}
+    (hD : IsDerivedOn ε σ D E)
+    : IsDerivedOn (ε ∘ Fin.rev) (sdd σ) (cjSub D) (Edd ε E) := by
   refine ⟨glRep_Edd ε hD.glRep, ?_, ?_⟩
   · intro k hk v hv
     exact hD.kStable (sub k) (K_sub hk) (ofCj v) hv

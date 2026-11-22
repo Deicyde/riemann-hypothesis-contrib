@@ -15,9 +15,11 @@ namespace GlobalTheory.Mem
 
 def GJStage.withTrue {B : Base} {C : Cols B} (G : GJStage B C) : GJStage B C :=
   letI := B.host.cmStar
-  { G with
+  {
+    G with
     vol := fun W => Vol.trueVol B.sp.cm (fun g : Tau B.R => B.host.emb g.1) G.cd W
     vol_pos := fun W => Vol.trueVol_pos B.sp.cm (fun g : Tau B.R => B.host.emb g.1) G.cd W
-    gx := Per.trueGx B.host B.embLL B.embE (Equiv.refl _) }
+    gx := Per.trueGx B.host B.embLL B.embE (Equiv.refl _)
+  }
 
 end GlobalTheory.Mem

@@ -6,13 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntBTmulBa
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
 open scoped TensorProduct Classical
 
 namespace GlobalTheory
 
-theorem exists_left_basis_through_algHom : ∀ (L : Type) [Field L] [NumberField L] (C : Type) [Ring C] [Algebra ℚ C] [FiniteDimensional ℚ C]
-    (ι : L →ₐ[ℚ] C), ∃ (r : ℕ) (e : Fin r → C), ∀ x : C, ∃! c : Fin r → L, x = ∑ i, ι (c i) * e i := by
+theorem exists_left_basis_through_algHom
+    : ∀ (L : Type) [Field L] [NumberField L] (C : Type) [Ring C] [Algebra ℚ C]
+        [FiniteDimensional ℚ C] (ι : L →ₐ[ℚ] C),
+      ∃ (r : ℕ) (e : Fin r → C), ∀ x : C,
+        ∃! c : Fin r → L, x = ∑ i, ι (c i) * e i := by
   intro L _ _ C _ _ _ ι
   letI : Module L C := Module.compHom C ι.toRingHom
   have hsmul : ∀ (l : L) (x : C), l • x = ι l * x := fun _ _ => rfl

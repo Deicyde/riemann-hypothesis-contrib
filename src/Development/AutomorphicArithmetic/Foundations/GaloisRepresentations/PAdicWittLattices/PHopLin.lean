@@ -4,7 +4,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
@@ -15,8 +16,7 @@ private lemma supp_fin {B : Scheme.{0}} {G : Type} [Group G] (X : Tower B G) {R 
   intro y hy h0
   exact hy (by simp only [h0, zero_smul])
 
-theorem UpperTheory.Gal.G3.pHopLin :
-    FnRing → HopDeep.{u} → HopEx.{u} → HopLin.{u} := by
+theorem UpperTheory.Gal.G3.pHopLin : FnRing → HopDeep.{u} → HopEx.{u} → HopLin.{u} := by
   intro hR hD hE B G _ X R _ _ T hT j f f' c hf hf'
   obtain ⟨⟨m1, hm1, ha1⟩, -⟩ := hD X T hT j f hf
   obtain ⟨⟨m2, hm2, ha2⟩, -⟩ := hD X T hT j f' hf'

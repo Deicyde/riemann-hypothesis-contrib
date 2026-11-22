@@ -35,30 +35,36 @@ private lemma dense_loc (L : Type) [CommRing L] [IsNoetherianRing L] [IsLocalRin
     RingHom.id_apply, sub_eq_zero, ← ha]
   simp [AdicCompletion.eval]
 
-theorem UpperTheory.V.CA.cpl_is :
-    ∀ (C : Type) [CommRing C] [IsNoetherianRing C] (x : Ideal C) [x.IsMaximal], ∃ _ : IsLocalRing (Cpl x), IsCplAt x (Cpl x) := by
+theorem UpperTheory.V.CA.cpl_is
+    : ∀ (C : Type) [CommRing C] [IsNoetherianRing C] (x : Ideal C) [x.IsMaximal],
+      ∃ _ : IsLocalRing (Cpl x),
+        IsCplAt x (Cpl x) := by
   intro C _ _ x hx
   refine ⟨inferInstance, ?_⟩
-  have hL : ∀ (n : ℕ) (a : Localization.AtPrime x),
-      a ∈ maximalIdeal (Localization.AtPrime x) ^ n →
-      algebraMap (Localization.AtPrime x) (Cpl x) a ∈ maximalIdeal (Cpl x) ^ n := by
+  have hL
+      : ∀ (n : ℕ) (a : Localization.AtPrime x),
+        a ∈ maximalIdeal (Localization.AtPrime x) ^ n
+          → algebraMap (Localization.AtPrime x) (Cpl x) a ∈ maximalIdeal (Cpl x) ^ n := by
     intro n a ha
     rw [AdicCompletion.maximalIdeal_eq_map, ← Ideal.map_pow]
     exact Ideal.mem_map_of_mem _ ha
-  refine
-    { noeth := GlobalTheory.AdicNoeth.isNoetherianRing_adicCompletion _ _
-      complete := inferInstance
-      comap_pow := fun n => ?_
-      dense := fun n r => ?_ }
+  refine {
+    noeth := GlobalTheory.AdicNoeth.isNoetherianRing_adicCompletion _ _
+    complete := inferInstance
+    comap_pow := fun n => ?_
+    dense := fun n r => ?_
+  }
   · rcases Nat.eq_zero_or_pos n with rfl | hn
     · simp
     rw [IsScalarTower.algebraMap_eq C (Localization.AtPrime x) (Cpl x), ← Ideal.comap_comap]
-    have e : Ideal.comap (algebraMap (Localization.AtPrime x) (Cpl x)) (maximalIdeal (Cpl x) ^ n) =
-        maximalIdeal (Localization.AtPrime x) ^ n := by
+    have e
+        : Ideal.comap (algebraMap (Localization.AtPrime x) (Cpl x)) (maximalIdeal (Cpl x) ^ n)
+          = maximalIdeal (Localization.AtPrime x) ^ n := by
       ext a
       exact ⟨strict_loc _ n a, hL n a⟩
     rw [e, ← Localization.AtPrime.map_eq_maximalIdeal, ← Ideal.map_pow]
-    refine IsLocalization.under_map_of_isPrimary_disjoint x.primeCompl (Localization.AtPrime x) ?_ ?_
+    refine IsLocalization.under_map_of_isPrimary_disjoint x.primeCompl (Localization.AtPrime x) ?_
+      ?_
     · apply Ideal.isPrimary_of_isMaximal_radical
       rw [Ideal.radical_pow _ hn.ne', (inferInstance : x.IsPrime).radical]
       infer_instance
@@ -77,16 +83,18 @@ theorem UpperTheory.V.CA.cpl_is :
     obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.mp h1
     obtain ⟨t, rfl⟩ := Ideal.mem_span_singleton'.mp hy
     refine ⟨c * t, ?_⟩
-    have key : IsLocalization.mk' (Localization.AtPrime x) c s - algebraMap C _ (c * t) =
-        IsLocalization.mk' (Localization.AtPrime x) c s * algebraMap C _ z := by
+    have key
+        : IsLocalization.mk' (Localization.AtPrime x) c s - algebraMap C _ (c * t)
+          = IsLocalization.mk' (Localization.AtPrime x) c s * algebraMap C _ z := by
       have hs := IsLocalization.mk'_spec (Localization.AtPrime x) c s
       have hz' : z = 1 - t * s := by
         rw [← hyz]
         ring
       rw [hz', map_sub, map_one, map_mul, map_mul, ← hs]
       ring
-    have hmem : IsLocalization.mk' (Localization.AtPrime x) c s - algebraMap C _ (c * t) ∈
-        maximalIdeal (Localization.AtPrime x) ^ n := by
+    have hmem
+        : IsLocalization.mk' (Localization.AtPrime x) c s - algebraMap C _ (c * t)
+          ∈ maximalIdeal (Localization.AtPrime x) ^ n := by
       rw [key, ← Localization.AtPrime.map_eq_maximalIdeal, ← Ideal.map_pow]
       exact Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ hz)
     have hsum := Ideal.add_mem _ ha (hL n _ hmem)

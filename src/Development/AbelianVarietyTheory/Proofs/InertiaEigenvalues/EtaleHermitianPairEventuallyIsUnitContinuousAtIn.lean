@@ -9,17 +9,18 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem units_near_one_inverse_continuousAt (F K : Type) [NontriviallyNormedField F] [CommRing K] [Algebra F K]
-    [Module.Finite F K] [TopologicalSpace K] [IsModuleTopology F K] [IsTopologicalRing K] :
-    (∀ᶠ a in 𝓝 (1 : K), IsUnit a) ∧ ContinuousAt Ring.inverse (1 : K) := by
+theorem units_near_one_inverse_continuousAt
+    (F K : Type) [NontriviallyNormedField F] [CommRing K] [Algebra F K] [Module.Finite F K]
+    [TopologicalSpace K] [IsModuleTopology F K] [IsTopologicalRing K]
+    : (∀ᶠ a in 𝓝 (1 : K), IsUnit a) ∧ ContinuousAt Ring.inverse (1 : K) := by
   classical
   let b := Module.finBasis F K
-  let ι : K →ₐ[F] Matrix (Fin (Module.finrank F K)) (Fin (Module.finrank F K)) F := Algebra.leftMulMatrix b
+  let ι : K →ₐ[F] Matrix (Fin (Module.finrank F K)) (Fin (Module.finrank F K)) F :=
+    Algebra.leftMulMatrix b
   have hι : Continuous ι := IsModuleTopology.continuous_of_linearMap ι.toLinearMap
   have hdet : Continuous fun a : K => (ι a).det := (continuous_id.matrix_det).comp hι
   have h1 : (ι 1).det ≠ 0 := by simp
-  have hev : ∀ᶠ a in 𝓝 (1 : K), (ι a).det ≠ 0 :=
-    hdet.continuousAt.eventually_ne h1
+  have hev : ∀ᶠ a in 𝓝 (1 : K), (ι a).det ≠ 0 := hdet.continuousAt.eventually_ne h1
   have hunit : ∀ a : K, (ι a).det ≠ 0 → IsUnit a := by
     intro a ha
     have hn : Algebra.norm F a ≠ 0 := by rw [Algebra.norm_eq_matrix_det b]; exact ha
@@ -37,7 +38,8 @@ theorem units_near_one_inverse_continuousAt (F K : Type) [NontriviallyNormedFiel
     rw [← map_mul, Ring.inverse_mul_cancel a ha, map_one]
   have heq : g =ᶠ[𝓝 (1 : K)] Ring.inverse := by
     filter_upwards [hev'] with a ha
-    simp only [g, hinv a ha, Module.Basis.equivFun_apply, ι, Algebra.leftMulMatrix_mulVec_repr, mul_one]
+    simp only [g, hinv a ha, Module.Basis.equivFun_apply, ι, Algebra.leftMulMatrix_mulVec_repr,
+      mul_one]
     rw [← Module.Basis.equivFun_apply, LinearEquiv.symm_apply_apply]
   refine ContinuousAt.congr ?_ heq
   have hsymm : Continuous b.equivFun.symm := LinearMap.continuous_on_pi b.equivFun.symm.toLinearMap
@@ -49,13 +51,15 @@ theorem units_near_one_inverse_continuousAt (F K : Type) [NontriviallyNormedFiel
     exact continuousAt_inv₀ one_ne_zero
   have hmi : ContinuousAt (fun a : K => (ι a)⁻¹) 1 :=
     (continuousAt_matrix_inv (ι 1) hdet1).comp hι.continuousAt
-  have hmv : Continuous fun M : Matrix (Fin (Module.finrank F K)) (Fin (Module.finrank F K)) F => M *ᵥ b.equivFun 1 :=
+  have hmv : Continuous fun M : Matrix (Fin (Module.finrank F K)) (Fin (Module.finrank F K)) F =>
+      M *ᵥ b.equivFun 1 :=
     continuous_id.matrix_mulVec continuous_const
   exact hsymm.continuousAt.comp (hmv.continuousAt.comp hmi)
 
-theorem et_units_near_one_inverse_continuousAt :
-    ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
-      (A : Et F E), (∀ᶠ a in 𝓝 (1 : A.K), IsUnit a) ∧ ContinuousAt Ring.inverse (1 : A.K) :=
-  fun F _ _ _ _ _ A => units_near_one_inverse_continuousAt F A.K
+theorem et_units_near_one_inverse_continuousAt
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] (A : Et F E),
+      (∀ᶠ a in 𝓝 (1 : A.K), IsUnit a) ∧ ContinuousAt Ring.inverse (1 : A.K) := fun F _ _ _ _ _ A =>
+  units_near_one_inverse_continuousAt F A.K
 
 end GlobalTheory

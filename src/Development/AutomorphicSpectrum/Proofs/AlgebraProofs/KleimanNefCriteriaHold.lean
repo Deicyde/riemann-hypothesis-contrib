@@ -12,13 +12,16 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.KleimanInputN
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Kleiman2
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH
+  GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Kleiman2
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
 theorem kleimanNef_field_and_fibre : KleimanNefIntersectionNonneg ∧ KleimanNefFStatement := by
   have hF : KleimanNefFStatement :=
-    GroundTheory.Heights₂.Heights.ForSecondHalf.KleimanNefF.kleimanNef_field_of_alt (GlobalTheory.T.kleiman_input_nef_ample_section_count GlobalTheory.T.kleiman_genericPointSectionInput).1
+    GroundTheory.Heights₂.Heights.ForSecondHalf.KleimanNefF.kleimanNef_field_of_alt
+      (GlobalTheory.T.kleiman_input_nef_ample_section_count
+        GlobalTheory.T.kleiman_genericPointSectionInput).1
   exact ⟨GroundTheory.Heights₂.Heights.ForSecondHalf.KleimanNef.proof hF, hF⟩
 
 end GlobalTheory.CompanionTheory.Ar.Giv

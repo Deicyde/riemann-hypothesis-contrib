@@ -12,8 +12,8 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-theorem lclosedeq_weight_sum {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) :
-    ∑ s : Fin n, Finsupp.weight (colW r n) m s = Finsupp.weight (1 : Fin r × Fin n → ℕ) m := by
+theorem lclosedeq_weight_sum {r n : ℕ} (m : Fin r × Fin n →₀ ℕ)
+    : ∑ s : Fin n, Finsupp.weight (colW r n) m s = Finsupp.weight (1 : Fin r × Fin n → ℕ) m := by
   classical
   simp only [Finsupp.weight_apply, Finsupp.sum, Finset.sum_apply]
   rw [Finset.sum_comm]
@@ -23,7 +23,8 @@ theorem lclosedeq_weight_sum {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) :
 theorem lclosedeq_fd (r n : ℕ) (ν : Fin n → ℕ) : FiniteDimensional ℚ (dualWeyl ℚ r n ν) := by
   classical
   have hS : Set.Finite {d : Fin r × Fin n →₀ ℕ | Finsupp.weight (colW r n) d = ν} := by
-    refine (Set.finite_Iic (Finsupp.equivFunOnFinite.symm (fun v : Fin r × Fin n => ν v.2))).subset ?_
+    refine (Set.finite_Iic (Finsupp.equivFunOnFinite.symm (fun v : Fin r × Fin n => ν v.2))).subset
+      ?_
     intro d hd
     have hd' : Finsupp.weight (colW r n) d = ν := hd
     show d ≤ _
@@ -32,8 +33,11 @@ theorem lclosedeq_fd (r n : ℕ) (ν : Fin n → ℕ) : FiniteDimensional ℚ (d
     have h1 : d v ≤ Finsupp.weight (colW r n) d v.2 := by
       rw [Finsupp.weight_apply, Finsupp.sum, Finset.sum_apply]
       by_cases hv : v ∈ d.support
-      · refine le_trans ?_ (Finset.single_le_sum
-          (f := fun u => (d u • colW r n u) v.2) (fun _ _ => Nat.zero_le _) hv)
+      · refine le_trans ?_
+          (Finset.single_le_sum
+            (f := fun u => (d u • colW r n u) v.2)
+            (fun _ _ => Nat.zero_le _)
+            hv)
         simp [colW]
       · have : d v = 0 := by
           by_contra h
@@ -49,31 +53,33 @@ theorem lclosedeq_fd (r n : ℕ) (ν : Fin n → ℕ) : FiniteDimensional ℚ (d
       {d : Fin r × Fin n →₀ ℕ | Finsupp.weight (colW r n) d = ν}).symm
   exact Submodule.finiteDimensional_of_le (fun f hf => (Submodule.mem_inf.mp hf).1)
 
-def lclosedeq_B {σ : Type} (h2 : FockQPos) (h3 : FockQBilin) :
-    LinearMap.BilinForm ℚ (MvPolynomial σ ℚ) :=
-  LinearMap.mk₂ ℚ fockQ (fun f f' g => (h3 σ f f' g 1).1)
+def lclosedeq_B {σ : Type} (h2 : FockQPos) (h3 : FockQBilin)
+    : LinearMap.BilinForm ℚ (MvPolynomial σ ℚ) :=
+  LinearMap.mk₂ ℚ fockQ
+    (fun f f' g => (h3 σ f f' g 1).1)
     (fun c f g => by rw [(h3 σ f f g c).2, smul_eq_mul])
     (fun f g g' => by rw [(h2 σ f _).1, (h3 σ g g' f 1).1, (h2 σ g f).1, (h2 σ g' f).1])
     (fun c f g => by rw [(h2 σ f _).1, (h3 σ g g f c).2, (h2 σ g f).1, smul_eq_mul])
 
-theorem closedEqNabla_of (h1 : HWInClosed) (h2 : FockQPos) (h3 : FockQBilin) (h4 : FockQRowDivAdj) :
-    ClosedEqNabla := by
+theorem closedEqNabla_of (h1 : HWInClosed) (h2 : FockQPos) (h3 : FockQBilin) (h4 : FockQRowDivAdj)
+    : ClosedEqNabla := by
   intro r n hn ν hν M hMV hMc hhw
   have hfdV : FiniteDimensional ℚ (dualWeyl ℚ r n ν) := lclosedeq_fd r n ν
   have hfdM : FiniteDimensional ℚ M := Submodule.finiteDimensional_of_le hMV
   let B := lclosedeq_B (σ := Fin r × Fin n) h2 h3
   have hB : ∀ f g, B f g = fockQ f g := fun _ _ => rfl
-  let N : Submodule ℚ (MvPolynomial (Fin r × Fin n) ℚ) :=
-    { carrier := {x | x ∈ dualWeyl ℚ r n ν ∧ ∀ g ∈ M, fockQ x g = 0}
-      add_mem' := by
-        rintro x y ⟨hx, hx'⟩ ⟨hy, hy'⟩
-        refine ⟨Submodule.add_mem _ hx hy, fun g hg => ?_⟩
-        rw [← hB, map_add (f := _), LinearMap.add_apply, hB, hB, hx' g hg, hy' g hg, add_zero]
-      zero_mem' := ⟨Submodule.zero_mem _, fun g _ => by rw [← hB, map_zero, LinearMap.zero_apply]⟩
-      smul_mem' := by
-        rintro c x ⟨hx, hx'⟩
-        refine ⟨Submodule.smul_mem _ c hx, fun g hg => ?_⟩
-        rw [← hB, map_smul, LinearMap.smul_apply, hB, hx' g hg, smul_zero] }
+  let N : Submodule ℚ (MvPolynomial (Fin r × Fin n) ℚ) := {
+    carrier := {x | x ∈ dualWeyl ℚ r n ν ∧ ∀ g ∈ M, fockQ x g = 0}
+    add_mem' := by
+      rintro x y ⟨hx, hx'⟩ ⟨hy, hy'⟩
+      refine ⟨Submodule.add_mem _ hx hy, fun g hg => ?_⟩
+      rw [← hB, map_add (f := _), LinearMap.add_apply, hB, hB, hx' g hg, hy' g hg, add_zero]
+    zero_mem' := ⟨Submodule.zero_mem _, fun g _ => by rw [← hB, map_zero, LinearMap.zero_apply]⟩
+    smul_mem' := by
+      rintro c x ⟨hx, hx'⟩
+      refine ⟨Submodule.smul_mem _ c hx, fun g hg => ?_⟩
+      rw [← hB, map_smul, LinearMap.smul_apply, hB, hx' g hg, smul_zero]
+  }
   have hNV : N ≤ dualWeyl ℚ r n ν := fun x hx => hx.1
   have hNc : RowDivClosed N := by
     intro a b k f hf

@@ -28,16 +28,18 @@ noncomputable def placeOf (κ : F →+* ℂ_[p]) : HeightOneSpectrum (𝓞 F) wh
     rw [hbot, Ideal.mem_bot] at hp
     exact (Fact.out : p.Prime).ne_zero (by exact_mod_cast hp)
 
-theorem mem_placeOf (κ : F →+* ℂ_[p]) (y : 𝓞 F) :
-    y ∈ (placeOf κ).asIdeal ↔ ‖κ (y : F)‖ < 1 := Iff.rfl
+theorem mem_placeOf (κ : F →+* ℂ_[p]) (y : 𝓞 F) : y ∈ (placeOf κ).asIdeal ↔ ‖κ (y : F)‖ < 1 :=
+  Iff.rfl
 
-theorem valuation_placeOf_le_one_iff (κ : F →+* ℂ_[p]) (a : F) :
-    (placeOf κ).valuation F a ≤ 1 ↔ ‖κ a‖ ≤ 1 :=
-  ⟨fun h => GlobalTheory.MomPlace.norm_le_one_of_valuation F p κ (placeOf κ) (mem_placeOf κ) a h,
-    fun h => GlobalTheory.DatumJets.Place.valuation_le_one_of_norm κ (placeOf κ) (mem_placeOf κ) a h⟩
+theorem valuation_placeOf_le_one_iff (κ : F →+* ℂ_[p]) (a : F)
+    : (placeOf κ).valuation F a ≤ 1 ↔ ‖κ a‖ ≤ 1 := ⟨
+  fun h => GlobalTheory.MomPlace.norm_le_one_of_valuation F p κ (placeOf κ) (mem_placeOf κ) a h,
+  fun h => GlobalTheory.DatumJets.Place.valuation_le_one_of_norm κ (placeOf κ) (mem_placeOf κ) a h
+⟩
 
-theorem norm_eq_one_of_valuation_eq_one (κ : F →+* ℂ_[p]) {u : F}
-    (hu : (placeOf κ).valuation F u = 1) : ‖κ u‖ = 1 := by
+theorem norm_eq_one_of_valuation_eq_one
+    (κ : F →+* ℂ_[p]) {u : F} (hu : (placeOf κ).valuation F u = 1)
+    : ‖κ u‖ = 1 := by
   have h1 : ‖κ u‖ ≤ 1 := (valuation_placeOf_le_one_iff κ u).1 hu.le
   have h2 : ‖κ u⁻¹‖ ≤ 1 := (valuation_placeOf_le_one_iff κ u⁻¹).1 (by simp [hu])
   rw [map_inv₀, norm_inv] at h2
@@ -47,10 +49,11 @@ theorem norm_eq_one_of_valuation_eq_one (κ : F →+* ℂ_[p]) {u : F}
   have h3 : 0 < ‖κ u‖ := by simp [h0]
   exact le_antisymm h1 ((inv_le_one₀ h3).1 h2)
 
-theorem log_norm_eq_of_valuation (κ : F →+* ℂ_[p]) {π α : F} {n : ℤ}
-    (hπ : (placeOf κ).valuation F π = WithZero.exp (-1 : ℤ))
-    (hα : (placeOf κ).valuation F α = WithZero.exp (-n)) (hα0 : α ≠ 0) :
-    Real.log ‖κ α‖ = n * Real.log ‖κ π‖ := by
+theorem log_norm_eq_of_valuation
+    (κ : F →+* ℂ_[p])
+    {π α : F} {n : ℤ} (hπ : (placeOf κ).valuation F π = WithZero.exp (-1 : ℤ))
+    (hα : (placeOf κ).valuation F α = WithZero.exp (-n)) (hα0 : α ≠ 0)
+    : Real.log ‖κ α‖ = n * Real.log ‖κ π‖ := by
   have hπ0 : π ≠ 0 := by
     rintro rfl
     rw [map_zero] at hπ
@@ -67,22 +70,31 @@ theorem log_norm_eq_of_valuation (κ : F →+* ℂ_[p]) {π α : F} {n : ℤ}
   push_cast at h2
   linarith
 
-theorem dvd_absNorm_placeOf (κ : F →+* ℂ_[p]) :
-    p ∣ Ideal.absNorm (placeOf κ).asIdeal := by
-  refine GlobalTheory.DatumJets.Place.dvd_of_natCast_mem (placeOf κ).asIdeal (placeOf κ).isPrime.ne_top
-    Fact.out ?_ (Ideal.absNorm_mem _)
+theorem dvd_absNorm_placeOf (κ : F →+* ℂ_[p]) : p ∣ Ideal.absNorm (placeOf κ).asIdeal := by
+  refine GlobalTheory.DatumJets.Place.dvd_of_natCast_mem (placeOf κ).asIdeal
+    (placeOf κ).isPrime.ne_top Fact.out ?_ (Ideal.absNorm_mem _)
   rw [mem_placeOf]
   simpa using GlobalTheory.DatumJets.Place.norm_p_lt_one (p := p)
 
 end Place
 
-theorem deg_eq_places : ∀ (F : Type) [Field F] [NumberField F] (N : LogNorms F) (r : HeightOneSpectrum (𝓞 F) →₀ ℚ), (∀ (p : Nat.Primes) (κ : F →+* ℂ_[p]) (v : HeightOneSpectrum (𝓞 F)) (π : F), (∀ a : F, v.valuation F a ≤ 1 ↔ ‖κ a‖ ≤ 1) → v.valuation F π = WithZero.exp (-1 : ℤ) → N.fin p κ = (r v : ℝ) * Real.log ‖κ π‖) → N.IsAdelic ∧ N.deg = ((r.sum fun v q => (q : ℝ) * Real.log (Ideal.absNorm v.asIdeal)) - ∑ σ : F →+* ℂ, N.inf σ) / (Module.finrank ℚ F : ℝ) := by
+theorem deg_eq_places
+    : ∀ (F : Type) [Field F] [NumberField F] (N : LogNorms F) (r : HeightOneSpectrum (𝓞 F) →₀ ℚ),
+      (∀ (p : Nat.Primes) (κ : F →+* ℂ_[p]) (v : HeightOneSpectrum (𝓞 F)) (π : F),
+          (∀ a : F, v.valuation F a ≤ 1 ↔ ‖κ a‖ ≤ 1) → v.valuation F π = WithZero.exp (-1 : ℤ)
+            → N.fin p κ = (r v : ℝ) * Real.log ‖κ π‖)
+        → N.IsAdelic
+          ∧ N.deg
+            = ((r.sum fun v q => (q : ℝ) * Real.log (Ideal.absNorm v.asIdeal))
+                - ∑ σ : F →+* ℂ, N.inf σ)
+              / (Module.finrank ℚ F : ℝ) := by
   intro F _ _ N r h
   obtain ⟨M, α, hM, hα, hn⟩ := exists_pow_principal F r
   have hMR : (M : ℝ) ≠ 0 := by exact_mod_cast hM.ne'
-  have hfin : ∀ (p : Nat.Primes) (κ : F →+* ℂ_[p]), ∃ π : F,
-      N.fin p κ = (r (placeOf κ) : ℝ) * Real.log ‖κ π‖ ∧
-        (placeOf κ).valuation F π = WithZero.exp (-1 : ℤ) := by
+  have hfin
+      : ∀ (p : Nat.Primes) (κ : F →+* ℂ_[p]), ∃ π : F,
+        N.fin p κ = (r (placeOf κ) : ℝ) * Real.log ‖κ π‖
+          ∧ (placeOf κ).valuation F π = WithZero.exp (-1 : ℤ) := by
     intro p κ
     obtain ⟨π, hπ⟩ := (placeOf κ).valuation_exists_uniformizer F
     exact ⟨π, h p κ _ π (valuation_placeOf_le_one_iff κ) hπ, hπ⟩
@@ -91,11 +103,14 @@ theorem deg_eq_places : ∀ (F : Type) [Field F] [NumberField F] (N : LogNorms F
     obtain ⟨π, h1, hπ⟩ := hfin p κ
     obtain ⟨m, hm, hv⟩ := hn (placeOf κ)
     rw [log_norm_eq_of_valuation κ hπ hv hα, h1]
-    have hm' : (m : ℝ) = M * (r (placeOf κ) : ℝ) := by exact_mod_cast congrArg (fun q : ℚ => (q : ℝ)) hm
+    have hm' : (m : ℝ) = M * (r (placeOf κ) : ℝ) := by
+      exact_mod_cast congrArg (fun q : ℚ => (q : ℝ)) hm
     rw [hm']
     ring
   have hadel : N.IsAdelic := by
-    have hS : ((r.support.biUnion fun v => (Ideal.absNorm v.asIdeal).primeFactors : Finset ℕ) : Set ℕ).Finite :=
+    have hS
+        : ((r.support.biUnion fun v => (Ideal.absNorm v.asIdeal).primeFactors : Finset ℕ)
+          : Set ℕ).Finite :=
       Finset.finite_toSet _
     refine (hS.preimage (f := fun p : Nat.Primes => (p : ℕ)) Subtype.val_injective.injOn).subset ?_
     rintro p ⟨κ, hκ⟩
@@ -103,7 +118,8 @@ theorem deg_eq_places : ∀ (F : Type) [Field F] [NumberField F] (N : LogNorms F
     have hr : r (placeOf κ) ≠ 0 := by
       intro h0
       exact hκ (by rw [h1, h0]; simp)
-    simp only [Set.mem_preimage, Finset.coe_biUnion, Set.mem_iUnion, Finset.mem_coe, Nat.mem_primeFactors]
+    simp only [Set.mem_preimage, Finset.coe_biUnion, Set.mem_iUnion, Finset.mem_coe,
+      Nat.mem_primeFactors]
     refine ⟨placeOf κ, Finsupp.mem_support_iff.2 hr, p.2, dvd_absNorm_placeOf κ, ?_⟩
     have := NumberField.HeightOneSpectrum.one_lt_absNorm (placeOf κ)
     omega
@@ -136,8 +152,9 @@ theorem deg_eq_places : ∀ (F : Type) [Field F] [NumberField F] (N : LogNorms F
   have h4 : ∑ᶠ p, (LogNorms.ofElt α).finSum p = M * ∑ᶠ p, N.finSum p := by
     simp_rw [h3]
     rw [mul_finsum]
-  have h5 : (n.sum fun v k => (k : ℝ) * Real.log (Ideal.absNorm v.asIdeal)) =
-      M * r.sum fun v q => (q : ℝ) * Real.log (Ideal.absNorm v.asIdeal) := by
+  have h5
+      : (n.sum fun v k => (k : ℝ) * Real.log (Ideal.absNorm v.asIdeal))
+        = M * r.sum fun v q => (q : ℝ) * Real.log (Ideal.absNorm v.asIdeal) := by
     rw [Finsupp.sum_mapRange_index (by simp), Finsupp.sum, Finsupp.sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun v _ => ?_
     have h6 : ((⌊(M : ℚ) * r v⌋ : ℤ) : ℝ) = M * (r v : ℝ) := by
@@ -147,7 +164,8 @@ theorem deg_eq_places : ∀ (F : Type) [Field F] [NumberField F] (N : LogNorms F
       exact_mod_cast congrArg (fun q : ℚ => (q : ℝ)) h7
     rw [h6]
     ring
-  have h6 : ∑ᶠ p, N.finSum p = -(r.sum fun v q => (q : ℝ) * Real.log (Ideal.absNorm v.asIdeal)) := by
+  have h6
+      : ∑ᶠ p, N.finSum p = -(r.sum fun v q => (q : ℝ) * Real.log (Ideal.absNorm v.asIdeal)) := by
     apply mul_left_cancel₀ hMR
     rw [← h4, mul_neg, ← h5, ← h1]
     linarith

@@ -33,7 +33,8 @@ lemma h_sub_right (u v v' : Fin n → ℂ) : herm H u (v - v') = herm H u v - he
 lemma h_conj (hH : Hᴴ = H) (u v : Fin n → ℂ) : conj (herm H u v) = herm H v u := B2x8.herm_conj H hH u v
 
 def hs (p v : Fin n → ℂ) (σ : ℂ) : Matrix (Fin n) (Fin n) ℂ :=
-  1 - Matrix.vecMulVec p (fun j => herm H (bvec j) v) + Matrix.vecMulVec (v + σ • p) (fun j => herm H (bvec j) p)
+  1 - Matrix.vecMulVec p (fun j => herm H (bvec j) v)
+    + Matrix.vecMulVec (v + σ • p) (fun j => herm H (bvec j) p)
 
 lemma hs_act (p v u : Fin n → ℂ) (σ : ℂ) :
     hs H p v σ *ᵥ u = u - herm H u v • p + herm H u p • (v + σ • p) := by
@@ -222,8 +223,10 @@ lemma up_nset {u : Mx k r} (hu : u ∈ UP k r l) : u ∈ Nset k r := by
       rw [Pi.add_apply, Pi.smul_apply, this, smul_zero, add_zero]; simp only [bvec, Pi.single_apply]
 
 def IsX (k r : ℕ) (l : Fin r) (x : Fin (2 * r + k + 1) → ℂ) : Prop :=
-  herm (Hpk k r) x (bvec (eI k r l)) = 1 ∧ herm (Hpk k r) x x = 0 ∧
-    ∀ a : Fin r, a.val < l.val → herm (Hpk k r) (bvec (eI k r a)) x = 0 ∧ herm (Hpk k r) (bvec (esI k r a)) x = 0
+  herm (Hpk k r) x (bvec (eI k r l)) = 1 ∧ herm (Hpk k r) x x = 0
+    ∧ ∀ a : Fin r,
+      a.val < l.val
+        → herm (Hpk k r) (bvec (eI k r a)) x = 0 ∧ herm (Hpk k r) (bvec (esI k r a)) x = 0
 
 lemma hs_glev {i : Fin (r + 1)} {p v : Fin (2 * r + k + 1) → ℂ} {σ : ℂ} (hpp : ⟪p, p⟫ = 0) (hvp : ⟪v, p⟫ = 0)
     (hσ : σ + conj σ + ⟪v, v⟫ = 0)
@@ -236,7 +239,8 @@ lemma hs_glev {i : Fin (r + 1)} {p v : Fin (2 * r + k + 1) → ℂ} {σ : ℂ} (
 
 def hx (k r : ℕ) (l : Fin r) (x : Fin (2 * r + k + 1) → ℂ) : Mx k r :=
   hs (Hpk k r) (bvec (eI k r l))
-    (x - bvec (esI k r l) - herm (Hpk k r) x (bvec (esI k r l)) • bvec (eI k r l)) (herm (Hpk k r) x (bvec (esI k r l)))
+    (x - bvec (esI k r l) - herm (Hpk k r) x (bvec (esI k r l)) • bvec (eI k r l))
+    (herm (Hpk k r) x (bvec (esI k r l)))
 
 lemma ne_of_val_lt {a : Fin r} (h : a.val < l.val) : a ≠ l := fun h' => by rw [h'] at h; exact lt_irrefl _ h
 
@@ -451,12 +455,13 @@ lemma dec_exists {g : Mx k r} (hg : g ∈ Glev k r l.castSucc) (hc : ⟪g *ᵥ �
   rw [Matrix.mul_assoc, Matrix.mul_assoc, ← h, ← Matrix.mul_assoc (w1 k r l c), uh_mul_inv hw.1, Matrix.one_mul,
     ← Matrix.mul_assoc, uh_mul_inv hu.1.1, Matrix.one_mul]
 
-
-def cF (k r : ℕ) (l : Fin r) (g : Mx k r) : ℂ := herm (Hpk k r) (g *ᵥ bvec (eI k r l)) (bvec (eI k r l))
+def cF (k r : ℕ) (l : Fin r) (g : Mx k r) : ℂ :=
+  herm (Hpk k r) (g *ᵥ bvec (eI k r l)) (bvec (eI k r l))
 
 def iH (g : Mx k r) : Mx k r := Hpk k r * gᴴ * Hpk k r
 
-def uL (k r : ℕ) (l : Fin r) (g : Mx k r) : Mx k r := hx k r l ((cF k r l g)⁻¹ • (g *ᵥ bvec (eI k r l)))
+def uL (k r : ℕ) (l : Fin r) (g : Mx k r) : Mx k r :=
+  hx k r l ((cF k r l g)⁻¹ • (g *ᵥ bvec (eI k r l)))
 
 def rho (k r : ℕ) (l : Fin r) (g : Mx k r) : Mx k r :=
   w1 k r l (conj (cF k r l g)) * iH (uL k r l g) * g * uL k r l (iH g)
@@ -595,7 +600,8 @@ lemma psi_conjW' {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {h u : Mx k
 section smooth
 variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] {m : ℕ}
 
-def SmM (f : X → Matrix (Fin m) (Fin m) ℂ) (s : Set X) : Prop := ∀ i j, ContDiffOn ℝ ∞ (fun x => f x i j) s
+def SmM (f : X → Matrix (Fin m) (Fin m) ℂ) (s : Set X) : Prop :=
+  ∀ i j, ContDiffOn ℝ ∞ (fun x => f x i j) s
 
 def SmV (f : X → Fin m → ℂ) (s : Set X) : Prop := ∀ i, ContDiffOn ℝ ∞ (fun x => f x i) s
 
@@ -722,13 +728,18 @@ lemma Dec.cell_decomposition_mem {g u g₁ u' : Mx k r} {c : ℂ} (h : Dec k r l
   exact h.inv.hc
 
 section ext
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
 
 def D0 (k r : ℕ) (l : Fin r) (D₁ : Set (Mx k r)) : Set (Mx k r) := C0 k r l ∩ rho k r l ⁻¹' D₁
 
-def Jx (k r : ℕ) (l : Fin r) (z z' : Fin (2 * r + k + 1) → ℂ) (φ : ℂ → ℂ) (Ψ : Mx k r → (Wq →L[ℂ] Wp)) (g : Mx k r) :
-    Wq →L[ℂ] Wp :=
-  (psi k r z cStd (uL k r l g) * psi k r z' cStd (iH (uL k r l (iH g)))) • (φ (cF k r l g) • Ψ (rho k r l g))
+def Jx
+    (k r : ℕ) (l : Fin r) (z z' : Fin (2 * r + k + 1) → ℂ)
+    (φ : ℂ → ℂ) (Ψ : Mx k r → (Wq →L[ℂ] Wp)) (g : Mx k r)
+    : Wq →L[ℂ] Wp :=
+  (psi k r z cStd (uL k r l g) * psi k r z' cStd (iH (uL k r l (iH g))))
+    • (φ (cF k r l g) • Ψ (rho k r l g))
 
 lemma Dec.Jx_eq {g u g₁ u' : Mx k r} {c : ℂ} (h : Dec k r l g c u g₁ u') (z z' : Fin (2 * r + k + 1) → ℂ) (φ : ℂ → ℂ)
     (Ψ : Mx k r → (Wq →L[ℂ] Wp)) :
@@ -754,20 +765,23 @@ lemma isOpen_cell_domain {D₁ : Set (Mx k r)} (hD : IsOpen D₁) : IsOpen (D0 k
 theorem resSurj : ResSurj := by
   intro Wp Wq _ _ _ _ k r z z' π π' l D₁ φ Ψ hz hz' hD₁ hφ hΨ
   obtain ⟨hΨs, hΨL, hΨR, hΨW⟩ := hΨ
-  refine ⟨D0 k r l D₁, ⟨isOpen_cell_domain hD₁.1, ?_⟩, ?_, ?_, Jx k r l z z' φ Ψ, ⟨?_, ?_, ?_, ?_⟩, ?_⟩
-  ·
-    rintro g hg s ⟨h, hh, m, hm, rfl⟩ s' ⟨h', hh', m', hm', rfl⟩
+  refine
+    ⟨D0 k r l D₁, ⟨isOpen_cell_domain hD₁.1, ?_⟩, ?_, ?_, Jx k r l z z' φ Ψ, ⟨?_, ?_, ?_, ?_⟩, ?_⟩
+  · rintro g hg s ⟨h, hh, m, hm, rfl⟩ s' ⟨h', hh', m', hm', rfl⟩
     obtain ⟨c, u, g₁, u', d, hg₁⟩ := mem_cell_domain_iff.1 hg
     obtain ⟨u₂, hu₂, n₁, hn₁, rfl⟩ := nlev_dec hm
     obtain ⟨u₃, hu₃, n₃, hn₃, rfl⟩ := nlev_dec' hm'
-    have d1 := (((((d.leftG hn₁.2).leftU hu₂).leftG (uw_glev hh _)).rightG (uw_glev hh' _)).rightG hn₃.2).rightU hu₃
+    have d1 :=
+      (((((d.leftG hn₁.2).leftU hu₂).leftG (uw_glev hh _)).rightG (uw_glev hh' _)).rightG
+        hn₃.2).rightU hu₃
     have e : h * (u₂ * n₁) * g * (h' * (n₃ * u₃)) = h * (u₂ * (n₁ * g)) * h' * n₃ * u₃ := by
       simp only [Matrix.mul_assoc]
     rw [e]
     refine (mem_cell_domain_iff.2 ⟨_, _, _, _, d1, ?_⟩).2
     have h2 := hD₁.2 g₁ ⟨d.hg, hg₁⟩ (h * n₁) ⟨h, hh, n₁, hn₁, rfl⟩ (h' * n₃) ⟨h', hh', n₃, hn₃, rfl⟩
     have e2 : h * (n₁ * g₁) * h' * n₃ = h * n₁ * g₁ * (h' * n₃) := by simp only [Matrix.mul_assoc]
-    rw [e2]; exact h2
+    rw [e2]
+    exact h2
   · intro g hg
     exact hg.1.1
   · intro c hc g hg
@@ -779,20 +793,31 @@ theorem resSurj : ResSurj := by
     · intro h
       refine ⟨d.cell_decomposition_mem, ?_⟩
       show rho k r l (w1 k r l c * g) ∈ D₁
-      rw [d.rho_eq]; exact h
-  ·
-    intro g₀ hg₀
+      rw [d.rho_eq]
+      exact h
+  · intro g₀ hg₀
     obtain ⟨c, u, g₁, u', d, hg₁⟩ := mem_cell_domain_iff.1 hg₀
     obtain ⟨U₁, F₁, hU₁, hmem, hF₁, hag⟩ := hΨs g₁ ⟨d.hg, hg₁⟩
-    refine ⟨C0 k r l ∩ rho k r l ⁻¹' U₁, fun g => (psi k r z cStd (uL k r l g) * psi k r z' cStd (iH (uL k r l (iH g)))) •
-      (φ (cF k r l g) • F₁ (rho k r l g)), (smM_contDiffOn smM_rho).continuousOn.isOpen_inter_preimage isOpen_adelicUnipotentTimesIntegralOutsideSet hU₁,
-      ⟨d.cell_decomposition_mem, ?_⟩, ?_, ?_⟩
+    refine ⟨
+      C0 k r l ∩ rho k r l ⁻¹' U₁,
+      fun g =>
+        (psi k r z cStd (uL k r l g) * psi k r z' cStd (iH (uL k r l (iH g))))
+          • (φ (cF k r l g) • F₁ (rho k r l g)),
+      (smM_contDiffOn smM_rho).continuousOn.isOpen_inter_preimage
+        isOpen_adelicUnipotentTimesIntegralOutsideSet hU₁,
+      ⟨d.cell_decomposition_mem, ?_⟩,
+      ?_,
+      ?_
+    ⟩
     · show rho k r l g₀ ∈ U₁
-      rw [d.rho_eq]; exact hmem
+      rw [d.rho_eq]
+      exact hmem
     · have hs : C0 k r l ∩ rho k r l ⁻¹' U₁ ⊆ C0 k r l := Set.inter_subset_left
       have h1 := smM_id (C0 k r l ∩ rho k r l ⁻¹' U₁)
-      have h2 : SmM (fun g => uL k r l g) (C0 k r l ∩ rho k r l ⁻¹' U₁) := smM_uL h1 fun x hx => hx.1.1
-      have h3 : SmM (fun g => uL k r l (iH g)) (C0 k r l ∩ rho k r l ⁻¹' U₁) := smM_uL (smM_iH h1) fun x hx => hx.1.2
+      have h2 : SmM (fun g => uL k r l g) (C0 k r l ∩ rho k r l ⁻¹' U₁) :=
+        smM_uL h1 fun x hx => hx.1.1
+      have h3 : SmM (fun g => uL k r l (iH g)) (C0 k r l ∩ rho k r l ⁻¹' U₁) :=
+        smM_uL (smM_iH h1) fun x hx => hx.1.2
       have h4 : ContDiffOn ℝ ∞ (fun g => φ (cF k r l g)) (C0 k r l ∩ rho k r l ⁻¹' U₁) :=
         hφ.comp (sm_cF h1) fun x hx => hx.1.1
       have h5 : ContDiffOn ℝ ∞ (fun g => F₁ (rho k r l g)) (C0 k r l ∩ rho k r l ⁻¹' U₁) :=
@@ -802,8 +827,7 @@ theorem resSurj : ResSurj := by
       obtain ⟨u₂, g₂, u₂', d₂⟩ := dec_exists hgG hgU.1.1
       unfold Jx
       rw [hag (rho k r l g) hgU.2 (by rw [d₂.rho_eq]; exact d₂.hg)]
-  ·
-    intro g hg n hn
+  · intro g hg n hn
     obtain ⟨c, u, g₁, u', d, hg₁⟩ := mem_cell_domain_iff.1 hg
     obtain ⟨u₂, hu₂, n₁, hn₁, rfl⟩ := nlev_dec hn
     have d1 := (d.leftG hn₁.2).leftU hu₂
@@ -813,19 +837,17 @@ theorem resSurj : ResSurj := by
     simp only [smul_smul]
     congr 1
     ring
-  ·
-    intro g hg n hn
+  · intro g hg n hn
     obtain ⟨c, u, g₁, u', d, hg₁⟩ := mem_cell_domain_iff.1 hg
     obtain ⟨u₃, hu₃, n₃, hn₃, rfl⟩ := nlev_dec' hn
     have d1 := (d.rightG hn₃.2).rightU hu₃
     rw [← Matrix.mul_assoc, d1.Jx_eq, d.Jx_eq, hΨR g₁ ⟨d.hg, hg₁⟩ n₃ hn₃,
-      psi_mul hz' (up_nset (up_conj' d.hu' hn₃.2)) (up_nset hu₃), psi_conjN' hz' hn₃.1 (up_nset d.hu'),
-      psi_mul hz' hn₃.1 (up_nset hu₃)]
+      psi_mul hz' (up_nset (up_conj' d.hu' hn₃.2)) (up_nset hu₃),
+      psi_conjN' hz' hn₃.1 (up_nset d.hu'), psi_mul hz' hn₃.1 (up_nset hu₃)]
     simp only [smul_smul]
     congr 1
     ring
-  ·
-    intro g hg h hh h' hh'
+  · intro g hg h hh h' hh'
     obtain ⟨c, u, g₁, u', d, hg₁⟩ := mem_cell_domain_iff.1 hg
     have d1 := (d.leftG (uw_glev hh _)).rightG (uw_glev hh' _)
     rw [d1.Jx_eq, d.Jx_eq, hΨW g₁ ⟨d.hg, hg₁⟩ h hh h' hh', psi_conjW hz hh (up_nset d.hu),
@@ -938,8 +960,17 @@ lemma cont_blk : Continuous (fun x : Mx k (1 + r') => (blk x : Mx k r')) :=
 theorem fFTransfer : FFTransfer := by
   intro Wp Wq _ _ _ _ k r' z z' π π' D hz hz' hD J hJ
   obtain ⟨hJs, hJL, hJR, hJW⟩ := hJ
-  refine ⟨fun x => π (blk x), fun x => π' (blk x), (fun x : Mx k (1 + r') => (blk x : Mx k r')) ⁻¹' D,
-    fun x => J (blk x), lift_inWb hz, lift_inWb hz', ⟨hD.1.preimage cont_blk, ?_⟩, ⟨?_, ?_, ?_, ?_⟩, ?_⟩
+  refine ⟨
+    fun x => π (blk x),
+    fun x => π' (blk x),
+    (fun x : Mx k (1 + r') => (blk x : Mx k r')) ⁻¹' D,
+    fun x => J (blk x),
+    lift_inWb hz,
+    lift_inWb hz',
+    ⟨hD.1.preimage cont_blk, ?_⟩,
+    ⟨?_, ?_, ?_, ?_⟩,
+    ?_
+  ⟩
   · rintro x hx s ⟨h, hh, m, hm, rfl⟩ s' ⟨h', hh', m', hm', rfl⟩
     obtain ⟨g, hg, rfl⟩ := level_one_eq_embedding hx.1
     obtain ⟨h₁, hh₁, rfl⟩ := level_one_eq_embedding (uw_glev hh _)
@@ -952,8 +983,9 @@ theorem fFTransfer : FFTransfer := by
       exact this
     show blk (ιLev k 1 r' h₁ * ιLev k 1 r' m₁ * ιLev k 1 r' g * (ιLev k 1 r' h₂ * ιLev k 1 r' m₂)) ∈ D
     rw [← B2x8.al_lev_mul, ← B2x8.al_lev_mul, ← B2x8.al_lev_mul, ← B2x8.al_lev_mul, blk_lev]
-    exact hD.2 g ⟨glev0 hg, hgD⟩ (h₁ * m₁) ⟨h₁, lev_uw hh₁ hh, m₁, ⟨lev_nset hm₁ hm.1, glev0 hm₁⟩, rfl⟩
-      (h₂ * m₂) ⟨h₂, lev_uw hh₂ hh', m₂, ⟨lev_nset hm₂ hm'.1, glev0 hm₂⟩, rfl⟩
+    exact hD.2 g ⟨glev0 hg, hgD⟩ (h₁ * m₁)
+      ⟨h₁, lev_uw hh₁ hh, m₁, ⟨lev_nset hm₁ hm.1, glev0 hm₁⟩, rfl⟩ (h₂ * m₂)
+      ⟨h₂, lev_uw hh₂ hh', m₂, ⟨lev_nset hm₂ hm'.1, glev0 hm₂⟩, rfl⟩
   · intro x₀ hx₀
     obtain ⟨g₀, hg₀, rfl⟩ := level_one_eq_embedding hx₀.1
     have hgD : g₀ ∈ D := by
@@ -961,7 +993,14 @@ theorem fFTransfer : FFTransfer := by
       simp only [Set.mem_preimage, blk_lev] at this
       exact this
     obtain ⟨U, F, hU, hmem, hF, hag⟩ := hJs g₀ ⟨glev0 hg₀, hgD⟩
-    refine ⟨(fun x : Mx k (1 + r') => (blk x : Mx k r')) ⁻¹' U, fun x => F (blk x), hU.preimage cont_blk, ?_, ?_, ?_⟩
+    refine ⟨
+      (fun x : Mx k (1 + r') => (blk x : Mx k r')) ⁻¹' U,
+      fun x => F (blk x),
+      hU.preimage cont_blk,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · simp only [Set.mem_preimage, blk_lev]; exact hmem
     · exact hF.comp (smM_contDiffOn (smM_blk _)) fun x hx => hx
     · intro x hxU hxG

@@ -5,10 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Pp
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Ws.Pp
 
-theorem UpperTheory.V.Ws.Pp.smallFlag :
-    ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) {Γ : Type} [Group Γ] [TopologicalSpace Γ] (r : Γ →* M4 𝔞.V) (u : M4 𝔞.V), 𝔞.Small (⟨r, fun _ => 1⟩ : PD Unit _ _) → 𝔞.Small (⟨r, fun _ => u⟩ : PD Unit _ _) := by
+theorem UpperTheory.V.Ws.Pp.smallFlag
+    : ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+        (r : Γ →* M4 𝔞.V) (u : M4 𝔞.V),
+      𝔞.Small (⟨r, fun _ => 1⟩ : PD Unit _ _) → 𝔞.Small (⟨r, fun _ => u⟩ : PD Unit _ _) := by
   classical
   intro l _ 𝔞 Γ _ _ r u hS
   unfold Amb.Small at hS ⊢
@@ -27,16 +30,25 @@ theorem UpperTheory.V.Ws.Pp.smallFlag :
     simp only [Ideal.mem_comap, mem_maximalIdeal, mem_nonunits_iff] at hz ⊢
     exact fun h => hz (isUnit_of_map_unit g z h)
   have huR : ∀ i j, u i j ∈ f'.range := fun i j =>
-    hcl _ (Subfield.subset_closure (Or.inr
-      (Finset.mem_coe.2 (Finset.mem_image_of_mem _ (Finset.mem_univ (i, j))))))
+    hcl _
+      (Subfield.subset_closure (Or.inr (Finset.mem_coe.2 (Finset.mem_image_of_mem _
+        (Finset.mem_univ (i, j))))))
   let e : 𝔞.V → A' := Function.invFun f'
   have hE : ∀ i j, f' (e (u i j)) = u i j := fun i j => by
     obtain ⟨y, hy⟩ := huR i j
     exact Function.invFun_eq ⟨y, hy⟩
-  have hr : ∀ γ i j, f (P₁.r γ i j) = r γ i j := fun γ i j =>
-    congrArg (fun P => PD.r P γ i j) hP
-  refine ⟨A', inferInstance, inferInstance, inferInstance, f',
-    ⟨(P₁.map g).r, fun _ => u.map e⟩, hf', ?_, ?_⟩
+  have hr : ∀ γ i j, f (P₁.r γ i j) = r γ i j := fun γ i j => congrArg (fun P => PD.r P γ i j) hP
+  refine ⟨
+    A',
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    f',
+    ⟨(P₁.map g).r, fun _ => u.map e⟩,
+    hf',
+    ?_,
+    ?_
+  ⟩
   · unfold PD.Cont
     intro i j N
     rw [IsLocallyConstant.iff_eventually_eq]

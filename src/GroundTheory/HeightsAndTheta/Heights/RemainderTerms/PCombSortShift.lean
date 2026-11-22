@@ -13,8 +13,9 @@ open Finset Equiv
 
 namespace Comb
 
-theorem add_index_le_of_strictAnti {m : ℕ} {f : Fin m → ℕ} (hf : StrictAnti f) (a b : Fin m)
-    (hab : a ≤ b) : f b + (b : ℕ) ≤ f a + (a : ℕ) := by
+theorem add_index_le_of_strictAnti
+    {m : ℕ} {f : Fin m → ℕ} (hf : StrictAnti f) (a b : Fin m) (hab : a ≤ b)
+    : f b + (b : ℕ) ≤ f a + (a : ℕ) := by
   obtain ⟨a, ha⟩ := a
   obtain ⟨b, hb⟩ := b
   simp only [Fin.mk_le_mk] at hab
@@ -32,7 +33,9 @@ theorem CombSortShift.proof (h1 : CombSortLe.Statement) : CombSortShift.Statemen
   obtain ⟨σ, hσ⟩ := exists_perm_strictAnti hinj
   have hge : ∀ k : Fin m, stair m k ≤ u (σ k) := by
     intro k
-    have hk := add_index_le_of_strictAnti hσ k ⟨m - 1, by have := k.isLt; omega⟩ (by rw [Fin.le_def]; exact Nat.le_sub_one_of_lt k.isLt)
+    have hk :=
+      add_index_le_of_strictAnti hσ k ⟨m - 1, by have := k.isLt; omega⟩
+        (by rw [Fin.le_def]; exact Nat.le_sub_one_of_lt k.isLt)
     simp only [Function.comp_apply] at hk
     simp only [stair]
     omega

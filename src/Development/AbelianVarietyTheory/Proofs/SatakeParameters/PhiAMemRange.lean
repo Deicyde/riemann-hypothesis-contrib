@@ -8,16 +8,24 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.Exists
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.UG Formalism.L2.DIV Formalism.L2.G.Pend Formalism.L2.PairingIndexBounds.F Formalism.MainNotions.G.KAat GlobalTheory.TwV GlobalTheory.TwV.Xc TensorProduct
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.G Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.UG
+  Formalism.L2.DIV Formalism.L2.G.Pend Formalism.L2.PairingIndexBounds.F
+  Formalism.MainNotions.G.KAat GlobalTheory.TwV GlobalTheory.TwV.Xc TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.TwV.Xc.OrdA
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n p : ℕ} {G : GAtP p}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {n p : ℕ} {G : GAtP p}
 
-theorem phiA_mem_range (A : LocAt F E n G) (hI : LocInt A) (hS : SplAlg A) (v : Fin G.P.nV)
-    {x : AfE F E} (hx : x ∈ RInt F E) : phiA A v x ∈ (algebraMap (G.P.W v) (G.P.Qq v)).range := by
+theorem phiA_mem_range
+    (A : LocAt F E n G) (hI : LocInt A) (hS : SplAlg A)
+    (v : Fin G.P.nV)
+    {x : AfE F E} (hx : x ∈ RInt F E)
+    : phiA A v x ∈ (algebraMap (G.P.W v) (G.P.Qq v)).range := by
   haveI := (G.P.setting v).frac_alt
   have key : RInt F E ≤ (algebraMap (G.P.W v) (G.P.Qq v)).range.comap (phiA A v) := by
     show Subring.closure _ ≤ _
@@ -42,8 +50,11 @@ theorem phiA_mem_range (A : LocAt F E n G) (hI : LocInt A) (hS : SplAlg A) (v : 
       exact (hI v _).2 (by rw [RingEquiv.apply_symm_apply]; exact hc (A.pl v).1)
   exact key hx
 
-theorem phiA_intU (A : LocAt F E n G) (hI : LocInt A) (hS : SplAlg A) (v : Fin G.P.nV) {k : (AfE F E)ˣ}
-    (hk : k ∈ intU F E) : ∃ u : (G.P.W v)ˣ, phiA A v (k : AfE F E) = algebraMap (G.P.W v) (G.P.Qq v) u := by
+theorem phiA_intU
+    (A : LocAt F E n G) (hI : LocInt A) (hS : SplAlg A)
+    (v : Fin G.P.nV)
+    {k : (AfE F E)ˣ} (hk : k ∈ intU F E)
+    : ∃ u : (G.P.W v)ˣ, phiA A v (k : AfE F E) = algebraMap (G.P.W v) (G.P.Qq v) u := by
   haveI := (G.P.setting v).frac_alt
   obtain ⟨a, ha⟩ := phiA_mem_range A hI hS v (x := (k : AfE F E)) hk.1
   obtain ⟨b, hb⟩ := phiA_mem_range A hI hS v (x := ((k⁻¹ : (AfE F E)ˣ) : AfE F E)) hk.2
@@ -52,27 +63,33 @@ theorem phiA_intU (A : LocAt F E n G) (hI : LocInt A) (hS : SplAlg A) (v : Fin G
     rw [map_mul, ha, hb, ← map_mul, Units.mul_inv, map_one, map_one]
   exact ⟨⟨a, b, hab, by rw [mul_comm]; exact hab⟩, ha.symm⟩
 
-theorem ordA_mul (A : LocAt F E n G) (v : Fin G.P.nV) (x y : (AfE F E)ˣ) :
-    ordA A v (x * y) = ordA A v x + ordA A v y := by
+theorem ordA_mul (A : LocAt F E n G) (v : Fin G.P.nV) (x y : (AfE F E)ˣ)
+    : ordA A v (x * y) = ordA A v x + ordA A v y := by
   haveI := (G.P.setting v).frac_alt
   have hp := (G.P.setting v).p_unif
   obtain ⟨a, u, ha⟩ := exists_eq_unit_mul_zpow₂ hp (x.isUnit.map (phiA A v)).ne_zero
   obtain ⟨b, u', hb⟩ := exists_eq_unit_mul_zpow₂ hp (y.isUnit.map (phiA A v)).ne_zero
   unfold ordA
-  rw [Units.val_mul, map_mul, ha, hb, ordP_eq hp, ordP_eq hp, ← ordP_eq (Qq := G.P.Qq v) hp (a + b) (u * u')]
+  rw [Units.val_mul, map_mul, ha, hb, ordP_eq hp, ordP_eq hp,
+    ← ordP_eq (Qq := G.P.Qq v) hp (a + b) (u * u')]
   congr 1
-  rw [zpow_add₀ (pQ_ne hp), Units.val_mul, map_mul]; ring
+  rw [zpow_add₀ (pQ_ne hp), Units.val_mul, map_mul]
+  ring
 
-theorem ordP_unit (v : Fin G.P.nV) (u : (G.P.W v)ˣ) :
-    ordP (G.P.W v) p (algebraMap (G.P.W v) (G.P.Qq v) u) = 0 := by
+theorem ordP_unit (v : Fin G.P.nV) (u : (G.P.W v)ˣ)
+    : ordP (G.P.W v) p (algebraMap (G.P.W v) (G.P.Qq v) u) = 0 := by
   haveI := (G.P.setting v).frac_alt
   have := ordP_eq (Qq := G.P.Qq v) (G.P.setting v).p_unif 0 u
   simpa using this
 
-theorem ordA_props : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n p : ℕ) [Fact p.Prime]
-    (G : GAtP p) (A : LocAt F E n G), LocInt A → SplAlg A → ∀ v, (∀ x y, ordA A v (x * y) = ordA A v x + ordA A v y) ∧
-    (∀ k ∈ intU F E, ordA A v k = 0) ∧ (∀ z : Eˣ, ordA A v (ratId F E z) = ordP (G.P.W v) p (A.iw v (z : E))) ∧
-    ∀ v', v' ≠ v → ∀ x, OneOff (A.pl v').1 x → ordA A v x = 0 := by
+theorem ordA_props
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n p : ℕ)
+        [Fact p.Prime] (G : GAtP p) (A : LocAt F E n G),
+      LocInt A → SplAlg A
+        → ∀ v,
+          (∀ x y, ordA A v (x * y) = ordA A v x + ordA A v y) ∧ (∀ k ∈ intU F E, ordA A v k = 0)
+            ∧ (∀ z : Eˣ, ordA A v (ratId F E z) = ordP (G.P.W v) p (A.iw v (z : E)))
+            ∧ ∀ v', v' ≠ v → ∀ x, OneOff (A.pl v').1 x → ordA A v x = 0 := by
   intro F E _ _ _ _ _ n p _ G A hI hS v
   refine ⟨ordA_mul A v, fun k hk => ?_, fun z => ?_, fun v' hv x hx => ?_⟩
   · obtain ⟨u, hu⟩ := phiA_intU A hI hS v hk

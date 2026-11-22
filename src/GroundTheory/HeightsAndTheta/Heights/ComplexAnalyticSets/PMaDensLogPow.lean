@@ -21,8 +21,11 @@ namespace MaDensLogPow
 
 variable {D : ℕ}
 
-theorem det_eq_zero_of_rows_smul (M : Matrix (Fin D) (Fin D) ℂ) (w : Fin D → ℂ) {i j : Fin D}
-    (hij : i ≠ j) (a b : ℂ) (hi : M i = a • w) (hj : M j = b • w) : M.det = 0 := by
+theorem det_eq_zero_of_rows_smul
+    (M : Matrix (Fin D) (Fin D) ℂ) (w : Fin D → ℂ)
+    {i j : Fin D} (hij : i ≠ j)
+    (a b : ℂ) (hi : M i = a • w) (hj : M j = b • w)
+    : M.det = 0 := by
   by_cases ha : a = 0
   · exact Matrix.det_eq_zero_of_row_eq_zero i fun k => by simp [hi, ha]
   · rw [← Matrix.det_updateRow_add_smul_self M hij.symm (-(b / a))]
@@ -32,9 +35,11 @@ theorem det_eq_zero_of_rows_smul (M : Matrix (Fin D) (Fin D) ℂ) (w : Fin D →
     field_simp
     ring
 
-theorem mdisc_eq_zero_of_two_rankOne (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (w : Fin D → ℂ)
-    {a b : Fin D} (hab : a ≠ b) (x x' : Fin D → ℂ) (ha : A a = vecMulVec x w)
-    (hb : A b = vecMulVec x' w) : mdisc A = 0 := by
+theorem mdisc_eq_zero_of_two_rankOne
+    (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (w : Fin D → ℂ)
+    {a b : Fin D} (hab : a ≠ b)
+    (x x' : Fin D → ℂ) (ha : A a = vecMulVec x w) (hb : A b = vecMulVec x' w)
+    : mdisc A = 0 := by
   rw [mdisc_eq_sum_polCoef]
   refine mul_eq_zero_of_right _ (Finset.sum_eq_zero fun r _ => ?_)
   by_cases hr : Function.Surjective r
@@ -46,12 +51,16 @@ theorem mdisc_eq_zero_of_two_rankOne (A : Fin D → Matrix (Fin D) (Fin D) ℂ) 
     · funext k; simp [hj, hb, vecMulVec_apply]
   · rw [polCoef_eq_zero r hr, zero_mul]
 
-theorem mdisc_expand (α β : ℂ) (H G : Matrix (Fin D) (Fin D) ℂ)
-    (hG : ∀ (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (i j : Fin D), i ≠ j → A i = G → A j = G →
-      mdisc A = 0) :
-    ∀ (s : Finset (Fin D)) (C : Fin D → Matrix (Fin D) (Fin D) ℂ), (∀ i ∈ s, C i = H) →
-      mdisc (fun i => if i ∈ s then α • H + β • G else C i) =
-        α ^ s.card * mdisc C + α ^ (s.card - 1) * β * ∑ i ∈ s, mdisc (Function.update C i G) := by
+theorem mdisc_expand
+    (α β : ℂ)
+    (H G : Matrix (Fin D) (Fin D) ℂ)
+    (hG : ∀ (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (i j : Fin D),
+      i ≠ j → A i = G → A j = G → mdisc A = 0)
+    : ∀ (s : Finset (Fin D)) (C : Fin D → Matrix (Fin D) (Fin D) ℂ),
+      (∀ i ∈ s, C i = H)
+        → mdisc (fun i => if i ∈ s then α • H + β • G else C i)
+          = α ^ s.card * mdisc C
+            + α ^ (s.card - 1) * β * ∑ i ∈ s, mdisc (Function.update C i G) := by
   classical
   intro s
   induction s using Finset.induction_on with
@@ -60,20 +69,23 @@ theorem mdisc_expand (α β : ℂ) (H G : Matrix (Fin D) (Fin D) ℂ)
     intro C hC
     have hCj : C j = H := hC j (Finset.mem_insert_self j s)
     have hCs : ∀ i ∈ s, C i = H := fun i hi => hC i (Finset.mem_insert_of_mem hi)
-    have e1 : (fun i => if i ∈ insert j s then α • H + β • G else C i) =
-        Function.update (fun i => if i ∈ s then α • H + β • G else C i) j (α • H + β • G) := by
+    have e1
+        : (fun i => if i ∈ insert j s then α • H + β • G else C i)
+          = Function.update (fun i => if i ∈ s then α • H + β • G else C i) j (α • H + β • G) := by
       funext i
       by_cases hij : i = j
       · subst hij; simp
       · simp [hij]
-    have e2 : Function.update (fun i => if i ∈ s then α • H + β • G else C i) j H =
-        (fun i => if i ∈ s then α • H + β • G else C i) := by
+    have e2
+        : Function.update (fun i => if i ∈ s then α • H + β • G else C i) j H
+          = (fun i => if i ∈ s then α • H + β • G else C i) := by
       funext i
       by_cases hij : i = j
       · subst hij; simp [hj, hCj]
       · simp [Function.update_of_ne hij]
-    have e3 : Function.update (fun i => if i ∈ s then α • H + β • G else C i) j G =
-        (fun i => if i ∈ s then α • H + β • G else Function.update C j G i) := by
+    have e3
+        : Function.update (fun i => if i ∈ s then α • H + β • G else C i) j G
+          = (fun i => if i ∈ s then α • H + β • G else Function.update C j G i) := by
       funext i
       by_cases hij : i = j
       · subst hij; simp [hj]
@@ -83,8 +95,8 @@ theorem mdisc_expand (α β : ℂ) (H G : Matrix (Fin D) (Fin D) ℂ)
     have hz : ∀ i ∈ s, mdisc (Function.update (Function.update C j G) i G) = 0 := fun i hi =>
       hG _ i j (by rintro rfl; exact hj hi) (by simp)
         (by rw [Function.update_of_ne (by rintro rfl; exact hj hi)]; simp)
-    rw [e1, mdisc_update_add, mdisc_update_smul, mdisc_update_smul, e2, e3, ih C hCs,
-      ih _ hCs', Finset.sum_eq_zero hz, Finset.card_insert_of_notMem hj, Finset.sum_insert hj]
+    rw [e1, mdisc_update_add, mdisc_update_smul, mdisc_update_smul, e2, e3, ih C hCs, ih _ hCs',
+      Finset.sum_eq_zero hz, Finset.card_insert_of_notMem hj, Finset.sum_insert hj]
     rcases Nat.eq_zero_or_pos s.card with h0 | hpos
     · rw [h0, Finset.card_eq_zero.mp h0]; simp
     · obtain ⟨m, hm⟩ : ∃ m, s.card = m + 1 := ⟨s.card - 1, by omega⟩
@@ -92,16 +104,23 @@ theorem mdisc_expand (α β : ℂ) (H G : Matrix (Fin D) (Fin D) ℂ)
       simp only [Nat.add_sub_cancel]
       ring
 
-theorem cons_const_apply {n : ℕ} (A₀ H : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ) (k : Fin (n + 1 + 1)) :
-    (Fin.cons A₀ (fun _ : Fin (n + 1) => H) : Fin (n + 1 + 1) → _) k = if k = 0 then A₀ else H := by
+theorem cons_const_apply
+    {n : ℕ} (A₀ H : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ) (k : Fin (n + 1 + 1))
+    : (Fin.cons A₀ (fun _ : Fin (n + 1) => H) : Fin (n + 1 + 1) → _) k
+      = if k = 0 then A₀ else H := by
   refine Fin.cases ?_ (fun i => ?_) k
   · simp
   · simp [Fin.succ_ne_zero]
 
-theorem cons_cons_const_apply {n : ℕ} (G A₀ H : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ)
-    (k : Fin (n + 1 + 1)) :
-    (Fin.cons G (Fin.cons A₀ (fun _ : Fin n => H)) : Fin (n + 1 + 1) → _) k =
-      if k = 0 then G else if k = 1 then A₀ else H := by
+theorem cons_cons_const_apply
+    {n : ℕ} (G A₀ H : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ) (k : Fin (n + 1 + 1))
+    : (Fin.cons G (Fin.cons A₀ (fun _ : Fin n => H)) : Fin (n + 1 + 1) → _) k
+      = if k = 0 then
+          G
+        else if k = 1 then
+          A₀
+        else
+          H := by
   refine Fin.cases ?_ (fun i => ?_) k
   · simp
   · refine Fin.cases ?_ (fun l => ?_) i
@@ -110,10 +129,11 @@ theorem cons_cons_const_apply {n : ℕ} (G A₀ H : Matrix (Fin (n + 1 + 1)) (Fi
         rw [← Fin.succ_zero_eq_one]; exact fun h => Fin.succ_ne_zero l (Fin.succ_injective _ h)
       simp [Fin.succ_ne_zero, h1]
 
-theorem mdisc_update_eq {n : ℕ} (G A₀ H : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ) (i : Fin (n + 1 + 1))
-    (hi : i ≠ 0) :
-    mdisc (Function.update (Fin.cons A₀ (fun _ : Fin (n + 1) => H) : Fin (n + 1 + 1) → _) i G) =
-      mdisc (Fin.cons G (Fin.cons A₀ (fun _ : Fin n => H)) : Fin (n + 1 + 1) → _) := by
+theorem mdisc_update_eq
+    {n : ℕ}
+    (G A₀ H : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ) (i : Fin (n + 1 + 1)) (hi : i ≠ 0)
+    : mdisc (Function.update (Fin.cons A₀ (fun _ : Fin (n + 1) => H) : Fin (n + 1 + 1) → _) i G)
+      = mdisc (Fin.cons G (Fin.cons A₀ (fun _ : Fin n => H)) : Fin (n + 1 + 1) → _) := by
   rw [← mdisc_comp_perm (Fin.cons G (Fin.cons A₀ (fun _ : Fin n => H)) : Fin (n + 1 + 1) → _)
     ((Equiv.swap 1 i).trans (Equiv.swap 0 1))]
   congr 1
@@ -133,21 +153,25 @@ theorem mdisc_update_eq {n : ℕ} (G A₀ H : Matrix (Fin (n + 1 + 1)) (Fin (n +
       · subst hk1; simp [hki, Ne.symm hki, hi, Ne.symm h01]
       · simp [hki, hk0, hk1]
 
-theorem hessC_log_comp {p : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ} (hp : ContDiffAt ℝ 2 p y) (hpos : 0 < p y) :
-    hessC (Real.log ∘ p) y =
-      (((p y)⁻¹ : ℝ) : ℂ) • hessC p y + ((-((p y) ^ 2)⁻¹ : ℝ) : ℂ) • gradMat p p y := by
+theorem hessC_log_comp
+    {p : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ} (hp : ContDiffAt ℝ 2 p y) (hpos : 0 < p y)
+    : hessC (Real.log ∘ p) y
+      = (((p y)⁻¹ : ℝ) : ℂ) • hessC p y + ((-((p y) ^ 2)⁻¹ : ℝ) : ℂ) • gradMat p p y := by
   set c := p y / 2 with hc
   have hc0 : 0 < c := by positivity
   set h : ℝ → ℝ := fun t => c / 2 + Real.smoothTransition ((t - c / 2) / (c / 2)) * (t - c / 2) with hh
   have hhpos : ∀ t, 0 < h t := by
     intro t
     by_cases ht : t ≤ c / 2
-    · have : (t - c / 2) / (c / 2) ≤ 0 := div_nonpos_of_nonpos_of_nonneg (by linarith) (by positivity)
-      simp only [hh, Real.smoothTransition.zero_of_nonpos this, zero_mul, add_zero]; positivity
+    · have : (t - c / 2) / (c / 2) ≤ 0 :=
+        div_nonpos_of_nonpos_of_nonneg (by linarith) (by positivity)
+      simp only [hh, Real.smoothTransition.zero_of_nonpos this, zero_mul, add_zero]
+      positivity
     · have := Real.smoothTransition.nonneg ((t - c / 2) / (c / 2))
       have : 0 ≤ Real.smoothTransition ((t - c / 2) / (c / 2)) * (t - c / 2) :=
         mul_nonneg this (by linarith)
-      simp only [hh]; linarith
+      simp only [hh]
+      linarith
   have hhc : ContDiff ℝ 2 h := by
     have hs : ContDiff ℝ 2 Real.smoothTransition := Real.smoothTransition.contDiff (n := 2)
     exact contDiff_const.add ((hs.comp ((contDiff_id.sub contDiff_const).div_const _)).mul
@@ -178,8 +202,10 @@ theorem proof : MaDensLogPow.Statement := by
   set a : ℝ := (p y)⁻¹ with ha
   set b : ℝ := -((p y) ^ 2)⁻¹ with hb
   have hlog : hessC (Real.log ∘ p) y = (a : ℂ) • H + (b : ℂ) • G := hessC_log_comp hp hpos
-  have hG : ∀ (A : Fin (e + 1 + 1) → Matrix (Fin (e + 1 + 1)) (Fin (e + 1 + 1)) ℂ) (i j : Fin (e + 1 + 1)),
-      i ≠ j → A i = G → A j = G → mdisc A = 0 := fun A i j hij hi hj =>
+  have hG
+      : ∀ (A : Fin (e + 1 + 1) → Matrix (Fin (e + 1 + 1)) (Fin (e + 1 + 1)) ℂ)
+          (i j : Fin (e + 1 + 1)),
+        i ≠ j → A i = G → A j = G → mdisc A = 0 := fun A i j hij hi hj =>
     mdisc_eq_zero_of_two_rankOne A _ hij _ _ (hi.trans (gradMat_eq_vecMulVec p p y))
       (hj.trans (gradMat_eq_vecMulVec p p y))
   set s : Finset (Fin (e + 1 + 1)) := Finset.univ.erase 0 with hs
@@ -190,22 +216,34 @@ theorem proof : MaDensLogPow.Statement := by
     rw [hC, cons_const_apply, if_neg (Finset.ne_of_mem_erase hi)]
   have key := mdisc_expand (a : ℂ) (b : ℂ) H G hG s C hCs
   rw [Finset.sum_congr rfl fun i hi => mdisc_update_eq G A₀ H i (Finset.ne_of_mem_erase hi),
-    Finset.sum_const, hscard, Nat.add_sub_cancel, nsmul_eq_mul] at key
-  have hfam1 : (fun k => hessC ((Fin.cons φ₀ fun _ : Fin (e + 1) => Real.log ∘ p :
-      Fin (e + 1 + 1) → (Fin (e + 1 + 1) → ℂ) → ℝ) k) y) =
-      fun i => if i ∈ s then (a : ℂ) • H + (b : ℂ) • G else C i := by
+      Finset.sum_const, hscard, Nat.add_sub_cancel, nsmul_eq_mul]
+    at key
+  have hfam1
+      : (fun k =>
+          hessC
+            ((Fin.cons φ₀ fun _ : Fin (e + 1) => Real.log ∘ p
+                : Fin (e + 1 + 1) → (Fin (e + 1 + 1) → ℂ) → ℝ)
+              k)
+            y)
+        = fun i => if i ∈ s then (a : ℂ) • H + (b : ℂ) • G else C i := by
     funext k
     refine Fin.cases ?_ (fun i => ?_) k
     · simp [hs, hC, hA₀]
     · simp [hs, Fin.succ_ne_zero, hlog]
-  have hfam2 : (fun k => hessC ((Fin.cons φ₀ fun _ : Fin (e + 1) => p :
-      Fin (e + 1 + 1) → (Fin (e + 1 + 1) → ℂ) → ℝ) k) y) = C := by
+  have hfam2
+      : (fun k =>
+          hessC
+            ((Fin.cons φ₀ fun _ : Fin (e + 1) => p : Fin (e + 1 + 1) → (Fin (e + 1 + 1) → ℂ) → ℝ) k)
+            y)
+        = C := by
     funext k
     refine Fin.cases ?_ (fun i => ?_) k
     · simp [hC, hA₀]
     · simp [hC, hH]
-  have hfam3 : (fun i => hessC ((Fin.cons φ₀ fun _ : Fin e => p :
-      Fin (e + 1) → (Fin (e + 1 + 1) → ℂ) → ℝ) i) y) = Fin.cons A₀ (fun _ : Fin e => H) := by
+  have hfam3
+      : (fun i =>
+          hessC ((Fin.cons φ₀ fun _ : Fin e => p : Fin (e + 1) → (Fin (e + 1 + 1) → ℂ) → ℝ) i) y)
+        = Fin.cons A₀ (fun _ : Fin e => H) := by
     funext k
     refine Fin.cases ?_ (fun i => ?_) k
     · simp [hA₀]

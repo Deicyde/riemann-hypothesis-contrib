@@ -6,7 +6,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.SubgroupCharExtensionOneApp
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer
+  GlobalTheory.MixModel
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -18,17 +21,22 @@ noncomputable section
 
 namespace GlobalTheory.LatVHat
 
-theorem gen_mem (D : D7) (S : HSp D) (L : Lat S) (α : Af D.host.F) (hα : α ∈ intAf D.host.F) (x : Fin S.rank → D.host.E)
-    (hx : x ∈ L) :
-    (fun i => Formalism.IndefR.Lev.swapAE D (finPart D ((pairA D.host.F 0 α) ⊗ₜ[D.host.F] ((1 : D.host.E) * x i)))) ∈
-      Formalism.L2.Herm.hatL (F := D.host.F) L := by
+theorem gen_mem
+    (D : D7) (S : HSp D) (L : Lat S) (α : Af D.host.F) (hα : α ∈ intAf D.host.F)
+    (x : Fin S.rank → D.host.E) (hx : x ∈ L)
+    : (fun i =>
+        Formalism.IndefR.Lev.swapAE D
+          (finPart D ((pairA D.host.F 0 α) ⊗ₜ[D.host.F] ((1 : D.host.E) * x i))))
+      ∈ Formalism.L2.Herm.hatL (F := D.host.F) L := by
   have hint : (1 : D.host.E) ⊗ₜ[D.host.F] α ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
     apply Subring.subset_closure
     right
     refine ⟨⟨α, ?_⟩, rfl⟩
     intro v
     exact hα v
-  have hgen : (fun i => Formalism.UG.inclE (F := D.host.F) (Af D.host.F) (x i)) ∈ Formalism.L2.Herm.hatL (F := D.host.F) L :=
+  have hgen
+      : (fun i => Formalism.UG.inclE (F := D.host.F) (Af D.host.F) (x i))
+        ∈ Formalism.L2.Herm.hatL (F := D.host.F) L :=
     Submodule.subset_span ⟨x, hx, rfl⟩
   have := Submodule.smul_mem _ (⟨_, hint⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) hgen
   convert this using 1
@@ -37,11 +45,15 @@ theorem gen_mem (D : D7) (S : HSp D) (L : Lat S) (α : Af D.host.F) (hα : α �
   rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_one]
   rfl
 
-theorem latV_mem_hatL : ∀ (D : D7) (S : HSp D) (L : Lat S) (P : Pl D → Prop) (y : Fin S.rank → AE D), y ∈ latV S L P →
-    (fun i => Formalism.IndefR.Lev.swapAE D (finPart D (y i))) ∈ Formalism.L2.Herm.hatL (F := D.host.F) L := by
+theorem latV_mem_hatL
+    : ∀ (D : D7) (S : HSp D) (L : Lat S) (P : Pl D → Prop) (y : Fin S.rank → AE D),
+      y ∈ latV S L P
+        → (fun i => Formalism.IndefR.Lev.swapAE D (finPart D (y i)))
+          ∈ Formalism.L2.Herm.hatL (F := D.host.F) L := by
   intro D S L P y hy
   let Φ : (Fin S.rank → AE D) →+ (Fin S.rank → Formalism.IndefR.Lev.EAf D) :=
-    AddMonoidHom.compLeft ((Formalism.IndefR.Lev.swapAE D).comp (finPart D)).toAddMonoidHom (Fin S.rank)
+    AddMonoidHom.compLeft ((Formalism.IndefR.Lev.swapAE D).comp (finPart D)).toAddMonoidHom
+      (Fin S.rank)
   have hle : latV S L P ≤ (Formalism.L2.Herm.hatL (F := D.host.F) L).toAddSubgroup.comap Φ := by
     unfold GlobalTheory.FinPl.latV GlobalTheory.FinPl.latMul
     rw [AddSubgroup.closure_le]

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BddOfMe
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 noncomputable section
@@ -17,9 +19,10 @@ namespace GlobalTheory.BK.TorsFree
 
 variable {K : Type} [NormedField K] [IsUltrametricDist K]
 
-theorem norm_coeff_le_one_of_mul {x g : K⟦X⟧} (hx : ∃ B : ℝ, ∀ n, ‖coeff n x‖ ≤ B)
-    (hg : ∀ n, ‖coeff n g‖ ≤ 1) (hg1 : ∃ n, ‖coeff n g‖ = 1) (hgx : ∀ n, ‖coeff n (g * x)‖ ≤ 1) :
-    ∀ n, ‖coeff n x‖ ≤ 1 := by
+theorem norm_coeff_le_one_of_mul
+    {x g : K⟦X⟧} (hx : ∃ B : ℝ, ∀ n, ‖coeff n x‖ ≤ B) (hg : ∀ n, ‖coeff n g‖ ≤ 1)
+    (hg1 : ∃ n, ‖coeff n g‖ = 1) (hgx : ∀ n, ‖coeff n (g * x)‖ ≤ 1)
+    : ∀ n, ‖coeff n x‖ ≤ 1 := by
   classical
   obtain ⟨B, hB⟩ := hx
   have hbdd : BddAbove (Set.range fun n => ‖coeff n x‖) := ⟨B, by rintro _ ⟨n, rfl⟩; exact hB n⟩
@@ -28,14 +31,14 @@ theorem norm_coeff_le_one_of_mul {x g : K⟦X⟧} (hx : ∃ B : ℝ, ∀ n, ‖c
   have hS0 : 0 ≤ S := (norm_nonneg _).trans (hxS 0)
   set d := Nat.find hg1 with hd
   have hgd : ‖coeff d g‖ = 1 := Nat.find_spec hg1
-  have hlt : ∀ i < d, ‖coeff i g‖ < 1 := fun i hi =>
-    lt_of_le_of_ne (hg i) (Nat.find_min hg1 hi)
+  have hlt : ∀ i < d, ‖coeff i g‖ < 1 := fun i hi => lt_of_le_of_ne (hg i) (Nat.find_min hg1 hi)
   set θ : NNReal := (Finset.range d).sup fun i => ‖coeff i g‖₊ with hθdef
   have hθ1 : θ < 1 := by
     rw [hθdef, Finset.sup_lt_iff (by simp)]
     intro i hi
     have := hlt i (Finset.mem_range.1 hi)
-    rw [← NNReal.coe_lt_coe]; simpa using this
+    rw [← NNReal.coe_lt_coe]
+    simpa using this
   have hθi : ∀ i < d, ‖coeff i g‖ ≤ (θ : ℝ) := fun i hi => by
     have : ‖coeff i g‖₊ ≤ θ := Finset.le_sup (f := fun i => ‖coeff i g‖₊) (Finset.mem_range.2 hi)
     exact_mod_cast this
@@ -46,31 +49,38 @@ theorem norm_coeff_le_one_of_mul {x g : K⟦X⟧} (hx : ∃ B : ℝ, ∀ n, ‖c
     intro n
     induction n using Nat.strong_induction_on with
     | _ n ih =>
-    have hmem : (d, n) ∈ Finset.HasAntidiagonal.antidiagonal (n + d) := by
-      rw [Finset.HasAntidiagonal.mem_antidiagonal]; exact add_comm d n
-    have hc := coeff_mul (n + d) g x
-    rw [← Finset.add_sum_erase _ _ hmem] at hc
-    have hrest : ‖∑ p ∈ (Finset.HasAntidiagonal.antidiagonal (n + d)).erase (d, n), coeff p.1 g * coeff p.2 x‖ ≤ Mx := by
-      refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hM0 fun p hp => ?_
-      obtain ⟨hne, hp⟩ := Finset.mem_erase.1 hp
-      rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
-      rw [norm_mul]
-      rcases lt_trichotomy p.1 d with h | h | h
-      · calc ‖coeff p.1 g‖ * ‖coeff p.2 x‖ ≤ θ * S :=
-            mul_le_mul (hθi _ h) (hxS _) (norm_nonneg _) hθ0
-          _ ≤ Mx := le_max_right _ _
-      · exact absurd (Prod.ext h (by omega)) hne
-      · have hj : p.2 < n := by omega
-        calc ‖coeff p.1 g‖ * ‖coeff p.2 x‖ ≤ 1 * Mx :=
-            mul_le_mul (hg _) (ih _ hj) (norm_nonneg _) zero_le_one
-          _ = Mx := one_mul _
-    have heq : coeff d g * coeff n x = coeff (n + d) (g * x) -
-        ∑ p ∈ (Finset.HasAntidiagonal.antidiagonal (n + d)).erase (d, n), coeff p.1 g * coeff p.2 x := by
-      rw [hc]; ring
-    have : ‖coeff n x‖ = ‖coeff d g * coeff n x‖ := by rw [norm_mul, hgd, one_mul]
-    rw [this, heq, sub_eq_add_neg]
-    refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ (by rw [norm_neg]; exact hrest))
-    exact (hgx _).trans (le_max_left _ _)
+      have hmem : (d, n) ∈ Finset.HasAntidiagonal.antidiagonal (n + d) := by
+        rw [Finset.HasAntidiagonal.mem_antidiagonal]; exact add_comm d n
+      have hc := coeff_mul (n + d) g x
+      rw [← Finset.add_sum_erase _ _ hmem] at hc
+      have hrest
+          : ‖∑ p ∈ (Finset.HasAntidiagonal.antidiagonal (n + d)).erase (d, n), coeff p.1 g * coeff p.2 x‖
+            ≤ Mx := by
+        refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hM0 fun p hp => ?_
+        obtain ⟨hne, hp⟩ := Finset.mem_erase.1 hp
+        rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
+        rw [norm_mul]
+        rcases lt_trichotomy p.1 d with h | h | h
+        · calc
+            ‖coeff p.1 g‖ * ‖coeff p.2 x‖
+              ≤ θ * S := mul_le_mul (hθi _ h) (hxS _) (norm_nonneg _) hθ0
+            _ ≤ Mx := le_max_right _ _
+        · exact absurd (Prod.ext h (by omega)) hne
+        · have hj : p.2 < n := by omega
+          calc
+            ‖coeff p.1 g‖ * ‖coeff p.2 x‖
+              ≤ 1 * Mx := mul_le_mul (hg _) (ih _ hj) (norm_nonneg _) zero_le_one
+            _ = Mx := one_mul _
+      have heq
+          : coeff d g * coeff n x
+            = coeff (n + d) (g * x)
+              - ∑ p ∈ (Finset.HasAntidiagonal.antidiagonal (n + d)).erase (d, n), coeff p.1 g * coeff p.2 x :=
+        by rw [hc]; ring
+      have : ‖coeff n x‖ = ‖coeff d g * coeff n x‖ := by rw [norm_mul, hgd, one_mul]
+      rw [this, heq, sub_eq_add_neg]
+      refine (IsUltrametricDist.norm_add_le_max _ _).trans
+        (max_le ?_ (by rw [norm_neg]; exact hrest))
+      exact (hgx _).trans (le_max_left _ _)
   have hSM : S ≤ Mx := ciSup_le key
   have hS1 : S ≤ 1 := by
     by_contra h
@@ -90,15 +100,19 @@ namespace GlobalTheory.BK.Hom
 
 open GlobalTheory.BK.TorsFree
 
-variable {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+variable
+  {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
   {l e a : ℕ} {ι κ : Type} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ] [Fact l.Prime]
   {P : PhiMod O K l e a ι} {Q : PhiMod O K l e a κ}
 
-theorem mem_imM_of_smul_mem (F : Hom P Q)
-    (hg : ∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧), (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1) ∧
-      Y * F.mat τ = g • (1 : Matrix ι ι K⟦X⟧))
-    (hl : ∀ τ, (1 : K⟦X⟧) ∈ F.ldivSet τ) {v : Vec K a κ} (hv : v ∈ Q.M) {f : K⟦X⟧}
-    (hf0 : f ≠ 0) (hfv : f • v ∈ F.imM) : v ∈ F.imM := by
+theorem mem_imM_of_smul_mem
+    (F : Hom P Q)
+    (hg : ∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧),
+      (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1) ∧ Y * F.mat τ = g • (1 : Matrix ι ι K⟦X⟧))
+    (hl : ∀ τ, (1 : K⟦X⟧) ∈ F.ldivSet τ)
+    {v : Vec K a κ} (hv : v ∈ Q.M)
+    {f : K⟦X⟧} (hf0 : f ≠ 0) (hfv : f • v ∈ F.imM)
+    : v ∈ F.imM := by
   unfold imM at hfv ⊢
   obtain ⟨w, hw, hwv⟩ := Submodule.mem_map.1 hfv
   rw [LinearMap.restrictScalars_apply] at hwv
@@ -124,10 +138,15 @@ theorem mem_imM_of_smul_mem (F : Hom P Q)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (le_max_right _ _) fun j _ => ?_
-    have := norm_coeff_mul_le (w := fun _ => 1) (fun _ => zero_le_one) (fun _ _ => by simp)
-      (le_max_right c 0) zero_le_one (f := Y τ i j) (g := v τ j)
-      (fun m => by rw [mul_one]; exact (hc i j m).trans (le_max_left _ _))
-      (fun m => by rw [mul_one]; exact hv' τ j m) n
+    have :=
+      norm_coeff_mul_le
+        (w := fun _ => 1)
+        (fun _ => zero_le_one)
+        (fun _ _ => by simp)
+        (le_max_right c 0) zero_le_one (f := Y τ i j) (g := v τ j)
+        (fun m => by rw [mul_one]; exact (hc i j m).trans (le_max_left _ _))
+        (fun m => by rw [mul_one]; exact hv' τ j m)
+        n
     rwa [mul_one, mul_one] at this
   have hgA : ∀ τ (i : ι), ∀ n, ‖coeff n (g τ)‖ ≤ 1 := by
     intro τ i
@@ -140,17 +159,26 @@ theorem mem_imM_of_smul_mem (F : Hom P Q)
       conv_rhs => rw [← hFx]
       rw [app_apply, Matrix.mulVec_mulVec, hY0 τ]
       first
-        | rw [Matrix.smul_mulVec_assoc, Matrix.one_mulVec]
-        | rw [Matrix.smul_mulVec, Matrix.one_mulVec]
+      | rw [Matrix.smul_mulVec_assoc, Matrix.one_mulVec]
+      | rw [Matrix.smul_mulVec, Matrix.one_mulVec]
     have h4 : g τ * x τ i = (Y0 τ *ᵥ v τ) i := by rw [← h3]; rfl
     rw [h4]
     exact Subalgebra.sum_mem _ fun j _ => mul_mem (hY0A τ i j) (hv' τ j)
-  have hxA : x ∈ P.M := mem_tot.2 fun τ i =>
-    norm_coeff_le_one_of_mul (hbx τ i) (hgA τ i) (hg1 τ) (hgx τ i)
+  have hxA : x ∈ P.M :=
+    mem_tot.2 fun τ i => norm_coeff_le_one_of_mul (hbx τ i) (hgA τ i) (hg1 τ) (hgx τ i)
   exact Submodule.mem_map.2 ⟨x, hxA, by rw [LinearMap.restrictScalars_apply]; exact hFx⟩
 
 end GlobalTheory.BK.Hom
 
-theorem GlobalTheory.BK.Hom.coker_torsionFree : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (κ : Type) [Fintype κ] [DecidableEq κ] (P : PhiMod O K l e a ι) (Q : PhiMod O K l e a κ) (F : GlobalTheory.BK.Hom P Q), (∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧), (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1) ∧ Y * F.mat τ = g • (1 : Matrix ι ι K⟦X⟧)) → (∀ τ, (1 : K⟦X⟧) ∈ F.ldivSet τ) → ∀ v ∈ Q.M, ∀ f ∈ A O K, f ≠ 0 → f • v ∈ F.imM → v ∈ F.imM := by
+theorem GlobalTheory.BK.Hom.coker_torsionFree
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+        [TameDescentExponentData K l e a] (κ : Type) [Fintype κ] [DecidableEq κ]
+        (P : PhiMod O K l e a ι) (Q : PhiMod O K l e a κ) (F : GlobalTheory.BK.Hom P Q),
+      (∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧),
+          (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1) ∧ Y * F.mat τ = g • (1 : Matrix ι ι K⟦X⟧))
+        → (∀ τ, (1 : K⟦X⟧) ∈ F.ldivSet τ)
+        → ∀ v ∈ Q.M, ∀ f ∈ A O K, f ≠ 0 → f • v ∈ F.imM → v ∈ F.imM := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ κ _ _ P Q F hg hl v hv f _ hf0 hfv
   exact F.mem_imM_of_smul_mem hg hl hv hf0 hfv

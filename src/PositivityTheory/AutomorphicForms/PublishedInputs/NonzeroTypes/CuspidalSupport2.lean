@@ -10,26 +10,30 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsE
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.CuspidalSupport₂
 
 variable {k : Type} [Field k]
 
-theorem twist_detRep_one (χ η : kˣ →* ℂˣ) :
-    twist (detRep (Fin 1) χ) (detChar (Fin 1) η) = detRep (Fin 1) (η * χ) := by
-  have h : GlobalTheory.SmGL.detChar (Fin 1) η * GlobalTheory.SmGL.detChar (Fin 1) χ =
-      GlobalTheory.SmGL.detChar (R := k) (Fin 1) (η * χ) := by
+theorem twist_detRep_one (χ η : kˣ →* ℂˣ)
+    : twist (detRep (Fin 1) χ) (detChar (Fin 1) η) = detRep (Fin 1) (η * χ) := by
+  have h
+      : GlobalTheory.SmGL.detChar (Fin 1) η * GlobalTheory.SmGL.detChar (Fin 1) χ
+        = GlobalTheory.SmGL.detChar (R := k) (Fin 1) (η * χ) := by
     refine MonoidHom.ext fun g => ?_
     simp only [MonoidHom.mul_apply, GlobalTheory.SmGL.detChar_apply]
   unfold GlobalTheory.SmGL.detRep GlobalTheory.SmGL.ofChar
   rw [GlobalTheory.SmGL.twist_twist, h]
 
-theorem twist_twist_inv {d : ℕ} {X : Type} [AddCommGroup X] [Module ℂ X]
-    (σ : Representation ℂ (GL (Fin d) k) X) (η : kˣ →* ℂˣ) :
-    twist (twist σ (detChar (Fin d) η⁻¹)) (detChar (Fin d) η) = σ := by
-  have h : GlobalTheory.SmGL.detChar (Fin d) η * GlobalTheory.SmGL.detChar (Fin d) η⁻¹ =
-      (1 : GL (Fin d) k →* ℂˣ) := by
+theorem twist_twist_inv
+    {d : ℕ} {X : Type} [AddCommGroup X] [Module ℂ X]
+    (σ : Representation ℂ (GL (Fin d) k) X) (η : kˣ →* ℂˣ)
+    : twist (twist σ (detChar (Fin d) η⁻¹)) (detChar (Fin d) η) = σ := by
+  have h
+      : GlobalTheory.SmGL.detChar (Fin d) η * GlobalTheory.SmGL.detChar (Fin d) η⁻¹
+        = (1 : GL (Fin d) k →* ℂˣ) := by
     refine MonoidHom.ext fun g => ?_
     simp only [MonoidHom.mul_apply, GlobalTheory.SmGL.detChar_apply, MonoidHom.inv_apply,
       mul_inv_cancel, MonoidHom.one_apply]
@@ -59,15 +63,26 @@ theorem step_cuspSupp : CuspidalSupportProp := by
   have h1 := hα.trans (GlobalTheory.PrinProd.isSubquotient_prinSeries_multiProd k d χ)
   have h2 := isSubquotient_twist h1 (detChar (Fin d) η)
   rw [hτ, twist_twist_inv] at h2
-  have hχs : ∀ i, IsSmoothChar (χ i) := fun i => isSmoothChar_of_isUnram (isUnram_unrChar (k := k) (α i))
-  let φ := multiProdTwistEquiv (Equiv.sigmaUnique (Fin d) fun _ => Fin 1)
-    (fun i => detRep (Fin 1) (χ i)) hη
+  have hχs : ∀ i, IsSmoothChar (χ i) := fun i =>
+    isSmoothChar_of_isUnram (isUnram_unrChar (k := k) (α i))
+  let φ :=
+    multiProdTwistEquiv (Equiv.sigmaUnique (Fin d) fun _ => Fin 1)
+      (fun i => detRep (Fin 1) (χ i))
+      hη
   have h3 := h2.trans (.of_injective φ.toIntertwiningMap φ.toLinearEquiv.injective)
-  have hfam : (fun i => twist (detRep (Fin 1) (χ i)) (detChar (Fin 1) η)) =
-      fun i => detRep (Fin 1) (η * χ i) := funext fun i => twist_detRep_one _ _
+  have hfam
+      : (fun i => twist (detRep (Fin 1) (χ i)) (detChar (Fin 1) η))
+        = fun i => detRep (Fin 1) (η * χ i) :=
+    funext fun i => twist_detRep_one _ _
   rw [hfam] at h3
-  refine ⟨fun j => η * χ j, fun j => ⟨hη.mul (hχs j), fun u hu => ?_⟩, hi,
-    fun j => ⟨one_pos, isIrreducible_ofChar _, isCuspidal_detRep_one (hη.mul (hχs j))⟩, _, h3⟩
+  refine ⟨
+    fun j => η * χ j,
+    fun j => ⟨hη.mul (hχs j), fun u hu => ?_⟩,
+    hi,
+    fun j => ⟨one_pos, isIrreducible_ofChar _, isCuspidal_detRep_one (hη.mul (hχs j))⟩,
+    _,
+    h3
+  ⟩
   show η u * unrChar k (α j) u = η u
   rw [isUnram_unrChar (k := k) (α j) u hu, mul_one]
 

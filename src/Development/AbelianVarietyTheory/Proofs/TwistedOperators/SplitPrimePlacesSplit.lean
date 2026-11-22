@@ -6,18 +6,23 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Links
 open GlobalTheory.IndefiniteRowSideFullHecke.IteratedLiftChains GlobalTheory.PRep GlobalTheory.LFun
 open Formalism.UG (IsCommensurated Hecke)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
 
 namespace GlobalTheory.SplitPlace
 
-theorem isSplit_of_norm {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (h2 : Module.finrank F E = 2) {p : ℕ} (hp : p.Prime)
-    (h : ∀ w : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ w.asIdeal →
-      Ideal.absNorm w.asIdeal = p ∧ (p : 𝓞 E) ∉ w.asIdeal ^ 2)
-    (v : HeightOneSpectrum (𝓞 F)) (hv : (p : 𝓞 F) ∈ v.asIdeal) : IsSplit (E := E) v := by
+theorem isSplit_of_norm
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (h2 : Module.finrank F E = 2)
+    {p : ℕ} (hp : p.Prime)
+    (h : ∀ w : HeightOneSpectrum (𝓞 E),
+      (p : 𝓞 E) ∈ w.asIdeal → Ideal.absNorm w.asIdeal = p ∧ (p : 𝓞 E) ∉ w.asIdeal ^ 2)
+    (v : HeightOneSpectrum (𝓞 F)) (hv : (p : 𝓞 F) ∈ v.asIdeal)
+    : IsSplit (E := E) v := by
   classical
   haveI hfin : Module.Finite (𝓞 F) (𝓞 E) := by
     first
@@ -76,10 +81,11 @@ theorem isSplit_of_norm {F E : Type} [Field F] [NumberField F] [Field E] [Number
   by_contra hns
   obtain ⟨Q0, hQ0p, hQ0o⟩ : ∃ Q0 : Ideal (𝓞 E), Q0.IsPrime ∧ Q0.LiesOver v.asIdeal := by
     first
-    | obtain ⟨Q0, hQ0m, hQ0o⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) v.asIdeal
+    | obtain ⟨Q0, hQ0m, hQ0o⟩ :=
+        Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) v.asIdeal
       exact ⟨Q0, hQ0m.isPrime, hQ0o⟩
-    | obtain ⟨Q0, hQ0⟩ := Set.nonempty_of_ncard_ne_zero
-        (IsDedekindDomain.primesOver_ncard_ne_zero v.asIdeal (𝓞 E))
+    | obtain ⟨Q0, hQ0⟩ :=
+        Set.nonempty_of_ncard_ne_zero (IsDedekindDomain.primesOver_ncard_ne_zero v.asIdeal (𝓞 E))
       exact ⟨Q0, hQ0.1, hQ0.2⟩
   let q0 : v.asIdeal.primesOver (𝓞 E) := ⟨Q0, hQ0p, hQ0o⟩
   have honly : ∀ q : v.asIdeal.primesOver (𝓞 E), q = q0 := by
@@ -88,15 +94,27 @@ theorem isSplit_of_norm {F E : Type} [Field F] [NumberField F] [Field E] [Number
     apply hns
     haveI := hQo
     haveI := hQ0o
-    refine ⟨⟨Q, hQp, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
-      ⟨Q0, hQ0p, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q0⟩, ?_, hQo.over.symm, hQ0o.over.symm⟩
+    refine ⟨
+      ⟨Q, hQp, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
+      ⟨Q0, hQ0p, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q0⟩,
+      ?_,
+      hQo.over.symm,
+      hQ0o.over.symm
+    ⟩
     intro hPQ
     exact hne (Subtype.ext (congrArg HeightOneSpectrum.asIdeal hPQ))
-  rw [Finset.sum_eq_single q0 (fun b _ hb => absurd (honly b) hb)
-    (fun h0 => absurd (Finset.mem_univ q0) h0), he q0, hf q0] at hsum
+  rw [Finset.sum_eq_single q0
+        (fun b _ hb => absurd (honly b) hb)
+        (fun h0 => absurd (Finset.mem_univ q0) h0),
+      he q0, hf q0]
+    at hsum
   omega
 
-theorem isSplit_of_splitsCompletely : ∀ (D : D7) (p : ℕ), SplitsCompletely D p → ∀ v : HeightOneSpectrum (𝓞 D.host.F), (p : 𝓞 D.host.F) ∈ v.asIdeal → IsSplit (E := D.host.E) v := by
+theorem isSplit_of_splitsCompletely
+    : ∀ (D : D7) (p : ℕ),
+      SplitsCompletely D p
+        → ∀ v : HeightOneSpectrum (𝓞 D.host.F),
+          (p : 𝓞 D.host.F) ∈ v.asIdeal → IsSplit (E := D.host.E) v := by
   intro D p hp v hv
   have h2 : Module.finrank D.host.F D.host.E = 2 := by
     first

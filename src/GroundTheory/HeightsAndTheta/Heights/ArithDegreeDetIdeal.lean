@@ -19,8 +19,9 @@ def detIdeal {r : ℕ} (E : Submodule (𝓞 K) (Fin r → 𝓞 K)) : Ideal (𝓞
   Ideal.span {d | ∃ v : Fin r → Fin r → 𝓞 K, (∀ i, v i ∈ E) ∧ (Matrix.of v).det = d}
 
 omit [NumberField K] in
-theorem det_mem_detIdeal {r : ℕ} (E : Submodule (𝓞 K) (Fin r → 𝓞 K)) (v : Fin r → Fin r → 𝓞 K)
-    (hv : ∀ i, v i ∈ E) : (Matrix.of v).det ∈ detIdeal E :=
+theorem det_mem_detIdeal
+    {r : ℕ} (E : Submodule (𝓞 K) (Fin r → 𝓞 K)) (v : Fin r → Fin r → 𝓞 K) (hv : ∀ i, v i ∈ E)
+    : (Matrix.of v).det ∈ detIdeal E :=
   Ideal.subset_span ⟨v, hv, rfl⟩
 
 def consZero (r : ℕ) : (Fin r → 𝓞 K) →ₗ[𝓞 K] (Fin (r + 1) → 𝓞 K) where
@@ -35,10 +36,9 @@ def consZero (r : ℕ) : (Fin r → 𝓞 K) →ₗ[𝓞 K] (Fin (r + 1) → 𝓞
 omit [NumberField K] in
 theorem consZero_zero {r : ℕ} (y : Fin r → 𝓞 K) : consZero r y 0 = 0 := rfl
 
-
 omit [NumberField K] in
-theorem range_consZero (r : ℕ) :
-    LinearMap.range (consZero (K := K) r) = LinearMap.ker (LinearMap.proj 0) := by
+theorem range_consZero (r : ℕ)
+    : LinearMap.range (consZero (K := K) r) = LinearMap.ker (LinearMap.proj 0) := by
   ext x
   simp only [LinearMap.mem_range, LinearMap.mem_ker, LinearMap.proj_apply]
   constructor
@@ -48,12 +48,11 @@ theorem range_consZero (r : ℕ) :
     rw [← Fin.cons_self_tail x, hx]
     rfl
 
-
 omit [NumberField K] in
-theorem card_quotient_succ {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K)) :
-    Nat.card ((Fin (r + 1) → 𝓞 K) ⧸ E) =
-      Nat.card ((Fin r → 𝓞 K) ⧸ E.comap (consZero r)) *
-        Nat.card (𝓞 K ⧸ E.map (LinearMap.proj 0)) := by
+theorem card_quotient_succ {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K))
+    : Nat.card ((Fin (r + 1) → 𝓞 K) ⧸ E)
+      = Nat.card ((Fin r → 𝓞 K) ⧸ E.comap (consZero r))
+        * Nat.card (𝓞 K ⧸ E.map (LinearMap.proj 0)) := by
   set π : (Fin (r + 1) → 𝓞 K) →ₗ[𝓞 K] 𝓞 K := LinearMap.proj 0
   set S := E ⊔ LinearMap.ker π
   rw [← Submodule.card_quotient_mul_card_quotient S E le_sup_left]
@@ -71,9 +70,8 @@ theorem card_quotient_succ {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → �
     have hφ : Function.Surjective φ := (Submodule.mkQ_surjective _).comp hπ
     have hker : LinearMap.ker φ = S := by
       ext x
-      simp only [φ, LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply,
-        Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_map, S,
-        Submodule.mem_sup]
+      simp only [φ, LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply, Submodule.mkQ_apply,
+        Submodule.Quotient.mk_eq_zero, Submodule.mem_map, S, Submodule.mem_sup]
       constructor
       · rintro ⟨e, he, hex⟩
         refine ⟨e, he, x - e, ?_, add_sub_cancel _ _⟩
@@ -85,10 +83,9 @@ theorem card_quotient_succ {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → �
     rw [← hker]
     exact Nat.card_congr (φ.quotKerEquivOfSurjective hφ).toEquiv
 
-
 omit [NumberField K] in
-theorem mul_le_detIdeal {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K)) :
-    E.map (LinearMap.proj 0) * detIdeal (E.comap (consZero r)) ≤ detIdeal E := by
+theorem mul_le_detIdeal {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K))
+    : E.map (LinearMap.proj 0) * detIdeal (E.comap (consZero r)) ≤ detIdeal E := by
   rw [Ideal.mul_le]
   intro a ha d hd
   obtain ⟨w, hw, rfl⟩ := Submodule.mem_map.mp ha
@@ -108,14 +105,16 @@ theorem mul_le_detIdeal {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 
       congr 2
     rw [LinearMap.proj_apply, ← hdet]
     exact det_mem_detIdeal E v hv
-  | zero => rw [mul_zero]; exact Ideal.zero_mem _
-  | add x y _ _ hx hy => rw [mul_add]; exact Ideal.add_mem _ hx hy
+  | zero =>
+    rw [mul_zero]; exact Ideal.zero_mem _
+  | add x y _ _ hx hy =>
+    rw [mul_add]; exact Ideal.add_mem _ hx hy
   | smul c x _ hx =>
     rw [smul_eq_mul, mul_left_comm]
     exact Ideal.mul_mem_left _ c hx
 
-theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K)) :
-    detIdeal E ≤ E.map (LinearMap.proj 0) * detIdeal (E.comap (consZero r)) := by
+theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K))
+    : detIdeal E ≤ E.map (LinearMap.proj 0) * detIdeal (E.comap (consZero r)) := by
   classical
   set π : (Fin (r + 1) → 𝓞 K) →ₗ[𝓞 K] 𝓞 K := LinearMap.proj 0
   set 𝔞 := E.map π
@@ -171,8 +170,7 @@ theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 
   set T := Finset.univ \ S
   have hT : ∀ k, k ∈ T ↔ k ∉ S := fun k ↦ by simp [T]
   by_cases h2 : 1 < T.card
-  ·
-    obtain ⟨i, hi, j, hj, hij⟩ := Finset.one_lt_card.mp h2
+  · obtain ⟨i, hi, j, hj, hij⟩ := Finset.one_lt_card.mp h2
     have hi' := (hT i).mp hi
     have hj' := (hT j).mp hj
     suffices (Matrix.of R).det = 0 by rw [this]; exact Ideal.zero_mem _
@@ -183,8 +181,9 @@ theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 
       rfl
     · have key : (a j : 𝓞 K) * (Matrix.of R).det = 0 := by
         have hRi : (Matrix.of R) i = w i := hRT i hi'
-        have e1 : (a j : 𝓞 K) * (Matrix.of R).det =
-            (updateRow (Matrix.of R) i ((a j : 𝓞 K) • w i)).det := by
+        have e1
+            : (a j : 𝓞 K) * (Matrix.of R).det
+              = (updateRow (Matrix.of R) i ((a j : 𝓞 K) • w i)).det := by
           rw [det_updateRow_smul, ← hRi, updateRow_eq_self]
         rw [e1, hprop i j, det_updateRow_smul]
         refine mul_eq_zero_of_right _ (det_zero_of_row_eq hij ?_)
@@ -192,8 +191,7 @@ theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 
         exact (hRT j hj').symm
       exact (mul_eq_zero.mp key).resolve_left haj
   · rcases Nat.lt_or_ge T.card 1 with h0 | h1
-    ·
-      have hTe : T = ∅ := Finset.card_eq_zero.mp (by omega)
+    · have hTe : T = ∅ := Finset.card_eq_zero.mp (by omega)
       suffices (Matrix.of R).det = 0 by rw [this]; exact Ideal.zero_mem _
       apply det_eq_zero_of_column_eq_zero 0
       intro k
@@ -203,8 +201,7 @@ theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 
         rw [hTe] at this
         exact Finset.notMem_empty k this
       rw [of_apply, hRS k hk, he0]
-    ·
-      obtain ⟨j, hTj⟩ := Finset.card_eq_one.mp (by omega : T.card = 1)
+    · obtain ⟨j, hTj⟩ := Finset.card_eq_one.mp (by omega : T.card = 1)
       have hjS : j ∉ S := (hT j).mp (by rw [hTj]; exact Finset.mem_singleton_self j)
       have hkS : ∀ k, k ≠ j → k ∈ S := by
         intro k hk
@@ -214,8 +211,9 @@ theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 
         exact hk this
       rw [det_succ_column_zero, Finset.sum_eq_single j]
       · rw [of_apply, hRT j hjS, hw0]
-        have hsub : (Matrix.of R).submatrix j.succAbove Fin.succ =
-            Matrix.of fun k ↦ Fin.tail (e (j.succAbove k)) := by
+        have hsub
+            : (Matrix.of R).submatrix j.succAbove Fin.succ
+              = Matrix.of fun k ↦ Fin.tail (e (j.succAbove k)) := by
           ext k l
           simp only [submatrix_apply, of_apply, Fin.tail]
           rw [hRS _ (hkS _ (Fin.succAbove_ne j k))]
@@ -227,12 +225,12 @@ theorem detIdeal_le_mul {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 
       · intro h
         exact absurd (Finset.mem_univ j) h
 
-theorem detIdeal_succ {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K)) :
-    detIdeal E = E.map (LinearMap.proj 0) * detIdeal (E.comap (consZero r)) :=
+theorem detIdeal_succ {r : ℕ} (E : Submodule (𝓞 K) (Fin (r + 1) → 𝓞 K))
+    : detIdeal E = E.map (LinearMap.proj 0) * detIdeal (E.comap (consZero r)) :=
   le_antisymm (detIdeal_le_mul E) (mul_le_detIdeal E)
 
-theorem card_quotient_eq_absNorm_detIdeal :
-    ∀ (r : ℕ) (E : Submodule (𝓞 K) (Fin r → 𝓞 K)),
+theorem card_quotient_eq_absNorm_detIdeal
+    : ∀ (r : ℕ) (E : Submodule (𝓞 K) (Fin r → 𝓞 K)),
       Nat.card ((Fin r → 𝓞 K) ⧸ E) = Ideal.absNorm (detIdeal E)
   | 0, E => by
     have hE : E = ⊤ := Subsingleton.elim _ _

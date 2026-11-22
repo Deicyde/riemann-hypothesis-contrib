@@ -8,9 +8,13 @@ public import Development.AutomorphicArithmetic.WeightCongruences.ProdNegOneZpow
 open NumberField IsDedekindDomain
 open scoped Pointwise
 
-private theorem exists_nat_residue {L : Type} [Field L] [NumberField L] {p : ℕ} (hp : p.Prime)
-    (v : HeightOneSpectrum (𝓞 L)) (hv : ((p : ℕ) : 𝓞 L) ∈ v.asIdeal) (hn : Ideal.absNorm v.asIdeal = p)
-    (x : 𝓞 L) : ∃ a : ℕ, Ideal.Quotient.mk v.asIdeal x = (a : 𝓞 L ⧸ v.asIdeal) := by
+private theorem exists_nat_residue
+    {L : Type} [Field L] [NumberField L]
+    {p : ℕ} (hp : p.Prime)
+    (v : HeightOneSpectrum (𝓞 L))
+    (hv : ((p : ℕ) : 𝓞 L) ∈ v.asIdeal) (hn : Ideal.absNorm v.asIdeal = p)
+    (x : 𝓞 L)
+    : ∃ a : ℕ, Ideal.Quotient.mk v.asIdeal x = (a : 𝓞 L ⧸ v.asIdeal) := by
   haveI : Fact p.Prime := ⟨hp⟩
   haveI : v.asIdeal.IsMaximal := v.isMaximal
   haveI : CharP (𝓞 L ⧸ v.asIdeal) p := (CharP.charP_iff_prime_eq_zero hp).2 (by
@@ -25,14 +29,18 @@ private theorem exists_nat_residue {L : Type} [Field L] [NumberField L] {p : ℕ
   refine ⟨k.val, ?_⟩
   rw [← hk, ZMod.castHom_apply, ZMod.natCast_val]
 
-private theorem smul_natCast_eq {K L : Type} [Field K] [Field L] [Algebra K L] (σ : L ≃ₐ[K] L) (n : ℕ) :
-    σ • (n : 𝓞 L) = n :=
+private theorem smul_natCast_eq
+    {K L : Type} [Field K] [Field L] [Algebra K L] (σ : L ≃ₐ[K] L) (n : ℕ)
+    : σ • (n : 𝓞 L) = n :=
   map_natCast (MulSemiringAction.toRingHom (L ≃ₐ[K] L) (𝓞 L) σ) n
 
-private theorem stab_trivial {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
-    {p : ℕ} (hp : p.Prime) (w : HeightOneSpectrum (𝓞 L)) (hv : ((p : ℕ) : 𝓞 L) ∈ w.asIdeal)
+private theorem stab_trivial
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+    {p : ℕ} (hp : p.Prime)
+    (w : HeightOneSpectrum (𝓞 L)) (hv : ((p : ℕ) : 𝓞 L) ∈ w.asIdeal)
     (hn : Ideal.absNorm w.asIdeal = p) (h2 : ((p : ℕ) : 𝓞 L) ∉ w.asIdeal ^ 2)
-    (σ : L ≃ₐ[K] L) (hσ : σ • w.asIdeal = w.asIdeal) : σ = 1 := by
+    (σ : L ≃ₐ[K] L) (hσ : σ • w.asIdeal = w.asIdeal)
+    : σ = 1 := by
   have : IsGaloisGroup (L ≃ₐ[K] L) (𝓞 K) (𝓞 L) := IsGaloisGroup.of_isFractionRing _ _ _ K L
   haveI := w.isPrime
   let Q := w.under (𝓞 K)
@@ -42,8 +50,7 @@ private theorem stab_trivial {K L : Type} [Field K] [NumberField K] [Field L] [N
   have hin : σ ∈ w.asIdeal.inertia (L ≃ₐ[K] L) := by
     intro x
     obtain ⟨a, ha⟩ := exists_nat_residue hp w hv hn x
-    have h1 : x - (a : 𝓞 L) ∈ w.asIdeal := by
-      rw [← Ideal.Quotient.eq, ha, map_natCast]
+    have h1 : x - (a : 𝓞 L) ∈ w.asIdeal := by rw [← Ideal.Quotient.eq, ha, map_natCast]
     have h3 : σ • (x - (a : 𝓞 L)) ∈ w.asIdeal := by
       rw [← hσ]; exact Ideal.smul_mem_pointwise_smul _ _ _ h1
     rw [smul_sub, smul_natCast_eq] at h3
@@ -58,7 +65,8 @@ private theorem stab_trivial {K L : Type} [Field K] [NumberField K] [Field L] [N
       apply h2
       have h1 : ((p : ℕ) : 𝓞 K) ∈ Q.asIdeal := by
         show ((p : ℕ) : 𝓞 K) ∈ Ideal.under (𝓞 K) w.asIdeal
-        rw [Ideal.mem_under, map_natCast]; exact hv
+        rw [Ideal.mem_under, map_natCast]
+        exact hv
       have h5 := h (Ideal.mem_map_of_mem (algebraMap (𝓞 K) (𝓞 L)) h1)
       rwa [map_natCast] at h5
   have hc : Nat.card (w.asIdeal.inertia (L ≃ₐ[K] L)) = 1 := by
@@ -67,15 +75,20 @@ private theorem stab_trivial {K L : Type} [Field K] [NumberField K] [Field L] [N
   rw [Subgroup.card_eq_one.1 hc] at hin
   exact Subgroup.mem_bot.1 hin
 
-theorem UpperTheory.prod_residue_char_norm_one_unit_eq_one :
-    ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L] (p : ℕ), p.Prime →
-      ∀ (Q : HeightOneSpectrum (𝓞 K)) (S : Finset (HeightOneSpectrum (𝓞 L))), (∀ w, w ∈ S ↔ w.under (𝓞 K) = Q) →
-      (∀ w ∈ S, Ideal.absNorm w.asIdeal = p ∧ ((p : ℕ) : 𝓞 L) ∉ w.asIdeal ^ 2) →
-      ∀ (ω : (ZMod p)ˣ →* ℂˣ) (θ : ∀ w : HeightOneSpectrum (𝓞 L), (𝓞 L ⧸ w.asIdeal)ˣ →* ℂˣ),
-      (∀ w ∈ S, ∀ (a : ℕ) (ha : a.Coprime p), ∃ b : (𝓞 L ⧸ w.asIdeal)ˣ,
-        (b : 𝓞 L ⧸ w.asIdeal) = Ideal.Quotient.mk w.asIdeal (a : 𝓞 L) ∧ θ w b = ω (ZMod.unitOfCoprime a ha)) →
-      ∀ u : (𝓞 L)ˣ, Algebra.norm K ((u : 𝓞 L) : L) = 1 →
-        ∏ w ∈ S, θ w (Units.map (Ideal.Quotient.mk w.asIdeal).toMonoidHom u) = 1 := by
+theorem UpperTheory.prod_residue_char_norm_one_unit_eq_one
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+        [IsGalois K L] (p : ℕ),
+      p.Prime
+        → ∀ (Q : HeightOneSpectrum (𝓞 K)) (S : Finset (HeightOneSpectrum (𝓞 L))),
+          (∀ w, w ∈ S ↔ w.under (𝓞 K) = Q)
+            → (∀ w ∈ S, Ideal.absNorm w.asIdeal = p ∧ ((p : ℕ) : 𝓞 L) ∉ w.asIdeal ^ 2)
+            → ∀ (ω : (ZMod p)ˣ →* ℂˣ) (θ : ∀ w : HeightOneSpectrum (𝓞 L), (𝓞 L ⧸ w.asIdeal)ˣ →* ℂˣ),
+              (∀ w ∈ S, ∀ (a : ℕ) (ha : a.Coprime p), ∃ b : (𝓞 L ⧸ w.asIdeal)ˣ,
+                  (b : 𝓞 L ⧸ w.asIdeal) = Ideal.Quotient.mk w.asIdeal (a : 𝓞 L)
+                    ∧ θ w b = ω (ZMod.unitOfCoprime a ha))
+                → ∀ u : (𝓞 L)ˣ,
+                  Algebra.norm K ((u : 𝓞 L) : L) = 1
+                    → ∏ w ∈ S, θ w (Units.map (Ideal.Quotient.mk w.asIdeal).toMonoidHom u) = 1 := by
   intro K L _ _ _ _ _ _ p hp Q S memS hs ω θ hθ ζ hζ
   classical
   haveI : Fact p.Prime := ⟨hp⟩
@@ -87,8 +100,8 @@ theorem UpperTheory.prod_residue_char_norm_one_unit_eq_one :
   rcases S.eq_empty_or_nonempty with hE | ⟨w₀, hw₀⟩
   · rw [hE, Finset.prod_empty]
 
-  have hres : ∀ w ∈ S, ∃ a : ℕ, Ideal.Quotient.mk w.asIdeal (ζ : 𝓞 L) = (a : 𝓞 L ⧸ w.asIdeal) := fun w hw =>
-    exists_nat_residue hp w (overp w hw) (hs w hw).1 _
+  have hres : ∀ w ∈ S, ∃ a : ℕ, Ideal.Quotient.mk w.asIdeal (ζ : 𝓞 L) = (a : 𝓞 L ⧸ w.asIdeal) :=
+    fun w hw => exists_nat_residue hp w (overp w hw) (hs w hw).1 _
   choose! a ha using hres
   have hcop : ∀ w ∈ S, (a w).Coprime p := by
     intro w hw
@@ -111,7 +124,8 @@ theorem UpperTheory.prod_residue_char_norm_one_unit_eq_one :
     exact Ideal.exists_smul_eq_of_isGaloisGroup Q.asIdeal w.asIdeal w₀.asIdeal (L ≃ₐ[K] L)
   choose! σ hσw using hσ
 
-  have hσres : ∀ w ∈ S, Ideal.Quotient.mk w₀.asIdeal (σ w • (ζ : 𝓞 L)) = (a w : 𝓞 L ⧸ w₀.asIdeal) := by
+  have hσres
+      : ∀ w ∈ S, Ideal.Quotient.mk w₀.asIdeal (σ w • (ζ : 𝓞 L)) = (a w : 𝓞 L ⧸ w₀.asIdeal) := by
     intro w hw
     have h1 : (ζ : 𝓞 L) - (a w : 𝓞 L) ∈ w.asIdeal := by
       rw [← Ideal.Quotient.eq, ha w hw, map_natCast]
@@ -141,8 +155,9 @@ theorem UpperTheory.prod_residue_char_norm_one_unit_eq_one :
           apply HeightOneSpectrum.ext
           exact Ideal.under_smul (𝓞 K) w₀.asIdeal τ⁻¹
         refine ⟨w, hw, ?_⟩
-        have h1 := stab_trivial hp w (overp w hw) (hs w hw).1 (hs w hw).2 (τ⁻¹ * σ w)
-          (by rw [mul_smul, hσw w hw])
+        have h1 :=
+          stab_trivial hp w (overp w hw) (hs w hw).1 (hs w hw).2 (τ⁻¹ * σ w)
+            (by rw [mul_smul, hσw w hw])
         exact (inv_mul_eq_one.1 h1).symm
       · intro w hw
         rfl
@@ -150,8 +165,8 @@ theorem UpperTheory.prod_residue_char_norm_one_unit_eq_one :
     apply RingOfIntegers.ext
     have h := Algebra.norm_eq_prod_automorphisms K ((ζ : 𝓞 L) : L)
     rw [hζ, map_one] at h
-    have h' : ∀ τ : L ≃ₐ[K] L, algebraMap (𝓞 L) L (τ • (ζ : 𝓞 L)) = τ ((ζ : 𝓞 L) : L) :=
-      fun τ => rfl
+    have h' : ∀ τ : L ≃ₐ[K] L, algebraMap (𝓞 L) L (τ • (ζ : 𝓞 L)) = τ ((ζ : 𝓞 L) : L) := fun τ =>
+      rfl
     show algebraMap (𝓞 L) L (∏ τ : L ≃ₐ[K] L, τ • (ζ : 𝓞 L)) = algebraMap (𝓞 L) L 1
     rw [map_prod, map_one]
     exact (Finset.prod_congr rfl fun τ _ => h' τ).trans h.symm
@@ -162,8 +177,8 @@ theorem UpperTheory.prod_residue_char_norm_one_unit_eq_one :
   have hmod : ∏ w ∈ S, ((a w : ℕ) : ZMod p) = 1 := by
     apply (ZMod.castHom (dvd_refl p) (𝓞 L ⧸ w₀.asIdeal)).injective
     rw [map_prod, map_one]
-    have : ∏ w ∈ S, (ZMod.castHom (dvd_refl p) (𝓞 L ⧸ w₀.asIdeal)) ((a w : ℕ) : ZMod p) =
-        ∏ w ∈ S, Ideal.Quotient.mk w₀.asIdeal (σ w • (ζ : 𝓞 L)) :=
+    have : ∏ w ∈ S, (ZMod.castHom (dvd_refl p) (𝓞 L ⧸ w₀.asIdeal)) ((a w : ℕ) : ZMod p)
+        = ∏ w ∈ S, Ideal.Quotient.mk w₀.asIdeal (σ w • (ζ : 𝓞 L)) :=
       Finset.prod_congr rfl fun w hw => by rw [map_natCast, hσres w hw]
     rw [this, ← map_prod, hprod, map_one]
 

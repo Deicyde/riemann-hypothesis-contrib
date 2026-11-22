@@ -10,12 +10,13 @@ namespace PI.OmLocU
 
 open MeasureTheory
 
-theorem measure_image_cosets {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V]
-    (μ : Measure V) [μ.IsAddLeftInvariant] (H L : AddSubgroup V) (hHL : H ≤ L)
-    (hH : MeasurableSet (H : Set V)) (hfin : H.relIndex L ≠ 0) (S : Set L)
-    (hS : ∀ x ∈ S, ∀ y : L, (y : V) ∈ H → x + y ∈ S) :
-    μ (((↑) : L → V) '' S) =
-      (Nat.card (QuotientAddGroup.mk '' S : Set (L ⧸ H.addSubgroupOf L)) : ENNReal) * μ H := by
+theorem measure_image_cosets
+    {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V]
+    (μ : Measure V) [μ.IsAddLeftInvariant]
+    (H L : AddSubgroup V) (hHL : H ≤ L) (hH : MeasurableSet (H : Set V)) (hfin : H.relIndex L ≠ 0)
+    (S : Set L) (hS : ∀ x ∈ S, ∀ y : L, (y : V) ∈ H → x + y ∈ S)
+    : μ (((↑) : L → V) '' S)
+      = (Nat.card (QuotientAddGroup.mk '' S : Set (L ⧸ H.addSubgroupOf L)) : ENNReal) * μ H := by
   classical
   set H' := H.addSubgroupOf L with hH'
   haveI : H'.FiniteIndex := ⟨hfin⟩
@@ -50,7 +51,8 @@ theorem measure_image_cosets {V : Type} [AddCommGroup V] [MeasurableSpace V] [Me
     refine Set.disjoint_left.mpr fun v hv hv' => hne ?_
     rw [← hrt t ht1, ← hrt t' ht2, QuotientAddGroup.eq]
     show ((-(r t) + r t' : L) : V) ∈ H
-    have hs := H.sub_mem (show -((r t : L) : V) + v ∈ H from hv) (show -((r t' : L) : V) + v ∈ H from hv')
+    have hs :=
+      H.sub_mem (show -((r t : L) : V) + v ∈ H from hv) (show -((r t' : L) : V) + v ∈ H from hv')
     convert hs using 1
     push_cast
     abel

@@ -44,8 +44,7 @@ lemma norm_finsum_le' {α : Type*} {g : α → K} {C : ℝ} (hC : 0 ≤ C) (hg :
   · rw [finsum_of_infinite_support hfin]
     simpa using hC
 
-def Cong (c : K) (A B : MvPowerSeries ι K) : Prop :=
-  IntegralMv A ∧ IntegralMv B ∧ DivByMv c (A - B)
+def Cong (c : K) (A B : MvPowerSeries ι K) : Prop := IntegralMv A ∧ IntegralMv B ∧ DivByMv c (A - B)
 
 end Cong
 

@@ -7,16 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.I
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity GlobalTheory.HermitianPreEigenvalues Polynomial Module
+open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity
+  GlobalTheory.HermitianPreEigenvalues Polynomial Module
 
 namespace GlobalTheory.SubLen
 
-theorem exists_relLen_of_smul_le (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (M : Type)
-    [AddCommGroup M] [Module (Int0 v) M]
+theorem exists_relLen_of_smul_le
+    (C : Type) [Field C]
+    (v : AddValuation C (WithTop ℝ)) (M : Type) [AddCommGroup M] [Module (Int0 v) M]
     (htf : ∀ (c : Int0 v) (x : M), c ≠ 0 → c • x = 0 → x = 0)
-    (X' X : Submodule (Int0 v) M) (hle : X' ≤ X) (hX : Module.Finite (Int0 v) X)
-    (hX' : Module.Finite (Int0 v) X') (c : Int0 v) (hc : c ≠ 0) (hcX : ∀ x ∈ X, c • x ∈ X') :
-    ∃ r : ℝ, RelLen v X' X r := by
+    (X' X : Submodule (Int0 v) M)
+    (hle : X' ≤ X) (hX : Module.Finite (Int0 v) X) (hX' : Module.Finite (Int0 v) X')
+    (c : Int0 v) (hc : c ≠ 0) (hcX : ∀ x ∈ X, c • x ∈ X')
+    : ∃ r : ℝ, RelLen v X' X r := by
   haveI tfX : Module.IsTorsionFree (Int0 v) X :=
     Module.isTorsionFree_iff_smul_eq_zero.mpr fun r x h => by
       by_cases hr : r = 0
@@ -37,12 +40,14 @@ theorem exists_relLen_of_smul_le (C : Type) [Field C] (v : AddValuation C (WithT
   haveI := GlobalTheory.free_of_finite_of_isTorsionFree_of_valuationRing (R := Int0 v) (M := X')
   let ι : X' →ₗ[Int0 v] X := Submodule.inclusion hle
   have hι : Function.Injective ι := Submodule.inclusion_injective hle
-  let μ : X →ₗ[Int0 v] X' :=
-    { toFun := fun x => ⟨c • (x : M), hcX x x.2⟩
-      map_add' := fun x y => Subtype.ext (smul_add c (x : M) y)
-      map_smul' := fun r x => Subtype.ext (by
+  let μ : X →ₗ[Int0 v] X' := {
+    toFun := fun x => ⟨c • (x : M), hcX x x.2⟩
+    map_add' := fun x y => Subtype.ext (smul_add c (x : M) y)
+    map_smul' := fun r x =>
+      Subtype.ext (by
         change c • (r • (x : M)) = r • (c • (x : M))
-        exact smul_comm c r (x : M)) }
+        exact smul_comm c r (x : M))
+  }
   have hμ : Function.Injective μ := by
     intro x y hxy
     have : c • ((x : M) - y) = 0 := by

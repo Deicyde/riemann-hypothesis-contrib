@@ -14,16 +14,18 @@ variable {F E K : Type} [Field F] [Field E] [Algebra F E] [Field K] [Algebra F K
 
 def sigT (σ : E →ₐ[F] E) : K ⊗[F] E →ₐ[F] K ⊗[F] E := Algebra.TensorProduct.map (AlgHom.id F K) σ
 
-theorem sigT_algebraMap (σ : E →ₐ[F] E) (x : K) :
-    sigT σ (algebraMap K (K ⊗[F] E) x) = algebraMap K (K ⊗[F] E) x := by
+theorem sigT_algebraMap (σ : E →ₐ[F] E) (x : K)
+    : sigT σ (algebraMap K (K ⊗[F] E) x) = algebraMap K (K ⊗[F] E) x := by
   simp [sigT, Algebra.TensorProduct.algebraMap_apply]
 
-theorem sigT_tmul_one (σ : E →ₐ[F] E) (a : E) : sigT (K := K) σ ((1 : K) ⊗ₜ[F] a) = (1 : K) ⊗ₜ[F] σ a := by
+theorem sigT_tmul_one (σ : E →ₐ[F] E) (a : E)
+    : sigT (K := K) σ ((1 : K) ⊗ₜ[F] a) = (1 : K) ⊗ₜ[F] σ a := by
   simp [sigT]
 
-theorem exists_alpha (σ : E →ₐ[F] E) (hσσ : ∀ a, σ (σ a) = a)
-    (hfix : ∀ a, σ a = a → a ∈ (algebraMap F E).range) (h2 : Module.finrank F E = 2) :
-    ∃ α : E, α ≠ 0 ∧ σ α = -α := by
+theorem exists_alpha
+    (σ : E →ₐ[F] E) (hσσ : ∀ a, σ (σ a) = a) (hfix : ∀ a, σ a = a → a ∈ (algebraMap F E).range)
+    (h2 : Module.finrank F E = 2)
+    : ∃ α : E, α ≠ 0 ∧ σ α = -α := by
   have : ∃ a : E, a ∉ (algebraMap F E).range := by
     by_contra hall
     push Not at hall
@@ -41,13 +43,13 @@ theorem exists_alpha (σ : E →ₐ[F] E) (hσσ : ∀ a, σ (σ a) = a)
     exact ha (hfix a (by linear_combination -h0))
   · rw [map_sub, hσσ]; ring
 
-variable (σ : E →ₐ[F] E) (hσσ : ∀ a, σ (σ a) = a)
-    (hfix : ∀ a, σ a = a → a ∈ (algebraMap F E).range) (h2 : Module.finrank F E = 2)
-    (h2K : (2 : K) ≠ 0)
+variable
+  (σ : E →ₐ[F] E) (hσσ : ∀ a, σ (σ a) = a) (hfix : ∀ a, σ a = a → a ∈ (algebraMap F E).range)
+  (h2 : Module.finrank F E = 2) (h2K : (2 : K) ≠ 0)
 
 include hσσ hfix h2 h2K in
-theorem exists_split (hnf : ¬ IsField (K ⊗[F] E)) :
-    ∃ π : K ⊗[F] E ≃+* K × K, ∀ r, π (sigT σ r) = (π r).swap := by
+theorem exists_split (hnf : ¬ IsField (K ⊗[F] E))
+    : ∃ π : K ⊗[F] E ≃+* K × K, ∀ r, π (sigT σ r) = (π r).swap := by
   have h2F : (2 : F) ≠ 0 := by
     intro h
     apply h2K
@@ -77,10 +79,10 @@ theorem exists_split (hnf : ¬ IsField (K ⊗[F] E)) :
   set A : K ⊗[F] E := (1 : K) ⊗ₜ[F] α with hAdef
   have hbR0 : bR 0 = 1 := by
     simp [bR, Algebra.TensorProduct.basis_apply, hbE0, Algebra.TensorProduct.one_def]
-  have hbR1 : bR 1 = A := by
-    simp [bR, Algebra.TensorProduct.basis_apply, hbE1, hAdef]
-  have hdec : ∀ r : K ⊗[F] E, ∃ x y : K,
-      r = algebraMap K (K ⊗[F] E) x + algebraMap K (K ⊗[F] E) y * A := by
+  have hbR1 : bR 1 = A := by simp [bR, Algebra.TensorProduct.basis_apply, hbE1, hAdef]
+  have hdec
+      : ∀ r : K ⊗[F] E, ∃ x y : K,
+        r = algebraMap K (K ⊗[F] E) x + algebraMap K (K ⊗[F] E) y * A := by
     intro r
     refine ⟨bR.repr r 0, bR.repr r 1, ?_⟩
     conv_lhs => rw [← bR.sum_repr r]
@@ -92,16 +94,14 @@ theorem exists_split (hnf : ¬ IsField (K ⊗[F] E)) :
     rw [map_zero] at hb0
     exact hα0 (mul_self_eq_zero.1 hb0.symm)
   set bK : K := algebraMap F K b0 with hbK
-  have hbK0 : bK ≠ 0 := by
-    rw [hbK]; exact (map_ne_zero _).2 hb00
+  have hbK0 : bK ≠ 0 := by rw [hbK]; exact (map_ne_zero _).2 hb00
   have hA : A * A = algebraMap K (K ⊗[F] E) bK := by
-    rw [hAdef, Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← hb0, Algebra.TensorProduct.algebraMap_apply, hbK,
-      Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul,
-      TensorProduct.smul_tmul']
+    rw [hAdef, Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← hb0,
+      Algebra.TensorProduct.algebraMap_apply, hbK, Algebra.algebraMap_eq_smul_one,
+      Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul, TensorProduct.smul_tmul']
     congr 1
     rw [smul_eq_mul, mul_one, Algebra.algebraMap_eq_smul_one]
-  have hnt : (1 : K ⊗[F] E) ≠ 0 := by
-    rw [← hbR0]; exact bR.ne_zero 0
+  have hnt : (1 : K ⊗[F] E) ≠ 0 := by rw [← hbR0]; exact bR.ne_zero 0
 
   have hsq : ∃ c : K, c * c = bK := by
     by_contra hno
@@ -121,17 +121,20 @@ theorem exists_split (hnf : ¬ IsField (K ⊗[F] E)) :
       · apply hno (x / y)
         field_simp
         linear_combination h0
-    refine ⟨algebraMap K (K ⊗[F] E) N⁻¹ *
-      (algebraMap K (K ⊗[F] E) x - algebraMap K (K ⊗[F] E) y * A), ?_⟩
-    have hNN : algebraMap K (K ⊗[F] E) N⁻¹ *
-        (algebraMap K (K ⊗[F] E) x * algebraMap K (K ⊗[F] E) x -
-          algebraMap K (K ⊗[F] E) bK * algebraMap K (K ⊗[F] E) y * algebraMap K (K ⊗[F] E) y) = 1 := by
+    refine ⟨
+      algebraMap K (K ⊗[F] E) N⁻¹ * (algebraMap K (K ⊗[F] E) x - algebraMap K (K ⊗[F] E) y * A),
+      ?_
+    ⟩
+    have hNN
+        : algebraMap K (K ⊗[F] E) N⁻¹
+            * (algebraMap K (K ⊗[F] E) x * algebraMap K (K ⊗[F] E) x
+              - algebraMap K (K ⊗[F] E) bK * algebraMap K (K ⊗[F] E) y * algebraMap K (K ⊗[F] E) y)
+          = 1 := by
       rw [← map_mul, ← map_mul, ← map_mul, ← map_sub, ← map_mul, ← hN, inv_mul_cancel₀ hN0, map_one]
     linear_combination (-(algebraMap K (K ⊗[F] E) N⁻¹ * algebraMap K (K ⊗[F] E) y *
       algebraMap K (K ⊗[F] E) y)) * hA + hNN
   obtain ⟨c, hc⟩ := hsq
-  have hc0 : c ≠ 0 := by
-    rintro rfl; exact hbK0 (by simpa using hc.symm)
+  have hc0 : c ≠ 0 := by rintro rfl; exact hbK0 (by simpa using hc.symm)
   set ac := algebraMap K (K ⊗[F] E) c
   set aci := algebraMap K (K ⊗[F] E) c⁻¹
   set a2i := algebraMap K (K ⊗[F] E) (2⁻¹ : K)
@@ -145,26 +148,26 @@ theorem exists_split (hnf : ¬ IsField (K ⊗[F] E)) :
     rw [he]
     linear_combination (a2i ^ 2 * aci ^ 2) * hA - (a2i ^ 2 * aci ^ 2) * hcc +
       (a2i ^ 2 * (aci * ac + 1)) * hci + ((1 + aci * A) * a2i) * h2i
-  have hsA : sigT σ A = -A := by
-    rw [hAdef, sigT_tmul_one, hσα, TensorProduct.tmul_neg]
+  have hsA : sigT σ A = -A := by rw [hAdef, sigT_tmul_one, hσα, TensorProduct.tmul_neg]
   have hse : sigT σ e = 1 - e := by
     rw [he, map_mul, map_add (f := _), map_one, map_mul, hsA]
     simp only [a2i, aci, sigT_algebraMap]
     linear_combination h2i
 
-  let ψ : K × K →+* K ⊗[F] E :=
-    { toFun := fun p => algebraMap K (K ⊗[F] E) p.1 * e + algebraMap K (K ⊗[F] E) p.2 * (1 - e)
-      map_one' := by simp only [Prod.fst_one, Prod.snd_one, map_one]; ring
-      map_mul' := by
-        intro p q
-        simp only [Prod.fst_mul, Prod.snd_mul, map_mul]
-        linear_combination (-(algebraMap K (K ⊗[F] E) p.1 - algebraMap K (K ⊗[F] E) p.2) *
-          (algebraMap K (K ⊗[F] E) q.1 - algebraMap K (K ⊗[F] E) q.2)) * hee
-      map_zero' := by simp
-      map_add' := by
-        intro p q
-        simp only [Prod.fst_add, Prod.snd_add, map_add (f := _)]
-        ring }
+  let ψ : K × K →+* K ⊗[F] E := {
+    toFun := fun p => algebraMap K (K ⊗[F] E) p.1 * e + algebraMap K (K ⊗[F] E) p.2 * (1 - e)
+    map_one' := by simp only [Prod.fst_one, Prod.snd_one, map_one]; ring
+    map_mul' := by
+      intro p q
+      simp only [Prod.fst_mul, Prod.snd_mul, map_mul]
+      linear_combination (-(algebraMap K (K ⊗[F] E) p.1 - algebraMap K (K ⊗[F] E) p.2) *
+        (algebraMap K (K ⊗[F] E) q.1 - algebraMap K (K ⊗[F] E) q.2)) * hee
+    map_zero' := by simp
+    map_add' := by
+      intro p q
+      simp only [Prod.fst_add, Prod.snd_add, map_add (f := _)]
+      ring
+  }
   have hψ : ∀ p, ψ p = algebraMap K (K ⊗[F] E) p.1 * e + algebraMap K (K ⊗[F] E) p.2 * (1 - e) :=
     fun p => rfl
   have he0 : e ≠ 0 := by
@@ -179,15 +182,15 @@ theorem exists_split (hnf : ¬ IsField (K ⊗[F] E)) :
     rw [h1, map_one, sub_self] at this
     exact hnt this
   have hinj : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro p hp
     rw [hψ] at hp
     have h1 : algebraMap K (K ⊗[F] E) p.1 * e = 0 := by
       have := congrArg (· * e) hp
       simp only [zero_mul] at this
       linear_combination this - (algebraMap K (K ⊗[F] E) p.1 - algebraMap K (K ⊗[F] E) p.2) * hee
-    have h2' : algebraMap K (K ⊗[F] E) p.2 * (1 - e) = 0 := by
-      linear_combination hp - h1
+    have h2' : algebraMap K (K ⊗[F] E) p.2 * (1 - e) = 0 := by linear_combination hp - h1
     rw [← Algebra.smul_def] at h1 h2'
     have e1 := (smul_eq_zero.1 h1).resolve_right he0
     have e2 := (smul_eq_zero.1 h2').resolve_right he1
@@ -205,7 +208,8 @@ theorem exists_split (hnf : ¬ IsField (K ⊗[F] E)) :
   intro r
   obtain ⟨p, rfl⟩ := hsurj r
   have : sigT σ (ψ p) = ψ p.swap := by
-    rw [hψ, hψ, map_add (f := _), map_mul, map_mul, sigT_algebraMap, sigT_algebraMap, map_sub, map_one, hse]
+    rw [hψ, hψ, map_add (f := _), map_mul, map_mul, sigT_algebraMap, sigT_algebraMap, map_sub,
+      map_one, hse]
     simp only [Prod.fst_swap, Prod.snd_swap]
     ring
   have hΨ : ∀ q, Ψ.symm (ψ q) = q := fun q => Ψ.symm_apply_apply q

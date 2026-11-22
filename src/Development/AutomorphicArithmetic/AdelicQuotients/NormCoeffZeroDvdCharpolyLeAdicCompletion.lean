@@ -7,13 +7,14 @@ public import GroundTheory.GlobalFields.IdeleGroups.GaloisOnAdeles.Places
 @[expose] public section
 
 open NumberField IsDedekindDomain Polynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global
+  GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
 open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.Tf.Geo
 open scoped NumberField.AdeleRing
 
-private theorem charpoly_scale {K : Type} [Field K] [Infinite K] {n : ℕ}
-    (M : Matrix (Fin n) (Fin n) K) {c : K} (hc : c ≠ 0) :
-    (c • M).charpoly = M.charpoly.scaleRoots c := by
+private theorem charpoly_scale
+    {K : Type} [Field K] [Infinite K] {n : ℕ} (M : Matrix (Fin n) (Fin n) K) {c : K} (hc : c ≠ 0)
+    : (c • M).charpoly = M.charpoly.scaleRoots c := by
   apply Polynomial.funext
   intro x
   obtain ⟨y, rfl⟩ : ∃ y, x = c * y := ⟨c⁻¹ * x, by rw [← mul_assoc, mul_inv_cancel₀ hc, one_mul]⟩
@@ -24,9 +25,12 @@ private theorem charpoly_scale {K : Type} [Field K] [Infinite K] {n : ℕ}
   simp only [Matrix.smul_apply, Matrix.scalar_apply, Matrix.diagonal_apply, smul_eq_mul]
   split_ifs <;> simp
 
-private theorem coeff_zero_mem {K : Type} [Field K] (O : ValuationSubring K) {n : ℕ}
-    (N : Matrix (Fin n) (Fin n) K) (hN : ∀ i j, N i j ∈ O) (q : K[X]) (hq : q.Monic)
-    (hd : q ∣ N.charpoly) : q.coeff 0 ∈ O := by
+private theorem coeff_zero_mem
+    {K : Type} [Field K]
+    (O : ValuationSubring K)
+    {n : ℕ} (N : Matrix (Fin n) (Fin n) K) (hN : ∀ i j, N i j ∈ O)
+    (q : K[X]) (hq : q.Monic) (hd : q ∣ N.charpoly)
+    : q.coeff 0 ∈ O := by
   let N' : Matrix (Fin n) (Fin n) O := fun i j => ⟨N i j, hN i j⟩
   have hmap : N'.map (algebraMap O K) = N := by
     ext i j
@@ -39,9 +43,11 @@ private theorem coeff_zero_mem {K : Type} [Field K] (O : ValuationSubring K) {n 
   rw [← hg, coeff_map]
   exact (g.coeff 0).2
 
-theorem UpperTheory.norm_coeff_zero_dvd_charpoly_le_adicCompletion :
-    ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ) (M : Matrix (Fin n) (Fin n) (w.adicCompletion E)) (R : ℝ), 1 ≤ R →
-        (∀ i j, ‖M i j‖ ≤ R) → ∀ p : (w.adicCompletion E)[X], p.Monic → p ∣ M.charpoly → ‖p.coeff 0‖ ≤ R ^ n := by
+theorem UpperTheory.norm_coeff_zero_dvd_charpoly_le_adicCompletion
+    : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ)
+        (M : Matrix (Fin n) (Fin n) (w.adicCompletion E)) (R : ℝ),
+      1 ≤ R → (∀ i j, ‖M i j‖ ≤ R)
+        → ∀ p : (w.adicCompletion E)[X], p.Monic → p ∣ M.charpoly → ‖p.coeff 0‖ ≤ R ^ n := by
   intro E _ _ w n M R hR hM p hp hd
   classical
   haveI : Infinite (w.adicCompletion E) :=
@@ -66,9 +72,11 @@ theorem UpperTheory.norm_coeff_zero_dvd_charpoly_le_adicCompletion :
     hcmax _ (Finset.mem_insert_of_mem (Finset.mem_image.2 ⟨(i, j), Finset.mem_univ _, rfl⟩))
   have hinv : c⁻¹ ≠ 0 := inv_ne_zero hc0
   have hint : ∀ x : w.adicCompletion E, ‖x‖ ≤ 1 → x ∈ w.adicCompletionIntegers E := fun x hx =>
-    (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w).2 (Valued.toNormedField.norm_le_one_iff.1 hx)
+    (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w).2
+      (Valued.toNormedField.norm_le_one_iff.1 hx)
   have hint' : ∀ x : w.adicCompletion E, x ∈ w.adicCompletionIntegers E → ‖x‖ ≤ 1 := fun x hx =>
-    Valued.toNormedField.norm_le_one_iff.2 ((HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w).1 hx)
+    Valued.toNormedField.norm_le_one_iff.2
+      ((HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w).1 hx)
   have hN : ∀ i j, (c⁻¹ • M) i j ∈ w.adicCompletionIntegers E := by
     intro i j
     apply hint
@@ -83,11 +91,12 @@ theorem UpperTheory.norm_coeff_zero_dvd_charpoly_le_adicCompletion :
   have hmem := hint' _ (coeff_zero_mem _ _ hN _ hq hdq)
   rw [Polynomial.coeff_scaleRoots, Nat.sub_zero, norm_mul, norm_pow, norm_inv, inv_pow] at hmem
   have hcpos : 0 < ‖c‖ ^ p.natDegree := by positivity
-  have h1 : ‖p.coeff 0‖ ≤ ‖c‖ ^ p.natDegree := by
-    rwa [← div_eq_mul_inv, div_le_one hcpos] at hmem
+  have h1 : ‖p.coeff 0‖ ≤ ‖c‖ ^ p.natDegree := by rwa [← div_eq_mul_inv, div_le_one hcpos] at hmem
   have hdeg : p.natDegree ≤ n := by
     have := Polynomial.natDegree_le_of_dvd hd (Matrix.charpoly_monic M).ne_zero
     simpa [Matrix.charpoly_natDegree_eq_dim] using this
-  calc ‖p.coeff 0‖ ≤ ‖c‖ ^ p.natDegree := h1
+  calc
+    ‖p.coeff 0‖
+      ≤ ‖c‖ ^ p.natDegree := h1
     _ ≤ R ^ p.natDegree := pow_le_pow_left₀ (norm_nonneg _) hcR _
     _ ≤ R ^ n := pow_le_pow_right₀ hR hdeg

@@ -7,18 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LatticeCompl
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.G3 (sp)
 open GlobalTheory.UPel.HT.HeckeAd (IsTranslA heckeSubA)
 open scoped TensorProduct
 open UpperTheory.Gal.FiniteEtaleModels
 
-private theorem ev_eq {Λ Q : Type} [AddCommGroup Λ] [Group Q] (E : ℕ → Λ → Q)
-    (add : ∀ n x y, E n (x + y) = E n x * E n y) (ker : ∀ n, 0 < n → ∀ x, E n x = 1 ↔ ∃ y, x = n • y)
-    (tower : ∀ n m, 0 < n → 0 < m → ∀ x, E (n * m) x ^ m = E n x) {κ m N : ℕ} (hN : N = κ * m) (hκ : 0 < κ)
-    (hm : 0 < m) {a b c : Λ} (h : a = b + κ • c) : E κ a = E N (m • b) := by
+private theorem ev_eq
+    {Λ Q : Type} [AddCommGroup Λ] [Group Q]
+    (E : ℕ → Λ → Q) (add : ∀ n x y, E n (x + y) = E n x * E n y)
+    (ker : ∀ n, 0 < n → ∀ x, E n x = 1 ↔ ∃ y, x = n • y)
+    (tower : ∀ n m, 0 < n → 0 < m → ∀ x, E (n * m) x ^ m = E n x)
+    {κ m N : ℕ} (hN : N = κ * m) (hκ : 0 < κ) (hm : 0 < m)
+    {a b c : Λ} (h : a = b + κ • c)
+    : E κ a = E N (m • b) := by
   have hz : ∀ n, E n 0 = 1 := by
     intro n
     have h0 := add n 0 0
@@ -32,8 +39,7 @@ private theorem ev_eq {Λ Q : Type} [AddCommGroup Λ] [Group Q] (E : ℕ → Λ 
   have hc : E κ (κ • c) = 1 := (ker κ hκ _).mpr ⟨c, rfl⟩
   rw [h, add, hc, _root_.mul_one, hN, hpow, tower κ m hκ hm]
 
-theorem UpperTheory.Gal.FiniteEtaleModels.trKer_holds :
-    TrKer := by
+theorem UpperTheory.Gal.FiniteEtaleModels.trKer_holds : TrKer := by
   intro p _ D G L R _ _ gb h X s M₁ M₂ o' o ψ hT n κ c₁ hM hsurj f hf Ω _ _ z g hg hgk
   obtain ⟨hM3, hMc⟩ := M₁.2
   have hne : (M₁ : ℕ) ≠ 0 := by omega
@@ -57,21 +63,24 @@ theorem UpperTheory.Gal.FiniteEtaleModels.trKer_holds :
   have hinv : ∀ y, L.actG h⁻¹ (L.actG h y) = y := by
     intro y
     rw [← Module.End.mul_apply, ← map_mul, _root_.inv_mul_cancel, map_one, Module.End.one_apply]
-  obtain ⟨x, w, hw, hvx⟩ := GlobalTheory.T.latticeCompletion_eq_latticeVector_add_nsmul p D (n * κ) (Nat.mul_pos hn0 hκ0) hnκc v hv
+  obtain ⟨x, w, hw, hvx⟩ :=
+    GlobalTheory.T.latticeCompletion_eq_latticeVector_add_nsmul p D (n * κ) (Nat.mul_pos hn0 hκ0)
+      hnκc v hv
   obtain ⟨w', hw', hfx⟩ := hf x
   obtain ⟨w'', hw'', hw''e⟩ := hsurj w hw
   have e2 : κ • L.actG h⁻¹ w = w'' := by rw [← map_nsmul, ← hw''e, hinv]
   have key : inAf D ((show D.La from a) - f x) = κ • (n • (w' + w'')) := by
     have e1 : inAf D a = L.actG h⁻¹ (κ • v) := by rw [← hav, hinv]
-    rw [GlobalTheory.HeckeApprox.inAf_sub, e1, hvx, map_nsmul, map_add (f := _), map_nsmul, _root_.smul_add, hfx,
-      smul_comm κ (n * κ), e2, smul_smul κ n, mul_comm κ n, _root_.smul_add]
+    rw [GlobalTheory.HeckeApprox.inAf_sub, e1, hvx, map_nsmul, map_add (f := _), map_nsmul,
+      _root_.smul_add, hfx, smul_comm κ (n * κ), e2, smul_smul κ n, mul_comm κ n, _root_.smul_add]
     abel
   have hmem : n • (w' + w'') ∈ LaHat D := AddSubgroup.nsmul_mem _ (AddSubgroup.add_mem _ hw' hw'') n
   obtain ⟨y, hy⟩ := LatDiv.eq_nsmul_of_inAf_eq_nsmul p D _ κ hκ0 hκc _ hmem key
   have hay : (show D.La from a) = f x + κ • y := by rw [← hy]; abel
   refine ⟨x, ?_⟩
-  calc g = I'.ev κ a := ha.symm
+  calc
+    g = I'.ev κ a := ha.symm
     _ = I'.ev (M₁ : ℕ) ((n * c₁) • f x) :=
-        ev_eq I'.ev I'.add I'.ker I'.tower (by rw [hM]; ring) hκ0 (Nat.mul_pos hn0 hc0) hay
+      ev_eq I'.ev I'.add I'.ker I'.tower (by rw [hM]; ring) hκ0 (Nat.mul_pos hn0 hc0) hay
     _ = I'.ev (M₁ : ℕ) (c₁ • n • f x) := by rw [smul_smul, mul_comm n c₁]
     _ = _ := (h1 _).symm

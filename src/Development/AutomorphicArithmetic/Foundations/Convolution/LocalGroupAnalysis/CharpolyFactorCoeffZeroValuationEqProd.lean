@@ -216,30 +216,36 @@ private lemma main [IsAlgClosed K] (t : Fin n → K) (ht0 : ∀ i, t i ≠ 0)
 end UpperTheory.ConvolutionTheory.G.TA1
 
 open UpperTheory.ConvolutionTheory.G.TA1 GroundTheory.Automorphic in
-theorem UpperTheory.ConvolutionTheory.G.charpoly_factor_coeff_zero_valuation_eq_prod :
-    A1 := by
+theorem UpperTheory.ConvolutionTheory.G.charpoly_factor_coeff_zero_valuation_eq_prod : A1 := by
   intro k _ _ _ _ n μ hμ a ha b hb p hp hd
   obtain ⟨h1, h2, h3⟩ := (GLnLocal.mem_iwahori_iff k n).mp ((GLnLocal.iwahori k n).mul_mem hb ha)
   let f : k →+* AlgebraicClosure k := algebraMap _ _
   obtain ⟨B, hB⟩ := ext_val (ValuativeRel.valuation k) f
-  have hd' : p ∣ (Matrix.diagonal (fun i => (GLnLocal.uniformizer k : k) ^ μ i) *
-      ((b * a : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)).charpoly := by
-    rwa [Units.val_mul, Units.val_mul, Matrix.mul_assoc, Matrix.charpoly_mul_comm, Cartan.coe_diagPow,
-      Matrix.mul_assoc, ← Units.val_mul] at hd
+  have hd'
+      : p
+        ∣ (Matrix.diagonal (fun i => (GLnLocal.uniformizer k : k) ^ μ i)
+          * ((b * a : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)).charpoly := by
+    rwa [Units.val_mul, Units.val_mul, Matrix.mul_assoc, Matrix.charpoly_mul_comm,
+        Cartan.coe_diagPow, Matrix.mul_assoc, ← Units.val_mul]
+      at hd
   have hπ := Cartan.uniformizer_ne_zero k
-  obtain ⟨J, hJ, hv⟩ := main B.valuation (fun i => f ((GLnLocal.uniformizer k : k) ^ μ i))
-    (fun i => (map_ne_zero f).mpr (zpow_ne_zero _ hπ))
-    (fun i j h => by
-      have h' := (hB.eq_iff).mp h
-      simp only [map_zpow₀] at h'
-      exact hμ (zpow_right_injective₀ (GLnLocal.valuation_uniformizer_pos k)
-        (GLnLocal.valuation_uniformizer_lt_one k).ne h'))
-    (((b * a : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).map f)
-    (fun i j => (hB.le_one_iff_le_one).mpr (h1 i j))
-    (fun i j h => (hB.lt_one_iff_lt_one).mpr (h2 i j h))
-    (fun i => (hB.eq_one_iff_eq_one).mpr (h3 i)) (p.map f) (hp.map f) (by
-      have := Polynomial.map_dvd f hd'
-      rwa [← Matrix.charpoly_map, Matrix.map_mul, Matrix.diagonal_map (map_zero f)] at this)
+  obtain ⟨J, hJ, hv⟩ :=
+    main B.valuation
+      (fun i => f ((GLnLocal.uniformizer k : k) ^ μ i))
+      (fun i => (map_ne_zero f).mpr (zpow_ne_zero _ hπ))
+      (fun i j h => by
+        have h' := (hB.eq_iff).mp h
+        simp only [map_zpow₀] at h'
+        exact hμ (zpow_right_injective₀ (GLnLocal.valuation_uniformizer_pos k)
+          (GLnLocal.valuation_uniformizer_lt_one k).ne h'))
+      (((b * a : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).map f)
+      (fun i j => (hB.le_one_iff_le_one).mpr (h1 i j))
+      (fun i j h => (hB.lt_one_iff_lt_one).mpr (h2 i j h))
+      (fun i => (hB.eq_one_iff_eq_one).mpr (h3 i))
+      (p.map f) (hp.map f)
+      (by
+        have := Polynomial.map_dvd f hd'
+        rwa [← Matrix.charpoly_map, Matrix.map_mul, Matrix.diagonal_map (map_zero f)] at this)
   refine ⟨J, by rw [hJ, natDegree_map], ?_⟩
   rw [coeff_map, ← map_prod] at hv
   simp only [Cartan.coe_diagPow, Matrix.diagonal_apply_eq]

@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -26,8 +28,8 @@ theorem continuous_lastRow : Continuous (lastRow : GA E k → Fin k → Ad E) :=
   · exact Continuous.matrix_elem Units.continuous_val i c
   · exact continuous_const
 
-theorem lastRow_mir (p : GL (Fin k) E) (hp : IsMir (k - 1) p) (g : GA E k) :
-    lastRow (ratGL E k p * g) = lastRow g := by
+theorem lastRow_mir (p : GL (Fin k) E) (hp : IsMir (k - 1) p) (g : GA E k)
+    : lastRow (ratGL E k p * g) = lastRow g := by
   funext c
   unfold lastRow
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -42,15 +44,22 @@ theorem lastRow_mir (p : GL (Fin k) E) (hp : IsMir (k - 1) p) (g : GA E k) :
     simp [Matrix.one_apply]
   · rfl
 
-theorem measurable_sumF [Countable (RowT E k k)] {f : GA E k → ℂ} (hf : Continuous f)
-    (hfin : ∀ g, {ξ : RowT E k k | f (ratGL E k (gam ξ) * g) ≠ 0}.Finite) : Measurable (sumF f) := by
+theorem measurable_sumF
+    [Countable (RowT E k k)]
+    {f : GA E k → ℂ}
+    (hf : Continuous f) (hfin : ∀ g, {ξ : RowT E k k | f (ratGL E k (gam ξ) * g) ≠ 0}.Finite)
+    : Measurable (sumF f) := by
   refine measurable_of_tendsto_metrizable' (Filter.atTop : Filter (Finset (RowT E k k)))
-    (f := fun T g => ∑ ξ ∈ T, f (ratGL E k (gam ξ) * g)) (fun T => ?_) ?_
-  · exact Finset.measurable_sum _ fun ξ _ => (hf.comp (continuous_const.mul continuous_id)).measurable
+    (f := fun T g => ∑ ξ ∈ T, f (ratGL E k (gam ξ) * g))
+    (fun T => ?_)
+    ?_
+  · exact Finset.measurable_sum _ fun ξ _ =>
+      (hf.comp (continuous_const.mul continuous_id)).measurable
   · rw [tendsto_pi_nhds]
     intro g
-    have e : ∀ T : Finset (RowT E k k), (hfin g).toFinset ⊆ T →
-        ∑ ξ ∈ T, f (ratGL E k (gam ξ) * g) = sumF f g := by
+    have e
+        : ∀ T : Finset (RowT E k k),
+          (hfin g).toFinset ⊆ T → ∑ ξ ∈ T, f (ratGL E k (gam ξ) * g) = sumF f g := by
       intro T hT
       unfold sumF
       rw [tsum_eq_sum (s := T)]
@@ -59,11 +68,15 @@ theorem measurable_sumF [Countable (RowT E k k)] {f : GA E k → ℂ} (hf : Cont
       exact hb (hT ((hfin g).mem_toFinset.2 h))
     exact tendsto_const_nhds.congr' (Filter.eventually_atTop.2 ⟨_, fun T hT => (e T hT).symm⟩)
 
-theorem fin_bd {X : ℂ} {B C x y : ℝ} (hB : 0 ≤ B) (hx : 0 ≤ x) (hxy : x ≤ y)
-    (h : ‖X‖ₑ ≤ ENNReal.ofReal B * ENNReal.ofReal (C * x)) : ‖X‖ ≤ B * max C 0 * y := by
+theorem fin_bd
+    {X : ℂ} {B C x y : ℝ}
+    (hB : 0 ≤ B) (hx : 0 ≤ x) (hxy : x ≤ y) (h : ‖X‖ₑ ≤ ENNReal.ofReal B * ENNReal.ofReal (C * x))
+    : ‖X‖ ≤ B * max C 0 * y := by
   rw [← ENNReal.ofReal_mul hB, ← ofReal_norm, ENNReal.ofReal_le_ofReal_iff'] at h
   have h0 : C * x ≤ max C 0 * y :=
-    calc C * x ≤ max C 0 * x := mul_le_mul_of_nonneg_right (le_max_left _ _) hx
+    calc
+      C * x
+        ≤ max C 0 * x := mul_le_mul_of_nonneg_right (le_max_left _ _) hx
       _ ≤ max C 0 * y := mul_le_mul_of_nonneg_left hxy (le_max_right _ _)
   have h1 : B * (C * x) ≤ B * max C 0 * y := by
     rw [mul_assoc]; exact mul_le_mul_of_nonneg_left h0 hB
@@ -76,7 +89,8 @@ theorem enorm_conj' (z : ℂ) : ‖conj z‖ₑ = ‖z‖ₑ := by
 end PKEq2
 
 open PKEq2 in
-theorem kernel_equality_second_of : D0 → N0 → H0 → ThetaDecaying → RowsInCompactSet → PoissonCutoffFormula → KEq2 := by
+theorem kernel_equality_second_of
+    : D0 → N0 → H0 → ThetaDecaying → RowsInCompactSet → PoissonCutoffFormula → KEq2 := by
   intro hD0 hN0 hH0 hG4t hG5t hK12 E _ _ _ k hk ψ hψ S α' φ' hφ' U φ η s hcut hinv hcen
   obtain ⟨hDpos, hDmul, hDcont, hDrat, -, hDinv, -⟩ := hD0 E k
   obtain ⟨-, -, -, -, -, -, hcount, -, hperm, -⟩ := hN0 E k k hk le_rfl
@@ -88,7 +102,8 @@ theorem kernel_equality_second_of : D0 → N0 → H0 → ThetaDecaying → RowsI
   set F : GA E k → ℂ := fun g => (η (lastRow g) : ℂ) * φ (g * (s (lastRow g))⁻¹) with hF
   have hVc : Continuous V := hcut.contV
   have hVcpt : HasCompactSupport V := by
-    have h1 : HasCompactSupport (fun y => (η y : ℂ)) := hcut.cpt.comp_left (g := Complex.ofReal) (by simp)
+    have h1 : HasCompactSupport (fun y => (η y : ℂ)) :=
+      hcut.cpt.comp_left (g := Complex.ofReal) (by simp)
     exact h1.smul_right (f' := fun y => Rt E k (s y)⁻¹ φ)
   have hFV : ∀ x, F x = V (lastRow x) x := fun x => by simp [hF, hV]
   have hFc : Continuous F := by
@@ -144,15 +159,19 @@ theorem kernel_equality_second_of : D0 → N0 → H0 → ThetaDecaying → RowsI
     have hB0 : 0 ≤ B := (norm_nonneg _).trans (hB 0)
     obtain ⟨C, hC⟩ := (hG4t E k hk φ' hφ'.dec).2 (tsupport η) hcpt (k * M + k) (by nlinarith)
     refine ⟨B * max C 0, fun g hg => ?_⟩
-    have hFbd : ∀ x, ‖F x‖ₑ ≤ ENNReal.ofReal B * (tsupport η).indicator (fun _ => (1 : ℝ≥0∞)) (lastRow x) := by
+    have hFbd
+        : ∀ x,
+          ‖F x‖ₑ ≤ ENNReal.ofReal B * (tsupport η).indicator (fun _ => (1 : ℝ≥0∞)) (lastRow x) := by
       intro x
       by_cases hx : lastRow x ∈ tsupport η
       · rw [Set.indicator_of_mem hx, mul_one, ← ofReal_norm]
-        exact ENNReal.ofReal_le_ofReal (by rw [hFV]; exact ((V (lastRow x)).norm_coe_le_norm x).trans (hB _))
+        exact ENNReal.ofReal_le_ofReal (by
+          rw [hFV]; exact ((V (lastRow x)).norm_coe_le_norm x).trans (hB _))
       · rw [Set.indicator_of_notMem hx, hFzero x hx]; simp
     set θ := ∑' ξ : RowT E k k, (tsupport η).indicator (fun _ => (1 : ℝ≥0∞)) (lastRow (ratGL E k (gam ξ) * g)) with hθ
     have hS : ‖sumF F g‖ₑ ≤ ENNReal.ofReal B * θ :=
-      enorm_tsum_le_tsum_enorm.trans ((ENNReal.tsum_le_tsum fun ξ => hFbd _).trans_eq ENNReal.tsum_mul_left)
+      enorm_tsum_le_tsum_enorm.trans ((ENNReal.tsum_le_tsum fun ξ => hFbd _).trans_eq
+        ENNReal.tsum_mul_left)
     have hx : Dt g ^ (-((k * M + k : ℕ) : ℝ) / k) ≤ (Dt g ^ M)⁻¹ := by
       have e : (-((k * M + k : ℕ) : ℝ) / k) = -(((M + 1 : ℕ) : ℝ)) := by push_cast; field_simp
       rw [e, Real.rpow_neg (hDpos g).le, Real.rpow_natCast]
@@ -160,22 +179,28 @@ theorem kernel_equality_second_of : D0 → N0 → H0 → ThetaDecaying → RowsI
     refine fin_bd hB0 (Real.rpow_nonneg (hDpos g).le _) hx ?_
     simp only [hp1, mul_one]
     rw [enorm_mul, enorm_conj']
-    calc ‖sumF F g‖ₑ * ‖φ' g‖ₑ ≤ (ENNReal.ofReal B * θ) * ‖φ' g‖ₑ := by gcongr
+    calc
+      ‖sumF F g‖ₑ * ‖φ' g‖ₑ
+        ≤ (ENNReal.ofReal B * θ) * ‖φ' g‖ₑ := by gcongr
       _ = ENNReal.ofReal B * (θ * ‖φ' g‖ₑ) := mul_assoc _ _ _
       _ ≤ _ := by gcongr; exact hC g
   · obtain ⟨Cf, hCf, hft⟩ := hcut.ft
     obtain ⟨M, C, hC⟩ := (hG4t E k hk (fun x => φ' (invT x)) hφ'.dec').1 Cf hCf k le_rfl
     obtain ⟨C', hC'⟩ := hft M
     refine ⟨max C' 0 * max C 0, fun g _ => ?_⟩
-    have hJ : ∀ (z : Fin k → Ad E), ‖∫ y, (η y : ℂ) * φ (g * (s y)⁻¹) * ψ (∑ i, y i * z i) ∂vecMeasure E (Fin k)‖ₑ ≤
-        ENNReal.ofReal (max C' 0) * ENNReal.ofReal (Cf.indicator (fun _ => ((1 + ‖fun i => pInf E (z i)‖) ^ M)⁻¹)
-          fun i => pFin E (z i)) := by
+    have hJ
+        : ∀ (z : Fin k → Ad E),
+          ‖∫ y, (η y : ℂ) * φ (g * (s y)⁻¹) * ψ (∑ i, y i * z i) ∂vecMeasure E (Fin k)‖ₑ
+            ≤ ENNReal.ofReal (max C' 0) * ENNReal.ofReal (Cf.indicator
+              (fun _ => ((1 + ‖fun i => pInf E (z i)‖) ^ M)⁻¹)
+              fun i => pFin E (z i)) := by
       intro z
       have h := hC' z g
       by_cases hz : (fun i => pFin E (z i)) ∈ Cf
       · rw [Set.indicator_of_mem hz] at h ⊢
         rw [← ENNReal.ofReal_mul (le_max_right _ _), ← ofReal_norm]
-        exact ENNReal.ofReal_le_ofReal (h.trans (mul_le_mul_of_nonneg_right (le_max_left _ _) (by positivity)))
+        exact ENNReal.ofReal_le_ofReal (h.trans (mul_le_mul_of_nonneg_right (le_max_left _ _)
+          (by positivity)))
       · rw [Set.indicator_of_notMem hz] at h ⊢
         rw [← ofReal_norm, le_antisymm h (norm_nonneg _)]
         simp
@@ -189,11 +214,15 @@ theorem kernel_equality_second_of : D0 → N0 → H0 → ThetaDecaying → RowsI
     rw [hp1, mul_one, ← mul_assoc, hK, add_mul, add_sub_cancel_left]
     refine fin_bd (le_max_right _ _) (hDpos g).le le_rfl ?_
     rw [enorm_mul, enorm_conj']
-    calc _ ≤ (ENNReal.ofReal (max C' 0) * ∑' ξ : {ξ : Fin k → E // ξ ≠ 0}, ENNReal.ofReal (Cf.indicator
-          (fun _ => ((1 + ‖fun i => pInf E (((fun i => algebraMap E (Ad E) (ξ.1 i)) ᵥ* (invT g).val) i)‖) ^ M)⁻¹)
-          fun i => pFin E (((fun i => algebraMap E (Ad E) (ξ.1 i)) ᵥ* (invT g).val) i))) * ‖φ' g‖ₑ := by
-          gcongr
-          exact enorm_tsum_le_tsum_enorm.trans ((ENNReal.tsum_le_tsum fun ξ => hJ _).trans_eq ENNReal.tsum_mul_left)
+    calc
+      _ ≤ (ENNReal.ofReal (max C' 0)
+            * ∑' ξ : {ξ : Fin k → E // ξ ≠ 0}, ENNReal.ofReal (Cf.indicator
+              (fun _ => ((1 + ‖fun i => pInf E (((fun i => algebraMap E (Ad E) (ξ.1 i)) ᵥ* (invT g).val) i)‖) ^ M)⁻¹)
+              fun i => pFin E (((fun i => algebraMap E (Ad E) (ξ.1 i)) ᵥ* (invT g).val) i)))
+          * ‖φ' g‖ₑ := by
+        gcongr
+        exact enorm_tsum_le_tsum_enorm.trans ((ENNReal.tsum_le_tsum fun ξ => hJ _).trans_eq
+          ENNReal.tsum_mul_left)
       _ = ENNReal.ofReal (max C' 0) * (_ * ‖φ' g‖ₑ) := mul_assoc _ _ _
       _ ≤ _ := by gcongr
 

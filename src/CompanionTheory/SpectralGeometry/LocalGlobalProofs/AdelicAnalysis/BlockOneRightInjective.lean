@@ -7,7 +7,8 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 noncomputable section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.StabFirst
@@ -158,8 +159,12 @@ end Blocks
 
 section Grp
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-  (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (s : E)
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (R : Type) [CommRing R] [Algebra F R]
+  (σ : E →ₐ[F] E)
+  {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+  (s : E)
 
 lemma JR_blockOne : JR (F := F) R (blockOne s J) = blockOne (inclR (F := F) R s) (JR (F := F) R J) :=
   map_blockOne (inclR (F := F) R) s J
@@ -176,8 +181,7 @@ lemma of_blockGL_mem_HR {g : GL (Fin M) (R ⊗[F] E)} (hg : blockGL g ∈ HR R �
   rw [JR_blockOne] at hg
   exact of_blockGL_mem_UJ _ _ _ hg
 
-def mkHA (g : GL (Fin M) (R ⊗[F] E)) (hg : g ∈ HR R σ J) : HA R σ J :=
-  (⟨g, hg⟩ : HR R σ J)
+def mkHA (g : GL (Fin M) (R ⊗[F] E)) (hg : g ∈ HR R σ J) : HA R σ J := (⟨g, hg⟩ : HR R σ J)
 
 lemma mat_mem (u : HA R σ J) : HA.mat R σ J u ∈ HR R σ J :=
   Subtype.property (p := fun g => g ∈ HR R σ J) u
@@ -188,8 +192,9 @@ lemma mat_injective : Function.Injective (HA.mat R σ J) :=
 def iotaHom : HA R σ J →* HA R σ (blockOne s J) where
   toFun u := mkHA R σ _ (blockGL (HA.mat R σ J u)) (blockGL_mem_HR R σ J s (mat_mem R σ J u))
   map_one' := mat_injective R σ _ (map_one (blockGL (K := R ⊗[F] E) (M := M)))
-  map_mul' a b := mat_injective R σ _
-    (map_mul (blockGL (K := R ⊗[F] E) (M := M)) (HA.mat R σ J a) (HA.mat R σ J b))
+  map_mul' a b :=
+    mat_injective R σ _
+      (map_mul (blockGL (K := R ⊗[F] E) (M := M)) (HA.mat R σ J a) (HA.mat R σ J b))
 
 lemma mat_iotaHom (u : HA R σ J) :
     HA.mat R σ _ (iotaHom R σ J s u) = blockGL (HA.mat R σ J u) := rfl
@@ -278,8 +283,8 @@ section Top
 
 variable [TopologicalSpace R]
 
-def pairMap {N : ℕ} (J' : Matrix (Fin N) (Fin N) E) (h : HA R σ J') :
-    Matrix (Fin N) (Fin N) (R ⊗[F] E) × (Matrix (Fin N) (Fin N) (R ⊗[F] E))ᵐᵒᵖ :=
+def pairMap {N : ℕ} (J' : Matrix (Fin N) (Fin N) E) (h : HA R σ J')
+    : Matrix (Fin N) (Fin N) (R ⊗[F] E) × (Matrix (Fin N) (Fin N) (R ⊗[F] E))ᵐᵒᵖ :=
   Units.embedProduct _ (HA.mat R σ J' h)
 
 lemma isEmbedding_pairMap {N : ℕ} (J' : Matrix (Fin N) (Fin N) E) :
@@ -344,11 +349,32 @@ lemma t2_tensor_product {F E : Type} [Field F] [Field E] [Algebra F E] [Module.F
     IsModuleTopology.continuous_of_linearMap _
   exact T2Space.of_injective_continuous b.equivFun.injective hc
 
-theorem stab_first :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (t : F), t ≠ 0 → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] [T2Space R], ∃ ι : HA R σ J →* HA R σ (blockOne (algebraMap F E t) J), IsClosedEmbedding ι ∧ (∀ u, (HA.mat R σ _ (ι u) : Matrix (Fin (M + 1)) (Fin (M + 1)) (R ⊗[F] E)) = blockOne 1 (HA.mat R σ J u : Matrix (Fin M) (Fin M) (R ⊗[F] E))) ∧ (∀ h, h ∈ ι.range ↔ actW R σ _ h (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0)) = (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0))) ∧ (∀ u, HA.mat R σ _ (ι u) ∈ HFin R σ (blockOne (algebraMap F E t) J) ↔ HA.mat R σ J u ∈ HFin R σ J) ∧ ∀ (u : HA R σ J) (n : ℕ) (X : Fin n → Fin M → R ⊗[F] E), actW R σ _ (ι u) (consTup X) = consTup (actW R σ J u X) := by
+theorem stab_first
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
+          IsHermND σ J
+            → ∀ (t : F),
+              t ≠ 0
+                → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+                    [T2Space R],
+                  ∃ ι : HA R σ J →* HA R σ (blockOne (algebraMap F E t) J),
+                    IsClosedEmbedding ι
+                      ∧ (∀ u,
+                        (HA.mat R σ _ (ι u) : Matrix (Fin (M + 1)) (Fin (M + 1)) (R ⊗[F] E))
+                          = blockOne 1 (HA.mat R σ J u : Matrix (Fin M) (Fin M) (R ⊗[F] E)))
+                      ∧ (∀ h,
+                        h ∈ ι.range
+                          ↔ actW R σ _ h (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0))
+                            = (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0)))
+                      ∧ (∀ u,
+                        HA.mat R σ _ (ι u) ∈ HFin R σ (blockOne (algebraMap F E t) J)
+                          ↔ HA.mat R σ J u ∈ HFin R σ J)
+                      ∧ ∀ (u : HA R σ J) (n : ℕ) (X : Fin n → Fin M → R ⊗[F] E),
+                        actW R σ _ (ι u) (consTup X) = consTup (actW R σ J u X) := by
   intro F E _ _ _ _ _ σ hCM M J _ t ht R _ _ _ _ _
-  have hs : algebraMap F E t ≠ 0 := by
-    simpa using ht
+  have hs : algebraMap F E t ≠ 0 := by simpa using ht
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by rw [hCM.2.2.1]; norm_num)
   haveI : T2Space (R ⊗[F] E) := t2_tensor_product R
   refine ⟨iotaHom R σ J (algebraMap F E t), ?_, fun _ => rfl, ?_, ?_, ?_⟩

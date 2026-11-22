@@ -36,17 +36,21 @@ private lemma cs_form {N : ℕ} (G : Matrix (Fin N) (Fin N) ℂ) (hG : G.PosSemi
   rw [key] at hx hy ⊢
   exact cs_vec _ _ hx hy
 
-theorem UpperTheory.V.KT.cramer :
-    ∀ (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ) (c : Fin N → ℂ), G.PosSemidef → (∀ a, (G a a).re ≤ 1) →
-    (star c ⬝ᵥ (G *ᵥ c)).re ≤ 1 → ∀ a, ‖G.det‖ * ‖c a‖ ≤ (N : ℝ) ^ N := by
+theorem UpperTheory.V.KT.cramer
+    : ∀ (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ) (c : Fin N → ℂ),
+      G.PosSemidef → (∀ a, (G a a).re ≤ 1) → (star c ⬝ᵥ (G *ᵥ c)).re ≤ 1
+        → ∀ a, ‖G.det‖ * ‖c a‖ ≤ (N : ℝ) ^ N := by
   intro N G c hG hd hc a
   have hs : ∀ (i : Fin N) (v : Fin N → ℂ), star (Pi.single i (1 : ℂ) : Fin N → ℂ) ⬝ᵥ v = v i := by
     intro i v
     simp [← Pi.single_star]
-  have he : ∀ i j : Fin N, star (Pi.single i (1 : ℂ) : Fin N → ℂ) ⬝ᵥ
-      (G *ᵥ (Pi.single j (1 : ℂ) : Fin N → ℂ)) = G i j := by
+  have he
+      : ∀ i j : Fin N,
+        star (Pi.single i (1 : ℂ) : Fin N → ℂ) ⬝ᵥ (G *ᵥ (Pi.single j (1 : ℂ) : Fin N → ℂ))
+          = G i j := by
     intro i j
-    rw [hs]; simp
+    rw [hs]
+    simp
   have h1 : ∀ i j, ‖G i j‖ ≤ 1 := by
     intro i j
     rw [← he]
@@ -59,8 +63,8 @@ theorem UpperTheory.V.KT.cramer :
     rw [← Matrix.cramer_apply, Matrix.cramer_eq_adjugate_mulVec, mulVec_mulVec, adjugate_mul]
     simp [smul_mulVec]
   rw [← norm_mul, h3]
-  have h4 := Matrix.det_le (A := G.updateCol a (G *ᵥ c)) (abv := NormedField.toAbsoluteValue ℂ)
-    (x := 1) (by
+  have h4 :=
+    Matrix.det_le (A := G.updateCol a (G *ᵥ c)) (abv := NormedField.toAbsoluteValue ℂ) (x := 1) (by
       intro i j
       change ‖G.updateCol a (G *ᵥ c) i j‖ ≤ 1
       rw [updateCol_apply]

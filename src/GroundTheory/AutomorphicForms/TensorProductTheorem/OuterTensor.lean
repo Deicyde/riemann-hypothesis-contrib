@@ -15,11 +15,12 @@ open Module Set TensorProduct
 
 open scoped TensorProduct
 
-variable {M₁ M₂ : Type*} [Monoid M₁] [Monoid M₂] {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁]
-  [AddCommGroup V₂] [Module ℂ V₂]
+variable
+  {M₁ M₂ : Type*} [Monoid M₁] [Monoid M₂]
+  {V₁ V₂ : Type*} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
 
-theorem nontrivial_of_irreducible {ρ : Representation ℂ M₁ V₁} (h : ρ.IsIrreducible) :
-    Nontrivial V₁ := by
+theorem nontrivial_of_irreducible {ρ : Representation ℂ M₁ V₁} (h : ρ.IsIrreducible)
+    : Nontrivial V₁ := by
   by_contra hV
   rw [not_nontrivial_iff_subsingleton] at hV
   obtain ⟨a, b, hab⟩ := h.toNontrivial.exists_pair_ne
@@ -28,8 +29,8 @@ theorem nontrivial_of_irreducible {ρ : Representation ℂ M₁ V₁} (h : ρ.Is
   rw [Subsingleton.elim x 0]
   exact ⟨fun _ => b.toSubmodule.zero_mem, fun _ => a.toSubmodule.zero_mem⟩
 
-def outerTensor (ρ₁ : Representation ℂ M₁ V₁) (ρ₂ : Representation ℂ M₂ V₂) :
-    Representation ℂ (M₁ × M₂) (V₁ ⊗[ℂ] V₂) where
+def outerTensor (ρ₁ : Representation ℂ M₁ V₁) (ρ₂ : Representation ℂ M₂ V₂)
+    : Representation ℂ (M₁ × M₂) (V₁ ⊗[ℂ] V₂) where
   toFun p := TensorProduct.map (ρ₁ p.1) (ρ₂ p.2)
   map_one' := by
     simp only [Prod.fst_one, Prod.snd_one, map_one]
@@ -38,15 +39,16 @@ def outerTensor (ρ₁ : Representation ℂ M₁ V₁) (ρ₂ : Representation �
     simp only [Prod.fst_mul, Prod.snd_mul, map_mul]
     exact TensorProduct.map_mul _ _ _ _
 
-theorem outerTensor_tmul (ρ₁ : Representation ℂ M₁ V₁) (ρ₂ : Representation ℂ M₂ V₂)
-    (p : M₁ × M₂) (a : V₁) (b : V₂) :
-    outerTensor ρ₁ ρ₂ p (a ⊗ₜ b) = ρ₁ p.1 a ⊗ₜ ρ₂ p.2 b :=
+theorem outerTensor_tmul
+    (ρ₁ : Representation ℂ M₁ V₁) (ρ₂ : Representation ℂ M₂ V₂) (p : M₁ × M₂) (a : V₁) (b : V₂)
+    : outerTensor ρ₁ ρ₂ p (a ⊗ₜ b) = ρ₁ p.1 a ⊗ₜ ρ₂ p.2 b :=
   TensorProduct.map_tmul _ _ _ _
 
-theorem exists_asAlgebraHom_eq {ρ₂ : Representation ℂ M₂ V₂} (hirr : ρ₂.IsIrreducible)
+theorem exists_asAlgebraHom_eq
+    {ρ₂ : Representation ℂ M₂ V₂} (hirr : ρ₂.IsIrreducible)
     (hschur : ∀ T : End ℂ V₂, (∀ m, T * ρ₂ m = ρ₂ m * T) → ∃ c : ℂ, T = c • 1)
-    (A : End ℂ V₂) (s : Finset V₂) :
-    ∃ r : MonoidAlgebra ℂ M₂, ∀ v ∈ s, ρ₂.asAlgebraHom r v = A v := by
+    (A : End ℂ V₂) (s : Finset V₂)
+    : ∃ r : MonoidAlgebra ℂ M₂, ∀ v ∈ s, ρ₂.asAlgebraHom r v = A v := by
   classical
   set R := MonoidAlgebra ℂ M₂
   have hsimple : IsSimpleModule R ρ₂.asModule :=
@@ -55,30 +57,33 @@ theorem exists_asAlgebraHom_eq {ρ₂ : Representation ℂ M₂ V₂} (hirr : ρ
 
   have hsc : ∀ φ : Module.End R ρ₂.asModule, ∃ c : ℂ, ∀ x, E (φ x) = c • E x := by
     intro φ
-    let T : End ℂ V₂ :=
-      { toFun := fun v => E (φ (E.symm v))
-        map_add' := fun a b => by simp
-        map_smul' := fun c v => by
-          rw [RingHom.id_apply, Representation.asModuleEquiv_symm_map_smul, map_smul,
-            Representation.asModuleEquiv_map_smul, AlgHom.commutes,
-            Algebra.algebraMap_eq_smul_one, LinearMap.smul_apply, Module.End.one_apply] }
-    obtain ⟨c, hc⟩ := hschur T fun m => by
-      ext v
-      simp only [Module.End.mul_apply, T, LinearMap.coe_mk, AddHom.coe_mk]
-      rw [Representation.asModuleEquiv_symm_map_rho, map_smul,
-        Representation.asModuleEquiv_map_smul, MonoidAlgebra.of_apply,
-        Representation.asAlgebraHom_single_one]
+    let T : End ℂ V₂ := {
+      toFun := fun v => E (φ (E.symm v))
+      map_add' := fun a b => by simp
+      map_smul' := fun c v => by
+        rw [RingHom.id_apply, Representation.asModuleEquiv_symm_map_smul, map_smul,
+          Representation.asModuleEquiv_map_smul, AlgHom.commutes, Algebra.algebraMap_eq_smul_one,
+          LinearMap.smul_apply, Module.End.one_apply]
+    }
+    obtain ⟨c, hc⟩ :=
+      hschur T fun m => by
+        ext v
+        simp only [Module.End.mul_apply, T, LinearMap.coe_mk, AddHom.coe_mk]
+        rw [Representation.asModuleEquiv_symm_map_rho, map_smul,
+          Representation.asModuleEquiv_map_smul, MonoidAlgebra.of_apply,
+          Representation.asAlgebraHom_single_one]
     refine ⟨c, fun x => ?_⟩
     have := congrArg (fun F : End ℂ V₂ => F (E x)) hc
     simpa [T] using this
-  let f : Module.End (Module.End R ρ₂.asModule) ρ₂.asModule :=
-    { toFun := fun x => E.symm (A (E x))
-      map_add' := fun a b => by simp
-      map_smul' := fun φ x => by
-        obtain ⟨c, hc⟩ := hsc φ
-        show E.symm (A (E (φ x))) = φ (E.symm (A (E x)))
-        apply E.injective
-        rw [hc, hc, LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply, map_smul] }
+  let f : Module.End (Module.End R ρ₂.asModule) ρ₂.asModule := {
+    toFun := fun x => E.symm (A (E x))
+    map_add' := fun a b => by simp
+    map_smul' := fun φ x => by
+      obtain ⟨c, hc⟩ := hsc φ
+      show E.symm (A (E (φ x))) = φ (E.symm (A (E x)))
+      apply E.injective
+      rw [hc, hc, LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply, map_smul]
+  }
   obtain ⟨r, hr⟩ := jacobson_density f (s.image E.symm)
   refine ⟨r, fun v hv => ?_⟩
   have := hr (E.symm v) (Finset.mem_image_of_mem _ hv)
@@ -86,10 +91,11 @@ theorem exists_asAlgebraHom_eq {ρ₂ : Representation ℂ M₂ V₂} (hirr : ρ
   simp only [f, LinearMap.coe_mk, AddHom.coe_mk, LinearEquiv.apply_symm_apply] at h2
   rw [h2, Representation.asModuleEquiv_map_smul, LinearEquiv.apply_symm_apply]
 
-theorem isIrreducible_outerTensor {ρ₁ : Representation ℂ M₁ V₁} {ρ₂ : Representation ℂ M₂ V₂}
+theorem isIrreducible_outerTensor
+    {ρ₁ : Representation ℂ M₁ V₁} {ρ₂ : Representation ℂ M₂ V₂}
     (hirr₁ : ρ₁.IsIrreducible) (hirr₂ : ρ₂.IsIrreducible)
-    (hschur : ∀ T : End ℂ V₂, (∀ m, T * ρ₂ m = ρ₂ m * T) → ∃ c : ℂ, T = c • 1) :
-    (outerTensor ρ₁ ρ₂).IsIrreducible := by
+    (hschur : ∀ T : End ℂ V₂, (∀ m, T * ρ₂ m = ρ₂ m * T) → ∃ c : ℂ, T = c • 1)
+    : (outerTensor ρ₁ ρ₂).IsIrreducible := by
   classical
   haveI := hirr₁
   haveI := hirr₂
@@ -109,8 +115,9 @@ theorem isIrreducible_outerTensor {ρ₁ : Representation ℂ M₁ V₁} {ρ₂ 
 
     let A : End ℂ V₂ := b.constr ℂ fun j => if j = j₀ then b j₀ else 0
     obtain ⟨r, hr⟩ := exists_asAlgebraHom_eq hirr₂ hschur A ((F y).support.image b)
-    have hstab : ∀ r' : MonoidAlgebra ℂ M₂, ∀ z ∈ Y.toSubmodule,
-        TensorProduct.map LinearMap.id (ρ₂.asAlgebraHom r') z ∈ Y.toSubmodule := by
+    have hstab
+        : ∀ r' : MonoidAlgebra ℂ M₂, ∀ z ∈ Y.toSubmodule,
+          TensorProduct.map LinearMap.id (ρ₂.asAlgebraHom r') z ∈ Y.toSubmodule := by
       intro r' z hz
       induction r' using MonoidAlgebra.induction_on with
       | of m =>
@@ -136,8 +143,8 @@ theorem isIrreducible_outerTensor {ρ₁ : Representation ℂ M₁ V₁} {ρ₂ 
       rw [hy', map_finsuppSum] at this
       convert this using 1
       rw [Finsupp.sum, Finset.sum_eq_single j₀]
-      · rw [TensorProduct.map_tmul, LinearMap.id_apply, hr _ (Finset.mem_image_of_mem _
-          (Finsupp.mem_support_iff.2 hj₀))]
+      · rw [TensorProduct.map_tmul, LinearMap.id_apply,
+          hr _ (Finset.mem_image_of_mem _ (Finsupp.mem_support_iff.2 hj₀))]
         simp [A]
       · intro j hj hjj
         rw [TensorProduct.map_tmul, LinearMap.id_apply, hr _ (Finset.mem_image_of_mem _ hj)]
@@ -146,8 +153,9 @@ theorem isIrreducible_outerTensor {ρ₁ : Representation ℂ M₁ V₁} {ρ₂ 
         exact absurd (Finsupp.mem_support_iff.2 hj₀) h
 
     intro a b'
-    have h1 : ∀ a' ∈ Submodule.span ℂ (range fun m => ρ₁ m (F y j₀)),
-        a' ⊗ₜ[ℂ] b j₀ ∈ Y.toSubmodule := by
+    have h1
+        : ∀ a' ∈ Submodule.span ℂ (range fun m => ρ₁ m (F y j₀)),
+          a' ⊗ₜ[ℂ] b j₀ ∈ Y.toSubmodule := by
       intro a' ha'
       induction ha' using Submodule.span_induction with
       | mem x hx =>
@@ -158,8 +166,8 @@ theorem isIrreducible_outerTensor {ρ₁ : Representation ℂ M₁ V₁} {ρ₂ 
       | add x z _ _ hx hz => rw [TensorProduct.add_tmul]; exact Y.toSubmodule.add_mem hx hz
       | smul c x _ hx => rw [← TensorProduct.smul_tmul']; exact Y.toSubmodule.smul_mem c hx
     have ha := h1 a (mem_span_mOrbit (ρ := ρ₁) hj₀ a)
-    have h2 : ∀ b'' ∈ Submodule.span ℂ (range fun m => ρ₂ m (b j₀)),
-        a ⊗ₜ[ℂ] b'' ∈ Y.toSubmodule := by
+    have h2
+        : ∀ b'' ∈ Submodule.span ℂ (range fun m => ρ₂ m (b j₀)), a ⊗ₜ[ℂ] b'' ∈ Y.toSubmodule := by
       intro b'' hb''
       induction hb'' using Submodule.span_induction with
       | mem x hx =>
@@ -182,7 +190,8 @@ theorem isIrreducible_outerTensor {ρ₁ : Representation ℂ M₁ V₁} {ρ₂ 
     have h0 : a ⊗ₜ[ℂ] v₂ = 0 := this
     have := congrArg (fun z => F z j) h0
     simp only [F, TensorProduct.equivFinsuppOfBasisRight_apply_tmul_apply, map_zero,
-      Finsupp.coe_zero, Pi.zero_apply] at this
+        Finsupp.coe_zero, Pi.zero_apply]
+      at this
     exact (smul_ne_zero hj ha) this
   refine { exists_pair_ne := ⟨⊥, ⊤, hbt⟩, eq_bot_or_eq_top := fun Y => ?_ }
   by_cases hY : Y = ⊥

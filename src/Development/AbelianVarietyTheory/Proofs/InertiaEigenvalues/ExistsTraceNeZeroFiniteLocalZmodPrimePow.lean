@@ -11,8 +11,10 @@ open NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.LocalTraceNonzero
 
-theorem isUnit_of_cast_ne_zero (l b : ℕ) [Fact l.Prime] (hb : b ≠ 0) (x : ZMod (l ^ b))
-    (hx : ZMod.castHom (dvd_pow_self l hb) (ZMod l) x ≠ 0) : IsUnit x := by
+theorem isUnit_of_cast_ne_zero
+    (l b : ℕ) [Fact l.Prime]
+    (hb : b ≠ 0) (x : ZMod (l ^ b)) (hx : ZMod.castHom (dvd_pow_self l hb) (ZMod l) x ≠ 0)
+    : IsUnit x := by
   have hl := (Fact.out : l.Prime)
   haveI : NeZero (l ^ b) := ⟨pow_ne_zero _ hl.ne_zero⟩
   rw [← ZMod.natCast_zmod_val x] at hx ⊢
@@ -20,20 +22,26 @@ theorem isUnit_of_cast_ne_zero (l b : ℕ) [Fact l.Prime] (hb : b ≠ 0) (x : ZM
   rw [ZMod.isUnit_iff_coprime]
   exact Nat.Coprime.pow_right _ ((Nat.coprime_comm).1 ((Nat.Prime.coprime_iff_not_dvd hl).2 hx))
 
-theorem henselian_of_finite (A : Type) [CommRing A] [Finite A] [IsLocalRing A] :
-    HenselianLocalRing A := by
+theorem henselian_of_finite (A : Type) [CommRing A] [Finite A] [IsLocalRing A]
+    : HenselianLocalRing A := by
   refine ⟨fun f hf a₀ h₁ h₂ => ?_⟩
   exact HenselianRing.is_henselian f hf a₀ h₁ (h₂.map _)
 
-theorem exists_trace_ne_zero_adjoinRoot (l : ℕ) [Fact l.Prime] (p : (ZMod l)[X]) (hp : Irreducible p) :
-    ∃ z : AdjoinRoot p, Algebra.trace (ZMod l) (AdjoinRoot p) z ≠ 0 := by
+theorem exists_trace_ne_zero_adjoinRoot
+    (l : ℕ) [Fact l.Prime] (p : (ZMod l)[X]) (hp : Irreducible p)
+    : ∃ z : AdjoinRoot p, Algebra.trace (ZMod l) (AdjoinRoot p) z ≠ 0 := by
   haveI : Fact (Irreducible p) := ⟨hp⟩
   haveI : FiniteDimensional (ZMod l) (AdjoinRoot p) := (AdjoinRoot.powerBasis hp.ne_zero).finite
   haveI : Algebra.IsSeparable (ZMod l) (AdjoinRoot p) := inferInstance
   obtain ⟨z, hz⟩ := Algebra.trace_surjective (ZMod l) (AdjoinRoot p) 1
   exact ⟨z, by rw [hz]; exact one_ne_zero⟩
 
-theorem exists_trace_ne_zero : ∀ (l b e : ℕ) [Fact l.Prime] (B : Type) [CommRing B] [Finite B] [Algebra (ZMod (l ^ b)) B] (π : B), 0 < e → (∀ x : B, ¬ IsUnit x ↔ π ∣ x) → Ideal.span {((l : ℕ) : B)} = Ideal.span {π ^ e} → Nat.card B = Nat.card (B ⧸ Ideal.span {π}) ^ (b * e) → ¬ l ^ b ∣ e → ∃ c : B, Algebra.trace (ZMod (l ^ b)) B c ≠ 0 := by
+theorem exists_trace_ne_zero
+    : ∀ (l b e : ℕ) [Fact l.Prime] (B : Type) [CommRing B] [Finite B] [Algebra (ZMod (l ^ b)) B]
+        (π : B),
+      0 < e → (∀ x : B, ¬ IsUnit x ↔ π ∣ x) → Ideal.span {((l : ℕ) : B)} = Ideal.span {π ^ e}
+        → Nat.card B = Nat.card (B ⧸ Ideal.span {π}) ^ (b * e) → ¬ l ^ b ∣ e
+        → ∃ c : B, Algebra.trace (ZMod (l ^ b)) B c ≠ 0 := by
   intro l b e _ B _ _ _ π he hunit hspan hcard hdvd
   have hb : b ≠ 0 := by rintro rfl; exact hdvd (by simp)
   have hl := (Fact.out : l.Prime)
@@ -58,24 +66,26 @@ theorem exists_trace_ne_zero : ∀ (l b e : ℕ) [Fact l.Prime] (B : Type) [Comm
     exact hlmax
   letI : Algebra (ZMod l) K := ZMod.algebra K l
   haveI : Finite K := Finite.of_surjective _ IsLocalRing.residue_surjective
-  obtain ⟨a, p, hpm, hpirr, hpa, hpa', hgen, hcardK⟩ := GlobalTheory.T.exists_separable_generator_card_eq_pow_natDegree l K
+  obtain ⟨a, p, hpm, hpirr, hpa, hpa', hgen, hcardK⟩ :=
+    GlobalTheory.T.exists_separable_generator_card_eq_pow_natDegree l K
   set g : ZMod (l ^ b) →+* ZMod l := ZMod.castHom (dvd_pow_self l hb) (ZMod l) with hg
   have hgs : Function.Surjective g := ZMod.ringHom_surjective g
   obtain ⟨h, hhp, hdeg, hmon⟩ :=
     lifts_and_natDegree_eq_and_monic ((mem_lifts p).2 (map_surjective g hgs p)) hpm
-  have hcomp : (algebraMap B K).comp (algebraMap (ZMod (l ^ b)) B) =
-      (algebraMap (ZMod l) K).comp g := RingHom.ext_zmod _ _
-  have key : ∀ q : (ZMod (l ^ b))[X],
-      aeval a (q.map (algebraMap (ZMod (l ^ b)) B)) = aeval a (q.map g) := by
+  have hcomp
+      : (algebraMap B K).comp (algebraMap (ZMod (l ^ b)) B) = (algebraMap (ZMod l) K).comp g :=
+    RingHom.ext_zmod _ _
+  have key
+      : ∀ q : (ZMod (l ^ b))[X],
+        aeval a (q.map (algebraMap (ZMod (l ^ b)) B)) = aeval a (q.map g) := by
     intro q
     simp only [aeval_def, eval₂_map, hcomp]
   haveI : HenselianLocalRing B := henselian_of_finite B
   have H2 := ((HenselianLocalRing.TFAE B).out 1 2).mp ‹_›
-  obtain ⟨ω, hω, hωa⟩ := H2 (h.map (algebraMap _ B)) (hmon.map _) a
-    (by rw [key, hhp]; exact hpa)
-    (by rw [derivative_map, key, ← derivative_map, hhp]; exact hpa')
-  have hω' : eval₂ (algebraMap (ZMod (l ^ b)) B) ω h = 0 := by
-    rw [← eval_map]; exact hω
+  obtain ⟨ω, hω, hωa⟩ :=
+    H2 (h.map (algebraMap _ B)) (hmon.map _) a (by rw [key, hhp]; exact hpa)
+      (by rw [derivative_map, key, ← derivative_map, hhp]; exact hpa')
+  have hω' : eval₂ (algebraMap (ZMod (l ^ b)) B) ω h = 0 := by rw [← eval_map]; exact hω
 
   set C := AdjoinRoot h
   let φ : C →+* B := AdjoinRoot.lift (algebraMap (ZMod (l ^ b)) B) ω hω'
@@ -92,7 +102,9 @@ theorem exists_trace_ne_zero : ∀ (l b e : ℕ) [Fact l.Prime] (B : Type) [Comm
     rw [← Nat.cast_pow, ← map_natCast (algebraMap (ZMod (l ^ b)) B), ZMod.natCast_self, map_zero]
   have hpe : π ^ e ∈ Ideal.span {φ (l : C)} := by
     rw [map_natCast, hspan]; exact Ideal.mem_span_singleton_self _
-  have hE := GlobalTheory.T.exists_sum_mul_pow_of_residue_surjective_of_nilpotent C B φ π (l : C) e b hsurj hpe (by rw [map_natCast]; exact hlb)
+  have hE :=
+    GlobalTheory.T.exists_sum_mul_pow_of_residue_surjective_of_nilpotent C B φ π (l : C) e b hsurj
+      hpe (by rw [map_natCast]; exact hlb)
 
   letI : Algebra C B := φ.toAlgebra
   have hsmul : ∀ (c : C) (x : B), c • x = φ c * x := fun c x => Algebra.smul_def c x
@@ -105,10 +117,11 @@ theorem exists_trace_ne_zero : ∀ (l b e : ℕ) [Fact l.Prime] (B : Type) [Comm
     simp only [hsmul]
   let pb := AdjoinRoot.powerBasis' hmon
   have hcardC : Nat.card C = (l ^ b) ^ p.natDegree := by
-    rw [Nat.card_congr pb.basis.equivFun.toEquiv, Nat.card_fun, Nat.card_zmod, Nat.card_eq_fintype_card,
-      Fintype.card_fin, AdjoinRoot.powerBasis'_dim, hdeg]
+    rw [Nat.card_congr pb.basis.equivFun.toEquiv, Nat.card_fun, Nat.card_zmod,
+      Nat.card_eq_fintype_card, Fintype.card_fin, AdjoinRoot.powerBasis'_dim, hdeg]
   have hcardB : Nat.card B = Nat.card (Fin e → C) := by
-    rw [Nat.card_fun, hcardC, Nat.card_eq_fintype_card (α := Fin e), Fintype.card_fin, hcard, ← hmax]
+    rw [Nat.card_fun, hcardC, Nat.card_eq_fintype_card (α := Fin e), Fintype.card_fin, hcard,
+      ← hmax]
     change Nat.card K ^ (b * e) = _
     rw [hcardK, ← pow_mul, ← pow_mul, ← pow_mul]
     ring_nf
@@ -116,9 +129,13 @@ theorem exists_trace_ne_zero : ∀ (l b e : ℕ) [Fact l.Prime] (B : Type) [Comm
   haveI : Module.Finite (ZMod (l ^ b)) C := pb.finite
   haveI : Finite C := Module.finite_of_finite (ZMod (l ^ b))
   have hTbij : Function.Bijective T := hTsurj.bijective_of_nat_card_le hcardB.ge
-  let bB : Module.Basis (Fin e) C B := Module.Basis.ofEquivFun (LinearEquiv.ofBijective T hTbij).symm
+  let bB : Module.Basis (Fin e) C B :=
+    Module.Basis.ofEquivFun (LinearEquiv.ofBijective T hTbij).symm
   haveI : IsScalarTower (ZMod (l ^ b)) C B := IsScalarTower.of_algebraMap_eq' (RingHom.ext_zmod _ _)
-  have htr : ∀ y : C, Algebra.trace (ZMod (l ^ b)) B (φ y) = (e : ZMod (l ^ b)) * Algebra.trace (ZMod (l ^ b)) C y := by
+  have htr
+      : ∀ y : C,
+        Algebra.trace (ZMod (l ^ b)) B (φ y)
+          = (e : ZMod (l ^ b)) * Algebra.trace (ZMod (l ^ b)) C y := by
     intro y
     rw [← Algebra.trace_trace_of_basis pb.basis bB]
     change Algebra.trace (ZMod (l ^ b)) C (Algebra.trace C B (algebraMap C B y)) = _
@@ -128,13 +145,15 @@ theorem exists_trace_ne_zero : ∀ (l b e : ℕ) [Fact l.Prime] (B : Type) [Comm
   obtain ⟨z, hz⟩ := exists_trace_ne_zero_adjoinRoot l (h.map g) hirr'
   obtain ⟨q, rfl⟩ := AdjoinRoot.mk_surjective z
   obtain ⟨q', rfl⟩ := map_surjective g hgs q
-  have hmap : AdjoinRoot.map g h (h.map g) dvd_rfl (AdjoinRoot.mk h q') =
-      AdjoinRoot.mk (h.map g) (q'.map g) := by
+  have hmap
+      : AdjoinRoot.map g h (h.map g) dvd_rfl (AdjoinRoot.mk h q')
+        = AdjoinRoot.mk (h.map g) (q'.map g) := by
     rw [AdjoinRoot.map, AdjoinRoot.lift_mk, ← AdjoinRoot.aeval_eq, aeval_def, eval₂_map,
       AdjoinRoot.algebraMap_eq]
   have hu : IsUnit (Algebra.trace (ZMod (l ^ b)) C (AdjoinRoot.mk h q')) := by
     apply isUnit_of_cast_ne_zero l b hb
-    rw [← hg, GlobalTheory.T.map_trace_adjoinRoot_eq_trace_map _ _ g h hmon, hmap]; exact hz
+    rw [← hg, GlobalTheory.T.map_trace_adjoinRoot_eq_trace_map _ _ g h hmon, hmap]
+    exact hz
   refine ⟨φ (AdjoinRoot.mk h q'), ?_⟩
   rw [htr]
   intro h0

@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -22,13 +23,15 @@ theorem ClosedPtChartUnit.proof : ClosedPtChartUnit.Statement := by
 
   have hTP : KH.cellMon S I ≤ P.primeCompl :=
     Submonoid.closure_le.mpr (by rintro _ ⟨k, i, hi, rfl⟩; exact hX k i hi)
-  have hPh : NumbersDVR.IsMultiHomogIdeal P := (NumbersDVR.Objects.isMultiHomogIdeal_iff P).mpr hP.1.2.1
+  have hPh : NumbersDVR.IsMultiHomogIdeal P :=
+    (NumbersDVR.Objects.isMultiHomogIdeal_iff P).mpr hP.1.2.1
 
   obtain ⟨t, htT, htJ⟩ : ∃ t ∈ KH.cellMon S I, t ∈ P ⊔ Ideal.span {f} := by
     by_contra hno
     push Not at hno
-    obtain ⟨p, hp, hJp, hdisj⟩ := Ideal.exists_le_prime_disjoint (P ⊔ Ideal.span {f}) (KH.cellMon S I)
-      (Set.disjoint_left.mpr fun x hxJ hxT => hno x hxT hxJ)
+    obtain ⟨p, hp, hJp, hdisj⟩ :=
+      Ideal.exists_le_prime_disjoint (P ⊔ Ideal.span {f}) (KH.cellMon S I)
+        (Set.disjoint_left.mpr fun x hxJ hxT => hno x hxT hxJ)
     obtain ⟨W, hW, hWh, hWp, hWJ, hWf⟩ := NumbersDVR.exists_multiHomog_core hp
     have hPW : P ≤ W := hWJ P hPh (le_sup_left.trans hJp)
     have hfW : f ∈ W :=
@@ -48,7 +51,8 @@ theorem ClosedPtChartUnit.proof : ClosedPtChartUnit.Statement := by
     | mem x hx =>
       obtain ⟨k, i, -, rfl⟩ := hx
       exact ⟨_, isWeightedHomogeneous_X S (NumbersDVR.blockWeight ι) ⟨k, i⟩⟩
-    | one => exact ⟨0, isWeightedHomogeneous_one S (NumbersDVR.blockWeight ι)⟩
+    | one =>
+      exact ⟨0, isWeightedHomogeneous_one S (NumbersDVR.blockWeight ι)⟩
     | mul x y _ _ hx hy =>
       obtain ⟨c, hc⟩ := hx
       obtain ⟨d, hd⟩ := hy
@@ -56,19 +60,30 @@ theorem ClosedPtChartUnit.proof : ClosedPtChartUnit.Statement := by
   have hf' : NumbersDVR.IsMultiHomog f a := (NumbersDVR.Objects.isMultiHomog_iff f a).mpr hf
   obtain ⟨p, hpP, r, hr, hpr⟩ := Submodule.mem_sup.mp htJ
   obtain ⟨g₀, rfl⟩ := Ideal.mem_span_singleton'.mp hr
-  have hcomp : weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e t =
-      weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e p +
-        weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e (g₀ * f) := by
+  have hcomp
+      : weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e t
+        = weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e p
+          + weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e (g₀ * f) := by
     rw [← hpr, map_add (f := _)]
   have htself : weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e t = t := by
-    rw [weightedHomogeneousComponent_of_mem ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr hte'), if_pos rfl]
+    rw [weightedHomogeneousComponent_of_mem ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr hte'),
+      if_pos rfl]
   rw [htself] at hcomp
   have hpe : weightedHomogeneousComponent (NumbersDVR.blockWeight ι) e p ∈ P := hPh p hpP e
   by_cases hae : a ≤ e
-  · refine ⟨t, htT, weightedHomogeneousComponent (NumbersDVR.blockWeight ι) (e - a) g₀, e - a, ?_, ?_, ?_⟩
+  · refine ⟨
+      t,
+      htT,
+      weightedHomogeneousComponent (NumbersDVR.blockWeight ι) (e - a) g₀,
+      e - a,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · rw [add_tsub_cancel_of_le hae]
       exact (NumbersDVR.Objects.isMultiHomog_iff t e).mp hte'
-    · exact (NumbersDVR.Objects.isMultiHomog_iff _ _).mp (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
+    · exact (NumbersDVR.Objects.isMultiHomog_iff _ _).mp
+        (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
     · rw [NumbersDVR.component_mul_form_of_le hf' hae] at hcomp
       rw [hcomp, add_sub_cancel_right]
       exact hpe

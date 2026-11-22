@@ -186,8 +186,8 @@ lemma complete [IsLocalRing (AdjoinRoot f)] [IsAdicComplete (maximalIdeal V) V] 
       exact SModEq.sub_mem.mp (hL n)⟩
   exact IsAdicComplete.mk
 
-noncomputable def resEquiv [IsLocalRing (AdjoinRoot f)] :
-    ResidueField (AdjoinRoot f) ≃+* AdjoinRoot (f.map (residue V)) :=
+noncomputable def resEquiv [IsLocalRing (AdjoinRoot f)]
+    : ResidueField (AdjoinRoot f) ≃+* AdjoinRoot (f.map (residue V)) :=
   (Ideal.quotEquivOfEq (maxEq f hf hg)).trans
     (AdjoinRoot.quotEquivQuotMap f (maximalIdeal V)).toRingEquiv
 
@@ -205,23 +205,36 @@ lemma resEquiv_comp [IsLocalRing (AdjoinRoot f)] :
 end Step
 section Main
 
-theorem nbMain (n : ℕ) : ∀ (V' : Type) [CommRing V'] [IsDomain V'] [IsDiscreteValuationRing V']
-    [IsAdicComplete (maximalIdeal V') V']
-    (k'' : Type) [Field k''] [Algebra (ResidueField V') k'']
-    [FiniteDimensional (ResidueField V') k''], Module.finrank (ResidueField V') k'' = n →
-    ∃ (V'' : Type) (_ : CommRing V'') (_ : IsDomain V'') (_ : IsDiscreteValuationRing V'')
-      (_ : IsAdicComplete (maximalIdeal V'') V'') (_ : Algebra V' V''),
-      Module.Finite V' V'' ∧ Function.Injective (algebraMap V' V'') ∧
-      ∃ (_ : IsLocalHom (algebraMap V' V'')) (e : k'' ≃+* ResidueField V''),
-        e.toRingHom.comp (algebraMap (ResidueField V') k'') =
-          ResidueField.map (algebraMap V' V'') := by
+theorem nbMain (n : ℕ)
+    : ∀ (V' : Type) [CommRing V'] [IsDomain V'] [IsDiscreteValuationRing V']
+        [IsAdicComplete (maximalIdeal V') V'] (k'' : Type) [Field k'']
+        [Algebra (ResidueField V') k''] [FiniteDimensional (ResidueField V') k''],
+      Module.finrank (ResidueField V') k'' = n
+        → ∃ (V'' : Type) (_ : CommRing V'') (_ : IsDomain V'') (_ : IsDiscreteValuationRing V'')
+            (_ : IsAdicComplete (maximalIdeal V'') V'') (_ : Algebra V' V''),
+          Module.Finite V' V'' ∧ Function.Injective (algebraMap V' V'')
+            ∧ ∃ (_ : IsLocalHom (algebraMap V' V'')) (e : k'' ≃+* ResidueField V''),
+              e.toRingHom.comp (algebraMap (ResidueField V') k'')
+                = ResidueField.map (algebraMap V' V'') := by
   refine Nat.strong_induction_on n fun n ih => ?_
   intro V' _ _ _ _ k'' _ _ _ hn
   by_cases hs : Function.Surjective (algebraMap (ResidueField V') k'')
-  · let e0 : ResidueField V' ≃+* k'' := RingEquiv.ofBijective (algebraMap (ResidueField V') k'')
-      ⟨(algebraMap (ResidueField V') k'').injective, hs⟩
-    refine ⟨V', inferInstance, inferInstance, inferInstance, inferInstance, Algebra.id V',
-      Module.Finite.self V', fun x y h => h, ⟨fun x hx => hx⟩, e0.symm, ?_⟩
+  · let e0 : ResidueField V' ≃+* k'' :=
+      RingEquiv.ofBijective (algebraMap (ResidueField V') k'')
+        ⟨(algebraMap (ResidueField V') k'').injective, hs⟩
+    refine ⟨
+      V',
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      Algebra.id V',
+      Module.Finite.self V',
+      fun x y h => h,
+      ⟨fun x hx => hx⟩,
+      e0.symm,
+      ?_
+    ⟩
     refine RingHom.ext fun x => ?_
     obtain ⟨y, rfl⟩ := residue_surjective x
     rw [RingHom.comp_apply, ResidueField.map_residue]
@@ -247,14 +260,18 @@ theorem nbMain (n : ℕ) : ∀ (V' : Type) [CommRing V'] [IsDomain V'] [IsDiscre
     letI : Algebra (ResidueField (AdjoinRoot f)) k'' := RingHom.toAlgebra
       ((AdjoinRoot.lift (f := f.map (residue V')) (algebraMap (ResidueField V') k'') a hroot).comp
         (resEquiv f hf hg).toRingHom)
-    have htow_eq : algebraMap (ResidueField V') k'' =
-        (algebraMap (ResidueField (AdjoinRoot f)) k'').comp
-          (algebraMap (ResidueField V') (ResidueField (AdjoinRoot f))) := by
+    have htow_eq
+        : algebraMap (ResidueField V') k''
+          = (algebraMap (ResidueField (AdjoinRoot f)) k'').comp
+            (algebraMap (ResidueField V') (ResidueField (AdjoinRoot f))) := by
       refine RingHom.ext fun x => ?_
-      have hc : (resEquiv f hf hg) (ResidueField.map (algebraMap V' (AdjoinRoot f)) x) =
-          AdjoinRoot.of (f.map (residue V')) x := RingHom.congr_fun (resEquiv_comp f hf hg) x
-      change _ = AdjoinRoot.lift (f := f.map (residue V')) (algebraMap (ResidueField V') k'') a hroot
-        ((resEquiv f hf hg) (ResidueField.map (algebraMap V' (AdjoinRoot f)) x))
+      have hc
+          : (resEquiv f hf hg) (ResidueField.map (algebraMap V' (AdjoinRoot f)) x)
+            = AdjoinRoot.of (f.map (residue V')) x :=
+        RingHom.congr_fun (resEquiv_comp f hf hg) x
+      change _
+        = AdjoinRoot.lift (f := f.map (residue V')) (algebraMap (ResidueField V') k'') a hroot
+          ((resEquiv f hf hg) (ResidueField.map (algebraMap V' (AdjoinRoot f)) x))
       rw [hc, AdjoinRoot.lift_of]
     haveI : IsScalarTower (ResidueField V') (ResidueField (AdjoinRoot f)) k'' :=
       IsScalarTower.of_algebraMap_eq' htow_eq
@@ -262,7 +279,8 @@ theorem nbMain (n : ℕ) : ∀ (V' : Type) [CommRing V'] [IsDomain V'] [IsDiscre
       Module.Finite.of_restrictScalars_finite (ResidueField V') (ResidueField (AdjoinRoot f)) k''
     have hdim : 2 ≤ Module.finrank (ResidueField V') (ResidueField (AdjoinRoot f)) := by
       let E : ResidueField (AdjoinRoot f) ≃ₐ[ResidueField V'] AdjoinRoot (f.map (residue V')) :=
-        AlgEquiv.ofRingEquiv (f := resEquiv f hf hg) fun x => RingHom.congr_fun (resEquiv_comp f hf hg) x
+        AlgEquiv.ofRingEquiv (f := resEquiv f hf hg) fun x =>
+          RingHom.congr_fun (resEquiv_comp f hf hg) x
       rw [E.toLinearEquiv.finrank_eq, (AdjoinRoot.powerBasis hg.ne_zero).finrank,
         AdjoinRoot.powerBasis_dim, hfg]
       have h1 : (minpoly (ResidueField V') a).natDegree ≠ 1 := fun h =>
@@ -270,7 +288,9 @@ theorem nbMain (n : ℕ) : ∀ (V' : Type) [CommRing V'] [IsDomain V'] [IsDiscre
       have h2 := minpoly.natDegree_pos hint
       omega
     have hlt : Module.finrank (ResidueField (AdjoinRoot f)) k'' < n := by
-      have h1 := (letI : Module.Free (ResidueField (AdjoinRoot f)) k'' := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank (ResidueField V') (ResidueField (AdjoinRoot f)) k'')
+      have h1 :=
+        (letI : Module.Free (ResidueField (AdjoinRoot f)) k'' := Module.Free.of_divisionRing _ _
+         Module.finrank_mul_finrank (ResidueField V') (ResidueField (AdjoinRoot f)) k'')
       have h2 : 0 < Module.finrank (ResidueField (AdjoinRoot f)) k'' := Module.finrank_pos
       rw [hn] at h1
       nlinarith
@@ -281,12 +301,25 @@ theorem nbMain (n : ℕ) : ∀ (V' : Type) [CommRing V'] [IsDomain V'] [IsDiscre
     haveI hl2 : IsLocalHom (algebraMap V' V2) := by
       show IsLocalHom ((algebraMap (AdjoinRoot f) V2).comp (algebraMap V' (AdjoinRoot f)))
       infer_instance
-    refine ⟨V2, i1, i2, i3, i4, inferInstance, Module.Finite.trans (AdjoinRoot f) V2,
-      hinj.comp (inj f hf hg), hl2, e, ?_⟩
+    refine ⟨
+      V2,
+      i1,
+      i2,
+      i3,
+      i4,
+      inferInstance,
+      Module.Finite.trans (AdjoinRoot f) V2,
+      hinj.comp (inj f hf hg),
+      hl2,
+      e,
+      ?_
+    ⟩
     rw [htow_eq, ← RingHom.comp_assoc, he]
     first
-    | exact (ResidueField.map_comp (algebraMap V' (AdjoinRoot f)) (algebraMap (AdjoinRoot f) V2)).symm
-    | exact (ResidueField.map_comp (algebraMap (AdjoinRoot f) V2) (algebraMap V' (AdjoinRoot f))).symm
+    | exact (ResidueField.map_comp (algebraMap V' (AdjoinRoot f))
+        (algebraMap (AdjoinRoot f) V2)).symm
+    | exact (ResidueField.map_comp (algebraMap (AdjoinRoot f) V2)
+        (algebraMap V' (AdjoinRoot f))).symm
 
 end Main
 

@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 private lemma hensel_root (p : ℕ) [Fact p.Prime] (tr nm r : ℤ) (hd : ¬ (p : ℤ) ∣ tr ^ 2 - 4 * nm)
@@ -39,8 +40,7 @@ private lemma hensel_root (p : ℕ) [Fact p.Prime] (tr nm r : ℤ) (hd : ¬ (p :
   refine ⟨z, ?_⟩
   simpa [hFdef] using hz
 
-theorem UpperTheory.Gal.W2.Seed.pUEx :
-    UEx := by
+theorem UpperTheory.Gal.W2.Seed.pUEx : UEx := by
   intro E _ _ _ A p _ hsplit Kq hω hspan τ
   unfold Arith.SplitK at hsplit
   obtain ⟨hd, r, hr⟩ := hsplit
@@ -57,7 +57,8 @@ theorem UpperTheory.Gal.W2.Seed.pUEx :
   have hw : w ^ 2 - (A.tr : PadicAlgCl p) * w + (A.nm : PadicAlgCl p) = 0 := by
     have := congrArg τ h1
     simpa [hwdef] using this
-  have hc : ι (ρ : ℚ_[p]) ^ 2 - (A.tr : PadicAlgCl p) * ι (ρ : ℚ_[p]) + (A.nm : PadicAlgCl p) = 0 := by
+  have hc
+      : ι (ρ : ℚ_[p]) ^ 2 - (A.tr : PadicAlgCl p) * ι (ρ : ℚ_[p]) + (A.nm : PadicAlgCl p) = 0 := by
     have := congrArg (fun t : ℤ_[p] => ι (t : ℚ_[p])) hρ
     simpa using this
   have hprod : (w - ι (ρ : ℚ_[p])) * (w - ((A.tr : PadicAlgCl p) - ι (ρ : ℚ_[p]))) = 0 := by
@@ -75,12 +76,13 @@ theorem UpperTheory.Gal.W2.Seed.pUEx :
     rw [hab]
     simp [← hρ₀, hwdef]
   choose f hf using hex
-  let u : Kq →+* ℚ_[p] :=
-    { toFun := f
-      map_one' := hinj (by rw [hf]; simp)
-      map_mul' := fun x y => hinj (by rw [hf, map_mul, hf, hf]; simp)
-      map_zero' := hinj (by rw [hf]; simp)
-      map_add' := fun x y => hinj (by rw [hf, map_add (f := _), hf, hf]; simp) }
+  let u : Kq →+* ℚ_[p] := {
+    toFun := f
+    map_one' := hinj (by rw [hf]; simp)
+    map_mul' := fun x y => hinj (by rw [hf, map_mul, hf, hf]; simp)
+    map_zero' := hinj (by rw [hf]; simp)
+    map_add' := fun x y => hinj (by rw [hf, map_add (f := _), hf, hf]; simp)
+  }
   refine ⟨u, ρ₀, ?_, ?_⟩
   · unfold LiesOver
     intro x

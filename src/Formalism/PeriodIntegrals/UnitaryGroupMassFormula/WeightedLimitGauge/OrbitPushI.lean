@@ -93,23 +93,26 @@ lemma op_uwb_eq_emb {g : Mat k r} (hg : g ∈ UWb k r) : g = embWb k r (g.submat
 def toW (k : ℕ) (p : (Fin k → ℂ) × ℂ) : Fin (k + 1) → ℂ := fun j =>
   if h : j.val < k then p.1 ⟨j.val, h⟩ else p.2
 
-def ofW (k : ℕ) (v : Fin (k + 1) → ℂ) : (Fin k → ℂ) × ℂ := (fun i => v (Fin.castSucc i), v (Fin.last k))
+def ofW (k : ℕ) (v : Fin (k + 1) → ℂ) : (Fin k → ℂ) × ℂ :=
+  (fun i => v (Fin.castSucc i), v (Fin.last k))
 
-def blkAct (k : ℕ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (p : (Fin k → ℂ) × ℂ) : (Fin k → ℂ) × ℂ :=
+def blkAct (k : ℕ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (p : (Fin k → ℂ) × ℂ)
+    : (Fin k → ℂ) × ℂ :=
   ofW k (μ *ᵥ toW k p)
 
 def qf (k : ℕ) (p : (Fin k → ℂ) × ℂ) : ℝ := ∑ i, Complex.normSq (p.1 i) - Complex.normSq p.2
 
 def LebInvB : Prop :=
-  ∀ (k : ℕ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ), μᴴ * Hb k * μ = Hb k →
-    (volume : Measure ((Fin k → ℂ) × ℂ)).map (blkAct k μ) = volume
+  ∀ (k : ℕ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ),
+    μᴴ * Hb k * μ = Hb k → (volume : Measure ((Fin k → ℂ) × ℂ)).map (blkAct k μ) = volume
 
 def coneSh (k : ℕ) (T' : ℝ) (E : Set ((Fin k → ℂ) × ℂ)) : Set ((Fin k → ℂ) × ℂ) :=
   (fun q : ((Fin k → ℂ) × ℂ) × ℝ => q.2 • q.1) '' ((E ∩ hypS k T') ×ˢ Set.Ioo (1 : ℝ) 2)
 
 def ConeForm : Prop :=
-  ∀ (k : ℕ) (T' : ℝ), 0 < T' → ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ⊤ ∧
-    ∀ E, MeasurableSet E → hypM k T' E = κ * volume (coneSh k T' E)
+  ∀ (k : ℕ) (T' : ℝ),
+    0 < T'
+      → ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ⊤ ∧ ∀ E, MeasurableSet E → hypM k T' E = κ * volume (coneSh k T' E)
 
 lemma toW_ofW (v : Fin (k + 1) → ℂ) : toW k (ofW k v) = v := by
   funext j
@@ -245,13 +248,14 @@ theorem hypInv_of (hL : LebInvB) (hC : ConeForm) : HypInv := by
   set ν := Hb k * μᴴ * Hb k with hν
   have hνμ : ν * μ = 1 := hb_inv_mul hμ
   have hμν : μ * ν = 1 := mul_eq_one_comm.1 hνμ
-  let e : ((Fin k → ℂ) × ℂ) ≃ᵐ ((Fin k → ℂ) × ℂ) :=
-    { toFun := blkAct k μ
-      invFun := blkAct k ν
-      left_inv := fun p => by simp only [blkAct_mul, hνμ, blkAct_one]
-      right_inv := fun p => by simp only [blkAct_mul, hμν, blkAct_one]
-      measurable_toFun := (continuous_blkAct μ).measurable
-      measurable_invFun := (continuous_blkAct ν).measurable }
+  let e : ((Fin k → ℂ) × ℂ) ≃ᵐ ((Fin k → ℂ) × ℂ) := {
+    toFun := blkAct k μ
+    invFun := blkAct k ν
+    left_inv := fun p => by simp only [blkAct_mul, hνμ, blkAct_one]
+    right_inv := fun p => by simp only [blkAct_mul, hμν, blkAct_one]
+    measurable_toFun := (continuous_blkAct μ).measurable
+    measurable_invFun := (continuous_blkAct ν).measurable
+  }
   obtain ⟨κ, -, -, hκ⟩ := hC k T' hT'
   have hset : ∀ E, coneSh k T' (blkAct k μ ⁻¹' E) = blkAct k μ ⁻¹' coneSh k T' E := by
     intro E
@@ -265,10 +269,10 @@ theorem hypInv_of (hL : LebInvB) (hC : ConeForm) : HypInv := by
       have hw : blkAct k μ (blkAct k ν w) = w := by rw [blkAct_mul, hμν, blkAct_one]
       refine ⟨(blkAct k ν w, t), ⟨⟨?_, ?_⟩, ht⟩, ?_⟩
       · show blkAct k μ (blkAct k ν w) ∈ E
-        rw [hw]; exact hwE
+        rw [hw]
+        exact hwE
       · rw [hypS_iff, ← qf_blkAct hμ, hw]; exact hwS
-      · have h1 : blkAct k μ (t • blkAct k ν w) = blkAct k μ x := by
-          rw [blkAct_smul, hw]; exact hx
+      · have h1 : blkAct k μ (t • blkAct k ν w) = blkAct k μ x := by rw [blkAct_smul, hw]; exact hx
         have h2 := congrArg (blkAct k ν) h1
         simp only [blkAct_mul, hνμ, blkAct_one] at h2
         exact h2

@@ -6,12 +6,15 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.etale_surjective_local_section : ∀ {S : Type} [CommRing S],
-    Aic (S := S) → Loc (S := S) →
-    ∀ (Y : Scheme.{0}) (f : Y ⟶ Spec (CommRingCat.of S)), Etale f → Surjective f →
-    ∀ m : Ideal S, m.IsMaximal → ∃ e : S, IsIdempotentElem e ∧ e ∉ m ∧ SecOn f e := by
+theorem _root_.GlobalTheory.T.etale_surjective_local_section
+    : ∀ {S : Type} [CommRing S],
+      Aic (S := S) → Loc (S := S)
+        → ∀ (Y : Scheme.{0}) (f : Y ⟶ Spec (CommRingCat.of S)),
+          Etale f → Surjective f
+            → ∀ m : Ideal S, m.IsMaximal → ∃ e : S, IsIdempotentElem e ∧ e ∉ m ∧ SecOn f e := by
   intro S _ hA hL Y f hE hS m hm
   let x : Spec (CommRingCat.of S) := ⟨m, hm.isPrime⟩
   obtain ⟨y, hy⟩ := hS.surj x
@@ -40,10 +43,10 @@ theorem _root_.GlobalTheory.T.etale_surjective_local_section : ∀ {S : Type} [C
   have hqm : q.comap (algebraMap S Bg) = m := by
     rw [IsScalarTower.algebraMap_eq S B Bg, ← Ideal.comap_comap, hcomap, hQm]
   obtain ⟨P⟩ := Algebra.IsStandardEtale.nonempty_standardEtalePresentation (R := S) (S := Bg)
-  have hroot_of_mem (F : Polynomial S) (hF : F.Monic) (hmem : Polynomial.aeval P.x F ∈ q) :
-      ∃ b : S, F.IsRoot b ∧ P.x - algebraMap S Bg b ∈ q := by
-    have : Nontrivial S := nontrivial_of_ne 0 1 fun h =>
-      hm.ne_top ((Ideal.eq_top_iff_one m).2 (h ▸ m.zero_mem))
+  have hroot_of_mem (F : Polynomial S) (hF : F.Monic) (hmem : Polynomial.aeval P.x F ∈ q)
+      : ∃ b : S, F.IsRoot b ∧ P.x - algebraMap S Bg b ∈ q := by
+    have : Nontrivial S :=
+      nontrivial_of_ne 0 1 fun h => hm.ne_top ((Ideal.eq_top_iff_one m).2 (h ▸ m.zero_mem))
     induction hd : F.natDegree using Nat.strong_induction_on generalizing F with
     | ind n ih =>
       by_cases hn : n = 0
@@ -54,8 +57,8 @@ theorem _root_.GlobalTheory.T.etale_surjective_local_section : ∀ {S : Type} [C
       let G := F /ₘ (Polynomial.X - Polynomial.C b)
       have hFG : (Polynomial.X - Polynomial.C b) * G = F :=
         Polynomial.mul_divByMonic_eq_iff_isRoot.2 hb
-      have hG : G.Monic := (Polynomial.Monic.of_mul_monic_left (Polynomial.monic_X_sub_C b))
-        (hFG.symm ▸ hF)
+      have hG : G.Monic :=
+        (Polynomial.Monic.of_mul_monic_left (Polynomial.monic_X_sub_C b)) (hFG.symm ▸ hF)
       have hdeg := (Polynomial.monic_X_sub_C b).natDegree_mul hG
       rw [hFG, Polynomial.natDegree_X_sub_C, hd] at hdeg
       rw [← hFG, map_mul] at hmem
@@ -71,7 +74,8 @@ theorem _root_.GlobalTheory.T.etale_surjective_local_section : ∀ {S : Type} [C
     have hdvd : P.x - algebraMap S Bg b ∣ Polynomial.aeval P.x P.g - algebraMap S Bg c := by
       have h := Polynomial.sub_dvd_eval_sub P.x (algebraMap S Bg b) (P.g.map (algebraMap S Bg))
       rwa [Polynomial.eval_map_algebraMap, Polynomial.eval_map_algebraMap,
-        Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval] at h
+          Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval]
+        at h
     have hgq : Polynomial.aeval P.x P.g ∈ q := by
       simpa using q.add_mem (Ideal.mem_of_dvd q hdvd hbq) (show algebraMap S Bg c ∈ q from hcq)
     exact hq.ne_top (Ideal.eq_top_of_isUnit_mem q hgq P.hasMap.2)
@@ -89,8 +93,9 @@ theorem _root_.GlobalTheory.T.etale_surjective_local_section : ∀ {S : Type} [C
   have heu : IsUnit (algebraMap S (Localization.Away e) e) :=
     IsLocalization.Away.algebraMap_isUnit e
   have hcu : IsUnit (algebraMap S (Localization.Away e) c) := by
-    have hmul : algebraMap S (Localization.Away e) e =
-        algebraMap S (Localization.Away e) (r * a) * algebraMap S (Localization.Away e) c := by
+    have hmul
+        : algebraMap S (Localization.Away e) e
+          = algebraMap S (Localization.Away e) (r * a) * algebraMap S (Localization.Away e) c := by
       rw [← map_mul, ← hr]; ring_nf
     rw [hmul] at heu
     exact isUnit_of_mul_isUnit_right heu

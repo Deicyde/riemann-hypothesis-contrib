@@ -7,7 +7,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.ModeDecay
@@ -17,7 +19,9 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 open NumberField MeasureTheory Topology in
 open scoped ContDiff ENNReal Matrix in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.ModeDecay.nonempty_cmType {r : ℕ} (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) : Nonempty X.Ψ := by
+theorem _root_.GlobalTheory.ModeDecay.nonempty_cmType
+    {r : ℕ} (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+    : Nonempty X.Ψ := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   by_cases h : τ ∈ X.Ψ
   · exact ⟨⟨τ, h⟩⟩
@@ -335,7 +339,6 @@ private lemma eq_zero_of_le_poly_mul_exp_neg {a D K L A S b : ℝ} (ha : 0 ≤ a
         ≤ D * ((1 + K) ^ A * y ^ A) * ((1 + L) ^ S * y ^ S) * Real.exp (-b * y) := by gcongr
       _ = _ := by ring
   linarith
-
 
 open NumberField MeasureTheory Topology in
 open scoped ContDiff ENNReal Matrix in

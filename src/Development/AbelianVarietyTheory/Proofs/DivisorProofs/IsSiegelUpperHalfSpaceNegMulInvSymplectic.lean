@@ -13,12 +13,13 @@ open scoped ComplexOrder
 
 namespace GlobalTheory
 
-theorem IsSiegel.neg_mul_inv_of_symplectic (l : Type) [Fintype l] [DecidableEq l] (s : Matrix (l ⊕ l) (l ⊕ l) ℝ)
-    (P Q : Matrix l l ℂ)
+theorem IsSiegel.neg_mul_inv_of_symplectic
+    (l : Type) [Fintype l] [DecidableEq l]
+    (s : Matrix (l ⊕ l) (l ⊕ l) ℝ) (P Q : Matrix l l ℂ)
     (hP : ∀ a b, P a b = (s (.inl a) (.inl b) : ℂ) - I * (s (.inl a) (.inr b) : ℂ))
     (hQ : ∀ a b, Q a b = (s (.inr a) (.inl b) : ℂ) - I * (s (.inr a) (.inr b) : ℂ))
-    (hs : s ∈ Matrix.symplecticGroup l ℝ) (hdet : P.det ≠ 0) (hsym : (-(Q * P⁻¹)).IsSymm) :
-    GlobalTheory.IsSiegel (-(Q * P⁻¹)) := by
+    (hs : s ∈ Matrix.symplecticGroup l ℝ) (hdet : P.det ≠ 0) (hsym : (-(Q * P⁻¹)).IsSymm)
+    : GlobalTheory.IsSiegel (-(Q * P⁻¹)) := by
   refine ⟨hsym, ?_⟩
   set A : Matrix l l ℂ := fun a b => (s (.inl a) (.inl b) : ℂ) with hA
   set B : Matrix l l ℂ := fun a b => (s (.inl a) (.inr b) : ℂ) with hB
@@ -27,11 +28,12 @@ theorem IsSiegel.neg_mul_inv_of_symplectic (l : Type) [Fintype l] [DecidableEq l
   have hPe : P = A - I • B := by ext a b; simp only [hP]; rfl
   have hQe : Q = C - I • D := by ext a b; simp only [hQ]; rfl
   have hsc : s.map (Complex.ofRealHom : ℝ →+* ℂ) = fromBlocks A B C D := by
-    ext (a|a) (b|b) <;> rfl
+    ext (a | a) (b | b) <;> rfl
   have hJ : (J l ℝ).map (Complex.ofRealHom : ℝ →+* ℂ) = J l ℂ := by
-    ext (a|a) (b|b) <;> simp [J, Matrix.one_apply] <;> split_ifs <;> simp
+    ext (a | a) (b | b) <;> simp [J, Matrix.one_apply] <;> split_ifs <;> simp
   have hc : (fromBlocks A B C D)ᵀ * J l ℂ * fromBlocks A B C D = J l ℂ := by
-    have h1 := congrArg (fun M => M.map (Complex.ofRealHom : ℝ →+* ℂ)) (SymplecticGroup.mem_iff'.mp hs)
+    have h1 :=
+      congrArg (fun M => M.map (Complex.ofRealHom : ℝ →+* ℂ)) (SymplecticGroup.mem_iff'.mp hs)
     simp only [Matrix.map_mul, transpose_map, hJ, hsc] at h1
     exact h1
   rw [J, fromBlocks_transpose, fromBlocks_multiply, fromBlocks_multiply, fromBlocks_inj] at hc
@@ -50,7 +52,8 @@ theorem IsSiegel.neg_mul_inv_of_symplectic (l : Type) [Fintype l] [DecidableEq l
     linear_combination (norm := (match_scalars <;> ring_nf <;> (try simp only [I_sq]) <;> ring_nf)) -h11 - h22 + I • h12 - I • h21
   have hu : IsUnit P.det := isUnit_iff_ne_zero.mpr hdet
   set τ := -(Q * P⁻¹) with hτ
-  have hτP : τ * P = -Q := by rw [hτ, neg_mul, Matrix.mul_assoc, nonsing_inv_mul _ hu, Matrix.mul_one]
+  have hτP : τ * P = -Q := by
+    rw [hτ, neg_mul, Matrix.mul_assoc, nonsing_inv_mul _ hu, Matrix.mul_one]
   have hsymm : ∀ a b, τ b a = τ a b := fun a b => by
     have := congrFun (congrFun hsym a) b
     simpa [transpose_apply] using this
@@ -58,11 +61,11 @@ theorem IsSiegel.neg_mul_inv_of_symplectic (l : Type) [Fintype l] [DecidableEq l
   set Mc : Matrix l l ℂ := M.map (Complex.ofRealHom : ℝ →+* ℂ) with hMc
   have hdiff : τ - τᴴ = (2 * I) • Mc := by
     ext a b
-    simp only [Matrix.sub_apply, conjTranspose_apply, hsymm a b, Matrix.smul_apply, smul_eq_mul, Mc, M, map_apply,
-      Complex.ofRealHom_eq_coe, Complex.star_def, Complex.sub_conj]
+    simp only [Matrix.sub_apply, conjTranspose_apply, hsymm a b, Matrix.smul_apply, smul_eq_mul, Mc,
+      M, map_apply, Complex.ofRealHom_eq_coe, Complex.star_def, Complex.sub_conj]
     push_cast
     ring
-  have hQP : Pᴴ * τᴴ = -Qᴴ := by rw [← conjTranspose_mul, hτP, conjTranspose_neg]
+  have hQP : Pᴴ * τᴴ = - Qᴴ := by rw [← conjTranspose_mul, hτP, conjTranspose_neg]
   have h2 : Pᴴ * Mc * P = 1 := by
     have e : Pᴴ * (τ - τᴴ) * P = (2 * I) • (1 : Matrix l l ℂ) := by
       rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_assoc, hτP, hQP]
@@ -73,7 +76,9 @@ theorem IsSiegel.neg_mul_inv_of_symplectic (l : Type) [Fintype l] [DecidableEq l
   have e1 : (P⁻¹)ᴴ * Pᴴ = 1 := by rw [← conjTranspose_mul, mul_nonsing_inv _ hu, conjTranspose_one]
   have e2 : P * P⁻¹ = 1 := mul_nonsing_inv _ hu
   have hMcf : Mc = (P⁻¹)ᴴ * P⁻¹ := by
-    calc Mc = ((P⁻¹)ᴴ * Pᴴ) * Mc * (P * P⁻¹) := by rw [e1, e2, Matrix.one_mul, Matrix.mul_one]
+    calc
+      Mc
+        = ((P⁻¹)ᴴ * Pᴴ) * Mc * (P * P⁻¹) := by rw [e1, e2, Matrix.one_mul, Matrix.mul_one]
       _ = (P⁻¹)ᴴ * (Pᴴ * Mc * P) * P⁻¹ := by simp only [Matrix.mul_assoc]
       _ = (P⁻¹)ᴴ * P⁻¹ := by rw [h2, Matrix.mul_one]
   have hinj : Function.Injective (P⁻¹).mulVec := by
@@ -87,7 +92,9 @@ theorem IsSiegel.neg_mul_inv_of_symplectic (l : Type) [Fintype l] [DecidableEq l
   · intro x hx
     set xc : l → ℂ := fun i => (x i : ℂ) with hxc
     have hxc0 : xc ≠ 0 := by
-      intro h; apply hx; ext i
+      intro h
+      apply hx
+      ext i
       have := congrFun h i
       simpa [xc] using this
     have e : star xc ⬝ᵥ Mc *ᵥ xc = ((star x ⬝ᵥ M *ᵥ x : ℝ) : ℂ) := by

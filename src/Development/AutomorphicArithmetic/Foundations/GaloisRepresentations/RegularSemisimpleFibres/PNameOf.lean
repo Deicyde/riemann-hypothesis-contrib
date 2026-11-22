@@ -7,21 +7,32 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.RegularIff
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem natCard_of_finrank {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Type} [Field K] [Algebra (ZMod g) K]
-    (hK : Module.finrank (ZMod g) K = m) : Nat.card K = g ^ m := by
+private theorem natCard_of_finrank
+    {g : ℕ} [Fact g.Prime]
+    {m : ℕ} (hm : 0 < m)
+    {K : Type} [Field K] [Algebra (ZMod g) K]
+    (hK : Module.finrank (ZMod g) K = m)
+    : Nat.card K = g ^ m := by
   haveI : Module.Finite (ZMod g) K := Module.finite_of_finrank_pos (hK ▸ hm)
   haveI : Finite K := Module.finite_of_finite (ZMod g)
   haveI : Fintype K := Fintype.ofFinite K
   rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod g), ZMod.card, hK]
 
-private theorem frob_top {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Type} [Field K] [Algebra (ZMod g) K]
-    (hK : Module.finrank (ZMod g) K = m) (x : K) : x ^ g ^ m = x := by
+private theorem frob_top
+    {g : ℕ} [Fact g.Prime]
+    {m : ℕ} (hm : 0 < m)
+    {K : Type} [Field K] [Algebra (ZMod g) K]
+    (hK : Module.finrank (ZMod g) K = m) (x : K)
+    : x ^ g ^ m = x := by
   haveI : Module.Finite (ZMod g) K := Module.finite_of_finrank_pos (hK ▸ hm)
   haveI : Finite K := Module.finite_of_finite (ZMod g)
   haveI : Fintype K := Fintype.ofFinite K
@@ -31,16 +42,24 @@ private theorem frob_top {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Ty
   rw [← hc]
   exact FiniteField.pow_card x
 
-private theorem aeval_pow_prime_pow_eq_pow {g : ℕ} [Fact g.Prime] {K : Type} [Field K] [Algebra (ZMod g) K]
-    (Y : (ZMod g)[X]) (x : K) (j : ℕ) : aeval (x ^ g ^ j) Y = (aeval x Y) ^ g ^ j := by
+private theorem aeval_pow_prime_pow_eq_pow
+    {g : ℕ} [Fact g.Prime]
+    {K : Type} [Field K] [Algebra (ZMod g) K]
+    (Y : (ZMod g)[X]) (x : K) (j : ℕ)
+    : aeval (x ^ g ^ j) Y = (aeval x Y) ^ g ^ j := by
   induction j with
   | zero => simp
   | succ j ih =>
     rw [pow_succ, pow_mul, pow_mul, ← ih, ← Polynomial.expand_aeval, ZMod.expand_card, map_pow]
 
-private theorem conj_ne {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Type} [Field K] [Algebra (ZMod g) K]
-    (hK : Module.finrank (ZMod g) K = m) (z : Kˣ) (hz : (minpoly (ZMod g) (z : K)).natDegree = m)
-    (a : ℕ) (ha : 0 < a) (ham : a < m) : (z : K) ^ g ^ a ≠ z := by
+private theorem conj_ne
+    {g : ℕ} [Fact g.Prime]
+    {m : ℕ} (hm : 0 < m)
+    {K : Type} [Field K] [Algebra (ZMod g) K]
+    (hK : Module.finrank (ZMod g) K = m)
+    (z : Kˣ) (hz : (minpoly (ZMod g) (z : K)).natDegree = m)
+    (a : ℕ) (ha : 0 < a) (ham : a < m)
+    : (z : K) ^ g ^ a ≠ z := by
   intro h
   classical
   have hg : g.Prime := Fact.out
@@ -49,8 +68,7 @@ private theorem conj_ne {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Typ
   haveI : Fintype K := Fintype.ofFinite K
   have hint : IsIntegral (ZMod g) (z : K) := Algebra.IsIntegral.isIntegral _
   set F := IntermediateField.adjoin (ZMod g) {(z : K)} with hFdef
-  have hF : Module.finrank (ZMod g) F = m := by
-    rw [IntermediateField.adjoin.finrank hint, hz]
+  have hF : Module.finrank (ZMod g) F = m := by rw [IntermediateField.adjoin.finrank hint, hz]
   have hfix : ∀ y ∈ F, y ^ g ^ a = y := by
     intro y hy
     have hy' : y ∈ Algebra.adjoin (ZMod g) {(z : K)} := by
@@ -62,22 +80,30 @@ private theorem conj_ne {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Typ
     rw [← aeval_pow_prime_pow_eq_pow, h]
   have hq : 1 < g ^ a := Nat.one_lt_pow ha.ne' hg.one_lt
   have hP0 : (X ^ (g ^ a) - X : K[X]) ≠ 0 := Polynomial.X_pow_sub_X_ne_zero hq
-  have hle := Polynomial.card_le_degree_of_subset_roots (p := (X ^ (g ^ a) - X : K[X]))
-    (Z := Finset.univ.map (Function.Embedding.subtype (· ∈ F))) (by
-      intro y hy
-      rw [Finset.map_val, Multiset.mem_map] at hy
-      obtain ⟨⟨y, hyF⟩, -, rfl⟩ := hy
-      rw [Polynomial.mem_roots hP0, IsRoot, eval_sub, eval_pow, eval_X]
-      simp only [Function.Embedding.coe_subtype]
-      rw [hfix y hyF, sub_self])
+  have hle :=
+    Polynomial.card_le_degree_of_subset_roots (p := (X ^ (g ^ a) - X : K[X]))
+      (Z := Finset.univ.map (Function.Embedding.subtype (· ∈ F)))
+      (by
+        intro y hy
+        rw [Finset.map_val, Multiset.mem_map] at hy
+        obtain ⟨⟨y, hyF⟩, -, rfl⟩ := hy
+        rw [Polynomial.mem_roots hP0, IsRoot, eval_sub, eval_pow, eval_X]
+        simp only [Function.Embedding.coe_subtype]
+        rw [hfix y hyF, sub_self])
   rw [Polynomial.natDegree_X_pow_sub_X (R := K) hq, Finset.card_map, Finset.card_univ,
-    Module.card_eq_pow_finrank (K := ZMod g), ZMod.card, hF] at hle
+      Module.card_eq_pow_finrank (K := ZMod g), ZMod.card, hF]
+    at hle
   have := Nat.pow_lt_pow_right hg.one_lt ham
   omega
 
-private theorem conj_inj {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Type} [Field K] [Algebra (ZMod g) K]
-    (hK : Module.finrank (ZMod g) K = m) (z : Kˣ) (hz : (minpoly (ZMod g) (z : K)).natDegree = m)
-    (i j : ℕ) (hij : i < j) (hj : j < m) : (z : K) ^ g ^ i ≠ (z : K) ^ g ^ j := by
+private theorem conj_inj
+    {g : ℕ} [Fact g.Prime]
+    {m : ℕ} (hm : 0 < m)
+    {K : Type} [Field K] [Algebra (ZMod g) K]
+    (hK : Module.finrank (ZMod g) K = m)
+    (z : Kˣ) (hz : (minpoly (ZMod g) (z : K)).natDegree = m)
+    (i j : ℕ) (hij : i < j) (hj : j < m)
+    : (z : K) ^ g ^ i ≠ (z : K) ^ g ^ j := by
   intro h
   have key : ∀ x : K, (x ^ g ^ i) ^ g ^ (m - i) = x := by
     intro x
@@ -91,14 +117,25 @@ private theorem conj_inj {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Ty
   simp only [key] at h2
   exact h2.symm
 
-private theorem aeval_conj {g : ℕ} [Fact g.Prime] {K : Type} [Field K] [Algebra (ZMod g) K]
-    (Y : (ZMod g)[X]) (x : K) (hx : aeval x Y = 0) (j : ℕ) : aeval (x ^ g ^ j) Y = 0 := by
+private theorem aeval_conj
+    {g : ℕ} [Fact g.Prime]
+    {K : Type} [Field K] [Algebra (ZMod g) K]
+    (Y : (ZMod g)[X]) (x : K) (hx : aeval x Y = 0)
+    (j : ℕ)
+    : aeval (x ^ g ^ j) Y = 0 := by
   rw [aeval_pow_prime_pow_eq_pow, hx, zero_pow (pow_ne_zero _ (Fact.out : g.Prime).ne_zero)]
 
-private theorem roots_conj {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : Type} [Field K] [Algebra (ZMod g) K]
-    (hK : Module.finrank (ZMod g) K = m) (Y : (ZMod g)[X]) (hY : Irreducible Y) (hYm : Y.Monic)
-    (hYd : Y.natDegree = m) (z : Kˣ) (hz : aeval (z : K) Y = 0) {L : Type} [Field L] (ι : K →+* L) :
-    ((Y.map (algebraMap (ZMod g) K)).map ι).roots = (Multiset.range m).map fun j => ι ((z : K) ^ g ^ j) := by
+private theorem roots_conj
+    {g : ℕ} [Fact g.Prime]
+    {m : ℕ} (hm : 0 < m)
+    {K : Type} [Field K] [Algebra (ZMod g) K]
+    (hK : Module.finrank (ZMod g) K = m)
+    (Y : (ZMod g)[X]) (hY : Irreducible Y) (hYm : Y.Monic) (hYd : Y.natDegree = m)
+    (z : Kˣ) (hz : aeval (z : K) Y = 0)
+    {L : Type} [Field L]
+    (ι : K →+* L)
+    : ((Y.map (algebraMap (ZMod g) K)).map ι).roots
+      = (Multiset.range m).map fun j => ι ((z : K) ^ g ^ j) := by
   have hzm : (minpoly (ZMod g) (z : K)).natDegree = m := by
     rw [← minpoly.eq_of_irreducible_of_monic hY hz hYm, hYd]
   have hnd : ((Multiset.range m).map fun j => ι ((z : K) ^ g ^ j)).Nodup := by
@@ -111,8 +148,9 @@ private theorem roots_conj {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : 
     · exact h
     · exact absurd h'.symm (conj_inj hm hK z hzm j i h hi)
   have hP0 : ((Y.map (algebraMap (ZMod g) K)).map ι) ≠ 0 := ((hYm.map _).map _).ne_zero
-  have hle : ((Multiset.range m).map fun j => ι ((z : K) ^ g ^ j)) ≤
-      ((Y.map (algebraMap (ZMod g) K)).map ι).roots := by
+  have hle
+      : ((Multiset.range m).map fun j => ι ((z : K) ^ g ^ j))
+        ≤ ((Y.map (algebraMap (ZMod g) K)).map ι).roots := by
     rw [Multiset.le_iff_subset hnd]
     intro y hy
     rw [Multiset.mem_map] at hy
@@ -125,8 +163,10 @@ private theorem roots_conj {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K : 
   rw [Multiset.card_map, Multiset.card_range, ← hdeg]
   exact card_roots' _
 
-private theorem false_of_reg_of_mul_pow_modEq {g m c i j : ℕ} (hg : 0 < g) (hc : Reg g m c) (hij : i < j) (hj : j < m)
-    (h : c * g ^ i ≡ c * g ^ j [MOD g ^ m - 1]) : False := by
+private theorem false_of_reg_of_mul_pow_modEq
+    {g m c i j : ℕ} (hg : 0 < g) (hc : Reg g m c) (hij : i < j) (hj : j < m)
+    (h : c * g ^ i ≡ c * g ^ j [MOD g ^ m - 1])
+    : False := by
   have hone : g ^ m ≡ 1 [MOD g ^ m - 1] := Nat.modEq_sub (Nat.one_le_pow _ _ hg)
   have h2 := h.mul_right (g ^ (m - i))
   have e1 : c * g ^ i * g ^ (m - i) = c * g ^ m := by
@@ -141,9 +181,15 @@ private theorem false_of_reg_of_mul_pow_modEq {g m c i j : ℕ} (hg : 0 < g) (hc
     simpa using hone.mul_left (c * g ^ (j - i))
   exact hc (j - i) (by omega) (by omega) (h4.symm.trans (h2.symm.trans h3))
 
-private theorem regular_character_of_pow {g : ℕ} [Fact g.Prime] {m : ℕ} (hm : 0 < m) {K 𝔨 : Type} [Field K] [Algebra (ZMod g) K] [Field 𝔨]
-    (hK : Module.finrank (ZMod g) K = m) (ι : K →+* 𝔨) (Θ : 𝔨 →* ℂ) (hΘ : Inj Θ) (c : ℕ) (hc : Reg g m c) :
-    GlobalTheory.Published.IsRegularChar g m ((Units.map (Θ.comp ι.toMonoidHom)) ^ c : Kˣ →* ℂˣ) := by
+private theorem regular_character_of_pow
+    {g : ℕ} [Fact g.Prime]
+    {m : ℕ} (hm : 0 < m)
+    {K 𝔨 : Type} [Field K] [Algebra (ZMod g) K] [Field 𝔨]
+    (hK : Module.finrank (ZMod g) K = m) (ι : K →+* 𝔨)
+    (Θ : 𝔨 →* ℂ) (hΘ : Inj Θ)
+    (c : ℕ) (hc : Reg g m c)
+    : GlobalTheory.Published.IsRegularChar g m
+      ((Units.map (Θ.comp ι.toMonoidHom)) ^ c : Kˣ →* ℂˣ) := by
   intro i j hi hj hij
   have hg : g.Prime := Fact.out
   haveI : Module.Finite (ZMod g) K := Module.finite_of_finrank_pos (hK ▸ hm)
@@ -166,46 +212,52 @@ private theorem regular_character_of_pow {g : ℕ} [Fact g.Prime] {m : ℕ} (hm 
   · exact h
   · exact (false_of_reg_of_mul_pow_modEq hg.pos hc h hi h2.symm).elim
 
-theorem UpperTheory.Gal.InertialTypesAlt.nameOf :
-    NameOf := by
+theorem UpperTheory.Gal.InertialTypesAlt.nameOf : NameOf := by
   intro g _ m hm F K 𝔨 _ _ _ _ _ hK r e ι Θ hΘ c hc
-  refine ⟨(Units.map (Θ.comp ι.toMonoidHom)) ^ c, ?_, regular_character_of_pow hm hK ι Θ hΘ c hc, ?_⟩
+  refine
+    ⟨(Units.map (Θ.comp ι.toMonoidHom)) ^ c, ?_, regular_character_of_pow hm hK ι Θ hΘ c hc, ?_⟩
   · intro u
     rw [MonoidHom.pow_apply, Units.val_pow_eq_pow_val]
     rfl
   · intro τ hτ y hy z hz
     set Y : (ZMod g)[X] := (y : Matrix (Fin m) (Fin m) (ZMod g)).charpoly with hYdef
     have hYm : Y.Monic := Matrix.charpoly_monic _
-    have hYd : Y.natDegree = m := by
-      rw [hYdef, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+    have hYd : Y.natDegree = m := by rw [hYdef, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
     let γ : GL (Fin m) F := Matrix.GeneralLinearGroup.map r.symm.toRingHom y
     have hyγ : Matrix.GeneralLinearGroup.map r.toRingHom γ = y := by
       ext i j
       simp [γ]
     have hγc : (γ : Matrix (Fin m) (Fin m) F).charpoly = Y.map r.symm.toRingHom := by
-      rw [show (γ : Matrix (Fin m) (Fin m) F) = (y : Matrix (Fin m) (Fin m) (ZMod g)).map r.symm.toRingHom
-        from rfl, Matrix.charpoly_map]
-    have hirr : Irreducible (LinearMap.charpoly (Matrix.toLin' (γ : Matrix (Fin m) (Fin m) F))) := by
+      rw [show (γ : Matrix (Fin m) (Fin m) F)
+            = (y : Matrix (Fin m) (Fin m) (ZMod g)).map r.symm.toRingHom from
+          rfl,
+        Matrix.charpoly_map]
+    have hirr
+        : Irreducible (LinearMap.charpoly (Matrix.toLin' (γ : Matrix (Fin m) (Fin m) F))) := by
       rw [Matrix.charpoly_toLin', hγc]
       exact (MulEquiv.irreducible_iff (Polynomial.mapEquiv r.symm)).mpr hy
     rw [← hyγ, hτ γ]
     delta cusp psiG
     congr 1
-    refine (GlobalTheory.T.invariantSubspaceMobiusInverseCharpoly_of_irreducible F (Fin m → F) _ (GlobalTheory.T.rootPowerSumCharacter_additive_and_X_sub_one_pow F (Θ.comp e) c).1 _ hirr).trans ?_
+    refine (GlobalTheory.T.invariantSubspaceMobiusInverseCharpoly_of_irreducible F (Fin m → F) _
+      (GlobalTheory.T.rootPowerSumCharacter_additive_and_X_sub_one_pow F (Θ.comp e) c).1 _
+      hirr).trans ?_
     rw [Matrix.charpoly_toLin', hγc]
     delta GlobalTheory.CuspGL.rootSum
     rw [Polynomial.map_map]
     have hP : (Y.map ((algebraMap F (AlgebraicClosure F)).comp r.symm.toRingHom)).Splits :=
       IsAlgClosed.splits _
-    have hroots : (Y.map ((algebraMap F (AlgebraicClosure F)).comp r.symm.toRingHom)).roots.map e =
-        ((Y.map (algebraMap (ZMod g) K)).map ι).roots := by
+    have hroots
+        : (Y.map ((algebraMap F (AlgebraicClosure F)).comp r.symm.toRingHom)).roots.map e
+          = ((Y.map (algebraMap (ZMod g) K)).map ι).roots := by
       rw [← hP.roots_map e, Polynomial.map_map, Polynomial.map_map]
       congr 2
       exact Subsingleton.elim _ _
-    have hre : ((Y.map ((algebraMap F (AlgebraicClosure F)).comp r.symm.toRingHom)).roots.map
-        fun α => (Θ.comp e) α ^ c) =
-        (((Y.map ((algebraMap F (AlgebraicClosure F)).comp r.symm.toRingHom)).roots.map e).map
-        fun β => Θ β ^ c) := by
+    have hre
+        : ((Y.map ((algebraMap F (AlgebraicClosure F)).comp r.symm.toRingHom)).roots.map fun α =>
+            (Θ.comp e) α ^ c)
+          = (((Y.map ((algebraMap F (AlgebraicClosure F)).comp r.symm.toRingHom)).roots.map e).map
+            fun β => Θ β ^ c) := by
       rw [Multiset.map_map]
       rfl
     rw [hre, hroots, roots_conj hm hK Y hy hYm hYd z hz ι, Multiset.map_map,

@@ -11,11 +11,20 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.KernelDat
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Ker Formalism.L2.Forms GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc GlobalTheory.Svd NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Ker
+  Formalism.L2.Forms GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc GlobalTheory.Svd NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory.Pdv
 
-theorem rowAt_of_stdTie : Formalism.L2.KerInert.AlgTAll → Formalism.L2.KerInert.GenusOneModelExistsLattice → Formalism.L2.KerInert.Rep.CurveDict → Formalism.L2.KerInert.IntInert → ∀ {Bd : BdT} (Q : V4.Slot) (Lk : LkT Bd) (ker : ∀ (D : D7) (O : Obj D) (c : ℝ), Bd D O c → KerEntTied O.ex), RowE Q Lk (fun _ D O c b => StdTie D O (ker D O c b)) → Row Q Lk (AtAll fun D O c b => GlobalTheory.Pdv.At O.ex (ker D O c b).ent) := by
+theorem rowAt_of_stdTie
+    : Formalism.L2.KerInert.AlgTAll → Formalism.L2.KerInert.GenusOneModelExistsLattice
+      → Formalism.L2.KerInert.Rep.CurveDict → Formalism.L2.KerInert.IntInert
+      → ∀ {Bd : BdT} (Q : V4.Slot) (Lk : LkT Bd)
+          (ker : ∀ (D : D7) (O : Obj D) (c : ℝ), Bd D O c → KerEntTied O.ex),
+        RowE Q Lk (fun _ D O c b => StdTie D O (ker D O c b))
+          → Row Q Lk (AtAll fun D O c b => GlobalTheory.Pdv.At O.ex (ker D O c b).ent) := by
   intro hA hG hD hI Bd Q Lk ker hE
   choose x0 hx0 using GlobalTheory.ShapeUniform.shape_uniform
   refine ⟨fun κ D O c b => x0 κ.eps ≤ O.L.sc.x ∧ StdTie D O (ker D O c b), ?_, ?_⟩
@@ -36,8 +45,12 @@ theorem rowAt_of_stdTie : Formalism.L2.KerInert.AlgTAll → Formalism.L2.KerIner
       exact h0'
     have hsh := hx0 eps Fm x hge hx i
     have hsb : 3 ≤ (Fm.D x i).host.splitBound :=
-      (hsh (OrbitPlaces.ofKer (nuRowOK (Fm.D x i)) (ker _ _ _ (σ Fm hc x hx i)).ent (fun _ => 0) (fun _ _ => 0) (fun _ _ => 0))).2.2
-    exact GlobalTheory.T.kernelDatumConditions_at_standardKernelComparison hA hG hD hI (Fm.D x i) (objAt Fm x hx i) (ker _ _ _ (σ Fm hc x hx i)) hst hsb
-      Fm.fixed.2.1.ge Fm.fixed.2.2.1.ge (fun Ee => ⟨(hsh Ee).1, (hsh Ee).2.1⟩)
+      (hsh (OrbitPlaces.ofKer (nuRowOK (Fm.D x i)) (ker _ _ _ (σ Fm hc x hx i)).ent
+        (fun _ => 0)
+        (fun _ _ => 0)
+        (fun _ _ => 0))).2.2
+    exact GlobalTheory.T.kernelDatumConditions_at_standardKernelComparison hA hG hD hI (Fm.D x i)
+      (objAt Fm x hx i) (ker _ _ _ (σ Fm hc x hx i)) hst hsb Fm.fixed.2.1.ge Fm.fixed.2.2.1.ge
+      (fun Ee => ⟨(hsh Ee).1, (hsh Ee).2.1⟩)
 
 end GlobalTheory.Pdv

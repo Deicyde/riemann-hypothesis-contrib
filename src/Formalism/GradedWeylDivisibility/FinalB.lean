@@ -25,7 +25,8 @@ theorem fockQBilin : FockQBilin := fischerInnerRatBilinear
 theorem fockQRowDivAdj : FockQRowDivAdj := fock_space_row_divided_adjoint
 theorem rowDivClosedGraded : RowDivClosedGraded := row_divided_closed_graded
 theorem hwInClosed : HWInClosed := hwInClosed_of hwLine rowDivClosedGraded
-theorem closedEqNabla : ClosedEqNabla := closedEqNabla_of hwInClosed fockQPos fockQBilin fockQRowDivAdj
+theorem closedEqNabla : ClosedEqNabla :=
+  closedEqNabla_of hwInClosed fockQPos fockQBilin fockQRowDivAdj
 theorem weylEqNablaQ : WeylEqNablaQ := weylEqNablaQ_of closedEqNabla
 
 theorem weylRational : WeylRational := weyl_module_rational weylEqNablaQ

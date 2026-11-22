@@ -6,13 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-private theorem idxTwo_conj {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (U : Subgroup Γ) (S : Set Γ)
-    (σ : Γ) (n : ℕ) (hc : ∀ u ∈ U, σ⁻¹ * u * σ ∈ U) (h2 : σ * σ ∈ U) (hS : ∀ s ∈ S, σ⁻¹ * s * σ ∈ S)
-    (h : CardLe {φ : CharOff U S 2 // ∀ u u' : U, u'.1 = σ⁻¹ * u.1 * σ → φ.1 u' = φ.1 u} n) :
-    CardLe (CharOff U S 2) (n ^ 2) := by
+private theorem idxTwo_conj
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+    (U : Subgroup Γ) (S : Set Γ) (σ : Γ) (n : ℕ)
+    (hc : ∀ u ∈ U, σ⁻¹ * u * σ ∈ U) (h2 : σ * σ ∈ U) (hS : ∀ s ∈ S, σ⁻¹ * s * σ ∈ S)
+    (h : CardLe {φ : CharOff U S 2 // ∀ u u' : U, u'.1 = σ⁻¹ * u.1 * σ → φ.1 u' = φ.1 u} n)
+    : CardLe (CharOff U S 2) (n ^ 2) := by
   let c : U → U := fun u => ⟨σ⁻¹ * u.1 * σ, hc u.1 u.2⟩
   have hcc : Continuous c :=
     ((continuous_const.mul continuous_subtype_val).mul continuous_const).subtype_mk _
@@ -28,18 +32,19 @@ private theorem idxTwo_conj {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopo
     · simp only [hcm, hadd]
       ring
     · simp only [hz u hu, hz (c u) (hS _ hu), add_zero]
-  let f : CharOff U S 2 →+ CharOff U S 2 :=
-    { toFun := fun φ => ⟨_, hmem φ⟩
-      map_zero' := by
-        apply Subtype.ext
-        funext u
-        simp
-      map_add' := by
-        intro a b
-        apply Subtype.ext
-        funext u
-        simp only [Submodule.coe_add, Pi.add_apply]
-        ring }
+  let f : CharOff U S 2 →+ CharOff U S 2 := {
+    toFun := fun φ => ⟨_, hmem φ⟩
+    map_zero' := by
+      apply Subtype.ext
+      funext u
+      simp
+    map_add' := by
+      intro a b
+      apply Subtype.ext
+      funext u
+      simp only [Submodule.coe_add, Pi.add_apply]
+      ring
+  }
   have hff : ∀ x, f (f x) = 0 := by
     intro φ
     obtain ⟨-, hadd, -⟩ := φ.2
@@ -81,9 +86,12 @@ private theorem idxTwo_conj {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopo
       exact Subtype.ext hab'
   exact sqZero _ f n hff hker
 
-theorem UpperTheory.V.Two.idxTwo :
-    ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (U V : Subgroup Γ) (S : Set Γ) (n : ℕ), U ≤ V → IsOpen (U.subgroupOf V : Set V) → U.relIndex V ∣ 2 → (∀ v ∈ V, ∀ s ∈ S, v⁻¹ * s * v ∈ S) → (∀ s ∈ S, s ∈ V → s ∈ U) →
-      CardLe (CharOff V S 2) n → CardLe (CharOff U S 2) (n ^ 2) := by
+theorem UpperTheory.V.Two.idxTwo
+    : ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (U V : Subgroup Γ)
+        (S : Set Γ) (n : ℕ),
+      U ≤ V → IsOpen (U.subgroupOf V : Set V) → U.relIndex V ∣ 2
+        → (∀ v ∈ V, ∀ s ∈ S, v⁻¹ * s * v ∈ S) → (∀ s ∈ S, s ∈ V → s ∈ U) → CardLe (CharOff V S 2) n
+        → CardLe (CharOff U S 2) (n ^ 2) := by
   intro Γ _ _ _ U V S n hUV hopen hdvd hSV hSU hV
   rcases (Nat.dvd_prime Nat.prime_two).1 hdvd with h1 | h2
   · have hVU : V ≤ U := Subgroup.relIndex_eq_one.1 h1
@@ -96,7 +104,8 @@ theorem UpperTheory.V.Two.idxTwo :
     obtain ⟨σ, hσV, hσU⟩ := SetLike.not_le_iff_exists.1 hnot
     have hidx : (U.subgroupOf V).index = 2 := h2
     have hnorm := Subgroup.normal_of_index_eq_two hidx
-    refine idxTwo_conj U S σ n ?_ ?_ (fun s hs => hSV σ hσV s hs)
+    refine idxTwo_conj U S σ n ?_ ?_
+      (fun s hs => hSV σ hσV s hs)
       (invTwo Γ U V S σ n hUV hσV hopen h2 hσU hSU hV)
     · intro u hu
       have := hnorm.conj_mem ⟨u, hUV hu⟩ (Subgroup.mem_subgroupOf.2 hu) (⟨σ, hσV⟩⁻¹)

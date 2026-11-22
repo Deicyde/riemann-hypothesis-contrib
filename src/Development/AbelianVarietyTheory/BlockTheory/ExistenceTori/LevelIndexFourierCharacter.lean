@@ -13,7 +13,8 @@ noncomputable section
 namespace GlobalTheory.IndefiniteRowSideFullHecke.LevelSpanSeparation
 
 open AlgebraicGeometry CategoryTheory MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -28,12 +29,13 @@ theorem bar_bar (H : Host E) (a : 𝓞 E) : H.bar (H.bar a) = a := by
   rw [h1, h2, IsCMField.complexConj_apply_apply]
 
 theorem bar_mem_of_mem_conjHalf (l : Level H) {a : 𝓞 E} (ha : a ∈ conjHalf l) : H.bar a ∈ l.Mb := by
-  obtain ⟨b, hb, rfl⟩ := (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).1 ha
+  obtain ⟨b, hb, rfl⟩ :=
+    (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).1 ha
   have : H.bar ((H.bar : 𝓞 E →+* 𝓞 E) b) = b := bar_bar H b
   rwa [this]
 
-theorem mul_mem_span_level (l : Level H) {a b : 𝓞 E} (ha : a ∈ l.Mb) (hb : b ∈ conjHalf l) :
-    ∃ z : 𝓞 E, a * b = (l.M : 𝓞 E) * z := by
+theorem mul_mem_span_level (l : Level H) {a b : 𝓞 E} (ha : a ∈ l.Mb) (hb : b ∈ conjHalf l)
+    : ∃ z : 𝓞 E, a * b = (l.M : 𝓞 E) * z := by
   have h : a * b ∈ Ideal.span {(l.M : 𝓞 E)} := l.prod ▸ Ideal.mul_mem_mul ha hb
   obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 h
   exact ⟨z, by rw [← hz, mul_comm]⟩
@@ -41,12 +43,12 @@ theorem mul_mem_span_level (l : Level H) {a b : 𝓞 E} (ha : a ∈ l.Mb) (hb : 
 def IsSep (l : Level H) (c : 𝓞 E) : Prop := c ∈ conjHalf l ∧ c - 1 ∈ l.Mb
 
 theorem exists_isSep (l : Level H) : ∃ c, IsSep l c := by
-  have h : (1 : 𝓞 E) ∈ l.Mb ⊔ conjHalf l := by
-    rw [conjHalf, l.coprime]; trivial
+  have h : (1 : 𝓞 E) ∈ l.Mb ⊔ conjHalf l := by rw [conjHalf, l.coprime]; trivial
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 h
   refine ⟨b, hb, ?_⟩
   have : b - 1 = -a := by rw [← hab]; ring
-  rw [this]; exact neg_mem ha
+  rw [this]
+  exact neg_mem ha
 
 def sep (l : Level H) : 𝓞 E := (exists_isSep l).choose
 
@@ -58,8 +60,8 @@ abbrev NamedCl : Type := D.La ⧸ (l.Mb • (⊤ : Submodule (𝓞 E) D.La))
 
 abbrev ConjCl : Type := D.La ⧸ (conjHalf l • (⊤ : Submodule (𝓞 E) D.La))
 
-theorem finite_quot (I : Ideal (𝓞 E)) (hI : (l.M : 𝓞 E) ∈ I) :
-    Finite (D.La ⧸ (I • (⊤ : Submodule (𝓞 E) D.La))) := by
+theorem finite_quot (I : Ideal (𝓞 E)) (hI : (l.M : 𝓞 E) ∈ I)
+    : Finite (D.La ⧸ (I • (⊤ : Submodule (𝓞 E) D.La))) := by
   haveI := D.fin
   haveI : Module.Finite ℤ D.La := Module.Finite.trans (𝓞 E) D.La
   have hM : (l.M : ℤ) ≠ 0 := by have := l.three_le; omega
@@ -73,29 +75,33 @@ theorem finite_quot (I : Ideal (𝓞 E)) (hI : (l.M : 𝓞 E) ∈ I) :
 theorem level_mem_mul : (l.M : 𝓞 E) ∈ l.Mb * conjHalf l := by
   rw [conjHalf, l.prod]; exact Ideal.mem_span_singleton_self _
 
-instance finite_namedCl : Finite (NamedCl D l) := finite_quot D l _
-  (Ideal.mul_le_inf (level_mem_mul l)).1
+instance finite_namedCl : Finite (NamedCl D l) :=
+  finite_quot D l _ (Ideal.mul_le_inf (level_mem_mul l)).1
 
-instance finite_conjCl : Finite (ConjCl D l) := finite_quot D l _
-  (Ideal.mul_le_inf (level_mem_mul l)).2
+instance finite_conjCl : Finite (ConjCl D l) :=
+  finite_quot D l _ (Ideal.mul_le_inf (level_mem_mul l)).2
 
-theorem ef_smul_eq_zero {a b : 𝓞 E} (ha : a ∈ l.Mb) (hb : b ∈ conjHalf l) (u v : D.La) :
-    ((D.EF u ((a * b) • v) : ℤ) : ZMod l.M) = 0 := by
+theorem ef_smul_eq_zero {a b : 𝓞 E} (ha : a ∈ l.Mb) (hb : b ∈ conjHalf l) (u v : D.La)
+    : ((D.EF u ((a * b) • v) : ℤ) : ZMod l.M) = 0 := by
   obtain ⟨z, hz⟩ := mul_mem_span_level l ha hb
   rw [hz, mul_smul, Nat.cast_smul_eq_nsmul, map_nsmul]
   simp
 
-theorem ef_left_zero {c : 𝓞 E} (hc : c ∈ conjHalf l) {u : D.La}
-    (hu : u ∈ conjHalf l • (⊤ : Submodule (𝓞 E) D.La)) (v : D.La) :
-    ((D.EF u (c • v) : ℤ) : ZMod l.M) = 0 := by
+theorem ef_left_zero
+    {c : 𝓞 E} (hc : c ∈ conjHalf l)
+    {u : D.La} (hu : u ∈ conjHalf l • (⊤ : Submodule (𝓞 E) D.La))
+    (v : D.La)
+    : ((D.EF u (c • v) : ℤ) : ZMod l.M) = 0 := by
   refine Submodule.smul_induction_on hu (fun m hm w _ => ?_) (fun x y hx hy => ?_)
   · rw [D.adj, ← mul_smul]
     exact ef_smul_eq_zero D l (bar_mem_of_mem_conjHalf l hm) hc w v
   · rw [map_add (f := _), LinearMap.add_apply, Int.cast_add, hx, hy, add_zero]
 
-theorem ef_right_zero {c : 𝓞 E} (hc : c ∈ conjHalf l) (u : D.La) {v : D.La}
-    (hv : v ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La)) :
-    ((D.EF u (c • v) : ℤ) : ZMod l.M) = 0 := by
+theorem ef_right_zero
+    {c : 𝓞 E} (hc : c ∈ conjHalf l)
+    (u : D.La)
+    {v : D.La} (hv : v ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La))
+    : ((D.EF u (c • v) : ℤ) : ZMod l.M) = 0 := by
   refine Submodule.smul_induction_on hv (fun m hm w _ => ?_) (fun x y hx hy => ?_)
   · rw [← mul_smul, mul_comm]
     exact ef_smul_eq_zero D l hm hc u w
@@ -130,11 +136,8 @@ theorem zeta_level_mem (c : Coeff l) : zeta l.M ∈ c.F := by
   rw [this]
   exact pow_mem c.zeta_mem k
 
-
 variable {l} in
 def zetaM (c : Coeff l) : c.F := ⟨zeta l.M, zeta_level_mem l c⟩
-
-
 
 variable {l}
 
@@ -143,8 +146,8 @@ def eChar (c : Coeff l) {n : ℕ} (a : Fin n → ConjCl D l) (t : Fin n → Name
 
 variable {D}
 
-def levPtCl (Xo : Moduli D l) {S : Type} [CommRing S] (x0 : Sp S ⟶ Xo.X) (x : NamedCl D l) :
-    ptO Xo x0 ⟶ Xo.univ.t.G :=
+def levPtCl (Xo : Moduli D l) {S : Type} [CommRing S] (x0 : Sp S ⟶ Xo.X) (x : NamedCl D l)
+    : ptO Xo x0 ⟶ Xo.univ.t.G :=
   Quotient.liftOn' x (fun u => levPt Xo x0 u) (by
     intro u v huv
     have h := (Submodule.quotientRel_def _).1 huv
@@ -154,32 +157,29 @@ def levPtCl (Xo : Moduli D l) {S : Type} [CommRing S] (x0 : Sp S ⟶ Xo.X) (x : 
       exact h2
     simp only [levPt, this])
 
-
 variable (D l) in
 def levelIndex (n : ℕ) : Finset (Fin n → NamedCl D l) := (Set.finite_univ).toFinset
 
 def SpansAtEvery {n : ℕ} (s : Set (Fin n)) (x₀ : Fin n → ConjCl D l) : Prop :=
-  ∀ 𝔭 : Ideal (𝓞 E), 𝔭.IsMaximal → conjHalf l ≤ 𝔭 →
-    Submodule.span (𝓞 E) (x₀ '' s) ⊔ 𝔭 • (⊤ : Submodule (𝓞 E) (ConjCl D l)) = ⊤
+  ∀ 𝔭 : Ideal (𝓞 E),
+    𝔭.IsMaximal → conjHalf l ≤ 𝔭
+      → Submodule.span (𝓞 E) (x₀ '' s) ⊔ 𝔭 • (⊤ : Submodule (𝓞 E) (ConjCl D l)) = ⊤
 
 def FirstInv {n : ℕ} (x₀ : Fin n → ConjCl D l) : Prop :=
   D.p + D.q ≤ n ∧ SpansAtEvery {b : Fin n | (b : ℕ) < D.p + D.q} x₀
 
 def RankFull {n : ℕ} (x₀ : Fin n → ConjCl D l) : Prop := SpansAtEvery Set.univ x₀
 
-
 open Classical in
 def Admissible (nV : ℕ) {n : ℕ} (x₀ : Fin n → ConjCl D l) : Prop :=
   if n = nV then RankFull x₀ else FirstInv x₀
 
-def fourier (c : Coeff l) {n : ℕ} (φ : (Fin n → ConjCl D l) → c.F) (t : Fin n → NamedCl D l) : c.F :=
-  (Nat.card (Fin n → NamedCl D l) : c.F)⁻¹ *
-    ∑ a ∈ (Set.finite_univ : (Set.univ : Set (Fin n → ConjCl D l)).Finite).toFinset, φ a * (eChar D c a t)⁻¹
+def fourier (c : Coeff l) {n : ℕ} (φ : (Fin n → ConjCl D l) → c.F) (t : Fin n → NamedCl D l)
+    : c.F :=
+  (Nat.card (Fin n → NamedCl D l) : c.F)⁻¹
+    * ∑ a ∈ (Set.finite_univ : (Set.univ : Set (Fin n → ConjCl D l)).Finite).toFinset, φ a * (eChar D c a t)⁻¹
 
 def indicatorCl (c : Coeff l) {n : ℕ} (x₀ : Fin n → ConjCl D l) : (Fin n → ConjCl D l) → c.F :=
   Set.indicator {x₀} 1
-
-
-
 
 end GlobalTheory.IndefiniteRowSideFullHecke.LevelSpanSeparation

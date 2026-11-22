@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
 noncomputable section
 
 open scoped TensorProduct Classical
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 namespace PositivityTheory.RL
 
@@ -34,18 +35,22 @@ theorem at_sgn (w : InfinitePlace F) : At (evI F) (algebraMap (AF F) (AE F E) (s
       rw [sub_self, mul_zero]
   rw [← map_one (algebraMap (AF F) (AE F E)), ← map_sub, Algebra.smul_def, ← map_mul, h2, map_zero]
 
-theorem piInf_sgn (w v : InfinitePlace F) (τ : EmbOver E v) :
-    piInf τ (algebraMap (AF F) (AE F E) (sgnAd w)) = if v = w then -1 else 1 := by
+theorem piInf_sgn (w v : InfinitePlace F) (τ : EmbOver E v)
+    : piInf τ (algebraMap (AF F) (AE F E) (sgnAd w)) = if v = w then -1 else 1 := by
   change infEmb τ ((if v = w then (-1 : v.Completion) else 1) ⊗ₜ[F] (1 : E)) = _
   rw [infEmb_tmul]
   split_ifs <;> simp
 
-theorem hasExp_sgn {τ : ∀ w : InfinitePlace F, EmbOver E w} {χ : Chr F E} {m : InfinitePlace F → ℤ}
-    (h : HasExp τ χ m) (w : InfinitePlace F) :
-    (χ (Units.map (algebraMap (AF F) (AE F E) : AF F →* AE F E) (sgnId w)) : ℂ) = (-1) ^ m w := by
+theorem hasExp_sgn
+    {τ : ∀ w : InfinitePlace F, EmbOver E w} {χ : Chr F E} {m : InfinitePlace F → ℤ}
+    (h : HasExp τ χ m)
+    (w : InfinitePlace F)
+    : (χ (Units.map (algebraMap (AF F) (AE F E) : AF F →* AE F E) (sgnId w)) : ℂ) = (-1) ^ m w := by
   rw [h _ (at_sgn w)]
-  change ∏ v, (piInf (τ v) (algebraMap (AF F) (AE F E) (sgnAd w)) /
-    ‖piInf (τ v) (algebraMap (AF F) (AE F E) (sgnAd w))‖) ^ m v = _
+  change
+    ∏ v, (piInf (τ v) (algebraMap (AF F) (AE F E) (sgnAd w)) /
+        ‖piInf (τ v) (algebraMap (AF F) (AE F E) (sgnAd w))‖) ^ m v
+      = _
   simp only [piInf_sgn]
   rw [Finset.prod_eq_single w]
   · simp

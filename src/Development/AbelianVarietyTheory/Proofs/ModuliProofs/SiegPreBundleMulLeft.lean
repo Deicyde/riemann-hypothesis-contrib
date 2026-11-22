@@ -11,15 +11,27 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsHeckeQu
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
 open CechPic
 
-theorem siegPre_bundle_mul_left : (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left), M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen) → ∀ (K : Type) [Field K] (o : Type) [CommRing o] (s : Sp K ⟶ Sp o) (h k : ℕ) (ζ : o) (c : SiegPre h k ζ s) (P : Out.PolAV (Sp K)) (pr : Fin 8 → (P.A ⟶ c.A)), (∀ u, IsMonHom (pr u)) → (∀ (T : Over (Sp K)) (y : Fin 8 → (T ⟶ c.A)), ∃! x : T ⟶ P.A, ∀ u, x ≫ pr u = y u) → ∀ (T : Over (Sp K)) (x x' y : T ⟶ c.A), ∃ t : LB.Gen (LB.LinComb c.P (K := Fin 3) ![(lift (x * x') y).left, (lift x y).left, (lift x' y).left] ![1, -1, -1]), t.IsGen := by
+theorem siegPre_bundle_mul_left
+    : (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left),
+        M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen)
+      → ∀ (K : Type) [Field K] (o : Type) [CommRing o] (s : Sp K ⟶ Sp o) (h k : ℕ) (ζ : o)
+          (c : SiegPre h k ζ s) (P : Out.PolAV (Sp K)) (pr : Fin 8 → (P.A ⟶ c.A)),
+        (∀ u, IsMonHom (pr u))
+          → (∀ (T : Over (Sp K)) (y : Fin 8 → (T ⟶ c.A)), ∃! x : T ⟶ P.A, ∀ u, x ≫ pr u = y u)
+          → ∀ (T : Over (Sp K)) (x x' y : T ⟶ c.A),
+            ∃ t : LB.Gen (LB.LinComb c.P (K := Fin 3)
+                ![(lift (x * x') y).left, (lift x y).left, (lift x' y).left] ![1, -1, -1]),
+              t.IsGen := by
   intro hΘ K _ o _ s h k ζ c P pr hpr huniv T x x' y
   have := hpr 0
   have := hpr 1
@@ -27,8 +39,10 @@ theorem siegPre_bundle_mul_left : (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : L
   have hL : (c.P.pull (lift (pr 0) (pr 1)).left).IsLB := pull_isLB c.isLB _
   have hθ := hΘ (Sp K) P _ hL
 
-  have hpt : ∀ z : T ⟶ P.A, CechPic.pull z.left (cls _ hL) =
-      CechPic.pull (lift (z ≫ pr 0) (z ≫ pr 1)).left (cls c.P c.isLB) := by
+  have hpt
+      : ∀ z : T ⟶ P.A,
+        CechPic.pull z.left (cls _ hL)
+          = CechPic.pull (lift (z ≫ pr 0) (z ≫ pr 1)).left (cls c.P c.isLB) := by
     intro z
     rw [cls_pull c.isLB _ hL, ← pull_comp, ← Over.comp_left, comp_lift]
 

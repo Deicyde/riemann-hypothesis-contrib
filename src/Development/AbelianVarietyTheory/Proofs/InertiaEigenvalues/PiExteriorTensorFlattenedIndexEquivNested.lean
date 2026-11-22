@@ -16,14 +16,17 @@ namespace GlobalTheory.JacStages
 
 section SigmaCurry
 
-variable {α : Type} [DecidableEq α] {β : α → Type} [∀ a, DecidableEq (β a)]
+variable
+  {α : Type} [DecidableEq α]
+  {β : α → Type} [∀ a, DecidableEq (β a)]
   (M : (Σ a, β a) → Type) [∀ p, AddCommGroup (M p)] [∀ p, Module ℂ (M p)]
 
-theorem tprod_tprod_update_sigma [DecidableEq (Σ a, β a)] (x : ∀ p, M p) (a₀ : α) (b₀ : β a₀)
-    (v : M ⟨a₀, b₀⟩) :
-    (fun a => tprod ℂ fun b => Function.update x ⟨a₀, b₀⟩ v ⟨a, b⟩) =
-      Function.update (fun a => tprod ℂ fun b => x ⟨a, b⟩) a₀
-        (tprod ℂ (Function.update (fun b => x ⟨a₀, b⟩) b₀ v)) := by
+theorem tprod_tprod_update_sigma
+    [DecidableEq (Σ a, β a)] (x : ∀ p, M p) (a₀ : α) (b₀ : β a₀) (v : M ⟨a₀, b₀⟩)
+    : (fun a => tprod ℂ fun b => Function.update x ⟨a₀, b₀⟩ v ⟨a, b⟩)
+      = Function.update
+        (fun a => tprod ℂ fun b => x ⟨a, b⟩)
+        a₀ (tprod ℂ (Function.update (fun b => x ⟨a₀, b⟩) b₀ v)) := by
   funext a
   by_cases h : a = a₀
   · subst h
@@ -53,7 +56,8 @@ def curryML : (∀ p, M p) →ₘₗ[ℂ] ⨂[ℂ] a, ⨂[ℂ] b, M ⟨a, b⟩ w
     obtain ⟨a₀, b₀⟩ := p
     simp only [tprod_tprod_update_sigma, MultilinearMap.map_update_smul, RingHom.id_apply]
 
-theorem curryML_apply (x : ∀ p, M p) : curryML M x = tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ := rfl
+theorem curryML_apply (x : ∀ p, M p) : curryML M x = tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ :=
+  rfl
 
 variable [Finite α] [∀ a, Finite (β a)]
 
@@ -73,8 +77,9 @@ theorem sigmaCurry_eq_lift : (sigmaCurry M : (⨂[ℂ] p, M p) →ₗ[ℂ] _) = 
   simp only [sigBasis, nestBasis, Basis.piTensorProduct_apply, lift.tprod, curryML_apply]
   rfl
 
-@[simp] theorem sigmaCurry_tprod (x : ∀ p, M p) :
-    sigmaCurry M (tprod ℂ x) = tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ := by
+@[simp]
+theorem sigmaCurry_tprod (x : ∀ p, M p)
+    : sigmaCurry M (tprod ℂ x) = tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ := by
   have h := LinearMap.congr_fun (sigmaCurry_eq_lift M) (tprod ℂ x)
   simpa [curryML_apply] using h
 
@@ -84,38 +89,49 @@ section Flat
 
 variable {s : ℕ} {t : Fin s → ℕ}
 
-def flatTensorEquiv (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)] [∀ a b, Module ℂ (Y a b)] :
-    (⨂[ℂ] c : Fin (∑ a, t a), Y (finSigmaFinEquiv.symm c).1 (finSigmaFinEquiv.symm c).2) ≃ₗ[ℂ]
-      ⨂[ℂ] a, ⨂[ℂ] b, Y a b :=
+def flatTensorEquiv
+    (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)] [∀ a b, Module ℂ (Y a b)]
+    : (⨂[ℂ] c : Fin (∑ a, t a), Y (finSigmaFinEquiv.symm c).1 (finSigmaFinEquiv.symm c).2) ≃ₗ[ℂ]
+        ⨂[ℂ] a, ⨂[ℂ] b, Y a b :=
   (reindex ℂ (fun p : Σ a, Fin (t a) => Y p.1 p.2) finSigmaFinEquiv).symm.trans
     (sigmaCurry fun p : Σ a, Fin (t a) => Y p.1 p.2)
 
-theorem flatTensorEquiv_reindex_tprod (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)]
-    [∀ a b, Module ℂ (Y a b)] (x : ∀ p : Σ a, Fin (t a), Y p.1 p.2) :
-    flatTensorEquiv Y (reindex ℂ (fun p : Σ a, Fin (t a) => Y p.1 p.2) finSigmaFinEquiv (tprod ℂ x)) =
-      tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ := by
+theorem flatTensorEquiv_reindex_tprod
+    (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)] [∀ a b, Module ℂ (Y a b)]
+    (x : ∀ p : Σ a, Fin (t a), Y p.1 p.2)
+    : flatTensorEquiv Y
+        (reindex ℂ (fun p : Σ a, Fin (t a) => Y p.1 p.2) finSigmaFinEquiv (tprod ℂ x))
+      = tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ := by
   rw [flatTensorEquiv, LinearEquiv.trans_apply, LinearEquiv.symm_apply_apply, sigmaCurry_tprod]
 
-theorem flatTensorEquiv_tprod (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)]
-    [∀ a b, Module ℂ (Y a b)] (x : ∀ p : Σ a, Fin (t a), Y p.1 p.2) :
-    flatTensorEquiv Y (tprod ℂ fun c => x (finSigmaFinEquiv.symm c)) =
-      tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ := by
+theorem flatTensorEquiv_tprod
+    (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)] [∀ a b, Module ℂ (Y a b)]
+    (x : ∀ p : Σ a, Fin (t a), Y p.1 p.2)
+    : flatTensorEquiv Y (tprod ℂ fun c => x (finSigmaFinEquiv.symm c))
+      = tprod ℂ fun a => tprod ℂ fun b => x ⟨a, b⟩ := by
   rw [← flatTensorEquiv_reindex_tprod, reindex_tprod]
 
-theorem piTensor_flatHom_equiv : ∀ (s : ℕ) (t : Fin s → ℕ) (Γ : ∀ a, Fin (t a) → Type) [∀ a b, Group (Γ a b)]
-    (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)] [∀ a b, Module ℂ (Y a b)]
-    (ρ : ∀ a b, Representation ℂ (Γ a b) (Y a b)),
-    Nonempty (Representation.Equiv ((piTensor fun c : Fin (∑ a, t a) =>
-        ρ (finSigmaFinEquiv.symm c).1 (finSigmaFinEquiv.symm c).2).comp (flatHom Γ))
-      (piTensor fun a => piTensor (ρ a))) := by
+theorem piTensor_flatHom_equiv
+    : ∀ (s : ℕ) (t : Fin s → ℕ) (Γ : ∀ a, Fin (t a) → Type) [∀ a b, Group (Γ a b)]
+        (Y : ∀ a, Fin (t a) → Type) [∀ a b, AddCommGroup (Y a b)] [∀ a b, Module ℂ (Y a b)]
+        (ρ : ∀ a b, Representation ℂ (Γ a b) (Y a b)),
+      Nonempty (Representation.Equiv
+        ((piTensor fun c : Fin (∑ a, t a) =>
+          ρ (finSigmaFinEquiv.symm c).1 (finSigmaFinEquiv.symm c).2).comp (flatHom Γ))
+        (piTensor fun a => piTensor (ρ a))) := by
   intro s t Γ _ Y _ _ ρ
   refine ⟨Representation.Equiv.mk (flatTensorEquiv Y) fun g => ?_⟩
-  have key : ∀ w : ⨂[ℂ] p : Σ a, Fin (t a), Y p.1 p.2,
-      flatTensorEquiv Y (((piTensor fun c : Fin (∑ a, t a) =>
-        ρ (finSigmaFinEquiv.symm c).1 (finSigmaFinEquiv.symm c).2).comp (flatHom Γ)) g
-          (reindex ℂ (fun p : Σ a, Fin (t a) => Y p.1 p.2) finSigmaFinEquiv w)) =
-        piTensor (fun a => piTensor (ρ a)) g
-          (flatTensorEquiv Y (reindex ℂ (fun p : Σ a, Fin (t a) => Y p.1 p.2) finSigmaFinEquiv w)) := by
+  have key
+      : ∀ w : ⨂[ℂ] p : Σ a, Fin (t a), Y p.1 p.2,
+        flatTensorEquiv Y
+            (((piTensor fun c : Fin (∑ a, t a) =>
+                ρ (finSigmaFinEquiv.symm c).1 (finSigmaFinEquiv.symm c).2).comp (flatHom Γ))
+              g (reindex ℂ (fun p : Σ a, Fin (t a) => Y p.1 p.2) finSigmaFinEquiv w))
+          = piTensor
+            (fun a => piTensor (ρ a))
+            g
+            (flatTensorEquiv Y
+              (reindex ℂ (fun p : Σ a, Fin (t a) => Y p.1 p.2) finSigmaFinEquiv w)) := by
     intro w
     induction w using PiTensorProduct.induction_on with
     | smul_tprod r x =>

@@ -15,9 +15,11 @@ open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.Chart
 
 namespace GlobalTheory.ThetaSumBound
 
-theorem finsum_mem_le_card_mul {α ι : Type*} [Fintype ι] (g : ι → α) (S : Set α)
-    (hS : S ⊆ Set.range g) (f : α → ℝ) (M : ℝ) (hM : 0 ≤ M) (hf : ∀ a ∈ S, f a ≤ M) :
-    ∑ᶠ (a : α) (_ : a ∈ S), f a ≤ Fintype.card ι * M := by
+theorem finsum_mem_le_card_mul
+    {α ι : Type*} [Fintype ι]
+    (g : ι → α) (S : Set α) (hS : S ⊆ Set.range g)
+    (f : α → ℝ) (M : ℝ) (hM : 0 ≤ M) (hf : ∀ a ∈ S, f a ≤ M)
+    : ∑ᶠ (a : α) (_ : a ∈ S), f a ≤ Fintype.card ι * M := by
   classical
   have hfin : S.Finite := (Set.finite_range g).subset hS
   rw [finsum_mem_eq_finite_toFinset_sum _ hfin]
@@ -32,10 +34,11 @@ theorem finsum_mem_le_card_mul {α ι : Type*} [Fintype ι] (g : ι → α) (S :
   rw [nsmul_eq_mul] at h1
   exact h1.trans (mul_le_mul_of_nonneg_right (by exact_mod_cast h2) hM)
 
-theorem exists_coords {ι κ : Type} [Fintype ι] [Fintype κ]
+theorem exists_coords
+    {ι κ : Type} [Fintype ι] [Fintype κ]
     (b : Module.Basis κ ℝ (EuclideanSpace ℂ ι)) (v : EuclideanSpace ℂ ι)
-    (hv : v ∈ ZSpan.fundamentalDomain b) (hL : ((5 : ℂ) ^ 2) • v ∈ lat b) :
-    ∃ k : κ → Fin 25, ∑ i, (((k i : ℕ) : ℝ) / 25) • b i = v := by
+    (hv : v ∈ ZSpan.fundamentalDomain b) (hL : ((5 : ℂ) ^ 2) • v ∈ lat b)
+    : ∃ k : κ → Fin 25, ∑ i, (((k i : ℕ) : ℝ) / 25) • b i = v := by
   have e : ((5 : ℂ) ^ 2) • v = (25 : ℝ) • v := by
     rw [← Complex.coe_smul]; congr 1; push_cast; norm_num
   rw [e] at hL
@@ -58,20 +61,26 @@ theorem exists_coords {ι κ : Type} [Fintype ι] [Fintype κ]
   simp only [hk]
   exact b.sum_repr v
 
-theorem log_le_of_bounds {K S la th c k B p3 p1 f t : ℝ} (hK : 0 < K) (hS : 0 < S) (hla : 0 < la)
-    (hth : 0 < th) (hc : 0 < c) (hk : 0 < k) (hB : 0 ≤ B) (hf : 0 < f) (ht : la ^ 2 * t ≤ f)
-    (h1 : la < th → S ≤ K * (Real.exp p3 * (k * (c / la ^ 2)) ^ B *
-      Real.exp (-(Real.pi * (c / la ^ 2) / 5 ^ 4))) ^ 2)
-    (h2 : th ≤ la → S ≤ K * Real.exp p1 ^ 2) :
-    Real.log S ≤ (Real.log K + 2 * |p3| + 2 * B * |Real.log (k * c)| + 2 * |p1| +
-      2 * Real.pi * c / (5 ^ 4 * th ^ 2)) + 4 * B * Real.log (1 + 1 / la) -
-      2 * Real.pi * c / (5 ^ 4 * f) * t := by
+theorem log_le_of_bounds
+    {K S la th c k B p3 p1 f t : ℝ} (hK : 0 < K) (hS : 0 < S) (hla : 0 < la) (hth : 0 < th)
+    (hc : 0 < c) (hk : 0 < k) (hB : 0 ≤ B) (hf : 0 < f) (ht : la ^ 2 * t ≤ f)
+    (h1 : la < th
+      → S
+        ≤ K
+          * (Real.exp p3 * (k * (c / la ^ 2)) ^ B * Real.exp (-(Real.pi * (c / la ^ 2) / 5 ^ 4)))
+            ^ 2)
+    (h2 : th ≤ la → S ≤ K * Real.exp p1 ^ 2)
+    : Real.log S
+      ≤ (Real.log K + 2 * |p3| + 2 * B * |Real.log (k * c)| + 2 * |p1|
+          + 2 * Real.pi * c / (5 ^ 4 * th ^ 2))
+        + 4 * B * Real.log (1 + 1 / la) - 2 * Real.pi * c / (5 ^ 4 * f) * t := by
   have hpi := Real.pi_pos
   have hl0 : 0 ≤ Real.log (1 + 1 / la) := Real.log_nonneg (by have := one_div_pos.2 hla; linarith)
   have hd : 2 * Real.pi * c / (5 ^ 4 * f) * t ≤ 2 * Real.pi * c / (5 ^ 4 * la ^ 2) := by
     have : t ≤ f / la ^ 2 := by rw [le_div_iff₀ (by positivity)]; linarith
-    calc 2 * Real.pi * c / (5 ^ 4 * f) * t ≤ 2 * Real.pi * c / (5 ^ 4 * f) * (f / la ^ 2) :=
-          mul_le_mul_of_nonneg_left this (by positivity)
+    calc
+      2 * Real.pi * c / (5 ^ 4 * f) * t ≤ 2 * Real.pi * c / (5 ^ 4 * f) * (f / la ^ 2) :=
+        mul_le_mul_of_nonneg_left this (by positivity)
       _ = _ := by field_simp
   have hth0 : 0 ≤ 2 * Real.pi * c / (5 ^ 4 * th ^ 2) := by positivity
   have a3 := abs_nonneg p3
@@ -80,9 +89,10 @@ theorem log_le_of_bounds {K S la th c k B p3 p1 f t : ℝ} (hK : 0 < K) (hS : 0 
   have aB := mul_nonneg hB hl0
   rcases lt_or_ge la th with h | h
   · have h3 := Real.log_le_log hS (h1 h)
-    rw [Real.log_mul hK.ne' (by positivity), Real.log_pow, Real.log_mul (by positivity) (by positivity),
-      Real.log_mul (by positivity) (by positivity), Real.log_exp, Real.log_exp,
-      Real.log_rpow (by positivity)] at h3
+    rw [Real.log_mul hK.ne' (by positivity), Real.log_pow,
+        Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
+        Real.log_exp, Real.log_exp, Real.log_rpow (by positivity)]
+      at h3
     have h4 : Real.log (k * (c / la ^ 2)) ≤ |Real.log (k * c)| + 2 * Real.log (1 + 1 / la) := by
       have e : k * (c / la ^ 2) = (k * c) * (1 / la) ^ 2 := by field_simp
       rw [e, Real.log_mul (by positivity) (by positivity), Real.log_pow]
@@ -98,8 +108,7 @@ theorem log_le_of_bounds {K S la th c k B p3 p1 f t : ℝ} (hK : 0 < K) (hS : 0 
     linarith
   · have h3 := Real.log_le_log hS (h2 h)
     rw [Real.log_mul hK.ne' (by positivity), Real.log_pow, Real.log_exp] at h3
-    have h4 : 2 * Real.pi * c / (5 ^ 4 * la ^ 2) ≤ 2 * Real.pi * c / (5 ^ 4 * th ^ 2) := by
-      gcongr
+    have h4 : 2 * Real.pi * c / (5 ^ 4 * la ^ 2) ≤ 2 * Real.pi * c / (5 ^ 4 * th ^ 2) := by gcongr
     have := le_abs_self p1
     push_cast at h3
     linarith
@@ -114,12 +123,14 @@ theorem two_le_rank (X : Data E r) (ξ : Fin r → E) (h : X.IsIso ξ) : 2 ≤ r
     have hd := X.Gm_det
     have h0 : ξ 0 ≠ 0 := fun h0 => h2 (funext fun i => by fin_cases i; exact h0)
     simp only [herm, cc, Nat.reduceAdd, Fin.sum_univ_one, Matrix.det_fin_one, mul_eq_zero,
-      map_eq_zero, Finset.univ_unique, Finset.sum_singleton, Fin.default_eq_zero] at h1 hd
+        map_eq_zero, Finset.univ_unique, Finset.sum_singleton, Fin.default_eq_zero]
+      at h1 hd
     simp_all
   · omega
 
-theorem firstMinimum_sq_mul_iInf_height_le_card (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) {ξ : Fin r → E}
-    (hξ : ξ ∈ X.Λ) (h0 : ξ ≠ 0) : X.la1 x ^ 2 * ⨅ τ, X.tt ξ x τ ≤ Fintype.card X.Ψ := by
+theorem firstMinimum_sq_mul_iInf_height_le_card
+    (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) {ξ : Fin r → E} (hξ : ξ ∈ X.Λ) (h0 : ξ ≠ 0)
+    : X.la1 x ^ 2 * ⨅ τ, X.tt ξ x τ ≤ Fintype.card X.Ψ := by
   have hc : ∀ τ : X.Ψ, 0 < X.c τ := fun τ => by
     unfold Data.c
     have : τ.1 X.ξ0 ≠ 0 := (map_ne_zero _).2 X.ξ0_ne
@@ -141,40 +152,49 @@ theorem firstMinimum_sq_mul_iInf_height_le_card (X : Data E r) {x : Frame X.Ψ r
   have ht0 : 0 ≤ ⨅ τ, X.tt ξ x τ := Real.iInf_nonneg fun τ => (one_div_pos.2 (hpos ξ h0 τ)).le
   refine (mul_le_mul_of_nonneg_right h1 ht0).trans ?_
   rw [Finset.sum_mul]
-  calc _ ≤ ∑ _τ : X.Ψ, (1 : ℝ) := by
-        refine Finset.sum_le_sum fun τ _ => ?_
-        have h2 : ⨅ τ, X.tt ξ x τ ≤ X.tt ξ x τ := ciInf_le (Set.finite_range _).bddBelow τ
-        refine (mul_le_mul_of_nonneg_left h2 (hpos ξ h0 τ).le).trans (le_of_eq ?_)
-        exact mul_one_div_cancel (hpos ξ h0 τ).ne'
+  calc
+    _ ≤ ∑ _τ : X.Ψ, (1 : ℝ) := by
+      refine Finset.sum_le_sum fun τ _ => ?_
+      have h2 : ⨅ τ, X.tt ξ x τ ≤ X.tt ξ x τ := ciInf_le (Set.finite_range _).bddBelow τ
+      refine (mul_le_mul_of_nonneg_left h2 (hpos ξ h0 τ).le).trans (le_of_eq ?_)
+      exact mul_one_div_cancel (hpos ξ h0 τ).ne'
     _ = _ := by simp
 
 omit [IsCMField E] in
-theorem prod_eq_sq (T : PT E) (s : (Fin 1 → Vsp T.dim) → ℂ) (a : Fin T.r → Vsp T.dim) :
-    ∏ b, T.ptN2 1 s (fun _ => a b) / T.l2 1 s =
-      (∏ j, Real.sqrt (T.ptN2 1 s fun _ => a j) / Real.sqrt (T.l2 1 s)) ^ 2 := by
+theorem prod_eq_sq (T : PT E) (s : (Fin 1 → Vsp T.dim) → ℂ) (a : Fin T.r → Vsp T.dim)
+    : ∏ b, T.ptN2 1 s (fun _ => a b) / T.l2 1 s
+      = (∏ j, Real.sqrt (T.ptN2 1 s fun _ => a j) / Real.sqrt (T.l2 1 s)) ^ 2 := by
   have hp : ∀ v, 0 ≤ T.ptN2 1 s v := fun v => by unfold PT.ptN2; positivity
   have hl : 0 ≤ T.l2 1 s := MeasureTheory.integral_nonneg hp
   rw [← Finset.prod_pow]
   refine Finset.prod_congr rfl fun j _ => ?_
   rw [div_pow, Real.sq_sqrt (hp _), Real.sq_sqrt hl]
 
-
 omit [IsCMField E] in
-theorem finsum_le (T : PT E) (S : Set (Fin T.r → Vsp T.dim))
+theorem finsum_le
+    (T : PT E) (S : Set (Fin T.r → Vsp T.dim))
     (hS : ∀ a ∈ S, (∀ j, a j ∈ ZSpan.fundamentalDomain T.b) ∧ ∀ j, ((5 : ℂ) ^ 2) • a j ∈ T.L)
-    (f : (Fin T.r → Vsp T.dim) → ℝ) (M : ℝ) (hM : 0 ≤ M) (hf : ∀ a ∈ S, f a ≤ M) :
-    ∑ᶠ (a) (_ : a ∈ S), f a ≤ (25 : ℝ) ^ (2 * (Module.finrank ℚ E * T.r) * T.r) * M := by
-  have h := finsum_mem_le_card_mul
-    (fun (k : Fin T.r → Fin (2 * Fintype.card (Idx T.dim)) → Fin 25) (j : Fin T.r) =>
-      ∑ i, (((k j i : ℕ) : ℝ) / 25) • T.b i) S (fun a ha => by
+    (f : (Fin T.r → Vsp T.dim) → ℝ)
+    (M : ℝ) (hM : 0 ≤ M) (hf : ∀ a ∈ S, f a ≤ M)
+    : ∑ᶠ (a) (_ : a ∈ S), f a ≤ (25 : ℝ) ^ (2 * (Module.finrank ℚ E * T.r) * T.r) * M := by
+  have h :=
+    finsum_mem_le_card_mul
+      (fun (k : Fin T.r → Fin (2 * Fintype.card (Idx T.dim)) → Fin 25) (j : Fin T.r) =>
+        ∑ i, (((k j i : ℕ) : ℝ) / 25) • T.b i)
+      S
+      (fun a ha => by
         choose k hk using fun j => exists_coords T.b (a j) ((hS a ha).1 j) ((hS a ha).2 j)
-        exact ⟨k, funext hk⟩) f M hM hf
+        exact ⟨k, funext hk⟩)
+      f M hM hf
   refine h.trans (mul_le_mul_of_nonneg_right ?_ hM)
   have hN : Fintype.card (Idx T.dim) ≤ Module.finrank ℚ E * T.r := by
     rw [Fintype.card_sigma, ← NumberField.Embeddings.card E ℂ]
-    calc _ ≤ ∑ _τ : E →+* ℂ, T.r := Finset.sum_le_sum fun τ _ => by
+    calc
+      _ ≤ ∑ _τ : E →+* ℂ, T.r :=
+        Finset.sum_le_sum fun τ _ => by
           have := T.dim_conj τ
-          simp only [Fintype.card_fin]; omega
+          simp only [Fintype.card_fin]
+          omega
       _ = _ := by simp
   simp only [Fintype.card_fun, Fintype.card_fin]
   push_cast

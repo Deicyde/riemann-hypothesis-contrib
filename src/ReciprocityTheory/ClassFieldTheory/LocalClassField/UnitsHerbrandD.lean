@@ -9,15 +9,19 @@ namespace ReciprocityTheory.DiscreteGroups.LocalClassField.UnitsFilt
 
 open Finset
 
-variable {K L : Type*} [NontriviallyNormedField K] [CompleteSpace K] [IsUltrametricDist K] [NormedField L]
+variable
+  {K L : Type*} [NontriviallyNormedField K] [CompleteSpace K] [IsUltrametricDist K] [NormedField L]
   [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 
 theorem rad_nonneg {ρ : ℝ} (hρ : 0 ≤ ρ) (n : ℕ) : 0 ≤ ρ * (1 / 2 : ℝ) ^ n := by positivity
 
-theorem filt_ball {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : L, ‖x‖ ≤ A * ‖Phi K L x‖) (hA : 0 ≤ A)
-    (hC1 : ∀ x y : L, ‖Phi K L (x * y)‖ ≤ C * ‖Phi K L x‖ * ‖Phi K L y‖)
-    (hAρ : A * ρ < 1) (hCρ : C * ρ ≤ 1 / 2) :
-    Filt (L ≃ₐ[K] L) (fun n => ball (K := K) (L := L) (ρ * (1 / 2 : ℝ) ^ n) (rad_nonneg hρ n)) (proj1 (K := K) (L := L)) := by
+theorem filt_ball
+    {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : L, ‖x‖ ≤ A * ‖Phi K L x‖) (hA : 0 ≤ A)
+    (hC1 : ∀ x y : L, ‖Phi K L (x * y)‖ ≤ C * ‖Phi K L x‖ * ‖Phi K L y‖) (hAρ : A * ρ < 1)
+    (hCρ : C * ρ ≤ 1 / 2)
+    : Filt (L ≃ₐ[K] L)
+      (fun n => ball (K := K) (L := L) (ρ * (1 / 2 : ℝ) ^ n) (rad_nonneg hρ n))
+      (proj1 (K := K) (L := L)) := by
   refine {
     anti := ?_
     mul := ?_
@@ -26,7 +30,8 @@ theorem filt_ball {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : 
     sep := ?_
     inv := ?_
     e_mem := ?_
-    e_sum := ?_ }
+    e_sum := ?_
+  }
   · intro n x hx
     change ‖Phi K L x‖ ≤ ρ * (1 / 2 : ℝ) ^ (n + 1) at hx
     change ‖Phi K L x‖ ≤ ρ * (1 / 2 : ℝ) ^ n
@@ -38,7 +43,9 @@ theorem filt_ball {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : 
     change ‖Phi K L y‖ ≤ ρ * (1 / 2 : ℝ) ^ 0 at hy
     change ‖Phi K L (x * y)‖ ≤ ρ * (1 / 2 : ℝ) ^ (n + 1)
     rw [pow_zero, mul_one] at hy
-    calc ‖Phi K L (x * y)‖ ≤ C * ‖Phi K L x‖ * ‖Phi K L y‖ := hC1 x y
+    calc
+      ‖Phi K L (x * y)‖
+        ≤ C * ‖Phi K L x‖ * ‖Phi K L y‖ := hC1 x y
       _ ≤ C * (ρ * (1 / 2 : ℝ) ^ n) * ρ := by gcongr
       _ = (C * ρ) * (ρ * (1 / 2 : ℝ) ^ n) := by ring
       _ ≤ (1 / 2) * (ρ * (1 / 2 : ℝ) ^ n) := by
@@ -47,15 +54,16 @@ theorem filt_ball {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : 
   · intro n g x hx
     exact (norm_Phi_map g x).trans hx
   · intro x hx
-    have hx' : ∀ k, ‖Phi K L (x k)‖ ≤ ρ * (1 / 2 : ℝ) ^ k := fun k => by
-      exact hx k
+    have hx' : ∀ k, ‖Phi K L (x k)‖ ≤ ρ * (1 / 2 : ℝ) ^ k := fun k => by exact hx k
     have hsum : Summable fun k => Phi K L (x k) :=
-      Summable.of_norm_bounded ((summable_geometric_of_lt_one (by norm_num) (by norm_num)).mul_left ρ) hx'
+      Summable.of_norm_bounded
+        ((summable_geometric_of_lt_one (by norm_num) (by norm_num)).mul_left ρ) hx'
     refine ⟨(Phi K L).symm (∑' k, Phi K L (x k)), fun n => ?_⟩
-    change ‖Phi K L ((Phi K L).symm (∑' k, Phi K L (x k)) - ∑ k ∈ range n, x k)‖ ≤ ρ * (1 / 2 : ℝ) ^ n
+    change ‖Phi K L ((Phi K L).symm (∑' k, Phi K L (x k)) - ∑ k ∈ range n, x k)‖
+      ≤ ρ * (1 / 2 : ℝ) ^ n
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, ContinuousLinearEquiv.apply_symm_apply, map_sum,
-      ← hsum.sum_add_tsum_nat_add n, add_sub_cancel_left]
+      rw [map_sub, ContinuousLinearEquiv.apply_symm_apply, map_sum, ← hsum.sum_add_tsum_nat_add n,
+        add_sub_cancel_left]
     refine IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg (rad_nonneg hρ n) fun k => ?_
     refine (hx' (k + n)).trans ?_
     gcongr ρ * ?_
@@ -84,8 +92,7 @@ theorem filt_ball {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : 
       rw [this, norm_neg, norm_one] at hxlt
       exact lt_irrefl _ hxlt
     set y : L := (1 + x)⁻¹ - 1 with hy
-    have hy1 : y = -x + -(x * y) := by
-      rw [hy]; field_simp; ring
+    have hy1 : y = -x + -(x * y) := by rw [hy]; field_simp; ring
     have h1 : ‖Phi K L y‖ ≤ max ‖Phi K L x‖ ‖Phi K L (x * y)‖ := by
       conv_lhs => rw [hy1, map_add (f := _), map_neg, map_neg]
       refine (IsUltrametricDist.norm_add_le_max _ _).trans ?_
@@ -117,23 +124,25 @@ theorem filt_ball {A C ρ : ℝ} (hC : 0 ≤ C) (hρ : 0 ≤ ρ) (hA1 : ∀ x : 
         exact norm_nonneg _
     exact hbound.trans (by change ‖Phi K L x‖ ≤ _; exact hx)
   · intro x
-    calc ∑ σ : L ≃ₐ[K] L, σ • proj1 (K := K) (L := L) (σ⁻¹ • x)
-        = ∑ σ : L ≃ₐ[K] L, Phi K L x σ • σ (IsGalois.normalBasis K L 1) := by
-          refine Finset.sum_congr rfl fun σ _ => ?_
-          show σ (Phi K L (σ⁻¹ • x) 1 • IsGalois.normalBasis K L 1) = _
-          rw [map_smul]
-          congr 1
-          have h := Phi_map (σ⁻¹) x (1 : L ≃ₐ[K] L)
-          simpa [inv_inv] using h
-      _ = x := by
-        rw [← Phi_symm_apply, ContinuousLinearEquiv.symm_apply_apply]
+    calc
+      ∑ σ : L ≃ₐ[K] L, σ • proj1 (K := K) (L := L) (σ⁻¹ • x)
+          = ∑ σ : L ≃ₐ[K] L, Phi K L x σ • σ (IsGalois.normalBasis K L 1) := by
+        refine Finset.sum_congr rfl fun σ _ => ?_
+        show σ (Phi K L (σ⁻¹ • x) 1 • IsGalois.normalBasis K L 1) = _
+        rw [map_smul]
+        congr 1
+        have h := Phi_map (σ⁻¹) x (1 : L ≃ₐ[K] L)
+        simpa [inv_inv] using h
+      _ = x := by rw [← Phi_symm_apply, ContinuousLinearEquiv.symm_apply_apply]
 
-theorem exists_units_subgroup [IsUltrametricDist L] : ∃ S : Subgroup Lˣ,
-    (∀ (σ : L ≃ₐ[K] L) (u v : Lˣ), u ∈ S → (v : L) = σ u → v ∈ S) ∧
-    (∀ u ∈ S, ‖(u : L)‖ = 1) ∧ (∃ ε : ℝ, 0 < ε ∧ ∀ u : Lˣ, ‖(u : L) - 1‖ < ε → u ∈ S) ∧
-    (∀ u ∈ S, (∀ σ : L ≃ₐ[K] L, σ (u : L) = u) → ∃ v ∈ S, ∏ σ : L ≃ₐ[K] L, σ (v : L) = u) ∧
-    ∀ σ₀ : L ≃ₐ[K] L, (∀ σ, σ ∈ Subgroup.zpowers σ₀) → ∀ u ∈ S, ∏ σ : L ≃ₐ[K] L, σ (u : L) = 1 →
-      ∃ v ∈ S, σ₀ (v : L) = u * v := by
+theorem exists_units_subgroup [IsUltrametricDist L]
+    : ∃ S : Subgroup Lˣ,
+      (∀ (σ : L ≃ₐ[K] L) (u v : Lˣ), u ∈ S → (v : L) = σ u → v ∈ S) ∧ (∀ u ∈ S, ‖(u : L)‖ = 1)
+        ∧ (∃ ε : ℝ, 0 < ε ∧ ∀ u : Lˣ, ‖(u : L) - 1‖ < ε → u ∈ S)
+        ∧ (∀ u ∈ S, (∀ σ : L ≃ₐ[K] L, σ (u : L) = u) → ∃ v ∈ S, ∏ σ : L ≃ₐ[K] L, σ (v : L) = u)
+        ∧ ∀ σ₀ : L ≃ₐ[K] L,
+          (∀ σ, σ ∈ Subgroup.zpowers σ₀)
+            → ∀ u ∈ S, ∏ σ : L ≃ₐ[K] L, σ (u : L) = 1 → ∃ v ∈ S, σ₀ (v : L) = u * v := by
   obtain ⟨A, B, C, hA, hB, hC, hA1, hB1, hC1⟩ := exists_consts (K := K) (L := L)
   set ρ : ℝ := (2 * (C + A + 1))⁻¹ with hρdef
   have hpos : 0 < 2 * (C + A + 1) := by positivity
@@ -142,8 +151,14 @@ theorem exists_units_subgroup [IsUltrametricDist L] : ∃ S : Subgroup Lˣ,
   have hAρ : A * ρ < 1 := by nlinarith [mul_nonneg hC hρ.le, mul_nonneg hA hρ.le]
   have hCρ : C * ρ ≤ 1 / 2 := by nlinarith [mul_nonneg hC hρ.le, mul_nonneg hA hρ.le]
   have F := filt_ball hC hρ.le hA1 hA hC1 hAρ hCρ
-  refine ⟨F.V 0, fun σ u v hu hv => ?_, fun u hu => ?_, ⟨ρ / (B + 1), by positivity, fun u hu => ?_⟩,
-    fun u hu hfix => F.norm_surj u hu hfix, fun σ₀ hσ₀ u hu hN => F.hilbert90_matrix_subalgebra_norm_one σ₀ hσ₀ u hu hN⟩
+  refine ⟨
+    F.V 0,
+    fun σ u v hu hv => ?_,
+    fun u hu => ?_,
+    ⟨ρ / (B + 1), by positivity, fun u hu => ?_⟩,
+    fun u hu hfix => F.norm_surj u hu hfix,
+    fun σ₀ hσ₀ u hu hN => F.hilbert90_matrix_subalgebra_norm_one σ₀ hσ₀ u hu hN
+  ⟩
   · have : v = act σ u := Units.ext hv
     rw [this]
     exact F.act_mem σ hu
@@ -153,7 +168,8 @@ theorem exists_units_subgroup [IsUltrametricDist L] : ∃ S : Subgroup Lˣ,
       refine lt_of_le_of_lt ((hA1 _).trans ?_) hAρ
       gcongr
     have h1 : (u : L) = 1 + ((u : L) - 1) := by ring
-    rw [h1, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_one]; exact hlt.ne'), norm_one]
+    rw [h1, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_one]; exact hlt.ne'),
+      norm_one]
     exact max_eq_left hlt.le
   · show ‖Phi K L ((u : L) - 1)‖ ≤ ρ * (1 / 2 : ℝ) ^ 0
     rw [pow_zero, mul_one]

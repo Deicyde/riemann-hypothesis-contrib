@@ -110,9 +110,12 @@ end SlopeTestRemainingChoices
 
 section Main
 
-variable {G H W W' : Type} [Group G] [Group H] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+variable
+  {G H W W' : Type}
+  [Group G] [Group H] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
 
-private def intwSub (τ : Representation ℂ G W') (ρ : Representation ℂ G W) : Submodule ℂ (W' →ₗ[ℂ] W) where
+private def intwSub (τ : Representation ℂ G W') (ρ : Representation ℂ G W)
+    : Submodule ℂ (W' →ₗ[ℂ] W) where
   carrier := {f | Intw τ ρ f}
   add_mem' {f f'} h h' g v := by simp [h g v, h' g v]
   zero_mem' g v := by simp
@@ -123,15 +126,19 @@ private lemma comm_inl (ρ : Representation ℂ (G × H) W) (g : G) (h : H) (w :
   rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul]
   simp
 
-private def kap (ρ : Representation ℂ (G × H) W) (τ : Representation ℂ G W') :
-    Representation ℂ H (intwSub τ (ρ.comp (MonoidHom.inl G H))) where
-  toFun h :=
-    { toFun := fun φ => ⟨ρ (1, h) ∘ₗ φ.1, fun g v => by
+private def kap (ρ : Representation ℂ (G × H) W) (τ : Representation ℂ G W')
+    : Representation ℂ H (intwSub τ (ρ.comp (MonoidHom.inl G H))) where
+  toFun h := {
+    toFun := fun φ => ⟨
+      ρ (1, h) ∘ₗ φ.1,
+      fun g v => by
         have := φ.2 g v
         simp only [LinearMap.comp_apply, MonoidHom.comp_apply, MonoidHom.inl_apply] at this ⊢
-        rw [this, comm_inl]⟩
-      map_add' := fun φ φ' => by ext; simp
-      map_smul' := fun a φ => by ext; simp }
+        rw [this, comm_inl]
+    ⟩
+    map_add' := fun φ φ' => by ext; simp
+    map_smul' := fun a φ => by ext; simp
+  }
   map_one' := by
     ext φ v
     show ρ (1, 1) (φ.1 v) = φ.1 v
@@ -142,8 +149,8 @@ private def kap (ρ : Representation ℂ (G × H) W) (τ : Representation ℂ G 
     show ρ (1, h * h') (φ.1 v) = ρ (1, h) (ρ (1, h') (φ.1 v))
     rw [← Module.End.mul_apply, ← map_mul, Prod.mk_mul_mk, one_mul]
 
-private def evl (τ : Representation ℂ G W') (ρ : Representation ℂ G W) :
-    W' ⊗[ℂ] intwSub τ ρ →ₗ[ℂ] W :=
+private def evl (τ : Representation ℂ G W') (ρ : Representation ℂ G W)
+    : W' ⊗[ℂ] intwSub τ ρ →ₗ[ℂ] W :=
   TensorProduct.lift (LinearMap.flip (Submodule.subtype (intwSub τ ρ)))
 
 private lemma evl_tmul (τ : Representation ℂ G W') (ρ : Representation ℂ G W) (w : W') (φ : intwSub τ ρ) :
@@ -185,11 +192,16 @@ private lemma evl_surj {τ : Representation ℂ G W'} {ρ : Representation ℂ G
 
 end Main
 
-theorem step :
-    Step := by
+theorem step : Step := by
   intro G H W W' _ _ _ _ _ _ ρ τ hτ hI
-  refine ⟨intwSub τ (ρ.comp (MonoidHom.inl G H)), inferInstance, inferInstance, kap ρ τ,
-    LinearEquiv.ofBijective (evl τ _) ⟨evl_inj hτ, evl_surj hI⟩, ?_⟩
+  refine ⟨
+    intwSub τ (ρ.comp (MonoidHom.inl G H)),
+    inferInstance,
+    inferInstance,
+    kap ρ τ,
+    LinearEquiv.ofBijective (evl τ _) ⟨evl_inj hτ, evl_surj hI⟩,
+    ?_
+  ⟩
   rintro ⟨g, h⟩ z
   show evl τ _ (box τ (kap ρ τ) (g, h) z) = ρ (g, h) (evl τ _ z)
   induction z using TensorProduct.induction_on with

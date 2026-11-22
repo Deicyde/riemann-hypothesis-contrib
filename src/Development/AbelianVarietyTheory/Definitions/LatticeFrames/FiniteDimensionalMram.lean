@@ -11,8 +11,12 @@ namespace GlobalTheory.Core.Rk
 
 open NumberField Formalism.BasicNotions Module
 
-theorem rank_map_field {K L : Type} [Field K] [Field L] (f : K →+* L) {m n : Type} [Fintype m] [Fintype n]
-    (A : Matrix m n K) : (A.map f).rank = A.rank := by
+theorem rank_map_field
+    {K L : Type} [Field K] [Field L]
+    (f : K →+* L)
+    {m n : Type} [Fintype m] [Fintype n]
+    (A : Matrix m n K)
+    : (A.map f).rank = A.rank := by
   classical
   letI := f.toAlgebra
   rw [Matrix.rank_eq_finrank_span_cols, Matrix.rank_eq_finrank_span_cols]
@@ -21,12 +25,14 @@ theorem rank_map_field {K L : Type} [Field K] [Field L] (f : K →+* L) {m n : T
   letI : Fintype κ := Fintype.ofFinite κ
   have hL : LinearIndependent L (fun i => algebraMap K L ∘ (A.col ∘ a) i) :=
     linearIndependent_algebraMap_comp_iff.2 hli
-  have hs : Submodule.span L (Set.range (A.map f).col) =
-      Submodule.span L (Set.range (fun i => algebraMap K L ∘ (A.col ∘ a) i)) := by
+  have hs
+      : Submodule.span L (Set.range (A.map f).col)
+        = Submodule.span L (Set.range (fun i => algebraMap K L ∘ (A.col ∘ a) i)) := by
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨j, rfl⟩
-      have hj : A.col j ∈ Submodule.span K (Set.range (A.col ∘ a)) := hspan ▸ Submodule.subset_span ⟨j, rfl⟩
+      have hj : A.col j ∈ Submodule.span K (Set.range (A.col ∘ a)) :=
+        hspan ▸ Submodule.subset_span ⟨j, rfl⟩
       obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hj
       refine (Submodule.mem_span_range_iff_exists_fun L).2 ⟨fun i => f (c i), ?_⟩
       funext r
@@ -44,10 +50,14 @@ section Member
 variable {R : Ranks} {ι : Type} [Fintype ι] {hc : ι → HCParam R} (C : ColumnChain R ι hc)
 
 noncomputable def colTo (j : ℕ) : (C.cls 0 → C.Y 0 → ℂ) →ₗ[ℂ] (C.cls j → C.Y j → ℂ) :=
-  Nat.rec (motive := fun j => (C.cls 0 → C.Y 0 → ℂ) →ₗ[ℂ] (C.cls j → C.Y j → ℂ)) LinearMap.id
-    (fun i f => (C.Klin i).comp f) j
+  Nat.rec
+    (motive := fun j => (C.cls 0 → C.Y 0 → ℂ) →ₗ[ℂ] (C.cls j → C.Y j → ℂ))
+    LinearMap.id
+    (fun i f => (C.Klin i).comp f)
+    j
 
-theorem colTo_eq (j : ℕ) (φ : C.cls 0 → C.Y 0 → ℂ) : colTo C j φ = Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap j φ := by
+theorem colTo_eq (j : ℕ) (φ : C.cls 0 → C.Y 0 → ℂ)
+    : colTo C j φ = Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap j φ := by
   induction j with
   | zero => rfl
   | succ j ih => show C.K j (colTo C j φ) = _; rw [ih]; rfl
@@ -58,9 +68,11 @@ def PsiC : A.Mram →ₗ[ℂ] P.Wrow := P.lowerMap ∘ₗ P.evz ∘ₗ colTo C R
 
 def PhiC : A.Mram →ₗ[ℂ] Module.Dual ℂ P.Mt := P.period ∘ₗ PsiC C A P
 
-theorem PhiC_apply (φ : A.Mram) (F : P.Mt) : PhiC C A P φ F = P.PtilCol (φ : C.cls 0 → C.Y 0 → ℂ) F := by
+theorem PhiC_apply (φ : A.Mram) (F : P.Mt)
+    : PhiC C A P φ F = P.PtilCol (φ : C.cls 0 → C.Y 0 → ℂ) F := by
   show P.period (P.lowerMap (P.evz (colTo C R.m _))) F = _
-  rw [colTo_eq]; rfl
+  rw [colTo_eq]
+  rfl
 
 def rkC : ℕ := Module.finrank ℂ (LinearMap.range (PhiC C A P))
 
@@ -100,11 +112,10 @@ abbrev MtDual : HLat D.what₂.LL := dualH (Mt D Am)
 
 def IsPhi (Φ : (D.div.Nu u).V →ₗ[D.what₂.LL] (MtDual D Am).V) : Prop :=
   ∀ (x : (D.div.Nu u).V) (z : (Mt D Am).V),
-    D.what₂.embLL ((show Module.Dual D.what₂.LL (Mt D Am).V from Φ x) z) =
-      D.what₂.perCol u D.what₂.mu0 (D.jN u x) (Am.jAmb D.what₂.mu0 z)
+    D.what₂.embLL ((show Module.Dual D.what₂.LL (Mt D Am).V from Φ x) z)
+      = D.what₂.perCol u D.what₂.mu0 (D.jN u x) (Am.jAmb D.what₂.mu0 z)
 
 def PhiRat : Prop := ∃ Φ, IsPhi D Am u Φ
-
 
 open Classical in
 def Phi : (D.div.Nu u).V →ₗ[D.what₂.LL] (MtDual D Am).V := if h : PhiRat D Am u then h.choose else 0

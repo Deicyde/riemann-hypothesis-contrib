@@ -18,17 +18,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
 namespace UpperTheory.Gal.crystallineComparison
 
-private theorem roots_prod {W : Type} [AddCommGroup W] [Module ℂ W] [Module.Finite ℂ W] (M : End ℂ W) :
-    M.charpoly.roots.prod = LinearMap.det M := by
+private theorem roots_prod
+    {W : Type} [AddCommGroup W] [Module ℂ W] [Module.Finite ℂ W] (M : End ℂ W)
+    : M.charpoly.roots.prod = LinearMap.det M := by
   classical
   let b := Module.finBasis ℂ W
-  rw [← LinearMap.charpoly_toMatrix M b, ← LinearMap.det_toMatrix b M, Matrix.det_eq_prod_roots_charpoly]
+  rw [← LinearMap.charpoly_toMatrix M b, ← LinearMap.det_toMatrix b M,
+    Matrix.det_eq_prod_roots_charpoly]
 
 set_option maxHeartbeats 1600000 in
 theorem detWD_of (hW : WdModel) (hC : CommonModel) (hE : DetE) : DetWD := by
@@ -47,12 +51,13 @@ theorem detWD_of (hW : WdModel) (hC : CommonModel) (hE : DetE) : DetWD := by
   have e₂ := (hW l P ι E Ω A w h O Bw hj 1 c LL c' m₂ p₂ g).1
   haveI := p₁.finite
   haveI := p₂.finite
-  exact ((congrArg (fun p : Polynomial ℂ => p.roots.prod) e₁).trans ((roots_prod _).trans (k.trans (roots_prod _).symm))).trans
+  exact ((congrArg (fun p : Polynomial ℂ => p.roots.prod) e₁).trans
+      ((roots_prod _).trans (k.trans (roots_prod _).symm))).trans
     (congrArg (fun p : Polynomial ℂ => p.roots.prod) e₂).symm
 
 theorem detWD_holds : DetWD :=
   detWD_of wdModel_of detCommon_of
-    (detOne_of detCo_of detRingS_of (detCore_of detUnit_of detBasis_of) (detMem_of detCo_of) detWeil_of (detSpan_of detCo_of)
-      (detCoLift_of detCo_of detWdLift_of))
+    (detOne_of detCo_of detRingS_of (detCore_of detUnit_of detBasis_of) (detMem_of detCo_of)
+      detWeil_of (detSpan_of detCo_of) (detCoLift_of detCo_of detWdLift_of))
 
 end UpperTheory.Gal.crystallineComparison

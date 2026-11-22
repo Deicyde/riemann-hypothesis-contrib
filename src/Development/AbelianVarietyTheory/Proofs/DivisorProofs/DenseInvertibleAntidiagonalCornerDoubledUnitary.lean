@@ -13,14 +13,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsConjSk
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct
 open Filter Topology
 
 namespace GlobalTheory.SiegelDense
 
-theorem prod_idem {R : Type} [CommRing R] {e : R} (he : e * e = e) {ι : Type} (s : Finset ι) (a b : ι → R) :
-    ∏ i ∈ s, (e * a i + (1 - e) * b i) = e * ∏ i ∈ s, a i + (1 - e) * ∏ i ∈ s, b i := by
+theorem prod_idem
+    {R : Type} [CommRing R] {e : R} (he : e * e = e) {ι : Type} (s : Finset ι) (a b : ι → R)
+    : ∏ i ∈ s, (e * a i + (1 - e) * b i) = e * ∏ i ∈ s, a i + (1 - e) * ∏ i ∈ s, b i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -28,16 +31,23 @@ theorem prod_idem {R : Type} [CommRing R] {e : R} (he : e * e = e) {ι : Type} (
     rw [Finset.prod_insert hi, Finset.prod_insert hi, Finset.prod_insert hi, ih]
     linear_combination (a i * ∏ j ∈ s, a j - a i * ∏ j ∈ s, b j - b i * ∏ j ∈ s, a j + b i * ∏ j ∈ s, b j) * he
 
-theorem det_idem {R : Type} [CommRing R] {e : R} (he : e * e = e) {m : Type} [Fintype m] [DecidableEq m]
-    (A B : Matrix m m R) : (e • A + (1 - e) • B).det = e * A.det + (1 - e) * B.det := by
+theorem det_idem
+    {R : Type} [CommRing R]
+    {e : R} (he : e * e = e)
+    {m : Type} [Fintype m] [DecidableEq m]
+    (A B : Matrix m m R)
+    : (e • A + (1 - e) • B).det = e * A.det + (1 - e) * B.det := by
   simp only [Matrix.det_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
   rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun τ _ => ?_
   rw [prod_idem he]
   rcases Int.units_eq_one_or (Equiv.Perm.sign τ) with h | h <;> simp [h] <;> ring
 
-theorem isUnit_mix {R : Type} [CommRing R] {e : R} (he : e * e = e) {a b : R} (ha : IsUnit (e * a + (1 - e)))
-    (hb : IsUnit b) : IsUnit (e * a + (1 - e) * b) := by
+theorem isUnit_mix
+    {R : Type} [CommRing R]
+    {e : R} (he : e * e = e)
+    {a b : R} (ha : IsUnit (e * a + (1 - e))) (hb : IsUnit b)
+    : IsUnit (e * a + (1 - e) * b) := by
   obtain ⟨u, rfl⟩ := hb
   have h1 : e * a + (1 - e) * (u : R) = (e * a + (1 - e)) * (e + (1 - e) * (u : R)) := by
     linear_combination (-a + a * (u : R) + 1 - (u : R)) * he
@@ -48,60 +58,90 @@ theorem isUnit_mix {R : Type} [CommRing R] {e : R} (he : e * e = e) {a b : R} (h
   rw [h1]
   exact ha.mul h2
 
-theorem mix_corner {R : Type} [CommRing R] {n : ℕ} (e : R) (he : e * e = e) (A : Matrix (Fin n) (Fin n ⊕ Fin n) R)
-    (B D' : Matrix (Fin n ⊕ Fin n) (Fin n) R) (G : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R) (y : Matrix (Fin n) (Fin n) R)
-    (hAB : A * B = (2 : R) • 1) (hAD : A * D' = 0) :
-    A * (e • G + (1 - e) • 1) * B + A * (e • G + (1 - e) • 1) * D' * (e • y) =
-      e • (A * G * B + A * G * D' * y) + (1 - e) • ((2 : R) • (1 : Matrix (Fin n) (Fin n) R)) := by
-  simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, hAB, hAD,
-    Matrix.zero_mul, smul_zero, add_zero, smul_smul, he, smul_add]
+theorem mix_corner
+    {R : Type} [CommRing R]
+    {n : ℕ}
+    (e : R) (he : e * e = e)
+    (A : Matrix (Fin n) (Fin n ⊕ Fin n) R) (B D' : Matrix (Fin n ⊕ Fin n) (Fin n) R)
+    (G : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R) (y : Matrix (Fin n) (Fin n) R)
+    (hAB : A * B = (2 : R) • 1) (hAD : A * D' = 0)
+    : A * (e • G + (1 - e) • 1) * B + A * (e • G + (1 - e) • 1) * D' * (e • y)
+      = e • (A * G * B + A * G * D' * y)
+        + (1 - e) • ((2 : R) • (1 : Matrix (Fin n) (Fin n) R)) := by
+  simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, hAB,
+    hAD, Matrix.zero_mul, smul_zero, add_zero, smul_smul, he, smul_add]
   simp only [Matrix.mul_assoc]
   abel
 
-theorem approx : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
-    {ι : Type} [Fintype ι] [DecidableEq ι] (J₀ : Matrix ι ι (AE F E)) (g : UG (cA σ) J₀),
-    ∃ q : Finset (HeightOneSpectrum (𝓞 F)) → UG (cA σ) J₀,
-      (∀ S, ((q S).1.1 : Matrix ι ι (AE F E)) =
-        algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S) • (g.1.1 : Matrix ι ι (AE F E)) +
-          (1 - algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)) • (1 : Matrix ι ι (AE F E))) ∧
-      Tendsto q atTop (𝓝 g) :=
+theorem approx
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) {ι : Type} [Fintype ι] [DecidableEq ι] (J₀ : Matrix ι ι (AE F E))
+        (g : UG (cA σ) J₀),
+      ∃ q : Finset (HeightOneSpectrum (𝓞 F)) → UG (cA σ) J₀,
+        (∀ S,
+            ((q S).1.1 : Matrix ι ι (AE F E))
+              = algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)
+                  • (g.1.1 : Matrix ι ι (AE F E))
+                + (1 - algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S))
+                  • (1 : Matrix ι ι (AE F E)))
+          ∧ Tendsto q atTop (𝓝 g) :=
   GlobalTheory.T.exists_idempotentCutoff_tendsto_adelicUnitary
 
-theorem unip : ∀ {R₀ R : Type} [CommRing R₀] [CommRing R] [Algebra R₀ R] [Invertible (2 : R)] (c : R →ₐ[R₀] R)
-    {n : ℕ} (J₀ : Matrix (Fin n) (Fin n) R) (x : Matrix (Fin n) (Fin n) R), xᵀ * J₀ + J₀ * x.map c = 0 →
-    ∃ p : UG c (dbl J₀), (p.1.1 : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R) * diagCols (Fin n) =
-        diagCols (Fin n) * (1 : Matrix (Fin n) (Fin n) R) ∧
-      ∀ h : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R,
-        Matrix.fromCols (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R) * (h * p.1.1) *
-            Matrix.fromRows (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R) =
-          Matrix.fromCols (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R) * h *
-              Matrix.fromRows (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R) +
-            Matrix.fromCols (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R) * h * diagCols (Fin n) * x :=
+theorem unip
+    : ∀ {R₀ R : Type} [CommRing R₀] [CommRing R] [Algebra R₀ R] [Invertible (2 : R)]
+        (c : R →ₐ[R₀] R) {n : ℕ} (J₀ : Matrix (Fin n) (Fin n) R) (x : Matrix (Fin n) (Fin n) R),
+      xᵀ * J₀ + J₀ * x.map c = 0
+        → ∃ p : UG c (dbl J₀),
+          (p.1.1 : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R) * diagCols (Fin n)
+              = diagCols (Fin n) * (1 : Matrix (Fin n) (Fin n) R)
+            ∧ ∀ h : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R,
+              Matrix.fromCols (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R)
+                  * (h * p.1.1)
+                  * Matrix.fromRows (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R)
+                = Matrix.fromCols (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R) * h
+                    * Matrix.fromRows (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R)
+                  + Matrix.fromCols (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R)
+                    * h * diagCols (Fin n) * x :=
   GlobalTheory.T.siegelUnipotent_antidiagonal_corner
 
-theorem avoid : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (S : Finset (HeightOneSpectrum (𝓞 F))) (ψ : Polynomial (AE F E)),
-    (∀ (Ω : Type) [Field Ω] (φ : AE F E →+* Ω),
-      φ (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)) = 1 → ψ.map φ ≠ 0) →
-    ∃ t : F, IsUnit (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S) * ψ.eval (algebraMap F (AE F E) t) +
-      (1 - algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S))) :=
+theorem avoid
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (S : Finset (HeightOneSpectrum (𝓞 F))) (ψ : Polynomial (AE F E)),
+      (∀ (Ω : Type) [Field Ω] (φ : AE F E →+* Ω),
+          φ (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)) = 1 → ψ.map φ ≠ 0)
+        → ∃ t : F,
+          IsUnit
+            (algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S)
+                * ψ.eval (algebraMap F (AE F E) t)
+              + (1 - algebraMap (AF F) (AE F E) (GlobalTheory.LocalGlobalChar.eps S))) :=
   GlobalTheory.T.exists_rationalPoint_polynomial_idempotentUnit_value
 
-theorem exists_corner : ∀ {F R : Type} [Field F] [CommRing R] [Algebra F R] (e : R), e * e = e →
-    (∀ ψ : Polynomial R, (∀ (Ω : Type) [Field Ω] (φ : R →+* Ω), φ e = 1 → ψ.map φ ≠ 0) →
-      ∃ t : F, IsUnit (e * ψ.eval (algebraMap F R t) + (1 - e))) →
-    ∀ {n : ℕ} (D C P Q : Matrix (Fin n) (Fin n) R), D * P + C * Q = 1 →
-      ∃ x : Matrix (Fin n) (Fin n) R, IsUnit (e * (D + C * x).det + (1 - e)) :=
+theorem exists_corner
+    : ∀ {F R : Type} [Field F] [CommRing R] [Algebra F R] (e : R),
+      e * e = e
+        → (∀ ψ : Polynomial R,
+          (∀ (Ω : Type) [Field Ω] (φ : R →+* Ω), φ e = 1 → ψ.map φ ≠ 0)
+            → ∃ t : F, IsUnit (e * ψ.eval (algebraMap F R t) + (1 - e)))
+        → ∀ {n : ℕ} (D C P Q : Matrix (Fin n) (Fin n) R),
+          D * P + C * Q = 1
+            → ∃ x : Matrix (Fin n) (Fin n) R, IsUnit (e * (D + C * x).det + (1 - e)) :=
   GlobalTheory.T.exists_corner_unit_of_right_inverse'
 
-theorem descend : ∀ {F R : Type} [Field F] [CommRing R] [Algebra F R] [Invertible (2 : R)] (c : R →+* R),
-    (∀ r, c (c r) = r) → (∀ t : F, c (algebraMap F R t) = algebraMap F R t) → ∀ (e : R),
-    (∀ ψ : Polynomial R, (∀ (Ω : Type) [Field Ω] (φ : R →+* Ω), φ e = 1 → ψ.map φ ≠ 0) →
-      ∃ t : F, IsUnit (e * ψ.eval (algebraMap F R t) + (1 - e))) →
-    ∀ (ρ : R), IsUnit ρ → c ρ = -ρ → ∀ {n : ℕ} (J₀ : Matrix (Fin n) (Fin n) R) (ε : ℤˣ),
-      (J₀.map c)ᵀ = ((ε : ℤ) : R) • J₀ → IsUnit J₀.det →
-      ∀ (D C x₀ : Matrix (Fin n) (Fin n) R), IsUnit (e * (D + C * x₀).det + (1 - e)) →
-        ∃ x : Matrix (Fin n) (Fin n) R, xᵀ * J₀ + J₀ * x.map c = 0 ∧ IsUnit (e * (D + C * x).det + (1 - e)) :=
+theorem descend
+    : ∀ {F R : Type} [Field F] [CommRing R] [Algebra F R] [Invertible (2 : R)] (c : R →+* R),
+      (∀ r, c (c r) = r) → (∀ t : F, c (algebraMap F R t) = algebraMap F R t)
+        → ∀ (e : R),
+          (∀ ψ : Polynomial R,
+              (∀ (Ω : Type) [Field Ω] (φ : R →+* Ω), φ e = 1 → ψ.map φ ≠ 0)
+                → ∃ t : F, IsUnit (e * ψ.eval (algebraMap F R t) + (1 - e)))
+            → ∀ (ρ : R),
+              IsUnit ρ → c ρ = -ρ
+                → ∀ {n : ℕ} (J₀ : Matrix (Fin n) (Fin n) R) (ε : ℤˣ),
+                  (J₀.map c)ᵀ = ((ε : ℤ) : R) • J₀ → IsUnit J₀.det
+                    → ∀ (D C x₀ : Matrix (Fin n) (Fin n) R),
+                      IsUnit (e * (D + C * x₀).det + (1 - e))
+                        → ∃ x : Matrix (Fin n) (Fin n) R,
+                          xᵀ * J₀ + J₀ * x.map c = 0 ∧ IsUnit (e * (D + C * x).det + (1 - e)) :=
   GlobalTheory.T.exists_conj_skew_det_unit_of_avoidance'
 
 theorem dense : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (ε : ℤˣ), (∀ i j, σ (J j i) = ((ε : ℤ) : E) * J i j) → J.det ≠ 0 → ∀ g : UG (cA σ) (dbl (incM F J)), g ∈ closure {h : UG (cA σ) (dbl (incM F J)) | ∃ (p : UG (cA σ) (dbl (incM F J))) (t : GL (Fin n) (AE F E)), (p.1.1 : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) (AE F E)) * diagCols (Fin n) = diagCols (Fin n) * t.1 ∧ IsUnit (Matrix.fromCols (1 : Matrix (Fin n) (Fin n) (AE F E)) (-1 : Matrix (Fin n) (Fin n) (AE F E)) * ((h * p).1.1 : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) (AE F E)) * Matrix.fromRows (1 : Matrix (Fin n) (Fin n) (AE F E)) (-1 : Matrix (Fin n) (Fin n) (AE F E))).det} := by

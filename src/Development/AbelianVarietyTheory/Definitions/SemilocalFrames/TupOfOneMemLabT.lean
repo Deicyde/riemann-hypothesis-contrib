@@ -11,7 +11,8 @@ noncomputable section
 
 namespace GlobalTheory.RowLev
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.ArithmeticCylinders Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.ArithmeticCylinders Polynomial
 
 variable (D : D7)
 
@@ -27,7 +28,6 @@ def ES (S : Set (Tup2 D)) : MonoidAlgebra ℂ (G0g D.nd) :=
       (open Classical in if tupOf D a ∈ S then
         ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (g kv) else 0)
 
-
 open Classical in
 def labT : Finset (Tup2 D) :=
   haveI : ∀ k, NeZero (D.host.g k) := fun k => ⟨(D.host.g_prime k).ne_zero⟩
@@ -35,7 +35,8 @@ def labT : Finset (Tup2 D) :=
 
 def zTup (t : Tup2 D) : MonoidAlgebra ℂ (G0g D.nd) :=
   haveI : ∀ k, NeZero (D.host.g k) := fun k => ⟨(D.host.g_prime k).ne_zero⟩
-  tensAlg (ι := Σ k : Fin 2, D.nd.PlG k) (G := fun kv => GL (Fin D.R.r) (ZMod (D.host.g kv.1)))
+  tensAlg (ι := Σ k : Fin 2, D.nd.PlG k)
+    (G := fun kv => GL (Fin D.R.r) (ZMod (D.host.g kv.1)))
     fun kv => D.ntypes.eSer kv.1 (t kv.1 kv.2)
 
 local instance factTypePrime (k : Fin 2) : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
@@ -47,14 +48,20 @@ variable {D}
 theorem tupOf_injective : Function.Injective (tupOf D) := fun a b h =>
   funext fun kv => PrimeDegreeVariant.Ten.monicOf_inj _ _ (congrFun (congrFun h kv.1) kv.2)
 
-theorem mem_range_tupOf {t : Tup2 D} :
-    t ∈ Set.range (tupOf D) ↔ ∀ k v, (t k v).Monic ∧ (t k v).natDegree = D.R.r := by
+theorem mem_range_tupOf {t : Tup2 D}
+    : t ∈ Set.range (tupOf D) ↔ ∀ k v, (t k v).Monic ∧ (t k v).natDegree = D.R.r := by
   constructor
   · rintro ⟨a, rfl⟩ k v
-    exact ⟨Formalism.CyclotomicNorms.Sqf.monic_monicOf _, Formalism.CyclotomicNorms.Sqf.natDegree_monicOf _⟩
+    exact ⟨
+      Formalism.CyclotomicNorms.Sqf.monic_monicOf _,
+      Formalism.CyclotomicNorms.Sqf.natDegree_monicOf _
+    ⟩
   · intro h
-    exact ⟨fun kv i => (t kv.1 kv.2).coeff i, funext fun k => funext fun v =>
-      Formalism.CyclotomicNorms.Sqf.monicOf_coeffs _ (h k v).1 (h k v).2⟩
+    exact ⟨
+      fun kv i => (t kv.1 kv.2).coeff i,
+      funext fun k =>
+        funext fun v => Formalism.CyclotomicNorms.Sqf.monicOf_coeffs _ (h k v).1 (h k v).2
+    ⟩
 
 theorem mem_labT {t : Tup2 D} : t ∈ labT D ↔ ∀ k v, IsLabel D k (t k v) := by
   classical
@@ -64,8 +71,10 @@ theorem mem_labT {t : Tup2 D} : t ∈ labT D ↔ ∀ k v, IsLabel D k (t k v) :=
   obtain ⟨a, ha⟩ := mem_range_tupOf.2 fun k v => ⟨(h k v).1, (h k v).2.1⟩
   exact Finset.mem_image.2 ⟨a, Finset.mem_univ _, ha⟩
 
-theorem zTup_coeff (t : Tup2 D) (g : G0g D.nd) :
-    (zTup D t).coeff g = ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (t kv.1 kv.2)).coeff (g kv) := rfl
+theorem zTup_coeff (t : Tup2 D) (g : G0g D.nd)
+    : (zTup D t).coeff g
+      = ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (t kv.1 kv.2)).coeff (g kv) :=
+  rfl
 
 theorem zTup_eq_zero {t : Tup2 D} (h : t ∉ labT D) : zTup D t = 0 := by
   rw [mem_labT] at h
@@ -78,7 +87,8 @@ theorem zTup_eq_zero {t : Tup2 D} (h : t ∉ labT D) : zTup D t = 0 := by
   rfl
 
 theorem zTup_mul_self (t : Tup2 D) : zTup D t * zTup D t = zTup D t :=
-  (PrimeDegreeVariant.Ten.tens_mul _ _).trans (congrArg PrimeDegreeVariant.Ten.tens (funext fun _ => D.ntypes.eSer_idem _ _))
+  (PrimeDegreeVariant.Ten.tens_mul _ _).trans
+    (congrArg PrimeDegreeVariant.Ten.tens (funext fun _ => D.ntypes.eSer_idem _ _))
 
 theorem zTup_mul_of_ne {t t' : Tup2 D} (h : t ≠ t') : zTup D t * zTup D t' = 0 := by
   obtain ⟨k, hk⟩ := Function.ne_iff.1 h
@@ -96,39 +106,45 @@ theorem zTup_comm (t : Tup2 D) (a : MonoidAlgebra ℂ (G0g D.nd)) : zTup D t * a
   | add a b ha hb => rw [mul_add, add_mul, ha, hb]
   | single x c =>
     ext g
-    rw [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, zTup_coeff, zTup_coeff, mul_comm]
+    rw [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, zTup_coeff,
+      zTup_coeff, mul_comm]
     congr 1
     refine Finset.prod_congr rfl fun kv _ => ?_
-    have := congrArg (fun z => z.coeff (g kv))
-      (D.ntypes.eSer_central kv.1 (t kv.1 kv.2) (MonoidAlgebra.single (x kv) 1))
-    simpa only [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, one_mul, mul_one,
-      Pi.mul_apply, Pi.inv_apply] using this
-
+    have :=
+      congrArg
+        (fun z => z.coeff (g kv))
+        (D.ntypes.eSer_central kv.1 (t kv.1 kv.2) (MonoidAlgebra.single (x kv) 1))
+    simpa only [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, one_mul,
+        mul_one, Pi.mul_apply, Pi.inv_apply]
+      using this
 
 open Classical in
-theorem ES_coeff (S : Set (Tup2 D)) (g : G0g D.nd) :
-    (ES D S).coeff g = ∑ a : (∀ kv : (Σ k : Fin 2, D.nd.PlG k), (Fin D.R.r → ZMod (D.host.g kv.1))),
-      if tupOf D a ∈ S then
-        ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (g kv) else 0 :=
+theorem ES_coeff (S : Set (Tup2 D)) (g : G0g D.nd)
+    : (ES D S).coeff g
+      = ∑ a : (∀ kv : (Σ k : Fin 2, D.nd.PlG k), (Fin D.R.r → ZMod (D.host.g kv.1))),
+        if tupOf D a ∈ S then
+          ∏ kv : (Σ k : Fin 2, D.nd.PlG k), (D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf (a kv))).coeff (g kv) else 0 :=
   finsum_eq_sum_of_fintype _
 
 theorem ES_good : ES D {t | D.ntypes.goodTuple t} = D.ntypes.e0 := rfl
 
-
 open Classical in
-theorem ES_eq_sum_coef (S : Set (Tup2 D)) :
-    ES D S = ∑ a : (∀ kv : (Σ k : Fin 2, D.nd.PlG k), (Fin D.R.r → ZMod (D.host.g kv.1))),
-      if tupOf D a ∈ S then zTup D (tupOf D a) else 0 := by
+theorem ES_eq_sum_coef (S : Set (Tup2 D))
+    : ES D S
+      = ∑ a : (∀ kv : (Σ k : Fin 2, D.nd.PlG k), (Fin D.R.r → ZMod (D.host.g kv.1))),
+        if tupOf D a ∈ S then zTup D (tupOf D a) else 0 := by
   ext g
   rw [ES_coeff, MonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply]
   refine Finset.sum_congr rfl fun a _ => ?_
   split_ifs <;> rfl
 
-
 open Classical in
 theorem ES_eq_sum (S : Set (Tup2 D)) : ES D S = ∑ t ∈ (labT D).filter (· ∈ S), zTup D t := by
-  rw [ES_eq_sum_coef, ← Finset.sum_image (s := Finset.univ) (g := tupOf D)
-    (f := fun t => if t ∈ S then zTup D t else 0) fun _ _ _ _ h => tupOf_injective h, Finset.sum_filter]
+  rw [ES_eq_sum_coef,
+    ← Finset.sum_image (s := Finset.univ) (g := tupOf D)
+      (f := fun t => if t ∈ S then zTup D t else 0)
+      fun _ _ _ _ h => tupOf_injective h,
+    Finset.sum_filter]
   symm
   refine Finset.sum_subset (by unfold labT; exact Finset.filter_subset _ _) fun t _ ht => ?_
   rw [zTup_eq_zero ht, ite_self]
@@ -147,8 +163,7 @@ theorem ES_coe (S : Finset (Tup2 D)) : ES D (S : Set (Tup2 D)) = ∑ t ∈ S, zT
 theorem ES_singleton (t : Tup2 D) : ES D {t} = zTup D t := by
   rw [ES_eq_finsum, finsum_mem_singleton]
 
-theorem ES_empty : ES D ∅ = 0 := by
-  rw [ES_eq_finsum, finsum_mem_empty]
+theorem ES_empty : ES D ∅ = 0 := by rw [ES_eq_finsum, finsum_mem_empty]
 
 theorem ES_congr {S T : Set (Tup2 D)} (h : ∀ t ∈ labT D, t ∈ S ↔ t ∈ T) : ES D S = ES D T := by
   classical
@@ -166,15 +181,16 @@ theorem sum_zTup : ∑ t ∈ labT D, zTup D t = 1 := by
   rw [← ES_coe, ← ES_univ]
   exact ES_congr fun _ ht => ⟨fun _ => trivial, fun _ => ht⟩
 
-
 open Classical in
-theorem ES_mul_zTup (S : Set (Tup2 D)) (t : Tup2 D) :
-    ES D S * zTup D t = if t ∈ S then zTup D t else 0 := by
+theorem ES_mul_zTup (S : Set (Tup2 D)) (t : Tup2 D)
+    : ES D S * zTup D t = if t ∈ S then zTup D t else 0 := by
   rw [ES_eq_sum, Finset.sum_mul]
   by_cases hl : t ∈ labT D
   · split_ifs with h
-    · rw [Finset.sum_eq_single_of_mem t (Finset.mem_filter.2 ⟨hl, h⟩) fun _ _ => zTup_mul_of_ne, zTup_mul_self]
-    · exact Finset.sum_eq_zero fun s hs => zTup_mul_of_ne fun e => h (e ▸ (Finset.mem_filter.1 hs).2)
+    · rw [Finset.sum_eq_single_of_mem t (Finset.mem_filter.2 ⟨hl, h⟩) fun _ _ => zTup_mul_of_ne,
+        zTup_mul_self]
+    · exact Finset.sum_eq_zero fun s hs =>
+        zTup_mul_of_ne fun e => h (e ▸ (Finset.mem_filter.1 hs).2)
   · simp [zTup_eq_zero hl]
 
 theorem ES_mul (S T : Set (Tup2 D)) : ES D S * ES D T = ES D (S ∩ T) := by
@@ -184,14 +200,14 @@ theorem ES_mul (S T : Set (Tup2 D)) : ES D S * ES D T = ES D (S ∩ T) := by
   rw [ES_mul_zTup]
   by_cases h : t ∈ S <;> by_cases h' : t ∈ T <;> simp [h, h']
 
-theorem ES_mul_self (S : Set (Tup2 D)) : ES D S * ES D S = ES D S := by
-  rw [ES_mul, Set.inter_self]
+theorem ES_mul_self (S : Set (Tup2 D)) : ES D S * ES D S = ES D S := by rw [ES_mul, Set.inter_self]
 
 theorem ES_comm (S : Set (Tup2 D)) (a : MonoidAlgebra ℂ (G0g D.nd)) : ES D S * a = a * ES D S := by
   rw [ES_eq_sum, Finset.sum_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun t _ => zTup_comm t a
 
-theorem ES_union_add_inter (S T : Set (Tup2 D)) : ES D (S ∪ T) + ES D (S ∩ T) = ES D S + ES D T := by
+theorem ES_union_add_inter (S T : Set (Tup2 D))
+    : ES D (S ∪ T) + ES D (S ∩ T) = ES D S + ES D T := by
   classical
   simp only [ES_eq_sum, Finset.sum_filter, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun t _ => ?_

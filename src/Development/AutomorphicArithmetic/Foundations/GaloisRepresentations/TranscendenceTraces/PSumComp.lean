@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.sumComp_of :
-    FibFin → SumComp := by
+theorem UpperTheory.Gal.TranscendenceTraces.sumComp_of : FibFin → SumComp := by
   intro hF W V U r p _ _ Ω _ x M _ c
   have hset : fib (r ≫ p) x = ⋃ y ∈ fib p x, fib r y := by
     ext z

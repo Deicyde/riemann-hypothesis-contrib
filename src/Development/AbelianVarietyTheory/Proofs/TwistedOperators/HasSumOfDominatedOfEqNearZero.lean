@@ -8,13 +8,13 @@ open Metric Filter Topology
 
 namespace GlobalTheory
 
-theorem hasSum_of_dominated_of_eq_near_zero {ι : Type} (b : ι → ℂ) (c : ι → ℝ) (n : ι → ℕ)
+theorem hasSum_of_dominated_of_eq_near_zero
+    {ι : Type} (b : ι → ℂ) (c : ι → ℝ) (n : ι → ℕ)
     (R : ℂ → ℂ) (r ε : ℝ)
-    (hbc : ∀ i, ‖b i‖ ≤ c i)
-    (hc : ∀ x : ℝ, 0 ≤ x → x < r → Summable (fun i => c i * x ^ n i)) (hε : 0 < ε)
-    (hR : DifferentiableOn ℂ R (Metric.ball 0 r))
-    (hnear : ∀ z : ℂ, 0 < ‖z‖ → ‖z‖ < ε → HasSum (fun i => b i * z ^ n i) (R z)) :
-    ∀ z : ℂ, ‖z‖ < r → HasSum (fun i => b i * z ^ n i) (R z) := by
+    (hbc : ∀ i, ‖b i‖ ≤ c i) (hc : ∀ x : ℝ, 0 ≤ x → x < r → Summable (fun i => c i * x ^ n i))
+    (hε : 0 < ε) (hR : DifferentiableOn ℂ R (Metric.ball 0 r))
+    (hnear : ∀ z : ℂ, 0 < ‖z‖ → ‖z‖ < ε → HasSum (fun i => b i * z ^ n i) (R z))
+    : ∀ z : ℂ, ‖z‖ < r → HasSum (fun i => b i * z ^ n i) (R z) := by
   intro z hz
   have hr : 0 < r := lt_of_le_of_lt (norm_nonneg z) hz
   have hbound : ∀ i (w : ℂ), ‖b i * w ^ n i‖ ≤ c i * ‖w‖ ^ n i := by
@@ -31,8 +31,12 @@ theorem hasSum_of_dominated_of_eq_near_zero {ι : Type} (b : ι → ℂ) (c : ι
     obtain ⟨s, hws, hsr⟩ := exists_between hw'
     have hs0 : 0 ≤ s := le_trans (norm_nonneg w) hws.le
     have hd : DifferentiableOn ℂ F (ball 0 s) := by
-      refine Complex.differentiableOn_tsum_of_summable_norm (u := fun i => c i * s ^ n i) (hc s hs0 hsr)
-        (fun i => ?_) isOpen_ball (fun i v hv => ?_)
+      refine Complex.differentiableOn_tsum_of_summable_norm
+        (u := fun i => c i * s ^ n i)
+        (hc s hs0 hsr)
+        (fun i => ?_)
+        isOpen_ball
+        (fun i v hv => ?_)
       · exact ((differentiable_const _).mul (differentiable_id.pow _)).differentiableOn
       · refine (hbound i v).trans ?_
         have hv' : ‖v‖ < s := by simpa using hv
@@ -48,17 +52,19 @@ theorem hasSum_of_dominated_of_eq_near_zero {ι : Type} (b : ι → ℂ) (c : ι
     have hw0' : 0 < ‖w‖ := norm_pos_iff.mpr hw0
     have hwε : ‖w‖ < ε := by simpa using hw
     exact (hnear w hw0' hwε).tsum_eq
-  have heq := hFa.eqOn_of_preconnected_of_frequently_eq hRa (convex_ball (0:ℂ) r).isPreconnected
-    (mem_ball_self hr) hfreq
-  have hzb : z ∈ ball (0:ℂ) r := by simpa using hz
+  have heq :=
+    hFa.eqOn_of_preconnected_of_frequently_eq hRa (convex_ball (0 : ℂ) r).isPreconnected
+      (mem_ball_self hr) hfreq
+  have hzb : z ∈ ball (0 : ℂ) r := by simpa using hz
   rw [← heq hzb]
   exact (hsum z hz).hasSum
 
-theorem hasSum_of_dominated_of_eq_near_zero' : ∀ {ι : Type} (b : ι → ℂ) (c : ι → ℝ) (n : ι → ℕ) (R : ℂ → ℂ) (r ε : ℝ), (∀ i, ‖b i‖ ≤ c i) →
-    (∀ x : ℝ, 0 ≤ x → x < r → Summable (fun i => c i * x ^ n i)) → 0 < ε →
-    DifferentiableOn ℂ R (Metric.ball 0 r) →
-    (∀ z : ℂ, 0 < ‖z‖ → ‖z‖ < ε → HasSum (fun i => b i * z ^ n i) (R z)) →
-    ∀ z : ℂ, ‖z‖ < r → HasSum (fun i => b i * z ^ n i) (R z) :=
+theorem hasSum_of_dominated_of_eq_near_zero'
+    : ∀ {ι : Type} (b : ι → ℂ) (c : ι → ℝ) (n : ι → ℕ) (R : ℂ → ℂ) (r ε : ℝ),
+      (∀ i, ‖b i‖ ≤ c i) → (∀ x : ℝ, 0 ≤ x → x < r → Summable (fun i => c i * x ^ n i)) → 0 < ε
+        → DifferentiableOn ℂ R (Metric.ball 0 r)
+        → (∀ z : ℂ, 0 < ‖z‖ → ‖z‖ < ε → HasSum (fun i => b i * z ^ n i) (R z))
+        → ∀ z : ℂ, ‖z‖ < r → HasSum (fun i => b i * z ^ n i) (R z) :=
   fun b c n R r ε h1 h2 h3 h4 h5 => hasSum_of_dominated_of_eq_near_zero b c n R r ε h1 h2 h3 h4 h5
 
 end GlobalTheory

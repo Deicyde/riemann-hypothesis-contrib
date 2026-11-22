@@ -27,8 +27,8 @@ namespace HeckeCharacter
 
 variable (χ : HeckeCharacter K)
 
-theorem infiniteGamma_ne_zero (w : InfinitePlace K) {s : ℂ} (hs : 0 < s.re) :
-    χ.infiniteGamma w s ≠ 0 := by
+theorem infiniteGamma_ne_zero (w : InfinitePlace K) {s : ℂ} (hs : 0 < s.re)
+    : χ.infiniteGamma w s ≠ 0 := by
   unfold infiniteGamma
   split_ifs with hw
   · refine Gammaℝ_ne_zero_of_re_pos ?_

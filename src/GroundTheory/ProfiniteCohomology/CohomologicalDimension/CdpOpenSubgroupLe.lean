@@ -16,9 +16,10 @@ universe u
 
 variable {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
 
-theorem isAddTorsion_coind (U : OpenSubgroup G) (B : Rep.{u} (ULift.{u} ℤ) (U : Subgroup G))
-    [IsDiscreteRep B] (hB : IsAddTorsion B) :
-    IsAddTorsion (Rep.coind (U : Subgroup G).subtype B) := by
+theorem isAddTorsion_coind
+    (U : OpenSubgroup G) (B : Rep.{u} (ULift.{u} ℤ) (U : Subgroup G)) [IsDiscreteRep B]
+    (hB : IsAddTorsion B)
+    : IsAddTorsion (Rep.coind (U : Subgroup G).subtype B) := by
   classical
   intro f
   have hfin : (Set.range (f.1 : G → B)).Finite := (isLocallyConstant_coind U B f).range_finite
@@ -32,8 +33,9 @@ theorem isAddTorsion_coind (U : OpenSubgroup G) (B : Rep.{u} (ULift.{u} ℤ) (U 
 theorem cdp_openSubgroup_le (p : ℕ) (U : OpenSubgroup G) : cdp p (U : Subgroup G) ≤ cdp p G := by
   rw [cdp_le_iff]
   intro B _ hB q hq
-  have h0 := primaryComponent_cohomology_eq_bot_of_cdp_lt (Rep.coind (U : Subgroup G).subtype B)
-    (isAddTorsion_coind U B hB) hq
+  have h0 :=
+    primaryComponent_cohomology_eq_bot_of_cdp_lt (Rep.coind (U : Subgroup G).subtype B)
+      (isAddTorsion_coind U B hB) hq
   rw [primaryComponent_eq_bot_iff] at h0 ⊢
   rintro x ⟨k, hk⟩
   have hy : (shapiroIso U B q).inv.hom x = 0 := h0 _ ⟨k, by rw [← map_nsmul, hk, map_zero]⟩

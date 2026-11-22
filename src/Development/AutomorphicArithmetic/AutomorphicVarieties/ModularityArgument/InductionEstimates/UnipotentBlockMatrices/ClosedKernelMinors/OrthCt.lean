@@ -11,17 +11,21 @@ public import GroundTheory.AutomorphicForms.CuspidalProjection.Global
 @[expose] public section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-private theorem ae4 {A B C D : Type} [MeasurableSpace A] [MeasurableSpace B] [MeasurableSpace C] [MeasurableSpace D]
-    (α : Measure A) (β : Measure B) (γ : Measure C) (δ : Measure D) [SFinite β] [SFinite γ] [SFinite δ]
-    (H : A × B × C × D → ℝ≥0∞) (hH : Measurable H)
-    (h0 : ∫⁻ a, ∫⁻ b, ∫⁻ c, ∫⁻ d, H (a, b, c, d) ∂δ ∂γ ∂β ∂α = 0) :
-    ∀ᵐ a ∂α, ∀ᵐ b ∂β, ∀ᵐ c ∂γ, ∀ᵐ d ∂δ, H (a, b, c, d) = 0 := by
+private theorem ae4
+    {A B C D : Type} [MeasurableSpace A] [MeasurableSpace B] [MeasurableSpace C] [MeasurableSpace D]
+    (α : Measure A)
+    (β : Measure B) (γ : Measure C) (δ : Measure D) [SFinite β] [SFinite γ] [SFinite δ]
+    (H : A × B × C × D → ℝ≥0∞)
+    (hH : Measurable H) (h0 : ∫⁻ a, ∫⁻ b, ∫⁻ c, ∫⁻ d, H (a, b, c, d) ∂δ ∂γ ∂β ∂α = 0)
+    : ∀ᵐ a ∂α, ∀ᵐ b ∂β, ∀ᵐ c ∂γ, ∀ᵐ d ∂δ, H (a, b, c, d) = 0 := by
   have h1 : ∫⁻ p, H p ∂α.prod (β.prod (γ.prod δ)) = 0 := by
     rw [lintegral_prod _ hH.aemeasurable, ← h0]
     refine lintegral_congr fun a => ?_
@@ -36,30 +40,41 @@ private theorem ae4 {A B C D : Type} [MeasurableSpace A] [MeasurableSpace B] [Me
   filter_upwards [Measure.ae_ae_of_ae_prod hb] with c hc
   exact hc
 
-private theorem int0 {A B : Type} [MeasurableSpace A] [MeasurableSpace B]
-    {α : Measure A} {β : Measure B} [SFinite α] [SFinite β] {f : A × B → ℂ} (hf : Integrable f (α.prod β))
-    (h : ∀ᵐ a ∂α, Integrable (fun b => f (a, b)) β → ∫ b, f (a, b) ∂β = 0) : ∫ p, f p ∂α.prod β = 0 := by
+private theorem int0
+    {A B : Type} [MeasurableSpace A] [MeasurableSpace B]
+    {α : Measure A} {β : Measure B} [SFinite α] [SFinite β]
+    {f : A × B → ℂ} (hf : Integrable f (α.prod β))
+    (h : ∀ᵐ a ∂α, Integrable (fun b => f (a, b)) β → ∫ b, f (a, b) ∂β = 0)
+    : ∫ p, f p ∂α.prod β = 0 := by
   rw [integral_prod _ hf]
   refine integral_eq_zero_of_ae ?_
   filter_upwards [h, hf.prod_right_ae] with a ha hi
   exact ha hi
 
-private theorem constantTermL2_unipotent_mul {K : Type} [Field K] [NumberField K] {n : ℕ}
-    (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (w : L2 μ) (r : ℕ)
-    (Y : UPos n r → 𝔸[K]) (z : G1 K n) :
-    constantTermL2 μ r w (unipOne r Y * z) = constantTermL2 μ r w z := by
+private theorem constantTermL2_unipotent_mul
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
+    (w : L2 μ)
+    (r : ℕ) (Y : UPos n r → 𝔸[K])
+    (z : G1 K n)
+    : constantTermL2 μ r w (unipOne r Y * z) = constantTermL2 μ r w z := by
   simp only [constantTermL2, ctFun]
   have h (X : UPos n r → 𝔸[K]) : unipOne r X * (unipOne r Y * z) = unipOne r (X + Y) * z := by
     rw [unipOne_add, mul_assoc]
   simp_rw [h]
   refine setIntegral_add_right_of_periodic isAddFundamentalDomain_unipFundamentalDomain
-    (h := fun X => (w : RightCosetSpace (Gam K n) → ℂ) (RightCosetSpace.mk (Gam K n) (unipOne r X * z)))
-    (fun ξ hξ s => ?_) Y
+    (h := fun X =>
+      (w : RightCosetSpace (Gam K n) → ℂ) (RightCosetSpace.mk (Gam K n) (unipOne r X * z)))
+    (fun ξ hξ s => ?_)
+    Y
   rw [unipOne_add, mul_assoc, RightCosetSpace.mk_mul_of_mem (unipOne_mem_rationalGLOne r ⟨ξ, hξ⟩)]
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.orthCt :
-    ∀ {K : Type} [Field K] [NumberField K] (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure] (F : G1 K (2 + 2) → ℂ), Continuous F → (∀ γ ∈ PK K, ∀ g, F (γ * g) = F g) → InBand F → Decays F → (∀ X g, F (nn X * g) = F g) → ∀ v w : L2 μ, Reps μ v (th F) →
-      constantTermL2 μ 2 w =ᵐ[μ] 0 → ⟪v, w⟫_ℂ = 0 := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.orthCt
+    : ∀ {K : Type} [Field K] [NumberField K] (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure]
+        (F : G1 K (2 + 2) → ℂ),
+      Continuous F → (∀ γ ∈ PK K, ∀ g, F (γ * g) = F g) → InBand F → Decays F
+        → (∀ X g, F (nn X * g) = F g)
+        → ∀ v w : L2 μ, Reps μ v (th F) → constantTermL2 μ 2 w =ᵐ[μ] 0 → ⟪v, w⟫_ℂ = 0 := by
   intro K _ _ μ _ F hFc hFP hFB hFD hFN v w hv hw
   obtain ⟨-, -, -, hlv, -, -, -, -, -, -, -, hcpt⟩ := blkLaws (K := K)
   haveI : CompactSpace (KG K (2 + 2)) := isCompact_iff_compactSpace.mp (hcpt (2 + 2)).1
@@ -106,12 +121,14 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.orthCt :
   simp only [mul_assoc, constantTermL2_unipotent_mul, lintegral_const] at h1
   have hcont : Continuous fun p : G1 K 2 × G1 K 2 × ℝ × KG K (2 + 2) =>
       lv p.1 p.2.1 p.2.2.1 * (p.2.2.2 : G1 K (2 + 2)) :=
-    (hlv.comp (f := fun p : G1 K 2 × G1 K 2 × ℝ × KG K (2 + 2) => (p.1, p.2.1, p.2.2.1)) (by fun_prop)).mul
-      (continuous_subtype_val.comp (by fun_prop))
-  have h2 := ae4 μ₂ μ₂ volume κ (fun p : G1 K 2 × G1 K 2 × ℝ × KG K (2 + 2) =>
-      ‖constantTermL2 μ 2 w (lv p.1 p.2.1 p.2.2.1 * (p.2.2.2 : G1 K (2 + 2)))‖ₑ *
-        (ENNReal.ofReal (Real.exp (-4 * p.2.2.1)) * unipMeasure K (2 + 2) 2 univ))
-    ((hm.comp hcont.measurable).eNorm.mul (Measurable.mul_const (by fun_prop) _)) h1
+    (hlv.comp (f := fun p : G1 K 2 × G1 K 2 × ℝ × KG K (2 + 2) => (p.1, p.2.1, p.2.2.1)) (by
+      fun_prop)).mul (continuous_subtype_val.comp (by fun_prop))
+  have h2 :=
+    ae4 μ₂ μ₂ volume κ
+      (fun p : G1 K 2 × G1 K 2 × ℝ × KG K (2 + 2) =>
+        ‖constantTermL2 μ 2 w (lv p.1 p.2.1 p.2.2.1 * (p.2.2.2 : G1 K (2 + 2)))‖ₑ
+          * (ENNReal.ofReal (Real.exp (-4 * p.2.2.1)) * unipMeasure K (2 + 2) 2 univ))
+      ((hm.comp hcont.measurable).eNorm.mul (Measurable.mul_const (by fun_prop) _)) h1
   have hU : unipMeasure K (2 + 2) 2 univ ≠ 0 := NeZero.ne _
   rw [heq]
   refine mul_eq_zero_of_right _ ?_

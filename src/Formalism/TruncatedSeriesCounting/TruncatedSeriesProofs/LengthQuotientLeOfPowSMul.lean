@@ -18,7 +18,9 @@ theorem length_quotient_le_of_pow_smul : LengthQuotientLeOfPowSMul := by
     rw [smul_add]
     exact J.add_mem (h1 (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) hf))
       (J.smul_mem _ (h2 hm))
-  have hS := Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.submodule_generator_count O M ℓ e A J hx
+  have hS :=
+    Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.submodule_generator_count O M ℓ e A
+      J hx
   let f : (A ⧸ J.comap A.subtype) →ₗ[O] M ⧸ J := (J.comap A.subtype).mapQ J A.subtype le_rfl
   let g : (M ⧸ J) →ₗ[O] M ⧸ (A ⊔ J) :=
     J.mapQ (A ⊔ J) LinearMap.id (fun x hx => Submodule.mem_sup_right hx)
@@ -51,7 +53,8 @@ theorem length_quotient_le_of_pow_smul : LengthQuotientLeOfPowSMul := by
       exact Submodule.sub_mem _ (Submodule.mem_sup_left a.2) (Submodule.mem_sup_right hx)
   have hlen := Module.length_eq_add_of_exact f g hf hg hex
   have hq : Module.length O (M ⧸ (A ⊔ J)) ≤ Module.length O (M ⧸ A) := by
-    refine Module.length_le_of_surjective (A.mapQ (A ⊔ J) LinearMap.id (fun x hx => Submodule.mem_sup_left hx)) ?_
+    refine Module.length_le_of_surjective
+      (A.mapQ (A ⊔ J) LinearMap.id (fun x hx => Submodule.mem_sup_left hx)) ?_
     intro z
     obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective _ z
     exact ⟨Submodule.Quotient.mk m, rfl⟩

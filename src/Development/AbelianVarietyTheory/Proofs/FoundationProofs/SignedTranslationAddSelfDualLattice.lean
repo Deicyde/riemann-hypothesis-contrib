@@ -6,15 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Different
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.GalTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.GalTheta
 open scoped BigOperators
 
 namespace GlobalTheory.GalTheta
 
-theorem al_add (D : D7) (T : Tor D) (N N' : ℕ) (A : AddSubgroup (VC D N N'))
-    (h1 : ∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D T x y).im = m) (h2 : ∀ x ∈ A, ∃ m : ℤ, qH D T x = m)
-    (h3 : ∀ x ∈ A, w0 D • x ∈ A) : ∀ x ∈ A, ∀ y ∈ A, al D T (x + y) =
-      al D T x * al D T y * Complex.exp (-(Real.pi : ℂ) * Complex.I * ((Hf D T x y).im : ℂ)) := by
+theorem al_add
+    (D : D7) (T : Tor D)
+    (N N' : ℕ) (A : AddSubgroup (VC D N N')) (h1 : ∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D T x y).im = m)
+    (h2 : ∀ x ∈ A, ∃ m : ℤ, qH D T x = m) (h3 : ∀ x ∈ A, w0 D • x ∈ A)
+    : ∀ x ∈ A, ∀ y ∈ A,
+      al D T (x + y)
+        = al D T x * al D T y
+          * Complex.exp (-(Real.pi : ℂ) * Complex.I * ((Hf D T x y).im : ℂ)) := by
   intro x hx y hy
   obtain ⟨a, ha⟩ := h2 x hx
   obtain ⟨c, hc⟩ := h2 y hy
@@ -40,8 +46,8 @@ theorem al_add (D : D7) (T : Tor D) (N N' : ℕ) (A : AddSubgroup (VC D N N'))
     push_cast
     ring
   have hn : (-1 : ℂ) ≠ 0 := by norm_num
-  rw [hal _ _ hs, hal _ _ ha, hal _ _ hc, he, sub_eq_add_neg, zpow_add₀ hn, zpow_add₀ hn, zpow_add₀ hn,
-    zpow_mul]
+  rw [hal _ _ hs, hal _ _ ha, hal _ _ hc, he, sub_eq_add_neg, zpow_add₀ hn, zpow_add₀ hn,
+    zpow_add₀ hn, zpow_mul]
   simp
 
 end GlobalTheory.GalTheta

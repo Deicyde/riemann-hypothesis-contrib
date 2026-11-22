@@ -61,47 +61,56 @@ private lemma chart_ring {X W : Scheme.{0}} (π : W ⟶ X) (N : X.Opens) (hN : I
     rw [← basicOpen_eq_of_affine, Scheme.image_basicOpen]
     rfl
 
-theorem UpperTheory.isAffineOpen_image_pullback_openImmersion_chart :
-    ∀ {S C : Type} [CommRing S] [CommRing C] {X W E : Scheme.{0}} (π : W ⟶ X) (N : X.Opens)
+theorem UpperTheory.isAffineOpen_image_pullback_openImmersion_chart
+    : ∀ {S C : Type} [CommRing S] [CommRing C] {X W E : Scheme.{0}} (π : W ⟶ X) (N : X.Opens)
         (hN : IsAffineOpen N) (φ : S →+* Γ(X, N)) (τ : E ⟶ Spec (CommRingCat.of S))
         (q : (π ⁻¹ᵁ N).toScheme ⟶ E)
         (_ : IsPullback q (π ∣_ N) τ (hN.isoSpec.hom ≫ Spec.map (CommRingCat.ofHom φ)))
         (χ : S →+* C) (c : Spec (CommRingCat.of C) ⟶ E) [IsOpenImmersion c]
         (_ : c ≫ τ = Spec.map (CommRingCat.ofHom χ)),
-        IsAffineOpen ((π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange)) ∧
-        ∃ (hle : (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange) ≤ π ⁻¹ᵁ N)
-          (ρ : C →+* Γ(W, (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange))),
-          IsPushout (CommRingCat.ofHom φ) (CommRingCat.ofHom χ) (Scheme.Hom.appLE π N _ hle) (CommRingCat.ofHom ρ) ∧
-          ∀ (O : E.Opens) (f : C), c ⁻¹ᵁ O = PrimeSpectrum.basicOpen f →
-            (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange) ⊓ (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ O) = W.basicOpen (ρ f) := by
+      IsAffineOpen ((π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange))
+        ∧ ∃ (hle : (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange) ≤ π ⁻¹ᵁ N)
+            (ρ : C →+* Γ(W, (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange))),
+          IsPushout (CommRingCat.ofHom φ) (CommRingCat.ofHom χ) (Scheme.Hom.appLE π N _ hle)
+              (CommRingCat.ofHom ρ)
+            ∧ ∀ (O : E.Opens) (f : C),
+              c ⁻¹ᵁ O = PrimeSpectrum.basicOpen f
+                → (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange) ⊓ (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ O)
+                  = W.basicOpen (ρ f) := by
   intro S C _ _ X W E π N hN φ τ q hq χ c _ hc
-  obtain ⟨ι', _, hr, hq', hπ'⟩ := chart_open π N hN (CommRingCat.ofHom φ) τ q hq (CommRingCat.ofHom χ) c hc
-    (pushout.inl (CommRingCat.ofHom φ) (CommRingCat.ofHom χ))
-    (pushout.inr (CommRingCat.ofHom φ) (CommRingCat.ofHom χ)) (IsPushout.of_hasPushout _ _)
-  have hι : (ι' ≫ (π ⁻¹ᵁ N).ι) ≫ π =
-      Spec.map (pushout.inl (CommRingCat.ofHom φ) (CommRingCat.ofHom χ)) ≫ hN.fromSpec := by
+  obtain ⟨ι', _, hr, hq', hπ'⟩ :=
+    chart_open π N hN (CommRingCat.ofHom φ) τ q hq (CommRingCat.ofHom χ) c hc
+      (pushout.inl (CommRingCat.ofHom φ) (CommRingCat.ofHom χ))
+      (pushout.inr (CommRingCat.ofHom φ) (CommRingCat.ofHom χ)) (IsPushout.of_hasPushout _ _)
+  have hι
+      : (ι' ≫ (π ⁻¹ᵁ N).ι) ≫ π
+        = Spec.map (pushout.inl (CommRingCat.ofHom φ) (CommRingCat.ofHom χ)) ≫ hN.fromSpec := by
     rw [Category.assoc, ← morphismRestrict_ι, ← Category.assoc, hπ', Category.assoc]
     rfl
   have hV : (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange) = (ι' ≫ (π ⁻¹ᵁ N).ι) ''ᵁ ⊤ := by
     rw [Scheme.Hom.image_top_eq_opensRange, Scheme.Hom.opensRange_comp, hr]
   have hle : (π ⁻¹ᵁ N).ι ''ᵁ (q ⁻¹ᵁ c.opensRange) ≤ π ⁻¹ᵁ N := (π ⁻¹ᵁ N).ι_image_le _
-  obtain ⟨ρ, hpo, hb⟩ := chart_ring π N hN (CommRingCat.ofHom φ) (CommRingCat.ofHom χ) _ _
-    (IsPushout.of_hasPushout _ _) (ι' ≫ (π ⁻¹ᵁ N).ι) hι _ hV hle
+  obtain ⟨ρ, hpo, hb⟩ :=
+    chart_ring π N hN (CommRingCat.ofHom φ) (CommRingCat.ofHom χ) _ _ (IsPushout.of_hasPushout _ _)
+      (ι' ≫ (π ⁻¹ᵁ N).ι) hι _ hV hle
   refine ⟨?_, hle, ρ.hom, ?_, ?_⟩
   · rw [hV]
     exact (isAffineOpen_top _).image_of_isOpenImmersion _
   · simpa using hpo
   · intro O f hO
-    have hbo : (PrimeSpectrum.basicOpen ((pushout.inr (CommRingCat.ofHom φ) (CommRingCat.ofHom χ)).hom f) :
-        (Spec _).Opens) = ι' ⁻¹ᵁ q ⁻¹ᵁ O := by
+    have hbo
+        : (PrimeSpectrum.basicOpen ((pushout.inr (CommRingCat.ofHom φ) (CommRingCat.ofHom χ)).hom f)
+            : (Spec _).Opens)
+          = ι' ⁻¹ᵁ q ⁻¹ᵁ O := by
       rw [← Scheme.Hom.comp_preimage, hq', Scheme.Hom.comp_preimage, hO]
       ext x
       exact Iff.rfl
     rw [← hb f, hbo]
     have hinj := (π ⁻¹ᵁ N).ι.isOpenEmbedding.injective
     apply TopologicalSpace.Opens.ext
-    rw [TopologicalSpace.Opens.coe_inf, Scheme.Hom.coe_image, Scheme.Hom.coe_image, Scheme.Hom.coe_image, ← hr,
-      ← Set.image_inter hinj, Scheme.Hom.comp_base, TopCat.coe_comp, Set.image_comp]
+    rw [TopologicalSpace.Opens.coe_inf, Scheme.Hom.coe_image, Scheme.Hom.coe_image,
+      Scheme.Hom.coe_image, ← hr, ← Set.image_inter hinj, Scheme.Hom.comp_base, TopCat.coe_comp,
+      Set.image_comp]
     congr 1
     rw [← Scheme.Hom.coe_image, Scheme.Hom.image_preimage_eq_opensRange_inf]
     rfl

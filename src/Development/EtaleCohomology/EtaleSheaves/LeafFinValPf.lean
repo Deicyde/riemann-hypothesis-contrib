@@ -13,13 +13,19 @@ namespace LateralTheory.E.E4
 
 open Polynomial IsDedekindDomain
 
-theorem finVal_dedekind (D L : Type) [CommRing D] [IsDedekindDomain D] [Field L] [Algebra D L]
-    [IsFractionRing D L] [Finite (HeightOneSpectrum D)] :
-    ∃ (n : ℕ) (φ : Lˣ →* Multiplicative (Fin n → ℤ)), ∀ x : Lˣ, φ x = 1 →
-      (x : L) ∈ (algebraMap D L).range := by
+theorem finVal_dedekind
+    (D L : Type) [CommRing D] [IsDedekindDomain D] [Field L] [Algebra D L] [IsFractionRing D L]
+    [Finite (HeightOneSpectrum D)]
+    : ∃ (n : ℕ) (φ : Lˣ →* Multiplicative (Fin n → ℤ)), ∀ x : Lˣ,
+      φ x = 1 → (x : L) ∈ (algebraMap D L).range := by
   obtain ⟨n, ⟨e⟩⟩ := Finite.exists_equiv_fin (HeightOneSpectrum D)
-  refine ⟨n, MonoidHom.mk' (fun x => Multiplicative.ofAdd
-    (fun i => WithZero.log ((e.symm i).valuation L (x : L)))) ?_, ?_⟩
+  refine ⟨
+    n,
+    MonoidHom.mk'
+      (fun x => Multiplicative.ofAdd (fun i => WithZero.log ((e.symm i).valuation L (x : L))))
+      ?_,
+    ?_
+  ⟩
   · intro x y
     rw [← ofAdd_add]
     congr 1
@@ -35,23 +41,27 @@ theorem finVal_dedekind (D L : Type) [CommRing D] [IsDedekindDomain D] [Field L]
     rw [e.symm_apply_apply] at h
     exact WithZero.le_exp_of_log_le h.le
 
-theorem finVal_finite (A D : Type) [CommRing A] [IsLocalRing A] [CommRing D] [IsDedekindDomain D]
-    [Algebra A D] [Algebra.IsIntegral A D] [IsDomain A] [Module.IsTorsionFree A D] :
-    Finite (HeightOneSpectrum D) := by
+theorem finVal_finite
+    (A D : Type) [CommRing A] [IsLocalRing A] [CommRing D] [IsDedekindDomain D] [Algebra A D]
+    [Algebra.IsIntegral A D] [IsDomain A] [Module.IsTorsionFree A D]
+    : Finite (HeightOneSpectrum D) := by
   have hf := IsDedekindDomain.primesOver_finite (IsLocalRing.maximalIdeal A) D
   have := hf.to_subtype
   refine Finite.of_injective (β := (IsLocalRing.maximalIdeal A).primesOver D)
-    (fun v => ⟨v.asIdeal, v.isPrime, ⟨?_⟩⟩) ?_
+    (fun v => ⟨v.asIdeal, v.isPrime, ⟨?_⟩⟩)
+    ?_
   · have := v.isMaximal
-    exact (IsLocalRing.eq_maximalIdeal
-      (Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := A) v.asIdeal)).symm
+    exact (IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := A)
+      v.asIdeal)).symm
   · intro v w h
     exact HeightOneSpectrum.ext (congrArg Subtype.val h)
 
-theorem finVal_sep (A K L : Type) [CommRing A] [IsLocalRing A] [IsDedekindDomain A] [Field K] [Field L]
+theorem finVal_sep
+    (A K L : Type) [CommRing A] [IsLocalRing A] [IsDedekindDomain A] [Field K] [Field L]
     [Algebra A K] [IsFractionRing A K] [Algebra K L] [Algebra A L] [IsScalarTower A K L]
-    [FiniteDimensional K L] [Algebra.IsSeparable K L] :
-    ∃ (n : ℕ) (φ : Lˣ →* Multiplicative (Fin n → ℤ)), ∀ x : Lˣ, φ x = 1 → IsIntegral A (x : L) := by
+    [FiniteDimensional K L] [Algebra.IsSeparable K L]
+    : ∃ (n : ℕ) (φ : Lˣ →* Multiplicative (Fin n → ℤ)), ∀ x : Lˣ,
+      φ x = 1 → IsIntegral A (x : L) := by
   have := integralClosure.isDedekindDomain A K L
   have := integralClosure.isFractionRing_of_finite_extension (A := A) K L
   have hinj : Function.Injective (algebraMap A L) := by
@@ -68,15 +78,17 @@ theorem finVal_sep (A K L : Type) [CommRing A] [IsLocalRing A] [IsDedekindDomain
   rw [← hy]
   exact y.2
 
-theorem finVal_gen (A K L : Type) [CommRing A] [IsLocalRing A] [IsDedekindDomain A] [Field K] [Field L]
-    [Algebra A K] [IsFractionRing A K] [Algebra K L] [Algebra A L] [IsScalarTower A K L]
-    [FiniteDimensional K L] :
-    ∃ (n : ℕ) (φ : Lˣ →* Multiplicative (Fin n → ℤ)), ∀ x : Lˣ, φ x = 1 → IsIntegral A (x : L) := by
+theorem finVal_gen
+    (A K L : Type)
+    [CommRing A] [IsLocalRing A] [IsDedekindDomain A] [Field K] [Field L] [Algebra A K]
+    [IsFractionRing A K] [Algebra K L] [Algebra A L] [IsScalarTower A K L] [FiniteDimensional K L]
+    : ∃ (n : ℕ) (φ : Lˣ →* Multiplicative (Fin n → ℤ)), ∀ x : Lˣ,
+      φ x = 1 → IsIntegral A (x : L) := by
   obtain ⟨n, φ, h⟩ := finVal_sep A K (separableClosure K L)
   refine ⟨n, φ.comp (Units.map (Algebra.norm (separableClosure K L))), fun x hx => ?_⟩
   have h1 : IsIntegral A (Algebra.norm (separableClosure K L) (x : L)) := h _ hx
-  obtain ⟨m, y, hy⟩ := IsPurelyInseparable.pow_mem (separableClosure K L)
-    (ringExpChar (separableClosure K L)) (x : L)
+  obtain ⟨m, y, hy⟩ :=
+    IsPurelyInseparable.pow_mem (separableClosure K L) (ringExpChar (separableClosure K L)) (x : L)
   have hq : 0 < ringExpChar (separableClosure K L) ^ m := expChar_pow_pos (separableClosure K L) _ m
   have h2 : IsIntegral A (y ^ Module.finrank (separableClosure K L) L) := by
     rw [← Algebra.norm_algebraMap, hy, map_pow]
@@ -89,7 +101,8 @@ theorem finVal_gen (A K L : Type) [CommRing A] [IsLocalRing A] [IsDedekindDomain
 
 theorem LeafFinVal_of : LeafFinVal := by
   intro k L _ _ _ _ s hs hfd
-  have hne : ∀ p : Polynomial k, p ≠ 0 → aeval s p ≠ 0 := fun p hp h0 => hp ((transcendental_iff.mp hs) p h0)
+  have hne : ∀ p : Polynomial k, p ≠ 0 → aeval s p ≠ 0 := fun p hp h0 =>
+    hp ((transcendental_iff.mp hs) p h0)
   let P : Ideal k[X] := RingHom.ker (evalRingHom (0 : k))
   have hP : P.IsPrime := RingHom.ker_isPrime _
   let A := Localization.AtPrime P
@@ -113,7 +126,8 @@ theorem LeafFinVal_of : LeafFinVal := by
     rw [map_mul, hf, hf] at this
     exact (eq_div_iff (hu b).ne_zero).mpr this
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro c hc
     obtain ⟨⟨a, b⟩, hab⟩ := IsLocalization.surj P.primeCompl c
     have h1 := congrArg f hab

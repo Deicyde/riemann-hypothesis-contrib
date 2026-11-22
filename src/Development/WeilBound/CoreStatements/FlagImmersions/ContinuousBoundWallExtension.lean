@@ -10,11 +10,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace RootFieldNumerics
 
-theorem exists_rat_near_le (δ : ℝ) (hδ : 0 < δ) (x : ℝ) : ∃ q : ℚ, |(q : ℝ)| ≤ |x| ∧ |(q : ℝ) - x| ≤ δ := by
+theorem exists_rat_near_le (δ : ℝ) (hδ : 0 < δ) (x : ℝ)
+    : ∃ q : ℚ, |(q : ℝ)| ≤ |x| ∧ |(q : ℝ) - x| ≤ δ := by
   rcases lt_trichotomy x 0 with hx | hx | hx
   · obtain ⟨q, h1, h2⟩ := exists_rat_btwn (show x < min (x + δ) 0 from lt_min (by linarith) hx)
     have m1 := min_le_left (x + δ) 0
@@ -34,15 +36,20 @@ theorem exists_rat_near_le (δ : ℝ) (hδ : 0 < δ) (x : ℝ) : ∃ q : ℚ, |(
     · rw [abs_le]
       constructor <;> linarith
 
-theorem continuous_bound_wall_extension : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (c₀ b : ℝ) (τ₀ : Ψ) (Φ : Wt Ψ N → ℝ), 1 ≤ j → j < N → 0 < c₀ → Continuous Φ → (∀ lam, IsRatWt lam → InWall j τ₀ (c₀ / 2) lam → |Φ lam| ≤ b) → ∀ lam, InWall j τ₀ c₀ lam → |Φ lam| ≤ b := by
+theorem continuous_bound_wall_extension
+    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (c₀ b : ℝ) (τ₀ : Ψ) (Φ : Wt Ψ N → ℝ),
+      1 ≤ j → j < N → 0 < c₀ → Continuous Φ
+        → (∀ lam, IsRatWt lam → InWall j τ₀ (c₀ / 2) lam → |Φ lam| ≤ b)
+        → ∀ lam, InWall j τ₀ c₀ lam → |Φ lam| ≤ b := by
   intro Ψ _ _ N j c₀ b τ₀ Φ hj hjN hc hΦ hrat lam hlam
-  have hex : ∀ n : ℕ, ∀ x : ℝ, ∃ q : ℚ, |(q:ℝ)| ≤ |x| ∧ |(q:ℝ) - x| ≤ c₀ / 4 * (1 / ((n:ℝ) + 1)) :=
+  have hex
+      : ∀ n : ℕ, ∀ x : ℝ, ∃ q : ℚ, |(q:ℝ)| ≤ |x| ∧ |(q:ℝ) - x| ≤ c₀ / 4 * (1 / ((n : ℝ) + 1)) :=
     fun n x => exists_rat_near_le _ (by positivity) x
   choose F hF1 hF2 using hex
   let A : ℕ → Wt Ψ N := fun n τ i => (F n (lam τ i) : ℝ)
-  have hδ : ∀ n : ℕ, c₀ / 4 * (1 / ((n:ℝ) + 1)) ≤ c₀ / 4 := by
+  have hδ : ∀ n : ℕ, c₀ / 4 * (1 / ((n : ℝ) + 1)) ≤ c₀ / 4 := by
     intro n
-    have h1 : 1 / ((n:ℝ) + 1) ≤ 1 := by
+    have h1 : 1 / ((n : ℝ) + 1) ≤ 1 := by
       rw [div_le_one (by positivity)]
       linarith [(n.cast_nonneg : (0:ℝ) ≤ n)]
     exact mul_le_of_le_one_right (by positivity) h1
@@ -60,7 +67,8 @@ theorem continuous_bound_wall_extension : ∀ (Ψ : Type) [Fintype Ψ] [Decidabl
     refine ⟨?_, ?_, ?_, ?_⟩
     · refine (pi_norm_le_iff_of_nonneg (by norm_num)).2 fun τ =>
         (pi_norm_le_iff_of_nonneg (by norm_num)).2 fun i => ?_
-      have h1 : ‖lam τ i‖ ≤ 1 / 2 := (norm_le_pi_norm (lam τ) i).trans ((norm_le_pi_norm lam τ).trans hn)
+      have h1 : ‖lam τ i‖ ≤ 1 / 2 :=
+        (norm_le_pi_norm (lam τ) i).trans ((norm_le_pi_norm lam τ).trans hn)
       simp only [Real.norm_eq_abs, A] at h1 ⊢
       exact (hF1 n _).trans h1
     · simp only [gap] at hg0 ⊢
@@ -84,7 +92,7 @@ theorem continuous_bound_wall_extension : ∀ (Ψ : Type) [Fintype Ψ] [Decidabl
     rw [tendsto_pi_nhds]
     intro i
     rw [tendsto_iff_norm_sub_tendsto_zero]
-    have hlim : Tendsto (fun n : ℕ => c₀ / 4 * (1 / ((n:ℝ) + 1))) atTop (𝓝 0) := by
+    have hlim : Tendsto (fun n : ℕ => c₀ / 4 * (1 / ((n : ℝ) + 1))) atTop (𝓝 0) := by
       simpa using (tendsto_one_div_add_atTop_nhds_zero_nat).const_mul (c₀ / 4)
     refine squeeze_zero (fun n => norm_nonneg _) (fun n => ?_) hlim
     simp only [A, Real.norm_eq_abs]

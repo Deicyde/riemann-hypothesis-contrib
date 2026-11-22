@@ -17,7 +17,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
 open scoped ENNReal Classical
 
 open CategoryTheory AlgebraicGeometry
@@ -34,18 +37,30 @@ namespace GlobalTheory.NormalModel
 
 open TopologicalSpace
 
-theorem exists_normal_model : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] (D m : ℕ) (y : Fin (m + 1) → Ω) (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp (𝓞 K)) (g : X ⟶ PSpace (𝓞 K) m) (ψ : Ω →+* X.functionField),
-    (g ≫ PSpace.str (𝓞 K) m = p ∧ IsArithVar p D ∧ Function.Bijective ψ ∧
-      (∀ a : 𝓞 K, ψ (algebraMap K Ω (a : K)) = fnOf ⊤ (TopologicalSpace.Opens.mem_top _) (algX p ⊤ a)) ∧
-      ∀ (k l : Fin (m + 1)) (i : ((ProjSpace.O1 (𝓞 K) m).pull g).ι) (h : genericPoint X ∈ ((ProjSpace.O1 (𝓞 K) m).pull g).U i),
-        ψ (y k) * fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m l) g).f i) =
-          ψ (y l) * fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g).f i)) →
-    ∃ (X' : Scheme.{0}) (_ : IsIntegral X') (p' : X' ⟶ Sp (𝓞 K)) (g' : X' ⟶ PSpace (𝓞 K) m) (ψ' : Ω →+* X'.functionField),
-      g' ≫ PSpace.str (𝓞 K) m = p' ∧ IsArithVar p' D ∧ ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme X' ∧ Function.Bijective ψ' ∧
-      (∀ a : 𝓞 K, ψ' (algebraMap K Ω (a : K)) = fnOf ⊤ (TopologicalSpace.Opens.mem_top _) (algX p' ⊤ a)) ∧
-      ∀ (k l : Fin (m + 1)) (i : ((ProjSpace.O1 (𝓞 K) m).pull g').ι) (h : genericPoint X' ∈ ((ProjSpace.O1 (𝓞 K) m).pull g').U i),
-        ψ' (y k) * fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m l) g').f i) =
-          ψ' (y l) * fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g').f i) := by
+theorem exists_normal_model
+    : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] (D m : ℕ)
+        (y : Fin (m + 1) → Ω) (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp (𝓞 K))
+        (g : X ⟶ PSpace (𝓞 K) m) (ψ : Ω →+* X.functionField),
+      (g ≫ PSpace.str (𝓞 K) m = p ∧ IsArithVar p D ∧ Function.Bijective ψ
+          ∧ (∀ a : 𝓞 K,
+            ψ (algebraMap K Ω (a : K)) = fnOf ⊤ (TopologicalSpace.Opens.mem_top _) (algX p ⊤ a))
+          ∧ ∀ (k l : Fin (m + 1)) (i : ((ProjSpace.O1 (𝓞 K) m).pull g).ι)
+              (h : genericPoint X ∈ ((ProjSpace.O1 (𝓞 K) m).pull g).U i),
+            ψ (y k) * fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m l) g).f i)
+              = ψ (y l)
+                * fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g).f i))
+        → ∃ (X' : Scheme.{0}) (_ : IsIntegral X') (p' : X' ⟶ Sp (𝓞 K)) (g' : X' ⟶ PSpace (𝓞 K) m)
+            (ψ' : Ω →+* X'.functionField),
+          g' ≫ PSpace.str (𝓞 K) m = p' ∧ IsArithVar p' D
+            ∧ ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme X' ∧ Function.Bijective ψ'
+            ∧ (∀ a : 𝓞 K,
+              ψ' (algebraMap K Ω (a : K)) = fnOf ⊤ (TopologicalSpace.Opens.mem_top _) (algX p' ⊤ a))
+            ∧ ∀ (k l : Fin (m + 1)) (i : ((ProjSpace.O1 (𝓞 K) m).pull g').ι)
+                (h : genericPoint X' ∈ ((ProjSpace.O1 (𝓞 K) m).pull g').U i),
+              ψ' (y k)
+                  * fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m l) g').f i)
+                = ψ' (y l) * fnOf _ h
+                  ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g').f i) := by
   intro K Ω _ _ _ _ D m y X _ p g ψ ⟨hgp, hX, hψ, hK, hy⟩
   obtain ⟨W, hne, hn⟩ := GlobalTheory.T.exists_nonempty_normal_open_arithmeticVariety (𝓞 K) X p D hX
   have := hX.finite
@@ -67,8 +82,8 @@ theorem exists_normal_model : ∀ (K Ω : Type) [Field K] [NumberField K] [Field
   have : IsIntegral W.toScheme := isIntegral_of_isOpenImmersion W.ι
   have : IsIntegral Y := by
     have := GlobalTheory.IsNormalScheme.of_pred hnY
-    have h := ((IrreducibleSpace.isIrreducible_univ W.toScheme).image _
-      e.continuous.continuousOn).closure
+    have h :=
+      ((IrreducibleSpace.isIrreducible_univ W.toScheme).image _ e.continuous.continuousOn).closure
     rw [Set.image_univ, hd.closure_eq] at h
     have : IrreducibleSpace Y := (irreducibleSpace_def _).2 h
     exact isIntegral_of_irreducibleSpace_of_isReduced Y
@@ -85,8 +100,14 @@ theorem exists_normal_model : ∀ (K Ω : Type) [Field K] [NumberField K] [Field
     exact one_ne_zero h1
   have hproj : IsProjOver (ν ≫ p) := isProjOver_comp_of_isFinite ν hX.isProjOver
   have hflat : Flat ((ν ≫ p) ≫ spMap (Int.castRingHom (𝓞 K))) := by rwa [Category.assoc]
-  have har : IsArithVar (ν ≫ p) D := ⟨hX.isDomain, hX.finite, ‹_›, hproj, hflat,
-    DimCover.topologicalKrullDim_eq (𝓞 K) X Y p (ν ≫ p) D hX hproj hflat ν rfl hgen hdeg⟩
+  have har : IsArithVar (ν ≫ p) D := ⟨
+    hX.isDomain,
+    hX.finite,
+    ‹_›,
+    hproj,
+    hflat,
+    DimCover.topologicalKrullDim_eq (𝓞 K) X Y p (ν ≫ p) D hX hproj hflat ν rfl hgen hdeg
+  ⟩
 
   have hη : ν (genericPoint Y) ⤳ genericPoint X := specializes_of_eq hgen
   have hWη : W.ι (genericPoint W.toScheme) ⤳ genericPoint X :=
@@ -96,10 +117,22 @@ theorem exists_normal_model : ∀ (K Ω : Type) [Field K] [NumberField K] [Field
     refine ⟨(SmallSec.fnMap ν hη).injective, fun u => ?_⟩
     obtain ⟨t, ht⟩ := SmallSec.fnMap_surjective W.ι hWη (SmallSec.fnMap e heη u)
     refine ⟨t, (SmallSec.fnMap e heη).injective ?_⟩
-    rw [← ht, ← ProjSpace.fnMap_comp e ν heη hη (ProjSpace.comp_genericPoint_specializes _ _ heη hη)]
+    rw [← ht,
+      ← ProjSpace.fnMap_comp e ν heη hη (ProjSpace.comp_genericPoint_specializes _ _ heη hη)]
     exact ProjSpace.fnMap_congr hfac _ _ t
-  refine ⟨Y, ‹_›, ν ≫ p, ν ≫ g, (SmallSec.fnMap ν hη).comp ψ, by rw [Category.assoc, hgp], har, hnY,
-    hbij.comp hψ, fun a => ?_, fun k l i h => ?_⟩
+  refine ⟨
+    Y,
+    ‹_›,
+    ν ≫ p,
+    ν ≫ g,
+    (SmallSec.fnMap ν hη).comp ψ,
+    by rw [Category.assoc, hgp],
+    har,
+    hnY,
+    hbij.comp hψ,
+    fun a => ?_,
+    fun k l i h => ?_
+  ⟩
   · have e₁ : ν.app ⊤ (algX p ⊤ a) = algX (ν ≫ p) ⊤ a := by
       simp only [algX, RingHom.comp_apply]
       rw [← Scheme.Hom.appLE_comp_appLE ν p ⊤ ⊤ ⊤ (by simp) (by simp)]
@@ -107,13 +140,16 @@ theorem exists_normal_model : ∀ (K Ω : Type) [Field K] [NumberField K] [Field
       rfl
     rw [RingHom.comp_apply, hK, SmallSec.fnMap_fnOf ν hη _ (Opens.mem_top _), e₁]
     rfl
-  · have hX' : genericPoint X ∈ ((ProjSpace.O1 (𝓞 K) m).pull g).U i := (pull_U _ g i).ge (by
-      have h' : ν (genericPoint Y) ∈ g ⁻¹ᵁ (ProjSpace.O1 (𝓞 K) m).U (i PUnit.unit) :=
-        (pull_U _ (ν ≫ g) i).le h
-      rw [hgen] at h'
-      exact h')
-    have key (a : Fin (m + 1)) : fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m a) (ν ≫ g)).f i) =
-        SmallSec.fnMap ν hη (fnOf _ hX' ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m a) g).f i)) := by
+  · have hX' : genericPoint X ∈ ((ProjSpace.O1 (𝓞 K) m).pull g).U i :=
+      (pull_U _ g i).ge (by
+        have h' : ν (genericPoint Y) ∈ g ⁻¹ᵁ (ProjSpace.O1 (𝓞 K) m).U (i PUnit.unit) :=
+          (pull_U _ (ν ≫ g) i).le h
+        rw [hgen] at h'
+        exact h')
+    have key (a : Fin (m + 1))
+        : fnOf _ h ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m a) (ν ≫ g)).f i)
+          = SmallSec.fnMap ν hη
+            (fnOf _ hX' ((GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m a) g).f i)) := by
       have h₁ : genericPoint Y ∈ (ν ≫ g) ⁻¹ᵁ (ProjSpace.O1 (𝓞 K) m).U (i PUnit.unit) :=
         (pull_U _ (ν ≫ g) i).le h
       have h₂ : genericPoint X ∈ g ⁻¹ᵁ (ProjSpace.O1 (𝓞 K) m).U (i PUnit.unit) :=

@@ -15,9 +15,11 @@ open Formalism.IndefR.DatumF GlobalTheory.FinLatF GlobalTheory.FinWeil
 
 namespace PositivityTheory.ThKW.LatB
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem exists_trace_one (hu : Algebra.Unramified (𝓞 F) (𝓞 E)) : ∃ b : 𝓞 E, Algebra.trace F E (b : E) = 1 := by
+theorem exists_trace_one (hu : Algebra.Unramified (𝓞 F) (𝓞 E))
+    : ∃ b : 𝓞 E, Algebra.trace F E (b : E) = 1 := by
   classical
   haveI : Module.Finite (𝓞 F) (𝓞 E) := Module.Finite.of_restrictScalars_finite ℤ _ _
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
@@ -48,7 +50,9 @@ theorem exists_trace_one (hu : Algebra.Unramified (𝓞 F) (𝓞 E)) : ∃ b : �
       have hb : Algebra.intTrace (𝓞 F) (𝓞 E) b ∈ p := hJp ⟨b, rfl⟩
       have hp0' : (p : FractionalIdeal (𝓞 F)⁰ F) ≠ 0 := by
         rwa [ne_eq, FractionalIdeal.coeIdeal_eq_zero]
-      have h2 : t * algebraMap (𝓞 F) F (Algebra.intTrace (𝓞 F) (𝓞 E) b) ∈ (1 : FractionalIdeal (𝓞 F)⁰ F) := by
+      have h2
+          : t * algebraMap (𝓞 F) F (Algebra.intTrace (𝓞 F) (𝓞 E) b)
+            ∈ (1 : FractionalIdeal (𝓞 F)⁰ F) := by
         have := FractionalIdeal.mul_mem_mul ht ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, hb, rfl⟩)
         rwa [inv_mul_cancel₀ hp0'] at this
       obtain ⟨c, hc⟩ := (FractionalIdeal.mem_one_iff _).1 h2
@@ -62,7 +66,8 @@ theorem exists_trace_one (hu : Algebra.Unramified (𝓞 F) (𝓞 E)) : ∃ b : �
       exact RingOfIntegers.isIntegral_coe c
     exact ht1 ((FractionalIdeal.mem_one_iff _).2 ⟨⟨t, hint⟩, rfl⟩)
 
-theorem exists_w (h : IsCMExt F E σ) (hu : Algebra.Unramified (𝓞 F) (𝓞 E)) : ∃ w : 𝓞 E, w + sgOF σ w = 1 := by
+theorem exists_w (h : IsCMExt F E σ) (hu : Algebra.Unramified (𝓞 F) (𝓞 E))
+    : ∃ w : 𝓞 E, w + sgOF σ w = 1 := by
   obtain ⟨b, hb⟩ := exists_trace_one hu
   refine ⟨b, RingOfIntegers.ext ?_⟩
   show (b : E) + σ b = 1
@@ -94,15 +99,21 @@ theorem sg_ne (h : IsCMExt F E σ) : ∃ x : E, σ x ≠ x := by
   rw [hn y] at this
   simpa using this.symm
 
-theorem inertQ_of_fix (h : IsCMExt F E σ) [IsGalois ℚ E] {P : Ideal (𝓞 E)} (hP : P.IsMaximal) {q : ℕ}
-    (hq : q.Prime) (hqP : (q : 𝓞 E) ∈ P) (hfix : ∀ r ∈ P, sgOF σ r ∈ P) : InertQF σ q := by
+theorem inertQ_of_fix
+    (h : IsCMExt F E σ)
+    [IsGalois ℚ E]
+    {P : Ideal (𝓞 E)} (hP : P.IsMaximal)
+    {q : ℕ} (hq : q.Prime) (hqP : (q : 𝓞 E) ∈ P)
+    (hfix : ∀ r ∈ P, sgOF σ r ∈ P)
+    : InertQF σ q := by
   intro Q hQ hqQ r hr
   have hmax : (Ideal.span {(q : ℤ)}).IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.1 hq).irreducible
   have key : ∀ P : Ideal (𝓞 E), P.IsPrime → (q : 𝓞 E) ∈ P → P.LiesOver (Ideal.span {(q : ℤ)}) :=
-    fun P hP h => ⟨hmax.eq_of_le (Ideal.IsPrime.ne_top inferInstance) (by
-      rw [Ideal.span_singleton_le_iff_mem, Ideal.under, Ideal.mem_comap]
-      simpa using h)⟩
+    fun P hP h =>
+      ⟨hmax.eq_of_le (Ideal.IsPrime.ne_top inferInstance) (by
+        rw [Ideal.span_singleton_le_iff_mem, Ideal.under, Ideal.mem_comap]
+        simpa using h)⟩
   haveI := key P hP.isPrime hqP
   haveI := key Q hQ.isPrime hqQ
   obtain ⟨g, rfl⟩ := Ideal.exists_smul_eq_of_isGaloisGroup (Ideal.span {(q : ℤ)}) P Q (E ≃ₐ[ℚ] E)
@@ -111,8 +122,9 @@ theorem inertQ_of_fix (h : IsCMExt F E σ) [IsGalois ℚ E] {P : Ideal (𝓞 E)}
   rw [e]
   exact hfix _ hr
 
-theorem exists_move (h : IsCMExt F E σ) (hu : Algebra.Unramified (𝓞 F) (𝓞 E)) {P : Ideal (𝓞 E)}
-    (hP : P.IsMaximal) : ∃ r, sgOF σ r - r ∉ P := by
+theorem exists_move
+    (h : IsCMExt F E σ) (hu : Algebra.Unramified (𝓞 F) (𝓞 E)) {P : Ideal (𝓞 E)} (hP : P.IsMaximal)
+    : ∃ r, sgOF σ r - r ∉ P := by
   have : Algebra.IsQuadraticExtension F E := { finrank_eq_two' := h.2.2.1 }
   have : IsGalois F E := inferInstance
   have hσ := sg_sg h
@@ -120,7 +132,8 @@ theorem exists_move (h : IsCMExt F E σ) (hu : Algebra.Unramified (𝓞 F) (𝓞
   have : (P.under (𝓞 F)).IsMaximal := Ideal.isMaximal_under_of_isIntegral_of_isMaximal P
   have hcard := Ideal.card_inertia_eq_ramificationIdxIn (G := E ≃ₐ[F] E) (P.under (𝓞 F)) P
   rw [Ideal.ramificationIdxIn_eq_ramificationIdx (P.under (𝓞 F)) P (E ≃ₐ[F] E),
-    Ideal.ramificationIdx_eq_one_of_isUnramifiedAt] at hcard
+      Ideal.ramificationIdx_eq_one_of_isUnramifiedAt]
+    at hcard
   let s : E ≃ₐ[F] E := AlgEquiv.ofAlgHom σ σ (AlgHom.ext hσ) (AlgHom.ext hσ)
   have hs1 : s ≠ 1 := fun hs => by
     obtain ⟨x, hx⟩ := sg_ne h
@@ -131,12 +144,14 @@ theorem exists_move (h : IsCMExt F E σ) (hu : Algebra.Unramified (𝓞 F) (𝓞
   rw [Subgroup.eq_bot_of_card_eq _ hcard, Subgroup.mem_bot] at hs
   exact hs1 hs
 
-theorem exists_goodNorm (h : IsCMExt F E σ) [IsGalois ℚ E] (hu : Algebra.Unramified (𝓞 F) (𝓞 E)) :
-    ∃ lam : ℕ →* ℂ, GoodNorm (sgOF σ) lam ∧
-      ∀ n : ℕ, n ≠ 0 → (∀ q : ℕ, q.Prime → InertQF σ q → ¬ q ∣ n) → lam n = (Real.sqrt n : ℂ) := by
+theorem exists_goodNorm (h : IsCMExt F E σ) [IsGalois ℚ E] (hu : Algebra.Unramified (𝓞 F) (𝓞 E))
+    : ∃ lam : ℕ →* ℂ,
+      GoodNorm (sgOF σ) lam
+        ∧ ∀ n : ℕ,
+          n ≠ 0 → (∀ q : ℕ, q.Prime → InertQF σ q → ¬ q ∣ n) → lam n = (Real.sqrt n : ℂ) := by
   classical
-  obtain ⟨lam, h0, h1, h2⟩ := GlobalTheory.FinWeil.exists_lam (InertQF σ)
-    fun q => (Ideal.span {(q : ℤ)}).inertiaDegIn (𝓞 E)
+  obtain ⟨lam, h0, h1, h2⟩ :=
+    GlobalTheory.FinWeil.exists_lam (InertQF σ) fun q => (Ideal.span {(q : ℤ)}).inertiaDegIn (𝓞 E)
   refine ⟨lam, ⟨h0, fun P hP _ => ?_⟩, h2⟩
   obtain ⟨q, hq, hqP, hf, hc⟩ := GlobalTheory.FinWeil.exists_card_eq_pow P hP
   have hsq : ∀ n : ℕ, ((Real.sqrt n : ℝ) : ℂ) ^ 2 = n := fun n => by
@@ -145,8 +160,9 @@ theorem exists_goodNorm (h : IsCMExt F E σ) [IsGalois ℚ E] (hu : Algebra.Unra
   · rw [hc]
     by_cases hI : InertQF σ q
     · rw [h1 q hq hf hI, neg_sq, hsq]
-    · rw [h2 _ (pow_ne_zero _ hq.ne_zero) fun p hp hIp hd => hI
-        ((Nat.prime_dvd_prime_iff_eq hp hq).1 (hp.dvd_of_dvd_pow hd) ▸ hIp), hsq]
+    · rw [h2 _ (pow_ne_zero _ hq.ne_zero) fun p hp hIp hd =>
+          hI ((Nat.prime_dvd_prime_iff_eq hp hq).1 (hp.dvd_of_dvd_pow hd) ▸ hIp),
+        hsq]
   · rw [hc]
     exact h1 q hq hf (inertQ_of_fix h hP hq hqP hfix)
 

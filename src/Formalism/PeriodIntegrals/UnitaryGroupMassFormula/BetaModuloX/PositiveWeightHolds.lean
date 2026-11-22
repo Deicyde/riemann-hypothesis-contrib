@@ -8,7 +8,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BetaUniqueness.W
 
 noncomputable section
 
-open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat
 
 namespace PI.UnitaryGroupMassFormula.BetaModX
 
@@ -30,8 +31,7 @@ theorem positive_weight_holds : PosW := by
     rw [← (hS D).herm.eq x y, starRingEnd_apply]
   have horth := (mem_orth (hS D)).1 hw
   have hez : ∀ a, (hS D).hT (F'.fl.e a) F'.fl.z = 0 := F'.fl.z_orth
-  have hze : ∀ a, (hS D).hT F'.fl.z (F'.fl.e a) = 0 := by
-    intro a; rw [hsymm, hez, star_zero]
+  have hze : ∀ a, (hS D).hT F'.fl.z (F'.fl.e a) = 0 := by intro a; rw [hsymm, hez, star_zero]
   have hXz : ∀ x ∈ Xsp F', (hS D).hT x F'.fl.z = 0 := by
     intro x hx
     induction hx using Submodule.span_induction with
@@ -41,8 +41,7 @@ theorem positive_weight_holds : PosW := by
     | zero => simp
     | add y y' _ _ h1 h2 => simp [h1, h2]
     | smul c y _ h1 => simp [h1]
-  have hzX : ∀ x ∈ Xsp F', (hS D).hT F'.fl.z x = 0 := by
-    intro x hx; rw [hsymm, hXz x hx, star_zero]
+  have hzX : ∀ x ∈ Xsp F', (hS D).hT F'.fl.z x = 0 := by intro x hx; rw [hsymm, hXz x hx, star_zero]
   have hzz : (hS D).hT F'.fl.z F'.fl.z = -((T' : ℕ) : D.host.E) := F'.fl.z_norm
   have he_mem : ∀ a, F'.fl.e a ∈ Xplus F' := fun a =>
     Submodule.mem_sup_left (Submodule.subset_span ⟨a, rfl⟩)
@@ -56,12 +55,14 @@ theorem positive_weight_holds : PosW := by
     have := hXz _ h
     rw [hzz] at this
     exact hTE (neg_eq_zero.1 this)
-  have hwX' : w ∉ Submodule.span D.host.E
-      (Set.range (Fin.snoc F'.fl.e F'.fl.z : Fin (D.R.rS + 1) → (hS D).V)) := by
+  have hwX'
+      : w ∉ Submodule.span D.host.E
+        (Set.range (Fin.snoc F'.fl.e F'.fl.z : Fin (D.R.rS + 1) → (hS D).V)) := by
     intro h
-    have hle : Submodule.span D.host.E
-        (Set.range (Fin.snoc F'.fl.e F'.fl.z : Fin (D.R.rS + 1) → (hS D).V)) ≤
-        Xsp F' ⊔ Submodule.span D.host.E {F'.fl.z} := by
+    have hle
+        : Submodule.span D.host.E
+            (Set.range (Fin.snoc F'.fl.e F'.fl.z : Fin (D.R.rS + 1) → (hS D).V))
+          ≤ Xsp F' ⊔ Submodule.span D.host.E {F'.fl.z} := by
       rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       induction i using Fin.lastCases with
@@ -91,21 +92,26 @@ theorem positive_weight_holds : PosW := by
     rw [D.sp.baseSpace_signature_eq τ] at h
     exact h
   obtain ⟨hcard, Q, hQ⟩ := wa_sig_data _ _ _ hsig
-  have hdim := wa_neg_dim (((hS D).gram).map τ) Q hQ hcard (fun k => wa_cv (hS D) τ (u k))
-    (fun x hx => wa_indep u hu x hx) (by
-      intro x
-      rw [wa_comb hτ x u]
-      simp only [Fin.sum_univ_castSucc, u, Fin.snoc_castSucc, Fin.snoc_last, F'.fl.e_iso, hez, hze, hew,
-        hwe, hzw, hwz, hzz, map_zero, mul_zero, Finset.sum_const_zero, add_zero, zero_add]
-      have h1 : ∀ c : ℂ, starRingEnd ℂ c * c = (Complex.normSq c : ℂ) := by
-        intro c; rw [mul_comm]; exact Complex.mul_conj c
-      rw [h1, h1, map_neg, map_natCast]
-      simp only [Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, Complex.neg_re,
-        Complex.neg_im, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero, mul_zero]
-      have := Complex.normSq_nonneg (x (Fin.castSucc (Fin.last D.R.rS)))
-      have := Complex.normSq_nonneg (x (Fin.last (D.R.rS + 1)))
-      have : (0 : ℝ) ≤ (T' : ℝ) := Nat.cast_nonneg _
-      nlinarith)
+  have hdim :=
+    wa_neg_dim (((hS D).gram).map τ) Q hQ hcard
+      (fun k => wa_cv (hS D) τ (u k))
+      (fun x hx => wa_indep u hu x hx)
+      (by
+        intro x
+        rw [wa_comb hτ x u]
+        simp only [Fin.sum_univ_castSucc, u, Fin.snoc_castSucc, Fin.snoc_last, F'.fl.e_iso, hez,
+          hze, hew, hwe, hzw, hwz, hzz, map_zero, mul_zero, Finset.sum_const_zero, add_zero,
+          zero_add]
+        have h1 : ∀ c : ℂ, starRingEnd ℂ c * c = (Complex.normSq c : ℂ) := by
+          intro c; rw [mul_comm]; exact Complex.mul_conj c
+        rw [h1, h1, map_neg, map_natCast]
+        simp only [Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
+          Complex.neg_re, Complex.neg_im, Complex.natCast_re, Complex.natCast_im, zero_mul,
+          sub_zero, mul_zero]
+        have := Complex.normSq_nonneg (x (Fin.castSucc (Fin.last D.R.rS)))
+        have := Complex.normSq_nonneg (x (Fin.last (D.R.rS + 1)))
+        have : (0 : ℝ) ≤ (T' : ℝ) := Nat.cast_nonneg _
+        nlinarith)
   omega
 
 end D7

@@ -8,31 +8,39 @@ public import ReciprocityTheory.DualLattices.CotangentSurjective
 
 set_option autoImplicit false
 noncomputable section
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Pdiv
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 section Lie
 
-variable {O : Type} [CommRing O] (G : Over (Spec (CommRingCat.of O))) [GrpObj G] [IsCommMonObj G]
-  {OE : Type} [CommRing OE] (io : Out.RingAct G OE)
+variable
+  {O : Type} [CommRing O]
+  (G : Over (Spec (CommRingCat.of O))) [GrpObj G] [IsCommMonObj G]
+  {OE : Type} [CommRing OE]
+  (io : Out.RingAct G OE)
 
-def lieAct (a : OE) (x : LieG G) : LieG G :=
-  ⟨x.1 ≫ io.act a, by
+def lieAct (a : OE) (x : LieG G) : LieG G := ⟨
+  x.1 ≫ io.act a,
+  by
     rw [← Category.assoc, x.2, Category.assoc]
     haveI := io.hom a
-    rw [IsMonHom.one_hom]⟩
+    rw [IsMonHom.one_hom]
+⟩
 
-theorem fst_scale (c : O) :
-    ptMap (TrivSqZeroExt.fstHom O O O) ≫ ptMap (dualScale c) = ptMap (TrivSqZeroExt.fstHom O O O) := by
-
-  have h : ((TrivSqZeroExt.fstHom O O O).toRingHom).comp (dualScale c).toRingHom =
-      (TrivSqZeroExt.fstHom O O O).toRingHom := by
+theorem fst_scale (c : O)
+    : ptMap (TrivSqZeroExt.fstHom O O O) ≫ ptMap (dualScale c)
+      = ptMap (TrivSqZeroExt.fstHom O O O) := by
+  have h
+      : ((TrivSqZeroExt.fstHom O O O).toRingHom).comp (dualScale c).toRingHom
+        = (TrivSqZeroExt.fstHom O O O).toRingHom := by
     refine RingHom.ext fun x => ?_
     simp [dualScale]
   apply Over.OverMorphism.ext
@@ -84,16 +92,27 @@ end Place
 
 section Signature
 
-variable (p : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  (p : ℕ) [Fact p.Prime]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   (G : Over (Spec (CommRingCat.of O))) [GrpObj G] [IsCommMonObj G]
-  {OE : Type} [CommRing OE] [StarRing OE] (io : Out.RingAct G OE)
+  {OE : Type} [CommRing OE] [StarRing OE]
+  (io : Out.RingAct G OE)
 
-def HasVd {C : Type} [Field C] (v : Valuation C NNReal) [Algebra O C] (w : Place p OE)
-    (t : Fin w.n ≃ Emb (O := O) w.e) (vd : ℝ) : Prop :=
+def HasVd
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    [Algebra O C]
+    (w : Place p OE) (t : Fin w.n ≃ Emb (O := O) w.e)
+    (vd : ℝ)
+    : Prop :=
   ∃ b : Module.Basis (Fin w.n) ℤ_[p] w.Ow,
-    (v (algebraMap O C (Matrix.det (Matrix.of fun i j =>
-        tauExt ((t j : Emb (O := O) w.e) : OE →+* O) (b i : ℤ_[p] ⊗[ℤ] OE)) ^ 2)) : ℝ) =
-      (v (algebraMap O C (p : O)) : ℝ) ^ ((w.n : ℝ) * vd)
+    (v (algebraMap O C
+          (Matrix.det (Matrix.of fun i j =>
+              tauExt ((t j : Emb (O := O) w.e) : OE →+* O) (b i : ℤ_[p] ⊗[ℤ] OE))
+            ^ 2))
+        : ℝ)
+      = (v (algebraMap O C (p : O)) : ℝ) ^ ((w.n : ℝ) * vd)
 
 end Signature
 

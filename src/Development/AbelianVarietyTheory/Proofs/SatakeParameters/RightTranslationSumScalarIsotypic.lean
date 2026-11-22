@@ -11,25 +11,35 @@ noncomputable section
 
 namespace GlobalTheory.SumTransIso
 
-variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+variable
+  {L : Type} [Field L] [NumberField L] [IsCMField L]
+  {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem sumRt_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (Formalism.AUTREP.GAf L n → W)}
+theorem sumRt_iso
+    {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (Formalism.AUTREP.GAf L n → W)}
     (hS : Formalism.L2.NG.IsSubrep ρ S) (hiso : Formalism.L2.NG.IsoRep S S')
-    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) {ι : Type} (R : Finset ι) (r : ι → Formalism.AUTREP.GAf L n) (c : ℂ)
-    (hc : ∀ f ∈ S, (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f) →
-      ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f)
-    (f' : Formalism.AUTREP.GAf L n → W) (hf' : f' ∈ S')
-    (hfix : ∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f' = f') :
-    ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f' = c • f' := by
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L)))
+    {ι : Type} (R : Finset ι) (r : ι → Formalism.AUTREP.GAf L n)
+    (c : ℂ)
+    (hc : ∀ f ∈ S,
+      (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f)
+        → ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f)
+    (f' : Formalism.AUTREP.GAf L n → W)
+    (hf' : f' ∈ S') (hfix : ∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f' = f')
+    : ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f' = c • f' := by
   obtain ⟨T, hT⟩ := hiso
   set f : S := T.symm ⟨f', hf'⟩ with hfdef
   have hTf : T f = ⟨f', hf'⟩ := T.apply_symm_apply _
-  have hrt : ∀ h : Formalism.AUTREP.GAf L n,
-      ((T ⟨Formalism.L2.NG.rt L n h f, hS.stable h _ f.2⟩ : S') : Formalism.AUTREP.GAf L n → W) = Formalism.L2.NG.rt L n h f' := by
+  have hrt
+      : ∀ h : Formalism.AUTREP.GAf L n,
+        ((T ⟨Formalism.L2.NG.rt L n h f, hS.stable h _ f.2⟩ : S') : Formalism.AUTREP.GAf L n → W)
+          = Formalism.L2.NG.rt L n h f' := by
     intro h
     have := hT h f ⟨_, hS.stable h _ f.2⟩ rfl
     rw [this, hTf]
-  have hffix : ∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ (f : Formalism.AUTREP.GAf L n → W) = f := by
+  have hffix
+      : ∀ κ ∈ Umax L n,
+        TrivOutside {v} κ → Formalism.L2.NG.rt L n κ (f : Formalism.AUTREP.GAf L n → W) = f := by
     intro κ hκ ht
     have h1 := hrt κ
     rw [hfix κ hκ ht] at h1
@@ -39,7 +49,8 @@ theorem sumRt_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (Fo
   let σ : S := ∑ γ ∈ R, (⟨Formalism.L2.NG.rt L n (r γ) f, hS.stable _ _ f.2⟩ : S)
   have hσ : (σ : Formalism.AUTREP.GAf L n → W) = ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f := by
     simp only [σ, Submodule.coe_sum]
-  have hTσ : ((T σ : S') : Formalism.AUTREP.GAf L n → W) = ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f' := by
+  have hTσ
+      : ((T σ : S') : Formalism.AUTREP.GAf L n → W) = ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f' := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [σ, map_sum, Submodule.coe_sum]
     exact Finset.sum_congr rfl fun γ _ => hrt _
@@ -48,24 +59,32 @@ theorem sumRt_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (Fo
   simp only [map_smul, Submodule.coe_smul, hTσ, hTf] at h3
   exact h3
 
-theorem iSup_finset_stable (t : Finset (Submodule ℂ (Formalism.AUTREP.GAf L n → W)))
-    (ht : ∀ i ∈ t, ∀ h, ∀ f ∈ i, Formalism.L2.NG.rt L n h f ∈ i) (h : Formalism.AUTREP.GAf L n) :
-    ∀ f ∈ (⨆ i ∈ t, i), Formalism.L2.NG.rt L n h f ∈ (⨆ i ∈ t, i) := by
+theorem iSup_finset_stable
+    (t : Finset (Submodule ℂ (Formalism.AUTREP.GAf L n → W)))
+    (ht : ∀ i ∈ t, ∀ h, ∀ f ∈ i, Formalism.L2.NG.rt L n h f ∈ i)
+    (h : Formalism.AUTREP.GAf L n)
+    : ∀ f ∈ (⨆ i ∈ t, i), Formalism.L2.NG.rt L n h f ∈ (⨆ i ∈ t, i) := by
   have hle : (⨆ i ∈ t, i) ≤ (⨆ i ∈ t, i).comap (Formalism.L2.NG.rt L n h) := by
     refine iSup₂_le fun i hi => ?_
     intro f hf
     exact (le_iSup₂ (f := fun i (_ : i ∈ t) => i) i hi) (ht i hi h f hf)
   exact fun f hf => hle hf
 
-theorem sumRt_finset_sum {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (Formalism.AUTREP.GAf L n → W)}
+theorem sumRt_finset_sum
+    {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (Formalism.AUTREP.GAf L n → W)}
     (hS : Formalism.L2.NG.IsIrrRep ρ S)
-    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) {ι : Type} (R : Finset ι) (r : ι → Formalism.AUTREP.GAf L n) (c : ℂ)
-    (hc : ∀ f ∈ S, (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f) →
-      ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f)
-    (t : Finset (Submodule ℂ (Formalism.AUTREP.GAf L n → W))) :
-    ((↑t : Set (Submodule ℂ (Formalism.AUTREP.GAf L n → W))) ⊆ {S' | Formalism.L2.NG.IsIrrRep ρ S' ∧ Formalism.L2.NG.IsoRep S S'}) → ∀ f ∈ (⨆ i ∈ t, i),
-      (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f) →
-      ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f := by
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L)))
+    {ι : Type} (R : Finset ι) (r : ι → Formalism.AUTREP.GAf L n)
+    (c : ℂ)
+    (hc : ∀ f ∈ S,
+      (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f)
+        → ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f)
+    (t : Finset (Submodule ℂ (Formalism.AUTREP.GAf L n → W)))
+    : ((↑t : Set (Submodule ℂ (Formalism.AUTREP.GAf L n → W)))
+        ⊆ {S' | Formalism.L2.NG.IsIrrRep ρ S' ∧ Formalism.L2.NG.IsoRep S S'})
+      → ∀ f ∈ (⨆ i ∈ t, i),
+        (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f)
+          → ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f := by
   classical
   induction t using Finset.induction_on with
   | empty =>
@@ -75,7 +94,8 @@ theorem sumRt_finset_sum {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ
     simp
   | insert a t ha ih =>
     intro hsub f hf hfix
-    have haF : Formalism.L2.NG.IsIrrRep ρ a ∧ Formalism.L2.NG.IsoRep S a := hsub (Finset.mem_insert_self a t)
+    have haF : Formalism.L2.NG.IsIrrRep ρ a ∧ Formalism.L2.NG.IsoRep S a :=
+      hsub (Finset.mem_insert_self a t)
     have htF : (↑t : Set _) ⊆ {S' | Formalism.L2.NG.IsIrrRep ρ S' ∧ Formalism.L2.NG.IsoRep S S'} :=
       fun x hx => hsub (Finset.mem_insert_of_mem hx)
     rw [Finset.iSup_insert] at hf
@@ -109,13 +129,18 @@ theorem sumRt_finset_sum {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ
     · have hle : a ≤ ⨆ i ∈ t, i := inf_eq_left.1 htop
       exact ih htF f ((sup_le hle le_rfl) hf) hfix
 
-theorem sumRt_isoTyp : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (a : Formalism.L2.NG.AlgWt L n)
-    (S : Submodule ℂ (Formalism.AUTREP.GAf L n → a.W)), Formalism.L2.NG.IsIrrRep a.ρ S →
-    ∀ (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (ι : Type) (R : Finset ι) (r : ι → Formalism.AUTREP.GAf L n) (c : ℂ),
-    (∀ f ∈ S, (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f) →
-      ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f) →
-    ∀ f ∈ Formalism.L2.NG.isoTyp a.ρ S, (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f) →
-      ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f := by
+theorem sumRt_isoTyp
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (a : Formalism.L2.NG.AlgWt L n)
+        (S : Submodule ℂ (Formalism.AUTREP.GAf L n → a.W)),
+      Formalism.L2.NG.IsIrrRep a.ρ S
+        → ∀ (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (ι : Type) (R : Finset ι)
+            (r : ι → Formalism.AUTREP.GAf L n) (c : ℂ),
+          (∀ f ∈ S,
+              (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f)
+                → ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f)
+            → ∀ f ∈ Formalism.L2.NG.isoTyp a.ρ S,
+              (∀ κ ∈ Umax L n, TrivOutside {v} κ → Formalism.L2.NG.rt L n κ f = f)
+                → ∑ γ ∈ R, Formalism.L2.NG.rt L n (r γ) f = c • f := by
   intro L _ _ _ n a S hS v ι R r c hc f hf hfix
   obtain ⟨t, ht, hft⟩ := Submodule.mem_sSup_iff_exists_finset.1 hf
   exact sumRt_finset_sum hS v R r c hc t ht f hft hfix

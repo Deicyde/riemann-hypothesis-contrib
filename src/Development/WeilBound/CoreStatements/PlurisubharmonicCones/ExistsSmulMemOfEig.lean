@@ -8,17 +8,25 @@ noncomputable section
 
 namespace LevelTowerAlt
 
-open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights TensorProduct
+open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+  GroundTheory.Heights₂.Heights TensorProduct
 
-theorem abel_abstract :
-    ∀ C₀ : ℝ, 0 ≤ C₀ → ∃ C : ℝ, 0 ≤ C ∧ ∀ (L Ψ : Type) [Field L] [NumberField L] [Fintype Ψ] (B : HermitianBundle.{0} L)
-      (F F' : Ψ → Submodule (𝓞 L) B.carrier) (m N : ℕ) (La : ℝ), 1 ≤ Fintype.card Ψ * m → 1 ≤ La →
-      ((Fintype.card Ψ * N : ℕ) : ℝ) ≤ Real.exp La → Module.finrank (𝓞 L) B.carrier ≤ Fintype.card Ψ * N →
-      (∀ τ, B.rank (F τ) ≤ m) →
-      B.slopeMax ≤ ((C₀ * Real.log (2 + Module.finrank (𝓞 L) B.carrier + max (-B.normDegree ⊤) 0) : ℝ) : EReal) →
-      ∑ τ, B.normDegree (F τ) + ∑ τ, B.normDegree (F' τ) ≤ B.normDegree ⊤ →
-      (∀ τ, |B.normDegree (F τ) - B.normDegree (F' τ)| ≤ C₀ * N * La) →
-      ∑ τ, B.normDegree (F τ) ≤ C * (Fintype.card Ψ * m) * La := by
+theorem abel_abstract
+    : ∀ C₀ : ℝ,
+      0 ≤ C₀
+        → ∃ C : ℝ,
+          0 ≤ C
+            ∧ ∀ (L Ψ : Type) [Field L] [NumberField L] [Fintype Ψ] (B : HermitianBundle.{0} L)
+                (F F' : Ψ → Submodule (𝓞 L) B.carrier) (m N : ℕ) (La : ℝ),
+              1 ≤ Fintype.card Ψ * m → 1 ≤ La → ((Fintype.card Ψ * N : ℕ) : ℝ) ≤ Real.exp La
+                → Module.finrank (𝓞 L) B.carrier ≤ Fintype.card Ψ * N → (∀ τ, B.rank (F τ) ≤ m)
+                → B.slopeMax
+                  ≤ ((C₀ * Real.log (2 + Module.finrank (𝓞 L) B.carrier + max (- B.normDegree ⊤) 0)
+                      : ℝ)
+                    : EReal)
+                → ∑ τ, B.normDegree (F τ) + ∑ τ, B.normDegree (F' τ) ≤ B.normDegree ⊤
+                → (∀ τ, |B.normDegree (F τ) - B.normDegree (F' τ)| ≤ C₀ * N * La)
+                → ∑ τ, B.normDegree (F τ) ≤ C * (Fintype.card Ψ * m) * La := by
   intro C₀ hC₀
   obtain ⟨C, hC⟩ := LowerBound.InteriorDichotomy.proof C₀ 0 C₀ hC₀ le_rfl hC₀
   refine ⟨max C 0, le_max_right _ _, ?_⟩
@@ -56,7 +64,8 @@ theorem abel_abstract :
     have h1 : ∀ τ, B.normDegree (F τ) ≤ m * μ := fun τ =>
       (HermitianBundle.normDegree_le_rank_mul B _ μ hslope).trans
         (mul_le_mul_of_nonneg_right (by exact_mod_cast hm τ) hμ0)
-    calc x ≤ ∑ _τ : Ψ, (m : ℝ) * μ := Finset.sum_le_sum fun τ _ => h1 τ
+    calc
+      x ≤ ∑ _τ : Ψ, (m : ℝ) * μ := Finset.sum_le_sum fun τ _ => h1 τ
       _ = f * m * μ := by rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, hf]; ring
 
   have hsum : x + y ≤ -h := by
@@ -71,29 +80,36 @@ theorem abel_abstract :
   have hfC : f * (C₀ * N * La) ≤ C₀ * g * La := by
     have : C₀ * (f * N) * La ≤ C₀ * g * La :=
       mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hfN hC₀) hLa0.le
-    calc f * (C₀ * N * La) = C₀ * (f * N) * La := by ring
+    calc
+      f * (C₀ * N * La)
+        = C₀ * (f * N) * La := by ring
       _ ≤ _ := this
-  have hyp : LowerBound.InteriorDichotomy.Hyp C₀ 0 C₀ h (-x) g (f * m) La :=
-    { one_le_g := hg1
-      one_le_fj := hfj
-      g_le_exp := hgexp
-      one_le_La := hLa
-      lower := by
-        have h1 : f * m * μ ≤ f * m * (C₀ * Real.log (2 + g + max h 0)) :=
-          mul_le_mul_of_nonneg_left hμg (by linarith)
-        have h2 : f * m * (C₀ * Real.log (2 + g + max h 0) + 0 * La) =
-            f * m * (C₀ * Real.log (2 + g + max h 0)) := by ring
-        rw [h2]
-        linarith
-      upper := by linarith }
+  have hyp : LowerBound.InteriorDichotomy.Hyp C₀ 0 C₀ h (-x) g (f * m) La := {
+    one_le_g := hg1
+    one_le_fj := hfj
+    g_le_exp := hgexp
+    one_le_La := hLa
+    lower := by
+      have h1 : f * m * μ ≤ f * m * (C₀ * Real.log (2 + g + max h 0)) :=
+        mul_le_mul_of_nonneg_left hμg (by linarith)
+      have h2
+          : f * m * (C₀ * Real.log (2 + g + max h 0) + 0 * La)
+            = f * m * (C₀ * Real.log (2 + g + max h 0)) := by
+        ring
+      rw [h2]
+      linarith
+    upper := by linarith
+  }
   have hfin := hC h (-x) g (f * m) La hyp
   have h1 : C * (f * m) * La ≤ max C 0 * (f * m) * La :=
     mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_max_left _ _) (by linarith)) hLa0.le
   have h2 : x ≤ C * (f * m) * La := by linarith
   exact h2.trans h1
 
-theorem mem_eigSp_iff {R M O : Type} [CommRing R] [AddCommGroup M] [Module R M] [CommRing O]
-    (ρ : O →+* Module.End R M) (σ : O →+* R) (x : M) : x ∈ eigSp ρ σ ↔ ∀ a, ρ a x = σ a • x := by
+theorem mem_eigSp_iff
+    {R M O : Type} [CommRing R] [AddCommGroup M] [Module R M] [CommRing O]
+    (ρ : O →+* Module.End R M) (σ : O →+* R) (x : M)
+    : x ∈ eigSp ρ σ ↔ ∀ a, ρ a x = σ a • x := by
   simp [eigSp, Submodule.mem_iInf, sub_eq_zero]
 
 def intLift {E L : Type} [Field E] [Field L] (σ : 𝓞 E →+* L) : 𝓞 E →+* 𝓞 L where
@@ -103,13 +119,16 @@ def intLift {E L : Type} [Field E] [Field L] (σ : 𝓞 E →+* L) : 𝓞 E →+
   map_zero' := Subtype.ext (map_zero σ)
   map_add' a b := Subtype.ext (map_add σ a b)
 
-theorem intLift_apply {E L : Type} [Field E] [Field L] (σ : 𝓞 E →+* L) (a : 𝓞 E) :
-    algebraMap (𝓞 L) L (intLift σ a) = σ a := rfl
+theorem intLift_apply {E L : Type} [Field E] [Field L] (σ : 𝓞 E →+* L) (a : 𝓞 E)
+    : algebraMap (𝓞 L) L (intLift σ a) = σ a :=
+  rfl
 
-theorem exists_smul_mem_of_eig {R M O ι : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M] [CommRing O]
-    (ρ : O →+* Module.End R M) (σ : ι → (O →+* R)) (s : ι) (N : Submodule R M) (hN : N ≤ eigSp ρ (σ s))
-    (T : Finset ι) (hT : ∀ t ∈ T, σ t ≠ σ s) :
-    ∀ y ∈ eigSp ρ (σ s), y ∈ N ⊔ ⨆ t ∈ T, eigSp ρ (σ t) → ∃ d : R, d ≠ 0 ∧ d • y ∈ N := by
+theorem exists_smul_mem_of_eig
+    {R M O ι : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M] [CommRing O]
+    (ρ : O →+* Module.End R M) (σ : ι → (O →+* R)) (s : ι) (N : Submodule R M)
+    (hN : N ≤ eigSp ρ (σ s))
+    (T : Finset ι) (hT : ∀ t ∈ T, σ t ≠ σ s)
+    : ∀ y ∈ eigSp ρ (σ s), y ∈ N ⊔ ⨆ t ∈ T, eigSp ρ (σ t) → ∃ d : R, d ≠ 0 ∧ d • y ∈ N := by
   classical
   induction T using Finset.induction_on with
   | empty =>
@@ -135,12 +154,16 @@ theorem exists_smul_mem_of_eig {R M O ι : Type} [CommRing R] [IsDomain R] [AddC
             (Submodule.mem_iSup_of_mem u (Submodule.mem_iSup_of_mem hu hz)))
     have h1 := hle hy'
     rw [Submodule.mem_comap, hφ s y hy] at h1
-    obtain ⟨d, hd, h2⟩ := ih (fun u hu => hT u (Finset.mem_insert_of_mem hu)) _ (Submodule.smul_mem _ _ hy) h1
+    obtain ⟨d, hd, h2⟩ :=
+      ih (fun u hu => hT u (Finset.mem_insert_of_mem hu)) _ (Submodule.smul_mem _ _ hy) h1
     exact ⟨d * (σ s a - σ t a), mul_ne_zero hd (sub_ne_zero.2 ha.symm), by rwa [mul_smul]⟩
 
-theorem orthAt_saturation {L : Type} [Field L] [NumberField L] (B : HermitianBundle.{0} L)
-    {F F' G G' : Submodule (𝓞 L) B.carrier} (h : OrthAt B F F') (hG : ∀ x ∈ G, ∃ a : 𝓞 L, a ≠ 0 ∧ a • x ∈ F)
-    (hG' : ∀ x ∈ G', ∃ a : 𝓞 L, a ≠ 0 ∧ a • x ∈ F') : OrthAt B G G' := by
+theorem orthAt_saturation
+    {L : Type} [Field L] [NumberField L]
+    (B : HermitianBundle.{0} L)
+    {F F' G G' : Submodule (𝓞 L) B.carrier} (h : OrthAt B F F')
+    (hG : ∀ x ∈ G, ∃ a : 𝓞 L, a ≠ 0 ∧ a • x ∈ F) (hG' : ∀ x ∈ G', ∃ a : 𝓞 L, a ≠ 0 ∧ a • x ∈ F')
+    : OrthAt B G G' := by
   intro σ x hx y hy
   obtain ⟨a, ha, hx⟩ := hG x hx
   obtain ⟨b, hb, hy⟩ := hG' y hy
@@ -154,14 +177,17 @@ theorem orthAt_saturation {L : Type} [Field L] [NumberField L] (B : HermitianBun
     exact_mod_cast hb
   exact (mul_eq_zero.1 ((mul_eq_zero.1 h1).resolve_left ((map_ne_zero _).2 ha'))).resolve_left hb'
 
-variable {E L Ψ V : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Fintype Ψ] [AddCommGroup V] [Module L V]
-  [Module (𝓞 L) V] [IsScalarTower (𝓞 L) L V] (A : LinPt E L Ψ V) (ρM : 𝓞 E →+* Module.End (𝓞 L) A.Bq.carrier)
+variable
+  {E L Ψ V : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Fintype Ψ] [AddCommGroup V]
+  [Module L V] [Module (𝓞 L) V] [IsScalarTower (𝓞 L) L V]
+  (A : LinPt E L Ψ V) (ρM : 𝓞 E →+* Module.End (𝓞 L) A.Bq.carrier)
 
-theorem eig_facts (hcard : 2 * Fintype.card Ψ = Module.finrank ℚ E)
-    (hρ : ∀ (a : 𝓞 E) (x : A.Λ), A.f ⟨A.ρ a x, A.stable a x x.2⟩ = ρM a (A.f x)) :
-    (∀ s, A.Bq.rank (eigSp ρM (intLift (A.σ s))) = A.Bq.rank (A.img s)) ∧
-    (∀ s, A.Bq.normDegree (A.img s) ≤ A.Bq.normDegree (eigSp ρM (intLift (A.σ s)))) ∧
-    ∑ s, A.Bq.normDegree (eigSp ρM (intLift (A.σ s))) ≤ A.Bq.normDegree ⊤ := by
+theorem eig_facts
+    (hcard : 2 * Fintype.card Ψ = Module.finrank ℚ E)
+    (hρ : ∀ (a : 𝓞 E) (x : A.Λ), A.f ⟨A.ρ a x, A.stable a x x.2⟩ = ρM a (A.f x))
+    : (∀ s, A.Bq.rank (eigSp ρM (intLift (A.σ s))) = A.Bq.rank (A.img s))
+      ∧ (∀ s, A.Bq.normDegree (A.img s) ≤ A.Bq.normDegree (eigSp ρM (intLift (A.σ s))))
+      ∧ ∑ s, A.Bq.normDegree (eigSp ρM (intLift (A.σ s))) ≤ A.Bq.normDegree ⊤ := by
   classical
   have h1 : ∀ s, A.img s ≤ eigSp ρM (intLift (A.σ s)) := by
     rintro s _ ⟨x, hx, rfl⟩
@@ -178,29 +204,49 @@ theorem eig_facts (hcard : 2 * Fintype.card Ψ = Module.finrank ℚ E)
       rw [A.saturation_iSup_img hcard]
       exact Submodule.mem_top
     obtain ⟨c, hc, h3⟩ := h3
-    have hle : (⨆ t, A.img t) ≤ A.img s ⊔ ⨆ t ∈ Finset.univ.erase s, eigSp ρM (intLift (A.σ t)) := by
+    have hle
+        : (⨆ t, A.img t) ≤ A.img s ⊔ ⨆ t ∈ Finset.univ.erase s, eigSp ρM (intLift (A.σ t)) := by
       refine iSup_le fun t z hz => ?_
       by_cases hts : t = s
       · subst hts
         exact Submodule.mem_sup_left hz
       · exact Submodule.mem_sup_right (Submodule.mem_iSup_of_mem t
           (Submodule.mem_iSup_of_mem (Finset.mem_erase.2 ⟨hts, Finset.mem_univ t⟩) (h1 t hz)))
-    obtain ⟨d, hd, h4⟩ := exists_smul_mem_of_eig ρM (fun t => intLift (A.σ t)) s (A.img s) (h1 s) (Finset.univ.erase s)
-      (fun t ht h => (Finset.mem_erase.1 ht).1 (A.σ_bij.1 (RingHom.ext fun a => by
-        rw [← intLift_apply, ← intLift_apply (A.σ s)]
-        exact congrArg _ (DFunLike.congr_fun h a)))) _ (Submodule.smul_mem _ c hy) (hle h3)
+    obtain ⟨d, hd, h4⟩ :=
+      exists_smul_mem_of_eig ρM
+        (fun t => intLift (A.σ t))
+        s (A.img s) (h1 s) (Finset.univ.erase s)
+        (fun t ht h =>
+          (Finset.mem_erase.1 ht).1
+            (A.σ_bij.1 (RingHom.ext fun a => by
+              rw [← intLift_apply, ← intLift_apply (A.σ s)]
+              exact congrArg _ (DFunLike.congr_fun h a))))
+        _ (Submodule.smul_mem _ c hy) (hle h3)
     exact ⟨d * c, mul_ne_zero hd hc, by rwa [mul_smul]⟩
   have mono : ∀ {X Y : Submodule (𝓞 L) A.Bq.carrier}, X ≤ Y → A.Bq.rank X ≤ A.Bq.rank Y := fun h =>
     Submodule.finrank_mono h
   have h5 : ∀ s, A.Bq.rank (eigSp ρM (intLift (A.σ s))) = A.Bq.rank (A.img s) := fun s =>
-    le_antisymm ((mono (Y := CanonicalFiltration.saturation A.Bq (A.img s)) fun y hy => h2 s y hy).trans
-      (CanonicalFiltration.rank_saturation A.Bq _).le) (mono (h1 s))
-  refine ⟨h5, fun s => div_le_div_of_nonneg_right
-    (CanonicalFiltration.degree_le_of_le_of_rank_eq A.Bq (h1 s) (h5 s).symm) (Nat.cast_nonneg _), ?_⟩
-  have hI := GlobalTheory.T.normalized_degree_orthogonal_sum L A.Bq (Ψ ⊕ Ψ) (fun s => eigSp ρM (intLift (A.σ s))) fun s s' h =>
-    orthAt_saturation A.Bq (F := A.img s) (F' := A.img s') (by
-      rw [A.img_eq, A.img_eq]
-      exact A.orth s s' h) (h2 s) (h2 s')
+    le_antisymm
+      ((mono (Y := CanonicalFiltration.saturation A.Bq (A.img s)) fun y hy => h2 s y hy).trans
+        (CanonicalFiltration.rank_saturation A.Bq _).le)
+      (mono (h1 s))
+  refine ⟨
+    h5,
+    fun s =>
+      div_le_div_of_nonneg_right
+        (CanonicalFiltration.degree_le_of_le_of_rank_eq A.Bq (h1 s) (h5 s).symm)
+        (Nat.cast_nonneg _),
+    ?_
+  ⟩
+  have hI :=
+    GlobalTheory.T.normalized_degree_orthogonal_sum L A.Bq (Ψ ⊕ Ψ)
+      (fun s => eigSp ρM (intLift (A.σ s)))
+      fun s s' h =>
+        orthAt_saturation A.Bq (F := A.img s) (F' := A.img s')
+          (by
+            rw [A.img_eq, A.img_eq]
+            exact A.orth s s' h)
+          (h2 s) (h2 s')
   have hr : A.Bq.rank (⨆ s, eigSp ρM (intLift (A.σ s))) = A.Bq.rank ⊤ := by
     refine le_antisymm (mono le_top) ?_
     have := CanonicalFiltration.rank_saturation A.Bq (⨆ s, A.img s)
@@ -208,6 +254,7 @@ theorem eig_facts (hcard : 2 * Fintype.card Ψ = Module.finrank ℚ E)
     rw [this]
     exact mono (iSup_mono h1)
   rw [← hI.1]
-  exact div_le_div_of_nonneg_right (CanonicalFiltration.degree_le_of_le_of_rank_eq A.Bq le_top hr) (Nat.cast_nonneg _)
+  exact div_le_div_of_nonneg_right (CanonicalFiltration.degree_le_of_le_of_rank_eq A.Bq le_top hr)
+    (Nat.cast_nonneg _)
 
 end LevelTowerAlt

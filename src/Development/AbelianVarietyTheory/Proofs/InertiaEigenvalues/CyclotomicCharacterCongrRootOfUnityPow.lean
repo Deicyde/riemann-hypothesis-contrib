@@ -12,11 +12,21 @@ open Formalism.NG (KO)
 
 namespace GlobalTheory.LocDualInt
 
-theorem exists_root_pow_cyclotomicCharacter_congr {p : ℕ} [Fact p.Prime]
-    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (g : Formalism.GaloisCohomology.GK p K) (k : ℕ) :
-    ∃ ζ : PadicAlgCl p, ζ ^ (p ^ k) = 1 ∧ ∀ a : ℕ, g ζ = ζ ^ a → (a : ZMod (p ^ k)) =
-      PadicInt.toZModPow k ((cyclotomicCharacter (PadicAlgCl p) p
-        (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK p K) (PadicAlgCl p) g) : ℤ_[p]ˣ) : ℤ_[p]) := by
+theorem exists_root_pow_cyclotomicCharacter_congr
+    {p : ℕ} [Fact p.Prime]
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (g : Formalism.GaloisCohomology.GK p K)
+    (k : ℕ)
+    : ∃ ζ : PadicAlgCl p,
+      ζ ^ (p ^ k) = 1
+        ∧ ∀ a : ℕ,
+          g ζ = ζ ^ a
+            → (a : ZMod (p ^ k))
+              = PadicInt.toZModPow k
+                ((cyclotomicCharacter (PadicAlgCl p) p
+                      (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK p K)
+                        (PadicAlgCl p) g)
+                    : ℤ_[p]ˣ)
+                  : ℤ_[p]) := by
   classical
   haveI : ∀ i : ℕ, HasEnoughRootsOfUnity (PadicAlgCl p) (p ^ i) := fun i => by
     haveI : NeZero ((p ^ i : ℕ) : PadicAlgCl p) :=
@@ -26,9 +36,14 @@ theorem exists_root_pow_cyclotomicCharacter_congr {p : ℕ} [Fact p.Prime]
   refine ⟨ζ, hζ.pow_eq_one, fun a ha => ?_⟩
   set c : ZMod (p ^ k) := PadicInt.toZModPow k ((cyclotomicCharacter (PadicAlgCl p) p
     (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK p K) (PadicAlgCl p) g) : ℤ_[p]ˣ) : ℤ_[p]) with hc
-  have hspec := cyclotomicCharacter.spec (L := PadicAlgCl p) p
-    (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK p K) (PadicAlgCl p) g) ζ hζ.pow_eq_one
-  have hg : (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK p K) (PadicAlgCl p) g) ζ = g ζ := rfl
+  have hspec :=
+    cyclotomicCharacter.spec (L := PadicAlgCl p) p
+      (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK p K) (PadicAlgCl p) g) ζ
+      hζ.pow_eq_one
+  have hg
+      : (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK p K) (PadicAlgCl p) g) ζ
+        = g ζ :=
+    rfl
   rw [hg, ha] at hspec
   have hpos : 0 < p ^ k := pow_pos (Fact.out : p.Prime).pos k
   have hfin : IsOfFinOrder ζ := isOfFinOrder_iff_pow_eq_one.mpr ⟨p ^ k, hpos, hζ.pow_eq_one⟩

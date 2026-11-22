@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open GlobalTheory.ProjSpace GlobalTheory.UMin.ThBdl
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -19,8 +22,11 @@ noncomputable section
 
 namespace GlobalTheory.UMin.ThBdl.Glued
 
-theorem valF_resG {F : Type} [Field F] {X : Scheme.{0}} (y : Sp F ⟶ X) {U W : X.Opens} (h : W ≤ U) (f : Γ(X, U))
-    (hy : ⊤ ≤ y ⁻¹ᵁ W) : valF y W (resG X h f) = valF y U f := by
+theorem valF_resG
+    {F : Type} [Field F]
+    {X : Scheme.{0}} (y : Sp F ⟶ X)
+    {U W : X.Opens} (h : W ≤ U) (f : Γ(X, U)) (hy : ⊤ ≤ y ⁻¹ᵁ W)
+    : valF y W (resG X h f) = valF y U f := by
   have hU : ⊤ ≤ y ⁻¹ᵁ U := fun a ha => h (hy ha)
   unfold valF
   rw [dite_eq_left hy, dite_eq_left hU]
@@ -28,11 +34,17 @@ theorem valF_resG {F : Type} [Field F] {X : Scheme.{0}} (y : Sp F ⟶ X) {U W : 
   show (X.presheaf.map (homOfLE h).op ≫ y.appLE W ⊤ hy).hom f = _
   rw [Scheme.Hom.map_appLE]
 
-theorem glued : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (L : LB G.left) (K : Type) [Field K] (ξ : Sp K ⟶ S)
-    (V : S.Opens) (κ : Type) (N : κ → S.Opens) (s : ∀ k, LocSec G L (N k)) (s' : LocSec G L V)
-    (v : SecM G L 1 (Over.mk ξ)) (hN : ∀ k, N k ≤ V), (⨆ k, N k) = V →
-    (∀ k i, resG _ (fun _ hx => ⟨hx.1, hN k hx.2⟩ : L.U i ⊓ G.hom ⁻¹ᵁ N k ≤ L.U i ⊓ G.hom ⁻¹ᵁ V) (s' i) = s k i) →
-    (∀ k, GenIs ξ (s k) v) → (∀ k, FibNz (s k) (N k)) → (Nonempty κ → GenIs ξ s' v) ∧ FibNz s' V := by
+theorem glued
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (L : LB G.left) (K : Type) [Field K] (ξ : Sp K ⟶ S)
+        (V : S.Opens) (κ : Type) (N : κ → S.Opens) (s : ∀ k, LocSec G L (N k)) (s' : LocSec G L V)
+        (v : SecM G L 1 (Over.mk ξ)) (hN : ∀ k, N k ≤ V),
+      (⨆ k, N k) = V
+        → (∀ k i,
+          resG _ (fun _ hx => ⟨hx.1, hN k hx.2⟩ : L.U i ⊓ G.hom ⁻¹ᵁ N k ≤ L.U i ⊓ G.hom ⁻¹ᵁ V)
+              (s' i)
+            = s k i)
+        → (∀ k, GenIs ξ (s k) v) → (∀ k, FibNz (s k) (N k))
+        → (Nonempty κ → GenIs ξ s' v) ∧ FibNz s' V := by
   intro S G _ L K _ ξ V κ N s s' v hN hsup hres hgen hnz
   refine ⟨fun ⟨k⟩ => ?_, ?_⟩
   · obtain ⟨hξk, hk⟩ := hgen k

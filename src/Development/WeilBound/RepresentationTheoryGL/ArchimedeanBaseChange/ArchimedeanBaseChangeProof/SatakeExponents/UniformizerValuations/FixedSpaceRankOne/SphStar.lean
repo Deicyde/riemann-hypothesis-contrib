@@ -11,7 +11,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -22,11 +23,15 @@ open PositivityTheory.Rg.BcB.F.Eig (locOp lconv lstar LocAlg SphStarU)
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem levOp_KL_apply {n : ℕ} {w : Pl E} {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (UL n w) V) (f : UL n w → ℂ) (S : Finset (UL n w ⧸ KL n w))
-    (hS : ∀ q : UL n w ⧸ KL n w, f q.out ≠ 0 → q ∈ S) (v : V) :
-    levOp ρ (KL n w) (KL n w) f LinearMap.id v = ∑ q ∈ S, f q.out • ρ q.out v := by
-  have hsub : Function.support (fun q : UL n w ⧸ KL n w => f q.out • (ρ q.out ∘ₗ LinearMap.id)) ⊆ ↑S := by
+theorem levOp_KL_apply
+    {n : ℕ} {w : Pl E} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (UL n w) V)
+    (f : UL n w → ℂ) (S : Finset (UL n w ⧸ KL n w))
+    (hS : ∀ q : UL n w ⧸ KL n w, f q.out ≠ 0 → q ∈ S)
+    (v : V)
+    : levOp ρ (KL n w) (KL n w) f LinearMap.id v = ∑ q ∈ S, f q.out • ρ q.out v := by
+  have hsub
+      : Function.support (fun q : UL n w ⧸ KL n w => f q.out • (ρ q.out ∘ₗ LinearMap.id)) ⊆ ↑S := by
     intro q hq
     refine Finset.mem_coe.2 (hS q fun h0 => ?_)
     apply Function.mem_support.1 hq
@@ -52,39 +57,49 @@ theorem sphStar : LocAlg → SphStarU := by
     obtain ⟨v, hv0⟩ := exists_ne (0 : fixed σ.ρ (KL n w))
     have hvfix := mem_fixed_iff.1 v.2
     let φ : UL n w → ℂ := fun x => B (σ.ρ x v) v
-    have key : ∀ f, IsHecke (KL n w) f →
-        twTr σ.ρ (KL n w) (KL n w) f LinearMap.id = LinearMap.trace ℂ _ (locOp σ (KL n w) f) →
-        (∀ u : fixed σ.ρ (KL n w), (locOp σ (KL n w) f u).1 = levOp σ.ρ (KL n w) (KL n w) f LinearMap.id u.1) →
-        twTr σ.ρ (KL n w) (KL n w) f LinearMap.id * B v v = ∑ᶠ q : UL n w ⧸ KL n w, f q.out * φ q.out := by
+    have key
+        : ∀ f,
+          IsHecke (KL n w) f
+            → twTr σ.ρ (KL n w) (KL n w) f LinearMap.id = LinearMap.trace ℂ _ (locOp σ (KL n w) f)
+            → (∀ u : fixed σ.ρ (KL n w),
+              (locOp σ (KL n w) f u).1 = levOp σ.ρ (KL n w) (KL n w) f LinearMap.id u.1)
+            → twTr σ.ρ (KL n w) (KL n w) f LinearMap.id * B v v
+              = ∑ᶠ q : UL n w ⧸ KL n w, f q.out * φ q.out := by
       intro f hf htr happ
-      have hfin := finite_support_quot (KL n w) (GlobalTheory.CompanionTheory.IwLevels.isOpen_KL n w) f hf.1
-      have hS : ∀ q : UL n w ⧸ KL n w, f q.out ≠ 0 → q ∈ hfin.toFinset := fun q hq => hfin.mem_toFinset.2 hq
+      have hfin :=
+        finite_support_quot (KL n w) (GlobalTheory.CompanionTheory.IwLevels.isOpen_KL n w) f hf.1
+      have hS : ∀ q : UL n w ⧸ KL n w, f q.out ≠ 0 → q ∈ hfin.toFinset := fun q hq =>
+        hfin.mem_toFinset.2 hq
       have hline : locOp σ (KL n w) f v = twTr σ.ρ (KL n w) (KL n w) f LinearMap.id • v := by
         rw [htr]
         conv_lhs => rw [end_eq_trace_smul hrank (locOp σ (KL n w) f)]
         rfl
-      have h1 : levOp σ.ρ (KL n w) (KL n w) f LinearMap.id v.1 = twTr σ.ρ (KL n w) (KL n w) f LinearMap.id • v.1 := by
+      have h1
+          : levOp σ.ρ (KL n w) (KL n w) f LinearMap.id v.1
+            = twTr σ.ρ (KL n w) (KL n w) f LinearMap.id • v.1 := by
         rw [← happ, hline]
         rfl
       rw [levOp_KL_apply σ.ρ f hfin.toFinset hS] at h1
       have h2 := congrArg (fun x => B x v.1) h1
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul] at h2
-      have hsub : Function.support (fun q : UL n w ⧸ KL n w => f q.out * φ q.out) ⊆ ↑hfin.toFinset := by
+      have hsub
+          : Function.support (fun q : UL n w ⧸ KL n w => f q.out * φ q.out) ⊆ ↑hfin.toFinset := by
         intro q hq
         exact Finset.mem_coe.2 (hS q (left_ne_zero_of_mul (Function.mem_support.1 hq)))
       rw [← h2, finsum_eq_sum_of_support_subset _ hsub]
     have hφ : ∀ x, starRingEnd ℂ (φ x) = φ x⁻¹ := by
       intro x
       show starRingEnd ℂ (B (σ.ρ x v) v) = B (σ.ρ x⁻¹ v) v
-      rw [← hBh, ← hBinv x⁻¹ (v : σ.V) (σ.ρ x v), ← Module.End.mul_apply (σ.ρ x⁻¹) (σ.ρ x), ← map_mul,
-        inv_mul_cancel, map_one, Module.End.one_apply]
+      rw [← hBh, ← hBinv x⁻¹ (v : σ.V) (σ.ρ x v), ← Module.End.mul_apply (σ.ρ x⁻¹) (σ.ρ x),
+        ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
     have hφbi : ∀ k₁ ∈ KL n w, ∀ k₂ ∈ KL n w, ∀ x, φ (k₁ * x * k₂) = φ x := by
       intro k₁ hk₁ k₂ hk₂ x
       show B (σ.ρ (k₁ * x * k₂) v) v = B (σ.ρ x v) v
       rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hvfix k₂ hk₂,
         ← hBinv k₁⁻¹ (σ.ρ k₁ (σ.ρ x v)) (v : σ.V), hvfix _ ((KL n w).inv_mem hk₁),
-        ← Module.End.mul_apply (σ.ρ k₁⁻¹) (σ.ρ k₁), ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+        ← Module.End.mul_apply (σ.ρ k₁⁻¹) (σ.ρ k₁), ← map_mul, inv_mul_cancel, map_one,
+        Module.End.one_apply]
     let F : UL n w → ℂ := fun x => starRingEnd ℂ (h₁ x) * φ x⁻¹
     have hF : ∀ k₁ ∈ KL n w, ∀ k₂ ∈ KL n w, ∀ x, F (k₁ * x * k₂) = F x := by
       intro k₁ hk₁ k₂ hk₂ x
@@ -99,18 +114,21 @@ theorem sphStar : LocAlg → SphStarU := by
       have := hBpos (v : σ.V) (fun h0 => hv0 (Subtype.ext h0))
       rw [h] at this
       simp at this
-    have hfin1 := finite_support_quot (KL n w) (GlobalTheory.CompanionTheory.IwLevels.isOpen_KL n w) h₁ hh₁.1
+    have hfin1 :=
+      finite_support_quot (KL n w) (GlobalTheory.CompanionTheory.IwLevels.isOpen_KL n w) h₁ hh₁.1
     have hsupp : (Function.support fun q : UL n w ⧸ KL n w => h₁ q.out * φ q.out).Finite :=
       hfin1.subset fun q hq => left_ne_zero_of_mul (Function.mem_support.1 hq)
-    have eqc : starRingEnd ℂ (twTr σ.ρ (KL n w) (KL n w) h₁ LinearMap.id) * B v v =
-        ∑ᶠ q : UL n w ⧸ KL n w, F q.out := by
+    have eqc
+        : starRingEnd ℂ (twTr σ.ρ (KL n w) (KL n w) h₁ LinearMap.id) * B v v
+          = ∑ᶠ q : UL n w ⧸ KL n w, F q.out := by
       have h := congrArg (starRingEnd ℂ) eqL
       rw [map_mul, hBvv, map_finsum _ hsupp] at h
       rw [h]
       refine finsum_congr fun q => ?_
       simp only [map_mul, hφ, F]
-    have eqμ' : twTr σ.ρ (KL n w) (KL n w) (lstar h₁) LinearMap.id * B v v =
-        ∑ᶠ q : UL n w ⧸ KL n w, F (q.out)⁻¹ := by
+    have eqμ'
+        : twTr σ.ρ (KL n w) (KL n w) (lstar h₁) LinearMap.id * B v v
+          = ∑ᶠ q : UL n w ⧸ KL n w, F (q.out)⁻¹ := by
       rw [eqμ]
       refine finsum_congr fun q => ?_
       simp only [F, lstar, inv_inv]

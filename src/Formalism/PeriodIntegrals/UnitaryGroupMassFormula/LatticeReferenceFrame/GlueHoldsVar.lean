@@ -19,7 +19,8 @@ theorem glue_holds_var : Glue := by
   apply PI.ScRefExists.UnitaryGroupMassFormula.target_of_two
   intro I g r k e f hg hs hn he hf hef hi
   have hg1 : 1 ≤ g := by omega
-  have hc : ∀ x : Fin I.n → I.E, InAt I g 1 (incl I x) → ∃ c : ℕ, Nat.Coprime c g ∧ c • x ∈ I.L := by
+  have hc
+      : ∀ x : Fin I.n → I.E, InAt I g 1 (incl I x) → ∃ c : ℕ, Nat.Coprime c g ∧ c • x ∈ I.L := by
     rintro x ⟨c, hcg, hm⟩
     refine ⟨c, hcg, mem_L_of I h3 ?_⟩
     rw [incl_nsmul, ← PI.ScRefExists.UnitaryGroupMassFormula.mL_one]
@@ -27,8 +28,11 @@ theorem glue_holds_var : Glue := by
   choose ce hce hceL using fun a => hc (e a) (hi a).1
   choose cf hcf hcfL using fun a => hc (f a) (hi a).2
   obtain ⟨M, hM, hMef⟩ : ∃ M : ℕ, Nat.Coprime M g ∧ ∀ a, M • e a ∈ I.L ∧ M • f a ∈ I.L := by
-    refine ⟨∏ a, ce a * cf a, Nat.coprime_prod_left_iff.2 (fun a _ => Nat.Coprime.mul_left (hce a) (hcf a)),
-      fun a => ?_⟩
+    refine ⟨
+      ∏ a, ce a * cf a,
+      Nat.coprime_prod_left_iff.2 (fun a _ => Nat.Coprime.mul_left (hce a) (hcf a)),
+      fun a => ?_
+    ⟩
     obtain ⟨d, hd⟩ : ce a * cf a ∣ ∏ a, ce a * cf a := Finset.dvd_prod_of_mem _ (Finset.mem_univ a)
     constructor
     · rw [hd, show ce a * cf a * d = (cf a * d) * ce a by ring, mul_smul]
@@ -65,16 +69,23 @@ theorem glue_holds_var : Glue := by
     bw_w := ?_
     bwd_w := ?_
     bw_dual := ?_
-    latticeSpan := ?_ }⟩
-  · exact ⟨fun a => ⟨incl_mem_Lf I (nsmul_mem (hMef a).1 Q), incl_mem_Lf I (nsmul_mem (hMef a).2 Q)⟩,
-      incl_mem_Lf I hz, fun i => ⟨smul_mem_Lf I hεi (incl_mem_Lf I (hb i).1),
-        smul_mem_Lf I (sigA_mem I hεi) (incl_mem_Lf I (hb i).2)⟩⟩
+    latticeSpan := ?_
+  }⟩
+  · exact ⟨
+      fun a => ⟨incl_mem_Lf I (nsmul_mem (hMef a).1 Q), incl_mem_Lf I (nsmul_mem (hMef a).2 Q)⟩,
+      incl_mem_Lf I hz,
+      fun i => ⟨
+        smul_mem_Lf I hεi (incl_mem_Lf I (hb i).1),
+        smul_mem_Lf I (sigA_mem I hεi) (incl_mem_Lf I (hb i).2)
+      ⟩
+    ⟩
   · intro a
     have key : ∀ x : Fin I.n → I.E, M • x ∈ I.L → InAt I g g (incl I (Q • M • x) - incl I x) := by
       intro x hx
       refine ⟨M, hM, ?_⟩
-      have h' : ((M : ℕ) : I.E ⊗[I.F] Af I.F) • (incl I (Q • M • x) - incl I x) =
-          ((g : ℕ) : I.E ⊗[I.F] Af I.F) • incl I (s • M • x) := by
+      have h'
+          : ((M : ℕ) : I.E ⊗[I.F] Af I.F) • (incl I (Q • M • x) - incl I x)
+            = ((g : ℕ) : I.E ⊗[I.F] Af I.F) • incl I (s • M • x) := by
         rw [← incl_sub, ← incl_nsmul, ← incl_nsmul]
         congr 1
         funext i
@@ -142,8 +153,10 @@ theorem glue_holds_var : Glue := by
       exact zmod_zero I g
   · intro y hy
     obtain ⟨u, hu⟩ := hθ.2.2
-    have e1 : 1 - ε - sigA I ε = ((g : ℕ) : I.E ⊗[I.F] Af I.F) *
-        (Formalism.UG.inclE (F := I.F) (Af I.F) (u : I.E) - t - t') := by
+    have e1
+        : 1 - ε - sigA I ε
+          = ((g : ℕ) : I.E ⊗[I.F] Af I.F)
+            * (Formalism.UG.inclE (F := I.F) (Af I.F) (u : I.E) - t - t') := by
       have hu' := congrArg (Formalism.UG.inclE (F := I.F) (Af I.F)) hu
       rw [map_sub, map_sub, map_one, map_mul, map_natCast] at hu'
       linear_combination hu' - hεt - hσt
@@ -158,9 +171,12 @@ theorem glue_holds_var : Glue := by
   · intro i j
     show ZMod' I g (hA I (sigA I ε • incl I (bd i)) (ε • incl I (b j)) - if i = j then ε else 0)
     rw [hA_smul_left, hA_smul_right, sigA_sigA, hA_incl]
-    have e2 : ε * (ε * Formalism.UG.inclE (F := I.F) (Af I.F) (Formalism.UG.hform (starRingEnd I.E) I.J (bd i) (b j))) -
-        (if i = j then ε else 0) = ε * Formalism.UG.inclE (F := I.F) (Af I.F)
-          (Formalism.UG.hform (starRingEnd I.E) I.J (bd i) (b j) - if i = j then 1 else 0) := by
+    have e2
+        : ε * (ε * Formalism.UG.inclE (F := I.F) (Af I.F)
+              (Formalism.UG.hform (starRingEnd I.E) I.J (bd i) (b j)))
+            - (if i = j then ε else 0)
+          = ε * Formalism.UG.inclE (F := I.F) (Af I.F)
+            (Formalism.UG.hform (starRingEnd I.E) I.J (bd i) (b j) - if i = j then 1 else 0) := by
       split_ifs
       · rw [map_sub, map_one, ← mul_assoc, hεe]; ring
       · rw [sub_zero, sub_zero, ← mul_assoc, hεe]
@@ -170,9 +186,10 @@ theorem glue_holds_var : Glue := by
     · exact one_mem _
     · exact zero_mem _
   · intro y hy
-    let S : Set (VA I) := Set.range (fun a => incl I (Q • M • e a)) ∪
-      Set.range (fun a => incl I (Q • M • f a)) ∪ {incl I z} ∪ Set.range (fun i => ε • incl I (b i)) ∪
-      Set.range (fun i => sigA I ε • incl I (bd i))
+    let S : Set (VA I) :=
+      Set.range (fun a => incl I (Q • M • e a)) ∪ Set.range (fun a => incl I (Q • M • f a))
+        ∪ {incl I z} ∪ Set.range (fun i => ε • incl I (b i))
+        ∪ Set.range (fun i => sigA I ε • incl I (bd i))
     show y ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g
     have hSe : ∀ a, incl I (Q • M • e a) ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g := fun a =>
       Submodule.mem_sup_left (Submodule.subset_span (Or.inl (Or.inl (Or.inl (Or.inl ⟨a, rfl⟩)))))
@@ -182,20 +199,21 @@ theorem glue_holds_var : Glue := by
       Submodule.mem_sup_left (Submodule.subset_span (Or.inl (Or.inl (Or.inr rfl))))
     have hSb : ∀ i, ε • incl I (b i) ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g := fun i =>
       Submodule.mem_sup_left (Submodule.subset_span (Or.inl (Or.inr ⟨i, rfl⟩)))
-    have hSbd : ∀ i, sigA I ε • incl I (bd i) ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g := fun i =>
-      Submodule.mem_sup_left (Submodule.subset_span (Or.inr ⟨i, rfl⟩))
-    let T : Submodule (𝓞 I.E) (Fin I.n → I.E) :=
-      { carrier := {x | incl I x ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g}
-        add_mem' := fun {x y} hx hy => by
-          simp only [Set.mem_ofPred_eq, incl_add] at *
-          exact add_mem hx hy
-        zero_mem' := by
-          simp only [Set.mem_ofPred_eq, incl_zero]
-          exact zero_mem _
-        smul_mem' := fun c x hx => by
-          simp only [Set.mem_ofPred_eq] at *
-          rw [incl_osmul]
-          exact Submodule.smul_mem _ _ hx }
+    have hSbd : ∀ i, sigA I ε • incl I (bd i) ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g :=
+      fun i => Submodule.mem_sup_left (Submodule.subset_span (Or.inr ⟨i, rfl⟩))
+    let T : Submodule (𝓞 I.E) (Fin I.n → I.E) := {
+      carrier := {x | incl I x ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g}
+      add_mem' := fun {x y} hx hy => by
+        simp only [Set.mem_ofPred_eq, incl_add] at *
+        exact add_mem hx hy
+      zero_mem' := by
+        simp only [Set.mem_ofPred_eq, incl_zero]
+        exact zero_mem _
+      smul_mem' := fun c x hx => by
+        simp only [Set.mem_ofPred_eq] at *
+        rw [incl_osmul]
+        exact Submodule.smul_mem _ _ hx
+    }
     have memT : ∀ x, incl I x ∈ Submodule.span (IntAf I.F I.E) S ⊔ mL I g → x ∈ T := fun x h => h
     have hgT : gL I g ≤ T := by
       refine Submodule.span_le.2 ?_
@@ -203,13 +221,18 @@ theorem glue_holds_var : Glue := by
       refine memT _ ?_
       rw [incl_smul, ← natCast_eq]
       exact Submodule.mem_sup_right (mem_mL I g (incl_mem_Lf I hx))
-    have hST : Submodule.span (𝓞 I.E) (Set.range (fun a => M • e a) ∪ Set.range (fun a => M • f a) ∪
-        {z} ∪ Set.range (fun i => (θ : I.E) • b i) ∪ Set.range (fun i => star (θ : I.E) • bd i)) ≤ T := by
+    have hST
+        : Submodule.span (𝓞 I.E)
+            (Set.range (fun a => M • e a) ∪ Set.range (fun a => M • f a) ∪ {z}
+              ∪ Set.range (fun i => (θ : I.E) • b i) ∪ Set.range (fun i => star (θ : I.E) • bd i))
+          ≤ T := by
       refine Submodule.span_le.2 ?_
       rintro _ ((((⟨a, rfl⟩ | ⟨a, rfl⟩) | rfl) | ⟨i, rfl⟩) | ⟨i, rfl⟩)
       · refine memT _ ?_
-        have h' : incl I (M • e a) = M • incl I (Q • M • e a) -
-            ((g : ℕ) : I.E ⊗[I.F] Af I.F) • incl I (s • M • e a) := by
+        have h'
+            : incl I (M • e a)
+              = M • incl I (Q • M • e a)
+                - ((g : ℕ) : I.E ⊗[I.F] Af I.F) • incl I (s • M • e a) := by
           rw [← incl_nsmul', ← incl_nsmul, ← incl_sub]
           congr 1
           funext i
@@ -219,8 +242,10 @@ theorem glue_holds_var : Glue := by
         exact sub_mem (nsmul_mem (hSe a) M)
           (Submodule.mem_sup_right (mem_mL I g (incl_mem_Lf I (nsmul_mem (hMef a).1 s))))
       · refine memT _ ?_
-        have h' : incl I (M • f a) = M • incl I (Q • M • f a) -
-            ((g : ℕ) : I.E ⊗[I.F] Af I.F) • incl I (s • M • f a) := by
+        have h'
+            : incl I (M • f a)
+              = M • incl I (Q • M • f a)
+                - ((g : ℕ) : I.E ⊗[I.F] Af I.F) • incl I (s • M • f a) := by
           rw [← incl_nsmul', ← incl_nsmul, ← incl_sub]
           congr 1
           funext i
@@ -231,8 +256,9 @@ theorem glue_holds_var : Glue := by
           (Submodule.mem_sup_right (mem_mL I g (incl_mem_Lf I (nsmul_mem (hMef a).2 s))))
       · exact memT _ hSz
       · refine memT _ ?_
-        have h' : incl I ((θ : I.E) • b i) = ε • incl I (b i) -
-            ((g : ℕ) : I.E ⊗[I.F] Af I.F) • (t • incl I (b i)) := by
+        have h'
+            : incl I ((θ : I.E) • b i)
+              = ε • incl I (b i) - ((g : ℕ) : I.E ⊗[I.F] Af I.F) • (t • incl I (b i)) := by
           rw [incl_smul, smul_smul, ← sub_smul]
           congr 1
           linear_combination -hεt
@@ -240,8 +266,10 @@ theorem glue_holds_var : Glue := by
         exact sub_mem (hSb i)
           (Submodule.mem_sup_right (mem_mL I g (smul_mem_Lf I ht (incl_mem_Lf I (hb i).1))))
       · refine memT _ ?_
-        have h' : incl I (star (θ : I.E) • bd i) = sigA I ε • incl I (bd i) -
-            ((g : ℕ) : I.E ⊗[I.F] Af I.F) • (t' • incl I (bd i)) := by
+        have h'
+            : incl I (star (θ : I.E) • bd i)
+              = sigA I ε • incl I (bd i)
+                - ((g : ℕ) : I.E ⊗[I.F] Af I.F) • (t' • incl I (bd i)) := by
           rw [incl_smul, smul_smul, ← sub_smul]
           congr 1
           linear_combination -hσt

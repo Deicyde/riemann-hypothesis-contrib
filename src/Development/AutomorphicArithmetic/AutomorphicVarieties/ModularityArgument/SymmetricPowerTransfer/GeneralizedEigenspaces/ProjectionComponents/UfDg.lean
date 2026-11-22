@@ -14,21 +14,29 @@ namespace UpperTheory.V.Z.Sym.U
 
 private def dg {Γ k : Type} [Group Γ] [Field k] (χ : Γ →* kˣ) : Γ →* GL (Fin 2) k where
   toFun g := Matrix.GeneralLinearGroup.mkOfDetNeZero !![(χ g : k), 0; 0, 1] (by simp)
-  map_one' := by ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.GeneralLinearGroup.mkOfDetNeZero]
+  map_one' := by
+    ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.GeneralLinearGroup.mkOfDetNeZero]
   map_mul' g h := by
-    ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.GeneralLinearGroup.mkOfDetNeZero, Matrix.mul_apply, Fin.sum_univ_two]
+    ext i j
+    fin_cases i <;> fin_cases j
+      <;> simp [Matrix.GeneralLinearGroup.mkOfDetNeZero, Matrix.mul_apply, Fin.sum_univ_two]
 
-private theorem uf_dg {Γ k : Type} [Group Γ] [Field k] (χ : Γ →* kˣ) (g : Γ) : Ga.uf (dg χ g) = (χ g : k) + (χ g : k)⁻¹ := by
+private theorem uf_dg {Γ k : Type} [Group Γ] [Field k] (χ : Γ →* kˣ) (g : Γ)
+    : Ga.uf (dg χ g) = (χ g : k) + (χ g : k)⁻¹ := by
   have h0 : (χ g : k) ≠ 0 := (χ g).ne_zero
-  simp only [Ga.uf, Ga.tr, dg, MonoidHom.coe_mk, OneHom.coe_mk, Matrix.GeneralLinearGroup.mkOfDetNeZero,
-    Matrix.trace_fin_two, Matrix.det_fin_two]
+  simp only [Ga.uf, Ga.tr, dg, MonoidHom.coe_mk, OneHom.coe_mk,
+    Matrix.GeneralLinearGroup.mkOfDetNeZero, Matrix.trace_fin_two, Matrix.det_fin_two]
   simp
   field_simp
   ring
 
-theorem xiOne (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime]
-    (r : G L Ω →* GL (Fin 2) (Qbar l)) (hc : Continuous r) (h4 : IrrOpen (Ga.sym4 r)) (ξ : G L Ω →* (Qbar l)ˣ)
-    (hξ : IsOpen (ξ.ker : Set (G L Ω))) (h : ∀ g ∉ Ga.Bad r, (ξ g : Qbar l) * (Ga.uf (r g) + 1) = Ga.uf (r g) + 1) : ξ = 1 := by
+theorem xiOne
+    (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    (l : ℕ) [Fact l.Prime]
+    (r : G L Ω →* GL (Fin 2) (Qbar l)) (hc : Continuous r) (h4 : IrrOpen (Ga.sym4 r))
+    (ξ : G L Ω →* (Qbar l)ˣ) (hξ : IsOpen (ξ.ker : Set (G L Ω)))
+    (h : ∀ g ∉ Ga.Bad r, (ξ g : Qbar l) * (Ga.uf (r g) + 1) = Ga.uf (r g) + 1)
+    : ξ = 1 := by
   by_contra hne
   obtain ⟨g0, hg0⟩ : ∃ g0, ξ g0 ≠ 1 := by
     by_contra hall
@@ -81,8 +89,10 @@ theorem xiOne (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] 
       show _ = _
       rw [hepz, hepz]
       exact he
-    have claim : ∀ (s : Finset ℤ) (W : Set (G L Ω)), IsOpen W → W.Nonempty → W ⊆ ⋃ m ∈ s, B m →
-        ∃ m, ∃ V : Set (G L Ω), IsOpen V ∧ V.Nonempty ∧ V ⊆ B m := by
+    have claim
+        : ∀ (s : Finset ℤ) (W : Set (G L Ω)),
+          IsOpen W → W.Nonempty → W ⊆ ⋃ m ∈ s, B m
+            → ∃ m, ∃ V : Set (G L Ω), IsOpen V ∧ V.Nonempty ∧ V ⊆ B m := by
       intro s
       refine Finset.induction_on s ?_ ?_
       · intro W _ hW hsW

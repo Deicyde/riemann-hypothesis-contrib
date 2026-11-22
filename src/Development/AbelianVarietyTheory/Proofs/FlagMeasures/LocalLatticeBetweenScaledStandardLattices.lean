@@ -20,32 +20,41 @@ section general
 
 variable {R : Type} [CommRing R] {O : Subring R} {n : ℕ}
 
-theorem smul_mem_of_mem' (Λ : Submodule O (Fin n → R)) {c : R} (hc : c ∈ O) {x : Fin n → R}
-    (hx : x ∈ Λ) : c • x ∈ Λ := by
+theorem smul_mem_of_mem'
+    (Λ : Submodule O (Fin n → R)) {c : R} (hc : c ∈ O) {x : Fin n → R} (hx : x ∈ Λ)
+    : c • x ∈ Λ := by
   have := Λ.smul_mem (⟨c, hc⟩ : O) hx
   simpa [Subring.smul_def] using this
 
-theorem exists_nat_smul_mem (Λ : Submodule O (Fin n → R))
-    (hd : ∀ y : R, ∃ m : ℕ, m ≠ 0 ∧ (m : R) * y ∈ O) {x : Fin n → R}
-    (hx : x ∈ Submodule.span R (Λ : Set (Fin n → R))) : ∃ m : ℕ, m ≠ 0 ∧ (m : R) • x ∈ Λ := by
+theorem exists_nat_smul_mem
+    (Λ : Submodule O (Fin n → R))
+    (hd : ∀ y : R, ∃ m : ℕ, m ≠ 0 ∧ (m : R) * y ∈ O)
+    {x : Fin n → R} (hx : x ∈ Submodule.span R (Λ : Set (Fin n → R)))
+    : ∃ m : ℕ, m ≠ 0 ∧ (m : R) • x ∈ Λ := by
   first
   | exact @_root_.GlobalTheory.NatSmulMem.exists_nat_smul_mem
   | exact _root_.GlobalTheory.NatSmulMem.exists_nat_smul_mem
   | (apply _root_.GlobalTheory.NatSmulMem.exists_nat_smul_mem <;> assumption)
   | (intros; apply _root_.GlobalTheory.NatSmulMem.exists_nat_smul_mem <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.NatSmulMem.exists_nat_smul_mem <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.NatSmulMem.exists_nat_smul_mem
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.NatSmulMem.exists_nat_smul_mem ..)
 
-theorem exists_nat_between (Λ : Submodule O (Fin n → R)) (hfg : Λ.FG)
-    (hsp : Submodule.span R (Λ : Set (Fin n → R)) = ⊤)
-    (hd : ∀ y : R, ∃ m : ℕ, m ≠ 0 ∧ (m : R) * y ∈ O) :
-    ∃ m : ℕ, m ≠ 0 ∧ (∀ v : Fin n → R, (∀ i, v i ∈ O) → (m : R) • v ∈ Λ) ∧
-      ∀ v ∈ Λ, ∀ i, (m : R) * v i ∈ O := by
+theorem exists_nat_between
+    (Λ : Submodule O (Fin n → R)) (hfg : Λ.FG) (hsp : Submodule.span R (Λ : Set (Fin n → R)) = ⊤)
+    (hd : ∀ y : R, ∃ m : ℕ, m ≠ 0 ∧ (m : R) * y ∈ O)
+    : ∃ m : ℕ,
+      m ≠ 0 ∧ (∀ v : Fin n → R, (∀ i, v i ∈ O) → (m : R) • v ∈ Λ)
+        ∧ ∀ v ∈ Λ, ∀ i, (m : R) * v i ∈ O := by
   choose md hmd0 hmd using hd
   obtain ⟨S, hS⟩ := hfg
 
   set m1 : ℕ := ∏ s ∈ S, ∏ i, md (s i) with hm1
-  have hm10 : m1 ≠ 0 := Finset.prod_ne_zero_iff.2 fun s _ => Finset.prod_ne_zero_iff.2 fun i _ => hmd0 _
+  have hm10 : m1 ≠ 0 :=
+    Finset.prod_ne_zero_iff.2 fun s _ => Finset.prod_ne_zero_iff.2 fun i _ => hmd0 _
   have hup : ∀ v ∈ Λ, ∀ i, (m1 : R) * v i ∈ O := by
     intro v hv
     rw [← hS] at hv
@@ -58,12 +67,13 @@ theorem exists_nat_between (Λ : Submodule O (Fin n → R)) (hfg : Λ.FG)
       obtain ⟨k, hk⟩ := hdvd
       rw [hk, Nat.cast_mul, mul_comm (md (s i) : R), mul_assoc]
       exact O.mul_mem (natCast_mem O k) (hmd _)
-    | zero => intro i; simp
-    | add x y _ _ hx hy => intro i; simpa [mul_add] using O.add_mem (hx i) (hy i)
+    | zero =>
+      intro i; simp
+    | add x y _ _ hx hy =>
+      intro i; simpa [mul_add] using O.add_mem (hx i) (hy i)
     | smul a x _ hx =>
       intro i
-      have : (m1 : R) * (a • x) i = (a : R) * ((m1 : R) * x i) := by
-        simp [Subring.smul_def]; ring
+      have : (m1 : R) * (a • x) i = (a : R) * ((m1 : R) * x i) := by simp [Subring.smul_def]; ring
       rw [this]
       exact O.mul_mem a.2 (hx i)
 
@@ -95,13 +105,16 @@ theorem exists_nat_between (Λ : Submodule O (Fin n → R)) (hfg : Λ.FG)
 
 end general
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
 
-theorem lat_between (A : Places F E sig) (p : HeightOneSpectrum (𝓞 F)) (n : ℕ)
+theorem lat_between
+    (A : Places F E sig) (p : HeightOneSpectrum (𝓞 F)) (n : ℕ)
     (Λ : Submodule (A.L p).O (Fin n → (A.loc p).Ep)) (hΛ : IsLat (A.L p) Λ)
-    (hd : ∀ y : (A.loc p).Ep, ∃ m : ℕ, m ≠ 0 ∧ (m : (A.loc p).Ep) * y ∈ (A.L p).O) :
-    ∃ m : ℕ, m ≠ 0 ∧ (∀ v : Fin n → (A.loc p).Ep, (∀ i, v i ∈ (A.L p).O) → (m : (A.loc p).Ep) • v ∈ Λ) ∧
-      ∀ v ∈ Λ, ∀ i, (m : (A.loc p).Ep) * v i ∈ (A.L p).O :=
+    (hd : ∀ y : (A.loc p).Ep, ∃ m : ℕ, m ≠ 0 ∧ (m : (A.loc p).Ep) * y ∈ (A.L p).O)
+    : ∃ m : ℕ,
+      m ≠ 0 ∧ (∀ v : Fin n → (A.loc p).Ep, (∀ i, v i ∈ (A.L p).O) → (m : (A.loc p).Ep) • v ∈ Λ)
+        ∧ ∀ v ∈ Λ, ∀ i, (m : (A.loc p).Ep) * v i ∈ (A.L p).O :=
   exists_nat_between Λ hΛ.1 hΛ.2 hd
 
 end GlobalTheory.HL.Glue

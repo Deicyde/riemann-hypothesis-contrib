@@ -22,9 +22,11 @@ theorem DivCycleSupport.proof : DivCycleSupport.Statement.{u} := by
     by_contra h
     exact hW (by rw [divCycle, dite_eq_right h])
   obtain ⟨hmin, hrel⟩ := h
-  have hWh : IsMultiHomogIdeal W := (Bridge.isMultiHomogIdeal_iff W).mpr
-    (ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_isMultiHomogIdeal_of_mem_minimalPrimes
-      ((Bridge.isMultiHomogIdeal_iff P).mp hP.multiHomog) ((Bridge.isMultiHomog_iff f c).mp hf) hmin)
+  have hWh : IsMultiHomogIdeal W :=
+    (Bridge.isMultiHomogIdeal_iff W).mpr
+      (ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_isMultiHomogIdeal_of_mem_minimalPrimes
+        ((Bridge.isMultiHomogIdeal_iff P).mp hP.multiHomog) ((Bridge.isMultiHomog_iff f c).mp hf)
+        hmin)
   refine ⟨⟨hmin.1.1, hWh, hrel⟩, ?_⟩
   have := hP.isPrime
   have hPd : ringKrullDim (MRing ι F ⧸ P) = ((Fintype.card K + n + 1 : ℕ) : WithBot ℕ∞) := by

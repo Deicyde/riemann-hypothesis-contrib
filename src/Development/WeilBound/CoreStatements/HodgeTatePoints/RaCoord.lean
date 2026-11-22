@@ -78,19 +78,43 @@ lemma monomialCount_exponent (p : ℕ) [Fact p.Prime] {ι : Type} [Fintype ι] [
     _ = p ^ (Fintype.card ι - 1) * (p * (p - 1) / 2 * 2) := by rw [h2]
     _ = p ^ (Fintype.card ι - 1) * (p * (p - 1) / 2) * 2 := by ring
 
-theorem cnt_coord_of (hsmith : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)), ∃ (Λ : Matrix ι ι R) (ε : ι → R), IsUnit Λ.det ∧ afLat p AA.carrier = Submodule.span R (Set.range fun j => ε j • Λ j) ∧ (∀ j, v (p : C) ≤ v (algebraMap R C (ε j)) ^ (p - 1)) ∧ HasLen v R (AFQuot p AA.carrier) (∏ j, v (algebraMap R C (ε j)))) :
-    ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)), ∀ cA cN, HasLen v R (AFQuot p AA.carrier) cA → HasColen R v AA.carrier cN → cA ^ (Fintype.card (ι → ZMod p) * (p - 1)) ≤ cN ^ 2 ∧ (cA ^ (Fintype.card (ι → ZMod p) * (p - 1)) = cN ^ 2 → ∃ x : ι → (ι → ZMod p) → C, (∀ j, x j ∈ afFun p AA.carrier) ∧ AA.carrier = Submodule.span R (Set.range fun (α : ι → ZMod p) (y : ι → ZMod p) => ∏ j, x j y ^ (α j).val)) := by
+theorem cnt_coord_of
+    (hsmith : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)),
+          ∃ (Λ : Matrix ι ι R) (ε : ι → R),
+            IsUnit Λ.det ∧ afLat p AA.carrier = Submodule.span R (Set.range fun j => ε j • Λ j)
+              ∧ (∀ j, v (p : C) ≤ v (algebraMap R C (ε j)) ^ (p - 1))
+              ∧ HasLen v R (AFQuot p AA.carrier) (∏ j, v (algebraMap R C (ε j))))
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)),
+          ∀ cA cN,
+            HasLen v R (AFQuot p AA.carrier) cA → HasColen R v AA.carrier cN
+              → cA ^ (Fintype.card (ι → ZMod p) * (p - 1)) ≤ cN ^ 2
+                ∧ (cA ^ (Fintype.card (ι → ZMod p) * (p - 1)) = cN ^ 2
+                  → ∃ x : ι → (ι → ZMod p) → C,
+                    (∀ j, x j ∈ afFun p AA.carrier)
+                      ∧ AA.carrier
+                        = Submodule.span R
+                          (Set.range fun (α : ι → ZMod p) (y : ι → ZMod p) =>
+                            ∏ j, x j y ^ (α j).val)) := by
   intro p _ C _ _ _ v R _ _ hv hp1 ι _ _ AA cA cN hA hN
   obtain ⟨Λ, ε, hΛ, hspan, hε, hlen⟩ := hsmith p C v R hv hp1 ι AA
   have hcA : cA = ∏ j, v (algebraMap R C (ε j)) := hasLen_unique hv hA hlen
-  have hl := fun j => lifts p C v R hv hp1 ι AA (Λ j) (ε j)
-    (by rw [hspan]; exact Submodule.subset_span ⟨j, rfl⟩) (hε j)
+  have hl := fun j =>
+    lifts p C v R hv hp1 ι AA (Λ j) (ε j) (by rw [hspan]; exact Submodule.subset_span ⟨j, rfl⟩)
+      (hε j)
   choose u hu_mem hu_int hu_cong using hl
 
-  let B' : Matrix (ι → ZMod p) (ι → ZMod p) C := Matrix.of fun (x α : ι → ZMod p) =>
-    ∏ j, (algebraMap R C (ε j) * u j x) ^ (α j).val
-  have hB'v : v B'.det = ∏ j, v (algebraMap R C (ε j)) ^
-      (p ^ (Fintype.card ι - 1) * (p * (p - 1) / 2)) :=
+  let B' : Matrix (ι → ZMod p) (ι → ZMod p) C :=
+    Matrix.of fun (x α : ι → ZMod p) => ∏ j, (algebraMap R C (ε j) * u j x) ^ (α j).val
+  have hB'v
+      : v B'.det
+        = ∏ j, v (algebraMap R C (ε j)) ^
+          (p ^ (Fintype.card ι - 1) * (p * (p - 1) / 2)) :=
     (u5 p C v R hv hp1 ι Λ u hΛ hu_int hu_cong).2 fun j => algebraMap R C (ε j)
   have hsq : cA ^ (Fintype.card (ι → ZMod p) * (p - 1)) = v B'.det ^ 2 := by
     rw [hcA, hB'v]
@@ -110,15 +134,16 @@ theorem cnt_coord_of (hsmith : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
 
   have hmem : ∀ α : ι → ZMod p, (fun x => B' x α) ∈ AA.carrier := by
     intro α
-    exact monomialCount_prod_pow_mem AA (fun j y => algebraMap R C (ε j) * u j y)
-      (fun j => (Submodule.mem_inf.1 (hu_mem j)).1) (fun j => (α j).val)
+    exact monomialCount_prod_pow_mem AA
+      (fun j y => algebraMap R C (ε j) * u j y)
+      (fun j => (Submodule.mem_inf.1 (hu_mem j)).1)
+      (fun j => (α j).val)
   obtain ⟨B, hAA, hBc⟩ := hN
   obtain ⟨W, hW⟩ := monomialCount_exists_factor (R := R) B B' (fun α => hAA ▸ hmem α)
   have hdet : v B'.det = cN * v (algebraMap R C W.det) := by
     rw [hW, Matrix.det_mul, map_mul, RingHom.map_det, hBc]; rfl
   have hw1 : v (algebraMap R C W.det) ≤ 1 := hv.map_le_one W.det
-  have hle : v B'.det ≤ cN := by
-    rw [hdet]; exact mul_le_of_le_one_right zero_le hw1
+  have hle : v B'.det ≤ cN := by rw [hdet]; exact mul_le_of_le_one_right zero_le hw1
   refine ⟨by rw [hsq]; exact pow_le_pow_left₀ zero_le hle 2, fun heq => ?_⟩
   have hBeq : v B'.det = cN := by
     rw [hsq] at heq
@@ -127,15 +152,17 @@ theorem cnt_coord_of (hsmith : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
   have hw : v (algebraMap R C W.det) = 1 := by
     have h : cN * v (algebraMap R C W.det) = cN * 1 := by rw [← hdet, hBeq, mul_one]
     exact mul_left_cancel₀ hcN0 h
-  have hWu : IsUnit W.det :=
-    hv.isUnit_of_one (isUnit_iff_ne_zero.2 fun h0 => by simp [h0] at hw) hw
+  have hWu : IsUnit W.det := hv.isUnit_of_one (isUnit_iff_ne_zero.2 fun h0 => by simp [h0] at hw) hw
   have hBeq' : B' * (W⁻¹).map (algebraMap R C) = B := by
     rw [hW, Matrix.mul_assoc, ← Matrix.map_mul, Matrix.mul_nonsing_inv _ hWu,
       Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one]
   refine ⟨fun j y => algebraMap R C (ε j) * u j y, hu_mem, ?_⟩
-  have hspan' : Submodule.span R (Set.range fun (α : ι → ZMod p) (y : ι → ZMod p) =>
-      ∏ j, (algebraMap R C (ε j) * u j y) ^ (α j).val) =
-      Submodule.span R (Set.range fun α x => B' x α) := rfl
+  have hspan'
+      : Submodule.span R
+          (Set.range fun (α : ι → ZMod p) (y : ι → ZMod p) =>
+            ∏ j, (algebraMap R C (ε j) * u j y) ^ (α j).val)
+        = Submodule.span R (Set.range fun α x => B' x α) :=
+    rfl
   rw [hspan']
   refine le_antisymm ?_ (Submodule.span_le.2 ?_)
   · rw [hAA]

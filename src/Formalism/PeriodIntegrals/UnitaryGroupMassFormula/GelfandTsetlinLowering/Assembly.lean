@@ -21,10 +21,11 @@ theorem ioIntegral_of (hZ : CapelliZ) (hL : LiftMod) (hV : ZScalarVanish) : IoIn
     Formalism.GradedWeylDivisibility.dualWeylMap ℤ ℂ (Int.castRingHom ℂ) n n sg.natW s hs
   have hO : OtherPart h lam sg ≤ LinearMap.ker Z := by
     unfold OtherPart
-    refine iSup_le fun mu => iSup_le fun hmu => iSup_le fun hne => iSup_le fun hw =>
-      iSup_le fun φ => iSup_le fun hφ => ?_
+    refine iSup_le fun mu =>
+      iSup_le fun hmu => iSup_le fun hne => iSup_le fun hw => iSup_le fun φ => iSup_le fun hφ => ?_
     rintro _ ⟨t, ht, rfl⟩
-    rw [LinearMap.mem_ker, hZa mu hmu φ hφ t ht, hV n N h lam sg mu hI hmu hne hw, Int.cast_zero, zero_smul]
+    rw [LinearMap.mem_ker, hZa mu hmu φ hφ t ht, hV n N h lam sg mu hI hmu hne hw, Int.cast_zero,
+      zero_smul]
   have h0 := hO hd
   rw [LinearMap.mem_ker, map_sub, hZf, hZa sg hI io0 hE _ hsC] at h0
   have hz : zScalar h lam sg sg = cBr h lam sg := rfl
@@ -32,12 +33,15 @@ theorem ioIntegral_of (hZ : CapelliZ) (hL : LiftMod) (hV : ZScalarVanish) : IoIn
   rw [map_smul]
   exact (sub_eq_zero.mp h0).symm
 
-theorem sqAct_smul {k : ℕ} (mu : DomWeight k) (g : GL (Fin k) ℂ) (c : ℂ)
-    (x : MvPolynomial (Fin k × Fin k) ℂ) : sqAct ℂ k mu g (c • x) = c • sqAct ℂ k mu g x := by
+theorem sqAct_smul
+    {k : ℕ} (mu : DomWeight k) (g : GL (Fin k) ℂ) (c : ℂ) (x : MvPolynomial (Fin k × Fin k) ℂ)
+    : sqAct ℂ k mu g (c • x) = c • sqAct ℂ k mu g x := by
   rw [sqAct, sqAct, map_smul, smul_comm]
 
-theorem gTLower_of_steps (hN : Numbers) (hX : XiFacts) (hE : IoExists) (hP4 : IoIntegral)
-    (hA : AdjointBr) (hB : BrIntegral) : PI.GTLower := by
+theorem gTLower_of_steps
+    (hN : Numbers) (hX : XiFacts) (hE : IoExists) (hP4 : IoIntegral) (hA : AdjointBr)
+    (hB : BrIntegral)
+    : PI.GTLower := by
   intro n N h lam sg hI
   obtain ⟨hc0, hcB, hdeg⟩ := hN n N h lam sg hI
   obtain ⟨hxi0, -⟩ := hX n N h lam sg hI
@@ -47,16 +51,18 @@ theorem gTLower_of_steps (hN : Numbers) (hX : XiFacts) (hE : IoExists) (hP4 : Io
   have hio : ∀ x, io x = c • io0 x := fun x => rfl
   have I2 : ∀ s ∈ nablaSq ℂ n sg, io s ∈ nablaSq ℂ N lam := fun s hs =>
     Submodule.smul_mem _ _ (hE1 s hs)
-  have I3 : ∀ (g : GL (Fin n) ℂ), ∀ s ∈ nablaSq ℂ n sg,
-      io (sqAct ℂ n sg g s) = sqAct ℂ N lam (embGL ℂ n N h g) (io s) := by
+  have I3
+      : ∀ (g : GL (Fin n) ℂ), ∀ s ∈ nablaSq ℂ n sg,
+        io (sqAct ℂ n sg g s) = sqAct ℂ N lam (embGL ℂ n N h g) (io s) := by
     intro g s hs
     rw [hio, hio, hE2 g s hs, sqAct_smul]
   have I4 : io (extremal ℂ n sg) = c • xi ℂ h lam sg := by rw [hio, hx]
   have I5 : LastWeight lam sg io := by
     intro a s hs
     rw [hio, sqAct_smul, hW a s hs, smul_comm]
-  have I1 : ∀ s ∈ nablaSq ℤ n sg, ∃ f ∈ nablaSq ℤ N lam,
-      io (MvPolynomial.map (Int.castRingHom ℂ) s) = MvPolynomial.map (Int.castRingHom ℂ) f := by
+  have I1
+      : ∀ s ∈ nablaSq ℤ n sg, ∃ f ∈ nablaSq ℤ N lam,
+        io (MvPolynomial.map (Int.castRingHom ℂ) s) = MvPolynomial.map (Int.castRingHom ℂ) f := by
     intro s hs
     obtain ⟨f, hf, hf'⟩ := hP4 n N h lam sg hI io0 ⟨hE1, hE2⟩ hx hW s hs
     exact ⟨f, hf, by rw [hio, ← map_smul]; exact hf'⟩

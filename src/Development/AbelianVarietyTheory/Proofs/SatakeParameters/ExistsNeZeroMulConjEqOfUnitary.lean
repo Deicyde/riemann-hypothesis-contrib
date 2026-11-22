@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Character
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Host Formalism.L2.Col Formalism.L2.DIV
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.Host Formalism.L2.Col Formalism.L2.DIV
 
 noncomputable section
 
@@ -18,10 +19,12 @@ namespace GlobalTheory.NormOneHilbert90Units
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem exists_ne_zero_mul_conj_eq_of_unitary (D : D7) (z : unitary D.host.E) :
-    ∃ w : D.host.E, w ≠ 0 ∧ (z : D.host.E) * D.host.conj w = w := by
+theorem exists_ne_zero_mul_conj_eq_of_unitary (D : D7) (z : unitary D.host.E)
+    : ∃ w : D.host.E, w ≠ 0 ∧ (z : D.host.E) * D.host.conj w = w := by
   have hz : (z : D.host.E) * star (z : D.host.E) = 1 := z.2.2
-  have key : ∀ a : D.host.E, (z : D.host.E) * star (a + (z : D.host.E) * star a) = a + (z : D.host.E) * star a := by
+  have key
+      : ∀ a : D.host.E,
+        (z : D.host.E) * star (a + (z : D.host.E) * star a) = a + (z : D.host.E) * star a := by
     intro a
     rw [star_add, star_mul, star_star]
     linear_combination a * hz
@@ -43,7 +46,9 @@ theorem exists_ne_zero_mul_conj_eq_of_unitary (D : D7) (z : unitary D.host.E) :
 
 section Comparison₂
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : G.Inst D L} {Gl : G.LatInst D} {K : G.Consts} {Y : DivX D} {cX : ExtraC}
+variable
+  {D : D7} {L : SizeData₂ D}
+  {hT : GatTies D} {Gi : G.Inst D L} {Gl : G.LatInst D} {K : G.Consts} {Y : DivX D} {cX : ExtraC}
 
 end Comparison₂
 

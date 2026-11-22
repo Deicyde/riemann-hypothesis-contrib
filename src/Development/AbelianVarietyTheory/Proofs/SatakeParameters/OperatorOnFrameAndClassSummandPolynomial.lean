@@ -4,7 +4,12 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RkLe
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp
+  Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection
+  Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
+  Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -13,13 +18,20 @@ namespace GlobalTheory.TwV.DelA
 
 open MvPolynomial
 
-theorem polD_eq_map_polDY (D : D7) {N N' : ℕ} (s : D.what₂.Tau → ℂ) (Q : MvPolynomial (GL3Theta.FrV D N) ℂ)
-    (y' : D.what₂.Tau → Matrix (Fin N') (Fin N') ℂ) :
-    GL3Theta.polD D s Q y' =
-      MvPolynomial.map (MvPolynomial.eval fun k : GL3Theta.FrV D N' => y' k.1 k.2.1 k.2.2) (polDY D s Q) := by
+theorem polD_eq_map_polDY
+    (D : D7)
+    {N N' : ℕ}
+    (s : D.what₂.Tau → ℂ) (Q : MvPolynomial (GL3Theta.FrV D N) ℂ)
+    (y' : D.what₂.Tau → Matrix (Fin N') (Fin N') ℂ)
+    : GL3Theta.polD D s Q y'
+      = MvPolynomial.map (MvPolynomial.eval fun k : GL3Theta.FrV D N' => y' k.1 k.2.1 k.2.2)
+        (polDY D s Q) := by
   set v : GL3Theta.FrV D N' → ℂ := fun k => y' k.1 k.2.1 k.2.2
-  have hmap : ∀ P : MvPolynomial (GL3Theta.Idx D N N') (MvPolynomial (GL3Theta.FrV D N') ℂ),
-      MvPolynomial.map (MvPolynomial.eval v) P = MvPolynomial.mapAlgHom (MvPolynomial.aeval v) P := fun P => rfl
+  have hmap
+      : ∀ P : MvPolynomial (GL3Theta.Idx D N N') (MvPolynomial (GL3Theta.FrV D N') ℂ),
+        MvPolynomial.map (MvPolynomial.eval v) P
+          = MvPolynomial.mapAlgHom (MvPolynomial.aeval v) P := fun P =>
+    rfl
   rw [hmap]
   unfold GL3Theta.polD polDY
   rw [← AlgHom.comp_apply]
@@ -56,7 +68,9 @@ theorem entQFrame : Formalism.L2.KerInert.SecondKernelDifference.EntQFrame := by
   rw [applyFrame]
   rfl
 
-theorem applyFrame_and_entQFrame : Formalism.L2.KerInert.SecondKernelDifference.ApplyFrame ∧ Formalism.L2.KerInert.SecondKernelDifference.EntQFrame :=
+theorem applyFrame_and_entQFrame
+    : Formalism.L2.KerInert.SecondKernelDifference.ApplyFrame
+      ∧ Formalism.L2.KerInert.SecondKernelDifference.EntQFrame :=
   ⟨applyFrame, entQFrame⟩
 
 end GlobalTheory.TwV.DelA

@@ -8,8 +8,9 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem exists_pivot_entry {L : Type} [Field L] (W : ValuationSubring L) {n : ℕ}
-    (w : Fin n → L) (hw : w ≠ 0) : ∃ k, w k ≠ 0 ∧ ∀ i, w i / w k ∈ W := by
+theorem exists_pivot_entry
+    {L : Type} [Field L] (W : ValuationSubring L) {n : ℕ} (w : Fin n → L) (hw : w ≠ 0)
+    : ∃ k, w k ≠ 0 ∧ ∀ i, w i / w k ∈ W := by
   obtain ⟨j, hj⟩ : ∃ j, w j ≠ 0 := by
     by_contra h
     exact hw (funext fun i => by_contra fun hi => h ⟨i, hi⟩)
@@ -24,17 +25,28 @@ theorem exists_pivot_entry {L : Type} [Field L] (W : ValuationSubring L) {n : �
   rw [← W.valuation_le_one_iff, map_div₀]
   exact div_le_one_of_le₀ (hk i (Finset.mem_univ i)) zero_le
 
-private theorem exists_pivot_unipotent_mul_triangular {L : Type} [Field L] (W : ValuationSubring L) {n : ℕ} :
-    ∀ (r : ℕ) (g : Matrix (Fin n) (Fin r) L), LinearIndependent L g.transpose →
-      ∃ (ι : Fin r ↪ Fin n) (u : Matrix (Fin n) (Fin r) L) (b : Matrix (Fin r) (Fin r) L),
-        (∀ i j, u i j ∈ W) ∧ (∀ i j : Fin r, i < j → u (ι i) j = 0) ∧
-        (∀ i : Fin r, u (ι i) i = 1) ∧ b.BlockTriangular id ∧ (∀ i, b i i ≠ 0) ∧ g = u * b := by
+private theorem exists_pivot_unipotent_mul_triangular
+    {L : Type} [Field L] (W : ValuationSubring L) {n : ℕ}
+    : ∀ (r : ℕ) (g : Matrix (Fin n) (Fin r) L),
+      LinearIndependent L g.transpose
+        → ∃ (ι : Fin r ↪ Fin n) (u : Matrix (Fin n) (Fin r) L) (b : Matrix (Fin r) (Fin r) L),
+          (∀ i j, u i j ∈ W) ∧ (∀ i j : Fin r, i < j → u (ι i) j = 0) ∧ (∀ i : Fin r, u (ι i) i = 1)
+            ∧ b.BlockTriangular id ∧ (∀ i, b i i ≠ 0) ∧ g = u * b := by
   intro r
   induction r with
   | zero =>
     intro g _
-    refine ⟨⟨Fin.elim0, fun a => Fin.elim0 a⟩, 0, 0, fun _ j => Fin.elim0 j, fun i => Fin.elim0 i,
-      fun i => Fin.elim0 i, fun i => Fin.elim0 i, fun i => Fin.elim0 i, ?_⟩
+    refine ⟨
+      ⟨Fin.elim0, fun a => Fin.elim0 a⟩,
+      0,
+      0,
+      fun _ j => Fin.elim0 j,
+      fun i => Fin.elim0 i,
+      fun i => Fin.elim0 i,
+      fun i => Fin.elim0 i,
+      fun i => Fin.elim0 i,
+      ?_
+    ⟩
     ext _ j
     exact Fin.elim0 j
   | succ r ih =>
@@ -109,10 +121,13 @@ private theorem exists_pivot_unipotent_mul_triangular {L : Type} [Field L] (W : 
           rw [ι'.injective hij]
     let u : Matrix (Fin n) (Fin (r + 1)) L :=
       Matrix.of fun a => Fin.snoc (α := fun _ => L) (u' a) (v a / v k)
-    let b : Matrix (Fin (r + 1)) (Fin (r + 1)) L := Matrix.of fun i j =>
-      Fin.lastCases (motive := fun _ => L)
-        (Fin.lastCases (motive := fun _ => L) (v k) (fun i' => c i') i)
-        (fun j' => Fin.lastCases (motive := fun _ => L) 0 (fun i' => b' i' j') i) j
+    let b : Matrix (Fin (r + 1)) (Fin (r + 1)) L :=
+      Matrix.of fun i j =>
+        Fin.lastCases
+          (motive := fun _ => L)
+          (Fin.lastCases (motive := fun _ => L) (v k) (fun i' => c i') i)
+          (fun j' => Fin.lastCases (motive := fun _ => L) 0 (fun i' => b' i' j') i)
+          j
     refine ⟨⟨ιf, hιf⟩, u, b, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · intro a j
       cases j using Fin.lastCases with
@@ -173,12 +188,12 @@ private theorem exists_pivot_unipotent_mul_triangular {L : Type} [Field L] (W : 
         have hentry := congrFun (congrFun hgub a) j
         simpa [g', cols', Matrix.mul_apply] using hentry
 
-theorem exists_integral_pivot_decomposition :
-    ∀ (L : Type) [Field L] (W : ValuationSubring L) (n r : ℕ) (g : Matrix (Fin n) (Fin r) L),
-      LinearIndependent L g.transpose →
-      ∃ (ι : Fin r ↪ Fin n) (u : Matrix (Fin n) (Fin r) L) (b : Matrix (Fin r) (Fin r) L),
-        (∀ i j, u i j ∈ W) ∧ (∀ i j : Fin r, i < j → u (ι i) j = 0) ∧
-        (∀ i : Fin r, u (ι i) i = 1) ∧ b.BlockTriangular id ∧ (∀ i, b i i ≠ 0) ∧ g = u * b := by
+theorem exists_integral_pivot_decomposition
+    : ∀ (L : Type) [Field L] (W : ValuationSubring L) (n r : ℕ) (g : Matrix (Fin n) (Fin r) L),
+      LinearIndependent L g.transpose
+        → ∃ (ι : Fin r ↪ Fin n) (u : Matrix (Fin n) (Fin r) L) (b : Matrix (Fin r) (Fin r) L),
+          (∀ i j, u i j ∈ W) ∧ (∀ i j : Fin r, i < j → u (ι i) j = 0) ∧ (∀ i : Fin r, u (ι i) i = 1)
+            ∧ b.BlockTriangular id ∧ (∀ i, b i i ≠ 0) ∧ g = u * b := by
   intro L _ W n r g hg
   exact exists_pivot_unipotent_mul_triangular W r g hg
 

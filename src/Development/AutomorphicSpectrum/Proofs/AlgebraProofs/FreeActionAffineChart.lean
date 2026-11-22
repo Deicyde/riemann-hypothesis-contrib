@@ -15,7 +15,8 @@ noncomputable section
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry Opposite
 open scoped CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
-open GlobalTheory.CompanionTheory.FreeQuotProof GlobalTheory.CompanionTheory.Hypotheses₂ GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot
+open GlobalTheory.CompanionTheory.FreeQuotProof GlobalTheory.CompanionTheory.Hypotheses₂
+  GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot
 open GlobalTheory.AffineQuotient
 open TensorProduct Algebra.TensorProduct
 
@@ -23,22 +24,31 @@ namespace GlobalTheory.CompanionTheory.FreeQuotProof.Chart
 
 set_option backward.isDefEq.respectTransparency false
 
-abbrev modObjObj {C D : Type*} [Category C] [Category D] [CartesianMonoidalCategory C]
-    [CartesianMonoidalCategory D] (F : C ⥤ D) [F.Monoidal] (M X : C) [MonObj M] [ModObj M X] :
-    letI := Functor.monObjObj (F := F) (X := M); ModObj (F.obj M) (F.obj X) :=
+abbrev modObjObj
+    {C D : Type*}
+    [Category C] [Category D] [CartesianMonoidalCategory C] [CartesianMonoidalCategory D]
+    (F : C ⥤ D) [F.Monoidal]
+    (M X : C) [MonObj M] [ModObj M X]
+    : letI := Functor.monObjObj (F := F) (X := M); ModObj (F.obj M) (F.obj X) :=
   letI := Functor.monObjObj (F := F) (X := M)
-  { smul := Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X]
+  {
+    smul := Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X]
     one_smul := by
-      change (Functor.LaxMonoidal.ε F ≫ F.map η[M]) ▷ F.obj X ≫ Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X] = (λ_ (F.obj X)).hom
+      change (Functor.LaxMonoidal.ε F ≫ F.map η[M]) ▷ F.obj X ≫ Functor.LaxMonoidal.μ F M X
+          ≫ F.map γ[M, X]
+        = (λ_ (F.obj X)).hom
       rw [comp_whiskerRight, Category.assoc, Functor.LaxMonoidal.μ_natural_left_assoc, ← F.map_comp,
         ModObj.one_smul_self, Functor.LaxMonoidal.left_unitality]
     mul_smul := by
-      change (Functor.LaxMonoidal.μ F M M ≫ F.map μ[M]) ▷ F.obj X ≫ Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X] =
-        (α_ _ _ _).hom ≫ F.obj M ◁ (Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X]) ≫ Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X]
+      change (Functor.LaxMonoidal.μ F M M ≫ F.map μ[M]) ▷ F.obj X ≫ Functor.LaxMonoidal.μ F M X
+          ≫ F.map γ[M, X]
+        = (α_ _ _ _).hom ≫ F.obj M ◁ (Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X])
+          ≫ Functor.LaxMonoidal.μ F M X ≫ F.map γ[M, X]
       rw [comp_whiskerRight, Category.assoc, Functor.LaxMonoidal.μ_natural_left_assoc, ← F.map_comp,
         ModObj.mul_smul_self, whiskerLeft_comp, Category.assoc,
         Functor.LaxMonoidal.μ_natural_right_assoc, ← F.map_comp, F.map_comp, F.map_comp]
-      simp [Functor.LaxMonoidal.associativity_assoc] }
+      simp [Functor.LaxMonoidal.associativity_assoc]
+  }
 
 lemma comp_inv'' {C : Type*} [Category C] [CartesianMonoidalCategory C] {A : C} [GrpObj A] {T T' : C}
     (r : T' ⟶ T) (x : T ⟶ A) : r ≫ x⁻¹ = (r ≫ x)⁻¹ :=
@@ -48,17 +58,16 @@ section Affine
 
 variable {R : Type} [CommRing R]
 
-theorem exists_hopf (H : Over (Spec (CommRingCat.of R))) [GrpObj H] (hH : IsFiniteLocallyFree H.hom) :
-    ∃ (Λ : Type) (_ : CommRing Λ) (_ : HopfAlgebra R Λ) (_ : Module.Finite R Λ)
-      (_ : Module.Projective R Λ) (e : specOver R Λ ≅ H), IsMonHom e.hom := by
+theorem exists_hopf (H : Over (Spec (CommRingCat.of R))) [GrpObj H] (hH : IsFiniteLocallyFree H.hom)
+    : ∃ (Λ : Type) (_ : CommRing Λ) (_ : HopfAlgebra R Λ) (_ : Module.Finite R Λ)
+        (_ : Module.Projective R Λ) (e : specOver R Λ ≅ H),
+      IsMonHom e.hom := by
   obtain ⟨h1, h2, h3⟩ := hH
   have : IsAffine H.left := isAffine_of_isAffineHom H.hom
   obtain ⟨⟨Λ⟩, ⟨e⟩⟩ := (essImage_hopfSpec (R := .of R) (G := Grp.mk H)).2 this
   let e' : specOver R Λ ≅ H := (Grp.forget _).mapIso e
-  have h₁ : IsFinite (specOver R Λ).hom := by
-    rw [← Over.w e'.hom]; infer_instance
-  have h₂ : Flat (specOver R Λ).hom := by
-    rw [← Over.w e'.hom]; infer_instance
+  have h₁ : IsFinite (specOver R Λ).hom := by rw [← Over.w e'.hom]; infer_instance
+  have h₂ : Flat (specOver R Λ).hom := by rw [← Over.w e'.hom]; infer_instance
   have h₃ : LocallyOfFinitePresentation (specOver R Λ).hom := by
     rw [← Over.w e'.hom]; infer_instance
   have : Module.Finite R Λ := RingHom.finite_algebraMap.1 ((IsFinite.SpecMap_iff _).1 h₁)
@@ -67,11 +76,18 @@ theorem exists_hopf (H : Over (Spec (CommRingCat.of R))) [GrpObj H] (hH : IsFini
     RingHom.finitePresentation_algebraMap.1 ((LocallyOfFinitePresentation.SpecMap_iff _).1 h₃)
   have : Module.FinitePresentation R Λ :=
     Module.FinitePresentation.of_finite_of_finitePresentation _ _
-  exact ⟨Λ, inferInstance, inferInstance, inferInstance,
-    Module.Flat.projective_of_finitePresentation, e', e.hom.hom.isMonHom_hom⟩
+  exact ⟨
+    Λ,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    Module.Flat.projective_of_finitePresentation,
+    e',
+    e.hom.hom.isMonHom_hom
+  ⟩
 
-theorem exists_alg (Z : Over (Spec (CommRingCat.of R))) [IsAffine Z.left] :
-    ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B), Nonempty (specOver R B ≅ Z) := by
+theorem exists_alg (Z : Over (Spec (CommRingCat.of R))) [IsAffine Z.left]
+    : ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B), Nonempty (specOver R B ≅ Z) := by
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (Z.left.isoSpec.inv ≫ Z.hom)
   refine ⟨Γ(Z.left, ⊤), inferInstance, φ.hom.toAlgebra, ⟨Over.isoMk Z.left.isoSpec.symm ?_⟩⟩
   exact hφ.symm
@@ -94,17 +110,23 @@ lemma specHom_surjective {S T : Type} [CommRing S] [CommRing T] [Algebra R S] [A
 
 variable {H Z : Over (Spec (CommRingCat.of R))} [GrpObj H] [ModObj H Z]
 
-theorem exists_rightCoaction (i : specOver R Λ ⟶ H) (v : specOver R B ≅ Z) :
-    ∃ ρ : B →ₐ[R] B ⊗[R] Λ, specHom ρ ≫ v.hom =
-      (specHom (includeRight : Λ →ₐ[R] B ⊗[R] Λ) ≫ i)⁻¹ •
-        (specHom (includeLeft : B →ₐ[R] B ⊗[R] Λ) ≫ v.hom) := by
-  obtain ⟨ρ, hρ⟩ := specHom_surjective (((specHom (includeRight : Λ →ₐ[R] B ⊗[R] Λ) ≫ i)⁻¹ •
-        (specHom (includeLeft : B →ₐ[R] B ⊗[R] Λ) ≫ v.hom)) ≫ v.inv)
+theorem exists_rightCoaction (i : specOver R Λ ⟶ H) (v : specOver R B ≅ Z)
+    : ∃ ρ : B →ₐ[R] B ⊗[R] Λ,
+      specHom ρ ≫ v.hom
+        = (specHom (includeRight : Λ →ₐ[R] B ⊗[R] Λ) ≫ i)⁻¹
+          • (specHom (includeLeft : B →ₐ[R] B ⊗[R] Λ) ≫ v.hom) := by
+  obtain ⟨ρ, hρ⟩ :=
+    specHom_surjective
+      (((specHom (includeRight : Λ →ₐ[R] B ⊗[R] Λ) ≫ i)⁻¹
+          • (specHom (includeLeft : B →ₐ[R] B ⊗[R] Λ) ≫ v.hom))
+        ≫ v.inv)
   exact ⟨ρ, by simp [hρ]⟩
 
-variable (i : specOver R Λ ⟶ H) (v : specOver R B ⟶ Z) (ρ : B →ₐ[R] B ⊗[R] Λ)
-  (hρ : specHom ρ ≫ v = (specHom (includeRight : Λ →ₐ[R] B ⊗[R] Λ) ≫ i)⁻¹ •
-    (specHom (includeLeft : B →ₐ[R] B ⊗[R] Λ) ≫ v))
+variable
+  (i : specOver R Λ ⟶ H) (v : specOver R B ⟶ Z) (ρ : B →ₐ[R] B ⊗[R] Λ)
+  (hρ : specHom ρ ≫ v
+    = (specHom (includeRight : Λ →ₐ[R] B ⊗[R] Λ) ≫ i)⁻¹
+      • (specHom (includeLeft : B →ₐ[R] B ⊗[R] Λ) ≫ v))
 
 include hρ
 
@@ -257,36 +279,37 @@ def invIso (H : Over (Spec (CommRingCat.of R))) [GrpObj H] : H ≅ H where
     have h : ι[H] = (𝟙 H)⁻¹ := by rw [Hom.inv_def]; simp
     rw [h, comp_inv'', Category.comp_id, inv_inv]
 
-theorem affine_chart (H Z : Over (Spec (CommRingCat.of R))) [GrpObj H] [ModObj H Z]
-    (hH : IsFiniteLocallyFree H.hom) (hf : IsFreeAction H Z) [IsAffine Z.left] :
-    ∃ (Y : Scheme.{0}) (q : Z.left ⟶ Y), IsAffine Y ∧ IsFinite q ∧ Flat q ∧
-      LocallyOfFinitePresentation q ∧ Surjective q ∧
-      IsPullback (γ[H, Z] : H ⊗ Z ⟶ Z).left (snd H Z).left q q := by
+theorem affine_chart
+    (H Z : Over (Spec (CommRingCat.of R))) [GrpObj H] [ModObj H Z]
+    (hH : IsFiniteLocallyFree H.hom) (hf : IsFreeAction H Z)
+    [IsAffine Z.left]
+    : ∃ (Y : Scheme.{0}) (q : Z.left ⟶ Y),
+      IsAffine Y ∧ IsFinite q ∧ Flat q ∧ LocallyOfFinitePresentation q ∧ Surjective q
+        ∧ IsPullback (γ[H, Z] : H ⊗ Z ⟶ Z).left (snd H Z).left q q := by
   obtain ⟨Λ, _, _, _, _, e, _⟩ := exists_hopf H hH
   obtain ⟨B, _, _, ⟨v⟩⟩ := exists_alg Z
   obtain ⟨ρ, hρ⟩ := exists_rightCoaction e.hom v
   have hs := rightCoaction_free e.hom v.hom ρ hρ hf
-  obtain ⟨h₁, -, h₃, h₄⟩ := GlobalTheory.HopfQuot.finite_faithfullyFlat_ker ρ
-    (rightCoaction_assoc e.hom v.hom ρ hρ) (rightCoaction_counit e.hom v.hom ρ hρ) hs
+  obtain ⟨h₁, -, h₃, h₄⟩ :=
+    GlobalTheory.HopfQuot.finite_faithfullyFlat_ker ρ (rightCoaction_assoc e.hom v.hom ρ hρ)
+      (rightCoaction_counit e.hom v.hom ρ hρ) hs
   let C : Subring B := ρ.toRingHom.eqLocus (includeLeft : B →ₐ[R] B ⊗[R] Λ).toRingHom
   let c : CommRingCat.of C ⟶ CommRingCat.of B := CommRingCat.ofHom C.subtype
   have po : IsPushout c c (CommRingCat.ofHom ρ.toRingHom)
       (CommRingCat.ofHom (includeLeft : B →ₐ[R] B ⊗[R] Λ).toRingHom) := by
     let β : B →ₐ[R] B ⊗[R] Λ := includeLeft
     refine ⟨⟨by ext x; exact x.2⟩, ⟨PushoutCocone.isColimitAux' _ fun s ↦ ?_⟩⟩
-    have he (b : B) (hb : ρ b = β b) : s.inl b = s.inr b :=
-      congr($(s.condition) ⟨b, hb⟩)
+    have he (b : B) (hb : ρ b = β b) : s.inl b = s.inr b := congr($(s.condition) ⟨b, hb⟩)
     let : Algebra R s.pt := (s.inl.hom.comp (algebraMap R B)).toAlgebra
     let φ : B →ₐ[R] s.pt := ⟨s.inl.hom, fun _ ↦ rfl⟩
     let ψ : B →ₐ[R] s.pt := ⟨s.inr.hom, fun r ↦ (he _ (by simp [β])).symm⟩
-    have hk : RingHom.ker (productMap β ρ).toRingHom ≤
-        RingHom.ker (productMap ψ φ).toRingHom := by
+    have hk : RingHom.ker (productMap β ρ).toRingHom ≤ RingHom.ker (productMap ψ φ).toRingHom := by
       refine h₄.le.trans (Ideal.span_le.2 ?_)
       rintro _ ⟨b, hb, rfl⟩
       have : ψ b = φ b := (he b hb).symm
       simpa [sub_eq_zero, RingHom.mem_ker] using this
-    let d : B ⊗[R] Λ →+* s.pt := (productMap β ρ).toRingHom.liftOfSurjective hs
-      ⟨(productMap ψ φ).toRingHom, hk⟩
+    let d : B ⊗[R] Λ →+* s.pt :=
+      (productMap β ρ).toRingHom.liftOfSurjective hs ⟨(productMap ψ φ).toRingHom, hk⟩
     have hd (z) : d (productMap β ρ z) = productMap ψ φ z :=
       RingHom.liftOfRightInverse_comp_apply (productMap β ρ).toRingHom _ _ _ z
     refine ⟨CommRingCat.ofHom d, ?_, ?_, fun {m} hm₁ hm₂ ↦ ?_⟩
@@ -345,12 +368,12 @@ section Open
 
 variable {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X]
 
-theorem exists_openAction (V : X.left.Opens)
-    (hst : (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V) :
-    ∃ _ : ModObj G (Over.mk (V.ι ≫ X.hom)),
-      (γ[G, Over.mk (V.ι ≫ X.hom)] : G ⊗ Over.mk (V.ι ≫ X.hom) ⟶ Over.mk (V.ι ≫ X.hom)) ≫
-        (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X) =
-      G ◁ (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X) ≫ γ[G, X] := by
+theorem exists_openAction
+    (V : X.left.Opens) (hst : (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V)
+    : ∃ _ : ModObj G (Over.mk (V.ι ≫ X.hom)),
+      (γ[G, Over.mk (V.ι ≫ X.hom)] : G ⊗ Over.mk (V.ι ≫ X.hom) ⟶ Over.mk (V.ι ≫ X.hom))
+          ≫ (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X)
+        = G ◁ (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X) ≫ γ[G, X] := by
   let Z : Over S := Over.mk (V.ι ≫ X.hom)
   let m : Z ⟶ X := Over.homMk V.ι rfl
   have : Mono m.left := inferInstanceAs (Mono V.ι)
@@ -366,10 +389,11 @@ theorem exists_openAction (V : X.left.Opens)
       exact ((snd G Z).left p).2
     rw [← hst] at h1
     simpa [u, Scheme.Hom.comp_apply] using h1
-  let t : G ⊗ Z ⟶ Z := Over.homMk (IsOpenImmersion.lift V.ι u.left hu) (by
-    change IsOpenImmersion.lift V.ι u.left hu ≫ V.ι ≫ X.hom = _
-    rw [IsOpenImmersion.lift_fac_assoc]
-    exact Over.w u)
+  let t : G ⊗ Z ⟶ Z :=
+    Over.homMk (IsOpenImmersion.lift V.ι u.left hu) (by
+      change IsOpenImmersion.lift V.ι u.left hu ≫ V.ι ≫ X.hom = _
+      rw [IsOpenImmersion.lift_fac_assoc]
+      exact Over.w u)
   have ht : t ≫ m = u := by
     ext1
     exact IsOpenImmersion.lift_fac _ _ _
@@ -387,17 +411,18 @@ theorem exists_openAction (V : X.left.Opens)
     simp only [u, whiskerLeft_comp, Category.assoc]
     rw [associator_naturality_right_assoc]
 
-theorem hasAffineChart_of_open (V : X.left.Opens)
-    (hst : (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V)
+theorem hasAffineChart_of_open
+    (V : X.left.Opens) (hst : (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V)
     [ModObj G (Over.mk (V.ι ≫ X.hom))]
-    (hm : (γ[G, Over.mk (V.ι ≫ X.hom)] : G ⊗ Over.mk (V.ι ≫ X.hom) ⟶ Over.mk (V.ι ≫ X.hom)) ≫
-        (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X) =
-      G ◁ (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X) ≫ γ[G, X])
+    (hm : (γ[G, Over.mk (V.ι ≫ X.hom)] : G ⊗ Over.mk (V.ι ≫ X.hom) ⟶ Over.mk (V.ι ≫ X.hom))
+        ≫ (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X)
+      = G ◁ (Over.homMk V.ι rfl : Over.mk (V.ι ≫ X.hom) ⟶ X) ≫ γ[G, X])
     (Y : Scheme.{0}) (q : V.toScheme ⟶ Y) (hY : IsAffine Y) (h₁ : IsFinite q) (h₂ : Flat q)
     (h₃ : LocallyOfFinitePresentation q) (h₄ : Surjective q)
-    (pb : IsPullback (γ[G, Over.mk (V.ι ≫ X.hom)] : G ⊗ Over.mk (V.ι ≫ X.hom) ⟶ Over.mk (V.ι ≫ X.hom)).left
-      (snd G (Over.mk (V.ι ≫ X.hom))).left q q) :
-    HasAffineChart (γ[G, X] : G ⊗ X ⟶ X).left (snd G X).left V := by
+    (pb : IsPullback
+      (γ[G, Over.mk (V.ι ≫ X.hom)] : G ⊗ Over.mk (V.ι ≫ X.hom) ⟶ Over.mk (V.ι ≫ X.hom)).left
+      (snd G (Over.mk (V.ι ≫ X.hom))).left q q)
+    : HasAffineChart (γ[G, X] : G ⊗ X ⟶ X).left (snd G X).left V := by
   let Z : Over S := Over.mk (V.ι ≫ X.hom)
   let m : Z ⟶ X := Over.homMk V.ι rfl
   have P : IsPullback (G ◁ m) (snd G Z) (snd G X) m := by
@@ -431,13 +456,11 @@ end Open
 
 section Base
 
-theorem mono_of_free {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X]
-    (hf : IsFreeAction G X) : Mono (lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X)) := by
+theorem mono_of_free {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X] (hf : IsFreeAction G X)
+    : Mono (lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X)) := by
   refine ⟨fun {T} a b h ↦ ?_⟩
-  have h₁ : a ≫ γ[G, X] = b ≫ γ[G, X] := by
-    simpa using congr($h ≫ fst X X)
-  have h₂ : a ≫ snd G X = b ≫ snd G X := by
-    simpa using congr($h ≫ snd X X)
+  have h₁ : a ≫ γ[G, X] = b ≫ γ[G, X] := by simpa using congr($h ≫ fst X X)
+  have h₂ : a ≫ snd G X = b ≫ snd G X := by simpa using congr($h ≫ snd X X)
   have ea : ∀ c : T ⟶ G ⊗ X, c ≫ γ[G, X] = (c ≫ fst G X) • (c ≫ snd G X) := by
     intro c
     rw [Hom.smul_def, ← comp_lift, lift_fst_snd, Category.comp_id]
@@ -449,12 +472,16 @@ theorem mono_of_free {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X]
   · exact (inv_mul_eq_one.1 h₃).symm
   · exact h₂
 
-theorem free_of_mono {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X]
-    (h : Mono (lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X))) : IsFreeAction G X := by
+theorem free_of_mono
+    {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X]
+    (h : Mono (lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X)))
+    : IsFreeAction G X := by
   intro T g x e
-  have e₁ : lift g x ≫ lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X) =
-      lift (1 : T ⟶ G) x ≫ lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X) := by
-    rw [comp_lift, comp_lift, ← Hom.smul_def, ← Hom.smul_def, e, _root_.one_smul, lift_snd, lift_snd]
+  have e₁
+      : lift g x ≫ lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X)
+        = lift (1 : T ⟶ G) x ≫ lift (γ[G, X] : G ⊗ X ⟶ X) (snd G X) := by
+    rw [comp_lift, comp_lift, ← Hom.smul_def, ← Hom.smul_def, e, _root_.one_smul, lift_snd,
+      lift_snd]
   have := (cancel_mono _).1 e₁
   simpa using congr($this ≫ fst G X)
 
@@ -468,48 +495,60 @@ lemma isIso_pullback_fst [Mono j] (W : Over S) (z : W.left ⟶ S') (hz : z ≫ j
   · rw [← cancel_mono j]
     simp [pullback.condition, hz]
 
-theorem baseChange_compare [Mono j] (G Z : Over S) [GrpObj G] [ModObj G Z] (z : Z.left ⟶ S')
-    (hz : z ≫ j = Z.hom) :
-    letI := Functor.grpObjObj (F := Over.pullback j) (G := G)
-    letI := modObjObj (Over.pullback j) G Z
-    IsIso (pullback.fst Z.hom j) ∧
-      ∃ e : (((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z)).left ≅ (G ⊗ Z).left,
-      e.hom ≫ (γ[G, Z] : G ⊗ Z ⟶ Z).left =
-        (γ[(Over.pullback j).obj G, (Over.pullback j).obj Z] :
-          ((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z) ⟶ (Over.pullback j).obj Z).left ≫
-          pullback.fst Z.hom j ∧
-      e.hom ≫ (snd G Z).left =
-        (snd ((Over.pullback j).obj G) ((Over.pullback j).obj Z)).left ≫ pullback.fst Z.hom j := by
+theorem baseChange_compare
+    [Mono j] (G Z : Over S) [GrpObj G] [ModObj G Z] (z : Z.left ⟶ S') (hz : z ≫ j = Z.hom)
+    : letI := Functor.grpObjObj (F := Over.pullback j) (G := G)
+      letI := modObjObj (Over.pullback j) G Z
+      IsIso (pullback.fst Z.hom j)
+        ∧ ∃ e : (((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z)).left ≅ (G ⊗ Z).left,
+          e.hom ≫ (γ[G, Z] : G ⊗ Z ⟶ Z).left
+              = (γ[(Over.pullback j).obj G, (Over.pullback j).obj Z]
+                  : ((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z)
+                    ⟶ (Over.pullback j).obj Z).left
+                ≫ pullback.fst Z.hom j
+            ∧ e.hom ≫ (snd G Z).left
+              = (snd ((Over.pullback j).obj G) ((Over.pullback j).obj Z)).left
+                ≫ pullback.fst Z.hom j := by
   refine ⟨isIso_pullback_fst j Z z hz, ?_⟩
   have iW : IsIso (pullback.fst (G ⊗ Z).hom j) :=
     isIso_pullback_fst j (G ⊗ Z) ((snd G Z).left ≫ z)
       (by rw [Category.assoc, hz]; exact Over.w (snd G Z))
-  have nat : ∀ {A B : Over S} (f : A ⟶ B), ((Over.pullback j).map f).left ≫ pullback.fst B.hom j =
-      pullback.fst A.hom j ≫ f.left := by
+  have nat
+      : ∀ {A B : Over S} (f : A ⟶ B),
+        ((Over.pullback j).map f).left ≫ pullback.fst B.hom j = pullback.fst A.hom j ≫ f.left := by
     intro A B f
     simp
-  refine ⟨(Over.forget _).mapIso (Functor.Monoidal.μIso (Over.pullback j) G Z) ≪≫
-    asIso (pullback.fst (G ⊗ Z).hom j), ?_, ?_⟩
-  · change (Functor.LaxMonoidal.μ (Over.pullback j) G Z).left ≫ pullback.fst (G ⊗ Z).hom j ≫ _ = (Functor.LaxMonoidal.μ (Over.pullback j) G Z ≫ (Over.pullback j).map γ[G, Z]).left ≫ _
+  refine ⟨
+    (Over.forget _).mapIso (Functor.Monoidal.μIso (Over.pullback j) G Z)
+      ≪≫ asIso (pullback.fst (G ⊗ Z).hom j),
+    ?_,
+    ?_
+  ⟩
+  · change (Functor.LaxMonoidal.μ (Over.pullback j) G Z).left ≫ pullback.fst (G ⊗ Z).hom j ≫ _
+      = (Functor.LaxMonoidal.μ (Over.pullback j) G Z ≫ (Over.pullback j).map γ[G, Z]).left ≫ _
     rw [← nat, Over.comp_left, Category.assoc]
   · rw [← Functor.Monoidal.μ_snd (Over.pullback j) G Z]
-    change (Functor.LaxMonoidal.μ (Over.pullback j) G Z).left ≫ pullback.fst (G ⊗ Z).hom j ≫ _ = (Functor.LaxMonoidal.μ (Over.pullback j) G Z ≫ (Over.pullback j).map (snd G Z)).left ≫ _
+    change (Functor.LaxMonoidal.μ (Over.pullback j) G Z).left ≫ pullback.fst (G ⊗ Z).hom j ≫ _
+      = (Functor.LaxMonoidal.μ (Over.pullback j) G Z ≫ (Over.pullback j).map (snd G Z)).left ≫ _
     rw [← nat, Over.comp_left, Category.assoc]
 
-theorem baseChange_free (G Z : Over S) [GrpObj G] [ModObj G Z] (hf : IsFreeAction G Z) :
-    letI := Functor.grpObjObj (F := Over.pullback j) (G := G)
-    letI := modObjObj (Over.pullback j) G Z
-    IsFreeAction ((Over.pullback j).obj G) ((Over.pullback j).obj Z) := by
+theorem baseChange_free (G Z : Over S) [GrpObj G] [ModObj G Z] (hf : IsFreeAction G Z)
+    : letI := Functor.grpObjObj (F := Over.pullback j) (G := G)
+      letI := modObjObj (Over.pullback j) G Z
+      IsFreeAction ((Over.pullback j).obj G) ((Over.pullback j).obj Z) := by
   letI := Functor.grpObjObj (F := Over.pullback j) (G := G)
   letI := modObjObj (Over.pullback j) G Z
   apply free_of_mono
   have := mono_of_free G Z hf
   have hm : Mono ((Over.pullback j).map (lift (γ[G, Z] : G ⊗ Z ⟶ Z) (snd G Z))) := inferInstance
-  have key : Functor.LaxMonoidal.μ (Over.pullback j) G Z ≫
-        (Over.pullback j).map (lift (γ[G, Z] : G ⊗ Z ⟶ Z) (snd G Z)) =
-      lift (γ[(Over.pullback j).obj G, (Over.pullback j).obj Z] :
-          ((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z) ⟶ (Over.pullback j).obj Z)
-        (snd _ _) ≫ Functor.LaxMonoidal.μ (Over.pullback j) Z Z := by
+  have key
+      : Functor.LaxMonoidal.μ (Over.pullback j) G Z
+          ≫ (Over.pullback j).map (lift (γ[G, Z] : G ⊗ Z ⟶ Z) (snd G Z))
+        = lift
+            (γ[(Over.pullback j).obj G, (Over.pullback j).obj Z]
+              : ((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z) ⟶ (Over.pullback j).obj Z)
+            (snd _ _)
+          ≫ Functor.LaxMonoidal.μ (Over.pullback j) Z Z := by
     rw [← cancel_mono (Functor.OplaxMonoidal.δ (Over.pullback j) Z Z)]
     simp only [Category.assoc, Functor.Monoidal.μ_δ, Category.comp_id]
     apply CartesianMonoidalCategory.hom_ext
@@ -518,19 +557,24 @@ theorem baseChange_free (G Z : Over S) [GrpObj G] [ModObj G Z] (hf : IsFreeActio
       rfl
     · rw [lift_snd, Category.assoc, Category.assoc, Functor.OplaxMonoidal.δ_snd, ← Functor.map_comp,
         lift_snd, Functor.Monoidal.μ_snd]
-  have : Mono (lift (γ[(Over.pullback j).obj G, (Over.pullback j).obj Z] :
-          ((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z) ⟶ (Over.pullback j).obj Z)
-        (snd _ _) ≫ Functor.LaxMonoidal.μ (Over.pullback j) Z Z) := by
+  have : Mono
+      (lift
+          (γ[(Over.pullback j).obj G, (Over.pullback j).obj Z]
+            : ((Over.pullback j).obj G) ⊗ ((Over.pullback j).obj Z) ⟶ (Over.pullback j).obj Z)
+          (snd _ _)
+        ≫ Functor.LaxMonoidal.μ (Over.pullback j) Z Z) := by
     rw [← key]; infer_instance
   exact mono_of_mono _ (Functor.LaxMonoidal.μ (Over.pullback j) Z Z)
 
 end Base
 
-theorem hasAffineChart_of_stable : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X],
-    IsFiniteLocallyFree G.hom → IsFreeAction G X → ∀ (V : X.left.Opens) (W : S.Opens),
-    IsAffineOpen V → IsAffineOpen W → V ≤ X.hom ⁻¹ᵁ W →
-    (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V →
-    HasAffineChart (γ[G, X] : G ⊗ X ⟶ X).left (snd G X).left V := by
+theorem hasAffineChart_of_stable
+    : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj G] [ModObj G X],
+      IsFiniteLocallyFree G.hom → IsFreeAction G X
+        → ∀ (V : X.left.Opens) (W : S.Opens),
+          IsAffineOpen V → IsAffineOpen W → V ≤ X.hom ⁻¹ᵁ W
+            → (γ[G, X] : G ⊗ X ⟶ X).left ⁻¹ᵁ V = (snd G X).left ⁻¹ᵁ V
+            → HasAffineChart (γ[G, X] : G ⊗ X ⟶ X).left (snd G X).left V := by
   intro S G X _ _ hG hf V W hV hW hVW hst
   obtain ⟨_, hm⟩ := exists_openAction G X V hst
   let j : Spec (CommRingCat.of Γ(S, W)) ⟶ S := hW.fromSpec
@@ -557,15 +601,19 @@ theorem hasAffineChart_of_stable : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj G
   have hfZ' := baseChange_free j G Z hfZ
   have hH : IsFiniteLocallyFree ((Over.pullback j).obj G).hom := by
     obtain ⟨a, b, c⟩ := hG
-    exact ⟨inferInstanceAs (IsFinite (pullback.snd G.hom j)),
+    exact ⟨
+      inferInstanceAs (IsFinite (pullback.snd G.hom j)),
       inferInstanceAs (Flat (pullback.snd G.hom j)),
-      inferInstanceAs (LocallyOfFinitePresentation (pullback.snd G.hom j))⟩
+      inferInstanceAs (LocallyOfFinitePresentation (pullback.snd G.hom j))
+    ⟩
   have : IsAffine ((Over.pullback j).obj Z).left := by
     have : IsAffine Z.left := hV
     exact IsAffine.of_isIso (pullback.fst Z.hom j)
   obtain ⟨Y, q', a1, a2, a3, a4, a5, pb⟩ := affine_chart _ _ hH hfZ'
-  refine hasAffineChart_of_open G X V hst hm Y (inv (pullback.fst Z.hom j) ≫ q') a1 (by infer_instance) (by infer_instance) (by infer_instance) (by infer_instance) ?_
-  refine pb.of_iso e (asIso (pullback.fst Z.hom j)) (asIso (pullback.fst Z.hom j)) (Iso.refl _) ?_ ?_ ?_ ?_
+  refine hasAffineChart_of_open G X V hst hm Y (inv (pullback.fst Z.hom j) ≫ q') a1
+    (by infer_instance) (by infer_instance) (by infer_instance) (by infer_instance) ?_
+  refine pb.of_iso e (asIso (pullback.fst Z.hom j)) (asIso (pullback.fst Z.hom j)) (Iso.refl _) ?_
+    ?_ ?_ ?_
   · exact he₁.symm
   · exact he₂.symm
   · simp

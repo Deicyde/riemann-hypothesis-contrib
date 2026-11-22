@@ -15,8 +15,11 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ThetaA
 
 open NumberField IsDedekindDomain
 open scoped TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
-  Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.CoverRead GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.CoverRead
+  GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option synthInstance.maxHeartbeats 400000
@@ -38,21 +41,23 @@ def divPts (Λ : AddSubgroup (WO S T)) (c : AE D) (N : ℕ) : AddSubgroup (WO S 
     rintro x ⟨hx1, hx2⟩
     exact ⟨by rw [smul_neg, hx1], by rw [smul_neg]; exact Λ.neg_mem hx2⟩
 
-theorem mem_divPts {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ} {y : WO S T} :
-    y ∈ divPts Λ c N ↔ c • y = y ∧ N • y ∈ Λ := Iff.rfl
+theorem mem_divPts {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ} {y : WO S T}
+    : y ∈ divPts Λ c N ↔ c • y = y ∧ N • y ∈ Λ :=
+  Iff.rfl
 
 abbrev DQ (Λ : AddSubgroup (WO S T)) (c : AE D) (N : ℕ) :=
   ↥(divPts Λ c N) ⧸ (Λ ⊓ GlobalTheory.PlaceModel.half S T c).addSubgroupOf (divPts Λ c N)
 
-noncomputable def rep {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ} (q : DQ Λ c N) : ↥(divPts Λ c N) :=
+noncomputable def rep {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ} (q : DQ Λ c N)
+    : ↥(divPts Λ c N) :=
   (QuotientAddGroup.mk_surjective q).choose
 
-theorem mk_rep {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ} (q : DQ Λ c N) :
-    (QuotientAddGroup.mk (rep q) : DQ Λ c N) = q :=
+theorem mk_rep {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ} (q : DQ Λ c N)
+    : (QuotientAddGroup.mk (rep q) : DQ Λ c N) = q :=
   (QuotientAddGroup.mk_surjective q).choose_spec
 
-theorem rep_injective {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ} :
-    Function.Injective fun q : DQ Λ c N => ((rep q : ↥(divPts Λ c N)) : WO S T) := by
+theorem rep_injective {Λ : AddSubgroup (WO S T)} {c : AE D} {N : ℕ}
+    : Function.Injective fun q : DQ Λ c N => ((rep q : ↥(divPts Λ c N)) : WO S T) := by
   intro q₁ q₂ h
   rw [← mk_rep q₁, ← mk_rep q₂, Subtype.ext h]
 

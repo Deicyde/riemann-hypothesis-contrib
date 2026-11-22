@@ -15,11 +15,13 @@ universe w' w v u
 
 section EndAction
 
-variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
+variable
+  {C : Type u} [Category.{v} C]
+  {J : GrothendieckTopology C}
   [HasSheafify J AddCommGrpCat.{w}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{w})]
 
-noncomputable def H.endRingHom (G : Sheaf J AddCommGrpCat.{w}) (n : ℕ) :
-    End G →+* AddMonoid.End (Sheaf.H.{w'} G n) where
+noncomputable def H.endRingHom (G : Sheaf J AddCommGrpCat.{w}) (n : ℕ)
+    : End G →+* AddMonoid.End (Sheaf.H.{w'} G n) where
   toFun f := Sheaf.H.map f.asHom n
   map_one' := by
     ext x
@@ -33,8 +35,7 @@ noncomputable def H.endRingHom (G : Sheaf J AddCommGrpCat.{w}) (n : ℕ) :
     rw [Sheaf.H.map_apply, Abelian.Ext.mk₀_zero, Abelian.Ext.comp_zero]
   map_add' f g := by
     ext x
-    change Sheaf.H.map (f.asHom + g.asHom) n x =
-      Sheaf.H.map f.asHom n x + Sheaf.H.map g.asHom n x
+    change Sheaf.H.map (f.asHom + g.asHom) n x = Sheaf.H.map f.asHom n x + Sheaf.H.map g.asHom n x
     exact Sheaf.H.map_add_apply f.asHom g.asHom x
 
 end EndAction
@@ -53,16 +54,21 @@ lemma restrictTop_restrict {U V : X.Opens} (i : U ⟶ V) (r : Γ(X, ⊤)) :
 
 noncomputable def smulHom (F : X.Modules) (r : Γ(X, ⊤)) : F ⟶ F :=
   ⟨PresheafOfModules.homMk
-    { app := fun U => (Scheme.Modules.smul (M := F) (U := U.unop) (restrictTop U.unop r)).asHom
+    {
+      app := fun U => (Scheme.Modules.smul (M := F) (U := U.unop) (restrictTop U.unop r)).asHom
       naturality := fun {U V} f => by
-        induction U with | op U => ?_
-        induction V with | op V => ?_
+        induction U with
+        | op U => ?_
+        induction V with
+        | op V => ?_
         ext x
         let x' : Γ(F, U) := x
         change restrictTop V r • F.presheaf.map f x' = F.presheaf.map f (restrictTop U r • x')
-        rw [show f = f.unop.op from rfl, Scheme.Modules.map_smul, restrictTop_restrict] }
+        rw [show f = f.unop.op from rfl, Scheme.Modules.map_smul, restrictTop_restrict]
+    }
     (fun U s m => by
-      induction U with | op U => ?_
+      induction U with
+      | op U => ?_
       let m' : Γ(F, U) := m
       let s' : Γ(X, U) := s
       change restrictTop U r • (s' • m') = s' • (restrictTop U r • m')
@@ -88,8 +94,8 @@ noncomputable def smulRingHom (F : X.Modules) : Γ(X, ⊤) →+* End F where
     apply End.ext
     change smulHom F (r * s) = smulHom F s ≫ smulHom F r
     ext U x
-    simp only [smulHom_app_apply, Scheme.Modules.Hom.comp_app, ConcreteCategory.comp_apply,
-      map_mul, mul_smul]
+    simp only [smulHom_app_apply, Scheme.Modules.Hom.comp_app, ConcreteCategory.comp_apply, map_mul,
+      mul_smul]
   map_zero' := by
     apply End.ext
     change smulHom F 0 = 0
@@ -116,8 +122,8 @@ noncomputable def smulAbRingHom (F : X.Modules) : Γ(X, ⊤) →+* End (modulesA
     exact (SheafOfModules.toSheaf X.ringCatSheaf).map_id F
   map_mul' r s := by
     apply End.ext
-    change modulesAbMap (smulHom F (r * s)) =
-      modulesAbMap (smulHom F s) ≫ modulesAbMap (smulHom F r)
+    change modulesAbMap (smulHom F (r * s))
+      = modulesAbMap (smulHom F s) ≫ modulesAbMap (smulHom F r)
     rw [← smulRingHom_apply, map_mul, End.mul_asHom, smulRingHom_apply, smulRingHom_apply]
     exact (SheafOfModules.toSheaf X.ringCatSheaf).map_comp _ _
   map_zero' := by
@@ -127,8 +133,8 @@ noncomputable def smulAbRingHom (F : X.Modules) : Γ(X, ⊤) →+* End (modulesA
     exact (SheafOfModules.toSheaf X.ringCatSheaf).map_zero F F
   map_add' r s := by
     apply End.ext
-    change modulesAbMap (smulHom F (r + s)) =
-      modulesAbMap (smulHom F r) + modulesAbMap (smulHom F s)
+    change modulesAbMap (smulHom F (r + s))
+      = modulesAbMap (smulHom F r) + modulesAbMap (smulHom F s)
     rw [← smulRingHom_apply, map_add]
     exact (SheafOfModules.toSheaf X.ringCatSheaf).map_add
 
@@ -152,30 +158,30 @@ end Scalar
 
 section Module
 
-variable {X : Scheme.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
+variable
+  {X : Scheme.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
   (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
 
-noncomputable def H.actRingHom (F : X.Modules) (n : ℕ) :
-    A →+* AddMonoid.End (Sheaf.H.{w'} (modulesAb F) n) :=
+noncomputable def H.actRingHom (F : X.Modules) (n : ℕ)
+    : A →+* AddMonoid.End (Sheaf.H.{w'} (modulesAb F) n) :=
   ((H.endRingHom (modulesAb F) n).comp (smulAbRingHom F)).comp (algebraMap A Γ(X, ⊤))
 
-noncomputable instance H.instModule (F : X.Modules) (n : ℕ) :
-    Module A (Sheaf.H.{w'} (modulesAb F) n) :=
+noncomputable instance H.instModule (F : X.Modules) (n : ℕ)
+    : Module A (Sheaf.H.{w'} (modulesAb F) n) :=
   Module.compHom _ (H.actRingHom A F n)
 
 lemma H.smul_def (F : X.Modules) (n : ℕ) (a : A) (x : Sheaf.H.{w'} (modulesAb F) n) :
     a • x = Sheaf.H.map.{w'} (modulesAbMap
       (smulHom F (algebraMap A Γ(X, ⊤) a))) n x := rfl
 
-noncomputable def H.linearMap {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    Sheaf.H.{w'} (modulesAb F) n →ₗ[A] Sheaf.H.{w'} (modulesAb G) n where
+noncomputable def H.linearMap {F G : X.Modules} (φ : F ⟶ G) (n : ℕ)
+    : Sheaf.H.{w'} (modulesAb F) n →ₗ[A] Sheaf.H.{w'} (modulesAb G) n where
   toFun := Sheaf.H.map.{w'} (modulesAbMap φ) n
   map_add' := map_add _
   map_smul' a x := by
     let r := algebraMap A Γ(X, ⊤) a
-    change Sheaf.H.map.{w'} (modulesAbMap φ) n
-        (Sheaf.H.map.{w'} (smulAbRingHom F r).asHom n x) =
-      Sheaf.H.map.{w'} (smulAbRingHom G r).asHom n (Sheaf.H.map.{w'} (modulesAbMap φ) n x)
+    change Sheaf.H.map.{w'} (modulesAbMap φ) n (Sheaf.H.map.{w'} (smulAbRingHom F r).asHom n x)
+      = Sheaf.H.map.{w'} (smulAbRingHom G r).asHom n (Sheaf.H.map.{w'} (modulesAbMap φ) n x)
     rw [← Sheaf.H.map_comp_apply, ← Sheaf.H.map_comp_apply, smulAbRingHom_comp]
 
 lemma H.linearMap_apply {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) (x : Sheaf.H.{w'} (modulesAb F) n) :

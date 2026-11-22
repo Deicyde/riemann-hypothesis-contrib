@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -20,8 +22,9 @@ namespace GlobalTheory.FieldPair.ResidueTransport
 
 variable {k M : Type} [Field k] [Field M] {c : k →+* M}
 
-theorem ord_prod_zpow {ι : Type} (P : Place c) (s : Finset ι) (f : ι → M) (n : ι → ℤ)
-    (hf : ∀ i ∈ s, f i ≠ 0) : P.ord (∏ i ∈ s, f i ^ n i) = ∑ i ∈ s, n i * P.ord (f i) := by
+theorem ord_prod_zpow
+    {ι : Type} (P : Place c) (s : Finset ι) (f : ι → M) (n : ι → ℤ) (hf : ∀ i ∈ s, f i ≠ 0)
+    : P.ord (∏ i ∈ s, f i ^ n i) = ∑ i ∈ s, n i * P.ord (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -31,25 +34,33 @@ theorem ord_prod_zpow {ι : Type} (P : Place c) (s : Finset ι) (f : ι → M) (
         (Finset.prod_ne_zero_iff.2 fun i hi => zpow_ne_zero _ (hf i (Finset.mem_insert_of_mem hi))),
       P.ord_zpow, ih fun i hi => hf i (Finset.mem_insert_of_mem hi)]
 
-theorem ordQ_mapDomain {ι : Type} (P : Place c) (φ : ι →₀ ℚ) (f : ι → M) :
-    P.ordQ (Finsupp.mapDomain f φ) = ∑ g ∈ φ.support, φ g * P.ord (f g) := by
+theorem ordQ_mapDomain {ι : Type} (P : Place c) (φ : ι →₀ ℚ) (f : ι → M)
+    : P.ordQ (Finsupp.mapDomain f φ) = ∑ g ∈ φ.support, φ g * P.ord (f g) := by
   rw [Place.ordQ, Finsupp.linearCombination_mapDomain, Finsupp.linearCombination_apply, Finsupp.sum]
   simp [smul_eq_mul]
 
-theorem ord_prod_eq_mul_ordQ {ι : Type} (P : Place c) (φ : ι →₀ ℚ) (f : ι → M) (N : ℕ)
-    (m : ι → ℤ) (hm : ∀ g ∈ φ.support, (m g : ℚ) = N * φ g) (hf : ∀ g ∈ φ.support, f g ≠ 0) :
-    (P.ord (∏ g ∈ φ.support, f g ^ m g) : ℚ) = N * P.ordQ (Finsupp.mapDomain f φ) := by
+theorem ord_prod_eq_mul_ordQ
+    {ι : Type}
+    (P : Place c)
+    (φ : ι →₀ ℚ)
+    (f : ι → M)
+    (N : ℕ) (m : ι → ℤ) (hm : ∀ g ∈ φ.support, (m g : ℚ) = N * φ g)
+    (hf : ∀ g ∈ φ.support, f g ≠ 0)
+    : (P.ord (∏ g ∈ φ.support, f g ^ m g) : ℚ) = N * P.ordQ (Finsupp.mapDomain f φ) := by
   rw [ord_prod_zpow P _ f m hf, ordQ_mapDomain, Finset.mul_sum]
   push_cast
   refine Finset.sum_congr rfl fun g hg => ?_
   rw [hm g hg]
   ring
 
-theorem exists_common_den {ι : Type} (s : Finset ι) (φ : ι → ℚ) :
-    ∃ N : ℕ, 0 < N ∧ ∀ g ∈ s, ∃ m : ℤ, (m : ℚ) = N * φ g := by
+theorem exists_common_den {ι : Type} (s : Finset ι) (φ : ι → ℚ)
+    : ∃ N : ℕ, 0 < N ∧ ∀ g ∈ s, ∃ m : ℤ, (m : ℚ) = N * φ g := by
   classical
-  refine ⟨∏ g ∈ s, (φ g).den, Finset.prod_pos fun g _ => (φ g).den_pos, fun g hg =>
-    ⟨(φ g).num * ∏ x ∈ s.erase g, ((φ x).den : ℤ), ?_⟩⟩
+  refine ⟨
+    ∏ g ∈ s, (φ g).den,
+    Finset.prod_pos fun g _ => (φ g).den_pos,
+    fun g hg => ⟨(φ g).num * ∏ x ∈ s.erase g, ((φ x).den : ℤ), ?_⟩
+  ⟩
   rw [← Finset.mul_prod_erase s _ hg]
   push_cast
   rw [← Rat.mul_den_eq_num]
@@ -59,22 +70,26 @@ end GlobalTheory.FieldPair.ResidueTransport
 
 namespace GlobalTheory.FieldPair
 
-
 open ResidueTransport in
-theorem ordQ_mapDomain_residue_eq {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K)
-    (Q : Subring L) (u : Q) (S E : Place cL) (ψ : S.ring →+* K) (F : Place cK)
-    (hSQ : S.Contains Q) (hSu : S.ord (u : L) = 0) (hu0 : (u : L) ≠ 0)
-    (hψ : Function.Surjective ψ)
+theorem ordQ_mapDomain_residue_eq
+    {L K : Type} [Field L] [Field K]
+    (cL : ℂ →+* L)
+    (cK : ℂ →+* K)
+    (Q : Subring L) (u : Q)
+    (S E : Place cL) (ψ : S.ring →+* K)
+    (F : Place cK)
+    (hSQ : S.Contains Q) (hSu : S.ord (u : L) = 0) (hu0 : (u : L) ≠ 0) (hψ : Function.Surjective ψ)
     (hF : ∀ a : K, a ∈ F.ring ↔ ∃ q : S.ring, (q : L) ∈ Q ∧ ψ q = a)
     (hFu : ∀ us : S.ring, (us : L) = u → F.ord (ψ us) = 1)
-    (hG : ∀ G : L, G ≠ 0 → (∀ P : Place cL, P.IsPrimeOf Q → P.ring ≠ E.ring → P.ord G = 0) →
-      ∃ q : Q, IsUnit q ∧ G = (q : L) * (u : L) ^ E.ord G)
+    (hG : ∀ G : L,
+      G ≠ 0 → (∀ P : Place cL, P.IsPrimeOf Q → P.ring ≠ E.ring → P.ord G = 0)
+        → ∃ q : Q, IsUnit q ∧ G = (q : L) * (u : L) ^ E.ord G)
     (φ : S.ring →₀ ℚ) (hsupp : ∀ g ∈ φ.support, ψ g ≠ 0)
-    (hPφ : ∀ P : Place cL, P.IsPrimeOf Q → P.ring ≠ S.ring → P.ring ≠ E.ring →
-      P.ordQ (Finsupp.mapDomain (fun g : S.ring => (g : L)) φ) = 0) :
-    F.ordQ (Finsupp.mapDomain ψ φ) =
-      E.ordQ (Finsupp.mapDomain (fun g : S.ring => (g : L)) φ) := by
-
+    (hPφ : ∀ P : Place cL,
+      P.IsPrimeOf Q → P.ring ≠ S.ring → P.ring ≠ E.ring
+        → P.ordQ (Finsupp.mapDomain (fun g : S.ring => (g : L)) φ) = 0)
+    : F.ordQ (Finsupp.mapDomain ψ φ)
+      = E.ordQ (Finsupp.mapDomain (fun g : S.ring => (g : L)) φ) := by
   have hker : RingHom.ker ψ = IsLocalRing.maximalIdeal S.ring :=
     IsLocalRing.eq_maximalIdeal (RingHom.ker_isMaximal_of_surjective ψ hψ)
   have hunit : ∀ g ∈ φ.support, IsUnit g := fun g hg =>
@@ -127,12 +142,11 @@ theorem ordQ_mapDomain_residue_eq {L K : Type} [Field L] [Field K] (cL : ℂ →
     simp only [W, map_prod, map_zpow, Units.coe_prod, Units.val_zpow_eq_zpow_val, hf]
     exact Finset.prod_congr rfl fun g hg => by rw [hw g hg]
   have hWeq : W = qU * uU ^ b := by
-    have hinj : Function.Injective e := fun x y h =>
-      Units.ext (Subtype.ext (by rw [← he, ← he, h]))
+    have hinj : Function.Injective e := fun x y h => Units.ext (Subtype.ext (by rw [← he, ← he, h]))
     apply hinj
     apply Units.ext
-    rw [heW, map_mul, map_zpow, Units.val_mul, Units.val_zpow_eq_zpow_val, he, he,
-      IsUnit.unit_spec, IsUnit.unit_spec]
+    rw [heW, map_mul, map_zpow, Units.val_mul, Units.val_zpow_eq_zpow_val, he, he, IsUnit.unit_spec,
+      IsUnit.unit_spec]
     exact hGq
   have hH : H = ψ qS * ψ uS ^ b := by
     rw [← hfW, hWeq, map_mul, map_zpow, Units.val_mul, Units.val_zpow_eq_zpow_val, hf, hf,
@@ -144,8 +158,8 @@ theorem ordQ_mapDomain_residue_eq {L K : Type} [Field L] [Field K] (cL : ℂ →
   have hFq : F.ord (ψ qS) = 0 := by
     have h1 : 0 ≤ F.ord (ψ qS) := (F.ord_nonneg_iff hψq0).2 ((hF _).2 ⟨qS, q.2, rfl⟩)
     have hinv : (ψ qS)⁻¹ = ψ rS := inv_eq_of_mul_eq_one_right hq0
-    have h2 : 0 ≤ F.ord (ψ qS)⁻¹ := (F.ord_nonneg_iff (inv_ne_zero hψq0)).2
-      (by rw [hinv]; exact (hF _).2 ⟨rS, r.2, rfl⟩)
+    have h2 : 0 ≤ F.ord (ψ qS)⁻¹ :=
+      (F.ord_nonneg_iff (inv_ne_zero hψq0)).2 (by rw [hinv]; exact (hF _).2 ⟨rS, r.2, rfl⟩)
     rw [F.ord_inv] at h2
     omega
   have hFH : F.ord H = b := by

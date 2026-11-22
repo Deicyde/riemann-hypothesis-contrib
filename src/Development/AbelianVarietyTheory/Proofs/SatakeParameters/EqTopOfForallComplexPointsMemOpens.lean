@@ -16,15 +16,18 @@ noncomputable section
 
 namespace GlobalTheory.MaxPt
 
-theorem eq_top_of_forall_cxPts_mem : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] (U : X.Opens),
-    (∀ z : CxPts p (RingHom.id ℂ), z ∈ CxPts.ptsIn p (RingHom.id ℂ) U) → U = ⊤ := by
+theorem eq_top_of_forall_cxPts_mem
+    : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] (U : X.Opens),
+      (∀ z : CxPts p (RingHom.id ℂ), z ∈ CxPts.ptsIn p (RingHom.id ℂ) U) → U = ⊤ := by
   intro X p _ U hall
   by_contra hU
   obtain ⟨x, hx⟩ : ∃ x : X, x ∉ U := by
     by_contra h
     push_neg at h
     exact hU (eq_top_iff.2 fun y _ => h y)
-  obtain ⟨V, hV, hxV, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens) (show x ∈ (⊤ : X.Opens) from trivial)
+  obtain ⟨V, hV, hxV, -⟩ :=
+    (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens) (show x ∈ (⊤ : X.Opens) from
+      trivial)
   have hV : IsAffineOpen V := hV
   let S : Set (PrimeSpectrum Γ(X, V)) := {η | hV.fromSpec η ∉ U}
   have hS : IsClosed S := by

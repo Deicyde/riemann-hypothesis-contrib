@@ -9,8 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-private theorem dirichletCharacter_unit_isIntegral {R : Type} [CommRing R] {N : ℕ} [NeZero N]
-    (χ : DirichletCharacter R N) (u : (ZMod N)ˣ) : IsIntegral ℤ (χ u) := by
+private theorem dirichletCharacter_unit_isIntegral
+    {R : Type} [CommRing R] {N : ℕ} [NeZero N] (χ : DirichletCharacter R N) (u : (ZMod N)ˣ)
+    : IsIntegral ℤ (χ u) := by
   have hpos : 0 < orderOf u := orderOf_pos u
   refine IsIntegral.of_pow hpos ?_
   have h1 : χ (u : ZMod N) ^ orderOf u = 1 := by
@@ -18,8 +19,12 @@ private theorem dirichletCharacter_unit_isIntegral {R : Type} [CommRing R] {N : 
   rw [h1]
   exact isIntegral_one
 
-theorem UpperTheory.V.Bern.b_primmem :
-    ∀ {R : Type} [CommRing R] [Algebra ℚ R] {N : ℕ} [NeZero N] (k : ℕ) (χ : DirichletCharacter R N), (∀ A : Subalgebra ℚ R, (∀ u : (ZMod N)ˣ, χ u ∈ A) → Bprim k χ ∈ A) ∧ (∀ A : Subring R, (∀ u : (ZMod N)ˣ, χ u ∈ A) → (den N k : R) * Bprim k χ ∈ A) ∧ IsIntegral ℤ ((den N k : R) * Bprim k χ) ∧ IsIntegral ℤ ((den N k : R) * genB k χ) := by
+theorem UpperTheory.V.Bern.b_primmem
+    : ∀ {R : Type} [CommRing R] [Algebra ℚ R] {N : ℕ} [NeZero N] (k : ℕ)
+        (χ : DirichletCharacter R N),
+      (∀ A : Subalgebra ℚ R, (∀ u : (ZMod N)ˣ, χ u ∈ A) → Bprim k χ ∈ A)
+        ∧ (∀ A : Subring R, (∀ u : (ZMod N)ˣ, χ u ∈ A) → (den N k : R) * Bprim k χ ∈ A)
+        ∧ IsIntegral ℤ ((den N k : R) * Bprim k χ) ∧ IsIntegral ℤ ((den N k : R) * genB k χ) := by
   intro R _ _ N _ k χ
   have hN : N ≠ 0 := NeZero.ne N
   have hc : 0 < χ.conductor :=
@@ -54,5 +59,6 @@ theorem UpperTheory.V.Bern.b_primmem :
     · rw [h]; exact hA u
   · have := part2 (integralClosure ℤ R).toSubring (fun u => dirichletCharacter_unit_isIntegral χ u)
     exact this
-  · have := b_denchar k (⇑χ) (integralClosure ℤ R).toSubring (Nat.pos_of_ne_zero hN) (fun a => hint a)
+  · have :=
+      b_denchar k (⇑χ) (integralClosure ℤ R).toSubring (Nat.pos_of_ne_zero hN) (fun a => hint a)
     exact this

@@ -14,7 +14,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TwistedK
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZSeg GlobalTheory.BZMir Zc
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZSeg
+  GlobalTheory.BZMir Zc
 
 namespace GlobalTheory.CompanionTheory.MirPsiPair
 
@@ -29,9 +30,11 @@ theorem det_glEmbMat (n : ℕ) (A : Matrix (Fin n) (Fin n) k) : (glEmbMat k n A)
   rw [Matrix.det_succ_row _ (Fin.last n), Fin.sum_univ_castSucc]
   simp [glEmbMat, hsub]
 
-theorem det_unip (n : ℕ) (v : Multiplicative (Fin n → k)) :
-    ((unip k n v : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k).det = 1 := by
-  have htri : (((unip k n v : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k)).BlockTriangular id := by
+theorem det_unip (n : ℕ) (v : Multiplicative (Fin n → k))
+    : ((unip k n v : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k).det = 1 := by
+  have htri
+      : (((unip k n v : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k)).BlockTriangular
+        id := by
     intro i j hij
     have hij' : j < i := hij
     have hj : j ≠ Fin.last n := fun h => by
@@ -54,14 +57,19 @@ theorem thetaA_zero (ψ : AddChar k Circle) (n : ℕ) : thetaA k ψ (0 : Fin n �
   ext u
   simp [thetaA, chrA]
 
-theorem unip_fixes (ψ : AddChar k Circle) (hψ : Continuous ψ) (h1 : ψ ≠ 1) (n : ℕ) {V : Type}
-    [AddCommGroup V] [Module ℂ V] (T : Representation ℂ (Mir k (n + 1)) V) (hT : IsSmooth T)
-    (hsub : Subsingleton (TwJacquet T (MirUin k (n + 1)) (mirChar k ψ n)))
-    (u : MirUin k (n + 1)) (v : V) : T (u : Mir k (n + 1)) v = v := by
+theorem unip_fixes
+    (ψ : AddChar k Circle) (hψ : Continuous ψ) (h1 : ψ ≠ 1)
+    (n : ℕ)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (T : Representation ℂ (Mir k (n + 1)) V)
+    (hT : IsSmooth T) (hsub : Subsingleton (TwJacquet T (MirUin k (n + 1)) (mirChar k ψ n)))
+    (u : MirUin k (n + 1)) (v : V)
+    : T (u : Mir k (n + 1)) v = v := by
   have htop : twKer T (MirUin k (n + 1)) (mirChar k ψ n) = ⊤ :=
-    (Submodule.eq_top_iff' ).2 fun x => (Submodule.Quotient.mk_eq_zero _).1 (Subsingleton.elim _ _)
-  have hall : ∀ a : Fin (n + 1) → k,
-      T (u : Mir k (n + 1)) v - v ∈ twKer T (MirUin k (n + 1)) (thetaA k ψ a) := by
+    (Submodule.eq_top_iff').2 fun x => (Submodule.Quotient.mk_eq_zero _).1 (Subsingleton.elim _ _)
+  have hall
+      : ∀ a : Fin (n + 1) → k,
+        T (u : Mir k (n + 1)) v - v ∈ twKer T (MirUin k (n + 1)) (thetaA k ψ a) := by
     intro a
     by_cases ha : a = 0
     · subst ha
@@ -69,17 +77,21 @@ theorem unip_fixes (ψ : AddChar k Circle) (hψ : Continuous ψ) (h1 : ψ ≠ 1)
       exact Submodule.subset_span ⟨u, v, by simp⟩
     · obtain ⟨m, hm⟩ := GlobalTheory.CompanionTheory.LinAlg.exists_GL_lastRow_eq k n a ha
       rw [← hm]
-      refine (GlobalTheory.CompanionTheory.BZMirabolic.twKerConj k ψ (n + 1) V T (Pi.single (Fin.last n) 1) m _).2 ?_
+      refine (GlobalTheory.CompanionTheory.BZMirabolic.twKerConj k ψ (n + 1) V T
+        (Pi.single (Fin.last n) 1) m _).2 ?_
       rw [← GlobalTheory.CompanionTheory.BZMir.mirChar_eq_thetaA_single k ψ n, htop]
       trivial
-  exact sub_eq_zero.1 (GlobalTheory.CompanionTheory.MirFourier.fourier k ψ hψ h1 (n + 1) V T hT _ hall)
+  exact sub_eq_zero.1 (GlobalTheory.CompanionTheory.MirFourier.fourier k ψ hψ h1 (n + 1) V T hT _
+    hall)
 
-theorem psiMinus_mk {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (τ : Representation ℂ (Mir k n) V)
-    (g : GL (Fin n) k) (v : V) :
-    psiMinus k τ g (Submodule.Quotient.mk v) = Submodule.Quotient.mk (τ (levi k n g) v) := rfl
+theorem psiMinus_mk
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (τ : Representation ℂ (Mir k n) V) (g : GL (Fin n) k) (v : V)
+    : psiMinus k τ g (Submodule.Quotient.mk v) = Submodule.Quotient.mk (τ (levi k n g) v) :=
+  rfl
 
-theorem detChar_unip (χ : kˣ →* ℂˣ) (n : ℕ) (u : MirUin k n) :
-    detChar (Fin (n + 1)) χ ((u : Mir k n) : GL (Fin (n + 1)) k) = 1 := by
+theorem detChar_unip (χ : kˣ →* ℂˣ) (n : ℕ) (u : MirUin k n)
+    : detChar (Fin (n + 1)) χ ((u : Mir k n) : GL (Fin (n + 1)) k) = 1 := by
   obtain ⟨v, hv⟩ := (u.2 : ((u : Mir k n) : GL (Fin (n + 1)) k) ∈ MirU k n)
   have hdet : Matrix.GeneralLinearGroup.det ((u : Mir k n) : GL (Fin (n + 1)) k) = 1 := by
     have hv' : ((u : Mir k n) : GL (Fin (n + 1)) k) = unip k n v := hv.symm
@@ -88,10 +100,12 @@ theorem detChar_unip (χ : kˣ →* ℂˣ) (n : ℕ) (u : MirUin k n) :
     simpa using det_unip n v
   rw [detChar_apply, hdet, map_one]
 
-theorem detChar_levi (χ : kˣ →* ℂˣ) (n : ℕ) (g : GL (Fin n) k) :
-    detChar (Fin (n + 1)) χ ((levi k n g : Mir k n) : GL (Fin (n + 1)) k) = detChar (Fin n) χ g := by
-  have hdet : Matrix.GeneralLinearGroup.det ((levi k n g : Mir k n) : GL (Fin (n + 1)) k) =
-      Matrix.GeneralLinearGroup.det g := by
+theorem detChar_levi (χ : kˣ →* ℂˣ) (n : ℕ) (g : GL (Fin n) k)
+    : detChar (Fin (n + 1)) χ ((levi k n g : Mir k n) : GL (Fin (n + 1)) k)
+      = detChar (Fin n) χ g := by
+  have hdet
+      : Matrix.GeneralLinearGroup.det ((levi k n g : Mir k n) : GL (Fin (n + 1)) k)
+        = Matrix.GeneralLinearGroup.det g := by
     ext
     exact det_glEmbMat n (g : Matrix (Fin n) (Fin n) k)
   rw [detChar_apply, detChar_apply, hdet]
@@ -102,11 +116,12 @@ section Descent
 
 variable {G V V' : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
 
-theorem exists_descent (N : Subgroup G) (T : Representation ℂ G V) (T' : Representation ℂ G V')
-    (B : V →ₗ[ℂ] V' →ₗ[ℂ] ℂ) (hfix : ∀ (u : N) v, T (u : G) v = v)
-    (hinv : ∀ (u : N) v x, B v (T' (u : G) x) = B v x) :
-    ∃ B' : TwJacquet T N 1 →ₗ[ℂ] TwJacquet T' N 1 →ₗ[ℂ] ℂ,
-      ∀ v v', B' (Submodule.Quotient.mk v) (Submodule.Quotient.mk v') = B v v' := by
+theorem exists_descent
+    (N : Subgroup G) (T : Representation ℂ G V) (T' : Representation ℂ G V')
+    (B : V →ₗ[ℂ] V' →ₗ[ℂ] ℂ)
+    (hfix : ∀ (u : N) v, T (u : G) v = v) (hinv : ∀ (u : N) v x, B v (T' (u : G) x) = B v x)
+    : ∃ B' : TwJacquet T N 1 →ₗ[ℂ] TwJacquet T' N 1 →ₗ[ℂ] ℂ, ∀ v v',
+      B' (Submodule.Quotient.mk v) (Submodule.Quotient.mk v') = B v v' := by
   have hR : twKer T' N 1 ≤ LinearMap.ker B.flip := by
     refine Submodule.span_le.2 ?_
     rintro w ⟨u, x, rfl⟩
@@ -121,20 +136,29 @@ theorem exists_descent (N : Subgroup G) (T : Representation ℂ G V) (T' : Repre
 
 end Descent
 
-
 set_option maxHeartbeats 2000000 in
-theorem pair_psi : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (ψ : AddChar k Circle), Continuous ψ → ψ ≠ 1 → ∀ (n s : ℕ) (V V' : Type) [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup V'] [Module ℂ V'] (T : Representation ℂ (Mir k (n + 1)) V) (T' : Representation ℂ (Mir k (n + 1)) V'),
-    IsSmooth T → IsSmooth T' → ∀ B : V →ₗ[ℂ] V' →ₗ[ℂ] ℂ,
-    (∀ (p : Mir k (n + 1)) v v', B (T p v) (T' p v') =
-      ((detChar (Fin (n + 1 + 1)) (absPow k (s : ℂ)) (p : GL (Fin (n + 1 + 1)) k) : ℂˣ) : ℂ) * B v v') →
-    (∀ v, v ≠ 0 → ∃ v', B v v' ≠ 0) →
-    Subsingleton (TwJacquet T (MirUin k (n + 1)) (mirChar k ψ n)) →
-    ∃ B' : TwJacquet T (MirUin k (n + 1)) 1 →ₗ[ℂ] TwJacquet T' (MirUin k (n + 1)) 1 →ₗ[ℂ] ℂ,
-      (∀ (g : GL (Fin (n + 1)) k) w w', B' (psiMinus k T g w) (psiMinus k T' g w') =
-        ((detChar (Fin (n + 1)) (absPow k (s : ℂ)) g : ℂˣ) : ℂ) * B' w w') ∧
-      (∀ w, w ≠ 0 → ∃ w', B' w w' ≠ 0) := by
+theorem pair_psi
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle),
+      Continuous ψ → ψ ≠ 1
+        → ∀ (n s : ℕ) (V V' : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
+            (T : Representation ℂ (Mir k (n + 1)) V) (T' : Representation ℂ (Mir k (n + 1)) V'),
+          IsSmooth T → IsSmooth T'
+            → ∀ B : V →ₗ[ℂ] V' →ₗ[ℂ] ℂ,
+              (∀ (p : Mir k (n + 1)) v v',
+                  B (T p v) (T' p v')
+                    = ((detChar (Fin (n + 1 + 1)) (absPow k (s : ℂ)) (p : GL (Fin (n + 1 + 1)) k)
+                          : ℂˣ)
+                        : ℂ)
+                      * B v v')
+                → (∀ v, v ≠ 0 → ∃ v', B v v' ≠ 0)
+                → Subsingleton (TwJacquet T (MirUin k (n + 1)) (mirChar k ψ n))
+                → ∃ B'
+                    : TwJacquet T (MirUin k (n + 1)) 1 →ₗ[ℂ] TwJacquet T' (MirUin k (n + 1)) 1 →ₗ[ℂ] ℂ,
+                  (∀ (g : GL (Fin (n + 1)) k) w w',
+                      B' (psiMinus k T g w) (psiMinus k T' g w')
+                        = ((detChar (Fin (n + 1)) (absPow k (s : ℂ)) g : ℂˣ) : ℂ) * B' w w')
+                    ∧ (∀ w, w ≠ 0 → ∃ w', B' w w' ≠ 0) := by
   intro k _ _ _ _ ψ hψ h1 n s V V' _ _ _ _ T T' hT _ B hB hnd hsub
   have hfix := unip_fixes ψ hψ h1 n T hT hsub
 

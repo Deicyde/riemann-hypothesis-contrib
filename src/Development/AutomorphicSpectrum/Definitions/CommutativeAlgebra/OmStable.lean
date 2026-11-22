@@ -11,30 +11,25 @@ namespace GlobalTheory.CompanionTheory.Ar.HT
 
 open Module NumberField
 
-structure HTPoint (C O : Type) [Field C] [CommRing O] [Algebra O C] {E : Type} [Field E] [NumberField E]
+structure HTPoint
+    (C O : Type) [Field C] [CommRing O] [Algebra O C]
+    {E : Type} [Field E] [NumberField E]
     (c : E ≃+* E) (κ : O) (N : ℕ)
-    (V Ω : Type) [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
-    [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω] where
-
+    (V Ω : Type) [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V] [AddCommGroup Ω]
+    [Module C Ω] [Module O Ω] [IsScalarTower O C Ω] where
   T : Submodule O V
-
   ρ : 𝓞 E →+* Module.End C V
-
   t : Fin N → V
   free : IsFreeOn ρ T t
-
   e : V →ₗ[C] V →ₗ[C] C
   alt : ∀ x, e x x = 0
   nondeg : ∀ y, (∀ x, e x y = 0) → y = 0
   perfect : dualLat e T = T
   adj : ∀ (a : 𝓞 E) (x y : V), e (ρ a x) y = e x (ρ (RingOfIntegers.mapRingEquiv c a) y)
-
   om : Submodule O Ω
   om_lat : om.IsFullLattice C
-
   ρΩ : 𝓞 E →+* Module.End C Ω
   om_stable : ∀ (a : 𝓞 E), ∀ x ∈ om, ρΩ a x ∈ om
-
   ht : V →ₗ[C] Ω
   ht_lin : ∀ (a : 𝓞 E) (x : V), ht (ρ a x) = ρΩ a (ht x)
   ht_mem : ∀ x ∈ T, ht x ∈ om
@@ -44,10 +39,11 @@ structure HTPoint (C O : Type) [Field C] [CommRing O] [Algebra O C] {E : Type} [
 
 namespace HTPoint
 
-variable {C O : Type} [Field C] [CommRing O] [Algebra O C] {E : Type} [Field E] [NumberField E]
-  {c : E ≃+* E} {κ : O} {N : ℕ}
-  {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
-  [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
+variable
+  {C O : Type} [Field C] [CommRing O] [Algebra O C]
+  {E : Type} [Field E] [NumberField E]
+  {c : E ≃+* E} {κ : O} {N : ℕ} {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V]
+  [IsScalarTower O C V] [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
   (P : HTPoint C O c κ N V Ω)
 
 def W : Submodule C V := LinearMap.ker P.ht

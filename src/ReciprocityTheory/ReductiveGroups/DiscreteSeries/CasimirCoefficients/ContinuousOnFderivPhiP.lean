@@ -70,8 +70,8 @@ lemma continuousOn_fderiv_phiP (μ : Fin n → ℤ) :
 lemma continuousOn_phiP (μ : Fin n → ℤ) : ContinuousOn (PhiP μ) (OmegaSet n : Set 𝕄) :=
   fun _ hz => (contDiffAt_phiP μ hz).continuousAt.continuousWithinAt
 
-def conjLin (A B : Matrix (Fin n) (Fin n) ℂ) :
-    Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ where
+def conjLin (A B : Matrix (Fin n) (Fin n) ℂ)
+    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ where
   toFun H := A * H * B
   map_add' H H' := by simp only [Matrix.mul_add, Matrix.add_mul]
   map_smul' c H := by simp only [Matrix.mul_smul, Matrix.smul_mul, RingHom.id_apply]
@@ -134,8 +134,8 @@ lemma posSet_subset_Uset : posSet n ⊆ Uset ε := by
   have := congrArg (fun u => (toMK k)ᴴ *ᵥ u) hvw
   simpa only [Matrix.mulVec_mulVec, h1, Matrix.one_mulVec] using this
 
-def GintD (T : KType ε Λ) (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε) :
-    𝕄 →L[ℂ] (T.V →L[ℂ] T.V) :=
+def GintD (T : KType ε Λ) (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε)
+    : 𝕄 →L[ℂ] (T.V →L[ℂ] T.V) :=
   fderiv ℂ (fun y : 𝕄 => Gint T μ y k) x
 
 lemma hasFDerivAt_Gint0 (T : KType ε Λ) (μ : Fin n → ℤ) {x : Matrix (Fin n) (Fin n) ℂ} (k : KG ε)
@@ -249,21 +249,29 @@ lemma hasFDerivAt_psM [CompactSpace (KG ε)] (T : KType ε Λ) (μ : Fin n → �
 
 end Ps1
 
-theorem psM_holo {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ) :
-    ∃ U : Set (Matrix (Fin n) (Fin n) ℂ), IsOpen U ∧ posSet n ⊆ U ∧
-      (∀ z ∈ U, ∀ k : KG ε, toMK k⁻¹ * z * toMK k ∈ OmegaSet n) ∧
-      DifferentiableOn ℂ (psM T μ) U ∧
-      ∀ z ∈ U, ∀ H : Matrix (Fin n) (Fin n) ℂ, fderiv ℂ (psM T μ) z H =
-        ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-          ∫ k, fderiv ℂ (PhiM μ) (toMK k⁻¹ * z * toMK k) (toMK k⁻¹ * H * toMK k) •
-            (T.op k * projW T * T.op k⁻¹) ∂(muK ε) := by
+theorem psM_holo {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ)
+    : ∃ U : Set (Matrix (Fin n) (Fin n) ℂ),
+      IsOpen U ∧ posSet n ⊆ U ∧ (∀ z ∈ U, ∀ k : KG ε, toMK k⁻¹ * z * toMK k ∈ OmegaSet n)
+        ∧ DifferentiableOn ℂ (psM T μ) U
+        ∧ ∀ z ∈ U, ∀ H : Matrix (Fin n) (Fin n) ℂ,
+          fderiv ℂ (psM T μ) z H
+            = ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+              • ∫ k, fderiv ℂ (PhiM μ) (toMK k⁻¹ * z * toMK k) (toMK k⁻¹ * H * toMK k) •
+                  (T.op k * projW T * T.op k⁻¹) ∂(muK ε) := by
   have := compactSpace_KG ε
-  refine ⟨Ps1.Uset ε, Ps1.isOpen_Uset, Ps1.posSet_subset_Uset, fun z hz k => hz k,
-    fun z hz => ?_, fun z hz H => ?_⟩
+  refine ⟨
+    Ps1.Uset ε,
+    Ps1.isOpen_Uset,
+    Ps1.posSet_subset_Uset,
+    fun z hz k => hz k,
+    fun z hz => ?_,
+    fun z hz H => ?_
+  ⟩
   · have h : DifferentiableAt ℂ (psM T μ) z := (Ps1.hasFDerivAt_psM T μ hz).differentiableAt
     exact h.differentiableWithinAt
-  · rw [show fderiv ℂ (psM T μ) z H =
-        fderiv ℂ (fun x : Fin n → Fin n → ℂ => psM T μ x) z (Matrix.of.symm H) from rfl,
+  · rw [show fderiv ℂ (psM T μ) z H
+          = fderiv ℂ (fun x : Fin n → Fin n → ℂ => psM T μ x) z (Matrix.of.symm H) from
+        rfl,
       (Ps1.hasFDerivAt_psM T μ hz).fderiv, ContinuousLinearMap.smul_apply,
       ContinuousLinearMap.integral_apply (Ps1.integrable_GintD T μ hz)]
     congr 1

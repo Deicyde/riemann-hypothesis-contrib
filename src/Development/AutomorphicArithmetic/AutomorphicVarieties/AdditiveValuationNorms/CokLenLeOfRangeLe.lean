@@ -29,8 +29,8 @@ def Unip (γ : Module.End ℤ_[l] X) : Prop := ∃ N : ℕ, InPow 1 ((γ - 1) ^ 
 
 def twLen (γ : Module.End ℤ_[l] X) (u : ℤ_[l]) (e m : ℕ) : ℕ∞ := cokLen ((u ^ e • γ) ^ l ^ m - 1)
 
-theorem cokLen_le_of_range_le {f g : Module.End ℤ_[l] X} (h : LinearMap.range g ≤ LinearMap.range f) :
-    cokLen f ≤ cokLen g :=
+theorem cokLen_le_of_range_le {f g : Module.End ℤ_[l] X} (h : LinearMap.range g ≤ LinearMap.range f)
+    : cokLen f ≤ cokLen g :=
   Module.length_le_of_surjective (Submodule.factor h) (Submodule.factor_surjective h)
 
 end UpperTheory.V.PropA

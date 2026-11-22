@@ -8,10 +8,11 @@ namespace UpperTheory
 
 open nonZeroDivisors
 
-private theorem finite_of_finite_over_normal (P A K : Type*) [CommRing P] [IsDomain P]
-    [CharZero P] [IsIntegrallyClosed P] [IsNoetherianRing P] [CommRing A] [IsDomain A]
-    [Algebra P A] [FaithfulSMul P A] [Module.Finite P A] [Field K] [Algebra A K]
-    [IsFractionRing A K] : Module.Finite A (integralClosure A K) := by
+private theorem finite_of_finite_over_normal
+    (P A K : Type*) [CommRing P] [IsDomain P] [CharZero P] [IsIntegrallyClosed P]
+    [IsNoetherianRing P] [CommRing A] [IsDomain A] [Algebra P A] [FaithfulSMul P A]
+    [Module.Finite P A] [Field K] [Algebra A K] [IsFractionRing A K]
+    : Module.Finite A (integralClosure A K) := by
   letI : Algebra P K := ((algebraMap A K).comp (algebraMap P A)).toAlgebra
   haveI : IsScalarTower P A K := IsScalarTower.of_algebraMap_eq fun _ => rfl
   haveI : FaithfulSMul P K := (faithfulSMul_iff_algebraMap_injective P K).mpr
@@ -29,9 +30,10 @@ private theorem finite_of_finite_over_normal (P A K : Type*) [CommRing P] [IsDom
     IsIntegralClosure.finite P (FractionRing P) K (integralClosure A K)
   exact Module.Finite.of_restrictScalars_finite P A (integralClosure A K)
 
-theorem integralClosure_finite (k A K : Type*) [Field k] [CharZero k] [CommRing A] [IsDomain A] [Algebra k A]
-    [Algebra.FiniteType k A] [Field K] [Algebra A K] [IsFractionRing A K] :
-    Module.Finite A (integralClosure A K) := by
+theorem integralClosure_finite
+    (k A K : Type*) [Field k] [CharZero k] [CommRing A] [IsDomain A] [Algebra k A]
+    [Algebra.FiniteType k A] [Field K] [Algebra A K] [IsFractionRing A K]
+    : Module.Finite A (integralClosure A K) := by
   obtain ⟨s, g, hinj, hfin⟩ := exists_finite_inj_algHom_of_fg k A
   letI : Algebra (MvPolynomial (Fin s) k) A := g.toRingHom.toAlgebra
   haveI : Module.Finite (MvPolynomial (Fin s) k) A := hfin

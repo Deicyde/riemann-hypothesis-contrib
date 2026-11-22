@@ -13,9 +13,12 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
@@ -23,8 +26,17 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SquareGeneric
 
-theorem exists_gen_square :
-    ∀ (R' : Type) [CommRing R'] [IsDomain R'] [IsNoetherianRing R'] [IsIntegrallyClosed R'] [IsLocalRing R'] (G' : Over (Sp R')) [GrpObj G'], IsSemiAbelian G' → IsAbelianScheme ((Over.pullback (jK R')).obj G') → ∀ N : LB G'.left, N.IsLB → ∀ a : 𝟙_ (Over (Sp R')) ⟶ G', ∃ t : LB.Gen (LB.LinComb N (K := Fin 3) ![(𝟙 G' * (toUnit G' ≫ a)).left, (𝟙 G' * (toUnit G' ≫ a⁻¹)).left, 𝟙 G'.left] ![1, 1, -2]), t.IsGen := by
+theorem exists_gen_square
+    : ∀ (R' : Type) [CommRing R'] [IsDomain R'] [IsNoetherianRing R'] [IsIntegrallyClosed R']
+        [IsLocalRing R'] (G' : Over (Sp R')) [GrpObj G'],
+      IsSemiAbelian G' → IsAbelianScheme ((Over.pullback (jK R')).obj G')
+        → ∀ N : LB G'.left,
+          N.IsLB
+            → ∀ a : 𝟙_ (Over (Sp R')) ⟶ G',
+              ∃ t : LB.Gen (LB.LinComb N (K := Fin 3)
+                  ![(𝟙 G' * (toUnit G' ≫ a)).left, (𝟙 G' * (toUnit G' ≫ a⁻¹)).left, 𝟙 G'.left]
+                  ![1, 1, -2]),
+                t.IsGen := by
   intro R' _ _ _ _ _ G' _ hG hA N hN a
   have := hG.comm
   let j := jK R'
@@ -39,7 +51,8 @@ theorem exists_gen_square :
   have hh : h ≫ pullback.fst (G3 G').hom j = πA ≫ ℓ.left := pullback.lift_fst _ _ _
   let t₁ := LB.pullGen (Theta G' N) (fun _ => pullback.fst (G3 G').hom j) (fun _ => 1) t₀ h
   have ht₁ : t₁.IsGen := DVR.pullGen_isGen _ _ _ _ ht₀ _
-  obtain ⟨t₂, ht₂⟩ := gen_chartPull (chartPullIn N (thφ G' (x3 G')) thε (h ≫ pullback.fst (G3 G').hom j)) t₁ ht₁
+  obtain ⟨t₂, ht₂⟩ :=
+    gen_chartPull (chartPullIn N (thφ G' (x3 G')) thε (h ≫ pullback.fst (G3 G').hom j)) t₁ ht₁
   have hcc : c * c' = 1 := by
     simp only [c, c']
     rw [← MonObj.comp_mul, _root_.mul_inv_cancel, MonObj.comp_one]
@@ -58,18 +71,25 @@ theorem exists_gen_square :
   choose i hi using fun k => hconst (s₃ k)
   let φw : Fin 3 → (pullback G'.hom j ⟶ G'.left) := fun k => πA ≫ (toUnit G' ≫ s₃ k).left
   obtain ⟨w, hw⟩ := GlobalTheory.AbSquare.exists_gen_of_mem_chart hN φw ![1, 1, -2] i hi
-  let ψ : Fin 3 → (G'.left ⟶ G'.left) := ![(𝟙 G' * (toUnit G' ≫ a)).left, (𝟙 G' * (toUnit G' ≫ a⁻¹)).left, 𝟙 G'.left]
+  let ψ : Fin 3 → (G'.left ⟶ G'.left) :=
+    ![(𝟙 G' * (toUnit G' ≫ a)).left, (𝟙 G' * (toUnit G' ≫ a⁻¹)).left, 𝟙 G'.left]
   have hF : ReciprocityTheory.ChartRestriction.G.Geo.Tor.FormEq
       (Sum.elim (fun I => (h ≫ pullback.fst (G3 G').hom j) ≫ thφ G' (x3 G') I) φw)
-      (Sum.elim (fun I => -thε I) ![1, 1, -2]) (fun k => πA ≫ ψ k) ![1, 1, -2] := by
+      (Sum.elim (fun I => - thε I) ![1, 1, -2])
+      (fun k => πA ≫ ψ k)
+      ![1, 1, -2] := by
     intro U _ g
     rw [Fintype.prod_sum_type]
     dsimp only [Sum.elim_inl, Sum.elim_inr]
     simp only [zpow_neg, Finset.prod_inv_distrib]
-    have e : ∀ I, (h ≫ pullback.fst (G3 G').hom j) ≫ thφ G' (x3 G') I = πA ≫ (ℓ.left ≫ thφ G' (x3 G') I) :=
-      fun I => by rw [hh, Category.assoc]
-    have e2 : (∏ I : thK, g ((h ≫ pullback.fst (G3 G').hom j) ≫ thφ G' (x3 G') I) ^ thε I) =
-        ∏ I : thK, (fun q => g (πA ≫ q)) ((lift (𝟙 G') (lift c c')).left ≫ thφ G' (x3 G') I) ^ thε I :=
+    have e
+        : ∀ I,
+          (h ≫ pullback.fst (G3 G').hom j) ≫ thφ G' (x3 G') I
+            = πA ≫ (ℓ.left ≫ thφ G' (x3 G') I) := fun I => by
+      rw [hh, Category.assoc]
+    have e2
+        : (∏ I : thK, g ((h ≫ pullback.fst (G3 G').hom j) ≫ thφ G' (x3 G') I) ^ thε I)
+          = ∏ I : thK, (fun q => g (πA ≫ q)) ((lift (𝟙 G') (lift c c')).left ≫ thφ G' (x3 G') I) ^ thε I :=
       Finset.prod_congr rfl fun I _ => by rw [e I]
     rw [e2, prod_cub (𝟙 G') c c' (fun q => g (πA ≫ q))]
     rw [show 𝟙 G' * c * c' = 𝟙 G' by rw [_root_.mul_assoc, hcc, _root_.mul_one], hcc]
@@ -81,12 +101,15 @@ theorem exists_gen_square :
     have p2 : ψ 2 = Over.Hom.left (𝟙 G') := (Over.id_left _).symm
     rw [Fin.prod_univ_three, Fin.prod_univ_three, f0, f1, f2, p0, p1, p2]
     apply Additive.ofMul.injective
-    simp only [ofMul_mul, ofMul_inv, ofMul_zpow, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two,
-      Matrix.head_cons, Matrix.tail_cons]
+    simp only [ofMul_mul, ofMul_inv, ofMul_zpow, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
     abel
-  obtain ⟨u, hu, -⟩ := ReciprocityTheory.ChartRestriction.G.Geo.Tor.exists_gen hN hF (LB.mulGen N _ _ _ _ (LB.invGen N _ _ t₂) w)
-    (DVR.mulGen_isGen _ _ _ _ _ _ _ (DVR.invGen_isGen _ _ _ _ ht₂) hw)
-  obtain ⟨v, hv⟩ := gen_chartPull (chartPullOut N ψ ![1, 1, -2] πA (fun k => πA ≫ ψ k) (fun _ => rfl)) u hu
+  obtain ⟨u, hu, -⟩ :=
+    ReciprocityTheory.ChartRestriction.G.Geo.Tor.exists_gen hN hF
+      (LB.mulGen N _ _ _ _ (LB.invGen N _ _ t₂) w)
+      (DVR.mulGen_isGen _ _ _ _ _ _ _ (DVR.invGen_isGen _ _ _ _ ht₂) hw)
+  obtain ⟨v, hv⟩ :=
+    gen_chartPull (chartPullOut N ψ ![1, 1, -2] πA (fun k => πA ≫ ψ k) (fun _ => rfl)) u hu
   exact GlobalTheory.PicGenericInj.exists_gen_of_generic R' G' hG _ (LB.isLB_linComb hN _ _) ⟨v, hv⟩
 
 end GlobalTheory.SquareGeneric

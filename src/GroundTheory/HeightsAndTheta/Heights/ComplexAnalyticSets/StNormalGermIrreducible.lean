@@ -14,7 +14,7 @@ open MvPolynomial Topology
 
 def NormalGermIrreducible.Statement : Prop :=
   ∀ (σ : Type) [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ),
-    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I) → w ∈ zeroSetIn I →
-      GermIrreducibleAt (zeroSetIn I) w
+    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I) → w ∈ zeroSetIn I
+      → GermIrreducibleAt (zeroSetIn I) w
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteP
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N
 
 theorem UpperTheory.cm_inertia_restriction_holds : UpperTheory.V.Af.Cr.IneRes := by
   intro F₀ F Ω _ _ _ _ _ _ _ _ _ _
@@ -18,8 +19,7 @@ theorem UpperTheory.cm_inertia_restriction_holds : UpperTheory.V.Af.Cr.IneRes :=
     obtain ⟨y, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.mp (h.tower_top : IsIntegral A x)
     exact A.valuation_le_one y
   obtain ⟨α₁, hα₁⟩ := Field.exists_primitive_element F₀ F
-  have hα₁alg : IsAlgebraic ℤ α₁ :=
-    (IsFractionRing.isAlgebraic_iff ℤ ℚ F).mpr (.of_finite ℚ α₁)
+  have hα₁alg : IsAlgebraic ℤ α₁ := (IsFractionRing.isAlgebraic_iff ℤ ℚ F).mpr (.of_finite ℚ α₁)
   obtain ⟨m, hm0, hmint⟩ := hα₁alg.exists_integral_multiple
   set α : F := m • α₁ with hαdef
   set g : Polynomial ℤ := minpoly ℤ α with hgdef
@@ -39,8 +39,9 @@ theorem UpperTheory.cm_inertia_restriction_holds : UpperTheory.V.Af.Cr.IneRes :=
   have hcint : IsIntegral ℤ c := by
     have h1 : c = Polynomial.aeval α (Polynomial.derivative g) := by
       rw [hcdef, hfdef, Polynomial.derivative_map, Polynomial.aeval_map_algebraMap]
-    have key := Polynomial.aeval_algHom_apply (integralClosure ℤ F).val
-      (⟨α, hmint⟩ : integralClosure ℤ F) (Polynomial.derivative g)
+    have key :=
+      Polynomial.aeval_algHom_apply (integralClosure ℤ F).val (⟨α, hmint⟩ : integralClosure ℤ F)
+        (Polynomial.derivative g)
     rw [h1]
     refine key ▸ ?_
     exact (Polynomial.aeval (⟨α, hmint⟩ : integralClosure ℤ F) (Polynomial.derivative g)).2
@@ -85,7 +86,8 @@ theorem UpperTheory.cm_inertia_restriction_holds : UpperTheory.V.Af.Cr.IneRes :=
       intro y hy
       refine ⟨g, hgmonic, ?_⟩
       rw [Polynomial.mem_roots hfΩ0, Polynomial.IsRoot, hfΩ, hfdef, Polynomial.map_map,
-        ← Polynomial.eval₂_eq_eval_map] at hy
+          ← Polynomial.eval₂_eq_eval_map]
+        at hy
       have hZ : algebraMap ℤ Ω = (algebraMap F₀ Ω).comp (algebraMap ℤ F₀) := RingHom.ext_int _ _
       rw [hZ]
       exact hy
@@ -95,7 +97,8 @@ theorem UpperTheory.cm_inertia_restriction_holds : UpperTheory.V.Af.Cr.IneRes :=
         Polynomial.aeval_algebraMap_apply]
     have hβmem : σ α₀ ∈ fΩ.roots.erase α₀ := (Multiset.mem_erase_of_ne hne).mpr hβroot
     have hcv : A.valuation (algebraMap F Ω c) < 1 := by
-      rw [hder, ← Multiset.cons_erase hβmem, Multiset.map_cons, Multiset.prod_cons, Valuation.map_mul]
+      rw [hder, ← Multiset.cons_erase hβmem, Multiset.map_cons, Multiset.prod_cons,
+        Valuation.map_mul]
       have h1 : A.valuation (α₀ - σ α₀) < 1 := by
         rw [Valuation.map_sub_swap]
         exact hσ2 α₀ (hint A α₀ (hrootint α₀ hα₀root))
@@ -109,7 +112,8 @@ theorem UpperTheory.cm_inertia_restriction_holds : UpperTheory.V.Af.Cr.IneRes :=
       exact lt_of_le_of_lt (mul_le_of_le_one_right' h2) h1
     have hnorm := Algebra.norm_eq_prod_embeddings F₀ Ω c
     set φ₀ : F →ₐ[F₀] Ω := IsScalarTower.toAlgHom F₀ F Ω with hφ₀
-    rw [← Finset.mul_prod_erase Finset.univ (fun φ : F →ₐ[F₀] Ω => φ c) (Finset.mem_univ φ₀)] at hnorm
+    rw [← Finset.mul_prod_erase Finset.univ (fun φ : F →ₐ[F₀] Ω => φ c) (Finset.mem_univ φ₀)]
+      at hnorm
     have hdv : A.valuation (algebraMap F₀ Ω d) < 1 := by
       rw [hddef, hnorm, Valuation.map_mul]
       have h2 : A.valuation (∏ φ ∈ Finset.univ.erase φ₀, φ c) ≤ 1 := by
@@ -124,11 +128,13 @@ theorem UpperTheory.cm_inertia_restriction_holds : UpperTheory.V.Af.Cr.IneRes :=
     haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
     simp only [hαdef, zsmul_eq_mul, map_mul, map_intCast] at h
     exact mul_left_cancel₀ (Int.cast_ne_zero.mpr hm0) h
-  have hφ : ((σ : Ω ≃ₐ[F₀] Ω).toAlgHom).comp (IsScalarTower.toAlgHom F₀ F Ω) =
-      IsScalarTower.toAlgHom F₀ F Ω := by
+  have hφ
+      : ((σ : Ω ≃ₐ[F₀] Ω).toAlgHom).comp (IsScalarTower.toAlgHom F₀ F Ω)
+        = IsScalarTower.toAlgHom F₀ F Ω := by
     have hadj : Algebra.adjoin F₀ {α₁} = ⊤ := by
       rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-        (Algebra.IsAlgebraic.isAlgebraic α₁), hα₁, IntermediateField.top_toSubalgebra]
+          (Algebra.IsAlgebraic.isAlgebraic α₁),
+        hα₁, IntermediateField.top_toSubalgebra]
     refine AlgHom.ext_of_adjoin_eq_top hadj ?_
     intro x hx
     rw [Set.mem_singleton_iff.mp hx]

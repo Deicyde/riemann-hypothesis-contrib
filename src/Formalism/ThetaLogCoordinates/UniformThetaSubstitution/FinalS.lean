@@ -38,7 +38,8 @@ theorem logRescaleUnique : LogRescaleUnique := log_rescale_unique
 theorem twoSums : TwoSums := two_sums
 theorem thmSCore : ThmSCore :=
   ThmSCore_of rescaleCore classSubst classChange classMul twoSums logRescale logRescaleUnique
-theorem theorem_s_from_k_one : CyclicPowerClassOfExpEquiv := theorem_s_from_k_one_of thmSCore simeqRules
+theorem theorem_s_from_k_one : CyclicPowerClassOfExpEquiv :=
+  theorem_s_from_k_one_of thmSCore simeqRules
 
 theorem lawExists : LawExists := formal_law_exists
 theorem lawSymm : LawSymm := formal_law_symmetric

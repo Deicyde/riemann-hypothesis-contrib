@@ -429,64 +429,73 @@ private lemma norm_sum_sq_le_totient_mul_of_avoids_classes (S : Finset ℕ) :
     _ = _ := by
         rw [← Finset.mul_sum]; push_cast [Nat.cast_sub hp.one_le]; ring
 
-
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
-theorem _root_.GlobalTheory.arithmetic_large_sieve_one_class : ∀ (M N Q q : ℕ) (S : Finset ℕ), 1 ≤ Q → 1 ≤ q →
-    S ⊆ Finset.Ioc M (M + N) →
-    (∀ p : ℕ, p.Prime → p ≤ Q → ¬ p ∣ q → ∃ c : ℕ, ∀ n ∈ S, ¬ n ≡ c [MOD p]) →
-    (S.card : ℝ) * ((q.totient : ℝ) / q * Real.log Q) ≤ (Q : ℝ) ^ 2 + 2 * Real.pi * N := by
+theorem _root_.GlobalTheory.arithmetic_large_sieve_one_class
+    : ∀ (M N Q q : ℕ) (S : Finset ℕ),
+      1 ≤ Q → 1 ≤ q → S ⊆ Finset.Ioc M (M + N)
+        → (∀ p : ℕ, p.Prime → p ≤ Q → ¬ p ∣ q → ∃ c : ℕ, ∀ n ∈ S, ¬ n ≡ c [MOD p])
+        → (S.card : ℝ) * ((q.totient : ℝ) / q * Real.log Q) ≤ (Q : ℝ) ^ 2 + 2 * Real.pi * N := by
   intro M N Q q S hQ hq hS hcl
   set D := (Finset.Icc 1 Q).filter (fun f => Squarefree f ∧ Nat.Coprime f q) with hD
   set Z : ℝ := (S.card : ℝ) with hZ
   have hZ0 : 0 ≤ Z := Nat.cast_nonneg _
   have hRHS : 0 ≤ (Q : ℝ) ^ 2 + 2 * Real.pi * N := by positivity
 
-  have hφq : (0:ℝ) < q.totient := by exact_mod_cast Nat.totient_pos.2 hq
-  have hqpos : (0:ℝ) < q := by exact_mod_cast hq
+  have hφq : (0 : ℝ) < q.totient := by exact_mod_cast Nat.totient_pos.2 hq
+  have hqpos : (0 : ℝ) < q := by exact_mod_cast hq
   have hlog : Real.log Q ≤ ∑ n ∈ Finset.Icc 1 Q, (1:ℝ) / n := by
     have h1 := log_add_one_le_harmonic Q
     rw [harmonic_eq_sum_Icc] at h1
     push_cast at h1
-    calc Real.log Q ≤ Real.log (Q + 1) := Real.log_le_log (by exact_mod_cast hQ) (by linarith)
+    calc
+      Real.log Q
+        ≤ Real.log (Q + 1) := Real.log_le_log (by exact_mod_cast hQ) (by linarith)
       _ ≤ _ := by simpa [one_div] using h1
   have hL : (q.totient : ℝ) / q * Real.log Q ≤ ∑ d ∈ D, (1:ℝ) / d.totient := by
     have h2 := sum_inv_le_mul_sum_squarefree_inv_totient Q q hq
-    have h3 : (q.totient : ℝ) / q * ((q:ℝ) / q.totient) = 1 := by field_simp
-    calc (q.totient : ℝ) / q * Real.log Q ≤ (q.totient : ℝ) / q * ∑ n ∈ Finset.Icc 1 Q, (1:ℝ) / n := by
-          gcongr
-      _ ≤ (q.totient : ℝ) / q * (((q:ℝ) / q.totient) * ∑ d ∈ D, (1:ℝ) / d.totient) := by gcongr
+    have h3 : (q.totient : ℝ) / q * ((q : ℝ) / q.totient) = 1 := by field_simp
+    calc
+      (q.totient : ℝ) / q * Real.log Q
+        ≤ (q.totient : ℝ) / q * ∑ n ∈ Finset.Icc 1 Q, (1:ℝ) / n := by gcongr
+      _ ≤ (q.totient : ℝ) / q * (((q : ℝ) / q.totient) * ∑ d ∈ D, (1:ℝ) / d.totient) := by gcongr
       _ = _ := by rw [← mul_assoc, h3, one_mul]
 
   set U : ℕ → ℝ := fun d => ∑ a ∈ (Finset.range d).filter d.Coprime,
     ‖∑ n ∈ S, (1:ℂ) * cexp (2 * ↑Real.pi * I * n * a / d)‖ ^ 2 with hU
-  have hmont : ∀ d ∈ D, Z ^ 2 * ((1:ℝ) / d.totient) ≤ U d := by
+  have hmont : ∀ d ∈ D, Z ^ 2 * ((1 : ℝ) / d.totient) ≤ U d := by
     intro d hd
     rw [hD, Finset.mem_filter, Finset.mem_Icc] at hd
     have hd0 : 0 < d := hd.1.1
-    have h := norm_sum_sq_le_totient_mul_of_avoids_classes S d hd0 hd.2.1 (fun p hp hpd => hcl p hp
-      (le_trans (Nat.le_of_dvd hd0 hpd) hd.1.2)
-      (fun hpq => (Nat.Prime.coprime_iff_not_dvd hp).1 (Nat.Coprime.coprime_dvd_left hpd hd.2.2) hpq)) (fun _ => 1)
-    have hφd : (0:ℝ) < d.totient := by exact_mod_cast Nat.totient_pos.2 hd0
+    have h :=
+      norm_sum_sq_le_totient_mul_of_avoids_classes S d hd0 hd.2.1
+        (fun p hp hpd =>
+          hcl p hp (le_trans (Nat.le_of_dvd hd0 hpd) hd.1.2) (fun hpq =>
+            (Nat.Prime.coprime_iff_not_dvd hp).1 (Nat.Coprime.coprime_dvd_left hpd hd.2.2) hpq))
+        (fun _ => 1)
+    have hφd : (0 : ℝ) < d.totient := by exact_mod_cast Nat.totient_pos.2 hd0
     have hsum : ‖∑ n ∈ S, (1:ℂ)‖ ^ 2 = Z ^ 2 := by simp [hZ]
     rw [hsum] at h
     rw [mul_one_div, div_le_iff₀ hφd]
     linarith [h, mul_comm (d.totient : ℝ) (U d)]
-  have hls : ∑ d ∈ D, U d ≤ ((Q:ℝ) ^ 2 + 2 * Real.pi * N) * Z := by
+  have hls : ∑ d ∈ D, U d ≤ ((Q : ℝ) ^ 2 + 2 * Real.pi * N) * Z := by
     set P := D.sigma (fun d => (Finset.range d).filter d.Coprime) with hP
     set T : Finset ℝ := P.image (fun x => (x.2:ℝ) / x.1) with hT
     have hmemP : ∀ x ∈ P, 0 < x.1 ∧ x.1 ≤ Q ∧ x.2 < x.1 ∧ Nat.Coprime x.2 x.1 := by
       intro x hx
       rw [hP, Finset.mem_sigma, hD, Finset.mem_filter, Finset.mem_Icc, Finset.mem_filter,
-        Finset.mem_range] at hx
+          Finset.mem_range]
+        at hx
       exact ⟨hx.1.1.1, hx.1.1.2, hx.2.1, hx.2.2.symm⟩
-    have hinj : Set.InjOn (fun x : (Σ _ : ℕ, ℕ) => (x.2:ℝ) / x.1) P := by
+    have hinj : Set.InjOn (fun x : (Σ _ : ℕ, ℕ) => (x.2 : ℝ) / x.1) P := by
       intro x hx y hy hxy
       obtain ⟨h1, -, -, h4⟩ := hmemP x hx
       obtain ⟨g1, -, -, g4⟩ := hmemP y hy
       obtain ⟨e1, e2⟩ := _root_.GlobalTheory.MultSieve.reduced_inj h1 g1 h4 g4 hxy
       exact Sigma.ext e1 (heq_of_eq e2)
-    have hsumU : ∑ d ∈ D, U d = ∑ x ∈ T, ‖∑ n ∈ Finset.Ioc M (M + N),
-        (if n ∈ S then (1:ℂ) else 0) * cexp (2 * ↑Real.pi * I * ↑n * ↑x)‖ ^ 2 := by
+    have hsumU
+        : ∑ d ∈ D, U d
+          = ∑ x ∈ T, ‖∑ n ∈ Finset.Ioc M (M + N),
+            (if n ∈ S then (1:ℂ) else 0) * cexp (2 * ↑Real.pi * I * ↑n * ↑x)‖ ^ 2 := by
       rw [hT, Finset.sum_image hinj, hP, Finset.sum_sigma]
       refine Finset.sum_congr rfl fun d _ => Finset.sum_congr rfl fun a _ => ?_
       simp only [ite_mul, one_mul, zero_mul]
@@ -496,34 +505,38 @@ theorem _root_.GlobalTheory.arithmetic_large_sieve_one_class : ∀ (M N Q q : �
       congr 1
       push_cast
       ring
-    have hspaced : ∀ x ∈ T, ∀ y ∈ T, x ≠ y → ∀ k : ℤ, 1 / (Q:ℝ) ^ 2 ≤ |x - y - k| := by
+    have hspaced : ∀ x ∈ T, ∀ y ∈ T, x ≠ y → ∀ k : ℤ, 1 / (Q : ℝ) ^ 2 ≤ |x - y - k| := by
       intro x hx y hy hxy k
       obtain ⟨u, hu, rfl⟩ := Finset.mem_image.1 hx
       obtain ⟨v, hv, rfl⟩ := Finset.mem_image.1 hy
       obtain ⟨-, u2, u3, -⟩ := hmemP u hu
       obtain ⟨-, v2, v3, -⟩ := hmemP v hv
       exact _root_.GlobalTheory.MultSieve.farey_spaced Q u.1 v.1 u.2 v.2 u2 v2 u3 v3 hxy k
-    have hQpos : (0:ℝ) < Q := by exact_mod_cast hQ
-    have h := _root_.GlobalTheory.additive_large_sieve M N (fun n => if n ∈ S then (1:ℂ) else 0) T (1 / (Q:ℝ) ^ 2)
-      (by positivity) (by rw [div_le_one (by positivity)]; exact one_le_pow₀ (by exact_mod_cast hQ)) hspaced
+    have hQpos : (0 : ℝ) < Q := by exact_mod_cast hQ
+    have h :=
+      _root_.GlobalTheory.additive_large_sieve M N
+        (fun n => if n ∈ S then (1 : ℂ) else 0)
+        T (1 / (Q : ℝ) ^ 2) (by positivity)
+        (by rw [div_le_one (by positivity)]; exact one_le_pow₀ (by exact_mod_cast hQ)) hspaced
     rw [one_div_one_div, ← hsumU] at h
     have hnorm : ∑ n ∈ Finset.Ioc M (M + N), ‖(if n ∈ S then (1:ℂ) else 0)‖ ^ 2 = Z := by
-      have hpt : ∀ n, ‖(if n ∈ S then (1:ℂ) else 0)‖ ^ 2 = if n ∈ S then (1:ℝ) else 0 := by
+      have hpt : ∀ n, ‖(if n ∈ S then (1:ℂ) else 0)‖ ^ 2 = if n ∈ S then (1 : ℝ) else 0 := by
         intro n; split_ifs <;> simp
       simp_rw [hpt]
       rw [← Finset.sum_filter, Finset.filter_mem_eq_inter, Finset.inter_eq_right.2 hS]
       simp [hZ]
     rw [hnorm] at h
     exact h
-  have hbig : Z ^ 2 * ∑ d ∈ D, (1:ℝ) / d.totient ≤ ((Q:ℝ) ^ 2 + 2 * Real.pi * N) * Z := by
+  have hbig : Z ^ 2 * ∑ d ∈ D, (1:ℝ) / d.totient ≤ ((Q : ℝ) ^ 2 + 2 * Real.pi * N) * Z := by
     rw [Finset.mul_sum]
     exact le_trans (Finset.sum_le_sum hmont) hls
   rcases hZ0.eq_or_lt with h0 | hpos
   · rw [← h0, zero_mul]; exact hRHS
-  · calc Z * ((q.totient : ℝ) / q * Real.log Q) ≤ Z * ∑ d ∈ D, (1:ℝ) / d.totient :=
-          mul_le_mul_of_nonneg_left hL hZ0
-      _ ≤ (Q:ℝ) ^ 2 + 2 * Real.pi * N := by
-          refine le_of_mul_le_mul_left ?_ hpos
-          nlinarith [hbig]
+  · calc
+      Z * ((q.totient : ℝ) / q * Real.log Q)
+        ≤ Z * ∑ d ∈ D, (1:ℝ) / d.totient := mul_le_mul_of_nonneg_left hL hZ0
+      _ ≤ (Q : ℝ) ^ 2 + 2 * Real.pi * N := by
+        refine le_of_mul_le_mul_left ?_ hpos
+        nlinarith [hbig]
 
 end GlobalTheory

@@ -13,8 +13,8 @@ open scoped ContDiff ENNReal
 noncomputable section
 
 set_option synthInstance.maxHeartbeats 100000 in
-theorem aprb_complement {n d : ℕ} (Lm : V n →L[ℂ] V d) (hs : Function.Surjective Lm) :
-    ∃ A : V n ≃L[ℂ] V d × V (n - d), ∀ v, (A v).1 = Lm v := by
+theorem aprb_complement {n d : ℕ} (Lm : V n →L[ℂ] V d) (hs : Function.Surjective Lm)
+    : ∃ A : V n ≃L[ℂ] V d × V (n - d), ∀ v, (A v).1 = Lm v := by
   classical
   let K := LinearMap.ker (Lm : V n →ₗ[ℂ] V d)
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl K
@@ -40,8 +40,9 @@ theorem aprb_complement {n d : ℕ} (Lm : V n →L[ℂ] V d) (hs : Function.Surj
   refine ⟨(LinearMap.linearEquivOfInjective T hT hdim).toContinuousLinearEquiv, fun v => ?_⟩
   rfl
 
-theorem aprb_contDiffOn {n d : ℕ} {U : Set (V n)} (hU : IsOpen U) {p : V n → V d}
-    (hp : DifferentiableOn ℂ p U) (k : ℕ) : ContDiffOn ℂ k p U := by
+theorem aprb_contDiffOn
+    {n d : ℕ} {U : Set (V n)} (hU : IsOpen U) {p : V n → V d} (hp : DifferentiableOn ℂ p U) (k : ℕ)
+    : ContDiffOn ℂ k p U := by
   rw [contDiffOn_euclidean]
   intro i
   have h1 : DifferentiableOn ℂ (fun x => p x i) U :=

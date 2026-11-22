@@ -16,10 +16,12 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem cmp_props :
-    (∀ f : ℍ → ℂ, GlobalTheory.FN.cmp 1 f = f) ∧ (∀ (g h : GQ) (f : ℍ → ℂ), GlobalTheory.FN.cmp (g * h) f = GlobalTheory.FN.cmp h (GlobalTheory.FN.cmp g f)) ∧
-      (∀ (γ : SL(2, ℤ)) (f : ℍ → ℂ), GlobalTheory.FN.cmp (ofSL γ) f = fun τ => f (γ • τ)) ∧
-        ∀ (g : GQ) (f : ℍ → ℂ), ∀ z ∈ Hs, up (GlobalTheory.FN.cmp g f) z = up f (mob g z) := by
+theorem cmp_props
+    : (∀ f : ℍ → ℂ, GlobalTheory.FN.cmp 1 f = f)
+      ∧ (∀ (g h : GQ) (f : ℍ → ℂ),
+        GlobalTheory.FN.cmp (g * h) f = GlobalTheory.FN.cmp h (GlobalTheory.FN.cmp g f))
+      ∧ (∀ (γ : SL(2, ℤ)) (f : ℍ → ℂ), GlobalTheory.FN.cmp (ofSL γ) f = fun τ => f (γ • τ))
+      ∧ ∀ (g : GQ) (f : ℍ → ℂ), ∀ z ∈ Hs, up (GlobalTheory.FN.cmp g f) z = up f (mob g z) := by
   obtain ⟨hH, hmul, hone, hsl, -, -⟩ := GlobalTheory.T.glTwoPosRatMobius_upperHalfPlane_properties
   have hup : ∀ (f : ℍ → ℂ) (z : ℂ) (hz : 0 < z.im), up f z = f ⟨z, hz⟩ := by
     intro f z hz

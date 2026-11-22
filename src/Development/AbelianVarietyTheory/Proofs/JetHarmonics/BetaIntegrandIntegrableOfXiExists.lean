@@ -12,7 +12,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaCutoffLi
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Filter Topology MeasureTheory
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Filter Topology
+  MeasureTheory
 
 noncomputable section
 
@@ -20,32 +21,50 @@ namespace GlobalTheory.BetaIntegrand
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
 end GlobalTheory.BetaIntegrand
 
 open Filter Topology MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
-private theorem exists_CCle_four_of_inCC_five {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {A : ℝ}
-    {G : _root_.Formalism.FourierDecayAlt.B.Mat k r → E} (hG : _root_.Formalism.FourierDecayAlt.B.InCC A 5 G) : ∃ c, _root_.Formalism.FourierDecayAlt.B.CCle A 4 G c := by
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
+private theorem exists_CCle_four_of_inCC_five
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {A : ℝ} {G : _root_.Formalism.FourierDecayAlt.B.Mat k r → E}
+    (hG : _root_.Formalism.FourierDecayAlt.B.InCC A 5 G)
+    : ∃ c, _root_.Formalism.FourierDecayAlt.B.CCle A 4 G c := by
   unfold _root_.Formalism.FourierDecayAlt.B.InCC _root_.Formalism.FourierDecayAlt.B.CCle at hG
   obtain ⟨c, h1, h2⟩ := hG
-  exact ⟨c, _root_.Formalism.FourierDecayAlt.P.B5.ckOn_mono (by norm_num) h1, fun u v hu hv hl g hg => h2 u v hu hv (by omega) g hg⟩
+  exact ⟨
+    c,
+    _root_.Formalism.FourierDecayAlt.P.B5.ckOn_mono (by norm_num) h1,
+    fun u v hu hv hl g hg => h2 u v hu hv (by omega) g hg
+  ⟩
 
 open Filter Topology MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
-private theorem measurableSet_Qset' (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) : MeasurableSet (_root_.Formalism.FourierDecayAlt.B.Qset Bs) :=
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
+private theorem measurableSet_Qset'
+    (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq)
+    : MeasurableSet (_root_.Formalism.FourierDecayAlt.B.Qset Bs) :=
   measurableSet_lt measurable_const (_root_.Formalism.FourierDecayAlt.P.B7.measurable_bcWeight _ _)
 
 open Filter Topology MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
-private theorem aestronglyMeasurable_indicator_hsVec_JF (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq)
-    {G : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp} (hG : ContinuousOn G (_root_.Formalism.FourierDecayAlt.B.GV k r)) :
-    AEStronglyMeasurable ((_root_.Formalism.FourierDecayAlt.B.Qset Bs).indicator fun q => _root_.Formalism.FourierDecayAlt.B.hsVec (_root_.Formalism.FourierDecayAlt.B.JF Bs G (_root_.Formalism.FourierDecayAlt.B.gq Bs q)))
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
+private theorem aestronglyMeasurable_indicator_hsVec_JF
+    (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq)
+    {G : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp}
+    (hG : ContinuousOn G (_root_.Formalism.FourierDecayAlt.B.GV k r))
+    : AEStronglyMeasurable
+      ((_root_.Formalism.FourierDecayAlt.B.Qset Bs).indicator fun q =>
+        _root_.Formalism.FourierDecayAlt.B.hsVec (_root_.Formalism.FourierDecayAlt.B.JF Bs G
+          (_root_.Formalism.FourierDecayAlt.B.gq Bs q)))
       volume := by
   refine (aestronglyMeasurable_indicator_iff (measurableSet_Qset' Bs)).2 ?_
   have h := _root_.Formalism.FourierDecayAlt.P.B7.jc_aesm_J Bs hG (1, 1)
@@ -53,24 +72,45 @@ private theorem aestronglyMeasurable_indicator_hsVec_JF (Bs : _root_.Formalism.F
   exact _root_.Formalism.FourierDecayAlt.P.JCTx2.hsVec_cont'.comp_aestronglyMeasurable h
 
 open Filter Topology MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
-private theorem mem_Qset_iff_zero_lt_bcWeight (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) (q : (Fin r → ℂ) × ℂ) :
-    q ∈ _root_.Formalism.FourierDecayAlt.B.Qset Bs ↔ 0 < _root_.Formalism.QuantumDeterminants.bcWeight k r (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z) (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q := Iff.rfl
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
+private theorem mem_Qset_iff_zero_lt_bcWeight
+    (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) (q : (Fin r → ℂ) × ℂ)
+    : q ∈ _root_.Formalism.FourierDecayAlt.B.Qset Bs
+      ↔ 0
+        < _root_.Formalism.QuantumDeterminants.bcWeight k r
+          (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z)
+          (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q :=
+  Iff.rfl
 
 open Filter Topology MeasureTheory in
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
-private theorem bcWeight_mul_eq_bcWeight_mul_indicator (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) {β : Type} [Zero β] (Φ : β → ℝ)
-    (hΦ : Φ 0 = 0) (u : (Fin r → ℂ) × ℂ → β) (q : (Fin r → ℂ) × ℂ) :
-    _root_.Formalism.QuantumDeterminants.bcWeight k r (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z) (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q * Φ (u q) =
-      _root_.Formalism.QuantumDeterminants.bcWeight k r (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z) (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q * Φ ((_root_.Formalism.FourierDecayAlt.B.Qset Bs).indicator u q) := by
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] in
+private theorem bcWeight_mul_eq_bcWeight_mul_indicator
+    (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq)
+    {β : Type} [Zero β]
+    (Φ : β → ℝ) (hΦ : Φ 0 = 0)
+    (u : (Fin r → ℂ) × ℂ → β) (q : (Fin r → ℂ) × ℂ)
+    : _root_.Formalism.QuantumDeterminants.bcWeight k r
+          (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z)
+          (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q
+        * Φ (u q)
+      = _root_.Formalism.QuantumDeterminants.bcWeight k r
+          (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z)
+          (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q
+        * Φ ((_root_.Formalism.FourierDecayAlt.B.Qset Bs).indicator u q) := by
   by_cases hq : q ∈ _root_.Formalism.FourierDecayAlt.B.Qset Bs
   · rw [Set.indicator_of_mem hq]
-  · have hw : _root_.Formalism.QuantumDeterminants.bcWeight k r (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z) (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q = 0 :=
-      le_antisymm (not_lt.1 ((mem_Qset_iff_zero_lt_bcWeight Bs q).not.1 hq)) (_root_.Formalism.FourierDecayAlt.P.JCTx2.bcWeight_nonneg' _ _ q)
+  · have hw
+        : _root_.Formalism.QuantumDeterminants.bcWeight k r
+            (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z)
+            (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q
+          = 0 :=
+      le_antisymm (not_lt.1 ((mem_Qset_iff_zero_lt_bcWeight Bs q).not.1 hq))
+        (_root_.Formalism.FourierDecayAlt.P.JCTx2.bcWeight_nonneg' _ _ q)
     rw [hw, zero_mul, zero_mul]
-
 
 open Filter Topology MeasureTheory in
 theorem _root_.GlobalTheory.betaIntegrand_integrable_of_xiExists (hXi : _root_.Formalism.FourierDecayAlt.B.XiExists) : ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData k r Wp Wq) (A : ℝ) (X F : _root_.Formalism.FourierDecayAlt.B.Mat k r → (Wq →L[ℂ] Wp)), _root_.Formalism.FourierDecayAlt.B.AB k r ≤ A → _root_.Formalism.FourierDecayAlt.B.InCC A 5 X → _root_.Formalism.FourierDecayAlt.B.InCC A 5 F → Integrable (fun q : (Fin r → ℂ) × ℂ => (_root_.Formalism.QuantumDeterminants.bcWeight k r (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z) (_root_.Formalism.QuantumDeterminants.Tz k r Bs.z') q : ℂ) * inner ℂ (_root_.Formalism.FourierDecayAlt.B.hsVec (_root_.Formalism.FourierDecayAlt.B.JF Bs F (_root_.Formalism.FourierDecayAlt.B.gq Bs q))) (_root_.Formalism.FourierDecayAlt.B.hsVec (_root_.Formalism.FourierDecayAlt.B.JF Bs X (_root_.Formalism.FourierDecayAlt.B.gq Bs q)))) := by

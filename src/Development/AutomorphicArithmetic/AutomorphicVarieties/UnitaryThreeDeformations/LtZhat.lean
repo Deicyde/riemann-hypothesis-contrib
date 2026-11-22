@@ -4,22 +4,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
-theorem UpperTheory.V.UnitaryThreeInertia.lt_zhat :
-    ∀ {D E E' : Type} [Group D] [TopologicalSpace D] [IsTopologicalGroup D] [Group E] [Finite E] [Group E'] (I : Subgroup D) (φ : D),
-      (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤ →
-      (∀ n : ℕ, 0 < n → ∃ d : D →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1) →
-      ∀ (q : E →* E') (w' : D →* E') (e : E), IsLocallyConstant w' → (∀ s ∈ I, w' s = 1) → q e = w' φ →
-      ∃ w : D →* E, IsLocallyConstant w ∧ (∀ s ∈ I, w s = 1) ∧ q.comp w = w' ∧ ∀ g, w g ∈ Subgroup.zpowers e := by
+theorem UpperTheory.V.UnitaryThreeInertia.lt_zhat
+    : ∀ {D E E' : Type} [Group D] [TopologicalSpace D] [IsTopologicalGroup D] [Group E] [Finite E]
+        [Group E'] (I : Subgroup D) (φ : D),
+      (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤
+        → (∀ n : ℕ,
+          0 < n
+            → ∃ d : D →* Multiplicative (ZMod n),
+              IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1)
+        → ∀ (q : E →* E') (w' : D →* E') (e : E),
+          IsLocallyConstant w' → (∀ s ∈ I, w' s = 1) → q e = w' φ
+            → ∃ w : D →* E,
+              IsLocallyConstant w ∧ (∀ s ∈ I, w s = 1) ∧ q.comp w = w'
+                ∧ ∀ g, w g ∈ Subgroup.zpowers e := by
   intro D E E' _ _ _ _ _ _ I φ hcl hd q w' e hw' hw'I hqe
   obtain ⟨d, hdc, hdI, hdφ⟩ := hd (orderOf e) (orderOf_pos e)
   haveI : NeZero (orderOf e) := ⟨(orderOf_pos e).ne'⟩
-  let w : D →* E :=
-    { toFun := fun g => e ^ (Multiplicative.toAdd (d g)).val
-      map_one' := by simp
-      map_mul' := fun x y => by
-        simp only [map_mul, toAdd_mul, ZMod.val_add, pow_mod_orderOf, pow_add] }
+  let w : D →* E := {
+    toFun := fun g => e ^ (Multiplicative.toAdd (d g)).val
+    map_one' := by simp
+    map_mul' := fun x y => by simp only [map_mul, toAdd_mul, ZMod.val_add, pow_mod_orderOf, pow_add]
+  }
   have hwapp : ∀ g, w g = e ^ (Multiplicative.toAdd (d g)).val := fun g => rfl
   have hwc : IsLocallyConstant w := hdc.comp fun x => e ^ (Multiplicative.toAdd x).val
   have hφ : w φ = e := by

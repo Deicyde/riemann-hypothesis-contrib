@@ -35,7 +35,8 @@ variable {l}
 
 namespace PAlg
 
-@[ext] structure Hom (A B : PAlg l) where
+@[ext]
+structure Hom (A B : PAlg l) where
   f : A.A →+* B.A
   comm : f.comp A.s = B.s
 
@@ -50,8 +51,10 @@ def pi : A.A := A.s (pFlat l)
 
 def AIC : Prop := ∀ P : Polynomial A.A, P.Monic → 0 < P.natDegree → ∃ x, P.IsRoot x
 
-def VAL : Prop := ∀ f g : A.A, (∃ N : ℕ, A.pi ^ N ∈ Ideal.span {f, g}) →
-  ∃ e : A.A, IsIdempotentElem e ∧ e * f ∈ Ideal.span {g} ∧ (1 - e) * g ∈ Ideal.span {f}
+def VAL : Prop :=
+  ∀ f g : A.A,
+    (∃ N : ℕ, A.pi ^ N ∈ Ideal.span {f, g})
+      → ∃ e : A.A, IsIdempotentElem e ∧ e * f ∈ Ideal.span {g} ∧ (1 - e) * g ∈ Ideal.span {f}
 
 def IsTest : Prop := A.AIC ∧ A.VAL
 
@@ -70,12 +73,15 @@ def th : A.W →+* A.U := Ideal.Quotient.mk _
 abbrev Ug : Type := Localization.Away (l : A.U)
 
 def Acr0 : Subalgebra A.W (Localization.Away (l : A.W)) :=
-  Algebra.adjoin A.W (Set.range fun k : ℕ =>
-    Ring.inverse (k.factorial : Localization.Away (l : A.W)) * algebraMap A.W (Localization.Away (l : A.W)) A.xi ^ k)
+  Algebra.adjoin A.W
+    (Set.range fun k : ℕ =>
+      Ring.inverse (k.factorial : Localization.Away (l : A.W))
+        * algebraMap A.W (Localization.Away (l : A.W)) A.xi ^ k)
 
 def Acr (n : ℕ) : Type := A.Acr0 ⧸ Ideal.span {(l : A.Acr0) ^ n}
 
-instance (n : ℕ) : CommRing (A.Acr n) := inferInstanceAs (CommRing (A.Acr0 ⧸ Ideal.span {(l : A.Acr0) ^ n}))
+instance (n : ℕ) : CommRing (A.Acr n) :=
+  inferInstanceAs (CommRing (A.Acr0 ⧸ Ideal.span {(l : A.Acr0) ^ n}))
 
 def toAcr (n : ℕ) : A.W →+* A.Acr n := (Ideal.Quotient.mk _).comp (algebraMap A.W A.Acr0)
 
@@ -94,14 +100,13 @@ def mapU (f : A ⟶ B) : A.U →+* B.U :=
   Ideal.quotientMap _ (mapW f) (by
     rw [Ideal.span_le, Set.singleton_subset_iff]
     show mapW f A.xi ∈ Ideal.span {B.xi}
-    rw [mapW_xi]; exact Ideal.mem_span_singleton_self _)
+    rw [mapW_xi]
+    exact Ideal.mem_span_singleton_self _)
 
 end PAlg
 
-
 variable (l) in
 def IsBase (A : PAlg l) : Prop := Function.Bijective A.s
-
 
 variable (l) in
 abbrev Test : Type 1 := ObjectProperty.FullSubcategory fun A : PAlg l => A.IsTest

@@ -5,16 +5,16 @@ public import Mathlib
 @[expose] public section
 
 open Polynomial in
-private theorem UpperTheory.Reformulated.B.Ybf4.isIntegral_det_of_isIntegral {R E : Type} [CommRing R] [Field E]
-    [Algebra R E] {N : ℕ} (γ : Matrix (Fin N) (Fin N) E) (h : IsIntegral R γ) :
-    IsIntegral R γ.det := by
+private theorem UpperTheory.Reformulated.B.Ybf4.isIntegral_det_of_isIntegral
+    {R E : Type} [CommRing R] [Field E] [Algebra R E]
+    {N : ℕ} (γ : Matrix (Fin N) (Fin N) E) (h : IsIntegral R γ)
+    : IsIntegral R γ.det := by
   let K := AlgebraicClosure E
   let φ : Matrix (Fin N) (Fin N) E →ₐ[R] Matrix (Fin N) (Fin N) K :=
     (IsScalarTower.toAlgHom R E K).mapMatrix
   have hφ : IsIntegral R (φ γ) := h.map φ
   have hdet : algebraMap E K γ.det = (φ γ).det := RingHom.map_det (algebraMap E K) γ
-  rw [← isIntegral_algebraMap_iff (B := K) , hdet,
-    Matrix.det_eq_prod_roots_charpoly]
+  rw [← isIntegral_algebraMap_iff (B := K), hdet, Matrix.det_eq_prod_roots_charpoly]
   refine IsIntegral.multiset_prod fun μ hμ => ?_
   have hspec : μ ∈ spectrum K (φ γ) :=
     Matrix.mem_spectrum_iff_isRoot_charpoly.2 (isRoot_of_mem_roots hμ)
@@ -29,11 +29,11 @@ private theorem UpperTheory.Reformulated.B.Ybf4.isIntegral_det_of_isIntegral {R 
   exact (IsUnit.mk0 _ hne).map _
 
 open Polynomial in
-theorem UpperTheory.Reformulated.B.Ybf4.isIntegral_det :
-    ∀ {E : Type} [inst : Field E] [NumberField E] {N : ℕ} (L : Submodule (NumberField.RingOfIntegers E) (Fin N → E)),
-      L.FG →
-        Submodule.span E (↑L : Set (Fin N → E)) = ⊤ →
-          ∀ (γ : Matrix (Fin N) (Fin N) E), (∀ v ∈ L, γ.mulVec v ∈ L) → IsIntegral ℤ γ.det := by
+theorem UpperTheory.Reformulated.B.Ybf4.isIntegral_det
+    : ∀ {E : Type} [inst : Field E] [NumberField E] {N : ℕ}
+        (L : Submodule (NumberField.RingOfIntegers E) (Fin N → E)),
+      L.FG → Submodule.span E (↑L : Set (Fin N → E)) = ⊤
+        → ∀ (γ : Matrix (Fin N) (Fin N) E), (∀ v ∈ L, γ.mulVec v ∈ L) → IsIntegral ℤ γ.det := by
   intro E _ _ N L hfg hspan γ hγ
   refine isIntegral_trans (A := NumberField.RingOfIntegers E) _
     (UpperTheory.Reformulated.B.Ybf4.isIntegral_det_of_isIntegral γ ?_)
@@ -51,8 +51,9 @@ theorem UpperTheory.Reformulated.B.Ybf4.isIntegral_det :
       intro v
       rw [pow_succ, pow_succ, Module.End.mul_apply, ih, ← Matrix.mulVec_mulVec]
       rfl
-  have key : ∀ (q : (NumberField.RingOfIntegers E)[X]) (v : L),
-      ((aeval f q) v : Fin N → E) = (aeval γ q).mulVec v := by
+  have key
+      : ∀ (q : (NumberField.RingOfIntegers E)[X]) (v : L),
+        ((aeval f q) v : Fin N → E) = (aeval γ q).mulVec v := by
     intro q v
     induction q using Polynomial.induction_on' with
     | add a b ha hb => simp [ha, hb, Matrix.add_mulVec]

@@ -11,21 +11,28 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
 namespace PositivityTheory.PfDR.h_smooth
 
-private theorem rayRel_of_mul_left' {F : Type} [Field F] [NumberField F] {𝔣 𝔠 I J : Ideal (𝓞 F)}
-    (h𝔠 : 𝔠 ≠ 0) (h : RayRel F 𝔣 (𝔠 * I) (𝔠 * J)) : RayRel F 𝔣 I J := by
+private theorem rayRel_of_mul_left'
+    {F : Type} [Field F] [NumberField F]
+    {𝔣 𝔠 I J : Ideal (𝓞 F)} (h𝔠 : 𝔠 ≠ 0) (h : RayRel F 𝔣 (𝔠 * I) (𝔠 * J))
+    : RayRel F 𝔣 I J := by
   obtain ⟨a, b, ha, hb, ha1, hb1, hpos, heq⟩ := h
   refine ⟨a, b, ha, hb, ha1, hb1, hpos, ?_⟩
   apply mul_left_cancel₀ h𝔠
-  calc 𝔠 * (Ideal.span {a} * I) = Ideal.span {a} * (𝔠 * I) := by ring
+  calc
+    𝔠 * (Ideal.span {a} * I)
+      = Ideal.span {a} * (𝔠 * I) := by ring
     _ = Ideal.span {b} * (𝔠 * J) := heq
     _ = 𝔠 * (Ideal.span {b} * J) := by ring
 
-private theorem ne_zero_of_totPos' {F : Type} [Field F] [NumberField F] [IsTotallyReal F] {x : F}
-    (hx : TotPos F x) : x ≠ 0 := by
+private theorem ne_zero_of_totPos'
+    {F : Type} [Field F] [NumberField F] [IsTotallyReal F] {x : F} (hx : TotPos F x)
+    : x ≠ 0 := by
   obtain ⟨w⟩ := (inferInstance : Nonempty (InfinitePlace F))
   have h := hx (InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal w))
   intro h0
@@ -33,35 +40,64 @@ private theorem ne_zero_of_totPos' {F : Type} [Field F] [NumberField F] [IsTotal
   exact lt_irrefl _ h
 
 theorem smoothed_of
-    (hcv : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 𝔞 𝔟 𝔠 : Ideal (𝓞 F)) (J : Type) [Fintype J]
-      (r : J → ℕ) (y : J → 𝓞 F) (v : ∀ j, Fin (r j) → 𝓞 F), ClassParam 𝔣 𝔞 𝔟 r y v → 𝔠.IsPrime → (Ideal.absNorm 𝔠).Prime →
-      (∀ j i, v j i ∉ 𝔠 * 𝔟) → ∀ T : ℂ → ℂ, DifferentiableOn ℂ T {1}ᶜ →
-        (∀ s : ℂ, 1 < s.re → HasSum (fun I : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I 𝔞} =>
-          (classWeight (Ideal.absNorm 𝔠) 𝔠 I.1 : ℂ) * ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s)) (T s)) →
-        ∀ k : ℕ, 1 ≤ k → ∃ q : ℚ, T (1 - (k : ℂ)) = (q : ℂ) ∧
-          ∀ l : ℕ, l.Prime → l ≠ Ideal.absNorm 𝔠 → ¬ l ∣ Ideal.absNorm 𝔟 → 0 ≤ padicValRat l q)
-    (hcp : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 : Ideal (𝓞 F)), 𝔣 ≠ ⊥ →
-      ∀ 𝔞 : Ideal (𝓞 F), CoprimeTo F 𝔣 𝔞 →
-        ∃ (𝔟 : Ideal (𝓞 F)) (J : Type) (_ : Fintype J) (r' : J → ℕ) (y : J → 𝓞 F) (v' : ∀ j, Fin (r' j) → 𝓞 F),
-          ClassParam 𝔣 𝔞 𝔟 r' y v' ∧ 𝔟 ⊔ 𝔣 = ⊤)
-    (hnd : ∀ {F : Type} [Field F] [NumberField F] {l : ℕ}, l.Prime → ∀ {𝔟 : Ideal (𝓞 F)},
-      𝔟 ⊔ Ideal.span {(l : 𝓞 F)} = ⊤ → ¬ l ∣ Ideal.absNorm 𝔟) :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 : Ideal (𝓞 F)), 𝔣 ≠ ⊥ →
-    ∀ (S : Finset (Ideal (𝓞 F))), (∀ a ∈ S, CoprimeTo F 𝔣 a) → (∀ a ∈ S, ∀ b ∈ S, RayRel F 𝔣 a b → a = b) →
-      (∀ I, CoprimeTo F 𝔣 I → ∃ a ∈ S, RayRel F 𝔣 I a) → ∀ Z : S → ℂ → ℂ, (∀ c, IsRayZeta 𝔣 c.1 (Z c)) →
-      ∃ W : Finset (𝓞 F), (∀ x ∈ W, x ≠ 0) ∧ ∀ 𝔠 : Ideal (𝓞 F), 𝔠.IsPrime → (Ideal.absNorm 𝔠).Prime → 𝔠 ⊔ 𝔣 = ⊤ →
-        (∀ x ∈ W, x ∉ 𝔠) → ∃ τ : Equiv.Perm S, (∀ c, RayRel F 𝔣 (𝔠 * (τ c).1) c.1) ∧
-          ∀ k : ℕ, 1 ≤ k → ∀ c, ∃ q : ℚ,
-            ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ k * Z (τ c) (1 - (k : ℂ)) - Z c (1 - (k : ℂ)) = (q : ℂ) ∧
-            ∀ l : ℕ, l.Prime → l ≠ Ideal.absNorm 𝔠 → 𝔣 ≤ Ideal.span {(l : 𝓞 F)} → 0 ≤ padicValRat l q := by
+    (hcv : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 𝔞 𝔟 𝔠 : Ideal (𝓞 F))
+        (J : Type) [Fintype J] (r : J → ℕ) (y : J → 𝓞 F) (v : ∀ j, Fin (r j) → 𝓞 F),
+      ClassParam 𝔣 𝔞 𝔟 r y v → 𝔠.IsPrime → (Ideal.absNorm 𝔠).Prime → (∀ j i, v j i ∉ 𝔠 * 𝔟)
+        → ∀ T : ℂ → ℂ,
+          DifferentiableOn ℂ T {1}ᶜ
+            → (∀ s : ℂ,
+              1 < s.re
+                → HasSum
+                  (fun I : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I 𝔞} =>
+                    (classWeight (Ideal.absNorm 𝔠) 𝔠 I.1 : ℂ)
+                      * ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s))
+                  (T s))
+            → ∀ k : ℕ,
+              1 ≤ k
+                → ∃ q : ℚ,
+                  T (1 - (k : ℂ)) = (q : ℂ)
+                    ∧ ∀ l : ℕ,
+                      l.Prime → l ≠ Ideal.absNorm 𝔠 → ¬ l ∣ Ideal.absNorm 𝔟 → 0 ≤ padicValRat l q)
+    (hcp : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 : Ideal (𝓞 F)),
+      𝔣 ≠ ⊥
+        → ∀ 𝔞 : Ideal (𝓞 F),
+          CoprimeTo F 𝔣 𝔞
+            → ∃ (𝔟 : Ideal (𝓞 F)) (J : Type) (_ : Fintype J) (r' : J → ℕ) (y : J → 𝓞 F)
+                (v' : ∀ j, Fin (r' j) → 𝓞 F),
+              ClassParam 𝔣 𝔞 𝔟 r' y v' ∧ 𝔟 ⊔ 𝔣 = ⊤)
+    (hnd : ∀ {F : Type} [Field F] [NumberField F] {l : ℕ},
+      l.Prime → ∀ {𝔟 : Ideal (𝓞 F)}, 𝔟 ⊔ Ideal.span {(l : 𝓞 F)} = ⊤ → ¬ l ∣ Ideal.absNorm 𝔟)
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 : Ideal (𝓞 F)),
+      𝔣 ≠ ⊥
+        → ∀ (S : Finset (Ideal (𝓞 F))),
+          (∀ a ∈ S, CoprimeTo F 𝔣 a) → (∀ a ∈ S, ∀ b ∈ S, RayRel F 𝔣 a b → a = b)
+            → (∀ I, CoprimeTo F 𝔣 I → ∃ a ∈ S, RayRel F 𝔣 I a)
+            → ∀ Z : S → ℂ → ℂ,
+              (∀ c, IsRayZeta 𝔣 c.1 (Z c))
+                → ∃ W : Finset (𝓞 F),
+                  (∀ x ∈ W, x ≠ 0)
+                    ∧ ∀ 𝔠 : Ideal (𝓞 F),
+                      𝔠.IsPrime → (Ideal.absNorm 𝔠).Prime → 𝔠 ⊔ 𝔣 = ⊤ → (∀ x ∈ W, x ∉ 𝔠)
+                        → ∃ τ : Equiv.Perm S,
+                          (∀ c, RayRel F 𝔣 (𝔠 * (τ c).1) c.1)
+                            ∧ ∀ k : ℕ,
+                              1 ≤ k
+                                → ∀ c, ∃ q : ℚ,
+                                  ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ k * Z (τ c) (1 - (k : ℂ))
+                                        - Z c (1 - (k : ℂ))
+                                      = (q : ℂ)
+                                    ∧ ∀ l : ℕ,
+                                      l.Prime → l ≠ Ideal.absNorm 𝔠 → 𝔣 ≤ Ideal.span {(l : 𝓞 F)}
+                                        → 0 ≤ padicValRat l q := by
   intro F _ _ _ 𝔣 h𝔣 S hSc hSinj hScov Z hZ
   classical
   have hdat := fun c : S => hcp F 𝔣 h𝔣 c.1 (hSc c.1 c.2)
   choose 𝔟 J hJ r y v hP hb using hdat
   have vne : ∀ c j i, v c j i ≠ 0 := fun c j i h =>
     ne_zero_of_totPos' ((hP c).2.2.1 j i).2 (by simp [h])
-  let W : Finset (𝓞 F) := Finset.univ.biUnion
-    (fun c : S => (Finset.univ : Finset (Σ j : J c, Fin (r c j))).image (fun p => v c p.1 p.2))
+  let W : Finset (𝓞 F) :=
+    Finset.univ.biUnion (fun c : S =>
+      (Finset.univ : Finset (Σ j : J c, Fin (r c j))).image (fun p => v c p.1 p.2))
   have memW : ∀ c j i, v c j i ∈ W := fun c j i =>
     Finset.mem_biUnion.2 ⟨c, Finset.mem_univ _, Finset.mem_image.2 ⟨⟨j, i⟩, Finset.mem_univ _, rfl⟩⟩
   refine ⟨W, ?_, ?_⟩
@@ -92,7 +128,9 @@ theorem smoothed_of
     have h1 := hσ c
     have h2 := hσ d
     rw [h] at h1
-    have h3 := rayRel_of_mul_left' h𝔠0 (GlobalTheory.RayZeta.rayRel_trans h1 (GlobalTheory.RayZeta.rayRel_symm h2))
+    have h3 :=
+      rayRel_of_mul_left' h𝔠0
+        (GlobalTheory.RayZeta.rayRel_trans h1 (GlobalTheory.RayZeta.rayRel_symm h2))
     exact Subtype.ext (hSinj _ c.2 _ d.2 h3)
   have σbij := Finite.injective_iff_bijective.mp σinj
   set τ : Equiv.Perm S := (Equiv.ofBijective σ σbij).symm with hτdef
@@ -106,26 +144,39 @@ theorem smoothed_of
   intro k hk c
   have hd1 : Differentiable ℂ (fun s : ℂ => ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s)) :=
     Differentiable.const_cpow differentiable_neg (Or.inl hN0)
-  have hdiff : DifferentiableOn ℂ (fun s => ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s)
-      * Z (τ c) s - Z c s) {1}ᶜ :=
+  have hdiff : DifferentiableOn ℂ
+      (fun s =>
+        ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s - Z c s)
+      {1}ᶜ :=
     (((differentiableOn_const _).mul hd1.differentiableOn).mul (hZ (τ c)).1).sub (hZ c).1
-  have hsum : ∀ s : ℂ, 1 < s.re → HasSum (fun I : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I c.1} =>
-      (classWeight (Ideal.absNorm 𝔠) 𝔠 I.1 : ℂ) * ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s))
-      (((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s - Z c s) := by
+  have hsum
+      : ∀ s : ℂ,
+        1 < s.re
+          → HasSum
+            (fun I : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I c.1} =>
+              (classWeight (Ideal.absNorm 𝔠) 𝔠 I.1 : ℂ) * ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s))
+            (((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s
+              - Z c s) := by
     intro s hs
     have hA := (hZ c).2 s hs
     have hB := (hZ (τ c)).2 s hs
-    let m : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I (τ c).1} →
-        {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I c.1} := fun I' =>
-      ⟨𝔠 * I'.1, hcopI _ I'.2.1,
-        GlobalTheory.RayZeta.rayRel_trans (GlobalTheory.RayZeta.rayRel_mul_left 𝔠 I'.2.2) (hτ c)⟩
+    let m
+        : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I (τ c).1}
+          → {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I c.1} := fun I' => ⟨
+      𝔠 * I'.1,
+      hcopI _ I'.2.1,
+      GlobalTheory.RayZeta.rayRel_trans (GlobalTheory.RayZeta.rayRel_mul_left 𝔠 I'.2.2) (hτ c)
+    ⟩
     have minj : Function.Injective m := fun a b h =>
       Subtype.ext (mul_left_cancel₀ h𝔠0 (Subtype.ext_iff.1 h))
     let f : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I c.1} → ℂ := fun I =>
       if I.1 ≤ 𝔠 then ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s) else 0
     have hf : HasSum f (((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s) := by
       rw [← minj.hasSum_iff]
-      · have e : f ∘ m = fun I' => ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * ((Ideal.absNorm I'.1 : ℕ) : ℂ) ^ (-s) := by
+      · have e
+            : f ∘ m
+              = fun I' =>
+                ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * ((Ideal.absNorm I'.1 : ℕ) : ℂ) ^ (-s) := by
           funext I'
           simp only [Function.comp, f, m]
           rw [if_pos Ideal.mul_le_left, map_mul, Nat.cast_mul, Complex.natCast_mul_natCast_cpow]
@@ -143,24 +194,33 @@ theorem smoothed_of
         have hle' : I.1 ≤ I' := by
           rw [hI']
           exact Ideal.mul_le_right
-        refine ⟨⟨I', ⟨fun h => I.2.1.1 (by rw [hI', h, Ideal.mul_bot]), ?_⟩, ?_⟩, Subtype.ext hI'.symm⟩
+        refine
+          ⟨⟨I', ⟨fun h => I.2.1.1 (by rw [hI', h, Ideal.mul_bot]), ?_⟩, ?_⟩, Subtype.ext hI'.symm⟩
         · exact top_le_iff.1 (I.2.1.2.ge.trans (sup_le_sup_right hle' _))
-        · exact rayRel_of_mul_left' h𝔠0 (GlobalTheory.RayZeta.rayRel_trans h1 (GlobalTheory.RayZeta.rayRel_symm (hτ c)))
+        · exact rayRel_of_mul_left' h𝔠0
+            (GlobalTheory.RayZeta.rayRel_trans h1 (GlobalTheory.RayZeta.rayRel_symm (hτ c)))
     have hC := (hf.mul_left ((Ideal.absNorm 𝔠 : ℕ) : ℂ)).sub hA
-    have e2 : (fun I : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I c.1} =>
-        (classWeight (Ideal.absNorm 𝔠) 𝔠 I.1 : ℂ) * ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s))
-        = fun I => ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * f I - ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s) := by
+    have e2
+        : (fun I : {I : Ideal (𝓞 F) // CoprimeTo F 𝔣 I ∧ RayRel F 𝔣 I c.1} =>
+            (classWeight (Ideal.absNorm 𝔠) 𝔠 I.1 : ℂ) * ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s))
+          = fun I => ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * f I - ((Ideal.absNorm I.1 : ℕ) : ℂ) ^ (-s) := by
       funext I
       simp only [f, classWeight]
       split_ifs <;> push_cast <;> ring
-    rw [e2, show ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s - Z c s
-      = ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * (((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s) - Z c s by ring]
+    rw [e2,
+      show ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s - Z c s
+          = ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * (((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-s) * Z (τ c) s)
+            - Z c s by
+        ring]
     exact hC
-  obtain ⟨q, hq, hql⟩ := hcv F 𝔣 c.1 (𝔟 c) 𝔠 (J c) (r c) (y c) (v c) (hP c) h𝔠p h𝔠N
-    (fun j i hv => hW (v c j i) (memW c j i) (Ideal.mul_le_left hv)) _ hdiff hsum k hk
+  obtain ⟨q, hq, hql⟩ :=
+    hcv F 𝔣 c.1 (𝔟 c) 𝔠 (J c) (r c) (y c) (v c) (hP c) h𝔠p h𝔠N
+      (fun j i hv => hW (v c j i) (memW c j i) (Ideal.mul_le_left hv))
+      _ hdiff hsum k hk
   refine ⟨q, ?_, fun l hl hlc hfl => hql l hl hlc (hnd hl ?_)⟩
-  · have hpow : ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-(1 - (k : ℂ)))
-        = ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ k := by
+  · have hpow
+        : ((Ideal.absNorm 𝔠 : ℕ) : ℂ) * ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ (-(1 - (k : ℂ)))
+          = ((Ideal.absNorm 𝔠 : ℕ) : ℂ) ^ k := by
       have he : -(1 - (k : ℂ)) = ((k - 1 : ℕ) : ℂ) := by
         push_cast [Nat.cast_sub hk]
         ring

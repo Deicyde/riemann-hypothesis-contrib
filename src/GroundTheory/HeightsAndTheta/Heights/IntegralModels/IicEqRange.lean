@@ -14,9 +14,9 @@ theorem MertensUpper.Iic_eq_range (n : ℕ) : Finset.Iic n = Finset.range (n + 1
   ext m
   simp
 
-theorem MertensUpper.equiv :
-    GroundTheory.Heights₂.Heights.Model.MertensUpper.Statement ↔
-      GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.MertensUpper.Statement := by
+theorem MertensUpper.equiv
+    : GroundTheory.Heights₂.Heights.Model.MertensUpper.Statement
+      ↔ GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.MertensUpper.Statement := by
   unfold GroundTheory.Heights₂.Heights.Model.MertensUpper.Statement
     GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.MertensUpper.Statement
   simp only [MertensUpper.Iic_eq_range]

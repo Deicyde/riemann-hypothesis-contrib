@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEi
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -93,8 +96,9 @@ private lemma lin_map {R S : Type} [CommRing R] [CommRing S] (β : R →+* S) {d
   ext i j
   simp [lin, MvPowerSeries.coeff_map]
 
-private noncomputable def mapLaw {R S : Type} [CommRing R] [CommRing S] (β : R →+* S) {d : ℕ} (F : FGLaw R d) :
-    FGLaw S d where
+private noncomputable def mapLaw
+    {R S : Type} [CommRing R] [CommRing S] (β : R →+* S) {d : ℕ} (F : FGLaw R d)
+    : FGLaw S d where
   F := F.mapF β
   const i := by simp [FGLaw.mapF, MvPowerSeries.constantCoeff_map, F.const]
   unit i := by
@@ -112,16 +116,31 @@ private noncomputable def mapLaw {R S : Type} [CommRing R] [CommRing S] (β : R 
   assoc i := by
     have := congrArg (MvPowerSeries.map β) (F.assoc i)
     simp only [ev_eq] at this ⊢
-    rw [map_sub_pair_eq_sub_map_of_constantCoeff_eq_zero β _ _ (fun l => constantCoeff_sub2_eq_zero _ _ (cc_pt _) (cc_pt _) _ (F.const l)) (cc_pt _),
-      map_sub_pair_eq_sub_map_of_constantCoeff_eq_zero β _ _ (cc_pt _) (fun l => constantCoeff_sub2_eq_zero _ _ (cc_pt _) (cc_pt _) _ (F.const l))] at this
-    simp only [map_sub_pair_eq_sub_map_of_constantCoeff_eq_zero β _ _ (cc_pt _) (cc_pt _), map_pt] at this
+    rw [map_sub_pair_eq_sub_map_of_constantCoeff_eq_zero β _ _
+          (fun l => constantCoeff_sub2_eq_zero _ _ (cc_pt _) (cc_pt _) _ (F.const l))
+          (cc_pt _),
+        map_sub_pair_eq_sub_map_of_constantCoeff_eq_zero β _ _ (cc_pt _)
+          (fun l => constantCoeff_sub2_eq_zero _ _ (cc_pt _) (cc_pt _) _ (F.const l))]
+      at this
+    simp only [map_sub_pair_eq_sub_map_of_constantCoeff_eq_zero β _ _ (cc_pt _) (cc_pt _), map_pt]
+      at this
     exact this
 
-theorem changeCoeff_law_lin_extSer : ∀ (R S : Type) [CommRing R] [CommRing S] (β : R →+* S), (∀ (d : ℕ) (F : FGLaw R d), ∃ F' : FGLaw S d, F'.F = F.mapF β) ∧ (∀ (d e : ℕ) (φ : Fin e → PS R 1 d), lin (fun j => MvPowerSeries.map β (φ j)) = (lin φ).map β) ∧ ∀ (d g r : ℕ) (F : FGLaw R d) (FB : FGLaw R g) (J : Fin d → PS R 1 r) (Q : Fin g → PS R 1 d), ExtSer F.F FB.F J Q → ExtSer (F.mapF β) (FB.mapF β) (fun j => MvPowerSeries.map β (J j)) (fun j => MvPowerSeries.map β (Q j)) := by
+theorem changeCoeff_law_lin_extSer
+    : ∀ (R S : Type) [CommRing R] [CommRing S] (β : R →+* S),
+      (∀ (d : ℕ) (F : FGLaw R d), ∃ F' : FGLaw S d, F'.F = F.mapF β)
+        ∧ (∀ (d e : ℕ) (φ : Fin e → PS R 1 d),
+          lin (fun j => MvPowerSeries.map β (φ j)) = (lin φ).map β)
+        ∧ ∀ (d g r : ℕ) (F : FGLaw R d) (FB : FGLaw R g) (J : Fin d → PS R 1 r)
+            (Q : Fin g → PS R 1 d),
+          ExtSer F.F FB.F J Q
+            → ExtSer (F.mapF β) (FB.mapF β)
+              (fun j => MvPowerSeries.map β (J j))
+              (fun j => MvPowerSeries.map β (Q j)) := by
   intro R S _ _ β
-  refine ⟨fun d F => ⟨mapLaw β F, rfl⟩, fun d e φ => lin_map β φ, fun d g r F FB J Q h => ⟨?_, ?_, ?_⟩⟩
-  · have hg : (fun j => MvPowerSeries.map β (gmF R r j)) = gmF S r := by
-      funext j; simp [gmF]
+  refine
+    ⟨fun d F => ⟨mapLaw β F, rfl⟩, fun d e φ => lin_map β φ, fun d g r F FB J Q h => ⟨?_, ?_, ?_⟩⟩
+  · have hg : (fun j => MvPowerSeries.map β (gmF R r j)) = gmF S r := by funext j; simp [gmF]
     rw [← hg]
     exact isHomF_map β _ _ _ (fun j => by simp [gmF]) h.homI
   · exact isHomF_map β _ _ _ F.const h.homQ

@@ -13,10 +13,11 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Metric Filter
 
-theorem exists_forall_ne_zero_of_isOpen {E ι : Type} [TopologicalSpace E] (s : Finset ι)
-    (G : ι → E → ℂ) (U : Set E) (hc : ∀ i ∈ s, ContinuousOn (G i) U)
-    (hne : ∀ i ∈ s, ∀ W : Set E, IsOpen W → W ⊆ U → W.Nonempty → ∃ t ∈ W, G i t ≠ 0) :
-    ∀ W : Set E, IsOpen W → W ⊆ U → W.Nonempty → ∃ t ∈ W, ∀ i ∈ s, G i t ≠ 0 := by
+theorem exists_forall_ne_zero_of_isOpen
+    {E ι : Type} [TopologicalSpace E]
+    (s : Finset ι) (G : ι → E → ℂ) (U : Set E) (hc : ∀ i ∈ s, ContinuousOn (G i) U)
+    (hne : ∀ i ∈ s, ∀ W : Set E, IsOpen W → W ⊆ U → W.Nonempty → ∃ t ∈ W, G i t ≠ 0)
+    : ∀ W : Set E, IsOpen W → W ⊆ U → W.Nonempty → ∃ t ∈ W, ∀ i ∈ s, G i t ≠ 0 := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -26,17 +27,21 @@ theorem exists_forall_ne_zero_of_isOpen {E ι : Type} [TopologicalSpace E] (s : 
     intro W hWo hWU hW
     obtain ⟨t₀, ht₀W, ht₀⟩ := hne a (Finset.mem_insert_self a s) W hWo hWU hW
     have hW'o : IsOpen (W ∩ G a ⁻¹' {0}ᶜ) :=
-      ((hc a (Finset.mem_insert_self a s)).mono hWU).isOpen_inter_preimage hWo isOpen_compl_singleton
-    obtain ⟨t, ⟨htW, hta⟩, hts⟩ := ih (fun i hi => hc i (Finset.mem_insert_of_mem hi))
-      (fun i hi => hne i (Finset.mem_insert_of_mem hi)) _ hW'o (Set.inter_subset_left.trans hWU)
-      ⟨t₀, ht₀W, ht₀⟩
+      ((hc a (Finset.mem_insert_self a s)).mono hWU).isOpen_inter_preimage hWo
+        isOpen_compl_singleton
+    obtain ⟨t, ⟨htW, hta⟩, hts⟩ :=
+      ih
+        (fun i hi => hc i (Finset.mem_insert_of_mem hi))
+        (fun i hi => hne i (Finset.mem_insert_of_mem hi))
+        _ hW'o (Set.inter_subset_left.trans hWU) ⟨t₀, ht₀W, ht₀⟩
     refine ⟨t, htW, fun i hi => ?_⟩
     rcases Finset.mem_insert.1 hi with rfl | hi
     · exact hta
     · exact hts i hi
 
-theorem ProperOpenProjectionLocalUnbranched.proof (hFin : CompactHolomorphicFibreFinite.Statement)
-    (hLoc : IsolatedFibreLocalUnbranched.Statement) : ProperOpenProjectionLocalUnbranched.Statement := by
+theorem ProperOpenProjectionLocalUnbranched.proof
+    (hFin : CompactHolomorphicFibreFinite.Statement) (hLoc : IsolatedFibreLocalUnbranched.Statement)
+    : ProperOpenProjectionLocalUnbranched.Statement := by
   classical
   intro σ _ X B k f d A D hB hf hXB hD hAD hprop hopen y₀ hy₀
   have zerosX : ∀ z, z ∈ X ∩ B → ∀ i, f i z = 0 := fun z hz => by
@@ -88,12 +93,14 @@ theorem ProperOpenProjectionLocalUnbranched.proof (hFin : CompactHolomorphicFibr
     have h1 := (hFin n (k + d) U₀ Φ yv hU₀o hΦd hfibc).image L.symm
     rwa [hfib, Set.image_preimage_eq _ L.symm.surjective] at h1
 
-  have hloc : ∀ x ∈ F, ∃ (M : Set (σ → ℂ)) (g : (Fin d → ℂ) → ℂ), IsOpen M ∧ x ∈ M ∧
-      AnalyticAt ℂ g y₀ ∧ (¬ ∀ᶠ t in 𝓝 y₀, g t = 0) ∧
-      ∀ z ∈ X ∩ B ∩ M, g (A z) ≠ 0 →
-        ∃ (O : Set (Fin d → ℂ)) (V : Set (σ → ℂ)) (h : (Fin d → ℂ) → σ → ℂ),
-          IsOpen O ∧ IsOpen V ∧ z ∈ V ∧ AnalyticOnNhd ℂ h O ∧ (∀ y' ∈ O, A (h y') = y') ∧
-          X ∩ B ∩ V = h '' O := by
+  have hloc
+      : ∀ x ∈ F, ∃ (M : Set (σ → ℂ)) (g : (Fin d → ℂ) → ℂ),
+        IsOpen M ∧ x ∈ M ∧ AnalyticAt ℂ g y₀ ∧ (¬ ∀ᶠ t in 𝓝 y₀, g t = 0)
+          ∧ ∀ z ∈ X ∩ B ∩ M,
+            g (A z) ≠ 0
+              → ∃ (O : Set (Fin d → ℂ)) (V : Set (σ → ℂ)) (h : (Fin d → ℂ) → σ → ℂ),
+                IsOpen O ∧ IsOpen V ∧ z ∈ V ∧ AnalyticOnNhd ℂ h O ∧ (∀ y' ∈ O, A (h y') = y')
+                  ∧ X ∩ B ∩ V = h '' O := by
     intro x hx
     have hiso : ∃ W ∈ 𝓝 x, ∀ x' ∈ X ∩ B ∩ W, A x' = A x → x' = x := by
       refine ⟨(F \ {x})ᶜ, hFfin.sdiff.isClosed.isOpen_compl.mem_nhds fun h => h.2 rfl, ?_⟩
@@ -102,8 +109,15 @@ theorem ProperOpenProjectionLocalUnbranched.proof (hFin : CompactHolomorphicFibr
       exact hx'W ⟨⟨hx'XB, hx'A.trans hx.2⟩, hne⟩
     obtain ⟨M, g, hM, hg, hg0, hsec⟩ := hLoc σ X B k f d A hB hf hXB hopen x hx.1 hiso
     rw [hx.2] at hg hg0
-    exact ⟨interior M, g, isOpen_interior, mem_interior_iff_mem_nhds.2 hM, hg, hg0,
-      fun z hz => hsec z ⟨hz.1, interior_subset hz.2⟩⟩
+    exact ⟨
+      interior M,
+      g,
+      isOpen_interior,
+      mem_interior_iff_mem_nhds.2 hM,
+      hg,
+      hg0,
+      fun z hz => hsec z ⟨hz.1, interior_subset hz.2⟩
+    ⟩
   choose! M g hMo hxM hga hgne hsec using hloc
   set s := hFfin.toFinset with hs
   have hsF : ∀ x, x ∈ s ↔ x ∈ F := fun x => hFfin.mem_toFinset
@@ -120,28 +134,39 @@ theorem ProperOpenProjectionLocalUnbranched.proof (hFin : CompactHolomorphicFibr
     refine (show ∀ᶠ t in 𝓝 y₀, t ∈ ball y₀ r₀ from ball_mem_nhds y₀ hr₀).and
       ((show ∀ᶠ t in 𝓝 y₀, t ∉ A '' C from
         ((hCc.image A.continuous).isClosed.isOpen_compl).mem_nhds hAC).and ?_)
-    exact (Filter.eventually_all_finset s).2 fun x hx => (hga x ((hsF x).1 hx)).eventually_analyticAt
+    exact (Filter.eventually_all_finset s).2 fun x hx =>
+      (hga x ((hsF x).1 hx)).eventually_analyticAt
   obtain ⟨r, hr, hball⟩ := Metric.eventually_nhds_iff_ball.1 hev
   have hgan : ∀ x ∈ s, AnalyticOnNhd ℂ (g x) (ball y₀ r) := fun x hx t ht => (hball t ht).2.2 x hx
-  refine ⟨ball y₀ r, fun t => ∏ x ∈ s, g x t, isOpen_ball, mem_ball_self hr, ?_,
-    Finset.analyticOnNhd_fun_prod s hgan, ?_, ?_⟩
+  refine ⟨
+    ball y₀ r,
+    fun t => ∏ x ∈ s, g x t,
+    isOpen_ball,
+    mem_ball_self hr,
+    ?_,
+    Finset.analyticOnNhd_fun_prod s hgan,
+    ?_,
+    ?_
+  ⟩
   · intro t ht
     exact hr₀D (ball_subset_closedBall (hball t ht).1)
   · intro W hWo hWU hW
-    have hne : ∀ x ∈ s, ∀ W : Set (Fin d → ℂ), IsOpen W → W ⊆ ball y₀ r → W.Nonempty →
-        ∃ t ∈ W, g x t ≠ 0 := by
+    have hne
+        : ∀ x ∈ s, ∀ W : Set (Fin d → ℂ),
+          IsOpen W → W ⊆ ball y₀ r → W.Nonempty → ∃ t ∈ W, g x t ≠ 0 := by
       intro x hx W hWo hWU hW
       by_contra hcon
       push Not at hcon
       obtain ⟨t, htW⟩ := hW
-      have hzt : g x =ᶠ[𝓝 t] 0 := by
-        filter_upwards [hWo.mem_nhds htW] with u hu using hcon u hu
-      have hEq := (hgan x hx).eqOn_zero_of_preconnected_of_eventuallyEq_zero
-        (convex_ball y₀ r).isPreconnected (hWU htW) hzt
-      exact hgne x ((hsF x).1 hx) (by
-        filter_upwards [ball_mem_nhds y₀ hr] with u hu using hEq hu)
-    obtain ⟨t, htW, ht⟩ := exists_forall_ne_zero_of_isOpen s g (ball y₀ r)
-      (fun x hx => (hgan x hx).continuousOn) hne W hWo hWU hW
+      have hzt : g x =ᶠ[𝓝 t] 0 := by filter_upwards [hWo.mem_nhds htW] with u hu using hcon u hu
+      have hEq :=
+        (hgan x hx).eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball y₀ r).isPreconnected
+          (hWU htW) hzt
+      exact hgne x ((hsF x).1 hx) (by filter_upwards [ball_mem_nhds y₀ hr] with u hu using hEq hu)
+    obtain ⟨t, htW, ht⟩ :=
+      exists_forall_ne_zero_of_isOpen s g (ball y₀ r)
+        (fun x hx => (hgan x hx).continuousOn)
+        hne W hWo hWU hW
     exact ⟨t, htW, Finset.prod_ne_zero_iff.2 ht⟩
   · intro y hyU hgy x' hx'XB hx'A
     have hx'M : x' ∈ Mall := by

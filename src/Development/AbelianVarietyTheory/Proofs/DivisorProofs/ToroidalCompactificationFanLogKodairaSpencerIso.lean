@@ -10,6 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RigidBoundar
 namespace GlobalTheory.TorKSField
 
 theorem toroidalForFanKS : GlobalTheory.Published.ToroidalForFanKS :=
-  GlobalTheory.T.toroidalFanKodairaSpencer_of_rigidBoundaryCharts GlobalTheory.T.rigidBoundaryChartsForFan_unitaryDatum
+  GlobalTheory.T.toroidalFanKodairaSpencer_of_rigidBoundaryCharts
+    GlobalTheory.T.rigidBoundaryChartsForFan_unitaryDatum
 
 end GlobalTheory.TorKSField

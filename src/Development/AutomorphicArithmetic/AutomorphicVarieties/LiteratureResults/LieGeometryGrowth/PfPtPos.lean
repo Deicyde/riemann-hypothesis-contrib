@@ -4,14 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 open UpperTheory.V.Lit.Geo
 open scoped TensorProduct ComplexOrder
 
-theorem UpperTheory.V.Lit.Geo.Pf.ptPos :
-    UpperTheory.V.Lit.Geo.Pf.PtPos := by
+theorem UpperTheory.V.Lit.Geo.Pf.ptPos : UpperTheory.V.Lit.Geo.Pf.PtPos := by
   intro E _ _ _ a Ξ χ G hG n e he q α
-  have hnn : ∀ v : Fin Ξ.d → ℂ, 0 ≤ star v ⬝ᵥ G *ᵥ v := fun v => hG.pos.posSemidef.dotProduct_mulVec_nonneg v
+  have hnn : ∀ v : Fin Ξ.d → ℂ, 0 ≤ star v ⬝ᵥ G *ᵥ v := fun v =>
+    hG.pos.posSemidef.dotProduct_mulVec_nonneg v
   refine ⟨fun g => ?_, fun h0 => ?_⟩
   · have h : 0 ≤ ptIp χ G e α α g :=
       mul_nonneg (Complex.zero_le_real.2 (by positivity)) (Finset.sum_nonneg fun I _ => hnn _)
@@ -28,8 +29,8 @@ theorem UpperTheory.V.Lit.Geo.Pf.ptPos :
           exact (hG.pos.dotProduct_mulVec_pos hne).ne' h1
       rw [← sum_cmp (α fun i => e (I i))]
       refine Finset.sum_eq_zero fun j _ => ?_
-      have : cmp j (α fun i => e (I i)) = 0 := Subtype.ext (funext fun g => by
-        rw [Pf.cmp_ev, hev]; rfl)
+      have : cmp j (α fun i => e (I i)) = 0 :=
+        Subtype.ext (funext fun g => by rw [Pf.cmp_ev, hev]; rfl)
       rw [this, TensorProduct.zero_tmul]
     refine AlternatingMap.ext fun X => ?_
     have hX : X = fun i => ∑ j, trF (e j).1 (X i).1 • e j := funext fun i => he (X i)

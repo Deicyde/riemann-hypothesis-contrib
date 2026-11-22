@@ -5,12 +5,15 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.ValPowDvd
 
-theorem dvd_of_pow_mul_dvd_pow : ∀ {S : Type} [CommRing S] (ϖ : S), ϖ ∈ nonZeroDivisors S → Val ϖ →
-    ∀ (z : S) (m d : ℕ), 0 < d → ϖ ^ (m * d) ∣ z ^ d → ϖ ^ m ∣ z := by
+theorem dvd_of_pow_mul_dvd_pow
+    : ∀ {S : Type} [CommRing S] (ϖ : S),
+      ϖ ∈ nonZeroDivisors S → Val ϖ
+        → ∀ (z : S) (m d : ℕ), 0 < d → ϖ ^ (m * d) ∣ z ^ d → ϖ ^ m ∣ z := by
   intro S _ ϖ hϖ hV z m d hd hdiv
   obtain ⟨d', rfl⟩ : ∃ d', d = d' + 1 := ⟨d - 1, by omega⟩
   obtain ⟨w, hw⟩ := hdiv
@@ -23,8 +26,11 @@ theorem dvd_of_pow_mul_dvd_pow : ∀ {S : Type} [CommRing S] (ϖ : S), ϖ ∈ no
   have he' : e = w * c' ^ (d' + 1) :=
     sub_eq_zero.mp ((mem_nonZeroDivisors_iff.mp (pow_mem hϖ (m * (d' + 1)))).2 _ key)
   have hee : e * e = e := he.eq
-  exact ⟨e * w * c' ^ d' + c, by
-    linear_combination (-1 : S) * hc + (-z) * hee + (z * e) * he' + (e * w * c' ^ d') * hc' +
-      (w * c' ^ d' * ϖ ^ m) * hee⟩
+  exact ⟨
+    e * w * c' ^ d' + c,
+    by
+      linear_combination (-1 : S) * hc + (-z) * hee + (z * e) * he' + (e * w * c' ^ d') * hc' +
+        (w * c' ^ d' * ϖ ^ m) * hee
+  ⟩
 
 end GlobalTheory.CompanionTheory.ValPowDvd

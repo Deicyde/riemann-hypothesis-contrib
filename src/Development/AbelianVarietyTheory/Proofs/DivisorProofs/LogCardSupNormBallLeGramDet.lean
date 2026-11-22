@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramPosDefL2
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSAmp
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSAmp
 
 set_option autoImplicit false
 
@@ -23,14 +25,16 @@ noncomputable section
 namespace GlobalTheory.BallGram
 
 def comb {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) : (Fin r → ℤ) →+ K :=
-  AddMonoidHom.mk' (fun z => ∑ i, z i • f i) fun z w => by
-    simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
+  AddMonoidHom.mk'
+    (fun z => ∑ i, z i • f i)
+    fun z w => by simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
 
-theorem comb_apply {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) (z : Fin r → ℤ) :
-    comb f z = ∑ i, z i • f i := rfl
+theorem comb_apply {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) (z : Fin r → ℤ)
+    : comb f z = ∑ i, z i • f i :=
+  rfl
 
-theorem mem_closure_iff {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) (g : K) :
-    g ∈ AddSubgroup.closure (Set.range f) ↔ ∃ z, comb f z = g := by
+theorem mem_closure_iff {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) (g : K)
+    : g ∈ AddSubgroup.closure (Set.range f) ↔ ∃ z, comb f z = g := by
   constructor
   · intro hg
     have hle : AddSubgroup.closure (Set.range f) ≤ (comb f).range := by
@@ -41,11 +45,14 @@ theorem mem_closure_iff {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) 
     exact hle hg
   · rintro ⟨z, rfl⟩
     rw [comb_apply]
-    exact AddSubgroup.sum_mem _ fun i _ => AddSubgroup.zsmul_mem _ (AddSubgroup.subset_closure (Set.mem_range_self i)) _
+    exact AddSubgroup.sum_mem _ fun i _ =>
+      AddSubgroup.zsmul_mem _ (AddSubgroup.subset_closure (Set.mem_range_self i)) _
 
-theorem comb_injective {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) (hf : LinearIndependent ℤ f) :
-    Function.Injective (comb f) :=
-  (injective_iff_map_eq_zero (comb f)).2 fun z hz => funext (Fintype.linearIndependent_iff.1 hf z hz)
+theorem comb_injective
+    {K : Type} [AddCommGroup K] {r : ℕ} (f : Fin r → K) (hf : LinearIndependent ℤ f)
+    : Function.Injective (comb f) :=
+  (injective_iff_map_eq_zero (comb f)).2 fun z hz =>
+    funext (Fintype.linearIndependent_iff.1 hf z hz)
 
 end GlobalTheory.BallGram
 
@@ -53,9 +60,12 @@ namespace GlobalTheory.BallGram
 
 variable {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k}
 
-theorem val_comb (P : Pair p) (a b : ℤ) {r : ℕ} (f : Fin r → X.functionField) (hf : ∀ i, f i ∈ P.H a b)
-    (σ : k →+* ℂ) (y : CxPts p σ) (z : Fin r → ℤ) :
-    val P a b σ y (comb f z) = ∑ i, (z i : ℂ) * val P a b σ y (f i) := by
+theorem val_comb
+    (P : Pair p) (a b : ℤ)
+    {r : ℕ} (f : Fin r → X.functionField) (hf : ∀ i, f i ∈ P.H a b)
+    (σ : k →+* ℂ) (y : CxPts p σ)
+    (z : Fin r → ℤ)
+    : val P a b σ y (comb f z) = ∑ i, (z i : ℂ) * val P a b σ y (f i) := by
   obtain ⟨ℓ, hℓ⟩ := GlobalTheory.T.exists_additive_sectionValueUnitFrame k X p P a b σ y
   have hmem : comb f z ∈ P.H a b := by
     rw [comb_apply]
@@ -68,16 +78,24 @@ theorem val_comb (P : Pair p) (a b : ℤ) {r : ℕ} (f : Fin r → X.functionFie
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_zsmul, hℓ, zsmul_eq_mul]
 
-theorem nu_comb_sq (P : Pair p) (a b : ℤ) {r : ℕ} (f : Fin r → X.functionField) (hf : ∀ i, f i ∈ P.H a b)
-    (σ : k →+* ℂ) (y : CxPts p σ) (z : Fin r → ℤ) :
-    P.nu a b σ y (comb f z) ^ 2 = cmb (vals P a b f) (fun i => (z i : ℂ)) σ y := by
+theorem nu_comb_sq
+    (P : Pair p) (a b : ℤ)
+    {r : ℕ} (f : Fin r → X.functionField) (hf : ∀ i, f i ∈ P.H a b)
+    (σ : k →+* ℂ) (y : CxPts p σ)
+    (z : Fin r → ℤ)
+    : P.nu a b σ y (comb f z) ^ 2 = cmb (vals P a b f) (fun i => (z i : ℂ)) σ y := by
   rw [← norm_val, val_comb P a b f hf, cmb]
   rfl
 
-theorem jacobi_field_square_integrable {S : Type} {Y : S → Type} [∀ σ, MeasurableSpace (Y σ)] {r : ℕ} (μ : ∀ σ, Measure (Y σ))
-    (v : ∀ σ, Y σ → Fin r → ℂ) (h : IsFam μ v) (z : Fin r → ℤ) :
-    l2 μ v (fun i => (z i : ℂ)) = ∑ i, ∑ j, (gram μ v).map Complex.re i j * (z i : ℝ) * (z j : ℝ) := by
-  have h1 := congrArg Complex.re ((gram_isHermitian_and_l2_eq_quadratic_form S Y (Fin r) μ v h).2 (fun i => (z i : ℂ))).2.2
+theorem jacobi_field_square_integrable
+    {S : Type} {Y : S → Type} [∀ σ, MeasurableSpace (Y σ)]
+    {r : ℕ} (μ : ∀ σ, Measure (Y σ)) (v : ∀ σ, Y σ → Fin r → ℂ) (h : IsFam μ v)
+    (z : Fin r → ℤ)
+    : l2 μ v (fun i => (z i : ℂ))
+      = ∑ i, ∑ j, (gram μ v).map Complex.re i j * (z i : ℝ) * (z j : ℝ) := by
+  have h1 :=
+    congrArg Complex.re
+      ((gram_isHermitian_and_l2_eq_quadratic_form S Y (Fin r) μ v h).2 (fun i => (z i : ℂ))).2.2
   rw [Complex.ofReal_re] at h1
   rw [h1, Complex.re_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -93,14 +111,19 @@ namespace GlobalTheory.BallGram
 
 variable {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k}
 
-theorem cmb_conj_le (P : Pair p) (a b : ℤ) {r : ℕ} (f : Fin r → X.functionField) (hf : ∀ i, f i ∈ P.H a b)
-    (c : Fin r → ℂ) (B : ℝ) (hB : ∀ σ y, cmb (vals P a b f) c σ y ≤ B) (σ : k →+* ℂ) (y : CxPts p σ) :
-    cmb (vals P a b f) (fun i => starRingEnd ℂ (c i)) σ y ≤ B := by
-  obtain ⟨σ', y', θ, hθ, hval⟩ := GlobalTheory.T.sectionValueUnitFrame_conj_point_eq_phase_conj k X p P a b σ y
+theorem cmb_conj_le
+    (P : Pair p) (a b : ℤ)
+    {r : ℕ} (f : Fin r → X.functionField) (hf : ∀ i, f i ∈ P.H a b) (c : Fin r → ℂ)
+    (B : ℝ) (hB : ∀ σ y, cmb (vals P a b f) c σ y ≤ B)
+    (σ : k →+* ℂ) (y : CxPts p σ)
+    : cmb (vals P a b f) (fun i => starRingEnd ℂ (c i)) σ y ≤ B := by
+  obtain ⟨σ', y', θ, hθ, hval⟩ :=
+    GlobalTheory.T.sectionValueUnitFrame_conj_point_eq_phase_conj k X p P a b σ y
   refine le_trans (le_of_eq ?_) (hB σ' y')
   simp only [cmb, vals]
-  have h : ∑ i, c i * val P a b σ' y' (f i) =
-      θ * starRingEnd ℂ (∑ i, starRingEnd ℂ (c i) * val P a b σ y (f i)) := by
+  have h
+      : ∑ i, c i * val P a b σ' y' (f i)
+        = θ * starRingEnd ℂ (∑ i, starRingEnd ℂ (c i) * val P a b σ y (f i)) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_

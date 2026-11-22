@@ -84,10 +84,12 @@ theorem monomials_span_of_prod_eq : EigenLiftsBasisStatement := by
   have hv := hS.integers
   have hp1 : v (p : C) < 1 := by simpa [map_natCast] using hS.p_lt
 
-  let B' : Matrix (Nb p g) (Nb p g) C := Matrix.of fun (x α : Nb p g) =>
-    ∏ j, (algebraMap R C (D.ε j) * D.u j x) ^ (α j).val
-  have hB'v : v B'.det = ∏ j, v (algebraMap R C (D.ε j)) ^
-      (p ^ (Fintype.card (Ix g) - 1) * (p * (p - 1) / 2)) :=
+  let B' : Matrix (Nb p g) (Nb p g) C :=
+    Matrix.of fun (x α : Nb p g) => ∏ j, (algebraMap R C (D.ε j) * D.u j x) ^ (α j).val
+  have hB'v
+      : v B'.det
+        = ∏ j, v (algebraMap R C (D.ε j)) ^
+          (p ^ (Fintype.card (Ix g) - 1) * (p * (p - 1) / 2)) :=
     (u5 p C v R hv hp1 (Ix g) D.Λ D.u D.Λ_det D.u_int D.u_cong).2 fun j => algebraMap R C (D.ε j)
   have hε : ∏ j, v (algebraMap R C (D.ε j)) = v (algebraMap R C cp) ^ g := by
     rw [← Finset.prod_fiberwise Finset.univ D.κ, ← hprod]
@@ -102,14 +104,15 @@ theorem monomials_span_of_prod_eq : EigenLiftsBasisStatement := by
 
   obtain ⟨B, hBu, hAA⟩ := H.AA.lat
   have hcol : HasColen R v H.AA.carrier (v B.det) := ⟨B, hAA, rfl⟩
-  have hN : ∀ x : Nb p g, p • x = 0 := by
-    intro x; ext i; simp
+  have hN : ∀ x : Nb p g, p • x = 0 := by intro x; ext i; simp
   have hdeg := u4 p C v R hv hp1 (Nb p g) hN H.AA (v B.det) _ hcol (hasLen_om H)
 
   have hmem : ∀ α : Nb p g, (fun x => B' x α) ∈ H.AA.carrier := by
     intro α
-    exact prod_pow_mem H.AA (fun j y => algebraMap R C (D.ε j) * D.u j y)
-      (fun j => (Submodule.mem_inf.1 (D.x_mem j)).1) (fun j => (α j).val)
+    exact prod_pow_mem H.AA
+      (fun j y => algebraMap R C (D.ε j) * D.u j y)
+      (fun j => (Submodule.mem_inf.1 (D.x_mem j)).1)
+      (fun j => (α j).val)
   obtain ⟨W, hW⟩ := exists_factor B B' (fun α => hAA ▸ hmem α)
   have hdet : v B'.det = v B.det * v (algebraMap R C W.det) := by
     rw [hW, Matrix.det_mul, map_mul, RingHom.map_det]; rfl
@@ -124,14 +127,16 @@ theorem monomials_span_of_prod_eq : EigenLiftsBasisStatement := by
       exact mul_lt_of_lt_one_right hpos (pow_lt_one₀ zero_le hlt two_ne_zero)
     rw [hsq] at this
     exact absurd hdeg (not_le.2 this)
-  have hWu : IsUnit W.det :=
-    hv.isUnit_of_one (isUnit_iff_ne_zero.2 fun h0 => by simp [h0] at hw) hw
+  have hWu : IsUnit W.det := hv.isUnit_of_one (isUnit_iff_ne_zero.2 fun h0 => by simp [h0] at hw) hw
   have hBeq : B' * (W⁻¹).map (algebraMap R C) = B := by
     rw [hW, Matrix.mul_assoc, ← Matrix.map_mul, Matrix.mul_nonsing_inv _ hWu,
       Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one]
-  have hspan : Submodule.span R (Set.range fun (α : Nb p g) (y : Nb p g) =>
-      ∏ j, (algebraMap R C (D.ε j) * D.u j y) ^ (α j).val) =
-      Submodule.span R (Set.range fun α x => B' x α) := rfl
+  have hspan
+      : Submodule.span R
+          (Set.range fun (α : Nb p g) (y : Nb p g) =>
+            ∏ j, (algebraMap R C (D.ε j) * D.u j y) ^ (α j).val)
+        = Submodule.span R (Set.range fun α x => B' x α) :=
+    rfl
   rw [hspan]
   refine le_antisymm ?_ (Submodule.span_le.2 ?_)
   · rw [hAA]

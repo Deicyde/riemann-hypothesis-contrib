@@ -9,7 +9,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.Contin
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
 
 namespace Formalism.IndefR.Fin
 
@@ -19,7 +21,8 @@ variable {D : D7}
 
 theorem dRhoStable (D : D7) : DRhoStable D := by
   intro ψ θ hψ hθ S T τ z f hf
-  exact (Formalism.IndefR.Fock.DRho.thetaDRho D ψ θ hψ hθ (Formalism.IndefR.Eqv.lineAtExists_holds D) S T τ z f hf).1
+  exact (Formalism.IndefR.Fock.DRho.thetaDRho D ψ θ hψ hθ
+    (Formalism.IndefR.Eqv.lineAtExists_holds D) S T τ z f hf).1
 
 section Pt
 
@@ -50,13 +53,17 @@ lemma theta_opPow {ι : Type} (A : ι → (WO S T → ℂ) → (WO S T → ℂ))
 
 theorem ptStable (D : D7) : PtStable D := by
   intro ψ θ hψ hθ S T sS sT BS BT f P hf
-  have hA : ∀ (i : FVar D T.rank S.rank) (g : WO S T → ℂ), IsThetaFunO ψ S T g →
-      IsThetaFunO ψ S T (aPlusAll (heisO ψ S T) θ (fun τ => cplxO (sS τ) (sT τ)) BS BT i g) := by
+  have hA
+      : ∀ (i : FVar D T.rank S.rank) (g : WO S T → ℂ),
+        IsThetaFunO ψ S T g
+          → IsThetaFunO ψ S T
+            (aPlusAll (heisO ψ S T) θ (fun τ => cplxO (sS τ) (sT τ)) BS BT i g) := by
     intro i g hg
     unfold aPlusAll aPlus crea
     exact Formalism.IndefR.Fock.CCR.theta_smul
       (theta_sub (dRhoStable D ψ θ hψ hθ S T i.1 _ g hg)
-        (Formalism.IndefR.Fock.CCR.theta_smul (dRhoStable D ψ θ hψ hθ S T i.1 _ g hg) _)) _
+        (Formalism.IndefR.Fock.CCR.theta_smul (dRhoStable D ψ θ hψ hθ S T i.1 _ g hg) _))
+      _
   unfold pureTensorO pureTensorL
   rw [Module.Basis.constr_apply, Finsupp.sum]
   exact theta_finsetSum _ _ fun k _ =>

@@ -19,10 +19,11 @@ open MvPolynomial MeasureTheory Filter Topology Matrix
 
 noncomputable section
 
-theorem le_ringKrullDim_slice {n e : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {ℓ : Fin n → ℂ}
-    (hJ : IsAffVariety J (e + 1)) (hH : IsHomogIdeal J) (hℓ : linForm ℓ ∉ J) :
-    ((e : ℕ) : WithBot ℕ∞) ≤
-      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (J ⊔ Ideal.span {linForm ℓ - 1})) := by
+theorem le_ringKrullDim_slice
+    {n e : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {ℓ : Fin n → ℂ}
+    (hJ : IsAffVariety J (e + 1)) (hH : IsHomogIdeal J) (hℓ : linForm ℓ ∉ J)
+    : ((e : ℕ) : WithBot ℕ∞)
+      ≤ ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (J ⊔ Ideal.span {linForm ℓ - 1})) := by
   have hP := hJ.isPrime
   have hne : J ⊔ Ideal.span {linForm ℓ - 1} ≠ ⊤ := by
     intro htop
@@ -36,11 +37,13 @@ theorem le_ringKrullDim_slice {n e : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
   have hht := Ideal.map_height_le_one_of_mem_minimalPrimes hp
   have hpm : (p.map (Ideal.Quotient.mk J)).IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
-  have hform := GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient (k := ℂ)
-    (p.map (Ideal.Quotient.mk J))
+  have hform :=
+    GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient (k := ℂ)
+      (p.map (Ideal.Quotient.mk J))
   rw [hJ.dim, ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotOfLE hJp)] at hform
-  have hle : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ p) ≤
-      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (J ⊔ Ideal.span {linForm ℓ - 1})) :=
+  have hle
+      : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ p)
+        ≤ ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (J ⊔ Ideal.span {linForm ℓ - 1})) :=
     ringKrullDim_le_of_surjective (Ideal.Quotient.factor hp.1.2)
       (Ideal.Quotient.factor_surjective hp.1.2)
   refine le_trans ?_ hle
@@ -66,13 +69,18 @@ theorem le_ringKrullDim_slice {n e : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
       exact_mod_cast hform
     exact_mod_cast key _ b hht hab
 
-theorem exists_isChowForm_iff {n e : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (hJ : IsProjPrime J) :
-    (∃ F : MvPolynomial (Fin (e + 1) × Fin n) ℂ, IsChowForm J (e + 1) F) ↔
-      IsAffVariety J (e + 1) :=
-  ⟨fun ⟨F, hF⟩ => ⟨hJ.isPrime, GroundTheory.Heights₂.Heights.ConeDimOfChowForm.of_affineChartTrdeg
-      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof ℂ n (e + 1) J F hJ hF⟩,
-    fun hA => GroundTheory.Heights₂.Heights.ChowFormExists.of_affineChartTrdeg
-      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof ℂ n (e + 1) J hJ hA.dim⟩
+theorem exists_isChowForm_iff {n e : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (hJ : IsProjPrime J)
+    : (∃ F : MvPolynomial (Fin (e + 1) × Fin n) ℂ, IsChowForm J (e + 1) F)
+      ↔ IsAffVariety J (e + 1) := ⟨
+  fun ⟨F, hF⟩ => ⟨
+    hJ.isPrime,
+    GroundTheory.Heights₂.Heights.ConeDimOfChowForm.of_affineChartTrdeg
+      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof ℂ n (e + 1) J F hJ hF
+  ⟩,
+  fun hA =>
+    GroundTheory.Heights₂.Heights.ChowFormExists.of_affineChartTrdeg
+      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof ℂ n (e + 1) J hJ hA.dim
+⟩
 
 end
 

@@ -79,12 +79,13 @@ lemma coeff_lval_eq_zero {k : ℤ} {p : ℕ} (σ : Cochain (twistAb A n k) (cove
     exact hi fun j => hc j
   exact absurd (this.2 j hj) (not_le.mpr (hm j))
 
-theorem exists_d_eq_of_coeff_allNeg {k : ℤ} {p : ℕ}
-    (σ : Cochain (twistAb A n k) (cover A n) (p + 1)) (hσ : d _ _ (p + 1) σ = 0)
-    (hneg : ∀ i m, (∀ j, m j < 0) → (lval σ i).coeff m = 0) :
-    ∃ τ, d _ _ p τ = σ := by
-  have hmem : ∀ i : Fin (p + 1) → Fin (n + 1),
-      ∑ j, filterL (IsSel j) (lval σ (Fin.cons j i)) ∈ LDeg A (Set.range i) k := by
+theorem exists_d_eq_of_coeff_allNeg
+    {k : ℤ} {p : ℕ} (σ : Cochain (twistAb A n k) (cover A n) (p + 1)) (hσ : d _ _ (p + 1) σ = 0)
+    (hneg : ∀ i m, (∀ j, m j < 0) → (lval σ i).coeff m = 0)
+    : ∃ τ, d _ _ p τ = σ := by
+  have hmem
+      : ∀ i : Fin (p + 1) → Fin (n + 1),
+        ∑ j, filterL (IsSel j) (lval σ (Fin.cons j i)) ∈ LDeg A (Set.range i) k := by
     intro i
     refine AddSubgroup.sum_mem _ fun j _ => ?_
     intro m hm
@@ -114,22 +115,24 @@ theorem exists_d_eq_of_coeff_allNeg {k : ℤ} {p : ℕ}
     rw [Finset.sum_eq_zero fun j _ => ?_, smul_zero]
     rw [if_neg fun hs => not_allNeg_of_isSel hs hm]
   · obtain ⟨j₀, hj₀⟩ := exists_isSel hm
-    have hsel : ∀ (f : Fin (n + 1) → A),
-        (∑ j, if IsSel j m then f j else 0) = f j₀ := fun f => by
-      rw [Finset.sum_eq_single j₀ (fun j _ hj => if_neg fun hs => hj (isSel_unique hs hj₀))
-        (fun h => absurd (Finset.mem_univ _) h), if_pos hj₀]
+    have hsel : ∀ (f : Fin (n + 1) → A), (∑ j, if IsSel j m then f j else 0) = f j₀ := fun f => by
+      rw [Finset.sum_eq_single j₀
+          (fun j _ hj => if_neg fun hs => hj (isSel_unique hs hj₀))
+          (fun h => absurd (Finset.mem_univ _) h),
+        if_pos hj₀]
     simp_rw [hsel]
     have hc := congrArg (fun ℓ => (ℓ : Laurent A n).coeff m) (lval_d σ (Fin.cons j₀ i))
     simp only [hσ, lval_zero, coeff_sum', coeff_zsmul'] at hc
     change (0 : Laurent A n).coeff m = _ at hc
     rw [Fin.sum_univ_succ, cons_comp_succAbove_zero] at hc
-    simp only [cons_comp_succAbove_succ, Fin.val_zero, pow_zero, one_smul, Fin.val_succ,
-      pow_succ, mul_neg, mul_one, neg_smul, Finset.sum_neg_distrib] at hc
+    simp only [cons_comp_succAbove_succ, Fin.val_zero, pow_zero, one_smul, Fin.val_succ, pow_succ,
+        mul_neg, mul_one, neg_smul, Finset.sum_neg_distrib]
+      at hc
     rw [AddMonoidAlgebra.coeff_zero, Finsupp.coe_zero, Pi.zero_apply] at hc
     linear_combination hc
 
-theorem subsingleton_cechH_of_lt {k : ℤ} {q : ℕ} (hq0 : 0 < q) (hqn : q < n) :
-    Subsingleton (cechH (twistAb A n k) (cover A n) q) := by
+theorem subsingleton_cechH_of_lt {k : ℤ} {q : ℕ} (hq0 : 0 < q) (hqn : q < n)
+    : Subsingleton (cechH (twistAb A n k) (cover A n) q) := by
   obtain ⟨p, rfl⟩ : ∃ p, q = p + 1 := ⟨q - 1, by omega⟩
   refine subsingleton_of_forall_eq 0 fun c => ?_
   obtain ⟨σ, hσ, rfl⟩ := exists_cls c
@@ -139,10 +142,9 @@ theorem subsingleton_cechH_of_lt {k : ℤ} {q : ℕ} (hq0 : 0 < q) (hqn : q < n)
   simp only [Fintype.card_fin] at this
   omega
 
-theorem subsingleton_cechH_of_gt {k : ℤ} {q : ℕ} (hq : n < q) :
-    Subsingleton (cechH (twistAb A n k) (cover A n) q) :=
+theorem subsingleton_cechH_of_gt {k : ℤ} {q : ℕ} (hq : n < q)
+    : Subsingleton (cechH (twistAb A n k) (cover A n) q) :=
   CechOrdered.subsingleton_cechH (by simp; omega) (by omega)
-
 
 variable (n) in
 abbrev NegMon (k : ℤ) : Type := {m : Fin (n + 1) → ℤ // (∀ j, m j < 0) ∧ ∑ j, m j = k}
@@ -165,8 +167,8 @@ lemma filterL_mem_LDeg {s : Set (Fin (n + 1))} {k : ℤ} (S : (Fin (n + 1) → �
   · rw [if_neg hS] at hm
     exact absurd rfl hm
 
-def posPart {k : ℤ} {q : ℕ} (σ : Cochain (twistAb A n k) (cover A n) q) :
-    Cochain (twistAb A n k) (cover A n) q :=
+def posPart {k : ℤ} {q : ℕ} (σ : Cochain (twistAb A n k) (cover A n) q)
+    : Cochain (twistAb A n k) (cover A n) q :=
   ofL fun i => ⟨filterL (fun e => ¬ ∀ j, e j < 0) (lval σ i), filterL_mem_LDeg _ (lval_mem σ i)⟩
 
 lemma lval_posPart {k : ℤ} {q : ℕ} (σ : Cochain (twistAb A n k) (cover A n) q) (i) :
@@ -194,8 +196,8 @@ lemma topCoeff_d {k : ℤ} {q : ℕ} (hq : q + 1 = n) (τ : Cochain (twistAb A n
 lemma posPart_zero {k : ℤ} {q : ℕ} : posPart (0 : Cochain (twistAb A n k) (cover A n) q) = 0 :=
   cochain_ext fun i => by rw [lval_posPart, lval_zero, map_zero]
 
-def topMap {k : ℤ} {m : ℕ} :
-    cechH (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1) →+ (NegMon (m + 1) k →₀ A) :=
+def topMap {k : ℤ} {m : ℕ}
+    : cechH (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1) →+ (NegMon (m + 1) k →₀ A) :=
   QuotientAddGroup.lift _ (topCoeff.comp (cocycles _ _ (m + 1)).subtype) (by
     rintro ⟨σ, hσ⟩ hx
     rw [AddSubgroup.mem_addSubgroupOf, coboundaries_succ] at hx
@@ -207,8 +209,8 @@ def topMap {k : ℤ} {m : ℕ} :
 lemma topMap_cls {k : ℤ} {m : ℕ} (σ : Cochain (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1))
     (hσ : d _ _ (m + 1) σ = 0) : topMap (cls σ hσ) = topCoeff σ := rfl
 
-theorem topMap_bijective {k : ℤ} {m : ℕ} :
-    Function.Bijective (topMap (A := A) (k := k) (m := m)) := by
+theorem topMap_bijective {k : ℤ} {m : ℕ}
+    : Function.Bijective (topMap (A := A) (k := k) (m := m)) := by
   constructor
   · rw [injective_iff_map_eq_zero]
     intro c hc
@@ -234,16 +236,19 @@ theorem topMap_bijective {k : ℤ} {m : ℕ} :
       · rfl
     have hcong := CechOrdered.altProj_congr (m + 1) hsame
     have hσp : d _ _ (m + 1) (posPart σ) = 0 := by rw [d_posPart, hσ, posPart_zero]
-    obtain ⟨τ, hτ⟩ := exists_d_eq_of_coeff_allNeg (posPart σ) hσp fun i e he => by
-      rw [lval_posPart, coeff_filterL, if_neg (not_not_intro he)]
+    obtain ⟨τ, hτ⟩ :=
+      exists_d_eq_of_coeff_allNeg (posPart σ) hσp fun i e he => by
+        rw [lval_posPart, coeff_filterL, if_neg (not_not_intro he)]
     rw [← CechOrdered.cls_altProj m σ hσ, cls_eq_zero_iff, coboundaries_succ, hcong, ← hτ,
       ← CechOrdered.d_altProj]
     exact ⟨_, rfl⟩
   · intro ν
     let ℓ : Laurent A (m + 1) := ∑ e ∈ ν.support, AddMonoidAlgebra.single e.1 (ν e)
-    have hℓ : ∀ i : Fin (m + 2) → Fin (m + 2), Set.range i = Set.univ →
-        ℓ ∈ LDeg A (Set.range i) k := fun i h =>
-      AddSubgroup.sum_mem _ fun e _ => single_mem_LDeg ⟨e.2.2, fun j hj => (hj (h ▸ Set.mem_univ j)).elim⟩ _
+    have hℓ
+        : ∀ i : Fin (m + 2) → Fin (m + 2),
+          Set.range i = Set.univ → ℓ ∈ LDeg A (Set.range i) k := fun i h =>
+      AddSubgroup.sum_mem _ fun e _ =>
+        single_mem_LDeg ⟨e.2.2, fun j hj => (hj (h ▸ Set.mem_univ j)).elim⟩ _
     let σ₀ : Cochain (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1) :=
       ofL fun i => if h : Set.range i = Set.univ then ⟨ℓ, hℓ i h⟩ else 0
     have hσ : d _ _ (m + 1) (CechOrdered.altProj _ _ (m + 1) σ₀) = 0 := by
@@ -267,8 +272,8 @@ theorem topMap_bijective {k : ℤ} {m : ℕ} :
       rw [if_pos rfl]
       exact Finsupp.notMem_support_iff.mp he
 
-def cechHTopEquiv (k : ℤ) (m : ℕ) :
-    cechH (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1) ≃+ (NegMon (m + 1) k →₀ A) :=
+def cechHTopEquiv (k : ℤ) (m : ℕ)
+    : cechH (twistAb A (m + 1) k) (cover A (m + 1)) (m + 1) ≃+ (NegMon (m + 1) k →₀ A) :=
   AddEquiv.ofBijective topMap topMap_bijective
 
 lemma lval_eq_of_cocycle {k : ℤ} (σ : Cochain (twistAb A n k) (cover A n) 0)

@@ -13,12 +13,13 @@ namespace GroundTheory.Global
 
 section Descent
 
-variable {L : Type} [Field L] [CharZero L] [Algebra L ℂ] {W W' : WeierstrassCurve L} [W.IsElliptic]
-  [W'.IsElliptic]
+variable
+  {L : Type} [Field L] [CharZero L] [Algebra L ℂ]
+  {W W' : WeierstrassCurve L} [W.IsElliptic] [W'.IsElliptic]
 
 theorem _root_.GroundTheory.Arith.Abelian.Isogeny.exists_map_eq_of_forall_conj_eq
-    (ψ : Isogeny (W.baseChange ℂ) (W'.baseChange ℂ)) (h : ∀ g : ℂ ≃ₐ[L] ℂ, ψ.conj g = ψ) :
-    ∃ φ : Isogeny W W', φ.map (algebraMap L ℂ) = ψ := by
+    (ψ : Isogeny (W.baseChange ℂ) (W'.baseChange ℂ)) (h : ∀ g : ℂ ≃ₐ[L] ℂ, ψ.conj g = ψ)
+    : ∃ φ : Isogeny W W', φ.map (algebraMap L ℂ) = ψ := by
   classical
   have hxfix : ∀ g : ℂ ≃ₐ[L] ℂ, galFF W g ψ.x = ψ.x := fun g ↦ by rw [← Isogeny.conj_alt_bis, h g]
   have hyfix : ∀ g : ℂ ≃ₐ[L] ℂ, galFF W g ψ.y = ψ.y := fun g ↦ by rw [← Isogeny.conj_y, h g]
@@ -35,12 +36,13 @@ theorem _root_.GroundTheory.Arith.Abelian.Isogeny.exists_map_eq_of_forall_conj_e
     intro g
     have e := hyfix g
     rw [hab, map_add (f := _), map_mul, galFF_genY] at e
-    exact eq_of_add_mul_genY_eq (galFF_mem_adjoin_genX W _ ha) (galFF_mem_adjoin_genX W _ hb)
-      ha hb e
-  have hlift : ∀ s : RatFunc ℂ, (∀ g : ℂ ≃ₐ[L] ℂ,
-      galFF W g (ratEmb (W.baseChange ℂ) s) = ratEmb (W.baseChange ℂ) s) →
-      (∃ p : L[X], p.map (algebraMap L ℂ) = s.num) ∧
-        ∃ q : L[X], q.map (algebraMap L ℂ) = s.denom := by
+    exact eq_of_add_mul_genY_eq (galFF_mem_adjoin_genX W _ ha) (galFF_mem_adjoin_genX W _ hb) ha hb
+      e
+  have hlift
+      : ∀ s : RatFunc ℂ,
+        (∀ g : ℂ ≃ₐ[L] ℂ, galFF W g (ratEmb (W.baseChange ℂ) s) = ratEmb (W.baseChange ℂ) s)
+          → (∃ p : L[X], p.map (algebraMap L ℂ) = s.num)
+            ∧ ∃ q : L[X], q.map (algebraMap L ℂ) = s.denom := by
     intro s hs
     have hc : ∀ c ∈ s.num.coeffs ∪ s.denom.coeffs, c ∈ Set.range (algebraMap L ℂ) := by
       intro c hc
@@ -73,9 +75,10 @@ theorem _root_.GroundTheory.Arith.Abelian.Isogeny.exists_map_eq_of_forall_conj_e
   set x₁ : W.toAffine.FunctionField := aeval X₁ n₁ / aeval X₁ d₁
   set y₁ : W.toAffine.FunctionField :=
     aeval X₁ n₂ / aeval X₁ d₂ + aeval X₁ n₃ / aeval X₁ d₃ * genY W
-  have hrat : ∀ (s : RatFunc ℂ) (p q : L[X]), p.map (algebraMap L ℂ) = s.num →
-      q.map (algebraMap L ℂ) = s.denom →
-      ffMap (algebraMap L ℂ) W (aeval X₁ p / aeval X₁ q) = ratEmb (W.baseChange ℂ) s := by
+  have hrat
+      : ∀ (s : RatFunc ℂ) (p q : L[X]),
+        p.map (algebraMap L ℂ) = s.num → q.map (algebraMap L ℂ) = s.denom
+          → ffMap (algebraMap L ℂ) W (aeval X₁ p / aeval X₁ q) = ratEmb (W.baseChange ℂ) s := by
     intro s p q hp hq
     conv_rhs => rw [← RatFunc.num_div_denom s]
     rw [ratEmb_div, map_div₀, ffMap_aeval, ffMap_aeval, ffMap_genX, hp, hq]
@@ -87,21 +90,24 @@ theorem _root_.GroundTheory.Arith.Abelian.Isogeny.exists_map_eq_of_forall_conj_e
     rw [hab, map_add (f := _), map_mul, ← hr₂, ← hr₃, hrat r₂ n₂ d₂ hn₂ hd₂, hrat r₃ n₃ d₃ hn₃ hd₃,
       ffMap_genY]
     rfl
-  exact ⟨Isogeny.ofMap (algebraMap L ℂ) ψ x₁ y₁ hx₁ hy₁,
-    Isogeny.map_ofMap (algebraMap L ℂ) ψ x₁ y₁ hx₁ hy₁⟩
+  exact ⟨
+    Isogeny.ofMap (algebraMap L ℂ) ψ x₁ y₁ hx₁ hy₁,
+    Isogeny.map_ofMap (algebraMap L ℂ) ψ x₁ y₁ hx₁ hy₁
+  ⟩
 
 omit [CharZero L] [W.IsElliptic] [W'.IsElliptic] in
-theorem _root_.GroundTheory.Arith.Abelian.Isogeny.invConst_congr {F : Type} [Field F]
-    {C D C' D' : WeierstrassCurve F} [C.IsElliptic] [D.IsElliptic] [C'.IsElliptic]
-    [D'.IsElliptic] (hC : C = D) (hC' : C' = D') (φ : Isogeny C C') :
-    invConst (φ.congr hC hC') = invConst φ := by
+theorem _root_.GroundTheory.Arith.Abelian.Isogeny.invConst_congr
+    {F : Type} [Field F]
+    {C D C' D' : WeierstrassCurve F} [C.IsElliptic] [D.IsElliptic] [C'.IsElliptic] [D'.IsElliptic]
+    (hC : C = D) (hC' : C' = D') (φ : Isogeny C C')
+    : invConst (φ.congr hC hC') = invConst φ := by
   subst hC hC'
   rw [Isogeny.congr_rfl]
 
-
 omit [CharZero L] in
-theorem _root_.GroundTheory.Arith.Abelian.Isogeny.invConst_conj (g : ℂ ≃ₐ[L] ℂ)
-    (ψ : Isogeny (W.baseChange ℂ) (W'.baseChange ℂ)) : invConst (ψ.conj g) = g (invConst ψ) := by
+theorem _root_.GroundTheory.Arith.Abelian.Isogeny.invConst_conj
+    (g : ℂ ≃ₐ[L] ℂ) (ψ : Isogeny (W.baseChange ℂ) (W'.baseChange ℂ))
+    : invConst (ψ.conj g) = g (invConst ψ) := by
   rw [Isogeny.conj, Isogeny.mapOf, Isogeny.invConst_congr, invConst_map]
   rfl
 
@@ -109,7 +115,9 @@ end Descent
 
 namespace Elliptic
 
-variable {K : Type} [Field K] [NumberField K] [Algebra K ℂ] (hK : finrank ℚ K = 2)
+variable
+  {K : Type} [Field K] [NumberField K] [Algebra K ℂ]
+  (hK : finrank ℚ K = 2)
   [_root_.NumberField.IsTotallyComplex K]
 include hK
 

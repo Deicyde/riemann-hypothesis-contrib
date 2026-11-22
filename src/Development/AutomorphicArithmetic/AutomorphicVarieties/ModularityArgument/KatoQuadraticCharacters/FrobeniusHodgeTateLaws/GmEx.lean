@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open UpperTheory.V.Z.Kato.Joint
 open scoped Matrix MatrixGroups
 
-theorem UpperTheory.V.Z.Kato.Joint.gmEx :
-    UpperTheory.V.Z.Kato.Joint.GmEx := by
+theorem UpperTheory.V.Z.Kato.Joint.gmEx : UpperTheory.V.Z.Kato.Joint.GmEx := by
   intro l _ N h
   have hN : (N : ZMod l) * (N : ZMod l)⁻¹ = 1 := ZMod.coe_mul_inv_eq_one N h.symm
   let m : (ZMod l)ˣ → ℤ := fun r => (((-(r : ZMod l)) * (N : ZMod l)⁻¹).val : ℤ)

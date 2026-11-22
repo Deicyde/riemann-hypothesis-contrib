@@ -13,11 +13,15 @@ variable {H P Q : Type} [AddCommGroup P] [Module ℂ P] [AddCommGroup Q] [Module
 def vals (ρ : H → Module.End ℂ P) (c : H → Module.End ℂ Q) : Set Q :=
   {y | ∃ U : P →ₗ[ℂ] Q, (∀ h x, U (ρ h x) = c h (U x)) ∧ ∃ x, y = U x}
 
-theorem decomp (ρ : H → Module.End ℂ P) (c : H → Module.End ℂ Q) [Nontrivial P]
-    (irr : ∀ N : Submodule ℂ P, (∀ h, ∀ x ∈ N, ρ h x ∈ N) → N = ⊥ ∨ N = ⊤) (R : Submodule ℂ Q) (hR : ∀ h, ∀ x ∈ R, c h x ∈ R)
-    {f : Q} (hf : f ∈ R) (hs : f ∈ Submodule.span ℂ (vals ρ c)) :
-    ∃ (m : ℕ) (U : Fin m → P →ₗ[ℂ] Q) (ξ : Fin m → P), (∀ i, (∀ h x, U i (ρ h x) = c h (U i x)) ∧ ∀ x, U i x ∈ R) ∧
-      f = ∑ i, U i (ξ i) := by
+theorem decomp
+    (ρ : H → Module.End ℂ P)
+    (c : H → Module.End ℂ Q)
+    [Nontrivial P]
+    (irr : ∀ N : Submodule ℂ P, (∀ h, ∀ x ∈ N, ρ h x ∈ N) → N = ⊥ ∨ N = ⊤)
+    (R : Submodule ℂ Q) (hR : ∀ h, ∀ x ∈ R, c h x ∈ R)
+    {f : Q} (hf : f ∈ R) (hs : f ∈ Submodule.span ℂ (vals ρ c))
+    : ∃ (m : ℕ) (U : Fin m → P →ₗ[ℂ] Q) (ξ : Fin m → P),
+      (∀ i, (∀ h x, U i (ρ h x) = c h (U i x)) ∧ ∀ x, U i x ∈ R) ∧ f = ∑ i, U i (ξ i) := by
   classical
   let A := FreeAlgebra ℂ H
   letI : Module A P := Module.compHom P (FreeAlgebra.lift ℂ ρ).toRingHom
@@ -32,38 +36,48 @@ theorem decomp (ρ : H → Module.End ℂ P) (c : H → Module.End ℂ Q) [Nontr
       simpa [eP] using N.smul_mem (FreeAlgebra.ι ℂ h) hx) with h | h
     · exact Or.inl (Submodule.restrictScalars_injective ℂ A P h)
     · exact Or.inr (Submodule.restrictScalars_injective ℂ A P h)
-  let R' : Submodule A Q :=
-    { R.toAddSubmonoid with
-      smul_mem' := fun a x hx => by
-        induction a using FreeAlgebra.induction generalizing x with
-        | grade0 z => simpa [eQ] using R.smul_mem z hx
-        | grade1 h => simpa [eQ] using hR h x hx
-        | mul a b ha hb => rw [mul_smul]; exact ha _ (hb _ hx)
-        | add a b ha hb => rw [add_smul]; exact R.add_mem (ha _ hx) (hb _ hx) }
+  let R' : Submodule A Q := {
+    R.toAddSubmonoid with
+    smul_mem' := fun a x hx => by
+      induction a using FreeAlgebra.induction generalizing x with
+      | grade0 z => simpa [eQ] using R.smul_mem z hx
+      | grade1 h => simpa [eQ] using hR h x hx
+      | mul a b ha hb => rw [mul_smul]; exact ha _ (hb _ hx)
+      | add a b ha hb => rw [add_smul]; exact R.add_mem (ha _ hx) (hb _ hx)
+  }
   obtain ⟨m, z, g, rfl⟩ := Submodule.mem_span_set'.1 hs
   choose U hU x hx using fun i => (g i).2
-  let V : Fin m → P →ₗ[A] Q := fun i =>
-    { (U i).toAddHom with
-      map_smul' := fun a y => by
-        change U i (a • y) = a • U i y
-        induction a using FreeAlgebra.induction generalizing y with
-        | grade0 z => simp [eP, eQ]
-        | grade1 h => simpa [eP, eQ] using hU i h y
-        | mul a b ha hb => rw [mul_smul, mul_smul, ha, hb]
-        | add a b ha hb => rw [add_smul, add_smul, map_add (f := _), ha, hb] }
+  let V : Fin m → P →ₗ[A] Q := fun i => {
+    (U i).toAddHom with
+    map_smul' := fun a y => by
+      change U i (a • y) = a • U i y
+      induction a using FreeAlgebra.induction generalizing y with
+      | grade0 z => simp [eP, eQ]
+      | grade1 h => simpa [eP, eQ] using hU i h y
+      | mul a b ha hb => rw [mul_smul, mul_smul, ha, hb]
+      | add a b ha hb => rw [add_smul, add_smul, map_add (f := _), ha, hb]
+  }
   let T : (Fin m → P) →ₗ[A] Q := ∑ i, V i ∘ₗ LinearMap.proj i
   have hT : T (fun i => z i • x i) = ∑ i, z i • (g i : Q) := by
     simp only [T, LinearMap.sum_apply, hx, ← map_smul]
     rfl
   obtain ⟨C, hC⟩ := exists_isCompl (R'.comap T)
   let π := (R'.comap T).subtype ∘ₗ Submodule.linearProjOfIsCompl _ C hC
-  refine ⟨m, fun i => (T ∘ₗ π ∘ₗ LinearMap.single A (fun _ => P) i).restrictScalars ℂ, fun i => z i • x i,
-    fun i => ⟨fun h y => ?_, fun y => Subtype.prop (p := (· ∈ R'.comap T)) _⟩, ?_⟩
-  · simpa [eP, eQ] using (T ∘ₗ π ∘ₗ LinearMap.single A (fun _ => P) i).map_smul (FreeAlgebra.ι ℂ h) y
+  refine ⟨
+    m,
+    fun i => (T ∘ₗ π ∘ₗ LinearMap.single A (fun _ => P) i).restrictScalars ℂ,
+    fun i => z i • x i,
+    fun i => ⟨fun h y => ?_, fun y => Subtype.prop (p := (· ∈ R'.comap T)) _⟩,
+    ?_
+  ⟩
+  · simpa [eP, eQ] using
+      (T ∘ₗ π ∘ₗ LinearMap.single A (fun _ => P) i).map_smul (FreeAlgebra.ι ℂ h) y
   · have e : π (fun i => z i • x i) = fun i => z i • x i :=
-      congrArg Subtype.val (Submodule.linearProjOfIsCompl_apply_left hC ⟨_, show T _ ∈ R from hT ▸ hf⟩)
+      congrArg Subtype.val
+        (Submodule.linearProjOfIsCompl_apply_left hC ⟨_, show T _ ∈ R from hT ▸ hf⟩)
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.restrictScalars_apply, LinearMap.comp_apply, ← map_sum, LinearMap.single_apply, Finset.univ_sum_single]
+      simp only [LinearMap.restrictScalars_apply, LinearMap.comp_apply, ← map_sum,
+        LinearMap.single_apply, Finset.univ_sum_single]
     exact hT.symm.trans (congrArg T e.symm)
 
 end PositivityTheory.ThKEnd.Orth

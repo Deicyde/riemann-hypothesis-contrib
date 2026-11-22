@@ -7,16 +7,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.bijective_multiplicativeGroup_sections_units :
-    ∀ U : Scheme.{0}, Function.Bijective (ofRings.sec unitsF U) := by
+theorem _root_.GlobalTheory.T.bijective_multiplicativeGroup_sections_units
+    : ∀ U : Scheme.{0}, Function.Bijective (ofRings.sec unitsF U) := by
   have hGamma : Presheaf.IsSheaf Scheme.etaleTopology.{0} Scheme.Γ := by
     intro R
     have gammaIso : Scheme.Γ ⋙ coyoneda.obj (op R) ≅ yoneda.obj (Spec R) :=
       NatIso.ofComponents
-        (fun U => (Equiv.trans (Quiver.Hom.opEquiv)
-          (ΓSpec.adjunction.homEquiv U.unop (op R))).toIso)
+        (fun U =>
+          (Equiv.trans (Quiver.Hom.opEquiv) (ΓSpec.adjunction.homEquiv U.unop (op R))).toIso)
         (by
           intro U V f
           ext g
@@ -26,8 +27,9 @@ theorem _root_.GlobalTheory.T.bijective_multiplicativeGroup_sections_units :
         (GrothendieckTopology.Subcanonical.isSheaf_of_isRepresentable _))
   have hUnits : Presheaf.IsSheaf Scheme.etaleTopology (Scheme.Γ ⋙ unitsF) := by
     apply (Presheaf.isSheaf_iff_isSheaf_forget _ _ (forget _)).mpr
-    let F := forget₂ CommRingCat.{0} CommMonCat ⋙ CommMonCat.units ⋙
-      forget CommGrpCat ⋙ uliftFunctor.{1, 0}
+    let F :=
+      forget₂ CommRingCat.{0} CommMonCat ⋙ CommMonCat.units ⋙ forget CommGrpCat
+        ⋙ uliftFunctor.{1, 0}
     have hF : Presheaf.IsSheaf Scheme.etaleTopology (Scheme.Γ ⋙ F) :=
       Presheaf.isSheaf_comp_of_isSheaf _ _ F hGamma
     exact hF

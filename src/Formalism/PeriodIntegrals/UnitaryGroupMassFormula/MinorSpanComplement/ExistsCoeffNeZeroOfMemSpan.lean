@@ -14,11 +14,12 @@ open scoped MonomialOrder
 
 variable {σ R : Type*} [CommRing R]
 
-theorem exists_coeff_ne_zero_of_mem_span (O : MonomialOrder σ) {ι : Type*}
-    (c : ι → MvPolynomial σ R) (hinj : Function.Injective fun i => O.degree (c i))
-    (hlc : ∀ i, O.leadingCoeff (c i) = 1) {g : MvPolynomial σ R}
-    (hg : g ∈ Submodule.span R (Set.range c)) (hg0 : g ≠ 0) :
-    ∃ i, g.coeff (O.degree (c i)) ≠ 0 := by
+theorem exists_coeff_ne_zero_of_mem_span
+    (O : MonomialOrder σ)
+    {ι : Type*} (c : ι → MvPolynomial σ R) (hinj : Function.Injective fun i => O.degree (c i))
+    (hlc : ∀ i, O.leadingCoeff (c i) = 1)
+    {g : MvPolynomial σ R} (hg : g ∈ Submodule.span R (Set.range c)) (hg0 : g ≠ 0)
+    : ∃ i, g.coeff (O.degree (c i)) ≠ 0 := by
   classical
   obtain ⟨f, rfl⟩ := Finsupp.mem_span_range_iff_exists_finsupp.mp hg
   have hne : f.support.Nonempty := by
@@ -43,23 +44,30 @@ theorem exists_coeff_ne_zero_of_mem_span (O : MonomialOrder σ) {ι : Type*}
   · intro h
     exact absurd hi h
 
-theorem monomial_mem_sup (O : MonomialOrder σ) {ι : Type*} (c : ι → MvPolynomial σ R)
-    (hlc : ∀ i, O.leadingCoeff (c i) = 1) (e : σ →₀ ℕ) (a : R) :
-    monomial e a ∈ Submodule.span R (Set.range c) ⊔
-      restrictSupport R (Set.range fun i => O.degree (c i))ᶜ := by
+theorem monomial_mem_sup
+    (O : MonomialOrder σ)
+    {ι : Type*} (c : ι → MvPolynomial σ R) (hlc : ∀ i, O.leadingCoeff (c i) = 1)
+    (e : σ →₀ ℕ) (a : R)
+    : monomial e a
+      ∈ Submodule.span R (Set.range c)
+        ⊔ restrictSupport R (Set.range fun i => O.degree (c i))ᶜ := by
   classical
   haveI := O.wf
-  have key : ∀ s : O.syn, ∀ e : σ →₀ ℕ, O.toSyn e = s → ∀ a : R,
-      monomial e a ∈ Submodule.span R (Set.range c) ⊔
-        restrictSupport R (Set.range fun i => O.degree (c i))ᶜ := by
+  have key
+      : ∀ s : O.syn, ∀ e : σ →₀ ℕ,
+        O.toSyn e = s
+          → ∀ a : R,
+            monomial e a
+              ∈ Submodule.span R (Set.range c)
+                ⊔ restrictSupport R (Set.range fun i => O.degree (c i))ᶜ := by
     intro s
     induction s using WellFoundedLT.induction with
     | _ s ih =>
       intro e he a
       by_cases hmem : e ∈ Set.range fun i => O.degree (c i)
       · obtain ⟨i, rfl⟩ := hmem
-        have hdecomp : monomial (O.degree (c i)) a =
-            a • c i - a • (c i - monomial (O.degree (c i)) 1) := by
+        have hdecomp
+            : monomial (O.degree (c i)) a = a • c i - a • (c i - monomial (O.degree (c i)) 1) := by
           rw [smul_sub, sub_sub_cancel, MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
         rw [hdecomp]
         refine Submodule.sub_mem _
@@ -74,20 +82,25 @@ theorem monomial_mem_sup (O : MonomialOrder σ) {ι : Type*} (c : ι → MvPolyn
         have hne : d ≠ O.degree (c i) := by
           intro hdeq
           apply hd'
-          rw [hdeq, hq, MvPolynomial.coeff_sub, MvPolynomial.coeff_monomial, if_pos rfl, hlc1, sub_self]
+          rw [hdeq, hq, MvPolynomial.coeff_sub, MvPolynomial.coeff_monomial, if_pos rfl, hlc1,
+            sub_self]
         have hci : (c i).coeff d ≠ 0 := by
           rw [hq, MvPolynomial.coeff_sub, MvPolynomial.coeff_monomial, if_neg (Ne.symm hne),
-            sub_zero] at hd'
+              sub_zero]
+            at hd'
           exact hd'
         have hle := MonomialOrder.le_degree (m := O) (MvPolynomial.mem_support_iff.mpr hci)
         exact lt_of_le_of_ne hle (fun h => hne (O.toSyn.injective h))
-      · exact Submodule.mem_sup_right ((MvPolynomial.monomial_mem_restrictSupport R).mpr (Or.inl hmem))
+      · exact Submodule.mem_sup_right ((MvPolynomial.monomial_mem_restrictSupport R).mpr
+          (Or.inl hmem))
   exact key _ e rfl a
 
-theorem isCompl_map_rename (O : MonomialOrder σ) {τ : Type*} {φ : σ → τ}
-    (hφ : Function.Injective φ) {ι : Type*} (c : ι → MvPolynomial σ R)
-    (hinj : Function.Injective fun i => O.degree (c i)) (hlc : ∀ i, O.leadingCoeff (c i) = 1) :
-    IsCompl (Submodule.map (rename φ).toLinearMap (Submodule.span R (Set.range c)))
+theorem isCompl_map_rename
+    (O : MonomialOrder σ)
+    {τ : Type*} {φ : σ → τ} (hφ : Function.Injective φ)
+    {ι : Type*} (c : ι → MvPolynomial σ R) (hinj : Function.Injective fun i => O.degree (c i))
+    (hlc : ∀ i, O.leadingCoeff (c i) = 1)
+    : IsCompl (Submodule.map (rename φ).toLinearMap (Submodule.span R (Set.range c)))
       (restrictSupport R (Finsupp.mapDomain φ '' Set.range fun i => O.degree (c i))ᶜ) := by
   classical
   have hmapinj : Function.Injective (Finsupp.mapDomain φ : (σ →₀ ℕ) → (τ →₀ ℕ)) :=

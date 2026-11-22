@@ -10,9 +10,9 @@ namespace GlobalTheory
 
 theorem map_comap_maximalIdeal_eq_of_formallyUnramified
     (A B : Type) [CommRing A] [CommRing B] [IsLocalRing B] [Algebra A B]
-    [Algebra.FormallyUnramified A B] [Algebra.EssFiniteType A B] :
-    ((IsLocalRing.maximalIdeal B).comap (algebraMap A B)).map (algebraMap A B) =
-      IsLocalRing.maximalIdeal B := by
+    [Algebra.FormallyUnramified A B] [Algebra.EssFiniteType A B]
+    : ((IsLocalRing.maximalIdeal B).comap (algebraMap A B)).map (algebraMap A B)
+      = IsLocalRing.maximalIdeal B := by
   set p := (maximalIdeal B).comap (algebraMap A B) with hp
   haveI : p.IsPrime := Ideal.comap_isPrime _ _
   let A' := Localization.AtPrime p
@@ -44,8 +44,7 @@ theorem map_comap_maximalIdeal_eq_of_formallyUnramified
   haveI : Algebra.FormallyUnramified A' B := .of_restrictScalars A A' B
   haveI : Algebra.EssFiniteType A' B := .of_comp A A' B
   have h := Algebra.FormallyUnramified.map_maximalIdeal (R := A') (S := B)
-  rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_map,
-    ← IsScalarTower.algebraMap_eq] at h
+  rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_map, ← IsScalarTower.algebraMap_eq] at h
   exact h
 
 end GlobalTheory

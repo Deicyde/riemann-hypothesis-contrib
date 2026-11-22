@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.TopLePreimag
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.WeierstrassCurve
 open scoped CategoryTheory.Obj UpperHalfPlane
 
@@ -18,25 +20,29 @@ namespace GlobalTheory.UnifCoord
 
 open Filter Topology
 
-theorem exists_xyt {g : ℕ} (V : WeierstrassCurve ℂ) (Λ : Submodule ℤ (Fin g → ℂ))
-    [DiscreteTopology Λ] (P : (Fin g → ℂ) → Fin 3 → ℂ) (F : Fin 3 → Fin 3 → (Fin g → ℂ) → ℂ)
-    (hE : ∀ z, V.toProjective.Equation (P z))
-    (ho : ∀ i, IsOpen {z | P z i ≠ 0}) (hd : ∀ i j, DifferentiableOn ℂ (F i j) {z | P z i ≠ 0})
+theorem exists_xyt
+    {g : ℕ}
+    (V : WeierstrassCurve ℂ)
+    (Λ : Submodule ℤ (Fin g → ℂ)) [DiscreteTopology Λ]
+    (P : (Fin g → ℂ) → Fin 3 → ℂ)
+    (F : Fin 3 → Fin 3 → (Fin g → ℂ) → ℂ)
+    (hE : ∀ z, V.toProjective.Equation (P z)) (ho : ∀ i, IsOpen {z | P z i ≠ 0})
+    (hd : ∀ i j, DifferentiableOn ℂ (F i j) {z | P z i ≠ 0})
     (hF : ∀ i j z, P z i ≠ 0 → F i j z * P z i = P z j) (hΛ : ∀ z, P z 2 = 0 ↔ z ∈ Λ)
     (hper : ∀ i j z l, l ∈ Λ → F i j (z + l) = F i j z) (h0 : P 0 0 = 0) (h1 : P 0 1 ≠ 0)
-    (w : Fin g → ℂ) (hw : fderiv ℂ (F 1 0) 0 w = -1) :
-    w ≠ 0 ∧ ∃ x y t : ℂ → ℂ, DifferentiableOn ℂ x {z | z • w ∈ Λ}ᶜ ∧
-      DifferentiableOn ℂ y {z | z • w ∈ Λ}ᶜ ∧
-      (∀ l : ℂ, l • w ∈ Λ → ∀ z, x (z + l) = x z ∧ y (z + l) = y z) ∧
-      (∀ z : ℂ, z • w ∉ Λ → V.toAffine.Equation (x z) (y z)) ∧ AnalyticAt ℂ t 0 ∧ t 0 = 0 ∧
-      deriv t 0 = 1 ∧ (∀ᶠ z in nhdsWithin 0 {0}ᶜ, t z * y z = -x z) ∧
-      Filter.Tendsto (fun z => ‖y z‖) (nhdsWithin 0 {0}ᶜ) Filter.atTop := by
+    (w : Fin g → ℂ) (hw : fderiv ℂ (F 1 0) 0 w = -1)
+    : w ≠ 0
+      ∧ ∃ x y t : ℂ → ℂ,
+        DifferentiableOn ℂ x {z | z • w ∈ Λ}ᶜ ∧ DifferentiableOn ℂ y {z | z • w ∈ Λ}ᶜ
+          ∧ (∀ l : ℂ, l • w ∈ Λ → ∀ z, x (z + l) = x z ∧ y (z + l) = y z)
+          ∧ (∀ z : ℂ, z • w ∉ Λ → V.toAffine.Equation (x z) (y z)) ∧ AnalyticAt ℂ t 0 ∧ t 0 = 0
+          ∧ deriv t 0 = 1 ∧ (∀ᶠ z in nhdsWithin 0 {0}ᶜ, t z * y z = -x z)
+          ∧ Filter.Tendsto (fun z => ‖y z‖) (nhdsWithin 0 {0}ᶜ) Filter.atTop := by
   have hw0 : w ≠ 0 := by
     rintro rfl
     simp at hw
   have hlin : Differentiable ℂ (fun z : ℂ => z • w) := by fun_prop
-  have hcont : Tendsto (fun z : ℂ => z • w) (𝓝 0) (𝓝 0) := by
-    simpa using hlin.continuous.tendsto 0
+  have hcont : Tendsto (fun z : ℂ => z • w) (𝓝 0) (𝓝 0) := by simpa using hlin.continuous.tendsto 0
   have hd2 : ∀ j, DifferentiableOn ℂ (fun z : ℂ => F 2 j (z • w)) {z | z • w ∈ Λ}ᶜ := fun j =>
     (hd 2 j).comp hlin.differentiableOn fun z hz h => hz ((hΛ _).1 h)
   have hn1 : {z | P z 1 ≠ 0} ∈ 𝓝 (0 : Fin g → ℂ) := (ho 1).mem_nhds h1
@@ -52,8 +58,21 @@ theorem exists_xyt {g : ℕ} (V : WeierstrassCurve ℂ) (Λ : Submodule ℤ (Fin
     exact hz0 ((smul_eq_zero.1 e).resolve_right hw0)
   have hda : ∀ j, DifferentiableAt ℂ (F 1 j) 0 := fun j => (hd 1 j).differentiableAt hn1
   have h2 : P 0 2 = 0 := (hΛ 0).2 Λ.zero_mem
-  refine ⟨hw0, fun z => F 2 0 (z • w), fun z => F 2 1 (z • w), fun z => -F 1 0 (z • w), hd2 0, hd2 1,
-    fun l hl z => ?_, fun z hz => ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    hw0,
+    fun z => F 2 0 (z • w),
+    fun z => F 2 1 (z • w),
+    fun z => - F 1 0 (z • w),
+    hd2 0,
+    hd2 1,
+    fun l hl z => ?_,
+    fun z hz => ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · simp only [add_smul, hper _ _ _ _ hl, and_self]
   · have hz2 : P (z • w) 2 ≠ 0 := fun h => hz ((hΛ _).1 h)
     rw [← WeierstrassCurve.Projective.equation_some,
@@ -103,9 +122,11 @@ theorem exists_xyt {g : ℕ} (V : WeierstrassCurve ℂ) (Λ : Submodule ℤ (Fin
     simp only [Function.comp_apply]
     rw [eq_inv_of_mul_eq_one_right hz]
 
-theorem top_le_ptHom_preimage_iff {R : Type} [CommRing R] (W : WeierstrassCurve R) (f : R →+* ℂ)
-    (P : Fin 3 → ℂ) (hP : IsUnimodularSol (W.map f) P) (i : Fin 3) :
-    ⊤ ≤ ptHom W f P hP ⁻¹ᵁ coordOpen W i ↔ P i ≠ 0 := by
+theorem top_le_ptHom_preimage_iff
+    {R : Type} [CommRing R]
+    (W : WeierstrassCurve R) (f : R →+* ℂ) (P : Fin 3 → ℂ) (hP : IsUnimodularSol (W.map f) P)
+    (i : Fin 3)
+    : ⊤ ≤ ptHom W f P hP ⁻¹ᵁ coordOpen W i ↔ P i ≠ 0 := by
   rw [ptHom_preimage_coordOpen]
   constructor
   · intro h h0
@@ -114,8 +135,9 @@ theorem top_le_ptHom_preimage_iff {R : Type} [CommRing R] (W : WeierstrassCurve 
   · intro h p _ hp
     exact p.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ hp (isUnit_iff_ne_zero.2 h))
 
-theorem eq_zero_and_ne_zero {V : WeierstrassCurve ℂ} {P : Fin 3 → ℂ} (hP : IsUnimodularSol V P)
-    (h2 : P 2 = 0) : P 0 = 0 ∧ P 1 ≠ 0 := by
+theorem eq_zero_and_ne_zero
+    {V : WeierstrassCurve ℂ} {P : Fin 3 → ℂ} (hP : IsUnimodularSol V P) (h2 : P 2 = 0)
+    : P 0 = 0 ∧ P 1 ≠ 0 := by
   have h0 : P 0 = 0 := WeierstrassCurve.Projective.X_eq_zero_of_Z_eq_zero hP.equation h2
   refine ⟨h0, fun h1 => ?_⟩
   have h : Ideal.span (Set.range P) ≤ ⊥ := by
@@ -128,9 +150,10 @@ theorem eq_zero_and_ne_zero {V : WeierstrassCurve ℂ} {P : Fin 3 → ℂ} (hP :
   rw [hP.span_eq_top] at h
   exact top_ne_bot (le_bot_iff.1 h)
 
-theorem ptHom_eq_zero_iff {R : Type} [CommRing R] (W : WeierstrassCurve R) (f : R →+* ℂ)
-    (P : Fin 3 → ℂ) (hP : IsUnimodularSol (W.map f) P) :
-    P 2 = 0 ↔ ptHom W f P hP = spMap f ≫ zero W := by
+theorem ptHom_eq_zero_iff
+    {R : Type} [CommRing R]
+    (W : WeierstrassCurve R) (f : R →+* ℂ) (P : Fin 3 → ℂ) (hP : IsUnimodularSol (W.map f) P)
+    : P 2 = 0 ↔ ptHom W f P hP = spMap f ≫ zero W := by
   rw [SpecMap_zero]
   constructor
   · intro h2
@@ -145,20 +168,37 @@ theorem ptHom_eq_zero_iff {R : Type} [CommRing R] (W : WeierstrassCurve R) (f : 
     rw [e, top_le_ptHom_preimage_iff] at this
     exact this rfl
 
-theorem exists_coord_on_line : ∀ (R : Type) [CommRing R] (W : WeierstrassCurve R) (f : R →+* ℂ) (A : Over (Sp ℂ)) [GrpObj A] (φ : A.left ⟶ scheme W) (v : epsR ℂ ⟶ A) (h : IsUnimodularSol (W.map ((algebraMap ℂ (DualNumber ℂ)).comp f)) ![DualNumber.eps, -1, 0]), IsPullback φ A.hom (toSpec W) (spMap f) → eSec A ≫ φ = spMap f ≫ zero W → v.left ≫ φ = ptHom W ((algebraMap ℂ (DualNumber ℂ)).comp f) ![DualNumber.eps, -1, 0] h → ∀ (L₁ : LB A.left) (g : ℕ) (u : HolUnif A L₁ g) (w : Fin g → ℂ), u.IsDiff w v → w ≠ 0 ∧ ∃ x y t : ℂ → ℂ, DifferentiableOn ℂ x {z | z • w ∈ u.Λ}ᶜ ∧ DifferentiableOn ℂ y {z | z • w ∈ u.Λ}ᶜ ∧ (∀ l : ℂ, l • w ∈ u.Λ → ∀ z, x (z + l) = x z ∧ y (z + l) = y z) ∧ (∀ z : ℂ, z • w ∉ u.Λ → (W.map f).toAffine.Equation (x z) (y z)) ∧ AnalyticAt ℂ t 0 ∧ t 0 = 0 ∧ deriv t 0 = 1 ∧ (∀ᶠ z in nhdsWithin 0 {0}ᶜ, t z * y z = -x z) ∧ Filter.Tendsto (fun z => ‖y z‖) (nhdsWithin 0 {0}ᶜ) Filter.atTop := by
+theorem exists_coord_on_line
+    : ∀ (R : Type) [CommRing R] (W : WeierstrassCurve R) (f : R →+* ℂ) (A : Over (Sp ℂ)) [GrpObj A]
+        (φ : A.left ⟶ scheme W) (v : epsR ℂ ⟶ A)
+        (h : IsUnimodularSol (W.map ((algebraMap ℂ (DualNumber ℂ)).comp f))
+          ![DualNumber.eps, -1, 0]),
+      IsPullback φ A.hom (toSpec W) (spMap f) → eSec A ≫ φ = spMap f ≫ zero W
+        → v.left ≫ φ = ptHom W ((algebraMap ℂ (DualNumber ℂ)).comp f) ![DualNumber.eps, -1, 0] h
+        → ∀ (L₁ : LB A.left) (g : ℕ) (u : HolUnif A L₁ g) (w : Fin g → ℂ),
+          u.IsDiff w v
+            → w ≠ 0
+              ∧ ∃ x y t : ℂ → ℂ,
+                DifferentiableOn ℂ x {z | z • w ∈ u.Λ}ᶜ ∧ DifferentiableOn ℂ y {z | z • w ∈ u.Λ}ᶜ
+                  ∧ (∀ l : ℂ, l • w ∈ u.Λ → ∀ z, x (z + l) = x z ∧ y (z + l) = y z)
+                  ∧ (∀ z : ℂ, z • w ∉ u.Λ → (W.map f).toAffine.Equation (x z) (y z))
+                  ∧ AnalyticAt ℂ t 0 ∧ t 0 = 0 ∧ deriv t 0 = 1
+                  ∧ (∀ᶠ z in nhdsWithin 0 {0}ᶜ, t z * y z = -x z)
+                  ∧ Filter.Tendsto (fun z => ‖y z‖) (nhdsWithin 0 {0}ᶜ) Filter.atTop := by
   intro R _ W f A _ φ v h hpb he hv L₁ g u w hw
   obtain ⟨c, hc, -⟩ := GlobalTheory.CoordFn.exists_coordFn R W
   have hover : ∀ z, (u.ex z).left ≫ A.hom = 𝟙 (Sp ℂ) := fun z => Over.w (u.ex z)
-  have hpt : ∀ z, ∃ (P : Fin 3 → ℂ) (hP : IsUnimodularSol (W.map f) P),
-      (u.ex z).left ≫ φ = ptHom W f P hP := fun z =>
+  have hpt
+      : ∀ z, ∃ (P : Fin 3 → ℂ) (hP : IsUnimodularSol (W.map f) P),
+        (u.ex z).left ≫ φ = ptHom W f P hP := fun z =>
     exists_eq_ptHom_of_isLocalRing R W ℂ f ((u.ex z).left ≫ φ) (by
       rw [Category.assoc, hpb.w, ← Category.assoc, hover]
       exact Category.id_comp _)
   choose P hP hPe using hpt
   have hmem : ∀ z i, ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ coordOpen W i) ↔ P z i ≠ 0 := fun z i => by
     rw [← top_le_ptHom_preimage_iff W f (P z) (hP z), ← hPe, Scheme.Hom.comp_preimage]
-  have hset : ∀ i, {z | P z i ≠ 0} = {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ coordOpen W i)} :=
-    fun i => Set.ext fun z => (hmem z i).symm
+  have hset : ∀ i, {z | P z i ≠ 0} = {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ (φ ⁻¹ᵁ coordOpen W i)} := fun i =>
+    Set.ext fun z => (hmem z i).symm
   have hΛ : ∀ z, P z 2 = 0 ↔ z ∈ u.Λ := fun z => by
     rw [ptHom_eq_zero_iff W f (P z) (hP z), ← hPe, ← he, ← u.ker]
     constructor
@@ -172,20 +212,28 @@ theorem exists_coord_on_line : ∀ (R : Type) [CommRing R] (W : WeierstrassCurve
       simp [eSec]
   have h00 := eq_zero_and_ne_zero (hP 0) ((hΛ 0).2 u.Λ.zero_mem)
   have := u.discrete
-  refine exists_xyt (W.map f) u.Λ P (fun i j z => valAt' (u.ex z).left (φ ⁻¹ᵁ coordOpen W i)
-    ((φ.app (coordOpen W i)).hom (c i j))) (fun z => (hP z).equation)
-    (fun i => hset i ▸ (u.hol _ 0).1) (fun i j => hset i ▸ (u.hol _ _).2) (fun i j z hz => ?_) hΛ
-    (fun i j z l hl => ?_) h00.1 h00.2 w ?_
+  refine exists_xyt (W.map f) u.Λ P
+    (fun i j z => valAt' (u.ex z).left (φ ⁻¹ᵁ coordOpen W i) ((φ.app (coordOpen W i)).hom (c i j)))
+    (fun z => (hP z).equation)
+    (fun i => hset i ▸ (u.hol _ 0).1)
+    (fun i j => hset i ▸ (u.hol _ _).2)
+    (fun i j z hz => ?_)
+    hΛ
+    (fun i j z l hl => ?_)
+    h00.1 h00.2 w ?_
   · have hz' := (top_le_ptHom_preimage_iff W f (P z) (hP z) i).2 hz
-    have e : valAt' (u.ex z).left (φ ⁻¹ᵁ coordOpen W i) ((φ.app (coordOpen W i)).hom (c i j)) =
-        valAt' (ptHom W f (P z) (hP z)) (coordOpen W i) (c i j) :=
+    have e
+        : valAt' (u.ex z).left (φ ⁻¹ᵁ coordOpen W i) ((φ.app (coordOpen W i)).hom (c i j))
+          = valAt' (ptHom W f (P z) (hP z)) (coordOpen W i) (c i j) :=
       (valAt'_comp (u.ex z).left φ _ _).trans (congrArg (fun k => valAt' k _ _) (hPe z))
     beta_reduce
     rw [e, valAt'_eq_valAt _ hz']
     exact hc i j ℂ f (P z) (hP z) hz'
   · simp only [u.ex_add, (u.ker l).2 hl, _root_.mul_one]
-  · have h1 : ⊤ ≤ ptHom W ((algebraMap ℂ (DualNumber ℂ)).comp f) ![DualNumber.eps, -1, 0] h ⁻¹ᵁ
-        coordOpen W 1 := by
+  · have h1
+        : ⊤
+          ≤ ptHom W ((algebraMap ℂ (DualNumber ℂ)).comp f) ![DualNumber.eps, -1, 0] h
+            ⁻¹ᵁ coordOpen W 1 := by
       rw [ptHom_preimage_coordOpen]
       intro p _ hp
       exact p.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ hp isUnit_one.neg)
@@ -194,16 +242,19 @@ theorem exists_coord_on_line : ∀ (R : Type) [CommRing R] (W : WeierstrassCurve
       exact h1
     rw [← hw _ h2]
     have e := hc 1 0 _ _ _ h h1
-    have e2 : ∀ (k : Sp (DualNumber ℂ) ⟶ scheme W) (hk : ⊤ ≤ k ⁻¹ᵁ coordOpen W 1),
-        v.left ≫ φ = k → (v.left.appLE (φ ⁻¹ᵁ coordOpen W 1) ⊤ h2).hom
-          ((φ.app (coordOpen W 1)).hom (c 1 0)) = (k.appLE (coordOpen W 1) ⊤ hk).hom (c 1 0) := by
+    have e2
+        : ∀ (k : Sp (DualNumber ℂ) ⟶ scheme W) (hk : ⊤ ≤ k ⁻¹ᵁ coordOpen W 1),
+          v.left ≫ φ = k
+            → (v.left.appLE (φ ⁻¹ᵁ coordOpen W 1) ⊤ h2).hom ((φ.app (coordOpen W 1)).hom (c 1 0))
+              = (k.appLE (coordOpen W 1) ⊤ hk).hom (c 1 0) := by
       rintro _ hk rfl
       rw [Scheme.Hom.comp_appLE]
       rfl
     rw [e2 _ h1 hv]
     have e3 := congrArg TrivSqZeroExt.snd e
     simp only [Matrix.cons_val_zero, Matrix.cons_val_one, mul_neg, _root_.mul_one,
-      TrivSqZeroExt.snd_neg, DualNumber.snd_eps] at e3
+        TrivSqZeroExt.snd_neg, DualNumber.snd_eps]
+      at e3
     exact neg_eq_iff_eq_neg.1 e3
 
 end GlobalTheory.UnifCoord

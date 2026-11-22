@@ -9,4 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HasLenOfL
 open GlobalTheory.InertZeta
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_unitary_block_diagonal_levi_element : LeviExists := by
-  first | exact @GlobalTheory.InertZeta.leviExists | exact GlobalTheory.InertZeta.leviExists | (intros; apply GlobalTheory.InertZeta.leviExists <;> assumption)
+  first
+  | exact @GlobalTheory.InertZeta.leviExists
+  | exact GlobalTheory.InertZeta.leviExists
+  | (intros; apply GlobalTheory.InertZeta.leviExists <;> assumption)

@@ -13,42 +13,54 @@ variable {O Q N : Type} [CommRing O] [CommGroup Q] [Fintype Q] [AddCommGroup N] 
 private noncomputable def prj (π : Representation O Q N) (c : O) (ψ : Q →* Oˣ) : N →ₗ[O] N :=
   c • ∑ g : Q, ((ψ g⁻¹ : Oˣ) : O) • π g
 
-private theorem prj_apply (π : Representation O Q N) (c : O) (ψ : Q →* Oˣ) (x : N) :
-    prj π c ψ x = c • ∑ g : Q, ((ψ g⁻¹ : Oˣ) : O) • π g x := by
+private theorem prj_apply (π : Representation O Q N) (c : O) (ψ : Q →* Oˣ) (x : N)
+    : prj π c ψ x = c • ∑ g : Q, ((ψ g⁻¹ : Oˣ) : O) • π g x := by
   simp only [prj, LinearMap.smul_apply, LinearMap.sum_apply]
 
-private theorem prj_mem (π : Representation O Q N) (c : O) (ψ : Q →* Oˣ) (x : N) :
-    prj π c ψ x ∈ eig π ψ := by
+private theorem prj_mem (π : Representation O Q N) (c : O) (ψ : Q →* Oˣ) (x : N)
+    : prj π c ψ x ∈ eig π ψ := by
   rw [mem_eig]
   intro h
   set_option synthInstance.maxHeartbeats 100000 in
     rw [prj_apply, map_smul, smul_comm, map_sum, Finset.smul_sum (r := ((ψ h : Oˣ) : O))]
   congr 1
   refine Fintype.sum_equiv (Equiv.mulLeft h) _ _ fun g => ?_
-  rw [map_smul, smul_smul, Equiv.coe_mulLeft, ← Units.val_mul, ← map_mul, map_mul π, Module.End.mul_apply]
+  rw [map_smul, smul_smul, Equiv.coe_mulLeft, ← Units.val_mul, ← map_mul, map_mul π,
+    Module.End.mul_apply]
   congr 3
   rw [mul_inv, mul_inv_cancel_left]
 
-private theorem prj_act (π : Representation O Q N) (c : O) (ψ : Q →* Oˣ) (h : Q) (x : N) :
-    prj π c ψ (π h x) = ((ψ h : Oˣ) : O) • prj π c ψ x := by
+private theorem prj_act (π : Representation O Q N) (c : O) (ψ : Q →* Oˣ) (h : Q) (x : N)
+    : prj π c ψ (π h x) = ((ψ h : Oˣ) : O) • prj π c ψ x := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← mem_eig.1 (prj_mem π c ψ x) h, prj_apply, prj_apply, map_smul, map_sum]
   congr 1
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [map_smul, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_comm]
 
-private theorem prj_self (π : Representation O Q N) {c : O} (hc : c * (Fintype.card Q : O) = 1) (ψ : Q →* Oˣ)
-    {x : N} (hx : x ∈ eig π ψ) : prj π c ψ x = x := by
+private theorem prj_self
+    (π : Representation O Q N)
+    {c : O} (hc : c * (Fintype.card Q : O) = 1)
+    (ψ : Q →* Oˣ)
+    {x : N} (hx : x ∈ eig π ψ)
+    : prj π c ψ x = x := by
   rw [prj_apply]
   have : ∀ g : Q, ((ψ g⁻¹ : Oˣ) : O) • π g x = x := fun g => by
-    rw [mem_eig.1 hx, smul_smul, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one, one_smul]
+    rw [mem_eig.1 hx, smul_smul, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one,
+      one_smul]
   simp only [this]
   rw [Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul O, smul_smul, hc, one_smul]
 
-private theorem prj_ne [IsDomain O] (π : Representation O Q N) (c : O) {ψ χ : Q →* Oˣ} (hne : ψ ≠ χ)
-    {x : N} (hx : x ∈ eig π χ) : prj π c ψ x = 0 := by
+private theorem prj_ne
+    [IsDomain O]
+    (π : Representation O Q N)
+    (c : O)
+    {ψ χ : Q →* Oˣ} (hne : ψ ≠ χ)
+    {x : N} (hx : x ∈ eig π χ)
+    : prj π c ψ x = 0 := by
   rw [prj_apply]
-  have : ∀ g : Q, ((ψ g⁻¹ : Oˣ) : O) • π g x = ((Units.coeHom O).comp (ψ⁻¹ * χ) g) • x := fun g => by
+  have : ∀ g : Q,
+      ((ψ g⁻¹ : Oˣ) : O) • π g x = ((Units.coeHom O).comp (ψ⁻¹ * χ) g) • x := fun g => by
     rw [mem_eig.1 hx, smul_smul]
     simp
   simp only [this]
@@ -60,8 +72,9 @@ private theorem prj_ne [IsDomain O] (π : Representation O Q N) (c : O) {ψ χ :
   have h2 : (ψ g)⁻¹ * χ g = 1 := Units.ext (by simpa using h1)
   rw [inv_mul_eq_one.1 h2]
 
-private theorem sub_prj_mem (π : Representation O Q N) {c : O} (hc : c * (Fintype.card Q : O) = 1) (ψ : Q →* Oˣ)
-    (x : N) : prj π c ψ x - x ∈ coeig π ψ := by
+private theorem sub_prj_mem
+    (π : Representation O Q N) {c : O} (hc : c * (Fintype.card Q : O) = 1) (ψ : Q →* Oˣ) (x : N)
+    : prj π c ψ x - x ∈ coeig π ψ := by
   have hx : x = c • ∑ g : Q, ((ψ g⁻¹ : Oˣ) : O) • ((ψ g : Oˣ) : O) • x := by
     have : ∀ g : Q, ((ψ g⁻¹ : Oˣ) : O) • ((ψ g : Oˣ) : O) • x = x := fun g => by
       rw [smul_smul, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one, one_smul]
@@ -74,9 +87,12 @@ private theorem sub_prj_mem (π : Representation O Q N) {c : O} (hc : c * (Finty
   refine Submodule.smul_mem _ _ (Submodule.sum_mem _ fun g _ => Submodule.smul_mem _ _ ?_)
   exact Submodule.mem_iSup_of_mem g ⟨x, rfl⟩
 
-private theorem sum_prj [IsDomain O] [HasEnoughRootsOfUnity O (Monoid.exponent Q)] [Fintype (Q →* Oˣ)]
-    (π : Representation O Q N) {c : O} (hc : c * (Fintype.card Q : O) = 1) (x : N) :
-    ∑ ψ : Q →* Oˣ, prj π c ψ x = x := by
+private theorem sum_prj
+    [IsDomain O] [HasEnoughRootsOfUnity O (Monoid.exponent Q)] [Fintype (Q →* Oˣ)]
+    (π : Representation O Q N)
+    {c : O} (hc : c * (Fintype.card Q : O) = 1)
+    (x : N)
+    : ∑ ψ : Q →* Oˣ, prj π c ψ x = x := by
   simp only [prj_apply]
   rw [← Finset.smul_sum, Finset.sum_comm, Finset.sum_eq_single (1 : Q)]
   · simp only [inv_one, map_one, Units.val_one, one_smul, Module.End.one_apply]
@@ -86,19 +102,23 @@ private theorem sum_prj [IsDomain O] [HasEnoughRootsOfUnity O (Monoid.exponent Q
   · intro g _ hg
     rw [← Finset.sum_smul]
     obtain ⟨φ, hφ⟩ := CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity Q O (inv_ne_one.2 hg)
-    have := sum_hom_units_eq_zero ((Units.coeHom O).comp (MonoidHom.eval g⁻¹ : (Q →* Oˣ) →* Oˣ)) (by
-      intro h
-      exact hφ (Units.ext (DFunLike.congr_fun h φ)))
+    have :=
+      sum_hom_units_eq_zero ((Units.coeHom O).comp (MonoidHom.eval g⁻¹ : (Q →* Oˣ) →* Oˣ)) (by
+        intro h
+        exact hφ (Units.ext (DFunLike.congr_fun h φ)))
     have h2 : ∑ ψ : Q →* Oˣ, ((ψ g⁻¹ : Oˣ) : O) = 0 := this
     rw [h2, zero_smul]
   · simp
 
 end
 
-theorem UpperTheory.V.Base.lenEigEq :
-    ∀ (O Q N : Type) [CommRing O] [IsDomain O] [CommGroup Q] [Finite Q] [HasEnoughRootsOfUnity O (Monoid.exponent Q)]
-      [Fintype (Q →* Oˣ)] [AddCommGroup N] [Module O N] (π : Representation O Q N), IsUnit (Nat.card Q : O) →
-      Module.length O N = ∑ ψ : Q →* Oˣ, Module.length O (eig π ψ) ∧ ∀ ψ : Q →* Oˣ, IsCompl (eig π ψ) (coeig π ψ) := by
+theorem UpperTheory.V.Base.lenEigEq
+    : ∀ (O Q N : Type) [CommRing O] [IsDomain O] [CommGroup Q] [Finite Q]
+        [HasEnoughRootsOfUnity O (Monoid.exponent Q)] [Fintype (Q →* Oˣ)] [AddCommGroup N]
+        [Module O N] (π : Representation O Q N),
+      IsUnit (Nat.card Q : O)
+        → Module.length O N = ∑ ψ : Q →* Oˣ, Module.length O (eig π ψ)
+          ∧ ∀ ψ : Q →* Oˣ, IsCompl (eig π ψ) (coeig π ψ) := by
   intro O Q N _ _ _ _ _ _ _ _ π hu
   classical
   letI := Fintype.ofFinite Q

@@ -53,16 +53,16 @@ theorem Cg.trans {p : ℕ} {f g h : PowerSeries ℂ} (h1 : Cg p f g) (h2 : Cg p 
   obtain ⟨hh, w₂, hw₂, rfl⟩ := h2
   exact ⟨hh, w₂ + w₁, hw₂.add hw₁, by ring⟩
 
-theorem Cg.mul {p : ℕ} {f g f' g' : PowerSeries ℂ} (h1 : Cg p f g) (h2 : Cg p f' g') :
-    Cg p (f * f') (g * g') := by
+theorem Cg.mul {p : ℕ} {f g f' g' : PowerSeries ℂ} (h1 : Cg p f g) (h2 : Cg p f' g')
+    : Cg p (f * f') (g * g') := by
   obtain ⟨hg, w, hw, rfl⟩ := h1
   obtain ⟨hg', w', hw', rfl⟩ := h2
   have hε := CoeffIn.ksC (ks_one_sub_zetaC_mem p)
   refine ⟨hg.mul hg', w * g' + g * w' + PowerSeries.C (1 - zetaC p) * w * w', ?_, by ring⟩
   exact ((hw.mul hg').add (hg.mul hw')).add ((hε.mul hw).mul hw')
 
-theorem Cg.sub {p : ℕ} {f g f' g' : PowerSeries ℂ} (h1 : Cg p f g) (h2 : Cg p f' g') :
-    Cg p (f - f') (g - g') := by
+theorem Cg.sub {p : ℕ} {f g f' g' : PowerSeries ℂ} (h1 : Cg p f g) (h2 : Cg p f' g')
+    : Cg p (f - f') (g - g') := by
   obtain ⟨hg, w, hw, rfl⟩ := h1
   obtain ⟨hg', w', hw', rfl⟩ := h2
   exact ⟨hg.sub hg', w - w', hw.sub hw', by ring⟩
@@ -71,8 +71,9 @@ theorem Cg.xp {p : ℕ} {f g : PowerSeries ℂ} (h1 : Cg p f g) (k : ℕ) : Cg p
   obtain ⟨hg, w, hw, rfl⟩ := h1
   exact ⟨hg.xp k, ReciprocityTheory.ChartRestriction.L1.xp k w, hw.xp k, by rw [xp_add, xp_C_mul]⟩
 
-theorem Cg.prod {p : ℕ} {α : Type*} (s : Finset α) (f g : α → PowerSeries ℂ)
-    (h : ∀ t ∈ s, Cg p (f t) (g t)) : Cg p (∏ t ∈ s, f t) (∏ t ∈ s, g t) := by
+theorem Cg.prod
+    {p : ℕ} {α : Type*} (s : Finset α) (f g : α → PowerSeries ℂ) (h : ∀ t ∈ s, Cg p (f t) (g t))
+    : Cg p (∏ t ∈ s, f t) (∏ t ∈ s, g t) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -82,11 +83,16 @@ theorem Cg.prod {p : ℕ} {α : Type*} (s : Finset α) (f g : α → PowerSeries
     rw [Finset.prod_insert ha, Finset.prod_insert ha]
     exact (h a (Finset.mem_insert_self a s)).mul (ih fun t ht => h t (Finset.mem_insert_of_mem ht))
 
-theorem Cg.of_int {p : ℕ} (hp : p.Prime) {F G W : PowerSeries ℤ} (h : F = G + PowerSeries.C (p : ℤ) * W) :
-    Cg p (F.map (Int.castRingHom ℂ)) (G.map (Int.castRingHom ℂ)) := by
+theorem Cg.of_int
+    {p : ℕ} (hp : p.Prime) {F G W : PowerSeries ℤ} (h : F = G + PowerSeries.C (p : ℤ) * W)
+    : Cg p (F.map (Int.castRingHom ℂ)) (G.map (Int.castRingHom ℂ)) := by
   obtain ⟨r, hr, hpr⟩ := p_mem_span hp
-  refine ⟨CoeffIn.map_int _ G, PowerSeries.C r * W.map (Int.castRingHom ℂ),
-    (CoeffIn.ksC hr).mul (CoeffIn.map_int _ W), ?_⟩
+  refine ⟨
+    CoeffIn.map_int _ G,
+    PowerSeries.C r * W.map (Int.castRingHom ℂ),
+    (CoeffIn.ksC hr).mul (CoeffIn.map_int _ W),
+    ?_
+  ⟩
   rw [h, map_add (f := _), map_mul, PowerSeries.map_C]
   have hc : (Int.castRingHom ℂ) (p : ℤ) = (1 - zetaC p) * r := by
     rw [eq_intCast, Int.cast_natCast, hpr]
@@ -97,8 +103,9 @@ theorem ks_coeffIn_aC (R : Subring ℂ) : CoeffIn R aC := CoeffIn.map_int R aZ
 
 theorem ks_coeffIn_dC (R : Subring ℂ) : CoeffIn R dC := CoeffIn.map_int R dZ
 
-theorem Cg.xp_map_int {p : ℕ} (hp : p.Prime) (F : PowerSeries ℤ) :
-    Cg p (ReciprocityTheory.ChartRestriction.L1.xp p (F.map (Int.castRingHom ℂ))) (F.map (Int.castRingHom ℂ) ^ p) := by
+theorem Cg.xp_map_int {p : ℕ} (hp : p.Prime) (F : PowerSeries ℤ)
+    : Cg p (ReciprocityTheory.ChartRestriction.L1.xp p (F.map (Int.castRingHom ℂ)))
+      (F.map (Int.castRingHom ℂ) ^ p) := by
   obtain ⟨g, hg⟩ := xp_congr hp F
   have h := Cg.of_int hp hg
   rwa [← xp_map, map_pow] at h
@@ -108,8 +115,8 @@ theorem ks_xp_one {R : Type*} [CommRing R] (f : PowerSeries R) : xp 1 f = f := b
   rw [coeff_xp]
   simp
 
-theorem ks_xp_xp {R : Type*} [CommRing R] {k : ℕ} (hk : k ≠ 0) (f : PowerSeries R) :
-    xp (k ^ 2) f = xp k (xp k f) := by
+theorem ks_xp_xp {R : Type*} [CommRing R] {k : ℕ} (hk : k ≠ 0) (f : PowerSeries R)
+    : xp (k ^ 2) f = xp k (xp k f) := by
   ext n
   rw [coeff_xp, coeff_xp, coeff_xp]
   have hk0 : 0 < k := Nat.pos_of_ne_zero hk
@@ -126,8 +133,8 @@ theorem ks_xp_xp {R : Type*} [CommRing R] {k : ℕ} (hk : k ≠ 0) (f : PowerSer
   · rw [if_neg h1, if_neg]
     exact fun h => h1 (dvd_trans (dvd_pow_self k two_ne_zero) h)
 
-theorem Tm_prime {p : ℕ} (hp : p.Prime) :
-    Tm p = insert (p, 0, 1) ((Finset.range p).image fun b => (1, b, p)) := by
+theorem Tm_prime {p : ℕ} (hp : p.Prime)
+    : Tm p = insert (p, 0, 1) ((Finset.range p).image fun b => (1, b, p)) := by
   ext ⟨a, b, e⟩
   rw [mem_Tm hp.pos, Finset.mem_insert, Finset.mem_image]
   simp only [Finset.mem_range, Prod.mk.injEq]
@@ -145,8 +152,8 @@ theorem Tm_prime {p : ℕ} (hp : p.Prime) :
     · exact ⟨mul_one _, Nat.zero_lt_one⟩
     · exact ⟨one_mul _, hc⟩
 
-theorem Tm_prime_notMem {p : ℕ} (hp : p.Prime) :
-    ((p, 0, 1) : ℕ × ℕ × ℕ) ∉ (Finset.range p).image fun b => ((1, b, p) : ℕ × ℕ × ℕ) := by
+theorem Tm_prime_notMem {p : ℕ} (hp : p.Prime)
+    : ((p, 0, 1) : ℕ × ℕ × ℕ) ∉ (Finset.range p).image fun b => ((1, b, p) : ℕ × ℕ × ℕ) := by
   intro h
   obtain ⟨b, _, hb⟩ := Finset.mem_image.mp h
   simp only [Prod.mk.injEq] at hb
@@ -161,12 +168,14 @@ theorem card_Tm_prime {p : ℕ} (hp : p.Prime) : (Tm p).card = p + 1 := by
   rw [Tm_prime hp, Finset.card_insert_of_notMem (Tm_prime_notMem hp),
     Finset.card_image_of_injective _ (Tm_prime_inj p), Finset.card_range]
 
-theorem facSer_Cg_a {p : ℕ} (hp : p.Prime) :
-    Cg p (facSer p (p, 0, 1)) (xp p (aC * dC ^ p - aC ^ p * dC)) := by
+theorem facSer_Cg_a {p : ℕ} (hp : p.Prime)
+    : Cg p (facSer p (p, 0, 1)) (xp p (aC * dC ^ p - aC ^ p * dC)) := by
   have hp0 : p ≠ 0 := hp.ne_zero
-  have hsub : ∀ f : PowerSeries ℂ,
-      sub1 (zetaC ((p, 0, 1) : ℕ × ℕ × ℕ).2.2 ^ ((p, 0, 1) : ℕ × ℕ × ℕ).2.1)
-        (((p, 0, 1) : ℕ × ℕ × ℕ).1 ^ 2) f = xp p (xp p f) := by
+  have hsub
+      : ∀ f : PowerSeries ℂ,
+        sub1 (zetaC ((p, 0, 1) : ℕ × ℕ × ℕ).2.2 ^ ((p, 0, 1) : ℕ × ℕ × ℕ).2.1)
+            (((p, 0, 1) : ℕ × ℕ × ℕ).1 ^ 2) f
+          = xp p (xp p f) := by
     intro f
     simp only [sub1, pow_zero, PowerSeries.rescale_one, RingHom.id_apply]
     exact ks_xp_xp hp0 f
@@ -177,14 +186,18 @@ theorem facSer_Cg_a {p : ℕ} (hp : p.Prime) :
   have ha : Cg p (xp p aC) (aC ^ p) := Cg.xp_map_int hp aZ
   exact (((Cg.refl (ks_coeffIn_aC _)).mul hd).sub (ha.mul (Cg.refl (ks_coeffIn_dC _)))).xp p
 
-theorem Cg.rescale_map_int {p : ℕ} (hp : 0 < p) (b : ℕ) (F : PowerSeries ℤ) :
-    Cg p (PowerSeries.rescale (zetaC p ^ b) (F.map (Int.castRingHom ℂ))) (F.map (Int.castRingHom ℂ)) := ⟨CoeffIn.map_int _ F, rescale_congr hp b F⟩
+theorem Cg.rescale_map_int {p : ℕ} (hp : 0 < p) (b : ℕ) (F : PowerSeries ℤ)
+    : Cg p (PowerSeries.rescale (zetaC p ^ b) (F.map (Int.castRingHom ℂ)))
+      (F.map (Int.castRingHom ℂ)) :=
+  ⟨CoeffIn.map_int _ F, rescale_congr hp b F⟩
 
-theorem facSer_Cg_b {p : ℕ} (hp : p.Prime) (b : ℕ) :
-    Cg p (facSer p (1, b, p)) (xp p aC * dC - aC * xp p dC) := by
-  have hsub : ∀ f : PowerSeries ℂ,
-      sub1 (zetaC ((1, b, p) : ℕ × ℕ × ℕ).2.2 ^ ((1, b, p) : ℕ × ℕ × ℕ).2.1)
-        (((1, b, p) : ℕ × ℕ × ℕ).1 ^ 2) f = PowerSeries.rescale (zetaC p ^ b) f := by
+theorem facSer_Cg_b {p : ℕ} (hp : p.Prime) (b : ℕ)
+    : Cg p (facSer p (1, b, p)) (xp p aC * dC - aC * xp p dC) := by
+  have hsub
+      : ∀ f : PowerSeries ℂ,
+        sub1 (zetaC ((1, b, p) : ℕ × ℕ × ℕ).2.2 ^ ((1, b, p) : ℕ × ℕ × ℕ).2.1)
+            (((1, b, p) : ℕ × ℕ × ℕ).1 ^ 2) f
+          = PowerSeries.rescale (zetaC p ^ b) f := by
     intro f
     simp only [sub1, one_pow]
     exact ks_xp_one _
@@ -193,8 +206,8 @@ theorem facSer_Cg_b {p : ℕ} (hp : p.Prime) (b : ℕ) :
   have ha : Cg p (PowerSeries.rescale (zetaC p ^ b) aC) aC := Cg.rescale_map_int hp.pos b aZ
   exact ((Cg.refl ((ks_coeffIn_aC _).xp p)).mul hd).sub (ha.mul (Cg.refl ((ks_coeffIn_dC _).xp p)))
 
-theorem pow_Cg {p : ℕ} (hp : p.Prime) :
-    Cg p ((xp p aC * dC - aC * xp p dC) ^ p) (- xp p (aC * dC ^ p - aC ^ p * dC)) := by
+theorem pow_Cg {p : ℕ} (hp : p.Prime)
+    : Cg p ((xp p aC * dC - aC * xp p dC) ^ p) (- xp p (aC * dC ^ p - aC ^ p * dC)) := by
   have hp0 : p ≠ 0 := hp.ne_zero
   have haR : CoeffIn (Rm p) aC := ks_coeffIn_aC _
   have hdR : CoeffIn (Rm p) dC := ks_coeffIn_dC _
@@ -213,9 +226,10 @@ theorem pow_Cg {p : ℕ} (hp : p.Prime) :
   rw [← h3]
   exact h1.trans h2
 
-theorem kronSer {p : ℕ} (hp : p.Prime) :
-    ∃ w : PowerSeries ℂ, CoeffIn (Rm p) w ∧
-      prodSer p + xp p ((aC * dC ^ p - aC ^ p * dC) ^ 2) = PowerSeries.C (1 - zetaC p) * w := by
+theorem kronSer {p : ℕ} (hp : p.Prime)
+    : ∃ w : PowerSeries ℂ,
+      CoeffIn (Rm p) w
+        ∧ prodSer p + xp p ((aC * dC ^ p - aC ^ p * dC) ^ 2) = PowerSeries.C (1 - zetaC p) * w := by
   have hp0 : p ≠ 0 := hp.ne_zero
   have hprod : prodSer p = facSer p (p, 0, 1) * ∏ b ∈ Finset.range p, facSer p (1, b, p) := by
     rw [prodSer, Tm_prime hp, Finset.prod_insert (Tm_prime_notMem hp),

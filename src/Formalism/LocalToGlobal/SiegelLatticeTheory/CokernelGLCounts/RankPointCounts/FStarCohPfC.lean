@@ -9,8 +9,10 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut Formalism.L2.SG.LsDatumB
-  Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount Formalism.L2.SG.Pf.FrameGlobalPatching
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+  Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount
+  Formalism.L2.SG.Pf.FrameGlobalPatching
 
 namespace Formalism.L2.SG.Pf.FrameGlobalPatching.FStar
 
@@ -18,13 +20,15 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open CohCut
 
-variable {D : Formalism.BasicNotions.D7} (Zd : LocDat D) {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)}
-  {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
+variable
+  {D : Formalism.BasicNotions.D7} (Zd : LocDat D)
+  {u u' : D.what₂.Word}
+  {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
 theorem split_finite : {p : PlF D | (Zd.M p).split.isSome}.Finite := by
   have hfinite (ℓ : ℕ) : {p : PlF D | Loc.resChar p = ℓ}.Finite := by
-    have hsub : {p : PlF D | Loc.resChar p = ℓ} ⊆
-        {v | v.asIdeal ∣ Ideal.span {(ℓ : 𝓞 D.host.F)}} := by
+    have hsub
+        : {p : PlF D | Loc.resChar p = ℓ} ⊆ {v | v.asIdeal ∣ Ideal.span {(ℓ : 𝓞 D.host.F)}} := by
       intro p hp
       simp only [Set.mem_ofPred_eq] at hp ⊢
       rw [Ideal.dvd_span_singleton, ← hp, ← Ideal.Quotient.eq_zero_iff_mem, map_natCast]

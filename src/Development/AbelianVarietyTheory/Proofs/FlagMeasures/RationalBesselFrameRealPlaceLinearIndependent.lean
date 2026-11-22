@@ -17,7 +17,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Matrix
 
@@ -25,16 +27,21 @@ namespace GlobalTheory.RationalFrame
 
 open NumberField Formalism.L2.SG.PoincareInHH
 
-theorem hJ_lin {n : ℕ} (ε : Fin n → Bool) {ι : Type*} [Fintype ι] (x : Fin n → ℂ) (g : ι → ℂ)
-    (y : ι → Fin n → ℂ) (c : ℂ) (w : Fin n → ℂ) :
-    hJ ε x (∑ i, g i • y i + c • w) = ∑ i, g i * hJ ε x (y i) + c * hJ ε x w := by
+theorem hJ_lin
+    {n : ℕ} (ε : Fin n → Bool)
+    {ι : Type*} [Fintype ι]
+    (x : Fin n → ℂ) (g : ι → ℂ) (y : ι → Fin n → ℂ) (c : ℂ) (w : Fin n → ℂ)
+    : hJ ε x (∑ i, g i • y i + c • w) = ∑ i, g i * hJ ε x (y i) + c * hJ ε x w := by
   unfold hJ
-  simp only [mulVec_add, mulVec_sum, mulVec_smul, dotProduct_add, dotProduct_sum, dotProduct_smul, smul_eq_mul]
+  simp only [mulVec_add, mulVec_sum, mulVec_smul, dotProduct_add, dotProduct_sum, dotProduct_smul,
+    smul_eq_mul]
 
-theorem frame_linearIndependent (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (v : InfinitePlace X.B.I.F) :
-    LinearIndependent ℂ (Formalism.L2.SG.RealObj.frm X u 1 v) := by
-  have hfr : Formalism.L2.SG.RealObj.frm X u 1 v = Formalism.L2.SG.RealObj.fam (fun a => rv X.B.I v (X.eR a))
-      (rv X.B.I v (X.zR u)) := by
+theorem frame_linearIndependent
+    (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (v : InfinitePlace X.B.I.F)
+    : LinearIndependent ℂ (Formalism.L2.SG.RealObj.frm X u 1 v) := by
+  have hfr
+      : Formalism.L2.SG.RealObj.frm X u 1 v
+        = Formalism.L2.SG.RealObj.fam (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)) := by
     funext a
     simp [Formalism.L2.SG.RealObj.frm, Formalism.L2.SG.RealObj.famSc]
   have hze : ∀ a, hJ (X.B.I.ε v) (rv X.B.I v (X.zR u)) (rv X.B.I v (X.eR a)) = 0 := by
@@ -48,7 +55,9 @@ theorem frame_linearIndependent (D : D7) (X : HidaSetting D) (u : D.what₂.Word
     rw [HidaSetting.zR, Cut.hJ_crd X v, X.zu_norm]
     simp only [map_neg, map_natCast, neg_ne_zero, Nat.cast_ne_zero]
     exact ((D.mem u).A.T_prime).ne_zero
-  have hfe : ∀ j a, hJ (X.B.I.ε v) (rv X.B.I v (X.fR j)) (rv X.B.I v (X.eR a)) = if a = j then 1 else 0 := by
+  have hfe
+      : ∀ j a,
+        hJ (X.B.I.ε v) (rv X.B.I v (X.fR j)) (rv X.B.I v (X.eR a)) = if a = j then 1 else 0 := by
     intro j a
     refine (Cut.hJ_crd X v _ _).trans ?_
     rw [Cut.hT_f_e X]
@@ -73,7 +82,9 @@ theorem frame_linearIndependent (D : D7) (X : HidaSetting D) (u : D.what₂.Word
   refine Fin.lastCases hlast (fun j => ?_) i
   have h := congrArg (hJ (X.B.I.ε v) (rv X.B.I v (X.fR j))) hg
   rw [hJ_lin, hfz] at h
-  simp only [hfe, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, add_zero] at h
+  simp only [hfe, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true,
+      add_zero]
+    at h
   unfold hJ at h
   simp only [mulVec_zero, dotProduct_zero] at h
   exact h

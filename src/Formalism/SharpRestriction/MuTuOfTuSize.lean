@@ -26,7 +26,8 @@ theorem muTu_of_tuSize {eps : ℝ} (Fm : FamP eps) (h0 : 0 < eps) (h : TuSize Fm
   have a2 : x ≥ x2 := ((le_max_right _ _).trans (le_max_left _ _)).trans hx
   have a1 : Fm.x1 < x := lt_of_lt_of_le (by linarith) ((le_max_right _ _).trans hx)
   refine ((h x a0 i).2 u).trans ?_
-  have hL : 0 ≤ (Fm.L x i).sc.L := Real.rpow_nonneg (zero_lt_one.trans (Fm.L x i).sc.one_lt_alt).le _
+  have hL : 0 ≤ (Fm.L x i).sc.L :=
+    Real.rpow_nonneg (zero_lt_one.trans (Fm.L x i).sc.one_lt_alt).le _
   have hC : Fm.CTu ≤ (Fm.L x i).sc.x ^ szTh (Fm.L x i) := by
     unfold szTh; rw [Fm.L_x x i a1, Fm.L_eps x i]; exact hx2 x a2
   exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hC (Nat.cast_nonneg _)) hL

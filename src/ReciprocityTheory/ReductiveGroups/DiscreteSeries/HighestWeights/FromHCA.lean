@@ -17,9 +17,9 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 section Sig
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-  [CompleteSpace V]
-
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type}
+  [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
 
 open Classical in
 def fhSig (τ : KG ε →* unitary (V →L[ℂ] V)) (g : Matrix (Fin n) (Fin n) ℂ) : V →L[ℂ] V :=
@@ -115,8 +115,9 @@ section Coef2
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
-variable {k : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
-  [CompleteSpace V]
+variable
+  {k : ℕ} {V : Type}
+  [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] [CompleteSpace V]
 
 lemma fh_det_ne_zero {g : Matrix (Fin k) (Fin k) ℂ} (hg : g ∈ Kset (fun _ : Fin k => true)) : g.det ≠ 0 := by
   intro h0
@@ -125,20 +126,24 @@ lemma fh_det_ne_zero {g : Matrix (Fin k) (Fin k) ℂ} (hg : g ∈ Kset (fun _ : 
   rw [Matrix.det_mul, h0, zero_mul, Matrix.det_one] at h
   exact zero_ne_one h
 
-theorem fh_coef (τ : KG (fun _ : Fin k => true) →* unitary (V →L[ℂ] V)) (hτ : Continuous τ) (v w : V) :
-    ∃ L : Matrix (Fin k) (Fin k) ℂ →ₗ[ℂ] ℂ, ∀ X, inK (fun _ : Fin k => true) X →
-      inner ℂ w (derOp (fun _ : Fin k => true) τ X v) = L X := by
+theorem fh_coef
+    (τ : KG (fun _ : Fin k => true) →* unitary (V →L[ℂ] V)) (hτ : Continuous τ) (v w : V)
+    : ∃ L : Matrix (Fin k) (Fin k) ℂ →ₗ[ℂ] ℂ, ∀ X,
+      inK (fun _ : Fin k => true) X → inner ℂ w (derOp (fun _ : Fin k => true) τ X v) = L X := by
   classical
-  obtain ⟨m, P, hP⟩ := polynomial_coefficients k V (fhSig τ) ⊤ (fhSig_isURepOn τ hτ) inferInstance
-    (fun _ _ _ _ => Submodule.mem_top) v Submodule.mem_top w
+  obtain ⟨m, P, hP⟩ :=
+    polynomial_coefficients k V (fhSig τ) ⊤ (fhSig_isURepOn τ hτ) inferInstance
+      (fun _ _ _ _ => Submodule.mem_top)
+      v Submodule.mem_top w
   have hdet1 : DifferentiableAt ℂ (fun A : Matrix (Fin k) (Fin k) ℂ => A.det) 1 := by
-    have h : (fun A : Matrix (Fin k) (Fin k) ℂ => A.det) = fun A =>
-        MvPolynomial.eval (fhEnt k A) (Matrix.det (Matrix.mvPolynomialX (Fin k) (Fin k) ℂ)) :=
+    have h
+        : (fun A : Matrix (Fin k) (Fin k) ℂ => A.det)
+          = fun A =>
+            MvPolynomial.eval (fhEnt k A) (Matrix.det (Matrix.mvPolynomialX (Fin k) (Fin k) ℂ)) :=
       funext fh_det_eq
     rw [h]
     exact fh_diff_eval _ _
-  let F : Matrix (Fin k) (Fin k) ℂ → ℂ := fun A =>
-    MvPolynomial.eval (fhEnt k A) P * (A.det ^ m)⁻¹
+  let F : Matrix (Fin k) (Fin k) ℂ → ℂ := fun A => MvPolynomial.eval (fhEnt k A) P * (A.det ^ m)⁻¹
   have hF : DifferentiableAt ℂ F 1 := by
     have hne : (1 : Matrix (Fin k) (Fin k) ℂ).det ^ m ≠ 0 := by
       rw [Matrix.det_one, one_pow]
@@ -154,16 +159,18 @@ theorem fh_coef (τ : KG (fun _ : Fin k => true) →* unitary (V →L[ℂ] V)) (
   have he := hasDerivAt_exp_smul_const (𝕂 := ℝ) X (0 : ℝ)
   rw [zero_smul, NormedSpace.exp_zero, one_mul] at he
   have h3 := (hF.hasFDerivAt.restrictScalars ℝ).comp_hasDerivAt_of_eq 0 he (by simp)
-  have heq : (⇑(Λ.restrictScalars ℝ) ∘ fun t : ℝ =>
-      ((τ (kcurve (fun _ : Fin k => true) X t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) =
-      F ∘ fun u : ℝ => NormedSpace.exp (u • X) := by
+  have heq
+      : (⇑(Λ.restrictScalars ℝ) ∘ fun t : ℝ =>
+          ((τ (kcurve (fun _ : Fin k => true) X t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V))
+        = F ∘ fun u : ℝ => NormedSpace.exp (u • X) := by
     funext t
     have hx : NormedSpace.exp (t • X) = toMK (kcurve (fun _ : Fin k => true) X t) := by
       rw [hγ t]
       exact congrArg NormedSpace.exp (Complex.coe_smul t X).symm
     simp only [Function.comp_apply]
     rw [hx]
-    have hk : toMK (kcurve (fun _ : Fin k => true) X t) ∈ Kset (fun _ : Fin k => true) := (kcurve (fun _ : Fin k => true) X t).2
+    have hk : toMK (kcurve (fun _ : Fin k => true) X t) ∈ Kset (fun _ : Fin k => true) :=
+      (kcurve (fun _ : Fin k => true) X t).2
     have hP' := hP _ hk
     rw [fhSig_toMK] at hP'
     simp only [Λ, F, ContinuousLinearMap.coe_restrictScalars', ContinuousLinearMap.comp_apply,

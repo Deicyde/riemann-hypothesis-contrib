@@ -10,8 +10,9 @@ namespace GlobalTheory.WittMapUniq
 
 open WittVector
 
-theorem exists_pow_pow_eq (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] [CharP R l]
-    [PerfectRing R l] : ∀ (n : ℕ) (r : R), ∃ s : R, s ^ l ^ n = r := by
+theorem exists_pow_pow_eq
+    (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] [CharP R l] [PerfectRing R l]
+    : ∀ (n : ℕ) (r : R), ∃ s : R, s ^ l ^ n = r := by
   intro n
   induction n with
   | zero => intro r; exact ⟨r, by simp⟩
@@ -22,10 +23,10 @@ theorem exists_pow_pow_eq (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] [Char
     refine ⟨s, ?_⟩
     rw [pow_succ, pow_mul, hs, ← ht, frobenius_def]
 
-theorem eq_map_of_coeff_zero : ∀ (l : ℕ) [Fact l.Prime] (R O : Type) [CommRing R] [CharP R l]
-    [PerfectRing R l] [CommRing O] [CharP O l] [PerfectRing O l]
-    (F : WittVector l R →+* WittVector l O) (ψ : R →+* O),
-    (∀ a, (F a).coeff 0 = ψ (a.coeff 0)) → F = WittVector.map ψ := by
+theorem eq_map_of_coeff_zero
+    : ∀ (l : ℕ) [Fact l.Prime] (R O : Type) [CommRing R] [CharP R l] [PerfectRing R l] [CommRing O]
+        [CharP O l] [PerfectRing O l] (F : WittVector l R →+* WittVector l O) (ψ : R →+* O),
+      (∀ a, (F a).coeff 0 = ψ (a.coeff 0)) → F = WittVector.map ψ := by
   intro l _ R O _ _ _ _ _ _ F ψ hF
   have hdiff : ∀ x : WittVector l R, (l : WittVector l O) ∣ F x - WittVector.map ψ x := by
     intro x
@@ -33,8 +34,9 @@ theorem eq_map_of_coeff_zero : ∀ (l : ℕ) [Fact l.Prime] (R O : Type) [CommRi
     have h := (WittVector.constantCoeff : WittVector l O →+* O).map_sub (F x) (WittVector.map ψ x)
     simp only [WittVector.constantCoeff_apply] at h
     rw [h, hF, WittVector.map_coeff, sub_self]
-  have hteich : ∀ (n : ℕ) (r : R),
-      (l : WittVector l O) ^ (n + 1) ∣ F (teichmuller l r) - teichmuller l (ψ r) := by
+  have hteich
+      : ∀ (n : ℕ) (r : R),
+        (l : WittVector l O) ^ (n + 1) ∣ F (teichmuller l r) - teichmuller l (ψ r) := by
     intro n r
     obtain ⟨s, rfl⟩ := exists_pow_pow_eq l R n r
     have h1 : (l : WittVector l O) ∣ F (teichmuller l s) - teichmuller l (ψ s) := by

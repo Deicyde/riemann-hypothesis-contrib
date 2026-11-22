@@ -13,11 +13,13 @@ open TensorProduct
 
 section Modules
 
-theorem nonempty_linearEquiv_of_finrank_eq {K R : Type*} {M N : Type*} [Field K] [Ring R]
-    [Algebra K R] [IsSimpleRing R] [FiniteDimensional K R]
-    [AddCommGroup M] [Module K M] [Module R M] [IsScalarTower K R M] [FiniteDimensional K M]
-    [AddCommGroup N] [Module K N] [Module R N] [IsScalarTower K R N] [FiniteDimensional K N]
-    (h : Module.finrank K M = Module.finrank K N) : Nonempty (M ≃ₗ[R] N) := by
+theorem nonempty_linearEquiv_of_finrank_eq
+    {K R : Type*} {M N : Type*}
+    [Field K] [Ring R] [Algebra K R] [IsSimpleRing R] [FiniteDimensional K R] [AddCommGroup M]
+    [Module K M] [Module R M] [IsScalarTower K R M] [FiniteDimensional K M] [AddCommGroup N]
+    [Module K N] [Module R N] [IsScalarTower K R N] [FiniteDimensional K N]
+    (h : Module.finrank K M = Module.finrank K N)
+    : Nonempty (M ≃ₗ[R] N) := by
   have : IsArtinianRing R := IsArtinianRing.of_finite K R
   rcases subsingleton_or_nontrivial (M × N) with hMN | hMN
   · have : Subsingleton M := (Prod.fst_surjective (β := N)).subsingleton
@@ -28,8 +30,10 @@ theorem nonempty_linearEquiv_of_finrank_eq {K R : Type*} {M N : Type*} [Field K]
   have : Module.Finite R N := Module.Finite.of_restrictScalars_finite K R _
   obtain ⟨k, _, S, hS, -⟩ := (IsSimpleRing.isIsotypic R (M × N)).linearEquiv_fun
   have hT : IsIsotypicOfType R (M × N) S := IsSimpleRing.isIsotypic R (M × N) S
-  obtain ⟨m, ⟨eM⟩⟩ := (hT.of_injective (LinearMap.inl R M N) LinearMap.inl_injective).linearEquiv_fun
-  obtain ⟨n, ⟨eN⟩⟩ := (hT.of_injective (LinearMap.inr R M N) LinearMap.inr_injective).linearEquiv_fun
+  obtain ⟨m, ⟨eM⟩⟩ :=
+    (hT.of_injective (LinearMap.inl R M N) LinearMap.inl_injective).linearEquiv_fun
+  obtain ⟨n, ⟨eN⟩⟩ :=
+    (hT.of_injective (LinearMap.inr R M N) LinearMap.inr_injective).linearEquiv_fun
   have : Nontrivial S := IsSimpleModule.nontrivial R S
   have : FiniteDimensional K S :=
     FiniteDimensional.of_injective ((Submodule.subtype S).restrictScalars K) Subtype.val_injective
@@ -61,8 +65,8 @@ noncomputable def bimoduleHom (f : B →ₐ[K] A) : A ⊗[K] Bᵐᵒᵖ →ₐ[K
   Algebra.TensorProduct.lift (Algebra.lmul K A) (mulRightHom f) fun a b ↦ by
     ext x; simp [mulRightHom, mul_assoc]
 
-theorem bimoduleHom_tmul (f : B →ₐ[K] A) (a : A) (b : Bᵐᵒᵖ) (x : A) :
-    bimoduleHom f (a ⊗ₜ[K] b) x = a * x * f b.unop := by
+theorem bimoduleHom_tmul (f : B →ₐ[K] A) (a : A) (b : Bᵐᵒᵖ) (x : A)
+    : bimoduleHom f (a ⊗ₜ[K] b) x = a * x * f b.unop := by
   simp [bimoduleHom, mulRightHom, mul_assoc]
 
 def Twist (_f : B →ₐ[K] A) : Type _ := A
@@ -79,7 +83,8 @@ instance : AddCommGroup (Twist f) := inferInstanceAs (AddCommGroup A)
 
 instance : Module K (Twist f) := inferInstanceAs (Module K A)
 
-instance [FiniteDimensional K A] : FiniteDimensional K (Twist f) := inferInstanceAs (FiniteDimensional K A)
+instance [FiniteDimensional K A] : FiniteDimensional K (Twist f) :=
+  inferInstanceAs (FiniteDimensional K A)
 
 noncomputable instance : Module (A ⊗[K] Bᵐᵒᵖ) (Twist f) :=
   letI : Module (A ⊗[K] Bᵐᵒᵖ) A := Module.compHom A (bimoduleHom f).toRingHom
@@ -90,22 +95,24 @@ theorem val_smul (r : A ⊗[K] Bᵐᵒᵖ) (x : Twist f) : (r • x).val = bimod
 instance : IsScalarTower K (A ⊗[K] Bᵐᵒᵖ) (Twist f) :=
   ⟨fun c r x ↦ by
     change bimoduleHom f (c • r) x.val = c • bimoduleHom f r x.val
-    rw [map_smul]; rfl⟩
+    rw [map_smul]
+    rfl⟩
 
-@[simp] theorem of_val (x : Twist f) : of f x.val = x := rfl
+@[simp]
+theorem of_val (x : Twist f) : of f x.val = x := rfl
 
 variable {f} {g : B →ₐ[K] A}
 
-theorem map_val (φ : Twist f →ₗ[A ⊗[K] Bᵐᵒᵖ] Twist g) (x : A) :
-    (φ (of f x)).val = x * (φ (of f 1)).val := by
+theorem map_val (φ : Twist f →ₗ[A ⊗[K] Bᵐᵒᵖ] Twist g) (x : A)
+    : (φ (of f x)).val = x * (φ (of f 1)).val := by
   have hx : of f x = (x ⊗ₜ[K] (1 : Bᵐᵒᵖ)) • of f 1 := by
     change x = bimoduleHom f (x ⊗ₜ[K] (1 : Bᵐᵒᵖ)) 1
     simp [bimoduleHom_tmul]
   rw [hx, map_smul, val_smul, bimoduleHom_tmul]
   simp
 
-theorem map_val_apply (φ : Twist f →ₗ[A ⊗[K] Bᵐᵒᵖ] Twist g) (b : B) :
-    (φ (of f (f b))).val = (φ (of f 1)).val * g b := by
+theorem map_val_apply (φ : Twist f →ₗ[A ⊗[K] Bᵐᵒᵖ] Twist g) (b : B)
+    : (φ (of f (f b))).val = (φ (of f 1)).val * g b := by
   have hb : of f (f b) = ((1 : A) ⊗ₜ[K] MulOpposite.op b) • of f 1 := by
     change f b = bimoduleHom f ((1 : A) ⊗ₜ[K] MulOpposite.op b) 1
     simp [bimoduleHom_tmul]
@@ -122,14 +129,14 @@ section SkolemNoether
 
 open SkolemNoether
 
-variable {K A B : Type*} [Field K] [Ring A] [Algebra K A] [Ring B] [Algebra K B]
-  [Algebra.IsCentral K A] [IsSimpleRing A] [FiniteDimensional K A]
-  [IsSimpleRing B] [FiniteDimensional K B]
+variable
+  {K A B : Type*} [Field K] [Ring A] [Algebra K A] [Ring B] [Algebra K B] [Algebra.IsCentral K A]
+  [IsSimpleRing A] [FiniteDimensional K A] [IsSimpleRing B] [FiniteDimensional K B]
 
-theorem exists_unit_conj (f g : B →ₐ[K] A) :
-    ∃ a : Aˣ, ∀ x, g x = a * f x * ↑a⁻¹ := by
-  obtain ⟨e⟩ := nonempty_linearEquiv_of_finrank_eq (K := K) (R := A ⊗[K] Bᵐᵒᵖ)
-    (M := Twist f) (N := Twist g) (by rfl)
+theorem exists_unit_conj (f g : B →ₐ[K] A) : ∃ a : Aˣ, ∀ x, g x = a * f x * ↑a⁻¹ := by
+  obtain ⟨e⟩ :=
+    nonempty_linearEquiv_of_finrank_eq (K := K) (R := A ⊗[K] Bᵐᵒᵖ) (M := Twist f) (N := Twist g)
+      (by rfl)
   set u := (e (Twist.of f 1)).val with hu
   set v := (e.symm (Twist.of g 1)).val with hv
   have hvu : v * u = 1 := by

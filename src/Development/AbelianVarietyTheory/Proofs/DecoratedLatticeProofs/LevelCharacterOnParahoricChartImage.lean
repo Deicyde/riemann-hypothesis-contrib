@@ -24,27 +24,48 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Twi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.ChainTw
-open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
+open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting
+  (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
 open GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection (Blocks parahoric datum)
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField
 open GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.PairLift GlobalTheory.Chain.RealIt
 
 noncomputable section
 
 namespace GlobalTheory.ChartChi
 
-
 set_option maxHeartbeats 2000000 in
-theorem levChi_chart : ∀ (D : D7) (c : Com D) (w : Twist D), w.Is c → ∀ j ≤ D.R.m, ∀ s : PiLocalization₂ D, IsStage c w j s → ∀ PP ∈ w.Q, ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (φ : SplitProj D v), IsProjAt φ PP → ∀ ι, IsChart s j φ ι → ∀ ξl, LiftsChar φ PP ξl (w.ξ PP) → ∀ y ∈ parahoric (Fv D.host.F v) (Fin D.R.r) (Blocks j D.R.t), ∀ d : (Fv D.host.F v)ˣ, (d : Fv D.host.F v) = y.1.toBlocks₂₂.det → Lev.levChi s.V s.β s.L (ι y) = (((ξl d)⁻¹ : ℂˣ) : ℂ) := by
+theorem levChi_chart
+    : ∀ (D : D7) (c : Com D) (w : Twist D),
+      w.Is c
+        → ∀ j ≤ D.R.m, ∀ s : PiLocalization₂ D,
+          IsStage c w j s
+            → ∀ PP ∈ w.Q, ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (φ : SplitProj D v),
+              IsProjAt φ PP
+                → ∀ ι,
+                  IsChart s j φ ι
+                    → ∀ ξl,
+                      LiftsChar φ PP ξl (w.ξ PP)
+                        → ∀ y ∈ parahoric (Fv D.host.F v) (Fin D.R.r) (Blocks j D.R.t),
+                          ∀ d : (Fv D.host.F v)ˣ,
+                            (d : Fv D.host.F v) = y.1.toBlocks₂₂.det
+                              → Lev.levChi s.V s.β s.L (ι y) = (((ξl d)⁻¹ : ℂˣ) : ℂ) := by
   intro D c w hw j hj s hs PP hPP v φ hφ ι hι ξl hξ y hy d hd
   have hlev := (GlobalTheory.chart_level_iff D c w hw j hj s hs PP hPP v φ hφ ι hι y).2 hy
   obtain ⟨hr, hL, hfl⟩ := hs
-  obtain ⟨e, he⟩ := GlobalTheory.ChartSplitIso.exists_equiv_emb D s j v φ ι hfl.selfDual hfl.frame hι
-  have hv : v = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) := (GlobalTheory.PlaceProjAt.under_resCard D v φ PP hφ).1
+  obtain ⟨e, he⟩ :=
+    GlobalTheory.ChartSplitIso.exists_equiv_emb D s j v φ ι hfl.selfDual hfl.frame hι
+  have hv : v = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) :=
+    (GlobalTheory.PlaceProjAt.under_resCard D v φ PP hφ).1
   obtain ⟨ε, hε, hch⟩ := hι
   rw [Lev.levG, Lev.mem_levA, hL] at hlev
   have hmem := hlev.2
@@ -73,14 +94,19 @@ theorem levChi_chart : ∀ (D : D7) (c : Com D) (w : Twist D), w.Is c → ∀ j 
   have hLQ : L.Q = w.Q := rfl
   have hLr : L.r = D.R.r := rfl
   set x := Lev.finE s.V (ι y) with hx
-  have h1 : ext1 L.P.H (⇑L.P.chi) (rTup s.β L x) = 1 := Lev.subgroupCharExtension_one_apply (LevelP.triv w.Pg D.R.r ℂ).H _
-  have h2 : ∏ PP ∈ L.Pg, ∏ c ∈ Finset.range L.s, (L.cg (c + 1) PP) (dBlk (blkOf L.r L.t) (c + 1) (redFn s.β PP x)) = 1 := by
+  have h1 : ext1 L.P.H (⇑L.P.chi) (rTup s.β L x) = 1 :=
+    Lev.subgroupCharExtension_one_apply (LevelP.triv w.Pg D.R.r ℂ).H _
+  have h2
+      : ∏ PP ∈ L.Pg, ∏ c ∈ Finset.range L.s, (L.cg (c + 1) PP) (dBlk (blkOf L.r L.t) (c + 1) (redFn s.β PP x))
+        = 1 := by
     refine Finset.prod_eq_one fun PP' hP' => Finset.prod_eq_one fun c' _ => ?_
     have hne : PP' ≠ PP := by
       rintro rfl
       exact Finset.disjoint_left.1 hw.disj hP' hPP
     rw [hone PP' (hsub _ (Or.inl hP')) hne, dBlk, blockDiagonalExtendByOnePrimeField_one, map_one]
-  have h3 : ∏ PP ∈ L.Q, (L.xq PP) (dBlk (blk2 L.r) 1 (redFn s.β PP x)) = (L.xq PP) (dBlk (blk2 L.r) 1 (redFn s.β PP x)) := by
+  have h3
+      : ∏ PP ∈ L.Q, (L.xq PP) (dBlk (blk2 L.r) 1 (redFn s.β PP x))
+        = (L.xq PP) (dBlk (blk2 L.r) 1 (redFn s.β PP x)) := by
     refine Finset.prod_eq_single PP (fun PP' hP' hne => ?_) (fun h => absurd hPP h)
     rw [hone PP' (hsub _ (Or.inr hP')) hne, dBlk, blockDiagonalExtendByOnePrimeField_one, map_one]
   unfold levFn
@@ -93,24 +119,41 @@ theorem levChi_chart : ∀ (D : D7) (c : Com D) (w : Twist D), w.Is c → ∀ j 
     rw [← hY]
     simp [frGL, MulAut.conj_apply]
     group
-  have hxm : Matrix.GeneralLinearGroup.map (GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ) x =
-      Matrix.GeneralLinearGroup.map (rdA φ) (Formalism.L2.Theta.matHom s.V (ι y)) := by
+  have hxm
+      : Matrix.GeneralLinearGroup.map
+          (GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ) x
+        = Matrix.GeneralLinearGroup.map (rdA φ) (Formalism.L2.Theta.matHom s.V (ι y)) := by
     refine Units.ext (Matrix.ext fun i j => ?_)
     show GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ (x.val i j) = rdA φ ((Formalism.L2.Theta.matHom s.V (ι y)).val i j)
     exact GlobalTheory.SplitProjChart.rdE_toEAf φ _
-  have hm : Matrix.GeneralLinearGroup.map (GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ) (s.β⁻¹ * x * s.β) = grpCo φ s.V (frCo φ s.β) (ι y) := by
+  have hm
+      : Matrix.GeneralLinearGroup.map
+          (GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ)
+          (s.β⁻¹ * x * s.β)
+        = grpCo φ s.V (frCo φ s.β) (ι y) := by
     rw [MonoidHom.map_mul, MonoidHom.map_mul, MonoidHom.map_inv, hxm]
     rfl
-  have key : ∀ a b, GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ ((Y.val a b : Formalism.L2.Herm.intAf D.host.F D.host.E) : Lev.EAf D) = G a b := by
+  have key
+      : ∀ a b,
+        GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ
+            ((Y.val a b : Formalism.L2.Herm.intAf D.host.F D.host.E) : Lev.EAf D)
+          = G a b := by
     intro a b
     rw [hG, ← hm, ← hi]
     rfl
-  have hint : ∀ a b, G a b ∈ v.adicCompletionIntegers D.host.F := fun a b => key a b ▸ (hN _ (Y.val a b).2).1
+  have hint : ∀ a b, G a b ∈ v.adicCompletionIntegers D.host.F := fun a b =>
+    key a b ▸ (hN _ (Y.val a b).2).1
   have hred : ∀ a b, rr ⟨G a b, hint a b⟩ = (redFn s.β PP x).val a b := by
     intro a b
     obtain ⟨h, hh⟩ := hN _ (Y.val a b).2
     rw [← hY, redFn_frGL]
-    have e : (⟨G a b, hint a b⟩ : v.adicCompletionIntegers D.host.F) = ⟨GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ (Y.val a b : Lev.EAf D), h⟩ :=
+    have e
+        : (⟨G a b, hint a b⟩ : v.adicCompletionIntegers D.host.F)
+          = ⟨
+            GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.rdE φ
+              (Y.val a b : Lev.EAf D),
+            h
+          ⟩ :=
       Subtype.ext (key a b).symm
     rw [e, hh]
     rfl
@@ -132,14 +175,21 @@ theorem levChi_chart : ∀ (D : D7) (c : Com D) (w : Twist D), w.Is c → ∀ j 
         simp [blk2, hp] at ha
       · exact ⟨p, rfl⟩
   let ef := Equiv.ofBijective f hfb
-  let Gi : Matrix (Fin s.V.rank) (Fin s.V.rank) (v.adicCompletionIntegers D.host.F) := fun a b => ⟨G a b, hint a b⟩
-  let A : Matrix {a : Fin s.V.rank // blk2 D.R.r a = 1} {a : Fin s.V.rank // blk2 D.R.r a = 1} (v.adicCompletionIntegers D.host.F) :=
+  let Gi : Matrix (Fin s.V.rank) (Fin s.V.rank) (v.adicCompletionIntegers D.host.F) := fun a b =>
+    ⟨G a b, hint a b⟩
+  let A : Matrix {a : Fin s.V.rank // blk2 D.R.r a = 1} {a : Fin s.V.rank // blk2 D.R.r a = 1}
+      (v.adicCompletionIntegers D.host.F) :=
     Gi.submatrix Subtype.val Subtype.val
-  have hdA : (d : Fv D.host.F v) = ((A.det : v.adicCompletionIntegers D.host.F) : Fv D.host.F v) := by
+  have hdA
+      : (d : Fv D.host.F v) = ((A.det : v.adicCompletionIntegers D.host.F) : Fv D.host.F v) := by
     rw [hd]
-    have e1 : ((A.det : v.adicCompletionIntegers D.host.F) : Fv D.host.F v) =
-        (G.submatrix (Subtype.val : {a : Fin s.V.rank // blk2 D.R.r a = 1} → Fin s.V.rank) (Subtype.val : {a : Fin s.V.rank // blk2 D.R.r a = 1} → Fin s.V.rank)).det := by
-      rw [show ((A.det : v.adicCompletionIntegers D.host.F) : Fv D.host.F v) = (v.adicCompletionIntegers D.host.F).subtype A.det from rfl,
+    have e1
+        : ((A.det : v.adicCompletionIntegers D.host.F) : Fv D.host.F v)
+          = (G.submatrix (Subtype.val : {a : Fin s.V.rank // blk2 D.R.r a = 1} → Fin s.V.rank)
+            (Subtype.val : {a : Fin s.V.rank // blk2 D.R.r a = 1} → Fin s.V.rank)).det := by
+      rw [show ((A.det : v.adicCompletionIntegers D.host.F) : Fv D.host.F v)
+            = (v.adicCompletionIntegers D.host.F).subtype A.det from
+          rfl,
         RingHom.map_det]
       congr 1
     rw [e1, ← Matrix.det_submatrix_equiv_self ef]
@@ -152,7 +202,8 @@ theorem levChi_chart : ∀ (D : D7) (c : Com D) (w : Twist D), w.Is c → ∀ j 
     congr 1
     ext a b
     exact (hred a b).symm
-  have hrel' : GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.RedRel φ PP (d : Fv D.host.F v) ((dBlk (blk2 D.R.r) 1 (redFn s.β PP x) : (kP PP)ˣ) : kP PP) := by
+  have hrel' : GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.RedRel φ PP
+      (d : Fv D.host.F v) ((dBlk (blk2 D.R.r) 1 (redFn s.β PP x) : (kP PP)ˣ) : kP PP) := by
     rw [hrel]
     refine ⟨hdA ▸ A.det.2, ?_⟩
     rw [hk]

@@ -8,7 +8,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
 
-open NumberField Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC
+open NumberField Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC
 open scoped ComplexConjugate ComplexOrder
 
 noncomputable section
@@ -59,7 +61,8 @@ theorem flag_domain_frames_connected : GGConnStatement (E := E) := by
   intro r X
   choose P hP using X.signature
   let K : Set (X.Ψ → Matrix (Fin r) (Fin r) ℂ) := {y | ∀ τ, Ok X.p0 (y τ)}
-  let φ : (X.Ψ → Matrix (Fin r) (Fin r) ℂ) → Frame X.Ψ r := fun y τ => (P τ * y τ : Matrix (Fin r) (Fin r) ℂ)
+  let φ : (X.Ψ → Matrix (Fin r) (Fin r) ℂ) → Frame X.Ψ r := fun y τ =>
+    (P τ * y τ : Matrix (Fin r) (Fin r) ℂ)
   have hφc : Continuous φ := continuous_pi fun τ => continuous_const.matrix_mul (continuous_apply τ)
   have hK : ∀ y ∈ K, φ y ∈ X.dom := fun y hy => mem_dom_of_ok X P hP y hy
   have hKc : IsPreconnected (φ '' K) := isPreconnected_ok.image φ hφc.continuousOn
@@ -67,11 +70,13 @@ theorem flag_domain_frames_connected : GGConnStatement (E := E) := by
     unfold sv
     split_ifs <;> norm_num
   have h1 : (1 : X.Ψ → Matrix (Fin r) (Fin r) ℂ) ∈ K := fun τ =>
-    ok_of_blk (fun k a hka => by
-      have hne : k ≠ a := by
-        rintro rfl
-        exact hka Iff.rfl
-      simp [Matrix.one_apply_ne hne]) (by simp)
+    ok_of_blk
+      (fun k a hka => by
+        have hne : k ≠ a := by
+          rintro rfl
+          exact hka Iff.rfl
+        simp [Matrix.one_apply_ne hne])
+      (by simp)
   refine ⟨⟨φ 1, hK 1 h1⟩, isPreconnected_of_forall (φ 1) fun x hx => ?_⟩
   obtain ⟨b, hb, hort⟩ := (orthonormalFlagTranslate_holds r X).1 x hx
   let y0 : X.Ψ → Matrix (Fin r) (Fin r) ℂ := fun τ => (P τ)⁻¹ * mat (rmul x b) τ
@@ -91,20 +96,24 @@ theorem flag_domain_frames_connected : GGConnStatement (E := E) := by
     rw [diagonal_one]
     exact PosDef.one
   have hB : IsPreconnected (Bor X.Ψ r) := isPreconnected_upper (ι := X.Ψ) (r := r)
-  have h1B : (fun _ => (1 : Matrix (Fin r) (Fin r) ℂ) : Frame X.Ψ r) ∈ Bor X.Ψ r := fun τ =>
-    ⟨by
+  have h1B : (fun _ => (1 : Matrix (Fin r) (Fin r) ℂ) : Frame X.Ψ r) ∈ Bor X.Ψ r := fun τ => ⟨
+    by
       show (1 : Matrix (Fin r) (Fin r) ℂ).det ≠ 0
-      simp, fun a c hca => Matrix.one_apply_ne (ne_of_gt hca)⟩
+      simp,
+    fun a c hca => Matrix.one_apply_ne (ne_of_gt hca)
+  ⟩
   have hxB : rmul x (fun _ => (1 : Matrix (Fin r) (Fin r) ℂ)) = x := by
     funext τ
     exact Matrix.mul_one (mat x τ)
   have hrc : Continuous fun b' : Frame X.Ψ r => rmul x b' :=
     continuous_pi fun τ => continuous_const.matrix_mul (continuous_apply τ)
-  refine ⟨(fun b' => rmul x b') '' Bor X.Ψ r ∪ φ '' K, ?_, Or.inr ⟨1, h1, rfl⟩, Or.inl ⟨_, h1B, hxB⟩, ?_⟩
+  refine
+    ⟨(fun b' => rmul x b') '' Bor X.Ψ r ∪ φ '' K, ?_, Or.inr ⟨1, h1, rfl⟩, Or.inl ⟨_, h1B, hxB⟩, ?_⟩
   · rintro z (⟨b', hb', rfl⟩ | ⟨y, hy, rfl⟩)
     · exact rmul_mem X hx hb'
     · exact hK y hy
-  · exact IsPreconnected.union (rmul x b) ⟨b, hb, rfl⟩ ⟨y0, hy0K, hy0⟩ (hB.image _ hrc.continuousOn) hKc
+  · exact IsPreconnected.union (rmul x b) ⟨b, hb, rfl⟩ ⟨y0, hy0K, hy0⟩ (hB.image _ hrc.continuousOn)
+      hKc
 
 end
 

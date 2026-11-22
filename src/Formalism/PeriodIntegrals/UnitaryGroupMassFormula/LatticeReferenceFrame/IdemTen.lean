@@ -24,8 +24,8 @@ theorem fixInt : FixInt := by
     (isIntegral_algHom_iff (algebraMap I.F I.E).toIntAlgHom (algebraMap I.F I.E).injective).mp hs'
   exact ⟨⟨a, hint⟩, ha⟩
 
-theorem intF {F : Type} [Field F] [NumberField F] (r : 𝓞 F) :
-    algebraMap F (Af F) (r : F) ∈ Formalism.UG.intAd F := by
+theorem intF {F : Type} [Field F] [NumberField F] (r : 𝓞 F)
+    : algebraMap F (Af F) (r : F) ∈ Formalism.UG.intAd F := by
   show ∀ v, _
   intro v
   rw [IsDedekindDomain.FiniteAdeleRing.algebraMap_apply]
@@ -88,14 +88,14 @@ theorem tenStep : TenStep := by
     exact mul_left_cancel₀ hgE h1
   obtain ⟨a2, ha2⟩ := hFix I t2 hs2
   obtain ⟨a3, ha3⟩ := hFix I t3 hs3
-  have hαi : -algebraMap I.F (Af I.F) (a3 : I.F) ∈ Formalism.UG.intAd I.F :=
+  have hαi : - algebraMap I.F (Af I.F) (a3 : I.F) ∈ Formalism.UG.intAd I.F :=
     (Formalism.UG.intAd I.F).neg_mem (intF a3)
   have hβi : algebraMap I.F (Af I.F) (a2 : I.F) ∈ Formalism.UG.intAd I.F := intF a2
   obtain ⟨C₁, C₂, hC₁, hC₂, hi, hii, hiii⟩ := hAd I.F g _ _ hg hαi hβi
   obtain ⟨W, hWd⟩ : ∃ W : Af I.F, W = 1 + (g : Af I.F) * C₁ := ⟨_, rfl⟩
   obtain ⟨Q, hQd⟩ : ∃ Q : Af I.F, Q = (g : Af I.F) * C₂ := ⟨_, rfl⟩
-  obtain ⟨A0, hA0d⟩ : ∃ A0 : Af I.F,
-      A0 = 1 + (g : Af I.F) * -algebraMap I.F (Af I.F) (a3 : I.F) := ⟨_, rfl⟩
+  obtain ⟨A0, hA0d⟩ : ∃ A0 : Af I.F, A0 = 1 + (g : Af I.F) * - algebraMap I.F (Af I.F) (a3 : I.F) :=
+    ⟨_, rfl⟩
   obtain ⟨B0, hB0d⟩ : ∃ B0 : Af I.F, B0 = (g : Af I.F) * algebraMap I.F (Af I.F) (a2 : I.F) :=
     ⟨_, rfl⟩
   rw [← hWd, ← hQd, ← hA0d] at hi
@@ -104,7 +104,8 @@ theorem tenStep : TenStep := by
   have hi' := congrArg (iA I) hi
   have hii' := congrArg (iA I) hii
   have hiii' := congrArg (iA I) hiii
-  simp only [map_mul, map_add (f := _), map_sub, map_pow, map_neg, map_ofNat, map_zero] at hi' hii' hiii'
+  simp only [map_mul, map_add (f := _), map_sub, map_pow, map_neg, map_ofNat, map_zero]
+    at hi' hii' hiii'
   have hA : iA I A0 = iE I (θ : I.E) + iE I (star (θ : I.E)) := by
     have e1 : A0 = algebraMap I.F (Af I.F) (1 - (g : I.F) * (a3 : I.F)) := by
       rw [hA0d, map_sub, map_one, map_mul, map_natCast]
@@ -132,12 +133,14 @@ theorem tenStep : TenStep := by
   · linear_combination (iE I (θ : I.E)) * hi' + hii'
   · rw [map_sub, map_mul, sig_iE, sig_iA, sig_iA]
     linear_combination hiii'
-  · refine ⟨iE I (θ : I.E) * iA I C₁ - iA I C₂,
-      sub_mem (mul_mem (iE_mem I θ) (iA_mem I hC₁)) (iA_mem I hC₂), ?_⟩
+  · refine ⟨
+      iE I (θ : I.E) * iA I C₁ - iA I C₂,
+      sub_mem (mul_mem (iE_mem I θ) (iA_mem I hC₁)) (iA_mem I hC₂),
+      ?_
+    ⟩
     have hW' : iA I W = 1 + (g : I.E ⊗[I.F] Af I.F) * iA I C₁ := by
       rw [hWd, map_add (f := _), map_one, map_mul, map_natCast]
-    have hQ' : iA I Q = (g : I.E ⊗[I.F] Af I.F) * iA I C₂ := by
-      rw [hQd, map_mul, map_natCast]
+    have hQ' : iA I Q = (g : I.E ⊗[I.F] Af I.F) * iA I C₂ := by rw [hQd, map_mul, map_natCast]
     show iE I (θ : I.E) * iA I W - iA I Q - iE I (θ : I.E) = _
     rw [hW', hQ']
     ring

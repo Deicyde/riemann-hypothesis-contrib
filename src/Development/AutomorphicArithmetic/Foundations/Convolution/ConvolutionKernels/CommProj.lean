@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.ConvolutionTheory.K.commProj :
-    ∀ {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (V : Submodule ℂ H) [V.HasOrthogonalProjection]
-      (U : H →L[ℂ] H), (∀ v ∈ V, U v ∈ V) → (∀ v ∈ V, ContinuousLinearMap.adjoint U v ∈ V) →
-      U ∘L V.starProjection = V.starProjection ∘L U := by
+theorem UpperTheory.ConvolutionTheory.K.commProj
+    : ∀ {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        (V : Submodule ℂ H) [V.HasOrthogonalProjection] (U : H →L[ℂ] H),
+      (∀ v ∈ V, U v ∈ V) → (∀ v ∈ V, ContinuousLinearMap.adjoint U v ∈ V)
+        → U ∘L V.starProjection = V.starProjection ∘L U := by
   intro H _ _ _ V _ U h1 h2
   ext x
   simp only [ContinuousLinearMap.comp_apply]

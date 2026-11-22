@@ -8,7 +8,40 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem integral_flag_lift_of_residue : ∀ (O Γ : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Group Γ] (n a t : ℕ) (r : Γ →* GL (Fin n) O) (ρ : Γ →* GL (Fin a) O) (ψ : Fin t → Γ →* Oˣ) (ϖ : O), Irreducible ϖ → a + t = n → (∀ g m, ((r g : Matrix (Fin n) (Fin n) O).charpoly - (ρ g : Matrix (Fin a) (Fin a) O).charpoly * ∏ s, (Polynomial.X - Polynomial.C ((ψ s g : Oˣ) : O))).coeff m ∈ IsLocalRing.maximalIdeal O) → (∀ (k Γ : Type) [Field k] [Group Γ] (n a t : ℕ) (r : Γ →* GL (Fin n) k) (ρ : Γ →* GL (Fin a) k) (ψ : Fin t → Γ →* kˣ), a + t = n → (∀ g, (r g : Matrix (Fin n) (Fin n) k).charpoly = (ρ g : Matrix (Fin a) (Fin a) k).charpoly * ∏ s, (Polynomial.X - Polynomial.C ((ψ s g : kˣ) : k))) → ∃ (R : ℕ) (V : Fin (R + 1) → Submodule k (Fin n → k)) (rs : Fin t → Fin R), V 0 = ⊥ ∧ V (Fin.last R) = ⊤ ∧ Monotone V ∧ (∀ g j x, x ∈ V j → (r g : Matrix (Fin n) (Fin n) k).mulVec x ∈ V j) ∧ Function.Injective rs ∧ ∀ s, ∃ x ∈ V (rs s).succ, x ∉ V (rs s).castSucc ∧ V (rs s).succ = V (rs s).castSucc ⊔ Submodule.span k {x} ∧ ∀ g, (r g : Matrix (Fin n) (Fin n) k).mulVec x - ((ψ s g : kˣ) : k) • x ∈ V (rs s).castSucc) → ∃ (R : ℕ) (M : Fin (R + 1) → Submodule O (Fin n → O)) (rs : Fin t → Fin R), (∀ x, x ∈ M 0 ↔ ∃ y : Fin n → O, x = fun i => ϖ * y i) ∧ M (Fin.last R) = ⊤ ∧ Monotone M ∧ (∀ g j x, x ∈ M j → (r g : Matrix (Fin n) (Fin n) O).mulVec x ∈ M j) ∧ Function.Injective rs ∧ ∀ s, ∃ x ∈ M (rs s).succ, x ∉ M (rs s).castSucc ∧ M (rs s).succ = M (rs s).castSucc ⊔ Submodule.span O {x} ∧ ∀ g, (r g : Matrix (Fin n) (Fin n) O).mulVec x - (fun i => ((ψ s g : Oˣ) : O) * x i) ∈ M (rs s).castSucc := by
+theorem integral_flag_lift_of_residue
+    : ∀ (O Γ : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Group Γ] (n a t : ℕ)
+        (r : Γ →* GL (Fin n) O) (ρ : Γ →* GL (Fin a) O) (ψ : Fin t → Γ →* Oˣ) (ϖ : O),
+      Irreducible ϖ → a + t = n
+        → (∀ g m,
+          ((r g : Matrix (Fin n) (Fin n) O).charpoly
+              - (ρ g : Matrix (Fin a) (Fin a) O).charpoly
+                * ∏ s, (Polynomial.X - Polynomial.C ((ψ s g : Oˣ) : O))).coeff m
+            ∈ IsLocalRing.maximalIdeal O)
+        → (∀ (k Γ : Type) [Field k] [Group Γ] (n a t : ℕ) (r : Γ →* GL (Fin n) k)
+            (ρ : Γ →* GL (Fin a) k) (ψ : Fin t → Γ →* kˣ),
+          a + t = n
+            → (∀ g,
+              (r g : Matrix (Fin n) (Fin n) k).charpoly
+                = (ρ g : Matrix (Fin a) (Fin a) k).charpoly
+                  * ∏ s, (Polynomial.X - Polynomial.C ((ψ s g : kˣ) : k)))
+            → ∃ (R : ℕ) (V : Fin (R + 1) → Submodule k (Fin n → k)) (rs : Fin t → Fin R),
+              V 0 = ⊥ ∧ V (Fin.last R) = ⊤ ∧ Monotone V
+                ∧ (∀ g j x, x ∈ V j → (r g : Matrix (Fin n) (Fin n) k).mulVec x ∈ V j)
+                ∧ Function.Injective rs
+                ∧ ∀ s, ∃ x ∈ V (rs s).succ,
+                  x ∉ V (rs s).castSucc ∧ V (rs s).succ = V (rs s).castSucc ⊔ Submodule.span k {x}
+                    ∧ ∀ g,
+                      (r g : Matrix (Fin n) (Fin n) k).mulVec x - ((ψ s g : kˣ) : k) • x
+                        ∈ V (rs s).castSucc)
+        → ∃ (R : ℕ) (M : Fin (R + 1) → Submodule O (Fin n → O)) (rs : Fin t → Fin R),
+          (∀ x, x ∈ M 0 ↔ ∃ y : Fin n → O, x = fun i => ϖ * y i) ∧ M (Fin.last R) = ⊤ ∧ Monotone M
+            ∧ (∀ g j x, x ∈ M j → (r g : Matrix (Fin n) (Fin n) O).mulVec x ∈ M j)
+            ∧ Function.Injective rs
+            ∧ ∀ s, ∃ x ∈ M (rs s).succ,
+              x ∉ M (rs s).castSucc ∧ M (rs s).succ = M (rs s).castSucc ⊔ Submodule.span O {x}
+                ∧ ∀ g,
+                  (r g : Matrix (Fin n) (Fin n) O).mulVec x - (fun i => ((ψ s g : Oˣ) : O) * x i)
+                    ∈ M (rs s).castSucc := by
   intro O Γ _ _ _ _ n a t r ρ ψ ϖ hϖ hat hcong hfield
   let k := IsLocalRing.ResidueField O
   let f : O →+* k := IsLocalRing.residue O
@@ -20,28 +53,30 @@ theorem integral_flag_lift_of_residue : ∀ (O Γ : Type) [CommRing O] [IsDomain
   have hρk : ∀ g, (ρk g : Matrix (Fin a) (Fin a) k) = (ρ g : Matrix (Fin a) (Fin a) O).map f :=
     fun g => Matrix.GeneralLinearGroup.val_map_apply f (ρ g)
   have hψk : ∀ s g, ((ψk s g : kˣ) : k) = f ((ψ s g : Oˣ) : O) := fun s g => rfl
-  have hchar : ∀ g, (rk g : Matrix (Fin n) (Fin n) k).charpoly
-      = (ρk g : Matrix (Fin a) (Fin a) k).charpoly * ∏ s, (X - C ((ψk s g : kˣ) : k)) := by
+  have hchar
+      : ∀ g,
+        (rk g : Matrix (Fin n) (Fin n) k).charpoly
+          = (ρk g : Matrix (Fin a) (Fin a) k).charpoly * ∏ s, (X - C ((ψk s g : kˣ) : k)) := by
     intro g
     rw [hrk, hρk, Matrix.charpoly_map, Matrix.charpoly_map]
     simp_rw [hψk]
-    have hp : ∏ s, (X - C (f ((ψ s g : Oˣ) : O)))
-        = (∏ s, (X - C ((ψ s g : Oˣ) : O))).map f := by
+    have hp : ∏ s, (X - C (f ((ψ s g : Oˣ) : O))) = (∏ s, (X - C ((ψ s g : Oˣ) : O))).map f := by
       simp [Polynomial.map_prod]
     rw [hp, ← Polynomial.map_mul, ← sub_eq_zero, ← Polynomial.map_sub]
     ext m
     rw [coeff_map, coeff_zero]
     exact (IsLocalRing.residue_eq_zero_iff _).mpr (hcong g m)
-  obtain ⟨R, V, rs, hV0, hVtop, hVmono, hVstab, hrs, hstep⟩ :=
-    hfield k Γ n a t rk ρk ψk hat hchar
+  obtain ⟨R, V, rs, hV0, hVtop, hVmono, hVstab, hrs, hstep⟩ := hfield k Γ n a t rk ρk ψk hat hchar
   let π : (Fin n → O) →ₗ[O] (Fin n → k) := (Algebra.linearMap O k).compLeft (Fin n)
   have hπ : ∀ x i, π x i = f (x i) := fun x i => rfl
   have hπsurj : ∀ y : Fin n → k, ∃ x, π x = y := by
     intro y
     choose x hx using fun i => IsLocalRing.residue_surjective (y i)
     exact ⟨x, funext hx⟩
-  have hπmul : ∀ g x, π ((r g : Matrix (Fin n) (Fin n) O).mulVec x)
-      = (rk g : Matrix (Fin n) (Fin n) k).mulVec (π x) := by
+  have hπmul
+      : ∀ g x,
+        π ((r g : Matrix (Fin n) (Fin n) O).mulVec x)
+          = (rk g : Matrix (Fin n) (Fin n) k).mulVec (π x) := by
     intro g x; funext i; rw [hπ, RingHom.map_mulVec, hrk]; rfl
   let M : Fin (R + 1) → Submodule O (Fin n → O) := fun j => ((V j).restrictScalars O).comap π
   have hM : ∀ j x, x ∈ M j ↔ π x ∈ V j := fun j x => Iff.rfl
@@ -65,7 +100,10 @@ theorem integral_flag_lift_of_residue : ∀ (O Γ : Type) [CommRing O] [IsDomain
     · rintro ⟨y, rfl⟩
       funext i
       show f (ϖ * y i) = 0
-      rw [map_mul, (IsLocalRing.residue_eq_zero_iff ϖ).mpr (by rw [hmax]; exact Ideal.mem_span_singleton_self ϖ), zero_mul]
+      rw [map_mul,
+        (IsLocalRing.residue_eq_zero_iff ϖ).mpr
+          (by rw [hmax]; exact Ideal.mem_span_singleton_self ϖ),
+        zero_mul]
   · ext x
     simp only [hM, hVtop, Submodule.mem_top]
   · intro g j x hx
@@ -82,8 +120,13 @@ theorem integral_flag_lift_of_residue : ∀ (O Γ : Type) [CommRing O] [IsDomain
         obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hw
         obtain ⟨c', rfl⟩ := IsLocalRing.residue_surjective c
         rw [Submodule.mem_sup]
-        refine ⟨y - c' • x, ?_, c' • x, Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x),
-          sub_add_cancel _ _⟩
+        refine ⟨
+          y - c' • x,
+          ?_,
+          c' • x,
+          Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x),
+          sub_add_cancel _ _
+        ⟩
         rw [hM, map_sub, map_smul, ← hvw]
         convert hv using 1
         ext i

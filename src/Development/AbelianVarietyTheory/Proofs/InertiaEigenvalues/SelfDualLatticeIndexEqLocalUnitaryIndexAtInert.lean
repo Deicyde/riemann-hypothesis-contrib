@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IndexTr
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
@@ -21,12 +24,16 @@ open GlobalTheory.InertLoc Formalism.UG
 
 theorem finPart_surjective (D : D7) : Function.Surjective (finPart D) := by
   intro b
-  obtain ⟨a, ha⟩ := Algebra.TensorProduct.map_surjective (sndA D.host.F) (AlgHom.id D.host.F D.host.E)
-    (fun b => ⟨pairA D.host.F 0 b, rfl⟩) Function.surjective_id b
+  obtain ⟨a, ha⟩ :=
+    Algebra.TensorProduct.map_surjective (sndA D.host.F) (AlgHom.id D.host.F D.host.E)
+      (fun b => ⟨pairA D.host.F 0 b, rfl⟩)
+      Function.surjective_id b
   exact ⟨a, ha⟩
 
-theorem ker_finPart_le {D : D7} {P : HeightOneSpectrum (𝓞 D.host.E)} {e : AE D} {σ : LP D P →+* LP D P}
-    {π : AE D →+* LP D P} (hC : Chart e σ π) : RingHom.ker (finPart D) ≤ RingHom.ker π := by
+theorem ker_finPart_le
+    {D : D7} {P : HeightOneSpectrum (𝓞 D.host.E)} {e : AE D} {σ : LP D P →+* LP D P}
+    {π : AE D →+* LP D P} (hC : Chart e σ π)
+    : RingHom.ker (finPart D) ≤ RingHom.ker π := by
   intro a ha
   rw [RingHom.mem_ker] at ha ⊢
   refine (hC.2.2.1 a).2 ?_
@@ -36,8 +43,9 @@ theorem ker_finPart_le {D : D7} {P : HeightOneSpectrum (𝓞 D.host.E)} {e : AE 
   · show finPart D (e * a) = 0
     rw [map_mul, ha, mul_zero]
 
-theorem mem_span_basisFun {K : Type} [Field K] (O : ValuationSubring K) {n : Type} [Fintype n] [DecidableEq n]
-    (z : n → K) : z ∈ Submodule.span O (Set.range (Pi.basisFun K n)) ↔ ∀ i, z i ∈ O := by
+theorem mem_span_basisFun
+    {K : Type} [Field K] (O : ValuationSubring K) {n : Type} [Fintype n] [DecidableEq n] (z : n → K)
+    : z ∈ Submodule.span O (Set.range (Pi.basisFun K n)) ↔ ∀ i, z i ∈ O := by
   constructor
   · intro hz
     induction hz using Submodule.span_induction with
@@ -58,28 +66,44 @@ theorem mem_span_basisFun {K : Type} [Field K] (O : ValuationSubring K) {n : Typ
     rw [this]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem finMat_apply {D : D7} {W : HSp D} (x : GA D W) (i j : Fin W.rank) :
-    finMat D.sp.cm.sig W.gram x i j = finPart D (Formalism.L2.Theta.mt W x i j) := rfl
+theorem finMat_apply {D : D7} {W : HSp D} (x : GA D W) (i j : Fin W.rank)
+    : finMat D.sp.cm.sig W.gram x i j = finPart D (Formalism.L2.Theta.mt W x i j) :=
+  rfl
 
-theorem finMat_sub_one_eq {D : D7} {W : HSp D} {e : AE D} (x : GA D W) (hx : SuppF W e x) (i j : Fin W.rank) :
-    finMat D.sp.cm.sig W.gram x i j - (1 : Matrix (Fin W.rank) (Fin W.rank)
-        (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)) i j =
-      finPart D e * (finMat D.sp.cm.sig W.gram x i j - (1 : Matrix (Fin W.rank) (Fin W.rank)
-        (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)) i j) := by
-  have h1ij : (1 : Matrix (Fin W.rank) (Fin W.rank) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)) i j =
-      finPart D ((1 : Matrix (Fin W.rank) (Fin W.rank) (AE D)) i j) := by
+theorem finMat_sub_one_eq
+    {D : D7} {W : HSp D} {e : AE D} (x : GA D W) (hx : SuppF W e x) (i j : Fin W.rank)
+    : finMat D.sp.cm.sig W.gram x i j
+        - (1 : Matrix (Fin W.rank) (Fin W.rank)
+            (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E))
+          i j
+      = finPart D e
+        * (finMat D.sp.cm.sig W.gram x i j
+          - (1 : Matrix (Fin W.rank) (Fin W.rank)
+              (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E))
+            i j) := by
+  have h1ij
+      : (1 : Matrix (Fin W.rank) (Fin W.rank)
+            (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E))
+          i j
+        = finPart D ((1 : Matrix (Fin W.rank) (Fin W.rank) (AE D)) i j) := by
     by_cases hij : i = j
     · subst hij; simp
     · simp [Matrix.one_apply_ne hij]
   rw [h1ij, finMat_apply, ← RingHom.map_sub, ← RingHom.map_mul, ← Matrix.sub_apply, hx i j]
 
-theorem finMat_mulVec_fix {D : D7} {W : HSp D} {e : AE D} (x : GA D W) (hx : SuppF W e x)
-    (y : Fin W.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) :
-    finMat D.sp.cm.sig W.gram x *ᵥ (y - finPart D e • y) = y - finPart D e • y := by
+theorem finMat_mulVec_fix
+    {D : D7} {W : HSp D} {e : AE D} (x : GA D W) (hx : SuppF W e x)
+    (y : Fin W.rank
+      → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
+    : finMat D.sp.cm.sig W.gram x *ᵥ (y - finPart D e • y) = y - finPart D e • y := by
   funext i
-  have key : ∀ j, finMat D.sp.cm.sig W.gram x i j * (y - finPart D e • y) j =
-      (1 : Matrix (Fin W.rank) (Fin W.rank) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)) i j *
-        (y - finPart D e • y) j := by
+  have key
+      : ∀ j,
+        finMat D.sp.cm.sig W.gram x i j * (y - finPart D e • y) j
+          = (1 : Matrix (Fin W.rank) (Fin W.rank)
+                (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E))
+              i j
+            * (y - finPart D e • y) j := by
     intro j
     have := finMat_sub_one_eq x hx i j
     rw [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
@@ -88,38 +112,54 @@ theorem finMat_mulVec_fix {D : D7} {W : HSp D} {e : AE D} (x : GA D W) (hx : Sup
   rw [Finset.sum_congr rfl (fun j _ => key j)]
   simp [Matrix.one_apply]
 
-theorem inv_mulVec_conj {K : Type} [Field K] {n : Type} [Fintype n] [DecidableEq n] (β g : GL n K) (w : n → K) :
-    (β⁻¹).1 *ᵥ ((β.1 * g.1 * (β⁻¹).1) *ᵥ w) = g.1 *ᵥ ((β⁻¹).1 *ᵥ w) := by
+theorem inv_mulVec_conj
+    {K : Type} [Field K] {n : Type} [Fintype n] [DecidableEq n] (β g : GL n K) (w : n → K)
+    : (β⁻¹).1 *ᵥ ((β.1 * g.1 * (β⁻¹).1) *ᵥ w) = g.1 *ᵥ ((β⁻¹).1 *ᵥ w) := by
   rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
   congr 1
   rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul]
 
-
 set_option maxHeartbeats 1000000 in
-theorem latIndex_eq_of_chart {D : D7} {W : HSp D} {P : HeightOneSpectrum (𝓞 D.host.E)} {e : AE D}
-    {σ : LP D P →+* LP D P} {π : AE D →+* LP D P} {β : GL (Fin W.rank) (LP D P)}
-    (α : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) (hα : finPart D e = α ⊗ₜ[D.host.F] (1 : D.host.E))
-    (hαint : ∀ a ∈ intAf D.host.F, α * a ∈ intAf D.host.F)
-    (hC : Chart e σ π) (hF : Frame W e σ π β) (x : GA D W) (hx : SuppF W e x) (g : GL (Fin W.rank) (LP D P))
-    (hxg : (Formalism.L2.Theta.mt W x).map π = β.1 * g.1 * (β⁻¹).1) :
-    latIndex W x = ((Submodule.span (P.adicCompletionIntegers D.host.E)
-        (Set.range (Pi.basisFun (LP D P) (Fin W.rank)))).map
-        ((g.1 : Matrix (Fin W.rank) (Fin W.rank) (LP D P)).mulVecLin.restrictScalars
-          (P.adicCompletionIntegers D.host.E))).toAddSubgroup.relIndex
-      (Submodule.span (P.adicCompletionIntegers D.host.E) (Set.range (Pi.basisFun (LP D P) (Fin W.rank)))).toAddSubgroup := by
-  let πf : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E →+* LP D P :=
+theorem latIndex_eq_of_chart
+    {D : D7} {W : HSp D} {P : HeightOneSpectrum (𝓞 D.host.E)} {e : AE D} {σ : LP D P →+* LP D P}
+    {π : AE D →+* LP D P} {β : GL (Fin W.rank) (LP D P)}
+    (α : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F)
+    (hα : finPart D e = α ⊗ₜ[D.host.F] (1 : D.host.E))
+    (hαint : ∀ a ∈ intAf D.host.F, α * a ∈ intAf D.host.F) (hC : Chart e σ π) (hF : Frame W e σ π β)
+    (x : GA D W) (hx : SuppF W e x) (g : GL (Fin W.rank) (LP D P))
+    (hxg : (Formalism.L2.Theta.mt W x).map π = β.1 * g.1 * (β⁻¹).1)
+    : latIndex W x
+      = ((Submodule.span (P.adicCompletionIntegers D.host.E)
+            (Set.range (Pi.basisFun (LP D P) (Fin W.rank)))).map
+          ((g.1 : Matrix (Fin W.rank) (Fin W.rank) (LP D P)).mulVecLin.restrictScalars
+            (P.adicCompletionIntegers D.host.E))).toAddSubgroup.relIndex
+        (Submodule.span (P.adicCompletionIntegers D.host.E)
+          (Set.range (Pi.basisFun (LP D P) (Fin W.rank)))).toAddSubgroup := by
+  let πf
+      : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E
+        →+* LP D P :=
     (RingHom.liftOfSurjective (finPart D) (finPart_surjective D)) ⟨π, ker_finPart_le hC⟩
   have hπf : ∀ a, πf (finPart D a) = π a := fun a => RingHom.liftOfRightInverse_comp_apply _ _ _ _ _
   have hπe : π e = 1 := by
     have h0 : e * (e - 1) = 0 := by rw [mul_sub, hC.1.1, mul_one, sub_self]
     have := (hC.2.2.1 (e - 1)).2 h0
     rwa [RingHom.map_sub, RingHom.map_one, sub_eq_zero] at this
-  let T : (Fin W.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) →+
-      (Fin W.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) :=
+  let T
+      : (Fin W.rank
+          → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
+        →+ (Fin W.rank
+          → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) :=
     (finMat D.sp.cm.sig W.gram x).mulVecLin.toAddMonoidHom
-  let p : (Fin W.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) →+
-      (Fin W.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) := DistribSMul.toAddMonoidHom _ (finPart D e)
-  let Φ : (Fin W.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) →+ (Fin W.rank → LP D P) :=
+  let p
+      : (Fin W.rank
+          → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
+        →+ (Fin W.rank
+          → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) :=
+    DistribSMul.toAddMonoidHom _ (finPart D e)
+  let Φ
+      : (Fin W.rank
+          → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
+        →+ (Fin W.rank → LP D P) :=
     ((β⁻¹).1 : Matrix (Fin W.rank) (Fin W.rank) (LP D P)).mulVecLin.toAddMonoidHom.comp
       (πf.toAddMonoidHom.compLeft (Fin W.rank))
   let h : (Fin W.rank → LP D P) →+ (Fin W.rank → LP D P) :=
@@ -146,7 +186,8 @@ theorem latIndex_eq_of_chart {D : D7} {W : HSp D} {P : HeightOneSpectrum (𝓞 D
     have h0 : ∀ k, πf (y k) = 0 := by
       intro k
       have := congrArg (fun w => β.1 *ᵥ w) hy
-      simp only [hΦ, Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec, Matrix.mulVec_zero] at this
+      simp only [hΦ, Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec, Matrix.mulVec_zero]
+        at this
       exact congrFun this k
     funext k
     obtain ⟨a, ha⟩ := finPart_surjective D (y k)
@@ -158,14 +199,17 @@ theorem latIndex_eq_of_chart {D : D7} {W : HSp D} {P : HeightOneSpectrum (𝓞 D
     have hmap : (finMat D.sp.cm.sig W.gram x).map πf = β.1 * g.1 * (β⁻¹).1 := by
       rw [← hxg]
       exact Matrix.ext fun i j => hπf _
-    have hT : (fun k => πf ((finMat D.sp.cm.sig W.gram x *ᵥ y) k)) =
-        (finMat D.sp.cm.sig W.gram x).map πf *ᵥ (fun k => πf (y k)) :=
+    have hT
+        : (fun k => πf ((finMat D.sp.cm.sig W.gram x *ᵥ y) k))
+          = (finMat D.sp.cm.sig W.gram x).map πf *ᵥ (fun k => πf (y k)) :=
       funext fun k => RingHom.map_mulVec πf _ y k
     show Φ (finMat D.sp.cm.sig W.gram x *ᵥ y) = g.1 *ᵥ Φ y
     rw [hΦ, hΦ, hT, hmap]
     exact inv_mulVec_conj β g _
-  have hmapΦ : (Formalism.L2.NTheta.LamHat W).map Φ =
-      (Submodule.span (P.adicCompletionIntegers D.host.E) (Set.range (Pi.basisFun (LP D P) (Fin W.rank)))).toAddSubgroup := by
+  have hmapΦ
+      : (Formalism.L2.NTheta.LamHat W).map Φ
+        = (Submodule.span (P.adicCompletionIntegers D.host.E)
+          (Set.range (Pi.basisFun (LP D P) (Fin W.rank)))).toAddSubgroup := by
     ext z
     rw [AddSubgroup.mem_map, Submodule.mem_toAddSubgroup]
     refine Iff.trans ?_ (mem_span_basisFun _ z).symm
@@ -198,11 +242,35 @@ theorem latIndex_eq_of_chart {D : D7} {W : HSp D} {P : HeightOneSpectrum (𝓞 D
         funext k
         rw [hπf, RingHom.map_mul, hπe, one_mul]
   unfold latIndex
-  rw [GlobalTheory.index_transfer_along_projection (Formalism.L2.NTheta.LamHat W) T p Φ h h1 h2 h3 h4 h5, hmapΦ,
-    Submodule.map_toAddSubgroup]
+  rw [GlobalTheory.index_transfer_along_projection (Formalism.L2.NTheta.LamHat W) T p Φ h h1 h2 h3
+      h4 h5,
+    hmapΦ, Submodule.map_toAddSubgroup]
   rfl
 
-theorem latIndex_chart_eq : ∀ (D : D7) (W : HSp D) (v : HeightOneSpectrum (𝓞 D.host.F)) (ε : AF D.host.F), IsPlaceIdem D v ε → ∀ (P : HeightOneSpectrum (𝓞 D.host.E)) (σ : GlobalTheory.InertLoc.LP D P →+* GlobalTheory.InertLoc.LP D P) (π : AE D →+* GlobalTheory.InertLoc.LP D P) (β : GL (Fin W.rank) (GlobalTheory.InertLoc.LP D P)) (ι : Formalism.UG.UJ σ (1 : Matrix (Fin W.rank) (Fin W.rank) (GlobalTheory.InertLoc.LP D P)) →* GA D W), GlobalTheory.InertLoc.Chart (algebraMap (AF D.host.F) (AE D) ε) σ π → GlobalTheory.InertLoc.Frame W (algebraMap (AF D.host.F) (AE D) ε) σ π β → GlobalTheory.InertLoc.GrpChart W (algebraMap (AF D.host.F) (AE D) ε) σ π β ι → ∀ (g : Formalism.UG.UJ σ (1 : Matrix (Fin W.rank) (Fin W.rank) (GlobalTheory.InertLoc.LP D P))), latIndex W (ι g) = ((Submodule.span (P.adicCompletionIntegers D.host.E) (Set.range (Pi.basisFun (GlobalTheory.InertLoc.LP D P) (Fin W.rank)))).map (((g : GL (Fin W.rank) (GlobalTheory.InertLoc.LP D P)) : Matrix (Fin W.rank) (Fin W.rank) (GlobalTheory.InertLoc.LP D P)).mulVecLin.restrictScalars (P.adicCompletionIntegers D.host.E))).toAddSubgroup.relIndex (Submodule.span (P.adicCompletionIntegers D.host.E) (Set.range (Pi.basisFun (GlobalTheory.InertLoc.LP D P) (Fin W.rank)))).toAddSubgroup := by
+theorem latIndex_chart_eq
+    : ∀ (D : D7) (W : HSp D) (v : HeightOneSpectrum (𝓞 D.host.F)) (ε : AF D.host.F),
+      IsPlaceIdem D v ε
+        → ∀ (P : HeightOneSpectrum (𝓞 D.host.E))
+            (σ : GlobalTheory.InertLoc.LP D P →+* GlobalTheory.InertLoc.LP D P)
+            (π : AE D →+* GlobalTheory.InertLoc.LP D P)
+            (β : GL (Fin W.rank) (GlobalTheory.InertLoc.LP D P))
+            (ι : Formalism.UG.UJ σ
+                (1 : Matrix (Fin W.rank) (Fin W.rank) (GlobalTheory.InertLoc.LP D P))
+              →* GA D W),
+          GlobalTheory.InertLoc.Chart (algebraMap (AF D.host.F) (AE D) ε) σ π
+            → GlobalTheory.InertLoc.Frame W (algebraMap (AF D.host.F) (AE D) ε) σ π β
+            → GlobalTheory.InertLoc.GrpChart W (algebraMap (AF D.host.F) (AE D) ε) σ π β ι
+            → ∀ (g : Formalism.UG.UJ σ
+                (1 : Matrix (Fin W.rank) (Fin W.rank) (GlobalTheory.InertLoc.LP D P))),
+              latIndex W (ι g)
+                = ((Submodule.span (P.adicCompletionIntegers D.host.E)
+                      (Set.range (Pi.basisFun (GlobalTheory.InertLoc.LP D P) (Fin W.rank)))).map
+                    (((g : GL (Fin W.rank) (GlobalTheory.InertLoc.LP D P)) : Matrix (Fin W.rank)
+                        (Fin W.rank) (GlobalTheory.InertLoc.LP D P)).mulVecLin.restrictScalars
+                      (P.adicCompletionIntegers D.host.E))).toAddSubgroup.relIndex
+                  (Submodule.span (P.adicCompletionIntegers D.host.E)
+                    (Set.range (Pi.basisFun (GlobalTheory.InertLoc.LP D P)
+                      (Fin W.rank)))).toAddSubgroup := by
   intro D W v ε hε P σ π β ι hC hF hG g
   obtain ⟨α, hεα, hα1, hα0⟩ := hε
   have hα : finPart D (algebraMap (AF D.host.F) (AE D) ε) = α ⊗ₜ[D.host.F] (1 : D.host.E) := by

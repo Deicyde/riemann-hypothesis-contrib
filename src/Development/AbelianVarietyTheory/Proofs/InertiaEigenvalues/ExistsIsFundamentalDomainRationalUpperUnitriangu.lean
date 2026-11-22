@@ -13,13 +13,15 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW GroundTheory.Global.IdeleGroup Formalism.L2.Host
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host
 open scoped ENNReal nonZeroDivisors
 
 namespace GlobalTheory.CellDec
 
-theorem exists_isFundamentalDomain_NE : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (μ : Measure (GA E a)),
-    ∃ 𝓕₀ : Set (GA E a), IsFundamentalDomain (GlobalTheory.CellDec.NE E a) 𝓕₀ μ := by
+theorem exists_isFundamentalDomain_NE
+    : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (μ : Measure (GA E a)), ∃ 𝓕₀ : Set (GA E a),
+      IsFundamentalDomain (GlobalTheory.CellDec.NE E a) 𝓕₀ μ := by
   intro E _ _ a μ
   haveI : DiscreteTopology (GlobalTheory.CellDec.NE E a) :=
     GlobalTheory.MirTower.discrete_of_le_range (Subgroup.map_le_range _ _)

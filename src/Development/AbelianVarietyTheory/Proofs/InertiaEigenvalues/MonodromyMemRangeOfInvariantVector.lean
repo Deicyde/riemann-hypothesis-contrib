@@ -12,12 +12,12 @@ noncomputable section
 
 namespace GlobalTheory.BK
 
-variable {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
-  [IsUnitBall O K] {l e a : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] [Fact l.Prime]
-  [NormedAlgebra ℚ_[l] K]
+variable
+  {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+  {l e a : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K]
 
-theorem PhiMod.eq_xi_red_of_conn_eq_zero (P : PhiMod O K l e a ι) {v : Vec K a ι}
-    (h : P.conn v = 0) : v = P.xi (red v) := by
+theorem PhiMod.eq_xi_red_of_conn_eq_zero (P : PhiMod O K l e a ι) {v : Vec K a ι} (h : P.conn v = 0)
+    : v = P.xi (red v) := by
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ_[l] K).injective
   obtain ⟨w, rfl⟩ := P.xiExt.surjective v
   rw [PhiMod.conn_xiExt] at h
@@ -36,9 +36,11 @@ theorem PhiMod.eq_xi_red_of_conn_eq_zero (P : PhiMod O K l e a ι) {v : Vec K a 
       exact (mul_eq_zero.1 this).resolve_left (by exact_mod_cast hn)
   rw [PhiMod.xi_apply, PhiMod.red_xiExt, ← hw]
 
-theorem PhiMod.mem_ext_of_plusInl (P : PhiMod O K l e a ι) {y : Vec K a ι}
-    (hy : y ∈ P.Mext (invE l e (A O K))) {B : Subalgebra O K⟦X⟧} {v : Vec K a ι}
-    (h : (P.plusInl hy).app v ∈ (P.plus hy).ext B) : v ∈ P.ext B := by
+theorem PhiMod.mem_ext_of_plusInl
+    (P : PhiMod O K l e a ι)
+    {y : Vec K a ι} (hy : y ∈ P.Mext (invE l e (A O K)))
+    {B : Subalgebra O K⟦X⟧} {v : Vec K a ι} (h : (P.plusInl hy).app v ∈ (P.plus hy).ext B)
+    : v ∈ P.ext B := by
   rw [PhiMod.plusInl_app] at h
   refine mem_tot.2 fun τ => ?_
   obtain ⟨m, hm, hmv⟩ := (P.plus hy).mem_extc.1 (mem_tot.1 h τ)
@@ -54,14 +56,17 @@ end GlobalTheory.BK
 
 namespace GlobalTheory.BK
 
-variable {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
-  [Algebra O K] [IsUnitBall O K] {l e a : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
-  [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] {η H : ℕ}
+variable
+  {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K]
+  [IsUnitBall O K]
+  {l e a : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K]
+  [NeZero e] [NeZero a] [TameDescentExponentData K l e a]
+  {η H : ℕ}
 
 namespace BKDat
 
-theorem exists_conn_eq_zeta_of_mem_Y (D : BKDat O K l e a ι η H) {y : Vec K a ι} (hy : y ∈ D.Y) :
-    ∃ s ∈ D.MMl, s ∈ D.desc.inv ∧ D.conn s = D.zeta y := by
+theorem exists_conn_eq_zeta_of_mem_Y (D : BKDat O K l e a ι η H) {y : Vec K a ι} (hy : y ∈ D.Y)
+    : ∃ s ∈ D.MMl, s ∈ D.desc.inv ∧ D.conn s = D.zeta y := by
   have hy' := mem_invE_of_mem_Y hy
   set P := D.toPhiMod.plus hy'
   set F := D.toPhiMod.plusInl hy'
@@ -74,8 +79,7 @@ theorem exists_conn_eq_zeta_of_mem_Y (D : BKDat O K l e a ι η H) {y : Vec K a 
   have hct : P.conn t = F.app (D.zeta y) := by
     rw [ht, map_sub, PhiMod.conn_xi, sub_zero]
     exact D.conn_phi_extension_generator_eq_zeta hy'
-  have hrt : red t = 0 := by
-    rw [ht, map_sub, PhiMod.red_xi, sub_self]
+  have hrt : red t = 0 := by rw [ht, map_sub, PhiMod.red_xi, sub_self]
   have hx : G.app t = 0 := by
     have h1 : (rankOne O K l e fun _ : ZMod a => 0).conn (G.app t) = 0 := by
       rw [← Hom.app_conn, hct, PhiMod.plusInl_app, PhiMod.plusProj_app]
@@ -98,13 +102,17 @@ theorem exists_conn_eq_zeta_of_mem_Y (D : BKDat O K l e a ι η H) {y : Vec K a 
   have htM : t ∈ P.MMl := by
     refine sub_mem (P.ext_mono ((A_le_S l e).trans (le_away _ _)) (P.phi_mem_L hxM)) ?_
     rw [PhiMod.xi_apply]
-    refine ((GlobalTheory.T.breuilKisin_section_trivialises_invertPrime_tensor O K l e a (ι ⊕ Unit) P).2 _).2 (mem_tot.2 fun τ i => ?_)
+    refine
+      ((GlobalTheory.T.breuilKisin_section_trivialises_invertPrime_tensor O K l e a (ι ⊕ Unit) P).2
+        _).2 (mem_tot.2 fun τ i => ?_)
     rw [cst_apply]
     exact HasK.C_mem _
   refine ⟨s, D.toPhiMod.mem_ext_of_plusInl hy' (hts ▸ htM), fun g => ?_, inj _ _ ?_⟩
   · have hΔ : (D.desc.plus hy' hy.2).act g t = t := by
-      rw [ht, map_sub, Descent.act_phi, Descent.tameDescent_extended_action_extraVector D.desc hy' hy.2 g, Descent.act_xi,
-        ← Descent.red_act, Descent.act_phi, Descent.tameDescent_extended_action_extraVector D.desc hy' hy.2 g]
+      rw [ht, map_sub, Descent.act_phi,
+        Descent.tameDescent_extended_action_extraVector D.desc hy' hy.2 g, Descent.act_xi,
+        ← Descent.red_act, Descent.act_phi,
+        Descent.tameDescent_extended_action_extraVector D.desc hy' hy.2 g]
     apply inj
     have h2 : (D.desc.plus hy' hy.2).act g (F.app s) = F.app s := by rw [← hts]; exact hΔ
     exact ((Descent.plusInl D.desc hy' hy.2).app_act g s).trans h2
@@ -118,12 +126,15 @@ namespace GlobalTheory.BK
 
 namespace BKDat
 
-variable {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
-  [Algebra O K] [IsUnitBall O K] {l e a : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
-  [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] {η H : ℕ}
+variable
+  {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K]
+  [IsUnitBall O K]
+  {l e a : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K]
+  [NeZero e] [NeZero a] [TameDescentExponentData K l e a]
+  {η H : ℕ}
 
-theorem exists_conn_eq_zeta (D : BKDat O K l e a ι η H) {y : Vec K a ι} (hy : y ∈ D.Yl) :
-    ∃ s ∈ D.MMl, s ∈ D.desc.inv ∧ D.conn s = D.zeta y := by
+theorem exists_conn_eq_zeta (D : BKDat O K l e a ι η H) {y : Vec K a ι} (hy : y ∈ D.Yl)
+    : ∃ s ∈ D.MMl, s ∈ D.desc.inv ∧ D.conn s = D.zeta y := by
   obtain ⟨n, hn⟩ := D.desc.mem_Yl_iff.1 hy
   obtain ⟨s, hsM, hsi, hsc⟩ := D.exists_conn_eq_zeta_of_mem_Y hn
   have hl : ((l : K) ^ n) ≠ 0 := pow_ne_zero _ (l_ne_zero l)
@@ -135,12 +146,16 @@ theorem exists_conn_eq_zeta (D : BKDat O K l e a ι η H) {y : Vec K a ι} (hy :
     exact D.smul_tot_mem_ext (fun _ => HasK.C_mem _) hsM
   · rw [map_smul, hsc, map_smul, smul_smul, inv_mul_cancel₀ hl, one_smul]
 
-theorem Mon_mem_range_Lc : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K]
-    [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι]
-    [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
-    [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H), ∀ y ∈ D.Yl,
-    (∃ s ∈ D.MMl, s ∈ D.desc.inv ∧ D.conn s = D.zeta y ∧ ∃ d : D.D, (∀ g, D.desc.actD g d = d) ∧
-      D.phi s - s - D.phi y = D.xi d) ∧ ∃ w ∈ D.Zl, D.Lc w = D.Mon y := by
+theorem Mon_mem_range_Lc
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+        [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H),
+      ∀ y ∈ D.Yl,
+        (∃ s ∈ D.MMl,
+            s ∈ D.desc.inv ∧ D.conn s = D.zeta y
+              ∧ ∃ d : D.D, (∀ g, D.desc.actD g d = d) ∧ D.phi s - s - D.phi y = D.xi d)
+          ∧ ∃ w ∈ D.Zl, D.Lc w = D.Mon y := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ η H D y hy
   obtain ⟨s, hsM, hsi, hsc⟩ := D.exists_conn_eq_zeta hy
   have hyi : ∀ g, D.desc.act g y = y := hy.2
@@ -159,8 +174,8 @@ theorem Mon_mem_range_Lc : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltr
       hyi g]
   · rw [SetLike.mem_coe, mem_divE, smul_sub]
     refine sub_mem ((PhiMod.mem_Man _).2 (D.Mext_mono (invL_A_le_Rpi l e) (mem_divE.1 hy.1)))
-      ((PhiMod.mem_Man _).2 (D.Mext_mono (invL_S_le_Rpi l e)
-        (D.smul_mem_Mext ((A_le_S l e).trans (le_away _ _)) hsM)))
+      ((PhiMod.mem_Man _).2
+        (D.Mext_mono (invL_S_le_Rpi l e) (D.smul_mem_Mext ((A_le_S l e).trans (le_away _ _)) hsM)))
   · rw [Descent.actPol_cls, map_sub, hyi g, hsi' g]
   · rw [Lc_cls, PhiMod.Mon_apply, map_sub, PhiMod.EN_apply D.toPhiMod s, hsc]
 

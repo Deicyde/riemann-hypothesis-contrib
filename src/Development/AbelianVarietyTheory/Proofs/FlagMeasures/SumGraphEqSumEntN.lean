@@ -12,12 +12,14 @@ namespace GlobalTheory.GLm
 open Polynomial Formalism.MainNotions.ArithmeticCylinders GlobalTheory.GLq GlobalTheory.GLm
 open scoped Classical
 
-theorem sum_graph_eq_sum_entN {A : Type} [AddCommMonoid A] {N : ℕ} (M : Matrix (Fin N) (Fin N) A)
-    (S : Finset ℕ) (f : ℕ → ℕ) :
-    (∑ a : Fin N, ∑ b : Fin N, if (a : ℕ) ∈ S ∧ (b : ℕ) = f a then M a b else 0) =
-      ∑ a ∈ S, entN M a (f a) := by
-  have h1 : ∀ a : Fin N, (∑ b : Fin N, if (a : ℕ) ∈ S ∧ (b : ℕ) = f a then M a b else 0) =
-      if (a : ℕ) ∈ S then entN M a (f a) else 0 := by
+theorem sum_graph_eq_sum_entN
+    {A : Type} [AddCommMonoid A] {N : ℕ} (M : Matrix (Fin N) (Fin N) A) (S : Finset ℕ) (f : ℕ → ℕ)
+    : (∑ a : Fin N, ∑ b : Fin N, if (a : ℕ) ∈ S ∧ (b : ℕ) = f a then M a b else 0)
+      = ∑ a ∈ S, entN M a (f a) := by
+  have h1
+      : ∀ a : Fin N,
+        (∑ b : Fin N, if (a : ℕ) ∈ S ∧ (b : ℕ) = f a then M a b else 0)
+          = if (a : ℕ) ∈ S then entN M a (f a) else 0 := by
     intro a
     by_cases ha : (a : ℕ) ∈ S
     · rw [if_pos ha]
@@ -53,15 +55,15 @@ theorem sum_graph_eq_sum_entN {A : Type} [AddCommMonoid A] {N : ℕ} (M : Matrix
     unfold entN
     rw [dite_eq_right (fun hh => hlt hh.1)]
 
-theorem phI_last_iff {N : ℕ} (k s : ℕ) (a b : Fin N) :
-    phI k s s a b ↔ (a : ℕ) < b ∧ ¬ (s ≤ (a : ℕ) ∧ (a : ℕ) < s + k ∧ (b : ℕ) = s + k) := by
+theorem phI_last_iff {N : ℕ} (k s : ℕ) (a b : Fin N)
+    : phI k s s a b ↔ (a : ℕ) < b ∧ ¬(s ≤ (a : ℕ) ∧ (a : ℕ) < s + k ∧ (b : ℕ) = s + k) := by
   simp only [phI, IsW, Fin.lt_iff_val_lt_val]
   constructor <;> intro h <;> omega
 
 variable {g : ℕ} [Fact g.Prime]
 
-theorem inPat_phI_last_iff {N : ℕ} (k s : ℕ) (M : Mt g N) :
-    InPat (phI k s s) M ↔ IsUniUp M ∧ ∀ a, s ≤ a → a < s + k → entN M a (s + k) = 0 := by
+theorem inPat_phI_last_iff {N : ℕ} (k s : ℕ) (M : Mt g N)
+    : InPat (phI k s s) M ↔ IsUniUp M ∧ ∀ a, s ≤ a → a < s + k → entN M a (s + k) = 0 := by
   unfold InPat IsUniUp
   constructor
   · intro h
@@ -111,60 +113,82 @@ theorem inPat_phI_last_iff {N : ℕ} (k s : ℕ) (M : Mt g N) :
       simp only [Fin.mk.injEq] at e
       omega
 
-private theorem sum_sum_ite_eq_sum_entN_of_iff {A : Type} [AddCommMonoid A] {N : ℕ} (M : Matrix (Fin N) (Fin N) A)
-    (P : ℕ → ℕ → Prop) [∀ a b, Decidable (P a b)] (S : Finset ℕ) (f : ℕ → ℕ)
-    (h : ∀ a b : ℕ, b < N → (P a b ↔ a ∈ S ∧ b = f a)) :
-    (∑ a : Fin N, ∑ b : Fin N, if P (a : ℕ) (b : ℕ) then M a b else 0) = ∑ a ∈ S, entN M a (f a) := by
+private theorem sum_sum_ite_eq_sum_entN_of_iff
+    {A : Type} [AddCommMonoid A]
+    {N : ℕ} (M : Matrix (Fin N) (Fin N) A)
+    (P : ℕ → ℕ → Prop) [∀ a b, Decidable (P a b)]
+    (S : Finset ℕ) (f : ℕ → ℕ) (h : ∀ a b : ℕ, b < N → (P a b ↔ a ∈ S ∧ b = f a))
+    : (∑ a : Fin N, ∑ b : Fin N, if P (a : ℕ) (b : ℕ) then M a b else 0)
+      = ∑ a ∈ S, entN M a (f a) := by
   rw [← sum_graph_eq_sum_entN]
   refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
   by_cases hp : P a b
   · rw [if_pos hp, if_pos ((h a b b.isLt).1 hp)]
   · rw [if_neg hp, if_neg (fun hq => hp ((h a b b.isLt).2 hq))]
 
-theorem sumAt_eeI_eq_phiJ {N : ℕ} (k s : ℕ) (hN : N = k + 2 * s + 1) (M : Mt g N) :
-    sumAt (eeI k s) M = phiJ k s M := by
+theorem sumAt_eeI_eq_phiJ {N : ℕ} (k s : ℕ) (hN : N = k + 2 * s + 1) (M : Mt g N)
+    : sumAt (eeI k s) M = phiJ k s M := by
   subst hN
-  have hsplit : sumAt (eeI k s) M =
-      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-        if (b : ℕ) = a + 1 ∧ (b : ℕ) < s then M a b else 0) +
-      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-        if (a : ℕ) + 1 = s ∧ (b : ℕ) = s + k then M a b else 0) +
-      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-        if (b : ℕ) = a + 1 ∧ s + k ≤ (a : ℕ) then M a b else 0) +
-      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-        if (b : ℕ) = a + 1 ∧ s ≤ (a : ℕ) ∧ (b : ℕ) < s + k then M a b else 0) := by
+  have hsplit
+      : sumAt (eeI k s) M
+        = (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+            if (b : ℕ) = a + 1 ∧ (b : ℕ) < s then M a b else 0)
+          + (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+              if (a : ℕ) + 1 = s ∧ (b : ℕ) = s + k then M a b else 0)
+          + (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+              if (b : ℕ) = a + 1 ∧ s + k ≤ (a : ℕ) then M a b else 0)
+          + (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+              if (b : ℕ) = a + 1 ∧ s ≤ (a : ℕ) ∧ (b : ℕ) < s + k then M a b else 0) := by
     unfold sumAt
     simp only [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
     have hb := b.isLt
     unfold eeI IsW
     split_ifs <;> first | omega | simp
-  have h1 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-      if (b : ℕ) = a + 1 ∧ (b : ℕ) < s then M a b else 0) =
-      ∑ a ∈ Finset.range (s - 1), entN M a (a + 1) :=
-    sum_sum_ite_eq_sum_entN_of_iff M (fun a b => b = a + 1 ∧ b < s) _ (fun a => a + 1)
+  have h1
+      : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+          if (b : ℕ) = a + 1 ∧ (b : ℕ) < s then M a b else 0)
+        = ∑ a ∈ Finset.range (s - 1), entN M a (a + 1) :=
+    sum_sum_ite_eq_sum_entN_of_iff M
+      (fun a b => b = a + 1 ∧ b < s)
+      _
+      (fun a => a + 1)
       (fun a b _ => by simp only [Finset.mem_range]; constructor <;> intro h <;> omega)
-  have h2 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-      if (a : ℕ) + 1 = s ∧ (b : ℕ) = s + k then M a b else 0) =
-      ∑ a ∈ (Finset.range s).filter (fun a => a + 1 = s), entN M a (s + k) :=
-    sum_sum_ite_eq_sum_entN_of_iff M (fun a b => a + 1 = s ∧ b = s + k) _ (fun _ => s + k)
-      (fun a b _ => by simp only [Finset.mem_filter, Finset.mem_range]; constructor <;> intro h <;> omega)
-  have h3 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-      if (b : ℕ) = a + 1 ∧ s + k ≤ (a : ℕ) then M a b else 0) =
-      ∑ i ∈ Finset.range s, entN M (s + k + i) (s + k + i + 1) := by
-    rw [sum_sum_ite_eq_sum_entN_of_iff M (fun a b => b = a + 1 ∧ s + k ≤ a) (Finset.Ico (s + k) (s + k + s)) (fun a => a + 1)
+  have h2
+      : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+          if (a : ℕ) + 1 = s ∧ (b : ℕ) = s + k then M a b else 0)
+        = ∑ a ∈ (Finset.range s).filter (fun a => a + 1 = s), entN M a (s + k) :=
+    sum_sum_ite_eq_sum_entN_of_iff M
+      (fun a b => a + 1 = s ∧ b = s + k)
+      _
+      (fun _ => s + k)
+      (fun a b _ => by
+        simp only [Finset.mem_filter, Finset.mem_range]; constructor <;> intro h <;> omega)
+  have h3
+      : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+          if (b : ℕ) = a + 1 ∧ s + k ≤ (a : ℕ) then M a b else 0)
+        = ∑ i ∈ Finset.range s, entN M (s + k + i) (s + k + i + 1) := by
+    rw [sum_sum_ite_eq_sum_entN_of_iff M
+      (fun a b => b = a + 1 ∧ s + k ≤ a)
+      (Finset.Ico (s + k) (s + k + s))
+      (fun a => a + 1)
       (fun a b hb => by simp only [Finset.mem_Ico]; constructor <;> intro h <;> omega)]
     rw [Finset.sum_Ico_eq_sum_range, Nat.add_sub_cancel_left]
-  have h4 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
-      if (b : ℕ) = a + 1 ∧ s ≤ (a : ℕ) ∧ (b : ℕ) < s + k then M a b else 0) =
-      ∑ a ∈ Finset.range (k - 1), entN M (s + a) (s + a + 1) := by
-    rw [sum_sum_ite_eq_sum_entN_of_iff M (fun a b => b = a + 1 ∧ s ≤ a ∧ b < s + k) (Finset.Ico s (s + (k - 1))) (fun a => a + 1)
+  have h4
+      : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+          if (b : ℕ) = a + 1 ∧ s ≤ (a : ℕ) ∧ (b : ℕ) < s + k then M a b else 0)
+        = ∑ a ∈ Finset.range (k - 1), entN M (s + a) (s + a + 1) := by
+    rw [sum_sum_ite_eq_sum_entN_of_iff M
+      (fun a b => b = a + 1 ∧ s ≤ a ∧ b < s + k)
+      (Finset.Ico s (s + (k - 1)))
+      (fun a => a + 1)
       (fun a b _ => by simp only [Finset.mem_Ico]; constructor <;> intro h <;> omega)]
     rw [Finset.sum_Ico_eq_sum_range, Nat.add_sub_cancel_left]
-  have key : (∑ a ∈ (Finset.range s).filter (fun a => a + 1 = s), entN M a (s + k)) +
-      (∑ i ∈ Finset.range s, entN M (s + k + i) (s + k + i + 1)) =
-      (if 1 ≤ s then entN M (s - 1) (s + k) + entN M (s + k) (s + k + 1) else 0) +
-      ∑ i ∈ Finset.range (s - 1), entN M (s + k + 1 + i) (s + k + 2 + i) := by
+  have key
+      : (∑ a ∈ (Finset.range s).filter (fun a => a + 1 = s), entN M a (s + k))
+          + (∑ i ∈ Finset.range s, entN M (s + k + i) (s + k + i + 1))
+        = (if 1 ≤ s then entN M (s - 1) (s + k) + entN M (s + k) (s + k + 1) else 0)
+          + ∑ i ∈ Finset.range (s - 1), entN M (s + k + 1 + i) (s + k + 2 + i) := by
     rcases Nat.eq_zero_or_pos s with hs | hs
     · subst hs
       simp
@@ -173,9 +197,10 @@ theorem sumAt_eeI_eq_phiJ {N : ℕ} (k s : ℕ) (hN : N = k + 2 * s + 1) (M : Mt
         ext a
         simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_singleton]
         omega
-      have hC : (∑ i ∈ Finset.range (t + 1), entN M (t + 1 + k + i) (t + 1 + k + i + 1)) =
-          (∑ i ∈ Finset.range (t + 1 - 1), entN M (t + 1 + k + 1 + i) (t + 1 + k + 2 + i)) +
-            entN M (t + 1 + k) (t + 1 + k + 1) := by
+      have hC
+          : (∑ i ∈ Finset.range (t + 1), entN M (t + 1 + k + i) (t + 1 + k + i + 1))
+            = (∑ i ∈ Finset.range (t + 1 - 1), entN M (t + 1 + k + 1 + i) (t + 1 + k + 2 + i))
+              + entN M (t + 1 + k) (t + 1 + k + 1) := by
         rw [Finset.sum_range_succ', Nat.add_sub_cancel]
         simp only [add_zero]
         congr 1
@@ -186,13 +211,16 @@ theorem sumAt_eeI_eq_phiJ {N : ℕ} (k s : ℕ) (hN : N = k + 2 * s + 1) (M : Mt
   unfold phiJ
   linear_combination key
 
-theorem ePat_last_eq_eJ : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (N k s : ℕ), N = k + 2 * s + 1 →
-    ePat g N (phI k s s) (eeI k s) ψ = eJ g N k s ψ := by
+theorem ePat_last_eq_eJ
+    : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (N k s : ℕ),
+      N = k + 2 * s + 1 → ePat g N (phI k s s) (eeI k s) ψ = eJ g N k s ψ := by
   intro g _ ψ N k s hN
-  have hP : (InPat (phI k s s) : Mt g N → Prop) =
-      fun M => IsUniUp M ∧ ∀ a, s ≤ a → a < s + k → entN M a (s + k) = 0 :=
+  have hP
+      : (InPat (phI k s s) : Mt g N → Prop)
+        = fun M => IsUniUp M ∧ ∀ a, s ≤ a → a < s + k → entN M a (s + k) = 0 :=
     funext fun M => propext (inPat_phI_last_iff k s M)
-  have hφ : (sumAt (eeI k s) : Mt g N → ZMod g) = phiJ k s := funext fun M => sumAt_eeI_eq_phiJ k s hN M
+  have hφ : (sumAt (eeI k s) : Mt g N → ZMod g) = phiJ k s :=
+    funext fun M => sumAt_eeI_eq_phiJ k s hN M
   unfold ePat eJ
   rw [hP, hφ]
 

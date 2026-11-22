@@ -7,8 +7,13 @@ public import Mathlib.RepresentationTheory.Homological.GroupCohomology.Hilbert90
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-theorem UpperTheory.V.ZK.Ct.h90 :
-    ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (γ : F ≃ₐ[L] F) (l : ℕ), IsGalois L F → (∀ σ : F ≃ₐ[L] F, σ ∈ Subgroup.zpowers γ) → ∀ x y : Fˣ, actU γ x = x * y ^ l → Algebra.norm L (y : F) = 1 → ∃ (x₀ : Lˣ) (z : Fˣ), x = Units.map (algebraMap L F : L →* F) x₀ * z ^ l := by
+theorem UpperTheory.V.ZK.Ct.h90
+    : ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
+        (γ : F ≃ₐ[L] F) (l : ℕ),
+      IsGalois L F → (∀ σ : F ≃ₐ[L] F, σ ∈ Subgroup.zpowers γ)
+        → ∀ x y : Fˣ,
+          actU γ x = x * y ^ l → Algebra.norm L (y : F) = 1
+            → ∃ (x₀ : Lˣ) (z : Fˣ), x = Units.map (algebraMap L F : L →* F) x₀ * z ^ l := by
   intro L F _ _ _ _ _ γ l hG hγ x y hx hy
   haveI : FiniteDimensional L F := Module.Finite.of_restrictScalars_finite ℚ L F
   haveI : IsCyclic (F ≃ₐ[L] F) := ⟨⟨γ, hγ⟩⟩

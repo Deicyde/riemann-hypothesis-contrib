@@ -16,14 +16,20 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
 namespace GlobalTheory.UPel.HT.ES.IsogRep
 
-theorem eq_one_iff_of_isGrpPullback {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} [GrpObj G] {G' : Over S'}
-    [GrpObj G'] {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) {T : Over S'} (z : T ⟶ G') :
-    z = 1 ↔ z.left ≫ φ = T.hom ≫ f ≫ η[G].left := by
+theorem eq_one_iff_of_isGrpPullback
+    {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over S} [GrpObj G]
+    {G' : Over S'} [GrpObj G']
+    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    {T : Over S'} (z : T ⟶ G')
+    : z = 1 ↔ z.left ≫ φ = T.hom ≫ f ≫ η[G].left := by
   have e1 : (1 : T ⟶ G').left ≫ φ = T.hom ≫ f ≫ η[G].left := by
     show (T.hom ≫ η[G'].left) ≫ φ = _
     rw [Category.assoc, ReciprocityTheory.ChartRestriction.G.Out.PullGtPf.IsGrpPullback.one_left h]
@@ -35,17 +41,22 @@ theorem eq_one_iff_of_isGrpPullback {S S' : Scheme.{0}} {f : S' ⟶ S} {G : Over
     · rw [hz, e1]
     · rw [Over.w, Over.w]
 
-theorem comp_pow_hom {S : Scheme.{0}} {T H A : Over S} [GrpObj A] (z : T ⟶ H) (f : H ⟶ A) (n : ℕ) :
-    z ≫ f ^ n = (z ≫ f) ^ n := by
+theorem comp_pow_hom {S : Scheme.{0}} {T H A : Over S} [GrpObj A] (z : T ⟶ H) (f : H ⟶ A) (n : ℕ)
+    : z ≫ f ^ n = (z ≫ f) ^ n := by
   induction n with
   | zero => rw [pow_zero, pow_zero, comp_one]
   | succ n ih => rw [pow_succ, pow_succ, comp_mul, ih]
 
-theorem exists_quot_quasiInv {Y : Scheme.{0}} [IsLocallyNoetherian Y] (A₀ : Over Y) [GrpObj A₀] [IsCommMonObj A₀]
-    (H : Over Y) [GrpObj H] (i : H ⟶ A₀) (k : ℕ) (hA : IsAbelianScheme A₀) (hi : IsMonHom i) (hm : Mono i)
-    (hf : IsFinite H.hom) (he : Etale H.hom) (hk : i ^ k = 1) :
-    ∃ (B : Over Y) (_ : GrpObj B) (_ : IsCommMonObj B) (ψ : A₀ ⟶ B) (ψ' : B ⟶ A₀), IsAbelianScheme B ∧
-      IsQuasiInv k ψ ψ' ∧ ∀ (T : Over Y) (x : T ⟶ A₀), x ≫ ψ = 1 ↔ ∃ z : T ⟶ H, z ≫ i = x := by
+theorem exists_quot_quasiInv
+    {Y : Scheme.{0}} [IsLocallyNoetherian Y]
+    (A₀ : Over Y) [GrpObj A₀] [IsCommMonObj A₀]
+    (H : Over Y) [GrpObj H]
+    (i : H ⟶ A₀) (k : ℕ)
+    (hA : IsAbelianScheme A₀) (hi : IsMonHom i) (hm : Mono i) (hf : IsFinite H.hom)
+    (he : Etale H.hom) (hk : i ^ k = 1)
+    : ∃ (B : Over Y) (_ : GrpObj B) (_ : IsCommMonObj B) (ψ : A₀ ⟶ B) (ψ' : B ⟶ A₀),
+      IsAbelianScheme B ∧ IsQuasiInv k ψ ψ'
+        ∧ ∀ (T : Over Y) (x : T ⟶ A₀), x ≫ ψ = 1 ↔ ∃ z : T ⟶ H, z ≫ i = x := by
   obtain ⟨B, gB, q, hB, hqm, hqfin, hqflat, hqsurj, hq⟩ :=
     GlobalTheory.IwLevel.quotGlobal_holds Y A₀ H i hA hi hm hf inferInstance
   have hcB : IsCommMonObj B := hB.comm
@@ -63,22 +74,28 @@ theorem exists_quot_quasiInv {Y : Scheme.{0}} [IsLocallyNoetherian Y] (A₀ : Ov
       simpa [comp_mul, ← Category.assoc] using this
   have hK := GlobalTheory.TranslQuotientPow.isMonHom_id_pow A₀ k
   have hqc : QuasiCompact q.left := inferInstance
-  obtain ⟨⟨ψ', hψ', hψ'e⟩, hepi⟩ := GlobalTheory.exists_monHom_factor_of_flat_surjective Y A₀ B A₀ q ((𝟙 A₀) ^ k)
-    hqm hK hqflat hqsurj hqc (fun T x hx => by
-      obtain ⟨z, rfl⟩ := (hker T x).1 hx
-      rw [GlobalTheory.TranslQuotientPow.comp_id_pow, ← comp_pow_hom, hk, comp_one])
+  obtain ⟨⟨ψ', hψ', hψ'e⟩, hepi⟩ :=
+    GlobalTheory.exists_monHom_factor_of_flat_surjective Y A₀ B A₀ q ((𝟙 A₀) ^ k) hqm hK hqflat
+      hqsurj hqc
+      (fun T x hx => by
+        obtain ⟨z, rfl⟩ := (hker T x).1 hx
+        rw [GlobalTheory.TranslQuotientPow.comp_id_pow, ← comp_pow_hom, hk, comp_one])
   refine ⟨B, gB, hcB, q, ψ', hB, ⟨hqm, hψ', hψ'e, ?_⟩, hker⟩
   rw [← cancel_epi q, reassoc_of% hψ'e, GlobalTheory.TranslQuotientPow.comp_id_pow q k,
     GlobalTheory.TranslQuotientPow.pow_comp_hom q (𝟙 A₀) k, Category.id_comp]
 
-theorem ker_iff_of_pullbacks {S Y T : Scheme.{0}} {g₀ : Y ⟶ S} {A : Over S} {A₀ : Over Y}
-    {φ₀ : A₀.left ⟶ A.left} (h₀ : IsPullback φ₀ A₀.hom A.hom g₀)
-    {H : Over Y} {i : H ⟶ A₀} {B : Over Y} [GrpObj B] {ψ : A₀ ⟶ B}
-    (hker : ∀ (T' : Over Y) (x : T' ⟶ A₀), x ≫ ψ = 1 ↔ ∃ z : T' ⟶ H, z ≫ i = x)
+theorem ker_iff_of_pullbacks
+    {S Y T : Scheme.{0}} {g₀ : Y ⟶ S} {A : Over S} {A₀ : Over Y} {φ₀ : A₀.left ⟶ A.left}
+    (h₀ : IsPullback φ₀ A₀.hom A.hom g₀)
+    {H : Over Y} {i : H ⟶ A₀} {B : Over Y} [GrpObj B]
+    {ψ : A₀ ⟶ B} (hker : ∀ (T' : Over Y) (x : T' ⟶ A₀), x ≫ ψ = 1 ↔ ∃ z : T' ⟶ H, z ≫ i = x)
     {y : T ⟶ Y} {A₁ : Over T} {θ : A₁.left ⟶ A₀.left} (hθ : θ ≫ A₀.hom = A₁.hom ≫ y)
-    {B₁ : Over T} [GrpObj B₁] {θ' : B₁.left ⟶ B.left} (hθ' : IsGrpPullback B₁ B y θ') {ψ₁ : A₁ ⟶ B₁}
-    (hc : θ ≫ ψ.left = ψ₁.left ≫ θ') (T' : Over T) (g : T' ⟶ A₁) :
-    g ≫ ψ₁ = 1 ↔ ∃ h : T'.left ⟶ H.left, h ≫ H.hom = T'.hom ≫ y ∧ h ≫ i.left ≫ φ₀ = g.left ≫ θ ≫ φ₀ := by
+    {B₁ : Over T} [GrpObj B₁]
+    {θ' : B₁.left ⟶ B.left} (hθ' : IsGrpPullback B₁ B y θ')
+    {ψ₁ : A₁ ⟶ B₁} (hc : θ ≫ ψ.left = ψ₁.left ≫ θ')
+    (T' : Over T) (g : T' ⟶ A₁)
+    : g ≫ ψ₁ = 1
+      ↔ ∃ h : T'.left ⟶ H.left, h ≫ H.hom = T'.hom ≫ y ∧ h ≫ i.left ≫ φ₀ = g.left ≫ θ ≫ φ₀ := by
   have hP : (g.left ≫ θ) ≫ A₀.hom = T'.hom ≫ y := by
     rw [Category.assoc, hθ, ← Category.assoc, Over.w g]
   let P : Over.mk (T'.hom ≫ y) ⟶ A₀ := Over.homMk (g.left ≫ θ) hP
@@ -87,7 +104,8 @@ theorem ker_iff_of_pullbacks {S Y T : Scheme.{0}} {g₀ : Y ⟶ S} {A : Over S} 
     constructor
     · intro h; exact congrArg Over.Hom.left h
     · intro h; exact Over.OverMorphism.ext h
-  rw [eq_one_iff_of_isGrpPullback hθ', Over.comp_left, Category.assoc, ← hc, ← Category.assoc, ← e, hker]
+  rw [eq_one_iff_of_isGrpPullback hθ', Over.comp_left, Category.assoc, ← hc, ← Category.assoc, ← e,
+    hker]
   constructor
   · rintro ⟨z, hz⟩
     refine ⟨z.left, Over.w z, ?_⟩

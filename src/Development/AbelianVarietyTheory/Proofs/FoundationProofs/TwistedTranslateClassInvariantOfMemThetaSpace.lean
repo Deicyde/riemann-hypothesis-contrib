@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsTraceCo
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.ThetaConj
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.ThetaConj
 open scoped BigOperators
 
 namespace GlobalTheory.ThetaConj
@@ -21,14 +23,14 @@ theorem ee_intCast_half (n : ℤ) : ee ((n : ℝ) / 2) = (-1 : ℂ) ^ n := by
   push_cast
   ring
 
-theorem al_of_qH (D : D7) (T : Tor D) {N N' : ℕ} (x : VC D N N') (m : ℤ) (h : qH D T x = m) :
-    al D T x = (-1 : ℂ) ^ m := by
+theorem al_of_qH (D : D7) (T : Tor D) {N N' : ℕ} (x : VC D N N') (m : ℤ) (h : qH D T x = m)
+    : al D T x = (-1 : ℂ) ^ m := by
   unfold qH at h
   unfold al
   rw [h, round_intCast]
 
-theorem qH_add_im (D : D7) (T : Tor D) {N N' : ℕ} (y u : VC D N N') :
-    qH D T (y + u) - qH D T y - qH D T u + (Hf D T y u).im = 2 * (Hf D T (w0 D • y) u).im := by
+theorem qH_add_im (D : D7) (T : Tor D) {N N' : ℕ} (y u : VC D N N')
+    : qH D T (y + u) - qH D T y - qH D T u + (Hf D T y u).im = 2 * (Hf D T (w0 D • y) u).im := by
   unfold qH
   rw [Hf_smul_left, Hf_add_left, Hf_add_right, Hf_add_right, Hf_conj D T y u]
   have h1 : (w0 D).re = 1 / 2 := by simp [w0]
@@ -36,10 +38,12 @@ theorem qH_add_im (D : D7) (T : Tor D) {N N' : ℕ} (y u : VC D N N') :
   simp only [Complex.add_re, Complex.conj_re, Complex.mul_im, h1, h2]
   ring
 
-theorem repInd_of_thSp (D : D7) (T : Tor D) (N N' : ℕ) (A₁ A₂ : AddSubgroup (VC D N N'))
-    (F : VC D N N' → ℂ) (hq : ∀ x ∈ A₂, ∃ m : ℤ, qH D T x = m)
-    (hw : ∀ x ∈ A₂, ∀ y ∈ A₂, ∃ m : ℤ, (Hf D T (w0 D • x) y).im = m) (hF : F ∈ ThSp D T A₁) :
-    RepInd D T A₁ A₂ F := by
+theorem repInd_of_thSp
+    (D : D7) (T : Tor D)
+    (N N' : ℕ) (A₁ A₂ : AddSubgroup (VC D N N')) (F : VC D N N' → ℂ)
+    (hq : ∀ x ∈ A₂, ∃ m : ℤ, qH D T x = m)
+    (hw : ∀ x ∈ A₂, ∀ y ∈ A₂, ∃ m : ℤ, (Hf D T (w0 D • x) y).im = m) (hF : F ∈ ThSp D T A₁)
+    : RepInd D T A₁ A₂ F := by
   intro x hx y hy hxy
   have hu2 : x - y ∈ A₂ := A₂.sub_mem hx hy
   obtain ⟨u, rfl⟩ : ∃ u, x = y + u := ⟨x - y, by abel⟩

@@ -22,8 +22,7 @@ theorem codim_pf : Codim := by
     Module.Finite.map B A.mkQ
   have h1 : Module.finrank k (LinearMap.range f) ≤ Module.finrank k (B.map A.mkQ) :=
     Submodule.finrank_mono hrange
-  have h2 : Module.finrank k (B.map A.mkQ) ≤ Module.finrank k B :=
-    Submodule.finrank_map_le A.mkQ B
+  have h2 : Module.finrank k (B.map A.mkQ) ≤ Module.finrank k B := Submodule.finrank_map_le A.mkQ B
   have h3 := LinearMap.finrank_range_add_finrank_ker f
   rw [hker] at h3
   omega

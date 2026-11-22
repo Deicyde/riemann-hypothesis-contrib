@@ -22,8 +22,8 @@ namespace GlobalTheory.CxForm.DbarLocStokes
 
 open GlobalTheory.CxForm GlobalTheory.CxForm.HolAtlas
 
-theorem dbarAt_eq_zero_of_eventually {n : ℕ} {F : V n → Alt n} {v : V n} (h : F =ᶠ[𝓝 v] fun _ => 0) :
-    dbarAt F v = 0 := by
+theorem dbarAt_eq_zero_of_eventually {n : ℕ} {F : V n → Alt n} {v : V n} (h : F =ᶠ[𝓝 v] fun _ => 0)
+    : dbarAt F v = 0 := by
   refine Finset.sum_eq_zero fun a _ => ?_
   have : coefwise (fun f => GlobalTheory.dbar f v (coordVec a)) F = 0 := by
     refine Finset.sum_eq_zero fun S _ => ?_
@@ -37,8 +37,9 @@ theorem dbarAt_eq_zero_of_eventually {n : ℕ} {F : V n → Alt n} {v : V n} (h 
 
 variable {M : Type} [TopologicalSpace M] {n : ℕ} (A : HolAtlas M n)
 
-theorem loc_fn_mul_eq_zero (γ : A.Fld) (χ : M → ℝ) (j : A.ι) (w : V n)
-    (h : w ∈ (A.e j).target → χ ((A.e j).symm w) = 0) : A.loc (A.fn χ * γ) j w = 0 := by
+theorem loc_fn_mul_eq_zero
+    (γ : A.Fld) (χ : M → ℝ) (j : A.ι) (w : V n) (h : w ∈ (A.e j).target → χ ((A.e j).symm w) = 0)
+    : A.loc (A.fn χ * γ) j w = 0 := by
   unfold HolAtlas.loc
   split_ifs with hw
   · have key : ∀ x : A.Pt, x.pt = (A.e j).symm w → (A.fn χ * γ) x = 0 := fun x hx => by
@@ -52,7 +53,12 @@ namespace GlobalTheory.CxForm.DbarLocStokes
 
 open GlobalTheory.CxForm GlobalTheory.CxForm.HolAtlas
 
-theorem integral_dbar_fn_mul_eq_zero : ∀ {M : Type} [TopologicalSpace M] [CompactSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] {n : ℕ} (A : GlobalTheory.CxForm.HolAtlas M n) (γ : A.Fld) (χ : M → ℝ) (i : A.ι), A.IsForm γ → A.SmoothOn univ (fun y => (χ y : ℂ)) → tsupport χ ⊆ (A.e i).source → A.integral (A.dbar (A.fn χ * γ)) = 0 := by
+theorem integral_dbar_fn_mul_eq_zero
+    : ∀ {M : Type} [TopologicalSpace M] [CompactSpace M] [T2Space M] [SecondCountableTopology M]
+        [MeasurableSpace M] [BorelSpace M] {n : ℕ} (A : GlobalTheory.CxForm.HolAtlas M n)
+        (γ : A.Fld) (χ : M → ℝ) (i : A.ι),
+      A.IsForm γ → A.SmoothOn univ (fun y => (χ y : ℂ)) → tsupport χ ⊆ (A.e i).source
+        → A.integral (A.dbar (A.fn χ * γ)) = 0 := by
   intro M _ _ _ _ _ _ n A γ χ i hγ hχ hK
   set K := tsupport χ with hKdef
   have hKc : IsCompact K := (isClosed_tsupport χ).isCompact
@@ -61,8 +67,9 @@ theorem integral_dbar_fn_mul_eq_zero : ∀ {M : Type} [TopologicalSpace M] [Comp
   have hω : A.IsForm (A.dbar (A.fn χ * γ)) :=
     (GlobalTheory.T.holAtlas_isForm_del_dbar_smooth M n A _ hP).2
 
-  have hnear : ∀ (j : A.ι) (w : V n), w ∈ (A.e j).target → (A.e j).symm w ∉ K →
-      A.loc (A.fn χ * γ) j =ᶠ[𝓝 w] fun _ => 0 := by
+  have hnear
+      : ∀ (j : A.ι) (w : V n),
+        w ∈ (A.e j).target → (A.e j).symm w ∉ K → A.loc (A.fn χ * γ) j =ᶠ[𝓝 w] fun _ => 0 := by
     intro j w hw hwK
     have hW := ChartGlue.isOpen_over (A.e j) (isClosed_tsupport χ).isOpen_compl
     filter_upwards [hW.mem_nhds ⟨hw, hwK⟩] with u hu
@@ -82,7 +89,8 @@ theorem integral_dbar_fn_mul_eq_zero : ∀ {M : Type} [TopologicalSpace M] [Comp
   have hF0 : ∀ v ∉ B, F =ᶠ[𝓝 v] fun _ => 0 := by
     intro v hv
     filter_upwards [hB.isClosed.isOpen_compl.mem_nhds hv] with u hu
-    refine loc_fn_mul_eq_zero A γ χ i u fun ht => image_eq_zero_of_notMem_tsupport fun hk => hu ⟨_, hk, ?_⟩
+    refine loc_fn_mul_eq_zero A γ χ i u fun ht =>
+      image_eq_zero_of_notMem_tsupport fun hk => hu ⟨_, hk, ?_⟩
     exact (A.e i).right_inv ht
   have hFs : HasCompactSupport F := HasCompactSupport.intro hB fun v hv => (hF0 v hv).self_of_nhds
   have hFC : ∀ S, ContDiff ℝ 1 (fun v => (bas n).repr (F v) S) := fun S =>

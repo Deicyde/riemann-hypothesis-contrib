@@ -13,15 +13,22 @@ noncomputable section
 namespace SheetDecomposition
 
 open ReciprocityTheory.ChartRestriction.G MvPolynomial
-open GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.NumbersDVR GroundTheory.Heights₂.Heights.FieldNumbers
+open GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.NumbersDVR
+  GroundTheory.Heights₂.Heights.FieldNumbers
 
 section
 
-variable {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k Ω] {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type}
+variable
+  {k : Type} [Field k]
+  {Ω : Type} [Field Ω] [Algebra k Ω]
+  {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type}
 
-theorem aeval_scale [Fintype K] [DecidableEq K] {L : Type} [CommRing L] [Algebra k L] (s : K → L) (w : (Σ b, ι b) → L)
-    {f : MRing ι k} {b : K → ℕ} (hf : IsMultiHomog f b) :
-    aeval (fun p => s p.1 * w p) f = (∏ x, s x ^ b x) * aeval w f := by
+theorem aeval_scale
+    [Fintype K] [DecidableEq K]
+    {L : Type} [CommRing L] [Algebra k L]
+    (s : K → L) (w : (Σ b, ι b) → L)
+    {f : MRing ι k} {b : K → ℕ} (hf : IsMultiHomog f b)
+    : aeval (fun p => s p.1 * w p) f = (∏ x, s x ^ b x) * aeval w f := by
   have key : ∀ m ∈ f.support, (m.prod fun p e => s p.1 ^ e) = ∏ x, s x ^ b x := by
     intro m hm
     have hw : Finsupp.weight (blockWeight ι) m = b := hf (mem_support_iff.mp hm)
@@ -47,9 +54,13 @@ theorem aeval_scale [Fintype K] [DecidableEq K] {L : Type} [CommRing L] [Algebra
   rw [Finsupp.prod_mul, key m hm]
   ring
 
-theorem pointIdeal_comp (y : (Σ b, ι' b) → Ω) (κ : K → K') (hκ : Function.Injective κ) (v : (Σ b, ι b) → Σ b, ι' b)
-    (hv : ∀ p, (v p).1 = κ p.1) : pointIdeal k (y ∘ v) = (pointIdeal k y).comap (rename v : MRing ι k →ₐ[k] MRing ι' k) := by
-  have key : ∀ f : MRing ι k, pointConeMap k y (rename v f) = rename κ (pointConeMap k (y ∘ v) f) := by
+theorem pointIdeal_comp
+    (y : (Σ b, ι' b) → Ω)
+    (κ : K → K') (hκ : Function.Injective κ)
+    (v : (Σ b, ι b) → Σ b, ι' b) (hv : ∀ p, (v p).1 = κ p.1)
+    : pointIdeal k (y ∘ v) = (pointIdeal k y).comap (rename v : MRing ι k →ₐ[k] MRing ι' k) := by
+  have key
+      : ∀ f : MRing ι k, pointConeMap k y (rename v f) = rename κ (pointConeMap k (y ∘ v) f) := by
     intro f
     induction f using MvPolynomial.induction_on with
     | C a => simp [pointConeMap]
@@ -68,9 +79,13 @@ theorem pointIdeal_comp (y : (Σ b, ι' b) → Ω) (κ : K → K') (hκ : Functi
     apply MvPolynomial.rename_injective _ hκ
     rw [h, map_zero]
 
-private theorem aeval_div_mem_fnField_of_multiHomog {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k Ω] {K : Type} {ι : K → Type}
-    [Fintype K] [DecidableEq K] (z : (Σ b, ι b) → Ω) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0) {f g : MRing ι k} {b : K → ℕ}
-    (hf : IsMultiHomog f b) (hg : IsMultiHomog g b) : aeval z f / aeval z g ∈ fnField k z := by
+private theorem aeval_div_mem_fnField_of_multiHomog
+    {k : Type} [Field k]
+    {Ω : Type} [Field Ω] [Algebra k Ω]
+    {K : Type} {ι : K → Type} [Fintype K] [DecidableEq K]
+    (z : (Σ b, ι b) → Ω) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0)
+    {f g : MRing ι k} {b : K → ℕ} (hf : IsMultiHomog f b) (hg : IsMultiHomog g b)
+    : aeval z f / aeval z g ∈ fnField k z := by
   choose i hi using hz
   let s : K → Ω := fun x => z ⟨x, i x⟩
   let w : (Σ b, ι b) → Ω := fun p => z p / s p.1
@@ -100,18 +115,25 @@ private theorem aeval_div_mem_fnField_of_multiHomog {k : Type} [Field k] {Ω : T
   rw [e f hf, e g hg, mul_div_mul_left _ _ hP]
   exact div_mem (hmem f) (hmem g)
 
-theorem map_homFrac [Fintype K] [DecidableEq K] {L : Type} [Field L] [Algebra k L] (P : Ideal (MRing ι k)) [P.IsPrime]
-    (φ : FractionRing (MRing ι k ⧸ P) →ₐ[k] L) (c : Ω →ₐ[k] L) (t : K → L) (z : (Σ b, ι b) → Ω)
-    (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0) (ht : ∀ b, t b ≠ 0)
-    (hφ : ∀ p, φ (algebraMap (MRing ι k ⧸ P) _ (Ideal.Quotient.mk P (X p))) = c (z p) * t p.1) :
-    (homFracDegZero P).map φ = (fnField k z).map c := by
-  let Ψ : MRing ι k →ₐ[k] L := φ.comp ((IsScalarTower.toAlgHom k (MRing ι k ⧸ P)
-    (FractionRing (MRing ι k ⧸ P))).comp (Ideal.Quotient.mkₐ k P))
+theorem map_homFrac
+    [Fintype K] [DecidableEq K]
+    {L : Type} [Field L] [Algebra k L]
+    (P : Ideal (MRing ι k)) [P.IsPrime]
+    (φ : FractionRing (MRing ι k ⧸ P) →ₐ[k] L) (c : Ω →ₐ[k] L) (t : K → L)
+    (z : (Σ b, ι b) → Ω) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0)
+    (ht : ∀ b, t b ≠ 0)
+    (hφ : ∀ p, φ (algebraMap (MRing ι k ⧸ P) _ (Ideal.Quotient.mk P (X p))) = c (z p) * t p.1)
+    : (homFracDegZero P).map φ = (fnField k z).map c := by
+  let Ψ : MRing ι k →ₐ[k] L :=
+    φ.comp ((IsScalarTower.toAlgHom k (MRing ι k ⧸ P) (FractionRing (MRing ι k ⧸ P))).comp
+      (Ideal.Quotient.mkₐ k P))
   have hΨX : ∀ p, Ψ (X p) = t p.1 * c (z p) := by
     intro p
     rw [mul_comm]
     exact hφ p
-  have hΨ : ∀ {f : MRing ι k} {b : K → ℕ}, IsMultiHomog f b → Ψ f = (∏ x, t x ^ b x) * c (aeval z f) := by
+  have hΨ
+      : ∀ {f : MRing ι k} {b : K → ℕ},
+        IsMultiHomog f b → Ψ f = (∏ x, t x ^ b x) * c (aeval z f) := by
     intro f b hf
     rw [MvPolynomial.aeval_unique Ψ]
     have hfun : (⇑Ψ ∘ X) = fun p => t p.1 * c (z p) := funext hΨX
@@ -137,12 +159,15 @@ theorem map_homFrac [Fintype K] [DecidableEq K] {L : Type} [Field L] [Algebra k 
       exact zero_mem _
     · have hXq : X q ∉ P := by
         intro hm
-        have h0 : Ψ (X q) = 0 := by
-          simp [Ψ, Ideal.Quotient.eq_zero_iff_mem.mpr hm]
+        have h0 : Ψ (X q) = 0 := by simp [Ψ, Ideal.Quotient.eq_zero_iff_mem.mpr hm]
         rw [hΨX] at h0
         exact mul_ne_zero (ht q.1) ((map_ne_zero c).mpr hq) h0
-      refine ⟨algebraMap _ (FractionRing (MRing ι k ⧸ P)) (Ideal.Quotient.mk P (X p)) /
-        algebraMap _ (FractionRing (MRing ι k ⧸ P)) (Ideal.Quotient.mk P (X q)), ?_, ?_⟩
+      refine ⟨
+        algebraMap _ (FractionRing (MRing ι k ⧸ P)) (Ideal.Quotient.mk P (X p))
+          / algebraMap _ (FractionRing (MRing ι k ⧸ P)) (Ideal.Quotient.mk P (X q)),
+        ?_,
+        ?_
+      ⟩
       · apply IntermediateField.subset_adjoin
         refine ⟨Pi.single q.1 1, X p, X q, ?_, ?_, hXq, rfl⟩
         · have h1 := isWeightedHomogeneous_X k (blockWeight ι) p
@@ -153,17 +178,21 @@ theorem map_homFrac [Fintype K] [DecidableEq K] {L : Type} [Field L] [Algebra k 
         change Ψ (X p) / Ψ (X q) = _
         rw [hΨX, hΨX, hpq, mul_div_mul_left _ _ (ht q.1), map_div₀]
 
-theorem fnField_comp_le (y : (Σ b, ι' b) → Ω) (κ : K → K') (v : (Σ b, ι b) → Σ b, ι' b) (hv : ∀ p, (v p).1 = κ p.1) :
-    fnField k (y ∘ v) ≤ fnField k y := by
+theorem fnField_comp_le
+    (y : (Σ b, ι' b) → Ω) (κ : K → K') (v : (Σ b, ι b) → Σ b, ι' b) (hv : ∀ p, (v p).1 = κ p.1)
+    : fnField k (y ∘ v) ≤ fnField k y := by
   unfold fnField
   apply IntermediateField.adjoin_le_iff.mpr
   rintro t ⟨p, q, hpq, rfl⟩
   apply IntermediateField.subset_adjoin
   exact ⟨v p, v q, by rw [hv, hv, hpq], rfl⟩
 
-theorem relDeg_pointIdeal [Fintype K] [DecidableEq K] [Fintype K'] [DecidableEq K'] (j : K ↪ K') (y : (Σ b, ι' b) → Ω)
-    (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) [(pointIdeal k y).IsPrime] :
-    relDeg j (pointIdeal k y) = IntermediateField.relfinrank (fnField k (y ∘ blockIncl j ι')) (fnField k y) := by
+theorem relDeg_pointIdeal
+    [Fintype K] [DecidableEq K] [Fintype K'] [DecidableEq K']
+    (j : K ↪ K')
+    (y : (Σ b, ι' b) → Ω) (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) [(pointIdeal k y).IsPrime]
+    : relDeg j (pointIdeal k y)
+      = IntermediateField.relfinrank (fnField k (y ∘ blockIncl j ι')) (fnField k y) := by
   let P' := pointIdeal k y
   let M := MvPolynomial K' Ω
   let L := FractionRing M
@@ -180,7 +209,8 @@ theorem relDeg_pointIdeal [Fintype K] [DecidableEq K] [Fintype K'] [DecidableEq 
     apply IsFractionRing.injective M L
     rw [map_zero]
     exact h
-  have hφ : ∀ p, φ (algebraMap (MRing ι' k ⧸ P') _ (Ideal.Quotient.mk P' (X p))) = c (y p) * t p.1 := by
+  have hφ
+      : ∀ p, φ (algebraMap (MRing ι' k ⧸ P') _ (Ideal.Quotient.mk P' (X p))) = c (y p) * t p.1 := by
     intro p
     simp only [φ, IsFractionRing.liftAlgHom_apply, IsFractionRing.lift_algebraMap]
     show algebraMap M L (q (Ideal.Quotient.mk P' (X p))) = _
@@ -189,24 +219,34 @@ theorem relDeg_pointIdeal [Fintype K] [DecidableEq K] [Fintype K'] [DecidableEq 
     rfl
   have h1 := map_homFrac P' φ c t y hy ht hφ
   let φ₂ := φ.comp (contractFracMap j P')
-  have hφ₂ : ∀ p, φ₂ (algebraMap _ (FractionRing (MRing (fun b => ι' (j b)) k ⧸ contractPrime j P'))
-      (Ideal.Quotient.mk (contractPrime j P') (X p))) = c ((y ∘ blockIncl j ι') p) * (t ∘ j) p.1 := by
+  have hφ₂
+      : ∀ p,
+        φ₂ (algebraMap _ (FractionRing (MRing (fun b => ι' (j b)) k ⧸ contractPrime j P'))
+            (Ideal.Quotient.mk (contractPrime j P') (X p)))
+          = c ((y ∘ blockIncl j ι') p) * (t ∘ j) p.1 := by
     intro p
-    have hc : contractQuot j P' (Ideal.Quotient.mk (contractPrime j P') (X p)) =
-        Ideal.Quotient.mk P' (X (blockIncl j ι' p)) := by
+    have hc
+        : contractQuot j P' (Ideal.Quotient.mk (contractPrime j P') (X p))
+          = Ideal.Quotient.mk P' (X (blockIncl j ι' p)) := by
       show Ideal.Quotient.mk P' (rename (blockIncl j ι') (X p)) = _
       rw [rename_X]
-    have hcf : contractFracMap j P' (algebraMap _ (FractionRing (MRing (fun b => ι' (j b)) k ⧸ contractPrime j P'))
-        (Ideal.Quotient.mk (contractPrime j P') (X p))) =
-        algebraMap _ (FractionRing (MRing ι' k ⧸ P')) (contractQuot j P' (Ideal.Quotient.mk (contractPrime j P') (X p))) := by
+    have hcf
+        : contractFracMap j P'
+            (algebraMap _ (FractionRing (MRing (fun b => ι' (j b)) k ⧸ contractPrime j P'))
+              (Ideal.Quotient.mk (contractPrime j P') (X p)))
+          = algebraMap _ (FractionRing (MRing ι' k ⧸ P'))
+            (contractQuot j P' (Ideal.Quotient.mk (contractPrime j P') (X p))) := by
       unfold contractFracMap
       erw [IsFractionRing.liftAlgHom_apply, IsFractionRing.lift_algebraMap]
       rfl
     simp only [φ₂, AlgHom.comp_apply]
     rw [hcf, hc, hφ]
     rfl
-  have h2 := map_homFrac (contractPrime j P') φ₂ c (t ∘ j) (y ∘ blockIncl j ι') (fun b => hy (j b))
-    (fun b => ht (j b)) hφ₂
+  have h2 :=
+    map_homFrac (contractPrime j P') φ₂ c (t ∘ j) (y ∘ blockIncl j ι')
+      (fun b => hy (j b))
+      (fun b => ht (j b))
+      hφ₂
   unfold relDeg
   rw [← IntermediateField.relfinrank_map_map _ _ φ, IntermediateField.map_map, h1]
   erw [h2]
@@ -251,12 +291,14 @@ theorem numPull : NumPull := by
       conv_lhs => rw [hz]
       exact fnField_comp_le (z ∘ τ) id τ.symm (fun q => congrArg Sigma.fst (τ.apply_symm_apply q))
   have hinum : inum k (y ∘ v) a = inum k z a := by
-    have hP : pointIdeal k (z ∘ τ) =
-        (pointIdeal k z).comap (rename τ : MRing ι k →ₐ[k] MRing (fun b => ι' (j b)) k) :=
+    have hP
+        : pointIdeal k (z ∘ τ)
+          = (pointIdeal k z).comap (rename τ : MRing ι k →ₐ[k] MRing (fun b => ι' (j b)) k) :=
       pointIdeal_comp z id Function.injective_id τ (fun p => rfl)
     rw [hyvz]
     unfold inum
-    rw [hP, FieldNumbers.RenameIntNum.full k K K ι (fun b => ι' (j b)) (Equiv.refl K) τ (fun p => rfl)]
+    rw [hP,
+      FieldNumbers.RenameIntNum.full k K K ι (fun b => ι' (j b)) (Equiv.refl K) τ (fun p => rfl)]
     rfl
   have hzPt : IsPt k z d := by
     obtain ⟨h1, h2, h3⟩ := hyv
@@ -273,9 +315,10 @@ theorem numPull : NumPull := by
   haveI : (pointIdeal k y).IsPrime := hP'm.isPrime
   have hcon : contractPrime j (pointIdeal k y) = pointIdeal k z :=
     (pointIdeal_comp y κ hκ (blockIncl j ι') (fun p => rfl)).symm
-  have hPF := (ProjectionFormulaDegree.of_divPushForward
-    (DivPushForward.proof ContractRelDimLe.proof DivPushForwardLocalZero)
-    k K K' j ι' (pointIdeal k y) hP'm d hrel (by rw [hcon]; exact hrelz) a).2
+  have hPF :=
+    (ProjectionFormulaDegree.of_divPushForward
+      (DivPushForward.proof ContractRelDimLe.proof DivPushForwardLocalZero) k K K' j ι'
+      (pointIdeal k y) hP'm d hrel (by rw [hcon]; exact hrelz) a).2
   rw [hcon] at hPF
   have hrd := relDeg_pointIdeal (k := k) j y hy.1
   have hle : fnField k z ≤ fnField k y := fnField_comp_le y κ (blockIncl j ι') (fun p => rfl)

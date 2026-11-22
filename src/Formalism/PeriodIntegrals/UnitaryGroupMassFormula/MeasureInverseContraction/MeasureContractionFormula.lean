@@ -24,10 +24,13 @@ def wt (r : ℕ) (lam : ℝ) : Fin r → ℝ := fun b => lam ^ (r - b.val)
 theorem wt_ge (lam : ℝ) (hlam : 1 ≤ lam) (b : Fin r) : lam ≤ wt r lam b := by
   unfold wt
   have := b.isLt
-  calc lam = lam ^ 1 := (pow_one _).symm
+  calc
+    lam
+      = lam ^ 1 := (pow_one _).symm
     _ ≤ lam ^ (r - b.val) := pow_le_pow_right₀ hlam (by omega)
 
-theorem wt_step (lam : ℝ) (hlam : 1 ≤ lam) (b c : Fin r) (hbc : b < c) : lam * wt r lam c ≤ wt r lam b := by
+theorem wt_step (lam : ℝ) (hlam : 1 ≤ lam) (b c : Fin r) (hbc : b < c)
+    : lam * wt r lam c ≤ wt r lam b := by
   unfold wt
   have := b.isLt
   have := c.isLt
@@ -38,24 +41,32 @@ theorem wt_step (lam : ℝ) (hlam : 1 ≤ lam) (b c : Fin r) (hbc : b < c) : lam
 def Cmat (n : ℕ) : Set (Matrix (Fin n) (Fin n) ℂ) := {M | ∀ i j, ‖(M - 1) i j‖ ≤ 1}
 
 theorem isCompact_Cmat (n : ℕ) : IsCompact (Cmat n) := by
-  have : Cmat n = Set.pi Set.univ (fun i : Fin n =>
-      Set.pi Set.univ (fun j : Fin n => Metric.closedBall ((1 : Matrix (Fin n) (Fin n) ℂ) i j) 1)) := by
+  have : Cmat n
+      = Set.pi Set.univ (fun i : Fin n =>
+        Set.pi Set.univ
+          (fun j : Fin n => Metric.closedBall ((1 : Matrix (Fin n) (Fin n) ℂ) i j) 1)) := by
     ext M
     show (∀ i j, ‖(M - 1) i j‖ ≤ 1) ↔ _
-    exact ⟨fun h i _ j _ => by simpa [Metric.mem_closedBall, dist_eq_norm, Matrix.sub_apply] using h i j,
+    exact ⟨
+      fun h i _ j _ => by simpa [Metric.mem_closedBall, dist_eq_norm, Matrix.sub_apply] using h i j,
       fun h i j => by
         have := h i (Set.mem_univ _) j (Set.mem_univ _)
-        simpa [Metric.mem_closedBall, dist_eq_norm, Matrix.sub_apply] using this⟩
+        simpa [Metric.mem_closedBall, dist_eq_norm, Matrix.sub_apply] using this
+    ⟩
   rw [this]
   exact isCompact_univ_pi fun i => isCompact_univ_pi fun j => isCompact_closedBall _ _
 
 def aUJ (hG : Gram ε e f) (s : Fin r → ℝ) (hs : ∀ b, s b ≠ 0) : Formalism.REAL.UJ ε :=
   ⟨⟨Amat ε e f s, Amat ε e f s⁻¹, Amat_mul_inv hG s hs, Amat_inv_mul hG s hs⟩, inUJ_A hG s hs⟩
 
-theorem local_contract (hG : Gram ε e f) {z : Fin n → ℂ} (g : Formalism.REAL.UJ ε)
-    (hgN : InN ε e z (Formalism.MainNotions.S.uMat g)) (hg'N : InN ε e z (Formalism.MainNotions.S.uMat g⁻¹)) :
-    ∃ s : Fin r → ℝ, ∃ hs : ∀ b, s b ≠ 0, Formalism.MainNotions.S.uMat (aUJ hG s hs * g * (aUJ hG s hs)⁻¹) ∈ Cmat n := by
-  have hSb0 : ∀ y i, 0 ≤ Sb ε e f (Formalism.MainNotions.S.uMat g) y i := fun y i => by unfold Sb; positivity
+theorem local_contract
+    (hG : Gram ε e f)
+    {z : Fin n → ℂ} (g : Formalism.REAL.UJ ε) (hgN : InN ε e z (Formalism.MainNotions.S.uMat g))
+    (hg'N : InN ε e z (Formalism.MainNotions.S.uMat g⁻¹))
+    : ∃ s : Fin r → ℝ, ∃ hs : ∀ b, s b ≠ 0,
+      Formalism.MainNotions.S.uMat (aUJ hG s hs * g * (aUJ hG s hs)⁻¹) ∈ Cmat n := by
+  have hSb0 : ∀ y i, 0 ≤ Sb ε e f (Formalism.MainNotions.S.uMat g) y i := fun y i => by
+    unfold Sb; positivity
   set S : ℝ := ∑ i, ∑ j, Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j 1) i with hS
   have hS0 : 0 ≤ S := Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ => hSb0 _ _
   set lam : ℝ := 1 + S with hlamdef
@@ -64,29 +75,43 @@ theorem local_contract (hG : Gram ε e f) {z : Fin n → ℂ} (g : Formalism.REA
   have ht0 : ∀ b, 0 < t b := fun b => lt_of_lt_of_le one_pos (hlam.trans (wt_ge lam hlam b))
   have hs : ∀ b, t⁻¹ b ≠ 0 := fun b => by simp [(ht0 b).ne']
   refine ⟨t⁻¹, hs, fun i j => ?_⟩
-  have hmat : Formalism.MainNotions.S.uMat (aUJ hG t⁻¹ hs * g * (aUJ hG t⁻¹ hs)⁻¹) =
-      Amat ε e f t⁻¹ * Formalism.MainNotions.S.uMat g * Amat ε e f t⁻¹⁻¹ := rfl
+  have hmat
+      : Formalism.MainNotions.S.uMat (aUJ hG t⁻¹ hs * g * (aUJ hG t⁻¹ hs)⁻¹)
+        = Amat ε e f t⁻¹ * Formalism.MainNotions.S.uMat g * Amat ε e f t⁻¹⁻¹ :=
+    rfl
   have hentry : ∀ K : Matrix (Fin n) (Fin n) ℂ, K i j = (K *ᵥ Pi.single j 1) i := fun K => by
     simp [mulVec, dotProduct, Pi.single_apply]
-  rw [hmat, hentry (Amat ε e f t⁻¹ * Formalism.MainNotions.S.uMat g * Amat ε e f t⁻¹⁻¹ - 1), conj_sub_mulVec hG t⁻¹ hs,
-    inv_inv]
-  have hgg : Formalism.MainNotions.S.uMat g * Formalism.MainNotions.S.uMat g⁻¹ = 1 := PI.ScMuExists.UnitaryGroupMassFormula.uMat_mul_inv g
-  refine (entry_bound hG t lam hlam (wt_ge lam hlam) (wt_step lam hlam) (PI.ScMuExists.UnitaryGroupMassFormula.uMat_inUJ g) hgg
-    hgN hg'N _ i).trans ?_
-  have h1 : Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j 1) i ≤
-      ∑ j', Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j' 1) i :=
-    Finset.single_le_sum (f := fun j' => Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j' 1) i)
-      (fun j' _ => hSb0 _ _) (Finset.mem_univ j)
+  rw [hmat, hentry (Amat ε e f t⁻¹ * Formalism.MainNotions.S.uMat g * Amat ε e f t⁻¹⁻¹ - 1),
+    conj_sub_mulVec hG t⁻¹ hs, inv_inv]
+  have hgg : Formalism.MainNotions.S.uMat g * Formalism.MainNotions.S.uMat g⁻¹ = 1 :=
+    PI.ScMuExists.UnitaryGroupMassFormula.uMat_mul_inv g
+  refine (entry_bound hG t lam hlam (wt_ge lam hlam) (wt_step lam hlam)
+    (PI.ScMuExists.UnitaryGroupMassFormula.uMat_inUJ g) hgg hgN hg'N _ i).trans ?_
+  have h1
+      : Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j 1) i
+        ≤ ∑ j', Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j' 1) i :=
+    Finset.single_le_sum
+      (f := fun j' => Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j' 1) i)
+      (fun j' _ => hSb0 _ _)
+      (Finset.mem_univ j)
   have h2 : ∑ j', Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j' 1) i ≤ S :=
-    Finset.single_le_sum (f := fun i => ∑ j', Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j' 1) i)
-      (fun i _ => Finset.sum_nonneg fun _ _ => hSb0 _ _) (Finset.mem_univ i)
+    Finset.single_le_sum
+      (f := fun i => ∑ j', Sb ε e f (Formalism.MainNotions.S.uMat g) (Pi.single j' 1) i)
+      (fun i _ => Finset.sum_nonneg fun _ _ => hSb0 _ _)
+      (Finset.mem_univ i)
   rw [inv_mul_le_iff₀ (by linarith)]
   linarith
 
 theorem measure_contraction_formula : Contract := by
   intro I r e f z hF
-  refine ⟨Set.pi Set.univ (fun v => {g : Formalism.REAL.UJ (I.ε v) | Formalism.MainNotions.S.uMat g ∈ Cmat I.n}),
-    isCompact_univ_pi fun v => (Formalism.REAL.isClosedEmbeddingMatrix I.n (I.ε v)).1.isCompact_preimage (isCompact_Cmat I.n), ?_⟩
+  refine ⟨
+    Set.pi Set.univ
+      (fun v => {g : Formalism.REAL.UJ (I.ε v) | Formalism.MainNotions.S.uMat g ∈ Cmat I.n}),
+    isCompact_univ_pi fun v =>
+      (Formalism.REAL.isClosedEmbeddingMatrix I.n (I.ε v)).1.isCompact_preimage (isCompact_Cmat
+        I.n),
+    ?_
+  ⟩
   intro m hm
   have hfr := fun v => PI.ScMuExists.UnitaryGroupMassFormula.rv_frame (I := I) hF v
   have hG : ∀ v, Gram (I.ε v) (fun a => rv I v (e a)) (fun a => rv I v (f a)) := fun v =>

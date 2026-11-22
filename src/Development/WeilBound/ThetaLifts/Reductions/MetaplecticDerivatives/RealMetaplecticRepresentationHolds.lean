@@ -10,7 +10,8 @@ public import Development.WeilBound.ThetaLifts.Reductions.MetaplecticDerivatives
 @[expose] public section
 
 open PositivityTheory.ThKR.Mp in
-theorem PositivityTheory.ThKR.realMetaplecticRepresentation_holds : GlobalTheory.Published.RealMetaplecticRepresentation :=
+theorem PositivityTheory.ThKR.realMetaplecticRepresentation_holds
+    : GlobalTheory.Published.RealMetaplecticRepresentation :=
   realMetaplectic_of_forall fun l _ _ _ =>
     have hS : SecEx l := secEx_of mkElt nrmUp
     have hO : Surj l := surj_of ddNe hS

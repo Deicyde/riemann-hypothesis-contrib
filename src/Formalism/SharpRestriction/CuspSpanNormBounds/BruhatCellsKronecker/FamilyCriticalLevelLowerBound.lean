@@ -11,10 +11,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.FourierDecayAlt Finset
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.FourierDecayAlt
+  Finset
 
-theorem v_ge_of_hyp {D : D7} {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT CT : ℝ}
-    (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT) : 1 ≤ D.host.v := by
+theorem v_ge_of_hyp
+    {D : D7} {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT CT : ℝ}
+    (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT)
+    : 1 ≤ D.host.v := by
   dsimp only [StandingHypotheses] at hH
   exact hH.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
 
@@ -30,21 +33,27 @@ theorem VV_pos (D : D7) (τ : D.what₂.Tau) : 0 < VV D τ := by
   unfold VV
   exact mul_pos (D.dsig_pos τ) (Finset.prod_pos fun i _ => by positivity)
 
-theorem last_shifted_parameter_eq {D : D7} {C0 : ℝ} (hD : StandingNumericalData D C0) (u : D.what₂.Word) (τ : D.what₂.Tau) :
-    ¬ IsTop D τ → uOne D u τ D.R.k = vOne D τ (D.R.k - 1) - 1 / 2 := by
+theorem last_shifted_parameter_eq
+    {D : D7} {C0 : ℝ} (hD : StandingNumericalData D C0) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    : ¬ IsTop D τ → uOne D u τ D.R.k = vOne D τ (D.R.k - 1) - 1 / 2 := by
   dsimp only [StandingNumericalData] at hD
   exact hD.2.2.2.2.1 u τ
 
-theorem critical_level_ratio_le_exp {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl Cg cb Cu cT CT C1 : ℝ} (h40 : 40 ≤ Cl)
-    (hC1 : Real.exp (3 / 4) ≤ C1) : LocalBesselAndTopKernel.SecondBoundHyp D large₂ C0 C' Cl Cg cb Cu cT CT C1 := by
+theorem critical_level_ratio_le_exp
+    {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl Cg cb Cu cT CT C1 : ℝ}
+    (h40 : 40 ≤ Cl) (hC1 : Real.exp (3 / 4) ≤ C1)
+    : LocalBesselAndTopKernel.SecondBoundHyp D large₂ C0 C' Cl Cg cb Cu cT CT C1 := by
   rintro ⟨hD, hH, -⟩ u u' τ
   have ok := cfg_ok hD hH τ
   have sm := cfg_small hH h40 τ
   have hka := ka_pos_of (v_ge_of_hyp hH)
   have hrd : 0 < D.host.rdE := Formalism.MainNotions.S.rdE_pos D
-  have hTW := Formalism.FourierDecayAlt.P.critical_threshold_words (cfgOf D τ) (deOf D u) (deOf D u') D.host.ka D.host.rdE
-    (gg D) (VV D τ) ok sm.hvth (isWord_deOf D u) (isWord_deOf D u') hka hrd (gg_pos D) (VV_pos D τ)
-  rw [← Tcrit_eq D u τ hka.le, ← Tcrit_eq D u' τ hka.le, ← Vand_u D u τ (last_shifted_parameter_eq hD u τ),
+  have hTW :=
+    Formalism.FourierDecayAlt.P.critical_threshold_words (cfgOf D τ) (deOf D u) (deOf D u')
+      D.host.ka D.host.rdE (gg D) (VV D τ) ok sm.hvth (isWord_deOf D u) (isWord_deOf D u') hka hrd
+      (gg_pos D) (VV_pos D τ)
+  rw [← Tcrit_eq D u τ hka.le, ← Tcrit_eq D u' τ hka.le,
+    ← Vand_u D u τ (last_shifted_parameter_eq hD u τ),
     ← Vand_u D u' τ (last_shifted_parameter_eq hD u' τ)]
   exact le_trans (le_of_eq hTW.1) (hTW.2.2.trans hC1)
 
@@ -103,8 +112,10 @@ theorem cOne_ge {c : Sz.Cfg} {bb : ℝ} (ok : c.Ok) (sm : c.Small bb) : 1 / 5 �
   norm_num
   linarith [hV.1, hV.2, hE]
 
-theorem critical_level_lower_bound {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl Cg cb Cu cT CT ep0 CV C3' : ℝ} (h40 : 40 ≤ Cl)
-    (hep : ep0 ≤ 1 / 2) (hC3 : 1 ≤ C3') : LocalBesselAndTopKernel.LocalTiedPairs D large₂ C0 C' Cl Cg cb Cu cT CT ep0 CV C3' := by
+theorem critical_level_lower_bound
+    {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl Cg cb Cu cT CT ep0 CV C3' : ℝ}
+    (h40 : 40 ≤ Cl) (hep : ep0 ≤ 1 / 2) (hC3 : 1 ≤ C3')
+    : LocalBesselAndTopKernel.LocalTiedPairs D large₂ C0 C' Cl Cg cb Cu cT CT ep0 CV C3' := by
   rintro ⟨hD, hH, -⟩ hG u τ
   have ok := cfg_ok hD hH τ
   have sm := cfg_small hH h40 τ
@@ -144,16 +155,20 @@ theorem critical_level_lower_bound {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl
     unfold Sz.FormalDegreeLower
     rw [Vand_lam D τ]
     nlinarith
-  have hTL := Formalism.FourierDecayAlt.P.critical_threshold_lower_bound (cfgOf D τ) D.R.rS large₂.sc.b (deOf D u) D.host.ka D.host.rdE
-    (gg D) (VV D τ) ok (m_eq D) sm (isWord_deOf D u) hrd1 hka_eq hgg hFD
+  have hTL :=
+    Formalism.FourierDecayAlt.P.critical_threshold_lower_bound (cfgOf D τ) D.R.rS large₂.sc.b
+      (deOf D u) D.host.ka D.host.rdE (gg D) (VV D τ) ok (m_eq D) sm (isWord_deOf D u) hrd1 hka_eq
+      hgg hFD
   rw [← Tcrit_eq D u τ hka.le, ← Vand_u D u τ (last_shifted_parameter_eq hD u τ), ← cfg_aeff D u τ]
   refine le_trans ?_ hTL
   show _ ≤ Sz.cOne (cfgOf D τ) large₂.sc.b * gg D ^ D.R.m * (D.host.ka ^ (D.R.m - 1))⁻¹ *
     (∏ j ∈ Finset.Icc 1 D.R.m, bOne D τ j) / (cfgOf D τ).aeff
   have hpow : D.host.ka ^ (-((D.R.m : ℝ) - 1)) = (D.host.ka ^ (D.R.m - 1))⁻¹ := by
-    rw [Real.rpow_neg hka.le, show ((D.R.m : ℝ) - 1) = ((D.R.m - 1 : ℕ) : ℝ) by
-      rw [Nat.cast_sub (by omega : 1 ≤ D.R.m)]
-      simp, Real.rpow_natCast]
+    rw [Real.rpow_neg hka.le,
+      show ((D.R.m : ℝ) - 1) = ((D.R.m - 1 : ℕ) : ℝ) by
+        rw [Nat.cast_sub (by omega : 1 ≤ D.R.m)]
+        simp,
+      Real.rpow_natCast]
   rw [hpow]
   have hkC : (D.R.k : ℝ) ^ (-C3') ≤ 1 / 5 := by
     have h1 : (D.R.k : ℝ) ^ (-C3') ≤ (D.R.k : ℝ) ^ (-(1 : ℝ)) :=
@@ -166,8 +181,10 @@ theorem critical_level_lower_bound {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl
     refine Finset.prod_nonneg fun j hj => ?_
     obtain ⟨h1, h2⟩ := Finset.mem_Icc.1 hj
     exact le_trans (le_max_of_le_left (Real.rpow_nonneg (by linarith) _)) (hbO τ j h1 h2).1
-  have hA : 0 ≤ gg D ^ D.R.m * (D.host.ka ^ (D.R.m - 1))⁻¹ * (∏ j ∈ Finset.Icc 1 D.R.m, bOne D τ j)
-      / (cfgOf D τ).aeff := by
+  have hA
+      : 0
+        ≤ gg D ^ D.R.m * (D.host.ka ^ (D.R.m - 1))⁻¹ * (∏ j ∈ Finset.Icc 1 D.R.m, bOne D τ j)
+          / (cfgOf D τ).aeff := by
     have h1 := cfg_aeff_pos ok
     have h2 := gg_pos D
     positivity
@@ -176,13 +193,17 @@ theorem critical_level_lower_bound {D : D7} {large₂ : SizeData₂ D} {C0 C' Cl
 
 variable {eps : ℝ}
 
-theorem family_critical_level_ratio (Fm : FamP eps) {C0 Cg cb Cu cT CT C1 : ℝ} (h40 : 40 ≤ sCl Fm)
-    (hC1 : Real.exp (3 / 4) ≤ C1) : LocalBesselAndTopKernel.TheoremThreePassage Fm C0 Cg cb Cu cT CT C1 :=
-    ⟨0, fun x _ i hh => critical_level_ratio_le_exp h40 hC1 hh⟩
+theorem family_critical_level_ratio
+    (Fm : FamP eps) {C0 Cg cb Cu cT CT C1 : ℝ} (h40 : 40 ≤ sCl Fm) (hC1 : Real.exp (3 / 4) ≤ C1)
+    : LocalBesselAndTopKernel.TheoremThreePassage Fm C0 Cg cb Cu cT CT C1 :=
+  ⟨0, fun x _ i hh => critical_level_ratio_le_exp h40 hC1 hh⟩
 
-theorem family_critical_level_lower_bound (Fm : FamP eps) {C0 Cg cb Cu cT CT ep0 CV C3' : ℝ} (h40 : 40 ≤ sCl Fm)
-    (hep : ep0 ≤ 1 / 2) (hC3 : 1 ≤ C3') (hg : LocalBesselAndTopKernel.FamilyTopBound Fm C0 Cg cb Cu cT CT ep0 CV) :
-    LocalBesselAndTopKernel.LocalSplitExponents Fm C0 Cg cb Cu cT CT C3' := by
+theorem family_critical_level_lower_bound
+    (Fm : FamP eps)
+    {C0 Cg cb Cu cT CT ep0 CV C3' : ℝ}
+    (h40 : 40 ≤ sCl Fm) (hep : ep0 ≤ 1 / 2) (hC3 : 1 ≤ C3')
+    (hg : LocalBesselAndTopKernel.FamilyTopBound Fm C0 Cg cb Cu cT CT ep0 CV)
+    : LocalBesselAndTopKernel.LocalSplitExponents Fm C0 Cg cb Cu cT CT C3' := by
   obtain ⟨x0, hx0⟩ := hg
   refine ⟨x0, fun x hx i hh => ?_⟩
   exact critical_level_lower_bound (C0 := C0) (CV := CV) (ep0 := ep0) h40 hep hC3 hh (hx0 x hx i hh)

@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteDefini
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -27,69 +28,89 @@ namespace GlobalTheory.BCT.TraceBlocks
 section Assembly
 variable {G H V : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
 
-theorem trOn_eqvM (ι : H →* G) (hι : Function.Injective ι) (ρ : Representation ℂ H V) (K K' : Subgroup G) (F : G → ℂ)
-    (hF : ∀ k ∈ K', ∀ x, F (k * x) = F x ∧ F (x * k) = F x) (hsupp : {q : G ⧸ K' | F q.out ≠ 0}.Finite)
+theorem trOn_eqvM
+    (ι : H →* G) (hι : Function.Injective ι)
+    (ρ : Representation ℂ H V)
+    (K K' : Subgroup G) (F : G → ℂ) (hF : ∀ k ∈ K', ∀ x, F (k * x) = F x ∧ F (x * k) = F x)
+    (hsupp : {q : G ⧸ K' | F q.out ≠ 0}.Finite)
     (hdc : Finite (DoubleCoset.Quotient (ι.range : Set G) (K' : Set G)))
-    (hst : ∀ x : G, Finite (ι.range ⊓ K'.map (MulAut.conj x).toMonoidHom : Subgroup G)) :
-    trOn (eqvM ι ρ K') (levOp (rightReg ℂ G V) K K' F LinearMap.id) =
-      ((K'.relIndex K : ℕ) : ℂ)⁻¹ * ∑ᶠ q : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G),
-        ((stabCard ι K' (Quotient.out q) : ℂ))⁻¹ *
-          ∑ᶠ h : H, F ((Quotient.out q)⁻¹ * ι h * Quotient.out q) * LinearMap.trace ℂ V (ρ h) := by
-  classical
-  have hR : ∀ k ∈ K', ∀ x, F (x * k) = F x := fun k hk x => (hF k hk x).2
-  have hmaps := GlobalTheory.T.heckeOperator_preserves_equivariantRightInvariant G H V ι ρ K K' F hF
-  unfold trOn
-  rw [dite_eq_left hmaps]
-  haveI : Fintype (DoubleCoset.Quotient (ι.range : Set G) (K' : Set G)) := Fintype.ofFinite _
-  set T := levOp (rightReg ℂ G V) K K' F LinearMap.id with hT
-  set M := eqvM ι ρ K' with hM
-  let x : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G) → G := fun q => Quotient.out q
-  let e : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G) → (M →ₗ[ℂ] V) :=
-    fun q => (LinearMap.proj (R := ℂ) (φ := fun _ : G => V) (x q)).comp M.subtype
-  let s : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G) → (V →ₗ[ℂ] M) :=
-    fun q => (secM ι ρ K' (x q)).codRestrict M (fun v => GlobalTheory.T.equivariantDoubleCosetSection_mem_equivariant G H V ι ρ K' (x q) v)
-  have hid : ∑ q, s q ∘ₗ e q = LinearMap.id := by
-    ext φ : 1
-    apply Subtype.ext
-    have := GlobalTheory.T.equivariantFunction_eq_finsum_doubleCosetSections G H V ι hι ρ K' hdc hst φ.1 φ.2
-    rw [finsum_eq_sum_of_fintype] at this
-    simpa [s, e, x] using this
-  have h1 : ∀ φ : M, φ = ∑ q, s q (e q φ) := fun φ => by
-    conv_lhs => rw [← LinearMap.id_apply (R := ℂ) φ, ← hid]
-    simp
-  haveI : Module.Finite ℂ M := by
-    refine Module.Finite.of_injective (LinearMap.pi e) fun a b hab => ?_
-    rw [h1 a, h1 b]
-    refine Finset.sum_congr rfl fun q _ => ?_
-    rw [show e q a = e q b from congrFun hab q]
-  have htr : LinearMap.trace ℂ M (T.restrict hmaps) =
-      ∑ q, LinearMap.trace ℂ V (e q ∘ₗ T.restrict hmaps ∘ₗ s q) := by
-    have hsum : T.restrict hmaps ∘ₗ (∑ q, s q ∘ₗ e q) = ∑ q, (T.restrict hmaps ∘ₗ s q) ∘ₗ e q := by
+    (hst : ∀ x : G, Finite (ι.range ⊓ K'.map (MulAut.conj x).toMonoidHom : Subgroup G))
+    : trOn (eqvM ι ρ K') (levOp (rightReg ℂ G V) K K' F LinearMap.id)
+      = ((K'.relIndex K : ℕ) : ℂ)⁻¹
+        * ∑ᶠ q : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G),
+          ((stabCard ι K' (Quotient.out q) : ℂ))⁻¹ *
+            ∑ᶠ h : H, F ((Quotient.out q)⁻¹ * ι h * Quotient.out q) * LinearMap.trace ℂ V (ρ h) :=
+  by
+    classical
+    have hR : ∀ k ∈ K', ∀ x, F (x * k) = F x := fun k hk x => (hF k hk x).2
+    have hmaps :=
+      GlobalTheory.T.heckeOperator_preserves_equivariantRightInvariant G H V ι ρ K K' F hF
+    unfold trOn
+    rw [dite_eq_left hmaps]
+    haveI : Fintype (DoubleCoset.Quotient (ι.range : Set G) (K' : Set G)) := Fintype.ofFinite _
+    set T := levOp (rightReg ℂ G V) K K' F LinearMap.id with hT
+    set M := eqvM ι ρ K' with hM
+    let x : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G) → G := fun q => Quotient.out q
+    let e : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G) → (M →ₗ[ℂ] V) := fun q =>
+      (LinearMap.proj (R := ℂ) (φ := fun _ : G => V) (x q)).comp M.subtype
+    let s : DoubleCoset.Quotient (ι.range : Set G) (K' : Set G) → (V →ₗ[ℂ] M) := fun q =>
+      (secM ι ρ K' (x q)).codRestrict M
+        (fun v => GlobalTheory.T.equivariantDoubleCosetSection_mem_equivariant G H V ι ρ K' (x q) v)
+    have hid : ∑ q, s q ∘ₗ e q = LinearMap.id := by
       ext φ : 1
-      set_option synthInstance.maxHeartbeats 100000 in
+      apply Subtype.ext
+      have :=
+        GlobalTheory.T.equivariantFunction_eq_finsum_doubleCosetSections G H V ι hι ρ K' hdc hst φ.1
+          φ.2
+      rw [finsum_eq_sum_of_fintype] at this
+      simpa [s, e, x] using this
+    have h1 : ∀ φ : M, φ = ∑ q, s q (e q φ) := fun φ => by
+      conv_lhs => rw [← LinearMap.id_apply (R := ℂ) φ, ← hid]
+      simp
+    haveI : Module.Finite ℂ M := by
+      refine Module.Finite.of_injective (LinearMap.pi e) fun a b hab => ?_
+      rw [h1 a, h1 b]
+      refine Finset.sum_congr rfl fun q _ => ?_
+      rw [show e q a = e q b from congrFun hab q]
+    have htr
+        : LinearMap.trace ℂ M (T.restrict hmaps)
+          = ∑ q, LinearMap.trace ℂ V (e q ∘ₗ T.restrict hmaps ∘ₗ s q) := by
+      have hsum
+          : T.restrict hmaps ∘ₗ (∑ q, s q ∘ₗ e q) = ∑ q, (T.restrict hmaps ∘ₗ s q) ∘ₗ e q := by
+        ext φ : 1
+        set_option synthInstance.maxHeartbeats 100000 in
         simp [LinearMap.sum_apply, map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [← LinearMap.comp_id (T.restrict hmaps), ← hid, hsum, map_sum]
+      set_option synthInstance.maxHeartbeats 100000 in
+        conv_lhs => rw [← LinearMap.comp_id (T.restrict hmaps), ← hid, hsum, map_sum]
+      refine Finset.sum_congr rfl fun q _ => ?_
+      rw [LinearMap.trace_comp_comm']
+    rw [htr, finsum_eq_sum_of_fintype, Finset.mul_sum]
     refine Finset.sum_congr rfl fun q _ => ?_
-    rw [LinearMap.trace_comp_comm']
-  rw [htr, finsum_eq_sum_of_fintype, Finset.mul_sum]
-  refine Finset.sum_congr rfl fun q _ => ?_
-  have hfin := GlobalTheory.T.finite_rationalPoints_conj_in_support G H ι hι K' F hR hsupp (x q) (hst _)
-  have hsub : ∀ {β : Type} [AddCommMonoid β] (g : H → β), (∀ h, F ((x q)⁻¹ * ι h * x q) = 0 → g h = 0) →
-      Function.support g ⊆ hfin.toFinset := fun g hg h hh => by
-    simp only [Set.Finite.coe_toFinset, Set.mem_setOf_eq]
-    exact fun h0 => hh (hg h h0)
-  have hA : e q ∘ₗ T.restrict hmaps ∘ₗ s q = ((K'.relIndex K : ℕ) : ℂ)⁻¹ • ((stabCard ι K' (x q) : ℂ))⁻¹ •
-      ∑ h ∈ hfin.toFinset, F ((x q)⁻¹ * ι h * x q) • ρ h := by
-    ext v
-    have := GlobalTheory.T.heckeOperator_equivariantDoubleCosetSection_basePoint G H V ι hι ρ K K' F hR hsupp (x q) (hst _) hfin v
-    rw [finsum_eq_sum_of_support_subset _ (hsub _ fun h h0 => by simp [h0])] at this
-    simpa [e, s, LinearMap.restrict_apply, LinearMap.sum_apply] using this
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hA, LinearMap.map_smul, LinearMap.map_smul, map_sum, smul_eq_mul, smul_eq_mul,
-    finsum_eq_sum_of_support_subset _ (hsub (fun h => F ((x q)⁻¹ * ι h * x q) * LinearMap.trace ℂ V (ρ h))
-      fun h h0 => by simp [h0])]
-  simp only [map_smul, smul_eq_mul, x]
+    have hfin :=
+      GlobalTheory.T.finite_rationalPoints_conj_in_support G H ι hι K' F hR hsupp (x q) (hst _)
+    have hsub
+        : ∀ {β : Type} [AddCommMonoid β] (g : H → β),
+          (∀ h, F ((x q)⁻¹ * ι h * x q) = 0 → g h = 0)
+            → Function.support g ⊆ hfin.toFinset := fun g hg h hh => by
+      simp only [Set.Finite.coe_toFinset, Set.mem_setOf_eq]
+      exact fun h0 => hh (hg h h0)
+    have hA
+        : e q ∘ₗ T.restrict hmaps ∘ₗ s q
+          = ((K'.relIndex K : ℕ) : ℂ)⁻¹ • ((stabCard ι K' (x q) : ℂ))⁻¹
+            • ∑ h ∈ hfin.toFinset, F ((x q)⁻¹ * ι h * x q) • ρ h := by
+      ext v
+      have :=
+        GlobalTheory.T.heckeOperator_equivariantDoubleCosetSection_basePoint G H V ι hι ρ K K' F hR
+          hsupp (x q) (hst _) hfin v
+      rw [finsum_eq_sum_of_support_subset _ (hsub _ fun h h0 => by simp [h0])] at this
+      simpa [e, s, LinearMap.restrict_apply, LinearMap.sum_apply] using this
+    set_option synthInstance.maxHeartbeats 100000 in
+      rw [hA, LinearMap.map_smul, LinearMap.map_smul, map_sum, smul_eq_mul, smul_eq_mul,
+        finsum_eq_sum_of_support_subset _
+          (hsub
+            (fun h => F ((x q)⁻¹ * ι h * x q) * LinearMap.trace ℂ V (ρ h))
+            fun h h0 => by simp [h0])]
+    simp only [map_smul, smul_eq_mul, x]
 
 end Assembly
 
@@ -109,7 +130,8 @@ theorem finPtHom_injective : Function.Injective (finPtHom (E := E) (n := n)) := 
     simpa using this
   obtain ⟨w⟩ : Nonempty (HeightOneSpectrum (𝓞 E)) := by
     obtain ⟨P, hP⟩ := Ideal.exists_maximal (𝓞 E)
-    exact ⟨⟨P, hP.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField E)⟩⟩
+    exact
+      ⟨⟨P, hP.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField E)⟩⟩
   haveI : Nontrivial (Af E) := (pLoc E w).domain_nontrivial
   apply Subtype.ext
   apply Units.ext
@@ -129,7 +151,6 @@ theorem finPtHom_range : (finPtHom (E := E) (n := n)).range = ratFinU E n := by
     exact he
 
 end GlobalTheory.BCT.TraceBlocks
-
 
 open GlobalTheory.BCT.TraceBlocks in
 theorem GlobalTheory.BCT.TrKer.trOn_vecM_hopM : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ n : ℕ, 1 ≤ n → ∀ (S : Set (Pl E)), IsSection S → ∀ (lam : InfinitePlace E → DomWeight n) (K' : ∀ w : Pl E, Subgroup (UL n w)), IsLevelFam (fun w : Pl E => MonoidHom.id (UL n w)) (KL n) K' → ∀ f : ∀ w : Pl E, UL n w → ℂ, IsTest (KL n) K' f → trOn (GlobalTheory.BCT.TrKer.vecM S lam K') (GlobalTheory.BCT.TrKer.hopM S lam K' f) = (((globLev S K').relIndex (globLev S (KL n)) : ℕ) : ℂ)⁻¹ * ∑ᶠ q : DoubleCoset.Quotient (ratFinU E n : Set (finU (E := E) (n := n))) (globLev S K' : Set (finU (E := E) (n := n))), ((Nat.card (ratFinU E n ⊓ (globLev S K').map (MulAut.conj (Quotient.out q)).toMonoidHom : Subgroup (finU (E := E) (n := n))) : ℂ))⁻¹ * ∑ᶠ γ : UE E n, globFn S f ((Quotient.out q)⁻¹ * finPt γ * Quotient.out q) * LinearMap.trace ℂ _ (GlobalTheory.BCT.TrKer.wAt lam γ⁻¹) := by

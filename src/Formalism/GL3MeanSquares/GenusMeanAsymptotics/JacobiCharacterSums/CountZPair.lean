@@ -13,16 +13,16 @@ namespace Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD
 scoped instance (p p' : PC) : NeZero ((p.1 + 1) * (p'.1 + 1)) := ⟨by positivity⟩
 
 def mulLevel (p p' : PC) : DirichletCharacter ℂ ((p.1 + 1) * (p'.1 + 1)) :=
-  DirichletCharacter.changeLevel (dvd_mul_right (p.1 + 1) (p'.1 + 1)) p.2 *
-    (DirichletCharacter.changeLevel (dvd_mul_left (p'.1 + 1) (p.1 + 1)) p'.2)⁻¹
+  DirichletCharacter.changeLevel (dvd_mul_right (p.1 + 1) (p'.1 + 1)) p.2
+    * (DirichletCharacter.changeLevel (dvd_mul_left (p'.1 + 1) (p.1 + 1)) p'.2)⁻¹
 
-theorem mulLevel_ne_one (p p' : PC) (hp : p.2.IsPrimitive) (hp' : p'.2.IsPrimitive) (hne : p ≠ p') :
-    mulLevel p p' ≠ 1 := by
+theorem mulLevel_ne_one (p p' : PC) (hp : p.2.IsPrimitive) (hp' : p'.2.IsPrimitive) (hne : p ≠ p')
+    : mulLevel p p' ≠ 1 := by
   intro h
   have h1 := mul_inv_eq_one.mp h
   have hc := congrArg DirichletCharacter.conductor h1
-  rw [DirichletCharacter.conductor_changeLevel, DirichletCharacter.conductor_changeLevel,
-    hp, hp'] at hc
+  rw [DirichletCharacter.conductor_changeLevel, DirichletCharacter.conductor_changeLevel, hp, hp']
+    at hc
   obtain ⟨N, χ⟩ := p
   obtain ⟨N', χ'⟩ := p'
   simp only [add_left_inj] at hc
@@ -31,22 +31,28 @@ theorem mulLevel_ne_one (p p' : PC) (hp : p.2.IsPrimitive) (hp' : p'.2.IsPrimiti
   have := DirichletCharacter.changeLevel_injective (dvd_mul_right (N + 1) (N + 1)) h1
   exact congrArg (Sigma.mk N) this
 
-theorem mulLevel_apply (p p' : PC) (n : ℕ) :
-    mulLevel p p' (n : ZMod ((p.1 + 1) * (p'.1 + 1))) = cv p n * (starRingEnd ℂ) (cv p' n) := by
+theorem mulLevel_apply (p p' : PC) (n : ℕ)
+    : mulLevel p p' (n : ZMod ((p.1 + 1) * (p'.1 + 1))) = cv p n * (starRingEnd ℂ) (cv p' n) := by
   by_cases hu : IsUnit (n : ZMod ((p.1 + 1) * (p'.1 + 1)))
   · obtain ⟨u, hu⟩ := hu
-    have e1 : DirichletCharacter.changeLevel (dvd_mul_right (p.1 + 1) (p'.1 + 1)) p.2
-        (n : ZMod ((p.1 + 1) * (p'.1 + 1))) = cv p n := by
+    have e1
+        : DirichletCharacter.changeLevel (dvd_mul_right (p.1 + 1) (p'.1 + 1)) p.2
+            (n : ZMod ((p.1 + 1) * (p'.1 + 1)))
+          = cv p n := by
       rw [← hu, DirichletCharacter.changeLevel_eq_cast_of_dvd, hu,
         ZMod.cast_natCast (dvd_mul_right _ _)]
       rfl
-    have e2 : DirichletCharacter.changeLevel (dvd_mul_left (p'.1 + 1) (p.1 + 1)) p'.2
-        (n : ZMod ((p.1 + 1) * (p'.1 + 1))) = cv p' n := by
+    have e2
+        : DirichletCharacter.changeLevel (dvd_mul_left (p'.1 + 1) (p.1 + 1)) p'.2
+            (n : ZMod ((p.1 + 1) * (p'.1 + 1)))
+          = cv p' n := by
       rw [← hu, DirichletCharacter.changeLevel_eq_cast_of_dvd, hu,
         ZMod.cast_natCast (dvd_mul_left _ _)]
       rfl
-    have hn : ‖DirichletCharacter.changeLevel (dvd_mul_left (p'.1 + 1) (p.1 + 1)) p'.2
-        (n : ZMod ((p.1 + 1) * (p'.1 + 1)))‖ = 1 := by
+    have hn
+        : ‖DirichletCharacter.changeLevel (dvd_mul_left (p'.1 + 1) (p.1 + 1)) p'.2
+            (n : ZMod ((p.1 + 1) * (p'.1 + 1)))‖
+          = 1 := by
       rw [← hu]
       exact DirichletCharacter.unit_norm_eq_one _ u
     unfold mulLevel
@@ -101,7 +107,8 @@ private lemma norm_charSum_range_le_modulus_of_ne_one {Q : ℕ} [NeZero Q] (ψ :
 
 theorem pair_sum_bound : PairSum := by
   intro p p' hp hp' hne M
-  have h := norm_charSum_range_le_modulus_of_ne_one (mulLevel p p') (mulLevel_ne_one p p' hp hp' hne) M
+  have h :=
+    norm_charSum_range_le_modulus_of_ne_one (mulLevel p p') (mulLevel_ne_one p p' hp hp' hne) M
   simpa only [mulLevel_apply] using h
 
 end Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD

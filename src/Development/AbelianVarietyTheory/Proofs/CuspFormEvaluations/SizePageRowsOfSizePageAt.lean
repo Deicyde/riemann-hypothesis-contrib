@@ -13,15 +13,25 @@ public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClas
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps Formalism.L2.Pj GlobalTheory.RunIn
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps
+  Formalism.L2.Pj GlobalTheory.RunIn
 
 namespace GlobalTheory
 
-theorem pageRows_of_pageAt : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ) (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CR CT : ℝ) (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ), FamilyHypotheses.HypPage large₂ X H C2 A2 CR CT ka wL wF Tn nP nW h0 → PageAt large₂ C2 A2 → 4 * H.CK ≤ WeightFamilies.PPv D large₂ C2 A2 ^ 2 * D.R.f → ReciprocityTheory.ChartRestriction.G.PullbackSections.SupBoundPageRows D large₂ ka ∧ 16 ≤ D.R.f := by
+theorem pageRows_of_pageAt
+    : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ)
+        (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CR CT : ℝ)
+        (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ),
+      FamilyHypotheses.HypPage large₂ X H C2 A2 CR CT ka wL wF Tn nP nW h0 → PageAt large₂ C2 A2
+        → 4 * H.CK ≤ WeightFamilies.PPv D large₂ C2 A2 ^ 2 * D.R.f
+        → ReciprocityTheory.ChartRestriction.G.PullbackSections.SupBoundPageRows D large₂ ka
+          ∧ 16 ≤ D.R.f := by
   intro D B P j X large₂ H C2 A2 CR CT ka wL wF Tn nP nW h0 hp hPg hCK
   have hm4 := EtaleWeightGaps.lift_index_pow_four_le_degree hPg
   obtain ⟨Q, PT, -, hC, hA⟩ := hPg
-  have hPP : WeightFamilies.PPv D large₂ C2 A2 = PT.PP := by rw [← hC, ← hA]; exact WeightFamilies.PPv_rec PT
+  have hPP : WeightFamilies.PPv D large₂ C2 A2 = PT.PP := by
+    rw [← hC, ← hA]; exact WeightFamilies.PPv_rec PT
   obtain ⟨hA', hS, -, h4, -⟩ := hp
   obtain ⟨-, -, -, -, hg, -, -, hp1, hp2, -⟩ := hA'
   obtain ⟨hn, -, -, -, -, -, -, hsz, -, -, -, -, -, -, -, -, -, hT, -⟩ := hS
@@ -55,7 +65,8 @@ theorem pageRows_of_pageAt : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : Modul
   · linarith
   · have hs : 1 + (WeightAlgebra.DF ka : ℝ) ≤ ka.size := by
       unfold WeightFamilies.Wt.size WeightAlgebra.DF degP
-      have h2 : 0 ≤ (D.R.f : ℝ) * ((max (D.R.sigW j).2 1 : ℕ) : ℝ) * (D.R.r : ℝ) * (ka.n : ℝ) := by positivity
+      have h2 : 0 ≤ (D.R.f : ℝ) * ((max (D.R.sigW j).2 1 : ℕ) : ℝ) * (D.R.r : ℝ) * (ka.n : ℝ) := by
+        positivity
       push_cast at h2 ⊢
       linarith
     have hk0 : (0 : ℝ) ≤ D.R.k := Nat.cast_nonneg _
@@ -69,14 +80,17 @@ theorem pageRows_of_pageAt : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : Modul
       have : 0 ≤ PT.PP ^ 2 * D.R.f := by positivity
       linarith
     have h2 : H.CK * D.R.k ≤ PT.PP ^ 2 * D.R.f * D.R.r := mul_le_mul h1 hkr hk0 (by positivity)
-    have h3 : H.CK * D.R.k * D.R.f * large₂.sc.b ≤ PT.PP ^ 2 * D.R.f * D.R.r * D.R.f * large₂.sc.b := by gcongr
+    have h3
+        : H.CK * D.R.k * D.R.f * large₂.sc.b ≤ PT.PP ^ 2 * D.R.f * D.R.r * D.R.f * large₂.sc.b := by
+      gcongr
     have h4 := Real.log_le_log (by positivity) (hs.trans (hsz.trans h3))
     rw [Real.log_mul (by positivity) hb0.ne', Real.log_mul (by positivity) hf0.ne',
-      Real.log_mul (by positivity) hr0.ne', Real.log_mul (by positivity) hf0.ne', Real.log_pow, hb] at h4
+        Real.log_mul (by positivity) hr0.ne', Real.log_mul (by positivity) hf0.ne', Real.log_pow,
+        hb]
+      at h4
     push_cast at h4
     linarith
-  · have h1 : (ka.n : ℝ) ≤ (D.R.t : ℝ) ^ 2 := by
-      rw [hn]; unfold Ranks.nV; push_cast; nlinarith
+  · have h1 : (ka.n : ℝ) ≤ (D.R.t : ℝ) ^ 2 := by rw [hn]; unfold Ranks.nV; push_cast; nlinarith
     have h2 : (0 : ℝ) < ka.n := by rw [hn]; unfold Ranks.nV; push_cast; linarith
     have h3 := Real.log_le_log h2 h1
     rw [Real.log_pow] at h3

@@ -11,7 +11,11 @@ public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefiniti
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -21,14 +25,17 @@ section Root
 
 variable {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W] [CompleteSpace W]
 
-theorem exists_analytic_zero (f : W × ℂ → ℂ) (p : W × ℂ) (hf : AnalyticAt ℂ f p) (hp : f p = 0)
-    (hd : fderiv ℂ f p ((0 : W), (1 : ℂ)) ≠ 0) :
-    ∃ (U : Set W) (ε : ℝ) (r : W → ℂ), IsOpen U ∧ p.1 ∈ U ∧ 0 < ε ∧ AnalyticOnNhd ℂ r U ∧
-      ∀ w ∈ U, ∀ θ : ℂ, ‖θ - p.2‖ < ε → f (w, θ) = 0 → θ = r w := by
+theorem exists_analytic_zero
+    (f : W × ℂ → ℂ) (p : W × ℂ)
+    (hf : AnalyticAt ℂ f p) (hp : f p = 0) (hd : fderiv ℂ f p ((0 : W), (1 : ℂ)) ≠ 0)
+    : ∃ (U : Set W) (ε : ℝ) (r : W → ℂ),
+      IsOpen U ∧ p.1 ∈ U ∧ 0 < ε ∧ AnalyticOnNhd ℂ r U
+        ∧ ∀ w ∈ U, ∀ θ : ℂ, ‖θ - p.2‖ < ε → f (w, θ) = 0 → θ = r w := by
   set A := fderiv ℂ f p with hA
   let Lm : W × ℂ →L[ℂ] W × ℂ := (ContinuousLinearMap.fst ℂ W ℂ).prod A
   have hinj : Function.Injective Lm := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     rintro ⟨h, τ⟩ hv
     have h1 : h = 0 := congrArg Prod.fst hv
     have h2 : A (h, τ) = 0 := congrArg Prod.snd hv
@@ -40,14 +47,17 @@ theorem exists_analytic_zero (f : W × ℂ → ℂ) (p : W × ℂ) (hf : Analyti
   have hsurj : Function.Surjective Lm := by
     rintro ⟨u, c⟩
     refine ⟨(u, (c - A (u, 0)) / A ((0 : W), (1 : ℂ))), ?_⟩
-    have h3 : (u, (c - A (u, 0)) / A ((0 : W), (1 : ℂ))) =
-        (u, (0 : ℂ)) + ((c - A (u, 0)) / A ((0 : W), (1 : ℂ))) • ((0 : W), (1 : ℂ)) := by simp
+    have h3
+        : (u, (c - A (u, 0)) / A ((0 : W), (1 : ℂ)))
+          = (u, (0 : ℂ)) + ((c - A (u, 0)) / A ((0 : W), (1 : ℂ))) • ((0 : W), (1 : ℂ)) := by
+      simp
     refine Prod.ext rfl ?_
     show A _ = c
     rw [h3, map_add (f := _), map_smul, smul_eq_mul, div_mul_cancel₀ _ hd]
     ring
-  let Le := ContinuousLinearEquiv.ofBijective Lm (LinearMap.ker_eq_bot.mpr hinj)
-    (LinearMap.range_eq_top.mpr hsurj)
+  let Le :=
+    ContinuousLinearEquiv.ofBijective Lm (LinearMap.ker_eq_bot.mpr hinj)
+      (LinearMap.range_eq_top.mpr hsurj)
   have hLe : (Le : W × ℂ →L[ℂ] W × ℂ) = Lm := ContinuousLinearEquiv.coe_ofBijective _ _ _
   let φ : W × ℂ → W × ℂ := fun x => (x.1, f x)
   have hφ : HasStrictFDerivAt φ (Le : W × ℂ →L[ℂ] W × ℂ) p := by
@@ -65,7 +75,8 @@ theorem exists_analytic_zero (f : W × ℂ → ℂ) (p : W × ℂ) (hf : Analyti
   obtain ⟨U1, V1, hU1, hV1, hpU, hpV, hUV⟩ := isOpen_prod_iff.1 hS p.1 p.2 ⟨hpS, hT0p⟩
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.1 hV1 _ hpV
   have hΦp : Φ p = (p.1, 0) := by rw [hΦ, hp]
-  refine ⟨U1 ∩ {w | (w, (0 : ℂ)) ∈ Φ.target ∩ T0}, ε, fun w => (Φ.symm (w, 0)).2, ?_, ?_, hε, ?_, ?_⟩
+  refine
+    ⟨U1 ∩ {w | (w, (0 : ℂ)) ∈ Φ.target ∩ T0}, ε, fun w => (Φ.symm (w, 0)).2, ?_, ?_, hε, ?_, ?_⟩
   · exact hU1.inter ((Φ.open_target.inter hT0o).preimage (continuous_id.prodMk continuous_const))
   · refine ⟨hpU, ?_⟩
     show (p.1, (0 : ℂ)) ∈ Φ.target ∩ T0
@@ -85,14 +96,19 @@ theorem exists_analytic_zero (f : W × ℂ → ℂ) (p : W × ℂ) (hf : Analyti
     show θ = (Φ.symm (w, 0)).2
     rw [this]
 
-theorem exists_analytic_root (a : ℕ → W → ℂ) (n : ℕ) (w₀ : W) (θ₀ : ℂ)
-    (ha : ∀ e < n, AnalyticAt ℂ (a e) w₀)
+theorem exists_analytic_root
+    (a : ℕ → W → ℂ) (n : ℕ) (w₀ : W) (θ₀ : ℂ) (ha : ∀ e < n, AnalyticAt ℂ (a e) w₀)
     (h0 : (∑ e ∈ Finset.range n, Polynomial.C (a e w₀) * Polynomial.X ^ e).eval θ₀ = 0)
-    (h1 : (Polynomial.derivative (∑ e ∈ Finset.range n, Polynomial.C (a e w₀) * Polynomial.X ^ e)).eval θ₀ ≠ 0) :
-    ∃ (U : Set W) (ε : ℝ) (r : W → ℂ), IsOpen U ∧ w₀ ∈ U ∧ 0 < ε ∧ AnalyticOnNhd ℂ r U ∧
-      ∀ w ∈ U, ∀ θ : ℂ, ‖θ - θ₀‖ < ε →
-        (∑ e ∈ Finset.range n, Polynomial.C (a e w) * Polynomial.X ^ e).eval θ = 0 → θ = r w := by
-  let f : W × ℂ → ℂ := fun x => (∑ e ∈ Finset.range n, Polynomial.C (a e x.1) * Polynomial.X ^ e).eval x.2
+    (h1 : (Polynomial.derivative
+        (∑ e ∈ Finset.range n, Polynomial.C (a e w₀) * Polynomial.X ^ e)).eval θ₀
+      ≠ 0)
+    : ∃ (U : Set W) (ε : ℝ) (r : W → ℂ),
+      IsOpen U ∧ w₀ ∈ U ∧ 0 < ε ∧ AnalyticOnNhd ℂ r U
+        ∧ ∀ w ∈ U, ∀ θ : ℂ,
+          ‖θ - θ₀‖ < ε → (∑ e ∈ Finset.range n, Polynomial.C (a e w) * Polynomial.X ^ e).eval θ = 0
+            → θ = r w := by
+  let f : W × ℂ → ℂ := fun x =>
+    (∑ e ∈ Finset.range n, Polynomial.C (a e x.1) * Polynomial.X ^ e).eval x.2
   have hfe : f = fun x => ∑ e ∈ Finset.range n, a e x.1 * x.2 ^ e := by
     funext x
     simp [f, Polynomial.eval_finsetSum]
@@ -115,18 +131,30 @@ end Root
 
 section Fields
 
-theorem exists_sep_poly {Ω : Type} [Field Ω] [CharZero Ω] {L L' : IntermediateField ℚ Ω} (hle : L ≤ L')
-    (hpos : 0 < L.relfinrank L') {t : Ω} (ht : t ∈ L') :
-    ∃ μ A B : Polynomial Ω, (∀ e, μ.coeff e ∈ L) ∧ (∀ e, A.coeff e ∈ L) ∧ (∀ e, B.coeff e ∈ L) ∧
-      A * μ + B * Polynomial.derivative μ = 1 ∧ μ.eval t = 0 := by
+theorem exists_sep_poly
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {L L' : IntermediateField ℚ Ω} (hle : L ≤ L') (hpos : 0 < L.relfinrank L')
+    {t : Ω} (ht : t ∈ L')
+    : ∃ μ A B : Polynomial Ω,
+      (∀ e, μ.coeff e ∈ L) ∧ (∀ e, A.coeff e ∈ L) ∧ (∀ e, B.coeff e ∈ L)
+        ∧ A * μ + B * Polynomial.derivative μ = 1 ∧ μ.eval t = 0 := by
   rw [IntermediateField.relfinrank_eq_finrank_of_le hle] at hpos
-  have hfin : FiniteDimensional L (IntermediateField.extendScalars hle) := Module.finite_of_finrank_pos hpos
+  have hfin : FiniteDimensional L (IntermediateField.extendScalars hle) :=
+    Module.finite_of_finrank_pos hpos
   let t' : IntermediateField.extendScalars hle := ⟨t, ht⟩
   have hi : IsIntegral L t' := IsIntegral.of_finite L t'
   have hsep : (minpoly L t').Separable := (minpoly.irreducible hi).separable
   obtain ⟨a, b, hab⟩ := hsep
-  refine ⟨(minpoly L t').map (algebraMap L Ω), a.map (algebraMap L Ω), b.map (algebraMap L Ω),
-    fun e => ?_, fun e => ?_, fun e => ?_, ?_, ?_⟩
+  refine ⟨
+    (minpoly L t').map (algebraMap L Ω),
+    a.map (algebraMap L Ω),
+    b.map (algebraMap L Ω),
+    fun e => ?_,
+    fun e => ?_,
+    fun e => ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Polynomial.coeff_map]; exact SetLike.coe_mem _
   · rw [Polynomial.coeff_map]; exact SetLike.coe_mem _
   · rw [Polynomial.coeff_map]; exact SetLike.coe_mem _
@@ -141,11 +169,16 @@ end Fields
 
 section Forms
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
 
-theorem isMultiHomog_finset_prod {α : Type} (s : Finset α) (f : α → MRing ι) (a : α → K → ℕ)
-    (h : ∀ i ∈ s, IsMultiHomog (f i) (a i)) : IsMultiHomog (∏ i ∈ s, f i) (∑ i ∈ s, a i) := by
+theorem isMultiHomog_finset_prod
+    {α : Type}
+    (s : Finset α) (f : α → MRing ι) (a : α → K → ℕ) (h : ∀ i ∈ s, IsMultiHomog (f i) (a i))
+    : IsMultiHomog (∏ i ∈ s, f i) (∑ i ∈ s, a i) := by
   induction s using Finset.induction_on with
   | empty => simpa using (isMultiHomog_one : IsMultiHomog (1 : MRing ι) 0)
   | insert b s hb ih =>
@@ -153,8 +186,10 @@ theorem isMultiHomog_finset_prod {α : Type} (s : Finset α) (f : α → MRing �
     exact isMultiHomog_mul (h b (Finset.mem_insert_self _ _))
       (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem isMultiHomog_rename_block {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v) {f : MRing ι}
-    {a : K → ℕ} (hf : IsMultiHomog f a) : IsMultiHomog (rename v f : MRing ι') (Function.extend κ a 0) := by
+theorem isMultiHomog_rename_block
+    {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v)
+    {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    : IsMultiHomog (rename v f : MRing ι') (Function.extend κ a 0) := by
   intro m hm k'
   rw [support_rename_of_injective hv.2.1] at hm
   obtain ⟨m0, hm0, rfl⟩ := Finset.mem_image.mp hm
@@ -186,9 +221,10 @@ theorem isMultiHomog_rename_block {κ : K → K'} {v : (Σ k, ι k) → (Σ k, �
         refine ⟨i', ?_⟩
         have h2 : v ⟨k, g i'⟩ = v ⟨k, i⟩ := by rw [hg i', hi']
         exact eq_of_heq (Sigma.mk.inj (hv.2.1 h2)).2
-    calc ∑ i', (Finsupp.mapDomain v m0) ⟨κ k, i'⟩ = ∑ i', m0 ⟨k, g i'⟩ := by
-          refine Finset.sum_congr rfl fun i' _ => ?_
-          rw [← hg i', Finsupp.mapDomain_apply_of_injective hv.2.1]
+    calc
+      ∑ i', (Finsupp.mapDomain v m0) ⟨κ k, i'⟩ = ∑ i', m0 ⟨k, g i'⟩ := by
+        refine Finset.sum_congr rfl fun i' _ => ?_
+        rw [← hg i', Finsupp.mapDomain_apply_of_injective hv.2.1]
       _ = ∑ i, m0 ⟨k, i⟩ := hb.sum_comp fun i => m0 ⟨k, i⟩
   · rw [Function.extend_apply' _ _ _ (by simpa using hk)]
     refine Finset.sum_eq_zero fun i' _ => ?_
@@ -198,12 +234,14 @@ theorem isMultiHomog_rename_block {κ : K → K'} {v : (Σ k, ι k) → (Σ k, �
 
 abbrev ev (f : MRing ι) (w : (Σ k, ι k) → ℂ) : ℂ := eval w (map (Int.castRingHom ℂ) f)
 
-theorem ev_rename (z : (Σ k, ι' k) → ℂ) (v : (Σ k, ι k) → (Σ k, ι' k)) (s : MRing ι) :
-    ev (rename v s : MRing ι') z = ev s (z ∘ v) := by
+theorem ev_rename (z : (Σ k, ι' k) → ℂ) (v : (Σ k, ι k) → (Σ k, ι' k)) (s : MRing ι)
+    : ev (rename v s : MRing ι') z = ev s (z ∘ v) := by
   rw [ev, map_rename, eval_rename]
 
-theorem ev_ne_zero_of_orbit {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) {w w' : (Σ k, ι k) → ℂ}
-    (ho : SameOrbit w w') (h : ev f w ≠ 0) : ev f w' ≠ 0 := by
+theorem ev_ne_zero_of_orbit
+    {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    {w w' : (Σ k, ι k) → ℂ} (ho : SameOrbit w w') (h : ev f w ≠ 0)
+    : ev f w' ≠ 0 := by
   obtain ⟨c, -, rfl⟩ := ho
   intro h0
   apply h
@@ -211,17 +249,21 @@ theorem ev_ne_zero_of_orbit {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f 
 
 def fr (g h : MRing ι) (w : (Σ k, ι k) → ℂ) : ℂ := ev g w / ev h w
 
-theorem fr_orbit {g h : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (hh : IsMultiHomog h d)
-    {w w' : (Σ k, ι k) → ℂ} (ho : SameOrbit w w') : fr g h w = fr g h w' := by
+theorem fr_orbit
+    {g h : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (hh : IsMultiHomog h d)
+    {w w' : (Σ k, ι k) → ℂ} (ho : SameOrbit w w')
+    : fr g h w = fr g h w' := by
   obtain ⟨c, hc, rfl⟩ := ho
   have hu : (∏ k, c k ^ d k) ≠ 0 := Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hc k)
   rw [fr, fr, ev, ev, eval_smul_homog g d hg, eval_smul_homog h d hh, mul_div_mul_left _ _ hu]
 
-theorem exists_rep {Ω : Type} [Field Ω] [CharZero Ω] (y : (Σ k, ι k) → Ω) {c : Ω} (hc : c ∈ blockFnField y) :
-    ∃ (d : K → ℕ) (g h : MRing ι), IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval y h ≠ 0 ∧
-      aeval y g = c * aeval y h := by
-  have zero_rep : ∃ (d : K → ℕ) (g h : MRing ι), IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval y h ≠ 0 ∧
-      aeval y g = (0 : Ω) * aeval y h :=
+theorem exists_rep
+    {Ω : Type} [Field Ω] [CharZero Ω] (y : (Σ k, ι k) → Ω) {c : Ω} (hc : c ∈ blockFnField y)
+    : ∃ (d : K → ℕ) (g h : MRing ι),
+      IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval y h ≠ 0 ∧ aeval y g = c * aeval y h := by
+  have zero_rep
+      : ∃ (d : K → ℕ) (g h : MRing ι),
+        IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval y h ≠ 0 ∧ aeval y g = (0 : Ω) * aeval y h :=
     ⟨0, 0, 1, isMultiHomog_zero 0, isMultiHomog_one, by simp, by simp⟩
   unfold blockFnField at hc
   induction hc using IntermediateField.adjoin_induction with
@@ -245,8 +287,15 @@ theorem exists_rep {Ω : Type} [Field Ω] [CharZero Ω] (y : (Σ k, ι k) → Ω
   | add a b _ _ ha hb =>
     obtain ⟨d, g, h, hg, hh, hy, he⟩ := ha
     obtain ⟨d', g', h', hg', hh', hy', he'⟩ := hb
-    refine ⟨d + d', g * h' + g' * h, h * h', isMultiHomog_add (isMultiHomog_mul hg hh') ?_,
-      isMultiHomog_mul hh hh', ?_, ?_⟩
+    refine ⟨
+      d + d',
+      g * h' + g' * h,
+      h * h',
+      isMultiHomog_add (isMultiHomog_mul hg hh') ?_,
+      isMultiHomog_mul hh hh',
+      ?_,
+      ?_
+    ⟩
     · rw [add_comm d d']; exact isMultiHomog_mul hg' hh
     · rw [map_mul]; exact mul_ne_zero hy hy'
     · simp only [map_add (f := _), map_mul, he, he']; ring
@@ -268,32 +317,40 @@ end Forms
 
 section Values
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω]
   {x : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → ℂ}
 
-theorem isValueAt_finset_sum {α : Type} (s : Finset α) (f : α → Ω) (g : α → ℂ)
-    (h : ∀ a ∈ s, IsValueAt x (f a) z (g a)) : IsValueAt x (∑ a ∈ s, f a) z (∑ a ∈ s, g a) := by
+theorem isValueAt_finset_sum
+    {α : Type} (s : Finset α) (f : α → Ω) (g : α → ℂ) (h : ∀ a ∈ s, IsValueAt x (f a) z (g a))
+    : IsValueAt x (∑ a ∈ s, f a) z (∑ a ∈ s, g a) := by
   induction s using Finset.induction_on with
   | empty => simpa using ValRing.isValueAt_zero_self x z
   | insert a s ha ih =>
     rw [Finset.sum_insert ha, Finset.sum_insert ha]
-    exact isValueAt_add (h a (Finset.mem_insert_self _ _)) (ih fun b hb => h b (Finset.mem_insert_of_mem hb))
+    exact isValueAt_add (h a (Finset.mem_insert_self _ _))
+      (ih fun b hb => h b (Finset.mem_insert_of_mem hb))
 
-def PolyVal (x : (Σ k, ι k) → Ω) (z : (Σ k, ι k) → ℂ) (P : Polynomial Ω) (Q : Polynomial ℂ) : Prop :=
+def PolyVal (x : (Σ k, ι k) → Ω) (z : (Σ k, ι k) → ℂ) (P : Polynomial Ω) (Q : Polynomial ℂ)
+    : Prop :=
   ∀ e, IsValueAt x (P.coeff e) z (Q.coeff e)
 
-theorem PolyVal.add {P P' : Polynomial Ω} {Q Q' : Polynomial ℂ} (h : PolyVal x z P Q) (h' : PolyVal x z P' Q') :
-    PolyVal x z (P + P') (Q + Q') := fun e => by
+theorem PolyVal.add
+    {P P' : Polynomial Ω} {Q Q' : Polynomial ℂ} (h : PolyVal x z P Q) (h' : PolyVal x z P' Q')
+    : PolyVal x z (P + P') (Q + Q') := fun e => by
   rw [Polynomial.coeff_add, Polynomial.coeff_add]
   exact isValueAt_add (h e) (h' e)
 
-theorem PolyVal.mul {P P' : Polynomial Ω} {Q Q' : Polynomial ℂ} (h : PolyVal x z P Q) (h' : PolyVal x z P' Q') :
-    PolyVal x z (P * P') (Q * Q') := fun e => by
+theorem PolyVal.mul
+    {P P' : Polynomial Ω} {Q Q' : Polynomial ℂ} (h : PolyVal x z P Q) (h' : PolyVal x z P' Q')
+    : PolyVal x z (P * P') (Q * Q') := fun e => by
   rw [Polynomial.coeff_mul, Polynomial.coeff_mul]
   exact isValueAt_finset_sum _ _ _ fun a _ => isValueAt_mul (h a.1) (h' a.2)
 
-theorem PolyVal.derivative {P : Polynomial Ω} {Q : Polynomial ℂ} (h : PolyVal x z P Q) :
-    PolyVal x z (Polynomial.derivative P) (Polynomial.derivative Q) := fun e => by
+theorem PolyVal.derivative {P : Polynomial Ω} {Q : Polynomial ℂ} (h : PolyVal x z P Q)
+    : PolyVal x z (Polynomial.derivative P) (Polynomial.derivative Q) := fun e => by
   rw [Polynomial.coeff_derivative, Polynomial.coeff_derivative]
   refine isValueAt_mul (h (e + 1)) ?_
   simpa using isValueAt_intCast x z ((e : ℤ) + 1)
@@ -304,21 +361,27 @@ theorem polyVal_one : PolyVal x z (1 : Polynomial Ω) (1 : Polynomial ℂ) := fu
   · exact isValueAt_one_self x z
   · exact ValRing.isValueAt_zero_self x z
 
-theorem PolyVal.eval {P : Polynomial Ω} {Q : Polynomial ℂ} (h : PolyVal x z P Q) {t : Ω} {τ : ℂ}
-    (ht : IsValueAt x t z τ) : IsValueAt x (P.eval t) z (Q.eval τ) := by
+theorem PolyVal.eval
+    {P : Polynomial Ω} {Q : Polynomial ℂ} (h : PolyVal x z P Q)
+    {t : Ω} {τ : ℂ} (ht : IsValueAt x t z τ)
+    : IsValueAt x (P.eval t) z (Q.eval τ) := by
   have h1 : P.natDegree < P.natDegree + Q.natDegree + 1 := by omega
   have h2 : Q.natDegree < P.natDegree + Q.natDegree + 1 := by omega
   rw [Polynomial.eval_eq_sum_range' h1, Polynomial.eval_eq_sum_range' h2]
   exact isValueAt_finset_sum _ _ _ fun e _ => isValueAt_mul (h e) (isValueAt_pow ht e)
 
-theorem PolyVal.unique (hz : z ∈ mcPts (mCoordIdeal x)) {P : Polynomial Ω} {Q Q' : Polynomial ℂ}
-    (h : PolyVal x z P Q) (h' : PolyVal x z P Q') : Q = Q' :=
+theorem PolyVal.unique
+    (hz : z ∈ mcPts (mCoordIdeal x))
+    {P : Polynomial Ω} {Q Q' : Polynomial ℂ} (h : PolyVal x z P Q) (h' : PolyVal x z P Q')
+    : Q = Q' :=
   Polynomial.ext fun e => isValueAt_unique hz (h e) (h' e)
 
-theorem simple_root_value (hz : z ∈ mcPts (mCoordIdeal x)) {μ A B : Polynomial Ω} {Qμ QA QB : Polynomial ℂ}
-    (hμ : PolyVal x z μ Qμ) (hA : PolyVal x z A QA) (hB : PolyVal x z B QB)
-    (hid : A * μ + B * Polynomial.derivative μ = 1) {t : Ω} {τ : ℂ} (ht : IsValueAt x t z τ)
-    (hr : μ.eval t = 0) : Qμ.eval τ = 0 ∧ (Polynomial.derivative Qμ).eval τ ≠ 0 := by
+theorem simple_root_value
+    (hz : z ∈ mcPts (mCoordIdeal x))
+    {μ A B : Polynomial Ω} {Qμ QA QB : Polynomial ℂ} (hμ : PolyVal x z μ Qμ) (hA : PolyVal x z A QA)
+    (hB : PolyVal x z B QB) (hid : A * μ + B * Polynomial.derivative μ = 1)
+    {t : Ω} {τ : ℂ} (ht : IsValueAt x t z τ) (hr : μ.eval t = 0)
+    : Qμ.eval τ = 0 ∧ (Polynomial.derivative Qμ).eval τ ≠ 0 := by
   have h0 : Qμ.eval τ = 0 := by
     have := hμ.eval ht
     rw [hr] at this
@@ -334,36 +397,59 @@ end Values
 
 section Core
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)] {Ω : Type} [Field Ω]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+  {Ω : Type} [Field Ω]
   {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)}
 
-def IsRep (y : (Σ k, ι k) → Ω) (P : Polynomial Ω) (n : ℕ) (d : ℕ → K → ℕ) (g h : ℕ → MRing ι) : Prop :=
-  P.natDegree < n ∧ ∀ e, IsMultiHomog (g e) (d e) ∧ IsMultiHomog (h e) (d e) ∧ aeval y (h e) ≠ 0 ∧
-    aeval y (g e) = P.coeff e * aeval y (h e)
+def IsRep (y : (Σ k, ι k) → Ω) (P : Polynomial Ω) (n : ℕ) (d : ℕ → K → ℕ) (g h : ℕ → MRing ι)
+    : Prop :=
+  P.natDegree < n
+    ∧ ∀ e,
+      IsMultiHomog (g e) (d e) ∧ IsMultiHomog (h e) (d e) ∧ aeval y (h e) ≠ 0
+        ∧ aeval y (g e) = P.coeff e * aeval y (h e)
 
-theorem exists_isRep [CharZero Ω] (y : (Σ k, ι k) → Ω) {P : Polynomial Ω} (hP : ∀ e, P.coeff e ∈ blockFnField y) :
-    ∃ n d g h, IsRep y P n d g h := by
+theorem exists_isRep
+    [CharZero Ω] (y : (Σ k, ι k) → Ω) {P : Polynomial Ω} (hP : ∀ e, P.coeff e ∈ blockFnField y)
+    : ∃ n d g h, IsRep y P n d g h := by
   choose d g h a b c e using fun e => exists_rep y (hP e)
   exact ⟨P.natDegree + 1, d, g, h, Nat.lt_succ_self _, fun i => ⟨a i, b i, c i, e i⟩⟩
 
 def valPoly (n : ℕ) (g h : ℕ → MRing ι) (w : (Σ k, ι k) → ℂ) : Polynomial ℂ :=
   ∑ e ∈ Finset.range n, Polynomial.C (fr (g e) (h e) w) * Polynomial.X ^ e
 
-theorem isValueAt_of_rep (hv : IsBlockMap κ v) (x' : (Σ k, ι' k) → Ω) {d : K → ℕ} {g h : MRing ι} {c : Ω}
-    (hg : IsMultiHomog g d) (hh : IsMultiHomog h d) (hy : aeval (x' ∘ v) h ≠ 0)
-    (he : aeval (x' ∘ v) g = c * aeval (x' ∘ v) h) {z : (Σ k, ι' k) → ℂ} (hz : ev h (z ∘ v) ≠ 0) :
-    IsValueAt x' c z (fr g h (z ∘ v)) := by
-  refine ⟨Function.extend κ d 0, rename v g, rename v h, isMultiHomog_rename_block hv hg,
-    isMultiHomog_rename_block hv hh, ?_, ?_, ?_, ?_⟩
+theorem isValueAt_of_rep
+    (hv : IsBlockMap κ v)
+    (x' : (Σ k, ι' k) → Ω)
+    {d : K → ℕ} {g h : MRing ι} {c : Ω} (hg : IsMultiHomog g d) (hh : IsMultiHomog h d)
+    (hy : aeval (x' ∘ v) h ≠ 0) (he : aeval (x' ∘ v) g = c * aeval (x' ∘ v) h)
+    {z : (Σ k, ι' k) → ℂ} (hz : ev h (z ∘ v) ≠ 0)
+    : IsValueAt x' c z (fr g h (z ∘ v)) := by
+  refine ⟨
+    Function.extend κ d 0,
+    rename v g,
+    rename v h,
+    isMultiHomog_rename_block hv hg,
+    isMultiHomog_rename_block hv hh,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [aeval_rename]; exact hy
   · rw [aeval_rename, aeval_rename]; exact he
   · rw [← ev, ev_rename]; exact hz
   · rw [← ev, ← ev, ev_rename, ev_rename, fr]
 
-theorem polyVal_of_rep (hv : IsBlockMap κ v) (x' : (Σ k, ι' k) → Ω) {P : Polynomial Ω} {n : ℕ} {d : ℕ → K → ℕ}
-    {g h : ℕ → MRing ι} (hr : IsRep (x' ∘ v) P n d g h) {z : (Σ k, ι' k) → ℂ}
-    (hz : ∀ e < n, ev (h e) (z ∘ v) ≠ 0) : PolyVal x' z P (valPoly n g h (z ∘ v)) := fun e => by
+theorem polyVal_of_rep
+    (hv : IsBlockMap κ v)
+    (x' : (Σ k, ι' k) → Ω)
+    {P : Polynomial Ω} {n : ℕ} {d : ℕ → K → ℕ} {g h : ℕ → MRing ι} (hr : IsRep (x' ∘ v) P n d g h)
+    {z : (Σ k, ι' k) → ℂ} (hz : ∀ e < n, ev (h e) (z ∘ v) ≠ 0)
+    : PolyVal x' z P (valPoly n g h (z ∘ v)) := fun e => by
   have hc : (valPoly n g h (z ∘ v)).coeff e = if e < n then fr (g e) (h e) (z ∘ v) else 0 := by
     simp [valPoly, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow]
   by_cases he : e < n
@@ -374,23 +460,35 @@ theorem polyVal_of_rep (hv : IsBlockMap κ v) (x' : (Σ k, ι' k) → Ω) {P : P
     exact ValRing.isValueAt_zero_self _ _
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem ev_den {n : ℕ} {h : ℕ → MRing ι} {w : (Σ k, ι k) → ℂ} (H : ev (∏ e ∈ Finset.range n, h e) w ≠ 0) :
-    ∀ e < n, ev (h e) w ≠ 0 := fun e he hz => H (by
-  rw [ev, map_prod, map_prod]
-  exact Finset.prod_eq_zero (Finset.mem_range.2 he) hz)
+theorem ev_den
+    {n : ℕ} {h : ℕ → MRing ι} {w : (Σ k, ι k) → ℂ} (H : ev (∏ e ∈ Finset.range n, h e) w ≠ 0)
+    : ∀ e < n, ev (h e) w ≠ 0 := fun e he hz =>
+  H (by
+    rw [ev, map_prod, map_prod]
+    exact Finset.prod_eq_zero (Finset.mem_range.2 he) hz)
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem analyticAt_ev (f : MRing ι) (w : (Σ k, ι k) → ℂ) [Fintype (Σ k, ι k)] : AnalyticAt ℂ (ev f) w :=
+theorem analyticAt_ev (f : MRing ι) (w : (Σ k, ι k) → ℂ) [Fintype (Σ k, ι k)]
+    : AnalyticAt ℂ (ev f) w :=
   AnalyticOnNhd.eval_mvPolynomial _ w (Set.mem_univ _)
 
-theorem exists_good_form [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ k, ι' k) → Ω)
-    (hle : blockFnField (x' ∘ v) ≤ blockFnField x')
-    (hpos : 0 < (blockFnField (x' ∘ v)).relfinrank (blockFnField x')) {t : Ω} (ht : t ∈ blockFnField x') :
-    ∃ (E : MRing ι) (a : K → ℕ), IsMultiHomog E a ∧ aeval (x' ∘ v) E ≠ 0 ∧
-      ∀ b' ∈ mcPts (mCoordIdeal x'), ∀ wb, SameOrbit wb (b' ∘ v) → ev E wb ≠ 0 → ∀ τ₀, IsValueAt x' t b' τ₀ →
-        ∃ (U : Set ((Σ k, ι k) → ℂ)) (ε : ℝ) (r : ((Σ k, ι k) → ℂ) → ℂ), IsOpen U ∧ wb ∈ U ∧ 0 < ε ∧
-          AnalyticOnNhd ℂ r U ∧ ∀ b'' ∈ mcPts (mCoordIdeal x'), ∀ w' ∈ U, SameOrbit w' (b'' ∘ v) →
-            ∀ τ, IsValueAt x' t b'' τ → ‖τ - τ₀‖ < ε → τ = r w' := by
+theorem exists_good_form
+    [CharZero Ω]
+    (hv : IsBlockMap κ v)
+    (x' : (Σ k, ι' k) → Ω) (hle : blockFnField (x' ∘ v) ≤ blockFnField x')
+    (hpos : 0 < (blockFnField (x' ∘ v)).relfinrank (blockFnField x'))
+    {t : Ω} (ht : t ∈ blockFnField x')
+    : ∃ (E : MRing ι) (a : K → ℕ),
+      IsMultiHomog E a ∧ aeval (x' ∘ v) E ≠ 0
+        ∧ ∀ b' ∈ mcPts (mCoordIdeal x'), ∀ wb,
+          SameOrbit wb (b' ∘ v) → ev E wb ≠ 0
+            → ∀ τ₀,
+              IsValueAt x' t b' τ₀
+                → ∃ (U : Set ((Σ k, ι k) → ℂ)) (ε : ℝ) (r : ((Σ k, ι k) → ℂ) → ℂ),
+                  IsOpen U ∧ wb ∈ U ∧ 0 < ε ∧ AnalyticOnNhd ℂ r U
+                    ∧ ∀ b'' ∈ mcPts (mCoordIdeal x'), ∀ w' ∈ U,
+                      SameOrbit w' (b'' ∘ v)
+                        → ∀ τ, IsValueAt x' t b'' τ → ‖τ - τ₀‖ < ε → τ = r w' := by
   obtain ⟨μ, A, B, hμ, hA, hB, hid, hroot⟩ := exists_sep_poly hle hpos ht
   obtain ⟨n₁, d₁, g₁, h₁, r₁⟩ := exists_isRep _ hμ
   obtain ⟨n₂, d₂, g₂, h₂, r₂⟩ := exists_isRep _ hA
@@ -401,15 +499,22 @@ theorem exists_good_form [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ k, ι' k
   have mE := isMultiHomog_mul (isMultiHomog_mul m₁ m₂) m₃
   refine ⟨_, _, mE, ?_, ?_⟩
   · simp only [map_mul, map_prod]
-    exact mul_ne_zero (mul_ne_zero (Finset.prod_ne_zero_iff.2 fun e _ => (r₁.2 e).2.2.1)
-      (Finset.prod_ne_zero_iff.2 fun e _ => (r₂.2 e).2.2.1)) (Finset.prod_ne_zero_iff.2 fun e _ => (r₃.2 e).2.2.1)
+    exact mul_ne_zero
+      (mul_ne_zero (Finset.prod_ne_zero_iff.2 fun e _ => (r₁.2 e).2.2.1)
+        (Finset.prod_ne_zero_iff.2 fun e _ => (r₂.2 e).2.2.1))
+      (Finset.prod_ne_zero_iff.2 fun e _ => (r₃.2 e).2.2.1)
   intro b' hb' wb ho hE τ₀ hτ₀
   have hE' := ev_ne_zero_of_orbit mE ho hE
-  have split : ∀ {f₁ f₂ f₃ : MRing ι} {w : (Σ k, ι k) → ℂ}, ev (f₁ * f₂ * f₃) w ≠ 0 →
-      ev f₁ w ≠ 0 ∧ ev f₂ w ≠ 0 ∧ ev f₃ w ≠ 0 := fun {f₁ f₂ f₃ w} h => by
+  have split
+      : ∀ {f₁ f₂ f₃ : MRing ι} {w : (Σ k, ι k) → ℂ},
+        ev (f₁ * f₂ * f₃) w ≠ 0
+          → ev f₁ w ≠ 0 ∧ ev f₂ w ≠ 0 ∧ ev f₃ w ≠ 0 := fun {f₁ f₂ f₃ w} h => by
     have h' : ev f₁ w * ev f₂ w * ev f₃ w ≠ 0 := by simpa [ev] using h
-    exact ⟨left_ne_zero_of_mul (left_ne_zero_of_mul h'), right_ne_zero_of_mul (left_ne_zero_of_mul h'),
-      right_ne_zero_of_mul h'⟩
+    exact ⟨
+      left_ne_zero_of_mul (left_ne_zero_of_mul h'),
+      right_ne_zero_of_mul (left_ne_zero_of_mul h'),
+      right_ne_zero_of_mul h'
+    ⟩
   obtain ⟨e₁, e₂, e₃⟩ := split hE'
   have p₁ := polyVal_of_rep hv x' r₁ (ev_den e₁)
   have p₂ := polyVal_of_rep hv x' r₂ (ev_den e₂)
@@ -419,11 +524,22 @@ theorem exists_good_form [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ k, ι' k
     fun ho => Finset.sum_congr rfl fun e _ => by rw [fr_orbit (r₁.2 e).1 (r₁.2 e).2.1 ho]
   rw [← orb ho] at k₀ k₁
   have hw₁ := (split hE).1
-  obtain ⟨U, ε, r, hU, hw, hε, han, huniq⟩ := exists_analytic_root (fun e w => fr (g₁ e) (h₁ e) w) n₁ wb τ₀
-    (fun e he => (analyticAt_ev _ wb).div (analyticAt_ev _ wb) (ev_den hw₁ e he)) k₀ k₁
-  refine ⟨U ∩ {w | ev (∏ e ∈ Finset.range n₁, h₁ e) w ≠ 0}, ε, r,
-    hU.inter (isOpen_ne_fun (MvPolynomial.continuous_eval _) continuous_const), ⟨hw, hw₁⟩, hε,
-    han.mono Set.inter_subset_left, ?_⟩
+  obtain ⟨U, ε, r, hU, hw, hε, han, huniq⟩ :=
+    exists_analytic_root
+      (fun e w => fr (g₁ e) (h₁ e) w)
+      n₁ wb τ₀
+      (fun e he => (analyticAt_ev _ wb).div (analyticAt_ev _ wb) (ev_den hw₁ e he))
+      k₀ k₁
+  refine ⟨
+    U ∩ {w | ev (∏ e ∈ Finset.range n₁, h₁ e) w ≠ 0},
+    ε,
+    r,
+    hU.inter (isOpen_ne_fun (MvPolynomial.continuous_eval _) continuous_const),
+    ⟨hw, hw₁⟩,
+    hε,
+    han.mono Set.inter_subset_left,
+    ?_
+  ⟩
   intro b'' hb'' w' hw' ho' τ hτ hlt
   have p := polyVal_of_rep hv x' r₁ (ev_den (ev_ne_zero_of_orbit m₁ ho' hw'.2))
   have h0 := p.eval hτ
@@ -432,34 +548,52 @@ theorem exists_good_form [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ k, ι' k
   rw [← orb ho'] at h1
   exact huniq w' hw'.1 τ hlt h1
 
-theorem isValueAt_ratio (x : (Σ k, ι k) → Ω) {q m : Σ k, ι k} (hqm : q.1 = m.1) (hx : x m ≠ 0)
-    {z : (Σ k, ι k) → ℂ} (hz : z m ≠ 0) : IsValueAt x (x q / x m) z (z q / z m) := by
-  refine ⟨_, X q, X m, isMultiHomog_X_single q, ?_, by simpa using hx, ?_, by simpa using hz, by simp⟩
+theorem isValueAt_ratio
+    (x : (Σ k, ι k) → Ω)
+    {q m : Σ k, ι k} (hqm : q.1 = m.1) (hx : x m ≠ 0)
+    {z : (Σ k, ι k) → ℂ} (hz : z m ≠ 0)
+    : IsValueAt x (x q / x m) z (z q / z m) := by
+  refine
+    ⟨_, X q, X m, isMultiHomog_X_single q, ?_, by simpa using hx, ?_, by simpa using hz, by simp⟩
   · rw [hqm]; exact isMultiHomog_X_single m
   · simp [div_mul_cancel₀ _ hx]
 
-theorem coord_ne_zero {x : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal x))
-    {m : Σ k, ι k} (hm : z m ≠ 0) : x m ≠ 0 := fun h => hm (by
-  have h1 := eval_eq_zero_of_mem_mcPts hz
-    (mem_mCoordIdeal_of_aeval_eq_zero x (isMultiHomog_X_single m) (by simpa using h))
-  simpa using h1)
+theorem coord_ne_zero
+    {x : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal x))
+    {m : Σ k, ι k} (hm : z m ≠ 0)
+    : x m ≠ 0 := fun h =>
+  hm (by
+    have h1 :=
+      eval_eq_zero_of_mem_mcPts hz
+        (mem_mCoordIdeal_of_aeval_eq_zero x (isMultiHomog_X_single m) (by simpa using h))
+    simpa using h1)
 
 end Core
 
 section General
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)] {Ω : Type} [Field Ω]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+  {Ω : Type} [Field Ω]
   {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)}
 
-theorem exists_form_local_inverse [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ k, ι' k) → Ω)
-    (hle : blockFnField (x' ∘ v) ≤ blockFnField x')
-    (hpos : 0 < (blockFnField (x' ∘ v)).relfinrank (blockFnField x')) :
-    ∃ (D : MRing ι) (a : K → ℕ), IsMultiHomog D a ∧ aeval (x' ∘ v) D ≠ 0 ∧
-      ∀ b' ∈ mcPts (mCoordIdeal x'), ∀ wb, SameOrbit wb (b' ∘ v) → ev D wb ≠ 0 →
-        ∃ (V : Set ((Σ k, ι k) → ℂ)) (V' : Set ((Σ k, ι' k) → ℂ)) (s : ((Σ k, ι k) → ℂ) → (Σ k, ι' k) → ℂ),
-          IsOpen V ∧ wb ∈ V ∧ IsOpen V' ∧ b' ∈ V' ∧ AnalyticOnNhd ℂ s V ∧
-            ∀ b'' ∈ V' ∩ mcPts (mCoordIdeal x'), ∀ w' ∈ V, SameOrbit w' (b'' ∘ v) → SameOrbit (s w') b'' := by
+theorem exists_form_local_inverse
+    [CharZero Ω]
+    (hv : IsBlockMap κ v)
+    (x' : (Σ k, ι' k) → Ω) (hle : blockFnField (x' ∘ v) ≤ blockFnField x')
+    (hpos : 0 < (blockFnField (x' ∘ v)).relfinrank (blockFnField x'))
+    : ∃ (D : MRing ι) (a : K → ℕ),
+      IsMultiHomog D a ∧ aeval (x' ∘ v) D ≠ 0
+        ∧ ∀ b' ∈ mcPts (mCoordIdeal x'), ∀ wb,
+          SameOrbit wb (b' ∘ v) → ev D wb ≠ 0
+            → ∃ (V : Set ((Σ k, ι k) → ℂ)) (V' : Set ((Σ k, ι' k) → ℂ))
+                (s : ((Σ k, ι k) → ℂ) → (Σ k, ι' k) → ℂ),
+              IsOpen V ∧ wb ∈ V ∧ IsOpen V' ∧ b' ∈ V' ∧ AnalyticOnNhd ℂ s V
+                ∧ ∀ b'' ∈ V' ∩ mcPts (mCoordIdeal x'), ∀ w' ∈ V,
+                  SameOrbit w' (b'' ∘ v) → SameOrbit (s w') b'' := by
   let Pr := {r : (Σ k, ι' k) × (Σ k, ι' k) // r.1.1 = r.2.1 ∧ x' r.2 ≠ 0}
   have hmem : ∀ r : Pr, x' r.1.1 / x' r.1.2 ∈ blockFnField x' := fun r =>
     IntermediateField.subset_adjoin _ _ ⟨_, _, r.2.1, rfl⟩
@@ -469,9 +603,10 @@ theorem exists_form_local_inverse [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ
   · rw [map_prod]
     exact Finset.prod_ne_zero_iff.2 fun r _ => hE0 r
   intro b' hb' wb ho hD
-  have hD' : ∀ r, ev (E r) wb ≠ 0 := fun r h0 => hD (by
-    rw [ev, map_prod, map_prod]
-    exact Finset.prod_eq_zero (Finset.mem_univ r) h0)
+  have hD' : ∀ r, ev (E r) wb ≠ 0 := fun r h0 =>
+    hD (by
+      rw [ev, map_prod, map_prod]
+      exact Finset.prod_eq_zero (Finset.mem_univ r) h0)
   choose m hm using hb'.1
   have hxm : ∀ k, x' ⟨k, m k⟩ ≠ 0 := fun k => coord_ne_zero hb' (hm k)
   let c : (Σ k, ι' k) → (Σ k, ι' k) := fun q => ⟨q.1, m q.1⟩
@@ -479,13 +614,25 @@ theorem exists_form_local_inverse [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ
   have hval : ∀ q, IsValueAt x' (x' q / x' (c q)) b' (b' q / b' (c q)) := fun q =>
     isValueAt_ratio (q := q) (m := c q) x' rfl (hxm q.1) (hm q.1)
   choose U ε r hU hw hε han huniq using fun q => hE1 (pr q) b' hb' wb ho (hD' _) _ (hval q)
-  refine ⟨⋂ q, U q, {z | ∀ q, z (c q) ≠ 0 ∧ ‖z q / z (c q) - b' q / b' (c q)‖ < ε q}, fun w q => r q w,
-    isOpen_iInter_of_finite hU, Set.mem_iInter.2 hw, ?_, fun q => ⟨hm q.1, by simpa using hε q⟩, ?_, ?_⟩
+  refine ⟨
+    ⋂ q, U q,
+    {z | ∀ q, z (c q) ≠ 0 ∧ ‖z q / z (c q) - b' q / b' (c q)‖ < ε q},
+    fun w q => r q w,
+    isOpen_iInter_of_finite hU,
+    Set.mem_iInter.2 hw,
+    ?_,
+    fun q => ⟨hm q.1, by simpa using hε q⟩,
+    ?_,
+    ?_
+  ⟩
   · rw [isOpen_iff_mem_nhds]
     intro z hz
-    have h : ∀ q, ∀ᶠ z' in 𝓝 z, z' (c q) ≠ 0 ∧ ‖z' q / z' (c q) - b' q / b' (c q)‖ < ε q := fun q => by
-      have c1 : ContinuousAt (fun z' : (Σ k, ι' k) → ℂ => z' (c q)) z := (continuous_apply _).continuousAt
-      have c2 : ContinuousAt (fun z' : (Σ k, ι' k) → ℂ => z' q) z := (continuous_apply _).continuousAt
+    have h
+        : ∀ q, ∀ᶠ z' in 𝓝 z, z' (c q) ≠ 0 ∧ ‖z' q / z' (c q) - b' q / b' (c q)‖ < ε q := fun q => by
+      have c1 : ContinuousAt (fun z' : (Σ k, ι' k) → ℂ => z' (c q)) z :=
+        (continuous_apply _).continuousAt
+      have c2 : ContinuousAt (fun z' : (Σ k, ι' k) → ℂ => z' q) z :=
+        (continuous_apply _).continuousAt
       have c3 : ContinuousAt (fun z' : (Σ k, ι' k) → ℂ => ‖z' q / z' (c q) - b' q / b' (c q)‖) z :=
         ((c2.div c1 (hz q).1).sub continuousAt_const).norm
       exact (c1.eventually_ne (hz q).1).and (c3 (Iio_mem_nhds (hz q).2))
@@ -496,14 +643,17 @@ theorem exists_form_local_inverse [CharZero Ω] (hv : IsBlockMap κ v) (x' : (Σ
   · rintro b'' ⟨hb1, hb2⟩ w' hw' ho'
     refine ⟨fun k => (b'' ⟨k, m k⟩)⁻¹, fun k => inv_ne_zero (hb1 ⟨k, m k⟩).1, ?_⟩
     funext q
-    have hu := huniq q b'' hb2 w' (Set.mem_iInter.1 hw' q) ho' _
-      (isValueAt_ratio (q := q) (m := c q) x' rfl (hxm q.1) (hb1 q).1) (hb1 q).2
+    have hu :=
+      huniq q b'' hb2 w' (Set.mem_iInter.1 hw' q) ho' _
+        (isValueAt_ratio (q := q) (m := c q) x' rfl (hxm q.1) (hb1 q).1) (hb1 q).2
     exact hu.symm.trans (div_eq_inv_mul _ _)
 
-theorem aeval_eq_zero_of_mem {x : (Σ k, ι k) → Ω} {f : MRing ι} (hf : f ∈ mCoordIdeal x) : aeval x f = 0 := by
+theorem aeval_eq_zero_of_mem {x : (Σ k, ι k) → Ω} {f : MRing ι} (hf : f ∈ mCoordIdeal x)
+    : aeval x f = 0 := by
   have h : mConeMap x f = 0 := hf
-  have e : ((aeval (fun _ => (1 : Ω)) : MvPolynomial K Ω →ₐ[Ω] Ω).restrictScalars ℤ).comp (mConeMap x) =
-      aeval x := by
+  have e
+      : ((aeval (fun _ => (1 : Ω)) : MvPolynomial K Ω →ₐ[Ω] Ω).restrictScalars ℤ).comp (mConeMap x)
+        = aeval x := by
     apply MvPolynomial.algHom_ext
     intro p
     simp [mConeMap]
@@ -512,7 +662,23 @@ theorem aeval_eq_zero_of_mem {x : (Σ k, ι k) → Ω} {f : MRing ι} (hf : f �
 
 end General
 
-theorem main : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)] (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j) (Cv : FlagCover M' M) (d : ℕ), IsArithVar (mCoordIdeal y) (d + 2) → IsArithVar (mCoordIdeal y') (d + 2) → ∃ (D : MRing (baseIdx ι M.blk)) (a : NonPluckerBlocks M.blk → ℕ), IsMultiHomog D a ∧ D ∉ mCoordIdeal M.x ∧ ∀ b' ∈ mcPts (mCoordIdeal M'.x), ∀ wb, SameOrbit wb (b' ∘ Cv.v) → eval wb (map (Int.castRingHom ℂ) D) ≠ 0 → ∃ (V : Set ((Σ k, baseIdx ι M.blk k) → ℂ)) (V' : Set ((Σ k, baseIdx ι' M'.blk k) → ℂ)) (s : ((Σ k, baseIdx ι M.blk k) → ℂ) → (Σ k, baseIdx ι' M'.blk k) → ℂ), IsOpen V ∧ wb ∈ V ∧ IsOpen V' ∧ b' ∈ V' ∧ AnalyticOnNhd ℂ s V ∧ ∀ b'' ∈ V' ∩ mcPts (mCoordIdeal M'.x), ∀ w' ∈ V, SameOrbit w' (b'' ∘ Cv.v) → SameOrbit (s w') b'' := by
+theorem main
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
+        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
+        (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)]
+        (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j)
+        (Cv : FlagCover M' M) (d : ℕ),
+      IsArithVar (mCoordIdeal y) (d + 2) → IsArithVar (mCoordIdeal y') (d + 2)
+        → ∃ (D : MRing (baseIdx ι M.blk)) (a : NonPluckerBlocks M.blk → ℕ),
+          IsMultiHomog D a ∧ D ∉ mCoordIdeal M.x
+            ∧ ∀ b' ∈ mcPts (mCoordIdeal M'.x), ∀ wb,
+              SameOrbit wb (b' ∘ Cv.v) → eval wb (map (Int.castRingHom ℂ) D) ≠ 0
+                → ∃ (V : Set ((Σ k, baseIdx ι M.blk k) → ℂ))
+                    (V' : Set ((Σ k, baseIdx ι' M'.blk k) → ℂ))
+                    (s : ((Σ k, baseIdx ι M.blk k) → ℂ) → (Σ k, baseIdx ι' M'.blk k) → ℂ),
+                  IsOpen V ∧ wb ∈ V ∧ IsOpen V' ∧ b' ∈ V' ∧ AnalyticOnNhd ℂ s V
+                    ∧ ∀ b'' ∈ V' ∩ mcPts (mCoordIdeal M'.x), ∀ w' ∈ V,
+                      SameOrbit w' (b'' ∘ Cv.v) → SameOrbit (s w') b'' := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M K' _ ι' _ Φ' _ y' M' Cv d _ _
   have hle : blockFnField (M'.x ∘ Cv.v) ≤ blockFnField M'.x :=
     IntermediateField.adjoin_le_iff.2 (by

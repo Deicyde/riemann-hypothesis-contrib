@@ -28,32 +28,47 @@ private lemma curry_mp {ι : Type u_1} {κ : Type u_2} {X : Type} [Fintype ι] [
   rw [h]
   exact (MeasurableEquiv.curry ι κ X).map_map_symm
 
-theorem goal1 :
-  ∀ (ι : Type u_1) (κ : Type u_2) [inst : Fintype.{u_1} ι] [inst_1 : Fintype.{u_2} κ],
-  @MeasureTheory.MeasurePreserving.{max u_1 u_2, max u_1 u_2} (Prod.{u_1, u_2} ι κ → Complex) (ι → κ → Complex)
-    (@MeasureTheory.MeasureSpace.toMeasurableSpace.{max u_1 u_2} (Prod.{u_1, u_2} ι κ → Complex)
-      (@MeasureTheory.MeasureSpace.pi.{max u_1 u_2, 0} (Prod.{u_1, u_2} ι κ)
-        (@instFintypeProd.{u_1, u_2} ι κ inst inst_1) (fun (a : Prod.{u_1, u_2} ι κ) ↦ Complex)
-        fun (i : Prod.{u_1, u_2} ι κ) ↦
-        @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup instInnerProductSpaceRealComplex
-          Complex.instFiniteDimensionalReal Complex.measurableSpace Complex.borelSpace))
-    (@MeasureTheory.MeasureSpace.toMeasurableSpace.{max u_1 u_2} (ι → κ → Complex)
-      (@MeasureTheory.MeasureSpace.pi.{u_1, u_2} ι inst (fun (a : ι) ↦ κ → Complex) fun (i : ι) ↦
-        @MeasureTheory.MeasureSpace.pi.{u_2, 0} κ inst_1 (fun (a : κ) ↦ Complex) fun (i : κ) ↦
-          @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup instInnerProductSpaceRealComplex
-            Complex.instFiniteDimensionalReal Complex.measurableSpace Complex.borelSpace))
-    (@Function.curry.{u_1, u_2, 1} ι κ Complex)
-    (@MeasureTheory.MeasureSpace.volume.{max u_1 u_2} (Prod.{u_1, u_2} ι κ → Complex)
-      (@MeasureTheory.MeasureSpace.pi.{max u_1 u_2, 0} (Prod.{u_1, u_2} ι κ)
-        (@instFintypeProd.{u_1, u_2} ι κ inst inst_1) (fun (a : Prod.{u_1, u_2} ι κ) ↦ Complex)
-        fun (i : Prod.{u_1, u_2} ι κ) ↦
-        @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup instInnerProductSpaceRealComplex
-          Complex.instFiniteDimensionalReal Complex.measurableSpace Complex.borelSpace))
-    (@MeasureTheory.MeasureSpace.volume.{max u_1 u_2} (ι → κ → Complex)
-      (@MeasureTheory.MeasureSpace.pi.{u_1, u_2} ι inst (fun (a : ι) ↦ κ → Complex) fun (i : ι) ↦
-        @MeasureTheory.MeasureSpace.pi.{u_2, 0} κ inst_1 (fun (a : κ) ↦ Complex) fun (i : κ) ↦
-          @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup instInnerProductSpaceRealComplex
-            Complex.instFiniteDimensionalReal Complex.measurableSpace Complex.borelSpace)) := by
+theorem goal1
+    : ∀ (ι : Type u_1) (κ : Type u_2) [inst : Fintype.{u_1} ι] [inst_1 : Fintype.{u_2} κ],
+      @MeasureTheory.MeasurePreserving.{max u_1 u_2, max u_1 u_2} (Prod.{u_1, u_2} ι κ → Complex)
+        (ι → κ → Complex)
+        (@MeasureTheory.MeasureSpace.toMeasurableSpace.{max u_1 u_2} (Prod.{u_1, u_2} ι κ → Complex)
+          (@MeasureTheory.MeasureSpace.pi.{max u_1 u_2, 0} (Prod.{u_1, u_2} ι κ)
+            (@instFintypeProd.{u_1, u_2} ι κ inst inst_1)
+            (fun (a : Prod.{u_1, u_2} ι κ) ↦ Complex)
+            fun (i : Prod.{u_1, u_2} ι κ) ↦
+              @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup
+                instInnerProductSpaceRealComplex Complex.instFiniteDimensionalReal
+                Complex.measurableSpace Complex.borelSpace))
+        (@MeasureTheory.MeasureSpace.toMeasurableSpace.{max u_1 u_2} (ι → κ → Complex)
+          (@MeasureTheory.MeasureSpace.pi.{u_1, u_2} ι inst
+            (fun (a : ι) ↦ κ → Complex)
+            fun (i : ι) ↦
+              @MeasureTheory.MeasureSpace.pi.{u_2, 0} κ inst_1
+                (fun (a : κ) ↦ Complex)
+                fun (i : κ) ↦
+                  @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup
+                    instInnerProductSpaceRealComplex Complex.instFiniteDimensionalReal
+                    Complex.measurableSpace Complex.borelSpace))
+        (@Function.curry.{u_1, u_2, 1} ι κ Complex)
+        (@MeasureTheory.MeasureSpace.volume.{max u_1 u_2} (Prod.{u_1, u_2} ι κ → Complex)
+          (@MeasureTheory.MeasureSpace.pi.{max u_1 u_2, 0} (Prod.{u_1, u_2} ι κ)
+            (@instFintypeProd.{u_1, u_2} ι κ inst inst_1)
+            (fun (a : Prod.{u_1, u_2} ι κ) ↦ Complex)
+            fun (i : Prod.{u_1, u_2} ι κ) ↦
+              @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup
+                instInnerProductSpaceRealComplex Complex.instFiniteDimensionalReal
+                Complex.measurableSpace Complex.borelSpace))
+        (@MeasureTheory.MeasureSpace.volume.{max u_1 u_2} (ι → κ → Complex)
+          (@MeasureTheory.MeasureSpace.pi.{u_1, u_2} ι inst
+            (fun (a : ι) ↦ κ → Complex)
+            fun (i : ι) ↦
+              @MeasureTheory.MeasureSpace.pi.{u_2, 0} κ inst_1
+                (fun (a : κ) ↦ Complex)
+                fun (i : κ) ↦
+                  @measureSpaceOfInnerProductSpace.{0} Complex Complex.instNormedAddCommGroup
+                    instInnerProductSpaceRealComplex Complex.instFiniteDimensionalReal
+                    Complex.measurableSpace Complex.borelSpace)) := by
   intro ι κ _ _
   exact curry_mp _
 

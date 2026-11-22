@@ -10,17 +10,18 @@ open scoped ContDiff Topology
 
 namespace GlobalTheory
 
-theorem matrix_exists_sub_mem_trace_orthogonal {ι : Type} [Fintype ι] [DecidableEq ι]
-    (N : Submodule ℂ (Matrix ι ι ℂ)) (M : Matrix ι ι ℂ) :
-    ∃ M₀ : Matrix ι ι ℂ, M - M₀ ∈ N ∧ ∀ n ∈ N, (nᴴ * M₀).trace = 0 := by
-  let e : Matrix ι ι ℂ →ₗ[ℂ] EuclideanSpace ℂ (ι × ι) :=
-    { toFun := fun A => WithLp.toLp 2 (fun p : ι × ι => A p.1 p.2)
-      map_add' := fun A B => rfl
-      map_smul' := fun c A => rfl }
+theorem matrix_exists_sub_mem_trace_orthogonal
+    {ι : Type} [Fintype ι] [DecidableEq ι] (N : Submodule ℂ (Matrix ι ι ℂ)) (M : Matrix ι ι ℂ)
+    : ∃ M₀ : Matrix ι ι ℂ, M - M₀ ∈ N ∧ ∀ n ∈ N, (nᴴ * M₀).trace = 0 := by
+  let e : Matrix ι ι ℂ →ₗ[ℂ] EuclideanSpace ℂ (ι × ι) := {
+    toFun := fun A => WithLp.toLp 2 (fun p : ι × ι => A p.1 p.2)
+    map_add' := fun A B => rfl
+    map_smul' := fun c A => rfl
+  }
   have hin : ∀ A B : Matrix ι ι ℂ, inner ℂ (e A) (e B) = (Aᴴ * B).trace := by
     intro A B
-    simp only [e, LinearMap.coe_mk, AddHom.coe_mk, PiLp.inner_apply, Matrix.trace,
-      Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply, Fintype.sum_prod_type]
+    simp only [e, LinearMap.coe_mk, AddHom.coe_mk, PiLp.inner_apply, Matrix.trace, Matrix.diag,
+      Matrix.mul_apply, Matrix.conjTranspose_apply, Fintype.sum_prod_type]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     simp [mul_comm]
@@ -31,12 +32,13 @@ theorem matrix_exists_sub_mem_trace_orthogonal {ι : Type} [Fintype ι] [Decidab
   rw [← hin, map_sub, h, add_sub_cancel_left]
   exact (Submodule.mem_orthogonal _ _).1 hz _ ⟨n, hn, rfl⟩
 
-theorem matrix_commutant_lift_mod_stable :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S : Set (Matrix ι ι ℂ))
-      (N : Submodule ℂ (Matrix ι ι ℂ)), (∀ x ∈ S, xᴴ ∈ S) →
-      (∀ x ∈ S, ∀ y ∈ N, x * y - y * x ∈ N) → ∀ M : Matrix ι ι ℂ,
-      (∀ x ∈ S, x * M - M * x ∈ N) →
-      ∃ M₀ : Matrix ι ι ℂ, M - M₀ ∈ N ∧ ∀ x ∈ S, x * M₀ = M₀ * x := by
+theorem matrix_commutant_lift_mod_stable
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S : Set (Matrix ι ι ℂ))
+        (N : Submodule ℂ (Matrix ι ι ℂ)),
+      (∀ x ∈ S, xᴴ ∈ S) → (∀ x ∈ S, ∀ y ∈ N, x * y - y * x ∈ N)
+        → ∀ M : Matrix ι ι ℂ,
+          (∀ x ∈ S, x * M - M * x ∈ N)
+            → ∃ M₀ : Matrix ι ι ℂ, M - M₀ ∈ N ∧ ∀ x ∈ S, x * M₀ = M₀ * x := by
   intro ι _ _ S N hS hN M hM
   obtain ⟨M₀, h1, h2⟩ := matrix_exists_sub_mem_trace_orthogonal N M
   refine ⟨M₀, h1, fun x hx => ?_⟩

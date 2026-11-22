@@ -10,11 +10,14 @@ open GlobalTheory.LatHecke
 
 namespace GlobalTheory.LatHecke
 
-theorem sum_alt_card_subElem_ge : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K] (r : ℕ) (n : ℕ)
-    (L M : Lat O K r), 1 ≤ n → M ∈ subIdx n L →
-    ∑ k ∈ Finset.range (n + 1), (-1 : ℂ) ^ k * (qRes O : ℂ) ^ (k * (k - 1) / 2) *
-      (({M' | M' ∈ subElem k L ∧ M.1 ≤ M'.1} : Set (Lat O K r)).ncard : ℂ) = 0 := by
+theorem sum_alt_card_subElem_ge
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K] (r : ℕ)
+        (n : ℕ) (L M : Lat O K r),
+      1 ≤ n → M ∈ subIdx n L
+        → ∑ k ∈ Finset.range (n + 1), (-1 : ℂ) ^ k * (qRes O : ℂ) ^ (k * (k - 1) / 2) *
+            (({M' | M' ∈ subElem k L ∧ M.1 ≤ M'.1} : Set (Lat O K r)).ncard : ℂ)
+          = 0 := by
   intro O K _ _ _ _ _ _ _ r n L M hn hM
   classical
   set m := IsLocalRing.maximalIdeal O with hm
@@ -33,10 +36,11 @@ theorem sum_alt_card_subElem_ge : ∀ (O K : Type) [CommRing O] [IsDomain O] [Is
   have hq2 : 2 ≤ qRes O := two_le_qRes
   have hqn : 0 < qRes O ^ n := pow_pos (by omega) _
   have hcardV : Nat.card (L.1 ⧸ P) = A.toAddSubgroup.relIndex L.1.toAddSubgroup := rfl
-  have hmul := AddSubgroup.relIndex_mul_relIndex M.1.toAddSubgroup A.toAddSubgroup L.1.toAddSubgroup
-    ((Submodule.toAddSubgroup_le _ _).2 le_sup_left) ((Submodule.toAddSubgroup_le _ _).2 hAL)
-  have hdvd : Nat.card (L.1 ⧸ P) ∣ qRes O ^ n := ⟨M.1.toAddSubgroup.relIndex A.toAddSubgroup, by
-    rw [hcardV, mul_comm, hmul, hM.2]⟩
+  have hmul :=
+    AddSubgroup.relIndex_mul_relIndex M.1.toAddSubgroup A.toAddSubgroup L.1.toAddSubgroup
+      ((Submodule.toAddSubgroup_le _ _).2 le_sup_left) ((Submodule.toAddSubgroup_le _ _).2 hAL)
+  have hdvd : Nat.card (L.1 ⧸ P) ∣ qRes O ^ n :=
+    ⟨M.1.toAddSubgroup.relIndex A.toAddSubgroup, by rw [hcardV, mul_comm, hmul, hM.2]⟩
   haveI : Finite (L.1 ⧸ P) := Nat.finite_of_card_ne_zero (Nat.pos_of_dvd_of_pos hdvd hqn).ne'
   haveI : FiniteDimensional (IsLocalRing.ResidueField O) (L.1 ⧸ P) := Module.Finite.of_finite
   set d := Module.finrank (IsLocalRing.ResidueField O) (L.1 ⧸ P) with hd
@@ -48,9 +52,11 @@ theorem sum_alt_card_subElem_ge : ∀ (O K : Type) [CommRing O] [IsDomain O] [Is
     have h0' : d = 0 := by omega
     have h1 : A.toAddSubgroup.relIndex L.1.toAddSubgroup = 1 := by
       rw [← hcardV, hcardq, h0', pow_zero]
-    have h2 : L.1 ≤ M.1 ⊔ m • L.1 := (Submodule.toAddSubgroup_le _ _).1 (AddSubgroup.relIndex_eq_one.1 h1)
-    have h3 : L.1 ≤ M.1 := Submodule.le_of_le_smul_of_le_jacobson_bot L.2.fg
-      (by rw [hm, IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top]) h2
+    have h2 : L.1 ≤ M.1 ⊔ m • L.1 :=
+      (Submodule.toAddSubgroup_le _ _).1 (AddSubgroup.relIndex_eq_one.1 h1)
+    have h3 : L.1 ≤ M.1 :=
+      Submodule.le_of_le_smul_of_le_jacobson_bot L.2.fg
+        (by rw [hm, IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top]) h2
     have h4 : M.1.toAddSubgroup.relIndex L.1.toAddSubgroup = 1 :=
       AddSubgroup.relIndex_eq_one.2 ((Submodule.toAddSubgroup_le _ _).2 h3)
     rw [hM.2] at h4
@@ -78,8 +84,9 @@ theorem sum_alt_card_subElem_ge : ∀ (O K : Type) [CommRing O] [IsDomain O] [Is
     have h2 := Submodule.map_injective_of_injective L.1.injective_subtype h1
     have h3 := Submodule.comap_injective_of_surjective (Submodule.mkQ_surjective P) h2
     exact Submodule.restrictScalars_injective O k V h3
-  have hidx : ∀ W : Submodule k V,
-      (Φ W).toAddSubgroup.relIndex L.1.toAddSubgroup = qRes O ^ Module.finrank k (V ⧸ W) := by
+  have hidx
+      : ∀ W : Submodule k V,
+        (Φ W).toAddSubgroup.relIndex L.1.toAddSubgroup = qRes O ^ Module.finrank k (V ⧸ W) := by
     intro W
     change Nat.card (L.1 ⧸ (Φ W).comap L.1.subtype) = _
     rw [Submodule.comap_map_eq_of_injective L.1.injective_subtype,
@@ -88,8 +95,10 @@ theorem sum_alt_card_subElem_ge : ∀ (O K : Type) [CommRing O] [IsDomain O] [Is
       Nat.card_congr (Submodule.Quotient.restrictScalarsEquiv O W).toEquiv,
       Module.natCard_eq_pow_finrank (K := k)]
     rfl
-  have hset : ∀ j, ({M' | M' ∈ subElem j L ∧ M.1 ≤ M'.1} : Set (Lat O K r)) =
-      f '' {W | Module.finrank k (V ⧸ W) = j} := by
+  have hset
+      : ∀ j,
+        ({M' | M' ∈ subElem j L ∧ M.1 ≤ M'.1} : Set (Lat O K r))
+          = f '' {W | Module.finrank k (V ⧸ W) = j} := by
     intro j
     ext M'
     simp only [Set.mem_setOf_eq, Set.mem_image]
@@ -97,13 +106,14 @@ theorem sum_alt_card_subElem_ge : ∀ (O K : Type) [CommRing O] [IsDomain O] [Is
     · rintro ⟨⟨⟨hle, hi⟩, hmL⟩, hMM⟩
       set C := M'.1.comap L.1.subtype
       have hPC' : P ≤ C := Submodule.comap_mono (sup_le hMM hmL)
-      let Wk : Submodule k V :=
-        { (C.map P.mkQ).toAddSubmonoid with
-          smul_mem' := fun c x hx => by
-            obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective c
-            have e : (IsLocalRing.residue O a) • x = a • x := htor.mk_smul a x
-            rw [e]
-            exact (C.map P.mkQ).smul_mem a hx }
+      let Wk : Submodule k V := {
+        (C.map P.mkQ).toAddSubmonoid with
+        smul_mem' := fun c x hx => by
+          obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective c
+          have e : (IsLocalRing.residue O a) • x = a • x := htor.mk_smul a x
+          rw [e]
+          exact (C.map P.mkQ).smul_mem a hx
+      }
       have hWr : Wk.restrictScalars O = C.map P.mkQ := rfl
       have heq : Φ Wk = M'.1 := by
         change ((Wk.restrictScalars O).comap P.mkQ).map L.1.subtype = M'.1
@@ -114,27 +124,38 @@ theorem sum_alt_card_subElem_ge : ∀ (O K : Type) [CommRing O] [IsDomain O] [Is
       rw [heq, hi] at h
       exact (Nat.pow_right_injective hq2 h).symm
     · rintro ⟨W, hW, rfl⟩
-      exact ⟨⟨⟨hΦL W, (hidx W).trans (by rw [hW])⟩, le_trans le_sup_right (hΦA W)⟩,
-        le_trans le_sup_left (hΦA W)⟩
-  have hcount : ∀ j, (({M' | M' ∈ subElem j L ∧ M.1 ≤ M'.1} : Set (Lat O K r)).ncard : ℂ) =
-      (Nat.card {W : Submodule k V // Module.finrank k (V ⧸ W) = j} : ℂ) := by
+      exact ⟨
+        ⟨⟨hΦL W, (hidx W).trans (by rw [hW])⟩, le_trans le_sup_right (hΦA W)⟩,
+        le_trans le_sup_left (hΦA W)
+      ⟩
+  have hcount
+      : ∀ j,
+        (({M' | M' ∈ subElem j L ∧ M.1 ≤ M'.1} : Set (Lat O K r)).ncard : ℂ)
+          = (Nat.card {W : Submodule k V // Module.finrank k (V ⧸ W) = j} : ℂ) := by
     intro j
     rw [hset j, Set.ncard_image_of_injective _ hinj, ← Nat.card_coe_set_eq]
     rfl
   have hI := GlobalTheory.T.qBinomial_sum_card_quotient_subspaces k V 1
-  rw [Finset.prod_eq_zero (Finset.mem_range.2 (by rw [hdV]; omega : 0 < Module.finrank k V)) (by simp)] at hI
+  rw [Finset.prod_eq_zero (Finset.mem_range.2 (by rw [hdV]; omega : 0 < Module.finrank k V))
+      (by simp)]
+    at hI
   have hqk : (Nat.card k : ℂ) = (qRes O : ℂ) := rfl
   simp only [one_pow, mul_one, hqk, hdV] at hI
-  have hzero : ∀ x ∈ Finset.range (n + 1), x ∉ Finset.range (d + 1) →
-      (-1 : ℂ) ^ x * (qRes O : ℂ) ^ (x * (x - 1) / 2) *
-        (({M' | M' ∈ subElem x L ∧ M.1 ≤ M'.1} : Set (Lat O K r)).ncard : ℂ) = 0 := by
+  have hzero
+      : ∀ x ∈ Finset.range (n + 1),
+        x ∉ Finset.range (d + 1)
+          → (-1 : ℂ) ^ x * (qRes O : ℂ) ^ (x * (x - 1) / 2)
+              * (({M' | M' ∈ subElem x L ∧ M.1 ≤ M'.1} : Set (Lat O K r)).ncard : ℂ)
+            = 0 := by
     intro x _ hx
     rw [Finset.mem_range] at hx
     haveI : IsEmpty {W : Submodule k V // Module.finrank k (V ⧸ W) = x} :=
       ⟨fun ⟨W, hW⟩ => by have := Submodule.finrank_quotient_le W; rw [hdV] at this; omega⟩
     rw [hcount, Nat.card_of_isEmpty]
     simp
-  rw [← Finset.sum_subset (fun x hx => Finset.mem_range.2 (by have := Finset.mem_range.1 hx; omega)) hzero]
+  rw [← Finset.sum_subset
+    (fun x hx => Finset.mem_range.2 (by have := Finset.mem_range.1 hx; omega))
+    hzero]
   simp only [hcount]
   exact hI
 

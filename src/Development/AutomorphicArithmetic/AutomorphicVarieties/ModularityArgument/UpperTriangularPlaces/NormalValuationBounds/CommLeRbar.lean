@@ -6,10 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Z.Win
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Z.Win
 
-private theorem comm_le_fix {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] (F : IntermediateField k Ω)
-    (hF : IsAbelianGalois k F) : commutator (Ω ≃ₐ[k] Ω) ≤ F.fixingSubgroup := by
+private theorem comm_le_fix
+    {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω]
+    (F : IntermediateField k Ω) (hF : IsAbelianGalois k F)
+    : commutator (Ω ≃ₐ[k] Ω) ≤ F.fixingSubgroup := by
   haveI : Normal k F := IsGalois.to_normal
   rw [← IntermediateField.restrictNormalHom_ker]
   rw [commutator_def, Subgroup.commutator_le]
@@ -17,8 +22,11 @@ private theorem comm_le_fix {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] (F
   rw [MonoidHom.mem_ker, map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
   exact hF.toIsMulCommutative.is_comm.comm _ _
 
-private theorem comm_le_rbar {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
-    (D : Raw Ω c) (hD : D.Good) : commutator (G ℚ Ω) ≤ D.rbar.ker := by
+private theorem comm_le_rbar
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    {c : Coef l} (D : Raw Ω c) (hD : D.Good)
+    : commutator (G ℚ Ω) ≤ D.rbar.ker := by
   have hb := (UpperTheory.V.Ws.barFacts D hD).2.2.2.2.2.1
   intro g hg
   have h1 : g ∈ D.ξ.ker := Abelianization.commutator_subset_ker D.ξ hg

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.HasQIff
 @[expose] public section
 
 open NumberField UpperHalfPlane GlobalTheory.HilbFam GlobalTheory.QFam
-open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
+open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
+  (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
 open GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates (iterD partialD)
 open scoped Classical MatrixGroups nonZeroDivisors
 
@@ -16,9 +17,10 @@ open scoped Pointwise
 
 variable (E : Type) [Field E] [NumberField E]
 
-theorem mem_differentIdeal_iff_one (x : 𝓞 E) :
-    x ∈ differentIdeal ℤ (𝓞 E) ↔
-      ∀ y ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E), (x : E) * y ∈ (1 : Submodule (𝓞 E) E) := by
+theorem mem_differentIdeal_iff_one (x : 𝓞 E)
+    : x ∈ differentIdeal ℤ (𝓞 E)
+      ↔ ∀ y ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E),
+        (x : E) * y ∈ (1 : Submodule (𝓞 E) E) := by
   rw [← Submodule.mem_div_iff_forall_mul_mem, ← coeSubmodule_differentIdeal ℤ ℚ (L := E) (𝓞 E),
     IsLocalization.mem_coeSubmodule]
   constructor
@@ -28,10 +30,10 @@ theorem mem_differentIdeal_iff_one (x : 𝓞 E) :
     have : y = x := FaithfulSMul.algebraMap_injective (𝓞 E) E h
     exact this ▸ hy
 
-theorem galois_smul_mem_differentIdeal (σ : E ≃ₐ[ℚ] E) {x : 𝓞 E}
-    (hx : x ∈ differentIdeal ℤ (𝓞 E)) : σ • x ∈ differentIdeal ℤ (𝓞 E) := by
-  have hone : ∀ (τ : E ≃ₐ[ℚ] E) (a : E), a ∈ (1 : Submodule (𝓞 E) E) →
-      τ a ∈ (1 : Submodule (𝓞 E) E) := by
+theorem galois_smul_mem_differentIdeal (σ : E ≃ₐ[ℚ] E) {x : 𝓞 E} (hx : x ∈ differentIdeal ℤ (𝓞 E))
+    : σ • x ∈ differentIdeal ℤ (𝓞 E) := by
+  have hone
+      : ∀ (τ : E ≃ₐ[ℚ] E) (a : E), a ∈ (1 : Submodule (𝓞 E) E) → τ a ∈ (1 : Submodule (𝓞 E) E) := by
     intro τ a ha
     rw [Submodule.mem_one] at ha ⊢
     obtain ⟨b, rfl⟩ := ha
@@ -49,12 +51,13 @@ theorem galois_smul_mem_differentIdeal (σ : E ≃ₐ[ℚ] E) {x : 𝓞 E}
   rw [map_mul, AlgEquiv.apply_symm_apply] at this
   exact this
 
-theorem differentIdeal_pow_finrank_eq_span_discr :
-    ∀ (F : Type) [Field F] [NumberField F] [IsGalois ℚ F],
+theorem differentIdeal_pow_finrank_eq_span_discr
+    : ∀ (F : Type) [Field F] [NumberField F] [IsGalois ℚ F],
       differentIdeal ℤ (𝓞 F) ^ Module.finrank ℚ F = Ideal.span {((discr F : ℤ) : 𝓞 F)} := by
   intro E _ _ _
   classical
-  have hmap : Ideal.span {((discr E : ℤ) : 𝓞 E)} = (Ideal.span {discr E}).map (algebraMap ℤ (𝓞 E)) := by
+  have hmap
+      : Ideal.span {((discr E : ℤ) : 𝓞 E)} = (Ideal.span {discr E}).map (algebraMap ℤ (𝓞 E)) := by
     rw [Ideal.map_span, Set.image_singleton, eq_intCast]
   rw [hmap]
   set D := differentIdeal ℤ (𝓞 E) with hD
@@ -77,7 +80,8 @@ theorem differentIdeal_pow_finrank_eq_span_discr :
   obtain ⟨L, hL⟩ := Ideal.dvd_iff_le.mpr hle
   have h2 := congrArg Ideal.absNorm hL
   rw [Ideal.absNorm_algebraMap, map_mul, map_pow, hN, RingOfIntegers.rank,
-    Ideal.absNorm_span_singleton, Algebra.norm_self] at h2
+      Ideal.absNorm_span_singleton, Algebra.norm_self]
+    at h2
   have h0 : (discr E).natAbs ^ Module.finrank ℚ E ≠ 0 :=
     pow_ne_zero _ (Int.natAbs_ne_zero.mpr (discr_ne_zero E))
   have h3 : Ideal.absNorm L = 1 := by

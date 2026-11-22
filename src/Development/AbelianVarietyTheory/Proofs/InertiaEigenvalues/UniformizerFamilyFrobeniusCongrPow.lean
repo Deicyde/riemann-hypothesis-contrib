@@ -6,14 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffOf
 @[expose] public section
 
 noncomputable section
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
 open scoped Formalism.Per
 
 namespace GlobalTheory.CrysPrism
 
 section
-variable {l : ℕ} [hl : Fact l.Prime] {a : ℕ} [NeZero a] {O : Type} [CommRing O] [Algebra ℤ_[l] O]
-  (t : Wq l a →ₐ[ℤ_[l]] O) (K : Type) [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+variable
+  {l : ℕ} [hl : Fact l.Prime]
+  {a : ℕ} [NeZero a]
+  {O : Type} [CommRing O] [Algebra ℤ_[l] O]
+  (t : Wq l a →ₐ[ℤ_[l]] O)
+  (K : Type) [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
   (e : ℕ)
 
 theorem zero_mem_QSet_goodU : (0 : ZMod a → K⟦X⟧⟦X⟧) ∈ QSet t K e := by
@@ -23,8 +29,8 @@ theorem zero_mem_QSet_goodU : (0 : ZMod a → K⟦X⟧⟦X⟧) ∈ QSet t K e :=
   rw [coeff_ofW]
   simp
 
-theorem uPow_mem_QSet_goodU [CharZero K] (m : ℕ) :
-    (fun _ => C (X ^ m) : ZMod a → K⟦X⟧⟦X⟧) ∈ QSet t K e := by
+theorem uPow_mem_QSet_goodU [CharZero K] (m : ℕ)
+    : (fun _ => C (X ^ m) : ZMod a → K⟦X⟧⟦X⟧) ∈ QSet t K e := by
   refine ⟨fun p => if p = (0, m) then ((dpDen e 0 m : ℕ) : Wq l a) else 0, ?_⟩
   funext τ
   ext i n
@@ -44,7 +50,13 @@ theorem uPow_mem_QSet_goodU [CharZero K] (m : ℕ) :
 
 end
 
-theorem uFam_mem_GoodSet : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O] [Algebra ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] (t : Wq l a →ₐ[ℤ_[l]] O), ∀ (φ₂ : K⟦X⟧⟦X⟧ →+* K⟦X⟧⟦X⟧), (∀ f : K⟦X⟧, φ₂ (C f) = C (frob K l f)) → φ₂ X = (C X + X) ^ l - C (X ^ l) → uFam a K ∈ GoodSet t e φ₂ := by
+theorem uFam_mem_GoodSet
+    : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O]
+        [Algebra ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+        [NormedAlgebra ℚ_[l] K] (t : Wq l a →ₐ[ℤ_[l]] O),
+      ∀ (φ₂ : K⟦X⟧⟦X⟧ →+* K⟦X⟧⟦X⟧),
+        (∀ f : K⟦X⟧, φ₂ (C f) = C (frob K l f)) → φ₂ X = (C X + X) ^ l - C (X ^ l)
+          → uFam a K ∈ GoodSet t e φ₂ := by
   intro l _ a e _ _ O K _ _ _ _ _ _ _ t φ₂ hC _
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ_[l] K).injective
   have hf : frob2 φ₂ (uFam a K) = (fun _ => C (X ^ l) : ZMod a → K⟦X⟧⟦X⟧) := by

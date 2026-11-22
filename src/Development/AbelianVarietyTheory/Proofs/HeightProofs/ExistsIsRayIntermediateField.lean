@@ -19,20 +19,22 @@ public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.Finit
 
 set_option autoImplicit false
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj GlobalTheory.Mem GlobalTheory.FinalJoin GlobalTheory.FinalJoin2 GlobalTheory.FieldSize
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  GlobalTheory.Mem GlobalTheory.FinalJoin GlobalTheory.FinalJoin2 GlobalTheory.FieldSize
 open scoped IntermediateField
 
 namespace GlobalTheory.FieldSize.SmallField
 
-theorem exists_isRay_intermediateField (hR : GlobalTheory.NT.RayField) (K : IntermediateField ℚ ℂ) [NumberField K]
-    (𝔮 : Ideal (𝓞 K)) (h𝔮 : 𝔮 ≠ ⊥) :
-    ∃ (R : IntermediateField K ℂ) (_ : NumberField R) (_ : IsAbelianGalois K R), IsRay R 𝔮 := by
+theorem exists_isRay_intermediateField
+    (hR : GlobalTheory.NT.RayField)
+    (K : IntermediateField ℚ ℂ) [NumberField K]
+    (𝔮 : Ideal (𝓞 K)) (h𝔮 : 𝔮 ≠ ⊥)
+    : ∃ (R : IntermediateField K ℂ) (_ : NumberField R) (_ : IsAbelianGalois K R), IsRay R 𝔮 := by
   obtain ⟨M, _, _, _, hM⟩ := GlobalTheory.Mem.Fld.rayField_iff.1 hR K 𝔮 h𝔮
   have := hM.1
   let f : M →ₐ[K] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let e : M ≃ₐ[K] f.fieldRange := AlgEquiv.ofInjectiveField f
   have : FiniteDimensional K f.fieldRange := e.toLinearEquiv.finiteDimensional

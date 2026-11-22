@@ -8,20 +8,25 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeAt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+  GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.Ar.Flat.CPoint
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.CPoint
 
-theorem adaptedFamily_isBasis : ∀ (E : Type) [Field E] [NumberField E] (K W : Type) [Field K] [AddCommGroup W] [Module K W]
-    (ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)) (σ : E →+* K) (p q : ℕ) (v : Fin p → W) (w : Fin q → W)
-    (u : Fin (p + q) → W × Module.Dual K W),
-    IsAdapted ρH σ v w u → LinearIndependent K v → Module.finrank K (HT.eigSp ρH σ) = p + q →
-    FiniteDimensional K (HT.eigSp ρH σ) →
-    LinearIndependent K u ∧ Submodule.span K (Set.range u) = HT.eigSp ρH σ := by
+theorem adaptedFamily_isBasis
+    : ∀ (E : Type) [Field E] [NumberField E] (K W : Type) [Field K] [AddCommGroup W] [Module K W]
+        (ρH : 𝓞 E →+* Module.End K (W × Module.Dual K W)) (σ : E →+* K) (p q : ℕ) (v : Fin p → W)
+        (w : Fin q → W) (u : Fin (p + q) → W × Module.Dual K W),
+      IsAdapted ρH σ v w u → LinearIndependent K v → Module.finrank K (HT.eigSp ρH σ) = p + q
+        → FiniteDimensional K (HT.eigSp ρH σ)
+        → LinearIndependent K u ∧ Submodule.span K (Set.range u) = HT.eigSp ρH σ := by
   intro E _ _ K W _ _ _ ρH σ p q v w u hA hv hrank hfd
   obtain ⟨hmem, hfst, hsnd⟩ := hA
   have hz : ∀ j : Fin q, (u (Fin.natAdd p j)).1 = 0 := fun j => (hsnd j).1
@@ -35,10 +40,8 @@ theorem adaptedFamily_isBasis : ∀ (E : Type) [Field E] [NumberField E] (K W : 
       have := congrArg Prod.snd hg
       simpa [Prod.snd_sum] using this
     rw [Fin.sum_univ_add] at h1 h2
-    have h1' : ∑ i : Fin p, g (Fin.castAdd q i) • v i = 0 := by
-      simpa [hfst, hz] using h1
-    have hcast : ∀ i : Fin p, g (Fin.castAdd q i) = 0 :=
-      (Fintype.linearIndependent_iff.mp hv) _ h1'
+    have h1' : ∑ i : Fin p, g (Fin.castAdd q i) • v i = 0 := by simpa [hfst, hz] using h1
+    have hcast : ∀ i : Fin p, g (Fin.castAdd q i) = 0 := (Fintype.linearIndependent_iff.mp hv) _ h1'
     have h2' : ∑ j : Fin q, g (Fin.natAdd p j) • (u (Fin.natAdd p j)).2 = 0 := by
       simpa [hcast] using h2
     have hnat : ∀ j' : Fin q, g (Fin.natAdd p j') = 0 := by

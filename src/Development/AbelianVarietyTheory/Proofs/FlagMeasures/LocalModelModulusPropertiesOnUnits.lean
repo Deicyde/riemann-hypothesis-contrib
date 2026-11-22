@@ -11,7 +11,13 @@ open scoped Pointwise ENNReal Classical NNReal
 
 namespace GlobalTheory.ModuleUnits
 
-theorem modK_units : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → (∀ x y : E, IsUnit x → IsUnit y → M.modK (x * y) = M.modK x * M.modK y) ∧ (∀ x : E, IsUnit x → 0 < M.modK x ∧ M.modK (M.L.cj x) = M.modK x) ∧ ∀ x : E, x ∈ M.L.O → (∃ y ∈ M.L.O, x * y = 1) → M.modK x = 1 := by
+theorem modK_units
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → (∀ x y : E, IsUnit x → IsUnit y → M.modK (x * y) = M.modK x * M.modK y)
+          ∧ (∀ x : E, IsUnit x → 0 < M.modK x ∧ M.modK (M.L.cj x) = M.modK x)
+          ∧ ∀ x : E, x ∈ M.L.O → (∃ y ∈ M.L.O, x * y = 1) → M.modK x = 1 := by
   intro F _ _ _ E _ _ _ _ M hM
   obtain ⟨h1, h2, h3, h4, h5, hRc, hRo, hOc, hOo, -⟩ := GlobalTheory.SgLoc.Top.model_topology M hM
   have := hM.borel
@@ -56,8 +62,9 @@ theorem modK_units : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
       have h := hpre M.L.O
       rw [hφO] at h
       simp only [ENNReal.smul_def, smul_eq_mul] at h
-      calc _ = (addEquivAddHaarChar φ : ℝ≥0∞) * M.mu M.L.O / M.mu M.L.O :=
-            (ENNReal.mul_div_cancel_right hO0 hOt).symm
+      calc
+        _ = (addEquivAddHaarChar φ : ℝ≥0∞) * M.mu M.L.O / M.mu M.L.O :=
+          (ENNReal.mul_div_cancel_right hO0 hOt).symm
         _ = 1 := by rw [h, ENNReal.div_self hO0 hOt]
     let w : Eˣ := Units.map (M.L.cj : E →* E) u
     have hw : φ ⁻¹' (u • (M.L.O : Set E)) = w • (M.L.O : Set E) := by

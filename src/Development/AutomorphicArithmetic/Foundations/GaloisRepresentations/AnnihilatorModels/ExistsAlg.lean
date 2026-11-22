@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
@@ -26,13 +29,13 @@ private lemma exists_alg {κ B Λ : Type} [Field κ] [CommRing B] [Algebra κ B]
   refine ⟨{ toRingHom := φ.hom, commutes' := fun r => RingHom.congr_fun hφ r }, ?_⟩
   rfl
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.infE_of :
-    SplitAlg → InfE := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.infE_of : SplitAlg → InfE := by
   intro hS κ _ A _ P d hRep hcard Λ _ _ _ ε g hP hInf
   obtain ⟨B, _, _, hfin, hfree, hrank, i, hmono, hiff⟩ := hRep
   haveI : Mono i := hmono
-  have key : ∀ (Λ' : Type) [CommRing Λ'] [Algebra κ Λ'] (ν : B →ₐ[κ] Λ'),
-      spMap ν.toRingHom ≫ spMap (algebraMap κ B) = spMap (algebraMap κ Λ') := by
+  have key
+      : ∀ (Λ' : Type) [CommRing Λ'] [Algebra κ Λ'] (ν : B →ₐ[κ] Λ'),
+        spMap ν.toRingHom ≫ spMap (algebraMap κ B) = spMap (algebraMap κ Λ') := by
     intro Λ' _ _ ν
     dsimp only [spMap]
     rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
@@ -40,12 +43,13 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.infE_of :
     ext r
     simp
   have hid : spMap (algebraMap κ κ) = 𝟙 (Sp κ) := by simp [spMap]
-  let F : (B →ₐ[κ] κ) → { g // P (𝟙_ (Over (Sp κ))) g } := fun ν =>
-    ⟨Over.homMk (U := 𝟙_ (Over (Sp κ))) (V := algPt κ B) (spMap ν.toRingHom)
-        (by
-          show spMap ν.toRingHom ≫ spMap (algebraMap κ B) = 𝟙 _
-          rw [key κ ν, hid]) ≫ i,
-      (hiff _ _).1 ⟨_, rfl⟩⟩
+  let F : (B →ₐ[κ] κ) → {g // P (𝟙_ (Over (Sp κ))) g} := fun ν => ⟨
+    Over.homMk (U := 𝟙_ (Over (Sp κ))) (V := algPt κ B) (spMap ν.toRingHom) (by
+        show spMap ν.toRingHom ≫ spMap (algebraMap κ B) = 𝟙 _
+        rw [key κ ν, hid])
+      ≫ i,
+    (hiff _ _).1 ⟨_, rfl⟩
+  ⟩
   have hF : Function.Bijective F := by
     constructor
     · intro ν₁ ν₂ h
@@ -58,9 +62,10 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.infE_of :
       exact congrArg (fun φ => φ.hom x) h4
     · rintro ⟨g₀, hg₀⟩
       obtain ⟨y, hy⟩ := (hiff _ _).2 hg₀
-      obtain ⟨ν, hν⟩ := exists_alg (Λ := κ) y.left (by
-        rw [hid]
-        exact Over.w y)
+      obtain ⟨ν, hν⟩ :=
+        exists_alg (Λ := κ) y.left (by
+          rw [hid]
+          exact Over.w y)
       refine ⟨ν, Subtype.ext ?_⟩
       show _ ≫ i = g₀
       rw [← hy]

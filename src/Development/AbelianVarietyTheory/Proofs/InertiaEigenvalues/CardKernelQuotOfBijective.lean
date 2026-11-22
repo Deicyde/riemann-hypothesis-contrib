@@ -9,11 +9,12 @@ open GlobalTheory.UnitLemma GlobalTheory.StableLatCount Polynomial
 
 namespace GlobalTheory
 
-theorem card_kernel_quot_of_bijective (O : Type) [CommRing O] (P : Type) [AddCommGroup P]
-    [Module O P] (N : Submodule O P) (T : P →ₗ[O] P) (hT : Function.Bijective T)
-    (hN : ∀ x ∈ N, T x ∈ N) :
-    Nat.card {z : P ⧸ N // ∀ x : P, Submodule.Quotient.mk x = z → T x ∈ N} =
-      Nat.card (↥N ⧸ (N.map T).comap N.subtype) := by
+theorem card_kernel_quot_of_bijective
+    (O : Type) [CommRing O]
+    (P : Type) [AddCommGroup P] [Module O P]
+    (N : Submodule O P) (T : P →ₗ[O] P) (hT : Function.Bijective T) (hN : ∀ x ∈ N, T x ∈ N)
+    : Nat.card {z : P ⧸ N // ∀ x : P, Submodule.Quotient.mk x = z → T x ∈ N}
+      = Nat.card (↥N ⧸ (N.map T).comap N.subtype) := by
   let e : P ≃ₗ[O] P := LinearEquiv.ofBijective T hT
   have he1 : ∀ y, T (e.symm y) = y := fun y => e.apply_symm_apply y
   have he2 : ∀ x, e.symm (T x) = x := fun x => e.symm_apply_apply x
@@ -32,8 +33,8 @@ theorem card_kernel_quot_of_bijective (O : Type) [CommRing O] (P : Type) [AddCom
       show e.symm (T x) ∈ N
       rw [he2]
       exact hx
-  have hrange : ∀ z : P ⧸ N,
-      z ∈ LinearMap.range g ↔ ∀ x : P, Submodule.Quotient.mk x = z → T x ∈ N := by
+  have hrange
+      : ∀ z : P ⧸ N, z ∈ LinearMap.range g ↔ ∀ x : P, Submodule.Quotient.mk x = z → T x ∈ N := by
     intro z
     constructor
     · rintro ⟨⟨y, hy⟩, rfl⟩ x hx
@@ -48,11 +49,12 @@ theorem card_kernel_quot_of_bijective (O : Type) [CommRing O] (P : Type) [AddCom
       rw [hg]
       simp only
       rw [he2]
-  calc Nat.card {z : P ⧸ N // ∀ x : P, Submodule.Quotient.mk x = z → T x ∈ N}
-      = Nat.card (LinearMap.range g) :=
-        Nat.card_congr (Equiv.subtypeEquivRight (fun z => (hrange z).symm))
+  calc
+    Nat.card {z : P ⧸ N // ∀ x : P, Submodule.Quotient.mk x = z → T x ∈ N}
+        = Nat.card (LinearMap.range g) :=
+      Nat.card_congr (Equiv.subtypeEquivRight (fun z => (hrange z).symm))
     _ = Nat.card (↥N ⧸ LinearMap.ker g) := Nat.card_congr g.quotKerEquivRange.toEquiv.symm
     _ = Nat.card (↥N ⧸ (N.map T).comap N.subtype) :=
-        Nat.card_congr (Submodule.quotEquivOfEq _ _ hker).toEquiv
+      Nat.card_congr (Submodule.quotEquivOfEq _ _ hker).toEquiv
 
 end GlobalTheory

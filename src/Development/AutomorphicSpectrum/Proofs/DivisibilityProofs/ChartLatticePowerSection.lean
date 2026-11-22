@@ -11,13 +11,16 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.EffNm
 
-theorem exists_pow_mul_pow_mem {Ω : Type} [Field Ω] (R : Subalgebra ℤ Ω) {u g h : Ω}
-    (hu : u ∈ integralClosure R Ω) (hg : g ∈ R) (hh : h ∈ R) (e : u * h = g) :
-    ∃ M : ℕ, ∀ n : ℕ, h ^ M * u ^ n ∈ R := by
+theorem exists_pow_mul_pow_mem
+    {Ω : Type} [Field Ω]
+    (R : Subalgebra ℤ Ω)
+    {u g h : Ω} (hu : u ∈ integralClosure R Ω) (hg : g ∈ R) (hh : h ∈ R) (e : u * h = g)
+    : ∃ M : ℕ, ∀ n : ℕ, h ^ M * u ^ n ∈ R := by
   classical
   have hI : IsIntegral R u := hu
   obtain ⟨S, hS⟩ := hI.fg_adjoin_singleton
@@ -28,7 +31,8 @@ theorem exists_pow_mul_pow_mem {Ω : Type} [Field Ω] (R : Subalgebra ℤ Ω) {u
       rw [Set.mem_singleton_iff] at hx
       subst hx
       exact ⟨1, by rw [pow_one, mul_comm, e]; exact hg⟩
-    | algebraMap r => exact ⟨0, by simpa using r.2⟩
+    | algebraMap r =>
+      exact ⟨0, by simpa using r.2⟩
     | add x z _ _ ihx ihz =>
       obtain ⟨m₁, h₁⟩ := ihx
       obtain ⟨m₂, h₂⟩ := ihz
@@ -41,12 +45,11 @@ theorem exists_pow_mul_pow_mem {Ω : Type} [Field Ω] (R : Subalgebra ℤ Ω) {u
       obtain ⟨m₁, h₁⟩ := ihx
       obtain ⟨m₂, h₂⟩ := ihz
       refine ⟨m₁ + m₂, ?_⟩
-      have e' : h ^ (m₁ + m₂) * (x * z) = (h ^ m₁ * x) * (h ^ m₂ * z) := by
-        rw [pow_add]; ring
+      have e' : h ^ (m₁ + m₂) * (x * z) = (h ^ m₁ * x) * (h ^ m₂ * z) := by rw [pow_add]; ring
       rw [e']
       exact mul_mem h₁ h₂
-  have hfin : ∀ T : Finset Ω, (∀ x ∈ T, x ∈ Algebra.adjoin R {u}) →
-      ∃ M : ℕ, ∀ x ∈ T, h ^ M * x ∈ R := by
+  have hfin
+      : ∀ T : Finset Ω, (∀ x ∈ T, x ∈ Algebra.adjoin R {u}) → ∃ M : ℕ, ∀ x ∈ T, h ^ M * x ∈ R := by
     intro T
     induction T using Finset.induction_on with
     | empty => exact fun _ => ⟨0, by simp⟩
@@ -88,25 +91,43 @@ theorem exists_pow_mul_pow_mem {Ω : Type} [Field Ω] (R : Subalgebra ℤ Ω) {u
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
 
-theorem exists_form_at (y : (Σ k, ι k) → Ω) (a : K → ℤ) (s : Ω) (hb : Birational y)
-    (hs : s ∈ chartLatNm y a 1) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) :
-    ∃ (e : K → ℕ) (F : MRing ι), IsMultiHomog F e ∧ aeval y F ≠ 0 ∧
-      ∀ n : ℕ, aeval y F * s ^ n * ∏ k, y ⟨k, c k⟩ ^ (-((e k : ℤ) + n * a k)) ∈ chartRingZ y c := by
+theorem exists_form_at
+    (y : (Σ k, ι k) → Ω)
+    (a : K → ℤ) (s : Ω)
+    (hb : Birational y) (hs : s ∈ chartLatNm y a 1)
+    (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    : ∃ (e : K → ℕ) (F : MRing ι),
+      IsMultiHomog F e ∧ aeval y F ≠ 0
+        ∧ ∀ n : ℕ,
+          aeval y F * s ^ n * ∏ k, y ⟨k, c k⟩ ^ (-((e k : ℤ) + n * a k)) ∈ chartRingZ y c := by
   classical
   have hu := hs c hc
   set u : Ω := s * ∏ k, y ⟨k, c k⟩ ^ (-(((1 : ℕ) : ℤ) * a k)) with hudef
   obtain ⟨d, g, h, hg, hh, hh0, heq⟩ := hb u
-  have hG := (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.mem_chartLat_one y).1
-    (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_form (y := y) hg) c hc
-  have hH := (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.mem_chartLat_one y).1
-    (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_form (y := y) hh) c hc
+  have hG :=
+    (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.mem_chartLat_one y).1
+      (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_form (y := y) hg) c
+      hc
+  have hH :=
+    (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.mem_chartLat_one y).1
+      (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_form (y := y) hh) c
+      hc
   obtain ⟨M, hM⟩ := exists_pow_mul_pow_mem (chartRingZ y c) hu hG hH (by rw [heq]; ring)
-  refine ⟨M • d, h ^ M, ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_pow hh M, ?_, fun n => ?_⟩
+  refine ⟨
+    M • d,
+    h ^ M,
+    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_pow hh M,
+    ?_,
+    fun n => ?_
+  ⟩
   · rw [map_pow]; exact pow_ne_zero _ hh0
-  · have e' : aeval y (h ^ M) * s ^ n * ∏ k, y ⟨k, c k⟩ ^ (-((((M • d) k : ℕ) : ℤ) + n * a k)) =
-        (aeval y h * ∏ k, y ⟨k, c k⟩ ^ (-(d k : ℤ))) ^ M * u ^ n := by
-      have e2 : ∏ k, y ⟨k, c k⟩ ^ (-((((M • d) k : ℕ) : ℤ) + n * a k)) =
-          (∏ k, y ⟨k, c k⟩ ^ (-(d k : ℤ))) ^ M * (∏ k, y ⟨k, c k⟩ ^ (-(((1 : ℕ) : ℤ) * a k))) ^ n := by
+  · have e'
+        : aeval y (h ^ M) * s ^ n * ∏ k, y ⟨k, c k⟩ ^ (-((((M • d) k : ℕ) : ℤ) + n * a k))
+          = (aeval y h * ∏ k, y ⟨k, c k⟩ ^ (-(d k : ℤ))) ^ M * u ^ n := by
+      have e2
+          : ∏ k, y ⟨k, c k⟩ ^ (-((((M • d) k : ℕ) : ℤ) + n * a k))
+            = (∏ k, y ⟨k, c k⟩ ^ (-(d k : ℤ))) ^ M
+              * (∏ k, y ⟨k, c k⟩ ^ (-(((1 : ℕ) : ℤ) * a k))) ^ n := by
         rw [← Finset.prod_pow, ← Finset.prod_pow, ← Finset.prod_mul_distrib]
         refine Finset.prod_congr rfl fun k _ => ?_
         rw [← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, ← zpow_add₀ (hc k)]
@@ -123,45 +144,69 @@ end GlobalTheory.CompanionTheory.Ar.Top.EffNm
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-theorem exists_mul_pow_mem_chartLat_of_mem_chartLatNm :
-    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (y : (Σ k, ι k) → Ω) (d : ℕ) (a : K → ℤ) (s : Ω), IsArithVar (mCoordIdeal y) d → Birational y → s ∈ chartLatNm y a 1 → ∃ (b : K → ℤ) (c : Ω), c ≠ 0 ∧ ∀ n : ℕ, c * s ^ n ∈ chartLat y (b + (n : ℤ) • a) 1 := by
+theorem exists_mul_pow_mem_chartLat_of_mem_chartLatNm
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
+        (y : (Σ k, ι k) → Ω) (d : ℕ) (a : K → ℤ) (s : Ω),
+      IsArithVar (mCoordIdeal y) d → Birational y → s ∈ chartLatNm y a 1
+        → ∃ (b : K → ℤ) (c : Ω), c ≠ 0 ∧ ∀ n : ℕ, c * s ^ n ∈ chartLat y (b + (n : ℤ) • a) 1 := by
   intro K _ ι _ Ω _ y _ a s _ hb hs
   classical
-  have hex : ∀ c : ∀ k, ι k, ∃ (e : K → ℕ) (F : MRing ι), IsMultiHomog F e ∧ aeval y F ≠ 0 ∧
-      ((∀ k, y ⟨k, c k⟩ ≠ 0) → ∀ n : ℕ,
-        aeval y F * s ^ n * ∏ k, y ⟨k, c k⟩ ^ (-((e k : ℤ) + n * a k)) ∈ chartRingZ y c) := by
+  have hex
+      : ∀ c : ∀ k, ι k, ∃ (e : K → ℕ) (F : MRing ι),
+        IsMultiHomog F e ∧ aeval y F ≠ 0
+          ∧ ((∀ k, y ⟨k, c k⟩ ≠ 0)
+            → ∀ n : ℕ,
+              aeval y F * s ^ n * ∏ k, y ⟨k, c k⟩ ^ (-((e k : ℤ) + n * a k)) ∈ chartRingZ y c) := by
     intro c
     by_cases hc : ∀ k, y ⟨k, c k⟩ ≠ 0
     · obtain ⟨e, F, h1, h2, h3⟩ := EffNm.exists_form_at y a s hb hs c hc
       exact ⟨e, F, h1, h2, fun _ => h3⟩
-    · exact ⟨0, 1, ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_one, by simp, fun h => absurd h hc⟩
+    · exact ⟨
+        0,
+        1,
+        ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_one,
+        by simp,
+        fun h => absurd h hc
+      ⟩
   choose e F hF hF0 hFc using hex
-  refine ⟨∑ c, fun k => (e c k : ℤ), ∏ c, aeval y (F c),
-    Finset.prod_ne_zero_iff.2 fun c _ => hF0 c, fun n => ?_⟩
+  refine ⟨
+    ∑ c, fun k => (e c k : ℤ),
+    ∏ c, aeval y (F c),
+    Finset.prod_ne_zero_iff.2 fun c _ => hF0 c,
+    fun n => ?_
+  ⟩
   rw [GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.mem_chartLat_one]
   intro c₀ hc₀
-  have hP := (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.mem_chartLat_one y).1
-    (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_prod (y := y)
-      (Finset.univ.erase c₀) (fun c => aeval y (F c)) (fun c k => (e c k : ℤ))
-      (fun c _ => GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_form (y := y) (hF c)))
-    c₀ hc₀
+  have hP :=
+    (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.mem_chartLat_one y).1
+      (GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_prod (y := y)
+        (Finset.univ.erase c₀)
+        (fun c => aeval y (F c))
+        (fun c k => (e c k : ℤ))
+        (fun c _ =>
+          GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple.chartLat_form (y := y)
+            (hF c)))
+      c₀ hc₀
   have hQ := hFc c₀ hc₀ n
-  have e' : (∏ c, aeval y (F c)) * s ^ n *
-        ∏ k, y ⟨k, c₀ k⟩ ^ (-(((∑ c, fun k => (e c k : ℤ)) + (n : ℤ) • a) k)) =
-      (aeval y (F c₀) * s ^ n * ∏ k, y ⟨k, c₀ k⟩ ^ (-((e c₀ k : ℤ) + n * a k))) *
-        ((∏ c ∈ Finset.univ.erase c₀, aeval y (F c)) *
-          ∏ k, y ⟨k, c₀ k⟩ ^ (-((∑ c ∈ Finset.univ.erase c₀, fun k => (e c k : ℤ)) k))) := by
+  have e'
+      : (∏ c, aeval y (F c)) * s ^ n
+          * ∏ k, y ⟨k, c₀ k⟩ ^ (-(((∑ c, fun k => (e c k : ℤ)) + (n : ℤ) • a) k))
+        = (aeval y (F c₀) * s ^ n * ∏ k, y ⟨k, c₀ k⟩ ^ (-((e c₀ k : ℤ) + n * a k)))
+          * ((∏ c ∈ Finset.univ.erase c₀, aeval y (F c))
+            * ∏ k, y ⟨k, c₀ k⟩ ^ (-((∑ c ∈ Finset.univ.erase c₀, fun k => (e c k : ℤ)) k))) := by
     have e1 : ∏ c, aeval y (F c) = aeval y (F c₀) * ∏ c ∈ Finset.univ.erase c₀, aeval y (F c) :=
       (Finset.mul_prod_erase _ _ (Finset.mem_univ c₀)).symm
-    have e2 : ∏ k, y ⟨k, c₀ k⟩ ^ (-(((∑ c, fun k => (e c k : ℤ)) + (n : ℤ) • a) k)) =
-        (∏ k, y ⟨k, c₀ k⟩ ^ (-((e c₀ k : ℤ) + n * a k))) *
-          ∏ k, y ⟨k, c₀ k⟩ ^ (-((∑ c ∈ Finset.univ.erase c₀, fun k => (e c k : ℤ)) k)) := by
+    have e2
+        : ∏ k, y ⟨k, c₀ k⟩ ^ (-(((∑ c, fun k => (e c k : ℤ)) + (n : ℤ) • a) k))
+          = (∏ k, y ⟨k, c₀ k⟩ ^ (-((e c₀ k : ℤ) + n * a k)))
+            * ∏ k, y ⟨k, c₀ k⟩ ^ (-((∑ c ∈ Finset.univ.erase c₀, fun k => (e c k : ℤ)) k)) := by
       rw [← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun k _ => ?_
       rw [← zpow_add₀ (hc₀ k)]
       congr 1
-      have e3 : (∑ c, fun k => (e c k : ℤ)) =
-          (fun k => (e c₀ k : ℤ)) + ∑ c ∈ Finset.univ.erase c₀, fun k => (e c k : ℤ) :=
+      have e3
+          : (∑ c, fun k => (e c k : ℤ))
+            = (fun k => (e c₀ k : ℤ)) + ∑ c ∈ Finset.univ.erase c₀, fun k => (e c k : ℤ) :=
         (Finset.add_sum_erase _ _ (Finset.mem_univ c₀)).symm
       rw [e3]
       simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]

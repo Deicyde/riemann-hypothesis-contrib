@@ -19,10 +19,12 @@ theorem normLoc_of_card (hC : CardStep) : St.NormLoc := normLoc_of modulus_mul_c
 
 theorem modulus_eq_finitePlace : St.NormLoc := normLoc_of_card card_quotient_eq_absNorm
 
-theorem modF_localization_eq_adicAbv {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
-    (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) [IsNonarchimedeanLocalField L.Fp] (z : F) :
-    modF L.Fp (L.ιF z) = NumberField.HeightOneSpectrum.adicAbv F p z :=
+theorem modF_localization_eq_adicAbv
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
+    (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) [IsNonarchimedeanLocalField L.Fp]
+    (z : F)
+    : modF L.Fp (L.ιF z) = NumberField.HeightOneSpectrum.adicAbv F p z :=
   modF_locAt modulus_mul_card_quotient card_quotient_eq_absNorm L z
 
 end PI.ProdFormulaE

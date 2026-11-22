@@ -14,5 +14,10 @@ open GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.KZ GlobalTheory.FN
 open ReciprocityTheory.ChartRestriction.L1 (DD jT IsMF)
 open ModularForm (E₄ E₆)
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.modularFunctionFractionField_nonempty : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ), Nonempty (Frac Ω ε) := by
-  first | exact @GlobalTheory.FN.frac_nonempty | exact GlobalTheory.FN.frac_nonempty | (intros; apply GlobalTheory.FN.frac_nonempty <;> assumption)
+theorem _root_.GlobalTheory.T.modularFunctionFractionField_nonempty
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ),
+      Nonempty (Frac Ω ε) := by
+  first
+  | exact @GlobalTheory.FN.frac_nonempty
+  | exact GlobalTheory.FN.frac_nonempty
+  | (intros; apply GlobalTheory.FN.frac_nonempty <;> assumption)

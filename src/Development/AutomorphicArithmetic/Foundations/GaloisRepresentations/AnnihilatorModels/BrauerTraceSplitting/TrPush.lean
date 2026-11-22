@@ -9,7 +9,8 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV CrystallineSemistableComparison UpperTheory.Ru.crystallineComparison UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  CrystallineSemistableComparison UpperTheory.Ru.crystallineComparison UpperTheory.Gal.G3
 
 namespace UpperTheory.Gal.crystallineComparison.Br
 

@@ -4,4 +4,5 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-noncomputable abbrev UpperTheory.V.W.UniversalOrdinaryDeterminantRing.arithmeticPointPurityDense := @UpperTheory.GalN.V.ArithmeticPointDecomposition
+noncomputable abbrev UpperTheory.V.W.UniversalOrdinaryDeterminantRing.arithmeticPointPurityDense :=
+  @UpperTheory.GalN.V.ArithmeticPointDecomposition

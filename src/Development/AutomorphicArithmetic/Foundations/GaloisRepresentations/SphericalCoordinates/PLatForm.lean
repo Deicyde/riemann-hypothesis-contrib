@@ -4,23 +4,28 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem nsmul_canc {V : Type} [AddCommGroup V] [Module ℚ V] {a : ℕ} (ha : a ≠ 0) {x y : V}
-    (h : a • x = a • y) : x = y := by
+private theorem nsmul_canc
+    {V : Type} [AddCommGroup V] [Module ℚ V] {a : ℕ} (ha : a ≠ 0) {x y : V} (h : a • x = a • y)
+    : x = y := by
   have ha' : (a : ℚ) ≠ 0 := by exact_mod_cast ha
   have h' : (a : ℚ) • x = (a : ℚ) • y := by
     rw [Nat.cast_smul_eq_nsmul, Nat.cast_smul_eq_nsmul]; exact h
   exact (smul_right_injective V ha') h'
 
-private theorem ext_lin {Λ V V' : Type} [AddCommGroup Λ] [AddCommGroup V] [AddCommGroup V'] [Module ℚ V]
-    [Module ℚ V'] (j : Λ →+ V) (hj : Function.Injective j)
-    (hs : ∀ v, ∃ (m : ℕ) (u : Λ), m ≠ 0 ∧ m • v = j u) (f : Λ →+ V') :
-    ∃ A : V →ₗ[ℚ] V', ∀ u, A (j u) = f u := by
+private theorem ext_lin
+    {Λ V V' : Type} [AddCommGroup Λ] [AddCommGroup V] [AddCommGroup V'] [Module ℚ V] [Module ℚ V']
+    (j : Λ →+ V) (hj : Function.Injective j) (hs : ∀ v, ∃ (m : ℕ) (u : Λ), m ≠ 0 ∧ m • v = j u)
+    (f : Λ →+ V')
+    : ∃ A : V →ₗ[ℚ] V', ∀ u, A (j u) = f u := by
   choose m u hm hu using hs
   let g : V → V' := fun v => ((m v : ℚ))⁻¹ • f (u v)
   have hg : ∀ v, m v • g v = f (u v) := by
@@ -39,16 +44,16 @@ private theorem ext_lin {Λ V V' : Type} [AddCommGroup Λ] [AddCommGroup V] [Add
     have h12 : m v₁ * m v₂ ≠ 0 := mul_ne_zero (hm _) (hm _)
     apply nsmul_canc h12
     rw [key (m v₁ * m v₂) (m v₂ • u v₁ + m v₁ • u v₂) (v₁ + v₂) h12 ?_]
-    · rw [map_add (f := _), map_nsmul, map_nsmul, smul_add, ← hg v₁, ← hg v₂, smul_smul, smul_smul, mul_comm (m v₂),
-        mul_comm (m v₁) (m v₂)]
-    · rw [map_add (f := _), map_nsmul, map_nsmul, ← hu v₁, ← hu v₂, smul_add, smul_smul, smul_smul, mul_comm (m v₂)]
+    · rw [map_add (f := _), map_nsmul, map_nsmul, smul_add, ← hg v₁, ← hg v₂, smul_smul, smul_smul,
+        mul_comm (m v₂), mul_comm (m v₁) (m v₂)]
+    · rw [map_add (f := _), map_nsmul, map_nsmul, ← hu v₁, ← hu v₂, smul_add, smul_smul, smul_smul,
+        mul_comm (m v₂)]
   refine ⟨(AddMonoidHom.mk' g hadd).toRatLinearMap, fun x => ?_⟩
   show g (j x) = f x
   have h1 : (1 : ℕ) • g (j x) = f x := key 1 x (j x) one_ne_zero (one_nsmul _)
   simpa using h1
 
-theorem UpperTheory.Gal.W2.latForm_of :
-    UpperTheory.Gal.W2.LatForm := by
+theorem UpperTheory.Gal.W2.latForm_of : UpperTheory.Gal.W2.LatForm := by
   intro p _ D G L β β' D' D'' j j'' hP hP'' w m hm hw
   obtain ⟨hj, hjO, hjs, s₀, hs₀, hjF⟩ := hP
   obtain ⟨hj2, hjO2, hjs2, s₂, hs₂, hjF2⟩ := hP''
@@ -81,7 +86,9 @@ theorem UpperTheory.Gal.W2.latForm_of :
     obtain ⟨a, u, ha, hu⟩ := hjs2 v
     apply nsmul_canc ha
     show a • A (actQ D b v) = a • actQ D b (A v)
-    calc a • A (actQ D b v) = A (actQ D b (a • v)) := by rw [map_nsmul, map_nsmul]
+    calc
+      a • A (actQ D b v)
+        = A (actQ D b (a • v)) := by rw [map_nsmul, map_nsmul]
       _ = A (j'' (b • u)) := by rw [hu, hjO2]
       _ = j (w (b • u)) := hA _
       _ = j (b • w u) := by rw [map_smul]
@@ -90,7 +97,9 @@ theorem UpperTheory.Gal.W2.latForm_of :
       _ = a • actQ D b (A v) := by rw [map_nsmul, map_nsmul]
   have hBcomm : ∀ b, B * actQ D b = actQ D b * B := by
     intro b
-    calc B * actQ D b = B * actQ D b * (A * B) := by rw [hAB, _root_.mul_one]
+    calc
+      B * actQ D b
+        = B * actQ D b * (A * B) := by rw [hAB, _root_.mul_one]
       _ = B * (actQ D b * A) * B := by simp only [_root_.mul_assoc]
       _ = B * (A * actQ D b) * B := by rw [hcomm]
       _ = (B * A) * actQ D b * B := by simp only [_root_.mul_assoc]
@@ -100,8 +109,10 @@ theorem UpperTheory.Gal.W2.latForm_of :
   have hxx' : x * x' = 1 := L.rep_inj (by rw [map_mul, hx, hx', hAB, map_one])
   have hx'x : x' * x = 1 := L.rep_inj (by rw [map_mul, hx, hx', hBA, map_one])
   let y : G.Cˣ := ⟨x, x', hxx', hx'x⟩
-  have hform : ∀ v v', s₀ * D.EF.baseChange ℚ (L.rep ((β⁻¹ : G.Cˣ) : G.C) (A v)) (A v') =
-      (m : ℚ) * s₂ * D.EF.baseChange ℚ (L.rep ((β'⁻¹ : G.Cˣ) : G.C) v) v' := by
+  have hform
+      : ∀ v v',
+        s₀ * D.EF.baseChange ℚ (L.rep ((β⁻¹ : G.Cˣ) : G.C) (A v)) (A v')
+          = (m : ℚ) * s₂ * D.EF.baseChange ℚ (L.rep ((β'⁻¹ : G.Cˣ) : G.C) v) v' := by
     intro v v'
     obtain ⟨a, u, ha, hu⟩ := hjs2 v
     obtain ⟨b, u', hb, hu'⟩ := hjs2 v'
@@ -154,16 +165,18 @@ theorem UpperTheory.Gal.W2.latForm_of :
   refine ⟨y, Units.mk0 r hr0.ne', hr0, ?_, fun u => ?_⟩
   · show x * (β' : G.C) * sh G x = algebraMap ℚ G.C r * (β : G.C)
     have h1 : x * (β' : G.C) * sh G x * (((β⁻¹ : G.Cˣ) : G.C) * x) = r • x := by
-      calc x * (β' : G.C) * sh G x * (((β⁻¹ : G.Cˣ) : G.C) * x)
+      calc
+        x * (β' : G.C) * sh G x * (((β⁻¹ : G.Cˣ) : G.C) * x)
           = x * (β' : G.C) * (sh G x * ((β⁻¹ : G.Cˣ) : G.C) * x) := by simp only [_root_.mul_assoc]
         _ = r • (x * ((β' : G.C) * ((β'⁻¹ : G.Cˣ) : G.C))) := by
-            rw [hkey, ← Algebra.smul_def, mul_smul_comm, _root_.mul_assoc]
+          rw [hkey, ← Algebra.smul_def, mul_smul_comm, _root_.mul_assoc]
         _ = r • x := by rw [Units.mul_inv, _root_.mul_one]
-    calc x * (β' : G.C) * sh G x
-        = x * (β' : G.C) * sh G x * (((β⁻¹ : G.Cˣ) : G.C) * (x * x') * (β : G.C)) := by
-          rw [hxx', _root_.mul_one, Units.inv_mul, _root_.mul_one]
+    calc
+      x * (β' : G.C) * sh G x
+          = x * (β' : G.C) * sh G x * (((β⁻¹ : G.Cˣ) : G.C) * (x * x') * (β : G.C)) := by
+        rw [hxx', _root_.mul_one, Units.inv_mul, _root_.mul_one]
       _ = x * (β' : G.C) * sh G x * (((β⁻¹ : G.Cˣ) : G.C) * x) * (x' * (β : G.C)) := by
-          simp only [_root_.mul_assoc]
+        simp only [_root_.mul_assoc]
       _ = r • (x * x' * (β : G.C)) := by rw [h1, smul_mul_assoc, _root_.mul_assoc]
       _ = algebraMap ℚ G.C r * (β : G.C) := by rw [hxx', _root_.one_mul, Algebra.smul_def]
   · show j (w u) = L.rep x (j'' u)

@@ -31,8 +31,7 @@ variable {R : Ranks} (H : Host R)
 
 theorem phi_b : H.φ₀ (H.sqd) = Complex.I * (Real.sqrt H.d : ℂ) := H.φ₀_mem
 
-theorem phi_conj (φ : H.E →+* ℂ) (x : H.E) : φ (H.conj x) = conj (φ x) :=
-  H.conjE_apply φ x
+theorem phi_conj (φ : H.E →+* ℂ) (x : H.E) : φ (H.conj x) = conj (φ x) := H.conjE_apply φ x
 
 theorem d_pos : 0 < H.d := H.hyp.2.1.pos
 
@@ -52,7 +51,8 @@ theorem finrank_K : Module.finrank ℚ H.K = 2 := by
         simp
       · intro x hx
         simp only [Polynomial.IsRoot, Polynomial.eval_add, Polynomial.eval_pow, Polynomial.eval_X,
-          Polynomial.eval_C] at hx
+            Polynomial.eval_C]
+          at hx
         have hd : (0 : ℚ) < H.d := by exact_mod_cast d_pos H
         nlinarith [sq_nonneg x]
     · simp [bE_sq H]
@@ -60,9 +60,12 @@ theorem finrank_K : Module.finrank ℚ H.K = 2 := by
   show Module.finrank ℚ ℚ⟮H.sqd⟯ = 2
   rw [IntermediateField.adjoin.finrank hint, hp, Polynomial.natDegree_X_pow_add_C]
 
-theorem K_induction {p : H.E → Prop} (hb : p (H.sqd)) (hq : ∀ r : ℚ, p (algebraMap ℚ H.E r))
-    (hadd : ∀ x y, p x → p y → p (x + y)) (hinv : ∀ x, p x → p x⁻¹) (hmul : ∀ x y, p x → p y → p (x * y))
-    (k : H.K) : p (k : H.E) := by
+theorem K_induction
+    {p : H.E → Prop}
+    (hb : p (H.sqd)) (hq : ∀ r : ℚ, p (algebraMap ℚ H.E r)) (hadd : ∀ x y, p x → p y → p (x + y))
+    (hinv : ∀ x, p x → p x⁻¹) (hmul : ∀ x y, p x → p y → p (x * y))
+    (k : H.K)
+    : p (k : H.E) := by
   obtain ⟨k, hk⟩ := k
   show p k
   have hk' : k ∈ IntermediateField.adjoin ℚ {H.sqd} := hk
@@ -83,8 +86,7 @@ theorem conj_conj (x : H.E) : H.conj (H.conj x) = x := by
 theorem emb_on_K (g : R.GG) (hg : g ∈ R.Psi) (k : H.K) : H.emb g (k : H.E) = H.φ₀ (k : H.E) := by
   have hs : (H.sigmaOf g) H.sqd = H.sqd := by
     rw [H.gal_sqd (H.sigmaOf g)]
-    have h1 : H.gal (H.sigmaOf g) = g := by
-      simp [Formalism.BasicNotions.Host.sigmaOf]
+    have h1 : H.gal (H.sigmaOf g) = g := by simp [Formalism.BasicNotions.Host.sigmaOf]
     have h2 : g.1.2 = 1 := hg
     rw [h1, h2]
     simp
@@ -114,7 +116,8 @@ variable (D : Car)
 
 theorem kQuad : KQuad D := finrank_K D.host
 
-theorem embInj : EmbInj D := fun _ _ h => D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h))
+theorem embInj : EmbInj D := fun _ _ h =>
+  D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h))
 
 theorem embOnK : EmbOnK D := fun τ k => emb_on_K D.host _ (D.eTau τ).2 k
 
@@ -126,9 +129,9 @@ section Exist
 
 variable {D : Car}
 
-theorem periodExists_of (h2 : KQuad D) (hn : PhiNonReal D) : PeriodExists D :=
-  fun cc δ hcc hδ =>
-    exists_periodPairOfIdeal D.host.K (D.host.φ₀.comp (algebraMap D.host.K D.host.E)) cc δ h2 hn hcc hδ
+theorem periodExists_of (h2 : KQuad D) (hn : PhiNonReal D) : PeriodExists D := fun cc δ hcc hδ =>
+  exists_periodPairOfIdeal D.host.K (D.host.φ₀.comp (algebraMap D.host.K D.host.E)) cc δ h2 hn hcc
+    hδ
 
 end Exist
 

@@ -10,8 +10,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Fl
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CM
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
@@ -37,8 +39,11 @@ attribute [instance] Curve0.nf
 
 variable {D : Datum H} {l : Level H} {Xo : Moduli D l} {g : ℕ} {ty : Fin g → (E →+* ℂ)}
 
-structure CMPack (Z : ∀ b : Bool, Curve0 H (sgnRt H b)) (c : Coeff l) (FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty) (i : Fin FU.n)
-    {P : (FU.Di i).La →+ (Fin g → ℂ)} (hP : IsPeriod (FU.Di i) ty P) : Type 1 where
+structure CMPack
+    (Z : ∀ b : Bool, Curve0 H (sgnRt H b)) (c : Coeff l)
+    (FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty) (i : Fin FU.n)
+    {P : (FU.Di i).La →+ (Fin g → ℂ)} (hP : IsPeriod (FU.Di i) ty P)
+    : Type 1 where
   K : IntermediateField ℚ ℂ
   [nf : NumberField K]
   hc : c.F ≤ K
@@ -46,7 +51,10 @@ structure CMPack (Z : ∀ b : Bool, Curve0 H (sgnRt H b)) (c : Coeff l) (FU : Fa
   ω : Bool → 𝓞 K
   C : ∀ b, Ell H (𝓞 K) (ω b)
   φ : ∀ b, (C b).P.A.left ⟶ (Z b).C.P.A.left
-  map : ∀ b, EllMap (C b) (Z b).C (RingOfIntegers.mapRingHom (IntermediateField.inclusion (hM b)).toRingHom) (φ b)
+  map
+    : ∀ b,
+      EllMap (C b) (Z b).C
+        (RingOfIntegers.mapRingHom (IntermediateField.inclusion (hM b)).toRingHom) (φ b)
   π : ∀ b, (Z b).C'.P.A.left ⟶ (C b).P.A.left
   map' : ∀ b, EllMap (Z b).C' (C b) ((algebraMap K ℂ).comp (algebraMap (𝓞 K) K)) (π b)
   tri : ∀ b, π b ≫ φ b = (Z b).π
@@ -64,32 +72,44 @@ structure CMPack (Z : ∀ b : Bool, Curve0 H (sgnRt H b)) (c : Coeff l) (FU : Fa
   m' : SABMap t B.t (spMap (algebraMap (𝓞 K) K))
   ψ : ∀ b : Bool, PureType.lat hP (sgnRt H b) → ((C b).P.A ⟶ B.t.G)
   fam : ∀ b, IsFam (C b) B (fun x x' => h b x x') _ (ψ b)
-  tie : ∀ b a (s : ℂ) (x : Sp ℂ ⟶ t.G.left), x ≫ t.G.hom = spMap (algebraMap K ℂ) →
-    x ≫ m'.φ = ((Z b).u.ex (fun _ => (Z b).c * s)).left ≫ π b ≫ (ψ b a).left → x ≫ m.φ = (FU.ex i P (s • P a)).left
+  tie
+    : ∀ b a (s : ℂ) (x : Sp ℂ ⟶ t.G.left),
+      x ≫ t.G.hom = spMap (algebraMap K ℂ)
+        → x ≫ m'.φ = ((Z b).u.ex (fun _ => (Z b).c * s)).left ≫ π b ≫ (ψ b a).left
+        → x ≫ m.φ = (FU.ex i P (s • P a)).left
 
 attribute [instance] CMPack.nf
 
 namespace CMPack
 
-variable {Z : ∀ b : Bool, Curve0 H (sgnRt H b)} {c : Coeff l} {FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty} {i : Fin FU.n}
-  {P : (FU.Di i).La →+ (Fin g → ℂ)} {hP : IsPeriod (FU.Di i) ty P} (X : CMPack Z c FU i hP)
+variable
+  {Z : ∀ b : Bool, Curve0 H (sgnRt H b)} {c : Coeff l} {FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty}
+  {i : Fin FU.n} {P : (FU.Di i).La →+ (Fin g → ℂ)} {hP : IsPeriod (FU.Di i) ty P}
+  (X : CMPack Z c FU i hP)
 
 abbrev β : c.F →+* X.K := (IntermediateField.inclusion X.hc).toRingHom
 
-def IsImage (b : Bool) (a : PureType.lat hP (sgnRt H b)) (u : epsAt (under X.y) ⟶ Xo.univ.t.G) : Prop :=
-  ∃ r : Sp (DualNumber X.K) ⟶ X.t.G.left, r ≫ X.m.φ = u.left ∧
-    r ≫ X.m'.φ = spMap (dualMap (algebraMap (𝓞 X.K) X.K)) ≫ (X.C b).v.left ≫ (X.ψ b a).left
+def IsImage (b : Bool) (a : PureType.lat hP (sgnRt H b)) (u : epsAt (under X.y) ⟶ Xo.univ.t.G)
+    : Prop :=
+  ∃ r : Sp (DualNumber X.K) ⟶ X.t.G.left,
+    r ≫ X.m.φ = u.left
+      ∧ r ≫ X.m'.φ = spMap (dualMap (algebraMap (𝓞 X.K) X.K)) ≫ (X.C b).v.left ≫ (X.ψ b a).left
 
-def IsCMVec (b : Bool) (τ : E →+* ℂ) (a : PureType.lat hP (sgnRt H b))
-    (v : epsAt (under X.y) ⟶ Xo.univ.t.G) : Prop :=
-  ∃ (n : ℕ) (e : Fin n ≃ Module.Free.ChooseBasisIndex ℤ (𝓞 E)) (u : Fin n → (epsAt (under X.y) ⟶ Xo.univ.t.G)),
-    (∀ k, X.IsImage b (RingOfIntegers.basis E (e k) • a) (u k)) ∧
-      IsComb (fun k => X.β (tauE c τ (HT.dualInt E (e k)))) u v
+def IsCMVec
+    (b : Bool) (τ : E →+* ℂ) (a : PureType.lat hP (sgnRt H b)) (v : epsAt (under X.y) ⟶ Xo.univ.t.G)
+    : Prop :=
+  ∃ (n : ℕ) (e : Fin n ≃ Module.Free.ChooseBasisIndex ℤ (𝓞 E))
+      (u : Fin n → (epsAt (under X.y) ⟶ Xo.univ.t.G)),
+    (∀ k, X.IsImage b (RingOfIntegers.basis E (e k) • a) (u k))
+      ∧ IsComb (fun k => X.β (tauE c τ (HT.dualInt E (e k)))) u v
 
-def IsCMFrame (τ : E →+* ℂ) {x : Fin D.p ⊕ Fin D.q → (FU.Di i).La} (hx : IsPure hP x) (v : Vecs X.y D.p)
-    (w : Vecs X.y D.q) : Prop :=
-  (∀ a, X.IsCMVec true τ ⟨x (.inl a), hx.1 a⟩ (v a)) ∧
-    ∀ j, X.IsCMVec false (ComplexEmbedding.conjugate τ) ⟨x (.inr j), hx.2 j⟩ (w j)
+def IsCMFrame
+    (τ : E →+* ℂ)
+    {x : Fin D.p ⊕ Fin D.q → (FU.Di i).La} (hx : IsPure hP x)
+    (v : Vecs X.y D.p) (w : Vecs X.y D.q)
+    : Prop :=
+  (∀ a, X.IsCMVec true τ ⟨x (.inl a), hx.1 a⟩ (v a))
+    ∧ ∀ j, X.IsCMVec false (ComplexEmbedding.conjugate τ) ⟨x (.inr j), hx.2 j⟩ (w j)
 
 end CMPack
 

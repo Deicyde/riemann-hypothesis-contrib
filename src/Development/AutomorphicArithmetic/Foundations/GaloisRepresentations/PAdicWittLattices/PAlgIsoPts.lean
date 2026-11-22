@@ -4,7 +4,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
@@ -13,8 +14,7 @@ private lemma etale_specMap (D E : Type) [CommRing D] [CommRing E] [Algebra D E]
   apply HasRingHomProperty.Spec_iff.mpr
   exact RingHom.etale_algebraMap.mpr ‹_›
 
-theorem UpperTheory.Gal.G3.pAlgIsoPts :
-    IsoPts → AlgIsoPts := by
+theorem UpperTheory.Gal.G3.pAlgIsoPts : IsoPts → AlgIsoPts := by
   intro hI D E _ _ _ _ hpts
   let φ : CommRingCat.of D ⟶ CommRingCat.of E := CommRingCat.ofHom (algebraMap D E)
   have : Etale (Spec.map φ) := etale_specMap D E

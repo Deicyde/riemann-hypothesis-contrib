@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.Differentia
 
 @[expose] public section
 
-open Matrix MeasureTheory Filter Topology Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.SphJet
+open Matrix MeasureTheory Filter Topology Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.SphJet
 open scoped InnerProductSpace ComplexOrder Matrix.Norms.L2Operator
 
 namespace GlobalTheory.SphJet
@@ -50,12 +51,21 @@ private lemma norm_inner_ps_exp_le_decHS_mul {n : ℕ} {ε : Fin n → Bool} {la
   · simpa only [norm_inner_symm] using hint u
   · simpa only [norm_inner_symm] using GlobalTheory.PsiBound.schur_norm hτ u
 
-theorem ps_exp_pos_bound_analytic : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] (τ : Matrix (Fin n) (Fin n) ℂ → (W →L[ℂ] W)) (w : W), IsHCParam lam → IsTau ε (lowK ε lam) τ w → ∀ h : ℝ, GapAtLeast ε lam h → ∀ X, inP ε X → (∀ x : W, 0 ≤ ⟪x, ps ε lam τ w (NormedSpace.exp X) x⟫_ℂ) ∧ ‖ps ε lam τ w (NormedSpace.exp X)‖ ≤ decHS h (rkR ε) (Real.sqrt (hs X)) ∧ AnalyticAt ℂ (ps ε lam τ w) (NormedSpace.exp X) := by
+theorem ps_exp_pos_bound_analytic
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (W : Type) [NormedAddCommGroup W]
+        [InnerProductSpace ℂ W] (τ : Matrix (Fin n) (Fin n) ℂ → (W →L[ℂ] W)) (w : W),
+      IsHCParam lam → IsTau ε (lowK ε lam) τ w
+        → ∀ h : ℝ,
+          GapAtLeast ε lam h
+            → ∀ X,
+              inP ε X
+                → (∀ x : W, 0 ≤ ⟪x, ps ε lam τ w (NormedSpace.exp X) x⟫_ℂ)
+                  ∧ ‖ps ε lam τ w (NormedSpace.exp X)‖ ≤ decHS h (rkR ε) (Real.sqrt (hs X))
+                  ∧ AnalyticAt ℂ (ps ε lam τ w) (NormedSpace.exp X) := by
   intro n ε lam W _ _ τ w hlam hτ h hgap X hX
   have hP : (NormedSpace.exp X).PosDef := GlobalTheory.Dec.FormF.exp_posDef hX
   refine ⟨fun x => ?_, ?_, ?_⟩
-  ·
-    rw [GlobalTheory.PsiBound.ps_entry hτ lam hP x x]
+  · rw [GlobalTheory.PsiBound.ps_entry hτ lam hP x x]
     set F : KG ε → ℂ := fun k => Phi lam ((toMK k)⁻¹ * NormedSpace.exp X * toMK k) *
       (⟪x, τ (toMK k) w⟫_ℂ * ⟪τ (toMK k) w, x⟫_ℂ) with hFdef
     have hF : ∀ k, 0 ≤ F k := by
@@ -70,14 +80,11 @@ theorem ps_exp_pos_bound_analytic : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : F
       Complex.ext rfl (by simpa using ((Complex.le_def.1 (hF k)).2).symm)
     have hI : ∫ k, F k ∂(muK ε) = ((∫ k, (F k).re ∂(muK ε) : ℝ) : ℂ) := by
       rw [integral_congr_ae (Eventually.of_forall hre)]
-      first
-        | exact integral_complex_ofReal
-        | exact integral_ofReal
+      first | exact integral_complex_ofReal | exact integral_ofReal
     rw [hI]
     refine mul_nonneg (Nat.cast_nonneg _) (Complex.zero_le_real.2 (integral_nonneg fun k => ?_))
     exact (Complex.le_def.1 (hF k)).1
-  ·
-    have hM : 0 ≤ decHS h (rkR ε) (Real.sqrt (hs X)) := (Real.exp_pos _).le
+  · have hM : 0 ≤ decHS h (rkR ε) (Real.sqrt (hs X)) := (Real.exp_pos _).le
     refine ContinuousLinearMap.opNorm_le_bound _ hM fun u => ?_
     set T := ps ε lam τ w (NormedSpace.exp X)
     rcases eq_or_ne (T u) 0 with h0 | h0
@@ -87,13 +94,13 @@ theorem ps_exp_pos_bound_analytic : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : F
     simp only [norm_pow, RCLike.norm_ofReal, Complex.norm_real, Real.norm_eq_abs, abs_norm] at hb
     have hpos : 0 < ‖T u‖ := norm_pos_iff.2 h0
     nlinarith
-  ·
-    obtain ⟨hopen, hpos, hdiff, -⟩ := psBasic n ε lam W τ w hlam hτ
+  · obtain ⟨hopen, hpos, hdiff, -⟩ := psBasic n ε lam W τ w hlam hτ
     haveI : FiniteDimensional ℂ W := hτ.1
     haveI : CompleteSpace W := FiniteDimensional.complete ℂ W
     let e : (Fin n → Fin n → ℂ) ≃L[ℂ] Matrix (Fin n) (Fin n) ℂ :=
       (Matrix.ofLinearEquiv ℂ).toContinuousLinearEquiv
-    have hg : AnalyticAt ℂ (fun z : Fin n → Fin n → ℂ => ps ε lam τ w (Matrix.of z))
+    have hg : AnalyticAt ℂ
+        (fun z : Fin n → Fin n → ℂ => ps ε lam τ w (Matrix.of z))
         (e.symm (NormedSpace.exp X)) :=
       GlobalTheory.SCV.analyticAt_of_differentiableOn hdiff
         (hopen.mem_nhds (show Matrix.of _ ∈ U1 ε from hpos _ hP))

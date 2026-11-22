@@ -148,35 +148,48 @@ private lemma tsum_one_div_add_int_pow_three_of_im_pos (z : ℂ) (hz : 0 < z.im)
   rw [h, tsum_sq_mul_geometric_of_norm_lt_one hq]
   ring
 
-
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate in
 open Filter Topology in
-theorem _root_.GlobalTheory.WpFam.RowReal.row_real : ∀ w : ℂ, w.im = 0 → (∀ n : ℤ, w ≠ n) → (∑' m : ℤ, 1 / (w + m) ^ 2 = (2 * (Real.pi : ℂ) * Complex.I) ^ 2 * (Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w) / (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w)) ^ 2)) ∧ ∑' m : ℤ, 1 / (w + m) ^ 3 = -(1 / 2) * (2 * (Real.pi : ℂ) * Complex.I) ^ 3 * (Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w) * (1 + Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w)) / (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w)) ^ 3) := by
+theorem _root_.GlobalTheory.WpFam.RowReal.row_real
+    : ∀ w : ℂ,
+      w.im = 0 → (∀ n : ℤ, w ≠ n)
+        → (∑' m : ℤ, 1 / (w + m) ^ 2
+            = (2 * (Real.pi : ℂ) * Complex.I) ^ 2
+              * (Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w)
+                / (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w)) ^ 2))
+          ∧ ∑' m : ℤ, 1 / (w + m) ^ 3
+            = -(1 / 2) * (2 * (Real.pi : ℂ) * Complex.I) ^ 3
+              * (Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w)
+                * (1 + Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w))
+                / (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w)) ^ 3) := by
   intro w hw hn
   have hne : 1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w) ≠ 0 := by
     intro h
     have h1 : Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * w) = 1 := by linear_combination -h
     obtain ⟨n, hn'⟩ := Complex.exp_eq_one_iff.mp h1
     apply hn n
-    have h2 : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by
-      simp [Real.pi_ne_zero, Complex.I_ne_zero]
+    have h2 : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero]
     apply mul_left_cancel₀ h2
     linear_combination hn'
   have hE : ContinuousAt (fun x : ℂ => Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)) w := by
     fun_prop
   have hD2 : ContinuousAt
-      (fun x : ℂ => (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)) ^ 2) w := by
+      (fun x : ℂ => (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)) ^ 2)
+      w := by
     fun_prop
   have hD3 : ContinuousAt
-      (fun x : ℂ => (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)) ^ 3) w := by
+      (fun x : ℂ => (1 - Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)) ^ 3)
+      w := by
     fun_prop
-  have hN3 : ContinuousAt (fun x : ℂ => Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)
-      * (1 + Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x))) w := by
+  have hN3 : ContinuousAt
+      (fun x : ℂ =>
+        Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)
+          * (1 + Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * x)))
+      w := by
     fun_prop
   constructor
   · exact tsum_one_div_add_int_pow_of_real_of_continuousAt (k := 2) hw hn le_rfl
-      (continuousAt_const.mul (hE.div hD2 (pow_ne_zero 2 hne)))
-      tsum_one_div_add_int_sq_of_im_pos
+      (continuousAt_const.mul (hE.div hD2 (pow_ne_zero 2 hne))) tsum_one_div_add_int_sq_of_im_pos
   · exact tsum_one_div_add_int_pow_of_real_of_continuousAt (k := 3) hw hn (by norm_num)
       (continuousAt_const.mul (hN3.div hD3 (pow_ne_zero 3 hne)))
       tsum_one_div_add_int_pow_three_of_im_pos

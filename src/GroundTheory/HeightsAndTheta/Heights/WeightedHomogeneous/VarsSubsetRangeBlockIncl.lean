@@ -22,10 +22,8 @@ omit [Fintype ι] [DecidableEq ι] in
 theorem blockIncl_injective (k₀ : ι) : Function.Injective (blockIncl (n := n) k₀) := by
   rintro ⟨⟨⟩, i⟩ ⟨⟨⟩, j⟩ h
   simp only [blockIncl, Sigma.mk.injEq, heq_eq_eq, true_and] at h
-  subst h; rfl
-
-
-
+  subst h
+  rfl
 
 end
 

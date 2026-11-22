@@ -8,8 +8,12 @@ open Matrix
 
 namespace GlobalTheory.TraceGram
 
-theorem pow_entry_mem {K : Type} [Field K] (O : Subring K) {n : ℕ}
-    (g : Matrix (Fin n) (Fin n) K) (hg : ∀ i j, g i j ∈ O) (k : ℕ) : ∀ i j, (g ^ k) i j ∈ O := by
+theorem pow_entry_mem
+    {K : Type} [Field K]
+    (O : Subring K)
+    {n : ℕ} (g : Matrix (Fin n) (Fin n) K) (hg : ∀ i j, g i j ∈ O)
+    (k : ℕ)
+    : ∀ i j, (g ^ k) i j ∈ O := by
   induction k with
   | zero =>
     intro i j
@@ -22,19 +26,24 @@ theorem pow_entry_mem {K : Type} [Field K] (O : Subring K) {n : ℕ}
     rw [pow_succ, Matrix.mul_apply]
     exact O.sum_mem fun l _ => O.mul_mem (ih i l) (hg l j)
 
-theorem adjugate_entry_mem {K : Type} [Field K] (O : Subring K) {n : ℕ}
-    (G : Matrix (Fin n) (Fin n) K) (hG : ∀ i j, G i j ∈ O) : ∀ i j, G.adjugate i j ∈ O := by
+theorem adjugate_entry_mem
+    {K : Type} [Field K]
+    (O : Subring K)
+    {n : ℕ} (G : Matrix (Fin n) (Fin n) K) (hG : ∀ i j, G i j ∈ O)
+    : ∀ i j, G.adjugate i j ∈ O := by
   intro i j
   let G' : Matrix (Fin n) (Fin n) O := Matrix.of fun i j => ⟨G i j, hG i j⟩
-  have h : O.subtype.mapMatrix G' = G := by
-    ext i j; rfl
+  have h : O.subtype.mapMatrix G' = G := by ext i j; rfl
   rw [← h, ← RingHom.map_adjugate]
   exact (G'.adjugate i j).2
 
-theorem entry_mem_of_trace_gram : ∀ {K : Type} [Field K] (O : Subring K) {n : ℕ} (g x : Matrix (Fin n) (Fin n) K) (c : Fin n → K),
-    x = ∑ i, c i • g ^ (i : ℕ) → (∀ i j, g i j ∈ O) → (∀ j : Fin n, (x * g ^ (j : ℕ)).trace ∈ O) →
-    (Matrix.of fun i j : Fin n => (g ^ ((i : ℕ) + j)).trace).det ≠ 0 →
-    ((Matrix.of fun i j : Fin n => (g ^ ((i : ℕ) + j)).trace).det)⁻¹ ∈ O → ∀ i j, x i j ∈ O := by
+theorem entry_mem_of_trace_gram
+    : ∀ {K : Type} [Field K] (O : Subring K) {n : ℕ} (g x : Matrix (Fin n) (Fin n) K)
+        (c : Fin n → K),
+      x = ∑ i, c i • g ^ (i : ℕ) → (∀ i j, g i j ∈ O) → (∀ j : Fin n, (x * g ^ (j : ℕ)).trace ∈ O)
+        → (Matrix.of fun i j : Fin n => (g ^ ((i : ℕ) + j)).trace).det ≠ 0
+        → ((Matrix.of fun i j : Fin n => (g ^ ((i : ℕ) + j)).trace).det)⁻¹ ∈ O
+        → ∀ i j, x i j ∈ O := by
   intro K _ O n g x c hx hg htr hdet hinv
   set G : Matrix (Fin n) (Fin n) K := Matrix.of fun i j : Fin n => (g ^ ((i : ℕ) + j)).trace with hGdef
   have hG : ∀ i j, G i j ∈ O := by
@@ -47,7 +56,8 @@ theorem entry_mem_of_trace_gram : ∀ {K : Type} [Field K] (O : Subring K) {n : 
       rw [hx, Finset.sum_mul, Matrix.trace_sum]
       simp only [Matrix.vecMul, dotProduct, hGdef, Matrix.of_apply, smul_mul_assoc,
         Matrix.trace_smul, smul_eq_mul, pow_add]
-    rw [this]; exact htr j
+    rw [this]
+    exact htr j
   have hc : ∀ i, c i ∈ O := by
     intro i
     have h1 : (c ᵥ* G) ᵥ* G.adjugate = G.det • c := by

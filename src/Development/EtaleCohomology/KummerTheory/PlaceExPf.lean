@@ -9,15 +9,17 @@ noncomputable section
 namespace LateralTheory.KummerTheory
 
 def PlaceGood (k K : Type) [Field k] [Field K] [Algebra k K] (A : LocalSubring K) : Prop :=
-  (∀ c : k, algebraMap k K c ∈ A.toSubring) ∧
-    ∀ a ∈ A.toSubring, ∃ c : k, a = algebraMap k K c ∨ (a - algebraMap k K c)⁻¹ ∉ A.toSubring
+  (∀ c : k, algebraMap k K c ∈ A.toSubring)
+    ∧ ∀ a ∈ A.toSubring, ∃ c : k, a = algebraMap k K c ∨ (a - algebraMap k K c)⁻¹ ∉ A.toSubring
 
-def PlaceZorn : Prop := ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K],
-  ∃ A : LocalSubring K, PlaceGood k K A ∧ ∀ B : LocalSubring K, A ≤ B → PlaceGood k K B → B ≤ A
+def PlaceZorn : Prop :=
+  ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K], ∃ A : LocalSubring K,
+    PlaceGood k K A ∧ ∀ B : LocalSubring K, A ≤ B → PlaceGood k K B → B ≤ A
 
-def PlaceStep : Prop := ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K] (A : LocalSubring K),
-  PlaceGood k K A → (∀ B : LocalSubring K, A ≤ B → PlaceGood k K B → B ≤ A) →
-    ∀ x : K, x ∈ A.toSubring ∨ x⁻¹ ∈ A.toSubring
+def PlaceStep : Prop :=
+  ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K] (A : LocalSubring K),
+    PlaceGood k K A → (∀ B : LocalSubring K, A ≤ B → PlaceGood k K B → B ≤ A)
+      → ∀ x : K, x ∈ A.toSubring ∨ x⁻¹ ∈ A.toSubring
 
 theorem PlaceEx_of (h1 : PlaceZorn) (h2 : PlaceStep) : PlaceEx := by
   intro k K _ _ _ _ _
@@ -40,11 +42,12 @@ theorem PlaceEx_of (h1 : PlaceZorn) (h2 : PlaceStep) : PlaceEx := by
     simpa using this
   rcases hc with h | h
   · have : (σ c : K) - (a : K) = 0 := by rw [h]; simp [σ]
-    rw [this, zero_mul] at hK; exact zero_ne_one hK
+    rw [this, zero_mul] at hK
+    exact zero_ne_one hK
   · apply h
     have hinv : ((σ c : K) - (a : K))⁻¹ = (w : K) := inv_eq_of_mul_eq_one_right hK
-    have : ((a : K) - algebraMap k K c)⁻¹ = -(w : K) := by
-      rw [← hinv, ← inv_neg, neg_sub]; rfl
-    rw [this]; exact T.neg_mem _ w.2
+    have : ((a : K) - algebraMap k K c)⁻¹ = -(w : K) := by rw [← hinv, ← inv_neg, neg_sub]; rfl
+    rw [this]
+    exact T.neg_mem _ w.2
 
 end LateralTheory.KummerTheory

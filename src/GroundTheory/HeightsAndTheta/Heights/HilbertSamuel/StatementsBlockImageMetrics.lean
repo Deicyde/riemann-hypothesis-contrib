@@ -9,12 +9,15 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
-def linPullMetric {κ J : Type} [Fintype κ] [Fintype J] (N : Matrix κ J ℤ)
-    (hN : ∀ u : J → ℂ, (fun i => ∑ j, (N i j : ℂ) * u j) = 0 → u = 0) : ConeMetric ℂ J where
+def linPullMetric
+    {κ J : Type} [Fintype κ] [Fintype J]
+    (N : Matrix κ J ℤ) (hN : ∀ u : J → ℂ, (fun i => ∑ j, (N i j : ℂ) * u j) = 0 → u = 0)
+    : ConeMetric ℂ J where
   ρ u := (fsMetric (ι := κ)).ρ (fun i => ∑ j, (N i j : ℂ) * u j)
   pos u hu := (fsMetric (ι := κ)).pos _ fun h => hu (hN u h)
   smul c u := by
@@ -26,9 +29,11 @@ def linPullMetric {κ J : Type} [Fintype κ] [Fintype J] (N : Matrix κ J ℤ)
 
 def BlockImageMetrics.Statement : Prop :=
   (∀ (κ J : Type) [Fintype κ] [Fintype J] (N : Matrix κ (Ix J) ℤ)
-      (hN : ∀ u : Ix J → ℂ, (fun i => ∑ j, (N i j : ℂ) * u j) = 0 → u = 0) (P : Ideal (MRing (GlobalTheory J))),
-      IsSemipositiveRel ⊥ P (HermLine.ofCone (linPullMetric N hN))) ∧
-    ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (k₀ : K) (P : Ideal (MRing ι)),
+        (hN : ∀ u : Ix J → ℂ, (fun i => ∑ j, (N i j : ℂ) * u j) = 0 → u = 0)
+        (P : Ideal (MRing (GlobalTheory J))),
+      IsSemipositiveRel ⊥ P (HermLine.ofCone (linPullMetric N hN)))
+    ∧ ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (k₀ : K)
+        (P : Ideal (MRing ι)),
       IsSemipositiveRel ⊥ P (HermLine.ofMetrics (fun k => fsMetric (ι := ι k)) (unitDeg k₀))
 
 section Inhabitants

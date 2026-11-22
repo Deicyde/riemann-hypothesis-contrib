@@ -8,9 +8,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Poi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 set_option autoImplicit false
 noncomputable section
@@ -33,16 +35,19 @@ theorem eff_nsmul' {D : CartierDiv X} (h : D.Eff) (n : ℕ) : (n • D).Eff := b
   | zero => rw [zero_nsmul]; exact CartierDiv.eff_zero
   | succ n ih => rw [succ_nsmul]; exact ih.add h
 
-theorem isQCart_cone : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (D B : X → ℚ) (c : ℚ),
-    IsQCart D → IsQCart B → 0 ≤ c → IsQCart (D + B) ∧ IsQCart (c • D) ∧ IsQCart (0 : X → ℚ) := by
+theorem isQCart_cone
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (D B : X → ℚ) (c : ℚ),
+      IsQCart D → IsQCart B → 0 ≤ c → IsQCart (D + B) ∧ IsQCart (c • D) ∧ IsQCart (0 : X → ℚ) := by
   intro X _ _ D B c hD hB hc
   obtain ⟨m, D₀, hm, hD₀, rfl⟩ := hD
   obtain ⟨n, B₀, hn, hB₀, rfl⟩ := hB
   have hm' : (m : ℚ) ≠ 0 := by exact_mod_cast hm.ne'
   have hn' : (n : ℚ) ≠ 0 := by exact_mod_cast hn.ne'
-  refine ⟨⟨m * n, n • D₀ + m • B₀, Nat.mul_pos hm hn, (eff_nsmul' hD₀ n).add (eff_nsmul' hB₀ m), ?_⟩,
+  refine ⟨
+    ⟨m * n, n • D₀ + m • B₀, Nat.mul_pos hm hn, (eff_nsmul' hD₀ n).add (eff_nsmul' hB₀ m), ?_⟩,
     ⟨c.den * m, c.num.toNat • D₀, Nat.mul_pos c.den_pos hm, eff_nsmul' hD₀ _, ?_⟩,
-    ⟨1, 0, one_pos, CartierDiv.eff_zero, ?_⟩⟩
+    ⟨1, 0, one_pos, CartierDiv.eff_zero, ?_⟩
+  ⟩
   · funext z
     simp only [Pi.add_apply, qWeil, CartierDiv.mult_add, mult_nsmul']
     push_cast

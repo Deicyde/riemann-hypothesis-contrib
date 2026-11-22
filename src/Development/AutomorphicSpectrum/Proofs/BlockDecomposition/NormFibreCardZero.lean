@@ -53,8 +53,7 @@ theorem card_fx (h : ResAlg E τ q ε) : Nat.card (Fx τ) = q := by
   have h2 : Nat.card (Fx τ) ^ 2 = q ^ 2 := by rw [← h1]; ring
   exact (Nat.pow_left_inj (by norm_num)).1 h2
 
-theorem exists_idem (h : ResAlg E τ q ε) (hf : ¬ IsField E) :
-    ∃ e : E, e * e = e ∧ τ e = 1 - e := by
+theorem exists_idem (h : ResAlg E τ q ε) (hf : ¬ IsField E) : ∃ e : E, e * e = e ∧ τ e = 1 - e := by
   haveI := nontrivial_of_resAlg h
   obtain ⟨a, ha0, hau⟩ : ∃ a : E, a ≠ 0 ∧ ¬ IsUnit a := by
     by_contra hc
@@ -81,7 +80,9 @@ theorem exists_idem (h : ResAlg E τ q ε) (hf : ¬ IsField E) :
       have h1 : (a + τ a) * τ s = 1 := by
         have := congrArg τ hs
         rwa [map_mul, htfix, map_one] at this
-      calc τ s = (s * (a + τ a)) * τ s := by rw [mul_comm s, hs, one_mul]
+      calc
+        τ s
+          = (s * (a + τ a)) * τ s := by rw [mul_comm s, hs, one_mul]
         _ = s * ((a + τ a) * τ s) := by ring
         _ = s := by rw [h1, mul_one]
     have hτe : τ (a * s) = 1 - a * s := by
@@ -90,30 +91,35 @@ theorem exists_idem (h : ResAlg E τ q ε) (hf : ¬ IsField E) :
     refine ⟨a * s, ?_, hτe⟩
     linear_combination (-(s * s)) * hN + (a * s) * hs
 
-theorem card_axes {F : Type} [Finite F] (z : F) :
-    Nat.card {p : F × F // p.1 = z ∨ p.2 = z} + 1 = 2 * Nat.card F := by
+theorem card_axes {F : Type} [Finite F] (z : F)
+    : Nat.card {p : F × F // p.1 = z ∨ p.2 = z} + 1 = 2 * Nat.card F := by
   classical
   haveI := Fintype.ofFinite F
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_subtype]
-  have h1 : (Finset.univ.filter fun p : F × F => p.1 = z ∨ p.2 = z)
-      = (({z} : Finset F) ×ˢ (Finset.univ : Finset F)) ∪ ((Finset.univ : Finset F) ×ˢ ({z} : Finset F)) := by
+  have h1
+      : (Finset.univ.filter fun p : F × F => p.1 = z ∨ p.2 = z)
+        = (({z} : Finset F) ×ˢ (Finset.univ : Finset F))
+          ∪ ((Finset.univ : Finset F) ×ˢ ({z} : Finset F)) := by
     ext ⟨a, b⟩
     simp only [Finset.mem_filter, Finset.mem_union, Finset.mem_product, Finset.mem_singleton,
       Finset.mem_univ, and_true, true_and]
-  have h2 : (({z} : Finset F) ×ˢ (Finset.univ : Finset F)) ∩ ((Finset.univ : Finset F) ×ˢ ({z} : Finset F))
-      = {(z, z)} := by
+  have h2
+      : (({z} : Finset F) ×ˢ (Finset.univ : Finset F))
+          ∩ ((Finset.univ : Finset F) ×ˢ ({z} : Finset F))
+        = {(z, z)} := by
     ext ⟨a, b⟩
-    simp only [Finset.mem_inter, Finset.mem_product, Finset.mem_singleton, Finset.mem_univ, and_true,
-      true_and, Prod.mk.injEq]
-  have h3 := Finset.card_union_add_card_inter (({z} : Finset F) ×ˢ (Finset.univ : Finset F))
-    ((Finset.univ : Finset F) ×ˢ ({z} : Finset F))
+    simp only [Finset.mem_inter, Finset.mem_product, Finset.mem_singleton, Finset.mem_univ,
+      and_true, true_and, Prod.mk.injEq]
+  have h3 :=
+    Finset.card_union_add_card_inter (({z} : Finset F) ×ˢ (Finset.univ : Finset F))
+      ((Finset.univ : Finset F) ×ˢ ({z} : Finset F))
   rw [h2] at h3
   rw [h1]
   simp only [Finset.card_product, Finset.card_singleton, Finset.card_univ, one_mul, mul_one] at h3
   omega
 
-theorem card_zero_split (h : ResAlg E τ q ε) {e : E} (he : e * e = e) (hτ : τ e = 1 - e) :
-    Nat.card {a : E // a * τ a = 0} + 1 = 2 * q := by
+theorem card_zero_split (h : ResAlg E τ q ε) {e : E} (he : e * e = e) (hτ : τ e = 1 - e)
+    : Nat.card {a : E // a * τ a = 0} + 1 = 2 * q := by
   have hτf : τ (1 - e) = e := by rw [map_sub, map_one, hτ]; ring
   let g : Fx τ × Fx τ → E := fun p => (p.1 : E) * e + (p.2 : E) * (1 - e)
   have hnorm : ∀ p, g p * τ (g p) = (p.1 : E) * (p.2 : E) := by
@@ -128,10 +134,8 @@ theorem card_zero_split (h : ResAlg E τ q ε) {e : E} (he : e * e = e) (hτ : �
       have h2 : x * (1 - e) + y * e = x' * (1 - e) + y' * e := by
         have := congrArg τ h1
         simpa only [map_add (f := _), map_mul, hx, hy, hx', hy', hτ, hτf] using this
-      have hxe : x * e = x' * e := by
-        linear_combination e * h1 + (y - y' - x + x') * he
-      have hye : y * e = y' * e := by
-        linear_combination e * h2 + (x - x' - y + y') * he
+      have hxe : x * e = x' * e := by linear_combination e * h1 + (y - y' - x + x') * he
+      have hye : y * e = y' * e := by linear_combination e * h2 + (x - x' - y + y') * he
       have h5 : x = x' := by linear_combination h2 + hxe - hye
       have h6 : y = y' := by linear_combination h1 - hxe + hye
       subst h5 h6
@@ -153,14 +157,16 @@ theorem card_zero_split (h : ResAlg E τ q ε) {e : E} (he : e * e = e) (hτ : �
       by_cases hx : (p.1 : E) = 0
       · exact Or.inl (Subtype.ext hx)
       · exact Or.inr (Subtype.ext ((h.fixedUnit _ p.1.2 hx).mul_right_eq_zero.1 h0))
-  have hcard : Nat.card {p : Fx τ × Fx τ // p.1 = zeroFx τ ∨ p.2 = zeroFx τ}
-      = Nat.card {a : E // a * τ a = 0} :=
+  have hcard
+      : Nat.card {p : Fx τ × Fx τ // p.1 = zeroFx τ ∨ p.2 = zeroFx τ}
+        = Nat.card {a : E // a * τ a = 0} :=
     Nat.card_congr ((Equiv.ofBijective g hg).subtypeEquiv hz)
   haveI := finite_of_resAlg h
   rw [← hcard, card_axes, card_fx h]
 
-theorem card_norm_zero : ∀ (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ), ResAlg E τ q ε →
-    (Nat.card {a : E // a * τ a = 0} : ℤ) = q * (1 + ε) - ε := by
+theorem card_norm_zero
+    : ∀ (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ),
+      ResAlg E τ q ε → (Nat.card {a : E // a * τ a = 0} : ℤ) = q * (1 + ε) - ε := by
   intro E _ τ q ε h
   rcases h.eps with ⟨rfl, hf⟩ | ⟨rfl, hf⟩
   · haveI : IsDomain E := hf.isDomain

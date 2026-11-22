@@ -18,22 +18,30 @@ namespace Desc
 
 variable {e : ℕ} {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y]
 
-theorem contAt_of_holoOn (A : FinHolAtlas e X) {U : Set X} {f : X → ℂ} (hf : A.HoloOn U f) {x : X} (hx : x ∈ U) :
-    ContinuousAt f x := by
+theorem contAt_of_holoOn
+    (A : FinHolAtlas e X) {U : Set X} {f : X → ℂ} (hf : A.HoloOn U f) {x : X} (hx : x ∈ U)
+    : ContinuousAt f x := by
   obtain ⟨k, hk⟩ := A.cover x
-  have h1 := (hf k (A.chart k x) ⟨(A.chart k).map_source hk, by
-    show (A.chart k).symm (A.chart k x) ∈ U
-    rwa [(A.chart k).left_inv hk]⟩).continuousAt
+  have h1 :=
+    (hf k (A.chart k x) ⟨
+      (A.chart k).map_source hk,
+      by
+        show (A.chart k).symm (A.chart k x) ∈ U
+        rwa [(A.chart k).left_inv hk]
+    ⟩).continuousAt
   have h2 := h1.comp ((A.chart k).continuousAt hk)
   refine h2.congr ?_
   filter_upwards [(A.chart k).open_source.mem_nhds hk] with x' hx'
   simp [(A.chart k).left_inv hx']
 
-theorem analytic_off {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} {S U : Set X} {f : Y → ℂ}
-    (hh : HoloMap B A h) (hd : IsDegreeOff A B h 1 S) (hf : B.HoloOn (h ⁻¹' U) f) (σ : X → Y)
-    (hσ : ∀ x ∉ S, h (σ x) = x) (hσ' : ∀ y, h y ∉ S → σ (h y) = y) (k : Fin A.n) {q : Fin e → ℂ}
-    (hq : q ∈ (A.chart k).target) (hU : (A.chart k).symm q ∈ U) (hS : (A.chart k).symm q ∉ S) :
-    AnalyticAt ℂ (fun t => f (σ ((A.chart k).symm t))) q := by
+theorem analytic_off
+    {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} {S U : Set X} {f : Y → ℂ}
+    (hh : HoloMap B A h) (hd : IsDegreeOff A B h 1 S) (hf : B.HoloOn (h ⁻¹' U) f)
+    (σ : X → Y) (hσ : ∀ x ∉ S, h (σ x) = x) (hσ' : ∀ y, h y ∉ S → σ (h y) = y)
+    (k : Fin A.n)
+    {q : Fin e → ℂ}
+    (hq : q ∈ (A.chart k).target) (hU : (A.chart k).symm q ∈ U) (hS : (A.chart k).symm q ∉ S)
+    : AnalyticAt ℂ (fun t => f (σ ((A.chart k).symm t))) q := by
   have hSc : IsClosed S := isClosed_of_isAnalyticSubset' A hd.1
   set x := (A.chart k).symm q with hx
   obtain ⟨j, hj⟩ := B.cover (σ x)
@@ -47,9 +55,12 @@ theorem analytic_off {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} {
   have hφp : φ p = q := by
     show A.chart k (h ((B.chart j).symm p)) = q
     rw [hsp, hσ x hS, hx, (A.chart k).right_inv hq]
-  have hdet := hd.2.2.2.2.2 j k p hpt (by
-    show h ((B.chart j).symm p) ∉ S
-    rwa [hsp, hσ x hS]) hhs
+  have hdet :=
+    hd.2.2.2.2.2 j k p hpt
+      (by
+        show h ((B.chart j).symm p) ∉ S
+        rwa [hsp, hσ x hS])
+      hhs
   let L : (Fin e → ℂ) ≃L[ℂ] (Fin e → ℂ) := (fderiv ℂ φ p).toContinuousLinearEquivOfDetNeZero hdet
   have hL : HasFDerivAt φ (L : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) p := by
     have := hφ.differentiableAt.hasFDerivAt
@@ -74,7 +85,8 @@ theorem analytic_off {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} {
     rwa [hsp, hσ x hS]
   refine (hfa.comp hψ).congr ?_
   have c1 : ContinuousAt (fun t => h ((B.chart j).symm (ψ t))) q :=
-    hh.1.continuousAt.comp (ContinuousAt.comp (by rw [hψq]; exact (B.chart j).continuousAt_symm hpt) hψ.continuousAt)
+    hh.1.continuousAt.comp (ContinuousAt.comp (by rw [hψq]; exact (B.chart j).continuousAt_symm hpt)
+      hψ.continuousAt)
   have e1 : ∀ᶠ t in 𝓝 q, h ((B.chart j).symm (ψ t)) ∈ (A.chart k).source ∩ Sᶜ :=
     c1.eventually_mem (((A.chart k).open_source.inter hSc.isOpen_compl).mem_nhds (by
       show h ((B.chart j).symm (ψ q)) ∈ _
@@ -87,18 +99,22 @@ theorem analytic_off {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} {
   show f ((B.chart j).symm (ψ t)) = f (σ ((A.chart k).symm t))
   rw [h3, hσ' _ h2.2]
 
-theorem local_ext {A : FinHolAtlas e X} {S U : Set X} {u : X → ℂ} (hS : A.IsAnalyticSubset S) (hi : interior S = ∅)
-    (hU : IsOpen U) (k : Fin A.n)
-    (ha : ∀ q ∈ (A.chart k).target, (A.chart k).symm q ∈ U → (A.chart k).symm q ∉ S →
-      AnalyticAt ℂ (fun t => u ((A.chart k).symm t)) q)
-    (hb : ∀ x ∈ U, ∃ C : ℝ, ∀ᶠ x' in 𝓝 x, x' ∉ S → ‖u x'‖ ≤ C) {q : Fin e → ℂ} (hq : q ∈ (A.chart k).target)
-    (hqU : (A.chart k).symm q ∈ U) :
-    ∃ w : (Fin e → ℂ) → ℂ, AnalyticAt ℂ w q ∧ ∀ᶠ t in 𝓝 q, (A.chart k).symm t ∉ S → w t = u ((A.chart k).symm t) := by
+theorem local_ext
+    {A : FinHolAtlas e X} {S U : Set X} {u : X → ℂ}
+    (hS : A.IsAnalyticSubset S) (hi : interior S = ∅) (hU : IsOpen U) (k : Fin A.n)
+    (ha : ∀ q ∈ (A.chart k).target,
+      (A.chart k).symm q ∈ U → (A.chart k).symm q ∉ S
+        → AnalyticAt ℂ (fun t => u ((A.chart k).symm t)) q)
+    (hb : ∀ x ∈ U, ∃ C : ℝ, ∀ᶠ x' in 𝓝 x, x' ∉ S → ‖u x'‖ ≤ C)
+    {q : Fin e → ℂ} (hq : q ∈ (A.chart k).target) (hqU : (A.chart k).symm q ∈ U)
+    : ∃ w : (Fin e → ℂ) → ℂ,
+      AnalyticAt ℂ w q ∧ ∀ᶠ t in 𝓝 q, (A.chart k).symm t ∉ S → w t = u ((A.chart k).symm t) := by
   by_cases hqS : (A.chart k).symm q ∈ S
   swap
   · exact ⟨_, ha q hq hqU hqS, Eventually.of_forall fun _ _ => rfl⟩
-  obtain ⟨W, hW, hqW, hWc, φ, hφ, ⟨w₀, hw₀, hw₀'⟩, hz⟩ := analyticSubset_chart_local A hS hi k (z := q)
-    ⟨_, ⟨hqS, (A.chart k).map_target hq⟩, (A.chart k).right_inv hq⟩
+  obtain ⟨W, hW, hqW, hWc, φ, hφ, ⟨w₀, hw₀, hw₀'⟩, hz⟩ :=
+    analyticSubset_chart_local A hS hi k (z := q)
+      ⟨_, ⟨hqS, (A.chart k).map_target hq⟩, (A.chart k).right_inv hq⟩
   let U' := W ∩ ((A.chart k).target ∩ (A.chart k).symm ⁻¹' U)
   have hU' : IsOpen U' := hW.inter ((A.chart k).isOpen_inter_preimage_symm hU)
   have hns : ∀ b ∈ U', φ b ≠ 0 → (A.chart k).symm b ∉ S := fun b hb h0 hs =>
@@ -112,14 +128,18 @@ theorem local_ext {A : FinHolAtlas e X} {S U : Set X} {u : X → ℂ} (hS : A.Is
       by_contra h0
       exact h ⟨h', h0⟩
     exact hw₀' (hφ.eqOn_zero_of_preconnected_of_eventuallyEq_zero hWc hb.1 h2 hw₀)
-  obtain ⟨u', hu', he⟩ := GlobalTheory.LogExt.riemann_extension_log _ U' φ (fun t => u ((A.chart k).symm t)) hU'
-    (hφ.differentiableOn.mono Set.inter_subset_left)
-    (fun b hb => (ha b hb.1.2.1 hb.1.2.2 (hns b hb.1 hb.2)).differentiableAt.differentiableWithinAt) hden
-    (fun b hb' => by
-      obtain ⟨C, hC⟩ := hb _ hb'.2.2
-      refine ⟨C, 0, ?_⟩
-      filter_upwards [((A.chart k).continuousAt_symm hb'.2.1).eventually hC, hU'.mem_nhds hb'] with t h1 h2 h0
-      simpa using h1 (hns t h2 h0))
+  obtain ⟨u', hu', he⟩ :=
+    GlobalTheory.LogExt.riemann_extension_log _ U' φ
+      (fun t => u ((A.chart k).symm t))
+      hU' (hφ.differentiableOn.mono Set.inter_subset_left)
+      (fun b hb =>
+        (ha b hb.1.2.1 hb.1.2.2 (hns b hb.1 hb.2)).differentiableAt.differentiableWithinAt)
+      hden
+      (fun b hb' => by
+        obtain ⟨C, hC⟩ := hb _ hb'.2.2
+        refine ⟨C, 0, ?_⟩
+        filter_upwards [((A.chart k).continuousAt_symm hb'.2.1).eventually hC, hU'.mem_nhds hb'] with t h1 h2 h0
+        simpa using h1 (hns t h2 h0))
   have hq' : q ∈ U' := ⟨hqW, hq, hqU⟩
   refine ⟨u', GlobalTheory.SCV.analyticOnNhd_of_differentiableOn hU' hu' q hq', ?_⟩
   filter_upwards [hU'.mem_nhds hq'] with t ht hts
@@ -129,17 +149,22 @@ theorem local_ext {A : FinHolAtlas e X} {S U : Set X} {u : X → ℂ} (hS : A.Is
     ((ha t ht.2.1 ht.2.2 hts).continuousAt.tendsto.mono_left nhdsWithin_le_nhds) ?_
   filter_upwards [self_mem_nhdsWithin] with b hb using he hb
 
-theorem ext_manifold {A : FinHolAtlas e X} {S U : Set X} {u : X → ℂ} (hS : A.IsAnalyticSubset S) (hi : interior S = ∅)
-    (hU : IsOpen U)
-    (ha : ∀ k, ∀ q ∈ (A.chart k).target, (A.chart k).symm q ∈ U → (A.chart k).symm q ∉ S →
-      AnalyticAt ℂ (fun t => u ((A.chart k).symm t)) q)
-    (hb : ∀ x ∈ U, ∃ C : ℝ, ∀ᶠ x' in 𝓝 x, x' ∉ S → ‖u x'‖ ≤ C) :
-    ∃ F : X → ℂ, A.HoloOn U F ∧ ∀ x ∈ U, x ∉ S → F x = u x := by
+theorem ext_manifold
+    {A : FinHolAtlas e X} {S U : Set X} {u : X → ℂ}
+    (hS : A.IsAnalyticSubset S) (hi : interior S = ∅) (hU : IsOpen U)
+    (ha : ∀ k, ∀ q ∈ (A.chart k).target,
+      (A.chart k).symm q ∈ U → (A.chart k).symm q ∉ S
+        → AnalyticAt ℂ (fun t => u ((A.chart k).symm t)) q)
+    (hb : ∀ x ∈ U, ∃ C : ℝ, ∀ᶠ x' in 𝓝 x, x' ∉ S → ‖u x'‖ ≤ C)
+    : ∃ F : X → ℂ, A.HoloOn U F ∧ ∀ x ∈ U, x ∉ S → F x = u x := by
   have hden : Dense Sᶜ := interior_eq_empty_iff_dense_compl.1 hi
   let F : X → ℂ := fun x => limUnder (𝓝[Sᶜ] x) u
-  have key : ∀ k, ∀ q ∈ (A.chart k).target, (A.chart k).symm q ∈ U → ∃ w : (Fin e → ℂ) → ℂ, AnalyticAt ℂ w q ∧
-      (∀ᶠ t in 𝓝 q, (A.chart k).symm t ∉ S → w t = u ((A.chart k).symm t)) ∧
-      ∀ᶠ t in 𝓝 q, w t = F ((A.chart k).symm t) := fun k q hq hqU => by
+  have key
+      : ∀ k, ∀ q ∈ (A.chart k).target,
+        (A.chart k).symm q ∈ U
+          → ∃ w : (Fin e → ℂ) → ℂ,
+            AnalyticAt ℂ w q ∧ (∀ᶠ t in 𝓝 q, (A.chart k).symm t ∉ S → w t = u ((A.chart k).symm t))
+              ∧ ∀ᶠ t in 𝓝 q, w t = F ((A.chart k).symm t) := fun k q hq hqU => by
     obtain ⟨w, hw, he⟩ := local_ext hS hi hU k (ha k) hb hq hqU
     refine ⟨w, hw, he, ?_⟩
     filter_upwards [he.eventually_nhds, hw.eventually_analyticAt, (A.chart k).open_target.mem_nhds hq] with t h1 h2 h3
@@ -153,7 +178,10 @@ theorem ext_manifold {A : FinHolAtlas e X} {S U : Set X} {u : X → ℂ} (hS : A
     refine ((h2.continuousAt.tendsto.comp hc).mono_left nhdsWithin_le_nhds).congr' ?_
     filter_upwards [nhdsWithin_le_nhds (hc.eventually h1), nhdsWithin_le_nhds ((A.chart k).open_source.mem_nhds hs),
       self_mem_nhdsWithin] with x h4 h5 h6
-    have h7 : (A.chart k).symm (A.chart k x) ∉ S → w (A.chart k x) = u ((A.chart k).symm (A.chart k x)) := h4
+    have h7
+        : (A.chart k).symm (A.chart k x) ∉ S
+          → w (A.chart k x) = u ((A.chart k).symm (A.chart k x)) :=
+      h4
     rw [(A.chart k).left_inv h5] at h7
     exact h7 h6
   refine ⟨F, fun k q hq => ?_, fun x hx hxS => ?_⟩
@@ -190,19 +218,27 @@ theorem descend : Descend := by
     rw [hσ₀ _ hy] at this
     exact this.symm
   have hfc : ContinuousOn f (h ⁻¹' U) := fun y hy => (contAt_of_holoOn B hf hy).continuousWithinAt
-  obtain ⟨F, hF, he⟩ := ext_manifold (u := fun x => f (σ x)) hd.1 hd.2.1 hU
-    (fun k q hq h1 h2 => analytic_off hh hd hf σ hσ hσ' k hq h1 h2) (fun x hx => by
-      obtain ⟨K, hK, hKU, hKc⟩ := local_compact_nhds (hU.mem_nhds hx)
-      have hc : IsCompact (h ⁻¹' K) := (hKc.isClosed.preimage hh.1).isCompact
-      obtain ⟨C, hC⟩ := hc.exists_bound_of_continuousOn (hfc.mono (Set.preimage_mono hKU))
-      refine ⟨C, ?_⟩
-      filter_upwards [hK] with x' h1 h2
-      exact hC _ (by show h (σ x') ∈ K; rwa [hσ x' h2]))
+  obtain ⟨F, hF, he⟩ :=
+    ext_manifold
+      (u := fun x => f (σ x))
+      hd.1 hd.2.1 hU
+      (fun k q hq h1 h2 => analytic_off hh hd hf σ hσ hσ' k hq h1 h2)
+      (fun x hx => by
+        obtain ⟨K, hK, hKU, hKc⟩ := local_compact_nhds (hU.mem_nhds hx)
+        have hc : IsCompact (h ⁻¹' K) := (hKc.isClosed.preimage hh.1).isCompact
+        obtain ⟨C, hC⟩ := hc.exists_bound_of_continuousOn (hfc.mono (Set.preimage_mono hKU))
+        refine ⟨C, ?_⟩
+        filter_upwards [hK] with x' h1 h2
+        exact hC _ (by show h (σ x') ∈ K; rwa [hσ x' h2]))
   refine ⟨F, hF, fun y hy => ?_⟩
   have hden : Dense (h ⁻¹' S)ᶜ := interior_eq_empty_iff_dense_compl.1 hd.2.2.2.1
   have ho : IsOpen (h ⁻¹' U) := hU.preimage hh.1
-  refine Set.EqOn.of_subset_closure (f := fun y => F (h y)) (g := f) (s := h ⁻¹' U ∩ (h ⁻¹' S)ᶜ) (t := h ⁻¹' U)
-    (fun y' hy' => ?_) (fun y' hy' => ?_) hfc Set.inter_subset_left (hden.open_subset_closure_inter ho) hy
+  refine Set.EqOn.of_subset_closure
+    (f := fun y => F (h y))
+    (g := f) (s := h ⁻¹' U ∩ (h ⁻¹' S)ᶜ) (t := h ⁻¹' U)
+    (fun y' hy' => ?_)
+    (fun y' hy' => ?_)
+    hfc Set.inter_subset_left (hden.open_subset_closure_inter ho) hy
   · show F (h y') = f y'
     rw [he _ hy'.1 hy'.2, hσ' _ hy'.2]
   · exact ((contAt_of_holoOn A hF hy').comp hh.1.continuousAt).continuousWithinAt

@@ -41,8 +41,9 @@ def extn (Γ : Subgroup G) (ρ : G → E →ₗ[ℂ] E) (s : G) : Submodule ℂ 
     rw [← smul_sub, h1 γ hγ, ← smul_sub, map_smul]
 
 def relThree (Γ : Subgroup G) (ρ : G → E →ₗ[ℂ] E) (t : G) : Submodule ℂ (G → E) where
-  carrier := {Φ | Φ ∈ twInv Γ (t ^ 3) (ρ (t ^ 3)) ∧
-    ∀ x, ρ (t ^ 2) (Φ x) + ρ t (Φ (x * t)) + Φ (x * t ^ 2) = 0}
+  carrier :=
+    {Φ | Φ ∈ twInv Γ (t ^ 3) (ρ (t ^ 3)) ∧
+      ∀ x, ρ (t ^ 2) (Φ x) + ρ t (Φ (x * t)) + Φ (x * t ^ 2) = 0}
   add_mem' := by
     rintro f f' ⟨h1, h2⟩ ⟨h1', h2'⟩
     refine ⟨Submodule.add_mem _ h1 h1', fun x => ?_⟩

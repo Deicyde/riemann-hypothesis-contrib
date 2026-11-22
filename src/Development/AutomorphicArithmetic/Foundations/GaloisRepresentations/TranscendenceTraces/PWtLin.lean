@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.wtLin_of :
-    FibFin → WtLin := by
+theorem UpperTheory.Gal.TranscendenceTraces.wtLin_of : FibFin → WtLin := by
   intro hF
   refine ⟨?_, ?_, ?_⟩
   · intro Z S p _ w w' h1 h2

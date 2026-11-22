@@ -16,16 +16,18 @@ noncomputable section
 
 universe u
 
-theorem DegZeroLocNoetherian.proof (h : DegZeroLocQuot.Statement.{u}) :
-    DegZeroLocNoetherian.Statement.{u} := by
+theorem DegZeroLocNoetherian.proof (h : DegZeroLocQuot.Statement.{u})
+    : DegZeroLocNoetherian.Statement.{u} := by
   intro F _ K _ _ ι _ P hP W hW hPW
   have := hP.isPrime
   have := hW.isPrime
   let φ : MRing ι F →ₐ[F] FractionRing (MRing ι F ⧸ P) :=
     (IsScalarTower.toAlgHom F (MRing ι F ⧸ P) _).comp (Ideal.Quotient.mkₐ F P)
-  have hφ : ∀ f, f ∉ P → φ f ≠ 0 := fun f hf h0 => hf (by
-    rwa [AlgHom.comp_apply, IsScalarTower.coe_toAlgHom', IsFractionRing.to_map_eq_zero_iff,
-      Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem] at h0)
+  have hφ : ∀ f, f ∉ P → φ f ≠ 0 := fun f hf h0 =>
+    hf (by
+      rwa [AlgHom.comp_apply, IsScalarTower.coe_toAlgHom', IsFractionRing.to_map_eq_zero_iff,
+          Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
+        at h0)
   choose v hv using hW.relevant
   let e : MRing ι F →ₐ[F] FractionRing (MRing ι F ⧸ P) :=
     aeval fun x => φ (X x) / φ (X ⟨x.1, v x.1⟩)
@@ -37,9 +39,11 @@ theorem DegZeroLocNoetherian.proof (h : DegZeroLocQuot.Statement.{u}) :
     exact hv k (Ideal.IsPrime.mem_of_pow_mem inferInstance _ hk)
   have hc : ∀ b, IsMultiHomog (c b) b := by
     intro b
-    have hprod := IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
-      (fun k => (X ⟨k, v k⟩ : MRing ι F) ^ b k) (fun k => b k • blockWeight ι ⟨k, v k⟩)
-      (fun k _ => (isWeightedHomogeneous_X F (blockWeight ι) _).pow (b k))
+    have hprod :=
+      IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
+        (fun k => (X ⟨k, v k⟩ : MRing ι F) ^ b k)
+        (fun k => b k • blockWeight ι ⟨k, v k⟩)
+        (fun k _ => (isWeightedHomogeneous_X F (blockWeight ι) _).pow (b k))
     have hb : (∑ k, b k • blockWeight ι ⟨k, v k⟩) = b := by
       funext k'
       simp [blockWeight, Finset.sum_apply, Pi.single_apply]
@@ -48,14 +52,17 @@ theorem DegZeroLocNoetherian.proof (h : DegZeroLocQuot.Statement.{u}) :
   have hcadd : ∀ b b', c (b + b') = c b * c b' := fun b b' => by
     simp only [c, Pi.add_apply, pow_add, Finset.prod_mul_distrib]
 
-  have hmono : ∀ m : (Σ k, ι k) →₀ ℕ,
-      φ (monomial m 1) = e (monomial m 1) * φ (c (Finsupp.weight (blockWeight ι) m)) := by
+  have hmono
+      : ∀ m : (Σ k, ι k) →₀ ℕ,
+        φ (monomial m 1) = e (monomial m 1) * φ (c (Finsupp.weight (blockWeight ι) m)) := by
     intro m
     refine Finsupp.induction m ?_ ?_
     · simp [c]
     · intro x n m _ _ ih
-      have hs : φ (monomial (Finsupp.single x n) 1) = e (monomial (Finsupp.single x n) 1) *
-          φ (c (Finsupp.weight (blockWeight ι) (Finsupp.single x n))) := by
+      have hs
+          : φ (monomial (Finsupp.single x n) 1)
+            = e (monomial (Finsupp.single x n) 1)
+              * φ (c (Finsupp.weight (blockWeight ι) (Finsupp.single x n))) := by
         rw [Finsupp.weight_single, ← X_pow_eq_monomial, map_pow, map_pow, aeval_X]
         have hcs : c (n • blockWeight ι x) = (X ⟨x.1, v x.1⟩ : MRing ι F) ^ n := by
           simp only [c, blockWeight]
@@ -65,7 +72,8 @@ theorem DegZeroLocNoetherian.proof (h : DegZeroLocQuot.Statement.{u}) :
             simp [hk]
           · simp
         rw [hcs, map_pow, ← mul_pow, div_mul_cancel₀ _ (hφ _ fun hm => hv x.1 (hPW hm))]
-      rw [← mul_one (1 : F), ← monomial_mul, map_mul, map_mul, ih, map_add (f := _), hcadd, map_mul, hs]
+      rw [← mul_one (1 : F), ← monomial_mul, map_mul, map_mul, ih, map_add (f := _), hcadd, map_mul,
+        hs]
       ring
 
   have hhom : ∀ (b : K → ℕ) (f : MRing ι F), IsMultiHomog f b → φ f = e f * φ (c b) := by
@@ -76,14 +84,17 @@ theorem DegZeroLocNoetherian.proof (h : DegZeroLocQuot.Statement.{u}) :
       rw [map_sum, map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun m hm => ?_
     have hw : Finsupp.weight (blockWeight ι) m = b := hf (mem_support_iff.mp hm)
-    have hmon : monomial m (AddMonoidAlgebra.coeff f m) = AddMonoidAlgebra.coeff f m • monomial m (1 : F) := by
+    have hmon
+        : monomial m (AddMonoidAlgebra.coeff f m)
+          = AddMonoidAlgebra.coeff f m • monomial m (1 : F) := by
       rw [smul_monomial, smul_eq_mul, mul_one]
     rw [hmon, map_smul, map_smul, hmono, hw, smul_mul_assoc]
   have hle : e.range ≤ degZeroLoc P {W} := by
     rw [← Algebra.adjoin_range_eq_range_aeval, Algebra.adjoin_le_iff]
     rintro _ ⟨x, rfl⟩
     exact div_mem_degZeroLoc P {W} (isWeightedHomogeneous_X F (blockWeight ι) x)
-      (isWeightedHomogeneous_X F (blockWeight ι) ⟨x.1, v x.1⟩) (fun hm => hv x.1 (hPW hm))
+      (isWeightedHomogeneous_X F (blockWeight ι) ⟨x.1, v x.1⟩)
+      (fun hm => hv x.1 (hPW hm))
       (fun W' hW' => (Set.mem_singleton_iff.mp hW') ▸ hv x.1)
   have : Algebra.FiniteType F e.range :=
     Algebra.FiniteType.of_surjective e.rangeRestrict e.rangeRestrict_surjective
@@ -93,10 +104,13 @@ theorem DegZeroLocNoetherian.proof (h : DegZeroLocQuot.Statement.{u}) :
     (IsUnit.submonoid (degZeroLoc P {W})).comap (algebraMap e.range (degZeroLoc P {W}))
   have hloc : IsLocalization M (degZeroLoc P {W}) := by
     rw [isLocalization_iff]
-    refine ⟨fun y => y.2, fun z => ?_,
-      fun {x y} hxy => ⟨1, by rw [Subalgebra.inclusion_injective hle hxy]⟩⟩
-    obtain ⟨b, f, g, hf, hg, hgP, hgW, hz⟩ := h F K ι P {W}
-      (fun W' hW' => (Set.mem_singleton_iff.mp hW') ▸ hW.isPrime) z.1 z.2
+    refine ⟨
+      fun y => y.2,
+      fun z => ?_,
+      fun {x y} hxy => ⟨1, by rw [Subalgebra.inclusion_injective hle hxy]⟩
+    ⟩
+    obtain ⟨b, f, g, hf, hg, hgP, hgW, hz⟩ :=
+      h F K ι P {W} (fun W' hW' => (Set.mem_singleton_iff.mp hW') ▸ hW.isPrime) z.1 z.2
     have hgW' : g ∉ W := hgW W rfl
     have hcb : φ (c b) ≠ 0 := hφ _ fun hm => hcW b (hPW hm)
     have hz' : (z : FractionRing (MRing ι F ⧸ P)) = φ f / φ g := hz

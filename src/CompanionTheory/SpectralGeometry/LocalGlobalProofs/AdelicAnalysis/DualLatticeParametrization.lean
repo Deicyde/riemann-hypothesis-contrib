@@ -4,34 +4,41 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core GlobalTheory.CompanionTheory.SW.ThW
+open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
+  GlobalTheory.CompanionTheory.SW.ThW
 open scoped ENNReal NNReal MatrixGroups Kronecker
 
 namespace GlobalTheory.CompanionTheory.SW.ThW.DualLattice
 
-noncomputable def ratBasis {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    (b : Module.Basis κ ℤ (𝓞 F)) : Module.Basis κ ℚ F :=
+noncomputable def ratBasis
+    {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (b : Module.Basis κ ℤ (𝓞 F))
+    : Module.Basis κ ℚ F :=
   b.localizationLocalization ℚ (nonZeroDivisors ℤ) F
 
-theorem ratBasis_apply {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    (b : Module.Basis κ ℤ (𝓞 F)) (v : κ) : ratBasis b v = (b v : F) := by
+theorem ratBasis_apply
+    {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (b : Module.Basis κ ℤ (𝓞 F)) (v : κ)
+    : ratBasis b v = (b v : F) := by
   simp [ratBasis, Module.Basis.localizationLocalization_apply]
 
-theorem exists_trace_dual {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    [DecidableEq κ] (b : Module.Basis κ ℤ (𝓞 F)) :
-    ∃ d : κ → F, ∀ v u, Algebra.trace ℚ F ((b v : F) * d u) = if v = u then 1 else 0 := by
+theorem exists_trace_dual
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    (b : Module.Basis κ ℤ (𝓞 F))
+    : ∃ d : κ → F, ∀ v u, Algebra.trace ℚ F ((b v : F) * d u) = if v = u then 1 else 0 := by
   classical
   have hnd := traceForm_nondegenerate ℚ F
   refine ⟨fun u => (Algebra.traceForm ℚ F).dualBasis hnd (ratBasis b) u, fun v u => ?_⟩
-  have h := LinearMap.BilinForm.apply_dualBasis_left (B := Algebra.traceForm ℚ F) hnd
-    (ratBasis b) u v
+  have h :=
+    LinearMap.BilinForm.apply_dualBasis_left (B := Algebra.traceForm ℚ F) hnd (ratBasis b) u v
   rw [Algebra.traceForm_apply, ratBasis_apply, mul_comm] at h
   exact h
 
-theorem eq_of_trace_eq {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    (b : Module.Basis κ ℤ (𝓞 F)) {x y : F}
-    (h : ∀ v, Algebra.trace ℚ F ((b v : F) * x) = Algebra.trace ℚ F ((b v : F) * y)) :
-    x = y := by
+theorem eq_of_trace_eq
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ]
+    (b : Module.Basis κ ℤ (𝓞 F))
+    {x y : F} (h : ∀ v, Algebra.trace ℚ F ((b v : F) * x) = Algebra.trace ℚ F ((b v : F) * y))
+    : x = y := by
   have hnd := traceForm_nondegenerate ℚ F
   rw [← sub_eq_zero]
   apply hnd.2 _
@@ -42,13 +49,18 @@ theorem eq_of_trace_eq {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype
       sub_self, LinearMap.zero_apply]
   exact LinearMap.congr_fun hL z
 
-theorem exists_dual_param (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι]
-    [DecidableEq ι] (B : Matrix ι ι F) (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F)) (N : ℕ)
-    (hB : B.det ≠ 0) (hN : 0 < N) :
-    ∃ e : (ι × InfinitePlace F → ℤ) → ι → F,
-      (∀ n i v, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ e n) i) = n (i, v)) ∧
-      ∀ y : ι → F, (∀ i v, ∃ m : ℤ,
-        (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ y) i) = m) → ∃ n, e n = y := by
+theorem exists_dual_param
+    (F : Type) [Field F] [NumberField F]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (B : Matrix ι ι F)
+    (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F))
+    (N : ℕ)
+    (hB : B.det ≠ 0) (hN : 0 < N)
+    : ∃ e : (ι × InfinitePlace F → ℤ) → ι → F,
+      (∀ n i v, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ e n) i) = n (i, v))
+        ∧ ∀ y : ι → F,
+          (∀ i v, ∃ m : ℤ, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ y) i) = m)
+            → ∃ n, e n = y := by
   classical
   obtain ⟨d, hd⟩ := exists_trace_dual b
   have hNq : (N : ℚ) ≠ 0 := by exact_mod_cast hN.ne'
@@ -57,15 +69,18 @@ theorem exists_dual_param (F : Type) [Field F] [NumberField F] (ι : Type) [Fint
     rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv B hu, Matrix.one_mulVec]
   have hinj : ∀ y : ι → F, B⁻¹ *ᵥ (B *ᵥ y) = y := fun y => by
     rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul B hu, Matrix.one_mulVec]
-  obtain ⟨c, hc⟩ : ∃ c : (ι × InfinitePlace F → ℤ) → ι → F,
-      ∀ n i v, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * c n i) = n (i, v) := by
+  obtain ⟨c, hc⟩
+      : ∃ c : (ι × InfinitePlace F → ℤ) → ι → F, ∀ n i v,
+        (N : ℚ) * Algebra.trace ℚ F ((b v : F) * c n i) = n (i, v) := by
     refine ⟨fun n i => ∑ u, algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u, fun n i v => ?_⟩
     have : Algebra.trace ℚ F ((b v : F) * ∑ u, algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u)
         = (n (i, v) : ℚ) / N := by
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [Finset.mul_sum, map_sum]
-      have hterm : ∀ u, Algebra.trace ℚ F ((b v : F) * (algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u))
-          = ((n (i, u) : ℚ) / N) * (if v = u then 1 else 0) := by
+      have hterm
+          : ∀ u,
+            Algebra.trace ℚ F ((b v : F) * (algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u))
+              = ((n (i, u) : ℚ) / N) * (if v = u then 1 else 0) := by
         intro u
         rw [mul_left_comm, ← Algebra.smul_def, map_smul, hd, smul_eq_mul]
       rw [Finset.sum_congr rfl fun u _ => hterm u]

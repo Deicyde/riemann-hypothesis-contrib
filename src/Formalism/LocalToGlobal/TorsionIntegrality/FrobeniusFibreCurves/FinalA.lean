@@ -13,8 +13,11 @@ namespace Formalism.L2.Th1.B
 
 theorem expLogRules : ExpLogRules := by
   intro K _ _ ι
-  exact ⟨fun f g hf hg => fExp_add hf hg, fun f hf => ⟨constantCoeff_fExp hf, fLog_fExp hf⟩,
-    fun g hg => ⟨constantCoeff_fLog hg, fExp_fLog hg⟩⟩
+  exact ⟨
+    fun f g hf hg => fExp_add hf hg,
+    fun f hf => ⟨constantCoeff_fExp hf, fLog_fExp hf⟩,
+    fun g hg => ⟨constantCoeff_fLog hg, fExp_fLog hg⟩
+  ⟩
 theorem expLogDeriv : ExpLogDeriv := by
   intro K _ _ ι _ i
   exact ⟨fun f hf => pd_fExp i hf, fun g hg => mul_pd_fLog i hg⟩

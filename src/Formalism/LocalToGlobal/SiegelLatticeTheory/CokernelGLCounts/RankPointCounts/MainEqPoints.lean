@@ -9,9 +9,10 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt
-  Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.NGCut Formalism.L2.SG.Pf.MainEqCut Formalism.L2.SG.NGCut.PtPf
-  Formalism.L2.SG.Pf.MainEqSteps
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt
+  Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.NGCut Formalism.L2.SG.Pf.MainEqCut
+  Formalism.L2.SG.NGCut.PtPf Formalism.L2.SG.Pf.MainEqSteps
 
 namespace Formalism.L2.SG.Pf.MainEqPoints
 
@@ -21,8 +22,9 @@ theorem stepPointsG_of
     (hOV : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
       Formalism.L2.SG.TermOp.KExpCut.OOVanish (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u') (X := X))
     (hAt : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word)
-      (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)), t.G ≠ 0 → t.relevant → ∃ w, t.atPt w) :
-    StepPointsG := by
+        (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)),
+      t.G ≠ 0 → t.relevant → ∃ w, t.atPt w)
+    : StepPointsG := by
   intro Cg cb Cw cT CT C0
   refine ⟨0, 0, fun C' Cl _ _ D large₂ X Y u _ νL νB ng γ hγ => ?_⟩
   obtain ⟨c, ν, t, ht, hv, -, hpt, -⟩ := hγ
@@ -52,11 +54,13 @@ theorem stepPointsG_of
   exact hE
 
 open Formalism.L2.SG.TermOp.Vanish in
-theorem stepPointsG_of_leaves (hA : AvgCore) (hU : GinfUnimod) (hN : NLamNinf) (hC : ChiTrivialC) (hG : PsiInfChar)
+theorem stepPointsG_of_leaves
+    (hA : AvgCore) (hU : GinfUnimod) (hN : NLamNinf) (hC : ChiTrivialC) (hG : PsiInfChar)
     (h1 : RClosedC) (h2 : RODiscreteC) (h3 : RCocompactC) (h4 : NonRelCharC)
     (hAt : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word)
-      (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)), t.G ≠ 0 → t.relevant → ∃ w, t.atPt w) :
-    StepPointsG := by
+        (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)),
+      t.G ≠ 0 → t.relevant → ∃ w, t.atPt w)
+    : StepPointsG := by
   refine stepPointsG_of ?_ hAt
   intro D X Y u u'
   unfold Formalism.L2.SG.TermOp.KExpCut.OOVanish

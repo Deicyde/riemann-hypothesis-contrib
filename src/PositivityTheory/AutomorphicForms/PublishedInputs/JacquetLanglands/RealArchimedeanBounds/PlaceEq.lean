@@ -6,8 +6,10 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.JacquetLanglands
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V
+  UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
 open scoped Matrix NNReal
 
 namespace UpperTheory.Esk.BoxMapsToLemmas
@@ -66,8 +68,11 @@ theorem UpperTheory.Esk.dBox : UpperTheory.Esk.DBox := by
   refine ⟨5 ^ Fintype.card (InfinitePlace F), fun R hR => ?_⟩
   set d := Fintype.card (InfinitePlace F)
   set T := (Fintype.piFinset fun _ : InfinitePlace F => Finset.Icc (-(⌈R⌉₊ : ℤ)) ⌈R⌉₊)
-  refine ⟨Set.Finite.of_injOn (BoxMapsToLemmas.mapsTo R) (BoxMapsToLemmas.injOn R) T.finite_toSet, ?_⟩
-  have h1 := Set.ncard_le_ncard_of_injOn _ (BoxMapsToLemmas.mapsTo R) (BoxMapsToLemmas.injOn R) T.finite_toSet
+  refine
+    ⟨Set.Finite.of_injOn (BoxMapsToLemmas.mapsTo R) (BoxMapsToLemmas.injOn R) T.finite_toSet, ?_⟩
+  have h1 :=
+    Set.ncard_le_ncard_of_injOn _ (BoxMapsToLemmas.mapsTo R) (BoxMapsToLemmas.injOn R)
+      T.finite_toSet
   rw [Set.ncard_coe_finset] at h1
   have h2 : T.card = (2 * ⌈R⌉₊ + 1) ^ d := by
     simp only [T, Fintype.card_piFinset, Int.card_Icc, Finset.prod_const, Finset.card_univ]
@@ -85,7 +90,9 @@ theorem UpperTheory.Esk.dBox : UpperTheory.Esk.DBox := by
       linarith [pow_nonneg hR d]
     · rw [max_eq_right h]
       linarith [zero_le_one' ℝ]
-  calc (_ : ℝ) ≤ (T.card : ℝ) := by exact_mod_cast h1
+  calc
+    (_ : ℝ)
+      ≤ (T.card : ℝ) := by exact_mod_cast h1
     _ = ((2 * ⌈R⌉₊ + 1 : ℕ) : ℝ) ^ d := by rw [h2]; push_cast; ring
     _ ≤ (5 * max 1 R) ^ d := pow_le_pow_left₀ (by positivity) h3 _
     _ = 5 ^ d * (max 1 R) ^ d := mul_pow _ _ _

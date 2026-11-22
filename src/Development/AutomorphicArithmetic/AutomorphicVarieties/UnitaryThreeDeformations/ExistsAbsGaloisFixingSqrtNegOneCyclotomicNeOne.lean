@@ -6,11 +6,15 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia Module
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia Module
 
 open UpperTheory.V in
-private theorem quartic_character_eq_one (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (ζ : Ω) (hζ : IsPrimitiveRoot ζ 4)
-    (σ : Formalism.ConjugateSelfDual.G ℚ Ω) (h : σ ζ = ζ) : eta4 Ω σ = 1 := by
+private theorem quartic_character_eq_one
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (ζ : Ω) (hζ : IsPrimitiveRoot ζ 4)
+    (σ : Formalism.ConjugateSelfDual.G ℚ Ω) (h : σ ζ = ζ)
+    : eta4 Ω σ = 1 := by
   unfold eta4 Chr.dirG
   rw [MonoidHom.comp_apply]
   have hc := Chr.cls_spec (k := ℚ) (Ω := Ω) 4 σ ζ hζ.pow_eq_one
@@ -22,8 +26,9 @@ private theorem quartic_character_eq_one (Ω : Type) [Field Ω] [CharZero Ω] [I
   have hu : Chr.cls ℚ Ω 4 σ = 1 := Units.ext (ZMod.val_injective 4 (by rw [hv]; rfl))
   rw [hu, map_one]
 
-theorem UpperTheory.exists_absGalois_fixing_sqrt_neg_one_cyclotomic_ne_one :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∃ σ : Formalism.ConjugateSelfDual.G ℚ Ω, eta4 Ω σ = 1 ∧ cycMod ℚ Ω l 1 σ ≠ 1 := by
+theorem UpperTheory.exists_absGalois_fixing_sqrt_neg_one_cyclotomic_ne_one
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime],
+      l ≠ 2 → ∃ σ : Formalism.ConjugateSelfDual.G ℚ Ω, eta4 Ω σ = 1 ∧ cycMod ℚ Ω l 1 σ ≠ 1 := by
   intro Ω _ _ _ l _ hl2
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hlp : l.Prime := Fact.out
@@ -58,11 +63,18 @@ theorem UpperTheory.exists_absGalois_fixing_sqrt_neg_one_cyclotomic_ne_one :
       rw [← pow_mul, mul_comm 4 (4 * l), pow_mul, hζ.pow_eq_one, one_pow]
     haveI : ∀ i, HasEnoughRootsOfUnity Ω (l ^ i) := fun i => inferInstance
     unfold cycMod cycZ at hcyc
-    have hz : PadicInt.toZModPow 1 ((cyclotomicCharacter Ω l
-        (MulSemiringAction.toRingAut (Formalism.ConjugateSelfDual.G ℚ Ω) Ω σ) : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
+    have hz
+        : PadicInt.toZModPow 1
+            ((cyclotomicCharacter Ω l
+                  (MulSemiringAction.toRingAut (Formalism.ConjugateSelfDual.G ℚ Ω) Ω σ)
+                : ℤ_[l]ˣ)
+              : ℤ_[l])
+          = 1 := by
       simpa using congrArg Units.val hcyc
-    have hs := cyclotomicCharacter.spec l (n := 1) (MulSemiringAction.toRingAut (Formalism.ConjugateSelfDual.G ℚ Ω) Ω σ)
-      (ζ ^ 4) (by rw [pow_one]; exact hprim.pow_eq_one)
+    have hs :=
+      cyclotomicCharacter.spec l (n := 1)
+        (MulSemiringAction.toRingAut (Formalism.ConjugateSelfDual.G ℚ Ω) Ω σ) (ζ ^ 4)
+        (by rw [pow_one]; exact hprim.pow_eq_one)
     rw [hz, ZMod.val_one'' (by rw [pow_one]; exact hlp.one_lt.ne')] at hs
     have hs' : σ (ζ ^ 4) = (ζ ^ 4) ^ 1 := hs
     have heq := (hspec _ h4l).symm.trans hs'

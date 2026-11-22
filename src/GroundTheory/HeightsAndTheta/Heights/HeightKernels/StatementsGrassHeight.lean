@@ -16,22 +16,20 @@ noncomputable section
 
 abbrev PlIdx (j m : ℕ) : Type := {I : Finset (Fin (j + m)) // I.card = j}
 
-def plAnchor (j m : ℕ) : PlIdx j m :=
-  ⟨Finset.univ.map (Fin.castAddEmb m), by simp⟩
+def plAnchor (j m : ℕ) : PlIdx j m := ⟨Finset.univ.map (Fin.castAddEmb m), by simp⟩
 
 abbrev plBlocks (f j m : ℕ) : Fin f → Type := fun _ => PlIdx j m
 
 abbrev GrassField (f j m : ℕ) : Type := FractionRing (MvPolynomial (Fin f × Fin j × Fin m) ℚ)
 
-def grassPolyCoord (f j m : ℕ) : (Σ _ : Fin f, PlIdx j m) → MvPolynomial (Fin f × Fin j × Fin m) ℚ :=
-  fun p => (colsOf (onePipe (fun a b => (X (p.1, a, b) : MvPolynomial (Fin f × Fin j × Fin m) ℚ)))
-    p.2).det
+def grassPolyCoord (f j m : ℕ)
+    : (Σ _ : Fin f, PlIdx j m) → MvPolynomial (Fin f × Fin j × Fin m) ℚ := fun p =>
+  (colsOf (onePipe (fun a b => (X (p.1, a, b) : MvPolynomial (Fin f × Fin j × Fin m) ℚ))) p.2).det
 
-def grassCoord (f j m : ℕ) : (Σ _ : Fin f, PlIdx j m) → GrassField f j m :=
-  fun p => algebraMap _ _ (grassPolyCoord f j m p)
+def grassCoord (f j m : ℕ) : (Σ _ : Fin f, PlIdx j m) → GrassField f j m := fun p =>
+  algebraMap _ _ (grassPolyCoord f j m p)
 
-def grassIdeal (f j m : ℕ) : Ideal (MRing (plBlocks f j m)) :=
-  mCoordIdeal (grassCoord f j m)
+def grassIdeal (f j m : ℕ) : Ideal (MRing (plBlocks f j m)) := mCoordIdeal (grassCoord f j m)
 
 def fsMulti {K : Type*} [Fintype K] (ι : K → Type*) [∀ k, Fintype (ι k)] : HermLine ι :=
   HermLine.ofMetrics (fun k => fsMetric (ι := ι k)) (fun _ => 1)
@@ -42,8 +40,8 @@ def IsRootMatrix {f j m : ℕ} (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ) : Pro
 def rootCoord {f j m : ℕ} (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ) : (Σ _ : Fin f, PlIdx j m) → ℂ :=
   fun p => (colsOf (onePipe (ζ p.1)) p.2).det
 
-def rootPointIdeal {f j m : ℕ} (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ) :
-    Ideal (MRing (plBlocks f j m)) :=
+def rootPointIdeal {f j m : ℕ} (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ)
+    : Ideal (MRing (plBlocks f j m)) :=
   mCoordIdeal (rootCoord ζ)
 
 def rootFamily (f j m : ℕ) : Set (Ideal (MRing (plBlocks f j m))) :=
@@ -51,33 +49,37 @@ def rootFamily (f j m : ℕ) : Set (Ideal (MRing (plBlocks f j m))) :=
 
 def grassConst (f j m : ℕ) : ℝ := ((f * j : ℕ) : ℝ) / 2 * Real.log (1 + m)
 
-def rootAnchorSection (f j m : ℕ) : MRing (plBlocks f j m) :=
-  ∏ τ : Fin f, X ⟨τ, plAnchor j m⟩
+def rootAnchorSection (f j m : ℕ) : MRing (plBlocks f j m) := ∏ τ : Fin f, X ⟨τ, plAnchor j m⟩
 
-def coneRatios {K : Type*} {ι : K → Type*} {Ω : Type*} [Field Ω] (y : (Σ k, ι k) → Ω)
-    (c : ∀ k, ι k) : Set Ω :=
+def coneRatios {K : Type*} {ι : K → Type*} {Ω : Type*} [Field Ω] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
+    : Set Ω :=
   Set.range fun p : Σ k, ι k => y p / y ⟨p.1, c p.1⟩
 
 def GrassHeightBound.Statement : Prop :=
-  SuccessiveMinimaUpperBound → ∀ (f j m : ℕ), 1 ≤ f → ∀ II : IntersectionSystem, IsIntersectionSystem II →
-    II (Fin f) (plBlocks f j m) (grassIdeal f j m) (f * j * m + 1) (fun _ => fsMulti (plBlocks f j m)) ≤
-      ((f * j * m + 1 : ℕ) : ℝ) * grassConst f j m *
-        geomDeg (grassIdeal f j m) (fsMulti (plBlocks f j m)) (f * j * m)
+  SuccessiveMinimaUpperBound
+    → ∀ (f j m : ℕ),
+      1 ≤ f
+        → ∀ II : IntersectionSystem,
+          IsIntersectionSystem II
+            → II (Fin f) (plBlocks f j m) (grassIdeal f j m) (f * j * m + 1)
+                (fun _ => fsMulti (plBlocks f j m))
+              ≤ ((f * j * m + 1 : ℕ) : ℝ) * grassConst f j m
+                * geomDeg (grassIdeal f j m) (fsMulti (plBlocks f j m)) (f * j * m)
 
 def CoordConeArithVar.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [CharZero Ω]
-    (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (d : ℕ) (t : Fin d → Ω),
-    Nonempty K → (∀ k, y ⟨k, c k⟩ ≠ 0) → AlgebraicIndependent ℚ t →
-    (∀ i, t i ∈ IntermediateField.adjoin ℚ (coneRatios y c)) →
-    (∀ r ∈ coneRatios y c, IsAlgebraic (IntermediateField.adjoin ℚ (Set.range t)) r) →
-    IsArithVar (mCoordIdeal y) (d + 1)
+      (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (d : ℕ) (t : Fin d → Ω),
+    Nonempty K → (∀ k, y ⟨k, c k⟩ ≠ 0) → AlgebraicIndependent ℚ t
+      → (∀ i, t i ∈ IntermediateField.adjoin ℚ (coneRatios y c))
+      → (∀ r ∈ coneRatios y c, IsAlgebraic (IntermediateField.adjoin ℚ (Set.range t)) r)
+      → IsArithVar (mCoordIdeal y) (d + 1)
 
 def GrassArithVar.Statement : Prop :=
   ∀ (f j m : ℕ), 1 ≤ f → IsArithVar (grassIdeal f j m) (f * j * m + 1)
 
 def RootArithVar.Statement : Prop :=
-  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ), 1 ≤ f → IsRootMatrix ζ →
-    IsArithVar (rootPointIdeal ζ) 1
+  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ),
+    1 ≤ f → IsRootMatrix ζ → IsArithVar (rootPointIdeal ζ) 1
 
 def FsLineSmooth.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)], IsSmoothHerm (fsMulti ι)
@@ -99,7 +101,7 @@ def FsConjInvariant.Statement : Prop :=
 
 def MultiHomogMemCoord.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
-    (y : (Σ k, ι k) → Ω) (g : MRing ι) (a : K → ℕ),
+      (y : (Σ k, ι k) → Ω) (g : MRing ι) (a : K → ℕ),
     IsMultiHomog g a → (g ∈ mCoordIdeal y ↔ aeval y g = 0)
 
 def GrassLeRoot.Statement : Prop :=
@@ -109,44 +111,48 @@ def RootDense.Statement : Prop :=
   ∀ (f j m : ℕ), IsZariskiDense (grassIdeal f j m) (rootFamily f j m)
 
 def RootAnchorNonzero.Statement : Prop :=
-  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ), IsRootMatrix ζ →
-    ∀ z ∈ mcPts (rootPointIdeal ζ), ∀ τ, z ⟨τ, plAnchor j m⟩ ≠ 0
+  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ),
+    IsRootMatrix ζ → ∀ z ∈ mcPts (rootPointIdeal ζ), ∀ τ, z ⟨τ, plAnchor j m⟩ ≠ 0
 
 def RootPointConj.Statement : Prop :=
-  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ), IsRootMatrix ζ →
-    ∀ z ∈ mcPts (rootPointIdeal ζ), ∀ τ, ∃ ζ' : Matrix (Fin j) (Fin m) ℂ,
-      (∀ a b, ∃ k : ℕ, 0 < k ∧ ζ' a b ^ k = 1) ∧
-        ∀ I : PlIdx j m, z ⟨τ, I⟩ = z ⟨τ, plAnchor j m⟩ * (colsOf (onePipe ζ') I).det
+  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ),
+    IsRootMatrix ζ
+      → ∀ z ∈ mcPts (rootPointIdeal ζ), ∀ τ, ∃ ζ' : Matrix (Fin j) (Fin m) ℂ,
+        (∀ a b, ∃ k : ℕ, 0 < k ∧ ζ' a b ^ k = 1)
+          ∧ ∀ I : PlIdx j m, z ⟨τ, I⟩ = z ⟨τ, plAnchor j m⟩ * (colsOf (onePipe ζ') I).det
 
 def RootLogNormBound.Statement : Prop :=
-  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ), IsRootMatrix ζ →
-    ∀ z ∈ mcPts (rootPointIdeal ζ),
-      -grassConst f j m ≤ logNorm (fsMulti (plBlocks f j m)) (rootAnchorSection f j m) z
+  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ),
+    IsRootMatrix ζ
+      → ∀ z ∈ mcPts (rootPointIdeal ζ),
+        - grassConst f j m ≤ logNorm (fsMulti (plBlocks f j m)) (rootAnchorSection f j m) z
 
 def RootDivSuppEmpty.Statement : Prop :=
-  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ), IsRootMatrix ζ →
-    divSupp (rootPointIdeal ζ) (rootAnchorSection f j m) = ∅
+  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ),
+    IsRootMatrix ζ → divSupp (rootPointIdeal ζ) (rootAnchorSection f j m) = ∅
 
-abbrev McClasses {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    (W : Ideal (MRing ι)) : Type _ :=
-  Quot fun z z' : mcPts W => ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧
-    (z' : (Σ k, ι k) → ℂ) = fun p => c p.1 * (z : (Σ k, ι k) → ℂ) p
+abbrev McClasses {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] (W : Ideal (MRing ι))
+    : Type _ :=
+  Quot fun z z' : mcPts W =>
+    ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧ (z' : (Σ k, ι k) → ℂ) = fun p => c p.1 * (z : (Σ k, ι k) → ℂ) p
 
 def RootPointsFinite.Statement : Prop :=
-  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ), IsRootMatrix ζ →
-    Finite (McClasses (rootPointIdeal ζ))
+  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ),
+    IsRootMatrix ζ → Finite (McClasses (rootPointIdeal ζ))
 
 def RootHeight.Statement : Prop :=
-  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ), 1 ≤ f → IsRootMatrix ζ →
-    ∀ II : IntersectionSystem, IsIntersectionSystem II →
-      II (Fin f) (plBlocks f j m) (rootPointIdeal ζ) 1 ![fsMulti (plBlocks f j m)] ≤
-        grassConst f j m * degC (rootPointIdeal ζ)
+  ∀ (f j m : ℕ) (ζ : Fin f → Matrix (Fin j) (Fin m) ℂ),
+    1 ≤ f → IsRootMatrix ζ
+      → ∀ II : IntersectionSystem,
+        IsIntersectionSystem II
+          → II (Fin f) (plBlocks f j m) (rootPointIdeal ζ) 1 ![fsMulti (plBlocks f j m)]
+            ≤ grassConst f j m * degC (rootPointIdeal ζ)
 
-def lineExampleCoord : (Σ _ : Unit, Fin 2) → FractionRing (MvPolynomial (Fin 1) ℚ) :=
-  fun p => if p.2 = 0 then 1 else algebraMap _ _ (X 0 : MvPolynomial (Fin 1) ℚ)
+def lineExampleCoord : (Σ _ : Unit, Fin 2) → FractionRing (MvPolynomial (Fin 1) ℚ) := fun p =>
+  if p.2 = 0 then 1 else algebraMap _ _ (X 0 : MvPolynomial (Fin 1) ℚ)
 
-def lineExampleT : Fin 1 → FractionRing (MvPolynomial (Fin 1) ℚ) :=
-  fun _ => algebraMap _ _ (X 0 : MvPolynomial (Fin 1) ℚ)
+def lineExampleT : Fin 1 → FractionRing (MvPolynomial (Fin 1) ℚ) := fun _ =>
+  algebraMap _ _ (X 0 : MvPolynomial (Fin 1) ℚ)
 
 end
 

@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Tor
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -18,7 +21,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AffOff
 
-theorem isAffineOpen_inf_interior : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (Y : Model Xo c (RingHom.id c.F)), ReciprocityTheory.AnForm.R.FinalTheorems.Snc (genBdIdeal Y) → ∀ U : Y.X.affineOpens, IsAffineOpen (U.1 ⊓ interior Y) := by
+theorem isAffineOpen_inf_interior
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (Y : Model Xo c (RingHom.id c.F)),
+      ReciprocityTheory.AnForm.R.FinalTheorems.Snc (genBdIdeal Y)
+        → ∀ U : Y.X.affineOpens, IsAffineOpen (U.1 ⊓ interior Y) := by
   intro E _ _ _ H Dw l Xo c Y h U
   have hs := snc_gen_iff.1 h
   unfold boundary at hs
@@ -32,7 +39,8 @@ theorem isAffineOpen_inf_interior : ∀ (E : Type) [Field E] [NumberField E] [Is
       · rintro ⟨hW, hV⟩
         by_contra hz
         have : z ∈ (Scheme.IdealSheafData.vanishingIdeal V.compl).support := by
-          rw [Scheme.IdealSheafData.mem_support_iff_of_mem hW, hI, Scheme.zeroLocus_span, Scheme.zeroLocus_singleton]
+          rw [Scheme.IdealSheafData.mem_support_iff_of_mem hW, hI, Scheme.zeroLocus_span,
+            Scheme.zeroLocus_singleton]
           exact hz
         rw [← SetLike.mem_coe, Scheme.IdealSheafData.coe_support_vanishingIdeal] at this
         exact this hV
@@ -43,7 +51,8 @@ theorem isAffineOpen_inf_interior : ∀ (E : Type) [Field E] [NumberField E] [Is
           rw [← SetLike.mem_coe, Scheme.IdealSheafData.coe_support_vanishingIdeal]
           exact hV
         rw [Scheme.IdealSheafData.mem_support_iff_of_mem hW, hI, Scheme.zeroLocus_span,
-          Scheme.zeroLocus_singleton] at this
+            Scheme.zeroLocus_singleton]
+          at this
         exact this hz
     refine ⟨W.1, hy, W.2, ?_⟩
     rw [← V.ι.isAffineOpen_iff_of_isOpenImmersion, Scheme.Hom.image_preimage_eq_opensRange_inf,
@@ -52,7 +61,8 @@ theorem isAffineOpen_inf_interior : ∀ (E : Type) [Field E] [NumberField E] [Is
   have : IsAffineHom V.ι := isAffineHom_of_forall_exists_isAffineOpen _ key
   have h2 := U.2.preimage V.ι
   rw [← V.ι.isAffineOpen_iff_of_isOpenImmersion, Scheme.Hom.image_preimage_eq_opensRange_inf,
-    Scheme.Opens.opensRange_ι] at h2
+      Scheme.Opens.opensRange_ι]
+    at h2
   rwa [inf_comm]
 
 end GlobalTheory.AffOff

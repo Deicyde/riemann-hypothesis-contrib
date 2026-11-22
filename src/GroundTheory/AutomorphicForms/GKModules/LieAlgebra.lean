@@ -29,8 +29,8 @@ include h
 
 theorem isClosed_lie : IsClosed (𝔤 : Set 𝔸) := 𝔤.closed_of_finiteDimensional
 
-theorem conj_mem (g : G) {Y : 𝔸} (hY : Y ∈ 𝔤) :
-    ((g : 𝔸ˣ) : 𝔸) * Y * (((g⁻¹ : G) : 𝔸ˣ) : 𝔸) ∈ 𝔤 := by
+theorem conj_mem (g : G) {Y : 𝔸} (hY : Y ∈ 𝔤)
+    : ((g : 𝔸ˣ) : 𝔸) * Y * (((g⁻¹ : G) : 𝔸ˣ) : 𝔸) ∈ 𝔤 := by
   set Z := ((g : 𝔸ˣ) : 𝔸) * Y * (((g⁻¹ : G) : 𝔸ˣ) : 𝔸) with hZ
   have ht : Tendsto (fun s : ℝ => s • Z) (𝓝[≠] 0) (𝓝 0) := by
     have : Tendsto (fun s : ℝ => s • Z) (𝓝 0) (𝓝 ((0 : ℝ) • Z)) := tendsto_id.smul_const Z
@@ -52,15 +52,18 @@ theorem lie_mem {X Y : 𝔸} (hX : X ∈ 𝔤) (hY : Y ∈ 𝔤) : ⁅X, Y⁆ �
   let c : ℝ → 𝔸 := fun t => exp (t • X) * Y * exp (t • (-X))
   have hc : ∀ t : ℝ, c t ∈ 𝔤 := by
     intro t
-    have e : c t = ((h.expG ⟨t • X, 𝔤.smul_mem t hX⟩ : 𝔸ˣ) : 𝔸) * Y *
-        ((((h.expG ⟨t • X, 𝔤.smul_mem t hX⟩)⁻¹ : G) : 𝔸ˣ) : 𝔸) := by
+    have e
+        : c t
+          = ((h.expG ⟨t • X, 𝔤.smul_mem t hX⟩ : 𝔸ˣ) : 𝔸) * Y
+            * ((((h.expG ⟨t • X, 𝔤.smul_mem t hX⟩)⁻¹ : G) : 𝔸ˣ) : 𝔸) := by
       show exp (t • X) * Y * exp (t • -X) = exp (t • X) * Y * ↑((expUnit ℝ 𝔸 (t • X))⁻¹)
       rw [coe_expUnit_inv, smul_neg]
     rw [e]
     exact h.conj_mem _ hY
   have hd : HasDerivAt c (X * Y - Y * X) 0 := by
-    have h1 := ((hasDerivAt_exp_smul_const (𝕂 := ℝ) X (0 : ℝ)).mul_const Y).mul
-      (hasDerivAt_exp_smul_const (𝕂 := ℝ) (-X) (0 : ℝ))
+    have h1 :=
+      ((hasDerivAt_exp_smul_const (𝕂 := ℝ) X (0 : ℝ)).mul_const Y).mul
+        (hasDerivAt_exp_smul_const (𝕂 := ℝ) (-X) (0 : ℝ))
     simp only [zero_smul, exp_zero, one_mul, mul_one, mul_neg, ← sub_eq_add_neg] at h1
     exact h1
   have hlim := hasDerivAt_iff_tendsto_slope.1 hd
@@ -69,21 +72,23 @@ theorem lie_mem {X Y : 𝔸} (hX : X ∈ 𝔤) (hY : Y ∈ 𝔤) : ⁅X, Y⁆ �
   rw [slope_def_module]
   exact 𝔤.smul_mem _ (𝔤.sub_mem (hc t) (hc 0))
 
-def lieSubalgebra : LieSubalgebra ℝ 𝔸 :=
-  { 𝔤 with lie_mem' := fun hX hY => h.lie_mem hX hY }
+def lieSubalgebra : LieSubalgebra ℝ 𝔸 := { 𝔤 with lie_mem' := fun hX hY => h.lie_mem hX hY }
 
-@[simp] theorem mem_lieSubalgebra {X : 𝔸} : X ∈ h.lieSubalgebra ↔ X ∈ 𝔤 := Iff.rfl
+@[simp]
+theorem mem_lieSubalgebra {X : 𝔸} : X ∈ h.lieSubalgebra ↔ X ∈ 𝔤 := Iff.rfl
 
 noncomputable def Ad (g : G) : 𝔤 →ₗ[ℝ] 𝔤 where
   toFun X := ⟨((g : 𝔸ˣ) : 𝔸) * X * (((g⁻¹ : G) : 𝔸ˣ) : 𝔸), h.conj_mem g X.2⟩
   map_add' X Y := by ext; simp [mul_add, add_mul]
   map_smul' r X := by ext; simp
 
-@[simp] theorem coe_Ad (g : G) (X : 𝔤) :
-    ((h.Ad g X : 𝔤) : 𝔸) = ((g : 𝔸ˣ) : 𝔸) * X * (((g⁻¹ : G) : 𝔸ˣ) : 𝔸) := rfl
+@[simp]
+theorem coe_Ad (g : G) (X : 𝔤)
+    : ((h.Ad g X : 𝔤) : 𝔸) = ((g : 𝔸ˣ) : 𝔸) * X * (((g⁻¹ : G) : 𝔸ˣ) : 𝔸) :=
+  rfl
 
-@[simp] theorem Ad_one : h.Ad 1 = LinearMap.id := by
-  ext X; simp
+@[simp]
+theorem Ad_one : h.Ad 1 = LinearMap.id := by ext X; simp
 
 theorem Ad_mul (g g' : G) : h.Ad (g * g') = h.Ad g ∘ₗ h.Ad g' := by
   ext X
@@ -93,42 +98,48 @@ theorem Ad_mul (g g' : G) : h.Ad (g * g') = h.Ad g ∘ₗ h.Ad g' := by
 
 def bracket (X Y : 𝔤) : 𝔤 := ⟨⁅(X : 𝔸), (Y : 𝔸)⁆, h.lie_mem X.2 Y.2⟩
 
-@[simp] theorem coe_bracket (X Y : 𝔤) : ((h.bracket X Y : 𝔤) : 𝔸) = (X : 𝔸) * Y - Y * X :=
-  Ring.lie_def _ _
+@[simp]
+theorem coe_bracket (X Y : 𝔤) : ((h.bracket X Y : 𝔤) : 𝔸) = (X : 𝔸) * Y - Y * X := Ring.lie_def _ _
 
-theorem Ad_bracket (g : G) (X Y : 𝔤) :
-    h.Ad g (h.bracket X Y) = h.bracket (h.Ad g X) (h.Ad g Y) := by
-  have hgi : (((g⁻¹ : G) : 𝔸ˣ) : 𝔸) * ((g : 𝔸ˣ) : 𝔸) = 1 := by
-    rw [coe_inv_val, Units.inv_mul]
+theorem Ad_bracket (g : G) (X Y : 𝔤)
+    : h.Ad g (h.bracket X Y) = h.bracket (h.Ad g X) (h.Ad g Y) := by
+  have hgi : (((g⁻¹ : G) : 𝔸ˣ) : 𝔸) * ((g : 𝔸ˣ) : 𝔸) = 1 := by rw [coe_inv_val, Units.inv_mul]
   apply Subtype.ext
   simp only [coe_Ad, coe_bracket]
   set a := ((g : 𝔸ˣ) : 𝔸)
   set b := (((g⁻¹ : G) : 𝔸ˣ) : 𝔸)
   have e : ∀ U V : 𝔸, a * U * b * (a * V * b) = a * (U * V) * b := by
     intro U V
-    calc a * U * b * (a * V * b) = a * U * (b * a) * V * b := by simp only [mul_assoc]
+    calc
+      a * U * b * (a * V * b)
+        = a * U * (b * a) * V * b := by simp only [mul_assoc]
       _ = _ := by rw [hgi, mul_one]; simp only [mul_assoc]
   rw [e, e, mul_sub, sub_mul]
 
 noncomputable def AdL (g : G) : 𝔤 →L[ℝ] 𝔤 := LinearMap.toContinuousLinearMap (h.Ad g)
 
-@[simp] theorem AdL_apply (g : G) (X : 𝔤) : h.AdL g X = h.Ad g X := rfl
+@[simp]
+theorem AdL_apply (g : G) (X : 𝔤) : h.AdL g X = h.Ad g X := rfl
 
 theorem expG_Ad (g : G) (X : 𝔤) : h.expG (h.Ad g X) = g * h.expG X * g⁻¹ := by
-  apply Subtype.ext; apply Units.ext
+  apply Subtype.ext
+  apply Units.ext
   simp only [coe_expG, coe_Ad, Subgroup.coe_mul, Units.val_mul, coe_inv_val]
   exact exp_units_conj_real _ _
 
-theorem hasDerivAt_Ad_expG (X Y : 𝔤) :
-    HasDerivAt (fun t : ℝ => h.Ad (h.expG (t • X)) Y) (h.bracket X Y) 0 := by
-  have hd : HasDerivAt (fun t : ℝ => exp (t • (X : 𝔸)) * Y * exp (t • (-(X : 𝔸))))
+theorem hasDerivAt_Ad_expG (X Y : 𝔤)
+    : HasDerivAt (fun t : ℝ => h.Ad (h.expG (t • X)) Y) (h.bracket X Y) 0 := by
+  have hd : HasDerivAt
+      (fun t : ℝ => exp (t • (X : 𝔸)) * Y * exp (t • (-(X : 𝔸))))
       ((X : 𝔸) * Y - Y * X) 0 := by
-    have h1 := ((hasDerivAt_exp_smul_const (𝕂 := ℝ) (X : 𝔸) (0 : ℝ)).mul_const (Y : 𝔸)).mul
-      (hasDerivAt_exp_smul_const (𝕂 := ℝ) (-(X : 𝔸)) (0 : ℝ))
+    have h1 :=
+      ((hasDerivAt_exp_smul_const (𝕂 := ℝ) (X : 𝔸) (0 : ℝ)).mul_const (Y : 𝔸)).mul
+        (hasDerivAt_exp_smul_const (𝕂 := ℝ) (-(X : 𝔸)) (0 : ℝ))
     simp only [zero_smul, exp_zero, one_mul, mul_one, mul_neg, ← sub_eq_add_neg] at h1
     exact h1
-  have hval : ∀ t : ℝ, ((h.Ad (h.expG (t • X)) Y : 𝔤) : 𝔸) =
-      exp (t • (X : 𝔸)) * Y * exp (t • (-(X : 𝔸))) := by
+  have hval
+      : ∀ t : ℝ,
+        ((h.Ad (h.expG (t • X)) Y : 𝔤) : 𝔸) = exp (t • (X : 𝔸)) * Y * exp (t • (-(X : 𝔸))) := by
     intro t
     show exp (t • (X : 𝔸)) * Y * ↑((expUnit ℝ 𝔸 (t • (X : 𝔸)))⁻¹) = _
     rw [coe_expUnit_inv, smul_neg]

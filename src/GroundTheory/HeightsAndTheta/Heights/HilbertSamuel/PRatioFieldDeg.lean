@@ -9,7 +9,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -17,25 +18,31 @@ namespace RatioFieldDeg
 
 variable {ι : Type}
 
-def quotCone {E : Type} [Field E] (u : ι → E) (I : Ideal (MvPolynomial ι ℤ)) (hu : coordIdeal ℤ u = I) :
-    MvPolynomial ι ℤ ⧸ I →+* Polynomial E :=
+def quotCone
+    {E : Type} [Field E] (u : ι → E) (I : Ideal (MvPolynomial ι ℤ)) (hu : coordIdeal ℤ u = I)
+    : MvPolynomial ι ℤ ⧸ I →+* Polynomial E :=
   Ideal.Quotient.lift I (coneMap ℤ u).toRingHom (fun a ha => by rw [← hu] at ha; exact ha)
 
-theorem quotCone_injective {E : Type} [Field E] (u : ι → E) (I : Ideal (MvPolynomial ι ℤ))
-    (hu : coordIdeal ℤ u = I) : Function.Injective (quotCone u I hu) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem quotCone_injective
+    {E : Type} [Field E] (u : ι → E) (I : Ideal (MvPolynomial ι ℤ)) (hu : coordIdeal ℤ u = I)
+    : Function.Injective (quotCone u I hu) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   obtain ⟨p, rfl⟩ := Ideal.Quotient.mk_surjective a
   rw [Ideal.Quotient.eq_zero_iff_mem, ← hu, coordIdeal, RingHom.mem_ker]
   simpa [quotCone] using ha
 
-theorem isDomain_quot {E : Type} [Field E] (u : ι → E) (I : Ideal (MvPolynomial ι ℤ))
-    (hu : coordIdeal ℤ u = I) : IsDomain (MvPolynomial ι ℤ ⧸ I) :=
+theorem isDomain_quot
+    {E : Type} [Field E] (u : ι → E) (I : Ideal (MvPolynomial ι ℤ)) (hu : coordIdeal ℤ u = I)
+    : IsDomain (MvPolynomial ι ℤ ⧸ I) :=
   Function.Injective.isDomain _ (quotCone_injective u I hu)
 
-theorem charZero_frac {E : Type} [Field E] [CharZero E] (u : ι → E) (I : Ideal (MvPolynomial ι ℤ))
-    (hu : coordIdeal ℤ u = I) [IsDomain (MvPolynomial ι ℤ ⧸ I)] :
-    CharZero (FractionRing (MvPolynomial ι ℤ ⧸ I)) := by
+theorem charZero_frac
+    {E : Type} [Field E] [CharZero E]
+    (u : ι → E) (I : Ideal (MvPolynomial ι ℤ)) (hu : coordIdeal ℤ u = I)
+    [IsDomain (MvPolynomial ι ℤ ⧸ I)]
+    : CharZero (FractionRing (MvPolynomial ι ℤ ⧸ I)) := by
   have hg : Function.Injective ((algebraMap (Polynomial E) (RatFunc E)).comp (quotCone u I hu)) :=
     (IsFractionRing.injective (Polynomial E) (RatFunc E)).comp (quotCone_injective u I hu)
   refine ⟨fun n m h => ?_⟩
@@ -55,12 +62,15 @@ variable [CharZero (FractionRing (MvPolynomial ι ℤ ⧸ I))]
 def ratField {κ : Type} (s : κ → ι) : IntermediateField ℚ (FractionRing (MvPolynomial ι ℤ ⧸ I)) :=
   IntermediateField.adjoin ℚ {t | ∃ k l, t = coord I (s k) / coord I (s l)}
 
-theorem projDeg_eq {E : Type} [Field E] [CharZero E] (u : ι → E) (hu : coordIdeal ℤ u = I) {D : ℕ}
-    (e : Fin (D + 1) → ι) :
-    projDeg u e = IntermediateField.relfinrank (ratField I e) (ratField I id) := by
+theorem projDeg_eq
+    {E : Type} [Field E] [CharZero E]
+    (u : ι → E) (hu : coordIdeal ℤ u = I)
+    {D : ℕ} (e : Fin (D + 1) → ι)
+    : projDeg u e = IntermediateField.relfinrank (ratField I e) (ratField I id) := by
   have hg : Function.Injective ((algebraMap (Polynomial E) (RatFunc E)).comp (quotCone u I hu)) :=
     (IsFractionRing.injective (Polynomial E) (RatFunc E)).comp (quotCone_injective u I hu)
-  let f : FractionRing (MvPolynomial ι ℤ ⧸ I) →ₐ[ℚ] RatFunc E := (IsFractionRing.lift hg).toRatAlgHom
+  let f : FractionRing (MvPolynomial ι ℤ ⧸ I) →ₐ[ℚ] RatFunc E :=
+    (IsFractionRing.lift hg).toRatAlgHom
   let c : E →ₐ[ℚ] RatFunc E := (RatFunc.C : E →+* RatFunc E).toRatAlgHom
   have hx : ∀ i, f (coord I i) = RatFunc.C (u i) * RatFunc.X := by
     intro i

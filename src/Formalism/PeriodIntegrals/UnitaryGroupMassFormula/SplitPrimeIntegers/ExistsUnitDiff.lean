@@ -13,8 +13,10 @@ noncomputable section
 
 namespace PI.SplitIntLoc.Proof
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {v : HeightOneSpectrum (𝓞 F)} (spl : E ⊗[F] (v.adicCompletion F) ≃+* (v.adicCompletion F) × (v.adicCompletion F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {v : HeightOneSpectrum (𝓞 F)}
+  (spl : E ⊗[F] (v.adicCompletion F) ≃+* (v.adicCompletion F) × (v.adicCompletion F))
 
 lemma spl_tmul (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) = (a, a)) (e : E) (a : (v.adicCompletion F)) :
     spl (e ⊗ₜ[F] a) =
@@ -128,8 +130,8 @@ instance (Q : Ideal (𝓞 E)) [Q.IsPrime] : IsLocalization.AtPrime (Dloc Q) Q :=
     (Localization.subalgebra E Q.primeCompl Q.primeCompl_le_nonZeroDivisors))
 
 instance (Q : Ideal (𝓞 E)) [Q.IsPrime] : IsFractionRing (Dloc Q) E :=
-  inferInstanceAs (IsFractionRing
-    (Localization.subalgebra E Q.primeCompl Q.primeCompl_le_nonZeroDivisors) E)
+  inferInstanceAs
+    (IsFractionRing (Localization.subalgebra E Q.primeCompl Q.primeCompl_le_nonZeroDivisors) E)
 
 lemma prime_fst_ne_prime_snd (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) = (a, a)) :
     P spl (RingHom.fst (v.adicCompletion F) (v.adicCompletion F)) ≠ P spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) := by
@@ -188,22 +190,40 @@ lemma exists_unit_diff (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ
   have hb' : phi spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) b ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers F) := hb
   exact Ideal.add_mem _ ha' hb'
 
-theorem sup_dir (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) = (a, a)) (x : E ⊗[F] (v.adicCompletion F))
-    (h1 : (spl x).1 ∈ (v.adicCompletionIntegers F)) (h2 : (spl x).2 ∈ (v.adicCompletionIntegers F)) :
-    x ∈ tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring := by
+theorem sup_dir
+    (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) = (a, a))
+    (x : E ⊗[F] (v.adicCompletion F))
+    (h1 : (spl x).1 ∈ (v.adicCompletionIntegers F)) (h2 : (spl x).2 ∈ (v.adicCompletionIntegers F))
+    : x ∈ tensInt (F := F) (v.adicCompletion F) (intOE E)
+      ((v.adicCompletionIntegers F)).toSubring := by
   obtain ⟨b, hb⟩ := exists_unit_diff spl hspl
   obtain ⟨u, hu⟩ := hb.exists_right_inv
-  have hu' : ((phi spl (RingHom.fst (v.adicCompletion F) (v.adicCompletion F)) b : (v.adicCompletion F)) - (phi spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) b : (v.adicCompletion F))) *
-      (u : (v.adicCompletion F)) = 1 := congrArg Subtype.val hu
-  have hE : ∀ e : 𝓞 E, (algebraMap (𝓞 E) E e) ⊗ₜ[F] (1 : (v.adicCompletion F)) ∈
-      tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring := fun e =>
+  have hu'
+      : ((phi spl (RingHom.fst (v.adicCompletion F) (v.adicCompletion F)) b : (v.adicCompletion F))
+            - (phi spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) b
+              : (v.adicCompletion F)))
+          * (u : (v.adicCompletion F))
+        = 1 :=
+    congrArg Subtype.val hu
+  have hE
+      : ∀ e : 𝓞 E,
+        (algebraMap (𝓞 E) E e) ⊗ₜ[F] (1 : (v.adicCompletion F)) ∈ tensInt (F := F)
+          (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring := fun e =>
     Subring.subset_closure (Or.inl ⟨⟨_, RingHom.mem_range.2 ⟨e, rfl⟩⟩, rfl⟩)
-  have hK : ∀ c : (v.adicCompletionIntegers F), (1 : E) ⊗ₜ[F] (c : (v.adicCompletion F)) ∈
-      tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring := fun c =>
+  have hK
+      : ∀ c : (v.adicCompletionIntegers F),
+        (1 : E) ⊗ₜ[F] (c : (v.adicCompletion F)) ∈ tensInt (F := F) (v.adicCompletion F) (intOE E)
+          ((v.adicCompletionIntegers F)).toSubring := fun c =>
     Subring.subset_closure (Or.inr ⟨⟨c, c.2⟩, rfl⟩)
-  obtain ⟨w, hw_def⟩ : ∃ w : E ⊗[F] (v.adicCompletion F), w = (algebraMap (𝓞 E) E b ⊗ₜ[F] (1 : (v.adicCompletion F)) -
-      (1 : E) ⊗ₜ[F] (phi spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) b : (v.adicCompletion F))) * ((1 : E) ⊗ₜ[F] (u : (v.adicCompletion F))) := ⟨_, rfl⟩
-  have hw : w ∈ tensInt (F := F) (v.adicCompletion F) (intOE E) ((v.adicCompletionIntegers F)).toSubring := by
+  obtain ⟨w, hw_def⟩
+      : ∃ w : E ⊗[F] (v.adicCompletion F),
+        w = (algebraMap (𝓞 E) E b ⊗ₜ[F] (1 : (v.adicCompletion F))
+            - (1 : E) ⊗ₜ[F] (phi spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) b : (v.adicCompletion F)))
+          * ((1 : E) ⊗ₜ[F] (u : (v.adicCompletion F))) :=
+    ⟨_, rfl⟩
+  have hw
+      : w ∈ tensInt (F := F) (v.adicCompletion F) (intOE E)
+        ((v.adicCompletionIntegers F)).toSubring := by
     rw [hw_def]
     exact Subring.mul_mem _ (Subring.sub_mem _ (hE b) (hK _)) (hK u)
   have hsw : spl w = (1, 0) := by
@@ -213,14 +233,19 @@ theorem sup_dir (hspl : ∀ a : (v.adicCompletion F), spl ((1 : E) ⊗ₜ[F] a) 
     · show ((phi spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) b : (v.adicCompletion F)) - (phi spl (RingHom.snd (v.adicCompletion F) (v.adicCompletion F)) b : (v.adicCompletion F))) *
         (u : (v.adicCompletion F)) = 0
       rw [sub_self, zero_mul]
-  have hx' : spl x = spl ((1 : E) ⊗ₜ[F] (((⟨_, h2⟩ : (v.adicCompletionIntegers F))) : (v.adicCompletion F)) +
-      w * ((1 : E) ⊗ₜ[F] ((((⟨_, h1⟩ : (v.adicCompletionIntegers F)) - ⟨_, h2⟩ : (v.adicCompletionIntegers F))) : (v.adicCompletion F)))) := by
-    rw [map_add (f := _), map_mul, hsw, hspl, hspl]
-    refine Prod.ext ?_ ?_
-    · show (spl x).1 = (spl x).2 + 1 * ((spl x).1 - (spl x).2)
-      ring
-    · show (spl x).2 = (spl x).2 + 0 * ((spl x).1 - (spl x).2)
-      ring
+  have hx'
+      : spl x
+        = spl
+          ((1 : E) ⊗ₜ[F] (((⟨_, h2⟩ : (v.adicCompletionIntegers F))) : (v.adicCompletion F))
+            + w
+              * ((1 : E) ⊗ₜ[F] ((((⟨_, h1⟩ : (v.adicCompletionIntegers F)) - ⟨_, h2⟩ : (v.adicCompletionIntegers F))) : (v.adicCompletion F)))) :=
+    by
+      rw [map_add (f := _), map_mul, hsw, hspl, hspl]
+      refine Prod.ext ?_ ?_
+      · show (spl x).1 = (spl x).2 + 1 * ((spl x).1 - (spl x).2)
+        ring
+      · show (spl x).2 = (spl x).2 + 0 * ((spl x).1 - (spl x).2)
+        ring
   rw [spl.injective hx']
   exact Subring.add_mem _ (hK _) (Subring.mul_mem _ hw (hK _))
 

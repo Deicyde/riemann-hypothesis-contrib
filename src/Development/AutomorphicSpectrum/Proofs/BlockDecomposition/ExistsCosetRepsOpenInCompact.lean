@@ -10,11 +10,11 @@ namespace GlobalTheory.CompanionTheory.Topology
 
 theorem exists_finset_transversal_of_isCompact_of_isOpen
     (X : Type) [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
-    (A L : AddSubgroup X) (hA : IsCompact (A : Set X)) (hL : IsOpen (L : Set X)) (_hLA : L ≤ A) :
-    ∃ T : Finset X, (∀ t ∈ T, t ∈ A) ∧ (∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ L) := by
+    (A L : AddSubgroup X) (hA : IsCompact (A : Set X)) (hL : IsOpen (L : Set X)) (_hLA : L ≤ A)
+    : ∃ T : Finset X, (∀ t ∈ T, t ∈ A) ∧ (∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ L) := by
   classical
-  have hcoset : ∀ x : X, ((↑) : X → X ⧸ L) '' (Homeomorph.addLeft x '' (L : Set X)) =
-      {(x : X ⧸ L)} := by
+  have hcoset
+      : ∀ x : X, ((↑) : X → X ⧸ L) '' (Homeomorph.addLeft x '' (L : Set X)) = {(x : X ⧸ L)} := by
     intro x
     ext q
     constructor

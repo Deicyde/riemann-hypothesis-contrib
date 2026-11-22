@@ -10,12 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CharPolLp
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie GlobalTheory.SplitRead
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie
+  GlobalTheory.SplitRead
 
 namespace GlobalTheory.InertialTypes
 
-theorem not_mem_placesOver_of_ne {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
-    (hne : p ≠ q) {w : HeightOneSpectrum (𝓞 E)} (hw : w ∈ placesOver E p) : w ∉ placesOver E q := by
+theorem not_mem_placesOver_of_ne
+    {E : Type} [Field E] [NumberField E]
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hne : p ≠ q)
+    {w : HeightOneSpectrum (𝓞 E)} (hw : w ∈ placesOver E p)
+    : w ∉ placesOver E q := by
   intro hw'
   have hc : IsCoprime (p : 𝓞 E) (q : 𝓞 E) := Nat.Coprime.cast ((Nat.coprime_primes hp hq).2 hne)
   obtain ⟨a, b, hab⟩ := hc

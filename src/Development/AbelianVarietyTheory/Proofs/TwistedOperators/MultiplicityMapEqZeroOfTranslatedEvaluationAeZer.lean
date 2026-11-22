@@ -14,7 +14,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContD
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory
+  NumberField IsDedekindDomain
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -46,13 +50,18 @@ theorem gfset_countable (I : AutInst) : I.GFset.Countable := by
   · exact Subtype.ext (Units.ext ((hx1 v).trans (hy1 v).symm))
   · exact Subtype.ext (Units.ext (hx2.trans hy2.symm))
 
-theorem eq_zero_of_ae_fund (I : AutInst) (μf : Measure I.Gf) [μf.IsHaarMeasure] [SigmaFinite μf] {fund : Set I.GA}
-    (hfund : I.IsFundDom (I.muA μf) fund) {φ : I.GA → ℂ} (hc : Continuous φ)
-    (hinv : ∀ γ ∈ I.GFset, ∀ y, φ (γ * y) = φ y) (h0 : φ =ᵐ[(I.muA μf).restrict fund] 0) (y : I.GA) : φ y = 0 := by
+theorem eq_zero_of_ae_fund
+    (I : AutInst) (μf : Measure I.Gf) [μf.IsHaarMeasure] [SigmaFinite μf]
+    {fund : Set I.GA} (hfund : I.IsFundDom (I.muA μf) fund)
+    {φ : I.GA → ℂ} (hc : Continuous φ) (hinv : ∀ γ ∈ I.GFset, ∀ y, φ (γ * y) = φ y)
+    (h0 : φ =ᵐ[(I.muA μf).restrict fund] 0)
+    (y : I.GA)
+    : φ y = 0 := by
   by_contra hy
   obtain ⟨hl, -, -, -, hpos⟩ := GlobalTheory.AdelicUnimod.adelic_unimodular I μf
 
-  have hpre : ∀ γ : I.GA, ∀ A : Set I.GA, I.muA μf A = 0 → I.muA μf ((fun z => γ * z) ⁻¹' A) = 0 := by
+  have hpre
+      : ∀ γ : I.GA, ∀ A : Set I.GA, I.muA μf A = 0 → I.muA μf ((fun z => γ * z) ⁻¹' A) = 0 := by
     intro γ A hA
     obtain ⟨t, hAt, ht, ht0⟩ := exists_measurable_superset_of_null hA
     refine measure_mono_null (Set.preimage_mono hAt) ?_
@@ -81,8 +90,8 @@ theorem eq_zero_of_ae_fund (I : AutInst) (μf : Measure I.Gf) [μf.IsHaarMeasure
     exact hpre γ _ hnull
   exact (hpos _ hopen ⟨y, hy⟩).ne' hall
 
-theorem castGA_symm_mem {I I' : AutInst} (p : I = I') (γ : I'.GA) (hγ : γ ∈ I'.GFset) :
-    (castGA p).symm γ ∈ I.GFset := by
+theorem castGA_symm_mem {I I' : AutInst} (p : I = I') (γ : I'.GA) (hγ : γ ∈ I'.GFset)
+    : (castGA p).symm γ ∈ I.GFset := by
   subst p
   exact hγ
 
@@ -90,15 +99,18 @@ end Count
 
 section Cyclic
 
-variable {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} {θ : Formalism.IndefR.Datum.InfFam D} {M : DSModel V S} {J : Set (GA D V)}
-  {χ : GA D V → ℂ}
+variable
+  {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar}
+  {θ : Formalism.IndefR.Datum.InfFam D} {M : DSModel V S} {J : Set (GA D V)} {χ : GA D V → ℂ}
 
-theorem eq_zero_of_value {T : MMap M} (hT : IsMultMap θ M J χ T) (v₀ : M.Vec) (hv₀ : ∀ τ, (v₀ τ : M.H τ) ≠ 0)
-    (h0 : T v₀ = 0) : T = 0 := by
+theorem eq_zero_of_value
+    {T : MMap M} (hT : IsMultMap θ M J χ T)
+    (v₀ : M.Vec) (hv₀ : ∀ τ, (v₀ τ : M.H τ) ≠ 0) (h0 : T v₀ = 0)
+    : T = 0 := by
   classical
-
-  have step : ∀ (u : M.Vec) (τ : D.what₂.Tau), T u = 0 → (u τ : M.H τ) ≠ 0 →
-      ∀ w : M.sm τ, T (Function.update u τ w) = 0 := by
+  have step
+      : ∀ (u : M.Vec) (τ : D.what₂.Tau),
+        T u = 0 → (u τ : M.H τ) ≠ 0 → ∀ w : M.sm τ, T (Function.update u τ w) = 0 := by
     intro u τ hu hne w
     funext x
     obtain ⟨ℓ, hℓ, hval⟩ := hT.cont τ u x
@@ -108,11 +120,13 @@ theorem eq_zero_of_value {T : MMap M} (hT : IsMultMap θ M J χ T) (v₀ : M.Vec
       have h1 := hval ⟨_, hmem⟩
       rw [hT.equiv τ g hg u ⟨_, hmem⟩ rfl, hu] at h1
       simpa [rTr] using h1
-    have h2 := GlobalTheory.SmoothCyclic.eq_zero_of_orbit D V S M τ ℓ hℓ (u τ) (u τ).2 hne horb w w.2
+    have h2 :=
+      GlobalTheory.SmoothCyclic.eq_zero_of_orbit D V S M τ ℓ hℓ (u τ) (u τ).2 hne horb w w.2
     rw [hval w] at h2
     exact h2
 
-  have key : ∀ s : Finset D.what₂.Tau, ∀ w : M.Vec, T (fun τ => if τ ∈ s then w τ else v₀ τ) = 0 := by
+  have key
+      : ∀ s : Finset D.what₂.Tau, ∀ w : M.Vec, T (fun τ => if τ ∈ s then w τ else v₀ τ) = 0 := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · intro w
@@ -135,71 +149,116 @@ end Cyclic
 
 end GlobalTheory.TranslatedEvalInj
 
-theorem GlobalTheory.TranslatedEvalInj.eq_zero : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D), R.toLevCh.Is A.μ0 → R.IsGrp F → R.IsModels → ∀ (t : GA D (Yc D 0)) (v₀ : (MP R).Vec), (∀ τ, (v₀ τ : (MP R).H τ) ≠ 0) → ∀ S ∈ Mult R.θ (R.MY 0) (levS (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true))) (levChi (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true))), ∀ S' : MMap (R.MY 0), S' = postOn (R.MY 0) R.e0 S - S → ((fun x => ev (MP R) v₀ S' (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x) t)) =ᵐ[muX X] 0) → S' = 0 := by
+theorem GlobalTheory.TranslatedEvalInj.eq_zero
+    : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A)
+        (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+        (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D),
+      R.toLevCh.Is A.μ0 → R.IsGrp F → R.IsModels
+        → ∀ (t : GA D (Yc D 0)) (v₀ : (MP R).Vec),
+          (∀ τ, (v₀ τ : (MP R).H τ) ≠ 0)
+            → ∀ S
+                ∈ Mult R.θ (R.MY 0) (levS (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true)))
+                  (levChi (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true))),
+              ∀ S' : MMap (R.MY 0),
+                S' = postOn (R.MY 0) R.e0 S - S
+                  → ((fun x => ev (MP R) v₀ S' (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x) t)) =ᵐ[muX X] 0)
+                  → S' = 0 := by
   intro D G _ _ Pl0 T A Ks _ _ _ R F X h _ _ hmod t v₀ hv₀ S hS S' hS' hae
 
-  have hsub : ∀ k ∈ (levG (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) : Set (GA D (Yc D 0))),
-      k ∈ levS (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true)) ∧
-        levChi (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true)) k =
-          levChi (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) k := by
+  have hsub
+      : ∀ k ∈ (levG (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) : Set (GA D (Yc D 0))),
+        k ∈ levS (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true))
+          ∧ levChi (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true)) k
+            = levChi (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) k := by
     intro k hk
-    have h1 : Formalism.L2.DIV.rTup (R.βY 0) (R.dat0 R.triv) (finE (Yc D 0) k) = 1 := Subgroup.mem_bot.1 hk.2.2
+    have h1 : Formalism.L2.DIV.rTup (R.βY 0) (R.dat0 R.triv) (finE (Yc D 0) k) = 1 :=
+      Subgroup.mem_bot.1 hk.2.2
     refine ⟨⟨hk.1, hk.2.1, ?_⟩, ?_⟩
     · change Formalism.L2.DIV.rTup (R.βY 0) (R.dat0 R.triv) (finE (Yc D 0) k) ∈ (R.levR F true).H
       rw [h1]
       exact Subgroup.one_mem _
     · rw [GlobalTheory.FlagAction.levChi_flag1]
-      have e1 := Formalism.IndefR.Lev.levFn_withP (V := Yc D 0) (β := R.βY 0) (L := R.dat0 R.triv) (R.levR F true)
-        (finE (Yc D 0) k)
-      have e2 : Formalism.L2.DIV.ext1 (R.levR F true).H (R.levR F true).chi
-          (Formalism.L2.DIV.rTup (R.βY 0) (R.dat0 R.triv) (finE (Yc D 0) k)) = 1 := by
+      have e1 :=
+        Formalism.IndefR.Lev.levFn_withP (V := Yc D 0) (β := R.βY 0) (L := R.dat0 R.triv)
+          (R.levR F true) (finE (Yc D 0) k)
+      have e2
+          : Formalism.L2.DIV.ext1 (R.levR F true).H (R.levR F true).chi
+              (Formalism.L2.DIV.rTup (R.βY 0) (R.dat0 R.triv) (finE (Yc D 0) k))
+            = 1 := by
         rw [h1]
         exact Formalism.L2.DIV.blockDiagonalExtendByOnePrimeField_one _ _
-      calc levChi (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true)) k
-          = ((Formalism.L2.DIV.ext1 (R.levR F true).H (R.levR F true).chi
-              (Formalism.L2.DIV.rTup (R.βY 0) (R.dat0 R.triv) (finE (Yc D 0) k)) *
-              Formalism.L2.DIV.levFn (R.βY 0) (flagL (R.dat0 R.triv)) (finE (Yc D 0) k) : ℂˣ) : ℂ) :=
-            congrArg Units.val e1
-        _ = ((Formalism.L2.DIV.levFn (R.βY 0) (flagL (R.dat0 R.triv)) (finE (Yc D 0) k) : ℂˣ) : ℂ) := by
-            rw [e2, one_mul]
-  have hSp : S ∈ Mult R.θ (R.MY 0) (levG (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) : Set (GA D (Yc D 0)))
-      (levChi (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv))) :=
+      calc
+        levChi (Yc D 0) (R.βY 0) (R.dat0 (R.levR F true)) k
+            = ((Formalism.L2.DIV.ext1 (R.levR F true).H (R.levR F true).chi
+                    (Formalism.L2.DIV.rTup (R.βY 0) (R.dat0 R.triv) (finE (Yc D 0) k))
+                  * Formalism.L2.DIV.levFn (R.βY 0) (flagL (R.dat0 R.triv)) (finE (Yc D 0) k)
+                : ℂˣ)
+              : ℂ) :=
+          congrArg Units.val e1
+        _ = ((Formalism.L2.DIV.levFn (R.βY 0) (flagL (R.dat0 R.triv)) (finE (Yc D 0) k) : ℂˣ)
+            : ℂ) := by
+          rw [e2, one_mul]
+  have hSp
+      : S
+        ∈ Mult R.θ (R.MY 0) (levG (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) : Set (GA D (Yc D 0)))
+          (levChi (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv))) :=
     GlobalTheory.ProjectedLift.mult_mono hsub hS
-  have hS'm : S' ∈ Mult R.θ (R.MY 0) (levG (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) : Set (GA D (Yc D 0)))
-      (levChi (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv))) := by
+  have hS'm
+      : S'
+        ∈ Mult R.θ (R.MY 0) (levG (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv)) : Set (GA D (Yc D 0)))
+          (levChi (Yc D 0) (R.βY 0) (flag1L (R.dat0 R.triv))) := by
     rw [hS']
     exact Submodule.sub_mem _
       (GlobalTheory.ProjectedLift.postOn_gaL_mem (β := R.βY 0) (L := R.dat0 R.triv) hmod.inf R.eG
-        (RealDat.eC (A := A) D.what₂.embLL) hSp) hSp
+        (RealDat.eC (A := A) D.what₂.embLL) hSp)
+      hSp
   have hT := (GlobalTheory.MultMem.mem_mult_iff _ _ _ _ _ _ _ _).1 hS'm
 
   have hQ : ∀ γ ∈ X.B.I.GFset, (iotaX X h).symm γ ∈ GQ (D.sp.Y 0) := by
     intro γ hγ
     have h1 := GlobalTheory.TranslatedEvalInj.castGA_symm_mem h.symm γ hγ
     rw [Formalism.IndefR.RationalEmbedding.iota_rat]
-    change Formalism.IndefR.RationalEmbedding.iota D ((Formalism.IndefR.RationalEmbedding.iota D).symm ((castGA h.symm).symm γ)) ∈ _
+    change Formalism.IndefR.RationalEmbedding.iota D
+        ((Formalism.IndefR.RationalEmbedding.iota D).symm ((castGA h.symm).symm γ))
+      ∈ _
     rw [ContinuousMulEquiv.apply_symm_apply]
     exact h1
 
-  have hfun : ∀ y : X.B.I.GA, S' v₀ ((iotaX X h).symm (y * iotaX X h t)) =
-      ev (MP R) v₀ S' (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm y) t) := by
+  have hfun
+      : ∀ y : X.B.I.GA,
+        S' v₀ ((iotaX X h).symm (y * iotaX X h t))
+          = ev (MP R) v₀ S'
+            (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm y)
+              t) := by
     intro y
     rw [map_mul]
-    exact congrArg (fun z : GA D (D.sp.Y 0) => S' v₀ ((iotaX X h).symm y * z)) ((iotaX X h).symm_apply_apply t)
+    exact congrArg
+      (fun z : GA D (D.sp.Y 0) => S' v₀ ((iotaX X h).symm y * z))
+      ((iotaX X h).symm_apply_apply t)
   have hv : ∀ y : X.B.I.GA, S' v₀ ((iotaX X h).symm (y * iotaX X h t)) = 0 := by
     have hc : Continuous fun y : X.B.I.GA => S' v₀ ((iotaX X h).symm (y * iotaX X h t)) :=
       (hT.aut v₀).cont.comp ((iotaX X h).symm.continuous.comp (continuous_mul_const _))
-    have hinv : ∀ γ ∈ X.B.I.GFset, ∀ y,
-        S' v₀ ((iotaX X h).symm (γ * y * iotaX X h t)) = S' v₀ ((iotaX X h).symm (y * iotaX X h t)) := by
+    have hinv
+        : ∀ γ ∈ X.B.I.GFset, ∀ y,
+          S' v₀ ((iotaX X h).symm (γ * y * iotaX X h t))
+            = S' v₀ ((iotaX X h).symm (y * iotaX X h t)) := by
       intro γ hγ y
       rw [mul_assoc, map_mul]
       exact (hT.aut v₀).left _ (hQ γ hγ) _
-    have hae' : (fun y : X.B.I.GA => S' v₀ ((iotaX X h).symm (y * iotaX X h t))) =ᵐ[(X.B.I.muA X.B.μf).restrict X.B.fund] 0 := by
-      have e : (fun y : X.B.I.GA => S' v₀ ((iotaX X h).symm (y * iotaX X h t))) =
-          fun x => ev (MP R) v₀ S' (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x) t) :=
-        funext hfun
-      rw [e]
-      exact hae
+    have hae'
+        : (fun y : X.B.I.GA => S' v₀ ((iotaX X h).symm (y * iotaX X h t))) =ᵐ[(X.B.I.muA X.B.μf).restrict X.B.fund] 0 :=
+      by
+        have e
+            : (fun y : X.B.I.GA => S' v₀ ((iotaX X h).symm (y * iotaX X h t)))
+              = fun x =>
+                ev (MP R) v₀ S'
+                  (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x)
+                    t) :=
+          funext hfun
+        rw [e]
+        exact hae
     exact GlobalTheory.TranslatedEvalInj.eq_zero_of_ae_fund X.B.I X.B.μf X.B.fund_spec hc hinv hae'
   have h0 : S' v₀ = 0 := by
     funext g
@@ -207,9 +266,7 @@ theorem GlobalTheory.TranslatedEvalInj.eq_zero : ∀ {D : D7} {G : Type} [Group 
     have e : (iotaX X h).symm (iotaX X h (g * t⁻¹) * iotaX X h t) = g := by
       refine ((congrArg (iotaX X h).symm (map_mul (iotaX X h) (g * t⁻¹) t).symm).trans
         ((iotaX X h).symm_apply_apply _)).trans ?_
-      first
-        | exact inv_mul_cancel_right g t
-        | simp
+      first | exact inv_mul_cancel_right g t | simp
     rw [e] at h2
     exact h2
   exact GlobalTheory.TranslatedEvalInj.eq_zero_of_value hT v₀ hv₀ h0

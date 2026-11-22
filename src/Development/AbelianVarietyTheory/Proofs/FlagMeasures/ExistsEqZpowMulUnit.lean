@@ -15,8 +15,8 @@ namespace GlobalTheory.UnramVal
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem zpow_mul_unit_mem_iff {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) (k : ℤ) (u : (𝒪[F])ˣ) :
-    (ϖ : F) ^ k * ((u : 𝒪[F]) : F) ∈ 𝒪[F] ↔ 0 ≤ k := by
+theorem zpow_mul_unit_mem_iff {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) (k : ℤ) (u : (𝒪[F])ˣ)
+    : (ϖ : F) ^ k * ((u : 𝒪[F]) : F) ∈ 𝒪[F] ↔ 0 ≤ k := by
   have h0 : (ϖ : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   constructor
   · intro h
@@ -38,33 +38,50 @@ theorem zpow_mul_unit_mem_iff {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) (k : ℤ) (u
 
 variable [IsNonarchimedeanLocalField F]
 
-theorem vE_zpow_mul_unit (L : LocE F E) {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) (k : ℤ)
-    (u : (𝒪[F])ˣ) : vE L ϖ (algebraMap F E ((ϖ : F) ^ k * ((u : 𝒪[F]) : F))) = k := by
+theorem vE_zpow_mul_unit (L : LocE F E) {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) (k : ℤ) (u : (𝒪[F])ˣ)
+    : vE L ϖ (algebraMap F E ((ϖ : F) ^ k * ((u : 𝒪[F]) : F))) = k := by
   have h0 : (ϖ : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
-  have hset : {m : ℤ | ∃ y ∈ L.O, algebraMap F E ((ϖ : F) ^ k * ((u : 𝒪[F]) : F))
-      = algebraMap F E ((ϖ : F) ^ m) * y} = Set.Iic k := by
+  have hset
+      : {m : ℤ | ∃ y ∈ L.O, algebraMap F E ((ϖ : F) ^ k * ((u : 𝒪[F]) : F))
+          = algebraMap F E ((ϖ : F) ^ m) * y}
+        = Set.Iic k := by
     ext m
-    have hsplit : (ϖ : F) ^ k * ((u : 𝒪[F]) : F)
-        = (ϖ : F) ^ m * ((ϖ : F) ^ (k - m) * ((u : 𝒪[F]) : F)) := by
+    have hsplit
+        : (ϖ : F) ^ k * ((u : 𝒪[F]) : F)
+          = (ϖ : F) ^ m * ((ϖ : F) ^ (k - m) * ((u : 𝒪[F]) : F)) := by
       rw [← mul_assoc, ← zpow_add₀ h0]; congr 2; ring
-    have hun : IsUnit (algebraMap F E ((ϖ : F) ^ m)) :=
-      (IsUnit.mk0 _ (zpow_ne_zero m h0)).map _
+    have hun : IsUnit (algebraMap F E ((ϖ : F) ^ m)) := (IsUnit.mk0 _ (zpow_ne_zero m h0)).map _
     simp only [Set.mem_ofPred_eq, Set.mem_Iic]
     rw [hsplit, map_mul, ← sub_nonneg, ← zpow_mul_unit_mem_iff hϖ (k - m) u,
       ← GlobalTheory.UnramOrder.algebraMap_mem_iff L]
     constructor
     · rintro ⟨y, hy, h⟩
-      rw [hun.mul_left_cancel h]; exact hy
+      rw [hun.mul_left_cancel h]
+      exact hy
     · intro h; exact ⟨_, h, rfl⟩
   rw [vE, hset, csSup_Iic]
 
-theorem exists_eq_zpow_mul_unit {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) {x : F} (hx : x ≠ 0) :
-    ∃ (k : ℤ) (u : (𝒪[F])ˣ), x = (ϖ : F) ^ k * ((u : 𝒪[F]) : F) := by
+theorem exists_eq_zpow_mul_unit {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) {x : F} (hx : x ≠ 0)
+    : ∃ (k : ℤ) (u : (𝒪[F])ˣ), x = (ϖ : F) ^ k * ((u : 𝒪[F]) : F) := by
   obtain ⟨k, u, h⟩ := IsDiscreteValuationRing.exists_units_eq_smul_zpow_of_irreducible hϖ hx
   refine ⟨k, u, ?_⟩
-  rw [h, mul_comm]; rfl
+  rw [h, mul_comm]
+  rfl
 
-theorem vE_valuation : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ ϖ : 𝒪[F], Irreducible ϖ → (∀ x y : F, x ≠ 0 → y ≠ 0 → vE L ϖ (algebraMap F E (x * y)) = vE L ϖ (algebraMap F E x) + vE L ϖ (algebraMap F E y)) ∧ vE L ϖ (algebraMap F E (ϖ : F)) = 1 ∧ (∀ x : F, x ≠ 0 → (0 ≤ vE L ϖ (algebraMap F E x) ↔ x ∈ 𝒪[F])) ∧ (∀ x : F, x ≠ 0 → ∃ u : (𝒪[F])ˣ, x = (ϖ : F) ^ (vE L ϖ (algebraMap F E x)) * ((u : 𝒪[F]) : F)) := by
+theorem vE_valuation
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ ϖ : 𝒪[F],
+        Irreducible ϖ
+          → (∀ x y : F,
+              x ≠ 0 → y ≠ 0
+                → vE L ϖ (algebraMap F E (x * y))
+                  = vE L ϖ (algebraMap F E x) + vE L ϖ (algebraMap F E y))
+            ∧ vE L ϖ (algebraMap F E (ϖ : F)) = 1
+            ∧ (∀ x : F, x ≠ 0 → (0 ≤ vE L ϖ (algebraMap F E x) ↔ x ∈ 𝒪[F]))
+            ∧ (∀ x : F,
+              x ≠ 0
+                → ∃ u : (𝒪[F])ˣ, x = (ϖ : F) ^ (vE L ϖ (algebraMap F E x)) * ((u : 𝒪[F]) : F)) := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ
   have h0 : (ϖ : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   refine ⟨fun x y hx hy => ?_, ?_, fun x hx => ?_, fun x hx => ?_⟩

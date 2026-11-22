@@ -15,28 +15,27 @@ open GlobalTheory.CompanionTheory.Iwahori
 variable {E ι : Type} [Ring E] [Fintype ι] {wt : ι → ℕ} {P : ι → E}
 
 theorem eq_zero_of_mul_pieces (hP : IsPieces P) {y : E} (h : ∀ j, y * P j = 0) : y = 0 := by
-  have : y * ∑ j, P j = 0 := by
-    rw [Finset.mul_sum]; exact Finset.sum_eq_zero (fun j _ => h j)
+  have : y * ∑ j, P j = 0 := by rw [Finset.mul_sum]; exact Finset.sum_eq_zero (fun j _ => h j)
   rwa [hP.sum, mul_one] at this
 
 theorem eq_zero_of_pieces_mul (hP : IsPieces P) {y : E} (h : ∀ j, P j * y = 0) : y = 0 := by
-  have : (∑ j, P j) * y = 0 := by
-    rw [Finset.sum_mul]; exact Finset.sum_eq_zero (fun j _ => h j)
+  have : (∑ j, P j) * y = 0 := by rw [Finset.sum_mul]; exact Finset.sum_eq_zero (fun j _ => h j)
   rwa [hP.sum, one_mul] at this
 
-theorem block_mul (hP : IsPieces P) (u x y v : E) :
-    u * (x * y) * v = ∑ l, (u * x * P l) * (P l * y * v) := by
+theorem block_mul (hP : IsPieces P) (u x y v : E)
+    : u * (x * y) * v = ∑ l, (u * x * P l) * (P l * y * v) := by
   have h : ∀ l, (u * x * P l) * (P l * y * v) = u * x * (P l) * y * v := by
     intro l
-    calc (u * x * P l) * (P l * y * v) = u * x * (P l * P l) * y * v := by
-          simp only [mul_assoc]
+    calc
+      (u * x * P l) * (P l * y * v)
+        = u * x * (P l * P l) * y * v := by simp only [mul_assoc]
       _ = _ := by rw [hP.idem]
   simp_rw [h]
   rw [← Finset.sum_mul, ← Finset.sum_mul, ← Finset.mul_sum, hP.sum]
   simp only [mul_one, mul_assoc]
 
-theorem isUpper_mul (hP : IsPieces P) {a b : E} (ha : IsUpper wt P a) (hb : IsUpper wt P b) :
-    IsUpper wt P (a * b) := by
+theorem isUpper_mul (hP : IsPieces P) {a b : E} (ha : IsUpper wt P a) (hb : IsUpper wt P b)
+    : IsUpper wt P (a * b) := by
   intro i j hij
   rw [block_mul hP]
   refine Finset.sum_eq_zero fun l _ => ?_
@@ -44,8 +43,10 @@ theorem isUpper_mul (hP : IsPieces P) {a b : E} (ha : IsUpper wt P a) (hb : IsUp
   · rw [ha i l h, zero_mul]
   · rw [hb l j (lt_of_lt_of_le hij h), mul_zero]
 
-theorem isLowerUni_mul (hwt : Function.Injective wt) (hP : IsPieces P) {a b : E}
-    (ha : IsLowerUni wt P a) (hb : IsLowerUni wt P b) : IsLowerUni wt P (a * b) := by
+theorem isLowerUni_mul
+    (hwt : Function.Injective wt) (hP : IsPieces P)
+    {a b : E} (ha : IsLowerUni wt P a) (hb : IsLowerUni wt P b)
+    : IsLowerUni wt P (a * b) := by
   refine ⟨fun i j hij => ?_, fun i => ?_⟩
   · rw [block_mul hP]
     refine Finset.sum_eq_zero fun l _ => ?_
@@ -71,20 +72,23 @@ theorem isLowerUni_one (hP : IsPieces P) : IsLowerUni wt P 1 := by
     exact hP.orth i j (fun e => by subst e; exact lt_irrefl _ h)
   · rw [mul_one, hP.idem]
 
-theorem sub_one_mul_mem {J : AddSubgroup E} (hJ : IsCongIdeal J P) {a b : E}
-    (ha : a - 1 ∈ J) (hb : b - 1 ∈ J) : a * b - 1 ∈ J := by
+theorem sub_one_mul_mem
+    {J : AddSubgroup E} (hJ : IsCongIdeal J P) {a b : E} (ha : a - 1 ∈ J) (hb : b - 1 ∈ J)
+    : a * b - 1 ∈ J := by
   have : a * b - 1 = (a - 1) * (b - 1) + (a - 1) + (b - 1) := by noncomm_ring
   rw [this]
   exact J.add_mem (J.add_mem (hJ.mul_mem _ ha _ hb) ha) hb
 
-theorem step (hwt : Function.Injective wt) (hP : IsPieces P) {J : AddSubgroup E}
-    (hJ : IsCongIdeal J P) (m : ℕ)
-    (ih : ∀ k : E, k - 1 ∈ J →
-      (∀ i j, (m ≤ wt i ∨ m ≤ wt j) → P i * (k - 1) * P j = 0) →
-      ∃ a b : E, a - 1 ∈ J ∧ b - 1 ∈ J ∧ IsUpper wt P a ∧ IsLowerUni wt P b ∧ k = a * b)
-    (q : ι) (hq : wt q = m) (x : E) (hx : x ∈ J)
-    (hH : ∀ i j, (m + 1 ≤ wt i ∨ m + 1 ≤ wt j) → P i * x * P j = 0) :
-    ∃ a b : E, a - 1 ∈ J ∧ b - 1 ∈ J ∧ IsUpper wt P a ∧ IsLowerUni wt P b ∧ 1 + x = a * b := by
+theorem step
+    (hwt : Function.Injective wt) (hP : IsPieces P)
+    {J : AddSubgroup E} (hJ : IsCongIdeal J P)
+    (m : ℕ)
+    (ih : ∀ k : E,
+      k - 1 ∈ J → (∀ i j, (m ≤ wt i ∨ m ≤ wt j) → P i * (k - 1) * P j = 0)
+        → ∃ a b : E, a - 1 ∈ J ∧ b - 1 ∈ J ∧ IsUpper wt P a ∧ IsLowerUni wt P b ∧ k = a * b)
+    (q : ι) (hq : wt q = m)
+    (x : E) (hx : x ∈ J) (hH : ∀ i j, (m + 1 ≤ wt i ∨ m + 1 ≤ wt j) → P i * x * P j = 0)
+    : ∃ a b : E, a - 1 ∈ J ∧ b - 1 ∈ J ∧ IsUpper wt P a ∧ IsLowerUni wt P b ∧ 1 + x = a * b := by
   have hl : ∀ i, m + 1 ≤ wt i → P i * x = 0 := fun i hi =>
     eq_zero_of_mul_pieces hP fun j => hH i j (Or.inl hi)
   have hr : ∀ j, m + 1 ≤ wt j → x * P j = 0 := fun j hj =>
@@ -95,17 +99,18 @@ theorem step (hwt : Function.Injective wt) (hP : IsPieces P) {J : AddSubgroup E}
     hP.orth j q (fun e => by subst e; omega)
   have hQQ := hP.idem q
   obtain ⟨y, hy, h1, h2⟩ := hJ.inv (x * P q) (hJ.right_mem q x hx)
-  obtain ⟨z, hz, hzdef⟩ : ∃ z ∈ J, 1 + z = (1 + y) * (1 + x) :=
-    ⟨(1 + y) * (1 + x) - 1,
-      sub_one_mul_mem hJ (by rwa [add_sub_cancel_left]) (by rwa [add_sub_cancel_left]),
-      by abel⟩
-  have hAB : 1 + x = (1 + x * P q) * (1 + z) := by
-    rw [hzdef, ← mul_assoc, h1, one_mul]
+  obtain ⟨z, hz, hzdef⟩ : ∃ z ∈ J, 1 + z = (1 + y) * (1 + x) := ⟨
+    (1 + y) * (1 + x) - 1,
+    sub_one_mul_mem hJ (by rwa [add_sub_cancel_left]) (by rwa [add_sub_cancel_left]),
+    by abel
+  ⟩
+  have hAB : 1 + x = (1 + x * P q) * (1 + z) := by rw [hzdef, ← mul_assoc, h1, one_mul]
   have hzQ : z * P q = 0 := by
-    have e : (1 + x) * P q = (1 + x * P q) * P q := by
-      simp only [add_mul, one_mul, mul_assoc, hQQ]
+    have e : (1 + x) * P q = (1 + x * P q) * P q := by simp only [add_mul, one_mul, mul_assoc, hQQ]
     have : (1 + z) * P q = P q := by
-      calc (1 + z) * P q = (1 + y) * ((1 + x) * P q) := by rw [hzdef, mul_assoc]
+      calc
+        (1 + z) * P q
+          = (1 + y) * ((1 + x) * P q) := by rw [hzdef, mul_assoc]
         _ = (1 + y) * ((1 + x * P q) * P q) := by rw [e]
         _ = ((1 + y) * (1 + x * P q)) * P q := by rw [mul_assoc]
         _ = P q := by rw [h2, one_mul]
@@ -117,11 +122,12 @@ theorem step (hwt : Function.Injective wt) (hP : IsPieces P) {J : AddSubgroup E}
     have e2 : (1 + x * P q) * P j = P j := by
       rw [add_mul, one_mul, mul_assoc, hne j hj, mul_zero, add_zero]
     have e3 : (1 + y) * P j = P j := by
-      calc (1 + y) * P j = (1 + y) * ((1 + x * P q) * P j) := by rw [e2]
+      calc
+        (1 + y) * P j
+          = (1 + y) * ((1 + x * P q) * P j) := by rw [e2]
         _ = ((1 + y) * (1 + x * P q)) * P j := by rw [mul_assoc]
         _ = P j := by rw [h2, one_mul]
-    have : (1 + z) * P j = P j := by
-      rw [hzdef, mul_assoc, e1, e3]
+    have : (1 + z) * P j = P j := by rw [hzdef, mul_assoc, e1, e3]
     rw [add_mul, one_mul] at this
     simpa using this
   have hzl : ∀ i, m + 1 ≤ wt i → P i * z = 0 := by
@@ -130,11 +136,12 @@ theorem step (hwt : Function.Injective wt) (hP : IsPieces P) {J : AddSubgroup E}
     have e2 : P i * (1 + x * P q) = P i := by
       rw [mul_add, mul_one, ← mul_assoc, hl i hi, zero_mul, add_zero]
     have e3 : P i * (1 + y) = P i := by
-      calc P i * (1 + y) = (P i * (1 + x * P q)) * (1 + y) := by rw [e2]
+      calc
+        P i * (1 + y)
+          = (P i * (1 + x * P q)) * (1 + y) := by rw [e2]
         _ = P i * ((1 + x * P q) * (1 + y)) := by rw [mul_assoc]
         _ = P i := by rw [h1, mul_one]
-    have : P i * (1 + z) = P i := by
-      rw [hzdef, ← mul_assoc, e3, e1]
+    have : P i * (1 + z) = P i := by rw [hzdef, ← mul_assoc, e3, e1]
     rw [mul_add, mul_one] at this
     simpa using this
   have hsJ : z - P q * z ∈ J := J.sub_mem hz (hJ.left_mem q z hz)
@@ -152,18 +159,16 @@ theorem step (hwt : Function.Injective wt) (hP : IsPieces P) {J : AddSubgroup E}
       subst this
       rw [mul_sub, ← mul_assoc, hQQ, sub_self]
     · rw [mul_sub, hzl i h, ← mul_assoc, hne' i h, zero_mul, sub_zero]
-  have hS : ∀ i j, (m ≤ wt i ∨ m ≤ wt j) →
-      P i * ((1 + (z - P q * z)) - 1) * P j = 0 := by
+  have hS : ∀ i j, (m ≤ wt i ∨ m ≤ wt j) → P i * ((1 + (z - P q * z)) - 1) * P j = 0 := by
     intro i j hij
     rw [add_sub_cancel_left]
     rcases hij with h | h
     · rw [hsl i h, zero_mul]
     · rw [mul_assoc, hsr j h, mul_zero]
-  obtain ⟨a', b', ha, hb, hau, hbl, hk⟩ :=
-    ih (1 + (z - P q * z)) (by rwa [add_sub_cancel_left]) hS
+  obtain ⟨a', b', ha, hb, hau, hbl, hk⟩ := ih (1 + (z - P q * z)) (by rwa [add_sub_cancel_left]) hS
   have hSC : (1 + (z - P q * z)) * (1 + P q * z) = 1 + z := by
-    have : (1 + (z - P q * z)) * (1 + P q * z)
-        = 1 + z + (z * P q) * z - P q * (z * P q) * z := by noncomm_ring
+    have : (1 + (z - P q * z)) * (1 + P q * z) = 1 + z + (z * P q) * z - P q * (z * P q) * z := by
+      noncomm_ring
     rw [this, hzQ]
     simp
   have hA : IsUpper wt P (1 + x * P q) := by
@@ -191,23 +196,33 @@ theorem step (hwt : Function.Injective wt) (hP : IsPieces P) {J : AddSubgroup E}
       · subst hiq
         rw [hzQ, mul_zero, add_zero]
       · rw [hP.orth i q hiq, zero_mul, add_zero]
-  refine ⟨(1 + x * P q) * a', b' * (1 + P q * z), ?_, ?_, isUpper_mul hP hA hau,
-    isLowerUni_mul hwt hP hbl hC, ?_⟩
+  refine ⟨
+    (1 + x * P q) * a',
+    b' * (1 + P q * z),
+    ?_,
+    ?_,
+    isUpper_mul hP hA hau,
+    isLowerUni_mul hwt hP hbl hC,
+    ?_
+  ⟩
   · exact sub_one_mul_mem hJ (by rw [add_sub_cancel_left]; exact hJ.right_mem q x hx) ha
   · exact sub_one_mul_mem hJ hb (by rw [add_sub_cancel_left]; exact hJ.left_mem q z hz)
   · rw [hAB, ← hSC, hk]
     simp only [mul_assoc]
 
-theorem exists_of_support (hwt : Function.Injective wt) (hP : IsPieces P) {J : AddSubgroup E}
-    (hJ : IsCongIdeal J P) (m : ℕ) :
-    ∀ k : E, k - 1 ∈ J →
-      (∀ i j, (m ≤ wt i ∨ m ≤ wt j) → P i * (k - 1) * P j = 0) →
-      ∃ a b : E, a - 1 ∈ J ∧ b - 1 ∈ J ∧ IsUpper wt P a ∧ IsLowerUni wt P b ∧ k = a * b := by
+theorem exists_of_support
+    (hwt : Function.Injective wt) (hP : IsPieces P)
+    {J : AddSubgroup E} (hJ : IsCongIdeal J P)
+    (m : ℕ)
+    : ∀ k : E,
+      k - 1 ∈ J → (∀ i j, (m ≤ wt i ∨ m ≤ wt j) → P i * (k - 1) * P j = 0)
+        → ∃ a b : E, a - 1 ∈ J ∧ b - 1 ∈ J ∧ IsUpper wt P a ∧ IsLowerUni wt P b ∧ k = a * b := by
   induction m with
   | zero =>
     intro k _ h
-    have h0 : k - 1 = 0 := eq_zero_of_mul_pieces hP fun j => eq_zero_of_pieces_mul hP fun i => by
-      rw [← mul_assoc]; exact h i j (Or.inl (Nat.zero_le _))
+    have h0 : k - 1 = 0 :=
+      eq_zero_of_mul_pieces hP fun j =>
+        eq_zero_of_pieces_mul hP fun i => by rw [← mul_assoc]; exact h i j (Or.inl (Nat.zero_le _))
     have hk : k = 1 := sub_eq_zero.mp h0
     exact ⟨1, 1, by simp, by simp, isUpper_one hP, isLowerUni_one hP, by simp [hk]⟩
   | succ m ih =>
@@ -225,11 +240,18 @@ theorem exists_of_support (hwt : Function.Injective wt) (hP : IsPieces P) {J : A
       · exact Or.inl (hq' i e)
       · exact Or.inr (hq' j e)
 
-theorem block_gauss : ∀ {E ι : Type} [Ring E] [Fintype ι] (wt : ι → ℕ), Function.Injective wt →
-    ∀ (P : ι → E), GlobalTheory.CompanionTheory.Iwahori.IsPieces P → ∀ J : AddSubgroup E,
-    GlobalTheory.CompanionTheory.Iwahori.IsCongIdeal J P → ∀ k : E, k - 1 ∈ J →
-    ∃ a b : E, a - 1 ∈ J ∧ b - 1 ∈ J ∧ GlobalTheory.CompanionTheory.Iwahori.IsUpper wt P a ∧
-      GlobalTheory.CompanionTheory.Iwahori.IsLowerUni wt P b ∧ k = a * b := by
+theorem block_gauss
+    : ∀ {E ι : Type} [Ring E] [Fintype ι] (wt : ι → ℕ),
+      Function.Injective wt
+        → ∀ (P : ι → E),
+          GlobalTheory.CompanionTheory.Iwahori.IsPieces P
+            → ∀ J : AddSubgroup E,
+              GlobalTheory.CompanionTheory.Iwahori.IsCongIdeal J P
+                → ∀ k : E,
+                  k - 1 ∈ J
+                    → ∃ a b : E,
+                      a - 1 ∈ J ∧ b - 1 ∈ J ∧ GlobalTheory.CompanionTheory.Iwahori.IsUpper wt P a
+                        ∧ GlobalTheory.CompanionTheory.Iwahori.IsLowerUni wt P b ∧ k = a * b := by
   intro E ι _ _ wt hwt P hP J hJ k hk
   refine exists_of_support hwt hP hJ (Finset.univ.sup wt + 1) k hk ?_
   intro i j h

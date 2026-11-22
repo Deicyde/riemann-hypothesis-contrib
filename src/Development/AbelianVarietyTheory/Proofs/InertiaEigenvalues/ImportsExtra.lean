@@ -8,17 +8,18 @@ namespace GlobalTheory.SimpStatement
 
 open Finset
 
-theorem main {K B W G ι : Type} [Field K] [CommRing B] [IsDomain B] [Algebra K B]
-    [AddCommGroup W] [Module B W] [Module K W] [IsScalarTower K B W] [Module.IsTorsionFree B W]
+theorem main
+    {K B W G ι : Type} [Field K] [CommRing B] [IsDomain B] [Algebra K B] [AddCommGroup W]
+    [Module B W] [Module K W] [IsScalarTower K B W] [Module.IsTorsionFree B W]
     (a : G → B → B) (σ : G → W →+ W)
     (hσ : ∀ (g : G) (b : B) (w : W), (σ g : W → W) (b • w) = a g b • (σ g : W → W) w)
-    (ha : ∀ (b b' : B), b ≠ (0 : B) → (∀ (g : G), b * a g b' = a g b * b') →
-      ∃ (c : K), b' = (Algebra.algebraMap K B : K → B) c * b)
+    (ha : ∀ (b b' : B),
+      b ≠ (0 : B) → (∀ (g : G), b * a g b' = a g b * b')
+        → ∃ (c : K), b' = (Algebra.algebraMap K B : K → B) c * b)
     (v : ι → W) (hv : ∀ (g : G) (i : ι), (σ g : W → W) (v i) = v i)
-    (s : Finset ι) (hK : LinearIndepOn K v (↑s : Set ι)) :
-    LinearIndepOn B v (↑s : Set ι) := by
+    (s : Finset ι) (hK : LinearIndepOn K v (↑s : Set ι))
+    : LinearIndepOn B v (↑s : Set ι) := by
   classical
-
   have key : ∀ T : Finset ι, T ⊆ s → ∀ f : ι → B, ∑ i ∈ T, f i • v i = 0 → ∀ i ∈ T, f i = 0 := by
     intro T
     induction T using Finset.strongInduction with
@@ -47,12 +48,13 @@ theorem main {K B W G ι : Type} [Field K] [CommRing B] [IsDomain B] [Algebra K 
           exact hsum
         by_cases hj0 : j = i₀
         · subst hj0; ring
-        · have := ih (T.erase i₀) (Finset.erase_ssubset hi₀)
-            ((Finset.erase_subset _ _).trans hTs) f' hsum' j (Finset.mem_erase.2 ⟨hj0, hj⟩)
+        · have :=
+            ih (T.erase i₀) (Finset.erase_ssubset hi₀) ((Finset.erase_subset _ _).trans hTs) f'
+              hsum' j (Finset.mem_erase.2 ⟨hj0, hj⟩)
           simp only [hf'] at this
           exact sub_eq_zero.1 this
-      have hc : ∀ j ∈ T, ∃ c : K, f j = (Algebra.algebraMap K B : K → B) c * f i₀ :=
-        fun j hj => ha (f i₀) (f j) hfi₀ (hrel j hj)
+      have hc : ∀ j ∈ T, ∃ c : K, f j = (Algebra.algebraMap K B : K → B) c * f i₀ := fun j hj =>
+        ha (f i₀) (f j) hfi₀ (hrel j hj)
       choose! c hc using hc
       have hsumK : ∑ i ∈ T, c i • v i = 0 := by
         have : f i₀ • ∑ i ∈ T, c i • v i = 0 := by

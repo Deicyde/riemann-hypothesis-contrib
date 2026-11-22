@@ -7,18 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteMax
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.EtC GlobalTheory.EtC.GmStep
+open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.EtC
+  GlobalTheory.EtC.GmStep
 
 namespace GlobalTheory.EtC.GmStep.FinSH
 
 open IsLocalRing
 
-theorem sh_of_finite_local (A T : Type) [CommRing A] [CommRing T] [Algebra A T] (hA : SH A)
-    [Module.Finite A T] [IsLocalRing T] : SH T := by
+theorem sh_of_finite_local
+    (A T : Type) [CommRing A] [CommRing T] [Algebra A T]
+    (hA : SH A)
+    [Module.Finite A T] [IsLocalRing T]
+    : SH T := by
   obtain ⟨hH, hk⟩ := hA
   refine ⟨GlobalTheory.henselianLocalRing_of_finite A T, ?_⟩
   have hc : (maximalIdeal T).comap (algebraMap A T) = maximalIdeal A :=
-    IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (maximalIdeal T))
+    IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _)
+      (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (maximalIdeal T))
   haveI : IsLocalHom (algebraMap A T) := by
     refine ⟨fun a ha => ?_⟩
     by_contra hna
@@ -33,23 +38,33 @@ theorem sh_of_finite_local (A T : Type) [CommRing A] [CommRing T] [Algebra A T] 
     exact h1.tower_top
   exact Algebra.IsAlgebraic.isSepClosed (F := ResidueField A)
 
-def optionProdEquiv (A : Type) [CommRing A] {α : Type} (T : Option α → Type) [∀ i, CommRing (T i)]
-    [∀ i, Algebra A (T i)] : (∀ o, T o) ≃ₐ[A] T none × ∀ a, T (some a) :=
-  { Equiv.piOptionEquivProd with
-    map_mul' := fun _ _ => rfl, map_add' := fun _ _ => rfl, commutes' := fun _ => rfl }
+def optionProdEquiv
+    (A : Type) [CommRing A]
+    {α : Type} (T : Option α → Type) [∀ i, CommRing (T i)] [∀ i, Algebra A (T i)]
+    : (∀ o, T o) ≃ₐ[A] T none × ∀ a, T (some a) := {
+  Equiv.piOptionEquivProd with
+  map_mul' := fun _ _ => rfl
+  map_add' := fun _ _ => rfl
+  commutes' := fun _ => rfl
+}
 
-theorem induction_principle : ∀ (A : Type) [CommRing A], SH A → ∀ (P : ∀ (T : Type) [CommRing T] [Algebra A T], Prop),
-  (∀ (T T' : Type) [CommRing T] [CommRing T'] [Algebra A T] [Algebra A T'], (T ≃ₐ[A] T') → P T → P T') →
-  (∀ (T : Type) [CommRing T] [Algebra A T], Subsingleton T → P T) →
-  (∀ (T₁ T₂ : Type) [CommRing T₁] [CommRing T₂] [Algebra A T₁] [Algebra A T₂], Module.Finite A T₁ → Module.Finite A T₂ →
-    P T₁ → P T₂ → P (T₁ × T₂)) →
-  (∀ (T : Type) [CommRing T] [Algebra A T], Module.Finite A T → SH T → P T) →
-  ∀ (T : Type) [CommRing T] [Algebra A T], Module.Finite A T → P T := by
+theorem induction_principle
+    : ∀ (A : Type) [CommRing A],
+      SH A
+        → ∀ (P : ∀ (T : Type) [CommRing T] [Algebra A T], Prop),
+          (∀ (T T' : Type) [CommRing T] [CommRing T'] [Algebra A T] [Algebra A T'],
+              (T ≃ₐ[A] T') → P T → P T')
+            → (∀ (T : Type) [CommRing T] [Algebra A T], Subsingleton T → P T)
+            → (∀ (T₁ T₂ : Type) [CommRing T₁] [CommRing T₂] [Algebra A T₁] [Algebra A T₂],
+              Module.Finite A T₁ → Module.Finite A T₂ → P T₁ → P T₂ → P (T₁ × T₂))
+            → (∀ (T : Type) [CommRing T] [Algebra A T], Module.Finite A T → SH T → P T)
+            → ∀ (T : Type) [CommRing T] [Algebra A T], Module.Finite A T → P T := by
   intro A _ hA P hiso hsub hprod hsh T _ _ hT
   obtain ⟨hH, hk⟩ := hA
   obtain ⟨ι, hι, S, _, _, e, hS⟩ := GlobalTheory.exists_algEquiv_pi_henselianLocalRing A T
-  have key : ∀ (α : Type) [Finite α] (S : α → Type) [∀ i, CommRing (S i)] [∀ i, Algebra A (S i)],
-      (∀ i, Module.Finite A (S i) ∧ SH (S i)) → P (∀ i, S i) := by
+  have key
+      : ∀ (α : Type) [Finite α] (S : α → Type) [∀ i, CommRing (S i)] [∀ i, Algebra A (S i)],
+        (∀ i, Module.Finite A (S i) ∧ SH (S i)) → P (∀ i, S i) := by
     intro α _
     induction α using Finite.induction_empty_option with
     | of_equiv e' ih =>

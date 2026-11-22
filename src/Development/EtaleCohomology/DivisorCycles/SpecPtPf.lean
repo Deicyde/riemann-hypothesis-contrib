@@ -15,9 +15,10 @@ theorem SpecPt_of : LateralTheory.DivDb.SpecPt := by
   have hP : MvPolynomial.aeval x P ≠ 0 := by
     simp only [P, map_prod]
     exact Finset.prod_ne_zero_iff.mpr fun g hg => hx g (hG.mem_toFinset.mp hg)
-  have hPI : P ∉ I.radical := by
-    rw [hI.radical]; exact hP
-  rw [← MvPolynomial.vanishingIdeal_zeroLocus_eq_radical (K := C), MvPolynomial.mem_vanishingIdeal_iff] at hPI
+  have hPI : P ∉ I.radical := by rw [hI.radical]; exact hP
+  rw [← MvPolynomial.vanishingIdeal_zeroLocus_eq_radical (K := C),
+      MvPolynomial.mem_vanishingIdeal_iff]
+    at hPI
   push Not at hPI
   obtain ⟨y, hy, hyP⟩ := hPI
   rw [MvPolynomial.mem_zeroLocus_iff] at hy

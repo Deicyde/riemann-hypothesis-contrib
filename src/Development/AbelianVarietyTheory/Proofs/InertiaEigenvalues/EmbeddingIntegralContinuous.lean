@@ -35,14 +35,15 @@ private lemma norm_le_one_of_monic_root_lemma {K : Type*} [NormedField K] [IsUlt
   have hlt : ‖x‖ ^ (n - 1) < ‖x‖ ^ n := pow_lt_pow_right₀ h (by omega)
   linarith
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.padicAlgCl_embedding_bounded_continuous (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O]
-    [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
-    [TopologicalSpace O] [IsTopologicalRing O] (hO : IsAdic (IsLocalRing.maximalIdeal O))
+theorem _root_.GlobalTheory.padicAlgCl_embedding_bounded_continuous
+    (l : ℕ) [Fact l.Prime]
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O]
+    [Module.Finite ℤ_[l] O] [TopologicalSpace O] [IsTopologicalRing O]
+    (hO : IsAdic (IsLocalRing.maximalIdeal O))
     (ι : O →+* PadicAlgCl l)
-    (hι : ∀ z : ℤ_[l], ι (algebraMap ℤ_[l] O z) = algebraMap ℚ_[l] (PadicAlgCl l) (z : ℚ_[l])) :
-    (∀ a, ‖ι a‖ ≤ 1) ∧ (∀ a ∈ IsLocalRing.maximalIdeal O, ‖ι a‖ < 1) ∧ Continuous ι := by
+    (hι : ∀ z : ℤ_[l], ι (algebraMap ℤ_[l] O z) = algebraMap ℚ_[l] (PadicAlgCl l) (z : ℚ_[l]))
+    : (∀ a, ‖ι a‖ ≤ 1) ∧ (∀ a ∈ IsLocalRing.maximalIdeal O, ‖ι a‖ < 1) ∧ Continuous ι := by
   set g : ℤ_[l] →+* PadicAlgCl l := (algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom
   have hg : ι.comp (algebraMap ℤ_[l] O) = g := by
     ext z
@@ -93,7 +94,9 @@ theorem _root_.GlobalTheory.padicAlgCl_embedding_bounded_continuous (l : ℕ) [F
     rw [hmax, Ideal.span_singleton_pow, Ideal.mem_span_singleton'] at ha
     obtain ⟨b, rfl⟩ := ha
     rw [map_mul, norm_mul, map_pow, norm_pow]
-    calc ‖ι b‖ * ‖ι ϖ‖ ^ n ≤ 1 * ‖ι ϖ‖ ^ n := by gcongr; exact h1 b
+    calc
+      ‖ι b‖ * ‖ι ϖ‖ ^ n
+        ≤ 1 * ‖ι ϖ‖ ^ n := by gcongr; exact h1 b
       _ = ‖ι ϖ‖ ^ n := one_mul _
   refine ⟨h1, fun a ha => ?_, ?_⟩
   · have := hpow 1 a (by rwa [pow_one])

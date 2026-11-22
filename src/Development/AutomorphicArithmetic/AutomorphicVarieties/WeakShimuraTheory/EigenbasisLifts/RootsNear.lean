@@ -8,13 +8,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Eb
+  GlobalTheory.GalOfCusp
 
-private theorem rn_root {K : Type} [NormedField K] [IsUltrametricDist K] (p : K[X]) (hp : p.Monic)
-    (hc : ∀ i < p.natDegree, ‖p.coeff i‖ < 1) (s : K) (hs : p.eval s = 0) : ‖s‖ < 1 := by
+private theorem rn_root
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    (p : K[X]) (hp : p.Monic) (hc : ∀ i < p.natDegree, ‖p.coeff i‖ < 1)
+    (s : K) (hs : p.eval s = 0)
+    : ‖s‖ < 1 := by
   by_contra hlt
   push_neg at hlt
-  have sumlt : ∀ (t : Finset ℕ) (f : ℕ → K) (r : ℝ), 0 < r → (∀ i ∈ t, ‖f i‖ < r) → ‖∑ i ∈ t, f i‖ < r := by
+  have sumlt
+      : ∀ (t : Finset ℕ) (f : ℕ → K) (r : ℝ),
+        0 < r → (∀ i ∈ t, ‖f i‖ < r) → ‖∑ i ∈ t, f i‖ < r := by
     intro t f r hr
     induction t using Finset.induction_on with
     | empty => intro _; simpa using hr
@@ -22,7 +30,8 @@ private theorem rn_root {K : Type} [NormedField K] [IsUltrametricDist K] (p : K[
       intro hf
       rw [Finset.sum_insert hj]
       exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt
-        (max_lt (hf j (Finset.mem_insert_self _ _)) (ih fun i hi => hf i (Finset.mem_insert_of_mem hi)))
+        (max_lt (hf j (Finset.mem_insert_self _ _))
+          (ih fun i hi => hf i (Finset.mem_insert_of_mem hi)))
   have hsum : p.eval s = s ^ p.natDegree + ∑ i ∈ Finset.range p.natDegree, p.coeff i * s ^ i := by
     conv_lhs => rw [hp.as_sum]
     simp [eval_finsetSum]
@@ -32,11 +41,12 @@ private theorem rn_root {K : Type} [NormedField K] [IsUltrametricDist K] (p : K[
     intro i hi
     rw [Finset.mem_range] at hi
     rw [norm_mul, norm_pow]
-    calc ‖p.coeff i‖ * ‖s‖ ^ i < 1 * ‖s‖ ^ i :=
-          mul_lt_mul_of_pos_right (hc i hi) (pow_pos hpos _)
+    calc
+      ‖p.coeff i‖ * ‖s‖ ^ i
+        < 1 * ‖s‖ ^ i := mul_lt_mul_of_pos_right (hc i hi) (pow_pos hpos _)
       _ = ‖s‖ ^ i := one_mul _
       _ ≤ ‖s‖ ^ p.natDegree := pow_le_pow_right₀ hlt hi.le
-  have heq : s ^ p.natDegree = -∑ i ∈ Finset.range p.natDegree, p.coeff i * s ^ i := by
+  have heq : s ^ p.natDegree = - ∑ i ∈ Finset.range p.natDegree, p.coeff i * s ^ i := by
     rw [hs] at hsum
     exact eq_neg_of_add_eq_zero_left hsum.symm
   have h3 := congrArg norm heq
@@ -44,21 +54,30 @@ private theorem rn_root {K : Type} [NormedField K] [IsUltrametricDist K] (p : K[
   rw [h3] at hlt2
   exact lt_irrefl _ hlt2
 
-theorem UpperTheory.V.Ws.Eb.rootsNear :
-    ∀ {l : ℕ} [Fact l.Prime] {F : W.GFrame l} {c : Coef l} {n : ℕ} {r : W.Resid F c.O n} (B : W.UniversalOrdinaryDeterminantRing r) (x : B.B →ₐ[c.O] PadicAlgCl l) (ρ : F.G₀ →* GL (Fin n) (PadicAlgCl l)), B.u.D.map (x : B.B →+* PadicAlgCl l) = W.GDet.ofRep (W.mat ρ) →
-        ∀ g (a : c.O), (∀ i, residue c.O a = r.chib i g) → ∀ t ∈ (W.mat ρ g).charpoly.roots, ‖t - (a : PadicAlgCl l)‖ < 1 := by
+theorem UpperTheory.V.Ws.Eb.rootsNear
+    : ∀ {l : ℕ} [Fact l.Prime] {F : W.GFrame l} {c : Coef l} {n : ℕ} {r : W.Resid F c.O n}
+        (B : W.UniversalOrdinaryDeterminantRing r) (x : B.B →ₐ[c.O] PadicAlgCl l)
+        (ρ : F.G₀ →* GL (Fin n) (PadicAlgCl l)),
+      B.u.D.map (x : B.B →+* PadicAlgCl l) = W.GDet.ofRep (W.mat ρ)
+        → ∀ g (a : c.O),
+          (∀ i, residue c.O a = r.chib i g)
+            → ∀ t ∈ (W.mat ρ g).charpoly.roots, ‖t - (a : PadicAlgCl l)‖ < 1 := by
   intro l _ F c n r B x ρ hD g a ha t ht
-  have hsing : ∀ {A A' : Type} [CommRing A] [CommRing A'] (f : A →+* A'),
-      MonoidAlgebra.mapRingHom F.G₀ f (MonoidAlgebra.single g 1) = MonoidAlgebra.single g 1 := by
+  have hsing
+      : ∀ {A A' : Type} [CommRing A] [CommRing A'] (f : A →+* A'),
+        MonoidAlgebra.mapRingHom F.G₀ f (MonoidAlgebra.single g 1) = MonoidAlgebra.single g 1 := by
     intro A A' _ _ f
     simp [MonoidAlgebra.mapRingHom]
   set Q := B.u.D.chi (MonoidAlgebra.single g 1) with hQ
   have hx : (W.mat ρ g).charpoly = Q.map (x : B.B →+* PadicAlgCl l) := by
-    have h1 := (AlgebraTools.Det.mapApi B.u.D (x : B.B →+* PadicAlgCl l)).1 (MonoidAlgebra.single g 1)
+    have h1 :=
+      (AlgebraTools.Det.mapApi B.u.D (x : B.B →+* PadicAlgCl l)).1 (MonoidAlgebra.single g 1)
     rw [hsing, hD, (AlgebraTools.Det.repApi (W.mat ρ)).2.1] at h1
     exact h1
   have hred : Q.map (res c.O B.B : B.B →+* ResidueField c.O) = (X - C (residue c.O a)) ^ n := by
-    have h1 := (AlgebraTools.Det.mapApi B.u.D (res c.O B.B : B.B →+* ResidueField c.O)).1 (MonoidAlgebra.single g 1)
+    have h1 :=
+      (AlgebraTools.Det.mapApi B.u.D (res c.O B.B : B.B →+* ResidueField c.O)).1
+        (MonoidAlgebra.single g 1)
     rw [hsing, B.u.red, W.Resid.Dbar, (AlgebraTools.Det.repApi _).2.1] at h1
     rw [← h1]
     show (Matrix.diagonal _).charpoly = _
@@ -77,7 +96,8 @@ theorem UpperTheory.V.Ws.Eb.rootsNear :
   obtain ⟨_, a0, ha1, _, hb⟩ := (coPt c B.B).1 x
   have hmon : p.Monic := (Matrix.charpoly_monic _).comp_X_add_C _
   have hdeg : p.natDegree = n := by
-    rw [hp, Polynomial.natDegree_comp, Matrix.charpoly_natDegree_eq_dim, Polynomial.natDegree_X_add_C]
+    rw [hp, Polynomial.natDegree_comp, Matrix.charpoly_natDegree_eq_dim,
+      Polynomial.natDegree_X_add_C]
     simp
   have hc : ∀ i < p.natDegree, ‖p.coeff i‖ < 1 := by
     intro i hi

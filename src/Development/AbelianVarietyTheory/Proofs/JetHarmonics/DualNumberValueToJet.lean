@@ -8,12 +8,15 @@ public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ExistsTo
 @[expose] public section
 
 noncomputable section
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Chart ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.JetSer
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Chart
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.JetSer
 namespace GlobalTheory.JetSer
 
-theorem toJet_one_eq {O κ : Type} [CommRing O] [Fintype κ] (u : MvPowerSeries κ O) :
-    toJet 1 u = Ideal.Quotient.mk _ (MvPolynomial.C (constantCoeff u) +
-      ∑ q, MvPolynomial.C (coeff (Finsupp.single q 1) u) * MvPolynomial.X q) := by
+theorem toJet_one_eq {O κ : Type} [CommRing O] [Fintype κ] (u : MvPowerSeries κ O)
+    : toJet 1 u
+      = Ideal.Quotient.mk _
+        (MvPolynomial.C (constantCoeff u)
+          + ∑ q, MvPolynomial.C (coeff (Finsupp.single q 1) u) * MvPolynomial.X q) := by
   classical
   refine (toJet_eq_mk_iff 1 u _).2 fun a ha => ?_
   simp only [MvPolynomial.coeff_add, MvPolynomial.coeff_sum, MvPolynomial.coeff_C_mul,
@@ -34,14 +37,20 @@ theorem toJet_one_eq {O κ : Type} [CommRing O] [Fintype κ] (u : MvPowerSeries 
       rwa [Finsupp.single_left_inj one_ne_zero]
     · simp
 
-theorem constantCoeff_dof {R O : Type} [CommRing R] [CommRing O] (f : R →+* O) {d : ℕ}
-    (G : FGLaw R d) (e : Fin d → O) (u : PS O 1 d) :
-    constantCoeff (Dof (G.mapF f) e u) =
-      ∑ j, e j * coeff (Finsupp.single ((0 : Fin 1), j) 1) u := by
-  have h : ∀ i j : Fin d, constantCoeff (ev (n := 1) ![pt O d 0, 0]
-      (MvPowerSeries.pderiv (R := O) ((1 : Fin 2), i) (G.mapF f j))) = if j = i then 1 else 0 := by
+theorem constantCoeff_dof
+    {R O : Type} [CommRing R] [CommRing O]
+    (f : R →+* O)
+    {d : ℕ} (G : FGLaw R d) (e : Fin d → O) (u : PS O 1 d)
+    : constantCoeff (Dof (G.mapF f) e u)
+      = ∑ j, e j * coeff (Finsupp.single ((0 : Fin 1), j) 1) u := by
+  have h
+      : ∀ i j : Fin d,
+        constantCoeff (ev (n := 1) ![pt O d 0, 0]
+            (MvPowerSeries.pderiv (R := O) ((1 : Fin 2), i) (G.mapF f j)))
+          = if j = i then 1 else 0 := by
     intro i j
-    rw [← coeff_zero_eq_constantCoeff_apply, ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.coeff_ev_zero_right,
+    rw [← coeff_zero_eq_constantCoeff_apply,
+      ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.coeff_ev_zero_right,
       Finsupp.embDomain_zero, coeff_pderiv, FGLaw.mapF, coeff_map, zero_add, SymbolOne.coeff_law]
     split_ifs <;> simp
   unfold Dof
@@ -51,12 +60,23 @@ theorem constantCoeff_dof {R O : Type} [CommRing R] [CommRing O] (f : R →+* O)
   rw [← coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_pderiv]
   simp
 
-theorem dualNumber_value_toJet : ∀ (R O : Type) [CommRing R] [CommRing O] (f : R →+* O) (d : ℕ) (G : FGLaw R d) (e : Fin d → O) (u : PS O 1 d) (S : Type) [CommRing S] [Algebra O S] (ψ : JetR O (Fin 1 × Fin d) 1 →ₐ[O] DualNumber S), (∀ q, ψ (zR 1 q) = TrivSqZeroExt.inr (algebraMap O S (e q.2))) → ψ (toJet 1 u) = TrivSqZeroExt.inl (algebraMap O S (MvPowerSeries.constantCoeff u)) + TrivSqZeroExt.inr (algebraMap O S (MvPowerSeries.constantCoeff (Dof (G.mapF f) e u))) := by
+theorem dualNumber_value_toJet
+    : ∀ (R O : Type) [CommRing R] [CommRing O] (f : R →+* O) (d : ℕ) (G : FGLaw R d) (e : Fin d → O)
+        (u : PS O 1 d) (S : Type) [CommRing S] [Algebra O S]
+        (ψ : JetR O (Fin 1 × Fin d) 1 →ₐ[O] DualNumber S),
+      (∀ q, ψ (zR 1 q) = TrivSqZeroExt.inr (algebraMap O S (e q.2)))
+        → ψ (toJet 1 u)
+          = TrivSqZeroExt.inl (algebraMap O S (MvPowerSeries.constantCoeff u)) + TrivSqZeroExt.inr
+            (algebraMap O S (MvPowerSeries.constantCoeff (Dof (G.mapF f) e u))) := by
   intro R O _ _ f d G e u S _ _ ψ hψ
-  have hC : ∀ c : O, ψ (Ideal.Quotient.mk _ (MvPolynomial.C c)) = TrivSqZeroExt.inl (algebraMap O S c) :=
+  have hC
+      : ∀ c : O,
+        ψ (Ideal.Quotient.mk _ (MvPolynomial.C c)) = TrivSqZeroExt.inl (algebraMap O S c) :=
     fun c => ψ.commutes c
-  have hX : ∀ q, ψ (Ideal.Quotient.mk _ (MvPolynomial.X q)) =
-      TrivSqZeroExt.inr (algebraMap O S (e q.2)) := hψ
+  have hX
+      : ∀ q,
+        ψ (Ideal.Quotient.mk _ (MvPolynomial.X q)) = TrivSqZeroExt.inr (algebraMap O S (e q.2)) :=
+    hψ
   rw [toJet_one_eq, constantCoeff_dof]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_add (f := _), map_sum, map_mul, hC, hX, Fintype.sum_prod_type, Fin.sum_univ_one]

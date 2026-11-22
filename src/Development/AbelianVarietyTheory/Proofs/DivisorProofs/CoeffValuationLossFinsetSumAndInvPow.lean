@@ -18,19 +18,28 @@ public import Formalism.LocalToGlobal.ExponentGrids.ExponentGridsProofs.Normalis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.RowTest GlobalTheory.SumSize GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SplitFlip
+  GlobalTheory.SplitWeil GlobalTheory.RowTest GlobalTheory.SumSize GlobalTheory.RowClaim
 open Formalism.DivisionValues (vw lw)
 open MeasureTheory ValuativeRel GlobalTheory.UnfoldLoss
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw
-  GlobalTheory.FunObj.borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw GlobalTheory.FunObj.borelSpaceKw
 
 namespace GlobalTheory.LossSum
 
-theorem lossLe_sum_and_pow : ∀ {D : D7} (w : PlL D),
-    (∀ {ι : Type} (s : Finset ι) (z : ι → ℂ) (a : ℝ), (∀ i ∈ s, LossLe w (z i) a) → LossLe w (∑ i ∈ s, z i) a) ∧
-    ∀ q M : ℕ, 0 < q → LossLe w ((((q : ℝ)⁻¹ ^ M : ℝ)) : ℂ) ((M : ℝ) * (vw w ((q : ℕ) : D.what₂.LL) : ℝ)) := by
+theorem lossLe_sum_and_pow
+    : ∀ {D : D7} (w : PlL D),
+      (∀ {ι : Type} (s : Finset ι) (z : ι → ℂ) (a : ℝ),
+          (∀ i ∈ s, LossLe w (z i) a) → LossLe w (∑ i ∈ s, z i) a)
+        ∧ ∀ q M : ℕ,
+          0 < q
+            → LossLe w ((((q : ℝ)⁻¹ ^ M : ℝ)) : ℂ)
+              ((M : ℝ) * (vw w ((q : ℕ) : D.what₂.LL) : ℝ)) := by
   intro D w
   refine ⟨?_, ?_⟩
   · intro ι s z a h
@@ -59,6 +68,8 @@ theorem lossLe_sum_and_pow : ∀ {D : D7} (w : PlL D),
     refine ⟨((q : D.what₂.LL)⁻¹) ^ M, by push_cast; simp, Or.inr ?_⟩
     have hq0 : ((q : D.what₂.LL)⁻¹) ≠ 0 := inv_ne_zero (by exact_mod_cast hq.ne')
     rw [GlobalTheory.ScalAA.vw_pow' w hq0, GlobalTheory.ScalAA.vw_inv']
-    push_cast; ring_nf; rfl
+    push_cast
+    ring_nf
+    rfl
 
 end GlobalTheory.LossSum

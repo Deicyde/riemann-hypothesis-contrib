@@ -15,12 +15,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SobGL
 
-def lgArg {n : ℕ} (p : Mat n × Mat n) : ℝ :=
-  1 + ∑ a, ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2)
+def lgArg {n : ℕ} (p : Mat n × Mat n) : ℝ := 1 + ∑ a, ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2)
 
 theorem lgArg_continuous {n : ℕ} : Continuous (lgArg (n := n)) := by
   unfold lgArg
-  refine continuous_const.add (continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun b _ => ?_)
+  refine continuous_const.add (continuous_finsetSum _ fun a _ =>
+    continuous_finsetSum _ fun b _ => ?_)
   have h1 : Continuous fun p : Mat n × Mat n => p.1 a b :=
     (continuous_id.matrix_elem a b).comp continuous_fst
   have h2 : Continuous fun p : Mat n × Mat n => p.2 a b :=
@@ -33,15 +33,19 @@ theorem one_le_lgArg {n : ℕ} (p : Mat n × Mat n) : 1 ≤ lgArg p := by
     Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b _ => by positivity
   linarith
 
-theorem entry_sq_le_lgArg {n : ℕ} (p : Mat n × Mat n) (a b : Fin n) :
-    ‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2 ≤ lgArg p := by
+theorem entry_sq_le_lgArg {n : ℕ} (p : Mat n × Mat n) (a b : Fin n)
+    : ‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2 ≤ lgArg p := by
   unfold lgArg
   have h1 : ‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2 ≤ ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2) :=
-    Finset.single_le_sum (f := fun b => ‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2)
-      (fun b _ => by positivity) (Finset.mem_univ b)
+    Finset.single_le_sum
+      (f := fun b => ‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2)
+      (fun b _ => by positivity)
+      (Finset.mem_univ b)
   have h2 : ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2) ≤ ∑ a, ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2) :=
-    Finset.single_le_sum (f := fun a => ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2))
-      (fun a _ => Finset.sum_nonneg fun b _ => by positivity) (Finset.mem_univ a)
+    Finset.single_le_sum
+      (f := fun a => ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2))
+      (fun a _ => Finset.sum_nonneg fun b _ => by positivity)
+      (Finset.mem_univ a)
   linarith
 
 theorem lg_eq_log_lgArg {n : ℕ} (y : Mat n) : lg y = Real.log (lgArg (y, y⁻¹)) := rfl
@@ -74,8 +78,10 @@ theorem isCompact_entryBox {n : ℕ} (r : ℝ) : IsCompact {m : Mat n | ∀ a b,
   have h : IsCompact (Set.pi Set.univ fun _ : Fin n =>
       Set.pi Set.univ fun _ : Fin n => Metric.closedBall (0 : ℂ) r) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
-  have e : {m : Fin n → Fin n → ℂ | ∀ a b, ‖m a b‖ ≤ r} = Set.pi Set.univ fun _ : Fin n =>
-      Set.pi Set.univ fun _ : Fin n => Metric.closedBall (0 : ℂ) r := by
+  have e
+      : {m : Fin n → Fin n → ℂ | ∀ a b, ‖m a b‖ ≤ r}
+        = Set.pi Set.univ fun _ : Fin n =>
+          Set.pi Set.univ fun _ : Fin n => Metric.closedBall (0 : ℂ) r := by
     ext m
     simp [Set.mem_pi]
   have h' : IsCompact {m : Fin n → Fin n → ℂ | ∀ a b, ‖m a b‖ ≤ r} := e ▸ h
@@ -83,17 +89,18 @@ theorem isCompact_entryBox {n : ℕ} (r : ℝ) : IsCompact {m : Mat n | ∀ a b,
 
 theorem isCompact_lg_le {n : ℕ} (R : ℝ) : IsCompact {y : G n | lg y.val ≤ R} := by
   rw [pairOf_isInducing.isCompact_iff]
-  have hset : pairOf '' {y : G n | lg y.val ≤ R} =
-      {p : Mat n × Mat n | p.1 * p.2 = 1 ∧ p.2 * p.1 = 1 ∧ lgArg p ≤ Real.exp R} := by
+  have hset
+      : pairOf '' {y : G n | lg y.val ≤ R}
+        = {p : Mat n × Mat n | p.1 * p.2 = 1 ∧ p.2 * p.1 = 1 ∧ lgArg p ≤ Real.exp R} := by
     ext p
     constructor
     · rintro ⟨y, hy, rfl⟩
       refine ⟨by simp [pairOf], by simp [pairOf], ?_⟩
       have hinv : (y⁻¹ : G n).val = y.val⁻¹ := Matrix.coe_units_inv y
       have hy' : Real.log (lgArg (pairOf y)) ≤ R := by
-        have : lg y.val = Real.log (lgArg (pairOf y)) := by
-          rw [lg_eq_log_lgArg, pairOf, hinv]
-        rw [← this]; exact hy
+        have : lg y.val = Real.log (lgArg (pairOf y)) := by rw [lg_eq_log_lgArg, pairOf, hinv]
+        rw [← this]
+        exact hy
       have hpos : 0 < lgArg (pairOf y) := lt_of_lt_of_le one_pos (one_le_lgArg _)
       exact (Real.log_le_iff_le_exp hpos).1 hy'
     · rintro ⟨h1, h2, h3⟩
@@ -101,16 +108,16 @@ theorem isCompact_lg_le {n : ℕ} (R : ℝ) : IsCompact {y : G n | lg y.val ≤ 
       · set y : G n := ⟨p.1, p.2, h1, h2⟩ with hy
         have hinv : (y⁻¹ : G n).val = y.val⁻¹ := Matrix.coe_units_inv y
         have hpy : pairOf y = p := rfl
-        have : lg y.val = Real.log (lgArg p) := by
-          rw [lg_eq_log_lgArg, ← hinv, ← hpy]; rfl
+        have : lg y.val = Real.log (lgArg p) := by rw [lg_eq_log_lgArg, ← hinv, ← hpy]; rfl
         have hpos : 0 < lgArg p := lt_of_lt_of_le one_pos (one_le_lgArg _)
         show lg y.val ≤ R
         rw [this]
         exact (Real.log_le_iff_le_exp hpos).2 h3
       · rfl
   rw [hset]
-  have hbox : IsCompact ({m : Mat n | ∀ a b, ‖m a b‖ ≤ Real.sqrt (Real.exp R)} ×ˢ
-      {m : Mat n | ∀ a b, ‖m a b‖ ≤ Real.sqrt (Real.exp R)}) :=
+  have hbox : IsCompact
+      ({m : Mat n | ∀ a b, ‖m a b‖ ≤ Real.sqrt (Real.exp R)}
+        ×ˢ {m : Mat n | ∀ a b, ‖m a b‖ ≤ Real.sqrt (Real.exp R)}) :=
     (isCompact_entryBox _).prod (isCompact_entryBox _)
   refine hbox.of_isClosed_subset ?_ ?_
   · have c1 : IsClosed {p : Mat n × Mat n | p.1 * p.2 = 1} :=
@@ -127,8 +134,8 @@ theorem isCompact_lg_le {n : ℕ} (R : ℝ) : IsCompact {y : G n | lg y.val ≤ 
     · have := hb a b; nlinarith [sq_nonneg ‖p.2 a b‖]
     · have := hb a b; nlinarith [sq_nonneg ‖p.1 a b‖]
 
-theorem lg_continuousOn_and_isCompact :
-    ∀ n : ℕ, ContinuousOn (lg (n := n)) (GLs n) ∧ ∀ R : ℝ, IsCompact {y : G n | lg y.val ≤ R} :=
+theorem lg_continuousOn_and_isCompact
+    : ∀ n : ℕ, ContinuousOn (lg (n := n)) (GLs n) ∧ ∀ R : ℝ, IsCompact {y : G n | lg y.val ≤ R} :=
   fun _ => ⟨continuousOn_lg, isCompact_lg_le⟩
 
 end GlobalTheory.CompanionTheory.SobGL

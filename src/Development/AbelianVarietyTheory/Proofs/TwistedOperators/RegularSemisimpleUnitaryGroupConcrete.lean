@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RegularSe
 
 namespace GlobalTheory.RegSSObj
 
-theorem regularSemisimple : GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.RegularSemisimple :=
+theorem regularSemisimple
+    : GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.RegularSemisimple :=
   GlobalTheory.RegSS.regularSemisimple
 
 end GlobalTheory.RegSSObj

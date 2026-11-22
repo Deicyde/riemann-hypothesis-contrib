@@ -8,15 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvdSubO
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
 namespace GlobalTheory
 
-theorem conj_norm_eq_of_minpoly_root :
-    ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (z z' : Om l),
-    Polynomial.aeval z' (minpoly (↥(Kunr l a)) z) = 0 → ‖z'‖ = ‖z‖ := by
+theorem conj_norm_eq_of_minpoly_root
+    : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (z z' : Om l),
+      Polynomial.aeval z' (minpoly (↥(Kunr l a)) z) = 0 → ‖z'‖ = ‖z‖ := by
   intro l _ a _ z z' h
   have hint : IsIntegral (↥(Kunr l a)) z := Algebra.IsIntegral.isIntegral z
   have hm : minpoly (↥(Kunr l a)) z' = minpoly (↥(Kunr l a)) z :=

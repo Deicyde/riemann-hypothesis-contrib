@@ -14,8 +14,9 @@ namespace Formalism.HermitianLattices.Ext.L3
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-theorem exists_add_conj_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (a : 𝓞 F) :
-    ∃ z : 𝓞 K, z + conjO K z = algebraMap (𝓞 F) (𝓞 K) a := by
+theorem exists_add_conj_eq
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (a : 𝓞 F)
+    : ∃ z : 𝓞 K, z + conjO K z = algebraMap (𝓞 F) (𝓞 K) a := by
   let ι := algebraMap (𝓞 F) (𝓞 K)
   have coe_ι (b : 𝓞 F) : ((ι b : 𝓞 K) : K) = algebraMap F K (b : F) :=
     (IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K b).symm.trans
@@ -44,21 +45,21 @@ theorem exists_add_conj_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) 
     refine ⟨⟨b, hb_int⟩, RingOfIntegers.ext ?_⟩
     exact (coe_ι ⟨b, hb_int⟩).trans hb
   let trace (z : 𝓞 K) : 𝓞 F := Classical.choose (exists_trace z)
-  have trace_spec (z : 𝓞 K) : ι (trace z) = z + conjO K z :=
-    Classical.choose_spec (exists_trace z)
-  let tr : 𝓞 K →ₗ[𝓞 F] 𝓞 F :=
-    { toFun := trace
-      map_add' := by
-        intro x y
-        apply ι_injective
-        rw [trace_spec, map_add, map_add, trace_spec, trace_spec]
-        ring
-      map_smul' := by
-        intro b z
-        apply ι_injective
-        rw [RingHom.id_apply, smul_eq_mul, map_mul, trace_spec, trace_spec, Algebra.smul_def,
-          map_mul, conj_ι]
-        ring }
+  have trace_spec (z : 𝓞 K) : ι (trace z) = z + conjO K z := Classical.choose_spec (exists_trace z)
+  let tr : 𝓞 K →ₗ[𝓞 F] 𝓞 F := {
+    toFun := trace
+    map_add' := by
+      intro x y
+      apply ι_injective
+      rw [trace_spec, map_add, map_add, trace_spec, trace_spec]
+      ring
+    map_smul' := by
+      intro b z
+      apply ι_injective
+      rw [RingHom.id_apply, smul_eq_mul, map_mul, trace_spec, trace_spec, Algebra.smul_def, map_mul,
+        conj_ι]
+      ring
+  }
   have htop : LinearMap.range tr = ⊤ := by
     by_contra hne
     obtain ⟨𝔭, h𝔭, hle⟩ := Ideal.exists_le_maximal (LinearMap.range tr) hne
@@ -70,16 +71,16 @@ theorem exists_add_conj_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) 
       have := hmem 1
       rwa [map_one, one_add_one_eq_two] at this
     have hsq : (θ - conjO K θ) * (θ - conjO K θ) ∈ extP K 𝔭 := by
-      have : (θ - conjO K θ) * (θ - conjO K θ) =
-          (θ + conjO K θ) * (θ + conjO K θ) - 2 * (2 * (θ * conjO K θ)) := by ring
+      have : (θ - conjO K θ) * (θ - conjO K θ)
+          = (θ + conjO K θ) * (θ + conjO K θ) - 2 * (2 * (θ * conjO K θ)) := by
+        ring
       rw [this]
       exact sub_mem (Ideal.mul_mem_left _ _ (hmem θ)) (Ideal.mul_mem_right _ _ h2)
     have hdiff : (θ - conjO K θ) ∈ extP K 𝔭 ^ 1 :=
       idealPowerSpanBounds.mem_of_unit_mul_mem hθ (by simpa only [pow_one] using hsq)
     have hone : (1 : 𝓞 K) ∈ extP K 𝔭 ^ 1 :=
       idealPowerSpanBounds.mem_of_unit_mul_mem hθ (by simpa only [mul_one] using hdiff)
-    have hcomap : Ideal.comap ι (extP K 𝔭) = 𝔭 :=
-      Ideal.comap_map_eq_self_of_faithfullyFlat 𝔭
+    have hcomap : Ideal.comap ι (extP K 𝔭) = 𝔭 := Ideal.comap_map_eq_self_of_faithfullyFlat 𝔭
     have hone_mem : (1 : 𝓞 F) ∈ 𝔭 := by
       rw [← hcomap, Ideal.mem_comap, map_one]
       simpa only [pow_one] using hone

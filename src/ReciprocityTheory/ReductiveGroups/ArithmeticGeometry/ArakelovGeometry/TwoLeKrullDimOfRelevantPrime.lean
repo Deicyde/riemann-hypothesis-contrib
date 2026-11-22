@@ -15,8 +15,8 @@ section Dim
 
 variable {R : Type*} [CommRing R]
 
-theorem krullDim_quotient_add_one_le {p q : Ideal R} [p.IsPrime] [q.IsPrime]
-    (h : q < p) : ringKrullDim (R ⧸ p) + 1 ≤ ringKrullDim (R ⧸ q) := by
+theorem krullDim_quotient_add_one_le {p q : Ideal R} [p.IsPrime] [q.IsPrime] (h : q < p)
+    : ringKrullDim (R ⧸ p) + 1 ≤ ringKrullDim (R ⧸ q) := by
   obtain ⟨r, hrp, hrq⟩ := SetLike.exists_of_lt h
   have hr : Ideal.Quotient.mk q r ∈ nonZeroDivisors (R ⧸ q) :=
     mem_nonZeroDivisors_of_ne_zero (by rwa [ne_eq, Ideal.Quotient.eq_zero_iff_mem])

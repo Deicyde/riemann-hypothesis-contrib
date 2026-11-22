@@ -22,11 +22,12 @@ open GroundTheory.Heights₂.Heights.Kleiman
 universe u w
 
 theorem snapperHyperplane : SnapperHyperplane.Statement.{u, w} :=
-  SnapperHyperplane.proof SnapperQuotAdd.closed SnapperQuotDevissage.closed SnapperHyperplaneMid.proof
+  SnapperHyperplane.proof SnapperQuotAdd.closed SnapperQuotDevissage.closed
+    SnapperHyperplaneMid.proof
 
 theorem mixedTwistShift : MixedTwistShift.Statement.{u, w} :=
-  MixedTwistShift.proof snapperHyperplane SnapperSection.full SnapperDiffPoly.proof RestrLenEuler.proof
-    SubsetDiffConst.proof
+  MixedTwistShift.proof snapperHyperplane SnapperSection.full SnapperDiffPoly.proof
+    RestrLenEuler.proof SubsetDiffConst.proof
 
 theorem interNumEventual : InterNumEventual.Statement.{u, w} :=
   InterNumEventual.proof snapperHyperplane SnapperSection.full

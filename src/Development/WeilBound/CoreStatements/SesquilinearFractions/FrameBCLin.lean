@@ -9,15 +9,18 @@ namespace PositivityTheory.Xgf.EigenspaceComposition
 
 open GlobalTheory.CompanionTheory.Ar
 
-variable {F F' : Type} [Field F] [Field F'] (f : F →+* F') {N : ℕ} {O : Type} [CommRing O]
+variable
+  {F F' : Type} [Field F] [Field F']
+  (f : F →+* F')
+  {N : ℕ} {O : Type} [CommRing O]
   (ρ : O →+* Module.End F (Fin N → F)) (ρ' : O →+* Module.End F' (Fin N → F')) (τ : O →+* F)
 
-theorem mem_eigSp {K : Type} [Field K] {ρ : O →+* Module.End K (Fin N → K)} {σ : O →+* K} (w : Fin N → K) :
-    w ∈ eigSp ρ σ ↔ ∀ a, ρ a w = σ a • w := by
+theorem mem_eigSp
+    {K : Type} [Field K] {ρ : O →+* Module.End K (Fin N → K)} {σ : O →+* K} (w : Fin N → K)
+    : w ∈ eigSp ρ σ ↔ ∀ a, ρ a w = σ a • w := by
   simp [eigSp, Submodule.mem_iInf, LinearMap.mem_ker, sub_eq_zero]
 
-theorem comp_smul (c : F) (w : Fin N → F) : f ∘ (c • w) = f c • (f ∘ w) := by
-  funext i; simp
+theorem comp_smul (c : F) (w : Fin N → F) : f ∘ (c • w) = f c • (f ∘ w) := by funext i; simp
 
 theorem comp_inj : Function.Injective fun w : Fin N → F => f ∘ w := fun w w' h =>
   funext fun i => f.injective (congrFun h i)
@@ -26,33 +29,37 @@ theorem comp_add (w w' : Fin N → F) : f ∘ (w + w') = f ∘ w + f ∘ w' := b
 
 variable {f ρ ρ' τ}
 
-theorem mem_eigSp_comp (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) (w : Fin N → F) :
-    f ∘ w ∈ eigSp ρ' (f.comp τ) ↔ w ∈ eigSp ρ τ := by
+theorem mem_eigSp_comp (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) (w : Fin N → F)
+    : f ∘ w ∈ eigSp ρ' (f.comp τ) ↔ w ∈ eigSp ρ τ := by
   rw [mem_eigSp, mem_eigSp]
   refine forall_congr' fun a => ?_
   rw [hρ, RingHom.comp_apply, ← comp_smul]
   exact (comp_inj f).eq_iff
 
-theorem linIndep_comp {ι ι' : Type} [Finite ι'] (u : ι → ι' → F) :
-    LinearIndependent F' (fun k => f ∘ u k) ↔ LinearIndependent F u := by
+theorem linIndep_comp {ι ι' : Type} [Finite ι'] (u : ι → ι' → F)
+    : LinearIndependent F' (fun k => f ∘ u k) ↔ LinearIndependent F u := by
   letI : Algebra F F' := f.toAlgebra
   exact linearIndependent_algebraMap_comp_iff
 
-theorem comp_mem_span {ι : Type} (g : ι → Fin N → F) (w : Fin N → F) (hw : w ∈ Submodule.span F (Set.range g)) :
-    f ∘ w ∈ Submodule.span F' (Set.range fun s => f ∘ g s) := by
+theorem comp_mem_span
+    {ι : Type} (g : ι → Fin N → F) (w : Fin N → F) (hw : w ∈ Submodule.span F (Set.range g))
+    : f ∘ w ∈ Submodule.span F' (Set.range fun s => f ∘ g s) := by
   induction hw using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨s, rfl⟩ := hx
     exact Submodule.subset_span ⟨s, rfl⟩
   | zero =>
     have : f ∘ (0 : Fin N → F) = 0 := by funext i; simp
-    rw [this]; exact Submodule.zero_mem _
+    rw [this]
+    exact Submodule.zero_mem _
   | add x y _ _ hx hy => rw [comp_add]; exact Submodule.add_mem _ hx hy
   | smul c x _ hx => rw [comp_smul]; exact Submodule.smul_mem _ _ hx
 
-theorem span_comp_eq (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (b : Fin n → Fin N → F)
-    (hli : LinearIndependent F b) (hsp : Submodule.span F (Set.range b) = eigSp ρ τ) :
-    Submodule.span F' (Set.range fun k => f ∘ b k) = eigSp ρ' (f.comp τ) := by
+theorem span_comp_eq
+    (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u)
+    {n : ℕ} (b : Fin n → Fin N → F) (hli : LinearIndependent F b)
+    (hsp : Submodule.span F (Set.range b) = eigSp ρ τ)
+    : Submodule.span F' (Set.range fun k => f ∘ b k) = eigSp ρ' (f.comp τ) := by
   classical
   have hbW : ∀ k, b k ∈ eigSp ρ τ := fun k => hsp ▸ Submodule.subset_span ⟨k, rfl⟩
   apply le_antisymm
@@ -67,8 +74,9 @@ theorem span_comp_eq (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (
       {K | ∃ A : Finset O, K = ⨅ a ∈ A, LinearMap.ker (ρ a - τ a • LinearMap.id)}
     obtain ⟨K, ⟨A, rfl⟩, hmin⟩ := IsArtinian.set_has_minimal T ⟨_, ⟨∅, rfl⟩⟩
     refine ⟨A, fun w hw => (mem_eigSp w).2 fun a => ?_⟩
-    have hle : (⨅ a' ∈ insert a A, LinearMap.ker (ρ a' - τ a' • LinearMap.id)) ≤
-        ⨅ a' ∈ A, LinearMap.ker (ρ a' - τ a' • LinearMap.id) :=
+    have hle
+        : (⨅ a' ∈ insert a A, LinearMap.ker (ρ a' - τ a' • LinearMap.id))
+          ≤ ⨅ a' ∈ A, LinearMap.ker (ρ a' - τ a' • LinearMap.id) :=
       iInf_mono fun a' => iInf_mono' fun h => ⟨Finset.mem_insert_of_mem h, le_rfl⟩
     have heq := (eq_of_le_of_not_lt hle (hmin _ ⟨insert a A, rfl⟩))
     have hwK : w ∈ ⨅ a' ∈ A, LinearMap.ker (ρ a' - τ a' • LinearMap.id) := by
@@ -77,7 +85,8 @@ theorem span_comp_eq (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (
       exact hw
     rw [← heq] at hwK
     simp only [Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply,
-      LinearMap.id_apply, sub_eq_zero] at hwK
+        LinearMap.id_apply, sub_eq_zero]
+      at hwK
     exact hwK a (Finset.mem_insert_self a A)
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl (eigSp ρ τ)
   let bc := Module.finBasis F C
@@ -100,11 +109,14 @@ theorem span_comp_eq (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (
     intro v _
     rw [pi_eq_sum_univ v]
     refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ ?_
-    have e : (fun j => if i = j then (1 : F') else 0) = f ∘ (fun j => if i = j then (1 : F) else 0) := by
+    have e
+        : (fun j => if i = j then (1 : F') else 0)
+          = f ∘ (fun j => if i = j then (1 : F) else 0) := by
       funext j; by_cases h : i = j <;> simp [h]
     rw [e]
     exact comp_mem_span g _ (gspan ▸ Submodule.mem_top)
-  obtain ⟨z, hz⟩ := (Submodule.mem_span_range_iff_exists_fun F').1 (g'span ▸ (Submodule.mem_top : w' ∈ ⊤))
+  obtain ⟨z, hz⟩ :=
+    (Submodule.mem_span_range_iff_exists_fun F').1 (g'span ▸ (Submodule.mem_top : w' ∈ ⊤))
   rw [Fintype.sum_sum_type] at hz
   simp only [g, Sum.elim_inl, Sum.elim_inr] at hz
   let V : Fin (Module.finrank F C) → A0 × Fin N → F := fun j p => (ρ p.1 (c j) - τ p.1 • c j) p.2
@@ -118,7 +130,8 @@ theorem span_comp_eq (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (
       have := congrFun hy (⟨a, ha⟩, i)
       simp only [V, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at this
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+        simp only [map_sum, map_smul, Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
+          Pi.zero_apply]
       rw [← this, Finset.mul_sum, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
       simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
@@ -155,9 +168,10 @@ theorem span_comp_eq (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (
   simp only [hy, zero_smul, Finset.sum_const_zero, add_zero]
   exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
 
-theorem core (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (u : Fin n → Fin N → F) :
-    (LinearIndependent F u ∧ Submodule.span F (Set.range u) = eigSp ρ τ) ↔
-      (LinearIndependent F' (fun k => f ∘ u k) ∧ Submodule.span F' (Set.range fun k => f ∘ u k) = eigSp ρ' (f.comp τ)) := by
+theorem core (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (u : Fin n → Fin N → F)
+    : (LinearIndependent F u ∧ Submodule.span F (Set.range u) = eigSp ρ τ)
+      ↔ (LinearIndependent F' (fun k => f ∘ u k)
+        ∧ Submodule.span F' (Set.range fun k => f ∘ u k) = eigSp ρ' (f.comp τ)) := by
   constructor
   · rintro ⟨hli, hsp⟩
     exact ⟨(linIndep_comp (ι' := Fin N) u).2 hli, span_comp_eq hρ u hli hsp⟩
@@ -172,7 +186,8 @@ theorem core (hρ : ∀ a u, ρ' a (f ∘ u) = f ∘ ρ a u) {n : ℕ} (u : Fin 
     let W := eigSp ρ τ
     let bW := Module.finBasis F W
     let b : Fin (Module.finrank F W) → Fin N → F := fun j => (bW j : Fin N → F)
-    have hbli : LinearIndependent F b := bW.linearIndependent.map' W.subtype (Submodule.ker_subtype W)
+    have hbli : LinearIndependent F b :=
+      bW.linearIndependent.map' W.subtype (Submodule.ker_subtype W)
     have hbsp : Submodule.span F (Set.range b) = W := by
       have : Set.range b = W.subtype '' Set.range bW := by rw [← Set.range_comp]; rfl
       rw [this, Submodule.span_image, bW.span_eq, Submodule.map_top, Submodule.range_subtype]

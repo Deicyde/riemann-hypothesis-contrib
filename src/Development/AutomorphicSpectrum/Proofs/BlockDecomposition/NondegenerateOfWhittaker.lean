@@ -13,24 +13,30 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.AnalyticO
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.SWGlue
 
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 
 variable {D : D7} {n : ℕ}
 
-theorem weil_cell_zero {ψ : AddChar (AF D.host.F) ℂ} {χ : (AE D)ˣ →* Circle} {θ : InfFam D} {V : HSp D}
+theorem weil_cell_zero
+    {ψ : AddChar (AF D.host.F) ℂ} {χ : (AE D)ˣ →* Circle} {θ : InfFam D} {V : HSp D}
     {μ : Measure (Mx D V.rank n)} {ω : G D n →* Module.End ℂ (schwartzA θ V.rank n)}
-    (hω : IsWeilSch ψ χ θ V μ ω) {w u : G D n} (hw : mat w = blk4 0 1 (-1) 0) (b : hermA D n)
-    (hu : mat u = blk4 1 b.1 0 1) (Φ : schwartzA θ V.rank n) (g : G D n) :
-    (ω (w * u * g) Φ).1 0 = Jt ψ V μ (ω g Φ).1 b := by
-  have e : ω (w * u * g) Φ = ω w (ω u (ω g Φ)) := by
-    simp only [map_mul, Module.End.mul_apply]
+    (hω : IsWeilSch ψ χ θ V μ ω)
+    {w u : G D n} (hw : mat w = blk4 0 1 (-1) 0)
+    (b : hermA D n) (hu : mat u = blk4 1 b.1 0 1)
+    (Φ : schwartzA θ V.rank n) (g : G D n)
+    : (ω (w * u * g) Φ).1 0 = Jt ψ V μ (ω g Φ).1 b := by
+  have e : ω (w * u * g) Φ = ω w (ω u (ω g Φ)) := by simp only [map_mul, Module.End.mul_apply]
   rw [e, hω.weyl w hw _ 0]
   unfold Jt
   refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)

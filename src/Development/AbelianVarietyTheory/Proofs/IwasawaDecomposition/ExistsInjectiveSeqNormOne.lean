@@ -8,9 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Disjoi
 
 namespace GlobalTheory.InjectiveSeqNormOne
 
-theorem exists_injective_seq_norm_one {F E : Type} [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) :
-    ∃ a : ℕ → E, Function.Injective a ∧ ∀ k : ℕ, a k * σ (a k) = 1 := by
+theorem exists_injective_seq_norm_one
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
+    : ∃ a : ℕ → E, Function.Injective a ∧ ∀ k : ℕ, a k * σ (a k) = 1 := by
   obtain ⟨-, hE, -, hσ⟩ := h
   let τ : E →+* ℂ := (IsAlgClosed.lift (R := ℚ) (S := E) (M := ℂ)).toRingHom
   have hinv : ∀ x, σ (σ x) = x := fun x => τ.injective (by rw [hσ, hσ, star_star])

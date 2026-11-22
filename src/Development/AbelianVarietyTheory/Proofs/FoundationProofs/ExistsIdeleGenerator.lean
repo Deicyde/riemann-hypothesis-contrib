@@ -8,16 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CmFiniteA
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators Nat
 
 namespace GlobalTheory.IdealIdele
 
-theorem pow_factorial_mul {M : Type} [Monoid M] [Fintype M] (a : M) (t : ℕ) (ht : 0 < t) :
-    a ^ ((Fintype.card M)! * t) = a ^ (Fintype.card M)! := by
+theorem pow_factorial_mul {M : Type} [Monoid M] [Fintype M] (a : M) (t : ℕ) (ht : 0 < t)
+    : a ^ ((Fintype.card M)! * t) = a ^ (Fintype.card M)! := by
   obtain ⟨i, j, hij, hj, e⟩ : ∃ i j : ℕ, i < j ∧ j ≤ Fintype.card M ∧ a ^ i = a ^ j := by
-    obtain ⟨i, j, hne, e⟩ := Fintype.exists_ne_map_eq_of_card_lt
-      (fun i : Fin (Fintype.card M + 1) => a ^ (i : ℕ)) (by simp)
+    obtain ⟨i, j, hne, e⟩ :=
+      Fintype.exists_ne_map_eq_of_card_lt (fun i : Fin (Fintype.card M + 1) => a ^ (i : ℕ)) (by
+        simp)
     rcases lt_or_gt_of_ne hne with h | h
     · exact ⟨i, j, h, Nat.lt_succ_iff.1 j.2, e⟩
     · exact ⟨j, i, h, Nat.lt_succ_iff.1 i.2, e.symm⟩
@@ -29,20 +32,22 @@ theorem pow_factorial_mul {M : Type} [Monoid M] [Fintype M] (a : M) (t : ℕ) (h
     | zero => simp
     | succ u ih => rw [Nat.mul_succ, ← add_assoc, pow_add, ih, ← pow_add, ← e]
   obtain ⟨c, hc⟩ : d ∣ (Fintype.card M)! := Nat.dvd_factorial hd (by omega)
-  obtain ⟨s, hs⟩ := Nat.exists_eq_add_of_le
-    (show i ≤ (Fintype.card M)! from le_trans (by omega) (Nat.self_le_factorial _))
+  obtain ⟨s, hs⟩ :=
+    Nat.exists_eq_add_of_le (show i ≤ (Fintype.card M)! from
+      le_trans (by omega) (Nat.self_le_factorial _))
   obtain ⟨t, rfl⟩ := Nat.exists_eq_succ_of_ne_zero ht.ne'
   have : (Fintype.card M)! * t.succ = i + d * (c * t) + s := by
     rw [Nat.mul_succ, ← mul_assoc, ← hc]; omega
   rw [this, pow_add, key, ← pow_add, ← hs]
 
-theorem int_dvd_pow_sub (m N t : ℕ) (hN : 0 < N) (ht : 0 < t) :
-    ∃ c : ℤ, (m : ℤ) ^ (N ! * t) = (m : ℤ) ^ N ! + N * c := by
+theorem int_dvd_pow_sub (m N t : ℕ) (hN : 0 < N) (ht : 0 < t)
+    : ∃ c : ℤ, (m : ℤ) ^ (N ! * t) = (m : ℤ) ^ N ! + N * c := by
   haveI : NeZero N := ⟨hN.ne'⟩
   have h := pow_factorial_mul (m : ZMod N) t ht
   rw [ZMod.card] at h
-  obtain ⟨c, hc⟩ := (ZMod.intCast_zmod_eq_zero_iff_dvd ((m : ℤ) ^ (N ! * t) - (m : ℤ) ^ N !) N).1
-    (by push_cast; rw [h, sub_self])
+  obtain ⟨c, hc⟩ :=
+    (ZMod.intCast_zmod_eq_zero_iff_dvd ((m : ℤ) ^ (N ! * t) - (m : ℤ) ^ N !) N).1
+      (by push_cast; rw [h, sub_self])
   exact ⟨c, by linear_combination hc⟩
 
 section Abstract
@@ -51,42 +56,51 @@ variable {A : Type} [CommRing A] (S : Subring A)
 
 theorem exists_idem
     (hsep : ∀ y : A, (∀ N : ℕ, 0 < N → ∃ w ∈ S, y = (N : A) * w) → y = 0)
-    (hcpl : ∀ x : ℕ → A, (∀ N, x N ∈ S) →
-      (∀ N m : ℕ, 0 < N → 0 < m → ∃ w ∈ S, x (N * m) = x N + (N : A) * w) →
-      ∃ y ∈ S, ∀ N : ℕ, 0 < N → ∃ w ∈ S, y = x N + (N : A) * w)
-    (m : ℕ) (hm : 0 < m) :
-    ∃ f ∈ S, f * f = f ∧ (∃ w ∈ S, f = (m : A) * w) ∧
-      ∀ n : ℕ, 0 < n → m.Coprime n → ∃ w ∈ S, 1 - f = (n : A) * w := by
-  have hc : ∀ N t : ℕ, 0 < N → 0 < t →
-      ∃ c : ℤ, (m : A) ^ (N ! * t) = (m : A) ^ N ! + N * c := fun N t hN ht => by
+    (hcpl : ∀ x : ℕ → A,
+      (∀ N, x N ∈ S) → (∀ N m : ℕ, 0 < N → 0 < m → ∃ w ∈ S, x (N * m) = x N + (N : A) * w)
+        → ∃ y ∈ S, ∀ N : ℕ, 0 < N → ∃ w ∈ S, y = x N + (N : A) * w)
+    (m : ℕ) (hm : 0 < m)
+    : ∃ f ∈ S,
+      f * f = f ∧ (∃ w ∈ S, f = (m : A) * w)
+        ∧ ∀ n : ℕ, 0 < n → m.Coprime n → ∃ w ∈ S, 1 - f = (n : A) * w := by
+  have hc
+      : ∀ N t : ℕ,
+        0 < N → 0 < t → ∃ c : ℤ, (m : A) ^ (N ! * t) = (m : A) ^ N ! + N * c := fun N t hN ht => by
     obtain ⟨c, h⟩ := int_dvd_pow_sub m N t hN ht
     refine ⟨c, ?_⟩
     have := congrArg (Int.cast : ℤ → A) h
     push_cast at this
     exact this
   have hx : ∀ k : ℕ, (m : A) ^ k ∈ S := fun k => pow_mem (natCast_mem S m) k
-  obtain ⟨f, hf, h⟩ := hcpl (fun N => (m : A) ^ N !) (fun N => hx _) (by
-    intro N k hN hk
-    obtain ⟨t, ht⟩ := Nat.factorial_dvd_factorial (Nat.le_mul_of_pos_right N hk)
-    have ht0 : 0 < t := Nat.pos_of_ne_zero (by
-      rintro rfl
-      exact (Nat.factorial_ne_zero _) (by simpa using ht))
-    obtain ⟨c, hc⟩ := hc N t hN ht0
-    exact ⟨c, intCast_mem S c, by simp only [ht, hc]⟩)
+  obtain ⟨f, hf, h⟩ :=
+    hcpl (fun N => (m : A) ^ N !) (fun N => hx _) (by
+      intro N k hN hk
+      obtain ⟨t, ht⟩ := Nat.factorial_dvd_factorial (Nat.le_mul_of_pos_right N hk)
+      have ht0 : 0 < t :=
+        Nat.pos_of_ne_zero (by
+          rintro rfl
+          exact (Nat.factorial_ne_zero _) (by simpa using ht))
+      obtain ⟨c, hc⟩ := hc N t hN ht0
+      exact ⟨c, intCast_mem S c, by simp only [ht, hc]⟩)
   refine ⟨f, hf, ?_, ?_, fun n hn hmn => ?_⟩
   · rw [← sub_eq_zero]
     refine hsep _ fun N hN => ?_
     obtain ⟨w, hw, hh⟩ := h N hN
     obtain ⟨c, hc⟩ := hc N 2 hN two_pos
     refine ⟨c + (2 * (m : A) ^ N ! * w + N * w * w - w), ?_, ?_⟩
-    · exact add_mem (intCast_mem S c) (sub_mem (add_mem (mul_mem (mul_mem (ofNat_mem _ 2) (hx _)) hw)
-        (mul_mem (mul_mem (natCast_mem _ _) hw) hw)) hw)
+    · exact add_mem (intCast_mem S c)
+        (sub_mem
+          (add_mem (mul_mem (mul_mem (ofNat_mem _ 2) (hx _)) hw)
+            (mul_mem (mul_mem (natCast_mem _ _) hw) hw))
+          hw)
     · rw [pow_mul] at hc
-      rw [hh]; linear_combination hc
+      rw [hh]
+      linear_combination hc
   · obtain ⟨w, hw, hh⟩ := h m hm
     obtain ⟨s, hs⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.factorial_ne_zero m)
     refine ⟨(m : A) ^ s + w, add_mem (hx s) hw, ?_⟩
-    rw [hh, hs, pow_succ]; ring
+    rw [hh, hs, pow_succ]
+    ring
   · obtain ⟨w, hw, hh⟩ := h n hn
     obtain ⟨t, ht⟩ := Nat.dvd_factorial (Nat.totient_pos.2 hn) (Nat.totient_le n)
     have h1 : m ^ n ! ≡ 1 [MOD n] := by
@@ -96,21 +110,24 @@ theorem exists_idem
     have hc' := congrArg (Int.cast : ℤ → A) hc
     push_cast at hc'
     refine ⟨c - w, sub_mem (intCast_mem S c) hw, ?_⟩
-    rw [hh]; linear_combination hc'
+    rw [hh]
+    linear_combination hc'
 
 end Abstract
 
-theorem exists_local_generator {E : Type} [Field E] [NumberField E] (B : Ideal (𝓞 E)) (hB : B ≠ ⊥) :
-    ∃ (m n : ℕ) (β : 𝓞 E), 0 < m ∧ 0 < n ∧ m.Coprime n ∧ (m : 𝓞 E) ∈ B ∧ β ∈ B ∧ β ≠ 0 ∧
-      ∀ b ∈ B, β ∣ (n : 𝓞 E) * b := by
+theorem exists_local_generator {E : Type} [Field E] [NumberField E] (B : Ideal (𝓞 E)) (hB : B ≠ ⊥)
+    : ∃ (m n : ℕ) (β : 𝓞 E),
+      0 < m ∧ 0 < n ∧ m.Coprime n ∧ (m : 𝓞 E) ∈ B ∧ β ∈ B ∧ β ≠ 0 ∧ ∀ b ∈ B, β ∣ (n : 𝓞 E) * b := by
   set m := 2 * Ideal.absNorm B with hm
-  have hN : 0 < Ideal.absNorm B := Nat.pos_of_ne_zero (by simpa [Ideal.absNorm_eq_zero_iff] using hB)
+  have hN : 0 < Ideal.absNorm B :=
+    Nat.pos_of_ne_zero (by simpa [Ideal.absNorm_eq_zero_iff] using hB)
   have hm2 : 2 ≤ m := by omega
   have hmB : (m : 𝓞 E) ∈ B := by
     rw [hm, Nat.cast_mul]; exact Ideal.mul_mem_left _ _ (Ideal.absNorm_mem B)
   have hm0 : (m : 𝓞 E) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
-  obtain ⟨β, hβ⟩ := IsDedekindDomain.exists_sup_span_eq (I := B * Ideal.span {(m : 𝓞 E)}) (J := B)
-    Ideal.mul_le_left (mul_ne_zero hB (by simpa using hm0))
+  obtain ⟨β, hβ⟩ :=
+    IsDedekindDomain.exists_sup_span_eq (I := B * Ideal.span {(m : 𝓞 E)}) (J := B) Ideal.mul_le_left
+      (mul_ne_zero hB (by simpa using hm0))
   have hβB : β ∈ B := hβ ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self β)
   obtain ⟨C, hC⟩ : B ∣ Ideal.span {β} :=
     Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hβB)
@@ -149,7 +166,14 @@ theorem exists_local_generator {E : Type} [Field E] [NumberField E] (B : Ideal (
     push_cast
     exact e'
 
-theorem exists_idele_generator : ∀ (D : D7) (B : Ideal (𝓞 D.host.E)), B ≠ ⊥ → ∃ y : (AE D)ˣ, (∀ b ∈ B, ((y⁻¹ : (AE D)ˣ) : AE D) * inc D (b : D.host.E) ∈ OhE D) ∧ ∃ (k : ℕ) (b : Fin k → 𝓞 D.host.E) (w : Fin k → AE D), (∀ i, b i ∈ B) ∧ (∀ i, w i ∈ OhE D) ∧ (y : AE D) = ∑ i, inc D (b i : D.host.E) * w i := by
+theorem exists_idele_generator
+    : ∀ (D : D7) (B : Ideal (𝓞 D.host.E)),
+      B ≠ ⊥
+        → ∃ y : (AE D)ˣ,
+          (∀ b ∈ B, ((y⁻¹ : (AE D)ˣ) : AE D) * inc D (b : D.host.E) ∈ OhE D)
+            ∧ ∃ (k : ℕ) (b : Fin k → 𝓞 D.host.E) (w : Fin k → AE D),
+              (∀ i, b i ∈ B) ∧ (∀ i, w i ∈ OhE D)
+                ∧ (y : AE D) = ∑ i, inc D (b i : D.host.E) * w i := by
   intro D B hB
   obtain ⟨m, n, β, hm, hn, hmn, hmB, hβB, hβ0, hdvd⟩ := exists_local_generator B hB
   obtain ⟨hsep, hcpl⟩ := GlobalTheory.IntAdeleComplete.integral_separated_complete D
@@ -170,10 +194,10 @@ theorem exists_idele_generator : ∀ (D : D7) (B : Ideal (𝓞 D.host.E)), B ≠
       congr 1
       exact_mod_cast congrArg (fun x : 𝓞 D.host.E => (x : D.host.E)) hd
     change ((1 - f) * inc D (β : D.host.E)⁻¹ + f) * inc D (b : D.host.E) ∈ OhE D
-    rw [show ((1 - f) * inc D (β : D.host.E)⁻¹ + f) * inc D (b : D.host.E) =
-      v * inc D (d : D.host.E) + f * inc D (b : D.host.E) by
-        rw [hfv]
-        linear_combination v * inc D (β : D.host.E)⁻¹ * hd' + v * inc D (d : D.host.E) * hinv]
+    rw [show ((1 - f) * inc D (β : D.host.E)⁻¹ + f) * inc D (b : D.host.E)
+        = v * inc D (d : D.host.E) + f * inc D (b : D.host.E) by
+      rw [hfv]
+      linear_combination v * inc D (β : D.host.E)⁻¹ * hd' + v * inc D (d : D.host.E) * hinv]
     exact add_mem (mul_mem hv (hint d)) (mul_mem hf (hint b))
   · intro i
     fin_cases i
@@ -188,6 +212,7 @@ theorem exists_idele_generator : ∀ (D : D7) (B : Ideal (𝓞 D.host.E)), B ≠
     change (1 - f) * inc D (β : D.host.E) + f = _
     rw [Fin.sum_univ_two]
     change _ = inc D (β : D.host.E) * (1 - f) + inc D (((m : 𝓞 D.host.E)) : D.host.E) * w
-    rw [this, ← hfw]; ring
+    rw [this, ← hfw]
+    ring
 
 end GlobalTheory.IdealIdele

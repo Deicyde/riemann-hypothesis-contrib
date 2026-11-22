@@ -12,19 +12,27 @@ namespace PI.VolStabS
 open MeasureTheory Topology
 
 def LinDens : Prop :=
-  ∀ (n m : ℕ) (μ : Measure (Fin n → ℝ)) (ν : Measure (Fin m → ℝ)), μ.IsAddHaarMeasure →
-    ν.IsAddHaarMeasure → ∀ A : (Fin n → ℝ) →L[ℝ] (Fin m → ℝ), Function.Surjective A →
-      DensAll μ A id ν Set.univ
+  ∀ (n m : ℕ) (μ : Measure (Fin n → ℝ)) (ν : Measure (Fin m → ℝ)),
+    μ.IsAddHaarMeasure → ν.IsAddHaarMeasure
+      → ∀ A : (Fin n → ℝ) →L[ℝ] (Fin m → ℝ), Function.Surjective A → DensAll μ A id ν Set.univ
 
 def ChangeVar : Prop :=
-  ∀ (n m : ℕ) (μ : Measure (Fin n → ℝ)), μ.IsAddHaarMeasure →
-    ∀ (f : (Fin n → ℝ) → (Fin m → ℝ)), ContDiff ℝ 1 f → ∀ x0,
-      Function.Surjective (fderiv ℝ f x0) →
-      ∃ N, IsOpen N ∧ x0 ∈ N ∧ ∃ A : (Fin n → ℝ) →L[ℝ] (Fin m → ℝ), Function.Surjective A ∧
-        ∀ φ : (Fin n → ℝ) → ℝ, Continuous φ → HasCompactSupport φ → tsupport φ ⊆ N →
-          ∃ G : (Fin n → ℝ) → ℝ, Continuous G ∧ HasCompactSupport G ∧
-            ∀ S : Set (Fin m → ℝ), IsCompact S →
-              ∫ v in f ⁻¹' S, φ v ∂μ = ∫ v in A ⁻¹' S, G v ∂μ
+  ∀ (n m : ℕ) (μ : Measure (Fin n → ℝ)),
+    μ.IsAddHaarMeasure
+      → ∀ (f : (Fin n → ℝ) → (Fin m → ℝ)),
+        ContDiff ℝ 1 f
+          → ∀ x0,
+            Function.Surjective (fderiv ℝ f x0)
+              → ∃ N,
+                IsOpen N ∧ x0 ∈ N
+                  ∧ ∃ A : (Fin n → ℝ) →L[ℝ] (Fin m → ℝ),
+                    Function.Surjective A
+                      ∧ ∀ φ : (Fin n → ℝ) → ℝ,
+                        Continuous φ → HasCompactSupport φ → tsupport φ ⊆ N
+                          → ∃ G : (Fin n → ℝ) → ℝ,
+                            Continuous G ∧ HasCompactSupport G
+                              ∧ ∀ S : Set (Fin m → ℝ),
+                                IsCompact S → ∫ v in f ⁻¹' S, φ v ∂μ = ∫ v in A ⁻¹' S, G v ∂μ
 
 theorem submLocal_of (h1 : LinDens) (h2 : ChangeVar) : SubmLocal := by
   intro n m μ ν hμ hν f hf x0 hx0
@@ -82,8 +90,8 @@ theorem linDens_holds : LinDens := by
   have e2 : ∫ v, Q (T v) ∂μ = ∫ w, Q w ∂(μ.map T) := by
     rw [show (μ.map T) = μ.map T.toHomeomorph.toMeasurableEquiv from rfl, integral_map_equiv]
     rfl
-  rw [e2, hsm, integral_smul_measure, integral_prod _ hQi, smul_eq_mul,
-    ← integral_indicator hSm, ← integral_const_mul]
+  rw [e2, hsm, integral_smul_measure, integral_prod _ hQi, smul_eq_mul, ← integral_indicator hSm,
+    ← integral_const_mul]
   congr 1
   funext y
   by_cases hy : y ∈ S

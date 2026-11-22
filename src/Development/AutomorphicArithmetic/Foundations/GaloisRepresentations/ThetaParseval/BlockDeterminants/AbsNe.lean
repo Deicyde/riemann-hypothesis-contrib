@@ -6,12 +6,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open MeasureTheory
 
-theorem UpperTheory.TP.absNe :
-    UpperTheory.TP.AbsNe := by
-  intro A B C _ _ _ μA μB μC _ _ _ H K hH hK hH0 hHtop hKtop f m s c₀ κ r w hκ hr hf hoff hon hm hK1 hbd hlt
+theorem UpperTheory.TP.absNe : UpperTheory.TP.AbsNe := by
+  intro A B C _ _ _ μA μB μC _ _ _ H K hH hK hH0 hHtop hKtop f m s c₀ κ r w hκ hr hf hoff hon hm hK1
+    hbd hlt
   have hG := hf.integral_prod_right
-  have hGeq : (fun y : B × C => ∫ x, f (x, y) ∂μA) =
-      fun y => H.indicator (fun _ => (1 : ℂ)) y.1 * (κ * (s y.2 * c₀ y.2)) := by
+  have hGeq
+      : (fun y : B × C => ∫ x, f (x, y) ∂μA)
+        = fun y => H.indicator (fun _ => (1 : ℂ)) y.1 * (κ * (s y.2 * c₀ y.2)) := by
     funext ⟨b, c⟩
     by_cases hb : b ∈ H
     · have e : (fun x => f (x, b, c)) = fun x => s c * m x c := funext fun x => hon x c b hb
@@ -32,8 +33,9 @@ theorem UpperTheory.TP.absNe :
     have h0 := ae_iff.mp hnot
     simp only [not_not, Set.setOf_mem_eq] at h0
     exact hH0 h0
-  have hI : ∫ y, f y ∂μA.prod (μB.prod μC) =
-      (∫ b, H.indicator (fun _ => (1 : ℂ)) b ∂μB) * (κ * ∫ c, s c * c₀ c ∂μC) := by
+  have hI
+      : ∫ y, f y ∂μA.prod (μB.prod μC)
+        = (∫ b, H.indicator (fun _ => (1 : ℂ)) b ∂μB) * (κ * ∫ c, s c * c₀ c ∂μC) := by
     rw [integral_prod_symm _ hf, hGeq,
       integral_prod_mul (fun b => H.indicator (fun _ => (1 : ℂ)) b) (fun c => κ * (s c * c₀ c)),
       integral_const_mul]
@@ -51,8 +53,8 @@ theorem UpperTheory.TP.absNe :
     have lower : ‖∫ c in K, s c * c₀ c ∂μC‖ₑ = μC K * ENNReal.ofReal r := by
       rw [hKint, setIntegral_const, ← ofReal_norm_eq_enorm]
       rw [norm_smul, Complex.norm_real, Real.norm_eq_abs, Real.norm_eq_abs, abs_of_pos hr]
-      rw [Measure.real, abs_of_nonneg ENNReal.toReal_nonneg, ENNReal.ofReal_mul ENNReal.toReal_nonneg,
-        ENNReal.ofReal_toReal hKtop]
+      rw [Measure.real, abs_of_nonneg ENNReal.toReal_nonneg,
+        ENNReal.ofReal_mul ENNReal.toReal_nonneg, ENNReal.ofReal_toReal hKtop]
     have upper : ‖∫ c in Kᶜ, s c * c₀ c ∂μC‖ₑ ≤ (∫⁻ c in Kᶜ, w c ∂μC) * ENNReal.ofReal r := by
       refine (enorm_integral_le_lintegral_enorm _).trans ?_
       rw [← lintegral_mul_const' _ _ ENNReal.ofReal_ne_top]

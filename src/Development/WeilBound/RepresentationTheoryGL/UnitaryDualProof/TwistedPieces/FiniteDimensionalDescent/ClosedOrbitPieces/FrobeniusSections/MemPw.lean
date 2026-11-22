@@ -22,9 +22,12 @@ instance (p c : ℕ) [Fact p.Prime] [CharP k p] : Algebra k (Tw k p c) :=
 def Pw (k B : Type*) [Field k] [CommRing B] [Algebra k B] (q : ℕ) : Subalgebra k B :=
   Algebra.adjoin k (Set.range fun b : B => b ^ q)
 
-theorem mem_Pw {B : Type*} [CommRing B] [Algebra k B] (p c : ℕ) [Fact p.Prime] [CharP k p]
-    (hroot : ∀ a : k, ∃ w : B, w ^ (p ^ c) = algebraMap k B a) {b : B} :
-    b ∈ Pw k B (p ^ c) ↔ ∃ w : B, w ^ (p ^ c) = b := by
+theorem mem_Pw
+    {B : Type*} [CommRing B] [Algebra k B]
+    (p c : ℕ) [Fact p.Prime] [CharP k p]
+    (hroot : ∀ a : k, ∃ w : B, w ^ (p ^ c) = algebraMap k B a)
+    {b : B}
+    : b ∈ Pw k B (p ^ c) ↔ ∃ w : B, w ^ (p ^ c) = b := by
   unfold Pw
   constructor
   · intro hb
@@ -35,7 +38,8 @@ theorem mem_Pw {B : Type*} [CommRing B] [Algebra k B] (p c : ℕ) [Fact p.Prime]
     | mem x hx =>
       obtain ⟨w, rfl⟩ := hx
       exact ⟨w, rfl⟩
-    | algebraMap r => exact hroot r
+    | algebraMap r =>
+      exact hroot r
     | add x y _ _ hx hy =>
       obtain ⟨w₁, rfl⟩ := hx
       obtain ⟨w₂, rfl⟩ := hy
@@ -47,10 +51,11 @@ theorem mem_Pw {B : Type*} [CommRing B] [Algebra k B] (p c : ℕ) [Fact p.Prime]
   · rintro ⟨w, rfl⟩
     exact Algebra.subset_adjoin ⟨w, rfl⟩
 
-theorem fc {B : Type*} [CommRing B] [Algebra k B] [FiniteDimensional k B] [IsReduced B]
+theorem fc
+    {B : Type*} [CommRing B] [Algebra k B] [FiniteDimensional k B] [IsReduced B]
     (p c : ℕ) [Fact p.Prime] [CharP k p] [FiniteDimensional k (Tw k p c)]
-    (hroot : ∀ a : k, ∃ w : B, w ^ (p ^ c) = algebraMap k B a) :
-    finrank k B = finrank k (Tw k p c) * finrank k (Pw k B (p ^ c)) := by
+    (hroot : ∀ a : k, ∃ w : B, w ^ (p ^ c) = algebraMap k B a)
+    : finrank k B = finrank k (Tw k p c) * finrank k (Pw k B (p ^ c)) := by
   classical
   letI iT : Module (Tw k p c) (Pw k B (p ^ c)) := inferInstanceAs (Module k (Pw k B (p ^ c)))
   have hadd : ∀ x y : B, (x + y) ^ (p ^ c) = x ^ (p ^ c) + y ^ (p ^ c) := by
@@ -59,18 +64,18 @@ theorem fc {B : Type*} [CommRing B] [Algebra k B] [FiniteDimensional k B] [IsRed
     · exact Subsingleton.elim _ _
     · haveI := charP_of_injective_algebraMap (algebraMap k B).injective p
       exact add_pow_char_pow x y p c
-  have hmem : ∀ x : B, x ^ (p ^ c) ∈ Pw k B (p ^ c) := fun x =>
-    Algebra.subset_adjoin ⟨x, rfl⟩
-  let f : B →ₗ[k] RestrictScalars k (Tw k p c) (Pw k B (p ^ c)) :=
-    { toFun := fun x => (⟨x ^ (p ^ c), hmem x⟩ : Pw k B (p ^ c))
-      map_add' := fun x y => by
-        apply Subtype.ext
-        exact hadd x y
-      map_smul' := fun a x => by
-        apply Subtype.ext
-        show (a • x) ^ (p ^ c) = ((algebraMap k (Tw k p c) a) • (⟨x ^ (p ^ c), hmem x⟩ : Pw k B (p ^ c)) : Pw k B (p ^ c)).1
-        rw [smul_pow]
-        rfl }
+  have hmem : ∀ x : B, x ^ (p ^ c) ∈ Pw k B (p ^ c) := fun x => Algebra.subset_adjoin ⟨x, rfl⟩
+  let f : B →ₗ[k] RestrictScalars k (Tw k p c) (Pw k B (p ^ c)) := {
+    toFun := fun x => (⟨x ^ (p ^ c), hmem x⟩ : Pw k B (p ^ c))
+    map_add' := fun x y => by
+      apply Subtype.ext
+      exact hadd x y
+    map_smul' := fun a x => by
+      apply Subtype.ext
+      show (a • x) ^ (p ^ c) = ((algebraMap k (Tw k p c) a) • (⟨x ^ (p ^ c), hmem x⟩ : Pw k B (p ^ c)) : Pw k B (p ^ c)).1
+      rw [smul_pow]
+      rfl
+  }
   have hinj : Function.Injective f := by
     refine (injective_iff_map_eq_zero f).2 fun x hx => ?_
     have h0 : x ^ (p ^ c) = 0 := congrArg (fun z : Pw k B (p ^ c) => (z : B)) hx
@@ -84,8 +89,8 @@ theorem fc {B : Type*} [CommRing B] [Algebra k B] [FiniteDimensional k B] [IsRed
   haveI : Module.Free (Tw k p c) (RestrictScalars k (Tw k p c) (Pw k B (p ^ c))) :=
     show Module.Free k (Pw k B (p ^ c)) from inferInstance
   let e := LinearEquiv.ofBijective f ⟨hinj, hsurj⟩
-  rw [e.finrank_eq, ← Module.finrank_mul_finrank k (Tw k p c)
-    (RestrictScalars k (Tw k p c) (Pw k B (p ^ c)))]
+  rw [e.finrank_eq,
+    ← Module.finrank_mul_finrank k (Tw k p c) (RestrictScalars k (Tw k p c) (Pw k B (p ^ c)))]
   rfl
 
 end PositivityTheory.RgUd.TP.Desc.Piece.PSect

@@ -12,9 +12,10 @@ open scoped MatrixGroups ModularForm Manifold
 
 namespace GlobalTheory.HeckeFamilyMatrices
 
-def wSqOld (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) : SL(2, ℤ) :=
-  ⟨!![(l : ℤ) + a * N, a * (1 + b); (N : ℤ) * l * (1 + b), (N : ℤ) * a + l * b ^ 2], by
-    rw [Matrix.det_fin_two_of]; linear_combination ((l : ℤ) * b - N * a + 1) * h⟩
+def wSqOld (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) : SL(2, ℤ) := ⟨
+  !![(l : ℤ) + a * N, a * (1 + b); (N : ℤ) * l * (1 + b), (N : ℤ) * a + l * b ^ 2],
+  by rw [Matrix.det_fin_two_of]; linear_combination ((l : ℤ) * b - N * a + 1) * h
+⟩
 
 lemma oldformLevelRaisingMatrix_det_eq_level (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) : (wOld N l a b).det = l := by
   rw [wOld, Matrix.det_fin_two_of]; linear_combination (l : ℤ) * h
@@ -38,12 +39,19 @@ lemma wSqOld_entry (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) :
     simp [wSqOld, mat]; linear_combination b * h
   rw [e]; push_cast; simp
 
-theorem wOld_slash_slash (N l : ℕ) (k : ℤ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) (χ : DirichletCharacter ℂ N)
-    (G : ℍ → ℂ) (hl : 0 < l) (hG : ChiInv k N (N * l) χ G) :
-    (G ∣[k] toGL (wOld N l a b)) ∣[k] toGL (wOld N l a b) = ((l : ℂ) ^ (k - 2) * χ (b : ZMod N)) • G := by
-  have hd : (wOld N l a b).det ≠ 0 := by rw [oldformLevelRaisingMatrix_det_eq_level N l a b h]; exact_mod_cast hl.ne'
+theorem wOld_slash_slash
+    (N l : ℕ)
+    (k : ℤ)
+    (a b : ℤ) (h : (l : ℤ) * b - N * a = 1)
+    (χ : DirichletCharacter ℂ N) (G : ℍ → ℂ)
+    (hl : 0 < l) (hG : ChiInv k N (N * l) χ G)
+    : (G ∣[k] toGL (wOld N l a b)) ∣[k] toGL (wOld N l a b)
+      = ((l : ℂ) ^ (k - 2) * χ (b : ZMod N)) • G := by
+  have hd : (wOld N l a b).det ≠ 0 := by
+    rw [oldformLevelRaisingMatrix_det_eq_level N l a b h]; exact_mod_cast hl.ne'
   have hM : 0 < (mat (wSqOld N l a b h)).det := by simp [mat]
-  rw [← SlashAction.slash_mul, ← toGL_mul _ _ hd hd, atkin_lehner_square_mul N l a b h, slash_toGL_smul k l hl _ hM,
-    ← slash_SL_eq, hG _ (wSqOld_mem N l a b h), wSqOld_entry, smul_smul]
+  rw [← SlashAction.slash_mul, ← toGL_mul _ _ hd hd, atkin_lehner_square_mul N l a b h,
+    slash_toGL_smul k l hl _ hM, ← slash_SL_eq, hG _ (wSqOld_mem N l a b h), wSqOld_entry,
+    smul_smul]
 
 end GlobalTheory.HeckeFamilyMatrices

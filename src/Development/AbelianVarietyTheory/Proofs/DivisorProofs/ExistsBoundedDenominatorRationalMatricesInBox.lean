@@ -9,13 +9,23 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.RealSiz
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum MeasureTheory
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.ThetaConv
 
-theorem exists_den_of_inBox : ∀ (D : D7) (m n : ℕ) (K : Set (Mx D m n)), IsCompact K → ∃ L : ℕ, 0 < L ∧ ∀ (x : Mx D m n) (ξ : Matrix (Fin m) (Fin n) D.host.E), x.map (finPart D) = (ξ.map (incA D) : Mx D m n).map (finPart D) → GlobalTheory.Unf.InBox K x → ∀ i j, IsIntegral ℤ ((L : D.host.E) * ξ i j) := by
+theorem exists_den_of_inBox
+    : ∀ (D : D7) (m n : ℕ) (K : Set (Mx D m n)),
+      IsCompact K
+        → ∃ L : ℕ,
+          0 < L
+            ∧ ∀ (x : Mx D m n) (ξ : Matrix (Fin m) (Fin n) D.host.E),
+              x.map (finPart D) = (ξ.map (incA D) : Mx D m n).map (finPart D)
+                → GlobalTheory.Unf.InBox K x
+                → ∀ i j, IsIntegral ℤ ((L : D.host.E) * ξ i j) := by
   intro D m n K hK
   have hK1 : IsCompact (⋃ p : Fin m × Fin n, (fun x : Mx D m n => x p.1 p.2) '' K) :=
     isCompact_iUnion fun p => hK.image (continuous_id.matrix_elem p.1 p.2)

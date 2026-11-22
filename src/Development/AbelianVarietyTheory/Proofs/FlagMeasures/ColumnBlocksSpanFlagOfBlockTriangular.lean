@@ -5,16 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SigmaFiniteOf
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
 
 namespace GlobalTheory.LeviIso
 
-theorem exists_sum_mulVec_of_triangular {n a : ℕ} {j : Fin a → ℕ} (A B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ)
-    (p : ∀ k i, Matrix (Fin (j k)) (Fin (j i)) ℂ) (hp : ∀ k i, i < k → p k i = 0)
-    (hA : ∀ i, A i = ∑ k, B k * p k i) (l : Fin (a + 1)) (u : ∀ i, Fin (j i) → ℂ)
-    (hu : ∀ i : Fin a, ¬ i.castSucc < l → u i = 0) :
-    ∃ v : ∀ i, Fin (j i) → ℂ, (∀ i : Fin a, ¬ i.castSucc < l → v i = 0) ∧
-      ∑ i, A i *ᵥ u i = ∑ i, B i *ᵥ v i := by
+theorem exists_sum_mulVec_of_triangular
+    {n a : ℕ} {j : Fin a → ℕ}
+    (A B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ) (p : ∀ k i, Matrix (Fin (j k)) (Fin (j i)) ℂ)
+    (hp : ∀ k i, i < k → p k i = 0) (hA : ∀ i, A i = ∑ k, B k * p k i) (l : Fin (a + 1))
+    (u : ∀ i, Fin (j i) → ℂ) (hu : ∀ i : Fin a, ¬ i.castSucc < l → u i = 0)
+    : ∃ v : ∀ i, Fin (j i) → ℂ,
+      (∀ i : Fin a, ¬ i.castSucc < l → v i = 0) ∧ ∑ i, A i *ᵥ u i = ∑ i, B i *ᵥ v i := by
   refine ⟨fun k => ∑ i, p k i *ᵥ u i, ?_, ?_⟩
   · intro k hk
     refine Finset.sum_eq_zero fun i _ => ?_
@@ -27,10 +29,12 @@ theorem exists_sum_mulVec_of_triangular {n a : ℕ} {j : Fin a → ℕ} (A B : �
   · simp_rw [hA, Matrix.sum_mulVec, ← Matrix.mulVec_mulVec, Matrix.mulVec_sum]
     exact Finset.sum_comm
 
-theorem spansFlag_of_triangular (n a : ℕ) (j : Fin a → ℕ) (A B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ)
+theorem spansFlag_of_triangular
+    (n a : ℕ) (j : Fin a → ℕ) (A B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ)
     (p q : ∀ k i, Matrix (Fin (j k)) (Fin (j i)) ℂ) (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ))
     (hpq : ∀ k i, i < k → p k i = 0 ∧ q k i = 0) (hA : ∀ i, A i = ∑ k, B k * p k i)
-    (hB : ∀ i, B i = ∑ k, A k * q k i) (h : SpansFlag A W) : SpansFlag B W := by
+    (hB : ∀ i, B i = ∑ k, A k * q k i) (h : SpansFlag A W)
+    : SpansFlag B W := by
   intro k y
   rw [h k y]
   constructor

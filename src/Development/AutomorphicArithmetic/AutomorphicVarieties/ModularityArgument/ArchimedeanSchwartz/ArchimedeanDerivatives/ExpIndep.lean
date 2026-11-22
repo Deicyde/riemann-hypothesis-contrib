@@ -109,9 +109,11 @@ theorem expIndep : ExpIndep := by
     exact hU0 (funext fun s => by
       rw [hU, Pi.zero_apply]
       exact Finset.sum_eq_zero fun t ht => by rw [hc t ht, zero_mul])
-  have key := indep (T ∪ T')
-    (fun t => C (if t ∈ T then a t else 0) * p - C (if t ∈ T' then b t else 0) * q)
-    (fun s => ?_) t (Finset.mem_union_left _ htT)
+  have key :=
+    indep (T ∪ T')
+      (fun t => C (if t ∈ T then a t else 0) * p - C (if t ∈ T' then b t else 0) * q)
+      (fun s => ?_)
+      t (Finset.mem_union_left _ htT)
   · rw [if_pos htT] at key
     exact ⟨a t, _, hat, sub_eq_zero.mp key⟩
   · have e1 := extend (Finset.subset_union_left : T ⊆ T ∪ T') a s
@@ -119,12 +121,14 @@ theorem expIndep : ExpIndep := by
     rw [← hU] at e1
     rw [← hV] at e2
     simp only [eval_sub, eval_mul, eval_C, sub_mul, Finset.sum_sub_distrib]
-    have f1 : ∑ t ∈ T ∪ T', (if t ∈ T then a t else 0) * eval s p * Complex.exp (t * s) =
-        eval s p * ∑ t ∈ T ∪ T', (if t ∈ T then a t else 0) * Complex.exp (t * s) := by
+    have f1
+        : ∑ t ∈ T ∪ T', (if t ∈ T then a t else 0) * eval s p * Complex.exp (t * s)
+          = eval s p * ∑ t ∈ T ∪ T', (if t ∈ T then a t else 0) * Complex.exp (t * s) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun _ _ => by ring
-    have f2 : ∑ t ∈ T ∪ T', (if t ∈ T' then b t else 0) * eval s q * Complex.exp (t * s) =
-        eval s q * ∑ t ∈ T ∪ T', (if t ∈ T' then b t else 0) * Complex.exp (t * s) := by
+    have f2
+        : ∑ t ∈ T ∪ T', (if t ∈ T' then b t else 0) * eval s q * Complex.exp (t * s)
+          = eval s q * ∑ t ∈ T ∪ T', (if t ∈ T' then b t else 0) * Complex.exp (t * s) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun _ _ => by ring
     rw [f1, f2, e1, e2, h s, sub_self]

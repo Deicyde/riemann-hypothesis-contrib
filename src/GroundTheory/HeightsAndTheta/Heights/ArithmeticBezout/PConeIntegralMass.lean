@@ -31,14 +31,16 @@ theorem norm_zeroExt (m k : ℕ) (x : EuclideanSpace ℂ (Fin m)) : ‖zeroExt m
 theorem isometry_zeroExt (m k : ℕ) : Isometry (zeroExt m k) :=
   AddMonoidHomClass.isometry_of_norm (zeroExt m k) (norm_zeroExt m k)
 
-theorem coordBall_mass {n m : ℕ} (hmn : m ≤ n) :
-    0 < Measure.hausdorffMeasure ((2 * m : ℕ) : ℝ)
-        {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, m ≤ (j : ℕ) → y j = 0} ∧
-      Measure.hausdorffMeasure ((2 * m : ℕ) : ℝ)
-        {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, m ≤ (j : ℕ) → y j = 0} < ⊤ := by
+theorem coordBall_mass {n m : ℕ} (hmn : m ≤ n)
+    : 0 < Measure.hausdorffMeasure ((2 * m : ℕ) : ℝ)
+        {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, m ≤ (j : ℕ) → y j = 0}
+      ∧ Measure.hausdorffMeasure ((2 * m : ℕ) : ℝ)
+          {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, m ≤ (j : ℕ) → y j = 0}
+        < ⊤ := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
-  have hset : {y : EuclideanSpace ℂ (Fin (m + k)) | ‖y‖ < 1 ∧ ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0} =
-      zeroExt m k '' Metric.ball 0 1 := by
+  have hset
+      : {y : EuclideanSpace ℂ (Fin (m + k)) | ‖y‖ < 1 ∧ ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0}
+        = zeroExt m k '' Metric.ball 0 1 := by
     ext y
     simp only [Set.mem_ofPred_eq, Set.mem_image, Metric.mem_ball, dist_zero_right]
     constructor
@@ -69,8 +71,8 @@ theorem coordBall_mass {n m : ℕ} (hmn : m ≤ n) :
   rw [hd]
   exact ⟨Metric.measure_ball_pos _ _ one_pos, measure_ball_lt_top⟩
 
-def linProjₗ {m n : ℕ} (π : Fin m → Fin n → ℂ) :
-    EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin m) where
+def linProjₗ {m n : ℕ} (π : Fin m → Fin n → ℂ)
+    : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin m) where
   toFun := linProj π
   map_add' x y := by
     ext i
@@ -79,9 +81,10 @@ def linProjₗ {m n : ℕ} (π : Fin m → Fin n → ℂ) :
     ext i
     simp [linProj, Finset.mul_sum, mul_left_comm]
 
-theorem ae_fibreCount_eq_zero {n m : ℕ} (hnm : n < m) (h : HermNorm n)
-    (J : Ideal (MvPolynomial (Fin n) ℂ)) (π : Fin m → Fin n → ℂ) :
-    ∀ᵐ w : EuclideanSpace ℂ (Fin m), fibreCount h J π w = 0 := by
+theorem ae_fibreCount_eq_zero
+    {n m : ℕ}
+    (hnm : n < m) (h : HermNorm n) (J : Ideal (MvPolynomial (Fin n) ℂ)) (π : Fin m → Fin n → ℂ)
+    : ∀ᵐ w : EuclideanSpace ℂ (Fin m), fibreCount h J π w = 0 := by
   set R := (LinearMap.range (linProjₗ π)).restrictScalars ℝ
   have hR : R ≠ ⊤ := by
     intro hT
@@ -95,8 +98,8 @@ theorem ae_fibreCount_eq_zero {n m : ℕ} (hnm : n < m) (h : HermNorm n)
   rintro y ⟨-, rfl⟩
   exact hw ⟨y, rfl⟩
 
-theorem ConeIntegralMass.proof (hF : ConeFibreDegree.Statement) (hM : ConeMassOfFibre.Statement) :
-    ConeIntegralMass.Statement := by
+theorem ConeIntegralMass.proof (hF : ConeFibreDegree.Statement) (hM : ConeMassOfFibre.Statement)
+    : ConeIntegralMass.Statement := by
   intro n e δ h W f hW hf hδ
   have hfib := hF n e δ h W f hW hf hδ
   have hmass := hM n (e + 1) δ h W hW hfib

@@ -26,13 +26,13 @@ section Ord
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem ordL_eq_neg_log' (x : L) : ordL x = -WithZero.log (Valued.v x) := by
+theorem ordL_eq_neg_log' (x : L) : ordL x = - WithZero.log (Valued.v x) := by
   unfold ordL
   split_ifs with h
   · simp [h]
   · rw [WithZero.toAdd_unzero_eq_log]
 
-theorem v_eq_exp_ordL {x : L} (hx : x ≠ 0) : Valued.v x = WithZero.exp (-ordL x) := by
+theorem v_eq_exp_ordL {x : L} (hx : x ≠ 0) : Valued.v x = WithZero.exp (- ordL x) := by
   rw [ordL_eq_neg_log', neg_neg, WithZero.exp_log ((Valuation.ne_zero_iff _).2 hx)]
 
 theorem ordL_mul'' {x y : L} (hx : x ≠ 0) (hy : y ≠ 0) : ordL (x * y) = ordL x + ordL y := by
@@ -40,7 +40,7 @@ theorem ordL_mul'' {x y : L} (hx : x ≠ 0) (hy : y ≠ 0) : ordL (x * y) = ordL
   rw [map_mul, v_eq_exp_ordL hx, v_eq_exp_ordL hy, ← WithZero.exp_add, WithZero.exp_inj] at h
   linarith
 
-theorem ordL_inv'' {x : L} (hx : x ≠ 0) : ordL x⁻¹ = -ordL x := by
+theorem ordL_inv'' {x : L} (hx : x ≠ 0) : ordL x⁻¹ = - ordL x := by
   have h := v_eq_exp_ordL (inv_ne_zero hx)
   rw [map_inv₀, v_eq_exp_ordL hx, ← WithZero.exp_neg, WithZero.exp_inj] at h
   linarith
@@ -51,7 +51,9 @@ theorem v_eq_one_of_ordL {x : L} (hx : x ≠ 0) (h : ordL x = 0) : Valued.v x = 
 theorem ordL_zpow_units (x : Lˣ) (k : ℤ) : ordL ((x ^ k : Lˣ) : L) = k * ordL (x : L) := by
   have hx : (x : L) ≠ 0 := x.ne_zero
   have h := v_eq_exp_ordL ((x ^ k).ne_zero)
-  rw [Units.val_zpow_eq_zpow_val, map_zpow₀, v_eq_exp_ordL hx, ← WithZero.exp_zsmul, WithZero.exp_inj] at h
+  rw [Units.val_zpow_eq_zpow_val, map_zpow₀, v_eq_exp_ordL hx, ← WithZero.exp_zsmul,
+      WithZero.exp_inj]
+    at h
   rw [Units.val_zpow_eq_zpow_val]
   simp only [smul_eq_mul] at h
   linarith
@@ -60,26 +62,40 @@ end Ord
 
 def cjU (w : Pl E) : (w.adicCompletion E)ˣ →* (w.adicCompletion E)ˣ := Units.map (cj w).toMonoidHom
 
-@[simp] theorem cjU_val (w : Pl E) (x : (w.adicCompletion E)ˣ) : ((cjU w x : (w.adicCompletion E)ˣ) : w.adicCompletion E) = cj w x :=
+@[simp]
+theorem cjU_val (w : Pl E) (x : (w.adicCompletion E)ˣ)
+    : ((cjU w x : (w.adicCompletion E)ˣ) : w.adicCompletion E) = cj w x :=
   rfl
 
 theorem ordL_cj (hU : Unr E) (w : Pl E) (x : w.adicCompletion E) : ordL (cj w x) = ordL x := by
-  rw [ordL_eq_neg_log', ordL_eq_neg_log', (GlobalTheory.T.placeConjugation_properties_cmField E hU w).2.2.1 x]
+  rw [ordL_eq_neg_log', ordL_eq_neg_log',
+    (GlobalTheory.T.placeConjugation_properties_cmField E hU w).2.2.1 x]
 
-theorem thL_diagT (w : Pl E) (hw : ¬ IsSplitAt w) (a : ℕ) (d : Fin a → (w.adicCompletion E)ˣ) :
-    thL a w (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d) =
-      GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) (fun i => (cjU w (d i.rev))⁻¹) := by
-  have hth : ∀ g : GLw a w,
-      thL a w g = PhiU a _ * invT a _ (GeneralLinearGroup.map (cj w) g) * (PhiU a _)⁻¹ := by
+theorem thL_diagT (w : Pl E) (hw : ¬ IsSplitAt w) (a : ℕ) (d : Fin a → (w.adicCompletion E)ˣ)
+    : thL a w (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d)
+      = GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) (fun i => (cjU w (d i.rev))⁻¹) := by
+  have hth
+      : ∀ g : GLw a w,
+        thL a w g = PhiU a _ * invT a _ (GeneralLinearGroup.map (cj w) g) * (PhiU a _)⁻¹ := by
     intro g; simp only [thL, if_neg hw]; rfl
   rw [hth, mul_inv_eq_iff_eq_mul]
   apply Units.ext
-  have h1 : ((invT a _ (GeneralLinearGroup.map (cj w) (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d)) : GLw a w) :
-      Matrix (Fin a) (Fin a) (w.adicCompletion E)) = Matrix.diagonal fun i => cj w (((d i)⁻¹ : (w.adicCompletion E)ˣ) : w.adicCompletion E) := by
-    change ((((GeneralLinearGroup.map (cj w) (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d))⁻¹ : GLw a w) :
-      Matrix (Fin a) (Fin a) (w.adicCompletion E)))ᵀ = _
+  have h1
+      : ((invT a _
+              (GeneralLinearGroup.map (cj w)
+                (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d))
+            : GLw a w)
+          : Matrix (Fin a) (Fin a) (w.adicCompletion E))
+        = Matrix.diagonal fun i =>
+          cj w (((d i)⁻¹ : (w.adicCompletion E)ˣ) : w.adicCompletion E) := by
+    change ((((GeneralLinearGroup.map (cj w)
+            (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d))⁻¹
+          : GLw a w)
+        : Matrix (Fin a) (Fin a) (w.adicCompletion E)))ᵀ
+      = _
     rw [← map_inv, ← map_inv]
-    change ((GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d⁻¹ : GLw a w).val.map (cj w))ᵀ = _
+    change ((GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) d⁻¹ : GLw a w).val.map (cj w))ᵀ
+      = _
     rw [GlobalTheory.SmGL.val_diagT, diagonal_map (map_zero _), diagonal_transpose]
     rfl
   rw [Units.val_mul, Units.val_mul, h1, GlobalTheory.SmGL.val_diagT]
@@ -93,8 +109,10 @@ theorem thL_diagT (w : Pl E) (hw : ¬ IsSplitAt w) (a : ℕ) (d : Fin a → (w.a
     simp [mul_comm]
   · simp
 
-theorem csr_root (w : Pl E) (hw : ¬ IsSplitAt w) (Q : (w.adicCompletion E)[X]) (hQ : Q ≠ 0) (hcsr : IsCsr w Q)
-    (u : w.adicCompletion E) (hu0 : u ≠ 0) (hu : Q.eval u = 0) : Q.eval (cj w u)⁻¹ = 0 := by
+theorem csr_root
+    (w : Pl E) (hw : ¬ IsSplitAt w) (Q : (w.adicCompletion E)[X]) (hQ : Q ≠ 0) (hcsr : IsCsr w Q)
+    (u : w.adicCompletion E) (hu0 : u ≠ 0) (hu : Q.eval u = 0)
+    : Q.eval (cj w u)⁻¹ = 0 := by
   have hc : C (cj w (Q.coeff 0)) * Q = (Q.map (cj w)).reverse := hcsr.resolve_left hw
   have hcu : cj w u ≠ 0 := (map_ne_zero (cj w)).2 hu0
   let _ : Invertible (cj w u) := invertibleOfNonzero hcu
@@ -109,14 +127,20 @@ theorem csr_root (w : Pl E) (hw : ¬ IsSplitAt w) (Q : (w.adicCompletion E)[X]) 
     exact hQ ((Polynomial.map_eq_zero (cj w)).1 (reverse_eq_zero.1 hc.symm))
   exact (mul_eq_zero.1 h1).resolve_left h0
 
-theorem root_pair (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) {m : ℕ} (v : Fin m → ℤ) (hv : Function.Injective v)
-    (hvr : ∀ i, v i.rev = -v i) (Q : (w.adicCompletion E)[X]) (hQ : IsCsr w Q) (u : Fin m → w.adicCompletion E)
-    (hQu : Q = ∏ i, (X - C (u i))) (hu0 : ∀ i, u i ≠ 0) (huv : ∀ i, ordL (u i) = v i) (i : Fin m) :
-    u i.rev = (cj w (u i))⁻¹ := by
+theorem root_pair
+    (hU : Unr E)
+    (w : Pl E) (hw : ¬ IsSplitAt w)
+    {m : ℕ} (v : Fin m → ℤ) (hv : Function.Injective v) (hvr : ∀ i, v i.rev = - v i)
+    (Q : (w.adicCompletion E)[X]) (hQ : IsCsr w Q)
+    (u : Fin m → w.adicCompletion E)
+    (hQu : Q = ∏ i, (X - C (u i))) (hu0 : ∀ i, u i ≠ 0) (huv : ∀ i, ordL (u i) = v i)
+    (i : Fin m)
+    : u i.rev = (cj w (u i))⁻¹ := by
   have hQ0 : Q ≠ 0 := by
     rw [hQu]; exact (monic_prod_of_monic _ _ fun j _ => monic_X_sub_C (u j)).ne_zero
-  have hr := csr_root w hw Q hQ0 hQ (u i) (hu0 i)
-    (by rw [hQu, eval_prod]; exact Finset.prod_eq_zero (Finset.mem_univ i) (by simp))
+  have hr :=
+    csr_root w hw Q hQ0 hQ (u i) (hu0 i)
+      (by rw [hQu, eval_prod]; exact Finset.prod_eq_zero (Finset.mem_univ i) (by simp))
   rw [hQu, eval_prod, Finset.prod_eq_zero_iff] at hr
   obtain ⟨j, -, hj⟩ := hr
   rw [eval_sub, eval_X, eval_C, sub_eq_zero] at hj
@@ -132,14 +156,17 @@ theorem nv_strictAnti {a : ℕ} {y : Fin a → ℤ} (hy : StrictAnti y) : Strict
   simp only [nv]
   linarith
 
-theorem nv_rev {a : ℕ} (y : Fin a → ℤ) (i : Fin a) : nv y i.rev = -nv y i := by
-  simp [nv]
+theorem nv_rev {a : ℕ} (y : Fin a → ℤ) (i : Fin a) : nv y i.rev = - nv y i := by simp [nv]
 
-theorem diagT_mem_iwGL' (w : Pl E) (n : ℕ) (s : Fin n → (w.adicCompletion E)ˣ)
-    (hs : ∀ i, Valued.v (s i : w.adicCompletion E) = 1) : GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s ∈ iwGL n w := by
+theorem diagT_mem_iwGL'
+    (w : Pl E) (n : ℕ)
+    (s : Fin n → (w.adicCompletion E)ˣ) (hs : ∀ i, Valued.v (s i : w.adicCompletion E) = 1)
+    : GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s ∈ iwGL n w := by
   rw [(GlobalTheory.T.iwahori_and_maximal_compact_criteria E w n _).1]
-  have hinv : ((GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s)⁻¹ : GLw n w) =
-      GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s⁻¹ := (map_inv _ _).symm
+  have hinv
+      : ((GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s)⁻¹ : GLw n w)
+        = GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s⁻¹ :=
+    (map_inv _ _).symm
   refine ⟨fun i j => ?_, fun i j => ?_, fun i j hij => ?_⟩
   · rw [GlobalTheory.SmGL.val_diagT, diagonal_apply]
     split_ifs with h
@@ -152,19 +179,25 @@ theorem diagT_mem_iwGL' (w : Pl E) (n : ℕ) (s : Fin n → (w.adicCompletion E)
   · rw [GlobalTheory.SmGL.val_diagT, diagonal_apply_ne _ (ne_of_gt hij)]
     simp
 
-theorem nrmL_eq (w : Pl E) (hw : ¬ IsSplitAt w) (a : ℕ) (g : GLw a w) : nrmL a w g = g * thL a w g := by
+theorem nrmL_eq (w : Pl E) (hw : ¬ IsSplitAt w) (a : ℕ) (g : GLw a w)
+    : nrmL a w g = g * thL a w g := by
   simp only [nrmL, thL, if_neg hw]
 
-theorem ex_tw (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifAt ϖ) (a : ℕ)
-    (y : Fin a → ℤ) (u : Fin a → w.adicCompletion E) (hu0 : ∀ i, u i ≠ 0) (hu : ∀ i, ordL (u i) = nv y i)
-    (hrev : ∀ i, u i.rev = (cj w (u i))⁻¹) :
-    ∃ τ : Fin a → (w.adicCompletion E)ˣ, (∀ i, Valued.v (τ i : w.adicCompletion E) = 1) ∧
-      (nrmL a w (tdiag ϖ y * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) τ)).val = Matrix.diagonal u := by
+theorem ex_tw
+    (hU : Unr E)
+    (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifAt ϖ)
+    (a : ℕ) (y : Fin a → ℤ) (u : Fin a → w.adicCompletion E)
+    (hu0 : ∀ i, u i ≠ 0) (hu : ∀ i, ordL (u i) = nv y i) (hrev : ∀ i, u i.rev = (cj w (u i))⁻¹)
+    : ∃ τ : Fin a → (w.adicCompletion E)ˣ,
+      (∀ i, Valued.v (τ i : w.adicCompletion E) = 1)
+        ∧ (nrmL a w (tdiag ϖ y * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) τ)).val
+          = Matrix.diagonal u := by
   set U : Fin a → (w.adicCompletion E)ˣ := fun i => Units.mk0 (u i) (hu0 i) with hUdef
   set P : Fin a → (w.adicCompletion E)ˣ := fun i => ϖ ^ y i with hPdef
   have hcϖ : cjU w ϖ = ϖ := Units.ext hϖ.2
   have hcP : ∀ i, cjU w (P i) = P i := fun i => by simp only [hPdef, map_zpow, hcϖ]
-  have hcc : ∀ x, cj w (cj w x) = x := (GlobalTheory.T.placeConjugation_properties_cmField E hU w).2.1
+  have hcc : ∀ x, cj w (cj w x) = x :=
+    (GlobalTheory.T.placeConjugation_properties_cmField E hU w).2.1
   have hUr : ∀ i, U i.rev = (cjU w (U i))⁻¹ := fun i => Units.ext (by simp [hUdef, hrev])
   have hoP : ∀ i, ordL (P i : w.adicCompletion E) = y i := fun i => by
     rw [hPdef, ordL_zpow_units, hϖ.1, mul_one]
@@ -173,11 +206,15 @@ theorem ex_tw (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicComplet
     apply v_eq_one_of_ordL (c i).ne_zero
     simp only [hcdef, Units.val_mul]
     rw [ordL_mul'' (mul_ne_zero (U i).ne_zero (P i.rev).ne_zero) (P i)⁻¹.ne_zero,
-      ordL_mul'' (U i).ne_zero (P i.rev).ne_zero, Units.val_inv_eq_inv_val, ordL_inv'' (P i).ne_zero, hoP, hoP]
+      ordL_mul'' (U i).ne_zero (P i.rev).ne_zero, Units.val_inv_eq_inv_val,
+      ordL_inv'' (P i).ne_zero, hoP, hoP]
     simp only [hUdef, Units.val_mk0, hu, nv]
     ring
-  have hmid : ∀ i, i.rev = i → ∃ Z : (w.adicCompletion E)ˣ, Valued.v (Z : w.adicCompletion E) = 1 ∧
-      c i * cjU w Z = Z := fun i hi => by
+  have hmid
+      : ∀ i,
+        i.rev = i
+          → ∃ Z : (w.adicCompletion E)ˣ,
+            Valued.v (Z : w.adicCompletion E) = 1 ∧ c i * cjU w Z = Z := fun i hi => by
     have h1 : (c i : w.adicCompletion E) * cj w (c i) = 1 := by
       have : c i = U i := by simp only [hcdef, hi, mul_inv_cancel_right]
       rw [this]
@@ -189,7 +226,12 @@ theorem ex_tw (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicComplet
     have hz0 : z ≠ 0 := by intro h; rw [h, map_zero] at hz; exact zero_ne_one hz
     exact ⟨Units.mk0 z hz0, hz, Units.ext (by simpa using hz')⟩
   let τ : Fin a → (w.adicCompletion E)ˣ := fun i =>
-    if h : i < i.rev then c i else if h' : i.rev = i then Classical.choose (hmid i h') else 1
+    if h : i < i.rev then
+      c i
+    else if h' : i.rev = i then
+      Classical.choose (hmid i h')
+    else
+      1
   have hτv : ∀ i, Valued.v (τ i : w.adicCompletion E) = 1 := fun i => by
     simp only [τ]
     split_ifs with h h'
@@ -233,16 +275,19 @@ theorem ex_tw (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicComplet
       apply Units.ext
       simp only [Units.val_mul, Units.val_inv_eq_inv_val]
       field_simp
-  rw [nrmL_eq w hw, show tdiag ϖ y = GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) P from rfl, ← map_mul,
+  rw [nrmL_eq w hw,
+    show tdiag ϖ y = GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin a) P from rfl, ← map_mul,
     thL_diagT w hw, ← map_mul, GlobalTheory.SmGL.val_diagT]
   congr 1
   funext i
   simpa [hUdef] using congrArg Units.val (key i)
 
-theorem ext_pf (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifAt ϖ) (a : ℕ)
-    (y : Fin a → ℤ) (hy : StrictAnti y) (Q : (w.adicCompletion E)[X]) (hm : Q.Monic) (hQ : IsCsr w Q)
-    (hv : HasVals Q (nv y)) :
-    ∃ δ : GLw a w, dcos a w (tdiag ϖ y) δ ≠ 0 ∧ (nrmL a w δ).val.charpoly = Q := by
+theorem ext_pf
+    (hU : Unr E)
+    (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifAt ϖ)
+    (a : ℕ) (y : Fin a → ℤ) (hy : StrictAnti y)
+    (Q : (w.adicCompletion E)[X]) (hm : Q.Monic) (hQ : IsCsr w Q) (hv : HasVals Q (nv y))
+    : ∃ δ : GLw a w, dcos a w (tdiag ϖ y) δ ≠ 0 ∧ (nrmL a w δ).val.charpoly = Q := by
   obtain ⟨u, hQu, hu⟩ := hv
   have hu0 : ∀ i, u i ≠ 0 := fun i => (hu i).1
   have huv : ∀ i, ordL (u i) = nv y i := fun i => (hu i).2
@@ -254,10 +299,14 @@ theorem ext_pf (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (ϖ : (w.adicComple
     exact one_ne_zero
   · rw [hN, charpoly_diagonal, hQu]
 
-theorem exu_pf (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (n : ℕ) (b : GLw n w) (hb : IsWitt n w b)
-    (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifAt ϖ) (l : Fin (n / 2) → ℤ) (hl : Cone l) (Q : (w.adicCompletion E)[X])
-    (hm : Q.Monic) (hQ : IsCsr w Q) (hv : HasVals Q (wexp n l)) :
-    ∃ γ : UL n w, fU n w b ϖ l γ ≠ 0 ∧ γ.1.val.charpoly = Q := by
+theorem exu_pf
+    (hU : Unr E)
+    (w : Pl E) (hw : ¬ IsSplitAt w)
+    (n : ℕ) (b : GLw n w) (hb : IsWitt n w b)
+    (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifAt ϖ)
+    (l : Fin (n / 2) → ℤ) (hl : Cone l)
+    (Q : (w.adicCompletion E)[X]) (hm : Q.Monic) (hQ : IsCsr w Q) (hv : HasVals Q (wexp n l))
+    : ∃ γ : UL n w, fU n w b ϖ l γ ≠ 0 ∧ γ.1.val.charpoly = Q := by
   obtain ⟨u, hQu, hu⟩ := hv
   have hu0 : ∀ i, u i ≠ 0 := fun i => (hu i).1
   have huv : ∀ i, ordL (u i) = wexp n l i := fun i => (hu i).2
@@ -265,20 +314,26 @@ theorem exu_pf (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (n : ℕ) (b : GLw 
   have hpair := root_pair hU w hw (wexp n l) hwa.injective hwr Q hQ u hQu hu0 huv
   set U : Fin n → (w.adicCompletion E)ˣ := fun i => Units.mk0 (u i) (hu0 i) with hUdef
   obtain ⟨hw1, -, -, hw4⟩ := GlobalTheory.T.unitary_iwahori_facts E hU w hw n b hb
-  have hD : GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) U ∈ UJ (cj w) (antiJ (w.adicCompletion E) n) := by
+  have hD
+      : GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) U
+        ∈ UJ (cj w) (antiJ (w.adicCompletion E) n) := by
     rw [hw4]
     intro i
     simp only [hUdef, Units.val_mk0]
     rw [hpair i, mul_inv_cancel₀ ((_root_.map_ne_zero _).2 (hu0 i))]
   have hγ := (hw1 _).2 hD
   refine ⟨⟨_, hγ⟩, ?_, ?_⟩
-  · have h1 := GlobalTheory.T.unitary_iwahori_orbital_support E hU w hw n b hb ϖ hϖ l hl ⟨_, hγ⟩ U (fun i => by simpa [hUdef] using huv i) rfl
-      1 (one_mem _) 1 (one_mem _)
+  · have h1 :=
+      GlobalTheory.T.unitary_iwahori_orbital_support E hU w hw n b hb ϖ hϖ l hl ⟨_, hγ⟩ U
+        (fun i => by simpa [hUdef] using huv i)
+        rfl 1 (one_mem _) 1 (one_mem _)
     rw [one_mul, mul_one] at h1
     rw [h1]
     exact one_ne_zero
-  · change (b * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) U * b⁻¹ : GLw n w).val.charpoly = Q
-    rw [Units.val_mul, Units.val_mul, Matrix.coe_units_inv, charpoly_units_conj, GlobalTheory.SmGL.val_diagT, charpoly_diagonal, hQu]
+  · change (b * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) U * b⁻¹ : GLw n w).val.charpoly
+      = Q
+    rw [Units.val_mul, Units.val_mul, Matrix.coe_units_inv, charpoly_units_conj,
+      GlobalTheory.SmGL.val_diagT, charpoly_diagonal, hQu]
     simp [hUdef]
 
 end PositivityTheory.Rg.Bc.ArchbcB.B.M4

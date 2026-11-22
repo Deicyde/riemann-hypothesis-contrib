@@ -11,9 +11,12 @@ namespace GlobalTheory
 
 open QuadraticZeta
 
-private theorem norm_sq_add_norm_sq_sub_eq_complete_square {K : Type*} [Field K] [NumberField K] {d : ℕ}
-    (h2 : finrank ℚ K = 2) (hd : d % 4 = 3) {r : K} (hr : r ^ 2 = -d) :
-    (∀ x : K, ∃ a b : ℚ, x = a + b * r) ∧ ∃ τ : K →+* K, τ r = -r := by
+private theorem norm_sq_add_norm_sq_sub_eq_complete_square
+    {K : Type*} [Field K] [NumberField K]
+    {d : ℕ}
+    (h2 : finrank ℚ K = 2) (hd : d % 4 = 3)
+    {r : K} (hr : r ^ 2 = -d)
+    : (∀ x : K, ∃ a b : ℚ, x = a + b * r) ∧ ∃ τ : K →+* K, τ r = -r := by
   have hli : LinearIndependent ℚ ![(1 : K), r] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
@@ -51,30 +54,37 @@ private theorem norm_sq_add_norm_sq_sub_eq_complete_square {K : Type*} [Field K]
     rw [e, map_add (f := _), map_smul, map_smul, Basis.constr_basis, Basis.constr_basis]
     simp [Rat.smul_def, sub_eq_add_neg]
   have hone : (B.constr ℚ ![(1 : K), -r]) 1 = 1 := by simpa using hf 1 0
-  have hmul : ∀ x y : K, (B.constr ℚ ![(1 : K), -r]) (x * y) =
-      (B.constr ℚ ![(1 : K), -r]) x * (B.constr ℚ ![(1 : K), -r]) y := by
+  have hmul
+      : ∀ x y : K,
+        (B.constr ℚ ![(1 : K), -r]) (x * y)
+          = (B.constr ℚ ![(1 : K), -r]) x * (B.constr ℚ ![(1 : K), -r]) y := by
     intro x y
     obtain ⟨a, b, rfl⟩ := hdec x
     obtain ⟨c, e, rfl⟩ := hdec y
-    have hxy : ((a : K) + b * r) * (c + e * r) =
-        ((a * c - d * b * e : ℚ) : K) + ((a * e + b * c : ℚ) : K) * r := by
+    have hxy
+        : ((a : K) + b * r) * (c + e * r)
+          = ((a * c - d * b * e : ℚ) : K) + ((a * e + b * c : ℚ) : K) * r := by
       push_cast
       linear_combination ((b : K) * e) * hr
     rw [hxy, hf, hf, hf]
     push_cast
     linear_combination (-((b : K) * e)) * hr
-  exact ⟨(AlgHom.ofLinearMap (B.constr ℚ ![(1 : K), -r]) hone hmul).toRingHom,
-    by show (B.constr ℚ ![(1 : K), -r]) r = -r; simpa using hf 0 1⟩
+  exact ⟨
+    (AlgHom.ofLinearMap (B.constr ℚ ![(1 : K), -r]) hone hmul).toRingHom,
+    by show (B.constr ℚ ![(1 : K), -r]) r = -r; simpa using hf 0 1
+  ⟩
 
-private theorem exists_int_eq_of_isIntegral_rat {K : Type*} [Field K] [CharZero K] (q : ℚ)
-    (h : IsIntegral ℤ (q : K)) : ∃ z : ℤ, q = z := by
+private theorem exists_int_eq_of_isIntegral_rat
+    {K : Type*} [Field K] [CharZero K] (q : ℚ) (h : IsIntegral ℤ (q : K))
+    : ∃ z : ℤ, q = z := by
   have hq : IsIntegral ℤ q :=
     (isIntegral_algHom_iff (algebraMap ℚ K).toIntAlgHom (algebraMap ℚ K).injective).mp h
   obtain ⟨z, hz⟩ := IsIntegrallyClosed.isIntegral_iff.mp hq
   exact ⟨z, by simpa using hz.symm⟩
 
-private theorem exists_int_eq_of_squarefree_mul_sq_eq_int {d : ℕ} (hsq : Squarefree d) (q : ℚ) (M : ℤ)
-    (h : (d : ℚ) * q ^ 2 = M) : ∃ z : ℤ, q = z := by
+private theorem exists_int_eq_of_squarefree_mul_sq_eq_int
+    {d : ℕ} (hsq : Squarefree d) (q : ℚ) (M : ℤ) (h : (d : ℚ) * q ^ 2 = M)
+    : ∃ z : ℤ, q = z := by
   have hden : q.den = 1 := by
     have hq := Rat.num_div_den q
     have hpos : (q.den : ℚ) ≠ 0 := by positivity
@@ -94,9 +104,12 @@ private theorem exists_int_eq_of_squarefree_mul_sq_eq_int {d : ℕ} (hsq : Squar
     simpa using hu
   exact ⟨q.num, (Rat.coe_int_num_of_den_eq_one hden).symm⟩
 
-theorem exists_integer_generator_of_sq_eq_neg {K : Type*} [Field K] [NumberField K] {d : ℕ}
-    (h2 : finrank ℚ K = 2) (hsq : Squarefree d) (hd : d % 4 = 3) {r : K} (hr : r ^ 2 = -d) :
-    ∃ w : 𝓞 K, 2 * (w : K) = 1 + r ∧ ∀ c : 𝓞 K, ∃ m n : ℤ, c = m + n * w := by
+theorem exists_integer_generator_of_sq_eq_neg
+    {K : Type*} [Field K] [NumberField K]
+    {d : ℕ}
+    (h2 : finrank ℚ K = 2) (hsq : Squarefree d) (hd : d % 4 = 3)
+    {r : K} (hr : r ^ 2 = -d)
+    : ∃ w : 𝓞 K, 2 * (w : K) = 1 + r ∧ ∀ c : 𝓞 K, ∃ m n : ℤ, c = m + n * w := by
   obtain ⟨hdec, τ, hτ⟩ := norm_sq_add_norm_sq_sub_eq_complete_square h2 hd hr
   obtain ⟨k, hk⟩ : ∃ k, d = 4 * k + 3 := ⟨d / 4, by omega⟩
   have hw : IsIntegral ℤ ((1 + r) / 2) := by
@@ -134,10 +147,11 @@ theorem exists_integer_generator_of_sq_eq_neg {K : Type*} [Field K] [NumberField
       exact h
     obtain ⟨A, hA⟩ := exists_int_eq_of_isIntegral_rat _ hsum
     obtain ⟨N, hN⟩ := exists_int_eq_of_isIntegral_rat _ hprod
-    obtain ⟨B, hB⟩ := exists_int_eq_of_squarefree_mul_sq_eq_int hsq (2 * b) (4 * N - A ^ 2) (by
-      push_cast
-      rw [← hN, ← hA]
-      ring)
+    obtain ⟨B, hB⟩ :=
+      exists_int_eq_of_squarefree_mul_sq_eq_int hsq (2 * b) (4 * N - A ^ 2) (by
+        push_cast
+        rw [← hN, ← hA]
+        ring)
     have hpar : Even (A - B) := by
       have h4 : (A : ℚ) ^ 2 + d * (B : ℚ) ^ 2 = 4 * N := by
         rw [← hA, ← hB, ← hN]
@@ -159,27 +173,29 @@ theorem exists_integer_generator_of_sq_eq_neg {K : Type*} [Field K] [NumberField
     show (a : K) + b * r = m + B * ((1 + r) / 2)
     linear_combination (1 / 2 : K) * hA' + (r / 2) * hB' + (1 / 2 : K) * hm'
 
-theorem eq_I_mul_sqrt_or_of_sq_eq_neg {d : ℕ} {z : ℂ} (hz : z ^ 2 = -d) :
-    z = Complex.I * √d ∨ z = -(Complex.I * √d) := by
+theorem eq_I_mul_sqrt_or_of_sq_eq_neg {d : ℕ} {z : ℂ} (hz : z ^ 2 = -d)
+    : z = Complex.I * √d ∨ z = -(Complex.I * √d) := by
   have h : (Complex.I * √d) ^ 2 = -(d : ℂ) := by
     rw [mul_pow, Complex.I_sq, ← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg _)]
     push_cast
     ring
   exact sq_eq_sq_iff_eq_or_eq_neg.mp (hz.trans h.symm)
 
-theorem ringOfIntegers_sqrt_neg_three_mod_four (d : ℕ) (hsq : Squarefree d) (hd : d % 4 = 3)
-    (K : Type) [Field K] [NumberField K] (h2 : Module.finrank ℚ K = 2) (r : K)
-    (hr : r ^ 2 = -(d : K)) :
-    ∃ (w : 𝓞 K) (bar : 𝓞 K →+* 𝓞 K), 2 * (w : K) = 1 + r ∧ w + bar w = 1 ∧
-      (∀ c : 𝓞 K, ∃ m n : ℤ, c = m + n * w) ∧
-      (∀ σ : K →+* ℂ, ¬ ComplexEmbedding.IsReal σ ∧
-        ∀ c : 𝓞 K, σ (bar c : K) = starRingEnd ℂ (σ (c : K))) ∧
-      ∃ σ : K →+* ℂ, σ r = Complex.I * √d := by
+theorem ringOfIntegers_sqrt_neg_three_mod_four
+    (d : ℕ) (hsq : Squarefree d) (hd : d % 4 = 3)
+    (K : Type) [Field K] [NumberField K]
+    (h2 : Module.finrank ℚ K = 2)
+    (r : K) (hr : r ^ 2 = -(d : K))
+    : ∃ (w : 𝓞 K) (bar : 𝓞 K →+* 𝓞 K),
+      2 * (w : K) = 1 + r ∧ w + bar w = 1 ∧ (∀ c : 𝓞 K, ∃ m n : ℤ, c = m + n * w)
+        ∧ (∀ σ : K →+* ℂ,
+          ¬ ComplexEmbedding.IsReal σ ∧ ∀ c : 𝓞 K, σ (bar c : K) = starRingEnd ℂ (σ (c : K)))
+        ∧ ∃ σ : K →+* ℂ, σ r = Complex.I * √d := by
   obtain ⟨hdec, τ, hτ⟩ := norm_sq_add_norm_sq_sub_eq_complete_square h2 hd hr
   obtain ⟨w, hw2, hgen⟩ := exists_integer_generator_of_sq_eq_neg h2 hsq hd hr
   have hσr : ∀ σ : K →+* ℂ, σ r = Complex.I * √d ∨ σ r = -(Complex.I * √d) := fun σ =>
     eq_I_mul_sqrt_or_of_sq_eq_neg (by rw [← map_pow, hr, map_neg, map_natCast])
-  have hconj : ∀ σ : K →+* ℂ, starRingEnd ℂ (σ r) = -σ r := by
+  have hconj : ∀ σ : K →+* ℂ, starRingEnd ℂ (σ r) = - σ r := by
     intro σ
     rcases hσr σ with h | h <;> rw [h] <;> simp [Complex.conj_ofReal]
   have hcomp : ∀ σ : K →+* ℂ, ∀ x : K, σ (τ x) = starRingEnd ℂ (σ x) := by

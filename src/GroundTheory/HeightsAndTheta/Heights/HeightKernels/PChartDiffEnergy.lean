@@ -12,16 +12,18 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.AnForm ReciprocityTheory.AnForm.A Matrix MeasureTheory Filter Topology
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.AnForm ReciprocityTheory.AnForm.A
+  Matrix MeasureTheory Filter Topology
 open scoped ComplexOrder
 
 noncomputable section
 
 namespace ChartEnergyDifferenceBound
 
-theorem cross_le {u U χ a p G : ℝ} (hU : |u| ≤ U) (hχ : 0 ≤ χ) (hp : 0 ≤ p) (hG : 0 ≤ G)
-    (ha : |a| ≤ Real.sqrt p * Real.sqrt G) :
-    -(u * (χ * a + χ * a)) ≤ 2 * U ^ 2 * p + χ * χ * G / 2 := by
+theorem cross_le
+    {u U χ a p G : ℝ}
+    (hU : |u| ≤ U) (hχ : 0 ≤ χ) (hp : 0 ≤ p) (hG : 0 ≤ G) (ha : |a| ≤ Real.sqrt p * Real.sqrt G)
+    : -(u * (χ * a + χ * a)) ≤ 2 * U ^ 2 * p + χ * χ * G / 2 := by
   have hsp := Real.sq_sqrt hp
   have hsG := Real.sq_sqrt hG
   have h0 : 0 ≤ |u| := abs_nonneg u
@@ -30,7 +32,8 @@ theorem cross_le {u U χ a p G : ℝ} (hU : |u| ≤ U) (hχ : 0 ≤ χ) (hp : 0 
     exact neg_le_abs _
   have h1 : -(u * (χ * a + χ * a)) ≤ 2 * χ * (|u| * |a|) := by
     nlinarith [mul_le_mul_of_nonneg_left hua hχ]
-  have hb : |u| * |a| ≤ U * (Real.sqrt p * Real.sqrt G) := mul_le_mul hU ha (abs_nonneg a) (h0.trans hU)
+  have hb : |u| * |a| ≤ U * (Real.sqrt p * Real.sqrt G) :=
+    mul_le_mul hU ha (abs_nonneg a) (h0.trans hU)
   have h2 : 2 * χ * (|u| * |a|) ≤ 2 * χ * (U * (Real.sqrt p * Real.sqrt G)) :=
     mul_le_mul_of_nonneg_left hb (by positivity)
   have h3 : 2 * χ * (U * (Real.sqrt p * Real.sqrt G)) ≤ 2 * U ^ 2 * p + χ * χ * G / 2 := by
@@ -47,7 +50,8 @@ theorem ChartDiffEnergy.proof (hE : ChartCutoffEnergy.Statement) : ChartDiffEner
   set u : (Fin (n + 1) → ℂ) → ℝ := fun y => hermChartPot A y - hermChartPot B y with hudef
   have hφ3 : ∀ i, ContDiff ℝ 3 (φ i) := fun i => contDiff_hermChartPot_of_le 3 (hT i)
   have hφ2 : ∀ i, ContDiff ℝ 2 (φ i) := fun i => contDiff_hermChartPot_of_le 2 (hT i)
-  have hu3 : ContDiff ℝ 3 u := (contDiff_hermChartPot_of_le 3 hA).sub (contDiff_hermChartPot_of_le 3 hB)
+  have hu3 : ContDiff ℝ 3 u :=
+    (contDiff_hermChartPot_of_le 3 hA).sub (contDiff_hermChartPot_of_le 3 hB)
   have hu1 : ContDiff ℝ 1 u := hu3.of_le (by norm_num)
   have hGc : Continuous (gradDens φ u u) := continuous_gradDens hφ2 hu1 hu1
   have hG0 : ∀ y, 0 ≤ gradDens φ u u y := gradDens_chart_nonneg hT u
@@ -59,10 +63,13 @@ theorem ChartDiffEnergy.proof (hE : ChartCutoffEnergy.Statement) : ChartDiffEner
   have hI : Integrable (fun y => u y * maDens (Fin.cons u φ) y) :=
     integrable_pot_mul_maDensity hA hB hA hB hT
   set I : ℝ := ∫ y, |u y * maDens (Fin.cons u φ) y| with hIdef
-  have hψG : ∀ k : ℕ, Integrable (fun y => chartCutoff k y * chartCutoff k y * gradDens φ u u y) := fun k =>
-    (((contDiff_chartCutoff k 0).continuous.mul (contDiff_chartCutoff k 0).continuous).mul
-      hGc).integrable_of_hasCompactSupport (hasCompactSupport_chartCutoff k).mul_right.mul_right
-  have hX : ∀ k : ℕ, ∫ y, chartCutoff k y * chartCutoff k y * gradDens φ u u y ≤ 2 * I + 4 * U ^ 2 * K := by
+  have hψG : ∀ k : ℕ, Integrable (fun y => chartCutoff k y * chartCutoff k y * gradDens φ u u y) :=
+    fun k =>
+      (((contDiff_chartCutoff k 0).continuous.mul (contDiff_chartCutoff k 0).continuous).mul
+        hGc).integrable_of_hasCompactSupport (hasCompactSupport_chartCutoff k).mul_right.mul_right
+  have hX
+      : ∀ k : ℕ,
+        ∫ y, chartCutoff k y * chartCutoff k y * gradDens φ u u y ≤ 2 * I + 4 * U ^ 2 * K := by
     intro k
     set χ : (Fin (n + 1) → ℂ) → ℝ := chartCutoff k with hχdef
     have hχ3 : ContDiff ℝ 3 χ := contDiff_chartCutoff k 3
@@ -73,11 +80,17 @@ theorem ChartDiffEnergy.proof (hE : ChartCutoffEnergy.Statement) : ChartDiffEner
     have hP : Integrable (gradDens φ χ χ) :=
       (continuous_gradDens hφ2 hχ1 hχ1).integrable_of_hasCompactSupport
         (hasCompactSupport_gradDens_left φ χ (hasCompactSupport_chartCutoff k))
-    have hL : ∀ y, gradDens φ (fun y => χ y * χ y) u y = χ y * gradDens φ χ u y + χ y * gradDens φ χ u y :=
-      fun y => (gradDensLeibniz_thm n φ χ χ u y (hχ1.differentiable one_ne_zero y)
+    have hL
+        : ∀ y,
+          gradDens φ (fun y => χ y * χ y) u y
+            = χ y * gradDens φ χ u y + χ y * gradDens φ χ u y := fun y =>
+      (gradDensLeibniz_thm n φ χ χ u y (hχ1.differentiable one_ne_zero y)
         (hχ1.differentiable one_ne_zero y)).1
-    have hpt : ∀ y, -(χ y * χ y * u y * maDens (Fin.cons u φ) y) - u y * gradDens φ (fun y => χ y * χ y) u y ≤
-        |u y * maDens (Fin.cons u φ) y| + (2 * U ^ 2 * gradDens φ χ χ y + χ y * χ y * gradDens φ u u y / 2) := by
+    have hpt
+        : ∀ y,
+          -(χ y * χ y * u y * maDens (Fin.cons u φ) y) - u y * gradDens φ (fun y => χ y * χ y) u y
+            ≤ |u y * maDens (Fin.cons u φ) y|
+              + (2 * U ^ 2 * gradDens φ χ χ y + χ y * χ y * gradDens φ u u y / 2) := by
       intro y
       rw [hL y]
       have h0 : 0 ≤ χ y := chartCutoff_nonneg k y
@@ -89,21 +102,29 @@ theorem ChartDiffEnergy.proof (hE : ChartCutoffEnergy.Statement) : ChartDiffEner
       have ha : -(χ y * χ y * u y * maDens (Fin.cons u φ) y) ≤ |u y * maDens (Fin.cons u φ) y| := by
         nlinarith [mul_nonneg hψ0 (by linarith : 0 ≤ |u y * maDens (Fin.cons u φ) y| + u y * maDens (Fin.cons u φ) y),
           mul_nonneg (by linarith : 0 ≤ 1 - χ y * χ y) ht0]
-      have hb := cross_le (hUa y) h0 (gradDens_chart_nonneg hT χ y) (hG0 y) (abs_gradDens_chart_le hT χ u y)
+      have hb :=
+        cross_le (hUa y) h0 (gradDens_chart_nonneg hT χ y) (hG0 y) (abs_gradDens_chart_le hT χ u y)
       linarith
     have i1n : Integrable (fun y => -(χ y * χ y * u y * maDens (Fin.cons u φ) y)) := i1.neg
-    have iL : Integrable (fun y => -(χ y * χ y * u y * maDens (Fin.cons u φ) y) -
-        u y * gradDens φ (fun y => χ y * χ y) u y) := i1n.sub i3
+    have iL : Integrable (fun y =>
+        -(χ y * χ y * u y * maDens (Fin.cons u φ) y) - u y * gradDens φ (fun y => χ y * χ y) u y) :=
+      i1n.sub i3
     have iA : Integrable (fun y => |u y * maDens (Fin.cons u φ) y|) := hI.abs
     have iP : Integrable (fun y => 2 * U ^ 2 * gradDens φ χ χ y) := hP.const_mul _
     have iG : Integrable (fun y => χ y * χ y * gradDens φ u u y / 2) := i2.div_const 2
-    have iPG : Integrable (fun y => 2 * U ^ 2 * gradDens φ χ χ y + χ y * χ y * gradDens φ u u y / 2) := iP.add iG
-    have iR : Integrable (fun y => |u y * maDens (Fin.cons u φ) y| +
-        (2 * U ^ 2 * gradDens φ χ χ y + χ y * χ y * gradDens φ u u y / 2)) := iA.add iPG
-    have hXeq : ∫ y, χ y * χ y * gradDens φ u u y =
-        ∫ y, (-(χ y * χ y * u y * maDens (Fin.cons u φ) y) - u y * gradDens φ (fun y => χ y * χ y) u y) := by
-      rw [integral_sub i1n i3, integral_neg]
-      linarith
+    have iPG
+        : Integrable (fun y => 2 * U ^ 2 * gradDens φ χ χ y + χ y * χ y * gradDens φ u u y / 2) :=
+      iP.add iG
+    have iR : Integrable (fun y =>
+        |u y * maDens (Fin.cons u φ) y|
+          + (2 * U ^ 2 * gradDens φ χ χ y + χ y * χ y * gradDens φ u u y / 2)) :=
+      iA.add iPG
+    have hXeq
+        : ∫ y, χ y * χ y * gradDens φ u u y
+          = ∫ y, (-(χ y * χ y * u y * maDens (Fin.cons u φ) y) - u y * gradDens φ (fun y => χ y * χ y) u y) :=
+      by
+        rw [integral_sub i1n i3, integral_neg]
+        linarith
     have hmono := integral_mono iL iR hpt
     rw [← hXeq, integral_add iA iPG, integral_add iP iG, integral_const_mul, integral_div] at hmono
     have hKk : 2 * U ^ 2 * ∫ y, gradDens φ χ χ y ≤ 2 * U ^ 2 * K :=
@@ -123,8 +144,9 @@ theorem ChartDiffEnergy.proof (hE : ChartCutoffEnergy.Statement) : ChartDiffEner
     rw [one_mul, one_mul] at h
     exact (ENNReal.continuous_ofReal.tendsto _).comp h
   have hfm : ∀ k, AEMeasurable (f k) volume := fun k => (hψG k).1.aemeasurable.ennreal_ofReal
-  have hlim := lintegral_tendsto_of_tendsto_of_monotone hfm (Eventually.of_forall hmono)
-    (Eventually.of_forall htend)
+  have hlim :=
+    lintegral_tendsto_of_tendsto_of_monotone hfm (Eventually.of_forall hmono)
+      (Eventually.of_forall htend)
   have hbd : ∀ k, ∫⁻ y, f k y ≤ ENNReal.ofReal (2 * I + 4 * U ^ 2 * K) := by
     intro k
     have hnn : ∀ y, 0 ≤ chartCutoff k y * chartCutoff k y * gradDens φ u u y := fun y =>

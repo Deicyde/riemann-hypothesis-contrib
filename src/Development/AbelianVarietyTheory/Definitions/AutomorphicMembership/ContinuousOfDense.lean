@@ -49,7 +49,8 @@ theorem emb_monomial (α : σ →₀ ℕ) (c : ℂ) : emb σ (monomial α c) = l
     rw [coe_basisMonomials, smul_monomial, smul_eq_mul, mul_one]
   rw [h, map_smul, emb, Module.Basis.constr_basis, ← smul_eq_mul, lp.single_smul]
 
-theorem emb_apply (f : MvPolynomial σ ℂ) (α : σ →₀ ℕ) : emb σ f α = AddMonoidAlgebra.coeff f α * wt α := by
+theorem emb_apply (f : MvPolynomial σ ℂ) (α : σ →₀ ℕ)
+    : emb σ f α = AddMonoidAlgebra.coeff f α * wt α := by
   induction f using MvPolynomial.induction_on' with
   | monomial β c =>
     rw [emb_monomial, lp.single_apply, coeff_monomial]
@@ -87,17 +88,18 @@ theorem isFockIsometry_embedding : IsFockIP (emb σ) := by
     rw [Pi.single_eq_same, if_pos rfl, RCLike.inner_apply, mul_comm, star_wt_mul, mfact_cast]
   · rw [Pi.single_eq_of_ne h, if_neg h, inner_zero_right]
 
-
 omit [DecidableEq σ] in
 def diag (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖ = 1) : L2 σ →L[ℂ] L2 σ :=
-  lp.mapCLM 2 (fun α => c α • ContinuousLinearMap.id ℂ ℂ) zero_le_one fun α => by
-    simp [norm_smul, hc]
-
+  lp.mapCLM 2
+    (fun α => c α • ContinuousLinearMap.id ℂ ℂ)
+    zero_le_one
+    fun α => by simp [norm_smul, hc]
 
 omit [DecidableEq σ] in
-@[simp] theorem diag_apply (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖ = 1) (x : L2 σ) (α : σ →₀ ℕ) :
-    diag c hc x α = c α * x α := rfl
-
+@[simp]
+theorem diag_apply (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖ = 1) (x : L2 σ) (α : σ →₀ ℕ)
+    : diag c hc x α = c α * x α :=
+  rfl
 
 omit [DecidableEq σ] in
 theorem norm_diag (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖ = 1) (x : L2 σ) : ‖diag c hc x‖ = ‖x‖ := by
@@ -107,8 +109,8 @@ theorem norm_diag (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖ = 1) (x
   refine tsum_congr fun α => ?_
   rw [diag_apply, norm_mul, hc, one_mul]
 
-theorem diag_emb_monomial (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖ = 1) (α : σ →₀ ℕ) (a : ℂ) :
-    diag c hc (emb σ (monomial α a)) = c α • emb σ (monomial α a) := by
+theorem diag_emb_monomial (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖ = 1) (α : σ →₀ ℕ) (a : ℂ)
+    : diag c hc (emb σ (monomial α a)) = c α • emb σ (monomial α a) := by
   ext β
   rw [diag_apply, lp.coeFn_smul, Pi.smul_apply, smul_eq_mul, emb_monomial, lp.single_apply]
   by_cases h : β = α
@@ -116,9 +118,12 @@ theorem diag_emb_monomial (c : (σ →₀ ℕ) → ℂ) (hc : ∀ α, ‖c α‖
     rfl
   · rw [Pi.single_eq_of_ne h, mul_zero, mul_zero]
 
-theorem continuous_of_dense {G H : Type*} [TopologicalSpace G] [NormedAddCommGroup H] [NormedSpace ℂ H]
-    (π : G → H →L[ℂ] H) (hπ : ∀ g x, ‖π g x‖ = ‖x‖) {S : Set H} (hS : Dense S)
-    (h : ∀ x ∈ S, Continuous fun g => π g x) (x : H) : Continuous fun g => π g x := by
+theorem continuous_of_dense
+    {G H : Type*} [TopologicalSpace G] [NormedAddCommGroup H] [NormedSpace ℂ H]
+    (π : G → H →L[ℂ] H) (hπ : ∀ g x, ‖π g x‖ = ‖x‖)
+    {S : Set H} (hS : Dense S) (h : ∀ x ∈ S, Continuous fun g => π g x)
+    (x : H)
+    : Continuous fun g => π g x := by
   rw [continuous_iff_continuousAt]
   intro g₀
   rw [ContinuousAt, Metric.tendsto_nhds]
@@ -132,9 +137,9 @@ theorem continuous_of_dense {G H : Type*} [TopologicalSpace G] [NormedAddCommGro
   have h₁ := hd g
   have h₂ := hd g₀
   rw [dist_comm] at h₂
-  calc dist (π g x) (π g₀ x)
-      ≤ dist (π g x) (π g y) + dist (π g y) (π g₀ y) + dist (π g₀ y) (π g₀ x) :=
-        dist_triangle4 _ _ _ _
+  calc
+    dist (π g x) (π g₀ x) ≤ dist (π g x) (π g y) + dist (π g y) (π g₀ y) + dist (π g₀ y) (π g₀ x) :=
+      dist_triangle4 _ _ _ _
     _ < ε := by rw [h₁, h₂]; linarith
 
 end GlobalTheory.FockSeq

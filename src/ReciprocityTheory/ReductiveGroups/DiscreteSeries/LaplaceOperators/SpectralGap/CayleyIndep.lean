@@ -26,23 +26,27 @@ theorem cayleyIndep : CayleyIndepStatement := by
   have hJ : star P₀ * Formalism.REAL.Jm ε * P₀ = star P * Formalism.REAL.Jm ε * P := by
     rw [Matrix.star_eq_conjTranspose, Matrix.star_eq_conjTranspose, hH0, hH1]
   have hbK : P₀ * star P ∈ Formalism.REAL.Kset ε := by
-    refine ⟨Submonoid.mul_mem _ h0.2 (Matrix.mem_unitaryGroup_iff.mpr (by rw [star_star]; exact e1)), ?_⟩
-    calc P₀ * star P * Formalism.REAL.Jm ε = P₀ * (star P * Formalism.REAL.Jm ε * P) * star P := by
-          rw [Matrix.mul_assoc P₀ _ (star P), Matrix.mul_assoc (star P * _) P (star P), e1', Matrix.mul_one,
-            Matrix.mul_assoc]
+    refine
+      ⟨Submonoid.mul_mem _ h0.2 (Matrix.mem_unitaryGroup_iff.mpr (by rw [star_star]; exact e1)), ?_⟩
+    calc
+      P₀ * star P * Formalism.REAL.Jm ε = P₀ * (star P * Formalism.REAL.Jm ε * P) * star P := by
+        rw [Matrix.mul_assoc P₀ _ (star P), Matrix.mul_assoc (star P * _) P (star P), e1',
+          Matrix.mul_one, Matrix.mul_assoc]
       _ = P₀ * (star P₀ * Formalism.REAL.Jm ε * P₀) * star P := by rw [hJ]
       _ = Formalism.REAL.Jm ε * (P₀ * star P) := by
-          simp only [← Matrix.mul_assoc]
-          rw [e0', Matrix.one_mul]
+        simp only [← Matrix.mul_assoc]
+        rw [e0', Matrix.one_mul]
   have haK : P * star P₀ ∈ Formalism.REAL.Kset ε := by
-    refine ⟨Submonoid.mul_mem _ h1.2 (Matrix.mem_unitaryGroup_iff.mpr (by rw [star_star]; exact e0)), ?_⟩
-    calc P * star P₀ * Formalism.REAL.Jm ε = P * (star P₀ * Formalism.REAL.Jm ε * P₀) * star P₀ := by
-          rw [Matrix.mul_assoc P _ (star P₀), Matrix.mul_assoc (star P₀ * _) P₀ (star P₀), e0', Matrix.mul_one,
-            Matrix.mul_assoc]
+    refine
+      ⟨Submonoid.mul_mem _ h1.2 (Matrix.mem_unitaryGroup_iff.mpr (by rw [star_star]; exact e0)), ?_⟩
+    calc
+      P * star P₀ * Formalism.REAL.Jm ε = P * (star P₀ * Formalism.REAL.Jm ε * P₀) * star P₀ := by
+        rw [Matrix.mul_assoc P _ (star P₀), Matrix.mul_assoc (star P₀ * _) P₀ (star P₀), e0',
+          Matrix.mul_one, Matrix.mul_assoc]
       _ = P * (star P * Formalism.REAL.Jm ε * P) * star P₀ := by rw [hJ]
       _ = Formalism.REAL.Jm ε * (P * star P₀) := by
-          simp only [← Matrix.mul_assoc]
-          rw [e1', Matrix.one_mul]
+        simp only [← Matrix.mul_assoc]
+        rw [e1', Matrix.one_mul]
   have hbU := ReciprocityTheory.ChartRestriction.DS.Lap.CayleyIndepA.kset_uj hbK
   have haU := ReciprocityTheory.ChartRestriction.DS.Lap.CayleyIndepA.kset_uj haK
   have hab : P * star P₀ * (P₀ * star P) = 1 := by

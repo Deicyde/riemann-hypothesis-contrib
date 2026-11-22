@@ -10,6 +10,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MeasureDecomposi
 namespace PI
 
 theorem sc_mu_exists : PI.ScMuExists.Target :=
-  PI.ScMuExists.UnitaryGroupMassFormula.target_of_instDecomp PI.ScMuExists.UnitaryGroupMassFormula.place_decomposition_instance
+  PI.ScMuExists.UnitaryGroupMassFormula.target_of_instDecomp
+    PI.ScMuExists.UnitaryGroupMassFormula.place_decomposition_instance
 
 end PI

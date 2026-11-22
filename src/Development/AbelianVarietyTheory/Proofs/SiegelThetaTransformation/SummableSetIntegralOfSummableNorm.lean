@@ -6,21 +6,24 @@ public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsHe
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open scoped ComplexConjugate ComplexOrder Real Classical
 
 namespace GlobalTheory.SW
 
-theorem summable_setIntegral_of_summable_norm {I Y : Type} [MeasurableSpace Y] (ν : Measure Y)
-    (D : I → Set Y) (f : I → Y → ℂ) (h : Summable fun i => ∫ y in D i, ‖f i y‖ ∂ν) :
-    Summable fun i => ∫ y in D i, f i y ∂ν := by
-
+theorem summable_setIntegral_of_summable_norm
+    {I Y : Type} [MeasurableSpace Y]
+    (ν : Measure Y) (D : I → Set Y) (f : I → Y → ℂ) (h : Summable fun i => ∫ y in D i, ‖f i y‖ ∂ν)
+    : Summable fun i => ∫ y in D i, f i y ∂ν := by
   exact Summable.of_norm_bounded h fun i => norm_integral_le_integral_norm _
 
-def finiteRankDomain {I Y : Type} [MeasurableSpace Y] (ν : Measure Y) (D : I → Set Y) {m : ℕ}
-    (t : Fin m → I → Y → ℂ) : Submodule ℂ (Fin m → ℂ) where
-  carrier := {v | (∀ i, IntegrableOn (fun y => ∑ j, v j * t j i y) (D i) ν) ∧
-    Summable fun i => ∫ y in D i, ‖∑ j, v j * t j i y‖ ∂ν}
+def finiteRankDomain
+    {I Y : Type} [MeasurableSpace Y] (ν : Measure Y) (D : I → Set Y) {m : ℕ} (t : Fin m → I → Y → ℂ)
+    : Submodule ℂ (Fin m → ℂ) where
+  carrier :=
+    {v | (∀ i, IntegrableOn (fun y => ∑ j, v j * t j i y) (D i) ν) ∧
+      Summable fun i => ∫ y in D i, ‖∑ j, v j * t j i y‖ ∂ν}
   zero_mem' := by
     refine ⟨fun i => ?_, ?_⟩
     · simp
@@ -34,8 +37,10 @@ def finiteRankDomain {I Y : Type} [MeasurableSpace Y] (ν : Measure Y) (D : I �
     · simp only [key]
       exact (hv i).add (hw i)
     · simp only [key]
-      refine Summable.of_nonneg_of_le (fun i => integral_nonneg fun y => norm_nonneg _)
-        (fun i => ?_) (hv'.add hw')
+      refine Summable.of_nonneg_of_le
+        (fun i => integral_nonneg fun y => norm_nonneg _)
+        (fun i => ?_)
+        (hv'.add hw')
       rw [← integral_add (hv i).norm (hw i).norm]
       exact integral_mono ((hv i).add (hw i)).norm ((hv i).norm.add (hw i).norm)
         (fun y => norm_add_le _ _)
@@ -50,8 +55,9 @@ def finiteRankDomain {I Y : Type} [MeasurableSpace Y] (ν : Measure Y) (D : I �
     · simp only [key, norm_mul, integral_const_mul]
       exact hv'.mul_left _
 
-noncomputable def finiteRankFunctional {I Y : Type} [MeasurableSpace Y] (ν : Measure Y)
-    (D : I → Set Y) {m : ℕ} (t : Fin m → I → Y → ℂ) : finiteRankDomain ν D t →ₗ[ℂ] ℂ where
+noncomputable def finiteRankFunctional
+    {I Y : Type} [MeasurableSpace Y] (ν : Measure Y) (D : I → Set Y) {m : ℕ} (t : Fin m → I → Y → ℂ)
+    : finiteRankDomain ν D t →ₗ[ℂ] ℂ where
   toFun v := ∑' i, ∫ y in D i, ∑ j, v.1 j * t j i y ∂ν
   map_add' := by
     rintro ⟨v, hv, hv'⟩ ⟨w, hw, hw'⟩
@@ -75,7 +81,14 @@ noncomputable def finiteRankFunctional {I Y : Type} [MeasurableSpace Y] (ν : Me
     simp only [key, integral_const_mul]
     exact tsum_mul_left
 
-theorem finiteRank_integral_mem_span : ∀ (A I Y : Type) [Countable I] [MeasurableSpace Y] (ν : Measure Y) (D : I → Set Y) (S : Set A) (m : ℕ) (e : Fin m → A → ℂ) (t : Fin m → I → Y → ℂ), (∀ a ∈ S, (∀ i, IntegrableOn (fun y => ∑ j, e j a * t j i y) (D i) ν) ∧ Summable fun i => ∫ y in D i, ‖∑ j, e j a * t j i y‖ ∂ν) → ∃ b : Fin m → ℂ, ∀ a ∈ S, ∑' i, ∫ y in D i, ∑ j, e j a * t j i y ∂ν = ∑ j, b j * e j a := by
+theorem finiteRank_integral_mem_span
+    : ∀ (A I Y : Type) [Countable I] [MeasurableSpace Y] (ν : Measure Y) (D : I → Set Y) (S : Set A)
+        (m : ℕ) (e : Fin m → A → ℂ) (t : Fin m → I → Y → ℂ),
+      (∀ a ∈ S,
+          (∀ i, IntegrableOn (fun y => ∑ j, e j a * t j i y) (D i) ν)
+            ∧ Summable fun i => ∫ y in D i, ‖∑ j, e j a * t j i y‖ ∂ν)
+        → ∃ b : Fin m → ℂ, ∀ a ∈ S,
+          ∑' i, ∫ y in D i, ∑ j, e j a * t j i y ∂ν = ∑ j, b j * e j a := by
   intro A I Y _ _ ν D S m e t hS
 
   obtain ⟨g, hg⟩ := LinearMap.exists_extend (finiteRankFunctional ν D t)

@@ -10,9 +10,11 @@ open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.Xgf
 
-theorem logIdeal_pow (E : Type) [Field E] [NumberField E] (p : Nat.Primes) (j : 𝓞 E →+* ℂ_[p])
-    (hj : Function.Injective j) (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) :
-    ∀ n : ℕ, logIdeal j (I ^ n) = n * logIdeal j I := by
+theorem logIdeal_pow
+    (E : Type) [Field E] [NumberField E]
+    (p : Nat.Primes) (j : 𝓞 E →+* ℂ_[p]) (hj : Function.Injective j)
+    (I : Ideal (𝓞 E)) (hI : I ≠ ⊥)
+    : ∀ n : ℕ, logIdeal j (I ^ n) = n * logIdeal j I := by
   intro n
   induction n with
   | zero =>
@@ -24,7 +26,12 @@ theorem logIdeal_pow (E : Type) [Field E] [NumberField E] (p : Nat.Primes) (j : 
     push_cast
     ring
 
-theorem sum_logIdeal_eq_log_absNorm : ∀ (E : Type) [Field E] [NumberField E] (I : Ideal (𝓞 E)), I ≠ ⊥ → ∀ p : Nat.Primes, ∑ j : E →+* ℂ_[p], logIdeal (j.comp (algebraMap (𝓞 E) E)) I = Real.log ‖((Ideal.absNorm I : ℕ) : ℂ_[p])‖ := by
+theorem sum_logIdeal_eq_log_absNorm
+    : ∀ (E : Type) [Field E] [NumberField E] (I : Ideal (𝓞 E)),
+      I ≠ ⊥
+        → ∀ p : Nat.Primes,
+          ∑ j : E →+* ℂ_[p], logIdeal (j.comp (algebraMap (𝓞 E) E)) I
+            = Real.log ‖((Ideal.absNorm I : ℕ) : ℂ_[p])‖ := by
   intro E _ _ I hI p
   classical
   set h := Fintype.card (ClassGroup (𝓞 E)) with hh
@@ -41,20 +48,24 @@ theorem sum_logIdeal_eq_log_absNorm : ∀ (E : Type) [Field E] [NumberField E] (
     rintro rfl
     rw [Ideal.span_singleton_eq_bot.mpr rfl] at ha
     exact pow_ne_zero h hI ha
-  have key : ∀ j : E →+* ℂ_[p],
-      (h : ℝ) * logIdeal (j.comp (algebraMap (𝓞 E) E)) I = Real.log ‖j (a : E)‖ := by
+  have key
+      : ∀ j : E →+* ℂ_[p],
+        (h : ℝ) * logIdeal (j.comp (algebraMap (𝓞 E) E)) I = Real.log ‖j (a : E)‖ := by
     intro j
     have hinj : Function.Injective (j.comp (algebraMap (𝓞 E) E)) :=
       j.injective.comp (FaithfulSMul.algebraMap_injective (𝓞 E) E)
-    rw [← logIdeal_pow E p _ hinj I hI h, ha, (GlobalTheory.T.log_ideal_mul_span_map E p _ hinj).2.1]
+    rw [← logIdeal_pow E p _ hinj I hI h, ha,
+      (GlobalTheory.T.log_ideal_mul_span_map E p _ hinj).2.1]
     rfl
   have haE : (a : E) ≠ 0 := by
     intro h0
     exact ha0 (RingOfIntegers.coe_eq_zero_iff.mp h0)
   have hprod : ∏ j : E →+* ℂ_[p], j (a : E) = ((Algebra.norm ℤ a : ℤ) : ℂ_[p]) := by
-    rw [Fintype.prod_equiv (RingHom.equivRatAlgHom E ℂ_[p]) (fun j => j (a : E))
-      (fun σ => σ (a : E)) (fun _ => rfl), ← Algebra.norm_eq_prod_embeddings ℚ ℂ_[p] (a : E),
-      ← Algebra.coe_norm_int, map_intCast]
+    rw [Fintype.prod_equiv (RingHom.equivRatAlgHom E ℂ_[p])
+        (fun j => j (a : E))
+        (fun σ => σ (a : E))
+        (fun _ => rfl),
+      ← Algebra.norm_eq_prod_embeddings ℚ ℂ_[p] (a : E), ← Algebra.coe_norm_int, map_intCast]
   have hN : ((Algebra.norm ℤ a).natAbs : ℕ) = Ideal.absNorm I ^ h := by
     rw [← Ideal.absNorm_span_singleton, ← ha, map_pow]
   have hnorm : ‖((Algebra.norm ℤ a : ℤ) : ℂ_[p])‖ = ‖((Ideal.absNorm I : ℕ) : ℂ_[p])‖ ^ h := by

@@ -243,19 +243,20 @@ theorem lemS_main (hP : Ext.PackingCount) : GSupStatement := by
   set ρ := Real.sqrt (2 * N) / Real.sqrt (q * Real.pi) with hρ
   set K := (1 + 4 * Real.sqrt (2 * N) / (Real.sqrt (q * Real.pi) * Y.la1)) ^ (2 * N) with hKdef
   have hρ0 : 0 ≤ ρ := by positivity
-  have hK : ∀ S : Finset (EuclideanSpace ℂ ι), (∀ a ∈ S, ‖a‖ ≤ ρ) →
-      (∀ a ∈ S, ∀ b ∈ S, a - b ∈ lat Y.b) → (S.card : ℝ) ≤ K := by
+  have hK
+      : ∀ S : Finset (EuclideanSpace ℂ ι),
+        (∀ a ∈ S, ‖a‖ ≤ ρ) → (∀ a ∈ S, ∀ b ∈ S, a - b ∈ lat Y.b) → (S.card : ℝ) ≤ K := by
     intro S hS hSl
     rcases Nat.eq_zero_or_pos N with hN | hN
     · have hE : IsEmpty ι := Fintype.card_eq_zero_iff.mp hN
-      have hsub : ∀ a b : EuclideanSpace ℂ ι, a = b := fun a b =>
-        PiLp.ext (fun i => isEmptyElim i)
+      have hsub : ∀ a b : EuclideanSpace ℂ ι, a = b := fun a b => PiLp.ext (fun i => isEmptyElim i)
       have : S.card ≤ 1 := Finset.card_le_one.mpr (fun a _ b _ => hsub a b)
       rw [hKdef, hN, mul_zero, pow_zero]
       exact_mod_cast this
     · have hla := firstMinimum_pos Y hN
-      have := lemS_pack hP S Y.la1 ρ hla hρ0 hS (fun a ha b hb hab =>
-        firstMinimum_le_norm Y (hSl a ha b hb) (sub_ne_zero.mpr hab))
+      have :=
+        lemS_pack hP S Y.la1 ρ hla hρ0 hS
+          (fun a ha b hb hab => firstMinimum_le_norm Y (hSl a ha b hb) (sub_ne_zero.mpr hab))
       have e : 4 * Real.sqrt (2 * N) / (Real.sqrt (q * Real.pi) * Y.la1) = 4 * ρ / Y.la1 := by
         rw [hρ, mul_div_assoc', div_div]
       rw [hKdef, e]
@@ -281,10 +282,12 @@ theorem lemS_main (hP : Ext.PackingCount) : GSupStatement := by
     rw [hl2]
     exact le_mul_of_one_le_left hD0 ((one_le_inv₀ hvr).mpr hvr1)
   have hq0 : 0 ≤ 2 * (q : ℝ) ^ N := by positivity
-  calc Y.ptN2 q F v ≤ 2 * (q : ℝ) ^ N * ∫ u in closedBall v ρ, Y.ptN2 q F u := h1
+  calc
+    Y.ptN2 q F v
+      ≤ 2 * (q : ℝ) ^ N * ∫ u in closedBall v ρ, Y.ptN2 q F u := h1
     _ ≤ 2 * (q : ℝ) ^ N * (K * ∫ u in D, Y.ptN2 q F u) := mul_le_mul_of_nonneg_left h2 hq0
     _ ≤ 2 * (q : ℝ) ^ N * (K * Y.l2 q F) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hID hK0) hq0
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hID hK0) hq0
     _ = 2 * (q : ℝ) ^ N * K * Y.l2 q F := by ring
 
 theorem gSup (hP : Ext.PackingCount) : GSupStatement := lemS_main hP

@@ -10,7 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Matri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
+  Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation
+  Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory
+  NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,34 +25,43 @@ namespace GlobalTheory.Mem.SymChar
 
 variable {D : D7}
 
-theorem smul_mem_wLf_of_mem_wInt (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
-    {c : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} (hc : c ∈ wInt X w) {y : VA X.B.I} (hy : y ∈ X.B.I.Lf) :
-    c • y ∈ Formalism.L2.SG.RowDict.wLf X w := by
+theorem smul_mem_wLf_of_mem_wInt
+    (X : HidaSetting D)
+    (w : HeightOneSpectrum (𝓞 D.host.E))
+    {c : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} (hc : c ∈ wInt X w)
+    {y : VA X.B.I} (hy : y ∈ X.B.I.Lf)
+    : c • y ∈ Formalism.L2.SG.RowDict.wLf X w := by
   induction hc using Submodule.span_induction with
   | mem c hc =>
     obtain ⟨a, ha, rfl⟩ := hc
     exact GlobalTheory.Mem.SymFrame.inclE_smul_mem_wLf X w a ha hy
-  | zero => rw [zero_smul]; exact zero_mem _
-  | add a b _ _ ha hb => rw [add_smul]; exact add_mem ha hb
+  | zero =>
+    rw [zero_smul]; exact zero_mem _
+  | add a b _ _ ha hb =>
+    rw [add_smul]; exact add_mem ha hb
   | smul r a _ ha =>
     rw [smul_assoc]
     exact Submodule.smul_mem _ r ha
 
-theorem mem_wInt_of_mem_idS (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
+theorem mem_wInt_of_mem_idS
+    (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
     {s : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E}
-    (hs : s ∈ idS X.B.I.F (Formalism.L2.SG.Pf.RowDictPf.wB X w).asIdeal) :
-    (s : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w := by
-  let J : Ideal (Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) :=
-    { carrier := {s | (s : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w}
-      add_mem' := fun {a b} ha hb => by
-        show ((a + b : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w
-        rw [Subring.coe_add]; exact add_mem ha hb
-      zero_mem' := by
-        show ((0 : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w
-        rw [ZeroMemClass.coe_zero]; exact zero_mem _
-      smul_mem' := fun r {a} ha => by
-        show ((r * a : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w
-        exact (wInt X w).smul_mem r ha }
+    (hs : s ∈ idS X.B.I.F (Formalism.L2.SG.Pf.RowDictPf.wB X w).asIdeal)
+    : (s : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w := by
+  let J : Ideal (Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) := {
+    carrier := {s | (s : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w}
+    add_mem' := fun {a b} ha hb => by
+      show ((a + b : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w
+      rw [Subring.coe_add]
+      exact add_mem ha hb
+    zero_mem' := by
+      show ((0 : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w
+      rw [ZeroMemClass.coe_zero]
+      exact zero_mem _
+    smul_mem' := fun r {a} ha => by
+      show ((r * a : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w
+      exact (wInt X w).smul_mem r ha
+  }
   have hle : idS X.B.I.F (Formalism.L2.SG.Pf.RowDictPf.wB X w).asIdeal ≤ J := by
     refine Ideal.map_le_iff_le_comap.2 fun a ha => ?_
     show ((oToS X.B.I.F X.B.I.E a : Formalism.L2.Herm.intAf X.B.I.F X.B.I.E) :
@@ -61,7 +75,13 @@ end GlobalTheory.Mem.SymChar
 
 namespace GlobalTheory.Mem.SymChar
 
-theorem sigA_ew_sub_one_mem_wInt : ∀ (D : D7) (X : HidaSetting D), X.B.I = Formalism.L2.SG.InstExistsPf.instOf D → (∀ x : X.B.I.E, HEq (X.ιE x) x) → ∀ (kv : Σ k : Fin 2, D.nd.PlG k), ((D.host.g kv.1 : ℕ) : 𝓞 D.host.E) ∈ (D.naut.plGw kv.1 kv.2).asIdeal → ¬ GlobalTheory.Mem.SymFrame.EwAt X (D.naut.plGw kv.1 kv.2) → sigA X.B.I X.ew - 1 ∈ GlobalTheory.Mem.SymChar.wInt X (D.naut.plGw kv.1 kv.2) := by
+theorem sigA_ew_sub_one_mem_wInt
+    : ∀ (D : D7) (X : HidaSetting D),
+      X.B.I = Formalism.L2.SG.InstExistsPf.instOf D → (∀ x : X.B.I.E, HEq (X.ιE x) x)
+        → ∀ (kv : Σ k : Fin 2, D.nd.PlG k),
+          ((D.host.g kv.1 : ℕ) : 𝓞 D.host.E) ∈ (D.naut.plGw kv.1 kv.2).asIdeal
+            → ¬ GlobalTheory.Mem.SymFrame.EwAt X (D.naut.plGw kv.1 kv.2)
+            → sigA X.B.I X.ew - 1 ∈ GlobalTheory.Mem.SymChar.wInt X (D.naut.plGw kv.1 kv.2) := by
   intro D X _ _ kv hg hne
   set w := D.naut.plGw kv.1 kv.2 with hw
   have h1 : 1 - X.ew - sigA X.B.I X.ew ∈ wInt X w :=

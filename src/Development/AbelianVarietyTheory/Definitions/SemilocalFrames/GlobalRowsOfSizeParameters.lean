@@ -155,14 +155,14 @@ section Rec
 
 open Formalism.BasicNotions.Examples₂ Formalism.BasicNotions.Examples₂.NZ
 
-
 end Rec
-
 
 theorem two_le_rd {R : Ranks} (H : Host R) : 2 ≤ H.rdE := UpperTheory.Ram.Rd.two_le_rdE H
 
-theorem logrd_le {D : D7} (L : SizeData₂ D) (SzN : SizeN L) (SzQ : SizeQD L) (h2 : 2 ≤ XX L) (h3 : 5 / szTh L ≤ XX L) :
-    Real.log D.host.rdE ≤ L.sc.x ^ (L.sc.eps / 2) := by
+theorem logrd_le
+    {D : D7}
+    (L : SizeData₂ D) (SzN : SizeN L) (SzQ : SizeQD L) (h2 : 2 ≤ XX L) (h3 : 5 / szTh L ≤ XX L)
+    : Real.log D.host.rdE ≤ L.sc.x ^ (L.sc.eps / 2) := by
   obtain ⟨-, -, q2, -, d2, -⟩ := SzQ
   have a := UpperTheory.Ram.Rd.log_rdE_le D.host
   have b := logn_le L SzN
@@ -176,7 +176,8 @@ theorem logrd_le {D : D7} (L : SizeData₂ D) (SzN : SizeN L) (SzQ : SizeQD L) (
   have hth := th_pos L
   have k1 : 5 * (XX L / szTh L) ≤ XX L ^ 2 := by
     have : 5 * (XX L / szTh L) = 5 / szTh L * XX L := by ring
-    rw [this, sq]; exact mul_le_mul_of_nonneg_right h3 (by linarith)
+    rw [this, sq]
+    exact mul_le_mul_of_nonneg_right h3 (by linarith)
   have k0 : 0 ≤ XX L / szTh L := by positivity
   have k2 : XX L ^ 2 ≤ XX L ^ 21 := pow_le_pow_right₀ (by linarith) (by norm_num)
   have k3 : 1 ≤ XX L ^ 21 := one_le_pow₀ (by linarith)
@@ -184,9 +185,11 @@ theorem logrd_le {D : D7} (L : SizeData₂ D) (SzN : SizeN L) (SzQ : SizeQD L) (
   have k5 : XX L ^ 50 = XX L ^ 21 * XX L ^ 29 := by ring
   nlinarith
 
-theorem globalRows_of_sizeData {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (Sz : SizesAt L) (h2 : 2 ≤ XX L)
-    (h3 : 5 / szTh L ≤ XX L) (CD : ℝ) (h0 : 0 < CD) (hC : CD ≤ P.CCount) :
-    Glob0 D L.sc.x L.sc.eps CD (P.CYL + 1) := by
+theorem globalRows_of_sizeData
+    {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (Sz : SizesAt L) (h2 : 2 ≤ XX L)
+    (h3 : 5 / szTh L ≤ XX L)
+    (CD : ℝ) (h0 : 0 < CD) (hC : CD ≤ P.CCount)
+    : Glob0 D L.sc.x L.sc.eps CD (P.CYL + 1) := by
   obtain ⟨SzN, SzM, SzK, SzKR, -, -, SzQ, -, -, -, -, -, -, -, SzNo, -, SzD, -⟩ := Sz
   have hx1 := L.sc.one_lt_alt
   have hx : 0 < L.sc.x := by linarith
@@ -195,25 +198,46 @@ theorem globalRows_of_sizeData {D : D7} (L : SizeData₂ D) (P : ParameterChoice
   have hk := D.R.m_add_three_le_k
   have hm := D.R.two_le_m
   have hS := Sc_eq' L
-  refine ⟨⟨?_, ?_, ?_, ?_, ?_, Real.log_le_log (by norm_num) (two_le_rd _), logrd_le L SzN SzQ h2 h3, count_power_le_discriminant L P CD h0 hC, ?_⟩,
-    type_prime_size_bounds L P, fun τ j h => ?_, fun τ i => ?_, fun τ ht => ?_, two_le_rd _⟩
+  refine ⟨
+    ⟨
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      Real.log_le_log (by norm_num) (two_le_rd _),
+      logrd_le L SzN SzQ h2 h3,
+      count_power_le_discriminant L P CD h0 hC,
+      ?_
+    ⟩,
+    type_prime_size_bounds L P,
+    fun τ j h => ?_,
+    fun τ i => ?_,
+    fun τ ht => ?_,
+    two_le_rd _
+  ⟩
   · have a := SzM.1
     rw [sqrt_xd L, ← Real.rpow_add hx] at a
     refine le_trans (Real.rpow_le_rpow_of_exponent_le hx1.le ?_) a
-    unfold szTh; linarith
+    unfold szTh
+    linarith
   · exact_mod_cast hyp3 L SzN SzM
   · exact_mod_cast D.R.f_le_k
   · have a := SzKR.1
-    have b : L.sc.x ^ (L.sc.eps / 2) ≤ L.sc.x ^ L.sc.eps := Real.rpow_le_rpow_of_exponent_le hx1.le (by linarith)
+    have b : L.sc.x ^ (L.sc.eps / 2) ≤ L.sc.x ^ L.sc.eps :=
+      Real.rpow_le_rpow_of_exponent_le hx1.le (by linarith)
     have c : 1 ≤ L.sc.x ^ szTh L := (one_lt_XX L).le
     have e : L.sc.L = L.sc.x ^ L.sc.eps := rfl
     rw [e] at a
     refine le_trans ?_ a
-    calc _ = 1 * (D.R.m : ℝ) ^ 5 * D.R.f * L.sc.x ^ L.sc.eps * L.sc.x ^ (L.sc.eps / 2) := by ring
+    calc
+      _ = 1 * (D.R.m : ℝ) ^ 5 * D.R.f * L.sc.x ^ L.sc.eps * L.sc.x ^ (L.sc.eps / 2) := by ring
       _ ≤ _ := by gcongr
   · refine SzK.2.trans (Real.rpow_le_rpow_of_exponent_le hx1.le ?_)
-    unfold szTh; linarith
-  · have b : L.sc.x ^ (L.sc.eps / 4) ≤ L.sc.x ^ (L.sc.eps / 2) := Real.rpow_le_rpow_of_exponent_le hx1.le (by linarith)
+    unfold szTh
+    linarith
+  · have b : L.sc.x ^ (L.sc.eps / 4) ≤ L.sc.x ^ (L.sc.eps / 2) :=
+      Real.rpow_le_rpow_of_exponent_le hx1.le (by linarith)
     have c : 0 ≤ L.sc.x ^ (L.sc.eps / 4) := by positivity
     linarith [P.logDel]
   · exact le_trans SzNo.2.2.1 (P.nodes_gap τ j h).1
@@ -225,8 +249,9 @@ theorem globalRows_of_sizeData {D : D7} (L : SizeData₂ D) (P : ParameterChoice
     push_cast at a b
     unfold uFirst vFirst uLast vLast
     refine ⟨by linarith, by linarith, ?_⟩
-    rw [c]; push_cast; ring
-
+    rw [c]
+    push_cast
+    ring
 
 end GlobalTheory.Diag.PG.Model0
 

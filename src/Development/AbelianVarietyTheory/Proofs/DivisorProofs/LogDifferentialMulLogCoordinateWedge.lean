@@ -8,9 +8,11 @@ open GlobalTheory GlobalTheory.LogDR
 
 namespace GlobalTheory.LogDR.WedgeMul
 
-theorem prod_perm_sign {A : Type} [Ring A] {α : Type} (f : α → A)
-    (hf : ∀ a b, f a * f b = -(f b * f a)) {l₁ l₂ : List α} (h : l₁.Perm l₂) :
-    ∃ ε : ℤ, (ε = 1 ∨ ε = -1) ∧ (l₁.map f).prod = ε • (l₂.map f).prod := by
+theorem prod_perm_sign
+    {A : Type} [Ring A]
+    {α : Type} (f : α → A) (hf : ∀ a b, f a * f b = -(f b * f a))
+    {l₁ l₂ : List α} (h : l₁.Perm l₂)
+    : ∃ ε : ℤ, (ε = 1 ∨ ε = -1) ∧ (l₁.map f).prod = ε • (l₂.map f).prod := by
   induction h with
   | nil => exact ⟨1, Or.inl rfl, by simp⟩
   | cons x _ ih =>
@@ -27,9 +29,14 @@ theorem prod_perm_sign {A : Type} [Ring A] {α : Type} (f : α → A)
 
 end GlobalTheory.LogDR.WedgeMul
 
-
 open GlobalTheory.LogDR.WedgeMul in
-theorem GlobalTheory.LogDR.dlog_mul_logWedge : ∀ (K : Type) [Field K] (n : ℕ) (x : Fin n → Kˣ) (i : Fin n) (I : Finset (Fin n)), (i ∈ I → ExteriorAlgebra.ι K (dlog (x i)) * logWedge x I = 0) ∧ (i ∉ I → ∃ ε : ℤ, (ε = 1 ∨ ε = -1) ∧ ExteriorAlgebra.ι K (dlog (x i)) * logWedge x I = ε • logWedge x (insert i I)) := by
+theorem GlobalTheory.LogDR.dlog_mul_logWedge
+    : ∀ (K : Type) [Field K] (n : ℕ) (x : Fin n → Kˣ) (i : Fin n) (I : Finset (Fin n)),
+      (i ∈ I → ExteriorAlgebra.ι K (dlog (x i)) * logWedge x I = 0)
+        ∧ (i ∉ I
+          → ∃ ε : ℤ,
+            (ε = 1 ∨ ε = -1)
+              ∧ ExteriorAlgebra.ι K (dlog (x i)) * logWedge x I = ε • logWedge x (insert i I)) := by
   intro K _ n x i I
   set f : Fin n → abelian₂ K := fun j => ExteriorAlgebra.ι K (dlog (x j)) with hfdef
   have hf : ∀ a b, f a * f b = -(f b * f a) := fun a b =>

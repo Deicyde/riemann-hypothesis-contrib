@@ -6,11 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.pair_mf :
-    ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] {r : Resid F O n} {B : Type} [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B), PhiCond F.G₀ l → Finite (ResidueField B) ∧ (l : B) ∈ maximalIdeal B ∧ ∃ (h : ℕ) (χ : Fin n → F.G₀ →* (ResidueField B)ˣ), u.D.map (residue B) = GDet.ofChars χ ∧ MultFree χ h := by
+theorem UpperTheory.V.Pa.pair_mf
+    : ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {O : Type} [CommRing O] [IsDomain O]
+        [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] {r : Resid F O n} {B : Type}
+        [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B),
+      PhiCond F.G₀ l
+        → Finite (ResidueField B) ∧ (l : B) ∈ maximalIdeal B
+          ∧ ∃ (h : ℕ) (χ : Fin n → F.G₀ →* (ResidueField B)ˣ),
+            u.D.map (residue B) = GDet.ofChars χ ∧ MultFree χ h := by
   intro l _ F n O _ _ _ hc _ r B _ _ _ u hΦ
   haveI := hc.finite
   haveI := hc.char
@@ -38,6 +45,8 @@ theorem UpperTheory.V.Pa.pair_mf :
     unfold GDet.ofChars
     congr 1
     refine MonoidHom.ext fun g => ?_
-    change (Matrix.diagonal fun i => ((r.chib i g : (ResidueField O)ˣ) : ResidueField O)).map e.toRingHom = _
+    change (Matrix.diagonal fun i => ((r.chib i g : (ResidueField O)ˣ) : ResidueField O)).map
+        e.toRingHom
+      = _
     rw [Matrix.diagonal_map (map_zero _)]
     rfl

@@ -17,8 +17,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SmoothOfRelat
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -50,13 +52,14 @@ theorem base_rho (l : Level H) : (((baseKA l).ρ : KA l) : ℂ) = H.rt0 := rfl
 
 theorem base_zeta (l : Level H) : (((baseKA l).ζ : KA l) : ℂ) = zeta l.A := rfl
 
-theorem exists_inclusion' {F F' : IntermediateField ℚ ℂ} (h : F ≤ F') :
-    ∃ j : F →+* F', ∀ x, ((j x : F') : ℂ) = ((x : F) : ℂ) :=
+theorem exists_inclusion' {F F' : IntermediateField ℚ ℂ} (h : F ≤ F')
+    : ∃ j : F →+* F', ∀ x, ((j x : F') : ℂ) = ((x : F) : ℂ) :=
   ⟨(IntermediateField.inclusion h).toRingHom, fun x => IntermediateField.coe_inclusion h x⟩
 
-theorem exists_inclusion {l l₂ : Level H} (h : l.A ∣ l₂.A) :
-    ∃ j : KA l →+* KA l₂, (∀ x, ((j x : KA l₂) : ℂ) = ((x : KA l) : ℂ)) ∧ j (baseKA l).ρ = (baseKA l₂).ρ ∧
-      j (baseKA l).ζ = (baseKA l₂).ζ ^ (l₂.A / l.A) := by
+theorem exists_inclusion {l l₂ : Level H} (h : l.A ∣ l₂.A)
+    : ∃ j : KA l →+* KA l₂,
+      (∀ x, ((j x : KA l₂) : ℂ) = ((x : KA l) : ℂ)) ∧ j (baseKA l).ρ = (baseKA l₂).ρ
+        ∧ j (baseKA l).ζ = (baseKA l₂).ζ ^ (l₂.A / l.A) := by
   obtain ⟨j, hj⟩ := exists_inclusion' (KA_le h)
   refine ⟨j, hj, Subtype.ext ?_, Subtype.ext ?_⟩
   · rw [hj, base_rho, base_rho]
@@ -73,13 +76,17 @@ theorem finiteDimensional_KA (l : Level H) : FiniteDimensional ℚ (KA l) := by
     rw [show zeta l.A ^ l.A = 1 from (Complex.isPrimitiveRoot_exp l.A l.A_pos.ne').pow_eq_one]
     exact isIntegral_one
 
-theorem finite_of_numberField {K K' : Type} [Field K] [Field K'] [CharZero K] [CharZero K']
-    [FiniteDimensional ℚ K'] (j : K →+* K') : j.Finite := by
+theorem finite_of_numberField
+    {K K' : Type} [Field K] [Field K'] [CharZero K] [CharZero K'] [FiniteDimensional ℚ K']
+    (j : K →+* K')
+    : j.Finite := by
   letI := j.toAlgebra
   exact Module.Finite.of_restrictScalars_finite ℚ K K'
 
-theorem etale_of_numberField {K K' : Type} [Field K] [Field K'] [CharZero K] [CharZero K']
-    [FiniteDimensional ℚ K'] (j : K →+* K') : Etale (spMap j) := by
+theorem etale_of_numberField
+    {K K' : Type} [Field K] [Field K'] [CharZero K] [CharZero K'] [FiniteDimensional ℚ K']
+    (j : K →+* K')
+    : Etale (spMap j) := by
   letI := j.toAlgebra
   haveI : Module.Finite K K' := finite_of_numberField j
   haveI : Algebra.FormallyEtale K K' := Algebra.FormallyEtale.of_isSeparable K K'
@@ -93,7 +100,13 @@ namespace GlobalTheory
 
 open LevelTower
 
-theorem nonempty_levelQuot : Out.Laws → Out.Laws2 → (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left), M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen) → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l l₂ : Level H) (Xo₂ : Moduli D l₂), 1 ≤ D.p + D.q → l.Dvd l₂ → Nonempty (LevelQuot l Xo₂) := by
+theorem nonempty_levelQuot
+    : Out.Laws → Out.Laws2
+      → (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left),
+        M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen)
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
+          (l l₂ : Level H) (Xo₂ : Moduli D l₂),
+        1 ≤ D.p + D.q → l.Dvd l₂ → Nonempty (LevelQuot l Xo₂) := by
   intro hL hL2 hTh E _ _ _ H D l l₂ Xo₂ hpq hdvd
   have hA : l.A ∣ l₂.A := hdvd.2.2
   obtain ⟨jK, hj, hjρ, hjζ⟩ := exists_inclusion hA
@@ -105,7 +118,9 @@ theorem nonempty_levelQuot : Out.Laws → Out.Laws2 → (∀ (S : Scheme.{0}) (P
       (finite_of_numberField jK) Xo₂.qproj
   obtain ⟨Y, π, sY, hπ, hG, hsep, hft, -⟩ :=
     exists_isGaloisCover_of_isQProjOver (KA l) Xo₂.X (Xo₂.s ≫ spMap jK) Ga ρ hq h1 hmul hover hfree
-  have hqY : IsQProjOver sY := GlobalTheory.T.isQProjOver_target_of_isGaloisCover (KA l) _ Y π sY Ga ρ hG hsep hft (by rw [hπ]; exact hq)
+  have hqY : IsQProjOver sY :=
+    GlobalTheory.T.isQProjOver_target_of_isGaloisCover (KA l) _ Y π sY Ga ρ hG hsep hft
+      (by rw [hπ]; exact hq)
   have hsm : SmoothOfRelativeDimension D.dim (π ≫ sY) := by
     rw [hπ]
     haveI := Xo₂.smooth
@@ -113,13 +128,19 @@ theorem nonempty_levelQuot : Out.Laws → Out.Laws2 → (∀ (S : Scheme.{0}) (P
     haveI : SmoothOfRelativeDimension 0 (spMap jK) := inferInstance
     have := smoothOfRelativeDimension_comp D.dim 0 Xo₂.s (spMap jK)
     rwa [Nat.add_zero] at this
-  have hsY : SmoothOfRelativeDimension D.dim sY := GlobalTheory.T.smoothOfRelativeDimension_descends_etale_cover (KA l) _ Y π sY _ hG.etale hG.onto hft hsm
-  obtain ⟨t', m, hνm, hp, ha, hk⟩ := GlobalTheory.T.exists_abelianTriple_descent_galoisCover hL hL2 hTh E H (KA l) _ Y π sY Ga ρ Xo₂.univ.t _ ν hG hqY
-    Xo₂.univ.proper (obj_isAbelianScheme_dim_rigidified_sym E H D l₂ _ _ _ _ Xo₂.univ).2.1
-    Xo₂.univ.ample Xo₂.univ.ktriv hν1 hνmul
-  obtain ⟨ob, m', hη, hηA⟩ := obj_descend_lower_level hL hL2 E H D l l₂ _ _ (baseKA l) (baseKA l₂) jK _ Y π sY
-    Xo₂.s Ga ρ Xo₂.univ (fun a => (ν a).φ) t' m hdvd hjρ hjζ
-    hπ hG hνm hlow hp ha hk
+  have hsY : SmoothOfRelativeDimension D.dim sY :=
+    GlobalTheory.T.smoothOfRelativeDimension_descends_etale_cover (KA l) _ Y π sY _ hG.etale hG.onto
+      hft hsm
+  obtain ⟨t', m, hνm, hp, ha, hk⟩ :=
+    GlobalTheory.T.exists_abelianTriple_descent_galoisCover hL hL2 hTh E H (KA l) _ Y π sY Ga ρ
+      Xo₂.univ.t _ ν hG hqY Xo₂.univ.proper
+      (obj_isAbelianScheme_dim_rigidified_sym E H D l₂ _ _ _ _ Xo₂.univ).2.1 Xo₂.univ.ample
+      Xo₂.univ.ktriv hν1 hνmul
+  obtain ⟨ob, m', hη, hηA⟩ :=
+    obj_descend_lower_level hL hL2 E H D l l₂ _ _ (baseKA l) (baseKA l₂) jK _ Y π sY Xo₂.s Ga ρ
+      Xo₂.univ
+      (fun a => (ν a).φ)
+      t' m hdvd hjρ hjζ hπ hG hνm hlow hp ha hk
   refine ⟨⟨Y, sY, hqY, hsY, ob, π, jK, hj, hπ, hG.fin, hG.etale, hG.onto, m', hη, hηA, ?_⟩⟩
   intro K _ _ y y' t mu mu' eM eA h₀ h₁ h₂
   obtain ⟨a, rfl⟩ := htrans K y y' t mu mu' eM eA h₀ h₁ h₂

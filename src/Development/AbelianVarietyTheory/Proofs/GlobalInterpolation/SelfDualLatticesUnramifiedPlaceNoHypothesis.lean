@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 namespace GlobalTheory.UnramSelfDualClosed
 
-theorem selfDualLatticeLemmas : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeActions.SelfDualLatticeLemmas :=
-  GlobalTheory.SelfDualLatticeCompare.selfDualLattices_iff.1 GlobalTheory.UnramSelfDual.selfDualLattices
+theorem selfDualLatticeLemmas
+    : GlobalTheory.IndefiniteRowSideFullHecke.SelfDualLatticeActions.SelfDualLatticeLemmas :=
+  GlobalTheory.SelfDualLatticeCompare.selfDualLattices_iff.1
+    GlobalTheory.UnramSelfDual.selfDualLattices
 
 end GlobalTheory.UnramSelfDualClosed

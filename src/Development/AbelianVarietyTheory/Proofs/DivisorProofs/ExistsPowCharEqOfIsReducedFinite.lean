@@ -6,9 +6,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.WittOnFalse
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
-theorem GlobalTheory.exists_pow_char_eq_of_isReduced_finite : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (A : Type) [CommRing A] [Algebra k A] [Module.Finite k A] [IsReduced A], ∀ a : A, ∃ b : A, a = b ^ p := by
+theorem GlobalTheory.exists_pow_char_eq_of_isReduced_finite
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (A : Type)
+        [CommRing A] [Algebra k A] [Module.Finite k A] [IsReduced A],
+      ∀ a : A, ∃ b : A,
+        a = b ^ p := by
   intro p _ k _ _ _ A _ _ _ _ a
   haveI : IsArtinianRing A := IsArtinianRing.of_finite k A
   haveI : PerfectField k := PerfectRing.toPerfectField k p

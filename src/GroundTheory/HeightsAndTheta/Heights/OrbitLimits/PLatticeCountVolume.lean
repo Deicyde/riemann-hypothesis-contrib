@@ -16,23 +16,25 @@ noncomputable section
 
 namespace LatticeCountVolume
 
-theorem measure_le_encard_mul {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] (μ : Measure E)
-    [μ.IsAddHaarMeasure] (La : Submodule ℤ E) [DiscreteTopology La] [IsZLattice ℝ La]
-    (S T : Set E) (hS : MeasurableSet S) (hST : ∀ x ∈ S, ∀ y ∈ S, x - y ∈ T) {F : Set E}
-    (fund : IsAddFundamentalDomain La F μ) :
-    μ S ≤ (({x : E | x ∈ La ∧ x ∈ T}.encard : ℕ∞) : ℝ≥0∞) * μ F := by
+theorem measure_le_encard_mul
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (La : Submodule ℤ E) [DiscreteTopology La] [IsZLattice ℝ La]
+    (S T : Set E) (hS : MeasurableSet S) (hST : ∀ x ∈ S, ∀ y ∈ S, x - y ∈ T)
+    {F : Set E} (fund : IsAddFundamentalDomain La F μ)
+    : μ S ≤ (({x : E | x ∈ La ∧ x ∈ T}.encard : ℕ∞) : ℝ≥0∞) * μ F := by
   have : MeasurableVAdd La E := (inferInstance : MeasurableVAdd La.toAddSubgroup E)
-  have : VAddInvariantMeasure La E μ :=
-    (inferInstance : VAddInvariantMeasure La.toAddSubgroup E μ)
+  have : VAddInvariantMeasure La E μ := (inferInstance : VAddInvariantMeasure La.toAddSubgroup E μ)
   have : Countable La := inferInstance
   set A := {x : E | x ∈ La ∧ x ∈ T} with hAdef
-  have key : ∀ y : E, ∑' g : La, S.indicator (1 : E → ℝ≥0∞) (g +ᵥ y) ≤
-      ((A.encard : ℕ∞) : ℝ≥0∞) := by
+  have key
+      : ∀ y : E, ∑' g : La, S.indicator (1 : E → ℝ≥0∞) (g +ᵥ y) ≤ ((A.encard : ℕ∞) : ℝ≥0∞) := by
     intro y
     set U : Set La := {g | (g : E) + y ∈ S} with hUdef
-    have h1 : ∑' g : La, S.indicator (1 : E → ℝ≥0∞) (g +ᵥ y) =
-        ∑' g : La, U.indicator (1 : La → ℝ≥0∞) g := by
+    have h1
+        : ∑' g : La, S.indicator (1 : E → ℝ≥0∞) (g +ᵥ y)
+          = ∑' g : La, U.indicator (1 : La → ℝ≥0∞) g := by
       congr 1
     rw [h1, ← tsum_subtype]
     simp only [Pi.one_apply]
@@ -49,14 +51,15 @@ theorem measure_le_encard_mul {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ
       exact hST _ hg _ hg₀
     · intro g _ g' _ h
       exact Subtype.ext (sub_left_injective h)
-  calc μ S = ∫⁻ z, S.indicator 1 z ∂μ := (lintegral_indicator_one hS).symm
+  calc
+    μ S
+      = ∫⁻ z, S.indicator 1 z ∂μ := (lintegral_indicator_one hS).symm
     _ = ∑' g : La, ∫⁻ z in F, S.indicator 1 (g +ᵥ z) ∂μ := fund.lintegral_eq_tsum'' _
     _ = ∫⁻ z in F, ∑' g : La, S.indicator 1 (g +ᵥ z) ∂μ :=
-        (lintegral_tsum fun g => ((measurable_one.indicator hS).comp
-          (measurable_const_vadd g)).aemeasurable).symm
+      (lintegral_tsum fun g =>
+        ((measurable_one.indicator hS).comp (measurable_const_vadd g)).aemeasurable).symm
     _ ≤ ∫⁻ _ in F, ((A.encard : ℕ∞) : ℝ≥0∞) ∂μ := lintegral_mono fun z => key z
     _ = ((A.encard : ℕ∞) : ℝ≥0∞) * μ F := setLIntegral_const _ _
-
 
 open scoped Classical in
 theorem proof : LatticeCountVolume.Statement := by

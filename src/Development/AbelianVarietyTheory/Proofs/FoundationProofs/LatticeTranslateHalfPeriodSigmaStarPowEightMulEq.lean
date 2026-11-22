@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Weierstr
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 
 noncomputable section
@@ -20,8 +22,13 @@ namespace GlobalTheory.HalfPeriodValue
 
 open Filter Topology
 
-theorem U1_sgStar_pow_eight : ∀ Λ : AddSubgroup ℂ, IsLat Λ → ∀ t : ℂ, t ∉ Λ → 2 * t ∈ Λ →
-    U1 Λ t (sgStar Λ) 0 ^ 8 * ((wpF Λ t ^ 2 + g2 Λ / 4) ^ 2 + 2 * g3 Λ * wpF Λ t) = 1 := by
+theorem U1_sgStar_pow_eight
+    : ∀ Λ : AddSubgroup ℂ,
+      IsLat Λ
+        → ∀ t : ℂ,
+          t ∉ Λ → 2 * t ∈ Λ
+            → U1 Λ t (sgStar Λ) 0 ^ 8 * ((wpF Λ t ^ 2 + g2 Λ / 4) ^ 2 + 2 * g3 Λ * wpF Λ t)
+              = 1 := by
   intro Λ hΛ t ht h2t
   obtain ⟨L, hL⟩ := GlobalTheory.OddTheta.exists_periodPair Λ hΛ
   have laws := GlobalTheory.OddTheta.sgStar_laws Λ hΛ
@@ -37,40 +44,59 @@ theorem U1_sgStar_pow_eight : ∀ Λ : AddSubgroup ℂ, IsLat Λ → ∀ t : ℂ
     have := (hd (2 * t)).hasDerivAt.comp t ((hasDerivAt_id t).const_mul (2 : ℂ))
     rw [mul_one] at this
     exact this
-  have hB : HasDerivAt (fun z => -(L.derivWeierstrassP z) * sgStar Λ z ^ 4)
-      (-(6 * L.weierstrassP t ^ 2 - L.g₂ / 2) * sgStar Λ t ^ 4 +
-        -(L.derivWeierstrassP t) * ((4 : ℕ) * sgStar Λ t ^ (4 - 1) * deriv (sgStar Λ) t)) t :=
+  have hB : HasDerivAt
+      (fun z => -(L.derivWeierstrassP z) * sgStar Λ z ^ 4)
+      (-(6 * L.weierstrassP t ^ 2 - L.g₂ / 2) * sgStar Λ t ^ 4
+        + -(L.derivWeierstrassP t) * ((4 : ℕ) * sgStar Λ t ^ (4 - 1) * deriv (sgStar Λ) t))
+      t :=
     (GlobalTheory.hasDerivAt_derivWeierstrassP L htL).neg.mul ((hd t).hasDerivAt.pow 4)
-  have hev : (fun z => sgStar Λ (2 * z)) =ᶠ[𝓝 t] (fun z => -(L.derivWeierstrassP z) * sgStar Λ z ^ 4) := by
-    filter_upwards [L.isClosed_lattice.isOpen_compl.mem_nhds htL] with z hz
-    have hz' : z ∉ Λ := fun h => hz ((hL z).1 h)
-    rw [GlobalTheory.SigmaDuplication.sgStar_two_mul hΛ hz', GlobalTheory.LatticeInvariants.wpD_eq hL z]
+  have hev
+      : (fun z => sgStar Λ (2 * z)) =ᶠ[𝓝 t] (fun z => -(L.derivWeierstrassP z) * sgStar Λ z ^ 4) :=
+    by
+      filter_upwards [L.isClosed_lattice.isOpen_compl.mem_nhds htL] with z hz
+      have hz' : z ∉ Λ := fun h => hz ((hL z).1 h)
+      rw [GlobalTheory.SigmaDuplication.sgStar_two_mul hΛ hz',
+        GlobalTheory.LatticeInvariants.wpD_eq hL z]
   have hu := hA.unique (hB.congr_of_eventuallyEq hev)
   rw [hD0] at hu
 
   set s : ℂ := if 2 * t / 2 ∈ Λ then 1 else -1 with hs
   have hfun : U1 Λ (2 * t) (sgStar Λ) = fun z => s * sgStar Λ z := funext (hΛ.sg_law h2t)
-  have hE : Differentiable ℂ (fun z : ℂ => Complex.exp (-(Real.pi : ℂ) * z * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ) -
-      (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ)))) := by fun_prop
+  have hE : Differentiable ℂ (fun z : ℂ =>
+      Complex.exp
+        (-(Real.pi : ℂ) * z * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ)
+          - (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ)))) := by
+    fun_prop
   have hC : HasDerivAt (U1 Λ (2 * t) (sgStar Λ))
-      (deriv (sgStar Λ) (0 + 2 * t) * Complex.exp (-(Real.pi : ℂ) * 0 * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ) -
-      (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ))) +
-        sgStar Λ (0 + 2 * t) * deriv (fun z : ℂ => Complex.exp (-(Real.pi : ℂ) * z * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ) -
-      (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ)))) 0) 0 :=
+      (deriv (sgStar Λ) (0 + 2 * t) * Complex.exp
+          (-(Real.pi : ℂ) * 0 * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ)
+            - (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ)))
+        + sgStar Λ (0 + 2 * t) * deriv
+          (fun z : ℂ =>
+            Complex.exp
+              (-(Real.pi : ℂ) * z * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ)
+                - (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ))))
+          0)
+      0 :=
     ((hd _).hasDerivAt.comp_add_const 0 (2 * t)).mul (hE 0).hasDerivAt
   have hC' : HasDerivAt (U1 Λ (2 * t) (sgStar Λ)) (s * 1) 0 := by
     rw [hfun, ← hd0]; exact (hd 0).hasDerivAt.const_mul s
   have hv := hC.unique hC'
   rw [zero_add, hzw] at hv
   have hs2 : s ^ 2 = 1 := by rw [hs]; split_ifs <;> norm_num
-  have hU : U1 Λ t (sgStar Λ) 0 = sgStar Λ t * Complex.exp (-(Real.pi : ℂ) * t * (starRingEnd ℂ) t / (2 * (area Λ : ℂ))) := by
+  have hU
+      : U1 Λ t (sgStar Λ) 0
+        = sgStar Λ t
+          * Complex.exp (-(Real.pi : ℂ) * t * (starRingEnd ℂ) t / (2 * (area Λ : ℂ))) := by
     simp only [U1, zero_add]
     congr 1
     congr 1
     ring
-  have hexp : Complex.exp (-(Real.pi : ℂ) * 0 * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ) -
-      (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ))) =
-      Complex.exp (-(Real.pi : ℂ) * t * (starRingEnd ℂ) t / (2 * (area Λ : ℂ))) ^ 4 := by
+  have hexp
+      : Complex.exp
+          (-(Real.pi : ℂ) * 0 * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ)
+            - (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ)))
+        = Complex.exp (-(Real.pi : ℂ) * t * (starRingEnd ℂ) t / (2 * (area Λ : ℂ))) ^ 4 := by
     rw [← Complex.exp_nat_mul, map_mul, map_ofNat]
     congr 1
     push_cast

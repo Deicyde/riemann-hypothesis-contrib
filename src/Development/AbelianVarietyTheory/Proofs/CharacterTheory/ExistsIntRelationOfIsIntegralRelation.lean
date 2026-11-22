@@ -10,21 +10,23 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-theorem exists_int_eq_of_isIntegral_of_mul_eq_int {x : ℂ} (hx : IsIntegral ℤ x) {n k : ℤ}
-    (hn : n ≠ 0) (h : (n : ℂ) * x = k) : ∃ j : ℤ, (j : ℂ) = x := by
+theorem exists_int_eq_of_isIntegral_of_mul_eq_int
+    {x : ℂ} (hx : IsIntegral ℤ x) {n k : ℤ} (hn : n ≠ 0) (h : (n : ℂ) * x = k)
+    : ∃ j : ℤ, (j : ℂ) = x := by
   have hn' : (n : ℂ) ≠ 0 := by exact_mod_cast hn
   have hq : x = algebraMap ℚ ℂ ((k : ℚ) / n) := by
     simp only [eq_ratCast, Rat.cast_div, Rat.cast_intCast]
     rw [eq_div_iff hn', mul_comm, h]
-  rw [hq, isIntegral_algebraMap_iff ] at hx
+  rw [hq, isIntegral_algebraMap_iff] at hx
   obtain ⟨j, hj⟩ := IsIntegrallyClosed.isIntegral_iff.mp hx
   refine ⟨j, ?_⟩
   rw [hq, ← hj]
   simp
 
-theorem exists_int_retraction_of_isIntegral :
-    ∀ (ι : Type) [Fintype ι] (r : ι → ℂ), (∀ i, IsIntegral ℤ (r i)) →
-      ∃ c : ι → ℤ, ∀ (m : ι → ℤ) (d : ℤ), ∑ i, r i * (m i : ℂ) = d → ∑ i, c i * m i = d := by
+theorem exists_int_retraction_of_isIntegral
+    : ∀ (ι : Type) [Fintype ι] (r : ι → ℂ),
+      (∀ i, IsIntegral ℤ (r i))
+        → ∃ c : ι → ℤ, ∀ (m : ι → ℤ) (d : ℤ), ∑ i, r i * (m i : ℂ) = d → ∑ i, c i * m i = d := by
   intro ι _ r hr
   classical
   let f : (ι → ℤ) →ₗ[ℤ] ℂ := Fintype.linearCombination ℤ r
@@ -63,8 +65,7 @@ theorem exists_int_retraction_of_isIntegral :
       sub_self]
   have hp' : ∀ m ∈ K, p m = m := by
     intro m hm
-    have : K.mkQ m = 0 := by
-      rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]; exact hm
+    have : K.mkQ m = 0 := by rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]; exact hm
     simp only [p, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.id_apply, this, map_zero,
       sub_zero]
   choose c hc using fun i : ι => (hK _).mp (hp (Pi.single i 1))

@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UNInjective
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -13,9 +14,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.HintLevel
 
-theorem finsum_out_of_le {H : Type} [Group H] {L S : Subgroup H} (u : H → ℂ) (hLS : L ≤ S)
-    (hS : S ≤ rStab u) (hm : L.relIndex S ≠ 0) :
-    ∑ᶠ q : H ⧸ L, u q.out = ((L.relIndex S : ℕ) : ℂ) * ∑ᶠ c : H ⧸ S, u c.out := by
+theorem finsum_out_of_le
+    {H : Type} [Group H]
+    {L S : Subgroup H}
+    (u : H → ℂ)
+    (hLS : L ≤ S) (hS : S ≤ rStab u) (hm : L.relIndex S ≠ 0)
+    : ∑ᶠ q : H ⧸ L, u q.out = ((L.relIndex S : ℕ) : ℂ) * ∑ᶠ c : H ⧸ S, u c.out := by
   have hm' : Nat.card (S ⧸ L.subgroupOf S) ≠ 0 := hm
   haveI : Finite (S ⧸ L.subgroupOf S) := Nat.finite_of_card_ne_zero hm'
   let e := Subgroup.quotientEquivProdOfLE hLS
@@ -32,8 +36,7 @@ theorem finsum_out_of_le {H : Type} [Group H] {L S : Subgroup H} (u : H → ℂ)
       QuotientGroup.eq.1 (QuotientGroup.out_eq' ((q.out : H) : H ⧸ S))
     have := hS hk (((q.out : H) : H ⧸ S).out)
     simpa using this
-  have hcomp : ∑ᶠ q : H ⧸ L, u q.out =
-      ∑ᶠ p : (H ⧸ S) × (S ⧸ L.subgroupOf S), u p.1.out := by
+  have hcomp : ∑ᶠ q : H ⧸ L, u q.out = ∑ᶠ p : (H ⧸ S) × (S ⧸ L.subgroupOf S), u p.1.out := by
     rw [← finsum_comp_equiv e]
     exact finsum_congr hg
   rw [hcomp]
@@ -43,7 +46,8 @@ theorem finsum_out_of_le {H : Type} [Group H] {L S : Subgroup H} (u : H → ℂ)
       intro p hp
       exact ⟨hp, Set.mem_univ _⟩
     rw [finsum_curry _ hsupp]
-    have hin : ∀ c : H ⧸ S, ∑ᶠ _ : S ⧸ L.subgroupOf S, u c.out = ((L.relIndex S : ℕ) : ℂ) * u c.out := by
+    have hin
+        : ∀ c : H ⧸ S, ∑ᶠ _ : S ⧸ L.subgroupOf S, u c.out = ((L.relIndex S : ℕ) : ℂ) * u c.out := by
       intro c
       haveI := Fintype.ofFinite (S ⧸ L.subgroupOf S)
       rw [finsum_eq_sum_of_fintype, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
@@ -58,8 +62,10 @@ theorem finsum_out_of_le {H : Type} [Group H] {L S : Subgroup H} (u : H → ℂ)
     intro c hc
     exact ⟨(c, ((1 : S) : S ⧸ L.subgroupOf S)), hc, rfl⟩
 
-theorem hint_eq_level : ∀ (H : Type) [Group H] (K L : Subgroup H) (u : H → ℂ), L ≤ K → L ≤ rStab u →
-    L.relIndex K ≠ 0 → hint K u = ((L.relIndex K : ℕ) : ℂ)⁻¹ * ∑ᶠ q : H ⧸ L, u q.out := by
+theorem hint_eq_level
+    : ∀ (H : Type) [Group H] (K L : Subgroup H) (u : H → ℂ),
+      L ≤ K → L ≤ rStab u → L.relIndex K ≠ 0
+        → hint K u = ((L.relIndex K : ℕ) : ℂ)⁻¹ * ∑ᶠ q : H ⧸ L, u q.out := by
   intro H _ K L u hLK hLu hfin
   have hLS : L ≤ rStab u ⊓ K := le_inf hLu hLK
   have hmul := Subgroup.relIndex_mul_relIndex L (rStab u ⊓ K) K hLS inf_le_right

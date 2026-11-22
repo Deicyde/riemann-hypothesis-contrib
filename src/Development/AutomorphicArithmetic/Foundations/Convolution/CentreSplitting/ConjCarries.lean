@@ -9,30 +9,41 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-private theorem map_closure {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H] [CompleteSpace H] (U : H →L[ℂ] H)
-    (hU : ∀ v, ‖U v‖ = ‖v‖) (A V : Submodule ℂ H) :
-    V = A.topologicalClosure ↔ V.map U.toLinearMap = (A.map U.toLinearMap).topologicalClosure := by
+private theorem map_closure
+    {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H] [CompleteSpace H]
+    (U : H →L[ℂ] H) (hU : ∀ v, ‖U v‖ = ‖v‖)
+    (A V : Submodule ℂ H)
+    : V = A.topologicalClosure
+      ↔ V.map U.toLinearMap = (A.map U.toLinearMap).topologicalClosure := by
   have hi : Isometry U := AddMonoidHomClass.isometry_of_norm U hU
-  have e : (A.map U.toLinearMap).topologicalClosure = A.topologicalClosure.map U.toLinearMap := SetLike.coe_injective (by
-    rw [Submodule.topologicalClosure_coe, Submodule.map_coe, Submodule.map_coe, Submodule.topologicalClosure_coe]
-    exact hi.isClosedEmbedding.closure_image_eq _)
+  have e : (A.map U.toLinearMap).topologicalClosure = A.topologicalClosure.map U.toLinearMap :=
+    SetLike.coe_injective (by
+      rw [Submodule.topologicalClosure_coe, Submodule.map_coe, Submodule.map_coe,
+        Submodule.topologicalClosure_coe]
+      exact hi.isClosedEmbedding.closure_image_eq _)
   rw [e]
   exact (Submodule.map_injective_of_injective (f := U.toLinearMap) hi.injective).eq_iff.symm
 
-theorem UpperTheory.ConvolutionTheory.Dp.conjCarries :
-    UpperTheory.ConvolutionTheory.Dp.ConjCarries := by
+theorem UpperTheory.ConvolutionTheory.Dp.conjCarries
+    : UpperTheory.ConvolutionTheory.Dp.ConjCarries := by
   intro E _ _ _ n μ _ θ σ s hs hθ π π' V' hsp
   set m : GA E n →* GA E n := Matrix.GeneralLinearGroup.map s.toRingHom with hm
-  have hsurj : Function.Surjective m := fun g => ⟨Matrix.GeneralLinearGroup.map s.symm.toRingHom g, by
-    ext i j : 2
-    exact s.apply_symm_apply _⟩
+  have hsurj : Function.Surjective m := fun g => ⟨
+    Matrix.GeneralLinearGroup.map s.symm.toRingHom g,
+    by
+      ext i j : 2
+      exact s.apply_symm_apply _
+  ⟩
   have hcen : ∀ t, m (centralSection E n t) = centralSection E n t := (galCentral E n σ s hs).2
-  have hmem : ∀ (ρ : CuspSub E n) (f : GA E n → ℂ), f ∈ (UpperTheory.CBC.Cusp.cx ρ).space ↔ ∃ φ ∈ Cm.carrier ρ, f = φ.1 := fun ρ f => by
+  have hmem
+      : ∀ (ρ : CuspSub E n) (f : GA E n → ℂ),
+        f ∈ (UpperTheory.CBC.Cusp.cx ρ).space ↔ ∃ φ ∈ Cm.carrier ρ, f = φ.1 := fun ρ f => by
     constructor
     · rintro ⟨φ, hφ, rfl⟩
       rw [← Cm.map_carrier] at hφ
@@ -67,7 +78,9 @@ theorem UpperTheory.ConvolutionTheory.Dp.conjCarries :
       exact h3
   rw [exSummand E n μ π' V', exSummand E n μ π, hc]
   refine and_congr_right fun h => ?_
-  have hU : ∀ φ ∈ Cm.carrier π, ∀ ψ ∈ Cm.carrier π', (∀ g, ψ.1 g = φ.1 (m g)) → θ.U (clsL μ ψ) = clsL μ φ := fun φ hφ ψ hψ e =>
+  have hU
+      : ∀ φ ∈ Cm.carrier π, ∀ ψ ∈ Cm.carrier π',
+        (∀ g, ψ.1 g = φ.1 (m g)) → θ.U (clsL μ ψ) = clsL μ φ := fun φ hφ ψ hψ e =>
     (twCls E n μ θ φ (h hφ) ψ (hc.2 h hψ)).2 fun x => (e x).trans (congrArg φ.1 (hθ x).symm)
   have e : (Cm.carrier π).map (clsL μ) = ((Cm.carrier π').map (clsL μ)).map θ.U.toLinearMap := by
     refine le_antisymm (Submodule.map_le_iff_le_comap.2 fun φ hφ => ?_)

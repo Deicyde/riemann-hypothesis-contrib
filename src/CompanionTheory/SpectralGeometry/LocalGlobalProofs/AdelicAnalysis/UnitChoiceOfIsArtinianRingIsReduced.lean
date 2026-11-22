@@ -8,13 +8,15 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW
 
-theorem unitChoice_of_isArtinianRing_isReduced :
-    ∀ (R : Type) [CommRing R] [IsArtinianRing R] [IsReduced R], PIW.AdelicOrbitU.UnitChoice R := by
+theorem unitChoice_of_isArtinianRing_isReduced
+    : ∀ (R : Type) [CommRing R] [IsArtinianRing R] [IsReduced R],
+      PIW.AdelicOrbitU.UnitChoice R := by
   intro R _ _ _ k f hf
   classical
   let φ := IsArtinianRing.equivPi R
@@ -54,14 +56,14 @@ theorem unitChoice_of_isArtinianRing_isReduced :
       funext I
       simp [Finset.sum_apply, E]
   set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← isUnit_map_iff φ, map_sum, Pi.isUnit_iff]
-      intro I
-      have hcomp : (∑ i, φ (φ.symm (E i) * f i)) I = φ (f (c I)) I := by
-        simp only [map_mul, AlgEquiv.apply_symm_apply, Finset.sum_apply, Pi.mul_apply, E, ite_mul,
-          one_mul, zero_mul, Fintype.sum_ite_eq]
-      rw [hcomp]
-      haveI : I.asIdeal.IsMaximal := I.isMaximal
-      letI := Ideal.Quotient.field I.asIdeal
-      exact isUnit_iff_ne_zero.2 (hc I)
+  · rw [← isUnit_map_iff φ, map_sum, Pi.isUnit_iff]
+    intro I
+    have hcomp : (∑ i, φ (φ.symm (E i) * f i)) I = φ (f (c I)) I := by
+      simp only [map_mul, AlgEquiv.apply_symm_apply, Finset.sum_apply, Pi.mul_apply, E, ite_mul,
+        one_mul, zero_mul, Fintype.sum_ite_eq]
+    rw [hcomp]
+    haveI : I.asIdeal.IsMaximal := I.isMaximal
+    letI := Ideal.Quotient.field I.asIdeal
+    exact isUnit_iff_ne_zero.2 (hc I)
 
 end GlobalTheory.CompanionTheory.SW

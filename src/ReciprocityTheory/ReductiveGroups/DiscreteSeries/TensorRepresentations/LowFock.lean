@@ -15,15 +15,21 @@ namespace ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ} {N : Type*} [AddCommGroup N] [Module ℂ N]
 
-theorem lowFock_exists (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End ℂ N} (hE : IsGlRep E)
-    {lam : Fin n → ℝ} (hlam : StrictAnti lam) {V : Submodule ℂ N} (hV : IsKIrrHW ε E (lowK ε lam) V) :
-    ∃ x ∈ tensFock (n := n) V, x ∈ physicalSubspace ε ∧ x ≠ 0 ∧
-      IsKHWVec ε (diagE ε (eT E) cpT cmT) (lam - rhoC ε + rhoHol ε) x := by
+theorem lowFock_exists
+    (ε : Fin n → Bool)
+    {E : Fin n → Fin n → Module.End ℂ N} (hE : IsGlRep E)
+    {lam : Fin n → ℝ} (hlam : StrictAnti lam)
+    {V : Submodule ℂ N} (hV : IsKIrrHW ε E (lowK ε lam) V)
+    : ∃ x ∈ tensFock (n := n) V,
+      x ∈ physicalSubspace ε ∧ x ≠ 0
+        ∧ IsKHWVec ε (diagE ε (eT E) cpT cmT) (lam - rhoC ε + rhoHol ε) x := by
   have hK : Formalism.REAL.KRel ε E := fun a b c d _ _ => hE a b c d
   set S0 := lowerWedgeAlt ε
-  have hw : ∀ a, (lfMat ε a a).mulVec (Pi.single S0 (1 : ℂ)) =
-      (((rhoHol ε - rhoN ε) a : ℝ) : ℂ) • Pi.single S0 1 :=
-    fun a => lfMat_mulVec_single ε a a S0 _ (lowerWedge_weight ε a)
+  have hw
+      : ∀ a,
+        (lfMat ε a a).mulVec (Pi.single S0 (1 : ℂ))
+          = (((rhoHol ε - rhoN ε) a : ℝ) : ℂ) • Pi.single S0 1 := fun a =>
+    lfMat_mulVec_single ε a a S0 _ (lowerWedge_weight ε a)
   have hl : ∀ a b, b < a → ε a = ε b → (lfMat ε a b).mulVec (Pi.single S0 (1 : ℂ)) = 0 := by
     intro a b hba he
     have h0 : sgE ε cpFock cmFock a b (fockBasis n S0.1) = (0 : ℂ) • fockBasis n S0.1 := by
@@ -34,8 +40,9 @@ theorem lowFock_exists (ε : Fin n → Bool) {E : Fin n → Fin n → Module.End
     have := congrFun h S0
     simp at this
   obtain ⟨x, hxV, hx0, hxw, hxh⟩ :=
-    HW.parthasarathy_tensor_matrix ε hK hV (lfMat_kRel ε) (fun a b h => lfMat_conjTranspose ε h) hne hw hl
-      (lf_dom hlam hK hV)
+    HW.parthasarathy_tensor_matrix ε hK hV (lfMat_kRel ε)
+      (fun a b h => lfMat_conjTranspose ε h)
+      hne hw hl (lf_dom hlam hK hV)
   have hwt : lowK ε lam + (rhoHol ε - rhoN ε) = lam - rhoC ε + rhoHol ε := by
     funext a
     simp only [lowK, Pi.add_apply, Pi.sub_apply]

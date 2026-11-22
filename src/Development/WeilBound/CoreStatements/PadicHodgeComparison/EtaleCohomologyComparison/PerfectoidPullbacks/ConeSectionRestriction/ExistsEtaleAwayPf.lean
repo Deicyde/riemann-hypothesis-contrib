@@ -16,17 +16,23 @@ namespace CrystallineSemistableComparison.Pb
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-theorem exists_etale_away_pf {K A : Type} [Field K] [CharZero K] [CommRing A] [IsDomain A] [Algebra K A]
-    [Algebra.FiniteType K A] {d : ℕ} (s : Fin d → A) (hs : AlgebraicIndependent K s)
-    (halg : Algebra.IsAlgebraic (Algebra.adjoin K (Set.range s)) A) :
-    ∃ g : A, g ≠ 0 ∧ (MvPolynomial.eval₂Hom (algebraMap K (Localization.Away g))
-      (fun k => algebraMap A (Localization.Away g) (s k)) : MvPolynomial (Fin d) K →+* Localization.Away g).Etale := by
+theorem exists_etale_away_pf
+    {K A : Type}
+    [Field K] [CharZero K] [CommRing A] [IsDomain A] [Algebra K A] [Algebra.FiniteType K A]
+    {d : ℕ} (s : Fin d → A) (hs : AlgebraicIndependent K s)
+    (halg : Algebra.IsAlgebraic (Algebra.adjoin K (Set.range s)) A)
+    : ∃ g : A,
+      g ≠ 0
+        ∧ (MvPolynomial.eval₂Hom (algebraMap K (Localization.Away g))
+            (fun k => algebraMap A (Localization.Away g) (s k))
+          : MvPolynomial (Fin d) K →+* Localization.Away g).Etale := by
   classical
   letI : Algebra (MvPolynomial (Fin d) K) A := (MvPolynomial.aeval s).toRingHom.toAlgebra
   have hRA : algebraMap (MvPolynomial (Fin d) K) A = (MvPolynomial.aeval s).toRingHom := rfl
-  have : IsScalarTower K (MvPolynomial (Fin d) K) A := IsScalarTower.of_algebraMap_eq fun x => by
-    rw [hRA, MvPolynomial.algebraMap_eq]
-    simp
+  have : IsScalarTower K (MvPolynomial (Fin d) K) A :=
+    IsScalarTower.of_algebraMap_eq fun x => by
+      rw [hRA, MvPolynomial.algebraMap_eq]
+      simp
   have hinj : Function.Injective (algebraMap (MvPolynomial (Fin d) K) A) := by
     intro a b h
     exact hs h
@@ -54,21 +60,26 @@ theorem exists_etale_away_pf {K A : Type} [Field K] [CharZero K] [CommRing A] [I
     IsLocalization.isAlgebraic _ (nonZeroDivisors A)
   have : Algebra.IsAlgebraic (MvPolynomial (Fin d) K) (Localization.AtPrime (⊥ : Ideal A)) :=
     Algebra.IsAlgebraic.trans (MvPolynomial (Fin d) K) A _
-  have : Algebra.IsAlgebraic (FractionRing (MvPolynomial (Fin d) K)) (Localization.AtPrime (⊥ : Ideal A)) :=
+  have : Algebra.IsAlgebraic (FractionRing (MvPolynomial (Fin d) K))
+      (Localization.AtPrime (⊥ : Ideal A)) :=
     Algebra.IsAlgebraic.extendScalars (IsFractionRing.injective (MvPolynomial (Fin d) K) _)
   have : CharZero (FractionRing (MvPolynomial (Fin d) K)) :=
     charZero_of_injective_algebraMap (IsFractionRing.injective (MvPolynomial (Fin d) K) _)
-  have : Algebra.FormallyEtale (FractionRing (MvPolynomial (Fin d) K)) (Localization.AtPrime (⊥ : Ideal A)) :=
+  have : Algebra.FormallyEtale (FractionRing (MvPolynomial (Fin d) K))
+      (Localization.AtPrime (⊥ : Ideal A)) :=
     Algebra.FormallyEtale.of_isSeparable _ _
   have : Algebra.FormallyEtale (MvPolynomial (Fin d) K) (FractionRing (MvPolynomial (Fin d) K)) :=
     Algebra.FormallyEtale.of_isLocalization (nonZeroDivisors (MvPolynomial (Fin d) K))
   have hE : Algebra.IsEtaleAt (MvPolynomial (Fin d) K) (⊥ : Ideal A) :=
     Algebra.FormallyEtale.comp (MvPolynomial (Fin d) K) (FractionRing (MvPolynomial (Fin d) K)) _
-  obtain ⟨g, hg, he⟩ := Algebra.exists_etale_of_isEtaleAt (R := MvPolynomial (Fin d) K) (⊥ : Ideal A)
+  obtain ⟨g, hg, he⟩ :=
+    Algebra.exists_etale_of_isEtaleAt (R := MvPolynomial (Fin d) K) (⊥ : Ideal A)
   refine ⟨g, by simpa using hg, ?_⟩
-  have heq : (MvPolynomial.eval₂Hom (algebraMap K (Localization.Away g))
-      (fun k => algebraMap A (Localization.Away g) (s k)) : MvPolynomial (Fin d) K →+* Localization.Away g) =
-      algebraMap (MvPolynomial (Fin d) K) (Localization.Away g) := by
+  have heq
+      : (MvPolynomial.eval₂Hom (algebraMap K (Localization.Away g))
+            (fun k => algebraMap A (Localization.Away g) (s k))
+          : MvPolynomial (Fin d) K →+* Localization.Away g)
+        = algebraMap (MvPolynomial (Fin d) K) (Localization.Away g) := by
     apply MvPolynomial.ringHom_ext
     · intro r
       rw [IsScalarTower.algebraMap_apply (MvPolynomial (Fin d) K) A (Localization.Away g)]

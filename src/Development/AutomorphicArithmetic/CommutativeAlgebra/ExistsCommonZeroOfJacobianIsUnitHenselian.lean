@@ -9,15 +9,16 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.ExistsSection
 noncomputable section
 open IsLocalRing UpperTheory.Et
 
-private theorem etale_away_jacobian (A : Type) [CommRing A] (n : ℕ)
-    (F : Fin n → MvPolynomial (Fin n) A) :
-    Algebra.Etale A (Localization.Away (Ideal.Quotient.mk (Ideal.span (Set.range F))
-      (Matrix.of fun s t : Fin n => MvPolynomial.pderiv s (F t)).det)) := by
+private theorem etale_away_jacobian
+    (A : Type) [CommRing A] (n : ℕ) (F : Fin n → MvPolynomial (Fin n) A)
+    : Algebra.Etale A
+      (Localization.Away (Ideal.Quotient.mk (Ideal.span (Set.range F))
+        (Matrix.of fun s t : Fin n => MvPolynomial.pderiv s (F t)).det)) := by
   classical
   let I := Ideal.span (Set.range F)
   let d := Ideal.Quotient.mk I (Matrix.of fun s t : Fin n => MvPolynomial.pderiv s (F t)).det
-  let P1 := Algebra.PreSubmersivePresentation.naive (v := F) (id : Fin n → Fin n)
-    Function.injective_id
+  let P1 :=
+    Algebra.PreSubmersivePresentation.naive (v := F) (id : Fin n → Fin n) Function.injective_id
   let P2 := Algebra.PreSubmersivePresentation.localizationAway (Localization.Away d) d
   have hJ : P1.jacobian = d := by
     rw [P1.jacobian_eq_jacobiMatrix_det]
@@ -28,21 +29,23 @@ private theorem etale_away_jacobian (A : Type) [CommRing A] (n : ℕ)
     have hE : MvPolynomial.aeval P1.val = Ideal.Quotient.mkₐ A I :=
       MvPolynomial.algHom_ext fun i => by simp [P1, I, Algebra.Generators.naive]
     exact congrFun (congrArg DFunLike.coe hE) _
-  let P : Algebra.SubmersivePresentation A (Localization.Away d) (Unit ⊕ Fin n) (Unit ⊕ Fin n) :=
-    { P2.comp P1 with
-      jacobian_isUnit := by
-        rw [Algebra.PreSubmersivePresentation.comp_jacobian_eq_jacobian_smul_jacobian,
-          Algebra.smul_def, Algebra.PreSubmersivePresentation.localizationAway_jacobian, hJ]
-        exact (IsLocalization.Away.algebraMap_isUnit d).mul
-          (IsLocalization.Away.algebraMap_isUnit d) }
+  let P : Algebra.SubmersivePresentation A (Localization.Away d) (Unit ⊕ Fin n) (Unit ⊕ Fin n) := {
+    P2.comp P1 with
+    jacobian_isUnit := by
+      rw [Algebra.PreSubmersivePresentation.comp_jacobian_eq_jacobian_smul_jacobian,
+        Algebra.smul_def, Algebra.PreSubmersivePresentation.localizationAway_jacobian, hJ]
+      exact (IsLocalization.Away.algebraMap_isUnit d).mul (IsLocalization.Away.algebraMap_isUnit d)
+  }
   have : Algebra.IsStandardSmoothOfRelativeDimension 0 A (Localization.Away d) :=
     P.isStandardSmoothOfRelativeDimension (by simp [Algebra.Presentation.dimension])
   infer_instance
 
-theorem UpperTheory.exists_common_zero_of_jacobian_isUnit_henselian :
-    ∀ (A : Type) [CommRing A] [HenselianLocalRing A] (n : ℕ) (F : Fin n → MvPolynomial (Fin n) A),
-      (∀ i, MvPolynomial.eval 0 (F i) ∈ maximalIdeal A) → IsUnit (Matrix.det (Matrix.of fun i j => MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i)))) →
-      ∃ x : Fin n → A, (∀ i, MvPolynomial.eval x (F i) = 0) ∧ ∀ j, x j ∈ maximalIdeal A := by
+theorem UpperTheory.exists_common_zero_of_jacobian_isUnit_henselian
+    : ∀ (A : Type) [CommRing A] [HenselianLocalRing A] (n : ℕ) (F : Fin n → MvPolynomial (Fin n) A),
+      (∀ i, MvPolynomial.eval 0 (F i) ∈ maximalIdeal A)
+        → IsUnit (Matrix.det (Matrix.of fun i j =>
+          MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i))))
+        → ∃ x : Fin n → A, (∀ i, MvPolynomial.eval x (F i) = 0) ∧ ∀ j, x j ∈ maximalIdeal A := by
   intro A _ _ n F hF hU
   classical
   let I := Ideal.span (Set.range F)
@@ -66,8 +69,9 @@ theorem UpperTheory.exists_common_zero_of_jacobian_isUnit_henselian :
     rfl
   have hd : IsUnit (π0 d) := by
     rw [hπ0]
-    have hdet : MvPolynomial.eval 0 (Matrix.of fun s t : Fin n => MvPolynomial.pderiv s (F t)).det =
-        (Matrix.of fun i j => MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i))).det := by
+    have hdet
+        : MvPolynomial.eval 0 (Matrix.of fun s t : Fin n => MvPolynomial.pderiv s (F t)).det
+          = (Matrix.of fun i j => MvPolynomial.eval 0 (MvPolynomial.pderiv j (F i))).det := by
       rw [RingHom.map_det, ← Matrix.det_transpose]
       congr 1
     rw [hdet]
@@ -82,8 +86,10 @@ theorem UpperTheory.exists_common_zero_of_jacobian_isUnit_henselian :
   have hφ : ∀ p, φ p = MvPolynomial.eval (fun j => φ (MvPolynomial.X j)) p := by
     intro p
     rw [← MvPolynomial.coe_aeval_eq_eval]
-    exact congrFun (congrArg DFunLike.coe
-      (MvPolynomial.algHom_ext (fun j => by simp) : φ = MvPolynomial.aeval _)) p
+    exact congrFun
+      (congrArg DFunLike.coe
+        (MvPolynomial.algHom_ext (fun j => by simp) : φ = MvPolynomial.aeval _))
+      p
   refine ⟨fun j => φ (MvPolynomial.X j), fun i => ?_, fun j => ?_⟩
   · rw [← hφ]
     have h0 : Ideal.Quotient.mk I (F i) = 0 :=

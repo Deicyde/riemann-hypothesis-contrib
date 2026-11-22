@@ -8,12 +8,15 @@ public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsEmbed
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.Small Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+  GlobalTheory.CompanionTheory.Ar.Small Filter Topology
 
 namespace MultiProjectiveCoordinates
 
-theorem adjoin_rat_clear {Ω : Type} [Field Ω] [CharZero Ω] (T : Set Ω) (x : Ω) (hx : x ∈ Algebra.adjoin ℚ T) :
-    ∃ N : ℕ, 0 < N ∧ (N : Ω) * x ∈ Algebra.adjoin ℤ T := by
+theorem adjoin_rat_clear
+    {Ω : Type} [Field Ω] [CharZero Ω] (T : Set Ω) (x : Ω) (hx : x ∈ Algebra.adjoin ℚ T)
+    : ∃ N : ℕ, 0 < N ∧ (N : Ω) * x ∈ Algebra.adjoin ℤ T := by
   induction hx using Algebra.adjoin_induction with
   | mem x hx => exact ⟨1, one_pos, by simpa using Algebra.subset_adjoin hx⟩
   | algebraMap r =>
@@ -39,13 +42,13 @@ theorem adjoin_rat_clear {Ω : Type} [Field Ω] [CharZero Ω] (T : Set Ω) (x : 
     rw [this]
     exact mul_mem hx hy
 
-theorem integral_rat_clear {Ω : Type} [Field Ω] [CharZero Ω] (T : Set Ω) (x : Ω)
-    (hx : IsIntegral (Algebra.adjoin ℚ T) x) :
-    ∃ N : ℕ, 0 < N ∧ IsIntegral (Algebra.adjoin ℤ T) ((N : Ω) * x) := by
+theorem integral_rat_clear
+    {Ω : Type} [Field Ω] [CharZero Ω] (T : Set Ω) (x : Ω) (hx : IsIntegral (Algebra.adjoin ℚ T) x)
+    : ∃ N : ℕ, 0 < N ∧ IsIntegral (Algebra.adjoin ℤ T) ((N : Ω) * x) := by
   classical
   obtain ⟨p, hmon, hp⟩ := hx
-  have hc : ∀ i, ∃ N : ℕ, 0 < N ∧ (N : Ω) * (p.coeff i : Ω) ∈ Algebra.adjoin ℤ T :=
-    fun i => adjoin_rat_clear T _ (p.coeff i).2
+  have hc : ∀ i, ∃ N : ℕ, 0 < N ∧ (N : Ω) * (p.coeff i : Ω) ∈ Algebra.adjoin ℤ T := fun i =>
+    adjoin_rat_clear T _ (p.coeff i).2
   choose N hN hNm using hc
   obtain ⟨M, hM⟩ : ∃ M, M = ∏ i ∈ Finset.range (p.natDegree + 1), N i := ⟨_, rfl⟩
   have hMpos : 0 < M := hM ▸ Finset.prod_pos fun i _ => hN i
@@ -57,8 +60,9 @@ theorem integral_rat_clear {Ω : Type} [Field Ω] [CharZero Ω] (T : Set Ω) (x 
     · rw [Finset.mem_range, not_lt] at hi
       rw [Polynomial.coeff_eq_zero_of_natDegree_lt (by omega)]
       simp
-  have hlift : Polynomial.C (M : Ω) * p.map (algebraMap (Algebra.adjoin ℚ T) Ω) ∈
-      Polynomial.lifts (algebraMap (Algebra.adjoin ℤ T) Ω) := by
+  have hlift
+      : Polynomial.C (M : Ω) * p.map (algebraMap (Algebra.adjoin ℚ T) Ω)
+        ∈ Polynomial.lifts (algebraMap (Algebra.adjoin ℤ T) Ω) := by
     rw [Polynomial.lifts_iff_coeff_lifts]
     intro n
     rw [Polynomial.coeff_C_mul, Polynomial.coeff_map]
@@ -76,11 +80,21 @@ theorem integral_rat_clear {Ω : Type} [Field Ω] [CharZero Ω] (T : Set Ω) (x 
   refine ⟨M, hMpos, ?_⟩
   rwa [Algebra.smul_def, hlc] at hint
 
-theorem exists_integer_multiple_in_lattice : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (y : (Σ k, ι k) → Ω) [CharZero Ω] (d : ℕ) (a : K → ℤ) (s : Ω), (∀ c : ∀ k, ι k, (∀ k, y ⟨k, c k⟩ ≠ 0) → IsIntegral (Algebra.adjoin ℚ (Set.range fun p : Σ k, ι k => y p / y ⟨p.1, c p.1⟩)) (s * ∏ k, y ⟨k, c k⟩ ^ (-(a k)))) → ∃ N₀ : ℕ, 0 < N₀ ∧ (N₀ : Ω) * s ∈ chartLatNm y a 1 := by
+theorem exists_integer_multiple_in_lattice
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
+        (y : (Σ k, ι k) → Ω) [CharZero Ω] (d : ℕ) (a : K → ℤ) (s : Ω),
+      (∀ c : ∀ k, ι k,
+          (∀ k, y ⟨k, c k⟩ ≠ 0)
+            → IsIntegral (Algebra.adjoin ℚ (Set.range fun p : Σ k, ι k => y p / y ⟨p.1, c p.1⟩))
+              (s * ∏ k, y ⟨k, c k⟩ ^ (-(a k))))
+        → ∃ N₀ : ℕ, 0 < N₀ ∧ (N₀ : Ω) * s ∈ chartLatNm y a 1 := by
   intro K _ ι _ Ω _ y _ d a s hs
   classical
-  have hc : ∀ c : ∀ k, ι k, ∃ N : ℕ, 0 < N ∧ ((∀ k, y ⟨k, c k⟩ ≠ 0) →
-      IsIntegral (chartRingZ y c) ((N : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-(a k))))) := by
+  have hc
+      : ∀ c : ∀ k, ι k, ∃ N : ℕ,
+        0 < N
+          ∧ ((∀ k, y ⟨k, c k⟩ ≠ 0)
+            → IsIntegral (chartRingZ y c) ((N : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-(a k))))) := by
     intro c
     by_cases hy : ∀ k, y ⟨k, c k⟩ ≠ 0
     · obtain ⟨N, hN, hint⟩ := integral_rat_clear _ _ (hs c hy)
@@ -91,7 +105,8 @@ theorem exists_integer_multiple_in_lattice : ∀ (K : Type) [Fintype K] (ι : K 
   intro c hy
   rw [mem_integralClosure_iff]
   simp only [Nat.cast_one, one_mul]
-  rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ c), Nat.cast_mul, mul_comm (N c : Ω), mul_assoc, mul_assoc]
+  rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ c), Nat.cast_mul, mul_comm (N c : Ω), mul_assoc,
+    mul_assoc]
   exact IsIntegral.mul (isIntegral_natCast _) (by simpa only [mul_assoc] using hNint c hy)
 
 end MultiProjectiveCoordinates

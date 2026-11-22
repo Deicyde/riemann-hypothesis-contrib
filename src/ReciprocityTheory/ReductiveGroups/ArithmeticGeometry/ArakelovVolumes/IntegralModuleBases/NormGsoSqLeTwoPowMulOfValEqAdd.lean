@@ -104,18 +104,25 @@ lemma gs_sq_ge (b : Fin d → E) (hr : IsRed b) (m : ℝ) (hm : ∀ i, m ≤ ‖
   rw [div_le_iff₀ hpos]
   nlinarith [mul_le_mul_of_nonneg_right hp (sq_nonneg ‖gs b j‖)]
 
-theorem red_norm_sq_le (b : Fin d → E) (hr : IsRed b) (m D : ℝ) (hm0 : 0 < m)
-    (hm : ∀ i, m ≤ ‖b i‖ ^ 2) (hD : (Matrix.gram ℝ b).det ≤ D) (i : Fin d) :
-    ‖b i‖ ^ 2 ≤ 2 ^ (d * (d - 1)) * D / m ^ (d - 1) := by
+theorem red_norm_sq_le
+    (b : Fin d → E) (hr : IsRed b)
+    (m D : ℝ) (hm0 : 0 < m) (hm : ∀ i, m ≤ ‖b i‖ ^ 2) (hD : (Matrix.gram ℝ b).det ≤ D)
+    (i : Fin d)
+    : ‖b i‖ ^ 2 ≤ 2 ^ (d * (d - 1)) * D / m ^ (d - 1) := by
   have hb := hr.1
   obtain ⟨L, hL⟩ : ∃ L : ℝ, L = m / 2 ^ (d - 1) := ⟨_, rfl⟩
   have hLpos : 0 < L := by rw [hL]; positivity
   have hG : ∀ j, L ≤ ‖gs b j‖ ^ 2 := fun j => by rw [hL]; exact gs_sq_ge b hr m hm j
   have hprod : L ^ (d - 1) ≤ ∏ j ∈ univ.erase i, ‖gs b j‖ ^ 2 := by
-    have := Finset.prod_le_prod₀ (s := univ.erase i) (f := fun _ => L) (g := fun j => ‖gs b j‖ ^ 2)
-      (fun _ _ => hLpos.le) (fun j _ => hG j)
+    have :=
+      Finset.prod_le_prod₀ (s := univ.erase i)
+        (f := fun _ => L)
+        (g := fun j => ‖gs b j‖ ^ 2)
+        (fun _ _ => hLpos.le)
+        (fun j _ => hG j)
     rw [Finset.prod_const, Finset.card_erase_of_mem (mem_univ i), Finset.card_univ,
-      Fintype.card_fin] at this
+        Fintype.card_fin]
+      at this
     exact this
   have hdet : ‖gs b i‖ ^ 2 * ∏ j ∈ univ.erase i, ‖gs b j‖ ^ 2 ≤ D := by
     rw [Finset.mul_prod_erase univ (fun j => ‖gs b j‖ ^ 2) (mem_univ i), ← det_gram_eq b hb]
@@ -124,7 +131,7 @@ theorem red_norm_sq_le (b : Fin d → E) (hr : IsRed b) (m D : ℝ) (hm0 : 0 < m
     le_trans (mul_le_mul_of_nonneg_left hprod (sq_nonneg _)) hdet
   have hLp : 0 < L ^ (d - 1) := pow_pos hLpos _
   have hGi' : ‖gs b i‖ ^ 2 ≤ D / L ^ (d - 1) := by rw [le_div_iff₀ hLp]; exact hGi
-  have hid : (2:ℝ) ^ i.val ≤ 2 ^ (d - 1) :=
+  have hid : (2 : ℝ) ^ i.val ≤ 2 ^ (d - 1) :=
     pow_le_pow_right₀ (by norm_num) (by have := i.isLt; omega)
   have key : D / L ^ (d - 1) = 2 ^ ((d - 1) * (d - 1)) * D / m ^ (d - 1) := by
     rw [hL, div_pow, ← pow_mul, div_div_eq_mul_div]; ring
@@ -132,21 +139,25 @@ theorem red_norm_sq_le (b : Fin d → E) (hr : IsRed b) (m D : ℝ) (hm0 : 0 < m
     cases d with
     | zero => rfl
     | succ k => simp only [Nat.add_sub_cancel]; ring
-  have hexp : (2:ℝ) ^ (d * (d - 1)) = 2 ^ (d - 1) * 2 ^ ((d - 1) * (d - 1)) := by
+  have hexp : (2 : ℝ) ^ (d * (d - 1)) = 2 ^ (d - 1) * 2 ^ ((d - 1) * (d - 1)) := by
     rw [← pow_add, hnat]
   have hDL : 0 ≤ D / L ^ (d - 1) := le_trans (sq_nonneg _) hGi'
-  calc ‖b i‖ ^ 2 ≤ 2 ^ i.val * ‖gs b i‖ ^ 2 := norm_sq_le_pow_gs b hr i
+  calc
+    ‖b i‖ ^ 2
+      ≤ 2 ^ i.val * ‖gs b i‖ ^ 2 := norm_sq_le_pow_gs b hr i
     _ ≤ 2 ^ (d - 1) * (D / L ^ (d - 1)) := mul_le_mul hid hGi' (sq_nonneg _) (by positivity)
     _ = 2 ^ (d * (d - 1)) * D / m ^ (d - 1) := by rw [key, hexp]; ring
 
-theorem red_coeff_sq_le (b : Fin d → E) (hr : IsRed b) (m : ℝ) (hm0 : 0 < m)
-    (hm : ∀ i, m ≤ ‖b i‖ ^ 2) (c : Fin d → ℝ) (i : Fin d) :
-    c i ^ 2 ≤ 9 ^ d * ‖∑ l, c l • b l‖ ^ 2 / m := by
+theorem red_coeff_sq_le
+    (b : Fin d → E) (hr : IsRed b)
+    (m : ℝ) (hm0 : 0 < m) (hm : ∀ i, m ≤ ‖b i‖ ^ 2)
+    (c : Fin d → ℝ) (i : Fin d)
+    : c i ^ 2 ≤ 9 ^ d * ‖∑ l, c l • b l‖ ^ 2 / m := by
   have hb := hr.1
   obtain ⟨X, hX⟩ : ∃ X : ℝ, X = ‖∑ l, c l • b l‖ ^ 2 := ⟨_, rfl⟩
   rw [← hX]
   have hX0 : 0 ≤ X := by rw [hX]; exact sq_nonneg _
-  have hp : (0:ℝ) < 2 ^ (d - 1) := by positivity
+  have hp : (0 : ℝ) < 2 ^ (d - 1) := by positivity
   obtain ⟨y, hy⟩ : ∃ y : ℝ, y = X * 2 ^ (d - 1) / m := ⟨_, rfl⟩
   have hy0 : 0 ≤ y := by rw [hy]; exact div_nonneg (mul_nonneg hX0 hp.le) hm0.le
   have hnu : ∀ j, |nu b c j| ≤ Real.sqrt y := by
@@ -154,8 +165,10 @@ theorem red_coeff_sq_le (b : Fin d → E) (hr : IsRed b) (m : ℝ) (hm0 : 0 < m)
     apply Real.abs_le_sqrt
     have h1 : nu b c j ^ 2 * ‖gs b j‖ ^ 2 ≤ X := by
       rw [hX, norm_sq_comb b hb c]
-      exact Finset.single_le_sum (f := fun j => nu b c j ^ 2 * ‖gs b j‖ ^ 2)
-        (fun k _ => by positivity) (mem_univ j)
+      exact Finset.single_le_sum
+        (f := fun j => nu b c j ^ 2 * ‖gs b j‖ ^ 2)
+        (fun k _ => by positivity)
+        (mem_univ j)
     have h2 := gs_sq_ge b hr m hm j
     have h3 : nu b c j ^ 2 * (m / 2 ^ (d - 1)) ≤ X :=
       le_trans (mul_le_mul_of_nonneg_left h2 (sq_nonneg _)) h1
@@ -169,13 +182,18 @@ theorem red_coeff_sq_le (b : Fin d → E) (hr : IsRed b) (m : ℝ) (hm0 : 0 < m)
   rw [mul_pow, Real.sq_sqrt hy0] at hsq
   have h1 : ((3 / 2 : ℝ) ^ d) ^ 2 * 4 ^ d = 9 ^ d := by
     rw [← pow_mul, mul_comm d 2, pow_mul, ← mul_pow]; norm_num
-  have h2 : (2:ℝ) ^ (d - 1) ≤ 4 ^ d :=
-    calc (2:ℝ) ^ (d - 1) ≤ 2 ^ d := pow_le_pow_right₀ (by norm_num) (Nat.sub_le _ _)
+  have h2 : (2 : ℝ) ^ (d - 1) ≤ 4 ^ d :=
+    calc
+      (2 : ℝ) ^ (d - 1)
+        ≤ 2 ^ d := pow_le_pow_right₀ (by norm_num) (Nat.sub_le _ _)
       _ ≤ 4 ^ d := pow_le_pow_left₀ (by norm_num) (by norm_num) _
   have hA : ((3 / 2 : ℝ) ^ d) ^ 2 * 2 ^ (d - 1) ≤ 9 ^ d :=
-    calc _ ≤ ((3 / 2 : ℝ) ^ d) ^ 2 * 4 ^ d := mul_le_mul_of_nonneg_left h2 (by positivity)
+    calc
+      _ ≤ ((3 / 2 : ℝ) ^ d) ^ 2 * 4 ^ d := mul_le_mul_of_nonneg_left h2 (by positivity)
       _ = 9 ^ d := h1
-  calc c i ^ 2 ≤ ((3 / 2 : ℝ) ^ d) ^ 2 * y := hsq
+  calc
+    c i ^ 2
+      ≤ ((3 / 2 : ℝ) ^ d) ^ 2 * y := hsq
     _ = (((3 / 2 : ℝ) ^ d) ^ 2 * 2 ^ (d - 1)) * X / m := by rw [hy]; ring
     _ ≤ 9 ^ d * X / m := div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_right hA hX0) hm0.le
 

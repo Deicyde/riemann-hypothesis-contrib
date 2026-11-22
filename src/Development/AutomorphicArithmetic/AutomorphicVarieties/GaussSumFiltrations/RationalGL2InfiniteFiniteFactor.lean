@@ -6,28 +6,33 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaussSumFil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 namespace GlobalTheory.HilbertThetaSeries.RatPts
 
-theorem pInf_algebraMap (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (x : F) :
-    TR.pInf F (algebraMap F (Ad F) x) = rhom x := by
+theorem pInf_algebraMap (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (x : F)
+    : TR.pInf F (algebraMap F (Ad F) x) = rhom x := by
   funext v
   change InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal v)
-    ((algebraMap F (Ad F) x).1 v) = InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal v) x
+      ((algebraMap F (Ad F) x).1 v)
+    = InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal v) x
   rw [AdeleRing.algebraMap_fst_apply, InfinitePlace.Completion.ringEquivRealOfIsReal_apply]
-  simpa using InfinitePlace.Completion.extensionEmbeddingOfIsReal_coe
-    (IsTotallyReal.isReal v) (WithAbs.toAbs _ x)
+  simpa using
+    InfinitePlace.Completion.extensionEmbeddingOfIsReal_coe (IsTotallyReal.isReal v)
+      (WithAbs.toAbs _ x)
 
-theorem pInf_ratGL (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (γ : GL (Fin 2) F) :
-    Matrix.GeneralLinearGroup.map (TR.pInf F) (ratGL F 2 γ) = toInf γ := by
+theorem pInf_ratGL (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (γ : GL (Fin 2) F)
+    : Matrix.GeneralLinearGroup.map (TR.pInf F) (ratGL F 2 γ) = toInf γ := by
   ext i j v
   exact congrFun (pInf_algebraMap F (γ i j)) v
 
-theorem ratGL_real_fin : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (γ : GL (Fin 2) F),
-    ratGL F 2 γ = TR.infGL F 2 (toInf γ) * finGL F 2 (toFin γ) ∧
-      ∀ h : GL (Fin 2) (InfinitePlace F → ℝ), ∃ τ : GL (Fin 2) F, Pos (toInf τ * h) := by
+theorem ratGL_real_fin
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (γ : GL (Fin 2) F),
+      ratGL F 2 γ = TR.infGL F 2 (toInf γ) * finGL F 2 (toFin γ)
+        ∧ ∀ h : GL (Fin 2) (InfinitePlace F → ℝ), ∃ τ : GL (Fin 2) F, Pos (toInf τ * h) := by
   intro F _ _ _ γ
   refine ⟨?_, fun h => ?_⟩
   · rw [← pInf_ratGL]
@@ -39,8 +44,16 @@ theorem ratGL_real_fin : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal
 
 end GlobalTheory.HilbertThetaSeries.RatPts
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.rational_GL2_infinite_finite_factor : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (γ : GL (Fin 2) F), ratGL F 2 γ = TR.infGL F 2 (toInf γ) * finGL F 2 (toFin γ) ∧ ∀ h : GL (Fin 2) (InfinitePlace F → ℝ), ∃ τ : GL (Fin 2) F, Pos (toInf τ * h) := by
-  first | exact @GlobalTheory.HilbertThetaSeries.RatPts.ratGL_real_fin | exact GlobalTheory.HilbertThetaSeries.RatPts.ratGL_real_fin | (intros; apply GlobalTheory.HilbertThetaSeries.RatPts.ratGL_real_fin <;> assumption)
+theorem _root_.GlobalTheory.T.rational_GL2_infinite_finite_factor
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (γ : GL (Fin 2) F),
+      ratGL F 2 γ = TR.infGL F 2 (toInf γ) * finGL F 2 (toFin γ)
+        ∧ ∀ h : GL (Fin 2) (InfinitePlace F → ℝ), ∃ τ : GL (Fin 2) F, Pos (toInf τ * h) := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.RatPts.ratGL_real_fin
+  | exact GlobalTheory.HilbertThetaSeries.RatPts.ratGL_real_fin
+  | (intros; apply GlobalTheory.HilbertThetaSeries.RatPts.ratGL_real_fin <;> assumption)

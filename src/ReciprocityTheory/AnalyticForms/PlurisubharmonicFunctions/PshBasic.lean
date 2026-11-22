@@ -19,8 +19,7 @@ def L0 (w : Fin D → ℂ) : ℂ →L[ℝ] (Fin D → ℂ) := (ContinuousLinearM
 def Pc (w : Fin D → ℂ) : ((Fin D → ℂ) →L[ℝ] ℝ) →L[ℝ] (ℂ →L[ℝ] ℝ) :=
   (ContinuousLinearMap.compL ℝ ℂ (Fin D → ℂ) ℝ).flip (L0 w)
 
-def Gc (φ : (Fin D → ℂ) → ℝ) (z w : Fin D → ℂ) (ζ : ℂ) : ℂ →L[ℝ] ℝ :=
-  Pc w (fderiv ℝ φ (z + ζ • w))
+def Gc (φ : (Fin D → ℂ) → ℝ) (z w : Fin D → ℂ) (ζ : ℂ) : ℂ →L[ℝ] ℝ := Pc w (fderiv ℝ φ (z + ζ • w))
 
 def Hc (φ : (Fin D → ℂ) → ℝ) (z w : Fin D → ℂ) (ζ : ℂ) : ℂ →L[ℝ] ℂ →L[ℝ] ℝ :=
   (Pc w).comp ((fderiv ℝ (fderiv ℝ φ) (z + ζ • w)).comp (L0 w))
@@ -76,26 +75,29 @@ theorem plurisubharmonicIffLeviNonneg_holds : IsPsh_iff_isLeviPshStatement := by
     refine ⟨hφ, fun z hz w => ?_⟩
     set V := {ζ : ℂ | z + ζ • w ∈ U} with hV
     have hVo : IsOpen V := hU.preimage (by fun_prop)
-    have h0 : (0:ℂ) ∈ V := by simpa [V] using hz
+    have h0 : (0 : ℂ) ∈ V := by simpa [V] using hz
     obtain ⟨R, hR0, hR⟩ := Metric.isOpen_iff.mp hVo 0 h0
-    have hR' : closedBall (0:ℂ) (R/2) ⊆ V := (closedBall_subset_ball (by linarith)).trans hR
-    have key := lap_nonneg_of_sub_mean (V := V) (g := fun ζ => φ (z + ζ • w)) (G := Gc φ z w)
-      (H := Hc φ z w) (fun ζ hζ => line_hasFDerivAt_g hU hφ z w hζ)
-      (fun ζ hζ => line_hasFDerivAt_G hU hφ z w hζ) (line_contOn_H hU hφ z w)
-      (by linarith : (0:ℝ) < R/2) hR' ?_
+    have hR' : closedBall (0 : ℂ) (R / 2) ⊆ V := (closedBall_subset_ball (by linarith)).trans hR
+    have key :=
+      lap_nonneg_of_sub_mean (V := V)
+        (g := fun ζ => φ (z + ζ • w))
+        (G := Gc φ z w) (H := Hc φ z w)
+        (fun ζ hζ => line_hasFDerivAt_g hU hφ z w hζ)
+        (fun ζ hζ => line_hasFDerivAt_G hU hφ z w hζ)
+        (line_contOn_H hU hφ z w) (by linarith : (0 : ℝ) < R / 2) hR' ?_
     · rw [Hc_apply, Hc_apply] at key
       simp only [zero_smul, add_zero, one_smul] at key
       unfold levi
       linarith
     · intro r hr
-      have hmem : ∀ ζ : ℂ, ‖ζ‖ ≤ 1 → z + ζ • ((r:ℂ) • w) ∈ U := by
+      have hmem : ∀ ζ : ℂ, ‖ζ‖ ≤ 1 → z + ζ • ((r : ℂ) • w) ∈ U := by
         intro ζ hζ
         rw [smul_smul]
         apply hR'
         rw [mem_closedBall, dist_zero_right, norm_mul, Complex.norm_real, Real.norm_eq_abs,
           abs_of_pos hr.1]
         nlinarith [norm_nonneg ζ, hr.2]
-      have h1 := (hsub z ((r:ℂ) • w) hmem).2
+      have h1 := (hsub z ((r : ℂ) • w) hmem).2
       simp only [zero_smul, add_zero]
       convert h1 using 1
       rw [Real.circleAverage_def, Real.circleAverage_def]
@@ -105,15 +107,19 @@ theorem plurisubharmonicIffLeviNonneg_holds : IsPsh_iff_isLeviPshStatement := by
   · rintro ⟨-, hlev⟩
     refine ⟨hφ.continuousOn.upperSemicontinuousOn, fun z w hdisc => ?_⟩
     set V := {ζ : ℂ | z + ζ • w ∈ U} with hV
-    have hB : closedBall (0:ℂ) 1 ⊆ V := fun ζ hζ => hdisc ζ (by simpa using hζ)
+    have hB : closedBall (0 : ℂ) 1 ⊆ V := fun ζ hζ => hdisc ζ (by simpa using hζ)
     have hcont : Continuous fun θ => φ (z + circleMap 0 1 θ • w) :=
       hφ.continuousOn.comp_continuous
         (continuous_const.add ((continuous_circleMap 0 1).smul continuous_const))
         (fun θ => hdisc _ (by simp))
-    refine ⟨hcont.intervalIntegrable 0 (2*π), ?_⟩
-    have key := le_circleAverage_of_lap_nonneg (V := V) (g := fun ζ => φ (z + ζ • w))
-      (G := Gc φ z w) (H := Hc φ z w) (fun ζ hζ => line_hasFDerivAt_g hU hφ z w hζ)
-      (fun ζ hζ => line_hasFDerivAt_G hU hφ z w hζ) (line_contOn_H hU hφ z w) zero_le_one hB ?_
+    refine ⟨hcont.intervalIntegrable 0 (2 * π), ?_⟩
+    have key :=
+      le_circleAverage_of_lap_nonneg (V := V)
+        (g := fun ζ => φ (z + ζ • w))
+        (G := Gc φ z w) (H := Hc φ z w)
+        (fun ζ hζ => line_hasFDerivAt_g hU hφ z w hζ)
+        (fun ζ hζ => line_hasFDerivAt_G hU hφ z w hζ)
+        (line_contOn_H hU hφ z w) zero_le_one hB ?_
     · simpa using key
     · intro x hx θ
       rw [Hc_apply, Hc_apply]
@@ -153,7 +159,8 @@ namespace ReciprocityTheory.AnForm.A
 
 open MeasureTheory Metric Set Filter Topology Real PshInh
 
-theorem isPsh_iff_isLeviPsh_thm : IsPsh_iff_isLeviPshStatement := PshLap.plurisubharmonicIffLeviNonneg_holds
+theorem isPsh_iff_isLeviPsh_thm : IsPsh_iff_isLeviPshStatement :=
+  PshLap.plurisubharmonicIffLeviNonneg_holds
 
 theorem isPsh_sup_thm : IsPsh_supStatement := by
   intro D ι _ _ U u hU hu
@@ -163,10 +170,11 @@ theorem isPsh_sup_thm : IsPsh_supStatement := by
       (hu j).1 x hx y (lt_of_le_of_lt (Finset.le_sup' (fun j => u j x) (Finset.mem_univ j)) hy)
     filter_upwards [Filter.eventually_all.2 this] with x' hx'
     exact (Finset.sup'_lt_iff _).2 fun j _ => hx' j
-  · have hci : ∀ j, CircleIntegrable (fun ζ : ℂ => u j (z + ζ • w)) 0 1 :=
-      fun j => ((hu j).2 z w hdisc).1
-    have hcs : CircleIntegrable (fun ζ : ℂ =>
-        Finset.univ.sup' Finset.univ_nonempty (fun j => u j (z + ζ • w))) 0 1 :=
+  · have hci : ∀ j, CircleIntegrable (fun ζ : ℂ => u j (z + ζ • w)) 0 1 := fun j =>
+      ((hu j).2 z w hdisc).1
+    have hcs : CircleIntegrable
+        (fun ζ : ℂ => Finset.univ.sup' Finset.univ_nonempty (fun j => u j (z + ζ • w)))
+        0 1 :=
       ii_sup' (fun j θ => u j (z + circleMap 0 1 θ • w)) hci
     refine ⟨hcs, ?_⟩
     obtain ⟨j, -, hj⟩ := Finset.exists_mem_eq_sup' Finset.univ_nonempty (fun j => u j z)
@@ -180,6 +188,7 @@ theorem isPsh_locallyIntegrable_thm : IsPsh_locallyIntegrableStatement :=
 
 theorem subMeanPolydisc_thm : SubMeanPolydiscStatement := PshMean.subMeanValuePolydisc_holds
 
-theorem mollifierInhabit_thm : MollifierInhabitStatement := PshMol.circleInvariantMollifierExists_holds
+theorem mollifierInhabit_thm : MollifierInhabitStatement :=
+  PshMol.circleInvariantMollifierExists_holds
 
 end ReciprocityTheory.AnForm.A

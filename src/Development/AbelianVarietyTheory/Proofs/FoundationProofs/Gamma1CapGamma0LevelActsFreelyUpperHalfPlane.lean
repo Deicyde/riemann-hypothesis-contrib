@@ -11,15 +11,18 @@ open scoped MatrixGroups
 
 namespace GlobalTheory.KZ.FreeAct
 
-theorem ent_ofSL (γ : SL(2, ℤ)) (i j : Fin 2) :
-    ent (ofSL γ) i j = ((γ : Matrix (Fin 2) (Fin 2) ℤ) i j : ℚ) := by
+theorem ent_ofSL (γ : SL(2, ℤ)) (i j : Fin 2)
+    : ent (ofSL γ) i j = ((γ : Matrix (Fin 2) (Fin 2) ℤ) i j : ℚ) := by
   simp [ent, ofSL]
 
-theorem key (a b c d x y : ℝ) (h1 : a - d = 2 * c * x) (h2 : c * (x ^ 2 - y ^ 2) + (d - a) * x - b = 0)
-    (hdet : a * d - b * c = 1) : 4 * c ^ 2 * y ^ 2 = 4 - (a + d) ^ 2 := by
+theorem key
+    (a b c d x y : ℝ) (h1 : a - d = 2 * c * x) (h2 : c * (x ^ 2 - y ^ 2) + (d - a) * x - b = 0)
+    (hdet : a * d - b * c = 1)
+    : 4 * c ^ 2 * y ^ 2 = 4 - (a + d) ^ 2 := by
   linear_combination (-4 * c) * h2 + 4 * hdet + (a - d - 2 * c * x) * h1
 
-theorem no_small (N : ℕ) (hN : 4 ≤ N) (t k : ℤ) (hk : t - 2 = (N : ℤ) * k) (ht : t ^ 2 < 4) : False := by
+theorem no_small (N : ℕ) (hN : 4 ≤ N) (t k : ℤ) (hk : t - 2 = (N : ℤ) * k) (ht : t ^ 2 < 4)
+    : False := by
   have h1 : -1 ≤ t := by nlinarith
   have h2 : t ≤ 1 := by nlinarith
   have hN' : (4 : ℤ) ≤ N := by exact_mod_cast hN
@@ -31,7 +34,6 @@ theorem no_small (N : ℕ) (hN : 4 ≤ N) (t k : ℤ) (hk : t - 2 = (N : ℤ) * 
 end GlobalTheory.KZ.FreeAct
 
 namespace GlobalTheory.KZ
-
 
 open FreeAct in
 theorem gam_free : ∀ (N l : ℕ), 4 ≤ N → ∀ γ ∈ Gam N l, ∀ z ∈ Hs, mob (ofSL γ) z = z → γ = 1 := by
@@ -51,7 +53,8 @@ theorem gam_free : ∀ (N l : ℕ), 4 ≤ N → ∀ γ ∈ Gam N l, ∀ z ∈ Hs
   have hre := congrArg Complex.re hfix
   have him := congrArg Complex.im hfix
   simp only [Complex.add_re, Complex.add_im, Complex.mul_re, Complex.mul_im, Complex.intCast_re,
-    Complex.intCast_im, Complex.ratCast_re, Complex.ratCast_im] at hre him
+      Complex.intCast_im, Complex.ratCast_re, Complex.ratCast_im]
+    at hre him
   push_cast at hre him
   simp at hre him
   obtain ⟨k, hk⟩ := (ZMod.intCast_eq_intCast_iff_dvd_sub 1 (A 0 0) N).1 (by simpa using ha1.symm)

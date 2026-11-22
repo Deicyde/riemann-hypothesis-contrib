@@ -13,9 +13,11 @@ namespace Formalism.MainNotions.flipOneThree.Pf
 
 open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames
 
-theorem dens_abs (N : ℕ) (hN : 1 ≤ N) (x1 x2 wa wb e : ℝ) (h1 : 0 ≤ x1) (h2 : 0 ≤ x2) (hwa : 0 < wa) (hwb : 0 < wb)
-    (he : 0 ≤ e) (hs : (N : ℝ) * (x1 + x2 + e / wa + e / wb) ≤ 1 / 2) :
-    (wa + e) ^ N * (wb + e) ^ N ≤ 2 * ((1 - x1) * (1 - x2)) ^ N * (wa ^ N * wb ^ N) := by
+theorem dens_abs
+    (N : ℕ) (hN : 1 ≤ N)
+    (x1 x2 wa wb e : ℝ) (h1 : 0 ≤ x1) (h2 : 0 ≤ x2) (hwa : 0 < wa) (hwb : 0 < wb) (he : 0 ≤ e)
+    (hs : (N : ℝ) * (x1 + x2 + e / wa + e / wb) ≤ 1 / 2)
+    : (wa + e) ^ N * (wb + e) ^ N ≤ 2 * ((1 - x1) * (1 - x2)) ^ N * (wa ^ N * wb ^ N) := by
   set u := e / wa with hu
   set v := e / wb with hv
   have hu0 : 0 ≤ u := div_nonneg he hwa.le
@@ -41,8 +43,9 @@ theorem dens_abs (N : ℕ) (hN : 1 ≤ N) (x1 x2 wa wb e : ℝ) (h1 : 0 ≤ x1) 
     have h1 : (1 + z) ^ N * (1 - z) ^ N ≤ 1 := by
       rw [← mul_pow]; exact pow_le_one₀ (by nlinarith) (by nlinarith)
     have h2 : 0 ≤ (1 + z) ^ N := by positivity
-    calc (1 + z) ^ N * (1 - N * z) ≤ (1 + z) ^ N * (1 - z) ^ N :=
-          mul_le_mul_of_nonneg_left (by linarith) h2
+    calc
+      (1 + z) ^ N * (1 - N * z)
+        ≤ (1 + z) ^ N * (1 - z) ^ N := mul_le_mul_of_nonneg_left (by linarith) h2
       _ ≤ 1 := h1
   have hC : ∀ x : ℝ, x ≤ 1 → 1 - N * x ≤ (1 - x) ^ N := by
     intro x hx1
@@ -58,37 +61,42 @@ theorem dens_abs (N : ℕ) (hN : 1 ≤ N) (x1 x2 wa wb e : ℝ) (h1 : 0 ≤ x1) 
 
   have e1 : 1 - N * u - N * v ≤ (1 - N * u) * (1 - N * v) := by nlinarith [mul_nonneg hp1 hp2]
   have e2 : 1 - N * x1 - N * x2 ≤ (1 - N * x1) * (1 - N * x2) := by nlinarith [mul_nonneg hp3 hp4]
-  have e3 : (1 - N * u - N * v) * (1 - N * x1 - N * x2) ≤
-      (1 - N * u) * (1 - N * v) * ((1 - N * x1) * (1 - N * x2)) :=
+  have e3
+      : (1 - N * u - N * v) * (1 - N * x1 - N * x2)
+        ≤ (1 - N * u) * (1 - N * v) * ((1 - N * x1) * (1 - N * x2)) :=
     mul_le_mul e1 e2 (by linarith) (by nlinarith)
-  have e4 : 1 - (N * u + N * v) - (N * x1 + N * x2) ≤ (1 - N * u - N * v) * (1 - N * x1 - N * x2) := by
+  have e4
+      : 1 - (N * u + N * v) - (N * x1 + N * x2) ≤ (1 - N * u - N * v) * (1 - N * x1 - N * x2) := by
     nlinarith [mul_nonneg (add_nonneg hp1 hp2) (add_nonneg hp3 hp4)]
   have hprod : 1 ≤ 2 * ((1 - N * u) * (1 - N * v) * ((1 - N * x1) * (1 - N * x2))) := by linarith
   have hAB : (1 + u) ^ N * (1 + v) ^ N * ((1 - N * u) * (1 - N * v)) ≤ 1 := by
     have := mul_le_one₀ ha (mul_nonneg hB0 (by linarith)) hb
-    calc (1 + u) ^ N * (1 + v) ^ N * ((1 - N * u) * (1 - N * v))
+    calc
+      (1 + u) ^ N * (1 + v) ^ N * ((1 - N * u) * (1 - N * v))
         = (1 + u) ^ N * (1 - N * u) * ((1 + v) ^ N * (1 - N * v)) := by ring
       _ ≤ 1 := this
   have hCD : (1 - N * x1) * (1 - N * x2) ≤ (1 - x1) ^ N * (1 - x2) ^ N :=
     mul_le_mul hc hd (by linarith) (le_trans (by linarith) hc)
   have key : (1 + u) ^ N * (1 + v) ^ N ≤ 2 * ((1 - x1) ^ N * (1 - x2) ^ N) := by
     have hγδ : 0 ≤ (1 - N * x1) * (1 - N * x2) := by nlinarith
-    calc (1 + u) ^ N * (1 + v) ^ N
-        ≤ (1 + u) ^ N * (1 + v) ^ N *
-            (2 * ((1 - N * u) * (1 - N * v) * ((1 - N * x1) * (1 - N * x2)))) :=
-          le_mul_of_one_le_right (mul_nonneg hA0 hB0) hprod
-      _ = 2 * ((1 - N * x1) * (1 - N * x2)) *
-            ((1 + u) ^ N * (1 + v) ^ N * ((1 - N * u) * (1 - N * v))) := by ring
-      _ ≤ 2 * ((1 - N * x1) * (1 - N * x2)) * 1 :=
-          mul_le_mul_of_nonneg_left hAB (by linarith)
+    calc
+      (1 + u) ^ N * (1 + v) ^ N
+          ≤ (1 + u) ^ N * (1 + v) ^ N
+            * (2 * ((1 - N * u) * (1 - N * v) * ((1 - N * x1) * (1 - N * x2)))) :=
+        le_mul_of_one_le_right (mul_nonneg hA0 hB0) hprod
+      _ = 2 * ((1 - N * x1) * (1 - N * x2))
+          * ((1 + u) ^ N * (1 + v) ^ N * ((1 - N * u) * (1 - N * v))) := by
+        ring
+      _ ≤ 2 * ((1 - N * x1) * (1 - N * x2)) * 1 := mul_le_mul_of_nonneg_left hAB (by linarith)
       _ ≤ 2 * ((1 - x1) ^ N * (1 - x2) ^ N) := by linarith
   have hw : 0 ≤ wa ^ N * wb ^ N := by positivity
-  calc wa ^ N * (1 + u) ^ N * (wb ^ N * (1 + v) ^ N)
+  calc
+    wa ^ N * (1 + u) ^ N * (wb ^ N * (1 + v) ^ N)
       = (1 + u) ^ N * (1 + v) ^ N * (wa ^ N * wb ^ N) := by ring
     _ ≤ 2 * ((1 - x1) ^ N * (1 - x2) ^ N) * (wa ^ N * wb ^ N) := mul_le_mul_of_nonneg_right key hw
 
-theorem Nexp_le (N Y La : ℝ) (hN : 2 ≤ N) (hY : 1 ≤ Y) (hLa : 8 * Real.log (N * Y) ≤ La) :
-    N * Real.exp (-La / 3) ≤ 0.36 := by
+theorem Nexp_le (N Y La : ℝ) (hN : 2 ≤ N) (hY : 1 ≤ Y) (hLa : 8 * Real.log (N * Y) ≤ La)
+    : N * Real.exp (-La / 3) ≤ 0.36 := by
   have hNY : 2 ≤ N * Y := by nlinarith
   have hL2 : Real.log 2 ≤ Real.log (N * Y) := Real.log_le_log (by norm_num) hNY
   have hlog2 := Real.log_two_gt_d9

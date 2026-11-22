@@ -105,14 +105,13 @@ lemma app_compat_generic (h : Z ⟶ Y) {Ui Uj : Y.Opens} {Wi Wj : Z.Opens} (hi :
   rw [e1, e2, hc, map_mul, hm, hg']
   rfl
 
-
 variable (L) in
-def pullSec (φ : K → (Y ⟶ X)) (ε : K → ℤ) (s : LB.Sec (LB.LinComb L φ ε)) (h : Z ⟶ Y) :
-    LB.Sec (LB.LinComb L (fun k => h ≫ φ k) ε) where
+def pullSec (φ : K → (Y ⟶ X)) (ε : K → ℤ) (s : LB.Sec (LB.LinComb L φ ε)) (h : Z ⟶ Y)
+    : LB.Sec (LB.LinComb L (fun k => h ≫ φ k) ε) where
   f j := rs (wchart_comp_le φ h j) ((h.app (LB.wchart L φ j)).hom (s.f j))
   compat i j :=
-    app_compat_generic h (wchart_comp_le φ h i) (wchart_comp_le φ h j) (s.f i) (s.f j) _ (s.compat i j) _
-      (linComb_g_comp φ ε h i j)
+    app_compat_generic h (wchart_comp_le φ h i) (wchart_comp_le φ h j) (s.f i) (s.f j) _
+      (s.compat i j) _ (linComb_g_comp φ ε h i j)
 
 def genSec {M : LB Y} (t : LB.Gen M) (ht : t.IsGen) : LB.Sec M where
   f j := (t.s j : Γ(Y, M.U j))
@@ -218,15 +217,15 @@ lemma mul_compat_generic {Ui Uj Ui' Uj' Wi Wj : Y.Opens} (hi : Wi ≤ Ui) (hi' :
   rw [hm, hm, e1, e2, e3, e4, hc, hc', hm, hm, hG, Units.val_mul, hres, hres]
   ring
 
-
 variable (L) in
-def mulSec (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
-    (s : LB.Sec (LB.LinComb L φ ε)) (s' : LB.Sec (LB.LinComb L φ' ε')) :
-    LB.Sec (LB.LinComb L (Sum.elim φ φ') (Sum.elim ε ε')) where
+def mulSec
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
+    (s : LB.Sec (LB.LinComb L φ ε)) (s' : LB.Sec (LB.LinComb L φ' ε'))
+    : LB.Sec (LB.LinComb L (Sum.elim φ φ') (Sum.elim ε ε')) where
   f j := rs (wchart_inl φ φ' j) (s.f (j ∘ Sum.inl)) * rs (wchart_inr φ φ' j) (s'.f (j ∘ Sum.inr))
   compat i j :=
-    mul_compat_generic (wchart_inl φ φ' i) (wchart_inr φ φ' i) (wchart_inl φ φ' j) (wchart_inr φ φ' j)
-      (s.f (i ∘ Sum.inl)) (s.f (j ∘ Sum.inl)) (s'.f (i ∘ Sum.inr)) (s'.f (j ∘ Sum.inr)) _ _
-      (s.compat _ _) (s'.compat _ _) _ (linComb_g_sum φ ε φ' ε' i j)
+    mul_compat_generic (wchart_inl φ φ' i) (wchart_inr φ φ' i) (wchart_inl φ φ' j)
+      (wchart_inr φ φ' j) (s.f (i ∘ Sum.inl)) (s.f (j ∘ Sum.inl)) (s'.f (i ∘ Sum.inr))
+      (s'.f (j ∘ Sum.inr)) _ _ (s.compat _ _) (s'.compat _ _) _ (linComb_g_sum φ ε φ' ε' i j)
 
 end ReciprocityTheory.ChartRestriction.G.DVR

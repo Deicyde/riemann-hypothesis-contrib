@@ -17,8 +17,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 theorem traceOne_holds (D : D7) : TraceOne D := by
   haveI : NumberField.IsCMField D.host.E := D.host.isCMField_hostE
 
-  have hgal := (D.host.der.conj_iff D.host.φ₀ ((NumberField.IsCMField.complexConj D.host.E).restrictScalars ℚ)).mp (fun x =>
-    NumberField.ComplexEmbedding.IsConj.eq (NumberField.IsCMField.isConj_complexConj D.host.E D.host.φ₀) x)
+  have hgal :=
+    (D.host.der.conj_iff D.host.φ₀
+        ((NumberField.IsCMField.complexConj D.host.E).restrictScalars ℚ)).mp (fun x =>
+      NumberField.ComplexEmbedding.IsConj.eq
+        (NumberField.IsCMField.isConj_complexConj D.host.E D.host.φ₀) x)
   have hc : ∀ x : D.host.E, D.host.conj x = star x := by
     intro x
     unfold Formalism.HC.HostRaw.conj
@@ -28,7 +31,8 @@ theorem traceOne_holds (D : D7) : TraceOne D := by
     refine ⟨?_, ?_, ?_⟩
     · infer_instance
     · intro ψ a
-      exact NumberField.ComplexEmbedding.IsConj.eq (NumberField.IsCMField.isConj_complexConj D.host.E ψ) a
+      exact NumberField.ComplexEmbedding.IsConj.eq
+        (NumberField.IsCMField.isConj_complexConj D.host.E ψ) a
     · intro P hP
       have hne : P ≠ ⊥ :=
         Ring.ne_bot_of_isMaximal_of_not_isField hP (NumberField.RingOfIntegers.not_isField D.host.E)

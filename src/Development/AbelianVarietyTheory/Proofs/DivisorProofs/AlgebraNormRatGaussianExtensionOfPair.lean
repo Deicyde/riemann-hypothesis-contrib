@@ -36,7 +36,8 @@ theorem basisOneI_one : basisOneI F 1 = ii F := by simp [basisOneI_apply]
 theorem gEmb_eq (a b : F) : gEmb F (a, b) = a • basisOneI F 0 + b • basisOneI F 1 := by
   simp [gEmb, basisOneI_zero, basisOneI_one, Algebra.smul_def]
 
-theorem gEmb_mul_ii (a b : F) : gEmb F (a, b) * ii F = (-b) • basisOneI F 0 + a • basisOneI F 1 := by
+theorem gEmb_mul_ii (a b : F)
+    : gEmb F (a, b) * ii F = (-b) • basisOneI F 0 + a • basisOneI F 1 := by
   simp only [gEmb, basisOneI_zero, basisOneI_one, Algebra.smul_def, map_neg]
   linear_combination (algebraMap F (Ext F) b) * ii_sq F
 
@@ -48,8 +49,8 @@ theorem norm_gEmb_F (a b : F) : Algebra.norm F (gEmb F (a, b)) = a ^ 2 + b ^ 2 :
   simp [Module.Basis.repr_self, Finsupp.single_apply]
   ring
 
-theorem norm_gEmb (a b : F) :
-    ((Algebra.norm ℚ (gEmb F (a, b)) : ℚ) : ℝ) = ∏ τ : F →+* ℝ, ((τ a) ^ 2 + (τ b) ^ 2) := by
+theorem norm_gEmb (a b : F)
+    : ((Algebra.norm ℚ (gEmb F (a, b)) : ℚ) : ℝ) = ∏ τ : F →+* ℝ, ((τ a) ^ 2 + (τ b) ^ 2) := by
   rw [← Algebra.norm_norm (S := F), norm_gEmb_F]
   have h := prod_emb (F := F) (a ^ 2 + b ^ 2)
   apply Complex.ofReal_injective

@@ -6,12 +6,16 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix
+  IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
-private theorem totDisc_quot {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-    [TotallyDisconnectedSpace G] (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G)) :
-    TotallyDisconnectedSpace (G ⧸ N) := by
+private theorem totDisc_quot
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    [TotallyDisconnectedSpace G]
+    (N : Subgroup G) [N.Normal]
+    (hN : IsClosed (N : Set G))
+    : TotallyDisconnectedSpace (G ⧸ N) := by
   haveI : TotallySeparatedSpace (G ⧸ N) := by
     rw [totallySeparatedSpace_iff_exists_isClopen]
     intro a b hab
@@ -48,17 +52,22 @@ private theorem totDisc_quot {G : Type} [Group G] [TopologicalSpace G] [IsTopolo
       exact hyU hy'
   infer_instance
 
-private def permR (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ) :
-    Representation R Γ (Γ ⧸ H → R) where
+private def permR (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ)
+    : Representation R Γ (Γ ⧸ H → R) where
   toFun g := LinearMap.funLeft R R fun x => g⁻¹ • x
   map_one' := by ext f x; simp
   map_mul' g h := by ext f x; simp [mul_smul]
 
-private theorem permR_apply (R : Type) [CommRing R] {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (f : Γ ⧸ H → R)
-    (x : Γ ⧸ H) : permR R H g f x = f (g⁻¹ • x) := rfl
+private theorem permR_apply
+    (R : Type) [CommRing R]
+    {Γ : Type} [Group Γ]
+    (H : Subgroup Γ)
+    (g : Γ) (f : Γ ⧸ H → R) (x : Γ ⧸ H)
+    : permR R H g f x = f (g⁻¹ • x) :=
+  rfl
 
-private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : Γ ⧸ H) :
-    (x.out)⁻¹ * g * (g⁻¹ • x).out ∈ H := by
+private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : Γ ⧸ H)
+    : (x.out)⁻¹ * g * (g⁻¹ • x).out ∈ H := by
   have h1 : ((g⁻¹ * x.out : Γ) : Γ ⧸ H) = (((g⁻¹ • x).out : Γ) : Γ ⧸ H) := by
     rw [QuotientGroup.out_eq']
     conv_rhs => rw [← QuotientGroup.out_eq' x]
@@ -66,15 +75,20 @@ private theorem sec_mem {Γ : Type} [Group Γ] (H : Subgroup Γ) (g : Γ) (x : �
   have h2 := QuotientGroup.eq.1 h1
   simpa [mul_assoc] using h2
 
-private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] (n : ℕ)
-    [NeZero n]
-    (h : ∀ (M : Type) [AddCommGroup M] [Module (ZMod n) M] [TopologicalSpace M] [DiscreteTopology M] [Finite M]
-      (ρ : Representation (ZMod n) Γ M), ContAction ρ → Finite (H1 ρ)) : PhiCond Γ n := by
+private theorem phi_condition_of_finite_cohomology
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (n : ℕ) [NeZero n]
+    (h : ∀ (M : Type) [AddCommGroup M] [Module (ZMod n) M] [TopologicalSpace M] [DiscreteTopology M]
+        [Finite M] (ρ : Representation (ZMod n) Γ M),
+      ContAction ρ → Finite (H1 ρ))
+    : PhiCond Γ n := by
   classical
   intro H hH
   haveI : Finite (Γ ⧸ H) := Subgroup.quotient_finite_of_isOpen H hH
-  have getN : ∀ W : Set Γ, IsClopen W → (1 : Γ) ∈ W →
-      ∃ N : Subgroup Γ, N.Normal ∧ IsOpen (N : Set Γ) ∧ (N : Set Γ) ⊆ W := by
+  have getN
+      : ∀ W : Set Γ,
+        IsClopen W → (1 : Γ) ∈ W
+          → ∃ N : Subgroup Γ, N.Normal ∧ IsOpen (N : Set Γ) ∧ (N : Set Γ) ⊆ W := by
     intro W hW h1
     obtain ⟨N, hN⟩ := IsTopologicalGroup.exist_openNormalSubgroup_sub_clopen_nhds_of_one hW h1
     exact ⟨N.toOpenSubgroup, N.isNormal', N.toOpenSubgroup.isOpen, hN⟩
@@ -86,8 +100,9 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     apply hNH
     have := hN.conj_mem k⁻¹ (N.inv_mem hk) z⁻¹
     simpa [mul_assoc] using this
-  have lc : ∀ {X : Type} [TopologicalSpace X] [DiscreteTopology X] (F : Γ → X) (N : Subgroup Γ),
-      IsOpen (N : Set Γ) → (∀ g, ∀ k ∈ N, F (g * k) = F g) → Continuous F := by
+  have lc
+      : ∀ {X : Type} [TopologicalSpace X] [DiscreteTopology X] (F : Γ → X) (N : Subgroup Γ),
+        IsOpen (N : Set Γ) → (∀ g, ∀ k ∈ N, F (g * k) = F g) → Continuous F := by
     intro X _ _ F N hN hF
     rw [continuous_discrete_rng]
     intro b
@@ -172,8 +187,8 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
     apply lc (c φ) N hNo
     intro g k hk
     rw [hcoc φ g k, hk0 k hk, map_zero, add_zero]
-  let F : {φ : H →* Multiplicative (ZMod n) // IsOpen (φ.ker : Set H)} → H1 ρ :=
-    fun φ => Submodule.Quotient.mk ⟨c φ.1, hZ φ.1 φ.2⟩
+  let F : {φ : H →* Multiplicative (ZMod n) // IsOpen (φ.ker : Set H)} → H1 ρ := fun φ =>
+    Submodule.Quotient.mk ⟨c φ.1, hZ φ.1 φ.2⟩
   have hfin : Finite (H1 ρ) := h M ρ hcont
   refine Finite.of_injective F ?_
   rintro ⟨φ, hφ⟩ ⟨ψ, hψ⟩ hEq
@@ -200,7 +215,8 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
       simp [hfix]
     rw [hel]
     congr 1
-    rw [map_mul, map_mul, map_inv, mul_comm (χ ⟨x0.out, ht⟩)⁻¹ (χ h), mul_assoc, inv_mul_cancel, mul_one]
+    rw [map_mul, map_mul, map_inv, mul_comm (χ ⟨x0.out, ht⟩)⁻¹ (χ h), mul_assoc, inv_mul_cancel,
+      mul_one]
   have hx := congrFun (congrFun hm h) x0
   have hL : (d0 ρ m) h x0 = 0 := by
     show m ((h : Γ)⁻¹ • x0) - m x0 = 0
@@ -210,13 +226,20 @@ private theorem phi_condition_of_finite_cohomology {Γ : Type} [Group Γ] [Topol
   rw [hval φ, hval ψ] at hcc
   exact hcc
 
-theorem UpperTheory.galois_group_phi_condition :
-    GlobalFiniteness → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (S : Finset (HeightOneSpectrum (𝓞 ℚ))), ContainsAbove S l →
-          PhiCond (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) l ∧ CompactSpace (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) ∧ T2Space (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) ∧ TotallyDisconnectedSpace (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) := by
+theorem UpperTheory.galois_group_phi_condition
+    : GlobalFiniteness
+      → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
+          (S : Finset (HeightOneSpectrum (𝓞 ℚ))),
+        ContainsAbove S l
+          → PhiCond (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) l
+            ∧ CompactSpace (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))))
+            ∧ T2Space (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))))
+            ∧ TotallyDisconnectedSpace (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) := by
   intro hGF Ω _ _ _ l _ S hS
   haveI : IsClosed ((NS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))) : Set (G ℚ Ω))) := isClosed_NS Ω _
   refine ⟨?_, inferInstance, inferInstance, totDisc_quot _ (isClosed_NS Ω _)⟩
   haveI : NeZero (l ^ 1) := ⟨pow_ne_zero 1 (Fact.out : l.Prime).ne_zero⟩
-  have key := phi_condition_of_finite_cohomology (Γ := GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) (l ^ 1)
-    (fun M _ _ _ _ _ ρ hc => (hGF ℚ Ω l 1 M S ρ one_pos hS hc).2.1)
+  have key :=
+    phi_condition_of_finite_cohomology (Γ := GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) (l ^ 1)
+      (fun M _ _ _ _ _ ρ hc => (hGF ℚ Ω l 1 M S ρ one_pos hS hc).2.1)
   rwa [pow_one] at key

@@ -12,8 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.ProfCoh
 
-open NumberField IntermediateField GroundTheory.Global GroundTheory.Global.Cyclotomic GroundTheory.LocalField.Abstract
-  FiniteSubfield IsDedekindDomain
+open NumberField IntermediateField GroundTheory.Global GroundTheory.Global.Cyclotomic
+  GroundTheory.LocalField.Abstract FiniteSubfield IsDedekindDomain
 
 open scoped GroundTheory.LocalField.Abstract Pointwise GroundTheory.Global.SemiLocal
 
@@ -29,9 +29,11 @@ end TotallyReal
 
 section Order
 
-theorem pow_dvd_addOrderOf_toZModPow {q : ℕ} [hq : Fact q.Prime] {n e a : ℕ} (hna : n + e ≤ a)
-    {x : ℤ_[q]} (hx : PadicInt.toZModPow n x ≠ 0) :
-    q ^ e ∣ addOrderOf (PadicInt.toZModPow a x) := by
+theorem pow_dvd_addOrderOf_toZModPow
+    {q : ℕ} [hq : Fact q.Prime]
+    {n e a : ℕ} (hna : n + e ≤ a)
+    {x : ℤ_[q]} (hx : PadicInt.toZModPow n x ≠ 0)
+    : q ^ e ∣ addOrderOf (PadicInt.toZModPow a x) := by
   have hdvd : addOrderOf (PadicInt.toZModPow a x) ∣ q ^ a := by
     have := addOrderOf_dvd_natCard (PadicInt.toZModPow a x)
     rwa [Nat.card_zmod] at this
@@ -57,25 +59,31 @@ theorem pow_dvd_addOrderOf_toZModPow {q : ℕ} [hq : Fact q.Prime] {n e a : ℕ}
   rw [← RingHom.mem_ker, PadicInt.ker_toZModPow, Ideal.mem_span_singleton]
   exact h3
 
-theorem pow_dvd_orderOf_degreeMod (r : ℕ+) (q : Nat.Primes) {n e a : ℕ} (hqr : (q : ℕ) ^ a ∣ (r : ℕ))
-    (hna : n + e ≤ a) {σ : Gal(ℚ̄/ℚ)}
-    (hσ : PadicInt.toZModPow n (Multiplicative.toAdd (degreeComponent q σ)) ≠ 0) :
-    (q : ℕ) ^ e ∣ orderOf (degreeMod r σ) := by
+theorem pow_dvd_orderOf_degreeMod
+    (r : ℕ+)
+    (q : Nat.Primes)
+    {n e a : ℕ} (hqr : (q : ℕ) ^ a ∣ (r : ℕ)) (hna : n + e ≤ a)
+    {σ : Gal(ℚ̄/ℚ)} (hσ : PadicInt.toZModPow n (Multiplicative.toAdd (degreeComponent q σ)) ≠ 0)
+    : (q : ℕ) ^ e ∣ orderOf (degreeMod r σ) := by
   let f : Multiplicative (ZMod r) →* Multiplicative (ZMod ((q : ℕ) ^ a)) :=
     AddMonoidHom.toMultiplicative (ZMod.castHom hqr (ZMod ((q : ℕ) ^ a))).toAddMonoidHom
   refine dvd_trans ?_ (orderOf_map_dvd f _)
-  have hf : f (degreeMod r σ) = Multiplicative.ofAdd
-      (PadicInt.toZModPow a (Multiplicative.toAdd (degreeComponent q σ))) := by
+  have hf
+      : f (degreeMod r σ)
+        = Multiplicative.ofAdd (PadicInt.toZModPow a
+          (Multiplicative.toAdd (degreeComponent q σ))) := by
     rw [← toPadicInt_degree, toZModPow_toPadicInt]
     exact congrArg Multiplicative.ofAdd
-      (ProfiniteInteger.castHom_proj (m := primePowPNat (q : ℕ) a) hqr (Multiplicative.toAdd (degree σ)))
+      (ProfiniteInteger.castHom_proj (m := primePowPNat (q : ℕ) a) hqr
+        (Multiplicative.toAdd (degree σ)))
   rw [hf, orderOf_ofAdd_eq_addOrderOf]
   exact pow_dvd_addOrderOf_toZModPow hna hσ
 
-theorem dvd_natCard_of_forall_pow_dvd_orderOf {G : Type*} [Group G] [Finite G] (A : Subgroup G)
-    {m : ℕ} (hm : m ≠ 0)
-    (h : ∀ q : ℕ, q.Prime → q ∣ m → ∃ y ∈ A, q ^ m.factorization q ∣ orderOf y) :
-    m ∣ Nat.card A := by
+theorem dvd_natCard_of_forall_pow_dvd_orderOf
+    {G : Type*} [Group G] [Finite G]
+    (A : Subgroup G)
+    {m : ℕ} (hm : m ≠ 0) (h : ∀ q : ℕ, q.Prime → q ∣ m → ∃ y ∈ A, q ^ m.factorization q ∣ orderOf y)
+    : m ∣ Nat.card A := by
   have hA : Nat.card A ≠ 0 := Nat.card_pos.ne'
   refine (Nat.factorization_prime_le_iff_dvd hm hA).1 fun q hq => ?_
   by_cases hqm : q ∣ m
@@ -91,8 +99,8 @@ end Order
 
 section Primes
 
-theorem exists_prime_comap_eq (E : FiniteSubfield) (w : HeightOneSpectrum (𝓞 E.1)) :
-    ∃ P : Ideal (𝓞 ℚ̄), P.IsPrime ∧ P.comap (ringOfIntegersIncl E.1) = w.asIdeal := by
+theorem exists_prime_comap_eq (E : FiniteSubfield) (w : HeightOneSpectrum (𝓞 E.1))
+    : ∃ P : Ideal (𝓞 ℚ̄), P.IsPrime ∧ P.comap (ringOfIntegersIncl E.1) = w.asIdeal := by
   let _ : Algebra (𝓞 E.1) (𝓞 ℚ̄) := (ringOfIntegersIncl E.1).toAlgebra
   have : IsScalarTower ℤ (𝓞 E.1) (𝓞 ℚ̄) := IsScalarTower.of_algebraMap_eq fun x => by simp
   have : Algebra.IsIntegral ℤ (𝓞 ℚ̄) := ⟨fun b => RingOfIntegers.isIntegral b⟩
@@ -103,29 +111,32 @@ theorem exists_prime_comap_eq (E : FiniteSubfield) (w : HeightOneSpectrum (𝓞 
     rw [← RingHom.ker_eq_comap_bot]
     exact (RingHom.injective_iff_ker_eq_bot _).1 hinj
   have := w.isPrime
-  obtain ⟨P, -, hP, hPw⟩ := Ideal.exists_ideal_over_prime_of_isIntegral w.asIdeal (⊥ : Ideal (𝓞 ℚ̄))
-    (hker.le.trans bot_le)
+  obtain ⟨P, -, hP, hPw⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral w.asIdeal (⊥ : Ideal (𝓞 ℚ̄)) (hker.le.trans bot_le)
   exact ⟨P, hP, hPw⟩
 
-theorem comap_eq_of_liesOver {K E : FiniteSubfield} [Fact (K ≤ E)] {v : HeightOneSpectrum (𝓞 K.1)}
-    (w : HeightOneSpectrum (𝓞 E.1)) [w.asIdeal.LiesOver v.asIdeal] {P : Ideal (𝓞 ℚ̄)}
-    (hP : P.comap (ringOfIntegersIncl E.1) = w.asIdeal) :
-    P.comap (ringOfIntegersIncl K.1) = v.asIdeal := by
+theorem comap_eq_of_liesOver
+    {K E : FiniteSubfield} [Fact (K ≤ E)]
+    {v : HeightOneSpectrum (𝓞 K.1)} (w : HeightOneSpectrum (𝓞 E.1)) [w.asIdeal.LiesOver v.asIdeal]
+    {P : Ideal (𝓞 ℚ̄)} (hP : P.comap (ringOfIntegersIncl E.1) = w.asIdeal)
+    : P.comap (ringOfIntegersIncl K.1) = v.asIdeal := by
   have h : ringOfIntegersIncl K.1 = (ringOfIntegersIncl E.1).comp (algebraMap (𝓞 K.1) (𝓞 E.1)) :=
     RingHom.ext fun _ => rfl
   rw [h, ← Ideal.comap_comap, hP, Ideal.over_def w.asIdeal v.asIdeal]
 
 variable (K : FiniteSubfield) (r : ℕ+)
 
-theorem restrictHom_mem_stabilizer (P : Ideal (𝓞 ℚ̄)) (g : K.1.fixingSubgroup)
-    (hg : (g : Gal(ℚ̄/ℚ)) ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P) :
-    restrictHom (E := cyclotomicLayer K r) g ∈ MulAction.stabilizer Gal((cyclotomicLayer K r).1/K.1)
-      (P.comap (ringOfIntegersIncl (cyclotomicLayer K r).1)) := by
+theorem restrictHom_mem_stabilizer
+    (P : Ideal (𝓞 ℚ̄)) (g : K.1.fixingSubgroup)
+    (hg : (g : Gal(ℚ̄/ℚ)) ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P)
+    : restrictHom (E := cyclotomicLayer K r) g ∈ MulAction.stabilizer
+      Gal((cyclotomicLayer K r).1/K.1) (P.comap (ringOfIntegersIncl (cyclotomicLayer K r).1)) := by
   rw [MulAction.mem_stabilizer_iff] at hg ⊢
   ext x
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem, Ideal.mem_comap, Ideal.mem_comap, ← map_inv]
-  have hx : ringOfIntegersIncl (cyclotomicLayer K r).1 (restrictHom (E := cyclotomicLayer K r) g⁻¹ • x) =
-      ((g : Gal(ℚ̄/ℚ)))⁻¹ • ringOfIntegersIncl (cyclotomicLayer K r).1 x :=
+  have hx
+      : ringOfIntegersIncl (cyclotomicLayer K r).1 (restrictHom (E := cyclotomicLayer K r) g⁻¹ • x)
+        = ((g : Gal(ℚ̄/ℚ)))⁻¹ • ringOfIntegersIncl (cyclotomicLayer K r).1 x :=
     RingOfIntegers.ext rfl
   rw [hx, ← Ideal.mem_pointwise_smul_iff_inv_smul_mem, hg]
 
@@ -133,15 +144,15 @@ end Primes
 
 section Main
 
-theorem exists_dvd_finrank_cyclotomicLayer (K : FiniteSubfield) (S : Finset (HeightOneSpectrum (𝓞 K.1)))
-    {m : ℕ} (hm : m ≠ 0) :
-    ∃ r : ℕ+, ∀ v ∈ S, ∀ w : SemiLocal.PlacesOver (cyclotomicLayer K r).1 v,
+theorem exists_dvd_finrank_cyclotomicLayer
+    (K : FiniteSubfield) (S : Finset (HeightOneSpectrum (𝓞 K.1))) {m : ℕ} (hm : m ≠ 0)
+    : ∃ r : ℕ+, ∀ v ∈ S, ∀ w : SemiLocal.PlacesOver (cyclotomicLayer K r).1 v,
       m ∣ Module.finrank (v.adicCompletion K.1) (w.1.adicCompletion (cyclotomicLayer K r).1) := by
   have h (v : HeightOneSpectrum (𝓞 K.1)) (q : Nat.Primes) :=
     exists_mem_stabilizer_toZModPow_degreeComponent_ne_zero (K := K) v q
   choose n hn using h
-  let N : ℕ := S.sup fun v =>
-    m.primeFactors.attach.sup fun q => n v ⟨q.1, Nat.prime_of_mem_primeFactors q.2⟩
+  let N : ℕ :=
+    S.sup fun v => m.primeFactors.attach.sup fun q => n v ⟨q.1, Nat.prime_of_mem_primeFactors q.2⟩
   obtain ⟨r, hr⟩ : ∃ r : ℕ+, (r : ℕ) = m ^ (N + 1) :=
     ⟨⟨m ^ (N + 1), pow_pos (Nat.pos_of_ne_zero hm) _⟩, rfl⟩
   refine ⟨r, fun v hv w => ?_⟩
@@ -151,32 +162,42 @@ theorem exists_dvd_finrank_cyclotomicLayer (K : FiniteSubfield) (S : Finset (Hei
   obtain ⟨P, hP, hPw⟩ := exists_prime_comap_eq (cyclotomicLayer K _) w.1
   have hPv : P.comap (ringOfIntegersIncl K.1) = v.asIdeal := comap_eq_of_liesOver w.1 hPw
   obtain ⟨σ, hσP, hσK, hσ⟩ := hn v ⟨q, hq⟩ P hP hPv
-  refine ⟨degreeMod _ σ, Subgroup.mem_map.2 ⟨restrictHom (E := cyclotomicLayer K _) ⟨σ, hσK⟩, ?_,
-    layerDegree_restrictHom K _ _⟩, ?_⟩
+  refine ⟨
+    degreeMod _ σ,
+    Subgroup.mem_map.2
+      ⟨restrictHom (E := cyclotomicLayer K _) ⟨σ, hσK⟩, ?_, layerDegree_restrictHom K _ _⟩,
+    ?_
+  ⟩
   · rw [← hPw]
     exact restrictHom_mem_stabilizer K _ P ⟨σ, hσK⟩ hσP
   · have hnN : n v ⟨q, hq⟩ ≤ N := by
       have hqmem : q ∈ m.primeFactors := Nat.mem_primeFactors.2 ⟨hq, hqm, hm⟩
-      refine le_trans ?_ (Finset.le_sup (f := fun v =>
-        m.primeFactors.attach.sup fun q => n v ⟨q.1, Nat.prime_of_mem_primeFactors q.2⟩) hv)
-      exact Finset.le_sup (f := fun q : m.primeFactors => n v ⟨q.1, Nat.prime_of_mem_primeFactors q.2⟩)
+      refine le_trans ?_
+        (Finset.le_sup
+          (f := fun v =>
+            m.primeFactors.attach.sup fun q => n v ⟨q.1, Nat.prime_of_mem_primeFactors q.2⟩)
+          hv)
+      exact Finset.le_sup
+        (f := fun q : m.primeFactors => n v ⟨q.1, Nat.prime_of_mem_primeFactors q.2⟩)
         (Finset.mem_attach _ ⟨q, hqmem⟩)
     have he : 1 ≤ m.factorization q := (hq.dvd_iff_one_le_factorization hm).1 hqm
     have hqr : q ^ (N + m.factorization q) ∣ m ^ (N + 1) := by
-      calc q ^ (N + m.factorization q) ∣ q ^ (m.factorization q * (N + 1)) :=
-            Nat.pow_dvd_pow q (by nlinarith)
+      calc
+        q ^ (N + m.factorization q)
+          ∣ q ^ (m.factorization q * (N + 1)) := Nat.pow_dvd_pow q (by nlinarith)
         _ = (q ^ m.factorization q) ^ (N + 1) := pow_mul _ _ _
         _ ∣ m ^ (N + 1) := pow_dvd_pow_of_dvd (Nat.ordProj_dvd m q) _
     exact pow_dvd_orderOf_degreeMod r ⟨q, hq⟩ (hr ▸ hqr) (by omega) hσ
 
-theorem exists_cyclic_layer_dvd_localDegree (K : FiniteSubfield)
-    (S : Finset (HeightOneSpectrum (𝓞 K.1))) {m : ℕ} (hm : m ≠ 0) :
-    ∃ (E : FiniteSubfield) (_ : Fact (K ≤ E)), IsGalois K.1 E.1 ∧ IsCyclic Gal(E.1/K.1) ∧
-      E.1 ≤ K.1 ⊔ zhatField ∧
-      ∀ v ∈ S, ∀ w : SemiLocal.PlacesOver E.1 v,
-        m ∣ Module.finrank (v.adicCompletion K.1) (w.1.adicCompletion E.1) := by
+theorem exists_cyclic_layer_dvd_localDegree
+    (K : FiniteSubfield) (S : Finset (HeightOneSpectrum (𝓞 K.1))) {m : ℕ} (hm : m ≠ 0)
+    : ∃ (E : FiniteSubfield) (_ : Fact (K ≤ E)),
+      IsGalois K.1 E.1 ∧ IsCyclic Gal(E.1/K.1) ∧ E.1 ≤ K.1 ⊔ zhatField
+        ∧ ∀ v ∈ S, ∀ w : SemiLocal.PlacesOver E.1 v,
+          m ∣ Module.finrank (v.adicCompletion K.1) (w.1.adicCompletion E.1) := by
   obtain ⟨r, hr⟩ := exists_dvd_finrank_cyclotomicLayer K S hm
-  exact ⟨cyclotomicLayer K r, inferInstance, inferInstance, inferInstance, cyclotomicLayer_le K r, hr⟩
+  exact
+    ⟨cyclotomicLayer K r, inferInstance, inferInstance, inferInstance, cyclotomicLayer_le K r, hr⟩
 
 end Main
 

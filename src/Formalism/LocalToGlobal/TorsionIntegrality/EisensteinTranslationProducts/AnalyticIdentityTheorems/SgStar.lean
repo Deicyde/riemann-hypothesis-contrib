@@ -25,10 +25,11 @@ theorem sgStarQuasi_of (hq : SigmaQuasi) (he : EtaSplit) : SgStarQuasi := by
   intro L ω z hω
   simp only [sgStar]
   rw [hq L ω z hω, he L ω]
-  have key : Complex.exp ((s2 L * ω + ((Real.pi : ℂ) / (area L : ℂ)) * conj ω) * (z + ω / 2))
-        * Complex.exp (-(s2 L) * (z + ω) ^ 2 / 2)
-      = Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2)
-        * Complex.exp (-(s2 L) * z ^ 2 / 2) := by
+  have key
+      : Complex.exp ((s2 L * ω + ((Real.pi : ℂ) / (area L : ℂ)) * conj ω) * (z + ω / 2))
+          * Complex.exp (-(s2 L) * (z + ω) ^ 2 / 2)
+        = Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2)
+          * Complex.exp (-(s2 L) * z ^ 2 / 2) := by
     rw [← Complex.exp_add, ← Complex.exp_add]
     congr 1
     simp only [herm]
@@ -39,11 +40,15 @@ theorem sgStarFixed_of (h : SgStarQuasi) : SgStarFixed := by
   intro L ω z hω
   simp only [opU]
   rw [h L ω z hω]
-  have key : Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2)
-      * Complex.exp (-(Real.pi : ℂ) * herm L z ω - (Real.pi : ℂ) * herm L ω ω / 2) = 1 := by
+  have key
+      : Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2)
+          * Complex.exp (-(Real.pi : ℂ) * herm L z ω - (Real.pi : ℂ) * herm L ω ω / 2)
+        = 1 := by
     rw [← Complex.exp_add]
     have : (Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2
-        + (-(Real.pi : ℂ) * herm L z ω - (Real.pi : ℂ) * herm L ω ω / 2) = 0 := by ring
+          + (-(Real.pi : ℂ) * herm L z ω - (Real.pi : ℂ) * herm L ω ω / 2)
+        = 0 := by
+      ring
     rw [this, Complex.exp_zero]
   linear_combination (semiChar L ω * semiChar L ω * sgStar L z) * key
     + sgStar L z * semiChar_sq L ω
@@ -149,8 +154,8 @@ lemma iteratedDeriv_eq_zero_of_bound {f : ℂ → ℂ} (hf : Differentiable ℂ 
 end ModifiedSigmaBounds
 
 open ModifiedSigmaBounds in
-theorem sigmaTaylorLow_of (he : SigmaEntire) (hs : SigmaSummable) :
-    ∀ L : PeriodPair, iteratedDeriv 2 (wSigma L) 0 = 0 ∧ iteratedDeriv 3 (wSigma L) 0 = 0 := by
+theorem sigmaTaylorLow_of (he : SigmaEntire) (hs : SigmaSummable)
+    : ∀ L : PeriodPair, iteratedDeriv 2 (wSigma L) 0 = 0 ∧ iteratedDeriv 3 (wSigma L) 0 = 0 := by
   intro L
   obtain ⟨K, r, hr, hb⟩ := sigma_sub_id_bound hs L
   have hd : Differentiable ℂ (fun z => wSigma L z - z) := (he L).sub differentiable_id
@@ -158,17 +163,18 @@ theorem sigmaTaylorLow_of (he : SigmaEntire) (hs : SigmaSummable) :
     intro n hn hn1
     have h0 := iteratedDeriv_eq_zero_of_bound hd hr hb n hn
     rw [iteratedDeriv_fun_sub ((he L).contDiff.contDiffAt) (contDiff_fun_id.contDiffAt),
-      iteratedDeriv_fun_id_zero, if_neg hn1, sub_zero] at h0
+        iteratedDeriv_fun_id_zero, if_neg hn1, sub_zero]
+      at h0
     exact h0
   exact ⟨key 2 (by norm_num) (by norm_num), key 3 (by norm_num) (by norm_num)⟩
 
-theorem sgStarBasic_of (he : SigmaEntire) (ho : SigmaOdd) (hz : SigmaZero) (h1 : SigmaSimple)
-    (h3 : ∀ L : PeriodPair, iteratedDeriv 2 (wSigma L) 0 = 0 ∧ iteratedDeriv 3 (wSigma L) 0 = 0) :
-    SgStarBasic := by
+theorem sgStarBasic_of
+    (he : SigmaEntire) (ho : SigmaOdd) (hz : SigmaZero) (h1 : SigmaSimple)
+    (h3 : ∀ L : PeriodPair, iteratedDeriv 2 (wSigma L) 0 = 0 ∧ iteratedDeriv 3 (wSigma L) 0 = 0)
+    : SgStarBasic := by
   intro L
   set e : ℂ → ℂ := fun z => Complex.exp (-(s2 L) * z ^ 2 / 2) with he_def
-  have hed : Differentiable ℂ e := by
-    rw [he_def]; fun_prop
+  have hed : Differentiable ℂ e := by rw [he_def]; fun_prop
   have hfun : sgStar L = wSigma L * e := rfl
   have hs0 : wSigma L 0 = 0 := (hz L 0).mpr L.lattice.zero_mem
   have he0 : e 0 = 1 := by simp [he_def]
@@ -182,7 +188,8 @@ theorem sgStarBasic_of (he : SigmaEntire) (ho : SigmaOdd) (hz : SigmaZero) (h1 :
   have he1 : deriv e 0 = 0 := by rw [hde]; simp
   have he2 : iteratedDeriv 2 e 0 = -(s2 L) := by
     rw [iteratedDeriv_succ, iteratedDeriv_one, hde]
-    have h : HasDerivAt (fun z : ℂ => -(s2 L) * z * e z)
+    have h : HasDerivAt
+        (fun z : ℂ => -(s2 L) * z * e z)
         (-(s2 L) * e 0 + -(s2 L) * 0 * deriv e 0) 0 := by
       have := ((hasDerivAt_id (0 : ℂ)).const_mul (-(s2 L))).fun_mul (hed 0).hasDerivAt
       simpa using this

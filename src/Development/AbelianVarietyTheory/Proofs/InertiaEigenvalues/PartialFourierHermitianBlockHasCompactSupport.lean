@@ -9,7 +9,13 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem fourU_hasCompactSupport : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ), IsStdChar ψ → (∀ y : E, algebraMap F E (Algebra.trace F E y) = y + star y) → ∀ f : Hn r F E → ℂ, IsTest f → (∃ U ∈ 𝓝 (0 : Hn r F E), ∀ X : Hn r F E, ∀ u ∈ U, f (X + u) = f X) → HasCompactSupport (fourU M ψ f) := by
+theorem fourU_hasCompactSupport
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ → (∀ y : E, algebraMap F E (Algebra.trace F E y) = y + star y)
+        → ∀ f : Hn r F E → ℂ,
+          IsTest f → (∃ U ∈ 𝓝 (0 : Hn r F E), ∀ X : Hn r F E, ∀ u ∈ U, f (X + u) = f X)
+            → HasCompactSupport (fourU M ψ f) := by
   intro F E _ _ _ _ hUn r M ψ hψ htr f hf hloc
   obtain ⟨U, hU, hfU⟩ := hloc
   haveI : CharZero F := hUn.charZero
@@ -24,9 +30,12 @@ theorem fourU_hasCompactSupport : ∀ (F E : Type) [NontriviallyNormedField F] [
     apply (algebraMap F E).injective
     rw [htr a, ha, hUn.star_fix, ← map_add (f := _), add_halves]
 
-  have hcont : Continuous (fun t : Fin r → E => ((0 : selfAdjoint (Matrix (Fin r) (Fin r) E)), t, (0 : F))) := by
+  have hcont : Continuous (fun t : Fin r → E =>
+      ((0 : selfAdjoint (Matrix (Fin r) (Fin r) E)), t, (0 : F))) := by
     fun_prop
-  have hpre : (fun t : Fin r → E => ((0 : selfAdjoint (Matrix (Fin r) (Fin r) E)), t, (0 : F))) ⁻¹' U ∈ 𝓝 (0 : Fin r → E) :=
+  have hpre
+      : (fun t : Fin r → E => ((0 : selfAdjoint (Matrix (Fin r) (Fin r) E)), t, (0 : F))) ⁻¹' U
+        ∈ 𝓝 (0 : Fin r → E) :=
     hcont.tendsto 0 hU
   obtain ⟨δ, hδ, hball⟩ := Metric.mem_nhds_iff.1 hpre
 
@@ -50,17 +59,22 @@ theorem fourU_hasCompactSupport : ∀ (F E : Type) [NontriviallyNormedField F] [
       rw [← this]
       congr 1
       ext <;> simp [add_comm]
-    have hchar : ∀ c : Fin r → E, ψ (Algebra.trace F E (star (t + c) ⬝ᵥ X.2.1)) =
-        ψ x₀ * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1)) := by
+    have hchar
+        : ∀ c : Fin r → E,
+          ψ (Algebra.trace F E (star (t + c) ⬝ᵥ X.2.1))
+            = ψ x₀ * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1)) := by
       intro c
       rw [star_add, add_dotProduct, map_add (f := _), AddChar.map_add_eq_mul, hst, htra]
     have key : fourU M ψ f X = ψ x₀ * fourU M ψ f X := by
       simp only [fourU]
-      calc ∫ c, f (X.1, c, X.2.2) * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1)) ∂(Measure.pi fun _ : Fin r => M.μE)
-          = ∫ c, f (X.1, t + c, X.2.2) * ψ (Algebra.trace F E (star (t + c) ⬝ᵥ X.2.1)) ∂(Measure.pi fun _ : Fin r => M.μE) :=
-            (integral_add_left_eq_self (fun c => f (X.1, c, X.2.2) * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1))) t).symm
-        _ = ∫ c, ψ x₀ * (f (X.1, c, X.2.2) * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1))) ∂(Measure.pi fun _ : Fin r => M.μE) := by
-            congr 1; funext c; rw [hshift, hchar]; ring
+      calc
+        ∫ c, f (X.1, c, X.2.2) * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1)) ∂(Measure.pi fun _ : Fin r => M.μE)
+            = ∫ c, f (X.1, t + c, X.2.2) * ψ (Algebra.trace F E (star (t + c) ⬝ᵥ X.2.1)) ∂(Measure.pi fun _ : Fin r => M.μE) :=
+          (integral_add_left_eq_self
+            (fun c => f (X.1, c, X.2.2) * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1)))
+            t).symm
+        _ = ∫ c, ψ x₀ * (f (X.1, c, X.2.2) * ψ (Algebra.trace F E (star c ⬝ᵥ X.2.1))) ∂(Measure.pi fun _ : Fin r => M.μE) :=
+          by congr 1; funext c; rw [hshift, hchar]; ring
         _ = _ := integral_const_mul _ _
     have h1 : (1 - ψ x₀) * fourU M ψ f X = 0 := by rw [sub_mul, one_mul, ← key, sub_self]
     rcases mul_eq_zero.1 h1 with h | h
@@ -70,8 +84,10 @@ theorem fourU_hasCompactSupport : ∀ (F E : Type) [NontriviallyNormedField F] [
   have hzero2 : ∀ X : Hn r F E, (∀ c, f (X.1, c, X.2.2) = 0) → fourU M ψ f X = 0 := by
     intro X h
     simp [fourU, h]
-  have hK : IsCompact ((Prod.fst '' tsupport f) ×ˢ (Metric.closedBall (0 : Fin r → E) (‖a‖ / δ) ×ˢ
-      ((fun Y : Hn r F E => Y.2.2) '' tsupport f))) :=
+  have hK : IsCompact
+      ((Prod.fst '' tsupport f)
+        ×ˢ (Metric.closedBall (0 : Fin r → E) (‖a‖ / δ)
+          ×ˢ ((fun Y : Hn r F E => Y.2.2) '' tsupport f))) :=
     (hf.2.image continuous_fst).prod ((isCompact_closedBall _ _).prod (hf.2.image (by fun_prop)))
   refine HasCompactSupport.intro hK fun X hX => ?_
   by_contra hne

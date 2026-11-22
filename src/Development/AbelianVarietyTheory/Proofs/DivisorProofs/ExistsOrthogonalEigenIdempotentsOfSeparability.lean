@@ -8,19 +8,38 @@ open scoped TensorProduct
 
 namespace GlobalTheory.LieIdempotents
 
-theorem balanced_apply {K : Type} {M : Type*} [CommRing K] [AddCommGroup M] (k : ℕ) (u v : Fin k → K)
-    (hyp : ∀ c : K, ∑ j, (c * u j) ⊗ₜ[ℤ] v j = ∑ j, u j ⊗ₜ[ℤ] (v j * c))
-    (B : K →+ K →+ M) (c : K) : ∑ j, B (c * u j) (v j) = ∑ j, B (u j) (v j * c) := by
+theorem balanced_apply
+    {K : Type} {M : Type*} [CommRing K] [AddCommGroup M]
+    (k : ℕ) (u v : Fin k → K) (hyp : ∀ c : K, ∑ j, (c * u j) ⊗ₜ[ℤ] v j = ∑ j, u j ⊗ₜ[ℤ] (v j * c))
+    (B : K →+ K →+ M) (c : K)
+    : ∑ j, B (c * u j) (v j) = ∑ j, B (u j) (v j * c) := by
   have hB : ∀ (r : ℤ) (m n : K), B (r • m) n = B m (r • n) := by
     intro r m n; rw [map_zsmul, map_zsmul]; rfl
   have := congrArg (TensorProduct.liftAddHom B hB) (hyp c)
   set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_sum, TensorProduct.liftAddHom_tmul] using this
+  simpa [map_sum, TensorProduct.liftAddHom_tmul] using this
 
 end GlobalTheory.LieIdempotents
 
 open GlobalTheory.LieIdempotents in
-theorem GlobalTheory.lie_idempotents : ∀ (R C K : Type) [CommRing R] [CommRing C] [CommRing K] (tR : R →+* C) (a : ℕ) (t : Fin a → (K →+* R)), (∀ i j, i ≠ j → Ideal.span (Set.range fun x => t i x - t j x) = ⊤) → ∀ (N : ℤ) (k : ℕ) (u v : Fin k → K), ∑ j, u j * v j = (N : K) → (∀ c : K, ∑ j, (c * u j) ⊗ₜ[ℤ] v j = ∑ j, u j ⊗ₜ[ℤ] (v j * c)) → IsUnit (N : C) → ∀ (H : Type*) [AddCommGroup H] [Module C H] (ρF : K →+* Module.End C H), ∃ φ : Fin a → Module.End C H, (∀ i c, ρF c * φ i = tR (t i c) • φ i) ∧ (∀ i j, φ i * φ j = if i = j then φ i else 0) ∧ (∀ g : Module.End C H, (∀ c, g * ρF c = ρF c * g) → ∀ i, g * φ i = φ i * g) ∧ (∀ F : Submodule C H, (∀ c, ∀ x ∈ F, ρF c x ∈ F) → ∀ i, ∀ x ∈ F, φ i x ∈ F) ∧ (∀ F : Submodule C H, (∀ c, ∀ x ∈ F, ρF c x ∈ F) → ∀ i w, (∀ c, ρF c w - tR (t i c) • w ∈ F) → ∀ j, φ j w - (if j = i then w else 0) ∈ F) := by
+theorem GlobalTheory.lie_idempotents
+    : ∀ (R C K : Type) [CommRing R] [CommRing C] [CommRing K] (tR : R →+* C) (a : ℕ)
+        (t : Fin a → (K →+* R)),
+      (∀ i j, i ≠ j → Ideal.span (Set.range fun x => t i x - t j x) = ⊤)
+        → ∀ (N : ℤ) (k : ℕ) (u v : Fin k → K),
+          ∑ j, u j * v j = (N : K) → (∀ c : K, ∑ j, (c * u j) ⊗ₜ[ℤ] v j = ∑ j, u j ⊗ₜ[ℤ] (v j * c))
+            → IsUnit (N : C)
+            → ∀ (H : Type*) [AddCommGroup H] [Module C H] (ρF : K →+* Module.End C H),
+              ∃ φ : Fin a → Module.End C H,
+                (∀ i c, ρF c * φ i = tR (t i c) • φ i)
+                  ∧ (∀ i j, φ i * φ j = if i = j then φ i else 0)
+                  ∧ (∀ g : Module.End C H, (∀ c, g * ρF c = ρF c * g) → ∀ i, g * φ i = φ i * g)
+                  ∧ (∀ F : Submodule C H, (∀ c, ∀ x ∈ F, ρF c x ∈ F) → ∀ i, ∀ x ∈ F, φ i x ∈ F)
+                  ∧ (∀ F : Submodule C H,
+                    (∀ c, ∀ x ∈ F, ρF c x ∈ F)
+                      → ∀ i w,
+                        (∀ c, ρF c w - tR (t i c) • w ∈ F)
+                          → ∀ j, φ j w - (if j = i then w else 0) ∈ F) := by
   intro R C K _ _ _ tR a t hcom N k u v huv hyp hN H _ _ ρF
   set n : C := ((hN.unit⁻¹ : Cˣ) : C) with hn
   have hnN : n * (N : C) = 1 := hN.val_inv_mul
@@ -30,17 +49,21 @@ theorem GlobalTheory.lie_idempotents : ∀ (R C K : Type) [CommRing R] [CommRing
     split_ifs with hpq
     · subst hpq
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← map_mul, ← map_sum, huv, map_intCast]
+      simp only [← map_mul, ← map_sum, huv, map_intCast]
     · set S := ∑ j, t p (u j) * t q (v j) with hSdef
-      let B : K →+ K →+ R := AddMonoidHom.mk' (fun x => AddMonoidHom.mk' (fun y => t p x * t q y)
-        (by intro y y'; simp [mul_add])) (by intro x x'; ext y; simp [add_mul])
+      let B : K →+ K →+ R :=
+        AddMonoidHom.mk'
+          (fun x => AddMonoidHom.mk' (fun y => t p x * t q y) (by intro y y'; simp [mul_add]))
+          (by intro x x'; ext y; simp [add_mul])
       have hc : ∀ c, t p c * S = S * t q c := by
         intro c
         have := balanced_apply k u v hyp B c
         simp only [B, AddMonoidHom.mk'_apply, map_mul] at this
         rw [hSdef, Finset.mul_sum, Finset.sum_mul]
         convert this using 2 <;> ring
-      have hle : Ideal.span (Set.range fun x => t p x - t q x) ≤ LinearMap.ker (LinearMap.mulLeft R S) := by
+      have hle
+          : Ideal.span (Set.range fun x => t p x - t q x)
+            ≤ LinearMap.ker (LinearMap.mulLeft R S) := by
         rw [Ideal.span_le]
         rintro _ ⟨x, rfl⟩
         simp only [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.mulLeft_apply]
@@ -53,13 +76,18 @@ theorem GlobalTheory.lie_idempotents : ∀ (R C K : Type) [CommRing R] [CommRing
     have := congrArg tR (hS p q)
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_mul] at this
-    rw [this]; split_ifs <;> simp
-  have hnNx : ∀ x : Module.End C H, n • (N : C) • x = x := by
-    intro x; rw [smul_smul, hnN, one_smul]
-  have heig : ∀ i c, ρF c * (n • ∑ j, tR (t i (v j)) • ρF (u j)) = tR (t i c) • (n • ∑ j, tR (t i (v j)) • ρF (u j)) := by
+    rw [this]
+    split_ifs <;> simp
+  have hnNx : ∀ x : Module.End C H, n • (N : C) • x = x := by intro x; rw [smul_smul, hnN, one_smul]
+  have heig
+      : ∀ i c,
+        ρF c * (n • ∑ j, tR (t i (v j)) • ρF (u j))
+          = tR (t i c) • (n • ∑ j, tR (t i (v j)) • ρF (u j)) := by
     intro i c
-    let B : K →+ K →+ Module.End C H := AddMonoidHom.mk' (fun x => AddMonoidHom.mk' (fun y => tR (t i y) • ρF x)
-        (by intro y y'; simp [add_smul])) (by intro x x'; ext y : 1; simp [smul_add])
+    let B : K →+ K →+ Module.End C H :=
+      AddMonoidHom.mk'
+        (fun x => AddMonoidHom.mk' (fun y => tR (t i y) • ρF x) (by intro y y'; simp [add_smul]))
+        (by intro x x'; ext y : 1; simp [smul_add])
     have hb := balanced_apply k u v hyp B c
     simp only [B, AddMonoidHom.mk'_apply, map_mul] at hb
     rw [mul_smul_comm, Finset.mul_sum]
@@ -70,8 +98,7 @@ theorem GlobalTheory.lie_idempotents : ∀ (R C K : Type) [CommRing R] [CommRing
     congr 1
     rw [smul_smul, mul_comm]
   refine ⟨fun i => n • ∑ j, tR (t i (v j)) • ρF (u j), heig, ?_, ?_, ?_, ?_⟩
-  ·
-    intro i j
+  · intro i j
     dsimp only
     generalize hΦ : n • ∑ l, tR (t j (v l)) • ρF (u l) = Φ at heig
     have hj := heig j
@@ -90,14 +117,17 @@ theorem GlobalTheory.lie_idempotents : ∀ (R C K : Type) [CommRing R] [CommRing
     simp only [LinearMap.smul_apply, LinearMap.sum_apply]
     exact F.smul_mem _ (F.sum_mem fun l _ => F.smul_mem _ (hF _ _ hx))
   · intro F hF i w hw j
-    have e : (n • ∑ l, tR (t j (v l)) • ρF (u l)) w - (if j = i then w else 0)
-        = n • ∑ l, tR (t j (v l)) • (ρF (u l) w - tR (t i (u l)) • w) := by
+    have e
+        : (n • ∑ l, tR (t j (v l)) • ρF (u l)) w - (if j = i then w else 0)
+          = n • ∑ l, tR (t j (v l)) • (ρF (u l) w - tR (t i (u l)) • w) := by
       have hite : (if j = i then w else 0) = n • (∑ l, tR (t i (u l)) * tR (t j (v l))) • w := by
-        rw [hSC i j]; by_cases hij : i = j
+        rw [hSC i j]
+        by_cases hij : i = j
         · subst hij; simp [smul_smul, hnN]
         · simp [hij, Ne.symm hij]
       rw [hite]
-      simp only [LinearMap.smul_apply, LinearMap.sum_apply, smul_sub, Finset.sum_sub_distrib, Finset.sum_smul, Finset.smul_sum, smul_smul]
+      simp only [LinearMap.smul_apply, LinearMap.sum_apply, smul_sub, Finset.sum_sub_distrib,
+        Finset.sum_smul, Finset.smul_sum, smul_smul]
       congr 1
       refine Finset.sum_congr rfl fun l _ => ?_
       ring_nf

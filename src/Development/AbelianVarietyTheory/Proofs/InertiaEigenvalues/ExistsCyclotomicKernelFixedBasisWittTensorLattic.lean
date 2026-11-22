@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct GlobalTheory.HWL
 
 namespace GlobalTheory.HWL.FixedBasis
 
@@ -17,13 +18,16 @@ section Average
 
 variable {H R M : Type} [Group H] [CommRing R] [AddCommGroup M] [Module R M]
 
-theorem shift_mem (τ : H → M →+ M) (hmul : ∀ g h x, τ (g * h) x = τ g (τ h x))
-    (J : AddSubgroup M) (hJ : ∀ g, ∀ x ∈ J, τ g x ∈ J) (N : Subgroup H) [Fintype (H ⧸ N)] (x : M)
-    (hx : ∀ ν ∈ N, τ ν x - x ∈ J) (h : H) :
-    τ h (∑ q : H ⧸ N, τ q.out x) - ∑ q : H ⧸ N, τ q.out x ∈ J := by
+theorem shift_mem
+    (τ : H → M →+ M) (hmul : ∀ g h x, τ (g * h) x = τ g (τ h x))
+    (J : AddSubgroup M) (hJ : ∀ g, ∀ x ∈ J, τ g x ∈ J)
+    (N : Subgroup H) [Fintype (H ⧸ N)]
+    (x : M) (hx : ∀ ν ∈ N, τ ν x - x ∈ J)
+    (h : H)
+    : τ h (∑ q : H ⧸ N, τ q.out x) - ∑ q : H ⧸ N, τ q.out x ∈ J := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, ← Equiv.sum_comp (MulAction.toPerm h) (fun q : H ⧸ N => τ q.out x),
-    ← Finset.sum_sub_distrib]
+      ← Finset.sum_sub_distrib]
   refine J.sum_mem fun q _ => ?_
   obtain ⟨ν, hν⟩ := QuotientGroup.mk_out_eq_mul N (h * q.out)
   have e : (MulAction.toPerm h q : H ⧸ N) = ((h * q.out : H) : H ⧸ N) :=
@@ -31,23 +35,32 @@ theorem shift_mem (τ : H → M →+ M) (hmul : ∀ g h x, τ (g * h) x = τ g (
   rw [e, hν, ← hmul, hmul _ (ν : H), ← map_sub, ← neg_sub, map_neg]
   exact J.neg_mem (hJ _ _ (hx _ ν.2))
 
-theorem exists_fixed (σ : H → R → R) (τ : H → M →+ M) (hmul : ∀ g h x, τ (g * h) x = τ g (τ h x))
-    (hsm : ∀ g c x, τ g (c • x) = σ g c • τ g x)
+theorem exists_fixed
+    (σ : H → R → R) (τ : H → M →+ M)
+    (hmul : ∀ g h x, τ (g * h) x = τ g (τ h x)) (hsm : ∀ g c x, τ g (c • x) = σ g c • τ g x)
     (J : ℕ → Submodule R M) (hJ : ∀ n g, ∀ x ∈ J n, τ g x ∈ J n)
     (hcomp : ∀ f : ℕ → M, (∀ n, f (n + 1) - f n ∈ J n) → ∃ L, ∀ n, f n - L ∈ J n)
     (hsep : ∀ x, (∀ n, x ∈ J n) → x = 0)
-    (𝒩 : Set (Subgroup H)) (hnorm : ∀ N ∈ 𝒩, N.Normal)
-    (hdir : ∀ N ∈ 𝒩, ∀ N' ∈ 𝒩, ∃ N'' ∈ 𝒩, N'' ≤ N ∧ N'' ≤ N')
-    (htr : ∀ N ∈ 𝒩, ∃ (_ : Fintype (H ⧸ N)) (b : R), (∀ ν ∈ N, σ ν b = b) ∧
-      ∑ q : H ⧸ N, σ q.out b = 1)
+    (𝒩 : Set (Subgroup H))
+    (hnorm : ∀ N ∈ 𝒩, N.Normal) (hdir : ∀ N ∈ 𝒩, ∀ N' ∈ 𝒩, ∃ N'' ∈ 𝒩, N'' ≤ N ∧ N'' ≤ N')
+    (htr
+      : ∀ N ∈ 𝒩, ∃ (_ : Fintype (H ⧸ N)) (b : R), (∀ ν ∈ N, σ ν b = b) ∧ ∑ q : H ⧸ N, σ q.out b = 1)
     (x₀ : M) (hx₀ : ∀ m, ∃ N ∈ 𝒩, ∀ ν ∈ N, τ ν x₀ - x₀ ∈ J m)
-    (N₀ : Subgroup H) (hN₀ : N₀ ∈ 𝒩) [Fintype (H ⧸ N₀)] (h₀ : ∀ ν ∈ N₀, τ ν x₀ - x₀ ∈ J 0)
-    (y : R) (hy : ∀ ν ∈ N₀, σ ν y = y) :
-    ∃ x, (∀ h, τ h x = x) ∧ ∑ q : H ⧸ N₀, σ q.out y • τ q.out x₀ - x ∈ J 0 := by
+    (N₀ : Subgroup H) (hN₀ : N₀ ∈ 𝒩) [Fintype (H ⧸ N₀)]
+    (h₀ : ∀ ν ∈ N₀, τ ν x₀ - x₀ ∈ J 0)
+    (y : R) (hy : ∀ ν ∈ N₀, σ ν y = y)
+    : ∃ x, (∀ h, τ h x = x) ∧ ∑ q : H ⧸ N₀, σ q.out y • τ q.out x₀ - x ∈ J 0 := by
   let Sm : M → Prop := fun x => ∀ m, ∃ N ∈ 𝒩, ∀ ν ∈ N, τ ν x - x ∈ J m
-  have av : ∀ (m : ℕ) (x : M), Sm x → ∀ N ∈ 𝒩, ∀ [Fintype (H ⧸ N)], (∀ ν ∈ N, τ ν x - x ∈ J m) →
-      ∀ c : R, (∀ ν ∈ N, σ ν c = c) → Sm (∑ q : H ⧸ N, τ q.out (c • x)) ∧
-        ∀ h, τ h (∑ q : H ⧸ N, τ q.out (c • x)) - ∑ q : H ⧸ N, τ q.out (c • x) ∈ J m := by
+  have av
+      : ∀ (m : ℕ) (x : M),
+        Sm x
+          → ∀ N ∈ 𝒩, ∀ [Fintype (H ⧸ N)],
+            (∀ ν ∈ N, τ ν x - x ∈ J m)
+              → ∀ c : R,
+                (∀ ν ∈ N, σ ν c = c)
+                  → Sm (∑ q : H ⧸ N, τ q.out (c • x))
+                    ∧ ∀ h,
+                      τ h (∑ q : H ⧸ N, τ q.out (c • x)) - ∑ q : H ⧸ N, τ q.out (c • x) ∈ J m := by
     intro m x hx N hN _ hNx c hc
     refine ⟨fun k => ?_, shift_mem τ hmul (J m).toAddSubgroup (hJ m) N _ fun ν hν => ?_⟩
     · obtain ⟨N₁, hN₁, h₁⟩ := hx k
@@ -98,8 +111,8 @@ def mult (M : Type) [AddCommGroup M] [Module R M] (p : R) (n : ℕ) : Submodule 
 
 theorem mem_mult {p : R} {n : ℕ} {x : M} : x ∈ mult M p n ↔ ∃ z, p ^ (n + 1) • z = x := Iff.rfl
 
-theorem mem_mult_iff (b : Module.Basis ι R M) {p : R} {n : ℕ} {x : M} :
-    x ∈ mult M p n ↔ ∀ i, p ^ (n + 1) ∣ b.repr x i := by
+theorem mem_mult_iff (b : Module.Basis ι R M) {p : R} {n : ℕ} {x : M}
+    : x ∈ mult M p n ↔ ∀ i, p ^ (n + 1) ∣ b.repr x i := by
   constructor
   · rintro ⟨z, rfl⟩ i
     exact ⟨b.repr z i, by simp⟩
@@ -109,8 +122,11 @@ theorem mem_mult_iff (b : Module.Basis ι R M) {p : R} {n : ℕ} {x : M} :
     conv_rhs => rw [← b.sum_repr x]
     simp only [Finset.smul_sum, hr, mul_smul]
 
-theorem mult_sep (b : Module.Basis ι R M) (p : R) [h : IsAdicComplete (Ideal.span {p}) R] (x : M)
-    (hx : ∀ n, x ∈ mult M p n) : x = 0 := by
+theorem mult_sep
+    (b : Module.Basis ι R M)
+    (p : R) [h : IsAdicComplete (Ideal.span {p}) R]
+    (x : M) (hx : ∀ n, x ∈ mult M p n)
+    : x = 0 := by
   refine b.ext_elem fun i => ?_
   rw [map_zero, Finsupp.zero_apply]
   refine h.haus' _ fun n => ?_
@@ -118,33 +134,44 @@ theorem mult_sep (b : Module.Basis ι R M) (p : R) [h : IsAdicComplete (Ideal.sp
     Ideal.mem_span_singleton]
   exact (pow_dvd_pow p n.le_succ).trans ((mem_mult_iff b).1 (hx n) i)
 
-theorem mult_complete (b : Module.Basis ι R M) (p : R) [h : IsAdicComplete (Ideal.span {p}) R]
-    (f : ℕ → M) (hf : ∀ n, f (n + 1) - f n ∈ mult M p n) : ∃ L, ∀ n, f n - L ∈ mult M p n := by
+theorem mult_complete
+    (b : Module.Basis ι R M)
+    (p : R) [h : IsAdicComplete (Ideal.span {p}) R]
+    (f : ℕ → M) (hf : ∀ n, f (n + 1) - f n ∈ mult M p n)
+    : ∃ L, ∀ n, f n - L ∈ mult M p n := by
   have h1 : ∀ i, ∃ L, ∀ n, p ^ (n + 1) ∣ b.repr (f n) i - L := by
     intro i
     have h2 : ∀ n, p ^ (n + 1) ∣ b.repr (f n) i - b.repr (f (n + 1)) i := fun n => by
       have := (mem_mult_iff b).1 (hf n) i
       rw [map_sub, Finsupp.sub_apply] at this
       exact dvd_sub_comm.1 this
-    obtain ⟨L, hL⟩ := h.prec' (fun n => b.repr (f n) i)
-      ((AdicCompletion.isAdicCauchy_iff (Ideal.span {p}) R _).2 fun n => by
-        simp only [Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, SModEq.sub_mem,
-          Ideal.mem_span_singleton]
-        exact (pow_dvd_pow p n.le_succ).trans (h2 n))
+    obtain ⟨L, hL⟩ :=
+      h.prec'
+        (fun n => b.repr (f n) i)
+        ((AdicCompletion.isAdicCauchy_iff (Ideal.span {p}) R _).2 fun n => by
+          simp only [Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, SModEq.sub_mem,
+            Ideal.mem_span_singleton]
+          exact (pow_dvd_pow p n.le_succ).trans (h2 n))
     refine ⟨L, fun n => ?_⟩
     have hn := hL (n + 1)
     simp only [Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, SModEq.sub_mem,
-      Ideal.mem_span_singleton] at hn
+        Ideal.mem_span_singleton]
+      at hn
     rw [← sub_add_sub_cancel _ (b.repr (f (n + 1)) i)]
     exact (h2 n).add hn
   choose L hL using h1
   refine ⟨b.equivFun.symm L, fun n => (mem_mult_iff b).2 fun i => ?_⟩
-  rw [map_sub, Finsupp.sub_apply, ← b.equivFun_apply (b.equivFun.symm L), LinearEquiv.apply_symm_apply]
+  rw [map_sub, Finsupp.sub_apply, ← b.equivFun_apply (b.equivFun.symm L),
+    LinearEquiv.apply_symm_apply]
   exact hL i n
 
-theorem exists_basis [Nontrivial R] (b : Module.Basis ι R M) (p : R) [IsAdicComplete (Ideal.span {p}) R]
-    (u : M →ₗ[R] M) (hu : Function.Surjective u) (e : ι → M) (he : ∀ i, u (b i) - e i ∈ mult M p 0) :
-    ∃ e' : Module.Basis ι R M, ∀ i, e' i = e i := by
+theorem exists_basis
+    [Nontrivial R]
+    (b : Module.Basis ι R M)
+    (p : R) [IsAdicComplete (Ideal.span {p}) R]
+    (u : M →ₗ[R] M) (hu : Function.Surjective u)
+    (e : ι → M) (he : ∀ i, u (b i) - e i ∈ mult M p 0)
+    : ∃ e' : Module.Basis ι R M, ∀ i, e' i = e i := by
   haveI := Module.Free.of_basis b
   haveI := Module.Finite.of_basis b
   have htop : ⊤ ≤ Submodule.span R (Set.range e) := by
@@ -160,12 +187,16 @@ theorem exists_basis [Nontrivial R] (b : Module.Basis ι R M) (p : R) [IsAdicCom
     · rw [zero_add, pow_one]; exact Ideal.mem_span_singleton_self p
     · rw [← Submodule.map_span, b.span_eq, ← LinearMap.range_eq_map, LinearMap.range_eq_top.2 hu]
       trivial
-  exact ⟨basisOfTopLeSpanOfCardEqFinrank e htop (Module.finrank_eq_card_basis b).symm,
-    fun i => by simp⟩
+  exact
+    ⟨basisOfTopLeSpanOfCardEqFinrank e htop (Module.finrank_eq_card_basis b).symm, fun i => by simp⟩
 
-theorem surjective_of_matrix {W : Type} [CommRing W] [DecidableEq ι] (j : W →+* R) (m : ι → M)
-    (hm : Submodule.span R (Set.range m) = ⊤) (u : M →ₗ[R] M) (U : Matrix ι ι W)
-    (hU : IsUnit U.det) (hu : ∀ k, u (m k) = ∑ i, j (U i k) • m i) : Function.Surjective u := by
+theorem surjective_of_matrix
+    {W : Type} [CommRing W] [DecidableEq ι]
+    (j : W →+* R)
+    (m : ι → M) (hm : Submodule.span R (Set.range m) = ⊤)
+    (u : M →ₗ[R] M) (U : Matrix ι ι W)
+    (hU : IsUnit U.det) (hu : ∀ k, u (m k) = ∑ i, j (U i k) • m i)
+    : Function.Surjective u := by
   rw [← LinearMap.range_eq_top, eq_top_iff, ← hm, Submodule.span_le]
   rintro _ ⟨k, rfl⟩
   refine ⟨∑ a, j (U⁻¹ a k) • m a, ?_⟩
@@ -183,23 +214,28 @@ end Complete
 
 section Independent
 
-theorem exists_det_ne_zero {A C Q ι : Type} [CommRing A] [Field C] [Fintype Q] [Fintype ι]
-    [DecidableEq ι] (s : Q → A →+* C) (hs : Function.Injective s) (S : Set C) (hS : S.Infinite)
-    (hSA : ∀ c ∈ S, ∃ a : A, ∀ q, s q a = c) (B : Q → Matrix ι ι C) (q₀ : Q) (hB : (B q₀).det ≠ 0) :
-    ∃ y : A, (∑ q, s q y • B q).det ≠ 0 := by
+theorem exists_det_ne_zero
+    {A C Q ι : Type} [CommRing A] [Field C] [Fintype Q] [Fintype ι] [DecidableEq ι]
+    (s : Q → A →+* C) (hs : Function.Injective s)
+    (S : Set C) (hS : S.Infinite) (hSA : ∀ c ∈ S, ∃ a : A, ∀ q, s q a = c)
+    (B : Q → Matrix ι ι C) (q₀ : Q) (hB : (B q₀).det ≠ 0)
+    : ∃ y : A, (∑ q, s q y • B q).det ≠ 0 := by
   classical
   have hli : LinearIndependent C fun q => (s q : A → C) :=
-    (linearIndependent_monoidHom A C).comp (fun q => (s q : A →* C)) fun q q' h =>
-      hs (RingHom.ext fun a => DFunLike.congr_fun h a)
+    (linearIndependent_monoidHom A C).comp
+      (fun q => (s q : A →* C))
+      fun q q' h => hs (RingHom.ext fun a => DFunLike.congr_fun h a)
   have hsp := span_flip_eq_top_iff_linearIndependent.2 hli
-  have hmem : (Pi.single q₀ 1 : Q → C) ∈ Submodule.span C
-      (Set.range (flip fun q => (s q : A → C))) := by rw [hsp]; trivial
+  have hmem
+      : (Pi.single q₀ 1 : Q → C) ∈ Submodule.span C (Set.range (flip fun q => (s q : A → C))) := by
+    rw [hsp]; trivial
   obtain ⟨c, hc⟩ := Finsupp.mem_span_range_iff_exists_finsupp.1 hmem
   let F : MvPolynomial A C :=
     (∑ q, (∑ a ∈ c.support, MvPolynomial.X a * MvPolynomial.C (s q a) : MvPolynomial A C) •
       (B q).map MvPolynomial.C).det
-  have hF : ∀ x : A → C, MvPolynomial.eval x F =
-      (∑ q, (∑ a ∈ c.support, x a * s q a) • B q).det := fun x => by
+  have hF
+      : ∀ x : A → C,
+        MvPolynomial.eval x F = (∑ q, (∑ a ∈ c.support, x a * s q a) • B q).det := fun x => by
     rw [RingHom.map_det]
     congr 1
     ext i k
@@ -223,23 +259,29 @@ end Independent
 
 section Generic
 
-variable {H Z O W T ι κ : Type} [Group H] [CommRing Z] [CommRing O] [CommRing W] [Algebra Z O]
-  [Algebra Z W] [AddCommGroup T] [Module O T] [Module Z T] [IsScalarTower Z O T] [Fintype ι]
-  [Fintype κ] [DecidableEq κ]
+variable
+  {H Z O W T ι κ : Type}
+  [Group H] [CommRing Z] [CommRing O] [CommRing W] [Algebra Z O] [Algebra Z W] [AddCommGroup T]
+  [Module O T] [Module Z T] [IsScalarTower Z O T] [Fintype ι] [Fintype κ] [DecidableEq κ]
 
-theorem generic (b : Module.Basis ι O T) (c : Module.Basis κ Z T) (ρ : H →* (T →ₗ[O] T))
-    (a : H →* (W ≃ₐ[Z] W)) (p : ℕ) [Nontrivial (O ⊗[Z] W)]
-    [IsAdicComplete (Ideal.span {(p : O ⊗[Z] W)}) (O ⊗[Z] W)]
+theorem generic
+    (b : Module.Basis ι O T)
+    (c : Module.Basis κ Z T)
+    (ρ : H →* (T →ₗ[O] T)) (a : H →* (W ≃ₐ[Z] W))
+    (p : ℕ) [Nontrivial (O ⊗[Z] W)] [IsAdicComplete (Ideal.span {(p : O ⊗[Z] W)}) (O ⊗[Z] W)]
     (𝒩 : Set (Subgroup H)) (hnorm : ∀ N ∈ 𝒩, N.Normal)
-    (hdir : ∀ N ∈ 𝒩, ∀ N' ∈ 𝒩, ∃ N'' ∈ 𝒩, N'' ≤ N ∧ N'' ≤ N')
-    (hfin : ∀ N ∈ 𝒩, Finite (H ⧸ N))
+    (hdir : ∀ N ∈ 𝒩, ∀ N' ∈ 𝒩, ∃ N'' ∈ 𝒩, N'' ≤ N ∧ N'' ≤ N') (hfin : ∀ N ∈ 𝒩, Finite (H ⧸ N))
     (hsmall : ∀ m, ∃ N ∈ 𝒩, ∀ ν ∈ N, ∀ i, ρ ν (b i) - b i ∈ mult T (p : Z) m)
-    (hbase : ∀ N ∈ 𝒩, ∀ [Fintype (H ⧸ N)] {μ : Type} [Fintype μ] [DecidableEq μ]
-      (B : H ⧸ N → Matrix μ μ Z) (q₀ : H ⧸ N), IsUnit (B q₀).det →
-      ∃ y : W, (∀ ν ∈ N, a ν y = y) ∧ IsUnit (∑ q, a q.out y • (B q).map (algebraMap Z W)).det) :
-    ∃ e : Module.Basis ι (O ⊗[Z] W) ((O ⊗[Z] W) ⊗[O] T), ∀ g i,
-      TensorProduct.map (Algebra.TensorProduct.map (AlgHom.id O O) (a g).toAlgHom).toLinearMap
-        (ρ g) (e i) = e i := by
+    (hbase : ∀ N ∈ 𝒩,
+      ∀ [Fintype (H ⧸ N)] {μ : Type} [Fintype μ] [DecidableEq μ] (B : H ⧸ N → Matrix μ μ Z)
+          (q₀ : H ⧸ N),
+        IsUnit (B q₀).det
+          → ∃ y : W,
+            (∀ ν ∈ N, a ν y = y) ∧ IsUnit (∑ q, a q.out y • (B q).map (algebraMap Z W)).det)
+    : ∃ e : Module.Basis ι (O ⊗[Z] W) ((O ⊗[Z] W) ⊗[O] T), ∀ g i,
+      TensorProduct.map (Algebra.TensorProduct.map (AlgHom.id O O) (a g).toAlgHom).toLinearMap (ρ g)
+          (e i)
+        = e i := by
   classical
   let σ : H → (O ⊗[Z] W →ₐ[O] O ⊗[Z] W) := fun g =>
     Algebra.TensorProduct.map (AlgHom.id O O) (a g).toAlgHom
@@ -268,8 +310,9 @@ theorem generic (b : Module.Basis ι O T) (c : Module.Basis κ Z T) (ρ : H →*
   have hJ : ∀ n g, ∀ x ∈ J n, τ g x ∈ J n := by
     rintro n g _ ⟨z, rfl⟩
     exact ⟨τ g z, by simp only [LinearMap.lsmul_apply, hsm, map_pow, map_natCast]⟩
-  have htr : ∀ N ∈ 𝒩, ∃ (_ : Fintype (H ⧸ N)) (b : O ⊗[Z] W), (∀ ν ∈ N, σ ν b = b) ∧
-      ∑ q : H ⧸ N, σ q.out b = 1 := by
+  have htr
+      : ∀ N ∈ 𝒩, ∃ (_ : Fintype (H ⧸ N)) (b : O ⊗[Z] W),
+        (∀ ν ∈ N, σ ν b = b) ∧ ∑ q : H ⧸ N, σ q.out b = 1 := by
     intro N hN
     haveI := hfin N hN
     letI := Fintype.ofFinite (H ⧸ N)
@@ -277,9 +320,15 @@ theorem generic (b : Module.Basis ι O T) (c : Module.Basis κ Z T) (ρ : H →*
     rw [Matrix.det_unique, Matrix.sum_apply] at hu
     have hu' : IsUnit (∑ q : H ⧸ N, a q.out y) := by simpa using hu
     have ht : ∀ h, a h (∑ q : H ⧸ N, a q.out y) = ∑ q : H ⧸ N, a q.out y := fun h => by
-      have := shift_mem (fun g => (a g).toAddEquiv.toAddMonoidHom) (fun g h x => by simp) ⊥
-        (fun g x hx => by rw [AddSubgroup.mem_bot] at hx ⊢; simp [hx]) N y
-        (fun ν hν => by simp [hy ν hν]) h
+      have :=
+        shift_mem
+          (fun g => (a g).toAddEquiv.toAddMonoidHom)
+          (fun g h x => by simp)
+          ⊥
+          (fun g x hx => by rw [AddSubgroup.mem_bot] at hx ⊢; simp [hx])
+          N y
+          (fun ν hν => by simp [hy ν hν])
+          h
       exact sub_eq_zero.1 (AddSubgroup.mem_bot.1 this)
     obtain ⟨w, hw⟩ := hu'.exists_right_inv
     have hwf : ∀ h, a h w = w := fun h => by
@@ -291,8 +340,10 @@ theorem generic (b : Module.Basis ι O T) (c : Module.Basis κ Z T) (ρ : H →*
     · simp only [hσ, map_mul, hwf]
       rw [← TensorProduct.tmul_sum, ← Finset.sum_mul, hw]
       rfl
-  have hz : ∀ (z : Z) (t : T), (1 : O ⊗[Z] W) ⊗ₜ[O] (z • t) =
-      ((1 : O) ⊗ₜ[Z] algebraMap Z W z) • ((1 : O ⊗[Z] W) ⊗ₜ[O] t) := fun z t => by
+  have hz
+      : ∀ (z : Z) (t : T),
+        (1 : O ⊗[Z] W) ⊗ₜ[O] (z • t)
+          = ((1 : O) ⊗ₜ[Z] algebraMap Z W z) • ((1 : O ⊗[Z] W) ⊗ₜ[O] t) := fun z t => by
     rw [← algebraMap_smul O z t, ← TensorProduct.smul_tmul, TensorProduct.smul_tmul', smul_eq_mul,
       mul_one, Algebra.TensorProduct.one_def, TensorProduct.smul_tmul', smul_eq_mul, mul_one,
       Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
@@ -309,26 +360,35 @@ theorem generic (b : Module.Basis ι O T) (c : Module.Basis κ Z T) (ρ : H →*
   obtain ⟨N₀, hN₀, h₀⟩ := hsmall' 0
   haveI := hfin N₀ hN₀
   letI := Fintype.ofFinite (H ⧸ N₀)
-  obtain ⟨y, hy, hu⟩ := hbase N₀ hN₀
-    (fun q => LinearMap.toMatrix c c ((ρ q.out).restrictScalars Z)) ((1 : H) : H ⧸ N₀) (by
-      haveI := Module.Free.of_basis c
-      haveI := Module.Finite.of_basis c
-      rw [LinearMap.det_toMatrix, ← LinearMap.isUnit_iff_isUnit_det, Module.End.isUnit_iff]
-      exact (Module.End.isUnit_iff (ρ _)).1 ((Group.isUnit _).map ρ))
-  have hex := fun i => exists_fixed (fun g => σ g) τ hmul hsm J hJ (mult_complete bM _)
-    (mult_sep bM _) 𝒩 hnorm hdir htr (bM i)
-    (fun m => (hsmall' m).imp fun N h => ⟨h.1, h.2 i⟩) N₀ hN₀ (h₀ i) ((1 : O) ⊗ₜ[Z] y)
-    (fun ν hν => by rw [hσ, hy ν hν])
+  obtain ⟨y, hy, hu⟩ :=
+    hbase N₀ hN₀
+      (fun q => LinearMap.toMatrix c c ((ρ q.out).restrictScalars Z))
+      ((1 : H) : H ⧸ N₀)
+      (by
+        haveI := Module.Free.of_basis c
+        haveI := Module.Finite.of_basis c
+        rw [LinearMap.det_toMatrix, ← LinearMap.isUnit_iff_isUnit_det, Module.End.isUnit_iff]
+        exact (Module.End.isUnit_iff (ρ _)).1 ((Group.isUnit _).map ρ))
+  have hex := fun i =>
+    exists_fixed
+      (fun g => σ g)
+      τ hmul hsm J hJ (mult_complete bM _) (mult_sep bM _) 𝒩 hnorm hdir htr (bM i)
+      (fun m => (hsmall' m).imp fun N h => ⟨h.1, h.2 i⟩)
+      N₀ hN₀ (h₀ i) ((1 : O) ⊗ₜ[Z] y)
+      (fun ν hν => by rw [hσ, hy ν hν])
   choose e he he' using hex
   let u : (O ⊗[Z] W) ⊗[O] T →ₗ[O ⊗[Z] W] (O ⊗[Z] W) ⊗[O] T :=
     ∑ q : H ⧸ N₀, ((1 : O) ⊗ₜ[Z] a q.out y) • (ρ q.out).baseChange (O ⊗[Z] W)
-  have hut : ∀ t, u (1 ⊗ₜ[O] t) =
-      ∑ q : H ⧸ N₀, ((1 : O) ⊗ₜ[Z] a q.out y) • ((1 : O ⊗[Z] W) ⊗ₜ[O] ρ q.out t) := fun t => by
-    simp only [u, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.baseChange_tmul]
+  have hut
+      : ∀ t,
+        u (1 ⊗ₜ[O] t)
+          = ∑ q : H ⧸ N₀, ((1 : O) ⊗ₜ[Z] a q.out y) • ((1 : O ⊗[Z] W) ⊗ₜ[O] ρ q.out t) := fun t =>
+    by simp only [u, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.baseChange_tmul]
   have hsurj : Function.Surjective u := by
-    refine surjective_of_matrix
-      (Algebra.TensorProduct.includeRight : W →ₐ[Z] O ⊗[Z] W).toRingHom
-      (fun k => 1 ⊗ₜ[O] c k) ?_ u _ hu fun k => ?_
+    refine surjective_of_matrix (Algebra.TensorProduct.includeRight : W →ₐ[Z] O ⊗[Z] W).toRingHom
+      (fun k => 1 ⊗ₜ[O] c k)
+      ?_ u _ hu
+      fun k => ?_
     · rw [eq_top_iff, ← bM.span_eq, Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       rw [hbM, ← c.sum_repr (b i), TensorProduct.tmul_sum]
@@ -344,11 +404,12 @@ theorem generic (b : Module.Basis ι O T) (c : Module.Basis κ Z T) (ρ : H →*
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hz, smul_smul]
       simp [LinearMap.toMatrix_apply]
-  obtain ⟨e', he''⟩ := exists_basis bM _ u hsurj e fun i => by
-    have := he' i
-    simp only [hbM, hσ, hτ, map_one] at this
-    rw [hbM, hut]
-    exact this
+  obtain ⟨e', he''⟩ :=
+    exists_basis bM _ u hsurj e fun i => by
+      have := he' i
+      simp only [hbM, hσ, hτ, map_one] at this
+      rw [hbM, hut]
+      exact this
   exact ⟨e', fun g i => by rw [he'']; exact he i g⟩
 
 end Generic
@@ -357,8 +418,8 @@ section Concrete
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem exists_normal {U : Set (GQ l)} (hU : U ∈ nhds (1 : GQ l)) :
-    ∃ L : FinExt l, (GK L).Normal ∧ (GK L : Set (GQ l)) ⊆ U := by
+theorem exists_normal {U : Set (GQ l)} (hU : U ∈ nhds (1 : GQ l))
+    : ∃ L : FinExt l, (GK L).Normal ∧ (GK L : Set (GQ l)) ⊆ U := by
   obtain ⟨E, h1, h2, h3⟩ := (krullTopology_mem_nhds_one_iff_of_normal ℚ_[l] (Om l) U).1 hU
   refine ⟨⟨E, h1⟩, ?_, h3⟩
   change E.fixingSubgroup.Normal
@@ -376,9 +437,9 @@ theorem finiteIndex_GK (L : FinExt l) : (GK L).FiniteIndex := by
 
 variable {P : LocPrime l} (AI : LocAinf l P)
 
-theorem act_teich (g : GQ l) (y : OCb l) :
-    AI.actWCbHom g (WittVector.teichmuller l (algebraMap (OCb l) (Cb l) y)) =
-      WittVector.teichmuller l (algebraMap (OCb l) (Cb l) (AI.actT g y)) := by
+theorem act_teich (g : GQ l) (y : OCb l)
+    : AI.actWCbHom g (WittVector.teichmuller l (algebraMap (OCb l) (Cb l) y))
+      = WittVector.teichmuller l (algebraMap (OCb l) (Cb l) (AI.actT g y)) := by
   change AI.actWCb g _ = _
   rw [LocAinf.actWCb, WittVector.map_teichmuller, ← autCb_alg]
   rfl
@@ -393,19 +454,25 @@ theorem pow_injective : Function.Injective fun n : ℕ => (AI.ε - 1) ^ n := by
   rw [map_sub, AI.ε_coeff, AI.ζ_zero, map_one, map_one, sub_self] at h1
   exact not_isUnit_zero h1
 
-theorem base (hF : FaithH AI) {H : Type} [Group H] (f : H →* GQ l) (hf : ∀ h, P.χQ (f h) = 1)
-    (L : FinExt l) (hL : ∀ g ∈ GK L, P.χQ g = 1 → g ∈ f.range) (N : Subgroup H)
-    (hN : ∀ h, h ∈ N ↔ f h ∈ GK L) [Fintype (H ⧸ N)] {μ : Type} [Fintype μ] [DecidableEq μ]
-    (B : H ⧸ N → Matrix μ μ ℤ_[l]) (q₀ : H ⧸ N) (hB : IsUnit (B q₀).det) :
-    ∃ y : WCb l, (∀ ν ∈ N, AI.actWCbHom (f ν) y = y) ∧
-      IsUnit (∑ q, AI.actWCbHom (f q.out) y • (B q).map (algebraMap ℤ_[l] (WCb l))).det := by
-  let A : Subring (OCb l) :=
-    { carrier := {x | ∀ ν ∈ N, AI.actT (f ν) x = x}
-      mul_mem' := fun hx hy ν hν => by rw [map_mul, hx ν hν, hy ν hν]
-      one_mem' := fun ν _ => map_one _
-      add_mem' := fun hx hy ν hν => by rw [map_add (f := _), hx ν hν, hy ν hν]
-      zero_mem' := fun ν _ => map_zero _
-      neg_mem' := fun hx ν hν => by rw [map_neg, hx ν hν] }
+theorem base
+    (hF : FaithH AI)
+    {H : Type} [Group H]
+    (f : H →* GQ l) (hf : ∀ h, P.χQ (f h) = 1)
+    (L : FinExt l) (hL : ∀ g ∈ GK L, P.χQ g = 1 → g ∈ f.range)
+    (N : Subgroup H) (hN : ∀ h, h ∈ N ↔ f h ∈ GK L) [Fintype (H ⧸ N)]
+    {μ : Type} [Fintype μ] [DecidableEq μ]
+    (B : H ⧸ N → Matrix μ μ ℤ_[l]) (q₀ : H ⧸ N) (hB : IsUnit (B q₀).det)
+    : ∃ y : WCb l,
+      (∀ ν ∈ N, AI.actWCbHom (f ν) y = y)
+        ∧ IsUnit (∑ q, AI.actWCbHom (f q.out) y • (B q).map (algebraMap ℤ_[l] (WCb l))).det := by
+  let A : Subring (OCb l) := {
+    carrier := {x | ∀ ν ∈ N, AI.actT (f ν) x = x}
+    mul_mem' := fun hx hy ν hν => by rw [map_mul, hx ν hν, hy ν hν]
+    one_mem' := fun ν _ => map_one _
+    add_mem' := fun hx hy ν hν => by rw [map_add (f := _), hx ν hν, hy ν hν]
+    zero_mem' := fun ν _ => map_zero _
+    neg_mem' := fun hx ν hν => by rw [map_neg, hx ν hν]
+  }
   let s : H ⧸ N → A →+* Cb l := fun q =>
     (algebraMap (OCb l) (Cb l)).comp ((AI.actT (f q.out)).toRingHom.comp A.subtype)
   have hs : ∀ q (x : A), s q x = algebraMap (OCb l) (Cb l) (AI.actT (f q.out) x) := fun _ _ => rfl
@@ -414,8 +481,7 @@ theorem base (hF : FaithH AI) {H : Type} [Group H] (f : H →* GQ l) (hf : ∀ h
     rw [← q.out_eq', ← q'.out_eq', QuotientGroup.eq, hN]
     refine hF L _ (hf _) fun x hx => ?_
     have hxA : x ∈ A := fun ν hν => hx _ ((hN ν).1 hν) (hf ν)
-    have h1 : AI.actT (f q.out) x = AI.actT (f q'.out) x :=
-      hinj (DFunLike.congr_fun h ⟨x, hxA⟩)
+    have h1 : AI.actT (f q.out) x = AI.actT (f q'.out) x := hinj (DFunLike.congr_fun h ⟨x, hxA⟩)
     rw [map_mul, map_mul, RingAut.mul_apply]
     erw [← h1]
     rw [← RingAut.mul_apply, ← map_mul, ← map_mul]
@@ -425,15 +491,17 @@ theorem base (hF : FaithH AI) {H : Type} [Group H] (f : H →* GQ l) (hf : ∀ h
   have hfix : ∀ (n : ℕ) h, AI.actT (f h) ((AI.ε - 1) ^ n) = (AI.ε - 1) ^ n := fun n h => by
     rw [map_pow, map_sub, map_one, act_eps AI _ (hf h)]
   let z : ℤ_[l] →+* Cb l := WittVector.constantCoeff.comp (algebraMap ℤ_[l] (WCb l))
-  obtain ⟨y, hy⟩ := exists_det_ne_zero s hsi
-    (Set.range fun n : ℕ => algebraMap (OCb l) (Cb l) ((AI.ε - 1) ^ n))
-    (Set.infinite_range_of_injective (hinj.comp (pow_injective AI)))
-    (by
-      rintro _ ⟨n, rfl⟩
-      exact ⟨⟨(AI.ε - 1) ^ n, fun ν _ => hfix n ν⟩, fun q => by rw [hs, hfix]⟩)
-    (fun q => (B q).map z) q₀ (by
-      have := (hB.map z).ne_zero
-      rwa [RingHom.map_det] at this)
+  obtain ⟨y, hy⟩ :=
+    exists_det_ne_zero s hsi (Set.range fun n : ℕ => algebraMap (OCb l) (Cb l) ((AI.ε - 1) ^ n))
+      (Set.infinite_range_of_injective (hinj.comp (pow_injective AI)))
+      (by
+        rintro _ ⟨n, rfl⟩
+        exact ⟨⟨(AI.ε - 1) ^ n, fun ν _ => hfix n ν⟩, fun q => by rw [hs, hfix]⟩)
+      (fun q => (B q).map z)
+      q₀
+      (by
+        have := (hB.map z).ne_zero
+        rwa [RingHom.map_det] at this)
   refine ⟨WittVector.teichmuller l (algebraMap (OCb l) (Cb l) y), fun ν hν => ?_, ?_⟩
   · rw [act_teich, y.2 ν hν]
   · apply WittVector.isUnit_of_coeff_zero_ne_zero
@@ -443,32 +511,39 @@ theorem base (hF : FaithH AI) {H : Type} [Group H] (f : H →* GQ l) (hf : ∀ h
     ext i k
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply,
-      smul_eq_mul, map_sum, map_mul, act_teich, hs]
+        smul_eq_mul, map_sum, map_mul, act_teich, hs]
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero]
     rfl
 
 section Lattice
 
-variable {G L O : Type} [Group G] [TopologicalSpace G] [Field L] [Algebra ℚ_[l] L] [CommRing O]
+variable
+  {G L O : Type} [Group G] [TopologicalSpace G] [Field L] [Algebra ℚ_[l] L] [CommRing O]
   [Algebra O L] [TopologicalSpace L] [Algebra ℤ_[l] O] [FiniteDimensional ℚ_[l] L]
   [IsTopologicalRing L] [T2Space L] [ContinuousSMul ℚ_[l] L]
 
-theorem small (hc : ∀ c : ℤ_[l], algebraMap O L (algebraMap ℤ_[l] O c) =
-      algebraMap ℚ_[l] L (algebraMap ℤ_[l] ℚ_[l] c)) (T : LocLat G ℚ_[l] L O) {ι κ : Type}
-    [Fintype ι] [Fintype κ] (x : ι → ↥T.L.T) (m : ℕ) :
-    letI := Module.compHom ↥T.L.T (algebraMap ℤ_[l] O);
-    ∀ _ : Module.Basis κ ℤ_[l] ↥T.L.T, ∀ᶠ g : G in nhds 1,
-      ∀ i, T.actT g (x i) - x i ∈ mult ↥T.L.T (l : ℤ_[l]) m := by
+theorem small
+    (hc : ∀ c : ℤ_[l],
+      algebraMap O L (algebraMap ℤ_[l] O c) = algebraMap ℚ_[l] L (algebraMap ℤ_[l] ℚ_[l] c))
+    (T : LocLat G ℚ_[l] L O)
+    {ι κ : Type} [Fintype ι] [Fintype κ]
+    (x : ι → ↥T.L.T) (m : ℕ)
+    : letI := Module.compHom ↥T.L.T (algebraMap ℤ_[l] O)
+      ∀ _ : Module.Basis κ ℤ_[l] ↥T.L.T,
+        ∀ᶠ g : G in nhds 1,
+          ∀ i, T.actT g (x i) - x i ∈ mult ↥T.L.T (l : ℤ_[l]) m := by
   letI := Module.compHom ↥T.L.T (algebraMap ℤ_[l] O)
   intro c
   have hp : l.Prime := Fact.out
   simp only [mem_mult_iff c, Filter.eventually_all]
   intro i k
   have h1 := (GlobalTheory.Cyc.continuous_coord_lat hc T c (x i) k).tendsto 1
-  have h2 : actT T.L 1 (x i) = x i := Subtype.ext (by
-    change T.ρ 1 (x i : T.V) = x i
-    rw [map_one]; rfl)
+  have h2 : actT T.L 1 (x i) = x i :=
+    Subtype.ext (by
+      change T.ρ 1 (x i : T.V) = x i
+      rw [map_one]
+      rfl)
   rw [h2] at h1
   have hpos : (0 : ℝ) < (l : ℝ) ^ (-((m + 1 : ℕ) : ℤ)) := by have := hp.pos; positivity
   filter_upwards [Metric.tendsto_nhds.1 h1 _ hpos] with g hg
@@ -477,23 +552,25 @@ theorem small (hc : ∀ c : ℤ_[l], algebraMap O L (algebraMap ℤ_[l] O c) =
   rw [dist_eq_norm, ← map_sub] at hg
   exact hg.le
 
-theorem lattice [Nontrivial O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O]
-    (hc : ∀ c : ℤ_[l], algebraMap O L (algebraMap ℤ_[l] O c) =
-      algebraMap ℚ_[l] L (algebraMap ℤ_[l] ℚ_[l] c)) (T : LocLat G ℚ_[l] L O)
+theorem lattice
+    [Nontrivial O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O]
+    (hc : ∀ c : ℤ_[l],
+      algebraMap O L (algebraMap ℤ_[l] O c) = algebraMap ℚ_[l] L (algebraMap ℤ_[l] ℚ_[l] c))
+    (T : LocLat G ℚ_[l] L O)
     {W : Type} [CommRing W] [Nontrivial W] [Algebra ℤ_[l] W]
     (hW : IsAdicComplete (Ideal.span {((l : ℕ) : O ⊗[ℤ_[l]] W)}) (O ⊗[ℤ_[l]] W))
-    (H : Subgroup G) (a : ↥H →* (W ≃ₐ[ℤ_[l]] W))
-    (𝒩 : Set (Subgroup ↥H)) (hnorm : ∀ N ∈ 𝒩, N.Normal)
-    (hdir : ∀ N ∈ 𝒩, ∀ N' ∈ 𝒩, ∃ N'' ∈ 𝒩, N'' ≤ N ∧ N'' ≤ N')
-    (hfin : ∀ N ∈ 𝒩, Finite (↥H ⧸ N))
-    (hopen : ∀ U ∈ nhds (1 : G), ∃ N ∈ 𝒩, ∀ ν ∈ N, (ν : G) ∈ U)
-    (hbase : ∀ N ∈ 𝒩, ∀ [Fintype (↥H ⧸ N)] {μ : Type} [Fintype μ] [DecidableEq μ]
-      (B : ↥H ⧸ N → Matrix μ μ ℤ_[l]) (q₀ : ↥H ⧸ N), IsUnit (B q₀).det →
-      ∃ y : W, (∀ ν ∈ N, a ν y = y) ∧
-        IsUnit (∑ q, a q.out y • (B q).map (algebraMap ℤ_[l] W)).det) :
-    ∃ e : Module.Basis (Fin (Module.finrank O ↥T.L.T)) (O ⊗[ℤ_[l]] W) (TW (O ⊗[ℤ_[l]] W) T),
-      ∀ (g : ↥H) i, TWact (Algebra.TensorProduct.map (AlgHom.id O O) (a g).toAlgHom) T (g : G)
-        (e i) = e i := by
+    (H : Subgroup G) (a : ↥H →* (W ≃ₐ[ℤ_[l]] W)) (𝒩 : Set (Subgroup ↥H))
+    (hnorm : ∀ N ∈ 𝒩, N.Normal) (hdir : ∀ N ∈ 𝒩, ∀ N' ∈ 𝒩, ∃ N'' ∈ 𝒩, N'' ≤ N ∧ N'' ≤ N')
+    (hfin : ∀ N ∈ 𝒩, Finite (↥H ⧸ N)) (hopen : ∀ U ∈ nhds (1 : G), ∃ N ∈ 𝒩, ∀ ν ∈ N, (ν : G) ∈ U)
+    (hbase : ∀ N ∈ 𝒩,
+      ∀ [Fintype (↥H ⧸ N)] {μ : Type} [Fintype μ] [DecidableEq μ] (B : ↥H ⧸ N → Matrix μ μ ℤ_[l])
+          (q₀ : ↥H ⧸ N),
+        IsUnit (B q₀).det
+          → ∃ y : W,
+            (∀ ν ∈ N, a ν y = y) ∧ IsUnit (∑ q, a q.out y • (B q).map (algebraMap ℤ_[l] W)).det)
+    : ∃ e : Module.Basis (Fin (Module.finrank O ↥T.L.T)) (O ⊗[ℤ_[l]] W) (TW (O ⊗[ℤ_[l]] W) T),
+      ∀ (g : ↥H) i,
+        TWact (Algebra.TensorProduct.map (AlgHom.id O O) (a g).toAlgHom) T (g : G) (e i) = e i := by
   letI := Module.compHom ↥T.L.T (algebraMap ℤ_[l] O)
   obtain ⟨d, ⟨c⟩⟩ := GlobalTheory.Cyc.exists_basis_lat (R := ℤ_[l]) T
   haveI : IsScalarTower ℤ_[l] O ↥T.L.T := ⟨fun c a x => by
@@ -502,53 +579,70 @@ theorem lattice [Nontrivial O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O]
   haveI : Module.Finite O ↥T.L.T := Module.Finite.iff_fg.2 T.L.fg
   haveI : Nontrivial (O ⊗[ℤ_[l]] W) :=
     Module.FaithfullyFlat.lTensor_nontrivial ℤ_[l] O W
-  let ρ : ↥H →* (↥T.L.T →ₗ[O] ↥T.L.T) :=
-    { toFun := fun h => T.actT (h : G)
-      map_one' := LinearMap.ext fun x => Subtype.ext (by
-        change T.ρ 1 (x : T.V) = x
-        rw [map_one]; rfl)
-      map_mul' := fun g h => LinearMap.ext fun x => Subtype.ext (by
-        change T.ρ ((g : G) * h) (x : T.V) = T.ρ g (T.ρ h (x : T.V))
-        rw [map_mul]; rfl) }
+  let ρ : ↥H →* (↥T.L.T →ₗ[O] ↥T.L.T) := {
+    toFun := fun h => T.actT (h : G)
+    map_one' :=
+      LinearMap.ext fun x =>
+        Subtype.ext (by
+          change T.ρ 1 (x : T.V) = x
+          rw [map_one]
+          rfl)
+    map_mul' := fun g h =>
+      LinearMap.ext fun x =>
+        Subtype.ext (by
+          change T.ρ ((g : G) * h) (x : T.V) = T.ρ g (T.ρ h (x : T.V))
+          rw [map_mul]
+          rfl)
+  }
   refine generic (Module.finBasis O ↥T.L.T) c ρ a l 𝒩 hnorm hdir hfin (fun m => ?_) hbase
   exact hopen _ (small hc T (Module.finBasis O ↥T.L.T) m c)
 
 end Lattice
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), FaithH AI →
-    ∀ (K LL : FinExt l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)),
-    ∃ e : Module.Basis (Fin (Module.finrank ↥(OL LL) ↥T.L.T)) (RW LL) (TW (RW LL) T),
-      FixBasis AI T e := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      FaithH AI
+        → ∀ (K LL : FinExt l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)),
+          ∃ e : Module.Basis (Fin (Module.finrank ↥(OL LL) ↥T.L.T)) (RW LL) (TW (RW LL) T),
+            FixBasis AI T e := by
   intro l _ P AI hF K LL T
   have := LL.2
-  have hc : ∀ c : ℤ_[l], algebraMap ↥(OL LL) ↥LL.1 (algebraMap ℤ_[l] ↥(OL LL) c) =
-      algebraMap ℚ_[l] ↥LL.1 (algebraMap ℤ_[l] ℚ_[l] c) := fun c =>
+  have hc
+      : ∀ c : ℤ_[l],
+        algebraMap ↥(OL LL) ↥LL.1 (algebraMap ℤ_[l] ↥(OL LL) c)
+          = algebraMap ℚ_[l] ↥LL.1 (algebraMap ℤ_[l] ℚ_[l] c) := fun c =>
     (IsScalarTower.algebraMap_apply ℤ_[l] ↥(OL LL) ↥LL.1 c).symm.trans
       (IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] ↥LL.1 c)
   haveI := Module.Free.of_basis (GlobalTheory.Decompl.basisO LL)
   haveI := Module.Finite.of_basis (GlobalTheory.Decompl.basisO LL)
   let H : Subgroup ↥(GK K) := (P.χQ.comp (GK K).subtype).ker
   let f : ↥H →* GQ l := (GK K).subtype.comp H.subtype
-  obtain ⟨e, he⟩ := lattice hc T (TensorWitt.main l LL).1 H (AI.actWCbHom.comp f)
-    {N | ∃ L : FinExt l, (GK L).Normal ∧ GK L ≤ GK K ∧ N = (GK L).comap f}
-    (by rintro _ ⟨L, hL, -, rfl⟩; infer_instance)
-    (by
-      rintro _ ⟨L, -, hL, rfl⟩ _ ⟨L', -, -, rfl⟩
-      obtain ⟨E, h1, h2⟩ := exists_normal (Filter.inter_mem (GK_mem_nhds L) (GK_mem_nhds L'))
-      exact ⟨_, ⟨E, h1, fun g hg => hL (h2 hg).1, rfl⟩, fun g hg => (h2 hg).1,
-        fun g hg => (h2 hg).2⟩)
-    (by
-      rintro _ ⟨L, -, -, rfl⟩
-      haveI := finiteIndex_GK L
-      exact (inferInstance : Finite (↥H ⧸ ((GK L).subgroupOf (GK K)).subgroupOf H)))
-    (fun V hV => by
-      obtain ⟨U, hU, h⟩ := (mem_nhds_subtype _ _ _).1 hV
-      obtain ⟨E, h1, h2⟩ := exists_normal (Filter.inter_mem hU (GK_mem_nhds K))
-      exact ⟨_, ⟨E, h1, fun g hg => (h2 hg).2, rfl⟩, fun ν hν => h (h2 hν).1⟩)
-    (by
-      rintro _ ⟨L, -, hL, rfl⟩ _ μ _ _ B q₀ hB
-      exact base AI hF f (fun h => h.2) L (fun g hg hχ => ⟨⟨⟨g, hL hg⟩, hχ⟩, rfl⟩) _
-        (fun _ => Iff.rfl) B q₀ hB)
+  obtain ⟨e, he⟩ :=
+    lattice hc T (TensorWitt.main l LL).1 H (AI.actWCbHom.comp f)
+      {N | ∃ L : FinExt l, (GK L).Normal ∧ GK L ≤ GK K ∧ N = (GK L).comap f}
+      (by rintro _ ⟨L, hL, -, rfl⟩; infer_instance)
+      (by
+        rintro _ ⟨L, -, hL, rfl⟩ _ ⟨L', -, -, rfl⟩
+        obtain ⟨E, h1, h2⟩ := exists_normal (Filter.inter_mem (GK_mem_nhds L) (GK_mem_nhds L'))
+        exact
+          ⟨_, ⟨E, h1, fun g hg => hL (h2 hg).1, rfl⟩, fun g hg => (h2 hg).1, fun g hg => (h2 hg).2⟩)
+      (by
+        rintro _ ⟨L, -, -, rfl⟩
+        haveI := finiteIndex_GK L
+        exact (inferInstance : Finite (↥H ⧸ ((GK L).subgroupOf (GK K)).subgroupOf H)))
+      (fun V hV => by
+        obtain ⟨U, hU, h⟩ := (mem_nhds_subtype _ _ _).1 hV
+        obtain ⟨E, h1, h2⟩ := exists_normal (Filter.inter_mem hU (GK_mem_nhds K))
+        exact ⟨_, ⟨E, h1, fun g hg => (h2 hg).2, rfl⟩, fun ν hν => h (h2 hν).1⟩)
+      (by
+        rintro _ ⟨L, -, hL, rfl⟩ _ μ _ _ B q₀ hB
+        exact base AI hF f
+          (fun h => h.2)
+          L
+          (fun g hg hχ => ⟨⟨⟨g, hL hg⟩, hχ⟩, rfl⟩)
+          _
+          (fun _ => Iff.rfl)
+          B q₀ hB)
   exact ⟨e, fun g hg i => he ⟨g, hg⟩ i⟩
 
 end Concrete

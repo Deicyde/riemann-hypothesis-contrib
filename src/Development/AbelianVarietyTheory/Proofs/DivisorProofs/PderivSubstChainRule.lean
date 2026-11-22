@@ -13,25 +13,29 @@ open MvPowerSeries
 
 namespace GlobalTheory.PSChain
 
-
 open scoped MvPowerSeries.WithPiTopology in
-theorem continuous_pderiv_discrete {σ R : Type} [CommRing R] [TopologicalSpace R] [DiscreteTopology R]
-    (i : σ) : Continuous (fun f : MvPowerSeries σ R => pderiv (R := R) i f) := by
+theorem continuous_pderiv_discrete
+    {σ R : Type} [CommRing R] [TopologicalSpace R] [DiscreteTopology R] (i : σ)
+    : Continuous (fun f : MvPowerSeries σ R => pderiv (R := R) i f) := by
   classical
   apply continuous_pi
   intro n
-  have e : (fun f : MvPowerSeries σ R => (pderiv (R := R) i f) n) =
-      (fun r : R => r * (n i + 1)) ∘ (fun f : MvPowerSeries σ R => coeff (n + Finsupp.single i 1) f) := by
+  have e
+      : (fun f : MvPowerSeries σ R => (pderiv (R := R) i f) n)
+        = (fun r : R => r * (n i + 1))
+          ∘ (fun f : MvPowerSeries σ R => coeff (n + Finsupp.single i 1) f) := by
     funext f
     exact coeff_pderiv f n
   rw [e]
   exact continuous_of_discreteTopology.comp (MvPowerSeries.WithPiTopology.continuous_coeff R _)
 
-
 open scoped MvPowerSeries.WithPiTopology in
-theorem pderiv_subst_chain {R σ τ : Type} [CommRing R] [Fintype σ] [Fintype τ]
-    (a : σ → MvPowerSeries τ R) (ha0 : ∀ s, constantCoeff (a s) = 0) (f : MvPowerSeries σ R) (k : τ) :
-    pderiv (R := R) k (subst a f) = ∑ j, subst a (pderiv (R := R) j f) * pderiv (R := R) k (a j) := by
+theorem pderiv_subst_chain
+    {R σ τ : Type} [CommRing R] [Fintype σ] [Fintype τ]
+    (a : σ → MvPowerSeries τ R) (ha0 : ∀ s, constantCoeff (a s) = 0)
+    (f : MvPowerSeries σ R) (k : τ)
+    : pderiv (R := R) k (subst a f)
+      = ∑ j, subst a (pderiv (R := R) j f) * pderiv (R := R) k (a j) := by
   classical
   have ha : HasSubst a := hasSubst_of_constantCoeff_zero ha0
   let _ : UniformSpace R := ⊥
@@ -56,14 +60,19 @@ theorem pderiv_subst_chain {R σ τ : Type} [CommRing R] [Fintype σ] [Fintype �
     | mul_X p s2 hp =>
       simp only [D1, D2, MvPolynomial.coe_mul, MvPolynomial.coe_X] at hp ⊢
       rw [subst_mul ha, subst_X ha, Derivation.leibniz, smul_eq_mul, smul_eq_mul, hp]
-      have hX : ∀ i : σ, pderiv (R := R) i (X s2 : MvPowerSeries σ R) = if i = s2 then 1 else 0 := by
+      have hX
+          : ∀ i : σ, pderiv (R := R) i (X s2 : MvPowerSeries σ R) = if i = s2 then 1 else 0 := by
         intro i
         by_cases h : i = s2
         · subst h; simp
         · rw [if_neg h, pderiv_X_of_ne (Ne.symm h)]
-      have hterm : ∀ i : σ, subst a (pderiv (R := R) i ((p : MvPowerSeries σ R) * X s2)) * pderiv (R := R) k (a i) =
-          (if i = s2 then subst a (p : MvPowerSeries σ R) * pderiv (R := R) k (a i) else 0) +
-            a s2 * (subst a (pderiv (R := R) i (p : MvPowerSeries σ R)) * pderiv (R := R) k (a i)) := by
+      have hterm
+          : ∀ i : σ,
+            subst a (pderiv (R := R) i ((p : MvPowerSeries σ R) * X s2)) * pderiv (R := R) k (a i)
+              = (if i = s2 then subst a (p : MvPowerSeries σ R) * pderiv (R := R) k (a i) else 0)
+                + a s2
+                  * (subst a (pderiv (R := R) i (p : MvPowerSeries σ R))
+                    * pderiv (R := R) k (a i)) := by
         intro i
         rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, hX i, subst_add ha, subst_mul ha,
           subst_mul ha, subst_X ha]

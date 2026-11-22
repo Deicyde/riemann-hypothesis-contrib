@@ -21,7 +21,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeightDivisi
 
 set_option synthInstance.maxHeartbeats 400000
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.CovHt
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.BigTop GlobalTheory.CovHt
 
 namespace GlobalTheory.CovHt.DividedNum
 
@@ -29,11 +32,13 @@ section Point
 
 open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
 
-theorem zBase_pow_le_lenT {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) :
-    zBase L ^ 24 ≤ (lenT p i PP : ℝ) := by
+theorem zBase_pow_le_lenT {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP)
+    : zBase L ^ 24 ≤ (lenT p i PP : ℝ) := by
   have m2 := D.R.two_le_m
   have k3 := D.R.m_add_three_le_k
   have f8 := h.f8
@@ -57,10 +62,13 @@ theorem zBase_pow_le_lenT {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i 
     linarith
   exact hP.trans (h1.trans (Nat.le_ceil _))
 
-theorem at_point {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (hi : (i : ℕ) + 1 < D.R.m) :
-    zBase L ^ 24 ≤ (lenT p i PP : ℝ) ∧ ∀ u1, Quo p i PP u1 →
-      lenT p i PP * GlobalTheory.CovHt.l1 u1 ≤ 834 * unitE p ∧
-      ∀ τ (a b : Fin ((dat p i).p + (dat p i).q)), (b : ℕ) = a + 1 → (lenT p i PP : ℤ) ≤ u1 τ a - u1 τ b := by
+theorem at_point {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (hi : (i : ℕ) + 1 < D.R.m)
+    : zBase L ^ 24 ≤ (lenT p i PP : ℝ)
+      ∧ ∀ u1,
+        Quo p i PP u1
+          → lenT p i PP * GlobalTheory.CovHt.l1 u1 ≤ 834 * unitE p
+            ∧ ∀ τ (a b : Fin ((dat p i).p + (dat p i).q)),
+              (b : ℕ) = a + 1 → (lenT p i PP : ℤ) ≤ u1 τ a - u1 τ b := by
   refine ⟨zBase_pow_le_lenT p i h hw, fun u1 hq => ?_⟩
   obtain ⟨h0, S, eta, hS, he, hP, h4, hh, hH⟩ := hw.hyp hi
   have hW := hH u1
@@ -74,7 +82,8 @@ theorem at_point {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (hi :
     have hr : (1 : ℝ) ≤ D.R.r := by exact_mod_cast (by unfold Ranks.r; omega : 1 ≤ D.R.r)
     have hm : (1 : ℝ) ≤ D.R.m := by exact_mod_cast (by omega : 1 ≤ D.R.m)
     have hb : 0 < L.sc.b := Real.exp_pos _
-    have hcard : (Fintype.card (Psi p.T.Q.H) : ℝ) = D.R.f := by rw [← hw.card, Nat.card_eq_fintype_card]
+    have hcard : (Fintype.card (Psi p.T.Q.H) : ℝ) = D.R.f := by
+      rw [← hw.card, Nat.card_eq_fintype_card]
     have hN : (((dat p i).p + (dat p i).q : ℕ) : ℝ) = D.R.r := by rw [hw.sig.2.2]
     have hT : (0 : ℝ) ≤ lenT p i PP := Nat.cast_nonneg _
     have fr : (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 ≤ PP := by
@@ -89,11 +98,15 @@ theorem at_point {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (hi :
     have a3 := GlobalTheory.CovHt.BudgetPf.l1_u_le _ hW hS
     have e1 : (dat p i).p + (dat p i).q - (wtsAt p i PP h0 S eta u1).kc = D.R.m := by
       show (dat p i).p + (dat p i).q - (D.R.k - 1) = _
-      rw [hw.sig.2.2]; unfold Ranks.r; omega
+      rw [hw.sig.2.2]
+      unfold Ranks.r
+      omega
     rw [e1, hcard, hN] at a3
     rw [hcard, hN] at a1
     change _ ≤ D.R.f * (D.R.r * S + D.R.m * (2 * (4 * L.sc.b))) at a3
-    change (lenT p i PP : ℝ) * GlobalTheory.MeanTop.l1 u1 ≤ _ + D.R.f * D.R.r * ((cZero D ((i : ℕ) + 1) : ℤ) + 4 * D.R.r) at a1
+    change (lenT p i PP : ℝ) * GlobalTheory.MeanTop.l1 u1
+        ≤ _ + D.R.f * D.R.r * ((cZero D ((i : ℕ) + 1) : ℤ) + 4 * D.R.r)
+      at a1
     have c1 : ((cZero D ((i : ℕ) + 1) : ℤ) : ℝ) ≤ 22 * (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 4 := by
       exact_mod_cast (cZero_spec D ((i : ℕ) + 1)).2.2
     have c2 : (D.R.r : ℝ) * ((cZero D ((i : ℕ) + 1) : ℤ) + 4 * D.R.r) ≤ 26 * L.sc.b := by
@@ -113,9 +126,14 @@ theorem at_point {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (hi :
       have h1 : (D.R.r : ℝ) * S ≤ PP * S := mul_le_mul_of_nonneg_right (by linarith) hS
       nlinarith [mul_nonneg (by linarith : 0 ≤ PP) he]
     have bm : L.sc.b ≤ D.R.m * L.sc.b := le_mul_of_one_le_left hb.le hm
-    have t2 : (D.R.f : ℝ) * ((D.R.r * S + D.R.m * (2 * (4 * L.sc.b))) + D.R.r * ((cZero D ((i : ℕ) + 1) : ℤ) + 4 * D.R.r)) ≤
-        D.R.f * (834 * (D.R.m * L.sc.b)) := mul_le_mul_of_nonneg_left (by linarith) (by linarith)
-    have t3 : (lenT p i PP : ℝ) * GlobalTheory.MeanTop.l1 u1 ≤ 834 * (D.R.f * D.R.m * L.sc.b) := by nlinarith
+    have t2
+        : (D.R.f : ℝ)
+            * ((D.R.r * S + D.R.m * (2 * (4 * L.sc.b)))
+              + D.R.r * ((cZero D ((i : ℕ) + 1) : ℤ) + 4 * D.R.r))
+          ≤ D.R.f * (834 * (D.R.m * L.sc.b)) :=
+      mul_le_mul_of_nonneg_left (by linarith) (by linarith)
+    have t3 : (lenT p i PP : ℝ) * GlobalTheory.MeanTop.l1 u1 ≤ 834 * (D.R.f * D.R.m * L.sc.b) := by
+      nlinarith
     have u0 : (D.R.f : ℝ) * D.R.m * L.sc.b ≤ unitE p := by
       rw [hw.unit]
       have hL := h.big.2.1
@@ -130,14 +148,18 @@ theorem at_point {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (hi :
   · intro τ a b hab
     obtain ⟨g1, g2, -⟩ := GlobalTheory.MeanTop.divided_gaps _ _ _ hW hD τ a b hab
     have hT1 : 4 * dimFlag (dat p i) + 4 ≤ lenT p i PP := hW.h1
-    change ((b : ℕ) ≠ (dat p i).p → (lenT p i PP : ℤ) + dimFlag (dat p i) + 2 + 2 * ((dat p i).p + (dat p i).q : ℕ) ≤ u1 τ a - u1 τ b) at g1
+    change ((b : ℕ) ≠ (dat p i).p
+        → (lenT p i PP : ℤ) + dimFlag (dat p i) + 2 + 2 * ((dat p i).p + (dat p i).q : ℕ)
+          ≤ u1 τ a - u1 τ b)
+      at g1
     change ((b : ℕ) = (dat p i).p → h0 ≤ 2 * (lenT p i PP : ℤ) * (u1 τ a - u1 τ b) ∧ _) at g2
     by_cases hb : (b : ℕ) = (dat p i).p
     · have k := (g2 hb).1
       have hT0 : (1 : ℤ) ≤ lenT p i PP := by exact_mod_cast (by omega : 1 ≤ lenT p i PP)
       nlinarith
     · have k := g1 hb
-      have : (0 : ℤ) ≤ (dimFlag (dat p i) : ℤ) + 2 + 2 * (((dat p i).p + (dat p i).q : ℕ) : ℤ) := by positivity
+      have : (0 : ℤ) ≤ (dimFlag (dat p i) : ℤ) + 2 + 2 * (((dat p i).p + (dat p i).q : ℕ) : ℤ) := by
+        positivity
       linarith
 
 end Point

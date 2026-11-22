@@ -9,24 +9,30 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace LateralTheory.CohomologicalPurity.Cl
 
-theorem sub_C_mem_X {σ R : Type} [CommRing R] (f : MvPolynomial σ R) :
-    f - MvPolynomial.C (MvPolynomial.constantCoeff f) ∈ Ideal.span (Set.range (MvPolynomial.X : σ → MvPolynomial σ R)) := by
+theorem sub_C_mem_X {σ R : Type} [CommRing R] (f : MvPolynomial σ R)
+    : f - MvPolynomial.C (MvPolynomial.constantCoeff f)
+      ∈ Ideal.span (Set.range (MvPolynomial.X : σ → MvPolynomial σ R)) := by
   induction f using MvPolynomial.induction_on with
   | C a => simp
   | add p r hp hr =>
-    have : p + r - MvPolynomial.C (MvPolynomial.constantCoeff (p + r)) =
-      (p - MvPolynomial.C (MvPolynomial.constantCoeff p)) + (r - MvPolynomial.C (MvPolynomial.constantCoeff r)) := by
+    have : p + r - MvPolynomial.C (MvPolynomial.constantCoeff (p + r))
+        = (p - MvPolynomial.C (MvPolynomial.constantCoeff p))
+          + (r - MvPolynomial.C (MvPolynomial.constantCoeff r)) := by
       simp only [map_add (f := _)]; ring
-    rw [this]; exact add_mem hp hr
+    rw [this]
+    exact add_mem hp hr
   | mul_X p n _ =>
     simp only [map_mul, MvPolynomial.constantCoeff_X, mul_zero, map_zero, sub_zero]
     exact Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨n, rfl⟩)
 
-theorem chart_nbhd {d : ℕ} {A B : Type} [CommRing A] [CommRing B] (I : Ideal A) (φ : A →+* B)
-    (ψ : MvPolynomial (Fin d) (A ⧸ I) →+* B) (hφ : Nbhd φ I) (hψ : ψ.Etale)
-    (hJ : (Ideal.span (Set.range (MvPolynomial.X : Fin d → MvPolynomial (Fin d) (A ⧸ I)))).map ψ = I.map φ)
-    (hc : ∀ a : A, φ a - ψ (MvPolynomial.C (Ideal.Quotient.mk I a)) ∈ I.map φ) :
-    Nbhd ψ (Ideal.span (Set.range MvPolynomial.X)) := by
+theorem chart_nbhd
+    {d : ℕ} {A B : Type} [CommRing A] [CommRing B]
+    (I : Ideal A)
+    (φ : A →+* B) (ψ : MvPolynomial (Fin d) (A ⧸ I) →+* B) (hφ : Nbhd φ I) (hψ : ψ.Etale)
+    (hJ : (Ideal.span (Set.range (MvPolynomial.X : Fin d → MvPolynomial (Fin d) (A ⧸ I)))).map ψ
+      = I.map φ)
+    (hc : ∀ a : A, φ a - ψ (MvPolynomial.C (Ideal.Quotient.mk I a)) ∈ I.map φ)
+    : Nbhd ψ (Ideal.span (Set.range MvPolynomial.X)) := by
   refine ⟨hψ, ?_, ?_⟩
   · set_option synthInstance.maxHeartbeats 200000 in
     apply (injective_iff_map_eq_zero _).2
@@ -63,7 +69,9 @@ theorem LeafVanRing_of (hNb : LeafNb) (hTh : LeafThom) : LeafVanRing := by
   have hA1 : A1 := hH.1
   have hA9 : A9 := hH.2.2.2.2.2.2.1
   obtain ⟨B, _, φ, ψ, hφ, hψ, hI, hc⟩ := hC
-  have hJ : (Ideal.span (Set.range (MvPolynomial.X : Fin d → MvPolynomial (Fin d) (A ⧸ I)))).map ψ = I.map φ := by
+  have hJ
+      : (Ideal.span (Set.range (MvPolynomial.X : Fin d → MvPolynomial (Fin d) (A ⧸ I)))).map ψ
+        = I.map φ := by
     rw [Ideal.map_span, hI, ← Set.range_comp]; rfl
   have hN := chart_nbhd I φ ψ hφ hψ hJ hc
   have e1 := hNb hA1 q φ I (I.map φ) hφ rfl (off_map φ I).le n i
@@ -75,13 +83,25 @@ theorem LeafVanRing_of (hNb : LeafNb) (hTh : LeafThom) : LeafVanRing := by
   have hm : m < 0 := by omega
   have hsub : Subsingleton (Ht q (sp (A ⧸ I)) m j) := (hA9 (ZMod q) (tw q j)).1 _ m hm
   have h3 := ((hth q).2.2.1 (A ⧸ I) _ rfl hqR m j).2
-  have hR : Subsingleton (Hs q (opn (off (MvPolynomial (Fin d) (A ⧸ I))
-      (Ideal.span (Set.range MvPolynomial.X)))) (m + 2 * d) (j + d)) := by
-    constructor; intro x y
-    obtain ⟨a, rfl⟩ := h3 x; obtain ⟨b, rfl⟩ := h3 y; rw [Subsingleton.elim a b]
-  have hB : ∀ x y : Hs q (opn (off B ((Ideal.span (Set.range (MvPolynomial.X : Fin d → MvPolynomial (Fin d) (A ⧸ I)))).map ψ))) (m + 2 * d) (j + d), x = y := by
+  have hR : Subsingleton (Hs q
+      (opn (off (MvPolynomial (Fin d) (A ⧸ I)) (Ideal.span (Set.range MvPolynomial.X)))) (m + 2 * d)
+      (j + d)) := by
+    constructor
     intro x y
-    obtain ⟨a, rfl⟩ := e2.2 x; obtain ⟨b, rfl⟩ := e2.2 y; rw [Subsingleton.elim a b]
+    obtain ⟨a, rfl⟩ := h3 x
+    obtain ⟨b, rfl⟩ := h3 y
+    rw [Subsingleton.elim a b]
+  have hB
+      : ∀ x y : Hs q
+          (opn (off B
+            ((Ideal.span (Set.range (MvPolynomial.X : Fin d → MvPolynomial (Fin d) (A ⧸ I)))).map
+              ψ)))
+          (m + 2 * d) (j + d),
+        x = y := by
+    intro x y
+    obtain ⟨a, rfl⟩ := e2.2 x
+    obtain ⟨b, rfl⟩ := e2.2 y
+    rw [Subsingleton.elim a b]
   rw [hJ] at hB
   exact ⟨fun x y => e1.1 (hB _ _)⟩
 

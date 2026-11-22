@@ -61,7 +61,8 @@ lemma gv_sub_norm_le [CompleteSpace H] {τ : Matrix (Fin n) (Fin n) ℂ → (H �
         · exact mul_le_mul_of_nonneg_left (hsupp h hz) (hΦ0 _)
     _ = δ := by rw [integral_mul_const, h1, one_mul]
 
-def qd (x : Matrix (Fin n) (Fin n) ℂ) : ℝ := ∑ i, ∑ j, ‖x i j - (1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ^ 2
+def qd (x : Matrix (Fin n) (Fin n) ℂ) : ℝ :=
+  ∑ i, ∑ j, ‖x i j - (1 : Matrix (Fin n) (Fin n) ℂ) i j‖ ^ 2
 
 lemma qd_contDiff : ContDiff ℝ ∞ (qd (n := n)) := by
   unfold qd
@@ -121,12 +122,13 @@ theorem dense_weak_vectors : StepDenseW := by
     have h1 := hr' hg hd
     rw [dist_eq_norm] at h1
     have h2 := (R g - R 1).le_opNorm ⟨w, hw⟩
-    have h3 : (R g - R 1) ⟨w, hw⟩ = τ g w - w := by
-      simp [R, hτ1]
+    have h3 : (R g - R 1) ⟨w, hw⟩ = τ g w - w := by simp [R, hτ1]
     rw [h3] at h2
     have h4 : ‖(⟨w, hw⟩ : W)‖ = ‖w‖ := rfl
     rw [h4] at h2
-    calc ‖τ g w - w‖ ≤ ‖R g - R 1‖ * ‖w‖ := h2
+    calc
+      ‖τ g w - w‖
+        ≤ ‖R g - R 1‖ * ‖w‖ := h2
       _ ≤ (1 / 2) * ‖w‖ := mul_le_mul_of_nonneg_right h1.le (norm_nonneg _)
       _ = ‖w‖ / 2 := by ring
 
@@ -146,7 +148,8 @@ theorem dense_weak_vectors : StepDenseW := by
     exact hx (Metric.mem_closedBall.2 (hsupp0 x hne).le)
   have hcomp : Continuous (fun h : UJ ε => Φ0 (umat h)) := hΦ0c.comp (continuous_coeMatrix ε)
   have hint : Integrable (fun h : UJ ε => Φ0 (umat h)) (muG ε) :=
-    hcomp.integrable_of_hasCompactSupport (hcs.comp_isClosedEmbedding (isClosedEmbeddingMatrix n ε).1)
+    hcomp.integrable_of_hasCompactSupport (hcs.comp_isClosedEmbedding (isClosedEmbeddingMatrix n
+      ε).1)
   have hpos : 0 < ∫ h, Φ0 (umat h) ∂(muG ε) := by
     rw [integral_pos_iff_support_of_nonneg (fun h => ψ.nonneg) hint]
     apply IsOpen.measure_pos
@@ -169,9 +172,11 @@ theorem dense_weak_vectors : StepDenseW := by
       rwa [Matrix.star_eq_conjTranspose] at this
     simp only [Φ0, qd_conj a m hu1 hu2]
   · intro w hw
-    refine gv_sub_norm_le hτ (fun x => Φ0 x / c) (hΦ0c.div_const c)
-      (fun x => div_nonneg ψ.nonneg hpos.le) (hint.div_const c)
-      (by rw [integral_div, ← hc, div_self hpos.ne']) w (‖w‖ / 2) ?_
+    refine gv_sub_norm_le hτ
+      (fun x => Φ0 x / c)
+      (hΦ0c.div_const c)
+      (fun x => div_nonneg ψ.nonneg hpos.le)
+      (hint.div_const c) (by rw [integral_div, ← hc, div_self hpos.ne']) w (‖w‖ / 2) ?_
     intro h hz
     have hne : Φ0 (umat h) ≠ 0 := by
       intro h0

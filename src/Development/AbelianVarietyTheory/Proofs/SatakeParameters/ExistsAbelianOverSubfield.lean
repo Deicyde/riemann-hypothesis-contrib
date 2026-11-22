@@ -10,17 +10,20 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsAbe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 
 namespace GlobalTheory.AbOverSubfield
 
-theorem exists_place_between {F K Ω : Type} [Field F] [NumberField F] [Field K] [NumberField K] [Field Ω]
-    [Algebra F K] [Algebra K Ω] [Algebra F Ω] [IsScalarTower F K Ω]
-    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A v) :
-    ∃ w : HeightOneSpectrum (𝓞 K), IsPlaceOver A w := by
+theorem exists_place_between
+    {F K Ω : Type} [Field F] [NumberField F] [Field K] [NumberField K] [Field Ω] [Algebra F K]
+    [Algebra K Ω] [Algebra F Ω] [IsScalarTower F K Ω]
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A v)
+    : ∃ w : HeightOneSpectrum (𝓞 K), IsPlaceOver A w := by
   have hint : ∀ x : 𝓞 K, algebraMap K Ω (x : K) ∈ A := fun x => by
     have h : IsIntegral A (algebraMap K Ω (x : K)) :=
       (x.isIntegral_coe.map (algebraMap K Ω).toIntAlgHom).tower_top

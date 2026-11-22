@@ -9,7 +9,9 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open MeasureTheory Filter NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open MeasureTheory Filter NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open scoped TensorProduct NNReal ENNReal
 
 noncomputable section
@@ -28,13 +30,19 @@ theorem isModuleTopology_Ev : IsModuleTopology (Fv F v) (Fv F v ⊗[F] E) := ⟨
 
 def coordEv : (Fv F v ⊗[F] E) ≃ₜ+ (Fin (Module.finrank F E) → Fv F v) :=
   haveI := isModuleTopology_Ev (E := E) v
-  { (basisEv v).equivFun.toAddEquiv with
-    continuous_toFun := IsModuleTopology.continuous_of_linearMap (basisEv (E := E) v).equivFun.toLinearMap
-    continuous_invFun := IsModuleTopology.continuous_of_linearMap (basisEv (E := E) v).equivFun.symm.toLinearMap }
+  {
+    (basisEv v).equivFun.toAddEquiv with
+    continuous_toFun :=
+      IsModuleTopology.continuous_of_linearMap (basisEv (E := E) v).equivFun.toLinearMap
+    continuous_invFun :=
+      IsModuleTopology.continuous_of_linearMap (basisEv (E := E) v).equivFun.symm.toLinearMap
+  }
 
-theorem isTopologicalRing_Ev : IsTopologicalRing (Fv F v ⊗[F] E) := GlobalTheory.Doubling.isTopologicalRing_tens
+theorem isTopologicalRing_Ev : IsTopologicalRing (Fv F v ⊗[F] E) :=
+  GlobalTheory.Doubling.isTopologicalRing_tens
 
-theorem t2Space_Fv_tensor : T2Space (Fv F v ⊗[F] E) := GlobalTheory.Doubling.t2Space_tensorProduct_finiteExtension
+theorem t2Space_Fv_tensor : T2Space (Fv F v ⊗[F] E) :=
+  GlobalTheory.Doubling.t2Space_tensorProduct_finiteExtension
 
 theorem locallyCompactSpace_Ev : LocallyCompactSpace (Fv F v ⊗[F] E) :=
   haveI := PI.UnitaryGroupMassFormula.LocJacTyp.BM.secondCountable_Fv v
@@ -49,29 +57,36 @@ theorem isOpenUnits_Ev : IsOpenUnits (Fv F v ⊗[F] E) :=
   haveI := isTopologicalRing_Ev (E := E) v
   GlobalTheory.GaugeEx.isOpenUnits_of_basis (basisEv v)
 
-attribute [local instance] isTopologicalRing_Ev t2Space_Fv_tensor locallyCompactSpace_Ev secondCountable_Ev isOpenUnits_Ev
+attribute [local instance]
+  isTopologicalRing_Ev t2Space_Fv_tensor locallyCompactSpace_Ev secondCountable_Ev isOpenUnits_Ev
 
-theorem distribHaarChar_Ev (u : (Fv F v ⊗[F] E)ˣ) :
-    distribHaarChar (Fv F v ⊗[F] E) u = ‖Algebra.norm (Fv F v) (u : Fv F v ⊗[F] E)‖₊ := by
+theorem distribHaarChar_Ev (u : (Fv F v ⊗[F] E)ˣ)
+    : distribHaarChar (Fv F v ⊗[F] E) u = ‖Algebra.norm (Fv F v) (u : Fv F v ⊗[F] E)‖₊ := by
   borelize (Fv F v ⊗[F] E)
   haveI := PI.UnitaryGroupMassFormula.LocJacTyp.BM.secondCountable_Fv v
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
   set b := basisEv (E := E) v
   set M := Algebra.leftMulMatrix b (u : Fv F v ⊗[F] E) with hMdef
-  have hdet : M.det = Algebra.norm (Fv F v) (u : Fv F v ⊗[F] E) := (Algebra.norm_eq_matrix_det b _).symm
+  have hdet : M.det = Algebra.norm (Fv F v) (u : Fv F v ⊗[F] E) :=
+    (Algebra.norm_eq_matrix_det b _).symm
   have hM : IsUnit M.det := hdet ▸ u.isUnit.map (Algebra.norm (Fv F v))
   have hN0 : Algebra.norm (Fv F v) (u : Fv F v ⊗[F] E) ≠ 0 := (hdet ▸ hM).ne_zero
   rw [GlobalTheory.ModuNorm.distribHaarChar_eq_addEquivAddHaarChar]
-  have ht := GlobalTheory.ModuLR.addEquivAddHaarChar_transport (coordEv (E := E) v).symm (GlobalTheory.ModuLR.mulVecCE M hM)
-  have hext : (((coordEv (E := E) v).symm.symm.trans (GlobalTheory.ModuLR.mulVecCE M hM)).trans (coordEv (E := E) v).symm) =
-      GlobalTheory.ModuNorm.mulUnitCE u := by
+  have ht :=
+    GlobalTheory.ModuLR.addEquivAddHaarChar_transport (coordEv (E := E) v).symm
+      (GlobalTheory.ModuLR.mulVecCE M hM)
+  have hext
+      : (((coordEv (E := E) v).symm.symm.trans (GlobalTheory.ModuLR.mulVecCE M hM)).trans
+          (coordEv (E := E) v).symm)
+        = GlobalTheory.ModuNorm.mulUnitCE u := by
     ext x
     show b.equivFun.symm (Matrix.mulVec M (b.equivFun x)) = (u : Fv F v ⊗[F] E) * x
-    rw [show Matrix.mulVec M (b.equivFun x) = b.equivFun ((u : Fv F v ⊗[F] E) * x) from Algebra.leftMulMatrix_mulVec_repr b _ x,
+    rw [show Matrix.mulVec M (b.equivFun x) = b.equivFun ((u : Fv F v ⊗[F] E) * x) from
+        Algebra.leftMulMatrix_mulVec_repr b _ x,
       LinearEquiv.symm_apply_apply]
   rw [hext] at ht
-  rw [ht, GlobalTheory.ModuArtin.addEquivAddHaarChar_mulVecCE _ inferInstance inferInstance, hdet, GlobalTheory.GaugeEx.modu,
-    dite_eq_left (hdet ▸ hM)]
+  rw [ht, GlobalTheory.ModuArtin.addEquivAddHaarChar_mulVecCE _ inferInstance inferInstance, hdet,
+    GlobalTheory.GaugeEx.modu, dite_eq_left (hdet ▸ hM)]
   convert GlobalTheory.CompanionTheory.SW.ProdFormula.distribHaarChar_eq_nnnorm v _ hN0 using 2
   exact Units.ext rfl
 
@@ -81,6 +96,8 @@ namespace GlobalTheory.LocTateInt
 
 open scoped Pointwise
 
-attribute [local instance] finite_FE isTopologicalRing_Ev t2Space_Fv_tensor locallyCompactSpace_Ev secondCountable_Ev isOpenUnits_Ev
+attribute [local instance]
+  finite_FE isTopologicalRing_Ev t2Space_Fv_tensor locallyCompactSpace_Ev secondCountable_Ev
+  isOpenUnits_Ev
 
 end GlobalTheory.LocTateInt

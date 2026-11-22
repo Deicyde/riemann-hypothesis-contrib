@@ -13,8 +13,11 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExistsPowMulE
 @[expose] public section
 
 noncomputable section
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.H1
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.DVR
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS FB ev Dof)
 open ReciprocityTheory.ChartRestriction.G.TB (colM dAct)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -22,14 +25,19 @@ namespace GlobalTheory.FamGerm
 
 section Inhabitant
 
-theorem surjective_appTop_sq_cube {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
-    {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))} [GrpObj G]
-    [IsCommMonObj G] (U : UnifPre I D A G) :
-    Function.Surjective (G ⊗ G).hom.appTop.hom ∧ Function.Surjective (G ⊗ G ⊗ G).hom.appTop.hom := by
+theorem surjective_appTop_sq_cube
+    {R : Type} [CommRing R] [IsDomain R]
+    {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+    {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+    (U : UnifPre I D A G)
+    : Function.Surjective (G ⊗ G).hom.appTop.hom
+      ∧ Function.Surjective (G ⊗ G ⊗ G).hom.appTop.hom := by
   have hG := GlobalTheory.globalFns_holds
   have := U.smooth
-  have : IsDominant (jK R) := ⟨(PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical _).2
-    (((RingHom.injective_iff_ker_eq_bot _).1 (IsFractionRing.injective R (FractionRing R))).le.trans bot_le)⟩
+  have : IsDominant (jK R) :=
+    ⟨(PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical _).2
+      (((RingHom.injective_iff_ker_eq_bot _).1
+        (IsFractionRing.injective R (FractionRing R))).le.trans bot_le)⟩
   have := IsSchemeTheoreticallyDominant.of_isDominant (jK R)
   have hg : IsPullback (U.gen.inv.left ≫ pullback.fst G.hom (jK R)) A.A.hom G.hom (jK R) := by
     have : IsIso U.gen.inv.left := inferInstanceAs (IsIso ((Over.forget _).map U.gen.inv))
@@ -45,10 +53,14 @@ theorem surjective_appTop_sq_cube {R : Type} [CommRing R] [IsDomain R] {I : Idea
   rw [Over.w (snd G (G ⊗ G))] at s₃
   exact ⟨s₂, s₃⟩
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {V : Type} [CommRing V] [IsDomain V]
-  [IsDiscreteValuationRing V] {F : Type} [Field F] [Algebra (FractionRing V) F] (y : Pt1 E H V F)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+  {F : Type} [Field F] [Algebra (FractionRing V) F]
+  (y : Pt1 E H V F)
 
-theorem Pt1.exists_frameSer : ∃ r : PS V 1 y.d, JetSer.IsSer1 y.x _ (y.ρ.s (fun _ => y.j)).val r := by
+theorem Pt1.exists_frameSer
+    : ∃ r : PS V 1 y.d, JetSer.IsSer1 y.x _ (y.ρ.s (fun _ => y.j)).val r := by
   refine ((JetRoad.jetRoad.2.2.2.2.2.2.2.2.1 V y.t.G y.d y.x y.hx).1 _ ?_ _).exists
   have := y.t.act.hom H.w0
   intro z hz
@@ -68,7 +80,8 @@ theorem Pt1.exists_frameSer : ∃ r : PS V 1 y.d, JetSer.IsSer1 y.x _ (y.ρ.s (f
     · show η[y.t.G].left ≫ (1 : y.t.G ⟶ y.t.G).left = _
       rw [← Over.comp_left, MonObj.comp_one]
       simp [Hom.one_def]
-  have : (η[y.t.G].left ≫ JetSer.primφ (y.t.act.act H.w0) i) z ∈ y.P.U.LG.L.U y.j := by rw [key]; exact hj
+  have : (η[y.t.G].left ≫ JetSer.primφ (y.t.act.act H.w0) i) z ∈ y.P.U.LG.L.U y.j := by
+    rw [key]; exact hj
   exact this
 
 end Inhabitant

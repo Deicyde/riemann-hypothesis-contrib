@@ -6,16 +6,22 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ResInject
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RealGal
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL
+  GlobalTheory.RealGal
 open UpperTheory.V.Af (FrobEig algSat RepIso)
 open UpperTheory.V.Af.Bc (res)
 open UpperTheory.Gal.Int.Core
 
-private theorem normV_under_eq_of_normV_prime {K M : Type} [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
-    (w : HeightOneSpectrum (𝓞 M)) (hp : (normV w).Prime) : normV (w.under (𝓞 K)) = normV w := by
+private theorem normV_under_eq_of_normV_prime
+    {K M : Type} [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
+    (w : HeightOneSpectrum (𝓞 M)) (hp : (normV w).Prime)
+    : normV (w.under (𝓞 K)) = normV w := by
   let f : 𝓞 K ⧸ (w.under (𝓞 K)).asIdeal →+* 𝓞 M ⧸ w.asIdeal :=
     Ideal.quotientMap w.asIdeal (algebraMap (𝓞 K) (𝓞 M)) le_rfl
   have hf : Function.Injective f := Ideal.quotientMap_injective' le_rfl
@@ -29,11 +35,11 @@ private theorem normV_under_eq_of_normV_prime {K M : Type} [Field K] [NumberFiel
     exact not_subsingleton (𝓞 K ⧸ (w.under (𝓞 K)).asIdeal) h2
   · exact h
 
-theorem UpperTheory.Gal.Int.Core.oneTower_holds :
-    OneTower := by
+theorem UpperTheory.Gal.Int.Core.oneTower_holds : OneTower := by
   intro F Ω _ _ _ _ _ K _ _ _ _ _ _ M _ _ _ _ _ _ _ _ _ l _ ι a sat r hK
   unfold AttOne at hK ⊢
-  have hT : Filter.Tendsto (fun w : HeightOneSpectrum (𝓞 M) => w.under (𝓞 K))
+  have hT : Filter.Tendsto
+      (fun w : HeightOneSpectrum (𝓞 M) => w.under (𝓞 K))
       Filter.cofinite Filter.cofinite := by
     refine ((Filter.tendstoCofinite_iff_finite_preimage_singleton _).2 ?_).tendsto_cofinite
     intro v

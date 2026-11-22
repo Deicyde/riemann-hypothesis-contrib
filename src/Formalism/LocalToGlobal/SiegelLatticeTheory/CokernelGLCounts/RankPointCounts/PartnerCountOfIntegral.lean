@@ -8,7 +8,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.PCount
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups
+  Formalism.L2.SG.TermLoc
 
 theorem shUnit_holds (D : Formalism.BasicNotions.D7) : ShUnit D := by
   intro p c
@@ -19,11 +20,12 @@ theorem shUnit_holds (D : Formalism.BasicNotions.D7) : ShUnit D := by
   by_contra hcon
   simp only [not_exists] at hcon
   let f : Module.End (D.s.atP p).Fp (D.s.atP p).Ep := LinearMap.mulLeft (D.s.atP p).Fp c
-  have hev : ∀ n : Fin 3, ∃ y : (D.s.atP p).Ep, f.HasEigenvector (-(((n : ℕ) : (D.s.atP p).Fp))) y := by
+  have hev
+      : ∀ n : Fin 3, ∃ y : (D.s.atP p).Ep, f.HasEigenvector (-(((n : ℕ) : (D.s.atP p).Fp))) y := by
     intro n
     have hnu := hcon n
-    have hni : ¬ Function.Injective
-        (LinearMap.mulLeft (D.s.atP p).Fp (c + (((n : ℕ)) : (D.s.atP p).Ep))) := by
+    have hni : ¬ Function.Injective (LinearMap.mulLeft (D.s.atP p).Fp
+        (c + (((n : ℕ)) : (D.s.atP p).Ep))) := by
       intro hinj
       obtain ⟨y, hy⟩ := (LinearMap.injective_iff_surjective.1 hinj) 1
       exact hnu (isUnit_iff_exists_inv.2 ⟨y, hy⟩)
@@ -44,8 +46,11 @@ theorem shUnit_holds (D : Formalism.BasicNotions.D7) : ShUnit D := by
   rw [Fintype.card_fin, (D.s.atP p).rank] at hc
   omega
 
-theorem partnerCount_of_integral {D : Formalism.BasicNotions.D7} (Zd : LocDat D) (hT2 : Formalism.MainNotions.ThinScalesBound.T2 D) (hI : IntGenP Zd)
-    (hB : BridgeBA) : PartnerIsomorphismCount Zd :=
+theorem partnerCount_of_integral
+    {D : Formalism.BasicNotions.D7}
+    (Zd : LocDat D) (hT2 : Formalism.MainNotions.ThinScalesBound.T2 D) (hI : IntGenP Zd)
+    (hB : BridgeBA)
+    : PartnerIsomorphismCount Zd :=
   partnerCount_of_shUnit Zd hT2 hI (shUnit_holds D) hB
 
 end Formalism.L2.SG.Pf.PCount

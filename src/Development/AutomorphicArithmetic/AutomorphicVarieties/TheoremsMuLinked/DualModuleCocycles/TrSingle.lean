@@ -4,32 +4,51 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuL
 
 @[expose] public section
 
-open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa UpperTheory.V.Th UpperTheory.V.Th.Coc
+open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa
+  UpperTheory.V.Th UpperTheory.V.Th.Coc
 
-private theorem corner_eq {R : Type} [CommRing R] {n : ℕ} {E : Type} [Ring E] [Algebra R E] {τ : E →ₗ[R] R}
-    {e : Fin n → E} (h : IsTrGMA τ e) (i : Fin n) (z : E) (hz : e i * z * e i = z) : z = τ z • e i := by
+private theorem corner_eq
+    {R : Type} [CommRing R]
+    {n : ℕ} {E : Type} [Ring E] [Algebra R E]
+    {τ : E →ₗ[R] R} {e : Fin n → E} (h : IsTrGMA τ e)
+    (i : Fin n) (z : E) (hz : e i * z * e i = z)
+    : z = τ z • e i := by
   have hidem : e i * e i = e i := (h.idem.idem i).eq
   have h1 : e i * z = z := by
-    calc e i * z = e i * (e i * z * e i) := by rw [hz]
+    calc
+      e i * z
+        = e i * (e i * z * e i) := by rw [hz]
       _ = e i * z * e i := by rw [← mul_assoc, ← mul_assoc, hidem]
       _ = z := hz
-  calc z = e i * z * e i := hz.symm
+  calc
+    z = e i * z * e i := hz.symm
     _ = τ (e i * z) • e i := h.corner i z
     _ = τ z • e i := by rw [h1]
 
-private theorem tr_single {O : Type} [CommRing O] {n : ℕ} (o i j : Fin n) (c : O) (A : Matrix (Fin n) (Fin n) O) :
-    ((c • Matrix.single o i (1 : O)) * A * (c • Matrix.single j o (1 : O))).trace = c ^ 2 * A i j := by
+private theorem tr_single
+    {O : Type} [CommRing O] {n : ℕ} (o i j : Fin n) (c : O) (A : Matrix (Fin n) (Fin n) O)
+    : ((c • Matrix.single o i (1 : O)) * A * (c • Matrix.single j o (1 : O))).trace
+      = c ^ 2 * A i j := by
   rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.single_mul_mul_single]
   simp [Matrix.trace_smul, pow_two, mul_assoc]
 
-theorem UpperTheory.V.Th.Coc.smat :
-    ∀ {O R : Type} [CommRing O] [CommRing R] [Algebra O R] {n : ℕ} {E : Type} [Ring E] [Algebra R E] (x : R →ₐ[O] O) (ρ : E →+* Matrix (Fin n) (Fin n) O) (τ : E →ₗ[R] R) (e : Fin n → E) (c : O), 1 ≤ n → IsTrGMA τ e → (∀ i, ρ (e i) = Matrix.single i i 1) → (∀ a, (ρ a).trace = x (τ a)) → (∀ Z, ∃ a, ρ a = c • Z) → ∃ (s : E →ₗ[R] Matrix (Fin n) (Fin n) R) (β : R), x β = c ^ (2 * n) ∧ (∀ a b, s a * s b = β • s (a * b)) ∧ (∀ a, (s a).map x = c ^ (2 * n) • ρ a) ∧ ∀ a, (s a).trace = β * τ a := by
+theorem UpperTheory.V.Th.Coc.smat
+    : ∀ {O R : Type} [CommRing O] [CommRing R] [Algebra O R] {n : ℕ} {E : Type} [Ring E]
+        [Algebra R E] (x : R →ₐ[O] O) (ρ : E →+* Matrix (Fin n) (Fin n) O) (τ : E →ₗ[R] R)
+        (e : Fin n → E) (c : O),
+      1 ≤ n → IsTrGMA τ e → (∀ i, ρ (e i) = Matrix.single i i 1) → (∀ a, (ρ a).trace = x (τ a))
+        → (∀ Z, ∃ a, ρ a = c • Z)
+        → ∃ (s : E →ₗ[R] Matrix (Fin n) (Fin n) R) (β : R),
+          x β = c ^ (2 * n) ∧ (∀ a b, s a * s b = β • s (a * b))
+            ∧ (∀ a, (s a).map x = c ^ (2 * n) • ρ a) ∧ ∀ a, (s a).trace = β * τ a := by
   intro O R _ _ _ n E _ _ x ρ τ e c hn hT hρe htr hsurj
   classical
   obtain ⟨o, -⟩ : ∃ o : Fin n, True := ⟨⟨0, hn⟩, trivial⟩
   have hidem : ∀ i, e i * e i = e i := fun i => (hT.idem.idem i).eq
-  have hρE : ∀ (i j : Fin n) (r : O), Matrix.single i i (1 : O) * (r • Matrix.single i j (1 : O)) *
-      Matrix.single j j (1 : O) = r • Matrix.single i j (1 : O) := by
+  have hρE
+      : ∀ (i j : Fin n) (r : O),
+        Matrix.single i i (1 : O) * (r • Matrix.single i j (1 : O)) * Matrix.single j j (1 : O)
+          = r • Matrix.single i j (1 : O) := by
     intro i j r
     ext u v
     simp only [Matrix.single_mul_mul_single, Matrix.smul_apply, Matrix.single_apply, smul_eq_mul]
@@ -73,17 +92,16 @@ theorem UpperTheory.V.Th.Coc.smat :
     exact h
   have hρs : ∀ r : R, ρ (r • e o) = Matrix.single o o (x r) := by
     intro r
-    have hz : e o * (r • e o) * e o = r • e o := by
-      rw [mul_smul_comm, smul_mul_assoc, hidem, hidem]
+    have hz : e o * (r • e o) * e o = r • e o := by rw [mul_smul_comm, smul_mul_assoc, hidem, hidem]
     have h1 : ρ (r • e o) = Matrix.single o o ((ρ (r • e o)) o o) := by
       conv_lhs => rw [← hz]
       rw [map_mul, map_mul, hρe, Matrix.single_mul_mul_single, one_mul, mul_one]
-    have h2 : (ρ (r • e o)).trace = x r := by
-      rw [htr, map_smul, hT.one, smul_eq_mul, mul_one]
+    have h2 : (ρ (r • e o)).trace = x r := by rw [htr, map_smul, hT.one, smul_eq_mul, mul_one]
     rw [h1] at h2 ⊢
     congr 1
     simpa [Matrix.trace, Matrix.single_apply] using h2
-  obtain ⟨Γj, hΓj⟩ : ∃ Γj : Fin n → R, ∀ j, Γj j = ∏ l ∈ Finset.univ.erase j, γ l := ⟨_, fun _ => rfl⟩
+  obtain ⟨Γj, hΓj⟩ : ∃ Γj : Fin n → R, ∀ j, Γj j = ∏ l ∈ Finset.univ.erase j, γ l :=
+    ⟨_, fun _ => rfl⟩
   obtain ⟨q', hq'⟩ : ∃ q' : Fin n → E, ∀ j, q' j = q j * (Γj j • e o) := ⟨_, fun _ => rfl⟩
   have hq'p : ∀ j, q' j * p j = (∏ l, γ l) • e j := by
     intro j
@@ -98,10 +116,12 @@ theorem UpperTheory.V.Th.Coc.smat :
   have hX : ∀ i j a, p i * a * q' j = τ (p i * a * q' j) • e o := by
     intro i j a
     apply hcorner
-    have h : e o * (p i * a * q' j) * e o = (e o * p i) * a * (q' j * e o) := by simp only [mul_assoc]
+    have h : e o * (p i * a * q' j) * e o = (e o * p i) * a * (q' j * e o) := by
+      simp only [mul_assoc]
     rw [h, hpl, hq'r]
-  have hτmul : ∀ i k j a b, τ (p i * a * q' k) * τ (p k * b * q' j) =
-      τ (p i * a * q' k * (p k * b * q' j)) := by
+  have hτmul
+      : ∀ i k j a b,
+        τ (p i * a * q' k) * τ (p k * b * q' j) = τ (p i * a * q' k * (p k * b * q' j)) := by
     intro i k j a b
     have hl : e o * (p k * b * q' j) = p k * b * q' j := by simp only [← mul_assoc, hpl]
     conv_rhs => rw [hX i k a, smul_mul_assoc, hl, map_smul, smul_eq_mul]
@@ -109,24 +129,27 @@ theorem UpperTheory.V.Th.Coc.smat :
     intro j
     rw [hq', map_mul, ρq, hρs]
     ext u v
-    simp only [Matrix.smul_mul, Matrix.single_mul_single_same, Matrix.smul_apply, Matrix.single_apply, smul_eq_mul]
+    simp only [Matrix.smul_mul, Matrix.single_mul_single_same, Matrix.smul_apply,
+      Matrix.single_apply, smul_eq_mul]
     split_ifs <;> ring
   have hxΓj : ∀ j, x (Γj j) = (c ^ 2) ^ (n - 1) := by
     intro j
     rw [hΓj, map_prod]
     simp_rw [hxγ]
-    rw [Finset.prod_const, Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, Fintype.card_fin]
-  let s : E →ₗ[R] Matrix (Fin n) (Fin n) R :=
-    { toFun := fun a => Matrix.of fun i j => τ (p i * a * q' j)
-      map_add' := by
-        intro a b
-        ext i j
-        simp only [Matrix.of_apply, Matrix.add_apply, mul_add, add_mul, map_add (f := _)]
-      map_smul' := by
-        intro r a
-        ext i j
-        simp only [Matrix.of_apply, Matrix.smul_apply, mul_smul_comm, smul_mul_assoc, map_smul,
-          RingHom.id_apply] }
+    rw [Finset.prod_const, Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ,
+      Fintype.card_fin]
+  let s : E →ₗ[R] Matrix (Fin n) (Fin n) R := {
+    toFun := fun a => Matrix.of fun i j => τ (p i * a * q' j)
+    map_add' := by
+      intro a b
+      ext i j
+      simp only [Matrix.of_apply, Matrix.add_apply, mul_add, add_mul, map_add (f := _)]
+    map_smul' := by
+      intro r a
+      ext i j
+      simp only [Matrix.of_apply, Matrix.smul_apply, mul_smul_comm, smul_mul_assoc, map_smul,
+        RingHom.id_apply]
+  }
   have hs : ∀ a i j, s a i j = τ (p i * a * q' j) := fun _ _ _ => rfl
   refine ⟨s, ∏ l, γ l, ?_, ?_, ?_, ?_⟩
   · rw [map_prod]
@@ -154,4 +177,4 @@ theorem UpperTheory.V.Th.Coc.smat :
       rw [mul_assoc, hT.comm, mul_assoc]
     simp only [Matrix.trace, Matrix.diag_apply, hs, hc]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← Finset.mul_sum, hsum, mul_smul_comm, mul_one, map_smul, smul_eq_mul]
+    rw [← map_sum, ← Finset.mul_sum, hsum, mul_smul_comm, mul_one, map_smul, smul_eq_mul]

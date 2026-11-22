@@ -6,13 +6,14 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.NumFam
 
-theorem eps_adj (k r : ℕ) (a c : Fin (2 * r + k + 1)) (ha : k ≤ a.val + 1) (hc : c.val = a.val + 1) :
-    PI.BesselPeriodGGP.eps48 k r a ≠ PI.BesselPeriodGGP.eps48 k r c := by
+theorem eps_adj (k r : ℕ) (a c : Fin (2 * r + k + 1)) (ha : k ≤ a.val + 1) (hc : c.val = a.val + 1)
+    : PI.BesselPeriodGGP.eps48 k r a ≠ PI.BesselPeriodGGP.eps48 k r c := by
   have h1 : ¬ a.val < k - 1 := by omega
   have h2 : ¬ c.val < k - 1 := by omega
   simp only [PI.BesselPeriodGGP.eps48]
@@ -23,10 +24,14 @@ theorem eps_adj (k r : ℕ) (a c : Fin (2 * r + k + 1)) (ha : k ≤ a.val + 1) (
   · have h4 : (a.val + 1 - (k - 1)) % 2 = 0 := by omega
     simp [h3, h4]
 
-theorem abs_le_of_lOneNorm_le_coord {n : ℕ} (ν : Fin n → ℤ) (q0 : ℕ) (h : n1 ν ≤ q0) (a : Fin n) : |(ν a : ℝ)| ≤ q0 := by
+theorem abs_le_of_lOneNorm_le_coord {n : ℕ} (ν : Fin n → ℤ) (q0 : ℕ) (h : n1 ν ≤ q0) (a : Fin n)
+    : |(ν a : ℝ)| ≤ q0 := by
   have h1 : (ν a).natAbs ≤ n1 ν := by
     unfold n1
-    exact Finset.single_le_sum (f := fun i => (ν i).natAbs) (fun i _ => Nat.zero_le _) (Finset.mem_univ a)
+    exact Finset.single_le_sum
+      (f := fun i => (ν i).natAbs)
+      (fun i _ => Nat.zero_le _)
+      (Finset.mem_univ a)
   have h2 : |(ν a : ℝ)| = ((ν a).natAbs : ℝ) := by
     rw [← Int.cast_abs, ← Int.natCast_natAbs, Int.cast_natCast]
   rw [h2]
@@ -74,13 +79,26 @@ private lemma le_bv_and_lam_gap_of_num (k r : ℕ) (lam : Fin (2 * r + k + 1) �
   have h7 := hanti.antitone hle
   linarith
 
-theorem num_fam : ∀ (k r : ℕ) (lam : Fin (2 * r + k + 1) → ℝ) (u : ℕ → ℝ) (b bv ga h : ℝ) (q0 : ℕ), Num k r lam u b bv ga h q0 → (bv ≤ b ∧ (1000000 : ℝ) ≤ bv ∧ ((2 * r + k + 1) : ℝ) ≤ b ∧ 100 * (q0 : ℝ) ≤ bv ∧ GapOK k r (h / 2)) ∧ ∀ ν : Fin (2 * r + k + 1) → ℤ, n1 ν ≤ q0 → Formalism.QuantumDeterminants.IsHCParam (fun a => lam a + (ν a : ℝ)) ∧ Shape (PI.BesselPeriodGGP.eps48 k r) k (fun a => lam a + (ν a : ℝ)) bv ∧ Formalism.QuantumDeterminants.GapAtLeast (PI.BesselPeriodGGP.eps48 k r) (fun a => lam a + (ν a : ℝ)) (h / 2) ∧ ∀ a c, a < c → 2 ≤ (lam a + (ν a : ℝ)) - (lam c + (ν c : ℝ)) := by
+theorem num_fam
+    : ∀ (k r : ℕ) (lam : Fin (2 * r + k + 1) → ℝ) (u : ℕ → ℝ) (b bv ga h : ℝ) (q0 : ℕ),
+      Num k r lam u b bv ga h q0
+        → (bv ≤ b ∧ (1000000 : ℝ) ≤ bv ∧ ((2 * r + k + 1) : ℝ) ≤ b ∧ 100 * (q0 : ℝ) ≤ bv
+            ∧ GapOK k r (h / 2))
+          ∧ ∀ ν : Fin (2 * r + k + 1) → ℤ,
+            n1 ν ≤ q0
+              → Formalism.QuantumDeterminants.IsHCParam (fun a => lam a + (ν a : ℝ))
+                ∧ Shape (PI.BesselPeriodGGP.eps48 k r) k (fun a => lam a + (ν a : ℝ)) bv
+                ∧ Formalism.QuantumDeterminants.GapAtLeast (PI.BesselPeriodGGP.eps48 k r)
+                  (fun a => lam a + (ν a : ℝ))
+                  (h / 2)
+                ∧ ∀ a c, a < c → 2 ≤ (lam a + (ν a : ℝ)) - (lam c + (ν c : ℝ)) := by
   intro k r lam u b bv ga h q0 H
   obtain ⟨hhb, hgaps⟩ := le_bv_and_lam_gap_of_num k r lam u b bv ga h q0 H
   obtain ⟨hk, ⟨hanti, hint⟩, -, -, -, hcl, hnd, hlb, -, -, hgap, hok, hq1, hq2, hbv⟩ := H
   have hq0 : (0 : ℝ) ≤ q0 := Nat.cast_nonneg _
   have hN1 : (1 : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) := by exact_mod_cast (by omega : 1 ≤ 2 * r + k + 1)
-  have hN7 : ((2 * r + k + 1 : ℕ) : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) ^ 7 := le_self_pow₀ hN1 (by norm_num)
+  have hN7 : ((2 * r + k + 1 : ℕ) : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) ^ 7 :=
+    le_self_pow₀ hN1 (by norm_num)
   have hNc : ((2 * r + k + 1 : ℕ) : ℝ) = 2 * (r : ℝ) + k + 1 := by push_cast; ring
   have hL := hnd ⟨2 * r + k, by omega⟩ (show k ≤ 2 * r + k + 1 by omega)
   have hLb := hlb ⟨2 * r + k, by omega⟩
@@ -88,12 +106,18 @@ theorem num_fam : ∀ (k r : ℕ) (lam : Fin (2 * r + k + 1) → ℝ) (u : ℕ �
   have hbvb : bv ≤ b := by linarith [hL.2]
   have h100 : 100 * (q0 : ℝ) ≤ bv := by linarith
   refine ⟨⟨hbvb, by linarith, by linarith, h100, gapOK_mono k r (by linarith) hok⟩, fun ν hν => ?_⟩
-  have hνb : ∀ a, -(q0 : ℝ) ≤ ν a ∧ (ν a : ℝ) ≤ q0 := fun a => abs_le.mp (abs_le_of_lOneNorm_le_coord ν q0 hν a)
-  have hgap2 : ∀ a c : Fin (2 * r + k + 1), a < c → 2 ≤ (lam a + (ν a : ℝ)) - (lam c + (ν c : ℝ)) := by
+  have hνb : ∀ a, -(q0 : ℝ) ≤ ν a ∧ (ν a : ℝ) ≤ q0 := fun a =>
+    abs_le.mp (abs_le_of_lOneNorm_le_coord ν q0 hν a)
+  have hgap2
+      : ∀ a c : Fin (2 * r + k + 1), a < c → 2 ≤ (lam a + (ν a : ℝ)) - (lam c + (ν c : ℝ)) := by
     intro a c hac
     linarith [hgaps a c hac, (hνb a).1, (hνb a).2, (hνb c).1, (hνb c).2]
-  refine ⟨⟨fun a c hac => ?_, fun a => ?_⟩, ⟨hk, by omega, fun a c hac => hgap2 a c hac, fun a ha => ?_,
-    fun a ha => ?_, hbv⟩, fun a c he => ?_, fun a c hac => hgap2 a c hac⟩
+  refine ⟨
+    ⟨fun a c hac => ?_, fun a => ?_⟩,
+    ⟨hk, by omega, fun a c hac => hgap2 a c hac, fun a ha => ?_, fun a ha => ?_, hbv⟩,
+    fun a c he => ?_,
+    fun a c hac => hgap2 a c hac
+  ⟩
   · show lam c + (ν c : ℝ) < lam a + ν a
     linarith [hgap2 a c hac]
   · obtain ⟨m, hm⟩ := hint a

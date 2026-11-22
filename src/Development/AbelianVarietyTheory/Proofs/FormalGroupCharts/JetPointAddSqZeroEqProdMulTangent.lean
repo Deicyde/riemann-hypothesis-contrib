@@ -10,7 +10,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Chart
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.MonObj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp epsR IsTangent IsLieComb IsLieBasis)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -32,14 +33,15 @@ variable {R}
 theorem mem_congrPairs {J : Ideal A} {b : A × A} : b ∈ congrPairs R J ↔ b.2 - b.1 ∈ J :=
   Ideal.Quotient.eq
 
-theorem mul_eq_aug_mul (aug : A →ₐ[R] R) {J : Ideal A} (hJ : J * RingHom.ker aug = ⊥) {δ : A}
-    (hδ : δ ∈ J) (a : A) : δ * (a - algebraMap R A (aug a)) = 0 := by
+theorem mul_eq_aug_mul
+    (aug : A →ₐ[R] R) {J : Ideal A} (hJ : J * RingHom.ker aug = ⊥) {δ : A} (hδ : δ ∈ J) (a : A)
+    : δ * (a - algebraMap R A (aug a)) = 0 := by
   have : δ * (a - algebraMap R A (aug a)) ∈ J * RingHom.ker aug :=
     Ideal.mul_mem_mul hδ (by simp [RingHom.mem_ker])
   rwa [hJ] at this
 
-def pairDiff (aug : A →ₐ[R] R) {J : Ideal A} (hJ : J * RingHom.ker aug = ⊥) :
-    congrPairs R J →ₐ[R] A where
+def pairDiff (aug : A →ₐ[R] R) {J : Ideal A} (hJ : J * RingHom.ker aug = ⊥)
+    : congrPairs R J →ₐ[R] A where
   toFun b := algebraMap R A (aug b.1.1) + (b.1.2 - b.1.1)
   map_one' := by simp
   map_mul' b c := by
@@ -57,23 +59,29 @@ def pairDiff (aug : A →ₐ[R] R) {J : Ideal A} (hJ : J * RingHom.ker aug = ⊥
 
 end Pairs
 
-theorem jet_sqZero_eq_lieExp {R : Type} [CommRing R] {G : Over (Spec (CommRingCat.of R))}
-    [GrpObj G] [IsCommMonObj G] (hG : Smooth G.hom) {d : ℕ} {v : Fin d → (epsR R ⟶ G)}
+theorem jet_sqZero_eq_lieExp
+    {R : Type} [CommRing R]
+    {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+    (hG : Smooth G.hom)
+    {d : ℕ} {v : Fin d → (epsR R ⟶ G)}
     (hv : IsLieBasis v) (x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin d) m) ⟶ G)
     (hxt : ∀ m, spMap (jetTruncR R (Fin d) m) ≫ x (m + 1) = x m)
     (hx0 : ∀ m, spMap (jetZeroR R (Fin d) m) ≫ x m = 1)
     (hx1 : ∀ j, spMap (dualLift (Pi.single j (1 : R))) ≫ x 1 = v j)
-    {A : Type} [CommRing A] [Algebra R A] {J : Ideal A} (hJ : J ^ 2 = ⊥) (δ : Fin d → A)
-    (hδ : ∀ j, δ j ∈ J) (hδ' : ∀ j, δ j * δ j = 0) (m : ℕ) (φ : JetR R (Fin d) m →ₐ[R] A)
-    (hφ : ∀ j, φ (zR m j) = δ j) : spMap φ ≫ x m = lieExp v δ hδ' := by
-  have key : ∀ (k : ℕ) (φ : JetR R (Fin d) (k + 1) →ₐ[R] A), (∀ j, φ (zR (k + 1) j) = δ j) →
-      spMap φ ≫ x (k + 1) = lieExp v δ hδ' := by
+    {A : Type} [CommRing A] [Algebra R A]
+    {J : Ideal A} (hJ : J ^ 2 = ⊥)
+    (δ : Fin d → A) (hδ : ∀ j, δ j ∈ J) (hδ' : ∀ j, δ j * δ j = 0)
+    (m : ℕ) (φ : JetR R (Fin d) m →ₐ[R] A) (hφ : ∀ j, φ (zR m j) = δ j)
+    : spMap φ ≫ x m = lieExp v δ hδ' := by
+  have key
+      : ∀ (k : ℕ) (φ : JetR R (Fin d) (k + 1) →ₐ[R] A),
+        (∀ j, φ (zR (k + 1) j) = δ j) → spMap φ ≫ x (k + 1) = lieExp v δ hδ' := by
     intro k
     induction k with
     | zero =>
       intro φ hφ
-      exact firstJet_eq_prod_tangent R G hG d v hv x hx0 hx1 A φ _
-        fun j => (epsTo_eps _ _).trans (hφ j).symm
+      exact firstJet_eq_prod_tangent R G hG d v hv x hx0 hx1 A φ _ fun j =>
+        (epsTo_eps _ _).trans (hφ j).symm
     | succ k ih =>
       intro φ hφ
       have hk : J ^ (k + 1 + 1) = ⊥ :=
@@ -85,20 +93,25 @@ theorem jet_sqZero_eq_lieExp {R : Type} [CommRing R] {G : Over (Spec (CommRingCa
   rw [← hxt m, ← Category.assoc, spMap_comp]
   exact key m _ hφ
 
-theorem jet_add_sqZero_eq_prod_mul : ∀ (R : Type) [CommRing R]
-    (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G], Smooth G.hom →
-    ∀ (d : ℕ) (v : Fin d → (epsR R ⟶ G)), IsLieBasis v →
-    ∀ (x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin d) m) ⟶ G),
-    (∀ m, spMap (jetTruncR R (Fin d) m) ≫ x (m + 1) = x m) →
-    (∀ m, spMap (jetZeroR R (Fin d) m) ≫ x m = 1) →
-    (∀ j, spMap (dualLift (Pi.single j (1 : R))) ≫ x 1 = v j) →
-    ∀ (A : Type) [CommRing A] [Algebra R A] (aug : A →ₐ[R] R) (J : Ideal A),
-    J * RingHom.ker aug = ⊥ → J ≤ RingHom.ker aug →
-    ∀ (m : ℕ) (ψ ψ' : JetR R (Fin d) m →ₐ[R] A), aug.comp ψ = jetAug R (Fin d) m →
-    aug.comp ψ' = jetAug R (Fin d) m → ∀ e : Fin d → (DualNumber R →ₐ[R] A),
-    (∀ j, e j (TrivSqZeroExt.inr 1) ∈ J) →
-    (∀ j, ψ' (zR m j) = ψ (zR m j) + e j (TrivSqZeroExt.inr 1)) →
-    spMap ψ' ≫ x m = (∏ j, (spMap (e j) ≫ v j : sp (R₀ := R) A ⟶ G)) * (spMap ψ ≫ x m) := by
+theorem jet_add_sqZero_eq_prod_mul
+    : ∀ (R : Type) [CommRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G],
+      Smooth G.hom
+        → ∀ (d : ℕ) (v : Fin d → (epsR R ⟶ G)),
+          IsLieBasis v
+            → ∀ (x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin d) m) ⟶ G),
+              (∀ m, spMap (jetTruncR R (Fin d) m) ≫ x (m + 1) = x m)
+                → (∀ m, spMap (jetZeroR R (Fin d) m) ≫ x m = 1)
+                → (∀ j, spMap (dualLift (Pi.single j (1 : R))) ≫ x 1 = v j)
+                → ∀ (A : Type) [CommRing A] [Algebra R A] (aug : A →ₐ[R] R) (J : Ideal A),
+                  J * RingHom.ker aug = ⊥ → J ≤ RingHom.ker aug
+                    → ∀ (m : ℕ) (ψ ψ' : JetR R (Fin d) m →ₐ[R] A),
+                      aug.comp ψ = jetAug R (Fin d) m → aug.comp ψ' = jetAug R (Fin d) m
+                        → ∀ e : Fin d → (DualNumber R →ₐ[R] A),
+                          (∀ j, e j (TrivSqZeroExt.inr 1) ∈ J)
+                            → (∀ j, ψ' (zR m j) = ψ (zR m j) + e j (TrivSqZeroExt.inr 1))
+                            → spMap ψ' ≫ x m
+                              = (∏ j, (spMap (e j) ≫ v j : sp (R₀ := R) A ⟶ G))
+                                * (spMap ψ ≫ x m) := by
   intro R _ G _ _ hG d v hv x hxt hx0 hx1 A _ _ aug J hJ hle m ψ ψ' hψ _ e he hz
   have hJJ : ∀ a ∈ J, ∀ b ∈ J, a * b = 0 := fun a ha b hb => by
     have : a * b ∈ J * RingHom.ker aug := Ideal.mul_mem_mul ha (hle hb)
@@ -108,15 +121,16 @@ theorem jet_add_sqZero_eq_prod_mul : ∀ (R : Type) [CommRing R]
     exact le_bot_iff.1 ((Ideal.mul_mono_right hle).trans hJ.le)
   let p₁ : congrPairs R J →ₐ[R] A := (AlgHom.fst R A A).comp (congrPairs R J).val
   let p₂ : congrPairs R J →ₐ[R] A := (AlgHom.snd R A A).comp (congrPairs R J).val
-  let s : A →ₐ[R] congrPairs R J := ((AlgHom.id R A).prod (AlgHom.id R A)).codRestrict _
-    fun a => mem_congrPairs.2 (by simp)
+  let s : A →ₐ[R] congrPairs R J :=
+    ((AlgHom.id R A).prod (AlgHom.id R A)).codRestrict _ fun a => mem_congrPairs.2 (by simp)
   have hq : (Ideal.Quotient.mkₐ R J).comp ψ' = (Ideal.Quotient.mkₐ R J).comp ψ :=
-    jet_ext fun j => Ideal.Quotient.eq.2 (by
-      change ψ' (zR m j) - ψ (zR m j) ∈ J
-      rw [hz, add_sub_cancel_left]
-      exact he j)
-  let Ψ : JetR R (Fin d) m →ₐ[R] congrPairs R J := (ψ.prod ψ').codRestrict _
-    fun a => AlgHom.congr_fun hq a
+    jet_ext fun j =>
+      Ideal.Quotient.eq.2 (by
+        change ψ' (zR m j) - ψ (zR m j) ∈ J
+        rw [hz, add_sub_cancel_left]
+        exact he j)
+  let Ψ : JetR R (Fin d) m →ₐ[R] congrPairs R J :=
+    (ψ.prod ψ').codRestrict _ fun a => AlgHom.congr_fun hq a
   let c : Fin d → congrPairs R J := fun j =>
     ⟨(0, e j (TrivSqZeroExt.inr 1)), mem_congrPairs.2 (by simpa using he j)⟩
   have hc : ∀ j, c j * c j = 0 := fun j =>
@@ -136,35 +150,44 @@ theorem jet_add_sqZero_eq_prod_mul : ∀ (R : Type) [CommRing R]
     rw [MonObj.comp_mul, GrpObj.comp_inv, ← Category.assoc, ← Category.assoc, spMap_comp,
       spMap_comp]
     exact mul_inv_cancel _
-  have m₂ : lieExp v c hc ∈ redKer G (RingHom.ker p₁) :=
-    lieExp_mem_redKer hv.1 c (fun _ => rfl) hc
-  have main := redKer_ext hK m₁ m₂ p₁ (pairDiff aug hJ)
-    (fun a h₁ h₂ => by
-      have h₁' : a.1.1 = 0 := h₁
-      have h₂' : algebraMap R A (aug a.1.1) + (a.1.2 - a.1.1) = 0 := h₂
-      rw [h₁', map_zero, map_zero, zero_add, sub_zero] at h₂'
-      exact Subtype.ext (Prod.ext h₁' h₂'))
-    (by rw [comp_eq_one_of_mem_redKer m₁ p₁ fun _ h => h,
-      comp_eq_one_of_mem_redKer m₂ p₁ fun _ h => h])
-    (by
-      have hψz : ∀ j, aug (ψ (zR m j)) = 0 := fun j =>
-        (AlgHom.congr_fun hψ _).trans (jetAug_zR m j)
-      rw [MonObj.comp_mul, GrpObj.comp_inv, ← Category.assoc, ← Category.assoc, spMap_comp,
-        spMap_comp, comp_lieExp,
-        jet_sqZero_eq_lieExp hG hv x hxt hx0 hx1 hJ2 (fun j => e j (TrivSqZeroExt.inr 1)) he
-          (fun j => hJJ _ (he j) _ (he j)) m _ (fun j => by
-            change algebraMap R A (aug (ψ (zR m j))) + (ψ' (zR m j) - ψ (zR m j)) = _
-            rw [hψz, hz, map_zero, zero_add, add_sub_cancel_left]),
-        jet_sqZero_eq_lieExp hG hv x hxt hx0 hx1 hJ2 (fun _ => 0) (fun _ => J.zero_mem)
-          (fun _ => mul_zero _) m _ (fun j => by
-            change algebraMap R A (aug (ψ (zR m j))) + (ψ (zR m j) - ψ (zR m j)) = _
-            rw [hψz, map_zero, zero_add, sub_self])]
-      have h1 : lieExp v (fun _ => (0 : A)) (fun _ => mul_zero _) = 1 :=
-        Finset.prod_eq_one fun i _ => epsTo_zero_comp ((isTan_iff _).2 (hv.1 i)) _ rfl _
-      rw [h1, inv_one, _root_.mul_one]
-      refine lieExp_congr _ (fun j => ?_) _ _
-      change _ = algebraMap R A (aug 0) + (e j (TrivSqZeroExt.inr 1) - 0)
-      rw [map_zero, map_zero, zero_add, sub_zero])
+  have m₂ : lieExp v c hc ∈ redKer G (RingHom.ker p₁) := lieExp_mem_redKer hv.1 c (fun _ => rfl) hc
+  have main :=
+    redKer_ext hK m₁ m₂ p₁ (pairDiff aug hJ)
+      (fun a h₁ h₂ => by
+        have h₁' : a.1.1 = 0 := h₁
+        have h₂' : algebraMap R A (aug a.1.1) + (a.1.2 - a.1.1) = 0 := h₂
+        rw [h₁', map_zero, map_zero, zero_add, sub_zero] at h₂'
+        exact Subtype.ext (Prod.ext h₁' h₂'))
+      (by
+        rw [comp_eq_one_of_mem_redKer m₁ p₁ fun _ h => h,
+          comp_eq_one_of_mem_redKer m₂ p₁ fun _ h => h])
+      (by
+        have hψz : ∀ j, aug (ψ (zR m j)) = 0 := fun j =>
+          (AlgHom.congr_fun hψ _).trans (jetAug_zR m j)
+        rw [MonObj.comp_mul, GrpObj.comp_inv, ← Category.assoc, ← Category.assoc, spMap_comp,
+          spMap_comp, comp_lieExp,
+          jet_sqZero_eq_lieExp hG hv x hxt hx0 hx1 hJ2
+            (fun j => e j (TrivSqZeroExt.inr 1))
+            he
+            (fun j => hJJ _ (he j) _ (he j))
+            m _
+            (fun j => by
+              change algebraMap R A (aug (ψ (zR m j))) + (ψ' (zR m j) - ψ (zR m j)) = _
+              rw [hψz, hz, map_zero, zero_add, add_sub_cancel_left]),
+          jet_sqZero_eq_lieExp hG hv x hxt hx0 hx1 hJ2
+            (fun _ => 0)
+            (fun _ => J.zero_mem)
+            (fun _ => mul_zero _)
+            m _
+            (fun j => by
+              change algebraMap R A (aug (ψ (zR m j))) + (ψ (zR m j) - ψ (zR m j)) = _
+              rw [hψz, map_zero, zero_add, sub_self])]
+        have h1 : lieExp v (fun _ => (0 : A)) (fun _ => mul_zero _) = 1 :=
+          Finset.prod_eq_one fun i _ => epsTo_zero_comp ((isTan_iff _).2 (hv.1 i)) _ rfl _
+        rw [h1, inv_one, _root_.mul_one]
+        refine lieExp_congr _ (fun j => ?_) _ _
+        change _ = algebraMap R A (aug 0) + (e j (TrivSqZeroExt.inr 1) - 0)
+        rw [map_zero, map_zero, zero_add, sub_zero])
   have fin := congrArg (spMap p₂ ≫ ·) (mul_inv_eq_iff_eq_mul.1 main)
   simp only [MonObj.comp_mul, ← Category.assoc, spMap_comp, comp_lieExp] at fin
   refine fin.trans ?_

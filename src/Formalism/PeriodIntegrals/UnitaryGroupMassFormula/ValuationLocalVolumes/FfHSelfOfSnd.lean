@@ -15,30 +15,34 @@ section split
 
 variable {k : Type} [Field k] {M : ℕ} (J : Matrix (Fin M) (Fin M) (k × k))
 
-theorem ffH_fst' (y x : Fin M → k × k) :
-    (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J y x).1 = ∑ i, ∑ l, ((RingEquiv.prodComm (R := k) (S := k)).toRingHom (y i) * J i l).1 * (x l).1 := by
+theorem ffH_fst' (y x : Fin M → k × k)
+    : (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J y x).1
+      = ∑ i, ∑ l, ((RingEquiv.prodComm (R := k) (S := k)).toRingHom (y i) * J i l).1 * (x l).1 := by
   simp only [ffH, Prod.fst_sum, Prod.fst_mul]
 
-theorem ffH_snd' (y x : Fin M → k × k) :
-    (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J y x).2 = ∑ i, ∑ l, ((RingEquiv.prodComm (R := k) (S := k)).toRingHom (y i) * J i l).2 * (x l).2 := by
+theorem ffH_snd' (y x : Fin M → k × k)
+    : (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J y x).2
+      = ∑ i, ∑ l, ((RingEquiv.prodComm (R := k) (S := k)).toRingHom (y i) * J i l).2 * (x l).2 := by
   simp only [ffH, Prod.snd_sum, Prod.snd_mul]
 
-theorem ffH_self_of_snd (x : Fin M → k × k) (h : ∀ l, (x l).2 = 0) : ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0 := by
+theorem ffH_self_of_snd (x : Fin M → k × k) (h : ∀ l, (x l).2 = 0)
+    : ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0 := by
   refine Prod.ext ?_ ?_
   · rw [ffH_fst']
     simp [h]
   · rw [ffH_snd']
     simp [h]
 
-theorem ffH_self_of_fst (x : Fin M → k × k) (h : ∀ l, (x l).1 = 0) : ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0 := by
+theorem ffH_self_of_fst (x : Fin M → k × k) (h : ∀ l, (x l).1 = 0)
+    : ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J x x = 0 := by
   refine Prod.ext ?_ ?_
   · rw [ffH_fst']
     simp [h]
   · rw [ffH_snd']
     simp [h]
 
-theorem notFree_iff (x : Fin M → k × k) :
-    (¬ ∀ c : k × k, c • x = 0 → c = 0) ↔ (∀ l, (x l).1 = 0) ∨ (∀ l, (x l).2 = 0) := by
+theorem notFree_iff (x : Fin M → k × k)
+    : (¬ ∀ c : k × k, c • x = 0 → c = 0) ↔ (∀ l, (x l).1 = 0) ∨ (∀ l, (x l).2 = 0) := by
   constructor
   · intro h
     push_neg at h
@@ -56,24 +60,30 @@ theorem notFree_iff (x : Fin M → k × k) :
       simp only [Pi.smul_apply, smul_eq_mul, Prod.fst_mul, Pi.zero_apply, Prod.fst_zero] at hl
       exact (mul_eq_zero.1 hl).resolve_left h1
   · rintro (h | h) hfree
-    · have h1 := hfree (1, 0) (by
-        funext l
-        refine Prod.ext ?_ ?_ <;> simp [h l])
+    · have h1 :=
+        hfree (1, 0) (by
+          funext l
+          refine Prod.ext ?_ ?_ <;> simp [h l])
       simp at h1
-    · have h1 := hfree (0, 1) (by
-        funext l
-        refine Prod.ext ?_ ?_ <;> simp [h l])
+    · have h1 :=
+        hfree (0, 1) (by
+          funext l
+          refine Prod.ext ?_ ?_ <;> simp [h l])
       simp at h1
 
-theorem perp_surj {a' : ℕ} (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det)
-    (Y : Fin a' → Fin M → k × k) (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0) (w : Fin a' → k × k) :
-    ∃ x : Fin M → k × k, ∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = w j := by
+theorem perp_surj
+    {a' : ℕ}
+    (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det) (Y : Fin a' → Fin M → k × k)
+    (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0) (w : Fin a' → k × k)
+    : ∃ x : Fin M → k × k, ∀ j,
+      ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = w j := by
   classical
   set c := T0⁻¹.mulVec w with hc
   refine ⟨fun l => ∑ m, Y m l * c m, fun j => ?_⟩
 
-  have h1 : ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j)
-      (fun l => ∑ m, Y m l * c m) = ∑ m, T0 j m * c m := by
+  have h1
+      : ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) (fun l => ∑ m, Y m l * c m)
+        = ∑ m, T0 j m * c m := by
     rw [← hY]
     simp only [ffGram, ffH, Finset.mul_sum, Finset.sum_mul]
     conv_lhs => arg 2; ext i; rw [Finset.sum_comm]
@@ -91,9 +101,9 @@ theorem perp_surj {a' : ℕ} (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUn
   have h3 := congrFun h2 j
   simpa [Matrix.mulVec, dotProduct] using h3
 
-private theorem natCard_ker_mul_card_pow_eq_of_surjective [Finite k] {a' : ℕ} (B : Matrix (Fin a') (Fin M) k)
-    (hB : Function.Surjective B.mulVec) :
-    Nat.card {u : Fin M → k // B.mulVec u = 0} * Nat.card k ^ a' = Nat.card k ^ M := by
+private theorem natCard_ker_mul_card_pow_eq_of_surjective
+    [Finite k] {a' : ℕ} (B : Matrix (Fin a') (Fin M) k) (hB : Function.Surjective B.mulVec)
+    : Nat.card {u : Fin M → k // B.mulVec u = 0} * Nat.card k ^ a' = Nat.card k ^ M := by
   classical
   have _ := Fintype.ofFinite k
   have hs : LinearMap.range (Matrix.mulVecLin B) = ⊤ := by
@@ -110,16 +120,24 @@ private theorem natCard_ker_mul_card_pow_eq_of_surjective [Finite k] {a' : ℕ} 
   congr 1
   omega
 
-theorem card_half_snd [Finite k] {a' : ℕ} (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det)
-    (Y : Fin a' → Fin M → k × k) (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0) :
-    Nat.card {x : Fin M → k × k // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0) ∧ ∀ l, (x l).2 = 0} * Nat.card k ^ a' =
-      Nat.card k ^ M := by
+theorem card_half_snd
+    [Finite k]
+    {a' : ℕ}
+    (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det) (Y : Fin a' → Fin M → k × k)
+    (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0)
+    : Nat.card
+          {x : Fin M → k × k
+            // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0)
+              ∧ ∀ l, (x l).2 = 0}
+        * Nat.card k ^ a'
+      = Nat.card k ^ M := by
   classical
   let B : Matrix (Fin a') (Fin M) k := fun j l =>
     ∑ i, ((RingEquiv.prodComm (R := k) (S := k)).toRingHom (Y j i) * J i l).1
-  have hB : ∀ (x : Fin M → k × k) j,
-      (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x).1 =
-        B.mulVec (fun l => (x l).1) j := by
+  have hB
+      : ∀ (x : Fin M → k × k) j,
+        (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x).1
+          = B.mulVec (fun l => (x l).1) j := by
     intro x j
     rw [ffH_fst']
     simp only [Matrix.mulVec, dotProduct, B, Finset.sum_mul]
@@ -128,32 +146,51 @@ theorem card_half_snd [Finite k] {a' : ℕ} (T0 : Matrix (Fin a') (Fin a') (k ×
     intro w'
     obtain ⟨x, hx⟩ := perp_surj J T0 hu Y hY (fun j => (w' j, 0))
     exact ⟨fun l => (x l).1, funext fun j => by rw [← hB x j, hx j]⟩
-  have e : {x : Fin M → k × k // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J
-      (Y j) x = 0) ∧ ∀ l, (x l).2 = 0} ≃ {u : Fin M → k // B.mulVec u = 0} :=
-    { toFun := fun x => ⟨fun l => (x.1 l).1, funext fun j => by
+  have e
+      : {x : Fin M → k × k
+          // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0)
+            ∧ ∀ l, (x l).2 = 0}
+        ≃ {u : Fin M → k // B.mulVec u = 0} := {
+    toFun := fun x => ⟨
+      fun l => (x.1 l).1,
+      funext fun j => by
         rw [← hB, x.2.1 j]
-        rfl⟩
-      invFun := fun u => ⟨fun l => (u.1 l, 0), fun j => by
+        rfl
+    ⟩
+    invFun := fun u => ⟨
+      fun l => (u.1 l, 0),
+      fun j => by
         refine Prod.ext ?_ ?_
         · rw [hB]
           exact congrFun u.2 j
         · rw [ffH_snd']
-          simp, fun l => rfl⟩
-      left_inv := fun x => Subtype.ext (funext fun l => Prod.ext rfl (x.2.2 l).symm)
-      right_inv := fun u => rfl }
+          simp,
+      fun l => rfl
+    ⟩
+    left_inv := fun x => Subtype.ext (funext fun l => Prod.ext rfl (x.2.2 l).symm)
+    right_inv := fun u => rfl
+  }
   rw [Nat.card_congr e]
   exact natCard_ker_mul_card_pow_eq_of_surjective B hsurj
 
-theorem card_half_fst [Finite k] {a' : ℕ} (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det)
-    (Y : Fin a' → Fin M → k × k) (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0) :
-    Nat.card {x : Fin M → k × k // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0) ∧ ∀ l, (x l).1 = 0} * Nat.card k ^ a' =
-      Nat.card k ^ M := by
+theorem card_half_fst
+    [Finite k]
+    {a' : ℕ}
+    (T0 : Matrix (Fin a') (Fin a') (k × k)) (hu : IsUnit T0.det) (Y : Fin a' → Fin M → k × k)
+    (hY : ffGram (RingEquiv.prodComm (R := k) (S := k)).toRingHom J Y = T0)
+    : Nat.card
+          {x : Fin M → k × k
+            // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0)
+              ∧ ∀ l, (x l).1 = 0}
+        * Nat.card k ^ a'
+      = Nat.card k ^ M := by
   classical
   let B : Matrix (Fin a') (Fin M) k := fun j l =>
     ∑ i, ((RingEquiv.prodComm (R := k) (S := k)).toRingHom (Y j i) * J i l).2
-  have hB : ∀ (x : Fin M → k × k) j,
-      (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x).2 =
-        B.mulVec (fun l => (x l).2) j := by
+  have hB
+      : ∀ (x : Fin M → k × k) j,
+        (ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x).2
+          = B.mulVec (fun l => (x l).2) j := by
     intro x j
     rw [ffH_snd']
     simp only [Matrix.mulVec, dotProduct, B, Finset.sum_mul]
@@ -162,19 +199,30 @@ theorem card_half_fst [Finite k] {a' : ℕ} (T0 : Matrix (Fin a') (Fin a') (k ×
     intro w'
     obtain ⟨x, hx⟩ := perp_surj J T0 hu Y hY (fun j => (0, w' j))
     exact ⟨fun l => (x l).2, funext fun j => by rw [← hB x j, hx j]⟩
-  have e : {x : Fin M → k × k // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J
-      (Y j) x = 0) ∧ ∀ l, (x l).1 = 0} ≃ {u : Fin M → k // B.mulVec u = 0} :=
-    { toFun := fun x => ⟨fun l => (x.1 l).2, funext fun j => by
+  have e
+      : {x : Fin M → k × k
+          // (∀ j, ffH (RingEquiv.prodComm (R := k) (S := k)).toRingHom J (Y j) x = 0)
+            ∧ ∀ l, (x l).1 = 0}
+        ≃ {u : Fin M → k // B.mulVec u = 0} := {
+    toFun := fun x => ⟨
+      fun l => (x.1 l).2,
+      funext fun j => by
         rw [← hB, x.2.1 j]
-        rfl⟩
-      invFun := fun u => ⟨fun l => (0, u.1 l), fun j => by
+        rfl
+    ⟩
+    invFun := fun u => ⟨
+      fun l => (0, u.1 l),
+      fun j => by
         refine Prod.ext ?_ ?_
         · rw [ffH_fst']
           simp
         · rw [hB]
-          exact congrFun u.2 j, fun l => rfl⟩
-      left_inv := fun x => Subtype.ext (funext fun l => Prod.ext (x.2.2 l).symm rfl)
-      right_inv := fun u => rfl }
+          exact congrFun u.2 j,
+      fun l => rfl
+    ⟩
+    left_inv := fun x => Subtype.ext (funext fun l => Prod.ext (x.2.2 l).symm rfl)
+    right_inv := fun u => rfl
+  }
   rw [Nat.card_congr e]
   exact natCard_ker_mul_card_pow_eq_of_surjective B hsurj
 

@@ -10,19 +10,20 @@ open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum Polynomial
 
 namespace GlobalTheory.InertField
 
-
 open scoped TensorProduct in
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum Polynomial in
-theorem _root_.GlobalTheory.InertField.exists_not_congr {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ a : 𝓞 E, ∀ r : 𝓞 F, a - algebraMap (𝓞 F) (𝓞 E) r ∉ v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E)) := by
+theorem _root_.GlobalTheory.InertField.exists_not_congr
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (h2 : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F))
+    : ∃ a : 𝓞 E, ∀ r : 𝓞 F,
+      a - algebraMap (𝓞 F) (𝓞 E) r ∉ v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E)) := by
   by_contra hcon
   push_neg at hcon
   haveI : v.asIdeal.IsMaximal := v.isMaximal
   have hrank := Ideal.finrank_quotient_map v.asIdeal F E (S := 𝓞 E)
   rw [h2] at hrank
-  have hle : Module.finrank (𝓞 F ⧸ v.asIdeal)
-      (𝓞 E ⧸ v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E))) ≤ 1 := by
+  have hle
+      : Module.finrank (𝓞 F ⧸ v.asIdeal) (𝓞 E ⧸ v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E))) ≤ 1 := by
     apply finrank_le_one 1
     intro w
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective w
@@ -177,10 +178,14 @@ private lemma exists_quadratic_root_mod_of_adic_root {F : Type} [Field F] [Numbe
   rw [heq, hvF, valuation_of_algebraMap] at hval
   exact (intValuation_lt_one_iff_mem v _).mp hval
 
-
 open scoped TensorProduct in
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum Polynomial in
-theorem _root_.GlobalTheory.InertField.isField_of_inert : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E], Module.finrank F E = 2 → ∀ v : HeightOneSpectrum (𝓞 F), (v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E))).IsPrime → IsField (v.adicCompletion F ⊗[F] E) := by
+theorem _root_.GlobalTheory.InertField.isField_of_inert
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
+      Module.finrank F E = 2
+        → ∀ v : HeightOneSpectrum (𝓞 F),
+          (v.asIdeal.map (algebraMap (𝓞 F) (𝓞 E))).IsPrime
+            → IsField (v.adicCompletion F ⊗[F] E) := by
   intro F E _ _ _ _ _ h2 v hP
   classical
   obtain ⟨a, ha⟩ := _root_.GlobalTheory.InertField.exists_not_congr h2 v
@@ -188,20 +193,16 @@ theorem _root_.GlobalTheory.InertField.isField_of_inert : ∀ (F E : Type) [Fiel
   have hai : IsIntegral (𝓞 F) a := Algebra.IsIntegral.isIntegral a
   set g := minpoly (𝓞 F) a with hg
   have hgm : g.Monic := minpoly.monic hai
-  have hgE : minpoly (𝓞 F) (a : E) = g :=
-    minpoly.algebraMap_eq (IsFractionRing.injective (𝓞 E) E) a
+  have hgE : minpoly (𝓞 F) (a : E) = g := minpoly.algebraMap_eq (IsFractionRing.injective (𝓞 E) E) a
   have haiE : IsIntegral (𝓞 F) (a : E) := hai.map (IsScalarTower.toAlgHom (𝓞 F) (𝓞 E) E)
   have hgF : minpoly F (a : E) = g.map (algebraMap (𝓞 F) F) := by
     rw [← hgE]; exact minpoly.isIntegrallyClosed_eq_field_fractions' F haiE
-  have hdegF : (minpoly F (a : E)).natDegree = g.natDegree := by
-    rw [hgF]; exact hgm.natDegree_map _
-  have hle2 : g.natDegree ≤ 2 := by
-    rw [← hdegF, ← h2]; exact minpoly.natDegree_le (a : E)
+  have hdegF : (minpoly F (a : E)).natDegree = g.natDegree := by rw [hgF]; exact hgm.natDegree_map _
+  have hle2 : g.natDegree ≤ 2 := by rw [← hdegF, ← h2]; exact minpoly.natDegree_le (a : E)
   have hpos : 0 < g.natDegree := minpoly.natDegree_pos hai
   have hne1 : g.natDegree ≠ 1 := by
     intro h1
-    have hX : g = Polynomial.X + Polynomial.C (g.coeff 0) := by
-      rw [hgm.as_sum, h1]; simp
+    have hX : g = Polynomial.X + Polynomial.C (g.coeff 0) := by rw [hgm.as_sum, h1]; simp
     have h0 : Polynomial.aeval a g = 0 := minpoly.aeval _ _
     rw [hX] at h0
     simp at h0
@@ -221,9 +222,10 @@ theorem _root_.GlobalTheory.InertField.isField_of_inert : ∀ (F E : Type) [Fiel
   have hnoroot : ∀ r : 𝓞 F, r ^ 2 + b * r + c ∉ v.asIdeal := by
     intro r hr
     have hmem := Ideal.mem_map_of_mem (algebraMap (𝓞 F) (𝓞 E)) hr
-    have hfac : algebraMap (𝓞 F) (𝓞 E) (r ^ 2 + b * r + c)
-        = (algebraMap (𝓞 F) (𝓞 E) r - a)
-          * (algebraMap (𝓞 F) (𝓞 E) r + algebraMap (𝓞 F) (𝓞 E) b + a) := by
+    have hfac
+        : algebraMap (𝓞 F) (𝓞 E) (r ^ 2 + b * r + c)
+          = (algebraMap (𝓞 F) (𝓞 E) r - a)
+            * (algebraMap (𝓞 F) (𝓞 E) r + algebraMap (𝓞 F) (𝓞 E) b + a) := by
       simp only [map_add (f := _), map_mul, map_pow]
       linear_combination hrel
     rw [hfac] at hmem
@@ -260,35 +262,41 @@ theorem _root_.GlobalTheory.InertField.isField_of_inert : ∀ (F E : Type) [Fiel
   set α : v.adicCompletion F ⊗[F] E := (1 : v.adicCompletion F) ⊗ₜ[F] (a : E) with hαdef
   set B := algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F b) with hB
   set C := algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F c) with hC
-  have hrelE : (a : E) ^ 2 + algebraMap F E (algebraMap (𝓞 F) F b) * (a : E)
-      + algebraMap F E (algebraMap (𝓞 F) F c) = 0 := by
+  have hrelE
+      : (a : E) ^ 2 + algebraMap F E (algebraMap (𝓞 F) F b) * (a : E)
+          + algebraMap F E (algebraMap (𝓞 F) F c)
+        = 0 := by
     have h := congrArg (algebraMap (𝓞 E) E) hrel
     rw [map_add (f := _), map_add (f := _), map_mul, map_pow, map_zero,
-      ← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 E) E,
-      ← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 E) E,
-      IsScalarTower.algebraMap_apply (𝓞 F) F E,
-      IsScalarTower.algebraMap_apply (𝓞 F) F E] at h
+        ← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 E) E,
+        ← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 E) E, IsScalarTower.algebraMap_apply (𝓞 F) F E,
+        IsScalarTower.algebraMap_apply (𝓞 F) F E]
+      at h
     exact h
-  have hα : α ^ 2 + algebraMap (v.adicCompletion F) _ B * α
-      + algebraMap (v.adicCompletion F) _ C = 0 := by
-    have h := congrArg (Algebra.TensorProduct.includeRight (R := F) (A := v.adicCompletion F)
-      (B := E)) hrelE
-    rw [map_add (f := _), map_add (f := _), map_mul, map_pow, map_zero, AlgHom.commutes, AlgHom.commutes,
-      Algebra.TensorProduct.includeRight_apply] at h
+  have hα
+      : α ^ 2 + algebraMap (v.adicCompletion F) _ B * α + algebraMap (v.adicCompletion F) _ C
+        = 0 := by
+    have h :=
+      congrArg (Algebra.TensorProduct.includeRight (R := F) (A := v.adicCompletion F) (B := E))
+        hrelE
+    rw [map_add (f := _), map_add (f := _), map_mul, map_pow, map_zero, AlgHom.commutes,
+        AlgHom.commutes, Algebra.TensorProduct.includeRight_apply]
+      at h
     rw [hB, hC, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
     exact h
-  have hdecomp : ∀ z : v.adicCompletion F ⊗[F] E, z = algebraMap (v.adicCompletion F) _ (TB.repr z 0)
-      + algebraMap (v.adicCompletion F) _ (TB.repr z 1) * α := by
+  have hdecomp
+      : ∀ z : v.adicCompletion F ⊗[F] E,
+        z = algebraMap (v.adicCompletion F) _ (TB.repr z 0)
+          + algebraMap (v.adicCompletion F) _ (TB.repr z 1) * α := by
     intro z
     conv_lhs => rw [← TB.sum_repr z]
-    rw [Fin.sum_univ_two, hTB, Algebra.TensorProduct.basis_apply,
-      Algebra.TensorProduct.basis_apply, hBs, coe_basisOfLinearIndependentOfCardEqFinrank]
+    rw [Fin.sum_univ_two, hTB, Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.basis_apply,
+      hBs, coe_basisOfLinearIndependentOfCardEqFinrank]
     simp [Algebra.smul_def, hαdef, ← Algebra.TensorProduct.one_def]
   refine ⟨⟨0, 1, ?_⟩, fun x y => mul_comm x y, ?_⟩
   · intro h01
     have h1 : TB 0 = 1 := by
-      rw [hTB, Algebra.TensorProduct.basis_apply, hBs,
-        coe_basisOfLinearIndependentOfCardEqFinrank]
+      rw [hTB, Algebra.TensorProduct.basis_apply, hBs, coe_basisOfLinearIndependentOfCardEqFinrank]
       simp [Algebra.TensorProduct.one_def]
     exact TB.ne_zero 0 (h1.trans h01.symm)
   · intro z hz
@@ -305,21 +313,26 @@ theorem _root_.GlobalTheory.InertField.isField_of_inert : ∀ (F E : Type) [Fiel
         have hx0 : x = 0 := by simpa using hN0
         rw [hz', hx0, hy0]
         simp
-      · obtain ⟨r, hr⟩ := exists_quadratic_root_mod_of_adic_root v b c (-x / y) (by
-          rw [← hB, ← hC]
-          field_simp
-          linear_combination hN0)
+      · obtain ⟨r, hr⟩ :=
+          exists_quadratic_root_mod_of_adic_root v b c (-x / y) (by
+            rw [← hB, ← hC]
+            field_simp
+            linear_combination hN0)
         exact hnoroot r hr
-    refine ⟨(algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) x
-      - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) B
-        * algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y
-      - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y * α)
-      * algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) N⁻¹, ?_⟩
-    have hzN : z * (algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) x
-        - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) B
-          * algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y
-        - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y * α)
-        = algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) N := by
+    refine ⟨
+      (algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) x
+          - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) B
+            * algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y
+          - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y * α)
+        * algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) N⁻¹,
+      ?_
+    ⟩
+    have hzN
+        : z * (algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) x
+            - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) B
+              * algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y
+            - algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) y * α)
+          = algebraMap (v.adicCompletion F) (v.adicCompletion F ⊗[F] E) N := by
       rw [hz', hN]
       simp only [map_add (f := _), map_sub, map_mul, map_pow]
       linear_combination

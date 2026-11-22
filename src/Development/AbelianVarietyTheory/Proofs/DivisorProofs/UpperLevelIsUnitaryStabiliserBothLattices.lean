@@ -7,17 +7,27 @@ public import Development.AbelianVarietyTheory.Definitions.UpperBounds.FreeBallI
 
 @[expose] public section
 
-open NumberField Module ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
+open NumberField Module ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
 
 namespace GlobalTheory.UpperStab
 
-theorem upper_isUStab (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (U C : Type) [Group U] [MulAction U C]
-    (M : TwoLevels E r U C) (c : C) :
-    ∀ β ∈ M.upper c, IsUStab (M.comp c).Gm (M.comp c).L' β ∧ IsUStab (M.comp c).Gm (M.comp c).Λ β := by
+theorem upper_isUStab
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r : ℕ)
+    (U C : Type) [Group U] [MulAction U C]
+    (M : TwoLevels E r U C) (c : C)
+    : ∀ β ∈ M.upper c,
+      IsUStab (M.comp c).Gm (M.comp c).L' β ∧ IsUStab (M.comp c).Gm (M.comp c).Λ β := by
   rintro β ⟨u, hu, γ, hγ, rfl⟩
   have hs := (M.comp c).Γ_stab γ hγ
-  have hh : ∀ x y, herm (M.comp c).Gm (Matrix.mulVec ((γ * M.tr u c : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) x)
-      (Matrix.mulVec ((γ * M.tr u c : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) y) = herm (M.comp c).Gm x y := by
+  have hh
+      : ∀ x y,
+        herm (M.comp c).Gm
+            (Matrix.mulVec ((γ * M.tr u c : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) x)
+            (Matrix.mulVec ((γ * M.tr u c : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) y)
+          = herm (M.comp c).Gm x y := by
     intro x y
     rw [Units.val_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hs.1, M.comp_Gm c, M.tr_herm]
   refine ⟨⟨hh, fun v => ?_⟩, ⟨hh, fun v => ?_⟩⟩

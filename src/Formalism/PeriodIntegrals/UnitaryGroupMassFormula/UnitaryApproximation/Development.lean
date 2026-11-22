@@ -16,9 +16,10 @@ def TopStep : Prop := CayleyFin → EigAvoid → PI.UnitaryApproxFin.UnitaryAppr
 def CayleyStep : Prop := ApproxE → BddR → UnitS → CayleyFin
 def ApproxEStep : Prop := WeakApproxF → ApproxE
 
-theorem unitaryApproxFin_of (h1 : TopStep) (h2 : CayleyStep) (h3 : ApproxEStep)
-    (hW : WeakApproxF) (hB : BddR) (hU : UnitS) (hE : EigAvoid) :
-    PI.UnitaryApproxFin.UnitaryApproxFin :=
+theorem unitaryApproxFin_of
+    (h1 : TopStep) (h2 : CayleyStep) (h3 : ApproxEStep) (hW : WeakApproxF) (hB : BddR) (hU : UnitS)
+    (hE : EigAvoid)
+    : PI.UnitaryApproxFin.UnitaryApproxFin :=
   h1 (h2 (h3 hW) hB hU) hE
 
 end PI.UnitaryApproxFinWork

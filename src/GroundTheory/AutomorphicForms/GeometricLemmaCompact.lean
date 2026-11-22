@@ -17,8 +17,8 @@ namespace Parabolic
 
 open Matrix Iwasawa GLnLocal ValuativeRel Topology Set DoubleCoset
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
 section Bounds
 
@@ -26,8 +26,9 @@ variable (F) in
 abbrev EntryBound (e : ℕ) (A : Matrix (Fin n) (Fin n) F) : Prop :=
   ∀ i j, (uniformizer F : F) ^ e * A i j ∈ 𝒪[F]
 
-theorem EntryBound.mul {a b : ℕ} {A B : Matrix (Fin n) (Fin n) F} (hA : EntryBound F a A)
-    (hB : EntryBound F b B) : EntryBound F (a + b) (A * B) := by
+theorem EntryBound.mul
+    {a b : ℕ} {A B : Matrix (Fin n) (Fin n) F} (hA : EntryBound F a A) (hB : EntryBound F b B)
+    : EntryBound F (a + b) (A * B) := by
   intro i j
   rw [Matrix.mul_apply, Finset.mul_sum]
   refine sum_mem fun k _ => ?_
@@ -35,16 +36,19 @@ theorem EntryBound.mul {a b : ℕ} {A B : Matrix (Fin n) (Fin n) F} (hA : EntryB
   convert this using 1
   ring
 
-theorem entryBound_of_isCompact {S : Set (GL (Fin n) F)} (hS : IsCompact S) :
-    ∃ e : ℕ, ∀ g ∈ S, EntryBound F e (g : Matrix (Fin n) (Fin n) F) ∧
-      EntryBound F e ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
+theorem entryBound_of_isCompact {S : Set (GL (Fin n) F)} (hS : IsCompact S)
+    : ∃ e : ℕ, ∀ g ∈ S,
+      EntryBound F e (g : Matrix (Fin n) (Fin n) F)
+        ∧ EntryBound F e ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
   obtain ⟨e, he⟩ := exists_pow_mul_mem_of_isCompact F n (hS.union (hS.image continuous_inv))
-  exact ⟨e, fun g hg => ⟨fun i j => he g (Or.inl hg) i j,
-    fun i j => he g⁻¹ (Or.inr ⟨g, hg, rfl⟩) i j⟩⟩
+  exact
+    ⟨e, fun g hg => ⟨fun i j => he g (Or.inl hg) i j, fun i j => he g⁻¹ (Or.inr ⟨g, hg, rfl⟩) i j⟩⟩
 
-theorem EntryBound.leviProj {γ : Fin n → ℕ} {e : ℕ} {p : blockUpper F n γ}
-    (hp : EntryBound F e ((p : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)) :
-    EntryBound F e (((leviProj F n γ p : levi F n γ) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
+theorem EntryBound.leviProj
+    {γ : Fin n → ℕ} {e : ℕ} {p : blockUpper F n γ}
+    (hp : EntryBound F e ((p : GL (Fin n) F) : Matrix (Fin n) (Fin n) F))
+    : EntryBound F e
+      (((leviProj F n γ p : levi F n γ) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
   intro i j
   rw [leviProj_apply]
   split_ifs
@@ -61,83 +65,95 @@ def unipotentCompactG (γ : Fin n → ℕ) (e : ℕ) : Subgroup (GL (Fin n) F) :
 
 variable {γ : Fin n → ℕ}
 
-theorem unipotentCompactG_le (e : ℕ) :
-    unipotentCompactG (F := F) γ e ≤ unipotentRadical F n γ := by
+theorem unipotentCompactG_le (e : ℕ) : unipotentCompactG (F := F) γ e ≤ unipotentRadical F n γ := by
   rintro _ ⟨u, -, rfl⟩
   exact u.2
 
-theorem mem_unipotentCompactG {e : ℕ} {u : GL (Fin n) F} :
-    u ∈ unipotentCompactG γ e ↔ u ∈ unipotentRadical F n γ ∧
-      rankTorus F n γ e * u * (rankTorus F n γ e)⁻¹ ∈ integralGL F n := by
-  have hmem (v : unipotentRadical F n γ) :
-      v ∈ unipotentCompact (F := F) (n := n) (β := γ) e ↔
-        rankTorus F n γ e * v * (rankTorus F n γ e)⁻¹ ∈ integralGL F n := Iff.rfl
+theorem mem_unipotentCompactG {e : ℕ} {u : GL (Fin n) F}
+    : u ∈ unipotentCompactG γ e
+      ↔ u ∈ unipotentRadical F n γ
+        ∧ rankTorus F n γ e * u * (rankTorus F n γ e)⁻¹ ∈ integralGL F n := by
+  have hmem (v : unipotentRadical F n γ)
+      : v ∈ unipotentCompact (F := F) (n := n) (β := γ) e
+        ↔ rankTorus F n γ e * v * (rankTorus F n γ e)⁻¹ ∈ integralGL F n :=
+    Iff.rfl
   constructor
   · rintro ⟨v, hv, rfl⟩
     exact ⟨v.2, (hmem v).1 hv⟩
   · rintro ⟨hu, h⟩
     exact ⟨⟨u, hu⟩, (hmem ⟨u, hu⟩).2 h, rfl⟩
 
-theorem unipotentCompactG_eq (e : ℕ) :
-    unipotentCompactG (F := F) γ e = unipotentRadical F n γ ⊓
-      (integralGL F n).comap (MulAut.conj (rankTorus F n γ e)).toMonoidHom := by
+theorem unipotentCompactG_eq (e : ℕ)
+    : unipotentCompactG (F := F) γ e
+      = unipotentRadical F n γ
+        ⊓ (integralGL F n).comap (MulAut.conj (rankTorus F n γ e)).toMonoidHom := by
   ext u
   rw [mem_unipotentCompactG, Subgroup.mem_inf, Subgroup.mem_comap]
   rfl
 
-theorem isCompact_unipotentCompactG (e : ℕ) :
-    IsCompact (unipotentCompactG (F := F) γ e : Set (GL (Fin n) F)) := by
+theorem isCompact_unipotentCompactG (e : ℕ)
+    : IsCompact (unipotentCompactG (F := F) γ e : Set (GL (Fin n) F)) := by
   rw [unipotentCompactG_eq, Subgroup.coe_inf]
-  change IsCompact ((unipotentRadical F n γ : Set (GL (Fin n) F)) ∩
-    (conjHomeomorph (rankTorus F n γ e)) ⁻¹' (integralGL F n : Set (GL (Fin n) F)))
+  change IsCompact
+    ((unipotentRadical F n γ : Set (GL (Fin n) F))
+      ∩ (conjHomeomorph (rankTorus F n γ e)) ⁻¹' (integralGL F n : Set (GL (Fin n) F)))
   exact ((conjHomeomorph _).isCompact_preimage.2 (isCompact_integralGL F n)).inter_left
     isClosed_unipotentRadical
 
-theorem isOpen_conj_integralGL (t : GL (Fin n) F) :
-    IsOpen (((integralGL F n).comap (MulAut.conj t).toMonoidHom : Subgroup (GL (Fin n) F)) :
-      Set (GL (Fin n) F)) :=
+theorem isOpen_conj_integralGL (t : GL (Fin n) F)
+    : IsOpen
+      (((integralGL F n).comap (MulAut.conj t).toMonoidHom : Subgroup (GL (Fin n) F))
+        : Set (GL (Fin n) F)) :=
   (isOpen_integralGL F n).preimage (conjHomeomorph t).continuous
 
-theorem mem_unipotentCompactG_of_bound {e : ℕ} {u : GL (Fin n) F}
-    (hu : u ∈ unipotentRadical F n γ)
-    (hb : EntryBound F e (u : Matrix (Fin n) (Fin n) F))
-    (hb' : EntryBound F e ((u⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)) :
-    u ∈ unipotentCompactG γ e := by
+theorem mem_unipotentCompactG_of_bound
+    {e : ℕ} {u : GL (Fin n) F}
+    (hu : u ∈ unipotentRadical F n γ) (hb : EntryBound F e (u : Matrix (Fin n) (Fin n) F))
+    (hb' : EntryBound F e ((u⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F))
+    : u ∈ unipotentCompactG γ e := by
   rw [mem_unipotentCompactG, mem_integralGL_iff]
   refine ⟨hu, rankTorus_conj_apply_mem hu hb, fun i j => ?_⟩
-  have hinv : (rankTorus F n γ e * u * (rankTorus F n γ e)⁻¹)⁻¹ =
-      rankTorus F n γ e * u⁻¹ * (rankTorus F n γ e)⁻¹ := by group
+  have hinv
+      : (rankTorus F n γ e * u * (rankTorus F n γ e)⁻¹)⁻¹
+        = rankTorus F n γ e * u⁻¹ * (rankTorus F n γ e)⁻¹ := by
+    group
   rw [hinv]
   exact rankTorus_conj_apply_mem ((unipotentRadical F n γ).inv_mem hu) hb' i j
 
-theorem unipotentCompactG_mono {e e' : ℕ} (h : e ≤ e') :
-    unipotentCompactG (F := F) γ e ≤ unipotentCompactG γ e' := by
+theorem unipotentCompactG_mono {e e' : ℕ} (h : e ≤ e')
+    : unipotentCompactG (F := F) γ e ≤ unipotentCompactG γ e' := by
   intro u hu
   obtain ⟨huN, hu'⟩ := mem_unipotentCompactG.1 hu
   refine mem_unipotentCompactG.2 ⟨huN, ?_⟩
-  have key : ∀ v ∈ unipotentRadical F n γ,
-      (rankTorus F n γ e * v * (rankTorus F n γ e)⁻¹ : GL (Fin n) F) ∈ integralGL F n →
-        ∀ i j, ((rankTorus F n γ e' * v * (rankTorus F n γ e')⁻¹ : GL (Fin n) F) :
-          Matrix (Fin n) (Fin n) F) i j ∈ 𝒪[F] := by
+  have key
+      : ∀ v ∈ unipotentRadical F n γ,
+        (rankTorus F n γ e * v * (rankTorus F n γ e)⁻¹ : GL (Fin n) F) ∈ integralGL F n
+          → ∀ i j,
+            ((rankTorus F n γ e' * v * (rankTorus F n γ e')⁻¹ : GL (Fin n) F)
+                  : Matrix (Fin n) (Fin n) F)
+                i j
+              ∈ 𝒪[F] := by
     intro v hv hint i j
     have hij := ((mem_integralGL_iff F n).1 hint).1 i j
     rw [rankTorus_conj_apply] at hij ⊢
     obtain ⟨hvP, hv1⟩ := mem_unipotentRadical.1 hv
     rcases lt_trichotomy (γ i) (γ j) with hlt | heq | hgt
     · have hr := blockRank_lt hlt
-      have : (((e' * blockRank γ j : ℕ) : ℤ) - ((e' * blockRank γ i : ℕ) : ℤ)) =
-          (((e * blockRank γ j : ℕ) : ℤ) - ((e * blockRank γ i : ℕ) : ℤ)) +
-            (((e' - e) * (blockRank γ j - blockRank γ i) : ℕ) : ℤ) := by
+      have : (((e' * blockRank γ j : ℕ) : ℤ) - ((e' * blockRank γ i : ℕ) : ℤ))
+          = (((e * blockRank γ j : ℕ) : ℤ) - ((e * blockRank γ i : ℕ) : ℤ))
+            + (((e' - e) * (blockRank γ j - blockRank γ i) : ℕ) : ℤ) := by
         push_cast [Nat.cast_sub h, Nat.cast_sub hr.le]
         ring
       rw [this, zpow_add₀ uniformizer_ne_zero, zpow_natCast]
-      have e1 : ((GLnLocal.uniformizer F : F) ^ ((((e * blockRank γ j : ℕ) : ℤ) -
-          ((e * blockRank γ i : ℕ) : ℤ))) *
-            (GLnLocal.uniformizer F : F) ^ ((e' - e) * (blockRank γ j - blockRank γ i))) *
-              (v : Matrix (Fin n) (Fin n) F) i j =
-          ((GLnLocal.uniformizer F : F) ^ ((((e * blockRank γ j : ℕ) : ℤ) -
-            ((e * blockRank γ i : ℕ) : ℤ))) * (v : Matrix (Fin n) (Fin n) F) i j) *
-            (GLnLocal.uniformizer F : F) ^ ((e' - e) * (blockRank γ j - blockRank γ i)) := by
+      have e1
+          : ((GLnLocal.uniformizer F : F)
+                  ^ ((((e * blockRank γ j : ℕ) : ℤ) - ((e * blockRank γ i : ℕ) : ℤ)))
+                * (GLnLocal.uniformizer F : F) ^ ((e' - e) * (blockRank γ j - blockRank γ i)))
+              * (v : Matrix (Fin n) (Fin n) F) i j
+            = ((GLnLocal.uniformizer F : F)
+                  ^ ((((e * blockRank γ j : ℕ) : ℤ) - ((e * blockRank γ i : ℕ) : ℤ)))
+                * (v : Matrix (Fin n) (Fin n) F) i j)
+              * (GLnLocal.uniformizer F : F) ^ ((e' - e) * (blockRank γ j - blockRank γ i)) := by
         ring
       rw [e1]
       exact mul_mem hij (pow_mem (GLnLocal.uniformizer F).2 _)
@@ -148,11 +164,14 @@ theorem unipotentCompactG_mono {e e' : ℕ} (h : e ≤ e') :
   rw [mem_integralGL_iff F n]
   refine ⟨key u huN hu', ?_⟩
   intro i j
-  have : (rankTorus F n γ e' * u * (rankTorus F n γ e')⁻¹)⁻¹ =
-      rankTorus F n γ e' * u⁻¹ * (rankTorus F n γ e')⁻¹ := by group
+  have : (rankTorus F n γ e' * u * (rankTorus F n γ e')⁻¹)⁻¹
+      = rankTorus F n γ e' * u⁻¹ * (rankTorus F n γ e')⁻¹ := by
+    group
   rw [this]
-  have h' : (rankTorus F n γ e * u * (rankTorus F n γ e)⁻¹)⁻¹ =
-      rankTorus F n γ e * u⁻¹ * (rankTorus F n γ e)⁻¹ := by group
+  have h'
+      : (rankTorus F n γ e * u * (rankTorus F n γ e)⁻¹)⁻¹
+        = rankTorus F n γ e * u⁻¹ * (rankTorus F n γ e)⁻¹ := by
+    group
   have hinv := (integralGL F n).inv_mem hu'
   rw [h'] at hinv
   exact key u⁻¹ ((unipotentRadical F n γ).inv_mem huN) hinv i j
@@ -161,18 +180,19 @@ end UnipotentCompact
 
 section Support
 
-variable {β γ : Fin n → ℕ} {W : Type*} [AddCommGroup W] [Module ℂ W]
-  {σ : Representation ℂ (levi F n β) W}
+variable
+  {β γ : Fin n → ℕ} {W : Type*} [AddCommGroup W] [Module ℂ W] {σ : Representation ℂ (levi F n β) W}
 
-theorem isClopen_support_parabolicInd (f : parabolicIndSpace F n β σ) :
-    IsClopen {g : GL (Fin n) F | (f : GL (Fin n) F → W) g ≠ 0} := by
+theorem isClopen_support_parabolicInd (f : parabolicIndSpace F n β σ)
+    : IsClopen {g : GL (Fin n) F | (f : GL (Fin n) F → W) g ≠ 0} := by
   obtain ⟨-, K, hKo, hK⟩ := (mem_parabolicIndSpace σ).1 f.2
   have hnhds : ∀ g : GL (Fin n) F, (fun k => g * k) '' (K : Set (GL (Fin n) F)) ∈ 𝓝 g := by
     intro g
     have := (isOpenMap_mul_left g).image_mem_nhds (hKo.mem_nhds K.one_mem)
     simpa using this
-  have hval : ∀ g, ∀ x ∈ (fun k => g * k) '' (K : Set (GL (Fin n) F)),
-      (f : GL (Fin n) F → W) x = (f : GL (Fin n) F → W) g := by
+  have hval
+      : ∀ g, ∀ x ∈ (fun k => g * k) '' (K : Set (GL (Fin n) F)),
+        (f : GL (Fin n) F → W) x = (f : GL (Fin n) F → W) g := by
     rintro g _ ⟨k, hk, rfl⟩
     exact hK k hk g
   constructor
@@ -190,15 +210,19 @@ theorem isClopen_support_parabolicInd (f : parabolicIndSpace F n β σ) :
 
 variable (w : Equiv.Perm (Fin n))
 
-theorem exists_isCompact_support_doubleCoset {Y : Set (GL (Fin n) F)} (hYo : IsOpen Y)
+theorem exists_isCompact_support_doubleCoset
+    {Y : Set (GL (Fin n) F)} (hYo : IsOpen Y)
     (hCY : closure (doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F))
-      (blockUpper F n γ)) ∩ Y = doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F))
-      (blockUpper F n γ))
-    {f : parabolicIndSpace F n β σ} (hf : f ∈ supportedIn σ Y) :
-    ∃ L : Set (GL (Fin n) F), IsCompact L ∧ L ⊆ blockUpper F n γ ∧
-      ∀ q ∈ blockUpper F n γ, (f : GL (Fin n) F → W) (permGL F w * q) ≠ 0 →
-        ∃ x ∈ blockUpper F n γ, permGL F w * x * (permGL F w)⁻¹ ∈ blockUpper F n β ∧
-          ∃ l ∈ L, q = x * l := by
+          (blockUpper F n γ))
+        ∩ Y
+      = doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
+    {f : parabolicIndSpace F n β σ} (hf : f ∈ supportedIn σ Y)
+    : ∃ L : Set (GL (Fin n) F),
+      IsCompact L ∧ L ⊆ blockUpper F n γ
+        ∧ ∀ q ∈ blockUpper F n γ,
+          (f : GL (Fin n) F → W) (permGL F w * q) ≠ 0
+            → ∃ x ∈ blockUpper F n γ,
+              permGL F w * x * (permGL F w)⁻¹ ∈ blockUpper F n β ∧ ∃ l ∈ L, q = x * l := by
   set C := doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ)
   set S := {g : GL (Fin n) F | (f : GL (Fin n) F → W) g ≠ 0}
   have hS := isClopen_support_parabolicInd f
@@ -212,8 +236,9 @@ theorem exists_isCompact_support_doubleCoset {Y : Set (GL (Fin n) F)} (hYo : IsO
     rw [← hCY]
     exact ⟨hgC, hSY hgS⟩
   have hCl : IsLocallyClosed C := ⟨Y, closure C, hYo, isClosed_closure, by rw [inter_comm, hCY]⟩
-  obtain ⟨L, hL, hLQ, hKL⟩ := exists_isCompact_subset_doubleCoset
-    (Measures.isClosed_blockUpper F n β) (Measures.isClosed_blockUpper F n γ) hCl hKc hKcC
+  obtain ⟨L, hL, hLQ, hKL⟩ :=
+    exists_isCompact_subset_doubleCoset (Measures.isClosed_blockUpper F n β)
+      (Measures.isClosed_blockUpper F n γ) hCl hKc hKcC
   refine ⟨L, hL, hLQ, fun q hq hfq => ?_⟩
   obtain ⟨p, hp, k, hk, hpk⟩ := exists_blockUpper_mul_integralGL' (β := β) (permGL F w * q)
   have hfk : (f : GL (Fin n) F → W) k ≠ 0 := by
@@ -224,25 +249,36 @@ theorem exists_isCompact_support_doubleCoset {Y : Set (GL (Fin n) F)} (hYo : IsO
     refine mem_doubleCoset.2 ⟨p⁻¹, (blockUpper F n β).inv_mem hp, q, hq, ?_⟩
     rw [mul_assoc, hpk, inv_mul_cancel_left]
   obtain ⟨p', hp', l, hl, hkl⟩ := hKL k ⟨hk, hfk, subset_closure hkC⟩
-  refine ⟨q * l⁻¹, (blockUpper F n γ).mul_mem hq ((blockUpper F n γ).inv_mem (hLQ hl)), ?_, l, hl,
-    by group⟩
+  refine ⟨
+    q * l⁻¹,
+    (blockUpper F n γ).mul_mem hq ((blockUpper F n γ).inv_mem (hLQ hl)),
+    ?_,
+    l,
+    hl,
+    by group
+  ⟩
   have : permGL F w * (q * l⁻¹) * (permGL F w)⁻¹ = p * p' := by
     have h1 : permGL F w * q = p * (p' * permGL F w * l) := by rw [hpk, hkl]
-    calc permGL F w * (q * l⁻¹) * (permGL F w)⁻¹
+    calc
+      permGL F w * (q * l⁻¹) * (permGL F w)⁻¹
         = (permGL F w * q) * l⁻¹ * (permGL F w)⁻¹ := by group
       _ = p * p' := by rw [h1]; group
   rw [this]
   exact (blockUpper F n β).mul_mem hp hp'
 
-theorem exists_unipotentCompactG_support {Y : Set (GL (Fin n) F)} (hYo : IsOpen Y)
+theorem exists_unipotentCompactG_support
+    {Y : Set (GL (Fin n) F)} (hYo : IsOpen Y)
     (hCY : closure (doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F))
-      (blockUpper F n γ)) ∩ Y = doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F))
-      (blockUpper F n γ))
-    {f : parabolicIndSpace F n β σ} (hf : f ∈ supportedIn σ Y) {m : GL (Fin n) F}
-    (hm : m ∈ levi F n γ) :
-    ∃ e : ℕ, ∀ u ∈ unipotentRadical F n γ, (f : GL (Fin n) F → W) (permGL F w * u * m) ≠ 0 →
-      ∃ a ∈ unipotentRadical F n γ, permGL F w * a * (permGL F w)⁻¹ ∈ blockUpper F n β ∧
-        ∃ v ∈ unipotentCompactG γ e, u = a * v := by
+          (blockUpper F n γ))
+        ∩ Y
+      = doubleCoset (permGL F w) (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
+    {f : parabolicIndSpace F n β σ} (hf : f ∈ supportedIn σ Y)
+    {m : GL (Fin n) F} (hm : m ∈ levi F n γ)
+    : ∃ e : ℕ, ∀ u ∈ unipotentRadical F n γ,
+      (f : GL (Fin n) F → W) (permGL F w * u * m) ≠ 0
+        → ∃ a ∈ unipotentRadical F n γ,
+          permGL F w * a * (permGL F w)⁻¹ ∈ blockUpper F n β
+            ∧ ∃ v ∈ unipotentCompactG γ e, u = a * v := by
   obtain ⟨L, hL, hLQ, hsupp⟩ := exists_isCompact_support_doubleCoset w hYo hCY hf
   obtain ⟨e₀, he₀⟩ := entryBound_of_isCompact hL
   obtain ⟨e₁, he₁⟩ := entryBound_of_isCompact (isCompact_singleton (x := m))
@@ -250,8 +286,8 @@ theorem exists_unipotentCompactG_support {Y : Set (GL (Fin n) F)} (hYo : IsOpen 
   refine ⟨e₁ + e₀ + e₀ + e₁, fun u hu hfu => ?_⟩
   have hmQ : m ∈ blockUpper F n γ := levi_le_blockUpper hm
   have huQ : u ∈ blockUpper F n γ := unipotentRadical_le_blockUpper hu
-  obtain ⟨x, hxQ, hxP, l, hl, hum⟩ := hsupp (u * m) ((blockUpper F n γ).mul_mem huQ hmQ)
-    (by rwa [← mul_assoc])
+  obtain ⟨x, hxQ, hxP, l, hl, hum⟩ :=
+    hsupp (u * m) ((blockUpper F n γ).mul_mem huQ hmQ) (by rwa [← mul_assoc])
   have hlQ := hLQ hl
 
   set b : levi F n γ := leviProj F n γ ⟨x, hxQ⟩
@@ -262,8 +298,9 @@ theorem exists_unipotentCompactG_support {Y : Set (GL (Fin n) F)} (hYo : IsOpen 
       congr 1
       exact Subtype.ext hum
     have h2 : leviProj F n γ ⟨u * m, (blockUpper F n γ).mul_mem huQ hmQ⟩ = ⟨m, hm⟩ := by
-      have : (⟨u * m, (blockUpper F n γ).mul_mem huQ hmQ⟩ : blockUpper F n γ) =
-          ⟨u, huQ⟩ * ⟨m, hmQ⟩ := rfl
+      have : (⟨u * m, (blockUpper F n γ).mul_mem huQ hmQ⟩ : blockUpper F n γ)
+          = ⟨u, huQ⟩ * ⟨m, hmQ⟩ :=
+        rfl
       rw [this, map_mul, (mem_unipotentRadical_iff_leviProj (p := ⟨u, huQ⟩)).1 hu, one_mul]
       exact leviProj_of_mem_levi hm
     rw [h2] at h1
@@ -276,9 +313,10 @@ theorem exists_unipotentCompactG_support {Y : Set (GL (Fin n) F)} (hYo : IsOpen 
   have haQ : x * (b : GL (Fin n) F)⁻¹ ∈ blockUpper F n γ :=
     (blockUpper F n γ).mul_mem hxQ ((blockUpper F n γ).inv_mem hbQ)
   have haN : x * (b : GL (Fin n) F)⁻¹ ∈ unipotentRadical F n γ := by
-    rw [show x * (b : GL (Fin n) F)⁻¹ = ((⟨x, hxQ⟩ * (leviIncl b)⁻¹ : blockUpper F n γ) :
-      GL (Fin n) F) from rfl, mem_unipotentRadical_iff_leviProj, map_mul, map_inv,
-      leviProj_leviIncl, mul_inv_cancel]
+    rw [show x * (b : GL (Fin n) F)⁻¹
+          = ((⟨x, hxQ⟩ * (leviIncl b)⁻¹ : blockUpper F n γ) : GL (Fin n) F) from
+        rfl,
+      mem_unipotentRadical_iff_leviProj, map_mul, map_inv, leviProj_leviIncl, mul_inv_cancel]
   have hxβ : x ∈ blockUpper F n (β ∘ w) := (conj_permGL_mem_blockUpper_iff w).1 hxP
   have hbβ : (b : GL (Fin n) F) ∈ blockUpper F n (β ∘ w) := by
     intro i j hij
@@ -287,9 +325,15 @@ theorem exists_unipotentCompactG_support {Y : Set (GL (Fin n) F)} (hYo : IsOpen 
     split_ifs
     · exact hxβ hij
     · rfl
-  refine ⟨x * (b : GL (Fin n) F)⁻¹, haN, (conj_permGL_mem_blockUpper_iff w).2
-    ((blockUpper F n (β ∘ w)).mul_mem hxβ ((blockUpper F n (β ∘ w)).inv_mem hbβ)),
-    (b : GL (Fin n) F) * l * m⁻¹, ?_, ?_⟩
+  refine ⟨
+    x * (b : GL (Fin n) F)⁻¹,
+    haN,
+    (conj_permGL_mem_blockUpper_iff w).2
+      ((blockUpper F n (β ∘ w)).mul_mem hxβ ((blockUpper F n (β ∘ w)).inv_mem hbβ)),
+    (b : GL (Fin n) F) * l * m⁻¹,
+    ?_,
+    ?_
+  ⟩
   · have hv : (b : GL (Fin n) F) * l * m⁻¹ = m * (c : GL (Fin n) F)⁻¹ * l * m⁻¹ := by rw [hbc]
     have hvN : (b : GL (Fin n) F) * l * m⁻¹ ∈ unipotentRadical F n γ := by
       have : (b : GL (Fin n) F) * l * m⁻¹ = (x * (b : GL (Fin n) F)⁻¹)⁻¹ * u := by
@@ -298,12 +342,15 @@ theorem exists_unipotentCompactG_support {Y : Set (GL (Fin n) F)} (hYo : IsOpen 
       rw [this]
       exact (unipotentRadical F n γ).mul_mem ((unipotentRadical F n γ).inv_mem haN) hu
     obtain ⟨hlb, hlb'⟩ := he₀ l hl
-    have hcinv : ((c : GL (Fin n) F)⁻¹ : GL (Fin n) F) =
-        ((leviProj F n γ ⟨l⁻¹, (blockUpper F n γ).inv_mem hlQ⟩ : levi F n γ) : GL (Fin n) F) := by
+    have hcinv
+        : ((c : GL (Fin n) F)⁻¹ : GL (Fin n) F)
+          = ((leviProj F n γ ⟨l⁻¹, (blockUpper F n γ).inv_mem hlQ⟩ : levi F n γ)
+            : GL (Fin n) F) := by
       rw [show (⟨l⁻¹, (blockUpper F n γ).inv_mem hlQ⟩ : blockUpper F n γ) = (⟨l, hlQ⟩)⁻¹ from rfl,
         map_inv]
       rfl
-    have hcb' : EntryBound F e₀ (((c : GL (Fin n) F)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
+    have hcb'
+        : EntryBound F e₀ (((c : GL (Fin n) F)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
       rw [hcinv]
       exact EntryBound.leviProj (p := ⟨l⁻¹, (blockUpper F n γ).inv_mem hlQ⟩) hlb'
     have hcb : EntryBound F e₀ ((c : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) :=

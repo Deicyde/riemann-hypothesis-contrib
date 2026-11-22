@@ -24,8 +24,8 @@ open scoped nonZeroDivisors ComplexOrder
 
 noncomputable section
 
-theorem gramAt_single {K : Type*} [Field K] {k : ℕ} (h : Matrix (Fin k) (Fin k) ℂ) (σ : K →+* ℂ) :
-    gramAt h σ (fun j : Fin k => (Pi.single j 1 : Fin k → K)) = h := by
+theorem gramAt_single {K : Type*} [Field K] {k : ℕ} (h : Matrix (Fin k) (Fin k) ℂ) (σ : K →+* ℂ)
+    : gramAt h σ (fun j : Fin k => (Pi.single j 1 : Fin k → K)) = h := by
   have he : ∀ j : Fin k, embVec σ (Pi.single j 1 : Fin k → K) = Pi.single j 1 := fun j => by
     funext i
     by_cases hij : i = j

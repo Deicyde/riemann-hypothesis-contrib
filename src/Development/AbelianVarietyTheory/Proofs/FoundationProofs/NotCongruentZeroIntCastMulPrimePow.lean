@@ -6,13 +6,14 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SelNZero
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.IntNorm
 
-theorem norm_intCast_qbar (l : ℕ) [Fact l.Prime] (d : ℤ) :
-    ‖(d : Qbar l)‖ = ‖(d : ℚ_[l])‖ := by
+theorem norm_intCast_qbar (l : ℕ) [Fact l.Prime] (d : ℤ) : ‖(d : Qbar l)‖ = ‖(d : ℚ_[l])‖ := by
   have h : (d : Qbar l) = ((d : ℚ_[l]) : PadicAlgCl l) := by simp
   rw [h, PadicAlgCl.norm_extends]
 
@@ -20,8 +21,9 @@ theorem norm_l_qbar (l : ℕ) [Fact l.Prime] : ‖((l : ℕ) : Qbar l)‖ = (l :
   have h : ((l : ℕ) : Qbar l) = (((l : ℕ) : ℚ_[l]) : PadicAlgCl l) := by simp
   rw [h, PadicAlgCl.norm_extends, Padic.norm_p]
 
-theorem not_cg_int_mul_pow (l : ℕ) [Fact l.Prime] (t k : ℕ) (d : ℤ) (hd : d ≠ 0)
-    (hlt : |d| < (l : ℤ) ^ t) : ¬ Cg (t + k) ((d : Qbar l) * ((l : ℕ) : Qbar l) ^ k) 0 := by
+theorem not_cg_int_mul_pow
+    (l : ℕ) [Fact l.Prime] (t k : ℕ) (d : ℤ) (hd : d ≠ 0) (hlt : |d| < (l : ℤ) ^ t)
+    : ¬ Cg (t + k) ((d : Qbar l) * ((l : ℕ) : Qbar l) ^ k) 0 := by
   intro h
   unfold Cg at h
   rw [sub_zero, norm_mul, norm_pow, norm_pow, pow_add] at h

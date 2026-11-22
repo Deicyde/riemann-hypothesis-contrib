@@ -24,8 +24,12 @@ lemma lowM_mul (s s' : ℝ) : lowM n s * lowM n s' = lowM n (s + s') := by
 lemma lowM_zero : lowM n 0 = 1 := by
   unfold lowM; simp [fromBlocks_one]
 
-def lowU (n : ℕ) (s : ℝ) : GL (Fin n ⊕ Fin n) ℂ :=
-  ⟨lowM n s, lowM n (-s), by rw [lowM_mul, add_neg_cancel, lowM_zero], by rw [lowM_mul, neg_add_cancel, lowM_zero]⟩
+def lowU (n : ℕ) (s : ℝ) : GL (Fin n ⊕ Fin n) ℂ := ⟨
+  lowM n s,
+  lowM n (-s),
+  by rw [lowM_mul, add_neg_cancel, lowM_zero],
+  by rw [lowM_mul, neg_add_cancel, lowM_zero]
+⟩
 
 def lowG (n : ℕ) (s : ℝ) : GR n := ⟨lowU n s, InG_lower s⟩
 

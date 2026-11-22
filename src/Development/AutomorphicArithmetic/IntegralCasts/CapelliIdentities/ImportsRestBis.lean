@@ -46,15 +46,15 @@ private lemma key {E : Type} [AddCommGroup E] [Module ℂ E] [FiniteDimensional 
 
 end CommutingFamilyCommonEigenvector
 
-theorem UpperTheory.Reformulated.B.Ygb8.main :
-    ∀ (d : ℕ) (E : Type) [inst : AddCommGroup E] [inst_1 : _root_.Module ℂ E] [FiniteDimensional ℂ E] {I : Type}
-      (T : I → Module.End ℂ E),
-      (∀ (a b : I), Commute (T a) (T b)) →
-        Module.finrank ℂ E = d → (0 : ℕ) < d → ∃ (w : E), w ≠ (0 : E) ∧ ∃ (c : I → ℂ), ∀ (i : I), (T i : E → E) w = c i • w := by
+theorem UpperTheory.Reformulated.B.Ygb8.main
+    : ∀ (d : ℕ) (E : Type) [inst : AddCommGroup E] [inst_1 : _root_.Module ℂ E]
+        [FiniteDimensional ℂ E] {I : Type} (T : I → Module.End ℂ E),
+      (∀ (a b : I), Commute (T a) (T b)) → Module.finrank ℂ E = d → (0 : ℕ) < d
+        → ∃ (w : E), w ≠ (0 : E) ∧ ∃ (c : I → ℂ), ∀ (i : I), (T i : E → E) w = c i • w := by
   intro d E _ _ _ I T hc hd hpos
   classical
-  let P : ℕ → Prop := fun n => ∃ W : Submodule ℂ E, W ≠ ⊥ ∧ (∀ i, ∀ x ∈ W, T i x ∈ W) ∧
-    Module.finrank ℂ W = n
+  let P : ℕ → Prop := fun n =>
+    ∃ W : Submodule ℂ E, W ≠ ⊥ ∧ (∀ i, ∀ x ∈ W, T i x ∈ W) ∧ Module.finrank ℂ W = n
   have hex : ∃ n, P n := by
     refine ⟨Module.finrank ℂ (⊤ : Submodule ℂ E), ⊤, ?_, fun i x _ => Submodule.mem_top, rfl⟩
     intro h
@@ -62,12 +62,18 @@ theorem UpperTheory.Reformulated.B.Ygb8.main :
     rw [finrank_top] at this
     omega
   obtain ⟨W, hW, hinv, hWr⟩ := Nat.find_spec hex
-  have hmin : ∀ W' : Submodule ℂ E, W' ≠ ⊥ → (∀ i, ∀ x ∈ W', T i x ∈ W') →
-      Module.finrank ℂ W ≤ Module.finrank ℂ W' := by
+  have hmin
+      : ∀ W' : Submodule ℂ E,
+        W' ≠ ⊥ → (∀ i, ∀ x ∈ W', T i x ∈ W') → Module.finrank ℂ W ≤ Module.finrank ℂ W' := by
     intro W' h1 h2
     rw [hWr]
     exact Nat.find_min' hex ⟨W', h1, h2, rfl⟩
   obtain ⟨w, hwW, hw0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hW
-  refine ⟨w, hw0, fun i => Classical.choose (CommutingFamilyCommonEigenvector.key T hc W hW hinv hmin i w hwW), ?_⟩
+  refine ⟨
+    w,
+    hw0,
+    fun i => Classical.choose (CommutingFamilyCommonEigenvector.key T hc W hW hinv hmin i w hwW),
+    ?_
+  ⟩
   intro i
   exact Classical.choose_spec (CommutingFamilyCommonEigenvector.key T hc W hW hinv hmin i w hwW)

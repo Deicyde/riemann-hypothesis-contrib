@@ -18,8 +18,8 @@ open scoped TensorProduct RestrictedProduct
 
 variable {ι : Type*} {V : ι → Type*} [∀ v, AddCommGroup (V v)] [∀ v, Module ℂ (V v)]
 
-theorem tprod_ne_zero {ξ x : ∀ v, V v} (hx : IsRestricted ξ x) (h0 : ∀ v, x v ≠ 0) :
-    tprod ℂ x ≠ 0 := by
+theorem tprod_ne_zero {ξ x : ∀ v, V v} (hx : IsRestricted ξ x) (h0 : ∀ v, x v ≠ 0)
+    : tprod ℂ x ≠ 0 := by
   have hex : ∀ v, ∃ f : Dual ℂ (V v), f (x v) = 1 := by
     intro v
     obtain ⟨f, hf⟩ : ∃ f : Dual ℂ (V v), f (x v) ≠ 0 := by
@@ -35,10 +35,12 @@ theorem tprod_ne_zero {ξ x : ∀ v, V v} (hx : IsRestricted ξ x) (h0 : ∀ v, 
   rw [h, map_zero] at this
   simp [hl] at this
 
-
 omit [∀ v, Module ℂ (V v)] in
-theorem nontrivial_of_isIrreducible {H : Type*} [Group H] {W : Type*} [AddCommGroup W]
-    [Module ℂ W] {σ : Representation ℂ H W} (h : σ.IsIrreducible) : Nontrivial W := by
+theorem nontrivial_of_isIrreducible
+    {H : Type*} [Group H]
+    {W : Type*} [AddCommGroup W] [Module ℂ W]
+    {σ : Representation ℂ H W} (h : σ.IsIrreducible)
+    : Nontrivial W := by
   by_contra hW
   rw [not_nontrivial_iff_subsingleton] at hW
   obtain ⟨a, b, hab⟩ := h.toNontrivial.exists_pair_ne
@@ -47,19 +49,22 @@ theorem nontrivial_of_isIrreducible {H : Type*} [Group H] {W : Type*} [AddCommGr
   rw [Subsingleton.elim x 0]
   exact ⟨fun _ => b.toSubmodule.zero_mem, fun _ => a.toSubmodule.zero_mem⟩
 
-variable {G : ι → Type*} [∀ v, Group (G v)] [∀ v, TopologicalSpace (G v)]
-  [∀ v, IsTopologicalGroup (G v)] [∀ v, LocallyCompactSpace (G v)] [∀ v, T2Space (G v)]
-  [∀ v, TotallyDisconnectedSpace (G v)]
-  {K : ∀ v, Subgroup (G v)} [hKo : Fact (∀ v, IsOpen (K v : Set (G v)))]
-  [hKc : ∀ v, CompactSpace (K v)]
+variable
+  {G : ι → Type*} [∀ v, Group (G v)] [∀ v, TopologicalSpace (G v)] [∀ v, IsTopologicalGroup (G v)]
+  [∀ v, LocallyCompactSpace (G v)] [∀ v, T2Space (G v)] [∀ v, TotallyDisconnectedSpace (G v)]
+  {K : ∀ v, Subgroup (G v)}
+  [hKo : Fact (∀ v, IsOpen (K v : Set (G v)))] [hKc : ∀ v, CompactSpace (K v)]
   {π : ∀ v, Representation ℂ (G v) (V v)} {ξ : ∀ v, V v}
 
 omit [∀ v, Module ℂ (V v)] in
-theorem map_update_id_mul {κ : Type*} [DecidableEq κ] {M : κ → Type*} [∀ j, AddCommGroup (M j)]
-    [∀ j, Module ℂ (M j)] (i : κ) (a b : End ℂ (M i)) :
-    PiTensorProduct.map (R := ℂ) (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i (a * b)) =
-      PiTensorProduct.map (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i a) *
-        PiTensorProduct.map (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i b) := by
+theorem map_update_id_mul
+    {κ : Type*} [DecidableEq κ]
+    {M : κ → Type*} [∀ j, AddCommGroup (M j)] [∀ j, Module ℂ (M j)]
+    (i : κ) (a b : End ℂ (M i))
+    : PiTensorProduct.map (R := ℂ)
+        (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i (a * b))
+      = PiTensorProduct.map (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i a)
+        * PiTensorProduct.map (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i b) := by
   rw [← PiTensorProduct.map_mul]
   congr 1
   funext j
@@ -70,12 +75,14 @@ theorem map_update_id_mul {κ : Type*} [DecidableEq κ] {M : κ → Type*} [∀ 
     rfl
 
 omit [∀ v, Module ℂ (V v)] in
-theorem map_update_id_one {κ : Type*} [DecidableEq κ] {M : κ → Type*} [∀ j, AddCommGroup (M j)]
-    [∀ j, Module ℂ (M j)] (i : κ) :
-    PiTensorProduct.map (R := ℂ) (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i 1) =
-      LinearMap.id := by
-  have : Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i 1 =
-      fun j => (LinearMap.id : M j →ₗ[ℂ] M j) := by
+theorem map_update_id_one
+    {κ : Type*} [DecidableEq κ]
+    {M : κ → Type*} [∀ j, AddCommGroup (M j)] [∀ j, Module ℂ (M j)]
+    (i : κ)
+    : PiTensorProduct.map (R := ℂ) (Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i 1)
+      = LinearMap.id := by
+  have : Function.update (fun j => (LinearMap.id : M j →ₗ[ℂ] M j)) i 1
+      = fun j => (LinearMap.id : M j →ₗ[ℂ] M j) := by
     funext j
     by_cases hj : j = i
     · subst hj
@@ -86,19 +93,20 @@ theorem map_update_id_one {κ : Type*} [DecidableEq κ] {M : κ → Type*} [∀ 
 
 section Window
 
-variable (hπ : ∀ v, IsSmooth (π v)) (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
+variable
+  (hπ : ∀ v, IsSmooth (π v)) (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
   {K' : ∀ v, Subgroup (G v)} (hK'c : ∀ v, IsCompact (K' v : Set (G v)))
   (hK'o : ∀ v, IsOpen (K' v : Set (G v))) (hK'e : ∀ᶠ v in cofinite, K' v = K v)
-  [DecidableEq ι] (S : Finset ι) (hSK : ∀ v ∉ S, K' v = K v)
-  (hSξ : ∀ v ∉ S, ξ v ∈ fixedVectors (π v) (K v))
+  [DecidableEq ι]
+  (S : Finset ι) (hSK : ∀ v ∉ S, K' v = K v) (hSξ : ∀ v ∉ S, ξ v ∈ fixedVectors (π v) (K v))
 
 include hSK hSξ in
 omit [∀ v, IsTopologicalGroup (G v)] [∀ v, LocallyCompactSpace (G v)] [∀ v, T2Space (G v)]
   [∀ v, TotallyDisconnectedSpace (G v)] hKo hKc in
-theorem windowEmbed_mem (t : ⨂[ℂ] v : S, fixedVectors (π v) (K' v)) :
-    ∃ h : windowEmbed ξ S t ∈ restrictedTensor ξ,
-      (⟨windowEmbed ξ S t, h⟩ : restrictedTensor ξ) ∈
-        fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') := by
+theorem windowEmbed_mem (t : ⨂[ℂ] v : S, fixedVectors (π v) (K' v))
+    : ∃ h : windowEmbed ξ S t ∈ restrictedTensor ξ,
+      (⟨windowEmbed ξ S t, h⟩ : restrictedTensor ξ)
+        ∈ fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') := by
   induction t using PiTensorProduct.induction_on with
   | smul_tprod c w =>
     have hmem : windowEmbed ξ S (c • tprod ℂ w) ∈ restrictedTensor ξ := by
@@ -122,32 +130,41 @@ theorem windowEmbed_mem (t : ⨂[ℂ] v : S, fixedVectors (π v) (K' v)) :
     convert this using 1
     exact Subtype.ext (map_add _ _ _)
 
-def windowEmbedFixed : (⨂[ℂ] v : S, fixedVectors (π v) (K' v)) →ₗ[ℂ]
-    fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') :=
-  LinearMap.codRestrict _ (LinearMap.codRestrict (restrictedTensor ξ) (windowEmbed ξ S)
-    fun t => (windowEmbed_mem hξ S hSK hSξ t).1) fun t => (windowEmbed_mem hξ S hSK hSξ t).2
+def windowEmbedFixed
+    : (⨂[ℂ] v : S, fixedVectors (π v) (K' v)) →ₗ[ℂ]
+      fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') :=
+  LinearMap.codRestrict _
+    (LinearMap.codRestrict (restrictedTensor ξ) (windowEmbed ξ S) fun t =>
+      (windowEmbed_mem hξ S hSK hSξ t).1)
+    fun t => (windowEmbed_mem hξ S hSK hSξ t).2
 
 omit [∀ v, IsTopologicalGroup (G v)] [∀ v, LocallyCompactSpace (G v)] [∀ v, T2Space (G v)]
   [∀ v, TotallyDisconnectedSpace (G v)] hKo hKc in
-theorem coe_windowEmbedFixed (t : ⨂[ℂ] v : S, fixedVectors (π v) (K' v)) :
-    ((windowEmbedFixed hξ S hSK hSξ t : restrictedTensor ξ) : ⨂[ℂ] v, V v) =
-      windowEmbed ξ S t :=
+theorem coe_windowEmbedFixed (t : ⨂[ℂ] v : S, fixedVectors (π v) (K' v))
+    : ((windowEmbedFixed hξ S hSK hSξ t : restrictedTensor ξ) : ⨂[ℂ] v, V v) = windowEmbed ξ S t :=
   rfl
 
-
 include hπ hK'c hK'o hK'e in
-theorem lift_adjoin_heckeOps (v : S) {a : End ℂ (fixedVectors (π v) (K' v))}
-    (ha : a ∈ Algebra.adjoin ℂ (heckeOps (hπ v) (hK'c v) (hK'o v))) :
-    ∃ A ∈ Algebra.adjoin ℂ (heckeOps (isSmooth_restrictedTensorRep hπ hξ)
-        (isCompact_boxSubgroup_of_eq hK'c hK'e) (isOpen_boxSubgroup hK'o hK'e)),
-      ∀ t, A (windowEmbedFixed hξ S hSK hSξ t) =
-        windowEmbedFixed hξ S hSK hSξ
-          (PiTensorProduct.map (Function.update (fun _ => LinearMap.id) v a) t) := by
+theorem lift_adjoin_heckeOps
+    (v : S)
+    {a : End ℂ (fixedVectors (π v) (K' v))}
+    (ha : a ∈ Algebra.adjoin ℂ (heckeOps (hπ v) (hK'c v) (hK'o v)))
+    : ∃ A
+        ∈ Algebra.adjoin ℂ
+          (heckeOps (isSmooth_restrictedTensorRep hπ hξ) (isCompact_boxSubgroup_of_eq hK'c hK'e)
+            (isOpen_boxSubgroup hK'o hK'e)),
+      ∀ t,
+        A (windowEmbedFixed hξ S hSK hSξ t)
+          = windowEmbedFixed hξ S hSK hSξ
+            (PiTensorProduct.map (Function.update (fun _ => LinearMap.id) v a) t) := by
   induction ha using Algebra.adjoin_induction with
   | mem a ha =>
     obtain ⟨g, rfl⟩ := ha
-    refine ⟨heckeOp _ _ _ (RestrictedProduct.mulSingle K v g),
-      Algebra.subset_adjoin (heckeOp_mem_heckeOps _ _ _ _), fun t => ?_⟩
+    refine ⟨
+      heckeOp _ _ _ (RestrictedProduct.mulSingle K v g),
+      Algebra.subset_adjoin (heckeOp_mem_heckeOps _ _ _ _),
+      fun t => ?_
+    ⟩
     induction t using PiTensorProduct.induction_on with
     | smul_tprod c w =>
       rw [map_smul, map_smul, map_smul, map_smul]
@@ -155,11 +172,13 @@ theorem lift_adjoin_heckeOps (v : S) {a : End ℂ (fixedVectors (π v) (K' v))}
       refine Subtype.ext (Subtype.ext ?_)
       rw [heckeOp_apply]
       have hx : IsRestricted ξ (extend ξ S fun u => (w u : V u)) := isRestricted_extend ξ S _
-      have hx' : IsRestricted ξ (Function.update (extend ξ S fun u => (w u : V u)) v
-          (π v g (w v))) := hx.update _ _
-      have hρ : restrictedTensorRep π ξ hξ (RestrictedProduct.mulSingle K v g)
-          (windowEmbedFixed hξ S hSK hSξ (tprod ℂ w) : restrictedTensor ξ) =
-          ⟨tprod ℂ _, tprod_mem_restrictedTensor hx'⟩ := by
+      have hx'
+          : IsRestricted ξ (Function.update (extend ξ S fun u => (w u : V u)) v (π v g (w v))) :=
+        hx.update _ _
+      have hρ
+          : restrictedTensorRep π ξ hξ (RestrictedProduct.mulSingle K v g)
+              (windowEmbedFixed hξ S hSK hSξ (tprod ℂ w) : restrictedTensor ξ)
+            = ⟨tprod ℂ _, tprod_mem_restrictedTensor hx'⟩ := by
         refine Subtype.ext ?_
         rw [coe_restrictedTensorRep_apply, coe_windowEmbedFixed, windowEmbed_tprod,
           tensorRep_mulSingle_tprod]
@@ -180,7 +199,8 @@ theorem lift_adjoin_heckeOps (v : S) {a : End ℂ (fixedVectors (π v) (K' v))}
           rw [Function.update_of_ne hne]
           exact fixedProj_apply_of_mem (hπ u) (hK'c u) (hK'o u) (w ⟨u, hu⟩).2
         · exact fixedProj_apply_of_mem (hπ u) (hK'c u) (hK'o u) (hSK u hu ▸ hSξ u hu)
-    | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
+    | add a b ha hb =>
+      rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
   | algebraMap c =>
     refine ⟨algebraMap ℂ _ c, Subalgebra.algebraMap_mem _ c, fun t => ?_⟩
     rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one,
@@ -191,8 +211,7 @@ theorem lift_adjoin_heckeOps (v : S) {a : End ℂ (fixedVectors (π v) (K' v))}
     obtain ⟨A, hA, hAt⟩ := ha
     obtain ⟨B, hB, hBt⟩ := hb
     refine ⟨A + B, Subalgebra.add_mem _ hA hB, fun t => ?_⟩
-    rw [PiTensorProduct.map_update_add, LinearMap.add_apply, LinearMap.add_apply, hAt, hBt,
-      map_add]
+    rw [PiTensorProduct.map_update_add, LinearMap.add_apply, LinearMap.add_apply, hAt, hBt, map_add]
   | mul a b _ _ ha hb =>
     obtain ⟨A, hA, hAt⟩ := ha
     obtain ⟨B, hB, hBt⟩ := hb
@@ -201,19 +220,23 @@ theorem lift_adjoin_heckeOps (v : S) {a : End ℂ (fixedVectors (π v) (K' v))}
 
 end Window
 
-theorem isSimpleUnder_heckeOps_box (hπ : ∀ v, IsAdmissible (π v))
-    (hirr : ∀ v, (π v).IsIrreducible) (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
+theorem isSimpleUnder_heckeOps_box
+    (hπ : ∀ v, IsAdmissible (π v)) (hirr : ∀ v, (π v).IsIrreducible)
+    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
     (hgel : ∀ᶠ v in cofinite, ∀ u ∈ fixedVectors (π v) (K v), ∃ c : ℂ, u = c • ξ v)
     {K' : ∀ v, Subgroup (G v)} (hK'c : ∀ v, IsCompact (K' v : Set (G v)))
     (hK'o : ∀ v, IsOpen (K' v : Set (G v))) (hK'e : ∀ᶠ v in cofinite, K' v = K v)
-    (hne : fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') ≠ ⊥) :
-    IsSimpleUnder (heckeOps (isSmooth_restrictedTensorRep (fun v => (hπ v).1) hξ)
+    (hne : fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') ≠ ⊥)
+    : IsSimpleUnder (heckeOps (isSmooth_restrictedTensorRep (fun v => (hπ v).1) hξ)
       (isCompact_boxSubgroup_of_eq hK'c hK'e) (isOpen_boxSubgroup hK'o hK'e)) := by
   classical
   have hπs : ∀ v, IsSmooth (π v) := fun v => (hπ v).1
   set S : Finset ι := ((Filter.eventually_cofinite.1 ((hK'e.and hgel).and hξ))).toFinset
-  have hS : ∀ v ∉ S, K' v = K v ∧ (∀ u ∈ fixedVectors (π v) (K v), ∃ c : ℂ, u = c • ξ v) ∧
-      ξ v ∈ fixedVectors (π v) (K v) := fun v hv => by simpa [S] using hv
+  have hS
+      : ∀ v ∉ S,
+        K' v = K v ∧ (∀ u ∈ fixedVectors (π v) (K v), ∃ c : ℂ, u = c • ξ v)
+          ∧ ξ v ∈ fixedVectors (π v) (K v) := fun v hv => by
+    simpa [S] using hv
   have hSK : ∀ v ∉ S, K' v = K v := fun v hv => (hS v hv).1
   have hSξ : ∀ v ∉ S, ξ v ∈ fixedVectors (π v) (K v) := fun v hv => (hS v hv).2.2
   have hle := le_range_windowEmbed hπ hξ hK'c hK'o hK'e S hSK (fun v hv => (hS v hv).2.1) hSξ
@@ -242,11 +265,14 @@ theorem isSimpleUnder_heckeOps_box (hπ : ∀ v, IsAdmissible (π v))
         rw [(PiTensorProduct.tprod ℂ).map_coord_zero v (Subsingleton.elim _ _), smul_zero]
       | add a b ha hb => rw [ha, hb, add_zero]
     exact this s
-  have hfd : ∀ v : S, FiniteDimensional ℂ (fixedVectors (π v) (K' v)) :=
-    fun v => (hπ v).2 _ (hK'c v) (hK'o v)
+  have hfd : ∀ v : S, FiniteDimensional ℂ (fixedVectors (π v) (K' v)) := fun v =>
+    (hπ v).2 _ (hK'c v) (hK'o v)
 
-  let b : ∀ v : S, Basis (Basis.ofVectorSpaceIndex ℂ (fixedVectors (π v) (K' v))) ℂ
-      (fixedVectors (π v) (K' v)) := fun v => Basis.ofVectorSpace ℂ _
+  let b
+      : ∀ v : S,
+        Basis (Basis.ofVectorSpaceIndex ℂ (fixedVectors (π v) (K' v))) ℂ
+          (fixedVectors (π v) (K' v)) := fun v =>
+    Basis.ofVectorSpace ℂ _
   let B := Basis.piTensorProduct b
   obtain ⟨k, hk⟩ : ∃ k, B.repr s k ≠ 0 := by
     by_contra hcon
@@ -260,26 +286,30 @@ theorem isSimpleUnder_heckeOps_box (hπ : ∀ v, IsAdmissible (π v))
 
   have htarget : ∀ w : ∀ v : S, fixedVectors (π v) (K' v), J (tprod ℂ w) ∈ p := by
     intro w
-    let r : ∀ v : S, End ℂ (fixedVectors (π v) (K' v)) := fun v => (b v).coord (k v) |>.smulRight (w v)
-    have hstep : ∀ T : Finset S, J (PiTensorProduct.map (T.piecewise r fun _ => LinearMap.id) s) ∈ p := by
+    let r : ∀ v : S, End ℂ (fixedVectors (π v) (K' v)) := fun v =>
+      (b v).coord (k v) |>.smulRight (w v)
+    have hstep
+        : ∀ T : Finset S, J (PiTensorProduct.map (T.piecewise r fun _ => LinearMap.id) s) ∈ p := by
       intro T
       induction T using Finset.induction_on with
       | empty =>
         simp only [Finset.piecewise_empty, PiTensorProduct.map_id, LinearMap.id_apply]
         exact hz
       | insert v T hvT ih =>
-        obtain ⟨A, hA, hAt⟩ := lift_adjoin_heckeOps hπs hξ hK'c hK'o hK'e S hSK hSξ v
-          (a := r v) (by rw [hadj v]; trivial)
-        have hmap : (PiTensorProduct.map ((insert v T).piecewise r fun _ => LinearMap.id)) =
-            PiTensorProduct.map (Function.update (fun _ => LinearMap.id) v (r v)) *
-              PiTensorProduct.map (T.piecewise r fun _ => LinearMap.id) := by
+        obtain ⟨A, hA, hAt⟩ :=
+          lift_adjoin_heckeOps hπs hξ hK'c hK'o hK'e S hSK hSξ v (a := r v)
+            (by rw [hadj v]; trivial)
+        have hmap
+            : (PiTensorProduct.map ((insert v T).piecewise r fun _ => LinearMap.id))
+              = PiTensorProduct.map (Function.update (fun _ => LinearMap.id) v (r v))
+                * PiTensorProduct.map (T.piecewise r fun _ => LinearMap.id) := by
           rw [← PiTensorProduct.map_mul]
           congr 1
           funext u
           by_cases hu : u = v
           · subst hu
-            rw [Finset.piecewise_eq_of_mem _ _ _ (Finset.mem_insert_self _ _),
-              Function.update_self, Finset.piecewise_eq_of_notMem _ _ _ hvT]
+            rw [Finset.piecewise_eq_of_mem _ _ _ (Finset.mem_insert_self _ _), Function.update_self,
+              Finset.piecewise_eq_of_notMem _ _ _ hvT]
             rfl
           · rw [Function.update_of_ne hu]
             by_cases huT : u ∈ T
@@ -316,8 +346,11 @@ theorem isSimpleUnder_heckeOps_box (hπ : ∀ v, IsAdmissible (π v))
   rw [eq_top_iff]
   rintro t -
   obtain ⟨u, rfl⟩ := hJ t
-  have hspan : u ∈ Submodule.span ℂ (range (tprod ℂ : (∀ v : S, fixedVectors (π v) (K' v)) →
-      ⨂[ℂ] v : S, fixedVectors (π v) (K' v))) := by
+  have hspan
+      : u ∈ Submodule.span ℂ
+        (range
+          (tprod ℂ
+            : (∀ v : S, fixedVectors (π v) (K' v)) → ⨂[ℂ] v : S, fixedVectors (π v) (K' v))) := by
     rw [PiTensorProduct.span_tprod_eq_top]; trivial
   induction hspan using Submodule.span_induction with
   | mem u hu =>
@@ -327,11 +360,11 @@ theorem isSimpleUnder_heckeOps_box (hπ : ∀ v, IsAdmissible (π v))
   | add a b _ _ ha hb => rw [map_add (f := _)]; exact p.add_mem ha hb
   | smul c a _ ha => rw [map_smul]; exact p.smul_mem c ha
 
-theorem isIrreducible_restrictedTensorRep (hπ : ∀ v, IsAdmissible (π v))
-    (hirr : ∀ v, (π v).IsIrreducible) (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
-    (hξ0 : ∀ᶠ v in cofinite, ξ v ≠ 0)
-    (hgel : ∀ᶠ v in cofinite, ∀ u ∈ fixedVectors (π v) (K v), ∃ c : ℂ, u = c • ξ v) :
-    (restrictedTensorRep π ξ hξ).IsIrreducible := by
+theorem isIrreducible_restrictedTensorRep
+    (hπ : ∀ v, IsAdmissible (π v)) (hirr : ∀ v, (π v).IsIrreducible)
+    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v)) (hξ0 : ∀ᶠ v in cofinite, ξ v ≠ 0)
+    (hgel : ∀ᶠ v in cofinite, ∀ u ∈ fixedVectors (π v) (K v), ∃ c : ℂ, u = c • ξ v)
+    : (restrictedTensorRep π ξ hξ).IsIrreducible := by
   classical
   have hπs : ∀ v, IsSmooth (π v) := fun v => (hπ v).1
   have hnt : Nontrivial (restrictedTensor ξ) := by
@@ -351,18 +384,24 @@ theorem isIrreducible_restrictedTensorRep (hπ : ∀ v, IsAdmissible (π v))
   obtain ⟨A, hAc, hAo, hAK, hAe, hAfix⟩ := exists_boxSubgroup_fixing hπs hξ x.2
   obtain ⟨B, hBc, hBo, hBK, hBe, hBfix⟩ := exists_boxSubgroup_fixing hπs hξ y.2
   set K' : ∀ v, Subgroup (G v) := fun v => A v ⊓ B v
-  have hK'c : ∀ v, IsCompact (K' v : Set (G v)) :=
-    fun v => (hAc v).inter_right (Subgroup.isClosed_of_isOpen _ (hBo v))
+  have hK'c : ∀ v, IsCompact (K' v : Set (G v)) := fun v =>
+    (hAc v).inter_right (Subgroup.isClosed_of_isOpen _ (hBo v))
   have hK'o : ∀ v, IsOpen (K' v : Set (G v)) := fun v => (hAo v).inter (hBo v)
   have hK'e : ∀ᶠ v in cofinite, K' v = K v := by
     filter_upwards [hAe, hBe] with v h1 h2
     simp [K', h1, h2]
-  have hxK : x ∈ fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') :=
-    fun g hg => Subtype.ext (hAfix g fun v => (hg v).1)
-  have hyK : y ∈ fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') :=
-    fun g hg => Subtype.ext (hBfix g fun v => (hg v).2)
-  refine ⟨boxSubgroup K K', isCompact_boxSubgroup_of_eq hK'c hK'e, isOpen_boxSubgroup hK'o hK'e,
-    hxK, hyK, isSimpleUnder_heckeOps_box hπ hirr hξ hgel hK'c hK'o hK'e ?_⟩
+  have hxK : x ∈ fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') := fun g hg =>
+    Subtype.ext (hAfix g fun v => (hg v).1)
+  have hyK : y ∈ fixedVectors (restrictedTensorRep π ξ hξ) (boxSubgroup K K') := fun g hg =>
+    Subtype.ext (hBfix g fun v => (hg v).2)
+  refine ⟨
+    boxSubgroup K K',
+    isCompact_boxSubgroup_of_eq hK'c hK'e,
+    isOpen_boxSubgroup hK'o hK'e,
+    hxK,
+    hyK,
+    isSimpleUnder_heckeOps_box hπ hirr hξ hgel hK'c hK'o hK'e ?_
+  ⟩
   intro h
   have : x ∈ (⊥ : Submodule ℂ (restrictedTensor ξ)) := h ▸ hxK
   exact hx0 ((Submodule.mem_bot ℂ).1 this)

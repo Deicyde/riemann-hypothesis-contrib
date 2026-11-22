@@ -15,7 +15,8 @@ public import Formalism.LFunctionBounds.LFunctionBoundsProofs.DivisorBound
 namespace Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD
 
 theorem zero_density_box : Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZeroDensityBox :=
-  final_bound_of_assembly (coefficient_square_bound Formalism.FX.divisor_weight_bound) (zero_detection mollifier_identity)
+  final_bound_of_assembly (coefficient_square_bound Formalism.FX.divisor_weight_bound)
+    (zero_detection mollifier_identity)
     (blockCountOf_statement duality_inequality (pair_twist_bound pair_sum_bound)) numeric_constants
 
 end Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD

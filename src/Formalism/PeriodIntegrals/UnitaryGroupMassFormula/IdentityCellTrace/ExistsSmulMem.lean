@@ -12,18 +12,24 @@ open NumberField
 
 namespace PI.UnitaryGroupMassFormula.IdCellInSW
 
-variable {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module E V]
-  [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+variable
+  {E : Type} [Field E] [NumberField E]
+  {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
 
-theorem exists_smul_mem (Λ : Submodule (𝓞 E) V) (hsp : Submodule.span E (Λ : Set V) = ⊤) (x : V) :
-    ∃ d : 𝓞 E, d ≠ 0 ∧ d • x ∈ Λ := by
-  first | exact Bl.general_b_fact_third''''''.goal1 .. | (apply Bl.general_b_fact_third''''''.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_third''''''.goal1 <;> assumption)
+theorem exists_smul_mem (Λ : Submodule (𝓞 E) V) (hsp : Submodule.span E (Λ : Set V) = ⊤) (x : V)
+    : ∃ d : 𝓞 E, d ≠ 0 ∧ d • x ∈ Λ := by
+  first
+  | exact Bl.general_b_fact_third''''''.goal1 ..
+  | (apply Bl.general_b_fact_third''''''.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_third''''''.goal1 <;> assumption)
 
 variable [StarRing E]
 
-theorem riesz [FiniteDimensional E V] (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondegenerate)
-    (Λ : Submodule (𝓞 E) V) (hΛ : Λ.FG) (hsp : Submodule.span E (Λ : Set V) = ⊤)
-    (f : Λ →ₗ[𝓞 E] E) : ∃ w : V, ∀ y (hy : y ∈ Λ), h w y = f ⟨y, hy⟩ := by
+theorem riesz
+    [FiniteDimensional E V]
+    (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondegenerate)
+    (Λ : Submodule (𝓞 E) V) (hΛ : Λ.FG) (hsp : Submodule.span E (Λ : Set V) = ⊤) (f : Λ →ₗ[𝓞 E] E)
+    : ∃ w : V, ∀ y (hy : y ∈ Λ), h w y = f ⟨y, hy⟩ := by
   classical
   obtain ⟨s, _, b, hb, hsL⟩ := Formalism.HermitianLatticesTheory.dualLattice_basis (R := 𝓞 E) Λ hsp
   obtain ⟨d, hd, hdL⟩ := Formalism.HermitianLatticesTheory.dualLattice_denom b Λ hΛ
@@ -42,8 +48,8 @@ theorem riesz [FiniteDimensional E V] (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h
     rw [Submodule.span_le]
     rintro _ ⟨j, rfl⟩
     exact hbL j
-  have hspan : ∀ u (hu : u ∈ Submodule.span (𝓞 E) (Set.range b)) (huL : u ∈ Λ),
-      h w u = f ⟨u, huL⟩ := by
+  have hspan
+      : ∀ u (hu : u ∈ Submodule.span (𝓞 E) (Set.range b)) (huL : u ∈ Λ), h w u = f ⟨u, huL⟩ := by
     intro u hu
     induction hu using Submodule.span_induction with
     | mem x hx =>
@@ -66,13 +72,13 @@ theorem riesz [FiniteDimensional E V] (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h
   have h1 := hspan (d • y) (hdL y hy) (Λ.smul_mem d hy)
   have e2 : (⟨d • y, Λ.smul_mem d hy⟩ : Λ) = d • ⟨y, hy⟩ := rfl
   rw [e2, f.map_smul, ← algebraMap_smul E d y, (h w).map_smul, ← algebraMap_smul E d (f _),
-    smul_eq_mul, smul_eq_mul] at h1
+      smul_eq_mul, smul_eq_mul]
+    at h1
   exact mul_left_cancel₀ ((map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).mpr hd) h1
 
-
 omit [StarRing E] in
-theorem exists_retract (Λ : Submodule (𝓞 E) V) (hΛ : Λ.FG) (X : Submodule E V) :
-    ∃ ρ : Λ →ₗ[𝓞 E] Λ, (∀ y, ((ρ y : Λ) : V) ∈ X) ∧ ∀ y : Λ, (y : V) ∈ X → ρ y = y := by
+theorem exists_retract (Λ : Submodule (𝓞 E) V) (hΛ : Λ.FG) (X : Submodule E V)
+    : ∃ ρ : Λ →ₗ[𝓞 E] Λ, (∀ y, ((ρ y : Λ) : V) ∈ X) ∧ ∀ y : Λ, (y : V) ∈ X → ρ y = y := by
   classical
   let N : Submodule (𝓞 E) Λ := (X.restrictScalars (𝓞 E)).comap Λ.subtype
   have : Module.Finite (𝓞 E) Λ := Module.Finite.iff_fg.mpr hΛ

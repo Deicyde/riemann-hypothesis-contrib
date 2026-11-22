@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.RigidifiedS
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 open GlobalTheory.CechPic GlobalTheory.AbDual
 open GlobalTheory.IndefiniteRowSideFullHecke.ZeroSectionBase (IsPrincipalPol sqToBase)
@@ -24,9 +25,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Zarhin
 
-theorem integers_valuationRing_dimensionLEOne_isFractionRing :
-    ∀ (C : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R →
-    ∃ (_ : IsDomain R), ValuationRing R ∧ Ring.DimensionLEOne R ∧ IsFractionRing R C := by
+theorem integers_valuationRing_dimensionLEOne_isFractionRing
+    : ∀ (C : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) (R : Type) [CommRing R]
+        [Algebra R C],
+      v.Integers R
+        → ∃ (_ : IsDomain R), ValuationRing R ∧ Ring.DimensionLEOne R ∧ IsFractionRing R C := by
   intro C _ _ v R _ _ hv
   haveI hdom : IsDomain R := Function.Injective.isDomain (algebraMap R C) hv.hom_inj
   haveI hval : ValuationRing R := ValuationRing.of_integers v hv
@@ -37,8 +40,7 @@ theorem integers_valuationRing_dimensionLEOne_isFractionRing :
       by_cases hx0 : x = 0
       · rw [hx0]; exact p.zero_mem
       obtain ⟨y, hyp, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hp0
-      have hxu : ¬ IsUnit x := by
-        simpa [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff] using hx
+      have hxu : ¬ IsUnit x := by simpa [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff] using hx
       have hvx : v (algebraMap R C x) < 1 :=
         lt_of_le_of_ne (hv.map_le_one x) fun e => hxu (hv.isUnit_iff_valuation_eq_one.2 e)
       have hvy : 0 < v (algebraMap R C y) := by

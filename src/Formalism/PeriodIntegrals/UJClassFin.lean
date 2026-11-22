@@ -17,8 +17,8 @@ variable {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n]
 
 def cT (σ : A →+* A) {m p : Type} (M : Matrix m p A) : Matrix p m A := (M.map σ)ᵀ
 
-theorem cT_mul (σ : A →+* A) {m p q : Type} [Fintype p] (M : Matrix m p A) (N : Matrix p q A) :
-    cT σ (M * N) = cT σ N * cT σ M := by
+theorem cT_mul (σ : A →+* A) {m p q : Type} [Fintype p] (M : Matrix m p A) (N : Matrix p q A)
+    : cT σ (M * N) = cT σ N * cT σ M := by
   simp [cT, Matrix.map_mul, Matrix.transpose_mul]
 
 theorem cT_one (σ : A →+* A) : cT σ (1 : Matrix n n A) = 1 := by
@@ -31,19 +31,24 @@ def UJ (σ : A →+* A) (J : Matrix n n A) : Subgroup (GL n A) where
   mul_mem' := by
     intro a b ha hb
     simp only [Set.mem_ofPred_eq, Units.val_mul] at *
-    calc cT σ ((a : Matrix n n A) * (b : Matrix n n A)) * J * ((a : Matrix n n A) * (b : Matrix n n A))
-        = cT σ (b : Matrix n n A) * (cT σ (a : Matrix n n A) * J * (a : Matrix n n A)) * (b : Matrix n n A) := by
-          rw [cT_mul]; simp only [Matrix.mul_assoc]
+    calc
+      cT σ ((a : Matrix n n A) * (b : Matrix n n A)) * J * ((a : Matrix n n A) * (b : Matrix n n A))
+          = cT σ (b : Matrix n n A) * (cT σ (a : Matrix n n A) * J * (a : Matrix n n A))
+            * (b : Matrix n n A) := by
+        rw [cT_mul]; simp only [Matrix.mul_assoc]
       _ = J := by rw [ha, hb]
   inv_mem' := by
     intro g hg
     simp only [Set.mem_ofPred_eq] at *
-    calc cT σ ((g⁻¹ : GL n A) : Matrix n n A) * J * ((g⁻¹ : GL n A) : Matrix n n A)
-        = cT σ ((g⁻¹ : GL n A) : Matrix n n A) * (cT σ (g : Matrix n n A) * J * (g : Matrix n n A))
-            * ((g⁻¹ : GL n A) : Matrix n n A) := by rw [hg]
+    calc
+      cT σ ((g⁻¹ : GL n A) : Matrix n n A) * J * ((g⁻¹ : GL n A) : Matrix n n A)
+          = cT σ ((g⁻¹ : GL n A) : Matrix n n A)
+            * (cT σ (g : Matrix n n A) * J * (g : Matrix n n A))
+            * ((g⁻¹ : GL n A) : Matrix n n A) := by
+        rw [hg]
       _ = cT σ ((g : Matrix n n A) * ((g⁻¹ : GL n A) : Matrix n n A)) * J
-            * ((g : Matrix n n A) * ((g⁻¹ : GL n A) : Matrix n n A)) := by
-          rw [cT_mul]; simp only [Matrix.mul_assoc]
+          * ((g : Matrix n n A) * ((g⁻¹ : GL n A) : Matrix n n A)) := by
+        rw [cT_mul]; simp only [Matrix.mul_assoc]
       _ = J := by rw [Units.mul_inv, cT_one, Matrix.one_mul, Matrix.mul_one]
 
 def bc {B : Type} [CommRing B] (φ : A →+* B) : GL n A →* GL n B :=
@@ -55,8 +60,9 @@ def Jpq (p q : ℕ) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ := Matrix.f
 
 def HasSignature {n : Type} [Fintype n] [DecidableEq n] (J : Matrix n n ℂ) (p q : ℕ) : Prop :=
   ∃ e : n ≃ Fin p ⊕ Fin q, ∃ P : GL (Fin p ⊕ Fin q) ℂ,
-    cT (starRingEnd ℂ) (P : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ) * J.reindex e e *
-      (P : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ) = Jpq p q
+    cT (starRingEnd ℂ) (P : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ) * J.reindex e e
+        * (P : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ)
+      = Jpq p q
 
 section Adeles
 
@@ -92,15 +98,13 @@ def sigR (σ : E →ₐ[F] E) : R ⊗[F] E →+* R ⊗[F] E :=
 
 def inclR : E →+* R ⊗[F] E := (Algebra.TensorProduct.includeRight : E →ₐ[F] R ⊗[F] E).toRingHom
 
-def JR {M : ℕ} (J : Matrix (Fin M) (Fin M) E) : Matrix (Fin M) (Fin M) (R ⊗[F] E) :=
-  J.map (inclR R)
+def JR {M : ℕ} (J : Matrix (Fin M) (Fin M) E) : Matrix (Fin M) (Fin M) (R ⊗[F] E) := J.map (inclR R)
 
-def HR (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) :
-    Subgroup (GL (Fin M) (R ⊗[F] E)) :=
+def HR (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) : Subgroup (GL (Fin M) (R ⊗[F] E)) :=
   UJ (sigR R σ) (JR R J)
 
-def HFin (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) :
-    Subgroup (GL (Fin M) (R ⊗[F] E)) :=
+def HFin (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    : Subgroup (GL (Fin M) (R ⊗[F] E)) :=
   (UJ (σ : E →+* E) J).map (bc (inclR R))
 
 def HFinIn (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) : Subgroup (HR R σ J) :=
@@ -121,8 +125,9 @@ section Vol
 def intAf (F : Type) [Field F] [NumberField F] : Set (Af F) :=
   {a | ∀ v : HeightOneSpectrum (𝓞 F), evalV F v a ∈ v.adicCompletionIntegers F}
 
-def latHat (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] {M : ℕ}
-    (L : Set (Fin M → E)) : AddSubgroup (Fin M → Af F ⊗[F] E) :=
+def latHat
+    (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] {M : ℕ} (L : Set (Fin M → E))
+    : AddSubgroup (Fin M → Af F ⊗[F] E) :=
   AddSubgroup.closure {y | ∃ a ∈ intAf F, ∃ x ∈ L, y = fun i => a ⊗ₜ[F] x i}
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
@@ -132,16 +137,22 @@ def finMat (h : HA (AF F) σ J) : Matrix (Fin M) (Fin M) (Af F ⊗[F] E) :=
   ((HA.mat (AF F) σ J h : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)).map
     (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E))
 
-theorem mapAlg_mul {R A B : Type*} [CommSemiring R] [Semiring A] [Semiring B] [Algebra R A] [Algebra R B]
-    (φ : A →ₐ[R] B) {n : ℕ} (X Y : Matrix (Fin n) (Fin n) A) : (X * Y).map φ = X.map φ * Y.map φ :=
+theorem mapAlg_mul
+    {R A B : Type*} [CommSemiring R] [Semiring A] [Semiring B] [Algebra R A] [Algebra R B]
+    (φ : A →ₐ[R] B)
+    {n : ℕ} (X Y : Matrix (Fin n) (Fin n) A)
+    : (X * Y).map φ = X.map φ * Y.map φ :=
   Matrix.map_mul (f := φ.toRingHom)
 
-theorem mapAlg_one {R A B : Type*} [CommSemiring R] [Semiring A] [Semiring B] [Algebra R A] [Algebra R B]
-    (φ : A →ₐ[R] B) {n : ℕ} : (1 : Matrix (Fin n) (Fin n) A).map φ = 1 :=
+theorem mapAlg_one
+    {R A B : Type*} [CommSemiring R] [Semiring A] [Semiring B] [Algebra R A] [Algebra R B]
+    (φ : A →ₐ[R] B)
+    {n : ℕ}
+    : (1 : Matrix (Fin n) (Fin n) A).map φ = 1 :=
   Matrix.map_one _ (map_zero φ) (map_one φ)
 
-theorem HA_mat_mul (h h' : HA (AF F) σ J) :
-    HA.mat (AF F) σ J (h * h') = HA.mat (AF F) σ J h * HA.mat (AF F) σ J h' :=
+theorem HA_mat_mul (h h' : HA (AF F) σ J)
+    : HA.mat (AF F) σ J (h * h') = HA.mat (AF F) σ J h * HA.mat (AF F) σ J h' :=
   rfl
 
 theorem HA_mat_one : HA.mat (AF F) σ J 1 = 1 := rfl
@@ -177,15 +188,14 @@ end Vol
 
 def UJClassFin : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-    (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (L : Set (Fin M → E)),
-    (∀ a, σ a = star a) →
-    (∀ (τ : E →+* ℂ) (a : E), τ (star a) = starRingEnd ℂ (τ a)) →
-    (∀ τ : E →+* ℂ, HasSignature (J.map τ) M 0) →
-    (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x ∈ L, ∀ i, IsIntegral ℤ ((c : F) • x i)) →
-    (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((c : F) • e) ∈ L) →
-    ∃ (n : ℕ) (g : Fin n → HA (AF F) σ J),
-      (∀ x, ∃ i, ∃ γ : GamG σ J, ∃ k : SFin σ J L, x = (γ : HA (AF F) σ J) * g i * k) ∧
-      (∀ i j (γ γ' : GamG σ J) (k k' : SFin σ J L),
-        (γ : HA (AF F) σ J) * g i * k = (γ' : HA (AF F) σ J) * g j * k' → i = j)
+      (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (L : Set (Fin M → E)),
+    (∀ a, σ a = star a) → (∀ (τ : E →+* ℂ) (a : E), τ (star a) = starRingEnd ℂ (τ a))
+      → (∀ τ : E →+* ℂ, HasSignature (J.map τ) M 0)
+      → (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x ∈ L, ∀ i, IsIntegral ℤ ((c : F) • x i))
+      → (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((c : F) • e) ∈ L)
+      → ∃ (n : ℕ) (g : Fin n → HA (AF F) σ J),
+        (∀ x, ∃ i, ∃ γ : GamG σ J, ∃ k : SFin σ J L, x = (γ : HA (AF F) σ J) * g i * k)
+          ∧ (∀ i j (γ γ' : GamG σ J) (k k' : SFin σ J L),
+            (γ : HA (AF F) σ J) * g i * k = (γ' : HA (AF F) σ J) * g j * k' → i = j)
 
 end PI.UJClassFin

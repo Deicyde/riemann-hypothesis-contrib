@@ -12,11 +12,11 @@ open Finset
 
 variable {A : Type} [Ring A] [Algebra ℂ A]
 
-def shiftCoeff (d : ℕ) (p q : A) (c : ℕ → A) : ℕ → A :=
-  fun i => (Nat.casesOn i 0 (fun j => p * c j) : A) + (if i < d + 1 then q * c i else 0)
+def shiftCoeff (d : ℕ) (p q : A) (c : ℕ → A) : ℕ → A := fun i =>
+  (Nat.casesOn i 0 (fun j => p * c j) : A) + (if i < d + 1 then q * c i else 0)
 
-theorem affine_mul_eq (d : ℕ) (p q : A) (c : ℕ → A) (u : ℂ) :
-    (u • p + q) * (∑ i ∈ range (d + 1), u ^ i • c i)
+theorem affine_mul_eq (d : ℕ) (p q : A) (c : ℕ → A) (u : ℂ)
+    : (u • p + q) * (∑ i ∈ range (d + 1), u ^ i • c i)
       = ∑ i ∈ range (d + 1 + 1), u ^ i • shiftCoeff d p q c i := by
   unfold shiftCoeff
   simp only [smul_add, sum_add_distrib, add_mul]
@@ -30,14 +30,21 @@ theorem affine_mul_eq (d : ℕ) (p q : A) (c : ℕ → A) (u : ℂ) :
     refine sum_congr rfl fun i hi => ?_
     rw [if_pos (mem_range.mp hi), mul_smul_comm]
 
-theorem prod_affine_two_top (t : ℕ) (p : Fin (t + 1) → ℂ) (q : Fin (t + 1) → A) :
-    ∃ c : ℕ → A, c (t + 1) = (∏ k, p k) • (1 : A) ∧
-      c t = ∑ k, (∏ j, (if j = k then (1 : ℂ) else p j)) • q k ∧
-      ∀ u : ℂ, (List.ofFn fun k => (u * p k) • (1 : A) + q k).prod
-        = ∑ i ∈ range (t + 1 + 1), u ^ i • c i := by
+theorem prod_affine_two_top (t : ℕ) (p : Fin (t + 1) → ℂ) (q : Fin (t + 1) → A)
+    : ∃ c : ℕ → A,
+      c (t + 1) = (∏ k, p k) • (1 : A) ∧ c t = ∑ k, (∏ j, (if j = k then (1 : ℂ) else p j)) • q k
+        ∧ ∀ u : ℂ,
+          (List.ofFn fun k => (u * p k) • (1 : A) + q k).prod
+            = ∑ i ∈ range (t + 1 + 1), u ^ i • c i := by
   induction t with
   | zero =>
-    let c : ℕ → A := fun i => if i = 0 then q 0 else if i = 1 then (p 0) • (1 : A) else 0
+    let c : ℕ → A := fun i =>
+      if i = 0 then
+        q 0
+      else if i = 1 then
+        (p 0) • (1 : A)
+      else
+        0
     refine ⟨c, ?_, ?_, fun u => ?_⟩
     · simp [c]
     · simp [c]
@@ -64,19 +71,28 @@ end GlobalTheory.CapelliNext
 namespace GlobalTheory.CapelliNext
 open Finset
 
-theorem qdet_shift_next_coeff : ∀ (A : Type) [Ring A] [Algebra ℂ A] (m : ℕ) (E : Fin (m + 1) → Fin (m + 1) → A) (s : ℂ), ∃ (c : ℕ → A) (t : ℂ),
-    c (m + 1) = 1 ∧ c m = ∑ i, E i i + t • (1 : A) ∧
-      ∀ u : ℂ, Formalism.REAL.qdet E (u - s) = ∑ k ∈ Finset.range (m + 1 + 1), u ^ k • c k := by
+theorem qdet_shift_next_coeff
+    : ∀ (A : Type) [Ring A] [Algebra ℂ A] (m : ℕ) (E : Fin (m + 1) → Fin (m + 1) → A) (s : ℂ),
+      ∃ (c : ℕ → A) (t : ℂ),
+        c (m + 1) = 1 ∧ c m = ∑ i, E i i + t • (1 : A)
+          ∧ ∀ u : ℂ,
+            Formalism.REAL.qdet E (u - s) = ∑ k ∈ Finset.range (m + 1 + 1), u ^ k • c k := by
   intro A _ _ m E s
-  have h : ∀ σ : Equiv.Perm (Fin (m + 1)), ∃ c : ℕ → A,
-      c (m + 1) = (∏ k, (if σ k = k then (1 : ℂ) else 0)) • (1 : A) ∧
-      c m = ∑ k, (∏ j, (if j = k then (1 : ℂ) else (if σ j = j then (1 : ℂ) else 0))) •
-        ((if σ k = k then algebraMap ℂ A (-s - ((k : ℕ) : ℂ)) else 0) + E (σ k) k) ∧
-      ∀ u : ℂ, (List.ofFn fun k : Fin (m + 1) => Formalism.REAL.Tm E (u - s - ((k : ℕ) : ℂ)) (id (σ k)) (id k)).prod
-        = ∑ i ∈ range (m + 1 + 1), u ^ i • c i := by
+  have h
+      : ∀ σ : Equiv.Perm (Fin (m + 1)), ∃ c : ℕ → A,
+        c (m + 1) = (∏ k, (if σ k = k then (1 : ℂ) else 0)) • (1 : A)
+          ∧ c m
+            = ∑ k, (∏ j, (if j = k then (1 : ℂ) else (if σ j = j then (1 : ℂ) else 0))) •
+              ((if σ k = k then algebraMap ℂ A (-s - ((k : ℕ) : ℂ)) else 0) + E (σ k) k)
+          ∧ ∀ u : ℂ,
+            (List.ofFn fun k : Fin (m + 1) =>
+                Formalism.REAL.Tm E (u - s - ((k : ℕ) : ℂ)) (id (σ k)) (id k)).prod
+              = ∑ i ∈ range (m + 1 + 1), u ^ i • c i := by
     intro σ
-    obtain ⟨c, hc1, hc0, hc⟩ := prod_affine_two_top m (fun k => if σ k = k then (1 : ℂ) else 0)
-      (fun k => (if σ k = k then algebraMap ℂ A (-s - ((k : ℕ) : ℂ)) else 0) + E (σ k) k)
+    obtain ⟨c, hc1, hc0, hc⟩ :=
+      prod_affine_two_top m
+        (fun k => if σ k = k then (1 : ℂ) else 0)
+        (fun k => (if σ k = k then algebraMap ℂ A (-s - ((k : ℕ) : ℂ)) else 0) + E (σ k) k)
     refine ⟨c, hc1, hc0, fun u => ?_⟩
     rw [← hc u]
     congr 2
@@ -89,8 +105,13 @@ theorem qdet_shift_next_coeff : ∀ (A : Type) [Ring A] [Algebra ℂ A] (m : ℕ
       ring
     · simp
   choose c hc1 hc0 hc using h
-  refine ⟨fun i => ∑ σ : Equiv.Perm (Fin (m + 1)), ((Equiv.Perm.sign σ : ℤ) : A) * c σ i,
-    ∑ k : Fin (m + 1), (-s - ((k : ℕ) : ℂ)), ?_, ?_, fun u => ?_⟩
+  refine ⟨
+    fun i => ∑ σ : Equiv.Perm (Fin (m + 1)), ((Equiv.Perm.sign σ : ℤ) : A) * c σ i,
+    ∑ k : Fin (m + 1), (-s - ((k : ℕ) : ℂ)),
+    ?_,
+    ?_,
+    fun u => ?_
+  ⟩
   · simp only
     rw [Finset.sum_eq_single (1 : Equiv.Perm (Fin (m + 1)))]
     · rw [hc1 1]

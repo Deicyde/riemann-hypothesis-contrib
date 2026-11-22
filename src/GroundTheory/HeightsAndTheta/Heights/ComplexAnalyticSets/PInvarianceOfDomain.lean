@@ -16,19 +16,22 @@ open Metric Set MeasureTheory
 
 variable {n : ℕ}
 
-theorem brouwer_closedBall (hB : BrouwerFixedPoint.Statement) {a : Fin n → ℝ} {r : ℝ} (hr : 0 < r)
-    {h : (Fin n → ℝ) → Fin n → ℝ} (hc : ContinuousOn h (closedBall a r))
-    (hm : MapsTo h (closedBall a r) (closedBall a r)) : ∃ x ∈ closedBall a r, h x = x := by
+theorem brouwer_closedBall
+    (hB : BrouwerFixedPoint.Statement)
+    {a : Fin n → ℝ} {r : ℝ} (hr : 0 < r)
+    {h : (Fin n → ℝ) → Fin n → ℝ}
+    (hc : ContinuousOn h (closedBall a r)) (hm : MapsTo h (closedBall a r) (closedBall a r))
+    : ∃ x ∈ closedBall a r, h x = x := by
   have haff : MapsTo (fun x : Fin n → ℝ => a + r • x) (closedBall 0 1) (closedBall a r) := by
     intro x hx
     rw [mem_closedBall, dist_zero_right] at hx
     rw [mem_closedBall, dist_eq_norm, add_sub_cancel_left, norm_smul, Real.norm_of_nonneg hr.le]
     nlinarith [norm_nonneg x]
-  have hcont : ContinuousOn (fun x : Fin n → ℝ => a + r • x) (closedBall 0 1) :=
-    by fun_prop
-  have hcomp : ContinuousOn (fun x : Fin n → ℝ => h (a + r • x)) (closedBall 0 1) := hc.comp hcont haff
-  obtain ⟨x, hx, hfix⟩ := hB n (fun x => r⁻¹ • (h (a + r • x) - a)) (by fun_prop)
-    (by
+  have hcont : ContinuousOn (fun x : Fin n → ℝ => a + r • x) (closedBall 0 1) := by fun_prop
+  have hcomp : ContinuousOn (fun x : Fin n → ℝ => h (a + r • x)) (closedBall 0 1) :=
+    hc.comp hcont haff
+  obtain ⟨x, hx, hfix⟩ :=
+    hB n (fun x => r⁻¹ • (h (a + r • x) - a)) (by fun_prop) (by
       intro x hx
       have hy := hm (haff hx)
       rw [mem_closedBall, dist_eq_norm] at hy
@@ -61,12 +64,15 @@ theorem smoothSubalgebra_separatesPoints : (smoothSubalgebra n).SeparatesPoints 
   show ContDiff ℝ 1 fun z : Fin n → ℝ => z i
   exact contDiff_apply ℝ (fun _ => ℝ) i
 
-theorem exists_differentiable_near {S : Set (Fin n → ℝ)} (hS : IsCompact S)
-    (G : (Fin n → ℝ) → Fin n → ℝ) (hG : Continuous G) {η : ℝ} (hη : 0 < η) :
-    ∃ P : (Fin n → ℝ) → Fin n → ℝ, Differentiable ℝ P ∧ ∀ y ∈ S, ‖P y - G y‖ < η := by
+theorem exists_differentiable_near
+    {S : Set (Fin n → ℝ)} (hS : IsCompact S)
+    (G : (Fin n → ℝ) → Fin n → ℝ) (hG : Continuous G)
+    {η : ℝ} (hη : 0 < η)
+    : ∃ P : (Fin n → ℝ) → Fin n → ℝ, Differentiable ℝ P ∧ ∀ y ∈ S, ‖P y - G y‖ < η := by
   have h : ∀ i : Fin n, ∃ g ∈ smoothSubalgebra n, ∀ y ∈ S, ‖(g : (Fin n → ℝ) → ℝ) y - G y i‖ < η :=
-    fun i => ContinuousMap.exists_mem_subalgebra_near_continuous_of_isCompact_of_separatesPoints
-      smoothSubalgebra_separatesPoints ⟨fun y => G y i, (continuous_apply i).comp hG⟩ hS hη
+    fun i =>
+      ContinuousMap.exists_mem_subalgebra_near_continuous_of_isCompact_of_separatesPoints
+        smoothSubalgebra_separatesPoints ⟨fun y => G y i, (continuous_apply i).comp hG⟩ hS hη
   choose g hg hgS using h
   refine ⟨fun y i => g i y, differentiable_pi.2 fun i => ?_, fun y hy => ?_⟩
   · exact (show ContDiff ℝ 1 (g i : (Fin n → ℝ) → ℝ) from hg i).differentiable one_ne_zero
@@ -74,9 +80,11 @@ theorem exists_differentiable_near {S : Set (Fin n → ℝ)} (hS : IsCompact S)
     intro i
     simpa using hgS i y hy
 
-theorem exists_small_avoid {P : (Fin n → ℝ) → Fin n → ℝ} (hP : Differentiable ℝ P) (c a : Fin n → ℝ)
-    {ρ δ : ℝ} (hρ : 0 < ρ) (hδ : 0 < δ) :
-    ∃ v : Fin n → ℝ, ‖v‖ < δ ∧ ∀ y ∈ sphere c ρ, P y ≠ a + v := by
+theorem exists_small_avoid
+    {P : (Fin n → ℝ) → Fin n → ℝ} (hP : Differentiable ℝ P)
+    (c a : Fin n → ℝ)
+    {ρ δ : ℝ} (hρ : 0 < ρ) (hδ : 0 < δ)
+    : ∃ v : Fin n → ℝ, ‖v‖ < δ ∧ ∀ y ∈ sphere c ρ, P y ≠ a + v := by
   have hnull : volume (P '' sphere c ρ) = 0 :=
     addHaar_image_eq_zero_of_differentiableOn_of_addHaar_eq_zero volume hP.differentiableOn
       (Measure.addHaar_sphere_of_ne_zero volume c hρ.ne')
@@ -89,8 +97,10 @@ theorem exists_small_avoid {P : (Fin n → ℝ) → Fin n → ℝ} (hP : Differe
   rw [hnull] at hle
   exact (measure_ball_pos volume a hδ).ne' (nonpos_iff_eq_zero.mp hle)
 
-theorem exists_pos_le {s : Set (Fin n → ℝ)} (hs : IsCompact s) {g : (Fin n → ℝ) → ℝ}
-    (hg : ContinuousOn g s) (hpos : ∀ y ∈ s, 0 < g y) : ∃ δ > 0, ∀ y ∈ s, δ ≤ g y := by
+theorem exists_pos_le
+    {s : Set (Fin n → ℝ)} (hs : IsCompact s)
+    {g : (Fin n → ℝ) → ℝ} (hg : ContinuousOn g s) (hpos : ∀ y ∈ s, 0 < g y)
+    : ∃ δ > 0, ∀ y ∈ s, δ ≤ g y := by
   rcases s.eq_empty_or_nonempty with rfl | hne
   · exact ⟨1, one_pos, by simp⟩
   · obtain ⟨y0, hy0, hmin⟩ := hs.exists_isMinOn hne hg
@@ -99,22 +109,23 @@ theorem exists_pos_le {s : Set (Fin n → ℝ)} (hs : IsCompact s) {g : (Fin n �
 noncomputable def radialPush (c : Fin n → ℝ) (ρ : ℝ) (y : Fin n → ℝ) : Fin n → ℝ :=
   c + max 1 (ρ / ‖y - c‖) • (y - c)
 
-theorem radialPush_of_le {c y : Fin n → ℝ} {ρ : ℝ} (hρ : 0 < ρ) (hy : ρ ≤ dist y c) :
-    radialPush c ρ y = y := by
+theorem radialPush_of_le {c y : Fin n → ℝ} {ρ : ℝ} (hρ : 0 < ρ) (hy : ρ ≤ dist y c)
+    : radialPush c ρ y = y := by
   rw [dist_eq_norm] at hy
   have hpos : 0 < ‖y - c‖ := hρ.trans_le hy
   have h1 : ρ / ‖y - c‖ ≤ 1 := (div_le_one hpos).2 hy
   rw [radialPush, max_eq_left h1, one_smul, add_sub_cancel]
 
-theorem radialPush_mem_sphere {c y : Fin n → ℝ} {ρ : ℝ} (hy : dist y c < ρ) (hyc : y ≠ c) :
-    radialPush c ρ y ∈ sphere c ρ := by
+theorem radialPush_mem_sphere {c y : Fin n → ℝ} {ρ : ℝ} (hy : dist y c < ρ) (hyc : y ≠ c)
+    : radialPush c ρ y ∈ sphere c ρ := by
   rw [dist_eq_norm] at hy
   have hpos : 0 < ‖y - c‖ := norm_pos_iff.2 (sub_ne_zero.2 hyc)
   have h1 : 1 ≤ ρ / ‖y - c‖ := (one_le_div hpos).2 hy.le
   rw [mem_sphere, dist_eq_norm, radialPush, max_eq_right h1, add_sub_cancel_left, norm_smul,
     Real.norm_of_nonneg (div_nonneg (hpos.trans hy).le hpos.le), div_mul_cancel₀ ρ hpos.ne']
 
-theorem continuousOn_radialPush (c : Fin n → ℝ) (ρ : ℝ) : ContinuousOn (radialPush c ρ) {y | y ≠ c} := by
+theorem continuousOn_radialPush (c : Fin n → ℝ) (ρ : ℝ)
+    : ContinuousOn (radialPush c ρ) {y | y ≠ c} := by
   have hn : ContinuousOn (fun y : Fin n → ℝ => ρ / ‖y - c‖) {y | y ≠ c} := by
     refine ContinuousOn.div₀ continuousOn_const (by fun_prop) ?_
     intro y hy
@@ -124,9 +135,11 @@ theorem continuousOn_radialPush (c : Fin n → ℝ) (ρ : ℝ) : ContinuousOn (r
   unfold radialPush
   fun_prop
 
-theorem mem_interior_image (hB : BrouwerFixedPoint.Statement) {f : (Fin n → ℝ) → Fin n → ℝ}
-    {a : Fin n → ℝ} {r : ℝ} (hr : 0 < r) (hc : ContinuousOn f (closedBall a r))
-    (hi : InjOn f (closedBall a r)) : f a ∈ interior (f '' closedBall a r) := by
+theorem mem_interior_image
+    (hB : BrouwerFixedPoint.Statement)
+    {f : (Fin n → ℝ) → Fin n → ℝ} {a : Fin n → ℝ} {r : ℝ}
+    (hr : 0 < r) (hc : ContinuousOn f (closedBall a r)) (hi : InjOn f (closedBall a r))
+    : f a ∈ interior (f '' closedBall a r) := by
   have hK : IsCompact (closedBall a r) := isCompact_closedBall a r
 
   obtain ⟨G, hGf⟩ : ∃ G : C(Fin n → ℝ, Fin n → ℝ), ∀ x ∈ closedBall a r, G (f x) = x := by
@@ -138,7 +151,8 @@ theorem mem_interior_image (hB : BrouwerFixedPoint.Statement) {f : (Fin n → �
   have hGa : G (f a) = a := hGf a (mem_closedBall_self hr.le)
   by_contra hno
 
-  obtain ⟨ρ3, hρ3, hρG⟩ := Metric.continuousAt_iff.mp G.continuous.continuousAt (r / 4) (by positivity)
+  obtain ⟨ρ3, hρ3, hρG⟩ :=
+    Metric.continuousAt_iff.mp G.continuous.continuousAt (r / 4) (by positivity)
   obtain ⟨ρ, hρ, hρlt⟩ : ∃ ρ : ℝ, 0 < ρ ∧ 2 * ρ < ρ3 := ⟨ρ3 / 3, by positivity, by linarith⟩
   have hGnear : ∀ y, dist y (f a) ≤ 2 * ρ → dist (G y) a < r / 4 := fun y hy => by
     have h1 := hρG (show dist y (f a) < ρ3 by linarith)
@@ -146,8 +160,8 @@ theorem mem_interior_image (hB : BrouwerFixedPoint.Statement) {f : (Fin n → �
 
   obtain ⟨c, hcball, hcK⟩ : ∃ c, dist c (f a) < ρ ∧ c ∉ f '' closedBall a r := by
     by_contra! hall
-    exact hno (mem_interior_iff_mem_nhds.2
-      (Metric.mem_nhds_iff.2 ⟨ρ, hρ, fun c hc => hall c (mem_ball.1 hc)⟩))
+    exact hno (mem_interior_iff_mem_nhds.2 (Metric.mem_nhds_iff.2
+      ⟨ρ, hρ, fun c hc => hall c (mem_ball.1 hc)⟩))
   have hfK : IsCompact (f '' closedBall a r) := hK.image_of_continuousOn hc
   have hS1c : IsCompact (f '' closedBall a r ∩ {y | ρ ≤ dist y c}) :=
     hfK.inter_right (isClosed_le continuous_const (continuous_id.dist continuous_const))
@@ -168,10 +182,13 @@ theorem mem_interior_image (hB : BrouwerFixedPoint.Statement) {f : (Fin n → �
 
   obtain ⟨P, hPd, hPS⟩ := exists_differentiable_near hSc G G.continuous (half_pos hδ)
   obtain ⟨v, hv, hPv⟩ := exists_small_avoid hPd c a hρ (half_pos hδ)
-  have hQG : ∀ y ∈ (f '' closedBall a r ∩ {y | ρ ≤ dist y c}) ∪ sphere c ρ,
-      ‖P y - v - G y‖ < δ := fun y hy => by
+  have hQG
+      : ∀ y ∈ (f '' closedBall a r ∩ {y | ρ ≤ dist y c}) ∪ sphere c ρ,
+        ‖P y - v - G y‖ < δ := fun y hy => by
     have h1 := hPS y hy
-    calc ‖P y - v - G y‖ = ‖(P y - G y) - v‖ := by congr 1; abel
+    calc
+      ‖P y - v - G y‖
+        = ‖(P y - G y) - v‖ := by congr 1; abel
       _ ≤ ‖P y - G y‖ + ‖v‖ := norm_sub_le _ _
       _ < δ / 2 + δ / 2 := add_lt_add h1 hv
       _ = δ := add_halves δ
@@ -185,8 +202,9 @@ theorem mem_interior_image (hB : BrouwerFixedPoint.Statement) {f : (Fin n → �
     · exact hPv y hy (eq_add_of_sub_eq hQa)
 
   have hfc : ∀ x ∈ closedBall a r, f x ≠ c := fun x hx h => hcK ⟨x, hx, h⟩
-  have hΦS : ∀ x ∈ closedBall a r,
-      radialPush c ρ (f x) ∈ (f '' closedBall a r ∩ {y | ρ ≤ dist y c}) ∪ sphere c ρ := by
+  have hΦS
+      : ∀ x ∈ closedBall a r,
+        radialPush c ρ (f x) ∈ (f '' closedBall a r ∩ {y | ρ ≤ dist y c}) ∪ sphere c ρ := by
     intro x hx
     by_cases hle : ρ ≤ dist (f x) c
     · rw [radialPush_of_le hρ hle]
@@ -200,8 +218,8 @@ theorem mem_interior_image (hB : BrouwerFixedPoint.Statement) {f : (Fin n → �
     have h1 := (hPΦ.sub (continuousOn_const (c := v))).sub (continuousOn_const (c := a))
     exact continuousOn_id.sub h1
 
-  obtain ⟨x, hxK, hfix⟩ := brouwer_closedBall hB (a := a) hr
-    (h := fun x => x - (P (radialPush c ρ (f x)) - v - a)) hH (by
+  obtain ⟨x, hxK, hfix⟩ :=
+    brouwer_closedBall hB (a := a) hr (h := fun x => x - (P (radialPush c ρ (f x)) - v - a)) hH (by
       intro x hx
       have hGx : G (f x) = x := hGf x hx
       rw [mem_closedBall, dist_eq_norm]
@@ -210,24 +228,32 @@ theorem mem_interior_image (hB : BrouwerFixedPoint.Statement) {f : (Fin n → �
       · rw [radialPush_of_le hρ hle]
         have h1 := hQG (f x) (Or.inl ⟨⟨x, hx, rfl⟩, hle⟩)
         rw [hGx] at h1
-        calc ‖x - (P (f x) - v - a) - a‖ = ‖-(P (f x) - v - x)‖ := by congr 1; abel
+        calc
+          ‖x - (P (f x) - v - a) - a‖
+            = ‖-(P (f x) - v - x)‖ := by congr 1; abel
           _ = ‖P (f x) - v - x‖ := norm_neg _
           _ ≤ r := by linarith
       · have hzS := radialPush_mem_sphere (not_le.1 hle) (hfc x hx)
         have hxa : dist x a < r / 4 := by
           rw [← hGx]
           apply hGnear
-          calc dist (f x) (f a) ≤ dist (f x) c + dist c (f a) := dist_triangle _ _ _
+          calc
+            dist (f x) (f a)
+              ≤ dist (f x) c + dist c (f a) := dist_triangle _ _ _
             _ ≤ 2 * ρ := by linarith [not_le.1 hle]
         generalize radialPush c ρ (f x) = z at hzS ⊢
         have h1 := hQG z (Or.inr hzS)
         have hza : dist (G z) a < r / 4 := by
           apply hGnear
           have hzc : dist z c = ρ := mem_sphere.mp hzS
-          calc dist z (f a) ≤ dist z c + dist c (f a) := dist_triangle _ _ _
+          calc
+            dist z (f a)
+              ≤ dist z c + dist c (f a) := dist_triangle _ _ _
             _ ≤ 2 * ρ := by linarith
         rw [dist_eq_norm] at hxa hza
-        calc ‖x - (P z - v - a) - a‖ = ‖(x - a) - (P z - v - G z) - (G z - a)‖ := by congr 1; abel
+        calc
+          ‖x - (P z - v - a) - a‖
+            = ‖(x - a) - (P z - v - G z) - (G z - a)‖ := by congr 1; abel
           _ ≤ ‖(x - a) - (P z - v - G z)‖ + ‖G z - a‖ := norm_sub_le _ _
           _ ≤ ‖x - a‖ + ‖P z - v - G z‖ + ‖G z - a‖ := by
             gcongr
@@ -242,8 +268,7 @@ theorem proof (hB : BrouwerFixedPoint.Statement) : InvarianceOfDomain.Statement 
   obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp hU x hx
   have hsub : closedBall x (r / 2) ⊆ U := (closedBall_subset_ball (half_lt_self hr)).trans hball
   have h := mem_interior_image hB (half_pos hr) (hc.mono hsub) (hi.mono hsub)
-  exact Filter.mem_of_superset (mem_interior_iff_mem_nhds.mp h)
-    (Set.image_mono hsub)
+  exact Filter.mem_of_superset (mem_interior_iff_mem_nhds.mp h) (Set.image_mono hsub)
 
 end InvarianceOfDomain
 

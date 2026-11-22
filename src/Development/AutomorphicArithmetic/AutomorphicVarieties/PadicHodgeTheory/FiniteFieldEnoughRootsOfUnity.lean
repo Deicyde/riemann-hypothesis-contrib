@@ -5,10 +5,11 @@ public import Mathlib.GroupTheory.FiniteAbelian.Duality
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
 
-private theorem UpperTheory.V.Loc.finite_field_enough_roots_of_unity (k : Type) [Field k] [Finite k] :
-    HasEnoughRootsOfUnity k (Nat.card kˣ) := by
+private theorem UpperTheory.V.Loc.finite_field_enough_roots_of_unity (k : Type) [Field k] [Finite k]
+    : HasEnoughRootsOfUnity k (Nat.card kˣ) := by
   haveI : NeZero (Nat.card kˣ) := ⟨Nat.card_pos.ne'⟩
   refine HasEnoughRootsOfUnity.of_card_le ?_
   have htop : rootsOfUnity (Nat.card kˣ) k = ⊤ := by
@@ -17,21 +18,22 @@ private theorem UpperTheory.V.Loc.finite_field_enough_roots_of_unity (k : Type) 
     exact pow_card_eq_one'
   rw [htop, Subgroup.card_top]
 
-private theorem UpperTheory.V.Loc.mem_closure_of_kernel_containment {G k J : Type} [Group G] [Field k] [Finite k] [Finite J]
-    (χ : J → G →* kˣ) (ω : G →* kˣ) (h : ∀ g, (∀ j, χ j g = 1) → ω g = 1) :
-    ω ∈ Subgroup.closure (Set.range χ) := by
+private theorem UpperTheory.V.Loc.mem_closure_of_kernel_containment
+    {G k J : Type} [Group G] [Field k] [Finite k] [Finite J]
+    (χ : J → G →* kˣ) (ω : G →* kˣ) (h : ∀ g, (∀ j, χ j g = 1) → ω g = 1)
+    : ω ∈ Subgroup.closure (Set.range χ) := by
   classical
   let Φ : G →* (J → kˣ) := Pi.monoidHom χ
   let A := Φ.range
   have hker : Φ.ker ≤ ω.ker := fun g hg => by
     rw [MonoidHom.mem_ker] at hg ⊢
     exact h g fun j => congrFun hg j
-  let ψ : A →* kˣ := (QuotientGroup.lift Φ.ker ω hker).comp
-    (QuotientGroup.quotientKerEquivRange Φ).symm.toMonoidHom
+  let ψ : A →* kˣ :=
+    (QuotientGroup.lift Φ.ker ω hker).comp (QuotientGroup.quotientKerEquivRange Φ).symm.toMonoidHom
   have hψ : ∀ g, ψ (Φ.rangeRestrict g) = ω g := by
     intro g
-    have hs : (QuotientGroup.quotientKerEquivRange Φ).symm (Φ.rangeRestrict g)
-        = (g : G ⧸ Φ.ker) := by
+    have hs
+        : (QuotientGroup.quotientKerEquivRange Φ).symm (Φ.rangeRestrict g) = (g : G ⧸ Φ.ker) := by
       rw [MulEquiv.symm_apply_eq]
       rfl
     show QuotientGroup.lift Φ.ker ω hker
@@ -68,8 +70,9 @@ private theorem UpperTheory.V.Loc.mem_closure_of_kernel_containment {G k J : Typ
       rw [hη _ (Subgroup.subset_closure ⟨j, rfl⟩)] at hj
       exact hj
     rw [← CommGroup.apply_monoidHomMonoidHomEquiv k ψ η, ha, map_one]
-  have key : ∀ φ ∈ Subgroup.closure (Set.range e),
-      φ.comp Φ.rangeRestrict ∈ Subgroup.closure (Set.range χ) := by
+  have key
+      : ∀ φ ∈ Subgroup.closure (Set.range e),
+        φ.comp Φ.rangeRestrict ∈ Subgroup.closure (Set.range χ) := by
     intro φ hφ
     induction hφ using Subgroup.closure_induction with
     | mem x hx =>
@@ -88,8 +91,10 @@ private theorem UpperTheory.V.Loc.mem_closure_of_kernel_containment {G k J : Typ
   rw [hω]
   exact key ψ hS
 
-theorem UpperTheory.V.Loc.v0e :
-    ∀ {G k ι : Type} [Group G] [Field k] [Finite k] [Finite ι] (κ : ι → G →* kˣ) (ω : G →* kˣ), (∃ g, (∀ i j, κ i g = κ j g) ∧ ω g ≠ 1) ↔ ω ∉ Subgroup.closure (Set.range fun q : ι × ι => κ q.1 / κ q.2) := by
+theorem UpperTheory.V.Loc.v0e
+    : ∀ {G k ι : Type} [Group G] [Field k] [Finite k] [Finite ι] (κ : ι → G →* kˣ) (ω : G →* kˣ),
+      (∃ g, (∀ i j, κ i g = κ j g) ∧ ω g ≠ 1)
+        ↔ ω ∉ Subgroup.closure (Set.range fun q : ι × ι => κ q.1 / κ q.2) := by
   intro G k ι _ _ _ _ κ ω
   constructor
   · rintro ⟨g, hg, hω⟩ hmem

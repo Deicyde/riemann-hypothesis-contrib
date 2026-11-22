@@ -10,15 +10,20 @@ open Formalism.REAL
 
 namespace GlobalTheory
 
-theorem capelli_comatrix_last_row (A : Type) [Ring A] [Algebra ℂ A] (n : ℕ)
-    (E : Fin (n + 1) → Fin (n + 1) → A) (hE : GlRel E) (u : ℂ) (c : Fin (n + 1)) :
-    ∑ l : Fin (n + 1), (((-1 : ℤ) ^ (n + (l : ℕ)) : ℤ) : A) *
-        (qminor E Fin.castSucc (Fin.succAbove l) (u - 1) * Tm E u c l) =
-      if c = Fin.last n then qdet E u else 0 := by
-  have h := Formalism.FourierDecayAlt.P.expansion_last_line A (n + 1) n E hE
-    (Fin.snoc (α := fun _ => Fin (n + 1)) Fin.castSucc c) id u
-  have h1 : (Fin.snoc (α := fun _ => Fin (n + 1)) Fin.castSucc c : Fin (n + 1) → Fin (n + 1)) ∘
-      Fin.castSucc = Fin.castSucc := by
+theorem capelli_comatrix_last_row
+    (A : Type) [Ring A] [Algebra ℂ A]
+    (n : ℕ) (E : Fin (n + 1) → Fin (n + 1) → A) (hE : GlRel E)
+    (u : ℂ) (c : Fin (n + 1))
+    : ∑ l : Fin (n + 1), (((-1 : ℤ) ^ (n + (l : ℕ)) : ℤ) : A) *
+          (qminor E Fin.castSucc (Fin.succAbove l) (u - 1) * Tm E u c l)
+      = if c = Fin.last n then qdet E u else 0 := by
+  have h :=
+    Formalism.FourierDecayAlt.P.expansion_last_line A (n + 1) n E hE
+      (Fin.snoc (α := fun _ => Fin (n + 1)) Fin.castSucc c) id u
+  have h1
+      : (Fin.snoc (α := fun _ => Fin (n + 1)) Fin.castSucc c : Fin (n + 1) → Fin (n + 1))
+          ∘ Fin.castSucc
+        = Fin.castSucc := by
     funext k
     simp
   rw [h1, Fin.snoc_last] at h

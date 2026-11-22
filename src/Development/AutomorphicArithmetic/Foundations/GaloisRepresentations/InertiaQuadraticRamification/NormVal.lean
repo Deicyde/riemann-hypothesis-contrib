@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normVal :
-    NormVal := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normVal : NormVal := by
   intro Ω _ _ _ U hU q hq
   classical
   set K : IntermediateField ℚ Ω := IntermediateField.fixedField U with hK
@@ -45,11 +45,11 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.normVal :
     exact zero_ne_one hN
   have hqQ : (q : ℚ) ≠ 0 := by exact_mod_cast hq0
   have hv := congrArg (padicValRat q.minFac) hN
-  rw [padicValRat.mul (pow_ne_zero _ hNw) (pow_ne_zero _ (pow_ne_zero _ hqQ)),
-    padicValRat.pow, padicValRat.pow, padicValRat.pow, padicValRat.one,
-    padicValRat.of_nat] at hv
+  rw [padicValRat.mul (pow_ne_zero _ hNw) (pow_ne_zero _ (pow_ne_zero _ hqQ)), padicValRat.pow,
+      padicValRat.pow, padicValRat.pow, padicValRat.one, padicValRat.of_nat]
+    at hv
   have hd : ((k + 1 : ℕ) : ℤ) ∣ ((c * (Module.finrank ℚ K * padicValNat q.minFac q) : ℕ) : ℤ) := by
-    refine ⟨-padicValRat q.minFac (Algebra.norm ℚ w), ?_⟩
+    refine ⟨- padicValRat q.minFac (Algebra.norm ℚ w), ?_⟩
     rw [Nat.padicValNat_def, Nat.cast_mul, Nat.cast_mul]
     linear_combination hv
   exact Int.natCast_dvd_natCast.1 hd

@@ -10,9 +10,10 @@ namespace LateralTheory.E.FiniteChartSurjPf
 
 open LateralTheory.E.LSurjChartPf
 
-theorem ker_le {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] [Algebra.FormallyUnramified A A']
-    (I : Ideal A) (φ : A' →ₐ[A] A ⧸ I) :
-    RingHom.ker φ ≤ RingHom.ker φ ^ 2 ⊔ I.map (algebraMap A A') := by
+theorem ker_le
+    {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] [Algebra.FormallyUnramified A A']
+    (I : Ideal A) (φ : A' →ₐ[A] A ⧸ I)
+    : RingHom.ker φ ≤ RingHom.ker φ ^ 2 ⊔ I.map (algebraMap A A') := by
   set K := RingHom.ker φ with hKdef
   set N : Ideal A' := K ^ 2 ⊔ I.map (algebraMap A A') with hN
   let Q : Ideal (A' ⧸ N) := K.map (Ideal.Quotient.mk N)
@@ -25,19 +26,20 @@ theorem ker_le {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] [Algebra.
     intro x a h
     rw [RingHom.mem_ker, map_sub, AlgHom.commutes, h]
     simp [Ideal.Quotient.algebraMap_eq]
-  let g : A ⧸ I →ₐ[A] A' ⧸ N := Ideal.Quotient.liftₐ I (Algebra.ofId A (A' ⧸ N)) (by
-    intro a ha
-    rw [Algebra.ofId_apply, IsScalarTower.algebraMap_apply A A' (A' ⧸ N), Ideal.Quotient.algebraMap_eq,
-      Ideal.Quotient.eq_zero_iff_mem]
-    exact Ideal.mem_sup_right (Ideal.mem_map_of_mem _ ha))
-  have key : (Ideal.Quotient.mkₐ A Q).comp (Ideal.Quotient.mkₐ A N) =
-      (Ideal.Quotient.mkₐ A Q).comp (g.comp φ) := by
+  let g : A ⧸ I →ₐ[A] A' ⧸ N :=
+    Ideal.Quotient.liftₐ I (Algebra.ofId A (A' ⧸ N)) (by
+      intro a ha
+      rw [Algebra.ofId_apply, IsScalarTower.algebraMap_apply A A' (A' ⧸ N),
+        Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem]
+      exact Ideal.mem_sup_right (Ideal.mem_map_of_mem _ ha))
+  have key
+      : (Ideal.Quotient.mkₐ A Q).comp (Ideal.Quotient.mkₐ A N)
+        = (Ideal.Quotient.mkₐ A Q).comp (g.comp φ) := by
     ext x
     obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (I := I) (φ x)
     simp only [AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk]
     rw [← ha]
-    have : g (Ideal.Quotient.mk I a) = Ideal.Quotient.mk N (algebraMap A A' a) := by
-      rfl
+    have : g (Ideal.Quotient.mk I a) = Ideal.Quotient.mk N (algebraMap A A' a) := by rfl
     rw [this, Ideal.Quotient.eq, ← map_sub]
     exact Ideal.mem_map_of_mem _ (hmemK x a ha.symm)
   have := Algebra.FormallyUnramified.comp_injective Q hQ key
@@ -48,24 +50,36 @@ theorem ker_le {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] [Algebra.
   rw [hk', map_zero] at h1
   exact Ideal.Quotient.eq_zero_iff_mem.mp h1
 
-theorem P_le {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] (I : Ideal A) (φ : A' →ₐ[A] A ⧸ I)
+theorem P_le
+    {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A']
+    (I : Ideal A) (φ : A' →ₐ[A] A ⧸ I)
     (S : Subalgebra A A') (r : S) (hr : IsUnit (φ r.1)) (hb : ∀ x : A', ∃ m : ℕ, r.1 ^ m * x ∈ S)
-    (hK : RingHom.ker φ ≤ RingHom.ker φ ^ 2 ⊔ I.map (algebraMap A A')) :
-    RingHom.ker (φ.comp S.val) ≤ RingHom.ker (φ.comp S.val) ^ 2 ⊔ I.map (algebraMap A S) := by
+    (hK : RingHom.ker φ ≤ RingHom.ker φ ^ 2 ⊔ I.map (algebraMap A A'))
+    : RingHom.ker (φ.comp S.val) ≤ RingHom.ker (φ.comp S.val) ^ 2 ⊔ I.map (algebraMap A S) := by
   set P := RingHom.ker (φ.comp S.val) with hPdef
   set L := P ^ 2 ⊔ I.map (algebraMap A S) with hLdef
-  let W : Ideal A' :=
-    { carrier := {y | ∃ m : ℕ, ∃ s ∈ L, (s : A') = r.1 ^ m * y}
-      add_mem' := by
-        rintro y1 y2 ⟨m1, s1, hs1, e1⟩ ⟨m2, s2, hs2, e2⟩
-        refine ⟨m1 + m2, r ^ m2 * s1 + r ^ m1 * s2, L.add_mem (L.mul_mem_left _ hs1) (L.mul_mem_left _ hs2), ?_⟩
-        push_cast; rw [e1, e2]; ring
-      zero_mem' := ⟨0, 0, L.zero_mem, by simp⟩
-      smul_mem' := by
-        rintro c y ⟨m, s, hs, e⟩
-        obtain ⟨m', hm'⟩ := hb c
-        refine ⟨m + m', ⟨_, hm'⟩ * s, L.mul_mem_left _ hs, ?_⟩
-        push_cast; rw [e, smul_eq_mul]; ring }
+  let W : Ideal A' := {
+    carrier := {y | ∃ m : ℕ, ∃ s ∈ L, (s : A') = r.1 ^ m * y}
+    add_mem' := by
+      rintro y1 y2 ⟨m1, s1, hs1, e1⟩ ⟨m2, s2, hs2, e2⟩
+      refine ⟨
+        m1 + m2,
+        r ^ m2 * s1 + r ^ m1 * s2,
+        L.add_mem (L.mul_mem_left _ hs1) (L.mul_mem_left _ hs2),
+        ?_
+      ⟩
+      push_cast
+      rw [e1, e2]
+      ring
+    zero_mem' := ⟨0, 0, L.zero_mem, by simp⟩
+    smul_mem' := by
+      rintro c y ⟨m, s, hs, e⟩
+      obtain ⟨m', hm'⟩ := hb c
+      refine ⟨m + m', ⟨_, hm'⟩ * s, L.mul_mem_left _ hs, ?_⟩
+      push_cast
+      rw [e, smul_eq_mul]
+      ring
+  }
   have hmemP : ∀ (k : A') (m : ℕ) (h : r.1 ^ m * k ∈ S), k ∈ RingHom.ker φ → (⟨_, h⟩ : S) ∈ P := by
     intro k m h hk
     rw [RingHom.mem_ker] at hk ⊢
@@ -91,28 +105,36 @@ theorem P_le {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] (I : Ideal 
     exact ⟨b, hv⟩
   have hsx : s = r ^ m * x := Subtype.ext (by push_cast; exact e)
   have h1 : 1 - algebraMap A S b * r ^ m ∈ P := by
-    rw [RingHom.mem_ker, map_sub, map_one, map_mul, map_pow, AlgHom.commutes, Ideal.Quotient.algebraMap_eq]
+    rw [RingHom.mem_ker, map_sub, map_one, map_mul, map_pow, AlgHom.commutes,
+      Ideal.Quotient.algebraMap_eq]
     change 1 - Ideal.Quotient.mk I b * φ r.1 ^ m = 0
     rw [hb', sub_self]
   have hx' : x = algebraMap A S b * s + (1 - algebraMap A S b * r ^ m) * x := by rw [hsx]; ring
   rw [hx']
   refine L.add_mem (L.mul_mem_left _ hs) (Ideal.mem_sup_left ?_)
-  rw [pow_two]; exact Ideal.mul_mem_mul h1 hx
+  rw [pow_two]
+  exact Ideal.mul_mem_mul h1 hx
 
-theorem ker_le_span_sub_sup_map {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] (I : Ideal A) (φ : A' →ₐ[A] A ⧸ I)
-    (S : Subalgebra A A') {n : ℕ} (t : Fin n → S) (ht : Submodule.span A (Set.range t) = ⊤) (a : Fin n → A)
-    (ha : ∀ i, Ideal.Quotient.mk I (a i) = φ (t i).1) :
-    RingHom.ker (φ.comp S.val) ≤ Ideal.span (Set.range fun i => t i - algebraMap A S (a i)) ⊔
-      I.map (algebraMap A S) := by
+theorem ker_le_span_sub_sup_map
+    {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A']
+    (I : Ideal A) (φ : A' →ₐ[A] A ⧸ I)
+    (S : Subalgebra A A')
+    {n : ℕ} (t : Fin n → S) (ht : Submodule.span A (Set.range t) = ⊤) (a : Fin n → A)
+    (ha : ∀ i, Ideal.Quotient.mk I (a i) = φ (t i).1)
+    : RingHom.ker (φ.comp S.val)
+      ≤ Ideal.span (Set.range fun i => t i - algebraMap A S (a i)) ⊔ I.map (algebraMap A S) := by
   intro x hx
   have hxs : x ∈ Submodule.span A (Set.range t) := by rw [ht]; trivial
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun A).mp hxs
-  have hsplit : x = ∑ i, algebraMap A S (c i) * (t i - algebraMap A S (a i)) +
-      algebraMap A S (∑ i, c i * a i) := by
+  have hsplit
+      : x
+        = ∑ i, algebraMap A S (c i) * (t i - algebraMap A S (a i))
+          + algebraMap A S (∑ i, c i * a i) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hc, map_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [Algebra.smul_def, map_mul]; ring
+    rw [Algebra.smul_def, map_mul]
+    ring
   have hI : ∑ i, c i * a i ∈ I := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
@@ -127,8 +149,11 @@ theorem ker_le_span_sub_sup_map {A A' : Type} [CommRing A] [CommRing A'] [Algebr
   refine Ideal.add_mem _ (Ideal.mem_sup_left ?_) (Ideal.mem_sup_right (Ideal.mem_map_of_mem _ hI))
   exact Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
 
-theorem isUnit_of_mk {A : Type} [CommRing A] {I : Ideal A} (hI : I ≤ Ideal.jacobson ⊥) (a : A)
-    (h : IsUnit (Ideal.Quotient.mk I a)) : IsUnit a := by
+theorem isUnit_of_mk
+    {A : Type} [CommRing A]
+    {I : Ideal A} (hI : I ≤ Ideal.jacobson ⊥)
+    (a : A) (h : IsUnit (Ideal.Quotient.mk I a))
+    : IsUnit a := by
   obtain ⟨v, hv⟩ := h.exists_right_inv
   obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective v
   have hm : a * b - 1 ∈ I := by
@@ -137,36 +162,48 @@ theorem isUnit_of_mk {A : Type} [CommRing A] {I : Ideal A} (hI : I ≤ Ideal.jac
   rw [mul_one, sub_add_cancel] at this
   exact isUnit_of_mul_isUnit_left this
 
-theorem exists_idem {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] (I : Ideal A)
-    (hid : LateralTheory.E.LChartPf.IdemLiftInt A I) (φ : A' →ₐ[A] A ⧸ I) (S : Subalgebra A A') [Module.Finite A S]
-    (hP : RingHom.ker (φ.comp S.val) ≤ RingHom.ker (φ.comp S.val) ^ 2 ⊔ I.map (algebraMap A S)) :
-    ∃ e : S, IsIdempotentElem e ∧ φ e.1 = 1 ∧
-      ∀ p ∈ RingHom.ker (φ.comp S.val), e * p ∈ I.map (algebraMap A S) := by
+theorem exists_idem
+    {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A']
+    (I : Ideal A) (hid : LateralTheory.E.LChartPf.IdemLiftInt A I) (φ : A' →ₐ[A] A ⧸ I)
+    (S : Subalgebra A A') [Module.Finite A S]
+    (hP : RingHom.ker (φ.comp S.val) ≤ RingHom.ker (φ.comp S.val) ^ 2 ⊔ I.map (algebraMap A S))
+    : ∃ e : S,
+      IsIdempotentElem e ∧ φ e.1 = 1
+        ∧ ∀ p ∈ RingHom.ker (φ.comp S.val), e * p ∈ I.map (algebraMap A S) := by
   obtain ⟨n, t, ht⟩ := Module.Finite.exists_fin (R := A) (M := S)
   choose a ha using fun i => Ideal.Quotient.mk_surjective (I := I) (φ (t i).1)
   have hPfg := ker_le_span_sub_sup_map I φ S t ht a ha
   have hISP : I.map (algebraMap A S) ≤ RingHom.ker (φ.comp S.val) := by
-    rw [Ideal.map_le_iff_le_comap]; intro x hx
+    rw [Ideal.map_le_iff_le_comap]
+    intro x hx
     rw [Ideal.mem_comap, RingHom.mem_ker, AlgHom.commutes, Ideal.Quotient.algebraMap_eq,
-      Ideal.Quotient.eq_zero_iff_mem]; exact hx
+      Ideal.Quotient.eq_zero_iff_mem]
+    exact hx
   let IS := I.map (algebraMap A S)
   let J : Ideal (S ⧸ IS) := (RingHom.ker (φ.comp S.val)).map (Ideal.Quotient.mk IS)
-  have hJeq : J = Ideal.span (Set.range fun i => Ideal.Quotient.mk IS (t i - algebraMap A S (a i))) := by
+  have hJeq
+      : J = Ideal.span (Set.range fun i => Ideal.Quotient.mk IS (t i - algebraMap A S (a i))) := by
     apply le_antisymm
     · rw [Ideal.map_le_iff_le_comap]
       refine le_trans hPfg (sup_le ?_ ?_)
-      · rw [Ideal.span_le]; rintro _ ⟨i, rfl⟩
+      · rw [Ideal.span_le]
+        rintro _ ⟨i, rfl⟩
         exact Ideal.mem_comap.mpr (Ideal.subset_span ⟨i, rfl⟩)
       · intro x hx
-        rw [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.mpr hx]; exact Ideal.zero_mem _
-    · rw [Ideal.span_le]; rintro _ ⟨i, rfl⟩
+        rw [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.mpr hx]
+        exact Ideal.zero_mem _
+    · rw [Ideal.span_le]
+      rintro _ ⟨i, rfl⟩
       refine Ideal.mem_map_of_mem _ ?_
-      rw [RingHom.mem_ker, map_sub, AlgHom.commutes, Ideal.Quotient.algebraMap_eq, ha]; exact sub_self _
+      rw [RingHom.mem_ker, map_sub, AlgHom.commutes, Ideal.Quotient.algebraMap_eq, ha]
+      exact sub_self _
   have hJfg : J.FG := by rw [hJeq]; exact Submodule.fg_span (Set.finite_range _)
   have hJid : IsIdempotentElem J := by
     apply le_antisymm Ideal.mul_le_left
-    calc J ≤ (RingHom.ker (φ.comp S.val) ^ 2 ⊔ IS).map (Ideal.Quotient.mk IS) := Ideal.map_mono hP
-      _ = J * J := by rw [Ideal.map_sup, Ideal.map_pow, Ideal.map_quotient_self, sup_bot_eq, pow_two]
+    calc
+      J ≤ (RingHom.ker (φ.comp S.val) ^ 2 ⊔ IS).map (Ideal.Quotient.mk IS) := Ideal.map_mono hP
+      _ = J * J := by
+        rw [Ideal.map_sup, Ideal.map_pow, Ideal.map_quotient_self, sup_bot_eq, pow_two]
   obtain ⟨ε, hε, hJε⟩ := (Ideal.isIdempotentElem_iff_of_fg J hJfg).mp hJid
   obtain ⟨e, he, hee⟩ := hid S (1 - ε) hε.one_sub
   have hee' : Ideal.Quotient.mk IS e = 1 - ε := hee
@@ -189,10 +226,13 @@ theorem exists_idem {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] (I :
     have h2 : ε * ε = ε := hε
     linear_combination (-c) * h2
 
-theorem nak {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] (I : Ideal A) (hI : I ≤ Ideal.jacobson ⊥)
-    (φ : A' →ₐ[A] A ⧸ I) (S : Subalgebra A A') [Module.Finite A S] (e : S) (he : IsIdempotentElem e)
-    (heP : ∀ p ∈ RingHom.ker (φ.comp S.val), e * p ∈ I.map (algebraMap A S)) :
-    ∀ s : S, ∃ a : A, s * e = algebraMap A S a * e := by
+theorem nak
+    {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A']
+    (I : Ideal A) (hI : I ≤ Ideal.jacobson ⊥) (φ : A' →ₐ[A] A ⧸ I)
+    (S : Subalgebra A A') [Module.Finite A S]
+    (e : S) (he : IsIdempotentElem e)
+    (heP : ∀ p ∈ RingHom.ker (φ.comp S.val), e * p ∈ I.map (algebraMap A S))
+    : ∀ s : S, ∃ a : A, s * e = algebraMap A S a * e := by
   let f : S →ₗ[A] S := LinearMap.mulRight A e
   have hMfg : (LinearMap.range f).FG := by
     rw [LinearMap.range_eq_map]; exact (Module.Finite.fg_top).map f
@@ -200,7 +240,8 @@ theorem nak {A A' : Type} [CommRing A] [CommRing A'] [Algebra A A'] (I : Ideal A
     rintro _ ⟨s, rfl⟩
     obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective (I := I) (φ s.1)
     have hp : s - algebraMap A S b ∈ RingHom.ker (φ.comp S.val) := by
-      rw [RingHom.mem_ker, map_sub, AlgHom.commutes, Ideal.Quotient.algebraMap_eq, hb]; exact sub_self _
+      rw [RingHom.mem_ker, map_sub, AlgHom.commutes, Ideal.Quotient.algebraMap_eq, hb]
+      exact sub_self _
     have h1 : e * (s - algebraMap A S b) ∈ I • (⊤ : Submodule A S) := by
       rw [Ideal.smul_top_eq_map]; exact heP _ hp
     have h2 : f (e * (s - algebraMap A S b)) ∈ I • LinearMap.range f := by
@@ -224,8 +265,9 @@ theorem FiniteChartSurj_of : LateralTheory.E.LSurjChartPf.FiniteChartSurj := by
   obtain ⟨a₀, ha₀⟩ := hN r
   have hφr : φ r.1 = Ideal.Quotient.mk I a₀ := by
     have h := congrArg (fun x : S => φ x.1) ha₀
-    simp only [Subalgebra.coe_mul, map_mul, he1, mul_one, Subalgebra.coe_algebraMap, AlgHom.commutes,
-      Ideal.Quotient.algebraMap_eq] at h
+    simp only [Subalgebra.coe_mul, map_mul, he1, mul_one, Subalgebra.coe_algebraMap,
+        AlgHom.commutes, Ideal.Quotient.algebraMap_eq]
+      at h
     exact h
   have hu₀ : IsUnit a₀ := isUnit_of_mk hI a₀ (hφr ▸ hr)
   refine ⟨e.1 * r.1, by rw [map_mul, he1, one_mul]; exact hr, ?_⟩
@@ -236,43 +278,57 @@ theorem FiniteChartSurj_of : LateralTheory.E.LSurjChartPf.FiniteChartSurj := by
       rw [map_mul] at hg; exact isUnit_of_mul_isUnit_left hg
     have hi : IsIdempotentElem (algebraMap A' (Localization.Away (e.1 * r.1)) e.1) := by
       show _ * _ = _
-      rw [← map_mul]; exact congrArg _ (congrArg Subtype.val he)
+      rw [← map_mul]
+      exact congrArg _ (congrArg Subtype.val he)
     exact (IsIdempotentElem.iff_eq_one_of_isUnit h).mp hi
-  have hS : ∀ (s : S) (a : A), s * e = algebraMap A S a * e →
-      algebraMap A' (Localization.Away (e.1 * r.1)) s.1 = algebraMap A (Localization.Away (e.1 * r.1)) a := by
+  have hS
+      : ∀ (s : S) (a : A),
+        s * e = algebraMap A S a * e
+          → algebraMap A' (Localization.Away (e.1 * r.1)) s.1
+            = algebraMap A (Localization.Away (e.1 * r.1)) a := by
     intro s a ha
     have h := congrArg (fun x : S => algebraMap A' (Localization.Away (e.1 * r.1)) x.1) ha
     simp only [Subalgebra.coe_mul, map_mul, hue, mul_one, Subalgebra.coe_algebraMap] at h
     rw [h, ← IsScalarTower.algebraMap_apply]
-  have hur : algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) =
-      algebraMap A (Localization.Away (e.1 * r.1)) a₀ := by
+  have hur
+      : algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1)
+        = algebraMap A (Localization.Away (e.1 * r.1)) a₀ := by
     rw [map_mul, hue, one_mul]; exact hS r a₀ ha₀
   obtain ⟨b₀, hb₀⟩ := hu₀.exists_left_inv
-  have hw : algebraMap A (Localization.Away (e.1 * r.1)) b₀ *
-      algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) = 1 := by
+  have hw
+      : algebraMap A (Localization.Away (e.1 * r.1)) b₀
+          * algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1)
+        = 1 := by
     rw [hur, ← map_mul, hb₀, map_one]
   intro z
   obtain ⟨⟨x, _, k, rfl⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers (e.1 * r.1)) z
   obtain ⟨m, hm⟩ := hb x
   obtain ⟨c, hc⟩ := hN ⟨_, hm⟩
-  have hcx : algebraMap A' (Localization.Away (e.1 * r.1)) (r.1 ^ m * x) =
-      algebraMap A (Localization.Away (e.1 * r.1)) c := hS _ c hc
-  have hrr : algebraMap A' (Localization.Away (e.1 * r.1)) r.1 =
-      algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) := by rw [map_mul, hue, one_mul]
+  have hcx
+      : algebraMap A' (Localization.Away (e.1 * r.1)) (r.1 ^ m * x)
+        = algebraMap A (Localization.Away (e.1 * r.1)) c :=
+    hS _ c hc
+  have hrr
+      : algebraMap A' (Localization.Away (e.1 * r.1)) r.1
+        = algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) := by
+    rw [map_mul, hue, one_mul]
   rw [map_mul, map_pow, hrr] at hcx
   refine ⟨c * b₀ ^ (m + k), ?_⟩
   rw [eq_comm, IsLocalization.mk'_eq_iff_eq_mul]
   show _ = _ * algebraMap A' (Localization.Away (e.1 * r.1)) ((e.1 * r.1) ^ k)
   rw [map_mul, map_pow, map_pow (algebraMap A' _)]
-  calc algebraMap A' (Localization.Away (e.1 * r.1)) x
-      = algebraMap A' (Localization.Away (e.1 * r.1)) x *
-        (algebraMap A (Localization.Away (e.1 * r.1)) b₀ *
-          algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1)) ^ (m + k) := by
-        rw [hw, one_pow, mul_one]
-    _ = (algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) ^ m *
-          algebraMap A' (Localization.Away (e.1 * r.1)) x) *
-        algebraMap A (Localization.Away (e.1 * r.1)) b₀ ^ (m + k) *
-          algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) ^ k := by ring
+  calc
+    algebraMap A' (Localization.Away (e.1 * r.1)) x
+        = algebraMap A' (Localization.Away (e.1 * r.1)) x
+          * (algebraMap A (Localization.Away (e.1 * r.1)) b₀
+              * algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1))
+            ^ (m + k) := by
+      rw [hw, one_pow, mul_one]
+    _ = (algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) ^ m
+          * algebraMap A' (Localization.Away (e.1 * r.1)) x)
+        * algebraMap A (Localization.Away (e.1 * r.1)) b₀ ^ (m + k)
+        * algebraMap A' (Localization.Away (e.1 * r.1)) (e.1 * r.1) ^ k := by
+      ring
     _ = _ := by rw [hcx]
 
 end LateralTheory.E.FiniteChartSurjPf

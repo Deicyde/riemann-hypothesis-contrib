@@ -5,14 +5,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.countEx_of :
-    CountEx := by
+theorem UpperTheory.Gal.TranscendenceTraces.countEx_of : CountEx := by
   classical
   intro T Z S p π ι σ m hsym
-  refine ⟨fun Ω _ _ z => if h : ∃ x : gp Ω ⟶ T, z ≫ p = x ≫ π then
-      ∑ᶠ (j : ι) (_ : j ∈ {j | h.choose ≫ σ j = z}), m j else 0, ?_⟩
+  refine ⟨
+    fun Ω _ _ z =>
+      if h : ∃ x : gp Ω ⟶ T, z ≫ p = x ≫ π then
+        ∑ᶠ (j : ι) (_ : j ∈ {j | h.choose ≫ σ j = z}), m j
+      else
+        0,
+    ?_
+  ⟩
   intro Ω _ _ x z hz
   have hex : ∃ x : gp Ω ⟶ T, z ≫ p = x ≫ π := ⟨x, hz⟩
   simp only [dif_pos hex]

@@ -14,8 +14,8 @@ open scoped Pointwise
 
 variable {N : ℕ} [NeZero N] {K : Type*} [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
 
-private theorem bv_mem (E : IntermediateField ℚ K) (ψ : DirichletCharacter ℂ N) :
-    ψ ∈ fieldChars N E ↔ ∀ σ ∈ E.fixingSubgroup, ψ (galEquivZMod N K σ) = 1 := by
+private theorem bv_mem (E : IntermediateField ℚ K) (ψ : DirichletCharacter ℂ N)
+    : ψ ∈ fieldChars N E ↔ ∀ σ ∈ E.fixingSubgroup, ψ (galEquivZMod N K σ) = 1 := by
   rw [fieldChars, mem_annihilator_iff]
   constructor
   · intro h σ hσ
@@ -23,13 +23,13 @@ private theorem bv_mem (E : IntermediateField ℚ K) (ψ : DirichletCharacter �
   · rintro h _ ⟨σ, hσ, rfl⟩
     exact h σ hσ
 
-private theorem bv_eq [IsAbelianGalois ℚ K] (E : IntermediateField ℚ K) :
-    fieldChars N E = intermediateFieldEquivSubgroupChar N K ℂ E := by
+private theorem bv_eq [IsAbelianGalois ℚ K] (E : IntermediateField ℚ K)
+    : fieldChars N E = intermediateFieldEquivSubgroupChar N K ℂ E := by
   ext ψ
   rw [bv_mem, mem_intermediateFieldEquivSubgroupChar_iff]
 
-private theorem bv_conj (σ : Gal(K/ℚ)) (hσ : galEquivZMod N K σ = -1) (φ : K →+* ℂ)
-    (x : K) : φ (σ x) = starRingEnd ℂ (φ x) := by
+private theorem bv_conj (σ : Gal(K/ℚ)) (hσ : galEquivZMod N K σ = -1) (φ : K →+* ℂ) (x : K)
+    : φ (σ x) = starRingEnd ℂ (φ x) := by
   have hζ := IsCyclotomicExtension.zeta_spec N ℚ K
   have key : φ.toRatAlgHom.comp (σ : K →ₐ[ℚ] K) = ((starRingEnd ℂ).comp φ).toRatAlgHom := by
     apply (hζ.powerBasis ℚ).algHom_ext
@@ -44,14 +44,15 @@ private theorem bv_conj (σ : Gal(K/ℚ)) (hσ : galEquivZMod N K σ = -1) (φ :
     simp
   exact DFunLike.congr_fun key x
 
-private theorem bv_real (σ : Gal(K/ℚ)) (hσ : galEquivZMod N K σ = -1) (E : IntermediateField ℚ K)
-    (φ : E →+* ℂ) (x : E) : star (φ x) = φ x ↔ σ x = x := by
+private theorem bv_real
+    (σ : Gal(K/ℚ)) (hσ : galEquivZMod N K σ = -1) (E : IntermediateField ℚ K) (φ : E →+* ℂ) (x : E)
+    : star (φ x) = φ x ↔ σ x = x := by
   have h1 : φ x = ComplexEmbedding.lift K φ (x : K) :=
     (ComplexEmbedding.lift_algebraMap_apply K φ x).symm
   rw [h1, RCLike.star_def, ← bv_conj σ hσ, (ComplexEmbedding.lift K φ).injective.eq_iff]
 
-private theorem bv_complex (E : IntermediateField ℚ K) :
-    IsTotallyComplex E ↔ ∃ ψ ∈ fieldChars N E, ψ.Odd := by
+private theorem bv_complex (E : IntermediateField ℚ K)
+    : IsTotallyComplex E ↔ ∃ ψ ∈ fieldChars N E, ψ.Odd := by
   have h := (card_fieldChars (N := N) E).2
   obtain ⟨σ, hσ⟩ := (galEquivZMod N K).surjective (-1)
   constructor
@@ -71,12 +72,13 @@ private theorem bv_complex (E : IntermediateField ℚ K) :
     ext x
     exact (bv_real σ hσ E _ x).2 ((bv_real σ hσ E _ x).1 (RingHom.congr_fun hw x))
 
-theorem fieldChars_lattice :
-    Function.Bijective (fun E : IntermediateField ℚ K => fieldChars N E) ∧
-      ∀ E E' : IntermediateField ℚ K, (fieldChars N E ≤ fieldChars N E' ↔ E ≤ E') ∧
-        fieldChars N (E ⊔ E') = fieldChars N E ⊔ fieldChars N E' ∧
-        fieldChars N (E ⊓ E') = fieldChars N E ⊓ fieldChars N E' ∧
-        charKer (fieldChars N E) = fieldUnits N E := by
+theorem fieldChars_lattice
+    : Function.Bijective (fun E : IntermediateField ℚ K => fieldChars N E)
+      ∧ ∀ E E' : IntermediateField ℚ K,
+        (fieldChars N E ≤ fieldChars N E' ↔ E ≤ E')
+          ∧ fieldChars N (E ⊔ E') = fieldChars N E ⊔ fieldChars N E'
+          ∧ fieldChars N (E ⊓ E') = fieldChars N E ⊓ fieldChars N E'
+          ∧ charKer (fieldChars N E) = fieldUnits N E := by
   have : IsAbelianGalois ℚ K := IsCyclotomicExtension.isAbelianGalois {N} ℚ K
   refine ⟨?_, fun E E' => ⟨?_, ?_, ?_, (annihilator_charKer ⊥ (fieldUnits N E)).2.1⟩⟩
   · simp only [bv_eq]
@@ -85,15 +87,17 @@ theorem fieldChars_lattice :
   · rw [bv_eq, bv_eq, bv_eq, OrderIso.map_sup]
   · rw [bv_eq, bv_eq, bv_eq, OrderIso.map_inf]
 
-theorem quadratic_discr_iff (E : IntermediateField ℚ K) (d : ℕ) :
-    (Module.finrank ℚ E = 2 ∧ discr E = -(d : ℤ)) ↔
-      ∃ ψ, IsImagQuad ψ d ∧ fieldChars N E = Subgroup.zpowers ψ := by
+theorem quadratic_discr_iff (E : IntermediateField ℚ K) (d : ℕ)
+    : (Module.finrank ℚ E = 2 ∧ discr E = -(d : ℤ))
+      ↔ ∃ ψ, IsImagQuad ψ d ∧ fieldChars N E = Subgroup.zpowers ψ := by
   have hcard := (card_fieldChars (N := N) E).1
   have hdisc := (natAbs_discr_eq_finprod_conductor (N := N) E).1
   have hsign := sign_discr E
   have hcx := bv_complex (N := N) E
-  have hprod : ∀ ψ ∈ fieldChars N E, ψ.Odd → Nat.card (fieldChars N E) = 2 →
-      (discr E).natAbs = ψ.conductor ∧ fieldChars N E = Subgroup.zpowers ψ ∧ ψ ^ 2 = 1 := by
+  have hprod
+      : ∀ ψ ∈ fieldChars N E,
+        ψ.Odd → Nat.card (fieldChars N E) = 2
+          → (discr E).natAbs = ψ.conductor ∧ fieldChars N E = Subgroup.zpowers ψ ∧ ψ ^ 2 = 1 := by
     intro ψ hψ hodd h2
     rw [hdisc]
     generalize fieldChars N E = X at hψ h2
@@ -142,8 +146,7 @@ theorem quadratic_discr_iff (E : IntermediateField ℚ K) (d : ℕ) :
       apply hodd.not_even ψ
       rw [h', DirichletCharacter.Even]
       exact MulChar.one_apply (isUnit_one.neg)
-    have h2 : Nat.card (fieldChars N E) = 2 := by
-      rw [hX, Nat.card_zpowers, orderOf_eq_prime h1 hne]
+    have h2 : Nat.card (fieldChars N E) = 2 := by rw [hX, Nat.card_zpowers, orderOf_eq_prime h1 hne]
     have h0 := nrRealPlaces_eq_zero_iff.2 (hcx.2 ⟨ψ, hψ, hodd⟩)
     have h3 : InfinitePlace.nrComplexPlaces E = 1 := by omega
     rw [h3, pow_one, Int.sign_eq_neg_one_iff_neg] at hsign

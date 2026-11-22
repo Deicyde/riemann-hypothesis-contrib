@@ -14,9 +14,11 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology
 
-theorem FiniteProjectionSheetsDense.proof (hP : IrreducibleGermPrimitiveForm.Statement)
-    (hG : PrimitiveFormSheetedOffDiscriminant.Statement) (hD : FiniteProjectionOffZerosDense.Statement) :
-    FiniteProjectionSheetsDense.Statement := by
+theorem FiniteProjectionSheetsDense.proof
+    (hP : IrreducibleGermPrimitiveForm.Statement)
+    (hG : PrimitiveFormSheetedOffDiscriminant.Statement)
+    (hD : FiniteProjectionOffZerosDense.Statement)
+    : FiniteProjectionSheetsDense.Statement := by
   intro σ _ X w d A hX hI hiso hinj
   obtain ⟨ℓ, N, a, δ, q, ha, hδ, hq, hδ0, hp, hsep, hqz⟩ := hP σ X w d A hX hI hiso hinj
   obtain ⟨M, hM, hsh⟩ := hG σ X w d A hX hI hiso hinj ℓ N a δ q ha hδ hq hδ0 hp hsep hqz

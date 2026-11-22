@@ -17,7 +17,8 @@ namespace ConjugateMinimaInstance
 
 open NumberField Formalism.MainNotions.ModuliIntegralCharts Formalism.BasicNotions
 
-theorem scalar_frame_w_zero_exists (D : D7) : ∃ w₀ : 𝓞 D.host.E, (w₀ : D.host.E) + D.host.conj w₀ = 1 := by
+theorem scalar_frame_w_zero_exists (D : D7)
+    : ∃ w₀ : 𝓞 D.host.E, (w₀ : D.host.E) + D.host.conj w₀ = 1 := by
   have hd : D.host.d % 16 = 7 := D.host.hyp.2.2.2.1
   have hcc : (((D.host.gal D.host.conj).1.2 : ℤˣ) : ℤ) = -1 := by
     have hg : D.host.gal D.host.conj = Formalism.HC.Frame.cc _ := by
@@ -36,8 +37,9 @@ theorem scalar_frame_w_zero_exists (D : D7) : ∃ w₀ : 𝓞 D.host.E, (w₀ : 
   have hint : IsIntegral ℤ ((1 + D.host.sqd) / 2) := by
     refine ⟨Polynomial.X ^ 2 - Polynomial.X + Polynomial.C ((m : ℤ) + 1), by monicity!, ?_⟩
     rw [← Polynomial.aeval_def]
-    simp only [map_add (f := _), map_sub, map_pow, map_one, map_natCast, Polynomial.aeval_X, Polynomial.aeval_C,
-      algebraMap_int_eq, eq_intCast, Int.cast_add, Int.cast_natCast, Int.cast_one]
+    simp only [map_add (f := _), map_sub, map_pow, map_one, map_natCast, Polynomial.aeval_X,
+      Polynomial.aeval_C, algebraMap_int_eq, eq_intCast, Int.cast_add, Int.cast_natCast,
+      Int.cast_one]
     linear_combination (1 / 4 : D.host.E) * hs
   refine ⟨⟨(1 + D.host.sqd) / 2, hint⟩, ?_⟩
   show (1 + D.host.sqd) / 2 + D.host.conj ((1 + D.host.sqd) / 2) = 1
@@ -56,9 +58,12 @@ theorem conj_ne (D : D7) : ∃ z : D.host.E, D.host.conj z ≠ z := by
   revert h3
   decide
 
-theorem phiC_rec_eq {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : WeightAlgebra.PJ D B P j) (hj : j < D.R.m)
-    (la : IsDedekindDomain.HeightOneSpectrum (𝓞 B.KO)) (y : X.Pt la) :
-    X.phiC la y = (eWL B.KO la : ℝ) * (P.loc X.dat (WeightAlgebra.resCh la)).phiCy (X.pt66 la y) := by
+theorem phiC_rec_eq
+    {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+    (X : WeightAlgebra.PJ D B P j) (hj : j < D.R.m)
+    (la : IsDedekindDomain.HeightOneSpectrum (𝓞 B.KO)) (y : X.Pt la)
+    : X.phiC la y
+      = (eWL B.KO la : ℝ) * (P.loc X.dat (WeightAlgebra.resCh la)).phiCy (X.pt66 la y) := by
   simp [WeightAlgebra.PJ.phiC, hj]
 
 end ConjugateMinimaInstance

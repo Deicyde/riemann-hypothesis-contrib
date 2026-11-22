@@ -80,8 +80,10 @@ lemma sum_odd (hd : Even d) (σ : K →+* K) {c : K} (hc : σ^[d] c = c) :
 variable {ι : Type}
 
 def pXY (σ : K →+* K) (om oms : ι → K) (x : Bool × ι) (s : ZMod d) : K :=
-  if s.val % 2 = 0 then (if x.1 = false then σ^[s.val] (oms x.2) else 0)
-  else (if x.1 = true then σ^[s.val] (om x.2) else 0)
+  if s.val % 2 = 0 then
+    (if x.1 = false then σ^[s.val] (oms x.2) else 0)
+  else
+    (if x.1 = true then σ^[s.val] (om x.2) else 0)
 
 lemma dual1 [Fintype ι] [DecidableEq ι] (hd : Even d) (σ : K →+* K) {om oms : ι → K}
     (hfix : ∀ r, σ^[d] (om r) = om r ∧ σ^[d] (oms r) = oms r) (hT : TrDual d σ om oms)
@@ -314,7 +316,6 @@ lemma coeff_one_subst {R : Type} [CommRing R] {α τ : Type} [Fintype α] [Decid
       rw [hsum] at hg
       rw [hg.1 _ (by rw [Finsupp.degree_single]; omega), smul_zero]
 
-
 open Classical in
 def keep {τ : Type} (P : τ → Prop) (f : MvPowerSeries τ K) : MvPowerSeries τ K :=
   rescale (fun x => if P x then (1 : K) else 0) f
@@ -333,7 +334,6 @@ lemma coeff_keep {τ : Type} (P : τ → Prop) (f : MvPowerSeries τ K)
     obtain ⟨x, hx, hPx⟩ := h
     rw [Finsupp.prod, Finset.prod_eq_zero (Finsupp.mem_support_iff.2 hx), zero_mul]
     rw [if_neg hPx, zero_pow hx]
-
 
 open Classical in
 def keepX {τ : Type} (P : τ → Prop) : τ → MvPowerSeries τ K :=
@@ -524,14 +524,13 @@ theorem BMinus1_of' (hE : ExpSpec) : BMinus1 := by
   have hq : l ^ 2 ≠ 0 := pow_ne_zero 2 hl.ne_zero
   obtain ⟨hset, hball⟩ := frobenius_square K l σ hU
   have hfix := hO.2
-  have hLS : ShiftType l σ (fun s : ZMod d => letLog (K := K) l s) :=
-    (letter_shift K l d σ hl).2.1
+  have hLS : ShiftType l σ (fun s : ZMod d => letLog (K := K) l s) := (letter_shift K l d σ hl).2.1
   have hZS := shiftType_zXY hl hd hball hO
   have hid := isIdMod2_letLog (K := K) (d := d) hl
-  obtain ⟨T0, hT00, hT0I, hT0s⟩ := Formalism.FG.funEqHomV K l (l ^ 2) hq (σ.comp σ) hset (ZMod d)
-    (sM K d) (by intro j k; unfold sM; split_ifs <;> simp) (letLog l) hid
-    (funEq_of_shift hq σ hLS) (Bool × ι) (zXY l σ om oms) (cc_zXY hl2 σ om oms)
-    (funEq_of_shift hq σ hZS)
+  obtain ⟨T0, hT00, hT0I, hT0s⟩ :=
+    Formalism.FG.funEqHomV K l (l ^ 2) hq (σ.comp σ) hset (ZMod d) (sM K d)
+      (by intro j k; unfold sM; split_ifs <;> simp) (letLog l) hid (funEq_of_shift hq σ hLS)
+      (Bool × ι) (zXY l σ om oms) (cc_zXY hl2 σ om oms) (funEq_of_shift hq σ hZS)
   have hT0S : HasSubst T0 := hasSubst_of_constantCoeff_zero hT00
 
   let PX : ZMod d → Bool × ι → Prop := fun s x => (x.1 = false ↔ s.val % 2 = 0)
@@ -552,8 +551,9 @@ theorem BMinus1_of' (hE : ExpSpec) : BMinus1 := by
   have hTlog : ∀ j, subst T (letLog (K := K) l j) = zXY l σ om oms j := by
     intro j
     let PZ : ZMod d → Prop := fun s => (s.val % 2 = 0 ↔ j.val % 2 = 0)
-    have hfam : (fun s => subst T (keepX (K := K) PZ s)) =
-        fun s => subst (keepX (K := K) (PX j)) (subst T0 (keepX (K := K) PZ s)) := by
+    have hfam
+        : (fun s => subst T (keepX (K := K) PZ s))
+          = fun s => subst (keepX (K := K) (PX j)) (subst T0 (keepX (K := K) PZ s)) := by
       funext s
       by_cases hs : PZ s
       · rw [keepX_pos hs, subst_X hTS, subst_X hT0S, ← keep_eq_subst]
@@ -568,24 +568,27 @@ theorem BMinus1_of' (hE : ExpSpec) : BMinus1 := by
       by_cases hs : PZ s
       · rw [keepX_pos hs, subst_X hT0S, hT00]
       · rw [keepX_neg hs, subst_zero' hT0S, map_zero]
-    calc subst T (letLog (K := K) l j)
-        = subst T (subst (keepX (K := K) PZ) (letLog (K := K) l j)) := by
-          rw [← keep_eq_subst, keep_letLog hd]
+    calc
+      subst T (letLog (K := K) l j)
+          = subst T (subst (keepX (K := K) PZ) (letLog (K := K) l j)) := by
+        rw [← keep_eq_subst, keep_letLog hd]
       _ = subst (fun s => subst T (keepX (K := K) PZ s)) (letLog (K := K) l j) :=
-          subst_comp_subst_apply (hasSubst_keepX _) hTS _
-      _ = subst (fun s => subst (keepX (K := K) (PX j)) (subst T0 (keepX (K := K) PZ s)))
-            (letLog (K := K) l j) := by rw [hfam]
+        subst_comp_subst_apply (hasSubst_keepX _) hTS _
+      _ = subst
+          (fun s => subst (keepX (K := K) (PX j)) (subst T0 (keepX (K := K) PZ s)))
+          (letLog (K := K) l j) := by
+        rw [hfam]
       _ = subst (keepX (K := K) (PX j))
-            (subst (fun s => subst T0 (keepX (K := K) PZ s)) (letLog (K := K) l j)) :=
-          (subst_comp_subst_apply hcomp (hasSubst_keepX _) _).symm
+          (subst (fun s => subst T0 (keepX (K := K) PZ s)) (letLog (K := K) l j)) :=
+        (subst_comp_subst_apply hcomp (hasSubst_keepX _) _).symm
       _ = subst (keepX (K := K) (PX j))
-            (subst T0 (subst (keepX (K := K) PZ) (letLog (K := K) l j))) := by
-          rw [subst_comp_subst_apply (hasSubst_keepX _) hT0S]
+          (subst T0 (subst (keepX (K := K) PZ) (letLog (K := K) l j))) := by
+        rw [subst_comp_subst_apply (hasSubst_keepX _) hT0S]
       _ = zXY l σ om oms j := by
-          rw [← keep_eq_subst PZ, keep_letLog hd, hT0s, ← keep_eq_subst, keep_zXY]
+        rw [← keep_eq_subst PZ, keep_letLog hd, hT0s, ← keep_eq_subst, keep_zXY]
 
-  let G : Bool × ι → MvPowerSeries (ZMod d) K :=
-    fun x => ∑ s : ZMod d, C (pXY σ om oms x s) * letLog l s
+  let G : Bool × ι → MvPowerSeries (ZMod d) K := fun x =>
+    ∑ s : ZMod d, C (pXY σ om oms x s) * letLog l s
   have hG : ∀ x, IP l σ (G x) := by
     rintro ⟨b, r⟩
     have h := ShiftIP_of_frobSq frobenius_square K l d σ hU hd (ZMod d) (fun s => letLog l s) hLS
@@ -604,26 +607,34 @@ theorem BMinus1_of' (hE : ExpSpec) : BMinus1 := by
   · intro s x
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← coeff_one_subst hid hTc0 s x, hTlog, zXY_eq, map_sum, Finset.sum_eq_single x]
-    · rw [coeff_C_mul, artin_hasse_log_eq_generic_log (d := 1) l x 0, coeff_one_gLog hl, if_pos rfl, mul_one]
+    · rw [coeff_C_mul, artin_hasse_log_eq_generic_log (d := 1) l x 0, coeff_one_gLog hl, if_pos rfl,
+        mul_one]
     · intro y _ hy
-      rw [coeff_C_mul, artin_hasse_log_eq_generic_log (d := 1) l y 0, coeff_one_gLog hl, if_neg (Ne.symm hy),
-        mul_zero]
+      rw [coeff_C_mul, artin_hasse_log_eq_generic_log (d := 1) l y 0, coeff_one_gLog hl,
+        if_neg (Ne.symm hy), mul_zero]
     · intro h
       exact absurd (Finset.mem_univ x) h
   · intro s
-    have hj : ∀ j, subst (fun s => subst Xi (T s)) (letLog (K := K) l j) =
-        subst (X : ZMod d → MvPowerSeries (ZMod d) K) (letLog (K := K) l j) := by
+    have hj
+        : ∀ j,
+          subst (fun s => subst Xi (T s)) (letLog (K := K) l j)
+            = subst (X : ZMod d → MvPowerSeries (ZMod d) K) (letLog (K := K) l j) := by
       intro j
       rw [← subst_comp_subst_apply hTS hXiS, hTlog, zXY_eq, subst_comb hXiS, subst_self]
       simp only [subst_single_var hXiS, hXil]
       exact comb_back hd σ hfix hT _ j
-    have key := Formalism.FG.subst_injective_vector K (ZMod d) (ZMod d) (letLog l)
-      (fun s => subst Xi (T s)) X hid
-      (fun s => constantCoeff_subst_eq_zero hXiS hXi0 (hTc0 s)) (fun s => constantCoeff_X s) hj
+    have key :=
+      Formalism.FG.subst_injective_vector K (ZMod d) (ZMod d) (letLog l)
+        (fun s => subst Xi (T s))
+        X hid
+        (fun s => constantCoeff_subst_eq_zero hXiS hXi0 (hTc0 s))
+        (fun s => constantCoeff_X s)
+        hj
     exact congrFun key s
   · intro x
-    have h1 : PowerSeries.subst (subst T (Xi x)) (lgF K l) =
-        PowerSeries.subst (X x : MvPowerSeries (Bool × ι) K) (lgF K l) := by
+    have h1
+        : PowerSeries.subst (subst T (Xi x)) (lgF K l)
+          = PowerSeries.subst (X x : MvPowerSeries (Bool × ι) K) (lgF K l) := by
       rw [← subst_subst1 hTS (PowerSeries.HasSubst.of_constantCoeff_zero (hXi0 x)), hXil,
         subst_comb hTS]
       simp only [hTlog]
@@ -640,10 +651,13 @@ theorem BMinus1_of' (hE : ExpSpec) : BMinus1 := by
 theorem MeanSimeq_of' (hM : MeanSimeqL) (hB : BeTilXY) (hLS : LetterShift) : MeanSimeq := by
   intro K _ _ _ l d _ σ hU hd2 hd F hF be0 hF1 hF2 ι _ _ om oms hO hT ζ hζ
   have hball := (frobenius_square K l σ hU).2
-  refine ⟨hM K l d σ hU hd2 hd F hF be0 hF1 hF2 ι om oms hO hT ζ hζ (ZMod d) _
-    (hLS K l d σ hU.1).2.1, ?_⟩
-  have h := hM K l d σ hU hd2 hd F hF be0 hF1 hF2 ι om oms hO hT ζ hζ (Bool × ι) _
-    (shiftType_zXY hU.1 hd hball hO)
+  refine ⟨
+    hM K l d σ hU hd2 hd F hF be0 hF1 hF2 ι om oms hO hT ζ hζ (ZMod d) _ (hLS K l d σ hU.1).2.1,
+    ?_
+  ⟩
+  have h :=
+    hM K l d σ hU hd2 hd F hF be0 hF1 hF2 ι om oms hO hT ζ hζ (Bool × ι) _
+      (shiftType_zXY hU.1 hd hball hO)
   rw [hB K l d σ hU.1.two_le hd be0 ι om oms hO.2 hT] at h
   exact h
 

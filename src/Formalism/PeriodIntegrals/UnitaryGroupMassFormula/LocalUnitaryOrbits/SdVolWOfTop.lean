@@ -10,15 +10,18 @@ noncomputable section
 
 namespace PI.OmLocU
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain MeasureTheory
-  PI.VolStabSW PI.VolStabSW.SdUniqW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain MeasureTheory PI.VolStabSW
+  PI.VolStabSW.SdUniqW
 open scoped TensorProduct
 
 section Steps
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
 
 def LW (a : ℕ) : AddSubgroup (TupV (E := E) v n a) where
   carrier := LamT v Λ a
@@ -28,28 +31,33 @@ def LW (a : ℕ) : AddSubgroup (TupV (E := E) v n a) where
 
 theorem coe_LW (a : ℕ) : (LW v Λ a : Set (TupV (E := E) v n a)) = LamT v Λ a := rfl
 
-theorem smul_mem_LW {a : ℕ} {s : Fv F v} (hs : s ∈ v.adicCompletionIntegers F)
-    {X : TupV (E := E) v n a} (hX : X ∈ LW v Λ a) : s • X ∈ LW v Λ a :=
-  fun i => Submodule.smul_mem _ (⟨s, hs⟩ : v.adicCompletionIntegers F) (hX i)
+theorem smul_mem_LW
+    {a : ℕ} {s : Fv F v} (hs : s ∈ v.adicCompletionIntegers F)
+    {X : TupV (E := E) v n a} (hX : X ∈ LW v Λ a)
+    : s • X ∈ LW v Λ a := fun i =>
+  Submodule.smul_mem _ (⟨s, hs⟩ : v.adicCompletionIntegers F) (hX i)
 
 def TopW (a : ℕ) : Prop :=
-  (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsLattice E L ∧ (L : Set (Fin n → E)) = Λ) →
-    IsCompact (LamT (E := E) v Λ a) ∧ IsOpen (LamT (E := E) v Λ a)
+  (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsLattice E L ∧ (L : Set (Fin n → E)) = Λ)
+    → IsCompact (LamT (E := E) v Λ a) ∧ IsOpen (LamT (E := E) v Λ a)
 
 def DualW (a : ℕ) : Prop :=
-  StdHyp σ J ψ → (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsLattice E L ∧ (L : Set (Fin n → E)) = Λ) →
-    IsSDLoc σ J v Λ → UnramAt (E := E) v →
-    {Y : TupV (E := E) v n a | ∀ X ∈ LamT v Λ a,
-      dV v * BR (Fv F v) σ J X Y ∈ v.adicCompletionIntegers F} =
-      (smulSub (dV v)⁻¹ (LW v Λ a) : Set (TupV (E := E) v n a))
+  StdHyp σ J ψ
+    → (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsLattice E L ∧ (L : Set (Fin n → E)) = Λ)
+    → IsSDLoc σ J v Λ → UnramAt (E := E) v
+    → {Y : TupV (E := E) v n a | ∀ X ∈ LamT v Λ a,
+        dV v * BR (Fv F v) σ J X Y ∈ v.adicCompletionIntegers F}
+      = (smulSub (dV v)⁻¹ (LW v Λ a) : Set (TupV (E := E) v n a))
 
 def IdxW (a : ℕ) : Prop :=
-  (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsLattice E L ∧ (L : Set (Fin n → E)) = Λ) →
-    UnramAt (E := E) v →
-    ((LW v Λ a).relIndex (smulSub (dV v)⁻¹ (LW v Λ a)) : ℝ) = absV v (dV v) ^ (-(2 * ((n : ℝ) * a)))
+  (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsLattice E L ∧ (L : Set (Fin n → E)) = Λ)
+    → UnramAt (E := E) v
+    → ((LW v Λ a).relIndex (smulSub (dV v)⁻¹ (LW v Λ a)) : ℝ)
+      = absV v (dV v) ^ (-(2 * ((n : ℝ) * a)))
 
-theorem sdVolW_of_top (a : ℕ) (hC : CondV σ J ψ v) (hT : TopW v Λ a) (hD : DualW σ J ψ v Λ a)
-    (hI : IdxW v Λ a) : SdVolW σ J ψ v Λ a := by
+theorem sdVolW_of_top
+    (a : ℕ) (hC : CondV σ J ψ v) (hT : TopW v Λ a) (hD : DualW σ J ψ v Λ a) (hI : IdxW v Λ a)
+    : SdVolW σ J ψ v Λ a := by
   intro hS hL hSD hU hμ
   have hd0 := dV_ne_zero v
   have hμsd : SdW F E σ n J (Fv F v) (psiV F ψ v) a (dX σ J ψ v a) := by
@@ -63,8 +71,10 @@ theorem sdVolW_of_top (a : ℕ) (hC : CondV σ J ψ v) (hT : TopW v Λ a) (hD : 
   rw [← coe_LW] at hLc hLo
   have hL'c : IsCompact (L' : Set (TupV (E := E) v n a)) := isCompact_smulSub _ L hLc
   have hL'o : IsOpen (L' : Set (TupV (E := E) v n a)) := isOpen_smulSub _ (inv_ne_zero hd0) L hLo
-  have hχ : ∀ x t y : TupV (E := E) v n a, psiV F ψ v (BR (Fv F v) σ J (t + x) y) =
-      psiV F ψ v (BR (Fv F v) σ J t y) * psiV F ψ v (BR (Fv F v) σ J x y) := by
+  have hχ
+      : ∀ x t y : TupV (E := E) v n a,
+        psiV F ψ v (BR (Fv F v) σ J (t + x) y)
+          = psiV F ψ v (BR (Fv F v) σ J t y) * psiV F ψ v (BR (Fv F v) σ J x y) := by
     intro x t y
     rw [BR_add, psiV_add]
   have h0 : ∀ y : TupV (E := E) v n a, psiV F ψ v (BR (Fv F v) σ J y 0) = 1 := by
@@ -72,7 +82,8 @@ theorem sdVolW_of_top (a : ℕ) (hC : CondV σ J ψ v) (hT : TopW v Λ a) (hD : 
     have e := SdDualW.BR_smul_right v σ J 0 y y
     rw [zero_smul, zero_mul] at e
     rw [e, psiV_zero]
-  have hA : ann (fun X Y => psiV F ψ v (BR (Fv F v) σ J X Y)) (L : Set (TupV (E := E) v n a)) = L' := by
+  have hA
+      : ann (fun X Y => psiV F ψ v (BR (Fv F v) σ J X Y)) (L : Set (TupV (E := E) v n a)) = L' := by
     rw [Sd.ann_eq_cond v (psiV F ψ v) (dV v) (BR (Fv F v) σ J) _ (hC hS)]
     · exact hD hS hL hSD hU
     · intro s hs x hx

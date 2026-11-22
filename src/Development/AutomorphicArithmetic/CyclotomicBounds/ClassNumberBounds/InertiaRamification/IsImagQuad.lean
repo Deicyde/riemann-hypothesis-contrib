@@ -10,7 +10,6 @@ open DirichletCharacter
 
 variable {N : ℕ}
 
-def IsImagQuad (ψ : DirichletCharacter ℂ N) (d : ℕ) : Prop :=
-  ψ ^ 2 = 1 ∧ ψ.Odd ∧ ψ.conductor = d
+def IsImagQuad (ψ : DirichletCharacter ℂ N) (d : ℕ) : Prop := ψ ^ 2 = 1 ∧ ψ.Odd ∧ ψ.conductor = d
 
 end KStar.Ram

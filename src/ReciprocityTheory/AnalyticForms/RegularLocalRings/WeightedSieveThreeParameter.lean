@@ -43,13 +43,13 @@ theorem WData.t2Space (w : WData P D hP) : T2Space w.M := by
     exact ⟨j, hj⟩
   by_cases hfib : ∃ l, w.fib c.1 l x ≠ w.fib c.1 l y
   · obtain ⟨l, hl⟩ := hfib
-    exact sep_of_continuousOn (w.isOpen_overP c.1) (w.continuousOn_fib c.1 l) ⟨c.2, hxc⟩
-      ⟨j, hyj⟩ hl
+    exact sep_of_continuousOn (w.isOpen_overP c.1) (w.continuousOn_fib c.1 l) ⟨c.2, hxc⟩ ⟨j, hyj⟩ hl
   push Not at hfib
   have h1 : w.fib c.1 j y ≠ 0 := by
     rw [w.fib_eq c.1 j j y hyj, vecNorm_ne_zero_iff, w.tv_self c.1 j y hyj]
     exact one_ne_zero
-  rw [← hfib j, w.fib_eq c.1 j c.2 x hxc, vecNorm_ne_zero_iff, w.tv_ne_zero_iff c.1 c.2 j x hxc] at h1
+  rw [← hfib j, w.fib_eq c.1 j c.2 x hxc, vecNorm_ne_zero_iff, w.tv_ne_zero_iff c.1 c.2 j x hxc]
+    at h1
   exact (hcom _ h1 hyj).elim
 
 end ReciprocityTheory.AnForm.R

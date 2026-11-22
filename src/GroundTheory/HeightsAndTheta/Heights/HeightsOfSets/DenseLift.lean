@@ -10,8 +10,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem exists_rootsOfUnity_eval_ne_zero {s : ℕ} {c : MvPolynomial (Fin s) ℚ} (hc : c ≠ 0) :
-    ∃ (N : ℕ) (y : Fin s → AlgebraicClosure ℚ), 0 < N ∧ (∀ j, y j ^ N = 1) ∧ aeval y c ≠ 0 := by
+theorem exists_rootsOfUnity_eval_ne_zero {s : ℕ} {c : MvPolynomial (Fin s) ℚ} (hc : c ≠ 0)
+    : ∃ (N : ℕ) (y : Fin s → AlgebraicClosure ℚ), 0 < N ∧ (∀ j, y j ^ N = 1) ∧ aeval y c ≠ 0 := by
   classical
   set N := c.totalDegree + 1 with hN
   have hNpos : 0 < N := Nat.succ_pos _
@@ -30,9 +30,10 @@ theorem exists_rootsOfUnity_eval_ne_zero {s : ℕ} {c : MvPolynomial (Fin s) ℚ
   apply hc'
   refine MvPolynomial.eq_zero_of_eval_zero_at_prod_finset c' (fun _ ↦ S) (fun i ↦ ?_) ?_
   · rw [hS]
-    calc c'.degreeOf i = c.degreeOf i := by
-          simp only [c', MvPolynomial.degreeOf_def,
-            MvPolynomial.degrees_map_of_injective _ (algebraMap ℚ (AlgebraicClosure ℚ)).injective]
+    calc
+      c'.degreeOf i = c.degreeOf i := by
+        simp only [c', MvPolynomial.degreeOf_def,
+          MvPolynomial.degrees_map_of_injective _ (algebraMap ℚ (AlgebraicClosure ℚ)).injective]
       _ ≤ c.totalDegree := MvPolynomial.degreeOf_le_totalDegree c i
       _ < N := Nat.lt_succ_self _
   · intro x hx
@@ -42,11 +43,13 @@ theorem exists_rootsOfUnity_eval_ne_zero {s : ℕ} {c : MvPolynomial (Fin s) ℚ
     rw [MvPolynomial.aeval_def] at this
     exact this
 
-theorem exists_algHom_rootsOfUnity_ne_zero {B : Type*} [CommRing B] [IsDomain B] [Algebra ℚ B]
-    {s : ℕ} (g0 : MvPolynomial (Fin s) ℚ →ₐ[ℚ] B) (hinj : Function.Injective g0)
-    (hint : g0.IsIntegral) {g : B} (hg : g ≠ 0) :
-    ∃ ψ : B →ₐ[ℚ] AlgebraicClosure ℚ, ψ g ≠ 0 ∧
-      ∀ j, ∃ N : ℕ, 0 < N ∧ ψ (g0 (MvPolynomial.X j)) ^ N = 1 := by
+theorem exists_algHom_rootsOfUnity_ne_zero
+    {B : Type*} [CommRing B] [IsDomain B] [Algebra ℚ B]
+    {s : ℕ}
+    (g0 : MvPolynomial (Fin s) ℚ →ₐ[ℚ] B) (hinj : Function.Injective g0) (hint : g0.IsIntegral)
+    {g : B} (hg : g ≠ 0)
+    : ∃ ψ : B →ₐ[ℚ] AlgebraicClosure ℚ,
+      ψ g ≠ 0 ∧ ∀ j, ∃ N : ℕ, 0 < N ∧ ψ (g0 (MvPolynomial.X j)) ^ N = 1 := by
   classical
   let : Algebra (MvPolynomial (Fin s) ℚ) B := g0.toRingHom.toAlgebra
   have hmap : ∀ a, algebraMap (MvPolynomial (Fin s) ℚ) B a = g0 a := fun _ ↦ rfl
@@ -67,7 +70,8 @@ theorem exists_algHom_rootsOfUnity_ne_zero {B : Type*} [CommRing B] [IsDomain B]
     have : a = 0 := hinj (ha.trans (map_zero g0).symm)
     rw [this]
     exact (RingHom.ker ev).zero_mem
-  obtain ⟨Q, hQ, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral_of_isDomain (RingHom.ker ev) hker
+  obtain ⟨Q, hQ, hQc⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral_of_isDomain (RingHom.ker ev) hker
   have := hQ
   set p := Q.comap (algebraMap (MvPolynomial (Fin s) ℚ) B) with hp
   have : p.IsPrime := Ideal.comap_isPrime _ Q
@@ -77,8 +81,7 @@ theorem exists_algHom_rootsOfUnity_ne_zero {B : Type*} [CommRing B] [IsDomain B]
     rw [hpc] at ha
     exact RingHom.mem_ker.mp ha
   let evq : MvPolynomial (Fin s) ℚ ⧸ p →+* AlgebraicClosure ℚ := Ideal.Quotient.lift p ev hvan
-  have hevq : Function.Injective evq :=
-    RingHom.lift_injective_of_ker_le_ideal p hvan (by rw [hpc])
+  have hevq : Function.Injective evq := RingHom.lift_injective_of_ker_le_ideal p hvan (by rw [hpc])
   let : Algebra (MvPolynomial (Fin s) ℚ ⧸ p) (AlgebraicClosure ℚ) := evq.toAlgebra
   have : Module.IsTorsionFree (MvPolynomial (Fin s) ℚ ⧸ p) (AlgebraicClosure ℚ) :=
     (Module.isTorsionFree_iff_algebraMap_injective).mpr hevq
@@ -87,14 +90,15 @@ theorem exists_algHom_rootsOfUnity_ne_zero {B : Type*} [CommRing B] [IsDomain B]
   have : Algebra.IsIntegral (MvPolynomial (Fin s) ℚ ⧸ p) (B ⧸ Q) := Algebra.IsIntegral.quotient
   let ψq : (B ⧸ Q) →ₐ[MvPolynomial (Fin s) ℚ ⧸ p] AlgebraicClosure ℚ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let ψ0 : B →+* AlgebraicClosure ℚ := ψq.toRingHom.comp (Ideal.Quotient.mk Q)
   have hψ0 : ∀ a, ψ0 (g0 a) = aeval y a := by
     intro a
-    have h1 : Ideal.Quotient.mk Q (g0 a) =
-        algebraMap (MvPolynomial (Fin s) ℚ ⧸ p) (B ⧸ Q) (Ideal.Quotient.mk p a) := rfl
+    have h1
+        : Ideal.Quotient.mk Q (g0 a)
+          = algebraMap (MvPolynomial (Fin s) ℚ ⧸ p) (B ⧸ Q) (Ideal.Quotient.mk p a) :=
+      rfl
     change ψq (Ideal.Quotient.mk Q (g0 a)) = aeval y a
     rw [h1, ψq.commutes]
     rfl

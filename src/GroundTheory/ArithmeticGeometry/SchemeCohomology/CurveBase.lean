@@ -18,8 +18,7 @@ section Scalars
 
 variable {k : Type u} [Field k] (X : Scheme.{u}) [X.Over (Spec (.of k))]
 
-noncomputable def scalarRingHom : k →+* Γ(X, ⊤) :=
-  @algebraMap k Γ(X, ⊤) _ _ (overAlgebra (.of k))
+noncomputable def scalarRingHom : k →+* Γ(X, ⊤) := @algebraMap k Γ(X, ⊤) _ _ (overAlgebra (.of k))
 
 noncomputable instance stalkAlgebra (x : X) : Algebra k (X.presheaf.stalk x) :=
   ((X.presheaf.germ ⊤ x trivial).hom.comp (scalarRingHom X)).toAlgebra

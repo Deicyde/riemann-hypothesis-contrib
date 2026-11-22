@@ -20,14 +20,16 @@ namespace GlobalTheory.PerRedTw
 
 section Copied
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.MainNotions.G Formalism.MainNotions.WeilJacquetShalikaLaw Formalism.L2.Forms Matrix NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.MainNotions.G
+  Formalism.MainNotions.WeilJacquetShalikaLaw Formalism.L2.Forms Matrix NumberField
 open scoped BigOperators
 
 theorem exists_orthonormal_frame_twisted (D : D7) : ∃ o : FrP D, o.IsON := by
   classical
   let _ := D.host.cmStar
-  have hY : ∀ τ, ∃ Y : Matrix (Fin (D.R.N D.R.m - 1)) (Fin (D.R.N D.R.m - 1)) ℂ,
-      IsUnit Y.det ∧ Yᴴ * (gramP D).map (embT D τ) * Y = 1 := by
+  have hY
+      : ∀ τ, ∃ Y : Matrix (Fin (D.R.N D.R.m - 1)) (Fin (D.R.N D.R.m - 1)) ℂ,
+        IsUnit Y.det ∧ Yᴴ * (gramP D).map (embT D τ) * Y = 1 := by
     intro τ
     have hs := D.sp.X'_sig (embT D τ)
     rw [D.X'_posDef (embT D τ)] at hs
@@ -45,14 +47,19 @@ theorem exists_orthonormal_frame_twisted (D : D7) : ∃ o : FrP D, o.IsON := by
     rw [hcT, hJ] at hP
     let f : Fin D.sp.X'.rank ≃ Fin (D.R.N D.R.m - 1) := finCongr (rankP D)
     let g : Fin (D.R.N D.R.m - 1) ≃ Fin D.sp.X'.rank ⊕ Fin 0 := f.symm.trans e
-    have hG : ((gramP D).map (embT D τ)).submatrix g.symm g.symm = (D.sp.X'.gram.map (embT D τ)).reindex e e := by
+    have hG
+        : ((gramP D).map (embT D τ)).submatrix g.symm g.symm
+          = (D.sp.X'.gram.map (embT D τ)).reindex e e := by
       ext i j
       simp [g, f, gramP, Matrix.reindex_apply, Matrix.submatrix_apply]
     refine ⟨P.1.submatrix g g, ?_, ?_⟩
     · rw [Matrix.det_submatrix_equiv_self]; exact Matrix.isUnits_det_units P
-    · have h1 : (gramP D).map (embT D τ) = (((gramP D).map (embT D τ)).submatrix g.symm g.symm).submatrix g g := by
+    · have h1
+          : (gramP D).map (embT D τ)
+            = (((gramP D).map (embT D τ)).submatrix g.symm g.symm).submatrix g g := by
         ext i j; simp
-      rw [Matrix.conjTranspose_submatrix, h1, Matrix.submatrix_mul_equiv, Matrix.submatrix_mul_equiv, hG, hP]
+      rw [Matrix.conjTranspose_submatrix, h1, Matrix.submatrix_mul_equiv,
+        Matrix.submatrix_mul_equiv, hG, hP]
       exact Matrix.submatrix_one_equiv g
   choose Y hYu hY using hY
   exact ⟨⟨Y, hYu⟩, fun τ => Or.inl (hY τ)⟩
@@ -62,20 +69,28 @@ theorem nfAll_zero_tw {D : D7} (n : ℕ) (lam : D.what₂.Tau → DomWeight n) :
 
 end Copied
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Forms Formalism.MainNotions.RT.PeriodPointConditions GlobalTheory.PerQ
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Forms
+  Formalism.MainNotions.RT.PeriodPointConditions GlobalTheory.PerQ
 
 attribute [local instance] MemberForms.clsPFin
 
-variable {D : D7} {cf : Formalism.L2.Host.CharFrame D} {nch : NChoice D} {tp : Formalism.L2.Host.TupTied D cf nch} {C : ColsTiedSym D}
-  {Tw : TwForms D} {Y : DivX D}
+variable
+  {D : D7} {cf : Formalism.L2.Host.CharFrame D} {nch : NChoice D}
+  {tp : Formalism.L2.Host.TupTied D cf nch} {C : ColsTiedSym D} {Tw : TwForms D} {Y : DivX D}
 
-theorem eW_rep_o_tw (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what₂.Word) (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0) (o : FrP D)
-    (z : (D.PTw u μ).Wrow) (hz : z ∈ (Tw.fm u μ).ptC) (c : (Tw.fm u μ).clsP) :
-    ∃ Q ∈ CSpan (Tw.fm u μ).sg,
+theorem eW_rep_o_tw
+    (t : SymmetricTwistedColumnsAtPrimes tp C Tw)
+    (u : D.what₂.Word)
+    (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0)
+    (o : FrP D)
+    (z : (D.PTw u μ).Wrow) (hz : z ∈ (Tw.fm u μ).ptC)
+    (c : (Tw.fm u μ).clsP)
+    : ∃ Q ∈ CSpan (Tw.fm u μ).sg,
       (t.pt.val u μ hμ).eW z c = fnOf _ (shiftOf (sgTG (Tw.fm u μ))) (fun τ => (o.1 τ)⁻¹) Q := by
   have hF := ((t.pt.val u μ hμ).ptC z).1 hz
   obtain ⟨g, hg, hres⟩ := Submodule.mem_map.1 hF
-  have hval := (Submodule.mem_pi.1 (Submodule.mem_inf.1 hg).2) ((t.pt.cls u μ hμ).y c) (Set.mem_univ _)
+  have hval :=
+    (Submodule.mem_pi.1 (Submodule.mem_inf.1 hg).2) ((t.pt.cls u μ hμ).y c) (Set.mem_univ _)
   obtain ⟨Q0, hQ0, hfn⟩ := Submodule.mem_map.1 hval
   have hQ0' : Q0 ∈ CSpan (Tw.fm u μ).sg := by
     have := CSpan_shW (Tw.fm u μ).sg (fun _ => ((D.R.m * (D.R.t + 1) / 2 : ℕ) : ℤ))
@@ -90,16 +105,21 @@ theorem eW_rep_o_tw (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what₂
   exact Submodule.smul_mem _ _ (blkRow_mem _ _ hQ0')
 
 open Classical in
-theorem eW_resCTw (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what₂.Word) (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0)
-    (c : (Tw.fm u μ).clsP) (z : (D.PTw u μ).Wrow) :
-    (t.pt.val u μ hμ).eW (resCTw t u μ hμ c z) = fun c' => if c' = c then (t.pt.val u μ hμ).eW z c' else 0 := by
+theorem eW_resCTw
+    (t : SymmetricTwistedColumnsAtPrimes tp C Tw)
+    (u : D.what₂.Word) (μ : D.what₂.Tup)
+    (hμ : μ ≠ D.what₂.mu0) (c : (Tw.fm u μ).clsP) (z : (D.PTw u μ).Wrow)
+    : (t.pt.val u μ hμ).eW (resCTw t u μ hμ c z)
+      = fun c' => if c' = c then (t.pt.val u μ hμ).eW z c' else 0 := by
   classical
   unfold resCTw
   rw [LinearEquiv.apply_symm_apply]
 
-theorem petersson_eq_sum_restrict_twist (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what₂.Word) (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0)
-    (a b : (D.PTw u μ).Wrow) (ha : a ∈ (Tw.fm u μ).ptC) (hb : b ∈ (Tw.fm u μ).ptC) :
-    (Tw.fm u μ).ipP a b = ∑ c, (Tw.fm u μ).ipP (resCTw t u μ hμ c a) (resCTw t u μ hμ c b) := by
+theorem petersson_eq_sum_restrict_twist
+    (t : SymmetricTwistedColumnsAtPrimes tp C Tw)
+    (u : D.what₂.Word) (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0) (a b : (D.PTw u μ).Wrow)
+    (ha : a ∈ (Tw.fm u μ).ptC) (hb : b ∈ (Tw.fm u μ).ptC)
+    : (Tw.fm u μ).ipP a b = ∑ c, (Tw.fm u μ).ipP (resCTw t u μ hμ c a) (resCTw t u μ hμ c b) := by
   classical
   obtain ⟨o, ho⟩ := exists_orthonormal_frame_twisted D
   choose P hP hPe using eW_rep_o_tw t u μ hμ o a ha
@@ -114,15 +134,23 @@ theorem petersson_eq_sum_restrict_twist (t : SymmetricTwistedColumnsAtPrimes tp 
     split_ifs
     · exact hQ c'
     · exact Submodule.zero_mem _
-  have hPe' : ∀ c', (t.pt.val u μ hμ).eW (resCTw t u μ hμ c a) c' =
-      fnOf _ (shiftOf (sgTG (Tw.fm u μ))) (fun τ => (o.1 τ)⁻¹) (if c' = c then P c' else 0) := fun c' => by
+  have hPe'
+      : ∀ c',
+        (t.pt.val u μ hμ).eW (resCTw t u μ hμ c a) c'
+          = fnOf _ (shiftOf (sgTG (Tw.fm u μ)))
+            (fun τ => (o.1 τ)⁻¹)
+            (if c' = c then P c' else 0) := fun c' => by
     rw [eW_resCTw]
     dsimp only
     split_ifs
     · exact hPe c'
     · exact (map_zero _).symm
-  have hQe' : ∀ c', (t.pt.val u μ hμ).eW (resCTw t u μ hμ c b) c' =
-      fnOf _ (shiftOf (sgTG (Tw.fm u μ))) (fun τ => (o.1 τ)⁻¹) (if c' = c then Q c' else 0) := fun c' => by
+  have hQe'
+      : ∀ c',
+        (t.pt.val u μ hμ).eW (resCTw t u μ hμ c b) c'
+          = fnOf _ (shiftOf (sgTG (Tw.fm u μ)))
+            (fun τ => (o.1 τ)⁻¹)
+            (if c' = c then Q c' else 0) := fun c' => by
     rw [eW_resCTw]
     dsimp only
     split_ifs
@@ -135,15 +163,25 @@ theorem petersson_eq_sum_restrict_twist (t : SymmetricTwistedColumnsAtPrimes tp 
   · intro h; exact absurd (Finset.mem_univ c) h
 
 open Classical in
-def pcTw (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what₂.Word) (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0)
-    (c : (Tw.fm u μ).clsP) (z : (D.PTw u μ).Wrow) (G : (D.PTw u μ).Mt) : ℂ :=
-  if z ∈ (Tw.fm u μ).ptC then pcLTw t u μ hμ c z G
+def pcTw
+    (t : SymmetricTwistedColumnsAtPrimes tp C Tw)
+    (u : D.what₂.Word) (μ : D.what₂.Tup)
+    (hμ : μ ≠ D.what₂.mu0) (c : (Tw.fm u μ).clsP) (z : (D.PTw u μ).Wrow) (G : (D.PTw u μ).Mt)
+    : ℂ :=
+  if z ∈ (Tw.fm u μ).ptC then
+    pcLTw t u μ hμ c z G
   else if h : Nonempty (Tw.fm u μ).clsP then
-    (if c = Classical.choice h then ((Nat.card ((Tw.fm u μ).stabilizer₂ c) : ℕ) : ℂ) * (D.PTw u μ).period z G else 0)
-  else 0
+    (if c = Classical.choice h then
+       ((Nat.card ((Tw.fm u μ).stabilizer₂ c) : ℕ) : ℂ) * (D.PTw u μ).period z G
+     else
+       0)
+  else
+    0
 
-theorem perDecTw_of_at (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what₂.Word) (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0)
-    (h : PerDecTwT Y t u μ hμ) : Formalism.MainNotions.RT.PeriodPointConditions.PerDecTw D Y Tw u μ := by
+theorem perDecTw_of_at
+    (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what₂.Word) (μ : D.what₂.Tup)
+    (hμ : μ ≠ D.what₂.mu0) (h : PerDecTwT Y t u μ hμ)
+    : Formalism.MainNotions.RT.PeriodPointConditions.PerDecTw D Y Tw u μ := by
   classical
   have hcard : ∀ c, ((Nat.card ((Tw.fm u μ).stabilizer₂ c) : ℕ) : ℂ) ≠ 0 := fun c =>
     Nat.cast_ne_zero.mpr Nat.card_pos.ne'
@@ -156,7 +194,7 @@ theorem perDecTw_of_at (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what
       rw [← mul_assoc, inv_mul_cancel₀ (hcard c), one_mul]
     · by_cases hne : Nonempty (Tw.fm u μ).clsP
       · rw [Finset.sum_eq_single (Classical.choice hne)]
-        · simp only [pcTw, if_neg hz, dif_pos hne, ↓reduceIte]
+        · simp only [pcTw, if_neg hz, dif_pos hne, ↓ reduceIte]
           rw [← mul_assoc, inv_mul_cancel₀ (hcard _), one_mul]
         · intro c _ hc
           simp only [pcTw, if_neg hz, dif_pos hne, if_neg hc, mul_zero]
@@ -171,7 +209,13 @@ theorem perDecTw_of_at (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (u : D.what
     simp only [pcTw, if_pos hz]
     exact hy
 
-theorem reduction_perDecTw : ∀ (D : D7) (cf : Formalism.L2.Host.CharFrame D) (nch : NChoice D) (tp : Formalism.L2.Host.TupTied D cf nch) (C : ColsTiedSym D) (Tw : TwForms D) (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (Y : DivX D) (u : D.what₂.Word) (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0), GlobalTheory.PerQ.PerDecTwT Y t u μ hμ → Formalism.MainNotions.RT.PeriodPointConditions.PerDecTw D Y Tw u μ :=
+theorem reduction_perDecTw
+    : ∀ (D : D7) (cf : Formalism.L2.Host.CharFrame D) (nch : NChoice D)
+        (tp : Formalism.L2.Host.TupTied D cf nch) (C : ColsTiedSym D) (Tw : TwForms D)
+        (t : SymmetricTwistedColumnsAtPrimes tp C Tw) (Y : DivX D) (u : D.what₂.Word)
+        (μ : D.what₂.Tup) (hμ : μ ≠ D.what₂.mu0),
+      GlobalTheory.PerQ.PerDecTwT Y t u μ hμ
+        → Formalism.MainNotions.RT.PeriodPointConditions.PerDecTw D Y Tw u μ :=
   fun _ _ _ _ _ _ t _ u μ hμ h => perDecTw_of_at t u μ hμ h
 
 end GlobalTheory.PerRedTw

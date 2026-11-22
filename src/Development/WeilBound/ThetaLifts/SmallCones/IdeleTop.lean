@@ -10,16 +10,20 @@ noncomputable section
 namespace PositivityTheory.ThKCT
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open GlobalTheory.Doubling (absE)
 
 def IdeleTop : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
-    (IsTopologicalRing (AE F E) ∧ LocallyCompactSpace (AE F E) ∧ SecondCountableTopology (AE F E) ∧ T2Space (AE F E)) ∧
-    LocallyCompactSpace (AE F E)ˣ ∧ SecondCountableTopology (AE F E)ˣ ∧ T2Space (AE F E)ˣ ∧ IsTopologicalGroup (AE F E)ˣ ∧
-    BorelSpace (AE F E)ˣ ∧
-    ∀ μ : Measure (AE F E)ˣ, μ.IsHaarMeasure → SigmaFinite μ ∧ μ.IsInvInvariant ∧ μ.IsMulRightInvariant ∧ μ.Regular
+    (IsTopologicalRing (AE F E) ∧ LocallyCompactSpace (AE F E) ∧ SecondCountableTopology (AE F E)
+        ∧ T2Space (AE F E))
+      ∧ LocallyCompactSpace (AE F E)ˣ ∧ SecondCountableTopology (AE F E)ˣ ∧ T2Space (AE F E)ˣ
+      ∧ IsTopologicalGroup (AE F E)ˣ ∧ BorelSpace (AE F E)ˣ
+      ∧ ∀ μ : Measure (AE F E)ˣ,
+        μ.IsHaarMeasure → SigmaFinite μ ∧ μ.IsInvInvariant ∧ μ.IsMulRightInvariant ∧ μ.Regular
 
 theorem ideleTop : IdeleTop := by
   intro F E _ _ _ _ _
@@ -36,8 +40,15 @@ theorem ideleTop : IdeleTop := by
   haveI h5 : SecondCountableTopology (AE F E)ˣ := Units.isEmbedding_embedProduct.secondCountableTopology
   haveI h6 : LocallyCompactSpace (AE F E)ˣ := Units.isClosedEmbedding_embedProduct.locallyCompactSpace
   haveI h7 : BorelSpace (AE F E)ˣ := ⟨rfl⟩
-  exact ⟨⟨h1, h2, h3, h4⟩, h6, h5, inferInstance, inferInstance, h7, fun μ _ =>
-    ⟨inferInstance, inferInstance, inferInstance, inferInstance⟩⟩
+  exact ⟨
+    ⟨h1, h2, h3, h4⟩,
+    h6,
+    h5,
+    inferInstance,
+    inferInstance,
+    h7,
+    fun μ _ => ⟨inferInstance, inferInstance, inferInstance, inferInstance⟩
+  ⟩
 
 end PositivityTheory.ThKCT
 

@@ -35,8 +35,10 @@ theorem isCompact_intMat : IsCompact (intMat F n) := by
   have hmat : IsCompact (Set.pi Set.univ fun _ : Fin n =>
       Set.pi Set.univ fun _ : Fin n => ((intO F : Subring F) : Set F)) :=
     isCompact_univ_pi fun _ => hrow
-  have hset : intMat F n = Set.pi Set.univ fun _ : Fin n =>
-      Set.pi Set.univ fun _ : Fin n => ((intO F : Subring F) : Set F) := by
+  have hset
+      : intMat F n
+        = Set.pi Set.univ fun _ : Fin n =>
+          Set.pi Set.univ fun _ : Fin n => ((intO F : Subring F) : Set F) := by
     ext X
     exact ⟨fun h i _ j _ => h i j, fun h i j => h i trivial j trivial⟩
   rw [hset]
@@ -45,19 +47,20 @@ theorem isCompact_intMat : IsCompact (intMat F n) := by
 theorem isOpen_intMat : IsOpen (intMat F n) := by
   have hO : IsOpen ((intO F : Subring F) : Set F) :=
     Valuation.isOpen_integer (v := ValuativeRel.valuation F)
-  have hset : intMat F n =
-      ⋂ i : Fin n, ⋂ j : Fin n, (fun X : Matrix (Fin n) (Fin n) F => X i j) ⁻¹'
-        ((intO F : Subring F) : Set F) := by
+  have hset
+      : intMat F n
+        = ⋂ i : Fin n, ⋂ j : Fin n, (fun X : Matrix (Fin n) (Fin n) F => X i j) ⁻¹'
+            ((intO F : Subring F) : Set F) := by
     ext X
     simp [intMat]
   rw [hset]
   refine isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => hO.preimage ?_
   exact (continuous_apply j).comp (continuous_apply i)
 
-theorem mem_unitGL_iff (g : GL (Fin n) F) :
-    g ∈ unitGL (n := Fin n) F ↔
-      (g : Matrix (Fin n) (Fin n) F) ∈ intMat F n ∧
-        ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) ∈ intMat F n := by
+theorem mem_unitGL_iff (g : GL (Fin n) F)
+    : g ∈ unitGL (n := Fin n) F
+      ↔ (g : Matrix (Fin n) (Fin n) F) ∈ intMat F n
+        ∧ ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) ∈ intMat F n := by
   constructor
   · rintro ⟨h, rfl⟩
     refine ⟨fun i j => ?_, fun i j => ?_⟩
@@ -65,38 +68,42 @@ theorem mem_unitGL_iff (g : GL (Fin n) F) :
     · rw [← map_inv]
       exact (((h⁻¹ : GL (Fin n) (intO F)) : Matrix (Fin n) (Fin n) (intO F)) i j).2
   · rintro ⟨h1, h2⟩
-    let A : Matrix (Fin n) (Fin n) (intO F) := fun i j => ⟨(g : Matrix (Fin n) (Fin n) F) i j, h1 i j⟩
-    let B : Matrix (Fin n) (Fin n) (intO F) :=
-      fun i j => ⟨((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j, h2 i j⟩
+    let A : Matrix (Fin n) (Fin n) (intO F) := fun i j =>
+      ⟨(g : Matrix (Fin n) (Fin n) F) i j, h1 i j⟩
+    let B : Matrix (Fin n) (Fin n) (intO F) := fun i j =>
+      ⟨((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j, h2 i j⟩
     have hA : A.map (intO F).subtype = (g : Matrix (Fin n) (Fin n) F) := by ext i j; rfl
     have hB : B.map (intO F).subtype = ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
       ext i j; rfl
-    have hinj : Function.Injective
-        (fun X : Matrix (Fin n) (Fin n) (intO F) => X.map (intO F).subtype) :=
+    have hinj
+        : Function.Injective (fun X : Matrix (Fin n) (Fin n) (intO F) => X.map (intO F).subtype) :=
       Matrix.map_injective Subtype.val_injective
-    have hAB : A * B = 1 := hinj (by
-      simp only
-      rw [Matrix.map_mul, hA, hB, Units.mul_inv, Matrix.map_one _ (map_zero _) (map_one _)])
-    have hBA : B * A = 1 := hinj (by
-      simp only
-      rw [Matrix.map_mul, hA, hB, Units.inv_mul, Matrix.map_one _ (map_zero _) (map_one _)])
+    have hAB : A * B = 1 :=
+      hinj (by
+        simp only
+        rw [Matrix.map_mul, hA, hB, Units.mul_inv, Matrix.map_one _ (map_zero _) (map_one _)])
+    have hBA : B * A = 1 :=
+      hinj (by
+        simp only
+        rw [Matrix.map_mul, hA, hB, Units.inv_mul, Matrix.map_one _ (map_zero _) (map_one _)])
     refine ⟨⟨A, B, hAB, hBA⟩, ?_⟩
     ext i j
     rfl
 
 variable [T2Space F]
 
-theorem unitGL_eq_preimage :
-    (unitGL (n := Fin n) F : Set (GL (Fin n) F)) =
-      Units.embedProduct (Matrix (Fin n) (Fin n) F) ⁻¹'
-        (intMat F n ×ˢ (MulOpposite.unop ⁻¹' intMat F n)) := by
+theorem unitGL_eq_preimage
+    : (unitGL (n := Fin n) F : Set (GL (Fin n) F))
+      = Units.embedProduct (Matrix (Fin n) (Fin n) F)
+        ⁻¹' (intMat F n ×ˢ (MulOpposite.unop ⁻¹' intMat F n)) := by
   ext g
   exact mem_unitGL_iff F n g
 
 theorem isOpen_unitGL : IsOpen (unitGL (n := Fin n) F : Set (GL (Fin n) F)) := by
   rw [unitGL_eq_preimage]
-  exact ((isOpen_intMat F n).prod ((isOpen_intMat F n).preimage MulOpposite.continuous_unop)).preimage
-    Units.continuous_embedProduct
+  exact
+    ((isOpen_intMat F n).prod ((isOpen_intMat F n).preimage MulOpposite.continuous_unop)).preimage
+      Units.continuous_embedProduct
 
 theorem isCompact_unitGL : IsCompact (unitGL (n := Fin n) F : Set (GL (Fin n) F)) := by
   rw [unitGL_eq_preimage]
@@ -123,17 +130,18 @@ end Field
 
 section Twisted
 
-variable {k E : Type} [Field k] [Field E] [TopologicalSpace E] [IsTopologicalRing E] [T2Space E]
-  [Algebra k E]
+variable
+  {k E : Type}
+  [Field k] [Field E] [TopologicalSpace E] [IsTopologicalRing E] [T2Space E] [Algebra k E]
 
-theorem continuous_sigmaGL (σ : E ≃ₐ[k] E) (hσ : Continuous σ) (n : ℕ) :
-    Continuous (sigmaGL σ : Monoid.End (GL (Fin n) E)) := by
+theorem continuous_sigmaGL (σ : E ≃ₐ[k] E) (hσ : Continuous σ) (n : ℕ)
+    : Continuous (sigmaGL σ : Monoid.End (GL (Fin n) E)) := by
   rw [Units.continuous_iff]
   refine ⟨?_, ?_⟩
   · exact Units.continuous_val.matrix_map hσ
-  · have : (fun g : GL (Fin n) E => (((sigmaGL σ g : GL (Fin n) E)⁻¹ : GL (Fin n) E) :
-        Matrix (Fin n) (Fin n) E)) =
-        fun g : GL (Fin n) E => ((g⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E).map σ := by
+  · have : (fun g : GL (Fin n) E =>
+          (((sigmaGL σ g : GL (Fin n) E)⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E))
+        = fun g : GL (Fin n) E => ((g⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E).map σ := by
       funext g
       rw [← map_inv]
       rfl
@@ -142,8 +150,8 @@ theorem continuous_sigmaGL (σ : E ≃ₐ[k] E) (hσ : Continuous σ) (n : ℕ) 
     rw [this]
     exact (Units.continuous_val.comp continuous_inv).matrix_map hσ
 
-theorem isClosed_twCent (σ : E ≃ₐ[k] E) (hσ : Continuous σ) (n : ℕ) (δ : GL (Fin n) E) :
-    IsClosed (twCent (sigmaGL σ) δ : Set (GL (Fin n) E)) := by
+theorem isClosed_twCent (σ : E ≃ₐ[k] E) (hσ : Continuous σ) (n : ℕ) (δ : GL (Fin n) E)
+    : IsClosed (twCent (sigmaGL σ) δ : Set (GL (Fin n) E)) := by
   haveI : T2Space (GL (Fin n) E) :=
     (Units.isEmbedding_embedProduct (M := Matrix (Fin n) (Fin n) E)).t2Space
   have hθ := continuous_sigmaGL σ hσ n

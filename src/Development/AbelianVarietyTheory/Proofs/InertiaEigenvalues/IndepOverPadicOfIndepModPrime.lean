@@ -8,11 +8,17 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem indep_over_Ql_of_indep_mod_l : ∀ (l : ℕ) [Fact l.Prime] (d : ℕ) (ι : Type) (w : Fin d → ι → ℂ_[l]) (γ : ι → ℝ), (∀ a i, ‖w a i‖ ≤ γ i) → (∀ n : Fin d → ℕ, (∀ i, ‖∑ a, (n a : ℂ_[l]) * w a i‖ ≤ ‖(l : ℂ_[l])‖ * γ i) → ∀ a, l ∣ n a) → ∀ c : Fin d → ℚ_[l], (∀ i, ∑ a, algebraMap ℚ_[l] ℂ_[l] (c a) * w a i = 0) → c = 0 := by
+theorem indep_over_Ql_of_indep_mod_l
+    : ∀ (l : ℕ) [Fact l.Prime] (d : ℕ) (ι : Type) (w : Fin d → ι → ℂ_[l]) (γ : ι → ℝ),
+      (∀ a i, ‖w a i‖ ≤ γ i)
+        → (∀ n : Fin d → ℕ,
+          (∀ i, ‖∑ a, (n a : ℂ_[l]) * w a i‖ ≤ ‖(l : ℂ_[l])‖ * γ i) → ∀ a, l ∣ n a)
+        → ∀ c : Fin d → ℚ_[l], (∀ i, ∑ a, algebraMap ℚ_[l] ℂ_[l] (c a) * w a i = 0) → c = 0 := by
   intro l _ d ι w γ hw hn c hc
   by_contra hne
   obtain ⟨a1, ha1⟩ := Function.ne_iff.mp hne
-  obtain ⟨a₀, -, ha₀⟩ := Finset.exists_max_image Finset.univ (fun a => ‖c a‖) ⟨a1, Finset.mem_univ _⟩
+  obtain ⟨a₀, -, ha₀⟩ :=
+    Finset.exists_max_image Finset.univ (fun a => ‖c a‖) ⟨a1, Finset.mem_univ _⟩
   have hc0 : c a₀ ≠ 0 := by
     intro h
     have := ha₀ a1 (Finset.mem_univ _)
@@ -37,14 +43,16 @@ theorem indep_over_Ql_of_indep_mod_l : ∀ (l : ℕ) [Fact l.Prime] (d : ℕ) (�
   let n : Fin d → ℕ := fun a => (e a).appr 1
   have hen : ∀ a, ‖e a - (n a : ℤ_[l])‖ ≤ (l : ℝ)⁻¹ := by
     intro a
-    have h := (PadicInt.norm_le_pow_iff_mem_span_pow _ 1).mpr (by simpa using PadicInt.appr_spec 1 (e a))
+    have h :=
+      (PadicInt.norm_le_pow_iff_mem_span_pow _ 1).mpr (by simpa using PadicInt.appr_spec 1 (e a))
     simpa using h
   have hlC : ‖(l : ℂ_[l])‖ = (l : ℝ)⁻¹ := by
     rw [← map_natCast (algebraMap ℚ_[l] ℂ_[l]) l, norm_algebraMap', Padic.norm_p]
   have hsmall : ∀ i, ‖∑ a, (n a : ℂ_[l]) * w a i‖ ≤ ‖(l : ℂ_[l])‖ * γ i := by
     intro i
-    have heq : ∑ a, (n a : ℂ_[l]) * w a i
-        = ∑ a, ((n a : ℂ_[l]) - algebraMap ℚ_[l] ℂ_[l] (c' a)) * w a i := by
+    have heq
+        : ∑ a, (n a : ℂ_[l]) * w a i
+          = ∑ a, ((n a : ℂ_[l]) - algebraMap ℚ_[l] ℂ_[l] (c' a)) * w a i := by
       simp only [sub_mul, Finset.sum_sub_distrib, hsum' i, sub_zero]
     rw [heq, hlC]
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg
@@ -67,7 +75,8 @@ theorem indep_over_Ql_of_indep_mod_l : ∀ (l : ℕ) [Fact l.Prime] (d : ℕ) (�
   have he1 : ‖e a₀‖ = 1 := by
     show ‖c' a₀‖ = 1
     rw [hc'a₀, norm_one]
-  have hlinv : (l : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt)
+  have hlinv : (l : ℝ)⁻¹ < 1 :=
+    inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt)
   have : ‖e a₀‖ ≤ max ‖e a₀ - (n a₀ : ℤ_[l])‖ ‖(n a₀ : ℤ_[l])‖ := by
     simpa using IsUltrametricDist.norm_add_le_max (e a₀ - (n a₀ : ℤ_[l])) (n a₀ : ℤ_[l])
   rw [he1] at this

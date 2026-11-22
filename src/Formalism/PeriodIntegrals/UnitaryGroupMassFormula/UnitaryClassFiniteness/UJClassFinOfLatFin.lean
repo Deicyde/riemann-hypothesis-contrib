@@ -8,7 +8,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnitaryClassFini
 
 namespace PI.UnitaryGroupMassFormula.UJClassFin
 
-theorem uJClassFin_of_latFin (hS : SigPos) (hA : AdelBounds) (hB : LatFin) : PI.UJClassFin.UJClassFin :=
+theorem uJClassFin_of_latFin (hS : SigPos) (hA : AdelBounds) (hB : LatFin)
+    : PI.UJClassFin.UJClassFin :=
   uJClassFin_of rational_points_dense (classFinite_of hS hA hB)
 
 end PI.UnitaryGroupMassFormula.UJClassFin

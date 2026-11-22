@@ -11,17 +11,33 @@ set_option synthInstance.maxHeartbeats 200000
 section
 set_option synthInstance.maxHeartbeats 400000
 noncomputable section
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV
+  Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
 open GlobalTheory.AllWt GlobalTheory.BigTop Filter Topology
 namespace GlobalTheory.CovTop.Assembly
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
-theorem covolX_of_lift_bounds_and_coreLe : _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.LiftRecursive → _root_.GlobalTheory.CovTop.LiftTruncation → _root_.GlobalTheory.CovTop.LiftBadSet → _root_.GlobalTheory.CovTop.LiftLambdaBound → _root_.GlobalTheory.CovTop.SizeCondition → _root_.GlobalTheory.CovTop.CoreBound' → _root_.GlobalTheory.CovTop.LiftLowBound → _root_.GlobalTheory.CovTop.CovolumeBoundOfX := by
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
+theorem covolX_of_lift_bounds_and_coreLe
+    : _root_.GlobalTheory.CovTop.GramCondition → _root_.GlobalTheory.CovTop.LiftRecursive
+      → _root_.GlobalTheory.CovTop.LiftTruncation → _root_.GlobalTheory.CovTop.LiftBadSet
+      → _root_.GlobalTheory.CovTop.LiftLambdaBound → _root_.GlobalTheory.CovTop.SizeCondition
+      → _root_.GlobalTheory.CovTop.CoreBound' → _root_.GlobalTheory.CovTop.LiftLowBound
+      → _root_.GlobalTheory.CovTop.CovolumeBoundOfX := by
   intro hG hR hC hB hL hS hK hW
-  refine Closed.imp (Closed.and (Closed.and (Closed.and hG hR) (Closed.and hC hB))
-    (Closed.and (Closed.and hL hS) (Closed.and hK hW))) ?_
-  rintro eps Fm CH he ⟨⟨⟨⟨_, -, g⟩, ⟨_, -, r⟩⟩, ⟨⟨_, -, c⟩, ⟨_, -, b⟩⟩⟩, ⟨⟨A, -, l⟩, ⟨B, -, s⟩⟩, ⟨C1, h1, k⟩, ⟨C2, h2, w⟩⟩
+  refine Closed.imp
+    (Closed.and (Closed.and (Closed.and hG hR) (Closed.and hC hB))
+      (Closed.and (Closed.and hL hS) (Closed.and hK hW)))
+    ?_
+  rintro eps Fm CH he
+    ⟨
+      ⟨⟨⟨_, -, g⟩, ⟨_, -, r⟩⟩, ⟨⟨_, -, c⟩, ⟨_, -, b⟩⟩⟩,
+      ⟨⟨A, -, l⟩, ⟨B, -, s⟩⟩,
+      ⟨C1, h1, k⟩,
+      ⟨C2, h2, w⟩
+    ⟩
   have hez : 0 < Fm.ez := by
     obtain ⟨i⟩ := Fm.Ix_zero
     rw [← Fm.L_ez 0 i]
@@ -34,7 +50,9 @@ theorem covolX_of_lift_bounds_and_coreLe : _root_.GlobalTheory.CovTop.GramCondit
   have ee := Fm.L_ez x ι
   have hs := hx0 x ((le_max_left _ _).trans hle)
   have hx' : 0 < x := (zero_lt_one.trans Fm.one_lt_family_threshold).trans hx
-  have main := lcv_le p i (ex.symm ▸ hx') h1 h2 (by rw [ex, ee]; exact hs) (g i) (r i) (c i) (b i) (l i) (s i) (k i) (w i)
+  have main :=
+    lcv_le p i (ex.symm ▸ hx') h1 h2 (by rw [ex, ee]; exact hs) (g i) (r i) (c i) (b i) (l i) (s i)
+      (k i) (w i)
   have hE : 0 ≤ unitE p := by
     obtain ⟨s1, s2, -⟩ := s i
     linarith

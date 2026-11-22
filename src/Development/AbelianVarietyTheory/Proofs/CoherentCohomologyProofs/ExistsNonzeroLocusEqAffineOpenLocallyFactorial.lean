@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.E
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry DirectSum TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry DirectSum TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.AbLaw
 
@@ -19,10 +21,12 @@ namespace GlobalTheory.AffineComplement
 
 open ReciprocityTheory.AnForm.R
 
-theorem effCartier_of_stalkId_of_isLocallyNoetherian {W : Scheme.{0}} [IsLocallyNoetherian W]
+theorem effCartier_of_stalkId_of_isLocallyNoetherian
+    {W : Scheme.{0}} [IsLocallyNoetherian W]
     (G : W.IdealSheafData)
-    (hG : ∀ x : W, ∃ t ∈ nonZeroDivisors (W.presheaf.stalk x), FinalTheorems.stalkId G x = Ideal.span {t}) :
-    FinalTheorems.EffCartier G := by
+    (hG : ∀ x : W, ∃ t ∈ nonZeroDivisors (W.presheaf.stalk x),
+      FinalTheorems.stalkId G x = Ideal.span {t})
+    : FinalTheorems.EffCartier G := by
   intro x
   obtain ⟨t, htnzd, ht⟩ := hG x
   obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ :=
@@ -36,8 +40,9 @@ theorem effCartier_of_stalkId_of_isLocallyNoetherian {W : Scheme.{0}} [IsLocally
   have halg : algebraMap Γ(W, U) (W.presheaf.stalk x) = (W.presheaf.germ U x hx).hom := rfl
   rw [Ideal.map] at ht
   obtain ⟨y, ⟨a, haI, rfl⟩, c, hc⟩ := ds_gen_of_span _ t htnzd ht
-  have hmap : (G.ideal U').map (algebraMap Γ(W, U) (W.presheaf.stalk x)) =
-      Ideal.span {algebraMap Γ(W, U) (W.presheaf.stalk x) a} := by
+  have hmap
+      : (G.ideal U').map (algebraMap Γ(W, U) (W.presheaf.stalk x))
+        = Ideal.span {algebraMap Γ(W, U) (W.presheaf.stalk x) a} := by
     rw [halg, Ideal.map, ht, hc, Ideal.span_singleton_mul_left_unit c.isUnit]
   have hnzd : algebraMap Γ(W, U) (W.presheaf.stalk x) a ∈ nonZeroDivisors (W.presheaf.stalk x) := by
     rw [halg, hc]
@@ -53,9 +58,9 @@ theorem effCartier_of_stalkId_of_isLocallyNoetherian {W : Scheme.{0}} [IsLocally
   · rw [← G.map_ideal_basicOpen U' σ]
     exact h1
 
-theorem exists_radical_span_singleton_eq {A : Type} [CommRing A] [IsDomain A]
-    [UniqueFactorizationMonoid A] {a : A} (ha : a ≠ 0) :
-    ∃ t ∈ nonZeroDivisors A, (Ideal.span {a}).radical = Ideal.span {t} := by
+theorem exists_radical_span_singleton_eq
+    {A : Type} [CommRing A] [IsDomain A] [UniqueFactorizationMonoid A] {a : A} (ha : a ≠ 0)
+    : ∃ t ∈ nonZeroDivisors A, (Ideal.span {a}).radical = Ideal.span {t} := by
   obtain ⟨y, n, hy, hya, hay⟩ := exists_squarefree_dvd_pow_of_ne_zero ha
   refine ⟨y, mem_nonZeroDivisors_of_ne_zero hy.ne_zero, le_antisymm ?_ ?_⟩
   · rw [← (isRadical_iff_span_singleton.1 hy.isRadical).radical]
@@ -63,10 +68,11 @@ theorem exists_radical_span_singleton_eq {A : Type} [CommRing A] [IsDomain A]
   · rw [Ideal.span_singleton_le_iff_mem]
     exact ⟨n, Ideal.mem_span_singleton.2 hay⟩
 
-theorem stalkId_vanishingIdeal_compl {X : Scheme.{0}} (U : X.Opens) (x : X)
-    (a : X.presheaf.stalk x)
-    (h : ∀ q : PrimeSpectrum (X.presheaf.stalk x), X.fromSpecStalk x q ∈ U ↔ a ∉ q.asIdeal) :
-    FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal U.compl) x = (Ideal.span {a}).radical := by
+theorem stalkId_vanishingIdeal_compl
+    {X : Scheme.{0}} (U : X.Opens) (x : X) (a : X.presheaf.stalk x)
+    (h : ∀ q : PrimeSpectrum (X.presheaf.stalk x), X.fromSpecStalk x q ∈ U ↔ a ∉ q.asIdeal)
+    : FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal U.compl) x
+      = (Ideal.span {a}).radical := by
   obtain ⟨_, ⟨W, hW, rfl⟩, hx, -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
   rw [ds_stalkId_eq_map _ ⟨W, hW⟩ x hx, Scheme.IdealSheafData.vanishingIdeal_ideal]
@@ -74,7 +80,8 @@ theorem stalkId_vanishingIdeal_compl {X : Scheme.{0}} (U : X.Opens) (x : X)
   haveI := hW.isLocalization_stalk ⟨x, hx⟩
   have hcl : IsClosed (X := PrimeSpectrum Γ(X, W)) (hW.fromSpec ⁻¹' (U.compl : Set X)) :=
     U.compl.isClosed.preimage hW.fromSpec.continuous
-  generalize hJ : PrimeSpectrum.vanishingIdeal (R := Γ(X, W)) (hW.fromSpec ⁻¹' (U.compl : Set X)) = J
+  generalize hJ
+    : PrimeSpectrum.vanishingIdeal (R := Γ(X, W)) (hW.fromSpec ⁻¹' (U.compl : Set X)) = J
   have hz : PrimeSpectrum.zeroLocus (J : Set Γ(X, W)) = hW.fromSpec ⁻¹' (U.compl : Set X) := by
     rw [← hJ, PrimeSpectrum.zeroLocus_vanishingIdeal_eq_closure, hcl.closure_eq]
     rfl
@@ -83,8 +90,9 @@ theorem stalkId_vanishingIdeal_compl {X : Scheme.{0}} (U : X.Opens) (x : X)
   rw [← hr, IsLocalization.map_radical (hW.primeIdealOf ⟨x, hx⟩).asIdeal.primeCompl,
     ← PrimeSpectrum.zeroLocus_eq_iff]
   ext q
-  have e : X.fromSpecStalk x q =
-      hW.fromSpec (PrimeSpectrum.comap (algebraMap Γ(X, W) (X.presheaf.stalk x)) q) := by
+  have e
+      : X.fromSpecStalk x q
+        = hW.fromSpec (PrimeSpectrum.comap (algebraMap Γ(X, W) (X.presheaf.stalk x)) q) := by
     rw [← hW.fromSpecStalk_eq_fromSpecStalk hx]
     rfl
   rw [PrimeSpectrum.mem_zeroLocus, PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe,
@@ -93,7 +101,11 @@ theorem stalkId_vanishingIdeal_compl {X : Scheme.{0}} (U : X.Opens) (x : X)
   have := Set.ext_iff.1 hz (PrimeSpectrum.comap (algebraMap Γ(X, W) (X.presheaf.stalk x)) q)
   exact (not_congr this).trans not_not
 
-theorem exists_nonzeroLocus_eq : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [X.IsSeparated] (U : X.Opens), IsAffineOpen U → (U : Set X).Nonempty → (∀ x : X, UniqueFactorizationMonoid (X.presheaf.stalk x)) → ∃ (L : LB X) (σ : LB.Sec L), L.IsLB ∧ nonzeroLocus σ = U := by
+theorem exists_nonzeroLocus_eq
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [X.IsSeparated] (U : X.Opens),
+      IsAffineOpen U → (U : Set X).Nonempty
+        → (∀ x : X, UniqueFactorizationMonoid (X.presheaf.stalk x))
+        → ∃ (L : LB X) (σ : LB.Sec L), L.IsLB ∧ nonzeroLocus σ = U := by
   intro X _ _ _ U hU hne hufd
   have hι : IsAffineHom U.ι :=
     haveI : IsAffine U := hU
@@ -117,11 +129,11 @@ theorem exists_nonzeroLocus_eq : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyN
       change X.fromSpecStalk x q ∈ U
       rw [hq]
       exact ((genericPoint_spec X).mem_open_set_iff U.isOpen).2 (by simpa using hne)
-    obtain ⟨a, ha⟩ := @GlobalTheory.exists_eq_basicOpen_of_isAffineOpen_of_uniqueFactorization (X.presheaf.stalk x) (X.presheaf.stalk x).commRing hd hn (hufd x)
-      (X.fromSpecStalk x ⁻¹ᵁ U) hA ⟨q, hqU⟩
-    have h : ∀ q : PrimeSpectrum (X.presheaf.stalk x),
-        X.fromSpecStalk x q ∈ U ↔ a ∉ q.asIdeal := fun q =>
-      iff_of_eq (congrArg (fun V => q ∈ V) ha)
+    obtain ⟨a, ha⟩ :=
+      @GlobalTheory.exists_eq_basicOpen_of_isAffineOpen_of_uniqueFactorization (X.presheaf.stalk x)
+        (X.presheaf.stalk x).commRing hd hn (hufd x) (X.fromSpecStalk x ⁻¹ᵁ U) hA ⟨q, hqU⟩
+    have h : ∀ q : PrimeSpectrum (X.presheaf.stalk x), X.fromSpecStalk x q ∈ U ↔ a ∉ q.asIdeal :=
+      fun q => iff_of_eq (congrArg (fun V => q ∈ V) ha)
     have ha0 : a ≠ 0 := fun h0 => (h q).1 hqU (h0 ▸ zero_mem _)
     rw [stalkId_vanishingIdeal_compl U x a h]
     exact exists_radical_span_singleton_eq ha0

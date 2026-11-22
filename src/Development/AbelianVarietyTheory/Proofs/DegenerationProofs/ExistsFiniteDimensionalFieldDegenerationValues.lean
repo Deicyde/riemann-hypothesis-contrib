@@ -6,9 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsG
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex
 
@@ -16,13 +18,17 @@ noncomputable section
 namespace GlobalTheory.FiniteValues
 open GlobalTheory.TorusExt GlobalTheory.ArcExt
 
-theorem exists_finset_point {R : Type} [CommRing R] [IsDomain R] {F : Type} [Field F] [Algebra (FractionRing R) F]
-    (B : Over (Spec (CommRingCat.of R))) [LocallyOfFiniteType B.hom] (p : TF (R := R) F ⟶ B) :
-    ∃ S : Finset F, ∀ K : IntermediateField (FractionRing R) F, (S : Set F) ⊆ K →
-      ∃ l : TF (R := R) K ⟶ B, extMap (R := R) (algebraMap K F) rfl ≫ l = p := by
+theorem exists_finset_point
+    {R : Type} [CommRing R] [IsDomain R]
+    {F : Type} [Field F] [Algebra (FractionRing R) F]
+    (B : Over (Spec (CommRingCat.of R))) [LocallyOfFiniteType B.hom]
+    (p : TF (R := R) F ⟶ B)
+    : ∃ S : Finset F, ∀ K : IntermediateField (FractionRing R) F,
+      (S : Set F) ⊆ K → ∃ l : TF (R := R) K ⟶ B, extMap (R := R) (algebraMap K F) rfl ≫ l = p := by
   classical
-  obtain ⟨_, ⟨U, hU, rfl⟩, hpt, -⟩ := B.left.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ (p.left (IsLocalRing.closedPoint F))) isOpen_univ
+  obtain ⟨_, ⟨U, hU, rfl⟩, hpt, -⟩ :=
+    B.left.isBasis_affineOpens.exists_subset_of_mem_open
+      (Set.mem_univ (p.left (IsLocalRing.closedPoint F))) isOpen_univ
   have hU : IsAffineOpen U := hU
   obtain ⟨f, hf⟩ : ∃ f : Γ(B.left, U) ⟶ CommRingCat.of F, Spec.map f ≫ hU.fromSpec = p.left := by
     refine ⟨Spec.preimage (IsOpenImmersion.lift hU.fromSpec p.left ?_), ?_⟩
@@ -32,8 +38,10 @@ theorem exists_finset_point {R : Type} [CommRing R] [IsDomain R] {F : Type} [Fie
     · rw [Spec.map_preimage]; exact IsOpenImmersion.lift_fac _ _ _
   obtain ⟨g, hg⟩ : ∃ g : CommRingCat.of R ⟶ Γ(B.left, U), Spec.map g = hU.fromSpec ≫ B.hom :=
     ⟨Spec.preimage _, Spec.map_preimage _⟩
-  have hgf : g ≫ f = CommRingCat.ofHom (algebraMap R (FractionRing R)) ≫
-      CommRingCat.ofHom (algebraMap (FractionRing R) F) :=
+  have hgf
+      : g ≫ f
+        = CommRingCat.ofHom (algebraMap R (FractionRing R))
+          ≫ CommRingCat.ofHom (algebraMap (FractionRing R) F) :=
     Spec.map_injective (by
       rw [Spec.map_comp, hg, ← Category.assoc, hf, Spec.map_comp]
       exact Over.w p)
@@ -63,7 +71,15 @@ theorem exists_finset_point {R : Type} [CommRing R] [IsDomain R] {F : Type} [Fie
     rw [← hf, ← Spec.map_comp_assoc]
     rfl
 
-theorem exists_finite_field_of_values : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F] [Algebra (FractionRing R) F] [Algebra.IsAlgebraic (FractionRing R) F] (N : NumD F) (_ : NumOf D F N) (T : Set N.A), T.Finite → ∃ (K₁ : IntermediateField (FractionRing R) F) (A₀ : Subgroup N.A), FiniteDimensional (FractionRing R) K₁ ∧ (∀ x ∈ T, x ∈ A₀) ∧ (∀ χ, N.c χ ∈ A₀) ∧ (∀ x ∈ A₀, ∀ y ∈ A₀, ∀ u ∈ A₀, (N.θ x y u : F) ∈ K₁) ∧ (∀ x ∈ A₀, (N.σ x : F) ∈ K₁) ∧ (∀ x ∈ A₀, N.th x ∈ K₁) ∧ ∀ χ, (N.ψ χ : F) ∈ K₁ := by
+theorem exists_finite_field_of_values
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F]
+        [Algebra (FractionRing R) F] [Algebra.IsAlgebraic (FractionRing R) F] (N : NumD F)
+        (_ : NumOf D F N) (T : Set N.A),
+      T.Finite
+        → ∃ (K₁ : IntermediateField (FractionRing R) F) (A₀ : Subgroup N.A),
+          FiniteDimensional (FractionRing R) K₁ ∧ (∀ x ∈ T, x ∈ A₀) ∧ (∀ χ, N.c χ ∈ A₀)
+            ∧ (∀ x ∈ A₀, ∀ y ∈ A₀, ∀ u ∈ A₀, (N.θ x y u : F) ∈ K₁) ∧ (∀ x ∈ A₀, (N.σ x : F) ∈ K₁)
+            ∧ (∀ x ∈ A₀, N.th x ∈ K₁) ∧ ∀ χ, (N.ψ χ : F) ∈ K₁ := by
   intro R _ _ D F _ _ _ N ν T hT
   haveI := D.P.isAb.proper
   choose S hS using fun x : N.A => exists_finset_point D.P.A (ν.eA x)
@@ -82,21 +98,40 @@ theorem exists_finite_field_of_values : ∀ (R : Type) [CommRing R] [IsDomain R]
     exact h
   have hJ' : ∀ ψ, ν.J (spMap f ≫ ψ) = J ψ := fun _ => rfl
   have hm : ∀ a : K, f a ∈ K := fun a => a.2
-  have hv : ∀ {Y : Scheme.{0}} {I : Type} [Fintype I] {φ : I → (Y ⟶ D.P.A.left)} {ε : I → ℤ}
-      (t : LB.Gen (LB.LinComb D.P.L φ ε)) (r : Sp K ⟶ Y), vF t (spMap f ≫ r) ν.J ∈ K := fun t r => by
+  have hv
+      : ∀ {Y : Scheme.{0}} {I : Type} [Fintype I] {φ : I → (Y ⟶ D.P.A.left)} {ε : I → ℤ}
+          (t : LB.Gen (LB.LinComb D.P.L φ ε)) (r : Sp K ⟶ Y),
+        vF t (spMap f ≫ r) ν.J ∈ K := fun t r => by
     rw [vF_ext f hJ hJ']; exact hm _
-  have hw : ∀ {Y : Scheme.{0}} {I : Type} [Fintype I] {φ : I → (Y ⟶ D.P.A.left)} {ε : I → ℤ}
-      (t : LB.Sec (LB.LinComb D.P.L φ ε)) (r : Sp K ⟶ Y), sF t (spMap f ≫ r) ν.J ∈ K := fun t r => by
+  have hw
+      : ∀ {Y : Scheme.{0}} {I : Type} [Fintype I] {φ : I → (Y ⟶ D.P.A.left)} {ε : I → ℤ}
+          (t : LB.Sec (LB.LinComb D.P.L φ ε)) (r : Sp K ⟶ Y),
+        sF t (spMap f ≫ r) ν.J ∈ K := fun t r => by
     rw [sF_ext f hJ hJ']; exact hm _
   have hrig : rigVal ν ∈ K := by
     rw [rigVal, ← Over.w (extMap (R := R) f hf)]
     exact hv _ _
-  refine ⟨K, Φ.range, IntermediateField.finiteDimensional_adjoin fun x _ => (Algebra.IsAlgebraic.isAlgebraic x).isIntegral,
-    fun x hx => ?_, fun χ => ?_, ?_, ?_, ?_, fun χ => ?_⟩
-  · obtain ⟨l, hl⟩ := hS x K ((Set.subset_biUnion_of_mem (u := fun x => (S x : Set F)) hx).trans
-      (IntermediateField.subset_adjoin _ _))
+  refine ⟨
+    K,
+    Φ.range,
+    IntermediateField.finiteDimensional_adjoin fun x _ =>
+      (Algebra.IsAlgebraic.isAlgebraic x).isIntegral,
+    fun x hx => ?_,
+    fun χ => ?_,
+    ?_,
+    ?_,
+    ?_,
+    fun χ => ?_
+  ⟩
+  · obtain ⟨l, hl⟩ :=
+      hS x K
+        ((Set.subset_biUnion_of_mem (u := fun x => (S x : Set F)) hx).trans
+          (IntermediateField.subset_adjoin _ _))
     exact ⟨l, ν.eA.injective ((hΦ l).trans hl)⟩
-  · exact ⟨DegPre.cF D K (ν.eX χ), ν.eA.injective ((hΦ _).trans ((DVR.comp_cP D _ _).trans (ν.c_eq χ).symm))⟩
+  · exact ⟨
+      DegPre.cF D K (ν.eX χ),
+      ν.eA.injective ((hΦ _).trans ((DVR.comp_cP D _ _).trans (ν.c_eq χ).symm))
+    ⟩
   · rintro _ ⟨x, rfl⟩ _ ⟨y, rfl⟩ _ ⟨u, rfl⟩
     rw [ν.θ_eq, hΦ, hΦ, hΦ, ← comp_lift, ← comp_lift]
     exact hv _ _

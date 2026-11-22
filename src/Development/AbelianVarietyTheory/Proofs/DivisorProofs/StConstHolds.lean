@@ -37,9 +37,14 @@ theorem stConst_holds : StConst := by
       exact absurd ((pi_norm_le_iff_of_nonneg zero_le_one).2 h) (not_le.2 hw)
     obtain ⟨x, hx⟩ := this
     apply hf0
-    calc (1 : ℝ) < ‖w x‖ ^ 2 := by nlinarith
+    calc
+      (1 : ℝ)
+        < ‖w x‖ ^ 2 := by nlinarith
       _ ≤ ∑ y, ‖w y‖ ^ 2 :=
-        Finset.single_le_sum (f := fun y => ‖w y‖ ^ 2) (fun y _ => by positivity) (Finset.mem_univ x)
+        Finset.single_le_sum
+          (f := fun y => ‖w y‖ ^ 2)
+          (fun y _ => by positivity)
+          (Finset.mem_univ x)
   have hFn : 0 ≤ F := fun w => hnonneg _
   have hF0 : F 0 ≠ 0 := by
     simp only [hF, Pi.zero_apply, norm_zero]

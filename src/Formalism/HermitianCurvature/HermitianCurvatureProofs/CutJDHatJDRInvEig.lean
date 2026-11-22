@@ -12,13 +12,13 @@ open Matrix
 
 noncomputable section
 
-theorem neg_one_sq (p : ℕ) : ((-1 : ℂ) ^ p) * (-1) ^ p - 1 = 0 := by
-  rw [← mul_pow]; simp
+theorem neg_one_sq (p : ℕ) : ((-1 : ℂ) ^ p) * (-1) ^ p - 1 = 0 := by rw [← mul_pow]; simp
 
-theorem core_col {N : ℕ} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (η : Fin (N + 1) → ℂ) (h : T *ᵥ η = η)
-    (j : Fin (N + 1)) :
-    ∑ p, η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix p.succAbove j.succAbove).det) =
-      (-1 : ℂ) ^ (j : ℕ) * (T.det * η j) := by
+theorem core_col
+    {N : ℕ} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (η : Fin (N + 1) → ℂ) (h : T *ᵥ η = η)
+    (j : Fin (N + 1))
+    : ∑ p, η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix p.succAbove j.succAbove).det)
+      = (-1 : ℂ) ^ (j : ℕ) * (T.det * η j) := by
   have kj : ∑ p, T.adjugate j p * η p = T.det * η j := by
     have := congrFun (congrArg (fun M => M *ᵥ η) (adjugate_mul T)) j
     rw [← mulVec_mulVec, h] at this
@@ -29,10 +29,11 @@ theorem core_col {N : ℕ} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (η : Fi
   linear_combination (-(-1 : ℂ) ^ (j : ℕ) * η p) * E -
     (η p * (-1 : ℂ) ^ (p : ℕ) * (T.submatrix p.succAbove j.succAbove).det) * (neg_one_sq (j : ℕ))
 
-theorem core_row {N : ℕ} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (η : Fin (N + 1) → ℂ) (h : η ᵥ* T = η)
-    (j : Fin (N + 1)) :
-    ∑ p, η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix j.succAbove p.succAbove).det) =
-      (-1 : ℂ) ^ (j : ℕ) * (T.det * η j) := by
+theorem core_row
+    {N : ℕ} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (η : Fin (N + 1) → ℂ) (h : η ᵥ* T = η)
+    (j : Fin (N + 1))
+    : ∑ p, η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix j.succAbove p.succAbove).det)
+      = (-1 : ℂ) ^ (j : ℕ) * (T.det * η j) := by
   have h' : Tᵀ *ᵥ η = η := by rw [mulVec_transpose]; exact h
   have := core_col Tᵀ η h' j
   rw [det_transpose] at this
@@ -40,8 +41,8 @@ theorem core_row {N : ℕ} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (η : Fi
   refine Finset.sum_congr rfl (fun p _ => ?_)
   rw [← transpose_submatrix, det_transpose]
 
-theorem smono_succAbove {N : ℕ} (f : Fin N → Fin (N + 1)) (hf : StrictMono f) :
-    ∃ j : Fin (N + 1), f = j.succAbove := by
+theorem smono_succAbove {N : ℕ} (f : Fin N → Fin (N + 1)) (hf : StrictMono f)
+    : ∃ j : Fin (N + 1), f = j.succAbove := by
   classical
   obtain ⟨j, hj⟩ : ∃ j, ∀ l, f l ≠ j := by
     by_contra hc
@@ -51,49 +52,63 @@ theorem smono_succAbove {N : ℕ} (f : Fin N → Fin (N + 1)) (hf : StrictMono f
     simp at this
   have hcard : (Finset.univ.erase j).card = N := by simp [Finset.card_erase_of_mem]
   have h1 := Finset.orderEmbOfFin_unique hcard (f := f) (fun x => by simp [hj x]) hf
-  have h2 := Finset.orderEmbOfFin_unique hcard (f := j.succAbove) (fun x => by simp [Fin.succAbove_ne])
-    (Fin.strictMono_succAbove j)
+  have h2 :=
+    Finset.orderEmbOfFin_unique hcard (f := j.succAbove)
+      (fun x => by simp [Fin.succAbove_ne])
+      (Fin.strictMono_succAbove j)
   exact ⟨j, h1.trans h2.symm⟩
 
 variable {k r : ℕ}
 
-def eV (k r : ℕ) (p : Fin (r + k + 1)) : Fin (2 * r + k + 1) := ⟨r + p.val, by have := p.isLt; omega⟩
+def eV (k r : ℕ) (p : Fin (r + k + 1)) : Fin (2 * r + k + 1) :=
+  ⟨r + p.val, by have := p.isLt; omega⟩
 
 def e0 (k r : ℕ) (p : Fin (r + k + 1)) : Fin (2 * r + k + 1) := ⟨p.val, by have := p.isLt; omega⟩
 
-theorem colsV_eq (t : Fin (k + 1)) :
-    colsV k r t = eV k r ∘ (⟨t.val, by have := t.isLt; omega⟩ : Fin (r + k + 1)).succAbove := by
+theorem colsV_eq (t : Fin (k + 1))
+    : colsV k r t = eV k r ∘ (⟨t.val, by have := t.isLt; omega⟩ : Fin (r + k + 1)).succAbove := by
   funext l
   apply Fin.ext
   simp only [colsV, eV, Function.comp_apply, Fin.succAbove, Fin.lt_def]
   split_ifs <;> simp only [Fin.val_castSucc, Fin.val_succ] at * <;> omega
 
-theorem rowsR_eq (i : Fin (k + 1)) :
-    rowsR k r i = e0 k r ∘ (⟨r + i.val, by have := i.isLt; omega⟩ : Fin (r + k + 1)).succAbove := by
+theorem rowsR_eq (i : Fin (k + 1))
+    : rowsR k r i
+      = e0 k r ∘ (⟨r + i.val, by have := i.isLt; omega⟩ : Fin (r + k + 1)).succAbove := by
   funext l
   apply Fin.ext
   simp only [rowsR, e0, Function.comp_apply, Fin.succAbove, Fin.lt_def]
   split_ifs <;> simp only [Fin.val_castSucc, Fin.val_succ] at * <;> omega
 
-theorem w_col_e {z' : Fin (2 * r + k + 1) → ℂ} {w : B.Mat k r} (hw : w ∈ UWset k r z') (q : Fin (2 * r + k + 1))
-    (hq : q.val < r) (y : Fin (2 * r + k + 1)) : w y q = if y = q then 1 else 0 := by
+theorem w_col_e
+    {z' : Fin (2 * r + k + 1) → ℂ} {w : B.Mat k r} (hw : w ∈ UWset k r z')
+    (q : Fin (2 * r + k + 1)) (hq : q.val < r)
+    (y : Fin (2 * r + k + 1))
+    : w y q = if y = q then 1 else 0 := by
   have h1 := congrFun (hw.2.1 ⟨q.val, hq⟩).1 y
   have e : eI k r ⟨q.val, hq⟩ = q := Fin.ext rfl
   rw [e] at h1
   simpa [bvec, Matrix.mulVec, dotProduct, Pi.single_apply] using h1
 
-theorem m_col_e {m : B.Mat k r} (hm : m ∈ Nset k r) (q i : Fin (2 * r + k + 1)) (hq : q.val < r) (hi : q.val ≤ i.val) :
-    m i q = if i = q then 1 else 0 := by
+theorem m_col_e
+    {m : B.Mat k r} (hm : m ∈ Nset k r)
+    (q i : Fin (2 * r + k + 1)) (hq : q.val < r) (hi : q.val ≤ i.val)
+    : m i q = if i = q then 1 else 0 := by
   have := hm.2.1 ⟨q.val, hq⟩ i hi
   have e : eI k r ⟨q.val, hq⟩ = q := Fin.ext rfl
   rwa [e] at this
 
-theorem mw_X {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hw : w ∈ UWset k r z') (hm : m ∈ Nset k r)
-    (i q : Fin (2 * r + k + 1)) (hi : r ≤ i.val) (hq : q.val < r) : (m * w) i q = 0 := by
+theorem mw_X
+    {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hw : w ∈ UWset k r z') (hm : m ∈ Nset k r)
+    (i q : Fin (2 * r + k + 1)) (hi : r ≤ i.val) (hq : q.val < r)
+    : (m * w) i q = 0 := by
   rw [Matrix.mul_apply]
-  simp only [w_col_e hw q hq, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [w_col_e hw q hq, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+    if_true]
   rw [m_col_e hm q i hq (by omega), if_neg]
-  intro h; subst h; omega
+  intro h
+  subst h
+  omega
 
 end
 
@@ -107,12 +122,18 @@ noncomputable section
 
 variable {k r : ℕ}
 
-theorem sum_emb {a b : ℕ} (f : Fin a → Fin b) (hf : Function.Injective f) (G : Fin b → ℂ)
-    (hG : ∀ q, (∀ p, f p ≠ q) → G q = 0) : ∑ p, G (f p) = ∑ q, G q := by
+theorem sum_emb
+    {a b : ℕ} (f : Fin a → Fin b) (hf : Function.Injective f) (G : Fin b → ℂ)
+    (hG : ∀ q, (∀ p, f p ≠ q) → G q = 0)
+    : ∑ p, G (f p) = ∑ q, G q := by
   classical
-  calc ∑ p, G (f p) = ∑ q ∈ Finset.univ.map ⟨f, hf⟩, G q := by rw [Finset.sum_map]; rfl
-    _ = ∑ q, G q := Finset.sum_subset (Finset.subset_univ _) (fun q _ hq => hG q (fun p hp => hq (by
-        simp only [Finset.mem_map, Finset.mem_univ, true_and]; exact ⟨p, hp⟩)))
+  calc
+    ∑ p, G (f p)
+      = ∑ q ∈ Finset.univ.map ⟨f, hf⟩, G q := by rw [Finset.sum_map]; rfl
+    _ = ∑ q, G q :=
+      Finset.sum_subset (Finset.subset_univ _) (fun q _ hq =>
+        hG q (fun p hp =>
+          hq (by simp only [Finset.mem_map, Finset.mem_univ, true_and]; exact ⟨p, hp⟩)))
 
 theorem eV_inj : Function.Injective (eV k r) := fun a b h => by
   simp only [eV, Fin.ext_iff] at h; exact Fin.ext (by omega)
@@ -120,32 +141,47 @@ theorem eV_inj : Function.Injective (eV k r) := fun a b h => by
 theorem index_embedding_injective : Function.Injective (e0 k r) := fun a b h => by
   simp only [e0, Fin.ext_iff] at h; exact Fin.ext h
 
-theorem comp_inj {a b c : ℕ} {e : Fin b → Fin c} (he : Function.Injective e) {f g : Fin a → Fin b}
-    (h : e ∘ f = e ∘ g) : f = g := funext fun l => he (congrFun h l)
+theorem comp_inj
+    {a b c : ℕ} {e : Fin b → Fin c} (he : Function.Injective e)
+    {f g : Fin a → Fin b} (h : e ∘ f = e ∘ g)
+    : f = g :=
+  funext fun l => he (congrFun h l)
 
-theorem nilpotent_column_anisotropic {m : B.Mat k r} (hm : m ∈ Nset k r) (i j : Fin (2 * r + k + 1)) (hj1 : r ≤ j.val)
-    (hj2 : j.val ≤ r + k) (hi : r ≤ i.val) : m i j = if i = j then 1 else 0 :=
+theorem nilpotent_column_anisotropic
+    {m : B.Mat k r} (hm : m ∈ Nset k r)
+    (i j : Fin (2 * r + k + 1)) (hj1 : r ≤ j.val) (hj2 : j.val ≤ r + k) (hi : r ≤ i.val)
+    : m i j = if i = j then 1 else 0 :=
   hm.2.2 i j hj1 hj2 hi
 
-theorem mw_colX {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hw : w ∈ UWset k r z')
-    (i q : Fin (2 * r + k + 1)) (hq : q.val < r) : (m * w) i q = m i q := by
+theorem mw_colX
+    {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hw : w ∈ UWset k r z')
+    (i q : Fin (2 * r + k + 1)) (hq : q.val < r)
+    : (m * w) i q = m i q := by
   rw [Matrix.mul_apply]
-  simp only [w_col_e hw q hq, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [w_col_e hw q hq, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+    if_true]
 
-theorem nilpotent_unitary_fixes_tail {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hz' : inWb k r z') (hw : w ∈ UWset k r z')
-    (hm : m ∈ Nset k r) (i : Fin (2 * r + k + 1)) (hi : r ≤ i.val) : ((m * w) *ᵥ z') i = z' i := by
+theorem nilpotent_unitary_fixes_tail
+    {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r}
+    (hz' : inWb k r z') (hw : w ∈ UWset k r z') (hm : m ∈ Nset k r)
+    (i : Fin (2 * r + k + 1)) (hi : r ≤ i.val)
+    : ((m * w) *ᵥ z') i = z' i := by
   rw [← Matrix.mulVec_mulVec, hw.2.2]
   have e : ∀ j, m i j * z' j = (if i = j then 1 else 0) * z' j := by
     intro j
     by_cases hj : r ≤ j.val ∧ j.val ≤ r + k
     · rw [nilpotent_column_anisotropic hm i j hj.1 hj.2 hi]
     · rw [hz' j (by omega), mul_zero, mul_zero]
-  simp only [Matrix.mulVec, dotProduct, e, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  simp only [Matrix.mulVec, dotProduct, e, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq,
+    Finset.mem_univ, if_true]
 
-def TV (k r : ℕ) (S : B.Mat k r) : Matrix (Fin (r + k + 1)) (Fin (r + k + 1)) ℂ := S.submatrix (eV k r) (eV k r)
+def TV (k r : ℕ) (S : B.Mat k r) : Matrix (Fin (r + k + 1)) (Fin (r + k + 1)) ℂ :=
+  S.submatrix (eV k r) (eV k r)
 
-theorem TV_fix {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hz' : inWb k r z') (hw : w ∈ UWset k r z')
-    (hm : m ∈ Nset k r) : TV k r (m * w) *ᵥ (fun p => z' (eV k r p)) = fun p => z' (eV k r p) := by
+theorem TV_fix
+    {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r}
+    (hz' : inWb k r z') (hw : w ∈ UWset k r z') (hm : m ∈ Nset k r)
+    : TV k r (m * w) *ᵥ (fun p => z' (eV k r p)) = fun p => z' (eV k r p) := by
   funext i
   have h := nilpotent_unitary_fixes_tail hz' hw hm (eV k r i) (by simp [eV])
   rw [← h]
@@ -162,10 +198,13 @@ def eVEquiv (k r : ℕ) : Fin (r + k + 1) ≃ {a : Fin (2 * r + k + 1) // ¬ a.v
   left_inv p := by ext; simp [eV]
   right_inv a := by ext; simp [eV]; have := a.2; omega
 
-theorem det_mw_V {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hw : w ∈ UWset k r z')
-    (hm : m ∈ Nset k r) : (m * w).det = (TV k r (m * w)).det := by
+theorem det_mw_V
+    {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hw : w ∈ UWset k r z') (hm : m ∈ Nset k r)
+    : (m * w).det = (TV k r (m * w)).det := by
   classical
-  rw [Matrix.twoBlockTriangular_det (m * w) (fun i => i.val < r) (fun i hi j hj => mw_X hw hm i j (by omega) hj)]
+  rw [Matrix.twoBlockTriangular_det (m * w)
+    (fun i => i.val < r)
+    (fun i hi j hj => mw_X hw hm i j (by omega) hj)]
   have h1 : ((m * w).toSquareBlockProp (fun i => i.val < r)).det = 1 := by
     rw [Matrix.det_of_isUpperTriangular]
     · refine Finset.prod_eq_one (fun i _ => ?_)
@@ -174,16 +213,19 @@ theorem det_mw_V {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hw : w �
     · intro i j hij
       simp only [Matrix.toSquareBlockProp, Matrix.toBlock_apply]
       rw [mw_colX hw _ _ j.2, m_col_e hm j.1 i.1 j.2 (le_of_lt hij), if_neg]
-      intro h; exact (ne_of_lt hij) (Subtype.ext h).symm
+      intro h
+      exact (ne_of_lt hij) (Subtype.ext h).symm
   have h2 : ((m * w).toSquareBlockProp (fun i => ¬ i.val < r)).det = (TV k r (m * w)).det := by
     rw [← Matrix.det_submatrix_equiv_self (eVEquiv k r)]
     rfl
   rw [h1, h2, one_mul]
 
-theorem betaM_d {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hz' : inWb k r z') (hw : w ∈ UWset k r z')
-    (hm : m ∈ Nset k r) (d : Fin (r + k) → Fin (2 * r + k + 1)) (hd : StrictMono d) :
-    ∑ t, beM k r z' t * ((m * w).submatrix (colsV k r t) d).det =
-      (m * w).det * ∑ t, beM k r z' t * (if d = colsV k r t then 1 else 0) := by
+theorem betaM_d
+    {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r}
+    (hz' : inWb k r z') (hw : w ∈ UWset k r z') (hm : m ∈ Nset k r)
+    (d : Fin (r + k) → Fin (2 * r + k + 1)) (hd : StrictMono d)
+    : ∑ t, beM k r z' t * ((m * w).submatrix (colsV k r t) d).det
+      = (m * w).det * ∑ t, beM k r z' t * (if d = colsV k r t then 1 else 0) := by
   classical
   by_cases hX : ∃ l, (d l).val < r
   · obtain ⟨l, hl⟩ := hX
@@ -219,25 +261,34 @@ theorem betaM_d {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hz' : inWb
     have hT : T *ᵥ η = η := TV_fix hz' hw hm
     have hη : ∀ p : Fin (r + k + 1), k < p.val → η p = 0 := fun p hp =>
       hz' _ (Or.inr (by simp [eV]; omega))
-    have hwI : ∀ t : Fin (k + 1), wI k r t = eV k r ⟨t.val, by have := t.isLt; omega⟩ := fun t => Fin.ext rfl
-    have emb_inj : Function.Injective (fun t : Fin (k + 1) => (⟨t.val, by have := t.isLt; omega⟩ : Fin (r + k + 1))) :=
-      fun a b h => Fin.ext (by simpa using h)
-    have notin : ∀ q : Fin (r + k + 1), (∀ t : Fin (k + 1), (⟨t.val, by have := t.isLt; omega⟩ : Fin (r + k + 1)) ≠ q) →
-        k < q.val := fun q hq => by
+    have hwI : ∀ t : Fin (k + 1), wI k r t = eV k r ⟨t.val, by have := t.isLt; omega⟩ := fun t =>
+      Fin.ext rfl
+    have emb_inj : Function.Injective (fun t : Fin (k + 1) =>
+        (⟨t.val, by have := t.isLt; omega⟩ : Fin (r + k + 1))) := fun a b h =>
+      Fin.ext (by simpa using h)
+    have notin
+        : ∀ q : Fin (r + k + 1),
+          (∀ t : Fin (k + 1), (⟨t.val, by have := t.isLt; omega⟩ : Fin (r + k + 1)) ≠ q)
+            → k < q.val := fun q hq => by
       by_contra hc
       exact hq ⟨q.val, by omega⟩ (Fin.ext rfl)
-    have lhs : ∑ t, beM k r z' t * ((m * w).submatrix (colsV k r t) d).det =
-        ∑ p, η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix p.succAbove j.succAbove).det) := by
-      rw [← sum_emb _ emb_inj (fun p => η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix p.succAbove j.succAbove).det))
+    have lhs
+        : ∑ t, beM k r z' t * ((m * w).submatrix (colsV k r t) d).det
+          = ∑ p, η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix p.succAbove j.succAbove).det) := by
+      rw [← sum_emb _ emb_inj
+        (fun p => η p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix p.succAbove j.succAbove).det))
         (fun q hq => by rw [hη q (notin q hq), zero_mul])]
       refine Finset.sum_congr rfl (fun t _ => ?_)
       rw [colsV_eq, hdj, beM, hwI]
       simp only [hTdef, TV, Matrix.submatrix_submatrix, hηdef]
       ring
-    have rhs : ∑ t, beM k r z' t * (if d = colsV k r t then 1 else 0) = (-1 : ℂ) ^ (j : ℕ) * η j := by
-      have e1 : ∀ t : Fin (k + 1), beM k r z' t * (if d = colsV k r t then 1 else 0) =
-          (fun p : Fin (r + k + 1) => if j = p then η p * (-1 : ℂ) ^ (p : ℕ) else 0)
-            ⟨t.val, by have := t.isLt; omega⟩ := by
+    have rhs
+        : ∑ t, beM k r z' t * (if d = colsV k r t then 1 else 0) = (-1 : ℂ) ^ (j : ℕ) * η j := by
+      have e1
+          : ∀ t : Fin (k + 1),
+            beM k r z' t * (if d = colsV k r t then 1 else 0)
+              = (fun p : Fin (r + k + 1) => if j = p then η p * (-1 : ℂ) ^ (p : ℕ) else 0)
+                ⟨t.val, by have := t.isLt; omega⟩ := by
         intro t
         dsimp only
         have iff : d = colsV k r t ↔ j = ⟨t.val, by have := t.isLt; omega⟩ := by
@@ -251,7 +302,8 @@ theorem betaM_d {z' : Fin (2 * r + k + 1) → ℂ} {w m : B.Mat k r} (hz' : inWb
           ring
         · rw [if_neg (fun h' => h (iff.1 h')), if_neg h, mul_zero]
       simp only [e1]
-      rw [sum_emb _ emb_inj (fun p : Fin (r + k + 1) => if j = p then η p * (-1 : ℂ) ^ (p : ℕ) else 0)
+      rw [sum_emb _ emb_inj
+        (fun p : Fin (r + k + 1) => if j = p then η p * (-1 : ℂ) ^ (p : ℕ) else 0)
         (fun q hq => by split_ifs <;> simp [hη q (notin q hq)])]
       rw [Finset.sum_ite_eq]
       simp only [Finset.mem_univ, if_true]
@@ -279,8 +331,10 @@ theorem inverse_beta_minus_holds : RInvBetaM := by
   classical
   have hmem : ∀ t, colsV k r t ∈ jSetR k r := fun t => by
     simp only [jSetR, Finset.mem_filter, Finset.mem_univ, true_and]; exact colsV_smono t
-  have e1 : ∀ d ∈ jSetR k r, (∑ t, beM k r z' t * ((m * w).submatrix (colsV k r t) d).det) • X d =
-      ∑ t, ((m * w).det * beM k r z' t) • (if d = colsV k r t then X d else 0) := by
+  have e1
+      : ∀ d ∈ jSetR k r,
+        (∑ t, beM k r z' t * ((m * w).submatrix (colsV k r t) d).det) • X d
+          = ∑ t, ((m * w).det * beM k r z' t) • (if d = colsV k r t then X d else 0) := by
     intro d hd
     have hd' : StrictMono d := by simpa [jSetR] using hd
     rw [betaM_d hz' hw hm d hd', Finset.mul_sum, Finset.sum_smul]
@@ -300,11 +354,12 @@ noncomputable section
 
 variable {k r : ℕ}
 
-theorem zeta_zero {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z') (q : Fin (2 * r + k + 1)) (hq : q.val < r) :
-    herm (Hpk k r) (bvec q) z' = 0 := by
+theorem zeta_zero
+    {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z') (q : Fin (2 * r + k + 1)) (hq : q.val < r)
+    : herm (Hpk k r) (bvec q) z' = 0 := by
   unfold herm
-  simp only [dotProduct, Matrix.mulVec, bvec, Pi.single_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
-    Finset.mem_univ, if_true, Pi.star_apply]
+  simp only [dotProduct, Matrix.mulVec, bvec, Pi.single_apply, mul_ite, mul_one, mul_zero,
+    Finset.sum_ite_eq', Finset.mem_univ, if_true, Pi.star_apply]
   refine Finset.sum_eq_zero (fun x _ => ?_)
   by_cases hx : r ≤ x.val ∧ x.val ≤ r + k
   · have : Hpk k r x q = 0 := by
@@ -320,14 +375,15 @@ theorem rowsR_smono (i : Fin (k + 1)) : StrictMono (rowsR k r i) := by
   simp only [Function.comp_apply, e0, Fin.lt_def] at this ⊢
   omega
 
-theorem conclusion₃ {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z') (P : B.Mat k r)
-    (hPV0 : ∀ i j : Fin (2 * r + k + 1), r + k < i.val → j.val ≤ r + k → P i j = 0)
+theorem conclusion₃
+    {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z')
+    (P : B.Mat k r) (hPV0 : ∀ i j : Fin (2 * r + k + 1), r + k < i.val → j.val ≤ r + k → P i j = 0)
     (hdet : P.det = (P.submatrix (e0 k r) (e0 k r)).det)
-    (hζ : (fun p => herm (Hpk k r) (bvec (e0 k r p)) z') ᵥ* (P.submatrix (e0 k r) (e0 k r)) =
-      (fun p => herm (Hpk k r) (bvec (e0 k r p)) z'))
-    (c : Fin (r + k) → Fin (2 * r + k + 1)) (hc : StrictMono c) :
-    ∑ i, alP k r z' i * (P.submatrix c (rowsR k r i)).det =
-      P.det * ∑ i, alP k r z' i * (if c = rowsR k r i then 1 else 0) := by
+    (hζ : (fun p => herm (Hpk k r) (bvec (e0 k r p)) z') ᵥ* (P.submatrix (e0 k r) (e0 k r))
+      = (fun p => herm (Hpk k r) (bvec (e0 k r p)) z'))
+    (c : Fin (r + k) → Fin (2 * r + k + 1)) (hc : StrictMono c)
+    : ∑ i, alP k r z' i * (P.submatrix c (rowsR k r i)).det
+      = P.det * ∑ i, alP k r z' i * (if c = rowsR k r i then 1 else 0) := by
   classical
   have hR : ∀ (i : Fin (k + 1)) (l : Fin (r + k)), (rowsR k r i l).val ≤ r + k := fun i l => by
     simp only [rowsR]; split_ifs <;> omega
@@ -359,32 +415,43 @@ theorem conclusion₃ {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z') (P 
       omega
     set T := P.submatrix (e0 k r) (e0 k r) with hTdef
     set ζ : Fin (r + k + 1) → ℂ := fun p => herm (Hpk k r) (bvec (e0 k r p)) z' with hζdef
-    have hζ0 : ∀ p : Fin (r + k + 1), p.val < r → ζ p = 0 := fun p hp => zeta_zero hz' _ (by simp [e0]; omega)
-    have hwI : ∀ i : Fin (k + 1), wI k r i = e0 k r ⟨r + i.val, by have := i.isLt; omega⟩ := fun i => Fin.ext rfl
-    have emb_inj : Function.Injective
-        (fun i : Fin (k + 1) => (⟨r + i.val, by have := i.isLt; omega⟩ : Fin (r + k + 1))) :=
-      fun a b h => Fin.ext (by simp only [Fin.mk.injEq] at h; omega)
-    have notin : ∀ q : Fin (r + k + 1),
-        (∀ i : Fin (k + 1), (⟨r + i.val, by have := i.isLt; omega⟩ : Fin (r + k + 1)) ≠ q) → q.val < r :=
-      fun q hq => by
-        by_contra hc
-        exact hq ⟨q.val - r, by have := q.isLt; omega⟩ (Fin.ext (by simp only; omega))
+    have hζ0 : ∀ p : Fin (r + k + 1), p.val < r → ζ p = 0 := fun p hp =>
+      zeta_zero hz' _ (by simp [e0]; omega)
+    have hwI : ∀ i : Fin (k + 1), wI k r i = e0 k r ⟨r + i.val, by have := i.isLt; omega⟩ :=
+      fun i => Fin.ext rfl
+    have emb_inj : Function.Injective (fun i : Fin (k + 1) =>
+        (⟨r + i.val, by have := i.isLt; omega⟩ : Fin (r + k + 1))) := fun a b h =>
+      Fin.ext (by simp only [Fin.mk.injEq] at h; omega)
+    have notin
+        : ∀ q : Fin (r + k + 1),
+          (∀ i : Fin (k + 1), (⟨r + i.val, by have := i.isLt; omega⟩ : Fin (r + k + 1)) ≠ q)
+            → q.val < r := fun q hq => by
+      by_contra hc
+      exact hq ⟨q.val - r, by have := q.isLt; omega⟩ (Fin.ext (by simp only; omega))
     have hs : ∀ i : ℕ, (-1 : ℂ) ^ i = (-1 : ℂ) ^ r * (-1 : ℂ) ^ (r + i) := fun i => by
       rw [pow_add, ← mul_assoc, ← mul_pow]; simp
-    have lhs : ∑ i, alP k r z' i * (P.submatrix c (rowsR k r i)).det =
-        (-1 : ℂ) ^ r * ∑ p, ζ p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix j.succAbove p.succAbove).det) := by
-      rw [Finset.mul_sum, ← sum_emb _ emb_inj
-        (fun p => (-1 : ℂ) ^ r * (ζ p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix j.succAbove p.succAbove).det)))
-        (fun q hq => by rw [hζ0 q (notin q hq)]; ring)]
+    have lhs
+        : ∑ i, alP k r z' i * (P.submatrix c (rowsR k r i)).det
+          = (-1 : ℂ) ^ r
+            * ∑ p, ζ p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix j.succAbove p.succAbove).det) := by
+      rw [Finset.mul_sum,
+        ← sum_emb _ emb_inj
+          (fun p =>
+            (-1 : ℂ) ^ r * (ζ p * ((-1 : ℂ) ^ (p : ℕ) * (T.submatrix j.succAbove p.succAbove).det)))
+          (fun q hq => by rw [hζ0 q (notin q hq)]; ring)]
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [rowsR_eq, hcj, alP, hwI, hs (i : ℕ)]
       simp only [hTdef, Matrix.submatrix_submatrix, hζdef]
       ring
-    have rhs : ∑ i, alP k r z' i * (if c = rowsR k r i then 1 else 0) =
-        (-1 : ℂ) ^ r * ((-1 : ℂ) ^ (j : ℕ) * ζ j) := by
-      have e1 : ∀ i : Fin (k + 1), alP k r z' i * (if c = rowsR k r i then 1 else 0) =
-          (fun p : Fin (r + k + 1) => if j = p then (-1 : ℂ) ^ r * ((-1 : ℂ) ^ (p : ℕ) * ζ p) else 0)
-            ⟨r + i.val, by have := i.isLt; omega⟩ := by
+    have rhs
+        : ∑ i, alP k r z' i * (if c = rowsR k r i then 1 else 0)
+          = (-1 : ℂ) ^ r * ((-1 : ℂ) ^ (j : ℕ) * ζ j) := by
+      have e1
+          : ∀ i : Fin (k + 1),
+            alP k r z' i * (if c = rowsR k r i then 1 else 0)
+              = (fun p : Fin (r + k + 1) =>
+                  if j = p then (-1 : ℂ) ^ r * ((-1 : ℂ) ^ (p : ℕ) * ζ p) else 0)
+                ⟨r + i.val, by have := i.isLt; omega⟩ := by
         intro i
         dsimp only
         have iff : c = rowsR k r i ↔ j = ⟨r + i.val, by have := i.isLt; omega⟩ := by
@@ -398,26 +465,31 @@ theorem conclusion₃ {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z') (P 
           ring
         · rw [if_neg (fun h' => h (iff.1 h')), if_neg h, mul_zero]
       simp only [e1]
-      rw [sum_emb _ emb_inj (fun p : Fin (r + k + 1) => if j = p then (-1 : ℂ) ^ r * ((-1 : ℂ) ^ (p : ℕ) * ζ p) else 0)
+      rw [sum_emb _ emb_inj
+        (fun p : Fin (r + k + 1) => if j = p then (-1 : ℂ) ^ r * ((-1 : ℂ) ^ (p : ℕ) * ζ p) else 0)
         (fun q hq => by split_ifs <;> simp [hζ0 q (notin q hq)])]
       rw [Finset.sum_ite_eq]
       simp only [Finset.mem_univ, if_true]
     rw [lhs, core_row T ζ hζ j, rhs, hdet]
     ring
 
-theorem usage₅ {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z') (P : B.Mat k r)
-    (hPV0 : ∀ i j : Fin (2 * r + k + 1), r + k < i.val → j.val ≤ r + k → P i j = 0)
+theorem usage₅
+    {z' : Fin (2 * r + k + 1) → ℂ} (hz' : inWb k r z')
+    (P : B.Mat k r) (hPV0 : ∀ i j : Fin (2 * r + k + 1), r + k < i.val → j.val ≤ r + k → P i j = 0)
     (hdet : P.det = (P.submatrix (e0 k r) (e0 k r)).det)
-    (hζ : (fun p => herm (Hpk k r) (bvec (e0 k r p)) z') ᵥ* (P.submatrix (e0 k r) (e0 k r)) =
-      (fun p => herm (Hpk k r) (bvec (e0 k r p)) z'))
-    (M : Type) [AddCommGroup M] [Module ℂ M] (X : (Fin (r + k) → Fin (2 * r + k + 1)) → M) :
-    ∑ c ∈ jSetR k r, (∑ i : Fin (k + 1), alP k r z' i * (P.submatrix c (rowsR k r i)).det) • X c =
-      P.det • ∑ i : Fin (k + 1), alP k r z' i • X (rowsR k r i) := by
+    (hζ : (fun p => herm (Hpk k r) (bvec (e0 k r p)) z') ᵥ* (P.submatrix (e0 k r) (e0 k r))
+      = (fun p => herm (Hpk k r) (bvec (e0 k r p)) z'))
+    (M : Type) [AddCommGroup M] [Module ℂ M]
+    (X : (Fin (r + k) → Fin (2 * r + k + 1)) → M)
+    : ∑ c ∈ jSetR k r, (∑ i : Fin (k + 1), alP k r z' i * (P.submatrix c (rowsR k r i)).det) • X c
+      = P.det • ∑ i : Fin (k + 1), alP k r z' i • X (rowsR k r i) := by
   classical
   have hmem : ∀ i, rowsR k r i ∈ jSetR k r := fun i => by
     simp only [jSetR, Finset.mem_filter, Finset.mem_univ, true_and]; exact rowsR_smono i
-  have e1 : ∀ c ∈ jSetR k r, (∑ i, alP k r z' i * (P.submatrix c (rowsR k r i)).det) • X c =
-      ∑ i, (P.det * alP k r z' i) • (if c = rowsR k r i then X c else 0) := by
+  have e1
+      : ∀ c ∈ jSetR k r,
+        (∑ i, alP k r z' i * (P.submatrix c (rowsR k r i)).det) • X c
+          = ∑ i, (P.det * alP k r z' i) • (if c = rowsR k r i then X c else 0) := by
     intro c hc
     have hc' : StrictMono c := by simpa [jSetR] using hc
     rw [conclusion₃ hz' P hPV0 hdet hζ c hc', Finset.mul_sum, Finset.sum_smul]

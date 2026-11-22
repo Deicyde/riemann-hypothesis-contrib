@@ -45,37 +45,50 @@ private lemma spec_gen {A : Type} [CommRing A] [IsDomain A] (a : PrimeSpectrum A
     (h : a ⤳ (⊥ : PrimeSpectrum A)) : a = ⊥ :=
   le_bot_iff.1 ((PrimeSpectrum.le_iff_specializes _ _).2 h)
 
-theorem UpperTheory.exists_specializes_lift_generic_base_change :
-    ∀ (R Ω : Type) [CommRing R] [IsDomain R] [Field Ω] [Algebra R Ω], Function.Injective (algebraMap R Ω) → ∀ {W : Scheme.{0}} (w : W ⟶ Sp R) (y' : ↑(pullback w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))))) (x : W), x ⤳ (pullback.fst w (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))) y' → ∃ x' : ↑(pullback w (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))), x' ⤳ y' ∧ (pullback.fst w (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))) x' = x := by
+theorem UpperTheory.exists_specializes_lift_generic_base_change
+    : ∀ (R Ω : Type) [CommRing R] [IsDomain R] [Field Ω] [Algebra R Ω],
+      Function.Injective (algebraMap R Ω)
+        → ∀ {W : Scheme.{0}} (w : W ⟶ Sp R)
+            (y' : ↑(pullback w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))))) (x : W),
+          x ⤳ (pullback.fst w (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))) y'
+            → ∃ x' : ↑(pullback w (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))),
+              x' ⤳ y'
+                ∧ (pullback.fst w (Spec.map (CommRingCat.ofHom (algebraMap R Ω)))) x' = x := by
   intro R Ω _ _ _ _ hinj W w y' x hx
   have hRK : Function.Injective (algebraMap R (FractionRing R)) := IsFractionRing.injective R _
   letI : Algebra (FractionRing R) Ω := (IsFractionRing.lift hinj : FractionRing R →+* Ω).toAlgebra
   haveI : IsPreimmersion (Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R)))) :=
     IsPreimmersion.of_isLocalization (nonZeroDivisors R)
-  have hcomp : (algebraMap (FractionRing R) Ω).comp (algebraMap R (FractionRing R)) =
-      algebraMap R Ω := IsLocalization.lift_comp _
-  have hg : Spec.map (CommRingCat.ofHom (algebraMap (FractionRing R) Ω)) ≫
-      Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R))) =
-      Spec.map (CommRingCat.ofHom (algebraMap R Ω)) := by
+  have hcomp
+      : (algebraMap (FractionRing R) Ω).comp (algebraMap R (FractionRing R)) = algebraMap R Ω :=
+    IsLocalization.lift_comp _
+  have hg
+      : Spec.map (CommRingCat.ofHom (algebraMap (FractionRing R) Ω))
+          ≫ Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R)))
+        = Spec.map (CommRingCat.ofHom (algebraMap R Ω)) := by
     rw [← Spec.map_comp, ← CommRingCat.ofHom_comp, hcomp]
   apply aux w (Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R))))
     (Spec.map (CommRingCat.ofHom (algebraMap (FractionRing R) Ω))) _ hg y' x hx
   have hwx : (show PrimeSpectrum R from w x) = ⊥ := by
     apply spec_gen
     have h1 := hx.map w.continuous
-    have h2 : w (pullback.fst w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) y') =
-        Spec.map (CommRingCat.ofHom (algebraMap R Ω))
-          (pullback.snd w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) y') := by
+    have h2
+        : w (pullback.fst w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) y')
+          = Spec.map (CommRingCat.ofHom (algebraMap R Ω))
+            (pullback.snd w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) y') := by
       show (pullback.fst w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) ≫ w).base y' =
         (pullback.snd w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) ≫
           Spec.map (CommRingCat.ofHom (algebraMap R Ω))).base y'
       rw [pullback.condition]
     rw [h2, spec_field (pullback.snd w (Spec.map (CommRingCat.ofHom (algebraMap R Ω))) y'),
-      spec_bot _ hinj] at h1
+        spec_bot _ hinj]
+      at h1
     exact h1
-  obtain ⟨z, hz, -⟩ := Scheme.Pullback.exists_preimage_pullback (f := w)
-    (g := Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R)))) x
-    (⊥ : PrimeSpectrum (FractionRing R)) (by
-      show (show PrimeSpectrum R from w x) = _
-      rw [hwx, spec_bot _ hRK])
+  obtain ⟨z, hz, -⟩ :=
+    Scheme.Pullback.exists_preimage_pullback (f := w)
+      (g := Spec.map (CommRingCat.ofHom (algebraMap R (FractionRing R)))) x
+      (⊥ : PrimeSpectrum (FractionRing R))
+      (by
+        show (show PrimeSpectrum R from w x) = _
+        rw [hwx, spec_bot _ hRK])
   exact ⟨z, hz⟩

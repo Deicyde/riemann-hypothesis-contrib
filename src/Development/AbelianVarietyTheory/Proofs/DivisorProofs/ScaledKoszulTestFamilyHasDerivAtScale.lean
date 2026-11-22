@@ -20,20 +20,28 @@ theorem ev_rP {n : ℕ} (ε : Fin n → Bool) (g : Mat n) : ev g (rP ε) = ((rM 
   push_cast
   ring
 
-theorem hasDerivAt_scale (G : ℝ → ℝ) (hG : ContDiff ℝ (⊤ : ℕ∞) G) (k : ℕ) (r t : ℝ) (ht : t ≠ 0) :
-    HasDerivAt (fun s : ℝ => iteratedDeriv k (fun y => G (s * y)) r)
-      (t⁻¹ * (k * iteratedDeriv k (fun y => G (t * y)) r + r * iteratedDeriv (k + 1) (fun y => G (t * y)) r)) t := by
+theorem hasDerivAt_scale (G : ℝ → ℝ) (hG : ContDiff ℝ (⊤ : ℕ∞) G) (k : ℕ) (r t : ℝ) (ht : t ≠ 0)
+    : HasDerivAt
+      (fun s : ℝ => iteratedDeriv k (fun y => G (s * y)) r)
+      (t⁻¹
+        * (k * iteratedDeriv k (fun y => G (t * y)) r
+          + r * iteratedDeriv (k + 1) (fun y => G (t * y)) r))
+      t := by
   have hc : ∀ m : ℕ, ContDiff ℝ m G := fun m => hG.of_le (by exact_mod_cast le_top)
-  have e : ∀ (m : ℕ) (s : ℝ), iteratedDeriv m (fun y => G (s * y)) r = s ^ m * iteratedDeriv m G (s * r) :=
-    fun m s => congrFun (iteratedDeriv_comp_const_mul (hc m) s) r
+  have e
+      : ∀ (m : ℕ) (s : ℝ),
+        iteratedDeriv m (fun y => G (s * y)) r = s ^ m * iteratedDeriv m G (s * r) := fun m s =>
+    congrFun (iteratedDeriv_comp_const_mul (hc m) s) r
   simp only [e]
   have hD : HasDerivAt (iteratedDeriv k G) (iteratedDeriv (k + 1) G (t * r)) (t * r) := by
     rw [iteratedDeriv_succ]
-    exact ((hc (k + 1)).differentiable_iteratedDeriv k (by exact_mod_cast Nat.lt_succ_self k)).differentiableAt.hasDerivAt
+    exact ((hc (k + 1)).differentiable_iteratedDeriv k
+      (by exact_mod_cast Nat.lt_succ_self k)).differentiableAt.hasDerivAt
   have h1 : HasDerivAt (fun s : ℝ => s * r) r t := by simpa using (hasDerivAt_id t).mul_const r
-  have h2 : HasDerivAt (fun s : ℝ => s ^ k * iteratedDeriv k G (s * r))
-      (k * t ^ (k - 1) * iteratedDeriv k G (t * r) + t ^ k * (iteratedDeriv (k + 1) G (t * r) * r)) t :=
-    by
+  have h2 : HasDerivAt
+      (fun s : ℝ => s ^ k * iteratedDeriv k G (s * r))
+      (k * t ^ (k - 1) * iteratedDeriv k G (t * r) + t ^ k * (iteratedDeriv (k + 1) G (t * r) * r))
+      t := by
     have h3 := (hasDerivAt_pow k t).mul (hD.comp t h1)
     exact h3
   refine h2.congr_deriv ?_
@@ -45,11 +53,12 @@ theorem hasDerivAt_scale (G : ℝ → ℝ) (hG : ContDiff ℝ (⊤ : ℕ∞) G) 
     field_simp
     ring
 
-theorem sum_shift (N : ℕ) (a e : ℕ → ℂ) (r : ℂ) (he : e (N + 1) = 0) :
-    ∑ k ∈ Finset.range (N + 1), ((k : ℂ) * a k + r * a (k + 1)) * e k =
-      ∑ k ∈ Finset.range (N + 1), a (k + 1) * (((k : ℂ) + 1) * e (k + 1) + r * e k) := by
-  have h1 : ∑ k ∈ Finset.range (N + 1), (k : ℂ) * a k * e k =
-      ∑ k ∈ Finset.range (N + 1), a (k + 1) * (((k : ℂ) + 1) * e (k + 1)) := by
+theorem sum_shift (N : ℕ) (a e : ℕ → ℂ) (r : ℂ) (he : e (N + 1) = 0)
+    : ∑ k ∈ Finset.range (N + 1), ((k : ℂ) * a k + r * a (k + 1)) * e k
+      = ∑ k ∈ Finset.range (N + 1), a (k + 1) * (((k : ℂ) + 1) * e (k + 1) + r * e k) := by
+  have h1
+      : ∑ k ∈ Finset.range (N + 1), (k : ℂ) * a k * e k
+        = ∑ k ∈ Finset.range (N + 1), a (k + 1) * (((k : ℂ) + 1) * e (k + 1)) := by
     rw [Finset.sum_range_succ', Finset.sum_range_succ (n := N), he]
     simp only [Nat.cast_zero, zero_mul, mul_zero, add_zero]
     refine Finset.sum_congr rfl fun k _ => ?_
@@ -59,9 +68,9 @@ theorem sum_shift (N : ℕ) (a e : ℕ → ℂ) (r : ℂ) (he : e (N + 1) = 0) :
   congr 1
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem sum_prev {n : ℕ} (g : Mat n) (N : ℕ) (a : ℕ → ℂ) (q : ℕ → Poly n) (hq : q N = 0) (R : ℂ) :
-    ∑ k ∈ Finset.range (N + 1), a (k + 1) * (R * ev g (prev q k)) =
-      ∑ k ∈ Finset.range (N + 1), a (k + 1 + 1) * (R * ev g (q k)) := by
+theorem sum_prev {n : ℕ} (g : Mat n) (N : ℕ) (a : ℕ → ℂ) (q : ℕ → Poly n) (hq : q N = 0) (R : ℂ)
+    : ∑ k ∈ Finset.range (N + 1), a (k + 1) * (R * ev g (prev q k))
+      = ∑ k ∈ Finset.range (N + 1), a (k + 1 + 1) * (R * ev g (q k)) := by
   rw [Finset.sum_range_succ', Finset.sum_range_succ (n := N), hq]
   simp [prev]
 

@@ -9,23 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsLocal
 
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr Polynomial
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt :
-    ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ →
-    ∀ (π : K.O) (π' : K'.O),
-      algebraMap K'.O K'.E π' = φ (algebraMap K.O K.E π) →
-      IsLocalRing.maximalIdeal K.O = Ideal.span {π} →
-      IsLocalRing.maximalIdeal K'.O = Ideal.span {π'} →
-      (letI : Algebra K.E K'.E := φ.toAlgebra
-       ∀ w : Module.Basis (Fin d) K.E K'.E,
-         (∀ z : K'.E, (∃ y : K'.O, algebraMap K'.O K'.E y = z) ↔
-           ∀ k, ∃ a : K.O, algebraMap K.O K.E a = w.repr z k) →
-         ∃ u : K.O, IsUnit u ∧
-           algebraMap K.O K.E u = (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m)).det) := by
+theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt
+    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
+      IsUnrExt K K' d φ
+        → ∀ (π : K.O) (π' : K'.O),
+          algebraMap K'.O K'.E π' = φ (algebraMap K.O K.E π)
+            → IsLocalRing.maximalIdeal K.O = Ideal.span {π}
+            → IsLocalRing.maximalIdeal K'.O = Ideal.span {π'}
+            → (letI : Algebra K.E K'.E := φ.toAlgebra
+               ∀ w : Module.Basis (Fin d) K.E K'.E,
+                 (∀ z : K'.E,
+                     (∃ y : K'.O, algebraMap K'.O K'.E y = z)
+                       ↔ ∀ k, ∃ a : K.O, algebraMap K.O K.E a = w.repr z k)
+                   → ∃ u : K.O,
+                     IsUnit u
+                       ∧ algebraMap K.O K.E u
+                         = (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m)).det) := by
   intro K K' d φ _ π π' hππ' hm hm'
   let : Algebra K.E K'.E := φ.toAlgebra
   intro w hw
-  have hdiscr : ∃ u : K.O, IsUnit u ∧ algebraMap K.O K.E u =
-      (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m)).det := by
+  have hdiscr
+      : ∃ u : K.O,
+        IsUnit u
+          ∧ algebraMap K.O K.E u
+            = (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m)).det := by
     have hj : Function.Injective (algebraMap K'.O K'.E) := IsFractionRing.injective K'.O K'.E
     have hi : Function.Injective (algebraMap K.O K.E) := IsFractionRing.injective K.O K.E
     have hφ : ∀ e : K.E, φ e = algebraMap K.E K'.E e := fun _ => rfl
@@ -46,15 +53,19 @@ theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt :
       e.symm.toRingHom.comp ((φ.comp (algebraMap K.O K.E)).codRestrict _ hlift)
     have hι : ∀ a, algebraMap K'.O K'.E (ι a) = φ (algebraMap K.O K.E a) := by
       intro a
-      exact congrArg Subtype.val (e.apply_symm_apply ((φ.comp (algebraMap K.O K.E)).codRestrict _ hlift a))
+      exact congrArg Subtype.val
+        (e.apply_symm_apply ((φ.comp (algebraMap K.O K.E)).codRestrict _ hlift a))
     let : Algebra K.O K'.O := ι.toAlgebra
-    have hsm : ∀ (a : K.O) (y : K'.O),
-        algebraMap K'.O K'.E (a • y) = algebraMap K.O K.E a • algebraMap K'.O K'.E y := by
+    have hsm
+        : ∀ (a : K.O) (y : K'.O),
+          algebraMap K'.O K'.E (a • y) = algebraMap K.O K.E a • algebraMap K'.O K'.E y := by
       intro a y
       rw [Algebra.smul_def, map_mul, Algebra.smul_def]
       exact congrArg (· * _) (hι a)
-    have hsum : ∀ (g : Fin d → K.O) (v : Fin d → K'.O),
-        algebraMap K'.O K'.E (∑ k, g k • v k) = ∑ k, algebraMap K.O K.E (g k) • algebraMap K'.O K'.E (v k) := by
+    have hsum
+        : ∀ (g : Fin d → K.O) (v : Fin d → K'.O),
+          algebraMap K'.O K'.E (∑ k, g k • v k)
+            = ∑ k, algebraMap K.O K.E (g k) • algebraMap K'.O K'.E (v k) := by
       intro g v
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
@@ -72,8 +83,10 @@ theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt :
       · exact absurd h2.symm h1
       · simp
     choose bv hbv using hw1
-    have hcoord : ∀ (y : K'.O) (k : Fin d), ∃ a : K.O, algebraMap K.O K.E a = w.repr (algebraMap K'.O K'.E y) k :=
-      fun y => (hw _).1 ⟨y, rfl⟩
+    have hcoord
+        : ∀ (y : K'.O) (k : Fin d), ∃ a : K.O,
+          algebraMap K.O K.E a = w.repr (algebraMap K'.O K'.E y) k := fun y =>
+      (hw _).1 ⟨y, rfl⟩
     choose c hc using hcoord
     have hli : LinearIndependent K.O bv := by
       rw [Fintype.linearIndependent_iff]
@@ -99,12 +112,14 @@ theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt :
       simp only [hb]
       rw [w.repr_sum_self]
 
-    have hTr : ∀ y, algebraMap K.O K.E (Algebra.trace K.O K'.O y) =
-        Algebra.trace K.E K'.E (algebraMap K'.O K'.E y) := by
+    have hTr
+        : ∀ y,
+          algebraMap K.O K.E (Algebra.trace K.O K'.O y)
+            = Algebra.trace K.E K'.E (algebraMap K'.O K'.E y) := by
       intro y
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace, Matrix.trace,
-        map_sum]
+        rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace,
+          Matrix.trace, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       simp only [Matrix.diag_apply, Algebra.leftMulMatrix_apply, LinearMap.toMatrix_apply,
         Algebra.coe_lmul_eq_mul, LinearMap.mul_apply', hrep, map_mul, hb]

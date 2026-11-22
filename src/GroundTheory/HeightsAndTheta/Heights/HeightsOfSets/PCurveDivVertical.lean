@@ -21,20 +21,19 @@ open Classical
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-
 open Classical in
 def wt (T : Finset K) : (Σ k, ι k) → ℕ := fun p ↦ if p.1 ∈ T then 1 else 0
 
 def proj (T : Finset K) : MRing ι →+* MRing ι :=
   GradedRing.projZeroRingHom (weightedHomogeneousSubmodule ℤ (wt (ι := ι) T))
 
-theorem proj_apply (T : Finset K) (f : MRing ι) :
-    proj T f = weightedHomogeneousComponent (wt T) 0 f := by
+theorem proj_apply (T : Finset K) (f : MRing ι)
+    : proj T f = weightedHomogeneousComponent (wt T) 0 f := by
   rw [proj, GradedRing.projZeroRingHom_apply]
   exact weightedDecomposition.decompose'_apply ℤ (wt T) f 0
 
-theorem weight_eq_zero_iff {σ : Type*} (w : σ → ℕ) (d : σ →₀ ℕ) :
-    Finsupp.weight w d = 0 ↔ ∀ p, d p ≠ 0 → w p = 0 := by
+theorem weight_eq_zero_iff {σ : Type*} (w : σ → ℕ) (d : σ →₀ ℕ)
+    : Finsupp.weight w d = 0 ↔ ∀ p, d p ≠ 0 → w p = 0 := by
   rw [Finsupp.weight_apply, Finsupp.sum, Finset.sum_eq_zero_iff]
   constructor
   · intro h p hp
@@ -42,8 +41,9 @@ theorem weight_eq_zero_iff {σ : Type*} (w : σ → ℕ) (d : σ →₀ ℕ) :
   · intro h p hp
     rw [smul_eq_mul, h p (Finsupp.mem_support_iff.mp hp), mul_zero]
 
-theorem coeff_proj (T : Finset K) (f : MRing ι) (d : (Σ k, ι k) →₀ ℕ) :
-    AddMonoidAlgebra.coeff (proj T f) d = if ∀ p, d p ≠ 0 → p.1 ∉ T then AddMonoidAlgebra.coeff f d else 0 := by
+theorem coeff_proj (T : Finset K) (f : MRing ι) (d : (Σ k, ι k) →₀ ℕ)
+    : AddMonoidAlgebra.coeff (proj T f) d
+      = if ∀ p, d p ≠ 0 → p.1 ∉ T then AddMonoidAlgebra.coeff f d else 0 := by
   classical
   rw [proj_apply, coeff_weightedHomogeneousComponent]
   have : Finsupp.weight (wt T) d = 0 ↔ ∀ p, d p ≠ 0 → p.1 ∉ T := by
@@ -79,8 +79,8 @@ theorem proj_univ (f : MRing ι) : proj Finset.univ f = C (constantCoeff f) := b
     by_contra hp
     exact h p hp (Finset.mem_univ _)
 
-theorem proj_X_of_mem {T : Finset K} {k : K} (hk : k ∈ T) (i : ι k) :
-    proj T (X ⟨k, i⟩ : MRing ι) = 0 := by
+theorem proj_X_of_mem {T : Finset K} {k : K} (hk : k ∈ T) (i : ι k)
+    : proj T (X ⟨k, i⟩ : MRing ι) = 0 := by
   ext d
   rw [coeff_proj, coeff_X]
   simp only [AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
@@ -90,24 +90,26 @@ theorem proj_X_of_mem {T : Finset K} {k : K} (hk : k ∈ T) (i : ι k) :
   · rfl
   · rfl
 
-theorem proj_X_of_notMem {T : Finset K} {k : K} (hk : k ∉ T) (i : ι k) :
-    proj T (X ⟨k, i⟩ : MRing ι) = X ⟨k, i⟩ := by
+theorem proj_X_of_notMem {T : Finset K} {k : K} (hk : k ∉ T) (i : ι k)
+    : proj T (X ⟨k, i⟩ : MRing ι) = X ⟨k, i⟩ := by
   ext d
   rw [coeff_proj, coeff_X]
   split_ifs with h1 h2 h2
   · rfl
   · rfl
   · subst h2
-    exact absurd (fun p hp ↦ by
-      rw [Finsupp.single_apply] at hp
-      split_ifs at hp with hq
-      · subst hq; exact hk
-      · exact absurd rfl hp) h1
+    exact absurd
+      (fun p hp ↦ by
+        rw [Finsupp.single_apply] at hp
+        split_ifs at hp with hq
+        · subst hq; exact hk
+        · exact absurd rfl hp)
+      h1
   · rfl
 
-theorem isWeightedHomogeneous_of_isMultiHomog (T : Finset K) {f : MRing ι} {a : K → ℕ}
-    (hf : IsMultiHomog f a) :
-    IsWeightedHomogeneous (wt T) f (∑ k, if k ∈ T then a k else 0) := by
+theorem isWeightedHomogeneous_of_isMultiHomog
+    (T : Finset K) {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    : IsWeightedHomogeneous (wt T) f (∑ k, if k ∈ T then a k else 0) := by
   classical
   intro d hd
   have hmon := hf d (mem_support_iff.mpr hd)
@@ -119,9 +121,11 @@ theorem isWeightedHomogeneous_of_isMultiHomog (T : Finset K) {f : MRing ι} {a :
     exact hmon k
   · simp [hk]
 
-theorem isHomogeneous_sup (T : Finset K) {W : Ideal (MRing ι)} (hW : IsMultiHomogIdeal W)
-    {s : MRing ι} {a : K → ℕ} (hs : IsMultiHomog s a) :
-    (W ⊔ Ideal.span {s}).IsHomogeneous (weightedHomogeneousSubmodule ℤ (wt (ι := ι) T)) := by
+theorem isHomogeneous_sup
+    (T : Finset K)
+    {W : Ideal (MRing ι)} (hW : IsMultiHomogIdeal W)
+    {s : MRing ι} {a : K → ℕ} (hs : IsMultiHomog s a)
+    : (W ⊔ Ideal.span {s}).IsHomogeneous (weightedHomogeneousSubmodule ℤ (wt (ι := ι) T)) := by
   obtain ⟨G, hG, rfl⟩ := hW
   rw [← Ideal.span_union]
   apply Ideal.homogeneous_span
@@ -132,10 +136,11 @@ theorem isHomogeneous_sup (T : Finset K) {W : Ideal (MRing ι)} (hW : IsMultiHom
     subst hx
     exact ⟨_, isWeightedHomogeneous_of_isMultiHomog T hs⟩
 
-theorem isHomogeneous_of_mem_minimalPrimes (T : Finset K) {J V : Ideal (MRing ι)}
-    (hJ : J.IsHomogeneous (weightedHomogeneousSubmodule ℤ (wt (ι := ι) T)))
-    (hV : V ∈ J.minimalPrimes) :
-    V.IsHomogeneous (weightedHomogeneousSubmodule ℤ (wt (ι := ι) T)) := by
+theorem isHomogeneous_of_mem_minimalPrimes
+    (T : Finset K)
+    {J V : Ideal (MRing ι)} (hJ : J.IsHomogeneous (weightedHomogeneousSubmodule ℤ (wt (ι := ι) T)))
+    (hV : V ∈ J.minimalPrimes)
+    : V.IsHomogeneous (weightedHomogeneousSubmodule ℤ (wt (ι := ι) T)) := by
   set 𝒜 := weightedHomogeneousSubmodule ℤ (wt (ι := ι) T)
   replace hV : Minimal (fun q : Ideal (MRing ι) ↦ q.IsPrime ∧ J ≤ q) V := hV
   have hcore : (V.homogeneousCore 𝒜).toIdeal.IsPrime := hV.prop.1.homogeneousCore
@@ -146,7 +151,6 @@ theorem isHomogeneous_of_mem_minimalPrimes (T : Finset K) {J V : Ideal (MRing ι
   exact (V.homogeneousCore 𝒜).isHomogeneous
 
 end CurveDivVertical
-
 
 open CurveDivVertical in
 theorem CurveDivVertical.full : CurveDivVertical.Statement := by
@@ -192,8 +196,7 @@ theorem CurveDivVertical.full : CurveDivVertical.Statement := by
       rw [proj_X_of_notMem hk] at h1
       exact hi h1
   have hbot : pt W hWp le_rfl < P ∅ := by
-    suffices key : W < V.comap (proj ∅) from
-      pt_lt _ _ hWp (hPp ∅) le_rfl (hWV.trans (hVP ∅)) key
+    suffices key : W < V.comap (proj ∅) from pt_lt _ _ hWp (hPp ∅) le_rfl (hWV.trans (hVP ∅)) key
     refine lt_of_le_of_ne (hWV.trans (hVP ∅)) fun h ↦ hsW ?_
     rw [h]
     change proj ∅ s ∈ V
@@ -202,7 +205,9 @@ theorem CurveDivVertical.full : CurveDivVertical.Statement := by
   have hchain : ∀ T : Finset K, ∃ l : LTSeries Z, l.last = P T ∧ l.length = T.card + 1 := by
     intro T
     induction T using Finset.induction_on with
-    | empty => exact ⟨(RelSeries.singleton _ (pt W hWp le_rfl)).snoc (P ∅) hbot, RelSeries.last_snoc _ _ _, rfl⟩
+    | empty =>
+      exact
+        ⟨(RelSeries.singleton _ (pt W hWp le_rfl)).snoc (P ∅) hbot, RelSeries.last_snoc _ _ _, rfl⟩
     | insert k T hk ih =>
       obtain ⟨l, hl, hlen⟩ := ih
       refine ⟨l.snoc (P (insert k T)) (hl ▸ hstep T k hk), RelSeries.last_snoc _ _ _, ?_⟩
@@ -211,8 +216,9 @@ theorem CurveDivVertical.full : CurveDivVertical.Statement := by
 
   have hQp : (Ideal.comap (constantCoeff : MRing ι →+* ℤ) (Ideal.span {(2 : ℤ)})).IsPrime :=
     ((Ideal.span_singleton_prime two_ne_zero).mpr Int.prime_two).comap _
-  have hPQ : V.comap (proj Finset.univ) <
-      Ideal.comap (constantCoeff : MRing ι →+* ℤ) (Ideal.span {(2 : ℤ)}) := by
+  have hPQ
+      : V.comap (proj Finset.univ)
+        < Ideal.comap (constantCoeff : MRing ι →+* ℤ) (Ideal.span {(2 : ℤ)}) := by
     have hc : ∀ c : ℤ, C c ∈ V → c = 0 := fun c hc ↦ by
       have : c ∈ V.comap (C : ℤ →+* MRing ι) := hc
       rw [hhor] at this
@@ -222,8 +228,9 @@ theorem CurveDivVertical.full : CurveDivVertical.Statement := by
       rw [proj_univ] at hf
       rw [Ideal.mem_comap, hc _ hf]
       exact Ideal.zero_mem _
-    · have h2 : (C 2 : MRing ι) ∈ Ideal.comap (constantCoeff : MRing ι →+* ℤ)
-          (Ideal.span {(2 : ℤ)}) := by
+    · have h2
+          : (C 2 : MRing ι)
+            ∈ Ideal.comap (constantCoeff : MRing ι →+* ℤ) (Ideal.span {(2 : ℤ)}) := by
         rw [Ideal.mem_comap, constantCoeff_C]
         exact Ideal.mem_span_singleton_self 2
       rw [← h] at h2
@@ -232,9 +239,11 @@ theorem CurveDivVertical.full : CurveDivVertical.Statement := by
       exact two_ne_zero (hc 2 h2)
   let Q : Z := pt _ hQp ((hWV.trans (hVP Finset.univ)).trans hPQ.le)
   obtain ⟨l, hl, hlen⟩ := hchain Finset.univ
-  have hlen' := Order.LTSeries.length_le_krullDim (l.snoc Q (by
-    rw [hl]
-    exact pt_lt _ _ (hPp _) hQp (hWV.trans (hVP _)) ((hWV.trans (hVP Finset.univ)).trans hPQ.le) hPQ))
+  have hlen' :=
+    Order.LTSeries.length_le_krullDim (l.snoc Q (by
+      rw [hl]
+      exact pt_lt _ _ (hPp _) hQp (hWV.trans (hVP _)) ((hWV.trans (hVP Finset.univ)).trans hPQ.le)
+        hPQ))
   change ((l.length + 1 : ℕ) : WithBot ℕ∞) ≤ _ at hlen'
   rw [hlen, Finset.card_univ, ← ringKrullDim_quotient, hdim] at hlen'
   have : Fintype.card K + 1 + 1 ≤ 1 + Fintype.card K := by exact_mod_cast hlen'

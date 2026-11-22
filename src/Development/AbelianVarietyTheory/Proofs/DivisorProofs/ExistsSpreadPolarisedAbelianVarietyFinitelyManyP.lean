@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.I
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -21,7 +23,14 @@ noncomputable section
 
 namespace GlobalTheory.SpreadPolAV
 
-theorem exists_spread : ∀ (F Ω : Type) [Field F] [Field Ω] (em : F →+* Ω) (A : PolAV (Sp Ω)) (I : Type) [Finite I] (y : I → (baseOver (Sp Ω) ⟶ A.A)), ∃ (T : Type) (_ : CommRing T) (_ : IsDomain T) (_ : Algebra F T) (jT : T →+* Ω) (P : PolAV (Sp T)) (φ : A.A.left ⟶ P.A.left) (y₀ : I → (baseOver (Sp T) ⟶ P.A)), Algebra.FiniteType F T ∧ Function.Injective jT ∧ jT.comp (algebraMap F T) = em ∧ IsGrpPullback A.A P.A (spMap jT) φ ∧ LBIso A.L (P.L.pull φ) ∧ ∀ i, (y i).left ≫ φ = spMap jT ≫ (y₀ i).left := by
+theorem exists_spread
+    : ∀ (F Ω : Type) [Field F] [Field Ω] (em : F →+* Ω) (A : PolAV (Sp Ω)) (I : Type) [Finite I]
+        (y : I → (baseOver (Sp Ω) ⟶ A.A)),
+      ∃ (T : Type) (_ : CommRing T) (_ : IsDomain T) (_ : Algebra F T) (jT : T →+* Ω)
+          (P : PolAV (Sp T)) (φ : A.A.left ⟶ P.A.left) (y₀ : I → (baseOver (Sp T) ⟶ P.A)),
+        Algebra.FiniteType F T ∧ Function.Injective jT ∧ jT.comp (algebraMap F T) = em
+          ∧ IsGrpPullback A.A P.A (spMap jT) φ ∧ LBIso A.L (P.L.pull φ)
+          ∧ ∀ i, (y i).left ≫ φ = spMap jT ≫ (y₀ i).left := by
   classical
   intro F Ω _ _ em A I _ y
   obtain ⟨R, P₀, φ₀, ftR, -, H₀, iso₀⟩ := GlobalTheory.KeyTf.exists_polAV_finiteType_subring Ω A
@@ -57,12 +66,9 @@ theorem exists_spread : ∀ (F Ω : Type) [Field F] [Field Ω] (em : F →+* Ω)
   let g : R →+* T := R.subtype.codRestrict T fun r => hRT r r.2
   let incl : R' →+* T := R'.val.toRingHom.codRestrict T fun z => hR'T z z.2
   let jT : T →+* Ω := T.val.toRingHom
-  have e₁ : spMap jT ≫ spMap g = spMap R.subtype := by
-    rw [← Spec.map_comp]; rfl
-  have e₂ : spMap jT ≫ spMap incl = spMap R'.val.toRingHom := by
-    rw [← Spec.map_comp]; rfl
-  have e₃ : spMap incl ≫ spMap (algebraMap R R') = spMap g := by
-    rw [← Spec.map_comp]; rfl
+  have e₁ : spMap jT ≫ spMap g = spMap R.subtype := by rw [← Spec.map_comp]; rfl
+  have e₂ : spMap jT ≫ spMap incl = spMap R'.val.toRingHom := by rw [← Spec.map_comp]; rfl
+  have e₃ : spMap incl ≫ spMap (algebraMap R R') = spMap g := by rw [← Spec.map_comp]; rfl
 
   let P : PolAV (Sp T) := GlobalTheory.AmpleSymModel.polPull P₀ (spMap g)
   have Gp : IsGrpPullback P.A P₀.A (spMap g) (pullback.fst P₀.A.hom (spMap g)) :=
@@ -77,15 +83,28 @@ theorem exists_spread : ∀ (F Ω : Type) [Field F] [Field Ω] (em : F →+* Ω)
     rw [Category.assoc, (hy' i).1, e₃, Category.id_comp]
   let y₀ : I → (baseOver (Sp T) ⟶ P.A) := fun i =>
     Over.homMk (Gp.1.lift (spMap incl ≫ y' i) (𝟙 _) (hu i)) (Gp.1.lift_snd _ _ (hu i))
-  refine ⟨T, inferInstance, inferInstance, inferInstance, jT, P, φ, y₀,
-    (Subalgebra.fg_iff_finiteType T).1 hTfg, Subtype.val_injective, RingHom.ext fun _ => rfl,
+  refine ⟨
+    T,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    jT,
+    P,
+    φ,
+    y₀,
+    (Subalgebra.fg_iff_finiteType T).1 hTfg,
+    Subtype.val_injective,
+    RingHom.ext fun _ => rfl,
     Gp.cancel (H₀.congr e₁.symm hφ.symm) hφ',
-    GlobalTheory.KeyTf.lbIso_pull_pull_of_comp A.isLB P₀.isLB hφ iso₀, fun i => ?_⟩
+    GlobalTheory.KeyTf.lbIso_pull_pull_of_comp A.isLB P₀.isLB hφ iso₀,
+    fun i => ?_
+  ⟩
   apply Gp.1.hom_ext
-  · change (y i).left ≫ φ ≫ pullback.fst P₀.A.hom (spMap g) =
-      spMap jT ≫ Gp.1.lift (spMap incl ≫ y' i) (𝟙 _) (hu i) ≫ pullback.fst P₀.A.hom (spMap g)
+  · change (y i).left ≫ φ ≫ pullback.fst P₀.A.hom (spMap g)
+      = spMap jT ≫ Gp.1.lift (spMap incl ≫ y' i) (𝟙 _) (hu i) ≫ pullback.fst P₀.A.hom (spMap g)
     rw [hφ, Gp.1.lift_fst, ← Category.assoc, e₂, (hy' i).2]
-  · change (y i).left ≫ φ ≫ P.A.hom = spMap jT ≫ Gp.1.lift (spMap incl ≫ y' i) (𝟙 _) (hu i) ≫ P.A.hom
+  · change (y i).left ≫ φ ≫ P.A.hom
+      = spMap jT ≫ Gp.1.lift (spMap incl ≫ y' i) (𝟙 _) (hu i) ≫ P.A.hom
     rw [hφ', Gp.1.lift_snd, ← Category.assoc, Over.w (y i)]
     exact (Category.id_comp _).trans (Category.comp_id _).symm
 end GlobalTheory.SpreadPolAV

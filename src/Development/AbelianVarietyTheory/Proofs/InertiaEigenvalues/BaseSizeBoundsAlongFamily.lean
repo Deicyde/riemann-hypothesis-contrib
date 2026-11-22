@@ -11,20 +11,24 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.NEqRZeroMulXPow
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
 
 namespace GlobalTheory.Proof.baseSize_bounds_along_family
 
 open Formalism.BasicNotions
 
-theorem baseSize_bounds {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) :
-    ∀ W0 ∈ GlobalTheory.IndefiniteRowSideFullHecke.BaseSizes.baseSizes L,
+theorem baseSize_bounds {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L)
+    : ∀ W0 ∈ GlobalTheory.IndefiniteRowSideFullHecke.BaseSizes.baseSizes L,
       2 * (L.sc.b / LevelStarExponents.lStar L) + (D.R.t : ℝ) / 2 + 3 ≤ W0 ∧ W0 ≤ L.sc.b := by
   intro W0 hW
   have hls : Formalism.MainNotions.TwistedPlaces.lStar L = LevelStarExponents.lStar L := rfl
   have hl0 : 0 < LevelStarExponents.lStar L := hls ▸ Formalism.MainNotions.TwistedPlaces.lStar_pos L
-  have hgt : L.sc.b' < LevelStarExponents.lStar L := hls ▸ Formalism.MainNotions.TwistedPlaces.lStar_gt L P
-  have hleb : LevelStarExponents.lStar L ≤ L.sc.b := hls ▸ Formalism.MainNotions.TwistedPlaces.lStar_le_b L
+  have hgt : L.sc.b' < LevelStarExponents.lStar L :=
+    hls ▸ Formalism.MainNotions.TwistedPlaces.lStar_gt L P
+  have hleb : LevelStarExponents.lStar L ≤ L.sc.b :=
+    hls ▸ Formalism.MainNotions.TwistedPlaces.lStar_le_b L
   have hw := Formalism.MainNotions.TwistedPlaces.w''_le_b' L
   have hb'0 := Formalism.MainNotions.TwistedPlaces.b'_pos L
   have hx := L.sc.one_lt_alt
@@ -40,13 +44,25 @@ theorem baseSize_bounds {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) 
     have hm := Formalism.MainNotions.TwistedPlaces.m_ge_one D
     have hn := Formalism.MainNotions.TwistedPlaces.n_ge_one D
     have ht : (7 : ℝ) ≤ D.R.t := by
-      have := Formalism.MainNotions.TwistedPlaces.t_ge D; have := Formalism.MainNotions.TwistedPlaces.k_le_r D; have := Formalism.MainNotions.TwistedPlaces.k_ge_five D; linarith
+      have := Formalism.MainNotions.TwistedPlaces.t_ge D
+      have := Formalism.MainNotions.TwistedPlaces.k_le_r D
+      have := Formalism.MainNotions.TwistedPlaces.k_ge_five D
+      linarith
     have hS := L.Sc_pos
     have hLg := Formalism.MainNotions.TwistedPlaces.Lg_nonneg L
     have hn2 : (1 : ℝ) ≤ (D.R.n : ℝ) ^ 2 := by nlinarith
-    have hA : 3 * (D.R.m : ℝ) ≤ (D.R.k : ℝ) * (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + Formalism.MainNotions.TwistedPlaces.large₂ L) := by
-      have e1 : (3 : ℝ) ≤ (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + Formalism.MainNotions.TwistedPlaces.large₂ L) := by nlinarith
-      have e2 : (D.R.m : ℝ) * 3 ≤ (D.R.k : ℝ) * ((D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + Formalism.MainNotions.TwistedPlaces.large₂ L)) :=
+    have hA
+        : 3 * (D.R.m : ℝ)
+          ≤ (D.R.k : ℝ) * (D.R.n : ℝ) ^ 2
+            * (L.Sc + D.R.t + Formalism.MainNotions.TwistedPlaces.large₂ L) := by
+      have e1
+          : (3 : ℝ)
+            ≤ (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + Formalism.MainNotions.TwistedPlaces.large₂ L) := by
+        nlinarith
+      have e2
+          : (D.R.m : ℝ) * 3
+            ≤ (D.R.k : ℝ)
+              * ((D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + Formalism.MainNotions.TwistedPlaces.large₂ L)) :=
         mul_le_mul hk e1 (by norm_num) (by linarith)
       linarith
     have : LevelStarExponents.lStar L * (3 * (D.R.m : ℝ)) ≤ D.R.m * L.sc.b :=
@@ -64,7 +80,10 @@ theorem baseSize_bounds {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) 
     have h4 : L.etaSz ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) * L.etaSz := by
       have : (1 : ℝ) ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) := by nlinarith
       nlinarith
-    have h7 : 12 * L.sc.b / LevelStarExponents.lStar L = 12 * (L.sc.b / LevelStarExponents.lStar L) := by ring
+    have h7
+        : 12 * L.sc.b / LevelStarExponents.lStar L
+          = 12 * (L.sc.b / LevelStarExponents.lStar L) := by
+      ring
     linarith
   rcases hW with rfl | rfl | ⟨t, rfl⟩
   · exact ⟨le_trans hlow (by linarith), le_rfl⟩
@@ -73,8 +92,15 @@ theorem baseSize_bounds {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) 
     have h2 := Formalism.MainNotions.TwistedPlaces.bT_le_two_mul_b' L P t
     exact ⟨by linarith, by linarith⟩
 
-theorem main : ∀ {eps : ℝ} (Fm : FamP eps) (x : ℝ), Fm.x1 < x → ∀ (a : Fm.Ix x), ∀ W0 ∈ GlobalTheory.IndefiniteRowSideFullHecke.BaseSizes.baseSizes (Fm.L x a),
-    2 * ((Fm.L x a).sc.b / LevelStarExponents.lStar (Fm.L x a)) + ((Fm.D x a).R.t : ℝ) / 2 + 3 ≤ W0 ∧ W0 ≤ (Fm.L x a).sc.b := by
+theorem main
+    : ∀ {eps : ℝ} (Fm : FamP eps) (x : ℝ),
+      Fm.x1 < x
+        → ∀ (a : Fm.Ix x),
+          ∀ W0 ∈ GlobalTheory.IndefiniteRowSideFullHecke.BaseSizes.baseSizes (Fm.L x a),
+            2 * ((Fm.L x a).sc.b / LevelStarExponents.lStar (Fm.L x a)) + ((Fm.D x a).R.t : ℝ) / 2
+                  + 3
+                ≤ W0
+              ∧ W0 ≤ (Fm.L x a).sc.b := by
   intro eps Fm x hx a W0 hW
   exact baseSize_bounds (Fm.L x a) (Fm.params x hx a) W0 hW
 

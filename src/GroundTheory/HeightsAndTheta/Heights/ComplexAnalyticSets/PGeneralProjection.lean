@@ -19,8 +19,8 @@ def genericMatrix (d n : ℕ) : Matrix (Fin d) (Fin n) (MvPolynomial (Fin d × F
 def detPoly {d n : ℕ} (M : Matrix (Fin n) (Fin d) ℂ) : MvPolynomial (Fin d × Fin n) ℂ :=
   Matrix.det (Matrix.of fun i j => ∑ k, genericMatrix d n i k * C (M k j))
 
-theorem eval_detPoly {d n : ℕ} (M : Matrix (Fin n) (Fin d) ℂ) (x : Fin d × Fin n → ℂ) :
-    eval x (detPoly M) = (Matrix.of (fun i k => x (i, k)) * M).det := by
+theorem eval_detPoly {d n : ℕ} (M : Matrix (Fin n) (Fin d) ℂ) (x : Fin d × Fin n → ℂ)
+    : eval x (detPoly M) = (Matrix.of (fun i k => x (i, k)) * M).det := by
   unfold detPoly
   rw [RingHom.map_det, RingHom.mapMatrix_apply]
   congr 1
@@ -35,7 +35,8 @@ theorem GeneralProjection.proof : GeneralProjection.Statement := by
     intro b h
     obtain ⟨g, hg⟩ := (L b).exists_leftInverse_of_injective (LinearMap.ker_eq_bot.mpr (hL b))
     have h1 : LinearMap.toMatrix' g * M b = 1 := by
-      rw [hM]; dsimp only
+      rw [hM]
+      dsimp only
       rw [← LinearMap.toMatrix'_comp, hg, LinearMap.toMatrix'_id]
     have := congrArg (eval (fun p : Fin d × Fin n => LinearMap.toMatrix' g p.1 p.2)) h
     rw [eval_detPoly, map_zero] at this
@@ -55,7 +56,10 @@ theorem GeneralProjection.proof : GeneralProjection.Statement := by
   have hb : (Matrix.of (fun i k => x (i, k)) * M b).det ≠ 0 := by
     rw [← eval_detPoly]
     exact (Finset.prod_ne_zero_iff.mp hx) b (Finset.mem_univ b)
-  have key : ∀ u, (Matrix.of fun i k => x (i, k)) *ᵥ L b u = (Matrix.of (fun i k => x (i, k)) * M b) *ᵥ u := by
+  have key
+      : ∀ u,
+        (Matrix.of fun i k => x (i, k)) *ᵥ L b u
+          = (Matrix.of (fun i k => x (i, k)) * M b) *ᵥ u := by
     intro u
     rw [← Matrix.mulVec_mulVec, hM]
     dsimp only

@@ -11,40 +11,44 @@ namespace GlobalTheory.SmallPrimeIdeal
 
 open NumberField
 
-theorem norm_le_one_of_isIntegral {K : Type} [NormedField K] [IsUltrametricDist K] {y : K}
-    (hy : IsIntegral ℤ y) : ‖y‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral
+    {K : Type} [NormedField K] [IsUltrametricDist K] {y : K} (hy : IsIntegral ℤ y)
+    : ‖y‖ ≤ 1 := by
   obtain ⟨p, hp, hpy⟩ := hy
   by_contra hlt
   rw [not_le] at hlt
 
   have heq : y ^ p.natDegree + ∑ i ∈ Finset.range p.natDegree, (p.coeff i : K) * y ^ i = 0 := by
     rw [hp.as_sum] at hpy
-    simp only [Polynomial.eval₂_add, Polynomial.eval₂_finsetSum, Polynomial.eval₂_mul, Polynomial.eval₂_C,
-      Polynomial.eval₂_X_pow] at hpy
+    simp only [Polynomial.eval₂_add, Polynomial.eval₂_finsetSum, Polynomial.eval₂_mul,
+        Polynomial.eval₂_C, Polynomial.eval₂_X_pow]
+      at hpy
     simp only [algebraMap_int_eq, eq_intCast] at hpy
     exact hpy
   rcases Nat.eq_zero_or_pos p.natDegree with h0 | hpos
   · rw [h0] at heq
     simp at heq
-  obtain ⟨i, hi, hle⟩ := IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty
-    (Finset.nonempty_range_iff.mpr hpos.ne') (fun i => (p.coeff i : K) * y ^ i)
+  obtain ⟨i, hi, hle⟩ :=
+    IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty (Finset.nonempty_range_iff.mpr hpos.ne')
+      (fun i => (p.coeff i : K) * y ^ i)
   have hnorm : ‖y‖ ^ p.natDegree = ‖∑ i ∈ Finset.range p.natDegree, (p.coeff i : K) * y ^ i‖ := by
     rw [← norm_pow, eq_neg_of_add_eq_zero_left heq, norm_neg]
   have hterm : ‖(p.coeff i : K) * y ^ i‖ < ‖y‖ ^ p.natDegree := by
     rw [norm_mul, norm_pow]
-    calc ‖(p.coeff i : K)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ i :=
-          mul_le_mul_of_nonneg_right (IsUltrametricDist.norm_intCast_le_one K _) (by positivity)
+    calc
+      ‖(p.coeff i : K)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ i :=
+        mul_le_mul_of_nonneg_right (IsUltrametricDist.norm_intCast_le_one K _) (by positivity)
       _ = ‖y‖ ^ i := one_mul _
       _ < ‖y‖ ^ p.natDegree := pow_lt_pow_right₀ hlt (Finset.mem_range.mp hi)
   linarith
 
-theorem norm_int_le_one {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K]
-    (a : L →+* K) (x : 𝓞 L) : ‖a (x : L)‖ ≤ 1 := by
-
+theorem norm_int_le_one
+    {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K] (a : L →+* K) (x : 𝓞 L)
+    : ‖a (x : L)‖ ≤ 1 := by
   exact norm_le_one_of_isIntegral ((NumberField.RingOfIntegers.isIntegral_coe x).map a.toIntAlgHom)
 
-def smallIdeal {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K]
-    (a : L →+* K) : Ideal (𝓞 L) where
+def smallIdeal {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K] (a : L →+* K)
+    : Ideal (𝓞 L) where
   carrier := {x | ‖a (x : L)‖ < 1}
   zero_mem' := by simp
   add_mem' := by
@@ -62,19 +66,22 @@ def smallIdeal {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K]
     rw [e, norm_mul]
     exact mul_lt_one_of_nonneg_of_lt_one_right (norm_int_le_one a c) (norm_nonneg _) hx
 
-theorem mem_smallIdeal {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K]
-    (a : L →+* K) (x : 𝓞 L) : x ∈ smallIdeal a ↔ ‖a (x : L)‖ < 1 := by
+theorem mem_smallIdeal
+    {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K] (a : L →+* K) (x : 𝓞 L)
+    : x ∈ smallIdeal a ↔ ‖a (x : L)‖ < 1 := by
   exact Iff.rfl
 
-theorem norm_eq_one {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K]
-    (a : L →+* K) (x : 𝓞 L) (h : ¬ ‖a (x : L)‖ < 1) : ‖a (x : L)‖ = 1 := by
+theorem norm_eq_one
+    {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K]
+    (a : L →+* K) (x : 𝓞 L) (h : ¬ ‖a (x : L)‖ < 1)
+    : ‖a (x : L)‖ = 1 := by
   exact le_antisymm (norm_int_le_one a x) (not_lt.mp h)
 
-theorem smallIdeal_isPrime {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K]
-    (a : L →+* K) : (smallIdeal a).IsPrime := by
+theorem smallIdeal_isPrime
+    {L K : Type} [Field L] [NormedField K] [IsUltrametricDist K] (a : L →+* K)
+    : (smallIdeal a).IsPrime := by
   refine ⟨?_, ?_⟩
-  ·
-    rw [Ideal.ne_top_iff_one, mem_smallIdeal]
+  · rw [Ideal.ne_top_iff_one, mem_smallIdeal]
     simp
   · intro x y hxy
     rw [mem_smallIdeal] at hxy
@@ -86,16 +93,16 @@ theorem smallIdeal_isPrime {L K : Type} [Field L] [NormedField K] [IsUltrametric
     rw [e, norm_mul, norm_eq_one a x (not_lt.mpr hx), norm_eq_one a y (not_lt.mpr hy)] at hxy
     norm_num at hxy
 
-theorem exists_local_dvd {L : Type} [Field L] [NumberField L] (P : Ideal (𝓞 L)) [P.IsPrime]
-    (hP : P ≠ ⊥) (u v : 𝓞 L) :
-    ∃ r s : 𝓞 L, s ∉ P ∧ (u * r = v * s ∨ v * r = u * s) := by
-
+theorem exists_local_dvd
+    {L : Type} [Field L] [NumberField L] (P : Ideal (𝓞 L)) [P.IsPrime] (hP : P ≠ ⊥) (u v : 𝓞 L)
+    : ∃ r s : 𝓞 L, s ∉ P ∧ (u * r = v * s ∨ v * r = u * s) := by
   let Rp := Localization.AtPrime P
   have : IsDiscreteValuationRing Rp :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (𝓞 L) hP Rp
   have hinj : Function.Injective (algebraMap (𝓞 L) Rp) :=
     IsLocalization.injective Rp P.primeCompl_le_nonZeroDivisors
-  rcases ValuationRing.dvd_total (algebraMap (𝓞 L) Rp u) (algebraMap (𝓞 L) Rp v) with ⟨c, hc⟩ | ⟨c, hc⟩
+  rcases ValuationRing.dvd_total (algebraMap (𝓞 L) Rp u) (algebraMap (𝓞 L) Rp v) with
+    ⟨c, hc⟩ | ⟨c, hc⟩
   · obtain ⟨⟨r, s⟩, rfl⟩ := IsLocalization.mk'_surjective P.primeCompl c
     refine ⟨r, s, s.2, Or.inl (hinj ?_)⟩
     rw [map_mul, map_mul, hc, mul_assoc, IsLocalization.mk'_spec]
@@ -103,9 +110,9 @@ theorem exists_local_dvd {L : Type} [Field L] [NumberField L] (P : Ideal (𝓞 L
     refine ⟨r, s, s.2, Or.inr (hinj ?_)⟩
     rw [map_mul, map_mul, hc, mul_assoc, IsLocalization.mk'_spec]
 
-theorem smallIdeal_ne_bot {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact l.Prime]
-    (a : L →+* PadicAlgCl l) : smallIdeal a ≠ ⊥ := by
-
+theorem smallIdeal_ne_bot
+    {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact l.Prime] (a : L →+* PadicAlgCl l)
+    : smallIdeal a ≠ ⊥ := by
   intro hbot
   have hl : ((l : 𝓞 L)) ∈ smallIdeal a := by
     rw [mem_smallIdeal]
@@ -118,12 +125,15 @@ theorem smallIdeal_ne_bot {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact l
   have h0 : ((l : 𝓞 L) : L) = 0 := by rw [hl]; simp
   exact (Fact.out : l.Prime).ne_zero (by exact_mod_cast h0)
 
-theorem le_one_of_le_one {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact l.Prime]
-    (a b : L →+* PadicAlgCl l)
-    (h : ∀ x : 𝓞 L, ‖a (x : L)‖ < 1 ↔ ‖b (x : L)‖ < 1) (x : L) (hx : ‖a x‖ ≤ 1) :
-    ‖b x‖ ≤ 1 := by
+theorem le_one_of_le_one
+    {L : Type} [Field L] [NumberField L]
+    {l : ℕ} [Fact l.Prime]
+    (a b : L →+* PadicAlgCl l) (h : ∀ x : 𝓞 L, ‖a (x : L)‖ < 1 ↔ ‖b (x : L)‖ < 1)
+    (x : L) (hx : ‖a x‖ ≤ 1)
+    : ‖b x‖ ≤ 1 := by
   classical
-  have hb : ∀ y : 𝓞 L, y ∈ smallIdeal a ↔ ‖b (y : L)‖ < 1 := fun y => (mem_smallIdeal a y).trans (h y)
+  have hb : ∀ y : 𝓞 L, y ∈ smallIdeal a ↔ ‖b (y : L)‖ < 1 := fun y =>
+    (mem_smallIdeal a y).trans (h y)
   have := smallIdeal_isPrime a
 
   obtain ⟨u, w, hw, rfl⟩ := IsFractionRing.div_surjective (𝓞 L) x
@@ -143,8 +153,7 @@ theorem le_one_of_le_one {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact l.
   have hbs : ‖b (s : L)‖ = 1 := norm_eq_one b s (fun hlt => hs ((hb s).mpr hlt))
   have has : ‖a (s : L)‖ = 1 := norm_eq_one a s (fun hlt => hs ((mem_smallIdeal a s).mpr hlt))
   rcases hrs with h1 | h1
-  ·
-    have h1' : (u : L) * r = w * s := by exact_mod_cast congrArg (fun z : 𝓞 L => (z : L)) h1
+  · have h1' : (u : L) * r = w * s := by exact_mod_cast congrArg (fun z : 𝓞 L => (z : L)) h1
     have hr0 : (r : L) ≠ 0 := by
       intro h0
       rw [h0, mul_zero] at h1'
@@ -161,18 +170,20 @@ theorem le_one_of_le_one {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact l.
       linarith
     have hbr : ‖b (r : L)‖ = 1 := norm_eq_one b r (fun hlt => har ((h r).mpr hlt))
     rw [map_div₀, norm_div, hbs, hbr, div_one]
-  ·
-    have h1' : (w : L) * r = u * s := by exact_mod_cast congrArg (fun z : 𝓞 L => (z : L)) h1
+  · have h1' : (w : L) * r = u * s := by exact_mod_cast congrArg (fun z : 𝓞 L => (z : L)) h1
     have e : (u : L) / w = r / s := by
       rw [div_eq_div_iff hw0 hs0]
       linear_combination -h1'
     rw [e, map_div₀, norm_div, hbs, div_one]
     exact norm_int_le_one b r
 
-theorem norm_le_one_iff {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact (Nat.Prime l)]
+theorem norm_le_one_iff
+    {L : Type} [Field L] [NumberField L]
+    {l : ℕ} [Fact (Nat.Prime l)]
     (a b : L →+* Formalism.ConjugateSelfDual.Qbar l)
-    (h : ∀ x : 𝓞 L, ‖a (x : L)‖ < (1 : ℝ) ↔ ‖b (x : L)‖ < (1 : ℝ)) (x : L) :
-    ‖a x‖ ≤ (1 : ℝ) ↔ ‖b x‖ ≤ (1 : ℝ) := by
+    (h : ∀ x : 𝓞 L, ‖a (x : L)‖ < (1 : ℝ) ↔ ‖b (x : L)‖ < (1 : ℝ))
+    (x : L)
+    : ‖a x‖ ≤ (1 : ℝ) ↔ ‖b x‖ ≤ (1 : ℝ) := by
   exact ⟨le_one_of_le_one a b h x, le_one_of_le_one b a (fun y => (h y).symm) x⟩
 
 end GlobalTheory.SmallPrimeIdeal

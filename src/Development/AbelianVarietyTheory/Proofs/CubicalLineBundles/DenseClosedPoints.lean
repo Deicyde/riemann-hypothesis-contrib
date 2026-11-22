@@ -10,14 +10,16 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp valAt valAt')
 
 namespace GlobalTheory.SchemeHomsFromPoints
 
-theorem dense_closedPoints {X : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] :
-    Dense (closedPoints X) := by
+theorem dense_closedPoints {X : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p]
+    : Dense (closedPoints X) := by
   have : JacobsonSpace X := LocallyOfFiniteType.jacobsonSpace p
   rw [dense_iff_closure_eq]
   exact closure_closedPoints
 
-theorem hom_ext_of_points {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
-    [Y.IsSeparated] (f g : X ⟶ Y) (H : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → x ≫ f = x ≫ g) : f = g := by
+theorem hom_ext_of_points
+    {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X] [Y.IsSeparated]
+    (f g : X ⟶ Y) (H : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → x ≫ f = x ≫ g)
+    : f = g := by
   refine ext_of_fromSpecResidueField_eq f g (terminal.from Y) (closedPoints X)
     (dense_closedPoints p) ?_ (terminal.hom_ext _ _)
   intro x hx
@@ -25,9 +27,11 @@ theorem hom_ext_of_points {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFinite
   rw [← cancel_epi (Spec.map (residueFieldIsoBase p x hx).hom)]
   simpa only [pointOfClosedPoint, Category.assoc] using h
 
-theorem eq_zero_of_points {X : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
+theorem eq_zero_of_points
+    {X : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
     (W : X.Opens) (h : Γ(X, W))
-    (H : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∀ e : ⊤ ≤ x ⁻¹ᵁ W, valAt x W e h = 0) : h = 0 := by
+    (H : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∀ e : ⊤ ≤ x ⁻¹ᵁ W, valAt x W e h = 0)
+    : h = 0 := by
   rw [← basicOpen_eq_bot_iff]
   by_contra hne
   have hne' : ((X.basicOpen h : X.Opens) : Set X).Nonempty := by
@@ -45,10 +49,12 @@ theorem eq_zero_of_points {X : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteTy
     rw [map_zero]
     exact h1
   have h3 := Scheme.basicOpen_appLE (pointOfClosedPoint p x hxc) ⊤ W e h
-  have h4 : (IsLocalRing.closedPoint ℂ : Spec (CommRingCat.of ℂ)) ∈
-      (Spec (CommRingCat.of ℂ)).basicOpen (((pointOfClosedPoint p x hxc).appLE W ⊤ e).hom h) := by
-    have h5 : (IsLocalRing.closedPoint ℂ : Spec (CommRingCat.of ℂ)) ∈
-        ⊤ ⊓ (pointOfClosedPoint p x hxc) ⁻¹ᵁ X.basicOpen h := by
+  have h4
+      : (IsLocalRing.closedPoint ℂ : Spec (CommRingCat.of ℂ)) ∈ (Spec (CommRingCat.of ℂ)).basicOpen
+        (((pointOfClosedPoint p x hxc).appLE W ⊤ e).hom h) := by
+    have h5
+        : (IsLocalRing.closedPoint ℂ : Spec (CommRingCat.of ℂ))
+          ∈ ⊤ ⊓ (pointOfClosedPoint p x hxc) ⁻¹ᵁ X.basicOpen h := by
       refine ⟨trivial, ?_⟩
       change pointOfClosedPoint p x hxc _ ∈ X.basicOpen h
       exact (pointOfClosedPoint_apply p x hxc _).symm ▸ hx
@@ -57,53 +63,53 @@ theorem eq_zero_of_points {X : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteTy
   rw [h2, Scheme.basicOpen_zero] at h4
   exact h4
 
-theorem lift_toSpecΓ {X : Scheme.{0}} {R : CommRingCat.{0}} (W : X.Opens) (x : Spec R ⟶ X)
-    (x' : Spec R ⟶ W) (hx : x' ≫ W.ι = x) (e : ⊤ ≤ x ⁻¹ᵁ W) :
-    x' ≫ W.toSpecΓ = Spec.map (x.appLE W ⊤ e ≫ (Scheme.ΓSpecIso R).hom) := by
+theorem lift_toSpecΓ
+    {X : Scheme.{0}} {R : CommRingCat.{0}}
+    (W : X.Opens) (x : Spec R ⟶ X) (x' : Spec R ⟶ W) (hx : x' ≫ W.ι = x) (e : ⊤ ≤ x ⁻¹ᵁ W)
+    : x' ≫ W.toSpecΓ = Spec.map (x.appLE W ⊤ e ≫ (Scheme.ΓSpecIso R).hom) := by
   have h1 : x.resLE W ⊤ e = (⊤ : (Spec R).Opens).ι ≫ x' := by
     rw [← cancel_mono W.ι, Scheme.Hom.resLE_comp_ι, Category.assoc, hx]
   have : IsIso (⊤ : (Spec R).Opens).ι := inferInstanceAs (IsIso (Spec R).topIso.hom)
-  rw [← cancel_epi (⊤ : (Spec R).Opens).ι, Spec.map_comp, SpecMap_ΓSpecIso_hom,
-    ← Category.assoc, ← h1, ← Category.assoc, ← Scheme.Opens.toSpecΓ_top,
-    Scheme.Opens.toSpecΓ_SpecMap_appLE]
+  rw [← cancel_epi (⊤ : (Spec R).Opens).ι, Spec.map_comp, SpecMap_ΓSpecIso_hom, ← Category.assoc,
+    ← h1, ← Category.assoc, ← Scheme.Opens.toSpecΓ_top, Scheme.Opens.toSpecΓ_SpecMap_appLE]
 
-theorem range_subset {X T : Scheme.{0}} (W : X.Opens) (x : T ⟶ X) (e : ⊤ ≤ x ⁻¹ᵁ W) :
-    Set.range x ⊆ Set.range W.ι := by
+theorem range_subset {X T : Scheme.{0}} (W : X.Opens) (x : T ⟶ X) (e : ⊤ ≤ x ⁻¹ᵁ W)
+    : Set.range x ⊆ Set.range W.ι := by
   rintro _ ⟨t, rfl⟩
   rw [Scheme.Opens.range_ι]
   exact e trivial
 
-theorem top_le_of_lift {X T : Scheme.{0}} (W : X.Opens) (x : T ⟶ X) (x' : T ⟶ W)
-    (hx : x' ≫ W.ι = x) : ⊤ ≤ x ⁻¹ᵁ W := by
+theorem top_le_of_lift {X T : Scheme.{0}} (W : X.Opens) (x : T ⟶ X) (x' : T ⟶ W) (hx : x' ≫ W.ι = x)
+    : ⊤ ≤ x ⁻¹ᵁ W := by
   subst hx
   intro t _
   exact (x'.base t).2
 
-noncomputable def ev {X : Scheme.{0}} (x : Sp ℂ ⟶ X) (W : X.Opens) (e : ⊤ ≤ x ⁻¹ᵁ W) :
-    Γ(X, W) ⟶ CommRingCat.of ℂ :=
+noncomputable def ev {X : Scheme.{0}} (x : Sp ℂ ⟶ X) (W : X.Opens) (e : ⊤ ≤ x ⁻¹ᵁ W)
+    : Γ(X, W) ⟶ CommRingCat.of ℂ :=
   x.appLE W ⊤ e ≫ (Scheme.ΓSpecIso (CommRingCat.of ℂ)).hom
 
-theorem valAt'_eq {X : Scheme.{0}} (x : Sp ℂ ⟶ X) (W : X.Opens) (e : ⊤ ≤ x ⁻¹ᵁ W) (h : Γ(X, W)) :
-    valAt' x W h = (ev x W e).hom h := by
+theorem valAt'_eq {X : Scheme.{0}} (x : Sp ℂ ⟶ X) (W : X.Opens) (e : ⊤ ≤ x ⁻¹ᵁ W) (h : Γ(X, W))
+    : valAt' x W h = (ev x W e).hom h := by
   rw [valAt', dite_eq_left e]
   rfl
 
-theorem exists_local {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
-    {Z : Type} (ex : Z → (Sp ℂ ⟶ X)) (ey : Z → (Sp ℂ ⟶ Y))
-    (hex : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∃ z, ex z = x)
-    (W : X.Opens) (D : Y.Opens) (hD : IsAffineOpen D)
-    (hWD : ∀ w, ⊤ ≤ ex w ⁻¹ᵁ W → ⊤ ≤ ey w ⁻¹ᵁ D)
-    (hf : ∀ f : Γ(Y, D), ∃ h : Γ(X, W), ∀ w, ⊤ ≤ ex w ⁻¹ᵁ W →
-      valAt' (ex w) W h = valAt' (ey w) D f) :
-    ∃ g : W.toScheme ⟶ Y, ∀ w (x' : Sp ℂ ⟶ W), x' ≫ W.ι = ex w → x' ≫ g = ey w := by
+theorem exists_local
+    {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
+    {Z : Type}
+    (ex : Z → (Sp ℂ ⟶ X)) (ey : Z → (Sp ℂ ⟶ Y)) (hex : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∃ z, ex z = x)
+    (W : X.Opens) (D : Y.Opens) (hD : IsAffineOpen D) (hWD : ∀ w, ⊤ ≤ ex w ⁻¹ᵁ W → ⊤ ≤ ey w ⁻¹ᵁ D)
+    (hf : ∀ f : Γ(Y, D), ∃ h : Γ(X, W), ∀ w, ⊤ ≤ ex w ⁻¹ᵁ W → valAt' (ex w) W h = valAt' (ey w) D f)
+    : ∃ g : W.toScheme ⟶ Y, ∀ w (x' : Sp ℂ ⟶ W), x' ≫ W.ι = ex w → x' ≫ g = ey w := by
   choose F hF using hf
-  have hF' : ∀ f w (e : ⊤ ≤ ex w ⁻¹ᵁ W),
-      (ev (ex w) W e).hom (F f) = (ev (ey w) D (hWD w e)).hom f := by
+  have hF'
+      : ∀ f w (e : ⊤ ≤ ex w ⁻¹ᵁ W), (ev (ex w) W e).hom (F f) = (ev (ey w) D (hWD w e)).hom f := by
     intro f w e
     rw [← valAt'_eq, ← valAt'_eq]
     exact hF f w e
-  have inj : ∀ a b : Γ(X, W), (∀ w (e : ⊤ ≤ ex w ⁻¹ᵁ W),
-      (ev (ex w) W e).hom a = (ev (ex w) W e).hom b) → a = b := by
+  have inj
+      : ∀ a b : Γ(X, W),
+        (∀ w (e : ⊤ ≤ ex w ⁻¹ᵁ W), (ev (ex w) W e).hom a = (ev (ex w) W e).hom b) → a = b := by
     intro a b hab
     rw [← sub_eq_zero]
     refine eq_zero_of_points p W _ ?_
@@ -111,12 +117,14 @@ theorem exists_local {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType 
     obtain ⟨w, rfl⟩ := hex x hx
     change (ev (ex w) W e).hom (a - b) = 0
     rw [map_sub, hab w e, sub_self]
-  let φ : Γ(Y, D) →+* Γ(X, W) :=
-    { toFun := F
-      map_one' := inj _ _ fun w e => by rw [hF', map_one, map_one]
-      map_mul' := fun a b => inj _ _ fun w e => by rw [hF', map_mul, map_mul, hF', hF']
-      map_zero' := inj _ _ fun w e => by rw [hF', map_zero, map_zero]
-      map_add' := fun a b => inj _ _ fun w e => by rw [hF', map_add (f := _), map_add (f := _), hF', hF'] }
+  let φ : Γ(Y, D) →+* Γ(X, W) := {
+    toFun := F
+    map_one' := inj _ _ fun w e => by rw [hF', map_one, map_one]
+    map_mul' := fun a b => inj _ _ fun w e => by rw [hF', map_mul, map_mul, hF', hF']
+    map_zero' := inj _ _ fun w e => by rw [hF', map_zero, map_zero]
+    map_add' := fun a b =>
+      inj _ _ fun w e => by rw [hF', map_add (f := _), map_add (f := _), hF', hF']
+  }
   refine ⟨W.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hD.fromSpec, ?_⟩
   intro w x' hx'
   have e := top_le_of_lift W (ex w) x' hx'
@@ -130,15 +138,15 @@ theorem exists_local {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType 
   rw [← Category.assoc, h1, ← Category.assoc, ← Spec.map_comp, h3, ← h2, Category.assoc,
     hD.toSpecΓ_fromSpec, hy']
 
-theorem exists_hom {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
-    {Z : Type} (ex : Z → (Sp ℂ ⟶ X)) (ey : Z → (Sp ℂ ⟶ Y))
-    (hex : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∃ z, ex z = x)
+theorem exists_hom
+    {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
+    {Z : Type}
+    (ex : Z → (Sp ℂ ⟶ X)) (ey : Z → (Sp ℂ ⟶ Y)) (hex : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∃ z, ex z = x)
     {S : Scheme.{0}} (q : Y ⟶ S) [IsSeparated q] [IsAffine S]
-    (H : ∀ z, ∃ (W : X.Opens) (D : Y.Opens), IsAffineOpen D ∧ ⊤ ≤ ex z ⁻¹ᵁ W ∧
-      (∀ w, ⊤ ≤ ex w ⁻¹ᵁ W → ⊤ ≤ ey w ⁻¹ᵁ D) ∧
-      ∀ f : Γ(Y, D), ∃ h : Γ(X, W), ∀ w, ⊤ ≤ ex w ⁻¹ᵁ W →
-        valAt' (ex w) W h = valAt' (ey w) D f) :
-    ∃ g : X ⟶ Y, ∀ z, ex z ≫ g = ey z := by
+    (H : ∀ z, ∃ (W : X.Opens) (D : Y.Opens),
+      IsAffineOpen D ∧ ⊤ ≤ ex z ⁻¹ᵁ W ∧ (∀ w, ⊤ ≤ ex w ⁻¹ᵁ W → ⊤ ≤ ey w ⁻¹ᵁ D)
+        ∧ ∀ f : Γ(Y, D), ∃ h : Γ(X, W), ∀ w, ⊤ ≤ ex w ⁻¹ᵁ W → valAt' (ex w) W h = valAt' (ey w) D f)
+    : ∃ g : X ⟶ Y, ∀ z, ex z ≫ g = ey z := by
   have hY : Y.IsSeparated := ⟨by rw [← terminal.comp_from q]; infer_instance⟩
   choose W D hD hW hWD hf using H
   choose g hg using fun z => exists_local p ex ey hex (W z) (D z) (hD z) (hWD z) (hf z)

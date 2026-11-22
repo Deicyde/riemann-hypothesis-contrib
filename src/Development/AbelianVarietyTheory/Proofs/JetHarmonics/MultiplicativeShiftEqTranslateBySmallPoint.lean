@@ -115,13 +115,24 @@ lemma DT_hat (ι : ℂ ≃+* ℂ_[q]) (ω : ℂ_[q]) {G : ℂ → ℂ} (hG : Ana
   linear_combination (C ω * hat ι (C ω * logS) (deriv G)) * one_add_X_mul_derivative_logS (q := q)
 
 def Peq (W : WeierstrassCurve ℂ_[q]) : MvPolynomial (Fin 2) ℂ_[q] :=
-  MvPolynomial.X 0 ^ 3 + MvPolynomial.C W.a₁ * MvPolynomial.X 0 * MvPolynomial.X 1 + MvPolynomial.C W.a₂ * MvPolynomial.X 0 ^ 2 * MvPolynomial.X 1 + MvPolynomial.C W.a₃ * MvPolynomial.X 1 ^ 2 + MvPolynomial.C W.a₄ * MvPolynomial.X 0 * MvPolynomial.X 1 ^ 2 + MvPolynomial.C W.a₆ * MvPolynomial.X 1 ^ 3
+  MvPolynomial.X 0 ^ 3 + MvPolynomial.C W.a₁ * MvPolynomial.X 0 * MvPolynomial.X 1
+    + MvPolynomial.C W.a₂ * MvPolynomial.X 0 ^ 2 * MvPolynomial.X 1
+    + MvPolynomial.C W.a₃ * MvPolynomial.X 1 ^ 2
+    + MvPolynomial.C W.a₄ * MvPolynomial.X 0 * MvPolynomial.X 1 ^ 2
+    + MvPolynomial.C W.a₆ * MvPolynomial.X 1 ^ 3
 
 def Pu (W : WeierstrassCurve ℂ_[q]) (c : ℂ_[q]) : MvPolynomial (Fin 2) ℂ_[q] :=
-  MvPolynomial.C c * (1 - MvPolynomial.C W.a₁ * MvPolynomial.X 0 - MvPolynomial.C W.a₂ * MvPolynomial.X 0 ^ 2 - 2 * MvPolynomial.C W.a₃ * MvPolynomial.X 1 - 2 * MvPolynomial.C W.a₄ * MvPolynomial.X 0 * MvPolynomial.X 1 - 3 * MvPolynomial.C W.a₆ * MvPolynomial.X 1 ^ 2)
+  MvPolynomial.C c
+    * (1 - MvPolynomial.C W.a₁ * MvPolynomial.X 0 - MvPolynomial.C W.a₂ * MvPolynomial.X 0 ^ 2
+      - 2 * MvPolynomial.C W.a₃ * MvPolynomial.X 1
+      - 2 * MvPolynomial.C W.a₄ * MvPolynomial.X 0 * MvPolynomial.X 1
+      - 3 * MvPolynomial.C W.a₆ * MvPolynomial.X 1 ^ 2)
 
 def Pw (W : WeierstrassCurve ℂ_[q]) (c : ℂ_[q]) : MvPolynomial (Fin 2) ℂ_[q] :=
-  MvPolynomial.C c * (3 * MvPolynomial.X 0 ^ 2 + MvPolynomial.C W.a₁ * MvPolynomial.X 1 + 2 * MvPolynomial.C W.a₂ * MvPolynomial.X 0 * MvPolynomial.X 1 + MvPolynomial.C W.a₄ * MvPolynomial.X 1 ^ 2)
+  MvPolynomial.C c
+    * (3 * MvPolynomial.X 0 ^ 2 + MvPolynomial.C W.a₁ * MvPolynomial.X 1
+      + 2 * MvPolynomial.C W.a₂ * MvPolynomial.X 0 * MvPolynomial.X 1
+      + MvPolynomial.C W.a₄ * MvPolynomial.X 1 ^ 2)
 
 lemma flow (M : Mdl q) (ω : ℂ_[q]) (p : ℂ) (hM : M.Ok) (hp : M.Small p) :
     hat M.ι (C ω * logS) (fun z => M.w (z + p)) =
@@ -263,7 +274,11 @@ lemma constantCoeff_equation (W : WeierstrassCurve ℂ_[q]) {U V : ℂ_[q]⟦X�
   have := congrArg constantCoeff h
   simpa [Peq, hC] using this
 
-theorem shift_eq_translate : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω ζ : ℂ_[q]) (p : ℂ), M.MChart ω → M.At ω ζ p → hat M.ι (C ω * logS) (fun z => M.u (z + p)) = shiftS ζ (hat M.ι (C ω * logS) M.u) ∧ hat M.ι (C ω * logS) (fun z => M.w (z + p)) = shiftS ζ (hat M.ι (C ω * logS) M.w) := by
+theorem shift_eq_translate
+    : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω ζ : ℂ_[q]) (p : ℂ),
+      M.MChart ω → M.At ω ζ p
+        → hat M.ι (C ω * logS) (fun z => M.u (z + p)) = shiftS ζ (hat M.ι (C ω * logS) M.u)
+          ∧ hat M.ι (C ω * logS) (fun z => M.w (z + p)) = shiftS ζ (hat M.ι (C ω * logS) M.w) := by
   intro q _ M ω ζ p hM hA
   obtain ⟨hOk, hℓ, hu, -⟩ := hM
   obtain ⟨hp, hζ, hev⟩ := hA
@@ -278,16 +293,17 @@ theorem shift_eq_translate : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω ζ : �
   have cw : constantCoeff (hat M.ι (C ω * logS) M.w) = 0 := by rw [hc, w0, map_zero]
   have hw : Bd 1 (hat M.ι (C ω * logS) M.w) := bd_of_equation M.W h1 h2 h3 h4 h6 hu cu cw g0
   have sh := shift_aeval hζ ⟨1, hu⟩ ⟨1, hw⟩
-  have eu : constantCoeff (hat M.ι (C ω * logS) (fun z => M.u (z + p))) =
-      constantCoeff (shiftS ζ (hat M.ι (C ω * logS) M.u)) := by
+  have eu
+      : constantCoeff (hat M.ι (C ω * logS) (fun z => M.u (z + p)))
+        = constantCoeff (shiftS ζ (hat M.ι (C ω * logS) M.u)) := by
     rw [hc, Shift.constantCoeff_shiftS, hev, zero_add]
   refine ode_unique q _ _ _ _ _ _ f1 f2 ?_ ?_ eu ?_
   · rw [← (sh _).2, ← g1, Shift.DT_shiftS hζ ⟨1, hu⟩]
   · rw [← (sh _).2, ← g2, Shift.DT_shiftS hζ ⟨1, hw⟩]
   · have e1 := constantCoeff_equation M.W f0
-    have e2 := constantCoeff_equation M.W
-      (U := shiftS ζ (hat M.ι (C ω * logS) M.u)) (V := shiftS ζ (hat M.ι (C ω * logS) M.w))
-      (by rw [← (sh _).2, ← g0])
+    have e2 :=
+      constantCoeff_equation M.W (U := shiftS ζ (hat M.ι (C ω * logS) M.u))
+        (V := shiftS ζ (hat M.ι (C ω * logS) M.w)) (by rw [← (sh _).2, ← g0])
     rw [← eu] at e2
     refine solution_unique h1 h2 h3 h4 h6 ?_ ?_ (norm_constantCoeff_shift_lt hζ hw cw) e1 e2
     · rw [hc, zero_add]; exact hup

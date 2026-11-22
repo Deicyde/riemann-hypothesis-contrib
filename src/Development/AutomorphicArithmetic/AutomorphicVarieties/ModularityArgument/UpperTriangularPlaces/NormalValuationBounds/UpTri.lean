@@ -4,10 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Z.Win
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Z.Win
 
-theorem UpperTheory.V.Keep.upTri :
-    UpperTheory.V.Keep.UpTri := by
+theorem UpperTheory.V.Keep.upTri : UpperTheory.V.Keep.UpTri := by
   intro k _ n M M' B d hd hM hM' hMd hM'd hB
   have key : ∀ m : ℕ, ∀ i j : Fin n, j.val + (n - i.val) = m → j < i → B i j = 0 := by
     intro m

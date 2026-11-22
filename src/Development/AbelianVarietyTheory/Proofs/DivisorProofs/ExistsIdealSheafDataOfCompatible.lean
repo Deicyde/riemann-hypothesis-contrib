@@ -16,8 +16,8 @@ lemma res_res {U V W : X.Opens} (h1 : V ≤ U) (h2 : W ≤ V) (s : Γ(X, U)) :
   rw [← CommRingCat.comp_apply, ← Functor.map_comp]
   rfl
 
-def glueIdeal (𝒜 : Set X.affineOpens) (k : ∀ W : X.affineOpens, Ideal Γ(X, W))
-    (V : X.affineOpens) : Ideal Γ(X, V) :=
+def glueIdeal (𝒜 : Set X.affineOpens) (k : ∀ W : X.affineOpens, Ideal Γ(X, W)) (V : X.affineOpens)
+    : Ideal Γ(X, V) :=
   ⨅ W ∈ 𝒜, ⨅ h : W ≤ V, (k W).comap (X.presheaf.map (homOfLE h).op).hom
 
 lemma mem_glueIdeal {𝒜 : Set X.affineOpens} {k : ∀ W : X.affineOpens, Ideal Γ(X, W)}
@@ -27,7 +27,8 @@ lemma mem_glueIdeal {𝒜 : Set X.affineOpens} {k : ∀ W : X.affineOpens, Ideal
   simp [glueIdeal, Submodule.mem_iInf]
 
 section
-variable {𝒜 : Set X.affineOpens} {k : ∀ W : X.affineOpens, Ideal Γ(X, W)}
+variable
+  {𝒜 : Set X.affineOpens} {k : ∀ W : X.affineOpens, Ideal Γ(X, W)}
   (hk : ∀ W ∈ 𝒜, ∀ (W' : X.affineOpens) (h : W' ≤ W),
     (k W).map (X.presheaf.map (homOfLE h).op).hom = k W')
 include hk
@@ -146,14 +147,17 @@ lemma glueIdeal_basicOpen (h𝒜 : ∀ W ∈ 𝒜, ∀ W' : X.affineOpens, W' �
 
 end
 
-theorem exists_idealSheafData_of_compatible :
-    ∀ {X : Scheme.{0}} (𝒜 : Set X.affineOpens), (∀ W ∈ 𝒜, ∀ W' : X.affineOpens, W' ≤ W → W' ∈ 𝒜) →
-      (∀ x : X, ∃ W ∈ 𝒜, x ∈ W.1) → ∀ (k : ∀ W : X.affineOpens, Ideal Γ(X, W)),
-      (∀ W ∈ 𝒜, ∀ (W' : X.affineOpens) (h : W' ≤ W),
-        (k W).map (X.presheaf.map (homOfLE h).op).hom = k W') →
-      ∃ I : X.IdealSheafData, ∀ W ∈ 𝒜, I.ideal W = k W := by
+theorem exists_idealSheafData_of_compatible
+    : ∀ {X : Scheme.{0}} (𝒜 : Set X.affineOpens),
+      (∀ W ∈ 𝒜, ∀ W' : X.affineOpens, W' ≤ W → W' ∈ 𝒜) → (∀ x : X, ∃ W ∈ 𝒜, x ∈ W.1)
+        → ∀ (k : ∀ W : X.affineOpens, Ideal Γ(X, W)),
+          (∀ W ∈ 𝒜, ∀ (W' : X.affineOpens) (h : W' ≤ W),
+              (k W).map (X.presheaf.map (homOfLE h).op).hom = k W')
+            → ∃ I : X.IdealSheafData, ∀ W ∈ 𝒜, I.ideal W = k W := by
   intro X 𝒜 h𝒜 hcov k hk
-  exact ⟨{ ideal := glueIdeal 𝒜 k, map_ideal_basicOpen := glueIdeal_basicOpen hk h𝒜 hcov },
-    fun W hW => glueIdeal_eq hk hW⟩
+  exact ⟨
+    { ideal := glueIdeal 𝒜 k, map_ideal_basicOpen := glueIdeal_basicOpen hk h𝒜 hcov },
+    fun W hW => glueIdeal_eq hk hW
+  ⟩
 
 end GlobalTheory.AffineIdealGlue

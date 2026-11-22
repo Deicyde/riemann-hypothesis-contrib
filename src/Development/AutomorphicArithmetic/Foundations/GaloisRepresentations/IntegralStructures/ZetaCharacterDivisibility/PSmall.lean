@@ -8,8 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso)
@@ -39,7 +42,8 @@ theorem detFrob_of : DetFrob := by
   · have := congrArg (fun p : ℂ[X] => p.coeff 0) (h2 σ hσ)
     simpa [rk1, Matrix.charpoly, Matrix.det_fin_one] using this
 
-theorem frobSeed_of (h1 : InFacts) (h2 : GenPin) (h3 : AlgGen) (h4 : DetFrob) : FrobeniusCondition := by
+theorem frobSeed_of (h1 : InFacts) (h2 : GenPin) (h3 : AlgGen) (h4 : DetFrob)
+    : FrobeniusCondition := by
   intro E Ω _ _ _ _ _ _ l _ ι a dd U ψ hψ r ρ hin hdet w hw hl B hB hg he A hA
   obtain ⟨-, i1, i2⟩ := h1 _ _ a dd r ρ hin
   obtain ⟨e1, e2⟩ := he A hA
@@ -53,28 +57,35 @@ theorem frobSeed_of (h1 : InFacts) (h2 : GenPin) (h3 : AlgGen) (h4 : DetFrob) : 
   rw [hdet]
   exact (h4 E Ω l ι a U ψ hψ w hw hl B hB A hA).2 σ hσ
 
-theorem centU_of (h1 : ZetaEx) (h2 : ZetaLoc) (h3 : SchurU) (h4 : CharOfZeta) (h5 : AlgOfFix) (h6 : SatCent) : CentU := by
+theorem centU_of
+    (h1 : ZetaEx) (h2 : ZetaLoc) (h3 : SchurU) (h4 : CharOfZeta) (h5 : AlgOfFix) (h6 : SatCent)
+    : CentU := by
   intro E _ _ _ a ha U hU
   obtain ⟨ζ, z1, z2, z3, z4, z5⟩ := h1 E a
   obtain ⟨χ, hχ⟩ := h4 E a U hU ζ z2 z3 z4 fun z => h3 E a U hU _ (z3 z)
   obtain ⟨φ, hφ, hφ0⟩ := (Submodule.ne_bot_iff _).1 hU.ne_bot
-  obtain ⟨n, hn⟩ := h5 E χ fun z hz => by
-    have := hχ z φ hφ
-    rw [z5 z hz, map_one] at this
-    refine Units.ext (smul_left_injective ℂ hφ0 ?_)
-    simpa using this.symm
+  obtain ⟨n, hn⟩ :=
+    h5 E χ fun z hz => by
+      have := hχ z φ hφ
+      rw [z5 z hz, map_one] at this
+      refine Units.ext (smul_left_injective ℂ hφ0 ?_)
+      simpa using this.symm
   refine ⟨χ, n, hn, fun w hw B hB => ?_⟩
   obtain ⟨σ, ⟨hirr, f, hf0, hfU, hfe⟩, hS⟩ := hB
   obtain ⟨x, hx0, hx1, hx2⟩ := h6 E a w σ B hS
   obtain ⟨e, he⟩ := GlobalTheory.locU_equiv_GL E a w hw
-  have hker : LinearMap.ker f = ⊥ := ((GlobalTheory.CuspRep.isIrreducible_iff σ.ρ).1 hirr).2 _ (fun g v hv => by
-      rw [LinearMap.mem_ker] at hv ⊢
-      have h1 := hfe (e.symm g) v
-      rw [MonoidHom.comp_apply, Subgroup.subtype_apply, ← he, e.apply_symm_apply] at h1
-      rw [h1, hv, map_zero]) |>.resolve_right fun h => hf0 (LinearMap.ker_eq_top.1 h)
+  have hker : LinearMap.ker f = ⊥ :=
+    ((GlobalTheory.CuspRep.isIrreducible_iff σ.ρ).1 hirr).2 _ (fun g v hv => by
+        rw [LinearMap.mem_ker] at hv ⊢
+        have h1 := hfe (e.symm g) v
+        rw [MonoidHom.comp_apply, Subgroup.subtype_apply, ← he, e.apply_symm_apply] at h1
+        rw [h1, hv, map_zero])
+      |>.resolve_right fun h => hf0 (LinearMap.ker_eq_top.1 h)
   have hfx : f x ≠ 0 := (map_ne_zero_iff f (LinearMap.ker_eq_bot.1 hker)).2 hx0
-  have key : ∀ u : (w.adicCompletion E)ˣ, f (σ.ρ (Matrix.GeneralLinearGroup.scalar (Fin a) u) x) =
-      ((χ.loc w u : ℂˣ) : ℂ) • f x := fun u => by
+  have key
+      : ∀ u : (w.adicCompletion E)ˣ,
+        f (σ.ρ (Matrix.GeneralLinearGroup.scalar (Fin a) u) x)
+          = ((χ.loc w u : ℂˣ) : ℂ) • f x := fun u => by
     obtain ⟨m1, m2⟩ := h2 E a ζ z1 w hw u
     have := hfe ⟨_, m1⟩ x
     rw [MonoidHom.comp_apply, Subgroup.subtype_apply, m2] at this

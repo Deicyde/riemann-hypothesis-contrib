@@ -15,11 +15,14 @@ open MeasureTheory
 
 section Abstract
 
-variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+variable
+  {V : Type}
+  [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
 
-theorem measure_eq_relIndex_mul (μ : Measure V) [μ.IsAddLeftInvariant] (K H : AddSubgroup V)
-    (hle : H ≤ K) (ho : IsOpen (H : Set V)) (hi : H.relIndex K ≠ 0) :
-    μ K = (H.relIndex K : ENNReal) * μ H := by
+theorem measure_eq_relIndex_mul
+    (μ : Measure V) [μ.IsAddLeftInvariant]
+    (K H : AddSubgroup V) (hle : H ≤ K) (ho : IsOpen (H : Set V)) (hi : H.relIndex K ≠ 0)
+    : μ K = (H.relIndex K : ENNReal) * μ H := by
   have hKm : MeasurableSet (K : Set V) := (AddSubgroup.isOpen_mono hle ho).measurableSet
   have hemb : MeasurableEmbedding (K.subtype : K → V) := MeasurableEmbedding.subtype_coe hKm
   have : (μ.comap (K.subtype : K → V)).IsAddLeftInvariant := Measure.IsAddLeftInvariant.comap μ hemb
@@ -31,7 +34,8 @@ theorem measure_eq_relIndex_mul (μ : Measure V) [μ.IsAddLeftInvariant] (K H : 
   have h1 : (K.subtype : K → V) '' Set.univ = (K : Set V) := by simp
   have h2 : (K.subtype : K → V) '' ((H.addSubgroupOf K : AddSubgroup K) : Set K) = (H : Set V) := by
     ext x
-    simp only [AddSubgroup.coe_subtype, Set.mem_image, SetLike.mem_coe, AddSubgroup.mem_addSubgroupOf]
+    simp only [AddSubgroup.coe_subtype, Set.mem_image, SetLike.mem_coe,
+      AddSubgroup.mem_addSubgroupOf]
     constructor
     · rintro ⟨y, hy, rfl⟩
       exact hy
@@ -41,11 +45,12 @@ theorem measure_eq_relIndex_mul (μ : Measure V) [μ.IsAddLeftInvariant] (K H : 
   rw [← key]
   rfl
 
-theorem relIndex_eq_card_range {W P Q : Type} [AddCommGroup W] [AddCommGroup P] [AddCommGroup Q] (L N : AddSubgroup W)
-    (f : P →+ W) (g : P →+ Q) (hN : N = L ⊔ f.range) (hfg : ∀ p, g p = 0 ↔ f p ∈ L) :
-    L.relIndex N = Nat.card (Set.range g) := by
-  have hfN : ∀ p, f p ∈ N := fun p => by
-    rw [hN]; exact AddSubgroup.mem_sup_right ⟨p, rfl⟩
+theorem relIndex_eq_card_range
+    {W P Q : Type} [AddCommGroup W] [AddCommGroup P] [AddCommGroup Q]
+    (L N : AddSubgroup W) (f : P →+ W) (g : P →+ Q)
+    (hN : N = L ⊔ f.range) (hfg : ∀ p, g p = 0 ↔ f p ∈ L)
+    : L.relIndex N = Nat.card (Set.range g) := by
+  have hfN : ∀ p, f p ∈ N := fun p => by rw [hN]; exact AddSubgroup.mem_sup_right ⟨p, rfl⟩
   let h : P →+ N ⧸ L.addSubgroupOf N := (QuotientAddGroup.mk' _).comp (f.codRestrict N hfN)
   have hs : Function.Surjective h := by
     intro c
@@ -72,10 +77,13 @@ theorem relIndex_eq_card_range {W P Q : Type} [AddCommGroup W] [AddCommGroup P] 
   rw [hr]
   exact Nat.card_congr (e1.symm.trans (e3.trans e2))
 
-theorem vol_ratio (lam : Measure V) [lam.IsAddHaarMeasure] (L : AddSubgroup V) (hLo : IsOpen (L : Set V))
-    (hLc : IsCompact (L : Set V)) (φ : V →+ V) (hφ : Continuous φ) {P Q : Type} [AddCommGroup P] [AddCommGroup Q]
-    (f : P →+ V) (g : P →+ Q) (hr : f.range = L.map φ) (hfg : ∀ p, g p = 0 ↔ f p ∈ L) :
-    (lam {x | ∃ y ∈ L, ∃ y' ∈ L, x = y + φ y'} / lam L).toReal = Nat.card (Set.range g) := by
+theorem vol_ratio
+    (lam : Measure V) [lam.IsAddHaarMeasure]
+    (L : AddSubgroup V) (hLo : IsOpen (L : Set V)) (hLc : IsCompact (L : Set V))
+    (φ : V →+ V) (hφ : Continuous φ)
+    {P Q : Type} [AddCommGroup P] [AddCommGroup Q]
+    (f : P →+ V) (g : P →+ Q) (hr : f.range = L.map φ) (hfg : ∀ p, g p = 0 ↔ f p ∈ L)
+    : (lam {x | ∃ y ∈ L, ∃ y' ∈ L, x = y + φ y'} / lam L).toReal = Nat.card (Set.range g) := by
   set N : AddSubgroup V := L ⊔ L.map φ with hNdef
   have hset : {x | ∃ y ∈ L, ∃ y' ∈ L, x = y + φ y'} = (N : Set V) := by
     ext x
@@ -99,46 +107,59 @@ theorem vol_ratio (lam : Measure V) [lam.IsAddHaarMeasure] (L : AddSubgroup V) (
     exact (hLc.prod hLc).image (continuous_fst.add (hφ.comp continuous_snd))
   have hidx : L.relIndex N ≠ 0 := by
     haveI : CompactSpace N := isCompact_iff_compactSpace.mp hNc
-    have ho : IsOpen ((L.addSubgroupOf N : AddSubgroup N) : Set N) := hLo.preimage continuous_subtype_val
+    have ho : IsOpen ((L.addSubgroupOf N : AddSubgroup N) : Set N) :=
+      hLo.preimage continuous_subtype_val
     haveI : Finite (N ⧸ L.addSubgroupOf N) := AddSubgroup.quotient_finite_of_isOpen _ ho
     exact AddSubgroup.index_ne_zero_of_finite
   have h0 : lam (L : Set V) ≠ 0 := (hLo.measure_pos lam ⟨0, L.zero_mem⟩).ne'
   have htop : lam (L : Set V) ≠ ⊤ := hLc.measure_lt_top.ne
-  rw [hset, measure_eq_relIndex_mul lam N L hle hLo hidx, div_eq_mul_inv, mul_assoc, ENNReal.mul_inv_cancel h0 htop, mul_one,
-    ENNReal.toReal_natCast, relIndex_eq_card_range L N f g (by rw [hr]) hfg]
+  rw [hset, measure_eq_relIndex_mul lam N L hle hLo hidx, div_eq_mul_inv, mul_assoc,
+    ENNReal.mul_inv_cancel h0 htop, mul_one, ENNReal.toReal_natCast,
+    relIndex_eq_card_range L N f g (by rw [hr]) hfg]
 
 end Abstract
 
-open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain PositivityTheory.PfSWUS.Loc PositivityTheory.SiegelWeilFormula.Gen PositivityTheory.SiegelWeilFormula.Gunr
+open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain PositivityTheory.PfSWUS.Loc
+  PositivityTheory.SiegelWeilFormula.Gen PositivityTheory.SiegelWeilFormula.Gunr
 open scoped TensorProduct
 
 section Lattice
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {d : ℕ} (bs : Module.Basis (Fin d) F E)
+  (v : HeightOneSpectrum (𝓞 F))
 
-theorem exists_coord_homeo : ∃ h : (Fv F v ⊗[F] E) ≃ₜ (Fin d → Fv F v),
-    ∀ x k, h x k = (Algebra.TensorProduct.basis (Fv F v) bs).repr x k := by
+theorem exists_coord_homeo
+    : ∃ h : (Fv F v ⊗[F] E) ≃ₜ (Fin d → Fv F v), ∀ x k,
+      h x k = (Algebra.TensorProduct.basis (Fv F v) bs).repr x k := by
   haveI : IsModuleTopology (Fv F v) (Fv F v ⊗[F] E) := ⟨rfl⟩
   haveI : Module.Finite (Fv F v) (Fv F v ⊗[F] E) := Module.Finite.of_basis (Algebra.TensorProduct.basis (Fv F v) bs)
   haveI : ContinuousAdd (Fv F v ⊗[F] E) := IsModuleTopology.toContinuousAdd (Fv F v) (Fv F v ⊗[F] E)
   let e := (Algebra.TensorProduct.basis (Fv F v) bs).equivFun
-  exact ⟨{ toEquiv := e.toEquiv
-           continuous_toFun := IsModuleTopology.continuous_of_linearMap e.toLinearMap
-           continuous_invFun := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap },
-    fun x k => rfl⟩
+  exact ⟨
+    {
+      toEquiv := e.toEquiv
+      continuous_toFun := IsModuleTopology.continuous_of_linearMap e.toLinearMap
+      continuous_invFun := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap
+    },
+    fun x k => rfl
+  ⟩
 
 theorem isOpen_Rv : IsOpen (Rv bs v) := by
   obtain ⟨h, hh⟩ := exists_coord_homeo bs v
-  have : Rv bs v = h ⁻¹' (Set.pi Set.univ fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) := by
+  have : Rv bs v
+      = h ⁻¹' (Set.pi Set.univ fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) := by
     ext x
     simp [Rv, Set.mem_pi, hh]
   rw [this]
-  exact (isOpen_set_pi Set.finite_univ fun _ _ => Valued.isOpen_valuationSubring _).preimage h.continuous
+  exact (isOpen_set_pi Set.finite_univ fun _ _ => Valued.isOpen_valuationSubring _).preimage
+    h.continuous
 
 theorem isCompact_Rv : IsCompact (Rv bs v) := by
   obtain ⟨h, hh⟩ := exists_coord_homeo bs v
-  have : Rv bs v = h ⁻¹' (Set.pi Set.univ fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) := by
+  have : Rv bs v
+      = h ⁻¹' (Set.pi Set.univ fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) := by
     ext x
     simp [Rv, Set.mem_pi, hh]
   rw [this, h.isCompact_preimage]
@@ -156,24 +177,26 @@ theorem topRing_tens : IsTopologicalRing (Fv F v ⊗[F] E) := by
   haveI : Module.Finite (Fv F v) (Fv F v ⊗[F] E) := Module.Finite.of_basis (Algebra.TensorProduct.basis (Fv F v) bs)
   exact IsModuleTopology.isTopologicalRing (Fv F v) (Fv F v ⊗[F] E)
 
-theorem mem_latO_iff {n : ℕ} (y : Fin n → Fv F v ⊗[F] E) : y ∈ latO bs v ↔ ∀ a, y a ∈ Rv bs v := Iff.rfl
+theorem mem_latO_iff {n : ℕ} (y : Fin n → Fv F v ⊗[F] E) : y ∈ latO bs v ↔ ∀ a, y a ∈ Rv bs v :=
+  Iff.rfl
 
 end Lattice
 
 section Good
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {M n d : ℕ} {J : Matrix (Fin M) (Fin M) E} {T : Matrix (Fin n) (Fin n) E}
-  {bs : Module.Basis (Fin d) F E} {v : HeightOneSpectrum (𝓞 F)} {ψv : Fv F v → ℂ} {S : Subring (Fv F v ⊗[F] E)}
-  {σS : S →+* S} {ϖ : Fv F v} {ε : ℤ}
+  {bs : Module.Basis (Fin d) F E} {v : HeightOneSpectrum (𝓞 F)} {ψv : Fv F v → ℂ}
+  {S : Subring (Fv F v ⊗[F] E)} {σS : S →+* S} {ϖ : Fv F v} {ε : ℤ}
 
-theorem coe_mul_pow (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (c : S) :
-    ((c * hG.pS ^ k : S) : Fv F v ⊗[F] E) = (ϖ ^ k) • (c : Fv F v ⊗[F] E) := by
+theorem coe_mul_pow (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (c : S)
+    : ((c * hG.pS ^ k : S) : Fv F v ⊗[F] E) = (ϖ ^ k) • (c : Fv F v ⊗[F] E) := by
   rw [Subring.coe_mul, Subring.coe_pow, Algebra.smul_def, map_pow, mul_comm]
   rfl
 
-theorem inv_smul_mem_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (s : S) :
-    (ϖ ^ k)⁻¹ • (s : Fv F v ⊗[F] E) ∈ S ↔ s ∈ lev hG.pS k := by
+theorem inv_smul_mem_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (s : S)
+    : (ϖ ^ k)⁻¹ • (s : Fv F v ⊗[F] E) ∈ S ↔ s ∈ lev hG.pS k := by
   have hne : ϖ ^ k ≠ 0 := pow_ne_zero _ hG.unif_ne
   constructor
   · intro h
@@ -184,21 +207,23 @@ theorem inv_smul_mem_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (s
     rw [coe_mul_pow, smul_smul, inv_mul_cancel₀ hne, one_smul]
     exact c.2
 
-theorem sig_mem_lev (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) {s : S} (hs : s ∈ lev hG.pS k) :
-    σS s ∈ lev hG.pS k := by
+theorem sig_mem_lev (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) {s : S} (hs : s ∈ lev hG.pS k)
+    : σS s ∈ lev hG.pS k := by
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 hs
   have hp : σS hG.pS = hG.pS := hG.quad.fix_ϖ
   exact Ideal.mem_span_singleton'.2 ⟨σS c, by rw [map_mul, map_pow, hp]⟩
 
-theorem sig_mem_lev_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (s : S) :
-    σS s ∈ lev hG.pS k ↔ s ∈ lev hG.pS k := by
+theorem sig_mem_lev_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (s : S)
+    : σS s ∈ lev hG.pS k ↔ s ∈ lev hG.pS k := by
   refine ⟨fun h => ?_, sig_mem_lev hG k⟩
   have := sig_mem_lev hG k h
   rwa [hG.quad.inv] at this
 
-theorem sum_mem_lev_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (X : Matrix (Fin n) (Fin n) S)
-    (hX : PositivityTheory.PfSWUS.Loc.cT σS X = X) (p : Fin n → S) (a : Fin n) :
-    (∑ c, X a c * σS (p c)) ∈ lev hG.pS k ↔ (∑ c, p c * X c a) ∈ lev hG.pS k := by
+theorem sum_mem_lev_iff
+    (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ)
+    (X : Matrix (Fin n) (Fin n) S) (hX : PositivityTheory.PfSWUS.Loc.cT σS X = X)
+    (p : Fin n → S) (a : Fin n)
+    : (∑ c, X a c * σS (p c)) ∈ lev hG.pS k ↔ (∑ c, p c * X c a) ∈ lev hG.pS k := by
   rw [← sig_mem_lev_iff hG k (∑ c, X a c * σS (p c))]
   have : σS (∑ c, X a c * σS (p c)) = ∑ c, p c * X c a := by
     set_option synthInstance.maxHeartbeats 100000 in
@@ -209,11 +234,12 @@ theorem sum_mem_lev_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (X 
     rw [map_mul, hG.quad.inv, h', mul_comm]
   rw [this]
 
-theorem multiplicity_hermitian_level (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (lam : Measure (Fin n → Fv F v ⊗[F] E))
-    (L : AddSubgroup (Fin n → Fv F v ⊗[F] E)) (hlam : lam.IsAddHaarMeasure)
-    (hL : (L : Set (Fin n → Fv F v ⊗[F] E)) = latO bs v) (k : ℕ) (X : Matrix (Fin n) (Fin n) S)
-    (hX : PositivityTheory.PfSWUS.Loc.cT σS X = X) :
-    nu2 lam L L (hG.hermLev k X hX).1 = (nuAt hG.pS (red hG.pS k X) : ℝ) := by
+theorem multiplicity_hermitian_level
+    (hG : GoodLoc σ J T bs v ψv S σS ϖ ε)
+    (lam : Measure (Fin n → Fv F v ⊗[F] E)) (L : AddSubgroup (Fin n → Fv F v ⊗[F] E))
+    (hlam : lam.IsAddHaarMeasure) (hL : (L : Set (Fin n → Fv F v ⊗[F] E)) = latO bs v) (k : ℕ)
+    (X : Matrix (Fin n) (Fin n) S) (hX : PositivityTheory.PfSWUS.Loc.cT σS X = X)
+    : nu2 lam L L (hG.hermLev k X hX).1 = (nuAt hG.pS (red hG.pS k X) : ℝ) := by
   haveI := topRing_tens (E := E) bs v
   haveI := secondCountable_tens (E := E) bs v
   haveI : BorelSpace (Fv F v ⊗[F] E) := ⟨rfl⟩
@@ -222,10 +248,12 @@ theorem multiplicity_hermitian_level (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) 
     have h1 : y ∈ L ↔ y ∈ latO bs v := by rw [← hL]; rfl
     rw [h1, mem_latO_iff]
     refine forall_congr' fun a => ?_
-    rw [← hG.carrier]; rfl
+    rw [← hG.carrier]
+    rfl
   have hSo : IsOpen (S : Set (Fv F v ⊗[F] E)) := by rw [hG.carrier]; exact isOpen_Rv bs v
   have hSc : IsCompact (S : Set (Fv F v ⊗[F] E)) := by rw [hG.carrier]; exact isCompact_Rv bs v
-  have hLset : (L : Set (Fin n → Fv F v ⊗[F] E)) = Set.pi Set.univ fun _ => (S : Set (Fv F v ⊗[F] E)) := by
+  have hLset
+      : (L : Set (Fin n → Fv F v ⊗[F] E)) = Set.pi Set.univ fun _ => (S : Set (Fv F v ⊗[F] E)) := by
     ext y
     simp [Set.mem_pi, hmem]
   have hLo : IsOpen (L : Set (Fin n → Fv F v ⊗[F] E)) := by
@@ -244,11 +272,15 @@ theorem multiplicity_hermitian_level (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) 
       ext c
       simp)
   let g : (Fin n → S) →+ (Fin n → S ⧸ lev hG.pS k) :=
-    AddMonoidHom.mk' (fun p => Matrix.vecMul (fun c => Ideal.Quotient.mk (lev hG.pS k) (p c)) (red hG.pS k X)) (by
-      intro p q
-      rw [← Matrix.add_vecMul]
-      congr 1)
-  have hgdef : ∀ p, g p = Matrix.vecMul (fun c => Ideal.Quotient.mk (lev hG.pS k) (p c)) (red hG.pS k X) := fun _ => rfl
+    AddMonoidHom.mk'
+      (fun p => Matrix.vecMul (fun c => Ideal.Quotient.mk (lev hG.pS k) (p c)) (red hG.pS k X))
+      (by
+        intro p q
+        rw [← Matrix.add_vecMul]
+        congr 1)
+  have hgdef
+      : ∀ p, g p = Matrix.vecMul (fun c => Ideal.Quotient.mk (lev hG.pS k) (p c)) (red hG.pS k X) :=
+    fun _ => rfl
   have hr : f.range = L.map φ := by
     ext x
     simp only [AddMonoidHom.mem_range, AddSubgroup.mem_map]
@@ -280,14 +312,19 @@ theorem multiplicity_hermitian_level (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) 
       simp [Matrix.vecMul, dotProduct, red, map_mul]
     constructor
     · intro h a
-      rw [hfa, inv_smul_mem_iff hG, sum_mem_lev_iff hG k X hX, ← Ideal.Quotient.eq_zero_iff_mem, ← hga, h]
+      rw [hfa, inv_smul_mem_iff hG, sum_mem_lev_iff hG k X hX, ← Ideal.Quotient.eq_zero_iff_mem,
+        ← hga, h]
       rfl
     · intro h
       ext a
       have := h a
-      rw [hfa, inv_smul_mem_iff hG, sum_mem_lev_iff hG k X hX, ← Ideal.Quotient.eq_zero_iff_mem, ← hga] at this
+      rw [hfa, inv_smul_mem_iff hG, sum_mem_lev_iff hG k X hX, ← Ideal.Quotient.eq_zero_iff_mem,
+          ← hga]
+        at this
       exact this
-  have hrange : Set.range g = Set.range fun x : Fin n → S ⧸ lev hG.pS k => Matrix.vecMul x (red hG.pS k X) := by
+  have hrange
+      : Set.range g
+        = Set.range fun x : Fin n → S ⧸ lev hG.pS k => Matrix.vecMul x (red hG.pS k X) := by
     ext w
     constructor
     · rintro ⟨p, rfl⟩

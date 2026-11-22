@@ -6,12 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
 
-private theorem sumBack_one {ι : Type} (S : Finset ι) (f : ι → ℕ∞) (a : ℕ∞) (b E : ℕ) (hE : E ≠ 0)
-    (hf : ∀ i ∈ S, f i ≠ ⊤) (h : a * (E : ℕ∞) ≤ ∑ i ∈ S, (f i + (b : ℕ∞) * (E : ℕ∞))) :
-    a ≠ ⊤ ∧ (a.toNat : ℝ) ≤ ∑ i ∈ S, ((f i).toNat : ℝ) / (E : ℝ) + S.card * (b : ℝ) := by
-  have hsum : ∑ i ∈ S, (f i + (b : ℕ∞) * (E : ℕ∞)) = ((∑ i ∈ S, ((f i).toNat + b * E) : ℕ) : ℕ∞) := by
+private theorem sumBack_one
+    {ι : Type} (S : Finset ι) (f : ι → ℕ∞)
+    (a : ℕ∞)
+    (b E : ℕ) (hE : E ≠ 0)
+    (hf : ∀ i ∈ S, f i ≠ ⊤) (h : a * (E : ℕ∞) ≤ ∑ i ∈ S, (f i + (b : ℕ∞) * (E : ℕ∞)))
+    : a ≠ ⊤ ∧ (a.toNat : ℝ) ≤ ∑ i ∈ S, ((f i).toNat : ℝ) / (E : ℝ) + S.card * (b : ℝ) := by
+  have hsum
+      : ∑ i ∈ S, (f i + (b : ℕ∞) * (E : ℕ∞)) = ((∑ i ∈ S, ((f i).toNat + b * E) : ℕ) : ℕ∞) := by
     rw [Nat.cast_sum]
     refine Finset.sum_congr rfl fun i hi => ?_
     push_cast
@@ -29,16 +34,25 @@ private theorem sumBack_one {ι : Type} (S : Finset ι) (f : ι → ℕ∞) (a :
   have h3 : (a.toNat : ℝ) * E ≤ ∑ i ∈ S, (((f i).toNat : ℝ) + b * E) := by exact_mod_cast h2
   rw [Finset.sum_add_distrib, Finset.sum_const, nsmul_eq_mul] at h3
   rw [← Finset.sum_div]
-  have h4 : (∑ i ∈ S, ((f i).toNat : ℝ)) / E + S.card * (b : ℝ) = ((∑ i ∈ S, ((f i).toNat : ℝ)) + S.card * ((b : ℝ) * E)) / E := by
+  have h4
+      : (∑ i ∈ S, ((f i).toNat : ℝ)) / E + S.card * (b : ℝ)
+        = ((∑ i ∈ S, ((f i).toNat : ℝ)) + S.card * ((b : ℝ) * E)) / E := by
     field_simp
   rw [h4, le_div_iff₀ hE']
   exact h3
 
-theorem UpperTheory.V.Chr.sumBack :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (ι : Type) (T : ℕ → Finset ι) (T₀ : Finset ι) (f : ι → ℕ → ℕ∞) (a : ℕ → ℕ∞) (b : ℕ → ℕ) (t : ℕ),
-          (∀ e, T e ⊆ T₀) → (∀ e, 0 < e → e < t → (∀ i ∈ T e, f i e ≠ ⊤) ∧ a e * eO l O ≤ ∑ i ∈ T e, (f i e + (b e : ℕ∞) * eO l O)) →
-          (∀ e, 0 < e → e < t → a e ≠ ⊤) ∧
-            ∑ e ∈ Finset.Ico 1 t, ((a e).toNat : ℝ) ≤ ∑ e ∈ Finset.Ico 1 t, ∑ i ∈ T e, nrm l O (f i e) + T₀.card * ∑ e ∈ Finset.Ico 1 t, (b e : ℝ) := by
+theorem UpperTheory.V.Chr.sumBack
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (ι : Type) (T : ℕ → Finset ι) (T₀ : Finset ι)
+        (f : ι → ℕ → ℕ∞) (a : ℕ → ℕ∞) (b : ℕ → ℕ) (t : ℕ),
+      (∀ e, T e ⊆ T₀)
+        → (∀ e,
+          0 < e → e < t
+            → (∀ i ∈ T e, f i e ≠ ⊤) ∧ a e * eO l O ≤ ∑ i ∈ T e, (f i e + (b e : ℕ∞) * eO l O))
+        → (∀ e, 0 < e → e < t → a e ≠ ⊤)
+          ∧ ∑ e ∈ Finset.Ico 1 t, ((a e).toNat : ℝ)
+            ≤ ∑ e ∈ Finset.Ico 1 t, ∑ i ∈ T e, nrm l O (f i e)
+              + T₀.card * ∑ e ∈ Finset.Ico 1 t, (b e : ℝ) := by
   intro l _ O _ _ _ _ _ ι T T₀ f a b t hT h
   obtain ⟨-, -, -, -, -, hne, hle, -, -⟩ := dvrFacts l O
   have htop : eO l O ≠ ⊤ := ne_top_of_le_ne_top (ENat.coe_ne_top _) hle
@@ -48,7 +62,11 @@ theorem UpperTheory.V.Chr.sumBack :
     apply hne
     rw [hEO, h0]
     rfl
-  have key : ∀ e ∈ Finset.Ico 1 t, a e ≠ ⊤ ∧ ((a e).toNat : ℝ) ≤ ∑ i ∈ T e, ((f i e).toNat : ℝ) / ((eO l O).toNat : ℝ) + (T e).card * (b e : ℝ) := by
+  have key
+      : ∀ e ∈ Finset.Ico 1 t,
+        a e ≠ ⊤
+          ∧ ((a e).toNat : ℝ)
+            ≤ ∑ i ∈ T e, ((f i e).toNat : ℝ) / ((eO l O).toNat : ℝ) + (T e).card * (b e : ℝ) := by
     intro e he
     rw [Finset.mem_Ico] at he
     obtain ⟨h1, h2⟩ := h e (by omega) he.2

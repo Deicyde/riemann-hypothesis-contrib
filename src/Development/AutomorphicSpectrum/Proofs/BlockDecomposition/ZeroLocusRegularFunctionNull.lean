@@ -10,16 +10,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChernPartOve
 
 set_option autoImplicit false
 open CategoryTheory AlgebraicGeometry Limits TopologicalSpace MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts
+  GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
 open ReciprocityTheory.ChartRestriction.G.Geo (mcPts IsMultiHomog SameOrbit)
 
-theorem GlobalTheory.CompanionTheory.MixZ.volume_chart_zeroSet_fnOf : ∀ (X : Scheme.{0}) [IsIntegral X] (q : X ⟶ Sp ℤ) (σ : ℤ →+* ℂ) (D : ℕ) (c : GlobalTheory.AlgChart q σ D) (W : X.Opens)
-    (h : genericPoint X ∈ W) (g : Γ(X, W)), fnOf W h g ≠ 0 →
-    volume (c.e.target ∩ c.e.symm ⁻¹' {y | y ∈ ptsIn q σ W ∧ ev q σ W g y = 0}) = 0 := by
+theorem GlobalTheory.CompanionTheory.MixZ.volume_chart_zeroSet_fnOf
+    : ∀ (X : Scheme.{0}) [IsIntegral X] (q : X ⟶ Sp ℤ) (σ : ℤ →+* ℂ) (D : ℕ)
+        (c : GlobalTheory.AlgChart q σ D) (W : X.Opens) (h : genericPoint X ∈ W) (g : Γ(X, W)),
+      fnOf W h g ≠ 0
+        → volume (c.e.target ∩ c.e.symm ⁻¹' {y | y ∈ ptsIn q σ W ∧ ev q σ W g y = 0}) = 0 := by
   intro X _ q σ D c W h g hg
   rcases c.e.source.eq_empty_or_nonempty with hs | ⟨y0, hy0⟩
   · have ht : c.e.target = ∅ := by rw [← c.e.image_source_eq_target, hs, Set.image_empty]
@@ -29,8 +33,8 @@ theorem GlobalTheory.CompanionTheory.MixZ.volume_chart_zeroSet_fnOf : ∀ (X : S
   have hgU : genericPoint X ∈ c.U := gen_mem sectionFrameQuotient
   haveI := functionField_isFractionRing_of_isAffineOpen X c.U c.affine
   obtain ⟨a, b, hb, hab⟩ := IsFractionRing.div_surjective (A := Γ(X, c.U)) (fnOf W h g)
-  have hal : ∀ t : Γ(X, c.U), algebraMap Γ(X, c.U) X.functionField t = fnOf c.U hgU t :=
-    fun _ => rfl
+  have hal : ∀ t : Γ(X, c.U), algebraMap Γ(X, c.U) X.functionField t = fnOf c.U hgU t := fun _ =>
+    rfl
   rw [hal, hal] at hab
   have hb0 : fnOf c.U hgU b ≠ 0 := fun e =>
     nonZeroDivisors.ne_zero hb ((map_eq_zero_iff _ (fnOf_injective _ _)).1 e)
@@ -38,11 +42,11 @@ theorem GlobalTheory.CompanionTheory.MixZ.volume_chart_zeroSet_fnOf : ∀ (X : S
     rintro rfl
     apply hg
     rw [← hab, map_zero, zero_div]
-  have hrel : fnOf W h g * fnOf c.U hgU b = fnOf c.U hgU a := by
-    rw [← hab, div_mul_cancel₀ _ hb0]
+  have hrel : fnOf W h g * fnOf c.U hgU b = fnOf c.U hgU a := by rw [← hab, div_mul_cancel₀ _ hb0]
   have hI : genericPoint X ∈ W ⊓ c.U := ⟨h, hgU⟩
-  have hres : resG X (inf_le_left : W ⊓ c.U ≤ W) g * resG X (inf_le_right : W ⊓ c.U ≤ c.U) b =
-      resG X (inf_le_right : W ⊓ c.U ≤ c.U) a := by
+  have hres
+      : resG X (inf_le_left : W ⊓ c.U ≤ W) g * resG X (inf_le_right : W ⊓ c.U ≤ c.U) b
+        = resG X (inf_le_right : W ⊓ c.U ≤ c.U) a := by
     apply fnOf_injective _ hI
     rw [map_mul, fnOf_resG, fnOf_resG, fnOf_resG]
     exact hrel
@@ -56,8 +60,10 @@ theorem GlobalTheory.CompanionTheory.MixZ.volume_chart_zeroSet_fnOf : ∀ (X : S
   have hyI : c.e.symm v ∈ ptsIn q σ (W ⊓ c.U) := mem_ptsIn_inf.2 ⟨hyW, hyU⟩
   have hay : ev q σ c.U a (c.e.symm v) = 0 := by
     rw [← ev_res inf_le_right hyI, ← hres, ev_mul, ev_res inf_le_left hyI, hyz, zero_mul]
-  have hcomp : (evHom hyU).comp (MvPolynomial.eval₂Hom (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX q c.U) c.x) =
-      MvPolynomial.eval₂Hom σ (fun i => c.e (c.e.symm v) i) := by
+  have hcomp
+      : (evHom hyU).comp
+          (MvPolynomial.eval₂Hom (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX q c.U) c.x)
+        = MvPolynomial.eval₂Hom σ (fun i => c.e (c.e.symm v) i) := by
     refine MvPolynomial.ringHom_ext (fun i => ?_) (fun i => ?_)
     · simp [← ev_eq hyU, ev_algX hyU]
     · simp [← ev_eq hyU, c.apply_eq _ hys]

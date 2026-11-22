@@ -181,7 +181,6 @@ lemma W_extW {n : ℕ} (la : Fin n → ℤ) :
 
 end Branch
 
-
 open Branch in
 theorem branchingDimensionFormula : BranchDim := by
   intro n mu hmu
@@ -195,8 +194,7 @@ theorem branchingDimensionFormula : BranchDim := by
   simp_rw [weylDim_eq, W_extW]
   rw [← Finset.sum_div, ← core mu h, W_id_succ]
   have h0 := W_id_ne_zero n
-  have h1 : (∏ j : Fin n, ((j : ℝ) + 1)) ≠ 0 :=
-    Finset.prod_ne_zero_iff.2 fun j _ => by positivity
+  have h1 : (∏ j : Fin n, ((j : ℝ) + 1)) ≠ 0 := Finset.prod_ne_zero_iff.2 fun j _ => by positivity
   field_simp
 
 end Formalism.InvariantFactorPaths.BranchingDimensions

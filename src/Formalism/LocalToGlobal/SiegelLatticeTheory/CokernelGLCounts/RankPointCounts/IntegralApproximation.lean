@@ -13,28 +13,29 @@ namespace Formalism.L2.SG.IntegralApproximation
 
 section Res
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
-theorem v_le_iff (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) (x y : F) :
-    valuation L.Fp (L.ιF x) ≤ valuation L.Fp (L.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
+theorem v_le_iff (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) (x y : F)
+    : valuation L.Fp (L.ιF x) ≤ valuation L.Fp (L.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
   rw [← Valuation.Compatible.vle_iff_le]
   exact L.val x y
 
-theorem v_le_one_iff (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) (x : F) :
-    valuation L.Fp (L.ιF x) ≤ 1 ↔ p.valuation F x ≤ 1 := by
+theorem v_le_one_iff (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) (x : F)
+    : valuation L.Fp (L.ιF x) ≤ 1 ↔ p.valuation F x ≤ 1 := by
   have h := v_le_iff L x 1
   simpa only [map_one] using h
 
-theorem v_lt_one_iff (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) (x : F) :
-    valuation L.Fp (L.ιF x) < 1 ↔ p.valuation F x < 1 := by
+theorem v_lt_one_iff (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) (x : F)
+    : valuation L.Fp (L.ιF x) < 1 ↔ p.valuation F x < 1 := by
   rw [← not_le, ← not_le]
   have h := v_le_iff L 1 x
   simp only [map_one] at h
   rw [h]
 
-theorem exists_int_approx (x : F) (hx : p.valuation F x ≤ 1) :
-    ∃ a : 𝓞 F, p.valuation F (x - algebraMap (𝓞 F) F a) < 1 := by
+theorem exists_int_approx (x : F) (hx : p.valuation F x ≤ 1)
+    : ∃ a : 𝓞 F, p.valuation F (x - algebraMap (𝓞 F) F a) < 1 := by
   classical
   obtain ⟨⟨b, s⟩, rfl⟩ := IsLocalization.mk'_surjective (nonZeroDivisors (𝓞 F)) x
   dsimp only at hx ⊢
@@ -70,7 +71,8 @@ theorem exists_int_approx (x : F) (hx : p.valuation F x ≤ 1) :
     · refine lt_of_le_of_ne le_sup_right fun h => hn1 ?_
       rw [h]
       exact Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)
-    · exact sup_le ((Ideal.span_singleton_le_iff_mem _).2 hn) (Ideal.pow_le_pow_right (Nat.le_succ n))
+    · exact sup_le ((Ideal.span_singleton_le_iff_mem _).2 hn)
+        (Ideal.pow_le_pow_right (Nat.le_succ n))
   rw [← hI] at hb
   obtain ⟨y, hy, r, hr, hyr⟩ := Submodule.mem_sup.1 hb
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 hy
@@ -87,8 +89,8 @@ theorem exists_int_approx (x : F) (hx : p.valuation F x ≤ 1) :
     hn1 ((HeightOneSpectrum.intValuation_le_pow_iff_mem p _ _).1 h)
   exact lt_of_le_of_lt hr' (not_le.1 hs')
 
-theorem card_res_le (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) :
-    Nat.card (IsLocalRing.ResidueField 𝒪[L.Fp]) ≤ Ideal.absNorm p.asIdeal := by
+theorem card_res_le (L : Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    : Nat.card (IsLocalRing.ResidueField 𝒪[L.Fp]) ≤ Ideal.absNorm p.asIdeal := by
   have := L.lf
   have hint : ∀ a : 𝓞 F, (L.ιF.comp (algebraMap (𝓞 F) F)) a ∈ 𝒪[L.Fp] := fun a => by
     rw [Valuation.mem_integer_iff]
@@ -96,8 +98,9 @@ theorem card_res_le (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) :
   let φ : 𝓞 F →+* 𝒪[L.Fp] := (L.ιF.comp (algebraMap (𝓞 F) F)).codRestrict 𝒪[L.Fp] hint
   let ρ : 𝓞 F →+* IsLocalRing.ResidueField 𝒪[L.Fp] := (IsLocalRing.residue 𝒪[L.Fp]).comp φ
   have hmax : ∀ z : 𝒪[L.Fp], valuation L.Fp (z : L.Fp) < 1 → z ∈ IsLocalRing.maximalIdeal 𝒪[L.Fp] :=
-    fun z hz => (IsLocalRing.mem_maximalIdeal _).2
-      (mem_nonunits_iff.2 (Valuation.Integer.not_isUnit_iff_valuation_lt_one.2 hz))
+    fun z hz =>
+      (IsLocalRing.mem_maximalIdeal _).2
+        (mem_nonunits_iff.2 (Valuation.Integer.not_isUnit_iff_valuation_lt_one.2 hz))
   have hker : ∀ a ∈ p.asIdeal, ρ a = 0 := by
     intro a ha
     show IsLocalRing.residue _ (φ a) = 0
@@ -134,8 +137,9 @@ theorem card_res_le (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) :
     rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff]
     apply hmax
     show valuation L.Fp (L.ιF (algebraMap (𝓞 F) F a) - y) < 1
-    have : L.ιF (algebraMap (𝓞 F) F a) - (y : L.Fp) =
-        -(L.ιF x - L.ιF (algebraMap (𝓞 F) F a)) + (L.ιF x - y) := by ring
+    have : L.ιF (algebraMap (𝓞 F) F a) - (y : L.Fp)
+        = -(L.ιF x - L.ιF (algebraMap (𝓞 F) F a)) + (L.ιF x - y) := by
+      ring
     rw [this]
     exact Valuation.map_add_lt _ (by rw [Valuation.map_neg]; exact ha') hx
   let ρq := Ideal.Quotient.lift p.asIdeal ρ hker
@@ -144,19 +148,20 @@ theorem card_res_le (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) :
     obtain ⟨a, ha⟩ := hsurj w
     exact ⟨Ideal.Quotient.mk _ a, by rw [Ideal.Quotient.lift_mk]; exact ha⟩
   haveI : Finite (𝓞 F ⧸ p.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ p.ne_bot
-  calc Nat.card (IsLocalRing.ResidueField 𝒪[L.Fp]) ≤ Nat.card (𝓞 F ⧸ p.asIdeal) :=
-        Nat.card_le_card_of_surjective ρq hsurjq
+  calc
+    Nat.card (IsLocalRing.ResidueField 𝒪[L.Fp])
+      ≤ Nat.card (𝓞 F ⧸ p.asIdeal) := Nat.card_le_card_of_surjective ρq hsurjq
     _ = Ideal.absNorm p.asIdeal := by rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
 
-theorem one_lt_card_res (L : Formalism.MainNotions.S.Loc.LocAt F E sig p) :
-    1 < Nat.card (IsLocalRing.ResidueField 𝒪[L.Fp]) := by
+theorem one_lt_card_res (L : Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    : 1 < Nat.card (IsLocalRing.ResidueField 𝒪[L.Fp]) := by
   have := L.lf
   exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance
 
 end Res
 
-theorem factor_bounds {t : ℝ} (ht : |t| ≤ 1 / 2) :
-    Real.exp (-(2 * |t|)) ≤ 1 - t ∧ 1 - t ≤ Real.exp (2 * |t|) := by
+theorem factor_bounds {t : ℝ} (ht : |t| ≤ 1 / 2)
+    : Real.exp (-(2 * |t|)) ≤ 1 - t ∧ 1 - t ≤ Real.exp (2 * |t|) := by
   have ha := abs_nonneg t
   constructor
   · have hpos : 0 < 1 - |t| := by linarith
@@ -166,16 +171,18 @@ theorem factor_bounds {t : ℝ} (ht : |t| ≤ 1 / 2) :
     have hlog : -(2 * |t|) ≤ Real.log (1 - |t|) := by
       have := Real.one_sub_inv_le_log_of_pos hpos
       linarith
-    calc Real.exp (-(2 * |t|)) ≤ Real.exp (Real.log (1 - |t|)) := Real.exp_le_exp.2 hlog
+    calc
+      Real.exp (-(2 * |t|))
+        ≤ Real.exp (Real.log (1 - |t|)) := Real.exp_le_exp.2 hlog
       _ = 1 - |t| := Real.exp_log hpos
       _ ≤ 1 - t := by linarith [le_abs_self t]
   · have := Real.add_one_le_exp (2 * |t|)
     linarith [neg_abs_le t]
 
-theorem prod_bounds (N : ℕ) (hN : 2 ≤ N) (η : ℝ) (hη : η = 1 ∨ η = -1) (a b k : ℕ) (hk : 1 ≤ k)
-    (hak : k ≤ a) :
-    Real.exp (-(4 * ((N : ℝ)⁻¹) ^ k)) ≤ ∏ i ∈ Finset.Icc a b, (1 - η ^ i / (N : ℝ) ^ i) ∧
-      ∏ i ∈ Finset.Icc a b, (1 - η ^ i / (N : ℝ) ^ i) ≤ Real.exp (4 * ((N : ℝ)⁻¹) ^ k) := by
+theorem prod_bounds
+    (N : ℕ) (hN : 2 ≤ N) (η : ℝ) (hη : η = 1 ∨ η = -1) (a b k : ℕ) (hk : 1 ≤ k) (hak : k ≤ a)
+    : Real.exp (-(4 * ((N : ℝ)⁻¹) ^ k)) ≤ ∏ i ∈ Finset.Icc a b, (1 - η ^ i / (N : ℝ) ^ i)
+      ∧ ∏ i ∈ Finset.Icc a b, (1 - η ^ i / (N : ℝ) ^ i) ≤ Real.exp (4 * ((N : ℝ)⁻¹) ^ k) := by
   set x : ℝ := (N : ℝ)⁻¹ with hx
   have hN' : (2 : ℝ) ≤ N := by exact_mod_cast hN
   have hx0 : 0 ≤ x := by positivity
@@ -191,7 +198,9 @@ theorem prod_bounds (N : ℕ) (hN : 2 ≤ N) (η : ℝ) (hη : η = 1 ∨ η = -
     intro i hi
     rw [habs]
     have hi1 : 1 ≤ i := le_trans hk (le_trans hak (Finset.mem_Icc.1 hi).1)
-    calc x ^ i ≤ x ^ 1 := pow_le_pow_of_le_one hx0 hx1.le hi1
+    calc
+      x ^ i
+        ≤ x ^ 1 := pow_le_pow_of_le_one hx0 hx1.le hi1
       _ = x := pow_one x
       _ ≤ 1 / 2 := hx2
   have hsum : ∑ i ∈ Finset.Icc a b, 2 * x ^ i ≤ 4 * x ^ k := by
@@ -218,14 +227,17 @@ theorem prod_bounds (N : ℕ) (hN : 2 ≤ N) (η : ℝ) (hη : η = 1 ∨ η = -
     have := (factor_bounds (hsmall i hi)).2
     rwa [habs] at this
   constructor
-  · calc Real.exp (-(4 * x ^ k)) ≤ Real.exp (-(∑ i ∈ Finset.Icc a b, 2 * x ^ i)) :=
-          Real.exp_le_exp.2 (by linarith)
+  · calc
+      Real.exp (-(4 * x ^ k))
+        ≤ Real.exp (-(∑ i ∈ Finset.Icc a b, 2 * x ^ i)) := Real.exp_le_exp.2 (by linarith)
       _ = ∏ i ∈ Finset.Icc a b, Real.exp (-(2 * x ^ i)) := by
-          rw [← Finset.sum_neg_distrib, Real.exp_sum]
+        rw [← Finset.sum_neg_distrib, Real.exp_sum]
       _ ≤ ∏ i ∈ Finset.Icc a b, (1 - η ^ i / (N : ℝ) ^ i) :=
-          Finset.prod_le_prod₀ (fun i _ => (Real.exp_pos _).le) hlo
-  · calc ∏ i ∈ Finset.Icc a b, (1 - η ^ i / (N : ℝ) ^ i) ≤ ∏ i ∈ Finset.Icc a b, Real.exp (2 * x ^ i) :=
-          Finset.prod_le_prod₀ (fun i hi => le_trans (Real.exp_pos _).le (hlo i hi)) hhi
+        Finset.prod_le_prod₀ (fun i _ => (Real.exp_pos _).le) hlo
+  · calc
+      ∏ i ∈ Finset.Icc a b, (1 - η ^ i / (N : ℝ) ^ i)
+          ≤ ∏ i ∈ Finset.Icc a b, Real.exp (2 * x ^ i) :=
+        Finset.prod_le_prod₀ (fun i hi => le_trans (Real.exp_pos _).le (hlo i hi)) hhi
       _ = Real.exp (∑ i ∈ Finset.Icc a b, 2 * x ^ i) := by rw [Real.exp_sum]
       _ ≤ Real.exp (4 * x ^ k) := Real.exp_le_exp.2 hsum
 
@@ -235,8 +247,8 @@ theorem etaP_pm {D : Formalism.BasicNotions.D7} (p : PlF D) : eta₃ p = 1 ∨ e
   unfold eta₃
   split_ifs <;> simp
 
-theorem absNorm_two_le {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F)) :
-    2 ≤ Ideal.absNorm p.asIdeal := by
+theorem absNorm_two_le {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F))
+    : 2 ≤ Ideal.absNorm p.asIdeal := by
   have h0 : Ideal.absNorm p.asIdeal ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]
     exact p.ne_bot
@@ -245,25 +257,30 @@ theorem absNorm_two_le {F : Type} [Field F] [NumberField F] (p : HeightOneSpectr
     exact p.isPrime.ne_top
   omega
 
-theorem aPD_bounds {D : Formalism.BasicNotions.D7} (p : PlF D) (T : ℕ) (hk : 1 ≤ D.R.k) :
-    Real.exp (-(4 * ((Ideal.absNorm p.asIdeal : ℕ) : ℝ)⁻¹ ^ D.R.k)) ≤ aPD p T ∧
-      aPD p T ≤ Real.exp (4 * ((Ideal.absNorm p.asIdeal : ℕ) : ℝ)⁻¹ ^ D.R.k) := by
+theorem aPD_bounds {D : Formalism.BasicNotions.D7} (p : PlF D) (T : ℕ) (hk : 1 ≤ D.R.k)
+    : Real.exp (-(4 * ((Ideal.absNorm p.asIdeal : ℕ) : ℝ)⁻¹ ^ D.R.k)) ≤ aPD p T
+      ∧ aPD p T ≤ Real.exp (4 * ((Ideal.absNorm p.asIdeal : ℕ) : ℝ)⁻¹ ^ D.R.k) := by
   unfold aPD
   apply prod_bounds _ (absNorm_two_le p) _ (etaP_pm p) _ _ _ hk
   split_ifs <;> omega
 
-theorem alpBoundU (D : Formalism.BasicNotions.D7) :
-    2 * D.R.rS + 2 + D.R.f + 5 ≤ D.R.k → ∀ (u u' : D.what₂.Word) (p : PlF D),
-      Real.exp (-(2 * (((Nat.card (IsLocalRing.ResidueField 𝒪[(D.s.atP p).Fp]) : ℝ)) ^
-          (D.R.k - 2 * D.R.rS - 2))⁻¹)) ≤ alpD u u' p ∧
-        alpD u u' p ≤ Real.exp (2 * (((Nat.card (IsLocalRing.ResidueField 𝒪[(D.s.atP p).Fp]) : ℝ)) ^
-          (D.R.k - 2 * D.R.rS - 2))⁻¹) := by
+theorem alpBoundU (D : Formalism.BasicNotions.D7)
+    : 2 * D.R.rS + 2 + D.R.f + 5 ≤ D.R.k
+      → ∀ (u u' : D.what₂.Word) (p : PlF D),
+        Real.exp (-(2 * (((Nat.card (IsLocalRing.ResidueField 𝒪[(D.s.atP p).Fp]) : ℝ))
+              ^ (D.R.k - 2 * D.R.rS - 2))⁻¹))
+            ≤ alpD u u' p
+          ∧ alpD u u' p
+            ≤ Real.exp
+              (2 * (((Nat.card (IsLocalRing.ResidueField 𝒪[(D.s.atP p).Fp]) : ℝ))
+                ^ (D.R.k - 2 * D.R.rS - 2))⁻¹) := by
   intro hk u u' p
   set m := D.R.k - 2 * D.R.rS - 2 with hm
   set q : ℝ := (Nat.card (IsLocalRing.ResidueField 𝒪[(D.s.atP p).Fp]) : ℝ) with hq
   have hN2 : 2 ≤ Ideal.absNorm p.asIdeal := absNorm_two_le p
   have hq1 : (1 : ℝ) < q := by rw [hq]; exact_mod_cast one_lt_card_res (D.s.atP p)
-  have hqN : q ≤ ((Ideal.absNorm p.asIdeal : ℕ) : ℝ) := by rw [hq]; exact_mod_cast card_res_le (D.s.atP p)
+  have hqN : q ≤ ((Ideal.absNorm p.asIdeal : ℕ) : ℝ) := by
+    rw [hq]; exact_mod_cast card_res_le (D.s.atP p)
   set x : ℝ := ((Ideal.absNorm p.asIdeal : ℕ) : ℝ)⁻¹ with hx
   have hk1 : 1 ≤ D.R.k := by omega
   have hkm : D.R.k = m + (2 * D.R.rS + 2) := by omega
@@ -287,30 +304,39 @@ theorem alpBoundU (D : Formalism.BasicNotions.D7) :
     linarith
   have hA := aPD_bounds p (D.mem u).A.T hk1
   have hA' := aPD_bounds p (D.mem u').A.T hk1
-  have hlow : Real.exp (-(2 * (q ^ m)⁻¹)) ≤ Real.exp (-(8 * x ^ D.R.k)) := Real.exp_le_exp.2 (by linarith)
+  have hlow : Real.exp (-(2 * (q ^ m)⁻¹)) ≤ Real.exp (-(8 * x ^ D.R.k)) :=
+    Real.exp_le_exp.2 (by linarith)
   have hup : Real.exp (8 * x ^ D.R.k) ≤ Real.exp (2 * (q ^ m)⁻¹) := Real.exp_le_exp.2 hkey
   have hxk : 0 ≤ x ^ D.R.k := pow_nonneg hx0 _
   unfold alpD
   split_ifs
   · constructor
-    · calc Real.exp (-(2 * (q ^ m)⁻¹)) ≤ Real.exp (-(8 * x ^ D.R.k)) := hlow
+    · calc
+        Real.exp (-(2 * (q ^ m)⁻¹))
+          ≤ Real.exp (-(8 * x ^ D.R.k)) := hlow
         _ ≤ Real.exp (-(4 * x ^ D.R.k)) := Real.exp_le_exp.2 (by linarith)
         _ ≤ aPD p (D.mem u).A.T := hA.1
-    · calc aPD p (D.mem u).A.T ≤ Real.exp (4 * x ^ D.R.k) := hA.2
+    · calc
+        aPD p (D.mem u).A.T
+          ≤ Real.exp (4 * x ^ D.R.k) := hA.2
         _ ≤ Real.exp (8 * x ^ D.R.k) := Real.exp_le_exp.2 (by linarith)
         _ ≤ Real.exp (2 * (q ^ m)⁻¹) := hup
   · constructor
-    · calc Real.exp (-(2 * (q ^ m)⁻¹)) ≤ Real.exp (-(8 * x ^ D.R.k)) := hlow
+    · calc
+        Real.exp (-(2 * (q ^ m)⁻¹))
+          ≤ Real.exp (-(8 * x ^ D.R.k)) := hlow
         _ = Real.exp (-(4 * x ^ D.R.k)) * Real.exp (-(4 * x ^ D.R.k)) := by
-            rw [← Real.exp_add]
-            ring_nf
+          rw [← Real.exp_add]
+          ring_nf
         _ ≤ aPD p (D.mem u).A.T * aPD p (D.mem u').A.T :=
-            mul_le_mul hA.1 hA'.1 (Real.exp_pos _).le (le_trans (Real.exp_pos _).le hA.1)
-    · calc aPD p (D.mem u).A.T * aPD p (D.mem u').A.T ≤ Real.exp (4 * x ^ D.R.k) * Real.exp (4 * x ^ D.R.k) :=
-            mul_le_mul hA.2 hA'.2 (le_trans (Real.exp_pos _).le hA'.1) (Real.exp_pos _).le
+          mul_le_mul hA.1 hA'.1 (Real.exp_pos _).le (le_trans (Real.exp_pos _).le hA.1)
+    · calc
+        aPD p (D.mem u).A.T * aPD p (D.mem u').A.T
+            ≤ Real.exp (4 * x ^ D.R.k) * Real.exp (4 * x ^ D.R.k) :=
+          mul_le_mul hA.2 hA'.2 (le_trans (Real.exp_pos _).le hA'.1) (Real.exp_pos _).le
         _ = Real.exp (8 * x ^ D.R.k) := by
-            rw [← Real.exp_add]
-            ring_nf
+          rw [← Real.exp_add]
+          ring_nf
         _ ≤ Real.exp (2 * (q ^ m)⁻¹) := hup
 
 end Formalism.L2.SG.IntegralApproximation

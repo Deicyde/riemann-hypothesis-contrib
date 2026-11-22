@@ -22,21 +22,22 @@ def SplitsCompletely (v : NumberField.InfinitePlace K) : Prop :=
 
 variable {L} (v : NumberField.InfinitePlace K)
 
-theorem isUnramified_iff_finrank_eq_one (w : NumberField.InfinitePlace L) [w.LiesOver v] :
-    w.IsUnramified K ↔ finrank v.Completion w.Completion = 1 := by
+theorem isUnramified_iff_finrank_eq_one (w : NumberField.InfinitePlace L) [w.LiesOver v]
+    : w.IsUnramified K ↔ finrank v.Completion w.Completion = 1 := by
   refine ⟨fun h ↦ h.finrank_eq_one v, fun h ↦ ?_⟩
   rcases w.isUnramified_or_isRamified K with hu | hr
   · exact hu
   · exact absurd (h.symm.trans (hr.finrank_eq_two v)) (by norm_num)
 
-theorem splitsCompletely_iff_forall_finrank :
-    SplitsCompletely L v ↔
-      ∀ w : v.placesOver L, finrank v.Completion (w : NumberField.InfinitePlace L).Completion = 1 :=
-  ⟨fun h w ↦ (isUnramified_iff_finrank_eq_one v w.1).1 (h w.1 w.2),
-    fun h w hw ↦ have := hw; (isUnramified_iff_finrank_eq_one v w).2 (h ⟨w, hw⟩)⟩
+theorem splitsCompletely_iff_forall_finrank
+    : SplitsCompletely L v
+      ↔ ∀ w : v.placesOver L,
+        finrank v.Completion (w : NumberField.InfinitePlace L).Completion = 1 := ⟨
+  fun h w ↦ (isUnramified_iff_finrank_eq_one v w.1).1 (h w.1 w.2),
+  fun h w hw ↦ have := hw; (isUnramified_iff_finrank_eq_one v w).2 (h ⟨w, hw⟩)
+⟩
 
 variable [NumberField K] [NumberField L]
-
 
 variable (L) in
 theorem nonempty_placesOver : Nonempty (v.placesOver L) := by

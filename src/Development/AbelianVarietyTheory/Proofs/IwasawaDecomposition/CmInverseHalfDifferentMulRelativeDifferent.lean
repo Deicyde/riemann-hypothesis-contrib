@@ -9,19 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.Lattice
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric NumberField GlobalTheory.Mem.Per
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric NumberField
+  GlobalTheory.Mem.Per
 open scoped nonZeroDivisors Pointwise UpperHalfPlane
 
 namespace GlobalTheory.Mem.PerField
 
-theorem ideal_eq_of_pow_eq {A : Type} [CommRing A] [IsDedekindDomain A] {I J : Ideal A} {n : ℕ} (hn : n ≠ 0)
-    (h : I ^ n = J ^ n) : I = J := by
+theorem ideal_eq_of_pow_eq
+    {A : Type} [CommRing A] [IsDedekindDomain A]
+    {I J : Ideal A} {n : ℕ} (hn : n ≠ 0) (h : I ^ n = J ^ n)
+    : I = J := by
   apply le_antisymm
   · rw [← Ideal.dvd_iff_le, ← UniqueFactorizationMonoid.pow_dvd_pow_iff_dvd hn, h]
   · rw [← Ideal.dvd_iff_le, ← UniqueFactorizationMonoid.pow_dvd_pow_iff_dvd hn, h]
 
-theorem exists_pow_eq_span {E : Type} [Field E] [NumberField E] (I : Ideal (𝓞 E)) :
-    ∃ n : ℕ, n ≠ 0 ∧ ∃ β : 𝓞 E, I ^ n = Ideal.span {β} := by
+theorem exists_pow_eq_span {E : Type} [Field E] [NumberField E] (I : Ideal (𝓞 E))
+    : ∃ n : ℕ, n ≠ 0 ∧ ∃ β : 𝓞 E, I ^ n = Ideal.span {β} := by
   classical
   by_cases hI : I = ⊥
   · exact ⟨1, one_ne_zero, 0, by simp [hI]⟩
@@ -32,10 +35,13 @@ theorem exists_pow_eq_span {E : Type} [Field E] [NumberField E] (I : Ideal (𝓞
   have h2 := (ClassGroup.mk0_eq_one_iff (pow_mem hI' (Fintype.card (ClassGroup (𝓞 E))))).1 h1
   exact ⟨_, (Ideal.span_singleton_generator _).symm⟩
 
-theorem span_root {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] (f : E →+* L)
-    {I : Ideal (𝓞 E)} {n : ℕ} (hn : n ≠ 0) {β : 𝓞 E} (h : I ^ n = Ideal.span {β}) {x : L}
-    (hx : x ^ n = f β) :
-    Submodule.span (𝓞 L) {x} = Submodule.span (𝓞 L) {y | ∃ c ∈ I, y = f (c : E)} := by
+theorem span_root
+    {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L]
+    (f : E →+* L)
+    {I : Ideal (𝓞 E)} {n : ℕ} (hn : n ≠ 0)
+    {β : 𝓞 E} (h : I ^ n = Ideal.span {β})
+    {x : L} (hx : x ^ n = f β)
+    : Submodule.span (𝓞 L) {x} = Submodule.span (𝓞 L) {y | ∃ c ∈ I, y = f (c : E)} := by
   have hi : IsIntegral ℤ x := by
     refine IsIntegral.of_pow (Nat.pos_of_ne_zero hn) ?_
     rw [hx]
@@ -48,7 +54,9 @@ theorem span_root {E L : Type} [Field E] [NumberField E] [Field L] [NumberField 
     congr 2
     exact RingOfIntegers.ext hx
   have e2 := congrArg (Submodule.map (Algebra.linearMap (𝓞 L) L)) e
-  rw [Ideal.map, Ideal.span, Ideal.span, Submodule.map_span, Submodule.map_span, Set.image_singleton] at e2
+  rw [Ideal.map, Ideal.span, Ideal.span, Submodule.map_span, Submodule.map_span,
+      Set.image_singleton]
+    at e2
   refine e2.trans ?_
   congr 1
   ext y
@@ -60,9 +68,9 @@ theorem span_root {E L : Type} [Field E] [NumberField E] [Field L] [NumberField 
 
 variable {R : Ranks} (H : Host R)
 
-theorem cmInverseHalfDifferent_mul_relativeDifferent :
-    H.AA0 * (differentIdeal (𝓞 H.K) (𝓞 H.E) : FractionalIdeal (𝓞 H.E)⁰ H.E) =
-      ((H.conj • H.𝔟 : Ideal (𝓞 H.E)) : FractionalIdeal (𝓞 H.E)⁰ H.E) := by
+theorem cmInverseHalfDifferent_mul_relativeDifferent
+    : H.AA0 * (differentIdeal (𝓞 H.K) (𝓞 H.E) : FractionalIdeal (𝓞 H.E)⁰ H.E)
+      = ((H.conj • H.𝔟 : Ideal (𝓞 H.E)) : FractionalIdeal (𝓞 H.E)⁰ H.E) := by
   have hd : differentIdeal (𝓞 H.K) (𝓞 H.E) ≠ ⊥ := differentIdeal_ne_bot
   have h1 : differentIdeal (𝓞 H.K) (𝓞 H.E) = H.𝔟 * (H.conj • H.𝔟) := H.𝔟_spec.1
   have hb : H.𝔟 ≠ ⊥ := by
@@ -72,30 +80,35 @@ theorem cmInverseHalfDifferent_mul_relativeDifferent :
   rw [h1, FractionalIdeal.coeIdeal_mul, Host.AA0, ← mul_assoc,
     inv_mul_cancel₀ (FractionalIdeal.coeIdeal_ne_zero.2 hb), one_mul]
 
-theorem ellLat_eq {LL : Type} [Field LL] [NumberField LL] (embE : H.E →+* LL) (g : R.GG) :
-    ellLat H embE g = Submodule.span (𝓞 LL)
-      {y | ∃ c ∈ (H.conj • H.𝔟 : Ideal (𝓞 H.E)), y = (embE.comp (H.sigmaOf g : H.E →+* H.E)) (c : H.E)} := by
-  apply le_antisymm
-  · refine Submodule.span_mono ?_
-    rintro _ ⟨a, ha, b, hb, rfl⟩
-    have : a * (b : H.E) ∈ H.AA0 * (differentIdeal (𝓞 H.K) (𝓞 H.E) : FractionalIdeal (𝓞 H.E)⁰ H.E) :=
-      FractionalIdeal.mul_mem_mul ha (FractionalIdeal.mem_coeIdeal_of_mem _ hb)
-    rw [cmInverseHalfDifferent_mul_relativeDifferent] at this
-    obtain ⟨c, hc, e⟩ := (FractionalIdeal.mem_coeIdeal _).1 this
-    exact ⟨c, hc, by rw [← e]; rfl⟩
-  · refine Submodule.span_le.2 ?_
-    rintro _ ⟨c, hc, rfl⟩
-    have : (c : H.E) ∈ H.AA0 * (differentIdeal (𝓞 H.K) (𝓞 H.E) : FractionalIdeal (𝓞 H.E)⁰ H.E) := by
-      rw [cmInverseHalfDifferent_mul_relativeDifferent]
-      exact FractionalIdeal.mem_coeIdeal_of_mem _ hc
-    refine FractionalIdeal.mul_induction_on
-      (C := fun z => (embE.comp (H.sigmaOf g : H.E →+* H.E)) z ∈ ellLat H embE g) this ?_ ?_
-    · intro a ha b hb
-      obtain ⟨b', hb', rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hb
-      exact Submodule.subset_span ⟨a, ha, b', hb', rfl⟩
-    · intro x y hx hy
-      rw [map_add (f := _)]
-      exact add_mem hx hy
+theorem ellLat_eq {LL : Type} [Field LL] [NumberField LL] (embE : H.E →+* LL) (g : R.GG)
+    : ellLat H embE g
+      = Submodule.span (𝓞 LL)
+        {y | ∃ c ∈ (H.conj • H.𝔟 : Ideal (𝓞 H.E)), y = (embE.comp (H.sigmaOf g : H.E →+* H.E)) (c : H.E)} :=
+  by
+    apply le_antisymm
+    · refine Submodule.span_mono ?_
+      rintro _ ⟨a, ha, b, hb, rfl⟩
+      have : a * (b : H.E)
+          ∈ H.AA0 * (differentIdeal (𝓞 H.K) (𝓞 H.E) : FractionalIdeal (𝓞 H.E)⁰ H.E) :=
+        FractionalIdeal.mul_mem_mul ha (FractionalIdeal.mem_coeIdeal_of_mem _ hb)
+      rw [cmInverseHalfDifferent_mul_relativeDifferent] at this
+      obtain ⟨c, hc, e⟩ := (FractionalIdeal.mem_coeIdeal _).1 this
+      exact ⟨c, hc, by rw [← e]; rfl⟩
+    · refine Submodule.span_le.2 ?_
+      rintro _ ⟨c, hc, rfl⟩
+      have : (c : H.E)
+          ∈ H.AA0 * (differentIdeal (𝓞 H.K) (𝓞 H.E) : FractionalIdeal (𝓞 H.E)⁰ H.E) := by
+        rw [cmInverseHalfDifferent_mul_relativeDifferent]
+        exact FractionalIdeal.mem_coeIdeal_of_mem _ hc
+      refine FractionalIdeal.mul_induction_on
+        (C := fun z => (embE.comp (H.sigmaOf g : H.E →+* H.E)) z ∈ ellLat H embE g)
+        this ?_ ?_
+      · intro a ha b hb
+        obtain ⟨b', hb', rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hb
+        exact Submodule.subset_span ⟨a, ha, b', hb', rfl⟩
+      · intro x y hx hy
+        rw [map_add (f := _)]
+        exact add_mem hx hy
 
 theorem mem_baseLat (w : ℂ) : w ∈ baseLat H ↔ ∃ c ∈ H.ccK, w = H.φ₀ (((c : H.K) : H.E)) := by
   constructor
@@ -116,15 +129,14 @@ theorem finrank_K : Module.finrank ℚ H.K = 2 :=
   Formalism.FrobeniusOrbits.SplitK.finrank_K H.hyp.2.1.pos (H.sqd_sq)
 
 theorem discr_K : NumberField.discr H.K = -(H.d : ℤ) :=
-  discr_eq_neg_of_sq_eq (finrank_K H) H.hyp.2.1.squarefree
-    (by have := H.hyp.2.2.2.1; omega)
+  discr_eq_neg_of_sq_eq (finrank_K H) H.hyp.2.1.squarefree (by have := H.hyp.2.2.2.1; omega)
     (Formalism.FrobeniusOrbits.SplitK.bK_sq (H.sqd_sq))
 
 theorem exists_periodPair_baseLat : ∃ L : PeriodPair, ∀ z, z ∈ baseLat H ↔ z ∈ L.lattice := by
   let σ : H.K →+* ℂ := H.φ₀.comp H.K.val.toRingHom
   let I : (Ideal (𝓞 H.K))⁰ := ⟨H.ccK, mem_nonZeroDivisors_of_ne_zero H.ccK_ne_bot⟩
-  obtain ⟨L, hL⟩ := QuadraticZeta.exists_periodPair (finrank_K H) (discr_K H) σ
-    (FractionalIdeal.mk0 H.K I)
+  obtain ⟨L, hL⟩ :=
+    QuadraticZeta.exists_periodPair (finrank_K H) (discr_K H) σ (FractionalIdeal.mk0 H.K I)
   refine ⟨L, fun z => ?_⟩
   rw [mem_baseLat, ← SetLike.mem_coe, hL]
   constructor
@@ -139,7 +151,8 @@ theorem isIntegral_jLat : IsIntegral ℤ (jLat (baseLat H)) := by
   have hd := GlobalTheory.LatticeInvariants.invariants_dictionary L _ hL
   obtain ⟨a, τ, ha, h⟩ := exists_lattice_eq_mul_tau L
   rw [jLat, TaylorLogMetric.discr, hd.1, hd.2.1, g₂_cube_div_eq_modularJ ha h]
-  refine isIntegral_modularJ_of_ringOfIntegers (finrank_K H) (H.φ₀.comp H.K.val.toRingHom) fun α x hx ↦ ?_
+  refine isIntegral_modularJ_of_ringOfIntegers (finrank_K H) (H.φ₀.comp H.K.val.toRingHom)
+    fun α x hx ↦ ?_
   have key : ∀ y : ℂ, y ∈ Submodule.span ℤ {(τ : ℂ), 1} ↔ a * y ∈ L.lattice := fun y ↦ by
     rw [h, Submodule.mem_span_pair]
     simp [mul_right_inj' ha]
@@ -149,7 +162,13 @@ theorem isIntegral_jLat : IsIntegral ℤ (jLat (baseLat H)) := by
   rw [mul_left_comm, e]
   simp
 
-theorem exists_fieldOK : ∀ (R : Ranks) (H : Host R) (M : IntermediateField ℚ ℂ), FiniteDimensional ℚ M → ∃ M' : IntermediateField ℚ ℂ, FiniteDimensional ℚ M' ∧ M ≤ M' ∧ ∀ (LL : Type) [Field LL] [NumberField LL] (emb : LL →+* ℂ) (embE : H.E →+* LL), emb.comp embE = H.φ₀ → (∀ x ∈ M', ∃ a, emb a = x) → FieldOK H emb embE := by
+theorem exists_fieldOK
+    : ∀ (R : Ranks) (H : Host R) (M : IntermediateField ℚ ℂ),
+      FiniteDimensional ℚ M
+        → ∃ M' : IntermediateField ℚ ℂ,
+          FiniteDimensional ℚ M' ∧ M ≤ M'
+            ∧ ∀ (LL : Type) [Field LL] [NumberField LL] (emb : LL →+* ℂ) (embE : H.E →+* LL),
+              emb.comp embE = H.φ₀ → (∀ x ∈ M', ∃ a, emb a = x) → FieldOK H emb embE := by
   intro R H M hM
   obtain ⟨n, hn, β, hβ⟩ := exists_pow_eq_span (H.conj • H.𝔟 : Ideal (𝓞 H.E))
   choose z hz using fun σ : H.E ≃ₐ[ℚ] H.E =>

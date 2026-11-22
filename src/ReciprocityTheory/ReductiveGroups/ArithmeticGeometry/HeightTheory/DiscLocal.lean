@@ -14,29 +14,38 @@ namespace HDiscOmL
 
 open IsDedekindDomain IsLocalRing Module
 
-variable {R F : Type} [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R] [Field F]
-  [Algebra R F] [IsFractionRing R F]
-  {ι : Type} [Fintype ι] [DecidableEq ι] {L : ι → Type} [∀ c, Field (L c)] [∀ c, Algebra F (L c)]
-  [∀ c, FiniteDimensional F (L c)] [∀ c, Algebra.IsSeparable F (L c)]
+variable
+  {R F : Type} [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R] [Field F] [Algebra R F]
+  [IsFractionRing R F]
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {L : ι → Type} [∀ c, Field (L c)] [∀ c, Algebra F (L c)] [∀ c, FiniteDimensional F (L c)]
+  [∀ c, Algebra.IsSeparable F (L c)]
 
 omit [IsDomain R] [UniqueFactorizationMonoid R] [IsFractionRing R F] in
-theorem prod_zpow {κ G : Type*} [CommGroupWithZero G] {x : G} (hx : x ≠ 0) (s : Finset κ)
-    (f : κ → ℤ) : ∏ i ∈ s, x ^ f i = x ^ ∑ i ∈ s, f i := by
+theorem prod_zpow
+    {κ G : Type*} [CommGroupWithZero G] {x : G} (hx : x ≠ 0) (s : Finset κ) (f : κ → ℤ)
+    : ∏ i ∈ s, x ^ f i = x ^ ∑ i ∈ s, f i := by
   induction s using Finset.cons_induction with
   | empty => simp
   | cons a s ha ih => rw [Finset.prod_cons, Finset.sum_cons, ih, zpow_add₀ hx]
 
-theorem disc_local (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p = Ideal.span {g})
+theorem disc_local
+    (p : Ideal R) [p.IsPrime]
+    (hp : p.height = 1)
+    (g : R) (hg : p = Ideal.span {g})
     (n : ∀ c, AddValuation (L c) (WithTop ℤ) → ℤ)
     {m : ℕ} (hm : m = ∑ c, finrank F (L c)) (b : Fin m → ∀ c, L c) (hli : LinearIndependent F b)
-    (hb : ∀ k c, ∀ w ∈ HNm.OverR (R := R) (F := F) (L := L c) p,
-      0 ≤ w (b k c) + (n c w : WithTop ℤ)) :
-    ∃ a s : R, s ∉ p ∧
-      (Matrix.of fun k l : Fin m => ∑ c, Algebra.trace F (L c) (b k c * b l c)).det *
-        algebraMap R F g ^ (2 * ∑ c, ∑ᶠ (w : AddValuation (L c) (WithTop ℤ))
-          (_ : w ∈ HNm.OverR (R := R) (F := F) (L := L c) p), (HNm.fz (F := F) w : ℤ) * n c w) *
-        algebraMap R F s =
-        algebraMap R F a := by
+    (hb
+      : ∀ k c, ∀ w ∈ HNm.OverR (R := R) (F := F) (L := L c) p, 0 ≤ w (b k c) + (n c w : WithTop ℤ))
+    : ∃ a s : R,
+      s ∉ p
+        ∧ (Matrix.of fun k l : Fin m => ∑ c, Algebra.trace F (L c) (b k c * b l c)).det
+            * algebraMap R F g
+              ^ (2
+                * ∑ c, ∑ᶠ (w : AddValuation (L c) (WithTop ℤ))
+                  (_ : w ∈ HNm.OverR (R := R) (F := F) (L := L c) p), (HNm.fz (F := F) w : ℤ) * n c w)
+            * algebraMap R F s
+          = algebraMap R F a := by
   classical
   let O := Localization.AtPrime p
   letI : Algebra O F := IsLocalization.localizationAlgebraOfSubmonoidLe O F p.primeCompl
@@ -58,14 +67,18 @@ theorem disc_local (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p
     (ReciprocityTheory.MultiplicativeHeights.Closed.dedekindRank O F (L c)).1
   have hfr : ∀ c, IsFractionRing (integralClosure O (L c)) (L c) := fun c =>
     integralClosure.isFractionRing_of_finite_extension F (L c)
-  have hset : ∀ c, ValPl.PlacesOver O (L c) = HNm.OverR (R := R) (F := F) (L := L c) p := fun c => by
+  have hset
+      : ∀ c, ValPl.PlacesOver O (L c) = HNm.OverR (R := R) (F := F) (L := L c) p := fun c => by
     ext w
     simp only [ValPl.PlacesOver, HNm.OverR, Set.mem_ofPred_eq]
     rw [← ValPl.placesOver_iff_loc (R := R) p w]
     rfl
-  have hG : ∀ c, ∃ gc : L c, gc ≠ 0 ∧ (∀ w ∈ ValPl.PlacesOver O (L c), w gc = n c w) ∧
-      ∀ y, (∀ w ∈ ValPl.PlacesOver O (L c), 0 ≤ w y + (n c w : WithTop ℤ)) ↔
-        gc * y ∈ integralClosure O (L c) := fun c => by
+  have hG
+      : ∀ c, ∃ gc : L c,
+        gc ≠ 0 ∧ (∀ w ∈ ValPl.PlacesOver O (L c), w gc = n c w)
+          ∧ ∀ y,
+            (∀ w ∈ ValPl.PlacesOver O (L c), 0 ≤ w y + (n c w : WithTop ℤ))
+              ↔ gc * y ∈ integralClosure O (L c) := fun c => by
     haveI := hded c
     haveI := hfr c
     obtain ⟨gc, hg0, hgv⟩ := HDiscVal.exists_val_eq O F (n c)
@@ -79,8 +92,10 @@ theorem disc_local (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p
   obtain ⟨nn, t, u, -, hdisc⟩ := HDiscLat.lattice_main (R := O) (F := F) hirr gc hgc0 hm b hbI hli
   set Nc : ι → ℤ := fun c => ∑ᶠ (w : AddValuation (L c) (WithTop ℤ))
     (_ : w ∈ HNm.OverR (R := R) (F := F) (L := L c) p), (HNm.fz (F := F) w : ℤ) * n c w with hNc
-  have hN : ∀ c, ∃ uc : O, IsUnit uc ∧ Algebra.norm F (gc c) =
-      algebraMap R F g ^ Nc c * algebraMap O F uc := fun c => by
+  have hN
+      : ∀ c, ∃ uc : O,
+        IsUnit uc
+          ∧ Algebra.norm F (gc c) = algebraMap R F g ^ Nc c * algebraMap O F uc := fun c => by
     haveI := hded c
     haveI := hfr c
     obtain ⟨uc, huc, hn⟩ := ValPl.norm_eq_places (O := O) (F := F) (gc c) (hgc0 c) hirr
@@ -107,8 +122,9 @@ theorem disc_local (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p
     simp only [U, Units.coe_prod, IsUnit.unit_spec]
   rw [hprod] at hdisc
   set Dt := (Matrix.of fun k l : Fin m => ∑ c, Algebra.trace F (L c) (b k c * b l c)).det with hDt
-  obtain ⟨⟨a, s⟩, has⟩ := IsLocalization.mk'_surjective p.primeCompl
-    ((u : O) * ((algebraMap R O g) ^ (2 * nn + t)) * ((U⁻¹ : Oˣ) : O) * ((U⁻¹ : Oˣ) : O))
+  obtain ⟨⟨a, s⟩, has⟩ :=
+    IsLocalization.mk'_surjective p.primeCompl
+      ((u : O) * ((algebraMap R O g) ^ (2 * nn + t)) * ((U⁻¹ : Oˣ) : O) * ((U⁻¹ : Oˣ) : O))
   refine ⟨a, s, s.2, ?_⟩
   have hsF : algebraMap O F (IsLocalization.mk' O a s) * algebraMap R F s = algebraMap R F a := by
     rw [IsScalarTower.algebraMap_apply R O F s, IsScalarTower.algebraMap_apply R O F a, ← map_mul,
@@ -124,12 +140,15 @@ theorem disc_local (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p
   have h2 : X ^ (2 * ∑ c, Nc c) = (X ^ (∑ c, Nc c)) ^ 2 := by
     rw [mul_comm, zpow_mul]
     norm_cast
-  have e1 : algebraMap O F ((u : O) * (algebraMap R O g) ^ (2 * nn + t) * ((U⁻¹ : Oˣ) : O) *
-      ((U⁻¹ : Oˣ) : O)) = algebraMap O F ((u : O) * (algebraMap R O g) ^ (2 * nn + t)) * V' * V' := by
+  have e1
+      : algebraMap O F
+          ((u : O) * (algebraMap R O g) ^ (2 * nn + t) * ((U⁻¹ : Oˣ) : O) * ((U⁻¹ : Oˣ) : O))
+        = algebraMap O F ((u : O) * (algebraMap R O g) ^ (2 * nn + t)) * V' * V' := by
     simp only [V', map_mul]
   rw [h2, e1, ← hdisc]
-  calc Dt * (X ^ ∑ c, Nc c) ^ 2 = Dt * (X ^ ∑ c, Nc c) ^ 2 * (V * V') * (V * V') := by
-        rw [hU]; ring
+  calc
+    Dt * (X ^ ∑ c, Nc c) ^ 2
+      = Dt * (X ^ ∑ c, Nc c) ^ 2 * (V * V') * (V * V') := by rw [hU]; ring
     _ = Dt * ((X ^ ∑ c, Nc c) * V) ^ 2 * V' * V' := by ring
 
 end HDiscOmL

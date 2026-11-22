@@ -20,29 +20,38 @@ def kChar {n : ℕ} {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
 
 def SqCharStatement : Prop :=
   ∀ (N : ℕ) (lam : Formalism.BasicNotions.DomWeight N) (g : GL (Fin N) ℂ) (t : Fin N → ℂ),
-    (g : Matrix (Fin N) (Fin N) ℂ) = Matrix.diagonal t →
-    ∃ f : Formalism.BasicNotions.nablaSq ℂ N lam →ₗ[ℂ] Formalism.BasicNotions.nablaSq ℂ N lam,
-      (∀ x, (f x : MvPolynomial (Fin N × Fin N) ℂ) = Formalism.BasicNotions.sqAct ℂ N lam g x) ∧
-      LinearMap.trace ℂ _ f = gtChar N lam.w t
+    (g : Matrix (Fin N) (Fin N) ℂ) = Matrix.diagonal t
+      → ∃ f : Formalism.BasicNotions.nablaSq ℂ N lam →ₗ[ℂ] Formalism.BasicNotions.nablaSq ℂ N lam,
+        (∀ x, (f x : MvPolynomial (Fin N × Fin N) ℂ) = Formalism.BasicNotions.sqAct ℂ N lam g x)
+          ∧ LinearMap.trace ℂ _ f = gtChar N lam.w t
 
 def UCharStatement : Prop :=
-  ∀ (N : ℕ) (Λ : Fin N → ℤ), Antitone Λ →
-    ∀ (T : KType (fun _ : Fin N => true) (fun a => (Λ a : ℝ))) (k : KG (fun _ : Fin N => true)) (t : Fin N → ℂ),
-      toMK k = Matrix.diagonal t → kChar T k = gtChar N Λ t
+  ∀ (N : ℕ) (Λ : Fin N → ℤ),
+    Antitone Λ
+      → ∀ (T : KType (fun _ : Fin N => true) (fun a => (Λ a : ℝ))) (k : KG (fun _ : Fin N => true))
+          (t : Fin N → ℂ),
+        toMK k = Matrix.diagonal t → kChar T k = gtChar N Λ t
 
 def KCharGTStatement : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (Λ : Fin n → ℤ), (∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a) →
-    ∀ (T : KType ε (fun a => (Λ a : ℝ))) (k : KG ε) (t : Fin n → ℂ), toMK k = Matrix.diagonal t →
-      kChar T k = gtChar (cnt ε true) (Λ ∘ blk ε true) (t ∘ blk ε true) *
-        gtChar (cnt ε false) (Λ ∘ blk ε false) (t ∘ blk ε false)
+  ∀ (n : ℕ) (ε : Fin n → Bool) (Λ : Fin n → ℤ),
+    (∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a)
+      → ∀ (T : KType ε (fun a => (Λ a : ℝ))) (k : KG ε) (t : Fin n → ℂ),
+        toMK k = Matrix.diagonal t
+          → kChar T k
+            = gtChar (cnt ε true) (Λ ∘ blk ε true) (t ∘ blk ε true)
+              * gtChar (cnt ε false) (Λ ∘ blk ε false) (t ∘ blk ε false)
 
 def WeylStatement : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (Λ : Fin n → ℤ), (∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a) →
-    ∀ (T : KType ε (fun a => (Λ a : ℝ))) (k : KG ε) (t : Fin n → ℂ), toMK k = Matrix.diagonal t →
-      wdenK ε t * kChar T k = numK ε (Λ + rhoK ε) t
+  ∀ (n : ℕ) (ε : Fin n → Bool) (Λ : Fin n → ℤ),
+    (∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a)
+      → ∀ (T : KType ε (fun a => (Λ a : ℝ))) (k : KG ε) (t : Fin n → ℂ),
+        toMK k = Matrix.diagonal t → wdenK ε t * kChar T k = numK ε (Λ + rhoK ε) t
 
-theorem ne_zero_of_toMK_diag {n : ℕ} {ε : Fin n → Bool} (k : KG ε) {t : Fin n → ℂ}
-    (hk : toMK k = Matrix.diagonal t) (i : Fin n) : t i ≠ 0 := by
+theorem ne_zero_of_toMK_diag
+    {n : ℕ} {ε : Fin n → Bool} (k : KG ε)
+    {t : Fin n → ℂ} (hk : toMK k = Matrix.diagonal t)
+    (i : Fin n)
+    : t i ≠ 0 := by
   unfold toMK toM at hk
   have hu : IsUnit (Matrix.diagonal t) := by
     rw [← hk]
@@ -54,8 +63,10 @@ theorem ne_zero_of_toMK_diag {n : ℕ} {ε : Fin n → Bool} (k : KG ε) {t : Fi
   rw [Matrix.det_diagonal] at hdet
   exact Finset.prod_ne_zero_iff.mp hdet.ne_zero i (Finset.mem_univ i)
 
-theorem antitone_blk {n : ℕ} {ε : Fin n → Bool} {Λ : Fin n → ℤ}
-    (hdom : ∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a) (b : Bool) : Antitone (Λ ∘ blk ε b) := by
+theorem antitone_blk
+    {n : ℕ} {ε : Fin n → Bool} {Λ : Fin n → ℤ} (hdom : ∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a)
+    (b : Bool)
+    : Antitone (Λ ∘ blk ε b) := by
   have hmem : ∀ r, ε (blk ε b r) = b := by
     intro r
     have hr := Finset.orderEmbOfFin_mem (univ.filter fun i : Fin n => ε i = b) rfl r
@@ -74,8 +85,10 @@ theorem weyl_of (hK : KCharGTStatement) (hB : BlockCombStatement) : WeylStatemen
   rw [hK n ε Λ hdom T k t hk]
   obtain ⟨hw, hnum, hrho⟩ := hB ℂ n ε (Λ + rhoK ε) t
   rw [hw, hnum]
-  have hG : ∀ b : Bool, wden (cnt ε b) (t ∘ blk ε b) * gtChar (cnt ε b) (Λ ∘ blk ε b) (t ∘ blk ε b) =
-      alt (cnt ε b) ((Λ + rhoK ε) ∘ blk ε b) (t ∘ blk ε b) := by
+  have hG
+      : ∀ b : Bool,
+        wden (cnt ε b) (t ∘ blk ε b) * gtChar (cnt ε b) (Λ ∘ blk ε b) (t ∘ blk ε b)
+          = alt (cnt ε b) ((Λ + rhoK ε) ∘ blk ε b) (t ∘ blk ε b) := by
     intro b
     have hc : (Λ + rhoK ε) ∘ blk ε b = Λ ∘ blk ε b + delta (cnt ε b) := by
       rw [← hrho b]

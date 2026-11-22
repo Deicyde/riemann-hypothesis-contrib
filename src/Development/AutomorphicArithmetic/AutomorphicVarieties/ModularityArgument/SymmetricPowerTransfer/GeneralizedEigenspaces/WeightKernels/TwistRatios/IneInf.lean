@@ -8,20 +8,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem ine_of_emb {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [Algebra ℚ Ω]
-    [IsScalarTower ℚ L Ω] (A : ValuationSubring Ω) (s : G L Ω)
-    (h : Base.galEmb ℚ L Ω s ∈ Ine (F := ℚ) A) : s ∈ Ine (F := L) A := h
+private theorem ine_of_emb
+    {L Ω : Type}
+    [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [Algebra ℚ Ω] [IsScalarTower ℚ L Ω]
+    (A : ValuationSubring Ω) (s : G L Ω) (h : Base.galEmb ℚ L Ω s ∈ Ine (F := ℚ) A)
+    : s ∈ Ine (F := L) A :=
+  h
 
-theorem UpperTheory.V.Z.Sym.Ga.ineInf :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 → ∀ H : Subgroup (G L Ω), IsOpen (H : Set (G L Ω)) → ∃ s ∈ H, s ∈ Ine (F := L) A ∧ ¬ IsOfFinOrder (cycBar L Ω l s) := by
+theorem UpperTheory.V.Z.Sym.Ga.ineInf
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
+        [Fact l.Prime] (A : ValuationSubring Ω),
+      A.valuation (l : Ω) < 1
+        → ∀ H : Subgroup (G L Ω),
+          IsOpen (H : Set (G L Ω))
+            → ∃ s ∈ H, s ∈ Ine (F := L) A ∧ ¬ IsOfFinOrder (cycBar L Ω l s) := by
   intro L Ω _ _ _ _ _ l _ A hA H hH
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap L Ω).injective
   haveI : IsScalarTower ℚ L Ω := inferInstance
@@ -57,8 +67,7 @@ theorem UpperTheory.V.Z.Sym.Ga.ineInf :
     have h2 : ((1 : ℤ_[l]) + l) ^ n = 1 := by
       have := congrArg Units.val hpow
       simpa using this
-    have h3 : ((1 + l) ^ n : ℕ) = 1 := by
-      exact_mod_cast h2
+    have h3 : ((1 + l) ^ n : ℕ) = 1 := by exact_mod_cast h2
     rcases Nat.pow_eq_one.mp h3 with h4 | h4
     · have := (Fact.out : l.Prime).pos
       omega
@@ -76,13 +85,15 @@ theorem UpperTheory.V.Z.Sym.Ga.ineInf :
     congr 1
   have hinj : Function.Injective ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom) :=
     (algebraMap ℚ_[l] (Qbar l)).injective.comp Subtype.val_injective
-  have hmap : Function.Injective (Units.map ((algebraMap ℚ_[l] (Qbar l)).comp
-      PadicInt.Coe.ringHom : ℤ_[l] →* Qbar l)) := by
+  have hmap : Function.Injective (Units.map
+      ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom : ℤ_[l] →* Qbar l)) := by
     intro a b hab
     exact Units.ext (hinj (congrArg Units.val hab))
   intro hfo
-  have hval : cycBar L Ω l s = Units.map ((algebraMap ℚ_[l] (Qbar l)).comp
-      PadicInt.Coe.ringHom : ℤ_[l] →* Qbar l) (hu.unit ^ (H.map (Base.galEmb ℚ L Ω)).normalCore.index) := by
+  have hval
+      : cycBar L Ω l s
+        = Units.map ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom : ℤ_[l] →* Qbar l)
+          (hu.unit ^ (H.map (Base.galEmb ℚ L Ω)).normalCore.index) := by
     simp only [cycBar, MonoidHom.comp_apply, hcyc, hsτ, map_pow, hτv]
     rfl
   rw [hval, ← orderOf_pos_iff, orderOf_injective _ hmap, orderOf_pos_iff, isOfFinOrder_pow] at hfo

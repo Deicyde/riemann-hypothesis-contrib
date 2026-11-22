@@ -7,8 +7,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwCen
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.G8.Fin GlobalTheory.CompanionTheory.LocalHypotheses
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.G8.Fin
+  GlobalTheory.CompanionTheory.LocalHypotheses
 open scoped Classical
 
 noncomputable section
@@ -17,37 +19,46 @@ namespace GlobalTheory.CompanionTheory.TransportLoc
 
 variable {G G' : Type} [Group G] [Group G']
 
-theorem mem_twCent_iff (e : G ≃* G') (θ : G →* G) (θ' : G' →* G') (h : ∀ x, e (θ x) = θ' (e x)) (d x : G) :
-    x ∈ twCent θ d ↔ e x ∈ twCent θ' (e d) := by
+theorem mem_twCent_iff
+    (e : G ≃* G') (θ : G →* G) (θ' : G' →* G') (h : ∀ x, e (θ x) = θ' (e x)) (d x : G)
+    : x ∈ twCent θ d ↔ e x ∈ twCent θ' (e d) := by
   show x * d = d * θ x ↔ e x * e d = e d * θ' (e x)
   rw [← h, ← map_mul, ← map_mul, e.injective.eq_iff]
 
-theorem map_twConj (e : G ≃* G') (θ : G →* G) (θ' : G' →* G') (h : ∀ x, e (θ x) = θ' (e x)) (d y : G) :
-    e (y⁻¹ * d * θ y) = (e y)⁻¹ * e d * θ' (e y) := by
+theorem map_twConj
+    (e : G ≃* G') (θ : G →* G) (θ' : G' →* G') (h : ∀ x, e (θ x) = θ' (e x)) (d y : G)
+    : e (y⁻¹ * d * θ y) = (e y)⁻¹ * e d * θ' (e y) := by
   simp only [map_mul, map_inv, h]
 
-theorem twConj_mul (θ : G →* G) (d t w : G) (ht : t ∈ twCent θ d) :
-    (t * w)⁻¹ * d * θ (t * w) = w⁻¹ * d * θ w := by
+theorem twConj_mul (θ : G →* G) (d t w : G) (ht : t ∈ twCent θ d)
+    : (t * w)⁻¹ * d * θ (t * w) = w⁻¹ * d * θ w := by
   have ht' : t * d = d * θ t := ht
   rw [map_mul, _root_.mul_inv_rev]
-  calc w⁻¹ * t⁻¹ * d * (θ t * θ w) = w⁻¹ * t⁻¹ * (d * θ t) * θ w := by group
+  calc
+    w⁻¹ * t⁻¹ * d * (θ t * θ w)
+      = w⁻¹ * t⁻¹ * (d * θ t) * θ w := by group
     _ = w⁻¹ * d * θ w := by rw [← ht']; group
 
-theorem finite_support (e : G ≃* G') (θ : G →* G) (θ' : G' →* G')
-    (K : Subgroup G) (K' : Subgroup G') (d : G) (f : G → ℂ) (f' : G' → ℂ)
+theorem finite_support
+    (e : G ≃* G') (θ : G →* G) (θ' : G' →* G') (K : Subgroup G) (K' : Subgroup G') (d : G)
+    (f : G → ℂ) (f' : G' → ℂ)
     (hθ : ∀ x, e (θ x) = θ' (e x)) (hK : ∀ x, x ∈ K ↔ e x ∈ K') (hf : ∀ x, f x = f' (e x))
-    (hfin : {q : DoubleCoset.Quotient (twCent θ' (e d) : Set G') (K' : Set G') |
-      ∃ k ∈ K', f' ((Quotient.out q * k)⁻¹ * e d * θ' (Quotient.out q * k)) ≠ 0}.Finite) :
-    {q : DoubleCoset.Quotient (twCent θ d : Set G) (K : Set G) |
-      ∃ k ∈ K, f ((Quotient.out q * k)⁻¹ * d * θ (Quotient.out q * k)) ≠ 0}.Finite := by
+    (hfin
+      : {q : DoubleCoset.Quotient (twCent θ' (e d) : Set G') (K' : Set G') |
+        ∃ k ∈ K', f' ((Quotient.out q * k)⁻¹ * e d * θ' (Quotient.out q * k)) ≠ 0}.Finite)
+    : {q : DoubleCoset.Quotient (twCent θ d : Set G) (K : Set G) |
+        ∃ k ∈ K, f ((Quotient.out q * k)⁻¹ * d * θ (Quotient.out q * k)) ≠ 0}.Finite := by
   refine Set.Finite.of_injOn
     (f := fun q : DoubleCoset.Quotient (twCent θ d : Set G) (K : Set G) =>
-      DoubleCoset.mk (twCent θ' (e d)) K' (e (Quotient.out q))) ?_ ?_ hfin
+      DoubleCoset.mk (twCent θ' (e d)) K' (e (Quotient.out q)))
+    ?_ ?_ hfin
   · rintro q ⟨k, hk, hne⟩
-    obtain ⟨t, ht₀, k₁, hk₁, hout⟩ := DoubleCoset.mk_out_eq_mul (twCent θ' (e d)) K' (e (Quotient.out q))
+    obtain ⟨t, ht₀, k₁, hk₁, hout⟩ :=
+      DoubleCoset.mk_out_eq_mul (twCent θ' (e d)) K' (e (Quotient.out q))
     refine ⟨k₁⁻¹ * e k, K'.mul_mem (K'.inv_mem hk₁) ((hK k).1 hk), ?_⟩
-    have hmul : Quotient.out (DoubleCoset.mk (twCent θ' (e d)) K' (e (Quotient.out q))) *
-        (k₁⁻¹ * e k) = t * e (Quotient.out q * k) := by
+    have hmul
+        : Quotient.out (DoubleCoset.mk (twCent θ' (e d)) K' (e (Quotient.out q))) * (k₁⁻¹ * e k)
+          = t * e (Quotient.out q * k) := by
       rw [hout, map_mul]; group
     simp only []
     rw [hmul, twConj_mul θ' (e d) t _ ht₀, ← map_twConj e θ θ' hθ, ← hf]
@@ -60,18 +71,20 @@ theorem finite_support (e : G ≃* G') (θ : G →* G) (θ' : G' →* G')
       exact hy
     have ht : e.symm t' ∈ twCent θ d := by
       rw [mem_twCent_iff e θ θ' hθ, e.apply_symm_apply]; exact ht'
-    have hk : e.symm k' ∈ K := by
-      rw [hK, e.apply_symm_apply]; exact hk'
+    have hk : e.symm k' ∈ K := by rw [hK, e.apply_symm_apply]; exact hk'
     rw [← DoubleCoset.out_eq' q₁, ← DoubleCoset.out_eq' q₂]
     exact (@DoubleCoset.eq _ _ _ _ _ _).2 ⟨_, ht, _, hk, h₂⟩
 
-theorem index_ne_zero (e : G ≃* G') (K : Subgroup G) (K' : Subgroup G') (hK : ∀ x, x ∈ K ↔ e x ∈ K')
-    (u : K → ℂ) (u' : K' → ℂ) (hu : ∀ k : K, u k = u' ⟨e k, (hK k).1 k.2⟩)
-    (h : (rStab u').index ≠ 0) : (rStab u).index ≠ 0 := by
-  let φ : K →* K' :=
-    { toFun := fun k => ⟨e k, (hK k).1 k.2⟩
-      map_one' := by ext; simp
-      map_mul' := fun a b => by ext; simp }
+theorem index_ne_zero
+    (e : G ≃* G') (K : Subgroup G) (K' : Subgroup G') (hK : ∀ x, x ∈ K ↔ e x ∈ K')
+    (u : K → ℂ) (u' : K' → ℂ)
+    (hu : ∀ k : K, u k = u' ⟨e k, (hK k).1 k.2⟩) (h : (rStab u').index ≠ 0)
+    : (rStab u).index ≠ 0 := by
+  let φ : K →* K' := {
+    toFun := fun k => ⟨e k, (hK k).1 k.2⟩
+    map_one' := by ext; simp
+    map_mul' := fun a b => by ext; simp
+  }
   have hφ : Function.Surjective φ := fun k' =>
     ⟨⟨e.symm k', by rw [hK, e.apply_symm_apply]; exact k'.2⟩, by ext; simp [φ]⟩
   have hu' : ∀ k : K, u k = u' (φ k) := hu
@@ -90,8 +103,9 @@ theorem index_ne_zero (e : G ≃* G') (K : Subgroup G) (K' : Subgroup G') (hK : 
   rw [hstab, Subgroup.index_comap_of_surjective _ hφ]
   exact h
 
-theorem mem_conj_iff (e : G ≃* G') (K : Subgroup G) (K' : Subgroup G') (hK : ∀ x, x ∈ K ↔ e x ∈ K') (y x : G) :
-    x ∈ K.map (MulAut.conj y).toMonoidHom ↔ e x ∈ K'.map (MulAut.conj (e y)).toMonoidHom := by
+theorem mem_conj_iff
+    (e : G ≃* G') (K : Subgroup G) (K' : Subgroup G') (hK : ∀ x, x ∈ K ↔ e x ∈ K') (y x : G)
+    : x ∈ K.map (MulAut.conj y).toMonoidHom ↔ e x ∈ K'.map (MulAut.conj (e y)).toMonoidHom := by
   constructor
   · rintro ⟨k, hk, rfl⟩
     exact ⟨e k, (hK k).1 hk, by simp [MulAut.conj_apply]⟩
@@ -103,16 +117,16 @@ theorem mem_conj_iff (e : G ≃* G') (K : Subgroup G) (K' : Subgroup G') (hK : �
 
 variable [TopologicalSpace G] [TopologicalSpace G']
 
-theorem isCompact_closure_zpowers_iff (e : G ≃ₜ* G') (t : G) :
-    IsCompact (closure (Subgroup.zpowers t : Set G)) ↔
-      IsCompact (closure (Subgroup.zpowers (e t) : Set G')) := by
+theorem isCompact_closure_zpowers_iff (e : G ≃ₜ* G') (t : G)
+    : IsCompact (closure (Subgroup.zpowers t : Set G))
+      ↔ IsCompact (closure (Subgroup.zpowers (e t) : Set G')) := by
   have h : (Subgroup.zpowers (e t) : Set G') = e.toHomeomorph '' (Subgroup.zpowers t : Set G) := by
     have := MonoidHom.map_zpowers e.toMulEquiv.toMonoidHom t
     exact (congrArg (fun S : Subgroup G' => (S : Set G')) this).symm
   rw [h, ← e.toHomeomorph.image_closure, e.toHomeomorph.isCompact_image]
 
-theorem map_cptPart (e : G ≃ₜ* G') (T : Subgroup G) (T' : Subgroup G') (hT : ∀ x, x ∈ T ↔ e x ∈ T') :
-    (cptPart T).map e.toMulEquiv.toMonoidHom = cptPart T' := by
+theorem map_cptPart (e : G ≃ₜ* G') (T : Subgroup G) (T' : Subgroup G') (hT : ∀ x, x ∈ T ↔ e x ∈ T')
+    : (cptPart T).map e.toMulEquiv.toMonoidHom = cptPart T' := by
   unfold cptPart
   rw [MonoidHom.map_closure]
   congr 1
@@ -125,9 +139,13 @@ theorem map_cptPart (e : G ≃ₜ* G') (T : Subgroup G) (T' : Subgroup G') (hT :
     · rw [hT]; simpa using ht'
     · rw [isCompact_closure_zpowers_iff e]; simpa using hc
 
-theorem locConds_of_equiv : ∀ {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G'] (e : G ≃ₜ* G') (θ : G →* G) (θ' : G' →* G')
-  (K : Subgroup G) (K' : Subgroup G') (d : G) (f : G → ℂ) (f' : G' → ℂ), (∀ x, e (θ x) = θ' (e x)) → (∀ x, x ∈ K ↔ e x ∈ K') →
-  (∀ x, f x = f' (e x)) → LocConds θ' K' (e d) f' → LocConds θ K d f := by
+theorem locConds_of_equiv
+    : ∀ {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G'] (e : G ≃ₜ* G')
+        (θ : G →* G) (θ' : G' →* G') (K : Subgroup G) (K' : Subgroup G') (d : G) (f : G → ℂ)
+        (f' : G' → ℂ),
+      (∀ x, e (θ x) = θ' (e x)) → (∀ x, x ∈ K ↔ e x ∈ K') → (∀ x, f x = f' (e x))
+        → LocConds θ' K' (e d) f'
+        → LocConds θ K d f := by
   intro G G' _ _ _ _ e θ θ' K K' d f f' hθ hK hf h
   obtain ⟨h₁, h₂, h₃, h₄⟩ := h
   have hθm : ∀ x, e.toMulEquiv (θ x) = θ' (e.toMulEquiv x) := hθ
@@ -149,8 +167,10 @@ theorem locConds_of_equiv : ∀ {G G' : Type} [Group G] [TopologicalSpace G] [Gr
   · intro y
     obtain ⟨ha, hb⟩ := h₄ (e y)
     have hB := map_cptPart e (twCent θ d) (twCent θ' (e d)) hT
-    have hA : twCent θ d ⊓ K.map (MulAut.conj y).toMonoidHom =
-        (twCent θ' (e d) ⊓ K'.map (MulAut.conj (e y)).toMonoidHom).comap e.toMulEquiv.toMonoidHom := by
+    have hA
+        : twCent θ d ⊓ K.map (MulAut.conj y).toMonoidHom
+          = (twCent θ' (e d) ⊓ K'.map (MulAut.conj (e y)).toMonoidHom).comap
+            e.toMulEquiv.toMonoidHom := by
       ext x
       rw [Subgroup.mem_inf, Subgroup.mem_comap, Subgroup.mem_inf]
       exact and_congr (hT x) (mem_conj_iff e.toMulEquiv K K' hKm y x)

@@ -9,10 +9,12 @@ open GlobalTheory.LKTrip NumberField
 
 namespace GlobalTheory.HTGroupOver
 
-theorem exists_gen {F : Type} [Field F] [NumberField F] [IsCMField F] (Kq : Subfield F)
-    (hKq : Module.finrank ℚ Kq = 2 ∧ ∀ τ : F →+* ℂ, ∃ x ∈ Kq, (τ x).im ≠ 0) :
-    ∃ y : Kq, ∃ r : ℚ, (y : F) * y = r ∧ IsCMField.complexConj F (y : F) = -(y : F) ∧
-      ∀ z : Kq, ∃ a b : ℚ, (z : F) = a + b * y := by
+theorem exists_gen
+    {F : Type} [Field F] [NumberField F] [IsCMField F]
+    (Kq : Subfield F) (hKq : Module.finrank ℚ Kq = 2 ∧ ∀ τ : F →+* ℂ, ∃ x ∈ Kq, (τ x).im ≠ 0)
+    : ∃ y : Kq, ∃ r : ℚ,
+      (y : F) * y = r ∧ IsCMField.complexConj F (y : F) = -(y : F)
+        ∧ ∀ z : Kq, ∃ a b : ℚ, (z : F) = a + b * y := by
   classical
   let σ : F →+* ℂ := (IsAlgClosed.lift : F →ₐ[ℚ] ℂ).toRingHom
   obtain ⟨x0, hx0K, hx0⟩ := hKq.2 σ
@@ -25,7 +27,8 @@ theorem exists_gen {F : Type} [Field F] [NumberField F] [IsCMField F] (Kq : Subf
   rw [Fintype.not_linearIndependent_iff] at hdep
   obtain ⟨g, hg, i, hi⟩ := hdep
   simp only [Fin.sum_univ_three, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two,
-    Matrix.head_cons, Matrix.tail_cons] at hg
+      Matrix.head_cons, Matrix.tail_cons]
+    at hg
   have hgF : (g 0 : F) + g 1 * x0 + g 2 * (x0 * x0) = 0 := by
     have := congrArg (fun w : Kq => (w : F)) hg
     simpa [Rat.smul_def, x] using this
@@ -33,8 +36,9 @@ theorem exists_gen {F : Type} [Field F] [NumberField F] [IsCMField F] (Kq : Subf
   have hnr : ∀ a b : ℚ, b ≠ 0 → (a : F) + b * x0 ≠ 0 := by
     intro a b hb h
     have h2 := congrArg (fun w => (σ w).im) h
-    simp only [map_add (f := _), map_mul, map_ratCast, Complex.add_im, Complex.ratCast_im, Complex.mul_im,
-      Complex.ratCast_re, zero_mul, add_zero, zero_add, map_zero, Complex.zero_im] at h2
+    simp only [map_add (f := _), map_mul, map_ratCast, Complex.add_im, Complex.ratCast_im,
+        Complex.mul_im, Complex.ratCast_re, zero_mul, add_zero, zero_add, map_zero, Complex.zero_im]
+      at h2
     rcases mul_eq_zero.1 h2 with h3 | h3
     · exact hb (by exact_mod_cast h3)
     · exact hx0 h3
@@ -77,8 +81,10 @@ theorem exists_gen {F : Type} [Field F] [NumberField F] [IsCMField F] (Kq : Subf
       have h5 : (σ y0).im = 2 * g 2 * (σ x0).im := by
         have e : σ y0 = ((2 * g 2 : ℚ) : ℂ) * σ x0 + ((g 1 : ℚ) : ℂ) := by
           simp only [y0, map_add (f := _), map_mul, map_ratCast, map_ofNat]; push_cast; ring
-        rw [e, Complex.add_im, Complex.mul_im, Complex.ratCast_re, Complex.ratCast_im, Complex.ratCast_im]
-        push_cast; ring
+        rw [e, Complex.add_im, Complex.mul_im, Complex.ratCast_re, Complex.ratCast_im,
+          Complex.ratCast_im]
+        push_cast
+        ring
       rw [h5] at h4
       rcases mul_eq_zero.1 h4 with h6 | h6
       · rcases mul_eq_zero.1 h6 with h7 | h7
@@ -105,13 +111,15 @@ theorem exists_gen {F : Type} [Field F] [NumberField F] [IsCMField F] (Kq : Subf
     rw [← hab]
     simp [Rat.smul_def, y]
 
-theorem liesOver_or_conj : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (τ : G.F →+* PadicAlgCl p),
-    LiesOver G.Kq G.u τ ∨ LiesOver G.Kq G.u (τ.comp (conjQ G.F).toRingHom) := by
+theorem liesOver_or_conj
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (τ : G.F →+* PadicAlgCl p),
+      LiesOver G.Kq G.u τ ∨ LiesOver G.Kq G.u (τ.comp (conjQ G.F).toRingHom) := by
   intro p _ G τ
   obtain ⟨y, r, hyr, hcy, hspan⟩ := exists_gen G.Kq G.hKq
   have hyK : y * y = (r : G.Kq) := Subtype.ext (by push_cast; exact hyr)
-  have hsq : τ (y : G.F) * τ (y : G.F) =
-      algebraMap ℚ_[p] (PadicAlgCl p) (G.u y) * algebraMap ℚ_[p] (PadicAlgCl p) (G.u y) := by
+  have hsq
+      : τ (y : G.F) * τ (y : G.F)
+        = algebraMap ℚ_[p] (PadicAlgCl p) (G.u y) * algebraMap ℚ_[p] (PadicAlgCl p) (G.u y) := by
     rw [← map_mul, ← map_mul, ← map_mul, hyK, hyr, map_ratCast, map_ratCast, map_ratCast]
   have hz : ∀ z : G.Kq, ∃ a b : ℚ, z = (a : G.Kq) + (b : G.Kq) * y := by
     intro z
@@ -121,12 +129,14 @@ theorem liesOver_or_conj : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (τ : G.
   · left
     intro z
     obtain ⟨a, b, rfl⟩ := hz z
-    simp only [Subfield.coe_add, Subfield.coe_mul, SubfieldClass.coe_ratCast, map_add (f := _), map_mul, map_ratCast, h]
+    simp only [Subfield.coe_add, Subfield.coe_mul, SubfieldClass.coe_ratCast, map_add (f := _),
+      map_mul, map_ratCast, h]
   · right
     intro z
     obtain ⟨a, b, rfl⟩ := hz z
-    simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, conjQ_apply,
-      Subfield.coe_add, Subfield.coe_mul, SubfieldClass.coe_ratCast, map_add, map_mul, map_ratCast, hcy, map_neg, h]
+    simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+      conjQ_apply, Subfield.coe_add, Subfield.coe_mul, SubfieldClass.coe_ratCast, map_add, map_mul,
+      map_ratCast, hcy, map_neg, h]
     ring
 
 end GlobalTheory.HTGroupOver

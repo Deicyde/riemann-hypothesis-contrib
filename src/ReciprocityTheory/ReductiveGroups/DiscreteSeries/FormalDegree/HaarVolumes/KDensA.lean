@@ -56,8 +56,8 @@ def kdSig (ε : Fin n → Bool) : (Σ s : Bool, Fin (kdC ε s)) ≃ Fin n :=
 
 lemma kdSig_apply (ε : Fin n → Bool) (s : Bool) (i : Fin (kdC ε s)) : kdSig ε ⟨s, i⟩ = kdE ε s i := rfl
 
-def kdD (ε : Fin n → Bool) :
-    (∀ s : Bool, Matrix (Fin (kdC ε s)) (Fin (kdC ε s)) ℂ) →+* Matrix (Fin n) (Fin n) ℂ :=
+def kdD (ε : Fin n → Bool)
+    : (∀ s : Bool, Matrix (Fin (kdC ε s)) (Fin (kdC ε s)) ℂ) →+* Matrix (Fin n) (Fin n) ℂ :=
   (Matrix.reindexAlgEquiv ℂ ℂ (kdSig ε)).toRingEquiv.toRingHom.comp
     (Matrix.blockDiagonal'RingHom (fun s => Fin (kdC ε s)) ℂ)
 
@@ -109,8 +109,8 @@ lemma kdD_commJ (ε : Fin n → Bool) (v : ∀ s : Bool, Matrix (Fin (kdC ε s))
   rw [kdSig_apply, kdSig_apply, ε_kdE ε s i, ε_kdE ε s' j] at hab
   exact hab
 
-def kdR (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) (s : Bool) :
-    Matrix (Fin (kdC ε s)) (Fin (kdC ε s)) ℂ :=
+def kdR (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) (s : Bool)
+    : Matrix (Fin (kdC ε s)) (Fin (kdC ε s)) ℂ :=
   Matrix.of fun i j => X (kdE ε s i) (kdE ε s j)
 
 lemma eq_kdD {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : X * Jm ε = Jm ε * X) :
@@ -170,25 +170,35 @@ lemma kd_un_unitary {N : ℕ} (u : UNgrp N) : toM u * (toM u)ᴴ = 1 := by
   rw [kd_Jm_true, Matrix.mul_one] at h
   exact mul_eq_one_comm.1 h
 
-def kdMkU {N : ℕ} (A : Matrix (Fin N) (Fin N) ℂ) (h : A * Aᴴ = 1) : UNgrp N :=
-  ⟨⟨A, Aᴴ, h, mul_eq_one_comm.1 h⟩, by
+def kdMkU {N : ℕ} (A : Matrix (Fin N) (Fin N) ℂ) (h : A * Aᴴ = 1) : UNgrp N := ⟨
+  ⟨A, Aᴴ, h, mul_eq_one_comm.1 h⟩,
+  by
     show Aᴴ * Jm (fun _ : Fin N => true) * A = Jm (fun _ : Fin N => true)
-    rw [kd_Jm_true, Matrix.mul_one]; exact mul_eq_one_comm.1 h⟩
+    rw [kd_Jm_true, Matrix.mul_one]
+    exact mul_eq_one_comm.1 h
+⟩
 
 lemma kd_toM_inj {ε : Fin n → Bool} {g h : UJ ε} (e : toM g = toM h) : g = h := Subtype.ext (Units.ext e)
 
 lemma kd_KG_ext {ε : Fin n → Bool} {g h : KG ε} (e : toMK g = toMK h) : g = h :=
   Subtype.ext (kd_toM_inj e)
 
-def kdMkK (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε) : KG ε :=
-  ⟨⟨⟨g, star g, Unitary.mul_star_self_of_mem hg.1, Unitary.star_mul_self_of_mem hg.1⟩, by
+def kdMkK (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε) : KG ε := ⟨
+  ⟨
+    ⟨g, star g, Unitary.mul_star_self_of_mem hg.1, Unitary.star_mul_self_of_mem hg.1⟩,
+    by
       show gᴴ * Jm ε * g = Jm ε
       have h1 : gᴴ * g = 1 := by
         rw [← Matrix.star_eq_conjTranspose]; exact Unitary.star_mul_self_of_mem hg.1
-      rw [Matrix.mul_assoc, ← hg.2, ← Matrix.mul_assoc, h1, Matrix.one_mul]⟩, hg⟩
+      rw [Matrix.mul_assoc, ← hg.2, ← Matrix.mul_assoc, h1, Matrix.one_mul]
+  ⟩,
+  hg
+⟩
 
-def kdPair (ε : Fin n → Bool) (A : Matrix (Fin (pOf ε)) (Fin (pOf ε)) ℂ)
-    (B : Matrix (Fin (qOf ε)) (Fin (qOf ε)) ℂ) : ∀ s : Bool, Matrix (Fin (kdC ε s)) (Fin (kdC ε s)) ℂ
+def kdPair
+    (ε : Fin n → Bool)
+    (A : Matrix (Fin (pOf ε)) (Fin (pOf ε)) ℂ) (B : Matrix (Fin (qOf ε)) (Fin (qOf ε)) ℂ)
+    : ∀ s : Bool, Matrix (Fin (kdC ε s)) (Fin (kdC ε s)) ℂ
   | true => A
   | false => B
 
@@ -258,31 +268,31 @@ lemma kdPsi_surjective (ε : Fin n → Bool) : Function.Surjective (kdPsi ε) :=
 def kdHomeo (ε : Fin n → Bool) : (UNgrp (pOf ε) × UNgrp (qOf ε)) ≃ₜ KG ε :=
   have := unGrp_compactSpace (pOf ε)
   have := unGrp_compactSpace (qOf ε)
-  (continuous_kdPsi ε).homeoOfEquivCompactToT2 (f := Equiv.ofBijective (kdPsi ε)
-    ⟨kdPsi_injective ε, kdPsi_surjective ε⟩)
+  (continuous_kdPsi ε).homeoOfEquivCompactToT2
+    (f := Equiv.ofBijective (kdPsi ε) ⟨kdPsi_injective ε, kdPsi_surjective ε⟩)
 
-theorem kd_dk_eq_map (ε : Fin n → Bool) (μp : Measure (UNgrp (pOf ε))) [μp.IsHaarMeasure]
-    [IsProbabilityMeasure μp] (μq : Measure (UNgrp (qOf ε))) [μq.IsHaarMeasure] [IsProbabilityMeasure μq] :
-    dk ε = (μp.prod μq).map (kdPsi ε) := by
+theorem kd_dk_eq_map
+    (ε : Fin n → Bool) (μp : Measure (UNgrp (pOf ε))) [μp.IsHaarMeasure] [IsProbabilityMeasure μp]
+    (μq : Measure (UNgrp (qOf ε))) [μq.IsHaarMeasure] [IsProbabilityMeasure μq]
+    : dk ε = (μp.prod μq).map (kdPsi ε) := by
   have := unGrp_compactSpace (pOf ε)
   have := unGrp_compactSpace (qOf ε)
   have := compactSpace_KG ε
   have : Measure.IsHaarMeasure ((μp.prod μq).map (kdPsi ε)) :=
     Measure.isHaarMeasure_map _ (kdPsi ε) (continuous_kdPsi ε) (kdPsi_surjective ε)
       (by rw [Filter.cocompact_eq_bot]; exact Filter.tendsto_bot)
-  have : IsProbabilityMeasure ((μp.prod μq).map (kdPsi ε)) :=
-    inferInstance
+  have : IsProbabilityMeasure ((μp.prod μq).map (kdPsi ε)) := inferInstance
   have h0 : (Measure.haar : Measure (KG ε)) Set.univ ≠ 0 :=
     isOpen_univ.measure_ne_zero _ Set.univ_nonempty
-  have htop : (Measure.haar : Measure (KG ε)) Set.univ ≠ ⊤ :=
-    isCompact_univ.measure_ne_top
+  have htop : (Measure.haar : Measure (KG ε)) Set.univ ≠ ⊤ := isCompact_univ.measure_ne_top
   have : Measure.IsHaarMeasure (dk ε) := by
     delta dk muK
     exact Measure.IsHaarMeasure.smul _ (ENNReal.inv_ne_zero.2 htop) (ENNReal.inv_ne_top.2 h0)
-  have : IsProbabilityMeasure (dk ε) := ⟨by
-    delta dk muK
-    simp only [smul_apply, smul_eq_mul]
-    exact ENNReal.inv_mul_cancel h0 htop⟩
+  have : IsProbabilityMeasure (dk ε) :=
+    ⟨by
+      delta dk muK
+      simp only [smul_apply, smul_eq_mul]
+      exact ENNReal.inv_mul_cancel h0 htop⟩
   exact Measure.isHaarMeasure_eq_of_isProbabilityMeasure _ _
 
 end ReciprocityTheory.ChartRestriction.DS

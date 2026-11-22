@@ -15,8 +15,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramAtPosDef
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -32,16 +35,25 @@ namespace GlobalTheory.MovedDict
 
 open scoped Matrix
 
-theorem sum_form_orthoFrame {K : Type} [Field K] [StarRing K] {n : ℕ} (G B : Matrix (Fin n) (Fin n) K)
-    (hB : Bᴴ * G * B = 1) (c d : Fin n → K) :
-    ∑ i, ∑ j, star ((B *ᵥ c) i) * G i j * (B *ᵥ d) j = ∑ i, star (c i) * d i := by
-  have h1 : ∑ i, ∑ j, star ((B *ᵥ c) i) * G i j * (B *ᵥ d) j = star (B *ᵥ c) ⬝ᵥ (G *ᵥ (B *ᵥ d)) := by
+theorem sum_form_orthoFrame
+    {K : Type} [Field K] [StarRing K]
+    {n : ℕ} (G B : Matrix (Fin n) (Fin n) K) (hB : Bᴴ * G * B = 1) (c d : Fin n → K)
+    : ∑ i, ∑ j, star ((B *ᵥ c) i) * G i j * (B *ᵥ d) j = ∑ i, star (c i) * d i := by
+  have h1
+      : ∑ i, ∑ j, star ((B *ᵥ c) i) * G i j * (B *ᵥ d) j = star (B *ᵥ c) ⬝ᵥ (G *ᵥ (B *ᵥ d)) := by
     simp only [dotProduct, Matrix.mulVec, Pi.star_apply, Finset.mul_sum, mul_assoc]
-  rw [h1, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hB,
-    Matrix.one_mulVec]
+  rw [h1, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
+    Matrix.mulVec_mulVec, hB, Matrix.one_mulVec]
   rfl
 
-theorem isSelfDualC_inV : ∀ {D : D7} (S : HSp D) (fr : GL (Fin S.rank) D.host.E), Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) fr.1 * S.gram * fr.1 = 1 → ∀ Ls : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E), SD D Ls → ∃ Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E), (Λ : Set (Fin S.rank → D.host.E)) = GlobalTheory.MovedDict.inV fr Ls ∧ IsSelfDualC S Λ := by
+theorem isSelfDualC_inV
+    : ∀ {D : D7} (S : HSp D) (fr : GL (Fin S.rank) D.host.E),
+      Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) fr.1 * S.gram * fr.1 = 1
+        → ∀ Ls : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E),
+          SD D Ls
+            → ∃ Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E),
+              (Λ : Set (Fin S.rank → D.host.E)) = GlobalTheory.MovedDict.inV fr Ls
+                ∧ IsSelfDualC S Λ := by
   intro D S fr hfr Ls hLs
   classical
   have hB : fr.1ᴴ * S.gram * fr.1 = 1 := hfr
@@ -58,12 +70,19 @@ theorem isSelfDualC_inV : ∀ {D : D7} (S : HSp D) (fr : GL (Fin S.rank) D.host.
       simpa [f, Matrix.toLin'_apply, hinv'] using hx
     · intro h
       exact ⟨_, h, by simp [f, Matrix.toLin'_apply, hinv]⟩
-  have hform : ∀ x y : Fin S.rank → D.host.E, ∑ i, ∑ j, star (x i) * S.gram i j * y j =
-      ∑ i, star (((fr⁻¹).1 *ᵥ x) i) * ((fr⁻¹).1 *ᵥ y) i := by
+  have hform
+      : ∀ x y : Fin S.rank → D.host.E,
+        ∑ i, ∑ j, star (x i) * S.gram i j * y j
+          = ∑ i, star (((fr⁻¹).1 *ᵥ x) i) * ((fr⁻¹).1 *ᵥ y) i := by
     intro x y
     have := sum_form_orthoFrame S.gram fr.1 hB ((fr⁻¹).1 *ᵥ x) ((fr⁻¹).1 *ᵥ y)
     rwa [hinv, hinv] at this
-  refine ⟨Ls.map (f.restrictScalars (𝓞 D.host.E)), ?_, Submodule.IsLattice.of_fg D.host.E (hfg.map _), fun y => ?_⟩
+  refine ⟨
+    Ls.map (f.restrictScalars (𝓞 D.host.E)),
+    ?_,
+    Submodule.IsLattice.of_fg D.host.E (hfg.map _),
+    fun y => ?_
+  ⟩
   · ext x
     simp [inV, f, Matrix.toLin'_apply]
   · rw [hmem, hdual]

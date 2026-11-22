@@ -7,14 +7,16 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.KUnits
 
-theorem continuousOn_ringInverse {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
-    (h : IsOpenEmbedding (Units.val : Rˣ → R)) :
-    ContinuousOn (Ring.inverse : R → R) {r | IsUnit r} := by
+theorem continuousOn_ringInverse
+    {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
+    (h : IsOpenEmbedding (Units.val : Rˣ → R))
+    : ContinuousOn (Ring.inverse : R → R) {r | IsUnit r} := by
   rintro _ ⟨u, rfl⟩
   refine ContinuousAt.continuousWithinAt ?_
   refine (h.continuousAt_iff).1 ?_
@@ -24,10 +26,13 @@ theorem continuousOn_ringInverse {R : Type} [CommRing R] [TopologicalSpace R] [I
   rw [this]
   exact (Units.continuous_val.comp continuous_inv).continuousAt
 
-theorem units_val_isOpenEmbedding : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (R : Type) [CommRing R] [Algebra F R]
-    [TopologicalSpace R] [MeasurableSpace R] [BorelSpace R], IsLocR R →
-    IsOpenEmbedding (Units.val : (R ⊗[F] E)ˣ → R ⊗[F] E) := by
+theorem units_val_isOpenEmbedding
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R]
+            [BorelSpace R],
+          IsLocR R → IsOpenEmbedding (Units.val : (R ⊗[F] E)ˣ → R ⊗[F] E) := by
   intro F E _ _ _ _ _ σ hσ R _ _ _ _ _ hR
   obtain ⟨hTR, hLC, hSC, hT2, hArt, hRd, hUo, -⟩ := hR
   haveI := hTR
@@ -36,7 +41,8 @@ theorem units_val_isOpenEmbedding : ∀ (F E : Type) [Field F] [NumberField F] [
   haveI := hT2
   haveI := hArt
   haveI := hRd
-  obtain ⟨-, -, -, hinv, -, hfix, hunit⟩ := GlobalTheory.T.tensor_involution_algebra_properties F E σ hσ R
+  obtain ⟨-, -, -, hinv, -, hfix, hunit⟩ :=
+    GlobalTheory.T.tensor_involution_algebra_properties F E σ hσ R
   obtain ⟨hTK, -, -, -, hsc, htr, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ R
   haveI := hTK
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
@@ -46,8 +52,7 @@ theorem units_val_isOpenEmbedding : ∀ (F E : Type) [Field F] [NumberField F] [
   let b : Module.Basis (Fin 2) F E := Module.finBasisOfFinrankEq F E hfin
   let N : R ⊗[F] E → R := fun y =>
     algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (y * sigR R σ y)
-  have hNc : Continuous N :=
-    continuous_const.mul (htr.comp (continuous_id.mul hsc))
+  have hNc : Continuous N := continuous_const.mul (htr.comp (continuous_id.mul hsc))
   have hhalf : algebraMap F R (1 / 2) * (2 : R) = 1 := by
     have : algebraMap F R (1 / 2) * algebraMap F R 2 = 1 := by
       rw [← map_mul]
@@ -82,7 +87,10 @@ theorem units_val_isOpenEmbedding : ∀ (F E : Type) [Field F] [NumberField F] [
       funext r
       simp [Algebra.TensorProduct.one_def, TensorProduct.smul_tmul']
     rw [h1]
-    exact Continuous.smul (f := fun r : R => r) (g := fun _ => (1 : R ⊗[F] E)) continuous_id continuous_const
+    exact Continuous.smul
+      (f := fun r : R => r)
+      (g := fun _ => (1 : R ⊗[F] E))
+      continuous_id continuous_const
   let f : R ⊗[F] E → R ⊗[F] E := fun y => sigR R σ y * (Ring.inverse (N y) ⊗ₜ[F] (1 : E))
   have hfc : ContinuousOn f {y | IsUnit y} := by
     have h1 : ContinuousOn (fun y => Ring.inverse (N y)) {y : R ⊗[F] E | IsUnit y} :=
@@ -98,8 +106,8 @@ theorem units_val_isOpenEmbedding : ∀ (F E : Type) [Field F] [NumberField F] [
       mul_one]
     rfl
   refine ⟨Units.isEmbedding_val_mk' hfc hfu, ?_⟩
-  have hrange : Set.range (Units.val : (R ⊗[F] E)ˣ → R ⊗[F] E) =
-      N ⁻¹' Set.range (Units.val : Rˣ → R) := by
+  have hrange
+      : Set.range (Units.val : (R ⊗[F] E)ˣ → R ⊗[F] E) = N ⁻¹' Set.range (Units.val : Rˣ → R) := by
     ext y
     constructor
     · rintro ⟨u, rfl⟩

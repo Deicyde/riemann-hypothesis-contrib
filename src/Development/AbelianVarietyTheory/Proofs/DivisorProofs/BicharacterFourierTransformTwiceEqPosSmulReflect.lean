@@ -39,8 +39,8 @@ def ann (he : IsPair e) (L : Set X) : AddSubgroup X where
     rw [add_neg_cancel, zero_right he, ha y hy, one_mul] at h
     exact h.symm
 
-theorem isOpen_ann [IsTopologicalAddGroup X] (he : IsPair e) {L : Set X} (hL : IsCompact L) :
-    IsOpen (ann he L : Set X) := by
+theorem isOpen_ann [IsTopologicalAddGroup X] (he : IsPair e) {L : Set X} (hL : IsCompact L)
+    : IsOpen (ann he L : Set X) := by
   have hS : IsOpen {p : X × X | e p.1 p.2 = 1} := he.lc.isOpen_fiber 1
   have hsub : L ×ˢ ({0} : Set X) ⊆ {p : X × X | e p.1 p.2 = 1} := by
     rintro ⟨y, z⟩ ⟨_, hz⟩
@@ -55,8 +55,8 @@ theorem isOpen_ann [IsTopologicalAddGroup X] (he : IsPair e) {L : Set X} (hL : I
   intro y hy
   exact huv (show (y, z) ∈ u ×ˢ v from ⟨hLu hy, hz⟩)
 
-theorem exists_invariant [IsTopologicalAddGroup X] {f : X → ℂ} (hf : f ∈ SB X) :
-    ∃ U ∈ 𝓝 (0 : X), ∀ M : AddSubgroup X, (M : Set X) ⊆ U → ∀ t ∈ M, ∀ x, f (x + t) = f x := by
+theorem exists_invariant [IsTopologicalAddGroup X] {f : X → ℂ} (hf : f ∈ SB X)
+    : ∃ U ∈ 𝓝 (0 : X), ∀ M : AddSubgroup X, (M : Set X) ⊆ U → ∀ t ∈ M, ∀ x, f (x + t) = f x := by
   have hf' : IsLocallyConstant f ∧ HasCompactSupport f := hf
   have hS : IsOpen {p : X × X | f (p.1 + p.2) - f p.1 = 0} :=
     ((hf'.1.comp_continuous continuous_add).comp₂ (hf'.1.comp_continuous continuous_fst)
@@ -80,8 +80,9 @@ theorem exists_invariant [IsTopologicalAddGroup X] {f : X → ℂ} (hf : f ∈ S
       exact h.symm
     · rw [image_eq_zero_of_notMem_tsupport hx, image_eq_zero_of_notMem_tsupport hxt]
 
-theorem indicator_invariant (L : AddSubgroup X) (c : ℂ) :
-    ∀ t ∈ L, ∀ x, (L : Set X).indicator (fun _ => c) (x + t) = (L : Set X).indicator (fun _ => c) x := by
+theorem indicator_invariant (L : AddSubgroup X) (c : ℂ)
+    : ∀ t ∈ L, ∀ x,
+      (L : Set X).indicator (fun _ => c) (x + t) = (L : Set X).indicator (fun _ => c) x := by
   intro t ht x
   by_cases hx : x ∈ (L : Set X)
   · have hxt : x + t ∈ (L : Set X) := L.add_mem hx ht
@@ -89,47 +90,62 @@ theorem indicator_invariant (L : AddSubgroup X) (c : ℂ) :
   · have hxt : x + t ∉ (L : Set X) := fun h => hx (by simpa using L.sub_mem h ht)
     rw [Set.indicator_of_notMem hxt, Set.indicator_of_notMem hx]
 
-theorem indicator_mem [IsTopologicalAddGroup X] [T2Space X] (L : AddSubgroup X) (hc : IsCompact (L : Set X))
-    (ho : IsOpen (L : Set X)) : (L : Set X).indicator (fun _ => (1 : ℂ)) ∈ SB X := by
+theorem indicator_mem
+    [IsTopologicalAddGroup X] [T2Space X]
+    (L : AddSubgroup X) (hc : IsCompact (L : Set X)) (ho : IsOpen (L : Set X))
+    : (L : Set X).indicator (fun _ => (1 : ℂ)) ∈ SB X := by
   have hcl : IsClosed (L : Set X) := AddSubgroup.isClosed_of_isOpen L ho
   show IsLocallyConstant _ ∧ HasCompactSupport _
   refine ⟨?_, ?_⟩
   · rw [IsLocallyConstant.iff_exists_open]
     intro x
     by_cases hx : x ∈ (L : Set X)
-    · exact ⟨(L : Set X), ho, hx, fun y hy => by rw [Set.indicator_of_mem hy, Set.indicator_of_mem hx]⟩
-    · exact ⟨(L : Set X)ᶜ, hcl.isOpen_compl, hx, fun y hy => by
-        rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]⟩
+    · exact
+        ⟨(L : Set X), ho, hx, fun y hy => by rw [Set.indicator_of_mem hy, Set.indicator_of_mem hx]⟩
+    · exact ⟨
+        (L : Set X)ᶜ,
+        hcl.isOpen_compl,
+        hx,
+        fun y hy => by rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]
+      ⟩
   · exact HasCompactSupport.intro' hc hcl fun x hx => Set.indicator_of_notMem hx _
 
-variable [IsTopologicalAddGroup X] [MeasurableSpace X] [BorelSpace X] (μ : Measure X) [μ.IsAddHaarMeasure]
+variable
+  [IsTopologicalAddGroup X] [MeasurableSpace X] [BorelSpace X] (μ : Measure X) [μ.IsAddHaarMeasure]
 
-theorem four_eq_zero (he : IsPair e) {M : Set X} {f : X → ℂ}
-    (hs : ∀ t ∈ M, ∀ x, f (x + t) = f x) {y : X} (hy : y ∉ ann he M) : four μ e f y = 0 := by
+theorem four_eq_zero
+    (he : IsPair e)
+    {M : Set X} {f : X → ℂ} (hs : ∀ t ∈ M, ∀ x, f (x + t) = f x)
+    {y : X} (hy : y ∉ ann he M)
+    : four μ e f y = 0 := by
   have hy' : ¬ ∀ t ∈ M, e t y = 1 := hy
   simp only [not_forall] at hy'
   obtain ⟨t, ht, hne⟩ := hy'
   have hne' : e y t ≠ 1 := by rwa [he.symm]
   have key : four μ e f y = e y t * four μ e f y := by
     simp only [four]
-    calc ∫ z, e y z * f z ∂μ = ∫ z, e y (t + z) * f (t + z) ∂μ :=
-          (integral_add_left_eq_self (fun z => e y z * f z) t).symm
+    calc
+      ∫ z, e y z * f z ∂μ = ∫ z, e y (t + z) * f (t + z) ∂μ :=
+        (integral_add_left_eq_self (fun z => e y z * f z) t).symm
       _ = ∫ z, e y t * (e y z * f z) ∂μ := by
-          congr 1; ext z
-          rw [add_right he, add_comm t z, hs t ht z]; ring
+        congr 1
+        ext z
+        rw [add_right he, add_comm t z, hs t ht z]
+        ring
       _ = e y t * ∫ z, e y z * f z ∂μ := integral_const_mul _ _
   by_contra h
   exact hne' (mul_right_cancel₀ h (key.symm.trans (one_mul _).symm))
 
-theorem four_indicator (he : IsPair e) (L : AddSubgroup X) (ho : IsOpen (L : Set X)) (x : X) :
-    four μ e ((L : Set X).indicator fun _ => (1 : ℂ)) x =
-      (ann he L : Set X).indicator (fun _ => (μ.real (L : Set X) : ℂ)) x := by
+theorem four_indicator (he : IsPair e) (L : AddSubgroup X) (ho : IsOpen (L : Set X)) (x : X)
+    : four μ e ((L : Set X).indicator fun _ => (1 : ℂ)) x
+      = (ann he L : Set X).indicator (fun _ => (μ.real (L : Set X) : ℂ)) x := by
   by_cases hx : x ∈ (ann he L : Set X)
   · rw [Set.indicator_of_mem hx]
     have hx' : ∀ y ∈ (L : Set X), e y x = 1 := hx
     simp only [four]
-    have h : (fun z => e x z * (L : Set X).indicator (fun _ => (1 : ℂ)) z) =
-        (L : Set X).indicator (fun _ => (1 : ℂ)) := by
+    have h
+        : (fun z => e x z * (L : Set X).indicator (fun _ => (1 : ℂ)) z)
+          = (L : Set X).indicator (fun _ => (1 : ℂ)) := by
       ext z
       by_cases hz : z ∈ (L : Set X)
       · rw [Set.indicator_of_mem hz, mul_one, he.symm, hx' z hz]
@@ -139,10 +155,14 @@ theorem four_indicator (he : IsPair e) (L : AddSubgroup X) (ho : IsOpen (L : Set
   · rw [Set.indicator_of_notMem hx]
     exact four_eq_zero μ he (indicator_invariant L 1) hx
 
-private theorem exists_four_four_eq_smul_neg_of_ann_invariant (hX : Good X) (he : IsPair e) (L : AddSubgroup X)
-    (hLc : IsCompact (L : Set X)) (hLo : IsOpen (L : Set X)) :
-    ∃ C : ℝ, 0 < C ∧ ∀ φ ∈ SB X, (∀ t ∈ ann he (L : Set X), ∀ x, φ (x + t) = φ x) →
-      ∀ x, four μ e (four μ e φ) x = (C : ℂ) * φ (-x) := by
+private theorem exists_four_four_eq_smul_neg_of_ann_invariant
+    (hX : Good X) (he : IsPair e)
+    (L : AddSubgroup X) (hLc : IsCompact (L : Set X)) (hLo : IsOpen (L : Set X))
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ φ ∈ SB X,
+          (∀ t ∈ ann he (L : Set X), ∀ x, φ (x + t) = φ x)
+            → ∀ x, four μ e (four μ e φ) x = (C : ℂ) * φ (-x) := by
   have := hX.sc
   set A := ann he (L : Set X) with hA
   set B := ann he (A : Set X) with hB
@@ -190,24 +210,33 @@ private theorem exists_four_four_eq_smul_neg_of_ann_invariant (hX : Good X) (he 
   have h1 : ∀ x, ∫ z, e x z * φ z ∂μ = ∫ z in tsupport φ, e x z * φ z ∂μ := fun x =>
     (setIntegral_eq_integral_of_forall_compl_eq_zero fun z hz => by
       rw [image_eq_zero_of_notMem_tsupport hz, mul_zero]).symm
-  have h2 : ∫ x, e w x * ∫ z, e x z * φ z ∂μ ∂μ = ∫ x in (B : Set X), e w x * ∫ z, e x z * φ z ∂μ ∂μ :=
+  have h2
+      : ∫ x, e w x * ∫ z, e x z * φ z ∂μ ∂μ = ∫ x in (B : Set X), e w x * ∫ z, e x z * φ z ∂μ ∂μ :=
     (setIntegral_eq_integral_of_forall_compl_eq_zero fun x hx => by
       have h0 := four_eq_zero μ he hs (y := x) hx
       simp only [four] at h0
       rw [h0, mul_zero]).symm
-  have h3 : ∀ x, e w x * ∫ z in tsupport φ, e x z * φ z ∂μ =
-      ∫ z in tsupport φ, e w x * (e x z * φ z) ∂μ := fun x => (integral_const_mul _ _).symm
+  have h3
+      : ∀ x,
+        e w x * ∫ z in tsupport φ, e x z * φ z ∂μ = ∫ z in tsupport φ, e w x * (e x z * φ z) ∂μ :=
+    fun x => (integral_const_mul _ _).symm
   obtain ⟨C0, hC0⟩ := hφ'.1.continuous.bounded_above_of_compact_support hφ'.2
   have hcont : Continuous (Function.uncurry fun x z => e w x * (e x z * φ z)) :=
     (he.lc.continuous.comp (continuous_const.prodMk continuous_fst)).mul
       (he.lc.continuous.mul (hφ'.1.continuous.comp continuous_snd))
   have hint : Integrable (Function.uncurry fun x z => e w x * (e x z * φ z))
       ((μ.restrict (B : Set X)).prod (μ.restrict (tsupport φ))) :=
-    (integrable_const C0).mono' hcont.aestronglyMeasurable (Filter.Eventually.of_forall fun p => by
-      simp only [Function.uncurry, norm_mul, he.norm, one_mul]
-      exact hC0 p.2)
-  have h4 : ∀ z, ∫ x in (B : Set X), e w x * (e x z * φ z) ∂μ =
-      φ z * (ann he (B : Set X) : Set X).indicator (fun _ => (μ.real (B : Set X) : ℂ)) (w + z) := by
+    (integrable_const C0).mono' hcont.aestronglyMeasurable
+      (Filter.Eventually.of_forall fun p => by
+        simp only [Function.uncurry, norm_mul, he.norm, one_mul]
+        exact hC0 p.2)
+  have h4
+      : ∀ z,
+        ∫ x in (B : Set X), e w x * (e x z * φ z) ∂μ
+          = φ z
+            * (ann he (B : Set X) : Set X).indicator
+              (fun _ => (μ.real (B : Set X) : ℂ))
+              (w + z) := by
     intro z
     have hB1 := four_indicator μ he B hBo (w + z)
     simp only [four] at hB1
@@ -219,8 +248,13 @@ private theorem exists_four_four_eq_smul_neg_of_ann_invariant (hX : Good X) (he 
       ring
     · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
       ring
-  have h5 : ∀ z, φ z * (ann he (B : Set X) : Set X).indicator (fun _ => (μ.real (B : Set X) : ℂ)) (w + z) =
-      φ (-w) * (ann he (B : Set X) : Set X).indicator (fun _ => (μ.real (B : Set X) : ℂ)) (w + z) := by
+  have h5
+      : ∀ z,
+        φ z * (ann he (B : Set X) : Set X).indicator (fun _ => (μ.real (B : Set X) : ℂ)) (w + z)
+          = φ (-w)
+            * (ann he (B : Set X) : Set X).indicator
+              (fun _ => (μ.real (B : Set X) : ℂ))
+              (w + z) := by
     intro z
     by_cases hz : w + z ∈ (ann he (B : Set X) : Set X)
     · have hzA : w + z ∈ (A : Set X) := hBA.subset hz
@@ -228,11 +262,13 @@ private theorem exists_four_four_eq_smul_neg_of_ann_invariant (hX : Good X) (he 
       rw [neg_add_cancel_left] at h
       rw [h]
     · rw [Set.indicator_of_notMem hz, mul_zero, mul_zero]
-  have h6 : ∫ z in tsupport φ, φ (-w) * (ann he (B : Set X) : Set X).indicator
-      (fun _ => (μ.real (B : Set X) : ℂ)) (w + z) ∂μ =
-      ∫ z, φ (-w) * (ann he (B : Set X) : Set X).indicator (fun _ => (μ.real (B : Set X) : ℂ)) (w + z) ∂μ := by
-    refine setIntegral_eq_integral_of_forall_compl_eq_zero fun z hz => ?_
-    rw [← h5 z, image_eq_zero_of_notMem_tsupport hz, zero_mul]
+  have h6
+      : ∫ z in tsupport φ, φ (-w) * (ann he (B : Set X) : Set X).indicator
+          (fun _ => (μ.real (B : Set X) : ℂ)) (w + z) ∂μ
+        = ∫ z, φ (-w) * (ann he (B : Set X) : Set X).indicator (fun _ => (μ.real (B : Set X) : ℂ)) (w + z) ∂μ :=
+    by
+      refine setIntegral_eq_integral_of_forall_compl_eq_zero fun z hz => ?_
+      rw [← h5 z, image_eq_zero_of_notMem_tsupport hz, zero_mul]
   have hAm : MeasurableSet (ann he (B : Set X) : Set X) := by
     rw [hBA]
     exact hAo.measurableSet
@@ -242,15 +278,20 @@ private theorem exists_four_four_eq_smul_neg_of_ann_invariant (hX : Good X) (he 
   rw [integral_integral_swap hint]
   simp_rw [h4, h5]
   rw [h6, integral_const_mul,
-    integral_add_left_eq_self (fun z => (ann he (B : Set X) : Set X).indicator
-      (fun _ => (μ.real (B : Set X) : ℂ)) z) w,
+    integral_add_left_eq_self
+      (fun z => (ann he (B : Set X) : Set X).indicator (fun _ => (μ.real (B : Set X) : ℂ)) z)
+      w,
     integral_indicator_const _ hAm, hBA, Complex.real_smul]
   push_cast
   ring
 
-theorem four_four_of_invariant (hX : Good X) (he : IsPair e) (M : AddSubgroup X) (hMc : IsCompact (M : Set X))
-    (hMo : IsOpen (M : Set X)) : ∃ C : ℝ, 0 < C ∧ ∀ φ ∈ SB X, (∀ t ∈ M, ∀ x, φ (x + t) = φ x) →
-      ∀ x, four μ e (four μ e φ) x = (C : ℂ) * φ (-x) := by
+theorem four_four_of_invariant
+    (hX : Good X) (he : IsPair e)
+    (M : AddSubgroup X) (hMc : IsCompact (M : Set X)) (hMo : IsOpen (M : Set X))
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ φ ∈ SB X,
+          (∀ t ∈ M, ∀ x, φ (x + t) = φ x) → ∀ x, four μ e (four μ e φ) x = (C : ℂ) * φ (-x) := by
   obtain ⟨K, hK, hKM⟩ := he.small (M : Set X) (hMo.mem_nhds M.zero_mem)
   obtain ⟨L, hLc, hLo, hKL⟩ := hX.large K hK
   obtain ⟨C, hC, hCφ⟩ := exists_four_four_eq_smul_neg_of_ann_invariant μ hX he L hLc hLo
@@ -261,11 +302,13 @@ end GlobalTheory.KSp.FourInv
 
 namespace GlobalTheory.KSp
 
-
 open FourInv in
-theorem four_four (X : Type) [AddCommGroup X] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X] (hX : Good X)
-    (μ : Measure X) [μ.IsAddHaarMeasure] (e : X → X → ℂ) (he : IsPair e) :
-    ∃ C : ℝ, 0 < C ∧ ∀ φ ∈ SB X, ∀ x, four μ e (four μ e φ) x = (C : ℂ) * φ (-x) := by
+theorem four_four
+    (X : Type) [AddCommGroup X] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
+    (hX : Good X)
+    (μ : Measure X) [μ.IsAddHaarMeasure]
+    (e : X → X → ℂ) (he : IsPair e)
+    : ∃ C : ℝ, 0 < C ∧ ∀ φ ∈ SB X, ∀ x, four μ e (four μ e φ) x = (C : ℂ) * φ (-x) := by
   have := hX.grp
   have := hX.t2
   obtain ⟨M0, hM0c, hM0o, -⟩ := hX.large ∅ isCompact_empty
@@ -283,8 +326,10 @@ theorem four_four (X : Type) [AddCommGroup X] [TopologicalSpace X] [MeasurableSp
   have h0 : (0 : X) ∈ (M0 : Set X) := M0.zero_mem
   have hCC : C' = C := by
     have h1 := hCφ _ (indicator_mem M0 hM0c hM0o) (indicator_invariant M0 1) 0
-    have h2 := hC'φ _ (indicator_mem M0 hM0c hM0o)
-      (fun t ht => indicator_invariant M0 1 t (AddSubgroup.mem_inf.mp ht).2) 0
+    have h2 :=
+      hC'φ _ (indicator_mem M0 hM0c hM0o)
+        (fun t ht => indicator_invariant M0 1 t (AddSubgroup.mem_inf.mp ht).2)
+        0
     rw [neg_zero, Set.indicator_of_mem h0, mul_one] at h1 h2
     exact_mod_cast h2.symm.trans h1
   rw [← hCC]

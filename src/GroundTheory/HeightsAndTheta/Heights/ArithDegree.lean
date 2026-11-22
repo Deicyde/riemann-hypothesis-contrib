@@ -16,19 +16,19 @@ variable {K : Type*} [Field K] [NumberField K]
 instance (σ : K →+* ℂ) : Module.IsTorsionFree (𝓞 K) (ComplexAt σ) := by
   refine ⟨fun a ha z w hzw ↦ ?_⟩
   have ha0 : a ≠ 0 := ha.ne_zero
-  have h1 : σ (a : K) ≠ 0 := by
-    rw [map_ne_zero]; exact_mod_cast ha0
+  have h1 : σ (a : K) ≠ 0 := by rw [map_ne_zero]; exact_mod_cast ha0
   simp only [smul_def] at hzw
   exact mul_left_cancel₀ (M₀ := ℂ) h1 hzw
 
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E]
-
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
 
 omit [Module.Projective (𝓞 K) E] in
-theorem finite_quotient_span {ι : Type*} [Fintype ι] {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
-    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E) :
-    Finite (E ⧸ Submodule.span (𝓞 K) (Set.range s)) := by
+theorem finite_quotient_span
+    {ι : Type*} [Fintype ι]
+    {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
+    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E)
+    : Finite (E ⧸ Submodule.span (𝓞 K) (Set.range s)) := by
   set N := Submodule.span (𝓞 K) (Set.range s)
   have hN : Module.rank (𝓞 K) N = Fintype.card ι := by
     classical
@@ -45,8 +45,7 @@ theorem finite_quotient_span {ι : Type*} [Fintype ι] {s : ι → E} (hs : Line
   have htors : ∀ x : E ⧸ N, ∃ n : ℤ, n ≠ 0 ∧ n • x = 0 := by
     intro x
     obtain ⟨a, ha, hax⟩ := (rank_eq_zero_iff.mp hQ0) x
-    have hI : Ideal.span ({a} : Set (𝓞 K)) ≠ ⊥ := by
-      rwa [Ne, Ideal.span_singleton_eq_bot]
+    have hI : Ideal.span ({a} : Set (𝓞 K)) ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
     have hmem := Ideal.absNorm_mem (Ideal.span ({a} : Set (𝓞 K)))
     obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.mp hmem
     refine ⟨(Ideal.absNorm (Ideal.span ({a} : Set (𝓞 K))) : ℤ), ?_, ?_⟩
@@ -67,20 +66,20 @@ variable (h : HermitianMetric K E) (σ : K →+* ℂ)
 theorem fibreVec_add (e f : E) : fibreVec h σ (e + f) = fibreVec h σ e + fibreVec h σ f := by
   simp only [fibreVec, tmul_add, map_add (f := _)]
 
-theorem fibreVec_smul (a : 𝓞 K) (e : E) :
-    fibreVec h σ (a • e) = (σ (a : K)) • fibreVec h σ e := by
+theorem fibreVec_smul (a : 𝓞 K) (e : E) : fibreVec h σ (a • e) = (σ (a : K)) • fibreVec h σ e := by
   simp only [fibreVec]
   rw [← map_smul, ← TensorProduct.smul_tmul, smul_tmul', smul_def, complex_smul_def]
 
-theorem fibreVec_sum {ι : Type*} (S : Finset ι) (c : ι → 𝓞 K) (s : ι → E) :
-    fibreVec h σ (∑ i ∈ S, c i • s i) = ∑ i ∈ S, (σ (c i : K)) • fibreVec h σ (s i) := by
+theorem fibreVec_sum {ι : Type*} (S : Finset ι) (c : ι → 𝓞 K) (s : ι → E)
+    : fibreVec h σ (∑ i ∈ S, c i • s i) = ∑ i ∈ S, (σ (c i : K)) • fibreVec h σ (s i) := by
   classical
   induction S using Finset.induction_on with
   | empty => simp [fibreVec]
-  | insert a S ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, fibreVec_add, fibreVec_smul, ih]
+  | insert a S ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, fibreVec_add, fibreVec_smul, ih]
 
-theorem linearIndependent_fibreVec {ι : Type*} {s : ι → E} (hs : LinearIndependent (𝓞 K) s) :
-    LinearIndependent ℂ (fun i ↦ fibreVec h σ (s i)) := by
+theorem linearIndependent_fibreVec {ι : Type*} {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
+    : LinearIndependent ℂ (fun i ↦ fibreVec h σ (s i)) := by
   set N := Submodule.span (𝓞 K) (Set.range s)
   let b : Module.Basis ι (𝓞 K) N := Module.Basis.span hs
   let bC := Algebra.TensorProduct.basis (ComplexAt σ) b
@@ -97,17 +96,19 @@ theorem linearIndependent_fibreVec {ι : Type*} {s : ι → E} (hs : LinearIndep
     rw [Module.Basis.span_apply]
   rw [h2] at h1
   have h3 : LinearIndependent ℂ (fun i ↦ (1 : ComplexAt σ) ⊗ₜ[𝓞 K] s i) :=
-    h1.restrict_scalars (R := ℂ) (fun a c hac ↦ by
-      simp only [complex_smul_def, mul_one] at hac; exact hac)
+    h1.restrict_scalars (R := ℂ)
+      (fun a c hac ↦ by simp only [complex_smul_def, mul_one] at hac; exact hac)
   exact h3.map' (FibreSpace.equiv h σ).toLinearMap (FibreSpace.equiv h σ).ker
 
 end FibreVec
 
 section Gram
 
-theorem gram_comb {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {ι : Type*}
-    [Fintype ι] (v : ι → V) (B : Matrix ι ι ℂ) :
-    gram ℂ (fun j ↦ ∑ i, B i j • v i) = Bᴴ * gram ℂ v * B := by
+theorem gram_comb
+    {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {ι : Type*} [Fintype ι]
+    (v : ι → V) (B : Matrix ι ι ℂ)
+    : gram ℂ (fun j ↦ ∑ i, B i j • v i) = Bᴴ * gram ℂ v * B := by
   ext j k
   simp only [gram_apply, sum_inner, inner_sum, inner_smul_left, inner_smul_right, Matrix.mul_apply,
     conjTranspose_apply, Finset.sum_mul, Finset.mul_sum, RCLike.star_def]
@@ -116,8 +117,9 @@ theorem gram_comb {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {
 
 end Gram
 
-def gramDet (h : HermitianMetric K E) (σ : K →+* ℂ) {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (s : ι → E) : ℝ :=
+def gramDet
+    (h : HermitianMetric K E) (σ : K →+* ℂ) {ι : Type*} [Fintype ι] [DecidableEq ι] (s : ι → E)
+    : ℝ :=
   (det (gram ℂ fun i ↦ fibreVec h σ (s i))).re
 
 section GramDet
@@ -126,14 +128,15 @@ variable (h : HermitianMetric K E) (σ : K →+* ℂ) {ι : Type*} [Fintype ι] 
 
 theorem gramDet_pos {s : ι → E} (hs : LinearIndependent (𝓞 K) s) : 0 < gramDet h σ s := by
   open scoped ComplexOrder in
-    have := (posDef_gram_of_linearIndependent (linearIndependent_fibreVec h σ hs)).det_pos
-    exact (RCLike.pos_iff.mp this).1
+  have := (posDef_gram_of_linearIndependent (linearIndependent_fibreVec h σ hs)).det_pos
+  exact (RCLike.pos_iff.mp this).1
 
-theorem gramDet_comb (A : Matrix ι ι (𝓞 K)) (s : ι → E) :
-    gramDet h σ (fun j ↦ ∑ i, A i j • s i) = ‖σ (A.det : K)‖ ^ 2 * gramDet h σ s := by
+theorem gramDet_comb (A : Matrix ι ι (𝓞 K)) (s : ι → E)
+    : gramDet h σ (fun j ↦ ∑ i, A i j • s i) = ‖σ (A.det : K)‖ ^ 2 * gramDet h σ s := by
   set τ : 𝓞 K →+* ℂ := σ.comp (algebraMap (𝓞 K) K)
-  have hv : (fun j ↦ fibreVec h σ (∑ i, A i j • s i)) =
-      fun j ↦ ∑ i, (τ.mapMatrix A) i j • fibreVec h σ (s i) := by
+  have hv
+      : (fun j ↦ fibreVec h σ (∑ i, A i j • s i))
+        = fun j ↦ ∑ i, (τ.mapMatrix A) i j • fibreVec h σ (s i) := by
     funext j; rw [fibreVec_sum]; rfl
   have hz : τ A.det = σ (A.det : K) := rfl
   simp only [gramDet]
@@ -141,28 +144,29 @@ theorem gramDet_comb (A : Matrix ι ι (𝓞 K)) (s : ι → E) :
     mul_comm _ (σ (A.det : K)), ← mul_assoc, RCLike.star_def, Complex.mul_conj,
     Complex.re_ofReal_mul, Complex.normSq_eq_norm_sq]
 
-theorem gramDet_reindex {ι' : Type*} [Fintype ι'] [DecidableEq ι'] (e : ι' ≃ ι) (s : ι → E) :
-    gramDet h σ (s ∘ e) = gramDet h σ s := by
+theorem gramDet_reindex {ι' : Type*} [Fintype ι'] [DecidableEq ι'] (e : ι' ≃ ι) (s : ι → E)
+    : gramDet h σ (s ∘ e) = gramDet h σ s := by
   simp only [gramDet]
-  have : (gram ℂ fun i ↦ fibreVec h σ ((s ∘ e) i)) =
-      (gram ℂ fun i ↦ fibreVec h σ (s i)).submatrix e e := by
+  have : (gram ℂ fun i ↦ fibreVec h σ ((s ∘ e) i))
+      = (gram ℂ fun i ↦ fibreVec h σ (s i)).submatrix e e := by
     ext i j; rfl
   rw [this, det_submatrix_equiv_self]
 
 end GramDet
 
 def degreeWith (h : HermitianMetric K E) {ι : Type*} [Fintype ι] [DecidableEq ι] (s : ι → E) : ℝ :=
-  Real.log (Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range s))) -
-    (1 / 2) * ∑ σ : K →+* ℂ, Real.log (gramDet h σ s)
+  Real.log (Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range s)))
+    - (1 / 2) * ∑ σ : K →+* ℂ, Real.log (gramDet h σ s)
 
 section Index
 
-
 omit [NumberField K] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] in
-theorem card_quotient_range_comp {M : Type*} [AddCommGroup M] [Module (𝓞 K) M]
-    (Φ : M →ₗ[𝓞 K] E) (hΦ : Function.Injective Φ) (g : M →ₗ[𝓞 K] M) :
-    Nat.card (E ⧸ LinearMap.range (Φ ∘ₗ g)) =
-      Nat.card (M ⧸ LinearMap.range g) * Nat.card (E ⧸ LinearMap.range Φ) := by
+theorem card_quotient_range_comp
+    {M : Type*} [AddCommGroup M] [Module (𝓞 K) M]
+    (Φ : M →ₗ[𝓞 K] E) (hΦ : Function.Injective Φ)
+    (g : M →ₗ[𝓞 K] M)
+    : Nat.card (E ⧸ LinearMap.range (Φ ∘ₗ g))
+      = Nat.card (M ⧸ LinearMap.range g) * Nat.card (E ⧸ LinearMap.range Φ) := by
   rw [← Submodule.card_quotient_mul_card_quotient (LinearMap.range Φ) (LinearMap.range (Φ ∘ₗ g))
     (LinearMap.range_comp_le_range _ _)]
   congr 1
@@ -176,9 +180,9 @@ theorem card_quotient_range_comp {M : Type*} [AddCommGroup M] [Module (𝓞 K) M
   rw [← LinearMap.range_comp, ← hker]
   exact Nat.card_congr (LinearMap.quotKerEquivRange _).toEquiv.symm
 
-theorem card_quotient_mulVecLin {ι : Type*} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι (𝓞 K))
-    (hA : A.det ≠ 0) :
-    Nat.card ((ι → 𝓞 K) ⧸ LinearMap.range A.mulVecLin) = (Algebra.norm ℤ A.det).natAbs := by
+theorem card_quotient_mulVecLin
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι (𝓞 K)) (hA : A.det ≠ 0)
+    : Nat.card ((ι → 𝓞 K) ⧸ LinearMap.range A.mulVecLin) = (Algebra.norm ℤ A.det).natAbs := by
   have hinj : Function.Injective A.mulVecLin := by
     intro x y hxy
     by_contra hne
@@ -190,15 +194,16 @@ theorem card_quotient_mulVecLin {ι : Type*} [Fintype ι] [DecidableEq ι] (A : 
     (LinearEquiv.ofInjective A.mulVecLin hinj).restrictScalars ℤ
   have h1 := Submodule.natAbs_det_equiv (N.restrictScalars ℤ) e
   rw [← Nat.card_congr (Submodule.Quotient.restrictScalarsEquiv ℤ N).toEquiv, ← h1]
-  have h2 : (N.restrictScalars ℤ).subtype ∘ₗ (e : (ι → 𝓞 K) →+ N.restrictScalars ℤ).toIntLinearMap
-      = A.mulVecLin.restrictScalars ℤ := by
+  have h2
+      : (N.restrictScalars ℤ).subtype ∘ₗ (e : (ι → 𝓞 K) →+ N.restrictScalars ℤ).toIntLinearMap
+        = A.mulVecLin.restrictScalars ℤ := by
     ext x; rfl
   rw [h2, LinearMap.det_restrictScalars, ← Matrix.toLin'_apply', LinearMap.det_toLin']
 
 end Index
 
-theorem sum_log_norm_embedding (d : 𝓞 K) (hd : d ≠ 0) :
-    ∑ σ : K →+* ℂ, Real.log ‖σ (d : K)‖ = Real.log ((Algebra.norm ℤ d).natAbs : ℝ) := by
+theorem sum_log_norm_embedding (d : 𝓞 K) (hd : d ≠ 0)
+    : ∑ σ : K →+* ℂ, Real.log ‖σ (d : K)‖ = Real.log ((Algebra.norm ℤ d).natAbs : ℝ) := by
   have h1 : (((Algebra.norm ℚ (d : K) : ℚ) : ℂ)) = ∏ σ : K →+* ℂ, σ (d : K) := by
     have := Algebra.norm_eq_prod_embeddings ℚ ℂ (d : K)
     rw [eq_ratCast] at this
@@ -206,7 +211,8 @@ theorem sum_log_norm_embedding (d : 𝓞 K) (hd : d ≠ 0) :
     exact (Fintype.prod_equiv (RingHom.equivRatAlgHom K ℂ) _ _ fun σ ↦ rfl).symm
   have h2 : ((Algebra.norm ℤ d).natAbs : ℝ) = ‖∏ σ : K →+* ℂ, σ (d : K)‖ := by
     rw [← h1, ← Algebra.coe_norm_int, Nat.cast_natAbs, Complex.norm_ratCast]
-    push_cast; rfl
+    push_cast
+    rfl
   rw [h2, norm_prod, Real.log_prod]
   intro σ _
   rw [norm_ne_zero_iff, map_ne_zero]
@@ -216,31 +222,36 @@ section Degree
 
 variable (h : HermitianMetric K E)
 
-
 omit [NumberField K] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] in
-theorem linearCombination_comb {ι : Type*} [Fintype ι] (s : ι → E) (A : Matrix ι ι (𝓞 K)) :
-    Fintype.linearCombination (𝓞 K) s ∘ₗ A.mulVecLin =
-      Fintype.linearCombination (𝓞 K) (fun j ↦ ∑ i, A i j • s i) := by
+theorem linearCombination_comb {ι : Type*} [Fintype ι] (s : ι → E) (A : Matrix ι ι (𝓞 K))
+    : Fintype.linearCombination (𝓞 K) s ∘ₗ A.mulVecLin
+      = Fintype.linearCombination (𝓞 K) (fun j ↦ ∑ i, A i j • s i) := by
   refine LinearMap.ext fun x ↦ ?_
   simp only [LinearMap.comp_apply, Matrix.mulVecLin_apply, Fintype.linearCombination_apply,
     Matrix.mulVec, dotProduct, Finset.sum_smul, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun i _ ↦ by rw [mul_comm]
 
-theorem degreeWith_reindex {ι ι' : Type*} [Fintype ι] [DecidableEq ι] [Fintype ι']
-    [DecidableEq ι'] (e : ι' ≃ ι) (s : ι → E) : degreeWith h (s ∘ e) = degreeWith h s := by
+theorem degreeWith_reindex
+    {ι ι' : Type*} [Fintype ι] [DecidableEq ι] [Fintype ι'] [DecidableEq ι']
+    (e : ι' ≃ ι) (s : ι → E)
+    : degreeWith h (s ∘ e) = degreeWith h s := by
   simp only [degreeWith, gramDet_reindex, e.surjective.range_comp]
 
-theorem degreeWith_comb {ι : Type*} [Fintype ι] [DecidableEq ι] {s : ι → E}
-    (hs : LinearIndependent (𝓞 K) s) (hcard : Fintype.card ι = Module.finrank (𝓞 K) E)
-    (A : Matrix ι ι (𝓞 K)) (hA : A.det ≠ 0) :
-    degreeWith h (fun j ↦ ∑ i, A i j • s i) = degreeWith h s := by
+theorem degreeWith_comb
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
+    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E)
+    (A : Matrix ι ι (𝓞 K)) (hA : A.det ≠ 0)
+    : degreeWith h (fun j ↦ ∑ i, A i j • s i) = degreeWith h s := by
   have hinj := hs.fintypeLinearCombination_injective
   have hfin := finite_quotient_span hs hcard
-  have hc : Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range (fun j ↦ ∑ i, A i j • s i))) =
-      (Algebra.norm ℤ A.det).natAbs * Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range s)) := by
+  have hc
+      : Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range (fun j ↦ ∑ i, A i j • s i)))
+        = (Algebra.norm ℤ A.det).natAbs * Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range s)) := by
     rw [← Fintype.range_linearCombination, ← linearCombination_comb,
-      card_quotient_range_comp _ hinj, card_quotient_mulVecLin A hA, Fintype.range_linearCombination]
+      card_quotient_range_comp _ hinj, card_quotient_mulVecLin A hA,
+      Fintype.range_linearCombination]
   have hcpos : (0 : ℝ) < Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range s)) := by
     exact_mod_cast Nat.card_pos
   have hN : (0 : ℝ) < (Algebra.norm ℤ A.det).natAbs := by
@@ -248,26 +259,32 @@ theorem degreeWith_comb {ι : Type*} [Fintype ι] [DecidableEq ι] {s : ι → E
     exact_mod_cast Int.natAbs_pos.mpr this
   have hσ : ∀ σ : K →+* ℂ, ‖σ (A.det : K)‖ ≠ 0 := fun σ ↦ by
     rw [norm_ne_zero_iff, map_ne_zero]; exact_mod_cast hA
-  have hlog : ∀ σ : K →+* ℂ, Real.log (gramDet h σ (fun j ↦ ∑ i, A i j • s i)) =
-      2 * Real.log ‖σ (A.det : K)‖ + Real.log (gramDet h σ s) := fun σ ↦ by
+  have hlog
+      : ∀ σ : K →+* ℂ,
+        Real.log (gramDet h σ (fun j ↦ ∑ i, A i j • s i))
+          = 2 * Real.log ‖σ (A.det : K)‖ + Real.log (gramDet h σ s) := fun σ ↦ by
     rw [gramDet_comb, Real.log_mul (pow_ne_zero 2 (hσ σ)) (gramDet_pos h σ hs).ne', Real.log_pow]
-    push_cast; ring
+    push_cast
+    ring
   simp only [degreeWith]
   rw [hc, Nat.cast_mul, Real.log_mul hN.ne' hcpos.ne']
   simp only [hlog]
   rw [Finset.sum_add_distrib, ← Finset.mul_sum, sum_log_norm_embedding _ hA]
   ring
 
-theorem degreeWith_eq_of_linearIndependent {ι : Type*} [Fintype ι] [DecidableEq ι] {s t : ι → E}
-    (hs : LinearIndependent (𝓞 K) s) (ht : LinearIndependent (𝓞 K) t)
-    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E) : degreeWith h t = degreeWith h s := by
+theorem degreeWith_eq_of_linearIndependent
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {s t : ι → E} (hs : LinearIndependent (𝓞 K) s) (ht : LinearIndependent (𝓞 K) t)
+    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E)
+    : degreeWith h t = degreeWith h s := by
   have hfin := finite_quotient_span hs hcard
   set n := Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range s))
   have hn : n ≠ 0 := Nat.card_pos.ne'
   have hmem : ∀ j, (n : 𝓞 K) • t j ∈ Submodule.span (𝓞 K) (Set.range s) := by
     intro j
-    have := card_nsmul_eq_zero' (G := E ⧸ Submodule.span (𝓞 K) (Set.range s))
-      (x := Submodule.Quotient.mk (t j))
+    have :=
+      card_nsmul_eq_zero' (G := E ⧸ Submodule.span (𝓞 K) (Set.range s))
+        (x := Submodule.Quotient.mk (t j))
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at this
     rwa [Nat.cast_smul_eq_nsmul]
   choose c hc using fun j ↦ (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).mp (hmem j)
@@ -295,10 +312,9 @@ theorem degreeWith_eq_of_linearIndependent {ι : Type*} [Fintype ι] [DecidableE
     exact ht.fintypeLinearCombination_injective (key2.trans (map_zero _).symm)
   rw [← degreeWith_comb h ht hcard D hD, hu2, ← hu1, degreeWith_comb h hs hcard A hA]
 
-
 omit [NumberField K] [Module.Projective (𝓞 K) E] in
-theorem exists_linearIndependent_fin :
-    ∃ s : Fin (Module.finrank (𝓞 K) E) → E, LinearIndependent (𝓞 K) s := by
+theorem exists_linearIndependent_fin
+    : ∃ s : Fin (Module.finrank (𝓞 K) E) → E, LinearIndependent (𝓞 K) s := by
   obtain ⟨S, hS, hli⟩ := exists_set_linearIndependent_of_isDomain (𝓞 K) E
   rw [← Module.finrank_eq_rank] at hS
   obtain ⟨e⟩ := Cardinal.mk_eq_nat_iff.mp hS
@@ -309,24 +325,28 @@ end Degree
 def arithDegree (h : HermitianMetric K E) : ℝ :=
   degreeWith h (exists_linearIndependent_fin (K := K) (E := E)).choose
 
-theorem arithDegree_eq (h : HermitianMetric K E) {ι : Type*} [Fintype ι] [DecidableEq ι]
+theorem arithDegree_eq
+    (h : HermitianMetric K E)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
     {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
-    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E) : arithDegree h = degreeWith h s := by
+    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E)
+    : arithDegree h = degreeWith h s := by
   let e : ι ≃ Fin (Module.finrank (𝓞 K) E) := Fintype.equivFinOfCardEq hcard
   rw [← degreeWith_reindex h e.symm s]
   exact (degreeWith_eq_of_linearIndependent h
-    (exists_linearIndependent_fin (K := K) (E := E)).choose_spec
-    (hs.comp e.symm e.symm.injective) (Fintype.card_fin _)).symm
+    (exists_linearIndependent_fin (K := K) (E := E)).choose_spec (hs.comp e.symm e.symm.injective)
+    (Fintype.card_fin _)).symm
 
-theorem norm_fibreVec_sq (h : HermitianMetric K E) (σ : K →+* ℂ) (e : E) :
-    ‖fibreVec h σ e‖ ^ 2 = ((h.form σ).inner ((1 : ComplexAt σ) ⊗ₜ e) (1 ⊗ₜ e)).re := by
+theorem norm_fibreVec_sq (h : HermitianMetric K E) (σ : K →+* ℂ) (e : E)
+    : ‖fibreVec h σ e‖ ^ 2 = ((h.form σ).inner ((1 : ComplexAt σ) ⊗ₜ e) (1 ⊗ₜ e)).re := by
   rw [@norm_sq_eq_re_inner ℂ]
   rfl
 
-theorem arithDegree_line (h : HermitianMetric K E) (hE : Module.finrank (𝓞 K) E = 1) {s : E}
-    (hs : s ≠ 0) :
-    arithDegree h = Real.log (Nat.card (E ⧸ Submodule.span (𝓞 K) {s})) -
-      ∑ σ : K →+* ℂ, Real.log ‖fibreVec h σ s‖ := by
+theorem arithDegree_line
+    (h : HermitianMetric K E) (hE : Module.finrank (𝓞 K) E = 1) {s : E} (hs : s ≠ 0)
+    : arithDegree h
+      = Real.log (Nat.card (E ⧸ Submodule.span (𝓞 K) {s}))
+        - ∑ σ : K →+* ℂ, Real.log ‖fibreVec h σ s‖ := by
   have hli : LinearIndependent (𝓞 K) (fun _ : Fin 1 ↦ s) := linearIndependent_unique_iff.mpr hs
   rw [arithDegree_eq h hli (by simp [hE]), degreeWith, Set.range_const]
   congr 1
@@ -336,12 +356,12 @@ theorem arithDegree_line (h : HermitianMetric K E) (hE : Module.finrank (𝓞 K)
   have hv : (inner ℂ (fibreVec h σ s) (fibreVec h σ s)).re = ‖fibreVec h σ s‖ ^ 2 :=
     (norm_sq_eq_re_inner (𝕜 := ℂ) _).symm
   rw [hv, Real.log_pow]
-  push_cast; ring
+  push_cast
+  ring
 
 theorem arithDegree_integers : arithDegree (HermitianMetric.integers K) = 0 := by
   rw [arithDegree_line _ (Module.finrank_self (𝓞 K)) one_ne_zero]
-  have h1 : Submodule.span (𝓞 K) {(1 : 𝓞 K)} = ⊤ := by
-    rw [← Ideal.span, Ideal.span_singleton_one]
+  have h1 : Submodule.span (𝓞 K) {(1 : 𝓞 K)} = ⊤ := by rw [← Ideal.span, Ideal.span_singleton_one]
   have h2 : ∀ σ : K →+* ℂ, ‖fibreVec (HermitianMetric.integers K) σ 1‖ = 1 := by
     intro σ
     have := norm_fibreVec_sq (HermitianMetric.integers K) σ 1
@@ -359,11 +379,10 @@ section Scale
 variable {V : Type*} [AddCommGroup V] [Module ℂ V]
 
 @[instance_reducible]
-def coreScale (hV : InnerProductSpace.Core ℂ V) (c : ℝ) (hc : 0 < c) :
-    InnerProductSpace.Core ℂ V where
+def coreScale (hV : InnerProductSpace.Core ℂ V) (c : ℝ) (hc : 0 < c)
+    : InnerProductSpace.Core ℂ V where
   inner x y := ((c ^ 2 : ℝ) : ℂ) * hV.inner x y
-  conj_inner_symm x y := by
-    rw [map_mul, Complex.conj_ofReal, hV.conj_inner_symm]
+  conj_inner_symm x y := by rw [map_mul, Complex.conj_ofReal, hV.conj_inner_symm]
   re_inner_nonneg x := by
     change 0 ≤ Complex.re _
     rw [Complex.re_ofReal_mul]
@@ -378,8 +397,9 @@ def coreScale (hV : InnerProductSpace.Core ℂ V) (c : ℝ) (hc : 0 < c) :
     have hc2 : ((c ^ 2 : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (pow_pos hc 2).ne'
     exact hV.definite x ((mul_eq_zero.mp hx).resolve_left hc2)
 
-theorem coreScale_inner (hV : InnerProductSpace.Core ℂ V) (c : ℝ) (hc : 0 < c) (x y : V) :
-    (coreScale hV c hc).inner x y = ((c ^ 2 : ℝ) : ℂ) * hV.inner x y := rfl
+theorem coreScale_inner (hV : InnerProductSpace.Core ℂ V) (c : ℝ) (hc : 0 < c) (x y : V)
+    : (coreScale hV c hc).inner x y = ((c ^ 2 : ℝ) : ℂ) * hV.inner x y :=
+  rfl
 
 end Scale
 
@@ -388,33 +408,41 @@ def HermitianMetric.scale (h : HermitianMetric K E) (c : ℝ) (hc : 0 < c) : Her
   form_conj σ x y := by
     rw [coreScale_inner, coreScale_inner, h.form_conj, map_mul, Complex.conj_ofReal]
 
-theorem gramDet_scale (h : HermitianMetric K E) (c : ℝ) (hc : 0 < c) (σ : K →+* ℂ) {ι : Type*}
-    [Fintype ι] [DecidableEq ι] (s : ι → E) :
-    gramDet (h.scale c hc) σ s = c ^ (2 * Fintype.card ι) * gramDet h σ s := by
+theorem gramDet_scale
+    (h : HermitianMetric K E)
+    (c : ℝ) (hc : 0 < c)
+    (σ : K →+* ℂ)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (s : ι → E)
+    : gramDet (h.scale c hc) σ s = c ^ (2 * Fintype.card ι) * gramDet h σ s := by
   simp only [gramDet]
-  have : (gram ℂ fun i ↦ fibreVec (h.scale c hc) σ (s i)) =
-      ((c ^ 2 : ℝ) : ℂ) • gram ℂ fun i ↦ fibreVec h σ (s i) := by
+  have : (gram ℂ fun i ↦ fibreVec (h.scale c hc) σ (s i))
+      = ((c ^ 2 : ℝ) : ℂ) • gram ℂ fun i ↦ fibreVec h σ (s i) := by
     ext i j
     rfl
   rw [this, det_smul, ← Complex.ofReal_pow, Complex.re_ofReal_mul, pow_mul]
 
-theorem arithDegree_scale (h : HermitianMetric K E) (c : ℝ) (hc : 0 < c) :
-    arithDegree (h.scale c hc) =
-      arithDegree h - Module.finrank (𝓞 K) E * Module.finrank ℚ K * Real.log c := by
+theorem arithDegree_scale (h : HermitianMetric K E) (c : ℝ) (hc : 0 < c)
+    : arithDegree (h.scale c hc)
+      = arithDegree h - Module.finrank (𝓞 K) E * Module.finrank ℚ K * Real.log c := by
   obtain ⟨s, hs⟩ := exists_linearIndependent_fin (K := K) (E := E)
-  rw [arithDegree_eq (h.scale c hc) hs (Fintype.card_fin _), arithDegree_eq h hs (Fintype.card_fin _)]
+  rw [arithDegree_eq (h.scale c hc) hs (Fintype.card_fin _),
+    arithDegree_eq h hs (Fintype.card_fin _)]
   simp only [degreeWith, gramDet_scale, Fintype.card_fin]
-  have hlog : ∀ σ : K →+* ℂ, Real.log (c ^ (2 * Module.finrank (𝓞 K) E) * gramDet h σ s) =
-      2 * Module.finrank (𝓞 K) E * Real.log c + Real.log (gramDet h σ s) := fun σ ↦ by
+  have hlog
+      : ∀ σ : K →+* ℂ,
+        Real.log (c ^ (2 * Module.finrank (𝓞 K) E) * gramDet h σ s)
+          = 2 * Module.finrank (𝓞 K) E * Real.log c + Real.log (gramDet h σ s) := fun σ ↦ by
     rw [Real.log_mul (pow_pos hc _).ne' (gramDet_pos h σ hs).ne', Real.log_pow]
-    push_cast; ring
+    push_cast
+    ring
   simp only [hlog]
   rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, NumberField.Embeddings.card,
     nsmul_eq_mul]
   ring
 
-theorem arithDegree_ratIntegers_scale (c : ℝ) (hc : 0 < c) :
-    arithDegree ((HermitianMetric.integers ℚ).scale c hc) = -Real.log c := by
+theorem arithDegree_ratIntegers_scale (c : ℝ) (hc : 0 < c)
+    : arithDegree ((HermitianMetric.integers ℚ).scale c hc) = - Real.log c := by
   rw [arithDegree_scale, arithDegree_integers, Module.finrank_self, Module.finrank_self]
   simp
 

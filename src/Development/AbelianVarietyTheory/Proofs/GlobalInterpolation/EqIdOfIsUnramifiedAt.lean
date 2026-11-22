@@ -8,17 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Disjoi
 @[expose] public section
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 namespace GlobalTheory.UnramifiedDiscriminant
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
 private lemma isCMExt_conj_ne_id (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) : σ ≠ AlgHom.id F E := by
   obtain ⟨-, hE, -, hτ⟩ := h
   intro hσ
@@ -35,8 +36,8 @@ private lemma isCMExt_conj_ne_id (h : _root_.Formalism.MainNotions.GlobalTheoryT
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
 private lemma isCMExt_mem_range_of_conj_fixed (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) {x : E} (hx : σ x = x) :
     x ∈ Set.range (algebraMap F E) := by
   have hprime : (Module.finrank F E).Prime := by rw [h.2.2.1]; exact Nat.prime_two
@@ -51,13 +52,14 @@ private lemma isCMExt_mem_range_of_conj_fixed (h : _root_.Formalism.MainNotions.
     have hmem : y ∈ AlgHom.equalizer σ (AlgHom.id F E) := h1 ▸ Algebra.mem_top
     exact hmem
 
-
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
-theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) (a : 𝓞 E) (ha : σ a = a) :
-    ∃ t : 𝓞 F, algebraMap (𝓞 F) (𝓞 E) t = a := by
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
+theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq
+    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
+    (a : 𝓞 E) (ha : σ a = a)
+    : ∃ t : 𝓞 F, algebraMap (𝓞 F) (𝓞 E) t = a := by
   obtain ⟨f, hf⟩ := isCMExt_mem_range_of_conj_fixed h ha
   have hint : IsIntegral ℤ f := by
     rw [← isIntegral_algebraMap_iff (B := E), hf]
@@ -68,8 +70,8 @@ theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq (h : _r
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
 private lemma isCMExt_conj_conj (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨-, -, -, hτ⟩ := h
   let τ : E →+* ℂ := (IsAlgClosed.lift (M := ℂ) (R := ℚ) (S := E)).toRingHom
@@ -78,16 +80,22 @@ private lemma isCMExt_conj_conj (h : _root_.Formalism.MainNotions.GlobalTheoryTh
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
-theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_discr_notMem (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
-    (v : HeightOneSpectrum (𝓞 F)) (hv : _root_.GlobalTheory.IndefiniteRowSideFullHecke.SelfDualUnramifiedPlaces.UnramifiedPlace F E v) :
-    ∃ (w : E) (t n : 𝓞 F), w + σ w = algebraMap F E (t : F) ∧ w * σ w = algebraMap F E (n : F) ∧
-      t ^ 2 - 4 * n ∉ v.asIdeal := by
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
+theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_discr_notMem
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
+    (v : HeightOneSpectrum (𝓞 F))
+    (hv : _root_.GlobalTheory.IndefiniteRowSideFullHecke.SelfDualUnramifiedPlaces.UnramifiedPlace F
+      E v)
+    : ∃ (w : E) (t n : 𝓞 F),
+      w + σ w = algebraMap F E (t : F) ∧ w * σ w = algebraMap F E (n : F)
+        ∧ t ^ 2 - 4 * n ∉ v.asIdeal := by
   have hinj : Function.Injective (algebraMap (𝓞 F) (𝓞 E)) := FaithfulSMul.algebraMap_injective _ _
-  obtain ⟨P, -, hPp, hPv⟩ := Ideal.exists_ideal_over_prime_of_isIntegral v.asIdeal (⊥ : Ideal (𝓞 E))
-    (by rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]; exact bot_le)
+  obtain ⟨P, -, hPp, hPv⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral v.asIdeal (⊥ : Ideal (𝓞 E))
+      (by rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ hinj)]; exact bot_le)
   have hPne : P ≠ ⊥ := by
     rintro rfl
     apply v.ne_bot
@@ -114,12 +122,14 @@ theorem _root_.GlobalTheory.UnramifiedDiscriminant.exists_discr_notMem (F E : Ty
     exact DFunLike.congr_fun h1 z
   set y : 𝓞 E := σ' • x
   have hy : (y : E) = σ x := rfl
-  obtain ⟨t, ht⟩ := _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq h (x + y) (by
-    show σ ((x : E) + σ x) = (x : E) + σ x
-    rw [map_add (f := _), isCMExt_conj_conj h, add_comm])
-  obtain ⟨n, hn⟩ := _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq h (x * y) (by
-    show σ ((x : E) * σ x) = (x : E) * σ x
-    rw [map_mul, isCMExt_conj_conj h, mul_comm])
+  obtain ⟨t, ht⟩ :=
+    _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq h (x + y) (by
+      show σ ((x : E) + σ x) = (x : E) + σ x
+      rw [map_add (f := _), isCMExt_conj_conj h, add_comm])
+  obtain ⟨n, hn⟩ :=
+    _root_.GlobalTheory.UnramifiedDiscriminant.exists_int_of_conj_eq h (x * y) (by
+      show σ ((x : E) * σ x) = (x : E) * σ x
+      rw [map_mul, isCMExt_conj_conj h, mul_comm])
   refine ⟨x, t, n, ?_, ?_, ?_⟩
   · rw [← hy]
     exact (congrArg (fun z : 𝓞 E => (z : E)) ht).symm

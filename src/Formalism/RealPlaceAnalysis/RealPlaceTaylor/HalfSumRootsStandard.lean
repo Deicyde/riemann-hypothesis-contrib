@@ -27,29 +27,33 @@ lemma rho_rhoN_bound {n : ℕ} (ε : Fin n → Bool) (a : Fin n) :
 theorem half_sum_roots_standard : RhoStd := by
   intro n ε a
   unfold rhoC rhoN
-  have k1 : #{b | a < b ∧ ε b = ε a} + #{b | a < b ∧ ε b ≠ ε a} = #{b | a < b} := by
+  have k1 : # {b | a < b ∧ ε b = ε a} + # {b | a < b ∧ ε b ≠ ε a} = # {b | a < b} := by
     simp only [Finset.card_filter, ← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl
     intro b _
     by_cases h1 : a < b <;> by_cases h2 : ε b = ε a <;> simp [h1, h2]
-  have k2 : #{b | b < a ∧ ε b = ε a} + #{b | b < a ∧ ε b ≠ ε a} = #{b | b < a} := by
+  have k2 : # {b | b < a ∧ ε b = ε a} + # {b | b < a ∧ ε b ≠ ε a} = # {b | b < a} := by
     simp only [Finset.card_filter, ← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl
     intro b _
     by_cases h1 : b < a <;> by_cases h2 : ε b = ε a <;> simp [h1, h2]
-  have k3 : #{b | a < b} = n - 1 - (a : ℕ) := by
+  have k3 : # {b | a < b} = n - 1 - (a : ℕ) := by
     rw [show (univ.filter fun b : Fin n => a < b) = Finset.Ioi a by ext b; simp]
     exact Fin.card_Ioi a
-  have k4 : #{b | b < a} = (a : ℕ) := by
+  have k4 : # {b | b < a} = (a : ℕ) := by
     rw [show (univ.filter fun b : Fin n => b < a) = Finset.Iio a by ext b; simp]
     exact Fin.card_Iio a
   have ha := a.isLt
-  have r1 : ((#{b | a < b ∧ ε b = ε a} : ℕ) : ℝ) + ((#{b | a < b ∧ ε b ≠ ε a} : ℕ) : ℝ)
-      + ((a : ℕ) : ℝ) + 1 = (n : ℝ) := by
-    exact_mod_cast (show #{b | a < b ∧ ε b = ε a} + #{b | a < b ∧ ε b ≠ ε a} + (a : ℕ) + 1 = n by omega)
-  have r2 : ((#{b | b < a ∧ ε b = ε a} : ℕ) : ℝ) + ((#{b | b < a ∧ ε b ≠ ε a} : ℕ) : ℝ)
-      = ((a : ℕ) : ℝ) := by
-    exact_mod_cast (show #{b | b < a ∧ ε b = ε a} + #{b | b < a ∧ ε b ≠ ε a} = (a : ℕ) by omega)
+  have r1
+      : ((# {b | a < b ∧ ε b = ε a} : ℕ) : ℝ) + ((# {b | a < b ∧ ε b ≠ ε a} : ℕ) : ℝ)
+          + ((a : ℕ) : ℝ) + 1
+        = (n : ℝ) := by
+    exact_mod_cast (show # {b | a < b ∧ ε b = ε a} + # {b | a < b ∧ ε b ≠ ε a} + (a : ℕ) + 1 = n by
+      omega)
+  have r2
+      : ((# {b | b < a ∧ ε b = ε a} : ℕ) : ℝ) + ((# {b | b < a ∧ ε b ≠ ε a} : ℕ) : ℝ)
+        = ((a : ℕ) : ℝ) := by
+    exact_mod_cast (show # {b | b < a ∧ ε b = ε a} + # {b | b < a ∧ ε b ≠ ε a} = (a : ℕ) by omega)
   linarith
 
 lemma rho_nsq_root {n : ℕ} (x : Fin n → ℝ) (a b : Fin n) (hab : a ≠ b) :
@@ -68,7 +72,9 @@ lemma rho_nsq_root {n : ℕ} (x : Fin n → ℝ) (a b : Fin n) (hab : a ≠ b) :
 
 theorem omega_eigenvalue_holds : OmEigen := by
   intro n ε lam a b hab
-  have e : lam + rhoN ε - rhoC ε + root a b + rhoC ε = (lam + rhoN ε - rhoC ε + rhoC ε) + root a b := by
+  have e
+      : lam + rhoN ε - rhoC ε + root a b + rhoC ε
+        = (lam + rhoN ε - rhoC ε + rhoC ε) + root a b := by
     abel
   rw [e, rho_nsq_root _ a b hab]
   simp only [Pi.add_apply, Pi.sub_apply]

@@ -5,12 +5,12 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-private theorem common_eigenvector_commuting_family {T D : Type}
-    [AddCommGroup D] [_root_.Module ℂ D] [FiniteDimensional ℂ D] (φ : T → _root_.Module.End ℂ D)
-    (hc : ∀ (s t : T), Commute (φ s) (φ t)) :
-    ∀ (n : ℕ) (W : Submodule ℂ D), _root_.Module.finrank ℂ W = n → W ≠ ⊥ →
-      (∀ (t : T), ∀ x ∈ W, φ t x ∈ W) →
-      ∃ (l : D) (a : T → ℂ), l ≠ (0 : D) ∧ ∀ (t : T), (φ t : D → D) l = a t • l := by
+private theorem common_eigenvector_commuting_family
+    {T D : Type} [AddCommGroup D] [_root_.Module ℂ D] [FiniteDimensional ℂ D]
+    (φ : T → _root_.Module.End ℂ D) (hc : ∀ (s t : T), Commute (φ s) (φ t))
+    : ∀ (n : ℕ) (W : Submodule ℂ D),
+      _root_.Module.finrank ℂ W = n → W ≠ ⊥ → (∀ (t : T), ∀ x ∈ W, φ t x ∈ W)
+        → ∃ (l : D) (a : T → ℂ), l ≠ (0 : D) ∧ ∀ (t : T), (φ t : D → D) l = a t • l := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -52,9 +52,10 @@ private theorem common_eigenvector_commuting_family {T D : Type}
         exact congrArg (fun f : _root_.Module.End ℂ D => f y) this
       rw [h1, hyc, map_smul]
 
-theorem UpperTheory.Reformulated.B.CommonEigenvectorExistence.common_eigenvector :
-    ∀ {T D : Type}
-    [inst : AddCommGroup D] [inst_1 : _root_.Module ℂ D] [FiniteDimensional ℂ D] [Nontrivial D] (φ : T → Module.End ℂ D),
-    (∀ (s t : T), Commute (φ s) (φ t)) → ∃ (l : D) (a : T → ℂ), l ≠ (0 : D) ∧ ∀ (t : T), (φ t : D → D) l = a t • l := by
+theorem UpperTheory.Reformulated.B.CommonEigenvectorExistence.common_eigenvector
+    : ∀ {T D : Type} [inst : AddCommGroup D] [inst_1 : _root_.Module ℂ D] [FiniteDimensional ℂ D]
+        [Nontrivial D] (φ : T → Module.End ℂ D),
+      (∀ (s t : T), Commute (φ s) (φ t))
+        → ∃ (l : D) (a : T → ℂ), l ≠ (0 : D) ∧ ∀ (t : T), (φ t : D → D) l = a t • l := by
   intro T D _ _ _ _ φ hc
   exact common_eigenvector_commuting_family φ hc _ ⊤ rfl top_ne_bot (fun _ _ _ => Submodule.mem_top)

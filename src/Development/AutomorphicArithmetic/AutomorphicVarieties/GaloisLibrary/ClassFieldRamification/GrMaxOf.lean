@@ -7,8 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.grMaxOf :
-    ∀ (p : ℕ) [Fact p.Prime] (R G : Type) [CommRing R] [IsLocalRing R] [CommGroup G] [Finite G], (p : R) ∈ IsLocalRing.maximalIdeal R → IsPGroup p G → ∀ M : Ideal (MonoidAlgebra R G), M.IsMaximal → M = (IsLocalRing.maximalIdeal R).comap (aug R G) := by
+theorem UpperTheory.V.CF.grMaxOf
+    : ∀ (p : ℕ) [Fact p.Prime] (R G : Type) [CommRing R] [IsLocalRing R] [CommGroup G] [Finite G],
+      (p : R) ∈ IsLocalRing.maximalIdeal R → IsPGroup p G
+        → ∀ M : Ideal (MonoidAlgebra R G),
+          M.IsMaximal → M = (IsLocalRing.maximalIdeal R).comap (aug R G) := by
   intro p _ R G _ _ _ _ hpm hG M hM
   classical
   have hcomap : M.comap (algebraMap R (MonoidAlgebra R G)) = IsLocalRing.maximalIdeal R :=
@@ -16,8 +19,7 @@ theorem UpperTheory.V.CF.grMaxOf :
   letI : Field (MonoidAlgebra R G ⧸ M) := Ideal.Quotient.field M
   have hpQ : ((p : ℕ) : MonoidAlgebra R G ⧸ M) = 0 := by
     rw [← map_natCast (Ideal.Quotient.mk M), Ideal.Quotient.eq_zero_iff_mem]
-    have h0 : (p : R) ∈ M.comap (algebraMap R (MonoidAlgebra R G)) := by
-      rw [hcomap]; exact hpm
+    have h0 : (p : R) ∈ M.comap (algebraMap R (MonoidAlgebra R G)) := by rw [hcomap]; exact hpm
     simpa using h0
   haveI : CharP (MonoidAlgebra R G ⧸ M) p := by
     have h := CharP.ringChar_of_prime_eq_zero (Fact.out : p.Prime) hpQ
@@ -41,8 +43,7 @@ theorem UpperTheory.V.CF.grMaxOf :
     have h3 := congrArg (fun f => f x) hext
     simp only [Ideal.Quotient.mkₐ_eq_mk, AlgHom.comp_apply, Algebra.ofId_apply] at h3
     rw [h3, ← Ideal.Quotient.mk_algebraMap, Ideal.Quotient.eq_zero_iff_mem]
-    have h2 : aug R G x ∈ M.comap (algebraMap R (MonoidAlgebra R G)) := by
-      rw [hcomap]; exact hx
+    have h2 : aug R G x ∈ M.comap (algebraMap R (MonoidAlgebra R G)) := by rw [hcomap]; exact hx
     exact h2
   haveI : ((IsLocalRing.maximalIdeal R).comap (aug R G)).IsMaximal :=
     Ideal.comap_isMaximal_of_surjective (aug R G) (fun r => ⟨MonoidAlgebra.single 1 r, aug_single R G 1 r⟩)

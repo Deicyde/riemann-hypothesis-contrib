@@ -29,7 +29,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Fundame
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG GlobalTheory.LFun Formalism.L2.Host
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG
+  GlobalTheory.LFun Formalism.L2.Host
 open scoped ENNReal ComplexConjugate ContDiff
 
 namespace GlobalTheory.RSnmUnfold

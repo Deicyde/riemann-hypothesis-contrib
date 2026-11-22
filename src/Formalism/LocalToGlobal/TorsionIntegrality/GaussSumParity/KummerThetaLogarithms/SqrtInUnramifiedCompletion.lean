@@ -237,16 +237,17 @@ open GaussNormEstimates
 theorem sqrt_in_unramified_completion : SqrtKur := by
   intro dK _ _ l _ h5 hin ι
   have h2 : 2 < l := by omega
-  have hr : (ι (rt dK)) ^ 2 = ((-(dK : ℤ) : ℤ) : ℂ_[l]) := by
-    rw [← map_pow, rt_sq]; simp
+  have hr : (ι (rt dK)) ^ 2 = ((-(dK : ℤ) : ℤ) : ℂ_[l]) := by rw [← map_pow, rt_sq]; simp
   have hmem : ι (rt dK) ∈ MaximalUnramifiedExtension l := sqrt_mem h2 _ _ hr (not_dvd_of_inert hin)
   have hom : ι (omegaK dK) = (1 + ι (rt dK)) / 2 := by
     have h0 : 2 * ι (omegaK dK) - 1 = ι (rt dK) := by
       rw [← omega_eq, map_sub, map_mul, map_ofNat, map_one]
-    rw [← h0]; ring
+    rw [← h0]
+    ring
   refine ⟨?_, ?_⟩
   · rw [hom]
-    refine (MaximalUnramifiedExtension l).div_mem ((MaximalUnramifiedExtension l).add_mem (MaximalUnramifiedExtension l).one_mem hmem) ?_
+    refine (MaximalUnramifiedExtension l).div_mem
+      ((MaximalUnramifiedExtension l).add_mem (MaximalUnramifiedExtension l).one_mem hmem) ?_
     exact_mod_cast natCast_mem (MaximalUnramifiedExtension l) 2
   · intro σ hσ w hw
     have hR : (w + w - 1) ^ 2 = ((-(dK : ℤ) : ℤ) : MaximalUnramifiedExtension l) := by
@@ -255,9 +256,9 @@ theorem sqrt_in_unramified_completion : SqrtKur := by
       rw [hw, hom]
       have := hr
       push_cast at this
-      rw [← this]; ring
-    have hin' : ¬ ∃ a : ZMod l, a ^ 2 = ((-(dK : ℤ) : ℤ) : ZMod l) := by
-      push_cast; exact hin
+      rw [← this]
+      ring
+    have hin' : ¬ ∃ a : ZMod l, a ^ 2 = ((-(dK : ℤ) : ℤ) : ZMod l) := by push_cast; exact hin
     have h := sigma_neg σ hσ _ hin' _ hR
     simp only [map_sub, map_add (f := _), map_one] at h
     have h20 : (2 : MaximalUnramifiedExtension l) ≠ 0 := two_ne_zero
@@ -270,7 +271,8 @@ theorem dense_criterion : DenseOK := by
   obtain ⟨hwm, hws⟩ := sqrt_in_unramified_completion dK hsq h4 l h5 hin ι
   set w : MaximalUnramifiedExtension l := ⟨ι (omegaK dK), hwm⟩ with hwdef
   have hw : σ w = 1 - w := hws σ hσ w rfl
-  have hiso : ∀ a : MaximalUnramifiedExtension l, ‖σ a‖ = ‖a‖ := sigmaIsom (MaximalUnramifiedExtension l) l σ hσ
+  have hiso : ∀ a : MaximalUnramifiedExtension l, ‖σ a‖ = ‖a‖ :=
+    sigmaIsom (MaximalUnramifiedExtension l) l σ hσ
 
   have hR2 : (w + w - 1) ^ 2 = ((-(dK : ℤ) : ℤ) : MaximalUnramifiedExtension l) := by
     apply Subtype.ext
@@ -279,15 +281,14 @@ theorem dense_criterion : DenseOK := by
       rw [← omega_eq, map_sub, map_mul, map_ofNat, map_one]; ring
     rw [hwdef]
     simp only
-    rw [h0, ← map_pow, rt_sq]; simp
+    rw [h0, ← map_pow, rt_sq]
+    simp
   set R : MaximalUnramifiedExtension l := w + w - 1 with hRdef
-  have hσR : σ R = -R := by
-    rw [hRdef]; simp only [map_sub, map_add (f := _), map_one, hw]; ring
+  have hσR : σ R = -R := by rw [hRdef]; simp only [map_sub, map_add (f := _), map_one, hw]; ring
   have hR1 : ‖R‖ = 1 := by
     have h1 : ‖R‖ ^ 2 = 1 := by rw [← norm_pow, hR2, normKZ_one (not_dvd_of_inert hin)]
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (by norm_num)).1 h1
-  have hR0 : R ≠ 0 := by
-    intro h; rw [h, norm_zero] at hR1; exact zero_ne_one hR1
+  have hR0 : R ≠ 0 := by intro h; rw [h, norm_zero] at hR1; exact zero_ne_one hR1
   have hn2 : ‖(2 : MaximalUnramifiedExtension l)‖ = 1 := by
     have := normKZ_one (l := l) (two_not_dvd h2)
     simpa using this
@@ -328,19 +329,24 @@ theorem dense_criterion : DenseOK := by
     rw [h0]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (by rwa [norm_neg]) ?_)
     rw [norm_mul, norm_neg]
-    calc ‖n0 - n‖ * ‖w‖ ≤ ((l : ℝ) ^ k)⁻¹ * 1 :=
-          mul_le_mul hn hw1 (norm_nonneg _) (by positivity)
+    calc
+      ‖n0 - n‖ * ‖w‖
+        ≤ ((l : ℝ) ^ k)⁻¹ * 1 := mul_le_mul hn hw1 (norm_nonneg _) (by positivity)
       _ = _ := mul_one _
   have hβ1 : ‖β‖ = 1 :=
     norm_one_of_close (lt_of_le_of_lt hβα (lt_of_lt_of_le hk (min_le_right _ _))) hα
-  have hσβ : σ β = (m : MaximalUnramifiedExtension l) + (n : MaximalUnramifiedExtension l) * (1 - w) := by
+  have hσβ
+      : σ β
+        = (m : MaximalUnramifiedExtension l) + (n : MaximalUnramifiedExtension l) * (1 - w) := by
     rw [hβ, map_add (f := _), map_mul, map_natCast, map_natCast, hw]
   obtain ⟨q, hq⟩ : ∃ q : ℤ, (dK : ℤ) + 1 = 4 * q := ⟨((dK : ℤ) + 1) / 4, by omega⟩
   have hq' : ((dK : ℤ) + 1) / 4 = q := by omega
   have hwq : w * (1 - w) = (q : MaximalUnramifiedExtension l) := by
     have h40 : (4 : MaximalUnramifiedExtension l) ≠ 0 := by norm_num
     apply mul_left_cancel₀ h40
-    have h1 : ((dK : MaximalUnramifiedExtension l)) + 1 = 4 * (q : MaximalUnramifiedExtension l) := by exact_mod_cast congrArg (fun z : ℤ => (z : MaximalUnramifiedExtension l)) hq
+    have h1
+        : ((dK : MaximalUnramifiedExtension l)) + 1 = 4 * (q : MaximalUnramifiedExtension l) := by
+      exact_mod_cast congrArg (fun z : ℤ => (z : MaximalUnramifiedExtension l)) hq
     have h3 := hR2
     rw [hRdef] at h3
     push_cast at h3
@@ -356,8 +362,11 @@ theorem dense_criterion : DenseOK := by
     have h1 := normKZ_lt.2 hd
     rw [← hnorm, norm_mul, hiso, hβ1] at h1
     norm_num at h1
-  · have h0 : ι (((m : ℤ) : ℂ) + ((n : ℤ) : ℂ) * omegaK dK) - (α : ℂ_[l]) = ((β - α : MaximalUnramifiedExtension l) : ℂ_[l]) := by
-      rw [hβ, hwdef]; push_cast
+  · have h0
+        : ι (((m : ℤ) : ℂ) + ((n : ℤ) : ℂ) * omegaK dK) - (α : ℂ_[l])
+          = ((β - α : MaximalUnramifiedExtension l) : ℂ_[l]) := by
+      rw [hβ, hwdef]
+      push_cast
       simp
     rw [h0, ← normK]
     exact lt_of_le_of_lt hβα (lt_of_lt_of_le hk (min_le_left _ _))

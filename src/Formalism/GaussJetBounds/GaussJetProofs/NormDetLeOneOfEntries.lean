@@ -15,8 +15,9 @@ namespace Formalism.DworkPowerSeriesWeights
 theorem oddExponentCount : JCount := by
   intro l a hl ha
   set L := Nat.log l a with hLdef
-  have hsub : (Finset.Icc (-(a : ℤ)) a).filter (fun j => Odd j ∧ l ^ j.natAbs ≤ a) ⊆
-      Finset.Icc (-(L : ℤ)) L := by
+  have hsub
+      : (Finset.Icc (-(a : ℤ)) a).filter (fun j => Odd j ∧ l ^ j.natAbs ≤ a)
+        ⊆ Finset.Icc (-(L : ℤ)) L := by
     intro j hj
     simp only [Finset.mem_filter, Finset.mem_Icc] at hj ⊢
     have h1 : j.natAbs ≤ L := Nat.le_log_of_pow_le (by omega) hj.2.2
@@ -26,8 +27,10 @@ theorem oddExponentCount : JCount := by
   have h2 : ((L : ℤ) + 1 - -(L : ℤ)).toNat = 2 * L + 1 := by omega
   rw [h2] at hcard
   have hL : (L : ℝ) ≤ Real.logb l a := Real.natLog_le_logb a l
-  have h3 : ((((Finset.Icc (-(a : ℤ)) a).filter (fun j => Odd j ∧ l ^ j.natAbs ≤ a)).card : ℕ) : ℝ)
-      ≤ ((2 * L + 1 : ℕ) : ℝ) := by exact_mod_cast hcard
+  have h3
+      : ((((Finset.Icc (-(a : ℤ)) a).filter (fun j => Odd j ∧ l ^ j.natAbs ≤ a)).card : ℕ) : ℝ)
+        ≤ ((2 * L + 1 : ℕ) : ℝ) := by
+    exact_mod_cast hcard
   push_cast at h3
   linarith
 

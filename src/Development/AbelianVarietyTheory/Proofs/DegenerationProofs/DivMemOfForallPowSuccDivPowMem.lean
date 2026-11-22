@@ -8,10 +8,11 @@ open Module
 
 namespace GlobalTheory.ZH
 
-theorem div_mem_of_forall_pow_succ_div_pow_mem :
-    ∀ (Ω : Type) [Field Ω] (O : Subring Ω) [ValuationRing O] [IsNoetherianRing O],
-      (∀ x : Ω, x ∈ O ∨ x⁻¹ ∈ O) → ∀ f f' : Ω, f ≠ 0 → f' ≠ 0 →
-        (∀ j : ℕ, 1 ≤ j → f' ^ (j + 1) / f ^ j ∈ O) → f' / f ∈ O := by
+theorem div_mem_of_forall_pow_succ_div_pow_mem
+    : ∀ (Ω : Type) [Field Ω] (O : Subring Ω) [ValuationRing O] [IsNoetherianRing O],
+      (∀ x : Ω, x ∈ O ∨ x⁻¹ ∈ O)
+        → ∀ f f' : Ω,
+          f ≠ 0 → f' ≠ 0 → (∀ j : ℕ, 1 ≤ j → f' ^ (j + 1) / f ^ j ∈ O) → f' / f ∈ O := by
   intro Ω _ O _ _ hO f f' hf hf' h
   by_contra hn
   have hg : f / f' ∈ O := by

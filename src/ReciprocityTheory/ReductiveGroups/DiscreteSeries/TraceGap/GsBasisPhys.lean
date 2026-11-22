@@ -25,18 +25,21 @@ theorem sIdx_eq (ε : Fin n → Bool) : sIdx ε = (lowerWedgeAlt ε).1 := by
   rw [mem_lowerWedge_iff]
   simp [sIdx, sModes]
 
-theorem gs_basis_deg (S : Finset (Fin (n * n))) : fockBasis n S ∈ ⋀[ℂ]^S.card (Fin n × Fin n → ℂ) := by
-  have hb : fockBasis n S = ExteriorAlgebra.ιMulti ℂ S.card
-      (((Pi.basisFun ℂ (Fin n × Fin n)).reindex finProdFinEquiv) ∘ S.orderEmbOfFin rfl) := by
+theorem gs_basis_deg (S : Finset (Fin (n * n)))
+    : fockBasis n S ∈ ⋀[ℂ]^S.card (Fin n × Fin n → ℂ) := by
+  have hb
+      : fockBasis n S
+        = ExteriorAlgebra.ιMulti ℂ S.card
+          (((Pi.basisFun ℂ (Fin n × Fin n)).reindex finProdFinEquiv) ∘ S.orderEmbOfFin rfl) := by
     rw [fockBasis, ExteriorAlgebra.basis_apply]
     rfl
   rw [hb]
   exact ExteriorAlgebra.ιMulti_range ℂ S.card ⟨_, rfl⟩
 
-theorem sDeg_eq_sum (ε : Fin n → Bool) :
-    (sDeg ε : ℝ) = ∑ a ∈ plusIdx ε, (rhoHol ε - rhoN ε) a := by
-  have h1 : ∀ a ∈ plusIdx ε, (rhoHol ε - rhoN ε) a =
-      ((univ.filter fun b => ε b = false ∧ b < a).card : ℝ) := by
+theorem sDeg_eq_sum (ε : Fin n → Bool) : (sDeg ε : ℝ) = ∑ a ∈ plusIdx ε, (rhoHol ε - rhoN ε) a := by
+  have h1
+      : ∀ a ∈ plusIdx ε,
+        (rhoHol ε - rhoN ε) a = ((univ.filter fun b => ε b = false ∧ b < a).card : ℝ) := by
     intro a ha
     rw [lf_rhoHol_sub_rhoN, if_pos (by simpa [plusIdx] using ha)]
   rw [Finset.sum_congr rfl h1]

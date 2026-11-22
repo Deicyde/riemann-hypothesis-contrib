@@ -13,8 +13,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValua
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -36,45 +38,60 @@ theorem flat_fromSpecStalk (X : Scheme.{u}) (x : X) : Flat (X.fromSpecStalk x) :
   have h₃ : Flat (IsAffineOpen.fromSpec hU) := inferInstance
   exact MorphismProperty.comp_mem @Flat _ _ this h₃
 
-theorem exists_hom_specStalk {W Y T X : Scheme.{u}} (j : W ⟶ Y) [IsSchemeTheoreticallyDominant j]
-    [QuasiCompact j] [X.IsSeparated] (F : W ⟶ X) (g' : T ⟶ Y) [Flat g'] (g : T ⟶ X)
-    (H : ∀ (Z : Scheme.{u}) (ρ : Z ⟶ T) (r : Z ⟶ W), r ≫ j = ρ ≫ g' → r ≫ F = ρ ≫ g) (p : T) :
-    ∃ φ : Spec (Y.presheaf.stalk (g' p)) ⟶ X, ∀ (Z : Scheme.{u})
-      (ρ : Z ⟶ Spec (Y.presheaf.stalk (g' p))) (r : Z ⟶ W),
-      r ≫ j = ρ ≫ Y.fromSpecStalk (g' p) → r ≫ F = ρ ≫ φ := by
+theorem exists_hom_specStalk
+    {W Y T X : Scheme.{u}} (j : W ⟶ Y)
+    [IsSchemeTheoreticallyDominant j] [QuasiCompact j] [X.IsSeparated]
+    (F : W ⟶ X)
+    (g' : T ⟶ Y) [Flat g']
+    (g : T ⟶ X) (H : ∀ (Z : Scheme.{u}) (ρ : Z ⟶ T) (r : Z ⟶ W), r ≫ j = ρ ≫ g' → r ≫ F = ρ ≫ g)
+    (p : T)
+    : ∃ φ : Spec (Y.presheaf.stalk (g' p)) ⟶ X,
+      ∀ (Z : Scheme.{u}) (ρ : Z ⟶ Spec (Y.presheaf.stalk (g' p))) (r : Z ⟶ W),
+        r ≫ j = ρ ≫ Y.fromSpecStalk (g' p) → r ≫ F = ρ ≫ φ := by
   let h := Spec.map (g'.stalkMap p)
   obtain ⟨h₁, h₂⟩ : Flat h ∧ Surjective h :=
     (flat_and_surjective_SpecMap_iff _).2 (faithfullyFlat_stalkMap_of_flat g' p)
   have hh : h ≫ Y.fromSpecStalk (g' p) = T.fromSpecStalk p ≫ g' :=
     Scheme.SpecMap_stalkMap_fromSpecStalk g'
   have := flat_fromSpecStalk Y (g' p)
-  have key : pullback.fst h h ≫ T.fromSpecStalk p ≫ g = pullback.snd h h ≫ T.fromSpecStalk p ≫ g := by
+  have key
+      : pullback.fst h h ≫ T.fromSpecStalk p ≫ g = pullback.snd h h ≫ T.fromSpecStalk p ≫ g := by
     let q := pullback.fst h h ≫ h ≫ Y.fromSpecStalk (g' p)
     have hq : Flat q := inferInstance
     refine hom_ext_of_isSchemeTheoreticallyDominant (pullback.fst q j) (terminal.from X) ?_
       (terminal.hom_ext _ _)
-    have e₁ := H _ (pullback.fst q j ≫ pullback.fst h h ≫ T.fromSpecStalk p) (pullback.snd q j) (by
-      rw [← pullback.condition]; simp only [q, Category.assoc, hh])
-    have e₂ := H _ (pullback.fst q j ≫ pullback.snd h h ≫ T.fromSpecStalk p) (pullback.snd q j) (by
-      rw [← pullback.condition]
-      simp only [q, Category.assoc, ← hh, pullback.condition_assoc])
+    have e₁ :=
+      H _ (pullback.fst q j ≫ pullback.fst h h ≫ T.fromSpecStalk p) (pullback.snd q j)
+        (by rw [← pullback.condition]; simp only [q, Category.assoc, hh])
+    have e₂ :=
+      H _ (pullback.fst q j ≫ pullback.snd h h ≫ T.fromSpecStalk p) (pullback.snd q j) (by
+        rw [← pullback.condition]
+        simp only [q, Category.assoc, ← hh, pullback.condition_assoc])
     simpa only [Category.assoc] using e₁.symm.trans e₂
-  let φ := EffectiveEpi.desc h (T.fromSpecStalk p ≫ g) (fun a b hab => by
-    have := congrArg (pullback.lift a b hab ≫ ·) key
-    simpa only [pullback.lift_fst_assoc, pullback.lift_snd_assoc] using this)
+  let φ :=
+    EffectiveEpi.desc h (T.fromSpecStalk p ≫ g) (fun a b hab => by
+      have := congrArg (pullback.lift a b hab ≫ ·) key
+      simpa only [pullback.lift_fst_assoc, pullback.lift_snd_assoc] using this)
   have hφ : h ≫ φ = T.fromSpecStalk p ≫ g := EffectiveEpi.fac _ _ _
   refine ⟨φ, fun Z ρ r hr => ?_⟩
   rw [← cancel_epi (pullback.fst ρ h), pullback.condition_assoc, hφ]
-  have := H _ (pullback.snd ρ h ≫ T.fromSpecStalk p) (pullback.fst ρ h ≫ r) (by
-    rw [Category.assoc, hr, pullback.condition_assoc, hh, Category.assoc])
+  have :=
+    H _ (pullback.snd ρ h ≫ T.fromSpecStalk p) (pullback.fst ρ h ≫ r)
+      (by rw [Category.assoc, hr, pullback.condition_assoc, hh, Category.assoc])
   simpa only [Category.assoc] using this
 
-theorem exists_extension {W Y X S : Scheme.{u}} (j : W ⟶ Y) [IsOpenImmersion j] [IsDominant j]
-    [QuasiCompact j] [IsIntegral Y] [S.IsSeparated] (sY : Y ⟶ S) (sX : X ⟶ S) [IsSeparated sX]
-    [LocallyOfFiniteType sX] (F : W ⟶ X) (hF : F ≫ sX = j ≫ sY)
-    (H : ∀ y : Y, y ∉ Set.range j → ∃ (T : Scheme.{u}) (g' : T ⟶ Y) (g : T ⟶ X), Flat g' ∧ y ∈ Set.range g' ∧
-      ∀ (Z : Scheme.{u}) (ρ : Z ⟶ T) (r : Z ⟶ W), r ≫ j = ρ ≫ g' → r ≫ F = ρ ≫ g) :
-    ∃ ψ : Y ⟶ X, j ≫ ψ = F ∧ ψ ≫ sX = sY := by
+theorem exists_extension
+    {W Y X S : Scheme.{u}} (j : W ⟶ Y)
+    [IsOpenImmersion j] [IsDominant j] [QuasiCompact j] [IsIntegral Y] [S.IsSeparated]
+    (sY : Y ⟶ S)
+    (sX : X ⟶ S) [IsSeparated sX] [LocallyOfFiniteType sX]
+    (F : W ⟶ X) (hF : F ≫ sX = j ≫ sY)
+    (H : ∀ y : Y,
+      y ∉ Set.range j
+        → ∃ (T : Scheme.{u}) (g' : T ⟶ Y) (g : T ⟶ X),
+          Flat g' ∧ y ∈ Set.range g'
+            ∧ ∀ (Z : Scheme.{u}) (ρ : Z ⟶ T) (r : Z ⟶ W), r ≫ j = ρ ≫ g' → r ≫ F = ρ ≫ g)
+    : ∃ ψ : Y ⟶ X, j ≫ ψ = F ∧ ψ ≫ sX = sY := by
   have hX : X.IsSeparated := ⟨by rw [← terminal.comp_from sX]; infer_instance⟩
   have : IsSchemeTheoreticallyDominant j := .of_isDominant j
   let e₀ := Y.fromSpecStalk (genericPoint Y)
@@ -83,14 +100,16 @@ theorem exists_extension {W Y X S : Scheme.{u}} (j : W ⟶ Y) [IsOpenImmersion j
     rw [Scheme.range_fromSpecStalk]
     intro z hz
     have hg : genericPoint Y ∈ Set.range j :=
-      (genericPoint_spec Y).mem_open_set_iff j.isOpenEmbedding.isOpen_range |>.2
-        (by simpa [Set.range_nonempty_iff_nonempty] using j.denseRange.nonempty)
+      (genericPoint_spec Y).mem_open_set_iff j.isOpenEmbedding.isOpen_range
+        |>.2 (by simpa [Set.range_nonempty_iff_nonempty] using j.denseRange.nonempty)
     exact Specializes.mem_open hz j.isOpenEmbedding.isOpen_range hg
   let e := IsOpenImmersion.lift j e₀ hr
   have he : e ≫ j = e₀ := IsOpenImmersion.lift_fac _ _ _
-  have loc : ∀ y : Y, ∃ (U : Scheme.{u}) (k : U ⟶ Y) (_ : IsOpenImmersion k) (ψ : U ⟶ X)
-      (l : Spec (Y.presheaf.stalk (genericPoint Y)) ⟶ U),
-      y ∈ Set.range k ∧ l ≫ k = e₀ ∧ l ≫ ψ = e ≫ F := by
+  have loc
+      : ∀ y : Y,
+        ∃ (U : Scheme.{u}) (k : U ⟶ Y) (_ : IsOpenImmersion k) (ψ : U ⟶ X)
+            (l : Spec (Y.presheaf.stalk (genericPoint Y)) ⟶ U),
+          y ∈ Set.range k ∧ l ≫ k = e₀ ∧ l ≫ ψ = e ≫ F := by
     intro y
     by_cases hy : y ∈ Set.range j
     · exact ⟨W, j, inferInstance, F, e, hy, he, rfl⟩
@@ -130,37 +149,54 @@ theorem exists_extension {W Y X S : Scheme.{u}} (j : W ⟶ Y) [IsOpenImmersion j
   refine ⟨_, h1, ext_of_isDominant j ?_⟩
   rw [reassoc_of% h1, hF]
 
-theorem isOpenImmersion_jK (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] :
-    IsOpenImmersion (jK R) := by
+theorem isOpenImmersion_jK (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    : IsOpenImmersion (jK R) := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible R
   have : IsLocalization.Away ϖ (FractionRing R) := by
-    refine (IsLocalization.iff_of_le_of_exists_dvd (Submonoid.powers ϖ)
-      (nonZeroDivisors R) (powers_le_nonZeroDivisors_of_noZeroDivisors hϖ.ne_zero)
-      fun a ha => ?_).2 inferInstance
-    obtain ⟨n, hn⟩ := IsDiscreteValuationRing.associated_pow_irreducible (nonZeroDivisors.ne_zero ha) hϖ
+    refine (IsLocalization.iff_of_le_of_exists_dvd (Submonoid.powers ϖ) (nonZeroDivisors R)
+      (powers_le_nonZeroDivisors_of_noZeroDivisors hϖ.ne_zero) fun a ha => ?_).2 inferInstance
+    obtain ⟨n, hn⟩ :=
+      IsDiscreteValuationRing.associated_pow_irreducible (nonZeroDivisors.ne_zero ha) hϖ
     exact ⟨ϖ ^ n, ⟨n, rfl⟩, hn.dvd⟩
   exact IsOpenImmersion.of_isLocalization ϖ
 
-theorem eq_closedPoint_of_not_mem_range (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    (s : Spec (CommRingCat.of R)) (hs : s ∉ Set.range (jK R)) : s = IsLocalRing.closedPoint R := by
+theorem eq_closedPoint_of_not_mem_range
+    (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    (s : Spec (CommRingCat.of R)) (hs : s ∉ Set.range (jK R))
+    : s = IsLocalRing.closedPoint R := by
   by_cases h : s.asIdeal = ⊥
   · refine (hs ⟨⟨⊥, Ideal.isPrime_bot⟩, PrimeSpectrum.ext ?_⟩).elim
     rw [h]
-    exact Ideal.comap_bot_of_injective (algebraMap R (FractionRing R)) (IsFractionRing.injective R _)
+    exact Ideal.comap_bot_of_injective (algebraMap R (FractionRing R))
+      (IsFractionRing.injective R _)
   · exact PrimeSpectrum.ext (IsLocalRing.eq_maximalIdeal (s.isPrime.isMaximal h))
 
-theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (X' X : Over (Spec (CommRingCat.of R))) [Flat X'.hom] [IsIntegral X'.left] [IsSeparated X.hom] [LocallyOfFiniteType X.hom] (f : (Over.pullback (jK R)).obj X' ⟶ (Over.pullback (jK R)).obj X), (∀ x : X'.left, X'.hom x = IsLocalRing.closedPoint R → ∃ (T : Scheme.{0}) (g' : T ⟶ X'.left) (g : T ⟶ X.left), Flat g' ∧ x ∈ Set.range g' ∧ ∀ (Z : Scheme.{0}) (ρ : Z ⟶ T) (r : Z ⟶ ((Over.pullback (jK R)).obj X').left), r ≫ pullback.fst X'.hom (jK R) = ρ ≫ g' → r ≫ f.left ≫ pullback.fst X.hom (jK R) = ρ ≫ g) → ∃ ψ : X' ⟶ X, (Over.pullback (jK R)).map ψ = f := by
+theorem main
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        (X' X : Over (Spec (CommRingCat.of R))) [Flat X'.hom] [IsIntegral X'.left]
+        [IsSeparated X.hom] [LocallyOfFiniteType X.hom]
+        (f : (Over.pullback (jK R)).obj X' ⟶ (Over.pullback (jK R)).obj X),
+      (∀ x : X'.left,
+          X'.hom x = IsLocalRing.closedPoint R
+            → ∃ (T : Scheme.{0}) (g' : T ⟶ X'.left) (g : T ⟶ X.left),
+              Flat g' ∧ x ∈ Set.range g'
+                ∧ ∀ (Z : Scheme.{0}) (ρ : Z ⟶ T) (r : Z ⟶ ((Over.pullback (jK R)).obj X').left),
+                  r ≫ pullback.fst X'.hom (jK R) = ρ ≫ g'
+                    → r ≫ f.left ≫ pullback.fst X.hom (jK R) = ρ ≫ g)
+        → ∃ ψ : X' ⟶ X, (Over.pullback (jK R)).map ψ = f := by
   intro R _ _ _ X' X _ _ _ _ f H
   have := isOpenImmersion_jK R
   have : IsDominant (jK R) := DVR.isDominant_jK
   have := IsSchemeTheoreticallyDominant.of_isDominant (jK R)
   have : IsDominant (pullback.fst X'.hom (jK R)) := inferInstance
   have hf : f.left ≫ pullback.snd X.hom (jK R) = pullback.snd X'.hom (jK R) := Over.w f
-  obtain ⟨ψ, h₁, h₂⟩ := exists_extension (pullback.fst X'.hom (jK R)) X'.hom X.hom
-    (f.left ≫ pullback.fst X.hom (jK R))
-    (by rw [Category.assoc, pullback.condition, pullback.condition, ← Category.assoc]; congr 1)
-    (fun y hy => H y (eq_closedPoint_of_not_mem_range R _ fun h => hy (by
-      rw [Scheme.Pullback.range_fst]; exact h)))
+  obtain ⟨ψ, h₁, h₂⟩ :=
+    exists_extension (pullback.fst X'.hom (jK R)) X'.hom X.hom (f.left ≫ pullback.fst X.hom (jK R))
+      (by rw [Category.assoc, pullback.condition, pullback.condition, ← Category.assoc]; congr 1)
+      (fun y hy =>
+        H y
+          (eq_closedPoint_of_not_mem_range R _ fun h =>
+            hy (by rw [Scheme.Pullback.range_fst]; exact h)))
   refine ⟨Over.homMk ψ h₂, Over.OverMorphism.ext (pullback.hom_ext ?_ ?_)⟩
   · exact (pullback.lift_fst _ _ _).trans h₁
   · exact (Over.w _).trans hf.symm

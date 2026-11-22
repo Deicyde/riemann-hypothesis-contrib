@@ -8,11 +8,13 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem quadratic_at_most_two_primes_over (K : Type) [Field K] [NumberField K]
-    (hK : Module.finrank ℚ K = 2) (q : ℕ) (hq : q.Prime)
-    (P₁ P₂ P₃ : HeightOneSpectrum (𝓞 K))
-    (h₁ : ((q : ℕ) : 𝓞 K) ∈ P₁.asIdeal) (h₂ : ((q : ℕ) : 𝓞 K) ∈ P₂.asIdeal)
-    (h₃ : ((q : ℕ) : 𝓞 K) ∈ P₃.asIdeal) : P₁ = P₂ ∨ P₁ = P₃ ∨ P₂ = P₃ := by
+theorem quadratic_at_most_two_primes_over
+    (K : Type) [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    (q : ℕ) (hq : q.Prime)
+    (P₁ P₂ P₃ : HeightOneSpectrum (𝓞 K)) (h₁ : ((q : ℕ) : 𝓞 K) ∈ P₁.asIdeal)
+    (h₂ : ((q : ℕ) : 𝓞 K) ∈ P₂.asIdeal) (h₃ : ((q : ℕ) : 𝓞 K) ∈ P₃.asIdeal)
+    : P₁ = P₂ ∨ P₁ = P₃ ∨ P₂ = P₃ := by
   by_contra hne
   push Not at hne
   obtain ⟨h12, h13, h23⟩ := hne
@@ -21,11 +23,13 @@ theorem quadratic_at_most_two_primes_over (K : Type) [Field K] [NumberField K]
     have : ((q : ℕ) : 𝓞 K) = algebraMap ℤ (𝓞 K) (q : ℤ) := by simp
     rw [this, Algebra.norm_algebraMap, RingOfIntegers.rank, hK]
     simp
-  have hd : ∀ P : HeightOneSpectrum (𝓞 K), ((q : ℕ) : 𝓞 K) ∈ P.asIdeal →
-      P.asIdeal ∣ Ideal.span {((q : ℕ) : 𝓞 K)} := fun P hP =>
+  have hd
+      : ∀ P : HeightOneSpectrum (𝓞 K),
+        ((q : ℕ) : 𝓞 K) ∈ P.asIdeal → P.asIdeal ∣ Ideal.span {((q : ℕ) : 𝓞 K)} := fun P hP =>
     Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hP)
-  have hqd : ∀ P : HeightOneSpectrum (𝓞 K), ((q : ℕ) : 𝓞 K) ∈ P.asIdeal →
-      q ∣ Ideal.absNorm P.asIdeal := by
+  have hqd
+      : ∀ P : HeightOneSpectrum (𝓞 K),
+        ((q : ℕ) : 𝓞 K) ∈ P.asIdeal → q ∣ Ideal.absNorm P.asIdeal := by
     intro P hP
     have h1 : Ideal.absNorm P.asIdeal ∣ q ^ 2 := hN ▸ map_dvd Ideal.absNorm (hd P hP)
     obtain ⟨i, -, hi⟩ := (Nat.dvd_prime_pow hq).mp h1

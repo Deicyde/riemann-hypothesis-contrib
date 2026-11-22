@@ -13,22 +13,27 @@ noncomputable section
 
 variable {k r : ℕ}
 
-def fam (k r : ℕ) (e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ) : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → ℂ :=
-  fun i => if h : r ≤ i.val ∧ i.val ≤ r + k then e ⟨i.val - r, by omega⟩ else bvec i
+def fam (k r : ℕ) (e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ)
+    : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → ℂ := fun i =>
+  if h : r ≤ i.val ∧ i.val ≤ r + k then e ⟨i.val - r, by omega⟩ else bvec i
 
 def ONb (k r : ℕ) (e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ) : Prop :=
-  (∀ a, inWb k r (e a)) ∧
-    ∀ a b, herm (Hpk k r) (e a) (e b) = if a = b then (if a.val = k then -1 else 1) else 0
+  (∀ a, inWb k r (e a))
+    ∧ ∀ a b, herm (Hpk k r) (e a) (e b) = if a = b then (if a.val = k then -1 else 1) else 0
 
-theorem hpk_out_in {i j : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val) (hj : r ≤ j.val ∧ j.val ≤ r + k) :
-    Hpk k r i j = 0 ∧ Hpk k r j i = 0 := by
+theorem hpk_out_in
+    {i j : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val) (hj : r ≤ j.val ∧ j.val ≤ r + k)
+    : Hpk k r i j = 0 ∧ Hpk k r j i = 0 := by
   constructor <;> simp only [Hpk] <;> split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem herm_bvec_bvec (i j : Fin (2 * r + k + 1)) : herm (Hpk k r) (bvec i) (bvec j) = Hpk k r j i := by
+theorem herm_bvec_bvec (i j : Fin (2 * r + k + 1))
+    : herm (Hpk k r) (bvec i) (bvec j) = Hpk k r j i := by
   simp [herm, bvec, dotProduct, Matrix.mulVec, Pi.single_apply]
 
-theorem herm_bvec_w {i : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val) {w : Fin (2 * r + k + 1) → ℂ}
-    (hw : inWb k r w) : herm (Hpk k r) (bvec i) w = 0 := by
+theorem herm_bvec_w
+    {i : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val)
+    {w : Fin (2 * r + k + 1) → ℂ} (hw : inWb k r w)
+    : herm (Hpk k r) (bvec i) w = 0 := by
   have hc : ∀ l, (Hpk k r *ᵥ bvec i) l = Hpk k r l i := fun l => by
     simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
   simp only [herm, dotProduct, hc]
@@ -38,8 +43,10 @@ theorem herm_bvec_w {i : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val)
   · rw [(hpk_out_in hi hl).2, mul_zero]
   · rw [Pi.star_apply, hw l (by omega), star_zero, zero_mul]
 
-theorem herm_w_bvec {i : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val) {w : Fin (2 * r + k + 1) → ℂ}
-    (hw : inWb k r w) : herm (Hpk k r) w (bvec i) = 0 := by
+theorem herm_w_bvec
+    {i : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val)
+    {w : Fin (2 * r + k + 1) → ℂ} (hw : inWb k r w)
+    : herm (Hpk k r) w (bvec i) = 0 := by
   have hc : herm (Hpk k r) w (bvec i) = (Hpk k r *ᵥ w) i := by
     simp [herm, bvec, dotProduct, Pi.single_apply]
   rw [hc]
@@ -50,19 +57,24 @@ theorem herm_w_bvec {i : Fin (2 * r + k + 1)} (hi : i.val < r ∨ r + k < i.val)
   · rw [(hpk_out_in hi hl).1, zero_mul]
   · rw [hw l (by omega), mul_zero]
 
-theorem fam_in {e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ} {i : Fin (2 * r + k + 1)} (h : r ≤ i.val ∧ i.val ≤ r + k) :
-    fam k r e i = e ⟨i.val - r, by omega⟩ := by
+theorem fam_in
+    {e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ} {i : Fin (2 * r + k + 1)}
+    (h : r ≤ i.val ∧ i.val ≤ r + k)
+    : fam k r e i = e ⟨i.val - r, by omega⟩ := by
   simp only [fam]
   rw [dite_eq_left h]
 
-theorem fam_out {e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ} {i : Fin (2 * r + k + 1)} (h : i.val < r ∨ r + k < i.val) :
-    fam k r e i = bvec i := by
+theorem fam_out
+    {e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ} {i : Fin (2 * r + k + 1)}
+    (h : i.val < r ∨ r + k < i.val)
+    : fam k r e i = bvec i := by
   simp only [fam]
   rw [dite_eq_right]
   omega
 
-theorem famGram {e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ} (he : ONb k r e) (i j : Fin (2 * r + k + 1)) :
-    herm (Hpk k r) (fam k r e i) (fam k r e j) = Hpk k r j i := by
+theorem famGram
+    {e : Fin (k + 1) → Fin (2 * r + k + 1) → ℂ} (he : ONb k r e) (i j : Fin (2 * r + k + 1))
+    : herm (Hpk k r) (fam k r e i) (fam k r e j) = Hpk k r j i := by
   by_cases hi : r ≤ i.val ∧ i.val ≤ r + k <;> by_cases hj : r ≤ j.val ∧ j.val ≤ r + k
   · rw [fam_in hi, fam_in hj, he.2]
     simp only [Hpk]

@@ -38,39 +38,56 @@ lemma m_eabH_zero (a b : Fin n) (x : Matrix (Fin n) (Fin n) ℂ) :
     EabH H a b (fun _ : Matrix (Fin n) (Fin n) ℂ => (0 : E)) x = 0 := by
   simp [EabH, RdV]
 
-def mSub {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] : Submodule ℂ ({x : Matrix (Fin n) (Fin n) ℂ // inUH H x} → E) where
+def mSub {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E]
+    : Submodule ℂ ({x : Matrix (Fin n) (Fin n) ℂ // inUH H x} → E) where
   carrier := {φ | SmoothOnH H (mExt φ)}
-  zero_mem' := smooth_local n H E (fun _ => 0) _ (fun x hx => by rw [mExt_pos hx]; rfl) m_smooth_zero
+  zero_mem' :=
+    smooth_local n H E (fun _ => 0) _ (fun x hx => by rw [mExt_pos hx]; rfl) m_smooth_zero
   add_mem' := by
     intro φ ψ hφ hψ
-    exact smooth_local n H E _ _ (fun x hx => by
-      rw [mExt_pos hx, mExt_pos hx, mExt_pos hx, one_smul]; rfl) (smooth_linear' n H E _ _ 1 hφ hψ)
+    exact smooth_local n H E _ _
+      (fun x hx => by rw [mExt_pos hx, mExt_pos hx, mExt_pos hx, one_smul]; rfl)
+      (smooth_linear' n H E _ _ 1 hφ hψ)
   smul_mem' := by
     intro c φ hφ
-    exact smooth_local n H E _ _ (fun x hx => by
-      rw [mExt_pos hx, mExt_pos hx, zero_add]; rfl) (smooth_linear' n H E _ _ c m_smooth_zero hφ)
+    exact smooth_local n H E _ _
+      (fun x hx => by rw [mExt_pos hx, mExt_pos hx, zero_add]; rfl)
+      (smooth_linear' n H E _ _ c m_smooth_zero hφ)
 
 def mCls (f : Matrix (Fin n) (Fin n) ℂ → E) : mSub H E :=
-  if hf : SmoothOnH H f then
-    ⟨fun x => f x.1, smooth_local n H E f _ (fun _ hx => (mExt_pos (φ := fun x => f x.1) hx).symm) hf⟩
-  else 0
+  if hf : SmoothOnH H f then ⟨
+    fun x => f x.1,
+    smooth_local n H E f _ (fun _ hx => (mExt_pos (φ := fun x => f x.1) hx).symm) hf
+  ⟩
+  else
+    0
 
 def mE (hH : HInvol H) (a b : Fin n) : Module.End ℂ (mSub H E) where
-  toFun φ := ⟨fun x => EabH H a b (mExt φ.1) x.1,
+  toFun φ := ⟨
+    fun x => EabH H a b (mExt φ.1) x.1,
     smooth_local n H E (EabH H a b (mExt φ.1)) _
       (fun x hx => (mExt_pos (φ := fun x => EabH H a b (mExt φ.1) x.1) hx).symm)
-      (eab_h_smooth n H E _ a b hH φ.2)⟩
+      (eab_h_smooth n H E _ a b hH φ.2)
+  ⟩
   map_add' φ ψ := by
-    apply Subtype.ext; funext x
+    apply Subtype.ext
+    funext x
     show EabH H a b (mExt (φ.1 + ψ.1)) x.1 = EabH H a b (mExt φ.1) x.1 + EabH H a b (mExt ψ.1) x.1
-    rw [eab_h_local n H E (mExt (φ.1 + ψ.1)) (fun y => mExt φ.1 y + (1 : ℂ) • mExt ψ.1 y) a b x.1 hH
-      (fun y hy => by rw [mExt_pos hy, mExt_pos hy, mExt_pos hy, one_smul]; rfl) x.2,
+    rw [eab_h_local n H E (mExt (φ.1 + ψ.1))
+        (fun y => mExt φ.1 y + (1 : ℂ) • mExt ψ.1 y)
+        a b x.1 hH
+        (fun y hy => by rw [mExt_pos hy, mExt_pos hy, mExt_pos hy, one_smul]; rfl)
+        x.2,
       eab_h_linear n H E _ _ 1 a b x.1 hH φ.2 ψ.2 x.2, one_smul]
   map_smul' c φ := by
-    apply Subtype.ext; funext x
+    apply Subtype.ext
+    funext x
     show EabH H a b (mExt (c • φ.1)) x.1 = c • EabH H a b (mExt φ.1) x.1
-    rw [eab_h_local n H E (mExt (c • φ.1)) (fun y => (fun _ => (0 : E)) y + c • mExt φ.1 y) a b x.1 hH
-      (fun y hy => by rw [mExt_pos hy, mExt_pos hy, zero_add]; rfl) x.2,
+    rw [eab_h_local n H E (mExt (c • φ.1))
+        (fun y => (fun _ => (0 : E)) y + c • mExt φ.1 y)
+        a b x.1 hH
+        (fun y hy => by rw [mExt_pos hy, mExt_pos hy, zero_add]; rfl)
+        x.2,
       eab_h_linear n H E _ _ c a b x.1 hH m_smooth_zero φ.2 x.2, m_eabH_zero, zero_add]
 
 lemma mE_apply (hH : HInvol H) (a b : Fin n) (φ : mSub H E) (x : {x : Matrix (Fin n) (Fin n) ℂ // inUH H x}) :
@@ -136,11 +153,16 @@ lemma mQminor (hH : HInvol H) (t : ℕ) (a b : Fin t → Fin n) (u : ℂ) (f : M
   rw [hfold]
   simp [Int.cast_smul_eq_zsmul]
 
-def mRho (hH : HInvol H) (s : Matrix (Fin n) (Fin n) ℂ) (hs : inUH H s) : Module.End ℂ (mSub H E) where
-  toFun φ := ⟨fun x => φ.1 ⟨x.1 * s, ana_mul x.2 hs⟩,
-    smooth_local n H E (fun y => mExt φ.1 (y * s)) _
+def mRho (hH : HInvol H) (s : Matrix (Fin n) (Fin n) ℂ) (hs : inUH H s)
+    : Module.End ℂ (mSub H E) where
+  toFun φ := ⟨
+    fun x => φ.1 ⟨x.1 * s, ana_mul x.2 hs⟩,
+    smooth_local n H E
+      (fun y => mExt φ.1 (y * s))
+      _
       (fun y hy => by rw [mExt_pos (ana_mul hy hs), mExt_pos hy])
-      (smooth_right' n H E (mExt φ.1) s hH hs φ.2)⟩
+      (smooth_right' n H E (mExt φ.1) s hH hs φ.2)
+  ⟩
   map_add' φ ψ := rfl
   map_smul' c φ := rfl
 

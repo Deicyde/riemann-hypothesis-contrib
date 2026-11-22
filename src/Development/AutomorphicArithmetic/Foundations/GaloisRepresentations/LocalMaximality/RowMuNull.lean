@@ -5,13 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system
 
 section
-variable {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
+variable
+  {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
 
 private lemma card_uni {β κ : Type} [LinearOrder β] [LinearOrder κ] (I : Finset β) (J : Finset κ) :
     (uni I J).card = I.card + J.card := by
@@ -143,8 +145,7 @@ end
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.thMu_of :
-    Det → ThMu := by
+theorem UpperTheory.Gal.productCup_of_system.thMu_of : Det → ThMu := by
   intro hDet d S E _ _ _ _ T
   refine ⟨?_, detC_left T, detC_univ T, detC_top T⟩
   have h := hDet S S (Algebra.lmul ℂ S) (Fin (d + 1) ⊕ₗ Mi d) (d + 1) T.rowMu 1 1

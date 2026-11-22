@@ -33,18 +33,18 @@ def formsIn (W : Ideal (MvPolynomial (Fin n) ℂ)) : Submodule ℝ (Fin n → �
     simp only [Set.mem_ofPred_eq, this] at hu ⊢
     exact W.mul_mem_left _ hu
 
-theorem linForm_single (j : Fin n) :
-    linForm (Pi.single j (1 : ℂ)) = (X j : MvPolynomial (Fin n) ℂ) := by
+theorem linForm_single (j : Fin n)
+    : linForm (Pi.single j (1 : ℂ)) = (X j : MvPolynomial (Fin n) ℂ) := by
   simp [linForm, Pi.single_apply]
 
-theorem formsIn_ne_top {W : Ideal (MvPolynomial (Fin n) ℂ)} (hW : IsRelevant W) : formsIn W ≠ ⊤ := by
+theorem formsIn_ne_top {W : Ideal (MvPolynomial (Fin n) ℂ)} (hW : IsRelevant W)
+    : formsIn W ≠ ⊤ := by
   obtain ⟨j, hj⟩ := hW
   intro htop
   have hmem : Pi.single j (1 : ℂ) ∈ formsIn W := htop ▸ Submodule.mem_top
   exact hj (linForm_single j ▸ hmem)
 
 end AdmissibleAE
-
 
 open AdmissibleAE in
 theorem AdmissibleAE.proof : AdmissibleAE.Statement := by

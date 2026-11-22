@@ -13,9 +13,14 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Theta
 
 namespace GlobalTheory
 
-theorem seriesRatS_and_serInt_of_globalArtin :
-    GlobalTheory.Published.GlobalArtinReciprocity → GlobalTheory.SerStd.SeriesRatS ∧ GlobalTheory.IndefiniteRowSideFullHecke.TwistSeries.SerInt :=
-  fun hA => ⟨GlobalTheory.T.thetaSeriesRationalOnGoodCovers_of_untwisted (GlobalTheory.Published.GlobalArtinReciprocity.rayClassFieldSt hA) GlobalTheory.T.untwisted_theta_rational_on_good_covers,
-    GlobalTheory.T.thetaSeries_integral_uniform_prime_power⟩
+theorem seriesRatS_and_serInt_of_globalArtin
+    : GlobalTheory.Published.GlobalArtinReciprocity
+      → GlobalTheory.SerStd.SeriesRatS
+        ∧ GlobalTheory.IndefiniteRowSideFullHecke.TwistSeries.SerInt := fun hA => ⟨
+  GlobalTheory.T.thetaSeriesRationalOnGoodCovers_of_untwisted
+    (GlobalTheory.Published.GlobalArtinReciprocity.rayClassFieldSt hA)
+    GlobalTheory.T.untwisted_theta_rational_on_good_covers,
+  GlobalTheory.T.thetaSeries_integral_uniform_prime_power
+⟩
 
 end GlobalTheory

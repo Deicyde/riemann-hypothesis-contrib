@@ -16,10 +16,11 @@ open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberFiel
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagVB
 
-theorem exists_gen_of_summand {A E : Type} [CommRing A] [IsLocalRing A] [AddCommGroup E] [Module A E]
-    {M M' Q : Submodule A E} (hMM : M ≤ M') (hM' : M' ≤ Q ⊔ M) (hd : Disjoint Q M) {m m' : ℕ} (hm : m' = m + 1)
-    (bM : Module.Basis (Fin m) A M) (bM' : Module.Basis (Fin m') A M') :
-    ∃ e ∈ M', M' = M ⊔ Submodule.span A {e} := by
+theorem exists_gen_of_summand
+    {A E : Type} [CommRing A] [IsLocalRing A] [AddCommGroup E] [Module A E]
+    {M M' Q : Submodule A E} (hMM : M ≤ M') (hM' : M' ≤ Q ⊔ M) (hd : Disjoint Q M)
+    {m m' : ℕ} (hm : m' = m + 1) (bM : Module.Basis (Fin m) A M) (bM' : Module.Basis (Fin m') A M')
+    : ∃ e ∈ M', M' = M ⊔ Submodule.span A {e} := by
   classical
   set P : Submodule A E := Q ⊓ M' with hP
   have hPM' : P ≤ M' := inf_le_right
@@ -34,7 +35,8 @@ theorem exists_gen_of_summand {A E : Type} [CommRing A] [IsLocalRing A] [AddComm
   have hdP : Disjoint P M := hd.mono_left inf_le_left
   let f : (P × M) →ₗ[A] M' := LinearMap.coprod (Submodule.inclusion hPM') (Submodule.inclusion hMM)
   have hfinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     rintro ⟨x, y⟩ h
     have h' : (x : E) + (y : E) = 0 := by
       have := congrArg Subtype.val h
@@ -62,7 +64,8 @@ theorem exists_gen_of_summand {A E : Type} [CommRing A] [IsLocalRing A] [AddComm
   haveI : Module.Free A P := Module.free_of_flat_of_isLocalRing
   have hr : Module.finrank A P = 1 := by
     have h1 := g.finrank_eq
-    rw [Module.finrank_prod, Module.finrank_eq_card_basis bM, Module.finrank_eq_card_basis bM'] at h1
+    rw [Module.finrank_prod, Module.finrank_eq_card_basis bM, Module.finrank_eq_card_basis bM']
+      at h1
     simp only [Fintype.card_fin] at h1
     omega
   let c : Module.Basis Unit A P := Module.basisUnique Unit hr
@@ -74,18 +77,23 @@ theorem exists_gen_of_summand {A E : Type} [CommRing A] [IsLocalRing A] [AddComm
     refine h2.symm.trans ?_
     congr 1
     ext x
-    simp only [Set.mem_image, Set.mem_range, Set.mem_singleton_iff, Submodule.subtype_apply, exists_exists_eq_and]
+    simp only [Set.mem_image, Set.mem_range, Set.mem_singleton_iff, Submodule.subtype_apply,
+      exists_exists_eq_and]
     exact ⟨fun ⟨a, h⟩ => h ▸ rfl, fun h => ⟨(), h.symm⟩⟩
   rw [← hPs, sup_comm, hsup]
 
-theorem exists_basis_of_frame {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] (A : Subring Ω) {m : ℕ}
-    {b : Fin m → E} (hb : LinearIndependent Ω b) {M : Submodule A E} (hM : M = Submodule.span A (Set.range b)) :
-    Nonempty (Module.Basis (Fin m) A M) := by
+theorem exists_basis_of_frame
+    {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
+    (A : Subring Ω)
+    {m : ℕ} {b : Fin m → E} (hb : LinearIndependent Ω b)
+    {M : Submodule A E} (hM : M = Submodule.span A (Set.range b))
+    : Nonempty (Module.Basis (Fin m) A M) := by
   subst hM
-  have h : LinearIndependent A b := hb.restrict_scalars (by
-    intro x y h
-    have := congrArg (fun t : Ω => t) h
-    simpa [Subring.smul_def] using this)
+  have h : LinearIndependent A b :=
+    hb.restrict_scalars (by
+      intro x y h
+      have := congrArg (fun t : Ω => t) h
+      simpa [Subring.smul_def] using this)
   exact ⟨Module.Basis.span h |>.map (LinearEquiv.refl _ _)⟩
 
 section Flag
@@ -107,8 +115,8 @@ theorem flagStep_last (b : Fin r → E) : flagStep Ω b r = Submodule.span Ω (S
   ext x
   simp
 
-theorem finrank_flagStep {b : Fin r → E} (hb : LinearIndependent Ω b) {n : ℕ} (hn : n ≤ r) :
-    Module.finrank Ω (flagStep Ω b n) = n := by
+theorem finrank_flagStep {b : Fin r → E} (hb : LinearIndependent Ω b) {n : ℕ} (hn : n ≤ r)
+    : Module.finrank Ω (flagStep Ω b n) = n := by
   have h : flagStep Ω b n = Submodule.span Ω (Set.range (b ∘ Fin.castLE hn)) := by
     unfold flagStep
     congr 1
@@ -121,17 +129,27 @@ theorem finrank_flagStep {b : Fin r → E} (hb : LinearIndependent Ω b) {n : �
   rw [h, finrank_span_eq_card (hb.comp _ (Fin.castLE_injective hn))]
   simp
 
-theorem exists_adapted (A : Subring Ω) [IsLocalRing A] (N : Submodule A E) (b₀ : Fin r → E)
-    (hfr : ∀ n ≤ r, ∃ m, m = n ∧ ∃ d : Fin m → E, LinearIndependent Ω d ∧
-      Submodule.span Ω (Set.range d) = flagStep Ω b₀ n ∧
-      N ⊓ (flagStep Ω b₀ n).restrictScalars A = Submodule.span A (Set.range d))
-    (hQ : ∀ n, ∃ Q : Submodule A E, Disjoint Q (N ⊓ (flagStep Ω b₀ n).restrictScalars A) ∧
-      Q ⊔ (N ⊓ (flagStep Ω b₀ n).restrictScalars A) = N) :
-    ∃ c : ℕ → E, (∀ i ≤ r, Submodule.span Ω (c '' Set.Iio i) = flagStep Ω b₀ i) ∧
-      N ⊓ (flagStep Ω b₀ r).restrictScalars A = Submodule.span A (c '' Set.Iio r) := by
+theorem exists_adapted
+    (A : Subring Ω) [IsLocalRing A]
+    (N : Submodule A E) (b₀ : Fin r → E)
+    (hfr : ∀ n ≤ r, ∃ m,
+      m = n
+        ∧ ∃ d : Fin m → E,
+          LinearIndependent Ω d ∧ Submodule.span Ω (Set.range d) = flagStep Ω b₀ n
+            ∧ N ⊓ (flagStep Ω b₀ n).restrictScalars A = Submodule.span A (Set.range d))
+    (hQ : ∀ n, ∃ Q : Submodule A E,
+      Disjoint Q (N ⊓ (flagStep Ω b₀ n).restrictScalars A)
+        ∧ Q ⊔ (N ⊓ (flagStep Ω b₀ n).restrictScalars A) = N)
+    : ∃ c : ℕ → E,
+      (∀ i ≤ r, Submodule.span Ω (c '' Set.Iio i) = flagStep Ω b₀ i)
+        ∧ N ⊓ (flagStep Ω b₀ r).restrictScalars A = Submodule.span A (c '' Set.Iio r) := by
   classical
-  have key : ∀ n, n ≤ r → ∃ c : ℕ → E, (∀ i ≤ n, Submodule.span Ω (c '' Set.Iio i) = flagStep Ω b₀ i) ∧
-      N ⊓ (flagStep Ω b₀ n).restrictScalars A = Submodule.span A (c '' Set.Iio n) := by
+  have key
+      : ∀ n,
+        n ≤ r
+          → ∃ c : ℕ → E,
+            (∀ i ≤ n, Submodule.span Ω (c '' Set.Iio i) = flagStep Ω b₀ i)
+              ∧ N ⊓ (flagStep Ω b₀ n).restrictScalars A = Submodule.span A (c '' Set.Iio n) := by
     intro n
     induction n with
     | zero =>
@@ -150,17 +168,23 @@ theorem exists_adapted (A : Subring Ω) [IsLocalRing A] (N : Submodule A E) (b�
       obtain ⟨bM⟩ := exists_basis_of_frame A hd hdA
       obtain ⟨bM'⟩ := exists_basis_of_frame A hd' hdA'
       have hle : flagStep Ω b₀ n ≤ flagStep Ω b₀ (n + 1) := flagStep_mono b₀ (Nat.le_succ n)
-      have hMM : N ⊓ (flagStep Ω b₀ n).restrictScalars A ≤ N ⊓ (flagStep Ω b₀ (n + 1)).restrictScalars A :=
+      have hMM
+          : N ⊓ (flagStep Ω b₀ n).restrictScalars A
+            ≤ N ⊓ (flagStep Ω b₀ (n + 1)).restrictScalars A :=
         inf_le_inf_left _ (fun x hx => hle hx)
-      have hM' : N ⊓ (flagStep Ω b₀ (n + 1)).restrictScalars A ≤
-          Q ⊔ (N ⊓ (flagStep Ω b₀ n).restrictScalars A) := by
+      have hM'
+          : N ⊓ (flagStep Ω b₀ (n + 1)).restrictScalars A
+            ≤ Q ⊔ (N ⊓ (flagStep Ω b₀ n).restrictScalars A) := by
         rw [hQ2]
         exact inf_le_left
       obtain ⟨e, he, hgen⟩ := exists_gen_of_summand hMM hM' hQ1 (by omega) bM bM'
       have himg : ∀ i ≤ n, Function.update c n e '' Set.Iio i = c '' Set.Iio i := fun i hi =>
-        Set.image_congr fun k hk => Function.update_of_ne (by
-          have : k < i := hk
-          omega) _ _
+        Set.image_congr fun k hk =>
+          Function.update_of_ne
+            (by
+              have : k < i := hk
+              omega)
+            _ _
       have himg' : Function.update c n e '' Set.Iio (n + 1) = insert e (c '' Set.Iio n) := by
         have : Set.Iio (n + 1) = insert n (Set.Iio n) := by
           ext k
@@ -195,7 +219,13 @@ end GlobalTheory.CompanionTheory.Ar.FlagVB
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-theorem isFlagVBOn_inter_of_steps : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (T : Set (Cpt ξ)) (g r : ℕ) (W : Submodule Ω E) (b₀ : Fin r → E), LinearIndependent Ω b₀ → (∀ k, b₀ k ∈ W) → L.IsVBOn T g W → (∀ n : ℕ, ∃ s W', (L.map (flagStep Ω b₀ n).mkQ).IsVBOn T s W') → (L.inter (Submodule.span Ω (Set.range b₀))).IsFlagVBOn T b₀ := by
+theorem isFlagVBOn_inter_of_steps
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
+        [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (T : Set (Cpt ξ)) (g r : ℕ) (W : Submodule Ω E)
+        (b₀ : Fin r → E),
+      LinearIndependent Ω b₀ → (∀ k, b₀ k ∈ W) → L.IsVBOn T g W
+        → (∀ n : ℕ, ∃ s W', (L.map (flagStep Ω b₀ n).mkQ).IsVBOn T s W')
+        → (L.inter (Submodule.span Ω (Set.range b₀))).IsFlagVBOn T b₀ := by
   intro X Ω _ ξ E _ _ L T g r W b₀ hli hW hL hq p hp
   classical
   haveI : IsLocalRing (regAt ξ p) := (GlobalTheory.T.regAt_local_order_fraction X Ω ξ).1 p
@@ -203,16 +233,22 @@ theorem isFlagVBOn_inter_of_steps : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] 
     Submodule.span_le.2 (by
       rintro _ ⟨k, -, rfl⟩
       exact hW k)
-  have hv : ∀ n, (L.inter (flagStep Ω b₀ n)).IsVBOn T (Module.finrank Ω (flagStep Ω b₀ n)) (flagStep Ω b₀ n) ∧
-      ∀ p ∈ T, ∃ Q : Submodule (regAt ξ p) E, Disjoint Q (L.inter (flagStep Ω b₀ n) p) ∧
-        Q ⊔ L.inter (flagStep Ω b₀ n) p = L p := fun n => by
+  have hv
+      : ∀ n,
+        (L.inter (flagStep Ω b₀ n)).IsVBOn T (Module.finrank Ω (flagStep Ω b₀ n)) (flagStep Ω b₀ n)
+          ∧ ∀ p ∈ T, ∃ Q : Submodule (regAt ξ p) E,
+            Disjoint Q (L.inter (flagStep Ω b₀ n) p)
+              ∧ Q ⊔ L.inter (flagStep Ω b₀ n) p = L p := fun n => by
     obtain ⟨s, W', h⟩ := hq n
-    exact GlobalTheory.T.lattice_sub_quotient_split X Ω ξ E L T g s W (flagStep Ω b₀ n) W' (hFW n) hL h
-  obtain ⟨c, h1, h2⟩ := FlagVB.exists_adapted (regAt ξ p) (L p) b₀ (fun n hn => by
-      obtain ⟨U, hU, d, hd, hfr⟩ := (hv n).1 p hp
-      obtain ⟨hd1, hd2⟩ := hfr p hp hU
-      exact ⟨_, FlagVB.finrank_flagStep hli hn, d, hd1, hd, hd2⟩)
-    (fun n => (hv n).2 p hp)
+    exact GlobalTheory.T.lattice_sub_quotient_split X Ω ξ E L T g s W (flagStep Ω b₀ n) W' (hFW n)
+      hL h
+  obtain ⟨c, h1, h2⟩ :=
+    FlagVB.exists_adapted (regAt ξ p) (L p) b₀
+      (fun n hn => by
+        obtain ⟨U, hU, d, hd, hfr⟩ := (hv n).1 p hp
+        obtain ⟨hd1, hd2⟩ := hfr p hp hU
+        exact ⟨_, FlagVB.finrank_flagStep hli hn, d, hd1, hd, hd2⟩)
+      (fun n => (hv n).2 p hp)
   let b : Fin r → E := fun k => c k
   have himg : ∀ i, b '' {k | (k : ℕ) < i} = c '' Set.Iio (min i r) := fun i => by
     ext x
@@ -231,10 +267,10 @@ theorem isFlagVBOn_inter_of_steps : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] 
     rw [← this]
     ext x
     simp
-  have hspan : Submodule.span Ω (Set.range b) = flagStep Ω b₀ r := by
-    rw [hrange, h1 r le_rfl]
+  have hspan : Submodule.span Ω (Set.range b) = flagStep Ω b₀ r := by rw [hrange, h1 r le_rfl]
   have hlib : LinearIndependent Ω b := by
-    rw [linearIndependent_iff_card_eq_finrank_span, Set.finrank, hspan, FlagVB.finrank_flagStep hli le_rfl]
+    rw [linearIndependent_iff_card_eq_finrank_span, Set.finrank, hspan,
+      FlagVB.finrank_flagStep hli le_rfl]
     simp
   have hV : Submodule.span Ω (Set.range b₀) = flagStep Ω b₀ r := (FlagVB.flagStep_last b₀).symm
   have hframe : (L.inter (Submodule.span Ω (Set.range b₀))).IsFrameAt b p := by
@@ -244,7 +280,9 @@ theorem isFlagVBOn_inter_of_steps : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] 
   have hcoh : (L.inter (Submodule.span Ω (Set.range b₀))).IsCohOn T := by
     have hvb := (hv r).1
     rw [← hV] at hvb
-    exact (GlobalTheory.T.coherent_lattice_closure X Ω ξ E E (L.inter (Submodule.span Ω (Set.range b₀))) (L.inter (Submodule.span Ω (Set.range b₀))) T).1 _ _ hvb
+    exact (GlobalTheory.T.coherent_lattice_closure X Ω ξ E E
+        (L.inter (Submodule.span Ω (Set.range b₀))) (L.inter (Submodule.span Ω (Set.range b₀))) T).1
+      _ _ hvb
   obtain ⟨U, hU, hall⟩ := GlobalTheory.T.frame_open_neighbourhood X Ω ξ E _ T r b p hcoh hp hframe
   exact ⟨U, hU, b, hflag, hall⟩
 

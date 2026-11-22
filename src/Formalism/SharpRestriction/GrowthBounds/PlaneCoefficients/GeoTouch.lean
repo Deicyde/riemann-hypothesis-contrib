@@ -13,7 +13,10 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.PairMembershipBlocks
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.Proposition5Numerics
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.Proposition5Numerics
 
 theorem geoTop : GeoTop := by
   intro n' r _ _ Fr L₁ N₁ hV J _ nL hJ hnL s hs
@@ -30,7 +33,12 @@ theorem geoTouch : GeoTouch := by
   rcases hx with (⟨l, hl, hlt⟩ | ⟨m, hm, hlt⟩) | ⟨m, hm⟩
   · subst hl
     have hl' : l.val < (Fr.LLset (segZ j)).card := by rw [← hnL]; exact l.isLt
-    refine ⟨llPos Fr (segZ j) l.val, (LL_sub_letters hV hr _ _ (llPos_mem Fr (segZ j) l.val hl')).1, rfl, ?_⟩
+    refine ⟨
+      llPos Fr (segZ j) l.val,
+      (LL_sub_letters hV hr _ _ (llPos_mem Fr (segZ j) l.val hl')).1,
+      rfl,
+      ?_
+    ⟩
     rw [← posU_ll (Fr := Fr) (segZ j) l.val hl']
     exact (posU_le_iff hV (segZ j) _ _ (by omega) hu').2 (by omega)
   · subst hm
@@ -44,8 +52,12 @@ theorem geoTouch : GeoTouch := by
     have hm' := m.isLt
     obtain ⟨s, hs, hsh⟩ := DdG.shift Fr hV.2.1 hJ (j - 1)
     rw [sub_add_cancel] at hsh
-    refine ⟨Fr.fr (segZ j - 1) (r - 1 - m.val), w_mem_letters hV hr _ _ (by omega), ?_,
-      (w_lt_posU hV hr _ _ _ (by omega) hu').le⟩
+    refine ⟨
+      Fr.fr (segZ j - 1) (r - 1 - m.val),
+      w_mem_letters hV hr _ _ (by omega),
+      ?_,
+      (w_lt_posU hV hr _ _ _ (by omega) hu').le
+    ⟩
     show _ = posOf n' (Fr.fr (segZ (j - 1)) (r - 1 - m.val))
     rw [(hsh (r - 1 - m.val)).1]
     rcases hs with rfl | rfl

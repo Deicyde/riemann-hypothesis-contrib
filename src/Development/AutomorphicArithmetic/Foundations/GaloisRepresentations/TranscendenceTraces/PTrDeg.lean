@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trDeg_of :
-    TrPush → TrLin → TrDeg := by
+theorem UpperTheory.Gal.TranscendenceTraces.trDeg_of : TrPush → TrLin → TrDeg := by
   intro hP hL q _ n i Z S p _ w d hw hq hpush x
   have h1 := hP q n i p (𝟙 S) w (by simpa using hw) hq x
   simp only [Category.comp_id] at h1

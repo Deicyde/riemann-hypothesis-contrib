@@ -13,14 +13,17 @@ noncomputable section
 
 variable {K : Type*} [Field K] [NumberField K]
 
-theorem finite_setOf_le_of_ne_bot {I : Ideal (𝓞 K)} (hI : I ≠ ⊥) :
-    {J : Ideal (𝓞 K) | I ≤ J}.Finite := by
+theorem finite_setOf_le_of_ne_bot {I : Ideal (𝓞 K)} (hI : I ≠ ⊥)
+    : {J : Ideal (𝓞 K) | I ≤ J}.Finite := by
   have hN : absNorm I ≠ 0 := fun h ↦ hI (absNorm_eq_zero_iff.1 h)
-  refine (Set.Finite.biUnion (Finset.finite_toSet (Finset.range (absNorm I + 1)))
-    fun k _ ↦ Ring.HasFiniteQuotients.finite_absNorm_eq (S := 𝓞 K) k).subset fun J hJ ↦ ?_
+  refine (Set.Finite.biUnion (Finset.finite_toSet (Finset.range (absNorm I + 1))) fun k _ ↦
+    Ring.HasFiniteQuotients.finite_absNorm_eq (S := 𝓞 K) k).subset fun J hJ ↦ ?_
   simp only [Set.mem_iUnion, Finset.coe_range, Set.mem_Iio]
-  exact ⟨absNorm J, Nat.lt_succ_of_le (Nat.le_of_dvd (Nat.pos_of_ne_zero hN)
-    (absNorm_dvd_absNorm_of_le hJ)), rfl⟩
+  exact ⟨
+    absNorm J,
+    Nat.lt_succ_of_le (Nat.le_of_dvd (Nat.pos_of_ne_zero hN) (absNorm_dvd_absNorm_of_le hJ)),
+    rfl
+  ⟩
 
 def idealDivisors (I : Ideal (𝓞 K)) : Finset (Ideal (𝓞 K)) :=
   if hI : I = ⊥ then ∅ else (finite_setOf_le_of_ne_bot hI).toFinset
@@ -30,11 +33,9 @@ theorem mem_idealDivisors {I J : Ideal (𝓞 K)} (hI : I ≠ ⊥) : J ∈ idealD
   rfl
 
 @[simp]
-theorem idealDivisors_bot : idealDivisors (⊥ : Ideal (𝓞 K)) = ∅ :=
-  dite_eq_left rfl
+theorem idealDivisors_bot : idealDivisors (⊥ : Ideal (𝓞 K)) = ∅ := dite_eq_left rfl
 
-def divisorSum (ψ : Ideal (𝓞 K) → ℝ) (I : Ideal (𝓞 K)) : ℝ :=
-  ∑ J ∈ idealDivisors I, ψ J
+def divisorSum (ψ : Ideal (𝓞 K) → ℝ) (I : Ideal (𝓞 K)) : ℝ := ∑ J ∈ idealDivisors I, ψ J
 
 @[simp]
 theorem divisorSum_bot (ψ : Ideal (𝓞 K) → ℝ) : divisorSum ψ ⊥ = 0 := by
@@ -46,29 +47,37 @@ theorem divisorSum_top (ψ : Ideal (𝓞 K) → ℝ) : divisorSum ψ ⊤ = ψ �
     rw [mem_idealDivisors top_ne_bot, Finset.mem_singleton, top_le_iff]
   rw [divisorSum, h, Finset.sum_singleton]
 
-theorem mul_sup_eq_of_le {R : Type*} [CommRing R] {I J B₁ B₂ : Ideal R} (hIJ : I ⊔ J = ⊤)
-    (h₁ : I ≤ B₁) (h₂ : J ≤ B₂) : B₁ * B₂ ⊔ I = B₁ := by
-  have hB₂ : B₂ ⊔ I = ⊤ := top_le_iff.1 (hIJ ▸ sup_le (le_sup_of_le_right le_rfl)
-    (le_sup_of_le_left h₂))
+theorem mul_sup_eq_of_le
+    {R : Type*} [CommRing R] {I J B₁ B₂ : Ideal R} (hIJ : I ⊔ J = ⊤) (h₁ : I ≤ B₁) (h₂ : J ≤ B₂)
+    : B₁ * B₂ ⊔ I = B₁ := by
+  have hB₂ : B₂ ⊔ I = ⊤ :=
+    top_le_iff.1 (hIJ ▸ sup_le (le_sup_of_le_right le_rfl) (le_sup_of_le_left h₂))
   refine le_antisymm (sup_le Ideal.mul_le_left h₁) ?_
-  calc B₁ = B₁ * (B₂ ⊔ I) := by rw [hB₂, Ideal.mul_top]
+  calc
+    B₁
+      = B₁ * (B₂ ⊔ I) := by rw [hB₂, Ideal.mul_top]
     _ = B₁ * B₂ ⊔ B₁ * I := Ideal.mul_sup _ _ _
     _ ≤ B₁ * B₂ ⊔ I := sup_le_sup_left Ideal.mul_le_right _
 
-theorem sup_mul_sup_eq_of_le {R : Type*} [CommRing R] {I J D : Ideal R} (hIJ : I ⊔ J = ⊤)
-    (hD : I * J ≤ D) : (D ⊔ I) * (D ⊔ J) = D := by
+theorem sup_mul_sup_eq_of_le
+    {R : Type*} [CommRing R] {I J D : Ideal R} (hIJ : I ⊔ J = ⊤) (hD : I * J ≤ D)
+    : (D ⊔ I) * (D ⊔ J) = D := by
   refine le_antisymm ?_ ?_
   · rw [Ideal.sup_mul, Ideal.mul_sup, Ideal.mul_sup]
     exact sup_le (sup_le Ideal.mul_le_left Ideal.mul_le_left) (sup_le Ideal.mul_le_right hD)
-  · calc D = D * (I ⊔ J) := by rw [hIJ, Ideal.mul_top]
+  · calc
+      D = D * (I ⊔ J) := by rw [hIJ, Ideal.mul_top]
       _ = D * I ⊔ D * J := Ideal.mul_sup _ _ _
-      _ ≤ (D ⊔ I) * (D ⊔ J) := sup_le (by
-          rw [mul_comm]
-          exact Ideal.mul_mono le_sup_right le_sup_left)
+      _ ≤ (D ⊔ I) * (D ⊔ J) :=
+        sup_le
+          (by
+            rw [mul_comm]
+            exact Ideal.mul_mono le_sup_right le_sup_left)
           (Ideal.mul_mono le_sup_left le_sup_right)
 
-theorem divisorSum_mul {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B)
-    {I J : Ideal (𝓞 K)} (hIJ : I ⊔ J = ⊤) : divisorSum ψ (I * J) = divisorSum ψ I * divisorSum ψ J := by
+theorem divisorSum_mul
+    {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B) {I J : Ideal (𝓞 K)} (hIJ : I ⊔ J = ⊤)
+    : divisorSum ψ (I * J) = divisorSum ψ I * divisorSum ψ J := by
   by_cases hI : I = ⊥
   · simp [hI]
   by_cases hJ : J = ⊥
@@ -97,17 +106,18 @@ theorem divisorSum_mul {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) 
   · intro p _
     exact (hψ p.1 p.2).symm
 
-theorem divisorSum_prime_pow {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B)
-    (hψ1 : ψ ⊤ = 1) {P : Ideal (𝓞 K)} (hP : Prime P) (k : ℕ) :
-    divisorSum ψ (P ^ k) = ∑ j ∈ Finset.range (k + 1), ψ P ^ j := by
+theorem divisorSum_prime_pow
+    {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B) (hψ1 : ψ ⊤ = 1)
+    {P : Ideal (𝓞 K)} (hP : Prime P)
+    (k : ℕ)
+    : divisorSum ψ (P ^ k) = ∑ j ∈ Finset.range (k + 1), ψ P ^ j := by
   have hP0 : P ≠ ⊥ := hP.ne_zero
   have hPk : P ^ k ≠ ⊥ := pow_ne_zero k hP0
   have hψpow : ∀ j : ℕ, ψ (P ^ j) = ψ P ^ j := fun j ↦ by
     induction j with
     | zero => rw [pow_zero, pow_zero, Ideal.one_eq_top, hψ1]
     | succ j ih => rw [pow_succ, pow_succ, hψ, ih]
-  have hinj : Function.Injective fun j : ℕ ↦ P ^ j :=
-    pow_injective_of_not_isUnit hP.not_isUnit hP0
+  have hinj : Function.Injective fun j : ℕ ↦ P ^ j := pow_injective_of_not_isUnit hP.not_isUnit hP0
   have hset : idealDivisors (P ^ k) = (Finset.range (k + 1)).image fun j ↦ P ^ j := by
     ext D
     rw [mem_idealDivisors hPk, Finset.mem_image, ← Ideal.dvd_iff_le, dvd_prime_pow hP]
@@ -120,8 +130,8 @@ theorem divisorSum_prime_pow {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A
   rw [divisorSum, hset, Finset.sum_image fun i _ j _ h ↦ hinj h]
   exact Finset.sum_congr rfl fun j _ ↦ hψpow j
 
-theorem geom_sum_nonneg_of_abs_le_one {x : ℝ} (hx : |x| ≤ 1) (n : ℕ) :
-    0 ≤ ∑ j ∈ Finset.range n, x ^ j := by
+theorem geom_sum_nonneg_of_abs_le_one {x : ℝ} (hx : |x| ≤ 1) (n : ℕ)
+    : 0 ≤ ∑ j ∈ Finset.range n, x ^ j := by
   rcases eq_or_ne x 1 with rfl | h1
   · simp
   have hlt : x < 1 := lt_of_le_of_ne (le_of_abs_le hx) h1
@@ -130,8 +140,10 @@ theorem geom_sum_nonneg_of_abs_le_one {x : ℝ} (hx : |x| ≤ 1) (n : ℕ) :
   have : x ^ n ≤ 1 := (le_abs_self _).trans (by rw [abs_pow]; exact pow_le_one₀ (abs_nonneg x) hx)
   linarith
 
-theorem divisorSum_nonneg {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B)
-    (hψ1 : ψ ⊤ = 1) (hψb : ∀ A, |ψ A| ≤ 1) (I : Ideal (𝓞 K)) : 0 ≤ divisorSum ψ I := by
+theorem divisorSum_nonneg
+    {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B) (hψ1 : ψ ⊤ = 1) (hψb : ∀ A, |ψ A| ≤ 1)
+    (I : Ideal (𝓞 K))
+    : 0 ≤ divisorSum ψ I := by
   induction I using UniqueFactorizationMonoid.induction_on_coprime with
   | h0 => rw [Ideal.zero_eq_bot, divisorSum_bot]
   | h1 hu =>
@@ -154,29 +166,26 @@ theorem neg_ne_zero_of_one_lt_re {s : ℂ} (hs : 1 < s.re) : -s ≠ 0 :=
     rw [h, zero_re] at hs
     linarith
 
-theorem summable_norm_mul_cpow {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| ≤ 1) {s : ℂ}
-    (hs : 1 < s.re) : Summable fun J : Ideal (𝓞 K) ↦ ‖(ψ J : ℂ) * (absNorm J : ℂ) ^ (-s)‖ := by
-  refine (summable_absNorm_rpow_inv (K := K) hs).of_nonneg_of_le
-    (fun _ ↦ norm_nonneg _) fun J ↦ ?_
+theorem summable_norm_mul_cpow {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| ≤ 1) {s : ℂ} (hs : 1 < s.re)
+    : Summable fun J : Ideal (𝓞 K) ↦ ‖(ψ J : ℂ) * (absNorm J : ℂ) ^ (-s)‖ := by
+  refine (summable_absNorm_rpow_inv (K := K) hs).of_nonneg_of_le (fun _ ↦ norm_nonneg _) fun J ↦ ?_
   by_cases hJ : J = ⊥
-  · simp [hJ, zero_cpow (neg_ne_zero_of_one_lt_re hs),
-      Real.zero_rpow (zero_lt_one.trans hs).ne']
+  · simp [hJ, zero_cpow (neg_ne_zero_of_one_lt_re hs), Real.zero_rpow (zero_lt_one.trans hs).ne']
   · have hpos : 0 < absNorm J := Nat.pos_of_ne_zero (absNorm_eq_zero_iff.not.2 hJ)
     rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, cpow_neg, norm_inv,
       norm_natCast_cpow_of_pos hpos]
     exact mul_le_of_le_one_left (inv_nonneg.2 (Real.rpow_nonneg (Nat.cast_nonneg _) _)) (hψb J)
 
-theorem hasSum_divisorSum {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| ≤ 1) {s : ℂ}
-    (hs : 1 < s.re) :
-    HasSum (fun I : Ideal (𝓞 K) ↦ (divisorSum ψ I : ℂ) * (absNorm I : ℂ) ^ (-s))
+theorem hasSum_divisorSum {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| ≤ 1) {s : ℂ} (hs : 1 < s.re)
+    : HasSum
+      (fun I : Ideal (𝓞 K) ↦ (divisorSum ψ I : ℂ) * (absNorm I : ℂ) ^ (-s))
       ((∑' J, (ψ J : ℂ) * (absNorm J : ℂ) ^ (-s)) * dedekindZeta K s) := by
   have hs0 := neg_ne_zero_of_one_lt_re hs
   set f : Ideal (𝓞 K) → ℂ := fun J ↦ (ψ J : ℂ) * (absNorm J : ℂ) ^ (-s) with hf_def
   set g : Ideal (𝓞 K) → ℂ := fun J ↦ (absNorm J : ℂ) ^ (-s) with hg_def
   have hf := summable_norm_mul_cpow hψb hs
   have hg : Summable fun J ↦ ‖g J‖ := by
-    simpa [hg_def] using
-      (summable_norm_mul_cpow (K := K) (ψ := fun _ ↦ 1) (by simp) hs)
+    simpa [hg_def] using (summable_norm_mul_cpow (K := K) (ψ := fun _ ↦ 1) (by simp) hs)
   have hζ : dedekindZeta K s = ∑' J, g J := by
     let e := Equiv.sigmaFiberEquiv (fun J : Ideal (𝓞 K) ↦ absNorm J)
     have hsum := e.summable_iff.2 hg.of_norm
@@ -184,8 +193,7 @@ theorem hasSum_divisorSum {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| �
     unfold dedekindZeta LSeries
     rw [← hgroup.tsum_eq]
     refine tsum_congr fun n ↦ ?_
-    have hterm (J : {J : Ideal (𝓞 K) // absNorm J = n}) :
-        (g ∘ e) ⟨n, J⟩ = (n : ℂ) ^ (-s) := by
+    have hterm (J : {J : Ideal (𝓞 K) // absNorm J = n}) : (g ∘ e) ⟨n, J⟩ = (n : ℂ) ^ (-s) := by
       simp [e, hg_def, J.2]
     rw [LSeries.term_def, tsum_congr hterm, tsum_const, nsmul_eq_mul]
     split_ifs with hn
@@ -213,35 +221,38 @@ theorem hasSum_divisorSum {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| �
 
   have hdvd : ∀ J : {J // J ∈ idealDivisors I}, J.1 ∣ I := fun J ↦
     Ideal.dvd_iff_le.2 ((mem_idealDivisors hI).1 J.2)
-  have hfib : ∀ q : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I},
-      q.1.1 ∈ idealDivisors I := fun q ↦ by
+  have hfib
+      : ∀ q : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I},
+        q.1.1 ∈ idealDivisors I := fun q ↦ by
     rw [mem_idealDivisors hI]
-    calc I = q.1.1 * q.1.2 := q.2.symm
+    calc
+      I = q.1.1 * q.1.2 := q.2.symm
       _ ≤ q.1.1 := Ideal.mul_le_left
-  have hne : ∀ q : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I},
-      q.1.1 ≠ ⊥ := fun q h0 ↦ hI (by rw [← q.2, h0, Ideal.bot_mul])
-  let eqv : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I} ≃ {J // J ∈ idealDivisors I} :=
-    { toFun := fun q ↦ ⟨q.1.1, hfib q⟩
-      invFun := fun J ↦ ⟨(J.1, (hdvd J).choose), (hdvd J).choose_spec.symm⟩
-      left_inv := fun q ↦ by
-        refine Subtype.ext (Prod.ext rfl ?_)
-        have h1 : I = q.1.1 * (hdvd ⟨q.1.1, hfib q⟩).choose := (hdvd ⟨q.1.1, hfib q⟩).choose_spec
-        exact mul_left_cancel₀ (hne q) (h1.symm.trans q.2.symm)
-      right_inv := fun J ↦ rfl }
-  have hterm : ∀ q : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I},
-      (F ∘ e) ⟨I, q⟩ = (ψ (eqv q).1 : ℂ) * (absNorm I : ℂ) ^ (-s) := fun q ↦ by
+  have hne : ∀ q : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I}, q.1.1 ≠ ⊥ := fun q h0 ↦
+    hI (by rw [← q.2, h0, Ideal.bot_mul])
+  let eqv : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I} ≃ {J // J ∈ idealDivisors I} := {
+    toFun := fun q ↦ ⟨q.1.1, hfib q⟩
+    invFun := fun J ↦ ⟨(J.1, (hdvd J).choose), (hdvd J).choose_spec.symm⟩
+    left_inv := fun q ↦ by
+      refine Subtype.ext (Prod.ext rfl ?_)
+      have h1 : I = q.1.1 * (hdvd ⟨q.1.1, hfib q⟩).choose := (hdvd ⟨q.1.1, hfib q⟩).choose_spec
+      exact mul_left_cancel₀ (hne q) (h1.symm.trans q.2.symm)
+    right_inv := fun J ↦ rfl
+  }
+  have hterm
+      : ∀ q : {p : Ideal (𝓞 K) × Ideal (𝓞 K) // p.1 * p.2 = I},
+        (F ∘ e) ⟨I, q⟩ = (ψ (eqv q).1 : ℂ) * (absNorm I : ℂ) ^ (-s) := fun q ↦ by
     change f q.1.1 * g q.1.2 = (ψ q.1.1 : ℂ) * (absNorm I : ℂ) ^ (-s)
-    rw [hf_def, hg_def, mul_assoc, ← natCast_mul_natCast_cpow,
-      ← Nat.cast_mul, ← map_mul, q.2]
+    rw [hf_def, hg_def, mul_assoc, ← natCast_mul_natCast_cpow, ← Nat.cast_mul, ← map_mul, q.2]
   rw [tsum_congr hterm, tsum_mul_right, Equiv.tsum_eq eqv (fun J ↦ (ψ J.1 : ℂ)),
     Finset.tsum_subtype (idealDivisors I) (fun J ↦ (ψ J : ℂ)), divisorSum, ofReal_sum]
 
 def divisorSumCoeff (ψ : Ideal (𝓞 K) → ℝ) (n : ℕ) : ℂ :=
   ∑' I : {I : Ideal (𝓞 K) // absNorm I = n}, (divisorSum ψ I : ℂ)
 
-theorem hasSum_LSeries_term_divisorSum {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| ≤ 1) {s : ℂ}
-    (hs : 1 < s.re) :
-    HasSum (LSeries.term (divisorSumCoeff ψ) s)
+theorem hasSum_LSeries_term_divisorSum
+    {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀ A, |ψ A| ≤ 1) {s : ℂ} (hs : 1 < s.re)
+    : HasSum (LSeries.term (divisorSumCoeff ψ) s)
       ((∑' J, (ψ J : ℂ) * (absNorm J : ℂ) ^ (-s)) * dedekindZeta K s) := by
   have hs0 := neg_ne_zero_of_one_lt_re hs
   have hsum := hasSum_divisorSum hψb hs
@@ -262,10 +273,11 @@ theorem hasSum_LSeries_term_divisorSum {ψ : Ideal (𝓞 K) → ℝ} (hψb : ∀
     refine tsum_congr fun y ↦ ?_
     simp [e, hh, y.2, cpow_neg, div_eq_mul_inv]
 
-
 open scoped ComplexOrder in
-theorem divisorSumCoeff_nonneg {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B)
-    (hψ1 : ψ ⊤ = 1) (hψb : ∀ A, |ψ A| ≤ 1) (n : ℕ) : 0 ≤ divisorSumCoeff ψ n := by
+theorem divisorSumCoeff_nonneg
+    {ψ : Ideal (𝓞 K) → ℝ} (hψ : ∀ A B, ψ (A * B) = ψ A * ψ B) (hψ1 : ψ ⊤ = 1) (hψb : ∀ A, |ψ A| ≤ 1)
+    (n : ℕ)
+    : 0 ≤ divisorSumCoeff ψ n := by
   rw [divisorSumCoeff, ← Complex.ofReal_tsum]
   exact Complex.zero_le_real.2 (tsum_nonneg fun I ↦ divisorSum_nonneg hψ hψ1 hψb I)
 

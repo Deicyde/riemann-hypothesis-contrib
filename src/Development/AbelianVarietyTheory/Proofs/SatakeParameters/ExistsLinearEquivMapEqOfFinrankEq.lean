@@ -5,16 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsIntOv
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.SplitHecke
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
+  GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.SplitHecke
 
-theorem exists_linearEquiv_map_eq_of_finrank_eq {k V : Type} [Field k] [AddCommGroup V]
-    [Module k V] [FiniteDimensional k V] (W W' : Submodule k V)
-    (h : Module.finrank k W = Module.finrank k W') :
-    ∃ e : V ≃ₗ[k] V, W.map e.toLinearMap = W' := by
+theorem exists_linearEquiv_map_eq_of_finrank_eq
+    {k V : Type} [Field k] [AddCommGroup V] [Module k V] [FiniteDimensional k V]
+    (W W' : Submodule k V) (h : Module.finrank k W = Module.finrank k W')
+    : ∃ e : V ≃ₗ[k] V, W.map e.toLinearMap = W' := by
   obtain ⟨U, hU⟩ := W.exists_isCompl
   obtain ⟨U', hU'⟩ := W'.exists_isCompl
   have h1 := Submodule.finrank_add_eq_of_isCompl hU
@@ -22,8 +25,9 @@ theorem exists_linearEquiv_map_eq_of_finrank_eq {k V : Type} [Field k] [AddCommG
   have h3 : Module.finrank k U = Module.finrank k U' := by omega
   let a : W ≃ₗ[k] W' := LinearEquiv.ofFinrankEq _ _ h
   let b : U ≃ₗ[k] U' := LinearEquiv.ofFinrankEq _ _ h3
-  let e : V ≃ₗ[k] V := (Submodule.prodEquivOfIsCompl W U hU).symm ≪≫ₗ (a.prodCongr b) ≪≫ₗ
-    Submodule.prodEquivOfIsCompl W' U' hU'
+  let e : V ≃ₗ[k] V :=
+    (Submodule.prodEquivOfIsCompl W U hU).symm ≪≫ₗ (a.prodCongr b)
+      ≪≫ₗ Submodule.prodEquivOfIsCompl W' U' hU'
   have he : ∀ w : W, e w = a w := by
     intro w
     simp [e]
@@ -41,11 +45,12 @@ theorem exists_linearEquiv_map_eq_of_finrank_eq {k V : Type} [Field k] [AddCommG
     rw [he]
     simp
 
-theorem exists_gl_map_residue_eq (O : Type) [CommRing O] [IsLocalRing O] (n : ℕ)
-    (W W' : Submodule (IsLocalRing.ResidueField O) (Fin n → IsLocalRing.ResidueField O))
-    (h : Module.finrank (IsLocalRing.ResidueField O) W =
-      Module.finrank (IsLocalRing.ResidueField O) W') :
-    ∃ g : GL (Fin n) O, W.map (g.1.map (IsLocalRing.residue O)).mulVecLin = W' := by
+theorem exists_gl_map_residue_eq
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (n : ℕ) (W W' : Submodule (IsLocalRing.ResidueField O) (Fin n → IsLocalRing.ResidueField O))
+    (h : Module.finrank (IsLocalRing.ResidueField O) W
+      = Module.finrank (IsLocalRing.ResidueField O) W')
+    : ∃ g : GL (Fin n) O, W.map (g.1.map (IsLocalRing.residue O)).mulVecLin = W' := by
   obtain ⟨e, he⟩ := exists_linearEquiv_map_eq_of_finrank_eq W W' h
   let M : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField O) := LinearMap.toMatrix' e.toLinearMap
   choose A hA using fun i j => IsLocalRing.residue_surjective (R := O) (M i j)

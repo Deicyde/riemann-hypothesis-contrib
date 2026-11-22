@@ -11,10 +11,14 @@ namespace PI.DefPosDefWork
 
 open Matrix ComplexOrder
 
-theorem re_nonneg_of_rat {k : ℕ} (M : Matrix (Fin k) (Fin k) ℂ) (z : ℂ) (hz : z.im ≠ 0)
-    (h : ∀ α β : Fin k → ℚ, 0 ≤ (star (fun i => (α i : ℂ) + (β i : ℂ) * z) ⬝ᵥ
-      (M *ᵥ (fun i => (α i : ℂ) + (β i : ℂ) * z))).re)
-    (v : Fin k → ℂ) : 0 ≤ (star v ⬝ᵥ (M *ᵥ v)).re := by
+theorem re_nonneg_of_rat
+    {k : ℕ} (M : Matrix (Fin k) (Fin k) ℂ)
+    (z : ℂ) (hz : z.im ≠ 0)
+    (h : ∀ α β : Fin k → ℚ,
+      0 ≤ (star (fun i => (α i : ℂ) + (β i : ℂ) * z)
+        ⬝ᵥ (M *ᵥ (fun i => (α i : ℂ) + (β i : ℂ) * z))).re)
+    (v : Fin k → ℂ)
+    : 0 ≤ (star v ⬝ᵥ (M *ᵥ v)).re := by
   have hQc : Continuous fun w : Fin k → ℂ => (star w ⬝ᵥ (M *ᵥ w)).re := by
     show Continuous fun w : Fin k → ℂ => (∑ i, star (w i) * ∑ j, M i j * w j).re
     exact Complex.continuous_re.comp (continuous_finsetSum _ fun i _ =>
@@ -25,23 +29,29 @@ theorem re_nonneg_of_rat {k : ℕ} (M : Matrix (Fin k) (Fin k) ℂ) (z : ℂ) (h
   let d : (Fin k → ℚ) × (Fin k → ℚ) → (Fin k → ℝ) × (Fin k → ℝ) :=
     Prod.map (fun α i => (α i : ℝ)) (fun β i => (β i : ℝ))
   have hd : DenseRange d :=
-    (DenseRange.piMap fun _ => Rat.denseRange_cast).prodMap (DenseRange.piMap fun _ => Rat.denseRange_cast)
+    (DenseRange.piMap fun _ => Rat.denseRange_cast).prodMap
+      (DenseRange.piMap fun _ => Rat.denseRange_cast)
   have key : ∀ p : (Fin k → ℝ) × (Fin k → ℝ), 0 ≤ (star (ψ p) ⬝ᵥ (M *ᵥ ψ p)).re := fun p =>
-    hd.induction_on p (isClosed_le continuous_const (hQc.comp hψ)) (fun q => by simpa [ψ, d] using h q.1 q.2)
-  let p : (Fin k → ℝ) × (Fin k → ℝ) := (fun i => (v i).re - (v i).im / z.im * z.re, fun i => (v i).im / z.im)
+    hd.induction_on p (isClosed_le continuous_const (hQc.comp hψ))
+      (fun q => by simpa [ψ, d] using h q.1 q.2)
+  let p : (Fin k → ℝ) × (Fin k → ℝ) :=
+    (fun i => (v i).re - (v i).im / z.im * z.re, fun i => (v i).im / z.im)
   have hp : ψ p = v := by
     funext i
     apply Complex.ext <;> simp [ψ, p] <;> (try field_simp) <;> (try ring)
   have h1 := key p
   rwa [hp] at h1
 
-theorem re_quad {k : ℕ} (N : Matrix (Fin k) (Fin k) ℂ) (hN : ∀ i j, (N i j).im = 0) (a b : Fin k → ℝ) :
-    (star (fun i => (a i : ℂ) + (b i : ℂ) * Complex.I) ⬝ᵥ (N *ᵥ (fun i => (a i : ℂ) + (b i : ℂ) * Complex.I))).re
+theorem re_quad
+    {k : ℕ} (N : Matrix (Fin k) (Fin k) ℂ) (hN : ∀ i j, (N i j).im = 0) (a b : Fin k → ℝ)
+    : (star (fun i => (a i : ℂ) + (b i : ℂ) * Complex.I)
+        ⬝ᵥ (N *ᵥ (fun i => (a i : ℂ) + (b i : ℂ) * Complex.I))).re
       = (star (fun i => (a i : ℂ)) ⬝ᵥ (N *ᵥ (fun i => (a i : ℂ)))).re
         + (star (fun i => (b i : ℂ)) ⬝ᵥ (N *ᵥ (fun i => (b i : ℂ)))).re := by
-  simp only [dotProduct, Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Complex.re_sum, Complex.mul_re,
-    Complex.star_def, Complex.conj_re, Complex.conj_im, Complex.add_re, Complex.add_im, Complex.ofReal_re,
-    Complex.ofReal_im, Complex.I_re, Complex.I_im, Complex.mul_im, hN]
+  simp only [dotProduct, Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Complex.re_sum,
+    Complex.mul_re, Complex.star_def, Complex.conj_re, Complex.conj_im, Complex.add_re,
+    Complex.add_im, Complex.ofReal_re, Complex.ofReal_im, Complex.I_re, Complex.I_im,
+    Complex.mul_im, hN]
   rw [← Finset.sum_add_distrib]
   apply Finset.sum_congr rfl
   intro i _
@@ -50,9 +60,13 @@ theorem re_quad {k : ℕ} (N : Matrix (Fin k) (Fin k) ℂ) (hN : ∀ i j, (N i j
   intro j _
   ring
 
-theorem posDef_of_points {E : Type} [Field E] (φ : E →+* ℂ) {k : ℕ} (N : Matrix (Fin k) (Fin k) ℂ)
-    (hN : N.IsHermitian) (hu : IsUnit N) (hNr : (∀ t : E, (φ t).im = 0) → ∀ i j, (N i j).im = 0)
-    (hpt : ∀ x : Fin k → E, 0 ≤ (star (fun i => φ (x i)) ⬝ᵥ (N *ᵥ (fun i => φ (x i)))).re) : N.PosDef := by
+theorem posDef_of_points
+    {E : Type} [Field E]
+    (φ : E →+* ℂ)
+    {k : ℕ} (N : Matrix (Fin k) (Fin k) ℂ) (hN : N.IsHermitian) (hu : IsUnit N)
+    (hNr : (∀ t : E, (φ t).im = 0) → ∀ i j, (N i j).im = 0)
+    (hpt : ∀ x : Fin k → E, 0 ≤ (star (fun i => φ (x i)) ⬝ᵥ (N *ᵥ (fun i => φ (x i)))).re)
+    : N.PosDef := by
   haveI : CharZero E := RingHom.charZero φ
   have hPSD : ∀ v : Fin k → ℂ, 0 ≤ (star v ⬝ᵥ (N *ᵥ v)).re := by
     by_cases hreal : ∀ t : E, (φ t).im = 0
@@ -66,8 +80,10 @@ theorem posDef_of_points {E : Type} [Field E] (φ : E →+* ℂ) {k : ℕ} (N : 
               continuous_const.mul (Complex.continuous_ofReal.comp (continuous_apply j))))
       have hd : DenseRange (fun α : Fin k → ℚ => fun i => (α i : ℝ)) :=
         DenseRange.piMap fun _ => Rat.denseRange_cast
-      have hreal' : ∀ a : Fin k → ℝ, 0 ≤ (star (fun i => (a i : ℂ)) ⬝ᵥ (N *ᵥ fun i => (a i : ℂ))).re :=
-        fun a => hd.induction_on a (isClosed_le continuous_const hQc) (fun α => by
+      have hreal'
+          : ∀ a : Fin k → ℝ,
+            0 ≤ (star (fun i => (a i : ℂ)) ⬝ᵥ (N *ᵥ fun i => (a i : ℂ))).re := fun a =>
+        hd.induction_on a (isClosed_le continuous_const hQc) (fun α => by
           have h1 := hpt (fun i => (α i : E))
           simpa [map_ratCast] using h1)
       intro v
@@ -98,12 +114,14 @@ theorem positive_definite_second : Step2 := by
   have hMh : (J.map φ).IsHermitian := by
     ext i j
     simp only [Matrix.conjTranspose_apply, Matrix.map_apply, hst, hJ]
-  have hQ : ∀ x : Fin k → E, star (fun i => φ (x i)) ⬝ᵥ (J.map φ *ᵥ (fun i => φ (x i)))
-      = φ (hform (σ : E →+* E) J x x) := by
+  have hQ
+      : ∀ x : Fin k → E,
+        star (fun i => φ (x i)) ⬝ᵥ (J.map φ *ᵥ (fun i => φ (x i)))
+          = φ (hform (σ : E →+* E) J x x) := by
     intro x
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [dotProduct, mulVec, hform, Pi.star_apply, hst, Matrix.map_apply, map_sum, map_mul,
-      Finset.mul_sum, mul_assoc]
+        Finset.mul_sum, mul_assoc]
     rfl
   have hdet : J.det ≠ 0 := by
     intro h0
@@ -125,7 +143,8 @@ theorem positive_definite_second : Step2 := by
       rw [ha0, map_zero] at ha'
       exact lt_irrefl _ ha'
   have hMu : IsUnit (J.map φ) := by
-    rw [Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
+    rw [Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero, ← RingHom.mapMatrix_apply,
+      ← RingHom.map_det]
     exact (map_ne_zero φ).mpr hdet
   have hMr : (∀ t : E, (φ t).im = 0) → ∀ i j, ((J.map φ) i j).im = 0 := fun ht i j => ht (J i j)
   have hQ0 : ∀ x : Fin k → E, x = 0 → hform (σ : E →+* E) J x x = 0 := by
@@ -143,7 +162,8 @@ theorem positive_definite_second : Step2 := by
       rw [← ha, hr']
       simpa using ha'.le
   · right
-    refine posDef_of_points φ _ hMh.neg hMu.neg (fun ht i j => by simpa using hMr ht i j) fun x => ?_
+    refine
+      posDef_of_points φ _ hMh.neg hMu.neg (fun ht i j => by simpa using hMr ht i j) fun x => ?_
     rw [Matrix.neg_mulVec, dotProduct_neg, hQ]
     by_cases hx : x = 0
     · rw [hQ0 x hx]

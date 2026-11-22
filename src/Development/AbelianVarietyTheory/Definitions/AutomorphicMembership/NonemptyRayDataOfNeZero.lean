@@ -19,27 +19,47 @@ def primeTo (K : Type) [Field K] [NumberField K] (M : ℕ) : Submonoid (Ideal (�
   mul_mem' := fun {I J} hI hJ => ⟨hI.1.mul_left hJ.1, mul_ne_zero hI.2 hJ.2⟩
   one_mem' := ⟨isCoprime_one_left, one_ne_zero⟩
 
-theorem one_mul_mem {R : Type} [CommRing R] {A : Ideal R} {a b : R} (ha : a - 1 ∈ A) (hb : b - 1 ∈ A) : a * b - 1 ∈ A := by
+theorem one_mul_mem
+    {R : Type} [CommRing R] {A : Ideal R} {a b : R} (ha : a - 1 ∈ A) (hb : b - 1 ∈ A)
+    : a * b - 1 ∈ A := by
   have e : a * b - 1 = (a - 1) * b + (b - 1) := by ring
   rw [e]
   exact A.add_mem (A.mul_mem_right b ha) hb
 
 def rayCon (K : Type) [Field K] [NumberField K] (M : ℕ) : Con (primeTo K M) where
-  r I J := ∃ a b : 𝓞 K, a ≠ 0 ∧ b ≠ 0 ∧ a - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ b - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧
-      Ideal.span {a} * I.1 = Ideal.span {b} * J.1
-  iseqv := ⟨fun I => ⟨1, 1, one_ne_zero, one_ne_zero, by simp, by simp, rfl⟩,
+  r I J :=
+    ∃ a b : 𝓞 K,
+      a ≠ 0 ∧ b ≠ 0 ∧ a - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ b - 1 ∈ Ideal.span {(M : 𝓞 K)}
+        ∧ Ideal.span {a} * I.1 = Ideal.span {b} * J.1
+  iseqv := ⟨
+    fun I => ⟨1, 1, one_ne_zero, one_ne_zero, by simp, by simp, rfl⟩,
     fun ⟨a, b, ha, hb, ha', hb', h⟩ => ⟨b, a, hb, ha, hb', ha', h.symm⟩,
-    fun ⟨a, b, ha, hb, ha', hb', h⟩ ⟨c, d, hc, hd, hc', hd', h'⟩ =>
-      ⟨a * c, b * d, mul_ne_zero ha hc, mul_ne_zero hb hd, one_mul_mem ha' hc', one_mul_mem hb' hd', by
+    fun ⟨a, b, ha, hb, ha', hb', h⟩ ⟨c, d, hc, hd, hc', hd', h'⟩ => ⟨
+      a * c,
+      b * d,
+      mul_ne_zero ha hc,
+      mul_ne_zero hb hd,
+      one_mul_mem ha' hc',
+      one_mul_mem hb' hd',
+      by
         rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_mul_span_singleton,
-          mul_right_comm, h, mul_right_comm, mul_assoc, h', mul_assoc]⟩⟩
-  mul' := fun ⟨a, b, ha, hb, ha', hb', h⟩ ⟨c, d, hc, hd, hc', hd', h'⟩ =>
-      ⟨a * c, b * d, mul_ne_zero ha hc, mul_ne_zero hb hd, one_mul_mem ha' hc', one_mul_mem hb' hd', by
-        rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_mul_span_singleton,
-          Submonoid.coe_mul, Submonoid.coe_mul, mul_mul_mul_comm, h, h', mul_mul_mul_comm]⟩
+          mul_right_comm, h, mul_right_comm, mul_assoc, h', mul_assoc]
+    ⟩
+  ⟩
+  mul' := fun ⟨a, b, ha, hb, ha', hb', h⟩ ⟨c, d, hc, hd, hc', hd', h'⟩ => ⟨
+    a * c,
+    b * d,
+    mul_ne_zero ha hc,
+    mul_ne_zero hb hd,
+    one_mul_mem ha' hc',
+    one_mul_mem hb' hd',
+    by
+      rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_mul_span_singleton,
+        Submonoid.coe_mul, Submonoid.coe_mul, mul_mul_mul_comm, h, h', mul_mul_mul_comm]
+  ⟩
 
-theorem exists_beta {M : ℕ} {α : 𝓞 K} (h : IsCoprime (Ideal.span {α}) (Ideal.span {(M : 𝓞 K)})) :
-    ∃ β : 𝓞 K, β ≠ 0 ∧ β * α - 1 ∈ Ideal.span {(M : 𝓞 K)} := by
+theorem exists_beta {M : ℕ} {α : 𝓞 K} (h : IsCoprime (Ideal.span {α}) (Ideal.span {(M : 𝓞 K)}))
+    : ∃ β : 𝓞 K, β ≠ 0 ∧ β * α - 1 ∈ Ideal.span {(M : 𝓞 K)} := by
   obtain ⟨i, hi, j, hj, hij⟩ := Ideal.isCoprime_iff_exists.mp h
   obtain ⟨β, rfl⟩ := Ideal.mem_span_singleton'.mp hi
   by_cases hβ : β = 0
@@ -56,9 +76,11 @@ theorem exists_beta {M : ℕ} {α : 𝓞 K} (h : IsCoprime (Ideal.span {α}) (Id
 def icl {M : ℕ} (I : primeTo K M) : ClassGroup (𝓞 K) :=
   ClassGroup.mk0 ⟨I.1, mem_nonZeroDivisors_of_ne_zero I.2.2⟩
 
-theorem exists_compl {M : ℕ} (I : primeTo K M) : ∃ L : primeTo K M, ∀ J : primeTo K M, icl J = icl I →
-    ∃ α : 𝓞 K, J.1 * L.1 = Ideal.span {α} := by
-  have hle : primeTo K M ≤ nonZeroDivisors (Ideal (𝓞 K)) := fun J hJ => mem_nonZeroDivisors_of_ne_zero hJ.2
+theorem exists_compl {M : ℕ} (I : primeTo K M)
+    : ∃ L : primeTo K M, ∀ J : primeTo K M,
+      icl J = icl I → ∃ α : 𝓞 K, J.1 * L.1 = Ideal.span {α} := by
+  have hle : primeTo K M ≤ nonZeroDivisors (Ideal (𝓞 K)) := fun J hJ =>
+    mem_nonZeroDivisors_of_ne_zero hJ.2
   let φ : primeTo K M →* ClassGroup (𝓞 K) := ClassGroup.mk0.comp (Submonoid.inclusion hle)
   have hφ : ∀ J, φ J = icl J := fun J => rfl
   refine ⟨I ^ (Fintype.card (ClassGroup (𝓞 K)) - 1), fun J hJ => ?_⟩
@@ -76,16 +98,17 @@ theorem finite_quot {M : ℕ} (hM : M ≠ 0) : Finite (rayCon K M).Quotient := b
     exact_mod_cast hM
   have : Finite (𝓞 K ⧸ Ideal.span {(M : 𝓞 K)}) :=
     (Ideal.absNorm_ne_zero_iff _).mp (by rwa [Ne, Ideal.absNorm_eq_zero_iff])
-  have hL : ∀ c : ClassGroup (𝓞 K), ∃ L : primeTo K M, ∀ J : primeTo K M, icl J = c →
-      ∃ α : 𝓞 K, J.1 * L.1 = Ideal.span {α} := by
+  have hL
+      : ∀ c : ClassGroup (𝓞 K), ∃ L : primeTo K M, ∀ J : primeTo K M,
+        icl J = c → ∃ α : 𝓞 K, J.1 * L.1 = Ideal.span {α} := by
     intro c
     by_cases hc : ∃ I : primeTo K M, icl I = c
     · obtain ⟨I, rfl⟩ := hc
       exact exists_compl I
     · exact ⟨1, fun J hJ => (hc ⟨J, hJ⟩).elim⟩
   choose L hL using hL
-  have hα : ∀ J : primeTo K M, ∃ α : 𝓞 K, J.1 * (L (icl J)).1 = Ideal.span {α} :=
-    fun J => hL _ J rfl
+  have hα : ∀ J : primeTo K M, ∃ α : 𝓞 K, J.1 * (L (icl J)).1 = Ideal.span {α} := fun J =>
+    hL _ J rfl
   choose α hα using hα
   have hne : ∀ J : primeTo K M, α J ≠ 0 := by
     intro J h0
@@ -93,8 +116,8 @@ theorem finite_quot {M : ℕ} (hM : M ≠ 0) : Finite (rayCon K M).Quotient := b
       rw [← hα J]
       exact mul_ne_zero J.2.2 (L (icl J)).2.2
     exact hb (Ideal.span_singleton_eq_bot.mpr h0)
-  let f : primeTo K M → ClassGroup (𝓞 K) × (𝓞 K ⧸ Ideal.span {(M : 𝓞 K)}) :=
-    fun J => (icl J, Ideal.Quotient.mk _ (α J))
+  let f : primeTo K M → ClassGroup (𝓞 K) × (𝓞 K ⧸ Ideal.span {(M : 𝓞 K)}) := fun J =>
+    (icl J, Ideal.Quotient.mk _ (α J))
   have key : ∀ J₁ J₂ : primeTo K M, f J₁ = f J₂ → rayCon K M J₁ J₂ := by
     intro J₁ J₂ h
     simp only [f, Prod.mk.injEq] at h
@@ -112,8 +135,7 @@ theorem finite_quot {M : ℕ} (hM : M ≠ 0) : Finite (rayCon K M).Quotient := b
       exact sub_mem hβα (Ideal.mul_mem_left _ _ (Ideal.Quotient.eq.mp hm))
     · apply mul_right_cancel₀ (b := (L (icl J₂)).1) (L (icl J₂)).2.2
       rw [mul_assoc, h₁, mul_assoc, h₂, Ideal.span_singleton_mul_span_singleton,
-        Ideal.span_singleton_mul_span_singleton,
-        show β * α J₂ * α J₁ = β * α J₁ * α J₂ by ring]
+        Ideal.span_singleton_mul_span_singleton, show β * α J₂ * α J₁ = β * α J₁ * α J₂ by ring]
   refine Finite.of_injective (fun q : (rayCon K M).Quotient => f (Quotient.out q)) fun q₁ q₂ h => ?_
   rw [← Quotient.out_eq q₁, ← Quotient.out_eq q₂]
   exact Quotient.sound (key _ _ h)
@@ -128,7 +150,8 @@ theorem exists_inv {M : ℕ} (q : (rayCon K M).Quotient) : IsUnit q := by
   obtain ⟨β, hβ, hβα⟩ := exists_beta hcop
   have hβcop : IsCoprime (Ideal.span {β}) (Ideal.span {(M : 𝓞 K)}) := by
     rw [Ideal.isCoprime_iff_exists]
-    refine ⟨β * α, Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self β), 1 - β * α, ?_, by ring⟩
+    refine
+      ⟨β * α, Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self β), 1 - β * α, ?_, by ring⟩
     have hn := neg_mem hβα
     rwa [neg_sub] at hn
   have hα0 : α ≠ 0 := by
@@ -142,30 +165,32 @@ theorem exists_inv {M : ℕ} (q : (rayCon K M).Quotient) : IsUnit q := by
   rw [Ideal.span_singleton_one, Ideal.top_mul, mul_one, ← mul_assoc, hα,
     Ideal.span_singleton_mul_span_singleton, mul_comm α β]
 
-theorem ne_bot_of_cop {M : ℕ} (hM : 2 ≤ M) {I : Ideal (𝓞 K)} (h : IsCoprime I (Ideal.span {(M : 𝓞 K)})) : I ≠ ⊥ := by
+theorem ne_bot_of_cop
+    {M : ℕ} (hM : 2 ≤ M) {I : Ideal (𝓞 K)} (h : IsCoprime I (Ideal.span {(M : 𝓞 K)}))
+    : I ≠ ⊥ := by
   rintro rfl
   have htop : Ideal.span {(M : 𝓞 K)} = ⊤ := by
     rw [Ideal.isCoprime_iff_add, Ideal.add_eq_sup, bot_sup_eq, Ideal.one_eq_top] at h
     exact h
   have h1 := congrArg Ideal.absNorm htop
   rw [Ideal.absNorm_span_singleton, Ideal.absNorm_top, ← map_natCast (algebraMap ℤ (𝓞 K)) M,
-    Algebra.norm_algebraMap, Int.natAbs_pow, Int.natAbs_natCast] at h1
+      Algebra.norm_algebraMap, Int.natAbs_pow, Int.natAbs_natCast]
+    at h1
   rcases Nat.pow_eq_one.mp h1 with h2 | h2
   · omega
   · exact (Module.finrank_pos (R := ℤ) (M := 𝓞 K)).ne' h2
 
-
 open Classical in
-def rcl (M : ℕ) (I : Ideal (𝓞 K)) : (rayCon K M).Quotient :=
-  by
-    classical
-    exact if h : I ∈ primeTo K M then (rayCon K M).mk' ⟨I, h⟩ else 1
+def rcl (M : ℕ) (I : Ideal (𝓞 K)) : (rayCon K M).Quotient := by
+  classical
+  exact if h : I ∈ primeTo K M then (rayCon K M).mk' ⟨I, h⟩ else 1
 
-theorem rcl_of {M : ℕ} {I : Ideal (𝓞 K)} (h : I ∈ primeTo K M) : rcl M I = (rayCon K M).mk' ⟨I, h⟩ := by
+theorem rcl_of {M : ℕ} {I : Ideal (𝓞 K)} (h : I ∈ primeTo K M)
+    : rcl M I = (rayCon K M).mk' ⟨I, h⟩ := by
   rw [rcl, dite_eq_left h]
 
-theorem rcl_mul {M : ℕ} {I J : Ideal (𝓞 K)} (h1 : I ∈ primeTo K M) (h2 : J ∈ primeTo K M) :
-    rcl M (I * J) = rcl M I * rcl M J := by
+theorem rcl_mul {M : ℕ} {I J : Ideal (𝓞 K)} (h1 : I ∈ primeTo K M) (h2 : J ∈ primeTo K M)
+    : rcl M (I * J) = rcl M I * rcl M J := by
   rw [rcl_of (mul_mem h1 h2), rcl_of h1, rcl_of h2, ← map_mul]
   rfl
 
@@ -177,26 +202,34 @@ instance (K : Type) [Field K] [NumberField K] (M : ℕ) : CommGroup (RayGroup K 
   @commGroupOfIsUnit (RayCl.rayCon K M).Quotient _ RayCl.exists_inv
 
 structure RayData (K : Type) [Field K] [NumberField K] (M : ℕ) where
-
   G : Type
   [grp : CommGroup G]
   [fin : Fintype G]
-
   cls : Ideal (𝓞 K) → G
-  cls_mul : ∀ I J, IsCoprime I (Ideal.span {(M : 𝓞 K)}) → IsCoprime J (Ideal.span {(M : 𝓞 K)}) →
-    ∀ (_hI : I ≠ ⊥ := by
-        first
-          | assumption | exact top_ne_bot | exact one_ne_zero
-          | exact GlobalTheory.Mem.RayCl.ne_bot_of_cop (by assumption) (by assumption))
-      (_hJ : J ≠ ⊥ := by
-        first
-          | assumption | exact top_ne_bot | exact one_ne_zero
-          | exact GlobalTheory.Mem.RayCl.ne_bot_of_cop (by assumption) (by assumption)),
-      cls (I * J) = cls I * cls J
+  cls_mul
+    : ∀ I J,
+      IsCoprime I (Ideal.span {(M : 𝓞 K)}) → IsCoprime J (Ideal.span {(M : 𝓞 K)})
+        → ∀ (_hI : I ≠ ⊥ := by
+            first
+            | assumption
+            | exact top_ne_bot
+            | exact one_ne_zero
+            | exact GlobalTheory.Mem.RayCl.ne_bot_of_cop (by assumption) (by assumption))
+            (_hJ : J ≠ ⊥ := by
+              first
+              | assumption
+              | exact top_ne_bot
+              | exact one_ne_zero
+              | exact GlobalTheory.Mem.RayCl.ne_bot_of_cop (by assumption) (by assumption)),
+          cls (I * J) = cls I * cls J
   cls_surj : ∀ c, ∃ I, IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ I ≠ ⊥ ∧ cls I = c
-  cls_eq : ∀ I J, IsCoprime I (Ideal.span {(M : 𝓞 K)}) → IsCoprime J (Ideal.span {(M : 𝓞 K)}) → I ≠ ⊥ → J ≠ ⊥ →
-    (cls I = cls J ↔ ∃ a b : 𝓞 K, a ≠ 0 ∧ b ≠ 0 ∧ a - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ b - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧
-      Ideal.span {a} * I = Ideal.span {b} * J)
+  cls_eq
+    : ∀ I J,
+      IsCoprime I (Ideal.span {(M : 𝓞 K)}) → IsCoprime J (Ideal.span {(M : 𝓞 K)}) → I ≠ ⊥ → J ≠ ⊥
+        → (cls I = cls J
+          ↔ ∃ a b : 𝓞 K,
+            a ≠ 0 ∧ b ≠ 0 ∧ a - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ b - 1 ∈ Ideal.span {(M : 𝓞 K)}
+              ∧ Ideal.span {a} * I = Ideal.span {b} * J)
 
 attribute [instance] RayData.grp RayData.fin
 
@@ -226,13 +259,16 @@ theorem cls_top : D.cls ⊤ = 1 := by
   rw [← Ideal.one_eq_top]
   exact D.cls_one
 
-theorem cls_eq_one_iff {I : Ideal (𝓞 K)} (hI : IsCoprime I (Ideal.span {(M : 𝓞 K)})) (hI' : I ≠ ⊥) :
-    D.cls I = 1 ↔ ∃ a b : 𝓞 K, a ≠ 0 ∧ b ≠ 0 ∧ a - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ b - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧
-      Ideal.span {a} * I = Ideal.span {b} := by
+theorem cls_eq_one_iff {I : Ideal (𝓞 K)} (hI : IsCoprime I (Ideal.span {(M : 𝓞 K)})) (hI' : I ≠ ⊥)
+    : D.cls I = 1
+      ↔ ∃ a b : 𝓞 K,
+        a ≠ 0 ∧ b ≠ 0 ∧ a - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ b - 1 ∈ Ideal.span {(M : 𝓞 K)}
+          ∧ Ideal.span {a} * I = Ideal.span {b} := by
   rw [← D.cls_one, D.cls_eq I 1 hI isCoprime_one_left hI' one_ne_zero]
   simp only [mul_one]
 
-theorem cls_span {a : 𝓞 K} (ha : a ≠ 0) (h : a - 1 ∈ Ideal.span {(M : 𝓞 K)}) : D.cls (Ideal.span {a}) = 1 := by
+theorem cls_span {a : 𝓞 K} (ha : a ≠ 0) (h : a - 1 ∈ Ideal.span {(M : 𝓞 K)})
+    : D.cls (Ideal.span {a}) = 1 := by
   have hcop : IsCoprime (Ideal.span {a}) (Ideal.span {(M : 𝓞 K)}) := by
     rw [Ideal.isCoprime_iff_exists]
     refine ⟨a, Ideal.mem_span_singleton_self a, 1 - a, ?_, by ring⟩
@@ -242,20 +278,20 @@ theorem cls_span {a : 𝓞 K} (ha : a ≠ 0) (h : a - 1 ∈ Ideal.span {(M : �
     ⟨1, a, one_ne_zero, ha, by simp, h, ?_⟩
   rw [Ideal.span_singleton_one, Ideal.top_mul]
 
-
 theorem card_eq_classNumber (D : RayData K 1) : Fintype.card D.G = classNumber K := by
   classical
-  have htop : Ideal.span {((1 : ℕ) : 𝓞 K)} = ⊤ := by
-    rw [Nat.cast_one, Ideal.span_singleton_one]
+  have htop : Ideal.span {((1 : ℕ) : 𝓞 K)} = ⊤ := by rw [Nat.cast_one, Ideal.span_singleton_one]
   have hcop : ∀ I : Ideal (𝓞 K), IsCoprime I (Ideal.span {((1 : ℕ) : 𝓞 K)}) := fun I => by
     rw [htop, ← Ideal.one_eq_top]
     exact isCoprime_one_right
   have hmod : ∀ x : 𝓞 K, x ∈ Ideal.span {((1 : ℕ) : 𝓞 K)} := fun x => by
     rw [htop]
     exact Submodule.mem_top
-  have heq : ∀ (I J : Ideal (𝓞 K)) (hI : I ≠ ⊥) (hJ : J ≠ ⊥),
-      D.cls I = D.cls J ↔ ClassGroup.mk0 ⟨I, mem_nonZeroDivisors_of_ne_zero hI⟩ =
-        ClassGroup.mk0 ⟨J, mem_nonZeroDivisors_of_ne_zero hJ⟩ := by
+  have heq
+      : ∀ (I J : Ideal (𝓞 K)) (hI : I ≠ ⊥) (hJ : J ≠ ⊥),
+        D.cls I = D.cls J
+          ↔ ClassGroup.mk0 ⟨I, mem_nonZeroDivisors_of_ne_zero hI⟩
+            = ClassGroup.mk0 ⟨J, mem_nonZeroDivisors_of_ne_zero hJ⟩ := by
     intro I J hI hJ
     rw [D.cls_eq I J (hcop I) (hcop J) hI hJ, ClassGroup.mk0_eq_mk0_iff]
     constructor
@@ -281,8 +317,13 @@ theorem card_eq_classNumber (D : RayData K 1) : Fintype.card D.G = classNumber K
 theorem cls_two_ne_one (D : RayData ℚ 5) : D.cls (Ideal.span {2}) ≠ 1 := by
   have hcop : IsCoprime (Ideal.span {(2 : 𝓞 ℚ)}) (Ideal.span {((5 : ℕ) : 𝓞 ℚ)}) := by
     rw [Ideal.isCoprime_iff_exists]
-    refine ⟨2 * (-2), Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self 2),
-      ((5 : ℕ) : 𝓞 ℚ) * 1, Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _), ?_⟩
+    refine ⟨
+      2 * (-2),
+      Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self 2),
+      ((5 : ℕ) : 𝓞 ℚ) * 1,
+      Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _),
+      ?_
+    ⟩
     push_cast
     ring
   have h2 : Ideal.span {(2 : 𝓞 ℚ)} ≠ ⊥ := by

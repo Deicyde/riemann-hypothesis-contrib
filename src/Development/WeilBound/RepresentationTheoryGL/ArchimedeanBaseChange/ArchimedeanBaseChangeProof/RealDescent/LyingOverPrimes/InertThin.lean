@@ -167,25 +167,28 @@ theorem inertThin_holds : InertThin := by
     Real.summable_one_div_nat_pow.mpr one_lt_two
   have hne : ∀ w : HeightOneSpectrum (𝓞 E), Ideal.absNorm w.asIdeal ≠ 0 := fun w h =>
     w.ne_bot (Ideal.absNorm_eq_zero_iff.mp h)
-  refine summable_of_sum_le (c := (Ram.card : ℝ) +
-    (Module.finrank ℚ E : ℝ) * ∑' k : ℕ, (1 : ℝ) / (k : ℝ) ^ 2) (fun w => by positivity) ?_
+  refine summable_of_sum_le
+    (c := (Ram.card : ℝ) + (Module.finrank ℚ E : ℝ) * ∑' k : ℕ, (1 : ℝ) / (k : ℝ) ^ 2)
+    (fun w => by positivity)
+    ?_
   intro u
   rw [← Finset.sum_filter_add_sum_filter_not u (fun w => w.1 ∈ Ram)]
   apply add_le_add
   · have hcard : (u.filter (fun w => w.1 ∈ Ram)).card ≤ Ram.card := by
-      apply Finset.card_le_card_of_injOn
-        (fun w : {w : HeightOneSpectrum (𝓞 E) // ¬ IsSplitAt w} => w.1)
+      apply Finset.card_le_card_of_injOn (fun w : {w : HeightOneSpectrum (𝓞 E) // ¬ IsSplitAt w} =>
+        w.1)
       · intro w hw
         rw [Finset.mem_coe, Finset.mem_filter] at hw
         exact hw.2
       · intro a _ b _ h
         exact Subtype.ext h
-    calc ∑ w ∈ u.filter (fun w => w.1 ∈ Ram), ((Ideal.absNorm w.1.asIdeal : ℝ))⁻¹
-        ≤ ∑ w ∈ u.filter (fun w => w.1 ∈ Ram), (1 : ℝ) := by
-          apply Finset.sum_le_sum
-          intro w _
-          apply inv_le_one_of_one_le₀
-          exact_mod_cast Nat.one_le_iff_ne_zero.mpr (hne w.1)
+    calc
+      ∑ w ∈ u.filter (fun w => w.1 ∈ Ram), ((Ideal.absNorm w.1.asIdeal : ℝ))⁻¹
+          ≤ ∑ w ∈ u.filter (fun w => w.1 ∈ Ram), (1 : ℝ) := by
+        apply Finset.sum_le_sum
+        intro w _
+        apply inv_le_one_of_one_le₀
+        exact_mod_cast Nat.one_le_iff_ne_zero.mpr (hne w.1)
       _ = ((u.filter (fun w => w.1 ∈ Ram)).card : ℝ) := by simp
       _ ≤ (Ram.card : ℝ) := by exact_mod_cast hcard
   · set u' := u.filter (fun w => w.1 ∉ Ram) with hu'
@@ -204,14 +207,16 @@ theorem inertThin_holds : InertThin := by
       rw [one_div]
       apply inv_anti₀ hgpos
       exact_mod_cast h2
-    have hfib : ∀ k ∈ u'.image (fun w => g w.1),
-        ((u'.filter (fun w => g w.1 = k)).card : ℝ) ≤ (Module.finrank ℚ E : ℝ) := by
+    have hfib
+        : ∀ k ∈ u'.image (fun w => g w.1),
+          ((u'.filter (fun w => g w.1 = k)).card : ℝ) ≤ (Module.finrank ℚ E : ℝ) := by
       intro k hk
       obtain ⟨w0, _, hw0⟩ := Finset.mem_image.mp hk
       have hkp : k.Prime := hw0 ▸ (hg w0).1
       have hc := card_le (K := E) hkp (u'.image (fun w => w.1))
-      have hle : (u'.filter (fun w => g w.1 = k)).card ≤
-          ((u'.image (fun w => w.1)).filter fun P => (k : 𝓞 E) ∈ P.asIdeal).card := by
+      have hle
+          : (u'.filter (fun w => g w.1 = k)).card
+            ≤ ((u'.image (fun w => w.1)).filter fun P => (k : 𝓞 E) ∈ P.asIdeal).card := by
         apply Finset.card_le_card_of_injOn
           (fun w : {w : HeightOneSpectrum (𝓞 E) // ¬ IsSplitAt w} => w.1)
         · intro w hw
@@ -223,25 +228,26 @@ theorem inertThin_holds : InertThin := by
         · intro a _ b _ h
           exact Subtype.ext h
       exact_mod_cast hle.trans hc
-    calc ∑ w ∈ u', ((Ideal.absNorm w.1.asIdeal : ℝ))⁻¹
+    calc
+      ∑ w ∈ u', ((Ideal.absNorm w.1.asIdeal : ℝ))⁻¹
         ≤ ∑ w ∈ u', 1 / (g w.1 : ℝ) ^ 2 := Finset.sum_le_sum hkey
       _ = ∑ k ∈ u'.image (fun w => g w.1),
             ∑ w ∈ u'.filter (fun w => g w.1 = k), 1 / (g w.1 : ℝ) ^ 2 :=
-          (Finset.sum_fiberwise_of_maps_to (fun w hw => Finset.mem_image_of_mem _ hw) _).symm
+        (Finset.sum_fiberwise_of_maps_to (fun w hw => Finset.mem_image_of_mem _ hw) _).symm
       _ = ∑ k ∈ u'.image (fun w => g w.1),
             ((u'.filter (fun w => g w.1 = k)).card : ℝ) * (1 / (k : ℝ) ^ 2) := by
-          apply Finset.sum_congr rfl
-          intro k _
-          rw [Finset.sum_congr rfl (fun w hw => by rw [(Finset.mem_filter.mp hw).2])]
-          simp
+        apply Finset.sum_congr rfl
+        intro k _
+        rw [Finset.sum_congr rfl (fun w hw => by rw [(Finset.mem_filter.mp hw).2])]
+        simp
       _ ≤ ∑ k ∈ u'.image (fun w => g w.1), (Module.finrank ℚ E : ℝ) * (1 / (k : ℝ) ^ 2) := by
-          apply Finset.sum_le_sum
-          intro k hk
-          exact mul_le_mul_of_nonneg_right (hfib k hk) (by positivity)
+        apply Finset.sum_le_sum
+        intro k hk
+        exact mul_le_mul_of_nonneg_right (hfib k hk) (by positivity)
       _ = (Module.finrank ℚ E : ℝ) * ∑ k ∈ u'.image (fun w => g w.1), 1 / (k : ℝ) ^ 2 := by
-          rw [Finset.mul_sum]
+        rw [Finset.mul_sum]
       _ ≤ (Module.finrank ℚ E : ℝ) * ∑' k : ℕ, (1 : ℝ) / (k : ℝ) ^ 2 := by
-          apply mul_le_mul_of_nonneg_left _ (by positivity)
-          exact hS.sum_le_tsum _ (fun k _ => by positivity)
+        apply mul_le_mul_of_nonneg_left _ (by positivity)
+        exact hS.sum_le_tsum _ (fun k _ => by positivity)
 
 end PositivityTheory.Rg.BcB.Desc

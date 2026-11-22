@@ -5,16 +5,17 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NoTo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
-
 open IsDiscreteValuationRing in
-theorem sq_mul_not_mem_maxIdeal_pow :
-    ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (p e : ℕ) (c : ℤ),
-      p.Prime → 0 < e → OrdIs F p e → ¬ (p : ℤ) ∣ c →
-      ∀ w ∈ 𝓂[F] ^ (3 * e), ((w : 𝒪[F]) : F) ≠ (p : F) ^ 2 * (c : F) := by
+theorem sq_mul_not_mem_maxIdeal_pow
+    : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (p e : ℕ) (c : ℤ),
+      p.Prime → 0 < e → OrdIs F p e → ¬ (p : ℤ) ∣ c
+        → ∀ w ∈ 𝓂[F] ^ (3 * e), ((w : 𝒪[F]) : F) ≠ (p : F) ^ 2 * (c : F) := by
   intro F _ _ _ _ p e c hp he hord hc w hw heq
   have hw' : w = (p : 𝒪[F]) ^ 2 * (c : 𝒪[F]) := by
     apply Subtype.ext
@@ -34,7 +35,8 @@ theorem sq_mul_not_mem_maxIdeal_pow :
     exact (Nat.pos_iff_ne_zero.mp he) (by exact_mod_cast h0)
   have hcu : IsUnit (c : 𝒪[F]) := by
     rcases IsLocalRing.isUnit_or_isUnit_of_isUnit_add h1 with h | h
-    · exfalso; apply hpnu
+    · exfalso
+      apply hpnu
       have := isUnit_of_mul_isUnit_right h
       simpa using this
     · have := isUnit_of_mul_isUnit_right h
@@ -48,7 +50,8 @@ theorem sq_mul_not_mem_maxIdeal_pow :
     push_cast
     rfl
   obtain ⟨ϖ, hϖ⟩ := exists_irreducible 𝒪[F]
-  rw [(irreducible_iff_uniformizer ϖ).mp hϖ, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at hw
+  rw [(irreducible_iff_uniformizer ϖ).mp hϖ, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+    at hw
   have hle := (addVal_le_iff_dvd).mpr hw
   rw [addVal_pow, addVal_uniformizer hϖ, hval] at hle
   have : ((3 * e : ℕ) : ℕ∞) ≤ ((2 * e : ℕ) : ℕ∞) := by simpa using hle

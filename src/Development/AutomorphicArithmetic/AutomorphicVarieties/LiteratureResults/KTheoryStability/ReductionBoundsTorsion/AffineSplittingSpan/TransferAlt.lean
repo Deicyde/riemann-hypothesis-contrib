@@ -12,31 +12,41 @@ namespace PositivityTheory.KB.SplitAffineSpectral.PrismTransfer
 
 open PositivityTheory.KB.SplitAffineSpectral Polynomial
 
-theorem pow_intertwine {V W : Type} [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
-    (T : Module.End ℝ V) (T' : Module.End ℝ W) (L : V →ₗ[ℝ] W) (h : ∀ v, T' (L v) = L (T v)) :
-    ∀ (n : ℕ) (v : V), (T' ^ n) (L v) = L ((T ^ n) v)
+theorem pow_intertwine
+    {V W : Type} [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    (T : Module.End ℝ V) (T' : Module.End ℝ W) (L : V →ₗ[ℝ] W) (h : ∀ v, T' (L v) = L (T v))
+    : ∀ (n : ℕ) (v : V), (T' ^ n) (L v) = L ((T ^ n) v)
   | 0, v => rfl
   | n + 1, v => by
-    rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, h, pow_intertwine T T' L h n]
+    rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, h,
+      pow_intertwine T T' L h n]
 
-theorem aeval_intertwine {V W : Type} [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+theorem aeval_intertwine
+    {V W : Type} [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
     (T : Module.End ℝ V) (T' : Module.End ℝ W) (L : V →ₗ[ℝ] W) (h : ∀ v, T' (L v) = L (T v))
-    (f : ℝ[X]) (v : V) : aeval T' f (L v) = L (aeval T f v) := by
+    (f : ℝ[X]) (v : V)
+    : aeval T' f (L v) = L (aeval T f v) := by
   induction f using Polynomial.induction_on' with
   | add p q hp hq => simp only [map_add (f := _), LinearMap.add_apply, hp, hq]
   | monomial n a =>
     simp only [aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply,
       pow_intertwine T T' L h n, map_smul]
 
-theorem pow_mem {V : Type} [AddCommGroup V] [Module ℝ V] (T : Module.End ℝ V) (S : Submodule ℝ V)
-    (hT : ∀ v ∈ S, T v ∈ S) : ∀ (n : ℕ) (v : V), v ∈ S → (T ^ n) v ∈ S
+theorem pow_mem
+    {V : Type} [AddCommGroup V] [Module ℝ V]
+    (T : Module.End ℝ V) (S : Submodule ℝ V) (hT : ∀ v ∈ S, T v ∈ S)
+    : ∀ (n : ℕ) (v : V), v ∈ S → (T ^ n) v ∈ S
   | 0, v, hv => hv
   | n + 1, v, hv => by
     rw [pow_succ, Module.End.mul_apply]
     exact pow_mem T S hT n _ (hT v hv)
 
-theorem aeval_mem {V : Type} [AddCommGroup V] [Module ℝ V] (T : Module.End ℝ V) (S : Submodule ℝ V)
-    (hT : ∀ v ∈ S, T v ∈ S) (f : ℝ[X]) (v : V) (hv : v ∈ S) : aeval T f v ∈ S := by
+theorem aeval_mem
+    {V : Type} [AddCommGroup V] [Module ℝ V]
+    (T : Module.End ℝ V) (S : Submodule ℝ V) (hT : ∀ v ∈ S, T v ∈ S)
+    (f : ℝ[X])
+    (v : V) (hv : v ∈ S)
+    : aeval T f v ∈ S := by
   induction f using Polynomial.induction_on' with
   | add p q hp hq => simp only [map_add (f := _), LinearMap.add_apply]; exact S.add_mem hp hq
   | monomial n a =>
@@ -51,10 +61,10 @@ def invSub {P : Type} [Group P] (S : Set P) (m : ℕ) : Submodule ℝ ((Fin m �
 
 def dcL (Y : Type) (m : ℕ) : ((Fin (m + 1) → Y) → ℝ) →ₗ[ℝ] ((Fin (m + 2) → Y) → ℝ) where
   toFun := dc
-  map_add' F G := by
-    funext y; simp only [dc, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+  map_add' F G := by funext y; simp only [dc, Pi.add_apply, mul_add, Finset.sum_add_distrib]
   map_smul' r F := by
-    funext y; simp only [dc, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
+    funext y
+    simp only [dc, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     ring
 
@@ -85,8 +95,7 @@ theorem transfer : Transfer := by
     intro k y hk; simp only [ρ, map_mul, hk, one_mul, mul_assoc]
   have hρAmul : ∀ b y, ρA (ι b * y) = b * ρA y := by
     intro b y; apply hι; rw [map_mul, hρA, hρA, hρmul _ _ (hιk b)]
-  have hcomm : ∀ g : Q, s g * t = t * s g := by
-    intro g; rw [ht, ← map_mul, ← map_mul, hu]
+  have hcomm : ∀ g : Q, s g * t = t * s g := by intro g; rw [ht, ← map_mul, ← map_mul, hu]
   have hρconj : ∀ y, ρ (t⁻¹ * y * t) = t⁻¹ * ρ y * t := by
     intro y
     have hp : pr (t⁻¹ * y * t) = pr y := by
@@ -96,8 +105,7 @@ theorem transfer : Transfer := by
     show t⁻¹ * y * t * (s (pr (t⁻¹ * y * t)))⁻¹ = t⁻¹ * (y * (s (pr y))⁻¹) * t
     rw [hp]
     simp only [mul_assoc, hc']
-  have hρAconj : ∀ y, ρA (t⁻¹ * y * t) = φ (ρA y) := by
-    intro y; apply hι; rw [hρA, hρconj, hφ, hρA]
+  have hρAconj : ∀ y, ρA (t⁻¹ * y * t) = φ (ρA y) := by intro y; apply hι; rw [hρA, hρconj, hφ, hρA]
 
   let cA : (Fin (q + 2) → A) → ℝ := fun x => c fun i => ι (x i)
   have hcA : InvS Set.univ cA := by
@@ -111,13 +119,14 @@ theorem transfer : Transfer := by
   obtain ⟨eA, heA, hfe⟩ := hfA cA hcA hccA
 
   let T : (n : ℕ) → Module.End ℝ ((Fin n → P) → ℝ) := fun n => mapOp (fun y => t⁻¹ * y * t) n
-  have hTR : ∀ (n : ℕ) (g : (Fin n → A) → ℝ),
-      T n (pullL ρA n g) = pullL ρA n (mapOp φ n g) := by
+  have hTR : ∀ (n : ℕ) (g : (Fin n → A) → ℝ), T n (pullL ρA n g) = pullL ρA n (mapOp φ n g) := by
     intro n g; funext y; simp only [T, mapOp, pullL, LinearMap.coe_mk, AddHom.coe_mk, hρAconj]
   have hTd : ∀ (n : ℕ) (F : (Fin (n + 1) → P) → ℝ), T (n + 2) (dcL P n F) = dcL P n (T (n + 1) F) :=
     fun n F => rfl
-  have hRd : ∀ (n : ℕ) (g : (Fin (n + 1) → A) → ℝ), pullL ρA (n + 2) (dcL A n g) = dcL P n (pullL ρA (n + 1) g) :=
-    fun n g => rfl
+  have hRd
+      : ∀ (n : ℕ) (g : (Fin (n + 1) → A) → ℝ),
+        pullL ρA (n + 2) (dcL A n g) = dcL P n (pullL ρA (n + 1) g) := fun n g =>
+    rfl
 
   have hpr : c = pullL ρA (q + 2) cA - dc (prism ρ q c) := by
     funext y
@@ -156,8 +165,10 @@ theorem transfer : Transfer := by
     congr 1
     simp only [pullL, LinearMap.coe_mk, AddHom.coe_mk, hρAmul]
     exact heA b trivial _
-  · have e1 : aeval (T (q + 2)) f c =
-        aeval (T (q + 2)) f (pullL ρA (q + 2) cA) - aeval (T (q + 2)) f (dcL P q (prism ρ q c)) := by
+  · have e1
+        : aeval (T (q + 2)) f c
+          = aeval (T (q + 2)) f (pullL ρA (q + 2) cA)
+            - aeval (T (q + 2)) f (dcL P q (prism ρ q c)) := by
       conv_lhs => rw [hpr]
       rw [map_sub]
       rfl

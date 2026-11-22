@@ -28,8 +28,9 @@ lemma isCusp_SL2Z_toGL_smul (M : Matrix (Fin 2) (Fin 2) ℤ) (hM : M.det ≠ 0) 
   rw [toGL_eq_map M hM]
   exact ⟨toGLQ M hM • c, by rw [← Rat.coe_castHom, OnePoint.map_smul]⟩
 
-theorem cuspAll_slash_toGL : ∀ (k : ℤ) (M : Matrix (Fin 2) (Fin 2) ℤ) (G : ℍ → ℂ), 0 < M.det →
-    CuspAll k G → CuspAll k (G ∣[k] toGL M) := by
+theorem cuspAll_slash_toGL
+    : ∀ (k : ℤ) (M : Matrix (Fin 2) (Fin 2) ℤ) (G : ℍ → ℂ),
+      0 < M.det → CuspAll k G → CuspAll k (G ∣[k] toGL M) := by
   intro k M G hM hG
   refine ⟨MDifferentiable.slash hG.1 k (toGL M), fun c hc => ?_⟩
   rw [← OnePoint.IsZeroAt.smul_iff]

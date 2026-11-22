@@ -5,7 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.VecPair
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo GlobalTheory.TwistDet GlobalTheory.NewPrime GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun
+  GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo GlobalTheory.TwistDet
+  GlobalTheory.NewPrime GlobalTheory.Published.PoitouTate
 
 noncomputable section
 
@@ -14,21 +18,41 @@ namespace GlobalTheory.NewPrime
 section
 variable {A : Type} [CommRing A] {a r : ℕ}
 
-theorem rect_map {B B' : Type} [AddCommGroup B] [Module A B] [AddCommGroup B'] [Module A B'] (p : B →ₗ[A] B')
-    (Z : Matrix (Fin r) (Fin a) A) (x : Fin a → B) : p.compLeft (Fin r) (rect Z x) = rect Z (p ∘ x) := by
+theorem rect_map
+    {B B' : Type} [AddCommGroup B] [Module A B] [AddCommGroup B'] [Module A B']
+    (p : B →ₗ[A] B') (Z : Matrix (Fin r) (Fin a) A) (x : Fin a → B)
+    : p.compLeft (Fin r) (rect Z x) = rect Z (p ∘ x) := by
   funext c
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [rect, map_sum]
+  simp [rect, map_sum]
 
-theorem matAct_map {B B' : Type} [AddCommGroup B] [Module A B] [AddCommGroup B'] [Module A B'] (p : B →ₗ[A] B')
-    (Φ : Matrix (Fin a) (Fin a) A) (x : Fin a → B) : p ∘ matAct Φ x = matAct Φ (p ∘ x) := by
+theorem matAct_map
+    {B B' : Type} [AddCommGroup B] [Module A B] [AddCommGroup B'] [Module A B']
+    (p : B →ₗ[A] B') (Φ : Matrix (Fin a) (Fin a) A) (x : Fin a → B)
+    : p ∘ matAct Φ x = matAct Φ (p ∘ x) := by
   funext c
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [matAct, map_sum]
+  simp [matAct, map_sum]
 
 end
 
-theorem comparison_cocycles : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R D.host D.what₂) (X : NTw D.R D.host D.what₂ D.LL0 N) (bkP : BKPh X) (i : X.Tw) (s : X.Sig i), ∀ (A : Type) [CommRing A] [Algebra (X.O0 i) A] (κ : GE N →* Aˣ) (Q Q' : Finset (PlE D.host)) (a a' : ℕ) (Φ : Matrix (Fin a) (Fin a) A) (Φ' : Matrix (Fin a') (Fin a') A) Z Z' (γ σ : Bool → GE N), Univ bkP i s κ Q Φ Z → Univ bkP i s κ Q' Φ' Z' → (∀ (Y : Type) [AddCommGroup Y] [Module A Y] [TopologicalSpace Y] [DiscreteTopology Y] (f : GE N → Fin D.R.r → Y), SelC bkP i s κ Y Q' f → (∀ b, f (γ b) = 0) → SelC bkP i s κ Y Q f) → (∀ (Y : Type) [AddCommGroup Y] [Module A Y] b m, repOn (Tgl i s) κ Y (σ b) m = m) → ∃ E : Matrix (Fin a) (Fin a') A, what₂ E ⊔ (what₂ Φ' ⊔ what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2)) = ⊤ ∧ (∀ b, (Φ * E) b ∈ what₂ Φ' ⊔ what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2)) ∧ ∀ j : Bool × Fin D.R.r, Z' (σ j.1) j.2 - Matrix.vecMul (Z (σ j.1) j.2) E ∈ what₂ Φ' ⊔ what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2) := by
+theorem comparison_cocycles
+    : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R D.host D.what₂)
+        (X : NTw D.R D.host D.what₂ D.LL0 N) (bkP : BKPh X) (i : X.Tw) (s : X.Sig i),
+      ∀ (A : Type) [CommRing A] [Algebra (X.O0 i) A] (κ : GE N →* Aˣ) (Q Q' : Finset (PlE D.host))
+          (a a' : ℕ) (Φ : Matrix (Fin a) (Fin a) A) (Φ' : Matrix (Fin a') (Fin a') A) Z Z'
+          (γ σ : Bool → GE N),
+        Univ bkP i s κ Q Φ Z → Univ bkP i s κ Q' Φ' Z'
+          → (∀ (Y : Type) [AddCommGroup Y] [Module A Y] [TopologicalSpace Y] [DiscreteTopology Y]
+              (f : GE N → Fin D.R.r → Y),
+            SelC bkP i s κ Y Q' f → (∀ b, f (γ b) = 0) → SelC bkP i s κ Y Q f)
+          → (∀ (Y : Type) [AddCommGroup Y] [Module A Y] b m, repOn (Tgl i s) κ Y (σ b) m = m)
+          → ∃ E : Matrix (Fin a) (Fin a') A,
+            what₂ E ⊔ (what₂ Φ' ⊔ what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2)) = ⊤
+              ∧ (∀ b, (Φ * E) b ∈ what₂ Φ' ⊔ what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2))
+              ∧ ∀ j : Bool × Fin D.R.r,
+                Z' (σ j.1) j.2 - Matrix.vecMul (Z (σ j.1) j.2) E
+                  ∈ what₂ Φ' ⊔ what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2) := by
   intro D N X bkP i s A _ _ κ Q Q' a a' Φ Φ' Z Z' γ σ hU hU' hSel hσ
   set W : Submodule A (Fin a' → A) := what₂ Φ' ⊔ what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2) with hW
   letI tY : TopologicalSpace ((Fin a' → A) ⧸ W) := ⊥
@@ -41,13 +65,14 @@ theorem comparison_cocycles : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R
       simp [Finset.sum_apply, Pi.single_apply]
     conv_rhs => rw [this]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [gens, map_sum]
+    simp [gens, map_sum]
   have hrect : ∀ g c, rect (Z' g) gens c = W.mkQ (Z' g c) := fun g c => hsum _
   have hgens : matAct Φ' gens = 0 := by
     funext b
     have : matAct Φ' gens b = W.mkQ (Φ' b) := hsum (Φ' b)
     rw [this]
-    exact (Submodule.Quotient.mk_eq_zero W).2 ((le_sup_left : what₂ Φ' ≤ W) (Submodule.subset_span ⟨b, rfl⟩))
+    exact (Submodule.Quotient.mk_eq_zero W).2
+      ((le_sup_left : what₂ Φ' ≤ W) (Submodule.subset_span ⟨b, rfl⟩))
   have hf' := (hU' ((Fin a' → A) ⧸ W)).1 gens hgens
   have hγ : ∀ b, (fun g => rect (Z' g) gens) (γ b) = 0 := by
     intro b
@@ -55,11 +80,14 @@ theorem comparison_cocycles : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R
     show rect (Z' (γ b)) gens c = 0
     rw [hrect]
     exact (Submodule.Quotient.mk_eq_zero W).2
-      ((le_sup_right : what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2) ≤ W) (Submodule.subset_span ⟨(b, c), rfl⟩))
+      ((le_sup_right : what₂ (fun j : Bool × Fin D.R.r => Z' (γ j.1) j.2) ≤ W)
+        (Submodule.subset_span ⟨(b, c), rfl⟩))
   have hf := hSel _ _ hf' hγ
   obtain ⟨x, hx, m, hm⟩ := (hU ((Fin a' → A) ⧸ W)).2.2 _ hf
-  obtain ⟨E, hE⟩ : ∃ E : Matrix (Fin a) (Fin a') A, ∀ b, W.mkQ (E b) = x b :=
-    ⟨fun b => (Submodule.mkQ_surjective W (x b)).choose, fun b => (Submodule.mkQ_surjective W (x b)).choose_spec⟩
+  obtain ⟨E, hE⟩ : ∃ E : Matrix (Fin a) (Fin a') A, ∀ b, W.mkQ (E b) = x b := ⟨
+    fun b => (Submodule.mkQ_surjective W (x b)).choose,
+    fun b => (Submodule.mkQ_surjective W (x b)).choose_spec
+  ⟩
   have hvm : ∀ v : Fin a → A, W.mkQ (∑ k, v k • E k) = ∑ k, v k • x k := fun v => by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
@@ -83,8 +111,7 @@ theorem comparison_cocycles : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R
           simp [rect]
         rw [h0, sub_zero] at e
         exact e
-    have hgS : ∀ j, gens j ∈ S := fun j =>
-      (Submodule.Quotient.mk_eq_zero S).1 (congrFun hz j)
+    have hgS : ∀ j, gens j ∈ S := fun j => (Submodule.Quotient.mk_eq_zero S).1 (congrFun hz j)
     rw [eq_top_iff]
     intro v _
     have hvS : W.mkQ v ∈ S := by

@@ -13,11 +13,13 @@ open Module Submodule Matrix GroundTheory.Heights₂.Theta.FunctionalEquationAlt
 
 noncomputable section
 
-theorem ReducedBasisBound.short_basis {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℝ W]
-    [FiniteDimensional ℝ W] (m : ℕ) : ∀ lam : ℝ, 0 < lam → ∀ C : ℝ, ∃ R : ℝ,
-    ∀ b : Fin m → W, LinearIndependent ℝ b → Sep (span ℤ (Set.range b)) lam →
-      (gram ℝ b).det ≤ C → ∃ b' : Fin m → W, span ℤ (Set.range b') = span ℤ (Set.range b) ∧
-        ∀ i, ‖b' i‖ ≤ R := by
+theorem ReducedBasisBound.short_basis
+    {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDimensional ℝ W] (m : ℕ)
+    : ∀ lam : ℝ,
+      0 < lam
+        → ∀ C : ℝ, ∃ R : ℝ, ∀ b : Fin m → W,
+          LinearIndependent ℝ b → Sep (span ℤ (Set.range b)) lam → (gram ℝ b).det ≤ C
+            → ∃ b' : Fin m → W, span ℤ (Set.range b') = span ℤ (Set.range b) ∧ ∀ i, ‖b' i‖ ≤ R := by
   induction m with
   | zero => exact fun _ _ _ => ⟨0, fun b _ _ _ => ⟨b, rfl, fun i => i.elim0⟩⟩
   | succ m ih =>
@@ -51,8 +53,8 @@ theorem ReducedBasisBound.short_basis {W : Type*} [NormedAddCommGroup W] [InnerP
       · simpa using hvL
       · simpa using hyL j
     · intro x hx
-      obtain ⟨k, hk⟩ := (mem_span_range_iff_exists_fun ℤ).1
-        (hc'span ▸ (hmemc (proj v x)).2 ⟨x, hx, rfl⟩)
+      obtain ⟨k, hk⟩ :=
+        (mem_span_range_iff_exists_fun ℤ).1 (hc'span ▸ (hmemc (proj v x)).2 ⟨x, hx, rfl⟩)
       have hzL : ∑ j, k j • y j ∈ L := L.sum_mem fun j _ => L.smul_mem _ (hyL j)
       have h0 : proj v (x - ∑ j, k j • y j) = 0 := by
         set_option synthInstance.maxHeartbeats 100000 in
@@ -78,12 +80,13 @@ theorem ReducedBasisBound.proof : ReducedBasisBound.Statement := by
   let e : Basis (Fin d) ℤ L := Module.finBasisOfFinrankEq ℤ L hrk
   have hspan : span ℤ (Set.range fun i => (e i : EuclideanSpace ℝ (Fin d))) = L := by
     rw [show (Set.range fun i => (e i : EuclideanSpace ℝ (Fin d))) = L.subtype '' Set.range e by
-      rw [← Set.range_comp]; rfl, ← Submodule.map_span, e.span_eq, Submodule.map_top,
-      Submodule.range_subtype]
+        rw [← Set.range_comp]; rfl,
+      ← Submodule.map_span, e.span_eq, Submodule.map_top, Submodule.range_subtype]
   have hli : LinearIndependent ℝ fun i => (e i : EuclideanSpace ℝ (Fin d)) := by
     have h := (e.ofZLatticeBasis ℝ L).linearIndependent
     rwa [show ⇑(e.ofZLatticeBasis ℝ L) = fun i => (e i : EuclideanSpace ℝ (Fin d)) from
-      funext fun i => e.ofZLatticeBasis_apply ℝ L i] at h
+        funext fun i => e.ofZLatticeBasis_apply ℝ L i]
+      at h
   have hdet : (gram ℝ fun i => (e i : EuclideanSpace ℝ (Fin d))).det ≤ c ^ 2 := by
     have h1 := GroundTheory.Heights₂.Heights.covolume_eq_sqrt_det_gram L e
     rcases le_or_gt 0 (gram ℝ fun i => (e i : EuclideanSpace ℝ (Fin d))).det with h | h

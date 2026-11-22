@@ -16,8 +16,8 @@ universe u
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem GenericDimBound.proof (hmax : MaximalIdealHeightFG.Statement.{u}) :
-    GenericDimBound.Statement.{u} := by
+theorem GenericDimBound.proof (hmax : MaximalIdealHeightFG.Statement.{u})
+    : GenericDimBound.Statement.{u} := by
   intro O _ _ _ K _ _ ι _ P hP hT
   classical
   let KO := FractionRing O
@@ -72,15 +72,17 @@ theorem GenericDimBound.proof (hmax : MaximalIdealHeightFG.Statement.{u}) :
       (Ideal.Quotient.mkₐ_surjective KO _)
   have hht : (m.height : WithBot ℕ∞) = ringKrullDim A := hmax KO A m hm
 
-  let g : PrimeSpectrum A → PrimeSpectrum.zeroLocus (R := S) (P : Set S) := fun x =>
-    ⟨⟨(x.asIdeal.comap mk).comap φ, inferInstance⟩, by
+  let g : PrimeSpectrum A → PrimeSpectrum.zeroLocus (R := S) (P : Set S) := fun x => ⟨
+    ⟨(x.asIdeal.comap mk).comap φ, inferInstance⟩,
+    by
       rw [PrimeSpectrum.mem_zeroLocus]
       intro f hf
       show mk (φ f) ∈ x.asIdeal
       have h0 : mk (φ f) = 0 :=
         Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_map_of_mem φ hf : φ f ∈ genFib P)
       rw [h0]
-      exact x.asIdeal.zero_mem⟩
+      exact x.asIdeal.zero_mem
+  ⟩
   have hg : StrictMono g := by
     intro x y hxy
     have h1 : x.asIdeal.comap mk < y.asIdeal.comap mk :=
@@ -93,17 +95,20 @@ theorem GenericDimBound.proof (hmax : MaximalIdealHeightFG.Statement.{u}) :
     rw [hcomapN, Ideal.mem_comap, RingHom.mem_ker]
     show constantCoeff (MvPolynomial.map (algebraMap O KO) f) = 0 ↔ _
     rw [constantCoeff_map]
-    exact ⟨fun h => IsFractionRing.injective O KO (by rw [h, map_zero]), fun h => by rw [h, map_zero]⟩
+    exact
+      ⟨fun h => IsFractionRing.injective O KO (by rw [h, map_zero]), fun h => by rw [h, map_zero]⟩
 
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   let M1 : Ideal S := (IsLocalRing.maximalIdeal O).comap (constantCoeff : S →+* O)
-  let top : PrimeSpectrum.zeroLocus (R := S) (P : Set S) :=
-    ⟨⟨M1, inferInstance⟩, by
+  let top : PrimeSpectrum.zeroLocus (R := S) (P : Set S) := ⟨
+    ⟨M1, inferInstance⟩,
+    by
       rw [PrimeSpectrum.mem_zeroLocus]
       intro f hf
       show constantCoeff f ∈ IsLocalRing.maximalIdeal O
       rw [hPker f hf]
-      exact Ideal.zero_mem _⟩
+      exact Ideal.zero_mem _
+  ⟩
   have htop : g ⟨m, hm.isPrime⟩ < top := by
     show (m.comap mk).comap φ < M1
     refine lt_of_le_of_ne (fun f hf => ?_) fun h => ?_
@@ -117,11 +122,15 @@ theorem GenericDimBound.proof (hmax : MaximalIdealHeightFG.Statement.{u}) :
       rw [← h, hlastN, constantCoeff_C] at hC
       exact hϖ.ne_zero hC
 
-  have key : ∀ n : ℕ, (n : ℕ∞) ≤ m.height →
-      ((n + 1 : ℕ) : WithBot ℕ∞) ≤ Order.krullDim (PrimeSpectrum.zeroLocus (R := S) (P : Set S)) := by
+  have key
+      : ∀ n : ℕ,
+        (n : ℕ∞) ≤ m.height
+          → ((n + 1 : ℕ) : WithBot ℕ∞)
+            ≤ Order.krullDim (PrimeSpectrum.zeroLocus (R := S) (P : Set S)) := by
     intro n hn
     rw [show m.height = Order.height (⟨m, hm.isPrime⟩ : PrimeSpectrum A) from
-      PrimeSpectrum.height_eq_orderHeight ⟨m, hm.isPrime⟩] at hn
+        PrimeSpectrum.height_eq_orderHeight ⟨m, hm.isPrime⟩]
+      at hn
     obtain ⟨p, hplast, hplen⟩ :=
       Order.exists_series_of_le_height (⟨m, hm.isPrime⟩ : PrimeSpectrum A) hn
     have hlt : (p.map g hg).last < top := by

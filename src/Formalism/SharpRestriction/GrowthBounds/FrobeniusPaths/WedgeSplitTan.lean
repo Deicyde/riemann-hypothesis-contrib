@@ -68,11 +68,13 @@ section S2
 
 variable {N r K : ℕ} (R : Type) [CommRing R]
 
-def PLc (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (j : ℕ) (J' : Finset (Fin r)) :
-    MvPolynomial (Fin N × Fin (r + K)) R := rename (plVar (K := K)) (Kcol R (plPart mu) c j J')
+def PLc (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (j : ℕ) (J' : Finset (Fin r))
+    : MvPolynomial (Fin N × Fin (r + K)) R :=
+  rename (plVar (K := K)) (Kcol R (plPart mu) c j J')
 
-def TNc (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (j : ℕ) (J'' : Finset (Fin K)) :
-    MvPolynomial (Fin N × Fin (r + K)) R := rename (tanVar (r := r)) (Kcol R (tanPart mu) c j J'')
+def TNc (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (j : ℕ) (J'' : Finset (Fin K))
+    : MvPolynomial (Fin N × Fin (r + K)) R :=
+  rename (tanVar (r := r)) (Kcol R (tanPart mu) c j J'')
 
 lemma PLc_succ (mu : Fin (N + 1) → Fin (r + K) → ℤ) (hdom : ∀ i, Dominant (mu i)) (c : ℤ) (j : ℕ) (h : j < N) :
     PLc R mu c (j + 1) = colStep c (min (colH (mu ⟨j, by omega⟩) c) r) (min (colH (mu ⟨j + 1, by omega⟩) c) r)
@@ -162,9 +164,11 @@ lemma nomL_0 (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → �
     (h : ¬ (condUS LL i m ↔ IsCostly mu c i)) : nomL R LL mu c i m = 0 := by
   unfold nomL; rw [if_neg h]
 
-theorem SgW_eq (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (H : ColOK LL mu c)
-    (hdom : ∀ i, Dominant (mu i)) (j : ℕ) (hj : j ≤ N) :
-    SgW R LL mu c j = fun J => PLc R mu c j (Jp J) * TNc R mu c j (Jt J) := by
+theorem SgW_eq
+    (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (H : ColOK LL mu c)
+    (hdom : ∀ i, Dominant (mu i))
+    (j : ℕ) (hj : j ≤ N)
+    : SgW R LL mu c j = fun J => PLc R mu c j (Jp J) * TNc R mu c j (Jt J) := by
   classical
   induction j with
   | zero =>
@@ -195,72 +199,102 @@ theorem SgW_eq (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → 
     by_cases h1 : colH (mu ⟨j, by omega⟩) c < colH (mu ⟨j + 1, by omega⟩) c
     · obtain ⟨hv, hN⟩ := H.rise j h h1
       have cc : IsCostly mu c ⟨j, h⟩ ↔ r ≤ colH (mu ⟨j, by omega⟩) c := by
-        rw [hci]; constructor
+        rw [hci]
+        constructor
         · rintro (⟨_, x⟩ | ⟨x, _⟩) <;> omega
         · intro x; exact Or.inl ⟨h1, x⟩
       by_cases hc : 1 ≤ c
       · by_cases hr : r ≤ colH (mu ⟨j, by omega⟩) c
         · rw [colStep_same c _ _ (by omega) _ (PLc R mu c j)]
           simp only [colStep, if_pos h1, if_pos hc,
-            if_pos (show colH (mu ⟨j, by omega⟩) c - r < colH (mu ⟨j + 1, by omega⟩) c - r by omega)]
-          rw [wedge_split_tan _ (fun a => nomL_0 R LL mu c _ _ (by
-            rw [condUS_vec LL _ _ hv, cc]; have := hca a; intro e; have := e.mpr hr; omega))]
+            if_pos (show colH (mu ⟨j, by omega⟩) c - r < colH (mu ⟨j + 1, by omega⟩) c - r by
+              omega)]
+          rw [wedge_split_tan _ (fun a =>
+            nomL_0 R LL mu c _ _
+              (by rw [condUS_vec LL _ _ hv, cc]; have := hca a; intro e; have := e.mpr hr; omega))]
           congr 2
           funext b
-          exact nomL_X R LL mu c _ _ (by rw [condUS_vec LL _ _ hv, cc]; exact iff_of_true (hna b) hr)
+          exact nomL_X R LL mu c _ _
+            (by rw [condUS_vec LL _ _ hv, cc]; exact iff_of_true (hna b) hr)
         · rw [colStep_same c _ _ (by omega) _ (TNc R mu c j)]
           simp only [colStep, if_pos h1, if_pos hc,
-            if_pos (show min (colH (mu ⟨j, by omega⟩) c) r < min (colH (mu ⟨j + 1, by omega⟩) c) r by omega)]
-          rw [wedge_split_pl _ (fun b => nomL_0 R LL mu c _ _ (by
-            rw [condUS_vec LL _ _ hv, cc]; intro e; exact hr (e.mp (hna b)))) _ _ (htn0 hc (by omega))]
+            if_pos (show min (colH (mu ⟨j, by omega⟩) c) r
+                < min (colH (mu ⟨j + 1, by omega⟩) c) r by
+              omega)]
+          rw [wedge_split_pl _
+            (fun b =>
+              nomL_0 R LL mu c _ _
+                (by rw [condUS_vec LL _ _ hv, cc]; intro e; exact hr (e.mp (hna b))))
+            _ _ (htn0 hc (by omega))]
           congr 2
           funext a
-          exact nomL_X R LL mu c _ _ (by
-            rw [condUS_vec LL _ _ hv, cc]; exact iff_of_false (by have := hca a; omega) hr)
+          exact nomL_X R LL mu c _ _
+            (by rw [condUS_vec LL _ _ hv, cc]; exact iff_of_false (by have := hca a; omega) hr)
       · have hd := H.dual hc j (by omega)
         rw [colStep_same c _ _ (by omega) _ (PLc R mu c j)]
         simp only [colStep, if_pos h1, if_neg hc,
           if_pos (show colH (mu ⟨j, by omega⟩) c - r < colH (mu ⟨j + 1, by omega⟩) c - r by omega)]
-        rw [contr_split_tan _ (fun a => nomL_0 R LL mu c _ _ (by
-          rw [condUS_vec LL _ _ hv, cc]; have := hca a; intro e; have := e.mpr (by omega); omega))]
+        rw [contr_split_tan _ (fun a =>
+          nomL_0 R LL mu c _ _ (by
+            rw [condUS_vec LL _ _ hv, cc]
+            have := hca a
+            intro e
+            have := e.mpr (by omega)
+            omega))]
         congr 2
         funext b
-        exact nomL_X R LL mu c _ _ (by rw [condUS_vec LL _ _ hv, cc]; exact iff_of_true (hna b) (by omega))
+        exact nomL_X R LL mu c _ _
+          (by rw [condUS_vec LL _ _ hv, cc]; exact iff_of_true (hna b) (by omega))
     · by_cases h3 : colH (mu ⟨j + 1, by omega⟩) c < colH (mu ⟨j, by omega⟩) c
       · obtain ⟨hv, hP⟩ := H.fall j h h3
         have cc : IsCostly mu c ⟨j, h⟩ ↔ colH (mu ⟨j, by omega⟩) c ≤ r := by
-          rw [hci]; constructor
+          rw [hci]
+          constructor
           · rintro (⟨x, _⟩ | ⟨_, x⟩) <;> omega
           · intro x; exact Or.inr ⟨h3, x⟩
         by_cases hc : 1 ≤ c
         · by_cases hr : colH (mu ⟨j, by omega⟩) c ≤ r
           · rw [colStep_same c _ _ (by omega) _ (TNc R mu c j)]
             simp only [colStep, if_neg h1, if_pos h3, if_pos hc,
-              if_neg (show ¬ min (colH (mu ⟨j, by omega⟩) c) r < min (colH (mu ⟨j + 1, by omega⟩) c) r by omega),
-              if_pos (show min (colH (mu ⟨j + 1, by omega⟩) c) r < min (colH (mu ⟨j, by omega⟩) c) r by omega)]
-            rw [contr_split_pl _ (fun b => nomL_0 R LL mu c _ _ (by
-              rw [condUS_cov LL _ _ hv, cc]; have := hna b; intro e; have := e.mpr hr; omega)) _ _ (htn0 hc hr)]
+              if_neg (show ¬ min (colH (mu ⟨j, by omega⟩) c) r
+                  < min (colH (mu ⟨j + 1, by omega⟩) c) r by
+                omega),
+              if_pos (show min (colH (mu ⟨j + 1, by omega⟩) c) r
+                  < min (colH (mu ⟨j, by omega⟩) c) r by
+                omega)]
+            rw [contr_split_pl _
+              (fun b =>
+                nomL_0 R LL mu c _ _ (by
+                  rw [condUS_cov LL _ _ hv, cc]; have := hna b; intro e; have := e.mpr hr; omega))
+              _ _ (htn0 hc hr)]
             congr 2
             funext a
-            exact nomL_X R LL mu c _ _ (by rw [condUS_cov LL _ _ hv, cc]; exact iff_of_true (hca a) hr)
+            exact nomL_X R LL mu c _ _
+              (by rw [condUS_cov LL _ _ hv, cc]; exact iff_of_true (hca a) hr)
           · rw [colStep_same c _ _ (by omega) _ (PLc R mu c j)]
             simp only [colStep, if_neg h1, if_pos h3, if_pos hc,
-              if_neg (show ¬ colH (mu ⟨j, by omega⟩) c - r < colH (mu ⟨j + 1, by omega⟩) c - r by omega),
-              if_pos (show colH (mu ⟨j + 1, by omega⟩) c - r < colH (mu ⟨j, by omega⟩) c - r by omega)]
-            rw [contr_split_tan _ (fun a => nomL_0 R LL mu c _ _ (by
-              rw [condUS_cov LL _ _ hv, cc]; intro e; exact hr (e.mp (hca a))))]
+              if_neg (show ¬ colH (mu ⟨j, by omega⟩) c - r < colH (mu ⟨j + 1, by omega⟩) c - r by
+                omega),
+              if_pos (show colH (mu ⟨j + 1, by omega⟩) c - r < colH (mu ⟨j, by omega⟩) c - r by
+                omega)]
+            rw [contr_split_tan _ (fun a =>
+              nomL_0 R LL mu c _ _
+                (by rw [condUS_cov LL _ _ hv, cc]; intro e; exact hr (e.mp (hca a))))]
             congr 2
             funext b
-            exact nomL_X R LL mu c _ _ (by
-              rw [condUS_cov LL _ _ hv, cc]; exact iff_of_false (by have := hna b; omega) hr)
+            exact nomL_X R LL mu c _ _
+              (by rw [condUS_cov LL _ _ hv, cc]; exact iff_of_false (by have := hna b; omega) hr)
         · have hd := H.dual hc j (by omega)
           have hd' := H.dual hc (j + 1) (by omega)
           rw [colStep_same c _ _ (by omega) _ (PLc R mu c j)]
           simp only [colStep, if_neg h1, if_pos h3, if_neg hc,
-            if_neg (show ¬ colH (mu ⟨j, by omega⟩) c - r < colH (mu ⟨j + 1, by omega⟩) c - r by omega),
-            if_pos (show colH (mu ⟨j + 1, by omega⟩) c - r < colH (mu ⟨j, by omega⟩) c - r by omega)]
-          rw [wedge_split_tan _ (fun a => nomL_0 R LL mu c _ _ (by
-            rw [condUS_cov LL _ _ hv, cc]; intro e; have := e.mp (hca a); omega))]
+            if_neg (show ¬ colH (mu ⟨j, by omega⟩) c - r < colH (mu ⟨j + 1, by omega⟩) c - r by
+              omega),
+            if_pos (show colH (mu ⟨j + 1, by omega⟩) c - r < colH (mu ⟨j, by omega⟩) c - r by
+              omega)]
+          rw [wedge_split_tan _ (fun a =>
+            nomL_0 R LL mu c _ _
+              (by rw [condUS_cov LL _ _ hv, cc]; intro e; have := e.mp (hca a); omega))]
           congr 2
           funext b
           exact nomL_X R LL mu c _ _ (by
@@ -268,8 +302,10 @@ theorem SgW_eq (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → 
       · have e : colH (mu ⟨j, by omega⟩) c = colH (mu ⟨j + 1, by omega⟩) c := by omega
         rw [colStep_same c _ _ e, colStep_same c _ _ (by rw [e]), colStep_same c _ _ (by rw [e])]
 
-theorem plTanCol_eq_SgW (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (H : ColOK LL mu c)
-    (hdom : ∀ i, Dominant (mu i)) (J : Finset (Fin (r + K))) : plTanCol R mu c J = SgW R LL mu c N J := by
+theorem plTanCol_eq_SgW
+    (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (H : ColOK LL mu c)
+    (hdom : ∀ i, Dominant (mu i)) (J : Finset (Fin (r + K)))
+    : plTanCol R mu c J = SgW R LL mu c N J := by
   rw [SgW_eq R LL mu c H hdom N le_rfl]; rfl
 
 end S2

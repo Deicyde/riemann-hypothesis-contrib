@@ -12,31 +12,34 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.RegularSmooth
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.ResK ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.ResK
+  ReciprocityTheory.AnForm.R
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂
 
 namespace Resolution
 
 inductive IsBlowupSeq {X : Scheme.{0}} : ∀ {X' : Scheme.{0}}, (X' ⟶ X) → Prop
-
   | id : IsBlowupSeq (𝟙 X)
+  | step {X₁ X₂ : Scheme.{0}} {s : X₁ ⟶ X} (J : X₁.IdealSheafData) (π : X₂ ⟶ X₁)
+    : IsBlowupSeq s → FinalTheorems.Blowup π J → IsBlowupSeq (π ≫ s)
 
-  | step {X₁ X₂ : Scheme.{0}} {s : X₁ ⟶ X} (J : X₁.IdealSheafData) (π : X₂ ⟶ X₁) :
-      IsBlowupSeq s → FinalTheorems.Blowup π J → IsBlowupSeq (π ≫ s)
-
-theorem IsBlowupSeq.single {X X' : Scheme.{0}} (J : X.IdealSheafData) (π : X' ⟶ X) (h : FinalTheorems.Blowup π J) :
-    IsBlowupSeq π := by
+theorem IsBlowupSeq.single
+    {X X' : Scheme.{0}} (J : X.IdealSheafData) (π : X' ⟶ X) (h : FinalTheorems.Blowup π J)
+    : IsBlowupSeq π := by
   simpa using IsBlowupSeq.step J π .id h
 
-theorem IsBlowupSeq.of_smooth {S Y Y' : Scheme.{0}} {f : Y ⟶ S} {B : Set Y} {s : Y' ⟶ Y}
-    (h : IsSmoothBlowupSeq f B s) : IsBlowupSeq s := by
+theorem IsBlowupSeq.of_smooth
+    {S Y Y' : Scheme.{0}} {f : Y ⟶ S} {B : Set Y} {s : Y' ⟶ Y} (h : IsSmoothBlowupSeq f B s)
+    : IsBlowupSeq s := by
   induction h with
   | id => exact .id
   | step J π _ _ _ h ih => exact .step J π ih h
 
-theorem IsBlowupSeq.isProjOver {R : Type} [CommRing R] [IsNoetherianRing R] {X X' : Scheme.{0}} {g : X ⟶ Sp R}
-    {s : X' ⟶ X} (h : IsBlowupSeq s) (hg : IsProjOver g) : IsProjOver (s ≫ g) := by
+theorem IsBlowupSeq.isProjOver
+    {R : Type} [CommRing R] [IsNoetherianRing R]
+    {X X' : Scheme.{0}} {g : X ⟶ Sp R} {s : X' ⟶ X} (h : IsBlowupSeq s) (hg : IsProjOver g)
+    : IsProjOver (s ≫ g) := by
   induction h with
   | id => simpa using hg
   | @step X₁ X₂ s J π _ hπ ih =>
@@ -50,16 +53,21 @@ open Resolution
 
 def ResolutionCharZero : Prop :=
   ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) (g : X ⟶ Sp k) [LocallyOfFiniteType g],
-    QuasiCompact g → IsSeparated g → IsReduced X →
-    ∃ (X' : Scheme.{0}) (s : X' ⟶ X),
-      IsBlowupSeq s ∧ Smooth (s ≫ g) ∧ IsIso (s ∣_ g.smoothLocus) ∧
-        FinalTheorems.Snc (preRed s (g.smoothLocus : Set X)ᶜ g.smoothLocus.isOpen.isClosed_compl)
+    QuasiCompact g → IsSeparated g → IsReduced X
+      → ∃ (X' : Scheme.{0}) (s : X' ⟶ X),
+        IsBlowupSeq s ∧ Smooth (s ≫ g) ∧ IsIso (s ∣_ g.smoothLocus)
+          ∧ FinalTheorems.Snc (preRed s (g.smoothLocus : Set X)ᶜ
+            g.smoothLocus.isOpen.isClosed_compl)
 
-theorem ResolutionCharZero.projective (h : ResolutionCharZero) {k : Type} [Field k] [CharZero k] {X : Scheme.{0}}
-    (g : X ⟶ Sp k) [LocallyOfFiniteType g] [IsReduced X] (hg : IsProjOver g) :
-    ∃ (X' : Scheme.{0}) (s : X' ⟶ X),
-      IsBlowupSeq s ∧ IsProjOver (s ≫ g) ∧ Smooth (s ≫ g) ∧ IsIso (s ∣_ g.smoothLocus) ∧
-        FinalTheorems.Snc (preRed s (g.smoothLocus : Set X)ᶜ g.smoothLocus.isOpen.isClosed_compl) := by
+theorem ResolutionCharZero.projective
+    (h : ResolutionCharZero)
+    {k : Type} [Field k] [CharZero k]
+    {X : Scheme.{0}} (g : X ⟶ Sp k) [LocallyOfFiniteType g] [IsReduced X]
+    (hg : IsProjOver g)
+    : ∃ (X' : Scheme.{0}) (s : X' ⟶ X),
+      IsBlowupSeq s ∧ IsProjOver (s ≫ g) ∧ Smooth (s ≫ g) ∧ IsIso (s ∣_ g.smoothLocus)
+        ∧ FinalTheorems.Snc (preRed s (g.smoothLocus : Set X)ᶜ
+          g.smoothLocus.isOpen.isClosed_compl) := by
   have hp : IsProper g := by
     obtain ⟨N, i, hi, rfl⟩ := hg
     have : IsProper (PSpace.str k N) := isProper_str k N

@@ -10,11 +10,12 @@ open Matrix Finset Formalism.MainNotions.S GlobalTheory.Dec
 
 namespace GlobalTheory.PhiTriangular
 
-theorem sum_sInt_from {n : ℕ} (lam : Fin n → ℝ) (l : Fin n) :
-    ∑ i : Fin n, (if l ≤ i then sInt lam i else 0) = muInt lam l := by
+theorem sum_sInt_from {n : ℕ} (lam : Fin n → ℝ) (l : Fin n)
+    : ∑ i : Fin n, (if l ≤ i then sInt lam i else 0) = muInt lam l := by
   let m : ℕ → ℤ := fun k => if h : k < n then muInt lam ⟨k, h⟩ else 0
-  have h1 : ∀ i : Fin n, (if l ≤ i then sInt lam i else 0) =
-      m (max i.val l.val) - m (max (i.val + 1) l.val) := by
+  have h1
+      : ∀ i : Fin n,
+        (if l ≤ i then sInt lam i else 0) = m (max i.val l.val) - m (max (i.val + 1) l.val) := by
     intro i
     by_cases h : l ≤ i
     · have h' : l.val ≤ i.val := h
@@ -28,8 +29,8 @@ theorem sum_sInt_from {n : ℕ} (lam : Fin n → ℝ) (l : Fin n) :
     max_eq_left l.isLt.le]
   simp [m]
 
-theorem prod_castLE_succ {n : ℕ} (d : Fin n → ℂ) (i : Fin n) :
-    ∏ j : Fin (i.val + 1), d (Fin.castLE i.isLt j) = ∏ l : Fin n, if l ≤ i then d l else 1 := by
+theorem prod_castLE_succ {n : ℕ} (d : Fin n → ℂ) (i : Fin n)
+    : ∏ j : Fin (i.val + 1), d (Fin.castLE i.isLt j) = ∏ l : Fin n, if l ≤ i then d l else 1 := by
   refine Finset.prod_of_injOn (Fin.castLE i.isLt) ((Fin.castLE_injective _).injOn) (by simp) ?_ ?_
   · intro k _ hk
     rw [if_neg]
@@ -39,16 +40,16 @@ theorem prod_castLE_succ {n : ℕ} (d : Fin n → ℂ) (i : Fin n) :
     rw [if_pos]
     exact Nat.le_of_lt_succ j.isLt
 
-theorem zpow_finset_sum {ι : Type} (s : Finset ι) (f : ι → ℤ) {a : ℂ} (ha : a ≠ 0) :
-    a ^ (∑ i ∈ s, f i) = ∏ i ∈ s, a ^ f i := by
+theorem zpow_finset_sum {ι : Type} (s : Finset ι) (f : ι → ℤ) {a : ℂ} (ha : a ≠ 0)
+    : a ^ (∑ i ∈ s, f i) = ∏ i ∈ s, a ^ f i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert i s hi ih => rw [Finset.sum_insert hi, Finset.prod_insert hi, zpow_add₀ ha, ih]
 
-theorem prod_partial_zpow {n : ℕ} (lam : Fin n → ℝ) (d : Fin n → ℂ) (hd : ∀ l, d l ≠ 0) :
-    ∏ i : Fin n, (∏ j : Fin (i.val + 1), d (Fin.castLE i.isLt j)) ^ (-(sInt lam i)) =
-      ∏ l, d l ^ (-(muInt lam l)) := by
+theorem prod_partial_zpow {n : ℕ} (lam : Fin n → ℝ) (d : Fin n → ℂ) (hd : ∀ l, d l ≠ 0)
+    : ∏ i : Fin n, (∏ j : Fin (i.val + 1), d (Fin.castLE i.isLt j)) ^ (-(sInt lam i))
+      = ∏ l, d l ^ (-(muInt lam l)) := by
   simp only [prod_castLE_succ, ← Finset.prod_zpow]
   rw [Finset.prod_comm]
   refine Finset.prod_congr rfl fun l _ => ?_
@@ -63,7 +64,8 @@ theorem phiTri : PhiTri := by
   · rw [GlobalTheory.LeadMinorTri.leadMinor_lower_mul_mul_upper n c z c' hc hc']
     exact mul_ne_zero (Finset.prod_ne_zero_iff.2 fun j _ => hd' _) (hz i)
   · unfold Phi
-    simp only [GlobalTheory.LeadMinorTri.leadMinor_lower_mul_mul_upper n c z c' hc hc', mul_zpow _ (leadMinor z _ _)]
+    simp only [GlobalTheory.LeadMinorTri.leadMinor_lower_mul_mul_upper n c z c' hc hc',
+      mul_zpow _ (leadMinor z _ _)]
     rw [Finset.prod_mul_distrib, prod_partial_zpow lam (fun l => c l l * c' l l) hd']
 
 end GlobalTheory.PhiTriangular

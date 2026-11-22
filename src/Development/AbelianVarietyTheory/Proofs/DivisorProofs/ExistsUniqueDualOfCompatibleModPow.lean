@@ -6,15 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CobOneEqZero
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz
+  GlobalTheory.QLog GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PDiv
 
-theorem exists_unique_dual_of_compatible_mod_pow :
-    ∀ (O M : Type) [CommRing O] [AddCommGroup M] [Module O M] (a : O)
-      [IsAdicComplete (Ideal.span {a}) O] (u : ∀ n : ℕ, M →ₗ[O] O ⧸ Ideal.span {a ^ n}),
-      (∀ n w (x : O), u (n + 1) w = Ideal.Quotient.mk _ x → u n w = Ideal.Quotient.mk _ x) →
-      ∃! l : Module.Dual O M, ∀ n w, Ideal.Quotient.mk _ (l w) = u n w := by
+theorem exists_unique_dual_of_compatible_mod_pow
+    : ∀ (O M : Type) [CommRing O] [AddCommGroup M] [Module O M] (a : O)
+        [IsAdicComplete (Ideal.span {a}) O] (u : ∀ n : ℕ, M →ₗ[O] O ⧸ Ideal.span {a ^ n}),
+      (∀ n w (x : O), u (n + 1) w = Ideal.Quotient.mk _ x → u n w = Ideal.Quotient.mk _ x)
+        → ∃! l : Module.Dual O M, ∀ n w, Ideal.Quotient.mk _ (l w) = u n w := by
   intro O M _ _ _ a _ u hu
 
   have sep : ∀ y : O, (∀ n : ℕ, y ∈ Ideal.span {a ^ n}) → y = 0 := by
@@ -37,9 +38,10 @@ theorem exists_unique_dual_of_compatible_mod_pow :
           (Ideal.span_singleton_le_span_singleton.mpr (pow_dvd_pow a hmk)) (step k)
         have := Ideal.add_mem _ ih h2
         simpa using this
-    obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := Ideal.span {a}) x (fun {m n} hmn => by
-      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow]
-      exact cauchy m n hmn)
+    obtain ⟨L, hL⟩ :=
+      IsPrecomplete.prec' (I := Ideal.span {a}) x (fun {m n} hmn => by
+        rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow]
+        exact cauchy m n hmn)
     refine ⟨L, fun n => ?_, fun y hy => ?_⟩
     · have h := hL n
       rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow] at h
@@ -48,8 +50,8 @@ theorem exists_unique_dual_of_compatible_mod_pow :
     · refine sub_eq_zero.mp (sep _ fun n => ?_)
       have h := hL n
       rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow] at h
-      exact Ideal.Quotient.eq.mp ((hy n).trans (hx n).symm) |> fun h' => by
-        simpa using Ideal.add_mem _ h' h
+      exact Ideal.Quotient.eq.mp ((hy n).trans (hx n).symm)
+        |> fun h' => by simpa using Ideal.add_mem _ h' h
   choose f hf huniq using key
   refine ⟨{ toFun := f, map_add' := ?_, map_smul' := ?_ }, ?_, ?_⟩
   · intro w w'

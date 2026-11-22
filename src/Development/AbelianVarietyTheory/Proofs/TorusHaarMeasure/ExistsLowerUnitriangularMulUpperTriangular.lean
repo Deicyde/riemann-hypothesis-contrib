@@ -10,10 +10,12 @@ open Matrix MvPolynomial ReciprocityTheory.MultiplicativeHeights
 
 namespace GlobalTheory
 
-theorem exists_lowerUnitriangular_mul_upperTriangular :
-    ∀ (p : ℕ) (x : Matrix (Fin p) (Fin p) ℂ), (∀ i, leadMinor x i ≠ 0) →
-      ∃ n b : Matrix (Fin p) (Fin p) ℂ, x = n * b ∧ (∀ i, n i i = 1) ∧
-        (∀ i j, i < j → n i j = 0) ∧ (∀ i j, j < i → b i j = 0) := by
+theorem exists_lowerUnitriangular_mul_upperTriangular
+    : ∀ (p : ℕ) (x : Matrix (Fin p) (Fin p) ℂ),
+      (∀ i, leadMinor x i ≠ 0)
+        → ∃ n b : Matrix (Fin p) (Fin p) ℂ,
+          x = n * b ∧ (∀ i, n i i = 1) ∧ (∀ i j, i < j → n i j = 0)
+            ∧ (∀ i j, j < i → b i j = 0) := by
   intro p x hx
   have hM : ∀ k : Fin (p + 1), ReciprocityTheory.ChartRestriction.G.FD.lminor x k ≠ 0 := by
     intro k
@@ -26,7 +28,8 @@ theorem exists_lowerUnitriangular_mul_upperTriangular :
   set L := ReciprocityTheory.ChartRestriction.G.AR.Up.LUPf.Lm x with hL
   have hu : IsUnit L.det := by
     rw [hL, ReciprocityTheory.ChartRestriction.G.AR.Up.LUPf.Lm_det]; exact isUnit_one
-  have hup : ∀ i k : Fin p, i < k → L i k = 0 := ReciprocityTheory.ChartRestriction.G.AR.Up.LUPf.Lm_up x
+  have hup : ∀ i k : Fin p, i < k → L i k = 0 :=
+    ReciprocityTheory.ChartRestriction.G.AR.Up.LUPf.Lm_up x
   have hd : ∀ i : Fin p, L i i = 1 := ReciprocityTheory.ChartRestriction.G.AR.Up.LUPf.Lm_diag x
   have hbt : L.BlockTriangular OrderDual.toDual := fun i k h => hup i k h
   let : Invertible L := L.invertibleOfIsUnitDet hu

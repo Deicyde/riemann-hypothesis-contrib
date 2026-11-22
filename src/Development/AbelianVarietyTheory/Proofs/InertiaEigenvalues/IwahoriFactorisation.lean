@@ -16,14 +16,15 @@ def IsUU {m : ℕ} (U : Matrix (Fin m) (Fin m) O) : Prop :=
 def IsLU {m : ℕ} (L : Matrix (Fin m) (Fin m) O) : Prop :=
   ∀ i j, (i < j → L i j = 0) ∧ (i = j → L i j = 1)
 
-theorem udl_apply {m : ℕ} (U L : Matrix (Fin m) (Fin m) O) (d : Fin m → O) (i j : Fin m) :
-    (U * diagonal d * L) i j = ∑ k, U i k * d k * L k j := by
+theorem udl_apply {m : ℕ} (U L : Matrix (Fin m) (Fin m) O) (d : Fin m → O) (i j : Fin m)
+    : (U * diagonal d * L) i j = ∑ k, U i k * d k * L k j := by
   rw [Matrix.mul_apply]
   simp only [mul_diagonal]
 
-theorem last_row {n : ℕ} {U L : Matrix (Fin (n+1)) (Fin (n+1)) O} (hU : IsUU U)
-    (D : Fin (n+1) → Oˣ) (j : Fin (n+1)) :
-    (U * diagonal (fun k => (D k : O)) * L) (Fin.last n) j
+theorem last_row
+    {n : ℕ} {U L : Matrix (Fin (n + 1)) (Fin (n + 1)) O}
+    (hU : IsUU U) (D : Fin (n + 1) → Oˣ) (j : Fin (n + 1))
+    : (U * diagonal (fun k => (D k : O)) * L) (Fin.last n) j
       = (D (Fin.last n) : O) * L (Fin.last n) j := by
   simp only [udl_apply]
   rw [Finset.sum_eq_single (Fin.last n)]
@@ -33,9 +34,10 @@ theorem last_row {n : ℕ} {U L : Matrix (Fin (n+1)) (Fin (n+1)) O} (hU : IsUU U
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem last_col {n : ℕ} {U L : Matrix (Fin (n+1)) (Fin (n+1)) O} (hL : IsLU L)
-    (D : Fin (n+1) → Oˣ) (i : Fin (n+1)) :
-    (U * diagonal (fun k => (D k : O)) * L) i (Fin.last n)
+theorem last_col
+    {n : ℕ} {U L : Matrix (Fin (n + 1)) (Fin (n + 1)) O}
+    (hL : IsLU L) (D : Fin (n + 1) → Oˣ) (i : Fin (n + 1))
+    : (U * diagonal (fun k => (D k : O)) * L) i (Fin.last n)
       = U i (Fin.last n) * (D (Fin.last n) : O) := by
   simp only [udl_apply]
   rw [Finset.sum_eq_single (Fin.last n)]
@@ -45,26 +47,28 @@ theorem last_col {n : ℕ} {U L : Matrix (Fin (n+1)) (Fin (n+1)) O} (hL : IsLU L
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem top_block {n : ℕ} (U L : Matrix (Fin (n+1)) (Fin (n+1)) O)
-    (D : Fin (n+1) → Oˣ) (i j : Fin n) :
-    (U * diagonal (fun k => (D k : O)) * L) i.castSucc j.castSucc =
-      (U.submatrix Fin.castSucc Fin.castSucc * diagonal (fun k : Fin n => (D k.castSucc : O)) *
-        L.submatrix Fin.castSucc Fin.castSucc) i j
-      + U i.castSucc (Fin.last n) * (D (Fin.last n) : O) * L (Fin.last n) j.castSucc := by
+theorem top_block
+    {n : ℕ} (U L : Matrix (Fin (n + 1)) (Fin (n + 1)) O) (D : Fin (n + 1) → Oˣ) (i j : Fin n)
+    : (U * diagonal (fun k => (D k : O)) * L) i.castSucc j.castSucc
+      = (U.submatrix Fin.castSucc Fin.castSucc * diagonal (fun k : Fin n => (D k.castSucc : O))
+            * L.submatrix Fin.castSucc Fin.castSucc)
+          i j
+        + U i.castSucc (Fin.last n) * (D (Fin.last n) : O) * L (Fin.last n) j.castSucc := by
   simp only [udl_apply, Fin.sum_univ_castSucc, submatrix_apply]
 
-theorem IsUU.top {n : ℕ} {U : Matrix (Fin (n+1)) (Fin (n+1)) O} (hU : IsUU U) :
-    IsUU (U.submatrix Fin.castSucc Fin.castSucc) := fun _ _ ↦
+theorem IsUU.top {n : ℕ} {U : Matrix (Fin (n + 1)) (Fin (n + 1)) O} (hU : IsUU U)
+    : IsUU (U.submatrix Fin.castSucc Fin.castSucc) := fun _ _ ↦
   ⟨fun h ↦ (hU _ _).1 (Fin.castSucc_lt_castSucc_iff.2 h), fun h ↦ (hU _ _).2 (congrArg _ h)⟩
 
-theorem IsLU.top {n : ℕ} {L : Matrix (Fin (n+1)) (Fin (n+1)) O} (hL : IsLU L) :
-    IsLU (L.submatrix Fin.castSucc Fin.castSucc) := fun _ _ ↦
+theorem IsLU.top {n : ℕ} {L : Matrix (Fin (n + 1)) (Fin (n + 1)) O} (hL : IsLU L)
+    : IsLU (L.submatrix Fin.castSucc Fin.castSucc) := fun _ _ ↦
   ⟨fun h ↦ (hL _ _).1 (Fin.castSucc_lt_castSucc_iff.2 h), fun h ↦ (hL _ _).2 (congrArg _ h)⟩
 
-theorem udl_unique : ∀ (n : ℕ) (U U' L L' : Matrix (Fin n) (Fin n) O) (D D' : Fin n → Oˣ),
-    IsUU U → IsUU U' → IsLU L → IsLU L' →
-    U * diagonal (fun i => (D i : O)) * L = U' * diagonal (fun i => (D' i : O)) * L' →
-    U = U' ∧ D = D' ∧ L = L' := by
+theorem udl_unique
+    : ∀ (n : ℕ) (U U' L L' : Matrix (Fin n) (Fin n) O) (D D' : Fin n → Oˣ),
+      IsUU U → IsUU U' → IsLU L → IsLU L'
+        → U * diagonal (fun i => (D i : O)) * L = U' * diagonal (fun i => (D' i : O)) * L'
+        → U = U' ∧ D = D' ∧ L = L' := by
   intro n
   induction n with
   | zero =>
@@ -73,11 +77,17 @@ theorem udl_unique : ∀ (n : ℕ) (U U' L L' : Matrix (Fin n) (Fin n) O) (D D' 
   | succ n ih =>
     intro U U' L L' D D' hU hU' hL hL' h
 
-    have hrow : ∀ j, (D (Fin.last n) : O) * L (Fin.last n) j = (D' (Fin.last n) : O) * L' (Fin.last n) j :=
-      fun j ↦ (last_row hU D (L := L) j).symm.trans
+    have hrow
+        : ∀ j,
+          (D (Fin.last n) : O) * L (Fin.last n) j
+            = (D' (Fin.last n) : O) * L' (Fin.last n) j := fun j ↦
+      (last_row hU D (L := L) j).symm.trans
         ((congrFun (congrFun h _) j).trans (last_row hU' D' (L := L') j))
-    have hcol : ∀ i, U i (Fin.last n) * (D (Fin.last n) : O) = U' i (Fin.last n) * (D' (Fin.last n) : O) :=
-      fun i ↦ (last_col hL D (U := U) i).symm.trans
+    have hcol
+        : ∀ i,
+          U i (Fin.last n) * (D (Fin.last n) : O)
+            = U' i (Fin.last n) * (D' (Fin.last n) : O) := fun i ↦
+      (last_col hL D (U := U) i).symm.trans
         ((congrFun (congrFun h i) _).trans (last_col hL' D' (U := U') i))
     have hDl : D (Fin.last n) = D' (Fin.last n) := by
       have e := hrow (Fin.last n)
@@ -92,17 +102,20 @@ theorem udl_unique : ∀ (n : ℕ) (U U' L L' : Matrix (Fin n) (Fin n) O) (D D' 
       rw [hDl] at e
       exact (Units.mul_left_inj (D' (Fin.last n))).1 e
 
-    have htop : U.submatrix Fin.castSucc Fin.castSucc * diagonal (fun k : Fin n ↦ ((D ∘ Fin.castSucc) k : O)) *
-        L.submatrix Fin.castSucc Fin.castSucc =
-        U'.submatrix Fin.castSucc Fin.castSucc * diagonal (fun k : Fin n ↦ ((D' ∘ Fin.castSucc) k : O)) *
-        L'.submatrix Fin.castSucc Fin.castSucc := by
+    have htop
+        : U.submatrix Fin.castSucc Fin.castSucc
+            * diagonal (fun k : Fin n ↦ ((D ∘ Fin.castSucc) k : O))
+            * L.submatrix Fin.castSucc Fin.castSucc
+          = U'.submatrix Fin.castSucc Fin.castSucc
+            * diagonal (fun k : Fin n ↦ ((D' ∘ Fin.castSucc) k : O))
+            * L'.submatrix Fin.castSucc Fin.castSucc := by
       ext i j
       have e1 := top_block U L D i j
       have e2 := top_block U' L' D' i j
       rw [h, e2, hUl, hDl, hLl] at e1
       exact (add_right_cancel e1).symm
-    obtain ⟨hU0, hD0, hL0⟩ := ih _ _ _ _ (D ∘ Fin.castSucc) (D' ∘ Fin.castSucc)
-      hU.top hU'.top hL.top hL'.top htop
+    obtain ⟨hU0, hD0, hL0⟩ :=
+      ih _ _ _ _ (D ∘ Fin.castSucc) (D' ∘ Fin.castSucc) hU.top hU'.top hL.top hL'.top htop
     refine ⟨?_, ?_, ?_⟩
     · ext i j
       rcases Fin.eq_castSucc_or_eq_last i with ⟨i, rfl⟩ | rfl
@@ -123,25 +136,32 @@ theorem udl_unique : ∀ (n : ℕ) (U U' L L' : Matrix (Fin n) (Fin n) O) (D D' 
         · rw [(hL _ _).1 (Fin.castSucc_lt_last i), (hL' _ _).1 (Fin.castSucc_lt_last i)]
       · exact hLl j
 
-def border {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (col row : Fin n → O) (x : O) :
-    Matrix (Fin (n+1)) (Fin (n+1)) O := fun i j =>
-  Fin.lastCases (motive := fun _ => O) (Fin.lastCases (motive := fun _ => O) x row j)
-    (fun i' => Fin.lastCases (motive := fun _ => O) (col i') (A i') j) i
+def border {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (col row : Fin n → O) (x : O)
+    : Matrix (Fin (n + 1)) (Fin (n + 1)) O := fun i j =>
+  Fin.lastCases
+    (motive := fun _ => O)
+    (Fin.lastCases (motive := fun _ => O) x row j)
+    (fun i' => Fin.lastCases (motive := fun _ => O) (col i') (A i') j)
+    i
 
 section
 variable {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (col row : Fin n → O) (x : O)
 omit [CommRing O]
 
 theorem border_ll : border A col row x (Fin.last n) (Fin.last n) = x := by simp [border]
-theorem border_lc (j : Fin n) : border A col row x (Fin.last n) j.castSucc = row j := by simp [border]
-theorem border_cl (i : Fin n) : border A col row x i.castSucc (Fin.last n) = col i := by simp [border]
-theorem border_cc (i j : Fin n) : border A col row x i.castSucc j.castSucc = A i j := by simp [border]
+theorem border_lc (j : Fin n) : border A col row x (Fin.last n) j.castSucc = row j := by
+  simp [border]
+theorem border_cl (i : Fin n) : border A col row x i.castSucc (Fin.last n) = col i := by
+  simp [border]
+theorem border_cc (i j : Fin n) : border A col row x i.castSucc j.castSucc = A i j := by
+  simp [border]
 theorem border_top : (border A col row x).submatrix Fin.castSucc Fin.castSucc = A :=
   Matrix.ext fun i j ↦ border_cc A col row x i j
 end
 
-theorem unit_sub [IsLocalRing O] {β : O} (hβ : ¬IsUnit β) {a y : O} (ha : IsUnit a)
-    (hy : β ∣ y) (z : O) : IsUnit (a - z * y) := by
+theorem unit_sub
+    [IsLocalRing O] {β : O} (hβ : ¬ IsUnit β) {a y : O} (ha : IsUnit a) (hy : β ∣ y) (z : O)
+    : IsUnit (a - z * y) := by
   have hm : z * y ∈ IsLocalRing.maximalIdeal O := by
     obtain ⟨t, rfl⟩ := hy
     exact Ideal.mul_mem_left _ z
@@ -152,11 +172,13 @@ theorem unit_sub [IsLocalRing O] {β : O} (hβ : ¬IsUnit β) {a y : O} (ha : Is
   have h3 : a ∈ IsLocalRing.maximalIdeal O := by simpa using Ideal.add_mem _ h2 hm
   exact mem_nonunits_iff.1 ((IsLocalRing.mem_maximalIdeal _).1 h3) ha
 
-theorem diag_unit [IsLocalRing O] {β : O} (hβ : ¬IsUnit β) {n : ℕ}
-    (g : Matrix (Fin n) (Fin n) O) (hg : IsUnit g.det) (hlow : ∀ i j, j < i → β ∣ g i j)
-    (i : Fin n) : IsUnit (g i i) := by
-
-  have hres : ∀ x : O, IsLocalRing.residue O x = 0 ↔ ¬IsUnit x := fun x ↦ by
+theorem diag_unit
+    [IsLocalRing O]
+    {β : O} (hβ : ¬ IsUnit β)
+    {n : ℕ}
+    (g : Matrix (Fin n) (Fin n) O) (hg : IsUnit g.det) (hlow : ∀ i j, j < i → β ∣ g i j) (i : Fin n)
+    : IsUnit (g i i) := by
+  have hres : ∀ x : O, IsLocalRing.residue O x = 0 ↔ ¬ IsUnit x := fun x ↦ by
     rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   have htri : (g.map (IsLocalRing.residue O)).BlockTriangular id := by
     intro a b hab
@@ -175,13 +197,13 @@ theorem diag_unit [IsLocalRing O] {β : O} (hβ : ¬IsUnit β) {n : ℕ}
   by_contra hu
   exact hi ((hres _).2 hu)
 
-theorem udl_exists [IsLocalRing O] {α β : O} (hβ : ¬IsUnit β) :
-    ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) O),
-    (∀ i j, (i < j → α ∣ g i j) ∧ (j < i → β ∣ g i j)) → (∀ i, IsUnit (g i i)) →
-    ∃ (U : Matrix (Fin n) (Fin n) O) (D : Fin n → Oˣ) (L : Matrix (Fin n) (Fin n) O),
-      (∀ i j, (j < i → U i j = 0) ∧ (i = j → U i j = 1) ∧ (i < j → α ∣ U i j)) ∧
-      (∀ i j, (i < j → L i j = 0) ∧ (i = j → L i j = 1) ∧ (j < i → β ∣ L i j)) ∧
-      g = U * diagonal (fun i => (D i : O)) * L := by
+theorem udl_exists [IsLocalRing O] {α β : O} (hβ : ¬ IsUnit β)
+    : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) O),
+      (∀ i j, (i < j → α ∣ g i j) ∧ (j < i → β ∣ g i j)) → (∀ i, IsUnit (g i i))
+        → ∃ (U : Matrix (Fin n) (Fin n) O) (D : Fin n → Oˣ) (L : Matrix (Fin n) (Fin n) O),
+          (∀ i j, (j < i → U i j = 0) ∧ (i = j → U i j = 1) ∧ (i < j → α ∣ U i j))
+            ∧ (∀ i j, (i < j → L i j = 0) ∧ (i = j → L i j = 1) ∧ (j < i → β ∣ L i j))
+            ∧ g = U * diagonal (fun i => (D i : O)) * L := by
   intro n
   induction n with
   | zero =>
@@ -214,13 +236,18 @@ theorem udl_exists [IsLocalRing O] {α β : O} (hβ : ¬IsUnit β) :
         · simp only [U, border_cc, Fin.castSucc_lt_castSucc_iff, Fin.castSucc_inj]
           exact hU0 i j
         · simp only [U, border_cl]
-          exact ⟨fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last i).le),
+          exact ⟨
+            fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last i).le),
             fun h ↦ absurd h (Fin.castSucc_lt_last i).ne,
-            fun _ ↦ Dvd.dvd.mul_right ((hg _ _).1 (Fin.castSucc_lt_last i)) _⟩
+            fun _ ↦ Dvd.dvd.mul_right ((hg _ _).1 (Fin.castSucc_lt_last i)) _
+          ⟩
       · rcases Fin.eq_castSucc_or_eq_last j with ⟨j, rfl⟩ | rfl
         · simp only [U, border_lc, Pi.zero_apply]
-          exact ⟨fun _ ↦ trivial, fun h ↦ absurd h (Fin.castSucc_lt_last j).ne',
-            fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last j).le)⟩
+          exact ⟨
+            fun _ ↦ trivial,
+            fun h ↦ absurd h (Fin.castSucc_lt_last j).ne',
+            fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last j).le)
+          ⟩
         · simp [U, border_ll]
     have hL : ∀ i j, (i < j → L i j = 0) ∧ (i = j → L i j = 1) ∧ (j < i → β ∣ L i j) := by
       intro i j
@@ -229,13 +256,18 @@ theorem udl_exists [IsLocalRing O] {α β : O} (hβ : ¬IsUnit β) :
         · simp only [L, border_cc, Fin.castSucc_lt_castSucc_iff, Fin.castSucc_inj]
           exact hL0 i j
         · simp only [L, border_cl, Pi.zero_apply]
-          exact ⟨fun _ ↦ trivial, fun h ↦ absurd h (Fin.castSucc_lt_last i).ne,
-            fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last i).le)⟩
+          exact ⟨
+            fun _ ↦ trivial,
+            fun h ↦ absurd h (Fin.castSucc_lt_last i).ne,
+            fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last i).le)
+          ⟩
       · rcases Fin.eq_castSucc_or_eq_last j with ⟨j, rfl⟩ | rfl
         · simp only [L, border_lc]
-          exact ⟨fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last j).le),
+          exact ⟨
+            fun h ↦ absurd h (not_lt.2 (Fin.castSucc_lt_last j).le),
             fun h ↦ absurd h (Fin.castSucc_lt_last j).ne',
-            fun _ ↦ Dvd.dvd.mul_left ((hg _ _).2 (Fin.castSucc_lt_last j)) _⟩
+            fun _ ↦ Dvd.dvd.mul_left ((hg _ _).2 (Fin.castSucc_lt_last j)) _
+          ⟩
         · simp [L, border_ll]
     have hUU : IsUU U := fun i j ↦ ⟨(hU i j).1, (hU i j).2.1⟩
     have hLU : IsLU L := fun i j ↦ ⟨(hL i j).1, (hL i j).2.1⟩
@@ -244,7 +276,8 @@ theorem udl_exists [IsLocalRing O] {α β : O} (hβ : ¬IsUnit β) :
     rcases Fin.eq_castSucc_or_eq_last i with ⟨i, rfl⟩ | rfl
     · rcases Fin.eq_castSucc_or_eq_last j with ⟨j, rfl⟩ | rfl
       · rw [top_block]
-        simp only [U, L, D, border_top, Fin.lastCases_castSucc, Fin.lastCases_last, border_cl, border_lc]
+        simp only [U, L, D, border_top, Fin.lastCases_castSucc, Fin.lastCases_last, border_cl,
+          border_lc]
         rw [← hg0]
         simp only [g']
         linear_combination (-(g i.castSucc (Fin.last n) * ↑u⁻¹ * g (Fin.last n) j.castSucc)) * hui

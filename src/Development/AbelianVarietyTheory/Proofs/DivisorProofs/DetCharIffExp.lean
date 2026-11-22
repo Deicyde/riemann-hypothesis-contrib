@@ -9,16 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCom
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Mult
+open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Mult
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.DetCharArch
 
-theorem map_conj {F E R R' : Type} [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R] [CommRing R']
-    [Algebra F R'] (f : R →ₐ[F] R') (σ : E →ₐ[F] E) (x : R ⊗[F] E) :
-    (Algebra.TensorProduct.map f (AlgHom.id F E)).toRingHom (sigR R σ x) =
-      sigR R' σ ((Algebra.TensorProduct.map f (AlgHom.id F E)).toRingHom x) := by
+theorem map_conj
+    {F E R R' : Type}
+    [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R']
+    (f : R →ₐ[F] R') (σ : E →ₐ[F] E) (x : R ⊗[F] E)
+    : (Algebra.TensorProduct.map f (AlgHom.id F E)).toRingHom (sigR R σ x)
+      = sigR R' σ ((Algebra.TensorProduct.map f (AlgHom.id F E)).toRingHom x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul a x => simp [sigR]

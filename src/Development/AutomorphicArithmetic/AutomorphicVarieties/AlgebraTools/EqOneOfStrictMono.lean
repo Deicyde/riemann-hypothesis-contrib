@@ -6,9 +6,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open MvPolynomial Equiv UpperTheory.V.AlgebraTools.Hk
 
-private theorem swap_lt {n : ℕ} {a c : Fin n} (h : a.val + 1 = c.val) {x y : Fin n} (hxy : x < y)
-    (hne : ¬ (x = a ∧ y = c)) : swap a c x < swap a c y := by
-  have key : ∀ z : Fin n, (swap a c z).val = if z.val = a.val then c.val else if z.val = c.val then a.val else z.val := by
+private theorem swap_lt
+    {n : ℕ} {a c : Fin n} (h : a.val + 1 = c.val)
+    {x y : Fin n} (hxy : x < y) (hne : ¬(x = a ∧ y = c))
+    : swap a c x < swap a c y := by
+  have key
+      : ∀ z : Fin n,
+        (swap a c z).val
+          = if z.val = a.val then
+              c.val
+            else if z.val = c.val then
+              a.val
+            else
+              z.val := by
     intro z
     rw [swap_apply_def]
     by_cases h1 : z = a
@@ -23,11 +33,11 @@ private theorem swap_lt {n : ℕ} {a c : Fin n} (h : a.val + 1 = c.val) {x y : F
         simp [h1, h2, h1', h2']
   rw [Fin.lt_def, key, key]
   rw [Fin.lt_def] at hxy
-  have hne' : ¬ (x.val = a.val ∧ y.val = c.val) := fun e => hne ⟨Fin.ext e.1, Fin.ext e.2⟩
+  have hne' : ¬(x.val = a.val ∧ y.val = c.val) := fun e => hne ⟨Fin.ext e.1, Fin.ext e.2⟩
   split_ifs <;> omega
 
-private theorem mem_invSet {n : ℕ} (w : Perm (Fin n)) (p : Fin n × Fin n) :
-    p ∈ invSet w ↔ p.1 < p.2 ∧ w⁻¹ p.2 < w⁻¹ p.1 := by
+private theorem mem_invSet {n : ℕ} (w : Perm (Fin n)) (p : Fin n × Fin n)
+    : p ∈ invSet w ↔ p.1 < p.2 ∧ w⁻¹ p.2 < w⁻¹ p.1 := by
   simp [invSet, pairs]
 
 private theorem eq_one_of_strictMono {n : ℕ} (w : Perm (Fin n)) (h : StrictMono w) : w = 1 := by
@@ -43,13 +53,19 @@ private theorem invSet_rev (n : ℕ) : invSet (Fin.revPerm : Perm (Fin n)) = pai
   simp only [pairs, Finset.mem_filter, Finset.mem_univ, true_and]
   exact ⟨fun h => h.1, fun h => ⟨h, h⟩⟩
 
-theorem UpperTheory.V.AlgebraTools.hkInv :
-    ∀ n : ℕ, (∀ (a c : Fin n), a.val + 1 = c.val → ∀ w : Perm (Fin n), w⁻¹ a < w⁻¹ c →
-        invSet (swap a c * w) = insert (a, c) ((invSet w).image fun p => (swap a c p.1, swap a c p.2)) ∧
-        (a, c) ∉ (invSet w).image (fun p => (swap a c p.1, swap a c p.2)) ∧ invN (swap a c * w) = invN w + 1) ∧
-      (∀ w : Perm (Fin n), w ≠ 1 → ∃ a c : Fin n, a.val + 1 = c.val ∧ w⁻¹ c < w⁻¹ a) ∧
-      invSet (1 : Perm (Fin n)) = ∅ ∧ invSet (Fin.revPerm : Perm (Fin n)) = pairs n ∧
-      (∀ w : Perm (Fin n), w ≠ Fin.revPerm → invN w < invN (Fin.revPerm : Perm (Fin n))) := by
+theorem UpperTheory.V.AlgebraTools.hkInv
+    : ∀ n : ℕ,
+      (∀ (a c : Fin n),
+          a.val + 1 = c.val
+            → ∀ w : Perm (Fin n),
+              w⁻¹ a < w⁻¹ c
+                → invSet (swap a c * w)
+                    = insert (a, c) ((invSet w).image fun p => (swap a c p.1, swap a c p.2))
+                  ∧ (a, c) ∉ (invSet w).image (fun p => (swap a c p.1, swap a c p.2))
+                  ∧ invN (swap a c * w) = invN w + 1)
+        ∧ (∀ w : Perm (Fin n), w ≠ 1 → ∃ a c : Fin n, a.val + 1 = c.val ∧ w⁻¹ c < w⁻¹ a)
+        ∧ invSet (1 : Perm (Fin n)) = ∅ ∧ invSet (Fin.revPerm : Perm (Fin n)) = pairs n
+        ∧ (∀ w : Perm (Fin n), w ≠ Fin.revPerm → invN w < invN (Fin.revPerm : Perm (Fin n))) := by
   intro n
   refine ⟨?_, ?_, ?_, invSet_rev n, ?_⟩
   · intro a c hac w hw
@@ -59,8 +75,10 @@ theorem UpperTheory.V.AlgebraTools.hkInv :
     have hff : ∀ p : Fin n × Fin n, (swap a c (swap a c p.1), swap a c (swap a c p.2)) = p := by
       intro p
       simp
-    have hmemimg : ∀ q : Fin n × Fin n, q ∈ (invSet w).image (fun p => (swap a c p.1, swap a c p.2)) ↔
-        (swap a c q.1, swap a c q.2) ∈ invSet w := by
+    have hmemimg
+        : ∀ q : Fin n × Fin n,
+          q ∈ (invSet w).image (fun p => (swap a c p.1, swap a c p.2))
+            ↔ (swap a c q.1, swap a c q.2) ∈ invSet w := by
       intro q
       rw [Finset.mem_image]
       constructor
@@ -72,7 +90,9 @@ theorem UpperTheory.V.AlgebraTools.hkInv :
       rw [hmemimg, mem_invSet]
       simp only [swap_apply_left, swap_apply_right]
       exact fun h => absurd h.1 (lt_asymm hlt)
-    have heq : invSet (swap a c * w) = insert (a, c) ((invSet w).image (fun p => (swap a c p.1, swap a c p.2))) := by
+    have heq
+        : invSet (swap a c * w)
+          = insert (a, c) ((invSet w).image (fun p => (swap a c p.1, swap a c p.2))) := by
       ext ⟨x, y⟩
       rw [Finset.mem_insert, hmemimg, mem_invSet, mem_invSet]
       simp only [mul_inv_rev, swap_inv, Perm.mul_apply, Prod.mk.injEq]
@@ -123,7 +143,8 @@ theorem UpperTheory.V.AlgebraTools.hkInv :
         intro i j h
         have hj := j.isLt
         have hm : i.val + k + 1 < n := by omega
-        exact lt_trans (ih i ⟨i.val + k + 1, hm⟩ rfl) (hadj _ _ (by show i.val + k + 1 + 1 = j.val; omega))
+        exact lt_trans (ih i ⟨i.val + k + 1, hm⟩ rfl)
+          (hadj _ _ (by show i.val + k + 1 + 1 = j.val; omega))
     have hsm : StrictMono ⇑(w⁻¹) := by
       intro i j hij
       rw [Fin.lt_def] at hij

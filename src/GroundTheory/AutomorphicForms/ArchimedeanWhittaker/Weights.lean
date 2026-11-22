@@ -35,10 +35,12 @@ theorem chi_mul_chi_neg (j : ℤ) (a : ℝ) : chi j a * chi j (-a) = 1 := by
 theorem chi_two_pi (j : ℤ) : chi j (2 * π) = 1 := by
   simp only [chi]
   have := Complex.exp_int_mul_two_pi_mul_I j
-  rw [← this]; congr 1; push_cast; ring
+  rw [← this]
+  congr 1
+  push_cast
+  ring
 
-theorem continuous_chi (j : ℤ) : Continuous (chi j) := by
-  unfold chi; fun_prop
+theorem continuous_chi (j : ℤ) : Continuous (chi j) := by unfold chi; fun_prop
 
 theorem norm_chi (j : ℤ) (a : ℝ) : ‖chi j a‖ = 1 := by
   rw [chi, Complex.norm_exp]
@@ -61,8 +63,7 @@ noncomputable def wProj (j : ℤ) (x : H) : H :=
 theorem continuous_orbit_kMat (x : H) : Continuous fun θ : ℝ => σ (kMat θ) x :=
   (σ.continuous_orbit x).comp continuous_kMat
 
-theorem continuous_wIntegrand (j : ℤ) (x : H) :
-    Continuous fun θ : ℝ => chi j (-θ) • σ (kMat θ) x :=
+theorem continuous_wIntegrand (j : ℤ) (x : H) : Continuous fun θ : ℝ => chi j (-θ) • σ (kMat θ) x :=
   ((continuous_chi j).comp continuous_neg).smul (continuous_orbit_kMat σ x)
 
 theorem wProj_mem (j : ℤ) (x : H) : wProj σ j x ∈ weightSpace σ j := by
@@ -71,25 +72,29 @@ theorem wProj_mem (j : ℤ) (x : H) : wProj σ j x ∈ weightSpace σ j := by
     intro θ
     simp only [kMat_add_two_pi, neg_add, chi_add, chi_neg j (2 * π), chi_two_pi, inv_one, mul_one]
   have hint := (continuous_wIntegrand σ j x).intervalIntegrable (μ := volume) 0 (2 * π)
-  have h1 : σ (kMat φ) (∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) • σ (kMat θ) x) =
-      ∫ θ in (0 : ℝ)..(2 * π), chi j φ • (chi j (-(φ + θ)) • σ (kMat (φ + θ)) x) := by
+  have h1
+      : σ (kMat φ) (∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) • σ (kMat θ) x)
+        = ∫ θ in (0 : ℝ)..(2 * π), chi j φ • (chi j (-(φ + θ)) • σ (kMat (φ + θ)) x) := by
     rw [← (σ (kMat φ)).intervalIntegral_comp_comm hint]
-    congr 1; funext θ
+    congr 1
+    funext θ
     simp only [map_smul, ← UnitaryRep.map_mul_apply, ← kMat_add, smul_smul, neg_add, chi_add]
     congr 1
     rw [← mul_assoc, chi_mul_chi_neg, one_mul]
-  have h2 : ∫ θ in (0 : ℝ)..(2 * π), (chi j (-(φ + θ)) • σ (kMat (φ + θ)) x) =
-      ∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) • σ (kMat θ) x := by
-    rw [intervalIntegral.integral_comp_add_left (fun θ : ℝ => chi j (-θ) • σ (kMat θ) x) φ, add_zero]
+  have h2
+      : ∫ θ in (0 : ℝ)..(2 * π), (chi j (-(φ + θ)) • σ (kMat (φ + θ)) x)
+        = ∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) • σ (kMat θ) x := by
+    rw [intervalIntegral.integral_comp_add_left (fun θ : ℝ => chi j (-θ) • σ (kMat θ) x) φ,
+      add_zero]
     have := hper.intervalIntegral_add_eq φ 0
     rw [zero_add] at this
     exact this
   unfold wProj
   rw [map_smul, h1, intervalIntegral.integral_smul, h2, smul_comm]
 
-theorem inner_wProj (j : ℤ) (x y : H) :
-    ⟪y, wProj σ j x⟫_ℂ = ((2 * π : ℝ)⁻¹ : ℂ) *
-      ∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) * ⟪y, σ (kMat θ) x⟫_ℂ := by
+theorem inner_wProj (j : ℤ) (x y : H)
+    : ⟪y, wProj σ j x⟫_ℂ
+      = ((2 * π : ℝ)⁻¹ : ℂ) * ∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) * ⟪y, σ (kMat θ) x⟫_ℂ := by
   rw [wProj, inner_smul_right]
   congr 1
   have hint := (continuous_wIntegrand σ j x).intervalIntegrable (μ := volume) 0 (2 * π)
@@ -106,7 +111,8 @@ theorem norm_wProj_le (j : ℤ) (x : H) : ‖wProj σ j x‖ ≤ ‖x‖ := by
   have hn : ‖((2 * π : ℝ)⁻¹ : ℂ)‖ = (2 * π)⁻¹ := by
     rw [norm_inv, Complex.norm_real, Real.norm_of_nonneg (by positivity)]
   rw [hn]
-  calc (2 * π)⁻¹ * ‖∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) • σ (kMat θ) x‖
+  calc
+    (2 * π)⁻¹ * ‖∫ θ in (0 : ℝ)..(2 * π), chi j (-θ) • σ (kMat θ) x‖
       ≤ (2 * π)⁻¹ * (‖x‖ * (2 * π)) := by gcongr
     _ = ‖x‖ := by field_simp
 

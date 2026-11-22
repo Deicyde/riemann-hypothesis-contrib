@@ -15,8 +15,11 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem exists_not_mem_not_pow_completion :
-    ∀ (p : ℕ) (F : Type) [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F] (ζ u : F) (S₀ : Finset (HeightOneSpectrum (𝓞 F))), p.Prime → IsPrimitiveRoot ζ p → u ≠ 0 → (∀ r : F, r ^ p ≠ u) → ∃ v, v ∉ S₀ ∧ ∀ r : v.adicCompletion F, r ^ p ≠ algebraMap F (v.adicCompletion F) u := by
+theorem exists_not_mem_not_pow_completion
+    : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F]
+        (ζ u : F) (S₀ : Finset (HeightOneSpectrum (𝓞 F))),
+      p.Prime → IsPrimitiveRoot ζ p → u ≠ 0 → (∀ r : F, r ^ p ≠ u)
+        → ∃ v, v ∉ S₀ ∧ ∀ r : v.adicCompletion F, r ^ p ≠ algebraMap F (v.adicCompletion F) u := by
   classical
   intro p F _ _ _ ζ u S₀ hp hζ hu hns
   by_contra hcon
@@ -36,10 +39,11 @@ theorem exists_not_mem_not_pow_completion :
   have hidx := (GlobalTheory.T.pow_countPlacesNotLocalPower_le_index p F ζ u S₀ hp hζ).1
   haveI : (finNorm p F u S₀).FiniteIndex := ⟨hidx⟩
   haveI : Fintype (Fˣ ⧸ finNorm p F u S₀) := Fintype.ofFinite _
-  obtain ⟨S₁, -, hS₁⟩ := exists_superset_mem_sUnits F
-    (insert (Units.mk0 u hu)
-      (Finset.univ.image (fun q : Fˣ ⧸ finNorm p F u S₀ => q.out))) S₀
-  obtain ⟨S, hS, hadm⟩ := (GlobalTheory.T.exists_admissiblePlacesContainingPrime_superset_mono p F hp.pos).1 S₁
+  obtain ⟨S₁, -, hS₁⟩ :=
+    exists_superset_mem_sUnits F
+      (insert (Units.mk0 u hu) (Finset.univ.image (fun q : Fˣ ⧸ finNorm p F u S₀ => q.out))) S₀
+  obtain ⟨S, hS, hadm⟩ :=
+    (GlobalTheory.T.exists_admissiblePlacesContainingPrime_superset_mono p F hp.pos).1 S₁
   have hX := hS₁ S hS
   refine GlobalTheory.T.sUnits_sup_localKummerNorms_ne_top p F ζ (Units.mk0 u hu) S hp hζ hadm
     (hX _ (Finset.mem_insert_self _ _)) hns ?_
@@ -49,8 +53,10 @@ theorem exists_not_mem_not_pow_completion :
     hX _ (Finset.mem_insert_of_mem (Finset.mem_image_of_mem _ (Finset.mem_univ _)))
   have hz : ((QuotientGroup.mk x : Fˣ ⧸ finNorm p F u S₀).out)⁻¹ * x ∈ finNorm p F u S₀ := by
     rw [← QuotientGroup.eq, QuotientGroup.out_eq']
-  have hx : x = (QuotientGroup.mk x : Fˣ ⧸ finNorm p F u S₀).out *
-      (((QuotientGroup.mk x : Fˣ ⧸ finNorm p F u S₀).out)⁻¹ * x) := by
+  have hx
+      : x
+        = (QuotientGroup.mk x : Fˣ ⧸ finNorm p F u S₀).out
+          * (((QuotientGroup.mk x : Fˣ ⧸ finNorm p F u S₀).out)⁻¹ * x) := by
     rw [mul_inv_cancel_left]
   rw [hx]
   exact Subgroup.mul_mem_sup hy (hle S hz)

@@ -12,8 +12,8 @@ namespace GlobalTheory.K5
 
 variable (p : ℕ) [Fact p.Prime]
 
-theorem natCast_dvd_iff_evalₐ_one (x : O0 p) :
-    (p : O0 p) ∣ x ↔ AdicCompletion.evalₐ (pI p) 1 x = 0 := by
+theorem natCast_dvd_iff_evalₐ_one (x : O0 p)
+    : (p : O0 p) ∣ x ↔ AdicCompletion.evalₐ (pI p) 1 x = 0 := by
   rw [GlobalTheory.ValCompletion.evalₐ_eq_zero_iff rfl, pow_one, map_natCast]
 
 theorem prime_natCast_completedLaurentRing : Prime (p : O0 p) := by
@@ -26,6 +26,7 @@ theorem prime_natCast_completedLaurentRing : Prime (p : O0 p) := by
     rw [natCast_dvd_iff_evalₐ_one, natCast_dvd_iff_evalₐ_one]
     exact mul_eq_zero.1 h
 
-theorem prime_natCast_completedLaurentRing_of_prime : ∀ (p : ℕ) [Fact p.Prime], Prime (p : O0 p) := fun p _ => prime_natCast_completedLaurentRing p
+theorem prime_natCast_completedLaurentRing_of_prime : ∀ (p : ℕ) [Fact p.Prime], Prime (p : O0 p) :=
+  fun p _ => prime_natCast_completedLaurentRing p
 
 end GlobalTheory.K5

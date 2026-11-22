@@ -4,4 +4,6 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-theorem GlobalTheory.Triple.IsGaloisTripleWithReduction.charpoly_frob : type_of% (@GlobalTheory.Triple.IsGaloisTripleWithReduction.charpoly_frob_of_isTriple) := @GlobalTheory.Triple.IsGaloisTripleWithReduction.charpoly_frob_of_isTriple
+theorem GlobalTheory.Triple.IsGaloisTripleWithReduction.charpoly_frob
+    : type_of% (@GlobalTheory.Triple.IsGaloisTripleWithReduction.charpoly_frob_of_isTriple) :=
+  @GlobalTheory.Triple.IsGaloisTripleWithReduction.charpoly_frob_of_isTriple

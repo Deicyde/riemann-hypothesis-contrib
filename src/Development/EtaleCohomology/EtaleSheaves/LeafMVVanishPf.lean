@@ -18,7 +18,8 @@ open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex GlobalTheor
 namespace LateralTheory.E.LeafMVVanishPf
 
 theorem mvSpc : LateralTheory.E.MVPf.MVSpc :=
-  LateralTheory.E.MVPf.MVSpc_of (fun R _ _ _ _ f g h => LateralTheory.Fin.EtaleMayerVietorisChainsShortExact.intersectionNumber_baseChange R f g h)
+  LateralTheory.E.MVPf.MVSpc_of (fun R _ _ _ _ f g h =>
+    LateralTheory.Fin.EtaleMayerVietorisChainsShortExact.intersectionNumber_baseChange R f g h)
 
 end LateralTheory.E.LeafMVVanishPf
 
