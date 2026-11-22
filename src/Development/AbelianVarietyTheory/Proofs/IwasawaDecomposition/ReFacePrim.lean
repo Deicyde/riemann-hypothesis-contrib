@@ -19,6 +19,11 @@ theorem reFace_prim (R : RealDat3 D A3 Ks) (F : Face3 D A3)
     (Dc : ∀ Zs : DefSub A3.fam3.amb3, DefCols (A3.side3 F.P1 F.ψ1 Zs)) (Sp : ∀ Zs, SPer (Dc Zs))
     (Zsc : DefSub A3.fam3.amb3 → IndefScale A3.fam3.base3) (e : type_of% R.err0) (h : PrimRows3 R F) :
     PrimRows3 (R.withErr e) (reFace F Dc Sp Zsc) := by
+  -- Expose the constructors so Lean can reduce projections of the updated records directly.
+  obtain ⟨R₂, _, _, _, _⟩ := R
+  cases R₂
+  cases F
+  dsimp only [RealDat3.withErr, reFace]
   obtain ⟨⟨hE, hR⟩, ⟨hW, hL⟩⟩ := h.hecke
   exact
   { heckeR := h.heckeR

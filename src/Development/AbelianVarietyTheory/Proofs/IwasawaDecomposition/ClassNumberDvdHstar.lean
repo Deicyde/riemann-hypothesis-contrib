@@ -101,13 +101,18 @@ theorem rootOne_mem_ray [_root_.NumberField.IsTotallyComplex E] (φ : E →+* �
   have : IsGalois E L := IsGalois.tower_top_of_isGalois ℚ E L
   have hq : natIdeal E n ≤ Ideal.span {(p : 𝓞 E)} :=
     Ideal.span_singleton_le_span_singleton.2 (Nat.cast_dvd_cast hp)
-  have hfin : {v : HeightOneSpectrum (𝓞 E) | v.asIdeal ∣ natIdeal E n}.Finite :=
-    Ideal.finite_factors (natIdeal_ne_bot hn)
-  obtain ⟨x, hx⟩ := GlobalTheory.T.rootsOfUnity_mem_rayClassField_of_multiple E M L _ p hp0 hq hM.isRayField
-    (GlobalTheory.T.closure_frobeniusElements_eq_top E L _ hfin fun F _ _ _ => aut_eq_one _ hfin F) (GlobalTheory.T.absNorm_modEq_one_of_principal_rayClass E _ p hq)
-    ⟨rootOne p, hS _ (Finset.mem_insert_self _ _)⟩
-    (Subtype.ext (Complex.isPrimitiveRoot_exp p hp0).pow_eq_one)
-  have e : (x : ℂ) = rootOne p := congrArg Subtype.val hx
+  let S : Set (HeightOneSpectrum (𝓞 E)) := {v | v.asIdeal ∣ natIdeal E n}
+  have hfin : S.Finite := Ideal.finite_factors (natIdeal_ne_bot hn)
+  have hFrob := GlobalTheory.T.closure_frobeniusElements_eq_top E L S hfin
+    (fun F _ _ _ => aut_eq_one S hfin F)
+  have hNorm := GlobalTheory.T.absNorm_modEq_one_of_principal_rayClass E (natIdeal E n) p hq
+  let ζ : L := ⟨rootOne p, hS _ (Finset.mem_insert_self _ _)⟩
+  have hζ : ζ ^ p = 1 := Subtype.ext (Complex.isPrimitiveRoot_exp p hp0).pow_eq_one
+  have hRange : ζ ∈ Set.range (algebraMap M L) :=
+    GlobalTheory.T.rootsOfUnity_mem_rayClassField_of_multiple E M L
+      (natIdeal E n) p hp0 hq hM.isRayField hFrob hNorm ζ hζ
+  obtain ⟨x, hx⟩ := hRange
+  have e : (x : ℂ) = rootOne p := congrArg (fun y : L => (y : ℂ)) hx
   exact e ▸ x.2
 
 theorem valueField_le [IsGalois ℚ E] [_root_.NumberField.IsTotallyComplex E] (φ₀ : E →+* ℂ) {𝔮 : Ideal (𝓞 E)} (h𝔮 : 𝔮 ≠ ⊥)

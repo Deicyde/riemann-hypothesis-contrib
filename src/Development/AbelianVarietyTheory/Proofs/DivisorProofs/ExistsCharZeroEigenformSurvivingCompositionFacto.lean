@@ -51,18 +51,22 @@ theorem nabla_zero_of_not_antitone {l : ℕ} [Fact l.Prime] {ι : Type} [Fintype
   | smul_tprod r x =>
     have hx : x τ0 = 0 :=
       Subtype.ext ((Submodule.eq_bot_iff _).1 hbot ((x τ0 : Formalism.GradedWeylDivisibility.dualWeyl F.O N N (res N (mu τ0))) : MvPolynomial _ F.O) (x τ0).2)
-    rw [(PiTensorProduct.tprod F.O).map_coord_zero τ0 hx, smul_zero]
-  | add x y hx hy => rw [hx, hy, add_zero]
+    exact (congrArg (r • ·) ((PiTensorProduct.tprod F.O).map_coord_zero τ0 hx)).trans (smul_zero r)
+  | add x y hx hy => exact (congrArg₂ (· + ·) hx hy).trans (add_zero _)
+
+private theorem map_mem_smul_top {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (I : Ideal R) (f : M →ₗ[R] M) {x : M} (hx : x ∈ I • (⊤ : Submodule R M)) :
+    f x ∈ I • (⊤ : Submodule R M) := by
+  have hmap : (I • (⊤ : Submodule R M)).map f ≤ I • (⊤ : Submodule R M) := by
+    rw [Submodule.map_smul'']
+    exact Submodule.smul_mono le_rfl le_top
+  exact hmap (Submodule.mem_map_of_mem hx)
 
 theorem quot_ker_stable {l : ℕ} [Fact l.Prime] {ι : Type} [Fintype ι] [DecidableEq ι] {N : ℕ} (F : Frame l ι N)
     (mu : ι → ℕ → ℕ) (jKm : F.K →* alg F.O N mu) (ϖ : F.O) (κ : F.K) (x : NablaT F.O N mu)
     (hx : x ∈ (Ideal.span {ϖ} • ⊤ : Submodule F.O (NablaT F.O N mu))) :
     repOf F.O (A := alg F.O N mu) jKm (NablaT F.O N mu) κ x ∈ (Ideal.span {ϖ} • ⊤ : Submodule F.O (NablaT F.O N mu)) := by
-  have hle : (Ideal.span {ϖ} • ⊤ : Submodule F.O (NablaT F.O N mu)).map (repOf F.O (A := alg F.O N mu) jKm (NablaT F.O N mu) κ) ≤
-      (Ideal.span {ϖ} • ⊤ : Submodule F.O (NablaT F.O N mu)) := by
-    rw [Submodule.map_smul'']
-    exact Submodule.smul_mono le_rfl le_top
-  exact hle ⟨x, hx, rfl⟩
+  exact map_mem_smul_top _ _ hx
 
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1000000
@@ -81,20 +85,19 @@ theorem hecke_compat (hH : F.IsHecke lam jK Gm) (hHm : F.IsHecke mu jKm (NablaT 
     (hxz : ∀ g, π ((x : F.G → NablaT F.O N mu) g) = ψ ((z : F.G → Gm) g)) (g : F.G) :
     π (((q • x : Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu)) : F.G → NablaT F.O N mu) g) =
       ψ (((q • z : Forms F.O (A := alg F.O N lam) F.Γ jK Gm) : F.G → Gm) g) := by
-  induction q using MvPolynomial.induction_on generalizing x z g with
+  induction q using MvPolynomial.induction_on generalizing g with
   | C c =>
-    rw [hHm.1, hH.1]
+    rw [hHm.1 c x, hH.1 c z]
     simp only [Submodule.coe_smul, Pi.smul_apply]
-    rw [map_smul, hxz, hψs]
+    rw [π.map_smul, hxz, hψs]
   | add p q hp hq =>
-    rw [add_smul, add_smul]
-    simp only [Submodule.coe_add, Pi.add_apply, map_add (f := _)]
-    rw [hp x z hxz g, hq x z hxz g]
+    rw [add_smul p q x, add_smul p q z]
+    simp only [Submodule.coe_add, Pi.add_apply, π.map_add, ψ.map_add, hp g, hq g]
   | mul_X p i hp =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_comm, mul_smul, mul_smul, hHm.2, hH.2, map_smul, hψs, map_sum, map_sum]
-    congr 1
-    exact Finset.sum_congr rfl fun s _ => hp x z hxz (g * s)
+    let Xᵢ : F.T := X i
+    rw [mul_comm p Xᵢ, mul_smul Xᵢ p x, mul_smul Xᵢ p z,
+      hHm.2 i _ g, hH.2 i _ g, π.map_smul, hψs, map_sum π, map_sum ψ]
+    exact congrArg (F.cst i • ·) (Finset.sum_congr rfl fun s _ => hp (g * s))
 
 theorem ann_lift (hOk : F.Ok) (hJ : F.IsJ lam jK) (hJm : F.IsJ mu jKm)
     (hH : F.IsHecke lam jK Gm) (hHm : F.IsHecke mu jKm (NablaT F.O N mu)) (hE : Embeds F.O N lam mu ϖ Gm) (p : F.T)
@@ -104,31 +107,27 @@ theorem ann_lift (hOk : F.Ok) (hJ : F.IsJ lam jK) (hJm : F.IsJ mu jKm)
   have hψs : ∀ (c : F.O) (w : Gm), ψ (c • w) = c • ψ w := by
     intro c w
     rw [← algebraMap_smul (alg F.O N lam) c w, hψc]
-  obtain ⟨Fm, hFm, hFπ⟩ := GlobalTheory.T.lift_forms_to_lattice_of_finite_invertible_stabilisers F.O F.G F.Γ F.K (NablaT F.O N mu)
-      (NablaT F.O N mu ⧸ (Ideal.span {ϖ} • ⊤ : Submodule F.O (NablaT F.O N mu)))
-      (repOf F.O (A := alg F.O N mu) jKm (NablaT F.O N mu)) (Submodule.mkQ _) (Submodule.mkQ_surjective _)
-      (by
-        intro κ x hx
-        rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at hx ⊢
-        exact quot_ker_stable F mu jKm ϖ κ x hx)
+  let U : Submodule F.O (NablaT F.O N mu) := Ideal.span {ϖ} • ⊤
+  let π := U.mkQ
+  let := Subalgebra.isScalarTower_mid (α := F.O) (β := NablaT F.O N mu) (alg F.O N mu)
+  let ρ := repOf F.O (A := alg F.O N mu) (K := F.K) jKm (NablaT F.O N mu)
+  obtain ⟨Fm, hFm, hFπ⟩ := GlobalTheory.T.lift_forms_to_lattice_of_finite_invertible_stabilisers
+      F.O F.G F.Γ F.K _ _ ρ π U.mkQ_surjective
+      (fun κ x hx => (Submodule.Quotient.mk_eq_zero U).2
+        (map_mem_smul_top _ (ρ κ) ((Submodule.Quotient.mk_eq_zero U).1 hx)))
       (fun g => ⟨(hOk.tame g).1, GlobalTheory.T.isUnit_natCast_frameCoeffRing_not_dvd l ι N F hOk _ (hOk.tame g).2⟩)
       (fun g => ψ ((y : F.G → Gm) g))
       (by
         intro γ g κ yy hyy
-        have hy := y.2 γ g κ
-        show ψ ((y : F.G → Gm) ((γ : F.G) * g * κ)) = _
-        rw [hy]
-        show ψ (jK κ⁻¹ • (y : F.G → Gm) g) = Submodule.mkQ _ (jKm κ⁻¹ • yy)
-        rw [hJ κ⁻¹, hJm κ⁻¹, smul_assoc, hψs, hψg _ _ _ hyy, smul_assoc, Submodule.mkQ_apply,
-          Submodule.Quotient.mk_smul]
-        rfl)
-  apply Subtype.ext
-  funext g
-  apply hψi
-  have := hecke_compat F lam mu jK jKm ϖ Gm hH hHm (Submodule.mkQ _) ψ hψs p ⟨Fm, hFm⟩ y (fun g => hFπ g) g
-  rw [hp] at this
-  simp only [Submodule.coe_zero, Pi.zero_apply, map_zero] at this ⊢
-  exact this.symm
+        change ψ ((y : F.G → Gm) ((γ : F.G) * g * κ)) = π (ρ κ⁻¹ yy)
+        rw [y.2 γ g κ]
+        change ψ (jK κ⁻¹ • (y : F.G → Gm) g) = π (jKm κ⁻¹ • yy)
+        rw [hJ κ⁻¹, hJm κ⁻¹, smul_assoc, hψs, hψg _ _ _ hyy]
+        exact (π.map_smul (F.chi κ⁻¹ : F.O) (grp F.O N mu (F.kap κ⁻¹) yy)).symm)
+  have h := hecke_compat F lam mu jK jKm ϖ Gm hH hHm π ψ hψs p ⟨Fm, hFm⟩ y hFπ
+  rw [hp] at h
+  refine Subtype.ext (funext fun g => hψi ?_)
+  simpa only [Submodule.coe_zero, Pi.zero_apply, π.map_zero, ψ.map_zero] using (h g).symm
 
 end Lift
 
@@ -136,20 +135,23 @@ section Eig
 variable {l : ℕ} [Fact l.Prime] {ι : Type} [Fintype ι] [DecidableEq ι] {N : ℕ} (F : Frame l ι N) (mu : ι → ℕ → ℕ)
   (jKm : F.K →* alg F.O N mu)
 
-theorem tf_forms (hOk : F.Ok) (b : NablaT F.O N mu →ₛₗ[F.emb] NablaT (PadicAlgCl l) N mu) (hbi : Function.Injective b)
-    (c : F.O) (x : Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu)) (hcx : c • x = 0) : c = 0 ∨ x = 0 := by
+private theorem smul_eq_zero_of_semilinear_eval {R K G M V : Type} [CommRing R] [Field K]
+    [AddCommGroup M] [Module R M] [AddCommGroup V] [Module K V] {S : Submodule R (G → M)}
+    {σ : R →+* K} (hσ : Function.Injective σ) (b : M →ₛₗ[σ] V) (hb : Function.Injective b)
+    {c : R} {x : S} (hcx : c • x = 0) : c = 0 ∨ x = 0 := by
   by_cases hc : c = 0
   · exact Or.inl hc
   right
-  apply Subtype.ext
-  funext g
-  have h1 : c • (x : F.G → NablaT F.O N mu) g = 0 := by
-    have := congrArg (fun y : Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu) => (y : F.G → NablaT F.O N mu) g) hcx
-    simpa using this
-  have h2 : F.emb c • b ((x : F.G → NablaT F.O N mu) g) = 0 := by rw [← map_smulₛₗ, h1, map_zero]
-  rcases smul_eq_zero.1 h2 with h | h
-  · exact absurd (hOk.ring.1 (h.trans (map_zero _).symm)) hc
-  · exact hbi (h.trans (map_zero b).symm)
+  refine Subtype.ext (funext fun g => hb ?_)
+  have h := congrArg (fun y : S => b (y.val g)) hcx
+  change b (c • x.val g) = b 0 at h
+  rw [b.map_smulₛₗ, b.map_zero] at h
+  have hc' : σ c ≠ 0 := fun he => hc (hσ (he.trans σ.map_zero.symm))
+  exact ((smul_eq_zero.mp h).resolve_left hc').trans b.map_zero.symm
+
+theorem tf_forms (hOk : F.Ok) (b : NablaT F.O N mu →ₛₗ[F.emb] NablaT (PadicAlgCl l) N mu) (hbi : Function.Injective b)
+    (c : F.O) (x : Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu)) (hcx : c • x = 0) : c = 0 ∨ x = 0 := by
+  exact smul_eq_zero_of_semilinear_eval hOk.ring.1 b hbi hcx
 
 def jmap (b : NablaT F.O N mu →ₛₗ[F.emb] NablaT (PadicAlgCl l) N mu) :
     Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu) →ₛₗ[F.emb] (F.G → NablaT (PadicAlgCl l) N mu) where
@@ -179,25 +181,20 @@ theorem form_of_mem_span (hJm : F.IsJ mu jKm) (b : NablaT F.O N mu →ₛₗ[F.e
     · intro κ g
       have hx := x.2 1 g κ
       simp only [OneMemClass.coe_one, one_mul] at hx
-      show F.emb (F.chi κ) • grp (PadicAlgCl l) N mu _ (b ((x : F.G → NablaT F.O N mu) (g * κ))) =
-        b ((x : F.G → NablaT F.O N mu) g)
-      rw [← hbg, ← map_smulₛₗ, hx]
-      congr 1
-      show (F.chi κ : F.O) • grp F.O N mu (F.kap κ) (jKm κ⁻¹ • (x : F.G → NablaT F.O N mu) g) = _
-      have h2 : (F.chi κ : F.O) • grp F.O N mu (F.kap κ) (jKm κ⁻¹ • (x : F.G → NablaT F.O N mu) g) =
-          jKm κ • jKm κ⁻¹ • (x : F.G → NablaT F.O N mu) g := by
-        rw [hJm κ, smul_assoc]
-        rfl
-      rw [h2, smul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
-  | zero => exact ⟨fun _ _ _ => rfl, fun _ _ => by simp⟩
+      let xg := (x : F.G → NablaT F.O N mu) g
+      show F.emb (F.chi κ) • grp (PadicAlgCl l) N mu _ (b ((x : F.G → NablaT F.O N mu) (g * κ))) = b xg
+      rw [← hbg, ← b.map_smulₛₗ, hx]
+      apply congrArg b
+      change ((F.chi κ : F.O) • grpA F.O N mu (F.kap κ)) • (jKm κ⁻¹ • xg) = xg
+      rw [← hJm κ, ← mul_smul, ← jKm.map_mul, mul_inv_cancel, jKm.map_one, one_smul]
+  | zero => exact ⟨fun _ _ _ => rfl, fun _ _ => by simp only [Pi.zero_apply, LinearMap.map_zero, smul_zero]⟩
   | add w w' _ _ hw hw' =>
-    refine ⟨fun γ hγ g => by simp [hw.1 γ hγ g, hw'.1 γ hγ g], fun κ g => ?_⟩
-    simp only [Pi.add_apply, map_add (f := _), smul_add]
-    rw [hw.2 κ g, hw'.2 κ g]
+    refine ⟨fun γ hγ g => congrArg₂ (· + ·) (hw.1 γ hγ g) (hw'.1 γ hγ g), fun κ g => ?_⟩
+    simp only [Pi.add_apply, LinearMap.map_add, smul_add, hw.2 κ g, hw'.2 κ g]
   | smul c w _ hw =>
-    refine ⟨fun γ hγ g => by simp [hw.1 γ hγ g], fun κ g => ?_⟩
-    simp only [Pi.smul_apply, map_smul]
-    rw [smul_comm, hw.2 κ g]
+    refine ⟨fun γ hγ g => congrArg (c • ·) (hw.1 γ hγ g), fun κ g => ?_⟩
+    simp only [Pi.smul_apply, LinearMap.map_smul]
+    rw [smul_comm _ c, hw.2 κ g]
 
 variable [Module F.T (Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu))]
   [IsScalarTower F.O F.T (Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu))]
@@ -206,10 +203,9 @@ theorem jmap_equiv (hHm : F.IsHecke mu jKm (NablaT F.O N mu)) (b : NablaT F.O N 
     (i : F.I) (x : Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu)) :
     jmap F mu jKm b ((MvPolynomial.X i : F.T) • x) = heckeQ F mu i (jmap F mu jKm b x) := by
   funext g
-  show b ((((MvPolynomial.X i : F.T) • x : Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu)) : F.G → NablaT F.O N mu) g) =
-    F.emb (F.cst i) • ∑ s ∈ F.tr i, b ((x : F.G → NablaT F.O N mu) (g * s))
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hHm.2 i x g, map_smulₛₗ, map_sum]
+  exact (congrArg b (hHm.2 i x g)).trans
+    ((b.map_smulₛₗ _ _).trans
+      (congrArg (F.emb (F.cst i) • ·) (map_sum b (fun s => (x : F.G → _) (g * s)) (F.tr i))))
 
 theorem eig_of_ann (hOk : F.Ok) (hJm : F.IsJ mu jKm) (hHm : F.IsHecke mu jKm (NablaT F.O N mu))
     (b : NablaT F.O N mu →ₛₗ[F.emb] NablaT (PadicAlgCl l) N mu) (hbi : Function.Injective b)
@@ -222,8 +218,10 @@ theorem eig_of_ann (hOk : F.Ok) (hJm : F.IsJ mu jKm) (hHm : F.IsHecke mu jKm (Na
   have h2 := tf_forms F mu jKm hOk b hbi
   have h3 := GlobalTheory.T.linearIndependent_frameForms_baseChange l ι N F mu jKm b hbi hOk hbli
   have h4 := jmap_equiv F mu jKm hHm b
-  have h5 := @GlobalTheory.T.exists_integral_hecke_eigensystem_deligne_serre l _ F.O _ _ _ F.emb hOk.ring.1 hOk.ring.2 F.I (Forms F.O (A := alg F.O N mu) F.Γ jKm (NablaT F.O N mu)) _ _ _ _ h1
-  obtain ⟨θ, hθ1, hθ2, v, hvspan, hv0, hvT⟩ := h5 h2 (F.G → NablaT (PadicAlgCl l) N mu) (jmap F mu jKm b) (heckeQ F mu) h3 h4 m inferInstance hannM
+  obtain ⟨θ, hθ1, hθ2, v, hvspan, hv0, hvT⟩ :=
+    @GlobalTheory.T.exists_integral_hecke_eigensystem_deligne_serre l _ F.O _ _ _ F.emb
+      hOk.ring.1 hOk.ring.2 F.I _ _ _ _ _ h1 h2 _ _ _
+      (jmap F mu jKm b) (heckeQ F mu) h3 h4 m inferInstance hannM
   exact ⟨θ, ⟨v, hv0, form_of_mem_span F mu jKm hJm b hbg v hvspan, fun i g => congrFun (hvT i) g⟩, hθ1, hθ2⟩
 
 end Eig
@@ -234,8 +232,7 @@ theorem eigenform_of_surviving : ∀ (l : ℕ) [Fact l.Prime] (ι : Type) [Finty
   by_cases hdom : ∀ τ, Antitone (res N (mu τ))
   swap
   · exfalso
-    push_neg at hdom
-    obtain ⟨τ0, hτ0⟩ := hdom
+    obtain ⟨τ0, hτ0⟩ := not_forall.mp hdom
     have h0 := nabla_zero_of_not_antitone F mu τ0 hτ0
     obtain ⟨ψ, hψi, -, -, -⟩ := hE
     have hG : ∀ a : Gm, a = 0 := by
@@ -245,6 +242,7 @@ theorem eigenform_of_surviving : ∀ (l : ℕ) [Fact l.Prime] (ι : Type) [Finty
       rw [map_zero, ← hya, h0 ya, Submodule.Quotient.mk_zero]
     exact hne (loc_subsingleton _ fun f => Subtype.ext (funext fun g => hG _))
   obtain ⟨jKm, hJm⟩ := GlobalTheory.ExpFrame.levelMap_exists l ι N F mu
+  let := Subalgebra.isScalarTower_mid (α := F.O) (β := NablaT F.O N mu) (alg F.O N mu)
   obtain ⟨instT, instTS, hHm⟩ := GlobalTheory.ExpFrame.HeckeMod.hecke_module l ι N F mu jKm hOk hJm (NablaT F.O N mu)
   obtain ⟨b, hbi, -, -, hbg, hbli, -⟩ := GlobalTheory.LatBC.baseChange_lattices l ι N F mu hOk.ring.1 hdom
   exact eig_of_ann F mu jKm hOk hJm hHm b hbi hbg hbli m

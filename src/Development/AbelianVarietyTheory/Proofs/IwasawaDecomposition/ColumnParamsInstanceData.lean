@@ -76,11 +76,13 @@ theorem rationalFormsComparison_baseLevel_indep_scalars {a0 : AmbForm D X0.s} (h
 
 theorem mj_new {Z : ReadL R F X0 Y} {Z' : ReadL (newR R lam err) (reFace F Dc Sp Zsc) X0 Y'} {Xd : DivX D} (h : MjAre Z Xd)
     (hj : HEq Z'.jW Z.jW) : MjAre Z' Xd := by
-  obtain ⟨J, hJ⟩ := h
-  have e : Z'.jW = (by with_unfolding_all exact (Z.jW :)) := eq_of_heq ((by with_unfolding_all exact (hj :)))
-  refine ⟨⟨(by with_unfolding_all exact (J.eW :))⟩, ?_, (by with_unfolding_all exact (hJ.hlat :))⟩
-  rewrite [e]
-  exact (by with_unfolding_all exact (hJ.j_eq :))
+  set_option backward.isDefEq.lazyWhnfCore false in
+  set_option backward.isDefEq.lazyProjDelta false in
+    obtain ⟨J, hJ⟩ := h
+    have e : Z'.jW = (by with_unfolding_all exact (Z.jW :)) := eq_of_heq ((by with_unfolding_all exact (hj :)))
+    refine ⟨⟨(by with_unfolding_all exact (J.eW :))⟩, ?_, (by with_unfolding_all exact (hJ.hlat :))⟩
+    rewrite [e]
+    exact (by with_unfolding_all exact (hJ.j_eq :))
 
 end Field
 
@@ -97,8 +99,10 @@ def newGeo {C : Formalism.L2.Pj.CoreJ D} [Algebra C.Q.c.F D.what₂.LL] {R : Rea
 
 theorem inGeo_new {C : Formalism.L2.Pj.CoreJ D} [Algebra C.Q.c.F D.what₂.LL] {R : RealDat3 D A3 C.Q.c.F} (lam : type_of% R.lam3)
     (err : type_of% R.err0) {g : GlobalTheory.RealGeo.GeoHalf C R.toRealDat fun _ => 1} (h : GlobalTheory.RealGeo.InGeo g) :
-    GlobalTheory.RealGeo.InGeo (newGeo lam err g) :=
-  ⟨h.jEvExists, h.jEvBar, h.evInj, h.jUnif, h.geoAct, h.latFull, h.dimMatch⟩
+    GlobalTheory.RealGeo.InGeo (newGeo lam err g) := by
+  set_option backward.isDefEq.lazyWhnfCore false in
+  set_option backward.isDefEq.lazyProjDelta false in
+    exact ⟨h.jEvExists, h.jEvBar, h.evInj, h.jUnif, h.geoAct, h.latFull, h.dimMatch⟩
 
 section Tw
 
@@ -165,11 +169,12 @@ private theorem newTw_preserves_columns
       (Sp₀ := Sp₀) (Sp := Sp) (Zsc₀ := Zsc₀) (Zsc := Zsc) (Y' := Y')
       lam err hC g Z' C₀ sEE hP hH hE hG hA hM ht hj hj0 hW
     HEq x.sEE sEE ∧ HEq x.C.wU C₀.wU ∧ HEq x.C.eNu C₀.eNu ∧ GlobalTheory.RealGeo.InGeo x.geo := by
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · with_unfolding_all exact (HEq.refl sEE :)
-  · with_unfolding_all exact (HEq.refl C₀.wU :)
-  · with_unfolding_all exact (HEq.refl C₀.eNu :)
-  · with_unfolding_all exact (inGeo_new lam err hg :)
+  have hCols := And.intro (HEq.refl sEE)
+    (And.intro (HEq.refl C₀.wU) (And.intro (HEq.refl C₀.eNu) (inGeo_new lam err hg)))
+  -- Check the dependent projections together with the kernel's conversion checker.
+  run_tac
+    Lean.Elab.Tactic.closeMainGoalUsing `exact fun _ _ =>
+      Lean.Elab.Tactic.elabTerm (Lean.mkIdent `hCols) none
 
 end Tw
 

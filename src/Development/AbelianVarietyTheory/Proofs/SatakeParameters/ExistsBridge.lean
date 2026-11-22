@@ -49,26 +49,33 @@ variable {l : ℕ} [Fact l.Prime] {K L Ω : Type} [Field Ω] [Field K] [NumberFi
 
 theorem exists_bridge (Bw : LocBridge l K Ω (Dec (F := K) A) O) (hj : Induces Bw) (S : FinExt l) :
     ∃ (LL' : FinExt l) (Bw' : LocBridge l L Ω (Dec (F := L) A) ↥(OL LL')), Bw'.j = Bw.j ∧ S.1 ≤ Bw'.LL.1 ∧ Bw.Kw.1 ≤ Bw'.Kw.1 := by
-  let K' : FinExt l := ⟨IntermediateField.adjoin ℚ_[l] (Set.range fun x : L => Bw.j (algebraMap L Ω x)),
-    GlobalTheory.PlaceBridge.finiteDimensional_adjoin_range (Bw.j.comp (algebraMap L Ω))⟩
+  let jL := Bw.j.comp (algebraMap L Ω)
+  let K' : FinExt l := ⟨IntermediateField.adjoin ℚ_[l] (Set.range jL),
+    GlobalTheory.PlaceBridge.finiteDimensional_adjoin_range jL⟩
   have := K'.2
-  obtain ⟨e, he, he', hec⟩ := GlobalTheory.PlaceBridge.exists_mulEquiv (E := L) hj K' rfl
-  refine ⟨_, {
+  let N : FinExt l := ⟨IntermediateField.normalClosure ℚ_[l] ↥K'.1 (PadicAlgCl l),
+    normalClosure.is_finiteDimensional ℚ_[l] ↥K'.1 (PadicAlgCl l)⟩
+  let LL' : FinExt l := supExt S N
+  have hN : N.1 ≤ LL'.1 := le_sup_right
+  have hS : S.1 ≤ LL'.1 := le_sup_left
+  obtain ⟨e, he, he', hec⟩ :=
+    GlobalTheory.PlaceBridge.exists_mulEquiv (E := L) (j := Bw.j) hj K' rfl
+  let B : LocBridge l L Ω (Dec (F := L) A) ↥(OL LL') := {
     Kw := K'
     j := Bw.j
-    j_E := fun x => IntermediateField.subset_adjoin _ _ ⟨x, rfl⟩
-    j_dense := GlobalTheory.PlaceBridge.adjoin_range_subset_closure (Bw.j.comp (algebraMap L Ω))
+    j_E := fun x => IntermediateField.subset_adjoin ℚ_[l] (Set.range jL) (Set.mem_range_self x)
+    j_dense := GlobalTheory.PlaceBridge.adjoin_range_subset_closure jL
     e := e
     e_cont := he
     e_symm_cont := he'
     e_comm := hec
-    LL := supExt S ⟨IntermediateField.normalClosure ℚ_[l] K'.1 (PadicAlgCl l), inferInstance⟩
-    LL_split := fun τ x => (le_sup_right : _ ≤ (supExt S ⟨IntermediateField.normalClosure ℚ_[l] K'.1 (PadicAlgCl l),
-      inferInstance⟩).1) (AlgHom.fieldRange_le_normalClosure τ ⟨x, rfl⟩)
-    eO := RingEquiv.refl _
+    LL := LL'
+    LL_split := fun τ x => hN (τ.fieldRange_le_normalClosure ⟨x, rfl⟩)
+    eO := RingEquiv.refl ↥(OL LL')
     eO_alg := fun _ => rfl
     eO_cont := continuous_id
-    eO_symm_cont := continuous_id }, rfl, le_sup_left, ?_⟩
+    eO_symm_cont := continuous_id }
+  refine ⟨LL', B, rfl, hS, ?_⟩
   show Bw.Kw.1 ≤ K'.1
   rw [BridgeInd.kw_eq_adjoin Bw, IntermediateField.adjoin_le_iff]
   rintro _ ⟨x, rfl⟩

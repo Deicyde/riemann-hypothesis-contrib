@@ -69,24 +69,31 @@ theorem h1_lift_shift : ∀ {M : Model l K} {r r' j : ℕ} {v : M.T j} {x : Fam 
       ((congrArg ((shT ht ((B.schFn M.p).pt (okToOC l K)) k h n).pull j) (hx.2 n)).trans (shT_tMor ht _ k h n j _))⟩
 
 theorem h1_lift_galois : ∀ {M : Model l K} {r j : ℕ} {v : M.T j} {x : Fam M r j} (σ : K.fixingSubgroup), IsLift ht e r v x →
-    IsLift ht e r (DeRhamTwist.Twist.chi0 l σ.1 ^ r • M.actT j σ v) (galS σ x) :=
-  fun {M r j v x} σ hx => ⟨comp_gal σ hx.1, fun n =>
-    (β_galF (B.schFn M.p) (okToOC l K) (IntermediateField.fixingSubgroupEquiv K σ) (galOC_okToOC _) r n j (x n)).trans
-      ((congrArg ((galT (IntermediateField.fixingSubgroupEquiv K σ) (B.ptTw (B.schFn M.p) (okToOC l K)
-          (IntermediateField.fixingSubgroupEquiv K σ) (galOC_okToOC _)) r n).pull j) (hx.2 n)).trans
-        ((galT_tMor ht _ _ r n j _).trans
-          ((map_smul ((tMor ht ((B.schFn M.p).pt (okToOC l K)) r n).pull j) _ _).symm.trans
-            (congrArg ((tMor ht ((B.schFn M.p).pt (okToOC l K)) r n).pull j)
-              ((e_smul e M j n ((DeRhamTwist.Twist.chi0 l σ.1 ^ r : ℤ_[l]ˣ) : ℤ_[l]) (M.actT j σ v)).trans
-                (congrArg₂ (· • ·) (zA_chi σ r)
-                  (he.good.equi M n j (IntermediateField.fixingSubgroupEquiv K σ) (v.lev n)))).symm))))⟩
+    IsLift ht e r (DeRhamTwist.Twist.chi0 l σ.1 ^ r • M.actT j σ v) (galS σ x) := by
+  intro M r j v x σ hx
+  refine ⟨comp_gal σ hx.1, fun n => ?_⟩
+  let τ := IntermediateField.fixingSubgroupEquiv K σ
+  let z : ℤ_[l] := ((DeRhamTwist.Twist.chi0 l σ.1 ^ r : ℤ_[l]ˣ) : ℤ_[l])
+  have hz : zA l z = χA τ ^ r := zA_chi σ r
+  have hequi : e M n j ((M.actT j σ v).lev n) =
+      (galMor τ (B.ptTw (B.schFn M.p) (okToOC l K) τ (galOC_okToOC τ)) n).pull j (e M n j (v.lev n)) :=
+    he.good.equi M n j τ (v.lev n)
+  have hgal := galT_tMor ht τ (B.ptTw (B.schFn M.p) (okToOC l K) τ (galOC_okToOC τ))
+    r n j (e M n j (v.lev n))
+  change _ = (tMor ht ((B.schFn M.p).pt (okToOC l K)) r n).pull j
+    (e M n j ((z • M.actT j σ v).lev n))
+  simpa only [galS, hx.2 n, hgal, e_smul e M j n z (M.actT j σ v), hz, hequi, LinearMap.map_smul] using
+    β_galF (B.schFn M.p) (okToOC l K) τ (galOC_okToOC τ) r n j (x n)
 
 theorem h1_lift_naturality : ∀ {M N : Model l K} (u : M.X ⟶ N.X) (hu : u ≫ N.p = M.p) {r j : ℕ} {v : N.T j} {x : Fam N r j},
-    IsLift ht e r v x → IsLift ht e r (Model.pullT u hu j v) (pullS u hu x) :=
-  fun {M N} u hu {r j v x} hx => ⟨comp_pull u hu hx.1, fun n =>
-    (β_pullF (okToOC l K) (B.schMap u hu) r n j (x n)).trans
-      ((congrArg ((pullT' ((B.schMap u hu).pt (okToOC l K)) r n).pull j) (hx.2 n)).trans
-        ((pullT_tMor ht _ r n j _).trans
-          (congrArg ((tMor ht ((B.schFn M.p).pt (okToOC l K)) r n).pull j) (he.good.nat M N u hu n j (v.lev n)).symm)))⟩
+    IsLift ht e r v x → IsLift ht e r (Model.pullT u hu j v) (pullS u hu x) := by
+  intro M N u hu r j v x hx
+  refine ⟨comp_pull u hu hx.1, fun n => ?_⟩
+  have hnat : e M n j ((Model.pullT u hu j v).lev n) =
+      (pullMor ((B.schMap u hu).pt (okToOC l K)) n).pull j (e N n j (v.lev n)) :=
+    he.good.nat M N u hu n j (v.lev n)
+  have hpull := pullT_tMor ht ((B.schMap u hu).pt (okToOC l K)) r n j (e N n j (v.lev n))
+  simpa only [pullS, hx.2 n, hpull, hnat] using
+    β_pullF (okToOC l K) (B.schMap u hu) r n j (x n)
 
 end CrystallineSemistableComparison.HT

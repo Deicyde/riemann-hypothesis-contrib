@@ -20,10 +20,39 @@ def reFaceErr (R : RealDat3 D A3 Ks) (F : Face3 D A3)
 
 
 
+private theorem toCx3_reFace (R : RealDat3 D A3 Ks) (F : Face3 D A3)
+    (Dc : ∀ Zs : DefSub A3.fam3.amb3, DefCols (A3.side3 F.P1 F.ψ1 Zs)) (Sp : ∀ Zs, SPer (Dc Zs))
+    (Zsc : DefSub A3.fam3.amb3 → IndefScale A3.fam3.base3) :
+    R.toCx3 (reFace F Dc Sp Zsc) = R.toCx3 F := by
+  dsimp only [RealDat3.toCx3, reFace, Face3.lv2]
+  rfl
+
+private theorem toCx3_withErr (R : RealDat3 D A3 Ks) (F : Face3 D A3) (e : type_of% R.err0) :
+    (R.withErr e).toCx3 F = reErr (R.toCx3 F) e := by
+  dsimp only [RealDat3.toCx3, RealDat3.withErr, reErr]
+  rfl
+
+private theorem errOf_data_reErr {K : Type} [Field K] [NumberField K] [StarRing K]
+    {Bs : DefBase K} {Am : DefAmb Bs} (X : CxData Am) (e : type_of% X.err0)
+    {fc : DefSub Am → DefFace Bs} (cr : Crd Am fc) (w : HeightOneSpectrum (𝓞 K)) :
+    errOf ((reErr X e).data cr false) (fc (reErr X e).zs).Z.F0 w =
+      errOf (X.data cr false) (fc X.zs).Z.F0 w := by
+  dsimp only [errOf, IndefData.Iw, CxData.data, CxData.liftMat, CxData.liftMatC, CxData.tC,
+    CxData.w0C, CxData.wC, CxData.zs, CxData.Z, CxData.Zl, reErr]
+  rfl
+
+
 theorem reFace_errEq (R : RealDat3 D A3 Ks) (F : Face3 D A3)
     (Dc : ∀ Zs : DefSub A3.fam3.amb3, DefCols (A3.side3 F.P1 F.ψ1 Zs)) (Sp : ∀ Zs, SPer (Dc Zs))
     (Zsc : DefSub A3.fam3.amb3 → IndefScale A3.fam3.base3) :
-    ErrEq (R.withErr (reFaceErr R F Dc Sp Zsc)) (reFace F Dc Sp Zsc) := fun _ _ => rfl
+    ErrEq (R.withErr (reFaceErr R F Dc Sp Zsc)) (reFace F Dc Sp Zsc) := by
+  intro w j
+  let F' := reFace F Dc Sp Zsc
+  let e := reFaceErr R F Dc Sp Zsc
+  change e w j = errOf (((R.withErr e).toCx3 F').data F'.cr false)
+    (F'.fc ((R.withErr e).toCx3 F').zs).Z.F0 w
+  rw [toCx3_withErr, toCx3_reFace, errOf_data_reErr]
+  rfl
 
 
 
