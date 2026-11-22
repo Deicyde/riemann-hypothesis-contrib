@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-25",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/DiscreteSubgroupCountableAndExistsStrictFundamen.lean",
+          "stages": {
+            "1": "2132346eeb29762674809747a5efee354de1e866",
+            "2": "b5b62c5789893ba176640db48fffd26fd574ac3a",
+            "3": "e3135887472e84ecb2f316ca157b465994dbdba6"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "c59eab264d5bd2678887b515db39700fd96fec31",
+      "checkpoint_head": "52bcf5b90d1ab5782912f1805d6b6093d38c06f4"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
