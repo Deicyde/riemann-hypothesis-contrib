@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/KummerResidueMemAdjoinUnit.lean",
+      "stages": {
+        "1": "f1f858d194bd4bbf7863a3a1a8685afb176981ea",
+        "2": "dc252b388f1b30717b094c1946c9f5d12ee1d32d",
+        "3": "c26956b7551bda67ab29408f1aef518c50693d88"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "6b0bec050cb8bafebf9c51b13e24f420f88ffb26",
+  "checkpoint_head": "d96ba682c2f7637fc78e3c6e0e8767e475bedb3c"
+}
